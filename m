@@ -1,110 +1,114 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-we0-f170.google.com ([74.125.82.170]:56883 "EHLO
-	mail-we0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1759240Ab3DIMDA (ORCPT
+Received: from us01smtp2.synopsys.com ([198.182.44.80]:46074 "EHLO
+	kiruna.synopsys.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1760402Ab3DINh0 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 9 Apr 2013 08:03:00 -0400
-Received: by mail-we0-f170.google.com with SMTP id z2so5417687wey.29
-        for <linux-kbuild@vger.kernel.org>; Tue, 09 Apr 2013 05:02:59 -0700 (PDT)
-Date: Tue, 9 Apr 2013 14:02:54 +0200
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH] kconfig: do randomise choice entries in presence of
- KCONFIG_ALLCONFIG
-Message-ID: <20130409120254.GA6418@free.fr>
-References: <20130227214102.6d63544d@skate>
- <1362931313-31829-1-git-send-email-yann.morin.1998@free.fr>
- <20130408115235.GA7741@free.fr>
+	Tue, 9 Apr 2013 09:37:26 -0400
+Message-ID: <51641986.4070904@synopsys.com>
+Date: Tue, 9 Apr 2013 19:07:10 +0530
+From: Vineet Gupta <Vineet.Gupta1@synopsys.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20130408115235.GA7741@free.fr>
+Subject: Re: [PATCH] Kbuild: Avoid DTB rebuilds if source files are untouched
+References: <1364973141-16354-1-git-send-email-vgupta@synopsys.com> <515BD6B8.1020607@synopsys.com> <515C5652.8070705@wwwdotorg.org> <515D0FFB.4030803@synopsys.com> <515DBA0E.6000604@wwwdotorg.org>
+In-Reply-To: <515DBA0E.6000604@wwwdotorg.org>
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Michal Marek <mmarek@suse.cz>, Sam Ravnborg <sam@ravnborg.org>, Arnaud Lacombe <lacombar@gmail.com>, Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+To: Stephen Warren <swarren@wwwdotorg.org>
+Cc: James Hogan <james.hogan@imgtec.com>, "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Stephen Warren <swarren@nvidia.com>, Grant Likely <grant.likely@secretlab.ca>, linux-kbuild@vger.kernel.org
 
-On Mon, Apr 08, 2013 at 01:52:35PM +0200, Yann E. MORIN wrote:
-> On Sun, Mar 10, 2013 at 05:01:53PM +0100, Yann E. MORIN wrote:
-> > Currently, randconfig does randomise choice entries, unless KCONFIG_ALLCONFIG
-> > is specified.
-[--SNIP--]
-> Although this patch does fix the suggested test-case, there are more
-> complex situations where this patch is not enough. (I need to shrink down
-> the currently failing Kconfig file to the smallest possible test-case).
+On 04/04/2013 11:06 PM, Stephen Warren wrote:
+>
+>> Technically .SECONDARY is better - however it doesn't seem to work.
+> Hmmm. It does for me.
+>
+> $ make --version
+> GNU Make 3.81
 
-Here is a newer, worse test-case (with my patch applied ontop Michal's
-kbuild/kconfig tree):
+Same tools here !
 
----8<--- config.in
-    config A
-        bool "A"
-    
-    if A
-    choice
-        bool "B/C"
-    config B
-        bool "B"
-    config C
-        bool "C"
-    endchoice
-    endif # A
-    
-    if B
-    choice
-        bool "D/E"
-    config D
-        bool "D"
-    config E
-        bool "E"
-    endchoice
-    endif # B
----8<---
+$ make -v
+GNU Make 3.81
 
-With an empty './defconfig' file:
-    KCONFIG_ALLCONFIG=defconfig conf --randconfig config.in
-will sometime emit a .config with *both* B=y and C=y although they are
-mutually exclusive, being in a choice block.
 
-However, if the two choices are inverted:
+> I hacked the ARM makefiles as follows:
+>
+> diff --git a/arch/arm/Makefile b/arch/arm/Makefile
+> index 4737408..70247c6 100644
+> --- a/arch/arm/Makefile
+> +++ b/arch/arm/Makefile
+> @@ -256,6 +256,7 @@ core-y                              +=
+> arch/arm/kernel/ arch/arm/mm/ arch/arm/common/
+>  core-y                         += arch/arm/net/
+>  core-y                         += arch/arm/crypto/
+>  core-y                         += $(machdirs) $(platdirs)
+> +core-y                         += arch/arm/boot/dts/
+>
+>  drivers-$(CONFIG_OPROFILE)      += arch/arm/oprofile/
+>
+> diff --git a/arch/arm/boot/dts/Makefile b/arch/arm/boot/dts/Makefile
+> index dedca49..af2202e 100644
+> --- a/arch/arm/boot/dts/Makefile
+> +++ b/arch/arm/boot/dts/Makefile
+> @@ -197,3 +197,5 @@ dtbs: $(addprefix $(obj)/, $(dtb-y))
+>         $(Q)rm -f $(obj)/../*.dtb
+>
+>  clean-files := *.dtb
+> +
+> +obj-y += tegra20-test.dtb.o
+>
+> and manually created a tegra20-test.dts. For reasons I didn't bother
+> investigating, the .dtb.S -> .dtb.o conversion failed with syntax
+> errors, and because the .dtb.S file was an intermediate file, make rm's
+> it in this case. That's exactly the issue you're seeing.
+>
+> I then added the following to Makefile.lib:
+>
+> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+> index a0ab6d7..fc11a67 100644
+> --- a/scripts/Makefile.lib
+> +++ b/scripts/Makefile.lib
+> @@ -258,6 +258,8 @@ cmd_dt_S_dtb=
+>         \
+>         echo '.balign STRUCT_ALIGNMENT';                \
+>  ) > $@
+>
+> +.SECONDARY: $(obj)/%.dtb.S
+> +
+>  $(obj)/%.dtb.S: $(obj)/%.dtb
+>         $(call cmd,dt_S_dtb)
+>
+> and no longer see make rm'ing the .dtb.S file. So, the .SECONDARY is
+> behaving as expected, and should fix your problem.
 
----8<--- config.in
-    config A
-        bool "A"
-    
-    if B
-    choice
-        bool "D/E"
-    config D
-        bool "D"
-    config E
-        bool "E"
-    endchoice
-    endif # B
-    
-    if A
-    choice
-        bool "B/C"
-    config B
-        bool "B"
-    config C
-        bool "C"
-    endchoice
-    endif # A
----8<---
+Nope, doesn't work for me. The slight difference in build system could be that ARC
+as of now only supports vmlinux embedded dtbs (so that likely changes what is
+intermediate from make's perspective and what is not).
 
-Then --randconfig will properly randomise *both* choices!
+James, I remeber u once mentioned the rm of *.dtb.S file for metag as well - can
+you please try adding the .secondary/.precious to makefile.lib to confirm what
+fixes deletion of intermediate .S files for you.
 
-Note: if my patch is not applied, then only B will ever be selected, and
-C will never be.
+> One other problem this highlighted: Unless you also mark the generated
+> .dtb file as PRECIOUS/SECONDARY (or unless that DTB is included in
+> targets for some reason) then make also rm's that, since it considers it
+> intermediate:
+>
+>   DTC     arch/arm/boot/dts/tegra20-test.dtb
+>   DTB    arch/arm/boot/dts/tegra20-test.dtb.S
+>   AS      arch/arm/boot/dts/tegra20-test.dtb.o
+> [error]
+> rm arch/arm/boot/dts/tegra20-test.dtb
+>
+> So, your patch would probably need modification to apply the fix to
+> *.dtb too, since they might also be intermediate?
+>
+> Perhaps add something like the following to arch/arc/boot/dts/Makefile?
+>
+> .SECONDARY: $(obj)/$(builtindtb-y).dtb
 
-Regards,
-Yann E. MORIN.
+angel4.dtb is not deleted in my case.
+If you add tegra20-test.dtb to targets (just as I do in dts/Makefile) what do u see !
 
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+-Vineet
