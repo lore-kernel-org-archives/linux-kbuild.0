@@ -1,51 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ie0-f173.google.com ([209.85.223.173]:37955 "EHLO
-	mail-ie0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S936017Ab3DKSEc (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 11 Apr 2013 14:04:32 -0400
+Received: from cantor2.suse.de ([195.135.220.15]:35944 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752491Ab3DKTUX (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 11 Apr 2013 15:20:23 -0400
+Message-ID: <51670CF4.9050700@suse.cz>
+Date: Thu, 11 Apr 2013 21:20:20 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <20130410152229.GC17541@sepie.suse.cz>
-References: <1365585879-5321-1-git-send-email-geert@linux-m68k.org>
-	<51653C5D.4060408@suse.cz>
-	<CAMuHMdXEvLMz5rRjQrhENxJ6UHRnPCtzyNg=hqitspuY88G7sA@mail.gmail.com>
-	<20130410122611.GB17541@sepie.suse.cz>
-	<CAMuHMdUHiiBEZm7eFYtL3PqCXF6PjscbFKjiJ33BEwQ+YLKOXQ@mail.gmail.com>
-	<20130410152229.GC17541@sepie.suse.cz>
-Date: Thu, 11 Apr 2013 20:04:31 +0200
-Message-ID: <CAMuHMdXJWo=R28rexHJZGof==CgEa0gbC3yr18iPs-tAkv2FZQ@mail.gmail.com>
-Subject: Re: [PATCH/RFC] m68k: Add -ffreestanding to KBUILD_CFLAGS
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH 3/3] convert headers_install.pl to headers_install.sh
+References: <1365697510.18069.78@driftwood>
+In-Reply-To: <1365697510.18069.78@driftwood>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-m68k <linux-m68k@lists.linux-m68k.org>, Linux-Arch <linux-arch@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Andi Kleen <andi@firstfloor.org>
+To: Rob Landley <rob@landley.net>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, Josh Boyer <jwboyer@redhat.com>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Andrew Morton <akpm@linux-foundation.org>, David Howells <dhowell@redhat.com>, Sam Ravnborg <sam@ravnborg.org>
 
-On Wed, Apr 10, 2013 at 5:22 PM, Michal Marek <mmarek@suse.cz> wrote:
-> Subject: [PATCH] m68k: Remove inline strlen() implementation
->
-> GCC can replace a strncat() call with constant second argument into a
-> strlen + store, which results in a link error:
->
-> ERROR: "strlen" [net/ipv4/ip_tunnel.ko] undefined!
->
-> The inline function is a simple for loop in C. Other architectures
-> either use an asm optimized variant, or use the generic function from
-> lib/string.c.
->
-> Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
-> Signed-off-by: Michal Marek <mmarek@suse.cz>
+Dne 11.4.2013 18:25, Rob Landley napsal(a):
+> On 04/09/2013 05:52:32 AM, Michal Marek wrote:
+>> I forgot to do it right after rc1, but I took the patch from the mm tree
+>> now. I also added Sam's Ack from the earlier submission.
+> 
+> Yay!
+> 
+> Is this for 3.10?
 
-Thanks, this one works. Let me do some measurements...
+Yes. The kbuild, kconfig, misc and trivial branches of kbuild.git
+contain changes for the next merge window (next -rc1). The rc-fixes
+branch is for the current rc phase.
 
-Gr{oetje,eeting}s,
+Michal
 
-                        Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
