@@ -1,62 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ie0-f175.google.com ([209.85.223.175]:61534 "EHLO
-	mail-ie0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754567Ab3DKQZP convert rfc822-to-8bit (ORCPT
+Received: from mail-ie0-f173.google.com ([209.85.223.173]:37955 "EHLO
+	mail-ie0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S936017Ab3DKSEc (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 11 Apr 2013 12:25:15 -0400
-Received: by mail-ie0-f175.google.com with SMTP id c12so2272041ieb.34
-        for <linux-kbuild@vger.kernel.org>; Thu, 11 Apr 2013 09:25:14 -0700 (PDT)
-Date: Thu, 11 Apr 2013 11:25:10 -0500
-From: Rob Landley <rob@landley.net>
-Subject: Re: [PATCH 3/3] convert headers_install.pl to headers_install.sh
-In-Reply-To: <5163F2F0.1070405@suse.cz> (from mmarek@suse.cz on Tue Apr  9
-	05:52:32 2013)
-Message-Id: <1365697510.18069.78@driftwood>
+	Thu, 11 Apr 2013 14:04:32 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; DelSp=Yes; Format=Flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: 8BIT
+In-Reply-To: <20130410152229.GC17541@sepie.suse.cz>
+References: <1365585879-5321-1-git-send-email-geert@linux-m68k.org>
+	<51653C5D.4060408@suse.cz>
+	<CAMuHMdXEvLMz5rRjQrhENxJ6UHRnPCtzyNg=hqitspuY88G7sA@mail.gmail.com>
+	<20130410122611.GB17541@sepie.suse.cz>
+	<CAMuHMdUHiiBEZm7eFYtL3PqCXF6PjscbFKjiJ33BEwQ+YLKOXQ@mail.gmail.com>
+	<20130410152229.GC17541@sepie.suse.cz>
+Date: Thu, 11 Apr 2013 20:04:31 +0200
+Message-ID: <CAMuHMdXJWo=R28rexHJZGof==CgEa0gbC3yr18iPs-tAkv2FZQ@mail.gmail.com>
+Subject: Re: [PATCH/RFC] m68k: Add -ffreestanding to KBUILD_CFLAGS
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, Josh Boyer <jwboyer@redhat.com>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Andrew Morton <akpm@linux-foundation.org>, David Howells <dhowell@redhat.com>, Sam Ravnborg <sam@ravnborg.org>
+Cc: linux-m68k <linux-m68k@lists.linux-m68k.org>, Linux-Arch <linux-arch@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Andi Kleen <andi@firstfloor.org>
 
-On 04/09/2013 05:52:32 AM, Michal Marek wrote:
-> On 28.2.2013 09:19, Michal Marek wrote:
-> > On 27.2.2013 06:58, Rob Landley wrote:
-> >> From: Rob Landley <rob@landley.net>
-> >>
-> >> Remove perl from make headers_install by replacing a perl script  
-> (doing
-> >> a simple regex search and replace) with a smaller, faster, simpler,
-> >> POSIX-2008 shell script implementation.  The new shell script is a  
-> single
-> >> for loop calling sed and piping its output through unifdef to  
-> produce the
-> >> target file.
-> >>
-> >> Same as last time except for minor tweak to deal with code review  
-> from here:
-> >> http://lkml.indiana.edu/hypermail/linux/kernel/1302.3/00078.html
-> >>
-> >> (Note that this drops the "arch" argument, which isn't used. Kbuild
-> >> already points to the right input files on the command line.)
-> >>
-> >> Signed-off-by: Rob Landley <rob@landley.net>
-> >
-> > Looks good, I will apply it after v3.9-rc1 is out.
-> 
-> I forgot to do it right after rc1, but I took the patch from the mm  
-> tree
-> now. I also added Sam's Ack from the earlier submission.
-> 
-> Michal
+On Wed, Apr 10, 2013 at 5:22 PM, Michal Marek <mmarek@suse.cz> wrote:
+> Subject: [PATCH] m68k: Remove inline strlen() implementation
+>
+> GCC can replace a strncat() call with constant second argument into a
+> strlen + store, which results in a link error:
+>
+> ERROR: "strlen" [net/ipv4/ip_tunnel.ko] undefined!
+>
+> The inline function is a simple for loop in C. Other architectures
+> either use an asm optimized variant, or use the generic function from
+> lib/string.c.
+>
+> Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
+> Signed-off-by: Michal Marek <mmarek@suse.cz>
 
-Yay!
+Thanks, this one works. Let me do some measurements...
 
-Is this for 3.10? (Not seeing it in Linus's tree now, and -rc7 seems a  
-bit late for anything to go in...)
+Gr{oetje,eeting}s,
 
-Thanks,
+                        Geert
 
-Rob
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
