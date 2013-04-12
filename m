@@ -1,45 +1,97 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from us02smtp1.synopsys.com ([198.182.60.75]:41336 "EHLO
-	vaxjo.synopsys.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753540Ab3DLHkj (ORCPT
+Received: from mail-ia0-f177.google.com ([209.85.210.177]:42422 "EHLO
+	mail-ia0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752680Ab3DLTrt (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 12 Apr 2013 03:40:39 -0400
-Message-ID: <5167BA67.5080403@synopsys.com>
-Date: Fri, 12 Apr 2013 13:10:23 +0530
-From: Vineet Gupta <Vineet.Gupta1@synopsys.com>
+	Fri, 12 Apr 2013 15:47:49 -0400
 MIME-Version: 1.0
-Subject: Re: [PATCH] Kbuild: Avoid DTB rebuilds if source files are untouched
-References: <1364973141-16354-1-git-send-email-vgupta@synopsys.com> <515BD6B8.1020607@synopsys.com> <515C5652.8070705@wwwdotorg.org> <515D0FFB.4030803@synopsys.com> <515DBA0E.6000604@wwwdotorg.org> <51642158.3070205@synopsys.com>
-In-Reply-To: <51642158.3070205@synopsys.com>
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <CAMuHMdXJWo=R28rexHJZGof==CgEa0gbC3yr18iPs-tAkv2FZQ@mail.gmail.com>
+References: <1365585879-5321-1-git-send-email-geert@linux-m68k.org>
+	<51653C5D.4060408@suse.cz>
+	<CAMuHMdXEvLMz5rRjQrhENxJ6UHRnPCtzyNg=hqitspuY88G7sA@mail.gmail.com>
+	<20130410122611.GB17541@sepie.suse.cz>
+	<CAMuHMdUHiiBEZm7eFYtL3PqCXF6PjscbFKjiJ33BEwQ+YLKOXQ@mail.gmail.com>
+	<20130410152229.GC17541@sepie.suse.cz>
+	<CAMuHMdXJWo=R28rexHJZGof==CgEa0gbC3yr18iPs-tAkv2FZQ@mail.gmail.com>
+Date: Fri, 12 Apr 2013 21:47:46 +0200
+Message-ID: <CAMuHMdXTKTVb_QLUn3xuA0tMThxC1mR331jU4O11dG4rNyWzRw@mail.gmail.com>
+Subject: Re: [PATCH/RFC] m68k: Add -ffreestanding to KBUILD_CFLAGS
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Stephen Warren <swarren@wwwdotorg.org>
-Cc: "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Stephen Warren <swarren@nvidia.com>, Grant Likely <grant.likely@secretlab.ca>, linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-m68k <linux-m68k@lists.linux-m68k.org>, Linux-Arch <linux-arch@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Andi Kleen <andi@firstfloor.org>
 
-On 04/09/2013 07:40 PM, Vineet Gupta wrote:
-> On 04/04/2013 11:06 PM, Stephen Warren wrote:
->
->> +.SECONDARY: $(obj)/%.dtb.S
->> +
->>  $(obj)/%.dtb.S: $(obj)/%.dtb
->>         $(call cmd,dt_S_dtb)
+On Thu, Apr 11, 2013 at 8:04 PM, Geert Uytterhoeven
+<geert@linux-m68k.org> wrote:
+> On Wed, Apr 10, 2013 at 5:22 PM, Michal Marek <mmarek@suse.cz> wrote:
+>> Subject: [PATCH] m68k: Remove inline strlen() implementation
 >>
->> and no longer see make rm'ing the .dtb.S file. So, the .SECONDARY is
->> behaving as expected, and should fix your problem.
-> Interestingly, if I make the file name explicit, .SECONDARY works for me too.
+>> GCC can replace a strncat() call with constant second argument into a
+>> strlen + store, which results in a link error:
+>>
+>> ERROR: "strlen" [net/ipv4/ip_tunnel.ko] undefined!
+>>
+>> The inline function is a simple for loop in C. Other architectures
+>> either use an asm optimized variant, or use the generic function from
+>> lib/string.c.
+>>
+>> Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
+>> Signed-off-by: Michal Marek <mmarek@suse.cz>
 >
-> .SECONDARY: $(obj)/angel4.dtb.S
+> Thanks, this one works. Let me do some measurements...
+
+No visible impact on size for a typical build; the increase in .text
+is offset by
+the decrease in .data:
+
+-      .text : 0x00001000 - 0x002aab64   (2727 KiB)
+-      .data : 0x002ad938 - 0x00392148   ( 915 KiB)
++      .text : 0x00001000 - 0x002aac74   (2728 KiB)
++      .data : 0x002ada48 - 0x00392148   ( 914 KiB)
+
+On Wed, Apr 10, 2013 at 5:22 PM, Michal Marek <mmarek@suse.cz> wrote:
+> On Wed, Apr 10, 2013 at 04:19:14PM +0200, Geert Uytterhoeven wrote:
+>> Thanks for the patch, but modpost still fails with
+>>
+>> ERROR: "strlen" [net/ipv4/ip_tunnel.ko] undefined!
 >
-> http://stackoverflow.com/questions/5426934/why-this-makefile-removes-my-goal
+> OK OK, I am convinced. Then how about this? If you prefer speed over
+> size, the the other option is to add
 >
-> Is this a make bug or is it related to when the rule is parsed by make !
+> size_t strlen(const char *s)
+> {
+>        return __kernel_strlen(s);
+> }
+> EXPORT_SYMBOL(strlen);
 >
-> -Vineet
+> to arch/m68k/lib/string.c.
 
-Ping ? Anyone know how to resolve this
+Interestingly, this also doesn't work. It turns out none of the
+symbols defined in
+this file (currently strcpy and strcat) end up in vmlinux.
 
--Vineet
+As we've been stripping code from string.c, we've been left with just
+a few symbols
+that are typically never referenced, so the whole string.o in
+arch/m68k/lib/lib.a
+is not included in the final vmlinux.
 
+So more stringectomy to do...
 
+> On a related note, arch/m68k/lib/string.c is
+> built only in the CONFIG_MMU case, whereas asm/string.h is shared.
+
+So due to the above, this difference is mostly moot ;-)
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
