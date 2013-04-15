@@ -1,61 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from avon.wwwdotorg.org ([70.85.31.133]:45630 "EHLO
-	avon.wwwdotorg.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752729Ab3DORMd (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 15 Apr 2013 13:12:33 -0400
-Message-ID: <516C34FD.6090705@wwwdotorg.org>
-Date: Mon, 15 Apr 2013 11:12:29 -0600
-From: Stephen Warren <swarren@wwwdotorg.org>
-MIME-Version: 1.0
-Subject: Re: [PATCH] Kbuild: Avoid DTB rebuilds if source files are untouched
-References: <1364973141-16354-1-git-send-email-vgupta@synopsys.com> <515BD6B8.1020607@synopsys.com> <515C5652.8070705@wwwdotorg.org> <515D0FFB.4030803@synopsys.com> <515DBA0E.6000604@wwwdotorg.org> <51642158.3070205@synopsys.com> <5167BA67.5080403@synopsys.com> <5168822C.6040303@wwwdotorg.org> <516C07AC.6070608@synopsys.com>
-In-Reply-To: <516C07AC.6070608@synopsys.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Received: from cantor2.suse.de ([195.135.220.15]:37504 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755547Ab3DOUfT (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 15 Apr 2013 16:35:19 -0400
+From: Michal Marek <mmarek@suse.cz>
+Subject: [PATCH 1/4] rpm-pkg: Do not package the whole source directory
+Date: Mon, 15 Apr 2013 22:35:05 +0200
+Message-Id: <1366058108-3500-1-git-send-email-mmarek@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Vineet Gupta <Vineet.Gupta1@synopsys.com>
-Cc: "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Stephen Warren <swarren@nvidia.com>, Grant Likely <grant.likely@secretlab.ca>, linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>
+To: linux-kbuild@vger.kernel.org
+Cc: jkosina@suse.cz, linux-kernel@vger.kernel.org
 
-On 04/15/2013 07:59 AM, Vineet Gupta wrote:
-> On 04/13/2013 03:22 AM, Stephen Warren wrote:
->>
->> After installing the ARC toolchain (which was a bit painful to track
->> down and install...) 
-> 
-> Sorry about that - we have a buildroot based distro about to be pushed upstream -
-> that would make it easier.
-> 
->> I reproduced your exact problem. I believe the
->> patch below fixes it:
->>
->> diff --git a/arch/arc/boot/dts/Makefile b/arch/arc/boot/dts/Makefile
->> index 5776835..2f2cf23 100644
->> --- a/arch/arc/boot/dts/Makefile
->> +++ b/arch/arc/boot/dts/Makefile
->> @@ -8,6 +8,8 @@ endif
->>  obj-y   += $(builtindtb-y).dtb.o
->>  targets += $(builtindtb-y).dtb
->>
->> +.SECONDARY: $(obj)/$(builtindtb-y).dtb.S
->> +
->>  dtbs:  $(addprefix  $(obj)/, $(builtindtb-y).dtb)
->>
->>  clean-files := *.dtb
-> 
-> Indeed it does - I fell stupid why this didn't occur to me. But given that you
-> have dealt with the dtb Makefile stuff alot more than I have :-) do you know why
-> it was not working when put in Makefile.lib because I feel a few other arches also
-> suffer from the same issue and would need similar fixes.
+The source tree can contain lots of uninteresting data like tag or
+cscope files, packaging which slows down make rpm needlessly. It can
+also break the build, if the tree contains an unrelated file named
+*.spec. The downside of this change is that new subdirectories have to
+be added to the KBUILD_ALLDIR variable in the top-level Makefile. The
+upside is that the behavior is more predictable.
 
-Searching in Google implies that .SECONDARY doesn't work with wildcards
-(%.dtb.S for example), whereas .PRECIOUS does. Seems like perhaps a bug
-in make to me, but who knows. Perhaps that's why?
+Signed-off-by: Michal Marek <mmarek@suse.cz>
+---
+ Makefile                 |    2 ++
+ scripts/package/Makefile |    6 +++++-
+ 2 files changed, 7 insertions(+), 1 deletions(-)
 
-> Anyhow, for the patch, I can manually add --author="you" but it'll still lack your
-> SOB - you OK with that or do you want to send a formal patch.
+diff --git a/Makefile b/Makefile
+index 5bd9f770..84392df 100644
+--- a/Makefile
++++ b/Makefile
+@@ -756,6 +756,8 @@ export KBUILD_VMLINUX_INIT := $(head-y) $(init-y)
+ export KBUILD_VMLINUX_MAIN := $(core-y) $(libs-y) $(drivers-y) $(net-y)
+ export KBUILD_LDS          := arch/$(SRCARCH)/kernel/vmlinux.lds
+ export LDFLAGS_vmlinux
++# used by scripts/pacmage/Makefile
++export KBUILD_ALLDIRS := $(sort $(filter-out arch/%,$(vmlinux-alldirs)) arch Documentation include samples scripts tools virt)
+ 
+ vmlinux-deps := $(KBUILD_LDS) $(KBUILD_VMLINUX_INIT) $(KBUILD_VMLINUX_MAIN)
+ 
+diff --git a/scripts/package/Makefile b/scripts/package/Makefile
+index d7b3285..b70b33e 100644
+--- a/scripts/package/Makefile
++++ b/scripts/package/Makefile
+@@ -27,6 +27,10 @@ RPM := $(shell if [ -x "/usr/bin/rpmbuild" ]; then echo rpmbuild; \
+ 
+ # Remove hyphens since they have special meaning in RPM filenames
+ KERNELPATH := kernel-$(subst -,_,$(KERNELRELEASE))
++# Include only those top-level files that are needed by make, plus the GPL copy
++TAR_CONTENT := $(KBUILD_ALLDIRS) kernel.spec .config .scmversion Makefile \
++               Kbuild Kconfig COPYING $(wildcard localversion*)
++TAR_CONTENT := $(addprefix $(KERNELPATH)/,$(TAR_CONTENT))
+ MKSPEC     := $(srctree)/scripts/package/mkspec
+ PREV       := set -e; cd -P ..;
+ 
+@@ -45,7 +49,7 @@ rpm-pkg rpm: $(objtree)/kernel.spec FORCE
+ 	$(MAKE) clean
+ 	$(PREV) ln -sf $(srctree) $(KERNELPATH)
+ 	$(CONFIG_SHELL) $(srctree)/scripts/setlocalversion --save-scmversion
+-	$(PREV) tar -cz $(RCS_TAR_IGNORE) -f $(KERNELPATH).tar.gz $(KERNELPATH)/.
++	$(PREV) tar -cz $(RCS_TAR_IGNORE) -f $(KERNELPATH).tar.gz $(TAR_CONTENT)
+ 	$(PREV) rm $(KERNELPATH)
+ 	rm -f $(objtree)/.scmversion
+ 	set -e; \
+-- 
+1.7.3.1
 
-Sure, you can either just say Suggested-by: for me, or apply my s-o-b below:
-
-Signed-off-by: Stephen Warren <swarren@nvidia.com>
