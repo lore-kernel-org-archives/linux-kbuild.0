@@ -1,71 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qe0-f48.google.com ([209.85.128.48]:34633 "EHLO
-	mail-qe0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752650Ab3DOOOU (ORCPT
+Received: from avon.wwwdotorg.org ([70.85.31.133]:45630 "EHLO
+	avon.wwwdotorg.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752729Ab3DORMd (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 15 Apr 2013 10:14:20 -0400
-From: Benjamin Poirier <bpoirier@suse.de>
-Subject: [PATCH 1/2] menuconfig: Fix memory leak introduced by jump keys feature
-Date: Mon, 15 Apr 2013 10:13:50 -0400
-Message-Id: <1366035231-24370-1-git-send-email-bpoirier@suse.de>
+	Mon, 15 Apr 2013 13:12:33 -0400
+Message-ID: <516C34FD.6090705@wwwdotorg.org>
+Date: Mon, 15 Apr 2013 11:12:29 -0600
+From: Stephen Warren <swarren@wwwdotorg.org>
+MIME-Version: 1.0
+Subject: Re: [PATCH] Kbuild: Avoid DTB rebuilds if source files are untouched
+References: <1364973141-16354-1-git-send-email-vgupta@synopsys.com> <515BD6B8.1020607@synopsys.com> <515C5652.8070705@wwwdotorg.org> <515D0FFB.4030803@synopsys.com> <515DBA0E.6000604@wwwdotorg.org> <51642158.3070205@synopsys.com> <5167BA67.5080403@synopsys.com> <5168822C.6040303@wwwdotorg.org> <516C07AC.6070608@synopsys.com>
+In-Reply-To: <516C07AC.6070608@synopsys.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, Wang YanQing <udknight@gmail.com>, Dirk Gouders <gouders@et.bocholt.fh-gelsenkirchen.de>, Paul Gortmaker <paul.gortmaker@windriver.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Vineet Gupta <Vineet.Gupta1@synopsys.com>
+Cc: "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Stephen Warren <swarren@nvidia.com>, Grant Likely <grant.likely@secretlab.ca>, linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>
 
-Fixes the memory leak of struct jump_key allocated in get_prompt_str()
+On 04/15/2013 07:59 AM, Vineet Gupta wrote:
+> On 04/13/2013 03:22 AM, Stephen Warren wrote:
+>>
+>> After installing the ARC toolchain (which was a bit painful to track
+>> down and install...) 
+> 
+> Sorry about that - we have a buildroot based distro about to be pushed upstream -
+> that would make it easier.
+> 
+>> I reproduced your exact problem. I believe the
+>> patch below fixes it:
+>>
+>> diff --git a/arch/arc/boot/dts/Makefile b/arch/arc/boot/dts/Makefile
+>> index 5776835..2f2cf23 100644
+>> --- a/arch/arc/boot/dts/Makefile
+>> +++ b/arch/arc/boot/dts/Makefile
+>> @@ -8,6 +8,8 @@ endif
+>>  obj-y   += $(builtindtb-y).dtb.o
+>>  targets += $(builtindtb-y).dtb
+>>
+>> +.SECONDARY: $(obj)/$(builtindtb-y).dtb.S
+>> +
+>>  dtbs:  $(addprefix  $(obj)/, $(builtindtb-y).dtb)
+>>
+>>  clean-files := *.dtb
+> 
+> Indeed it does - I fell stupid why this didn't occur to me. But given that you
+> have dealt with the dtb Makefile stuff alot more than I have :-) do you know why
+> it was not working when put in Makefile.lib because I feel a few other arches also
+> suffer from the same issue and would need similar fixes.
 
-Signed-off-by: Benjamin Poirier <bpoirier@suse.de>
----
- scripts/kconfig/list.h  |   13 +++++++++++++
- scripts/kconfig/mconf.c |    3 +++
- 2 files changed, 16 insertions(+)
+Searching in Google implies that .SECONDARY doesn't work with wildcards
+(%.dtb.S for example), whereas .PRECIOUS does. Seems like perhaps a bug
+in make to me, but who knows. Perhaps that's why?
 
-diff --git a/scripts/kconfig/list.h b/scripts/kconfig/list.h
-index 0ae730b..b87206c 100644
---- a/scripts/kconfig/list.h
-+++ b/scripts/kconfig/list.h
-@@ -51,6 +51,19 @@ struct list_head {
- 	     pos = list_entry(pos->member.next, typeof(*pos), member))
- 
- /**
-+ * list_for_each_entry_safe - iterate over list of given type safe against removal of list entry
-+ * @pos:	the type * to use as a loop cursor.
-+ * @n:		another type * to use as temporary storage
-+ * @head:	the head for your list.
-+ * @member:	the name of the list_struct within the struct.
-+ */
-+#define list_for_each_entry_safe(pos, n, head, member)			\
-+	for (pos = list_entry((head)->next, typeof(*pos), member),	\
-+		n = list_entry(pos->member.next, typeof(*pos), member);	\
-+	     &pos->member != (head);					\
-+	     pos = n, n = list_entry(n->member.next, typeof(*n), member))
-+
-+/**
-  * list_empty - tests whether a list is empty
-  * @head: the list to test.
-  */
-diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
-index 566288a..c5418d6 100644
---- a/scripts/kconfig/mconf.c
-+++ b/scripts/kconfig/mconf.c
-@@ -389,6 +389,7 @@ again:
- 			.targets = targets,
- 			.keys = keys,
- 		};
-+		struct jump_key *pos, *tmp;
- 
- 		res = get_relations_str(sym_arr, &head);
- 		dres = show_textbox_ext(_("Search Results"), (char *)
-@@ -402,6 +403,8 @@ again:
- 				again = true;
- 			}
- 		str_free(&res);
-+		list_for_each_entry_safe(pos, tmp, &head, entries)
-+			free(pos);
- 	} while (again);
- 	free(sym_arr);
- 	str_free(&title);
--- 
-1.7.10.4
+> Anyhow, for the patch, I can manually add --author="you" but it'll still lack your
+> SOB - you OK with that or do you want to send a formal patch.
 
+Sure, you can either just say Suggested-by: for me, or apply my s-o-b below:
+
+Signed-off-by: Stephen Warren <swarren@nvidia.com>
