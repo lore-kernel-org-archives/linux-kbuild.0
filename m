@@ -1,32 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:51283 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:56949 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751105Ab3DPJMn (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 16 Apr 2013 05:12:43 -0400
-Message-ID: <516D1609.6020500@suse.cz>
-Date: Tue, 16 Apr 2013 11:12:41 +0200
+	id S1753716Ab3DPL0D (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 16 Apr 2013 07:26:03 -0400
+Date: Tue, 16 Apr 2013 13:25:54 +0200
 From: Michal Marek <mmarek@suse.cz>
+Subject: [GIT] kbuild fix for v3.9
+Message-ID: <20130416112554.GA18585@sepie.suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH 1/2] menuconfig: Fix memory leak introduced by jump keys
- feature
-References: <1366035231-24370-1-git-send-email-bpoirier@suse.de> <20130415215432.GB12519@free.fr> <516D0A1B.1010704@suse.cz>
-In-Reply-To: <516D0A1B.1010704@suse.cz>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: Benjamin Poirier <bpoirier@suse.de>, Wang YanQing <udknight@gmail.com>, Dirk Gouders <gouders@et.bocholt.fh-gelsenkirchen.de>, Paul Gortmaker <paul.gortmaker@windriver.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: schwab@linux-m68k.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 16.4.2013 10:21, Michal Marek wrote:
-> On 15.4.2013 23:54, Yann E. MORIN wrote:
->> So, unless Michal really wants to pull this one and push it to Linus
->> before he cuts v3.9 final, I'll merge this later in my -for-next branch.
-> 
-> That's fine with me.
+Hi Linus,
 
-BTW, in you are going to rebase the commit, it would be good idea to add
-Cc: <stable@vger.kernel.org> to the changelog.
+please pull this fix for a missing dependency when generating
+scripts/mod/devicetable-offsets.h. This dependency got introduced in
+v3.9-rc1.
 
 Thanks,
 Michal
+
+The following changes since commit 6dbe51c251a327e012439c4772097a13df43c5b8:
+
+  Linux 3.9-rc1 (2013-03-03 15:11:05 -0800)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git rc-fixes
+
+for you to fetch changes up to a54292f58fc16e3d09aecea16de3e58a898dde97:
+
+  kbuild: generate generic headers before recursing into scripts (2013-04-10 09:55:34 +0200)
+
+----------------------------------------------------------------
+Andreas Schwab (1):
+      kbuild: generate generic headers before recursing into scripts
+
+ Makefile | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
