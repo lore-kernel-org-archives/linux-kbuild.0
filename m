@@ -1,16 +1,16 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:47997 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:51283 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932147Ab3DPIVt (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 16 Apr 2013 04:21:49 -0400
-Message-ID: <516D0A1B.1010704@suse.cz>
-Date: Tue, 16 Apr 2013 10:21:47 +0200
+	id S1751105Ab3DPJMn (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 16 Apr 2013 05:12:43 -0400
+Message-ID: <516D1609.6020500@suse.cz>
+Date: Tue, 16 Apr 2013 11:12:41 +0200
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
 Subject: Re: [PATCH 1/2] menuconfig: Fix memory leak introduced by jump keys
  feature
-References: <1366035231-24370-1-git-send-email-bpoirier@suse.de> <20130415215432.GB12519@free.fr>
-In-Reply-To: <20130415215432.GB12519@free.fr>
+References: <1366035231-24370-1-git-send-email-bpoirier@suse.de> <20130415215432.GB12519@free.fr> <516D0A1B.1010704@suse.cz>
+In-Reply-To: <516D0A1B.1010704@suse.cz>
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -18,10 +18,15 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: "Yann E. MORIN" <yann.morin.1998@free.fr>
 Cc: Benjamin Poirier <bpoirier@suse.de>, Wang YanQing <udknight@gmail.com>, Dirk Gouders <gouders@et.bocholt.fh-gelsenkirchen.de>, Paul Gortmaker <paul.gortmaker@windriver.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 15.4.2013 23:54, Yann E. MORIN wrote:
-> So, unless Michal really wants to pull this one and push it to Linus
-> before he cuts v3.9 final, I'll merge this later in my -for-next branch.
+On 16.4.2013 10:21, Michal Marek wrote:
+> On 15.4.2013 23:54, Yann E. MORIN wrote:
+>> So, unless Michal really wants to pull this one and push it to Linus
+>> before he cuts v3.9 final, I'll merge this later in my -for-next branch.
+> 
+> That's fine with me.
 
-That's fine with me.
+BTW, in you are going to rebase the commit, it would be good idea to add
+Cc: <stable@vger.kernel.org> to the changelog.
 
+Thanks,
 Michal
