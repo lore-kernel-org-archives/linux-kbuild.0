@@ -1,55 +1,32 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f47.google.com ([74.125.82.47]:62982 "EHLO
-	mail-wg0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S935825Ab3DPRU0 (ORCPT
+Received: from mail-we0-f172.google.com ([74.125.82.172]:48747 "EHLO
+	mail-we0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S935536Ab3DPRn1 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 16 Apr 2013 13:20:26 -0400
-Date: Tue, 16 Apr 2013 19:20:20 +0200
+	Tue, 16 Apr 2013 13:43:27 -0400
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH v3] menuconfig: Add "breadcrumbs" navigation aid
-Message-ID: <20130416172020.GB11398@free.fr>
-References: <20130415213958.GA12519@free.fr>
- <1366121243-966-1-git-send-email-bpoirier@suse.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1366121243-966-1-git-send-email-bpoirier@suse.de>
+Subject: [PATCH 0/4] Some kconfig improvements and fixes
+Date: Tue, 16 Apr 2013 19:43:09 +0200
+Message-Id: <1366134193-22030-1-git-send-email-yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Benjamin Poirier <bpoirier@suse.de>
-Cc: Michal Marek <mmarek@suse.cz>, Wang YanQing <udknight@gmail.com>, Dirk Gouders <gouders@et.bocholt.fh-gelsenkirchen.de>, Paul Gortmaker <paul.gortmaker@windriver.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org
 
-Benjamin, All,
+Michal, All,
 
-On Tue, Apr 16, 2013 at 10:07:23AM -0400, Benjamin Poirier wrote:
-> Displays a trail of the menu entries used to get to the current menu.
-> 
-> Signed-off-by: Benjamin Poirier <bpoirier@suse.de>
-> Tested-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
-> [yann.morin.1998@free.fr: small, trivial code re-ordering]
-> Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
-> ---
-> 
-> Indeed Yann, we can even remove one wmove() and one level of indentation in
-> dialog_clear().
-> 
-> I'm not sure who's pulling from who and where patches are going,
+Here is a short series with a few kconfig improvements and fixes:
+  - fix in ncurses headers location
+  - fix randconfig always selecting the first entry of a choice
+  - enhance randconfig with user-suplied seed and/or probability
 
-It would be me aggregating all kconfig-related changes in my repo during
-the devel phase, and then sending Michal a pull-request slightly before
-each merge window (which should be real-soon-now...).
+I'm posting this series for review before I send Michal a final
+pull-request before the merge window opens for 3.10.
 
-> but this would supersede what's in yem-kconfig-for-next now.
-
-OK, I've reintegrated this here. Thank you!
+    [PATCH 1/4] kconfig/lxdialog: rationalise the include paths where to find {.n}curses{,w}.h
+    [PATCH 2/4] kconfig: allow specifying the seed for randconfig
+    [PATCH 3/4] kconfig: implement KCONFIG_PROBABILITY for randconfig
+    [PATCH 4/4] kconfig: do randomise choice entries in presence of KCONFIG_ALLCONFIG
 
 Regards,
 Yann E. MORIN.
-
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
