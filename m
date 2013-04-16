@@ -1,40 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from multi.imgtec.com ([194.200.65.239]:28263 "EHLO multi.imgtec.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S935550Ab3DPQCN (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 16 Apr 2013 12:02:13 -0400
-Message-ID: <516D7600.4080002@imgtec.com>
-Date: Tue, 16 Apr 2013 17:02:08 +0100
-From: James Hogan <james.hogan@imgtec.com>
+Received: from mail-wi0-f176.google.com ([209.85.212.176]:36102 "EHLO
+	mail-wi0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S964962Ab3DPQib (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 16 Apr 2013 12:38:31 -0400
+Date: Tue, 16 Apr 2013 18:38:25 +0200
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: Re: [PATCH 1/2] menuconfig: Fix memory leak introduced by jump keys
+ feature
+Message-ID: <20130416163825.GA11398@free.fr>
+References: <1366035231-24370-1-git-send-email-bpoirier@suse.de>
+ <20130415215432.GB12519@free.fr>
+ <516D0A1B.1010704@suse.cz>
+ <516D1609.6020500@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH] Kbuild: Avoid DTB rebuilds if source files are untouched
-References: <1364973141-16354-1-git-send-email-vgupta@synopsys.com> <515BD6B8.1020607@synopsys.com> <515C5652.8070705@wwwdotorg.org> <515D0FFB.4030803@synopsys.com> <515DBA0E.6000604@wwwdotorg.org> <51642158.3070205@synopsys.com> <5167BA67.5080403@synopsys.com> <5168822C.6040303@wwwdotorg.org> <516D7405.3060202@imgtec.com>
-In-Reply-To: <516D7405.3060202@imgtec.com>
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <516D1609.6020500@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Vineet Gupta <Vineet.Gupta1@synopsys.com>
-Cc: Stephen Warren <swarren@wwwdotorg.org>, "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Stephen Warren <swarren@nvidia.com>, Grant Likely <grant.likely@secretlab.ca>, linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>
+To: Michal Marek <mmarek@suse.cz>
+Cc: Benjamin Poirier <bpoirier@suse.de>, Wang YanQing <udknight@gmail.com>, Dirk Gouders <gouders@et.bocholt.fh-gelsenkirchen.de>, Paul Gortmaker <paul.gortmaker@windriver.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 16/04/13 16:53, James Hogan wrote:
-> On 12/04/13 22:52, Stephen Warren wrote:
->> +.SECONDARY: $(obj)/$(builtindtb-y).dtb.S
-> 
-> Note, this may not work if you're using CONFIG_ARC_BUILTIN_DTB_NAME,
-> since it'll have quotes around it, so you may instead need:
-> .SECONDARY: $(obj)/$(patsubst "%",%,$(builtindtb-y)).dtb.S
-> 
-> (at least that's what's required for the metag equivalent)
-> 
->> +
->>  dtbs:  $(addprefix  $(obj)/, $(builtindtb-y).dtb)
-> 
-> You might find the same thing here too.
+Michal, All,
 
-Also, I think you probably now want *.dtb.S added to clean-files,
-otherwise they won't get removed by make clean.
+On Tue, Apr 16, 2013 at 11:12:41AM +0200, Michal Marek wrote:
+> > On 15.4.2013 23:54, Yann E. MORIN wrote:
+> >> So, unless Michal really wants to pull this one and push it to Linus
+> >> before he cuts v3.9 final, I'll merge this later in my -for-next branch.
+> BTW, in you are going to rebase the commit, it would be good idea to add
+> Cc: <stable@vger.kernel.org> to the changelog.
 
-Cheers
-James
+Yes sure.
 
+Regards,
+Yann E. MORIN.
+
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
