@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f179.google.com ([209.85.212.179]:45596 "EHLO
-	mail-wi0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S965099Ab3DPRna (ORCPT
+Received: from mail-wi0-f181.google.com ([209.85.212.181]:46158 "EHLO
+	mail-wi0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S965097Ab3DPRn3 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 16 Apr 2013 13:43:30 -0400
+	Tue, 16 Apr 2013 13:43:29 -0400
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: [PATCH 2/4] kconfig: allow specifying the seed for randconfig
-Date: Tue, 16 Apr 2013 19:43:11 +0200
-Message-Id: <1366134193-22030-3-git-send-email-yann.morin.1998@free.fr>
+Subject: [PATCH 1/4] kconfig/lxdialog: rationalise the include paths where to find {.n}curses{,w}.h
+Date: Tue, 16 Apr 2013 19:43:10 +0200
+Message-Id: <1366134193-22030-2-git-send-email-yann.morin.1998@free.fr>
 In-Reply-To: <1366134193-22030-1-git-send-email-yann.morin.1998@free.fr>
 References: <1366134193-22030-1-git-send-email-yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,83 +15,59 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-For reproducibility, it can be useful to be able to specify the
-seed to use to seed the RNG.
+The current code does this:
 
-Add a new KCONFIG_SEED environment variable which can be set to
-the seed to use:
-    $ make KCONFIG_SEED=42 randconfig
-    $ sha1sum .config
-    70a128c8dcc61303069e1be352cce64114dfcbca  .config
-    $ make KCONFIG_SEED=42 randconfig
-    $ sha1sum .config
-    70a128c8dcc61303069e1be352cce64114dfcbca  .config
+    if [ -f /usr/include/ncursesw/curses.h ]; then
+        echo '-I/usr/include/ncursesw -DCURSES_LOC="<ncursesw/curses.h>"'
+    elif [ -f /usr/include/ncurses/ncurses.h ]; then
+        echo '-I/usr/include/ncurses -DCURSES_LOC="<ncurses.h>"'
+    elif [ -f /usr/include/ncurses/curses.h ]; then
+        echo '-I/usr/include/ncurses -DCURSES_LOC="<ncurses/curses.h>"'
+    [...]
 
-It's very usefull for eg. debugging the kconfig parser.
+This is merely inconsistent:
+  - adding the full path to the directory in the -I directive,
+  - especially since that path is already a sub-path of the system
+    include path,
+  - and then repeating the sub-path in the #include directive.
+
+Rationalise each include directive:
+  - only use the filename in the #include directive,
+  - keep the -I directives: they are always searched for before the
+    system include path; this ensures the correct header is used.
+
+Using the -I directives and the filename-only in #include is more in
+line with how pkg-config behaves, eg.:
+    $ pkg-config --cflags ncursesw
+    -I/usr/include/ncursesw
+
+This paves the way for using pkg-config for CFLAGS, too, now we use it
+to find the libraries.
 
 Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
 ---
- Documentation/kbuild/kconfig.txt |    9 +++++++++
- scripts/kconfig/conf.c           |   12 +++++++++++-
- 2 files changed, 20 insertions(+), 1 deletions(-)
+ scripts/kconfig/lxdialog/check-lxdialog.sh |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/kbuild/kconfig.txt b/Documentation/kbuild/kconfig.txt
-index b8b77bb..dbf746b 100644
---- a/Documentation/kbuild/kconfig.txt
-+++ b/Documentation/kbuild/kconfig.txt
-@@ -90,6 +90,15 @@ disable the options that are explicitly listed in the specified
- mini-config files.
- 
- ______________________________________________________________________
-+Environment variables for 'randconfig'
-+
-+KCONFIG_SEED
-+--------------------------------------------------
-+You can set this to the integer value used to seed the RNG, if you want
-+to somehow debug the behaviour of the kconfig parser/frontends.
-+If not set, the current time will be used.
-+
-+______________________________________________________________________
- Environment variables for 'silentoldconfig'
- 
- KCONFIG_NOSILENTUPDATE
-diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
-index e39fcd8..bde5b95 100644
---- a/scripts/kconfig/conf.c
-+++ b/scripts/kconfig/conf.c
-@@ -13,6 +13,7 @@
- #include <getopt.h>
- #include <sys/stat.h>
- #include <sys/time.h>
-+#include <errno.h>
- 
- #include "lkc.h"
- 
-@@ -514,14 +515,23 @@ int main(int ac, char **av)
- 		{
- 			struct timeval now;
- 			unsigned int seed;
-+			char *seed_env;
- 
- 			/*
- 			 * Use microseconds derived seed,
- 			 * compensate for systems where it may be zero
- 			 */
- 			gettimeofday(&now, NULL);
--
- 			seed = (unsigned int)((now.tv_sec + 1) * (now.tv_usec + 1));
-+
-+			seed_env = getenv("KCONFIG_SEED");
-+			if( seed_env && *seed_env ) {
-+				char *endp;
-+				int tmp = (int)strtol(seed_env, &endp, 10);
-+				if (*endp == '\0') {
-+					seed = tmp;
-+				}
-+			}
- 			srand(seed);
- 			break;
- 		}
+diff --git a/scripts/kconfig/lxdialog/check-lxdialog.sh b/scripts/kconfig/lxdialog/check-lxdialog.sh
+index 782d200..9d2a4c5 100644
+--- a/scripts/kconfig/lxdialog/check-lxdialog.sh
++++ b/scripts/kconfig/lxdialog/check-lxdialog.sh
+@@ -22,12 +22,12 @@ ldflags()
+ ccflags()
+ {
+ 	if [ -f /usr/include/ncursesw/curses.h ]; then
+-		echo '-I/usr/include/ncursesw -DCURSES_LOC="<ncursesw/curses.h>"'
++		echo '-I/usr/include/ncursesw -DCURSES_LOC="<curses.h>"'
+ 		echo ' -DNCURSES_WIDECHAR=1'
+ 	elif [ -f /usr/include/ncurses/ncurses.h ]; then
+ 		echo '-I/usr/include/ncurses -DCURSES_LOC="<ncurses.h>"'
+ 	elif [ -f /usr/include/ncurses/curses.h ]; then
+-		echo '-I/usr/include/ncurses -DCURSES_LOC="<ncurses/curses.h>"'
++		echo '-I/usr/include/ncurses -DCURSES_LOC="<curses.h>"'
+ 	elif [ -f /usr/include/ncurses.h ]; then
+ 		echo '-DCURSES_LOC="<ncurses.h>"'
+ 	else
 -- 
 1.7.2.5
 
