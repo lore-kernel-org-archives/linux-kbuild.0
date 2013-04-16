@@ -1,37 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f176.google.com ([209.85.212.176]:36102 "EHLO
-	mail-wi0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S964962Ab3DPQib (ORCPT
+Received: from mail-wg0-f47.google.com ([74.125.82.47]:62982 "EHLO
+	mail-wg0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S935825Ab3DPRU0 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 16 Apr 2013 12:38:31 -0400
-Date: Tue, 16 Apr 2013 18:38:25 +0200
+	Tue, 16 Apr 2013 13:20:26 -0400
+Date: Tue, 16 Apr 2013 19:20:20 +0200
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH 1/2] menuconfig: Fix memory leak introduced by jump keys
- feature
-Message-ID: <20130416163825.GA11398@free.fr>
-References: <1366035231-24370-1-git-send-email-bpoirier@suse.de>
- <20130415215432.GB12519@free.fr>
- <516D0A1B.1010704@suse.cz>
- <516D1609.6020500@suse.cz>
+Subject: Re: [PATCH v3] menuconfig: Add "breadcrumbs" navigation aid
+Message-ID: <20130416172020.GB11398@free.fr>
+References: <20130415213958.GA12519@free.fr>
+ <1366121243-966-1-git-send-email-bpoirier@suse.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <516D1609.6020500@suse.cz>
+In-Reply-To: <1366121243-966-1-git-send-email-bpoirier@suse.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Benjamin Poirier <bpoirier@suse.de>, Wang YanQing <udknight@gmail.com>, Dirk Gouders <gouders@et.bocholt.fh-gelsenkirchen.de>, Paul Gortmaker <paul.gortmaker@windriver.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Benjamin Poirier <bpoirier@suse.de>
+Cc: Michal Marek <mmarek@suse.cz>, Wang YanQing <udknight@gmail.com>, Dirk Gouders <gouders@et.bocholt.fh-gelsenkirchen.de>, Paul Gortmaker <paul.gortmaker@windriver.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Michal, All,
+Benjamin, All,
 
-On Tue, Apr 16, 2013 at 11:12:41AM +0200, Michal Marek wrote:
-> > On 15.4.2013 23:54, Yann E. MORIN wrote:
-> >> So, unless Michal really wants to pull this one and push it to Linus
-> >> before he cuts v3.9 final, I'll merge this later in my -for-next branch.
-> BTW, in you are going to rebase the commit, it would be good idea to add
-> Cc: <stable@vger.kernel.org> to the changelog.
+On Tue, Apr 16, 2013 at 10:07:23AM -0400, Benjamin Poirier wrote:
+> Displays a trail of the menu entries used to get to the current menu.
+> 
+> Signed-off-by: Benjamin Poirier <bpoirier@suse.de>
+> Tested-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+> [yann.morin.1998@free.fr: small, trivial code re-ordering]
+> Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+> ---
+> 
+> Indeed Yann, we can even remove one wmove() and one level of indentation in
+> dialog_clear().
+> 
+> I'm not sure who's pulling from who and where patches are going,
 
-Yes sure.
+It would be me aggregating all kconfig-related changes in my repo during
+the devel phase, and then sending Michal a pull-request slightly before
+each merge window (which should be real-soon-now...).
+
+> but this would supersede what's in yem-kconfig-for-next now.
+
+OK, I've reintegrated this here. Thank you!
 
 Regards,
 Yann E. MORIN.
