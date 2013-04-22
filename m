@@ -1,115 +1,113 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.gentoo.org ([140.211.166.183]:37802 "EHLO smtp.gentoo.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754496Ab3DVSTk (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 22 Apr 2013 14:19:40 -0400
-From: Mike Frysinger <vapier@gentoo.org>
+Received: from mail-we0-f179.google.com ([74.125.82.179]:38858 "EHLO
+	mail-we0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755089Ab3DVU05 (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 22 Apr 2013 16:26:57 -0400
+Received: by mail-we0-f179.google.com with SMTP id u3so3934005wey.38
+        for <linux-kbuild@vger.kernel.org>; Mon, 22 Apr 2013 13:26:56 -0700 (PDT)
+Date: Mon, 22 Apr 2013 22:26:49 +0200
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
 Subject: Re: non-visible options vs menuconfigs
-Date: Mon, 22 Apr 2013 14:19:50 -0400
-References: <201304221251.54695.vapier@gentoo.org> <20130422180046.GA24143@free.fr>
-In-Reply-To: <20130422180046.GA24143@free.fr>
+Message-ID: <20130422202649.GD24143@free.fr>
+References: <201304221251.54695.vapier@gentoo.org>
+ <20130422180046.GA24143@free.fr>
+ <201304221419.51623.vapier@gentoo.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed;
-  boundary="nextPart4744025.mEQq85ylTY";
-  protocol="application/pgp-signature";
-  micalg=pgp-sha1
-Content-Transfer-Encoding: 7bit
-Message-Id: <201304221419.51623.vapier@gentoo.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <201304221419.51623.vapier@gentoo.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
+To: Mike Frysinger <vapier@gentoo.org>
 Cc: linux-kbuild@vger.kernel.org
 
---nextPart4744025.mEQq85ylTY
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Mike, All,
 
-On Monday 22 April 2013 14:00:46 Yann E. MORIN wrote:
-> On Mon, Apr 22, 2013 at 12:51:53PM -0400, Mike Frysinger wrote:
-> > the current EXPERT menuconfig is broken by some new options that happen
-> > to be sprinkled into the wrong place.  seems like if a node is
-> > unprintable, it should get skipped for menuconfig purposes ?  otherwise,
-> > this is a constantly losing battle where someone inserts new Kconfig
-> > options and forgets this nuance, and then it stays broken for a while
-> > until someone notices.  this particular bug wrt EXPERT has been
-> > linux-3.2.
-> >=20
-> > for example, in the General setup section, you currently see:
-> > 	[ ] Configure standard kernel features (expert users)  --->
-> > 	[ ] Embedded system
-> >=20
-> > if you enable EXPERT there, the options get dumped into the same level
-> > instead
-> >=20
-> > of being under that menuconfig:
-> > 	[*] Configure standard kernel features (expert users)  --->
-> > 	[ ] Sysctl syscall support
-> > 	[*] Load all symbols for debugging/ksymoops
-> > 	...
-> > 	[ ] Embedded system
->=20
-> Yes, this is indeed disturbing.
->=20
-> Reviewed-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
->=20
-> > is this feasible in the kconfig code ?
->=20
-> From Documentation/kbuild/kconfig-language.txt:
+On Mon, Apr 22, 2013 at 02:19:50PM -0400, Mike Frysinger wrote:
+> On Monday 22 April 2013 14:00:46 Yann E. MORIN wrote:
+> > As far as I remember, this has always been the behaviour of menuconfig.
+> > 
+> > What do you suggest the frontends do in this case, short of re-ordering
+> > the options (which I think is not correct) ?
+> 
+> i think you missed a critical part of my proposal:
+> 	seems like *if a node is unprintable*, it should get skipped for
+> 	menuconfig purposes
 
-when i said "kconfig code", i was referring to making changes to the parsin=
-g=20
-source, not the kconfig language.
+Ah, yes, I missed it. And it is part of the solutions I exposed, too:
 
-> As far as I remember, this has always been the behaviour of menuconfig.
->=20
-> What do you suggest the frontends do in this case, short of re-ordering
-> the options (which I think is not correct) ?
+    On the other hand, we could consider dependent options as candidates for
+    being sub-options until we see the first non-dependent option with a
+    prompt.
 
-i think you missed a critical part of my proposal:
-	seems like *if a node is unprintable*, it should get skipped for
-	menuconfig purposes
+> to modify your example, i'm proposing a change for:
+> 	menuconfig MENU_A
+> 		bool "A"
+> 
+> 	config OPT_B
+> 		bool
+> 
+> 	config OPT_C
+> 		bool "C"
+> 		depends on MENU_A
+> 
+> OPT_B is not shown to the user (there is no option text), therefore it should 
+> automatically get skipped when searching for options to collapse into the 
+> menuconfig MENU_A.
+> 
+> i do agree that if OPT_B had text, then the existing behavior would be 
+> unchanged.
 
-to modify your example, i'm proposing a change for:
-	menuconfig MENU_A
-		bool "A"
+And as I pointed out, this would break as soon as an option with a prompt
+(which you call 'option text') is added in-between. For example, starting
+with:
+    menuconfig MENU_A
+        bool "A"
+ 
+    config OPT_B
+        bool
+ 
+    config OPT_C
+        bool "C"
+        depends on MENU_A
 
-	config OPT_B
-		bool
+And then modifying into:
+    menuconfig MENU_A
+        bool "A"
+ 
+    config OPT_D
+        bool "D"
+ 
+    config OPT_B
+        bool
 
-	config OPT_C
-		bool "C"
-		depends on MENU_A
+    config OPT_C
+        bool "C"
+        depends on MENU_A
 
-OPT_B is not shown to the user (there is no option text), therefore it shou=
-ld=20
-automatically get skipped when searching for options to collapse into the=20
-menuconfig MENU_A.
+(which would be trivivaly noticed here, but can be more complex in real
+life, as you havee seen in the current init/Kconfig).
 
-i do agree that if OPT_B had text, then the existing behavior would be=20
-unchanged.
-=2Dmike
+This would change the semantic of the language anyway, where currently
+your example disrupts the dependendcy chain. Granted, it looks like a
+good change, but I think we should not encourage people to be lazy, and
+we better want them to be careful about what they intend to do, about
+what they review and ack (myself largely included! :-] ).
 
---nextPart4744025.mEQq85ylTY
-Content-Type: application/pgp-signature; name=signature.asc 
-Content-Description: This is a digitally signed message part.
+I'll see if I can coerce the kconfig parser and frontends (yes,
+frontends are probably impacted, too) to behave the way we discussed in
+this thread, and see how good it works when confronted to real life.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.17 (GNU/Linux)
+Thank you!
 
-iQIcBAABAgAGBQJRdX9HAAoJEEFjO5/oN/WBvW0P/jX9huIb/CPzV9CpnzYCSIy8
-Sa8mIBQbDhogur5hXwycJQj/xC/L9crpt7/+HKOhWMKZpse/iEizQK2V5xpQ+uKa
-z5Pefui+G1+x42Y+YYo4hhSNwqziJ9zks9nMXYr73/wc/izDkwCplwyAjaTL6ER5
-ioc597eQE3XxjWSwJcZ1ZSreQJuq/LPcdm8nn1oGoR1vgiBz7Dht7sDLcLCiLARA
-3BO9+oD/Y+DRar8wZmYcYp5Ae/bHfslMqXDDlQBXbGhDb3hinzZZ2AoRH9X2+ZoA
-CVK8xrumC0WLZgci1tCnSAuXfETEEMcp9osOO00U5T+2cbzVhC/fg3EK5+Pp91sY
-WQDKQs3DHtsngAUqIn+O8/naKOCDnsS9buUCYa37bTGg6i+Cl/zTRaKtFpuPMUTo
-Lj54byUTokCw8ESf3MRqDb/2X6iJJnBBn7aDl7gUC8bP+PhHxuGxto6RHSXZSTLs
-OPh7qGgByx1WInW9M89cQWOAe/a4zRlXYHJXrNP9uJBKHkKIX6Rm4mFXHGTTt8rD
-USSJqe5q6pX61+MzvaGIeiy+pnRuEYswXEsMgWT0bJce8a0IDOu0GsTze9oAlmvW
-JIMCjhhH3x9ENKaeSYTeyBHmzH/GMD4T6MFQZ97e3PRvQs543UH1sciReHF6r1H2
-qdU9KBKWhr/4FjzmHXad
-=GdhR
------END PGP SIGNATURE-----
+Regards,
+Yann E. MORIN.
 
---nextPart4744025.mEQq85ylTY--
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
