@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f177.google.com ([209.85.212.177]:55144 "EHLO
-	mail-wi0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753878Ab3DVVbk (ORCPT
+Received: from mail-wi0-f171.google.com ([209.85.212.171]:57148 "EHLO
+	mail-wi0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753878Ab3DVVbl (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 22 Apr 2013 17:31:40 -0400
-Received: by mail-wi0-f177.google.com with SMTP id hj19so5201043wib.4
-        for <linux-kbuild@vger.kernel.org>; Mon, 22 Apr 2013 14:31:39 -0700 (PDT)
+	Mon, 22 Apr 2013 17:31:41 -0400
+Received: by mail-wi0-f171.google.com with SMTP id l13so5233671wie.4
+        for <linux-kbuild@vger.kernel.org>; Mon, 22 Apr 2013 14:31:40 -0700 (PDT)
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: [PATCH 3/6] kconfig/lxdialog: rationalise the include paths where to find {.n}curses{,w}.h
-Date: Mon, 22 Apr 2013 23:31:22 +0200
-Message-Id: <cdf0c2cfd75c6c2f2a6eee5e21ff0e8271bd0660.1366665922.git.yann.morin.1998@free.fr>
+Subject: [PATCH 4/6] kconfig: allow specifying the seed for randconfig
+Date: Mon, 22 Apr 2013 23:31:23 +0200
+Message-Id: <7ec80ce9b14a09d141cf0e99ad2dc4dfad34ac88.1366665922.git.yann.morin.1998@free.fr>
 In-Reply-To: <cover.1366665921.git.yann.morin.1998@free.fr>
 References: <cover.1366665921.git.yann.morin.1998@free.fr>
 In-Reply-To: <cover.1366665921.git.yann.morin.1998@free.fr>
@@ -21,59 +21,83 @@ Cc: Michal Marek <mmarek@suse.cz>, "Yann E. MORIN" <yann.morin.1998@free.fr>
 
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-The current code does this:
+For reproducibility, it can be useful to be able to specify the
+seed to use to seed the RNG.
 
-    if [ -f /usr/include/ncursesw/curses.h ]; then
-        echo '-I/usr/include/ncursesw -DCURSES_LOC="<ncursesw/curses.h>"'
-    elif [ -f /usr/include/ncurses/ncurses.h ]; then
-        echo '-I/usr/include/ncurses -DCURSES_LOC="<ncurses.h>"'
-    elif [ -f /usr/include/ncurses/curses.h ]; then
-        echo '-I/usr/include/ncurses -DCURSES_LOC="<ncurses/curses.h>"'
-    [...]
+Add a new KCONFIG_SEED environment variable which can be set to
+the seed to use:
+    $ make KCONFIG_SEED=42 randconfig
+    $ sha1sum .config
+    70a128c8dcc61303069e1be352cce64114dfcbca  .config
+    $ make KCONFIG_SEED=42 randconfig
+    $ sha1sum .config
+    70a128c8dcc61303069e1be352cce64114dfcbca  .config
 
-This is merely inconsistent:
-  - adding the full path to the directory in the -I directive,
-  - especially since that path is already a sub-path of the system
-    include path,
-  - and then repeating the sub-path in the #include directive.
-
-Rationalise each include directive:
-  - only use the filename in the #include directive,
-  - keep the -I directives: they are always searched for before the
-    system include path; this ensures the correct header is used.
-
-Using the -I directives and the filename-only in #include is more in
-line with how pkg-config behaves, eg.:
-    $ pkg-config --cflags ncursesw
-    -I/usr/include/ncursesw
-
-This paves the way for using pkg-config for CFLAGS, too, now we use it
-to find the libraries.
+It's very usefull for eg. debugging the kconfig parser.
 
 Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
 ---
- scripts/kconfig/lxdialog/check-lxdialog.sh |    4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ Documentation/kbuild/kconfig.txt |    9 +++++++++
+ scripts/kconfig/conf.c           |   12 +++++++++++-
+ 2 files changed, 20 insertions(+), 1 deletion(-)
 
-diff --git a/scripts/kconfig/lxdialog/check-lxdialog.sh b/scripts/kconfig/lxdialog/check-lxdialog.sh
-index 782d200..9d2a4c5 100644
---- a/scripts/kconfig/lxdialog/check-lxdialog.sh
-+++ b/scripts/kconfig/lxdialog/check-lxdialog.sh
-@@ -22,12 +22,12 @@ ldflags()
- ccflags()
- {
- 	if [ -f /usr/include/ncursesw/curses.h ]; then
--		echo '-I/usr/include/ncursesw -DCURSES_LOC="<ncursesw/curses.h>"'
-+		echo '-I/usr/include/ncursesw -DCURSES_LOC="<curses.h>"'
- 		echo ' -DNCURSES_WIDECHAR=1'
- 	elif [ -f /usr/include/ncurses/ncurses.h ]; then
- 		echo '-I/usr/include/ncurses -DCURSES_LOC="<ncurses.h>"'
- 	elif [ -f /usr/include/ncurses/curses.h ]; then
--		echo '-I/usr/include/ncurses -DCURSES_LOC="<ncurses/curses.h>"'
-+		echo '-I/usr/include/ncurses -DCURSES_LOC="<curses.h>"'
- 	elif [ -f /usr/include/ncurses.h ]; then
- 		echo '-DCURSES_LOC="<ncurses.h>"'
- 	else
+diff --git a/Documentation/kbuild/kconfig.txt b/Documentation/kbuild/kconfig.txt
+index b8b77bb..dbf746b 100644
+--- a/Documentation/kbuild/kconfig.txt
++++ b/Documentation/kbuild/kconfig.txt
+@@ -90,6 +90,15 @@ disable the options that are explicitly listed in the specified
+ mini-config files.
+ 
+ ______________________________________________________________________
++Environment variables for 'randconfig'
++
++KCONFIG_SEED
++--------------------------------------------------
++You can set this to the integer value used to seed the RNG, if you want
++to somehow debug the behaviour of the kconfig parser/frontends.
++If not set, the current time will be used.
++
++______________________________________________________________________
+ Environment variables for 'silentoldconfig'
+ 
+ KCONFIG_NOSILENTUPDATE
+diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
+index e39fcd8..bde5b95 100644
+--- a/scripts/kconfig/conf.c
++++ b/scripts/kconfig/conf.c
+@@ -13,6 +13,7 @@
+ #include <getopt.h>
+ #include <sys/stat.h>
+ #include <sys/time.h>
++#include <errno.h>
+ 
+ #include "lkc.h"
+ 
+@@ -514,14 +515,23 @@ int main(int ac, char **av)
+ 		{
+ 			struct timeval now;
+ 			unsigned int seed;
++			char *seed_env;
+ 
+ 			/*
+ 			 * Use microseconds derived seed,
+ 			 * compensate for systems where it may be zero
+ 			 */
+ 			gettimeofday(&now, NULL);
+-
+ 			seed = (unsigned int)((now.tv_sec + 1) * (now.tv_usec + 1));
++
++			seed_env = getenv("KCONFIG_SEED");
++			if( seed_env && *seed_env ) {
++				char *endp;
++				int tmp = (int)strtol(seed_env, &endp, 10);
++				if (*endp == '\0') {
++					seed = tmp;
++				}
++			}
+ 			srand(seed);
+ 			break;
+ 		}
 -- 
 1.7.10.4
 
