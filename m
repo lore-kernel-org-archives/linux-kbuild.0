@@ -1,82 +1,110 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:39375 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753969Ab3DWUGD (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 23 Apr 2013 16:06:03 -0400
-Message-ID: <5176E9A7.60702@suse.cz>
-Date: Tue, 23 Apr 2013 22:05:59 +0200
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
+Received: from mail-we0-f175.google.com ([74.125.82.175]:64614 "EHLO
+	mail-we0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757195Ab3DWVuu (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 23 Apr 2013 17:50:50 -0400
+Received: by mail-we0-f175.google.com with SMTP id t11so1099827wey.34
+        for <linux-kbuild@vger.kernel.org>; Tue, 23 Apr 2013 14:50:49 -0700 (PDT)
+Date: Tue, 23 Apr 2013 23:50:44 +0200
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
 Subject: Re: [PATCH 5/6] kconfig: implement KCONFIG_PROBABILITY for randconfig
-References: <cover.1366665921.git.yann.morin.1998@free.fr> <e5fafd7ae13357e3d5cc604c89022982022a8909.1366665922.git.yann.morin.1998@free.fr> <51764A0A.9000506@suse.cz> <20130423163428.GA21997@free.fr>
-In-Reply-To: <20130423163428.GA21997@free.fr>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Message-ID: <20130423215044.GA20111@free.fr>
+References: <cover.1366665921.git.yann.morin.1998@free.fr>
+ <e5fafd7ae13357e3d5cc604c89022982022a8909.1366665922.git.yann.morin.1998@free.fr>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e5fafd7ae13357e3d5cc604c89022982022a8909.1366665922.git.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: linux-kbuild@vger.kernel.org, Peter Korsgaard <jacmet@uclibc.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.cz>, Peter Korsgaard <jacmet@uclibc.org>
 
-Dne 23.4.2013 18:34, Yann E. MORIN napsal(a):
-> Michal, All,
-> 
-> On Tue, Apr 23, 2013 at 10:44:58AM +0200, Michal Marek wrote:
->> On 22.4.2013 23:31, Yann E. MORIN wrote:
->>> diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
->>> index 13ddf11..8d8d853 100644
->>> --- a/scripts/kconfig/confdata.c
->>> +++ b/scripts/kconfig/confdata.c
->>> @@ -1106,7 +1106,16 @@ static void set_all_choice_values(struct symbol *csym)
->>>  void conf_set_all_new_symbols(enum conf_def_mode mode)
->>>  {
->>>  	struct symbol *sym, *csym;
->>> -	int i, cnt;
->>> +	int i, cnt, prob = 50;
->>> +
->> [...]
->>>  			case def_random:
->>> -				cnt = sym_get_type(sym) == S_TRISTATE ? 3 : 2;
->>> -				sym->def[S_DEF_USER].tri = (tristate)(rand() % cnt);
->>> +				cnt = (rand() % 100) - (100 - prob);
->>> +				if (cnt < 0)
->>> +					sym->def[S_DEF_USER].tri = no;
->>> +				else
->>> +					if ((sym_get_type(sym) == S_TRISTATE)
->>> +					    && (cnt > prob/2))
->>> +						sym->def[S_DEF_USER].tri = mod;
->>> +					else
->>> +						sym->def[S_DEF_USER].tri = yes;
->>
->> Previously, the distribution was 50%-50% for boolean options and
->> 33%-33%-33% for tristate options. Now the default for tristate options
->> changed to 50%-25%-25% (no-mod-yes). Wouldn't it make more sense to have
->> a special case for KCONFIG_PROBABILITY not set, that would use the same
->> distribution as before. I.e.
->>
->> if (prob == -1) {
->> 	cnt = sym_get_type(sym) == S_TRISTATE ? 3 : 2;
->> 	sym->def[S_DEF_USER].tri = (tristate)(rand() % cnt);
->> } else {
->> 	/* new math */
->> }
-> 
-> OK, what about this proposal, instead:
->     KCONFIG_PROBABILITY     y:n split           y:m:n split             Notes
->     -------------------------------------------------------------------------
->     unset or empty          50  : 50            33  : 33  : 34          [1]
->     N                        N  : 100-N         N/2 : N/2 : 100-N       [2]
->     N:M                     N+M : 100-(N+M)      N  :  M  : 100-(N+M)   [3]
->     N:M:L                    N  : 100-N          M  :  L  : 100-(M+L)   [4]
-> 
-> [1] current behaviour
-> [2] the curent patch's behaviour
-> [3] boolean's Y probability is tristate's Y plus tristate's M probabilities
-> [4] all probabilities explicitly stated
-> 
-> I have a prototype for this I need to clean up. If that's OK for you, I'll
-> submit that; if not, I'll use your suggestion.
+Michal, All,
 
-As long as the default behavior does not change (1/3 vs. 34% is fine
-:)), then I am fine with any semantics of $KCONFIG_PROBABILITY.
+On Mon, Apr 22, 2013 at 11:31:24PM +0200, Yann E. MORIN wrote:
+> From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+> Introduce a KCONFIG_PROBABILITY environment variable to tweak the
+> probability between 0 (all options off) and 100 (all options on).
 
-Michal
+Please, drop this patch: randconfig is utterly broken is a very subtle
+way (even without this patch applied), which I still have to track down,
+and I'm not confident I can find and properly fis it before the end of
+the week.
+
+The core of the problem is the following code (as seen in current master
+from Linus' tree):
+
+scripts/kconfig/confdata.c:
+[--SNIP--]
+  1106  void conf_set_all_new_symbols(enum conf_def_mode mode)
+  1107  {
+  1108          struct symbol *sym, *csym;
+  1109          int i, cnt;
+  1110
+  1111          for_all_symbols(i, sym) {
+  1112                  if (sym_has_value(sym))
+  1113                          continue;
+  1114                  switch (sym_get_type(sym)) {
+  1115                  case S_BOOLEAN:
+  1116                  case S_TRISTATE:
+  1117                          switch (mode) {
+  1118                          case def_yes:
+  1119                                  sym->def[S_DEF_USER].tri = yes;
+  1120                                  break;
+  1121                          case def_mod:
+  1122                                  sym->def[S_DEF_USER].tri = mod;
+  1123                                  break;
+  1124                          case def_no:
+  1125                                  sym->def[S_DEF_USER].tri = no;
+  1126                                  break;
+  1127                          case def_random:
+  1128                                  cnt = sym_get_type(sym) == S_TRISTATE ? 3 : 2;
+  1129                                  sym->def[S_DEF_USER].tri = (tristate)(rand() % cnt);
+  1130                                  break;
+  1131                          default:
+  1132                                  continue;
+  1133                          }
+  1134                          if (!(sym_is_choice(sym) && mode == def_random))
+  1135                                  sym->flags |= SYMBOL_DEF_USER;
+  1136                          break;
+  1137                  default:
+  1138                          break;
+  1139                  }
+  1140
+  1141          }
+  1142
+  1143          sym_clear_all_valid();
+[--SNIP--]
+
+Fact is, sym_get_type(sym) is never ever equal to S_TRISTATE when we
+test it on line 1128.
+
+I'm currently investigating, but I suspect that's because CONFIG_MODULES
+is not yet set, which only happens after we call to sym_clear_all_valid()
+later on line 1143, which is too late.
+
+I'll be testing this solution (pseudo-code):
+
+    find symbol defining MODULES
+        randomly set it to y or no
+    sym_clear_all_valid();
+    for_all_symbols(i, sym) {
+        current code
+    }
+    sym_clear_all_valid();
+
+More on this later. For now, just drop this probability patch. The other
+patches are still good for 3.10.
+
+Regards,
+Yann E. MORIN.
+
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
