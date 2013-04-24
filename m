@@ -1,42 +1,82 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:36457 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1758069Ab3DXW2J (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 24 Apr 2013 18:28:09 -0400
-Message-ID: <51785C72.5040206@suse.cz>
-Date: Thu, 25 Apr 2013 00:28:02 +0200
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: [PATCH 5/6] kconfig: implement KCONFIG_PROBABILITY for randconfig
-References: <cover.1366665921.git.yann.morin.1998@free.fr> <e5fafd7ae13357e3d5cc604c89022982022a8909.1366665922.git.yann.morin.1998@free.fr> <20130423215044.GA20111@free.fr> <20130424175648.GA24710@free.fr>
-In-Reply-To: <20130424175648.GA24710@free.fr>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Received: from mail-wi0-f174.google.com ([209.85.212.174]:55852 "EHLO
+	mail-wi0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756215Ab3DXWaU (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 24 Apr 2013 18:30:20 -0400
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: [pull request v2] Pull request for branch yem-kconfig-for-next
+Date: Thu, 25 Apr 2013 00:29:47 +0200
+Message-Id: <cover.1366841993.git.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: linux-kbuild@vger.kernel.org, Peter Korsgaard <jacmet@uclibc.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, "Yann E. MORIN" <yann.morin.1998@free.fr>, Benjamin Poirier <bpoirier@suse.de>, Peter Korsgaard <jacmet@uclibc.org>
 
-Dne 24.4.2013 19:56, Yann E. MORIN napsal(a):
-> Michal, All,
-> 
-> On Tue, Apr 23, 2013 at 11:50:44PM +0200, Yann E. MORIN wrote:
->> On Mon, Apr 22, 2013 at 11:31:24PM +0200, Yann E. MORIN wrote:
->>> From: "Yann E. MORIN" <yann.morin.1998@free.fr>
->>> Introduce a KCONFIG_PROBABILITY environment variable to tweak the
->>> probability between 0 (all options off) and 100 (all options on).
->>
->> Please, drop this patch: randconfig is utterly broken is a very subtle
->> way (even without this patch applied), which I still have to track down,
->> and I'm not confident I can find and properly fis it before the end of
-> [--SNIP--]
->> More on this later. For now, just drop this probability patch. The other
->> patches are still good for 3.10.
-> 
-> Michal, I have something interesting now that I'm testing. If you did
-> not already apply the rest of the series, just hold-on just a bit more,
-> I'll re-spin a new version of the series later tonight.
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-OK, I'll wait.
+Michal,
 
-Michal
+Here is the official pull-request for the kconfig-related changes I've
+gathered from the linux-kbuild list, and those I've locally accumulated,
+for inclusin in 3.10:
+
+  - memory leak fixed in mconf
+  - 3 randconfig fixes (randomising choices, setting tristates,
+    already set symbols)
+  - randconfig improvements: seed, and probability skew
+  - navigation breadcrumbs in mconf
+
+
+Changes v1 -> v2:
+  - restore the previous probabilities per default
+  - use different probabilities for booleans and tristates
+  - two new fixes for randconfig
+  - Cc: lkml this time
+
+Regards,
+Yann E. MORIN
+
+----------------------------------------------------------------
+The following changes since commit a45c7dfb942b6c198d5cd283f8dcee145241a017:
+
+  merge_config.sh: Avoid creating unnessary source softlinks (2013-04-10 10:55:22 +0200)
+
+are available in the git repository at:
+
+  git://gitorious.org/linux-kconfig/linux-kconfig.git yem-kconfig-for-next
+
+for you to fetch changes up to e43956e607692f9b1c710311e4a6591ffba1edf0:
+
+  kconfig: implement KCONFIG_PROBABILITY for randconfig (2013-04-25 00:16:30 +0200)
+
+----------------------------------------------------------------
+Benjamin Poirier (2):
+      menuconfig: Fix memory leak introduced by jump keys feature
+      menuconfig: Add "breadcrumbs" navigation aid
+
+Yann E. MORIN (6):
+      kconfig/lxdialog: rationalise the include paths where to find {.n}curses{,w}.h
+      kconfig: fix randconfig tristate detection
+      kconfig: do not override symbols already set
+      kconfig: fix randomising choice entries in presence of KCONFIG_ALLCONFIG
+      kconfig: allow specifying the seed for randconfig
+      kconfig: implement KCONFIG_PROBABILITY for randconfig
+
+ Documentation/kbuild/kconfig.txt           |   36 ++++++++++++++
+ scripts/kconfig/conf.c                     |   12 ++++-
+ scripts/kconfig/confdata.c                 |   66 ++++++++++++++++++++++---
+ scripts/kconfig/list.h                     |   40 +++++++++++++++
+ scripts/kconfig/lxdialog/check-lxdialog.sh |    4 +-
+ scripts/kconfig/lxdialog/dialog.h          |    7 +++
+ scripts/kconfig/lxdialog/util.c            |   45 ++++++++++++++++-
+ scripts/kconfig/mconf.c                    |   74 +++++++++++++++++++++++++++-
+ 8 files changed, 271 insertions(+), 13 deletions(-)
+
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
