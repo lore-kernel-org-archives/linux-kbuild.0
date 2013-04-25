@@ -1,53 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-we0-f173.google.com ([74.125.82.173]:55555 "EHLO
-	mail-we0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758537Ab3DXWa0 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 24 Apr 2013 18:30:26 -0400
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: [PATCH 4/8] kconfig: fix randconfig tristate detection
-Date: Thu, 25 Apr 2013 00:29:51 +0200
-Message-Id: <61fa0e17f99b60b851d4480605b7d905d3172f0c.1366841993.git.yann.morin.1998@free.fr>
-In-Reply-To: <cover.1366841993.git.yann.morin.1998@free.fr>
-References: <cover.1366841993.git.yann.morin.1998@free.fr>
-In-Reply-To: <cover.1366841993.git.yann.morin.1998@free.fr>
-References: <cover.1366841993.git.yann.morin.1998@free.fr>
+Received: from cantor2.suse.de ([195.135.220.15]:51915 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752001Ab3DYI51 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 25 Apr 2013 04:57:27 -0400
+Message-ID: <5178EFF6.50208@suse.cz>
+Date: Thu, 25 Apr 2013 10:57:26 +0200
+From: Michal Marek <mmarek@suse.cz>
+MIME-Version: 1.0
+Subject: Re: [PATCH 8/8] kconfig: implement KCONFIG_PROBABILITY for randconfig
+References: <cover.1366841993.git.yann.morin.1998@free.fr> <e43956e607692f9b1c710311e4a6591ffba1edf0.1366841993.git.yann.morin.1998@free.fr>
+In-Reply-To: <e43956e607692f9b1c710311e4a6591ffba1edf0.1366841993.git.yann.morin.1998@free.fr>
+Content-Type: text/plain; charset=ISO-8859-2
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, "Yann E. MORIN" <yann.morin.1998@free.fr>
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Peter Korsgaard <jacmet@uclibc.org>
 
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+On 25.4.2013 00:29, Yann E. MORIN wrote:
+> From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+> 
+> Currently the odds to set each symbol is (rounded):
+>     booleans:   y: 50%          n: 50%
+>     tristates:  y: 33%  m: 33%  n: 33%
+> 
+> Introduce a KCONFIG_PROBABILITY environment variable to tweak the
+> probabilities (in percentage), as such:
+>     KCONFIG_PROBABILITY     y:n split           y:m:n split
+>     -----------------------------------------------------------------
+> [1] unset or empty          50  : 50            33  : 33  : 34
+> [2] N                        N  : 100-N         N/2 : N/2 : 100-N
+>     N:M                     N+M : 100-(N+M)      N  :  M  : 100-(N+M)
+>     N:M:L                    N  : 100-N          M  :  L  : 100-(M+L)
 
-Because the modules' symbole (CONFIG_MODULES) may not yet be set when
-we check a symbol's tristate capabilty, we'll always find that tristate
-symbols are booleans, even if we randomly decided that to enable modules:
-sym_get_type(sym) always return boolean for tristates when modules_sym
-has not been previously set to 'y' *and* its value calculated *and* its
-visibility calculated, both of which only occur after we randomly assign
-values to symbols.
+I did a naive test with the current kconfig branch and with
+yem-kconfig-for-next:
 
-Fix that by looking at the raw type of symbols. Tristate set to 'm' will
-be promoted to 'y' when their values will be later calculated.
+$ git checkout a45c7df
+$ echo CONFIG_MODULES=y >all.config
+$ >test-orig; for i in `seq 1000`; do KCONFIG_ALLCONFIG=1 make
+randconfig || break; grep -c '=m' .config >>test-orig; done
+...
+$ git checkout e43956e
+$ >test-new; ...
 
-Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
----
- scripts/kconfig/confdata.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+$ awk '{ sum += $1; num++ } END { print sum / num}' test-orig
+573.247
+$ awk '{ sum += $1; num++ } END { print sum / num}' test-new
+565.194
 
-diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-index 13ddf11..306cbc1 100644
---- a/scripts/kconfig/confdata.c
-+++ b/scripts/kconfig/confdata.c
-@@ -1125,7 +1125,7 @@ void conf_set_all_new_symbols(enum conf_def_mode mode)
- 				sym->def[S_DEF_USER].tri = no;
- 				break;
- 			case def_random:
--				cnt = sym_get_type(sym) == S_TRISTATE ? 3 : 2;
-+				cnt = sym->type == S_TRISTATE ? 3 : 2;
- 				sym->def[S_DEF_USER].tri = (tristate)(rand() % cnt);
- 				break;
- 			default:
--- 
-1.7.10.4
+I am not a statistician, but this looks OK to me. For reference, the
+figure was ~340 with the previous patch.
 
+I pulled your changes to kbuild.git#kconfig.
+
+Thanks,
+Michal
