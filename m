@@ -1,58 +1,31 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:51915 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752001Ab3DYI51 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 25 Apr 2013 04:57:27 -0400
-Message-ID: <5178EFF6.50208@suse.cz>
-Date: Thu, 25 Apr 2013 10:57:26 +0200
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: [PATCH 8/8] kconfig: implement KCONFIG_PROBABILITY for randconfig
-References: <cover.1366841993.git.yann.morin.1998@free.fr> <e43956e607692f9b1c710311e4a6591ffba1edf0.1366841993.git.yann.morin.1998@free.fr>
-In-Reply-To: <e43956e607692f9b1c710311e4a6591ffba1edf0.1366841993.git.yann.morin.1998@free.fr>
-Content-Type: text/plain; charset=ISO-8859-2
+Received: from mail.linuxfoundation.org ([140.211.169.12]:57636 "EHLO
+	mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758746Ab3DYWn7 (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 25 Apr 2013 18:43:59 -0400
+Date: Thu, 25 Apr 2013 15:43:56 -0700
+From: Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH v3 -next 4/5] x86: Add support for LZ4-compressed kernel
+Message-Id: <20130425154356.4498719b15ccff41aaec0762@linux-foundation.org>
+In-Reply-To: <20130306063738.GB4979@Corona>
+References: <1362484056-9778-1-git-send-email-kyungsik.lee@lge.com>
+	<1362484056-9778-5-git-send-email-kyungsik.lee@lge.com>
+	<18eb6ca7-6993-40e9-a58d-116e1f6c37f6@email.android.com>
+	<20130306063738.GB4979@Corona>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Peter Korsgaard <jacmet@uclibc.org>
+To: Kyungsik Lee <kyungsik.lee@lge.com>
+Cc: "H. Peter Anvin" <hpa@zytor.com>, Russell King <linux@arm.linux.org.uk>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org, celinux-dev@lists.celinuxforum.org, Nicolas Pitre <nico@fluxnic.net>, David Sterba <dsterba@suse.cz>, Nitin Gupta <nitingupta910@gmail.com>, Joe Millenbach <jmillenbach@gmail.com>, Thomas Gleixner <tglx@linutronix.de>, Michal Marek <mmarek@suse.cz>, hyojun.im@lge.com, chan.jeong@lge.com, raphael.andy.lee@gmail.com
 
-On 25.4.2013 00:29, Yann E. MORIN wrote:
-> From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+On Wed, 6 Mar 2013 15:37:38 +0900 Kyungsik Lee <kyungsik.lee@lge.com> wrote:
+
+> On Tue, Mar 05, 2013 at 08:13:38AM -0800, H. Peter Anvin wrote:
+> > Please add the new magic to Documentation/x86/boot.txt as well.
 > 
-> Currently the odds to set each symbol is (rounded):
->     booleans:   y: 50%          n: 50%
->     tristates:  y: 33%  m: 33%  n: 33%
-> 
-> Introduce a KCONFIG_PROBABILITY environment variable to tweak the
-> probabilities (in percentage), as such:
->     KCONFIG_PROBABILITY     y:n split           y:m:n split
->     -----------------------------------------------------------------
-> [1] unset or empty          50  : 50            33  : 33  : 34
-> [2] N                        N  : 100-N         N/2 : N/2 : 100-N
->     N:M                     N+M : 100-(N+M)      N  :  M  : 100-(N+M)
->     N:M:L                    N  : 100-N          M  :  L  : 100-(M+L)
+> Ok, I will update it as soon as the patch set is stabilized.
 
-I did a naive test with the current kconfig branch and with
-yem-kconfig-for-next:
-
-$ git checkout a45c7df
-$ echo CONFIG_MODULES=y >all.config
-$ >test-orig; for i in `seq 1000`; do KCONFIG_ALLCONFIG=1 make
-randconfig || break; grep -c '=m' .config >>test-orig; done
-...
-$ git checkout e43956e
-$ >test-new; ...
-
-$ awk '{ sum += $1; num++ } END { print sum / num}' test-orig
-573.247
-$ awk '{ sum += $1; num++ } END { print sum / num}' test-new
-565.194
-
-I am not a statistician, but this looks OK to me. For reference, the
-figure was ~340 with the previous patch.
-
-I pulled your changes to kbuild.git#kconfig.
-
-Thanks,
-Michal
+It's been six weeks.  Please send the update asap.
