@@ -1,113 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-we0-f175.google.com ([74.125.82.175]:40095 "EHLO
-	mail-we0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751213Ab3DZWBh (ORCPT
+Received: from mail-wi0-f175.google.com ([209.85.212.175]:63275 "EHLO
+	mail-wi0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751893Ab3DZWJS (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 26 Apr 2013 18:01:37 -0400
-Date: Sat, 27 Apr 2013 00:01:31 +0200
+	Fri, 26 Apr 2013 18:09:18 -0400
+Date: Sat, 27 Apr 2013 00:09:12 +0200
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: linux-next: Tree for Apr 26
-Message-ID: <20130426220131.GC5100@free.fr>
-References: <20130426180357.7599d1b6b7965470905dcdf3@canb.auug.org.au>
- <CA+icZUWt_W5FUQgQ2TFoQU0df+sAbxZZE8AcD16T3f_fiTD9DQ@mail.gmail.com>
- <517A4FC1.3070605@suse.cz>
- <20130426100435.GA28733@sepie.suse.cz>
- <CA+icZUVOfB2JuL1xh1EO1hTP_eOkntYFKsUJ0Zp6VZqn09NABA@mail.gmail.com>
- <CA+icZUWNVEsiTs6u_2R9krb45ub4t-pZj_VEPRmrX2c4DzwfmA@mail.gmail.com>
- <CA+icZUXSsqN1iE3ttQakvpZqG-oOL9NR6RMUezB7LGeUw3d00Q@mail.gmail.com>
- <517A6033.5060103@suse.cz>
- <517A615D.9020400@suse.cz>
+Subject: Re: [PATCH 6/8] kconfig: fix randomising choice entries in presence
+ of KCONFIG_ALLCONFIG
+Message-ID: <20130426220912.GD5100@free.fr>
+References: <cover.1366841993.git.yann.morin.1998@free.fr>
+ <422c809f03f043d0950d8362214818e956a9daee.1366841993.git.yann.morin.1998@free.fr>
+ <6079984.JVoK3fHgsy@wuerfel>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <517A615D.9020400@suse.cz>
+In-Reply-To: <6079984.JVoK3fHgsy@wuerfel>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: sedat.dilek@gmail.com, Stephen Rothwell <sfr@canb.auug.org.au>, linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, Thomas Petazzoni <thomas.petazzoni@free-electrons.com>, Sam Ravnborg <sam@ravnborg.org>, Arnaud Lacombe <lacombar@gmail.com>, Greg KH <greg@kroah.com>
 
-Michal, Sedat, All,
-
-On Fri, Apr 26, 2013 at 01:13:33PM +0200, Michal Marek wrote:
-> On 26.4.2013 13:08, Michal Marek wrote:
-> > On 26.4.2013 12:49, Sedat Dilek wrote:
-> >> With reverting all kbuild-next commits I was able to build again.
-> >>
-> >>       Revert "kconfig: implement KCONFIG_PROBABILITY for randconfig"
-> >>       Revert "kconfig: allow specifying the seed for randconfig"
-> >>       Revert "kconfig: fix randomising choice entries in presence of
-> >> KCONFIG_ALLCONFIG"
-> >>       Revert "kconfig: do not override symbols already set"
-> >>       Revert "kconfig: fix randconfig tristate detection"
+On Fri, Apr 26, 2013 at 02:05:37PM +0200, Arnd Bergmann wrote:
+> On Thursday 25 April 2013 00:29:53 Yann E. MORIN wrote:
+> > From: "Yann E. MORIN" <yann.morin.1998@free.fr>
 > > 
-> > I did the same, then applied all the kconfig commits once more and did a
-> > git bisect with this script:
+> > Currently, randconfig does randomise choice entries, unless KCONFIG_ALLCONFIG
+> > is specified.
 > > 
-> > #!/bin/sh
-> > 
-> > cp config-bad .config
-> > make silentoldconfig </dev/null
-> > 
-> > This resulted in
-> > 
-> > 7ded2624f8988bd22819a60a6000ba6b7091db89 is the first bad commit
-> > commit 7ded2624f8988bd22819a60a6000ba6b7091db89
-> > Author: Yann E. MORIN <yann.morin.1998@free.fr>
-> > Date:   Sun Mar 10 16:34:10 2013 +0100
-> > 
-> >     kconfig: fix randomising choice entries in presence of KCONFIG_ALLCONFIG
-> > 
-> > The commit id is different, because it is reverted and applied again. Yann?
+> > For example, given those two files (Thomas' test-case):
 > 
-> Commit 422c809 ("kconfig: fix randomising choice entries in presence of
-> KCONFIG_ALLCONFIG") reverts cleanly and reverting it fixes the bug. So
-> there is a plan B.
+> This patch has made it into linux-next today, and while I agree with
+> the basic idea, it seems to cause regressions for me.
+> 
+> For these ARM defconfigs, 'make' always asks about USB_GADGET now
 
-I do not understand how reverting 422c809 could have fixed the
-silentoldconfig issue: as I previously reported, it already happens on
-Linus' master.
+OK, I threw in the towel on that one for tonight.
+I'll send a patch to revert this changeset, in the coming minutes.
 
-I tried again jsut a few minutes ago against:
-    d7d7271: Merge branch 'v4l_for_linus' of git://git.kernel.org/pub/scm/linux/kernel/git/mchehab/linux-media
-and it is already broken, although 422c809 is not yet in Linus' tree:
+It will have to be revisited later on, and hopefully we can come to a
+proper solution during the pre-rc1 window, or at worst, early during the
+-rc phase (as I'm on holidays the next two weeks, I should find sometime
+to gather what remains of my courage to look at that again).
 
-    $ make silentoldconfig </dev/null
-    scripts/kconfig/conf --silentoldconfig Kconfig
-    warning: (IA32_EMULATION) selects COMPAT_BINFMT_ELF which has unmet
-    direct dependencies (COMPAT && BINFMT_ELF)
-    *
-    * Restart config...
-    *
-    *
-    * Paravirtualized guest support
-    *
-    Paravirtualized guest support (PARAVIRT_GUEST) [N/y/?] (NEW) aborted!
-
-    Console input/output is redirected. Run 'make oldconfig' to update configuration.
-
-    make[1]: *** [silentoldconfig] Error 1
-    make: *** [silentoldconfig] Error 2
-
-Or did I miss something?
-
-However, oldconfig just works (with an error for each new symbol):
-    $ make oldconfig </dev/null
-    [--SNIP--]
-      NOP USB Transceiver Driver (NOP_USB_XCEIV) [N/m/?] (NEW)
-    Error in reading or end of file.
-
-    #
-    # configuration written to .config
-    #
-
-(Which does not mean 422c809 can't be reverted for other reasons, more
-on that in another mail).
+Really sorry for the inconvenience... :-(
 
 Regards,
 Yann E. MORIN.
-
-PS. I'm sad that I do not receive Sedat's emails for some reasons... :-(
-YEM.
 
 -- 
 .-----------------.--------------------.------------------.--------------------.
