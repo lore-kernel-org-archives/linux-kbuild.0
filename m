@@ -1,54 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f175.google.com ([209.85.212.175]:63275 "EHLO
-	mail-wi0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751893Ab3DZWJS (ORCPT
+Received: from mail-wi0-f171.google.com ([209.85.212.171]:43738 "EHLO
+	mail-wi0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756215Ab3DZWSd (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 26 Apr 2013 18:09:18 -0400
-Date: Sat, 27 Apr 2013 00:09:12 +0200
+	Fri, 26 Apr 2013 18:18:33 -0400
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH 6/8] kconfig: fix randomising choice entries in presence
- of KCONFIG_ALLCONFIG
-Message-ID: <20130426220912.GD5100@free.fr>
-References: <cover.1366841993.git.yann.morin.1998@free.fr>
- <422c809f03f043d0950d8362214818e956a9daee.1366841993.git.yann.morin.1998@free.fr>
- <6079984.JVoK3fHgsy@wuerfel>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6079984.JVoK3fHgsy@wuerfel>
+Subject: [pull request] Pull request for branch yem-kconfig-for-next
+Date: Sat, 27 Apr 2013 00:17:59 +0200
+Message-Id: <cover.1367014328.git.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, Thomas Petazzoni <thomas.petazzoni@free-electrons.com>, Sam Ravnborg <sam@ravnborg.org>, Arnaud Lacombe <lacombar@gmail.com>, Greg KH <greg@kroah.com>
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Sedat Dilek <sedat.dilek@gmail.com>, Arnd Bergmann <arnd@arndb.de>, Michal Marek <mmarek@suse.cz>, "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-On Fri, Apr 26, 2013 at 02:05:37PM +0200, Arnd Bergmann wrote:
-> On Thursday 25 April 2013 00:29:53 Yann E. MORIN wrote:
-> > From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-> > 
-> > Currently, randconfig does randomise choice entries, unless KCONFIG_ALLCONFIG
-> > is specified.
-> > 
-> > For example, given those two files (Thomas' test-case):
-> 
-> This patch has made it into linux-next today, and while I agree with
-> the basic idea, it seems to cause regressions for me.
-> 
-> For these ARM defconfigs, 'make' always asks about USB_GADGET now
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-OK, I threw in the towel on that one for tonight.
-I'll send a patch to revert this changeset, in the coming minutes.
+Michal,
 
-It will have to be revisited later on, and hopefully we can come to a
-proper solution during the pre-rc1 window, or at worst, early during the
--rc phase (as I'm on holidays the next two weeks, I should find sometime
-to gather what remains of my courage to look at that again).
+Please pull this to revert:
+    422c809: fix randomising choice entries in presence of KCONFIG_ALLCONFIG
 
-Really sorry for the inconvenience... :-(
+It causes more harm that it fixes issues, and I couldn't find a proper
+fix for now. To avoid breakage so close to the opening of the merge
+window, it makes more sense to revert it than to wait for a fix.
+
+As I already said earlier, I'll be on vacation the next two weeks, so
+I should find some time to look back at this again, hopefully before
+-rc1 is out (but any sane person that value his/her life should not hold
+his/her breath...)
+
+
+The following changes since commit e43956e607692f9b1c710311e4a6591ffba1edf0:
+
+  kconfig: implement KCONFIG_PROBABILITY for randconfig (2013-04-25 00:16:30 +0200)
+
+are available in the git repository at:
+
+  git://gitorious.org/linux-kconfig/linux-kconfig.git yem-kconfig-for-next
+
+for you to fetch changes up to 23a5dfdad22a574d19d7cc19b391f9ce0d3c2f21:
+
+  Revert "kconfig: fix randomising choice entries in presence of KCONFIG_ALLCONFIG" (2013-04-26 23:21:59 +0200)
+
+----------------------------------------------------------------
+Yann E. MORIN (1):
+      Revert "kconfig: fix randomising choice entries in presence of KCONFIG_ALLCONFIG"
+
+ scripts/kconfig/confdata.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
 Regards,
-Yann E. MORIN.
+Yann E. MORIN
 
--- 
 .-----------------.--------------------.------------------.--------------------.
 |  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
 | +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
