@@ -1,48 +1,107 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.snhosting.dk ([87.238.248.203]:18841 "EHLO
-	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753754Ab3DZS5M (ORCPT
+Received: from astoria.ccjclearline.com ([64.235.106.9]:41413 "EHLO
+	astoria.ccjclearline.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757317Ab3DZT2e (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 26 Apr 2013 14:57:12 -0400
-Date: Fri, 26 Apr 2013 20:57:09 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH] fix make headers_install when path is too long
-Message-ID: <20130426185709.GA13399@merkur.ravnborg.org>
-References: <513895F9.2050900@windriver.com> <1366994198-30550-1-git-send-email-nicolas.dichtel@6wind.com>
+	Fri, 26 Apr 2013 15:28:34 -0400
+Received: from cpec03f0ed08c7f-cm001ac318e826.cpe.net.cable.rogers.com ([174.115.5.73]:41109 helo=crashcourse.ca)
+	by astoria.ccjclearline.com with esmtpsa (TLSv1:DHE-RSA-AES256-SHA:256)
+	(Exim 4.80)
+	(envelope-from <rpjday@crashcourse.ca>)
+	id 1UVnxB-0004iS-IK
+	for linux-kbuild@vger.kernel.org; Fri, 26 Apr 2013 15:05:05 -0400
+Date: Fri, 26 Apr 2013 15:05:02 -0400 (EDT)
+From: "Robert P. J. Day" <rpjday@crashcourse.ca>
+Subject: strange behaviour from "make localmodconfig" throws out ath9k
+ stuff
+Message-ID: <alpine.DEB.2.02.1304261459030.17575@oneiric>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1366994198-30550-1-git-send-email-nicolas.dichtel@6wind.com>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Cc: bruce.ashfield@windriver.com, mmarek@suse.cz, linux-kbuild@vger.kernel.org
+To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Fri, Apr 26, 2013 at 06:36:38PM +0200, Nicolas Dichtel wrote:
-> If headers_install is executed from a deep/long directory structure, the
-> shell's maximum argument length can be execeeded, which breaks the operation
-> with:
-> 
-> | make[2]: execvp: /bin/sh: Argument list too long
-> | make[2]: ***
-> 
-> Instead of passing each files name with the entire path, I give only the file
-> name without the source path and give this path as a new argument to
-> headers_install.pl.
-> 
-> Because there is three possible path, I have tree input-files list, one per
-> path.
-> 
-> Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-> ---
-> 
-> I come back to this issue. Here is another proposal to fix this pb.
-> Comments are welcome.
-> 
->  scripts/Makefile.headersinst | 20 ++++++++++++++------
->  scripts/headers_install.pl   |  8 ++++----
 
-In the kbuild tree the perl script has been replaced by a shell script.
-You should base you patch on the kbuild-tree (or -next).
+  probably a simple explanation for this, but my first time playing
+with "make localmodconfig" and it appears to be tossing all my
+ath9k-related module settings.
 
-	Sam
+  currently running ubuntu on a 64-bit asus laptop with the following
+ath9k-related modules:
+
+$ lsmod | grep ath9k
+ath9k                 149545  0
+mac80211              558577  1 ath9k
+ath9k_common           14054  1 ath9k
+ath9k_hw              408874  2 ath9k,ath9k_common
+ath                    23828  3 ath9k,ath9k_common,ath9k_hw
+cfg80211              211955  3 ath9k,mac80211,ath
+$
+
+  starting with current kernel "git pull", i do:
+
+$ make allmodconfig
+
+at which point i get:
+
+$ grep ATH9K .config
+CONFIG_ATH9K_HW=m
+CONFIG_ATH9K_COMMON=m
+CONFIG_ATH9K_DFS_DEBUGFS=y
+CONFIG_ATH9K_BTCOEX_SUPPORT=y
+CONFIG_ATH9K=m
+CONFIG_ATH9K_PCI=y
+CONFIG_ATH9K_AHB=y
+CONFIG_ATH9K_DEBUGFS=y
+CONFIG_ATH9K_DFS_CERTIFIED=y
+CONFIG_ATH9K_MAC_DEBUG=y
+CONFIG_ATH9K_RATE_CONTROL=y
+CONFIG_ATH9K_HTC=m
+CONFIG_ATH9K_HTC_DEBUGFS=y
+$
+
+which looks reasonable(?).  then run:
+
+$ make localmodconfig
+
+have to answer maybe 4 questions manually, at which point i have:
+
+$ grep ATH9K .config
+$
+
+that doesn't look good, i should definitely have module selections for
+ath9k stuff, no?  and if i run that command again, i get:
+
+$ make localmodconfig
+using config: '.config'
+WARNING: ATH9K_HW is required, but nothing in the
+  current config selects it.
+WARNING: ATH_COMMON is required, but nothing in the
+  current config selects it.
+WARNING: ATH9K_COMMON is required, but nothing in the
+  current config selects it.
+module ath9k did not have configs CONFIG_ATH9K
+module uas did not have configs CONFIG_USB_UAS
+module ath did not have configs CONFIG_ATH_COMMON
+module ath9k_hw did not have configs CONFIG_ATH9K_HW
+module ath9k_common did not have configs CONFIG_ATH9K_COMMON
+#
+# configuration written to .config
+#
+$
+
+so there seems to be something related specifically to ath9k that
+doesn't play well with "localmodconfig". or am i doing something
+silly?
+
+rday
+
+-- 
+
+========================================================================
+Robert P. J. Day                                 Ottawa, Ontario, CANADA
+                        http://crashcourse.ca
+
+Twitter:                                       http://twitter.com/rpjday
+LinkedIn:                               http://ca.linkedin.com/in/rpjday
+========================================================================
