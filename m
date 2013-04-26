@@ -1,43 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f172.google.com ([209.85.212.172]:35167 "EHLO
-	mail-wi0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757350Ab3DZTgc (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 26 Apr 2013 15:36:32 -0400
-Received: by mail-wi0-f172.google.com with SMTP id hm14so992694wib.17
-        for <linux-kbuild@vger.kernel.org>; Fri, 26 Apr 2013 12:36:31 -0700 (PDT)
-Date: Fri, 26 Apr 2013 21:36:26 +0200
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: strange behaviour from "make localmodconfig" throws out ath9k
- stuff
-Message-ID: <20130426193626.GA5100@free.fr>
-References: <alpine.DEB.2.02.1304261459030.17575@oneiric>
+Received: from terminus.zytor.com ([198.137.202.10]:43051 "EHLO mail.zytor.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1757751Ab3DZUUv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 26 Apr 2013 16:20:51 -0400
+Message-ID: <517AE16A.8090602@zytor.com>
+Date: Fri, 26 Apr 2013 13:19:54 -0700
+From: "H. Peter Anvin" <hpa@zytor.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <alpine.DEB.2.02.1304261459030.17575@oneiric>
+Subject: Re: [PATCH -next] x86, doc: Add LZ4 magic number for the new compression
+References: <1366952933-31331-1-git-send-email-kyungsik.lee@lge.com>
+In-Reply-To: <1366952933-31331-1-git-send-email-kyungsik.lee@lge.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Robert P. J. Day" <rpjday@crashcourse.ca>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Kyungsik Lee <kyungsik.lee@lge.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Rob Landley <rob@landley.net>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org, celinux-dev@lists.celinuxforum.org, hyojun.im@lge.com, chan.jeong@lge.com, raphael.andy.lee@gmail.com, Ingo Molnar <mingo@elte.hu>, Thomas Gleixner <tglx@linutronix.de>, Russell King <rmk@arm.linux.org.uk>, Borislav Petkov <bp@alien8.de>, Florian Fainelli <florian@openwrt.org>, Yann Collet <yann.collet.73@gmail.com>
 
-Robert, All,
+On 04/25/2013 10:08 PM, Kyungsik Lee wrote:
+> Documentation/x86/boot.txt is updated to list the LZ4 magic number.
+> This LZ4 magic number is used for the new compression format.
+> 
+> Signed-off-by: Kyungsik Lee <kyungsik.lee@lge.com>
+> Cc: "H. Peter Anvin" <hpa@zytor.com>
+> Cc: Ingo Molnar <mingo@elte.hu>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Russell King <rmk@arm.linux.org.uk>
+> Cc: Borislav Petkov <bp@alien8.de>
+> Cc: Florian Fainelli <florian@openwrt.org>
+> Cc: Yann Collet <yann.collet.73@gmail.com>
+> ---
+>  Documentation/x86/boot.txt | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
+> 
+> diff --git a/Documentation/x86/boot.txt b/Documentation/x86/boot.txt
+> index 3840b6f..fc66d42 100644
+> --- a/Documentation/x86/boot.txt
+> +++ b/Documentation/x86/boot.txt
+> @@ -657,9 +657,10 @@ Protocol:	2.08+
+>    uncompressed data should be determined using the standard magic
+>    numbers.  The currently supported compression formats are gzip
+>    (magic numbers 1F 8B or 1F 9E), bzip2 (magic number 42 5A), LZMA
+> -  (magic number 5D 00), and XZ (magic number FD 37).  The uncompressed
+> -  payload is currently always ELF (magic number 7F 45 4C 46).
+> -  
+> +  (magic number 5D 00), XZ (magic number FD 37), and LZ4 (magic number
+> +  02 21).  The uncompressed payload is currently always ELF (magic
+> +  number 7F 45 4C 46).
+> +
+>  Field name:	payload_length
+>  Type:		read
+>  Offset/size:	0x24c/4
+> 
 
-On Fri, Apr 26, 2013 at 03:05:02PM -0400, Robert P. J. Day wrote:
->   probably a simple explanation for this, but my first time playing
-> with "make localmodconfig" and it appears to be tossing all my
-> ath9k-related module settings.
+Acked-by: H. Peter Anvin <hpa@linux.intel.com>
 
-Probably due to cset 422c809. It caused a few other issues.
-I'm working on it. In the meantime, can you just try to revert it, please?
-
-Regards,
-Yann E. MORIN.
-
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
