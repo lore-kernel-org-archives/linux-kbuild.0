@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from astoria.ccjclearline.com ([64.235.106.9]:52504 "EHLO
+Received: from astoria.ccjclearline.com ([64.235.106.9]:52736 "EHLO
 	astoria.ccjclearline.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753168Ab3D0RtF (ORCPT
+	with ESMTP id S1753369Ab3D0STU (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 27 Apr 2013 13:49:05 -0400
-Date: Sat, 27 Apr 2013 13:48:59 -0400 (EDT)
+	Sat, 27 Apr 2013 14:19:20 -0400
+Date: Sat, 27 Apr 2013 14:19:05 -0400 (EDT)
 From: "Robert P. J. Day" <rpjday@crashcourse.ca>
 Subject: Re: strange behaviour from "make localmodconfig" throws out ath9k
  stuff
 In-Reply-To: <20130427174226.GA25088@free.fr>
-Message-ID: <alpine.DEB.2.02.1304271347320.25661@oneiric>
+Message-ID: <alpine.DEB.2.02.1304271412250.27554@oneiric>
 References: <alpine.DEB.2.02.1304261459030.17575@oneiric> <20130427153833.GC3355@free.fr> <alpine.DEB.2.02.1304271325240.12586@oneiric> <20130427174226.GA25088@free.fr>
 MIME-Version: 1.0
 Content-Type: TEXT/PLAIN; charset=US-ASCII
@@ -92,10 +92,41 @@ On Sat, 27 Apr 2013, Yann E. MORIN wrote:
 >
 > Not sure where to go from there... :-/
 
-  see my later email, it might be fairly simple and i'll look at this
-later today. i started to suspect that it was something related to a
-strange change in the dependencies related to atheros, and from what
-you just wrote, that looks exactly like what it is.
+  i'm going to take a wild, uneducated stab at this, but it matches
+what i was starting to suspect, anyway. this has nothing to do with
+config processing, it has to do specifically with how the Kconfig
+entries related to atheros cards were changed.
+
+  here's the important part:
+
+$ git show 23c1d7f
+... snip ...
+    So, this patch introduce new Kconfig variable ATH_CARDS for belonging
+    to the "Atheros Wireless Cards" family; while ATH_COMMON becomes hidden
+    variable to express dependency on common Atheros code in ath.ko. Modules
+    that depend on this common code now express it by setting ATH_COMMON.
+... snip ...
+-menuconfig ATH_COMMON
++config ATH_COMMON
++       tristate
++
++menuconfig ATH_CARDS
+
+  in short, a new variable, ATH_CARDS, was introduced that doesn't
+appear in the earlier .config so, unsurprisingly, when you run "make
+oldconfig", in the midst of all of the other manual answers, you have
+to specify what you want done, and look at the default:
+
+$ make oldconfig
+... many manual choices ...
+Atheros Wireless Cards (ATH_CARDS) [N/m/?] (NEW)   <-- there's the culprit
+... snip ...
+
+  so running the standard "yes '' | make oldconfig" is going to
+deselect what looks like almost all ath9k-related stuff, simply
+because a new, low-level dependency variable was introduced.
+
+  am i making sense here?
 
 rday
 
