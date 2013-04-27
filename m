@@ -1,51 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f181.google.com ([209.85.212.181]:39355 "EHLO
-	mail-wi0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752569Ab3D0PYH (ORCPT
+Received: from mail-wi0-f175.google.com ([209.85.212.175]:46042 "EHLO
+	mail-wi0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755149Ab3D0Pih (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 27 Apr 2013 11:24:07 -0400
-Date: Sat, 27 Apr 2013 17:24:00 +0200
+	Sat, 27 Apr 2013 11:38:37 -0400
+Received: by mail-wi0-f175.google.com with SMTP id h11so1524107wiv.2
+        for <linux-kbuild@vger.kernel.org>; Sat, 27 Apr 2013 08:38:36 -0700 (PDT)
+Date: Sat, 27 Apr 2013 17:38:33 +0200
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: linux-next: Tree for Apr 26
-Message-ID: <20130427152400.GB3355@free.fr>
-References: <517A4FC1.3070605@suse.cz>
- <20130426100435.GA28733@sepie.suse.cz>
- <CA+icZUVOfB2JuL1xh1EO1hTP_eOkntYFKsUJ0Zp6VZqn09NABA@mail.gmail.com>
- <CA+icZUWNVEsiTs6u_2R9krb45ub4t-pZj_VEPRmrX2c4DzwfmA@mail.gmail.com>
- <CA+icZUXSsqN1iE3ttQakvpZqG-oOL9NR6RMUezB7LGeUw3d00Q@mail.gmail.com>
- <517A6033.5060103@suse.cz>
- <517A615D.9020400@suse.cz>
- <20130426220131.GC5100@free.fr>
- <517B762D.8030409@suse.cz>
- <CA+icZUWeQ_UcH4mFPr64Zm9Z48n1pen1Jh3LO3P4qVFKSq8kLw@mail.gmail.com>
+Subject: Re: strange behaviour from "make localmodconfig" throws out ath9k
+ stuff
+Message-ID: <20130427153833.GC3355@free.fr>
+References: <alpine.DEB.2.02.1304261459030.17575@oneiric>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CA+icZUWeQ_UcH4mFPr64Zm9Z48n1pen1Jh3LO3P4qVFKSq8kLw@mail.gmail.com>
+In-Reply-To: <alpine.DEB.2.02.1304261459030.17575@oneiric>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sedat Dilek <sedat.dilek@gmail.com>
-Cc: Michal Marek <mmarek@suse.cz>, Stephen Rothwell <sfr@canb.auug.org.au>, linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: "Robert P. J. Day" <rpjday@crashcourse.ca>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-Sedat, All,
+Robert, All,
 
-On Sat, Apr 27, 2013 at 01:30:33PM +0200, Sedat Dilek wrote:
-> On Sat, Apr 27, 2013 at 8:54 AM, Michal Marek <mmarek@suse.cz> wrote:
-> > That (silent)oldconfig with stdin redirection throws an error if it
-> > encounters a new option is expected and correct. The bug here is that
-> > _normal_ oldconfig run apparently does not set all the options. I.e.
-> >
-> > $ yes "" | make oldconfig; make silentoldconfig </dev/null
-> >
-> > should always pass.
-> >
+On Fri, Apr 26, 2013 at 03:05:02PM -0400, Robert P. J. Day wrote:
+>   probably a simple explanation for this, but my first time playing
+> with "make localmodconfig" and it appears to be tossing all my
+> ath9k-related module settings.
 > 
-> Yupp. That should be always tested... before sending patches and
-> committing to a repo :-).
-> Anyway, thanks for taking care and solving fast to all involved folks!
+>   currently running ubuntu on a 64-bit asus laptop with the following
+> ath9k-related modules:
+> 
+> $ lsmod | grep ath9k
+> ath9k                 149545  0
+> mac80211              558577  1 ath9k
+> ath9k_common           14054  1 ath9k
+> ath9k_hw              408874  2 ath9k,ath9k_common
+> ath                    23828  3 ath9k,ath9k_common,ath9k_hw
+> cfg80211              211955  3 ath9k,mac80211,ath
+> $
+> 
+>   starting with current kernel "git pull", i do:
+> 
+> $ make allmodconfig
+> 
+> at which point i get:
+> 
+> $ grep ATH9K .config
+> CONFIG_ATH9K_HW=m
+> CONFIG_ATH9K_COMMON=m
+> CONFIG_ATH9K_DFS_DEBUGFS=y
+> CONFIG_ATH9K_BTCOEX_SUPPORT=y
+> CONFIG_ATH9K=m
+> CONFIG_ATH9K_PCI=y
+> CONFIG_ATH9K_AHB=y
+> CONFIG_ATH9K_DEBUGFS=y
+> CONFIG_ATH9K_DFS_CERTIFIED=y
+> CONFIG_ATH9K_MAC_DEBUG=y
+> CONFIG_ATH9K_RATE_CONTROL=y
+> CONFIG_ATH9K_HTC=m
+> CONFIG_ATH9K_HTC_DEBUGFS=y
+> $
+> 
+> which looks reasonable(?).  then run:
+> 
+> $ make localmodconfig
+> 
+> have to answer maybe 4 questions manually, at which point i have:
+> 
+> $ grep ATH9K .config
 
-Yep, that kind of command was what I was missing to check for regression
-on this patch. Now, I have someting to test. Thanks.
+Can you send the output of your lsmod, please?
 
 Regards,
 Yann E. MORIN.
