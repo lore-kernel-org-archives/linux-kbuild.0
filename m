@@ -1,13 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.122]:9628 "EHLO
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.122]:15192 "EHLO
 	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932264Ab3D2Xau (ORCPT
+	with ESMTP id S932285Ab3D2Xav (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 29 Apr 2013 19:30:50 -0400
-Message-Id: <20130429233000.662744610@goodmis.org>
-Date: Mon, 29 Apr 2013 19:30:00 -0400
+	Mon, 29 Apr 2013 19:30:51 -0400
+Message-Id: <20130429233049.799089308@goodmis.org>
+Date: Mon, 29 Apr 2013 19:30:01 -0400
 From: Steven Rostedt <rostedt@goodmis.org>
-Subject: [PATCH 0/2] [GIT PULL take 2 ] localmodconfig: Fix missing depends of config files included in if statements
+Subject: [PATCH 1/2] localmodconfig: Add debug prints for dependencies of module configs
+References: <20130429233000.662744610@goodmis.org>
+Content-Disposition: inline; filename=0001-localmodconfig-Add-debug-prints-for-dependencies-of-.patch
 Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="00GvhwF7k39YY"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
@@ -18,37 +20,46 @@ Cc: Linus Torvalds <torvalds@linux-foundation.org>, Linux Kbuild mailing list <l
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
+From: Steven Rostedt <rostedt@goodmis.org>
 
-Linus,
+When a config for a module is added to the list to save in the final
+config file, add a print to show what dependencies are used. This is
+useful to debug when a config is disabled by the make oldconfig after
+localmodconfig is finished.
 
-[
-  Sorry for the previous confusion. My scripts to make my patch sets
-  key off of the tag name. Thus by using the ktest tag, my scripts
-  put in the linux-ktest.git tree.
-]
+This print only appears if the environment variable LOCALMODCONFIG_DEBUG
+is defined.
 
-A bug was recently found in the make localmodconfig where it would miss
-dependencies of config files are include in other config files inside
-an if statement.
+Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
+---
+ scripts/kconfig/streamline_config.pl |    9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-Also added a debug print that helped in solving this bug.
+diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streaml=
+ine_config.pl
+index 3368939..343a568 100644
+--- a/scripts/kconfig/streamline_config.pl
++++ b/scripts/kconfig/streamline_config.pl
+@@ -396,6 +396,15 @@ foreach my $module (keys(%modules)) {
+ 	foreach my $conf (@arr) {
+ 	    $configs{$conf} =3D $module;
+ 	    dprint "$conf added by direct ($module)\n";
++	    if ($debugprint) {
++		my $c=3D$conf;
++		$c =3D~ s/^CONFIG_//;
++		if (defined($depends{$c})) {
++		    dprint " deps =3D $depends{$c}\n";
++		} else {
++		    dprint " no deps\n";
++		}
++	    }
+ 	}
+     } else {
+ 	# Most likely, someone has a custom (binary?) module loaded.
+--=20
+1.7.10.4
 
 
-Please pull the latest localmodconfig-v3.10 tree, which can be found at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/rostedt/linux-kconfig.git
-localmodconfig-v3.10
-
-Head SHA1: 0d0f18b32c5382431163391f224195dea251cae8
-
-
-Steven Rostedt (2):
-      localmodconfig: Add debug prints for dependencies of module configs
-      localmodconfig: Process source kconfig files as they are found
-
-----
- scripts/kconfig/streamline_config.pl |   26 ++++++++++++++++----------
- 1 file changed, 16 insertions(+), 10 deletions(-)
 
 --00GvhwF7k39YY
 Content-Type: application/pgp-signature; name="signature.asc"
@@ -57,13 +68,13 @@ Content-Description: This is a digitally signed message part
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.4.12 (GNU/Linux)
 
-iQEcBAABAgAGBQJRfwKmAAoJEOdOSU1xswtMd0IIAMsHxNiia11NzyCDd01D+1Np
-g3Lqx/3LPA4o7wAfBHxHrAheES11w2J+PJg8Sq74z4V0TpdFYhdp5FbXdIYTQ/aV
-7pg+uPfmeALr6M3nl4rM55sJSyaq8jKLguFCNLziERsQIMQyFpqrtlpm7YvnTszJ
-RwZgh0fEZK69qOMCkacHdPd1XDu4YvXLhX+JHTwc3sR0MJYoPET6+qTQIY+ZRvrM
-uzVWl++jgBcC45wikPyIjQhQQoHAfILa/sHK9T56Z0fFgMbozlj6Ypo97fqY9hHk
-p6aOUefi7Up2+NsaoQ4PfN6WW52EnTse/JK5+topMkb1F8PK3eI8TSw2uLwY7gc=
-=NRGC
+iQEcBAABAgAGBQJRfwKpAAoJEOdOSU1xswtMiuQIAMnC76EjkDWCUF9Ax0wAU6Nx
+jQ/r1L2W9YoNSgWGVOKks74Nx1i/s6qZvAXfCUfbdy5BLs3TiQh7He5ST9ZjUBjW
+/x7a7FypvJy7z9L+C5nztQl/9yWKVSrZIPh0uU7eqGrOnqBI8u3XUYW7UDjnMnUg
+0bcraIhWEkvjAFA4BXE+mOY4j9eR5QziKyPUH1u77d3MBXSkSKpXaRnhOKubcZUh
++NlmrDTNo5LlZQ1wW78iIZCbcJUj2BL03AmFt+69wXEaffKCP1CpHIydUgo6cwK9
+lJMwvVI19SlWjfs1WFLm0vtmwpoMPygCYUJgNI9iiJ/D9zvms+oe3mtBhje3Sm0=
+=Zl/a
 -----END PGP SIGNATURE-----
 
 --00GvhwF7k39YY--
