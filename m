@@ -1,63 +1,84 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f180.google.com ([209.85.212.180]:37764 "EHLO
-	mail-wi0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757857Ab3D2Rm1 (ORCPT
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.122]:11448 "EHLO
+	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758114Ab3D2SAV (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 29 Apr 2013 13:42:27 -0400
-Date: Mon, 29 Apr 2013 19:42:21 +0200
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: linux-next: Tree for Apr 29 (kconfig)
-Message-ID: <20130429174221.GB3989@free.fr>
-References: <20130429191754.8ee71fb814790bf345516ab8@canb.auug.org.au>
- <517E9F12.1020309@infradead.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <517E9F12.1020309@infradead.org>
+	Mon, 29 Apr 2013 14:00:21 -0400
+Message-ID: <1367258419.30667.20.camel@gandalf.local.home>
+Subject: Re: strange behaviour from "make localmodconfig" throws out ath9k
+ stuff
+From: Steven Rostedt <rostedt@goodmis.org>
+Date: Mon, 29 Apr 2013 14:00:19 -0400
+In-Reply-To: <alpine.DEB.2.02.1304291121180.26536@oneiric>
+References: <alpine.DEB.2.02.1304261459030.17575@oneiric>
+	    <20130427153833.GC3355@free.fr>
+	    <alpine.DEB.2.02.1304271325240.12586@oneiric>
+	    <20130427174226.GA25088@free.fr>
+	    <alpine.DEB.2.02.1304271412250.27554@oneiric>
+	    <20130428202854.GC4571@free.fr>
+	 <alpine.DEB.2.02.1304290645150.16211@oneiric>
+	   <1367244700.28120.6.camel@fedora>
+	   <alpine.DEB.2.02.1304291022320.9234@oneiric>
+	  <1367246499.30667.9.camel@gandalf.local.home>
+	  <alpine.DEB.2.02.1304291056410.13584@oneiric>
+	 <1367248388.30667.13.camel@gandalf.local.home>
+	 <alpine.DEB.2.02.1304291121180.26536@oneiric>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>, linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Benjamin Poirier <bpoirier@suse.de>
+To: "Robert P. J. Day" <rpjday@crashcourse.ca>
+Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-Randy, All,
+Can you add this patch and see if it fixes your issue. If so, can I add
+your "tested-by" to this patch?
 
-On Mon, Apr 29, 2013 at 09:25:54AM -0700, Randy Dunlap wrote:
-> make ARCH=x86_64 O=X64 xconfig &
->   GEN     /local/lnx/next/linux-next-20130429/X64/Makefile
->   HOSTCXX scripts/kconfig/qconf.o
-> In file included from scripts/kconfig/expr.h:15:0,
->                  from scripts/kconfig/lkc.h:9,
->                  from scripts/kconfig/qconf.cc:46:
-> scripts/kconfig/list.h: In function 'void list_del(list_head*)':
-> scripts/kconfig/list.h:128:16: error: invalid conversion from 'void*' to 'list_head*' [-fpermissive]
-> scripts/kconfig/list.h:129:16: error: invalid conversion from 'void*' to 'list_head*' [-fpermissive]
-> make[2]: *** [scripts/kconfig/qconf.o] Error 1
+Thanks,
 
-Found the culprit:
+-- Steve
 
-9a69abf80edf2ea0dac058cab156879d29362788 is the first bad commit
-commit 9a69abf80edf2ea0dac058cab156879d29362788
-Author: Benjamin Poirier <bpoirier@suse.de>
-Date:   Tue Apr 16 10:07:23 2013 -0400
+diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
+index 3368939..4606cdf 100644
+--- a/scripts/kconfig/streamline_config.pl
++++ b/scripts/kconfig/streamline_config.pl
+@@ -156,7 +156,6 @@ sub read_kconfig {
+ 
+     my $state = "NONE";
+     my $config;
+-    my @kconfigs;
+ 
+     my $cont = 0;
+     my $line;
+@@ -190,7 +189,13 @@ sub read_kconfig {
+ 
+ 	# collect any Kconfig sources
+ 	if (/^source\s*"(.*)"/) {
+-	    $kconfigs[$#kconfigs+1] = $1;
++	    my $kconfig = $1;
++	    # prevent reading twice.
++	    if (!defined($read_kconfigs{$kconfig})) {
++		$read_kconfigs{$kconfig} = 1;
++		read_kconfig($kconfig);
++	    }
++	    next;
+ 	}
+ 
+ 	# configs found
+@@ -250,14 +255,6 @@ sub read_kconfig {
+ 	}
+     }
+     close($kinfile);
+-
+-    # read in any configs that were found.
+-    foreach my $kconfig (@kconfigs) {
+-	if (!defined($read_kconfigs{$kconfig})) {
+-	    $read_kconfigs{$kconfig} = 1;
+-	    read_kconfig($kconfig);
+-	}
+-    }
+ }
+ 
+ if ($kconfig) {
 
-    menuconfig: Add "breadcrumbs" navigation aid
 
-    Displays a trail of the menu entries used to get to the current menu.
-
-    Signed-off-by: Benjamin Poirier <bpoirier@suse.de>
-    Tested-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
-    [yann.morin.1998@free.fr: small, trivial code re-ordering]
-    Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
-
-I'll submit a fix in a moment.
-
-Regards,
-Yann E. MORIN.
-
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
