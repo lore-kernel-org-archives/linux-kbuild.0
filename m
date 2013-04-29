@@ -1,20 +1,20 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.122]:13093 "EHLO
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.122]:33571 "EHLO
 	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758856Ab3D2TwE (ORCPT
+	with ESMTP id S1759119Ab3D2TwF (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 29 Apr 2013 15:52:04 -0400
-Message-Id: <20130429195201.462539345@goodmis.org>
-Date: Mon, 29 Apr 2013 15:51:01 -0400
+	Mon, 29 Apr 2013 15:52:05 -0400
+Message-Id: <20130429195201.690687280@goodmis.org>
+Date: Mon, 29 Apr 2013 15:51:02 -0400
 From: Steven Rostedt <rostedt@goodmis.org>
-Subject: [PATCH 1/2] localmodconfig: Add debug prints for dependencies of module configs
+Subject: [PATCH 2/2] localmodconfig: Process source kconfig files as they are found
 References: <20130429195100.202681236@goodmis.org>
-Content-Disposition: inline; filename=0001-localmodconfig-Add-debug-prints-for-dependencies-of-.patch
+Content-Disposition: inline; filename=0002-localmodconfig-Process-source-kconfig-files-as-they-.patch
 Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="00GvhwF7k39YY"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, stable@vger.kernel.org, "Robert P. J. Day" <rpjday@crashcourse.ca>
 
 --00GvhwF7k39YY
 Content-Type: text/plain; charset="UTF-8"
@@ -22,40 +22,95 @@ Content-Transfer-Encoding: quoted-printable
 
 From: Steven Rostedt <rostedt@goodmis.org>
 
-When a config for a module is added to the list to save in the final
-config file, add a print to show what dependencies are used. This is
-useful to debug when a config is disabled by the make oldconfig after
-localmodconfig is finished.
+A bug was reported that caused localmodconfig to not keep all the
+dependencies of ATH9K. This was caused by the kconfig file:
 
-This print only appears if the environment variable LOCALMODCONFIG_DEBUG
-is defined.
+In drivers/net/wireless/ath/Kconfig:
 
+---
+if ATH_CARDS
+
+config ATH_DEBUG
+        bool "Atheros wireless debugging"
+        ---help---
+          Say Y, if you want to debug atheros wireless drivers.
+          Right now only ath9k makes use of this.
+
+source "drivers/net/wireless/ath/ath5k/Kconfig"
+source "drivers/net/wireless/ath/ath9k/Kconfig"
+source "drivers/net/wireless/ath/carl9170/Kconfig"
+source "drivers/net/wireless/ath/ath6kl/Kconfig"
+source "drivers/net/wireless/ath/ar5523/Kconfig"
+source "drivers/net/wireless/ath/wil6210/Kconfig"
+
+endif
+---
+
+The current way kconfig works, it processes new source files after the
+first file is completed. It creates an array of new source config files
+and when the one file is finished, it continues with the next file.
+
+Unfortunately, this means that it loses the fact that the source file is
+within an "if" statement, and this means that each of these source file's
+configs will not have the proper dependencies set.
+
+As ATH9K requires ATH_CARDS set, the localmodconfig did not see that
+dependency, and did not enable ATH_CARDS. When the oldconfig was run, it
+forced ATH9K to be disabled.
+
+Link: http://lkml.kernel.org/r/alpine.DEB.2.02.1304291022320.9234@oneiric
+
+Cc: stable@vger.kernel.org # 3.8+
+Reported-by: Robert P. J. Day <rpjday@crashcourse.ca>
+Tested-by: Robert P. J. Day <rpjday@crashcourse.ca>
 Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
 ---
- scripts/kconfig/streamline_config.pl |    9 +++++++++
- 1 file changed, 9 insertions(+)
+ scripts/kconfig/streamline_config.pl |   17 +++++++----------
+ 1 file changed, 7 insertions(+), 10 deletions(-)
 
 diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streaml=
 ine_config.pl
-index 3368939..343a568 100644
+index 343a568..4606cdf 100644
 --- a/scripts/kconfig/streamline_config.pl
 +++ b/scripts/kconfig/streamline_config.pl
-@@ -396,6 +396,15 @@ foreach my $module (keys(%modules)) {
- 	foreach my $conf (@arr) {
- 	    $configs{$conf} =3D $module;
- 	    dprint "$conf added by direct ($module)\n";
-+	    if ($debugprint) {
-+		my $c=3D$conf;
-+		$c =3D~ s/^CONFIG_//;
-+		if (defined($depends{$c})) {
-+		    dprint " deps =3D $depends{$c}\n";
-+		} else {
-+		    dprint " no deps\n";
-+		}
+@@ -156,7 +156,6 @@ sub read_kconfig {
+=20
+     my $state =3D "NONE";
+     my $config;
+-    my @kconfigs;
+=20
+     my $cont =3D 0;
+     my $line;
+@@ -190,7 +189,13 @@ sub read_kconfig {
+=20
+ 	# collect any Kconfig sources
+ 	if (/^source\s*"(.*)"/) {
+-	    $kconfigs[$#kconfigs+1] =3D $1;
++	    my $kconfig =3D $1;
++	    # prevent reading twice.
++	    if (!defined($read_kconfigs{$kconfig})) {
++		$read_kconfigs{$kconfig} =3D 1;
++		read_kconfig($kconfig);
 +	    }
++	    next;
  	}
-     } else {
- 	# Most likely, someone has a custom (binary?) module loaded.
+=20
+ 	# configs found
+@@ -250,14 +255,6 @@ sub read_kconfig {
+ 	}
+     }
+     close($kinfile);
+-
+-    # read in any configs that were found.
+-    foreach my $kconfig (@kconfigs) {
+-	if (!defined($read_kconfigs{$kconfig})) {
+-	    $read_kconfigs{$kconfig} =3D 1;
+-	    read_kconfig($kconfig);
+-	}
+-    }
+ }
+=20
+ if ($kconfig) {
 --=20
 1.7.10.4
 
@@ -68,13 +123,13 @@ Content-Description: This is a digitally signed message part
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.4.12 (GNU/Linux)
 
-iQEcBAABAgAGBQJRfs9hAAoJEOdOSU1xswtM/kwH/3YTLGutkGz6EBA7Kp50cKw+
-Xm/S4vmnpy3Qy9OZqoKYOYuBuP5MzcKnYo8gT9bGlUysO5IJsK32906/ycwikyph
-uPZEXqKYyoPEAM03CFSlMR9DVGIbhln4iVMaKa+UkOuOVf6BKiAuv24Bswa5VXg8
-b0E/V2agiNeZsUHz1s01FU/fqzDlRvIlEMZY77nnPDn1VkFyO6ntltniUOm/XfyD
-QhImfViKUvvts2K9JpoS5hmqTcMwILIqzEwXnPMuPMT7TOOwE9C8niUut/sBNwxW
-9HlBpcYNgbuUY5ys0Ql7jWqapQZdOQ4HFIfw4avkVbtI+iwmpcZ/qzonywSojb4=
-=8Bla
+iQEcBAABAgAGBQJRfs9hAAoJEOdOSU1xswtMHXQH/jV61d/9IzGCNdzZVFD/AZr8
+a0ejKxzpGJVe5G3EAyHyzElqEDPCPlHeq+nbr14kO17HrGX2+NFTfW9psTXLQM26
+L9D2IzXR+brFrMo8RqOX1E81Px4sNTn54C8Q9K1sdqI7q0KHD+oCprwn0ACGQqMc
+GdC+5eCEq4e0LWsz548o3BnPpabkax+Slkeq0HyBYgzDKqdy8MZ7d88NLbXATzgS
+d7ux3cRO90ctIvFSwhZb7jG5ZLF/XNxKyD+Jxateb7eo7px5Yd1iWJ8wiN4csk3n
+9Z27IMT0hg7ATGNvwzjPsUNO1zlTSItbsJEqyOLT+QcUtdDXGbxAS+L4ZHyPh2s=
+=x/Fj
 -----END PGP SIGNATURE-----
 
 --00GvhwF7k39YY--
