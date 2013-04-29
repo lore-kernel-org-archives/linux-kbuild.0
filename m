@@ -1,62 +1,80 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from casper.infradead.org ([85.118.1.10]:37212 "EHLO
-	casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757615Ab3D2T2q (ORCPT
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.122]:13093 "EHLO
+	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758856Ab3D2TwE (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 29 Apr 2013 15:28:46 -0400
-Message-ID: <517EC9C7.9000903@infradead.org>
-Date: Mon, 29 Apr 2013 12:28:07 -0700
-From: Randy Dunlap <rdunlap@infradead.org>
-MIME-Version: 1.0
-Subject: Re: [PATCH 1/1] kconfig: fix lists definition for C++
-References: <cover.1367258255.git.yann.morin.1998@free.fr> <21ca352b71ca252e1933b1538fe89da8a04395c3.1367258255.git.yann.morin.1998@free.fr>
-In-Reply-To: <21ca352b71ca252e1933b1538fe89da8a04395c3.1367258255.git.yann.morin.1998@free.fr>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+	Mon, 29 Apr 2013 15:52:04 -0400
+Message-Id: <20130429195201.462539345@goodmis.org>
+Date: Mon, 29 Apr 2013 15:51:01 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+Subject: [PATCH 1/2] localmodconfig: Add debug prints for dependencies of module configs
+References: <20130429195100.202681236@goodmis.org>
+Content-Disposition: inline; filename=0001-localmodconfig-Add-debug-prints-for-dependencies-of-.patch
+Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="00GvhwF7k39YY"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-next@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Benjamin Poirier <bpoirier@suse.de>
+To: linux-kernel@vger.kernel.org
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On 04/29/13 10:59, Yann E. MORIN wrote:
-> From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-> 
-> The C++ compiler is more strict in that it refuses to assign
-> a void* to a struct list_head*.
-> 
-> Fix that by explicitly casting the poisonning constants.
-> 
-> (Tested with all 5 frontends, now.)
-> 
-> Reported-by: Randy Dunlap <rdunlap@infradead.org>
-> Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
-> Cc: Randy Dunlap <rdunlap@infradead.org>
-> Cc: Benjamin Poirier <bpoirier@suse.de>
+--00GvhwF7k39YY
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Acked-by: Randy Dunlap <rdunlap@infradead.org>
+From: Steven Rostedt <rostedt@goodmis.org>
 
-Thanks.
+When a config for a module is added to the list to save in the final
+config file, add a print to show what dependencies are used. This is
+useful to debug when a config is disabled by the make oldconfig after
+localmodconfig is finished.
 
-> ---
->  scripts/kconfig/list.h | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/scripts/kconfig/list.h b/scripts/kconfig/list.h
-> index ea1d581..685d80e 100644
-> --- a/scripts/kconfig/list.h
-> +++ b/scripts/kconfig/list.h
-> @@ -125,7 +125,7 @@ static inline void __list_del(struct list_head *prev, struct list_head *next)
->  static inline void list_del(struct list_head *entry)
->  {
->  	__list_del(entry->prev, entry->next);
-> -	entry->next = LIST_POISON1;
-> -	entry->prev = LIST_POISON2;
-> +	entry->next = (struct list_head*)LIST_POISON1;
-> +	entry->prev = (struct list_head*)LIST_POISON2;
->  }
->  #endif
-> 
+This print only appears if the environment variable LOCALMODCONFIG_DEBUG
+is defined.
+
+Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
+---
+ scripts/kconfig/streamline_config.pl |    9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streaml=
+ine_config.pl
+index 3368939..343a568 100644
+--- a/scripts/kconfig/streamline_config.pl
++++ b/scripts/kconfig/streamline_config.pl
+@@ -396,6 +396,15 @@ foreach my $module (keys(%modules)) {
+ 	foreach my $conf (@arr) {
+ 	    $configs{$conf} =3D $module;
+ 	    dprint "$conf added by direct ($module)\n";
++	    if ($debugprint) {
++		my $c=3D$conf;
++		$c =3D~ s/^CONFIG_//;
++		if (defined($depends{$c})) {
++		    dprint " deps =3D $depends{$c}\n";
++		} else {
++		    dprint " no deps\n";
++		}
++	    }
+ 	}
+     } else {
+ 	# Most likely, someone has a custom (binary?) module loaded.
+--=20
+1.7.10.4
 
 
--- 
-~Randy
+
+--00GvhwF7k39YY
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQEcBAABAgAGBQJRfs9hAAoJEOdOSU1xswtM/kwH/3YTLGutkGz6EBA7Kp50cKw+
+Xm/S4vmnpy3Qy9OZqoKYOYuBuP5MzcKnYo8gT9bGlUysO5IJsK32906/ycwikyph
+uPZEXqKYyoPEAM03CFSlMR9DVGIbhln4iVMaKa+UkOuOVf6BKiAuv24Bswa5VXg8
+b0E/V2agiNeZsUHz1s01FU/fqzDlRvIlEMZY77nnPDn1VkFyO6ntltniUOm/XfyD
+QhImfViKUvvts2K9JpoS5hmqTcMwILIqzEwXnPMuPMT7TOOwE9C8niUut/sBNwxW
+9HlBpcYNgbuUY5ys0Ql7jWqapQZdOQ4HFIfw4avkVbtI+iwmpcZ/qzonywSojb4=
+=8Bla
+-----END PGP SIGNATURE-----
+
+--00GvhwF7k39YY--
