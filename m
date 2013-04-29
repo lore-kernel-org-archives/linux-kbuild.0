@@ -1,84 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.122]:11448 "EHLO
-	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758114Ab3D2SAV (ORCPT
+Received: from mail-wi0-f181.google.com ([209.85.212.181]:53780 "EHLO
+	mail-wi0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757824Ab3D2R7L (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 29 Apr 2013 14:00:21 -0400
-Message-ID: <1367258419.30667.20.camel@gandalf.local.home>
-Subject: Re: strange behaviour from "make localmodconfig" throws out ath9k
- stuff
-From: Steven Rostedt <rostedt@goodmis.org>
-Date: Mon, 29 Apr 2013 14:00:19 -0400
-In-Reply-To: <alpine.DEB.2.02.1304291121180.26536@oneiric>
-References: <alpine.DEB.2.02.1304261459030.17575@oneiric>
-	    <20130427153833.GC3355@free.fr>
-	    <alpine.DEB.2.02.1304271325240.12586@oneiric>
-	    <20130427174226.GA25088@free.fr>
-	    <alpine.DEB.2.02.1304271412250.27554@oneiric>
-	    <20130428202854.GC4571@free.fr>
-	 <alpine.DEB.2.02.1304290645150.16211@oneiric>
-	   <1367244700.28120.6.camel@fedora>
-	   <alpine.DEB.2.02.1304291022320.9234@oneiric>
-	  <1367246499.30667.9.camel@gandalf.local.home>
-	  <alpine.DEB.2.02.1304291056410.13584@oneiric>
-	 <1367248388.30667.13.camel@gandalf.local.home>
-	 <alpine.DEB.2.02.1304291121180.26536@oneiric>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+	Mon, 29 Apr 2013 13:59:11 -0400
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: [PATCH 1/1] kconfig: fix lists definition for C++
+Date: Mon, 29 Apr 2013 19:59:02 +0200
+Message-Id: <21ca352b71ca252e1933b1538fe89da8a04395c3.1367258255.git.yann.morin.1998@free.fr>
+In-Reply-To: <cover.1367258255.git.yann.morin.1998@free.fr>
+References: <cover.1367258255.git.yann.morin.1998@free.fr>
+In-Reply-To: <cover.1367258255.git.yann.morin.1998@free.fr>
+References: <cover.1367258255.git.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Robert P. J. Day" <rpjday@crashcourse.ca>
-Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, linux-next@vger.kernel.org, Randy Dunlap <rdunlap@infradead.org>, Michal Marek <mmarek@suse.cz>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Benjamin Poirier <bpoirier@suse.de>
 
-Can you add this patch and see if it fixes your issue. If so, can I add
-your "tested-by" to this patch?
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-Thanks,
+The C++ compiler is more strict in that it refuses to assign
+a void* to a struct list_head*.
 
--- Steve
+Fix that by explicitly casting the poisonning constants.
 
-diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
-index 3368939..4606cdf 100644
---- a/scripts/kconfig/streamline_config.pl
-+++ b/scripts/kconfig/streamline_config.pl
-@@ -156,7 +156,6 @@ sub read_kconfig {
- 
-     my $state = "NONE";
-     my $config;
--    my @kconfigs;
- 
-     my $cont = 0;
-     my $line;
-@@ -190,7 +189,13 @@ sub read_kconfig {
- 
- 	# collect any Kconfig sources
- 	if (/^source\s*"(.*)"/) {
--	    $kconfigs[$#kconfigs+1] = $1;
-+	    my $kconfig = $1;
-+	    # prevent reading twice.
-+	    if (!defined($read_kconfigs{$kconfig})) {
-+		$read_kconfigs{$kconfig} = 1;
-+		read_kconfig($kconfig);
-+	    }
-+	    next;
- 	}
- 
- 	# configs found
-@@ -250,14 +255,6 @@ sub read_kconfig {
- 	}
-     }
-     close($kinfile);
--
--    # read in any configs that were found.
--    foreach my $kconfig (@kconfigs) {
--	if (!defined($read_kconfigs{$kconfig})) {
--	    $read_kconfigs{$kconfig} = 1;
--	    read_kconfig($kconfig);
--	}
--    }
+(Tested with all 5 frontends, now.)
+
+Reported-by: Randy Dunlap <rdunlap@infradead.org>
+Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: Randy Dunlap <rdunlap@infradead.org>
+Cc: Benjamin Poirier <bpoirier@suse.de>
+---
+ scripts/kconfig/list.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/kconfig/list.h b/scripts/kconfig/list.h
+index ea1d581..685d80e 100644
+--- a/scripts/kconfig/list.h
++++ b/scripts/kconfig/list.h
+@@ -125,7 +125,7 @@ static inline void __list_del(struct list_head *prev, struct list_head *next)
+ static inline void list_del(struct list_head *entry)
+ {
+ 	__list_del(entry->prev, entry->next);
+-	entry->next = LIST_POISON1;
+-	entry->prev = LIST_POISON2;
++	entry->next = (struct list_head*)LIST_POISON1;
++	entry->prev = (struct list_head*)LIST_POISON2;
  }
- 
- if ($kconfig) {
-
+ #endif
+-- 
+1.8.1.2
 
