@@ -1,79 +1,72 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f174.google.com ([209.85.212.174]:33910 "EHLO
-	mail-wi0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756316Ab3D1U3A (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 28 Apr 2013 16:29:00 -0400
-Received: by mail-wi0-f174.google.com with SMTP id m6so2144695wiv.1
-        for <linux-kbuild@vger.kernel.org>; Sun, 28 Apr 2013 13:28:58 -0700 (PDT)
-Date: Sun, 28 Apr 2013 22:28:54 +0200
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: strange behaviour from "make localmodconfig" throws out ath9k
- stuff
-Message-ID: <20130428202854.GC4571@free.fr>
-References: <alpine.DEB.2.02.1304261459030.17575@oneiric>
- <20130427153833.GC3355@free.fr>
- <alpine.DEB.2.02.1304271325240.12586@oneiric>
- <20130427174226.GA25088@free.fr>
- <alpine.DEB.2.02.1304271412250.27554@oneiric>
+Received: from ozlabs.org ([203.10.76.45]:60508 "EHLO ozlabs.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756954Ab3D2DSV (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 28 Apr 2013 23:18:21 -0400
+From: Rusty Russell <rusty@rustcorp.com.au>
+Subject: Re: [PATCH] modpost.c: Add .text.unlikely to TEXT_SECTIONS
+In-Reply-To: <1366842363-7513-1-git-send-email-trini@ti.com>
+References: <1366842363-7513-1-git-send-email-trini@ti.com>
+Date: Mon, 29 Apr 2013 12:29:12 +0930
+Message-ID: <87sj2aca9r.fsf@rustcorp.com.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <alpine.DEB.2.02.1304271412250.27554@oneiric>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Robert P. J. Day" <rpjday@crashcourse.ca>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Steven Rostedt <srostedt@redhat.com>
+To: Tom Rini <trini@ti.com>, linux-kernel@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-kbuild@vger.kernel.org
 
-Robert, All,
+Tom Rini <trini@ti.com> writes:
 
-On Sat, Apr 27, 2013 at 02:19:05PM -0400, Robert P. J. Day wrote:
->   i'm going to take a wild, uneducated stab at this, but it matches
-> what i was starting to suspect, anyway. this has nothing to do with
-> config processing, it has to do specifically with how the Kconfig
-> entries related to atheros cards were changed.
-> 
->   here's the important part:
-> 
-> $ git show 23c1d7f
-> ... snip ...
->     So, this patch introduce new Kconfig variable ATH_CARDS for belonging
->     to the "Atheros Wireless Cards" family; while ATH_COMMON becomes hidden
->     variable to express dependency on common Atheros code in ath.ko. Modules
->     that depend on this common code now express it by setting ATH_COMMON.
-> ... snip ...
-> -menuconfig ATH_COMMON
-> +config ATH_COMMON
-> +       tristate
-> +
-> +menuconfig ATH_CARDS
-> 
->   in short, a new variable, ATH_CARDS, was introduced that doesn't
-> appear in the earlier .config so, unsurprisingly, when you run "make
-> oldconfig", in the midst of all of the other manual answers, you have
-> to specify what you want done, and look at the default:
-> 
-> $ make oldconfig
-> ... many manual choices ...
-> Atheros Wireless Cards (ATH_CARDS) [N/m/?] (NEW)   <-- there's the culprit
-> ... snip ...
-> 
->   so running the standard "yes '' | make oldconfig" is going to
-> deselect what looks like almost all ath9k-related stuff, simply
-> because a new, low-level dependency variable was introduced.
-> 
->   am i making sense here?
+> Recent gcc's may place functions into the .text.unlikely section and we
+> need to check this section as well for section mismatches now otherwise
+> we may have false negatives for this test.
 
-Not sure how streamline_config,pl should behave. Cc-ing Steven as the
-original author, maybe he has a better understanding on this situation.
+Hmm, I don't think it's all that recent, is it?  I can find it back to
+gcc 4.0.4:
 
-Regards,
-Yann E. MORIN.
+`-freorder-functions'
+     Reorder functions in the object file in order to improve code
+     locality.  This is implemented by using special subsections
+     `.text.hot' for most frequently executed functions and
+     `.text.unlikely' for unlikely executed functions.  Reordering is
+     done by the linker so object file format must support named
+     sections and linker must place them in a reasonable way.
 
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+     Also profile feedback must be available in to make this option
+     effective.  See `-fprofile-arcs' for details.
+
+     Enabled at levels `-O2', `-O3', `-Os'.
+
+The comment is the same in in gcc 4.7.
+
+So is your real issue that this section is generated with
+-fprofile-arcs, or has something changed with gcc 4.8, or...?
+
+Thanks,
+Rusty.
+
+> Cc: Rusty Russell <rusty@rustcorp.com.au>
+> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Cc: linux-kernel@vger.kernel.org
+> Cc: linux-kbuild@vger.kernel.org
+> Signed-off-by: Tom Rini <trini@ti.com>
+> ---
+>  scripts/mod/modpost.c |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+> index ff36c50..13ff12f 100644
+> --- a/scripts/mod/modpost.c
+> +++ b/scripts/mod/modpost.c
+> @@ -880,7 +880,7 @@ static void check_section(const char *modname, struct elf_info *elf,
+>  #define ALL_EXIT_SECTIONS EXIT_SECTIONS, ALL_XXXEXIT_SECTIONS
+>  
+>  #define DATA_SECTIONS ".data$", ".data.rel$"
+> -#define TEXT_SECTIONS ".text$"
+> +#define TEXT_SECTIONS ".text$", ".text.unlikely$"
+>  
+>  #define INIT_SECTIONS      ".init.*"
+>  #define CPU_INIT_SECTIONS  ".cpuinit.*"
+> -- 
+> 1.7.9.5
