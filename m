@@ -1,38 +1,71 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ie0-f176.google.com ([209.85.223.176]:32811 "EHLO
-	mail-ie0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933170Ab3D2VyR convert rfc822-to-8bit (ORCPT
+Received: from mail-wg0-f42.google.com ([74.125.82.42]:37186 "EHLO
+	mail-wg0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757746Ab3D2WWS (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 29 Apr 2013 17:54:17 -0400
-Received: by mail-ie0-f176.google.com with SMTP id x14so7921208ief.21
-        for <linux-kbuild@vger.kernel.org>; Mon, 29 Apr 2013 14:54:17 -0700 (PDT)
-Date: Mon, 29 Apr 2013 16:54:14 -0500
-From: Rob Landley <rob@landley.net>
-Subject: Re: [PATCH 1/1] kconfig: fix lists definition for C++
-References: <cover.1367258255.git.yann.morin.1998@free.fr>
-	<21ca352b71ca252e1933b1538fe89da8a04395c3.1367258255.git.yann.morin.1998@free.fr>
-	<517EC9C7.9000903@infradead.org>
-In-Reply-To: <517EC9C7.9000903@infradead.org> (from rdunlap@infradead.org on
-	Mon Apr 29 14:28:07 2013)
-Message-Id: <1367272454.18069.191@driftwood>
+	Mon, 29 Apr 2013 18:22:18 -0400
+Date: Tue, 30 Apr 2013 00:22:13 +0200
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: kconfig-frontends-3.9.0.0 released
+Message-ID: <20130429222213.GA31039@free.fr>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; DelSp=Yes; Format=Flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-next@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Benjamin Poirier <bpoirier@suse.de>
+To: Linux kbuild ML <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Cc: lwn@lwn.net
 
-On 04/29/2013 02:28:07 PM, Randy Dunlap wrote:
-> On 04/29/13 10:59, Yann E. MORIN wrote:
-> > From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-> >
-> > The C++ compiler is more strict in that it refuses to assign
-> > a void* to a struct list_head*.
+Hello All!
 
-Given that the code _isn't_ C++ (because C is not a subset of C++ but a  
-separate langauge in its own right where "throw" is a legitimate  
-variable name and so on), how is this an issue?
+I'm pleased to announce the release of kconfig-frontends 3.9.0.0!
+Go download it there:
+    http://ymorin.is-a-geek.org/download/kconfig-frontends/kconfig-frontends-3.9.0.0.tar.xz
+    http://ymorin.is-a-geek.org/download/kconfig-frontends/kconfig-frontends-3.9.0.0.tar.bz2
 
-Rob
+The kconfig-frontends package provides the kconfig parser, as well as all the
+kconfig frontends and utilities, packaged using the traditional autotools, so
+the kconfig infrastructure is easy to deploy, either locally or system-wide.
+
+What's new since 3.8.0.0:
+  - migrated from Hg to git (yeah!)
+  - updated from linux-3.9:
+    - fix colors with ncursesw
+    - parser:
+      - allow specifying an alternate prefix at runtime with $CONFIG_
+    - frontends:
+      - conf : add '\n' to "NEW" symbols when output is redirected (oldconfig)
+      - mconf: add load/save buttons
+      - mconf: remove legacy "Load/save alternate" menu entries
+      - mconf: allow left/right navigation in input boxes
+      - nconf: eye-candy on the function-keys line
+      - nconf: help text revamp up to speed with current functionality
+    - utilities:
+      - merge_config: add option to specify output dir
+  - handle curses libs with separate libtinfo (eg. Gentoo)
+
+As a reminder, the home for kconfig-frontends is:
+  http://ymorin.is-a-geek.org/projects/kconfig-frontends
+
+And the repository can be browsed or git-cloned from:
+  http://ymorin.is-a-geek.org/git/kconfig-frontends
+It is also possible to clone using the git protocol:
+  git://ymorin.is-a-geek.org/kconfig-frontends
+
+kconfig-frontends is not meant to replace the in-tree Linux kconfig, but
+really targets third-party projects that want an easy path to following
+the evolution of kconfig, without the burden to manually synchronise from
+the Linux kernel source tree.
+
+Any comment, any feedback, any patch is welcome! ;-)
+
+Regards,
+Yann E. MORIN.
+
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
