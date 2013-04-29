@@ -1,51 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f180.google.com ([209.85.212.180]:34732 "EHLO
-	mail-wi0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756715Ab3D2R7J (ORCPT
+Received: from astoria.ccjclearline.com ([64.235.106.9]:45833 "EHLO
+	astoria.ccjclearline.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757137Ab3D2S0i (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 29 Apr 2013 13:59:09 -0400
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: [pull request] Pull request for branch yem-kconfig-for-next
-Date: Mon, 29 Apr 2013 19:59:01 +0200
-Message-Id: <cover.1367258255.git.yann.morin.1998@free.fr>
+	Mon, 29 Apr 2013 14:26:38 -0400
+Date: Mon, 29 Apr 2013 14:26:30 -0400 (EDT)
+From: "Robert P. J. Day" <rpjday@crashcourse.ca>
+Subject: Re: strange behaviour from "make localmodconfig" throws out ath9k
+ stuff
+In-Reply-To: <1367258419.30667.20.camel@gandalf.local.home>
+Message-ID: <alpine.DEB.2.02.1304291426040.3793@oneiric>
+References: <alpine.DEB.2.02.1304261459030.17575@oneiric>     <20130427153833.GC3355@free.fr>     <alpine.DEB.2.02.1304271325240.12586@oneiric>     <20130427174226.GA25088@free.fr>     <alpine.DEB.2.02.1304271412250.27554@oneiric>     <20130428202854.GC4571@free.fr>
+  <alpine.DEB.2.02.1304290645150.16211@oneiric>    <1367244700.28120.6.camel@fedora>    <alpine.DEB.2.02.1304291022320.9234@oneiric>   <1367246499.30667.9.camel@gandalf.local.home>   <alpine.DEB.2.02.1304291056410.13584@oneiric>  <1367248388.30667.13.camel@gandalf.local.home>
+  <alpine.DEB.2.02.1304291121180.26536@oneiric> <1367258419.30667.20.camel@gandalf.local.home>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, linux-next@vger.kernel.org, Randy Dunlap <rdunlap@infradead.org>, Michal Marek <mmarek@suse.cz>, "Yann E. MORIN" <yann.morin.1998@free.fr>
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+On Mon, 29 Apr 2013, Steven Rostedt wrote:
 
-Michal,
+> Can you add this patch and see if it fixes your issue. If so, can I
+> add your "tested-by" to this patch?
 
-Please pull this fix to restore compilation of the qconf frontend.
+  i'll get to this shortly and let you know.
 
-Regards,
-Yann E. MORIN.
-
-
-The following changes since commit 23a5dfdad22a574d19d7cc19b391f9ce0d3c2f21:
-
-  Revert "kconfig: fix randomising choice entries in presence of KCONFIG_ALLCONFIG" (2013-04-26 23:21:59 +0200)
-
-are available in the git repository at:
-
-  git://gitorious.org/linux-kconfig/linux-kconfig.git yem-kconfig-for-next
-
-for you to fetch changes up to 21ca352b71ca252e1933b1538fe89da8a04395c3:
-
-  kconfig: fix lists definition for C++ (2013-04-29 19:55:56 +0200)
-
-----------------------------------------------------------------
-Yann E. MORIN (1):
-      kconfig: fix lists definition for C++
-
- scripts/kconfig/list.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+rday
 
 -- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+
+========================================================================
+Robert P. J. Day                                 Ottawa, Ontario, CANADA
+                        http://crashcourse.ca
+
+Twitter:                                       http://twitter.com/rpjday
+LinkedIn:                               http://ca.linkedin.com/in/rpjday
+========================================================================
