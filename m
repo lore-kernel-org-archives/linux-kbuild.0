@@ -1,135 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.122]:15192 "EHLO
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.122]:8323 "EHLO
 	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932378Ab3D2Xav (ORCPT
+	with ESMTP id S1758206Ab3D2XkL (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 29 Apr 2013 19:30:51 -0400
-Message-Id: <20130429233050.006754828@goodmis.org>
-Date: Mon, 29 Apr 2013 19:30:02 -0400
+	Mon, 29 Apr 2013 19:40:11 -0400
+Message-ID: <1367278809.30667.33.camel@gandalf.local.home>
+Subject: Re: strange behaviour from "make localmodconfig" throws out ath9k
+ stuff
 From: Steven Rostedt <rostedt@goodmis.org>
-Subject: [PATCH 2/2] localmodconfig: Process source kconfig files as they are found
-References: <20130429233000.662744610@goodmis.org>
-Content-Disposition: inline; filename=0002-localmodconfig-Process-source-kconfig-files-as-they-.patch
-Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="00GvhwF7k39YY"
+Date: Mon, 29 Apr 2013 19:40:09 -0400
+In-Reply-To: <alpine.DEB.2.02.1304291636380.16617@oneiric>
+References: <alpine.DEB.2.02.1304261459030.17575@oneiric>
+	     <20130427153833.GC3355@free.fr>
+	     <alpine.DEB.2.02.1304271325240.12586@oneiric>
+	     <20130427174226.GA25088@free.fr>
+	     <alpine.DEB.2.02.1304271412250.27554@oneiric>
+	     <20130428202854.GC4571@free.fr>
+	 <alpine.DEB.2.02.1304290645150.16211@oneiric>
+	    <1367244700.28120.6.camel@fedora>
+	    <alpine.DEB.2.02.1304291022320.9234@oneiric>
+	   <1367246499.30667.9.camel@gandalf.local.home>
+	   <alpine.DEB.2.02.1304291056410.13584@oneiric>
+	  <1367248388.30667.13.camel@gandalf.local.home>
+	 <alpine.DEB.2.02.1304291121180.26536@oneiric>
+	 <1367258419.30667.20.camel@gandalf.local.home>
+	 <alpine.DEB.2.02.1304291636380.16617@oneiric>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, stable@vger.kernel.org, "Robert P. J. Day" <rpjday@crashcourse.ca>
+To: "Robert P. J. Day" <rpjday@crashcourse.ca>
+Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
---00GvhwF7k39YY
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On Mon, 2013-04-29 at 16:39 -0400, Robert P. J. Day wrote:
 
-From: Steven Rostedt <rostedt@goodmis.org>
+>   i'm interested -- should that Kconfig file have been written using a
+> different structure to avoid this issue? surely there are other
+> Kconfig files that would have had the same problem, no? i can't
+> believe this could be restricted to a single example involving
+> atheros stuff.
 
-A bug was reported that caused localmodconfig to not keep all the
-dependencies of ATH9K. This was caused by the kconfig file:
+I did a quick search and there's lots of places that source is within if
+statements. But the config used isn't usually a tristate. That is, it is
+either enabled or not, but can't be a module.
 
-In drivers/net/wireless/ath/Kconfig:
+Here the if condition was a module and is something that localmodconfig
+can disabled.
 
----
-if ATH_CARDS
+Hmm, I did find another case like this (and there may be more).
 
-config ATH_DEBUG
-        bool "Atheros wireless debugging"
-        ---help---
-          Say Y, if you want to debug atheros wireless drivers.
-          Right now only ath9k makes use of this.
+drivers/ipack/Kconfig does it too. But nobody noticed.
 
-source "drivers/net/wireless/ath/ath5k/Kconfig"
-source "drivers/net/wireless/ath/ath9k/Kconfig"
-source "drivers/net/wireless/ath/carl9170/Kconfig"
-source "drivers/net/wireless/ath/ath6kl/Kconfig"
-source "drivers/net/wireless/ath/ar5523/Kconfig"
-source "drivers/net/wireless/ath/wil6210/Kconfig"
+Anyway, it's fixed now, which is good.
 
-endif
----
-
-The current way kconfig works, it processes new source files after the
-first file is completed. It creates an array of new source config files
-and when the one file is finished, it continues with the next file.
-
-Unfortunately, this means that it loses the fact that the source file is
-within an "if" statement, and this means that each of these source file's
-configs will not have the proper dependencies set.
-
-As ATH9K requires ATH_CARDS set, the localmodconfig did not see that
-dependency, and did not enable ATH_CARDS. When the oldconfig was run, it
-forced ATH9K to be disabled.
-
-Link: http://lkml.kernel.org/r/alpine.DEB.2.02.1304291022320.9234@oneiric
-
-Cc: stable@vger.kernel.org # 3.8+
-Reported-by: Robert P. J. Day <rpjday@crashcourse.ca>
-Tested-by: Robert P. J. Day <rpjday@crashcourse.ca>
-Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
----
- scripts/kconfig/streamline_config.pl |   17 +++++++----------
- 1 file changed, 7 insertions(+), 10 deletions(-)
-
-diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streaml=
-ine_config.pl
-index 343a568..4606cdf 100644
---- a/scripts/kconfig/streamline_config.pl
-+++ b/scripts/kconfig/streamline_config.pl
-@@ -156,7 +156,6 @@ sub read_kconfig {
-=20
-     my $state =3D "NONE";
-     my $config;
--    my @kconfigs;
-=20
-     my $cont =3D 0;
-     my $line;
-@@ -190,7 +189,13 @@ sub read_kconfig {
-=20
- 	# collect any Kconfig sources
- 	if (/^source\s*"(.*)"/) {
--	    $kconfigs[$#kconfigs+1] =3D $1;
-+	    my $kconfig =3D $1;
-+	    # prevent reading twice.
-+	    if (!defined($read_kconfigs{$kconfig})) {
-+		$read_kconfigs{$kconfig} =3D 1;
-+		read_kconfig($kconfig);
-+	    }
-+	    next;
- 	}
-=20
- 	# configs found
-@@ -250,14 +255,6 @@ sub read_kconfig {
- 	}
-     }
-     close($kinfile);
--
--    # read in any configs that were found.
--    foreach my $kconfig (@kconfigs) {
--	if (!defined($read_kconfigs{$kconfig})) {
--	    $read_kconfigs{$kconfig} =3D 1;
--	    read_kconfig($kconfig);
--	}
--    }
- }
-=20
- if ($kconfig) {
---=20
-1.7.10.4
+-- Steve
 
 
-
---00GvhwF7k39YY
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.12 (GNU/Linux)
-
-iQEcBAABAgAGBQJRfwKqAAoJEOdOSU1xswtMaNAH/iSV85JWaOGA2uYzNZpcx4j9
-AVS9k/ySEUiW39x2tr0Y3w5xV6MwElVnyshFYsE/7+fi8/luQSEv2RWWpVdKluSo
-z52zLdbWdRrUiaZrBFEzQhk7QihMvEPdrJ0nR2SxusOYxVRNNPkHbxizXbDZqKoJ
-OfO6+lpCrChHXKFp8dpuKFidkw2EQrEXGjTtQcQZMfX4TNczuV6/HYLzesUiM9Nm
-sMce2UEgYfsY2SezCKYpRTr8sZo0INp8o3ba+YR2wsEg/EKooptjWRBfaCSoEMMC
-E62XaflP/vLSRi8ITavpuB4lsTXgfeOblilZWbdaIOeq1MtjnUMLQuhs0i05c2U=
-=w9LI
------END PGP SIGNATURE-----
-
---00GvhwF7k39YY--
