@@ -1,55 +1,69 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.122]:3570 "EHLO
+Received: from hrndva-omtalb.mail.rr.com ([71.74.56.122]:9628 "EHLO
 	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932222Ab3D2XX4 (ORCPT
+	with ESMTP id S932264Ab3D2Xau (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 29 Apr 2013 19:23:56 -0400
-Message-ID: <1367277834.30667.27.camel@gandalf.local.home>
-Subject: Re: [PATCH 0/2] [GIT PULL] localmodconfig: Fix missing depends of
- config files included in if statements
+	Mon, 29 Apr 2013 19:30:50 -0400
+Message-Id: <20130429233000.662744610@goodmis.org>
+Date: Mon, 29 Apr 2013 19:30:00 -0400
 From: Steven Rostedt <rostedt@goodmis.org>
-Date: Mon, 29 Apr 2013 19:23:54 -0400
-In-Reply-To: <CA+55aFzEwRUWVQ8x1+f=6R_9+JO_Rmg=u2E1k_6jLuQEAorgtQ@mail.gmail.com>
-References: <20130429195100.202681236@goodmis.org>
-	 <CA+55aFzEwRUWVQ8x1+f=6R_9+JO_Rmg=u2E1k_6jLuQEAorgtQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Subject: [PATCH 0/2] [GIT PULL take 2 ] localmodconfig: Fix missing depends of config files included in if statements
+Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature"; boundary="00GvhwF7k39YY"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: linux-kernel@vger.kernel.org
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Mon, 2013-04-29 at 14:01 -0700, Linus Torvalds wrote:
-> On Mon, Apr 29, 2013 at 12:51 PM, Steven Rostedt <rostedt@goodmis.org> wrote:
-> >
-> >
-> > Please pull the latest ktest-v3.10 tree, which can be found at:
-> >
-> >   git://git.kernel.org/pub/scm/linux/kernel/git/rostedt/linux-ktest.git
-> > ktest-v3.10
-> 
-> Hmm. This is your ktest tree (which I already pulled the ktest changes
-> from), not your localmodconfig tree. But then all the explanations are
-> about your localmodconfig changes.
-> 
-> I assume you *meant* to ask me to pull your linux-kconfig.git tree?
-
-Face palm!
-
-> That has a "ktest-v3.10" tag too, but I think that's a mistake too,
-> and you *meant* to make a tag called "localconfig" like you have done
-> in the past.
-> 
-> There's just too much confusion here for me to touch anything at all,
-> so please fix things up.
-
-Yeah, sorry. I have no idea what I was thinking. I was doing my double
-check of ktest changes and must have still had that on my mind when I
-switched over to the localmodconfig stuff.
-
-I'll clean it up.
-
--- Steve
+--00GvhwF7k39YY
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
 
+Linus,
+
+[
+  Sorry for the previous confusion. My scripts to make my patch sets
+  key off of the tag name. Thus by using the ktest tag, my scripts
+  put in the linux-ktest.git tree.
+]
+
+A bug was recently found in the make localmodconfig where it would miss
+dependencies of config files are include in other config files inside
+an if statement.
+
+Also added a debug print that helped in solving this bug.
+
+
+Please pull the latest localmodconfig-v3.10 tree, which can be found at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/rostedt/linux-kconfig.git
+localmodconfig-v3.10
+
+Head SHA1: 0d0f18b32c5382431163391f224195dea251cae8
+
+
+Steven Rostedt (2):
+      localmodconfig: Add debug prints for dependencies of module configs
+      localmodconfig: Process source kconfig files as they are found
+
+----
+ scripts/kconfig/streamline_config.pl |   26 ++++++++++++++++----------
+ 1 file changed, 16 insertions(+), 10 deletions(-)
+
+--00GvhwF7k39YY
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQEcBAABAgAGBQJRfwKmAAoJEOdOSU1xswtMd0IIAMsHxNiia11NzyCDd01D+1Np
+g3Lqx/3LPA4o7wAfBHxHrAheES11w2J+PJg8Sq74z4V0TpdFYhdp5FbXdIYTQ/aV
+7pg+uPfmeALr6M3nl4rM55sJSyaq8jKLguFCNLziERsQIMQyFpqrtlpm7YvnTszJ
+RwZgh0fEZK69qOMCkacHdPd1XDu4YvXLhX+JHTwc3sR0MJYoPET6+qTQIY+ZRvrM
+uzVWl++jgBcC45wikPyIjQhQQoHAfILa/sHK9T56Z0fFgMbozlj6Ypo97fqY9hHk
+p6aOUefi7Up2+NsaoQ4PfN6WW52EnTse/JK5+topMkb1F8PK3eI8TSw2uLwY7gc=
+=NRGC
+-----END PGP SIGNATURE-----
+
+--00GvhwF7k39YY--
