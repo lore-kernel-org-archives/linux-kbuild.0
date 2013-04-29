@@ -1,14 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ve0-f179.google.com ([209.85.128.179]:40599 "EHLO
-	mail-ve0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1759212Ab3D2VBn (ORCPT
+Received: from mail-vc0-f175.google.com ([209.85.220.175]:38521 "EHLO
+	mail-vc0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932908Ab3D2VnA (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 29 Apr 2013 17:01:43 -0400
+	Mon, 29 Apr 2013 17:43:00 -0400
 MIME-Version: 1.0
-In-Reply-To: <20130429195100.202681236@goodmis.org>
+In-Reply-To: <CA+55aFzEwRUWVQ8x1+f=6R_9+JO_Rmg=u2E1k_6jLuQEAorgtQ@mail.gmail.com>
 References: <20130429195100.202681236@goodmis.org>
-Date: Mon, 29 Apr 2013 14:01:42 -0700
-Message-ID: <CA+55aFzEwRUWVQ8x1+f=6R_9+JO_Rmg=u2E1k_6jLuQEAorgtQ@mail.gmail.com>
+	<CA+55aFzEwRUWVQ8x1+f=6R_9+JO_Rmg=u2E1k_6jLuQEAorgtQ@mail.gmail.com>
+Date: Mon, 29 Apr 2013 14:42:59 -0700
+Message-ID: <CA+55aFzSfRv26E3UF1a8jwQK+vHSru-YTg8ADefZxOKZNnn6fA@mail.gmail.com>
 Subject: Re: [PATCH 0/2] [GIT PULL] localmodconfig: Fix missing depends of
  config files included in if statements
 From: Linus Torvalds <torvalds@linux-foundation.org>
@@ -18,24 +19,14 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Steven Rostedt <rostedt@goodmis.org>
 Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Mon, Apr 29, 2013 at 12:51 PM, Steven Rostedt <rostedt@goodmis.org> wrote:
+On Mon, Apr 29, 2013 at 2:01 PM, Linus Torvalds
+<torvalds@linux-foundation.org> wrote:
 >
->
-> Please pull the latest ktest-v3.10 tree, which can be found at:
->
->   git://git.kernel.org/pub/scm/linux/kernel/git/rostedt/linux-ktest.git
-> ktest-v3.10
+> There's just too much confusion here for me to touch anything at all,
+> so please fix things up.
 
-Hmm. This is your ktest tree (which I already pulled the ktest changes
-from), not your localmodconfig tree. But then all the explanations are
-about your localmodconfig changes.
-
-I assume you *meant* to ask me to pull your linux-kconfig.git tree?
-That has a "ktest-v3.10" tag too, but I think that's a mistake too,
-and you *meant* to make a tag called "localconfig" like you have done
-in the past.
-
-There's just too much confusion here for me to touch anything at all,
-so please fix things up.
+Oh, and you might as well check that I resolved the conflicts in the
+trace pull correctly while you're at it. They looked pretty obvious,
+and it compiles for me, but ..
 
               Linus
