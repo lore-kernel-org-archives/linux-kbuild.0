@@ -1,36 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:50439 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756744Ab3D3WHE (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 30 Apr 2013 18:07:04 -0400
-Date: Tue, 30 Apr 2013 18:06:47 -0400
-From: Dave Jones <davej@redhat.com>
+Received: from e38.co.us.ibm.com ([32.97.110.159]:54580 "EHLO
+	e38.co.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758281Ab3D3WTV (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 30 Apr 2013 18:19:21 -0400
+Received: from /spool/local
+	by e38.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-kbuild@vger.kernel.org> from <paulmck@linux.vnet.ibm.com>;
+	Tue, 30 Apr 2013 16:19:20 -0600
+Date: Tue, 30 Apr 2013 15:19:15 -0700
+From: "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>
 Subject: Re: rcu: Provide compile-time control for no-CBs CPUs
-Message-ID: <20130430220647.GA16524@redhat.com>
+Message-ID: <20130430221915.GM3780@linux.vnet.ibm.com>
+Reply-To: paulmck@linux.vnet.ibm.com
 References: <20130430214826.GK3780@linux.vnet.ibm.com>
+ <20130430220647.GA16524@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20130430214826.GK3780@linux.vnet.ibm.com>
+In-Reply-To: <20130430220647.GA16524@redhat.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, paul.mckenney@linaro.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org
+To: Dave Jones <davej@redhat.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, paul.mckenney@linaro.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org
 
-On Tue, Apr 30, 2013 at 02:48:26PM -0700, Paul E. McKenney wrote:
+On Tue, Apr 30, 2013 at 06:06:47PM -0400, Dave Jones wrote:
+> On Tue, Apr 30, 2013 at 02:48:26PM -0700, Paul E. McKenney wrote:
+> 
+>  > <snip excellent explanation>
+>  >
+>  > Should I add this to the Kconfig help text?  My guess is "not all of it",
+>  > but figured I should ask.
+> 
+> The commit msg would have been a great place for much of it, especially
+> the part explaining your desire to have users kick the tires etc.
 
- > <snip excellent explanation>
- >
- > Should I add this to the Kconfig help text?  My guess is "not all of it",
- > but figured I should ask.
+Good point, will keep that in mind for next time.
 
-The commit msg would have been a great place for much of it, especially
-the part explaining your desire to have users kick the tires etc.
+>  >  See below for my current best guess.
+> 
+> Much better. Be sure to pass on the 'terrible kconfig' award to the
+> next lucky recipient when their time comes :)
 
- >  See below for my current best guess.
+Interesting.  Who passed it to you, and what was the occasion?  ;-)
 
-Much better. Be sure to pass on the 'terrible kconfig' award to the
-next lucky recipient when their time comes :)
-
-	Dave
+							Thanx, Paul
 
