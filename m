@@ -1,90 +1,105 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from comal.ext.ti.com ([198.47.26.152]:54366 "EHLO comal.ext.ti.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1759863Ab3D3MBQ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 30 Apr 2013 08:01:16 -0400
-Message-ID: <517FB285.7030903@ti.com>
-Date: Tue, 30 Apr 2013 15:01:09 +0300
-From: Tomi Valkeinen <tomi.valkeinen@ti.com>
+Received: from astoria.ccjclearline.com ([64.235.106.9]:55329 "EHLO
+	astoria.ccjclearline.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1760512Ab3D3MfU (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 30 Apr 2013 08:35:20 -0400
+Received: from cpebcc8100de718-cmbcc8100de715.cpe.net.cable.rogers.com ([99.240.144.66]:44663 helo=crashcourse.ca)
+	by astoria.ccjclearline.com with esmtpsa (TLSv1:DHE-RSA-AES256-SHA:256)
+	(Exim 4.80)
+	(envelope-from <rpjday@crashcourse.ca>)
+	id 1UX9mA-0007ZR-Ta
+	for linux-kbuild@vger.kernel.org; Tue, 30 Apr 2013 08:35:19 -0400
+Date: Tue, 30 Apr 2013 08:35:15 -0400 (EDT)
+From: "Robert P. J. Day" <rpjday@crashcourse.ca>
+Subject: any interest these days in a Kconfig "maturity" level?
+Message-ID: <alpine.DEB.2.02.1304300808570.16544@oneiric>
 MIME-Version: 1.0
-Subject: Re: Kconfig "softdepends" idea
-References: <517F9472.2030106@ti.com> <20130430102440.GA15522@merkur.ravnborg.org> <20130430103318.GB12161@arwen.pp.htv.fi> <517FA68B.20001@ti.com> <20130430114004.GA15804@merkur.ravnborg.org>
-In-Reply-To: <20130430114004.GA15804@merkur.ravnborg.org>
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature";
-	boundary="----enig2XFDGKPHQPHCNSIDNXGBR"
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: balbi@ti.com, linux-kernel <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
-
-------enig2XFDGKPHQPHCNSIDNXGBR
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
-
-On 04/30/2013 02:40 PM, Sam Ravnborg wrote:
->> SHOW_ALL_DRIVERS" is not very descriptive. I'm not sure if that matter=
-s,
->> though. One doesn't need to read the Kconfig files every day =3D).
->>
->> But presuming most of the drivers would use that, it would add quite a=
-
->> bit of repetition to the Kconfig files. Well, ok, I have no idea how
->> many drivers have dependencies that could be removed.
->>
->> So SHOW_ALL_DRIVERS sounds quite an easy solution to this.
->=20
-> Someone suggested to add symbols that are only set yo "y" for allyescon=
-fig or allmodconfig.
-> This would be what you actuayl require here as what you are after is be=
-tter
-> build coverage.
-
-Sorry, I didn't quite get this. Do you mean that if I do allyesconfig,
-SHOW_ALL_DRIVERS would get enabled, but not otherwise?
-
-> But we should not annouyt the user just to get better build coverage - =
-which
-> is why hiding irrelevant symbols is good.
-
-No disagreement there.
-
-But I must say good build coverage is also important (I broke a powerpc
-fb driver compilation with my mmap changes, and after fixing the
-compilation I introduced a warning...). So I think it's a worthy goal to
-have most of the drivers arch-independent, and make it possible to build
-them if the user so wants.
-
-I'll do a bit experimenting with fb drivers to see how the
-SHOW_ALL_DRIVERS would work. And if there are any other fb drivers than
-omapfb that actually can be compiled on other archs.
-
- Tomi
+To: Linux Kbuild list <linux-kbuild@vger.kernel.org>
 
 
+  once upon a long time ago, i suggested extending kbuild with a whole
+new qualifier, a "maturity level", and i still think that idea has
+value since i don't think it would be hard to add, so let me throw it
+out there again.
 
-------enig2XFDGKPHQPHCNSIDNXGBR
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+  the *concept* of a Kconfig variable maturity level is already
+supported with the use of the dependency "EXPERIMENTAL", which i think
+is a hideous abuse of dependencies. first, EXPERIMENTAL simply isn't a
+dependency -- it's a subjective judgment about the danger of a Kconfig
+setting. sadly, it was implemented as a dependency, which means that
+not only is it mixed in with other *actual* dependencies, but there
+are numerous Kconfig entries that *manually* add the string
+"(EXPERIMENTAL)" at the end, making things even more aestheetically
+hideous.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.12 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+  instead of that, why not add a whole new Kconfig directive,
+"maturity", as in:
 
-iQIcBAEBAgAGBQJRf7KFAAoJEPo9qoy8lh71uWMP/j/1oA01EAODKZ7pk54xJNg9
-T3IiY+qzx93yX/Jj7jEfiB/bNhHstKZSg9o1iVTskn4RP8Drdk4R3PerYdmhZas9
-ikbDKzXaslKpn4Xhin4vQ5cBRcgzxAb4VWLyELyjnunsEOTCz8ce8m/EOpWkIfvt
-zSfeDfIKS2z+KPZMMSqTjEMPZTMBUfKMdX7r553WeHFiqcHJ2NqC/uu3ck5O7Kys
-gv8aP2ncSsU+KGkGk+klsoE7XW7j6p7Qy98SAOC3J1OLYGbBTtRo2G8lB2OnMDUc
-Dzcvt7MouTd0yRWq0smIc0BbiaosN1WmG1aAqgbnyf4Tbw+QIa5xfFxNx7BwdIAP
-VBWOqqltbUV3jXv/xn1WH20M6nJMn2TQxznaaf6eJVq0ma40EV0zqOEzETbmn6fo
-gmeIHUzjSwn6B6gUF8ZJCCBAYvqRHyEAk2SpNKojNgVdttnWZy8Ex9rsMucjWc46
-iHTu8Si5n9okx/QU9wOe6ScKE69jzLc0AeiPa4+z6yN2feT69HVEWOoGUoLx3111
-QPcuF8cqzoLfDuSF+1tXZC66DhNhk23jF0etzjKTwGV+fm0YPu7h58S87Fqxz5P/
-o2nX1NJCP1K9CHKHneLV1vw6MScdm3F6lYLYIQBZC5vd+ZQARC8qUEqGmtsU9PGU
-dqvQlINkFBqnx1eJun5v
-=XF85
------END PGP SIGNATURE-----
+config RDAY
+	bool ...
+	depends on ...
+	maturity <some maturity setting here>
 
-------enig2XFDGKPHQPHCNSIDNXGBR--
+where the "maturity" setting is one of a small number of predefined
+values. so what's the value of this?
+
+  first, this would allow getting rid of all that "EXPERIMENTAL"
+rubbish, which by itself justifies this new directive. :-) but wait,
+there's more.
+
+  next, this would be an entirely *optional* directive, so most of
+kbuild could stay as it is. the default value would mean that this
+variable is of normal maturity, nothing special about it.
+
+  then you get to define a range of maturity settings that can be
+applied to variables that represent their position in the normal life
+cycle of Kconfig variables, such as:
+
+  * OBSOLETE
+  * DEPRECATED
+  * EXPERIMENTAL
+  * BLEEDINGEDGE
+  * MAYCAUSEYOURSYSTEMTOEXPLODE
+
+that sort of thing. the beauty of this scheme is that it allows you to
+subjectively define how safe, dangerous or dead any variable is, and
+at the top of the config process, if you want, you should be able to
+select which maturity levels you want to be presented with, just like
+you can select whether or not to see EXPERIMENTAL or not.
+
+  in a single choice list menu, you might decide that you want to be
+presented with only maturity levels NORMAL, DEPRECATED and
+EXPERIMENTAL, but not OBSOLETE or BLEEDINGEDGE, that sort of thing.
+it's nothing more than the idea of EXPERIMENTAL, cleaned up and
+generalized. this allows folks to decide, with a few keystrokes, how
+safe or how dangerous they want their configuration to be.
+
+  one final benefit -- it should be easy to list the (non-default)
+maturity level of every variable next to it during the config process
+so you can *see* its maturity during configuration, rather than
+needing the ugly hack of setting something as EXPERIMENTAL and *also*
+having to add the string "(EXPERIMENTAL)" so people realize it. yuck.
+
+  all of this could be added to Kbuild as a first step without even
+changing any of the Kconfig files and, little by little, developers
+could start taking advantage of it, so it's not like there would be
+any huge transition at any point -- the ability to use the feature
+would just appear, and you could use it or ignore it.
+
+  thoughts?
+
+rday
+
+-- 
+
+========================================================================
+Robert P. J. Day                                 Ottawa, Ontario, CANADA
+                        http://crashcourse.ca
+
+Twitter:                                       http://twitter.com/rpjday
+LinkedIn:                               http://ca.linkedin.com/in/rpjday
+========================================================================
