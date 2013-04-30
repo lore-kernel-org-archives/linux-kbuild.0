@@ -1,41 +1,113 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from terminus.zytor.com ([198.137.202.10]:51934 "EHLO mail.zytor.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751267Ab3D3EYy (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 30 Apr 2013 00:24:54 -0400
-Message-ID: <517F477E.7090901@zytor.com>
-Date: Mon, 29 Apr 2013 21:24:30 -0700
-From: "H. Peter Anvin" <hpa@zytor.com>
+Received: from devils.ext.ti.com ([198.47.26.153]:44479 "EHLO
+	devils.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758972Ab3D3Jwx (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 30 Apr 2013 05:52:53 -0400
+Message-ID: <517F9472.2030106@ti.com>
+Date: Tue, 30 Apr 2013 12:52:50 +0300
+From: Tomi Valkeinen <tomi.valkeinen@ti.com>
 MIME-Version: 1.0
-Subject: Re: Build-failure with old files in build-directory (Was: Linux 3.9
- released)
-References: <CA+55aFxcqR+5wK0QoGBA_jYP1epH2NCbVTRaE51rLK3mdRjN6Q@mail.gmail.com> <20130429083649.GA23540@citd.de>
-In-Reply-To: <20130429083649.GA23540@citd.de>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Subject: Kconfig "softdepends" idea
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature";
+	boundary="----enig2UTACVJFDKXJDPETFRMKN"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Matthias Schniedermeyer <ms@citd.de>, Michal Marek <mmarek@suse.cz>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: linux-kernel <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
+Cc: "Balbi, Felipe" <balbi@ti.com>
 
-On 04/29/2013 01:36 AM, Matthias Schniedermeyer wrote:
-> On 28.04.2013 17:56, Linus Torvalds wrote:
-> 
-> I'm not sure if it is supported, but building with a O= -directory that 
-> was previously used to build a 3.8.9-kernel that was "clean"ed (but not 
-> "mrproper"ed) before building 3.9 results in a build-failure:
-> make[2]: *** No rule to make target `/xssd/usr_src/ko/leeloo/include/config/hz.h', needed by `kernel/hz.bc'.  Stop.
-> 
-> After deleting everything in the KBUILD_OUTPUT-directory, except the 
-> .config-file, the kernel-build worked again.
-> 
-> At least in the past a "clean" seamed to be enough. I had a file with a 
-> 2.6.39-name inside, so it seams i have build my kernels this way for the 
-> last few releases.
-> 
+------enig2UTACVJFDKXJDPETFRMKN
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
 
-This is a question for the Kbuild people I believe...
+Hi,
 
-	-hpa
+I have an idea to improve the Kconfig dependencies, especially for
+subsystem maintainers. First a bit of history:
+
+I recently changed the Kconfig rules for omapdss driver to not depend on
+OMAP platform, as the driver itself uses no OMAP specific APIs, and can
+be compiled fine on, say, x86.
+
+This got nack'ed by Linus, as omapdss is used only on OMAP, and allowing
+it to be visible for other platforms is just extra clutter. I think
+that's a valid point.
+
+However, I think there are valid cases to allow a driver to be compiled
+for other platforms. First two are quite minor, but I think the third
+one is a major use case. I say here "omapdss" but you can replace it
+with any driver that has build dependency to some platform.
+
+1) Building omapdss with arm compiler should show all relevant warnings,
+but in reality it seems that the compilers for different architectures
+have slightly different behaviors. Building omapdss with a compiler for
+other architecture is a good way to check for any possible errors. Also,
+direct arch dependencies in a driver are generally a mistake, and
+compiling with another compiler would bring these issues up.
+
+2) When developing a new SoC, the IP in question could be in a, say,
+FPGA board, attached to a PC. The same driver would thus be needed for
+x86 also.
+
+3) When making changes which affect drivers for multiple platforms (say,
+fbdev changes), it is very difficult to compile test the changes. I
+recently made changes to a bunch of fb drivers, and I think I managed to
+compile only a few of them. To compile them all, I'd need to install all
+the various cross compilers and find out which kind of kernel config is
+needed to get the driver enabled.
+
+If, on the other hand, the drivers would only depend on things they need
+to get compiled, it gets much easier to compile test.
 
 
+So, my idea is to have a new kind of Kconfig dependency. I'll call it
+"softdepends" in lack of better name. A driver maintainer could use
+"softdepends on ARCH_OMAP", instead of "depends on ARCH_OMAP", to say
+that this driver does not actually build depend on ARCH_OMAP, but for
+all normal purposes it does.
+
+Normally, this would result in the same behavior as the normal
+"depends", and Linus would not get a questions whether he wants to
+enable this OMAP specific driver or not, and the driver would not be
+visible on the menuconfig.
+
+But the user could enable the driver if he explicitly so wants. Perhaps
+a Kconfig option such as "ignore softdepends", enabling of which would
+allow the user to enable the drivers that use softdepends. Or, maybe
+just require the user to add the config option manually into his .config.=
+
+
+Now, I don't have much knowledge of the Kconfig internals, so the above
+implementation ideas are just rough ideas to show the point.
+
+Thoughts?
+
+ Tomi
+
+
+------enig2UTACVJFDKXJDPETFRMKN
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQIcBAEBAgAGBQJRf5RyAAoJEPo9qoy8lh71q/QP/iLx04HLm16lbubNCPbqoDda
+K+KKQZ+42pItBLOGl36tkWk48f+XRhxfy60izy6IrOzrVgHTyiIxTYz4d3ToFswl
+tkxq8SSJS8mehr6/5sHb3vkzxWCKnLHUIJcSCKPJd12NNB3CE+onQzldlwONP7ER
+i/Yppb9Puxj7fA9LUE1dNM0AMfun93lWiZlfmBDFyXojkpobc1yfxt7/XqYDhKDN
++vop+jufOQMeNUul8Ae/cZW2UrTiGarOmg4E60LUXFNz/27LXbzdWg/YxuFcLLxw
+E7vakZDorYHW6cKkMqU8w1x6AyZWdkKLE6OBkvngGenl9Sp40WEYiAjg5/D3AXq2
+7SAYIyWPQml2wzAKQOVgEDfvYgRQx8JBHT1/FbOLqKfK/ZqQU66b9oJm8R1OvVs/
+3w3Ic+QD6xdEEi8HNqzWhczGjWorgqL+o6YYDs/ZgQE3QhyEl/1RCDlNY7a7md2y
+WbDV+xDpNDTD8gJ9jeX4K5bwWWf/GXFpuKIi+ufvRQaikA7ZFs+Vfs/7jT+SlR8+
+EXZ25CLwUXfHd/njTdJqwPESNy/UPRJt6Y/kIn2wE/pf+FB6IYDOlE8dH/IWldJe
+oOXLB/q4Z1QT+e9gH3w1gQHRWcOiGYGxoxXPb7C+K8ujGbkWoUSgRt1DKx1ARcEv
+BM1rZSo1lnzG0EsPLNHx
+=wmE2
+-----END PGP SIGNATURE-----
+
+------enig2UTACVJFDKXJDPETFRMKN--
