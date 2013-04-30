@@ -1,37 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hrndva-omtalb.mail.rr.com ([71.74.56.122]:30275 "EHLO
-	hrndva-omtalb.mail.rr.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757395Ab3D3BBS (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 29 Apr 2013 21:01:18 -0400
-Message-ID: <1367283676.30667.44.camel@gandalf.local.home>
-Subject: Re: [PATCH 0/2] [GIT PULL] localmodconfig: Fix missing depends of
- config files included in if statements
-From: Steven Rostedt <rostedt@goodmis.org>
-Date: Mon, 29 Apr 2013 21:01:16 -0400
-In-Reply-To: <1367280494.30667.38.camel@gandalf.local.home>
-References: <20130429195100.202681236@goodmis.org>
-	 <CA+55aFzEwRUWVQ8x1+f=6R_9+JO_Rmg=u2E1k_6jLuQEAorgtQ@mail.gmail.com>
-	 <CA+55aFzSfRv26E3UF1a8jwQK+vHSru-YTg8ADefZxOKZNnn6fA@mail.gmail.com>
-	 <1367280494.30667.38.camel@gandalf.local.home>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Received: from terminus.zytor.com ([198.137.202.10]:51934 "EHLO mail.zytor.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751267Ab3D3EYy (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 30 Apr 2013 00:24:54 -0400
+Message-ID: <517F477E.7090901@zytor.com>
+Date: Mon, 29 Apr 2013 21:24:30 -0700
+From: "H. Peter Anvin" <hpa@zytor.com>
+MIME-Version: 1.0
+Subject: Re: Build-failure with old files in build-directory (Was: Linux 3.9
+ released)
+References: <CA+55aFxcqR+5wK0QoGBA_jYP1epH2NCbVTRaE51rLK3mdRjN6Q@mail.gmail.com> <20130429083649.GA23540@citd.de>
+In-Reply-To: <20130429083649.GA23540@citd.de>
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Matthias Schniedermeyer <ms@citd.de>, Michal Marek <mmarek@suse.cz>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On Mon, 2013-04-29 at 20:08 -0400, Steven Rostedt wrote:
-
-> I'll also run my full ftrace test suite on your latest kernel, and see
-> if it finds anything else.
+On 04/29/2013 01:36 AM, Matthias Schniedermeyer wrote:
+> On 28.04.2013 17:56, Linus Torvalds wrote:
+> 
+> I'm not sure if it is supported, but building with a O= -directory that 
+> was previously used to build a 3.8.9-kernel that was "clean"ed (but not 
+> "mrproper"ed) before building 3.9 results in a build-failure:
+> make[2]: *** No rule to make target `/xssd/usr_src/ko/leeloo/include/config/hz.h', needed by `kernel/hz.bc'.  Stop.
+> 
+> After deleting everything in the KBUILD_OUTPUT-directory, except the 
+> .config-file, the kernel-build worked again.
+> 
+> At least in the past a "clean" seamed to be enough. I had a file with a 
+> 2.6.39-name inside, so it seams i have build my kernels this way for the 
+> last few releases.
 > 
 
-With the fix I sent, everything passed.
+This is a question for the Kbuild people I believe...
 
-Thanks,
-
--- Steve
+	-hpa
 
 
