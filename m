@@ -1,26 +1,33 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pd0-f174.google.com ([209.85.192.174]:60666 "EHLO
-	mail-pd0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755462Ab3EAUk3 (ORCPT
+Received: from mail-wg0-f44.google.com ([74.125.82.44]:55870 "EHLO
+	mail-wg0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756536Ab3EAUyB (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 1 May 2013 16:40:29 -0400
-Received: by mail-pd0-f174.google.com with SMTP id y13so984372pdi.5
-        for <linux-kbuild@vger.kernel.org>; Wed, 01 May 2013 13:40:29 -0700 (PDT)
-Date: Wed, 1 May 2013 13:40:27 -0700 (PDT)
-From: David Rientjes <rientjes@google.com>
+	Wed, 1 May 2013 16:54:01 -0400
+Date: Wed, 1 May 2013 22:53:55 +0200
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
 Subject: Re: linux-next: Tree for May 1 (media/usb/stk1160)
-In-Reply-To: <518179BD.3010407@infradead.org>
-Message-ID: <alpine.DEB.2.02.1305011337430.14366@chino.kir.corp.google.com>
-References: <20130501183734.7ad1efca2d06e75432edabbd@canb.auug.org.au> <518157EB.3010700@infradead.org> <20130501192845.GA18811@free.fr> <alpine.DEB.2.02.1305011258180.8448@chino.kir.corp.google.com> <518179BD.3010407@infradead.org>
+Message-ID: <20130501205355.GB18811@free.fr>
+References: <20130501183734.7ad1efca2d06e75432edabbd@canb.auug.org.au>
+ <518157EB.3010700@infradead.org>
+ <20130501192845.GA18811@free.fr>
+ <alpine.DEB.2.02.1305011258180.8448@chino.kir.corp.google.com>
+ <518179BD.3010407@infradead.org>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <518179BD.3010407@infradead.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Randy Dunlap <rdunlap@infradead.org>
-Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, Stephen Rothwell <sfr@canb.auug.org.au>, linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, linux-media <linux-media@vger.kernel.org>, linux-kbuild@vger.kernel.org
+Cc: David Rientjes <rientjes@google.com>, Stephen Rothwell <sfr@canb.auug.org.au>, linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, linux-media <linux-media@vger.kernel.org>, linux-kbuild@vger.kernel.org
 
-On Wed, 1 May 2013, Randy Dunlap wrote:
+Randy, All,
 
+On Wed, May 01, 2013 at 01:23:25PM -0700, Randy Dunlap wrote:
+> On 05/01/13 12:58, David Rientjes wrote:
+> > On Wed, 1 May 2013, Yann E. MORIN wrote:
+> > 
 > >>> When CONFIG_SND=m and CONFIG_SND_AC97_CODEC=m and
 > >>> CONFIG_VIDEO_STK1160=y
 > >>> CONFIG_VIDEO_STK1160_AC97=y
@@ -43,19 +50,71 @@ On Wed, 1 May 2013, Randy Dunlap wrote:
 > >>> config VIDEO_STK1160_AC97
 > >>> 	bool "STK1160 AC97 codec support"
 > >>> 	depends on VIDEO_STK1160 && SND
-> > 
+
+BTW, can you check that:
+    make silentoldconfig
+does not warn about unmet dependencies for those symbols?
+
 > > This doesn't depend on SND, it depends on SND=y.
-> > --
-> 
 > 
 > Maybe this option *should* depend on SND=y, but that's not what the
-> kconfig syntax says.  The kconfig language does not care if the variable is
+> kconfig syntax says.
+
+I'd say  Documentation/kbuild/kconfig-language.txt  is not complete wrt
+the current syntax, grammar and semantics of the language. :-(
+
+> The kconfig language does not care if the variable is
 > a bool or a tristate when evaluating a depends expression AFAICT (but I am
 > only reading Documentation/kbuild/kconfig-language.txt, not the source code).
-> 
 
-Doing "depends on SND=y" will only allow an option to be enabled if SND is 
-builtin so the snd_card_* functions above will be defined (with your 
-config we have a builtin function calling a module which may or may not be 
-loaded).  I think you've already addressed the snd_ac97_* functions, so 
-the fix here should be relatively simple.  Yann?
+Yes, it does, I've just tried with the following snippet:
+
+    config MODULES
+        bool "modules"
+    
+    config A
+        tristate "A"
+    
+    config B
+        tristate "B"
+        depends on A
+    
+    config C
+        tristate "C"
+    
+    config D
+        bool "D"
+        depends on C
+        select B
+    
+    config E
+        bool "E"
+        depends on C=y
+        select B
+
+As you can test, E will not be visible if C is not =y, while D will be
+visible if C is =m or =y.
+
+Also, if A=m (and C=n), then B can only be =n or =m.
+
+But with the test-case above, if C=y and ( D=y or E=y ), then B will be
+forced to =y, even though A might be unset, which means silentoldconfig
+would warn abount unmet dependencies:
+    warning: (D && E) selects B which has unmet direct dependencies (A)
+
+Worse! With: A=m, C=y, D=y  -> B is forced to =y, which is wrong because
+it can only be =n or =m (see above), but silentoldconfig will not warn
+about this situation.
+
+Sigh... :-(
+
+Regards,
+Yann E. MORIN.
+
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
