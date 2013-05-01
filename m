@@ -1,47 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from e38.co.us.ibm.com ([32.97.110.159]:54580 "EHLO
-	e38.co.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758281Ab3D3WTV (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 30 Apr 2013 18:19:21 -0400
-Received: from /spool/local
-	by e38.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-kbuild@vger.kernel.org> from <paulmck@linux.vnet.ibm.com>;
-	Tue, 30 Apr 2013 16:19:20 -0600
-Date: Tue, 30 Apr 2013 15:19:15 -0700
-From: "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>
-Subject: Re: rcu: Provide compile-time control for no-CBs CPUs
-Message-ID: <20130430221915.GM3780@linux.vnet.ibm.com>
-Reply-To: paulmck@linux.vnet.ibm.com
-References: <20130430214826.GK3780@linux.vnet.ibm.com>
- <20130430220647.GA16524@redhat.com>
+Received: from ozlabs.org ([203.10.76.45]:37143 "EHLO ozlabs.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752790Ab3EAFbf (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 1 May 2013 01:31:35 -0400
+From: Rusty Russell <rusty@rustcorp.com.au>
+Subject: Re: [PATCH] modpost.c: Add .text.unlikely to TEXT_SECTIONS
+In-Reply-To: <517E7260.5070204@ti.com>
+References: <1366842363-7513-1-git-send-email-trini@ti.com> <87sj2aca9r.fsf@rustcorp.com.au> <517E7260.5070204@ti.com>
+Date: Wed, 01 May 2013 11:49:47 +0930
+Message-ID: <87ppxbxwzg.fsf@rustcorp.com.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20130430220647.GA16524@redhat.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dave Jones <davej@redhat.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, paul.mckenney@linaro.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org
+To: Tom Rini <trini@ti.com>
+Cc: linux-kernel@vger.kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-kbuild@vger.kernel.org
 
-On Tue, Apr 30, 2013 at 06:06:47PM -0400, Dave Jones wrote:
-> On Tue, Apr 30, 2013 at 02:48:26PM -0700, Paul E. McKenney wrote:
-> 
->  > <snip excellent explanation>
->  >
->  > Should I add this to the Kconfig help text?  My guess is "not all of it",
->  > but figured I should ask.
-> 
-> The commit msg would have been a great place for much of it, especially
-> the part explaining your desire to have users kick the tires etc.
+Tom Rini <trini@ti.com> writes:
+> On 04/28/2013 10:59 PM, Rusty Russell wrote:
+>> Tom Rini <trini@ti.com> writes:
+>> 
+>>> Recent gcc's may place functions into the .text.unlikely section and we
+>>> need to check this section as well for section mismatches now otherwise
+>>> we may have false negatives for this test.
+>> 
+>> Hmm, I don't think it's all that recent, is it?  I can find it back to
+>> gcc 4.0.4:
+>> 
+>> `-freorder-functions'
+>>      Reorder functions in the object file in order to improve code
+>>      locality.  This is implemented by using special subsections
+>>      `.text.hot' for most frequently executed functions and
+>>      `.text.unlikely' for unlikely executed functions.  Reordering is
+>>      done by the linker so object file format must support named
+>>      sections and linker must place them in a reasonable way.
+>> 
+>>      Also profile feedback must be available in to make this option
+>>      effective.  See `-fprofile-arcs' for details.
+>> 
+>>      Enabled at levels `-O2', `-O3', `-Os'.
+>> 
+>> The comment is the same in in gcc 4.7.
+>> 
+>> So is your real issue that this section is generated with
+>> -fprofile-arcs, or has something changed with gcc 4.8, or...?
+>
+> I've started seeing this with Linaro based 4.7 toolchains.  I can go
+> back through their releases and see when it starts showing up there if
+> it helps.  I didn't add .text.hot as I didn't have that section at all,
+> fwiw.
 
-Good point, will keep that in mind for next time.
+Weird, did you turn on CONFIG_GCOV_KERNEL?  AFAICT you shouldn't see
+this section without that.
 
->  >  See below for my current best guess.
-> 
-> Much better. Be sure to pass on the 'terrible kconfig' award to the
-> next lucky recipient when their time comes :)
-
-Interesting.  Who passed it to you, and what was the occasion?  ;-)
-
-							Thanx, Paul
-
+Thanks,
+Rusty.
