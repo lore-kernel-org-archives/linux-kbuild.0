@@ -1,67 +1,90 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.snhosting.dk ([87.238.248.203]:37836 "EHLO
-	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758644Ab3EBU0B (ORCPT
+Received: from casper.infradead.org ([85.118.1.10]:46931 "EHLO
+	casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750792Ab3EBVXk (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 2 May 2013 16:26:01 -0400
-Date: Thu, 2 May 2013 22:25:59 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: Silent failure when missing bc
-Message-ID: <20130502202559.GA17647@merkur.ravnborg.org>
-References: <20130502144403.GE6335@pomac.netswarm.net>
+	Thu, 2 May 2013 17:23:40 -0400
+Message-ID: <5182D93C.4000706@infradead.org>
+Date: Thu, 02 May 2013 14:23:08 -0700
+From: Randy Dunlap <rdunlap@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20130502144403.GE6335@pomac.netswarm.net>
+Subject: Re: linux-next: Tree for May 1 (media/usb/stk1160)
+References: <20130501183734.7ad1efca2d06e75432edabbd@canb.auug.org.au> <518157EB.3010700@infradead.org> <51827DB1.7000304@redhat.com>
+In-Reply-To: <51827DB1.7000304@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ian Kumlien <pomac@vapor.com>
-Cc: linux-kbuild@vger.kernel.org, hpa@zytor.com, mmarek@suse.cz
+To: Mauro Carvalho Chehab <mchehab@redhat.com>
+Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, =?UTF-8?B?RXplcXVpZWwgR2Fy?= =?UTF-8?B?Y8OtYQ==?= <elezegarcia@gmail.com>, Stephen Rothwell <sfr@canb.auug.org.au>, linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, linux-media <linux-media@vger.kernel.org>, linux-kbuild@vger.kernel.org
 
-On Thu, May 02, 2013 at 04:44:03PM +0200, Ian Kumlien wrote:
-> Hi, 
+On 05/02/13 07:52, Mauro Carvalho Chehab wrote:
+> [media] stk1160: Make stk1160 module if SND is m and audio support is selected
 > 
-> A dependency on bc was added at some point during the 3.9 development.
+> As reported by Randy:
 > 
-> My machines runs a git forest which contains both stable and Torvalds
-> mainline. So any kernel version is only a:
-> 	git fetch --all && git checkout <tag> away
+> When CONFIG_SND=m and CONFIG_SND_AC97_CODEC=m and
+> CONFIG_VIDEO_STK1160=y
+> CONFIG_VIDEO_STK1160_AC97=y
 > 
-> When switching from v3.8.5 to v3.9-rc7 i ran in to a odd thing.
+> drivers/built-in.o: In function `stk1160_ac97_register':
+> (.text+0x122706): undefined reference to `snd_card_create'
+> drivers/built-in.o: In function `stk1160_ac97_register':
+> (.text+0x1227b2): undefined reference to `snd_ac97_bus'
+> drivers/built-in.o: In function `stk1160_ac97_register':
+> (.text+0x1227cd): undefined reference to `snd_card_free'
+> drivers/built-in.o: In function `stk1160_ac97_register':
+> (.text+0x12281b): undefined reference to `snd_ac97_mixer'
+> drivers/built-in.o: In function `stk1160_ac97_register':
+> (.text+0x122832): undefined reference to `snd_card_register'
+> drivers/built-in.o: In function `stk1160_ac97_unregister':
+> (.text+0x12285e): undefined reference to `snd_card_free'
 > 
-> It seemed to build fine, make install and modules_install was all fine
-> as well but rebooting revealed that 3.8.5 had been installed again
-> instead.
-> 
-> Doing make clean and rebuilding revealed that I was missing bc ;)
-> 
-> I have tried to find exactly where it's run since then, i have found the
-> cmd_bc section but not found what triggers it... Due to lack of time and
-> energy, I hearby report this bug!
-> 
-> This is about as far as i got:
-> kernel/Makefile:135:quiet_cmd_bc  = BC      $@
-> kernel/Makefile:136:      cmd_bc  = bc -q $(filter-out FORCE,$^) > $@
+> Reported-by: Randy Dunlap <rdunlap@infradead.org>
+> Signed-off-by: Mauro Carvalho Chehab <mchehab@redhat.com>
 
-Could you try this patch. Untested but I think it required to catch this bug.
+Acked-by: Randy Dunlap <rdunlap@infradead.org>
 
-diff --git a/kernel/Makefile b/kernel/Makefile
-index d1574d4..18a9083 100644
---- a/kernel/Makefile
-+++ b/kernel/Makefile
-@@ -134,7 +134,7 @@ $(obj)/hz.bc: $(objtree)/include/config/hz.h FORCE
- 	$(call if_changed,hzfile)
- 
- quiet_cmd_bc  = BC      $@
--      cmd_bc  = bc -q $(filter-out FORCE,$^) > $@
-+      cmd_bc  = bc -q $(filter-out FORCE,$^) > $@ || (rm -f $@; false)
- 
- targets += timeconst.h
- $(obj)/timeconst.h: $(obj)/hz.bc $(src)/timeconst.bc FORCE
+Thanks.
 
 > 
-> Is there any detaled information and or instructions on kbuild btw?
-There is some docs in Documentation/kbuild/* - but I dunno if this is
-what you are after.
+> diff --git a/drivers/media/usb/stk1160/Kconfig b/drivers/media/usb/stk1160/Kconfig
+> index 1c3a1ec..2bf6392 100644
+> --- a/drivers/media/usb/stk1160/Kconfig
+> +++ b/drivers/media/usb/stk1160/Kconfig
+> @@ -1,8 +1,6 @@
+> -config VIDEO_STK1160
+> +config VIDEO_STK1160_COMMON
+>      tristate "STK1160 USB video capture support"
+>      depends on VIDEO_DEV && I2C
+> -    select VIDEOBUF2_VMALLOC
+> -    select VIDEO_SAA711X
+>  
+>      ---help---
+>        This is a video4linux driver for STK1160 based video capture devices.
+> @@ -12,9 +10,14 @@ config VIDEO_STK1160
+>  
+>  config VIDEO_STK1160_AC97
+>      bool "STK1160 AC97 codec support"
+> -    depends on VIDEO_STK1160 && SND
+> -    select SND_AC97_CODEC
+> -
+> +    depends on VIDEO_STK1160_COMMON && SND
+>      ---help---
+>        Enables AC97 codec support for stk1160 driver.
+> -.
+> +
+> +config VIDEO_STK1160
+> +    tristate
+> +    depends on (!VIDEO_STK1160_AC97 || (SND='n') || SND) && VIDEO_STK1160_COMMON
+> +    default y
+> +    select VIDEOBUF2_VMALLOC
+> +    select VIDEO_SAA711X
+> +    select SND_AC97_CODEC if SND
+> 
+> 
+> -- 
 
-	Sam
+
+-- 
+~Randy
