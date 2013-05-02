@@ -1,72 +1,32 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from casper.infradead.org ([85.118.1.10]:58702 "EHLO
-	casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756882Ab3EAU64 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 1 May 2013 16:58:56 -0400
-Message-ID: <518181F2.3@infradead.org>
-Date: Wed, 01 May 2013 13:58:26 -0700
-From: Randy Dunlap <rdunlap@infradead.org>
+Received: from cantor2.suse.de ([195.135.220.15]:33661 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751440Ab3EBIsk (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 2 May 2013 04:48:40 -0400
+Message-ID: <51822864.4060304@suse.cz>
+Date: Thu, 02 May 2013 10:48:36 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: linux-next: Tree for May 1 (media/usb/stk1160)
-References: <20130501183734.7ad1efca2d06e75432edabbd@canb.auug.org.au> <518157EB.3010700@infradead.org> <20130501192845.GA18811@free.fr> <alpine.DEB.2.02.1305011258180.8448@chino.kir.corp.google.com> <518179BD.3010407@infradead.org> <20130501205355.GB18811@free.fr>
-In-Reply-To: <20130501205355.GB18811@free.fr>
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [pull request] Pull request for branch yem-kconfig-for-next
+References: <cover.1367258255.git.yann.morin.1998@free.fr>
+In-Reply-To: <cover.1367258255.git.yann.morin.1998@free.fr>
+Content-Type: text/plain; charset=ISO-8859-2
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: David Rientjes <rientjes@google.com>, Stephen Rothwell <sfr@canb.auug.org.au>, linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, linux-media <linux-media@vger.kernel.org>, linux-kbuild@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-next@vger.kernel.org, Randy Dunlap <rdunlap@infradead.org>
 
-On 05/01/13 13:53, Yann E. MORIN wrote:
-> Randy, All,
+On 29.4.2013 19:59, Yann E. MORIN wrote:
+> The following changes since commit 23a5dfdad22a574d19d7cc19b391f9ce0d3c2f21:
 > 
-> On Wed, May 01, 2013 at 01:23:25PM -0700, Randy Dunlap wrote:
->> On 05/01/13 12:58, David Rientjes wrote:
->>> On Wed, 1 May 2013, Yann E. MORIN wrote:
->>>
->>>>> When CONFIG_SND=m and CONFIG_SND_AC97_CODEC=m and
->>>>> CONFIG_VIDEO_STK1160=y
->>>>> CONFIG_VIDEO_STK1160_AC97=y
->>>>>
->>>>> drivers/built-in.o: In function `stk1160_ac97_register':
->>>>> (.text+0x122706): undefined reference to `snd_card_create'
->>>>> drivers/built-in.o: In function `stk1160_ac97_register':
->>>>> (.text+0x1227b2): undefined reference to `snd_ac97_bus'
->>>>> drivers/built-in.o: In function `stk1160_ac97_register':
->>>>> (.text+0x1227cd): undefined reference to `snd_card_free'
->>>>> drivers/built-in.o: In function `stk1160_ac97_register':
->>>>> (.text+0x12281b): undefined reference to `snd_ac97_mixer'
->>>>> drivers/built-in.o: In function `stk1160_ac97_register':
->>>>> (.text+0x122832): undefined reference to `snd_card_register'
->>>>> drivers/built-in.o: In function `stk1160_ac97_unregister':
->>>>> (.text+0x12285e): undefined reference to `snd_card_free'
->>>>>
->>>>>
->>>>> This kconfig fragment:
->>>>> config VIDEO_STK1160_AC97
->>>>> 	bool "STK1160 AC97 codec support"
->>>>> 	depends on VIDEO_STK1160 && SND
+>   Revert "kconfig: fix randomising choice entries in presence of KCONFIG_ALLCONFIG" (2013-04-26 23:21:59 +0200)
 > 
-> BTW, can you check that:
->     make silentoldconfig
-> does not warn about unmet dependencies for those symbols?
-
-'make silentoldconfig' on the config file that I am using only gives me this:
-
-warning: (VIDEO_EM28XX) selects VIDEO_MT9V011 which has unmet direct dependencies (MEDIA_SUPPORT && I2C && VIDEO_V4L2 && MEDIA_CAMERA_SUPPORT)
-
-
->>> This doesn't depend on SND, it depends on SND=y.
->>
->> Maybe this option *should* depend on SND=y, but that's not what the
->> kconfig syntax says.
+> are available in the git repository at:
 > 
-> I'd say  Documentation/kbuild/kconfig-language.txt  is not complete wrt
-> the current syntax, grammar and semantics of the language. :-(
+>   git://gitorious.org/linux-kconfig/linux-kconfig.git yem-kconfig-for-next
 
-OK, that's not surprising.
+Pulled, thanks.
 
-thanks,
--- 
-~Randy
+Michal
+
