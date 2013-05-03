@@ -1,90 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from casper.infradead.org ([85.118.1.10]:46931 "EHLO
-	casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750792Ab3EBVXk (ORCPT
+Received: from LGEMRELSE6Q.lge.com ([156.147.1.121]:43341 "EHLO
+	LGEMRELSE6Q.lge.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755483Ab3ECJDD (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 2 May 2013 17:23:40 -0400
-Message-ID: <5182D93C.4000706@infradead.org>
-Date: Thu, 02 May 2013 14:23:08 -0700
-From: Randy Dunlap <rdunlap@infradead.org>
+	Fri, 3 May 2013 05:03:03 -0400
+Date: Fri, 3 May 2013 18:02:52 +0900
+From: Kyungsik Lee <kyungsik.lee@lge.com>
+Subject: Re: [PATCH v3 -next 3/5] arm: Add support for LZ4-compressed kernel
+Message-ID: <20130503090252.GB3170@Corona>
+References: <1362484056-9778-1-git-send-email-kyungsik.lee@lge.com>
+ <1362484056-9778-4-git-send-email-kyungsik.lee@lge.com>
+ <20130430135602.2aa0d3b4ec392bf83a9b64d0@linux-foundation.org>
 MIME-Version: 1.0
-Subject: Re: linux-next: Tree for May 1 (media/usb/stk1160)
-References: <20130501183734.7ad1efca2d06e75432edabbd@canb.auug.org.au> <518157EB.3010700@infradead.org> <51827DB1.7000304@redhat.com>
-In-Reply-To: <51827DB1.7000304@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20130430135602.2aa0d3b4ec392bf83a9b64d0@linux-foundation.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mauro Carvalho Chehab <mchehab@redhat.com>
-Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, =?UTF-8?B?RXplcXVpZWwgR2Fy?= =?UTF-8?B?Y8OtYQ==?= <elezegarcia@gmail.com>, Stephen Rothwell <sfr@canb.auug.org.au>, linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, linux-media <linux-media@vger.kernel.org>, linux-kbuild@vger.kernel.org
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Russell King <linux@arm.linux.org.uk>, "H. Peter Anvin" <hpa@zytor.com>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org, celinux-dev@lists.celinuxforum.org, Nicolas Pitre <nico@fluxnic.net>, David Sterba <dsterba@suse.cz>, Nitin Gupta <nitingupta910@gmail.com>, Joe Millenbach <jmillenbach@gmail.com>, Thomas Gleixner <tglx@linutronix.de>, Michal Marek <mmarek@suse.cz>, hyojun.im@lge.com, chan.jeong@lge.com, raphael.andy.lee@gmail.com
 
-On 05/02/13 07:52, Mauro Carvalho Chehab wrote:
-> [media] stk1160: Make stk1160 module if SND is m and audio support is selected
+On Tue, Apr 30, 2013 at 01:56:02PM -0700, Andrew Morton wrote:
+> On Tue,  5 Mar 2013 20:47:34 +0900 Kyungsik Lee <kyungsik.lee@lge.com> wrote:
 > 
-> As reported by Randy:
+> > This patch integrates the LZ4 decompression code to the arm pre-boot code.
+> > And it depends on two patchs below
+> > 
+> > lib: Add support for LZ4-compressed kernel
+> > decompressor: Add LZ4 decompressor module
+> > 
+> > ...
+> >
+> > - Apply CFLAGS, -Os to decompress.o to improve decompress
+> >   performance during boot-up process
+> >
+> > ...
+> >
+> > --- a/arch/arm/boot/compressed/Makefile
+> > +++ b/arch/arm/boot/compressed/Makefile
+> > @@ -24,6 +24,9 @@ endif
+> >  AFLAGS_head.o += -DTEXT_OFFSET=$(TEXT_OFFSET)
+> >  HEAD	= head.o
+> >  OBJS	+= misc.o decompress.o
+> > +ifeq ($(CONFIG_KERNEL_LZ4),y)
+> > +CFLAGS_decompress.o := -Os
+> > +endif
 > 
-> When CONFIG_SND=m and CONFIG_SND_AC97_CODEC=m and
-> CONFIG_VIDEO_STK1160=y
-> CONFIG_VIDEO_STK1160_AC97=y
-> 
-> drivers/built-in.o: In function `stk1160_ac97_register':
-> (.text+0x122706): undefined reference to `snd_card_create'
-> drivers/built-in.o: In function `stk1160_ac97_register':
-> (.text+0x1227b2): undefined reference to `snd_ac97_bus'
-> drivers/built-in.o: In function `stk1160_ac97_register':
-> (.text+0x1227cd): undefined reference to `snd_card_free'
-> drivers/built-in.o: In function `stk1160_ac97_register':
-> (.text+0x12281b): undefined reference to `snd_ac97_mixer'
-> drivers/built-in.o: In function `stk1160_ac97_register':
-> (.text+0x122832): undefined reference to `snd_card_register'
-> drivers/built-in.o: In function `stk1160_ac97_unregister':
-> (.text+0x12285e): undefined reference to `snd_card_free'
-> 
-> Reported-by: Randy Dunlap <rdunlap@infradead.org>
-> Signed-off-by: Mauro Carvalho Chehab <mchehab@redhat.com>
+> Surprised.  You found that -Os produces faster code than -O2?  Details,
+> please?
+-Os is enforced here, based on the test result of decompression time
+below, slightly faster than -O2.
+But further tests with UA show that using -O2 will be the right choice
+especially in the case of the unaligned access enabled.
 
-Acked-by: Randy Dunlap <rdunlap@infradead.org>
+Decompression Time(counts)
+             UA
+-Os  6717    3447
+-O2  6720    2728
 
-Thanks.
+Note: ARM v7, Kernel 3.4
+      counter freq. = 32768 HZ
+      UA(Unaligned Access)
+      gcc version 4.6.2 (Ubuntu/Linaro 4.6.2-14ubuntu2~ppa1)
 
-> 
-> diff --git a/drivers/media/usb/stk1160/Kconfig b/drivers/media/usb/stk1160/Kconfig
-> index 1c3a1ec..2bf6392 100644
-> --- a/drivers/media/usb/stk1160/Kconfig
-> +++ b/drivers/media/usb/stk1160/Kconfig
-> @@ -1,8 +1,6 @@
-> -config VIDEO_STK1160
-> +config VIDEO_STK1160_COMMON
->      tristate "STK1160 USB video capture support"
->      depends on VIDEO_DEV && I2C
-> -    select VIDEOBUF2_VMALLOC
-> -    select VIDEO_SAA711X
->  
->      ---help---
->        This is a video4linux driver for STK1160 based video capture devices.
-> @@ -12,9 +10,14 @@ config VIDEO_STK1160
->  
->  config VIDEO_STK1160_AC97
->      bool "STK1160 AC97 codec support"
-> -    depends on VIDEO_STK1160 && SND
-> -    select SND_AC97_CODEC
-> -
-> +    depends on VIDEO_STK1160_COMMON && SND
->      ---help---
->        Enables AC97 codec support for stk1160 driver.
-> -.
-> +
-> +config VIDEO_STK1160
-> +    tristate
-> +    depends on (!VIDEO_STK1160_AC97 || (SND='n') || SND) && VIDEO_STK1160_COMMON
-> +    default y
-> +    select VIDEOBUF2_VMALLOC
-> +    select VIDEO_SAA711X
-> +    select SND_AC97_CODEC if SND
-> 
-> 
-> -- 
-
-
--- 
-~Randy
+Thanks,
+Kyungsik
