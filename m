@@ -1,67 +1,88 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from LGEMRELSE6Q.lge.com ([156.147.1.121]:43341 "EHLO
-	LGEMRELSE6Q.lge.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755483Ab3ECJDD (ORCPT
+Received: from mail-ia0-f172.google.com ([209.85.210.172]:44751 "EHLO
+	mail-ia0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1762367Ab3ECLeu convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 3 May 2013 05:03:03 -0400
-Date: Fri, 3 May 2013 18:02:52 +0900
-From: Kyungsik Lee <kyungsik.lee@lge.com>
-Subject: Re: [PATCH v3 -next 3/5] arm: Add support for LZ4-compressed kernel
-Message-ID: <20130503090252.GB3170@Corona>
-References: <1362484056-9778-1-git-send-email-kyungsik.lee@lge.com>
- <1362484056-9778-4-git-send-email-kyungsik.lee@lge.com>
- <20130430135602.2aa0d3b4ec392bf83a9b64d0@linux-foundation.org>
+	Fri, 3 May 2013 07:34:50 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20130430135602.2aa0d3b4ec392bf83a9b64d0@linux-foundation.org>
+In-Reply-To: <518284E6.7040503@intel.com>
+References: <51814943.7000604@intel.com>
+	<20130501182138.GA17550@kroah.com>
+	<5B8DA87D05A7694D9FA63FD143655C1B01F18E66@HASMSX106.ger.corp.intel.com>
+	<518284E6.7040503@intel.com>
+Date: Fri, 3 May 2013 13:34:50 +0200
+Message-ID: <CAMuHMdWSVUcwkY=xn+HjbruLxsc8Eqq=CWX78CdUc1+MAwCVhg@mail.gmail.com>
+Subject: Re: mei file2alias compile error
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Russell King <linux@arm.linux.org.uk>, "H. Peter Anvin" <hpa@zytor.com>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org, celinux-dev@lists.celinuxforum.org, Nicolas Pitre <nico@fluxnic.net>, David Sterba <dsterba@suse.cz>, Nitin Gupta <nitingupta910@gmail.com>, Joe Millenbach <jmillenbach@gmail.com>, Thomas Gleixner <tglx@linutronix.de>, Michal Marek <mmarek@suse.cz>, hyojun.im@lge.com, chan.jeong@lge.com, raphael.andy.lee@gmail.com
+To: Dave Hansen <dave.hansen@intel.com>
+Cc: "Winkler, Tomas" <tomas.winkler@intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "SamuelOrtiz@kroah.com" <SamuelOrtiz@kroah.com>, LKML <linux-kernel@vger.kernel.org>, Andreas Schwab <schwab@linux-m68k.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On Tue, Apr 30, 2013 at 01:56:02PM -0700, Andrew Morton wrote:
-> On Tue,  5 Mar 2013 20:47:34 +0900 Kyungsik Lee <kyungsik.lee@lge.com> wrote:
-> 
-> > This patch integrates the LZ4 decompression code to the arm pre-boot code.
-> > And it depends on two patchs below
-> > 
-> > lib: Add support for LZ4-compressed kernel
-> > decompressor: Add LZ4 decompressor module
-> > 
-> > ...
-> >
-> > - Apply CFLAGS, -Os to decompress.o to improve decompress
-> >   performance during boot-up process
-> >
-> > ...
-> >
-> > --- a/arch/arm/boot/compressed/Makefile
-> > +++ b/arch/arm/boot/compressed/Makefile
-> > @@ -24,6 +24,9 @@ endif
-> >  AFLAGS_head.o += -DTEXT_OFFSET=$(TEXT_OFFSET)
-> >  HEAD	= head.o
-> >  OBJS	+= misc.o decompress.o
-> > +ifeq ($(CONFIG_KERNEL_LZ4),y)
-> > +CFLAGS_decompress.o := -Os
-> > +endif
-> 
-> Surprised.  You found that -Os produces faster code than -O2?  Details,
-> please?
--Os is enforced here, based on the test result of decompression time
-below, slightly faster than -O2.
-But further tests with UA show that using -O2 will be the right choice
-especially in the case of the unaligned access enabled.
+On Thu, May 2, 2013 at 5:23 PM, Dave Hansen <dave.hansen@intel.com> wrote:
+> On 05/01/2013 11:50 PM, Winkler, Tomas wrote:
+>>> On Wed, May 01, 2013 at 09:56:35AM -0700, Dave Hansen wrote:
+>>>> Linus's current git isn't compiling for me:
+>>>>>   HOSTCC  scripts/mod/file2alias.o
+>>>>> /home/davehans/linux.git/scripts/mod/file2alias.c: In function
+>>> ‘do_mei_entry’:
+>>>>> /home/davehans/linux.git/scripts/mod/file2alias.c:1140:1: error:
+>>> ‘OFF_mei_cl_device_id_name’ undeclared (first use in this function)
+>>>>> /home/davehans/linux.git/scripts/mod/file2alias.c:1140:1: note: each
+>>> undeclared identifier is reported only once for each function it appears in
+>>>>> /home/davehans/linux.git/scripts/mod/file2alias.c: At top level:
+>>>>> /home/davehans/linux.git/scripts/mod/file2alias.c:1146:1: error:
+>>> ‘SIZE_mei_cl_device_id’ undeclared here (not in a function)
+>>>>
+>>>> I confirmed that this commit: e5354107e is the one causing it for me.
+>>>> My .config is here:
+>>>>
+>>>>     http://sr71.net/~dave/linux/config-3.9-meibad
+>>>>
+>>>> Note that I don't even have CONFIG_INTEL_MEI enabled with this config.
+>>>
+>>> I don't have CONFIG_INTEL_MEI set either, and I can't duplicate this.
+>>> Samuel and Tomas, can you please track this down?
+>>
+>> I cannot reproduce it as well. I've tried with v3.9 and also with the latest tip.
+>
+> I did some more poking around.  I was building with O= to put the
+> binaries in another dir.  When I saw the error, one of the first things
+> I did was do a "make mrproper" on the binary directory.  But, I never
+> did one one the source directory.  Doing that seems to have made this go
+> away.  There must have been some build gunk in the source directory
+> causing this.
 
-Decompression Time(counts)
-             UA
--Os  6717    3447
--O2  6720    2728
+Same here.
 
-Note: ARM v7, Kernel 3.4
-      counter freq. = 32768 HZ
-      UA(Unaligned Access)
-      gcc version 4.6.2 (Ubuntu/Linaro 4.6.2-14ubuntu2~ppa1)
+Removing "scripts/mod/devicetable-offsets.h" from the source directory fixes it.
+Unfortunately I forgot to check the date on the bogus
+scripts/mod/devicetable-offsets.h,
+so I don't know when it was generated.
 
-Thanks,
-Kyungsik
+Usually, if you build in the source directory, a subsequent build in the output
+directory will tell you to run "make mrproper" in the source directory. That
+obviously didn't happen.
+
+Note that I did run "make tags" in the source directory. So far that
+never caused
+problems. Just checked, it does not create scripts/mod/devicetable-offsets.h.
+
+JFYI, putting back scripts/mod/devicetable-offsets.h by copying from a
+freshly generated one in the output directory, with the mei lines removed,
+resurrects the problem.
+Even after touching scripts/mod/devicetable-offsets.c afterwards, it is not
+regenerated.
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
