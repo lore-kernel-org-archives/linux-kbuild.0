@@ -1,54 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:38782 "EHLO mx2.suse.de"
+Received: from terminus.zytor.com ([198.137.202.10]:46091 "EHLO mail.zytor.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752354Ab3ECPTi (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 3 May 2013 11:19:38 -0400
-Message-ID: <5183D585.5040508@suse.cz>
-Date: Fri, 03 May 2013 17:19:33 +0200
-From: Michal Marek <mmarek@suse.cz>
+	id S1751721Ab3ECQr6 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 3 May 2013 12:47:58 -0400
+Message-ID: <5183EA30.2000005@zytor.com>
+Date: Fri, 03 May 2013 09:47:44 -0700
+From: "H. Peter Anvin" <hpa@zytor.com>
 MIME-Version: 1.0
-Subject: Re: [PATCH 1/2] deb-pkg: split debug symbols in their own package
-References: <1363946761-7449-1-git-send-email-anisse@astier.eu> <51629BFF.1080204@suse.cz> <20130408190645.29570fe5@serenity> <20130409120547.64ad0d50@serenity> <20130419100519.485cb557@serenity> <20130503170823.3991bb0f@serenity>
-In-Reply-To: <20130503170823.3991bb0f@serenity>
+Subject: Re: Build-failure with old files in build-directory (Was: Linux 3.9
+ released)
+References: <CA+55aFxcqR+5wK0QoGBA_jYP1epH2NCbVTRaE51rLK3mdRjN6Q@mail.gmail.com> <20130429083649.GA23540@citd.de>
+In-Reply-To: <20130429083649.GA23540@citd.de>
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Anisse Astier <anisse@astier.eu>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, maximilian attems <max@stro.at>
+To: Matthias Schniedermeyer <ms@citd.de>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On 3.5.2013 17:08, Anisse Astier wrote:
-> On Fri, 19 Apr 2013 10:05:19 +0200, Anisse Astier <anisse@astier.eu> wrote :
+On 04/29/2013 01:36 AM, Matthias Schniedermeyer wrote:
+> On 28.04.2013 17:56, Linus Torvalds wrote:
 > 
->> On Tue, 9 Apr 2013 12:05:47 +0200, Anisse Astier <anisse@astier.eu> wrote :
->>
->>>
->>>
->>> From: Anisse Astier <anisse@astier.eu>
->>> Subject: [PATCH v3] deb-pkg: split debug symbols in their own package
->>>
->>> This can reduce almost 3 times the size of the linux-image package,
->>> while keeping the debug symbols available for this particular build, in
->>> their own package.
->>>
->>> This mimics the way kernels are built in debian, ubuntu, or with
->>> make-kpkg, and comes at the price of a small slowdown in the building of
->>> packages.
->>>
->>> v2:
->>>  - only build when CONFIG_DEBUG_INFO=y
->>>  - build debug package last.
->>>  - more verbose package description
->>>  - put package in section debug
->>> v3:
->>>  - remove duplicate code from v2
->>>
->>
->> What do you think ?
+> I'm not sure if it is supported, but building with a O= -directory that 
+> was previously used to build a 3.8.9-kernel that was "clean"ed (but not 
+> "mrproper"ed) before building 3.9 results in a build-failure:
+> make[2]: *** No rule to make target `/xssd/usr_src/ko/leeloo/include/config/hz.h', needed by `kernel/hz.bc'.  Stop.
 > 
-> Any update ?
+> After deleting everything in the KBUILD_OUTPUT-directory, except the 
+> .config-file, the kernel-build worked again.
+> 
+> At least in the past a "clean" seamed to be enough. I had a file with a 
+> 2.6.39-name inside, so it seams i have build my kernels this way for the 
+> last few releases.
+> 
 
-I don't know much about debian (kernel) packaging, so I'd like to hear
-Max's opinion before merging this.
+This seems to be the fundamental problem here... include/config is used
+to track dependencies on configuration, but it looks like there are
+events that seem to delete include/config without them being regenerated?
 
-Michal
+	-hpa
+
+
