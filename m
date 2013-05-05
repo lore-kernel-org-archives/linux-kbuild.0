@@ -1,79 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f43.google.com ([74.125.82.43]:50987 "EHLO
-	mail-wg0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753956Ab3EDT74 (ORCPT
+Received: from mail-ee0-f44.google.com ([74.125.83.44]:40123 "EHLO
+	mail-ee0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751477Ab3EEIYp (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 4 May 2013 15:59:56 -0400
-Date: Sat, 4 May 2013 21:59:50 +0200
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: Splitting stk1160-ac97 as a module (Re: linux-next: Tree for May
- 1 (media/usb/stk1160))
-Message-ID: <20130504195950.GA3254@free.fr>
-References: <20130501183734.7ad1efca2d06e75432edabbd@canb.auug.org.au>
- <518157EB.3010700@infradead.org>
- <51827DB1.7000304@redhat.com>
- <20130504172142.GA21656@localhost>
+	Sun, 5 May 2013 04:24:45 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20130504172142.GA21656@localhost>
+In-Reply-To: <87sj22zuga.fsf_-_@hase.home>
+References: <51814943.7000604@intel.com>
+	<20130501182138.GA17550@kroah.com>
+	<5B8DA87D05A7694D9FA63FD143655C1B01F18E66@HASMSX106.ger.corp.intel.com>
+	<518284E6.7040503@intel.com>
+	<CAMuHMdWSVUcwkY=xn+HjbruLxsc8Eqq=CWX78CdUc1+MAwCVhg@mail.gmail.com>
+	<87sj22zuga.fsf_-_@hase.home>
+Date: Sun, 5 May 2013 10:24:43 +0200
+Message-ID: <CAMuHMdX6PETQqQG-ASDv4OtLyB=X0hNyQRaSO13rUHf_HqNt3w@mail.gmail.com>
+Subject: Re: [PATCH] Fix cleaning in scripts/mod
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ezequiel Garcia <ezequiel.garcia@free-electrons.com>
-Cc: Mauro Carvalho Chehab <mchehab@redhat.com>, Randy Dunlap <rdunlap@infradead.org>, Ezequiel =?iso-8859-1?Q?Garc=EDa?= <elezegarcia@gmail.com>, Stephen Rothwell <sfr@canb.auug.org.au>, linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, linux-media <linux-media@vger.kernel.org>, linux-kbuild@vger.kernel.org
+To: Andreas Schwab <schwab@linux-m68k.org>
+Cc: Dave Hansen <dave.hansen@intel.com>, "Winkler, Tomas" <tomas.winkler@intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "SamuelOrtiz@kroah.com" <SamuelOrtiz@kroah.com>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-Ezequiel, All,
+On Sat, May 4, 2013 at 4:32 PM, Andreas Schwab <schwab@linux-m68k.org> wrote:
+> Make sure devicetable-offsets.h is cleaned in the scripts/mod directory
+>
+> Signed-off-by: Andreas Schwab <schwab@linux-m68k.org>
 
-On Sat, May 04, 2013 at 02:21:44PM -0300, Ezequiel Garcia wrote:
-> I'm trying to split the ac97 support into a separate module.
-> So far I've managed to do this with two different approaches,
-> but both of them are broken in some way :-(
-> 
-> Couple questions:
-> 
-> 1. Is it possible to force two symbols to be both built-in (=y) or both
-> modules (=m)? This would make one of my solutions work.
+Tested-by: Geert Uytterhoeven <geert@linux-m68k.org>
 
-If they are always the same value, there is no need to have two symbols
-in the first place.
+> ---
+>  scripts/mod/Makefile | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/scripts/mod/Makefile b/scripts/mod/Makefile
+> index 9415b56..75d59fc 100644
+> --- a/scripts/mod/Makefile
+> +++ b/scripts/mod/Makefile
+> @@ -37,6 +37,8 @@ scripts/mod/devicetable-offsets.s: scripts/mod/devicetable-offsets.c FORCE
+>  $(obj)/$(devicetable-offsets-file): scripts/mod/devicetable-offsets.s
+>         $(call cmd,offsets)
+>
+> +targets += $(devicetable-offsets-file)
+> +
+>  # dependencies on generated files need to be listed explicitly
+>
+>  $(obj)/modpost.o $(obj)/file2alias.o $(obj)/sumversion.o: $(obj)/elfconfig.h
 
-However, given the original problem from this thread, if what you meant
-was to have the second symbol either 'n' or the same as the first symbol,
-ie. the following table:
+Gr{oetje,eeting}s,
 
-    A:  n   m   m   y   y
-    B:  n   n   m   n   y
+                        Geert
 
-Then the closest I came up with is:
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
-    config MODULES
-        bool "Modules"
-    
-    config A
-        tristate "A"
-    
-    config B_dummy
-        bool "B"
-        depends on A
-    
-    config B
-        tristate
-        default m if A=m && B_dummy
-        default y if A=y && B_dummy
-
-where B_dummy is not used outside of Kconfig, and only A and B are the
-symbols of interest (eg. to build the drivers).
-
-Otherwise, I was not able to get the desired behviour with only the A
-and B symbols.
-
-Regards,
-Yann E. MORIN.
-
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
