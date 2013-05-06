@@ -1,20 +1,21 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f43.google.com ([74.125.82.43]:41355 "EHLO
-	mail-wg0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753366Ab3EFKAM (ORCPT
+Received: from mail-wg0-f42.google.com ([74.125.82.42]:43000 "EHLO
+	mail-wg0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752970Ab3EFMzF (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 6 May 2013 06:00:12 -0400
-Received: by mail-wg0-f43.google.com with SMTP id c11so3363436wgh.22
-        for <linux-kbuild@vger.kernel.org>; Mon, 06 May 2013 03:00:11 -0700 (PDT)
-Date: Mon, 6 May 2013 12:00:07 +0200
+	Mon, 6 May 2013 08:55:05 -0400
+Received: by mail-wg0-f42.google.com with SMTP id j13so2617070wgh.3
+        for <linux-kbuild@vger.kernel.org>; Mon, 06 May 2013 05:55:04 -0700 (PDT)
+Date: Mon, 6 May 2013 14:54:59 +0200
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
 Subject: Re: Wish: exact matches displayed first
-Message-ID: <20130506100007.GA3958@free.fr>
+Message-ID: <20130506125459.GB3958@free.fr>
 References: <1367826629.4494.30.camel@chaos.site>
+ <20130506100007.GA3958@free.fr>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1367826629.4494.30.camel@chaos.site>
+In-Reply-To: <20130506100007.GA3958@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Jean Delvare <jdelvare@suse.de>
@@ -22,15 +23,22 @@ Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Roland Eggner <
 
 Jean, All,
 
-On Mon, May 06, 2013 at 09:50:29AM +0200, Jean Delvare wrote:
-> I wish a search in "make menuconfig" would return an exact match, if it
-> exists, first in the list. At the moment, looking for "PCI", for
-> example, returns several dozen entries (anything matching "PCI") and
-> CONFIG_PCI is far away from the top. Ideally I would expect this query
-> to return CONFIG_PCI first.
+On Mon, May 06, 2013 at 12:00:07PM +0200, Yann E. MORIN wrote:
+> On Mon, May 06, 2013 at 09:50:29AM +0200, Jean Delvare wrote:
+> > I wish a search in "make menuconfig" would return an exact match, if it
+> > exists, first in the list. At the moment, looking for "PCI", for
+> > example, returns several dozen entries (anything matching "PCI") and
+> > CONFIG_PCI is far away from the top. Ideally I would expect this query
+> > to return CONFIG_PCI first.
+> 
+> Indeed, this has bugged me a few times, too.
+> I'll see what I can do.
 
-Indeed, this has bugged me a few times, too.
-I'll see what I can do.
+BTW, did you know that you can search using extended regular expressions?
+Searching for ^PCI$ will yield only the CONFIG_PCI symbol.
+
+Otherwise, I have a patch (that I'll submit shortly) to sort the symbols
+by releveance.
 
 Regards,
 Yann E. MORIN.
