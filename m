@@ -1,48 +1,77 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.free-electrons.com ([94.23.35.102]:46612 "EHLO
+Received: from mail.free-electrons.com ([94.23.35.102]:46637 "EHLO
 	mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752863Ab3EFNEw (ORCPT
+	with ESMTP id S1754130Ab3EFNL7 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 6 May 2013 09:04:52 -0400
-Date: Mon, 6 May 2013 15:04:46 +0200
-From: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
-Subject: Re: Wish: exact matches displayed first
-Message-ID: <20130506150446.7e39f644@skate>
-In-Reply-To: <20130506125459.GB3958@free.fr>
-References: <1367826629.4494.30.camel@chaos.site>
-	<20130506100007.GA3958@free.fr>
-	<20130506125459.GB3958@free.fr>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+	Mon, 6 May 2013 09:11:59 -0400
+Date: Mon, 6 May 2013 10:11:52 -0300
+From: Ezequiel Garcia <ezequiel.garcia@free-electrons.com>
+Subject: Re: Splitting stk1160-ac97 as a module (Re: linux-next: Tree for May
+ 1 (media/usb/stk1160))
+Message-ID: <20130506131150.GB18007@localhost>
+References: <20130501183734.7ad1efca2d06e75432edabbd@canb.auug.org.au>
+ <518157EB.3010700@infradead.org>
+ <51827DB1.7000304@redhat.com>
+ <20130504172142.GA21656@localhost>
+ <20130504195950.GA3254@free.fr>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20130504195950.GA3254@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: Jean Delvare <jdelvare@suse.de>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Roland Eggner <edvx1@systemanalysen.net>, Wang YanQing <udknight@gmail.com>
+Cc: Mauro Carvalho Chehab <mchehab@redhat.com>, Randy Dunlap <rdunlap@infradead.org>, Ezequiel =?utf-8?Q?Garc=C3=ADa?= <elezegarcia@gmail.com>, Stephen Rothwell <sfr@canb.auug.org.au>, linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, linux-media <linux-media@vger.kernel.org>, linux-kbuild@vger.kernel.org
 
-Dear Yann E. MORIN,
-
-On Mon, 6 May 2013 14:54:59 +0200, Yann E. MORIN wrote:
-
-> On Mon, May 06, 2013 at 12:00:07PM +0200, Yann E. MORIN wrote:
-> > On Mon, May 06, 2013 at 09:50:29AM +0200, Jean Delvare wrote:
-> > > I wish a search in "make menuconfig" would return an exact match, if it
-> > > exists, first in the list. At the moment, looking for "PCI", for
-> > > example, returns several dozen entries (anything matching "PCI") and
-> > > CONFIG_PCI is far away from the top. Ideally I would expect this query
-> > > to return CONFIG_PCI first.
-> > 
-> > Indeed, this has bugged me a few times, too.
-> > I'll see what I can do.
+On Sat, May 04, 2013 at 09:59:50PM +0200, Yann E. MORIN wrote:
+> Ezequiel, All,
 > 
-> BTW, did you know that you can search using extended regular expressions?
-> Searching for ^PCI$ will yield only the CONFIG_PCI symbol.
+> On Sat, May 04, 2013 at 02:21:44PM -0300, Ezequiel Garcia wrote:
+> > I'm trying to split the ac97 support into a separate module.
+> > So far I've managed to do this with two different approaches,
+> > but both of them are broken in some way :-(
+> > 
+> > Couple questions:
+> > 
+> > 1. Is it possible to force two symbols to be both built-in (=y) or both
+> > modules (=m)? This would make one of my solutions work.
+> 
+> If they are always the same value, there is no need to have two symbols
+> in the first place.
+> 
+> However, given the original problem from this thread, if what you meant
+> was to have the second symbol either 'n' or the same as the first symbol,
+> ie. the following table:
+> 
+>     A:  n   m   m   y   y
+>     B:  n   n   m   n   y
+> 
+> Then the closest I came up with is:
+> 
+>     config MODULES
+>         bool "Modules"
+>     
+>     config A
+>         tristate "A"
+>     
+>     config B_dummy
+>         bool "B"
+>         depends on A
+>     
+>     config B
+>         tristate
+>         default m if A=m && B_dummy
+>         default y if A=y && B_dummy
+> 
+> where B_dummy is not used outside of Kconfig, and only A and B are the
+> symbols of interest (eg. to build the drivers).
+> 
 
-Wow, I didn't know that. Is this documented/advertised somewhere?
+That worked like a charm!
 
-Thomas
+Thanks a lot,
 -- 
-Thomas Petazzoni, Free Electrons
-Kernel, drivers, real-time and embedded Linux
-development, consulting, training and support.
+Ezequiel García, Free Electrons
+Embedded Linux, Kernel and Android Engineering
 http://free-electrons.com
