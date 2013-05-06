@@ -1,138 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-we0-f178.google.com ([74.125.82.178]:54483 "EHLO
-	mail-we0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753090Ab3EFNCx (ORCPT
+Received: from mail.free-electrons.com ([94.23.35.102]:46612 "EHLO
+	mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752863Ab3EFNEw (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 6 May 2013 09:02:53 -0400
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: [PATCH] kconfig: sort found symbols by relevance
-Date: Mon,  6 May 2013 15:02:45 +0200
-Message-Id: <1367845365-13316-1-git-send-email-yann.morin.1998@free.fr>
-In-Reply-To: <1367826629.4494.30.camel@chaos.site>
+	Mon, 6 May 2013 09:04:52 -0400
+Date: Mon, 6 May 2013 15:04:46 +0200
+From: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+Subject: Re: Wish: exact matches displayed first
+Message-ID: <20130506150446.7e39f644@skate>
+In-Reply-To: <20130506125459.GB3958@free.fr>
 References: <1367826629.4494.30.camel@chaos.site>
+	<20130506100007.GA3958@free.fr>
+	<20130506125459.GB3958@free.fr>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, "Yann E. MORIN" <yann.morin.1998@free.fr>, Jean Delvare <jdelvare@suse.de>, Michal Marek <mmarek@suse.cz>, Roland Eggner <edvx1@systemanalysen.net>, Wang YanQing <udknight@gmail.com>
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: Jean Delvare <jdelvare@suse.de>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Roland Eggner <edvx1@systemanalysen.net>, Wang YanQing <udknight@gmail.com>
 
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Dear Yann E. MORIN,
 
-When searching for symbols, return the symbols sorted by relevance.
+On Mon, 6 May 2013 14:54:59 +0200, Yann E. MORIN wrote:
 
-Relevance is the ratio of the length of the matched string and the
-length of the symbol name. Symbols of equal relevance are sorted
-alphabetically.
+> On Mon, May 06, 2013 at 12:00:07PM +0200, Yann E. MORIN wrote:
+> > On Mon, May 06, 2013 at 09:50:29AM +0200, Jean Delvare wrote:
+> > > I wish a search in "make menuconfig" would return an exact match, if it
+> > > exists, first in the list. At the moment, looking for "PCI", for
+> > > example, returns several dozen entries (anything matching "PCI") and
+> > > CONFIG_PCI is far away from the top. Ideally I would expect this query
+> > > to return CONFIG_PCI first.
+> > 
+> > Indeed, this has bugged me a few times, too.
+> > I'll see what I can do.
+> 
+> BTW, did you know that you can search using extended regular expressions?
+> Searching for ^PCI$ will yield only the CONFIG_PCI symbol.
 
-Reported-by: Jean Delvare <jdelvare@suse.de>
-Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: Jean Delvare <jdelvare@suse.de>
-Cc: Michal Marek <mmarek@suse.cz>
-Cc: Roland Eggner <edvx1@systemanalysen.net>
-Cc: Wang YanQing <udknight@gmail.com>
----
- scripts/kconfig/symbol.c | 66 +++++++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 57 insertions(+), 9 deletions(-)
+Wow, I didn't know that. Is this documented/advertised somewhere?
 
-diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
-index ecc5aa5..baba030 100644
---- a/scripts/kconfig/symbol.c
-+++ b/scripts/kconfig/symbol.c
-@@ -943,38 +943,86 @@ const char *sym_escape_string_value(const char *in)
- 	return res;
- }
- 
-+struct sym_match {
-+	struct symbol	*sym;
-+	int 		rel;
-+};
-+
-+/* Compare matched symbols as thus:
-+ * - highest relevance first
-+ * - equal relevance sorted alphabetically
-+ */
-+static int sym_rel_comp( const void *sym1, const void *sym2 )
-+{
-+	struct sym_match **s1 = (struct sym_match **)sym1;
-+	struct sym_match **s2 = (struct sym_match **)sym2;
-+
-+	if ( (*s1)->rel > (*s2)->rel )
-+		return -1;
-+	else if ( (*s1)->rel < (*s2)->rel )
-+		return 1;
-+	else
-+		return strcmp( (*s1)->sym->name, (*s2)->sym->name );
-+}
-+
- struct symbol **sym_re_search(const char *pattern)
- {
- 	struct symbol *sym, **sym_arr = NULL;
-+	struct sym_match **sym_match_arr = NULL;
- 	int i, cnt, size;
- 	regex_t re;
-+	regmatch_t match[1];
- 
- 	cnt = size = 0;
- 	/* Skip if empty */
- 	if (strlen(pattern) == 0)
- 		return NULL;
--	if (regcomp(&re, pattern, REG_EXTENDED|REG_NOSUB|REG_ICASE))
-+	if (regcomp(&re, pattern, REG_EXTENDED|REG_ICASE))
- 		return NULL;
- 
- 	for_all_symbols(i, sym) {
-+		struct sym_match *tmp_sym_match;
- 		if (sym->flags & SYMBOL_CONST || !sym->name)
- 			continue;
--		if (regexec(&re, sym->name, 0, NULL, 0))
-+		if (regexec(&re, sym->name, 1, match, 0))
- 			continue;
- 		if (cnt + 1 >= size) {
--			void *tmp = sym_arr;
-+			void *tmp;
- 			size += 16;
--			sym_arr = realloc(sym_arr, size * sizeof(struct symbol *));
--			if (!sym_arr) {
--				free(tmp);
--				return NULL;
-+			tmp = realloc(sym_match_arr, size * sizeof(struct sym_match *));
-+			if (!tmp) {
-+				goto sym_re_search_free;
- 			}
-+			sym_match_arr = tmp;
- 		}
- 		sym_calc_value(sym);
--		sym_arr[cnt++] = sym;
-+		tmp_sym_match = (struct sym_match*)malloc(sizeof(struct sym_match));
-+		if (!tmp_sym_match)
-+			goto sym_re_search_free;
-+		tmp_sym_match->sym = sym;
-+		/* As regexec return 0, we know we have a match, so
-+		 * we can use match[0].rm_[se]o without further checks
-+		 */
-+		tmp_sym_match->rel = (100*(match[0].rm_eo-match[0].rm_so))
-+				     /strlen(sym->name);
-+		sym_match_arr[cnt++] = tmp_sym_match;
- 	}
--	if (sym_arr)
-+
-+	if( sym_match_arr ) {
-+		qsort( sym_match_arr, cnt, sizeof(struct sym_match*), sym_rel_comp );
-+		sym_arr = malloc( (cnt+1) * sizeof(struct symbol) );
-+		if (!sym_arr)
-+			goto sym_re_search_free;
-+		for ( i=0; i<cnt; i++ )
-+			sym_arr[i] = sym_match_arr[i]->sym;
- 		sym_arr[cnt] = NULL;
-+	}
-+sym_re_search_free:
-+	if (sym_match_arr) {
-+		for ( i=0; i<cnt; i++ )
-+			free( sym_match_arr[i] );
-+		free( sym_match_arr );
-+	}
- 	regfree(&re);
- 
- 	return sym_arr;
+Thomas
 -- 
-1.8.1.2
-
+Thomas Petazzoni, Free Electrons
+Kernel, drivers, real-time and embedded Linux
+development, consulting, training and support.
+http://free-electrons.com
