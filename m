@@ -1,48 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-we0-f182.google.com ([74.125.82.182]:43782 "EHLO
-	mail-we0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751008Ab3EFIUC (ORCPT
+Received: from LGEMRELSE7Q.lge.com ([156.147.1.151]:55311 "EHLO
+	LGEMRELSE7Q.lge.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752345Ab3EFInS (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 6 May 2013 04:20:02 -0400
-Received: by mail-we0-f182.google.com with SMTP id r46so2824279wey.13
-        for <linux-kbuild@vger.kernel.org>; Mon, 06 May 2013 01:20:00 -0700 (PDT)
-Message-ID: <518767AE.2070005@6wind.com>
-Date: Mon, 06 May 2013 10:19:58 +0200
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Reply-To: nicolas.dichtel@6wind.com
-MIME-Version: 1.0
-Subject: Re: [PATCH linux-next v2] fix make headers_install when path is too
- long
-References: <20130426185709.GA13399@merkur.ravnborg.org> <1367237751-24962-1-git-send-email-nicolas.dichtel@6wind.com> <517E68BE.2060303@windriver.com>
-In-Reply-To: <517E68BE.2060303@windriver.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 8bit
+	Mon, 6 May 2013 04:43:18 -0400
+From: Kyungsik Lee <kyungsik.lee@lge.com>
+Subject: [PATCH -next 1/2] arm: Remove enforced Os flag for LZ4 decompressor
+Date: Mon,  6 May 2013 17:42:54 +0900
+Message-Id: <1367829775-4434-1-git-send-email-kyungsik.lee@lge.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mmarek@suse.cz
-Cc: Bruce Ashfield <bruce.ashfield@windriver.com>, sam@ravnborg.org, linux-kbuild@vger.kernel.org
+To: Andrew Morton <akpm@linux-foundation.org>, Michal Marek <mmarek@suse.cz>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org, celinux-dev@lists.celinuxforum.org, linux-arm-kernel@lists.infradead.org, hyojun.im@lge.com, chan.jeong@lge.com, raphael.andy.lee@gmail.com, Kyungsik Lee <kyungsik.lee@lge.com>, Thomas Gleixner <tglx@linutronix.de>, Russell King <rmk@arm.linux.org.uk>, Borislav Petkov <bp@alien8.de>, Florian Fainelli <florian@openwrt.org>, Yann Collet <yann.collet.73@gmail.com>
 
-Le 29/04/2013 14:34, Bruce Ashfield a écrit :
-> On 13-04-29 08:15 AM, Nicolas Dichtel wrote:
->> If headers_install is executed from a deep/long directory structure, the
->> shell's maximum argument length can be execeeded, which breaks the operation
->> with:
->>
->> | make[2]: execvp: /bin/sh: Argument list too long
->> | make[2]: ***
->>
->> Instead of passing each files name with the entire path, I give only the file
->> name without the source path and give this path as a new argument to
->> headers_install.pl.
->>
->> Because there is three possible paths, I have tree input-files list, one per
->> path.
->
-> This version still works for my test case.
->
-> Tested-by: Bruce Ashfield <bruce.ashfield@windriver.com>
->
->>
->> Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
->> ---
-Should I do something more for this patch? It seems not included.
+-Os is enforced here, based on the test result of decompression time
+below, slightly faster than -O2.
+
+But further tests with UA show that using -O2 will be the right choice
+especially in the case of the unaligned access enabled and the gap,
+few counts in the normal decompression mode is small enough to remove -Os.
+
+Decompression Time(counts)
+     Normal    UA enabled
+-Os  6717      3447
+-O2  6720      2728
+
+Note: ARM v7, Kernel 3.4
+      counter freq. = 32768 HZ
+      UA(Unaligned Access)
+      gcc version 4.6.2
+
+Signed-off-by: Kyungsik Lee <kyungsik.lee@lge.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Russell King <rmk@arm.linux.org.uk>
+Cc: Borislav Petkov <bp@alien8.de>
+Cc: Florian Fainelli <florian@openwrt.org>
+Cc: Yann Collet <yann.collet.73@gmail.com>
+---
+ arch/arm/boot/compressed/Makefile | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/arch/arm/boot/compressed/Makefile b/arch/arm/boot/compressed/Makefile
+index 001a13a..198a4ad 100644
+--- a/arch/arm/boot/compressed/Makefile
++++ b/arch/arm/boot/compressed/Makefile
+@@ -27,9 +27,6 @@ OBJS	+= misc.o decompress.o
+ ifeq ($(CONFIG_DEBUG_UNCOMPRESS),y)
+ OBJS	+= debug.o
+ endif
+-ifeq ($(CONFIG_KERNEL_LZ4),y)
+-CFLAGS_decompress.o := -Os
+-endif
+ FONTC	= $(srctree)/drivers/video/console/font_acorn_8x8.c
+ 
+ # string library code (-Os is enforced to keep it much smaller)
+-- 
+1.8.1.1
+
