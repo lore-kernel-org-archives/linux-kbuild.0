@@ -1,77 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.free-electrons.com ([94.23.35.102]:46637 "EHLO
-	mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754130Ab3EFNL7 (ORCPT
+Received: from mail-wi0-f172.google.com ([209.85.212.172]:42205 "EHLO
+	mail-wi0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751790Ab3EFNxc (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 6 May 2013 09:11:59 -0400
-Date: Mon, 6 May 2013 10:11:52 -0300
-From: Ezequiel Garcia <ezequiel.garcia@free-electrons.com>
-Subject: Re: Splitting stk1160-ac97 as a module (Re: linux-next: Tree for May
- 1 (media/usb/stk1160))
-Message-ID: <20130506131150.GB18007@localhost>
-References: <20130501183734.7ad1efca2d06e75432edabbd@canb.auug.org.au>
- <518157EB.3010700@infradead.org>
- <51827DB1.7000304@redhat.com>
- <20130504172142.GA21656@localhost>
- <20130504195950.GA3254@free.fr>
+	Mon, 6 May 2013 09:53:32 -0400
+Received: by mail-wi0-f172.google.com with SMTP id hm14so2564090wib.17
+        for <linux-kbuild@vger.kernel.org>; Mon, 06 May 2013 06:53:31 -0700 (PDT)
+Date: Mon, 6 May 2013 15:53:27 +0200
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: Re: Wish: exact matches displayed first
+Message-ID: <20130506135327.GC3958@free.fr>
+References: <1367826629.4494.30.camel@chaos.site>
+ <20130506100007.GA3958@free.fr>
+ <20130506125459.GB3958@free.fr>
+ <20130506150446.7e39f644@skate>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20130504195950.GA3254@free.fr>
+In-Reply-To: <20130506150446.7e39f644@skate>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: Mauro Carvalho Chehab <mchehab@redhat.com>, Randy Dunlap <rdunlap@infradead.org>, Ezequiel =?utf-8?Q?Garc=C3=ADa?= <elezegarcia@gmail.com>, Stephen Rothwell <sfr@canb.auug.org.au>, linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, linux-media <linux-media@vger.kernel.org>, linux-kbuild@vger.kernel.org
+To: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+Cc: Jean Delvare <jdelvare@suse.de>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Roland Eggner <edvx1@systemanalysen.net>, Wang YanQing <udknight@gmail.com>
 
-On Sat, May 04, 2013 at 09:59:50PM +0200, Yann E. MORIN wrote:
-> Ezequiel, All,
-> 
-> On Sat, May 04, 2013 at 02:21:44PM -0300, Ezequiel Garcia wrote:
-> > I'm trying to split the ac97 support into a separate module.
-> > So far I've managed to do this with two different approaches,
-> > but both of them are broken in some way :-(
-> > 
-> > Couple questions:
-> > 
-> > 1. Is it possible to force two symbols to be both built-in (=y) or both
-> > modules (=m)? This would make one of my solutions work.
-> 
-> If they are always the same value, there is no need to have two symbols
-> in the first place.
-> 
-> However, given the original problem from this thread, if what you meant
-> was to have the second symbol either 'n' or the same as the first symbol,
-> ie. the following table:
-> 
->     A:  n   m   m   y   y
->     B:  n   n   m   n   y
-> 
-> Then the closest I came up with is:
-> 
->     config MODULES
->         bool "Modules"
->     
->     config A
->         tristate "A"
->     
->     config B_dummy
->         bool "B"
->         depends on A
->     
->     config B
->         tristate
->         default m if A=m && B_dummy
->         default y if A=y && B_dummy
-> 
-> where B_dummy is not used outside of Kconfig, and only A and B are the
-> symbols of interest (eg. to build the drivers).
-> 
+Thomas, All,
 
-That worked like a charm!
+On Mon, May 06, 2013 at 03:04:46PM +0200, Thomas Petazzoni wrote:
+> On Mon, 6 May 2013 14:54:59 +0200, Yann E. MORIN wrote:
+> > BTW, did you know that you can search using extended regular expressions?
+> > Searching for ^PCI$ will yield only the CONFIG_PCI symbol.
+> 
+> Wow, I didn't know that. Is this documented/advertised somewhere?
 
-Thanks a lot,
+Yes. In Documentation/kbuild/kconfig.txt:
+
+    [...] This will tell you that you can also use
+    regular expressions (regexes) in the search string, [...]
+
+Regards,
+Yann E. MORIN.
+
 -- 
-Ezequiel García, Free Electrons
-Embedded Linux, Kernel and Android Engineering
-http://free-electrons.com
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
