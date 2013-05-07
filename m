@@ -1,53 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:36575 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:36801 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757650Ab3EGMms (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 7 May 2013 08:42:48 -0400
-Date: Tue, 7 May 2013 14:42:46 +0200
+	id S1758067Ab3EGMsZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 7 May 2013 08:48:25 -0400
+Date: Tue, 7 May 2013 14:48:23 +0200
 From: Michal Marek <mmarek@suse.cz>
-Subject: [GIT] kbuild changes for v3.10-rc1
-Message-ID: <20130507124246.GA12891@pobox.suse.cz>
+Subject: [GIT] kconfig changes for v3.10-rc1
+Message-ID: <20130507124814.GA13003@pobox.suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: antonynpavlov@gmail.com, rob@landley.net, schwab@linux-m68k.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: bpoirier@suse.de, jlec@gentoo.org, john.stultz@linaro.org, mmarek@suse.cz, yann.morin.1998@free.fr, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hi Linus,
 
-please pull these kbuild commits for v3.10-rc1:
+please pull the following kconfig bits for v3.10-rc1:
 
-* Fix make mrproper after mod/file2alias rework
-* Fix ld-option Makefile function
-* Rewrite headers_install to shell to drop Perl dependency.
+* use pkg-config to detect curses libraries
+* clean up the way curses headers are searched
+* Some randconfig fixes, of which one had to be reverted
+* KCONFIG_SEED for randconfig debugging
+* memuconfig memory leak plugged
+* menuconfig > breadcrumbs > navigation
+* xconfig compilation fix
+* Other minor fixes
 
-There are some more patches I have to look at, so I might send another
-pull request later. Or just queue them for 3.11.
+Michal
 
-The following changes since commit a937536b868b8369b98967929045f1df54234323:
+The following changes since commit 6dbe51c251a327e012439c4772097a13df43c5b8:
 
-  Linux 3.9-rc3 (2013-03-17 15:59:32 -0700)
+  Linux 3.9-rc1 (2013-03-03 15:11:05 -0800)
 
 are available in the git repository at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git kbuild
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git kconfig
 
-Andreas Schwab (1):
-      Fix cleaning in scripts/mod
+Benjamin Poirier (2):
+      menuconfig: Fix memory leak introduced by jump keys feature
+      menuconfig: Add "breadcrumbs" navigation aid
 
-Antony Pavlov (1):
-      kbuild: fix ld-option function
+John Stultz (1):
+      merge_config.sh: Avoid creating unnessary source softlinks
 
-Rob Landley (1):
-      headers_install.pl: convert to headers_install.sh
+Justin Lecher (2):
+      menuconfig: optionally use pkg-config to detect ncurses libs
+      kconfig: optionally use pkg-config to detect ncurses libs
 
- Documentation/kbuild/makefiles.txt |    2 +-
- scripts/Kbuild.include             |    2 +-
- scripts/Makefile.headersinst       |    4 +-
- scripts/headers_install.pl         |   63 ------------------------------------
- scripts/headers_install.sh         |   43 ++++++++++++++++++++++++
- scripts/mod/Makefile               |    2 +
- 6 files changed, 49 insertions(+), 67 deletions(-)
- delete mode 100644 scripts/headers_install.pl
- create mode 100644 scripts/headers_install.sh
+Michal Marek (1):
+      Merge branch 'yem-kconfig-rc-fixes' of git://gitorious.org/linux-kconfig/linux-kconfig into kbuild/kconfig
+
+Yann E. MORIN (8):
+      kconfig/lxdialog: rationalise the include paths where to find {.n}curses{,w}.h
+      kconfig: fix randconfig tristate detection
+      kconfig: do not override symbols already set
+      kconfig: fix randomising choice entries in presence of KCONFIG_ALLCONFIG
+      kconfig: allow specifying the seed for randconfig
+      kconfig: implement KCONFIG_PROBABILITY for randconfig
+      Revert "kconfig: fix randomising choice entries in presence of KCONFIG_ALLCONFIG"
+      kconfig: fix lists definition for C++
+
+ Documentation/kbuild/kconfig.txt           |   36 +++++++++++++
+ scripts/kconfig/Makefile                   |    4 +-
+ scripts/kconfig/conf.c                     |   12 ++++-
+ scripts/kconfig/confdata.c                 |   59 ++++++++++++++++++++--
+ scripts/kconfig/list.h                     |   40 +++++++++++++++
+ scripts/kconfig/lxdialog/check-lxdialog.sh |    6 ++-
+ scripts/kconfig/lxdialog/dialog.h          |    7 +++
+ scripts/kconfig/lxdialog/util.c            |   45 ++++++++++++++++-
+ scripts/kconfig/mconf.c                    |   74 +++++++++++++++++++++++++++-
+ scripts/kconfig/merge_config.sh            |   10 +++-
+ 10 files changed, 281 insertions(+), 12 deletions(-)
