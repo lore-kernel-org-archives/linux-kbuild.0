@@ -1,71 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:37237 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932076Ab3EGM6H (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 7 May 2013 08:58:07 -0400
-Date: Tue, 7 May 2013 14:58:03 +0200
-From: Michal Marek <mmarek@suse.cz>
-Subject: [GIT] kbuild misc change for v3.10-rc1
-Message-ID: <20130507125803.GA13389@pobox.suse.cz>
+Received: from mail-we0-f171.google.com ([74.125.82.171]:56338 "EHLO
+	mail-we0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757991Ab3EGNWF (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 7 May 2013 09:22:05 -0400
+Date: Tue, 7 May 2013 15:21:59 +0200
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: Re: [PATCH] menuconfig: fix NULL pointer dereference when searching
+ a symbol
+Message-ID: <20130507132159.GA15137@free.fr>
+References: <518869BB.2020808@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
+In-Reply-To: <518869BB.2020808@huawei.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: bp@suse.de, mmarek@suse.cz, nicolas.palix@imag.fr, pebolle@tiscali.nl, tkhai@yandex.ru, wbin00@gmail.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Li Zefan <lizefan@huawei.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, Weng Meiling <wengmeiling.weng@huawei.com>, Libo Chen <clbchenlibo.chen@huawei.com>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, Borislav Petkov <bp@alien8.de>
 
-Hi Linus,
+Li, All,
 
-please pull these non-critical kbuild changes for v3.10-rc1:
+On Tue, May 07, 2013 at 10:40:59AM +0800, Li Zefan wrote:
+> Searching PPC_EFIKA results segmentation fault, and it's because
+> get_symbol_prop() returns NULL.
+> 
+> In this case CONFIG_PPC_EFIKA is defined in arch/powerpc/platforms/
+> 52xx/Kconfig, so it won't be parsed if ARCH!=PPC, but menuconfig
+> knows this symbol when it parses sound/soc/fsl/Kconfig:
+> 
+> config SND_MPC52xx_SOC_EFIKA
+>         tristate "SoC AC97 Audio support for bbplan Efika and STAC9766"
+>         depends on PPC_EFIKA
+> 
+> This bug was introduced by commit bcdedcc1afd6 ("menuconfig: print more
+> info for symbol without prompts").
+> 
+> Reported-by: Borislav Petkov <bp@alien8.de>
+> Signed-off-by: Li Zefan <lizefan@huawei.com>
 
-* make coccicheck improvements, but no new semantic patches this time
-* make rpm improvements
-* make tar-pkg change to include the architecture in the filename. This
-  is a deliberate incompatibility, but nobody has complained so far and
-  it is useful if you build for different architectures. It also matches
-  what the deb-pkg and rpm-pkg targets produce.
-* kbuild documentation fix
+Reviewed-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-Michal
+Michal, I'll get this in my tree, and will send a pull-request to you
+later (I may have a few other smallish fixes shortly).
 
+Regards,
+Yann E. MORIN.
 
-The following changes since commit 6dbe51c251a327e012439c4772097a13df43c5b8:
-
-  Linux 3.9-rc1 (2013-03-03 15:11:05 -0800)
-
-are available in the git repository at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git misc
-
-Bin Wang (1):
-      scripts/package/Makefile: compare objtree with srctree instead of test KBUILD_OUTPUT
-
-Borislav Petkov (1):
-      buildtar: Add ARCH to the archive name
-
-Kirill Tkhai (1):
-      scripts/tags.sh: Add magic for OFFSET and DEFINE
-
-Michal Marek (4):
-      rpm-pkg: Do not package the whole source directory
-      rpm-pkg: Do not write to the parent directory
-      rpm-pkg: Always regenerate the specfile
-      rpm-pkg: Remove pointless set -e statements
-
-Nicolas Palix (4):
-      Coccinelle: Restore coccicheck verbosity in ONLINE mode (C=1 or C=2)
-      Coccinelle: Cleanup the setting of the FLAGS and OPTIONS variables
-      Coccinelle: Add support to the SPFLAGS variable
-      Coccinelle: Fix patch output when coccicheck is used with M= and C=
-
-Paul Bolle (1):
-      doc: change example to existing Makefile fragment
-
- Documentation/coccinelle.txt       |   11 +++++++++-
- Documentation/kbuild/makefiles.txt |    5 ++-
- Makefile                           |    2 +
- scripts/coccicheck                 |   31 ++++++++++++++++------------
- scripts/package/Makefile           |   39 +++++++++++++----------------------
- scripts/package/buildtar           |    2 +-
- scripts/tags.sh                    |    4 ++-
- 7 files changed, 52 insertions(+), 42 deletions(-)
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
