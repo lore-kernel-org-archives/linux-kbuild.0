@@ -1,237 +1,234 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga14.intel.com ([143.182.124.37]:34736 "EHLO mga14.intel.com"
+Received: from mga14.intel.com ([143.182.124.37]:8754 "EHLO mga14.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1759129Ab3EGUrL (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 7 May 2013 16:47:11 -0400
-Subject: [PATCH 4/7] consolidate compilation option configs
+	id S1758759Ab3EGUrg (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 7 May 2013 16:47:36 -0400
+Subject: [PATCH 6/7] kconfig: consolidate printk options
 From: Dave Hansen <dave@sr71.net>
-Date: Tue, 07 May 2013 13:46:48 -0700
+Date: Tue, 07 May 2013 13:46:51 -0700
 References: <20130507204642.D010DDC1@viggo.jf.intel.com>
 In-Reply-To: <20130507204642.D010DDC1@viggo.jf.intel.com>
-Message-Id: <20130507204648.6378A6C1@viggo.jf.intel.com>
+Message-Id: <20130507204651.52F3D9A5@viggo.jf.intel.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: mmarek@suse.cz
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Dave Hansen <dave@sr71.net>
 
 
-From: Dave Hansen <dave@linux.vnet.ibm.com>
+From: Dave Hansen <dave.hansen@linux.intel.com>
 
-Again, trying to come up with some common themes of the stuff in
-the kernel hacking menu...  There are quite a few options to
-tweak compilation in some way, or perform extra compile-time
-checks.  Give them their own menu.
+Same deal, take the printk-related things and hide them in a menu.
+This takes another 4 items out of the top-level menu.
 
-The diff here looks a bit funny... makes it look like I'm
-moving debugfs even though I'm actually moving the options on
-either side of it.
-
-Signed-off-by: Dave Hansen <dave@linux.vnet.ibm.com>
 Signed-off-by: Dave Hansen <dave.hansen@linux.intel.com>
 ---
 
- linux.git-davehans/lib/Kconfig.debug |  156 +++++++++++++++++------------------
- 1 file changed, 80 insertions(+), 76 deletions(-)
+ linux.git-davehans/lib/Kconfig.debug |  177 +++++++++++++++++------------------
+ 1 file changed, 90 insertions(+), 87 deletions(-)
 
-diff -puN lib/Kconfig.debug~consolidate-compilation-configs lib/Kconfig.debug
---- linux.git/lib/Kconfig.debug~consolidate-compilation-configs	2013-05-07 13:41:37.908511367 -0700
-+++ linux.git-davehans/lib/Kconfig.debug	2013-05-07 13:41:37.912511543 -0700
-@@ -25,6 +25,34 @@ config DEFAULT_MESSAGE_LOGLEVEL
+diff -puN lib/Kconfig.debug~printk-options lib/Kconfig.debug
+--- linux.git/lib/Kconfig.debug~printk-options	2013-05-07 13:41:38.407533570 -0700
++++ linux.git-davehans/lib/Kconfig.debug	2013-05-07 13:41:38.410533703 -0700
+@@ -1,3 +1,4 @@
++menu "printk and dmesg options"
+ 
+ config PRINTK_TIME
+ 	bool "Show timing information on printks"
+@@ -25,6 +26,95 @@ config DEFAULT_MESSAGE_LOGLEVEL
  	  that are auditing their logs closely may want to set it to a lower
  	  priority.
  
-+menu "Compile-time checks and compiler options"
-+
-+config DEBUG_INFO
-+	bool "Compile the kernel with debug info"
-+	depends on DEBUG_KERNEL
++config BOOT_PRINTK_DELAY
++	bool "Delay each boot printk message by N milliseconds"
++	depends on DEBUG_KERNEL && PRINTK && GENERIC_CALIBRATE_DELAY
 +	help
-+          If you say Y here the resulting kernel image will include
-+	  debugging info resulting in a larger kernel image.
-+	  This adds debug symbols to the kernel and modules (gcc -g), and
-+	  is needed if you intend to use kernel crashdump or binary object
-+	  tools like crash, kgdb, LKCD, gdb, etc on the kernel.
-+	  Say Y here only if you plan to debug the kernel.
++	  This build option allows you to read kernel boot messages
++	  by inserting a short delay after each one.  The delay is
++	  specified in milliseconds on the kernel command line,
++	  using "boot_delay=N".
 +
-+	  If unsure, say N.
++	  It is likely that you would also need to use "lpj=M" to preset
++	  the "loops per jiffie" value.
++	  See a previous boot log for the "lpj" value to use for your
++	  system, and then set "lpj=M" before setting "boot_delay=N".
++	  NOTE:  Using this option may adversely affect SMP systems.
++	  I.e., processors other than the first one may not boot up.
++	  BOOT_PRINTK_DELAY also may cause LOCKUP_DETECTOR to detect
++	  what it believes to be lockup conditions.
 +
-+config DEBUG_INFO_REDUCED
-+	bool "Reduce debugging information"
-+	depends on DEBUG_INFO
++config DYNAMIC_DEBUG
++	bool "Enable dynamic printk() support"
++	default n
++	depends on PRINTK
++	depends on DEBUG_FS
 +	help
-+	  If you say Y here gcc is instructed to generate less debugging
-+	  information for structure types. This means that tools that
-+	  need full debugging information (like kgdb or systemtap) won't
-+	  be happy. But if you merely need debugging information to
-+	  resolve line numbers there is no loss. Advantage is that
-+	  build directory object sizes shrink dramatically over a full
-+	  DEBUG_INFO build and compile times are reduced too.
-+	  Only works with newer gcc versions.
 +
- config ENABLE_WARN_DEPRECATED
- 	bool "Enable __deprecated logic"
- 	default y
-@@ -52,20 +80,6 @@ config FRAME_WARN
- 	  Setting it to 0 disables the warning.
- 	  Requires gcc 4.4
++	  Compiles debug level messages into the kernel, which would not
++	  otherwise be available at runtime. These messages can then be
++	  enabled/disabled based on various levels of scope - per source file,
++	  function, module, format string, and line number. This mechanism
++	  implicitly compiles in all pr_debug() and dev_dbg() calls, which
++	  enlarges the kernel text size by about 2%.
++
++	  If a source file is compiled with DEBUG flag set, any
++	  pr_debug() calls in it are enabled by default, but can be
++	  disabled at runtime as below.  Note that DEBUG flag is
++	  turned on by many CONFIG_*DEBUG* options.
++
++	  Usage:
++
++	  Dynamic debugging is controlled via the 'dynamic_debug/control' file,
++	  which is contained in the 'debugfs' filesystem. Thus, the debugfs
++	  filesystem must first be mounted before making use of this feature.
++	  We refer the control file as: <debugfs>/dynamic_debug/control. This
++	  file contains a list of the debug statements that can be enabled. The
++	  format for each line of the file is:
++
++		filename:lineno [module]function flags format
++
++	  filename : source file of the debug statement
++	  lineno : line number of the debug statement
++	  module : module that contains the debug statement
++	  function : function that contains the debug statement
++          flags : '=p' means the line is turned 'on' for printing
++          format : the format used for the debug statement
++
++	  From a live system:
++
++		nullarbor:~ # cat <debugfs>/dynamic_debug/control
++		# filename:lineno [module]function flags format
++		fs/aio.c:222 [aio]__put_ioctx =_ "__put_ioctx:\040freeing\040%p\012"
++		fs/aio.c:248 [aio]ioctx_alloc =_ "ENOMEM:\040nr_events\040too\040high\012"
++		fs/aio.c:1770 [aio]sys_io_cancel =_ "calling\040cancel\012"
++
++	  Example usage:
++
++		// enable the message at line 1603 of file svcsock.c
++		nullarbor:~ # echo -n 'file svcsock.c line 1603 +p' >
++						<debugfs>/dynamic_debug/control
++
++		// enable all the messages in file svcsock.c
++		nullarbor:~ # echo -n 'file svcsock.c +p' >
++						<debugfs>/dynamic_debug/control
++
++		// enable all the messages in the NFS server module
++		nullarbor:~ # echo -n 'module nfsd +p' >
++						<debugfs>/dynamic_debug/control
++
++		// enable all 12 messages in the function svc_process()
++		nullarbor:~ # echo -n 'func svc_process +p' >
++						<debugfs>/dynamic_debug/control
++
++		// disable all 12 messages in the function svc_process()
++		nullarbor:~ # echo -n 'func svc_process -p' >
++						<debugfs>/dynamic_debug/control
++
++	  See Documentation/dynamic-debug-howto.txt for additional information.
++
++endmenu # "printk and dmesg options"
++
+ menu "Compile-time checks and compiler options"
  
--config MAGIC_SYSRQ
--	bool "Magic SysRq key"
--	depends on !UML
--	help
--	  If you say Y here, you will have some control over the system even
--	  if the system crashes for example during kernel debugging (e.g., you
--	  will be able to flush the buffer cache to disk, reboot the system
--	  immediately or dump some status information). This is accomplished
--	  by pressing various keys while holding SysRq (Alt+PrintScreen). It
--	  also works on a serial console (on PC hardware at least), if you
--	  send a BREAK and then within 5 seconds a command keypress. The
--	  keys are documented in <file:Documentation/sysrq.txt>. Don't say Y
--	  unless you really know what this hack does.
--
- config STRIP_ASM_SYMS
- 	bool "Strip assembler-generated symbols during link"
- 	default n
-@@ -156,6 +170,58 @@ config DEBUG_SECTION_MISMATCH
- 	  - Enable verbose reporting from modpost in order to help resolve
- 	    the section mismatches that are reported.
- 
-+#
-+# Select this config option from the architecture Kconfig, if it
-+# is preferred to always offer frame pointers as a config
-+# option on the architecture (regardless of KERNEL_DEBUG):
-+#
-+config ARCH_WANT_FRAME_POINTERS
-+	bool
-+	help
-+
-+config FRAME_POINTER
-+	bool "Compile the kernel with frame pointers"
-+	depends on DEBUG_KERNEL && \
-+		(CRIS || M68K || FRV || UML || \
-+		 AVR32 || SUPERH || BLACKFIN || MN10300 || METAG) || \
-+		ARCH_WANT_FRAME_POINTERS
-+	default y if (DEBUG_INFO && UML) || ARCH_WANT_FRAME_POINTERS
-+	help
-+	  If you say Y here the resulting kernel image will be slightly
-+	  larger and slower, but it gives very useful debugging information
-+	  in case of kernel bugs. (precise oopses/stacktraces/warnings)
-+
-+config DEBUG_FORCE_WEAK_PER_CPU
-+	bool "Force weak per-cpu definitions"
-+	depends on DEBUG_KERNEL
-+	help
-+	  s390 and alpha require percpu variables in modules to be
-+	  defined weak to work around addressing range issue which
-+	  puts the following two restrictions on percpu variable
-+	  definitions.
-+
-+	  1. percpu symbols must be unique whether static or not
-+	  2. percpu variables can't be defined inside a function
-+
-+	  To ensure that generic code follows the above rules, this
-+	  option forces all percpu variables to be defined as weak.
-+
-+endmenu # "Compiler options"
-+
-+config MAGIC_SYSRQ
-+	bool "Magic SysRq key"
-+	depends on !UML
-+	help
-+	  If you say Y here, you will have some control over the system even
-+	  if the system crashes for example during kernel debugging (e.g., you
-+	  will be able to flush the buffer cache to disk, reboot the system
-+	  immediately or dump some status information). This is accomplished
-+	  by pressing various keys while holding SysRq (Alt+PrintScreen). It
-+	  also works on a serial console (on PC hardware at least), if you
-+	  send a BREAK and then within 5 seconds a command keypress. The
-+	  keys are documented in <file:Documentation/sysrq.txt>. Don't say Y
-+	  unless you really know what this hack does.
-+
- config DEBUG_KERNEL
- 	bool "Kernel debugging"
- 	help
-@@ -816,32 +882,6 @@ config DEBUG_BUGVERBOSE
- 	  of the BUG call as well as the EIP and oops trace.  This aids
- 	  debugging but costs about 70-100K of memory.
- 
--config DEBUG_INFO
--	bool "Compile the kernel with debug info"
--	depends on DEBUG_KERNEL
--	help
--          If you say Y here the resulting kernel image will include
--	  debugging info resulting in a larger kernel image.
--	  This adds debug symbols to the kernel and modules (gcc -g), and
--	  is needed if you intend to use kernel crashdump or binary object
--	  tools like crash, kgdb, LKCD, gdb, etc on the kernel.
--	  Say Y here only if you plan to debug the kernel.
--
--	  If unsure, say N.
--
--config DEBUG_INFO_REDUCED
--	bool "Reduce debugging information"
--	depends on DEBUG_INFO
--	help
--	  If you say Y here gcc is instructed to generate less debugging
--	  information for structure types. This means that tools that
--	  need full debugging information (like kgdb or systemtap) won't
--	  be happy. But if you merely need debugging information to
--	  resolve line numbers there is no loss. Advantage is that
--	  build directory object sizes shrink dramatically over a full
--	  DEBUG_INFO build and compile times are reduced too.
--	  Only works with newer gcc versions.
--
- config DEBUG_WRITECOUNT
- 	bool "Debug filesystem writers count"
- 	depends on DEBUG_KERNEL
-@@ -896,27 +936,6 @@ config DEBUG_CREDENTIALS
+ config DEBUG_INFO
+@@ -940,24 +1030,6 @@ config DEBUG_CREDENTIALS
  
  	  If unsure, say N.
  
--#
--# Select this config option from the architecture Kconfig, if it
--# is preferred to always offer frame pointers as a config
--# option on the architecture (regardless of KERNEL_DEBUG):
--#
--config ARCH_WANT_FRAME_POINTERS
--	bool
+-config BOOT_PRINTK_DELAY
+-	bool "Delay each boot printk message by N milliseconds"
+-	depends on DEBUG_KERNEL && PRINTK && GENERIC_CALIBRATE_DELAY
 -	help
+-	  This build option allows you to read kernel boot messages
+-	  by inserting a short delay after each one.  The delay is
+-	  specified in milliseconds on the kernel command line,
+-	  using "boot_delay=N".
 -
--config FRAME_POINTER
--	bool "Compile the kernel with frame pointers"
--	depends on DEBUG_KERNEL && \
--		(CRIS || M68K || FRV || UML || \
--		 AVR32 || SUPERH || BLACKFIN || MN10300 || METAG) || \
--		ARCH_WANT_FRAME_POINTERS
--	default y if (DEBUG_INFO && UML) || ARCH_WANT_FRAME_POINTERS
--	help
--	  If you say Y here the resulting kernel image will be slightly
--	  larger and slower, but it gives very useful debugging information
--	  in case of kernel bugs. (precise oopses/stacktraces/warnings)
+-	  It is likely that you would also need to use "lpj=M" to preset
+-	  the "loops per jiffie" value.
+-	  See a previous boot log for the "lpj" value to use for your
+-	  system, and then set "lpj=M" before setting "boot_delay=N".
+-	  NOTE:  Using this option may adversely affect SMP systems.
+-	  I.e., processors other than the first one may not boot up.
+-	  BOOT_PRINTK_DELAY also may cause LOCKUP_DETECTOR to detect
+-	  what it believes to be lockup conditions.
 -
- config BOOT_PRINTK_DELAY
- 	bool "Delay each boot printk message by N milliseconds"
- 	depends on DEBUG_KERNEL && PRINTK && GENERIC_CALIBRATE_DELAY
-@@ -1100,21 +1119,6 @@ config DEBUG_BLOCK_EXT_DEVT
+ menu "RCU Debugging"
+ 
+ config PROVE_RCU
+@@ -1441,75 +1513,6 @@ config BUILD_DOCSRC
  
  	  Say N if you are unsure.
  
--config DEBUG_FORCE_WEAK_PER_CPU
--	bool "Force weak per-cpu definitions"
--	depends on DEBUG_KERNEL
+-config DYNAMIC_DEBUG
+-	bool "Enable dynamic printk() support"
+-	default n
+-	depends on PRINTK
+-	depends on DEBUG_FS
 -	help
--	  s390 and alpha require percpu variables in modules to be
--	  defined weak to work around addressing range issue which
--	  puts the following two restrictions on percpu variable
--	  definitions.
 -
--	  1. percpu symbols must be unique whether static or not
--	  2. percpu variables can't be defined inside a function
+-	  Compiles debug level messages into the kernel, which would not
+-	  otherwise be available at runtime. These messages can then be
+-	  enabled/disabled based on various levels of scope - per source file,
+-	  function, module, format string, and line number. This mechanism
+-	  implicitly compiles in all pr_debug() and dev_dbg() calls, which
+-	  enlarges the kernel text size by about 2%.
 -
--	  To ensure that generic code follows the above rules, this
--	  option forces all percpu variables to be defined as weak.
+-	  If a source file is compiled with DEBUG flag set, any
+-	  pr_debug() calls in it are enabled by default, but can be
+-	  disabled at runtime as below.  Note that DEBUG flag is
+-	  turned on by many CONFIG_*DEBUG* options.
 -
- config NOTIFIER_ERROR_INJECTION
- 	tristate "Notifier error injection"
- 	depends on DEBUG_KERNEL
+-	  Usage:
+-
+-	  Dynamic debugging is controlled via the 'dynamic_debug/control' file,
+-	  which is contained in the 'debugfs' filesystem. Thus, the debugfs
+-	  filesystem must first be mounted before making use of this feature.
+-	  We refer the control file as: <debugfs>/dynamic_debug/control. This
+-	  file contains a list of the debug statements that can be enabled. The
+-	  format for each line of the file is:
+-
+-		filename:lineno [module]function flags format
+-
+-	  filename : source file of the debug statement
+-	  lineno : line number of the debug statement
+-	  module : module that contains the debug statement
+-	  function : function that contains the debug statement
+-          flags : '=p' means the line is turned 'on' for printing
+-          format : the format used for the debug statement
+-
+-	  From a live system:
+-
+-		nullarbor:~ # cat <debugfs>/dynamic_debug/control
+-		# filename:lineno [module]function flags format
+-		fs/aio.c:222 [aio]__put_ioctx =_ "__put_ioctx:\040freeing\040%p\012"
+-		fs/aio.c:248 [aio]ioctx_alloc =_ "ENOMEM:\040nr_events\040too\040high\012"
+-		fs/aio.c:1770 [aio]sys_io_cancel =_ "calling\040cancel\012"
+-
+-	  Example usage:
+-
+-		// enable the message at line 1603 of file svcsock.c
+-		nullarbor:~ # echo -n 'file svcsock.c line 1603 +p' >
+-						<debugfs>/dynamic_debug/control
+-
+-		// enable all the messages in file svcsock.c
+-		nullarbor:~ # echo -n 'file svcsock.c +p' >
+-						<debugfs>/dynamic_debug/control
+-
+-		// enable all the messages in the NFS server module
+-		nullarbor:~ # echo -n 'module nfsd +p' >
+-						<debugfs>/dynamic_debug/control
+-
+-		// enable all 12 messages in the function svc_process()
+-		nullarbor:~ # echo -n 'func svc_process +p' >
+-						<debugfs>/dynamic_debug/control
+-
+-		// disable all 12 messages in the function svc_process()
+-		nullarbor:~ # echo -n 'func svc_process -p' >
+-						<debugfs>/dynamic_debug/control
+-
+-	  See Documentation/dynamic-debug-howto.txt for additional information.
+-
+ config DMA_API_DEBUG
+ 	bool "Enable debugging of DMA-API usage"
+ 	depends on HAVE_DMA_API_DEBUG
 _
