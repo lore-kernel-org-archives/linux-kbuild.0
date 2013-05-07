@@ -1,30 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:51544 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757991Ab3EFVkk (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 6 May 2013 17:40:40 -0400
-Date: Mon, 6 May 2013 23:40:37 +0200
-From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] Fix cleaning in scripts/mod
-Message-ID: <20130506214037.GA25934@pobox.suse.cz>
-References: <51814943.7000604@intel.com> <20130501182138.GA17550@kroah.com> <5B8DA87D05A7694D9FA63FD143655C1B01F18E66@HASMSX106.ger.corp.intel.com> <518284E6.7040503@intel.com> <CAMuHMdWSVUcwkY=xn+HjbruLxsc8Eqq=CWX78CdUc1+MAwCVhg@mail.gmail.com> <87sj22zuga.fsf_-_@hase.home> <CAMuHMdX6PETQqQG-ASDv4OtLyB=X0hNyQRaSO13rUHf_HqNt3w@mail.gmail.com>
+Received: from mail-pb0-f49.google.com ([209.85.160.49]:49096 "EHLO
+	mail-pb0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757670Ab3EGBf1 (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 6 May 2013 21:35:27 -0400
+Date: Tue, 7 May 2013 09:35:11 +0800
+From: Wang YanQing <udknight@gmail.com>
+Subject: Re: [PATCH] kconfig: sort found symbols by relevance
+Message-ID: <20130507013511.GA4769@udknight>
+References: <1367826629.4494.30.camel@chaos.site>
+ <1367845365-13316-1-git-send-email-yann.morin.1998@free.fr>
+ <1367854112.4569.137.camel@chaos.site>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <CAMuHMdX6PETQqQG-ASDv4OtLyB=X0hNyQRaSO13rUHf_HqNt3w@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1367854112.4569.137.camel@chaos.site>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Andreas Schwab <schwab@linux-m68k.org>, Dave Hansen <dave.hansen@intel.com>, "Winkler, Tomas" <tomas.winkler@intel.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "SamuelOrtiz@kroah.com" <SamuelOrtiz@kroah.com>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Jean Delvare <jdelvare@suse.de>
+Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Roland Eggner <edvx1@systemanalysen.net>
 
-On Sun, May 05, 2013 at 10:24:43AM +0200, Geert Uytterhoeven wrote:
-> On Sat, May 4, 2013 at 4:32 PM, Andreas Schwab <schwab@linux-m68k.org> wrote:
-> > Make sure devicetable-offsets.h is cleaned in the scripts/mod directory
-> >
-> > Signed-off-by: Andreas Schwab <schwab@linux-m68k.org>
+On Mon, May 06, 2013 at 05:28:32PM +0200, Jean Delvare wrote:
+> Le Monday 06 May 2013 à 15:02 +0200, Yann E. MORIN a écrit :
+> > From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+> > 
+> > When searching for symbols, return the symbols sorted by relevance.
+> > 
+> > Relevance is the ratio of the length of the matched string and the
+> > length of the symbol name. Symbols of equal relevance are sorted
+> > alphabetically.
+> I did not look at the code, only tested it, and it does what I asked for
+> originally: exact match is listed first. So thank you :)
 > 
-> Tested-by: Geert Uytterhoeven <geert@linux-m68k.org>
+> However I am not sure if your implementation is what we want. Your
+> definition of "relevance" is somewhat arbitrary and may not be
+> immediately to others. For example, my own definition of "relevance" was
+> that symbols which start with the subject string are more relevant than
+> the symbols which have the string in the middle. Others would possibly
+> have other definitions.
 
-Applied to kbuild.git#kbuild.
+But no matter what the definition of relevance in text search, 
+in the middle or start or end, the searcher always want the "results" 
+look like what they input literal.
 
-Michal
+I think Yann's definition make sense. It is just a pattern matching ratio question.
+
+If you want in start, just use ^PCI(reguar search), then with the help of 
+this patch, will make people life easier.
+
+This patch is not to replace the regular search, you can just use them together.
+
+BTW, I haven't read the code right now, maybe I will read it tonight.
+I test it, it works well, and I find it is useful to use it with regular search.
+
+Thanks.
