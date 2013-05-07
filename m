@@ -1,57 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pb0-f49.google.com ([209.85.160.49]:49096 "EHLO
-	mail-pb0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757670Ab3EGBf1 (ORCPT
+Received: from szxga02-in.huawei.com ([119.145.14.65]:62745 "EHLO
+	szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758757Ab3EGCln (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 6 May 2013 21:35:27 -0400
-Date: Tue, 7 May 2013 09:35:11 +0800
-From: Wang YanQing <udknight@gmail.com>
-Subject: Re: [PATCH] kconfig: sort found symbols by relevance
-Message-ID: <20130507013511.GA4769@udknight>
-References: <1367826629.4494.30.camel@chaos.site>
- <1367845365-13316-1-git-send-email-yann.morin.1998@free.fr>
- <1367854112.4569.137.camel@chaos.site>
+	Mon, 6 May 2013 22:41:43 -0400
+Message-ID: <518869BB.2020808@huawei.com>
+Date: Tue, 7 May 2013 10:40:59 +0800
+From: Li Zefan <lizefan@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1367854112.4569.137.camel@chaos.site>
+Subject: [PATCH] menuconfig: fix NULL pointer dereference when searching a
+ symbol
+Content-Type: text/plain; charset="GB2312"
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jean Delvare <jdelvare@suse.de>
-Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Roland Eggner <edvx1@systemanalysen.net>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Michal Marek <mmarek@suse.cz>, Weng Meiling <wengmeiling.weng@huawei.com>, Libo Chen <clbchenlibo.chen@huawei.com>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, Borislav Petkov <bp@alien8.de>
 
-On Mon, May 06, 2013 at 05:28:32PM +0200, Jean Delvare wrote:
-> Le Monday 06 May 2013 à 15:02 +0200, Yann E. MORIN a écrit :
-> > From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-> > 
-> > When searching for symbols, return the symbols sorted by relevance.
-> > 
-> > Relevance is the ratio of the length of the matched string and the
-> > length of the symbol name. Symbols of equal relevance are sorted
-> > alphabetically.
-> I did not look at the code, only tested it, and it does what I asked for
-> originally: exact match is listed first. So thank you :)
-> 
-> However I am not sure if your implementation is what we want. Your
-> definition of "relevance" is somewhat arbitrary and may not be
-> immediately to others. For example, my own definition of "relevance" was
-> that symbols which start with the subject string are more relevant than
-> the symbols which have the string in the middle. Others would possibly
-> have other definitions.
+Searching PPC_EFIKA results segmentation fault, and it's because
+get_symbol_prop() returns NULL.
 
-But no matter what the definition of relevance in text search, 
-in the middle or start or end, the searcher always want the "results" 
-look like what they input literal.
+In this case CONFIG_PPC_EFIKA is defined in arch/powerpc/platforms/
+52xx/Kconfig, so it won't be parsed if ARCH!=PPC, but menuconfig
+knows this symbol when it parses sound/soc/fsl/Kconfig:
 
-I think Yann's definition make sense. It is just a pattern matching ratio question.
+config SND_MPC52xx_SOC_EFIKA
+        tristate "SoC AC97 Audio support for bbplan Efika and STAC9766"
+        depends on PPC_EFIKA
 
-If you want in start, just use ^PCI(reguar search), then with the help of 
-this patch, will make people life easier.
+This bug was introduced by commit bcdedcc1afd6 ("menuconfig: print more
+info for symbol without prompts").
 
-This patch is not to replace the regular search, you can just use them together.
+Reported-by: Borislav Petkov <bp@alien8.de>
+Signed-off-by: Li Zefan <lizefan@huawei.com>
+---
+ scripts/kconfig/menu.c | 16 ++++++++++------
+ 1 file changed, 10 insertions(+), 6 deletions(-)
 
-BTW, I haven't read the code right now, maybe I will read it tonight.
-I test it, it works well, and I find it is useful to use it with regular search.
-
-Thanks.
+diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+index 826da66..b5c7d90 100644
+--- a/scripts/kconfig/menu.c
++++ b/scripts/kconfig/menu.c
+@@ -600,14 +600,18 @@ void get_symbol_str(struct gstr *r, struct symbol *sym,
+ 	}
+ 	for_all_prompts(sym, prop)
+ 		get_prompt_str(r, prop, head);
++
+ 	prop = get_symbol_prop(sym);
+-	str_printf(r, _("  Defined at %s:%d\n"), prop->menu->file->name,
+-		prop->menu->lineno);
+-	if (!expr_is_yes(prop->visible.expr)) {
+-		str_append(r, _("  Depends on: "));
+-		expr_gstr_print(prop->visible.expr, r);
+-		str_append(r, "\n");
++	if (prop) {
++		str_printf(r, _("  Defined at %s:%d\n"), prop->menu->file->name,
++			prop->menu->lineno);
++		if (!expr_is_yes(prop->visible.expr)) {
++			str_append(r, _("  Depends on: "));
++			expr_gstr_print(prop->visible.expr, r);
++			str_append(r, "\n");
++		}
+ 	}
++
+ 	hit = false;
+ 	for_all_properties(sym, prop, P_SELECT) {
+ 		if (!hit) {
+-- 
+1.8.0.2
