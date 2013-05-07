@@ -1,72 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ie0-f172.google.com ([209.85.223.172]:64962 "EHLO
-	mail-ie0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758444Ab3EGMUv (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 7 May 2013 08:20:51 -0400
+Received: from cantor2.suse.de ([195.135.220.15]:36575 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1757650Ab3EGMms (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 7 May 2013 08:42:48 -0400
+Date: Tue, 7 May 2013 14:42:46 +0200
+From: Michal Marek <mmarek@suse.cz>
+Subject: [GIT] kbuild changes for v3.10-rc1
+Message-ID: <20130507124246.GA12891@pobox.suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <CAMuHMdWiQdUFREBMjQMmxrMa0LAOA2d3GqqeydyF5TK334ZwRw@mail.gmail.com>
-References: <20130506160253.GA27181@linux-mips.org>
-	<87mws8m3eu.fsf@hase.home>
-	<20130507100447.GA15044@linux-mips.org>
-	<CAMuHMdWiQdUFREBMjQMmxrMa0LAOA2d3GqqeydyF5TK334ZwRw@mail.gmail.com>
-Date: Tue, 7 May 2013 14:20:50 +0200
-Message-ID: <CAMuHMdWRJrvWw35yC4AHcC7o-DrTLz9kT9ipQs9XP=55oSNNYQ@mail.gmail.com>
-Subject: Re: Build errors caused by modalias generation patch
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ralf Baechle <ralf@linux-mips.org>
-Cc: Andreas Schwab <schwab@linux-m68k.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Linux MIPS Mailing List <linux-mips@linux-mips.org>, Linux-Arch <linux-arch@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: antonynpavlov@gmail.com, rob@landley.net, schwab@linux-m68k.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Tue, May 7, 2013 at 12:58 PM, Geert Uytterhoeven
-<geert@linux-m68k.org> wrote:
-> On Tue, May 7, 2013 at 12:04 PM, Ralf Baechle <ralf@linux-mips.org> wrote:
->> On Mon, May 06, 2013 at 07:19:53PM +0200, Andreas Schwab wrote:
->>> Please try the patch in
->>> <http://marc.info/?l=linux-kbuild&m=136767800809256&w=2>.
->>
->> No change in observed behaviour.  I did all my builds in empty object
->> directories so I don't see why this patch would make any difference.
->
-> I'm getting this in an ia64 build (don't ask me why I build for itanic ;-):
->
-> FATAL: drivers/acpi/button: sizeof(struct acpi_device_id)=14 is not a
-> modulo of the size of section __mod_acpi_device_table=144.
-> Fix definition of struct acpi_device_id in mod_devicetable.h
->
-> This is next-20130501, with or without Andreas' fix.
->
-> It works in my development tree based on yesterday's mainline
-> (d7ab7302f970a254997687a1cdede421a5635c68).
->
-> I'll try today's linux-next, and will bisect if I find time...
+Hi Linus,
 
-This was also caused by a leftover scripts/mod/devicetable-offsets.h in the
-source tree.
+please pull these kbuild commits for v3.10-rc1:
 
-Andreas' fix works (sort of, read on), but only if you run "make mrproper"
-_after_ applying it.
+* Fix make mrproper after mod/file2alias rework
+* Fix ld-option Makefile function
+* Rewrite headers_install to shell to drop Perl dependency.
 
-Still, if you have other leftovers from a previous build in the source tree,
-you get:
+There are some more patches I have to look at, so I might send another
+pull request later. Or just queue them for 3.11.
 
-  Using /scratch/geert/linux/linux-next as source for kernel
-  /scratch/geert/linux/linux-next is not clean, please run 'make mrproper'
-  in the '/scratch/geert/linux/linux-next' directory.
+The following changes since commit a937536b868b8369b98967929045f1df54234323:
 
-However, you don't get that message if there's still a stale
-scripts/mod/devicetable-offsets.h in the source tree.
-Any idea how to fix that?
+  Linux 3.9-rc3 (2013-03-17 15:59:32 -0700)
 
-Gr{oetje,eeting}s,
+are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git kbuild
 
-                        Geert
+Andreas Schwab (1):
+      Fix cleaning in scripts/mod
 
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+Antony Pavlov (1):
+      kbuild: fix ld-option function
 
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+Rob Landley (1):
+      headers_install.pl: convert to headers_install.sh
+
+ Documentation/kbuild/makefiles.txt |    2 +-
+ scripts/Kbuild.include             |    2 +-
+ scripts/Makefile.headersinst       |    4 +-
+ scripts/headers_install.pl         |   63 ------------------------------------
+ scripts/headers_install.sh         |   43 ++++++++++++++++++++++++
+ scripts/mod/Makefile               |    2 +
+ 6 files changed, 49 insertions(+), 67 deletions(-)
+ delete mode 100644 scripts/headers_install.pl
+ create mode 100644 scripts/headers_install.sh
