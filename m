@@ -1,73 +1,29 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-we0-f180.google.com ([74.125.82.180]:43868 "EHLO
-	mail-we0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933023Ab3EGOGr (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 7 May 2013 10:06:47 -0400
-Date: Tue, 7 May 2013 16:06:39 +0200
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Received: from cantor2.suse.de ([195.135.220.15]:42769 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S932394Ab3EGON3 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 7 May 2013 10:13:29 -0400
+Message-ID: <51890BFC.3020001@suse.cz>
+Date: Tue, 07 May 2013 16:13:16 +0200
+From: Michal Marek <mmarek@suse.cz>
+MIME-Version: 1.0
 Subject: Re: [PATCH] menuconfig: fix NULL pointer dereference when searching
  a symbol
-Message-ID: <20130507140639.GB15137@free.fr>
-References: <518869BB.2020808@huawei.com>
- <20130507132159.GA15137@free.fr>
- <518905E6.5050502@suse.cz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <518905E6.5050502@suse.cz>
+References: <518869BB.2020808@huawei.com> <20130507132159.GA15137@free.fr> <518905E6.5050502@suse.cz> <20130507140639.GB15137@free.fr>
+In-Reply-To: <20130507140639.GB15137@free.fr>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>
 Cc: Li Zefan <lizefan@huawei.com>, Andrew Morton <akpm@linux-foundation.org>, Weng Meiling <wengmeiling.weng@huawei.com>, Libo Chen <clbchenlibo.chen@huawei.com>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, Borislav Petkov <bp@alien8.de>
 
-Michal, All,
+Dne 7.5.2013 16:06, Yann E. MORIN napsal(a):
+> It's strange that a kconfig-related change did not land in your tree
+> before getting mainline...
 
-On Tue, May 07, 2013 at 03:47:18PM +0200, Michal Marek wrote:
-> On 7.5.2013 15:21, Yann E. MORIN wrote:
-> > Li, All,
-> > 
-> > On Tue, May 07, 2013 at 10:40:59AM +0800, Li Zefan wrote:
-> >> Searching PPC_EFIKA results segmentation fault, and it's because
-> >> get_symbol_prop() returns NULL.
-> >>
-> >> In this case CONFIG_PPC_EFIKA is defined in arch/powerpc/platforms/
-> >> 52xx/Kconfig, so it won't be parsed if ARCH!=PPC, but menuconfig
-> >> knows this symbol when it parses sound/soc/fsl/Kconfig:
-> >>
-> >> config SND_MPC52xx_SOC_EFIKA
-> >>         tristate "SoC AC97 Audio support for bbplan Efika and STAC9766"
-> >>         depends on PPC_EFIKA
-> >>
-> >> This bug was introduced by commit bcdedcc1afd6 ("menuconfig: print more
-> >> info for symbol without prompts").
-> >>
-> >> Reported-by: Borislav Petkov <bp@alien8.de>
-> >> Signed-off-by: Li Zefan <lizefan@huawei.com>
-> > 
-> > Reviewed-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
-> > 
-> > Michal, I'll get this in my tree, and will send a pull-request to you
-> > later (I may have a few other smallish fixes shortly).
-> 
-> It's difficult to apply this to kbuild.git#kconfig, because the bug that
-> it is fixing is not there. I will send it to Linus by mail.
+It's quite simple. I wanted to look at the patch, but Andrew beat me to
+it. I am not saying that I would have spotted the null pointer deref
+myself :-).
 
-Indeed. Thank you.
-
-It's strange that a kconfig-related change did not land in your tree
-before getting mainline...
-
-[For the records, it got in via akpm's (Andrew MORTON) branch in
- 5f56886 ;-) ]
-
-Regards,
-Yann E. MORIN.
-
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+Michal
