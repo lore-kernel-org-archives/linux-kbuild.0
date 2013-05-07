@@ -1,70 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga14.intel.com ([143.182.124.37]:12433 "EHLO mga14.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754882Ab3EGUqv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 7 May 2013 16:46:51 -0400
-Subject: [PATCH 5/7] group locking debugging options
-From: Dave Hansen <dave@sr71.net>
-Date: Tue, 07 May 2013 13:46:49 -0700
+Received: from mail-bk0-f43.google.com ([209.85.214.43]:38184 "EHLO
+	mail-bk0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750772Ab3EGWxb (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 7 May 2013 18:53:31 -0400
+Received: by mail-bk0-f43.google.com with SMTP id jm19so584206bkc.30
+        for <linux-kbuild@vger.kernel.org>; Tue, 07 May 2013 15:53:30 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <20130507204643.3ACA416E@viggo.jf.intel.com>
 References: <20130507204642.D010DDC1@viggo.jf.intel.com>
-In-Reply-To: <20130507204642.D010DDC1@viggo.jf.intel.com>
-Message-Id: <20130507204649.0188E6DB@viggo.jf.intel.com>
+	<20130507204643.3ACA416E@viggo.jf.intel.com>
+Date: Tue, 7 May 2013 23:53:30 +0100
+Message-ID: <CAAG0J9-TBpSJ4yU3kTq-0b3f_Y2-vFbPZBoW9try2CYyyTsJHg@mail.gmail.com>
+Subject: Re: [PATCH 1/7] consolidate per-arch stack overflow debugging options
+From: James Hogan <james.hogan@imgtec.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mmarek@suse.cz
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Dave Hansen <dave@sr71.net>
+To: Dave Hansen <dave@sr71.net>
+Cc: mmarek@suse.cz, linux-kbuild@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
 
+On 7 May 2013 21:46, Dave Hansen <dave@sr71.net> wrote:
+>
+> From: Dave Hansen <dave@linux.vnet.ibm.com>
+>
+> Several architectures have similar stack debugging config options.
+> They all pretty much do the same thing, some with slightly
+> differing help text.
+>
+> This patch changes the architectures to instead enable a Kconfig
+> boolean, and then use that boolean in the generic Kconfig.debug
+> to present the actual menu option.  This removes a bunch of
+> duplication and adds consistency across arches.
+>
+> Signed-off-by: Dave Hansen <dave@linux.vnet.ibm.com>
+> Reviewed-by: H. Peter Anvin <hpa@zytor.com>
+> Reviewed-by: James Hogan <james.hogan@imgtec.com>
+> Acked-by: Chris Metcalf <cmetcalf@tilera.com> [for tile]
+> Signed-off-by: Dave Hansen <dave.hansen@intel.com>
+> ---
+>
+>  linux.git-davehans/arch/blackfin/Kconfig       |    1 +
+>  linux.git-davehans/arch/blackfin/Kconfig.debug |    7 -------
+>  linux.git-davehans/arch/frv/Kconfig            |    1 +
+>  linux.git-davehans/arch/frv/Kconfig.debug      |    4 ----
+>  linux.git-davehans/arch/m32r/Kconfig           |    1 +
+>  linux.git-davehans/arch/m32r/Kconfig.debug     |    7 -------
+>  linux.git-davehans/arch/mips/Kconfig           |    1 +
+>  linux.git-davehans/arch/mips/Kconfig.debug     |    9 ---------
+>  linux.git-davehans/arch/mn10300/Kconfig        |    1 +
+>  linux.git-davehans/arch/mn10300/Kconfig.debug  |    4 ----
+>  linux.git-davehans/arch/powerpc/Kconfig        |    1 +
+>  linux.git-davehans/arch/powerpc/Kconfig.debug  |    7 -------
+>  linux.git-davehans/arch/tile/Kconfig           |    1 +
+>  linux.git-davehans/arch/tile/Kconfig.debug     |    7 -------
+>  linux.git-davehans/arch/x86/Kconfig            |    1 +
+>  linux.git-davehans/arch/x86/Kconfig.debug      |   10 ----------
+>  linux.git-davehans/lib/Kconfig.debug           |   21 +++++++++++++++++++++
+>  17 files changed, 29 insertions(+), 55 deletions(-)
 
-From: Dave Hansen <dave@linux.vnet.ibm.com>
+Now that metag, arc, and openrisc architectures are merged, maybe you
+could convert them too?
 
-There are quite a few of these, and we want to make sure that
-there is one-stop-shopping for lock debugging.
-
-Signed-off-by: Dave Hansen <dave@linux.vnet.ibm.com>
-Signed-off-by: Dave Hansen <dave.hansen@linux.intel.com>
----
-
- linux.git-davehans/lib/Kconfig.debug |   16 ++++++++++------
- 1 file changed, 10 insertions(+), 6 deletions(-)
-
-diff -puN lib/Kconfig.debug~order-lock-debugging-options lib/Kconfig.debug
---- linux.git/lib/Kconfig.debug~order-lock-debugging-options	2013-05-07 13:41:38.156522402 -0700
-+++ linux.git-davehans/lib/Kconfig.debug	2013-05-07 13:41:38.160522578 -0700
-@@ -703,6 +703,8 @@ config DEBUG_PREEMPT
- 	  if kernel code uses it in a preemption-unsafe way. Also, the kernel
- 	  will detect preemption count underflows.
- 
-+menu "Lock Debugging (spinlocks, mutexes, etc...)"
-+
- config DEBUG_RT_MUTEXES
- 	bool "RT Mutex debugging, deadlock detection"
- 	depends on DEBUG_KERNEL && RT_MUTEXES
-@@ -832,12 +834,6 @@ config DEBUG_LOCKDEP
- 	  additional runtime checks to debug itself, at the price
- 	  of more runtime overhead.
- 
--config TRACE_IRQFLAGS
--	bool
--	help
--	  Enables hooks to interrupt enabling and disabling for
--	  either tracing or lock debugging.
--
- config DEBUG_ATOMIC_SLEEP
- 	bool "Sleep inside atomic section checking"
- 	select PREEMPT_COUNT
-@@ -859,6 +855,14 @@ config DEBUG_LOCKING_API_SELFTESTS
- 	  The following locking APIs are covered: spinlocks, rwlocks,
- 	  mutexes and rwsems.
- 
-+endmenu # lock debugging
-+
-+config TRACE_IRQFLAGS
-+	bool
-+	help
-+	  Enables hooks to interrupt enabling and disabling for
-+	  either tracing or lock debugging.
-+
- config STACKTRACE
- 	bool
- 	depends on STACKTRACE_SUPPORT
-_
+Cheers
+James
