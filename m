@@ -1,184 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from casper.infradead.org ([85.118.1.10]:34844 "EHLO
-	casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751031Ab3EHV2w (ORCPT
+Received: from mail-wg0-f46.google.com ([74.125.82.46]:39767 "EHLO
+	mail-wg0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750881Ab3EHVkz (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 8 May 2013 17:28:52 -0400
-Message-ID: <518AC36D.3060303@infradead.org>
-Date: Wed, 08 May 2013 14:28:13 -0700
-From: Randy Dunlap <rdunlap@infradead.org>
+	Wed, 8 May 2013 17:40:55 -0400
+Received: by mail-wg0-f46.google.com with SMTP id n12so2303650wgh.13
+        for <linux-kbuild@vger.kernel.org>; Wed, 08 May 2013 14:40:54 -0700 (PDT)
+Date: Wed, 8 May 2013 23:40:50 +0200
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: Re: [PATCH v3] let lxdialog/util.c:print_autowrap() handle newline
+ characters
+Message-ID: <20130508214050.GG3413@free.fr>
+References: <gisj1xn0un.fsf@karga.hank.lab>
+ <giobclmyw3.fsf@karga.hank.lab>
+ <20130508133522.GD3413@free.fr>
+ <gifvxxmucf.fsf@karga.hank.lab>
+ <20130508150446.GE3413@free.fr>
+ <ghli7pa3rt.fsf_-_@mx10.gouders.net>
 MIME-Version: 1.0
-Subject: [PATCH -next v2] media/usb: fix kconfig dependencies (aka bool depending
- on tristate considered harmful)
-References: <20130508140122.e4747b58be4333060b7a248a@canb.auug.org.au> <518A98D9.4020906@infradead.org> <20130508211819.GF3413@free.fr>
-In-Reply-To: <20130508211819.GF3413@free.fr>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <ghli7pa3rt.fsf_-_@mx10.gouders.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>, linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, linux-media <linux-media@vger.kernel.org>, Mauro Carvalho Chehab <mchehab@redhat.com>, linux-kbuild@vger.kernel.org
+To: Dirk Gouders <dirk@gouders.net>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
-On 05/08/13 14:18, Yann E. MORIN wrote:
-> Randy, All,
+Dirk, All,
+
+On Wed, May 08, 2013 at 05:29:42PM +0200, Dirk Gouders wrote:
+
+> From dcaab3b8c6c9df84cba26fcc47c244932642f292 Mon Sep 17 00:00:00 2001
+> From: Dirk Gouders <gouders@et.bocholt.fh-gelsenkirchen.de>
+> Date: Wed, 8 May 2013 17:06:37 +0200
+> Subject: [PATCH v3] When exiting menuconfig with unsaved changes, a dialog like
+>  the following is shown
 > 
-> Why not starting the 'if USB' block just above MEDIA_USB_SUPPORT, and
-> removing the 'depends on USB' from MEDIA_USB_SUPPORT :
+>         Do you wish to save your new configuration ? <ESC><ESC>
+>         to continue.
 > 
-> ---8<--- 
-> if USB
-> menuconfig MEDIA_USB_SUPPORT
->     bool "Media USB Adapters"
->     depends on MEDIA_SUPPORT
+> The author of the dialog text specified a newline and probably
+> expected it to be processed, so let print_autowrap() handle newlines propperly.
 > 
-> if MEDIA_USB_SUPPORT
-> ---8<--- 
-> 
-> And keeping this hunk as-is:
->> @@ -52,3 +53,4 @@ source "drivers/media/usb/em28xx/Kconfig
->>  endif
->>  
->>  endif #MEDIA_USB_SUPPORT
->> +endif #USB
-> 
-> Regards,
-> Yann E. MORIN.
+> Signed-off-by: Dirk Gouders <dirk@gouders.net>
 
-Sure, that works also.  New patch here:
+I've taken this in my tree:
+    git://gitorious.org/linux-kconfig/linux-kconfig.git yem-kconfig-for-next
 
----
-From: Randy Dunlap <rdunlap@infradead.org>
+I had to edit the commit log, as 'git am' pulled the complete mail, and
+I further edited it a little teeny bit:
+(The repository is unbrowseable on gitorious, but you can see the commit
+here: https://www.gitorious.org/linux-kconfig/linux-kconfig/commit/87d46f0 )
 
-(a.k.a. Kconfig bool depending on a tristate considered harmful)
+Regards,
+Yann E. MORIN.
 
-Fix various build errors when CONFIG_USB=m and media USB drivers
-are builtin.  In this case, CONFIG_USB_ZR364XX=y,
-CONFIG_VIDEO_PVRUSB2=y, and CONFIG_VIDEO_STK1160=y.
-
-This is caused by (from drivers/media/usb/Kconfig):
-
-menuconfig MEDIA_USB_SUPPORT
-	bool "Media USB Adapters"
-	depends on USB && MEDIA_SUPPORT
-	           =m     =y
-so MEDIA_USB_SUPPORT=y and all following Kconfig 'source' lines
-are included.  By adding an "if USB" guard around most of this file,
-the needed dependencies are enforced.
-
-
-drivers/built-in.o: In function `zr364xx_start_readpipe':
-zr364xx.c:(.text+0xc726a): undefined reference to `usb_alloc_urb'
-zr364xx.c:(.text+0xc72bb): undefined reference to `usb_submit_urb'
-drivers/built-in.o: In function `zr364xx_stop_readpipe':
-zr364xx.c:(.text+0xc72fd): undefined reference to `usb_kill_urb'
-zr364xx.c:(.text+0xc7309): undefined reference to `usb_free_urb'
-drivers/built-in.o: In function `read_pipe_completion':
-zr364xx.c:(.text+0xc7acc): undefined reference to `usb_submit_urb'
-drivers/built-in.o: In function `send_control_msg.constprop.12':
-zr364xx.c:(.text+0xc7d2f): undefined reference to `usb_control_msg'
-drivers/built-in.o: In function `pvr2_ctl_timeout':
-pvrusb2-hdw.c:(.text+0xcadb6): undefined reference to `usb_unlink_urb'
-pvrusb2-hdw.c:(.text+0xcadcb): undefined reference to `usb_unlink_urb'
-drivers/built-in.o: In function `pvr2_hdw_create':
-(.text+0xcc42c): undefined reference to `usb_alloc_urb'
-drivers/built-in.o: In function `pvr2_hdw_create':
-(.text+0xcc448): undefined reference to `usb_alloc_urb'
-drivers/built-in.o: In function `pvr2_hdw_create':
-(.text+0xcc5f9): undefined reference to `usb_set_interface'
-drivers/built-in.o: In function `pvr2_hdw_create':
-(.text+0xcc65a): undefined reference to `usb_free_urb'
-drivers/built-in.o: In function `pvr2_hdw_create':
-(.text+0xcc666): undefined reference to `usb_free_urb'
-drivers/built-in.o: In function `pvr2_send_request_ex.part.22':
-pvrusb2-hdw.c:(.text+0xccbe3): undefined reference to `usb_submit_urb'
-pvrusb2-hdw.c:(.text+0xccc83): undefined reference to `usb_submit_urb'
-drivers/built-in.o: In function `pvr2_hdw_remove_usb_stuff.part.25':
-pvrusb2-hdw.c:(.text+0xcd3f9): undefined reference to `usb_kill_urb'
-pvrusb2-hdw.c:(.text+0xcd405): undefined reference to `usb_free_urb'
-pvrusb2-hdw.c:(.text+0xcd421): undefined reference to `usb_kill_urb'
-pvrusb2-hdw.c:(.text+0xcd42d): undefined reference to `usb_free_urb'
-drivers/built-in.o: In function `pvr2_hdw_device_reset':
-(.text+0xcd658): undefined reference to `usb_lock_device_for_reset'
-drivers/built-in.o: In function `pvr2_hdw_device_reset':
-(.text+0xcd664): undefined reference to `usb_reset_device'
-drivers/built-in.o: In function `pvr2_hdw_cpureset_assert':
-(.text+0xcd6f9): undefined reference to `usb_control_msg'
-drivers/built-in.o: In function `pvr2_hdw_cpufw_set_enabled':
-(.text+0xcd84e): undefined reference to `usb_control_msg'
-drivers/built-in.o: In function `pvr2_upload_firmware1':
-pvrusb2-hdw.c:(.text+0xcda47): undefined reference to `usb_clear_halt'
-pvrusb2-hdw.c:(.text+0xcdb04): undefined reference to `usb_control_msg'
-drivers/built-in.o: In function `pvr2_upload_firmware2':
-(.text+0xce7dc): undefined reference to `usb_bulk_msg'
-drivers/built-in.o: In function `pvr2_stream_buffer_count':
-pvrusb2-io.c:(.text+0xd2e05): undefined reference to `usb_alloc_urb'
-pvrusb2-io.c:(.text+0xd2e5b): undefined reference to `usb_kill_urb'
-pvrusb2-io.c:(.text+0xd2e9f): undefined reference to `usb_free_urb'
-drivers/built-in.o: In function `pvr2_stream_internal_flush':
-pvrusb2-io.c:(.text+0xd2f9b): undefined reference to `usb_kill_urb'
-drivers/built-in.o: In function `pvr2_buffer_queue':
-(.text+0xd3328): undefined reference to `usb_kill_urb'
-drivers/built-in.o: In function `pvr2_buffer_queue':
-(.text+0xd33ea): undefined reference to `usb_submit_urb'
-drivers/built-in.o: In function `stk1160_read_reg':
-(.text+0xd3efa): undefined reference to `usb_control_msg'
-drivers/built-in.o: In function `stk1160_write_reg':
-(.text+0xd3f4f): undefined reference to `usb_control_msg'
-drivers/built-in.o: In function `stop_streaming':
-stk1160-v4l.c:(.text+0xd4997): undefined reference to `usb_set_interface'
-drivers/built-in.o: In function `start_streaming':
-stk1160-v4l.c:(.text+0xd4a9f): undefined reference to `usb_set_interface'
-stk1160-v4l.c:(.text+0xd4afa): undefined reference to `usb_submit_urb'
-stk1160-v4l.c:(.text+0xd4ba3): undefined reference to `usb_set_interface'
-drivers/built-in.o: In function `stk1160_isoc_irq':
-stk1160-video.c:(.text+0xd509b): undefined reference to `usb_submit_urb'
-drivers/built-in.o: In function `stk1160_cancel_isoc':
-(.text+0xd50ef): undefined reference to `usb_kill_urb'
-drivers/built-in.o: In function `stk1160_free_isoc':
-(.text+0xd5155): undefined reference to `usb_free_coherent'
-drivers/built-in.o: In function `stk1160_free_isoc':
-(.text+0xd515d): undefined reference to `usb_free_urb'
-drivers/built-in.o: In function `stk1160_alloc_isoc':
-(.text+0xd5278): undefined reference to `usb_alloc_urb'
-drivers/built-in.o: In function `stk1160_alloc_isoc':
-(.text+0xd52c2): undefined reference to `usb_alloc_coherent'
-drivers/built-in.o: In function `stk1160_alloc_isoc':
-(.text+0xd53c4): undefined reference to `usb_free_urb'
-drivers/built-in.o: In function `zr364xx_driver_init':
-zr364xx.c:(.init.text+0x463e): undefined reference to `usb_register_driver'
-drivers/built-in.o: In function `pvr_init':
-pvrusb2-main.c:(.init.text+0x4662): undefined reference to `usb_register_driver'
-drivers/built-in.o: In function `stk1160_usb_driver_init':
-stk1160-core.c:(.init.text+0x467d): undefined reference to `usb_register_driver'
-drivers/built-in.o: In function `zr364xx_driver_exit':
-zr364xx.c:(.exit.text+0x1377): undefined reference to `usb_deregister'
-drivers/built-in.o: In function `pvr_exit':
-pvrusb2-main.c:(.exit.text+0x1389): undefined reference to `usb_deregister'
-drivers/built-in.o: In function `stk1160_usb_driver_exit':
-stk1160-core.c:(.exit.text+0x13a0): undefined reference to `usb_deregister'
-
-
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-Suggested-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
----
- drivers/media/usb/Kconfig |    5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
---- linux-next-20130508.orig/drivers/media/usb/Kconfig
-+++ linux-next-20130508/drivers/media/usb/Kconfig
-@@ -1,6 +1,8 @@
-+if USB
-+
- menuconfig MEDIA_USB_SUPPORT
- 	bool "Media USB Adapters"
--	depends on USB && MEDIA_SUPPORT
-+	depends on MEDIA_SUPPORT
- 	help
- 	  Enable media drivers for USB bus.
- 	  If you have such devices, say Y.
-@@ -52,3 +54,4 @@ source "drivers/media/usb/em28xx/Kconfig
- endif
- 
- endif #MEDIA_USB_SUPPORT
-+endif #USB
-
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
