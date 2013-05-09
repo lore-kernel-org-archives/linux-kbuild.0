@@ -1,119 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f174.google.com ([209.85.212.174]:63575 "EHLO
-	mail-wi0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751969Ab3EIQMk (ORCPT
+Received: from mail-pd0-f178.google.com ([209.85.192.178]:52988 "EHLO
+	mail-pd0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753050Ab3EIRb6 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 9 May 2013 12:12:40 -0400
-Date: Thu, 9 May 2013 18:12:17 +0200
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH v3] kconfig: sort found symbols by relevance
-Message-ID: <20130509161217.GA2948@free.fr>
-References: <1367826629.4494.30.camel@chaos.site>
- <1367874931-6251-1-git-send-email-yann.morin.1998@free.fr>
- <20130509152731.GA3355@udknight>
+	Thu, 9 May 2013 13:31:58 -0400
+Received: by mail-pd0-f178.google.com with SMTP id w11so2180355pde.37
+        for <linux-kbuild@vger.kernel.org>; Thu, 09 May 2013 10:31:57 -0700 (PDT)
+Date: Thu, 9 May 2013 10:31:30 -0700
+From: Kent Overstreet <koverstreet@google.com>
+Subject: Re: [PATCH 0/7] Put "Kernel hacking" Kconfig menu on a diet
+Message-ID: <20130509173130.GA17021@moria.home.lan>
+References: <20130507204642.D010DDC1@viggo.jf.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20130509152731.GA3355@udknight>
+In-Reply-To: <20130507204642.D010DDC1@viggo.jf.intel.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Wang YanQing <udknight@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Jean Delvare <jdelvare@suse.de>, Michal Marek <mmarek@suse.cz>, Roland Eggner <edvx1@systemanalysen.net>
+To: Dave Hansen <dave@sr71.net>
+Cc: mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, tj@kernel.org, akpm@linux-foundation.org
 
-Wang, All,
-
-On Thu, May 09, 2013 at 11:27:31PM +0800, Wang YanQing wrote:
-> On Mon, May 06, 2013 at 11:15:31PM +0200, Yann E. MORIN wrote:
-> > From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-> > 
-> > When searching for symbols, return the symbols sorted by relevance.
-> > 
-> > Sorting is done as thus:
-> >   - first, symbols with a prompt,   [1]
-> >   - then, smallest offset,          [2]
-> >   - then, shortest match,           [3]
-> >   - then, highest relative match,   [4]
-> >   - finally, alphabetical sort      [5]
-> > 
-> > So, searching (eg.) for 'P.*CI' :
-> > 
-> > [1] Symbols of interest are probably those with a prompt, as they can be
-> >     changed, while symbols with no prompt are only for info. Thus:
-> >         PCIEASPM comes before PCI_ATS
+On Tue, May 07, 2013 at 01:46:42PM -0700, Dave Hansen wrote:
+> Michal, I figure you're the most logical person for these to go
+> through.
 > 
-> Search the value of symbols with no prompt are useful too
-
-My reasonning here is that often I need to toggle a symbol, but am not
-sure what menu it's in, so I search for it.
-
-Sometime, I also need to search for prompt-less symbols, too, to see why
-a symbol I want is not visible. But that's not the most common use-case.
-
-Also, the examples provided were with a very verbose search: 'P.*CI'
-which is expected to return a hell of a lot of symbols. More precise
-searches will yield substancially fewer symbols, so the search results
-will probably fit in 1 or 2 pages, not 10+ like 'P.*CI'
-
-> > [2] Symbols that match earlier in the name are to be preferred over
-> >     symbols which match later. Thus:
-> >         PCI_MSI comes before WDTPCI
+> There is a fair amount of churn in the areas around these patches
+> so I've resolved conflicts a couple of times.  For the patches that
+> are almost purely code move patches, I'm doing this:
 > 
-> We can achieve this with ^PCI regular search
-
-Yes, but I expect users do enter the begining of symbols, not a string
-in the middle or at the end.
-
-Also, as Jean and Thomas have proven, not many people know that searches
-can be regular expressions.
-
-> > [3] The shortest match is (IMHO) more interesting than a longer one.
-> >     Thus:
-> >         PCI comes before PCMCIA
+> 	cat foo.patch | grep '^[-+]' | perl -pe 's/^.//' | sort | uniq -c | sort -n
 > 
-> We can achieve this with ^PCI regular search plus your previous heuristic
-
-This one is not about location of the match, it's about the length of
-the match: the shortest the match, the more interesting it is (IMHO). So
-we'd prefer FOO_PCI_BAR_BUZ over A_PACI_B  (when searching for 'P.*CI').
-
-> > [4] The relative match is the ratio of the length of the match against
-> >     the length of the symbol. The more of a symbol name we match, the
-> >     more instersting that symbol is. Thus:
-> >         PCIEAER comes before PCIEASPM
+> and watching for any non-even numbers coming out of uniq.  This
+> helps me make sure I'm not adding/removing code that I should not
+> be.
 > 
-> This is what your first heuristic
+> The Signed-off-by's in here look funky.  I changed employers
+> while working on this set, so I have signoffs from both email
+> addresses.
 > 
-> > [5] As fallback, sort symbols alphabetically
-> This is in your first heuristic too.
+> ---
 > 
-> > This heuristic tries hard to get interesting symbols first in the list.
-> I don't mean your this heuristic is bad, but
+> I think the "Kernel Hacking" menu has gotten a bit out of hand.  It
+> is over 120 lines long on my system with everything enabled and
+> options are scattered around it haphazardly.
+> 
+>         http://sr71.net/~dave/linux/kconfig-horror.png
+> 
+> Let's try to introduce some sanity.  This set takes that 120 lines
+> down to 55 and makes it vastly easier to find some things.  It's a
+> start.
+> 
+> This set stands on its own, but there is plenty of room for follow-up
+> patches.  The arch-specific debug options still end up getting stuck
+> in the top-level "kernel hacking" menu.  OPTIMIZE_INLINING, for
+> instance, could obviously go in to the "compiler options" menu, but
+> the fact that it is defined in arch/ in a separate Kconfig file keeps
+> it on its own for the moment.
 
-This heuristic is just that: a heuristic. It kicks in only if the user
-dit not provide an anchored regexp (ie with start- or end-of-line).
+Yes, please!
 
-For the ten-or-so tests I did, the sorting was rather appropriate,
-though that's only ten-or-so tests and is not exhaustive (and probably
-subject to testing bias, too).
+I'm sure there's more that could be done but, like you said, it's a
+start - and a significant one.
 
-What I'm trying to achieve here is come up with a way to sort symbols
-for searches of *non-anchored* regexps. Anchored regexps will always
-provide the results they used to provide so far.
-
-Maybe we can emphasize in the UI the fact that regexps, and especially
-anchored regexps, can be used.
-
-> maybe provide mechanism to user will make guesser life easier.
-
-Sorry, I can't make sense of this sentence. :-( Can you elaborate a bit
-what you meant, please?
-
-Regards,
-Yann E. MORIN.
-
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+Any chance this could go in sooner than later? I spend way too much time
+hunting down options in kernel hacking and I spend enough time in that
+menu that I should have the damn thing memorized by now.
