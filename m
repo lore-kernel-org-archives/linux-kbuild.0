@@ -1,64 +1,86 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f46.google.com ([74.125.82.46]:39767 "EHLO
-	mail-wg0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750881Ab3EHVkz (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 8 May 2013 17:40:55 -0400
-Received: by mail-wg0-f46.google.com with SMTP id n12so2303650wgh.13
-        for <linux-kbuild@vger.kernel.org>; Wed, 08 May 2013 14:40:54 -0700 (PDT)
-Date: Wed, 8 May 2013 23:40:50 +0200
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH v3] let lxdialog/util.c:print_autowrap() handle newline
- characters
-Message-ID: <20130508214050.GG3413@free.fr>
-References: <gisj1xn0un.fsf@karga.hank.lab>
- <giobclmyw3.fsf@karga.hank.lab>
- <20130508133522.GD3413@free.fr>
- <gifvxxmucf.fsf@karga.hank.lab>
- <20130508150446.GE3413@free.fr>
- <ghli7pa3rt.fsf_-_@mx10.gouders.net>
+Received: from ozlabs.org ([203.10.76.45]:39549 "EHLO ozlabs.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750774Ab3EIDTA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 8 May 2013 23:19:00 -0400
+From: Rusty Russell <rusty@rustcorp.com.au>
+Subject: Re: Build failures due to commit ea4054a2384 (handle huge number of modules)
+In-Reply-To: <20130508213007.GA11946@roeck-us.net>
+References: <20130508213007.GA11946@roeck-us.net>
+Date: Thu, 09 May 2013 10:26:00 +0930
+Message-ID: <8761ytnf8f.fsf@rustcorp.com.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <ghli7pa3rt.fsf_-_@mx10.gouders.net>
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dirk Gouders <dirk@gouders.net>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+To: Guenter Roeck <linux@roeck-us.net>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+Cc: Fengguang Wu <fengguang.wu@intel.com>
 
-Dirk, All,
+Guenter Roeck <linux@roeck-us.net> writes:
+> Hi all,
+>
+> I started seeing build failures such as the following in the last week or so.
+>
+> make[2]: [__modpost] Error 1
+>
+> followed by lots of messages such as
+>
+> gcc: error: arch/x86/crypto/ablk_helper.mod.c: No such file or directory
+> gcc: fatal error: no input files
+>
+> (at least if I run make -i)
 
-On Wed, May 08, 2013 at 05:29:42PM +0200, Dirk Gouders wrote:
+Hmm, weird!  Looks like __modules contains something it shouldn't.  We
+changed from:
 
-> From dcaab3b8c6c9df84cba26fcc47c244932642f292 Mon Sep 17 00:00:00 2001
-> From: Dirk Gouders <gouders@et.bocholt.fh-gelsenkirchen.de>
-> Date: Wed, 8 May 2013 17:06:37 +0200
-> Subject: [PATCH v3] When exiting menuconfig with unsaved changes, a dialog like
->  the following is shown
-> 
->         Do you wish to save your new configuration ? <ESC><ESC>
->         to continue.
-> 
-> The author of the dialog text specified a newline and probably
-> expected it to be processed, so let print_autowrap() handle newlines propperly.
-> 
-> Signed-off-by: Dirk Gouders <dirk@gouders.net>
+        __modules := $(sort $(shell grep -h '\.ko$$' /dev/null $(wildcard $(MODVERDIR)/*.mod)))
 
-I've taken this in my tree:
-    git://gitorious.org/linux-kconfig/linux-kconfig.git yem-kconfig-for-next
+To:
 
-I had to edit the commit log, as 'git am' pulled the complete mail, and
-I further edited it a little teeny bit:
-(The repository is unbrowseable on gitorious, but you can see the commit
-here: https://www.gitorious.org/linux-kconfig/linux-kconfig/commit/87d46f0 )
+        MODLISTCMD := find $(MODVERDIR) -name '*.mod' | xargs -r grep -h '\.ko$$' | sort -u
+        __modules := $(shell $(MODLISTCMD))
 
-Regards,
-Yann E. MORIN.
+They give the same results for me:
 
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
+index 8dcdca2..1ca358d 100644
+--- a/scripts/Makefile.modpost
++++ b/scripts/Makefile.modpost
+@@ -62,8 +62,14 @@ modulesymfile := $(firstword $(KBUILD_EXTMOD))/Module.symvers
+ # Step 1), find all modules listed in $(MODVERDIR)/
+ MODLISTCMD := find $(MODVERDIR) -name '*.mod' | xargs -r grep -h '\.ko$$' | sort -u
+ __modules := $(shell $(MODLISTCMD))
++__old_modules := $(sort $(shell grep -h '\.ko$$' /dev/null $(wildcard $(MODVERDIR)/*.mod)))
+ modules   := $(patsubst %.o,%.ko, $(wildcard $(__modules:.ko=.o)))
+ 
++.PHONY: dump_modules
++dump_modules:
++	@echo $(__modules) > __modules.list
++	@echo $(__old_modules) > __old_modules.list
++
+ # Stop after building .o files if NOFINAL is set. Makes compile tests quicker
+ _modpost: $(if $(KBUILD_MODPOST_NOFINAL), $(modules:.ko:.o),$(modules))
+ 
+@@ -84,7 +90,7 @@ quiet_cmd_modpost = MODPOST $(words $(filter-out vmlinux FORCE, $^)) modules
+       cmd_modpost = $(MODLISTCMD) | sed 's/\.ko$$/.o/' | $(modpost) -s -T -
+ 
+ PHONY += __modpost
+-__modpost: $(modules:.ko=.o) FORCE
++__modpost: $(modules:.ko=.o) dump_modules FORCE
+ 	$(call cmd,modpost) $(wildcard vmlinux)
+ 
+ quiet_cmd_kernel-mod = MODPOST $@
+
+> After reverting commit ea4054a238 (modpost: handle huge numbers of modules)
+> everything is fine.
+>
+> This happens with multiple gcc versions and target platforms (arm, x86_64,
+> i386, powerpc). Host kernel version is 3.8.10, system is Ubuntu 12.10.
+>
+> Does anyone else see this problem ? Any idea what might be wrong ?
+
+Assuming it happens with a clean tree, please send the .config, and I'll
+see if I can reproduce...
+
+Thanks,
+Rusty.
