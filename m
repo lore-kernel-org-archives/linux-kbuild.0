@@ -1,53 +1,35 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f181.google.com ([209.85.212.181]:34638 "EHLO
-	mail-wi0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751222Ab3ELTJD (ORCPT
+Received: from one.firstfloor.org ([193.170.194.197]:37674 "EHLO
+	one.firstfloor.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751492Ab3ELTZr (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 12 May 2013 15:09:03 -0400
-Received: by mail-wi0-f181.google.com with SMTP id hi5so838158wib.2
-        for <linux-kbuild@vger.kernel.org>; Sun, 12 May 2013 12:09:01 -0700 (PDT)
-From: Clement Chauplannaz <chauplac@gmail.com>
-Subject: [PATCH 2/2] scripts/config: fix assignment of parameters for short version of --*-after options
-Date: Sun, 12 May 2013 21:08:52 +0200
-Message-Id: <f0a94b2157c7bde8ec8a275d2f8f648f2e6b7c47.1368379475.git.chauplac@gmail.com>
-In-Reply-To: <cover.1368379475.git.chauplac@gmail.com>
+	Sun, 12 May 2013 15:25:47 -0400
+Date: Sun, 12 May 2013 21:25:45 +0200
+From: Andi Kleen <andi@firstfloor.org>
+Subject: Re: [PATCH 1/2] scripts/config: replace hard-coded script name by
+ a dynamic value
+Message-ID: <20130512192544.GZ17814@two.firstfloor.org>
 References: <cover.1368379475.git.chauplac@gmail.com>
-In-Reply-To: <cover.1368379475.git.chauplac@gmail.com>
-References: <cover.1368379475.git.chauplac@gmail.com>
+ <9442eebf0117a0d975ca766ea84efec4ad58c6d0.1368379475.git.chauplac@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9442eebf0117a0d975ca766ea84efec4ad58c6d0.1368379475.git.chauplac@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: mmarek@suse.cz, andi@firstfloor.org, yann.morin.1998@free.fr
+To: Clement Chauplannaz <chauplac@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, mmarek@suse.cz, andi@firstfloor.org, yann.morin.1998@free.fr
 
-When --*-after options are used, two parameters are parsed from the
-command-line before the adequate function is called:
-  - the `before' option, after which the new option will be inserted,
-  - the name of the option to enable/disable/modularise.
+On Sun, May 12, 2013 at 09:08:51PM +0200, Clement Chauplannaz wrote:
+> The script `config' prints its name in usage() function. It is currently
+> hard-coded to value `config'. However, the script may be reused under
+> a different name in contexts other than the Linux Kernel.
+> 
+> Replace the hard-coded value `config' by the name of the script at runtime.
+> 
+> Signed-off-by: Clement Chauplannaz <chauplac@gmail.com>
 
-With the short version of --*-after options (namely -E, -D, -M), the
-parsing step is not performed which leads to processing unset variables.
+Both patched are fine for me.
+Acked-by: Andi Kleen <ak@linux.intel.com>
 
-Add options -E, -D, -M to the test that triggers assignment of parameters
-for --*-after options.
-
-Signed-off-by: Clement Chauplannaz <chauplac@gmail.com>
----
- scripts/config | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/scripts/config b/scripts/config
-index 6b3272e..567120a 100755
---- a/scripts/config
-+++ b/scripts/config
-@@ -107,7 +107,7 @@ while [ "$1" != "" ] ; do
- 		;;
- 	--refresh)
- 		;;
--	--*-after)
-+	--*-after|-E|-D|-M)
- 		checkarg "$1"
- 		A=$ARG
- 		checkarg "$2"
--- 
-1.8.3.rc1.44.gb387c77.dirty
-
+-Andi
