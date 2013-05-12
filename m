@@ -1,59 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f42.google.com ([74.125.82.42]:36433 "EHLO
-	mail-wg0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753162Ab3ELOWY (ORCPT
+Received: from mail-wg0-f49.google.com ([74.125.82.49]:55226 "EHLO
+	mail-wg0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751222Ab3ELTI6 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 12 May 2013 10:22:24 -0400
-Received: by mail-wg0-f42.google.com with SMTP id j13so2118585wgh.3
-        for <linux-kbuild@vger.kernel.org>; Sun, 12 May 2013 07:22:22 -0700 (PDT)
-Date: Sun, 12 May 2013 16:22:19 +0200
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH v4] mconf: use function calls instead of ncurses'
- variables LINES and COLS
-Message-ID: <20130512142218.GB2976@free.fr>
-References: <20130511205802.GD3222@free.fr>
- <1368354649-10312-1-git-send-email-dirk@gouders.net>
- <20130512125529.GA2976@free.fr>
- <ghy5bk5n8l.fsf@mx10.gouders.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <ghy5bk5n8l.fsf@mx10.gouders.net>
+	Sun, 12 May 2013 15:08:58 -0400
+Received: by mail-wg0-f49.google.com with SMTP id j13so5477872wgh.28
+        for <linux-kbuild@vger.kernel.org>; Sun, 12 May 2013 12:08:57 -0700 (PDT)
+From: Clement Chauplannaz <chauplac@gmail.com>
+Subject: [PATCH 0/2] scripts/config: bug fix and improvement
+Date: Sun, 12 May 2013 21:08:50 +0200
+Message-Id: <cover.1368379475.git.chauplac@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dirk Gouders <dirk@gouders.net>
-Cc: linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: mmarek@suse.cz, andi@firstfloor.org, yann.morin.1998@free.fr
 
-Dirk, All,
+Hi all,
 
-On 2013-05-12 15:41 +0200, Dirk Gouders spake thusly:
-> "Yann E. MORIN" <yann.morin.1998@free.fr> writes:
-> 
-> > I've queued it now. Thank you!
-> >
-> > Regards,
-> > Yann E. MORIN.
-> >
-> > PS. That new mail was correctly formatted, now! Thanks!
-> > YEM.
-> 
-> Thank you, Yann.  Especially for your patience with me, wasting your
-> time with sending misformatted patches and getting rather simple changes
-> right.
+Here are two tiny patches which deal with scripts/config.
 
-No problem! Thanks for staying with us during the iterations.
+The first sets the reported name of the script to be what it was invoked
+as - this is of importance for kconfig-frontends package, where the script
+is renamed.
 
-Now, since you seem to be interested in some cleanup and polishing, I've
-noticed that the nconf frontend also uses COLS and LINES, so if you've
-got some spare time... ;-)
+The second fixes a bug in the assignement of parameters required by options
+-E/-D/-M; those are the options allowing to position a value below another
+one.
 
-Regards,
-Yann E. MORIN.
+Clement Chauplannaz (2):
+  scripts/config: replace hard-coded script name by a dynamic value
+  scripts/config: fix assignment of parameters for short version of
+    --*-after options
+
+ scripts/config | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
 -- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+1.8.3.rc1.44.gb387c77.dirty
+
