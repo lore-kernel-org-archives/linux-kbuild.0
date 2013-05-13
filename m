@@ -1,59 +1,33 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vc0-f181.google.com ([209.85.220.181]:55496 "EHLO
-	mail-vc0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751631Ab3ELUyz convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 12 May 2013 16:54:55 -0400
-Received: by mail-vc0-f181.google.com with SMTP id lf11so117476vcb.26
-        for <linux-kbuild@vger.kernel.org>; Sun, 12 May 2013 13:54:54 -0700 (PDT)
+Received: from ozlabs.org ([203.10.76.45]:34457 "EHLO ozlabs.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753173Ab3EMC51 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 12 May 2013 22:57:27 -0400
+From: Rusty Russell <rusty@rustcorp.com.au>
+Subject: Re: Build failures due to commit ea4054a2384 (handle huge number of modules)
+In-Reply-To: <20130509041448.GA11398@roeck-us.net>
+References: <20130508213007.GA11946@roeck-us.net> <8761ytnf8f.fsf@rustcorp.com.au> <20130509041448.GA11398@roeck-us.net>
+Date: Mon, 13 May 2013 11:52:09 +0930
+Message-ID: <87ehdb39gu.fsf@rustcorp.com.au>
 MIME-Version: 1.0
-In-Reply-To: <20130512202945.GA23643@free.fr>
-References: <cover.1368379475.git.chauplac@gmail.com>
-	<9442eebf0117a0d975ca766ea84efec4ad58c6d0.1368379475.git.chauplac@gmail.com>
-	<20130512192544.GZ17814@two.firstfloor.org>
-	<20130512202945.GA23643@free.fr>
-Date: Sun, 12 May 2013 22:54:54 +0200
-Message-ID: <CACW0xKXmhea7O=wcQM4wooeQkiYRREUupyi9fEvE=b_ce+jp0w@mail.gmail.com>
-Subject: Re: [PATCH 1/2] scripts/config: replace hard-coded script name by a
- dynamic value
-From: =?ISO-8859-1?Q?Cl=E9ment_Chauplannaz?= <chauplac@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: Andi Kleen <andi@firstfloor.org>, linux-kbuild@vger.kernel.org, mmarek@suse.cz
+To: Guenter Roeck <linux@roeck-us.net>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Fengguang Wu <fengguang.wu@intel.com>
 
-Thanks!
-Clément
+Guenter Roeck <linux@roeck-us.net> writes:
+> Attached is a failing configuration for x86_64. Note that
+> drivers/staging/android/logger.c fails to build with this configuration,
+> so you have to build it with make -i to see the problem.
+>
+> Looking through my logs, it seems that the problem may be related to other
+> build errors. At least in my latest nightly builds there was always some other
+> build error when this happened.
 
-2013/5/12 Yann E. MORIN <yann.morin.1998@free.fr>:
-> Andy, Clément, All,
->
-> On 2013-05-12 21:25 +0200, Andi Kleen spake thusly:
->> On Sun, May 12, 2013 at 09:08:51PM +0200, Clement Chauplannaz wrote:
->> > The script `config' prints its name in usage() function. It is currently
->> > hard-coded to value `config'. However, the script may be reused under
->> > a different name in contexts other than the Linux Kernel.
->> >
->> > Replace the hard-coded value `config' by the name of the script at runtime.
->> >
->> > Signed-off-by: Clement Chauplannaz <chauplac@gmail.com>
->>
->> Both patched are fine for me.
->> Acked-by: Andi Kleen <ak@linux.intel.com>
->
-> It's too late for 3.10 now, so I'll queue them in my tree for 3.11.
->
-> Thank you!
->
-> Regards,
-> Yann E. MORIN.
->
-> --
-> .-----------------.--------------------.------------------.--------------------.
-> |  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-> | +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-> | +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-> | http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-> '------------------------------^-------^------------------^--------------------'
+That would explain it.  Perhaps some kind of race?
+
+I can't see this as a real problem, though.
+
+Cheers,
+Rusty.
