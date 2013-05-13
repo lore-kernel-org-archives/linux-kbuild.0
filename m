@@ -1,175 +1,81 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx10.gouders.net ([89.244.147.155]:45784 "EHLO mx10.gouders.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752041Ab3EMJYC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 13 May 2013 05:24:02 -0400
-From: Dirk Gouders <dirk@gouders.net>
-Subject: [PATCH] nconf: use function calls instead of ncurses' variables LINES and COLS
-Date: Mon, 13 May 2013 11:23:58 +0200
-Message-Id: <1368437038-30444-1-git-send-email-dirk@gouders.net>
-In-Reply-To: <20130512142218.GB2976@free.fr>
+Received: from mail-wg0-f54.google.com ([74.125.82.54]:36012 "EHLO
+	mail-wg0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751982Ab3EMQkE (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 13 May 2013 12:40:04 -0400
+Received: by mail-wg0-f54.google.com with SMTP id x12so6762991wgg.9
+        for <linux-kbuild@vger.kernel.org>; Mon, 13 May 2013 09:40:02 -0700 (PDT)
+Date: Mon, 13 May 2013 18:39:56 +0200
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: Re: [PATCH] nconf: use function calls instead of ncurses' variables
+ LINES and COLS
+Message-ID: <20130513163956.GA17848@free.fr>
 References: <20130512142218.GB2976@free.fr>
+ <1368437038-30444-1-git-send-email-dirk@gouders.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1368437038-30444-1-git-send-email-dirk@gouders.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
+To: Dirk Gouders <dirk@gouders.net>
 Cc: linux-kbuild@vger.kernel.org
 
-According to the documentation [1], LINES and COLS are initialized by
-initscr(); it does not say anything about the behavior when windows are
-resized.
+Dirk, All,
 
-Do not rely on the current implementation of ncurses that updates
-these variables on resize, but use the propper function calls or macros
-to get window dimensions.
+On 2013-05-13 11:23 +0200, Dirk Gouders spake thusly:
+> According to the documentation [1], LINES and COLS are initialized by
+> initscr(); it does not say anything about the behavior when windows are
+> resized.
+> 
+> Do not rely on the current implementation of ncurses that updates
+> these variables on resize, but use the propper function calls or macros
+> to get window dimensions.
+> 
+> The use of the variables in main() was OK, but for the sake of
+> consistency it was modified to use the macro getmaxyx().
+> 
+> [1] ncurses(3X)
+> 
+> Signed-off-by: Dirk Gouders <dirk@gouders.net>
 
-The use of the variables in main() was OK, but for the sake of
-consistency it was modified to use the macro getmaxyx().
+Queued in my tree, with two very, very light changes:
 
-[1] ncurses(3X)
+> diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
+> index dbf31ed..55fe5a6 100644
+> --- a/scripts/kconfig/nconf.c
+> +++ b/scripts/kconfig/nconf.c
+[--SMIP--]
+> @@ -1455,14 +1456,19 @@ static void conf_save(void)
+>  
+>  void setup_windows(void)
+>  {
+> +	int lines;
+> +	int columns;
 
-Signed-off-by: Dirk Gouders <dirk@gouders.net>
----
- scripts/kconfig/nconf.c     | 23 ++++++++++++++++-------
- scripts/kconfig/nconf.gui.c | 20 +++++++++++---------
- 2 files changed, 27 insertions(+), 16 deletions(-)
+I've chamged this to be a single line:
+    int lines, columns;
 
-diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
-index dbf31ed..55fe5a6 100644
---- a/scripts/kconfig/nconf.c
-+++ b/scripts/kconfig/nconf.c
-@@ -365,15 +365,16 @@ static void print_function_line(void)
- 	int i;
- 	int offset = 1;
- 	const int skip = 1;
-+	int lines = getmaxy(stdscr);
- 
- 	for (i = 0; i < function_keys_num; i++) {
- 		(void) wattrset(main_window, attributes[FUNCTION_HIGHLIGHT]);
--		mvwprintw(main_window, LINES-3, offset,
-+		mvwprintw(main_window, lines-3, offset,
- 				"%s",
- 				function_keys[i].key_str);
- 		(void) wattrset(main_window, attributes[FUNCTION_TEXT]);
- 		offset += strlen(function_keys[i].key_str);
--		mvwprintw(main_window, LINES-3,
-+		mvwprintw(main_window, lines-3,
- 				offset, "%s",
- 				function_keys[i].func);
- 		offset += strlen(function_keys[i].func) + skip;
-@@ -954,7 +955,7 @@ static void show_menu(const char *prompt, const char *instructions,
- 
- 	clear();
- 	(void) wattrset(main_window, attributes[NORMAL]);
--	print_in_middle(stdscr, 1, 0, COLS,
-+	print_in_middle(stdscr, 1, 0, getmaxx(stdscr),
- 			menu_backtitle,
- 			attributes[MAIN_HEADING]);
- 
-@@ -1455,14 +1456,19 @@ static void conf_save(void)
- 
- void setup_windows(void)
- {
-+	int lines;
-+	int columns;
-+
-+	getmaxyx(stdscr, lines, columns);
-+
- 	if (main_window != NULL)
- 		delwin(main_window);
- 
- 	/* set up the menu and menu window */
--	main_window = newwin(LINES-2, COLS-2, 2, 1);
-+	main_window = newwin(lines-2, columns-2, 2, 1);
- 	keypad(main_window, TRUE);
--	mwin_max_lines = LINES-7;
--	mwin_max_cols = COLS-6;
-+	mwin_max_lines = lines-7;
-+	mwin_max_cols = columns-6;
- 
- 	/* panels order is from bottom to top */
- 	new_panel(main_window);
-@@ -1470,6 +1476,8 @@ void setup_windows(void)
- 
- int main(int ac, char **av)
- {
-+	int lines;
-+	int columns;
- 	char *mode;
- 
- 	setlocale(LC_ALL, "");
-@@ -1495,7 +1503,8 @@ int main(int ac, char **av)
- 	keypad(stdscr, TRUE);
- 	curs_set(0);
- 
--	if (COLS < 75 || LINES < 20) {
-+	getmaxyx(stdscr, lines, columns);
-+	if (columns < 75 || lines < 20) {
- 		endwin();
- 		printf("Your terminal should have at "
- 			"least 20 lines and 75 columns\n");
-diff --git a/scripts/kconfig/nconf.gui.c b/scripts/kconfig/nconf.gui.c
-index 9f8c44e..8275f0e5 100644
---- a/scripts/kconfig/nconf.gui.c
-+++ b/scripts/kconfig/nconf.gui.c
-@@ -276,8 +276,8 @@ int btn_dialog(WINDOW *main_window, const char *msg, int btn_num, ...)
- 
- 	total_width = max(msg_width, btns_width);
- 	/* place dialog in middle of screen */
--	y = (LINES-(msg_lines+4))/2;
--	x = (COLS-(total_width+4))/2;
-+	y = (getmaxy(stdscr)-(msg_lines+4))/2;
-+	x = (getmaxx(stdscr)-(total_width+4))/2;
- 
- 
- 	/* create the windows */
-@@ -387,8 +387,8 @@ int dialog_inputbox(WINDOW *main_window,
- 		prompt_width = max(prompt_width, strlen(title));
- 
- 	/* place dialog in middle of screen */
--	y = (LINES-(prompt_lines+4))/2;
--	x = (COLS-(prompt_width+4))/2;
-+	y = (getmaxy(stdscr)-(prompt_lines+4))/2;
-+	x = (getmaxx(stdscr)-(prompt_width+4))/2;
- 
- 	strncpy(result, init, *result_len);
- 
-@@ -545,7 +545,7 @@ void show_scroll_win(WINDOW *main_window,
- {
- 	int res;
- 	int total_lines = get_line_no(text);
--	int x, y;
-+	int x, y, lines, columns;
- 	int start_x = 0, start_y = 0;
- 	int text_lines = 0, text_cols = 0;
- 	int total_cols = 0;
-@@ -556,6 +556,8 @@ void show_scroll_win(WINDOW *main_window,
- 	WINDOW *pad;
- 	PANEL *panel;
- 
-+	getmaxyx(stdscr, lines, columns);
-+
- 	/* find the widest line of msg: */
- 	total_lines = get_line_no(text);
- 	for (i = 0; i < total_lines; i++) {
-@@ -569,14 +571,14 @@ void show_scroll_win(WINDOW *main_window,
- 	(void) wattrset(pad, attributes[SCROLLWIN_TEXT]);
- 	fill_window(pad, text);
- 
--	win_lines = min(total_lines+4, LINES-2);
--	win_cols = min(total_cols+2, COLS-2);
-+	win_lines = min(total_lines+4, lines-2);
-+	win_cols = min(total_cols+2, columns-2);
- 	text_lines = max(win_lines-4, 0);
- 	text_cols = max(win_cols-2, 0);
- 
- 	/* place window in middle of screen */
--	y = (LINES-win_lines)/2;
--	x = (COLS-win_cols)/2;
-+	y = (lines-win_lines)/2;
-+	x = (columns-win_cols)/2;
- 
- 	win = newwin(win_lines, win_cols, y, x);
- 	keypad(win, TRUE);
+[--SNIP--]
+> @@ -1470,6 +1476,8 @@ void setup_windows(void)
+>  
+>  int main(int ac, char **av)
+>  {
+> +	int lines;
+> +	int columns;
+
+Ditto.
+
+Thank you!
+
+Regards,
+Yann E. MORIN.
+
 -- 
-1.8.2.1
-
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
