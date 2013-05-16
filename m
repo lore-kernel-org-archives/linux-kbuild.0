@@ -1,59 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx10.gouders.net ([89.244.147.155]:54014 "EHLO mx10.gouders.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756256Ab3EPIZG (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 16 May 2013 04:25:06 -0400
-Received: from localhost ([193.175.198.193])
-	by mx10.gouders.net (8.14.6/8.14.5) with ESMTP id r4G8P32D018375
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK)
-	for <linux-kbuild@vger.kernel.org>; Thu, 16 May 2013 10:25:03 +0200
-From: Dirk Gouders <dirk@gouders.net>
+Received: from mail-wi0-f175.google.com ([209.85.212.175]:62735 "EHLO
+	mail-wi0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751473Ab3EPXEK (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 16 May 2013 19:04:10 -0400
+Received: by mail-wi0-f175.google.com with SMTP id hn14so82470wib.8
+        for <linux-kbuild@vger.kernel.org>; Thu, 16 May 2013 16:04:08 -0700 (PDT)
+Date: Fri, 17 May 2013 01:04:04 +0200
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
 Subject: Re: [RFC] mconf: suppress empty submenus
-In-Reply-To: <1368626738-31911-1-git-send-email-dirk@gouders.net> (Dirk
-	Gouders's message of "Wed, 15 May 2013 16:05:37 +0200")
+Message-ID: <20130516230404.GB19534@free.fr>
 References: <1368626738-31911-1-git-send-email-dirk@gouders.net>
-Date: Thu, 16 May 2013 10:24:58 +0200
-Message-ID: <gihai3uyat.fsf@karga.hank.lab>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1368626738-31911-1-git-send-email-dirk@gouders.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
+To: Dirk Gouders <dirk@gouders.net>
+Cc: linux-kbuild@vger.kernel.org
 
-Dirk Gouders <dirk@gouders.net> writes:
+Dirk, All,
 
-> Hello,
->
+On 2013-05-15 16:05 +0200, Dirk Gouders spake thusly:
 > I noticed that sometimes it happens that there are empty
 > submenus, and I tried to see if they can't be suppressed
 > by mconf (if not explicitely done by the kbuild-language).
->
-> Well, I am not sure if someone wants this change and also
-> if I realized all possible situations and therefore the
-> patch is not meant to be accepted as is but as a proof-of-concept.
->
-> Because of that I implemented the changes as a new function
-> menu_is_visible_new() and a helper function that walks the whole menu
-> structure and compares the results of the old and the new function.
->
-> I also tried to add coments to the new function which reflect
-> my understanding but of course might be incomplete or even wrong.
->
-> I'd be glad if someone takes the time to test and/or review
-> the code or comment on the sanity of such a change.
->
-> Attached is an example output of the helper function (i.e.
-> empty dialogs that would be suppressed by the menu_is_visible_new()).
 
-Sorry, I noticed the first problem with one potential user (nconfig) of
-such a change: with `nconfig' one cannot enter those hidden empty
-submenus even when turning on all options with (F4), in which case the
-submenu wouldn't be empty.
+I think we still want submenus to be visible if they are not hidden by
+any condition in the Kconfig. If the developper did not explicitly add
+masking condition, we should *not* try to mask it from the frontends.
 
-So, for a complete proof-of-concept I need to do some more work which I
-think should also contain a proof that the setting of the
-SYMBOL_DEF_USER flag behaves exactly the same as before.
+However, I agree that entering an empty menu can just be deceptive. If
+we could find a way to render an empty menu, and prevent the user from
+entering it, then that would be a huge win, I think.
 
-Dirk
+For example, menus are rendered as thus for now:
 
-PS: In the original message, `sed s/kbuild/kconfig/', of course.
+    This is a submenu  --->
+
+What about representing empty submenus as thus:
+
+    This is a submenu  ----
+
+Also, we have menuconfig which are simply empty if not selected, but can
+anyway be entererd like any other submenu:
+
+    [ ] menuconfig entry  --->
+        (Always empty when entered if not selected)
+
+which could be similarly rendered as:
+
+    [ ] menuconfig entry  ----
+
+This one is really deceptive, and should be handled in the same scheme
+as well.
+
+Any better scheme highly suggested! :-)
+
+Regards,
+Yann E. MORIN.
+
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
