@@ -1,71 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx10.gouders.net ([89.244.147.155]:55411 "EHLO mx10.gouders.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754135Ab3EQItQ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 17 May 2013 04:49:16 -0400
-From: Dirk Gouders <dirk@gouders.net>
-Subject: [PATCH] mconf: handle keys in empty dialogs
-Date: Fri, 17 May 2013 10:48:43 +0200
-Message-Id: <1368780523-19382-2-git-send-email-dirk@gouders.net>
+Received: from mail-wi0-f171.google.com ([209.85.212.171]:48161 "EHLO
+	mail-wi0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751449Ab3EQJMe (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 17 May 2013 05:12:34 -0400
+Received: by mail-wi0-f171.google.com with SMTP id hq7so283357wib.4
+        for <linux-kbuild@vger.kernel.org>; Fri, 17 May 2013 02:12:33 -0700 (PDT)
+Message-ID: <5195F47E.7090903@6wind.com>
+Date: Fri, 17 May 2013 11:12:30 +0200
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Reply-To: nicolas.dichtel@6wind.com
+MIME-Version: 1.0
+Subject: Re: [PATCH linux-next v2] fix make headers_install when path is too
+ long
+References: <20130426185709.GA13399@merkur.ravnborg.org> <1367237751-24962-1-git-send-email-nicolas.dichtel@6wind.com> <517E68BE.2060303@windriver.com> <518767AE.2070005@6wind.com>
+In-Reply-To: <518767AE.2070005@6wind.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: linux-kbuild@vger.kernel.org
+To: mmarek@suse.cz
+Cc: Bruce Ashfield <bruce.ashfield@windriver.com>, sam@ravnborg.org, linux-kbuild@vger.kernel.org
 
-When entering an empty dialog, using the movement keys resulted in
-unexpected characters beeing displayed, other keys like "z" and "h" did
-not work as expected.
-
-This patch handles the movement keys as well as other keys,
-especially "z", "h" and "/".
-
-Signed-off-by: Dirk Gouders <dirk@gouders.net>
----
- scripts/kconfig/lxdialog/menubox.c |  8 ++++----
- scripts/kconfig/mconf.c            | 11 ++++++-----
- 2 files changed, 10 insertions(+), 9 deletions(-)
-
-diff --git a/scripts/kconfig/lxdialog/menubox.c b/scripts/kconfig/lxdialog/menubox.c
-index 48d382e..f5aff9c 100644
---- a/scripts/kconfig/lxdialog/menubox.c
-+++ b/scripts/kconfig/lxdialog/menubox.c
-@@ -303,10 +303,10 @@ do_resize:
- 				}
- 		}
- 
--		if (i < max_choice ||
--		    key == KEY_UP || key == KEY_DOWN ||
--		    key == '-' || key == '+' ||
--		    key == KEY_PPAGE || key == KEY_NPAGE) {
-+		if ((i < max_choice ||
-+		     key == KEY_UP || key == KEY_DOWN ||
-+		     key == '-' || key == '+' ||
-+		     key == KEY_PPAGE || key == KEY_NPAGE) && item_count()) {
- 			/* Remove highligt of current item */
- 			print_item(scroll + choice, choice, FALSE);
- 
-diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
-index 387dc8d..ccb71ae 100644
---- a/scripts/kconfig/mconf.c
-+++ b/scripts/kconfig/mconf.c
-@@ -670,11 +670,12 @@ static void conf(struct menu *menu, struct menu *active_menu)
- 				  active_menu, &s_scroll);
- 		if (res == 1 || res == KEY_ESC || res == -ERRDISPLAYTOOSMALL)
- 			break;
--		if (!item_activate_selected())
--			continue;
--		if (!item_tag())
--			continue;
--
-+		if (item_count()) {
-+			if (!item_activate_selected())
-+				continue;
-+			if (!item_tag())
-+				continue;
-+		}
- 		submenu = item_data();
- 		active_menu = item_data();
- 		if (submenu)
--- 
-1.8.2.1
-
+Le 06/05/2013 10:19, Nicolas Dichtel a écrit :
+> Le 29/04/2013 14:34, Bruce Ashfield a écrit :
+>> On 13-04-29 08:15 AM, Nicolas Dichtel wrote:
+>>> If headers_install is executed from a deep/long directory structure, the
+>>> shell's maximum argument length can be execeeded, which breaks the operation
+>>> with:
+>>>
+>>> | make[2]: execvp: /bin/sh: Argument list too long
+>>> | make[2]: ***
+>>>
+>>> Instead of passing each files name with the entire path, I give only the file
+>>> name without the source path and give this path as a new argument to
+>>> headers_install.pl.
+>>>
+>>> Because there is three possible paths, I have tree input-files list, one per
+>>> path.
+>>
+>> This version still works for my test case.
+>>
+>> Tested-by: Bruce Ashfield <bruce.ashfield@windriver.com>
+>>
+>>>
+>>> Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+>>> ---
+> Should I do something more for this patch? It seems not included.
+ping
