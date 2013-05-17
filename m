@@ -1,70 +1,113 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f175.google.com ([209.85.212.175]:62735 "EHLO
-	mail-wi0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751473Ab3EPXEK (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 16 May 2013 19:04:10 -0400
-Received: by mail-wi0-f175.google.com with SMTP id hn14so82470wib.8
-        for <linux-kbuild@vger.kernel.org>; Thu, 16 May 2013 16:04:08 -0700 (PDT)
-Date: Fri, 17 May 2013 01:04:04 +0200
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Received: from mx10.gouders.net ([89.244.147.155]:55188 "EHLO mx10.gouders.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750712Ab3EQEWs (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 17 May 2013 00:22:48 -0400
+From: Dirk Gouders <dirk@gouders.net>
 Subject: Re: [RFC] mconf: suppress empty submenus
-Message-ID: <20130516230404.GB19534@free.fr>
+In-Reply-To: <20130516230404.GB19534@free.fr> (Yann E. MORIN's message of
+	"Fri, 17 May 2013 01:04:04 +0200")
 References: <1368626738-31911-1-git-send-email-dirk@gouders.net>
+	<20130516230404.GB19534@free.fr>
+Date: Fri, 17 May 2013 06:22:45 +0200
+Message-ID: <ghip2ikzfu.fsf@mx10.gouders.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1368626738-31911-1-git-send-email-dirk@gouders.net>
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dirk Gouders <dirk@gouders.net>
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>
 Cc: linux-kbuild@vger.kernel.org
 
-Dirk, All,
+"Yann E. MORIN" <yann.morin.1998@free.fr> writes:
 
-On 2013-05-15 16:05 +0200, Dirk Gouders spake thusly:
-> I noticed that sometimes it happens that there are empty
-> submenus, and I tried to see if they can't be suppressed
-> by mconf (if not explicitely done by the kbuild-language).
+> Dirk, All,
+>
+> On 2013-05-15 16:05 +0200, Dirk Gouders spake thusly:
+>> I noticed that sometimes it happens that there are empty
+>> submenus, and I tried to see if they can't be suppressed
+>> by mconf (if not explicitely done by the kbuild-language).
+>
+> I think we still want submenus to be visible if they are not hidden by
+> any condition in the Kconfig. If the developper did not explicitly add
+> masking condition, we should *not* try to mask it from the frontends.
+>
+> However, I agree that entering an empty menu can just be deceptive. If
+> we could find a way to render an empty menu, and prevent the user from
+> entering it, then that would be a huge win, I think.
+>
+> For example, menus are rendered as thus for now:
+>
+>     This is a submenu  --->
+>
+> What about representing empty submenus as thus:
+>
+>     This is a submenu  ----
+>
+> Also, we have menuconfig which are simply empty if not selected, but can
+> anyway be entererd like any other submenu:
+>
+>     [ ] menuconfig entry  --->
+>         (Always empty when entered if not selected)
+>
+> which could be similarly rendered as:
+>
+>     [ ] menuconfig entry  ----
+>
+> This one is really deceptive, and should be handled in the same scheme
+> as well.
 
-I think we still want submenus to be visible if they are not hidden by
-any condition in the Kconfig. If the developper did not explicitly add
-masking condition, we should *not* try to mask it from the frontends.
+Hello Yann,
 
-However, I agree that entering an empty menu can just be deceptive. If
-we could find a way to render an empty menu, and prevent the user from
-entering it, then that would be a huge win, I think.
+I like that scheme.  Maybe ---- can become ---0 or similar for better
+perceptibility, but I think what counts would be that the user knows
+that we know that there are empty menus/menuconfigs and we are treating
+them properly.
 
-For example, menus are rendered as thus for now:
+What I also like is that I think this scheme would justify a new
+function "menu_is_empty()" and we do not need to change the current
+behavior of "menu_is_visible()".
 
-    This is a submenu  --->
+While playing with the empty menus, I noticed that there are some more
+things that probably should be fixed and that I have on my list:
 
-What about representing empty submenus as thus:
+* mconf: Using Arrow-Keys should be handled properly (for empty menus)
+         (The point why I thought users get irritated by empty submenus)
+* mconf: "Z" does not work in empty menus
+* expr.c: Some days ago, there was a timeslot when "IRQ subsystem" had
+          just one config with a prompt in it and I tried to make the
+  visibility of the menu dependent on the same symbol as the
+  only one config option.
 
-    This is a submenu  ----
+  That did not work and I found out that this is because of the
+  expr_eliminate_dups* family of functions.  I am still figuring out if
+  this is correct behavior or if I just misread the kconfig-language
+  documentation.  The attached Kconfig that I use to trigger exactly that
+  point, also outputs an error because of an expression with an unknown
+  type when "Z" is pressed.
 
-Also, we have menuconfig which are simply empty if not selected, but can
-anyway be entererd like any other submenu:
 
-    [ ] menuconfig entry  --->
-        (Always empty when entered if not selected)
+Dirk
 
-which could be similarly rendered as:
+------------------------------------------------------------------------
+mainmenu "Kconfig Testing Configuration"
 
-    [ ] menuconfig entry  ----
+config MAY_TEST_VAR
+	def_bool y
 
-This one is really deceptive, and should be handled in the same scheme
-as well.
+config SRCARCH
+	string
+	prompt "srcarch"
+	option env="SRCARCH"
+	---help---
+	Helptext
 
-Any better scheme highly suggested! :-)
+menu "Testmenu"
+	visible if MAY_TEST_VAR
 
-Regards,
-Yann E. MORIN.
+config TEST_VAR
+	bool "Test option" if MAY_TEST_VAR
+	---help---
 
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+	  Help for TEST_VAR
+
+endmenu
