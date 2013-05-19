@@ -1,22 +1,20 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f175.google.com ([209.85.212.175]:61884 "EHLO
-	mail-wi0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752998Ab3ESJJB (ORCPT
+Received: from mail-we0-f169.google.com ([74.125.82.169]:33254 "EHLO
+	mail-we0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752662Ab3ESPMc (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 19 May 2013 05:09:01 -0400
-Received: by mail-wi0-f175.google.com with SMTP id hn14so1321855wib.2
-        for <linux-kbuild@vger.kernel.org>; Sun, 19 May 2013 02:08:59 -0700 (PDT)
-Date: Sun, 19 May 2013 11:08:55 +0200
+	Sun, 19 May 2013 11:12:32 -0400
+Received: by mail-we0-f169.google.com with SMTP id x54so4635619wes.0
+        for <linux-kbuild@vger.kernel.org>; Sun, 19 May 2013 08:12:31 -0700 (PDT)
+Date: Sun, 19 May 2013 17:12:27 +0200
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [RFC] mconf: mark empty menus/menuconfigs different form
- non-empty ones
-Message-ID: <20130519090855.GA3359@free.fr>
-References: <20130516230404.GB19534@free.fr>
- <1368786492-23751-1-git-send-email-dirk@gouders.net>
+Subject: Re: [PATCH] mconf: handle keys in empty dialogs
+Message-ID: <20130519151227.GA3339@free.fr>
+References: <1368780523-19382-2-git-send-email-dirk@gouders.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1368786492-23751-1-git-send-email-dirk@gouders.net>
+In-Reply-To: <1368780523-19382-2-git-send-email-dirk@gouders.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Dirk Gouders <dirk@gouders.net>
@@ -24,20 +22,62 @@ Cc: linux-kbuild@vger.kernel.org
 
 Dirk, All,
 
-On 2013-05-17 12:28 +0200, Dirk Gouders spake thusly:
-> here is a patch for the scheme you suggested.
+On 2013-05-17 10:48 +0200, Dirk Gouders spake thusly:
+> When entering an empty dialog, using the movement keys resulted in
+> unexpected characters beeing displayed, other keys like "z" and "h" did
+> not work as expected.
 > 
-> I also tried how it looks if empty submenus are maked by "---|" but I
-> think that is a matter of personal preferences and I don't want to try to
-> anticipate what users who use mconf heavily want.
+> This patch handles the movement keys as well as other keys,
+> especially "z", "h" and "/".
 
-I suggested '----' to floow the scheme for booleans and tristates:
-    [ ] Selectable boolean
-    < > Selectable tristate
-    { } Selectable tristate, forced to at least M
-    - - Unselectable tristate, forced to Y
+Yes, thank you!
 
-So I think '----' is a nice fit for '--->'.
+> Signed-off-by: Dirk Gouders <dirk@gouders.net>
+> ---
+>  scripts/kconfig/lxdialog/menubox.c |  8 ++++----
+>  scripts/kconfig/mconf.c            | 11 ++++++-----
+>  2 files changed, 10 insertions(+), 9 deletions(-)
+> 
+> diff --git a/scripts/kconfig/lxdialog/menubox.c b/scripts/kconfig/lxdialog/menubox.c
+> index 48d382e..f5aff9c 100644
+> --- a/scripts/kconfig/lxdialog/menubox.c
+> +++ b/scripts/kconfig/lxdialog/menubox.c
+> @@ -303,10 +303,10 @@ do_resize:
+>  				}
+>  		}
+>  
+> -		if (i < max_choice ||
+> -		    key == KEY_UP || key == KEY_DOWN ||
+> -		    key == '-' || key == '+' ||
+> -		    key == KEY_PPAGE || key == KEY_NPAGE) {
+> +		if ((i < max_choice ||
+> +		     key == KEY_UP || key == KEY_DOWN ||
+> +		     key == '-' || key == '+' ||
+> +		     key == KEY_PPAGE || key == KEY_NPAGE) && item_count()) {
+
+item_count() returns a number, not true/false, so you have to use it
+thus:
+    item_count() != 0
+
+>  			/* Remove highligt of current item */
+>  			print_item(scroll + choice, choice, FALSE);
+>  
+> diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
+> index 387dc8d..ccb71ae 100644
+> --- a/scripts/kconfig/mconf.c
+> +++ b/scripts/kconfig/mconf.c
+> @@ -670,11 +670,12 @@ static void conf(struct menu *menu, struct menu *active_menu)
+>  				  active_menu, &s_scroll);
+>  		if (res == 1 || res == KEY_ESC || res == -ERRDISPLAYTOOSMALL)
+>  			break;
+> -		if (!item_activate_selected())
+> -			continue;
+> -		if (!item_tag())
+> -			continue;
+> -
+> +		if (item_count()) {
+
+Ditto.
 
 Regards,
 Yann E. MORIN.
