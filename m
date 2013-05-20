@@ -1,43 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f182.google.com ([209.85.212.182]:45642 "EHLO
-	mail-wi0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755943Ab3ETPvH (ORCPT
+Received: from mail-wi0-f175.google.com ([209.85.212.175]:58640 "EHLO
+	mail-wi0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757418Ab3ETPxn (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 20 May 2013 11:51:07 -0400
-Received: by mail-wi0-f182.google.com with SMTP id c10so2212440wiw.3
-        for <linux-kbuild@vger.kernel.org>; Mon, 20 May 2013 08:51:06 -0700 (PDT)
-Date: Mon, 20 May 2013 17:51:01 +0200
+	Mon, 20 May 2013 11:53:43 -0400
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH v2] mconf: handle keys in empty dialogs
-Message-ID: <20130520155101.GC3164@free.fr>
-References: <20130519151227.GA3339@free.fr>
- <1368992924-4700-1-git-send-email-dirk@gouders.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1368992924-4700-1-git-send-email-dirk@gouders.net>
+Subject: [pull request] Pull request for branch yem-kconfig-rc-fixes
+Date: Mon, 20 May 2013 17:48:01 +0200
+Message-Id: <cover.1369064712.git.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dirk Gouders <dirk@gouders.net>
-Cc: linux-kbuild@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-Dirk, All,
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-On 2013-05-19 21:48 +0200, Dirk Gouders spake thusly:
-> When entering an empty dialog, using the movement keys resulted in
-> unexpected characters beeing displayed, other keys like "z" and "h"
-> did not work as expected.
-> 
-> This patch handles the movement keys as well as other keys, especially
-> "z", "h" and "/".
-> 
-> Signed-off-by: Dirk Gouders <dirk@gouders.net>
+Hello Michal, All,
 
-I've applied this to my tree in the yem-kconfig-rc-fixes branch, for
-which I just sent a pull-request to Michal. Thank you!
+Please pull these two rc-fixes:
+  - fix key handling in empty menus in mconf
+  - fix scripts/config wrt short --*-after options
 
 Regards,
-Yann E. MORIN.
+Yann E. MORIN
+
+
+The following changes since commit f722406faae2d073cc1d01063d1123c35425939e:
+
+  Linux 3.10-rc1 (2013-05-11 17:14:08 -0700)
+
+are available in the git repository at:
+
+  git://gitorious.org/linux-kconfig/linux-kconfig.git yem-kconfig-rc-fixes
+
+for you to fetch changes up to 8f9c6f75f603132869375a203d22e5b445f6294f:
+
+  mconf: handle keys in empty dialogs (2013-05-20 14:15:27 +0200)
+
+----------------------------------------------------------------
+Clement Chauplannaz (1):
+      scripts/config: fix assignment of parameters for short version of --*-after options
+
+Dirk Gouders (1):
+      mconf: handle keys in empty dialogs
+
+ scripts/config                     |  2 +-
+ scripts/kconfig/lxdialog/menubox.c |  8 ++++----
+ scripts/kconfig/mconf.c            | 11 ++++++-----
+ 3 files changed, 11 insertions(+), 10 deletions(-)
 
 -- 
 .-----------------.--------------------.------------------.--------------------.
