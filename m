@@ -1,53 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f175.google.com ([209.85.212.175]:58640 "EHLO
-	mail-wi0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757418Ab3ETPxn (ORCPT
+Received: from mail-we0-f171.google.com ([74.125.82.171]:55077 "EHLO
+	mail-we0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755340Ab3ETPzS convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 20 May 2013 11:53:43 -0400
+	Mon, 20 May 2013 11:55:18 -0400
+Received: by mail-we0-f171.google.com with SMTP id t59so1004862wes.16
+        for <linux-kbuild@vger.kernel.org>; Mon, 20 May 2013 08:55:17 -0700 (PDT)
+Date: Mon, 20 May 2013 17:55:12 +0200
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: [pull request] Pull request for branch yem-kconfig-rc-fixes
-Date: Mon, 20 May 2013 17:48:01 +0200
-Message-Id: <cover.1369064712.git.yann.morin.1998@free.fr>
+Subject: Re: [PATCH 2/2] scripts/config: fix assignment of parameters for
+ short version of --*-after options
+Message-ID: <20130520155512.GD3164@free.fr>
+References: <cover.1368379475.git.chauplac@gmail.com>
+ <f0a94b2157c7bde8ec8a275d2f8f648f2e6b7c47.1368379475.git.chauplac@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8BIT
+In-Reply-To: <f0a94b2157c7bde8ec8a275d2f8f648f2e6b7c47.1368379475.git.chauplac@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, "Yann E. MORIN" <yann.morin.1998@free.fr>
+To: Clement Chauplannaz <chauplac@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, mmarek@suse.cz, andi@firstfloor.org
 
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Clément, All,
 
-Hello Michal, All,
+On 2013-05-12 21:08 +0200, Clement Chauplannaz spake thusly:
+> When --*-after options are used, two parameters are parsed from the
+> command-line before the adequate function is called:
+>   - the `before' option, after which the new option will be inserted,
+>   - the name of the option to enable/disable/modularise.
+> 
+> With the short version of --*-after options (namely -E, -D, -M), the
+> parsing step is not performed which leads to processing unset variables.
+> 
+> Add options -E, -D, -M to the test that triggers assignment of parameters
+> for --*-after options.
+> 
+> Signed-off-by: Clement Chauplannaz <chauplac@gmail.com>
 
-Please pull these two rc-fixes:
-  - fix key handling in empty menus in mconf
-  - fix scripts/config wrt short --*-after options
+I've applied this to my tree in the branch yem-kconfig-rc-fixes, for
+which I've just sent a pull-request to Michal. Thank you!
 
 Regards,
-Yann E. MORIN
-
-
-The following changes since commit f722406faae2d073cc1d01063d1123c35425939e:
-
-  Linux 3.10-rc1 (2013-05-11 17:14:08 -0700)
-
-are available in the git repository at:
-
-  git://gitorious.org/linux-kconfig/linux-kconfig.git yem-kconfig-rc-fixes
-
-for you to fetch changes up to 8f9c6f75f603132869375a203d22e5b445f6294f:
-
-  mconf: handle keys in empty dialogs (2013-05-20 14:15:27 +0200)
-
-----------------------------------------------------------------
-Clement Chauplannaz (1):
-      scripts/config: fix assignment of parameters for short version of --*-after options
-
-Dirk Gouders (1):
-      mconf: handle keys in empty dialogs
-
- scripts/config                     |  2 +-
- scripts/kconfig/lxdialog/menubox.c |  8 ++++----
- scripts/kconfig/mconf.c            | 11 ++++++-----
- 3 files changed, 11 insertions(+), 10 deletions(-)
+Yann E. MORIN.
 
 -- 
 .-----------------.--------------------.------------------.--------------------.
