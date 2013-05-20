@@ -1,104 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ie0-f181.google.com ([209.85.223.181]:52085 "EHLO
-	mail-ie0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756145Ab3ETNes (ORCPT
+Received: from mail-we0-f181.google.com ([74.125.82.181]:64337 "EHLO
+	mail-we0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755943Ab3ETPsN (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 20 May 2013 09:34:48 -0400
-Received: by mail-ie0-f181.google.com with SMTP id x12so13860095ief.12
-        for <linux-kbuild@vger.kernel.org>; Mon, 20 May 2013 06:34:48 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <1367982881.4131.163.camel@deadeye.wl.decadent.org.uk>
-References: <1367941611-12223-1-git-send-email-anisse@astier.eu>
- <1367941611-12223-3-git-send-email-anisse@astier.eu> <1367982881.4131.163.camel@deadeye.wl.decadent.org.uk>
-From: Anisse Astier <anisse@astier.eu>
-Date: Mon, 20 May 2013 15:34:28 +0200
-Message-ID: <CALUN=qLaDcCxTduMRomP5KHH7zEuvRza2tnVgpVJi5GWP6b6KA@mail.gmail.com>
-Subject: Re: [PATCH v4 2/4] deb-pkg: split debug symbols in their own package
-Content-Type: text/plain; charset=ISO-8859-1
+	Mon, 20 May 2013 11:48:13 -0400
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: [PATCH 1/2] scripts/config: fix assignment of parameters for short version of --*-after options
+Date: Mon, 20 May 2013 17:48:02 +0200
+Message-Id: <57a9c7609d7418ce75324df38f66cd7d937a77cb.1369064712.git.yann.morin.1998@free.fr>
+In-Reply-To: <cover.1369064712.git.yann.morin.1998@free.fr>
+References: <cover.1369064712.git.yann.morin.1998@free.fr>
+In-Reply-To: <cover.1369064712.git.yann.morin.1998@free.fr>
+References: <cover.1369064712.git.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ben Hutchings <ben@decadent.org.uk>
-Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, maximilian attems <max@stro.at>, debian-kernel@lists.debian.org, kernel-team@lists.ubuntu.com
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Clement Chauplannaz <chauplac@gmail.com>, "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-Hi Ben,
+From: Clement Chauplannaz <chauplac@gmail.com>
 
-On Wed, May 8, 2013 at 5:14 AM, Ben Hutchings <ben@decadent.org.uk> wrote:
-> On Tue, 2013-05-07 at 17:46 +0200, Anisse Astier wrote:
->> This can reduce almost 3 times the size of the linux-image package,
->> while keeping the debug symbols available for this particular build, in
->> their own package.
->>
->> This mimics the way kernels are built in debian, ubuntu, or with
->> make-kpkg, and comes at the price of a small slowdown in the building of
->> packages.
->>
->> Signed-off-by: Anisse Astier <anisse@astier.eu>
->> ---
->>  scripts/package/builddeb | 43 ++++++++++++++++++++++++++++++++++++++++++-
->>  1 file changed, 42 insertions(+), 1 deletion(-)
->>
->> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
->> index 2d84671..797484b 100644
->> --- a/scripts/package/builddeb
->> +++ b/scripts/package/builddeb
->> @@ -78,17 +78,21 @@ tmpdir="$objtree/debian/tmp"
->>  fwdir="$objtree/debian/fwtmp"
->>  kernel_headers_dir="$objtree/debian/hdrtmp"
->>  libc_headers_dir="$objtree/debian/headertmp"
->> +dbg_dir="$objtree/debian/dbgtmp"
->>  packagename=linux-image-$version
->>  fwpackagename=linux-firmware-image
->>  kernel_headers_packagename=linux-headers-$version
->>  libc_headers_packagename=linux-libc-dev
->> +dbg_packagename=$packagename-dbg
->>
->>  if [ "$ARCH" = "um" ] ; then
->>       packagename=user-mode-linux-$version
->>  fi
->>
->> +BUILD_DEBUG="$(grep -s '^CONFIG_DEBUG_INFO=y' $objtree/$KCONFIG_CONFIG || true)"
->
-> As in the previous patch, you can omit $objtree/ here.
->
-> [...]
->> @@ -128,6 +136,20 @@ if grep -q '^CONFIG_MODULES=y' $objtree/$KCONFIG_CONFIG ; then
->>               mv "$tmpdir/lib/modules/$version"/* "$tmpdir/usr/lib/uml/modules/$version/"
->>               rmdir "$tmpdir/lib/modules/$version"
->>       fi
->> +     if [ -n "$BUILD_DEBUG" ] ; then
->> +             (
->> +                     cd $tmpdir
->> +                     for module in $(find lib/modules/ -name *.ko); do
->
-> What if this is a non-modular kernel?
+When --*-after options are used, two parameters are parsed from the
+command-line before the adequate function is called:
+  - the `before' option, after which the new option will be inserted,
+  - the name of the option to enable/disable/modularise.
 
-It's not entirely apparent in the diff, but this code is inside an if
-checking CONFIG_MODULES..
+With the short version of --*-after options (namely -E, -D, -M), the
+parsing step is not performed which leads to processing unset variables.
 
->
-> [...]
->> +if [ -n "$BUILD_DEBUG" ] ; then
->> +     # Build debug package
->> +     mkdir -p $dbg_dir/usr/lib/debug/lib/modules/$version/
->> +     cp vmlinux $dbg_dir/usr/lib/debug/lib/modules/$version/
-> [...]
->
-> Different tools have different ideas about where vmlinux debuginfo
-> should be.  What I ended up doing in Debian's own kernel debug packages
-> in wheezy was installing/symlinking to all of:
->
-> /usr/lib/debug/boot/vmlinux-$version        [systemtap]
-> /usr/lib/debug/lib/modules/$version/vmlinux [perf]
-> /usr/lib/debug/vmlinux-$version             [kdump-tools]
->
-> So unless anyone has a better suggestion I think you'd better do the
-> same here.
->
-> (But really, the Linux development community ought to agree on a single
-> canonical path format that all such tools will support.)
+Add options -E, -D, -M to the test that triggers assignment of parameters
+for --*-after options.
 
-I'll add the symlinks for the next iteration.
+Signed-off-by: Clement Chauplannaz <chauplac@gmail.com>
+Acked-by: Andi Kleen <ak@linux.intel.com>
+Signed-off-by: Yann E. MORIN <yann.morin.1998@free.fr>
+---
+ scripts/config | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thanks a lot for your review time.
+diff --git a/scripts/config b/scripts/config
+index bb4d3de..a65ecbb 100755
+--- a/scripts/config
++++ b/scripts/config
+@@ -105,7 +105,7 @@ while [ "$1" != "" ] ; do
+ 		;;
+ 	--refresh)
+ 		;;
+-	--*-after)
++	--*-after|-E|-D|-M)
+ 		checkarg "$1"
+ 		A=$ARG
+ 		checkarg "$2"
+-- 
+1.8.1.2
 
-Anisse
