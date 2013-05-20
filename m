@@ -1,81 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-we0-f172.google.com ([74.125.82.172]:39218 "EHLO
-	mail-we0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755998Ab3ETPsO (ORCPT
+Received: from mail-wi0-f175.google.com ([209.85.212.175]:35510 "EHLO
+	mail-wi0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755943Ab3ETPuK (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 20 May 2013 11:48:14 -0400
+	Mon, 20 May 2013 11:50:10 -0400
+Received: by mail-wi0-f175.google.com with SMTP id hn14so2212037wib.14
+        for <linux-kbuild@vger.kernel.org>; Mon, 20 May 2013 08:50:09 -0700 (PDT)
+Date: Mon, 20 May 2013 17:50:05 +0200
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: [PATCH 2/2] mconf: handle keys in empty dialogs
-Date: Mon, 20 May 2013 17:48:03 +0200
-Message-Id: <8f9c6f75f603132869375a203d22e5b445f6294f.1369064712.git.yann.morin.1998@free.fr>
-In-Reply-To: <cover.1369064712.git.yann.morin.1998@free.fr>
-References: <cover.1369064712.git.yann.morin.1998@free.fr>
-In-Reply-To: <cover.1369064712.git.yann.morin.1998@free.fr>
-References: <cover.1369064712.git.yann.morin.1998@free.fr>
+Subject: Re: [PATCH v3] mconf/nconf: mark empty menus/menuconfigs different
+ from non-empty ones
+Message-ID: <20130520155005.GB3164@free.fr>
+References: <20130519151417.GB3339@free.fr>
+ <1368992974-4748-1-git-send-email-dirk@gouders.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1368992974-4748-1-git-send-email-dirk@gouders.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Dirk Gouders <dirk@gouders.net>, "Yann E. MORIN" <yann.morin.1998@free.fr>
+To: Dirk Gouders <dirk@gouders.net>
+Cc: linux-kbuild@vger.kernel.org
 
-From: Dirk Gouders <dirk@gouders.net>
+Dirk, All,
 
-When entering an empty dialog, using the movement keys resulted in
-unexpected characters beeing displayed, other keys like "z" and "h"
-did not work as expected.
+On 2013-05-19 21:49 +0200, Dirk Gouders spake thusly:
+> Submenus are sometimes empty and it would be nice if there is
+> something that notifies us that we should not expect any content
+> _before_ we enter a submenu.
+> 
+> A new function menu_is_empty() was introduced and empty menus and
+> menuconfigs are now marked by "----" as opposed to non-empty ones that
+> are marked by "--->".
+> 
+> This scheme was suggested by "Yann E. MORIN"
+> <yann.morin.1998@free.fr>.
+> 
+> Signed-off-by: Dirk Gouders <dirk@gouders.net>
 
-This patch handles the movement keys as well as other keys, especially
-"z", "h" and "/".
+I've applied this to my tree in my yem-kconfig-for-next branch, for
+inclusion when the merge window for 3.11 opens. Thank you!
 
-Signed-off-by: Dirk Gouders <dirk@gouders.net>
-Tested-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Reviewed-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
----
- scripts/kconfig/lxdialog/menubox.c |  8 ++++----
- scripts/kconfig/mconf.c            | 11 ++++++-----
- 2 files changed, 10 insertions(+), 9 deletions(-)
+Regards,
+Yann E. MORIN.
 
-diff --git a/scripts/kconfig/lxdialog/menubox.c b/scripts/kconfig/lxdialog/menubox.c
-index 48d382e..eda0350 100644
---- a/scripts/kconfig/lxdialog/menubox.c
-+++ b/scripts/kconfig/lxdialog/menubox.c
-@@ -303,10 +303,10 @@ do_resize:
- 				}
- 		}
- 
--		if (i < max_choice ||
--		    key == KEY_UP || key == KEY_DOWN ||
--		    key == '-' || key == '+' ||
--		    key == KEY_PPAGE || key == KEY_NPAGE) {
-+		if ((i < max_choice ||
-+		     key == KEY_UP || key == KEY_DOWN ||
-+		     key == '-' || key == '+' ||
-+		     key == KEY_PPAGE || key == KEY_NPAGE) && item_count() != 0) {
- 			/* Remove highligt of current item */
- 			print_item(scroll + choice, choice, FALSE);
- 
-diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
-index 387dc8d..a69cbd7 100644
---- a/scripts/kconfig/mconf.c
-+++ b/scripts/kconfig/mconf.c
-@@ -670,11 +670,12 @@ static void conf(struct menu *menu, struct menu *active_menu)
- 				  active_menu, &s_scroll);
- 		if (res == 1 || res == KEY_ESC || res == -ERRDISPLAYTOOSMALL)
- 			break;
--		if (!item_activate_selected())
--			continue;
--		if (!item_tag())
--			continue;
--
-+		if (item_count() != 0) {
-+			if (!item_activate_selected())
-+				continue;
-+			if (!item_tag())
-+				continue;
-+		}
- 		submenu = item_data();
- 		active_menu = item_data();
- 		if (submenu)
 -- 
-1.8.1.2
-
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
