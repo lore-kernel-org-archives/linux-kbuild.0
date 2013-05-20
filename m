@@ -1,175 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx10.gouders.net ([89.244.147.155]:61387 "EHLO mx10.gouders.net"
+Received: from cantor2.suse.de ([195.135.220.15]:37208 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754337Ab3ESTth (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 19 May 2013 15:49:37 -0400
-From: Dirk Gouders <dirk@gouders.net>
-Subject: [PATCH v3] mconf/nconf: mark empty menus/menuconfigs different from non-empty ones
-Date: Sun, 19 May 2013 21:49:34 +0200
-Message-Id: <1368992974-4748-1-git-send-email-dirk@gouders.net>
-In-Reply-To: <20130519151417.GB3339@free.fr>
-References: <20130519151417.GB3339@free.fr>
+	id S1755141Ab3ETIR4 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 20 May 2013 04:17:56 -0400
+Date: Mon, 20 May 2013 10:17:54 +0200
+From: Michal Marek <mmarek@suse.cz>
+Subject: Re: [GIT] kbuild fix for v3.10-rc2
+Message-ID: <20130520081754.GA25645@sepie.suse.cz>
+References: <20130517193658.GA32023@pobox.suse.cz>
+ <CA+55aFzYf6aCXcCE8=M53OumqvXj_TYb5z7vibe9UDf79xaehw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+55aFzYf6aCXcCE8=M53OumqvXj_TYb5z7vibe9UDf79xaehw@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: linux-kbuild@vger.kernel.org
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: lcapitulino@redhat.com, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-Submenus are sometimes empty and it would be nice if there is
-something that notifies us that we should not expect any content
-_before_ we enter a submenu.
+On Sat, May 18, 2013 at 10:35:40AM -0700, Linus Torvalds wrote:
+> On Fri, May 17, 2013 at 12:36 PM, Michal Marek <mmarek@suse.cz> wrote:
+> >
+> >   git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git for-next
+> >
+> > Luiz Capitulino (1):
+> >       package: Makefile: unbreak binrpm-pkg target
+> >
+> >  scripts/package/Makefile |    2 +-
+> >  1 files changed, 1 insertions(+), 1 deletions(-)
+> 
+> Hmm. That's not at all what I get. I also get a merge and another
+> patch ("kbuild: fix make headers_install when path is too long") and
 
-A new function menu_is_empty() was introduced and empty menus and
-menuconfigs are now marked by "----" as opposed to non-empty ones that
-are marked by "--->".
+Sorry, I was on the wrong branch, which happened to be identical to the
+rc-fixes branch when I sent the pull request, but not when you read it.
+Here is the correct pull request:
 
-This scheme was suggested by "Yann E. MORIN"
-<yann.morin.1998@free.fr>.
 
-Signed-off-by: Dirk Gouders <dirk@gouders.net>
----
- scripts/kconfig/lkc_proto.h |  1 +
- scripts/kconfig/mconf.c     | 11 ++++++-----
- scripts/kconfig/menu.c      | 16 ++++++++++++++++
- scripts/kconfig/nconf.c     | 16 ++++++++--------
- 4 files changed, 31 insertions(+), 13 deletions(-)
+In an attempt to improve make rpm-pkg, I broke make binrpm-pkg. Please
+pull the fix below.
 
-diff --git a/scripts/kconfig/lkc_proto.h b/scripts/kconfig/lkc_proto.h
-index ef1a738..ecdb965 100644
---- a/scripts/kconfig/lkc_proto.h
-+++ b/scripts/kconfig/lkc_proto.h
-@@ -14,6 +14,7 @@ P(conf_set_message_callback, void,(void (*fn)(const char *fmt, va_list ap)));
- /* menu.c */
- P(rootmenu,struct menu,);
- 
-+P(menu_is_empty, bool, (struct menu *menu));
- P(menu_is_visible, bool, (struct menu *menu));
- P(menu_has_prompt, bool, (struct menu *menu));
- P(menu_get_prompt,const char *,(struct menu *menu));
-diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
-index 387dc8d..d40e293 100644
---- a/scripts/kconfig/mconf.c
-+++ b/scripts/kconfig/mconf.c
-@@ -48,7 +48,7 @@ static const char mconf_readme[] = N_(
- "----------\n"
- "o  Use the Up/Down arrow keys (cursor keys) to highlight the item\n"
- "   you wish to change or submenu wish to select and press <Enter>.\n"
--"   Submenus are designated by \"--->\".\n"
-+"   Submenus are designated by \"--->\", empty ones by \"----\".\n"
- "\n"
- "   Shortcut: Press the option's highlighted letter (hotkey).\n"
- "             Pressing a hotkey more than once will sequence\n"
-@@ -176,7 +176,7 @@ static const char mconf_readme[] = N_(
- "\n"),
- menu_instructions[] = N_(
- 	"Arrow keys navigate the menu.  "
--	"<Enter> selects submenus --->.  "
-+	"<Enter> selects submenus ---> (or empty submenus ----).  "
- 	"Highlighted letters are hotkeys.  "
- 	"Pressing <Y> includes, <N> excludes, <M> modularizes features.  "
- 	"Press <Esc><Esc> to exit, <?> for Help, </> for Search.  "
-@@ -498,8 +498,9 @@ static void build_conf(struct menu *menu)
- 						  menu->data ? "-->" : "++>",
- 						  indent + 1, ' ', prompt);
- 				} else
--					item_make("   %*c%s  --->", indent + 1, ' ', prompt);
--
-+					item_make("   %*c%s  %s",
-+						  indent + 1, ' ', prompt,
-+						  menu_is_empty(menu) ? "----" : "--->");
- 				item_set_tag('m');
- 				item_set_data(menu);
- 				if (single_menu_mode && menu->data)
-@@ -630,7 +631,7 @@ static void build_conf(struct menu *menu)
- 			  (sym_has_value(sym) || !sym_is_changable(sym)) ?
- 			  "" : _(" (NEW)"));
- 		if (menu->prompt->type == P_MENU) {
--			item_add_str("  --->");
-+			item_add_str("  %s", menu_is_empty(menu) ? "----" : "--->");
- 			return;
- 		}
- 	}
-diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
-index b5c7d90..6d11c8f 100644
---- a/scripts/kconfig/menu.c
-+++ b/scripts/kconfig/menu.c
-@@ -430,6 +430,22 @@ bool menu_has_prompt(struct menu *menu)
- 	return true;
- }
- 
-+/*
-+ * Determine if a menu is empty.
-+ * A menu is considered empty if it contains no or only
-+ * invisible entries.
-+ */
-+bool menu_is_empty(struct menu *menu)
-+{
-+	struct menu *child;
-+
-+	for (child = menu->list; child; child = child->next) {
-+		if (menu_is_visible(child))
-+			return(false);
-+	}
-+	return(true);
-+}
-+
- bool menu_is_visible(struct menu *menu)
- {
- 	struct menu *child;
-diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
-index dbf31ed..0bd62cc 100644
---- a/scripts/kconfig/nconf.c
-+++ b/scripts/kconfig/nconf.c
-@@ -45,8 +45,8 @@ static const char nconf_global_help[] = N_(
- "<n> to remove it.  You may press the <Space> key to cycle through the\n"
- "available options.\n"
- "\n"
--"A trailing \"--->\" designates a submenu.\n"
--"\n"
-+"A trailing \"--->\" designates a submenu, a trailing \"----\" an\n"
-+"empty submenu.\n"
- "\n"
- "Menu navigation keys\n"
- "----------------------------------------------------------------------\n"
-@@ -131,7 +131,7 @@ static const char nconf_global_help[] = N_(
- "\n"),
- menu_no_f_instructions[] = N_(
- "Legend:  [*] built-in  [ ] excluded  <M> module  < > module capable.\n"
--"Submenus are designated by a trailing \"--->\".\n"
-+"Submenus are designated by a trailing \"--->\", empty ones by \"----\".\n"
- "\n"
- "Use the following keys to navigate the menus:\n"
- "Move up or down with <Up> and <Down>.\n"
-@@ -148,7 +148,7 @@ menu_no_f_instructions[] = N_(
- "For help related to the current menu entry press <?> or <h>.\n"),
- menu_instructions[] = N_(
- "Legend:  [*] built-in  [ ] excluded  <M> module  < > module capable.\n"
--"Submenus are designated by a trailing \"--->\".\n"
-+"Submenus are designated by a trailing \"--->\", empty ones by \"----\".\n"
- "\n"
- "Use the following keys to navigate the menus:\n"
- "Move up or down with <Up> or <Down>.\n"
-@@ -759,9 +759,9 @@ static void build_conf(struct menu *menu)
- 						indent + 1, ' ', prompt);
- 				} else
- 					item_make(menu, 'm',
--						"   %*c%s  --->",
--						indent + 1,
--						' ', prompt);
-+						  "   %*c%s  %s",
-+						  indent + 1, ' ', prompt,
-+						  menu_is_empty(menu) ? "----" : "--->");
- 
- 				if (single_menu_mode && menu->data)
- 					goto conf_childs;
-@@ -903,7 +903,7 @@ static void build_conf(struct menu *menu)
- 				(sym_has_value(sym) || !sym_is_changable(sym)) ?
- 				"" : _(" (NEW)"));
- 		if (menu->prompt && menu->prompt->type == P_MENU) {
--			item_add_str("  --->");
-+			item_add_str("  %s", menu_is_empty(menu) ? "----" : "--->");
- 			return;
- 		}
- 	}
--- 
-1.8.2.1
+The following changes since commit f722406faae2d073cc1d01063d1123c35425939e:
+
+  Linux 3.10-rc1 (2013-05-11 17:14:08 -0700)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git rc-fixes
+
+for you to fetch changes up to f66ba560943ae21f5d1e505bad0a3591823b2b37:
+
+  package: Makefile: unbreak binrpm-pkg target (2013-05-16 09:46:45 +0200)
+
+----------------------------------------------------------------
+Luiz Capitulino (1):
+      package: Makefile: unbreak binrpm-pkg target
+
+ scripts/package/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
