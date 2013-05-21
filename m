@@ -1,49 +1,91 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-we0-f175.google.com ([74.125.82.175]:58585 "EHLO
-	mail-we0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752024Ab3ETQFy convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 20 May 2013 12:05:54 -0400
-Received: by mail-we0-f175.google.com with SMTP id p60so1563602wes.34
-        for <linux-kbuild@vger.kernel.org>; Mon, 20 May 2013 09:05:53 -0700 (PDT)
-Date: Mon, 20 May 2013 17:57:29 +0200
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH 1/2] scripts/config: replace hard-coded script name by a
- dynamic value
-Message-ID: <20130520155729.GE3164@free.fr>
-References: <cover.1368379475.git.chauplac@gmail.com>
- <9442eebf0117a0d975ca766ea84efec4ad58c6d0.1368379475.git.chauplac@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8BIT
-In-Reply-To: <9442eebf0117a0d975ca766ea84efec4ad58c6d0.1368379475.git.chauplac@gmail.com>
+Received: from mx10.gouders.net ([89.244.147.155]:42700 "EHLO mx10.gouders.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752862Ab3EUIyN (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 21 May 2013 04:54:13 -0400
+Received: from mx10.gouders.net (localhost [127.0.0.1])
+	by mx10.gouders.net (8.14.6/8.14.5) with ESMTP id r4L8sBrD011970
+	for <linux-kbuild@vger.kernel.org>; Tue, 21 May 2013 10:54:11 +0200
+From: Dirk Gouders <dirk@gouders.net>
+Subject: [PATCH] kconfig/menu.c: fix multiple references to expressions in menu_add_prop()
+Date: Tue, 21 May 2013 10:54:11 +0200
+Message-Id: <1369126451-11930-1-git-send-email-dirk@gouders.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Clement Chauplannaz <chauplac@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, mmarek@suse.cz, andi@firstfloor.org
+To: linux-kbuild@vger.kernel.org
 
-Clément, All,
+menu_add_prop() applies upper menus' visibilities to actual prompts
+by AND-ing the prompts visibilities with the upper menus ones.
 
-On 2013-05-12 21:08 +0200, Clement Chauplannaz spake thusly:
-> The script `config' prints its name in usage() function. It is currently
-> hard-coded to value `config'. However, the script may be reused under
-> a different name in contexts other than the Linux Kernel.
-> 
-> Replace the hard-coded value `config' by the name of the script at runtime.
-> 
-> Signed-off-by: Clement Chauplannaz <chauplac@gmail.com>
+This creates a further reference to the menu's visibilities and when
+the expression reduction functions do their work, they may remove or
+modify expressions that have multiple references, thus causing
+unpredictable side-effects.
 
-I've applied this in my tree in the branch yem-kconfig-for-next, for
-inclusion upstream when the 3.11 merge window opens. Thank you!
+The following example Kconfig constructs a case where this causes
+problems: a menu and a prompt which's visibilities depend on the same
+symbol.  When invoking mconf with this Kconfig and pressing "Z" we
+see a problem caused by a free'd expression still referenced by the
+menu's visibility:
 
-Regards,
-Yann E. MORIN.
+------------------------------------------------------------------------
+mainmenu "Kconfig Testing Configuration"
 
+config VISIBLE
+	def_bool n
+
+config Placeholder
+	bool "Place holder"
+
+menu "Invisible"
+	visible if VISIBLE
+
+config TEST_VAR
+	bool "Test option" if VISIBLE
+
+endmenu
+------------------------------------------------------------------------
+
+This patch fixes this problem by creating copies of the menu's
+visibility expressions before AND-ing them with the prompt's one.
+
+Signed-off-by: Dirk Gouders <dirk@gouders.net>
+---
+ scripts/kconfig/menu.c | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+index b5c7d90..567939c 100644
+--- a/scripts/kconfig/menu.c
++++ b/scripts/kconfig/menu.c
+@@ -143,14 +143,25 @@ struct property *menu_add_prop(enum prop_type type, char *prompt, struct expr *e
+ 
+ 		/* Apply all upper menus' visibilities to actual prompts. */
+ 		if(type == P_PROMPT) {
++			struct expr *dup_expr;
+ 			struct menu *menu = current_entry;
+ 
+ 			while ((menu = menu->parent) != NULL) {
+ 				if (!menu->visibility)
+ 					continue;
++				/*
++				 * Do not add a reference to the
++				 * menu's visibility expression but
++				 * use a copy of it.  Otherwise the
++				 * expression reduction functions
++				 * will modify expressions that have
++				 * multiple references which can
++				 * cause unwanted side-effects.
++				 */
++				dup_expr = expr_copy(menu->visibility);
++
+ 				prop->visible.expr
+-					= expr_alloc_and(prop->visible.expr,
+-							 menu->visibility);
++					= expr_alloc_and(prop->visible.expr, dup_expr);
+ 			}
+ 		}
+ 
 -- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+1.8.2.1
+
