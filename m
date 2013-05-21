@@ -1,97 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx10.gouders.net ([89.244.147.155]:42889 "EHLO mx10.gouders.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751648Ab3EUMgp (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 21 May 2013 08:36:45 -0400
-From: Dirk Gouders <dirk@gouders.net>
-Subject: Re: [PATCH] kconfig/menu.c: fix multiple references to expressions in menu_add_prop()
-In-Reply-To: <1369126451-11930-1-git-send-email-dirk@gouders.net> (Dirk
-	Gouders's message of "Tue, 21 May 2013 10:54:11 +0200")
-References: <1369126451-11930-1-git-send-email-dirk@gouders.net>
-Date: Tue, 21 May 2013 14:36:28 +0200
-Message-ID: <giwqqsmrw3.fsf@karga.hank.lab>
-MIME-Version: 1.0
-Content-Type: text/plain
+Received: from mailout1.samsung.com ([203.254.224.24]:51188 "EHLO
+	mailout1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751827Ab3EUWgz (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 21 May 2013 18:36:55 -0400
+Received: from epcpsbgr3.samsung.com
+ (u143.gpu120.samsung.co.kr [203.254.230.143])
+ by mailout1.samsung.com (Oracle Communications Messaging Server 7u4-24.01
+ (7.0.4.24.0) 64bit (built Nov 17 2011))
+ with ESMTP id <0MN6009U56SZUU40@mailout1.samsung.com> for
+ linux-kbuild@vger.kernel.org; Wed, 22 May 2013 07:36:54 +0900 (KST)
+Date: Tue, 21 May 2013 22:36:53 +0000 (GMT)
+From: EUNBONG SONG <eunb.song@samsung.com>
+Subject: kbuild: warning with cavium_octeon_defconfig
+Reply-to: eunb.song@samsung.com
+MIME-version: 1.0
+Content-transfer-encoding: base64
+Content-type: text/plain; charset=euc-kr
+MIME-version: 1.0
+Message-id: <25974545.244221369175813052.JavaMail.weblogic@epml11>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Jan Beulich <jbeulich@suse.com>
+To: mmarek@suse.cz
+Cc: linux-kbuild@vger.kernel.org, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "jogo@openwrt.org" <jogo@openwrt.org>
 
-CCing the original author of the code (commit 7ad1227818f09 "kconfig:
-fix undesirable side effect of adding "visible" menu attribute").
+DQpIZWxsby4gDQpFdmVyeSB0aW1lIGkgY29uZmlnIHdpdGggYXJjaC9taXBzL2NvbmZpZ3MvY2F2
+aXVtX29jdGVvbl9kZWZjb25maWcsIHRoZSBmb2xsb3dpbmcgd2FybmluZyBtZXNzYWdlcyBhcmUg
+c2hvd2VkLg0Kd2FybmluZzogKE1JUFNfU0VBRDMgJiYgUE1DX01TUCAmJiBDUFVfQ0FWSVVNX09D
+VEVPTikgc2VsZWN0cyBVU0JfRUhDSV9CSUdfRU5ESUFOX01NSU8gd2hpY2ggaGFzIHVubWV0IGRp
+cmVjdCBkZXBlbmRlbmNpZXMgKFVTQl9TVVBQT1JUICYmIFVTQiAmJiBVU0JfRUhDSV9IQ0QpDQp3
+YXJuaW5nOiAoTUlQU19TRUFEMyAmJiBQTUNfTVNQICYmIENQVV9DQVZJVU1fT0NURU9OKSBzZWxl
+Y3RzIFVTQl9FSENJX0JJR19FTkRJQU5fTU1JTyB3aGljaCBoYXMgdW5tZXQgZGlyZWN0IGRlcGVu
+ZGVuY2llcyAoVVNCX1NVUFBPUlQgJiYgVVNCICYmIFVTQl9FSENJX0hDRCkNCg0KDQpJIGd1ZXNz
+IGl0IGNhdXNlZCBieSBjb21taXQgaWQ6IDkyOTZkOTRkODM2NDllMWMyZjI1Yzg3ZGM0ZWFkOWMy
+YWIwNzMzMDUgDQoNClRoYW5rcy4=
 
-Dirk
 
-Dirk Gouders <dirk@gouders.net> writes:
-
-> menu_add_prop() applies upper menus' visibilities to actual prompts
-> by AND-ing the prompts visibilities with the upper menus ones.
->
-> This creates a further reference to the menu's visibilities and when
-> the expression reduction functions do their work, they may remove or
-> modify expressions that have multiple references, thus causing
-> unpredictable side-effects.
->
-> The following example Kconfig constructs a case where this causes
-> problems: a menu and a prompt which's visibilities depend on the same
-> symbol.  When invoking mconf with this Kconfig and pressing "Z" we
-> see a problem caused by a free'd expression still referenced by the
-> menu's visibility:
->
-> ------------------------------------------------------------------------
-> mainmenu "Kconfig Testing Configuration"
->
-> config VISIBLE
-> 	def_bool n
->
-> config Placeholder
-> 	bool "Place holder"
->
-> menu "Invisible"
-> 	visible if VISIBLE
->
-> config TEST_VAR
-> 	bool "Test option" if VISIBLE
->
-> endmenu
-> ------------------------------------------------------------------------
->
-> This patch fixes this problem by creating copies of the menu's
-> visibility expressions before AND-ing them with the prompt's one.
->
-> Signed-off-by: Dirk Gouders <dirk@gouders.net>
-> ---
->  scripts/kconfig/menu.c | 15 +++++++++++++--
->  1 file changed, 13 insertions(+), 2 deletions(-)
->
-> diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
-> index b5c7d90..567939c 100644
-> --- a/scripts/kconfig/menu.c
-> +++ b/scripts/kconfig/menu.c
-> @@ -143,14 +143,25 @@ struct property *menu_add_prop(enum prop_type type, char *prompt, struct expr *e
->  
->  		/* Apply all upper menus' visibilities to actual prompts. */
->  		if(type == P_PROMPT) {
-> +			struct expr *dup_expr;
->  			struct menu *menu = current_entry;
->  
->  			while ((menu = menu->parent) != NULL) {
->  				if (!menu->visibility)
->  					continue;
-> +				/*
-> +				 * Do not add a reference to the
-> +				 * menu's visibility expression but
-> +				 * use a copy of it.  Otherwise the
-> +				 * expression reduction functions
-> +				 * will modify expressions that have
-> +				 * multiple references which can
-> +				 * cause unwanted side-effects.
-> +				 */
-> +				dup_expr = expr_copy(menu->visibility);
-> +
->  				prop->visible.expr
-> -					= expr_alloc_and(prop->visible.expr,
-> -							 menu->visibility);
-> +					= expr_alloc_and(prop->visible.expr, dup_expr);
->  			}
->  		}
