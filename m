@@ -1,38 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mailout1.samsung.com ([203.254.224.24]:51188 "EHLO
-	mailout1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751827Ab3EUWgz (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 21 May 2013 18:36:55 -0400
-Received: from epcpsbgr3.samsung.com
- (u143.gpu120.samsung.co.kr [203.254.230.143])
- by mailout1.samsung.com (Oracle Communications Messaging Server 7u4-24.01
- (7.0.4.24.0) 64bit (built Nov 17 2011))
- with ESMTP id <0MN6009U56SZUU40@mailout1.samsung.com> for
- linux-kbuild@vger.kernel.org; Wed, 22 May 2013 07:36:54 +0900 (KST)
-Date: Tue, 21 May 2013 22:36:53 +0000 (GMT)
-From: EUNBONG SONG <eunb.song@samsung.com>
-Subject: kbuild: warning with cavium_octeon_defconfig
-Reply-to: eunb.song@samsung.com
-MIME-version: 1.0
-Content-transfer-encoding: base64
-Content-type: text/plain; charset=euc-kr
-MIME-version: 1.0
-Message-id: <25974545.244221369175813052.JavaMail.weblogic@epml11>
+Received: from cantor2.suse.de ([195.135.220.15]:46882 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1757451Ab3EWIP6 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 23 May 2013 04:15:58 -0400
+Message-ID: <519DD039.4030107@suse.cz>
+Date: Thu, 23 May 2013 10:15:53 +0200
+From: Michal Marek <mmarek@suse.cz>
+MIME-Version: 1.0
+Subject: Re: [PATCH] kbuild: Don't assume dts files live in arch/*/boot/dts
+References: <1368010744-11281-1-git-send-email-matthijs@stdin.nl> <518A6649.1020501@wwwdotorg.org> <20130518184101.GS25742@login.drsnuggles.stderr.nl>
+In-Reply-To: <20130518184101.GS25742@login.drsnuggles.stderr.nl>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mmarek@suse.cz
-Cc: linux-kbuild@vger.kernel.org, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "jogo@openwrt.org" <jogo@openwrt.org>
+To: Stephen Warren <swarren@wwwdotorg.org>, Grant Likely <grant.likely@linaro.org>, Rob Herring <rob.herring@calxeda.com>, linux-kbuild@vger.kernel.org, devicetree-discuss@lists.ozlabs.org, linux-kernel@vger.kernel.org, linux-mips@linux-mips.org, Stephen Warren <swarren@nvidia.com>
 
-DQpIZWxsby4gDQpFdmVyeSB0aW1lIGkgY29uZmlnIHdpdGggYXJjaC9taXBzL2NvbmZpZ3MvY2F2
-aXVtX29jdGVvbl9kZWZjb25maWcsIHRoZSBmb2xsb3dpbmcgd2FybmluZyBtZXNzYWdlcyBhcmUg
-c2hvd2VkLg0Kd2FybmluZzogKE1JUFNfU0VBRDMgJiYgUE1DX01TUCAmJiBDUFVfQ0FWSVVNX09D
-VEVPTikgc2VsZWN0cyBVU0JfRUhDSV9CSUdfRU5ESUFOX01NSU8gd2hpY2ggaGFzIHVubWV0IGRp
-cmVjdCBkZXBlbmRlbmNpZXMgKFVTQl9TVVBQT1JUICYmIFVTQiAmJiBVU0JfRUhDSV9IQ0QpDQp3
-YXJuaW5nOiAoTUlQU19TRUFEMyAmJiBQTUNfTVNQICYmIENQVV9DQVZJVU1fT0NURU9OKSBzZWxl
-Y3RzIFVTQl9FSENJX0JJR19FTkRJQU5fTU1JTyB3aGljaCBoYXMgdW5tZXQgZGlyZWN0IGRlcGVu
-ZGVuY2llcyAoVVNCX1NVUFBPUlQgJiYgVVNCICYmIFVTQl9FSENJX0hDRCkNCg0KDQpJIGd1ZXNz
-IGl0IGNhdXNlZCBieSBjb21taXQgaWQ6IDkyOTZkOTRkODM2NDllMWMyZjI1Yzg3ZGM0ZWFkOWMy
-YWIwNzMzMDUgDQoNClRoYW5rcy4=
+On 18.5.2013 20:41, Matthijs Kooijman wrote:
+> Hi Michal,
+> 
+> On Wed, May 08, 2013 at 08:50:49AM -0600, Stephen Warren wrote:
+>> On 05/08/2013 04:59 AM, Matthijs Kooijman wrote:
+>>> In commit b40b25ff (kbuild: always run gcc -E on *.dts, remove cmd_dtc_cpp),
+>>> dts building was changed to always use the C preprocessor. This meant
+>>> that the .dts file passed to dtc is not the original, but the
+>>> preprocessed one.
+>>>
+>>> When compiling with a separate build directory (i.e., with O=), this
+>>> preprocessed file will not live in the same directory as the original.
+>>> When the .dts file includes .dtsi files, dtc will look for them in the
+>>> build directory, not in the source directory and compilation will fail.
+>>>
+>>> The commit referenced above tried to fix this by passing arch/*/boot/dts
+>>> as an include path to dtc. However, for mips, the .dts files are not in
+>>> this directory, so dts compilation on mips breaks for some targets.
+>>>
+>>> Instead of hardcoding this particular include path, this commit just
+>>> uses the directory of the .dts file that is being compiled, which
+>>> effectively restores the previous behaviour wrt includes. For most .dts
+>>> files, this path is just the same as the previous hardcoded
+>>> arch/*/boot/dts path.
+>>>
+>>> This was tested on a mips (rt3052) and an arm (bcm2835) target.
+>>
+>> Reviewed-by: Stephen Warren <swarren@nvidia.com>
+> 
+> Did this patch look ok to you? If so, could you pick it up and send it
+> over to Linus for 3.10 (or should I send it directly)?
 
+I applied the patch to kbuild.git#rc-fixes now.
 
+Michal
