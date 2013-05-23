@@ -1,53 +1,92 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:46882 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757451Ab3EWIP6 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 23 May 2013 04:15:58 -0400
-Message-ID: <519DD039.4030107@suse.cz>
-Date: Thu, 23 May 2013 10:15:53 +0200
-From: Michal Marek <mmarek@suse.cz>
+Received: from mail-we0-f175.google.com ([74.125.82.175]:33867 "EHLO
+	mail-we0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751438Ab3EWI22 (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 23 May 2013 04:28:28 -0400
+Received: by mail-we0-f175.google.com with SMTP id p60so1960291wes.20
+        for <linux-kbuild@vger.kernel.org>; Thu, 23 May 2013 01:28:27 -0700 (PDT)
+Date: Thu, 23 May 2013 10:28:23 +0200
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: Re: [PATCH] kconfig/menu.c: fix multiple references to expressions
+ in menu_add_prop()
+Message-ID: <20130523082823.GF3373@free.fr>
+References: <1369126451-11930-1-git-send-email-dirk@gouders.net>
 MIME-Version: 1.0
-Subject: Re: [PATCH] kbuild: Don't assume dts files live in arch/*/boot/dts
-References: <1368010744-11281-1-git-send-email-matthijs@stdin.nl> <518A6649.1020501@wwwdotorg.org> <20130518184101.GS25742@login.drsnuggles.stderr.nl>
-In-Reply-To: <20130518184101.GS25742@login.drsnuggles.stderr.nl>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1369126451-11930-1-git-send-email-dirk@gouders.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Stephen Warren <swarren@wwwdotorg.org>, Grant Likely <grant.likely@linaro.org>, Rob Herring <rob.herring@calxeda.com>, linux-kbuild@vger.kernel.org, devicetree-discuss@lists.ozlabs.org, linux-kernel@vger.kernel.org, linux-mips@linux-mips.org, Stephen Warren <swarren@nvidia.com>
+To: Dirk Gouders <dirk@gouders.net>
+Cc: linux-kbuild@vger.kernel.org, Jan Beulich <jbeulich@suse.com>
 
-On 18.5.2013 20:41, Matthijs Kooijman wrote:
-> Hi Michal,
+Dirk, All,
+
+On 2013-05-21 10:54 +0200, Dirk Gouders spake thusly:
+> menu_add_prop() applies upper menus' visibilities to actual prompts
+> by AND-ing the prompts visibilities with the upper menus ones.
+[--SNIP--]
+> This patch fixes this problem by creating copies of the menu's
+> visibility expressions before AND-ing them with the prompt's one.
 > 
-> On Wed, May 08, 2013 at 08:50:49AM -0600, Stephen Warren wrote:
->> On 05/08/2013 04:59 AM, Matthijs Kooijman wrote:
->>> In commit b40b25ff (kbuild: always run gcc -E on *.dts, remove cmd_dtc_cpp),
->>> dts building was changed to always use the C preprocessor. This meant
->>> that the .dts file passed to dtc is not the original, but the
->>> preprocessed one.
->>>
->>> When compiling with a separate build directory (i.e., with O=), this
->>> preprocessed file will not live in the same directory as the original.
->>> When the .dts file includes .dtsi files, dtc will look for them in the
->>> build directory, not in the source directory and compilation will fail.
->>>
->>> The commit referenced above tried to fix this by passing arch/*/boot/dts
->>> as an include path to dtc. However, for mips, the .dts files are not in
->>> this directory, so dts compilation on mips breaks for some targets.
->>>
->>> Instead of hardcoding this particular include path, this commit just
->>> uses the directory of the .dts file that is being compiled, which
->>> effectively restores the previous behaviour wrt includes. For most .dts
->>> files, this path is just the same as the previous hardcoded
->>> arch/*/boot/dts path.
->>>
->>> This was tested on a mips (rt3052) and an arm (bcm2835) target.
->>
->> Reviewed-by: Stephen Warren <swarren@nvidia.com>
+> Signed-off-by: Dirk Gouders <dirk@gouders.net>
+> ---
+>  scripts/kconfig/menu.c | 15 +++++++++++++--
+>  1 file changed, 13 insertions(+), 2 deletions(-)
 > 
-> Did this patch look ok to you? If so, could you pick it up and send it
-> over to Linus for 3.10 (or should I send it directly)?
+> diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+> index b5c7d90..567939c 100644
+> --- a/scripts/kconfig/menu.c
+> +++ b/scripts/kconfig/menu.c
+> @@ -143,14 +143,25 @@ struct property *menu_add_prop(enum prop_type type, char *prompt, struct expr *e
+>  
+>  		/* Apply all upper menus' visibilities to actual prompts. */
+>  		if(type == P_PROMPT) {
+> +			struct expr *dup_expr;
 
-I applied the patch to kbuild.git#rc-fixes now.
+I'd rather this variable defined below:
 
-Michal
+>  			struct menu *menu = current_entry;
+>  
+>  			while ((menu = menu->parent) != NULL) {
+
+... here, in the block where it is used, since it is not relevant
+outside this block.
+
+>  				if (!menu->visibility)
+>  					continue;
+> +				/*
+> +				 * Do not add a reference to the
+> +				 * menu's visibility expression but
+> +				 * use a copy of it.  Otherwise the
+> +				 * expression reduction functions
+> +				 * will modify expressions that have
+> +				 * multiple references which can
+> +				 * cause unwanted side-effects.
+> +				 */
+> +				dup_expr = expr_copy(menu->visibility);
+
+I wonder if/where this should be de-allocated.
+
+> +
+>  				prop->visible.expr
+> -					= expr_alloc_and(prop->visible.expr,
+> -							 menu->visibility);
+> +					= expr_alloc_and(prop->visible.expr, dup_expr);
+>  			}
+>  		}
+>  
+
+I'm testing it right now. Thanks!
+
+Regards,
+Yann E. MORIN.
+
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
