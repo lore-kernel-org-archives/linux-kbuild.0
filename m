@@ -1,92 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-we0-f175.google.com ([74.125.82.175]:33867 "EHLO
-	mail-we0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751438Ab3EWI22 (ORCPT
+Received: from mail-pa0-f47.google.com ([209.85.220.47]:43684 "EHLO
+	mail-pa0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757890Ab3EWJw0 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 23 May 2013 04:28:28 -0400
-Received: by mail-we0-f175.google.com with SMTP id p60so1960291wes.20
-        for <linux-kbuild@vger.kernel.org>; Thu, 23 May 2013 01:28:27 -0700 (PDT)
-Date: Thu, 23 May 2013 10:28:23 +0200
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH] kconfig/menu.c: fix multiple references to expressions
- in menu_add_prop()
-Message-ID: <20130523082823.GF3373@free.fr>
-References: <1369126451-11930-1-git-send-email-dirk@gouders.net>
+	Thu, 23 May 2013 05:52:26 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1369126451-11930-1-git-send-email-dirk@gouders.net>
+Date: Thu, 23 May 2013 11:52:25 +0200
+Message-ID: <CAMuHMdXAGBU97pg2SzoZteFk9fd7FOpOVtu=buZ40z+SwRpE6Q@mail.gmail.com>
+Subject: Blocking allmodconfig with missing defaults (was: Re: kbuild: Fix
+ missing '\n' for NEW symbols in yes "" | make oldconfig >conf.new)
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dirk Gouders <dirk@gouders.net>
-Cc: linux-kbuild@vger.kernel.org, Jan Beulich <jbeulich@suse.com>
+To: Michal Marek <mmarek@suse.cz>, Ben Hutchings <bhutchings@solarflare.com>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-Dirk, All,
+On Wed, Feb 27, 2013 at 9:37 PM, Linux Kernel Mailing List
+<linux-kernel@vger.kernel.org> wrote:
+> Gitweb:     http://git.kernel.org/linus/;a=commit;h=62dc989921df2a98d1a73aacd085abe941cb9828
+>
+>     According to Documentation/kbuild/kconfig.txt, the commands:
+>
+>         yes "" | make oldconfig >conf.new
+>         grep "(NEW)" conf.new
+>
+>     should list the new config symbols with their default values.
 
-On 2013-05-21 10:54 +0200, Dirk Gouders spake thusly:
-> menu_add_prop() applies upper menus' visibilities to actual prompts
-> by AND-ing the prompts visibilities with the upper menus ones.
-[--SNIP--]
-> This patch fixes this problem by creating copies of the menu's
-> visibility expressions before AND-ing them with the prompt's one.
-> 
-> Signed-off-by: Dirk Gouders <dirk@gouders.net>
-> ---
->  scripts/kconfig/menu.c | 15 +++++++++++++--
->  1 file changed, 13 insertions(+), 2 deletions(-)
-> 
-> diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
-> index b5c7d90..567939c 100644
-> --- a/scripts/kconfig/menu.c
-> +++ b/scripts/kconfig/menu.c
-> @@ -143,14 +143,25 @@ struct property *menu_add_prop(enum prop_type type, char *prompt, struct expr *e
->  
->  		/* Apply all upper menus' visibilities to actual prompts. */
->  		if(type == P_PROMPT) {
-> +			struct expr *dup_expr;
+There are other cases where this is not working.
+If there are int or hex symbols without a default value, "allmodconfig",
+"allyesconfig", "allnoconfig", and "randconfig" fill in empty string values,
+causing a subsequent build (which does oldconfig) to wait for user input.
 
-I'd rather this variable defined below:
+This is easy to reproduce:
+    make ARCH=h8300 allmodconfig
+    make ARCH=h8300 oldconfig
 
->  			struct menu *menu = current_entry;
->  
->  			while ((menu = menu->parent) != NULL) {
+Should kconfig generate default values for these cases?
+Should all int/hex symbols provide default values? If yes, I think
+kconfig should
+complain about missing defaults.
 
-... here, in the block where it is used, since it is not relevant
-outside this block.
+Gr{oetje,eeting}s,
 
->  				if (!menu->visibility)
->  					continue;
-> +				/*
-> +				 * Do not add a reference to the
-> +				 * menu's visibility expression but
-> +				 * use a copy of it.  Otherwise the
-> +				 * expression reduction functions
-> +				 * will modify expressions that have
-> +				 * multiple references which can
-> +				 * cause unwanted side-effects.
-> +				 */
-> +				dup_expr = expr_copy(menu->visibility);
+                        Geert
 
-I wonder if/where this should be de-allocated.
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
-> +
->  				prop->visible.expr
-> -					= expr_alloc_and(prop->visible.expr,
-> -							 menu->visibility);
-> +					= expr_alloc_and(prop->visible.expr, dup_expr);
->  			}
->  		}
->  
-
-I'm testing it right now. Thanks!
-
-Regards,
-Yann E. MORIN.
-
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
