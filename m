@@ -1,47 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:51169 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1758102Ab3EWKgW (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 23 May 2013 06:36:22 -0400
-Message-ID: <519DF122.5020802@suse.cz>
-Date: Thu, 23 May 2013 12:36:18 +0200
-From: Michal Marek <mmarek@suse.cz>
+Received: from mail-pd0-f179.google.com ([209.85.192.179]:34970 "EHLO
+	mail-pd0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751210Ab3E1KQG (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 28 May 2013 06:16:06 -0400
+Received: by mail-pd0-f179.google.com with SMTP id q11so7427894pdj.24
+        for <linux-kbuild@vger.kernel.org>; Tue, 28 May 2013 03:16:05 -0700 (PDT)
+From: zzs0213@gmail.com
+Subject: [PATCH] let kbuild mkdir for dir/file.o
+Date: Tue, 28 May 2013 18:14:20 +0800
+Message-Id: <51a483e4.cfaf420a.3b33.5494@mx.google.com>
 MIME-Version: 1.0
-Subject: Re: Blocking allmodconfig with missing defaults (was: Re: kbuild:
- Fix missing '\n' for NEW symbols in yes "" | make oldconfig >conf.new)
-References: <CAMuHMdXAGBU97pg2SzoZteFk9fd7FOpOVtu=buZ40z+SwRpE6Q@mail.gmail.com>
-In-Reply-To: <CAMuHMdXAGBU97pg2SzoZteFk9fd7FOpOVtu=buZ40z+SwRpE6Q@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Ben Hutchings <bhutchings@solarflare.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: =?UTF-8?q?=E5=BC=A0=E5=BF=A0=E5=B1=B1?= <zzs213@126.com>, =?UTF-8?q?=E5=BC=A0=E5=BF=A0=E5=B1=B1?= <zzs0213@gmail.com>
 
-On 23.5.2013 11:52, Geert Uytterhoeven wrote:
-> On Wed, Feb 27, 2013 at 9:37 PM, Linux Kernel Mailing List
-> <linux-kernel@vger.kernel.org> wrote:
->> Gitweb:     http://git.kernel.org/linus/;a=commit;h=62dc989921df2a98d1a73aacd085abe941cb9828
->>
->>     According to Documentation/kbuild/kconfig.txt, the commands:
->>
->>         yes "" | make oldconfig >conf.new
->>         grep "(NEW)" conf.new
->>
->>     should list the new config symbols with their default values.
-> 
-> There are other cases where this is not working.
-> If there are int or hex symbols without a default value, "allmodconfig",
-> "allyesconfig", "allnoconfig", and "randconfig" fill in empty string values,
-> causing a subsequent build (which does oldconfig) to wait for user input.
-> 
-> This is easy to reproduce:
->     make ARCH=h8300 allmodconfig
->     make ARCH=h8300 oldconfig
-> 
-> Should kconfig generate default values for these cases?
+From: 张忠山 <zzs213@126.com>
 
-Yes, I think that we should generate a default of 0 / 0x0 or the lower
-bound of the range, if specified.
+when obj-y += dir/file.o
+the $(obj)/dir not created, this patch fix this
 
-Michal
+this bug caused by commit
+  f5fb976520a53f45f8bbf2e851f16b3b5558d485
+
+Signed-off-by: 张忠山 <zzs0213@gmail.com>
+---
+ scripts/Makefile.lib |    3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index 51bb3de..6bae5a9 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -63,7 +63,8 @@ multi-objs   := $(multi-objs-y) $(multi-objs-m)
+ subdir-obj-y := $(filter %/built-in.o, $(obj-y))
+ 
+ # $(obj-dirs) is a list of directories that contain object files
+-obj-dirs := $(dir $(multi-objs) $(subdir-obj-y))
++__subdir-obj-y := $(foreach o,$(obj-y),$(if $(filter-out $(o),$(notdir $(o))),$(o)))
++obj-dirs := $(dir $(multi-objs) $(__subdir-obj-y))
+ 
+ # Replace multi-part objects by their individual parts, look at local dir only
+ real-objs-y := $(foreach m, $(filter-out $(subdir-obj-y), $(obj-y)), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y))),$($(m:.o=-objs)) $($(m:.o=-y)),$(m))) $(extra-y)
+-- 
+1.7.9.5
+
