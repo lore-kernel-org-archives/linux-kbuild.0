@@ -1,59 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:41830 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:44394 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S965341Ab3E2TTm (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 29 May 2013 15:19:42 -0400
-Subject: Dependencies in the HID subsystem
-From: Jean Delvare <jdelvare@suse.de>
-Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 29 May 2013 21:19:34 +0200
-Message-ID: <1369855174.4306.198.camel@chaos.site>
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+	id S966896Ab3E2Uw6 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 29 May 2013 16:52:58 -0400
+Date: Wed, 29 May 2013 22:52:56 +0200 (CEST)
+From: Jiri Kosina <jkosina@suse.cz>
+Subject: Re: Dependencies in the HID subsystem
+In-Reply-To: <1369855174.4306.198.camel@chaos.site>
+Message-ID: <alpine.LNX.2.00.1305292245090.30576@pobox.suse.cz>
+References: <1369855174.4306.198.camel@chaos.site>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jiri Kosina <jkosina@suse.cz>, Michal Marek <mmarek@suse.cz>
-Cc: linux-input@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Jean Delvare <jdelvare@suse.de>
+Cc: Michal Marek <mmarek@suse.cz>, linux-input@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-Hi all,
+On Wed, 29 May 2013, Jean Delvare wrote:
 
-I am worried and confused by some Kconfig dependencies in the HID
-subsystem.
+> I am worried and confused by some Kconfig dependencies in the HID
+> subsystem.
+> 
+> There are 11 HID device drivers which are defined in drivers/hid/Kconfig
+> with:
+> 
+> 	tristate "..." if EXPERT
+> 	default !EXPERT
+> 
+> Unless EXPERT is enabled (and that's not the default), these driver
+> entries are hidden and automatically selected. If CONFIG_HID=m, they are
+> selected as modules. If CONFIG_HID=y, they are built into the kernel. So
+> it is impossible to have CONFIG_HID=y and build these device drivers as
+> modules - as device drivers typically are.
+> 
+> I would like to understand the reasoning behind this complexity. What is
+> so special about these 11 drivers, that we can't just let the (kernel
+> configuring) user chose if he/she wants them and in what form?
 
-There are 11 HID device drivers which are defined in drivers/hid/Kconfig
-with:
+That's quite a old story with some history behind. Linus himself 
+originally requested it, then much later asked the same question you did. 
+See some background here:
 
-	tristate "..." if EXPERT
-	default !EXPERT
+	https://lkml.org/lkml/2010/5/20/227
 
-Unless EXPERT is enabled (and that's not the default), these driver
-entries are hidden and automatically selected. If CONFIG_HID=m, they are
-selected as modules. If CONFIG_HID=y, they are built into the kernel. So
-it is impossible to have CONFIG_HID=y and build these device drivers as
-modules - as device drivers typically are.
+The thing is, that things indeed have changed quite a bit since then. We 
+are no longer in a situation that the generic driver would serve 99.99% of 
+the world and the specific drivers would be just quirks.
 
-I would like to understand the reasoning behind this complexity. What is
-so special about these 11 drivers, that we can't just let the (kernel
-configuring) user chose if he/she wants them and in what form?
+> Wouldn't "default !EXPERT" and a good old "If unsure, say Y" in the help
+> text be enough?
 
-Wouldn't "default !EXPERT" and a good old "If unsure, say Y" in the help
-text be enough?
+Normally, yes. This was all introduced back when separating out all the 
+messy quirks from generic hid driver into sub-drivers for maintaing 
+sort-of backwards compatibility and avoid confusion.
 
-I would be fine with "tristate ... if EXPERT" if I still had the choice
-between built-in or modular when both are possible. Is there any chance
-to change the meaning of this construct to that?
+> Also I find it unpleasant that this construct completely hides the
+> option from the user, as if it did not exist, except if other options
+> depend on it. This is inconsistent and makes it difficult for the user
+> to know whether a specific kernel version includes a given driver or not
+> (one has to check .config afterward to know the answer.)
 
-Also I find it unpleasant that this construct completely hides the
-option from the user, as if it did not exist, except if other options
-depend on it. This is inconsistent and makes it difficult for the user
-to know whether a specific kernel version includes a given driver or not
-(one has to check .config afterward to know the answer.)
+Yes. Again, purely historical reasons.
 
-Put in short, I don't like the way things are today and would welcome
-changes in this area.
+> Put in short, I don't like the way things are today and would welcome
+> changes in this area.
 
-Thanks,
+As things have changed a lot since 2.6.28, we can try to put things more 
+in line now for 3.11 or so.
+
 -- 
-Jean Delvare
-Suse L3
-
+Jiri Kosina
+SUSE Labs
