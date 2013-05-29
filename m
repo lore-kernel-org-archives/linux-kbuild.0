@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f51.google.com ([74.125.82.51]:35708 "EHLO
-	mail-wg0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S935271Ab3E2WZG (ORCPT
+Received: from mail-wg0-f41.google.com ([74.125.82.41]:56346 "EHLO
+	mail-wg0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S935281Ab3E2WZI (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 29 May 2013 18:25:06 -0400
+	Wed, 29 May 2013 18:25:08 -0400
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: [PATCH 1/3] scripts/config: fix assignment of parameters for short version of --*-after options
-Date: Thu, 30 May 2013 00:24:53 +0200
-Message-Id: <57a9c7609d7418ce75324df38f66cd7d937a77cb.1369866004.git.yann.morin.1998@free.fr>
+Subject: [PATCH 2/3] mconf: handle keys in empty dialogs
+Date: Thu, 30 May 2013 00:24:54 +0200
+Message-Id: <063f4661fde8c03c4c03f8a205071a52691c152e.1369866004.git.yann.morin.1998@free.fr>
 In-Reply-To: <cover.1369866004.git.yann.morin.1998@free.fr>
 References: <cover.1369866004.git.yann.morin.1998@free.fr>
 In-Reply-To: <cover.1369866004.git.yann.morin.1998@free.fr>
@@ -15,41 +15,69 @@ References: <cover.1369866004.git.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Clement Chauplannaz <chauplac@gmail.com>, "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Dirk Gouders <dirk@gouders.net>, "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-From: Clement Chauplannaz <chauplac@gmail.com>
+From: Dirk Gouders <dirk@gouders.net>
 
-When --*-after options are used, two parameters are parsed from the
-command-line before the adequate function is called:
-  - the `before' option, after which the new option will be inserted,
-  - the name of the option to enable/disable/modularise.
+When entering an empty dialog, using the movement keys resulted in
+unexpected characters beeing displayed, other keys like "z" and "h"
+did not work as expected.
 
-With the short version of --*-after options (namely -E, -D, -M), the
-parsing step is not performed which leads to processing unset variables.
+This patch handles the movement keys as well as other keys, especially
+"z", "h" and "/".
 
-Add options -E, -D, -M to the test that triggers assignment of parameters
-for --*-after options.
-
-Signed-off-by: Clement Chauplannaz <chauplac@gmail.com>
-Acked-by: Andi Kleen <ak@linux.intel.com>
-Signed-off-by: Yann E. MORIN <yann.morin.1998@free.fr>
+Signed-off-by: Dirk Gouders <dirk@gouders.net>
+[yann.morin.1998@free.fr: keep lines <80 chars, so reorder test]
+Tested-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Reviewed-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
 ---
- scripts/config | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ scripts/kconfig/lxdialog/menubox.c |  9 +++++----
+ scripts/kconfig/mconf.c            | 11 ++++++-----
+ 2 files changed, 11 insertions(+), 9 deletions(-)
 
-diff --git a/scripts/config b/scripts/config
-index bb4d3de..a65ecbb 100755
---- a/scripts/config
-+++ b/scripts/config
-@@ -105,7 +105,7 @@ while [ "$1" != "" ] ; do
- 		;;
- 	--refresh)
- 		;;
--	--*-after)
-+	--*-after|-E|-D|-M)
- 		checkarg "$1"
- 		A=$ARG
- 		checkarg "$2"
+diff --git a/scripts/kconfig/lxdialog/menubox.c b/scripts/kconfig/lxdialog/menubox.c
+index 48d382e..38cd69c 100644
+--- a/scripts/kconfig/lxdialog/menubox.c
++++ b/scripts/kconfig/lxdialog/menubox.c
+@@ -303,10 +303,11 @@ do_resize:
+ 				}
+ 		}
+ 
+-		if (i < max_choice ||
+-		    key == KEY_UP || key == KEY_DOWN ||
+-		    key == '-' || key == '+' ||
+-		    key == KEY_PPAGE || key == KEY_NPAGE) {
++		if (item_count() != 0 &&
++		    (i < max_choice ||
++		     key == KEY_UP || key == KEY_DOWN ||
++		     key == '-' || key == '+' ||
++		     key == KEY_PPAGE || key == KEY_NPAGE)) {
+ 			/* Remove highligt of current item */
+ 			print_item(scroll + choice, choice, FALSE);
+ 
+diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
+index 387dc8d..a69cbd7 100644
+--- a/scripts/kconfig/mconf.c
++++ b/scripts/kconfig/mconf.c
+@@ -670,11 +670,12 @@ static void conf(struct menu *menu, struct menu *active_menu)
+ 				  active_menu, &s_scroll);
+ 		if (res == 1 || res == KEY_ESC || res == -ERRDISPLAYTOOSMALL)
+ 			break;
+-		if (!item_activate_selected())
+-			continue;
+-		if (!item_tag())
+-			continue;
+-
++		if (item_count() != 0) {
++			if (!item_activate_selected())
++				continue;
++			if (!item_tag())
++				continue;
++		}
+ 		submenu = item_data();
+ 		active_menu = item_data();
+ 		if (submenu)
 -- 
 1.8.1.2
 
