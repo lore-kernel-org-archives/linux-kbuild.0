@@ -1,58 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ie0-f172.google.com ([209.85.223.172]:35304 "EHLO
-	mail-ie0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S966188Ab3E2WXj (ORCPT
+Received: from mail-wg0-f48.google.com ([74.125.82.48]:36498 "EHLO
+	mail-wg0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S935270Ab3E2WZE (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 29 May 2013 18:23:39 -0400
-MIME-Version: 1.0
-In-Reply-To: <alpine.LNX.2.00.1305292245090.30576@pobox.suse.cz>
-References: <1369855174.4306.198.camel@chaos.site>
-	<alpine.LNX.2.00.1305292245090.30576@pobox.suse.cz>
-Date: Thu, 30 May 2013 00:23:38 +0200
-Message-ID: <CANq1E4SPsF1SXC1Buh+VgK1MJ+LPKwQOqVk+xfA0oYqw7ptdqw@mail.gmail.com>
-Subject: Re: Dependencies in the HID subsystem
-From: David Herrmann <dh.herrmann@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+	Wed, 29 May 2013 18:25:04 -0400
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: [pull request v2] Pull request for branch yem-kconfig-rc-fixes
+Date: Thu, 30 May 2013 00:24:52 +0200
+Message-Id: <cover.1369866004.git.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jiri Kosina <jkosina@suse.cz>
-Cc: Jean Delvare <jdelvare@suse.de>, Michal Marek <mmarek@suse.cz>, "open list:HID CORE LAYER" <linux-input@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, "Yann E. MORIN" <yann.morin.1998@free.fr>, Dirk Gouders <dirk@gouders.net>, Clement Chauplannaz <chauplac@gmail.com>
 
-Hi
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-On Wed, May 29, 2013 at 10:52 PM, Jiri Kosina <jkosina@suse.cz> wrote:
-> On Wed, 29 May 2013, Jean Delvare wrote:
->
->> I am worried and confused by some Kconfig dependencies in the HID
->> subsystem.
->>
->> There are 11 HID device drivers which are defined in drivers/hid/Kconfig
->> with:
->>
->>       tristate "..." if EXPERT
->>       default !EXPERT
->>
->> Unless EXPERT is enabled (and that's not the default), these driver
->> entries are hidden and automatically selected. If CONFIG_HID=m, they are
->> selected as modules. If CONFIG_HID=y, they are built into the kernel. So
->> it is impossible to have CONFIG_HID=y and build these device drivers as
->> modules - as device drivers typically are.
->>
->> I would like to understand the reasoning behind this complexity. What is
->> so special about these 11 drivers, that we can't just let the (kernel
->> configuring) user chose if he/she wants them and in what form?
+Hello Michal, All,
 
-For several reason I recommend CONFIG_EXPERT for all users, anyway.
-But apart from that, what's wrong with "default y" and dropping any
-CONFIG_EXPERT dependency? We can still keep the "tristate '..' if
-EXPERT".
+Please pull these three rc-fixes:
+  - fix key handling in empty menus in mconf
+  - fix reference to eliminated duplicate expression in kconfig
+  - fix scripts/config wrt short --*-after options
 
-The CONFIG_EXPERT descriptions says "this option allows certain base
-kernel options and settings to be disabled or tweaked". This really
-doesn't say anything about "disable any non-standard options if this
-is selected". So why do we default to "n" if CONFIG_EXPERT is
-selected? This always bothered me because I don't expect the config to
-change if I select it.
+Changes v1 -> v2:
+  - add fix for eliminated dups in menu.c
+  - fix >80 chars in key handling fix
 
-Cheers
-David
+Regards,
+Yann E. MORIN
+
+
+The following changes since commit f722406faae2d073cc1d01063d1123c35425939e:
+
+  Linux 3.10-rc1 (2013-05-11 17:14:08 -0700)
+
+are available in the git repository at:
+
+  git://gitorious.org/linux-kconfig/linux-kconfig.git yem-kconfig-rc-fixes
+
+for you to fetch changes up to e983b7b17ad1a978e954e6aaa62cf12bfc747883:
+
+  kconfig/menu.c: fix multiple references to expressions in menu_add_prop() (2013-05-30 00:14:01 +0200)
+
+----------------------------------------------------------------
+Clement Chauplannaz (1):
+      scripts/config: fix assignment of parameters for short version of --*-after options
+
+Dirk Gouders (2):
+      mconf: handle keys in empty dialogs
+      kconfig/menu.c: fix multiple references to expressions in menu_add_prop()
+
+ scripts/config                     |  2 +-
+ scripts/kconfig/lxdialog/menubox.c |  9 +++++----
+ scripts/kconfig/mconf.c            | 11 ++++++-----
+ scripts/kconfig/menu.c             | 15 ++++++++++++++-
+ 4 files changed, 26 insertions(+), 11 deletions(-)
+
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
