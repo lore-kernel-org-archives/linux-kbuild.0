@@ -1,65 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f48.google.com ([74.125.82.48]:36498 "EHLO
-	mail-wg0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S935270Ab3E2WZE (ORCPT
+Received: from mail-wg0-f51.google.com ([74.125.82.51]:35708 "EHLO
+	mail-wg0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S935271Ab3E2WZG (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 29 May 2013 18:25:04 -0400
+	Wed, 29 May 2013 18:25:06 -0400
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: [pull request v2] Pull request for branch yem-kconfig-rc-fixes
-Date: Thu, 30 May 2013 00:24:52 +0200
-Message-Id: <cover.1369866004.git.yann.morin.1998@free.fr>
+Subject: [PATCH 1/3] scripts/config: fix assignment of parameters for short version of --*-after options
+Date: Thu, 30 May 2013 00:24:53 +0200
+Message-Id: <57a9c7609d7418ce75324df38f66cd7d937a77cb.1369866004.git.yann.morin.1998@free.fr>
+In-Reply-To: <cover.1369866004.git.yann.morin.1998@free.fr>
+References: <cover.1369866004.git.yann.morin.1998@free.fr>
+In-Reply-To: <cover.1369866004.git.yann.morin.1998@free.fr>
+References: <cover.1369866004.git.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, "Yann E. MORIN" <yann.morin.1998@free.fr>, Dirk Gouders <dirk@gouders.net>, Clement Chauplannaz <chauplac@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Clement Chauplannaz <chauplac@gmail.com>, "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+From: Clement Chauplannaz <chauplac@gmail.com>
 
-Hello Michal, All,
+When --*-after options are used, two parameters are parsed from the
+command-line before the adequate function is called:
+  - the `before' option, after which the new option will be inserted,
+  - the name of the option to enable/disable/modularise.
 
-Please pull these three rc-fixes:
-  - fix key handling in empty menus in mconf
-  - fix reference to eliminated duplicate expression in kconfig
-  - fix scripts/config wrt short --*-after options
+With the short version of --*-after options (namely -E, -D, -M), the
+parsing step is not performed which leads to processing unset variables.
 
-Changes v1 -> v2:
-  - add fix for eliminated dups in menu.c
-  - fix >80 chars in key handling fix
+Add options -E, -D, -M to the test that triggers assignment of parameters
+for --*-after options.
 
-Regards,
-Yann E. MORIN
+Signed-off-by: Clement Chauplannaz <chauplac@gmail.com>
+Acked-by: Andi Kleen <ak@linux.intel.com>
+Signed-off-by: Yann E. MORIN <yann.morin.1998@free.fr>
+---
+ scripts/config | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-
-The following changes since commit f722406faae2d073cc1d01063d1123c35425939e:
-
-  Linux 3.10-rc1 (2013-05-11 17:14:08 -0700)
-
-are available in the git repository at:
-
-  git://gitorious.org/linux-kconfig/linux-kconfig.git yem-kconfig-rc-fixes
-
-for you to fetch changes up to e983b7b17ad1a978e954e6aaa62cf12bfc747883:
-
-  kconfig/menu.c: fix multiple references to expressions in menu_add_prop() (2013-05-30 00:14:01 +0200)
-
-----------------------------------------------------------------
-Clement Chauplannaz (1):
-      scripts/config: fix assignment of parameters for short version of --*-after options
-
-Dirk Gouders (2):
-      mconf: handle keys in empty dialogs
-      kconfig/menu.c: fix multiple references to expressions in menu_add_prop()
-
- scripts/config                     |  2 +-
- scripts/kconfig/lxdialog/menubox.c |  9 +++++----
- scripts/kconfig/mconf.c            | 11 ++++++-----
- scripts/kconfig/menu.c             | 15 ++++++++++++++-
- 4 files changed, 26 insertions(+), 11 deletions(-)
-
+diff --git a/scripts/config b/scripts/config
+index bb4d3de..a65ecbb 100755
+--- a/scripts/config
++++ b/scripts/config
+@@ -105,7 +105,7 @@ while [ "$1" != "" ] ; do
+ 		;;
+ 	--refresh)
+ 		;;
+-	--*-after)
++	--*-after|-E|-D|-M)
+ 		checkarg "$1"
+ 		A=$ARG
+ 		checkarg "$2"
 -- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+1.8.1.2
+
