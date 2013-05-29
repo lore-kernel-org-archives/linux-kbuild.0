@@ -1,58 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from nat28.tlf.novell.com ([130.57.49.28]:47922 "EHLO
-	nat28.tlf.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S965495Ab3E2MTA convert rfc822-to-8bit (ORCPT
-	<rfc822;groupwise-linux-kbuild@vger.kernel.org:3:1>);
-	Wed, 29 May 2013 08:19:00 -0400
-Message-Id: <51A60E5002000078000D9978@nat28.tlf.novell.com>
-Date: Wed, 29 May 2013 13:18:56 +0100
-From: "Jan Beulich" <JBeulich@suse.com>
-Subject: [PATCH] improve modalias building
+Received: from cantor2.suse.de ([195.135.220.15]:41830 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S965341Ab3E2TTm (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 29 May 2013 15:19:42 -0400
+Subject: Dependencies in the HID subsystem
+From: Jean Delvare <jdelvare@suse.de>
+Content-Type: text/plain; charset="UTF-8"
+Date: Wed, 29 May 2013 21:19:34 +0200
+Message-ID: <1369855174.4306.198.camel@chaos.site>
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8BIT
-Content-Disposition: inline
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: schwab@linux-m68k.org, linux-kbuild@vger.kernel.org
+To: Jiri Kosina <jkosina@suse.cz>, Michal Marek <mmarek@suse.cz>
+Cc: linux-input@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-For one, there's no point in the respective pieces to be rebuilt
-unconditionally on each and every rebuild.
+Hi all,
 
-Second there's no need to invent a custom rule for generating the .s
-file from the .c source - we can simply use the generic rule here.
+I am worried and confused by some Kconfig dependencies in the HID
+subsystem.
 
-And finally, $(obj) should be used to refer to files in the build tree
-(rather than spelling out the subdirectory).
+There are 11 HID device drivers which are defined in drivers/hid/Kconfig
+with:
 
-Signed-off-by: Jan Beulich <jbeulich@suse.com>
+	tristate "..." if EXPERT
+	default !EXPERT
 
----
- scripts/mod/Makefile |   11 +++--------
- 1 file changed, 3 insertions(+), 8 deletions(-)
+Unless EXPERT is enabled (and that's not the default), these driver
+entries are hidden and automatically selected. If CONFIG_HID=m, they are
+selected as modules. If CONFIG_HID=y, they are built into the kernel. So
+it is impossible to have CONFIG_HID=y and build these device drivers as
+modules - as device drivers typically are.
 
---- 3.10-rc3/scripts/mod/Makefile
-+++ 3.10-rc3-file2alias-rebuild/scripts/mod/Makefile
-@@ -29,15 +29,10 @@ define cmd_offsets
- 	 echo "#endif" ) > $@
- endef
- 
--# We use internal kbuild rules to avoid the "is up to date" message from make
--scripts/mod/devicetable-offsets.s: scripts/mod/devicetable-offsets.c FORCE
--	$(Q)mkdir -p $(dir $@)
--	$(call if_changed_dep,cc_s_c)
-+$(obj)/$(devicetable-offsets-file): $(obj)/devicetable-offsets.s
-+	$(call if_changed,offsets)
- 
--$(obj)/$(devicetable-offsets-file): scripts/mod/devicetable-offsets.s
--	$(call cmd,offsets)
--
--targets += $(devicetable-offsets-file)
-+targets += $(devicetable-offsets-file) devicetable-offsets.s
- 
- # dependencies on generated files need to be listed explicitly
- 
+I would like to understand the reasoning behind this complexity. What is
+so special about these 11 drivers, that we can't just let the (kernel
+configuring) user chose if he/she wants them and in what form?
 
+Wouldn't "default !EXPERT" and a good old "If unsure, say Y" in the help
+text be enough?
 
+I would be fine with "tristate ... if EXPERT" if I still had the choice
+between built-in or modular when both are possible. Is there any chance
+to change the meaning of this construct to that?
+
+Also I find it unpleasant that this construct completely hides the
+option from the user, as if it did not exist, except if other options
+depend on it. This is inconsistent and makes it difficult for the user
+to know whether a specific kernel version includes a given driver or not
+(one has to check .config afterward to know the answer.)
+
+Put in short, I don't like the way things are today and would welcome
+changes in this area.
+
+Thanks,
+-- 
+Jean Delvare
+Suse L3
 
