@@ -1,64 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.eu.citrix.com ([46.33.159.39]:57490 "EHLO
+Received: from smtp.eu.citrix.com ([46.33.159.39]:45236 "EHLO
 	SMTP.EU.CITRIX.COM" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754125Ab3EaKOX (ORCPT
+	with ESMTP id S1753935Ab3EaK3l (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 31 May 2013 06:14:23 -0400
-From: Ian Campbell <ian.campbell@citrix.com>
-Subject: [PATCH] kbuild: make sure we clean up DTB temporary files
-Date: Fri, 31 May 2013 11:14:20 +0100
-Message-ID: <1369995261-20735-1-git-send-email-ian.campbell@citrix.com>
+	Fri, 31 May 2013 06:29:41 -0400
+Message-ID: <1369996170.5199.68.camel@zakaz.uk.xensource.com>
+Subject: DTB build failure due to preproccessing
+From: Ian Campbell <Ian.Campbell@citrix.com>
+Date: Fri, 31 May 2013 11:29:30 +0100
+Content-Type: text/plain; charset="UTF-8"
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: Ian Campbell <ian.campbell@citrix.com>, Michal Marek <mmarek@suse.cz>, Stephen Warren <swarren@nvidia.com>, Rob Herring <rob.herring@calxeda.com>, Grant Likely <grant.likely@secretlab.ca>, linux-kbuild@vger.kernel.org
+To: linux-kernel <linux-kernel@vger.kernel.org>
+Cc: linuxppc-dev@lists.ozlabs.org, Michal Marek <mmarek@suse.cz>, Stephen Warren <swarren@nvidia.com>, Rob Herring <rob.herring@calxeda.com>, Grant Likely <grant.likely@secretlab.ca>, JonLoeliger <jdl@jdl.com>, linux-kbuild@vger.kernel.org
 
-Various temporary files used when building DTB files were not suffixed with
-.tmp and therefore were not cleaned up by "make clean".
+This affects arch/powerpc/boot/dts/virtex440-ml510.dts but I think it is
+actually a more general issue:
 
-Signed-off-by: Ian Campbell <ian.campbell@citrix.com>
-Cc: Michal Marek <mmarek@suse.cz>
-Cc: Stephen Warren <swarren@nvidia.com>
-Cc: Rob Herring <rob.herring@calxeda.com>
-Cc: Grant Likely <grant.likely@secretlab.ca>
-Cc: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
----
- scripts/Makefile.lib |    8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+        $ make ARCH=powerpc CROSS_COMPILE=powerpc-linux- virtex440-ml510.dtb 
+          CC      scripts/mod/devicetable-offsets.s
+          GEN     scripts/mod/devicetable-offsets.h
+          HOSTCC  scripts/mod/file2alias.o
+          HOSTLD  scripts/mod/modpost
+          DTC     arch/powerpc/boot/virtex440-ml510.dtb
+        Error: arch/powerpc/boot/dts/virtex440-ml510.dts:374.6-7 syntax error
+        FATAL ERROR: Unable to parse input tree
+        make[1]: *** [arch/powerpc/boot/virtex440-ml510.dtb] Error 1
+        make: *** [virtex440-ml510.dtb] Error 2
+        
+Line 374 is the "IDSEL 0x16..." line here:
+			interrupt-map = <
+				/* IRQ mapping for pci slots and ALI M1533
+				 ...
+				 * management core also isn't used.
+				 */
 
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 51bb3de..d7ec7cf 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -149,7 +149,7 @@ cpp_flags      = -Wp,-MD,$(depfile) $(NOSTDINC_FLAGS) $(LINUXINCLUDE)     \
- 
- ld_flags       = $(LDFLAGS) $(ldflags-y)
- 
--dtc_cpp_flags  = -Wp,-MD,$(depfile).pre -nostdinc                        \
-+dtc_cpp_flags  = -Wp,-MD,$(depfile).pre.tmp -nostdinc                    \
- 		 -I$(srctree)/arch/$(SRCARCH)/boot/dts                   \
- 		 -I$(srctree)/arch/$(SRCARCH)/boot/dts/include           \
- 		 -undef -D__DTS__
-@@ -265,13 +265,13 @@ quiet_cmd_dtc = DTC     $@
- cmd_dtc = $(CPP) $(dtc_cpp_flags) -x assembler-with-cpp -o $(dtc-tmp) $< ; \
- 	$(objtree)/scripts/dtc/dtc -O dtb -o $@ -b 0 \
- 		-i $(srctree)/arch/$(SRCARCH)/boot/dts $(DTC_FLAGS) \
--		-d $(depfile).dtc $(dtc-tmp) ; \
--	cat $(depfile).pre $(depfile).dtc > $(depfile)
-+		-d $(depfile).dtc.tmp $(dtc-tmp) ; \
-+	cat $(depfile).pre.tmp $(depfile).dtc.tmp > $(depfile)
- 
- $(obj)/%.dtb: $(src)/%.dts FORCE
- 	$(call if_changed_dep,dtc)
- 
--dtc-tmp = $(subst $(comma),_,$(dot-target).dts)
-+dtc-tmp = $(subst $(comma),_,$(dot-target).dts.tmp)
- 
- # Bzip2
- # ---------------------------------------------------------------------------
--- 
-1.7.10.4
+				/* IDSEL 0x16 / dev=6, bus=0 / PCI slot 3 */
+				0x3000 0 0 1 &xps_intc_0 3 2
+				0x3000 0 0 2 &xps_intc_0 2 2
+				0x3000 0 0 3 &xps_intc_0 5 2
+				0x3000 0 0 4 &xps_intc_0 4 2
+
+Which gets preprocessed into:
+           interrupt-map = <
+        # 375 "arch/powerpc/boot/dts/virtex440-ml510.dts"
+            0x3000 0 0 1 &xps_intc_0 3 2
+            0x3000 0 0 2 &xps_intc_0 2 2
+            0x3000 0 0 3 &xps_intc_0 5 2
+            0x3000 0 0 4 &xps_intc_0 4 2
+
+If I manually remove the "# 375 " line then that fixes the error
+(although there is then a subsequent one of the same type).
+
+I suppose this is a bug in dtc? It appears to have at least some
+awareness of these preprocessor line number comments since it manages to
+report the original source line number.
+
+Ian.
 
