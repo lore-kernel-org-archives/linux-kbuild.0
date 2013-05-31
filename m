@@ -1,27 +1,32 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from avon.wwwdotorg.org ([70.85.31.133]:45641 "EHLO
-	avon.wwwdotorg.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752954Ab3EaR1U (ORCPT
+Received: from mail-out.m-online.net ([212.18.0.10]:48593 "EHLO
+	mail-out.m-online.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754155Ab3EaRjN (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 31 May 2013 13:27:20 -0400
-Message-ID: <51A8DD74.8090403@wwwdotorg.org>
-Date: Fri, 31 May 2013 11:27:16 -0600
-From: Stephen Warren <swarren@wwwdotorg.org>
+	Fri, 31 May 2013 13:39:13 -0400
+From: Andreas Schwab <schwab@linux-m68k.org>
+Subject: Re: [PATCH] dtc: Ensure #line directives don't consume data from the next line
+References: <1370020450-18136-1-git-send-email-swarren@wwwdotorg.org>
+Date: Fri, 31 May 2013 19:38:57 +0200
+In-Reply-To: <1370020450-18136-1-git-send-email-swarren@wwwdotorg.org>
+	(Stephen Warren's message of "Fri, 31 May 2013 11:14:10 -0600")
+Message-ID: <87sj13dp72.fsf@hase.home>
 MIME-Version: 1.0
-Subject: Re: [PATCH] kbuild: make sure we clean up DTB temporary files
-References: <1369995261-20735-1-git-send-email-ian.campbell@citrix.com>
-In-Reply-To: <1369995261-20735-1-git-send-email-ian.campbell@citrix.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ian Campbell <ian.campbell@citrix.com>
-Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Stephen Warren <swarren@nvidia.com>, Rob Herring <rob.herring@calxeda.com>, Grant Likely <grant.likely@secretlab.ca>, linux-kbuild@vger.kernel.org
+To: Stephen Warren <swarren@wwwdotorg.org>
+Cc: David Gibson <david@gibson.dropbear.id.au>, jdl@jdl.com, devicetree-discuss@lists.ozlabs.org, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, mmarek@suse.cz, rob.herring@calxeda.com, grant.likely@secretlab.ca, linux-kbuild@vger.kernel.org, Stephen Warren <swarren@nvidia.com>
 
-On 05/31/2013 04:14 AM, Ian Campbell wrote:
-> Various temporary files used when building DTB files were not suffixed with
-> .tmp and therefore were not cleaned up by "make clean".
+Stephen Warren <swarren@wwwdotorg.org> writes:
 
-Reviewed-by: Stephen Warren <swarren@nvidia.com>
-Tested-by: Stephen Warren <swarren@nvidia.com>
+> Fix this by replacing {WS} with [ \t] so that it can't match line-breaks.
 
+I think the other uses of {WS} shouldn't span lines either.
+
+Andreas.
+
+-- 
+Andreas Schwab, schwab@linux-m68k.org
+GPG Key fingerprint = 58CA 54C7 6D53 942B 1756  01D3 44D5 214B 8276 4ED5
+"And now for something completely different."
