@@ -1,75 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([203.10.76.45]:50306 "EHLO ozlabs.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752462Ab3FAFot (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 1 Jun 2013 01:44:49 -0400
-Date: Sat, 1 Jun 2013 15:30:57 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH V2] dtc: ensure #line directives don't consume data from
- the next line
-Message-ID: <20130601053057.GB12059@boomeroo.fritz.box>
-References: <1370025184-23808-1-git-send-email-swarren@wwwdotorg.org>
+Received: from smtp.eu.citrix.com ([46.33.159.39]:1738 "EHLO
+	SMTP.EU.CITRIX.COM" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753574Ab3FCJoH (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 3 Jun 2013 05:44:07 -0400
+Message-ID: <1370252643.11717.27.camel@zakaz.uk.xensource.com>
+Subject: Re: DTB build failure due to preproccessing
+From: Ian Campbell <Ian.Campbell@citrix.com>
+Date: Mon, 3 Jun 2013 10:44:03 +0100
+In-Reply-To: <CACxGe6vWtofRb3ysPueJ73e3O18vNegiLapcTg_JZ9eRmPL5BA@mail.gmail.com>
+References: <1369996170.5199.68.camel@zakaz.uk.xensource.com>
+	 <20130531114824.60D223E0901@localhost> <51A8CA15.4070504@wwwdotorg.org>
+	 <CACxGe6vWtofRb3ysPueJ73e3O18vNegiLapcTg_JZ9eRmPL5BA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="oC1+HKm2/end4ao3"
-Content-Disposition: inline
-In-Reply-To: <1370025184-23808-1-git-send-email-swarren@wwwdotorg.org>
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Stephen Warren <swarren@wwwdotorg.org>
-Cc: jdl@jdl.com, mmarek@suse.cz, Stephen Warren <swarren@nvidia.com>, linux-kbuild@vger.kernel.org, devicetree-discuss@lists.ozlabs.org, linux-kernel@vger.kernel.org, rob.herring@calxeda.com, linuxppc-dev@lists.ozlabs.org
+To: Grant Likely <grant.likely@secretlab.ca>
+Cc: Stephen Warren <swarren@wwwdotorg.org>, linux-kernel <linux-kernel@vger.kernel.org>, "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>, Michal Marek <mmarek@suse.cz>, Stephen Warren <swarren@nvidia.com>, Rob Herring <rob.herring@calxeda.com>, JonLoeliger <jdl@jdl.com>, linux-kbuild@vger.kernel.org
+
+On Fri, 2013-05-31 at 17:31 +0100, Grant Likely wrote:
+> On Fri, May 31, 2013 at 5:04 PM, Stephen Warren <swarren@wwwdotorg.org> wrote:
+> > On 05/31/2013 05:48 AM, Grant Likely wrote:
+> >> ---
+> >> commit d01dccdcb3ea8233b09efb9c24db9f057fbd3b37
+> >> Author: Grant Likely <grant.likely@linaro.org>
+> >> Date:   Fri May 31 12:45:18 2013 +0100
+> >>
+> >>     dtc: Suppress cpp linemarker annotations
+> >>
+> >>     DTC isn't able to parse cpp linemarker annotations, so suppress them in
+> >>     the cpp output by adding the -P flag to the cpp options.
+> >
+> > That's not true; it explicitly does have code to parse the line markers.
+> > I'll have to investigate why it isn't working in this case.
+> >
+> > If you apply this patch, then anyone who has switched to #include rther
+> > than /include/ will get incorrect line numbers in dtc error messages.
+> > Admittedly that's a smaller population right now though. Perhaps we
+> > should just do a kernel-wide conversion though.
+> 
+> My mistake. I tested the wrong thing. I've dropped the patch.
+
+FWIW I've also dropped it from my device-tree.git tree.
+
+Ian.
 
 
---oC1+HKm2/end4ao3
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, May 31, 2013 at 12:33:04PM -0600, Stephen Warren wrote:
-> From: Stephen Warren <swarren@nvidia.com>
->=20
-> Previously, the #line parsing regex ended with ({WS}+[0-9]+)?. The {WS}
-> could match line-break characters. If the #line directive did not contain
-> the optional flags field at the end, this could cause any integer data on
-> the next line to be consumed as part of the #line directive parsing. This
-> could cause syntax errors (i.e. #line parsing consuming the leading 0
-> from a hex literal 0x1234, leaving x1234 to be parsed as cell data,
-> which is a syntax error), or invalid compilation results (i.e. simply
-> consuming literal 1234 as part of the #line processing, thus removing it
-> from the cell data).
->=20
-> Fix this by replacing {WS} with [ \t] so that it can't match line-breaks.
->=20
-> Convert all instances of {WS}, even though the other instances should be
-> irrelevant for any well-formed #line directive. This is done for
-> consistency and ultimate safety.
->=20
-> Reported-by: Ian Campbell <Ian.Campbell@citrix.com>
-> Signed-off-by: Stephen Warren <swarren@nvidia.com>
-
-Nice catch.
-
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
-
-I'll pull it into my github tree.  Jon, please either apply directly
-or pull from my tree.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---oC1+HKm2/end4ao3
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.12 (GNU/Linux)
-
-iEYEARECAAYFAlGphxEACgkQaILKxv3ab8awPQCeL+iOBmgPbA5rnvnI6KTXMqxf
-W18AnjzJ4Pm02RaFdClj+TsWM5tqAJBo
-=zVV5
------END PGP SIGNATURE-----
-
---oC1+HKm2/end4ao3--
