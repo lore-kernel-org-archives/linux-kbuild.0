@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:44533 "EHLO mga01.intel.com"
+Received: from mga09.intel.com ([134.134.136.24]:51483 "EHLO mga09.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750748Ab3FDSAb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 4 Jun 2013 14:00:31 -0400
-Subject: [PATCH 2] kbuild: fix error when building from src rpm
+	id S1750808Ab3FDThb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 4 Jun 2013 15:37:31 -0400
+Subject: [RFC PATCH v3] kbuild: fix error when building from src rpm
 From: Mike Marciniszyn <mike.marciniszyn@intel.com>
-Date: Tue, 04 Jun 2013 14:00:26 -0400
-Message-ID: <20130604180026.12438.55336.stgit@phlsvslse11.ph.intel.com>
+Date: Tue, 04 Jun 2013 15:37:25 -0400
+Message-ID: <20130604193725.25028.74479.stgit@phlsvslse11.ph.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
@@ -53,6 +53,9 @@ it might be architecture specific.
 This patch changes the manual install code to user the kernel's make install
 with an INSTALL_PATH override.   installkernel with then install the
 files into $RPM_BUILD_ROOT/boot.
+
+Unfortunately, the /sbin/installkernel on RH6.4 has issues when presented
+a target directory that is not /boot.   The trace looks like:
 
 Signed-off-by: Mike Marciniszyn <mike.marciniszyn@intel.com>
 ---
