@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:51984 "EHLO mga09.intel.com"
+Received: from mga01.intel.com ([192.55.52.88]:44533 "EHLO mga01.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1758516Ab3FDRHK (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 4 Jun 2013 13:07:10 -0400
-Subject: [PATCH] kbuild: fix error when building from src rpm
+	id S1750748Ab3FDSAb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 4 Jun 2013 14:00:31 -0400
+Subject: [PATCH 2] kbuild: fix error when building from src rpm
 From: Mike Marciniszyn <mike.marciniszyn@intel.com>
-Date: Tue, 04 Jun 2013 13:06:24 -0400
-Message-ID: <20130604170624.6337.53803.stgit@phlsvslse11.ph.intel.com>
+Date: Tue, 04 Jun 2013 14:00:26 -0400
+Message-ID: <20130604180026.12438.55336.stgit@phlsvslse11.ph.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
@@ -17,7 +17,6 @@ Cc: linux-kbuild@vger.kernel.org
 
 The following issue can be reproduced with Linus' tree.
 
---- snip
 + cp /home/user/rpmbuild-test/BUILDROOT/kernel-3.9.2.x86_64/boot/vmlinuz-3.9.2
 cp: missing destination file operand after
 `/home/user/rpmbuild-test/BUILDROOT/kernel-3.9.2-1.x86_64/boot/vmlinuz-3.9.2'
@@ -42,14 +41,6 @@ cd ~/rpmbuild-test
 
 rpmbuild --rebuild --define "_topdir `pwd`" -vv
 ~/rpmbuild/SRPMS/kernel-3.10.0_rc1+-1.src.rpm
-
-The following error occurs:
-+ cp /home/user/rpmbuild-test/BUILDROOT/kernel-3.9.2.x86_64/boot/vmlinuz-3.9.2
-cp: missing destination file operand after
-`/home/user/rpmbuild-test/BUILDROOT/kernel-3.9.2-1.x86_64/boot/vmlinuz-3.9.2'
-Try `cp --help' for more information.
-error: Bad exit status from /var/tmp/rpm-tmp.R4o0iI (%install)
---- snip
 
 The issue is because the %install script uses $KBUILD_IMAGE and it hasn't
 been set.
