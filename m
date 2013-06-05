@@ -1,104 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:9982 "EHLO mx1.redhat.com"
+Received: from cantor2.suse.de ([195.135.220.15]:36930 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755902Ab3FEOGj (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 5 Jun 2013 10:06:39 -0400
-Message-ID: <51AF45EB.7030003@redhat.com>
-Date: Wed, 05 Jun 2013 10:06:35 -0400
-From: Doug Ledford <dledford@redhat.com>
+	id S1753060Ab3FEOMJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 5 Jun 2013 10:12:09 -0400
+Date: Wed, 5 Jun 2013 16:12:06 +0200
+From: Michal Marek <mmarek@suse.cz>
+Subject: [GIT] kbuild fixes for v3.10-rc5
+Message-ID: <20130605141206.GA1573@sepie.suse.cz>
 MIME-Version: 1.0
-Subject: Re: [RFC PATCH v3] kbuild: fix error when building from src rpm
-References: <32E1700B9017364D9B60AED9960492BC2114956E@FMSMSX107.amr.corp.intel.com> <51AF0AA6.8010008@suse.cz> <32E1700B9017364D9B60AED9960492BC21149807@FMSMSX107.amr.corp.intel.com>
-In-Reply-To: <32E1700B9017364D9B60AED9960492BC21149807@FMSMSX107.amr.corp.intel.com>
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature";
- boundary="----enig2VMQSDDREBOGHHKQUJDOK"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Marciniszyn, Mike" <mike.marciniszyn@intel.com>
-Cc: Michal Marek <mmarek@suse.cz>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: chauplac@gmail.com, dirk@gouders.net, matthijs@stdin.nl, mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
-------enig2VMQSDDREBOGHHKQUJDOK
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: quoted-printable
+Hi Linus,
 
-On 6/5/2013 6:17 AM, Marciniszyn, Mike wrote:
-> I sent a different version today that used %defines for each arch,
+There is one fix for a kbuild regression, plus three kconfig fixes for
+bugs that have alway been there, but are simple enough to be fixed in an
+-rc.
 
-I didn't look through the original patch (especially since you said you
-are sending a new one).  However, please keep in mind that we need to
-either put firmware in a kernel version specific directory or split it
-off to a separate patch.  Otherwise you can't install more than one
-kernel package at a time.
+Thanks,
+Michal
 
-> but this idea is better and doesn't create a maintenance issue.  The
-> scope would be kbuild wide so I assume that the cc list needs to
-> expand?
->=20
-> Also, I will also want to add a new package to create a kernel-devel
-> package and will be submitting patch for that shortly.
->=20
-> Thanks, Mike
->=20
->=20
->> -----Original Message----- From: Michal Marek
->> [mailto:mmarek@suse.cz] Sent: Wednesday, June 05, 2013 5:54 AM To:
->> Marciniszyn, Mike Cc: linux-kbuild@vger.kernel.org; Doug Ledford=20
->> Subject: Re: [RFC PATCH v3] kbuild: fix error when building from
->> src rpm
->>=20
->> On 4.6.2013 22:12, Marciniszyn, Mike wrote:
->>> Sorry for the confusion with the patch.
->>>=20
->>> The latest version I've changed to an RFC because of some
->>> testing issues I've encountered.
->>>=20
->>> The /sbin/installkernel doesn't behave very nicely when
->>> INSTALL_PATH is modified on RH6.4.
->> [snip]
->>> I'm seeing when spec file tries to do its own install...
->>>=20
->>> I'm open to suggestions for making this part of the spec file
->>> portable and the src RPM usable.
->>=20
->> You could introduce a new Makefile target, say image_name, that
->> would simply print the image name after including the arch
->> Makefile. Then in the spec file, you would simply do
->>=20
->> KBUILD_IMAGE=3D$(make -s image_name)
->>=20
->> I think that this target would be a useful addition to the already
->> existing kernelversion and kernelrelease targets. And BTW, we could
->> use make -s kernelrelease in the specfile as well, instead of
->> hardcoding the value there.
->>=20
->> Michal
+The following changes since commit f66ba560943ae21f5d1e505bad0a3591823b2b37:
 
+  package: Makefile: unbreak binrpm-pkg target (2013-05-16 09:46:45 +0200)
 
+are available in the git repository at:
 
-------enig2VMQSDDREBOGHHKQUJDOK
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git rc-fixes
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.17 (MingW32)
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+for you to fetch changes up to 42a0940d9d582214a8d0f8ba41f2b4fe987e21b0:
 
-iQIcBAEBAgAGBQJRr0XrAAoJELgmozMOVy/d238P/3tJgBvlSMAslA+IKg/QlL1D
-hWJ70YuPvePYaCB41mz4llUovGZYmjzf9humM1vOo2KXzy/ap8wXbD3/11UpEP+L
-v8JutPC1c5gE7LoIi6k/GC7DWJhKLU06LV7SgiJfDCiE4+ml3vJcmDQmANor1bfu
-YYUDsY6l7ZcM28JTznC0ECj3TA78xsEoIVYrE9eNLeP/uAwTBb0rNFZXVVzm/hi/
-6fOwgSlWzOk0NIf2X2gsV58ca3VQ6aFUwGiQ4JQSQXMZHIHQmiPsrHP03/f6bB2L
-NpuZoYz09tcvqEtZ3MZ55SyESREds7dsCxwxY9Uz9DVlRHT8AH81udlYqrvKccf/
-bvtxcG3IMvo6rfVtsx2eGI3yr/N+4BUkb9fbuko3KAWW22UCz3+jMhpKh9J9p+Bu
-PyVch//bOeEzkGyTKxPSOYJiRkdP2RCaMqKOjVtzElt1LTKM5WQaYdTyX4fTtzYB
-UHsM0GxOJOh7ABPhLSbIwwEL/e4OzRGwASk2DQOQofvd70+YH8C4S5G8w8KR9jDI
-zlHkQMKpDEMyH2OW/sOT8iT+kVQkwHD8BtSWZS0uzji6jXy9eSxptLj0b6PXYyZM
-LOeLxH0wd57mJ6FYFx/gDZEjsaMv2zuxOdbBIfrsAMMjhS3myaldi7q860I9Zfjx
-tfqIua6UEOdACzOmNcAg
-=x1Qw
------END PGP SIGNATURE-----
+  Merge branch 'yem-kconfig-rc-fixes' of git://gitorious.org/linux-kconfig/linux-kconfig into kbuild/rc-fixes (2013-05-30 15:21:48 +0200)
 
-------enig2VMQSDDREBOGHHKQUJDOK--
+----------------------------------------------------------------
+
+Clement Chauplannaz (1):
+      scripts/config: fix assignment of parameters for short version of --*-after options
+
+Dirk Gouders (2):
+      mconf: handle keys in empty dialogs
+      kconfig/menu.c: fix multiple references to expressions in menu_add_prop()
+
+Matthijs Kooijman (1):
+      kbuild: Don't assume dts files live in arch/*/boot/dts
+
+Michal Marek (1):
+      Merge branch 'yem-kconfig-rc-fixes' of git://gitorious.org/linux-kconfig/linux-kconfig into kbuild/rc-fixes
+
+ scripts/Makefile.lib               |  2 +-
+ scripts/config                     |  2 +-
+ scripts/kconfig/lxdialog/menubox.c |  9 +++++----
+ scripts/kconfig/mconf.c            | 11 ++++++-----
+ scripts/kconfig/menu.c             | 15 ++++++++++++++-
+ 5 files changed, 27 insertions(+), 12 deletions(-)
