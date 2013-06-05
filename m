@@ -1,59 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:36930 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753060Ab3FEOMJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 5 Jun 2013 10:12:09 -0400
-Date: Wed, 5 Jun 2013 16:12:06 +0200
-From: Michal Marek <mmarek@suse.cz>
-Subject: [GIT] kbuild fixes for v3.10-rc5
-Message-ID: <20130605141206.GA1573@sepie.suse.cz>
+Received: from avon.wwwdotorg.org ([70.85.31.133]:46452 "EHLO
+	avon.wwwdotorg.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754752Ab3FEQuG (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 5 Jun 2013 12:50:06 -0400
+Message-ID: <51AF6C3A.5020609@wwwdotorg.org>
+Date: Wed, 05 Jun 2013 10:50:02 -0600
+From: Stephen Warren <swarren@wwwdotorg.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Subject: Re: [PATCH] dtc: ensure #line directives don't consume data from
+ the next line
+References: <1370273816-19411-1-git-send-email-swarren@wwwdotorg.org>
+In-Reply-To: <1370273816-19411-1-git-send-email-swarren@wwwdotorg.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: chauplac@gmail.com, dirk@gouders.net, matthijs@stdin.nl, mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Grant Likely <grant.likely@linaro.org>, Rob Herring <rob.herring@calxeda.com>
+Cc: devicetree-discuss@lists.ozlabs.org, Ian Campbell <Ian.Campbell@citrix.com>, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, jdl@jdl.com, Stephen Warren <swarren@nvidia.com>
 
-Hi Linus,
+On 06/03/2013 09:36 AM, Stephen Warren wrote:
+> From: Stephen Warren <swarren@nvidia.com>
+> 
+> Previously, the #line parsing regex ended with ({WS}+[0-9]+)?. The {WS}
+> could match line-break characters. If the #line directive did not contain
+> the optional flags field at the end, this could cause any integer data on
+> the next line to be consumed as part of the #line directive parsing. This
+> could cause syntax errors (i.e. #line parsing consuming the leading 0
+> from a hex literal 0x1234, leaving x1234 to be parsed as cell data,
+> which is a syntax error), or invalid compilation results (i.e. simply
+> consuming literal 1234 as part of the #line processing, thus removing it
+> from the cell data).
+> 
+> Fix this by replacing {WS} with [ \t] so that it can't match line-breaks.
+> 
+> Convert all instances of {WS}, even though the other instances should be
+> irrelevant for any well-formed #line directive. This is done for
+> consistency and ultimate safety.
+> 
+> This is a port of upstream dtc commit a1ee6f0 (with same subject) to the
+> kernel's copy of dtc.
 
-There is one fix for a kbuild regression, plus three kconfig fixes for
-bugs that have alway been there, but are simple enough to be fixed in an
--rc.
-
-Thanks,
-Michal
-
-The following changes since commit f66ba560943ae21f5d1e505bad0a3591823b2b37:
-
-  package: Makefile: unbreak binrpm-pkg target (2013-05-16 09:46:45 +0200)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git rc-fixes
-
-for you to fetch changes up to 42a0940d9d582214a8d0f8ba41f2b4fe987e21b0:
-
-  Merge branch 'yem-kconfig-rc-fixes' of git://gitorious.org/linux-kconfig/linux-kconfig into kbuild/rc-fixes (2013-05-30 15:21:48 +0200)
-
-----------------------------------------------------------------
-
-Clement Chauplannaz (1):
-      scripts/config: fix assignment of parameters for short version of --*-after options
-
-Dirk Gouders (2):
-      mconf: handle keys in empty dialogs
-      kconfig/menu.c: fix multiple references to expressions in menu_add_prop()
-
-Matthijs Kooijman (1):
-      kbuild: Don't assume dts files live in arch/*/boot/dts
-
-Michal Marek (1):
-      Merge branch 'yem-kconfig-rc-fixes' of git://gitorious.org/linux-kconfig/linux-kconfig into kbuild/rc-fixes
-
- scripts/Makefile.lib               |  2 +-
- scripts/config                     |  2 +-
- scripts/kconfig/lxdialog/menubox.c |  9 +++++----
- scripts/kconfig/mconf.c            | 11 ++++++-----
- scripts/kconfig/menu.c             | 15 ++++++++++++++-
- 5 files changed, 27 insertions(+), 12 deletions(-)
+Rob, Grant, does this look OK to apply for v3.10-rc*?
