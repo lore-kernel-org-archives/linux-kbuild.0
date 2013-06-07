@@ -1,188 +1,80 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pa0-f42.google.com ([209.85.220.42]:44458 "EHLO
-	mail-pa0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751916Ab3FGDiJ (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 6 Jun 2013 23:38:09 -0400
-Received: by mail-pa0-f42.google.com with SMTP id rl6so2227395pac.29
-        for <linux-kbuild@vger.kernel.org>; Thu, 06 Jun 2013 20:38:08 -0700 (PDT)
-From: =?UTF-8?q?Arve=20Hj=C3=B8nnev=C3=A5g?= <arve@android.com>
-Subject: [RFC][PATCH] kconfig: Fix defconfig when one choice menu selects options that another choice menu depends on
-Date: Thu,  6 Jun 2013 20:37:00 -0700
-Message-Id: <1370576226-7597-1-git-send-email-arve@android.com>
+Received: from mga03.intel.com ([143.182.124.21]:64240 "EHLO mga03.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756549Ab3FGQZo (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 7 Jun 2013 12:25:44 -0400
+Subject: [PATCH v6] kbuild: fix error when building from src rpm
+From: Mike Marciniszyn <mike.marciniszyn@intel.com>
+Date: Fri, 07 Jun 2013 12:25:33 -0400
+Message-ID: <20130607162533.19157.25779.stgit@phlsvslse11.ph.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: =?UTF-8?q?Arve=20Hj=C3=B8nnev=C3=A5g?= <arve@android.com>, Michal Marek <mmarek@suse.cz>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Peter Korsgaard <jacmet@uclibc.org>, Cody Schafer <cody@linux.vnet.ibm.com>, Benjamin Poirier <bpoirier@suse.de>, Alan Cox <alan@linux.intel.com>, linux-kbuild@vger.kernel.org
+To: mmarek@suse.cz
+Cc: linux-kbuild@vger.kernel.org, mmarcini@yahoo.com
 
-The defconfig and Kconfig combination below, which is based on 3.10-rc4
-Kconfigs, resulted in several options getting set to "m" instead of "y".
+The following issue can be reproduced with Linus' tree on
+and x86_64 server.
 
-defconfig:
+>+ cp /home/user/rpmbuild-test/BUILDROOT/kernel-3.9.2.x86_64/boot/vmlinuz-3.9.2
+>cp: missing destination file operand after
+>/home/user/rpmbuild-test/BUILDROOT/kernel-3.9.2-1.x86_64/boot/vmlinuz-3.9.2'
+>Try `cp --help' for more information.
+>error: Bad exit status from /var/tmp/rpm-tmp.R4o0iI (%install)
+
+Here are the commands to reproduce:
+
+make defconfig
+make rpm-pkg
+
+Use the resulting src rpm to build as follows:
+
+mkdir ~/rpmbuild-test
+cd ~/rpmbuild-test
+rpmbuild --rebuild --define "_topdir `pwd`" -vv ~/rpmbuild/SRPMS/kernel-3.10.0_rc1+-1.src.rpm
+
+The issue is because the %install script uses $KBUILD_IMAGE and it hasn't
+been set since it is only available in the kbuild system and not in the
+%install script.
+
+This patch adds a Makefile target to emit the image_name that can be used
+and modifies the mkspec to use the dynamic name in %install.
+
+Signed-off-by: Mike Marciniszyn <mike.marciniszyn@intel.com>
 ---
-CONFIG_MODULES=y
-CONFIG_USB_GADGET=y
-CONFIG_USB_ZERO=y
----
+ Makefile               |    6 ++++++
+ scripts/package/mkspec |    1 +
+ 2 files changed, 7 insertions(+)
 
-Kconfig:
----
-menuconfig MODULES
-	bool "Enable loadable module support"
-
-config CONFIGFS_FS
-	tristate "Userspace-driven configuration filesystem"
-
-config OCFS2_FS
-        tristate "OCFS2 file system support"
-        depends on CONFIGFS_FS
-        select CRC32
-
-config USB_LIBCOMPOSITE
-	tristate
-	select CONFIGFS_FS
-
-choice
-	tristate "USB Gadget Drivers"
-	default USB_ETH
-
-config USB_ZERO
-	tristate "Gadget Zero (DEVELOPMENT)"
-	select USB_LIBCOMPOSITE
-
-config USB_ETH
-	tristate "Ethernet Gadget (with CDC Ethernet support)"
-	select USB_LIBCOMPOSITE
-
-endchoice
-
-config CRC32
-        tristate "CRC32/CRC32c functions"
-        default y
-
-choice
-        prompt "CRC32 implementation"
-        depends on CRC32
-        default CRC32_SLICEBY8
-
-config CRC32_SLICEBY8
-        bool "Slice by 8 bytes"
-
-endchoice
-
----
-
-Signed-off-by: Arve Hjønnevåg <arve@android.com>
----
- scripts/kconfig/confdata.c | 14 ++++++++++----
- scripts/kconfig/expr.h     |  3 +++
- scripts/kconfig/lkc.h      |  1 +
- scripts/kconfig/symbol.c   | 11 +++++++++++
- 4 files changed, 25 insertions(+), 4 deletions(-)
-
-diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-index 43eda40..35e0f16 100644
---- a/scripts/kconfig/confdata.c
-+++ b/scripts/kconfig/confdata.c
-@@ -1083,7 +1083,7 @@ static void randomize_choice_values(struct symbol *csym)
- 	csym->flags &= ~(SYMBOL_VALID);
- }
+diff --git a/Makefile b/Makefile
+index cd11e88..5b2217c 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1275,6 +1275,12 @@ clean: $(clean-dirs)
+ 		-o -name modules.builtin -o -name '.tmp_*.o.*' \
+ 		-o -name '*.gcno' \) -type f -print | xargs rm -f
  
--static void set_all_choice_values(struct symbol *csym)
-+void set_all_choice_values(struct symbol *csym)
- {
- 	struct property *prop;
- 	struct symbol *sym;
-@@ -1100,7 +1100,7 @@ static void set_all_choice_values(struct symbol *csym)
- 	}
- 	csym->flags |= SYMBOL_DEF_USER;
- 	/* clear VALID to get value calculated */
--	csym->flags &= ~(SYMBOL_VALID);
-+	csym->flags &= ~(SYMBOL_VALID | SYMBOL_NEED_SET_CHOICE_VALUES);
- }
- 
- void conf_set_all_new_symbols(enum conf_def_mode mode)
-@@ -1202,6 +1202,14 @@ void conf_set_all_new_symbols(enum conf_def_mode mode)
- 	 * selected in a choice block and we set it to yes,
- 	 * and the rest to no.
- 	 */
-+	if (mode != def_random) {
-+		for_all_symbols(i, csym) {
-+			if ((sym_is_choice(csym) && !sym_has_value(csym)) ||
-+			    sym_is_choice_value(csym))
-+				csym->flags |= SYMBOL_NEED_SET_CHOICE_VALUES;
-+		}
-+	}
++# For probing for image name
++# ---------------------------------------------------------------------------
++.PHONY += image_name
++image_name: FORCE
++	@echo $(KBUILD_IMAGE)
 +
- 	for_all_symbols(i, csym) {
- 		if (sym_has_value(csym) || !sym_is_choice(csym))
- 			continue;
-@@ -1209,7 +1217,5 @@ void conf_set_all_new_symbols(enum conf_def_mode mode)
- 		sym_calc_value(csym);
- 		if (mode == def_random)
- 			randomize_choice_values(csym);
--		else
--			set_all_choice_values(csym);
- 	}
- }
-diff --git a/scripts/kconfig/expr.h b/scripts/kconfig/expr.h
-index cdd4860..df198a5 100644
---- a/scripts/kconfig/expr.h
-+++ b/scripts/kconfig/expr.h
-@@ -106,6 +106,9 @@ struct symbol {
- #define SYMBOL_DEF3       0x40000  /* symbol.def[S_DEF_3] is valid */
- #define SYMBOL_DEF4       0x80000  /* symbol.def[S_DEF_4] is valid */
+ # Generate tags for editors
+ # ---------------------------------------------------------------------------
+ quiet_cmd_tags = GEN     $@
+diff --git a/scripts/package/mkspec b/scripts/package/mkspec
+index fbbfd08..fdd3fbf 100755
+--- a/scripts/package/mkspec
++++ b/scripts/package/mkspec
+@@ -74,6 +74,7 @@ echo ""
+ fi
  
-+/* choice values need to be set before calculating this symbol value */
-+#define SYMBOL_NEED_SET_CHOICE_VALUES  0x100000
-+
- #define SYMBOL_MAXLENGTH	256
- #define SYMBOL_HASHSIZE		9973
- 
-diff --git a/scripts/kconfig/lkc.h b/scripts/kconfig/lkc.h
-index f8aee5f..0c8d419 100644
---- a/scripts/kconfig/lkc.h
-+++ b/scripts/kconfig/lkc.h
-@@ -87,6 +87,7 @@ char *conf_get_default_confname(void);
- void sym_set_change_count(int count);
- void sym_add_change_count(int count);
- void conf_set_all_new_symbols(enum conf_def_mode mode);
-+void set_all_choice_values(struct symbol *csym);
- 
- struct conf_printer {
- 	void (*print_symbol)(FILE *, struct symbol *, const char *, void *);
-diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
-index ecc5aa5..ab8f4c8 100644
---- a/scripts/kconfig/symbol.c
-+++ b/scripts/kconfig/symbol.c
-@@ -300,6 +300,14 @@ void sym_calc_value(struct symbol *sym)
- 
- 	if (sym->flags & SYMBOL_VALID)
- 		return;
-+
-+	if (sym_is_choice_value(sym) &&
-+	    sym->flags & SYMBOL_NEED_SET_CHOICE_VALUES) {
-+		sym->flags &= ~SYMBOL_NEED_SET_CHOICE_VALUES;
-+		prop = sym_get_choice_prop(sym);
-+		sym_calc_value(prop_get_symbol(prop));
-+	}
-+
- 	sym->flags |= SYMBOL_VALID;
- 
- 	oldval = sym->curr;
-@@ -425,6 +433,9 @@ void sym_calc_value(struct symbol *sym)
- 
- 	if (sym->flags & SYMBOL_AUTO)
- 		sym->flags &= ~SYMBOL_WRITE;
-+
-+	if (sym->flags & SYMBOL_NEED_SET_CHOICE_VALUES)
-+		set_all_choice_values(sym);
- }
- 
- void sym_clear_all_valid(void)
--- 
-1.8.3
+ echo "%install"
++echo 'KBUILD_IMAGE=$(make image_name)'
+ echo "%ifarch ia64"
+ echo 'mkdir -p $RPM_BUILD_ROOT/boot/efi $RPM_BUILD_ROOT/lib/modules'
+ echo 'mkdir -p $RPM_BUILD_ROOT/lib/firmware'
 
