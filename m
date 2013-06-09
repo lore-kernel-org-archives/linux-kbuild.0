@@ -1,58 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pb0-f52.google.com ([209.85.160.52]:35608 "EHLO
-	mail-pb0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751983Ab3FICem (ORCPT
+Received: from mail-wg0-f45.google.com ([74.125.82.45]:55558 "EHLO
+	mail-wg0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751401Ab3FIQON (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 8 Jun 2013 22:34:42 -0400
-From: Daniel Tang <dt.tangr@gmail.com>
-Subject: [PATCH 2/2] Fix a build warning in scripts/mod/file2alias.c
-Date: Sun,  9 Jun 2013 12:33:55 +1000
-Message-Id: <1370745235-12951-2-git-send-email-dt.tangr@gmail.com>
-In-Reply-To: <1370745235-12951-1-git-send-email-dt.tangr@gmail.com>
-References: <1370745235-12951-1-git-send-email-dt.tangr@gmail.com>
+	Sun, 9 Jun 2013 12:14:13 -0400
+Received: by mail-wg0-f45.google.com with SMTP id n12so4241784wgh.0
+        for <linux-kbuild@vger.kernel.org>; Sun, 09 Jun 2013 09:14:12 -0700 (PDT)
+Message-ID: <51B4A9D1.7070502@gmail.com>
+Date: Sun, 09 Jun 2013 18:14:09 +0200
+From: Gabriel de Perthuis <g2p.code@gmail.com>
+MIME-Version: 1.0
+Subject: [PATCH] deb-pkg: Don't run find across mountpoints
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mmarek@suse.cz
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, trivial@kernel.org, Daniel Tang <dt.tangr@gmail.com>
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org
 
-On some systems, __used is already defined in sys/cdefs.h and causes
-a build warning:
-
-scripts/mod/file2alias.c:85:1: warning: "__used" redefined
-In file included from /usr/include/stdio.h:64,
-                 from scripts/mod/modpost.h:1,
-		                  from scripts/mod/file2alias.c:13:
-				  /usr/include/sys/cdefs.h:146:1: warning: this is the location of the previous definition
-
-This adds an extra check before defining the __used macro to see if
-the macro was already defined elsewhere.
-
-Signed-off-by: Daniel Tang <dt.tangr@gmail.com>
+Signed-off-by: Gabriel de Perthuis <g2p.code@gmail.com>
 ---
- scripts/mod/file2alias.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ scripts/package/builddeb | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/scripts/mod/file2alias.c b/scripts/mod/file2alias.c
-index 45f9a33..ab55456 100644
---- a/scripts/mod/file2alias.c
-+++ b/scripts/mod/file2alias.c
-@@ -79,10 +79,12 @@ struct devtable **__start___devtable, **__stop___devtable;
- extern struct devtable *__start___devtable[], *__stop___devtable[];
- #endif /* __MACH__ */
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index acb8650..1435f5a 100644
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -16,11 +16,11 @@ create_package() {
+ 	local pname="$1" pdir="$2"
  
--#if __GNUC__ == 3 && __GNUC_MINOR__ < 3
--# define __used			__attribute__((__unused__))
--#else
--# define __used			__attribute__((__used__))
-+#if !defined(__used)
-+# if __GNUC__ == 3 && __GNUC_MINOR__ < 3
-+#  define __used			__attribute__((__unused__))
-+# else
-+#  define __used			__attribute__((__used__))
-+# endif
- #endif
+ 	cp debian/copyright "$pdir/usr/share/doc/$pname/"
+ 	cp debian/changelog "$pdir/usr/share/doc/$pname/changelog.Debian"
+ 	gzip -9 "$pdir/usr/share/doc/$pname/changelog.Debian"
+-	sh -c "cd '$pdir'; find . -type f ! -path './DEBIAN/*' -printf '%P\0' \
++	sh -c "cd '$pdir'; find . -xdev -type f ! -path './DEBIAN/*' -printf '%P\0' \
+ 		| xargs -r0 md5sum > DEBIAN/md5sums"
  
- /* Define a variable f that holds the value of field f of struct devid
+ 	# Fix ownership and permissions
+ 	chown -R root:root "$pdir"
+ 	chmod -R go-w "$pdir"
+@@ -241,11 +241,11 @@ Description: Linux kernel, version $version
+ EOF
+ 
+ fi
+ 
+ # Build header package
+-(cd $srctree; find . -name Makefile\* -o -name Kconfig\* -o -name \*.pl > "$objtree/debian/hdrsrcfiles")
++(cd $srctree; find . -xdev -name Makefile\* -o -name Kconfig\* -o -name \*.pl > "$objtree/debian/hdrsrcfiles")
+ (cd $srctree; find arch/$SRCARCH/include include scripts -type f >> "$objtree/debian/hdrsrcfiles")
+ (cd $objtree; find arch/$SRCARCH/include .config Module.symvers include scripts -type f >> "$objtree/debian/hdrobjfiles")
+ destdir=$kernel_headers_dir/usr/src/linux-headers-$version
+ mkdir -p "$destdir"
+ (cd $srctree; tar -c -f - -T "$objtree/debian/hdrsrcfiles") | (cd $destdir; tar -xf -)
 -- 
-1.8.1.3
+1.8.3.222.g430da9e
 
