@@ -1,58 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f45.google.com ([74.125.82.45]:55558 "EHLO
-	mail-wg0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751401Ab3FIQON (ORCPT
+Received: from mail-we0-f174.google.com ([74.125.82.174]:44355 "EHLO
+	mail-we0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751116Ab3FIVAp convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 9 Jun 2013 12:14:13 -0400
-Received: by mail-wg0-f45.google.com with SMTP id n12so4241784wgh.0
-        for <linux-kbuild@vger.kernel.org>; Sun, 09 Jun 2013 09:14:12 -0700 (PDT)
-Message-ID: <51B4A9D1.7070502@gmail.com>
-Date: Sun, 09 Jun 2013 18:14:09 +0200
-From: Gabriel de Perthuis <g2p.code@gmail.com>
+	Sun, 9 Jun 2013 17:00:45 -0400
+Date: Sun, 9 Jun 2013 23:00:39 +0200
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: Re: [RFC][PATCH] kconfig: Fix defconfig when one choice menu selects
+ options that another choice menu depends on
+Message-ID: <20130609210039.GA3292@free.fr>
+References: <1370576226-7597-1-git-send-email-arve@android.com>
 MIME-Version: 1.0
-Subject: [PATCH] deb-pkg: Don't run find across mountpoints
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8BIT
+In-Reply-To: <1370576226-7597-1-git-send-email-arve@android.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org
+To: Arve =?utf-8?B?SGrDuG5uZXbDpWc=?= <arve@android.com>
+Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Peter Korsgaard <jacmet@uclibc.org>, Cody Schafer <cody@linux.vnet.ibm.com>, Benjamin Poirier <bpoirier@suse.de>, Alan Cox <alan@linux.intel.com>, linux-kbuild@vger.kernel.org
 
-Signed-off-by: Gabriel de Perthuis <g2p.code@gmail.com>
----
- scripts/package/builddeb | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Arve, All,
 
-diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index acb8650..1435f5a 100644
---- a/scripts/package/builddeb
-+++ b/scripts/package/builddeb
-@@ -16,11 +16,11 @@ create_package() {
- 	local pname="$1" pdir="$2"
- 
- 	cp debian/copyright "$pdir/usr/share/doc/$pname/"
- 	cp debian/changelog "$pdir/usr/share/doc/$pname/changelog.Debian"
- 	gzip -9 "$pdir/usr/share/doc/$pname/changelog.Debian"
--	sh -c "cd '$pdir'; find . -type f ! -path './DEBIAN/*' -printf '%P\0' \
-+	sh -c "cd '$pdir'; find . -xdev -type f ! -path './DEBIAN/*' -printf '%P\0' \
- 		| xargs -r0 md5sum > DEBIAN/md5sums"
- 
- 	# Fix ownership and permissions
- 	chown -R root:root "$pdir"
- 	chmod -R go-w "$pdir"
-@@ -241,11 +241,11 @@ Description: Linux kernel, version $version
- EOF
- 
- fi
- 
- # Build header package
--(cd $srctree; find . -name Makefile\* -o -name Kconfig\* -o -name \*.pl > "$objtree/debian/hdrsrcfiles")
-+(cd $srctree; find . -xdev -name Makefile\* -o -name Kconfig\* -o -name \*.pl > "$objtree/debian/hdrsrcfiles")
- (cd $srctree; find arch/$SRCARCH/include include scripts -type f >> "$objtree/debian/hdrsrcfiles")
- (cd $objtree; find arch/$SRCARCH/include .config Module.symvers include scripts -type f >> "$objtree/debian/hdrobjfiles")
- destdir=$kernel_headers_dir/usr/src/linux-headers-$version
- mkdir -p "$destdir"
- (cd $srctree; tar -c -f - -T "$objtree/debian/hdrsrcfiles") | (cd $destdir; tar -xf -)
+On 2013-06-06 20:37 -0700, Arve Hjønnevåg spake thusly:
+> The defconfig and Kconfig combination below, which is based on 3.10-rc4
+> Kconfigs, resulted in several options getting set to "m" instead of "y".
+
+OK, I was able to reproduce your test-case, and the fix seems
+reasonable.
+
+I'm just back from a week-end no-internet-access break, so I'll look at
+it more thoroughly tomorrow.
+
+Thank you!
+
+Regards,
+Yann E. MORIN.
+
 -- 
-1.8.3.222.g430da9e
-
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
