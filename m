@@ -1,43 +1,35 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:47601 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752570Ab3FJNH6 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 10 Jun 2013 09:07:58 -0400
-Message-ID: <51B5CFAC.6050704@suse.cz>
-Date: Mon, 10 Jun 2013 15:07:56 +0200
-From: Michal Marek <mmarek@suse.cz>
+Received: from mail-wi0-f180.google.com ([209.85.212.180]:60714 "EHLO
+	mail-wi0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752038Ab3FJNPs (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 10 Jun 2013 09:15:48 -0400
+Received: by mail-wi0-f180.google.com with SMTP id c10so1382880wiw.13
+        for <linux-kbuild@vger.kernel.org>; Mon, 10 Jun 2013 06:15:47 -0700 (PDT)
+Message-ID: <51B5D180.5080509@gmail.com>
+Date: Mon, 10 Jun 2013 15:15:44 +0200
+From: Gabriel de Perthuis <g2p.code@gmail.com>
 MIME-Version: 1.0
 Subject: Re: [PATCH] deb-pkg: Don't run find across mountpoints
-References: <51B4A9D1.7070502@gmail.com>
-In-Reply-To: <51B4A9D1.7070502@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+References: <51B4A9D1.7070502@gmail.com> <51B5CFAC.6050704@suse.cz>
+In-Reply-To: <51B5CFAC.6050704@suse.cz>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Gabriel de Perthuis <g2p.code@gmail.com>
+To: Michal Marek <mmarek@suse.cz>
 Cc: linux-kbuild@vger.kernel.org
 
-On 9.6.2013 18:14, Gabriel de Perthuis wrote:
-> Signed-off-by: Gabriel de Perthuis <g2p.code@gmail.com>
-> ---
->  scripts/package/builddeb | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-> index acb8650..1435f5a 100644
-> --- a/scripts/package/builddeb
-> +++ b/scripts/package/builddeb
-> @@ -16,11 +16,11 @@ create_package() {
->  	local pname="$1" pdir="$2"
->  
->  	cp debian/copyright "$pdir/usr/share/doc/$pname/"
->  	cp debian/changelog "$pdir/usr/share/doc/$pname/changelog.Debian"
->  	gzip -9 "$pdir/usr/share/doc/$pname/changelog.Debian"
-> -	sh -c "cd '$pdir'; find . -type f ! -path './DEBIAN/*' -printf '%P\0' \
-> +	sh -c "cd '$pdir'; find . -xdev -type f ! -path './DEBIAN/*' -printf '%P\0' \
+Le lun. 10 juin 2013 15:07:56 CEST, Michal Marek a écrit :
+> What kind of mountpoint zoo do you maintain in your build tree? :) We
+> run a find in make clean, make mrproper and other targets. So you might
+> need to fix more places. But please explain your use case.
+>
+> Michal
 
-What kind of mountpoint zoo do you maintain in your build tree? :) We
-run a find in make clean, make mrproper and other targets. So you might
-need to fix more places. But please explain your use case.
+I happened to be running a fuse thing (git fs, mounted under .git/fs);
+recursing that can take a *long* time.
 
-Michal
+`find .` is the only one that actually runs into trouble, although it
+might be good if -xdev could be the default (through a shell
+function maybe?).
