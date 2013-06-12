@@ -1,61 +1,79 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-bk0-f42.google.com ([209.85.214.42]:37448 "EHLO
-	mail-bk0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753959Ab3FLKN6 (ORCPT
+Received: from eddie.linux-mips.org ([78.24.191.182]:57259 "EHLO
+	cvs.linux-mips.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756639Ab3FLLUS (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 12 Jun 2013 06:13:58 -0400
-Date: Wed, 12 Jun 2013 12:13:47 +0200
-From: Robert Richter <rric@kernel.org>
-Subject: Re: [PATCH] Makefile: Fix install error with make -j option
-Message-ID: <20130612101347.GP3886@rric.localhost>
-References: <1367499037-8350-1-git-send-email-rric@kernel.org>
+	Wed, 12 Jun 2013 07:20:18 -0400
+Received: from localhost.localdomain ([127.0.0.1]:52207 "EHLO linux-mips.org"
+        rhost-flags-OK-OK-OK-FAIL) by eddie.linux-mips.org with ESMTP
+        id S6824813Ab3FLLURFrwWt (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 12 Jun 2013 13:20:17 +0200
+Date: Wed, 12 Jun 2013 13:20:09 +0200
+From: Ralf Baechle <ralf@linux-mips.org>
+Subject: Re: [PATCH] MIPS: Kconfig: Set default value for the "Kernel code
+ model"
+Message-ID: <20130612112009.GA7422@linux-mips.org>
+References: <1370944336-13703-1-git-send-email-markos.chandras@imgtec.com>
+ <20130611154129.GD13126@linux-mips.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1367499037-8350-1-git-send-email-rric@kernel.org>
+In-Reply-To: <20130611154129.GD13126@linux-mips.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: Markos Chandras <markos.chandras@imgtec.com>
+Cc: linux-mips@linux-mips.org, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
-Michal,
+Here's a simplified test case:
 
-please apply this fix, ideally for v3.10 if possible.
+< --------- bite here --------- >
+choice
+	prompt "choice 1"
 
-Thanks,
+config FOO1
+	bool "foo 1"
 
--Robert
+config FOO2
+	bool "foo 2"
+endchoice
 
+choice
+	prompt "frob"
 
-On 02.05.13 08:50:37, Robert Richter wrote:
-> From: Robert Richter <robert.richter@calxeda.com>
-> 
-> Make modules_install fails with -j option:
-> 
->    DEPMOD
->  Usage: .../.source/linux/scripts/depmod.sh /sbin/depmod <kernelrelease>
->  make[1]: *** [_modinst_post] Error 1
-> 
-> Adding kernelrelease dependency to fix this.
-> 
-> Signed-off-by: Robert Richter <robert.richter@calxeda.com>
-> ---
->  Makefile | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/Makefile b/Makefile
-> index 46263d8..0205e79 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -979,7 +979,7 @@ _modinst_:
->  # boot a modules.dep even before / is mounted read-write.  However the
->  # boot script depmod is the master version.
->  PHONY += _modinst_post
-> -_modinst_post: _modinst_
-> +_modinst_post: include/config/kernel.release _modinst_
->  	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.fwinst obj=firmware __fw_modinst
->  	$(call cmd,depmod)
->  
-> -- 
-> 1.8.1.1
-> 
+config BAR
+	bool "bar"
+	depends on FOO2
+
+endchoice
+< --------- bite here --------- >
+
+Save this to a file, then run:
+
+  scripts/kconfig/conf --randconfig /tmp/xxx && cat .config
+
+There will be two possible variants for generated .config files:
+
+< --------- Variant 1 --------- >
+CONFIG_FOO1=y
+# CONFIG_FOO2 is not set
+< --------- Variant 2 --------- >
+# CONFIG_FOO1 is not set
+# CONFIG_FOO2 is not set
+< --------- End       --------- >
+
+The intended third outcome which would be
+< --------- doesn't happen ---- >
+# CONFIG_FOO1 is not set
+CONFIG_FOO2=y
+< --------- End --------------- >
+
+never gets generated.
+
+Pretty much any tempering with this test case will change the behaviour.
+For example removing the "depends on FOO2" line will result in the
+behaviour of either CONFIG_FOO1 or CONFIG_FOO2 being set to y but never
+none or both.  Other minor changes might result in both symbols getting
+set.
+
+  Ralf
