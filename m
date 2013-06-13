@@ -1,51 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from multi.imgtec.com ([194.200.65.239]:19862 "EHLO multi.imgtec.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754697Ab3FMKx5 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 13 Jun 2013 06:53:57 -0400
-From: James Hogan <james.hogan@imgtec.com>
-Subject: [PATCH RESEND] Makefile.lib: align DTB quiet_cmd
-Date: Thu, 13 Jun 2013 11:53:09 +0100
-Message-ID: <1371120789-18342-1-git-send-email-james.hogan@imgtec.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Received: from juliette.telenet-ops.be ([195.130.137.74]:36029 "EHLO
+	juliette.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755618Ab3FMNLN (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 13 Jun 2013 09:11:13 -0400
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: [PATCH 1/3] h8300/boot: Use POSIX "$((..))" instead of bashism "$[...]"
+Date: Thu, 13 Jun 2013 15:10:50 +0200
+Message-Id: <1371129052-31506-2-git-send-email-geert@linux-m68k.org>
+In-Reply-To: <1371129052-31506-1-git-send-email-geert@linux-m68k.org>
+References: <1371129052-31506-1-git-send-email-geert@linux-m68k.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, James Hogan <james.hogan@imgtec.com>, Dirk Brandewie <dirk.brandewie@gmail.com>, Grant Likely <grant.likely@secretlab.ca>, trivial@kernel.org
+To: Yoshinori Sato <ysato@users.sourceforge.jp>, Simon Horman <horms@verge.net.au>, Magnus Damm <magnus.damm@gmail.com>, Russell King <linux@arm.linux.org.uk>, Paul Mundt <lethal@linux-sh.org>
+Cc: David McCullough <david_mccullough@au.securecomputing.com>, Thorsten Glaser <tg@mirbsd.org>, linux-sh@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Geert Uytterhoeven <geert@linux-m68k.org>
 
-The unaligned dtb.S filename in make output started to irritate me:
-  DTC     arch/metag/boot/dts/skeleton.dtb
-  DTB    arch/metag/boot/dts/skeleton.dtb.S
-  AS      arch/metag/boot/dts/skeleton.dtb.o
-  LD      arch/metag/boot/dts/built-in.o
+On Ubuntu, where /bin/sh -> dash, "make ARCH=h8300 clean" gives:
 
-Add an extra space to quiet_cmd_dt_S_dtb so the dtb.S filename aligns
-with all the others.
+printf: 1: $[0x00400000+0x00140000]: expected numeric value
 
-Signed-off-by: James Hogan <james.hogan@imgtec.com>
-Cc: Michal Marek <mmarek@suse.cz>
-Cc: Dirk Brandewie <dirk.brandewie@gmail.com>
-Cc: Grant Likely <grant.likely@secretlab.ca>
-Cc: trivial@kernel.org
+Replace the bash-specific "$[...]" by POSIX "$((..))" for arithmetic
+expansion to fix this.
+Note that according to the bash 4.1 manpage, "$[...]" is deprecated, and
+will be removed in upcoming versions of bash.
+
+Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
 ---
- scripts/Makefile.lib | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/h8300/boot/compressed/Makefile |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 8337663..281f82a 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -244,7 +244,7 @@ cmd_gzip = (cat $(filter-out FORCE,$^) | gzip -n -f -9 > $@) || \
- # ---------------------------------------------------------------------------
+diff --git a/arch/h8300/boot/compressed/Makefile b/arch/h8300/boot/compressed/Makefile
+index 94faad1..787fd04 100644
+--- a/arch/h8300/boot/compressed/Makefile
++++ b/arch/h8300/boot/compressed/Makefile
+@@ -16,7 +16,7 @@ OBJECTS = $(obj)/head.o $(obj)/misc.o
+ #
+ CONFIG_MEMORY_START     ?= 0x00400000
+ CONFIG_BOOT_LINK_OFFSET ?= 0x00140000
+-IMAGE_OFFSET := $(shell printf "0x%08x" $$[$(CONFIG_MEMORY_START)+$(CONFIG_BOOT_LINK_OFFSET)])
++IMAGE_OFFSET := $(shell printf "0x%08x" $$(($(CONFIG_MEMORY_START)+$(CONFIG_BOOT_LINK_OFFSET))))
  
- # Generate an assembly file to wrap the output of the device tree compiler
--quiet_cmd_dt_S_dtb= DTB    $@
-+quiet_cmd_dt_S_dtb= DTB     $@
- cmd_dt_S_dtb=						\
- (							\
- 	echo '\#include <asm-generic/vmlinux.lds.h>'; 	\
+ LDFLAGS_vmlinux := -Ttext $(IMAGE_OFFSET) -estartup $(obj)/vmlinux.lds
+ 
 -- 
-1.8.1.2
-
+1.7.0.4
 
