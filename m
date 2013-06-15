@@ -1,80 +1,153 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:40996 "EHLO
-	shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1750706Ab3FOED3 (ORCPT
+Received: from mail-bk0-f41.google.com ([209.85.214.41]:42172 "EHLO
+	mail-bk0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752503Ab3FOIsZ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 15 Jun 2013 00:03:29 -0400
-Message-ID: <1371268995.3776.13.camel@deadeye.wl.decadent.org.uk>
-Subject: Re: [PATCH v5 2/4] deb-pkg: split debug symbols in their own package
-From: Ben Hutchings <ben@decadent.org.uk>
-Date: Sat, 15 Jun 2013 05:03:15 +0100
-In-Reply-To: <1371203217-19572-3-git-send-email-anisse@astier.eu>
-References: <1371203217-19572-1-git-send-email-anisse@astier.eu>
-	 <1371203217-19572-3-git-send-email-anisse@astier.eu>
-Content-Type: multipart/signed; micalg="pgp-sha512";
-	protocol="application/pgp-signature"; boundary="=-sYQX/V1IdrKF8U1vEp1q"
-Mime-Version: 1.0
+	Sat, 15 Jun 2013 04:48:25 -0400
+From: Sedat Dilek <sedat.dilek@gmail.com>
+Subject: [PATCH kbuild-next] kconfig/lxdialog: Add definitions for mininimum (re)size values
+Date: Sat, 15 Jun 2013 10:48:13 +0200
+Message-Id: <1371286093-4003-1-git-send-email-sedat.dilek@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Anisse Astier <anisse@astier.eu>
-Cc: linux-kbuild@vger.kernel.org, debian-kernel@lists.debian.org, kernel-team@lists.ubuntu.com, Michal Marek <mmarek@suse.cz>, maximilian attems <max@stro.at>
+To: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>, Benjamin Poirier <bpoirier@suse.de>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Wang YanQing <udknight@gmail.com>, Dirk Gouders <gouders@et.bocholt.fh-gelsenkirchen.de>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Sedat Dilek <sedat.dilek@gmail.com>
 
+Commit c8dc68ad0fbd ("kconfig/lxdialog: support resize") added support
+for resizing, but forgot to collect all hardcoded values at one single
+place.
 
---=-sYQX/V1IdrKF8U1vEp1q
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Also add a definition for the check for a minimum screen/window size
+of 80x19.
 
-On Fri, 2013-06-14 at 11:46 +0200, Anisse Astier wrote:
-> This can reduce almost 3 times the size of the linux-image package,
-> while keeping the debug symbols available for this particular build, in
-> their own package.
->=20
-> This mimics the way kernels are built in debian, ubuntu, or with
-> make-kpkg, and comes at the price of a small slowdown in the building of
-> packages.
-[...]
-> @@ -128,6 +136,20 @@ if grep -q '^CONFIG_MODULES=3Dy' $KCONFIG_CONFIG ; t=
-hen
->  		mv "$tmpdir/lib/modules/$version"/* "$tmpdir/usr/lib/uml/modules/$vers=
-ion/"
->  		rmdir "$tmpdir/lib/modules/$version"
->  	fi
-> +	if [ -n "$BUILD_DEBUG" ] ; then
-> +		(
-> +			cd $tmpdir
-> +			for module in $(find lib/modules/ -name *.ko); do
-[...]
+[ ChangeLog v2:
+  * Rename WIN_{HEIGTH,WIDTH}_MIN -> WINDOW_{HEIGTH,WIDTH}_MIN
+  * Mention the check for a minimum screen/window size in the changelog
+  * Add a comment above the block of new definitions ]
 
-Can shells generally cope with the list this produces for, say, an
-allmodconfig build?  My instinct would be to use xargs and while, but
-I'm willing to believe that this does work.
+Signed-off-by: Sedat Dilek <sedat.dilek@gmail.com>
+---
+ scripts/kconfig/lxdialog/checklist.c |  4 ++--
+ scripts/kconfig/lxdialog/dialog.h    | 14 ++++++++++++++
+ scripts/kconfig/lxdialog/inputbox.c  |  4 ++--
+ scripts/kconfig/lxdialog/menubox.c   |  2 +-
+ scripts/kconfig/lxdialog/textbox.c   |  2 +-
+ scripts/kconfig/lxdialog/util.c      |  2 +-
+ scripts/kconfig/lxdialog/yesno.c     |  4 ++--
+ 7 files changed, 23 insertions(+), 9 deletions(-)
 
-Ben.
+diff --git a/scripts/kconfig/lxdialog/checklist.c b/scripts/kconfig/lxdialog/checklist.c
+index a2eb80f..3034057 100644
+--- a/scripts/kconfig/lxdialog/checklist.c
++++ b/scripts/kconfig/lxdialog/checklist.c
+@@ -132,9 +132,9 @@ int dialog_checklist(const char *title, const char *prompt, int height,
+ 	}
+ 
+ do_resize:
+-	if (getmaxy(stdscr) < (height + 6))
++	if (getmaxy(stdscr) < (height + CHECKLIST_HEIGTH_MIN))
+ 		return -ERRDISPLAYTOOSMALL;
+-	if (getmaxx(stdscr) < (width + 6))
++	if (getmaxx(stdscr) < (width + CHECKLIST_WIDTH_MIN))
+ 		return -ERRDISPLAYTOOSMALL;
+ 
+ 	max_choice = MIN(list_height, item_count());
+diff --git a/scripts/kconfig/lxdialog/dialog.h b/scripts/kconfig/lxdialog/dialog.h
+index 10993370..f9bfd7d 100644
+--- a/scripts/kconfig/lxdialog/dialog.h
++++ b/scripts/kconfig/lxdialog/dialog.h
+@@ -200,6 +200,20 @@ int item_is_tag(char tag);
+ int on_key_esc(WINDOW *win);
+ int on_key_resize(void);
+ 
++/* minimum (re)size values */
++#define CHECKLIST_HEIGTH_MIN 6	/* For dialog_checklist() */
++#define CHECKLIST_WIDTH_MIN 6
++#define INPUTBOX_HEIGTH_MIN 2	/* For dialog_inputbox() */
++#define INPUTBOX_WIDTH_MIN 2
++#define MENU_HEIGTH_MIN 15	/* For dialog_menu() */
++#define MENU_WIDTH_MIN 65
++#define TEXTBOX_HEIGTH_MIN 8	/* For dialog_textbox() */
++#define TEXTBOX_WIDTH_MIN 8
++#define YESNO_HEIGTH_MIN 4	/* For dialog_yesno() */
++#define YESNO_WIDTH_MIN 4
++#define WINDOW_HEIGTH_MIN 19	/* For init_dialog() */
++#define WINDOW_WIDTH_MIN 80
++
+ int init_dialog(const char *backtitle);
+ void set_dialog_backtitle(const char *backtitle);
+ void set_dialog_subtitles(struct subtitle_list *subtitles);
+diff --git a/scripts/kconfig/lxdialog/inputbox.c b/scripts/kconfig/lxdialog/inputbox.c
+index 21404a0..7b01add 100644
+--- a/scripts/kconfig/lxdialog/inputbox.c
++++ b/scripts/kconfig/lxdialog/inputbox.c
+@@ -56,9 +56,9 @@ int dialog_inputbox(const char *title, const char *prompt, int height, int width
+ 		strcpy(instr, init);
+ 
+ do_resize:
+-	if (getmaxy(stdscr) <= (height - 2))
++	if (getmaxy(stdscr) <= (height - INPUTBOX_HEIGTH_MIN))
+ 		return -ERRDISPLAYTOOSMALL;
+-	if (getmaxx(stdscr) <= (width - 2))
++	if (getmaxx(stdscr) <= (width - INPUTBOX_WIDTH_MIN))
+ 		return -ERRDISPLAYTOOSMALL;
+ 
+ 	/* center dialog box on screen */
+diff --git a/scripts/kconfig/lxdialog/menubox.c b/scripts/kconfig/lxdialog/menubox.c
+index 38cd69c..0ab663d 100644
+--- a/scripts/kconfig/lxdialog/menubox.c
++++ b/scripts/kconfig/lxdialog/menubox.c
+@@ -193,7 +193,7 @@ int dialog_menu(const char *title, const char *prompt,
+ do_resize:
+ 	height = getmaxy(stdscr);
+ 	width = getmaxx(stdscr);
+-	if (height < 15 || width < 65)
++	if (height < MENU_HEIGTH_MIN || width < MENU_WIDTH_MIN)
+ 		return -ERRDISPLAYTOOSMALL;
+ 
+ 	height -= 4;
+diff --git a/scripts/kconfig/lxdialog/textbox.c b/scripts/kconfig/lxdialog/textbox.c
+index a48bb93..907cdcb 100644
+--- a/scripts/kconfig/lxdialog/textbox.c
++++ b/scripts/kconfig/lxdialog/textbox.c
+@@ -80,7 +80,7 @@ int dialog_textbox(const char *title, char *tbuf, int initial_height,
+ 
+ do_resize:
+ 	getmaxyx(stdscr, height, width);
+-	if (height < 8 || width < 8)
++	if (height < TEXTBOX_HEIGTH_MIN || width < TEXTBOX_WIDTH_MIN)
+ 		return -ERRDISPLAYTOOSMALL;
+ 	if (initial_height != 0)
+ 		height = initial_height;
+diff --git a/scripts/kconfig/lxdialog/util.c b/scripts/kconfig/lxdialog/util.c
+index a0e97c2..78fe4e9 100644
+--- a/scripts/kconfig/lxdialog/util.c
++++ b/scripts/kconfig/lxdialog/util.c
+@@ -317,7 +317,7 @@ int init_dialog(const char *backtitle)
+ 	getyx(stdscr, saved_y, saved_x);
+ 
+ 	getmaxyx(stdscr, height, width);
+-	if (height < 19 || width < 80) {
++	if (height < WINDOW_HEIGTH_MIN || width < WINDOW_WIDTH_MIN) {
+ 		endwin();
+ 		return -ERRDISPLAYTOOSMALL;
+ 	}
+diff --git a/scripts/kconfig/lxdialog/yesno.c b/scripts/kconfig/lxdialog/yesno.c
+index 4e6e809..abb0c39 100644
+--- a/scripts/kconfig/lxdialog/yesno.c
++++ b/scripts/kconfig/lxdialog/yesno.c
+@@ -45,9 +45,9 @@ int dialog_yesno(const char *title, const char *prompt, int height, int width)
+ 	WINDOW *dialog;
+ 
+ do_resize:
+-	if (getmaxy(stdscr) < (height + 4))
++	if (getmaxy(stdscr) < (height + YESNO_HEIGTH_MIN))
+ 		return -ERRDISPLAYTOOSMALL;
+-	if (getmaxx(stdscr) < (width + 4))
++	if (getmaxx(stdscr) < (width + YESNO_WIDTH_MIN))
+ 		return -ERRDISPLAYTOOSMALL;
+ 
+ 	/* center dialog box on screen */
+-- 
+1.8.3.1
 
---=20
-Ben Hutchings
-If the facts do not conform to your theory, they must be disposed of.
-
---=-sYQX/V1IdrKF8U1vEp1q
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.12 (GNU/Linux)
-
-iQIVAwUAUbvng+e/yOyVhhEJAQpPzA//RLHWBW9x6X24SKtmJ0rJzJI49rqAwhMX
-n53iCzxAMagBgkoU4AKlmGFNFKrJpC9HLOdt4hjv5UOuXhpOEjXCiUc2zb+KzABa
-kRAbNjK/ggUYPIGMZeF6PMrcB3hsGpwDb4iUghEO6Jlyhpx57aS6E391UzzLFb1e
-55W4ewkPDox3vnFRqkZOo1LdEHlSTiXAY2zm2KHOPbWjPMOcR5oMt+8GxKEDA39q
-VWojQS4+pWDIzkRUgZyqY2RvxMwpJ4kBYobpAl/V/ZoeyDaoWpcepcly13VFN7SP
-0/TRyJpaLuBKX4PrQXU0EUobLNbFpeY/qkSm7Bv8GawAhGjepiX9kMEGfkilM2xe
-yeCESEVHT7+IlOmoHXJ71S1Eld1tusUidDJXohSrbBu2CEugZdpfXbEC9XS/jr7x
-RoePGZ0rSruOtJIxIy7AlxiGFwlzS59zhvPnZeS/jqtNZqvM7Dxvw4Np982VHG76
-uFc+/vEw6BZoKHmIbFvQ5Nc4rmLYo4Q4ndTJpAoosYakddSbEwlH4jT/VhXR5+Kb
-2Gc7GCCcEsFCatHE4a/Rv7NZ77NCYCpFfO7wXJwLPEb8kaYX4rokA+N5l8uXkKYb
-fGNPp8APm3TehFctFToCMWfglXhcG3DAbuhpum4YnQkB11j8qQ/PXhI1xPL7tQrR
-mDyXnmAlj84=
-=7fXp
------END PGP SIGNATURE-----
-
---=-sYQX/V1IdrKF8U1vEp1q--
