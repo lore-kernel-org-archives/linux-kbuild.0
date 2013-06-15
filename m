@@ -1,51 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ea0-f173.google.com ([209.85.215.173]:48044 "EHLO
-	mail-ea0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751706Ab3FNWBr (ORCPT
+Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:40881 "EHLO
+	shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752166Ab3FODLq (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 14 Jun 2013 18:01:47 -0400
-Received: by mail-ea0-f173.google.com with SMTP id g15so623878eak.32
-        for <linux-kbuild@vger.kernel.org>; Fri, 14 Jun 2013 15:01:46 -0700 (PDT)
-From: Grant Likely <grant.likely@linaro.org>
-Subject: Re: [PATCH] dtc: ensure #line directives don't consume data from the next line
-In-Reply-To: <51AF6C3A.5020609@wwwdotorg.org>
-References: <1370273816-19411-1-git-send-email-swarren@wwwdotorg.org> <51AF6C3A.5020609@wwwdotorg.org>
-Date: Fri, 14 Jun 2013 23:01:35 +0100
-Message-Id: <20130614220135.0D0D63E0A56@localhost>
+	Fri, 14 Jun 2013 23:11:46 -0400
+Message-ID: <1371265896.3776.2.camel@deadeye.wl.decadent.org.uk>
+Subject: Re: [PATCH v5 1/4] deb-pkg: use KCONFIG_CONFIG instead of .config
+ file directly
+From: Ben Hutchings <ben@decadent.org.uk>
+Date: Sat, 15 Jun 2013 04:11:36 +0100
+In-Reply-To: <1371203217-19572-2-git-send-email-anisse@astier.eu>
+References: <1371203217-19572-1-git-send-email-anisse@astier.eu>
+	 <1371203217-19572-2-git-send-email-anisse@astier.eu>
+Content-Type: multipart/signed; micalg="pgp-sha512";
+	protocol="application/pgp-signature"; boundary="=-/IDqbPqAc/mKZLwYPUtO"
+Mime-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Stephen Warren <swarren@wwwdotorg.org>, Rob Herring <rob.herring@calxeda.com>
-Cc: devicetree-discuss@lists.ozlabs.org, Ian Campbell <Ian.Campbell@citrix.com>, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, jdl@jdl.com, Stephen Warren <swarren@nvidia.com>
-
-On Wed, 05 Jun 2013 10:50:02 -0600, Stephen Warren <swarren@wwwdotorg.org> wrote:
-> On 06/03/2013 09:36 AM, Stephen Warren wrote:
-> > From: Stephen Warren <swarren@nvidia.com>
-> > 
-> > Previously, the #line parsing regex ended with ({WS}+[0-9]+)?. The {WS}
-> > could match line-break characters. If the #line directive did not contain
-> > the optional flags field at the end, this could cause any integer data on
-> > the next line to be consumed as part of the #line directive parsing. This
-> > could cause syntax errors (i.e. #line parsing consuming the leading 0
-> > from a hex literal 0x1234, leaving x1234 to be parsed as cell data,
-> > which is a syntax error), or invalid compilation results (i.e. simply
-> > consuming literal 1234 as part of the #line processing, thus removing it
-> > from the cell data).
-> > 
-> > Fix this by replacing {WS} with [ \t] so that it can't match line-breaks.
-> > 
-> > Convert all instances of {WS}, even though the other instances should be
-> > irrelevant for any well-formed #line directive. This is done for
-> > consistency and ultimate safety.
-> > 
-> > This is a port of upstream dtc commit a1ee6f0 (with same subject) to the
-> > kernel's copy of dtc.
-> 
-> Rob, Grant, does this look OK to apply for v3.10-rc*?
-
-The fix is in mainline now. Please check to make sure it is working for you.
-
-g.
+To: Anisse Astier <anisse@astier.eu>
+Cc: linux-kbuild@vger.kernel.org, debian-kernel@lists.debian.org, kernel-team@lists.ubuntu.com, Michal Marek <mmarek@suse.cz>, maximilian attems <max@stro.at>
 
 
--- 
-email sent from notmuch.vim plugin
+--=-/IDqbPqAc/mKZLwYPUtO
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, 2013-06-14 at 11:46 +0200, Anisse Astier wrote:
+> Signed-off-by: Anisse Astier <anisse@astier.eu>
+> Cc: Ben Hutchings <ben@decadent.org.uk>
+[...]
+> @@ -245,7 +245,7 @@ fi
+>  # Build header package
+>  (cd $srctree; find . -name Makefile\* -o -name Kconfig\* -o -name \*.pl =
+> "$objtree/debian/hdrsrcfiles")
+>  (cd $srctree; find arch/$SRCARCH/include include scripts -type f >> "$ob=
+jtree/debian/hdrsrcfiles")
+> -(cd $objtree; find arch/$SRCARCH/include .config Module.symvers include =
+scripts -type f >> "$objtree/debian/hdrobjfiles")
+> +(cd $objtree; find arch/$SRCARCH/include $KCONFIG_CONFIG Module.symvers =
+include scripts -type f >> "$objtree/debian/hdrobjfiles")
+[...]
+
+I think $KCONFIG_CONFIG needs to be handled specially here - it should
+be installed as .config in the linux-headers package, since you can't
+assume the environment variable is set when that package is used.
+
+Ben.
+
+--=20
+Ben Hutchings
+If the facts do not conform to your theory, they must be disposed of.
+
+--=-/IDqbPqAc/mKZLwYPUtO
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQIVAwUAUbvbaOe/yOyVhhEJAQqkZQ/8DL0Z/9Odw0TSK9wddF4uwk3upjgYqcK4
+BcB2b02SGEX9GaueCIwKYgrzUjrGVWzpqSLabURWhW0RxDUNf5IjxNodL+/i7qJm
+KniD1iz/8kk1u1jHbH3ZXkGlt3cc3WOXYZOW1c6kYdn0aBzmzgrhne2KmR5NyQBo
+eA2BNORWyCYQtIqaK68sP7gTQl0B/Rozwe/SakdBHLjOydjsPzBz8FjcP9Cha3HE
+Jgq+u3OmvmvHnBTmIdLCPa7lTFLDBmPpCm6eOO8LwwRe0wbY8Ex9MCXKk5fwzllr
+BMXV6If4lkEfW4R0n1e7NrodTj5YZwLVqVfou99rVmlzkKHTHQwQDtnx4+JYdB2B
+W+pHwT8TvW/RpD4k7D7oZkau4pnIWr/TWsQmV+xQWWiF20XwsdEuCYu5fCZOmXDz
+Ob+TCbfkoL4q7uIdngQmOAggM4qFx44/PbD7Oh3FcsIVatp7Y0AhyUSNHwKDDdVB
+aoS/UzfwQpoiWA1b8ZKTHJwQv2oCGuvUkTn56Xd5Dv1HjgRdhi3JepzuWt18lAQw
+VHnphumwtIpaC9eXsAd4sHnj1JhCVijjfjKqafzowVsecvH5nF6x1ZX05XyuuspJ
+qDE+FFvD7Ge69L2TvDrIj+r6YDfvzqCSqdw55DlIjQhrZsPRG9nGJwL34W2msgNK
+Gqdjl/n9L5c=
+=JK+1
+-----END PGP SIGNATURE-----
+
+--=-/IDqbPqAc/mKZLwYPUtO--
