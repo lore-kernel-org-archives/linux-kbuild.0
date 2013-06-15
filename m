@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-bk0-f41.google.com ([209.85.214.41]:42172 "EHLO
-	mail-bk0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752503Ab3FOIsZ (ORCPT
+Received: from mail-bk0-f48.google.com ([209.85.214.48]:63969 "EHLO
+	mail-bk0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752135Ab3FOJHq (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 15 Jun 2013 04:48:25 -0400
+	Sat, 15 Jun 2013 05:07:46 -0400
 From: Sedat Dilek <sedat.dilek@gmail.com>
 Subject: [PATCH kbuild-next] kconfig/lxdialog: Add definitions for mininimum (re)size values
-Date: Sat, 15 Jun 2013 10:48:13 +0200
-Message-Id: <1371286093-4003-1-git-send-email-sedat.dilek@gmail.com>
+Date: Sat, 15 Jun 2013 11:07:35 +0200
+Message-Id: <1371287255-4172-1-git-send-email-sedat.dilek@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>, Benjamin Poirier <bpoirier@suse.de>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Wang YanQing <udknight@gmail.com>, Dirk Gouders <gouders@et.bocholt.fh-gelsenkirchen.de>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
@@ -20,7 +20,9 @@ place.
 Also add a definition for the check for a minimum screen/window size
 of 80x19.
 
-[ ChangeLog v2:
+[ ChangeLog v3:
+  * Rename MENU_{HEIGTH,WIDTH}_MIN -> MENUBOX_{HEIGTH,WIDTH}_MIN
+  ChangeLog v2:
   * Rename WIN_{HEIGTH,WIDTH}_MIN -> WINDOW_{HEIGTH,WIDTH}_MIN
   * Mention the check for a minimum screen/window size in the changelog
   * Add a comment above the block of new definitions ]
@@ -53,7 +55,7 @@ index a2eb80f..3034057 100644
  
  	max_choice = MIN(list_height, item_count());
 diff --git a/scripts/kconfig/lxdialog/dialog.h b/scripts/kconfig/lxdialog/dialog.h
-index 10993370..f9bfd7d 100644
+index 10993370..b4343d3 100644
 --- a/scripts/kconfig/lxdialog/dialog.h
 +++ b/scripts/kconfig/lxdialog/dialog.h
 @@ -200,6 +200,20 @@ int item_is_tag(char tag);
@@ -65,8 +67,8 @@ index 10993370..f9bfd7d 100644
 +#define CHECKLIST_WIDTH_MIN 6
 +#define INPUTBOX_HEIGTH_MIN 2	/* For dialog_inputbox() */
 +#define INPUTBOX_WIDTH_MIN 2
-+#define MENU_HEIGTH_MIN 15	/* For dialog_menu() */
-+#define MENU_WIDTH_MIN 65
++#define MENUBOX_HEIGTH_MIN 15	/* For dialog_menu() */
++#define MENUBOX_WIDTH_MIN 65
 +#define TEXTBOX_HEIGTH_MIN 8	/* For dialog_textbox() */
 +#define TEXTBOX_WIDTH_MIN 8
 +#define YESNO_HEIGTH_MIN 4	/* For dialog_yesno() */
@@ -94,7 +96,7 @@ index 21404a0..7b01add 100644
  
  	/* center dialog box on screen */
 diff --git a/scripts/kconfig/lxdialog/menubox.c b/scripts/kconfig/lxdialog/menubox.c
-index 38cd69c..0ab663d 100644
+index 38cd69c..b7e6d3bb 100644
 --- a/scripts/kconfig/lxdialog/menubox.c
 +++ b/scripts/kconfig/lxdialog/menubox.c
 @@ -193,7 +193,7 @@ int dialog_menu(const char *title, const char *prompt,
@@ -102,7 +104,7 @@ index 38cd69c..0ab663d 100644
  	height = getmaxy(stdscr);
  	width = getmaxx(stdscr);
 -	if (height < 15 || width < 65)
-+	if (height < MENU_HEIGTH_MIN || width < MENU_WIDTH_MIN)
++	if (height < MENUBOX_HEIGTH_MIN || width < MENUBOX_WIDTH_MIN)
  		return -ERRDISPLAYTOOSMALL;
  
  	height -= 4;
