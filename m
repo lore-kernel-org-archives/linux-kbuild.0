@@ -1,38 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pa0-f41.google.com ([209.85.220.41]:61639 "EHLO
-	mail-pa0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750720Ab3FPEIb (ORCPT
+Received: from mail-we0-f182.google.com ([74.125.82.182]:32840 "EHLO
+	mail-we0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754923Ab3FPJcN convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 16 Jun 2013 00:08:31 -0400
-Date: Sun, 16 Jun 2013 12:07:58 +0800
-From: Wang YanQing <udknight@gmail.com>
-Subject: Re: [PATCH kbuild-next] kconfig/lxdialog: Add definitions for
- mininimum (re)size values
-Message-ID: <20130616040758.GA2022@udknight>
-References: <1371287255-4172-1-git-send-email-sedat.dilek@gmail.com>
+	Sun, 16 Jun 2013 05:32:13 -0400
+Date: Sun, 16 Jun 2013 11:32:07 +0200
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: Re: [RFC][PATCH] kconfig: Fix defconfig when one choice menu selects
+ options that another choice menu depends on
+Message-ID: <20130616093207.GA3495@free.fr>
+References: <1370576226-7597-1-git-send-email-arve@android.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1371287255-4172-1-git-send-email-sedat.dilek@gmail.com>
+Content-Transfer-Encoding: 8BIT
+In-Reply-To: <1370576226-7597-1-git-send-email-arve@android.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sedat Dilek <sedat.dilek@gmail.com>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>, Benjamin Poirier <bpoirier@suse.de>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Dirk Gouders <gouders@et.bocholt.fh-gelsenkirchen.de>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Arve =?utf-8?B?SGrDuG5uZXbDpWc=?= <arve@android.com>
+Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Peter Korsgaard <jacmet@uclibc.org>, Cody Schafer <cody@linux.vnet.ibm.com>, Benjamin Poirier <bpoirier@suse.de>, Alan Cox <alan@linux.intel.com>, linux-kbuild@vger.kernel.org
 
-On Sat, Jun 15, 2013 at 11:07:35AM +0200, Sedat Dilek wrote:
-> Commit c8dc68ad0fbd ("kconfig/lxdialog: support resize") added support
-> for resizing, but forgot to collect all hardcoded values at one single
-> place.
-> 
-> Also add a definition for the check for a minimum screen/window size
-> of 80x19.
-> 
-> [ ChangeLog v3:
->   * Rename MENU_{HEIGTH,WIDTH}_MIN -> MENUBOX_{HEIGTH,WIDTH}_MIN
->   ChangeLog v2:
->   * Rename WIN_{HEIGTH,WIDTH}_MIN -> WINDOW_{HEIGTH,WIDTH}_MIN
->   * Mention the check for a minimum screen/window size in the changelog
->   * Add a comment above the block of new definitions ]
-> 
-> Signed-off-by: Sedat Dilek <sedat.dilek@gmail.com>
-Acked-by: Wang YanQing <udknight@gmail.com>
+Arve, All,
+
+On 2013-06-06 20:37 -0700, Arve Hjønnevåg spake thusly:
+> The defconfig and Kconfig combination below, which is based on 3.10-rc4
+> Kconfigs, resulted in several options getting set to "m" instead of "y".
+[--SNIP--]
+> Signed-off-by: Arve Hjønnevåg <arve@android.com>
+
+I've taken this in my tree, and will push to Michal for the next merge
+window:
+    https://www.gitorious.org/linux-kconfig/linux-kconfig/ yem-kconfig-for-next
+
+Thank you!
+
+Regards,
+Yann E. MORIN.
+
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
