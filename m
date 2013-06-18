@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f171.google.com ([209.85.212.171]:38584 "EHLO
-	mail-wi0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933482Ab3FRWp2 (ORCPT
+Received: from mail-we0-f170.google.com ([74.125.82.170]:52462 "EHLO
+	mail-we0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933822Ab3FRWpi (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 18 Jun 2013 18:45:28 -0400
+	Tue, 18 Jun 2013 18:45:38 -0400
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: [PATCH 06/14] nconf: use function calls instead of ncurses' variables LINES and COLS
-Date: Wed, 19 Jun 2013 00:45:02 +0200
-Message-Id: <e0b42605e685a0833303e1d4dde277c99d9e17b5.1371595499.git.yann.morin.1998@free.fr>
+Subject: [PATCH 12/14] kconfig: sort found symbols by relevance
+Date: Wed, 19 Jun 2013 00:45:08 +0200
+Message-Id: <3e2346029e33ef9405b87d72a32d96d0aafb524a.1371595499.git.yann.morin.1998@free.fr>
 In-Reply-To: <cover.1371595499.git.yann.morin.1998@free.fr>
 References: <cover.1371595499.git.yann.morin.1998@free.fr>
 In-Reply-To: <cover.1371595499.git.yann.morin.1998@free.fr>
@@ -15,167 +15,185 @@ References: <cover.1371595499.git.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Dirk Gouders <dirk@gouders.net>, "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Jean Delvare <jdelvare@suse.de>, Roland Eggner <edvx1@systemanalysen.net>, Wang YanQing <udknight@gmail.com>
 
-From: Dirk Gouders <dirk@gouders.net>
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-According to the documentation [1], LINES and COLS are initialized by
-initscr(); it does not say anything about the behavior when windows are
-resized.
+When searching for symbols, return the symbols sorted by relevance.
 
-Do not rely on the current implementation of ncurses that updates
-these variables on resize, but use the propper function calls or macros
-to get window dimensions.
+Sorting is done as thus:
+  - first, symbols with a prompt,   [1]
+  - then, smallest offset,          [2]
+  - then, shortest match,           [3]
+  - then, highest relative match,   [4]
+  - finally, alphabetical sort      [5]
 
-The use of the variables in main() was OK, but for the sake of
-consistency it was modified to use the macro getmaxyx().
+So, searching (eg.) for 'P.*CI' :
 
-[1] ncurses(3X)
+[1] Symbols of interest are probably those with a prompt, as they can be
+    changed, while symbols with no prompt are only for info. Thus:
+        PCIEASPM comes before PCI_ATS
 
-Signed-off-by: Dirk Gouders <dirk@gouders.net>
-Reviewed-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
-[yann.morin.1998@free.fr: declare 'lines' and 'columns' on a single line]
-Signed-off-by: Yann E. MORIN <yann.morin.1998@free.fr>
+[2] Symbols that match earlier in the name are to be preferred over
+    symbols which match later. Thus:
+        PCI_MSI comes before WDTPCI
+
+[3] The shortest match is (IMHO) more interesting than a longer one.
+    Thus:
+        PCI comes before PCMCIA
+
+[4] The relative match is the ratio of the length of the match against
+    the length of the symbol. The more of a symbol name we match, the
+    more instersting that symbol is. Thus:
+        PCIEAER comes before PCIEASPM
+
+[5] As fallback, sort symbols alphabetically
+
+This heuristic tries hard to get interesting symbols first in the list.
+
+In any case, exact match can (as previously) be requested by using
+start-of-line and end-of-line in the search regexp: ^PCI$
+
+Reported-by: Jean Delvare <jdelvare@suse.de>
+Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: Jean Delvare <jdelvare@suse.de>
+Cc: Michal Marek <mmarek@suse.cz>
+Cc: Roland Eggner <edvx1@systemanalysen.net>
+Cc: Wang YanQing <udknight@gmail.com>
 ---
- scripts/kconfig/nconf.c     | 21 ++++++++++++++-------
- scripts/kconfig/nconf.gui.c | 20 +++++++++++---------
- 2 files changed, 25 insertions(+), 16 deletions(-)
+ scripts/kconfig/symbol.c | 96 +++++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 87 insertions(+), 9 deletions(-)
 
-diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
-index dbf31ed..aac85d3 100644
---- a/scripts/kconfig/nconf.c
-+++ b/scripts/kconfig/nconf.c
-@@ -365,15 +365,16 @@ static void print_function_line(void)
- 	int i;
- 	int offset = 1;
- 	const int skip = 1;
-+	int lines = getmaxy(stdscr);
+diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
+index ab8f4c8..d08e300 100644
+--- a/scripts/kconfig/symbol.c
++++ b/scripts/kconfig/symbol.c
+@@ -954,38 +954,116 @@ const char *sym_escape_string_value(const char *in)
+ 	return res;
+ }
  
- 	for (i = 0; i < function_keys_num; i++) {
- 		(void) wattrset(main_window, attributes[FUNCTION_HIGHLIGHT]);
--		mvwprintw(main_window, LINES-3, offset,
-+		mvwprintw(main_window, lines-3, offset,
- 				"%s",
- 				function_keys[i].key_str);
- 		(void) wattrset(main_window, attributes[FUNCTION_TEXT]);
- 		offset += strlen(function_keys[i].key_str);
--		mvwprintw(main_window, LINES-3,
-+		mvwprintw(main_window, lines-3,
- 				offset, "%s",
- 				function_keys[i].func);
- 		offset += strlen(function_keys[i].func) + skip;
-@@ -954,7 +955,7 @@ static void show_menu(const char *prompt, const char *instructions,
- 
- 	clear();
- 	(void) wattrset(main_window, attributes[NORMAL]);
--	print_in_middle(stdscr, 1, 0, COLS,
-+	print_in_middle(stdscr, 1, 0, getmaxx(stdscr),
- 			menu_backtitle,
- 			attributes[MAIN_HEADING]);
- 
-@@ -1455,14 +1456,18 @@ static void conf_save(void)
- 
- void setup_windows(void)
- {
-+	int lines, columns;
++struct sym_match {
++	struct symbol	*sym;
++	off_t		so, eo;
++};
 +
-+	getmaxyx(stdscr, lines, columns);
++/* Compare matched symbols as thus:
++ * - first, symbols with a prompt,
++ * - then, smallest offset,
++ * - then, shortest match,
++ * - then, highest relative match,
++ * - finally, alphabetical sort
++ */
++static int sym_rel_comp( const void *sym1, const void *sym2 )
++{
++	struct sym_match *s1 = *(struct sym_match **)sym1;
++	struct sym_match *s2 = *(struct sym_match **)sym2;
++	struct property *p;
++	bool p1 = false, p2 = false;
++	int l1, l2, r1, r2;
 +
- 	if (main_window != NULL)
- 		delwin(main_window);
- 
- 	/* set up the menu and menu window */
--	main_window = newwin(LINES-2, COLS-2, 2, 1);
-+	main_window = newwin(lines-2, columns-2, 2, 1);
- 	keypad(main_window, TRUE);
--	mwin_max_lines = LINES-7;
--	mwin_max_cols = COLS-6;
-+	mwin_max_lines = lines-7;
-+	mwin_max_cols = columns-6;
- 
- 	/* panels order is from bottom to top */
- 	new_panel(main_window);
-@@ -1470,6 +1475,7 @@ void setup_windows(void)
- 
- int main(int ac, char **av)
- {
-+	int lines, columns;
- 	char *mode;
- 
- 	setlocale(LC_ALL, "");
-@@ -1495,7 +1501,8 @@ int main(int ac, char **av)
- 	keypad(stdscr, TRUE);
- 	curs_set(0);
- 
--	if (COLS < 75 || LINES < 20) {
-+	getmaxyx(stdscr, lines, columns);
-+	if (columns < 75 || lines < 20) {
- 		endwin();
- 		printf("Your terminal should have at "
- 			"least 20 lines and 75 columns\n");
-diff --git a/scripts/kconfig/nconf.gui.c b/scripts/kconfig/nconf.gui.c
-index 9f8c44e..8275f0e5 100644
---- a/scripts/kconfig/nconf.gui.c
-+++ b/scripts/kconfig/nconf.gui.c
-@@ -276,8 +276,8 @@ int btn_dialog(WINDOW *main_window, const char *msg, int btn_num, ...)
- 
- 	total_width = max(msg_width, btns_width);
- 	/* place dialog in middle of screen */
--	y = (LINES-(msg_lines+4))/2;
--	x = (COLS-(total_width+4))/2;
-+	y = (getmaxy(stdscr)-(msg_lines+4))/2;
-+	x = (getmaxx(stdscr)-(total_width+4))/2;
- 
- 
- 	/* create the windows */
-@@ -387,8 +387,8 @@ int dialog_inputbox(WINDOW *main_window,
- 		prompt_width = max(prompt_width, strlen(title));
- 
- 	/* place dialog in middle of screen */
--	y = (LINES-(prompt_lines+4))/2;
--	x = (COLS-(prompt_width+4))/2;
-+	y = (getmaxy(stdscr)-(prompt_lines+4))/2;
-+	x = (getmaxx(stdscr)-(prompt_width+4))/2;
- 
- 	strncpy(result, init, *result_len);
- 
-@@ -545,7 +545,7 @@ void show_scroll_win(WINDOW *main_window,
- {
- 	int res;
- 	int total_lines = get_line_no(text);
--	int x, y;
-+	int x, y, lines, columns;
- 	int start_x = 0, start_y = 0;
- 	int text_lines = 0, text_cols = 0;
- 	int total_cols = 0;
-@@ -556,6 +556,8 @@ void show_scroll_win(WINDOW *main_window,
- 	WINDOW *pad;
- 	PANEL *panel;
- 
-+	getmaxyx(stdscr, lines, columns);
++	for_all_prompts(s1->sym, p) {
++		p1 = true;
++	}
++	for_all_prompts(s2->sym, p) {
++		p2 = true;
++	}
++	if (p1 && !p2)
++		return -1;
++	if (!p1 && p2)
++		return 1;
 +
- 	/* find the widest line of msg: */
- 	total_lines = get_line_no(text);
- 	for (i = 0; i < total_lines; i++) {
-@@ -569,14 +571,14 @@ void show_scroll_win(WINDOW *main_window,
- 	(void) wattrset(pad, attributes[SCROLLWIN_TEXT]);
- 	fill_window(pad, text);
++	if (s1->so < s2->so)
++		return -1;
++	if (s1->so > s2->so)
++		return 1;
++
++	l1 = s1->eo - s1->so;
++	l2 = s2->eo - s2->so;
++	if (l1>l2)
++		return 1;
++	if (l1<l2)
++		return -1;
++
++	r1 = 100*l1 / strlen(s1->sym->name);
++	r2 = 100*l2 / strlen(s2->sym->name);
++	if (r1 > r2)
++		return -1;
++	if (r1 < r2)
++		return 1;
++
++	return strcmp(s1->sym->name, s2->sym->name);
++}
++
+ struct symbol **sym_re_search(const char *pattern)
+ {
+ 	struct symbol *sym, **sym_arr = NULL;
++	struct sym_match **sym_match_arr = NULL;
+ 	int i, cnt, size;
+ 	regex_t re;
++	regmatch_t match[1];
  
--	win_lines = min(total_lines+4, LINES-2);
--	win_cols = min(total_cols+2, COLS-2);
-+	win_lines = min(total_lines+4, lines-2);
-+	win_cols = min(total_cols+2, columns-2);
- 	text_lines = max(win_lines-4, 0);
- 	text_cols = max(win_cols-2, 0);
+ 	cnt = size = 0;
+ 	/* Skip if empty */
+ 	if (strlen(pattern) == 0)
+ 		return NULL;
+-	if (regcomp(&re, pattern, REG_EXTENDED|REG_NOSUB|REG_ICASE))
++	if (regcomp(&re, pattern, REG_EXTENDED|REG_ICASE))
+ 		return NULL;
  
- 	/* place window in middle of screen */
--	y = (LINES-win_lines)/2;
--	x = (COLS-win_cols)/2;
-+	y = (lines-win_lines)/2;
-+	x = (columns-win_cols)/2;
+ 	for_all_symbols(i, sym) {
++		struct sym_match *tmp_sym_match;
+ 		if (sym->flags & SYMBOL_CONST || !sym->name)
+ 			continue;
+-		if (regexec(&re, sym->name, 0, NULL, 0))
++		if (regexec(&re, sym->name, 1, match, 0))
+ 			continue;
+ 		if (cnt + 1 >= size) {
+-			void *tmp = sym_arr;
++			void *tmp;
+ 			size += 16;
+-			sym_arr = realloc(sym_arr, size * sizeof(struct symbol *));
+-			if (!sym_arr) {
+-				free(tmp);
+-				return NULL;
++			tmp = realloc(sym_match_arr, size * sizeof(struct sym_match *));
++			if (!tmp) {
++				goto sym_re_search_free;
+ 			}
++			sym_match_arr = tmp;
+ 		}
+ 		sym_calc_value(sym);
+-		sym_arr[cnt++] = sym;
++		tmp_sym_match = (struct sym_match*)malloc(sizeof(struct sym_match));
++		if (!tmp_sym_match)
++			goto sym_re_search_free;
++		tmp_sym_match->sym = sym;
++		/* As regexec return 0, we know we have a match, so
++		 * we can use match[0].rm_[se]o without further checks
++		 */
++		tmp_sym_match->so = match[0].rm_so;
++		tmp_sym_match->eo = match[0].rm_eo;
++		sym_match_arr[cnt++] = tmp_sym_match;
+ 	}
+-	if (sym_arr)
++	if (sym_match_arr) {
++		qsort(sym_match_arr, cnt, sizeof(struct sym_match*), sym_rel_comp);
++		sym_arr = malloc((cnt+1) * sizeof(struct symbol));
++		if (!sym_arr)
++			goto sym_re_search_free;
++		for (i = 0; i < cnt; i++)
++			sym_arr[i] = sym_match_arr[i]->sym;
+ 		sym_arr[cnt] = NULL;
++	}
++sym_re_search_free:
++	if (sym_match_arr) {
++		for (i = 0; i < cnt; i++)
++			free(sym_match_arr[i]);
++		free(sym_match_arr);
++	}
+ 	regfree(&re);
  
- 	win = newwin(win_lines, win_cols, y, x);
- 	keypad(win, TRUE);
+ 	return sym_arr;
 -- 
 1.8.1.2
 
