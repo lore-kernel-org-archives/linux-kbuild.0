@@ -1,80 +1,119 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.rosario-conicet.gov.ar ([168.96.15.28]:52186 "EHLO
-	mail.rosario-conicet.gov.ar" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752436Ab3FQWPc (ORCPT
+Received: from mail-wg0-f54.google.com ([74.125.82.54]:37767 "EHLO
+	mail-wg0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755322Ab3FRWpS (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 17 Jun 2013 18:15:32 -0400
-Message-ID: <bf2bd1c7747c2b14e57da8b2a5c50f0c.squirrel@ifir-conicet.gov.ar>
-Date: Mon, 17 Jun 2013 16:28:00 -0300 (ART)
-Subject: 
-From: "AFG GTBANK LOAN" <turnos-escuelas@ifir-conicet.gov.ar>
-Reply-To: bar.stevenlee@yahoo.com
+	Tue, 18 Jun 2013 18:45:18 -0400
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: [pull request] Pull request for branch yem-kconfig-for-next
+Date: Wed, 19 Jun 2013 00:44:56 +0200
+Message-Id: <cover.1371595499.git.yann.morin.1998@free.fr>
 MIME-Version: 1.0
-Content-Type: text/plain;charset=iso-8859-1
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, "Yann E. MORIN" <yann.morin.1998@free.fr>
+
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+
+Hello Michal, All!
+
+These are the patches against kconfig that I have accumulated for 3.11,
+and for which I plan to later send a proper pull-request.
+
+Note-whorthy this time:
+  - fix values of tristates that are selected by boolean choices (Arve)
+  - fix choice randomisation in presence of KCONFIG_ALLCONFIG    (me)
+  - fix choice randomisation selecting more than one value in
+    a choice (but only if it is conditional)                     (me)
+  - fix choice-in-a-choice randomisation not selecting any value
+    for the inner-most choice                                    (me)
+
+Also, some code-cleanups and eye-candy:
+  - mconf and nconf code cleanups                                (Dirk, Sedat)
+  - mconf and nconf eye-candy                                    (Dirk)
+  - scripts/config script-name in help text                      (ClÃ©ment)
+  - heuristic to sort found symbols by relevance                 (me)
+  - more randconfig debugging help                               (me)
+
+Note: this series is for review before I send an official pull-request.
+I want to avoid the debacle [0] [1] of the last kconfig breakage I caused
+with my previous kconfig "fix" to randomising choices in presence of
+KCONFIG_ALLCONFIG.
+
+I would like to send an official pull-request early next week, so all of
+these can land early in -next, so they get some real-life t4esting before
+the next merge windows open. So please, please, test this carefully. ;-)
+
+[0] http://marc.info/?t=136684274600002&r=1&w=2
+[1] http://marc.info/?t=136696367200003&r=1&w=2
+
+Regards,
+Yann E. MORIN.
 
 
+The following changes since commit f722406faae2d073cc1d01063d1123c35425939e:
 
+  Linux 3.10-rc1 (2013-05-11 17:14:08 -0700)
 
-Loan Syndicacion
+are available in the git repository at:
 
-Am AFG Guaranty Trust Bank, zu strukturieren wir Kreditlinien treffen Sie
-unsere
-Kunden spezifischen geschäftlichen Anforderungen und einen deutlichen
-Mehrwert für unsere
-Kunden Unternehmen.
-eine Division der AFG Finance und Private Bank plc.
+  git://gitorious.org/linux-kconfig/linux-kconfig.git yem-kconfig-for-next
 
-Wenn Sie erwägen, eine große Akquisition oder ein Großprojekt sind, können
-Sie
-brauchen eine erhebliche Menge an Kredit. AFG Guaranty Trust Bank setzen
-können
-zusammen das Syndikat, das die gesamte Kredit schnürt für
-Sie.
+for you to fetch changes up to b4e0ac8385fecde0363a2499323f81b4a91e8430:
 
+  kconfig: fix randomising choice entries in presence of KCONFIG_ALLCONFIG (2013-06-18 23:59:02 +0200)
 
-Als Bank mit internationaler Reichweite, sind wir gekommen, um Darlehen zu
-identifizieren
-Syndizierungen als Teil unseres Kerngeschäfts und durch spitzte diese Zeile
-aggressiv sind wir an einem Punkt, wo wir kommen, um als erkannt haben
-Hauptakteur in diesem Bereich.
+----------------------------------------------------------------
+Arve HjÃ¸nnevÃ¥g (1):
+      kconfig: Fix defconfig when one choice menu selects options that another choice menu depends on
 
+Clement Chauplannaz (1):
+      scripts/config: replace hard-coded script name by a dynamic value
 
-öffnen Sie ein Girokonto heute mit einem Minimum Bankguthaben von 500 £ und
-Getup zu £ 10.000 als Darlehen und auch den Hauch einer Chance und gewann
-die Sterne
-Preis von £ 500.000 in die sparen und gewinnen promo in may.aply jetzt.
+Dirk Gouders (4):
+      kconfig/lxdialog: handle newline characters in print_autowrap()
+      mconf: use function calls instead of ncurses' variables LINES and COLS
+      nconf: use function calls instead of ncurses' variables LINES and COLS
+      mconf/nconf: mark empty menus/menuconfigs different from non-empty ones
 
+Sedat Dilek (2):
+      kconfig/lxdialog: Add definitions for mininimum (re)size values
+      kconfig/lxdialog: Use new mininimum resize definitions in conf_choice()
 
-mit dem Folowing Informationen über Rechtsanwalt steven lee das Konto
-Offizier.
+Yann E. MORIN (6):
+      kconfig/conf: fix randconfig setting multiple symbols in a choice
+      kconfig/conf: accept a base-16 seed for randconfig
+      kconfig/conf: print the seed used to initialise the RNG for randconfig
+      kconfig: sort found symbols by relevance
+      kconfig: loop as long as we changed some symbols in randconfig
+      kconfig: fix randomising choice entries in presence of KCONFIG_ALLCONFIG
 
-
-FULL NAME;
-
-
-Wohnadresse;
-
-
-E-MAIL-ADRESSE;
-
-Telefonnummer;
-
-Nächsten KINS;
-
-MUTTER MAIDEN NAME;
-
-
-Familienstand;
-
-
-BÜROADRESSE;
-
-ALTERNATIVE Telefonnummer;
-
-TO @ yahoo.com bar.stevenlee
-NOTE; ALLE Darlehen sind für 10JAHRE RATE VALID
-ANGEBOT ENDET BALD SO JETZT HURRY
-
+ scripts/config                       |  12 ++--
+ scripts/kconfig/conf.c               |   6 +-
+ scripts/kconfig/confdata.c           |  39 +++++++++----
+ scripts/kconfig/expr.h               |   3 +
+ scripts/kconfig/lkc.h                |   3 +-
+ scripts/kconfig/lkc_proto.h          |   1 +
+ scripts/kconfig/lxdialog/checklist.c |   8 +--
+ scripts/kconfig/lxdialog/dialog.h    |  14 +++++
+ scripts/kconfig/lxdialog/inputbox.c  |   8 +--
+ scripts/kconfig/lxdialog/menubox.c   |   6 +-
+ scripts/kconfig/lxdialog/textbox.c   |   6 +-
+ scripts/kconfig/lxdialog/util.c      |  46 ++++++++-------
+ scripts/kconfig/lxdialog/yesno.c     |   8 +--
+ scripts/kconfig/mconf.c              |  19 ++++---
+ scripts/kconfig/menu.c               |  16 ++++++
+ scripts/kconfig/nconf.c              |  37 +++++++-----
+ scripts/kconfig/nconf.gui.c          |  20 ++++---
+ scripts/kconfig/symbol.c             | 107 ++++++++++++++++++++++++++++++++---
+ 18 files changed, 263 insertions(+), 96 deletions(-)
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
