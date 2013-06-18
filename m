@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-we0-f178.google.com ([74.125.82.178]:49332 "EHLO
-	mail-we0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933042Ab3FRWp0 (ORCPT
+Received: from mail-wi0-f173.google.com ([209.85.212.173]:51369 "EHLO
+	mail-wi0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933042Ab3FRWpV (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 18 Jun 2013 18:45:26 -0400
+	Tue, 18 Jun 2013 18:45:21 -0400
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: [PATCH 05/14] mconf: use function calls instead of ncurses' variables LINES and COLS
-Date: Wed, 19 Jun 2013 00:45:01 +0200
-Message-Id: <4f2de3e19983dafca264b672152b36e4962ca1c3.1371595499.git.yann.morin.1998@free.fr>
+Subject: [PATCH 02/14] kconfig/lxdialog: Add definitions for mininimum (re)size values
+Date: Wed, 19 Jun 2013 00:44:58 +0200
+Message-Id: <851f665725581d02d48ffbca50240cda44d698d4.1371595499.git.yann.morin.1998@free.fr>
 In-Reply-To: <cover.1371595499.git.yann.morin.1998@free.fr>
 References: <cover.1371595499.git.yann.morin.1998@free.fr>
 In-Reply-To: <cover.1371595499.git.yann.morin.1998@free.fr>
@@ -15,151 +15,151 @@ References: <cover.1371595499.git.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Dirk Gouders <dirk@gouders.net>, "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Sedat Dilek <sedat.dilek@gmail.com>, "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-From: Dirk Gouders <dirk@gouders.net>
+From: Sedat Dilek <sedat.dilek@gmail.com>
 
-According to the documentation [1], LINES and COLS are initialized by
-initscr(); it does not say anything about the behavior when windows are
-resized.
+Commit c8dc68ad0fbd ("kconfig/lxdialog: support resize") added support
+for resizing, but forgot to collect all hardcoded values at one single
+place.
 
-Do not rely on the current implementation of ncurses that updates
-these variables on resize, but use the propper function calls to get
-window dimensions.
+Also add a definition for the check for a minimum screen/window size
+of 80x19.
 
-init_dialog() could make use of the variables, but for the sake of
-consistency we do not change it's current use of the macro getmaxyx().
+[ ChangeLog v3:
+  * Rename MENU_{HEIGTH,WIDTH}_MIN -> MENUBOX_{HEIGTH,WIDTH}_MIN
+  ChangeLog v2:
+  * Rename WIN_{HEIGTH,WIDTH}_MIN -> WINDOW_{HEIGTH,WIDTH}_MIN
+  * Mention the check for a minimum screen/window size in the changelog
+  * Add a comment above the block of new definitions ]
 
-[1] ncurses(3X)
-
-Signed-off-by: Dirk Gouders <dirk@gouders.net>
+Signed-off-by: Sedat Dilek <sedat.dilek@gmail.com>
+Acked-by: Wang YanQing <udknight@gmail.com>
 Tested-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
 Reviewed-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Signed-off-by: Yann E. MORIN <yann.morin.1998@free.fr>
+Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
 ---
  scripts/kconfig/lxdialog/checklist.c |  4 ++--
+ scripts/kconfig/lxdialog/dialog.h    | 14 ++++++++++++++
  scripts/kconfig/lxdialog/inputbox.c  |  4 ++--
- scripts/kconfig/lxdialog/menubox.c   |  4 ++--
- scripts/kconfig/lxdialog/textbox.c   |  4 ++--
- scripts/kconfig/lxdialog/util.c      | 13 +++++++++----
+ scripts/kconfig/lxdialog/menubox.c   |  2 +-
+ scripts/kconfig/lxdialog/textbox.c   |  2 +-
+ scripts/kconfig/lxdialog/util.c      |  2 +-
  scripts/kconfig/lxdialog/yesno.c     |  4 ++--
- 6 files changed, 19 insertions(+), 14 deletions(-)
+ 7 files changed, 23 insertions(+), 9 deletions(-)
 
 diff --git a/scripts/kconfig/lxdialog/checklist.c b/scripts/kconfig/lxdialog/checklist.c
-index 3034057..3b15c08 100644
+index a2eb80f..3034057 100644
 --- a/scripts/kconfig/lxdialog/checklist.c
 +++ b/scripts/kconfig/lxdialog/checklist.c
-@@ -140,8 +140,8 @@ do_resize:
+@@ -132,9 +132,9 @@ int dialog_checklist(const char *title, const char *prompt, int height,
+ 	}
+ 
+ do_resize:
+-	if (getmaxy(stdscr) < (height + 6))
++	if (getmaxy(stdscr) < (height + CHECKLIST_HEIGTH_MIN))
+ 		return -ERRDISPLAYTOOSMALL;
+-	if (getmaxx(stdscr) < (width + 6))
++	if (getmaxx(stdscr) < (width + CHECKLIST_WIDTH_MIN))
+ 		return -ERRDISPLAYTOOSMALL;
+ 
  	max_choice = MIN(list_height, item_count());
+diff --git a/scripts/kconfig/lxdialog/dialog.h b/scripts/kconfig/lxdialog/dialog.h
+index 10993370..b4343d3 100644
+--- a/scripts/kconfig/lxdialog/dialog.h
++++ b/scripts/kconfig/lxdialog/dialog.h
+@@ -200,6 +200,20 @@ int item_is_tag(char tag);
+ int on_key_esc(WINDOW *win);
+ int on_key_resize(void);
  
- 	/* center dialog box on screen */
--	x = (COLS - width) / 2;
--	y = (LINES - height) / 2;
-+	x = (getmaxx(stdscr) - width) / 2;
-+	y = (getmaxy(stdscr) - height) / 2;
- 
- 	draw_shadow(stdscr, y, x, height, width);
- 
++/* minimum (re)size values */
++#define CHECKLIST_HEIGTH_MIN 6	/* For dialog_checklist() */
++#define CHECKLIST_WIDTH_MIN 6
++#define INPUTBOX_HEIGTH_MIN 2	/* For dialog_inputbox() */
++#define INPUTBOX_WIDTH_MIN 2
++#define MENUBOX_HEIGTH_MIN 15	/* For dialog_menu() */
++#define MENUBOX_WIDTH_MIN 65
++#define TEXTBOX_HEIGTH_MIN 8	/* For dialog_textbox() */
++#define TEXTBOX_WIDTH_MIN 8
++#define YESNO_HEIGTH_MIN 4	/* For dialog_yesno() */
++#define YESNO_WIDTH_MIN 4
++#define WINDOW_HEIGTH_MIN 19	/* For init_dialog() */
++#define WINDOW_WIDTH_MIN 80
++
+ int init_dialog(const char *backtitle);
+ void set_dialog_backtitle(const char *backtitle);
+ void set_dialog_subtitles(struct subtitle_list *subtitles);
 diff --git a/scripts/kconfig/lxdialog/inputbox.c b/scripts/kconfig/lxdialog/inputbox.c
-index 7b01add..447a582 100644
+index 21404a0..7b01add 100644
 --- a/scripts/kconfig/lxdialog/inputbox.c
 +++ b/scripts/kconfig/lxdialog/inputbox.c
-@@ -62,8 +62,8 @@ do_resize:
+@@ -56,9 +56,9 @@ int dialog_inputbox(const char *title, const char *prompt, int height, int width
+ 		strcpy(instr, init);
+ 
+ do_resize:
+-	if (getmaxy(stdscr) <= (height - 2))
++	if (getmaxy(stdscr) <= (height - INPUTBOX_HEIGTH_MIN))
+ 		return -ERRDISPLAYTOOSMALL;
+-	if (getmaxx(stdscr) <= (width - 2))
++	if (getmaxx(stdscr) <= (width - INPUTBOX_WIDTH_MIN))
  		return -ERRDISPLAYTOOSMALL;
  
  	/* center dialog box on screen */
--	x = (COLS - width) / 2;
--	y = (LINES - height) / 2;
-+	x = (getmaxx(stdscr) - width) / 2;
-+	y = (getmaxy(stdscr) - height) / 2;
- 
- 	draw_shadow(stdscr, y, x, height, width);
- 
 diff --git a/scripts/kconfig/lxdialog/menubox.c b/scripts/kconfig/lxdialog/menubox.c
-index 00d2841..92b89a6 100644
+index 48d382e..00d2841 100644
 --- a/scripts/kconfig/lxdialog/menubox.c
 +++ b/scripts/kconfig/lxdialog/menubox.c
-@@ -203,8 +203,8 @@ do_resize:
- 	max_choice = MIN(menu_height, item_count());
+@@ -193,7 +193,7 @@ int dialog_menu(const char *title, const char *prompt,
+ do_resize:
+ 	height = getmaxy(stdscr);
+ 	width = getmaxx(stdscr);
+-	if (height < 15 || width < 65)
++	if (height < MENUBOX_HEIGTH_MIN || width < MENUBOX_WIDTH_MIN)
+ 		return -ERRDISPLAYTOOSMALL;
  
- 	/* center dialog box on screen */
--	x = (COLS - width) / 2;
--	y = (LINES - height) / 2;
-+	x = (getmaxx(stdscr) - width) / 2;
-+	y = (getmaxy(stdscr) - height) / 2;
- 
- 	draw_shadow(stdscr, y, x, height, width);
- 
+ 	height -= 4;
 diff --git a/scripts/kconfig/lxdialog/textbox.c b/scripts/kconfig/lxdialog/textbox.c
-index 907cdcb..1773319 100644
+index a48bb93..907cdcb 100644
 --- a/scripts/kconfig/lxdialog/textbox.c
 +++ b/scripts/kconfig/lxdialog/textbox.c
-@@ -98,8 +98,8 @@ do_resize:
- 			width = 0;
+@@ -80,7 +80,7 @@ int dialog_textbox(const char *title, char *tbuf, int initial_height,
  
- 	/* center dialog box on screen */
--	x = (COLS - width) / 2;
--	y = (LINES - height) / 2;
-+	x = (getmaxx(stdscr) - width) / 2;
-+	y = (getmaxy(stdscr) - height) / 2;
- 
- 	draw_shadow(stdscr, y, x, height, width);
- 
+ do_resize:
+ 	getmaxyx(stdscr, height, width);
+-	if (height < 8 || width < 8)
++	if (height < TEXTBOX_HEIGTH_MIN || width < TEXTBOX_WIDTH_MIN)
+ 		return -ERRDISPLAYTOOSMALL;
+ 	if (initial_height != 0)
+ 		height = initial_height;
 diff --git a/scripts/kconfig/lxdialog/util.c b/scripts/kconfig/lxdialog/util.c
-index 0fa567e..58a8289 100644
+index a0e97c2..78fe4e9 100644
 --- a/scripts/kconfig/lxdialog/util.c
 +++ b/scripts/kconfig/lxdialog/util.c
-@@ -254,7 +254,12 @@ void attr_clear(WINDOW * win, int height, int width, chtype attr)
+@@ -317,7 +317,7 @@ int init_dialog(const char *backtitle)
+ 	getyx(stdscr, saved_y, saved_x);
  
- void dialog_clear(void)
- {
--	attr_clear(stdscr, LINES, COLS, dlg.screen.atr);
-+	int lines, columns;
-+
-+	lines = getmaxy(stdscr);
-+	columns = getmaxx(stdscr);
-+
-+	attr_clear(stdscr, lines, columns, dlg.screen.atr);
- 	/* Display background title if it exists ... - SLH */
- 	if (dlg.backtitle != NULL) {
- 		int i, len = 0, skip = 0;
-@@ -269,10 +274,10 @@ void dialog_clear(void)
- 		}
- 
- 		wmove(stdscr, 1, 1);
--		if (len > COLS - 2) {
-+		if (len > columns - 2) {
- 			const char *ellipsis = "[...] ";
- 			waddstr(stdscr, ellipsis);
--			skip = len - (COLS - 2 - strlen(ellipsis));
-+			skip = len - (columns - 2 - strlen(ellipsis));
- 		}
- 
- 		for (pos = dlg.subtitles; pos != NULL; pos = pos->next) {
-@@ -298,7 +303,7 @@ void dialog_clear(void)
- 				skip--;
- 		}
- 
--		for (i = len + 1; i < COLS - 1; i++)
-+		for (i = len + 1; i < columns - 1; i++)
- 			waddch(stdscr, ACS_HLINE);
+ 	getmaxyx(stdscr, height, width);
+-	if (height < 19 || width < 80) {
++	if (height < WINDOW_HEIGTH_MIN || width < WINDOW_WIDTH_MIN) {
+ 		endwin();
+ 		return -ERRDISPLAYTOOSMALL;
  	}
- 	wnoutrefresh(stdscr);
 diff --git a/scripts/kconfig/lxdialog/yesno.c b/scripts/kconfig/lxdialog/yesno.c
-index abb0c39..676fb2f 100644
+index 4e6e809..abb0c39 100644
 --- a/scripts/kconfig/lxdialog/yesno.c
 +++ b/scripts/kconfig/lxdialog/yesno.c
-@@ -51,8 +51,8 @@ do_resize:
+@@ -45,9 +45,9 @@ int dialog_yesno(const char *title, const char *prompt, int height, int width)
+ 	WINDOW *dialog;
+ 
+ do_resize:
+-	if (getmaxy(stdscr) < (height + 4))
++	if (getmaxy(stdscr) < (height + YESNO_HEIGTH_MIN))
+ 		return -ERRDISPLAYTOOSMALL;
+-	if (getmaxx(stdscr) < (width + 4))
++	if (getmaxx(stdscr) < (width + YESNO_WIDTH_MIN))
  		return -ERRDISPLAYTOOSMALL;
  
  	/* center dialog box on screen */
--	x = (COLS - width) / 2;
--	y = (LINES - height) / 2;
-+	x = (getmaxx(stdscr) - width) / 2;
-+	y = (getmaxy(stdscr) - height) / 2;
- 
- 	draw_shadow(stdscr, y, x, height, width);
- 
 -- 
 1.8.1.2
 
