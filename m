@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f182.google.com ([209.85.212.182]:42073 "EHLO
-	mail-wi0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933236Ab3FRWpZ (ORCPT
+Received: from mail-we0-f178.google.com ([74.125.82.178]:49332 "EHLO
+	mail-we0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933042Ab3FRWp0 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 18 Jun 2013 18:45:25 -0400
+	Tue, 18 Jun 2013 18:45:26 -0400
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: [PATCH 04/14] kconfig/lxdialog: handle newline characters in print_autowrap()
-Date: Wed, 19 Jun 2013 00:45:00 +0200
-Message-Id: <1376391621654cc369c5e8b60497f7c184f0ed47.1371595499.git.yann.morin.1998@free.fr>
+Subject: [PATCH 05/14] mconf: use function calls instead of ncurses' variables LINES and COLS
+Date: Wed, 19 Jun 2013 00:45:01 +0200
+Message-Id: <4f2de3e19983dafca264b672152b36e4962ca1c3.1371595499.git.yann.morin.1998@free.fr>
 In-Reply-To: <cover.1371595499.git.yann.morin.1998@free.fr>
 References: <cover.1371595499.git.yann.morin.1998@free.fr>
 In-Reply-To: <cover.1371595499.git.yann.morin.1998@free.fr>
@@ -19,116 +19,147 @@ Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Dirk Gouders <d
 
 From: Dirk Gouders <dirk@gouders.net>
 
-When exiting menuconfig with unsaved changes, a dialog like
-the following is shown:
+According to the documentation [1], LINES and COLS are initialized by
+initscr(); it does not say anything about the behavior when windows are
+resized.
 
-        Do you wish to save your new configuration ? <ESC><ESC>
-        to continue.
+Do not rely on the current implementation of ncurses that updates
+these variables on resize, but use the propper function calls to get
+window dimensions.
 
-The author of the dialog text specified a newline after the '?',
-and probably expected it to be processed, so let print_autowrap()
-handle newlines propperly.
+init_dialog() could make use of the variables, but for the sake of
+consistency we do not change it's current use of the macro getmaxyx().
 
-Also, reword that dialog's second phrase with a real sentence.
+[1] ncurses(3X)
 
 Signed-off-by: Dirk Gouders <dirk@gouders.net>
 Tested-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
 Reviewed-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
-[yann.morin.1998@free.fr: very slightly tweak the commit message]
 Signed-off-by: Yann E. MORIN <yann.morin.1998@free.fr>
 ---
- scripts/kconfig/lxdialog/util.c | 31 +++++++++++++++++--------------
- scripts/kconfig/mconf.c         |  4 ++--
- 2 files changed, 19 insertions(+), 16 deletions(-)
+ scripts/kconfig/lxdialog/checklist.c |  4 ++--
+ scripts/kconfig/lxdialog/inputbox.c  |  4 ++--
+ scripts/kconfig/lxdialog/menubox.c   |  4 ++--
+ scripts/kconfig/lxdialog/textbox.c   |  4 ++--
+ scripts/kconfig/lxdialog/util.c      | 13 +++++++++----
+ scripts/kconfig/lxdialog/yesno.c     |  4 ++--
+ 6 files changed, 19 insertions(+), 14 deletions(-)
 
+diff --git a/scripts/kconfig/lxdialog/checklist.c b/scripts/kconfig/lxdialog/checklist.c
+index 3034057..3b15c08 100644
+--- a/scripts/kconfig/lxdialog/checklist.c
++++ b/scripts/kconfig/lxdialog/checklist.c
+@@ -140,8 +140,8 @@ do_resize:
+ 	max_choice = MIN(list_height, item_count());
+ 
+ 	/* center dialog box on screen */
+-	x = (COLS - width) / 2;
+-	y = (LINES - height) / 2;
++	x = (getmaxx(stdscr) - width) / 2;
++	y = (getmaxy(stdscr) - height) / 2;
+ 
+ 	draw_shadow(stdscr, y, x, height, width);
+ 
+diff --git a/scripts/kconfig/lxdialog/inputbox.c b/scripts/kconfig/lxdialog/inputbox.c
+index 7b01add..447a582 100644
+--- a/scripts/kconfig/lxdialog/inputbox.c
++++ b/scripts/kconfig/lxdialog/inputbox.c
+@@ -62,8 +62,8 @@ do_resize:
+ 		return -ERRDISPLAYTOOSMALL;
+ 
+ 	/* center dialog box on screen */
+-	x = (COLS - width) / 2;
+-	y = (LINES - height) / 2;
++	x = (getmaxx(stdscr) - width) / 2;
++	y = (getmaxy(stdscr) - height) / 2;
+ 
+ 	draw_shadow(stdscr, y, x, height, width);
+ 
+diff --git a/scripts/kconfig/lxdialog/menubox.c b/scripts/kconfig/lxdialog/menubox.c
+index 00d2841..92b89a6 100644
+--- a/scripts/kconfig/lxdialog/menubox.c
++++ b/scripts/kconfig/lxdialog/menubox.c
+@@ -203,8 +203,8 @@ do_resize:
+ 	max_choice = MIN(menu_height, item_count());
+ 
+ 	/* center dialog box on screen */
+-	x = (COLS - width) / 2;
+-	y = (LINES - height) / 2;
++	x = (getmaxx(stdscr) - width) / 2;
++	y = (getmaxy(stdscr) - height) / 2;
+ 
+ 	draw_shadow(stdscr, y, x, height, width);
+ 
+diff --git a/scripts/kconfig/lxdialog/textbox.c b/scripts/kconfig/lxdialog/textbox.c
+index 907cdcb..1773319 100644
+--- a/scripts/kconfig/lxdialog/textbox.c
++++ b/scripts/kconfig/lxdialog/textbox.c
+@@ -98,8 +98,8 @@ do_resize:
+ 			width = 0;
+ 
+ 	/* center dialog box on screen */
+-	x = (COLS - width) / 2;
+-	y = (LINES - height) / 2;
++	x = (getmaxx(stdscr) - width) / 2;
++	y = (getmaxy(stdscr) - height) / 2;
+ 
+ 	draw_shadow(stdscr, y, x, height, width);
+ 
 diff --git a/scripts/kconfig/lxdialog/util.c b/scripts/kconfig/lxdialog/util.c
-index 78fe4e9..0fa567e 100644
+index 0fa567e..58a8289 100644
 --- a/scripts/kconfig/lxdialog/util.c
 +++ b/scripts/kconfig/lxdialog/util.c
-@@ -371,27 +371,19 @@ void print_title(WINDOW *dialog, const char *title, int width)
- /*
-  * Print a string of text in a window, automatically wrap around to the
-  * next line if the string is too long to fit on one line. Newline
-- * characters '\n' are replaced by spaces.  We start on a new line
-+ * characters '\n' are propperly processed.  We start on a new line
-  * if there is no room for at least 4 nonblanks following a double-space.
-  */
- void print_autowrap(WINDOW * win, const char *prompt, int width, int y, int x)
+@@ -254,7 +254,12 @@ void attr_clear(WINDOW * win, int height, int width, chtype attr)
+ 
+ void dialog_clear(void)
  {
- 	int newl, cur_x, cur_y;
--	int i, prompt_len, room, wlen;
--	char tempstr[MAX_LEN + 1], *word, *sp, *sp2;
-+	int prompt_len, room, wlen;
-+	char tempstr[MAX_LEN + 1], *word, *sp, *sp2, *newline_separator = 0;
- 
- 	strcpy(tempstr, prompt);
- 
- 	prompt_len = strlen(tempstr);
- 
--	/*
--	 * Remove newlines
--	 */
--	for (i = 0; i < prompt_len; i++) {
--		if (tempstr[i] == '\n')
--			tempstr[i] = ' ';
--	}
--
- 	if (prompt_len <= width - x * 2) {	/* If prompt is short */
- 		wmove(win, y, (width - prompt_len) / 2);
- 		waddstr(win, tempstr);
-@@ -401,7 +393,10 @@ void print_autowrap(WINDOW * win, const char *prompt, int width, int y, int x)
- 		newl = 1;
- 		word = tempstr;
- 		while (word && *word) {
--			sp = strchr(word, ' ');
-+			sp = strpbrk(word, "\n ");
-+			if (sp && *sp == '\n')
-+				newline_separator = sp;
+-	attr_clear(stdscr, LINES, COLS, dlg.screen.atr);
++	int lines, columns;
 +
- 			if (sp)
- 				*sp++ = 0;
++	lines = getmaxy(stdscr);
++	columns = getmaxx(stdscr);
++
++	attr_clear(stdscr, lines, columns, dlg.screen.atr);
+ 	/* Display background title if it exists ... - SLH */
+ 	if (dlg.backtitle != NULL) {
+ 		int i, len = 0, skip = 0;
+@@ -269,10 +274,10 @@ void dialog_clear(void)
+ 		}
  
-@@ -413,7 +408,7 @@ void print_autowrap(WINDOW * win, const char *prompt, int width, int y, int x)
- 			if (wlen > room ||
- 			    (newl && wlen < 4 && sp
- 			     && wlen + 1 + strlen(sp) > room
--			     && (!(sp2 = strchr(sp, ' '))
-+			     && (!(sp2 = strpbrk(sp, "\n "))
- 				 || wlen + 1 + (sp2 - sp) > room))) {
- 				cur_y++;
- 				cur_x = x;
-@@ -421,7 +416,15 @@ void print_autowrap(WINDOW * win, const char *prompt, int width, int y, int x)
- 			wmove(win, cur_y, cur_x);
- 			waddstr(win, word);
- 			getyx(win, cur_y, cur_x);
--			cur_x++;
-+
-+			/* Move to the next line if the word separator was a newline */
-+			if (newline_separator) {
-+				cur_y++;
-+				cur_x = x;
-+				newline_separator = 0;
-+			} else
-+				cur_x++;
-+
- 			if (sp && *sp == ' ') {
- 				cur_x++;	/* double space */
- 				while (*++sp == ' ') ;
-diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
-index 2396c5b..cb8cf4a 100644
---- a/scripts/kconfig/mconf.c
-+++ b/scripts/kconfig/mconf.c
-@@ -958,8 +958,8 @@ static int handle_exit(void)
- 	dialog_clear();
- 	if (conf_get_changed())
- 		res = dialog_yesno(NULL,
--				   _("Do you wish to save your new configuration ?\n"
--				     "<ESC><ESC> to continue."),
-+				   _("Do you wish to save your new configuration?\n"
-+				     "(Press <ESC><ESC> to continue kernel configuration.)"),
- 				   6, 60);
- 	else
- 		res = -1;
+ 		wmove(stdscr, 1, 1);
+-		if (len > COLS - 2) {
++		if (len > columns - 2) {
+ 			const char *ellipsis = "[...] ";
+ 			waddstr(stdscr, ellipsis);
+-			skip = len - (COLS - 2 - strlen(ellipsis));
++			skip = len - (columns - 2 - strlen(ellipsis));
+ 		}
+ 
+ 		for (pos = dlg.subtitles; pos != NULL; pos = pos->next) {
+@@ -298,7 +303,7 @@ void dialog_clear(void)
+ 				skip--;
+ 		}
+ 
+-		for (i = len + 1; i < COLS - 1; i++)
++		for (i = len + 1; i < columns - 1; i++)
+ 			waddch(stdscr, ACS_HLINE);
+ 	}
+ 	wnoutrefresh(stdscr);
+diff --git a/scripts/kconfig/lxdialog/yesno.c b/scripts/kconfig/lxdialog/yesno.c
+index abb0c39..676fb2f 100644
+--- a/scripts/kconfig/lxdialog/yesno.c
++++ b/scripts/kconfig/lxdialog/yesno.c
+@@ -51,8 +51,8 @@ do_resize:
+ 		return -ERRDISPLAYTOOSMALL;
+ 
+ 	/* center dialog box on screen */
+-	x = (COLS - width) / 2;
+-	y = (LINES - height) / 2;
++	x = (getmaxx(stdscr) - width) / 2;
++	y = (getmaxy(stdscr) - height) / 2;
+ 
+ 	draw_shadow(stdscr, y, x, height, width);
+ 
 -- 
 1.8.1.2
 
