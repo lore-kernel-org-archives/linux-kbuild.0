@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f44.google.com ([74.125.82.44]:42962 "EHLO
-	mail-wg0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933482Ab3FRWpl (ORCPT
+Received: from mail-wi0-f171.google.com ([209.85.212.171]:59227 "EHLO
+	mail-wi0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933741Ab3FRWpj (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 18 Jun 2013 18:45:41 -0400
+	Tue, 18 Jun 2013 18:45:39 -0400
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: [PATCH 14/14] kconfig: fix randomising choice entries in presence of KCONFIG_ALLCONFIG
-Date: Wed, 19 Jun 2013 00:45:10 +0200
-Message-Id: <b4e0ac8385fecde0363a2499323f81b4a91e8430.1371595499.git.yann.morin.1998@free.fr>
+Subject: [PATCH 13/14] kconfig: loop as long as we changed some symbols in randconfig
+Date: Wed, 19 Jun 2013 00:45:09 +0200
+Message-Id: <6990fad0c8b4bf8be87b3d4736f4a9dd1b4421ee.1371595499.git.yann.morin.1998@free.fr>
 In-Reply-To: <cover.1371595499.git.yann.morin.1998@free.fr>
 References: <cover.1371595499.git.yann.morin.1998@free.fr>
 In-Reply-To: <cover.1371595499.git.yann.morin.1998@free.fr>
@@ -15,128 +15,165 @@ References: <cover.1371595499.git.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Thomas Petazzoni <thomas.petazzoni@free-electrons.com>, Sam Ravnborg <sam@ravnborg.org>, Sedat Dilek <sedat.dilek@gmail.com>, Arnd Bergmann <arnd@arndb.de>, Stephen Rothwell <sfr@canb.auug.org.au>
+Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, "Yann E. MORIN" <yann.morin.1998@free.fr>
 
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-Currently, randconfig does randomise choice entries, unless KCONFIG_ALLCONFIG
-is specified.
+Because of choice-in-a-choice constructs, it can happen that not all
+symbols are assigned a value during randconfig, leading in rare cases
+to this situation:
 
-For example, given those two files (Thomas' test-case):
-
-    ---8<--- Config.test.in
-    config OPTIONA
-        bool "Option A"
-
+    ---8<--- choice-in-choice.in
     choice
-        prompt "This is a choice"
+        bool "A/B/C"
+    config A
+        bool "A"
 
-    config CHOICE_OPTIONA
-        bool "Choice Option A"
-
-    config CHOICE_OPTIONB
-        bool "Choice Option B"
-
+    config B
+        bool "B"
+    if B
+    choice
+        bool "E/F"
+    config E
+        bool "E"
+    config F
+        bool "F"
     endchoice
+    endif # B
 
-    config OPTIONB
-        bool "Option B"
-    ---8<--- Config.test.in
+    config C
+        bool "C"
+    endchoice
+    ---8<---
 
-    ---8<--- config.defaults
-    CONFIG_OPTIONA=y
-    ---8<--- config.defaults
+    $ ./scripts/kconfig/conf --randconfig choice-in-choice.in
+    [--SNIP--]
+    $ ./scripts/kconfig/conf --silentoldconfig choice-in-choice.in </dev/null
+    [--SNIP--]
+    A/B/C
+      1. A (A)
+    > 2. B (B)
+      3. C (C)
+    choice[1-3]: 2
+      E/F
+      > 1. E (E) (NEW)
+        2. F (F) (NEW)
+      choice[1-2]: aborted!
 
-And running:
-    ./scripts/kconfig/conf --randconfig Config.test.in
+    Console input/output is redirected. Run 'make oldconfig' to update
+    configuration.
 
-does properly randomise the two choice symbols (and the two booleans).
+Fix this by looping in randconfig for as long as some symbol gets assigned
+a value.
 
-However, running:
-    KCONFIG_ALLCONFIG=config.defaults \
-    ./scripts/kconfig/conf --randconfig Config.test.in
+Note: this was spotted with the USB EHCI Debug Device Gadget (USB_G_DBGP),
+which uses this choice-in-a-choice construct, and exhibits this problem.
+The example above is just a stripped-down minimalist test-case.
 
-does *not* reandomise the two choice entries, and only CHOICE_OPTIONA
-will ever be selected. (OPTIONA will always be set (expected), and
-OPTIONB will be be properly randomised (expected).)
-
-This patch defers setting that a choice has a value until a symbol for
-that choice is indeed set, so that choices are properly randomised when
-KCONFIG_ALLCONFIG is set, but not if a symbol for that choice is set.
-
-Reported-by: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
 Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
-Cc: Michal Marek <mmarek@suse.cz>
-Cc: Sam Ravnborg <sam@ravnborg.org>
-Cc: Sedat Dilek <sedat.dilek@gmail.com>
-Cc: Arnd Bergmann <arnd@arndb.de>
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>
-
 ---
-Changes v3 -> v4
-  - fix previous issue where some choices would not be set, which would
-    cause silentoldconfig to ask for them and was then breaking this
-    workflow (as reported by Arnd and Sedat):
-        KCONFIG_ALLCONFIG=foo.defconfig make randconfig
-        make silentoldconfig </dev/nullo
-    which I have tested (3h28min!) with:
-        touch defconfig
-        for(( i=0; i<10000; i++ )); do
-            KCONFIG_ALLCONFIG=$(pwd)/defconfig make randconfig >/dev/null 2>&1
-            make silentoldconfig </dev/null >/dev/null 2>&1 || break
-        done
-    which did not break at all.
-  - change done in v3 (below) is already fixed by a previous patch
+ scripts/kconfig/conf.c     |  3 ++-
+ scripts/kconfig/confdata.c | 18 ++++++++++++++----
+ scripts/kconfig/lkc.h      |  2 +-
+ 3 files changed, 17 insertions(+), 6 deletions(-)
 
-Changes v2 -> v3
-  - ensure only one symbol is set in a choice
-
-Changes v1 -> v2:
-  - further postpone setting that a choice has a value until
-    one is indeed set
-  - do not print symbols that are part of an invisible choice
----
- scripts/kconfig/confdata.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
+diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
+index 38616c1..d19944f 100644
+--- a/scripts/kconfig/conf.c
++++ b/scripts/kconfig/conf.c
+@@ -654,7 +654,8 @@ int main(int ac, char **av)
+ 		conf_set_all_new_symbols(def_default);
+ 		break;
+ 	case randconfig:
+-		conf_set_all_new_symbols(def_random);
++		/* Really nothing to do in this loop */
++		while (conf_set_all_new_symbols(def_random)) ;
+ 		break;
+ 	case defconfig:
+ 		conf_set_all_new_symbols(def_default);
 diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-index c55c227..3e39208 100644
+index d36bc1f..c55c227 100644
 --- a/scripts/kconfig/confdata.c
 +++ b/scripts/kconfig/confdata.c
-@@ -288,8 +288,6 @@ load:
- 	for_all_symbols(i, sym) {
- 		sym->flags |= SYMBOL_CHANGED;
- 		sym->flags &= ~(def_flags|SYMBOL_VALID);
--		if (sym_is_choice(sym))
--			sym->flags |= def_flags;
- 		switch (sym->type) {
- 		case S_INT:
- 		case S_HEX:
-@@ -379,13 +377,13 @@ setsym:
- 			case mod:
- 				if (cs->def[def].tri == yes) {
- 					conf_warning("%s creates inconsistent choice state", sym->name);
--					cs->flags &= ~def_flags;
- 				}
- 				break;
- 			case yes:
- 				if (cs->def[def].tri != no)
- 					conf_warning("override: %s changes choice state", sym->name);
- 				cs->def[def].val = sym;
-+				cs->flags |= def_flags;
- 				break;
- 			}
- 			cs->def[def].tri = EXPR_OR(cs->def[def].tri, sym->def[def].tri);
-@@ -791,6 +789,8 @@ int conf_write(const char *name)
- 			sym_calc_value(sym);
- 			if (!(sym->flags & SYMBOL_WRITE))
- 				goto next;
-+			if (sym_is_choice_value(sym) && !menu_is_visible(menu->parent))
-+				goto next;
- 			sym->flags &= ~SYMBOL_WRITE;
+@@ -1040,7 +1040,7 @@ void conf_set_changed_callback(void (*fn)(void))
+ 	conf_changed_callback = fn;
+ }
  
- 			conf_write_symbol(out, sym, &kconfig_printer_cb, NULL);
+-static void randomize_choice_values(struct symbol *csym)
++static bool randomize_choice_values(struct symbol *csym)
+ {
+ 	struct property *prop;
+ 	struct symbol *sym;
+@@ -1053,7 +1053,7 @@ static void randomize_choice_values(struct symbol *csym)
+ 	 * In both cases stop.
+ 	 */
+ 	if (csym->curr.tri != yes)
+-		return;
++		return false;
+ 
+ 	prop = sym_get_choice_prop(csym);
+ 
+@@ -1084,6 +1084,8 @@ static void randomize_choice_values(struct symbol *csym)
+ 	csym->flags |= SYMBOL_DEF_USER;
+ 	/* clear VALID to get value calculated */
+ 	csym->flags &= ~(SYMBOL_VALID);
++
++	return true;
+ }
+ 
+ void set_all_choice_values(struct symbol *csym)
+@@ -1106,7 +1108,7 @@ void set_all_choice_values(struct symbol *csym)
+ 	csym->flags &= ~(SYMBOL_VALID | SYMBOL_NEED_SET_CHOICE_VALUES);
+ }
+ 
+-void conf_set_all_new_symbols(enum conf_def_mode mode)
++bool conf_set_all_new_symbols(enum conf_def_mode mode)
+ {
+ 	struct symbol *sym, *csym;
+ 	int i, cnt, pby, pty, ptm;	/* pby: probability of boolean  = y
+@@ -1154,6 +1156,7 @@ void conf_set_all_new_symbols(enum conf_def_mode mode)
+ 			exit( 1 );
+ 		}
+ 	}
++	bool has_changed = false;
+ 
+ 	for_all_symbols(i, sym) {
+ 		if (sym_has_value(sym) || (sym->flags & SYMBOL_VALID))
+@@ -1161,6 +1164,7 @@ void conf_set_all_new_symbols(enum conf_def_mode mode)
+ 		switch (sym_get_type(sym)) {
+ 		case S_BOOLEAN:
+ 		case S_TRISTATE:
++			has_changed = true;
+ 			switch (mode) {
+ 			case def_yes:
+ 				sym->def[S_DEF_USER].tri = yes;
+@@ -1219,6 +1223,12 @@ void conf_set_all_new_symbols(enum conf_def_mode mode)
+ 
+ 		sym_calc_value(csym);
+ 		if (mode == def_random)
+-			randomize_choice_values(csym);
++			has_changed = randomize_choice_values(csym);
++		else {
++			set_all_choice_values(csym);
++			has_changed = true;
++		}
+ 	}
++
++	return has_changed;
+ }
+diff --git a/scripts/kconfig/lkc.h b/scripts/kconfig/lkc.h
+index 0c8d419..09f4edf 100644
+--- a/scripts/kconfig/lkc.h
++++ b/scripts/kconfig/lkc.h
+@@ -86,7 +86,7 @@ const char *conf_get_autoconfig_name(void);
+ char *conf_get_default_confname(void);
+ void sym_set_change_count(int count);
+ void sym_add_change_count(int count);
+-void conf_set_all_new_symbols(enum conf_def_mode mode);
++bool conf_set_all_new_symbols(enum conf_def_mode mode);
+ void set_all_choice_values(struct symbol *csym);
+ 
+ struct conf_printer {
 -- 
 1.8.1.2
 
