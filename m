@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f171.google.com ([209.85.212.171]:39170 "EHLO
-	mail-wi0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933747Ab3FRWpd (ORCPT
+Received: from mail-wi0-f182.google.com ([209.85.212.182]:42073 "EHLO
+	mail-wi0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933236Ab3FRWpZ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 18 Jun 2013 18:45:33 -0400
+	Tue, 18 Jun 2013 18:45:25 -0400
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: [PATCH 09/14] kconfig/conf: fix randconfig setting multiple symbols in a choice
-Date: Wed, 19 Jun 2013 00:45:05 +0200
-Message-Id: <e6abf12a77bc56dceeb4cba557b726268e71350e.1371595499.git.yann.morin.1998@free.fr>
+Subject: [PATCH 04/14] kconfig/lxdialog: handle newline characters in print_autowrap()
+Date: Wed, 19 Jun 2013 00:45:00 +0200
+Message-Id: <1376391621654cc369c5e8b60497f7c184f0ed47.1371595499.git.yann.morin.1998@free.fr>
 In-Reply-To: <cover.1371595499.git.yann.morin.1998@free.fr>
 References: <cover.1371595499.git.yann.morin.1998@free.fr>
 In-Reply-To: <cover.1371595499.git.yann.morin.1998@free.fr>
@@ -15,70 +15,120 @@ References: <cover.1371595499.git.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Matthieu CASTET <matthieu.castet@parrot.com>, Arnaud Lacombe <lacombar@gmail.com>, Sedat Dilek <sedat.dilek@gmail.com>
+Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Dirk Gouders <dirk@gouders.net>, "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+From: Dirk Gouders <dirk@gouders.net>
 
-Currently, randconfig may set more than one symbol in a given choice.
-Given this config file:
-    config A
-        bool "A"
-    if A
-    choice
-        bool "B/C/D"
-    config B
-        bool "B"
-    config C
-        bool "C"
-    config D
-        bool "D"
-    endchoice
-    endif # A
+When exiting menuconfig with unsaved changes, a dialog like
+the following is shown:
 
-Then randconfig generates such .config files (case where A is not set is not
-shown below for brevity), and where only the right-most .config is valid:
-  CONFIG_A=y                  CONFIG_A=y                  CONFIG_A=y
-  CONFIG_B=y                  CONFIG_B=y                  CONFIG_B=y
-  CONFIG_C=y                  # CONFIG_C is not set       # CONFIG_C is not set
-  # CONFIG_D is not set       CONFIG_D=y                  # CONFIG_D is not set
+        Do you wish to save your new configuration ? <ESC><ESC>
+        to continue.
 
-That is, in a randomised choice, the first symbol is always selected,
-and at most one other symbol may be selected.
+The author of the dialog text specified a newline after the '?',
+and probably expected it to be processed, so let print_autowrap()
+handle newlines propperly.
 
-This is due to symbol randomised in a choice not being properly flagged
-as having a value.
+Also, reword that dialog's second phrase with a real sentence.
 
-Fix that by flagging those symbols adequately: have a user-defined value,
-and be not valid (to force recalculation of the symbol).
-
-Note: if the choice is not conditional, then the randomisation is properly
-done.
-
-Reported-by: Matthieu CASTET <matthieu.castet@parrot.com>
-Signed-off-by: Matthieu CASTET <matthieu.castet@parrot.com>
-[yann.morin.1998@free.fr: independently re-done the same patch as Matthieu,
-                          as pointed out by Sedat]
-Cc: Arnaud Lacombe <lacombar@gmail.com>
-Cc: Sedat Dilek <sedat.dilek@gmail.com>
-Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Signed-off-by: Dirk Gouders <dirk@gouders.net>
+Tested-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Reviewed-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+[yann.morin.1998@free.fr: very slightly tweak the commit message]
+Signed-off-by: Yann E. MORIN <yann.morin.1998@free.fr>
 ---
- scripts/kconfig/confdata.c | 3 +++
- 1 file changed, 3 insertions(+)
+ scripts/kconfig/lxdialog/util.c | 31 +++++++++++++++++--------------
+ scripts/kconfig/mconf.c         |  4 ++--
+ 2 files changed, 19 insertions(+), 16 deletions(-)
 
-diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-index 35e0f16..d36bc1f 100644
---- a/scripts/kconfig/confdata.c
-+++ b/scripts/kconfig/confdata.c
-@@ -1077,6 +1077,9 @@ static void randomize_choice_values(struct symbol *csym)
- 		else {
- 			sym->def[S_DEF_USER].tri = no;
- 		}
-+		sym->flags |= SYMBOL_DEF_USER;
-+		/* clear VALID to get value calculated */
-+		sym->flags &= ~SYMBOL_VALID;
- 	}
- 	csym->flags |= SYMBOL_DEF_USER;
- 	/* clear VALID to get value calculated */
+diff --git a/scripts/kconfig/lxdialog/util.c b/scripts/kconfig/lxdialog/util.c
+index 78fe4e9..0fa567e 100644
+--- a/scripts/kconfig/lxdialog/util.c
++++ b/scripts/kconfig/lxdialog/util.c
+@@ -371,27 +371,19 @@ void print_title(WINDOW *dialog, const char *title, int width)
+ /*
+  * Print a string of text in a window, automatically wrap around to the
+  * next line if the string is too long to fit on one line. Newline
+- * characters '\n' are replaced by spaces.  We start on a new line
++ * characters '\n' are propperly processed.  We start on a new line
+  * if there is no room for at least 4 nonblanks following a double-space.
+  */
+ void print_autowrap(WINDOW * win, const char *prompt, int width, int y, int x)
+ {
+ 	int newl, cur_x, cur_y;
+-	int i, prompt_len, room, wlen;
+-	char tempstr[MAX_LEN + 1], *word, *sp, *sp2;
++	int prompt_len, room, wlen;
++	char tempstr[MAX_LEN + 1], *word, *sp, *sp2, *newline_separator = 0;
+ 
+ 	strcpy(tempstr, prompt);
+ 
+ 	prompt_len = strlen(tempstr);
+ 
+-	/*
+-	 * Remove newlines
+-	 */
+-	for (i = 0; i < prompt_len; i++) {
+-		if (tempstr[i] == '\n')
+-			tempstr[i] = ' ';
+-	}
+-
+ 	if (prompt_len <= width - x * 2) {	/* If prompt is short */
+ 		wmove(win, y, (width - prompt_len) / 2);
+ 		waddstr(win, tempstr);
+@@ -401,7 +393,10 @@ void print_autowrap(WINDOW * win, const char *prompt, int width, int y, int x)
+ 		newl = 1;
+ 		word = tempstr;
+ 		while (word && *word) {
+-			sp = strchr(word, ' ');
++			sp = strpbrk(word, "\n ");
++			if (sp && *sp == '\n')
++				newline_separator = sp;
++
+ 			if (sp)
+ 				*sp++ = 0;
+ 
+@@ -413,7 +408,7 @@ void print_autowrap(WINDOW * win, const char *prompt, int width, int y, int x)
+ 			if (wlen > room ||
+ 			    (newl && wlen < 4 && sp
+ 			     && wlen + 1 + strlen(sp) > room
+-			     && (!(sp2 = strchr(sp, ' '))
++			     && (!(sp2 = strpbrk(sp, "\n "))
+ 				 || wlen + 1 + (sp2 - sp) > room))) {
+ 				cur_y++;
+ 				cur_x = x;
+@@ -421,7 +416,15 @@ void print_autowrap(WINDOW * win, const char *prompt, int width, int y, int x)
+ 			wmove(win, cur_y, cur_x);
+ 			waddstr(win, word);
+ 			getyx(win, cur_y, cur_x);
+-			cur_x++;
++
++			/* Move to the next line if the word separator was a newline */
++			if (newline_separator) {
++				cur_y++;
++				cur_x = x;
++				newline_separator = 0;
++			} else
++				cur_x++;
++
+ 			if (sp && *sp == ' ') {
+ 				cur_x++;	/* double space */
+ 				while (*++sp == ' ') ;
+diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
+index 2396c5b..cb8cf4a 100644
+--- a/scripts/kconfig/mconf.c
++++ b/scripts/kconfig/mconf.c
+@@ -958,8 +958,8 @@ static int handle_exit(void)
+ 	dialog_clear();
+ 	if (conf_get_changed())
+ 		res = dialog_yesno(NULL,
+-				   _("Do you wish to save your new configuration ?\n"
+-				     "<ESC><ESC> to continue."),
++				   _("Do you wish to save your new configuration?\n"
++				     "(Press <ESC><ESC> to continue kernel configuration.)"),
+ 				   6, 60);
+ 	else
+ 		res = -1;
 -- 
 1.8.1.2
 
