@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f47.google.com ([74.125.82.47]:51339 "EHLO
-	mail-wg0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933809Ab3FRWpg (ORCPT
+Received: from mail-wg0-f45.google.com ([74.125.82.45]:55575 "EHLO
+	mail-wg0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933773Ab3FRWpe (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 18 Jun 2013 18:45:36 -0400
+	Tue, 18 Jun 2013 18:45:34 -0400
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: [PATCH 11/14] kconfig/conf: print the seed used to initialise the RNG for randconfig
-Date: Wed, 19 Jun 2013 00:45:07 +0200
-Message-Id: <a5f6d795f5941e97e757b643a6482968a66c6150.1371595499.git.yann.morin.1998@free.fr>
+Subject: [PATCH 10/14] kconfig/conf: accept a base-16 seed for randconfig
+Date: Wed, 19 Jun 2013 00:45:06 +0200
+Message-Id: <e85ac12443da72d79dbf7c55c12e4b16b8923d87.1371595499.git.yann.morin.1998@free.fr>
 In-Reply-To: <cover.1371595499.git.yann.morin.1998@free.fr>
 References: <cover.1371595499.git.yann.morin.1998@free.fr>
 In-Reply-To: <cover.1371595499.git.yann.morin.1998@free.fr>
@@ -19,25 +19,24 @@ Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, "Yann E. MORIN"
 
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-... so the user has a chance to reproduce a test-case.
-
 Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
 ---
- scripts/kconfig/conf.c | 1 +
- 1 file changed, 1 insertion(+)
+ scripts/kconfig/conf.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
-index 94521c7..38616c1 100644
+index bde5b95..94521c7 100644
 --- a/scripts/kconfig/conf.c
 +++ b/scripts/kconfig/conf.c
-@@ -532,6 +532,7 @@ int main(int ac, char **av)
+@@ -527,7 +527,7 @@ int main(int ac, char **av)
+ 			seed_env = getenv("KCONFIG_SEED");
+ 			if( seed_env && *seed_env ) {
+ 				char *endp;
+-				int tmp = (int)strtol(seed_env, &endp, 10);
++				int tmp = (int)strtol(seed_env, &endp, 0);
+ 				if (*endp == '\0') {
  					seed = tmp;
  				}
- 			}
-+			fprintf( stderr, "KCONFIG_SEED=0x%X\n", seed );
- 			srand(seed);
- 			break;
- 		}
 -- 
 1.8.1.2
 
