@@ -1,119 +1,182 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f54.google.com ([74.125.82.54]:37767 "EHLO
-	mail-wg0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755322Ab3FRWpS (ORCPT
+Received: from mail-we0-f174.google.com ([74.125.82.174]:43032 "EHLO
+	mail-we0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933236Ab3FRWpa (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 18 Jun 2013 18:45:18 -0400
+	Tue, 18 Jun 2013 18:45:30 -0400
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: [pull request] Pull request for branch yem-kconfig-for-next
-Date: Wed, 19 Jun 2013 00:44:56 +0200
-Message-Id: <cover.1371595499.git.yann.morin.1998@free.fr>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Subject: [PATCH 07/14] mconf/nconf: mark empty menus/menuconfigs different from non-empty ones
+Date: Wed, 19 Jun 2013 00:45:03 +0200
+Message-Id: <1278ebdbc3167883f32095491990fbdc7cdf8b5e.1371595499.git.yann.morin.1998@free.fr>
+In-Reply-To: <cover.1371595499.git.yann.morin.1998@free.fr>
+References: <cover.1371595499.git.yann.morin.1998@free.fr>
+In-Reply-To: <cover.1371595499.git.yann.morin.1998@free.fr>
+References: <cover.1371595499.git.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Dirk Gouders <dirk@gouders.net>, "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+From: Dirk Gouders <dirk@gouders.net>
 
-Hello Michal, All!
+Submenus are sometimes empty and it would be nice if there is
+something that notifies us that we should not expect any content
+_before_ we enter a submenu.
 
-These are the patches against kconfig that I have accumulated for 3.11,
-and for which I plan to later send a proper pull-request.
+A new function menu_is_empty() was introduced and empty menus and
+menuconfigs are now marked by "----" as opposed to non-empty ones that
+are marked by "--->".
 
-Note-whorthy this time:
-  - fix values of tristates that are selected by boolean choices (Arve)
-  - fix choice randomisation in presence of KCONFIG_ALLCONFIG    (me)
-  - fix choice randomisation selecting more than one value in
-    a choice (but only if it is conditional)                     (me)
-  - fix choice-in-a-choice randomisation not selecting any value
-    for the inner-most choice                                    (me)
+This scheme was suggested by "Yann E. MORIN" <yann.morin.1998@free.fr>.
 
-Also, some code-cleanups and eye-candy:
-  - mconf and nconf code cleanups                                (Dirk, Sedat)
-  - mconf and nconf eye-candy                                    (Dirk)
-  - scripts/config script-name in help text                      (Clément)
-  - heuristic to sort found symbols by relevance                 (me)
-  - more randconfig debugging help                               (me)
+Signed-off-by: Dirk Gouders <dirk@gouders.net>
+Tested-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Reviewed-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+---
+ scripts/kconfig/lkc_proto.h |  1 +
+ scripts/kconfig/mconf.c     | 11 ++++++-----
+ scripts/kconfig/menu.c      | 16 ++++++++++++++++
+ scripts/kconfig/nconf.c     | 16 ++++++++--------
+ 4 files changed, 31 insertions(+), 13 deletions(-)
 
-Note: this series is for review before I send an official pull-request.
-I want to avoid the debacle [0] [1] of the last kconfig breakage I caused
-with my previous kconfig "fix" to randomising choices in presence of
-KCONFIG_ALLCONFIG.
-
-I would like to send an official pull-request early next week, so all of
-these can land early in -next, so they get some real-life t4esting before
-the next merge windows open. So please, please, test this carefully. ;-)
-
-[0] http://marc.info/?t=136684274600002&r=1&w=2
-[1] http://marc.info/?t=136696367200003&r=1&w=2
-
-Regards,
-Yann E. MORIN.
-
-
-The following changes since commit f722406faae2d073cc1d01063d1123c35425939e:
-
-  Linux 3.10-rc1 (2013-05-11 17:14:08 -0700)
-
-are available in the git repository at:
-
-  git://gitorious.org/linux-kconfig/linux-kconfig.git yem-kconfig-for-next
-
-for you to fetch changes up to b4e0ac8385fecde0363a2499323f81b4a91e8430:
-
-  kconfig: fix randomising choice entries in presence of KCONFIG_ALLCONFIG (2013-06-18 23:59:02 +0200)
-
-----------------------------------------------------------------
-Arve Hjønnevåg (1):
-      kconfig: Fix defconfig when one choice menu selects options that another choice menu depends on
-
-Clement Chauplannaz (1):
-      scripts/config: replace hard-coded script name by a dynamic value
-
-Dirk Gouders (4):
-      kconfig/lxdialog: handle newline characters in print_autowrap()
-      mconf: use function calls instead of ncurses' variables LINES and COLS
-      nconf: use function calls instead of ncurses' variables LINES and COLS
-      mconf/nconf: mark empty menus/menuconfigs different from non-empty ones
-
-Sedat Dilek (2):
-      kconfig/lxdialog: Add definitions for mininimum (re)size values
-      kconfig/lxdialog: Use new mininimum resize definitions in conf_choice()
-
-Yann E. MORIN (6):
-      kconfig/conf: fix randconfig setting multiple symbols in a choice
-      kconfig/conf: accept a base-16 seed for randconfig
-      kconfig/conf: print the seed used to initialise the RNG for randconfig
-      kconfig: sort found symbols by relevance
-      kconfig: loop as long as we changed some symbols in randconfig
-      kconfig: fix randomising choice entries in presence of KCONFIG_ALLCONFIG
-
- scripts/config                       |  12 ++--
- scripts/kconfig/conf.c               |   6 +-
- scripts/kconfig/confdata.c           |  39 +++++++++----
- scripts/kconfig/expr.h               |   3 +
- scripts/kconfig/lkc.h                |   3 +-
- scripts/kconfig/lkc_proto.h          |   1 +
- scripts/kconfig/lxdialog/checklist.c |   8 +--
- scripts/kconfig/lxdialog/dialog.h    |  14 +++++
- scripts/kconfig/lxdialog/inputbox.c  |   8 +--
- scripts/kconfig/lxdialog/menubox.c   |   6 +-
- scripts/kconfig/lxdialog/textbox.c   |   6 +-
- scripts/kconfig/lxdialog/util.c      |  46 ++++++++-------
- scripts/kconfig/lxdialog/yesno.c     |   8 +--
- scripts/kconfig/mconf.c              |  19 ++++---
- scripts/kconfig/menu.c               |  16 ++++++
- scripts/kconfig/nconf.c              |  37 +++++++-----
- scripts/kconfig/nconf.gui.c          |  20 ++++---
- scripts/kconfig/symbol.c             | 107 ++++++++++++++++++++++++++++++++---
- 18 files changed, 263 insertions(+), 96 deletions(-)
+diff --git a/scripts/kconfig/lkc_proto.h b/scripts/kconfig/lkc_proto.h
+index ef1a738..ecdb965 100644
+--- a/scripts/kconfig/lkc_proto.h
++++ b/scripts/kconfig/lkc_proto.h
+@@ -14,6 +14,7 @@ P(conf_set_message_callback, void,(void (*fn)(const char *fmt, va_list ap)));
+ /* menu.c */
+ P(rootmenu,struct menu,);
+ 
++P(menu_is_empty, bool, (struct menu *menu));
+ P(menu_is_visible, bool, (struct menu *menu));
+ P(menu_has_prompt, bool, (struct menu *menu));
+ P(menu_get_prompt,const char *,(struct menu *menu));
+diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
+index cb8cf4a..6ee4aae 100644
+--- a/scripts/kconfig/mconf.c
++++ b/scripts/kconfig/mconf.c
+@@ -48,7 +48,7 @@ static const char mconf_readme[] = N_(
+ "----------\n"
+ "o  Use the Up/Down arrow keys (cursor keys) to highlight the item\n"
+ "   you wish to change or submenu wish to select and press <Enter>.\n"
+-"   Submenus are designated by \"--->\".\n"
++"   Submenus are designated by \"--->\", empty ones by \"----\".\n"
+ "\n"
+ "   Shortcut: Press the option's highlighted letter (hotkey).\n"
+ "             Pressing a hotkey more than once will sequence\n"
+@@ -176,7 +176,7 @@ static const char mconf_readme[] = N_(
+ "\n"),
+ menu_instructions[] = N_(
+ 	"Arrow keys navigate the menu.  "
+-	"<Enter> selects submenus --->.  "
++	"<Enter> selects submenus ---> (or empty submenus ----).  "
+ 	"Highlighted letters are hotkeys.  "
+ 	"Pressing <Y> includes, <N> excludes, <M> modularizes features.  "
+ 	"Press <Esc><Esc> to exit, <?> for Help, </> for Search.  "
+@@ -498,8 +498,9 @@ static void build_conf(struct menu *menu)
+ 						  menu->data ? "-->" : "++>",
+ 						  indent + 1, ' ', prompt);
+ 				} else
+-					item_make("   %*c%s  --->", indent + 1, ' ', prompt);
+-
++					item_make("   %*c%s  %s",
++						  indent + 1, ' ', prompt,
++						  menu_is_empty(menu) ? "----" : "--->");
+ 				item_set_tag('m');
+ 				item_set_data(menu);
+ 				if (single_menu_mode && menu->data)
+@@ -630,7 +631,7 @@ static void build_conf(struct menu *menu)
+ 			  (sym_has_value(sym) || !sym_is_changable(sym)) ?
+ 			  "" : _(" (NEW)"));
+ 		if (menu->prompt->type == P_MENU) {
+-			item_add_str("  --->");
++			item_add_str("  %s", menu_is_empty(menu) ? "----" : "--->");
+ 			return;
+ 		}
+ 	}
+diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+index b5c7d90..6d11c8f 100644
+--- a/scripts/kconfig/menu.c
++++ b/scripts/kconfig/menu.c
+@@ -430,6 +430,22 @@ bool menu_has_prompt(struct menu *menu)
+ 	return true;
+ }
+ 
++/*
++ * Determine if a menu is empty.
++ * A menu is considered empty if it contains no or only
++ * invisible entries.
++ */
++bool menu_is_empty(struct menu *menu)
++{
++	struct menu *child;
++
++	for (child = menu->list; child; child = child->next) {
++		if (menu_is_visible(child))
++			return(false);
++	}
++	return(true);
++}
++
+ bool menu_is_visible(struct menu *menu)
+ {
+ 	struct menu *child;
+diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
+index aac85d3..0183153 100644
+--- a/scripts/kconfig/nconf.c
++++ b/scripts/kconfig/nconf.c
+@@ -45,8 +45,8 @@ static const char nconf_global_help[] = N_(
+ "<n> to remove it.  You may press the <Space> key to cycle through the\n"
+ "available options.\n"
+ "\n"
+-"A trailing \"--->\" designates a submenu.\n"
+-"\n"
++"A trailing \"--->\" designates a submenu, a trailing \"----\" an\n"
++"empty submenu.\n"
+ "\n"
+ "Menu navigation keys\n"
+ "----------------------------------------------------------------------\n"
+@@ -131,7 +131,7 @@ static const char nconf_global_help[] = N_(
+ "\n"),
+ menu_no_f_instructions[] = N_(
+ "Legend:  [*] built-in  [ ] excluded  <M> module  < > module capable.\n"
+-"Submenus are designated by a trailing \"--->\".\n"
++"Submenus are designated by a trailing \"--->\", empty ones by \"----\".\n"
+ "\n"
+ "Use the following keys to navigate the menus:\n"
+ "Move up or down with <Up> and <Down>.\n"
+@@ -148,7 +148,7 @@ menu_no_f_instructions[] = N_(
+ "For help related to the current menu entry press <?> or <h>.\n"),
+ menu_instructions[] = N_(
+ "Legend:  [*] built-in  [ ] excluded  <M> module  < > module capable.\n"
+-"Submenus are designated by a trailing \"--->\".\n"
++"Submenus are designated by a trailing \"--->\", empty ones by \"----\".\n"
+ "\n"
+ "Use the following keys to navigate the menus:\n"
+ "Move up or down with <Up> or <Down>.\n"
+@@ -760,9 +760,9 @@ static void build_conf(struct menu *menu)
+ 						indent + 1, ' ', prompt);
+ 				} else
+ 					item_make(menu, 'm',
+-						"   %*c%s  --->",
+-						indent + 1,
+-						' ', prompt);
++						  "   %*c%s  %s",
++						  indent + 1, ' ', prompt,
++						  menu_is_empty(menu) ? "----" : "--->");
+ 
+ 				if (single_menu_mode && menu->data)
+ 					goto conf_childs;
+@@ -904,7 +904,7 @@ static void build_conf(struct menu *menu)
+ 				(sym_has_value(sym) || !sym_is_changable(sym)) ?
+ 				"" : _(" (NEW)"));
+ 		if (menu->prompt && menu->prompt->type == P_MENU) {
+-			item_add_str("  --->");
++			item_add_str("  %s", menu_is_empty(menu) ? "----" : "--->");
+ 			return;
+ 		}
+ 	}
 -- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+1.8.1.2
+
