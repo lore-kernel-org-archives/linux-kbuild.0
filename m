@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f180.google.com ([209.85.212.180]:59167 "EHLO
-	mail-wi0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753008Ab3FXSMb (ORCPT
+Received: from mail-wg0-f42.google.com ([74.125.82.42]:64489 "EHLO
+	mail-wg0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752868Ab3FXSM1 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 24 Jun 2013 14:12:31 -0400
+	Mon, 24 Jun 2013 14:12:27 -0400
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: [PATCH 13/15] kconfig/[mn]conf: make it explicit in the search box that a regexp is possible
-Date: Mon, 24 Jun 2013 20:11:57 +0200
-Message-Id: <a1ce636f560336ba007bfabb15b167ff31b592cf.1372097219.git.yann.morin.1998@free.fr>
+Subject: [PATCH 11/15] kconfig/conf: print the seed used to initialise the RNG for randconfig
+Date: Mon, 24 Jun 2013 20:11:55 +0200
+Message-Id: <a5f6d795f5941e97e757b643a6482968a66c6150.1372097219.git.yann.morin.1998@free.fr>
 In-Reply-To: <cover.1372097219.git.yann.morin.1998@free.fr>
 References: <cover.1372097219.git.yann.morin.1998@free.fr>
 In-Reply-To: <cover.1372097219.git.yann.morin.1998@free.fr>
@@ -15,45 +15,29 @@ References: <cover.1372097219.git.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Jean Delvare <jdelvare@suse.de>
+Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, "Yann E. MORIN" <yann.morin.1998@free.fr>
 
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-Reported-by: Jean Delvare <jdelvare@suse.de>
-Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: Jean Delvare <jdelvare@suse.de>
-Cc: Michal Marek <mmarek@suse.cz>
----
- scripts/kconfig/mconf.c | 2 +-
- scripts/kconfig/nconf.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+... so the user has a chance to reproduce a test-case.
 
-diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
-index 6ee4aae..18d3dc9 100644
---- a/scripts/kconfig/mconf.c
-+++ b/scripts/kconfig/mconf.c
-@@ -401,7 +401,7 @@ static void search_conf(void)
- 	struct subtitle_part stpart;
- 
- 	title = str_new();
--	str_printf( &title, _("Enter %s (sub)string to search for "
-+	str_printf( &title, _("Enter %s (sub)string or regexp to search for "
- 			      "(with or without \"%s\")"), CONFIG_, CONFIG_);
- 
- again:
-diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
-index 0183153..7975d8d 100644
---- a/scripts/kconfig/nconf.c
-+++ b/scripts/kconfig/nconf.c
-@@ -695,7 +695,7 @@ static void search_conf(void)
- 	int dres;
- 
- 	title = str_new();
--	str_printf( &title, _("Enter %s (sub)string to search for "
-+	str_printf( &title, _("Enter %s (sub)string or regexp to search for "
- 			      "(with or without \"%s\")"), CONFIG_, CONFIG_);
- 
- again:
+Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+---
+ scripts/kconfig/conf.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
+index 94521c7..38616c1 100644
+--- a/scripts/kconfig/conf.c
++++ b/scripts/kconfig/conf.c
+@@ -532,6 +532,7 @@ int main(int ac, char **av)
+ 					seed = tmp;
+ 				}
+ 			}
++			fprintf( stderr, "KCONFIG_SEED=0x%X\n", seed );
+ 			srand(seed);
+ 			break;
+ 		}
 -- 
 1.8.1.2
 
