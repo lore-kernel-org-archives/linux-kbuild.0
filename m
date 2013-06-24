@@ -1,75 +1,110 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-we0-f175.google.com ([74.125.82.175]:44146 "EHLO
-	mail-we0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751894Ab3FXRNy convert rfc822-to-8bit (ORCPT
+Received: from mail-wi0-f174.google.com ([209.85.212.174]:46651 "EHLO
+	mail-wi0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752553Ab3FXSMJ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 24 Jun 2013 13:13:54 -0400
-Date: Mon, 24 Jun 2013 19:13:48 +0200
+	Mon, 24 Jun 2013 14:12:09 -0400
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH 12/14] kconfig: sort found symbols by relevance
-Message-ID: <20130624171348.GA3258@free.fr>
-References: <cover.1371595499.git.yann.morin.1998@free.fr>
- <3e2346029e33ef9405b87d72a32d96d0aafb524a.1371595499.git.yann.morin.1998@free.fr>
- <1372060659.4310.41.camel@chaos.site>
+Subject: [pull request v2] Pull request for branch yem-kconfig-for-next
+Date: Mon, 24 Jun 2013 20:11:44 +0200
+Message-Id: <cover.1372097219.git.yann.morin.1998@free.fr>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8BIT
-In-Reply-To: <1372060659.4310.41.camel@chaos.site>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jean Delvare <jdelvare@suse.de>, Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Roland Eggner <edvx1@systemanalysen.net>, Wang YanQing <udknight@gmail.com>
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-Jean, Michal, All,
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-On 2013-06-24 09:57 +0200, Jean Delvare spake thusly:
-> Le Wednesday 19 June 2013 à 00:45 +0200, Yann E. MORIN a écrit :
-> > When searching for symbols, return the symbols sorted by relevance.
-> > 
-> > Sorting is done as thus:
-> >   - first, symbols with a prompt,   [1]
-> >   - then, smallest offset,          [2]
-> >   - then, shortest match,           [3]
-> >   - then, highest relative match,   [4]
-> >   - finally, alphabetical sort      [5]
-> > 
-> > So, searching (eg.) for 'P.*CI' :
-> 
-> Nobody would actually search for that, so that's not a particularly good
-> example to determine whether your sort order is sane or not.
+Hello Michal, All!
+                                                                                                                                                                                      │
+Michal, please pull these patches against kconfig that I have accumulated
+for 3.11.
 
-Yes, this was just to explain the sorting algorithm with a simple
-example.
+Note-whorthy this time:
+  - fix values of tristates that are selected by boolean choices (Arve)
+  - fix choice randomisation in presence of KCONFIG_ALLCONFIG    (me)
+  - fix choice randomisation selecting more than one value in
+    a choice (but only if it is conditional)                     (me)
+  - fix choice-in-a-choice randomisation not selecting any value
+    for the inner-most choice                                    (me)
 
-[--SNIP--]
-> > This heuristic tries hard to get interesting symbols first in the list.
-> 
-> I know I am the one whose question triggered this work from you, but in
-> the end the "response" seems disproportionate. Having 5 different
-> ordering rules is a lot, and that's quite a bit of code, which while not
-> the most complex in the world, is still far from trivial and may require
-> maintenance work in the future.
+Also, some code-cleanups and eye-candy:
+  - mconf and nconf code cleanups                                (Dirk, Sedat)
+  - mconf and nconf eye-candy                                    (Dirk, me)
+  - scripts/config script-name in help text                      (Clément)
+  - heuristic to sort found symbols by relevance                 (me)
+  - more randconfig debugging help                               (me)
 
-OK, I understand you concerns.
-
-Michal, please do not apply this patch: I'll rewrite it with a simpler
-heuristic as Jean suggested, and will re-submit a complete pull-request
-later tonight.
-
-> So I think it is more important to make it clearer that regular
-> expressions are allowed, than to come up with a brilliant sort order. I
-> know the help page says it, but the prompt itself only asks for a
-> "(sub)string" and it is not immediately obvious (to me at least) that
-> regular expressions are considered substrings.
-
-OK, Ill see to rewite the title of the dialog box.
-
-Thanks for the review!
+Changes v1 -> v2:
+  - simplify sorting heuristic (Jean)
+  - make it clear in mconf/nconf that the search expression can
+    be a regexp (Jean)
 
 Regards,
 Yann E. MORIN.
 
+
+The following changes since commit f722406faae2d073cc1d01063d1123c35425939e:
+
+  Linux 3.10-rc1 (2013-05-11 17:14:08 -0700)
+
+are available in the git repository at:
+
+  git://gitorious.org/linux-kconfig/linux-kconfig.git yem-kconfig-for-next
+
+for you to fetch changes up to 8357b48549e17b3e4e402c7f977b65708922e60f:
+
+  kconfig: fix randomising choice entries in presence of KCONFIG_ALLCONFIG (2013-06-24 20:03:31 +0200)
+
+----------------------------------------------------------------
+Arve Hjønnevåg (1):
+      kconfig: Fix defconfig when one choice menu selects options that another choice menu depends on
+
+Clement Chauplannaz (1):
+      scripts/config: replace hard-coded script name by a dynamic value
+
+Dirk Gouders (4):
+      kconfig/lxdialog: handle newline characters in print_autowrap()
+      mconf: use function calls instead of ncurses' variables LINES and COLS
+      nconf: use function calls instead of ncurses' variables LINES and COLS
+      mconf/nconf: mark empty menus/menuconfigs different from non-empty ones
+
+Sedat Dilek (2):
+      kconfig/lxdialog: Add definitions for mininimum (re)size values
+      kconfig/lxdialog: Use new mininimum resize definitions in conf_choice()
+
+Yann E. MORIN (7):
+      kconfig/conf: fix randconfig setting multiple symbols in a choice
+      kconfig/conf: accept a base-16 seed for randconfig
+      kconfig/conf: print the seed used to initialise the RNG for randconfig
+      kconfig: sort found symbols by relevance
+      kconfig/[mn]conf: make it explicit in the search box that a regexp is possible
+      kconfig: loop as long as we changed some symbols in randconfig
+      kconfig: fix randomising choice entries in presence of KCONFIG_ALLCONFIG
+
+ Documentation/kbuild/kconfig.txt     | 13 ++++++
+ scripts/config                       | 12 +++--
+ scripts/kconfig/conf.c               |  6 ++-
+ scripts/kconfig/confdata.c           | 39 ++++++++++++----
+ scripts/kconfig/expr.h               |  3 ++
+ scripts/kconfig/lkc.h                |  3 +-
+ scripts/kconfig/lkc_proto.h          |  1 +
+ scripts/kconfig/lxdialog/checklist.c |  8 ++--
+ scripts/kconfig/lxdialog/dialog.h    | 14 ++++++
+ scripts/kconfig/lxdialog/inputbox.c  |  8 ++--
+ scripts/kconfig/lxdialog/menubox.c   |  6 +--
+ scripts/kconfig/lxdialog/textbox.c   |  6 +--
+ scripts/kconfig/lxdialog/util.c      | 46 +++++++++++--------
+ scripts/kconfig/lxdialog/yesno.c     |  8 ++--
+ scripts/kconfig/mconf.c              | 21 +++++----
+ scripts/kconfig/menu.c               | 16 +++++++
+ scripts/kconfig/nconf.c              | 39 +++++++++-------
+ scripts/kconfig/nconf.gui.c          | 20 ++++----
+ scripts/kconfig/symbol.c             | 89 ++++++++++++++++++++++++++++++++----
+ 19 files changed, 260 insertions(+), 98 deletions(-)
 -- 
 .-----------------.--------------------.------------------.--------------------.
 |  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
