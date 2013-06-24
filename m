@@ -1,77 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from moutng.kundenserver.de ([212.227.126.171]:59674 "EHLO
-	moutng.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750872Ab3FXOAb (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 24 Jun 2013 10:00:31 -0400
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: scripts/kallsyms: Avoid ARM veneer symbols
-Date: Mon, 24 Jun 2013 16:01:43 +0200
-Message-ID: <2983817.Xe2505Drlj@wuerfel>
+Received: from mga02.intel.com ([134.134.136.20]:12992 "EHLO mga02.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750936Ab3FXOiT (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 24 Jun 2013 10:38:19 -0400
+Subject: [PATCH 0/3] RPM enhancements for kbuild
+From: Mike Marciniszyn <mike.marciniszyn@intel.com>
+Date: Mon, 24 Jun 2013 10:38:17 -0400
+Message-ID: <20130624143658.10761.3787.stgit@phlsvslse11.ph.intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org
+To: mmarek@suse.cz
+Cc: Doug Ledford <dledford@redhat.com>, linux-kbuild@vger.kernel.org, mmarcini@yahoo.com
 
-When building ARM kernels that exceed a certain size, the linker
-will add "veneers" that allow long branches. Unfortunately,
-using a longer kallsyms section may lead to the extra veneers
-being needed, which leads to inconsistent kallsyms data with the
-message
+This series of patches enhances the kernel RPM mechanism
+as follows:
+- executes /sbin/installkernel in a %post
+- installs the firmware into a KERNELRELEASE specific directory
+- adds a kernel-devel package
 
-Inconsistent kallsyms data
-Try make KALLSYMS_EXTRA_PASS=1 as a workaround
+The installkernel allows for booting the target server
+after the RPM has been installed.  A "make install" would
+have done that.
 
-In some case, not just one but up to three extra passes were
-needed before getting to a state that needed no extra veneers.
-The easiest solution is to skip veneers in kallsyms in the
-same way we already skip a couple of other symbols.
+The unique firmware directory avoids conflicts with distribution
+firmware rpm's as recommended by Doug Ledford.
 
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+The kernel-devel package allows for external module builds
+against the kernel.  A "make modules" install would have
+supported such a build on a single server. The capability is lost
+through the rpm mechanism because the build server source
+directory is no longer appropriate for the target server.
+
 ---
-diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
-index 487ac6f..53ec0bb 100644
---- a/scripts/kallsyms.c
-+++ b/scripts/kallsyms.c
-@@ -69,14 +69,32 @@ static void usage(void)
- 	exit(1);
- }
- 
--/*
-- * This ignores the intensely annoying "mapping symbols" found
-- * in ARM ELF files: $a, $t and $d.
-- */
- static inline int is_arm_mapping_symbol(const char *str)
- {
--	return str[0] == '$' && strchr("atd", str[1])
--	       && (str[2] == '\0' || str[2] == '.');
-+	size_t len;
-+
-+	/*
-+	 * This ignores the intensely annoying "mapping symbols" found
-+	 * in ARM ELF files: $a, $t and $d.
-+	 */
-+	if (str[0] == '$' && strchr("atd", str[1])
-+	       && (str[2] == '\0' || str[2] == '.'))
-+		return 1;
-+
-+	len = strlen(str);
-+	if (len < 10)
-+		return 0;
-+
-+	/*
-+	 * This ignores any __.*_veneer symbol, which get
-+	 * inserted for large kernels, in order to avoid
-+	 * inconsistent data.
-+	 */
-+	if (str[0] == '_' && str[1] == '_' &&
-+	    strcmp(str + len - 7, "_veneer") == 0)
-+		return 1; 
-+
-+	return 0;
- }
- 
- static int read_symbol_tr(const char *sym, unsigned long long addr)
 
+Mike Marciniszyn (3):
+      kbuild: add %post section to create initramfs and grub hooks
+      kbuilld: install firmware files in kernel relative directory
+      kbuild: add generation of kernel-devel
+
+
+ scripts/package/mkspec |   44 ++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 40 insertions(+), 4 deletions(-)
+
+-- 
+Mike
