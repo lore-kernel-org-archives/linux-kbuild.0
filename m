@@ -1,52 +1,77 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:50799 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750900Ab3FXNgD (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 24 Jun 2013 09:36:03 -0400
-Date: Mon, 24 Jun 2013 15:36:00 +0200
-From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH v7] kbuild: fix error when building from src rpm
-Message-ID: <20130624133600.GA2069@sepie.suse.cz>
-References: <20130624124836.31126.67401.stgit@phlsvslse11.ph.intel.com>
+Received: from moutng.kundenserver.de ([212.227.126.171]:59674 "EHLO
+	moutng.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750872Ab3FXOAb (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 24 Jun 2013 10:00:31 -0400
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: scripts/kallsyms: Avoid ARM veneer symbols
+Date: Mon, 24 Jun 2013 16:01:43 +0200
+Message-ID: <2983817.Xe2505Drlj@wuerfel>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20130624124836.31126.67401.stgit@phlsvslse11.ph.intel.com>
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mike Marciniszyn <mike.marciniszyn@intel.com>
-Cc: linux-kbuild@vger.kernel.org, mmarcini@yahoo.com
+To: Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org
 
-On Mon, Jun 24, 2013 at 08:48:37AM -0400, Mike Marciniszyn wrote:
-> The following issue can be reproduced with Linus' tree on
-> an x86_64 server.
-> 
-> >+ cp /home/user/rpmbuild-test/BUILDROOT/kernel-3.9.2.x86_64/boot/vmlinuz-3.9.2
-> >cp: missing destination file operand after
-> >/home/user/rpmbuild-test/BUILDROOT/kernel-3.9.2-1.x86_64/boot/vmlinuz-3.9.2'
-> >Try `cp --help' for more information.
-> >error: Bad exit status from /var/tmp/rpm-tmp.R4o0iI (%install)
-> 
-> Here are the commands to reproduce:
-> 
-> make defconfig
-> make rpm-pkg
-> 
-> Use the resulting src rpm to build as follows:
-> 
-> mkdir ~/rpmbuild-test
-> cd ~/rpmbuild-test
-> rpmbuild --rebuild --define "_topdir `pwd`" -vv ~/rpmbuild/SRPMS/kernel-3.10.0_rc1+-1.src.rpm
-> 
-> The issue is because the %install script uses $KBUILD_IMAGE and it hasn't
-> been set since it is only available in the kbuild system and not in the
-> %install script.
-> 
-> This patch adds a Makefile target to emit the image_name that can be used
-> and modifies the mkspec to use the dynamic name in %install.
-> 
-> Signed-off-by: Mike Marciniszyn <mike.marciniszyn@intel.com>
+When building ARM kernels that exceed a certain size, the linker
+will add "veneers" that allow long branches. Unfortunately,
+using a longer kallsyms section may lead to the extra veneers
+being needed, which leads to inconsistent kallsyms data with the
+message
 
-Applied to kbuild.git#kbuild, thanks.
+Inconsistent kallsyms data
+Try make KALLSYMS_EXTRA_PASS=1 as a workaround
 
-Michal
+In some case, not just one but up to three extra passes were
+needed before getting to a state that needed no extra veneers.
+The easiest solution is to skip veneers in kallsyms in the
+same way we already skip a couple of other symbols.
+
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
+index 487ac6f..53ec0bb 100644
+--- a/scripts/kallsyms.c
++++ b/scripts/kallsyms.c
+@@ -69,14 +69,32 @@ static void usage(void)
+ 	exit(1);
+ }
+ 
+-/*
+- * This ignores the intensely annoying "mapping symbols" found
+- * in ARM ELF files: $a, $t and $d.
+- */
+ static inline int is_arm_mapping_symbol(const char *str)
+ {
+-	return str[0] == '$' && strchr("atd", str[1])
+-	       && (str[2] == '\0' || str[2] == '.');
++	size_t len;
++
++	/*
++	 * This ignores the intensely annoying "mapping symbols" found
++	 * in ARM ELF files: $a, $t and $d.
++	 */
++	if (str[0] == '$' && strchr("atd", str[1])
++	       && (str[2] == '\0' || str[2] == '.'))
++		return 1;
++
++	len = strlen(str);
++	if (len < 10)
++		return 0;
++
++	/*
++	 * This ignores any __.*_veneer symbol, which get
++	 * inserted for large kernels, in order to avoid
++	 * inconsistent data.
++	 */
++	if (str[0] == '_' && str[1] == '_' &&
++	    strcmp(str + len - 7, "_veneer") == 0)
++		return 1; 
++
++	return 0;
+ }
+ 
+ static int read_symbol_tr(const char *sym, unsigned long long addr)
+
