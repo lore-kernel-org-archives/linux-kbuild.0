@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-we0-f182.google.com ([74.125.82.182]:65361 "EHLO
-	mail-we0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753119Ab3FXSMP (ORCPT
+Received: from mail-we0-f181.google.com ([74.125.82.181]:55086 "EHLO
+	mail-we0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753186Ab3FXSMW (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 24 Jun 2013 14:12:15 -0400
+	Mon, 24 Jun 2013 14:12:22 -0400
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: [PATCH 04/15] kconfig/lxdialog: handle newline characters in print_autowrap()
-Date: Mon, 24 Jun 2013 20:11:48 +0200
-Message-Id: <1376391621654cc369c5e8b60497f7c184f0ed47.1372097219.git.yann.morin.1998@free.fr>
+Subject: [PATCH 08/15] scripts/config: replace hard-coded script name by a dynamic value
+Date: Mon, 24 Jun 2013 20:11:52 +0200
+Message-Id: <7387778510b7deaff866277877c5550c3a14f1fb.1372097219.git.yann.morin.1998@free.fr>
 In-Reply-To: <cover.1372097219.git.yann.morin.1998@free.fr>
 References: <cover.1372097219.git.yann.morin.1998@free.fr>
 In-Reply-To: <cover.1372097219.git.yann.morin.1998@free.fr>
@@ -15,120 +15,64 @@ References: <cover.1372097219.git.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Dirk Gouders <dirk@gouders.net>, "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Clement Chauplannaz <chauplac@gmail.com>, "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-From: Dirk Gouders <dirk@gouders.net>
+From: Clement Chauplannaz <chauplac@gmail.com>
 
-When exiting menuconfig with unsaved changes, a dialog like
-the following is shown:
+The script `config' prints its name in usage() function. It is currently
+hard-coded to value `config'. However, the script may be reused under
+a different name in contexts other than the Linux Kernel.
 
-        Do you wish to save your new configuration ? <ESC><ESC>
-        to continue.
+Replace the hard-coded value `config' by the name of the script at runtime.
 
-The author of the dialog text specified a newline after the '?',
-and probably expected it to be processed, so let print_autowrap()
-handle newlines propperly.
-
-Also, reword that dialog's second phrase with a real sentence.
-
-Signed-off-by: Dirk Gouders <dirk@gouders.net>
-Tested-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Reviewed-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
-[yann.morin.1998@free.fr: very slightly tweak the commit message]
+Signed-off-by: Clement Chauplannaz <chauplac@gmail.com>
+Acked-by: Andi Kleen <ak@linux.intel.com>
 Signed-off-by: Yann E. MORIN <yann.morin.1998@free.fr>
 ---
- scripts/kconfig/lxdialog/util.c | 31 +++++++++++++++++--------------
- scripts/kconfig/mconf.c         |  4 ++--
- 2 files changed, 19 insertions(+), 16 deletions(-)
+ scripts/config | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
 
-diff --git a/scripts/kconfig/lxdialog/util.c b/scripts/kconfig/lxdialog/util.c
-index 78fe4e9..0fa567e 100644
---- a/scripts/kconfig/lxdialog/util.c
-+++ b/scripts/kconfig/lxdialog/util.c
-@@ -371,27 +371,19 @@ void print_title(WINDOW *dialog, const char *title, int width)
- /*
-  * Print a string of text in a window, automatically wrap around to the
-  * next line if the string is too long to fit on one line. Newline
-- * characters '\n' are replaced by spaces.  We start on a new line
-+ * characters '\n' are propperly processed.  We start on a new line
-  * if there is no room for at least 4 nonblanks following a double-space.
-  */
- void print_autowrap(WINDOW * win, const char *prompt, int width, int y, int x)
- {
- 	int newl, cur_x, cur_y;
--	int i, prompt_len, room, wlen;
--	char tempstr[MAX_LEN + 1], *word, *sp, *sp2;
-+	int prompt_len, room, wlen;
-+	char tempstr[MAX_LEN + 1], *word, *sp, *sp2, *newline_separator = 0;
+diff --git a/scripts/config b/scripts/config
+index bb4d3de..6b3272e 100755
+--- a/scripts/config
++++ b/scripts/config
+@@ -1,6 +1,8 @@
+ #!/bin/bash
+ # Manipulate options in a .config file from the command line
  
- 	strcpy(tempstr, prompt);
- 
- 	prompt_len = strlen(tempstr);
- 
--	/*
--	 * Remove newlines
--	 */
--	for (i = 0; i < prompt_len; i++) {
--		if (tempstr[i] == '\n')
--			tempstr[i] = ' ';
--	}
--
- 	if (prompt_len <= width - x * 2) {	/* If prompt is short */
- 		wmove(win, y, (width - prompt_len) / 2);
- 		waddstr(win, tempstr);
-@@ -401,7 +393,10 @@ void print_autowrap(WINDOW * win, const char *prompt, int width, int y, int x)
- 		newl = 1;
- 		word = tempstr;
- 		while (word && *word) {
--			sp = strchr(word, ' ');
-+			sp = strpbrk(word, "\n ");
-+			if (sp && *sp == '\n')
-+				newline_separator = sp;
++myname=${0##*/}
 +
- 			if (sp)
- 				*sp++ = 0;
+ # If no prefix forced, use the default CONFIG_
+ CONFIG_="${CONFIG_-CONFIG_}"
  
-@@ -413,7 +408,7 @@ void print_autowrap(WINDOW * win, const char *prompt, int width, int y, int x)
- 			if (wlen > room ||
- 			    (newl && wlen < 4 && sp
- 			     && wlen + 1 + strlen(sp) > room
--			     && (!(sp2 = strchr(sp, ' '))
-+			     && (!(sp2 = strpbrk(sp, "\n "))
- 				 || wlen + 1 + (sp2 - sp) > room))) {
- 				cur_y++;
- 				cur_x = x;
-@@ -421,7 +416,15 @@ void print_autowrap(WINDOW * win, const char *prompt, int width, int y, int x)
- 			wmove(win, cur_y, cur_x);
- 			waddstr(win, word);
- 			getyx(win, cur_y, cur_x);
--			cur_x++;
-+
-+			/* Move to the next line if the word separator was a newline */
-+			if (newline_separator) {
-+				cur_y++;
-+				cur_x = x;
-+				newline_separator = 0;
-+			} else
-+				cur_x++;
-+
- 			if (sp && *sp == ' ') {
- 				cur_x++;	/* double space */
- 				while (*++sp == ' ') ;
-diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
-index 2396c5b..cb8cf4a 100644
---- a/scripts/kconfig/mconf.c
-+++ b/scripts/kconfig/mconf.c
-@@ -958,8 +958,8 @@ static int handle_exit(void)
- 	dialog_clear();
- 	if (conf_get_changed())
- 		res = dialog_yesno(NULL,
--				   _("Do you wish to save your new configuration ?\n"
--				     "<ESC><ESC> to continue."),
-+				   _("Do you wish to save your new configuration?\n"
-+				     "(Press <ESC><ESC> to continue kernel configuration.)"),
- 				   6, 60);
- 	else
- 		res = -1;
+@@ -8,7 +10,7 @@ usage() {
+ 	cat >&2 <<EOL
+ Manipulate options in a .config file from the command line.
+ Usage:
+-config options command ...
++$myname options command ...
+ commands:
+ 	--enable|-e option   Enable option
+ 	--disable|-d option  Disable option
+@@ -33,14 +35,14 @@ options:
+ 	--file config-file   .config file to change (default .config)
+ 	--keep-case|-k       Keep next symbols' case (dont' upper-case it)
+ 
+-config doesn't check the validity of the .config file. This is done at next
++$myname doesn't check the validity of the .config file. This is done at next
+ make time.
+ 
+-By default, config will upper-case the given symbol. Use --keep-case to keep
++By default, $myname will upper-case the given symbol. Use --keep-case to keep
+ the case of all following symbols unchanged.
+ 
+-config uses 'CONFIG_' as the default symbol prefix. Set the environment
+-variable CONFIG_ to the prefix to use. Eg.: CONFIG_="FOO_" config ...
++$myname uses 'CONFIG_' as the default symbol prefix. Set the environment
++variable CONFIG_ to the prefix to use. Eg.: CONFIG_="FOO_" $myname ...
+ EOL
+ 	exit 1
+ }
 -- 
 1.8.1.2
 
