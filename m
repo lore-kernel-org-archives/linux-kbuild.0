@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f42.google.com ([74.125.82.42]:64489 "EHLO
-	mail-wg0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752868Ab3FXSM1 (ORCPT
+Received: from mail-we0-f173.google.com ([74.125.82.173]:44035 "EHLO
+	mail-we0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753297Ab3FXSMZ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 24 Jun 2013 14:12:27 -0400
+	Mon, 24 Jun 2013 14:12:25 -0400
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: [PATCH 11/15] kconfig/conf: print the seed used to initialise the RNG for randconfig
-Date: Mon, 24 Jun 2013 20:11:55 +0200
-Message-Id: <a5f6d795f5941e97e757b643a6482968a66c6150.1372097219.git.yann.morin.1998@free.fr>
+Subject: [PATCH 09/15] kconfig/conf: fix randconfig setting multiple symbols in a choice
+Date: Mon, 24 Jun 2013 20:11:53 +0200
+Message-Id: <e6abf12a77bc56dceeb4cba557b726268e71350e.1372097219.git.yann.morin.1998@free.fr>
 In-Reply-To: <cover.1372097219.git.yann.morin.1998@free.fr>
 References: <cover.1372097219.git.yann.morin.1998@free.fr>
 In-Reply-To: <cover.1372097219.git.yann.morin.1998@free.fr>
@@ -15,29 +15,70 @@ References: <cover.1372097219.git.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Matthieu CASTET <matthieu.castet@parrot.com>, Arnaud Lacombe <lacombar@gmail.com>, Sedat Dilek <sedat.dilek@gmail.com>
 
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-... so the user has a chance to reproduce a test-case.
+Currently, randconfig may set more than one symbol in a given choice.
+Given this config file:
+    config A
+        bool "A"
+    if A
+    choice
+        bool "B/C/D"
+    config B
+        bool "B"
+    config C
+        bool "C"
+    config D
+        bool "D"
+    endchoice
+    endif # A
 
+Then randconfig generates such .config files (case where A is not set is not
+shown below for brevity), and where only the right-most .config is valid:
+  CONFIG_A=y                  CONFIG_A=y                  CONFIG_A=y
+  CONFIG_B=y                  CONFIG_B=y                  CONFIG_B=y
+  CONFIG_C=y                  # CONFIG_C is not set       # CONFIG_C is not set
+  # CONFIG_D is not set       CONFIG_D=y                  # CONFIG_D is not set
+
+That is, in a randomised choice, the first symbol is always selected,
+and at most one other symbol may be selected.
+
+This is due to symbol randomised in a choice not being properly flagged
+as having a value.
+
+Fix that by flagging those symbols adequately: have a user-defined value,
+and be not valid (to force recalculation of the symbol).
+
+Note: if the choice is not conditional, then the randomisation is properly
+done.
+
+Reported-by: Matthieu CASTET <matthieu.castet@parrot.com>
+Signed-off-by: Matthieu CASTET <matthieu.castet@parrot.com>
+[yann.morin.1998@free.fr: independently re-done the same patch as Matthieu,
+                          as pointed out by Sedat]
+Cc: Arnaud Lacombe <lacombar@gmail.com>
+Cc: Sedat Dilek <sedat.dilek@gmail.com>
 Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
 ---
- scripts/kconfig/conf.c | 1 +
- 1 file changed, 1 insertion(+)
+ scripts/kconfig/confdata.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
-index 94521c7..38616c1 100644
---- a/scripts/kconfig/conf.c
-+++ b/scripts/kconfig/conf.c
-@@ -532,6 +532,7 @@ int main(int ac, char **av)
- 					seed = tmp;
- 				}
- 			}
-+			fprintf( stderr, "KCONFIG_SEED=0x%X\n", seed );
- 			srand(seed);
- 			break;
+diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+index 35e0f16..d36bc1f 100644
+--- a/scripts/kconfig/confdata.c
++++ b/scripts/kconfig/confdata.c
+@@ -1077,6 +1077,9 @@ static void randomize_choice_values(struct symbol *csym)
+ 		else {
+ 			sym->def[S_DEF_USER].tri = no;
  		}
++		sym->flags |= SYMBOL_DEF_USER;
++		/* clear VALID to get value calculated */
++		sym->flags &= ~SYMBOL_VALID;
+ 	}
+ 	csym->flags |= SYMBOL_DEF_USER;
+ 	/* clear VALID to get value calculated */
 -- 
 1.8.1.2
 
