@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f50.google.com ([74.125.82.50]:50682 "EHLO
-	mail-wg0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753119Ab3FXSMT (ORCPT
+Received: from mail-wi0-f174.google.com ([209.85.212.174]:49898 "EHLO
+	mail-wi0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751426Ab3FXSMM (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 24 Jun 2013 14:12:19 -0400
+	Mon, 24 Jun 2013 14:12:12 -0400
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: [PATCH 06/15] nconf: use function calls instead of ncurses' variables LINES and COLS
-Date: Mon, 24 Jun 2013 20:11:50 +0200
-Message-Id: <e0b42605e685a0833303e1d4dde277c99d9e17b5.1372097219.git.yann.morin.1998@free.fr>
+Subject: [PATCH 02/15] kconfig/lxdialog: Add definitions for mininimum (re)size values
+Date: Mon, 24 Jun 2013 20:11:46 +0200
+Message-Id: <851f665725581d02d48ffbca50240cda44d698d4.1372097219.git.yann.morin.1998@free.fr>
 In-Reply-To: <cover.1372097219.git.yann.morin.1998@free.fr>
 References: <cover.1372097219.git.yann.morin.1998@free.fr>
 In-Reply-To: <cover.1372097219.git.yann.morin.1998@free.fr>
@@ -15,167 +15,151 @@ References: <cover.1372097219.git.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Dirk Gouders <dirk@gouders.net>, "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Sedat Dilek <sedat.dilek@gmail.com>, "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-From: Dirk Gouders <dirk@gouders.net>
+From: Sedat Dilek <sedat.dilek@gmail.com>
 
-According to the documentation [1], LINES and COLS are initialized by
-initscr(); it does not say anything about the behavior when windows are
-resized.
+Commit c8dc68ad0fbd ("kconfig/lxdialog: support resize") added support
+for resizing, but forgot to collect all hardcoded values at one single
+place.
 
-Do not rely on the current implementation of ncurses that updates
-these variables on resize, but use the propper function calls or macros
-to get window dimensions.
+Also add a definition for the check for a minimum screen/window size
+of 80x19.
 
-The use of the variables in main() was OK, but for the sake of
-consistency it was modified to use the macro getmaxyx().
+[ ChangeLog v3:
+  * Rename MENU_{HEIGTH,WIDTH}_MIN -> MENUBOX_{HEIGTH,WIDTH}_MIN
+  ChangeLog v2:
+  * Rename WIN_{HEIGTH,WIDTH}_MIN -> WINDOW_{HEIGTH,WIDTH}_MIN
+  * Mention the check for a minimum screen/window size in the changelog
+  * Add a comment above the block of new definitions ]
 
-[1] ncurses(3X)
-
-Signed-off-by: Dirk Gouders <dirk@gouders.net>
+Signed-off-by: Sedat Dilek <sedat.dilek@gmail.com>
+Acked-by: Wang YanQing <udknight@gmail.com>
+Tested-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
 Reviewed-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
-[yann.morin.1998@free.fr: declare 'lines' and 'columns' on a single line]
-Signed-off-by: Yann E. MORIN <yann.morin.1998@free.fr>
+Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
 ---
- scripts/kconfig/nconf.c     | 21 ++++++++++++++-------
- scripts/kconfig/nconf.gui.c | 20 +++++++++++---------
- 2 files changed, 25 insertions(+), 16 deletions(-)
+ scripts/kconfig/lxdialog/checklist.c |  4 ++--
+ scripts/kconfig/lxdialog/dialog.h    | 14 ++++++++++++++
+ scripts/kconfig/lxdialog/inputbox.c  |  4 ++--
+ scripts/kconfig/lxdialog/menubox.c   |  2 +-
+ scripts/kconfig/lxdialog/textbox.c   |  2 +-
+ scripts/kconfig/lxdialog/util.c      |  2 +-
+ scripts/kconfig/lxdialog/yesno.c     |  4 ++--
+ 7 files changed, 23 insertions(+), 9 deletions(-)
 
-diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
-index dbf31ed..aac85d3 100644
---- a/scripts/kconfig/nconf.c
-+++ b/scripts/kconfig/nconf.c
-@@ -365,15 +365,16 @@ static void print_function_line(void)
- 	int i;
- 	int offset = 1;
- 	const int skip = 1;
-+	int lines = getmaxy(stdscr);
+diff --git a/scripts/kconfig/lxdialog/checklist.c b/scripts/kconfig/lxdialog/checklist.c
+index a2eb80f..3034057 100644
+--- a/scripts/kconfig/lxdialog/checklist.c
++++ b/scripts/kconfig/lxdialog/checklist.c
+@@ -132,9 +132,9 @@ int dialog_checklist(const char *title, const char *prompt, int height,
+ 	}
  
- 	for (i = 0; i < function_keys_num; i++) {
- 		(void) wattrset(main_window, attributes[FUNCTION_HIGHLIGHT]);
--		mvwprintw(main_window, LINES-3, offset,
-+		mvwprintw(main_window, lines-3, offset,
- 				"%s",
- 				function_keys[i].key_str);
- 		(void) wattrset(main_window, attributes[FUNCTION_TEXT]);
- 		offset += strlen(function_keys[i].key_str);
--		mvwprintw(main_window, LINES-3,
-+		mvwprintw(main_window, lines-3,
- 				offset, "%s",
- 				function_keys[i].func);
- 		offset += strlen(function_keys[i].func) + skip;
-@@ -954,7 +955,7 @@ static void show_menu(const char *prompt, const char *instructions,
+ do_resize:
+-	if (getmaxy(stdscr) < (height + 6))
++	if (getmaxy(stdscr) < (height + CHECKLIST_HEIGTH_MIN))
+ 		return -ERRDISPLAYTOOSMALL;
+-	if (getmaxx(stdscr) < (width + 6))
++	if (getmaxx(stdscr) < (width + CHECKLIST_WIDTH_MIN))
+ 		return -ERRDISPLAYTOOSMALL;
  
- 	clear();
- 	(void) wattrset(main_window, attributes[NORMAL]);
--	print_in_middle(stdscr, 1, 0, COLS,
-+	print_in_middle(stdscr, 1, 0, getmaxx(stdscr),
- 			menu_backtitle,
- 			attributes[MAIN_HEADING]);
+ 	max_choice = MIN(list_height, item_count());
+diff --git a/scripts/kconfig/lxdialog/dialog.h b/scripts/kconfig/lxdialog/dialog.h
+index 10993370..b4343d3 100644
+--- a/scripts/kconfig/lxdialog/dialog.h
++++ b/scripts/kconfig/lxdialog/dialog.h
+@@ -200,6 +200,20 @@ int item_is_tag(char tag);
+ int on_key_esc(WINDOW *win);
+ int on_key_resize(void);
  
-@@ -1455,14 +1456,18 @@ static void conf_save(void)
- 
- void setup_windows(void)
- {
-+	int lines, columns;
++/* minimum (re)size values */
++#define CHECKLIST_HEIGTH_MIN 6	/* For dialog_checklist() */
++#define CHECKLIST_WIDTH_MIN 6
++#define INPUTBOX_HEIGTH_MIN 2	/* For dialog_inputbox() */
++#define INPUTBOX_WIDTH_MIN 2
++#define MENUBOX_HEIGTH_MIN 15	/* For dialog_menu() */
++#define MENUBOX_WIDTH_MIN 65
++#define TEXTBOX_HEIGTH_MIN 8	/* For dialog_textbox() */
++#define TEXTBOX_WIDTH_MIN 8
++#define YESNO_HEIGTH_MIN 4	/* For dialog_yesno() */
++#define YESNO_WIDTH_MIN 4
++#define WINDOW_HEIGTH_MIN 19	/* For init_dialog() */
++#define WINDOW_WIDTH_MIN 80
 +
-+	getmaxyx(stdscr, lines, columns);
-+
- 	if (main_window != NULL)
- 		delwin(main_window);
+ int init_dialog(const char *backtitle);
+ void set_dialog_backtitle(const char *backtitle);
+ void set_dialog_subtitles(struct subtitle_list *subtitles);
+diff --git a/scripts/kconfig/lxdialog/inputbox.c b/scripts/kconfig/lxdialog/inputbox.c
+index 21404a0..7b01add 100644
+--- a/scripts/kconfig/lxdialog/inputbox.c
++++ b/scripts/kconfig/lxdialog/inputbox.c
+@@ -56,9 +56,9 @@ int dialog_inputbox(const char *title, const char *prompt, int height, int width
+ 		strcpy(instr, init);
  
- 	/* set up the menu and menu window */
--	main_window = newwin(LINES-2, COLS-2, 2, 1);
-+	main_window = newwin(lines-2, columns-2, 2, 1);
- 	keypad(main_window, TRUE);
--	mwin_max_lines = LINES-7;
--	mwin_max_cols = COLS-6;
-+	mwin_max_lines = lines-7;
-+	mwin_max_cols = columns-6;
+ do_resize:
+-	if (getmaxy(stdscr) <= (height - 2))
++	if (getmaxy(stdscr) <= (height - INPUTBOX_HEIGTH_MIN))
+ 		return -ERRDISPLAYTOOSMALL;
+-	if (getmaxx(stdscr) <= (width - 2))
++	if (getmaxx(stdscr) <= (width - INPUTBOX_WIDTH_MIN))
+ 		return -ERRDISPLAYTOOSMALL;
  
- 	/* panels order is from bottom to top */
- 	new_panel(main_window);
-@@ -1470,6 +1475,7 @@ void setup_windows(void)
+ 	/* center dialog box on screen */
+diff --git a/scripts/kconfig/lxdialog/menubox.c b/scripts/kconfig/lxdialog/menubox.c
+index 48d382e..00d2841 100644
+--- a/scripts/kconfig/lxdialog/menubox.c
++++ b/scripts/kconfig/lxdialog/menubox.c
+@@ -193,7 +193,7 @@ int dialog_menu(const char *title, const char *prompt,
+ do_resize:
+ 	height = getmaxy(stdscr);
+ 	width = getmaxx(stdscr);
+-	if (height < 15 || width < 65)
++	if (height < MENUBOX_HEIGTH_MIN || width < MENUBOX_WIDTH_MIN)
+ 		return -ERRDISPLAYTOOSMALL;
  
- int main(int ac, char **av)
- {
-+	int lines, columns;
- 	char *mode;
+ 	height -= 4;
+diff --git a/scripts/kconfig/lxdialog/textbox.c b/scripts/kconfig/lxdialog/textbox.c
+index a48bb93..907cdcb 100644
+--- a/scripts/kconfig/lxdialog/textbox.c
++++ b/scripts/kconfig/lxdialog/textbox.c
+@@ -80,7 +80,7 @@ int dialog_textbox(const char *title, char *tbuf, int initial_height,
  
- 	setlocale(LC_ALL, "");
-@@ -1495,7 +1501,8 @@ int main(int ac, char **av)
- 	keypad(stdscr, TRUE);
- 	curs_set(0);
+ do_resize:
+ 	getmaxyx(stdscr, height, width);
+-	if (height < 8 || width < 8)
++	if (height < TEXTBOX_HEIGTH_MIN || width < TEXTBOX_WIDTH_MIN)
+ 		return -ERRDISPLAYTOOSMALL;
+ 	if (initial_height != 0)
+ 		height = initial_height;
+diff --git a/scripts/kconfig/lxdialog/util.c b/scripts/kconfig/lxdialog/util.c
+index a0e97c2..78fe4e9 100644
+--- a/scripts/kconfig/lxdialog/util.c
++++ b/scripts/kconfig/lxdialog/util.c
+@@ -317,7 +317,7 @@ int init_dialog(const char *backtitle)
+ 	getyx(stdscr, saved_y, saved_x);
  
--	if (COLS < 75 || LINES < 20) {
-+	getmaxyx(stdscr, lines, columns);
-+	if (columns < 75 || lines < 20) {
+ 	getmaxyx(stdscr, height, width);
+-	if (height < 19 || width < 80) {
++	if (height < WINDOW_HEIGTH_MIN || width < WINDOW_WIDTH_MIN) {
  		endwin();
- 		printf("Your terminal should have at "
- 			"least 20 lines and 75 columns\n");
-diff --git a/scripts/kconfig/nconf.gui.c b/scripts/kconfig/nconf.gui.c
-index 9f8c44e..8275f0e5 100644
---- a/scripts/kconfig/nconf.gui.c
-+++ b/scripts/kconfig/nconf.gui.c
-@@ -276,8 +276,8 @@ int btn_dialog(WINDOW *main_window, const char *msg, int btn_num, ...)
+ 		return -ERRDISPLAYTOOSMALL;
+ 	}
+diff --git a/scripts/kconfig/lxdialog/yesno.c b/scripts/kconfig/lxdialog/yesno.c
+index 4e6e809..abb0c39 100644
+--- a/scripts/kconfig/lxdialog/yesno.c
++++ b/scripts/kconfig/lxdialog/yesno.c
+@@ -45,9 +45,9 @@ int dialog_yesno(const char *title, const char *prompt, int height, int width)
+ 	WINDOW *dialog;
  
- 	total_width = max(msg_width, btns_width);
- 	/* place dialog in middle of screen */
--	y = (LINES-(msg_lines+4))/2;
--	x = (COLS-(total_width+4))/2;
-+	y = (getmaxy(stdscr)-(msg_lines+4))/2;
-+	x = (getmaxx(stdscr)-(total_width+4))/2;
+ do_resize:
+-	if (getmaxy(stdscr) < (height + 4))
++	if (getmaxy(stdscr) < (height + YESNO_HEIGTH_MIN))
+ 		return -ERRDISPLAYTOOSMALL;
+-	if (getmaxx(stdscr) < (width + 4))
++	if (getmaxx(stdscr) < (width + YESNO_WIDTH_MIN))
+ 		return -ERRDISPLAYTOOSMALL;
  
- 
- 	/* create the windows */
-@@ -387,8 +387,8 @@ int dialog_inputbox(WINDOW *main_window,
- 		prompt_width = max(prompt_width, strlen(title));
- 
- 	/* place dialog in middle of screen */
--	y = (LINES-(prompt_lines+4))/2;
--	x = (COLS-(prompt_width+4))/2;
-+	y = (getmaxy(stdscr)-(prompt_lines+4))/2;
-+	x = (getmaxx(stdscr)-(prompt_width+4))/2;
- 
- 	strncpy(result, init, *result_len);
- 
-@@ -545,7 +545,7 @@ void show_scroll_win(WINDOW *main_window,
- {
- 	int res;
- 	int total_lines = get_line_no(text);
--	int x, y;
-+	int x, y, lines, columns;
- 	int start_x = 0, start_y = 0;
- 	int text_lines = 0, text_cols = 0;
- 	int total_cols = 0;
-@@ -556,6 +556,8 @@ void show_scroll_win(WINDOW *main_window,
- 	WINDOW *pad;
- 	PANEL *panel;
- 
-+	getmaxyx(stdscr, lines, columns);
-+
- 	/* find the widest line of msg: */
- 	total_lines = get_line_no(text);
- 	for (i = 0; i < total_lines; i++) {
-@@ -569,14 +571,14 @@ void show_scroll_win(WINDOW *main_window,
- 	(void) wattrset(pad, attributes[SCROLLWIN_TEXT]);
- 	fill_window(pad, text);
- 
--	win_lines = min(total_lines+4, LINES-2);
--	win_cols = min(total_cols+2, COLS-2);
-+	win_lines = min(total_lines+4, lines-2);
-+	win_cols = min(total_cols+2, columns-2);
- 	text_lines = max(win_lines-4, 0);
- 	text_cols = max(win_cols-2, 0);
- 
- 	/* place window in middle of screen */
--	y = (LINES-win_lines)/2;
--	x = (COLS-win_cols)/2;
-+	y = (lines-win_lines)/2;
-+	x = (columns-win_cols)/2;
- 
- 	win = newwin(win_lines, win_cols, y, x);
- 	keypad(win, TRUE);
+ 	/* center dialog box on screen */
 -- 
 1.8.1.2
 
