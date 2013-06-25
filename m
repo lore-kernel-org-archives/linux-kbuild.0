@@ -1,41 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f50.google.com ([74.125.82.50]:64043 "EHLO
-	mail-wg0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751802Ab3FYU6l (ORCPT
+Received: from mail-we0-f174.google.com ([74.125.82.174]:46395 "EHLO
+	mail-we0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752453Ab3FYVDU (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 25 Jun 2013 16:58:41 -0400
-Date: Tue, 25 Jun 2013 22:58:36 +0200
+	Tue, 25 Jun 2013 17:03:20 -0400
+Date: Tue, 25 Jun 2013 23:03:14 +0200
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH 15/15] kconfig: fix randomising choice entries in
- presence of KCONFIG_ALLCONFIG
-Message-ID: <20130625205836.GB14074@free.fr>
-References: <cover.1372097219.git.yann.morin.1998@free.fr>
- <8357b48549e17b3e4e402c7f977b65708922e60f.1372097219.git.yann.morin.1998@free.fr>
+Subject: Re: linux-next: Tree for Jun 25
+Message-ID: <20130625210314.GC14074@free.fr>
+References: <20130625184420.b811089a069c63ccd3721d68@canb.auug.org.au>
+ <CA+icZUUH7AeR7OSm-SB56AGRiE815tTkQW9fFkKzyrSvzs3Etg@mail.gmail.com>
+ <201306251121.53862.yann.morin.1998@free.fr>
+ <CA+icZUU06C43bxyX2UGtDxRQqcyqeAQgt7fZHq7H7HgcJ6sHzQ@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <8357b48549e17b3e4e402c7f977b65708922e60f.1372097219.git.yann.morin.1998@free.fr>
+In-Reply-To: <CA+icZUU06C43bxyX2UGtDxRQqcyqeAQgt7fZHq7H7HgcJ6sHzQ@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Thomas Petazzoni <thomas.petazzoni@free-electrons.com>, Sam Ravnborg <sam@ravnborg.org>, Sedat Dilek <sedat.dilek@gmail.com>, Arnd Bergmann <arnd@arndb.de>, Stephen Rothwell <sfr@canb.auug.org.au>, Fengguang Wu <fengguang.wu@intel.com>, Alexandre Bounine <alexandre.bounine@idt.com>, Matt Porter <mporter@kernel.crashing.org>
+To: Sedat Dilek <sedat.dilek@gmail.com>
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>, linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>
 
-Michal, All,
+Sedat, All,
 
-On 2013-06-24 20:11 +0200, Yann E. MORIN spake thusly:
-> Currently, randconfig does randomise choice entries, unless KCONFIG_ALLCONFIG
-> is specified.
+On 2013-06-25 11:26 +0200, Sedat Dilek spake thusly:
+> On Tue, Jun 25, 2013 at 11:21 AM, Yann E. MORIN <yann.morin.1998@free.fr> wrote:
+> > On Tuesday 25 June 2013 10:55:20 Sedat Dilek wrote:
+> >> Not sure what's going on, but I get this with today's Linux-Next.
+> >> ( Yesterday's next-20130624 was OK. )
+> >>
+> >> $ LANG=C LC_ALL=C  yes "" | make oldconfig && LANG=C LC_ALL=C make
+> >> silentoldconfig </dev/null
+> > [--SNIP--]
+> >> RapidIO support (RAPIDIO) [Y/n/?] y
+> >>   IDT Tsi721 PCI Express SRIO Controller support (RAPIDIO_TSI721) [Y/n/?] y
+> >>   Discovery timeout duration (seconds) (RAPIDIO_DISC_TIMEOUT) [30] 30
+> >>   Enable RapidIO Input/Output Ports (RAPIDIO_ENABLE_RX_TX_PORTS) [N/y/?] n
+> >>   DMA Engine support for RapidIO (RAPIDIO_DMA_ENGINE) [Y/n/?] y
+> >>   RapidIO subsystem debug messages (RAPIDIO_DEBUG) [N/y/?] n
+> >>   Enumeration method [M/y/?] (NEW) aborted!
+> >>
+> >> Console input/output is redirected. Run 'make oldconfig' to update
+> >> configuration.
 [--SNIP--]
-> This patch defers setting that a choice has a value until a symbol for
-> that choice is indeed set, so that choices are properly randomised when
-> KCONFIG_ALLCONFIG is set, but not if a symbol for that choice is set.
+> Bad bad bad Yann, didn't Marek told you to test always with...
+> 
+>     $ yes "" | make oldconfig; make silentoldconfig </dev/null
 
-OK, so this second attempt also broke standard workflows. Fixing it is
-more involved than expected. Let's get rid of it before too many people
-complain, and before it hits mainline.
+If you looked at the commit log, you'd see how I tested this:
+    touch defconfig
+    for(( i=0; i<10000; i++ )); do
+        KCONFIG_ALLCONFIG=$(pwd)/defconfig make randconfig >/dev/null 2>&1
+        make silentoldconfig </dev/null >/dev/null 2>&1 || break
+    done
 
-Michal, can you strip this from your tree (since it's the HEAD of your
-kconfig branch), or do you want me to submit a revert patch?
+That is, 10 thousands random configurations, and none did exhibit the
+problem. :-(
+
+Which really means we need a comprehensive test-suite to kconfig.
+
+> Anyway, have fun.
+
+I would not call delving into the kconfig code 'fun'. ;-)
 
 Regards,
 Yann E. MORIN.
