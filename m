@@ -1,92 +1,84 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f178.google.com ([209.85.212.178]:56785 "EHLO
-	mail-wi0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750971Ab3FYV1M (ORCPT
+Received: from mail-wg0-f48.google.com ([74.125.82.48]:40232 "EHLO
+	mail-wg0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751694Ab3FYVh4 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 25 Jun 2013 17:27:12 -0400
-MIME-Version: 1.0
-Reply-To: sedat.dilek@gmail.com
-In-Reply-To: <20130625210314.GC14074@free.fr>
-References: <20130625184420.b811089a069c63ccd3721d68@canb.auug.org.au>
-	<CA+icZUUH7AeR7OSm-SB56AGRiE815tTkQW9fFkKzyrSvzs3Etg@mail.gmail.com>
-	<201306251121.53862.yann.morin.1998@free.fr>
-	<CA+icZUU06C43bxyX2UGtDxRQqcyqeAQgt7fZHq7H7HgcJ6sHzQ@mail.gmail.com>
-	<20130625210314.GC14074@free.fr>
-Date: Tue, 25 Jun 2013 23:27:11 +0200
-Message-ID: <CA+icZUWT3wV+kngNh0Vbg8=sfWm1tAhKNokkm7LS8Pt+H4o2cQ@mail.gmail.com>
-Subject: Re: linux-next: Tree for Jun 25
-From: Sedat Dilek <sedat.dilek@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+	Tue, 25 Jun 2013 17:37:56 -0400
+Received: by mail-wg0-f48.google.com with SMTP id f11so9758067wgh.15
+        for <linux-kbuild@vger.kernel.org>; Tue, 25 Jun 2013 14:37:55 -0700 (PDT)
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: [PATCH] Revert "kconfig: fix randomising choice entries in presence of KCONFIG_ALLCONFIG"
+Date: Tue, 25 Jun 2013 23:37:44 +0200
+Message-Id: <1372196264-3407-1-git-send-email-yann.morin.1998@free.fr>
+In-Reply-To: <20130625205836.GB14074@free.fr>
+References: <20130625205836.GB14074@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>, linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>
+To: linux-kbuild@vger.kernel.org
+Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, Michal Marek <mmarek@suse.cz>, Fengguang Wu <fengguang.wu@intel.com>, Sedat Dilek <sedat.dilek@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Stephen Rothwell <sfr@canb.auug.org.au>, Alexandre Bounine <alexandre.bounine@idt.com>, Matt Porter <mporter@kernel.crashing.org>
 
-On Tue, Jun 25, 2013 at 11:03 PM, Yann E. MORIN <yann.morin.1998@free.fr> wrote:
-> Sedat, All,
->
-> On 2013-06-25 11:26 +0200, Sedat Dilek spake thusly:
->> On Tue, Jun 25, 2013 at 11:21 AM, Yann E. MORIN <yann.morin.1998@free.fr> wrote:
->> > On Tuesday 25 June 2013 10:55:20 Sedat Dilek wrote:
->> >> Not sure what's going on, but I get this with today's Linux-Next.
->> >> ( Yesterday's next-20130624 was OK. )
->> >>
->> >> $ LANG=C LC_ALL=C  yes "" | make oldconfig && LANG=C LC_ALL=C make
->> >> silentoldconfig </dev/null
->> > [--SNIP--]
->> >> RapidIO support (RAPIDIO) [Y/n/?] y
->> >>   IDT Tsi721 PCI Express SRIO Controller support (RAPIDIO_TSI721) [Y/n/?] y
->> >>   Discovery timeout duration (seconds) (RAPIDIO_DISC_TIMEOUT) [30] 30
->> >>   Enable RapidIO Input/Output Ports (RAPIDIO_ENABLE_RX_TX_PORTS) [N/y/?] n
->> >>   DMA Engine support for RapidIO (RAPIDIO_DMA_ENGINE) [Y/n/?] y
->> >>   RapidIO subsystem debug messages (RAPIDIO_DEBUG) [N/y/?] n
->> >>   Enumeration method [M/y/?] (NEW) aborted!
->> >>
->> >> Console input/output is redirected. Run 'make oldconfig' to update
->> >> configuration.
-> [--SNIP--]
->> Bad bad bad Yann, didn't Marek told you to test always with...
->>
->>     $ yes "" | make oldconfig; make silentoldconfig </dev/null
->
-> If you looked at the commit log, you'd see how I tested this:
->     touch defconfig
->     for(( i=0; i<10000; i++ )); do
->         KCONFIG_ALLCONFIG=$(pwd)/defconfig make randconfig >/dev/null 2>&1
->         make silentoldconfig </dev/null >/dev/null 2>&1 || break
->     done
->
-> That is, 10 thousands random configurations, and none did exhibit the
-> problem. :-(
->
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-Killing ten thousand horses are not enough. 10.001 would have it :-).
+This reverts commit 8357b48549e17b3e4e402c7f977b65708922e60f.
 
-> Which really means we need a comprehensive test-suite to kconfig.
->
->> Anyway, have fun.
->
-> I would not call delving into the kconfig code 'fun'. ;-)
->
+It breaks more stuff than it fixes.
 
-Sorry, this issue took so much of your time.
-My ipc-msg-next issue seems to be fixed.
-fakeroot ran fine...
-Let's see if the LTP syscalls test-cases will succeed.
+Reported-by: Fengguang Wu <fengguang.wu@intel.com>
+Reported-by: Sedat Dilek <sedat.dilek@gmail.com>
+Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: Michal Marek <mmarek@suse.cz>
+Cc: Fengguang Wu <fengguang.wu@intel.com>
+Cc: Sedat Dilek <sedat.dilek@gmail.com>
+Cc: Sam Ravnborg <sam@ravnborg.org>
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>
+Cc: Alexandre Bounine <alexandre.bounine@idt.com>
+Cc: Matt Porter <mporter@kernel.crashing.org>
 
-Trust Sedat if he says there's sth. wrong :-).
+---
+Michal, here is the revert patch if you want it.
+Regards,
+Yann E. MORIN.
+---
+ scripts/kconfig/confdata.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-- Sedat -
+diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+index 3e39208..c55c227 100644
+--- a/scripts/kconfig/confdata.c
++++ b/scripts/kconfig/confdata.c
+@@ -288,6 +288,8 @@ load:
+ 	for_all_symbols(i, sym) {
+ 		sym->flags |= SYMBOL_CHANGED;
+ 		sym->flags &= ~(def_flags|SYMBOL_VALID);
++		if (sym_is_choice(sym))
++			sym->flags |= def_flags;
+ 		switch (sym->type) {
+ 		case S_INT:
+ 		case S_HEX:
+@@ -377,13 +379,13 @@ setsym:
+ 			case mod:
+ 				if (cs->def[def].tri == yes) {
+ 					conf_warning("%s creates inconsistent choice state", sym->name);
++					cs->flags &= ~def_flags;
+ 				}
+ 				break;
+ 			case yes:
+ 				if (cs->def[def].tri != no)
+ 					conf_warning("override: %s changes choice state", sym->name);
+ 				cs->def[def].val = sym;
+-				cs->flags |= def_flags;
+ 				break;
+ 			}
+ 			cs->def[def].tri = EXPR_OR(cs->def[def].tri, sym->def[def].tri);
+@@ -789,8 +791,6 @@ int conf_write(const char *name)
+ 			sym_calc_value(sym);
+ 			if (!(sym->flags & SYMBOL_WRITE))
+ 				goto next;
+-			if (sym_is_choice_value(sym) && !menu_is_visible(menu->parent))
+-				goto next;
+ 			sym->flags &= ~SYMBOL_WRITE;
+ 
+ 			conf_write_symbol(out, sym, &kconfig_printer_cb, NULL);
+-- 
+1.8.1.2
 
-[1] https://patchwork.kernel.org/patch/2780361/
-
-> Regards,
-> Yann E. MORIN.
->
-> --
-> .-----------------.--------------------.------------------.--------------------.
-> |  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-> | +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-> | +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-> | http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-> '------------------------------^-------^------------------^--------------------'
