@@ -1,75 +1,81 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-we0-f174.google.com ([74.125.82.174]:46395 "EHLO
-	mail-we0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752453Ab3FYVDU (ORCPT
+Received: from mail-wg0-f49.google.com ([74.125.82.49]:41106 "EHLO
+	mail-wg0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750971Ab3FYVWp (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 25 Jun 2013 17:03:20 -0400
-Date: Tue, 25 Jun 2013 23:03:14 +0200
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: linux-next: Tree for Jun 25
-Message-ID: <20130625210314.GC14074@free.fr>
-References: <20130625184420.b811089a069c63ccd3721d68@canb.auug.org.au>
- <CA+icZUUH7AeR7OSm-SB56AGRiE815tTkQW9fFkKzyrSvzs3Etg@mail.gmail.com>
- <201306251121.53862.yann.morin.1998@free.fr>
- <CA+icZUU06C43bxyX2UGtDxRQqcyqeAQgt7fZHq7H7HgcJ6sHzQ@mail.gmail.com>
+	Tue, 25 Jun 2013 17:22:45 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CA+icZUU06C43bxyX2UGtDxRQqcyqeAQgt7fZHq7H7HgcJ6sHzQ@mail.gmail.com>
+Reply-To: sedat.dilek@gmail.com
+In-Reply-To: <20130625205731.GA14074@free.fr>
+References: <CA+icZUVcWAmbRGXqrbkPXux6hSpYVM2yAPfbv_q8Faf348TGyw@mail.gmail.com>
+	<CA+icZUUta_HBtbpEOCsdPDRor1rvSNk46Wk=dHdvA6mAp61c1A@mail.gmail.com>
+	<20130625205731.GA14074@free.fr>
+Date: Tue, 25 Jun 2013 23:22:40 +0200
+Message-ID: <CA+icZUWfi+PG35Gs9Auefz1Qg7HuD1pAhpy7Uu+i83aNvDNs=g@mail.gmail.com>
+Subject: Re: linux-next: Tree for Jun 25 [ kbuild or rapidio? ]
+From: Sedat Dilek <sedat.dilek@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sedat Dilek <sedat.dilek@gmail.com>
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>, linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>, linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Alexandre Bounine <alexandre.bounine@idt.com>, Matt Porter <mporter@kernel.crashing.org>
 
-Sedat, All,
+On Tue, Jun 25, 2013 at 10:57 PM, Yann E. MORIN <yann.morin.1998@free.fr> wrote:
+> Sedat, All,
+>
+> On 2013-06-25 11:28 +0200, Sedat Dilek spake thusly:
+>> On Tue, Jun 25, 2013 at 11:17 AM, Sedat Dilek <sedat.dilek@gmail.com> wrote:
+>> > On Tue, Jun 25, 2013 at 10:55 AM, Sedat Dilek <sedat.dilek@gmail.com> wrote:
+> [--SNIP--]
+>> >> Not sure what's going on, but I get this with today's Linux-Next.
+>> >> ( Yesterday's next-20130624 was OK. )
+>> >>
+>> >> $ LANG=C LC_ALL=C  yes "" | make oldconfig && LANG=C LC_ALL=C make
+>> >> silentoldconfig </dev/null
+> [--SNIP--]
+>> >> RapidIO support (RAPIDIO) [Y/n/?] y
+>> >>   IDT Tsi721 PCI Express SRIO Controller support (RAPIDIO_TSI721) [Y/n/?] y
+>> >>   Discovery timeout duration (seconds) (RAPIDIO_DISC_TIMEOUT) [30] 30
+>> >>   Enable RapidIO Input/Output Ports (RAPIDIO_ENABLE_RX_TX_PORTS) [N/y/?] n
+>> >>   DMA Engine support for RapidIO (RAPIDIO_DMA_ENGINE) [Y/n/?] y
+>> >>   RapidIO subsystem debug messages (RAPIDIO_DEBUG) [N/y/?] n
+>> >>   Enumeration method [M/y/?] (NEW) aborted!
+>> >>
+>> >> Console input/output is redirected. Run 'make oldconfig' to update
+>> >> configuration.
+>> >>
+>> >> make[1]: *** [silentoldconfig] Error 1
+>> >> make: *** [silentoldconfig] Error 2
+> [--SNIP--]
+>> So, it's a kbuild issue (info to the rapidio maintainers).
+>
+> To be true, it's a kconfig (not kbuild) issue I introduced when trying
+> to fix choice randomisation.
+>
 
-On 2013-06-25 11:26 +0200, Sedat Dilek spake thusly:
-> On Tue, Jun 25, 2013 at 11:21 AM, Yann E. MORIN <yann.morin.1998@free.fr> wrote:
-> > On Tuesday 25 June 2013 10:55:20 Sedat Dilek wrote:
-> >> Not sure what's going on, but I get this with today's Linux-Next.
-> >> ( Yesterday's next-20130624 was OK. )
-> >>
-> >> $ LANG=C LC_ALL=C  yes "" | make oldconfig && LANG=C LC_ALL=C make
-> >> silentoldconfig </dev/null
-> > [--SNIP--]
-> >> RapidIO support (RAPIDIO) [Y/n/?] y
-> >>   IDT Tsi721 PCI Express SRIO Controller support (RAPIDIO_TSI721) [Y/n/?] y
-> >>   Discovery timeout duration (seconds) (RAPIDIO_DISC_TIMEOUT) [30] 30
-> >>   Enable RapidIO Input/Output Ports (RAPIDIO_ENABLE_RX_TX_PORTS) [N/y/?] n
-> >>   DMA Engine support for RapidIO (RAPIDIO_DMA_ENGINE) [Y/n/?] y
-> >>   RapidIO subsystem debug messages (RAPIDIO_DEBUG) [N/y/?] n
-> >>   Enumeration method [M/y/?] (NEW) aborted!
-> >>
-> >> Console input/output is redirected. Run 'make oldconfig' to update
-> >> configuration.
-[--SNIP--]
-> Bad bad bad Yann, didn't Marek told you to test always with...
-> 
->     $ yes "" | make oldconfig; make silentoldconfig </dev/null
+I was not precise enough "linux-kbuild" (I know there exists kbuild
+and kconfig).
 
-If you looked at the commit log, you'd see how I tested this:
-    touch defconfig
-    for(( i=0; i<10000; i++ )); do
-        KCONFIG_ALLCONFIG=$(pwd)/defconfig make randconfig >/dev/null 2>&1
-        make silentoldconfig </dev/null >/dev/null 2>&1 || break
-    done
+BTW, there is another GIT tree (from rostedt) containing kconfig stuff
+in Linux-Next (seems not to be very active).
 
-That is, 10 thousands random configurations, and none did exhibit the
-problem. :-(
+kbuild		git	git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git#for-next
+kconfig		git	git://git.kernel.org/pub/scm/linux/kernel/git/rostedt/linux-kconfig.git#for-next
 
-Which really means we need a comprehensive test-suite to kconfig.
+Confusing :-).
 
-> Anyway, have fun.
+- Sedat -
 
-I would not call delving into the kconfig code 'fun'. ;-)
+http://git.kernel.org/cgit/linux/kernel/git/next/linux-next.git/tree/Next/Trees#n96
+http://git.kernel.org/cgit/linux/kernel/git/next/linux-next.git/tree/Next/Trees#n97
 
-Regards,
-Yann E. MORIN.
-
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+> Regards,
+> Yann E. MORIN.
+>
+> --
+> .-----------------.--------------------.------------------.--------------------.
+> |  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+> | +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+> | +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+> | http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+> '------------------------------^-------^------------------^--------------------'
