@@ -1,107 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f174.google.com ([209.85.212.174]:35849 "EHLO
-	mail-wi0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751219Ab3FYHXu (ORCPT
+Received: from p-mail2.rd.orange.com ([195.101.245.16]:58556 "EHLO
+	p-mail2.rd.orange.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752080Ab3FYIIr (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 25 Jun 2013 03:23:50 -0400
+	Tue, 25 Jun 2013 04:08:47 -0400
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: Re: [PATCH 15/15] kconfig: fix randomising choice entries in presence of KCONFIG_ALLCONFIG
+Date: Tue, 25 Jun 2013 10:01:12 +0200
+References: <cover.1372097219.git.yann.morin.1998@free.fr> <8357b48549e17b3e4e402c7f977b65708922e60f.1372097219.git.yann.morin.1998@free.fr>
+In-Reply-To: <8357b48549e17b3e4e402c7f977b65708922e60f.1372097219.git.yann.morin.1998@free.fr>
 MIME-Version: 1.0
-Reply-To: sedat.dilek@gmail.com
-In-Reply-To: <e6abf12a77bc56dceeb4cba557b726268e71350e.1372097219.git.yann.morin.1998@free.fr>
-References: <cover.1372097219.git.yann.morin.1998@free.fr>
-	<e6abf12a77bc56dceeb4cba557b726268e71350e.1372097219.git.yann.morin.1998@free.fr>
-Date: Tue, 25 Jun 2013 09:23:49 +0200
-Message-ID: <CA+icZUXCfr3ijrRqQEjqK03imcENwUHZWMk536pE265BUtV0Eg@mail.gmail.com>
-Subject: Re: [PATCH 09/15] kconfig/conf: fix randconfig setting multiple
- symbols in a choice
-From: Sedat Dilek <sedat.dilek@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: Text/Plain;
+  charset="iso-8859-15"
+Content-Transfer-Encoding: 7bit
+Message-Id: <201306251001.12430.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>, Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Matthieu CASTET <matthieu.castet@parrot.com>, Arnaud Lacombe <lacombar@gmail.com>, Alexander Kriegisch <Alexander@kriegisch.name>
+To: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>
+Cc: linux-kernel@vger.kernel.org, Thomas Petazzoni <thomas.petazzoni@free-electrons.com>, Sam Ravnborg <sam@ravnborg.org>, Sedat Dilek <sedat.dilek@gmail.com>, Arnd Bergmann <arnd@arndb.de>, Stephen Rothwell <sfr@canb.auug.org.au>, Fengguang Wu <fengguang.wu@intel.com>
 
-On Mon, Jun 24, 2013 at 8:11 PM, Yann E. MORIN <yann.morin.1998@free.fr> wrote:
-> From: "Yann E. MORIN" <yann.morin.1998@free.fr>
->
-> Currently, randconfig may set more than one symbol in a given choice.
-> Given this config file:
->     config A
->         bool "A"
->     if A
->     choice
->         bool "B/C/D"
->     config B
->         bool "B"
->     config C
->         bool "C"
->     config D
->         bool "D"
->     endchoice
->     endif # A
->
-> Then randconfig generates such .config files (case where A is not set is not
-> shown below for brevity), and where only the right-most .config is valid:
->   CONFIG_A=y                  CONFIG_A=y                  CONFIG_A=y
->   CONFIG_B=y                  CONFIG_B=y                  CONFIG_B=y
->   CONFIG_C=y                  # CONFIG_C is not set       # CONFIG_C is not set
->   # CONFIG_D is not set       CONFIG_D=y                  # CONFIG_D is not set
->
-> That is, in a randomised choice, the first symbol is always selected,
-> and at most one other symbol may be selected.
->
-> This is due to symbol randomised in a choice not being properly flagged
-> as having a value.
->
-> Fix that by flagging those symbols adequately: have a user-defined value,
-> and be not valid (to force recalculation of the symbol).
->
-> Note: if the choice is not conditional, then the randomisation is properly
-> done.
->
-> Reported-by: Matthieu CASTET <matthieu.castet@parrot.com>
-> Signed-off-by: Matthieu CASTET <matthieu.castet@parrot.com>
-> [yann.morin.1998@free.fr: independently re-done the same patch as Matthieu,
->                           as pointed out by Sedat]
-> Cc: Arnaud Lacombe <lacombar@gmail.com>
-> Cc: Sedat Dilek <sedat.dilek@gmail.com>
-> Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Michal, All,
 
-[ CC Alexander ]
+On Monday 24 June 2013 20:11:59 Yann E. MORIN wrote:
+> Currently, randconfig does randomise choice entries, unless KCONFIG_ALLCONFIG
+> is specified.
+[--SNIP--]
+> This patch defers setting that a choice has a value until a symbol for
+> that choice is indeed set, so that choices are properly randomised when
+> KCONFIG_ALLCONFIG is set, but not if a symbol for that choice is set.
 
-Can you or Marek (kbuild maintainer) please add also a Reported-by of
-Alexander (see [1])?
+I've just been informed by Fengguang that this patch breaks yet another
+use-case of his, but this time KCONFIG_ALLCONFIG is not involved.
 
-     Reported-by: Alexander Kriegisch <Alexander@kriegisch.name>
+I'll investigate this issue when I'm back home tonight (ie. ~16:00 UTC).
+Sorry for the breakage (again...). :-(
 
-It's a bit a pity that you discovered this issue by yourself independantly.
-As said in PM, the Freetz router project has included it when playing
-with Kconfig of Linux-v3.1-rc9.
+We really need a known, shared test-suite for kconfig... :-/
 
-Thanks for taking care.
+Regards,
+Yann E. MORIN.
 
-- Sedat -
-
-[1] http://www.spinics.net/lists/linux-kbuild/msg05702.html
-[2] http://freetz.org/browser/trunk/tools/make/patches/340-fix_randconfig_choice.kconfig.patch
-
-> ---
->  scripts/kconfig/confdata.c | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-> index 35e0f16..d36bc1f 100644
-> --- a/scripts/kconfig/confdata.c
-> +++ b/scripts/kconfig/confdata.c
-> @@ -1077,6 +1077,9 @@ static void randomize_choice_values(struct symbol *csym)
->                 else {
->                         sym->def[S_DEF_USER].tri = no;
->                 }
-> +               sym->flags |= SYMBOL_DEF_USER;
-> +               /* clear VALID to get value calculated */
-> +               sym->flags &= ~SYMBOL_VALID;
->         }
->         csym->flags |= SYMBOL_DEF_USER;
->         /* clear VALID to get value calculated */
-> --
-> 1.8.1.2
->
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +0/33 662376056 | Software  Designer | \ / CAMPAIGN     |   ^                |
+| --==< O_o >==-- '------------.-------:  X  AGAINST      |  /e\  There is no  |
+| http://ymorin.is-a-geek.org/ | (*_*) | / \ HTML MAIL    |  """  conspiracy.  |
+'------------------------------'-------'------------------'--------------------'
