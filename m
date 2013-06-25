@@ -1,129 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-bk0-f42.google.com ([209.85.214.42]:64059 "EHLO
-	mail-bk0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751250Ab3FYPJt (ORCPT
+Received: from mail-we0-f178.google.com ([74.125.82.178]:43808 "EHLO
+	mail-we0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752094Ab3FYU5h (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 25 Jun 2013 11:09:49 -0400
-Received: by mail-bk0-f42.google.com with SMTP id jk13so4587473bkc.15
-        for <linux-kbuild@vger.kernel.org>; Tue, 25 Jun 2013 08:09:48 -0700 (PDT)
-Date: Tue, 25 Jun 2013 16:09:41 +0100
-From: Dave Martin <dave.martin@linaro.org>
-Subject: Re: scripts/kallsyms: Avoid ARM veneer symbols
-Message-ID: <20130625150941.GF2327@linaro.org>
-References: <2983817.Xe2505Drlj@wuerfel>
+	Tue, 25 Jun 2013 16:57:37 -0400
+Date: Tue, 25 Jun 2013 22:57:31 +0200
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: Re: linux-next: Tree for Jun 25 [ kbuild or rapidio? ]
+Message-ID: <20130625205731.GA14074@free.fr>
+References: <CA+icZUVcWAmbRGXqrbkPXux6hSpYVM2yAPfbv_q8Faf348TGyw@mail.gmail.com>
+ <CA+icZUUta_HBtbpEOCsdPDRor1rvSNk46Wk=dHdvA6mAp61c1A@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <2983817.Xe2505Drlj@wuerfel>
+In-Reply-To: <CA+icZUUta_HBtbpEOCsdPDRor1rvSNk46Wk=dHdvA6mAp61c1A@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org
+To: Sedat Dilek <sedat.dilek@gmail.com>
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>, linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Alexandre Bounine <alexandre.bounine@idt.com>, Matt Porter <mporter@kernel.crashing.org>
 
-On Mon, Jun 24, 2013 at 04:01:43PM +0200, Arnd Bergmann wrote:
-> When building ARM kernels that exceed a certain size, the linker
-> will add "veneers" that allow long branches. Unfortunately,
-> using a longer kallsyms section may lead to the extra veneers
-> being needed, which leads to inconsistent kallsyms data with the
-> message
-> 
-> Inconsistent kallsyms data
-> Try make KALLSYMS_EXTRA_PASS=1 as a workaround
-> 
-> In some case, not just one but up to three extra passes were
-> needed before getting to a state that needed no extra veneers.
+Sedat, All,
 
-Do you understand why this was happening?  It sounds like there
-must have been branches crossing from one side of the kallsyms
-data to the other, triggering veneer insertion any time the
-kallsyms data grows.
+On 2013-06-25 11:28 +0200, Sedat Dilek spake thusly:
+> On Tue, Jun 25, 2013 at 11:17 AM, Sedat Dilek <sedat.dilek@gmail.com> wrote:
+> > On Tue, Jun 25, 2013 at 10:55 AM, Sedat Dilek <sedat.dilek@gmail.com> wrote:
+[--SNIP--]
+> >> Not sure what's going on, but I get this with today's Linux-Next.
+> >> ( Yesterday's next-20130624 was OK. )
+> >>
+> >> $ LANG=C LC_ALL=C  yes "" | make oldconfig && LANG=C LC_ALL=C make
+> >> silentoldconfig </dev/null
+[--SNIP--]
+> >> RapidIO support (RAPIDIO) [Y/n/?] y
+> >>   IDT Tsi721 PCI Express SRIO Controller support (RAPIDIO_TSI721) [Y/n/?] y
+> >>   Discovery timeout duration (seconds) (RAPIDIO_DISC_TIMEOUT) [30] 30
+> >>   Enable RapidIO Input/Output Ports (RAPIDIO_ENABLE_RX_TX_PORTS) [N/y/?] n
+> >>   DMA Engine support for RapidIO (RAPIDIO_DMA_ENGINE) [Y/n/?] y
+> >>   RapidIO subsystem debug messages (RAPIDIO_DEBUG) [N/y/?] n
+> >>   Enumeration method [M/y/?] (NEW) aborted!
+> >>
+> >> Console input/output is redirected. Run 'make oldconfig' to update
+> >> configuration.
+> >>
+> >> make[1]: *** [silentoldconfig] Error 1
+> >> make: *** [silentoldconfig] Error 2
+[--SNIP--]
+> So, it's a kbuild issue (info to the rapidio maintainers).
 
-Branches between .{init,exit}.text and .text (crossing .rodata) seem the
-likeliest culprits, but that's guesswork on my part.
+To be true, it's a kconfig (not kbuild) issue I introduced when trying
+to fix choice randomisation.
 
+Regards,
+Yann E. MORIN.
 
-If that's whats going on, multiple kallsyms passes is actually a correct
-approach here: I think they should terminate after a number of steps
-roughly proportional to log(number of branches across .rodata). We
-could come up with a heuristic which allows us to choose the right
-limit with a high degree of reliability, since branch density in
-compiled C code is likely to be roughly.
-
-But including the veneer symbols in kallsyms is arguably not all
-that useful.
-
-The main potential effect is that profiling might occasionally
-sample the PC as being in a completely bogus function which it
-never passed through at all, because of the way kallsyms tracks
-only symbol locations and not sizes (if I remember right) --
-so a veneer will actually get accounted against some arbitrary
-adjacent function.
-
-I don't know how much this matters.
-
-> The easiest solution is to skip veneers in kallsyms in the
-> same way we already skip a couple of other symbols.
-
-The other symbols are not stripped for the purpose of making
-kallsyms terminate quickly.  The mapping symbols are rather
-different: masses of symbols with duplicate names which are
-not very interesting for most people.
-
-> 
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
-> diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
-> index 487ac6f..53ec0bb 100644
-> --- a/scripts/kallsyms.c
-> +++ b/scripts/kallsyms.c
-> @@ -69,14 +69,32 @@ static void usage(void)
->  	exit(1);
->  }
->  
-> -/*
-> - * This ignores the intensely annoying "mapping symbols" found
-> - * in ARM ELF files: $a, $t and $d.
-> - */
->  static inline int is_arm_mapping_symbol(const char *str)
-
-The function's name is now wrong.  Should it be renamed or split up?
-
-Cheers
----Dave
-
->  {
-> -	return str[0] == '$' && strchr("atd", str[1])
-> -	       && (str[2] == '\0' || str[2] == '.');
-> +	size_t len;
-> +
-> +	/*
-> +	 * This ignores the intensely annoying "mapping symbols" found
-> +	 * in ARM ELF files: $a, $t and $d.
-> +	 */
-> +	if (str[0] == '$' && strchr("atd", str[1])
-> +	       && (str[2] == '\0' || str[2] == '.'))
-> +		return 1;
-> +
-> +	len = strlen(str);
-> +	if (len < 10)
-> +		return 0;
-> +
-> +	/*
-> +	 * This ignores any __.*_veneer symbol, which get
-> +	 * inserted for large kernels, in order to avoid
-> +	 * inconsistent data.
-> +	 */
-> +	if (str[0] == '_' && str[1] == '_' &&
-> +	    strcmp(str + len - 7, "_veneer") == 0)
-> +		return 1; 
-> +
-> +	return 0;
->  }
->  
->  static int read_symbol_tr(const char *sym, unsigned long long addr)
-> 
-> 
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
