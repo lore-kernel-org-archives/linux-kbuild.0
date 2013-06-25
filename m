@@ -1,69 +1,101 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f179.google.com ([209.85.212.179]:41497 "EHLO
-	mail-wi0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751528Ab3FYIKp (ORCPT
+Received: from mail-wg0-f50.google.com ([74.125.82.50]:60631 "EHLO
+	mail-wg0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752512Ab3FYIzW (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 25 Jun 2013 04:10:45 -0400
+	Tue, 25 Jun 2013 04:55:22 -0400
 MIME-Version: 1.0
 Reply-To: sedat.dilek@gmail.com
-In-Reply-To: <201306251001.12430.yann.morin.1998@free.fr>
-References: <cover.1372097219.git.yann.morin.1998@free.fr>
-	<8357b48549e17b3e4e402c7f977b65708922e60f.1372097219.git.yann.morin.1998@free.fr>
-	<201306251001.12430.yann.morin.1998@free.fr>
-Date: Tue, 25 Jun 2013 10:10:44 +0200
-Message-ID: <CA+icZUW69zkZice9K4Q2Fr=nuC3KCOr2ZXRZFymYadsxCvB1tA@mail.gmail.com>
-Subject: Re: [PATCH 15/15] kconfig: fix randomising choice entries in presence
- of KCONFIG_ALLCONFIG
+In-Reply-To: <20130625184420.b811089a069c63ccd3721d68@canb.auug.org.au>
+References: <20130625184420.b811089a069c63ccd3721d68@canb.auug.org.au>
+Date: Tue, 25 Jun 2013 10:55:20 +0200
+Message-ID: <CA+icZUUH7AeR7OSm-SB56AGRiE815tTkQW9fFkKzyrSvzs3Etg@mail.gmail.com>
+Subject: Re: linux-next: Tree for Jun 25
 From: Sedat Dilek <sedat.dilek@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, Thomas Petazzoni <thomas.petazzoni@free-electrons.com>, Sam Ravnborg <sam@ravnborg.org>, Arnd Bergmann <arnd@arndb.de>, Stephen Rothwell <sfr@canb.auug.org.au>, Fengguang Wu <fengguang.wu@intel.com>, Alexander Kriegisch <Alexander@kriegisch.name>
+To: Stephen Rothwell <sfr@canb.auug.org.au>
+Cc: linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-On Tue, Jun 25, 2013 at 10:01 AM, Yann E. MORIN <yann.morin.1998@free.fr> wrote:
-> Michal, All,
+On Tue, Jun 25, 2013 at 10:44 AM, Stephen Rothwell <sfr@canb.auug.org.au> wrote:
+> Hi all,
 >
-> On Monday 24 June 2013 20:11:59 Yann E. MORIN wrote:
->> Currently, randconfig does randomise choice entries, unless KCONFIG_ALLCONFIG
->> is specified.
-> [--SNIP--]
->> This patch defers setting that a choice has a value until a symbol for
->> that choice is indeed set, so that choices are properly randomised when
->> KCONFIG_ALLCONFIG is set, but not if a symbol for that choice is set.
+> Changes since 20130624:
 >
-> I've just been informed by Fengguang that this patch breaks yet another
-> use-case of his, but this time KCONFIG_ALLCONFIG is not involved.
+> The vfs tree lost its build failure.
 >
-> I'll investigate this issue when I'm back home tonight (ie. ~16:00 UTC).
-> Sorry for the breakage (again...). :-(
+> The net-next tree gained a conflict against the net tree.
 >
-> We really need a known, shared test-suite for kconfig... :-/
+> The usb tree gained a conflict against the devicetree tree.
+>
+> The staging tree lost its build failure.
+>
+> The msm tree gained a conflict against the arm-soc tree.
+>
+> The samsung tree gained a conflict against the tip tree.
+>
+> The akpm tree lost a patch that turned up elsewhere and gained a conflict
+> against the samsung tree.
+>
+> ----------------------------------------------------------------------------
 >
 
-[ CC Alexander ]
+[ CC linux-kbuild folks ]
 
-A-propos, "testing Kconfig" I recommended to take into account the
-script of Alexander.
-In PM we discussed on where to place such scripts and that Alexander's
-patch needs some refreshing in your eyes.
-Maybe, Alexander can/will help as he is the original author.
-As said, this script helped in the Freetz router project to eliminate
-dozens of (logically) wrong Kconfig settings.
-IMHO there exist a lot of more, as there are "double/triple" checks in
-the Freetz-buildsystem, but hey noone is perfect :-).
+Not sure what's going on, but I get this with today's Linux-Next.
+( Yesterday's next-20130624 was OK. )
+
+$ LANG=C LC_ALL=C  yes "" | make oldconfig && LANG=C LC_ALL=C make
+silentoldconfig </dev/null
+...
+#
+# configuration written to .config
+#
+scripts/kconfig/conf --silentoldconfig Kconfig
+*
+* Restart config...
+*
+*
+* Bus options (PCI etc.)
+*
+PCI support (PCI) [Y/n/?] y
+  Support mmconfig PCI config space access (PCI_MMCONFIG) [Y/n] y
+  Read CNB20LE Host Bridge Windows (PCI_CNB20LE_QUIRK) [N/y/?] n
+  PCI Express support (PCIEPORTBUS) [Y/n/?] y
+    PCI Express Hotplug driver (HOTPLUG_PCI_PCIE) [Y/n/m/?] y
+    Root Port Advanced Error Reporting support (PCIEAER) [Y/n/?] y
+      PCI Express ECRC settings control (PCIE_ECRC) [N/y/?] n
+      PCIe AER error injector support (PCIEAER_INJECT) [N/m/y/?] n
+    PCI Express ASPM control (PCIEASPM) [Y/n/?] y
+      Debug PCI Express ASPM (PCIEASPM_DEBUG) [N/y/?] n
+      Default ASPM policy
+      > 1. BIOS default (PCIEASPM_DEFAULT)
+        2. Powersave (PCIEASPM_POWERSAVE)
+        3. Performance (PCIEASPM_PERFORMANCE)
+      choice[1-3]: 1
+Message Signaled Interrupts (MSI and MSI-X) (PCI_MSI) [Y/?] y
+PCI Debugging (PCI_DEBUG) [N/y/?] n
+Enable PCI resource re-allocation detection (PCI_REALLOC_ENABLE_AUTO) [Y/n/?] y
+PCI Stub driver (PCI_STUB) [M/n/y/?] m
+Interrupts on hypertransport devices (HT_IRQ) [Y/n/?] y
+PCI IOV support (PCI_IOV) [Y/n/?] y
+PCI PRI support (PCI_PRI) [Y/?] y
+PCI PASID support (PCI_PASID) [Y/?] y
+PCI IO-APIC hotplug support (PCI_IOAPIC) [Y/n/m] y
+ISA-style DMA support (ISA_DMA_API) [Y/n/?] y
+RapidIO support (RAPIDIO) [Y/n/?] y
+  IDT Tsi721 PCI Express SRIO Controller support (RAPIDIO_TSI721) [Y/n/?] y
+  Discovery timeout duration (seconds) (RAPIDIO_DISC_TIMEOUT) [30] 30
+  Enable RapidIO Input/Output Ports (RAPIDIO_ENABLE_RX_TX_PORTS) [N/y/?] n
+  DMA Engine support for RapidIO (RAPIDIO_DMA_ENGINE) [Y/n/?] y
+  RapidIO subsystem debug messages (RAPIDIO_DEBUG) [N/y/?] n
+  Enumeration method [M/y/?] (NEW) aborted!
+
+Console input/output is redirected. Run 'make oldconfig' to update
+configuration.
+
+make[1]: *** [silentoldconfig] Error 1
+make: *** [silentoldconfig] Error 2
 
 - Sedat -
-
-[1] http://freetz.org/browser/trunk/tools/developer/create-kconfig-warnings
-
-> Regards,
-> Yann E. MORIN.
->
-> --
-> .-----------------.--------------------.------------------.--------------------.
-> |  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-> | +0/33 662376056 | Software  Designer | \ / CAMPAIGN     |   ^                |
-> | --==< O_o >==-- '------------.-------:  X  AGAINST      |  /e\  There is no  |
-> | http://ymorin.is-a-geek.org/ | (*_*) | / \ HTML MAIL    |  """  conspiracy.  |
-> '------------------------------'-------'------------------'--------------------'
