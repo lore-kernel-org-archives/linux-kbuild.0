@@ -1,61 +1,114 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f47.google.com ([74.125.82.47]:46997 "EHLO
-	mail-wg0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751509Ab3FYJkU (ORCPT
+Received: from r-mail2.rd.orange.com ([217.108.152.42]:23158 "EHLO
+	r-mail2.rd.orange.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750864Ab3FYMJq (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 25 Jun 2013 05:40:20 -0400
-MIME-Version: 1.0
-Reply-To: sedat.dilek@gmail.com
-In-Reply-To: <51C96322.9000801@suse.cz>
-References: <20130625184420.b811089a069c63ccd3721d68@canb.auug.org.au>
-	<CA+icZUUH7AeR7OSm-SB56AGRiE815tTkQW9fFkKzyrSvzs3Etg@mail.gmail.com>
-	<201306251121.53862.yann.morin.1998@free.fr>
-	<CA+icZUU06C43bxyX2UGtDxRQqcyqeAQgt7fZHq7H7HgcJ6sHzQ@mail.gmail.com>
-	<51C96322.9000801@suse.cz>
-Date: Tue, 25 Jun 2013 11:40:18 +0200
-Message-ID: <CA+icZUWS6d98YA7_rdjXw-R3V+OyV2YCH9Hpn-C+qB385-QO_g@mail.gmail.com>
+	Tue, 25 Jun 2013 08:09:46 -0400
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
 Subject: Re: linux-next: Tree for Jun 25
-From: Sedat Dilek <sedat.dilek@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Date: Tue, 25 Jun 2013 14:03:17 +0200
+References: <20130625184420.b811089a069c63ccd3721d68@canb.auug.org.au> <CA+icZUUH7AeR7OSm-SB56AGRiE815tTkQW9fFkKzyrSvzs3Etg@mail.gmail.com> <201306251121.53862.yann.morin.1998@free.fr>
+In-Reply-To: <201306251121.53862.yann.morin.1998@free.fr>
+MIME-Version: 1.0
+Content-Type: Text/Plain;
+  charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <201306251403.17436.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.cz>
-Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, Stephen Rothwell <sfr@canb.auug.org.au>, linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+Cc: sedat.dilek@gmail.com, Stephen Rothwell <sfr@canb.auug.org.au>, linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Tue, Jun 25, 2013 at 11:30 AM, Michal Marek <mmarek@suse.cz> wrote:
-> On 25.6.2013 11:26, Sedat Dilek wrote:
->> On Tue, Jun 25, 2013 at 11:21 AM, Yann E. MORIN <yann.morin.1998@free.fr> wrote:
->> http://git.kernel.org/cgit/linux/kernel/git/next/linux-next.git/commit/?id=a11650e11093ed57dca78bf16e7836517c599098
->>
->>>   - for tristate choices, it is possible to select zero, one or more of the
->>>     symbols in the choice
->>>   - if no symbol is selected (randomly or otherwise) in a tristate choice,
->>>     then the choice symbol itself has no assigned 'value'
->>>   - then silentoldconfig whines
->>
->> Bad bad bad Yann, didn't Marek told you to test always with...
->>
->>     $ yes "" | make oldconfig; make silentoldconfig </dev/null
->>
->> Anyway, have fun.
->
-> You only hit this if you have CONFIG_RAPIDIO=y in the original config.
->
+Michal, All,
 
-OK, my kernel-config base was from a Ubuntu/precise kernel.
-You are right for x86 it is not a defconfig.
+[Sorry for duplicates, I inadvertently sent HTML]
 
-$ grep RAPIDIO arch/x86/configs/*_defconfig
+On Tuesday 25 June 2013 11:21:53 Yann E. MORIN wrote:
+> On Tuesday 25 June 2013 10:55:20 Sedat Dilek wrote:
+> > Not sure what's going on, but I get this with today's Linux-Next.
+> > ( Yesterday's next-20130624 was OK. )
+> > 
+> > $ LANG=C LC_ALL=C  yes "" | make oldconfig && LANG=C LC_ALL=C make
+> > silentoldconfig </dev/null
+> [--SNIP--]
+> > RapidIO support (RAPIDIO) [Y/n/?] y
+> >   IDT Tsi721 PCI Express SRIO Controller support (RAPIDIO_TSI721) [Y/n/?] y
+> >   Discovery timeout duration (seconds) (RAPIDIO_DISC_TIMEOUT) [30] 30
+> >   Enable RapidIO Input/Output Ports (RAPIDIO_ENABLE_RX_TX_PORTS) [N/y/?] n
+> >   DMA Engine support for RapidIO (RAPIDIO_DMA_ENGINE) [Y/n/?] y
+> >   RapidIO subsystem debug messages (RAPIDIO_DEBUG) [N/y/?] n
+> >   Enumeration method [M/y/?] (NEW) aborted!
+> > 
+> > Console input/output is redirected. Run 'make oldconfig' to update
+> > configuration.
+> 
+> Yes, the same error as reported by Fengguang earlier:
+>     http://marc.info/?l=linux-kbuild&m=137214773928335&w=4
+> 
+> And caused by (yet once more):
+>     8357b48: kconfig: fix randomising choice entries in presence of KCONFIG_ALLCONFIG
+> 
+> Basically, the issue is:
+> 
+>   - 'Enumeration method' is a tristate choice
+>   - for tristate choices, it is possible to select zero, one or more of the
+>     symbols in the choice
+>   - if no symbol is selected (randomly or otherwise) in a tristate choice,
+>     then the choice symbol itself has no assigned 'value'
+>   - then silentoldconfig whines
+> 
+> It worked so far as a side effect of another bug (which 8357b48 tries to
+> fix), and now this new one has been exposed.
 
-$ grep RAPIDIO arch/powerpc/configs/*_defconfig
-arch/powerpc/configs/corenet32_smp_defconfig:CONFIG_RAPIDIO=y
-arch/powerpc/configs/corenet64_smp_defconfig:CONFIG_RAPIDIO=y
-arch/powerpc/configs/mpc85xx_defconfig:CONFIG_RAPIDIO=y
-arch/powerpc/configs/mpc85xx_smp_defconfig:CONFIG_RAPIDIO=y
+OK, after battling on this during my lunch-break, I now better understand
+the root cause. Consider this trivial Kconfig snippet:
 
-Anyway, it is good we catched this.
+    ---8<--- BEGIN Ktest ---8<---
+    config MODULES
+        bool "Modules"
 
-- Sedat -
+    choice
+        tristate "test"
 
+    config A
+        tristate "A"
 
-> Michal
+    config B
+        tristate "B"
+
+    config C
+        tristate "C"
+
+    endchoice
+    ---8<---  END Ktest  ---8<---
+
+Now, this choice "test" is a tristate, so it can be either 'M' or 'Y'.
+
+But since this is a choice _prompt_ *and* it does not have a symbol
+associated, then its value is not stored in .config.
+
+On a sub-sequent run of a kconfig utility, the Ktest file is parsed, and
+the .config is read, associating read values to the symbols. But since
+the choice prompt has no symbol, no value is assigned to it, so it is
+believed to be new, and since it can be either 'M' or 'Y', it is asked
+for.
+
+Furthermore, even if the choice had a symbol, it would not be saved to
+the .config either. And we'd be back to square-1.
+
+> This one is starting to drive me crazy, really... :-(
+
+Yes, it is! (head spining frantically, toons-like) ;-)
+
+My lunch-break is over now, so more on this when I'mn back home, in ~6h.
+
+Regards,
+Yann E. MORIN.
+
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +0/33 662376056 | Software  Designer | \ / CAMPAIGN     |   ^                |
+| --==< O_o >==-- '------------.-------:  X  AGAINST      |  /e\  There is no  |
+| http://ymorin.is-a-geek.org/ | (*_*) | / \ HTML MAIL    |  """  conspiracy.  |
+'------------------------------'-------'------------------'--------------------'
