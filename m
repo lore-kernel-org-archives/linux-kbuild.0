@@ -1,84 +1,225 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f48.google.com ([74.125.82.48]:40232 "EHLO
-	mail-wg0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751694Ab3FYVh4 (ORCPT
+Received: from mail-ie0-f179.google.com ([209.85.223.179]:61735 "EHLO
+	mail-ie0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751101Ab3FZBOH (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 25 Jun 2013 17:37:56 -0400
-Received: by mail-wg0-f48.google.com with SMTP id f11so9758067wgh.15
-        for <linux-kbuild@vger.kernel.org>; Tue, 25 Jun 2013 14:37:55 -0700 (PDT)
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: [PATCH] Revert "kconfig: fix randomising choice entries in presence of KCONFIG_ALLCONFIG"
-Date: Tue, 25 Jun 2013 23:37:44 +0200
-Message-Id: <1372196264-3407-1-git-send-email-yann.morin.1998@free.fr>
-In-Reply-To: <20130625205836.GB14074@free.fr>
-References: <20130625205836.GB14074@free.fr>
+	Tue, 25 Jun 2013 21:14:07 -0400
+Received: by mail-ie0-f179.google.com with SMTP id c10so28436321ieb.24
+        for <linux-kbuild@vger.kernel.org>; Tue, 25 Jun 2013 18:14:07 -0700 (PDT)
+From: "Yaakov (Cygwin/X)" <yselkowitz@users.sourceforge.net>
+Subject: [PATCH] tools/include: use stdint types for user-space byteshift headers
+Date: Tue, 25 Jun 2013 20:13:37 -0500
+Message-Id: <1372209217-7176-1-git-send-email-yselkowitz@users.sourceforge.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, Michal Marek <mmarek@suse.cz>, Fengguang Wu <fengguang.wu@intel.com>, Sedat Dilek <sedat.dilek@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Stephen Rothwell <sfr@canb.auug.org.au>, Alexandre Bounine <alexandre.bounine@idt.com>, Matt Porter <mporter@kernel.crashing.org>
+Cc: mmarek@suse.cz
 
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+From: Yaakov Selkowitz <yselkowitz@users.sourceforge.net>
 
-This reverts commit 8357b48549e17b3e4e402c7f977b65708922e60f.
+Commit a07f7672d7cf0ff0d6e548a9feb6e0bd016d9c6c added user-space copies
+of the byteshift headers to be used by hostprogs, changing e.g. u8 to __u8.
+However, in order to cross-compile the kernel from a non-Linux system,
+stdint.h types need to be used instead of linux/types.h types.
 
-It breaks more stuff than it fixes.
-
-Reported-by: Fengguang Wu <fengguang.wu@intel.com>
-Reported-by: Sedat Dilek <sedat.dilek@gmail.com>
-Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: Michal Marek <mmarek@suse.cz>
-Cc: Fengguang Wu <fengguang.wu@intel.com>
-Cc: Sedat Dilek <sedat.dilek@gmail.com>
-Cc: Sam Ravnborg <sam@ravnborg.org>
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>
-Cc: Alexandre Bounine <alexandre.bounine@idt.com>
-Cc: Matt Porter <mporter@kernel.crashing.org>
-
+Signed-off-by: Yaakov Selkowitz <yselkowitz@users.sourceforge.net>
 ---
-Michal, here is the revert patch if you want it.
-Regards,
-Yann E. MORIN.
----
- scripts/kconfig/confdata.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+I have tried to get this patch in via LKML on several occasions without
+success:
 
-diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-index 3e39208..c55c227 100644
---- a/scripts/kconfig/confdata.c
-+++ b/scripts/kconfig/confdata.c
-@@ -288,6 +288,8 @@ load:
- 	for_all_symbols(i, sym) {
- 		sym->flags |= SYMBOL_CHANGED;
- 		sym->flags &= ~(def_flags|SYMBOL_VALID);
-+		if (sym_is_choice(sym))
-+			sym->flags |= def_flags;
- 		switch (sym->type) {
- 		case S_INT:
- 		case S_HEX:
-@@ -377,13 +379,13 @@ setsym:
- 			case mod:
- 				if (cs->def[def].tri == yes) {
- 					conf_warning("%s creates inconsistent choice state", sym->name);
-+					cs->flags &= ~def_flags;
- 				}
- 				break;
- 			case yes:
- 				if (cs->def[def].tri != no)
- 					conf_warning("override: %s changes choice state", sym->name);
- 				cs->def[def].val = sym;
--				cs->flags |= def_flags;
- 				break;
- 			}
- 			cs->def[def].tri = EXPR_OR(cs->def[def].tri, sym->def[def].tri);
-@@ -789,8 +791,6 @@ int conf_write(const char *name)
- 			sym_calc_value(sym);
- 			if (!(sym->flags & SYMBOL_WRITE))
- 				goto next;
--			if (sym_is_choice_value(sym) && !menu_is_visible(menu->parent))
--				goto next;
- 			sym->flags &= ~SYMBOL_WRITE;
+	https://lkml.org/lkml/2013/4/28/84
+	https://lkml.org/lkml/2012/10/15/608
+	https://lkml.org/lkml/2012/6/11/604
+
+As these headers are used by hostprogs, perhaps you would be willing to
+consider them, or direct me to someone else that will.
+
+Applies to Linus' master and stable linux-3.[3-10].y
+
+ tools/include/tools/be_byteshift.h |   34 +++++++++++++++++-----------------
+ tools/include/tools/le_byteshift.h |   34 +++++++++++++++++-----------------
+ 2 files changed, 34 insertions(+), 34 deletions(-)
+
+diff --git a/tools/include/tools/be_byteshift.h b/tools/include/tools/be_byteshift.h
+index f4912e2..84c17d8 100644
+--- a/tools/include/tools/be_byteshift.h
++++ b/tools/include/tools/be_byteshift.h
+@@ -1,68 +1,68 @@
+ #ifndef _TOOLS_BE_BYTESHIFT_H
+ #define _TOOLS_BE_BYTESHIFT_H
  
- 			conf_write_symbol(out, sym, &kconfig_printer_cb, NULL);
+-#include <linux/types.h>
++#include <stdint.h>
+ 
+-static inline __u16 __get_unaligned_be16(const __u8 *p)
++static inline uint16_t __get_unaligned_be16(const uint8_t *p)
+ {
+ 	return p[0] << 8 | p[1];
+ }
+ 
+-static inline __u32 __get_unaligned_be32(const __u8 *p)
++static inline uint32_t __get_unaligned_be32(const uint8_t *p)
+ {
+ 	return p[0] << 24 | p[1] << 16 | p[2] << 8 | p[3];
+ }
+ 
+-static inline __u64 __get_unaligned_be64(const __u8 *p)
++static inline uint64_t __get_unaligned_be64(const uint8_t *p)
+ {
+-	return (__u64)__get_unaligned_be32(p) << 32 |
++	return (uint64_t)__get_unaligned_be32(p) << 32 |
+ 	       __get_unaligned_be32(p + 4);
+ }
+ 
+-static inline void __put_unaligned_be16(__u16 val, __u8 *p)
++static inline void __put_unaligned_be16(uint16_t val, uint8_t *p)
+ {
+ 	*p++ = val >> 8;
+ 	*p++ = val;
+ }
+ 
+-static inline void __put_unaligned_be32(__u32 val, __u8 *p)
++static inline void __put_unaligned_be32(uint32_t val, uint8_t *p)
+ {
+ 	__put_unaligned_be16(val >> 16, p);
+ 	__put_unaligned_be16(val, p + 2);
+ }
+ 
+-static inline void __put_unaligned_be64(__u64 val, __u8 *p)
++static inline void __put_unaligned_be64(uint64_t val, uint8_t *p)
+ {
+ 	__put_unaligned_be32(val >> 32, p);
+ 	__put_unaligned_be32(val, p + 4);
+ }
+ 
+-static inline __u16 get_unaligned_be16(const void *p)
++static inline uint16_t get_unaligned_be16(const void *p)
+ {
+-	return __get_unaligned_be16((const __u8 *)p);
++	return __get_unaligned_be16((const uint8_t *)p);
+ }
+ 
+-static inline __u32 get_unaligned_be32(const void *p)
++static inline uint32_t get_unaligned_be32(const void *p)
+ {
+-	return __get_unaligned_be32((const __u8 *)p);
++	return __get_unaligned_be32((const uint8_t *)p);
+ }
+ 
+-static inline __u64 get_unaligned_be64(const void *p)
++static inline uint64_t get_unaligned_be64(const void *p)
+ {
+-	return __get_unaligned_be64((const __u8 *)p);
++	return __get_unaligned_be64((const uint8_t *)p);
+ }
+ 
+-static inline void put_unaligned_be16(__u16 val, void *p)
++static inline void put_unaligned_be16(uint16_t val, void *p)
+ {
+ 	__put_unaligned_be16(val, p);
+ }
+ 
+-static inline void put_unaligned_be32(__u32 val, void *p)
++static inline void put_unaligned_be32(uint32_t val, void *p)
+ {
+ 	__put_unaligned_be32(val, p);
+ }
+ 
+-static inline void put_unaligned_be64(__u64 val, void *p)
++static inline void put_unaligned_be64(uint64_t val, void *p)
+ {
+ 	__put_unaligned_be64(val, p);
+ }
+diff --git a/tools/include/tools/le_byteshift.h b/tools/include/tools/le_byteshift.h
+index c99d45a..8fe9f24 100644
+--- a/tools/include/tools/le_byteshift.h
++++ b/tools/include/tools/le_byteshift.h
+@@ -1,68 +1,68 @@
+ #ifndef _TOOLS_LE_BYTESHIFT_H
+ #define _TOOLS_LE_BYTESHIFT_H
+ 
+-#include <linux/types.h>
++#include <stdint.h>
+ 
+-static inline __u16 __get_unaligned_le16(const __u8 *p)
++static inline uint16_t __get_unaligned_le16(const uint8_t *p)
+ {
+ 	return p[0] | p[1] << 8;
+ }
+ 
+-static inline __u32 __get_unaligned_le32(const __u8 *p)
++static inline uint32_t __get_unaligned_le32(const uint8_t *p)
+ {
+ 	return p[0] | p[1] << 8 | p[2] << 16 | p[3] << 24;
+ }
+ 
+-static inline __u64 __get_unaligned_le64(const __u8 *p)
++static inline uint64_t __get_unaligned_le64(const uint8_t *p)
+ {
+-	return (__u64)__get_unaligned_le32(p + 4) << 32 |
++	return (uint64_t)__get_unaligned_le32(p + 4) << 32 |
+ 	       __get_unaligned_le32(p);
+ }
+ 
+-static inline void __put_unaligned_le16(__u16 val, __u8 *p)
++static inline void __put_unaligned_le16(uint16_t val, uint8_t *p)
+ {
+ 	*p++ = val;
+ 	*p++ = val >> 8;
+ }
+ 
+-static inline void __put_unaligned_le32(__u32 val, __u8 *p)
++static inline void __put_unaligned_le32(uint32_t val, uint8_t *p)
+ {
+ 	__put_unaligned_le16(val >> 16, p + 2);
+ 	__put_unaligned_le16(val, p);
+ }
+ 
+-static inline void __put_unaligned_le64(__u64 val, __u8 *p)
++static inline void __put_unaligned_le64(uint64_t val, uint8_t *p)
+ {
+ 	__put_unaligned_le32(val >> 32, p + 4);
+ 	__put_unaligned_le32(val, p);
+ }
+ 
+-static inline __u16 get_unaligned_le16(const void *p)
++static inline uint16_t get_unaligned_le16(const void *p)
+ {
+-	return __get_unaligned_le16((const __u8 *)p);
++	return __get_unaligned_le16((const uint8_t *)p);
+ }
+ 
+-static inline __u32 get_unaligned_le32(const void *p)
++static inline uint32_t get_unaligned_le32(const void *p)
+ {
+-	return __get_unaligned_le32((const __u8 *)p);
++	return __get_unaligned_le32((const uint8_t *)p);
+ }
+ 
+-static inline __u64 get_unaligned_le64(const void *p)
++static inline uint64_t get_unaligned_le64(const void *p)
+ {
+-	return __get_unaligned_le64((const __u8 *)p);
++	return __get_unaligned_le64((const uint8_t *)p);
+ }
+ 
+-static inline void put_unaligned_le16(__u16 val, void *p)
++static inline void put_unaligned_le16(uint16_t val, void *p)
+ {
+ 	__put_unaligned_le16(val, p);
+ }
+ 
+-static inline void put_unaligned_le32(__u32 val, void *p)
++static inline void put_unaligned_le32(uint32_t val, void *p)
+ {
+ 	__put_unaligned_le32(val, p);
+ }
+ 
+-static inline void put_unaligned_le64(__u64 val, void *p)
++static inline void put_unaligned_le64(uint64_t val, void *p)
+ {
+ 	__put_unaligned_le64(val, p);
+ }
 -- 
-1.8.1.2
+1.7.9
 
