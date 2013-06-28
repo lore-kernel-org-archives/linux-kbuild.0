@@ -1,35 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:35434 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752593Ab3F0XFf (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 27 Jun 2013 19:05:35 -0400
-Message-ID: <51CCC539.2000105@suse.cz>
-Date: Fri, 28 Jun 2013 01:05:29 +0200
-From: Michal Marek <mmarek@suse.cz>
+Received: from mail-wi0-f170.google.com ([209.85.212.170]:61699 "EHLO
+	mail-wi0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755717Ab3F1RTO (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 28 Jun 2013 13:19:14 -0400
+Received: by mail-wi0-f170.google.com with SMTP id ey16so2036082wid.3
+        for <linux-kbuild@vger.kernel.org>; Fri, 28 Jun 2013 10:19:13 -0700 (PDT)
+Date: Fri, 28 Jun 2013 19:19:09 +0200
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: Re: [PATCH] Revert "kconfig: fix randomising choice entries in
+ presence of KCONFIG_ALLCONFIG"
+Message-ID: <20130628171908.GD3165@free.fr>
+References: <20130625205836.GB14074@free.fr>
+ <1372196264-3407-1-git-send-email-yann.morin.1998@free.fr>
+ <20130626134852.GA25921@sepie.suse.cz>
+ <20130626214425.GA3223@free.fr>
+ <CA+icZUXBJrdveoptnvGAxsob9dXakqo0-vCnTJxFR563XYgGDQ@mail.gmail.com>
 MIME-Version: 1.0
-Subject: Re: [PATCH] improve modalias building
-References: <51A60E5002000078000D9978@nat28.tlf.novell.com>
-In-Reply-To: <51A60E5002000078000D9978@nat28.tlf.novell.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CA+icZUXBJrdveoptnvGAxsob9dXakqo0-vCnTJxFR563XYgGDQ@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jan Beulich <JBeulich@suse.com>
-Cc: schwab@linux-m68k.org, linux-kbuild@vger.kernel.org
+To: Sedat Dilek <sedat.dilek@gmail.com>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>
 
-Dne 29.5.2013 14:18, Jan Beulich napsal(a):
-> For one, there's no point in the respective pieces to be rebuilt
-> unconditionally on each and every rebuild.
-> 
-> Second there's no need to invent a custom rule for generating the .s
-> file from the .c source - we can simply use the generic rule here.
-> 
-> And finally, $(obj) should be used to refer to files in the build tree
-> (rather than spelling out the subdirectory).
-> 
-> Signed-off-by: Jan Beulich <jbeulich@suse.com>
+Sedat, All,
 
-Applied to kbuild.git#kbuild.
+On 2013-06-27 08:23 +0200, Sedat Dilek spake thusly:
+> On Wed, Jun 26, 2013 at 11:44 PM, Yann E. MORIN <yann.morin.1998@free.fr> wrote:
+> > Michal, All,
+> >
+> > On 2013-06-26 15:48 +0200, Michal Marek spake thusly:
+> >> On Tue, Jun 25, 2013 at 11:37:44PM +0200, Yann E. MORIN wrote:
+> >> > From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+> >> >
+> >> > This reverts commit 8357b48549e17b3e4e402c7f977b65708922e60f.
+> >> >
+> >> > It breaks more stuff than it fixes.
+> >>
+> >> Thanks, I applied it to kbuild.git#kconfig, after verifying that the
+> >> issue is gone.
+> >
+> > Yes, thanks. I'm sorry this second attempt was a (slightly different!)
+> > failure again. :-(
+[--SNIP--]
+> Can you please write up some cooler changelog next time why this
+> revert was done?
+> In one of your emails you did some nice analysis.
+> Such informations belong IMHO into the revert's changelog.
 
-Thanks,
-Michal
+Yes, you are right, I'll do next time I'll have to send a revert patch
+(which I hope not to have to for some time! ;-) )
+
+Regards,
+Yann E. MORIN.
+
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
