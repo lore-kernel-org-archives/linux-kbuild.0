@@ -1,65 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f170.google.com ([209.85.212.170]:61699 "EHLO
-	mail-wi0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755717Ab3F1RTO (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 28 Jun 2013 13:19:14 -0400
-Received: by mail-wi0-f170.google.com with SMTP id ey16so2036082wid.3
-        for <linux-kbuild@vger.kernel.org>; Fri, 28 Jun 2013 10:19:13 -0700 (PDT)
-Date: Fri, 28 Jun 2013 19:19:09 +0200
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH] Revert "kconfig: fix randomising choice entries in
- presence of KCONFIG_ALLCONFIG"
-Message-ID: <20130628171908.GD3165@free.fr>
-References: <20130625205836.GB14074@free.fr>
- <1372196264-3407-1-git-send-email-yann.morin.1998@free.fr>
- <20130626134852.GA25921@sepie.suse.cz>
- <20130626214425.GA3223@free.fr>
- <CA+icZUXBJrdveoptnvGAxsob9dXakqo0-vCnTJxFR563XYgGDQ@mail.gmail.com>
+Received: from smtp.outflux.net ([198.145.64.163]:59974 "EHLO smtp.outflux.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753305Ab3F1T47 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 28 Jun 2013 15:56:59 -0400
+Date: Fri, 28 Jun 2013 12:56:51 -0700
+From: Kees Cook <keescook@chromium.org>
+Subject: [PATCH] kconfig: allow "hex" and "range" to support longs
+Message-ID: <20130628195651.GA8198@www.outflux.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CA+icZUXBJrdveoptnvGAxsob9dXakqo0-vCnTJxFR563XYgGDQ@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sedat Dilek <sedat.dilek@gmail.com>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>
+To: linux-kernel@vger.kernel.org
+Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
-Sedat, All,
+The parsing routines for Kconfig files use strtol(), but store and
+render values as int. Switch types and formating to long to support a
+wider range of values. For example, 0x80000000 wasn't representable.
 
-On 2013-06-27 08:23 +0200, Sedat Dilek spake thusly:
-> On Wed, Jun 26, 2013 at 11:44 PM, Yann E. MORIN <yann.morin.1998@free.fr> wrote:
-> > Michal, All,
-> >
-> > On 2013-06-26 15:48 +0200, Michal Marek spake thusly:
-> >> On Tue, Jun 25, 2013 at 11:37:44PM +0200, Yann E. MORIN wrote:
-> >> > From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-> >> >
-> >> > This reverts commit 8357b48549e17b3e4e402c7f977b65708922e60f.
-> >> >
-> >> > It breaks more stuff than it fixes.
-> >>
-> >> Thanks, I applied it to kbuild.git#kconfig, after verifying that the
-> >> issue is gone.
-> >
-> > Yes, thanks. I'm sorry this second attempt was a (slightly different!)
-> > failure again. :-(
-[--SNIP--]
-> Can you please write up some cooler changelog next time why this
-> revert was done?
-> In one of your emails you did some nice analysis.
-> Such informations belong IMHO into the revert's changelog.
+Signed-off-by: Kees Cook <keescook@chromium.org>
+---
+ scripts/kconfig/symbol.c |   10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-Yes, you are right, I'll do next time I'll have to send a revert patch
-(which I hope not to have to for some time! ;-) )
+diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
+index ecc5aa5..8ee1ff58 100644
+--- a/scripts/kconfig/symbol.c
++++ b/scripts/kconfig/symbol.c
+@@ -136,7 +136,7 @@ static struct property *sym_get_range_prop(struct symbol *sym)
+ 	return NULL;
+ }
+ 
+-static int sym_get_range_val(struct symbol *sym, int base)
++static long sym_get_range_val(struct symbol *sym, int base)
+ {
+ 	sym_calc_value(sym);
+ 	switch (sym->type) {
+@@ -155,7 +155,7 @@ static int sym_get_range_val(struct symbol *sym, int base)
+ static void sym_validate_range(struct symbol *sym)
+ {
+ 	struct property *prop;
+-	int base, val, val2;
++	long base, val, val2;
+ 	char str[64];
+ 
+ 	switch (sym->type) {
+@@ -179,9 +179,9 @@ static void sym_validate_range(struct symbol *sym)
+ 			return;
+ 	}
+ 	if (sym->type == S_INT)
+-		sprintf(str, "%d", val2);
++		sprintf(str, "%ld", val2);
+ 	else
+-		sprintf(str, "0x%x", val2);
++		sprintf(str, "0x%lx", val2);
+ 	sym->curr.val = strdup(str);
+ }
+ 
+@@ -583,7 +583,7 @@ bool sym_string_valid(struct symbol *sym, const char *str)
+ bool sym_string_within_range(struct symbol *sym, const char *str)
+ {
+ 	struct property *prop;
+-	int val;
++	long val;
+ 
+ 	switch (sym->type) {
+ 	case S_STRING:
+-- 
+1.7.9.5
 
-Regards,
-Yann E. MORIN.
 
 -- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+Kees Cook
+Chrome OS Security
