@@ -1,39 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from fenja.rhi.hi.is ([130.208.165.103]:48380 "EHLO fenja.rhi.hi.is"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752758Ab3GBUJY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 2 Jul 2013 16:09:24 -0400
-Date: Tue, 2 Jul 2013 19:49:47 +0000
-From: Bjarni Ingi Gislason <bjarniig@rhi.hi.is>
-Subject: Re: 3.10.0-rc7: rtc_cmos.o: No linking because of missing
- CONFIG_HPET
-Message-ID: <20130702194947.GA4240@rhi.hi.is>
-References: <20130629204217.GA2589@rhi.hi.is>
- <51D14128.3040608@suse.cz>
- <51D14E78.7040309@ladisch.de>
+Received: from mail-pa0-f43.google.com ([209.85.220.43]:42471 "EHLO
+	mail-pa0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754467Ab3GBV3t (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 2 Jul 2013 17:29:49 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <51D14E78.7040309@ladisch.de>
+In-Reply-To: <CAErSpo41dwRCbMgYz8veHP6Mz62Z-uFJZ8NEQY6y1ULsqwiY7g@mail.gmail.com>
+References: <alpine.DEB.2.02.1307021912180.12710@ayla.of.borg>
+	<CAErSpo41dwRCbMgYz8veHP6Mz62Z-uFJZ8NEQY6y1ULsqwiY7g@mail.gmail.com>
+Date: Tue, 2 Jul 2013 23:29:49 +0200
+Message-ID: <CAMuHMdWoTMEyyph8aEu46+xHfkXRFN_qn4a987n7eo6EPRyyhw@mail.gmail.com>
+Subject: Re: Build regressions/improvements in v3.10
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Clemens Ladisch <clemens@ladisch.de>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>, rtc-linux@googlegroups.com, Alessandro Zummo <a.zummo@towertech.it>
+To: Bjorn Helgaas <bhelgaas@google.com>
+Cc: Linux Kernel Development <linux-kernel@vger.kernel.org>, linux-xtensa@linux-xtensa.org, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On Mon, Jul 01, 2013 at 11:40:08AM +0200, Clemens Ladisch wrote:
-> > On 29.6.2013 22:42, Bjarni Ingi Gislason wrote:
-> >>   The file "drivers/rtc/rtc_cmos.c" needs CONFIG_HPET to get linked.
-> >>
-> >> rtc-cmos.c:(.text+0x16f214): undefined reference to `hpet_rtc_interrupt'
-> 
-> CONFIG_HPET enables drivers/char/hpet.c and nothing else; it does not
-> affect the HPET RTC emulation.
-> 
-> You are probably searching for CONFIG_HPET_EMULATE_RTC.
-> 
+On Tue, Jul 2, 2013 at 8:34 PM, Bjorn Helgaas <bhelgaas@google.com> wrote:
+>>   + warning: vmlinux.o(.text+0x1ad7a4): Section mismatch in reference from the function pwmchip_add() to the function .init.text:pcibios_fixup_bus():  => N/A
+>>   + warning: vmlinux.o(.text+0x1b18d8): Section mismatch in reference from the function pci_scan_child_bus() to the function .init.text:pcibios_fixup_bus():  => N/A
+>
+> I understand the second warning, but not the first (reference from
+> pwmchip_add() to pcibios_fixup_bus()).  I don't think pwmchip_add()
+> calls pcibios_fixup_bus().  Is the pwmchip_chip() function name
+> inexact, or is there some other problem here?
 
-  Sorry.  I selected (configured) "HPET_TIMER" to fix the compilation
-and linking (which automatically includes HPET_EMULATE_RTC).
+Indeed, that's weird.
 
--- 
-Bjarni I. Gislason
+This happened with xtensa-allmodconfig.
+I compiled my own xtensa-allmodconfig kernel, and it happens there, too.
+
+If I'm not mistaken, the hex address between parentheses should match
+the "from" function, right?
+After disassembly ("xtensa-linux-objdump -D vmlinux"), the addresses
+didn't seem to match the function names at all.
+So it may be an issue with the toolchain?
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
