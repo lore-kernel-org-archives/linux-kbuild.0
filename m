@@ -1,128 +1,168 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx4-phx2.redhat.com ([209.132.183.25]:57778 "EHLO
-	mx4-phx2.redhat.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751386Ab3GAQdT convert rfc822-to-8bit (ORCPT
+Received: from cobra.newdream.net ([66.33.216.30]:42986 "EHLO
+	cobra.newdream.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755950Ab3GBAPc (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 1 Jul 2013 12:33:19 -0400
-Content-Type: text/plain;
-	charset=us-ascii
-Content-Transfer-Encoding: 8BIT
-Subject: Re: [RFC PATCH] Allow optional module parameters
-References: <b6b1676fd5bcd6b0ef47b0e0a1c26b1c05684135.1363291511.git.luto@amacapital.net> <87ehfhtftn.fsf@rustcorp.com.au> <CALCETrU+rehQzy4vVg589CGi561X_s73Xgsfp43pYZOoKvNDXQ@mail.gmail.com> <87sj3tsawh.fsf@rustcorp.com.au> <CALCETrUK54KViGex=V2pG8kAttsxOiDkeJUL48pk1NAhH-SdAA@mail.gmail.com> <87hak8qfu5.fsf@rustcorp.com.au> <CAMOw1v5AOmy38KNVfxj6OO-U0UCXST50vD0g0W5fEpNfKCpGvg@mail.gmail.com> <87sj3qpwdz.fsf@rustcorp.com.au> <87a9m6sri3.fsf@rustcorp.com.au>
-From: Jonathan Masters <jcm@redhat.com>
+	Mon, 1 Jul 2013 20:15:32 -0400
+Date: Mon, 1 Jul 2013 17:15:31 -0700 (PDT)
+From: Sage Weil <sage@inktank.com>
+Subject: [PATCH] scripts/package/builddeb: build perftools package
+Message-ID: <alpine.DEB.2.00.1307011713030.13163@cobra.newdream.net>
 MIME-Version: 1.0
-In-Reply-To: <87a9m6sri3.fsf@rustcorp.com.au>
-Message-Id: <9F26321B-7088-4D16-80D5-72EB388F8E49@redhat.com>
-Date: Mon, 1 Jul 2013 12:33:11 -0400 (EDT)
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rusty Russell <rusty@rustcorp.com.au>
-Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>, Andy Lutomirski <luto@amacapital.net>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Ben Hutchings <bhutchings@solarflare.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: debian-kernel@lists.debian.org, kernel-team@lists.ubuntu.com
 
-One caveat. Sometimes we have manufactured parameters intentionally to cause a module to fail. We should standardize that piece.
+This will build a linux-tools-$version package for each build that includes
+perf.
 
+Signed-off-by: Gary Lowell <gary.lowell@inktank.com>
+---
+ scripts/package/builddeb |   95 +++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 94 insertions(+), 1 deletion(-)
+
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index acb8650..f57d33c 100644
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -78,17 +78,20 @@ tmpdir="$objtree/debian/tmp"
+ fwdir="$objtree/debian/fwtmp"
+ kernel_headers_dir="$objtree/debian/hdrtmp"
+ libc_headers_dir="$objtree/debian/headertmp"
++tools_dir="$objtree/debian/toolstmp"
++tmp_build_dir="$objtree/debian/toolsbuild"
+ packagename=linux-image-$version
+ fwpackagename=linux-firmware-image
+ kernel_headers_packagename=linux-headers-$version
+ libc_headers_packagename=linux-libc-dev
++tools_packagename=linux-tools-$version
+ 
+ if [ "$ARCH" = "um" ] ; then
+ 	packagename=user-mode-linux-$version
+ fi
+ 
+ # Setup the directory structure
+-rm -rf "$tmpdir" "$fwdir" "$kernel_headers_dir" "$libc_headers_dir"
++rm -rf "$tmpdir" "$fwdir" "$kernel_headers_dir" "$libc_headers_dir" "$tools_dir" "$tmp_build_dir"
+ mkdir -m 755 -p "$tmpdir/DEBIAN"
+ mkdir -p  "$tmpdir/lib" "$tmpdir/boot" "$tmpdir/usr/share/doc/$packagename"
+ mkdir -m 755 -p "$fwdir/DEBIAN"
+@@ -98,6 +101,10 @@ mkdir -p "$libc_headers_dir/usr/share/doc/$libc_headers_packagename"
+ mkdir -m 755 -p "$kernel_headers_dir/DEBIAN"
+ mkdir -p "$kernel_headers_dir/usr/share/doc/$kernel_headers_packagename"
+ mkdir -p "$kernel_headers_dir/lib/modules/$version/"
++mkdir -m 755 -p "$tools_dir/DEBIAN"
++mkdir -p "$tools_dir/usr/share/doc/$tools_packagename"
++mkdir -p "$tools_dir/usr/bin/"
++mkdir -p "$tmp_build_dir"
+ if [ "$ARCH" = "um" ] ; then
+ 	mkdir -p "$tmpdir/usr/lib/uml/modules/$version" "$tmpdir/usr/bin"
+ fi
+@@ -120,6 +127,77 @@ else
+ 	fi
+ fi
+ 
++# Build the tools
++num_tools="0"
++tools_flavour_abi=${version#*-}
++tools_flavour=${tools_flavour_abi#*-}
++tools_version=${version%-$tools_flavour}
++debian_tools_version="${version%%-*}"
++debian_tools_version="${version%.*}"
++if grep -q '^CONFIG_PERF_EVENTS=y' .config ; then
++	# Build and install perf
++	(
++	 unset MAKEFLAGS
++	 unset MFLAGS
++	 unset MAKEOVERRIDES
++
++	 mkdir -p $objtree/tools/perf
++	 cd "$srctree/tools/perf"
++	 $MAKE DESTDIR="$tools_dir/usr/" LDFLAGS= O=$objtree/tools/perf/ install
++	 mv "$tools_dir/usr/bin/perf" "$tools_dir/usr/bin/perf_$debian_tools_version"
++	 ln -s "/usr/bin/perf_$debian_tools_version" "$tools_dir/usr/bin/perf_$tools_version"
++	 mv "$tools_dir/usr/libexec/perf-core" "$tools_dir/usr/share/perf_$debian_tools_version-core"
++	 rmdir "$tools_dir/usr/libexec"
++
++	 # Documentation can't be built out-of-tree so copy source
++	 # over to objtree and build man pages there
++	 mkdir -p $tmp_build_dir/perf
++	 cp -a "$srctree/tools/perf/Documentation" "$tmp_build_dir/perf/"
++	 cp -a "$srctree/tools/perf/config" "$tmp_build_dir/perf/"
++	 cd "$tmp_build_dir/perf/Documentation"
++	 $MAKE man
++	 $MAKE DESTDIR="$tools_dir/usr/" install
++	 for manpage in `find $tools_dir/usr/share/man/ -type f`; do
++		mv $manpage ${manpage/perf/perf_$debian_tools_version}
++		gzip -9 ${manpage/perf/perf_$debian_tools_version}
++	 done
++	)
++	num_tools=$(($num_tools+1))
++fi
++
++if [[ "$ARCH" = "i386" || "$ARCH" = "x86_64" ]]; then
++	# Build turbostat
++	(
++	 cp -a $srctree/tools/power/x86/turbostat "$tmp_build_dir"
++	 ln -s $srctree/arch "$tmp_build_dir/../../../arch"
++	 cd "$tmp_build_dir/turbostat/"
++	 unset MAKEFLAGS
++	 unset MFLAGS
++	 unset MAKEOVERRIDES
++	 $MAKE LDFLAGS=
++	 cp turbostat "$tools_dir/usr/bin/turbostat_$debian_tools_version"
++	 ln -s "/usr/bin/turbostat_$debian_tools_version" "$tools_dir/usr/bin/turbostat_$tools_version"
++	 mkdir -p "$tools_dir/usr/share/man/man8"
++	 cp turbostat.8 "$tools_dir/usr/share/man/man8/turbotstat_${debian_tools_version}.8"
++	 gzip -9 "$tools_dir/usr/share/man/man8/turbotstat_${debian_tools_version}.8"
++	)
++
++	# Build x86_energy_perf_policy
++	(
++	 cp -a $srctree/tools/power/x86/x86_energy_perf_policy "$tmp_build_dir"
++	 cd "$tmp_build_dir/x86_energy_perf_policy"
++	 unset MAKEFLAGS
++	 unset MFLAGS
++	 unset MAKEOVERRIDES
++	 $MAKE LDFLAGS=
++	 cp x86_energy_perf_policy "$tools_dir/usr/bin/x86_energy_perf_policy_$debian_tools_version"
++	 ln -s "/usr/bin/x86_energy_perf_policy_$debian_tools_version" "$tools_dir/usr/bin/x86_energy_perf_policy_$tools_version"
++	 cp x86_energy_perf_policy.8 "$tools_dir/usr/share/man/man8/x86_energy_perf_policy_${debian_tools_version}.8"
++	 gzip -9 "$tools_dir/usr/share/man/man8/x86_energy_perf_policy_${debian_tools_version}.8"
++	)
++	num_tools=$(($num_tools+2))
++fi
++
+ if grep -q '^CONFIG_MODULES=y' .config ; then
+ 	INSTALL_MOD_PATH="$tmpdir" $MAKE KBUILD_SRC= modules_install
+ 	rm -f "$tmpdir/lib/modules/$version/build"
+@@ -292,9 +370,24 @@ Description: Linux support headers for userspace development
+  are used by the installed headers for GNU glibc and other system libraries.
+ EOF
+ 
++cat <<EOF >> debian/control
++
++Package: $tools_packagename
++Section: devel
++Architecture: $arch
++Depends: \${shlibs:Depends}
++Description: Linux kernel tools for version $version
++ This package provides the architecture dependant parts for kernel
++ version locked tools for version $version
++EOF
++
+ if [ "$ARCH" != "um" ]; then
+ 	create_package "$kernel_headers_packagename" "$kernel_headers_dir"
+ 	create_package "$libc_headers_packagename" "$libc_headers_dir"
++	if [ "$num_tools" > "0" ]; then
++		dpkg-shlibdeps $tools_dir/usr/bin/*
++		create_package "$tools_packagename" "$tools_dir"
++	fi
+ fi
+ 
+ create_package "$packagename" "$tmpdir"
 -- 
-Sent from my iPad
+1.7.9.5
 
-On Jul 1, 2013, at 4:53, Rusty Russell <rusty@rustcorp.com.au> wrote:
-
-> Rusty Russell <rusty@rustcorp.com.au> writes:
->> Lucas De Marchi <lucas.demarchi@profusion.mobi> writes:
->>> Hi Rusty,
->>> 
->>> On Mon, Mar 18, 2013 at 11:32 PM, Rusty Russell <rusty@rustcorp.com.au> wrote:
->>>> Andy Lutomirski <luto@amacapital.net> writes:
->>>>> On Sun, Mar 17, 2013 at 7:24 PM, Rusty Russell <rusty@rustcorp.com.au> wrote:
->>>>>> Andy Lutomirski <luto@amacapital.net> writes:
->>>>>>> On Thu, Mar 14, 2013 at 10:03 PM, Rusty Russell <rusty@rustcorp.com.au> wrote:
->>>>>>>> Err, yes.  Don't remove module parameters, they're part of the API.  Do
->>>>>>>> you have a particular example?
->>>>>>> 
->>>>>>> So things like i915.i915_enable_ppgtt, which is there to enable
->>>>>>> something experimental, needs to stay forever once the relevant
->>>>>>> feature becomes non-experimental and non-optional?  This seems silly.
->>>> ...
->>>>>>> Having the module parameter go away while still allowing the module to
->>>>>>> load seems like a good solution (possibly with a warning in the logs
->>>>>>> so the user can eventually delete the parameter).
->>>>>> 
->>>>>> Why not do that for *every* missing parameter then?  Why have this weird
->>>>>> notation where the user must know that the parameter might one day go
->>>>>> away?
->>>>> 
->>>>> Fair enough.  What about the other approach, then?  Always warn if an
->>>>> option doesn't match (built-in or otherwise) but load the module
->>>>> anyways.
->>>> 
->>>> What does everyone think of this?  Jon, Lucas, does this match your
->>>> experience?
->>>> 
->>>> Thanks,
->>>> Rusty.
->>>> 
->>>> Subject: modules: don't fail to load on unknown parameters.
->>>> 
->>>> Although parameters are supposed to be part of the kernel API, experimental
->>>> parameters are often removed.  In addition, downgrading a kernel might cause
->>>> previously-working modules to fail to load.
->>> 
->>> I agree with this reasoning
->>> 
->>>> 
->>>> On balance, it's probably better to warn, and load the module anyway.
->>> 
->>> However loading the module anyway would bring at least one drawback:
->>> if the user made a typo when passing the option the module would load
->>> anyway and he will probably not even look in the log, since there's
->>> was no errors from modprobe.
-> 
-> OK, so I've had this patch on the backburner, but noone has come up with
-> anything better so I'll queue it into modules-next now.
-> 
-> Thanks,
-> Rusty.
-> 
-> modules: don't fail to load on unknown parameters.
-> 
-> Although parameters are supposed to be part of the kernel API, experimental
-> parameters are often removed.  In addition, downgrading a kernel might cause
-> previously-working modules to fail to load.
-> 
-> On balance, it's probably better to warn, and load the module anyway.
-> This may let through a typo, but at least the logs will show it.
-> 
-> Reported-by: Andy Lutomirski <luto@amacapital.net>
-> Signed-off-by: Rusty Russell <rusty@rustcorp.com.au>
-> 
-> diff --git a/kernel/module.c b/kernel/module.c
-> index 3c2c72d..46db10a 100644
-> --- a/kernel/module.c
-> +++ b/kernel/module.c
-> @@ -3206,6 +3206,17 @@ out:
->    return err;
-> }
-> 
-> +static int unknown_module_param_cb(char *param, char *val, const char *modname)
-> +{
-> +    /* Check for magic 'dyndbg' arg */ 
-> +    int ret = ddebug_dyndbg_module_param_cb(param, val, modname);
-> +    if (ret != 0) {
-> +        printk(KERN_WARNING "%s: unknown parameter '%s' ignored\n",
-> +               modname, param);
-> +    }
-> +    return 0;
-> +}
-> +
-> /* Allocate and load the module: note that size of section 0 is always
->    zero, and we rely on this for optional sections. */
-> static int load_module(struct load_info *info, const char __user *uargs,
-> @@ -3292,7 +3303,7 @@ static int load_module(struct load_info *info, const char __user *uargs,
-> 
->    /* Module is ready to execute: parsing args may do that. */
->    err = parse_args(mod->name, mod->args, mod->kp, mod->num_kp,
-> -             -32768, 32767, &ddebug_dyndbg_module_param_cb);
-> +             -32768, 32767, unknown_module_param_cb);
->    if (err < 0)
->        goto bug_cleanup;
-> 
-> 
