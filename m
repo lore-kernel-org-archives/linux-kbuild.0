@@ -1,168 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cobra.newdream.net ([66.33.216.30]:42986 "EHLO
-	cobra.newdream.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755950Ab3GBAPc (ORCPT
+Received: from mail-ee0-f42.google.com ([74.125.83.42]:42542 "EHLO
+	mail-ee0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753063Ab3GBPWg (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 1 Jul 2013 20:15:32 -0400
-Date: Mon, 1 Jul 2013 17:15:31 -0700 (PDT)
-From: Sage Weil <sage@inktank.com>
-Subject: [PATCH] scripts/package/builddeb: build perftools package
-Message-ID: <alpine.DEB.2.00.1307011713030.13163@cobra.newdream.net>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+	Tue, 2 Jul 2013 11:22:36 -0400
+Received: by mail-ee0-f42.google.com with SMTP id c4so2777064eek.15
+        for <linux-kbuild@vger.kernel.org>; Tue, 02 Jul 2013 08:22:35 -0700 (PDT)
+From: davidgraeff <david.graeff@web.de>
+Subject: Kconfig Gtk/Qt interface flavours ported to newest toolkit versions
+Date: Tue,  2 Jul 2013 17:22:21 +0200
+Message-Id: <1372778550-22110-1-git-send-email-david.graeff@web.de>
+In-Reply-To: <kconfig-port-gtk-qt>
+References: <kconfig-port-gtk-qt>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: debian-kernel@lists.debian.org, kernel-team@lists.ubuntu.com
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org
 
-This will build a linux-tools-$version package for each build that includes
-perf.
+Hello all,
 
-Signed-off-by: Gary Lowell <gary.lowell@inktank.com>
----
- scripts/package/builddeb |   95 +++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 94 insertions(+), 1 deletion(-)
+I've no idea if this is the right way to send patches. I'm kind of new to this.
+Attached is a patchset basically for porting the graphical Gtk and Qt flavours
+to their latest toolkit versions (Gtk3 and Qt4 with compatibility to Qt5 respectively).
+It took a day or so to get into the code -> Newly inserted and changed source code
+is commented in many/some places now.
 
-diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index acb8650..f57d33c 100644
---- a/scripts/package/builddeb
-+++ b/scripts/package/builddeb
-@@ -78,17 +78,20 @@ tmpdir="$objtree/debian/tmp"
- fwdir="$objtree/debian/fwtmp"
- kernel_headers_dir="$objtree/debian/hdrtmp"
- libc_headers_dir="$objtree/debian/headertmp"
-+tools_dir="$objtree/debian/toolstmp"
-+tmp_build_dir="$objtree/debian/toolsbuild"
- packagename=linux-image-$version
- fwpackagename=linux-firmware-image
- kernel_headers_packagename=linux-headers-$version
- libc_headers_packagename=linux-libc-dev
-+tools_packagename=linux-tools-$version
- 
- if [ "$ARCH" = "um" ] ; then
- 	packagename=user-mode-linux-$version
- fi
- 
- # Setup the directory structure
--rm -rf "$tmpdir" "$fwdir" "$kernel_headers_dir" "$libc_headers_dir"
-+rm -rf "$tmpdir" "$fwdir" "$kernel_headers_dir" "$libc_headers_dir" "$tools_dir" "$tmp_build_dir"
- mkdir -m 755 -p "$tmpdir/DEBIAN"
- mkdir -p  "$tmpdir/lib" "$tmpdir/boot" "$tmpdir/usr/share/doc/$packagename"
- mkdir -m 755 -p "$fwdir/DEBIAN"
-@@ -98,6 +101,10 @@ mkdir -p "$libc_headers_dir/usr/share/doc/$libc_headers_packagename"
- mkdir -m 755 -p "$kernel_headers_dir/DEBIAN"
- mkdir -p "$kernel_headers_dir/usr/share/doc/$kernel_headers_packagename"
- mkdir -p "$kernel_headers_dir/lib/modules/$version/"
-+mkdir -m 755 -p "$tools_dir/DEBIAN"
-+mkdir -p "$tools_dir/usr/share/doc/$tools_packagename"
-+mkdir -p "$tools_dir/usr/bin/"
-+mkdir -p "$tmp_build_dir"
- if [ "$ARCH" = "um" ] ; then
- 	mkdir -p "$tmpdir/usr/lib/uml/modules/$version" "$tmpdir/usr/bin"
- fi
-@@ -120,6 +127,77 @@ else
- 	fi
- fi
- 
-+# Build the tools
-+num_tools="0"
-+tools_flavour_abi=${version#*-}
-+tools_flavour=${tools_flavour_abi#*-}
-+tools_version=${version%-$tools_flavour}
-+debian_tools_version="${version%%-*}"
-+debian_tools_version="${version%.*}"
-+if grep -q '^CONFIG_PERF_EVENTS=y' .config ; then
-+	# Build and install perf
-+	(
-+	 unset MAKEFLAGS
-+	 unset MFLAGS
-+	 unset MAKEOVERRIDES
-+
-+	 mkdir -p $objtree/tools/perf
-+	 cd "$srctree/tools/perf"
-+	 $MAKE DESTDIR="$tools_dir/usr/" LDFLAGS= O=$objtree/tools/perf/ install
-+	 mv "$tools_dir/usr/bin/perf" "$tools_dir/usr/bin/perf_$debian_tools_version"
-+	 ln -s "/usr/bin/perf_$debian_tools_version" "$tools_dir/usr/bin/perf_$tools_version"
-+	 mv "$tools_dir/usr/libexec/perf-core" "$tools_dir/usr/share/perf_$debian_tools_version-core"
-+	 rmdir "$tools_dir/usr/libexec"
-+
-+	 # Documentation can't be built out-of-tree so copy source
-+	 # over to objtree and build man pages there
-+	 mkdir -p $tmp_build_dir/perf
-+	 cp -a "$srctree/tools/perf/Documentation" "$tmp_build_dir/perf/"
-+	 cp -a "$srctree/tools/perf/config" "$tmp_build_dir/perf/"
-+	 cd "$tmp_build_dir/perf/Documentation"
-+	 $MAKE man
-+	 $MAKE DESTDIR="$tools_dir/usr/" install
-+	 for manpage in `find $tools_dir/usr/share/man/ -type f`; do
-+		mv $manpage ${manpage/perf/perf_$debian_tools_version}
-+		gzip -9 ${manpage/perf/perf_$debian_tools_version}
-+	 done
-+	)
-+	num_tools=$(($num_tools+1))
-+fi
-+
-+if [[ "$ARCH" = "i386" || "$ARCH" = "x86_64" ]]; then
-+	# Build turbostat
-+	(
-+	 cp -a $srctree/tools/power/x86/turbostat "$tmp_build_dir"
-+	 ln -s $srctree/arch "$tmp_build_dir/../../../arch"
-+	 cd "$tmp_build_dir/turbostat/"
-+	 unset MAKEFLAGS
-+	 unset MFLAGS
-+	 unset MAKEOVERRIDES
-+	 $MAKE LDFLAGS=
-+	 cp turbostat "$tools_dir/usr/bin/turbostat_$debian_tools_version"
-+	 ln -s "/usr/bin/turbostat_$debian_tools_version" "$tools_dir/usr/bin/turbostat_$tools_version"
-+	 mkdir -p "$tools_dir/usr/share/man/man8"
-+	 cp turbostat.8 "$tools_dir/usr/share/man/man8/turbotstat_${debian_tools_version}.8"
-+	 gzip -9 "$tools_dir/usr/share/man/man8/turbotstat_${debian_tools_version}.8"
-+	)
-+
-+	# Build x86_energy_perf_policy
-+	(
-+	 cp -a $srctree/tools/power/x86/x86_energy_perf_policy "$tmp_build_dir"
-+	 cd "$tmp_build_dir/x86_energy_perf_policy"
-+	 unset MAKEFLAGS
-+	 unset MFLAGS
-+	 unset MAKEOVERRIDES
-+	 $MAKE LDFLAGS=
-+	 cp x86_energy_perf_policy "$tools_dir/usr/bin/x86_energy_perf_policy_$debian_tools_version"
-+	 ln -s "/usr/bin/x86_energy_perf_policy_$debian_tools_version" "$tools_dir/usr/bin/x86_energy_perf_policy_$tools_version"
-+	 cp x86_energy_perf_policy.8 "$tools_dir/usr/share/man/man8/x86_energy_perf_policy_${debian_tools_version}.8"
-+	 gzip -9 "$tools_dir/usr/share/man/man8/x86_energy_perf_policy_${debian_tools_version}.8"
-+	)
-+	num_tools=$(($num_tools+2))
-+fi
-+
- if grep -q '^CONFIG_MODULES=y' .config ; then
- 	INSTALL_MOD_PATH="$tmpdir" $MAKE KBUILD_SRC= modules_install
- 	rm -f "$tmpdir/lib/modules/$version/build"
-@@ -292,9 +370,24 @@ Description: Linux support headers for userspace development
-  are used by the installed headers for GNU glibc and other system libraries.
- EOF
- 
-+cat <<EOF >> debian/control
-+
-+Package: $tools_packagename
-+Section: devel
-+Architecture: $arch
-+Depends: \${shlibs:Depends}
-+Description: Linux kernel tools for version $version
-+ This package provides the architecture dependant parts for kernel
-+ version locked tools for version $version
-+EOF
-+
- if [ "$ARCH" != "um" ]; then
- 	create_package "$kernel_headers_packagename" "$kernel_headers_dir"
- 	create_package "$libc_headers_packagename" "$libc_headers_dir"
-+	if [ "$num_tools" > "0" ]; then
-+		dpkg-shlibdeps $tools_dir/usr/bin/*
-+		create_package "$tools_packagename" "$tools_dir"
-+	fi
- fi
- 
- create_package "$packagename" "$tmpdir"
--- 
-1.7.9.5
+I do not know if it was on purpose to keep all flavours except lxdialog in one single directory,
+but for presumably easier maintenance the first patch split of each flavours into its
+own subdirectory. Additionally I ripped out flavour specific makefile targets. Each subdirectory
+contains a separate makefile now.
+An advantage is a more simple makefile for e.g. all the C++/Qt stuff, where Qt specific moc and uic
+tools are necessary.
+
+The 2nd to 6th patch port the Gtk2 ui to the modern Gtk3 toolkit including the conversion
+from a libglade (deprecated) interface to a gtkbuilder interface.
+
+The 7th to 9th patch port the Qt3/Qt4+Qt3support ui to the current version 4 of the Qt toolkit.
+The gui is no longer realised by handwritten c++ code but by the Qt Designer for a much easier
+user interface design and less code.
+The Model/View concept of Qt is heavily used and no Qt3 support classes are used anymore,
+as a result the code should work with the newest Qt5, too.
+
+Those newer graphical kconfig flavours will be used by a project I'm involved in so
+I will maintain it for the next couple of months.
+
+If I did anything wrong, please instruct me or provide me a link please.
+
+- David -
 
