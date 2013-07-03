@@ -1,128 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:58309 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755322Ab3GCMHv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 3 Jul 2013 08:07:51 -0400
-Message-ID: <51D41413.9060500@suse.cz>
-Date: Wed, 03 Jul 2013 14:07:47 +0200
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
+Received: from mail-pd0-f182.google.com ([209.85.192.182]:43590 "EHLO
+	mail-pd0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752990Ab3GCMMU convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 3 Jul 2013 08:12:20 -0400
+Content-Type: text/plain; charset=windows-1252
+Mime-Version: 1.0 (Mac OS X Mail 6.3 \(1503\))
 Subject: Re: [PATCH 1/2] Fix a build warning in scripts/sortextable.h
-References: <1370745235-12951-1-git-send-email-dt.tangr@gmail.com> <51D413D9.8040604@suse.cz>
-In-Reply-To: <51D413D9.8040604@suse.cz>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+From: Daniel Tang <dt.tangr@gmail.com>
+In-Reply-To: <51D41413.9060500@suse.cz>
+Date: Wed, 3 Jul 2013 22:12:11 +1000
+Content-Transfer-Encoding: 8BIT
+Message-Id: <015BB7AD-78C4-4F1A-B65A-B37FBB6E2B9C@gmail.com>
+References: <1370745235-12951-1-git-send-email-dt.tangr@gmail.com> <51D413D9.8040604@suse.cz> <51D41413.9060500@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Daniel Tang <dt.tangr@gmail.com>
+To: Michal Marek <mmarek@suse.cz>
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, trivial@kernel.org, David Daney <david.daney@cavium.com>
 
-On 3.7.2013 14:06, Michal Marek wrote:
-> Added David Daney to CC.
+Hi,
 
-Second attempt, sorry.
+On 03/07/2013, at 10:07 PM, Michal Marek <mmarek@suse.cz> wrote:
 
+> On 3.7.2013 14:06, Michal Marek wrote:
+>> Added David Daney to CC.
+> 
+> Second attempt, sorry.
+> 
+> 
+>> On 9.6.2013 04:33, Daniel Tang wrote:
+>>> The pointer passed to the _r() macro does not always match the type
+>>> of the function that it is aliasing and raises several of the following
+>>> warnings at compile time:
+>>> 
+>>> warning: passing argument 1 of ‘r8’ from incompatible pointer type
+>> 
+>> In what environment (arch, compiler, glibc) are you seeing this?
+>> 
 
-> On 9.6.2013 04:33, Daniel Tang wrote:
->> The pointer passed to the _r() macro does not always match the type
->> of the function that it is aliasing and raises several of the following
->> warnings at compile time:
->>
->> warning: passing argument 1 of â€˜r8â€™ from incompatible pointer type
-> 
-> In what environment (arch, compiler, glibc) are you seeing this?
-> 
-> Michal
-> 
->> Fixed by casting the pointers to (void *) so they work with both the
->> 32bit and 64bit code.
->>
->> Signed-off-by: Daniel Tang <dt.tangr@gmail.com>
->> ---
->>  scripts/sortextable.h | 29 +++++++++++++++--------------
->>  1 file changed, 15 insertions(+), 14 deletions(-)
->>
->> diff --git a/scripts/sortextable.h b/scripts/sortextable.h
->> index f5eb43d..0a38fbd 100644
->> --- a/scripts/sortextable.h
->> +++ b/scripts/sortextable.h
->> @@ -110,9 +110,9 @@ do_func(Elf_Ehdr *ehdr, char const *const fname, table_sort_t custom_sort)
->>  	int i;
->>  	int idx;
->>  
->> -	shdr = (Elf_Shdr *)((char *)ehdr + _r(&ehdr->e_shoff));
->> +	shdr = (Elf_Shdr *)((char *)ehdr + _r((void *)&ehdr->e_shoff));
->>  	shstrtab_sec = shdr + r2(&ehdr->e_shstrndx);
->> -	secstrtab = (const char *)ehdr + _r(&shstrtab_sec->sh_offset);
->> +	secstrtab = (const char *)ehdr + _r((void *)&shstrtab_sec->sh_offset);
->>  	for (i = 0; i < r2(&ehdr->e_shnum); i++) {
->>  		idx = r(&shdr[i].sh_name);
->>  		if (strcmp(secstrtab + idx, "__ex_table") == 0) {
->> @@ -122,8 +122,8 @@ do_func(Elf_Ehdr *ehdr, char const *const fname, table_sort_t custom_sort)
->>  		if ((r(&shdr[i].sh_type) == SHT_REL ||
->>  		     r(&shdr[i].sh_type) == SHT_RELA) &&
->>  		    r(&shdr[i].sh_info) == extab_index) {
->> -			relocs = (void *)ehdr + _r(&shdr[i].sh_offset);
->> -			relocs_size = _r(&shdr[i].sh_size);
->> +			relocs = (void *)ehdr + _r((void *)&shdr[i].sh_offset);
->> +			relocs_size = _r((void *)&shdr[i].sh_size);
->>  		}
->>  		if (strcmp(secstrtab + idx, ".symtab") == 0)
->>  			symtab_sec = shdr + i;
->> @@ -142,14 +142,14 @@ do_func(Elf_Ehdr *ehdr, char const *const fname, table_sort_t custom_sort)
->>  		fprintf(stderr,	"no __ex_table in  file: %s\n", fname);
->>  		fail_file();
->>  	}
->> -	strtab = (const char *)ehdr + _r(&strtab_sec->sh_offset);
->> +	strtab = (const char *)ehdr + _r((void *)&strtab_sec->sh_offset);
->>  
->> -	extab_image = (void *)ehdr + _r(&extab_sec->sh_offset);
->> +	extab_image = (void *)ehdr + _r((void *)&extab_sec->sh_offset);
->>  
->>  	if (custom_sort) {
->> -		custom_sort(extab_image, _r(&extab_sec->sh_size));
->> +		custom_sort(extab_image, _r((void *)&extab_sec->sh_size));
->>  	} else {
->> -		int num_entries = _r(&extab_sec->sh_size) / extable_ent_size;
->> +		int num_entries = _r((void *)&extab_sec->sh_size) / extable_ent_size;
->>  		qsort(extab_image, num_entries,
->>  		      extable_ent_size, compare_extable);
->>  	}
->> @@ -159,12 +159,13 @@ do_func(Elf_Ehdr *ehdr, char const *const fname, table_sort_t custom_sort)
->>  
->>  	/* find main_extable_sort_needed */
->>  	sort_needed_sym = NULL;
->> -	for (i = 0; i < _r(&symtab_sec->sh_size) / sizeof(Elf_Sym); i++) {
->> -		sym = (void *)ehdr + _r(&symtab_sec->sh_offset);
->> +	for (i = 0; i < _r((void *)&symtab_sec->sh_size) / sizeof(Elf_Sym); i++)
->> +	{
->> +		sym = (void *)ehdr + _r((void *)&symtab_sec->sh_offset);
->>  		sym += i;
->>  		if (ELF_ST_TYPE(sym->st_info) != STT_OBJECT)
->>  			continue;
->> -		idx = r(&sym->st_name);
->> +		idx = r((void *)&sym->st_name);
->>  		if (strcmp(strtab + idx, "main_extable_sort_needed") == 0) {
->>  			sort_needed_sym = sym;
->>  			break;
->> @@ -178,9 +179,9 @@ do_func(Elf_Ehdr *ehdr, char const *const fname, table_sort_t custom_sort)
->>  	}
->>  	sort_needed_sec = &shdr[r2(&sort_needed_sym->st_shndx)];
->>  	sort_done_location = (void *)ehdr +
->> -		_r(&sort_needed_sec->sh_offset) +
->> -		_r(&sort_needed_sym->st_value) -
->> -		_r(&sort_needed_sec->sh_addr);
->> +		_r((void *)&sort_needed_sec->sh_offset) +
->> +		_r((void *)&sort_needed_sym->st_value) -
->> +		_r((void *)&sort_needed_sec->sh_addr);
->>  
->>  #if 0
->>  	printf("sort done marker at %lx\n",
->>
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
+I'm cross compiling the ARM arch with gcc version 4.7.2 on 64 bit OS X. It should throw that warning on any 64 bit environment (not just OS X) but I haven't tested it.
 
+If you want, I can look a little deeper into this.
+
+Cheers,
+tangrs
