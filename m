@@ -1,81 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:49993 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:50413 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S933131Ab3GCUt7 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 3 Jul 2013 16:49:59 -0400
-Message-ID: <51D48E72.5010403@suse.cz>
-Date: Wed, 03 Jul 2013 22:49:54 +0200
+	id S933054Ab3GCVDr (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 3 Jul 2013 17:03:47 -0400
+Message-ID: <51D491AD.7050008@suse.cz>
+Date: Wed, 03 Jul 2013 23:03:41 +0200
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH] let kbuild mkdir for dir/file.o
-References: <51CE11C2.5020406@suse.cz> <1372583368-32618-1-git-send-email-zzs0213@gmail.com>
-In-Reply-To: <1372583368-32618-1-git-send-email-zzs0213@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Subject: Re: [RFC PATCH] Allow optional module parameters
+References: <b6b1676fd5bcd6b0ef47b0e0a1c26b1c05684135.1363291511.git.luto@amacapital.net> <87ehfhtftn.fsf@rustcorp.com.au> <CALCETrU+rehQzy4vVg589CGi561X_s73Xgsfp43pYZOoKvNDXQ@mail.gmail.com> <87sj3tsawh.fsf@rustcorp.com.au> <CALCETrUK54KViGex=V2pG8kAttsxOiDkeJUL48pk1NAhH-SdAA@mail.gmail.com> <87hak8qfu5.fsf@rustcorp.com.au> <CAMOw1v5AOmy38KNVfxj6OO-U0UCXST50vD0g0W5fEpNfKCpGvg@mail.gmail.com> <87sj3qpwdz.fsf@rustcorp.com.au> <87a9m6sri3.fsf@rustcorp.com.au> <9F26321B-7088-4D16-80D5-72EB388F8E49@redhat.com>
+In-Reply-To: <9F26321B-7088-4D16-80D5-72EB388F8E49@redhat.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: =?UTF-8?B?5byg5b+g5bGx?= <zzs0213@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Jonathan Masters <jcm@redhat.com>
+Cc: Rusty Russell <rusty@rustcorp.com.au>, Lucas De Marchi <lucas.demarchi@profusion.mobi>, Andy Lutomirski <luto@amacapital.net>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Ben Hutchings <bhutchings@solarflare.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
 
-Dne 30.6.2013 11:09, 张忠山 napsal(a):
-> When add a obj with dir to obj-y, like this
-> 
->     obj-y += dir/file.o
-> 
-> The $(obj)/dir not created, this patch fix this.
-> 
-> When try to add a file(which in a subdir) to my board's obj-y, the build
-> progress crashed.
-> 
-> For example, I use at91rm9200ek board, and in kernel dir run:
-> 
->   mkdir objtree
->   make O=objtree at91rm9200_defconfig
->   mkdir arch/arm/mach-at91/dir
->   touch arch/arm/mach-at91/dir/file.c
-> 
-> and edit arch/arm/mach-at91/dir/file.c to add some code.
-> then edit arch/arm/mach-at91/Makefile, change the following line:
-> 
->   obj-$(CONFIG_MACH_AT91RM9200EK) += board-rm9200ek.o
-> 
-> to:
-> 
->   obj-$(CONFIG_MACH_AT91RM9200EK) += board-rm9200ek.o dir/file.o
-> 
-> Now build it:
-> 
->   make O=objtree
-> 
-> Then the error appears:
->   ...
->   CC      arch/arm/mach-at91/board-rm9200dk.o
->   CC      arch/arm/mach-at91/board-rm9200ek.o
->   CC      arch/arm/mach-at91/dir/file.o
->   linux-2.6/arch/arm/mach-at91/dir/file.c:5:
->     fatal error: opening dependency file
->     arch/arm/mach-at91/dir/.file.o.d: No such file or directory
-> 
-> Check the objtree:
->   LANG=en ls objtree/arch/arm/mach-at91/dir
->   ls: cannot access objtree/arch/arm/mach-at91/dir: No such file or directory
-> 
-> It's apparently that the target dir not created for file.o
-> 
-> Check kbuild source code. It seems that kbuild create dirs for that in
-> $(obj-dirs).  But if the dir need not to create a built-in.o, It should
-> never in  $(obj-dirs).
-> 
-> So I make this patch to make sure It in  $(obj-dirs)
-> 
-> this bug caused by commit
->    f5fb976520a53f45f8bbf2e851f16b3b5558d485
-> ---
+Dne 1.7.2013 18:33, Jonathan Masters napsal(a):
+> One caveat. Sometimes we have manufactured parameters intentionally
+> to cause a module to fail. We should standardize that piece.
 
-You forgot to sign off this patch, can I add
+You have:
 
-  Signed-off-by: 张忠山 <zzs0213@gmail.com>
+  blacklist foo
 
-like you did in the previous versions? Otherwise, the patch looks OK.
+to prevent udev from loading a module and
 
+  install foo /bin/true
+
+to prevent modprobe from loading the module at all. What is the
+motivation for inventing a third way, through adding invalid parameters?
+
+Thanks,
 Michal
