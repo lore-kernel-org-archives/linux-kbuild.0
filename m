@@ -1,45 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:33385 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753343Ab3GCNQB (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 3 Jul 2013 09:16:01 -0400
-Message-ID: <51D4240D.3050708@suse.cz>
-Date: Wed, 03 Jul 2013 15:15:57 +0200
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: [PATCH 1/2] Fix a build warning in scripts/sortextable.h
-References: <1370745235-12951-1-git-send-email-dt.tangr@gmail.com> <51D413D9.8040604@suse.cz> <51D41413.9060500@suse.cz> <015BB7AD-78C4-4F1A-B65A-B37FBB6E2B9C@gmail.com> <51D418DB.5060102@suse.cz> <E04C38F7-0FF7-4B8A-8A3B-9EC135BFEB4F@gmail.com> <51D41FA7.80209@suse.cz>
-In-Reply-To: <51D41FA7.80209@suse.cz>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Received: from mail-wg0-f52.google.com ([74.125.82.52]:64577 "EHLO
+	mail-wg0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932374Ab3GCOCN (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 3 Jul 2013 10:02:13 -0400
+Received: by mail-wg0-f52.google.com with SMTP id b12so157257wgh.19
+        for <linux-kbuild@vger.kernel.org>; Wed, 03 Jul 2013 07:02:12 -0700 (PDT)
+From: Anisse Astier <anisse@astier.eu>
+Subject: [PATCH v6 0/4] deb-pkg: bring it a little closer to debian packaging
+Date: Wed,  3 Jul 2013 16:02:02 +0200
+Message-Id: <1372860126-8909-1-git-send-email-anisse@astier.eu>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Daniel Tang <dt.tangr@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, trivial@kernel.org, David Daney <david.daney@cavium.com>
+To: linux-kbuild@vger.kernel.org
+Cc: debian-kernel@lists.debian.org, kernel-team@lists.ubuntu.com, Ben Hutchings <ben@decadent.org.uk>, Michal Marek <mmarek@suse.cz>, maximilian attems <max@stro.at>, Anisse Astier <anisse@astier.eu>
 
-On 3.7.2013 14:57, Michal Marek wrote:
-> On 3.7.2013 14:37, Daniel Tang wrote:
->> Hi,
->>
->> On 03/07/2013, at 10:28 PM, Michal Marek <mmarek@suse.cz> wrote:
->>>
->>>
->>> What is the type of Elf64_Shdr::sh_offset in OS X's <elf.h>? In
->>> glibc, this is Elf64_Off, which is a typedef name for uint64_t.
->>
->> Huh, that's weird. Elf64_Off is defined as unsigned long in my elf.h
->> which isn't 64 bit on x86_64 pretty sure.
-> 
-> unsigned long _is_ 64bit on x86_64 Linux (or any 64bit Linux), but it
-> might not be the case on OS X. But then, the <elf.h> on that platform
-> should use something that is actually 64bit for Elf64_Off.
+These little fixes should bring debian packaging closer to the way it's done in debian.
 
-Hm, according to
-https://developer.apple.com/library/mac/documentation/Darwin/Conceptual/64bitPorting/transition/transition.html,
-64bit OS X uses that same model as Linux, i.e. sizeof(long) ==
-sizeof(void*). So the warning is probably caused by the fact that the
-typedefs Elf64_Off and uint64_t are not identical (even though the types
-have the same size). How are these defined on OS X?
+Changes in:
+v2:
+ - only build debug packages when CONFIG_DEBUG_INFO=y
+ - build debug package last.
+ - more verbose debug package description
+ - put package in section debug
+v3:
+ - remove duplicate code from v2
+v4:
+ - fixes thanks to Ben Hutchings' review
+ - use KCONFIG_CONFIG instead of .config
+ - use installed path specific to each architecture instead of hard-coded
+   /boot/vmlinuz-$version, based on
+   http://anonscm.debian.org/viewvc/kernel/dists/wheezy/linux/debian/rules.real?view=markup
+v5:
+ - fixes thanks to Ben Hutchings' review
+ - don't use $objtree as it's redundant in build scripts
+ - add symbolic links to vmlinux to work with other tools than perf
+ - pick-up reviewed-by from ml for patch 3 and 4
+v6:
+ - first patch: handle .config path properly inside package archive
+ - pick-up reviewed-by and acked-by's
 
-Thanks,
-Michal
+
+Anisse Astier (4):
+  deb-pkg: use KCONFIG_CONFIG instead of .config file directly
+  deb-pkg: split debug symbols in their own package
+  deb-pkg: fix installed image path on parisc, mips and powerpc
+  deb-pkg: add a hook argument to match debian hooks parameters
+
+ scripts/package/builddeb | 92 ++++++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 77 insertions(+), 15 deletions(-)
+
+-- 
+1.8.3.rc1
+
