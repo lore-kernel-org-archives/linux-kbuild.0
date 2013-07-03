@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f41.google.com ([74.125.82.41]:43740 "EHLO
-	mail-wg0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756397Ab3GCOCR (ORCPT
+Received: from mail-wg0-f51.google.com ([74.125.82.51]:61458 "EHLO
+	mail-wg0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932369Ab3GCOCS (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 3 Jul 2013 10:02:17 -0400
-Received: by mail-wg0-f41.google.com with SMTP id y10so5536778wgg.0
-        for <linux-kbuild@vger.kernel.org>; Wed, 03 Jul 2013 07:02:16 -0700 (PDT)
+	Wed, 3 Jul 2013 10:02:18 -0400
+Received: by mail-wg0-f51.google.com with SMTP id e11so157543wgh.30
+        for <linux-kbuild@vger.kernel.org>; Wed, 03 Jul 2013 07:02:17 -0700 (PDT)
 From: Anisse Astier <anisse@astier.eu>
-Subject: [PATCH v6 2/4] deb-pkg: split debug symbols in their own package
-Date: Wed,  3 Jul 2013 16:02:04 +0200
-Message-Id: <1372860126-8909-3-git-send-email-anisse@astier.eu>
+Subject: [PATCH v6 3/4] deb-pkg: fix installed image path on parisc, mips and powerpc
+Date: Wed,  3 Jul 2013 16:02:05 +0200
+Message-Id: <1372860126-8909-4-git-send-email-anisse@astier.eu>
 In-Reply-To: <1372860126-8909-1-git-send-email-anisse@astier.eu>
 References: <1372860126-8909-1-git-send-email-anisse@astier.eu>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -17,111 +17,60 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: debian-kernel@lists.debian.org, kernel-team@lists.ubuntu.com, Ben Hutchings <ben@decadent.org.uk>, Michal Marek <mmarek@suse.cz>, maximilian attems <max@stro.at>, Anisse Astier <anisse@astier.eu>
 
-This can reduce almost 3 times the size of the linux-image package,
-while keeping the debug symbols available for this particular build, in
-their own package.
-
-This mimics the way kernels are built in debian, ubuntu, or with
-make-kpkg, and comes at the price of a small slowdown in the building of
-packages.
-
 Signed-off-by: Anisse Astier <anisse@astier.eu>
-Cc: Ben Hutchings <ben@decadent.org.uk>
-Acked-by: maximilian attems <max@stro.at>
+Reviewed-by: Ben Hutchings <ben@decadent.org.uk>
 ---
- scripts/package/builddeb | 50 +++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 49 insertions(+), 1 deletion(-)
+ scripts/package/builddeb | 27 ++++++++++++++++++++-------
+ 1 file changed, 20 insertions(+), 7 deletions(-)
 
 diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index a8662ef..541a1cf 100644
+index 541a1cf..aebc66e 100644
 --- a/scripts/package/builddeb
 +++ b/scripts/package/builddeb
-@@ -78,17 +78,21 @@ tmpdir="$objtree/debian/tmp"
- fwdir="$objtree/debian/fwtmp"
- kernel_headers_dir="$objtree/debian/hdrtmp"
- libc_headers_dir="$objtree/debian/headertmp"
-+dbg_dir="$objtree/debian/dbgtmp"
- packagename=linux-image-$version
- fwpackagename=linux-firmware-image
- kernel_headers_packagename=linux-headers-$version
- libc_headers_packagename=linux-libc-dev
-+dbg_packagename=$packagename-dbg
- 
- if [ "$ARCH" = "um" ] ; then
+@@ -89,6 +89,20 @@ if [ "$ARCH" = "um" ] ; then
  	packagename=user-mode-linux-$version
  fi
  
-+BUILD_DEBUG="$(grep -s '^CONFIG_DEBUG_INFO=y' $KCONFIG_CONFIG || true)"
++# Not all arches have the same installed path in debian
++# XXX: have each arch Makefile export a variable of the canonical image install
++# path instead
++case $ARCH in
++um)
++	installed_image_path="usr/bin/linux-$version"
++	;;
++parisc|mips|powerpc)
++	installed_image_path="boot/vmlinux-$version"
++	;;
++*)
++	installed_image_path="boot/vmlinuz-$version"
++esac
 +
+ BUILD_DEBUG="$(grep -s '^CONFIG_DEBUG_INFO=y' $KCONFIG_CONFIG || true)"
+ 
  # Setup the directory structure
--rm -rf "$tmpdir" "$fwdir" "$kernel_headers_dir" "$libc_headers_dir"
-+rm -rf "$tmpdir" "$fwdir" "$kernel_headers_dir" "$libc_headers_dir" "$dbg_dir"
- mkdir -m 755 -p "$tmpdir/DEBIAN"
- mkdir -p  "$tmpdir/lib" "$tmpdir/boot" "$tmpdir/usr/share/doc/$packagename"
- mkdir -m 755 -p "$fwdir/DEBIAN"
-@@ -101,6 +105,10 @@ mkdir -p "$kernel_headers_dir/lib/modules/$version/"
- if [ "$ARCH" = "um" ] ; then
- 	mkdir -p "$tmpdir/usr/lib/uml/modules/$version" "$tmpdir/usr/bin"
- fi
-+if [ -n "$BUILD_DEBUG" ] ; then
-+	mkdir -p "$dbg_dir/usr/share/doc/$dbg_packagename"
-+	mkdir -m 755 -p "$dbg_dir/DEBIAN"
+@@ -116,16 +130,15 @@ if [ "$ARCH" = "um" ] ; then
+ 	cp System.map "$tmpdir/usr/lib/uml/modules/$version/System.map"
+ 	cp $KCONFIG_CONFIG "$tmpdir/usr/share/doc/$packagename/config"
+ 	gzip "$tmpdir/usr/share/doc/$packagename/config"
+-	cp $KBUILD_IMAGE "$tmpdir/usr/bin/linux-$version"
+ else 
+ 	cp System.map "$tmpdir/boot/System.map-$version"
+ 	cp $KCONFIG_CONFIG "$tmpdir/boot/config-$version"
+-	# Not all arches include the boot path in KBUILD_IMAGE
+-	if [ -e $KBUILD_IMAGE ]; then
+-		cp $KBUILD_IMAGE "$tmpdir/boot/vmlinuz-$version"
+-	else
+-		cp arch/$ARCH/boot/$KBUILD_IMAGE "$tmpdir/boot/vmlinuz-$version"
+-	fi
 +fi
- 
- # Build and install the kernel
- if [ "$ARCH" = "um" ] ; then
-@@ -128,6 +136,20 @@ if grep -q '^CONFIG_MODULES=y' $KCONFIG_CONFIG ; then
- 		mv "$tmpdir/lib/modules/$version"/* "$tmpdir/usr/lib/uml/modules/$version/"
- 		rmdir "$tmpdir/lib/modules/$version"
- 	fi
-+	if [ -n "$BUILD_DEBUG" ] ; then
-+		(
-+			cd $tmpdir
-+			for module in $(find lib/modules/ -name *.ko); do
-+				mkdir -p $(dirname $dbg_dir/usr/lib/debug/$module)
-+				# only keep debug symbols in the debug file
-+				objcopy --only-keep-debug $module $dbg_dir/usr/lib/debug/$module
-+				# strip original module from debug symbols
-+				objcopy --strip-debug $module
-+				# then add a link to those
-+				objcopy --add-gnu-debuglink=$dbg_dir/usr/lib/debug/$module $module
-+			done
-+		)
-+	fi
++# Not all arches include the boot path in KBUILD_IMAGE
++if [ -e $KBUILD_IMAGE ]; then
++	cp $KBUILD_IMAGE "$tmpdir/$installed_image_path"
++else
++	cp arch/$ARCH/boot/$KBUILD_IMAGE "$tmpdir/$installed_image_path"
  fi
  
- if [ "$ARCH" != "um" ]; then
-@@ -300,4 +322,30 @@ fi
- 
- create_package "$packagename" "$tmpdir"
- 
-+if [ -n "$BUILD_DEBUG" ] ; then
-+	# Build debug package
-+	# Different tools want the image in different locations
-+	# perf
-+	mkdir -p $dbg_dir/usr/lib/debug/lib/modules/$version/
-+	cp vmlinux $dbg_dir/usr/lib/debug/lib/modules/$version/
-+	# systemtap
-+	mkdir -p $dbg_dir/usr/lib/debug/boot/
-+	ln -s ../lib/modules/$version/vmlinux $dbg_dir/usr/lib/debug/boot/vmlinux-$version
-+	# kdump-tools
-+	ln -s lib/modules/$version/vmlinux $dbg_dir/usr/lib/debug/vmlinux-$version
-+
-+	cat <<EOF >> debian/control
-+
-+Package: $dbg_packagename
-+Section: debug
-+Provides: linux-debug, linux-debug-$version
-+Architecture: any
-+Description: Linux kernel debugging symbols for $version
-+ This package will come in handy if you need to debug the kernel. It provides
-+ all the necessary debug symbols for the kernel and its modules.
-+EOF
-+
-+	create_package "$dbg_packagename" "$dbg_dir"
-+fi
-+
- exit 0
+ if grep -q '^CONFIG_MODULES=y' $KCONFIG_CONFIG ; then
 -- 
 1.8.3.rc1
 
