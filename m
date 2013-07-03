@@ -1,25 +1,81 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([203.10.76.45]:33246 "EHLO ozlabs.org"
+Received: from multi.imgtec.com ([194.200.65.239]:39143 "EHLO multi.imgtec.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751641Ab3GCBQD (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 2 Jul 2013 21:16:03 -0400
-From: Rusty Russell <rusty@rustcorp.com.au>
-Subject: Re: [RFC PATCH] Allow optional module parameters
-In-Reply-To: <9F26321B-7088-4D16-80D5-72EB388F8E49@redhat.com>
-References: <b6b1676fd5bcd6b0ef47b0e0a1c26b1c05684135.1363291511.git.luto@amacapital.net> <87ehfhtftn.fsf@rustcorp.com.au> <CALCETrU+rehQzy4vVg589CGi561X_s73Xgsfp43pYZOoKvNDXQ@mail.gmail.com> <87sj3tsawh.fsf@rustcorp.com.au> <CALCETrUK54KViGex=V2pG8kAttsxOiDkeJUL48pk1NAhH-SdAA@mail.gmail.com> <87hak8qfu5.fsf@rustcorp.com.au> <CAMOw1v5AOmy38KNVfxj6OO-U0UCXST50vD0g0W5fEpNfKCpGvg@mail.gmail.com> <87sj3qpwdz.fsf@rustcorp.com.au> <87a9m6sri3.fsf@rustcorp.com.au> <9F26321B-7088-4D16-80D5-72EB388F8E49@redhat.com>
-Date: Wed, 03 Jul 2013 09:58:49 +0930
-Message-ID: <87k3l8fpvi.fsf@rustcorp.com.au>
+	id S1754501Ab3GCIod (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 3 Jul 2013 04:44:33 -0400
+Message-ID: <51D3E464.9050707@imgtec.com>
+Date: Wed, 3 Jul 2013 09:44:20 +0100
+From: James Hogan <james.hogan@imgtec.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Subject: Re: [PATCH] metag: move EXPORT_SYMBOLs in libs to metag_ksyms.c
+References: <1372774074-18553-1-git-send-email-james.hogan@imgtec.com> <87bo6kfp32.fsf@rustcorp.com.au>
+In-Reply-To: <87bo6kfp32.fsf@rustcorp.com.au>
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jonathan Masters <jcm@redhat.com>
-Cc: Lucas De Marchi <lucas.demarchi@profusion.mobi>, Andy Lutomirski <luto@amacapital.net>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Ben Hutchings <bhutchings@solarflare.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
+To: Rusty Russell <rusty@rustcorp.com.au>
+Cc: linux-kernel@vger.kernel.org, linux-arch <linux-arch@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-Jonathan Masters <jcm@redhat.com> writes:
-> One caveat. Sometimes we have manufactured parameters intentionally to cause a module to fail. We should standardize that piece.
+(cc'ing linux-arch and linux-kbuild)
 
-Certainly.  Can you give an example?
+On 03/07/13 01:45, Rusty Russell wrote:
+> James Hogan <james.hogan@imgtec.com> writes:
+>> Move all EXPORT_SYMBOLs in libs-y directories (arch/metag/{lib,tbx})
+>> into metag_ksyms.c so that they don't get omitted by the static linker
+>> if they're not used by any other statically linked code, which can
+>> result in undefined symbols when building modules.
+>>
+>> For example a randconfig caused the following error:
+>> ERROR: "csum_partial" [fs/reiserfs/reiserfs.ko] undefined!
+>>
+>> Signed-off-by: James Hogan <james.hogan@imgtec.com>
+>> Cc: Rusty Russell <rusty@rustcorp.com.au>
+>> ---
+>> Unless there are any objections I'll apply this patch for v3.11. I'm
+>> assuming *_ksyms.c is the way that this problem is normally worked
+>> around.
+> 
+> Actually, normally those files are obj-y not lib-y.  See the top-level
+> lib/.
+> 
+> Subtle, I know.
 
-Cheers,
-Rusty.
+Hmm, subtle indeed, I hadn't noticed that.
+
+grepping for EXPORT_SYMBOL(csum_partial) gives:
+
+./arch/avr32/kernel/avr32_ksyms.c
+./arch/sparc/lib/ksyms.c
+./arch/sh/kernel/sh_ksyms_32.c
+./arch/powerpc/kernel/ppc_ksyms.c
+./arch/unicore32/kernel/ksyms.c
+./arch/x86/um/ksyms.c
+./arch/x86/kernel/x8664_ksyms_64.c
+./arch/x86/kernel/i386_ksyms_32.c
+./arch/cris/kernel/crisksyms.c
+./arch/mips/kernel/mips_ksyms.c
+./arch/xtensa/kernel/xtensa_ksyms.c
+./arch/arm/kernel/armksyms.c
+
+./arch/ia64/lib/checksum.c
+./arch/alpha/lib/checksum.c
+./arch/c6x/lib/checksum.c
+./arch/mn10300/lib/checksum.c
+./arch/cris/arch-v10/lib/old_checksum.c
+./arch/h8300/lib/checksum.c
+./arch/parisc/lib/checksum.c
+./arch/m32r/lib/csum_partial_copy.c
+./arch/m68k/lib/checksum.c
+./arch/metag/lib/checksum.c
+./arch/frv/lib/checksum.c
+
+./lib/checksum.c
+
+All of the above arches have *c*sum.o in lib-y. Should they all be
+switched to obj-y or the remaining EXPORT_SYMBOLs moved to *ksyms.c if
+this problem is noticed?
+
+Thanks
+James
+
