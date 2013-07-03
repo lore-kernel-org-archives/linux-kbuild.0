@@ -1,41 +1,71 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:60996 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:32807 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752228Ab3GCM5O (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 3 Jul 2013 08:57:14 -0400
-Message-ID: <51D41FA7.80209@suse.cz>
-Date: Wed, 03 Jul 2013 14:57:11 +0200
+	id S1753721Ab3GCM7M (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 3 Jul 2013 08:59:12 -0400
+Date: Wed, 3 Jul 2013 14:59:09 +0200
 From: Michal Marek <mmarek@suse.cz>
+Subject: Re: [PATCH] Makefile: Fix install error with make -j option
+Message-ID: <20130703125909.GA30955@sepie.suse.cz>
+References: <1367499037-8350-1-git-send-email-rric@kernel.org>
+ <20130612101347.GP3886@rric.localhost>
 MIME-Version: 1.0
-Subject: Re: [PATCH 1/2] Fix a build warning in scripts/sortextable.h
-References: <1370745235-12951-1-git-send-email-dt.tangr@gmail.com> <51D413D9.8040604@suse.cz> <51D41413.9060500@suse.cz> <015BB7AD-78C4-4F1A-B65A-B37FBB6E2B9C@gmail.com> <51D418DB.5060102@suse.cz> <E04C38F7-0FF7-4B8A-8A3B-9EC135BFEB4F@gmail.com>
-In-Reply-To: <E04C38F7-0FF7-4B8A-8A3B-9EC135BFEB4F@gmail.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20130612101347.GP3886@rric.localhost>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Daniel Tang <dt.tangr@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, trivial@kernel.org, David Daney <david.daney@cavium.com>
+To: Robert Richter <rric@kernel.org>
+Cc: "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 
-On 3.7.2013 14:37, Daniel Tang wrote:
-> Hi,
+On Wed, Jun 12, 2013 at 12:13:47PM +0200, Robert Richter wrote:
+> Michal,
 > 
-> On 03/07/2013, at 10:28 PM, Michal Marek <mmarek@suse.cz> wrote:
->> 
->> 
->> What is the type of Elf64_Shdr::sh_offset in OS X's <elf.h>? In
->> glibc, this is Elf64_Off, which is a typedef name for uint64_t.
-> 
-> Huh, that's weird. Elf64_Off is defined as unsigned long in my elf.h
-> which isn't 64 bit on x86_64 pretty sure.
+> please apply this fix, ideally for v3.10 if possible.
 
-unsigned long _is_ 64bit on x86_64 Linux (or any 64bit Linux), but it
-might not be the case on OS X. But then, the <elf.h> on that platform
-should use something that is actually 64bit for Elf64_Off.
-
-
-> It's a problem on my side then, apologies.
-
-If Elf64_Off is really defined as an 32bit integer on OS X, then yes.
+I applied it to kbuild.git#kbuild now, with Cc:
+<stable@vger.kernel.org>.
 
 Michal
+> 
+> Thanks,
+> 
+> -Robert
+> 
+> 
+> On 02.05.13 08:50:37, Robert Richter wrote:
+> > From: Robert Richter <robert.richter@calxeda.com>
+> > 
+> > Make modules_install fails with -j option:
+> > 
+> >    DEPMOD
+> >  Usage: .../.source/linux/scripts/depmod.sh /sbin/depmod <kernelrelease>
+> >  make[1]: *** [_modinst_post] Error 1
+> > 
+> > Adding kernelrelease dependency to fix this.
+> > 
+> > Signed-off-by: Robert Richter <robert.richter@calxeda.com>
+> > ---
+> >  Makefile | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/Makefile b/Makefile
+> > index 46263d8..0205e79 100644
+> > --- a/Makefile
+> > +++ b/Makefile
+> > @@ -979,7 +979,7 @@ _modinst_:
+> >  # boot a modules.dep even before / is mounted read-write.  However the
+> >  # boot script depmod is the master version.
+> >  PHONY += _modinst_post
+> > -_modinst_post: _modinst_
+> > +_modinst_post: include/config/kernel.release _modinst_
+> >  	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.fwinst obj=firmware __fw_modinst
+> >  	$(call cmd,depmod)
+> >  
+> > -- 
+> > 1.8.1.1
+> > 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
