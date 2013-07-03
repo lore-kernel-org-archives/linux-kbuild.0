@@ -1,38 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:59976 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753778Ab3GCMbw (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 3 Jul 2013 08:31:52 -0400
-Message-ID: <51D419B2.7000502@suse.cz>
-Date: Wed, 03 Jul 2013 14:31:46 +0200
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: [PATCH 2/2] Fix a build warning in scripts/mod/file2alias.c
-References: <1370745235-12951-1-git-send-email-dt.tangr@gmail.com> <1370745235-12951-2-git-send-email-dt.tangr@gmail.com>
-In-Reply-To: <1370745235-12951-2-git-send-email-dt.tangr@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-2
-Content-Transfer-Encoding: 7bit
+Received: from mail-pb0-f51.google.com ([209.85.160.51]:33192 "EHLO
+	mail-pb0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932142Ab3GCMh5 convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 3 Jul 2013 08:37:57 -0400
+Content-Type: text/plain; charset=windows-1252
+Mime-Version: 1.0 (Mac OS X Mail 6.3 \(1503\))
+Subject: Re: [PATCH 1/2] Fix a build warning in scripts/sortextable.h
+From: Daniel Tang <dt.tangr@gmail.com>
+In-Reply-To: <51D418DB.5060102@suse.cz>
+Date: Wed, 3 Jul 2013 22:37:47 +1000
+Content-Transfer-Encoding: 8BIT
+Message-Id: <E04C38F7-0FF7-4B8A-8A3B-9EC135BFEB4F@gmail.com>
+References: <1370745235-12951-1-git-send-email-dt.tangr@gmail.com> <51D413D9.8040604@suse.cz> <51D41413.9060500@suse.cz> <015BB7AD-78C4-4F1A-B65A-B37FBB6E2B9C@gmail.com> <51D418DB.5060102@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Daniel Tang <dt.tangr@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, trivial@kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, trivial@kernel.org, David Daney <david.daney@cavium.com>
 
-On 9.6.2013 04:33, Daniel Tang wrote:
-> On some systems, __used is already defined in sys/cdefs.h and causes
-> a build warning:
+Hi,
+
+On 03/07/2013, at 10:28 PM, Michal Marek <mmarek@suse.cz> wrote:
 > 
-> scripts/mod/file2alias.c:85:1: warning: "__used" redefined
-> In file included from /usr/include/stdio.h:64,
->                  from scripts/mod/modpost.h:1,
-> 		                  from scripts/mod/file2alias.c:13:
-> 				  /usr/include/sys/cdefs.h:146:1: warning: this is the location of the previous definition
 > 
-> This adds an extra check before defining the __used macro to see if
-> the macro was already defined elsewhere.
+> What is the type of Elf64_Shdr::sh_offset in OS X's <elf.h>? In glibc,
+> this is Elf64_Off, which is a typedef name for uint64_t.
+
+Huh, that's weird. Elf64_Off is defined as unsigned long in my elf.h which isn't 64 bit on x86_64 pretty sure.
+
+It's a problem on my side then, apologies.
+
 > 
-> Signed-off-by: Daniel Tang <dt.tangr@gmail.com>
+> Michal
 
-Applied to kbuild.git#kbuild.
-
-Michal
-
+Cheers,
+tangrs
