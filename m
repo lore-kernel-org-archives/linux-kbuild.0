@@ -1,110 +1,95 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from moutng.kundenserver.de ([212.227.126.187]:59167 "EHLO
-	moutng.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932369Ab3GCQDR (ORCPT
+Received: from mail-we0-f181.google.com ([74.125.82.181]:58771 "EHLO
+	mail-we0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752578Ab3GCQan (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 3 Jul 2013 12:03:17 -0400
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: scripts/kallsyms: Avoid ARM veneer symbols
-Date: Wed, 3 Jul 2013 18:03:04 +0200
-References: <2983817.Xe2505Drlj@wuerfel> <20130625150941.GF2327@linaro.org>
-In-Reply-To: <20130625150941.GF2327@linaro.org>
+	Wed, 3 Jul 2013 12:30:43 -0400
+Received: by mail-we0-f181.google.com with SMTP id p58so310785wes.12
+        for <linux-kbuild@vger.kernel.org>; Wed, 03 Jul 2013 09:30:42 -0700 (PDT)
+Date: Wed, 3 Jul 2013 18:30:38 +0200
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: Re: Kconfig Gtk/Qt interface flavours ported to newest toolkit
+ versions
+Message-ID: <20130703163038.GA3268@free.fr>
+References: <kconfig-port-gtk-qt>
+ <1372778550-22110-1-git-send-email-david.graeff@web.de>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Content-Transfer-Encoding: 7bit
-Message-Id: <201307031803.04501.arnd@arndb.de>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1372778550-22110-1-git-send-email-david.graeff@web.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-arm-kernel@lists.infradead.org
-Cc: Dave Martin <dave.martin@linaro.org>, Michal Marek <mmarek@suse.cz>, Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: davidgraeff <david.graeff@web.de>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
-On Tuesday 25 June 2013, Dave Martin wrote:
-> On Mon, Jun 24, 2013 at 04:01:43PM +0200, Arnd Bergmann wrote:
-> > When building ARM kernels that exceed a certain size, the linker
-> > will add "veneers" that allow long branches. Unfortunately,
-> > using a longer kallsyms section may lead to the extra veneers
-> > being needed, which leads to inconsistent kallsyms data with the
-> > message
-> > 
-> > Inconsistent kallsyms data
-> > Try make KALLSYMS_EXTRA_PASS=1 as a workaround
-> > 
-> > In some case, not just one but up to three extra passes were
-> > needed before getting to a state that needed no extra veneers.
-> 
-> Do you understand why this was happening?  It sounds like there
-> must have been branches crossing from one side of the kallsyms
-> data to the other, triggering veneer insertion any time the
-> kallsyms data grows.
-> 
-> Branches between .{init,exit}.text and .text (crossing .rodata) seem the
-> likeliest culprits, but that's guesswork on my part.
+David, All,
 
-kallsyms is part of rodata, which is between .text and .init.text.
-I understand this is intentional, and we already use two passes
-of kallsyms to make sure the size is right. However the assumption
-is that only the data of the kallsyms table changes between runs,
-not the size of it.
+On 2013-07-02 17:22 +0200, davidgraeff spake thusly:
+> I've no idea if this is the right way to send patches. I'm kind of new to this.
 
-> If that's whats going on, multiple kallsyms passes is actually a correct
-> approach here: I think they should terminate after a number of steps
-> roughly proportional to log(number of branches across .rodata). We
-> could come up with a heuristic which allows us to choose the right
-> limit with a high degree of reliability, since branch density in
-> compiled C code is likely to be roughly.
+It seems you're doing mostly fine! :-)
 
-It also seems to be a part of the design to do exactly two passes
-and treat anything beyond that as bugs, doing it the way you
-suggest would significantly increase the build time since the
-kallsyms+linker stage cannot be done in parallel or sped up
-using ccache.
+However, since you asked: your patches are numberedd 2 to 9. It seems
+you considered the intro mail (the one I'm replying to here) as the
+number one. Is that right, or is patch #1 missing?
 
-> But including the veneer symbols in kallsyms is arguably not all
-> that useful.
-> 
-> The main potential effect is that profiling might occasionally
-> sample the PC as being in a completely bogus function which it
-> never passed through at all, because of the way kallsyms tracks
-> only symbol locations and not sizes (if I remember right) --
-> so a veneer will actually get accounted against some arbitrary
-> adjacent function.
-> 
-> I don't know how much this matters.
+Usually, patch series are sent as thus:
+    [PATCH 0/N] Subject for intro mail, aka "cover letter"
+    [PATCH 1/N] Subject for first actual patch
+    [PATCH 2/N] Subject for second actual patch
+    [...]
+    [PATCH N-1/N] Subject for penultimate actual patch
+    [PATCH N/N] Subject for last actual patch
 
-Interesting point. No idea how often that happens. All the veneers
-for one section are in one place though, so we could in theory
-add a kallsyms entry for that section as long as can identify
-it.
+You can achieve this using 'git send-email'. See:
+    git help send-email
 
-> > The easiest solution is to skip veneers in kallsyms in the
-> > same way we already skip a couple of other symbols.
-> 
-> The other symbols are not stripped for the purpose of making
-> kallsyms terminate quickly.  The mapping symbols are rather
-> different: masses of symbols with duplicate names which are
-> not very interesting for most people.
+Also, see (albeit not totaly up-to-date):
+    Documentation/SubmittingPatches
 
-Right.
+Nit-picking: please keep your mails and commit messages below 80-chars
+per line, it's easier to read. Thanks! :-)
 
-> > Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> > ---
-> > diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
-> > index 487ac6f..53ec0bb 100644
-> > --- a/scripts/kallsyms.c
-> > +++ b/scripts/kallsyms.c
-> > @@ -69,14 +69,32 @@ static void usage(void)
-> >  	exit(1);
-> >  }
-> >  
-> > -/*
-> > - * This ignores the intensely annoying "mapping symbols" found
-> > - * in ARM ELF files: $a, $t and $d.
-> > - */
-> >  static inline int is_arm_mapping_symbol(const char *str)
-> 
-> The function's name is now wrong.  Should it be renamed or split up?
+> Attached is a patchset basically for porting the graphical Gtk and Qt flavours
+> to their latest toolkit versions (Gtk3 and Qt4 with compatibility to Qt5 respectively).
 
-Sure I can rename it. Any suggestions?
+I did not do any review of the patches, since I have a concern about the
+series. It happens very often that, in enterprise ecosystems, the host
+build machines are running rather aging distro, such as RHEL 5 (or even
+RHEL 4 in some cases), so I think we still want the new kernels to be
+buildable (and thus configurable) on such machines (eg. for
+cross-compilation).
 
-	Arnd
+I have no idea when such enterprise distros have started bundling GTK3
+or Qt4/5, but given RHEL-4 (which is still use in some places) is 8
+years old, I doubt the new frontends would build on those distros.
+
+> I do not know if it was on purpose to keep all flavours except lxdialog in one single directory,
+
+Historical artifact, I think... :-(
+
+[--SNIP--]
+> Those newer graphical kconfig flavours will be used by a project I'm involved in so
+> I will maintain it for the next couple of months.
+
+Could you please explain what this project of yours is about?
+
+> If I did anything wrong, please instruct me or provide me a link please.
+
+As I said above, mostly good. I've seen far worse submnissions, don't
+worry! ;-)
+
+Regards,
+Yann E. MORIN.
+
+PS. Sorry for not answering earlier, I had connection issues yesterday,
+    during all the evening & night. :-(
+YEM.
+
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
