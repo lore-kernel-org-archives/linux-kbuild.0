@@ -1,59 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qc0-f179.google.com ([209.85.216.179]:35676 "EHLO
-	mail-qc0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753740Ab3GCVb4 (ORCPT
+Received: from mail-vc0-f182.google.com ([209.85.220.182]:61260 "EHLO
+	mail-vc0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933348Ab3GCVhK (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 3 Jul 2013 17:31:56 -0400
-Received: by mail-qc0-f179.google.com with SMTP id e11so420729qcx.10
-        for <linux-kbuild@vger.kernel.org>; Wed, 03 Jul 2013 14:31:55 -0700 (PDT)
+	Wed, 3 Jul 2013 17:37:10 -0400
+Received: by mail-vc0-f182.google.com with SMTP id id13so467942vcb.13
+        for <linux-kbuild@vger.kernel.org>; Wed, 03 Jul 2013 14:37:09 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <51D49655.8030206@suse.cz>
+In-Reply-To: <CAMOw1v6gUt1AwrVLK4dAYb6_VHTQ4M2gv3eC1E3Rx=pT2P2_8Q@mail.gmail.com>
 References: <b6b1676fd5bcd6b0ef47b0e0a1c26b1c05684135.1363291511.git.luto@amacapital.net>
  <87ehfhtftn.fsf@rustcorp.com.au> <CALCETrU+rehQzy4vVg589CGi561X_s73Xgsfp43pYZOoKvNDXQ@mail.gmail.com>
  <87sj3tsawh.fsf@rustcorp.com.au> <CALCETrUK54KViGex=V2pG8kAttsxOiDkeJUL48pk1NAhH-SdAA@mail.gmail.com>
  <87hak8qfu5.fsf@rustcorp.com.au> <CAMOw1v5AOmy38KNVfxj6OO-U0UCXST50vD0g0W5fEpNfKCpGvg@mail.gmail.com>
  <87sj3qpwdz.fsf@rustcorp.com.au> <87a9m6sri3.fsf@rustcorp.com.au>
  <9F26321B-7088-4D16-80D5-72EB388F8E49@redhat.com> <51D491AD.7050008@suse.cz>
- <CALCETrWOUE=2fX1k+igfNizUfxRaZCc9NDgMzy7SM6fAjZMZuA@mail.gmail.com> <51D49655.8030206@suse.cz>
-From: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Date: Wed, 3 Jul 2013 18:31:35 -0300
-Message-ID: <CAMOw1v6gUt1AwrVLK4dAYb6_VHTQ4M2gv3eC1E3Rx=pT2P2_8Q@mail.gmail.com>
+ <CALCETrWOUE=2fX1k+igfNizUfxRaZCc9NDgMzy7SM6fAjZMZuA@mail.gmail.com>
+ <51D49655.8030206@suse.cz> <CAMOw1v6gUt1AwrVLK4dAYb6_VHTQ4M2gv3eC1E3Rx=pT2P2_8Q@mail.gmail.com>
+From: Andy Lutomirski <luto@amacapital.net>
+Date: Wed, 3 Jul 2013 14:36:48 -0700
+Message-ID: <CALCETrWK7qAN_zzoK0ojOHqh7Rtrno1DhZb+jtVJMCuXMUfOuw@mail.gmail.com>
 Subject: Re: [RFC PATCH] Allow optional module parameters
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Andy Lutomirski <luto@amacapital.net>, Jonathan Masters <jcm@redhat.com>, Rusty Russell <rusty@rustcorp.com.au>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Ben Hutchings <bhutchings@solarflare.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
+To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
+Cc: Michal Marek <mmarek@suse.cz>, Jonathan Masters <jcm@redhat.com>, Rusty Russell <rusty@rustcorp.com.au>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Ben Hutchings <bhutchings@solarflare.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
 
-On Wed, Jul 3, 2013 at 6:23 PM, Michal Marek <mmarek@suse.cz> wrote:
-> Dne 3.7.2013 23:17, Andy Lutomirski napsal(a):
->> On Wed, Jul 3, 2013 at 2:03 PM, Michal Marek <mmarek@suse.cz> wrote:
->>> Dne 1.7.2013 18:33, Jonathan Masters napsal(a):
->>>> One caveat. Sometimes we have manufactured parameters intentionally
->>>> to cause a module to fail. We should standardize that piece.
+On Wed, Jul 3, 2013 at 2:31 PM, Lucas De Marchi
+<lucas.demarchi@profusion.mobi> wrote:
+> On Wed, Jul 3, 2013 at 6:23 PM, Michal Marek <mmarek@suse.cz> wrote:
+>> Dne 3.7.2013 23:17, Andy Lutomirski napsal(a):
+>>> On Wed, Jul 3, 2013 at 2:03 PM, Michal Marek <mmarek@suse.cz> wrote:
+>>>> Dne 1.7.2013 18:33, Jonathan Masters napsal(a):
+>>>>> One caveat. Sometimes we have manufactured parameters intentionally
+>>>>> to cause a module to fail. We should standardize that piece.
+>>>>
+>>>> You have:
+>>>>
+>>>>   blacklist foo
+>>>>
+>>>> to prevent udev from loading a module and
+>>>>
+>>>>   install foo /bin/true
+>>>>
+>>>> to prevent modprobe from loading the module at all. What is the
+>>>> motivation for inventing a third way, through adding invalid parameters?
+>>>>
 >>>
->>> You have:
->>>
->>>   blacklist foo
->>>
->>> to prevent udev from loading a module and
->>>
->>>   install foo /bin/true
->>>
->>> to prevent modprobe from loading the module at all. What is the
->>> motivation for inventing a third way, through adding invalid parameters?
->>>
+>>> FWIW, I've occasionally booted with modulename.garbage=1 to prevent
+>>> modulename from loading at boot.  It may be worth adding a more
+>>> intentional way to do that.
 >>
->> FWIW, I've occasionally booted with modulename.garbage=1 to prevent
->> modulename from loading at boot.  It may be worth adding a more
->> intentional way to do that.
+>> Hm, right, there seems to be no clean way to achieve this via a
+>> commandline argument. Maybe define a magic module option to tell the
+>> module loader not to load a module?
 >
-> Hm, right, there seems to be no clean way to achieve this via a
-> commandline argument. Maybe define a magic module option to tell the
-> module loader not to load a module?
+> modprobe.blacklist=modname1,modname2,... is already there, though all
+> the silliness of blacklist applies unless "-b" is passed (that's the
+> equivalent behavior of udev)
 
-modprobe.blacklist=modname1,modname2,... is already there, though all
-the silliness of blacklist applies unless "-b" is passed (that's the
-equivalent behavior of udev)
+That would probably be good enough for me.
 
-Lucas De Marchi
+It would be neat if this worked for built-in "modules" as well, but
+that would probably be quite intrusive.
+
+--Andy
