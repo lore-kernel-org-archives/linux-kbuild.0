@@ -1,67 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vc0-f182.google.com ([209.85.220.182]:61260 "EHLO
-	mail-vc0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933348Ab3GCVhK (ORCPT
+Received: from mail-pb0-f50.google.com ([209.85.160.50]:56740 "EHLO
+	mail-pb0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755239Ab3GDBgA (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 3 Jul 2013 17:37:10 -0400
-Received: by mail-vc0-f182.google.com with SMTP id id13so467942vcb.13
-        for <linux-kbuild@vger.kernel.org>; Wed, 03 Jul 2013 14:37:09 -0700 (PDT)
+	Wed, 3 Jul 2013 21:36:00 -0400
+Date: Thu, 4 Jul 2013 09:35:47 +0800
+From: =?utf-8?B?5byg5b+g5bGx?= <zzs0213@gmail.com>
+Subject: Re: [PATCH] let kbuild mkdir for dir/file.o
+Message-ID: <20130704013546.GA3630@greatfirst.com>
+References: <51CE11C2.5020406@suse.cz>
+ <1372583368-32618-1-git-send-email-zzs0213@gmail.com>
+ <51D48E72.5010403@suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <CAMOw1v6gUt1AwrVLK4dAYb6_VHTQ4M2gv3eC1E3Rx=pT2P2_8Q@mail.gmail.com>
-References: <b6b1676fd5bcd6b0ef47b0e0a1c26b1c05684135.1363291511.git.luto@amacapital.net>
- <87ehfhtftn.fsf@rustcorp.com.au> <CALCETrU+rehQzy4vVg589CGi561X_s73Xgsfp43pYZOoKvNDXQ@mail.gmail.com>
- <87sj3tsawh.fsf@rustcorp.com.au> <CALCETrUK54KViGex=V2pG8kAttsxOiDkeJUL48pk1NAhH-SdAA@mail.gmail.com>
- <87hak8qfu5.fsf@rustcorp.com.au> <CAMOw1v5AOmy38KNVfxj6OO-U0UCXST50vD0g0W5fEpNfKCpGvg@mail.gmail.com>
- <87sj3qpwdz.fsf@rustcorp.com.au> <87a9m6sri3.fsf@rustcorp.com.au>
- <9F26321B-7088-4D16-80D5-72EB388F8E49@redhat.com> <51D491AD.7050008@suse.cz>
- <CALCETrWOUE=2fX1k+igfNizUfxRaZCc9NDgMzy7SM6fAjZMZuA@mail.gmail.com>
- <51D49655.8030206@suse.cz> <CAMOw1v6gUt1AwrVLK4dAYb6_VHTQ4M2gv3eC1E3Rx=pT2P2_8Q@mail.gmail.com>
-From: Andy Lutomirski <luto@amacapital.net>
-Date: Wed, 3 Jul 2013 14:36:48 -0700
-Message-ID: <CALCETrWK7qAN_zzoK0ojOHqh7Rtrno1DhZb+jtVJMCuXMUfOuw@mail.gmail.com>
-Subject: Re: [RFC PATCH] Allow optional module parameters
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <51D48E72.5010403@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Lucas De Marchi <lucas.demarchi@profusion.mobi>
-Cc: Michal Marek <mmarek@suse.cz>, Jonathan Masters <jcm@redhat.com>, Rusty Russell <rusty@rustcorp.com.au>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Ben Hutchings <bhutchings@solarflare.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, linux-kernel <linux-kernel@vger.kernel.org>, zzs0213@gmail.com
 
-On Wed, Jul 3, 2013 at 2:31 PM, Lucas De Marchi
-<lucas.demarchi@profusion.mobi> wrote:
-> On Wed, Jul 3, 2013 at 6:23 PM, Michal Marek <mmarek@suse.cz> wrote:
->> Dne 3.7.2013 23:17, Andy Lutomirski napsal(a):
->>> On Wed, Jul 3, 2013 at 2:03 PM, Michal Marek <mmarek@suse.cz> wrote:
->>>> Dne 1.7.2013 18:33, Jonathan Masters napsal(a):
->>>>> One caveat. Sometimes we have manufactured parameters intentionally
->>>>> to cause a module to fail. We should standardize that piece.
->>>>
->>>> You have:
->>>>
->>>>   blacklist foo
->>>>
->>>> to prevent udev from loading a module and
->>>>
->>>>   install foo /bin/true
->>>>
->>>> to prevent modprobe from loading the module at all. What is the
->>>> motivation for inventing a third way, through adding invalid parameters?
->>>>
->>>
->>> FWIW, I've occasionally booted with modulename.garbage=1 to prevent
->>> modulename from loading at boot.  It may be worth adding a more
->>> intentional way to do that.
->>
->> Hm, right, there seems to be no clean way to achieve this via a
->> commandline argument. Maybe define a magic module option to tell the
->> module loader not to load a module?
+> >
+> > this bug caused by commit
+> >    f5fb976520a53f45f8bbf2e851f16b3b5558d485
+> > ---
 >
-> modprobe.blacklist=modname1,modname2,... is already there, though all
-> the silliness of blacklist applies unless "-b" is passed (that's the
-> equivalent behavior of udev)
+> You forgot to sign off this patch, can I add
+>
+>   Signed-off-by: 张忠山 <zzs0213@gmail.com>
+>
+> like you did in the previous versions? Otherwise, the patch looks OK.
+>
+> Michal
 
-That would probably be good enough for me.
+Of course, you can.
+-- 
+Best Regards,
+zzs
 
-It would be neat if this worked for built-in "modules" as well, but
-that would probably be quite intrusive.
-
---Andy
