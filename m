@@ -1,69 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:60235 "EHLO
-	shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1755239Ab3GDBqK (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 3 Jul 2013 21:46:10 -0400
-Message-ID: <1372902360.22888.25.camel@deadeye.wl.decadent.org.uk>
-Subject: Re: [PATCH v6 2/4] deb-pkg: split debug symbols in their own package
-From: Ben Hutchings <ben@decadent.org.uk>
-Date: Thu, 04 Jul 2013 02:46:00 +0100
-In-Reply-To: <1372860126-8909-3-git-send-email-anisse@astier.eu>
-References: <1372860126-8909-1-git-send-email-anisse@astier.eu>
-	 <1372860126-8909-3-git-send-email-anisse@astier.eu>
-Content-Type: multipart/signed; micalg="pgp-sha512";
-	protocol="application/pgp-signature"; boundary="=-SgpgDroagHKo3LAHOe/O"
-Mime-Version: 1.0
+Received: from cantor2.suse.de ([195.135.220.15]:50510 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756634Ab3GDPPn (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 4 Jul 2013 11:15:43 -0400
+Message-ID: <51D5919B.7010208@suse.cz>
+Date: Thu, 04 Jul 2013 17:15:39 +0200
+From: Michal Marek <mmarek@suse.cz>
+MIME-Version: 1.0
+Subject: Re: [PATCH 3/3] kbuild: add generation of kernel-devel
+References: <20130624143658.10761.3787.stgit@phlsvslse11.ph.intel.com> <20130624143833.10761.94871.stgit@phlsvslse11.ph.intel.com>
+In-Reply-To: <20130624143833.10761.94871.stgit@phlsvslse11.ph.intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Anisse Astier <anisse@astier.eu>
-Cc: linux-kbuild@vger.kernel.org, debian-kernel@lists.debian.org, kernel-team@lists.ubuntu.com, Michal Marek <mmarek@suse.cz>, maximilian attems <max@stro.at>
+To: Mike Marciniszyn <mike.marciniszyn@intel.com>
+Cc: Doug Ledford <dledford@redhat.com>, linux-kbuild@vger.kernel.org, mmarcini@yahoo.com
 
+On 24.6.2013 16:38, Mike Marciniszyn wrote:
+> Change the spec file to generate a kernel-devel module
+> allowing for compilation of external kernel modules.
+> 
+> Signed-off-by: Mike Marciniszyn <mike.marciniszyn@intel.com>
+> ---
+>  scripts/package/mkspec |   26 ++++++++++++++++++++++++++
+>  1 file changed, 26 insertions(+)
+> 
+> diff --git a/scripts/package/mkspec b/scripts/package/mkspec
+> index 514aeb2..65131df 100755
+> --- a/scripts/package/mkspec
+> +++ b/scripts/package/mkspec
+> @@ -59,6 +59,14 @@ echo "header files define structures and constants that are needed for"
+>  echo "building most standard programs and are also needed for rebuilding the"
+>  echo "glibc package."
+>  echo ""
+> +echo "%package devel"
+> +echo "Summary: Development package for building kernel modules to match the $__KERNELRELEASE kernel"
+> +echo "Group: System Environment/Kernel"
+> +echo "AutoReqProv: no"
+> +echo "%description -n kernel-devel"
+> +echo "This package provides kernel headers and makefiles sufficient to build modules"
+> +echo "against the $__KERNELRELEASE kernel package."
+> +echo ""
+>  
+>  if ! $PREBUILT; then
+>  echo "%prep"
+> @@ -109,6 +117,11 @@ echo 'mv vmlinux.bz2 $RPM_BUILD_ROOT'"/boot/vmlinux-$KERNELRELEASE.bz2"
+>  echo 'mv vmlinux.orig vmlinux'
+>  echo "%endif"
+>  
+> +echo 'rm -rf $RPM_BUILD_ROOT'"/lib/modules/$KERNELRELEASE/{build,source}"
+> +echo "mkdir -p "'$RPM_BUILD_ROOT'"/usr/src/kernels/$KERNELRELEASE"
+> +echo "EXCLUDES=\"--exclude-vcs --exclude .tmp_versions --exclude=*vmlinux* --exclude=*.o --exclude=*.ko --exclude=*.cmd --exclude=Documentation --exclude=firmware --exclude .config.old --exclude .missing-syscalls.d\""
+> +echo "tar "'$EXCLUDES'" -cf- . | (cd "'$RPM_BUILD_ROOT'"/usr/src/kernels/$KERNELRELEASE;tar xvf -)"
 
---=-SgpgDroagHKo3LAHOe/O
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+For consistency and compatibility with older tar versions, please use
+$RCS_TAR_EXCLUDE instead of --exclude-vcs. Also, you only need .config,
+scripts/, include/ and the Makefiles to build external modules. But
+that's an optimization that can be done in a later patch.
 
-On Wed, 2013-07-03 at 16:02 +0200, Anisse Astier wrote:
-> This can reduce almost 3 times the size of the linux-image package,
-> while keeping the debug symbols available for this particular build, in
-> their own package.
->=20
-> This mimics the way kernels are built in debian, ubuntu, or with
-> make-kpkg, and comes at the price of a small slowdown in the building of
-> packages.
->=20
-> Signed-off-by: Anisse Astier <anisse@astier.eu>
-> Cc: Ben Hutchings <ben@decadent.org.uk>
-> Acked-by: maximilian attems <max@stro.at>
-[...]
+> +echo "%post devel"
+> +echo "cd /lib/modules/$KERNELRELEASE"
+> +echo "ln -sf /usr/src/kernels/$KERNELRELEASE build"
+> +echo "ln -sf /usr/src/kernels/$KERNELRELEASE source"
+> +echo ""
+> +echo "%postun devel"
+> +echo "cd /lib/modules/$KERNELRELEASE"
+> +echo "rm -f build source"
 
-Reviewed-by: Ben Hutchings <ben@decadent.org.uk>
+These symlinks should be part of the RPM payload.
 
---=20
-Ben Hutchings
-Tomorrow will be cancelled due to lack of interest.
-
---=-SgpgDroagHKo3LAHOe/O
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.12 (GNU/Linux)
-
-iQIVAwUAUdTT2Oe/yOyVhhEJAQrG0xAArS65piw5lFzDCnaRRl8ZuxN2f3+Gzg6k
-3wsyr+0150JzLZrgnTyJiGMYqmM8m8m/LhTSVOIHbOpMof6pPagaLBh1BSDa7CuQ
-Nhchuu3pXeDQn0yz8Sx3rapjqrO7/07bHOWpv6XPN+3Qslu2NQltKGBXr5c4qz8Z
-lQT0CHi574HVEZE/P2P06/rf0aQUUSeaqxRfsWGMMlRYGJLe4QsR+EIw7+95B4Q3
-tCMpyVcqwFNc7uOGMTT0yUZFtsy8o5PVsqPHIy9KeqcGQjK43RePgen6cEv5JYUP
-BhheM2GPQ3zRZ955vqCo+Nxcd97Oc9wFS5+joyKgYIB+UZpNcSPimsbukGn5aw9e
-f5UJXVmOjdw0RatDnVVFtvzOo01MUPnavp25gvUVoR+O+eJ+odcBRN5KglylaL9X
-1I+2h8wfGkPImWbsmgkghLgaJ/Inucu1sbX0kUuRokyeIqxmBZczzljCPPaPrm2r
-4u+LM08fsBnO/qDF+PS6cEtjKjEQVbnuAoQLQ0vhWT4mUGLf/5AqJdBN0afOu14y
-k+ml9brTo8THeH/GabJux0THQRSA+t0VshmnF2Ym9LtrhhsuNXgkAc94d4aDEurQ
-VowAqnZIc79OAGUO1VMWOpMUNzvWBekmhjNOtQGl2FsceT//DkLiEYVC4SgN3Xvu
-XCCF8/B2Vjg=
-=T0hk
------END PGP SIGNATURE-----
-
---=-SgpgDroagHKo3LAHOe/O--
+Michal
