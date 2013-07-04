@@ -1,73 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:50510 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756634Ab3GDPPn (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 4 Jul 2013 11:15:43 -0400
-Message-ID: <51D5919B.7010208@suse.cz>
-Date: Thu, 04 Jul 2013 17:15:39 +0200
-From: Michal Marek <mmarek@suse.cz>
+Received: from mail-we0-f173.google.com ([74.125.82.173]:37457 "EHLO
+	mail-we0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756728Ab3GDRo7 (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 4 Jul 2013 13:44:59 -0400
+Date: Thu, 4 Jul 2013 19:44:53 +0200
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: kconfig-frontends-3.10.0.0 released
+Message-ID: <20130704174453.GC5374@free.fr>
 MIME-Version: 1.0
-Subject: Re: [PATCH 3/3] kbuild: add generation of kernel-devel
-References: <20130624143658.10761.3787.stgit@phlsvslse11.ph.intel.com> <20130624143833.10761.94871.stgit@phlsvslse11.ph.intel.com>
-In-Reply-To: <20130624143833.10761.94871.stgit@phlsvslse11.ph.intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mike Marciniszyn <mike.marciniszyn@intel.com>
-Cc: Doug Ledford <dledford@redhat.com>, linux-kbuild@vger.kernel.org, mmarcini@yahoo.com
+To: Linux kbuild ML <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Cc: lwn@lwn.net
 
-On 24.6.2013 16:38, Mike Marciniszyn wrote:
-> Change the spec file to generate a kernel-devel module
-> allowing for compilation of external kernel modules.
-> 
-> Signed-off-by: Mike Marciniszyn <mike.marciniszyn@intel.com>
-> ---
->  scripts/package/mkspec |   26 ++++++++++++++++++++++++++
->  1 file changed, 26 insertions(+)
-> 
-> diff --git a/scripts/package/mkspec b/scripts/package/mkspec
-> index 514aeb2..65131df 100755
-> --- a/scripts/package/mkspec
-> +++ b/scripts/package/mkspec
-> @@ -59,6 +59,14 @@ echo "header files define structures and constants that are needed for"
->  echo "building most standard programs and are also needed for rebuilding the"
->  echo "glibc package."
->  echo ""
-> +echo "%package devel"
-> +echo "Summary: Development package for building kernel modules to match the $__KERNELRELEASE kernel"
-> +echo "Group: System Environment/Kernel"
-> +echo "AutoReqProv: no"
-> +echo "%description -n kernel-devel"
-> +echo "This package provides kernel headers and makefiles sufficient to build modules"
-> +echo "against the $__KERNELRELEASE kernel package."
-> +echo ""
->  
->  if ! $PREBUILT; then
->  echo "%prep"
-> @@ -109,6 +117,11 @@ echo 'mv vmlinux.bz2 $RPM_BUILD_ROOT'"/boot/vmlinux-$KERNELRELEASE.bz2"
->  echo 'mv vmlinux.orig vmlinux'
->  echo "%endif"
->  
-> +echo 'rm -rf $RPM_BUILD_ROOT'"/lib/modules/$KERNELRELEASE/{build,source}"
-> +echo "mkdir -p "'$RPM_BUILD_ROOT'"/usr/src/kernels/$KERNELRELEASE"
-> +echo "EXCLUDES=\"--exclude-vcs --exclude .tmp_versions --exclude=*vmlinux* --exclude=*.o --exclude=*.ko --exclude=*.cmd --exclude=Documentation --exclude=firmware --exclude .config.old --exclude .missing-syscalls.d\""
-> +echo "tar "'$EXCLUDES'" -cf- . | (cd "'$RPM_BUILD_ROOT'"/usr/src/kernels/$KERNELRELEASE;tar xvf -)"
+Hello All!
 
-For consistency and compatibility with older tar versions, please use
-$RCS_TAR_EXCLUDE instead of --exclude-vcs. Also, you only need .config,
-scripts/, include/ and the Makefiles to build external modules. But
-that's an optimization that can be done in a later patch.
+I'm pleased to announce the release of kconfig-frontends 3.10.0.0!
+Go download it there:
+    http://ymorin.is-a-geek.org/download/kconfig-frontends/kconfig-frontends-3.10.0.0.tar.xz
+    http://ymorin.is-a-geek.org/download/kconfig-frontends/kconfig-frontends-3.10.0.0.tar.bz2
 
-> +echo "%post devel"
-> +echo "cd /lib/modules/$KERNELRELEASE"
-> +echo "ln -sf /usr/src/kernels/$KERNELRELEASE build"
-> +echo "ln -sf /usr/src/kernels/$KERNELRELEASE source"
-> +echo ""
-> +echo "%postun devel"
-> +echo "cd /lib/modules/$KERNELRELEASE"
-> +echo "rm -f build source"
+The kconfig-frontends package provides the kconfig parser, as well as
+all the kconfig frontends and utilities, packaged using the traditional
+autotools, so the kconfig infrastructure is easy to deploy, either
+locally or system-wide.
 
-These symlinks should be part of the RPM payload.
+What's new since 3.9.0.0:
+  - updated from linux-3.10:
+    - parser:
+      - fix randconfig tristate detection
+      - do not override symbols already set
+    - frontends:
+      - conf : allow specifying the seed for randconfig
+      - conf : implement KCONFIG_PROBABILITY for randconfig
+      - mconf: print more info for symbol without prompts
+      - mconf: add "breadcrumbs" navigation aid
+      - mconf: handle keys in empty dialogs
+      - mconf: some fixes (NULL pointer dereference, memory leak...)
+    - utilities:
+      - merge_config: avoid creating unnessary source softlinks
+  - misc:
+    - BSD- and MacOS-X-related fixes and doc
+    - fix lex/yacc checks
 
-Michal
+As a reminder, the home for kconfig-frontends is:
+  http://ymorin.is-a-geek.org/projects/kconfig-frontends
+
+And the repository can be browsed or git-cloned from:
+  http://ymorin.is-a-geek.org/git/kconfig-frontends
+It is also possible to clone using the git protocol:
+  git://ymorin.is-a-geek.org/kconfig-frontends
+
+kconfig-frontends is not meant to replace the in-tree Linux kconfig, but
+really targets third-party projects that want an easy path to following
+the evolution of kconfig, without the burden to manually synchronise from
+the Linux kernel source tree.
+
+Any comment, any feedback, any patch is welcome! ;-)
+
+Regards,
+Yann E. MORIN.
+
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
