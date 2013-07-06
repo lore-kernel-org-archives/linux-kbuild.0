@@ -1,139 +1,108 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from moutng.kundenserver.de ([212.227.126.187]:60869 "EHLO
-	moutng.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751224Ab3GEXfK (ORCPT
+Received: from mx1.HRZ.Uni-Dortmund.DE ([129.217.128.51]:33675 "EHLO
+	unimail.uni-dortmund.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751670Ab3GFAoN (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 5 Jul 2013 19:35:10 -0400
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: scripts/kallsyms: Avoid ARM veneer symbols
-Date: Sat, 6 Jul 2013 01:34:56 +0200
-References: <2983817.Xe2505Drlj@wuerfel> <201307051842.44721.arnd@arndb.de> <20130705172659.GJ2932@localhost.localdomain>
-In-Reply-To: <20130705172659.GJ2932@localhost.localdomain>
+	Fri, 5 Jul 2013 20:44:13 -0400
+Message-ID: <51D76127.9060209@tu-dortmund.de>
+Date: Sat, 06 Jul 2013 02:13:27 +0200
+From: =?UTF-8?B?RGF2aWQgR3LDpGZm?= <david.graeff@tu-dortmund.de>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
+Subject: Re: Kconfig Gtk/Qt interface flavours ported to newest toolkit versions
+References: <kconfig-port-gtk-qt> <1372778550-22110-1-git-send-email-david.graeff@web.de> <20130703163038.GA3268@free.fr>
+In-Reply-To: <20130703163038.GA3268@free.fr>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <201307060134.56933.arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dave P Martin <Dave.Martin@arm.com>
-Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Dave Martin <dave.martin@linaro.org>, Michal Marek <mmarek@suse.cz>, Andrew Morton <akpm@linux-foundation.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: linux-kbuild@vger.kernel.org
 
-On Friday 05 July 2013, Dave P Martin wrote:
-> On Fri, Jul 05, 2013 at 05:42:44PM +0100, Arnd Bergmann wrote:
-> > On Friday 05 July 2013, Dave P Martin wrote:
-> > > On Wed, Jul 03, 2013 at 06:03:04PM +0200, Arnd Bergmann wrote:
-> 
-> I think there are a small number of patterns to check for.
-> 
-> __*_veneer, __*_from_arm and __*_from_thumb should cover most cases.
+Yem, All,
 
-Ok.
+Am 03.07.2013 18:30, schrieb Yann E. MORIN:
+> However, since you asked: your patches are numberedd 2 to 9. It seems
+> you considered the intro mail (the one I'm replying to here) as the
+> number one. Is that right, or is patch #1 missing?
+>
+> [...]
+>
+> You can achieve this using 'git send-email'. See:
+>      git help send-email
+I'm sorry for the missing first patch, actually I used git send-email, but
+had initial problems with perl and its smtp module. I guess perl ate
+this missing first patch mail, I'm not sure.
+> Nit-picking: please keep your mails and commit messages below 80-chars
+> per line, it's easier to read. Thanks! :-)
+I will do my best :) One of my intentions to use git send-email was
+because I thought it would automatically format patches in a way
+that reviewing them would be easier. Likely I'm too much used, should I
+say 'spoiled', by the github or gerrit review UI :)
+I will change my proposed code accordingly.
+> I did not do any review of the patches, since I have a concern about the
+> series. It happens very often that, in enterprise ecosystems, the host
+> build machines are running rather aging distro, such as RHEL 5 (or even
+> RHEL 4 in some cases), so I think we still want the new kernels to be
+> buildable (and thus configurable) on such machines (eg. for
+> cross-compilation).
+A serious concern, you're absolutly right. Let me tell you some
+background information and my concerns regarding the current
+code.
+Although the Gtk2->3 port was less effort than the Qt-flavour port,
+it is the more important one in my opinion. The current code definitly
+does not compile with gtk3 and some used libraries (e.g. libglade)
+are depreated for a while now.
+Of just a cosmetic nature: In my experience, on newer systems
+gtk2 applications additionally look somewhat outdated.
 
-> > * There are actually symbols without a name on ARM, which screws up the
-> >   kallsyms.c parser. These also seem to be veneers, but attached to some
-> >   random function:
-> 
-> Hmmm, I don't what those are.  By default, we should probably ignore those
-> too.  Maybe they have something to do with link-time relocation processing.
+Maybe it is a good idea, to have the current gtk implementation
+and the ported one side-by-side. What do you think?
 
-Definitely link-time. It only shows up after the final link, and only
-with ld.bfd not with ld.gold as I found out now.
+Regarding the Qt-flavour port, I would classify it as an almost
+complete rewrite. I'm more into C++/Qt and personally I always
+used xconfig for kconf. The current implementation is more a Qt3
+application that still compiles with Qt4 due of heavy usage of
+the deprecated Qt3support layer. For the new implementation,
+I adopted Qt4 techniques like the Qt MVC pattern
+and the Qt interface designer (similar to the kconf-Gtk solution),
+while paying attention to a Qt5 compatibilty.
+It's more likely that I introducted bugs in this kconf flavour port,
+of course. But I'd assume it's a good starting point for a discussion
+of a more future-proof and probably more easy to maintain implementation.
 
-> > $ nm obj-tmp/.tmp_vmlinux1 | head
-> > c09e8db1 t 
-> > c09e8db5 t 
-> > c09e8db9 t    # <==========
-> > c09e8dbd t 
-> > c0abfc29 t 
-> > c0008000 t $a
-> > c0f7b640 t $a
-> > 
-> > $ objdump -Dr obj-tmp/.tmp_vmlinux1 | grep -C 30 c09e8db.
-> > c0851fcc <wlc_phy_edcrs_lock>:
-> > c0851fcc:       b538            push    {r3, r4, r5, lr}
-> > c0851fce:       b500            push    {lr}
-> > c0851fd0:       f7bb d8dc       bl      c000d18c <__gnu_mcount_nc>
-> > c0851fd4:       f240 456b       movw    r5, #1131       ; 0x46b
-> > c0851fd8:       4604            mov     r4, r0
-> > c0851fda:       f880 14d5       strb.w  r1, [r0, #1237] ; 0x4d5
-> > c0851fde:       462a            mov     r2, r5
-> > c0851fe0:       f44f 710b       mov.w   r1, #556        ; 0x22c
-> > c0851fe4:       f7ff fe6d       bl      c0851cc2 <write_phy_reg>
-> > c0851fe8:       4620            mov     r0, r4
-> > c0851fea:       462a            mov     r2, r5
-> > c0851fec:       f240 212d       movw    r1, #557        ; 0x22d
-> > c0851ff0:       f7ff fe67       bl      c0851cc2 <write_phy_reg>
-> > c0851ff4:       4620            mov     r0, r4
-> > c0851ff6:       f240 212e       movw    r1, #558        ; 0x22e
-> > c0851ffa:       f44f 7270       mov.w   r2, #960        ; 0x3c0
-> > c0851ffe:       f196 fedb       bl      c09e8db8 <tpci200_free_irq+0x78>  # <===========
-> > c0852002:       4620            mov     r0, r4
-> > c0852004:       f240 212f       movw    r1, #559        ; 0x22f
-> > c0852008:       f44f 7270       mov.w   r2, #960        ; 0x3c0
-> > c085200c:       e8bd 4038       ldmia.w sp!, {r3, r4, r5, lr}
-> > c0852010:       f7ff be57       b.w     c0851cc2 <write_phy_reg>
-> > 
-> > 
-> > ... # in tpci200_free_irq:
-> > c09e8d9e:       e003            b.n     c09e8da8 <tpci200_free_irq+0x68>
-> > c09e8da0:       f06f 0415       mvn.w   r4, #21
-> > c09e8da4:       e000            b.n     c09e8da8 <tpci200_free_irq+0x68>
-> > c09e8da6:       4c01            ldr     r4, [pc, #4]    ; (c09e8dac <tpci200_free_irq+0x6c>)
-> > c09e8da8:       4620            mov     r0, r4
-> > c09e8daa:       bdf8            pop     {r3, r4, r5, r6, r7, pc}
-> > c09e8dac:       fffffe00                        ; <UNDEFINED> instruction: 0xfffffe00
-> > c09e8db0:       f4cf b814       b.w     c06b7ddc <bna_enet_sm_chld_stop_wait_entry>
-> > c09e8db4:       f53e bed8       b.w     c0727b68 <gem_do_stop>
-> > c09e8db8:       f668 bf83       b.w     c0851cc2 <write_phy_reg>           # <==========
-> > c09e8dbc:       d101            bne.n   c09e8dc2 <tpci200_free_irq+0x82>
-> > c09e8dbe:       f435 b920       b.w     c061e002 <twl_reset_sequence+0x34c>
-> > 
-> > It makes no sense to me at all that a function in one driver can just call
-> > write_phy_reg a couple of times, but need a veneer in the middle, and put
-> > that veneer in a totally unrelated function in another driver!
-> 
-> I think that if ld inserts a veneer for a function anywhere, branches
-> from any object in the link to that target symbol can reuse the same
-> veneer as a trampoline, effectively appearing to branch through an
-> unrelated location to reach the destination.
+Your concern about those aging distros certainly applies to this ported 
+kconf
+flavour, too. So I'm not sure how to proceed. Options, I can thing of
+are:
 
-That part makes sense, but it doesn't explain why ld would do that just
-for the third out of four identical function calls in the example above.
+* Remove the Qt3/4-flavour and use the new Qt4/5 one, keep the Gtk2-flavour
+for aging distros.
+* Keep both Qt-flavour implementations (maybe with make targets like
+xconfig and qconfig).
+* Don't change the Qt3/4-flavour and do not introduce this proposed 
+Qt-flavour.
 
-> ld inserts veneers between individual input sections, but I don't
-> think they have to go next to the same section the branch originates
-> from.  In the above code, it looks like that series of unconditional
-> branches after the end of tpci200_free_irq might be a common veneer pool
-> for many different destinations.
+I would prepare a v2 patch series consisting of three patches only:
+1) Directory structure. For each kconf ui flavour a separate one.
+2) gtk3-flavour as side-by-side solution to the existing gtk2 one.
+3) Qt4/5-flavour as side-by-side solution to the existing Qt3/4 one.
+Far less intrusive :)
+>> Those newer graphical kconfig flavours will be used by a project I'm involved in so
+>> I will maintain it for the next couple of months.
+> Could you please explain what this project of yours is about?
+* A configurable firmware for atmega processors (we are using the menuconfig
+kconf interface only) [github: ethersex].
+* CiAO: Highly configurable aspect oriented research operating-system. 
+Configuration
+is realised by kconf. We are using the Qt interface mainly.
+* And two other configurable operating systems, that are used for teaching.
 
-Yes, exactly. In this build I had six of these nameless symbols, and five
-of them were in this one function.
+I guess there are way more projects using the famous kconf and users who 
+like to use
+the graphical interface flavours :)
+> PS. Sorry for not answering earlier, I had connection issues yesterday,
+>      during all the evening & night. :-(
+> YEM.
+So now it's my time to say sorry, took a few days to respond.
 
-> LTO may also make the expected compilation unit boundaries disappear
-> completely.  Anything could end up almost anywhere in that case.
-> Files could get intermingled, inlined and generally spread all over the
-> place.
-
-I'm not sure we actually want to enable that in the kernel ;-)
-
-In particular in combination with kallsyms, it would make the kallsyms
-information rather useless when we can no longer infer a function name
-from an address.
-
-> Even so, veneers shouldn't be needed in the common case where we're not
-> jumping across .rodata.
-> 
-> > 
-> > If this is a binutils bug or gcc bug, we should probably just fix it, but it
-> > might be easier to work around it by changing kallsyms.c some more.
-> 
-> I haven't found a trivial way to reproduce those nameless symbols.
-> I don't know whether they're a bug or not...
-> 
-> Making kallsyms robust against this might be a good idea anyway.
-
-Maybe we can find a binutils expert next week at Linaro connect to take a
-look at the data. I can prepare a test case.
-
-	Arnd
+David.
