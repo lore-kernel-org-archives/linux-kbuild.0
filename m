@@ -1,89 +1,91 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pb0-f41.google.com ([209.85.160.41]:62841 "EHLO
-	mail-pb0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751582Ab3GHQ6z (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 8 Jul 2013 12:58:55 -0400
+Received: from mga14.intel.com ([143.182.124.37]:45162 "EHLO mga14.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751582Ab3GHROU (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 8 Jul 2013 13:14:20 -0400
+Subject: [PATCH v3] kbuild: add generation of kernel-devel
+From: Mike Marciniszyn <mike.marciniszyn@intel.com>
+Date: Mon, 08 Jul 2013 13:14:06 -0400
+Message-ID: <20130708171406.21590.49678.stgit@phlsvslse11.ph.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <522C1DF17AF50042AD8AE87F7887BD3D0B7886DB32@exch>
-References: <alpine.DEB.2.02.1307021912180.12710@ayla.of.borg>
-	<CAErSpo41dwRCbMgYz8veHP6Mz62Z-uFJZ8NEQY6y1ULsqwiY7g@mail.gmail.com>
-	<CAMuHMdWoTMEyyph8aEu46+xHfkXRFN_qn4a987n7eo6EPRyyhw@mail.gmail.com>
-	<522C1DF17AF50042AD8AE87F7887BD3D0B7886DB32@exch>
-Date: Mon, 8 Jul 2013 18:58:54 +0200
-Message-ID: <CAMuHMdXuFUSheKrxD_8Apj0y=j91cB+0p1VCqyF1piopQ_Of5w@mail.gmail.com>
-Subject: Re: Build regressions/improvements in v3.10
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Marc Gauthier <Marc.Gauthier@tensilica.com>, Bjorn Helgaas <bhelgaas@google.com>
-Cc: Linux Kernel Development <linux-kernel@vger.kernel.org>, "linux-xtensa@linux-xtensa.org" <linux-xtensa@linux-xtensa.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: mmarek@suse.cz
+Cc: linux-kbuild@vger.kernel.org, mmarcini@yahoo.com
 
-Hi Marc,
+Change the spec file to generate a kernel-devel module
+allowing for compilation of external kernel modules.
 
-On Sat, Jul 6, 2013 at 8:07 AM, Marc Gauthier
-<Marc.Gauthier@tensilica.com> wrote:
-> Geert Uytterhoeven wrote:
->> On Tue, Jul 2, 2013 at 8:34 PM, Bjorn Helgaas
->> <bhelgaas@google.com> wrote:
->> >>   + warning: vmlinux.o(.text+0x1ad7a4): Section mismatch
->> in reference from the function pwmchip_add() to the function
->> .init.text:pcibios_fixup_bus():  => N/A
->> >>   + warning: vmlinux.o(.text+0x1b18d8): Section mismatch
->> in reference from the function pci_scan_child_bus() to the
->> function .init.text:pcibios_fixup_bus():  => N/A
+This patch requires a new minimum RPM level of 4.0.3.
 
-Bjorn: both warnings went away after your patch
-(http://permalink.gmane.org/gmane.linux.kernel.pci/23678). Thanks!
+Signed-off-by: Mike Marciniszyn <mike.marciniszyn@intel.com>
+---
+ scripts/package/mkspec |   28 ++++++++++++++++++++++++++--
+ 1 file changed, 26 insertions(+), 2 deletions(-)
 
->> > I understand the second warning, but not the first (reference from
->> > pwmchip_add() to pcibios_fixup_bus()).  I don't think pwmchip_add()
->> > calls pcibios_fixup_bus().  Is the pwmchip_chip() function name
->> > inexact, or is there some other problem here?
->>
->> Indeed, that's weird.
->>
->> This happened with xtensa-allmodconfig.
->> I compiled my own xtensa-allmodconfig kernel, and it happens
->> there, too.
->>
->> If I'm not mistaken, the hex address between parentheses should match
->> the "from" function, right?
->> After disassembly ("xtensa-linux-objdump -D vmlinux"), the addresses
->> didn't seem to match the function names at all.
->> So it may be an issue with the toolchain?
->
-> The Xtensa linker, by default, does some code shrinkage
-> (some of the "relaxations") after applying relocations,
-> causing code to move around.  This can sometimes cause
-> error/warning messages to use incorrect addresses.
-> (Not trivial to fix in the linker.)
->
-> There's a config option LD_NO_RELAX to disable linker
-> relaxation.  If using this option fixes the names, it
-> may be this issue.
+diff --git a/scripts/package/mkspec b/scripts/package/mkspec
+index 514aeb2..1395760 100755
+--- a/scripts/package/mkspec
++++ b/scripts/package/mkspec
+@@ -1,7 +1,7 @@
+ #!/bin/sh
+ #
+-#	Output a simple RPM spec file that uses no fancy features requiring
+-#	RPM v4. This is intended to work with any RPM distro.
++#	Output a simple RPM spec file.
++#	This version assumes a minimum of RPM 4.0.3.
+ #
+ #	The only gothic bit here is redefining install_post to avoid
+ #	stripping the symbols from files in the kernel which we want
+@@ -59,6 +59,14 @@ echo "header files define structures and constants that are needed for"
+ echo "building most standard programs and are also needed for rebuilding the"
+ echo "glibc package."
+ echo ""
++echo "%package devel"
++echo "Summary: Development package for building kernel modules to match the $__KERNELRELEASE kernel"
++echo "Group: System Environment/Kernel"
++echo "AutoReqProv: no"
++echo "%description -n kernel-devel"
++echo "This package provides kernel headers and makefiles sufficient to build modules"
++echo "against the $__KERNELRELEASE kernel package."
++echo ""
+ 
+ if ! $PREBUILT; then
+ echo "%prep"
+@@ -109,6 +117,14 @@ echo 'mv vmlinux.bz2 $RPM_BUILD_ROOT'"/boot/vmlinux-$KERNELRELEASE.bz2"
+ echo 'mv vmlinux.orig vmlinux'
+ echo "%endif"
+ 
++echo 'rm -f $RPM_BUILD_ROOT'"/lib/modules/$KERNELRELEASE/{build,source}"
++echo "mkdir -p "'$RPM_BUILD_ROOT'"/usr/src/kernels/$KERNELRELEASE"
++echo "EXCLUDES=\"$RCS_TAR_IGNORE --exclude .tmp_versions --exclude=*vmlinux* --exclude=*.o --exclude=*.ko --exclude=*.cmd --exclude=Documentation --exclude=firmware --exclude .config.old --exclude .missing-syscalls.d\""
++echo "tar "'$EXCLUDES'" -cf- . | (cd "'$RPM_BUILD_ROOT'"/usr/src/kernels/$KERNELRELEASE;tar xvf -)"
++echo 'cd $RPM_BUILD_ROOT'"/lib/modules/$KERNELRELEASE"
++echo "ln -sf /usr/src/kernels/$KERNELRELEASE build"
++echo "ln -sf /usr/src/kernels/$KERNELRELEASE source"
++
+ echo ""
+ echo "%clean"
+ echo 'rm -rf $RPM_BUILD_ROOT'
+@@ -126,6 +142,8 @@ echo "%files"
+ echo '%defattr (-, root, root)'
+ echo "%dir /lib/modules"
+ echo "/lib/modules/$KERNELRELEASE"
++echo "%exclude /lib/modules/$KERNELRELEASE/build"
++echo "%exclude /lib/modules/$KERNELRELEASE/source"
+ echo "/lib/firmware/$KERNELRELEASE"
+ echo "/boot/*"
+ echo ""
+@@ -133,3 +151,9 @@ echo "%files headers"
+ echo '%defattr (-, root, root)'
+ echo "/usr/include"
+ echo ""
++echo "%files devel"
++echo '%defattr (-, root, root)'
++echo "/usr/src/kernels/$KERNELRELEASE"
++echo "/lib/modules/$KERNELRELEASE/build"
++echo "/lib/modules/$KERNELRELEASE/source"
++echo ""
 
-This was allmodconfig, so CONFIG_LD_NO_RELAX was set.
-After disabling it, it fails with:
-
-net/built-in.o: In function `net_rx_action':
-net/core/dev.c:4194:(.text+0x11b91): dangerous relocation: call8:
-misaligned call target: (.text.unlikely+0x47)
-net/built-in.o: In function `raw_seqcount_begin':
-include/linux/seqlock.h:106:(.text+0x132be): dangerous relocation:
-call8: misaligned call target: (.text.unlikely+0x47)
-
-Similar to the defconfig on
-http://kisskb.ellerman.id.au/kisskb/buildresult/9070101/.
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
