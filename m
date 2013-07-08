@@ -1,74 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f175.google.com ([209.85.212.175]:49714 "EHLO
-	mail-wi0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752499Ab3GHRhr convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 8 Jul 2013 13:37:47 -0400
-Date: Mon, 8 Jul 2013 19:37:42 +0200
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH 13/15] kconfig/[mn]conf: make it explicit in the search
- box that a regexp is possible
-Message-ID: <20130708173742.GC3206@free.fr>
-References: <cover.1372097219.git.yann.morin.1998@free.fr>
- <a1ce636f560336ba007bfabb15b167ff31b592cf.1372097219.git.yann.morin.1998@free.fr>
- <1373282724.4298.203.camel@chaos.site>
+Received: from mga11.intel.com ([192.55.52.93]:21336 "EHLO mga11.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751283Ab3GHLzI (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 8 Jul 2013 07:55:08 -0400
+From: "Marciniszyn, Mike" <mike.marciniszyn@intel.com>
+Subject: RE: [PATCH 3/3] kbuild: add generation of kernel-devel
+Date: Mon, 8 Jul 2013 11:55:06 +0000
+Message-ID: <32E1700B9017364D9B60AED9960492BC2115DC69@FMSMSX107.amr.corp.intel.com>
+References: <20130624143658.10761.3787.stgit@phlsvslse11.ph.intel.com>
+ <20130624143833.10761.94871.stgit@phlsvslse11.ph.intel.com>
+ <51D5919B.7010208@suse.cz>
+In-Reply-To: <51D5919B.7010208@suse.cz>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8BIT
-In-Reply-To: <1373282724.4298.203.camel@chaos.site>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jean Delvare <jdelvare@suse.de>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>
+To: Michal Marek <mmarek@suse.cz>
+Cc: Doug Ledford <dledford@redhat.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "mmarcini@yahoo.com" <mmarcini@yahoo.com>
 
-Jean, All,
-
-On 2013-07-08 13:25 +0200, Jean Delvare spake thusly:
-> Le Monday 24 June 2013 à 20:11 +0200, Yann E. MORIN a écrit :
-> > From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-> > 
-> > Reported-by: Jean Delvare <jdelvare@suse.de>
-> > Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
-> > Cc: Jean Delvare <jdelvare@suse.de>
-> > Cc: Michal Marek <mmarek@suse.cz>
-> > ---
-> >  scripts/kconfig/mconf.c | 2 +-
-> >  scripts/kconfig/nconf.c | 2 +-
-> >  2 files changed, 2 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
-> > index 6ee4aae..18d3dc9 100644
-> > --- a/scripts/kconfig/mconf.c
-> > +++ b/scripts/kconfig/mconf.c
-> > @@ -401,7 +401,7 @@ static void search_conf(void)
-> >  	struct subtitle_part stpart;
-> >  
-> >  	title = str_new();
-> > -	str_printf( &title, _("Enter %s (sub)string to search for "
-> > +	str_printf( &title, _("Enter %s (sub)string or regexp to search for "
-> >  			      "(with or without \"%s\")"), CONFIG_, CONFIG_);
-> 
-> While clearer, this also makes the title span over two lines when it
-> used to fit on a single one. I would like to suggest the following:
-> 
-> 	str_printf(&title, _("Enter (sub)string or regexp to search for "
-> 			     "(with or without \"%s\")"), CONFIG_);
-> 
-> Rationale: the "(with or without CONFIG_)" makes things clear enough
-> IMHO, making the first occurrence redundant.
-
-OK, I'll send another patch with the text updated with your suggestion.
-
-Thank you! :-)
-
-Regards,
-Yann E. MORIN.
-
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+PiBGb3IgY29uc2lzdGVuY3kgYW5kIGNvbXBhdGliaWxpdHkgd2l0aCBvbGRlciB0YXIgdmVyc2lv
+bnMsIHBsZWFzZSB1c2UNCj4gJFJDU19UQVJfRVhDTFVERSBpbnN0ZWFkIG9mIC0tZXhjbHVkZS12
+Y3MuIEFsc28sIHlvdSBvbmx5IG5lZWQgLmNvbmZpZywNCj4gc2NyaXB0cy8sIGluY2x1ZGUvIGFu
+ZCB0aGUgTWFrZWZpbGVzIHRvIGJ1aWxkIGV4dGVybmFsIG1vZHVsZXMuIEJ1dCB0aGF0J3MgYW4N
+Cj4gb3B0aW1pemF0aW9uIHRoYXQgY2FuIGJlIGRvbmUgaW4gYSBsYXRlciBwYXRjaC4NCj4gDQoN
+CkluIHYyIG9mIHRoZSBwYXRjaC4NCg0KPiANCj4gVGhlc2Ugc3ltbGlua3Mgc2hvdWxkIGJlIHBh
+cnQgb2YgdGhlIFJQTSBwYXlsb2FkLg0KPiANCg0KVGhpcyBpcyBhbHNvIGluIHYyIG9mIHRoZSBz
+YW1lIHBhdGNoLiAgVGhlICVwb3N0IGFuZCAlcG9zdHVuIHNjcmlwdGxldHMgYXJlIG5vIGxvbmdl
+ciB0aGVyZS4NCg0KVGhlc2UgaXMgb25lIG1pbm9yIG9kZGl0eSBpbiB0aGF0IHRoZSBzeW1saW5r
+cyBhcmUgaW4gdGhlIG1haW4gcGFja2FnZSBiZWNhdXNlIG9mIHRoYXQgcGFja2FnZXMgZmlsZSBz
+ZWxlY3Rpb24uICAgVGhvc2Ugc3ltbGlua3Mgd2lsbCBkYW5nbGUgdW50aWwgdGhlIGRldmVsIHBh
+Y2thZ2UgaXMgaW5zdGFsbGVkLg0KDQpJdCBtaWdodCBiZSBwb3NzaWJsZSB0byBhZGp1c3QgdGhl
+IGZpbGUgbGlzdHMgb2YgYm90aCwgYnV0IEkgd2FzIHdhcnkgb2YgY3JlYXRpbmcgYSBtb3JlIGV4
+cGxpY2l0IGxpc3QgaW4gdGhlIG1haW4gcGFja2FnZSBiZWNhdXNlIG9mIGEgcG90ZW50aWFsIG1h
+aW50ZW5hbmNlIGlzc3VlIGFzICJpbnN0YWxsIiBwYXlsb2FkIGNoYW5nZXMuDQoNCk1pa2UNCg==
