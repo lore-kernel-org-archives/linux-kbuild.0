@@ -1,256 +1,151 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f180.google.com ([209.85.212.180]:38501 "EHLO
-	mail-wi0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752158Ab3GHRfl convert rfc822-to-8bit (ORCPT
+Received: from fw-tnat.cambridge.arm.com ([217.140.96.21]:53128 "EHLO
+	cam-smtp0.cambridge.arm.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1751045Ab3GHKAV (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 8 Jul 2013 13:35:41 -0400
-Date: Mon, 8 Jul 2013 19:35:35 +0200
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH 12/15] kconfig: sort found symbols by relevance
-Message-ID: <20130708173535.GB3206@free.fr>
-References: <cover.1372097219.git.yann.morin.1998@free.fr>
- <193b40aeb537b59eaa36e3dfaabedc2025332ebf.1372097219.git.yann.morin.1998@free.fr>
- <1373282357.4298.198.camel@chaos.site>
+	Mon, 8 Jul 2013 06:00:21 -0400
+Date: Mon, 8 Jul 2013 10:59:40 +0100
+From: Dave P Martin <Dave.Martin@arm.com>
+Subject: Re: scripts/kallsyms: Avoid ARM veneer symbols
+Message-ID: <20130708095940.GB2906@localhost.localdomain>
+References: <2983817.Xe2505Drlj@wuerfel>
+ <201307051842.44721.arnd@arndb.de>
+ <20130705172659.GJ2932@localhost.localdomain>
+ <201307060134.56933.arnd@arndb.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8BIT
-In-Reply-To: <1373282357.4298.198.camel@chaos.site>
+In-Reply-To: <201307060134.56933.arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jean Delvare <jdelvare@suse.de>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Roland Eggner <edvx1@systemanalysen.net>, Wang YanQing <udknight@gmail.com>
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Michal Marek <mmarek@suse.cz>, Dave Martin <dave.martin@linaro.org>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 
-Jean, All,
-
-On 2013-07-08 13:19 +0200, Jean Delvare spake thusly:
-> Le Monday 24 June 2013 à 20:11 +0200, Yann E. MORIN a écrit :
-> > From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-[--SNIP--]
-> > Since the search can be a regexp, it is possible that more than one symbol
-> > matches exactly. In this case, we can't decide which to sort first, so we
-> > fallback to alphabeticall sort.
+On Sat, Jul 06, 2013 at 01:34:56AM +0200, Arnd Bergmann wrote:
+> On Friday 05 July 2013, Dave P Martin wrote:
+> > On Fri, Jul 05, 2013 at 05:42:44PM +0100, Arnd Bergmann wrote:
+> > > On Friday 05 July 2013, Dave P Martin wrote:
+> > > > On Wed, Jul 03, 2013 at 06:03:04PM +0200, Arnd Bergmann wrote:
+> > 
+> > I think there are a small number of patterns to check for.
+> > 
+> > __*_veneer, __*_from_arm and __*_from_thumb should cover most cases.
 > 
-> Typo: alphabetical.
-
-OK.
-
-> > Explain this (new!) sorting heuristic in the documentation.
+> Ok.
 > 
-> It's more of a rule than a heuristic.
-
-OK.
-
-> > Reported-by: Jean Delvare <jdelvare@suse.de>
-> > Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
-> > Cc: Jean Delvare <jdelvare@suse.de>
-> > Cc: Michal Marek <mmarek@suse.cz>
-> > Cc: Roland Eggner <edvx1@systemanalysen.net>
-> > Cc: Wang YanQing <udknight@gmail.com>
+> > > * There are actually symbols without a name on ARM, which screws up the
+> > >   kallsyms.c parser. These also seem to be veneers, but attached to some
+> > >   random function:
+> > 
+> > Hmmm, I don't what those are.  By default, we should probably ignore those
+> > too.  Maybe they have something to do with link-time relocation processing.
 > 
-> I tested it and it works fine, thanks!
+> Definitely link-time. It only shows up after the final link, and only
+> with ld.bfd not with ld.gold as I found out now.
 > 
-> Tested-by: Jean Delvare <jdelvare@suse.de>
+> > > $ nm obj-tmp/.tmp_vmlinux1 | head
+> > > c09e8db1 t 
+> > > c09e8db5 t 
+> > > c09e8db9 t    # <==========
+> > > c09e8dbd t 
+> > > c0abfc29 t 
+> > > c0008000 t $a
+> > > c0f7b640 t $a
+> > > 
+> > > $ objdump -Dr obj-tmp/.tmp_vmlinux1 | grep -C 30 c09e8db.
+> > > c0851fcc <wlc_phy_edcrs_lock>:
+> > > c0851fcc:       b538            push    {r3, r4, r5, lr}
+> > > c0851fce:       b500            push    {lr}
+> > > c0851fd0:       f7bb d8dc       bl      c000d18c <__gnu_mcount_nc>
+> > > c0851fd4:       f240 456b       movw    r5, #1131       ; 0x46b
+> > > c0851fd8:       4604            mov     r4, r0
+> > > c0851fda:       f880 14d5       strb.w  r1, [r0, #1237] ; 0x4d5
+> > > c0851fde:       462a            mov     r2, r5
+> > > c0851fe0:       f44f 710b       mov.w   r1, #556        ; 0x22c
+> > > c0851fe4:       f7ff fe6d       bl      c0851cc2 <write_phy_reg>
+> > > c0851fe8:       4620            mov     r0, r4
+> > > c0851fea:       462a            mov     r2, r5
+> > > c0851fec:       f240 212d       movw    r1, #557        ; 0x22d
+> > > c0851ff0:       f7ff fe67       bl      c0851cc2 <write_phy_reg>
+> > > c0851ff4:       4620            mov     r0, r4
+> > > c0851ff6:       f240 212e       movw    r1, #558        ; 0x22e
+> > > c0851ffa:       f44f 7270       mov.w   r2, #960        ; 0x3c0
+> > > c0851ffe:       f196 fedb       bl      c09e8db8 <tpci200_free_irq+0x78>  # <===========
+> > > c0852002:       4620            mov     r0, r4
+> > > c0852004:       f240 212f       movw    r1, #559        ; 0x22f
+> > > c0852008:       f44f 7270       mov.w   r2, #960        ; 0x3c0
+> > > c085200c:       e8bd 4038       ldmia.w sp!, {r3, r4, r5, lr}
+> > > c0852010:       f7ff be57       b.w     c0851cc2 <write_phy_reg>
+> > > 
+> > > 
+> > > ... # in tpci200_free_irq:
+> > > c09e8d9e:       e003            b.n     c09e8da8 <tpci200_free_irq+0x68>
+> > > c09e8da0:       f06f 0415       mvn.w   r4, #21
+> > > c09e8da4:       e000            b.n     c09e8da8 <tpci200_free_irq+0x68>
+> > > c09e8da6:       4c01            ldr     r4, [pc, #4]    ; (c09e8dac <tpci200_free_irq+0x6c>)
+> > > c09e8da8:       4620            mov     r0, r4
+> > > c09e8daa:       bdf8            pop     {r3, r4, r5, r6, r7, pc}
+> > > c09e8dac:       fffffe00                        ; <UNDEFINED> instruction: 0xfffffe00
+> > > c09e8db0:       f4cf b814       b.w     c06b7ddc <bna_enet_sm_chld_stop_wait_entry>
+> > > c09e8db4:       f53e bed8       b.w     c0727b68 <gem_do_stop>
+> > > c09e8db8:       f668 bf83       b.w     c0851cc2 <write_phy_reg>           # <==========
+> > > c09e8dbc:       d101            bne.n   c09e8dc2 <tpci200_free_irq+0x82>
+> > > c09e8dbe:       f435 b920       b.w     c061e002 <twl_reset_sequence+0x34c>
+> > > 
+> > > It makes no sense to me at all that a function in one driver can just call
+> > > write_phy_reg a couple of times, but need a veneer in the middle, and put
+> > > that veneer in a totally unrelated function in another driver!
+> > 
+> > I think that if ld inserts a veneer for a function anywhere, branches
+> > from any object in the link to that target symbol can reuse the same
+> > veneer as a trampoline, effectively appearing to branch through an
+> > unrelated location to reach the destination.
 > 
-> Now comes my late review. Overall I like the idea and the code but a few
-> things could be improved:
-
-Since this is already in Michal's tree, on should I proceed?
-  - send an updated patch that replaces that one, or
-  - send another additional patch with your proposed changes?
-
-> > +	When searching, symbols are sorted thus:
-> > +	  - exact match first: an exact match is when the search matches
-> > +	    the complete symbol name;
+> That part makes sense, but it doesn't explain why ld would do that just
+> for the third out of four identical function calls in the example above.
 > 
-> The use of singular seems to imply there can be only one, while there
-> could be several as you explained above.
-
-OK.
-
-> > +	  - alphabetical order: when two symbols do not match exactly,
-> > +	    they are sorted in alphabetical order (in the user's current
-> > +	    locale).
+> > ld inserts veneers between individual input sections, but I don't
+> > think they have to go next to the same section the branch originates
+> > from.  In the above code, it looks like that series of unconditional
+> > branches after the end of tpci200_free_irq might be a common veneer pool
+> > for many different destinations.
 > 
-> I think it would be better explained that way:
+> Yes, exactly. In this build I had six of these nameless symbols, and five
+> of them were in this one function.
 > 
-> 	 - first, exact matches, sorted alphabetically (an exact match
-> 	   is when the search matches the complete symbol name);
-> 	 - then, other matches, sorted alphabetically.
-
-OK.
-
-> This is more concise and easier to grasp, methinks. I don't think the
-> reference to the user's locale is needed, as there's no surprise here,
-> and it probably doesn't matter anyway for kernel symbols.
-
-Yes it may matter even for kernel symbols, since some locales may
-consider '_' as a character to sort by, while other locales may not.
-
-> BTW I was wondering if it would add value to explicitly print group
-> header labels "Exact matches" and "Other matches" in the search results.
-> What do you think?
-
-It is not trivial to do, since the search function only returns a single
-array, so there's no way for frontends (which do the display) to
-differentiate which part of the array are exact matches, and which are
-only partial matches.
-
-It is much more involved, and I don't think it would be easy to
-implement.
-
-> >  ______________________________________________________________________
-> >  User interface options for 'menuconfig'
-> >  
-> > diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
-> > index ab8f4c8..387d554 100644
-> > --- a/scripts/kconfig/symbol.c
-> > +++ b/scripts/kconfig/symbol.c
-> > @@ -954,38 +954,98 @@ const char *sym_escape_string_value(const char *in)
-> >  	return res;
-> >  }
-> >  
-> > +struct sym_match {
-> > +	struct symbol	*sym;
-> > +	off_t		so, eo;
-> > +};
-> > +
-> > +/* Compare matched symbols as thus:
-> > + * - first, symbols that match exactly
-> > + * - then, alphabetical sort
-> > + */
-> > +static int sym_rel_comp( const void *sym1, const void *sym2 )
+> > LTO may also make the expected compilation unit boundaries disappear
+> > completely.  Anything could end up almost anywhere in that case.
+> > Files could get intermingled, inlined and generally spread all over the
+> > place.
 > 
-> Coding style says no space after/before parentheses.
-
-OK.
-
-> > +{
-> > +	struct sym_match *s1 = *(struct sym_match **)sym1;
-> > +	struct sym_match *s2 = *(struct sym_match **)sym2;
+> I'm not sure we actually want to enable that in the kernel ;-)
 > 
-> You shouldn't need these casts.
+> In particular in combination with kallsyms, it would make the kallsyms
+> information rather useless when we can no longer infer a function name
+> from an address.
 
-Probably not, indeed, but I like to write (and read) what I expect to
-happen, and pointer arithmetics is always something I dread to foobar.
+Well, indeed.  But that's a separate discussion -- I don't think we want
+to block it needlessly just due to an obscure feature of the ARM toolchain.
 
-OK.
+Ignoring veneers and nameless symbols in kallsyms sounds like a reasonable
+approach for now, even if it's not a perfect.
 
-> > +	int l1, l2;
-> > +
-> > +	/* Exact match:
-> > +	 * - if matched length on symbol s1 is the length of that symbol,
-> > +	 *   then this symbol should come first;
-> > +	 * - if matched length on symbol s2 is the length of that symbol,
-> > +	 *   then this symbol should come first.
-> > +	 * Note: since the search can be a regexp, both symbols may match
-> > +	 * exactly; if this is the case, we can't decide which comes first,
-> > +	 * and we fallback to sorting alphabetically.
-> > +	 */
-> > +	l1 = s1->eo - s1->so;
-> > +	l2 = s2->eo - s2->so;
-> > +	if (l1 == strlen(s1->sym->name) && l2 != strlen(s2->sym->name))
-> > +		return -1;
-> > +	if (l1 != strlen(s1->sym->name) && l2 == strlen(s2->sym->name))
-> > +		return 1;
+> > Even so, veneers shouldn't be needed in the common case where we're not
+> > jumping across .rodata.
+> > 
+> > > 
+> > > If this is a binutils bug or gcc bug, we should probably just fix it, but it
+> > > might be easier to work around it by changing kallsyms.c some more.
+> > 
+> > I haven't found a trivial way to reproduce those nameless symbols.
+> > I don't know whether they're a bug or not...
+> > 
+> > Making kallsyms robust against this might be a good idea anyway.
 > 
-> Strlen is expensive so I would avoid calling it twice on the same symbol
-> name. You could store the result, together with the result of the
-> comparison, while you're at it. Something like:
-> 
-> 	int exact1, exact2;
-> 
-> 	exact1 = l1 == strlen(s1->sym->name);
-> 	exact2 = l2 == strlen(s2->sym->name);
-> 	if (exact1 && !exact2)
-> 		return -1;
-> 	if (!exact1 && exact2)
-> 		return 1;
-> 
-> You may even no longer need to introduce l1 and l2 as you would use them
-> only once.
+> Maybe we can find a binutils expert next week at Linaro connect to take a
+> look at the data. I can prepare a test case.
 
-OK.
+Sure, that could be worth a try.
 
-> It might be even faster to store the symbol length in struct sym_match,
-> but this would increase the structure size and consequently memory
-> consumption, and it is questionable if the speed gain is worth it.
-> Probably not.
-
-I intended this structure to only hold the result of the regexp match,
-and nothing more. The symbol length does not belong there, IMHO.
-Besides, it's easy to get back, since the symbol struct is available.
-
-OTOH, we would gain by computing strlen at regexp match, instead of
-every time in the sorting function.
-
-But that's micro-optimisation, methinks. Searching for the example
-^ATH.K took less than me focusing from the RETURN key to the screen. ;-)
- 
-[--SNIP--]
-> >  	for_all_symbols(i, sym) {
-> > +		struct sym_match *tmp_sym_match;
-> >  		if (sym->flags & SYMBOL_CONST || !sym->name)
-> >  			continue;
-> > -		if (regexec(&re, sym->name, 0, NULL, 0))
-> > +		if (regexec(&re, sym->name, 1, match, 0))
-> >  			continue;
-> >  		if (cnt + 1 >= size) {
-> 
-> I think the "+ 1" can be dropped because the new array is not
-> NULL-terminated.
-
-I'll look into that.
-
-> > -			void *tmp = sym_arr;
-> > +			void *tmp;
-> >  			size += 16;
-> > -			sym_arr = realloc(sym_arr, size * sizeof(struct symbol *));
-> > -			if (!sym_arr) {
-> > -				free(tmp);
-> > -				return NULL;
-> > +			tmp = realloc(sym_match_arr, size * sizeof(struct sym_match *));
-> > +			if (!tmp) {
-> > +				goto sym_re_search_free;
-> >  			}
-> 
-> Unnecessary curly braces (as reported by checkpatch.) Checkpatch reports
-> a few other issues BTW, you should run it and fix them.
-
-My fault, as I always use curly braces, even around single statements,
-in many other projects. ( /me believes this kernel coding style is bad,
-but will abide by the rules! ;-) ).
-
-OK.
-
-> > +			sym_match_arr = tmp;
-> >  		}
-> >  		sym_calc_value(sym);
-> > -		sym_arr[cnt++] = sym;
-> > +		tmp_sym_match = (struct sym_match*)malloc(sizeof(struct sym_match));
-> 
-> Cast not needed.
-
-OK.
-
-> In fact I don't think this allocation is needed in the first place.
-> Calling malloc for every match is rather costly. If you would have
-> allocated an array of struct sym_match (rather than only pointers
-> thereto) before, you would not need this per-symbol malloc. Struct
-> sym_match is small enough to not warrant an extra level of allocation
-> and indirection IMHO.
-
-OK, will look into that.
-
-Thank you for the review! :-)
-
-Regards,
-Yann E. MORIN.
-
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+Cheers
+---Dave
