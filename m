@@ -1,41 +1,80 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:18140 "EHLO mx1.redhat.com"
+Received: from cantor2.suse.de ([195.135.220.15]:54499 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751468Ab3GHNcQ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 8 Jul 2013 09:32:16 -0400
-Message-ID: <51DABF5C.3080502@redhat.com>
-Date: Mon, 08 Jul 2013 09:32:12 -0400
-From: Doug Ledford <dledford@redhat.com>
-MIME-Version: 1.0
-Subject: Re: [PATCH 3/3] kbuild: add generation of kernel-devel
-References: <20130624143658.10761.3787.stgit@phlsvslse11.ph.intel.com> <20130624143833.10761.94871.stgit@phlsvslse11.ph.intel.com> <51D5919B.7010208@suse.cz> <32E1700B9017364D9B60AED9960492BC2115DC69@FMSMSX107.amr.corp.intel.com> <51DAACB9.5080103@suse.cz> <32E1700B9017364D9B60AED9960492BC2115DD48@FMSMSX107.amr.corp.intel.com>
-In-Reply-To: <32E1700B9017364D9B60AED9960492BC2115DD48@FMSMSX107.amr.corp.intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+	id S1751213Ab3GHLZj (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 8 Jul 2013 07:25:39 -0400
+Subject: Re: [PATCH 13/15] kconfig/[mn]conf: make it explicit in the search
+ box that a regexp is possible
+From: Jean Delvare <jdelvare@suse.de>
+In-Reply-To: <a1ce636f560336ba007bfabb15b167ff31b592cf.1372097219.git.yann.morin.1998@free.fr>
+References: <cover.1372097219.git.yann.morin.1998@free.fr>
+	 <a1ce636f560336ba007bfabb15b167ff31b592cf.1372097219.git.yann.morin.1998@free.fr>
+Content-Type: text/plain; charset="UTF-8"
+Date: Mon, 08 Jul 2013 13:25:24 +0200
+Message-ID: <1373282724.4298.203.camel@chaos.site>
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Marciniszyn, Mike" <mike.marciniszyn@intel.com>
-Cc: Michal Marek <mmarek@suse.cz>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "mmarcini@yahoo.com" <mmarcini@yahoo.com>
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>
 
-On 07/08/13 09:15, Marciniszyn, Mike wrote:
+Hi Yann,
+
+Le Monday 24 June 2013 à 20:11 +0200, Yann E. MORIN a écrit :
+> From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+> 
+> Reported-by: Jean Delvare <jdelvare@suse.de>
+> Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+> Cc: Jean Delvare <jdelvare@suse.de>
+> Cc: Michal Marek <mmarek@suse.cz>
+> ---
+>  scripts/kconfig/mconf.c | 2 +-
+>  scripts/kconfig/nconf.c | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
+> index 6ee4aae..18d3dc9 100644
+> --- a/scripts/kconfig/mconf.c
+> +++ b/scripts/kconfig/mconf.c
+> @@ -401,7 +401,7 @@ static void search_conf(void)
+>  	struct subtitle_part stpart;
 >  
->> You can say '%exclude /some/path' to exclude a path that would otherwise
->> match an earlier pattern. But I do not know since when RPM supports this. If
->> there is a risk of breaking make rpm on older systems, then let's leave it as is.
-> 
-> This looks to be an RPM 4.0.3 feature.
-> 
-> 
-> I agree.
-> 
-> Mike
-> 
+>  	title = str_new();
+> -	str_printf( &title, _("Enter %s (sub)string to search for "
+> +	str_printf( &title, _("Enter %s (sub)string or regexp to search for "
+>  			      "(with or without \"%s\")"), CONFIG_, CONFIG_);
 
-rpm 4.0.3 is *ancient*.  An %exclude is perfectly acceptable and
-definitely preferable to a broken payload.
+While clearer, this also makes the title span over two lines when it
+used to fit on a single one. I would like to suggest the following:
+
+	str_printf(&title, _("Enter (sub)string or regexp to search for "
+			     "(with or without \"%s\")"), CONFIG_);
+
+Rationale: the "(with or without CONFIG_)" makes things clear enough
+IMHO, making the first occurrence redundant.
+
+But if you don't like this proposal then let's just go with yours, it's
+up to you.
+
+>  
+>  again:
+> diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
+> index 0183153..7975d8d 100644
+> --- a/scripts/kconfig/nconf.c
+> +++ b/scripts/kconfig/nconf.c
+> @@ -695,7 +695,7 @@ static void search_conf(void)
+>  	int dres;
+>  
+>  	title = str_new();
+> -	str_printf( &title, _("Enter %s (sub)string to search for "
+> +	str_printf( &title, _("Enter %s (sub)string or regexp to search for "
+>  			      "(with or without \"%s\")"), CONFIG_, CONFIG_);
+>  
+>  again:
+
 
 -- 
-Doug Ledford <dledford@redhat.com>
-              GPG KeyID: 0E572FDD
-	      http://people.redhat.com/dledford
+Jean Delvare
+Suse L3
 
