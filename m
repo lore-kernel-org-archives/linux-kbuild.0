@@ -1,84 +1,108 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f176.google.com ([209.85.212.176]:55945 "EHLO
-	mail-wi0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755141Ab3GJUif convert rfc822-to-8bit (ORCPT
+Received: from mail-wg0-f52.google.com ([74.125.82.52]:64464 "EHLO
+	mail-wg0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755118Ab3GJUqy convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 10 Jul 2013 16:38:35 -0400
-Received: by mail-wi0-f176.google.com with SMTP id ey16so11863628wid.15
-        for <linux-kbuild@vger.kernel.org>; Wed, 10 Jul 2013 13:38:33 -0700 (PDT)
-Date: Wed, 10 Jul 2013 22:38:29 +0200
+	Wed, 10 Jul 2013 16:46:54 -0400
+Date: Wed, 10 Jul 2013 22:46:48 +0200
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH] scripts/config: use sed's POSIX interface
-Message-ID: <20130710203829.GD3297@free.fr>
-References: <1373486288-715-1-git-send-email-chauplac@gmail.com>
+Subject: Re: [PATCH 12/15] kconfig: sort found symbols by relevance
+Message-ID: <20130710204648.GE3297@free.fr>
+References: <cover.1372097219.git.yann.morin.1998@free.fr>
+ <193b40aeb537b59eaa36e3dfaabedc2025332ebf.1372097219.git.yann.morin.1998@free.fr>
+ <1373282357.4298.198.camel@chaos.site>
+ <20130708173535.GB3206@free.fr>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8BIT
-In-Reply-To: <1373486288-715-1-git-send-email-chauplac@gmail.com>
+In-Reply-To: <20130708173535.GB3206@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Clement Chauplannaz <chauplac@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, mmarek@suse.cz, ak@linux.intel.com
+To: Jean Delvare <jdelvare@suse.de>, Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Roland Eggner <edvx1@systemanalysen.net>, Wang YanQing <udknight@gmail.com>
 
-Clément, All,
+Michal, All,
 
-On 2013-07-10 21:58 +0200, Clement Chauplannaz spake thusly:
-> Script `config' relies on extensions of `GNU sed', and is thus not
-> working on all Unixes:
-> - in-place edition of files (-i), which can be replaced with
-> a temporary file;
-> - extended-regexps (-r), which can be split into basic regexps;
-> - single-line calls to `a' command, while some implementations
-> require a leading newline before the parameter.
+On 2013-07-08 19:35 +0200, Yann E. MORIN spake thusly:
+> On 2013-07-08 13:19 +0200, Jean Delvare spake thusly:
+> > Le Monday 24 June 2013 à 20:11 +0200, Yann E. MORIN a écrit :
+> > > From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+> [--SNIP--]
+> > > Since the search can be a regexp, it is possible that more than one symbol
+> > > matches exactly. In this case, we can't decide which to sort first, so we
+> > > fallback to alphabeticall sort.
+[--SNIP--]
+> > > Reported-by: Jean Delvare <jdelvare@suse.de>
+> > > Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+> > > Cc: Jean Delvare <jdelvare@suse.de>
+> > > Cc: Michal Marek <mmarek@suse.cz>
+> > > Cc: Roland Eggner <edvx1@systemanalysen.net>
+> > > Cc: Wang YanQing <udknight@gmail.com>
+> > 
+> > I tested it and it works fine, thanks!
+> > 
+> > Tested-by: Jean Delvare <jdelvare@suse.de>
+> > 
+> > Now comes my late review. Overall I like the idea and the code but a few
+> > things could be improved:
 > 
-> Rewrite calls to `sed' program to comply with POSIX interface.
+> Since this is already in Michal's tree, on should I proceed?
+>   - send an updated patch that replaces that one, or
+>   - send another additional patch with your proposed changes?
 
-Clément, sorry I did not come back to you earlier after your second PM.
-Here is further review:
+OK, since Michal already sent his pull-request to Linus, I'll prepare a
+corrective patch I'll submit before the end of the week. Is that OK with
+you, Michal?
 
-> Signed-off-by: Clement Chauplannaz <chauplac@gmail.com>
-> ---
->  scripts/config | 12 +++++++++---
->  1 file changed, 9 insertions(+), 3 deletions(-)
+[--SNIP--]
+> > > +static int sym_rel_comp( const void *sym1, const void *sym2 )
+> > > +{
+> > > +	struct sym_match *s1 = *(struct sym_match **)sym1;
+> > > +	struct sym_match *s2 = *(struct sym_match **)sym2;
+> > 
+> > You shouldn't need these casts.
 > 
-> diff --git a/scripts/config b/scripts/config
-> index a65ecbb..3fd95eb 100755
-> --- a/scripts/config
-> +++ b/scripts/config
-> @@ -66,9 +66,14 @@ set_var() {
->  	name_re="^($name=|# $name is not set)"
->  	before_re="^($before=|# $before is not set)"
->  	if test -n "$before" && grep -Eq "$before_re" "$FN"; then
-> -		sed -ri "/$before_re/a $new" "$FN"
-> +		lf=$'\n'
+> Probably not, indeed, but I like to write (and read) what I expect to
+> happen, and pointer arithmetics is always something I dread to foobar.
 
-As you explained me earlier, you expect this to actually set the '\n'
-symbol (0x0a) as first char of variable 'lf'. This is a bashism, and is
-not POSIX. Here is a test script:
+In fact, we need the cast, otherwise gcc whines about const/non-const.
 
-    #!/bin/dash
-    lf=$'\n'
-    printf "lf='%s'\n" "${lf}"
-    printf "lf='${lf}'\n"
+[--SNIP--]
+> > >  	for_all_symbols(i, sym) {
+> > > +		struct sym_match *tmp_sym_match;
+> > >  		if (sym->flags & SYMBOL_CONST || !sym->name)
+> > >  			continue;
+> > > -		if (regexec(&re, sym->name, 0, NULL, 0))
+> > > +		if (regexec(&re, sym->name, 1, match, 0))
+> > >  			continue;
+> > >  		if (cnt + 1 >= size) {
+> > 
+> > I think the "+ 1" can be dropped because the new array is not
+> > NULL-terminated.
 
-And the output:
-    lf='$\n'
-    lf='$
-    '
+Indeed.
 
-Now, if you use #!/bin/bash, it works as you expect, but not with a
-POSIX-only script like dash.
+> > > +			sym_match_arr = tmp;
+> > >  		}
+> > >  		sym_calc_value(sym);
+> > > -		sym_arr[cnt++] = sym;
+> > > +		tmp_sym_match = (struct sym_match*)malloc(sizeof(struct sym_match));
+> > 
+> > Cast not needed.
+> 
+> OK.
+> 
+> > In fact I don't think this allocation is needed in the first place.
+> > Calling malloc for every match is rather costly. If you would have
+> > allocated an array of struct sym_match (rather than only pointers
+> > thereto) before, you would not need this per-symbol malloc. Struct
+> > sym_match is small enough to not warrant an extra level of allocation
+> > and indirection IMHO.
 
-A reliable way to get a single '\n' would be:
+Indeed, it makes for cleaner code.
 
-    lf="$( printf '\n' )"
-
-Yes, config is already a bash script, but no need to add bashisms when
-they can be avoided. And since this patch is about POSIX compliance in
-the first place... ;-)
-
-Otherwise, LGTM.
+Thank you again! :-)
 
 Regards,
 Yann E. MORIN.
