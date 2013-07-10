@@ -1,38 +1,35 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ip-78-102-49-28.net.upcbroadband.cz ([78.102.49.28]:62051 "EHLO
+Received: from ip-78-102-49-28.net.upcbroadband.cz ([78.102.49.28]:64953 "EHLO
 	emu.suse.cz" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1754442Ab3GJNzM (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 10 Jul 2013 09:55:12 -0400
-Date: Wed, 10 Jul 2013 15:37:42 +0200
+	id S1754046Ab3GJOIh (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 10 Jul 2013 10:08:37 -0400
+Date: Wed, 10 Jul 2013 16:08:30 +0200
 From: Michal Marek <mmarek@suse.cz>
-Subject: [GIT] kbuild changes for v3.11-rc1
-Message-ID: <20130710133742.GA29368@emu.suse.cz>
+Subject: [GIT] coccinelle updates for v3.11-rc1
+Message-ID: <20130710140830.GA32360@emu.suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: JBeulich@suse.com, dt.tangr@gmail.com, geert@linux-m68k.org, james.hogan@imgtec.com, lists@nerdbynature.de, mike.marciniszyn@intel.com, nicolas.dichtel@6wind.com, robert.richter@calxeda.com, yselkowitz@users.sourceforge.net, zzs0213@gmail.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Julia.Lawall@lip6.fr, keescook@chromium.org, nicolas.palix@imag.fr, strnape1@fel.cvut.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hi Linus,
 
-please pull the kbuild bits for v3.11-rc1:
+the misc branch is reserved for Coccinelle this time:
 
-- fix for make headers_install argv explosion with too long path
-- scripts/setlocalversion does not call git update-index needlessly
-- fix for the src.rpm produced by make rpm-pkg. The new make image_name
-  can be useful also for other packaging tools.
-- scripts/mod/devicetable-offsets.o is not rebuilt during each make run
-- make modules_install dependency fix
-- scripts/sortextable portability fix
-- fix for kbuild to generate the output directory for all object files
-  in subdirs.
-- a couple of minor fixes
+- 'report' is the default mode
+- MAINTAINERS update for Coccinelle
+- documentation udate
+- use new option format for spatch(1)
+- J=<n> variable to mimic make -j for coccicheck
+- check for missing pci_free_consistent() calls
+
+There are some patches for rpm-pkg and deb-pkg waiting for the 3.12-rc1
+merge window.
 
 Michal
-
 
 The following changes since commit f722406faae2d073cc1d01063d1123c35425939e:
 
@@ -40,51 +37,67 @@ The following changes since commit f722406faae2d073cc1d01063d1123c35425939e:
 
 are available in the git repository at:
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git kbuild
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git misc
 
-for you to fetch changes up to 4d47dde47f7dd95042fa56283d948f50dd4b509c:
+for you to fetch changes up to ec97946ed038f4b3faa587bc76152b198805b0c4:
 
-  kbuild: create directory for dir/file.o (2013-07-03 22:47:08 +0200)
+  Coccinelle: Update information about the minimal version required (2013-07-03 22:58:20 +0200)
 
 ----------------------------------------------------------------
-Christian Kujau (1):
-      scripts/setlocalversion on write-protected source tree
+Julia Lawall (1):
+      scripts/coccinelle: check for field address argument to kfree
 
-Daniel Tang (1):
-      Fix a build warning in scripts/mod/file2alias.c
+Kees Cook (1):
+      coccicheck: span checks across CPUs
 
-Geert Uytterhoeven (1):
-      scripts/mod: Spelling s/DEVICEVTABLE/DEVICETABLE/
+Nicolas Palix (6):
+      Coccinelle: Make 'report' the default mode
+      Coccinelle: Update the Coccinelle section of MAINTAINERS
+      Coccinelle: Update section of MAINTAINERS
+      Coccinelle: Update the documentation
+      Coccinelle: Update the options used to the new option scheme
+      Coccinelle: Update information about the minimal version required
 
-James Hogan (1):
-      Makefile.lib: align DTB quiet_cmd
+strnape1@fel.cvut.cz (1):
+      scripts: Coccinelle script for pci_free_consistent()
 
-Jan Beulich (1):
-      improve modalias building
-
-Mike Marciniszyn (1):
-      kbuild: fix error when building from src rpm
-
-Nicolas Dichtel (1):
-      kbuild: fix make headers_install when path is too long
-
-Robert Richter (1):
-      Makefile: Fix install error with make -j option
-
-Yaakov Selkowitz (1):
-      tools/include: use stdint types for user-space byteshift headers
-
-张忠山 (1):
-      kbuild: create directory for dir/file.o
-
- Makefile                           |  8 ++++++--
- scripts/Makefile.headersinst       | 20 ++++++++++++++------
- scripts/Makefile.lib               |  4 ++--
- scripts/headers_install.sh         |  7 +++++--
- scripts/mod/Makefile               | 15 +++++----------
- scripts/mod/file2alias.c           | 10 ++++++----
- scripts/package/mkspec             |  1 +
- scripts/setlocalversion            |  3 ---
- tools/include/tools/be_byteshift.h | 34 +++++++++++++++++-----------------
- tools/include/tools/le_byteshift.h | 34 +++++++++++++++++-----------------
- 10 files changed, 73 insertions(+), 63 deletions(-)
+ Documentation/coccinelle.txt                       | 63 +++++++++++-------
+ MAINTAINERS                                        |  3 +
+ scripts/coccicheck                                 | 76 ++++++++++++++++------
+ .../coccinelle/api/alloc/drop_kmalloc_cast.cocci   |  2 +-
+ scripts/coccinelle/api/alloc/kzalloc-simple.cocci  |  2 +-
+ scripts/coccinelle/api/d_find_alias.cocci          |  2 +-
+ .../coccinelle/api/devm_request_and_ioremap.cocci  |  2 +-
+ scripts/coccinelle/api/kstrdup.cocci               |  2 +-
+ scripts/coccinelle/api/memdup.cocci                |  2 +-
+ scripts/coccinelle/api/memdup_user.cocci           |  2 +-
+ scripts/coccinelle/api/ptr_ret.cocci               |  2 +-
+ scripts/coccinelle/api/simple_open.cocci           |  2 +-
+ scripts/coccinelle/free/devm_free.cocci            |  2 +-
+ scripts/coccinelle/free/kfree.cocci                |  2 +-
+ scripts/coccinelle/free/kfreeaddr.cocci            | 32 +++++++++
+ scripts/coccinelle/free/pci_free_consistent.cocci  | 52 +++++++++++++++
+ scripts/coccinelle/iterators/fen.cocci             |  2 +-
+ scripts/coccinelle/iterators/itnull.cocci          |  2 +-
+ .../coccinelle/iterators/list_entry_update.cocci   |  2 +-
+ scripts/coccinelle/iterators/use_after_iter.cocci  |  2 +-
+ scripts/coccinelle/locks/call_kern.cocci           |  2 +-
+ scripts/coccinelle/locks/double_lock.cocci         |  2 +-
+ scripts/coccinelle/locks/flags.cocci               |  2 +-
+ scripts/coccinelle/locks/mini_lock.cocci           |  2 +-
+ scripts/coccinelle/misc/boolinit.cocci             |  2 +-
+ scripts/coccinelle/misc/cstptr.cocci               |  2 +-
+ scripts/coccinelle/misc/doubleinit.cocci           |  2 +-
+ scripts/coccinelle/misc/ifaddr.cocci               |  2 +-
+ scripts/coccinelle/misc/ifcol.cocci                |  2 +-
+ scripts/coccinelle/misc/noderef.cocci              |  2 +-
+ scripts/coccinelle/misc/orplus.cocci               |  2 +-
+ scripts/coccinelle/misc/warn.cocci                 |  2 +-
+ scripts/coccinelle/null/eno.cocci                  |  2 +-
+ scripts/coccinelle/null/kmerr.cocci                |  2 +-
+ scripts/coccinelle/tests/doublebitand.cocci        |  2 +-
+ scripts/coccinelle/tests/doubletest.cocci          |  2 +-
+ scripts/coccinelle/tests/odd_ptr_err.cocci         |  2 +-
+ 37 files changed, 215 insertions(+), 75 deletions(-)
+ create mode 100644 scripts/coccinelle/free/kfreeaddr.cocci
+ create mode 100644 scripts/coccinelle/free/pci_free_consistent.cocci
