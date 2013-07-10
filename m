@@ -1,66 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f49.google.com ([74.125.82.49]:58102 "EHLO
-	mail-wg0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754051Ab3GJT6V (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 10 Jul 2013 15:58:21 -0400
-Received: by mail-wg0-f49.google.com with SMTP id a12so6196567wgh.4
-        for <linux-kbuild@vger.kernel.org>; Wed, 10 Jul 2013 12:58:20 -0700 (PDT)
-From: Clement Chauplannaz <chauplac@gmail.com>
-Subject: [PATCH] scripts/config: use sed's POSIX interface
-Date: Wed, 10 Jul 2013 21:58:08 +0200
-Message-Id: <1373486288-715-1-git-send-email-chauplac@gmail.com>
+Received: from mail.skyhub.de ([78.46.96.112]:52197 "EHLO mail.skyhub.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754051Ab3GJUB4 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 10 Jul 2013 16:01:56 -0400
+Date: Wed, 10 Jul 2013 22:01:39 +0200
+From: Borislav Petkov <bp@alien8.de>
+Subject: Re: [PATCH -next 2/2] kbuild: fix for updated LZ4 tool with the new
+ streaming format
+Message-ID: <20130710200139.GC9140@pd.tnic>
+References: <1367829775-4434-1-git-send-email-kyungsik.lee@lge.com>
+ <1367829775-4434-2-git-send-email-kyungsik.lee@lge.com>
+ <20130506095124.GA22041@pd.tnic>
+ <CAMuHMdWH9w5fj6HRXi+9QcBJym4dukAFsPVGZVqSSk3yTZJUcA@mail.gmail.com>
+ <20130710093642.GC14873@pd.tnic>
+ <20130710182815.GA362@x4>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20130710182815.GA362@x4>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: mmarek@suse.cz, ak@linux.intel.com, yann.morin.1998@free.fr
+To: Markus Trippelsdorf <markus@trippelsdorf.de>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>, Kyungsik Lee <kyungsik.lee@lge.com>, Andrew Morton <akpm@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, the arch/x86 maintainers <x86@kernel.org>, CE Linux Developers List <celinux-dev@lists.celinuxforum.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, hyojun.im@lge.com, chan.jeong@lge.com, raphael.andy.lee@gmail.com, "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@elte.hu>, Thomas Gleixner <tglx@linutronix.de>, Russell King <rmk@arm.linux.org.uk>, Florian Fainelli <florian@openwrt.org>, Yann Collet <yann.collet.73@gmail.com>, Chanho Min <chanho.min@lge.com>, Linux-Next <linux-next@vger.kernel.org>, "uclinux-dist-devel@blackfin.uclinux.org" <uclinux-dist-devel@blackfin.uclinux.org>
 
-Script `config' relies on extensions of `GNU sed', and is thus not
-working on all Unixes:
-- in-place edition of files (-i), which can be replaced with
-a temporary file;
-- extended-regexps (-r), which can be split into basic regexps;
-- single-line calls to `a' command, while some implementations
-require a leading newline before the parameter.
+On Wed, Jul 10, 2013 at 08:28:15PM +0200, Markus Trippelsdorf wrote:
+> Well, there's also no hand-holding when lzop is missing for LZO. And
+> the error message is clear enough. No?
 
-Rewrite calls to `sed' program to comply with POSIX interface.
+Actually, we should error out more gracefully than that. Maybe check for
+the presence of the executable first and if not, exit out of the build
+with an informational message that lz4c is not present on the system.
+Ditto for lzop.
 
-Signed-off-by: Clement Chauplannaz <chauplac@gmail.com>
----
- scripts/config | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+Currently, you wait for the whole build to complete just to see that
+there's no executable at the end. Not nice.
 
-diff --git a/scripts/config b/scripts/config
-index a65ecbb..3fd95eb 100755
---- a/scripts/config
-+++ b/scripts/config
-@@ -66,9 +66,14 @@ set_var() {
- 	name_re="^($name=|# $name is not set)"
- 	before_re="^($before=|# $before is not set)"
- 	if test -n "$before" && grep -Eq "$before_re" "$FN"; then
--		sed -ri "/$before_re/a $new" "$FN"
-+		lf=$'\n'
-+		sed -e "/^$before=/a\\$lf$new$lf" \
-+		    -e "/^# $before is not set/a\\$lf$new$lf" "$FN" >"$FN.swp"
-+		mv "$FN.swp" "$FN"
- 	elif grep -Eq "$name_re" "$FN"; then
--		sed -ri "s:$name_re.*:$new:" "$FN"
-+		sed -e "s:^$name=.*:$new:" \
-+		    -e "s:^# $name is not set:$new:" "$FN" >"$FN.swp"
-+		mv "$FN.swp" "$FN"
- 	else
- 		echo "$new" >>"$FN"
- 	fi
-@@ -77,7 +82,8 @@ set_var() {
- undef_var() {
- 	local name=$1
- 
--	sed -ri "/^($name=|# $name is not set)/d" "$FN"
-+	sed -e "/^$name=/d" -e "/^# $name is not set/d" "$FN" >"$FN.swp"
-+	mv "$FN.swp" "$FN"
- }
- 
- if [ "$1" = "--file" ]; then
+> BTW speaking of introductory-level patches, what about the following
+> one:
+> 
+> Now that lz4 kernel compression is available, add *.lz4 to .gitignore
+
+Yep. That makes sense.
+
+Thanks.
+
 -- 
-1.8.3.rc1.44.gb387c77.dirty
+Regards/Gruss,
+    Boris.
 
+Sent from a fat crate under my desk. Formatting is fine.
+--
