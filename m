@@ -1,63 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from relay1.mentorg.com ([192.94.38.131]:39187 "EHLO
-	relay1.mentorg.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754423Ab3GJTcF (ORCPT
+Received: from mail-wg0-f49.google.com ([74.125.82.49]:58102 "EHLO
+	mail-wg0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754051Ab3GJT6V (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 10 Jul 2013 15:32:05 -0400
-Message-ID: <51DDB6BC.5060203@mentor.com>
-Date: Wed, 10 Jul 2013 20:32:12 +0100
-From: Jim Baxter <jim_baxter@mentor.com>
-MIME-Version: 1.0
-Subject: Building CONFIG_SAMPLES separately.
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
+	Wed, 10 Jul 2013 15:58:21 -0400
+Received: by mail-wg0-f49.google.com with SMTP id a12so6196567wgh.4
+        for <linux-kbuild@vger.kernel.org>; Wed, 10 Jul 2013 12:58:20 -0700 (PDT)
+From: Clement Chauplannaz <chauplac@gmail.com>
+Subject: [PATCH] scripts/config: use sed's POSIX interface
+Date: Wed, 10 Jul 2013 21:58:08 +0200
+Message-Id: <1373486288-715-1-git-send-email-chauplac@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mmarek@suse.cz, linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, "Moseley, Drew" <drew_moseley@mentor.com>
+To: linux-kbuild@vger.kernel.org
+Cc: mmarek@suse.cz, ak@linux.intel.com, yann.morin.1998@free.fr
 
-Hi,
+Script `config' relies on extensions of `GNU sed', and is thus not
+working on all Unixes:
+- in-place edition of files (-i), which can be replaced with
+a temporary file;
+- extended-regexps (-r), which can be split into basic regexps;
+- single-line calls to `a' command, while some implementations
+require a leading newline before the parameter.
 
-I was wondering if there is a reason the modules under the samples
-directory only build if you use the command make uImage modules?
+Rewrite calls to `sed' program to comply with POSIX interface.
 
-I have created a patch so that they compile if you enable CONFIG_SAMPLES
-and then build the kernel separately, i.e.
-make uImage
-make modules
+Signed-off-by: Clement Chauplannaz <chauplac@gmail.com>
+---
+ scripts/config | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
-This two step approach is how the kernel is built if you use bitbake in
-yocto, currently it does not output the kernel module object file for
-the sample modules.
+diff --git a/scripts/config b/scripts/config
+index a65ecbb..3fd95eb 100755
+--- a/scripts/config
++++ b/scripts/config
+@@ -66,9 +66,14 @@ set_var() {
+ 	name_re="^($name=|# $name is not set)"
+ 	before_re="^($before=|# $before is not set)"
+ 	if test -n "$before" && grep -Eq "$before_re" "$FN"; then
+-		sed -ri "/$before_re/a $new" "$FN"
++		lf=$'\n'
++		sed -e "/^$before=/a\\$lf$new$lf" \
++		    -e "/^# $before is not set/a\\$lf$new$lf" "$FN" >"$FN.swp"
++		mv "$FN.swp" "$FN"
+ 	elif grep -Eq "$name_re" "$FN"; then
+-		sed -ri "s:$name_re.*:$new:" "$FN"
++		sed -e "s:^$name=.*:$new:" \
++		    -e "s:^# $name is not set:$new:" "$FN" >"$FN.swp"
++		mv "$FN.swp" "$FN"
+ 	else
+ 		echo "$new" >>"$FN"
+ 	fi
+@@ -77,7 +82,8 @@ set_var() {
+ undef_var() {
+ 	local name=$1
+ 
+-	sed -ri "/^($name=|# $name is not set)/d" "$FN"
++	sed -e "/^$name=/d" -e "/^# $name is not set/d" "$FN" >"$FN.swp"
++	mv "$FN.swp" "$FN"
+ }
+ 
+ if [ "$1" = "--file" ]; then
+-- 
+1.8.3.rc1.44.gb387c77.dirty
 
-This is the patch I am considering:
-
-diff --git a/Makefile b/Makefile
-index 29339b4..1acd69f 100644
---- a/Makefile
-+++ b/Makefile
-@@ -772,9 +772,6 @@ vmlinux: scripts/link-vmlinux.sh $(vmlinux-deps) FORCE
- ifdef CONFIG_HEADERS_CHECK
-        $(Q)$(MAKE) -f $(srctree)/Makefile headers_check
- endif
--ifdef CONFIG_SAMPLES
--       $(Q)$(MAKE) $(build)=samples
--endif
- ifdef CONFIG_BUILD_DOCSRC
-        $(Q)$(MAKE) $(build)=Documentation
- endif
-@@ -943,6 +940,9 @@ all: modules
-
- PHONY += modules
- modules: $(vmlinux-dirs) $(if $(KBUILD_BUILTIN),vmlinux) modules.builtin
-+ifdef CONFIG_SAMPLES
-+       $(Q)$(MAKE) $(build)=samples
-+endif
-        $(Q)$(AWK) '!x[$$0]++'
-$(vmlinux-dirs:%=$(objtree)/%/modules.order) > $(objtree)/modules.order
-        @$(kecho) '  Building modules, stage 2.';
-        $(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost
-
-
-Thank you for any help or advice,
-Jim Baxter
