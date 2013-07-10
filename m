@@ -1,59 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.skyhub.de ([78.46.96.112]:34186 "EHLO mail.skyhub.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751620Ab3GJJhA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 10 Jul 2013 05:37:00 -0400
-Date: Wed, 10 Jul 2013 11:36:42 +0200
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH -next 2/2] kbuild: fix for updated LZ4 tool with the new
- streaming format
-Message-ID: <20130710093642.GC14873@pd.tnic>
-References: <1367829775-4434-1-git-send-email-kyungsik.lee@lge.com>
- <1367829775-4434-2-git-send-email-kyungsik.lee@lge.com>
- <20130506095124.GA22041@pd.tnic>
- <CAMuHMdWH9w5fj6HRXi+9QcBJym4dukAFsPVGZVqSSk3yTZJUcA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAMuHMdWH9w5fj6HRXi+9QcBJym4dukAFsPVGZVqSSk3yTZJUcA@mail.gmail.com>
+Received: from mail-wg0-f51.google.com ([74.125.82.51]:35307 "EHLO
+	mail-wg0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753758Ab3GJNJQ (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 10 Jul 2013 09:09:16 -0400
+Received: by mail-wg0-f51.google.com with SMTP id e11so5789976wgh.6
+        for <linux-kbuild@vger.kernel.org>; Wed, 10 Jul 2013 06:09:15 -0700 (PDT)
+Date: Wed, 10 Jul 2013 15:09:23 +0200
+From: Anisse Astier <anisse@astier.eu>
+Subject: Re: [PATCH v6 2/4] deb-pkg: split debug symbols in their own
+ package
+Message-ID: <20130710150923.5cd9537f@serenity>
+In-Reply-To: <1372902360.22888.25.camel@deadeye.wl.decadent.org.uk>
+References: <1372860126-8909-1-git-send-email-anisse@astier.eu>
+	<1372860126-8909-3-git-send-email-anisse@astier.eu>
+	<1372902360.22888.25.camel@deadeye.wl.decadent.org.uk>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Kyungsik Lee <kyungsik.lee@lge.com>, Andrew Morton <akpm@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, the arch/x86 maintainers <x86@kernel.org>, CE Linux Developers List <celinux-dev@lists.celinuxforum.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, hyojun.im@lge.com, chan.jeong@lge.com, raphael.andy.lee@gmail.com, "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@elte.hu>, Thomas Gleixner <tglx@linutronix.de>, Russell King <rmk@arm.linux.org.uk>, Florian Fainelli <florian@openwrt.org>, Yann Collet <yann.collet.73@gmail.com>, Chanho Min <chanho.min@lge.com>, Linux-Next <linux-next@vger.kernel.org>, "uclinux-dist-devel@blackfin.uclinux.org" <uclinux-dist-devel@blackfin.uclinux.org>
+To: Michal Marek <mmarek@suse.cz>
+Cc: Ben Hutchings <ben@decadent.org.uk>, linux-kbuild@vger.kernel.org, debian-kernel@lists.debian.org, kernel-team@lists.ubuntu.com, maximilian attems <max@stro.at>
 
-On Wed, Jul 10, 2013 at 10:12:46AM +0200, Geert Uytterhoeven wrote:
-> >> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-> >> index a0ab6d7..c9bfbb0 100644
-> >> --- a/scripts/Makefile.lib
-> >> +++ b/scripts/Makefile.lib
-> >> @@ -313,7 +313,7 @@ cmd_lzo = (cat $(filter-out FORCE,$^) | \
-> >>
-> >>  quiet_cmd_lz4 = LZ4     $@
-> >>  cmd_lz4 = (cat $(filter-out FORCE,$^) | \
-> >> -     lz4demo -c1 stdin stdout && $(call size_append, $(filter-out FORCE,$^))) > $@ || \
-> >> +     lz4c -l -c1 stdin stdout && $(call size_append, $(filter-out FORCE,$^))) > $@ || \
-> >
-> > You probably want to check for the presence of lz4c on the system and
-> > bail with an informative message if absent.
+Michal,
+
+Every patch has now been reviewed, do you think it would be possible to
+take this series for 3.12 ?
+
+Thanks,
+
+Anisse
+
+On Thu, 04 Jul 2013 02:46:00 +0100, Ben Hutchings <ben@decadent.org.uk> wrote :
+
+> On Wed, 2013-07-03 at 16:02 +0200, Anisse Astier wrote:
+> > This can reduce almost 3 times the size of the linux-image package,
+> > while keeping the debug symbols available for this particular build, in
+> > their own package.
+> > 
+> > This mimics the way kernels are built in debian, ubuntu, or with
+> > make-kpkg, and comes at the price of a small slowdown in the building of
+> > packages.
+> > 
+> > Signed-off-by: Anisse Astier <anisse@astier.eu>
+> > Cc: Ben Hutchings <ben@decadent.org.uk>
+> > Acked-by: maximilian attems <max@stro.at>
+> [...]
 > 
-> Yep, x86_64-randconfig
-> (http://kisskb.ellerman.id.au/kisskb/buildresult/9110794/):
+> Reviewed-by: Ben Hutchings <ben@decadent.org.uk>
 > 
->   LZ4     arch/x86/boot/compressed/vmlinux.bin.lz4
-> /bin/sh: lz4c: command not found
-
-Sure, it had to be 2 months and to hit upstream for there still to be no
-fix. Geez...
-
-Anyone reading this and willing to try his skills with an
-introductory-level patch, feel free to address this. I'll help testing
-and upstreaming it.
-
-Thanks.
-
--- 
-Regards/Gruss,
-    Boris.
-
-Sent from a fat crate under my desk. Formatting is fine.
---
