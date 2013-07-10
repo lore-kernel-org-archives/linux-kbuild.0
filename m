@@ -1,151 +1,99 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from fw-tnat.cambridge.arm.com ([217.140.96.21]:53128 "EHLO
-	cam-smtp0.cambridge.arm.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1751045Ab3GHKAV (ORCPT
+Received: from mail-ie0-f175.google.com ([209.85.223.175]:37558 "EHLO
+	mail-ie0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750736Ab3GJIMr (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 8 Jul 2013 06:00:21 -0400
-Date: Mon, 8 Jul 2013 10:59:40 +0100
-From: Dave P Martin <Dave.Martin@arm.com>
-Subject: Re: scripts/kallsyms: Avoid ARM veneer symbols
-Message-ID: <20130708095940.GB2906@localhost.localdomain>
-References: <2983817.Xe2505Drlj@wuerfel>
- <201307051842.44721.arnd@arndb.de>
- <20130705172659.GJ2932@localhost.localdomain>
- <201307060134.56933.arnd@arndb.de>
+	Wed, 10 Jul 2013 04:12:47 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <201307060134.56933.arnd@arndb.de>
+In-Reply-To: <20130506095124.GA22041@pd.tnic>
+References: <1367829775-4434-1-git-send-email-kyungsik.lee@lge.com>
+	<1367829775-4434-2-git-send-email-kyungsik.lee@lge.com>
+	<20130506095124.GA22041@pd.tnic>
+Date: Wed, 10 Jul 2013 10:12:46 +0200
+Message-ID: <CAMuHMdWH9w5fj6HRXi+9QcBJym4dukAFsPVGZVqSSk3yTZJUcA@mail.gmail.com>
+Subject: Re: [PATCH -next 2/2] kbuild: fix for updated LZ4 tool with the new
+ streaming format
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Michal Marek <mmarek@suse.cz>, Dave Martin <dave.martin@linaro.org>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+To: Borislav Petkov <bp@alien8.de>
+Cc: Kyungsik Lee <kyungsik.lee@lge.com>, Andrew Morton <akpm@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, the arch/x86 maintainers <x86@kernel.org>, CE Linux Developers List <celinux-dev@lists.celinuxforum.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, hyojun.im@lge.com, chan.jeong@lge.com, raphael.andy.lee@gmail.com, "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@elte.hu>, Thomas Gleixner <tglx@linutronix.de>, Russell King <rmk@arm.linux.org.uk>, Florian Fainelli <florian@openwrt.org>, Yann Collet <yann.collet.73@gmail.com>, Chanho Min <chanho.min@lge.com>, Linux-Next <linux-next@vger.kernel.org>, "uclinux-dist-devel@blackfin.uclinux.org" <uclinux-dist-devel@blackfin.uclinux.org>
 
-On Sat, Jul 06, 2013 at 01:34:56AM +0200, Arnd Bergmann wrote:
-> On Friday 05 July 2013, Dave P Martin wrote:
-> > On Fri, Jul 05, 2013 at 05:42:44PM +0100, Arnd Bergmann wrote:
-> > > On Friday 05 July 2013, Dave P Martin wrote:
-> > > > On Wed, Jul 03, 2013 at 06:03:04PM +0200, Arnd Bergmann wrote:
-> > 
-> > I think there are a small number of patterns to check for.
-> > 
-> > __*_veneer, __*_from_arm and __*_from_thumb should cover most cases.
-> 
-> Ok.
-> 
-> > > * There are actually symbols without a name on ARM, which screws up the
-> > >   kallsyms.c parser. These also seem to be veneers, but attached to some
-> > >   random function:
-> > 
-> > Hmmm, I don't what those are.  By default, we should probably ignore those
-> > too.  Maybe they have something to do with link-time relocation processing.
-> 
-> Definitely link-time. It only shows up after the final link, and only
-> with ld.bfd not with ld.gold as I found out now.
-> 
-> > > $ nm obj-tmp/.tmp_vmlinux1 | head
-> > > c09e8db1 t 
-> > > c09e8db5 t 
-> > > c09e8db9 t    # <==========
-> > > c09e8dbd t 
-> > > c0abfc29 t 
-> > > c0008000 t $a
-> > > c0f7b640 t $a
-> > > 
-> > > $ objdump -Dr obj-tmp/.tmp_vmlinux1 | grep -C 30 c09e8db.
-> > > c0851fcc <wlc_phy_edcrs_lock>:
-> > > c0851fcc:       b538            push    {r3, r4, r5, lr}
-> > > c0851fce:       b500            push    {lr}
-> > > c0851fd0:       f7bb d8dc       bl      c000d18c <__gnu_mcount_nc>
-> > > c0851fd4:       f240 456b       movw    r5, #1131       ; 0x46b
-> > > c0851fd8:       4604            mov     r4, r0
-> > > c0851fda:       f880 14d5       strb.w  r1, [r0, #1237] ; 0x4d5
-> > > c0851fde:       462a            mov     r2, r5
-> > > c0851fe0:       f44f 710b       mov.w   r1, #556        ; 0x22c
-> > > c0851fe4:       f7ff fe6d       bl      c0851cc2 <write_phy_reg>
-> > > c0851fe8:       4620            mov     r0, r4
-> > > c0851fea:       462a            mov     r2, r5
-> > > c0851fec:       f240 212d       movw    r1, #557        ; 0x22d
-> > > c0851ff0:       f7ff fe67       bl      c0851cc2 <write_phy_reg>
-> > > c0851ff4:       4620            mov     r0, r4
-> > > c0851ff6:       f240 212e       movw    r1, #558        ; 0x22e
-> > > c0851ffa:       f44f 7270       mov.w   r2, #960        ; 0x3c0
-> > > c0851ffe:       f196 fedb       bl      c09e8db8 <tpci200_free_irq+0x78>  # <===========
-> > > c0852002:       4620            mov     r0, r4
-> > > c0852004:       f240 212f       movw    r1, #559        ; 0x22f
-> > > c0852008:       f44f 7270       mov.w   r2, #960        ; 0x3c0
-> > > c085200c:       e8bd 4038       ldmia.w sp!, {r3, r4, r5, lr}
-> > > c0852010:       f7ff be57       b.w     c0851cc2 <write_phy_reg>
-> > > 
-> > > 
-> > > ... # in tpci200_free_irq:
-> > > c09e8d9e:       e003            b.n     c09e8da8 <tpci200_free_irq+0x68>
-> > > c09e8da0:       f06f 0415       mvn.w   r4, #21
-> > > c09e8da4:       e000            b.n     c09e8da8 <tpci200_free_irq+0x68>
-> > > c09e8da6:       4c01            ldr     r4, [pc, #4]    ; (c09e8dac <tpci200_free_irq+0x6c>)
-> > > c09e8da8:       4620            mov     r0, r4
-> > > c09e8daa:       bdf8            pop     {r3, r4, r5, r6, r7, pc}
-> > > c09e8dac:       fffffe00                        ; <UNDEFINED> instruction: 0xfffffe00
-> > > c09e8db0:       f4cf b814       b.w     c06b7ddc <bna_enet_sm_chld_stop_wait_entry>
-> > > c09e8db4:       f53e bed8       b.w     c0727b68 <gem_do_stop>
-> > > c09e8db8:       f668 bf83       b.w     c0851cc2 <write_phy_reg>           # <==========
-> > > c09e8dbc:       d101            bne.n   c09e8dc2 <tpci200_free_irq+0x82>
-> > > c09e8dbe:       f435 b920       b.w     c061e002 <twl_reset_sequence+0x34c>
-> > > 
-> > > It makes no sense to me at all that a function in one driver can just call
-> > > write_phy_reg a couple of times, but need a veneer in the middle, and put
-> > > that veneer in a totally unrelated function in another driver!
-> > 
-> > I think that if ld inserts a veneer for a function anywhere, branches
-> > from any object in the link to that target symbol can reuse the same
-> > veneer as a trampoline, effectively appearing to branch through an
-> > unrelated location to reach the destination.
-> 
-> That part makes sense, but it doesn't explain why ld would do that just
-> for the third out of four identical function calls in the example above.
-> 
-> > ld inserts veneers between individual input sections, but I don't
-> > think they have to go next to the same section the branch originates
-> > from.  In the above code, it looks like that series of unconditional
-> > branches after the end of tpci200_free_irq might be a common veneer pool
-> > for many different destinations.
-> 
-> Yes, exactly. In this build I had six of these nameless symbols, and five
-> of them were in this one function.
-> 
-> > LTO may also make the expected compilation unit boundaries disappear
-> > completely.  Anything could end up almost anywhere in that case.
-> > Files could get intermingled, inlined and generally spread all over the
-> > place.
-> 
-> I'm not sure we actually want to enable that in the kernel ;-)
-> 
-> In particular in combination with kallsyms, it would make the kallsyms
-> information rather useless when we can no longer infer a function name
-> from an address.
+On Mon, May 6, 2013 at 11:51 AM, Borislav Petkov <bp@alien8.de> wrote:
+> On Mon, May 06, 2013 at 05:42:55PM +0900, Kyungsik Lee wrote:
+>> LZ4 has been updated with LZ4 Streaming Format specification(v1.3).
+>> lz4demo is replaced by lz4c. lz4c supports both the new streaming and
+>> legacy format with -l option.
+>>
+>> This patch makes use of lz4c to support legacy format which is
+>> used for LZ4 De/compression in the linux kernel.
+>>
+>> Link: https://code.google.com/p/lz4/source/checkout
+>> Signed-off-by: Kyungsik Lee <kyungsik.lee@lge.com>
+>> Cc: "H. Peter Anvin" <hpa@zytor.com>
+>> Cc: Ingo Molnar <mingo@elte.hu>
+>> Cc: Thomas Gleixner <tglx@linutronix.de>
+>> Cc: Russell King <rmk@arm.linux.org.uk>
+>> Cc: Borislav Petkov <bp@alien8.de>
+>> Cc: Florian Fainelli <florian@openwrt.org>
+>> Cc: Yann Collet <yann.collet.73@gmail.com>
+>> Cc: Chanho Min <chanho.min@lge.com>
+>> ---
+>>  scripts/Makefile.lib | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+>> index a0ab6d7..c9bfbb0 100644
+>> --- a/scripts/Makefile.lib
+>> +++ b/scripts/Makefile.lib
+>> @@ -313,7 +313,7 @@ cmd_lzo = (cat $(filter-out FORCE,$^) | \
+>>
+>>  quiet_cmd_lz4 = LZ4     $@
+>>  cmd_lz4 = (cat $(filter-out FORCE,$^) | \
+>> -     lz4demo -c1 stdin stdout && $(call size_append, $(filter-out FORCE,$^))) > $@ || \
+>> +     lz4c -l -c1 stdin stdout && $(call size_append, $(filter-out FORCE,$^))) > $@ || \
+>
+> You probably want to check for the presence of lz4c on the system and
+> bail with an informative message if absent.
 
-Well, indeed.  But that's a separate discussion -- I don't think we want
-to block it needlessly just due to an obscure feature of the ARM toolchain.
+Yep, x86_64-randconfig
+(http://kisskb.ellerman.id.au/kisskb/buildresult/9110794/):
 
-Ignoring veneers and nameless symbols in kallsyms sounds like a reasonable
-approach for now, even if it's not a perfect.
+  LZ4     arch/x86/boot/compressed/vmlinux.bin.lz4
+/bin/sh: lz4c: command not found
 
-> > Even so, veneers shouldn't be needed in the common case where we're not
-> > jumping across .rodata.
-> > 
-> > > 
-> > > If this is a binutils bug or gcc bug, we should probably just fix it, but it
-> > > might be easier to work around it by changing kallsyms.c some more.
-> > 
-> > I haven't found a trivial way to reproduce those nameless symbols.
-> > I don't know whether they're a bug or not...
-> > 
-> > Making kallsyms robust against this might be a good idea anyway.
-> 
-> Maybe we can find a binutils expert next week at Linaro connect to take a
-> look at the data. I can prepare a test case.
+Also, several of the blackfin builds started failing due to a
+compression-related
+issue, e.g. http://kisskb.ellerman.id.au/kisskb/buildresult/9101322/:
 
-Sure, that could be worth a try.
+  UIMAGE  arch/blackfin/boot/uImage.lzma
 
-Cheers
----Dave
+Invalid Compression Type - valid names are: none, bzip2, gzip
+Usage: /usr/local/bin/mkimage -l image
+          -l ==> list image header information
+       /usr/local/bin/mkimage [-x] -A arch -O os -T type -C comp -a
+addr -e ep -n name -d data_file[:data_file...] image
+          -A ==> set architecture to 'arch'
+          -O ==> set operating system to 'os'
+          -T ==> set image type to 'type'
+          -C ==> set compression type 'comp'
+          -a ==> set load address to 'addr' (hex)
+          -e ==> set entry point to 'ep' (hex)
+          -n ==> set image name to 'name'
+          -d ==> use image data from 'datafile'
+          -x ==> set XIP (execute in place)
+make[2]: *** [arch/blackfin/boot/uImage.lzma] Error 1
+
+May be unrelated, though.
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
