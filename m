@@ -1,108 +1,121 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f52.google.com ([74.125.82.52]:64464 "EHLO
-	mail-wg0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755118Ab3GJUqy convert rfc822-to-8bit (ORCPT
+Received: from mail-wi0-f178.google.com ([209.85.212.178]:33373 "EHLO
+	mail-wi0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755059Ab3GJVcT convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 10 Jul 2013 16:46:54 -0400
-Date: Wed, 10 Jul 2013 22:46:48 +0200
+	Wed, 10 Jul 2013 17:32:19 -0400
+Received: by mail-wi0-f178.google.com with SMTP id k10so6831067wiv.17
+        for <linux-kbuild@vger.kernel.org>; Wed, 10 Jul 2013 14:32:17 -0700 (PDT)
+Date: Wed, 10 Jul 2013 23:32:13 +0200
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH 12/15] kconfig: sort found symbols by relevance
-Message-ID: <20130710204648.GE3297@free.fr>
-References: <cover.1372097219.git.yann.morin.1998@free.fr>
- <193b40aeb537b59eaa36e3dfaabedc2025332ebf.1372097219.git.yann.morin.1998@free.fr>
- <1373282357.4298.198.camel@chaos.site>
- <20130708173535.GB3206@free.fr>
+Subject: Re: Kconfig Gtk/Qt interface flavours ported to newest toolkit
+ versions
+Message-ID: <20130710213213.GF3297@free.fr>
+References: <kconfig-port-gtk-qt>
+ <1372778550-22110-1-git-send-email-david.graeff@web.de>
+ <20130703163038.GA3268@free.fr>
+ <51D76127.9060209@tu-dortmund.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8BIT
-In-Reply-To: <20130708173535.GB3206@free.fr>
+In-Reply-To: <51D76127.9060209@tu-dortmund.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jean Delvare <jdelvare@suse.de>, Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Roland Eggner <edvx1@systemanalysen.net>, Wang YanQing <udknight@gmail.com>
+To: David =?utf-8?B?R3LDpGZm?= <david.graeff@tu-dortmund.de>
+Cc: linux-kbuild@vger.kernel.org
 
-Michal, All,
+David, All,
 
-On 2013-07-08 19:35 +0200, Yann E. MORIN spake thusly:
-> On 2013-07-08 13:19 +0200, Jean Delvare spake thusly:
-> > Le Monday 24 June 2013 à 20:11 +0200, Yann E. MORIN a écrit :
-> > > From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-> [--SNIP--]
-> > > Since the search can be a regexp, it is possible that more than one symbol
-> > > matches exactly. In this case, we can't decide which to sort first, so we
-> > > fallback to alphabeticall sort.
+On 2013-07-06 02:13 +0200, David Gräff spake thusly:
+> Am 03.07.2013 18:30, schrieb Yann E. MORIN:
+> >I did not do any review of the patches, since I have a concern about the
+> >series. It happens very often that, in enterprise ecosystems, the host
+> >build machines are running rather aging distro, such as RHEL 5 (or even
+> >RHEL 4 in some cases), so I think we still want the new kernels to be
+> >buildable (and thus configurable) on such machines (eg. for
+> >cross-compilation).
+
+> A serious concern, you're absolutly right. Let me tell you some
+> background information and my concerns regarding the current
+> code.
+> Although the Gtk2->3 port was less effort than the Qt-flavour port,
+> it is the more important one in my opinion. The current code definitly
+> does not compile with gtk3 and some used libraries (e.g. libglade)
+> are depreated for a while now.
+> Of just a cosmetic nature: In my experience, on newer systems
+> gtk2 applications additionally look somewhat outdated.
+> 
+> Maybe it is a good idea, to have the current gtk implementation
+> and the ported one side-by-side. What do you think?
+> 
+> Regarding the Qt-flavour port, I would classify it as an almost
+> complete rewrite. I'm more into C++/Qt and personally I always
+> used xconfig for kconf. The current implementation is more a Qt3
+> application that still compiles with Qt4 due of heavy usage of
+> the deprecated Qt3support layer. For the new implementation,
+> I adopted Qt4 techniques like the Qt MVC pattern
+> and the Qt interface designer (similar to the kconf-Gtk solution),
+> while paying attention to a Qt5 compatibilty.
+> It's more likely that I introducted bugs in this kconf flavour port,
+> of course. But I'd assume it's a good starting point for a discussion
+> of a more future-proof and probably more easy to maintain implementation.
+> 
+> Your concern about those aging distros certainly applies to this ported
+> kconf
+> flavour, too. So I'm not sure how to proceed. Options, I can thing of
+> are:
+> 
+> * Remove the Qt3/4-flavour and use the new Qt4/5 one, keep the Gtk2-flavour
+> for aging distros.
+> * Keep both Qt-flavour implementations (maybe with make targets like
+> xconfig and qconfig).
+> * Don't change the Qt3/4-flavour and do not introduce this proposed
+> Qt-flavour.
+> 
+> I would prepare a v2 patch series consisting of three patches only:
+> 1) Directory structure. For each kconf ui flavour a separate one.
+> 2) gtk3-flavour as side-by-side solution to the existing gtk2 one.
+> 3) Qt4/5-flavour as side-by-side solution to the existing Qt3/4 one.
+> Far less intrusive :)
+
+I personnally don't use any of the two GUIs, so I can't really tell what
+their status is. However, there are users of these, so I think we do not
+want to leave them out in the cold.
+
+I really don't know what to do about this.
+
+One idea would be to have two new goals: g3config and q5config, and kepp
+the existing ones in place. I don't like it much, since the two old ones
+will ultimately no longer work, so may dusrupt users' expectations, and
+it's double maintenance on non-GUI related changes.
+
+An alternate route would be to add the two new frontends, and keep
+xconfig and gconfig as-is, but decide which to build depending on
+availability of the libraries:
+  - xconfig: if Qt5 is present, then build and run the new Qt5-based
+    frontend, otherwise build the current Qt3/4 frontend
+  - gconfig: ditto, but with Gtk3 vs. Gtk2.
+This still means double maintenance, but means we can easily drop the
+old frontends in the future when Gtk2 and Qt3/4 are virtually no longer
+meaningful, since this does not break users' experience.
+
+So as a summarry, here are the three options:
+  - update existing frontends against their respective framework
+  - add two new frontends, and two new goals to call them
+  - add two new frontends, and decide whether to call them or the old ones
+
+Really, I have no idea what is best.
+
 [--SNIP--]
-> > > Reported-by: Jean Delvare <jdelvare@suse.de>
-> > > Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
-> > > Cc: Jean Delvare <jdelvare@suse.de>
-> > > Cc: Michal Marek <mmarek@suse.cz>
-> > > Cc: Roland Eggner <edvx1@systemanalysen.net>
-> > > Cc: Wang YanQing <udknight@gmail.com>
-> > 
-> > I tested it and it works fine, thanks!
-> > 
-> > Tested-by: Jean Delvare <jdelvare@suse.de>
-> > 
-> > Now comes my late review. Overall I like the idea and the code but a few
-> > things could be improved:
-> 
-> Since this is already in Michal's tree, on should I proceed?
->   - send an updated patch that replaces that one, or
->   - send another additional patch with your proposed changes?
+> I guess there are way more projects using the famous kconf and users who
+> like to use the graphical interface flavours :)
 
-OK, since Michal already sent his pull-request to Linus, I'll prepare a
-corrective patch I'll submit before the end of the week. Is that OK with
-you, Michal?
+Yes, countless other projects use that: busybox, uClibc, Buildroot,
+crosstool-NG, OpenBricks, NuttX, openWRT... to name a few I know of.
 
-[--SNIP--]
-> > > +static int sym_rel_comp( const void *sym1, const void *sym2 )
-> > > +{
-> > > +	struct sym_match *s1 = *(struct sym_match **)sym1;
-> > > +	struct sym_match *s2 = *(struct sym_match **)sym2;
-> > 
-> > You shouldn't need these casts.
-> 
-> Probably not, indeed, but I like to write (and read) what I expect to
-> happen, and pointer arithmetics is always something I dread to foobar.
-
-In fact, we need the cast, otherwise gcc whines about const/non-const.
-
-[--SNIP--]
-> > >  	for_all_symbols(i, sym) {
-> > > +		struct sym_match *tmp_sym_match;
-> > >  		if (sym->flags & SYMBOL_CONST || !sym->name)
-> > >  			continue;
-> > > -		if (regexec(&re, sym->name, 0, NULL, 0))
-> > > +		if (regexec(&re, sym->name, 1, match, 0))
-> > >  			continue;
-> > >  		if (cnt + 1 >= size) {
-> > 
-> > I think the "+ 1" can be dropped because the new array is not
-> > NULL-terminated.
-
-Indeed.
-
-> > > +			sym_match_arr = tmp;
-> > >  		}
-> > >  		sym_calc_value(sym);
-> > > -		sym_arr[cnt++] = sym;
-> > > +		tmp_sym_match = (struct sym_match*)malloc(sizeof(struct sym_match));
-> > 
-> > Cast not needed.
-> 
-> OK.
-> 
-> > In fact I don't think this allocation is needed in the first place.
-> > Calling malloc for every match is rather costly. If you would have
-> > allocated an array of struct sym_match (rather than only pointers
-> > thereto) before, you would not need this per-symbol malloc. Struct
-> > sym_match is small enough to not warrant an extra level of allocation
-> > and indirection IMHO.
-
-Indeed, it makes for cleaner code.
-
-Thank you again! :-)
+BTW, you may be interested in:
+    http://ymorin.is-a-geek.org/projects/kconfig-frontends
 
 Regards,
 Yann E. MORIN.
