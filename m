@@ -1,50 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from LGEMRELSE1Q.lge.com ([156.147.1.111]:62611 "EHLO
-	LGEMRELSE1Q.lge.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750811Ab3GKEed (ORCPT
+Received: from ud10.udmedia.de ([194.117.254.50]:52496 "EHLO
+	mail.ud10.udmedia.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754471Ab3GKJqn (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 11 Jul 2013 00:34:33 -0400
-Date: Thu, 11 Jul 2013 13:34:33 +0900
-From: Kyungsik Lee <kyungsik.lee@lge.com>
-Subject: Re: [PATCH -next 2/2] kbuild: fix for updated LZ4 tool with the new
- streaming format
-Message-ID: <20130711043433.GA29245@hulk>
+	Thu, 11 Jul 2013 05:46:43 -0400
+Date: Thu, 11 Jul 2013 11:46:40 +0200
+From: Markus Trippelsdorf <markus@trippelsdorf.de>
+Subject: [PATCH] .gitignore: ignore *.lz4 files
+Message-ID: <20130711094640.GA358@x4>
 References: <1367829775-4434-1-git-send-email-kyungsik.lee@lge.com>
  <1367829775-4434-2-git-send-email-kyungsik.lee@lge.com>
  <20130506095124.GA22041@pd.tnic>
  <CAMuHMdWH9w5fj6HRXi+9QcBJym4dukAFsPVGZVqSSk3yTZJUcA@mail.gmail.com>
  <20130710093642.GC14873@pd.tnic>
  <20130710182815.GA362@x4>
+ <20130711043433.GA29245@hulk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20130710182815.GA362@x4>
+In-Reply-To: <20130711043433.GA29245@hulk>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Markus Trippelsdorf <markus@trippelsdorf.de>
+To: Kyungsik Lee <kyungsik.lee@lge.com>
 Cc: Borislav Petkov <bp@alien8.de>, Geert Uytterhoeven <geert@linux-m68k.org>, Andrew Morton <akpm@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, the arch/x86 maintainers <x86@kernel.org>, CE Linux Developers List <celinux-dev@lists.celinuxforum.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, hyojun.im@lge.com, chan.jeong@lge.com, raphael.andy.lee@gmail.com, "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@elte.hu>, Thomas Gleixner <tglx@linutronix.de>, Russell King <rmk@arm.linux.org.uk>, Florian Fainelli <florian@openwrt.org>, Yann Collet <yann.collet.73@gmail.com>, Chanho Min <chanho.min@lge.com>, Linux-Next <linux-next@vger.kernel.org>, "uclinux-dist-devel@blackfin.uclinux.org" <uclinux-dist-devel@blackfin.uclinux.org>
 
-> 
-> BTW speaking of introductory-level patches, what about the following
-> one:
-> 
-> Now that lz4 kernel compression is available, add *.lz4 to .gitignore
-> 
-> diff --git a/.gitignore b/.gitignore
-> index 3b8b9b3..7e9932e 100644
-> --- a/.gitignore
-> +++ b/.gitignore
-> @@ -29,6 +29,7 @@ modules.builtin
->  *.bz2
->  *.lzma
->  *.xz
-> +*.lz4
->  *.lzo
->  *.patch
->  *.gcno
-> 
+Now that lz4 kernel compression is available, add *.lz4 to .gitignore.
+
+Signed-off-by: Markus Trippelsdorf <markus@trippelsdorf.de>
 Acked-by: Kyungsik Lee <kyungsik.lee@lge.com>
 
-Thanks,
-Kyungsik
-
+diff --git a/.gitignore b/.gitignore
+index 3b8b9b3..7e9932e 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -29,6 +29,7 @@ modules.builtin
+ *.bz2
+ *.lzma
+ *.xz
++*.lz4
+ *.lzo
+ *.patch
+ *.gcno
+-- 
+Markus
