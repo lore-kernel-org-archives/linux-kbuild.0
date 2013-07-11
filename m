@@ -1,34 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.linuxfoundation.org ([140.211.169.12]:57964 "EHLO
-	mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750765Ab3GKEZ0 (ORCPT
+Received: from LGEMRELSE1Q.lge.com ([156.147.1.111]:62611 "EHLO
+	LGEMRELSE1Q.lge.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750811Ab3GKEed (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 11 Jul 2013 00:25:26 -0400
-Date: Wed, 10 Jul 2013 21:26:26 -0700
-From: Greg KH <gregkh@linuxfoundation.org>
-Subject: Re: [GIT] kbuild changes for v3.11-rc1
-Message-ID: <20130711042626.GA23875@kroah.com>
-References: <20130710133742.GA29368@emu.suse.cz>
- <CA+55aFxtvT3Yvbxe5JGBThZS13payymFJ7jCLyEiE2iNDvsZtQ@mail.gmail.com>
+	Thu, 11 Jul 2013 00:34:33 -0400
+Date: Thu, 11 Jul 2013 13:34:33 +0900
+From: Kyungsik Lee <kyungsik.lee@lge.com>
+Subject: Re: [PATCH -next 2/2] kbuild: fix for updated LZ4 tool with the new
+ streaming format
+Message-ID: <20130711043433.GA29245@hulk>
+References: <1367829775-4434-1-git-send-email-kyungsik.lee@lge.com>
+ <1367829775-4434-2-git-send-email-kyungsik.lee@lge.com>
+ <20130506095124.GA22041@pd.tnic>
+ <CAMuHMdWH9w5fj6HRXi+9QcBJym4dukAFsPVGZVqSSk3yTZJUcA@mail.gmail.com>
+ <20130710093642.GC14873@pd.tnic>
+ <20130710182815.GA362@x4>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CA+55aFxtvT3Yvbxe5JGBThZS13payymFJ7jCLyEiE2iNDvsZtQ@mail.gmail.com>
+In-Reply-To: <20130710182815.GA362@x4>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Michal Marek <mmarek@suse.cz>, Jan Beulich <JBeulich@suse.com>, dt.tangr@gmail.com, Geert Uytterhoeven <geert@linux-m68k.org>, James Hogan <james.hogan@imgtec.com>, Christian Kujau <lists@nerdbynature.de>, Mike Marciniszyn <mike.marciniszyn@intel.com>, Nicolas Dichtel <nicolas.dichtel@6wind.com>, robert.richter@calxeda.com, "Yaakov (Cygwin/X)" <yselkowitz@users.sourceforge.net>, zzs0213@gmail.com, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Markus Trippelsdorf <markus@trippelsdorf.de>
+Cc: Borislav Petkov <bp@alien8.de>, Geert Uytterhoeven <geert@linux-m68k.org>, Andrew Morton <akpm@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, the arch/x86 maintainers <x86@kernel.org>, CE Linux Developers List <celinux-dev@lists.celinuxforum.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, hyojun.im@lge.com, chan.jeong@lge.com, raphael.andy.lee@gmail.com, "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@elte.hu>, Thomas Gleixner <tglx@linutronix.de>, Russell King <rmk@arm.linux.org.uk>, Florian Fainelli <florian@openwrt.org>, Yann Collet <yann.collet.73@gmail.com>, Chanho Min <chanho.min@lge.com>, Linux-Next <linux-next@vger.kernel.org>, "uclinux-dist-devel@blackfin.uclinux.org" <uclinux-dist-devel@blackfin.uclinux.org>
 
-On Wed, Jul 10, 2013 at 07:11:53PM -0700, Linus Torvalds wrote:
-> Commit d2aae8477cd00325bb7c7c7e95be488088900c48 is broken. It causes
-> root to re-write "include/config/kernel.release".
 > 
-> There is no excuse for this. That commit is shit. There's no way in
-> hell that "make modules_install" should ever rebuild anything, so
-> adding that kind of dependency is fundamentally wrong and broken.
+> BTW speaking of introductory-level patches, what about the following
+> one:
 > 
-> And that totally crap commit is even marked for stable.
+> Now that lz4 kernel compression is available, add *.lz4 to .gitignore
+> 
+> diff --git a/.gitignore b/.gitignore
+> index 3b8b9b3..7e9932e 100644
+> --- a/.gitignore
+> +++ b/.gitignore
+> @@ -29,6 +29,7 @@ modules.builtin
+>  *.bz2
+>  *.lzma
+>  *.xz
+> +*.lz4
+>  *.lzo
+>  *.patch
+>  *.gcno
+> 
+Acked-by: Kyungsik Lee <kyungsik.lee@lge.com>
 
-It's now dropped from my stable to-apply queue.
+Thanks,
+Kyungsik
 
-greg k-h
