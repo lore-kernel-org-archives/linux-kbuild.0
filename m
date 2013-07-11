@@ -1,109 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vc0-f181.google.com ([209.85.220.181]:36139 "EHLO
-	mail-vc0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753834Ab3GJWUI convert rfc822-to-8bit (ORCPT
+Received: from mail-vb0-f51.google.com ([209.85.212.51]:35292 "EHLO
+	mail-vb0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754922Ab3GKCLz (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 10 Jul 2013 18:20:08 -0400
-Received: by mail-vc0-f181.google.com with SMTP id lf11so6194701vcb.12
-        for <linux-kbuild@vger.kernel.org>; Wed, 10 Jul 2013 15:20:07 -0700 (PDT)
+	Wed, 10 Jul 2013 22:11:55 -0400
 MIME-Version: 1.0
-In-Reply-To: <20130710203829.GD3297@free.fr>
-References: <1373486288-715-1-git-send-email-chauplac@gmail.com>
-	<20130710203829.GD3297@free.fr>
-Date: Thu, 11 Jul 2013 00:20:07 +0200
-Message-ID: <CACW0xKUqAuxujpq+v8w81UsCNcUWQBj=iBZd20R1avjMRR-y1A@mail.gmail.com>
-Subject: Re: [PATCH] scripts/config: use sed's POSIX interface
-From: =?ISO-8859-1?Q?Cl=E9ment_Chauplannaz?= <chauplac@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+In-Reply-To: <20130710133742.GA29368@emu.suse.cz>
+References: <20130710133742.GA29368@emu.suse.cz>
+Date: Wed, 10 Jul 2013 19:11:53 -0700
+Message-ID: <CA+55aFxtvT3Yvbxe5JGBThZS13payymFJ7jCLyEiE2iNDvsZtQ@mail.gmail.com>
+Subject: Re: [GIT] kbuild changes for v3.11-rc1
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: linux-kbuild@vger.kernel.org, mmarek@suse.cz, ak@linux.intel.com
+To: Michal Marek <mmarek@suse.cz>
+Cc: Jan Beulich <JBeulich@suse.com>, dt.tangr@gmail.com, Geert Uytterhoeven <geert@linux-m68k.org>, James Hogan <james.hogan@imgtec.com>, Christian Kujau <lists@nerdbynature.de>, Mike Marciniszyn <mike.marciniszyn@intel.com>, Nicolas Dichtel <nicolas.dichtel@6wind.com>, robert.richter@calxeda.com, "Yaakov (Cygwin/X)" <yselkowitz@users.sourceforge.net>, zzs0213@gmail.com, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-Yann
+On Wed, Jul 10, 2013 at 6:37 AM, Michal Marek <mmarek@suse.cz> wrote:
+>
+> please pull the kbuild bits for v3.11-rc1:
 
-2013/7/10 Yann E. MORIN <yann.morin.1998@free.fr>:
-> Clément, All,
->
-> On 2013-07-10 21:58 +0200, Clement Chauplannaz spake thusly:
->> Script `config' relies on extensions of `GNU sed', and is thus not
->> working on all Unixes:
->> - in-place edition of files (-i), which can be replaced with
->> a temporary file;
->> - extended-regexps (-r), which can be split into basic regexps;
->> - single-line calls to `a' command, while some implementations
->> require a leading newline before the parameter.
->>
->> Rewrite calls to `sed' program to comply with POSIX interface.
->
-> Clément, sorry I did not come back to you earlier after your second PM.
-> Here is further review:
->
->> Signed-off-by: Clement Chauplannaz <chauplac@gmail.com>
->> ---
->>  scripts/config | 12 +++++++++---
->>  1 file changed, 9 insertions(+), 3 deletions(-)
->>
->> diff --git a/scripts/config b/scripts/config
->> index a65ecbb..3fd95eb 100755
->> --- a/scripts/config
->> +++ b/scripts/config
->> @@ -66,9 +66,14 @@ set_var() {
->>       name_re="^($name=|# $name is not set)"
->>       before_re="^($before=|# $before is not set)"
->>       if test -n "$before" && grep -Eq "$before_re" "$FN"; then
->> -             sed -ri "/$before_re/a $new" "$FN"
->> +             lf=$'\n'
->
-> As you explained me earlier, you expect this to actually set the '\n'
-> symbol (0x0a) as first char of variable 'lf'. This is a bashism, and is
-> not POSIX. Here is a test script:
->
->     #!/bin/dash
->     lf=$'\n'
->     printf "lf='%s'\n" "${lf}"
->     printf "lf='${lf}'\n"
->
-> And the output:
->     lf='$\n'
->     lf='$
->     '
->
-> Now, if you use #!/bin/bash, it works as you expect, but not with a
-> POSIX-only script like dash.
->
-> A reliable way to get a single '\n' would be:
->
->     lf="$( printf '\n' )"
-This looks like a good idea. I need to work it more in depth though,
-as the "single-newline" printf seems to get caught by bash as an IFS -
-in other words, it produces an empty var. I'll come back to you with
-my findings.
+THIS IS SOME HORRIBLY BROKEN CRAP.
 
->
-> Yes, config is already a bash script, but no need to add bashisms when
-> they can be avoided. And since this patch is about POSIX compliance in
-> the first place... ;-)
-Well, it's more about POSIX compliance for utilities (grep, sed, find,
-etc.) which share the same name, a somewhat loose common interface,
-but a different implementation between GNU & *BSD. I'm assuming bash
-under Linux and *BSD comes from the same source :-).
-Besides, I can't say to what extent `config' script complies with
-POSIX shell interface and how it would run under other shells...
->
-> Otherwise, LGTM.
->
-Best regards,
-Clement
+"make install" and "make modules_install" ABSOLUTELY MUST NOT MODIFY
+THE SOURCE TREE.
 
-> Regards,
-> Yann E. MORIN.
->
-> --
-> .-----------------.--------------------.------------------.--------------------.
-> |  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-> | +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-> | +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-> | http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-> '------------------------------^-------^------------------^--------------------'
+Dammit, this has happened before, and it was broken then, and it is broken now.
+
+If they do, they are *F*CKING*BROKEN*. They are really really badly
+broken, since we do *not* want root to write to the source tree. You
+should build the tree as a normal user, and install as root, and
+dammit, if there are any root-owned files in the source tree after
+that "make install", then the build system is broken.
+
+You need to start being more careful. And I would seriously suggest
+you start doing some explicit testing for this. You can do things like
+"find . -user root", and if that shows a single file in the kernel
+tree after a "make [modules_]install", then there's a problem.
+
+Commit d2aae8477cd00325bb7c7c7e95be488088900c48 is broken. It causes
+root to re-write "include/config/kernel.release".
+
+There is no excuse for this. That commit is shit. There's no way in
+hell that "make modules_install" should ever rebuild anything, so
+adding that kind of dependency is fundamentally wrong and broken.
+
+And that totally crap commit is even marked for stable.
+
+I hate hate hate when this kind of crap happens. In this case I
+noticed it because the git commit abbreviation rules are different for
+root and for a normal user on my machine, and so running that
+version-generation script as root actually GIVES THE WRONG ANSWER - it
+gives a different version than the one the kernel was actually built
+with.
+
+So no. We do *not* start adding random dependencies to the install
+targets. Because they damn well should not be building anything.
+
+                           Linus
