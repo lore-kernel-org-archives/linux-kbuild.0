@@ -1,45 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ud10.udmedia.de ([194.117.254.50]:52496 "EHLO
-	mail.ud10.udmedia.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754471Ab3GKJqn (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 11 Jul 2013 05:46:43 -0400
-Date: Thu, 11 Jul 2013 11:46:40 +0200
-From: Markus Trippelsdorf <markus@trippelsdorf.de>
-Subject: [PATCH] .gitignore: ignore *.lz4 files
-Message-ID: <20130711094640.GA358@x4>
-References: <1367829775-4434-1-git-send-email-kyungsik.lee@lge.com>
- <1367829775-4434-2-git-send-email-kyungsik.lee@lge.com>
- <20130506095124.GA22041@pd.tnic>
- <CAMuHMdWH9w5fj6HRXi+9QcBJym4dukAFsPVGZVqSSk3yTZJUcA@mail.gmail.com>
- <20130710093642.GC14873@pd.tnic>
- <20130710182815.GA362@x4>
- <20130711043433.GA29245@hulk>
+Received: from cantor2.suse.de ([195.135.220.15]:47190 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755025Ab3GKNyw (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 11 Jul 2013 09:54:52 -0400
+Date: Thu, 11 Jul 2013 15:54:45 +0200
+From: Michal Marek <mmarek@suse.cz>
+Subject: Re: [GIT] kbuild changes for v3.11-rc1
+Message-ID: <20130711135445.GA21500@sepie.suse.cz>
+References: <20130710133742.GA29368@emu.suse.cz>
+ <CA+55aFxtvT3Yvbxe5JGBThZS13payymFJ7jCLyEiE2iNDvsZtQ@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20130711043433.GA29245@hulk>
+In-Reply-To: <CA+55aFxtvT3Yvbxe5JGBThZS13payymFJ7jCLyEiE2iNDvsZtQ@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kyungsik Lee <kyungsik.lee@lge.com>
-Cc: Borislav Petkov <bp@alien8.de>, Geert Uytterhoeven <geert@linux-m68k.org>, Andrew Morton <akpm@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, the arch/x86 maintainers <x86@kernel.org>, CE Linux Developers List <celinux-dev@lists.celinuxforum.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, hyojun.im@lge.com, chan.jeong@lge.com, raphael.andy.lee@gmail.com, "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@elte.hu>, Thomas Gleixner <tglx@linutronix.de>, Russell King <rmk@arm.linux.org.uk>, Florian Fainelli <florian@openwrt.org>, Yann Collet <yann.collet.73@gmail.com>, Chanho Min <chanho.min@lge.com>, Linux-Next <linux-next@vger.kernel.org>, "uclinux-dist-devel@blackfin.uclinux.org" <uclinux-dist-devel@blackfin.uclinux.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Jan Beulich <JBeulich@suse.com>, dt.tangr@gmail.com, Geert Uytterhoeven <geert@linux-m68k.org>, James Hogan <james.hogan@imgtec.com>, Christian Kujau <lists@nerdbynature.de>, Mike Marciniszyn <mike.marciniszyn@intel.com>, Nicolas Dichtel <nicolas.dichtel@6wind.com>, robert.richter@calxeda.com, "Yaakov (Cygwin/X)" <yselkowitz@users.sourceforge.net>, zzs0213@gmail.com, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-Now that lz4 kernel compression is available, add *.lz4 to .gitignore.
+On Wed, Jul 10, 2013 at 07:11:53PM -0700, Linus Torvalds wrote:
+> You need to start being more careful. And I would seriously suggest
+> you start doing some explicit testing for this. You can do things like
+> "find . -user root", and if that shows a single file in the kernel
+> tree after a "make [modules_]install", then there's a problem.
 
-Signed-off-by: Markus Trippelsdorf <markus@trippelsdorf.de>
-Acked-by: Kyungsik Lee <kyungsik.lee@lge.com>
+Good idea. I added this after the *install calls in my test script.
 
-diff --git a/.gitignore b/.gitignore
-index 3b8b9b3..7e9932e 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -29,6 +29,7 @@ modules.builtin
- *.bz2
- *.lzma
- *.xz
-+*.lz4
- *.lzo
- *.patch
- *.gcno
--- 
-Markus
+
+> Commit d2aae8477cd00325bb7c7c7e95be488088900c48 is broken. It causes
+> root to re-write "include/config/kernel.release".
+
+Yeah. It also reveals another bug that we rewrite the kernel.release
+file each time. This patch should fix it, but please do not apply it
+yet:
+
+From f522eef24216f229c82b6bbb55f326814db2bac0 Mon Sep 17 00:00:00 2001
+From: Michal Marek <mmarek@suse.cz>
+Date: Thu, 11 Jul 2013 15:34:51 +0200
+Subject: [PATCH] kbuild: Do not overwrite include/config/kernel.release
+ needlessly
+
+Use filechk to detect if the content changed or not.
+
+diff --git a/Makefile b/Makefile
+index 4e3575c..3aa232f 100644
+--- a/Makefile
++++ b/Makefile
+@@ -794,10 +794,13 @@ PHONY += $(vmlinux-dirs)
+ $(vmlinux-dirs): prepare scripts
+ 	$(Q)$(MAKE) $(build)=$@
+ 
++define filechk_kernel.release
++	echo "$(KERNELVERSION)$$($(CONFIG_SHELL) $(srctree)/scripts/setlocalversion $(srctree))"
++endef
++
+ # Store (new) KERNELRELEASE string in include/config/kernel.release
+ include/config/kernel.release: include/config/auto.conf FORCE
+-	$(Q)rm -f $@
+-	$(Q)echo "$(KERNELVERSION)$$($(CONFIG_SHELL) $(srctree)/scripts/setlocalversion $(srctree))" > $@
++	$(call filechk,kernel.release)
+ 
+ 
+ # Things we need to do before we recursively start building the kernel
+
+
+> There is no excuse for this. That commit is shit. There's no way in
+> hell that "make modules_install" should ever rebuild anything, so
+> adding that kind of dependency is fundamentally wrong and broken.
+
+We also run dozens of gcc checks during every make invocation, including
+make install or make help, so there is some room for improvement. But at
+least, these do not write to the source or object tree.
+
+Michal
