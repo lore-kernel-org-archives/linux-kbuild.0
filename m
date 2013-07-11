@@ -1,45 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.snhosting.dk ([87.238.248.203]:11407 "EHLO
+Received: from smtp.snhosting.dk ([87.238.248.203]:37685 "EHLO
 	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756624Ab3GKU4u (ORCPT
+	with ESMTP id S1755864Ab3GKVCW (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 11 Jul 2013 16:56:50 -0400
-Date: Thu, 11 Jul 2013 22:56:47 +0200
+	Thu, 11 Jul 2013 17:02:22 -0400
+Date: Thu, 11 Jul 2013 23:02:20 +0200
 From: Sam Ravnborg <sam@ravnborg.org>
 Subject: Re: Kconfig Gtk/Qt interface flavours ported to newest toolkit
 	versions
-Message-ID: <20130711205647.GA29911@merkur.ravnborg.org>
-References: <1372778550-22110-1-git-send-email-david.graeff@web.de> <20130703163038.GA3268@free.fr>
+Message-ID: <20130711210220.GB29911@merkur.ravnborg.org>
+References: <1372778550-22110-1-git-send-email-david.graeff@web.de> <20130703163038.GA3268@free.fr> <51D76127.9060209@tu-dortmund.de> <20130710213213.GF3297@free.fr>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20130703163038.GA3268@free.fr>
+In-Reply-To: <20130710213213.GF3297@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: davidgraeff <david.graeff@web.de>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+Cc: David =?iso-8859-1?Q?Gr=E4ff?= <david.graeff@tu-dortmund.de>, linux-kbuild@vger.kernel.org
 
 > 
-> I did not do any review of the patches, since I have a concern about the
-> series. It happens very often that, in enterprise ecosystems, the host
-> build machines are running rather aging distro, such as RHEL 5 (or even
-> RHEL 4 in some cases), so I think we still want the new kernels to be
-> buildable (and thus configurable) on such machines (eg. for
-> cross-compilation).
+> So as a summarry, here are the three options:
+>   - update existing frontends against their respective framework
+>   - add two new frontends, and two new goals to call them
+>   - add two new frontends, and decide whether to call them or the old ones
 > 
-> I have no idea when such enterprise distros have started bundling GTK3
-> or Qt4/5, but given RHEL-4 (which is still use in some places) is 8
-> years old, I doubt the new frontends would build on those distros.
+> Really, I have no idea what is best.
 
-IMO users restricted to these systems - if required to look at / modify the kernel
-configuration can use one of the other frontends.
-In other words - I do not think we shall stick to the old gtk / qt versions due to this.
+As per my other mail the best candidate is
+"- update existing frontends against their respective framework".
 
-> > I do not know if it was on purpose to keep all flavours except lxdialog in one single directory,
-> 
-> Historical artifact, I think... :-(
-lxdialog was one a separate binary - later we did a very rough conversion
-so it is now a single binary. But there are many left-overs from when it was
-separated.
+Because:
+- There exist a fallback for users that do not have the never libs available
+- The gtk/qt frontends see only little love&care - so coming up with something
+  that require more love&care is not good
+- And we know that we have a person to look after the problems that is introduced
+  at lest for a few months.
+
+We should carefully review the patches to make sure the resulting code is maintainable
+in the long term. I assume this is more or less a no-brainer.
 
 	Sam
