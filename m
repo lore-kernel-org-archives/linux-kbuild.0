@@ -1,96 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:51413 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757310Ab3GLJIC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 12 Jul 2013 05:08:02 -0400
-Subject: Re: [PATCH 12/15] kconfig: sort found symbols by relevance
-From: Jean Delvare <jdelvare@suse.de>
-In-Reply-To: <20130710204648.GE3297@free.fr>
-References: <cover.1372097219.git.yann.morin.1998@free.fr>
-	 <193b40aeb537b59eaa36e3dfaabedc2025332ebf.1372097219.git.yann.morin.1998@free.fr>
-	 <1373282357.4298.198.camel@chaos.site> <20130708173535.GB3206@free.fr>
-	 <20130710204648.GE3297@free.fr>
-Content-Type: text/plain; charset="UTF-8"
-Date: Fri, 12 Jul 2013 11:07:45 +0200
-Message-ID: <1373620065.4410.25.camel@chaos.site>
-Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Received: from mail-ee0-f51.google.com ([74.125.83.51]:46421 "EHLO
+	mail-ee0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932111Ab3GLKNY (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 12 Jul 2013 06:13:24 -0400
+Date: Fri, 12 Jul 2013 12:13:19 +0200
+From: Ingo Molnar <mingo@kernel.org>
+Subject: Re: [PATCH -next 2/2] kbuild: fix for updated LZ4 tool with the new
+ streaming format
+Message-ID: <20130712101319.GA13421@gmail.com>
+References: <1367829775-4434-1-git-send-email-kyungsik.lee@lge.com>
+ <1367829775-4434-2-git-send-email-kyungsik.lee@lge.com>
+ <20130712075602.GA4002@gmail.com>
+ <20130712080145.GC24008@pd.tnic>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20130712080145.GC24008@pd.tnic>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Roland Eggner <edvx1@systemanalysen.net>, Wang YanQing <udknight@gmail.com>
+To: Borislav Petkov <bp@alien8.de>
+Cc: Kyungsik Lee <kyungsik.lee@lge.com>, Andrew Morton <akpm@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org, celinux-dev@lists.celinuxforum.org, linux-arm-kernel@lists.infradead.org, hyojun.im@lge.com, chan.jeong@lge.com, raphael.andy.lee@gmail.com, "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@elte.hu>, Thomas Gleixner <tglx@linutronix.de>, Russell King <rmk@arm.linux.org.uk>, Florian Fainelli <florian@openwrt.org>, Yann Collet <yann.collet.73@gmail.com>, Chanho Min <chanho.min@lge.com>, Linus Torvalds <torvalds@linux-foundation.org>
 
-Yann, Michal,
 
-Le Wednesday 10 July 2013 à 22:46 +0200, Yann E. MORIN a écrit :
-> Michal, All,
+* Borislav Petkov <bp@alien8.de> wrote:
+
+> On Fri, Jul 12, 2013 at 09:56:02AM +0200, Ingo Molnar wrote:
+> >
+> > If a utility is not widely available yet and if the utility is not in 
+> > the kernel proper, could you please at least make sure that randconfig 
+> > does not stumble over non-buildable kernels?
 > 
-> On 2013-07-08 19:35 +0200, Yann E. MORIN spake thusly:
-> > On 2013-07-08 13:19 +0200, Jean Delvare spake thusly:
-> > > Le Monday 24 June 2013 à 20:11 +0200, Yann E. MORIN a écrit :
-> > > > From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-> > [--SNIP--]
-> > > > Since the search can be a regexp, it is possible that more than one symbol
-> > > > matches exactly. In this case, we can't decide which to sort first, so we
-> > > > fallback to alphabeticall sort.
-> [--SNIP--]
-> > > > Reported-by: Jean Delvare <jdelvare@suse.de>
-> > > > Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
-> > > > Cc: Jean Delvare <jdelvare@suse.de>
-> > > > Cc: Michal Marek <mmarek@suse.cz>
-> > > > Cc: Roland Eggner <edvx1@systemanalysen.net>
-> > > > Cc: Wang YanQing <udknight@gmail.com>
-> > > 
-> > > I tested it and it works fine, thanks!
-> > > 
-> > > Tested-by: Jean Delvare <jdelvare@suse.de>
-> > > 
-> > > Now comes my late review. Overall I like the idea and the code but a few
-> > > things could be improved:
-> > 
-> > Since this is already in Michal's tree, on should I proceed?
-> >   - send an updated patch that replaces that one, or
-> >   - send another additional patch with your proposed changes?
-> 
-> OK, since Michal already sent his pull-request to Linus, I'll prepare a
-> corrective patch I'll submit before the end of the week. Is that OK with
-> you, Michal?
+> Two months ago I've complained about this and other people have burned 
+> themselves too in the meantime...
 
-Sounds good to me at least. I'll do my best to test and review it
-quickly this time.
+and now it is upstream already, via -mm:
 
-> [--SNIP--]
-> > > > +static int sym_rel_comp( const void *sym1, const void *sym2 )
-> > > > +{
-> > > > +	struct sym_match *s1 = *(struct sym_match **)sym1;
-> > > > +	struct sym_match *s2 = *(struct sym_match **)sym2;
-> > > 
-> > > You shouldn't need these casts.
-> > 
-> > Probably not, indeed, but I like to write (and read) what I expect to
-> > happen, and pointer arithmetics is always something I dread to foobar.
-> 
-> In fact, we need the cast, otherwise gcc whines about const/non-const.
+   e76e1fdfa8f8 lib: add support for LZ4-compressed kernel
 
-And quite rightly so, as you are taking const pointers (i.e. the caller
-told you you are _not_ allowed to change the contents) and making them
-non-const pointers (i.e. you give yourself the right to still change the
-contents.) It happens that your function doesn't actually change the
-contents, so no harm done, but this is still conceptually wrong.
-Preserving the const nature of pointers down the call chain lets the
-compiler warn you if a function changes data it was not supposed to.
-
-So what you want to do is:
-
-static int sym_rel_comp(const void *sym1, const void *sym2)
-{
-	const struct sym_match *s1 = sym1;
-	const struct sym_match *s2 = sym2; 
-
-This is both concise and correct, and it makes gcc happy.
 
 Thanks,
--- 
-Jean Delvare
-Suse L3
 
+	Ingo
