@@ -1,82 +1,96 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f171.google.com ([209.85.212.171]:53325 "EHLO
-	mail-wi0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757361Ab3GLJCn (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 12 Jul 2013 05:02:43 -0400
-Received: by mail-wi0-f171.google.com with SMTP id hj3so414476wib.4
-        for <linux-kbuild@vger.kernel.org>; Fri, 12 Jul 2013 02:02:42 -0700 (PDT)
-MIME-Version: 1.0
-Reply-To: sedat.dilek@gmail.com
-In-Reply-To: <20130712063216.GA30083@merkur.ravnborg.org>
-References: <CA+icZUX=sOdR5J3rM0YLw350jWJxS7+R_Bb0WkHb7Q4Ekbc6Zg@mail.gmail.com>
-	<20130711210355.GC29911@merkur.ravnborg.org>
-	<CA+icZUWQpoOH03MRT_r5T5vZKwU9p52tCU6MqyCfVi-k7ZGbNA@mail.gmail.com>
-	<20130711210827.GA29928@merkur.ravnborg.org>
-	<CA+icZUXwOSkE=mOyOuQWjnpFdka5LB4=PF-cXDAJJPUr26E0OQ@mail.gmail.com>
-	<CA+icZUVQ=WAO2X_7Wn2pnFfm1AnYPHHmXm=Q1NSG_u8O9YrtxA@mail.gmail.com>
-	<20130712063216.GA30083@merkur.ravnborg.org>
-Date: Fri, 12 Jul 2013 11:02:42 +0200
-Message-ID: <CA+icZUW=MWntq0jNG0V57UDVAxf4Yu_S+baw_O=O_uvLCTvEGA@mail.gmail.com>
-Subject: Re: $(call cc-option) in combination with KBUILD_*FLAGS
-From: Sedat Dilek <sedat.dilek@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Received: from cantor2.suse.de ([195.135.220.15]:51413 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1757310Ab3GLJIC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 12 Jul 2013 05:08:02 -0400
+Subject: Re: [PATCH 12/15] kconfig: sort found symbols by relevance
+From: Jean Delvare <jdelvare@suse.de>
+In-Reply-To: <20130710204648.GE3297@free.fr>
+References: <cover.1372097219.git.yann.morin.1998@free.fr>
+	 <193b40aeb537b59eaa36e3dfaabedc2025332ebf.1372097219.git.yann.morin.1998@free.fr>
+	 <1373282357.4298.198.camel@chaos.site> <20130708173535.GB3206@free.fr>
+	 <20130710204648.GE3297@free.fr>
+Content-Type: text/plain; charset="UTF-8"
+Date: Fri, 12 Jul 2013 11:07:45 +0200
+Message-ID: <1373620065.4410.25.camel@chaos.site>
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Roland Eggner <edvx1@systemanalysen.net>, Wang YanQing <udknight@gmail.com>
 
-On Fri, Jul 12, 2013 at 8:32 AM, Sam Ravnborg <sam@ravnborg.org> wrote:
-> On Fri, Jul 12, 2013 at 12:16:48AM +0200, Sedat Dilek wrote:
->> On Thu, Jul 11, 2013 at 11:12 PM, Sedat Dilek <sedat.dilek@gmail.com> wrote:
->> > On Thu, Jul 11, 2013 at 11:08 PM, Sam Ravnborg <sam@ravnborg.org> wrote:
->> >> On Thu, Jul 11, 2013 at 11:05:24PM +0200, Sedat Dilek wrote:
->> >>> On Thu, Jul 11, 2013 at 11:03 PM, Sam Ravnborg <sam@ravnborg.org> wrote:
->> >>> > On Fri, Jul 05, 2013 at 05:36:21PM +0200, Sedat Dilek wrote:
->> >>> >> Hi,
->> >>> >>
->> >>> >> in which case(s) do you have to set a comma or not?
->> >>> >
->> >>> > Only when you specify the last option.
->> >>>
->> >>> You have an example for this?
->> >>
->> >> Example:
->> >> arch/m68k/Makefile:cpuflags-$(CONFIG_M5441x)    := $(call cc-option,-mcpu=54455,-mcfv4e)
->> >>
->> >
->> > OK, so if I have multiple cc-options separated vi comma. So a single
->> > one it is not mandatory.
->> >
->>
->> So, this can be simplified:
->>
->> [ arch/x86/realmode/rm/Makefile ]
->>
->> OLD:
->>                    $(call cc-option, -fno-toplevel-reorder,\
->>                         $(call cc-option, -fno-unit-at-a-time)) \
->
-> It works like this:
-> - Use the option -fno-toplevel-reorder if supported by gcc,
->   otherwise use the option -fno-unit-at-a-time if supported by gcc.
->
->> NEW:
->>                    $(call cc-option, -fno-toplevel-reorder, -fno-unit-at-a-time)
-> It works like this:
-> - Use the option -fno-toplevel-reorder if supported by gcc,
->   otherwise use the option -fno-unit-at-a-time.
->
-> So the new variant fails to test if gcc supports -fno-unit-at-a-time before applying
-> that option.
-> I do not know with the current minimum gcc version if the checks are required.
-> But the functionality for the NEW and the OLD variant are not the same.
->
+Yann, Michal,
 
-Great, all your explanation helped me to understand it better.
+Le Wednesday 10 July 2013 à 22:46 +0200, Yann E. MORIN a écrit :
+> Michal, All,
+> 
+> On 2013-07-08 19:35 +0200, Yann E. MORIN spake thusly:
+> > On 2013-07-08 13:19 +0200, Jean Delvare spake thusly:
+> > > Le Monday 24 June 2013 à 20:11 +0200, Yann E. MORIN a écrit :
+> > > > From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+> > [--SNIP--]
+> > > > Since the search can be a regexp, it is possible that more than one symbol
+> > > > matches exactly. In this case, we can't decide which to sort first, so we
+> > > > fallback to alphabeticall sort.
+> [--SNIP--]
+> > > > Reported-by: Jean Delvare <jdelvare@suse.de>
+> > > > Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+> > > > Cc: Jean Delvare <jdelvare@suse.de>
+> > > > Cc: Michal Marek <mmarek@suse.cz>
+> > > > Cc: Roland Eggner <edvx1@systemanalysen.net>
+> > > > Cc: Wang YanQing <udknight@gmail.com>
+> > > 
+> > > I tested it and it works fine, thanks!
+> > > 
+> > > Tested-by: Jean Delvare <jdelvare@suse.de>
+> > > 
+> > > Now comes my late review. Overall I like the idea and the code but a few
+> > > things could be improved:
+> > 
+> > Since this is already in Michal's tree, on should I proceed?
+> >   - send an updated patch that replaces that one, or
+> >   - send another additional patch with your proposed changes?
+> 
+> OK, since Michal already sent his pull-request to Linus, I'll prepare a
+> corrective patch I'll submit before the end of the week. Is that OK with
+> you, Michal?
 
-I will give llvmlinux-project a reference to this thread on linux-kbuild ML.
+Sounds good to me at least. I'll do my best to test and review it
+quickly this time.
 
-- Sedat -
+> [--SNIP--]
+> > > > +static int sym_rel_comp( const void *sym1, const void *sym2 )
+> > > > +{
+> > > > +	struct sym_match *s1 = *(struct sym_match **)sym1;
+> > > > +	struct sym_match *s2 = *(struct sym_match **)sym2;
+> > > 
+> > > You shouldn't need these casts.
+> > 
+> > Probably not, indeed, but I like to write (and read) what I expect to
+> > happen, and pointer arithmetics is always something I dread to foobar.
+> 
+> In fact, we need the cast, otherwise gcc whines about const/non-const.
 
->         Sam
+And quite rightly so, as you are taking const pointers (i.e. the caller
+told you you are _not_ allowed to change the contents) and making them
+non-const pointers (i.e. you give yourself the right to still change the
+contents.) It happens that your function doesn't actually change the
+contents, so no harm done, but this is still conceptually wrong.
+Preserving the const nature of pointers down the call chain lets the
+compiler warn you if a function changes data it was not supposed to.
+
+So what you want to do is:
+
+static int sym_rel_comp(const void *sym1, const void *sym2)
+{
+	const struct sym_match *s1 = sym1;
+	const struct sym_match *s2 = sym2; 
+
+This is both concise and correct, and it makes gcc happy.
+
+Thanks,
+-- 
+Jean Delvare
+Suse L3
+
