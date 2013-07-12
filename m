@@ -1,66 +1,78 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.snhosting.dk ([87.238.248.203]:28467 "EHLO
-	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752554Ab3GLGcT (ORCPT
+Received: from mail-ea0-f178.google.com ([209.85.215.178]:62809 "EHLO
+	mail-ea0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757184Ab3GLH4H (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 12 Jul 2013 02:32:19 -0400
-Date: Fri, 12 Jul 2013 08:32:17 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: $(call cc-option) in combination with KBUILD_*FLAGS
-Message-ID: <20130712063216.GA30083@merkur.ravnborg.org>
-References: <CA+icZUX=sOdR5J3rM0YLw350jWJxS7+R_Bb0WkHb7Q4Ekbc6Zg@mail.gmail.com> <20130711210355.GC29911@merkur.ravnborg.org> <CA+icZUWQpoOH03MRT_r5T5vZKwU9p52tCU6MqyCfVi-k7ZGbNA@mail.gmail.com> <20130711210827.GA29928@merkur.ravnborg.org> <CA+icZUXwOSkE=mOyOuQWjnpFdka5LB4=PF-cXDAJJPUr26E0OQ@mail.gmail.com> <CA+icZUVQ=WAO2X_7Wn2pnFfm1AnYPHHmXm=Q1NSG_u8O9YrtxA@mail.gmail.com>
+	Fri, 12 Jul 2013 03:56:07 -0400
+Date: Fri, 12 Jul 2013 09:56:02 +0200
+From: Ingo Molnar <mingo@kernel.org>
+Subject: Re: [PATCH -next 2/2] kbuild: fix for updated LZ4 tool with the new
+ streaming format
+Message-ID: <20130712075602.GA4002@gmail.com>
+References: <1367829775-4434-1-git-send-email-kyungsik.lee@lge.com>
+ <1367829775-4434-2-git-send-email-kyungsik.lee@lge.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CA+icZUVQ=WAO2X_7Wn2pnFfm1AnYPHHmXm=Q1NSG_u8O9YrtxA@mail.gmail.com>
+In-Reply-To: <1367829775-4434-2-git-send-email-kyungsik.lee@lge.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sedat Dilek <sedat.dilek@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>
+To: Kyungsik Lee <kyungsik.lee@lge.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org, celinux-dev@lists.celinuxforum.org, linux-arm-kernel@lists.infradead.org, hyojun.im@lge.com, chan.jeong@lge.com, raphael.andy.lee@gmail.com, "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@elte.hu>, Thomas Gleixner <tglx@linutronix.de>, Russell King <rmk@arm.linux.org.uk>, Borislav Petkov <bp@alien8.de>, Florian Fainelli <florian@openwrt.org>, Yann Collet <yann.collet.73@gmail.com>, Chanho Min <chanho.min@lge.com>
 
-On Fri, Jul 12, 2013 at 12:16:48AM +0200, Sedat Dilek wrote:
-> On Thu, Jul 11, 2013 at 11:12 PM, Sedat Dilek <sedat.dilek@gmail.com> wrote:
-> > On Thu, Jul 11, 2013 at 11:08 PM, Sam Ravnborg <sam@ravnborg.org> wrote:
-> >> On Thu, Jul 11, 2013 at 11:05:24PM +0200, Sedat Dilek wrote:
-> >>> On Thu, Jul 11, 2013 at 11:03 PM, Sam Ravnborg <sam@ravnborg.org> wrote:
-> >>> > On Fri, Jul 05, 2013 at 05:36:21PM +0200, Sedat Dilek wrote:
-> >>> >> Hi,
-> >>> >>
-> >>> >> in which case(s) do you have to set a comma or not?
-> >>> >
-> >>> > Only when you specify the last option.
-> >>>
-> >>> You have an example for this?
-> >>
-> >> Example:
-> >> arch/m68k/Makefile:cpuflags-$(CONFIG_M5441x)    := $(call cc-option,-mcpu=54455,-mcfv4e)
-> >>
-> >
-> > OK, so if I have multiple cc-options separated vi comma. So a single
-> > one it is not mandatory.
-> >
+
+* Kyungsik Lee <kyungsik.lee@lge.com> wrote:
+
+> LZ4 has been updated with LZ4 Streaming Format specification(v1.3).
+> lz4demo is replaced by lz4c. lz4c supports both the new streaming and
+> legacy format with -l option.
 > 
-> So, this can be simplified:
+> This patch makes use of lz4c to support legacy format which is
+> used for LZ4 De/compression in the linux kernel.
 > 
-> [ arch/x86/realmode/rm/Makefile ]
+> Link: https://code.google.com/p/lz4/source/checkout
+> Signed-off-by: Kyungsik Lee <kyungsik.lee@lge.com>
+> Cc: "H. Peter Anvin" <hpa@zytor.com>
+> Cc: Ingo Molnar <mingo@elte.hu>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Russell King <rmk@arm.linux.org.uk>
+> Cc: Borislav Petkov <bp@alien8.de>
+> Cc: Florian Fainelli <florian@openwrt.org>
+> Cc: Yann Collet <yann.collet.73@gmail.com>
+> Cc: Chanho Min <chanho.min@lge.com>
+> ---
+>  scripts/Makefile.lib | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> OLD:
->                    $(call cc-option, -fno-toplevel-reorder,\
->                         $(call cc-option, -fno-unit-at-a-time)) \
+> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+> index a0ab6d7..c9bfbb0 100644
+> --- a/scripts/Makefile.lib
+> +++ b/scripts/Makefile.lib
+> @@ -313,7 +313,7 @@ cmd_lzo = (cat $(filter-out FORCE,$^) | \
+>  
+>  quiet_cmd_lz4 = LZ4     $@
+>  cmd_lz4 = (cat $(filter-out FORCE,$^) | \
+> -	lz4demo -c1 stdin stdout && $(call size_append, $(filter-out FORCE,$^))) > $@ || \
+> +	lz4c -l -c1 stdin stdout && $(call size_append, $(filter-out FORCE,$^))) > $@ || \
+>  	(rm -f $@ ; false)
 
-It works like this:
-- Use the option -fno-toplevel-reorder if supported by gcc,
-  otherwise use the option -fno-unit-at-a-time if supported by gcc.
+None of the major distros I tried has the lz4 or lz4c binary available, 
+and this breaks randconfig builds:
 
-> NEW:
->                    $(call cc-option, -fno-toplevel-reorder, -fno-unit-at-a-time)
-It works like this:
-- Use the option -fno-toplevel-reorder if supported by gcc,
-  otherwise use the option -fno-unit-at-a-time.
+  /bin/sh: lz4c: command not found
 
-So the new variant fails to test if gcc supports -fno-unit-at-a-time before applying
-that option.
-I do not know with the current minimum gcc version if the checks are required.
-But the functionality for the NEW and the OLD variant are not the same.
+If:
 
-	Sam
+ CONFIG_HAVE_KERNEL_LZ4=y
+ CONFIG_KERNEL_LZ4=y
+ CONFIG_RD_LZ4=y
+ CONFIG_LZ4_DECOMPRESS=y
+ CONFIG_DECOMPRESS_LZ4=y
+
+If a utility is not widely available yet and if the utility is not in the 
+kernel proper, could you please at least make sure that randconfig does 
+not stumble over non-buildable kernels?
+
+Thanks,
+
+	Ingo
