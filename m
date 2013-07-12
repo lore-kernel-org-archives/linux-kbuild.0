@@ -1,52 +1,107 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.skyhub.de ([78.46.96.112]:51720 "EHLO mail.skyhub.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S964794Ab3GLMrR (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 12 Jul 2013 08:47:17 -0400
-Date: Fri, 12 Jul 2013 14:46:57 +0200
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH -next 2/2] kbuild: fix for updated LZ4 tool with the new
- streaming format
-Message-ID: <20130712124657.GH24008@pd.tnic>
-References: <1367829775-4434-1-git-send-email-kyungsik.lee@lge.com>
- <1367829775-4434-2-git-send-email-kyungsik.lee@lge.com>
- <20130712075602.GA4002@gmail.com>
- <20130712080145.GC24008@pd.tnic>
- <20130712101319.GA13421@gmail.com>
- <20130712102326.GE24008@pd.tnic>
- <20130712041810.53c86e5f.akpm@linux-foundation.org>
- <20130712121354.GG24008@pd.tnic>
- <CAGVrzcZq-NQU=1UY7FpXPXZPFjJV7CQMsNQJbdY=bLTFVqGQHA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAGVrzcZq-NQU=1UY7FpXPXZPFjJV7CQMsNQJbdY=bLTFVqGQHA@mail.gmail.com>
+Received: from mail-we0-f175.google.com ([74.125.82.175]:47185 "EHLO
+	mail-we0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757776Ab3GLW0o (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 12 Jul 2013 18:26:44 -0400
+Received: by mail-we0-f175.google.com with SMTP id t59so8305919wes.6
+        for <linux-kbuild@vger.kernel.org>; Fri, 12 Jul 2013 15:26:43 -0700 (PDT)
+From: Clement Chauplannaz <chauplac@gmail.com>
+Subject: [PATCH v2] scripts/config: use sed's POSIX interface
+Date: Sat, 13 Jul 2013 00:26:17 +0200
+Message-Id: <1373667977-8034-1-git-send-email-chauplac@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Florian Fainelli <florian@openwrt.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Ingo Molnar <mingo@kernel.org>, Kyungsik Lee <kyungsik.lee@lge.com>, Michal Marek <mmarek@suse.cz>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, x86@kernel.org, celinux-dev@lists.celinuxforum.org, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, hyojun.im@lge.com, chan.jeong@lge.com, raphael.andy.lee@gmail.com, "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@elte.hu>, Thomas Gleixner <tglx@linutronix.de>, Russell King <rmk@arm.linux.org.uk>, Yann Collet <yann.collet.73@gmail.com>, Chanho Min <chanho.min@lge.com>, Linus Torvalds <torvalds@linux-foundation.org>
+To: linux-kbuild@vger.kernel.org
+Cc: mmarek@suse.cz, ak@linux.intel.com, yann.morin.1998@free.fr
 
-On Fri, Jul 12, 2013 at 01:34:38PM +0100, Florian Fainelli wrote:
-> Shall we provide a shell script wrapper for all of these compressor
-> commands which would test for the utility presence and issue a BIG FAT
-> WARNING if not, but still create the file not to make the kernel build
-> fail? I guess we could probably do this in the Makefile directly as
-> well.
+Script `config' relies on extensions of `GNU sed', and is thus not
+working on all Unixes:
+- in-place edition of files (-i), which can be replaced with
+a temporary file;
+- extended-regexps (-r), which can be split into basic regexps;
+- single-line calls to `a' command, while some implementations
+require a leading newline before the parameter.
 
-I don't know how that would work with the main kernel Makefile
-but we do those kinds of tests in perf before we build it so
-that we can save ourselves the time spent on a failed build:
-2209001fd895e8932ae2c85bfca233758234499a.
+Rewrite calls to `sed' to comply with POSIX interface, and move them
+to helper functions.
 
-This should probably work if you add a prerequisite target which runs
-early in the build process and checks for all the userspace tools
-required for the build.
+Signed-off-by: Clement Chauplannaz <chauplac@gmail.com>
+---
+Changes in v2:
+- ANSI C style quoting to produce newlines ($'\n') is replaced with
+  printf's, not to introduce further dependency on bash.
+- helper functions are introduced to wrap calls to `sed'.
 
-Thanks.
+ scripts/config | 41 ++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 38 insertions(+), 3 deletions(-)
 
+diff --git a/scripts/config b/scripts/config
+index a65ecbb..a01bc11 100755
+--- a/scripts/config
++++ b/scripts/config
+@@ -60,15 +60,48 @@ checkarg() {
+ 	fi
+ }
+ 
++txt_append() {
++	local anchor="$1"
++	local insert="$2"
++	local infile="$3"
++	local outfile="$4"
++
++	# sed append cmd: 'a\' + newline + text + newline
++	cmd="$(printf "a\\%b$insert%b" "\n" "\n")"
++
++	sed -e "/$anchor/$cmd" "$infile" >"$outfile"
++}
++
++txt_subst() {
++	local before="$1"
++	local after="$2"
++	local infile="$3"
++	local outfile="$4"
++
++	sed -e "s/$before/$after/" "$infile" >"$outfile"
++}
++
++txt_delete() {
++	local text="$1"
++	local infile="$2"
++	local outfile="$3"
++
++	sed -e "/$text/d" "$infile" >"$outfile"
++}
++
+ set_var() {
+ 	local name=$1 new=$2 before=$3
+ 
+ 	name_re="^($name=|# $name is not set)"
+ 	before_re="^($before=|# $before is not set)"
+ 	if test -n "$before" && grep -Eq "$before_re" "$FN"; then
+-		sed -ri "/$before_re/a $new" "$FN"
++		txt_append "^$before=" "$new" "$FN" "$FN.swp"
++		txt_append "^# $before is not set" "$new" "$FN.swp" "$FN"
++		rm "$FN.swp"
+ 	elif grep -Eq "$name_re" "$FN"; then
+-		sed -ri "s:$name_re.*:$new:" "$FN"
++		txt_subst "^$name=.*" "$new" "$FN" "$FN.swp"
++		txt_subst "^# $name is not set" "$new" "$FN.swp" "$FN"
++		rm "$FN.swp"
+ 	else
+ 		echo "$new" >>"$FN"
+ 	fi
+@@ -77,7 +110,9 @@ set_var() {
+ undef_var() {
+ 	local name=$1
+ 
+-	sed -ri "/^($name=|# $name is not set)/d" "$FN"
++	txt_delete "^$name=" "$FN" "$FN.swp"
++	txt_delete "^# $name is not set" "$FN.swp" "$FN"
++	rm "$FN.swp"
+ }
+ 
+ if [ "$1" = "--file" ]; then
 -- 
-Regards/Gruss,
-    Boris.
+1.8.3.rc1.44.gb387c77.dirty
 
-Sent from a fat crate under my desk. Formatting is fine.
---
