@@ -1,101 +1,82 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:51063 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757441Ab3GLI6G (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 12 Jul 2013 04:58:06 -0400
-Subject: Re: [PATCH 12/15] kconfig: sort found symbols by relevance
-From: Jean Delvare <jdelvare@suse.de>
-In-Reply-To: <20130708173535.GB3206@free.fr>
-References: <cover.1372097219.git.yann.morin.1998@free.fr>
-	 <193b40aeb537b59eaa36e3dfaabedc2025332ebf.1372097219.git.yann.morin.1998@free.fr>
-	 <1373282357.4298.198.camel@chaos.site>  <20130708173535.GB3206@free.fr>
-Content-Type: text/plain; charset="UTF-8"
-Date: Fri, 12 Jul 2013 10:57:48 +0200
-Message-ID: <1373619468.4410.19.camel@chaos.site>
-Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Received: from mail-wi0-f171.google.com ([209.85.212.171]:53325 "EHLO
+	mail-wi0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757361Ab3GLJCn (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 12 Jul 2013 05:02:43 -0400
+Received: by mail-wi0-f171.google.com with SMTP id hj3so414476wib.4
+        for <linux-kbuild@vger.kernel.org>; Fri, 12 Jul 2013 02:02:42 -0700 (PDT)
+MIME-Version: 1.0
+Reply-To: sedat.dilek@gmail.com
+In-Reply-To: <20130712063216.GA30083@merkur.ravnborg.org>
+References: <CA+icZUX=sOdR5J3rM0YLw350jWJxS7+R_Bb0WkHb7Q4Ekbc6Zg@mail.gmail.com>
+	<20130711210355.GC29911@merkur.ravnborg.org>
+	<CA+icZUWQpoOH03MRT_r5T5vZKwU9p52tCU6MqyCfVi-k7ZGbNA@mail.gmail.com>
+	<20130711210827.GA29928@merkur.ravnborg.org>
+	<CA+icZUXwOSkE=mOyOuQWjnpFdka5LB4=PF-cXDAJJPUr26E0OQ@mail.gmail.com>
+	<CA+icZUVQ=WAO2X_7Wn2pnFfm1AnYPHHmXm=Q1NSG_u8O9YrtxA@mail.gmail.com>
+	<20130712063216.GA30083@merkur.ravnborg.org>
+Date: Fri, 12 Jul 2013 11:02:42 +0200
+Message-ID: <CA+icZUW=MWntq0jNG0V57UDVAxf4Yu_S+baw_O=O_uvLCTvEGA@mail.gmail.com>
+Subject: Re: $(call cc-option) in combination with KBUILD_*FLAGS
+From: Sedat Dilek <sedat.dilek@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Roland Eggner <edvx1@systemanalysen.net>, Wang YanQing <udknight@gmail.com>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>
 
-Hi Yann,
+On Fri, Jul 12, 2013 at 8:32 AM, Sam Ravnborg <sam@ravnborg.org> wrote:
+> On Fri, Jul 12, 2013 at 12:16:48AM +0200, Sedat Dilek wrote:
+>> On Thu, Jul 11, 2013 at 11:12 PM, Sedat Dilek <sedat.dilek@gmail.com> wrote:
+>> > On Thu, Jul 11, 2013 at 11:08 PM, Sam Ravnborg <sam@ravnborg.org> wrote:
+>> >> On Thu, Jul 11, 2013 at 11:05:24PM +0200, Sedat Dilek wrote:
+>> >>> On Thu, Jul 11, 2013 at 11:03 PM, Sam Ravnborg <sam@ravnborg.org> wrote:
+>> >>> > On Fri, Jul 05, 2013 at 05:36:21PM +0200, Sedat Dilek wrote:
+>> >>> >> Hi,
+>> >>> >>
+>> >>> >> in which case(s) do you have to set a comma or not?
+>> >>> >
+>> >>> > Only when you specify the last option.
+>> >>>
+>> >>> You have an example for this?
+>> >>
+>> >> Example:
+>> >> arch/m68k/Makefile:cpuflags-$(CONFIG_M5441x)    := $(call cc-option,-mcpu=54455,-mcfv4e)
+>> >>
+>> >
+>> > OK, so if I have multiple cc-options separated vi comma. So a single
+>> > one it is not mandatory.
+>> >
+>>
+>> So, this can be simplified:
+>>
+>> [ arch/x86/realmode/rm/Makefile ]
+>>
+>> OLD:
+>>                    $(call cc-option, -fno-toplevel-reorder,\
+>>                         $(call cc-option, -fno-unit-at-a-time)) \
+>
+> It works like this:
+> - Use the option -fno-toplevel-reorder if supported by gcc,
+>   otherwise use the option -fno-unit-at-a-time if supported by gcc.
+>
+>> NEW:
+>>                    $(call cc-option, -fno-toplevel-reorder, -fno-unit-at-a-time)
+> It works like this:
+> - Use the option -fno-toplevel-reorder if supported by gcc,
+>   otherwise use the option -fno-unit-at-a-time.
+>
+> So the new variant fails to test if gcc supports -fno-unit-at-a-time before applying
+> that option.
+> I do not know with the current minimum gcc version if the checks are required.
+> But the functionality for the NEW and the OLD variant are not the same.
+>
 
-Sorry again for the late reply, busy...
+Great, all your explanation helped me to understand it better.
 
-Le Monday 08 July 2013 à 19:35 +0200, Yann E. MORIN a écrit :
-> On 2013-07-08 13:19 +0200, Jean Delvare spake thusly:
-> > This is more concise and easier to grasp, methinks. I don't think the
-> > reference to the user's locale is needed, as there's no surprise here,
-> > and it probably doesn't matter anyway for kernel symbols.
-> 
-> Yes it may matter even for kernel symbols, since some locales may
-> consider '_' as a character to sort by, while other locales may not.
+I will give llvmlinux-project a reference to this thread on linux-kbuild ML.
 
-I didn't know that, thanks for the information. That being said I still
-believe mentioning the user's locale is not needed ;-)
+- Sedat -
 
-> > BTW I was wondering if it would add value to explicitly print group
-> > header labels "Exact matches" and "Other matches" in the search results.
-> > What do you think?
-> 
-> It is not trivial to do, since the search function only returns a single
-> array, so there's no way for frontends (which do the display) to
-> differentiate which part of the array are exact matches, and which are
-> only partial matches.
-> 
-> It is much more involved, and I don't think it would be easy to
-> implement.
-
-I understand, and I agree it's not worth the effort.
-
-> > > +{
-> > > +	struct sym_match *s1 = *(struct sym_match **)sym1;
-> > > +	struct sym_match *s2 = *(struct sym_match **)sym2;
-> > 
-> > You shouldn't need these casts.
-> 
-> Probably not, indeed, but I like to write (and read) what I expect to
-> happen, and pointer arithmetics is always something I dread to foobar.
-
-I hear this argument every now and then but I do not think it holds. If
-you always forcibly cast pointers even when you don't have to, then gcc
-has no chance to warn you if you get it wrong.
-
-More on this later as I reply to your next post...
-
-> > It might be even faster to store the symbol length in struct sym_match,
-> > but this would increase the structure size and consequently memory
-> > consumption, and it is questionable if the speed gain is worth it.
-> > Probably not.
-> 
-> I intended this structure to only hold the result of the regexp match,
-> and nothing more. The symbol length does not belong there, IMHO.
-> Besides, it's easy to get back, since the symbol struct is available.
-> 
-> OTOH, we would gain by computing strlen at regexp match, instead of
-> every time in the sorting function.
-> 
-> But that's micro-optimisation, methinks. Searching for the example
-> ^ATH.K took less than me focusing from the RETURN key to the screen. ;-)
-
-OK, fair enough. I always pay attention to algorithmic complexity
-because not everyone is running brand new and powerful machines (I am
-not, to start with.)
-
-I agree that the number of items returned by the search should generally
-be small enough so it shouldn't be an issue in practice. If you want to
-test your code on extreme cases though, you could search for "A" or even
-".". It takes about 20 seconds for "A" on my machine and close to 1
-minute for ".", which is quite slow. That being said that was already
-the case before your patch, so I'm not blaming your changes for it.
-
-> (...)
-> Thank you for the review! :-)
-
-You're welcome :-)
-
--- 
-Jean Delvare
-Suse L3
-
+>         Sam
