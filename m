@@ -1,27 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-we0-f181.google.com ([74.125.82.181]:47011 "EHLO
-	mail-we0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757986Ab3GMSIf (ORCPT
+Received: from mail-wg0-f51.google.com ([74.125.82.51]:57891 "EHLO
+	mail-wg0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758161Ab3GMSIh (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 13 Jul 2013 14:08:35 -0400
+	Sat, 13 Jul 2013 14:08:37 -0400
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: [PATCH 0/3] Misc cleanups in kconfig for symbol-search
-Date: Sat, 13 Jul 2013 20:08:22 +0200
-Message-Id: <1373738905-23396-1-git-send-email-yann.morin.1998@free.fr>
+Subject: [PATCH 1/3] Documentation/kconfig: more concise and straightforward search explanation
+Date: Sat, 13 Jul 2013 20:08:23 +0200
+Message-Id: <1373738905-23396-2-git-send-email-yann.morin.1998@free.fr>
+In-Reply-To: <1373738905-23396-1-git-send-email-yann.morin.1998@free.fr>
+References: <1373738905-23396-1-git-send-email-yann.morin.1998@free.fr>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Jean Delvare <jdelvare@suse.de>
+Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Jean Delvare <jdelvare@suse.de>, "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-Hello All!
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-Here are a few code cleanups after Jean's review:
-    [PATCH 1/3] Documentation/kconfig: more concise and straightforward
-    [PATCH 2/3] kconfig: avoid multiple calls to strlen
-    [PATCH 3/3] kconfig: cleanup symbol-search code
+Re-phrase the explanations on the sorting of search results, in a more
+concise and complete way.
 
-If everything is good, I'll send a pull-request to Michal a bit later
-during the rc phase (in case more fixups accumulate).
+Drop reference to the user's locale when sorting alphabetically, since
+this is implicit.
 
-Regards,
-Yann E. MORIN.
+Reported-by: Jean Delvare <jdelvare@suse.de>
+Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: Jean Delvare <jdelvare@suse.de>
+---
+ Documentation/kbuild/kconfig.txt | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
+
+diff --git a/Documentation/kbuild/kconfig.txt b/Documentation/kbuild/kconfig.txt
+index e9f9e76..6edf37d 100644
+--- a/Documentation/kbuild/kconfig.txt
++++ b/Documentation/kbuild/kconfig.txt
+@@ -175,11 +175,9 @@ Searching in menuconfig:
+ 		/^hotplug
+ 
+ 	When searching, symbols are sorted thus:
+-	  - exact match first: an exact match is when the search matches
+-	    the complete symbol name;
+-	  - alphabetical order: when two symbols do not match exactly,
+-	    they are sorted in alphabetical order (in the user's current
+-	    locale).
++	  - first, exact matches, sorted alphabetically (an exact match                                                                │18:03 -!- - keep a notice in the topic and perhaps as an on-join message).
++	    is when the search matches the complete symbol name);                                                                      │18:03 -!- -  
++	  - then, other matches, sorted alphabetically.
+ 	For example: ^ATH.K matches:
+ 	    ATH5K ATH9K ATH5K_AHB ATH5K_DEBUG [...] ATH6KL ATH6KL_DEBUG
+ 	    [...] ATH9K_AHB ATH9K_BTCOEX_SUPPORT ATH9K_COMMON [...]
+-- 
+1.8.1.2
+
