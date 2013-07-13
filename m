@@ -1,60 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f49.google.com ([74.125.82.49]:61456 "EHLO
-	mail-wg0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758233Ab3GMSIi (ORCPT
+Received: from mail-wi0-f182.google.com ([209.85.212.182]:51650 "EHLO
+	mail-wi0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751752Ab3GMSOL convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 13 Jul 2013 14:08:38 -0400
+	Sat, 13 Jul 2013 14:14:11 -0400
+Date: Sat, 13 Jul 2013 20:14:05 +0200
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: [PATCH 2/3] kconfig: avoid multiple calls to strlen
-Date: Sat, 13 Jul 2013 20:08:24 +0200
-Message-Id: <1373738905-23396-3-git-send-email-yann.morin.1998@free.fr>
-In-Reply-To: <1373738905-23396-1-git-send-email-yann.morin.1998@free.fr>
+Subject: Re: [PATCH 1/3] Documentation/kconfig: more concise and
+ straightforward search explanation
+Message-ID: <20130713181405.GD3280@free.fr>
 References: <1373738905-23396-1-git-send-email-yann.morin.1998@free.fr>
+ <1373738905-23396-2-git-send-email-yann.morin.1998@free.fr>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8BIT
+In-Reply-To: <1373738905-23396-2-git-send-email-yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Jean Delvare <jdelvare@suse.de>, "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Jean Delvare <jdelvare@suse.de>
 
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+All,
 
-Calls to strlen are costly, so avoid calling strln as much as we can.
+On 2013-07-13 20:08 +0200, Yann E. MORIN spake thusly:
+> From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+> 
+> Re-phrase the explanations on the sorting of search results, in a more
+> concise and complete way.
+> 
+> Drop reference to the user's locale when sorting alphabetically, since
+> this is implicit.
+> 
+> Reported-by: Jean Delvare <jdelvare@suse.de>
+> Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+> Cc: Jean Delvare <jdelvare@suse.de>
+> ---
+>  Documentation/kbuild/kconfig.txt | 8 +++-----
+>  1 file changed, 3 insertions(+), 5 deletions(-)
+> 
+> diff --git a/Documentation/kbuild/kconfig.txt b/Documentation/kbuild/kconfig.txt
+> index e9f9e76..6edf37d 100644
+> --- a/Documentation/kbuild/kconfig.txt
+> +++ b/Documentation/kbuild/kconfig.txt
+> @@ -175,11 +175,9 @@ Searching in menuconfig:
+>  		/^hotplug
+>  
+>  	When searching, symbols are sorted thus:
+> -	  - exact match first: an exact match is when the search matches
+> -	    the complete symbol name;
+> -	  - alphabetical order: when two symbols do not match exactly,
+> -	    they are sorted in alphabetical order (in the user's current
+> -	    locale).
+> +	  - first, exact matches, sorted alphabetically (an exact match                                                                │18:03 -!- - keep a notice in the topic and perhaps as an on-join message).
+> +	    is when the search matches the complete symbol name);                                                                      │18:03 -!- -  
+> +	  - then, other matches, sorted alphabetically.
 
-Reported-by: Jean Delvare <jdelvare@suse.de>
-Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: Jean Delvare <jdelvare@suse.de>
----
- scripts/kconfig/symbol.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+Woops, forget this one, it appears I've busted the copy-paste, and
+it was too far right on my terminal. I only saw now, as my mailer
+wraps long lines.
 
-diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
-index d550300..020a0ac 100644
---- a/scripts/kconfig/symbol.c
-+++ b/scripts/kconfig/symbol.c
-@@ -967,7 +967,7 @@ static int sym_rel_comp( const void *sym1, const void *sym2 )
- {
- 	struct sym_match *s1 = *(struct sym_match **)sym1;
- 	struct sym_match *s2 = *(struct sym_match **)sym2;
--	int l1, l2;
-+	int exact1, exact2;
- 
- 	/* Exact match:
- 	 * - if matched length on symbol s1 is the length of that symbol,
-@@ -978,11 +978,11 @@ static int sym_rel_comp( const void *sym1, const void *sym2 )
- 	 * exactly; if this is the case, we can't decide which comes first,
- 	 * and we fallback to sorting alphabetically.
- 	 */
--	l1 = s1->eo - s1->so;
--	l2 = s2->eo - s2->so;
--	if (l1 == strlen(s1->sym->name) && l2 != strlen(s2->sym->name))
-+	exact1 = (s1->eo - s1->so) == strlen(s1->sym->name);
-+	exact2 = (s2->eo - s2->so) == strlen(s2->sym->name);
-+	if (exact1 && !exact2)
- 		return -1;
--	if (l1 != strlen(s1->sym->name) && l2 == strlen(s2->sym->name))
-+	if (!exact1 && exact2)
- 		return 1;
- 
- 	/* As a fallback, sort symbols alphabetically */
+Sigh... :-(
+
+Sorry,
+Yann E. MORIN.
+
 -- 
-1.8.1.2
-
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
