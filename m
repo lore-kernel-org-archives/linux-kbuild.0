@@ -1,107 +1,31 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-we0-f175.google.com ([74.125.82.175]:47185 "EHLO
-	mail-we0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757776Ab3GLW0o (ORCPT
+Received: from smtp.snhosting.dk ([87.238.248.203]:34014 "EHLO
+	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758125Ab3GMI4a (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 12 Jul 2013 18:26:44 -0400
-Received: by mail-we0-f175.google.com with SMTP id t59so8305919wes.6
-        for <linux-kbuild@vger.kernel.org>; Fri, 12 Jul 2013 15:26:43 -0700 (PDT)
-From: Clement Chauplannaz <chauplac@gmail.com>
-Subject: [PATCH v2] scripts/config: use sed's POSIX interface
-Date: Sat, 13 Jul 2013 00:26:17 +0200
-Message-Id: <1373667977-8034-1-git-send-email-chauplac@gmail.com>
+	Sat, 13 Jul 2013 04:56:30 -0400
+Date: Sat, 13 Jul 2013 10:56:27 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH 6/9] kconf: gtk: move relayout code out of a loop
+Message-ID: <20130713085627.GA32174@merkur.ravnborg.org>
+References: <1372778550-22110-1-git-send-email-david.graeff@web.de> <1372778550-22110-7-git-send-email-david.graeff@web.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1372778550-22110-7-git-send-email-david.graeff@web.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: mmarek@suse.cz, ak@linux.intel.com, yann.morin.1998@free.fr
+To: davidgraeff <david.graeff@web.de>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
-Script `config' relies on extensions of `GNU sed', and is thus not
-working on all Unixes:
-- in-place edition of files (-i), which can be replaced with
-a temporary file;
-- extended-regexps (-r), which can be split into basic regexps;
-- single-line calls to `a' command, while some implementations
-require a leading newline before the parameter.
+On Tue, Jul 02, 2013 at 05:22:27PM +0200, davidgraeff wrote:
+> ---
+>  scripts/kconfig/gconfig/gconf.c                |    2 +
+>  scripts/kconfig/gconfig/gconf_treeview_model.c |   10 +-
 
-Rewrite calls to `sed' to comply with POSIX interface, and move them
-to helper functions.
+>  scripts/kconfig/qconfig/qconf.cc               | 1768 ------------------------
+>  scripts/kconfig/qconfig/qconf.cpp              | 1768 ++++++++++++++++++++++++
+That rename does not belong here...
 
-Signed-off-by: Clement Chauplannaz <chauplac@gmail.com>
----
-Changes in v2:
-- ANSI C style quoting to produce newlines ($'\n') is replaced with
-  printf's, not to introduce further dependency on bash.
-- helper functions are introduced to wrap calls to `sed'.
-
- scripts/config | 41 ++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 38 insertions(+), 3 deletions(-)
-
-diff --git a/scripts/config b/scripts/config
-index a65ecbb..a01bc11 100755
---- a/scripts/config
-+++ b/scripts/config
-@@ -60,15 +60,48 @@ checkarg() {
- 	fi
- }
- 
-+txt_append() {
-+	local anchor="$1"
-+	local insert="$2"
-+	local infile="$3"
-+	local outfile="$4"
-+
-+	# sed append cmd: 'a\' + newline + text + newline
-+	cmd="$(printf "a\\%b$insert%b" "\n" "\n")"
-+
-+	sed -e "/$anchor/$cmd" "$infile" >"$outfile"
-+}
-+
-+txt_subst() {
-+	local before="$1"
-+	local after="$2"
-+	local infile="$3"
-+	local outfile="$4"
-+
-+	sed -e "s/$before/$after/" "$infile" >"$outfile"
-+}
-+
-+txt_delete() {
-+	local text="$1"
-+	local infile="$2"
-+	local outfile="$3"
-+
-+	sed -e "/$text/d" "$infile" >"$outfile"
-+}
-+
- set_var() {
- 	local name=$1 new=$2 before=$3
- 
- 	name_re="^($name=|# $name is not set)"
- 	before_re="^($before=|# $before is not set)"
- 	if test -n "$before" && grep -Eq "$before_re" "$FN"; then
--		sed -ri "/$before_re/a $new" "$FN"
-+		txt_append "^$before=" "$new" "$FN" "$FN.swp"
-+		txt_append "^# $before is not set" "$new" "$FN.swp" "$FN"
-+		rm "$FN.swp"
- 	elif grep -Eq "$name_re" "$FN"; then
--		sed -ri "s:$name_re.*:$new:" "$FN"
-+		txt_subst "^$name=.*" "$new" "$FN" "$FN.swp"
-+		txt_subst "^# $name is not set" "$new" "$FN.swp" "$FN"
-+		rm "$FN.swp"
- 	else
- 		echo "$new" >>"$FN"
- 	fi
-@@ -77,7 +110,9 @@ set_var() {
- undef_var() {
- 	local name=$1
- 
--	sed -ri "/^($name=|# $name is not set)/d" "$FN"
-+	txt_delete "^$name=" "$FN" "$FN.swp"
-+	txt_delete "^# $name is not set" "$FN.swp" "$FN"
-+	rm "$FN.swp"
- }
- 
- if [ "$1" = "--file" ]; then
--- 
-1.8.3.rc1.44.gb387c77.dirty
+	Sam
 
