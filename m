@@ -1,74 +1,60 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f182.google.com ([209.85.212.182]:51650 "EHLO
-	mail-wi0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751752Ab3GMSOL convert rfc822-to-8bit (ORCPT
+Received: from mail.linuxfoundation.org ([140.211.169.12]:50131 "EHLO
+	mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755095Ab3GOWDp (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 13 Jul 2013 14:14:11 -0400
-Date: Sat, 13 Jul 2013 20:14:05 +0200
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH 1/3] Documentation/kconfig: more concise and
- straightforward search explanation
-Message-ID: <20130713181405.GD3280@free.fr>
-References: <1373738905-23396-1-git-send-email-yann.morin.1998@free.fr>
- <1373738905-23396-2-git-send-email-yann.morin.1998@free.fr>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8BIT
-In-Reply-To: <1373738905-23396-2-git-send-email-yann.morin.1998@free.fr>
+	Mon, 15 Jul 2013 18:03:45 -0400
+Date: Mon, 15 Jul 2013 15:03:42 -0700
+From: Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH -next 2/2] kbuild: fix for updated LZ4 tool with the new
+ streaming format
+Message-Id: <20130715150342.35f7620ffe0835e3e2bc37d0@linux-foundation.org>
+In-Reply-To: <20130712075602.GA4002@gmail.com>
+References: <1367829775-4434-1-git-send-email-kyungsik.lee@lge.com>
+	<1367829775-4434-2-git-send-email-kyungsik.lee@lge.com>
+	<20130712075602.GA4002@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Jean Delvare <jdelvare@suse.de>
+To: Ingo Molnar <mingo@kernel.org>
+Cc: Kyungsik Lee <kyungsik.lee@lge.com>, Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org, celinux-dev@lists.celinuxforum.org, linux-arm-kernel@lists.infradead.org, hyojun.im@lge.com, chan.jeong@lge.com, raphael.andy.lee@gmail.com, "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@elte.hu>, Thomas Gleixner <tglx@linutronix.de>, Russell King <rmk@arm.linux.org.uk>, Borislav Petkov <bp@alien8.de>, Florian Fainelli <florian@openwrt.org>, Yann Collet <yann.collet.73@gmail.com>, Chanho Min <chanho.min@lge.com>
 
-All,
+On Fri, 12 Jul 2013 09:56:02 +0200 Ingo Molnar <mingo@kernel.org> wrote:
 
-On 2013-07-13 20:08 +0200, Yann E. MORIN spake thusly:
-> From: "Yann E. MORIN" <yann.morin.1998@free.fr>
 > 
-> Re-phrase the explanations on the sorting of search results, in a more
-> concise and complete way.
+> * Kyungsik Lee <kyungsik.lee@lge.com> wrote:
+> >  quiet_cmd_lz4 = LZ4     $@
+> >  cmd_lz4 = (cat $(filter-out FORCE,$^) | \
+> > -	lz4demo -c1 stdin stdout && $(call size_append, $(filter-out FORCE,$^))) > $@ || \
+> > +	lz4c -l -c1 stdin stdout && $(call size_append, $(filter-out FORCE,$^))) > $@ || \
+> >  	(rm -f $@ ; false)
 > 
-> Drop reference to the user's locale when sorting alphabetically, since
-> this is implicit.
+> None of the major distros I tried has the lz4 or lz4c binary available, 
+> and this breaks randconfig builds:
 > 
-> Reported-by: Jean Delvare <jdelvare@suse.de>
-> Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
-> Cc: Jean Delvare <jdelvare@suse.de>
-> ---
->  Documentation/kbuild/kconfig.txt | 8 +++-----
->  1 file changed, 3 insertions(+), 5 deletions(-)
+>   /bin/sh: lz4c: command not found
 > 
-> diff --git a/Documentation/kbuild/kconfig.txt b/Documentation/kbuild/kconfig.txt
-> index e9f9e76..6edf37d 100644
-> --- a/Documentation/kbuild/kconfig.txt
-> +++ b/Documentation/kbuild/kconfig.txt
-> @@ -175,11 +175,9 @@ Searching in menuconfig:
->  		/^hotplug
->  
->  	When searching, symbols are sorted thus:
-> -	  - exact match first: an exact match is when the search matches
-> -	    the complete symbol name;
-> -	  - alphabetical order: when two symbols do not match exactly,
-> -	    they are sorted in alphabetical order (in the user's current
-> -	    locale).
-> +	  - first, exact matches, sorted alphabetically (an exact match                                                                │18:03 -!- - keep a notice in the topic and perhaps as an on-join message).
-> +	    is when the search matches the complete symbol name);                                                                      │18:03 -!- -  
-> +	  - then, other matches, sorted alphabetically.
+> If:
+> 
+>  CONFIG_HAVE_KERNEL_LZ4=y
+>  CONFIG_KERNEL_LZ4=y
+>  CONFIG_RD_LZ4=y
+>  CONFIG_LZ4_DECOMPRESS=y
+>  CONFIG_DECOMPRESS_LZ4=y
+> 
+> If a utility is not widely available yet and if the utility is not in the 
+> kernel proper, could you please at least make sure that randconfig does 
+> not stumble over non-buildable kernels?
 
-Woops, forget this one, it appears I've busted the copy-paste, and
-it was too far right on my terminal. I only saw now, as my mailer
-wraps long lines.
+I don't know how to do this.  Any suggestions?
 
-Sigh... :-(
+It has to be done at `make config' time.  We'd need to probe for the
+presence of lz4c and then....  what?
 
-Sorry,
-Yann E. MORIN.
+Is there any precedent for this?
 
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+I don't think we can just ignore the absence of lz4c - the user has
+selected a config which his system cannot build.  The problem lies
+within randconfig itself.
