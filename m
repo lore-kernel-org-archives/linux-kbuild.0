@@ -1,85 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from p-mail2.rd.orange.com ([195.101.245.16]:57907 "EHLO
-	p-mail2.rd.orange.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753496Ab3GPJcn (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 16 Jul 2013 05:32:43 -0400
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH -next 2/2] kbuild: fix for updated LZ4 tool with the new streaming format
-Date: Tue, 16 Jul 2013 11:32:39 +0200
-References: <1367829775-4434-1-git-send-email-kyungsik.lee@lge.com> <201307161112.17901.yann.morin.1998@free.fr> <20130716092242.GD4402@pd.tnic>
-In-Reply-To: <20130716092242.GD4402@pd.tnic>
+Received: from mail.skyhub.de ([78.46.96.112]:38539 "EHLO mail.skyhub.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753139Ab3GPJiq (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 16 Jul 2013 05:38:46 -0400
+Date: Tue, 16 Jul 2013 11:38:20 +0200
+From: Borislav Petkov <bp@alien8.de>
+Subject: Re: [PATCH -next 2/2] kbuild: fix for updated LZ4 tool with the new
+ streaming format
+Message-ID: <20130716093820.GE4402@pd.tnic>
+References: <1367829775-4434-1-git-send-email-kyungsik.lee@lge.com>
+ <201307161112.17901.yann.morin.1998@free.fr>
+ <20130716092242.GD4402@pd.tnic>
+ <201307161132.39845.yann.morin.1998@free.fr>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <201307161132.39845.yann.morin.1998@free.fr>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <201307161132.39845.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Borislav Petkov <bp@alien8.de>
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>
 Cc: Andrew Morton <akpm@linux-foundation.org>, "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@kernel.org>, Kyungsik Lee <kyungsik.lee@lge.com>, Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org, celinux-dev@lists.celinuxforum.org, linux-arm-kernel@lists.infradead.org, hyojun.im@lge.com, chan.jeong@lge.com, raphael.andy.lee@gmail.com, Ingo Molnar <mingo@elte.hu>, Thomas Gleixner <tglx@linutronix.de>, Russell King <rmk@arm.linux.org.uk>, Florian Fainelli <florian@openwrt.org>, Yann Collet <yann.collet.73@gmail.com>, Chanho Min <chanho.min@lge.com>
 
-Borislav, All,
+On Tue, Jul 16, 2013 at 11:32:39AM +0200, Yann E. MORIN wrote:
+> No, this is already too late: the given .config *is* already broken and
+> unbuildable.
 
-On Tuesday 16 July 2013 11:22:42 Borislav Petkov wrote:
-> On Tue, Jul 16, 2013 at 11:12:17AM +0200, Yann E. MORIN wrote:
-> > The goal is to avoid generating a non-buildable kernel in the first place.
-> 
-> I know, that's why I'm proposing to fail the build with the script run
-> as one of the first things by make.
+Yes, and we don't build it because we fail the build.
 
-No, this is already too late: the given .config *is* already broken and
-unbuildable.
+> That does not work in two cases:
+>   - older distros that do not have the tool packaged
 
-> > > I.e., those steps:
-> > > 1. make <whatever>config
-> > > 2. make => A prereq. target runs the shell script.
-> > 
-> > This is too late, since this will bail out, and will give a false-positive
-> > failure.
-> 
-> Huh? This will tell you: "you've selected X, but I don't have toolX
-> needed for the build".
-> 
-> You install the tool and run make again. Checks pass, the build
-> continues.
+This point is moot - distro kernels are built by the distro people.
 
-That does not work in two cases:
-  - older distros that do not have the tool packaged
-  - automatic test-harness that run thousands of randconfig a day
+>   - automatic test-harness that run thousands of randconfig a day
 
-In the first case, this /could/ be overcome by the user compiling and
-installing the package manually, but is mostly undoable in enterprise
-environment with shared build machines, where each user would have to
-install the same tool(s) again and again.
+randconfigs are not guaranteed to build successfully.
 
-In the second case, this would yield a lot of false-positive in daily
-reports.
+> The idea is to be always have a .config that is buildable with the
+> current toolset of the system, especially for esoteric and/or recent
+> tools that are not packaged and/or installed by default by the
+> distros.
 
-Your solution mostly works with minimum overhead for a human user
-interactively building a kernel, not with automated test harnesses.
-
-> > While if we were to check for _known_ needed tools before calling into
-> > Kconfig,
-> 
-> How would you do that? How do you know what the user is going to select
-> *before* she even selects it?
-
-The idea is to *avoid* the user being able to select unavailable options.
-
-> You need to have a prepared .config to act upon.
-
-The idea is to be always have a .config that is buildable with the current
-toolset of the system, especially for esoteric and/or recent tools that are
-not packaged and/or installed by default by the distros.
-
-Regards,
-Yann E. MORIN.
+How are you going to tell the user running make <something>config to
+install the missing tools?
 
 -- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +0/33 662376056 | Software  Designer | \ / CAMPAIGN     |   ^                |
-| --==< O_o >==-- '------------.-------:  X  AGAINST      |  /e\  There is no  |
-| http://ymorin.is-a-geek.org/ | (*_*) | / \ HTML MAIL    |  """  conspiracy.  |
-'------------------------------'-------'------------------'--------------------'
+Regards/Gruss,
+    Boris.
+
+Sent from a fat crate under my desk. Formatting is fine.
+--
