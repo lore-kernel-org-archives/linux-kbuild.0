@@ -1,13 +1,17 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f46.google.com ([74.125.82.46]:45790 "EHLO
-	mail-wg0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932406Ab3GPUkR (ORCPT
+Received: from mail-wg0-f48.google.com ([74.125.82.48]:50062 "EHLO
+	mail-wg0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933952Ab3GPUkX (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 16 Jul 2013 16:40:17 -0400
+	Tue, 16 Jul 2013 16:40:23 -0400
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: [pull request] Pull request for branch yem-kconfig-rc-fixes
-Date: Tue, 16 Jul 2013 22:39:56 +0200
-Message-Id: <cover.1374006854.git.yann.morin.1998@free.fr>
+Subject: [PATCH 4/6] kconfig: minor style fixes in symbol-search code
+Date: Tue, 16 Jul 2013 22:40:00 +0200
+Message-Id: <803b3519880f255563d8590c1f5870398b9a4ea0.1374006854.git.yann.morin.1998@free.fr>
+In-Reply-To: <cover.1374006854.git.yann.morin.1998@free.fr>
+References: <cover.1374006854.git.yann.morin.1998@free.fr>
+In-Reply-To: <cover.1374006854.git.yann.morin.1998@free.fr>
+References: <cover.1374006854.git.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
@@ -15,49 +19,53 @@ Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Jean Delvare <j
 
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-Hello Michal,
+Two minor style fixes:
+  - no space before/after parenthesis in function definition
+  - no {} for single-line if()
 
-Please pull these post-rc1 kconfig cleanups, all after
-review and comments by Jean:
-  - simplify and cleanup the symbol-search code
-  - better documentation about the symbols ordering in search results
-  - eye-candy in the title of the search-box in [mn]conf
+And one grammar fix in a comment.
 
-Regards,
-Yann E. MORIN.
+Reported-by: Jean Delvare <jdelvare@suse.de>
+Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: Jean Delvare <jdelvare@suse.de>
+Reviewed-by: Jean Delvare <jdelvare@suse.de>
+---
+ scripts/kconfig/symbol.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-
-The following changes since commit b57caaaed2bd127fe656e6c145970ed6a05c0125:
-
-  kconfig: allow "hex" and "range" to support longs (2013-06-29 15:30:17 +0200)
-
-are available in the git repository at:
-
-  git://gitorious.org/linux-kconfig/linux-kconfig.git yem-kconfig-rc-fixes
-
-for you to fetch changes up to 508382a0428f2b2f49da0e0e89c921f07c9306aa:
-
-  kconfig: simplify symbol-search code (2013-07-16 20:39:42 +0200)
-
-----------------------------------------------------------------
-Yann E. MORIN (6):
-      Documentation/kconfig: more concise and straightforward search explanation
-      kconfig: avoid multiple calls to strlen
-      kconfig/[mn]conf: shorten title in search-box
-      kconfig: minor style fixes in symbol-search code
-      kconfig: don't allocate n+1 elements in temporary array
-      kconfig: simplify symbol-search code
-
- Documentation/kbuild/kconfig.txt |  8 +++----
- scripts/kconfig/mconf.c          |  4 ++--
- scripts/kconfig/nconf.c          |  4 ++--
- scripts/kconfig/symbol.c         | 49 ++++++++++++++++------------------------
- 4 files changed, 27 insertions(+), 38 deletions(-)
-
+diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
+index 020a0ac..b664d6e 100644
+--- a/scripts/kconfig/symbol.c
++++ b/scripts/kconfig/symbol.c
+@@ -963,7 +963,7 @@ struct sym_match {
+  * - first, symbols that match exactly
+  * - then, alphabetical sort
+  */
+-static int sym_rel_comp( const void *sym1, const void *sym2 )
++static int sym_rel_comp(const void *sym1, const void *sym2)
+ {
+ 	struct sym_match *s1 = *(struct sym_match **)sym1;
+ 	struct sym_match *s2 = *(struct sym_match **)sym2;
+@@ -1014,9 +1014,8 @@ struct symbol **sym_re_search(const char *pattern)
+ 			void *tmp;
+ 			size += 16;
+ 			tmp = realloc(sym_match_arr, size * sizeof(struct sym_match *));
+-			if (!tmp) {
++			if (!tmp)
+ 				goto sym_re_search_free;
+-			}
+ 			sym_match_arr = tmp;
+ 		}
+ 		sym_calc_value(sym);
+@@ -1024,7 +1023,7 @@ struct symbol **sym_re_search(const char *pattern)
+ 		if (!tmp_sym_match)
+ 			goto sym_re_search_free;
+ 		tmp_sym_match->sym = sym;
+-		/* As regexec return 0, we know we have a match, so
++		/* As regexec returned 0, we know we have a match, so
+ 		 * we can use match[0].rm_[se]o without further checks
+ 		 */
+ 		tmp_sym_match->so = match[0].rm_so;
 -- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+1.8.1.2
+
