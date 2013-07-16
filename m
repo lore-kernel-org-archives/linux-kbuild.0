@@ -1,75 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.snhosting.dk ([87.238.248.203]:59095 "EHLO
-	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932988Ab3GPSEK (ORCPT
+Received: from relay1.mentorg.com ([192.94.38.131]:51952 "EHLO
+	relay1.mentorg.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932958Ab3GPSaC (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 16 Jul 2013 14:04:10 -0400
-Date: Tue, 16 Jul 2013 20:04:08 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH -next 2/2] kbuild: fix for updated LZ4 tool with the
-	new streaming format
-Message-ID: <20130716180408.GA19863@merkur.ravnborg.org>
-References: <1367829775-4434-1-git-send-email-kyungsik.lee@lge.com> <20130716004727.b60b2c96.akpm@linux-foundation.org> <20130716005611.e4ccab02.akpm@linux-foundation.org> <201307161008.07643.yann.morin.1998@free.fr>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <201307161008.07643.yann.morin.1998@free.fr>
+	Tue, 16 Jul 2013 14:30:02 -0400
+From: Jim Baxter <jim_baxter@mentor.com>
+Subject: [RFC] kbuild: Build samples directory with make modules
+Date: Tue, 16 Jul 2013 19:29:50 +0100
+Message-Id: <1373999390-14548-1-git-send-email-jim_baxter@mentor.com>
+In-Reply-To: <Jim Baxter <jim_baxter@mentor.com>
+References: <Jim Baxter <jim_baxter@mentor.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: Andrew Morton <akpm@linux-foundation.org>, "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@kernel.org>, Kyungsik Lee <kyungsik.lee@lge.com>, Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org, celinux-dev@lists.celinuxforum.org, linux-arm-kernel@lists.infradead.org, hyojun.im@lge.com, chan.jeong@lge.com, raphael.andy.lee@gmail.com, Ingo Molnar <mingo@elte.hu>, Thomas Gleixner <tglx@linutronix.de>, Russell King <rmk@arm.linux.org.uk>, Borislav Petkov <bp@alien8.de>, Florian Fainelli <florian@openwrt.org>, Yann Collet <yann.collet.73@gmail.com>, Chanho Min <chanho.min@lge.com>
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Tue, Jul 16, 2013 at 10:08:07AM +0200, Yann E. MORIN wrote:
-> Andrew, All,
-> 
-> On Tuesday 16 July 2013 09:56:11 Andrew Morton wrote:
-> > On Tue, 16 Jul 2013 00:47:27 -0700 Andrew Morton <akpm@linux-foundation.org> wrote:
-> > > On Mon, 15 Jul 2013 15:08:20 -0700 "H. Peter Anvin" <hpa@zytor.com> wrote:
-> > > > On 07/15/2013 03:03 PM, Andrew Morton wrote:
-> [--SNIP--]
-> > > > We keep running over the need to be able to have kconfig run tests on
-> > > > the build system (for toolchain support or for optional tools needed);
-> > > > running them in the Makefiles (i.e. at Kbuild time) is simply too late.
-> > > > 
-> > > 
-> > > Would it make sense to extend Kconfig's `depends'?
-> > > 
-> > > 	depends on $(shell-command)
-> > > 
-> > > I don't know how practical that would be to implement...
-> 
-> I'm afraid this will get rather ugly and not trivial.
-> 
-> Can we mix 'depends on SYMBOL' and 'depends on $(command)' ?
-> Can we mix both in a boolean expression such as 'depends on SYMBOL
-> && $(command)' ?
-> 
-> What would be the condition for evaluating the dependency rule? Evaluation
-> at Kconfig read-time might not be enough, given this construct:
-> 
->     config FOO
->         depends on $(foo)
->     comment "'foo' is missing, please install it"
->         depends on !$(foo)
-> 
-> Also, I believe Kconfig should stay a config-only language, without
-> much esoteric features.
+If CONFIG_SAMPLES is enabled with any of the sample
+modules enabled, they are only built if the make command
+includes uImage and modules (i.e. make uImage modules).
 
-We could extend the symbol option part to retreive values from a binary.
-Something like this:
+This patches allows the kernel and modules to be built
+separately, this is how openembedded and yocto build
+the kernel.
 
-config FOOBAR
-        bool
-        option exec="true"
+Signed-off-by: Jim Baxter <jim_baxter@mentor.com>
+---
+ Makefile |    6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-FOOBAR would assume the value "y" if the command true has exit code == 0, otherwise "n".
-And similar conversions for other types.
+diff --git a/Makefile b/Makefile
+index 29339b4..1acd69f 100644
+--- a/Makefile
++++ b/Makefile
+@@ -772,9 +772,6 @@ vmlinux: scripts/link-vmlinux.sh $(vmlinux-deps) FORCE
+ ifdef CONFIG_HEADERS_CHECK
+ 	$(Q)$(MAKE) -f $(srctree)/Makefile headers_check
+ endif
+-ifdef CONFIG_SAMPLES
+-	$(Q)$(MAKE) $(build)=samples
+-endif
+ ifdef CONFIG_BUILD_DOCSRC
+ 	$(Q)$(MAKE) $(build)=Documentation
+ endif
+@@ -943,6 +940,9 @@ all: modules
+ 
+ PHONY += modules
+ modules: $(vmlinux-dirs) $(if $(KBUILD_BUILTIN),vmlinux) modules.builtin
++ifdef CONFIG_SAMPLES
++	$(Q)$(MAKE) $(build)=samples
++endif
+ 	$(Q)$(AWK) '!x[$$0]++' $(vmlinux-dirs:%=$(objtree)/%/modules.order) > $(objtree)/modules.order
+ 	@$(kecho) '  Building modules, stage 2.';
+ 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modpost
+-- 
+1.7.10.4
 
-This only extendt Kconfig slightly - using an already present method to import
-external values.
-
-The drawback I see with this approach is that we may execute a lot of small programs
-where the value is never used.
-Implementing lazy evaluation of a symbol value will not be easy I think.
-
-	Sam
