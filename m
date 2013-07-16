@@ -1,41 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pb0-f54.google.com ([209.85.160.54]:57177 "EHLO
-	mail-pb0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753658Ab3GPKFW (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 16 Jul 2013 06:05:22 -0400
-MIME-Version: 1.0
-In-Reply-To: <20130716095938.GA4962@pd.tnic>
-References: <1367829775-4434-1-git-send-email-kyungsik.lee@lge.com>
- <201307161132.39845.yann.morin.1998@free.fr> <20130716093820.GE4402@pd.tnic>
- <201307161145.27810.yann.morin.1998@free.fr> <20130716095938.GA4962@pd.tnic>
-From: Florian Fainelli <florian@openwrt.org>
-Date: Tue, 16 Jul 2013 11:04:41 +0100
-Message-ID: <CAGVrzcbJrhmxCHqZOhSZH9FeTNj_x674+CSBS0bSRaKDk3nRLA@mail.gmail.com>
-Subject: Re: [PATCH -next 2/2] kbuild: fix for updated LZ4 tool with the new
- streaming format
-Content-Type: text/plain; charset=UTF-8
+Received: from cantor2.suse.de ([195.135.220.15]:36533 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754423Ab3GPOOn (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 16 Jul 2013 10:14:43 -0400
+Subject: Re: [PATCH 1/3] Documentation/kconfig: more concise and
+ straightforward search explanation
+From: Jean Delvare <jdelvare@suse.de>
+In-Reply-To: <1373738905-23396-2-git-send-email-yann.morin.1998@free.fr>
+References: <1373738905-23396-1-git-send-email-yann.morin.1998@free.fr>
+	 <1373738905-23396-2-git-send-email-yann.morin.1998@free.fr>
+Content-Type: text/plain; charset="UTF-8"
+Date: Tue, 16 Jul 2013 16:14:25 +0200
+Message-ID: <1373984065.4513.5.camel@chaos.site>
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Borislav Petkov <bp@alien8.de>
-Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, Andrew Morton <akpm@linux-foundation.org>, "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@kernel.org>, Kyungsik Lee <kyungsik.lee@lge.com>, Michal Marek <mmarek@suse.cz>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, x86@kernel.org, celinux-dev@lists.celinuxforum.org, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, hyojun.im@lge.com, chan.jeong@lge.com, Andy Lee <raphael.andy.lee@gmail.com>, Ingo Molnar <mingo@elte.hu>, Thomas Gleixner <tglx@linutronix.de>, Russell King <rmk@arm.linux.org.uk>, Yann Collet <yann.collet.73@gmail.com>, Chanho Min <chanho.min@lge.com>
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>
 
-2013/7/16 Borislav Petkov <bp@alien8.de>:
-> On Tue, Jul 16, 2013 at 11:45:27AM +0200, Yann E. MORIN wrote:
->> As discussed with Florian in this thread, either one of:
->>   - a warning at check time
->>   - a comment in Kconfig
->
-> Whatever you do, make sure to make it quite clear to users what she
-> needs to do.
->
-> What I really have a problem with is options being hidden just because I
-> haven't selected something they depend on and having to run around the
-> Kconfig maze to find what I also need to select in order for the option
-> to appear.
+Le Saturday 13 July 2013 à 20:08 +0200, Yann E. MORIN a écrit :
+> From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+> 
+> Re-phrase the explanations on the sorting of search results, in a more
+> concise and complete way.
+> 
+> Drop reference to the user's locale when sorting alphabetically, since
+> this is implicit.
+> 
+> Reported-by: Jean Delvare <jdelvare@suse.de>
+> Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+> Cc: Jean Delvare <jdelvare@suse.de>
+> ---
+>  Documentation/kbuild/kconfig.txt | 8 +++-----
+>  1 file changed, 3 insertions(+), 5 deletions(-)
+> 
+> diff --git a/Documentation/kbuild/kconfig.txt b/Documentation/kbuild/kconfig.txt
+> index e9f9e76..6edf37d 100644
+> --- a/Documentation/kbuild/kconfig.txt
+> +++ b/Documentation/kbuild/kconfig.txt
+> @@ -175,11 +175,9 @@ Searching in menuconfig:
+>  		/^hotplug
+>  
+>  	When searching, symbols are sorted thus:
+> -	  - exact match first: an exact match is when the search matches
+> -	    the complete symbol name;
+> -	  - alphabetical order: when two symbols do not match exactly,
+> -	    they are sorted in alphabetical order (in the user's current
+> -	    locale).
+> +	  - first, exact matches, sorted alphabetically (an exact match                                                                │18:03 -!- - keep a notice in the topic and perhaps as an on-join message).
+> +	    is when the search matches the complete symbol name);                                                                      │18:03 -!- -  
+> +	  - then, other matches, sorted alphabetically.
+>  	For example: ^ATH.K matches:
+>  	    ATH5K ATH9K ATH5K_AHB ATH5K_DEBUG [...] ATH6KL ATH6KL_DEBUG
+>  	    [...] ATH9K_AHB ATH9K_BTCOEX_SUPPORT ATH9K_COMMON [...]
 
-Yes, me too, which is why I suggested the warning, as in "a warning
-printed to stdout/stderr" rather than a Kconfig comment which will be
-easy to be ignored.
---
-Florian
+After fixing the copy-and-paste mistake, this looks good to me.
+
+Reviewed-by: Jean Delvare <jdelvare@suse.de>
+
+-- 
+Jean Delvare
+Suse L3
+
