@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f176.google.com ([209.85.212.176]:58584 "EHLO
-	mail-wi0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932406Ab3GPUkW (ORCPT
+Received: from mail-wg0-f43.google.com ([74.125.82.43]:38760 "EHLO
+	mail-wg0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933952Ab3GPUkU (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 16 Jul 2013 16:40:22 -0400
+	Tue, 16 Jul 2013 16:40:20 -0400
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: [PATCH 3/6] kconfig/[mn]conf: shorten title in search-box
-Date: Tue, 16 Jul 2013 22:39:59 +0200
-Message-Id: <f6eb6e46f766f4e2eb64d2d467ef7efff084c47c.1374006854.git.yann.morin.1998@free.fr>
+Subject: [PATCH 2/6] kconfig: avoid multiple calls to strlen
+Date: Tue, 16 Jul 2013 22:39:58 +0200
+Message-Id: <26e933e3c35624d80281330c4beb17db4cd4960f.1374006854.git.yann.morin.1998@free.fr>
 In-Reply-To: <cover.1374006854.git.yann.morin.1998@free.fr>
 References: <cover.1374006854.git.yann.morin.1998@free.fr>
 In-Reply-To: <cover.1374006854.git.yann.morin.1998@free.fr>
@@ -19,47 +19,45 @@ Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Jean Delvare <j
 
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-No need to repeat the 'CONFIG_' string in the title,
-once is explicit enough.
+Calls to strlen are costly, so avoid calling strln as much as we can.
 
 Reported-by: Jean Delvare <jdelvare@suse.de>
 Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
 Cc: Jean Delvare <jdelvare@suse.de>
+Reviewed-by: Jean Delvare <jdelvare@suse.de>
 ---
- scripts/kconfig/mconf.c | 4 ++--
- scripts/kconfig/nconf.c | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ scripts/kconfig/symbol.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
-index 18d3dc9..b20e851 100644
---- a/scripts/kconfig/mconf.c
-+++ b/scripts/kconfig/mconf.c
-@@ -401,8 +401,8 @@ static void search_conf(void)
- 	struct subtitle_part stpart;
+diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
+index d550300..020a0ac 100644
+--- a/scripts/kconfig/symbol.c
++++ b/scripts/kconfig/symbol.c
+@@ -967,7 +967,7 @@ static int sym_rel_comp( const void *sym1, const void *sym2 )
+ {
+ 	struct sym_match *s1 = *(struct sym_match **)sym1;
+ 	struct sym_match *s2 = *(struct sym_match **)sym2;
+-	int l1, l2;
++	int exact1, exact2;
  
- 	title = str_new();
--	str_printf( &title, _("Enter %s (sub)string or regexp to search for "
--			      "(with or without \"%s\")"), CONFIG_, CONFIG_);
-+	str_printf( &title, _("Enter (sub)string or regexp to search for "
-+			      "(with or without \"%s\")"), CONFIG_);
+ 	/* Exact match:
+ 	 * - if matched length on symbol s1 is the length of that symbol,
+@@ -978,11 +978,11 @@ static int sym_rel_comp( const void *sym1, const void *sym2 )
+ 	 * exactly; if this is the case, we can't decide which comes first,
+ 	 * and we fallback to sorting alphabetically.
+ 	 */
+-	l1 = s1->eo - s1->so;
+-	l2 = s2->eo - s2->so;
+-	if (l1 == strlen(s1->sym->name) && l2 != strlen(s2->sym->name))
++	exact1 = (s1->eo - s1->so) == strlen(s1->sym->name);
++	exact2 = (s2->eo - s2->so) == strlen(s2->sym->name);
++	if (exact1 && !exact2)
+ 		return -1;
+-	if (l1 != strlen(s1->sym->name) && l2 == strlen(s2->sym->name))
++	if (!exact1 && exact2)
+ 		return 1;
  
- again:
- 	dialog_clear();
-diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
-index 7975d8d..4fbecd2 100644
---- a/scripts/kconfig/nconf.c
-+++ b/scripts/kconfig/nconf.c
-@@ -695,8 +695,8 @@ static void search_conf(void)
- 	int dres;
- 
- 	title = str_new();
--	str_printf( &title, _("Enter %s (sub)string or regexp to search for "
--			      "(with or without \"%s\")"), CONFIG_, CONFIG_);
-+	str_printf( &title, _("Enter (sub)string or regexp to search for "
-+			      "(with or without \"%s\")"), CONFIG_);
- 
- again:
- 	dres = dialog_inputbox(main_window,
+ 	/* As a fallback, sort symbols alphabetically */
 -- 
 1.8.1.2
 
