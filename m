@@ -1,76 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.linuxfoundation.org ([140.211.169.12]:55277 "EHLO
-	mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752860Ab3GPI1u (ORCPT
+Received: from p-mail1.rd.orange.com ([195.101.245.15]:35133 "EHLO
+	p-mail1.rd.orange.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753479Ab3GPJMW (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 16 Jul 2013 04:27:50 -0400
-Date: Tue, 16 Jul 2013 01:27:56 -0700
-From: Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH -next 2/2] kbuild: fix for updated LZ4 tool with the new
- streaming format
-Message-Id: <20130716012756.31936d8d.akpm@linux-foundation.org>
-In-Reply-To: <201307161008.07643.yann.morin.1998@free.fr>
-References: <1367829775-4434-1-git-send-email-kyungsik.lee@lge.com>
-	<20130716004727.b60b2c96.akpm@linux-foundation.org>
-	<20130716005611.e4ccab02.akpm@linux-foundation.org>
-	<201307161008.07643.yann.morin.1998@free.fr>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+	Tue, 16 Jul 2013 05:12:22 -0400
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: Re: [PATCH -next 2/2] kbuild: fix for updated LZ4 tool with the new streaming format
+Date: Tue, 16 Jul 2013 11:12:17 +0200
+References: <1367829775-4434-1-git-send-email-kyungsik.lee@lge.com> <20130716012756.31936d8d.akpm@linux-foundation.org> <20130716090546.GB4402@pd.tnic>
+In-Reply-To: <20130716090546.GB4402@pd.tnic>
+MIME-Version: 1.0
+Content-Type: Text/Plain;
+  charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-Id: <201307161112.17901.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@kernel.org>, Kyungsik Lee <kyungsik.lee@lge.com>, Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org, celinux-dev@lists.celinuxforum.org, linux-arm-kernel@lists.infradead.org, hyojun.im@lge.com, chan.jeong@lge.com, raphael.andy.lee@gmail.com, Ingo Molnar <mingo@elte.hu>, Thomas Gleixner <tglx@linutronix.de>, Russell King <rmk@arm.linux.org.uk>, Borislav Petkov <bp@alien8.de>, Florian Fainelli <florian@openwrt.org>, Yann Collet <yann.collet.73@gmail.com>, Chanho Min <chanho.min@lge.com>
+To: Borislav Petkov <bp@alien8.de>
+Cc: Andrew Morton <akpm@linux-foundation.org>, "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@kernel.org>, Kyungsik Lee <kyungsik.lee@lge.com>, Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org, celinux-dev@lists.celinuxforum.org, linux-arm-kernel@lists.infradead.org, hyojun.im@lge.com, chan.jeong@lge.com, raphael.andy.lee@gmail.com, Ingo Molnar <mingo@elte.hu>, Thomas Gleixner <tglx@linutronix.de>, Russell King <rmk@arm.linux.org.uk>, Florian Fainelli <florian@openwrt.org>, Yann Collet <yann.collet.73@gmail.com>, Chanho Min <chanho.min@lge.com>
 
-On Tue, 16 Jul 2013 10:08:07 +0200 "Yann E. MORIN" <yann.morin.1998@free.fr> wrote:
+Borislav, All,
 
-> > Or, easier and faster, run some front-end script which generates
-> > once-off Kconfig symbols.
+On Tuesday 16 July 2013 11:05:46 Borislav Petkov wrote:
+> On Tue, Jul 16, 2013 at 01:27:56AM -0700, Andrew Morton wrote:
+> > What I'm angling at is, rather than a single global front-end script,
+> > can we embed the scripts in some fashion within the various Kconfig
+> > files?  Say,
 > > 
-> > 	if [ -x /bin/lz4c ]
-> > 	then
-> > 		echo CONFIG_HAVE_LZ4C
-> > 	fi
+> > 	script ./some-script.sh
 > > 
-> > then munge the output of that script into the Kconfig run and do
-> > 
-> > 	depends on HAVE_LZ4C
+> > and the config system will only evaluate that command if it is working
+> > on that Kconfig file.  Obviously that requires a multiple-pass thing.
 > 
-> Yes, this is a better solution.
-> 
-> For what it's worth, this is what I'm doing in crosstool-NG: a script
-> checks for optional pre-requisites, spits out a Kconfig blob which is
-> included by the top-level Kconfig file.
-> 
-> Here is a snippet of generated Kconfig blob:
->     config HAVE_XZ
->         def_bool y
->     config HAVE_LZMA
->         bool
-> 
-> Which means we do have 'xz', but not 'lzma'. This is relatively trivial
-> to do, so I'll tackle this this evening when I'm back home (unless
-> someone beats me to it).
+> What's wrong with simply grepping the .config we've just created for
+> *enabled* symbols which require userspace support, check for the
+> presence of said support and bail out if none?
 
-Cool, thanks.
+The goal is to avoid generating a non-buildable kernel in the first place.
+This is very usefull for automatic check harness that run randconfig, for
+example (but may have more use-cases).
 
-It seems a bit inefficient to be evaluating commands in a Kconfig
-setting where doesn't need that done.  For example, if someone has
-selected LZO compression then they don't need to probe for lz4c.
+> I.e., those steps:
+> 1. make <whatever>config
+> 2. make => A prereq. target runs the shell script.
 
-That example sounds hard to solve in a simple fashion, but what about
-the case where the config system is not going to look at an entire
-subsystem?  Suppose for example, drivers/media/firewire wants to probe
-for some executable, but the user hasn't selected firewire at all.
+This is too late, since this will bail out, and will give a false-positive
+failure.
 
-What I'm angling at is, rather than a single global front-end script,
-can we embed the scripts in some fashion within the various Kconfig
-files?  Say,
+While if we were to check for _known_ needed tools before calling into
+Kconfig, we can simply hide non-available config options, and even inform
+the user *why* the option is not available.
 
-	script ./some-script.sh
+Regards,
+Yann E. MORIN.
 
-and the config system will only evaluate that command if it is working
-on that Kconfig file.  Obviously that requires a multiple-pass thing.
-
-It's late, but you see what I mean ;)
-
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +0/33 662376056 | Software  Designer | \ / CAMPAIGN     |   ^                |
+| --==< O_o >==-- '------------.-------:  X  AGAINST      |  /e\  There is no  |
+| http://ymorin.is-a-geek.org/ | (*_*) | / \ HTML MAIL    |  """  conspiracy.  |
+'------------------------------'-------'------------------'--------------------'
