@@ -1,40 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from terminus.zytor.com ([198.137.202.10]:45942 "EHLO mail.zytor.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755310Ab3GOWJo (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 15 Jul 2013 18:09:44 -0400
-Message-ID: <51E472D4.5060307@zytor.com>
-Date: Mon, 15 Jul 2013 15:08:20 -0700
-From: "H. Peter Anvin" <hpa@zytor.com>
-MIME-Version: 1.0
+Received: from mail.linuxfoundation.org ([140.211.169.12]:54798 "EHLO
+	mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752436Ab3GPHrU (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 16 Jul 2013 03:47:20 -0400
+Date: Tue, 16 Jul 2013 00:47:27 -0700
+From: Andrew Morton <akpm@linux-foundation.org>
 Subject: Re: [PATCH -next 2/2] kbuild: fix for updated LZ4 tool with the new
  streaming format
-References: <1367829775-4434-1-git-send-email-kyungsik.lee@lge.com> <1367829775-4434-2-git-send-email-kyungsik.lee@lge.com> <20130712075602.GA4002@gmail.com> <20130715150342.35f7620ffe0835e3e2bc37d0@linux-foundation.org>
-In-Reply-To: <20130715150342.35f7620ffe0835e3e2bc37d0@linux-foundation.org>
-Content-Type: text/plain; charset=UTF-8
+Message-Id: <20130716004727.b60b2c96.akpm@linux-foundation.org>
+In-Reply-To: <51E472D4.5060307@zytor.com>
+References: <1367829775-4434-1-git-send-email-kyungsik.lee@lge.com>
+	<1367829775-4434-2-git-send-email-kyungsik.lee@lge.com>
+	<20130712075602.GA4002@gmail.com>
+	<20130715150342.35f7620ffe0835e3e2bc37d0@linux-foundation.org>
+	<51E472D4.5060307@zytor.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrew Morton <akpm@linux-foundation.org>
+To: "H. Peter Anvin" <hpa@zytor.com>
 Cc: Ingo Molnar <mingo@kernel.org>, Kyungsik Lee <kyungsik.lee@lge.com>, Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org, celinux-dev@lists.celinuxforum.org, linux-arm-kernel@lists.infradead.org, hyojun.im@lge.com, chan.jeong@lge.com, raphael.andy.lee@gmail.com, Ingo Molnar <mingo@elte.hu>, Thomas Gleixner <tglx@linutronix.de>, Russell King <rmk@arm.linux.org.uk>, Borislav Petkov <bp@alien8.de>, Florian Fainelli <florian@openwrt.org>, Yann Collet <yann.collet.73@gmail.com>, Chanho Min <chanho.min@lge.com>
 
-On 07/15/2013 03:03 PM, Andrew Morton wrote:
+On Mon, 15 Jul 2013 15:08:20 -0700 "H. Peter Anvin" <hpa@zytor.com> wrote:
+
+> On 07/15/2013 03:03 PM, Andrew Morton wrote:
+> > 
+> > I don't know how to do this.  Any suggestions?
+> > 
+> > It has to be done at `make config' time.  We'd need to probe for the
+> > presence of lz4c and then....  what?
+> > 
+> > Is there any precedent for this?
+> > 
+> > I don't think we can just ignore the absence of lz4c - the user has
+> > selected a config which his system cannot build.  The problem lies
+> > within randconfig itself.
+> > 
 > 
-> I don't know how to do this.  Any suggestions?
-> 
-> It has to be done at `make config' time.  We'd need to probe for the
-> presence of lz4c and then....  what?
-> 
-> Is there any precedent for this?
-> 
-> I don't think we can just ignore the absence of lz4c - the user has
-> selected a config which his system cannot build.  The problem lies
-> within randconfig itself.
+> We keep running over the need to be able to have kconfig run tests on
+> the build system (for toolchain support or for optional tools needed);
+> running them in the Makefiles (i.e. at Kbuild time) is simply too late.
 > 
 
-We keep running over the need to be able to have kconfig run tests on
-the build system (for toolchain support or for optional tools needed);
-running them in the Makefiles (i.e. at Kbuild time) is simply too late.
+Would it make sense to extend Kconfig's `depends'?
 
-	-hpa
+	depends on $(shell-command)
 
+I don't know how practical that would be to implement...
