@@ -1,57 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f172.google.com ([209.85.212.172]:59149 "EHLO
-	mail-wi0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932993Ab3GPUkS (ORCPT
+Received: from relay1.mentorg.com ([192.94.38.131]:32945 "EHLO
+	relay1.mentorg.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933926Ab3GPVPs (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 16 Jul 2013 16:40:18 -0400
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: [PATCH 1/6] Documentation/kconfig: more concise and straightforward search explanation
-Date: Tue, 16 Jul 2013 22:39:57 +0200
-Message-Id: <9e554dd7b2de269c697943712d91b668f27a42bd.1374006854.git.yann.morin.1998@free.fr>
-In-Reply-To: <cover.1374006854.git.yann.morin.1998@free.fr>
-References: <cover.1374006854.git.yann.morin.1998@free.fr>
-In-Reply-To: <cover.1374006854.git.yann.morin.1998@free.fr>
-References: <cover.1374006854.git.yann.morin.1998@free.fr>
+	Tue, 16 Jul 2013 17:15:48 -0400
+Message-ID: <51E5B7FF.9080004@mentor.com>
+Date: Tue, 16 Jul 2013 22:15:43 +0100
+From: Jim Baxter <jim_baxter@mentor.com>
+MIME-Version: 1.0
+Subject: Re: [RFC] kbuild: Build samples directory with make modules
+References: <jim_baxter@mentor.com> <1373999390-14548-1-git-send-email-jim_baxter@mentor.com> <20130716193714.GA19924@merkur.ravnborg.org>
+In-Reply-To: <20130716193714.GA19924@merkur.ravnborg.org>
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Jean Delvare <jdelvare@suse.de>, "Yann E. MORIN" <yann.morin.1998@free.fr>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+On 16/07/13 20:37, Sam Ravnborg wrote:
+> On Tue, Jul 16, 2013 at 07:29:50PM +0100, Jim Baxter wrote:
+>> If CONFIG_SAMPLES is enabled with any of the sample
+>> modules enabled, they are only built if the make command
+>> includes uImage and modules (i.e. make uImage modules).
+> 
+> With the current location samples are built when you build vmlinux.
+> And vmlinux is implicit when you just type "make".
+> 
+> With the suggestion you have samples are built when you do "make modules".
+> IMO this is less logical than to built them with vmlinux as we do today.
+> 
+> 	Sam
+> 
 
-Re-phrase the explanations on the sorting of search results, in a more
-concise and complete way.
+Hi,
 
-Drop reference to the user's locale when sorting alphabetically, since
-this is implicit.
+I am building it with:
+make uImage
+make modules
 
-Reported-by: Jean Delvare <jdelvare@suse.de>
-Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: Jean Delvare <jdelvare@suse.de>
-Reviewed-by: Jean Delvare <jdelvare@suse.de>
----
- Documentation/kbuild/kconfig.txt | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
+At least bitbake in Yocto and Openembedded is.
 
-diff --git a/Documentation/kbuild/kconfig.txt b/Documentation/kbuild/kconfig.txt
-index e9f9e76..d58a2ea 100644
---- a/Documentation/kbuild/kconfig.txt
-+++ b/Documentation/kbuild/kconfig.txt
-@@ -175,11 +175,9 @@ Searching in menuconfig:
- 		/^hotplug
- 
- 	When searching, symbols are sorted thus:
--	  - exact match first: an exact match is when the search matches
--	    the complete symbol name;
--	  - alphabetical order: when two symbols do not match exactly,
--	    they are sorted in alphabetical order (in the user's current
--	    locale).
-+	  - first, exact matches, sorted alphabetically (an exact match
-+	    is when the search matches the complete symbol name);
-+	  - then, other matches, sorted alphabetically.
- 	For example: ^ATH.K matches:
- 	    ATH5K ATH9K ATH5K_AHB ATH5K_DEBUG [...] ATH6KL ATH6KL_DEBUG
- 	    [...] ATH9K_AHB ATH9K_BTCOEX_SUPPORT ATH9K_COMMON [...]
--- 
-1.8.1.2
+Running make on it's own is the equivalent of:
+make vmlinux modules
 
+which builds the samples directory, however if you run:
+make vmlinux
+make modules
+
+Then the Samples are not built, that is what I am trying to fix.
+
+Thank you,
+Jim
