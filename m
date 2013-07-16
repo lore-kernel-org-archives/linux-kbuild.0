@@ -1,16 +1,18 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:36912 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:37795 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754423Ab3GPOWA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 16 Jul 2013 10:22:00 -0400
-Subject: Re: [PATCH 2/3] kconfig: avoid multiple calls to strlen
+	id S932351Ab3GPObi (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 16 Jul 2013 10:31:38 -0400
+Subject: Re: [PATCH 13/15] kconfig/[mn]conf: make it explicit in the search
+ box that a regexp is possible
 From: Jean Delvare <jdelvare@suse.de>
-In-Reply-To: <1373738905-23396-3-git-send-email-yann.morin.1998@free.fr>
-References: <1373738905-23396-1-git-send-email-yann.morin.1998@free.fr>
-	 <1373738905-23396-3-git-send-email-yann.morin.1998@free.fr>
+In-Reply-To: <20130708173742.GC3206@free.fr>
+References: <cover.1372097219.git.yann.morin.1998@free.fr>
+	 <a1ce636f560336ba007bfabb15b167ff31b592cf.1372097219.git.yann.morin.1998@free.fr>
+	 <1373282724.4298.203.camel@chaos.site>  <20130708173742.GC3206@free.fr>
 Content-Type: text/plain; charset="UTF-8"
-Date: Tue, 16 Jul 2013 16:21:41 +0200
-Message-ID: <1373984501.4513.8.camel@chaos.site>
+Date: Tue, 16 Jul 2013 16:31:20 +0200
+Message-ID: <1373985080.4513.9.camel@chaos.site>
 Mime-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -18,53 +20,48 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: "Yann E. MORIN" <yann.morin.1998@free.fr>
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>
 
-Le Saturday 13 July 2013 à 20:08 +0200, Yann E. MORIN a écrit :
-> From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Hi Yann,
+
+Le Monday 08 July 2013 à 19:37 +0200, Yann E. MORIN a écrit :
+> Jean, All,
 > 
-> Calls to strlen are costly, so avoid calling strln as much as we can.
-
-Typo: strln -> strlen.
-
-> Reported-by: Jean Delvare <jdelvare@suse.de>
-> Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
-> Cc: Jean Delvare <jdelvare@suse.de>
-> ---
->  scripts/kconfig/symbol.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
+> On 2013-07-08 13:25 +0200, Jean Delvare spake thusly:
+> > Le Monday 24 June 2013 à 20:11 +0200, Yann E. MORIN a écrit :
+> > > From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+> > > 
+> > > Reported-by: Jean Delvare <jdelvare@suse.de>
+> > > Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+> > > Cc: Jean Delvare <jdelvare@suse.de>
+> > > Cc: Michal Marek <mmarek@suse.cz>
+> > > ---
+> > >  scripts/kconfig/mconf.c | 2 +-
+> > >  scripts/kconfig/nconf.c | 2 +-
+> > >  2 files changed, 2 insertions(+), 2 deletions(-)
+> > > 
+> > > diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
+> > > index 6ee4aae..18d3dc9 100644
+> > > --- a/scripts/kconfig/mconf.c
+> > > +++ b/scripts/kconfig/mconf.c
+> > > @@ -401,7 +401,7 @@ static void search_conf(void)
+> > >  	struct subtitle_part stpart;
+> > >  
+> > >  	title = str_new();
+> > > -	str_printf( &title, _("Enter %s (sub)string to search for "
+> > > +	str_printf( &title, _("Enter %s (sub)string or regexp to search for "
+> > >  			      "(with or without \"%s\")"), CONFIG_, CONFIG_);
+> > 
+> > While clearer, this also makes the title span over two lines when it
+> > used to fit on a single one. I would like to suggest the following:
+> > 
+> > 	str_printf(&title, _("Enter (sub)string or regexp to search for "
+> > 			     "(with or without \"%s\")"), CONFIG_);
+> > 
+> > Rationale: the "(with or without CONFIG_)" makes things clear enough
+> > IMHO, making the first occurrence redundant.
 > 
-> diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
-> index d550300..020a0ac 100644
-> --- a/scripts/kconfig/symbol.c
-> +++ b/scripts/kconfig/symbol.c
-> @@ -967,7 +967,7 @@ static int sym_rel_comp( const void *sym1, const void *sym2 )
->  {
->  	struct sym_match *s1 = *(struct sym_match **)sym1;
->  	struct sym_match *s2 = *(struct sym_match **)sym2;
-> -	int l1, l2;
-> +	int exact1, exact2;
->  
->  	/* Exact match:
->  	 * - if matched length on symbol s1 is the length of that symbol,
-> @@ -978,11 +978,11 @@ static int sym_rel_comp( const void *sym1, const void *sym2 )
->  	 * exactly; if this is the case, we can't decide which comes first,
->  	 * and we fallback to sorting alphabetically.
->  	 */
-> -	l1 = s1->eo - s1->so;
-> -	l2 = s2->eo - s2->so;
-> -	if (l1 == strlen(s1->sym->name) && l2 != strlen(s2->sym->name))
-> +	exact1 = (s1->eo - s1->so) == strlen(s1->sym->name);
-> +	exact2 = (s2->eo - s2->so) == strlen(s2->sym->name);
-> +	if (exact1 && !exact2)
->  		return -1;
-> -	if (l1 != strlen(s1->sym->name) && l2 == strlen(s2->sym->name))
-> +	if (!exact1 && exact2)
->  		return 1;
->  
->  	/* As a fallback, sort symbols alphabetically */
+> OK, I'll send another patch with the text updated with your suggestion.
 
-Looks good and tested OK.
-
-Reviewed-by: Jean Delvare <jdelvare@suse.de>
+Did you? I can't remember seeing it.
 
 -- 
 Jean Delvare
