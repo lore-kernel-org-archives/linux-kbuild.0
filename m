@@ -1,33 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.snhosting.dk ([87.238.248.203]:29733 "EHLO
-	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932991Ab3GPThR (ORCPT
+Received: from mail-wg0-f46.google.com ([74.125.82.46]:45790 "EHLO
+	mail-wg0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932406Ab3GPUkR (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 16 Jul 2013 15:37:17 -0400
-Date: Tue, 16 Jul 2013 21:37:15 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [RFC] kbuild: Build samples directory with make modules
-Message-ID: <20130716193714.GA19924@merkur.ravnborg.org>
-References: <jim_baxter@mentor.com> <1373999390-14548-1-git-send-email-jim_baxter@mentor.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1373999390-14548-1-git-send-email-jim_baxter@mentor.com>
+	Tue, 16 Jul 2013 16:40:17 -0400
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: [pull request] Pull request for branch yem-kconfig-rc-fixes
+Date: Tue, 16 Jul 2013 22:39:56 +0200
+Message-Id: <cover.1374006854.git.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jim Baxter <jim_baxter@mentor.com>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Jean Delvare <jdelvare@suse.de>, "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-On Tue, Jul 16, 2013 at 07:29:50PM +0100, Jim Baxter wrote:
-> If CONFIG_SAMPLES is enabled with any of the sample
-> modules enabled, they are only built if the make command
-> includes uImage and modules (i.e. make uImage modules).
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-With the current location samples are built when you build vmlinux.
-And vmlinux is implicit when you just type "make".
+Hello Michal,
 
-With the suggestion you have samples are built when you do "make modules".
-IMO this is less logical than to built them with vmlinux as we do today.
+Please pull these post-rc1 kconfig cleanups, all after
+review and comments by Jean:
+  - simplify and cleanup the symbol-search code
+  - better documentation about the symbols ordering in search results
+  - eye-candy in the title of the search-box in [mn]conf
 
-	Sam
+Regards,
+Yann E. MORIN.
 
+
+The following changes since commit b57caaaed2bd127fe656e6c145970ed6a05c0125:
+
+  kconfig: allow "hex" and "range" to support longs (2013-06-29 15:30:17 +0200)
+
+are available in the git repository at:
+
+  git://gitorious.org/linux-kconfig/linux-kconfig.git yem-kconfig-rc-fixes
+
+for you to fetch changes up to 508382a0428f2b2f49da0e0e89c921f07c9306aa:
+
+  kconfig: simplify symbol-search code (2013-07-16 20:39:42 +0200)
+
+----------------------------------------------------------------
+Yann E. MORIN (6):
+      Documentation/kconfig: more concise and straightforward search explanation
+      kconfig: avoid multiple calls to strlen
+      kconfig/[mn]conf: shorten title in search-box
+      kconfig: minor style fixes in symbol-search code
+      kconfig: don't allocate n+1 elements in temporary array
+      kconfig: simplify symbol-search code
+
+ Documentation/kbuild/kconfig.txt |  8 +++----
+ scripts/kconfig/mconf.c          |  4 ++--
+ scripts/kconfig/nconf.c          |  4 ++--
+ scripts/kconfig/symbol.c         | 49 ++++++++++++++++------------------------
+ 4 files changed, 27 insertions(+), 38 deletions(-)
+
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
