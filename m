@@ -1,67 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from p-mail1.rd.orange.com ([195.101.245.15]:54788 "EHLO
-	p-mail1.rd.orange.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932652Ab3GPOma convert rfc822-to-8bit (ORCPT
+Received: from smtp.snhosting.dk ([87.238.248.203]:59095 "EHLO
+	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932988Ab3GPSEK (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 16 Jul 2013 10:42:30 -0400
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH 3/3] kconfig: cleanup symbol-search code
-Date: Tue, 16 Jul 2013 16:42:28 +0200
-References: <1373738905-23396-1-git-send-email-yann.morin.1998@free.fr> <1373738905-23396-4-git-send-email-yann.morin.1998@free.fr> <1373985227.4513.12.camel@chaos.site>
-In-Reply-To: <1373985227.4513.12.camel@chaos.site>
+	Tue, 16 Jul 2013 14:04:10 -0400
+Date: Tue, 16 Jul 2013 20:04:08 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH -next 2/2] kbuild: fix for updated LZ4 tool with the
+	new streaming format
+Message-ID: <20130716180408.GA19863@merkur.ravnborg.org>
+References: <1367829775-4434-1-git-send-email-kyungsik.lee@lge.com> <20130716004727.b60b2c96.akpm@linux-foundation.org> <20130716005611.e4ccab02.akpm@linux-foundation.org> <201307161008.07643.yann.morin.1998@free.fr>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="utf-8"
-Content-Transfer-Encoding: 8BIT
-Message-Id: <201307161642.28527.yann.morin.1998@free.fr>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <201307161008.07643.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jean Delvare <jdelvare@suse.de>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: Andrew Morton <akpm@linux-foundation.org>, "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@kernel.org>, Kyungsik Lee <kyungsik.lee@lge.com>, Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org, celinux-dev@lists.celinuxforum.org, linux-arm-kernel@lists.infradead.org, hyojun.im@lge.com, chan.jeong@lge.com, raphael.andy.lee@gmail.com, Ingo Molnar <mingo@elte.hu>, Thomas Gleixner <tglx@linutronix.de>, Russell King <rmk@arm.linux.org.uk>, Borislav Petkov <bp@alien8.de>, Florian Fainelli <florian@openwrt.org>, Yann Collet <yann.collet.73@gmail.com>, Chanho Min <chanho.min@lge.com>
 
-Jean, All,
-
-On Tuesday 16 July 2013 16:33:47 Jean Delvare wrote:
-> Le Saturday 13 July 2013 à 20:08 +0200, Yann E. MORIN a écrit :
-> > From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-> > 
-> > - no need for a double-indirection for the temporary sym_match_arr array
-> > - the temporary sym_match_arr array is not NULL terminated, so no need
-> >   to allocate n+1 elements
-> > - two minor style fixes
-> > - grammar fix in comment
-> > 
-> > Reported-by: Jean Delvare <jdelvare@suse.de>
-> > Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
-> > Cc: Jean Delvare <jdelvare@suse.de>
-> > ---
-> >  scripts/kconfig/symbol.c | 39 +++++++++++++++------------------------
-> >  1 file changed, 15 insertions(+), 24 deletions(-)
-> >  (...)
+On Tue, Jul 16, 2013 at 10:08:07AM +0200, Yann E. MORIN wrote:
+> Andrew, All,
 > 
-> You mixed style cleanups with actual code changes, which is usually
-> avoided. Michal may ask you to split these changes into two separate
-> patches.
-
-Yes, I initially did three patches (style cleanups, n+1 elem, then
-double-indirection), and I eventually decided to merge them in a single
-patch. I don't know why I decided that... :-(
-
-I'll re-split.
-
-> Still, I'm happy with all the changes:
+> On Tuesday 16 July 2013 09:56:11 Andrew Morton wrote:
+> > On Tue, 16 Jul 2013 00:47:27 -0700 Andrew Morton <akpm@linux-foundation.org> wrote:
+> > > On Mon, 15 Jul 2013 15:08:20 -0700 "H. Peter Anvin" <hpa@zytor.com> wrote:
+> > > > On 07/15/2013 03:03 PM, Andrew Morton wrote:
+> [--SNIP--]
+> > > > We keep running over the need to be able to have kconfig run tests on
+> > > > the build system (for toolchain support or for optional tools needed);
+> > > > running them in the Makefiles (i.e. at Kbuild time) is simply too late.
+> > > > 
+> > > 
+> > > Would it make sense to extend Kconfig's `depends'?
+> > > 
+> > > 	depends on $(shell-command)
+> > > 
+> > > I don't know how practical that would be to implement...
 > 
-> Reviewed-by: Jean Delvare <jdelvare@suse.de>
+> I'm afraid this will get rather ugly and not trivial.
+> 
+> Can we mix 'depends on SYMBOL' and 'depends on $(command)' ?
+> Can we mix both in a boolean expression such as 'depends on SYMBOL
+> && $(command)' ?
+> 
+> What would be the condition for evaluating the dependency rule? Evaluation
+> at Kconfig read-time might not be enough, given this construct:
+> 
+>     config FOO
+>         depends on $(foo)
+>     comment "'foo' is missing, please install it"
+>         depends on !$(foo)
+> 
+> Also, I believe Kconfig should stay a config-only language, without
+> much esoteric features.
 
-Thank you! :-)
+We could extend the symbol option part to retreive values from a binary.
+Something like this:
 
-Regards,
-Yann E. MORIN.
+config FOOBAR
+        bool
+        option exec="true"
 
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +0/33 662376056 | Software  Designer | \ / CAMPAIGN     |   ^                |
-| --==< O_o >==-- '------------.-------:  X  AGAINST      |  /e\  There is no  |
-| http://ymorin.is-a-geek.org/ | (*_*) | / \ HTML MAIL    |  """  conspiracy.  |
-'------------------------------'-------'------------------'--------------------'
+FOOBAR would assume the value "y" if the command true has exit code == 0, otherwise "n".
+And similar conversions for other types.
+
+This only extendt Kconfig slightly - using an already present method to import
+external values.
+
+The drawback I see with this approach is that we may execute a lot of small programs
+where the value is never used.
+Implementing lazy evaluation of a symbol value will not be easy I think.
+
+	Sam
