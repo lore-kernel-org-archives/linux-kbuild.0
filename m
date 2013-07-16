@@ -1,17 +1,16 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:36533 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:36912 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754423Ab3GPOOn (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 16 Jul 2013 10:14:43 -0400
-Subject: Re: [PATCH 1/3] Documentation/kconfig: more concise and
- straightforward search explanation
+	id S1754423Ab3GPOWA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 16 Jul 2013 10:22:00 -0400
+Subject: Re: [PATCH 2/3] kconfig: avoid multiple calls to strlen
 From: Jean Delvare <jdelvare@suse.de>
-In-Reply-To: <1373738905-23396-2-git-send-email-yann.morin.1998@free.fr>
+In-Reply-To: <1373738905-23396-3-git-send-email-yann.morin.1998@free.fr>
 References: <1373738905-23396-1-git-send-email-yann.morin.1998@free.fr>
-	 <1373738905-23396-2-git-send-email-yann.morin.1998@free.fr>
+	 <1373738905-23396-3-git-send-email-yann.morin.1998@free.fr>
 Content-Type: text/plain; charset="UTF-8"
-Date: Tue, 16 Jul 2013 16:14:25 +0200
-Message-ID: <1373984065.4513.5.camel@chaos.site>
+Date: Tue, 16 Jul 2013 16:21:41 +0200
+Message-ID: <1373984501.4513.8.camel@chaos.site>
 Mime-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -22,40 +21,48 @@ Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Michal Marek <mm
 Le Saturday 13 July 2013 à 20:08 +0200, Yann E. MORIN a écrit :
 > From: "Yann E. MORIN" <yann.morin.1998@free.fr>
 > 
-> Re-phrase the explanations on the sorting of search results, in a more
-> concise and complete way.
-> 
-> Drop reference to the user's locale when sorting alphabetically, since
-> this is implicit.
-> 
+> Calls to strlen are costly, so avoid calling strln as much as we can.
+
+Typo: strln -> strlen.
+
 > Reported-by: Jean Delvare <jdelvare@suse.de>
 > Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
 > Cc: Jean Delvare <jdelvare@suse.de>
 > ---
->  Documentation/kbuild/kconfig.txt | 8 +++-----
->  1 file changed, 3 insertions(+), 5 deletions(-)
+>  scripts/kconfig/symbol.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
 > 
-> diff --git a/Documentation/kbuild/kconfig.txt b/Documentation/kbuild/kconfig.txt
-> index e9f9e76..6edf37d 100644
-> --- a/Documentation/kbuild/kconfig.txt
-> +++ b/Documentation/kbuild/kconfig.txt
-> @@ -175,11 +175,9 @@ Searching in menuconfig:
->  		/^hotplug
+> diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
+> index d550300..020a0ac 100644
+> --- a/scripts/kconfig/symbol.c
+> +++ b/scripts/kconfig/symbol.c
+> @@ -967,7 +967,7 @@ static int sym_rel_comp( const void *sym1, const void *sym2 )
+>  {
+>  	struct sym_match *s1 = *(struct sym_match **)sym1;
+>  	struct sym_match *s2 = *(struct sym_match **)sym2;
+> -	int l1, l2;
+> +	int exact1, exact2;
 >  
->  	When searching, symbols are sorted thus:
-> -	  - exact match first: an exact match is when the search matches
-> -	    the complete symbol name;
-> -	  - alphabetical order: when two symbols do not match exactly,
-> -	    they are sorted in alphabetical order (in the user's current
-> -	    locale).
-> +	  - first, exact matches, sorted alphabetically (an exact match                                                                │18:03 -!- - keep a notice in the topic and perhaps as an on-join message).
-> +	    is when the search matches the complete symbol name);                                                                      │18:03 -!- -  
-> +	  - then, other matches, sorted alphabetically.
->  	For example: ^ATH.K matches:
->  	    ATH5K ATH9K ATH5K_AHB ATH5K_DEBUG [...] ATH6KL ATH6KL_DEBUG
->  	    [...] ATH9K_AHB ATH9K_BTCOEX_SUPPORT ATH9K_COMMON [...]
+>  	/* Exact match:
+>  	 * - if matched length on symbol s1 is the length of that symbol,
+> @@ -978,11 +978,11 @@ static int sym_rel_comp( const void *sym1, const void *sym2 )
+>  	 * exactly; if this is the case, we can't decide which comes first,
+>  	 * and we fallback to sorting alphabetically.
+>  	 */
+> -	l1 = s1->eo - s1->so;
+> -	l2 = s2->eo - s2->so;
+> -	if (l1 == strlen(s1->sym->name) && l2 != strlen(s2->sym->name))
+> +	exact1 = (s1->eo - s1->so) == strlen(s1->sym->name);
+> +	exact2 = (s2->eo - s2->so) == strlen(s2->sym->name);
+> +	if (exact1 && !exact2)
+>  		return -1;
+> -	if (l1 != strlen(s1->sym->name) && l2 == strlen(s2->sym->name))
+> +	if (!exact1 && exact2)
+>  		return 1;
+>  
+>  	/* As a fallback, sort symbols alphabetically */
 
-After fixing the copy-and-paste mistake, this looks good to me.
+Looks good and tested OK.
 
 Reviewed-by: Jean Delvare <jdelvare@suse.de>
 
