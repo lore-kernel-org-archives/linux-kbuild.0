@@ -1,16 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:42244 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:42372 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752775Ab3GQJzd (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 17 Jul 2013 05:55:33 -0400
-Subject: Re: [PATCH 3/6] kconfig/[mn]conf: shorten title in search-box
+	id S1753724Ab3GQJ7h (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 17 Jul 2013 05:59:37 -0400
+Subject: Re: [pull request] Pull request for branch yem-kconfig-rc-fixes
 From: Jean Delvare <jdelvare@suse.de>
-In-Reply-To: <f6eb6e46f766f4e2eb64d2d467ef7efff084c47c.1374006854.git.yann.morin.1998@free.fr>
+In-Reply-To: <cover.1374006854.git.yann.morin.1998@free.fr>
 References: <cover.1374006854.git.yann.morin.1998@free.fr>
-	 <f6eb6e46f766f4e2eb64d2d467ef7efff084c47c.1374006854.git.yann.morin.1998@free.fr>
 Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 17 Jul 2013 11:55:12 +0200
-Message-ID: <1374054912.4495.0.camel@chaos.site>
+Date: Wed, 17 Jul 2013 11:59:18 +0200
+Message-ID: <1374055158.4495.1.camel@chaos.site>
 Mime-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -21,49 +20,18 @@ Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Michal Marek <mm
 Le Tuesday 16 July 2013 à 22:39 +0200, Yann E. MORIN a écrit :
 > From: "Yann E. MORIN" <yann.morin.1998@free.fr>
 > 
-> No need to repeat the 'CONFIG_' string in the title,
-> once is explicit enough.
+> Hello Michal,
 > 
-> Reported-by: Jean Delvare <jdelvare@suse.de>
-> Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
-> Cc: Jean Delvare <jdelvare@suse.de>
-> ---
->  scripts/kconfig/mconf.c | 4 ++--
->  scripts/kconfig/nconf.c | 4 ++--
->  2 files changed, 4 insertions(+), 4 deletions(-)
+> Please pull these post-rc1 kconfig cleanups, all after
+> review and comments by Jean:
+>   - simplify and cleanup the symbol-search code
+>   - better documentation about the symbols ordering in search results
+>   - eye-candy in the title of the search-box in [mn]conf
 > 
-> diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
-> index 18d3dc9..b20e851 100644
-> --- a/scripts/kconfig/mconf.c
-> +++ b/scripts/kconfig/mconf.c
-> @@ -401,8 +401,8 @@ static void search_conf(void)
->  	struct subtitle_part stpart;
->  
->  	title = str_new();
-> -	str_printf( &title, _("Enter %s (sub)string or regexp to search for "
-> -			      "(with or without \"%s\")"), CONFIG_, CONFIG_);
-> +	str_printf( &title, _("Enter (sub)string or regexp to search for "
-> +			      "(with or without \"%s\")"), CONFIG_);
->  
->  again:
->  	dialog_clear();
-> diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
-> index 7975d8d..4fbecd2 100644
-> --- a/scripts/kconfig/nconf.c
-> +++ b/scripts/kconfig/nconf.c
-> @@ -695,8 +695,8 @@ static void search_conf(void)
->  	int dres;
->  
->  	title = str_new();
-> -	str_printf( &title, _("Enter %s (sub)string or regexp to search for "
-> -			      "(with or without \"%s\")"), CONFIG_, CONFIG_);
-> +	str_printf( &title, _("Enter (sub)string or regexp to search for "
-> +			      "(with or without \"%s\")"), CONFIG_);
->  
->  again:
->  	dres = dialog_inputbox(main_window,
+> Regards,
+> Yann E. MORIN.
 
-Reviewed-by: Jean Delvare <jdelvare@suse.de>
+It looks very good to me now, thanks Yann for the good work!
 
 -- 
 Jean Delvare
