@@ -1,54 +1,71 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from relay1.mentorg.com ([192.94.38.131]:32945 "EHLO
-	relay1.mentorg.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933926Ab3GPVPs (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 16 Jul 2013 17:15:48 -0400
-Message-ID: <51E5B7FF.9080004@mentor.com>
-Date: Tue, 16 Jul 2013 22:15:43 +0100
-From: Jim Baxter <jim_baxter@mentor.com>
-MIME-Version: 1.0
-Subject: Re: [RFC] kbuild: Build samples directory with make modules
-References: <jim_baxter@mentor.com> <1373999390-14548-1-git-send-email-jim_baxter@mentor.com> <20130716193714.GA19924@merkur.ravnborg.org>
-In-Reply-To: <20130716193714.GA19924@merkur.ravnborg.org>
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
+Received: from cantor2.suse.de ([195.135.220.15]:42244 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752775Ab3GQJzd (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 17 Jul 2013 05:55:33 -0400
+Subject: Re: [PATCH 3/6] kconfig/[mn]conf: shorten title in search-box
+From: Jean Delvare <jdelvare@suse.de>
+In-Reply-To: <f6eb6e46f766f4e2eb64d2d467ef7efff084c47c.1374006854.git.yann.morin.1998@free.fr>
+References: <cover.1374006854.git.yann.morin.1998@free.fr>
+	 <f6eb6e46f766f4e2eb64d2d467ef7efff084c47c.1374006854.git.yann.morin.1998@free.fr>
+Content-Type: text/plain; charset="UTF-8"
+Date: Wed, 17 Jul 2013 11:55:12 +0200
+Message-ID: <1374054912.4495.0.camel@chaos.site>
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>
 
-On 16/07/13 20:37, Sam Ravnborg wrote:
-> On Tue, Jul 16, 2013 at 07:29:50PM +0100, Jim Baxter wrote:
->> If CONFIG_SAMPLES is enabled with any of the sample
->> modules enabled, they are only built if the make command
->> includes uImage and modules (i.e. make uImage modules).
+Le Tuesday 16 July 2013 à 22:39 +0200, Yann E. MORIN a écrit :
+> From: "Yann E. MORIN" <yann.morin.1998@free.fr>
 > 
-> With the current location samples are built when you build vmlinux.
-> And vmlinux is implicit when you just type "make".
+> No need to repeat the 'CONFIG_' string in the title,
+> once is explicit enough.
 > 
-> With the suggestion you have samples are built when you do "make modules".
-> IMO this is less logical than to built them with vmlinux as we do today.
+> Reported-by: Jean Delvare <jdelvare@suse.de>
+> Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+> Cc: Jean Delvare <jdelvare@suse.de>
+> ---
+>  scripts/kconfig/mconf.c | 4 ++--
+>  scripts/kconfig/nconf.c | 4 ++--
+>  2 files changed, 4 insertions(+), 4 deletions(-)
 > 
-> 	Sam
-> 
+> diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
+> index 18d3dc9..b20e851 100644
+> --- a/scripts/kconfig/mconf.c
+> +++ b/scripts/kconfig/mconf.c
+> @@ -401,8 +401,8 @@ static void search_conf(void)
+>  	struct subtitle_part stpart;
+>  
+>  	title = str_new();
+> -	str_printf( &title, _("Enter %s (sub)string or regexp to search for "
+> -			      "(with or without \"%s\")"), CONFIG_, CONFIG_);
+> +	str_printf( &title, _("Enter (sub)string or regexp to search for "
+> +			      "(with or without \"%s\")"), CONFIG_);
+>  
+>  again:
+>  	dialog_clear();
+> diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
+> index 7975d8d..4fbecd2 100644
+> --- a/scripts/kconfig/nconf.c
+> +++ b/scripts/kconfig/nconf.c
+> @@ -695,8 +695,8 @@ static void search_conf(void)
+>  	int dres;
+>  
+>  	title = str_new();
+> -	str_printf( &title, _("Enter %s (sub)string or regexp to search for "
+> -			      "(with or without \"%s\")"), CONFIG_, CONFIG_);
+> +	str_printf( &title, _("Enter (sub)string or regexp to search for "
+> +			      "(with or without \"%s\")"), CONFIG_);
+>  
+>  again:
+>  	dres = dialog_inputbox(main_window,
 
-Hi,
+Reviewed-by: Jean Delvare <jdelvare@suse.de>
 
-I am building it with:
-make uImage
-make modules
+-- 
+Jean Delvare
+Suse L3
 
-At least bitbake in Yocto and Openembedded is.
-
-Running make on it's own is the equivalent of:
-make vmlinux modules
-
-which builds the samples directory, however if you run:
-make vmlinux
-make modules
-
-Then the Samples are not built, that is what I am trying to fix.
-
-Thank you,
-Jim
