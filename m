@@ -1,111 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.outflux.net ([198.145.64.163]:58777 "EHLO smtp.outflux.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1758647Ab3GRQGw (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 18 Jul 2013 12:06:52 -0400
-Date: Thu, 18 Jul 2013 09:06:33 -0700
-From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH] kconfig: switch to "long long" for sanity
-Message-ID: <20130718160633.GA16208@www.outflux.net>
+Received: from mail-pb0-f49.google.com ([209.85.160.49]:48822 "EHLO
+	mail-pb0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1759072Ab3GRSBo (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 18 Jul 2013 14:01:44 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+In-Reply-To: <20130718160633.GA16208@www.outflux.net>
+References: <20130718160633.GA16208@www.outflux.net>
+Date: Thu, 18 Jul 2013 20:01:43 +0200
+Message-ID: <CAMuHMdVyyA43s=O_PoSKC75G49T71ZWLAQ2B1HKW1MSc=q5TZA@mail.gmail.com>
+Subject: Re: [PATCH] kconfig: switch to "long long" for sanity
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Michal Marek <mmarek@suse.cz>, Arve =?iso-8859-1?B?SGr4bm5lduVn?= <arve@android.com>, linux-kbuild@vger.kernel.org
+To: Kees Cook <keescook@chromium.org>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Michal Marek <mmarek@suse.cz>, =?UTF-8?B?QXJ2ZSBIasO4bm5ldsOlZw==?= <arve@android.com>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-Instead of using "long" for kconfig "hex" and "range" values, which may
-change in size depending on the host architecture, use "long long". This
-will allow values greater than INT_MAX on 32-bit hosts when cross
-compiling.
+On Thu, Jul 18, 2013 at 6:06 PM, Kees Cook <keescook@chromium.org> wrote:
+> Instead of using "long" for kconfig "hex" and "range" values, which may
+> change in size depending on the host architecture, use "long long". This
+> will allow values greater than INT_MAX on 32-bit hosts when cross
+> compiling.
+>
+> Signed-off-by: Kees Cook <keescook@chromium.org>
 
-Signed-off-by: Kees Cook <keescook@chromium.org>
----
- scripts/kconfig/symbol.c |   18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+Acked-by: Geert Uytterhoeven <geert@linux-m68k.org>
+with one minor nit...
 
-diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
-index d550300..5280c55 100644
---- a/scripts/kconfig/symbol.c
-+++ b/scripts/kconfig/symbol.c
-@@ -136,7 +136,7 @@ static struct property *sym_get_range_prop(struct symbol *sym)
- 	return NULL;
- }
- 
--static long sym_get_range_val(struct symbol *sym, int base)
-+static long long sym_get_range_val(struct symbol *sym, int base)
- {
- 	sym_calc_value(sym);
- 	switch (sym->type) {
-@@ -149,13 +149,13 @@ static long sym_get_range_val(struct symbol *sym, int base)
- 	default:
- 		break;
- 	}
--	return strtol(sym->curr.val, NULL, base);
-+	return strtoll(sym->curr.val, NULL, base);
- }
- 
- static void sym_validate_range(struct symbol *sym)
- {
- 	struct property *prop;
--	long base, val, val2;
-+	long long base, val, val2;
- 	char str[64];
- 
- 	switch (sym->type) {
-@@ -171,7 +171,7 @@ static void sym_validate_range(struct symbol *sym)
- 	prop = sym_get_range_prop(sym);
- 	if (!prop)
- 		return;
--	val = strtol(sym->curr.val, NULL, base);
-+	val = strtoll(sym->curr.val, NULL, base);
- 	val2 = sym_get_range_val(prop->expr->left.sym, base);
- 	if (val >= val2) {
- 		val2 = sym_get_range_val(prop->expr->right.sym, base);
-@@ -179,9 +179,9 @@ static void sym_validate_range(struct symbol *sym)
- 			return;
- 	}
- 	if (sym->type == S_INT)
--		sprintf(str, "%ld", val2);
-+		sprintf(str, "%lld", val2);
- 	else
--		sprintf(str, "0x%lx", val2);
-+		sprintf(str, "0x%llx", val2);
- 	sym->curr.val = strdup(str);
- }
- 
-@@ -594,7 +594,7 @@ bool sym_string_valid(struct symbol *sym, const char *str)
- bool sym_string_within_range(struct symbol *sym, const char *str)
- {
- 	struct property *prop;
--	long val;
-+	long long val;
- 
- 	switch (sym->type) {
- 	case S_STRING:
-@@ -605,7 +605,7 @@ bool sym_string_within_range(struct symbol *sym, const char *str)
- 		prop = sym_get_range_prop(sym);
- 		if (!prop)
- 			return true;
--		val = strtol(str, NULL, 10);
-+		val = strtoll(str, NULL, 10);
- 		return val >= sym_get_range_val(prop->expr->left.sym, 10) &&
- 		       val <= sym_get_range_val(prop->expr->right.sym, 10);
- 	case S_HEX:
-@@ -614,7 +614,7 @@ bool sym_string_within_range(struct symbol *sym, const char *str)
- 		prop = sym_get_range_prop(sym);
- 		if (!prop)
- 			return true;
--		val = strtol(str, NULL, 16);
-+		val = strtoll(str, NULL, 16);
- 		return val >= sym_get_range_val(prop->expr->left.sym, 16) &&
- 		       val <= sym_get_range_val(prop->expr->right.sym, 16);
- 	case S_BOOLEAN:
--- 
-1.7.9.5
+>  static void sym_validate_range(struct symbol *sym)
+>  {
+>         struct property *prop;
+> -       long base, val, val2;
+> +       long long base, val, val2;
 
+strtoll() expects an "int" type for "base". This was changed to "long" in your
+previous patch.
 
--- 
-Kees Cook
-Chrome OS Security
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
