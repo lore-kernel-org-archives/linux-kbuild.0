@@ -1,89 +1,111 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ie0-f179.google.com ([209.85.223.179]:54581 "EHLO
-	mail-ie0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932532Ab3GRP5N (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 18 Jul 2013 11:57:13 -0400
-Received: by mail-ie0-f179.google.com with SMTP id c10so7510021ieb.10
-        for <linux-kbuild@vger.kernel.org>; Thu, 18 Jul 2013 08:57:12 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <CAMuHMdUNQOiaia=j-+Cf7fW33ZfGi-kYAO0Y4qpCa5HBkKN8mQ@mail.gmail.com>
-References: <cover.1372515621.git.yann.morin.1998@free.fr>
-	<b57caaaed2bd127fe656e6c145970ed6a05c0125.1372515621.git.yann.morin.1998@free.fr>
-	<CAMuHMdUNQOiaia=j-+Cf7fW33ZfGi-kYAO0Y4qpCa5HBkKN8mQ@mail.gmail.com>
-Date: Thu, 18 Jul 2013 08:57:12 -0700
-Message-ID: <CAGXu5j+wYmD9H96dY738ALS2OVyeaCj-xjWm95LgGxnZ_ZcViw@mail.gmail.com>
-Subject: Re: [PATCH 1/1] kconfig: allow "hex" and "range" to support longs
+Received: from smtp.outflux.net ([198.145.64.163]:58777 "EHLO smtp.outflux.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1758647Ab3GRQGw (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 18 Jul 2013 12:06:52 -0400
+Date: Thu, 18 Jul 2013 09:06:33 -0700
 From: Kees Cook <keescook@chromium.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: [PATCH] kconfig: switch to "long long" for sanity
+Message-ID: <20130718160633.GA16208@www.outflux.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, linux-kbuild <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, Andrew Morton <akpm@linux-foundation.org>
+To: linux-kernel@vger.kernel.org
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Michal Marek <mmarek@suse.cz>, Arve =?iso-8859-1?B?SGr4bm5lduVn?= <arve@android.com>, linux-kbuild@vger.kernel.org
 
-On Thu, Jul 18, 2013 at 3:08 AM, Geert Uytterhoeven
-<geert@linux-m68k.org> wrote:
-> On Sat, Jun 29, 2013 at 4:21 PM, Yann E. MORIN <yann.morin.1998@free.fr> wrote:
->> From: Kees Cook <keescook@chromium.org>
->>
->> The parsing routines for Kconfig files use strtol(), but store and
->> render values as int. Switch types and formating to long to support a
->> wider range of values. For example, 0x80000000 wasn't representable.
->
-> 0x80000000 does fit in an int. If it's printed as hex, it's treated as unsigned.
-> Is there a "0" missing, or am I missing something?
+Instead of using "long" for kconfig "hex" and "range" values, which may
+change in size depending on the host architecture, use "long long". This
+will allow values greater than INT_MAX on 32-bit hosts when cross
+compiling.
 
-0x80000000 is 1 more than INT_MAX, but you're right about the hex
-printing. Regardless, it was still being truncated in kconfig
-(probably due to signed comparisons). I had to switch the formatting
-since the type changed, though.
+Signed-off-by: Kees Cook <keescook@chromium.org>
+---
+ scripts/kconfig/symbol.c |   18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
->> Signed-off-by: Kees Cook <keescook@chromium.org>
->> Tested-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
->> Reviewed-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
->> Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
->> ---
->>  scripts/kconfig/symbol.c | 10 +++++-----
->>  1 file changed, 5 insertions(+), 5 deletions(-)
->>
->> diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
->> index 387d554..d550300 100644
->> --- a/scripts/kconfig/symbol.c
->> +++ b/scripts/kconfig/symbol.c
->> @@ -136,7 +136,7 @@ static struct property *sym_get_range_prop(struct symbol *sym)
->>         return NULL;
->>  }
->>
->> -static int sym_get_range_val(struct symbol *sym, int base)
->> +static long sym_get_range_val(struct symbol *sym, int base)
->>  {
->>         sym_calc_value(sym);
->>         switch (sym->type) {
->
-> Changing all these "int" to "long" only matters on 64-bit platforms.
-> As kconfig is built on the host, this will cause different behavior when
-> cross-compiling 64-bit (I assume that's where you need it most) kernels
-> on a 32-bit or a 64-bit host.
->
-> Probably you wanted to use "long long" instead of "long", and switch
-> to "strtoll()", to make them always 64-bit?
+diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
+index d550300..5280c55 100644
+--- a/scripts/kconfig/symbol.c
++++ b/scripts/kconfig/symbol.c
+@@ -136,7 +136,7 @@ static struct property *sym_get_range_prop(struct symbol *sym)
+ 	return NULL;
+ }
+ 
+-static long sym_get_range_val(struct symbol *sym, int base)
++static long long sym_get_range_val(struct symbol *sym, int base)
+ {
+ 	sym_calc_value(sym);
+ 	switch (sym->type) {
+@@ -149,13 +149,13 @@ static long sym_get_range_val(struct symbol *sym, int base)
+ 	default:
+ 		break;
+ 	}
+-	return strtol(sym->curr.val, NULL, base);
++	return strtoll(sym->curr.val, NULL, base);
+ }
+ 
+ static void sym_validate_range(struct symbol *sym)
+ {
+ 	struct property *prop;
+-	long base, val, val2;
++	long long base, val, val2;
+ 	char str[64];
+ 
+ 	switch (sym->type) {
+@@ -171,7 +171,7 @@ static void sym_validate_range(struct symbol *sym)
+ 	prop = sym_get_range_prop(sym);
+ 	if (!prop)
+ 		return;
+-	val = strtol(sym->curr.val, NULL, base);
++	val = strtoll(sym->curr.val, NULL, base);
+ 	val2 = sym_get_range_val(prop->expr->left.sym, base);
+ 	if (val >= val2) {
+ 		val2 = sym_get_range_val(prop->expr->right.sym, base);
+@@ -179,9 +179,9 @@ static void sym_validate_range(struct symbol *sym)
+ 			return;
+ 	}
+ 	if (sym->type == S_INT)
+-		sprintf(str, "%ld", val2);
++		sprintf(str, "%lld", val2);
+ 	else
+-		sprintf(str, "0x%lx", val2);
++		sprintf(str, "0x%llx", val2);
+ 	sym->curr.val = strdup(str);
+ }
+ 
+@@ -594,7 +594,7 @@ bool sym_string_valid(struct symbol *sym, const char *str)
+ bool sym_string_within_range(struct symbol *sym, const char *str)
+ {
+ 	struct property *prop;
+-	long val;
++	long long val;
+ 
+ 	switch (sym->type) {
+ 	case S_STRING:
+@@ -605,7 +605,7 @@ bool sym_string_within_range(struct symbol *sym, const char *str)
+ 		prop = sym_get_range_prop(sym);
+ 		if (!prop)
+ 			return true;
+-		val = strtol(str, NULL, 10);
++		val = strtoll(str, NULL, 10);
+ 		return val >= sym_get_range_val(prop->expr->left.sym, 10) &&
+ 		       val <= sym_get_range_val(prop->expr->right.sym, 10);
+ 	case S_HEX:
+@@ -614,7 +614,7 @@ bool sym_string_within_range(struct symbol *sym, const char *str)
+ 		prop = sym_get_range_prop(sym);
+ 		if (!prop)
+ 			return true;
+-		val = strtol(str, NULL, 16);
++		val = strtoll(str, NULL, 16);
+ 		return val >= sym_get_range_val(prop->expr->left.sym, 16) &&
+ 		       val <= sym_get_range_val(prop->expr->right.sym, 16);
+ 	case S_BOOLEAN:
+-- 
+1.7.9.5
 
-That's an excellent point; I hadn't considered the cross-compiling
-from a 32-bit host.
 
-> Still, beware using 64-bit config symbols with arithmetic shell operations from
-> a Makefile, cfr. https://lkml.org/lkml/2013/6/13/200.
-
-Yeah, noted. I don't have plans to pass kconfig items through the shell.
-
-> Sorry for only noticing now, after it went into 3.11-rc1.
-
-Thanks for pointing it out! I don't think there is huge urgency since
-nothing is (yet) using > INT_MAX values in kconfig. Regardless, I'll
-send a new patch that switches to long long.
-
--Kees
-
---
+-- 
 Kees Cook
 Chrome OS Security
