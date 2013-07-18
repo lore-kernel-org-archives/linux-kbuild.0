@@ -1,42 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:53591 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753486Ab3GRJWa (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 18 Jul 2013 05:22:30 -0400
-Message-ID: <51E7B3D0.4060609@suse.cz>
-Date: Thu, 18 Jul 2013 11:22:24 +0200
-From: Michal Marek <mmarek@suse.cz>
+Received: from mail-pb0-f53.google.com ([209.85.160.53]:38479 "EHLO
+	mail-pb0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754902Ab3GRKId (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 18 Jul 2013 06:08:33 -0400
 MIME-Version: 1.0
-Subject: Re: [PATCH] arm, kbuild: make "make install" not depend on vmlinux
-References: <20130710133742.GA29368@emu.suse.cz> <CA+55aFxtvT3Yvbxe5JGBThZS13payymFJ7jCLyEiE2iNDvsZtQ@mail.gmail.com> <20130711135445.GA21500@sepie.suse.cz> <CA+55aFyVjugxM7cUDWi0ASWttYthCxa6e7X3CADknBcSFxWgew@mail.gmail.com> <20130712105721.GF8731@rric.localhost> <20130717160506.GI8731@rric.localhost> <CA+55aFx4G5gME3ByqE0Wr-_t2x_6WkP3Ta4k1z4jfW+PrcK0og@mail.gmail.com> <20130717165743.GK8731@rric.localhost> <CA+55aFzhmV7iq+Pv37trMCmdNzk53ORAoj0a6rV14fzKta3Dhw@mail.gmail.com>
-In-Reply-To: <CA+55aFzhmV7iq+Pv37trMCmdNzk53ORAoj0a6rV14fzKta3Dhw@mail.gmail.com>
+In-Reply-To: <b57caaaed2bd127fe656e6c145970ed6a05c0125.1372515621.git.yann.morin.1998@free.fr>
+References: <cover.1372515621.git.yann.morin.1998@free.fr>
+	<b57caaaed2bd127fe656e6c145970ed6a05c0125.1372515621.git.yann.morin.1998@free.fr>
+Date: Thu, 18 Jul 2013 12:08:33 +0200
+Message-ID: <CAMuHMdUNQOiaia=j-+Cf7fW33ZfGi-kYAO0Y4qpCa5HBkKN8mQ@mail.gmail.com>
+Subject: Re: [PATCH 1/1] kconfig: allow "hex" and "range" to support longs
+From: Geert Uytterhoeven <geert@linux-m68k.org>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Robert Richter <rric@kernel.org>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, Russell King <linux@arm.linux.org.uk>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>, Kees Cook <keescook@chromium.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, Andrew Morton <akpm@linux-foundation.org>
 
-On 17.7.2013 19:03, Linus Torvalds wrote:
-> On Wed, Jul 17, 2013 at 9:57 AM, Robert Richter <rric@kernel.org> wrote:
->>
->> If kernel.release doen't exist KERNEL_RELEASE is empty, thus all args
->> for install.sh shift one arg left.
-> 
-> You know what? I read the patch, but I didn't read your changelog well
-> enough. You already explained that in the commit log, and I just
-> missed it like some blind monkey. My bad.
-> 
->> Will splitt the patches and resend.
-> 
-> No need to split, I was wrong, it wasn't some unrelated cleanup, and
-> you were right the first time.
-> 
-> So Michal (or ARM people - whoever wants to take the patch), just take
-> my ack. No objections.
+On Sat, Jun 29, 2013 at 4:21 PM, Yann E. MORIN <yann.morin.1998@free.fr> wrote:
+> From: Kees Cook <keescook@chromium.org>
+>
+> The parsing routines for Kconfig files use strtol(), but store and
+> render values as int. Switch types and formating to long to support a
+> wider range of values. For example, 0x80000000 wasn't representable.
 
-I can add it to the kbuild tree if needed. Otherwise you can add
-Acked-by: Michal Marek <mmarek@suse.cz>.
+0x80000000 does fit in an int. If it's printed as hex, it's treated as unsigned.
+Is there a "0" missing, or am I missing something?
 
-Michal
+> Signed-off-by: Kees Cook <keescook@chromium.org>
+> Tested-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+> Reviewed-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+> Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+> ---
+>  scripts/kconfig/symbol.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
+>
+> diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
+> index 387d554..d550300 100644
+> --- a/scripts/kconfig/symbol.c
+> +++ b/scripts/kconfig/symbol.c
+> @@ -136,7 +136,7 @@ static struct property *sym_get_range_prop(struct symbol *sym)
+>         return NULL;
+>  }
+>
+> -static int sym_get_range_val(struct symbol *sym, int base)
+> +static long sym_get_range_val(struct symbol *sym, int base)
+>  {
+>         sym_calc_value(sym);
+>         switch (sym->type) {
 
+Changing all these "int" to "long" only matters on 64-bit platforms.
+As kconfig is built on the host, this will cause different behavior when
+cross-compiling 64-bit (I assume that's where you need it most) kernels
+on a 32-bit or a 64-bit host.
+
+Probably you wanted to use "long long" instead of "long", and switch
+to "strtoll()", to make them always 64-bit?
+
+Still, beware using 64-bit config symbols with arithmetic shell operations from
+a Makefile, cfr. https://lkml.org/lkml/2013/6/13/200.
+
+Sorry for only noticing now, after it went into 3.11-rc1.
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
