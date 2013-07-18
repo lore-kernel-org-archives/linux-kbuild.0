@@ -1,49 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pb0-f54.google.com ([209.85.160.54]:39845 "EHLO
-	mail-pb0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751485Ab3GRIC2 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 18 Jul 2013 04:02:28 -0400
+Received: from cantor2.suse.de ([195.135.220.15]:53591 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753486Ab3GRJWa (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 18 Jul 2013 05:22:30 -0400
+Message-ID: <51E7B3D0.4060609@suse.cz>
+Date: Thu, 18 Jul 2013 11:22:24 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <51E72752.9020206@zytor.com>
-References: <1367829775-4434-1-git-send-email-kyungsik.lee@lge.com>
-	<20130716004727.b60b2c96.akpm@linux-foundation.org>
-	<20130716005611.e4ccab02.akpm@linux-foundation.org>
-	<201307161008.07643.yann.morin.1998@free.fr>
-	<20130716180408.GA19863@merkur.ravnborg.org>
-	<20130717211649.GA5619@merkur.ravnborg.org>
-	<20130717223033.GF3385@free.fr>
-	<51E72752.9020206@zytor.com>
-Date: Thu, 18 Jul 2013 10:02:27 +0200
-Message-ID: <CAMuHMdVo3rnTtXUZOZavdjJ4uHv4KYPA5g1Py6GTdZD3dPwFzQ@mail.gmail.com>
-Subject: Re: [PATCH -next 2/2] kbuild: fix for updated LZ4 tool with the new
- streaming format
-From: Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: Re: [PATCH] arm, kbuild: make "make install" not depend on vmlinux
+References: <20130710133742.GA29368@emu.suse.cz> <CA+55aFxtvT3Yvbxe5JGBThZS13payymFJ7jCLyEiE2iNDvsZtQ@mail.gmail.com> <20130711135445.GA21500@sepie.suse.cz> <CA+55aFyVjugxM7cUDWi0ASWttYthCxa6e7X3CADknBcSFxWgew@mail.gmail.com> <20130712105721.GF8731@rric.localhost> <20130717160506.GI8731@rric.localhost> <CA+55aFx4G5gME3ByqE0Wr-_t2x_6WkP3Ta4k1z4jfW+PrcK0og@mail.gmail.com> <20130717165743.GK8731@rric.localhost> <CA+55aFzhmV7iq+Pv37trMCmdNzk53ORAoj0a6rV14fzKta3Dhw@mail.gmail.com>
+In-Reply-To: <CA+55aFzhmV7iq+Pv37trMCmdNzk53ORAoj0a6rV14fzKta3Dhw@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "H. Peter Anvin" <hpa@zytor.com>
-Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, Sam Ravnborg <sam@ravnborg.org>, Andrew Morton <akpm@linux-foundation.org>, Ingo Molnar <mingo@kernel.org>, Kyungsik Lee <kyungsik.lee@lge.com>, Michal Marek <mmarek@suse.cz>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, the arch/x86 maintainers <x86@kernel.org>, CE Linux Developers List <celinux-dev@lists.celinuxforum.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, hyojun.im@lge.com, chan.jeong@lge.com, Andy Lee <raphael.andy.lee@gmail.com>, Ingo Molnar <mingo@elte.hu>, Thomas Gleixner <tglx@linutronix.de>, Russell King <rmk@arm.linux.org.uk>, Borislav Petkov <bp@alien8.de>, Florian Fainelli <florian@openwrt.org>, Yann Collet <yann.collet.73@gmail.com>, Chanho Min <chanho.min@lge.com>
+To: Robert Richter <rric@kernel.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, Russell King <linux@arm.linux.org.uk>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 
-On Thu, Jul 18, 2013 at 1:22 AM, H. Peter Anvin <hpa@zytor.com> wrote:
-> It is worth noting that one of the things that keep getting brought up
-> as something that need this is gcc/binutils support for a specific feature.
+On 17.7.2013 19:03, Linus Torvalds wrote:
+> On Wed, Jul 17, 2013 at 9:57 AM, Robert Richter <rric@kernel.org> wrote:
+>>
+>> If kernel.release doen't exist KERNEL_RELEASE is empty, thus all args
+>> for install.sh shift one arg left.
+> 
+> You know what? I read the patch, but I didn't read your changelog well
+> enough. You already explained that in the commit log, and I just
+> missed it like some blind monkey. My bad.
+> 
+>> Will splitt the patches and resend.
+> 
+> No need to split, I was wrong, it wasn't some unrelated cleanup, and
+> you were right the first time.
+> 
+> So Michal (or ARM people - whoever wants to take the patch), just take
+> my ack. No objections.
 
-Yeah, then those tests would be run only once, at kconfig time. I guess we
-still run some of them many times, due to the use of recursive make?
+I can add it to the kbuild tree if needed. Otherwise you can add
+Acked-by: Michal Marek <mmarek@suse.cz>.
 
-Note that these will end up in your .config --- which is not necesarily a bad
-thing --- but it does mean that if e.g. you sent me your .config,
-several options
-may change when I try to use it.
+Michal
 
-Gr{oetje,eeting}s,
-
-                        Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
