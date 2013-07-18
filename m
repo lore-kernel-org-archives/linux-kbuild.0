@@ -1,75 +1,89 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pb0-f53.google.com ([209.85.160.53]:38479 "EHLO
-	mail-pb0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754902Ab3GRKId (ORCPT
+Received: from mail-ie0-f179.google.com ([209.85.223.179]:54581 "EHLO
+	mail-ie0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932532Ab3GRP5N (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 18 Jul 2013 06:08:33 -0400
+	Thu, 18 Jul 2013 11:57:13 -0400
+Received: by mail-ie0-f179.google.com with SMTP id c10so7510021ieb.10
+        for <linux-kbuild@vger.kernel.org>; Thu, 18 Jul 2013 08:57:12 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <b57caaaed2bd127fe656e6c145970ed6a05c0125.1372515621.git.yann.morin.1998@free.fr>
+In-Reply-To: <CAMuHMdUNQOiaia=j-+Cf7fW33ZfGi-kYAO0Y4qpCa5HBkKN8mQ@mail.gmail.com>
 References: <cover.1372515621.git.yann.morin.1998@free.fr>
 	<b57caaaed2bd127fe656e6c145970ed6a05c0125.1372515621.git.yann.morin.1998@free.fr>
-Date: Thu, 18 Jul 2013 12:08:33 +0200
-Message-ID: <CAMuHMdUNQOiaia=j-+Cf7fW33ZfGi-kYAO0Y4qpCa5HBkKN8mQ@mail.gmail.com>
+	<CAMuHMdUNQOiaia=j-+Cf7fW33ZfGi-kYAO0Y4qpCa5HBkKN8mQ@mail.gmail.com>
+Date: Thu, 18 Jul 2013 08:57:12 -0700
+Message-ID: <CAGXu5j+wYmD9H96dY738ALS2OVyeaCj-xjWm95LgGxnZ_ZcViw@mail.gmail.com>
 Subject: Re: [PATCH 1/1] kconfig: allow "hex" and "range" to support longs
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Content-Type: text/plain; charset=UTF-8
+From: Kees Cook <keescook@chromium.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>, Kees Cook <keescook@chromium.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, Andrew Morton <akpm@linux-foundation.org>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, linux-kbuild <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, Andrew Morton <akpm@linux-foundation.org>
 
-On Sat, Jun 29, 2013 at 4:21 PM, Yann E. MORIN <yann.morin.1998@free.fr> wrote:
-> From: Kees Cook <keescook@chromium.org>
+On Thu, Jul 18, 2013 at 3:08 AM, Geert Uytterhoeven
+<geert@linux-m68k.org> wrote:
+> On Sat, Jun 29, 2013 at 4:21 PM, Yann E. MORIN <yann.morin.1998@free.fr> wrote:
+>> From: Kees Cook <keescook@chromium.org>
+>>
+>> The parsing routines for Kconfig files use strtol(), but store and
+>> render values as int. Switch types and formating to long to support a
+>> wider range of values. For example, 0x80000000 wasn't representable.
 >
-> The parsing routines for Kconfig files use strtol(), but store and
-> render values as int. Switch types and formating to long to support a
-> wider range of values. For example, 0x80000000 wasn't representable.
+> 0x80000000 does fit in an int. If it's printed as hex, it's treated as unsigned.
+> Is there a "0" missing, or am I missing something?
 
-0x80000000 does fit in an int. If it's printed as hex, it's treated as unsigned.
-Is there a "0" missing, or am I missing something?
+0x80000000 is 1 more than INT_MAX, but you're right about the hex
+printing. Regardless, it was still being truncated in kconfig
+(probably due to signed comparisons). I had to switch the formatting
+since the type changed, though.
 
-> Signed-off-by: Kees Cook <keescook@chromium.org>
-> Tested-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
-> Reviewed-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
-> Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
-> ---
->  scripts/kconfig/symbol.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
+>> Signed-off-by: Kees Cook <keescook@chromium.org>
+>> Tested-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+>> Reviewed-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+>> Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+>> ---
+>>  scripts/kconfig/symbol.c | 10 +++++-----
+>>  1 file changed, 5 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
+>> index 387d554..d550300 100644
+>> --- a/scripts/kconfig/symbol.c
+>> +++ b/scripts/kconfig/symbol.c
+>> @@ -136,7 +136,7 @@ static struct property *sym_get_range_prop(struct symbol *sym)
+>>         return NULL;
+>>  }
+>>
+>> -static int sym_get_range_val(struct symbol *sym, int base)
+>> +static long sym_get_range_val(struct symbol *sym, int base)
+>>  {
+>>         sym_calc_value(sym);
+>>         switch (sym->type) {
 >
-> diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
-> index 387d554..d550300 100644
-> --- a/scripts/kconfig/symbol.c
-> +++ b/scripts/kconfig/symbol.c
-> @@ -136,7 +136,7 @@ static struct property *sym_get_range_prop(struct symbol *sym)
->         return NULL;
->  }
+> Changing all these "int" to "long" only matters on 64-bit platforms.
+> As kconfig is built on the host, this will cause different behavior when
+> cross-compiling 64-bit (I assume that's where you need it most) kernels
+> on a 32-bit or a 64-bit host.
 >
-> -static int sym_get_range_val(struct symbol *sym, int base)
-> +static long sym_get_range_val(struct symbol *sym, int base)
->  {
->         sym_calc_value(sym);
->         switch (sym->type) {
+> Probably you wanted to use "long long" instead of "long", and switch
+> to "strtoll()", to make them always 64-bit?
 
-Changing all these "int" to "long" only matters on 64-bit platforms.
-As kconfig is built on the host, this will cause different behavior when
-cross-compiling 64-bit (I assume that's where you need it most) kernels
-on a 32-bit or a 64-bit host.
+That's an excellent point; I hadn't considered the cross-compiling
+from a 32-bit host.
 
-Probably you wanted to use "long long" instead of "long", and switch
-to "strtoll()", to make them always 64-bit?
+> Still, beware using 64-bit config symbols with arithmetic shell operations from
+> a Makefile, cfr. https://lkml.org/lkml/2013/6/13/200.
 
-Still, beware using 64-bit config symbols with arithmetic shell operations from
-a Makefile, cfr. https://lkml.org/lkml/2013/6/13/200.
+Yeah, noted. I don't have plans to pass kconfig items through the shell.
 
-Sorry for only noticing now, after it went into 3.11-rc1.
+> Sorry for only noticing now, after it went into 3.11-rc1.
 
-Gr{oetje,eeting}s,
+Thanks for pointing it out! I don't think there is huge urgency since
+nothing is (yet) using > INT_MAX values in kconfig. Regardless, I'll
+send a new patch that switches to long long.
 
-                        Geert
+-Kees
 
 --
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+Kees Cook
+Chrome OS Security
