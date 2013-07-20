@@ -1,101 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.snhosting.dk ([87.238.248.203]:27744 "EHLO
-	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754072Ab3GTOTI (ORCPT
+Received: from mail-wg0-f41.google.com ([74.125.82.41]:43555 "EHLO
+	mail-wg0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754129Ab3GTOoI (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 20 Jul 2013 10:19:08 -0400
-Received: from merkur.ravnborg.org (unknown [188.228.89.252])
-	by smtp.domainteam.dk (Postfix) with ESMTPA id 62924F1A9D
-	for <linux-kbuild@vger.kernel.org>; Sat, 20 Jul 2013 16:19:06 +0200 (CEST)
-Date: Sat, 20 Jul 2013 16:19:05 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Kconfig test scripts
-Message-ID: <20130720141905.GA10229@merkur.ravnborg.org>
+	Sat, 20 Jul 2013 10:44:08 -0400
+Received: by mail-wg0-f41.google.com with SMTP id y10so1240417wgg.0
+        for <linux-kbuild@vger.kernel.org>; Sat, 20 Jul 2013 07:44:07 -0700 (PDT)
+Date: Sat, 20 Jul 2013 16:44:02 +0200
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: Re: Kconfig test scripts
+Message-ID: <20130720144402.GE3507@free.fr>
+References: <20130720141905.GA10229@merkur.ravnborg.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
+In-Reply-To: <20130720141905.GA10229@merkur.ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>
 
-Hi all.
+Sam, All,
 
-Often when I hack on Kconfig I have missed a set of test cases,
-that would allow me to verify that I did not introduce any regressions.
+On 2013-07-20 16:19 +0200, Sam Ravnborg spake thusly:
+> Often when I hack on Kconfig I have missed a set of test cases,
+> that would allow me to verify that I did not introduce any regressions.
+> 
+> I have not anything fancy in my mind and I spent
+> a little time on the attached today.
+> The following is obviously missing a lot a features - but this
+> would allow me to get started adding simple test cases.
+> 
+> The idea is that each test cases consist of a full
+> Kconfig file and the resulting output.
+> 
+> Anyone have something better than this,
+> or maybe some brilliant ideas how to do this much better?
 
-I have not anything fancy in my mind and I spent
-a little time on the attached today.
-The following is obviously missing a lot a features - but this
-would allow me to get started adding simple test cases.
+How would one express a test for 'choice'? Test randconfig?
 
-The idea is that each test cases consist of a full
-Kconfig file and the resulting output.
+I'm all for a test-suite. But we need to be able to test two things:
+  - the parser
+  - the behaviour
 
-Anyone have something better than this,
-or maybe some brilliant ideas how to do this much better?
+For the first, your static tests are doing (can do) fine.
+For the second, we'd need something a bit more sophisticated.
 
-	Sam
+For example, we need a way to tell that one of such or such symbol is
+expected, but not both at the same time. Eg, for a choice between A and
+B:
+    CONFIG_A=y | CONFIG_B=y     (inclusive OR, for tristate choice)
+or:
+    CONFIG_A=y ^ CONFIG_B=y     (exclusive OR, for boolean choice)
 
-diff --git a/scripts/kconfig/tests/run.sh b/scripts/kconfig/tests/run.sh
-new file mode 100644
-index 0000000..fbd7613
---- /dev/null
-+++ b/scripts/kconfig/tests/run.sh
-@@ -0,0 +1,20 @@
-+# set up test environment
-+mkdir -p include/config
-+mkdir -p include/generated
-+
-+tests="single_symbol.sh two_symbols.sh"
-+
-+
-+for t in ${tests}; do
-+
-+	rm -f dot_config.expect
-+
-+	sh $t
-+
-+	if [ -f dot_config.expect ]; then
-+		grep -v ^# .config > dot_config.actual
-+		if ! cmp -s dot_config.actual dot_config.expect ; then
-+			diff -u dot_config.expect dot_config.actual
-+		fi
-+	fi
-+done
-diff --git a/scripts/kconfig/tests/single_symbol.sh b/scripts/kconfig/tests/single_symbol.sh
-new file mode 100644
-index 0000000..6459fcf
---- /dev/null
-+++ b/scripts/kconfig/tests/single_symbol.sh
-@@ -0,0 +1,11 @@
-+cat << EOF > Kconfig.test
-+config SINGLE
-+	def_bool y
-+
-+EOF
-+
-+cat << EOF > dot_config.expect
-+CONFIG_SINGLE=y
-+EOF
-+
-+../conf Kconfig.test > /dev/null
-diff --git a/scripts/kconfig/tests/two_symbols.sh b/scripts/kconfig/tests/two_symbols.sh
-new file mode 100644
-index 0000000..c31902d
---- /dev/null
-+++ b/scripts/kconfig/tests/two_symbols.sh
-@@ -0,0 +1,14 @@
-+cat << EOF > Kconfig.test
-+config FIRST
-+	def_bool y
-+
-+config SECOND
-+	def_bool y
-+EOF
-+
-+cat << EOF > dot_config.expect
-+CONFIG_FIRST=y
-+CONFIG_SECOND=y
-+EOF
-+
-+../conf Kconfig.test > /dev/null
+Also, for randconfig, we'd need to be able to repeatedly run a test and
+check symbols probability. Eg:
+    CONFIG_A=y [25] ^ CONFIG_B=y [75]
+
+Of course, allow for a slight distortion of a few percent to account for
+bias in the RNG).
+
+No idea (yet) on how to do that...
+
+Regards,
+Yann E. MORIN.
+
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
