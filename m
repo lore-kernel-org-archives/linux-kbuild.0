@@ -1,53 +1,101 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ob0-f178.google.com ([209.85.214.178]:48109 "EHLO
-	mail-ob0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1759450Ab3GRWBD (ORCPT
+Received: from smtp.snhosting.dk ([87.238.248.203]:27744 "EHLO
+	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754072Ab3GTOTI (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 18 Jul 2013 18:01:03 -0400
-Received: by mail-ob0-f178.google.com with SMTP id fb19so4316011obc.23
-        for <linux-kbuild@vger.kernel.org>; Thu, 18 Jul 2013 15:01:02 -0700 (PDT)
+	Sat, 20 Jul 2013 10:19:08 -0400
+Received: from merkur.ravnborg.org (unknown [188.228.89.252])
+	by smtp.domainteam.dk (Postfix) with ESMTPA id 62924F1A9D
+	for <linux-kbuild@vger.kernel.org>; Sat, 20 Jul 2013 16:19:06 +0200 (CEST)
+Date: Sat, 20 Jul 2013 16:19:05 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Kconfig test scripts
+Message-ID: <20130720141905.GA10229@merkur.ravnborg.org>
 MIME-Version: 1.0
-In-Reply-To: <20130718204744.GC3417@free.fr>
-References: <20130718183201.GA21183@www.outflux.net>
-	<CAMuHMdX4dj3q53RsWTTmo-AOU1ee-xgp257CwacJnHfWn0BEAQ@mail.gmail.com>
-	<20130718204744.GC3417@free.fr>
-Date: Thu, 18 Jul 2013 15:01:02 -0700
-Message-ID: <CAGXu5j+FddNDgyrF1qMU5_SSODPJjYJrEXnog=J9CBMABiW_ng@mail.gmail.com>
-Subject: Re: [PATCH v2] kconfig: switch to "long long" for sanity
-From: Kees Cook <keescook@chromium.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, =?ISO-8859-1?Q?Arve_Hj=F8nnev=E5g?= <arve@android.com>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On Thu, Jul 18, 2013 at 1:47 PM, Yann E. MORIN <yann.morin.1998@free.fr> wrote:
-> Kees, Geert, All,
->
-> On 2013-07-18 22:00 +0200, Geert Uytterhoeven spake thusly:
->> On Thu, Jul 18, 2013 at 8:32 PM, Kees Cook <keescook@chromium.org> wrote:
->> > Instead of using "long" for kconfig "hex" and "range" values, which may
->> > change in size depending on the host architecture, use "long long". This
->> > will allow values greater than INT_MAX on 32-bit hosts when cross
->> > compiling.
->> >
->> > Signed-off-by: Kees Cook <keescook@chromium.org>
->>
->> Acked-by: Geert Uytterhoeven <geert@linux-m68k.org>
->
-> Ok, thanks, I'll take in my tree.
->
-> Is it material for -rc-fixes, or can it wait in -for-next?
->
-> My gut feelings is that it does not fix an existing breakage, but only a
-> potential problem in the future, so it would be a candidate for
-> -for-next. Agreed?
+Hi all.
 
-Correct. I'm not aware of anything in the tree that currently uses
->INT_MAX values in kconfig.
+Often when I hack on Kconfig I have missed a set of test cases,
+that would allow me to verify that I did not introduce any regressions.
 
--Kees
+I have not anything fancy in my mind and I spent
+a little time on the attached today.
+The following is obviously missing a lot a features - but this
+would allow me to get started adding simple test cases.
 
--- 
-Kees Cook
-Chrome OS Security
+The idea is that each test cases consist of a full
+Kconfig file and the resulting output.
+
+Anyone have something better than this,
+or maybe some brilliant ideas how to do this much better?
+
+	Sam
+
+diff --git a/scripts/kconfig/tests/run.sh b/scripts/kconfig/tests/run.sh
+new file mode 100644
+index 0000000..fbd7613
+--- /dev/null
++++ b/scripts/kconfig/tests/run.sh
+@@ -0,0 +1,20 @@
++# set up test environment
++mkdir -p include/config
++mkdir -p include/generated
++
++tests="single_symbol.sh two_symbols.sh"
++
++
++for t in ${tests}; do
++
++	rm -f dot_config.expect
++
++	sh $t
++
++	if [ -f dot_config.expect ]; then
++		grep -v ^# .config > dot_config.actual
++		if ! cmp -s dot_config.actual dot_config.expect ; then
++			diff -u dot_config.expect dot_config.actual
++		fi
++	fi
++done
+diff --git a/scripts/kconfig/tests/single_symbol.sh b/scripts/kconfig/tests/single_symbol.sh
+new file mode 100644
+index 0000000..6459fcf
+--- /dev/null
++++ b/scripts/kconfig/tests/single_symbol.sh
+@@ -0,0 +1,11 @@
++cat << EOF > Kconfig.test
++config SINGLE
++	def_bool y
++
++EOF
++
++cat << EOF > dot_config.expect
++CONFIG_SINGLE=y
++EOF
++
++../conf Kconfig.test > /dev/null
+diff --git a/scripts/kconfig/tests/two_symbols.sh b/scripts/kconfig/tests/two_symbols.sh
+new file mode 100644
+index 0000000..c31902d
+--- /dev/null
++++ b/scripts/kconfig/tests/two_symbols.sh
+@@ -0,0 +1,14 @@
++cat << EOF > Kconfig.test
++config FIRST
++	def_bool y
++
++config SECOND
++	def_bool y
++EOF
++
++cat << EOF > dot_config.expect
++CONFIG_FIRST=y
++CONFIG_SECOND=y
++EOF
++
++../conf Kconfig.test > /dev/null
