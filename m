@@ -1,49 +1,68 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:40688 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757459Ab3GWNhm (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 23 Jul 2013 09:37:42 -0400
-Message-ID: <51EE8721.10500@suse.cz>
-Date: Tue, 23 Jul 2013 15:37:37 +0200
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
+Received: from p-mail2.rd.orange.com ([195.101.245.16]:53899 "EHLO
+	p-mail2.rd.orange.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757304Ab3GWNzE convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 23 Jul 2013 09:55:04 -0400
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
 Subject: Re: [pull request] Pull request for branch yem-kconfig-rc-fixes
-References: <cover.1374006854.git.yann.morin.1998@free.fr> <1374055158.4495.1.camel@chaos.site>
-In-Reply-To: <1374055158.4495.1.camel@chaos.site>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Date: Tue, 23 Jul 2013 15:54:59 +0200
+References: <cover.1374006854.git.yann.morin.1998@free.fr> <1374055158.4495.1.camel@chaos.site> <51EE8721.10500@suse.cz>
+In-Reply-To: <51EE8721.10500@suse.cz>
+MIME-Version: 1.0
+Content-Type: Text/Plain;
+  charset="utf-8"
+Content-Transfer-Encoding: 8BIT
+Message-Id: <201307231555.00241.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
+To: Michal Marek <mmarek@suse.cz>
 Cc: Jean Delvare <jdelvare@suse.de>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 17.7.2013 11:59, Jean Delvare wrote:
-> Le Tuesday 16 July 2013 à 22:39 +0200, Yann E. MORIN a écrit :
->> From: "Yann E. MORIN" <yann.morin.1998@free.fr>
->>
->> Hello Michal,
->>
->> Please pull these post-rc1 kconfig cleanups, all after
->> review and comments by Jean:
->>   - simplify and cleanup the symbol-search code
->>   - better documentation about the symbols ordering in search results
->>   - eye-candy in the title of the search-box in [mn]conf
->>
->> Regards,
->> Yann E. MORIN.
+Michal, All,
+
+On Tuesday 23 July 2013 15:37:37 Michal Marek wrote:
+> On 17.7.2013 11:59, Jean Delvare wrote:
+> > Le Tuesday 16 July 2013 à 22:39 +0200, Yann E. MORIN a écrit :
+> >> From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+> >>
+> >> Hello Michal,
+> >>
+> >> Please pull these post-rc1 kconfig cleanups, all after
+> >> review and comments by Jean:
+> >>   - simplify and cleanup the symbol-search code
+> >>   - better documentation about the symbols ordering in search results
+> >>   - eye-candy in the title of the search-box in [mn]conf
+> >>
+> >> Regards,
+> >> Yann E. MORIN.
+> > 
+> > It looks very good to me now, thanks Yann for the good work!
 > 
-> It looks very good to me now, thanks Yann for the good work!
+> It does look good indeed. But I am wondering if it's necessary for 3.11.
+> AFAICS the only user-visible changes are
+> 
+>   [PATCH 1/6] Documentation/kconfig: more concise and straightforward
+> search explanation
+>   [PATCH 3/6] kconfig/[mn]conf: shorten title in search-box
+> 
+> and the rest are code cleanups (however worthwhile), is that correct?
+> There is no change in the search behavior, is there? Then I would say
+> merge this for 3.12-rc1. Maybe merge the documentation patch for 3.11.
 
-It does look good indeed. But I am wondering if it's necessary for 3.11.
-AFAICS the only user-visible changes are
+I think you can merge all for 3.12-rc1, in fact.
+Even patches 1 and 3 are only eye-candy, and can well wait for 3.12.
 
-  [PATCH 1/6] Documentation/kconfig: more concise and straightforward
-search explanation
-  [PATCH 3/6] kconfig/[mn]conf: shorten title in search-box
+Not sure why I wanted them in an -rc in the first place, so I'm fine
+with all 6 patches going in for 3.12.
 
-and the rest are code cleanups (however worthwhile), is that correct?
-There is no change in the search behavior, is there? Then I would say
-merge this for 3.12-rc1. Maybe merge the documentation patch for 3.11.
+Regards,
+Yann E. MORIN.
 
-Thanks,
-Michal
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +0/33 662376056 | Software  Designer | \ / CAMPAIGN     |   ^                |
+| --==< O_o >==-- '------------.-------:  X  AGAINST      |  /e\  There is no  |
+| http://ymorin.is-a-geek.org/ | (*_*) | / \ HTML MAIL    |  """  conspiracy.  |
+'------------------------------'-------'------------------'--------------------'
