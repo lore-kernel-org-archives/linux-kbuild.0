@@ -1,68 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from p-mail2.rd.orange.com ([195.101.245.16]:53899 "EHLO
-	p-mail2.rd.orange.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757304Ab3GWNzE convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 23 Jul 2013 09:55:04 -0400
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [pull request] Pull request for branch yem-kconfig-rc-fixes
-Date: Tue, 23 Jul 2013 15:54:59 +0200
-References: <cover.1374006854.git.yann.morin.1998@free.fr> <1374055158.4495.1.camel@chaos.site> <51EE8721.10500@suse.cz>
-In-Reply-To: <51EE8721.10500@suse.cz>
+Received: from cantor2.suse.de ([195.135.220.15]:43197 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1757580Ab3GWOhD (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 23 Jul 2013 10:37:03 -0400
+Message-ID: <51EE94EF.1010705@suse.cz>
+Date: Tue, 23 Jul 2013 16:36:31 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="utf-8"
-Content-Transfer-Encoding: 8BIT
-Message-Id: <201307231555.00241.yann.morin.1998@free.fr>
+Subject: Re: [pull request] Pull request for branch yem-kconfig-rc-fixes
+References: <cover.1374006854.git.yann.morin.1998@free.fr> <1374055158.4495.1.camel@chaos.site> <51EE8721.10500@suse.cz> <201307231555.00241.yann.morin.1998@free.fr>
+In-Reply-To: <201307231555.00241.yann.morin.1998@free.fr>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>
 Cc: Jean Delvare <jdelvare@suse.de>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Michal, All,
-
-On Tuesday 23 July 2013 15:37:37 Michal Marek wrote:
-> On 17.7.2013 11:59, Jean Delvare wrote:
-> > Le Tuesday 16 July 2013 à 22:39 +0200, Yann E. MORIN a écrit :
-> >> From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-> >>
-> >> Hello Michal,
-> >>
-> >> Please pull these post-rc1 kconfig cleanups, all after
-> >> review and comments by Jean:
-> >>   - simplify and cleanup the symbol-search code
-> >>   - better documentation about the symbols ordering in search results
-> >>   - eye-candy in the title of the search-box in [mn]conf
-> >>
-> >> Regards,
-> >> Yann E. MORIN.
-> > 
-> > It looks very good to me now, thanks Yann for the good work!
+Yann E. MORIN wrote:
+> Michal, All,
 > 
-> It does look good indeed. But I am wondering if it's necessary for 3.11.
-> AFAICS the only user-visible changes are
+> On Tuesday 23 July 2013 15:37:37 Michal Marek wrote:
+>> It does look good indeed. But I am wondering if it's necessary for 3.11.
+>> AFAICS the only user-visible changes are
+>>
+>>   [PATCH 1/6] Documentation/kconfig: more concise and straightforward
+>> search explanation
+>>   [PATCH 3/6] kconfig/[mn]conf: shorten title in search-box
+>>
+>> and the rest are code cleanups (however worthwhile), is that correct?
+>> There is no change in the search behavior, is there? Then I would say
+>> merge this for 3.12-rc1. Maybe merge the documentation patch for 3.11.
 > 
->   [PATCH 1/6] Documentation/kconfig: more concise and straightforward
-> search explanation
->   [PATCH 3/6] kconfig/[mn]conf: shorten title in search-box
-> 
-> and the rest are code cleanups (however worthwhile), is that correct?
-> There is no change in the search behavior, is there? Then I would say
-> merge this for 3.12-rc1. Maybe merge the documentation patch for 3.11.
+> I think you can merge all for 3.12-rc1, in fact.
+> Even patches 1 and 3 are only eye-candy, and can well wait for 3.12.
 
-I think you can merge all for 3.12-rc1, in fact.
-Even patches 1 and 3 are only eye-candy, and can well wait for 3.12.
+OK, I merged it to kbuild.git#kconfig then. It will show up a bit later
+on git.kernel.org, as I forgot my laptop with the ssh key at home :).
 
-Not sure why I wanted them in an -rc in the first place, so I'm fine
-with all 6 patches going in for 3.12.
-
-Regards,
-Yann E. MORIN.
-
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +0/33 662376056 | Software  Designer | \ / CAMPAIGN     |   ^                |
-| --==< O_o >==-- '------------.-------:  X  AGAINST      |  /e\  There is no  |
-| http://ymorin.is-a-geek.org/ | (*_*) | / \ HTML MAIL    |  """  conspiracy.  |
-'------------------------------'-------'------------------'--------------------'
+Michal
