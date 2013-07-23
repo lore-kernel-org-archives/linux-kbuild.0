@@ -1,41 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:43197 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757580Ab3GWOhD (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 23 Jul 2013 10:37:03 -0400
-Message-ID: <51EE94EF.1010705@suse.cz>
-Date: Tue, 23 Jul 2013 16:36:31 +0200
-From: Michal Marek <mmarek@suse.cz>
+Received: from georges.telenet-ops.be ([195.130.137.68]:38006 "EHLO
+	georges.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932447Ab3GWUUG (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 23 Jul 2013 16:20:06 -0400
+Date: Tue, 23 Jul 2013 22:20:03 +0200 (CEST)
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: Re: Build regressions/improvements in v3.11-rc2
+In-Reply-To: <alpine.DEB.2.02.1307232209510.32497@ayla.of.borg>
+Message-ID: <alpine.DEB.2.02.1307232210440.32577@ayla.of.borg>
+References: <alpine.DEB.2.02.1307232209510.32497@ayla.of.borg>
 MIME-Version: 1.0
-Subject: Re: [pull request] Pull request for branch yem-kconfig-rc-fixes
-References: <cover.1374006854.git.yann.morin.1998@free.fr> <1374055158.4495.1.camel@chaos.site> <51EE8721.10500@suse.cz> <201307231555.00241.yann.morin.1998@free.fr>
-In-Reply-To: <201307231555.00241.yann.morin.1998@free.fr>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: Jean Delvare <jdelvare@suse.de>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Linux Kernel Development <linux-kernel@vger.kernel.org>
+Cc: Andrew Veliath <andrewtv@usa.net>, linux-kbuild@vger.kernel.org, linux-sh@vger.kernel.org
 
-Yann E. MORIN wrote:
-> Michal, All,
-> 
-> On Tuesday 23 July 2013 15:37:37 Michal Marek wrote:
->> It does look good indeed. But I am wondering if it's necessary for 3.11.
->> AFAICS the only user-visible changes are
->>
->>   [PATCH 1/6] Documentation/kconfig: more concise and straightforward
->> search explanation
->>   [PATCH 3/6] kconfig/[mn]conf: shorten title in search-box
->>
->> and the rest are code cleanups (however worthwhile), is that correct?
->> There is no change in the search behavior, is there? Then I would say
->> merge this for 3.12-rc1. Maybe merge the documentation patch for 3.11.
-> 
-> I think you can merge all for 3.12-rc1, in fact.
-> Even patches 1 and 3 are only eye-candy, and can well wait for 3.12.
+On Tue, 23 Jul 2013, Geert Uytterhoeven wrote:
+> JFYI, when comparing v3.11-rc2 to v3.11-rc1[3], the summaries are:
+>   - build errors: +9/-23
 
-OK, I merged it to kbuild.git#kconfig then. It will show up a bit later
-on git.kernel.org, as I forgot my laptop with the ssh key at home :).
+Ignoring a few new R_PPC64_REL24 truncated relocations, we have:
 
-Michal
+  + error: No rule to make target /etc/sound/msndinit.bin:  => N/A
+  + error: No rule to make target /etc/sound/msndperm.bin:  => N/A
+  + error: No rule to make target /etc/sound/pndsperm.bin:  => N/A
+  + error: No rule to make target /etc/sound/pndspini.bin:  => N/A
+
+i386-randconfig, due to an OSS sound issue:
+
+make[3]: *** No rule to make target `/etc/sound/msndperm.bin', needed by `sound/oss/msndperm.c'.
+make[3]: *** No rule to make target `/etc/sound/msndinit.bin', needed by `sound/oss/msndinit.c'.
+make[3]: *** No rule to make target `/etc/sound/pndsperm.bin', needed by `sound/oss/pndsperm.c'.
+make[3]: *** No rule to make target `/etc/sound/pndspini.bin', needed by `sound/oss/pndspini.c'.
+
+  + error: No rule to make target include/config/auto.conf:  => N/A
+
+powerpc-randconfig, due to a kconfig issue:
+
+Expose SCOM controllers via debugfs (SCOM_DEBUGFS) [N/y] (NEW) aborted!
+Console input/output is redirected. Run 'make oldconfig' to update configuration
+.
+make[3]: *** [silentoldconfig] Error 1
+
+  + error: sh_mobile_sdhi.c: undefined reference to `shdma_chan_filter':  => .text+0x124658)
+
+sh-randconfig
+
+> [1] http://kisskb.ellerman.id.au/kisskb/head/6461/ (all 120 configs)
+> [3] http://kisskb.ellerman.id.au/kisskb/head/6435/ (all 120 configs)
+
+Gr{oetje,eeting}s,
+
+						Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+							    -- Linus Torvalds
