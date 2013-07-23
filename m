@@ -1,31 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:39920 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:40688 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932277Ab3GWNUl (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 23 Jul 2013 09:20:41 -0400
-Message-ID: <51EE8326.5030208@suse.cz>
-Date: Tue, 23 Jul 2013 15:20:38 +0200
+	id S1757459Ab3GWNhm (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 23 Jul 2013 09:37:42 -0400
+Message-ID: <51EE8721.10500@suse.cz>
+Date: Tue, 23 Jul 2013 15:37:37 +0200
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH v3] kbuild: add generation of kernel-devel
-References: <20130708171406.21590.49678.stgit@phlsvslse11.ph.intel.com>
-In-Reply-To: <20130708171406.21590.49678.stgit@phlsvslse11.ph.intel.com>
+Subject: Re: [pull request] Pull request for branch yem-kconfig-rc-fixes
+References: <cover.1374006854.git.yann.morin.1998@free.fr> <1374055158.4495.1.camel@chaos.site>
+In-Reply-To: <1374055158.4495.1.camel@chaos.site>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mike Marciniszyn <mike.marciniszyn@intel.com>
-Cc: linux-kbuild@vger.kernel.org, mmarcini@yahoo.com
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: Jean Delvare <jdelvare@suse.de>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 8.7.2013 19:14, Mike Marciniszyn wrote:
-> Change the spec file to generate a kernel-devel module
-> allowing for compilation of external kernel modules.
+On 17.7.2013 11:59, Jean Delvare wrote:
+> Le Tuesday 16 July 2013 à 22:39 +0200, Yann E. MORIN a écrit :
+>> From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+>>
+>> Hello Michal,
+>>
+>> Please pull these post-rc1 kconfig cleanups, all after
+>> review and comments by Jean:
+>>   - simplify and cleanup the symbol-search code
+>>   - better documentation about the symbols ordering in search results
+>>   - eye-candy in the title of the search-box in [mn]conf
+>>
+>> Regards,
+>> Yann E. MORIN.
 > 
-> This patch requires a new minimum RPM level of 4.0.3.
-> 
-> Signed-off-by: Mike Marciniszyn <mike.marciniszyn@intel.com>
+> It looks very good to me now, thanks Yann for the good work!
 
-Applied to kbuild.git#misc.
+It does look good indeed. But I am wondering if it's necessary for 3.11.
+AFAICS the only user-visible changes are
 
+  [PATCH 1/6] Documentation/kconfig: more concise and straightforward
+search explanation
+  [PATCH 3/6] kconfig/[mn]conf: shorten title in search-box
+
+and the rest are code cleanups (however worthwhile), is that correct?
+There is no change in the search behavior, is there? Then I would say
+merge this for 3.12-rc1. Maybe merge the documentation patch for 3.11.
+
+Thanks,
 Michal
-
