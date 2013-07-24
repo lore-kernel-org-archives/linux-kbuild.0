@@ -1,63 +1,32 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from georges.telenet-ops.be ([195.130.137.68]:38006 "EHLO
-	georges.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932447Ab3GWUUG (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 23 Jul 2013 16:20:06 -0400
-Date: Tue, 23 Jul 2013 22:20:03 +0200 (CEST)
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: Re: Build regressions/improvements in v3.11-rc2
-In-Reply-To: <alpine.DEB.2.02.1307232209510.32497@ayla.of.borg>
-Message-ID: <alpine.DEB.2.02.1307232210440.32577@ayla.of.borg>
-References: <alpine.DEB.2.02.1307232209510.32497@ayla.of.borg>
+Received: from cantor2.suse.de ([195.135.220.15]:58820 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751255Ab3GXN4h (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 24 Jul 2013 09:56:37 -0400
+Message-ID: <51EFDD11.7000204@suse.cz>
+Date: Wed, 24 Jul 2013 15:56:33 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Subject: Re: [PATCH v6 2/4] deb-pkg: split debug symbols in their own package
+References: <1372860126-8909-1-git-send-email-anisse@astier.eu> <1372860126-8909-3-git-send-email-anisse@astier.eu> <1372902360.22888.25.camel@deadeye.wl.decadent.org.uk> <20130710150923.5cd9537f@serenity> <51DD6DD2.2000003@suse.cz>
+In-Reply-To: <51DD6DD2.2000003@suse.cz>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kernel Development <linux-kernel@vger.kernel.org>
-Cc: Andrew Veliath <andrewtv@usa.net>, linux-kbuild@vger.kernel.org, linux-sh@vger.kernel.org
+To: Anisse Astier <anisse@astier.eu>
+Cc: Ben Hutchings <ben@decadent.org.uk>, linux-kbuild@vger.kernel.org, debian-kernel@lists.debian.org, kernel-team@lists.ubuntu.com, maximilian attems <max@stro.at>
 
-On Tue, 23 Jul 2013, Geert Uytterhoeven wrote:
-> JFYI, when comparing v3.11-rc2 to v3.11-rc1[3], the summaries are:
->   - build errors: +9/-23
+On 10.7.2013 16:21, Michal Marek wrote:
+> Dne 10.7.2013 15:09, Anisse Astier napsal(a):
+>> Michal,
+>>
+>> Every patch has now been reviewed, do you think it would be possible to
+>> take this series for 3.12 ?
+> 
+> Yes, I will merge it as soon as this merge window closes.
 
-Ignoring a few new R_PPC64_REL24 truncated relocations, we have:
+This is now in kbuild.git#misc. Thanks a lot to everyone!
 
-  + error: No rule to make target /etc/sound/msndinit.bin:  => N/A
-  + error: No rule to make target /etc/sound/msndperm.bin:  => N/A
-  + error: No rule to make target /etc/sound/pndsperm.bin:  => N/A
-  + error: No rule to make target /etc/sound/pndspini.bin:  => N/A
+Michal
 
-i386-randconfig, due to an OSS sound issue:
-
-make[3]: *** No rule to make target `/etc/sound/msndperm.bin', needed by `sound/oss/msndperm.c'.
-make[3]: *** No rule to make target `/etc/sound/msndinit.bin', needed by `sound/oss/msndinit.c'.
-make[3]: *** No rule to make target `/etc/sound/pndsperm.bin', needed by `sound/oss/pndsperm.c'.
-make[3]: *** No rule to make target `/etc/sound/pndspini.bin', needed by `sound/oss/pndspini.c'.
-
-  + error: No rule to make target include/config/auto.conf:  => N/A
-
-powerpc-randconfig, due to a kconfig issue:
-
-Expose SCOM controllers via debugfs (SCOM_DEBUGFS) [N/y] (NEW) aborted!
-Console input/output is redirected. Run 'make oldconfig' to update configuration
-.
-make[3]: *** [silentoldconfig] Error 1
-
-  + error: sh_mobile_sdhi.c: undefined reference to `shdma_chan_filter':  => .text+0x124658)
-
-sh-randconfig
-
-> [1] http://kisskb.ellerman.id.au/kisskb/head/6461/ (all 120 configs)
-> [3] http://kisskb.ellerman.id.au/kisskb/head/6435/ (all 120 configs)
-
-Gr{oetje,eeting}s,
-
-						Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-							    -- Linus Torvalds
