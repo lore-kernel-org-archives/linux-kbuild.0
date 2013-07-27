@@ -1,53 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f182.google.com ([209.85.212.182]:44074 "EHLO
-	mail-wi0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751559Ab3G0N3W (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 27 Jul 2013 09:29:22 -0400
-Date: Sat, 27 Jul 2013 15:29:15 +0200
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: Build regressions/improvements in v3.11-rc2
-Message-ID: <20130727132915.GA3655@free.fr>
-References: <alpine.DEB.2.02.1307232209510.32497@ayla.of.borg>
- <alpine.DEB.2.02.1307232210440.32577@ayla.of.borg>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <alpine.DEB.2.02.1307232210440.32577@ayla.of.borg>
+Received: from ozlabs.org ([203.10.76.45]:34190 "EHLO ozlabs.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751503Ab3G0Nia (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 27 Jul 2013 09:38:30 -0400
+Message-ID: <1374932307.7730.3.camel@concordia>
+Subject: Re: kisskb: sparc-allmodconfig is actually sparc64
+From: Michael Ellerman <michael@ellerman.id.au>
+Date: Sat, 27 Jul 2013 23:38:27 +1000
+In-Reply-To: <CAMuHMdUjaGRnHZpxs1j4VkYgTUXQNXvqu8LstpxLe8tYdf1oVw@mail.gmail.com>
+References: <CAMuHMdUjaGRnHZpxs1j4VkYgTUXQNXvqu8LstpxLe8tYdf1oVw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Linux Kernel Development <linux-kernel@vger.kernel.org>, Andrew Veliath <andrewtv@usa.net>, linux-kbuild@vger.kernel.org, linux-sh@vger.kernel.org
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>, sparclinux <sparclinux@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-Geert, All,
-
-Sorry to chime in a bit late...
-
-On 2013-07-23 22:20 +0200, Geert Uytterhoeven spake thusly:
-> On Tue, 23 Jul 2013, Geert Uytterhoeven wrote:
-> > JFYI, when comparing v3.11-rc2 to v3.11-rc1[3], the summaries are:
-> >   - build errors: +9/-23
-[--SNIP--]
-> powerpc-randconfig, due to a kconfig issue:
+On Fri, 2013-07-26 at 12:23 +0200, Geert Uytterhoeven wrote:
+> Hi Michael, Stephen,
 > 
-> Expose SCOM controllers via debugfs (SCOM_DEBUGFS) [N/y] (NEW) aborted!
-> Console input/output is redirected. Run 'make oldconfig' to update configuration
-> .
-> make[3]: *** [silentoldconfig] Error 1
+> The sparc-allmodconfig builds on http://kisskb.ellerman.id.au/kisskb/matrix/
+> seem to be sparc64, not sparc32, allmodconfig builds.
+> The sparc-allnoconfig builds are sparc32.
 
-Can you give me instructions on how to reproduce this error?
+Ah right, we seem to have sparc and sparc64 builds, but there is only
+arch/sparc now.
 
-randconfig now should print the RNF seed, so that's d be nice to have to
-reproduce the error. Also, having the problematic changeset would be
-nice.
+We'll have to sort that out next week.
 
-Regards,
-Yann E. MORIN.
+> BTW, what's the simplest way to make an all*config build with fixed sparc32 or
+> sparc64?
 
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+I think you can do it with KCONFIG_ALLCONFIG.
+
+cheers
+
