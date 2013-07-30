@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([203.10.76.45]:34190 "EHLO ozlabs.org"
+Received: from ozlabs.org ([203.10.76.45]:39348 "EHLO ozlabs.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751503Ab3G0Nia (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 27 Jul 2013 09:38:30 -0400
-Message-ID: <1374932307.7730.3.camel@concordia>
+	id S1752062Ab3G3CEq (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 29 Jul 2013 22:04:46 -0400
+Message-ID: <1375149883.8313.3.camel@concordia>
 Subject: Re: kisskb: sparc-allmodconfig is actually sparc64
 From: Michael Ellerman <michael@ellerman.id.au>
-Date: Sat, 27 Jul 2013 23:38:27 +1000
+Date: Tue, 30 Jul 2013 12:04:43 +1000
 In-Reply-To: <CAMuHMdUjaGRnHZpxs1j4VkYgTUXQNXvqu8LstpxLe8tYdf1oVw@mail.gmail.com>
 References: <CAMuHMdUjaGRnHZpxs1j4VkYgTUXQNXvqu8LstpxLe8tYdf1oVw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
@@ -24,15 +24,24 @@ On Fri, 2013-07-26 at 12:23 +0200, Geert Uytterhoeven wrote:
 > seem to be sparc64, not sparc32, allmodconfig builds.
 > The sparc-allnoconfig builds are sparc32.
 
-Ah right, we seem to have sparc and sparc64 builds, but there is only
-arch/sparc now.
+OK this should be fixed.
 
-We'll have to sort that out next week.
+See http://kisskb.ellerman.id.au/kisskb/buildresult/9234872/
 
-> BTW, what's the simplest way to make an all*config build with fixed sparc32 or
-> sparc64?
+In particular the config at http://kisskb.ellerman.id.au/kisskb/buildresult/9234872/config/
 
-I think you can do it with KCONFIG_ALLCONFIG.
+Shows:
+
+CONFIG_SPARC=y
+CONFIG_SPARC32=y
+# CONFIG_SPARC64 is not set
+
+vs an older result (http://kisskb.ellerman.id.au/kisskb/buildresult/9195810/config/)
+
+CONFIG_64BIT=y
+CONFIG_SPARC=y
+# CONFIG_SPARC32 is not set
+
 
 cheers
 
