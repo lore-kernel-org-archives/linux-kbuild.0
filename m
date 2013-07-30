@@ -1,47 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([203.10.76.45]:39348 "EHLO ozlabs.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752062Ab3G3CEq (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 29 Jul 2013 22:04:46 -0400
-Message-ID: <1375149883.8313.3.camel@concordia>
-Subject: Re: kisskb: sparc-allmodconfig is actually sparc64
-From: Michael Ellerman <michael@ellerman.id.au>
-Date: Tue, 30 Jul 2013 12:04:43 +1000
-In-Reply-To: <CAMuHMdUjaGRnHZpxs1j4VkYgTUXQNXvqu8LstpxLe8tYdf1oVw@mail.gmail.com>
-References: <CAMuHMdUjaGRnHZpxs1j4VkYgTUXQNXvqu8LstpxLe8tYdf1oVw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Received: from mail-we0-f170.google.com ([74.125.82.170]:42100 "EHLO
+	mail-we0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750803Ab3G3RLh (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 30 Jul 2013 13:11:37 -0400
+Received: by mail-we0-f170.google.com with SMTP id w60so5445230wes.1
+        for <linux-kbuild@vger.kernel.org>; Tue, 30 Jul 2013 10:11:36 -0700 (PDT)
+MIME-Version: 1.0
+Reply-To: sedat.dilek@gmail.com
+Date: Tue, 30 Jul 2013 19:11:36 +0200
+Message-ID: <CA+icZUVn+a=LSvO9JZXng1E0Ee+4ETk01PPCMRtfV9jqXRXAjw@mail.gmail.com>
+Subject: kconfig/menu.c: Fixup to "kconfig: fix undesirable side effect of
+ adding "visible" menu attribute" ?
+From: Sedat Dilek <sedat.dilek@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>, sparclinux <sparclinux@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Dirk Gouders <dirk@gouders.net>
+Cc: Jan Beulich <JBeulich@novell.com>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
-On Fri, 2013-07-26 at 12:23 +0200, Geert Uytterhoeven wrote:
-> Hi Michael, Stephen,
-> 
-> The sparc-allmodconfig builds on http://kisskb.ellerman.id.au/kisskb/matrix/
-> seem to be sparc64, not sparc32, allmodconfig builds.
-> The sparc-allnoconfig builds are sparc32.
+Hi,
 
-OK this should be fixed.
+The Freetz router project has 370 [1] as a revert-patch of [2] to its
+kconfig-v3.8.
 
-See http://kisskb.ellerman.id.au/kisskb/buildresult/9234872/
+commit 7ad1227818f09242cfe9bf1845fd24211f5f99bd
+"kconfig: fix undesirable side effect of adding "visible" menu attribute"
 
-In particular the config at http://kisskb.ellerman.id.au/kisskb/buildresult/9234872/config/
+I am not a kconfig-expert, but [3] looks like a fixup/folowup to it.
 
-Shows:
+commit/?id=e983b7b17ad1a978e954e6aaa62cf12bfc747883
+"kconfig/menu.c: fix multiple references to expressions in menu_add_prop()"
 
-CONFIG_SPARC=y
-CONFIG_SPARC32=y
-# CONFIG_SPARC64 is not set
+I contacted Yann in private, but I think this is worth to ask on the
+linux-kbuild ML.
 
-vs an older result (http://kisskb.ellerman.id.au/kisskb/buildresult/9195810/config/)
+Thanks in advance for your help.
 
-CONFIG_64BIT=y
-CONFIG_SPARC=y
-# CONFIG_SPARC32 is not set
+Regards,
+- Sedat -
 
-
-cheers
-
+[1] http://freetz.org/browser/trunk/tools/make/patches/370-save-hidden-prompts-to-file.kconfig.patch
+[2] kconfig: fix undesirable side effect of adding "visible" menu attribute
+[3] kconfig/menu.c: fix multiple references to expressions in menu_add_prop()
