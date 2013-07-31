@@ -1,99 +1,81 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from eddie.linux-mips.org ([78.24.191.182]:33356 "EHLO
-	cvs.linux-mips.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752234Ab3GaQZc (ORCPT
+Received: from mail-we0-f177.google.com ([74.125.82.177]:45855 "EHLO
+	mail-we0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1760162Ab3GaQxq (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 31 Jul 2013 12:25:32 -0400
-Received: from localhost.localdomain ([127.0.0.1]:35656 "EHLO linux-mips.org"
-        rhost-flags-OK-OK-OK-FAIL) by eddie.linux-mips.org with ESMTP
-        id S6827295Ab3GaQZ3ybciF (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org> + 1 other);
-        Wed, 31 Jul 2013 18:25:29 +0200
-Date: Wed, 31 Jul 2013 18:25:22 +0200
-From: Ralf Baechle <ralf@linux-mips.org>
-Subject: Re: [RFC MIPS] Update buildtar for MIPS
-Message-ID: <20130731162521.GA10570@linux-mips.org>
-References: <1286502337-23882-1-git-send-email-redhatter@gentoo.org>
- <alpine.LFD.2.00.1010160716270.15889@eddie.linux-mips.org>
+	Wed, 31 Jul 2013 12:53:46 -0400
+Received: by mail-we0-f177.google.com with SMTP id m46so804500wev.8
+        for <linux-kbuild@vger.kernel.org>; Wed, 31 Jul 2013 09:53:45 -0700 (PDT)
+Date: Wed, 31 Jul 2013 18:53:40 +0200
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: Re: kconfig/menu.c: Fixup to "kconfig: fix undesirable side effect
+ of adding "visible" menu attribute" ?
+Message-ID: <20130731165340.GA3448@free.fr>
+References: <CA+icZUVn+a=LSvO9JZXng1E0Ee+4ETk01PPCMRtfV9jqXRXAjw@mail.gmail.com>
+ <gir4eeizm9.fsf@karga.hank.lab>
+ <CA+icZUXL3trj_Zfisxek8dw4HtNbx2fNDq=Gwn5zKjbNh8GDMg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <alpine.LFD.2.00.1010160716270.15889@eddie.linux-mips.org>
+In-Reply-To: <CA+icZUXL3trj_Zfisxek8dw4HtNbx2fNDq=Gwn5zKjbNh8GDMg@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Maciej W. Rozycki" <macro@linux-mips.org>
-Cc: Stuart Longland <redhatter@gentoo.org>, linux-mips@linux-mips.org, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+To: Sedat Dilek <sedat.dilek@gmail.com>
+Cc: Dirk Gouders <dirk@gouders.net>, Jan Beulich <JBeulich@novell.com>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
-On Sat, Oct 16, 2010 at 07:17:45AM +0100, Maciej W. Rozycki wrote:
+Sedat, Dirk, All,
 
-> > This updates buildtar to support MIPS targets.  MIPS may use 'vmlinux'
-> > or 'vmlinux.32' depending on the target system.
-> 
->  Or vmlinux.64 -- why don't you handle that too?
+On 2013-07-31 16:22 +0200, Sedat Dilek spake thusly:
+> On Wed, Jul 31, 2013 at 4:16 PM, Dirk Gouders <dirk@gouders.net> wrote:
+> > Sedat Dilek <sedat.dilek@gmail.com> writes:
+> >> The Freetz router project has 370 [1] as a revert-patch of [2] to its
+> >> kconfig-v3.8.
+> >>
+> >> commit 7ad1227818f09242cfe9bf1845fd24211f5f99bd
+> >> "kconfig: fix undesirable side effect of adding "visible" menu attribute"
+> >>
+> >> I am not a kconfig-expert, but [3] looks like a fixup/folowup to it.
+> >>
+> >> commit/?id=e983b7b17ad1a978e954e6aaa62cf12bfc747883
+> >> "kconfig/menu.c: fix multiple references to expressions in menu_add_prop()"
+> >>
+> >> I contacted Yann in private, but I think this is worth to ask on the
+> >> linux-kbuild ML.
 
-Patchwork is patient, nothing gets lost :-)  I've updated Stuart's original
-patch http://patchwork.linux-mips.org/patch/1673/ to also handle compressed
-kernel images, how about below patch.
+Yes, there was no reason to write such a question in private.
 
-Michal, when testing this by building "make targz-pkg" for a particular MIPS
-platform I get
+> > you are right, [3] fixes a problem that was introduced by [2].
+> > (I should have noted that in the commit message -- I'm not sure if we
+> > can fix that afterwards.)
 
-  tar: lib/*: Cannot stat: No such file or directory
+No, it's been pushed to a public tree, it's too late.
+It's even in Linus' tree, so it is really too late!
 
-and I assume that's because CONFIG_MODULES is not enabled for my test
-configuration.
+> thanks for the clarification and fixing this up.
+> I told Yann in my private email to always add a reference to the
+> "culprit" commit (root-cause).
 
-  Ralf
+Since I was not the author of that patch, I have no way to know if it is
+"a fix for a previous commit", or "just a fix", if the original author
+does not provide this information.
 
-kbuild: Add MIPS specific files to generated package.
+Except for the patches I write, I "just" collect (and test/review) the
+patches to kconfig in my tree, to make it a bit easier for Michal. I
+just pass the patches' commit logs as-is (or do trivial edits if
+needed), so what gets in the tree is the responsibility of the author.
+Hey, Dirk! ;-)
 
-A lot of 64-bit systems supported by Linux/MIPS have boot firmware or
-bootloaders that only understand 32-bit ELF files, and as such, the vmlinux.32
-target exists to support these systems.  Therefore, it'd be nice if the tar-pkg
-target recognised this, and included the right version when packaging up a
-binary of the kernel.
+But on the principle, I do agree: if the patch fixes a regression
+introduced by a previous changeset, it should be referenced in the
+commit log of that new patch, indeed.
 
-This updates buildtar to support MIPS targets.  MIPS may use 'vmlinux'
-or 'vmlinux.32' depending on the target system.  This uses 'vmlinux.32'
-in preference to 'vmlinux' where present (although I should check which
-is newer), including either file as /boot/vmlinux-${version}.
+Regards,
+Yann E. MORIN.
 
-Cc: linux-mips@linux-mips.org
-Cc: linux-kernel@vger.kernel.org
-Signed-off-by: Ralf Baechle <ralf@linux-mips.org>
----
- scripts/package/buildtar | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
-
-diff --git a/scripts/package/buildtar b/scripts/package/buildtar
-index cdd9bb9..aa22f94 100644
---- a/scripts/package/buildtar
-+++ b/scripts/package/buildtar
-@@ -87,6 +87,27 @@ case "${ARCH}" in
- 		[ -f "${objtree}/vmlinux.SYS" ] && cp -v -- "${objtree}/vmlinux.SYS" "${tmpdir}/boot/vmlinux-${KERNELRELEASE}.SYS"
- 		[ -f "${objtree}/vmlinux.dsk" ] && cp -v -- "${objtree}/vmlinux.dsk" "${tmpdir}/boot/vmlinux-${KERNELRELEASE}.dsk"
- 		;;
-+	mips)
-+		if [ -f "${objtree}/arch/mips/boot/compressed/vmlinux.bin" ]; then
-+			cp -v -- "${objtree}/arch/mips/boot/compressed/vmlinux.bin" "${tmpdir}/boot/vmlinuz-${KERNELRELEASE}"
-+		elif [ -f "${objtree}/arch/mips/boot/compressed/vmlinux.ecoff" ]; then
-+			cp -v -- "${objtree}/arch/mips/boot/compressed/vmlinux.ecoff" "${tmpdir}/boot/vmlinuz-${KERNELRELEASE}"
-+		elif [ -f "${objtree}/arch/mips/boot/compressed/vmlinux.srec" ]; then
-+			cp -v -- "${objtree}/arch/mips/boot/compressed/vmlinux.srec" "${tmpdir}/boot/vmlinuz-${KERNELRELEASE}"
-+		elif [ -f "${objtree}/vmlinux.32" ]; then
-+			cp -v -- "${objtree}/vmlinux.32" "${tmpdir}/boot/vmlinux-${KERNELRELEASE}"
-+		elif [ -f "${objtree}/vmlinux.64" ]; then
-+			cp -v -- "${objtree}/vmlinux.64" "${tmpdir}/boot/vmlinux-${KERNELRELEASE}"
-+		elif [ -f "${objtree}/arch/mips/boot/vmlinux.bin" ]; then
-+			cp -v -- "${objtree}/arch/mips/boot/vmlinux.bin" "${tmpdir}/boot/vmlinux-${KERNELRELEASE}"
-+		elif [ -f "${objtree}/arch/mips/boot/vmlinux.ecoff" ]; then
-+			cp -v -- "${objtree}/arch/mips/boot/vmlinux.ecoff" "${tmpdir}/boot/vmlinux-${KERNELRELEASE}"
-+		elif [ -f "${objtree}/arch/mips/boot/vmlinux.srec" ]; then
-+			cp -v -- "${objtree}/arch/mips/boot/vmlinux.srec" "${tmpdir}/boot/vmlinux-${KERNELRELEASE}"
-+		elif [ -f "${objtree}/vmlinux" ]; then
-+			cp -v -- "${objtree}/vmlinux" "${tmpdir}/boot/vmlinux-${KERNELRELEASE}"
-+		fi
-+		;;
- 	*)
- 		[ -f "${KBUILD_IMAGE}" ] && cp -v -- "${KBUILD_IMAGE}" "${tmpdir}/boot/vmlinux-kbuild-${KERNELRELEASE}"
- 		echo "" >&2
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
