@@ -1,60 +1,99 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from services.gouders.net ([141.101.32.176]:50035 "EHLO
-	services.gouders.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751338Ab3GaOrt (ORCPT
+Received: from eddie.linux-mips.org ([78.24.191.182]:33356 "EHLO
+	cvs.linux-mips.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752234Ab3GaQZc (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 31 Jul 2013 10:47:49 -0400
-From: Dirk Gouders <dirk@gouders.net>
-Subject: Re: kconfig/menu.c: Fixup to "kconfig: fix undesirable side effect of adding "visible" menu attribute" ?
-In-Reply-To: <CA+icZUVn+a=LSvO9JZXng1E0Ee+4ETk01PPCMRtfV9jqXRXAjw@mail.gmail.com>
-	(Sedat Dilek's message of "Tue, 30 Jul 2013 19:11:36 +0200")
-References: <CA+icZUVn+a=LSvO9JZXng1E0Ee+4ETk01PPCMRtfV9jqXRXAjw@mail.gmail.com>
-Date: Wed, 31 Jul 2013 16:16:14 +0200
-Message-ID: <gir4eeizm9.fsf@karga.hank.lab>
+	Wed, 31 Jul 2013 12:25:32 -0400
+Received: from localhost.localdomain ([127.0.0.1]:35656 "EHLO linux-mips.org"
+        rhost-flags-OK-OK-OK-FAIL) by eddie.linux-mips.org with ESMTP
+        id S6827295Ab3GaQZ3ybciF (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org> + 1 other);
+        Wed, 31 Jul 2013 18:25:29 +0200
+Date: Wed, 31 Jul 2013 18:25:22 +0200
+From: Ralf Baechle <ralf@linux-mips.org>
+Subject: Re: [RFC MIPS] Update buildtar for MIPS
+Message-ID: <20130731162521.GA10570@linux-mips.org>
+References: <1286502337-23882-1-git-send-email-redhatter@gentoo.org>
+ <alpine.LFD.2.00.1010160716270.15889@eddie.linux-mips.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <alpine.LFD.2.00.1010160716270.15889@eddie.linux-mips.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: sedat.dilek@gmail.com
-Cc: Jan Beulich <JBeulich@novell.com>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+To: "Maciej W. Rozycki" <macro@linux-mips.org>
+Cc: Stuart Longland <redhatter@gentoo.org>, linux-mips@linux-mips.org, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
-Sedat Dilek <sedat.dilek@gmail.com> writes:
+On Sat, Oct 16, 2010 at 07:17:45AM +0100, Maciej W. Rozycki wrote:
 
-> Hi,
->
-> The Freetz router project has 370 [1] as a revert-patch of [2] to its
-> kconfig-v3.8.
->
-> commit 7ad1227818f09242cfe9bf1845fd24211f5f99bd
-> "kconfig: fix undesirable side effect of adding "visible" menu attribute"
->
-> I am not a kconfig-expert, but [3] looks like a fixup/folowup to it.
->
-> commit/?id=e983b7b17ad1a978e954e6aaa62cf12bfc747883
-> "kconfig/menu.c: fix multiple references to expressions in menu_add_prop()"
->
-> I contacted Yann in private, but I think this is worth to ask on the
-> linux-kbuild ML.
+> > This updates buildtar to support MIPS targets.  MIPS may use 'vmlinux'
+> > or 'vmlinux.32' depending on the target system.
+> 
+>  Or vmlinux.64 -- why don't you handle that too?
 
-Hi Sedat,
+Patchwork is patient, nothing gets lost :-)  I've updated Stuart's original
+patch http://patchwork.linux-mips.org/patch/1673/ to also handle compressed
+kernel images, how about below patch.
 
-you are right, [3] fixes a problem that was introduced by [2].
-(I should have noted that in the commit message -- I'm not sure if we
-can fix that afterwards.)
+Michal, when testing this by building "make targz-pkg" for a particular MIPS
+platform I get
 
-Best regards,
+  tar: lib/*: Cannot stat: No such file or directory
 
-Dirk
+and I assume that's because CONFIG_MODULES is not enabled for my test
+configuration.
 
-> Thanks in advance for your help.
+  Ralf
 
-> Regards,
-> - Sedat -
->
-> [1] http://freetz.org/browser/trunk/tools/make/patches/370-save-hidden-prompts-to-file.kconfig.patch
-> [2] kconfig: fix undesirable side effect of adding "visible" menu attribute
-> [3] kconfig/menu.c: fix multiple references to expressions in menu_add_prop()
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+kbuild: Add MIPS specific files to generated package.
+
+A lot of 64-bit systems supported by Linux/MIPS have boot firmware or
+bootloaders that only understand 32-bit ELF files, and as such, the vmlinux.32
+target exists to support these systems.  Therefore, it'd be nice if the tar-pkg
+target recognised this, and included the right version when packaging up a
+binary of the kernel.
+
+This updates buildtar to support MIPS targets.  MIPS may use 'vmlinux'
+or 'vmlinux.32' depending on the target system.  This uses 'vmlinux.32'
+in preference to 'vmlinux' where present (although I should check which
+is newer), including either file as /boot/vmlinux-${version}.
+
+Cc: linux-mips@linux-mips.org
+Cc: linux-kernel@vger.kernel.org
+Signed-off-by: Ralf Baechle <ralf@linux-mips.org>
+---
+ scripts/package/buildtar | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
+
+diff --git a/scripts/package/buildtar b/scripts/package/buildtar
+index cdd9bb9..aa22f94 100644
+--- a/scripts/package/buildtar
++++ b/scripts/package/buildtar
+@@ -87,6 +87,27 @@ case "${ARCH}" in
+ 		[ -f "${objtree}/vmlinux.SYS" ] && cp -v -- "${objtree}/vmlinux.SYS" "${tmpdir}/boot/vmlinux-${KERNELRELEASE}.SYS"
+ 		[ -f "${objtree}/vmlinux.dsk" ] && cp -v -- "${objtree}/vmlinux.dsk" "${tmpdir}/boot/vmlinux-${KERNELRELEASE}.dsk"
+ 		;;
++	mips)
++		if [ -f "${objtree}/arch/mips/boot/compressed/vmlinux.bin" ]; then
++			cp -v -- "${objtree}/arch/mips/boot/compressed/vmlinux.bin" "${tmpdir}/boot/vmlinuz-${KERNELRELEASE}"
++		elif [ -f "${objtree}/arch/mips/boot/compressed/vmlinux.ecoff" ]; then
++			cp -v -- "${objtree}/arch/mips/boot/compressed/vmlinux.ecoff" "${tmpdir}/boot/vmlinuz-${KERNELRELEASE}"
++		elif [ -f "${objtree}/arch/mips/boot/compressed/vmlinux.srec" ]; then
++			cp -v -- "${objtree}/arch/mips/boot/compressed/vmlinux.srec" "${tmpdir}/boot/vmlinuz-${KERNELRELEASE}"
++		elif [ -f "${objtree}/vmlinux.32" ]; then
++			cp -v -- "${objtree}/vmlinux.32" "${tmpdir}/boot/vmlinux-${KERNELRELEASE}"
++		elif [ -f "${objtree}/vmlinux.64" ]; then
++			cp -v -- "${objtree}/vmlinux.64" "${tmpdir}/boot/vmlinux-${KERNELRELEASE}"
++		elif [ -f "${objtree}/arch/mips/boot/vmlinux.bin" ]; then
++			cp -v -- "${objtree}/arch/mips/boot/vmlinux.bin" "${tmpdir}/boot/vmlinux-${KERNELRELEASE}"
++		elif [ -f "${objtree}/arch/mips/boot/vmlinux.ecoff" ]; then
++			cp -v -- "${objtree}/arch/mips/boot/vmlinux.ecoff" "${tmpdir}/boot/vmlinux-${KERNELRELEASE}"
++		elif [ -f "${objtree}/arch/mips/boot/vmlinux.srec" ]; then
++			cp -v -- "${objtree}/arch/mips/boot/vmlinux.srec" "${tmpdir}/boot/vmlinux-${KERNELRELEASE}"
++		elif [ -f "${objtree}/vmlinux" ]; then
++			cp -v -- "${objtree}/vmlinux" "${tmpdir}/boot/vmlinux-${KERNELRELEASE}"
++		fi
++		;;
+ 	*)
+ 		[ -f "${KBUILD_IMAGE}" ] && cp -v -- "${KBUILD_IMAGE}" "${tmpdir}/boot/vmlinux-kbuild-${KERNELRELEASE}"
+ 		echo "" >&2
