@@ -1,98 +1,98 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:58829 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754480Ab3HFIUY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 6 Aug 2013 04:20:24 -0400
-Message-ID: <5200B1BF.2060009@suse.cz>
-Date: Tue, 06 Aug 2013 10:20:15 +0200
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: Warnings from silentoldconfig (Re: [GIT PULL] PCI updates for
- v3.11)
-References: <20130802181740.GA27100@google.com> <CA+55aFzSG8ny=79_MFik5xP99c7eb-LMKh0JzTKpbiEB8Wt=5Q@mail.gmail.com> <20130805083943.GA14782@sepie.suse.cz> <20130805225830.GA29411@free.fr>
-In-Reply-To: <20130805225830.GA29411@free.fr>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Received: from mail-we0-f180.google.com ([74.125.82.180]:34487 "EHLO
+	mail-we0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756191Ab3HFRJW (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 6 Aug 2013 13:09:22 -0400
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: [PATCH] kconfig: silence warning when parsing auto.conf when a symbol has changed type
+Date: Tue,  6 Aug 2013 19:09:14 +0200
+Message-Id: <1375808954-7221-1-git-send-email-yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, Bjorn Helgaas <bhelgaas@google.com>, "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Yinghai Lu <yinghai@kernel.org>, Thomas Petazzoni <thomas.petazzoni@free-electrons.com>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, "Yann E. MORIN" <yann.morin.1998@free.fr>, Linus Torvalds <torvalds@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, Thomas Petazzoni <thomas.petazzoni@free-electrons.com>, Bjorn Helgaas <bhelgaas@google.com>, Yinghai Lu <yinghai@kernel.org>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
-On 6.8.2013 00:58, Yann E. MORIN wrote:
-> On 2013-08-05 10:39 +0200, Michal Marek spake thusly:
->> Added Yann and the linux-kbuild list to CC. Reproducer:
->>
->>   git checkout 1fe0135
->>   make mrproper
->>   make allmodconfig
->>   make silentoldconfig
->>   git checkout aa8032b
->>   make allmodconfig
->>   make silentoldconfig
->>
->> conf_write_autoconf() first calls conf_split_config() to generate the
->> include/config/**.h hierarchy, then generates include/config/auto.conf.
->> For some reason, conf_split_config() reads include/config/auto.conf,
->> which may not exist yet or may be out of date. Yann, can anything break
->> if we simply do not read that file from conf_split_config(), like this?
->>
->> diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
->> index c55c227..8c90835 100644
->> --- a/scripts/kconfig/confdata.c
->> +++ b/scripts/kconfig/confdata.c
->> @@ -829,16 +829,12 @@ next:
->>  
->>  static int conf_split_config(void)
->>  {
->> -	const char *name;
->>  	char path[PATH_MAX+1];
->>  	char *s, *d, c;
->>  	struct symbol *sym;
->>  	struct stat sb;
->>  	int res, i, fd;
->>  
->> -	name = conf_get_autoconfig_name();
->> -	conf_read_simple(name, S_DEF_AUTO);
->> -
->>  	if (chdir("include/config"))
->>  		return 1;
-[...]
-> 
-> What I understand of the code is that, we're reading auto.conf with
-> the S_DEF_AUTO flag, which is expected to set the SYMBOL_DEF_AUTO flags
-> to symbols read from auto.conf.
-> 
-> This is then used by conf_split_config to detect symbols that have
-> changed.
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-Ah, _that_ is why it's there.
+When a symbol changes type from tristate to bool, and was previously set to
+'m', a subsequent silentoldconfig would warn about inconsistency, such as:
 
-[...]
-> The two following tests do not invlolve the HOTPLUG_PCI_.* symbols
-> on purpose, and involve a pristine master c095ba7:
-> 
->     $ make allmodconfig
->     $ make silentoldconfig
->     $ make silentoldconfig
->     $ make silentoldconfig
-> 
->   - Without Michal's proposed change, unaffected symbols are not
->     touched. For example, mtime and ctime for zswap.h are not changed
->     after the second and third silentoldconfig.
-> 
->   - With Michal's proposed change, then mtime and ctime for zswap.h are
->     changed after each silentoldconfig, even though CONFIG_ZSWAP was not
->     changed.
+    include/config/auto.conf:3014:warning: symbol value 'm' invalid for
+    HOTPLUG_PCI_PCIE
 
-Yes, I only did a simple diff -rq between two generated include/config
-directories and did not think about mtimes.
+Seen by Linus with the merge in aa8032b (sequence to reproduce by Michal):
+    git checkout 1fe0135
+    make mrproper
+    make allmodconfig
+    make silentoldconfig
+    git checkout aa8032b
+    make allmodconfig
+    make silentoldconfig
 
+Since HOTPLUG_PCI_PCIE changed from tristate to bool in aa8032b, it was
+previously set to 'm' in auto.conf by the first allmodconfig+silentoldconfig,
+but then was set to 'y' by the second allmodconfig. Then the second
+silentoldconfig prints the warning.
 
-> One solution would be to read auto.conf *before* we fuzz around symbols,
-> not after. We should probably read auto.conf just after we read .config.
+The warning in this case is a spurious warning, which happens at the time
+kconfig tries to detect symbols that have changed, to touch the empty
+header files in include/config used for dependency-tracking by make.
 
-Maybe the safest solution would be to silence the warning if def ==
-S_DEF_AUTO. Because auto.conf is only read by kconfig in
-conf_split_config(), when it is expected to be out of date.
+Silence the warning when we read the old auto.conf file, since it is
+perfectly legit that a symbol changed type since the previous call.
 
-Michal
+Thread in:
+    http://marc.info/?l=linux-pci&m=137569198904000&w=2
+
+Reported-by: Linus Torvalds <torvalds@linux-foundation.org>
+Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Michal Marek <mmarek@suse.cz>
+Cc: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+Cc: Bjorn Helgaas <bhelgaas@google.com>
+Cc: Yinghai Lu <yinghai@kernel.org>
+Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+---
+ scripts/kconfig/confdata.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
+
+diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+index c55c227..87f7238 100644
+--- a/scripts/kconfig/confdata.c
++++ b/scripts/kconfig/confdata.c
+@@ -140,7 +140,9 @@ static int conf_set_sym_val(struct symbol *sym, int def, int def_flags, char *p)
+ 			sym->flags |= def_flags;
+ 			break;
+ 		}
+-		conf_warning("symbol value '%s' invalid for %s", p, sym->name);
++		if (def != S_DEF_AUTO)
++			conf_warning("symbol value '%s' invalid for %s",
++				     p, sym->name);
+ 		return 1;
+ 	case S_OTHER:
+ 		if (*p != '"') {
+@@ -161,7 +163,8 @@ static int conf_set_sym_val(struct symbol *sym, int def, int def_flags, char *p)
+ 			memmove(p2, p2 + 1, strlen(p2));
+ 		}
+ 		if (!p2) {
+-			conf_warning("invalid string found");
++			if (def != S_DEF_AUTO)
++				conf_warning("invalid string found");
+ 			return 1;
+ 		}
+ 		/* fall through */
+@@ -172,7 +175,9 @@ static int conf_set_sym_val(struct symbol *sym, int def, int def_flags, char *p)
+ 			sym->def[def].val = strdup(p);
+ 			sym->flags |= def_flags;
+ 		} else {
+-			conf_warning("symbol value '%s' invalid for %s", p, sym->name);
++			if (def != S_DEF_AUTO)
++				conf_warning("symbol value '%s' invalid for %s",
++					     p, sym->name);
+ 			return 1;
+ 		}
+ 		break;
+-- 
+1.8.1.2
+
