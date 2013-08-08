@@ -1,98 +1,91 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-we0-f180.google.com ([74.125.82.180]:34487 "EHLO
-	mail-we0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756191Ab3HFRJW (ORCPT
+Received: from mail-wg0-f46.google.com ([74.125.82.46]:59920 "EHLO
+	mail-wg0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758094Ab3HHVyz (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 6 Aug 2013 13:09:22 -0400
+	Thu, 8 Aug 2013 17:54:55 -0400
+Date: Thu, 8 Aug 2013 23:54:49 +0200
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: [PATCH] kconfig: silence warning when parsing auto.conf when a symbol has changed type
-Date: Tue,  6 Aug 2013 19:09:14 +0200
-Message-Id: <1375808954-7221-1-git-send-email-yann.morin.1998@free.fr>
+Subject: Re: linux-next: build failure after merge of the ext4 tree
+Message-ID: <20130808215449.GD3282@free.fr>
+References: <20130729110816.12958c3a26400f444a9a5012@canb.auug.org.au>
+ <CA+icZUUt4domktYZZn0Qp3BZoSFqmKic4qSnVP4cuTKwUww_=A@mail.gmail.com>
+ <20130807153840.4f2997b603397c07aca98b2d@canb.auug.org.au>
+ <87zjsted0c.fsf@linaro.org>
+ <20130808102228.d2034d3a4c986d2970926ab9@canb.auug.org.au>
+ <20130808103614.a039da2f236154b52329b28b@canb.auug.org.au>
+ <20130808191650.GB3282@free.fr>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20130808191650.GB3282@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, "Yann E. MORIN" <yann.morin.1998@free.fr>, Linus Torvalds <torvalds@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, Thomas Petazzoni <thomas.petazzoni@free-electrons.com>, Bjorn Helgaas <bhelgaas@google.com>, Yinghai Lu <yinghai@kernel.org>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
+To: Stephen Rothwell <sfr@canb.auug.org.au>
+Cc: Steven Rostedt <rostedt@goodmis.org>, Michal Marek <mmarek@suse.cz>, Kevin Hilman <khilman@linaro.org>, sedat.dilek@gmail.com, Theodore Ts'o <tytso@mit.edu>, linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, Linux kbuild ML <linux-kbuild@vger.kernel.org>
 
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Stephen, All,
 
-When a symbol changes type from tristate to bool, and was previously set to
-'m', a subsequent silentoldconfig would warn about inconsistency, such as:
+On 2013-08-08 21:16 +0200, Yann E. MORIN spake thusly:
+> On 2013-08-08 10:36 +1000, Stephen Rothwell spake thusly:
+> > On Thu, 8 Aug 2013 10:22:28 +1000 Stephen Rothwell <sfr@canb.auug.org.au>
+> > wrote:
+> > >
+> > > More quick testing with an empty file: v3.9 is OK, v3.10 gives
+> > > CONFIG_MODULES unset.
+> 
+> Sorry, I don't understand the above. Can you elaborate on what you did,
+> what you got, what expected, so I can try to reproduce and fix this,
+> please?
 
-    include/config/auto.conf:3014:warning: symbol value 'm' invalid for
-    HOTPLUG_PCI_PCIE
+Ok, I've had a look in the linux-next archives, and I think I got it.
+Is the following right?
 
-Seen by Linus with the merge in aa8032b (sequence to reproduce by Michal):
-    git checkout 1fe0135
-    make mrproper
-    make allmodconfig
-    make silentoldconfig
-    git checkout aa8032b
-    make allmodconfig
-    make silentoldconfig
+    git clean -d; git clean -dX     # To be sure tree is clean
+    touch empty
+    make KCONFIG_ALLCONFIG=empty allmodconfig
+    grep MODULES .config
+    $ CONFIG_MODULES is not set
 
-Since HOTPLUG_PCI_PCIE changed from tristate to bool in aa8032b, it was
-previously set to 'm' in auto.conf by the first allmodconfig+silentoldconfig,
-but then was set to 'y' by the second allmodconfig. Then the second
-silentoldconfig prints the warning.
+If so, I think I found the reason: the modules symbol is _always_ set to
+being valid as soon as KCONFIG_ALLCONFIG is read, even if it was not
+present in that file.
 
-The warning in this case is a spurious warning, which happens at the time
-kconfig tries to detect symbols that have changed, to touch the empty
-header files in include/config used for dependency-tracking by make.
+Since it is set to be valid, the following change means it is not
+affected another value later on.
 
-Silence the warning when we read the old auto.conf file, since it is
-perfectly legit that a symbol changed type since the previous call.
+So, I wonder what the best option is:
+  1- revert the following, and find another solution,
+  2- de-specialise the modules symbol,
+  3- or further specialise the modules symbol.
 
-Thread in:
-    http://marc.info/?l=linux-pci&m=137569198904000&w=2
+I'd be inclined to go for 1, but I have no straightforward idea so far.
+It's late here, so I'll look more thouroughly this WE.
 
-Reported-by: Linus Torvalds <torvalds@linux-foundation.org>
-Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Michal Marek <mmarek@suse.cz>
-Cc: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
-Cc: Bjorn Helgaas <bhelgaas@google.com>
-Cc: Yinghai Lu <yinghai@kernel.org>
-Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
----
- scripts/kconfig/confdata.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+> > Bisecting gives:
+> > 
+> > cfa98f2e0ae956feca935573e977d7661a9561b9 is the first bad commit
+> > commit cfa98f2e0ae956feca935573e977d7661a9561b9
+> > Author: Yann E. MORIN <yann.morin.1998@free.fr>
+> > Date:   Wed Apr 24 22:00:04 2013 +0200
+> > 
+> >     kconfig: do not override symbols already set
+> >     
+> >     For randconfig, if a list of required symbols is specified with
+> >     KCONFIG_ALLCONFIG, such symbols do not "have a value" as per
+> >     sym_has_value(), but have the "valid" flag set.
+> >     
+> >     Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+> > 
+> > And reverting that commit in v3.10 gives me CONFIG_MODULES=y.
 
-diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-index c55c227..87f7238 100644
---- a/scripts/kconfig/confdata.c
-+++ b/scripts/kconfig/confdata.c
-@@ -140,7 +140,9 @@ static int conf_set_sym_val(struct symbol *sym, int def, int def_flags, char *p)
- 			sym->flags |= def_flags;
- 			break;
- 		}
--		conf_warning("symbol value '%s' invalid for %s", p, sym->name);
-+		if (def != S_DEF_AUTO)
-+			conf_warning("symbol value '%s' invalid for %s",
-+				     p, sym->name);
- 		return 1;
- 	case S_OTHER:
- 		if (*p != '"') {
-@@ -161,7 +163,8 @@ static int conf_set_sym_val(struct symbol *sym, int def, int def_flags, char *p)
- 			memmove(p2, p2 + 1, strlen(p2));
- 		}
- 		if (!p2) {
--			conf_warning("invalid string found");
-+			if (def != S_DEF_AUTO)
-+				conf_warning("invalid string found");
- 			return 1;
- 		}
- 		/* fall through */
-@@ -172,7 +175,9 @@ static int conf_set_sym_val(struct symbol *sym, int def, int def_flags, char *p)
- 			sym->def[def].val = strdup(p);
- 			sym->flags |= def_flags;
- 		} else {
--			conf_warning("symbol value '%s' invalid for %s", p, sym->name);
-+			if (def != S_DEF_AUTO)
-+				conf_warning("symbol value '%s' invalid for %s",
-+					     p, sym->name);
- 			return 1;
- 		}
- 		break;
+Regards,
+Yann E. MORIN.
+
 -- 
-1.8.1.2
-
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
