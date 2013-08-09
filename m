@@ -1,76 +1,126 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.snhosting.dk ([87.238.248.203]:27967 "EHLO
+Received: from smtp.snhosting.dk ([87.238.248.203]:46694 "EHLO
 	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S934248Ab3HILmv (ORCPT
+	with ESMTP id S1751787Ab3HIMaj (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 9 Aug 2013 07:42:51 -0400
-Date: Fri, 9 Aug 2013 13:42:48 +0200
+	Fri, 9 Aug 2013 08:30:39 -0400
+Date: Fri, 9 Aug 2013 14:30:34 +0200
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: linux-next: build failure after merge of the ext4 tree
-Message-ID: <20130809114248.GA5691@merkur.ravnborg.org>
-References: <20130729110816.12958c3a26400f444a9a5012@canb.auug.org.au> <CA+icZUUt4domktYZZn0Qp3BZoSFqmKic4qSnVP4cuTKwUww_=A@mail.gmail.com> <20130807153840.4f2997b603397c07aca98b2d@canb.auug.org.au> <87zjsted0c.fsf@linaro.org> <20130808102228.d2034d3a4c986d2970926ab9@canb.auug.org.au> <20130808103614.a039da2f236154b52329b28b@canb.auug.org.au> <20130808191650.GB3282@free.fr> <20130808215449.GD3282@free.fr>
+Subject: Re: [PATCH] kconfig: Make diffconfig work with Python 3
+Message-ID: <20130809123034.GA5794@merkur.ravnborg.org>
+References: <20130809122655.GA7108@jtlinux>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20130808215449.GD3282@free.fr>
+In-Reply-To: <20130809122655.GA7108@jtlinux>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>, Steven Rostedt <rostedt@goodmis.org>, Michal Marek <mmarek@suse.cz>, Kevin Hilman <khilman@linaro.org>, sedat.dilek@gmail.com, Theodore Ts'o <tytso@mit.edu>, linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, Linux kbuild ML <linux-kbuild@vger.kernel.org>
+To: Johannes Thumshirn <johannes.thumshirn@men.de>
+Cc: Tim Bird <tim.bird@am.sony.com>, linux-kernel@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.cz>
 
-On Thu, Aug 08, 2013 at 11:54:49PM +0200, Yann E. MORIN wrote:
-> Stephen, All,
-> 
-> On 2013-08-08 21:16 +0200, Yann E. MORIN spake thusly:
-> > On 2013-08-08 10:36 +1000, Stephen Rothwell spake thusly:
-> > > On Thu, 8 Aug 2013 10:22:28 +1000 Stephen Rothwell <sfr@canb.auug.org.au>
-> > > wrote:
-> > > >
-> > > > More quick testing with an empty file: v3.9 is OK, v3.10 gives
-> > > > CONFIG_MODULES unset.
-> > 
-> > Sorry, I don't understand the above. Can you elaborate on what you did,
-> > what you got, what expected, so I can try to reproduce and fix this,
-> > please?
-> 
-> Ok, I've had a look in the linux-next archives, and I think I got it.
-> Is the following right?
-> 
->     git clean -d; git clean -dX     # To be sure tree is clean
->     touch empty
->     make KCONFIG_ALLCONFIG=empty allmodconfig
->     grep MODULES .config
->     $ CONFIG_MODULES is not set
-> 
-> If so, I think I found the reason: the modules symbol is _always_ set to
-> being valid as soon as KCONFIG_ALLCONFIG is read, even if it was not
-> present in that file.
-> 
-> Since it is set to be valid, the following change means it is not
-> affected another value later on.
-> 
-> So, I wonder what the best option is:
->   1- revert the following, and find another solution,
->   2- de-specialise the modules symbol,
->   3- or further specialise the modules symbol.
+Hi Johannes.
 
-If we drop the special handling of "MODULES" and introduced
-the following in we may fix it - hopefully:
-
-config MODULES
-	option modules
-
-The option handling is already in place. It is even documented :-)
-
-At least we could then drop the sym_lookup here (zconf.y):
-        if (!modules_sym->prop) {
-                struct property *prop;
-
-                prop = prop_alloc(P_DEFAULT, modules_sym);
-                prop->expr = expr_alloc_symbol(sym_lookup("MODULES", 0));
-        }
-Without the sym_lookup I think the symbol will not be defined and tus not marked valid.
-
-Soory - no patch as I am busy with day-time job stuff.
+Can you please resnd and include Michal Marek + kbuild mailing list.
+Both are added to this mail so you have the addresses.
 
 	Sam
+
+On Fri, Aug 09, 2013 at 02:27:02PM +0200, Johannes Thumshirn wrote:
+> Adjust diffconfig to run cleanly on Python 3 (Tested with 3.3.2) and
+> Python 2 (2.7.5)
+> 
+> Signed-off-by: Johannes Thumshirn <johannes.thumshirn@men.de>
+> ---
+>  scripts/diffconfig |   26 +++++++++++++-------------
+>  1 file changed, 13 insertions(+), 13 deletions(-)
+> 
+> diff --git a/scripts/diffconfig b/scripts/diffconfig
+> index b91f3e3..dd0e75b 100755
+> --- a/scripts/diffconfig
+> +++ b/scripts/diffconfig
+> @@ -10,7 +10,7 @@
+>  import sys, os
+> 
+>  def usage():
+> -    print """Usage: diffconfig [-h] [-m] [<config1> <config2>]
+> +    print ("""Usage: diffconfig [-h] [-m] [<config1> <config2>]
+> 
+>  Diffconfig is a simple utility for comparing two .config files.
+>  Using standard diff to compare .config files often includes extraneous and
+> @@ -33,7 +33,7 @@ Example usage:
+>   EXT2_FS  y -> n
+>   LOG_BUF_SHIFT  14 -> 16
+>   PRINTK_TIME  n -> y
+> -"""
+> +""")
+>      sys.exit(0)
+> 
+>  # returns a dictionary of name/value pairs for config items in the file
+> @@ -54,23 +54,23 @@ def print_config(op, config, value, new_value):
+>      if merge_style:
+>          if new_value:
+>              if new_value=="n":
+> -                print "# CONFIG_%s is not set" % config
+> +                print("# CONFIG_%s is not set" % config)
+>              else:
+> -                print "CONFIG_%s=%s" % (config, new_value)
+> +                print("CONFIG_%s=%s" % (config, new_value))
+>      else:
+>          if op=="-":
+> -            print "-%s %s" % (config, value)
+> +            print("-%s %s" % (config, value))
+>          elif op=="+":
+> -            print "+%s %s" % (config, new_value)
+> +            print("+%s %s" % (config, new_value))
+>          else:
+> -            print " %s %s -> %s" % (config, value, new_value)
+> +            print(" %s %s -> %s" % (config, value, new_value))
+> 
+>  def main():
+>      global merge_style
+> 
+>      # parse command line args
+>      if ("-h" in sys.argv or "--help" in sys.argv):
+> -	usage()
+> +        usage()
+> 
+>      merge_style = 0
+>      if "-m" in sys.argv:
+> @@ -79,13 +79,13 @@ def main():
+> 
+>      argc = len(sys.argv)
+>      if not (argc==1 or argc == 3):
+> -        print "Error: incorrect number of arguments or unrecognized option"
+> +        print("Error: incorrect number of arguments or unrecognized option")
+>          usage()
+> 
+>      if argc == 1:
+>          # if no filenames given, assume .config and .config.old
+>          build_dir=""
+> -        if os.environ.has_key("KBUILD_OUTPUT"):
+> +        if 'KBUILD_OUTPUT' in os.environ:
+>              build_dir = os.environ["KBUILD_OUTPUT"]+"/"
+> 
+>          configa_filename = build_dir + ".config.old"
+> @@ -94,8 +94,8 @@ def main():
+>          configa_filename = sys.argv[1]
+>          configb_filename = sys.argv[2]
+> 
+> -    a = readconfig(file(configa_filename))
+> -    b = readconfig(file(configb_filename))
+> +    a = readconfig(open(configa_filename))
+> +    b = readconfig(open(configb_filename))
+> 
+>      # print items in a but not b (accumulate, sort and print)
+>      old = []
+> @@ -121,7 +121,7 @@ def main():
+> 
+>      # now print items in b but not in a
+>      # (items from b that were in a were removed above)
+> -    new = b.keys()
+> +    new = list(b.keys())
+>      new.sort()
+>      for config in new:
+>          print_config("+", config, None, b[config])
+> --
+> 1.7.9.5
