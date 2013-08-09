@@ -1,84 +1,117 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:58927 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756539Ab3HIMgc (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 9 Aug 2013 08:36:32 -0400
-Message-ID: <5204E24B.3090608@suse.cz>
-Date: Fri, 09 Aug 2013 14:36:27 +0200
-From: Michal Marek <mmarek@suse.cz>
+Received: from mail1.bemta3.messagelabs.com ([195.245.230.162]:48661 "EHLO
+	mail1.bemta3.messagelabs.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S967587Ab3HINSf (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 9 Aug 2013 09:18:35 -0400
+Date: Fri, 9 Aug 2013 15:13:12 +0200
+From: Johannes Thumshirn <johannes.thumshirn@men.de>
+Subject: [RESEND PATCH] kconfig: Make diffconfig work with Python 3
+Message-ID: <20130809131305.GA8898@jtlinux>
 MIME-Version: 1.0
-Subject: Re: [PATCH] kbuild: Allow scripts/* to be cross compiled
-References: <1376046432-12588-1-git-send-email-broonie@kernel.org>
-In-Reply-To: <1376046432-12588-1-git-send-email-broonie@kernel.org>
-Content-Type: text/plain; charset=ISO-8859-2
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: linaro-kernel@lists.linaro.org, linux-kbuild@vger.kernel.org, John Rigby <john.rigby@linaro.org>, Mark Brown <broonie@linaro.org>
+To: Tim Bird <tim.bird@am.sony.com>, Michal Marek <mmarek@suse.cz>
+Cc: Sam Ravnborg <sam@ravnborg.org>, linux-kernel@vger.kernel.org, Johannes Thumshirn <johannes.thumshirn@men.de>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On 9.8.2013 13:07, Mark Brown wrote:
-> From: John Rigby <john.rigby@linaro.org>
-> 
-> Cross compiling the binaries in scripts/* is not possible
-> because various makefiles assume that $(obj)/whatever is
-> executable on the build host.
+Adjust diffconfig to run cleanly on Python 3 (Tested with 3.3.2) and
+Python 2 (2.7.5)
 
-What is the use case for cross-compiling them? If you have a powerful
-enough target machine to build the kernel on it, you can as well compile
-the host scripts natively, can't you? But maybe I'm missing something, I
-do not cross-compile the kernel on a daily basis. Are there other
-projects that have such feature in their build system?
+Signed-off-by: Johannes Thumshirn <johannes.thumshirn@men.de>
+---
+ scripts/diffconfig |   26 +++++++++++++-------------
+ 1 file changed, 13 insertions(+), 13 deletions(-)
 
+diff --git a/scripts/diffconfig b/scripts/diffconfig
+index b91f3e3..dd0e75b 100755
+--- a/scripts/diffconfig
++++ b/scripts/diffconfig
+@@ -10,7 +10,7 @@
+ import sys, os
 
-> This patch introduces a new variable called KBUILD_SCRIPTROOT
-> that points to script/binaries to use while cross compiling.
-> 
-> Usage:
-> 
-> Build scripts for the build host:
-> 	make O=path/to/buildhost/buildscripts \
-> 		silentoldconfig prepare scripts
-> Then cross build script for target:
-> 	make O=path/to/target/buildscripts \
-> 		HOSTCC=$CROSS_COMPILE \
-> 		KBUILD_SCRIPTROOT=path/to/buildhost/buildscripts
-> 		silentoldconfig prepare scripts
+ def usage():
+-    print """Usage: diffconfig [-h] [-m] [<config1> <config2>]
++    print ("""Usage: diffconfig [-h] [-m] [<config1> <config2>]
 
-Note that a build that uses KBUILD_SCRIPTROOT cannot detect if the
-scripts are up to date and cannot rebuild them. This must be documented.
+ Diffconfig is a simple utility for comparing two .config files.
+ Using standard diff to compare .config files often includes extraneous and
+@@ -33,7 +33,7 @@ Example usage:
+  EXT2_FS  y -> n
+  LOG_BUF_SHIFT  14 -> 16
+  PRINTK_TIME  n -> y
+-"""
++""")
+     sys.exit(0)
 
+ # returns a dictionary of name/value pairs for config items in the file
+@@ -54,23 +54,23 @@ def print_config(op, config, value, new_value):
+     if merge_style:
+         if new_value:
+             if new_value=="n":
+-                print "# CONFIG_%s is not set" % config
++                print("# CONFIG_%s is not set" % config)
+             else:
+-                print "CONFIG_%s=%s" % (config, new_value)
++                print("CONFIG_%s=%s" % (config, new_value))
+     else:
+         if op=="-":
+-            print "-%s %s" % (config, value)
++            print("-%s %s" % (config, value))
+         elif op=="+":
+-            print "+%s %s" % (config, new_value)
++            print("+%s %s" % (config, new_value))
+         else:
+-            print " %s %s -> %s" % (config, value, new_value)
++            print(" %s %s -> %s" % (config, value, new_value))
 
-> This patch does not use KBUILD_SCRIPTROOT for all script invocations
-> it only redefines the following if KBUILD_SCRIPTROOT is defined.
-> 
-> scripts/Makefile.build
-> 	scripts/basic/fixdep --> $(KBUILD_SCRIPTROOT)/scripts/basic/fixdep
-> 
-> scripts/kconfig/Makefile
-> 	$(obj)/conf --> $(KBUILD_SCRIPTROOT)/scripts/kconfig/conf
-> 
-> scripts/mod/Makefile
-> 	$(obj)mk_elfconfig --> $(KBUILD_SCRIPTROOT)/scripts/mod/mk_elfconfig
+ def main():
+     global merge_style
 
-OK, but you might need to add a couple of more of them, like
-lib/gen_crc32table.
+     # parse command line args
+     if ("-h" in sys.argv or "--help" in sys.argv):
+-	usage()
++        usage()
 
+     merge_style = 0
+     if "-m" in sys.argv:
+@@ -79,13 +79,13 @@ def main():
 
-> diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-> index 547e15d..09aa90c 100644
-> --- a/scripts/Kbuild.include
-> +++ b/scripts/Kbuild.include
-> @@ -222,11 +222,15 @@ if_changed = $(if $(strip $(any-prereq) $(arg-check)),                       \
->  	$(echo-cmd) $(cmd_$(1));                                             \
->  	echo 'cmd_$@ := $(make-cmd)' > $(dot-target).cmd)
->  
-> +ifeq ($(KBUILD_SCRIPTROOT),)
-> +KBUILD_SCRIPTROOT=.
-> +endif
-> +
+     argc = len(sys.argv)
+     if not (argc==1 or argc == 3):
+-        print "Error: incorrect number of arguments or unrecognized option"
++        print("Error: incorrect number of arguments or unrecognized option")
+         usage()
 
-This should be set in the top level Makefile once.
+     if argc == 1:
+         # if no filenames given, assume .config and .config.old
+         build_dir=""
+-        if os.environ.has_key("KBUILD_OUTPUT"):
++        if 'KBUILD_OUTPUT' in os.environ:
+             build_dir = os.environ["KBUILD_OUTPUT"]+"/"
 
-Thanks,
-Michal
+         configa_filename = build_dir + ".config.old"
+@@ -94,8 +94,8 @@ def main():
+         configa_filename = sys.argv[1]
+         configb_filename = sys.argv[2]
+
+-    a = readconfig(file(configa_filename))
+-    b = readconfig(file(configb_filename))
++    a = readconfig(open(configa_filename))
++    b = readconfig(open(configb_filename))
+
+     # print items in a but not b (accumulate, sort and print)
+     old = []
+@@ -121,7 +121,7 @@ def main():
+
+     # now print items in b but not in a
+     # (items from b that were in a were removed above)
+-    new = b.keys()
++    new = list(b.keys())
+     new.sort()
+     for config in new:
+         print_config("+", config, None, b[config])
+--
+1.7.9.5
+
