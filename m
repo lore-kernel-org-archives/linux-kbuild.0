@@ -1,91 +1,226 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from haggis.pcug.org.au ([203.10.76.10]:33713 "EHLO
-	members.tip.net.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S966520Ab3HHX6a (ORCPT
+Received: from cassiel.sirena.org.uk ([80.68.93.111]:49839 "EHLO
+	cassiel.sirena.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S967624Ab3HILJ6 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 8 Aug 2013 19:58:30 -0400
-Date: Fri, 9 Aug 2013 09:58:17 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-Subject: Re: linux-next: build failure after merge of the ext4 tree
-Message-Id: <20130809095817.4fafdf8cb64428ea062a19b7@canb.auug.org.au>
-In-Reply-To: <20130808215449.GD3282@free.fr>
-References: <20130729110816.12958c3a26400f444a9a5012@canb.auug.org.au>
-	<CA+icZUUt4domktYZZn0Qp3BZoSFqmKic4qSnVP4cuTKwUww_=A@mail.gmail.com>
-	<20130807153840.4f2997b603397c07aca98b2d@canb.auug.org.au>
-	<87zjsted0c.fsf@linaro.org>
-	<20130808102228.d2034d3a4c986d2970926ab9@canb.auug.org.au>
-	<20130808103614.a039da2f236154b52329b28b@canb.auug.org.au>
-	<20130808191650.GB3282@free.fr>
-	<20130808215449.GD3282@free.fr>
-Mime-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature";
- micalg="PGP-SHA256";
- boundary="Signature=_Fri__9_Aug_2013_09_58_17_+1000_ca.4epyt/2pxOUE."
+	Fri, 9 Aug 2013 07:09:58 -0400
+From: Mark Brown <broonie@kernel.org>
+Date: Fri,  9 Aug 2013 12:07:12 +0100
+Message-Id: <1376046432-12588-1-git-send-email-broonie@kernel.org>
+Subject: [PATCH] kbuild: Allow scripts/* to be cross compiled
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: Steven Rostedt <rostedt@goodmis.org>, Michal Marek <mmarek@suse.cz>, Kevin Hilman <khilman@linaro.org>, sedat.dilek@gmail.com, Theodore Ts'o <tytso@mit.edu>, linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, Linux kbuild ML <linux-kbuild@vger.kernel.org>
+To: Michal Marek <mmarek@suse.cz>
+Cc: linaro-kernel@lists.linaro.org, linux-kbuild@vger.kernel.org, John Rigby <john.rigby@linaro.org>, Mark Brown <broonie@linaro.org>
 
---Signature=_Fri__9_Aug_2013_09_58_17_+1000_ca.4epyt/2pxOUE.
-Content-Type: text/plain; charset=US-ASCII
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+From: John Rigby <john.rigby@linaro.org>
 
-Hi Yann,
+Cross compiling the binaries in scripts/* is not possible
+because various makefiles assume that $(obj)/whatever is
+executable on the build host.
 
-On Thu, 8 Aug 2013 23:54:49 +0200 "Yann E. MORIN" <yann.morin.1998@free.fr>=
- wrote:
->
-> Ok, I've had a look in the linux-next archives, and I think I got it.
-> Is the following right?
->=20
->     git clean -d; git clean -dX     # To be sure tree is clean
->     touch empty
->     make KCONFIG_ALLCONFIG=3Dempty allmodconfig
->     grep MODULES .config
->     $ CONFIG_MODULES is not set
+This patch introduces a new variable called KBUILD_SCRIPTROOT
+that points to script/binaries to use while cross compiling.
 
-Yes, that is what I am seeing.
+Usage:
 
-> If so, I think I found the reason: the modules symbol is _always_ set to
-> being valid as soon as KCONFIG_ALLCONFIG is read, even if it was not
-> present in that file.
->=20
-> Since it is set to be valid, the following change means it is not
-> affected another value later on.
->=20
-> So, I wonder what the best option is:
->   1- revert the following, and find another solution,
->   2- de-specialise the modules symbol,
->   3- or further specialise the modules symbol.
->=20
-> I'd be inclined to go for 1, but I have no straightforward idea so far.
-> It's late here, so I'll look more thouroughly this WE.
+Build scripts for the build host:
+	make O=path/to/buildhost/buildscripts \
+		silentoldconfig prepare scripts
+Then cross build script for target:
+	make O=path/to/target/buildscripts \
+		HOSTCC=$CROSS_COMPILE \
+		KBUILD_SCRIPTROOT=path/to/buildhost/buildscripts
+		silentoldconfig prepare scripts
 
-Thanks.
---=20
-Cheers,
-Stephen Rothwell                    sfr@canb.auug.org.au
+This patch does not use KBUILD_SCRIPTROOT for all script invocations
+it only redefines the following if KBUILD_SCRIPTROOT is defined.
 
---Signature=_Fri__9_Aug_2013_09_58_17_+1000_ca.4epyt/2pxOUE.
-Content-Type: application/pgp-signature
+scripts/Makefile.build
+	scripts/basic/fixdep --> $(KBUILD_SCRIPTROOT)/scripts/basic/fixdep
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.20 (GNU/Linux)
+scripts/kconfig/Makefile
+	$(obj)/conf --> $(KBUILD_SCRIPTROOT)/scripts/kconfig/conf
 
-iQIcBAEBCAAGBQJSBDCeAAoJEECxmPOUX5FEqEsP/jq8vB7El1WhsydZeVb/YpYX
-PR/14PAEgXnRW4Fy4YDYUK49ZQKk2uFZg920EcNgvfBZ2sh2LE/7hOMIEMFrFlvk
-7iyyjZxebgWRqXJHf0Eu69qTnPOI++DXd0kqtnWr0DrCM9hSlKsakqFvVsRuP7hu
-AeXQKRvU2TMWIIlwXQDaB3C64ovfUysAX4nkSgu+U2lokQBT0cQFURWe14txCoLv
-EKeZ8RVgrmIvU18SlzzZE5RCNq1gxCRuRCyQQVF9PH3coEvXNWpYuet4IP+Ibb/B
-m5L8r0hShzKHLWsUV9oGrXTAPnr/UTtCxOLg9qJcl5+cWBzTtJCtaoyMo9+le3CS
-6GoS5NM5hBOmPdMDwNHCuI5+EIkxJ9rkkYlAxFU5/SXFVJU+QCWOnRZNoL+0yPnM
-VVpNNbloIS2fQJ/1bPR396pZ0/PXm8wJv1fPvCYcv+ICNdCfkB6qxFH/cvTN/TRl
-glepNgeE+8qkLweBVr00DfNCUImtiUrPMG4NlCXXaCOr0LQzF96ZHrmqH55wcJEb
-2//e6ppoxHcMHP9yhSbgMA/asZMeL57mH2h/0vp3eVqc84cH/oc4LeljKDagDenm
-TPyAVneNzrfT373wKfwba97BGTEOQL3n20oe8Qrn2BtdhWAmVBgd9Q41AHHz5p02
-lHxt9mNGGjo8irzL1poT
-=qjz5
------END PGP SIGNATURE-----
+scripts/mod/Makefile
+	$(obj)mk_elfconfig --> $(KBUILD_SCRIPTROOT)/scripts/mod/mk_elfconfig
 
---Signature=_Fri__9_Aug_2013_09_58_17_+1000_ca.4epyt/2pxOUE.--
+Signed-off-by: John Rigby <john.rigby@linaro.org>
+Signed-off-by: Mark Brown <broonie@linaro.org>
+---
+ scripts/Kbuild.include   |  6 +++++-
+ scripts/Makefile.build   |  6 +++++-
+ scripts/kconfig/Makefile | 30 ++++++++++++++++++------------
+ scripts/mod/Makefile     | 10 ++++++++--
+ 4 files changed, 36 insertions(+), 16 deletions(-)
+
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index 547e15d..09aa90c 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -222,11 +222,15 @@ if_changed = $(if $(strip $(any-prereq) $(arg-check)),                       \
+ 	$(echo-cmd) $(cmd_$(1));                                             \
+ 	echo 'cmd_$@ := $(make-cmd)' > $(dot-target).cmd)
+ 
++ifeq ($(KBUILD_SCRIPTROOT),)
++KBUILD_SCRIPTROOT=.
++endif
++
+ # Execute the command and also postprocess generated .d dependencies file.
+ if_changed_dep = $(if $(strip $(any-prereq) $(arg-check) ),                  \
+ 	@set -e;                                                             \
+ 	$(echo-cmd) $(cmd_$(1));                                             \
+-	scripts/basic/fixdep $(depfile) $@ '$(make-cmd)' > $(dot-target).tmp;\
++	$(KBUILD_SCRIPTROOT)/scripts/basic/fixdep $(depfile) $@ '$(make-cmd)' > $(dot-target).tmp;\
+ 	rm -f $(depfile);                                                    \
+ 	mv -f $(dot-target).tmp $(dot-target).cmd)
+ 
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index d5d859c..de35192 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -291,13 +291,17 @@ cmd_record_mcount = 						\
+ 	fi;
+ endif
+ 
++ifeq ($(KBUILD_SCRIPTROOT),)
++KBUILD_SCRIPTROOT=.
++endif
++
+ define rule_cc_o_c
+ 	$(call echo-cmd,checksrc) $(cmd_checksrc)			  \
+ 	$(call echo-cmd,cc_o_c) $(cmd_cc_o_c);				  \
+ 	$(cmd_modversions)						  \
+ 	$(call echo-cmd,record_mcount)					  \
+ 	$(cmd_record_mcount)						  \
+-	scripts/basic/fixdep $(depfile) $@ '$(call make-cmd,cc_o_c)' >    \
++	$(KBUILD_SCRIPTROOT)/scripts/basic/fixdep $(depfile) $@ '$(call make-cmd,cc_o_c)' >    \
+ 	                                              $(dot-target).tmp;  \
+ 	rm -f $(depfile);						  \
+ 	mv -f $(dot-target).tmp $(dot-target).cmd
+diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+index 844bc9d..c58f912 100644
+--- a/scripts/kconfig/Makefile
++++ b/scripts/kconfig/Makefile
+@@ -14,6 +14,12 @@ endif
+ # We need this, in case the user has it in its environment
+ unexport CONFIG_
+ 
++ifdef KBUILD_SCRIPTROOT
++CONF = $(KBUILD_SCRIPTROOT)/scripts/kconfig/conf
++else
++CONF = $(obj)/conf
++endif
++
+ xconfig: $(obj)/qconf
+ 	$< $(Kconfig)
+ 
+@@ -23,31 +29,31 @@ gconfig: $(obj)/gconf
+ menuconfig: $(obj)/mconf
+ 	$< $(Kconfig)
+ 
+-config: $(obj)/conf
++config: $(CONF)
+ 	$< --oldaskconfig $(Kconfig)
+ 
+ nconfig: $(obj)/nconf
+ 	$< $(Kconfig)
+ 
+-oldconfig: $(obj)/conf
++oldconfig: $(CONF)
+ 	$< --$@ $(Kconfig)
+ 
+-silentoldconfig: $(obj)/conf
++silentoldconfig: $(CONF)
+ 	$(Q)mkdir -p include/generated
+ 	$< --$@ $(Kconfig)
+ 
+-localyesconfig localmodconfig: $(obj)/streamline_config.pl $(obj)/conf
++localyesconfig localmodconfig: $(obj)/streamline_config.pl $(CONF)
+ 	$(Q)mkdir -p include/generated
+ 	$(Q)perl $< --$@ $(srctree) $(Kconfig) > .tmp.config
+ 	$(Q)if [ -f .config ]; then 					\
+ 			cmp -s .tmp.config .config ||			\
+ 			(mv -f .config .config.old.1;			\
+ 			 mv -f .tmp.config .config;			\
+-			 $(obj)/conf --silentoldconfig $(Kconfig);	\
++			 $(CONF) --silentoldconfig $(Kconfig);	\
+ 			 mv -f .config.old.1 .config.old)		\
+ 	else								\
+ 			mv -f .tmp.config .config;			\
+-			$(obj)/conf --silentoldconfig $(Kconfig);	\
++			$(CONF) --silentoldconfig $(Kconfig);	\
+ 	fi
+ 	$(Q)rm -f .tmp.config
+ 
+@@ -76,24 +82,24 @@ update-po-config: $(obj)/kxgettext $(obj)/gconf.glade.h
+ 
+ PHONY += allnoconfig allyesconfig allmodconfig alldefconfig randconfig
+ 
+-allnoconfig allyesconfig allmodconfig alldefconfig randconfig: $(obj)/conf
++allnoconfig allyesconfig allmodconfig alldefconfig randconfig: $(CONF)
+ 	$< --$@ $(Kconfig)
+ 
+ PHONY += listnewconfig olddefconfig oldnoconfig savedefconfig defconfig
+ 
+-listnewconfig olddefconfig: $(obj)/conf
++listnewconfig olddefconfig: $(CONF)
+ 	$< --$@ $(Kconfig)
+ 
+ # oldnoconfig is an alias of olddefconfig, because people already are dependent
+ # on its behavior(sets new symbols to their default value but not 'n') with the
+ # counter-intuitive name.
+-oldnoconfig: $(obj)/conf
++oldnoconfig: $(CONF)
+ 	$< --olddefconfig $(Kconfig)
+ 
+-savedefconfig: $(obj)/conf
++savedefconfig: $(CONF)
+ 	$< --$@=defconfig $(Kconfig)
+ 
+-defconfig: $(obj)/conf
++defconfig: $(CONF)
+ ifeq ($(KBUILD_DEFCONFIG),)
+ 	$< --defconfig $(Kconfig)
+ else
+@@ -101,7 +107,7 @@ else
+ 	$(Q)$< --defconfig=arch/$(SRCARCH)/configs/$(KBUILD_DEFCONFIG) $(Kconfig)
+ endif
+ 
+-%_defconfig: $(obj)/conf
++%_defconfig: $(CONF)
+ 	$(Q)$< --defconfig=arch/$(SRCARCH)/configs/$@ $(Kconfig)
+ 
+ # Help text used by make help
+diff --git a/scripts/mod/Makefile b/scripts/mod/Makefile
+index c11212f..8967d55 100644
+--- a/scripts/mod/Makefile
++++ b/scripts/mod/Makefile
+@@ -1,6 +1,12 @@
+ hostprogs-y	:= modpost mk_elfconfig
+ always		:= $(hostprogs-y) empty.o
+ 
++ifdef KBUILD_SCRIPTROOT
++MKELFCONFIG = $(KBUILD_SCRIPTROOT)/scripts/mod/mk_elfconfig
++else
++MKELFCONFIG = $(obj)/mk_elfconfig
++endif
++
+ modpost-objs	:= modpost.o file2alias.o sumversion.o
+ 
+ devicetable-offsets-file := devicetable-offsets.h
+@@ -40,9 +46,9 @@ $(obj)/modpost.o $(obj)/file2alias.o $(obj)/sumversion.o: $(obj)/elfconfig.h
+ $(obj)/file2alias.o: $(obj)/$(devicetable-offsets-file)
+ 
+ quiet_cmd_elfconfig = MKELF   $@
+-      cmd_elfconfig = $(obj)/mk_elfconfig < $< > $@
++      cmd_elfconfig = $(MKELFCONFIG) < $< > $@
+ 
+-$(obj)/elfconfig.h: $(obj)/empty.o $(obj)/mk_elfconfig FORCE
++$(obj)/elfconfig.h: $(obj)/empty.o $(MKELFCONFIG) FORCE
+ 	$(call if_changed,elfconfig)
+ 
+ targets += elfconfig.h
+-- 
+1.8.4.rc1
+
