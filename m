@@ -1,164 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:29935 "EHLO mga09.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S934350Ab3HIQDc (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 9 Aug 2013 12:03:32 -0400
-From: Andi Kleen <andi@firstfloor.org>
-Subject: [PATCH 1/3] kallsyms/kbuild: Remove relocations from kallsyms table
-Date: Fri,  9 Aug 2013 09:03:17 -0700
-Message-Id: <1376064199-8296-2-git-send-email-andi@firstfloor.org>
-In-Reply-To: <1376064199-8296-1-git-send-email-andi@firstfloor.org>
-References: <1376064199-8296-1-git-send-email-andi@firstfloor.org>
+Received: from cassiel.sirena.org.uk ([80.68.93.111]:43527 "EHLO
+	cassiel.sirena.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933806Ab3HIQIk (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 9 Aug 2013 12:08:40 -0400
+Date: Fri, 9 Aug 2013 17:08:17 +0100
+From: Mark Brown <broonie@kernel.org>
+Message-ID: <20130809160817.GG6427@sirena.org.uk>
+References: <1376046432-12588-1-git-send-email-broonie@kernel.org>
+ <20130809123251.GB5794@merkur.ravnborg.org>
+ <20130809150031.GE6427@sirena.org.uk>
+ <20130809151346.GA6021@merkur.ravnborg.org>
+ <20130809152748.GF6427@sirena.org.uk>
+ <52050C4B.2060606@suse.cz>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="+WIyXkGFHMyqo73g"
+Content-Disposition: inline
+In-Reply-To: <52050C4B.2060606@suse.cz>
+Subject: Re: [PATCH] kbuild: Allow scripts/* to be cross compiled
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, david.daney@cavium.com, Andi Kleen <ak@linux.intel.com>
+To: Michal Marek <mmarek@suse.cz>
+Cc: Sam Ravnborg <sam@ravnborg.org>, linaro-kernel@lists.linaro.org, linux-kbuild@vger.kernel.org, John Rigby <john.rigby@linaro.org>, Andrey Konovalov <andrey.konovalov@linaro.org>
 
-From: Andi Kleen <ak@linux.intel.com>
 
-Remove the ELF relocations from the kallsyms_address[] table.
-Instead we just store offsets to _text and relocate that while
-accessing the kallsyms table. This is done with a new
-kallsyms_offsets[] table. With these changes .tmp_kallsyms*.o
-becomes relocation free.
+--+WIyXkGFHMyqo73g
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-This allows various optimizations further on.
+On Fri, Aug 09, 2013 at 05:35:39PM +0200, Michal Marek wrote:
+> On 9.8.2013 17:27, Mark Brown wrote:
 
-Signed-off-by: Andi Kleen <ak@linux.intel.com>
----
- kernel/kallsyms.c  | 27 ++++++++++++++++-----------
- scripts/kallsyms.c | 18 ++++++------------
- 2 files changed, 22 insertions(+), 23 deletions(-)
+> > ie, we can cross build the kernel but not fixdep, conf or mk_elfconfig
+> > since those are assumed to be runnable for the kernel build, meaning
+> > they can't be deployed onto a target system without hoop jumping.
 
-diff --git a/kernel/kallsyms.c b/kernel/kallsyms.c
-index 3127ad5..e7d7844 100644
---- a/kernel/kallsyms.c
-+++ b/kernel/kallsyms.c
-@@ -36,7 +36,7 @@
-  * These will be re-linked against their real values
-  * during the second link stage.
-  */
--extern const unsigned long kallsyms_addresses[] __attribute__((weak));
-+extern const long kallsyms_offsets[] __attribute__((weak));
- extern const u8 kallsyms_names[] __attribute__((weak));
- 
- /*
-@@ -51,6 +51,11 @@ extern const u16 kallsyms_token_index[] __attribute__((weak));
- 
- extern const unsigned long kallsyms_markers[] __attribute__((weak));
- 
-+static inline unsigned long kallsyms_address(int ind)
-+{
-+	return (unsigned long)RELOC_HIDE(&_text, kallsyms_offsets[ind]);
-+}
-+
- static inline int is_kernel_inittext(unsigned long addr)
- {
- 	if (addr >= (unsigned long)_sinittext
-@@ -186,7 +191,7 @@ unsigned long kallsyms_lookup_name(const char *name)
- 		off = kallsyms_expand_symbol(off, namebuf, ARRAY_SIZE(namebuf));
- 
- 		if (strcmp(namebuf, name) == 0)
--			return kallsyms_addresses[i];
-+			return kallsyms_address(i);
- 	}
- 	return module_kallsyms_lookup_name(name);
- }
-@@ -203,7 +208,7 @@ int kallsyms_on_each_symbol(int (*fn)(void *, const char *, struct module *,
- 
- 	for (i = 0, off = 0; i < kallsyms_num_syms; i++) {
- 		off = kallsyms_expand_symbol(off, namebuf, ARRAY_SIZE(namebuf));
--		ret = fn(data, namebuf, NULL, kallsyms_addresses[i]);
-+		ret = fn(data, namebuf, NULL, kallsyms_address(i));
- 		if (ret != 0)
- 			return ret;
- 	}
-@@ -219,15 +224,15 @@ static unsigned long get_symbol_pos(unsigned long addr,
- 	unsigned long i, low, high, mid;
- 
- 	/* This kernel should never had been booted. */
--	BUG_ON(!kallsyms_addresses);
-+	BUG_ON(!kallsyms_offsets);
- 
--	/* Do a binary search on the sorted kallsyms_addresses array. */
-+	/* Do a binary search on the sorted kallsyms_offsets array. */
- 	low = 0;
- 	high = kallsyms_num_syms;
- 
- 	while (high - low > 1) {
- 		mid = low + (high - low) / 2;
--		if (kallsyms_addresses[mid] <= addr)
-+		if (kallsyms_address(mid) <= addr)
- 			low = mid;
- 		else
- 			high = mid;
-@@ -237,15 +242,15 @@ static unsigned long get_symbol_pos(unsigned long addr,
- 	 * Search for the first aliased symbol. Aliased
- 	 * symbols are symbols with the same address.
- 	 */
--	while (low && kallsyms_addresses[low-1] == kallsyms_addresses[low])
-+	while (low && kallsyms_address(low - 1) == kallsyms_address(low))
- 		--low;
- 
--	symbol_start = kallsyms_addresses[low];
-+	symbol_start = kallsyms_address(low);
- 
- 	/* Search for next non-aliased symbol. */
- 	for (i = low + 1; i < kallsyms_num_syms; i++) {
--		if (kallsyms_addresses[i] > symbol_start) {
--			symbol_end = kallsyms_addresses[i];
-+		if (kallsyms_address(i) > symbol_start) {
-+			symbol_end = kallsyms_address(i);
- 			break;
- 		}
- 	}
-@@ -469,7 +474,7 @@ static unsigned long get_ksymbol_core(struct kallsym_iter *iter)
- 	unsigned off = iter->nameoff;
- 
- 	iter->module_name[0] = '\0';
--	iter->value = kallsyms_addresses[iter->pos];
-+	iter->value = kallsyms_address(iter->pos);
- 
- 	iter->type = kallsyms_get_symbol_type(off);
- 
-diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
-index 487ac6f..38c8ede 100644
---- a/scripts/kallsyms.c
-+++ b/scripts/kallsyms.c
-@@ -180,7 +180,7 @@ static int symbol_valid(struct sym_entry *s)
- 	 * specified so exclude them to get a stable symbol list.
- 	 */
- 	static char *special_symbols[] = {
--		"kallsyms_addresses",
-+		"kallsyms_offsets",
- 		"kallsyms_num_syms",
- 		"kallsyms_names",
- 		"kallsyms_markers",
-@@ -309,19 +309,13 @@ static void write_src(void)
- 	 * symbols that are declared static and are private to their
- 	 * .o files.  This prevents .tmp_kallsyms.o or any other
- 	 * object from referencing them.
-+	 *
-+	 * We do the offsets to _text now in kallsyms.c at runtime,
-+	 * to get a relocationless symbol table.
- 	 */
--	output_label("kallsyms_addresses");
-+	output_label("kallsyms_offsets");
- 	for (i = 0; i < table_cnt; i++) {
--		if (toupper(table[i].sym[0]) != 'A') {
--			if (_text <= table[i].addr)
--				printf("\tPTR\t_text + %#llx\n",
--					table[i].addr - _text);
--			else
--				printf("\tPTR\t_text - %#llx\n",
--					_text - table[i].addr);
--		} else {
--			printf("\tPTR\t%#llx\n", table[i].addr);
--		}
-+		printf("\tPTR\t%#llx\n", table[i].addr - _text);
- 	}
- 	printf("\n");
- 
--- 
-1.8.3.1
+> OK, but what what do you need cross compile them and deploy on the
+> target? Their job is to build the kernel. So if you are going to build
+> the kernel on the target, you can also build the tools there, can't you?
+> Or are you using the tools from something else than building the kernel?
 
+> I think that we are missing some detail of your use case and it does not
+> make sense without that detail.
+
+Well, fixdep in particular seems like a generically useful thing that
+you might want installed but in general I agree - Andrey, why are we
+carrying this patch?
+
+--+WIyXkGFHMyqo73g
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.20 (GNU/Linux)
+
+iQIcBAEBAgAGBQJSBRPuAAoJELSic+t+oim9dIsP/1YQdp/gvxaIqfK7Yu++yAYe
+3k0F0BaHG8Vs1MrLpWpvu8GtJqvJTYYD/PC8a9snFJjjwRQfZI76u43az57k/uRG
+tWk9LPGWveoBoehX6m7La4QphMk3g+Tdu1QK7Y+Fh7UpQSu4Pespqv14w2aLYvq3
+ML1LRPn7G1ATgIPmM4llP17XnrM1iXtZky9BiP+oI4m69kZ30CYfssR2Fvj3a6QZ
+NTgh7nS0qsH8DwmgNq8SUv7L98Ik/IqBZgms38V/z7KeNcZM3boSQyPkMLjpWcWR
+RtdgDklMJRbOhDWIU5Inzpf51qGP9GsGIx5SxExks3ay4tkEg1lkUT8oqS4IF56w
+45SnYqutvUGcF2/OnCSexYJeGvLCEDC0lIvh5uscjhJBP3AnEV/PI4VmlRTadxce
+fP8ebEvMMTbx4Orjko7FpXfqxFEOlmiNyFjFNuReqDbOjppUBZxN3nmeXqXKuZZ3
+pjnVeCYuO2jVvb2xS6BE9tGfsMUZXZJzTqp8M3WAPhP135KUTSFwe7bfnOtUeUud
+v2zUb7d+NDDUSINefVp6V7pbf9i1uS+4N9PalDMOSD4MB5QwgLaGS70Mqf6F4bLF
+IHqtGZo3e71ljLsTGwTo/Xr6qJkurk2t7JLDhx428D36I2TCytUsE/7KiHShgVV+
+u6Fc9mzXe8lTUtbW9Kdt
+=3Pjl
+-----END PGP SIGNATURE-----
+
+--+WIyXkGFHMyqo73g--
