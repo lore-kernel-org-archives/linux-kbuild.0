@@ -1,117 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail1.bemta3.messagelabs.com ([195.245.230.162]:48661 "EHLO
-	mail1.bemta3.messagelabs.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S967587Ab3HINSf (ORCPT
+Received: from cassiel.sirena.org.uk ([80.68.93.111]:40279 "EHLO
+	cassiel.sirena.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933949Ab3HIPAg (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 9 Aug 2013 09:18:35 -0400
-Date: Fri, 9 Aug 2013 15:13:12 +0200
-From: Johannes Thumshirn <johannes.thumshirn@men.de>
-Subject: [RESEND PATCH] kconfig: Make diffconfig work with Python 3
-Message-ID: <20130809131305.GA8898@jtlinux>
+	Fri, 9 Aug 2013 11:00:36 -0400
+Date: Fri, 9 Aug 2013 16:00:31 +0100
+From: Mark Brown <broonie@kernel.org>
+Message-ID: <20130809150031.GE6427@sirena.org.uk>
+References: <1376046432-12588-1-git-send-email-broonie@kernel.org>
+ <20130809123251.GB5794@merkur.ravnborg.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="4Cp72eN6HUuZZoDF"
 Content-Disposition: inline
+In-Reply-To: <20130809123251.GB5794@merkur.ravnborg.org>
+Subject: Re: [PATCH] kbuild: Allow scripts/* to be cross compiled
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Tim Bird <tim.bird@am.sony.com>, Michal Marek <mmarek@suse.cz>
-Cc: Sam Ravnborg <sam@ravnborg.org>, linux-kernel@vger.kernel.org, Johannes Thumshirn <johannes.thumshirn@men.de>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Michal Marek <mmarek@suse.cz>, linaro-kernel@lists.linaro.org, linux-kbuild@vger.kernel.org, John Rigby <john.rigby@linaro.org>
 
-Adjust diffconfig to run cleanly on Python 3 (Tested with 3.3.2) and
-Python 2 (2.7.5)
 
-Signed-off-by: Johannes Thumshirn <johannes.thumshirn@men.de>
----
- scripts/diffconfig |   26 +++++++++++++-------------
- 1 file changed, 13 insertions(+), 13 deletions(-)
+--4Cp72eN6HUuZZoDF
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-diff --git a/scripts/diffconfig b/scripts/diffconfig
-index b91f3e3..dd0e75b 100755
---- a/scripts/diffconfig
-+++ b/scripts/diffconfig
-@@ -10,7 +10,7 @@
- import sys, os
+On Fri, Aug 09, 2013 at 02:32:51PM +0200, Sam Ravnborg wrote:
+> On Fri, Aug 09, 2013 at 12:07:12PM +0100, Mark Brown wrote:
+> > From: John Rigby <john.rigby@linaro.org>
 
- def usage():
--    print """Usage: diffconfig [-h] [-m] [<config1> <config2>]
-+    print ("""Usage: diffconfig [-h] [-m] [<config1> <config2>]
+> > Cross compiling the binaries in scripts/* is not possible
+> > because various makefiles assume that $(obj)/whatever is
+> > executable on the build host.
 
- Diffconfig is a simple utility for comparing two .config files.
- Using standard diff to compare .config files often includes extraneous and
-@@ -33,7 +33,7 @@ Example usage:
-  EXT2_FS  y -> n
-  LOG_BUF_SHIFT  14 -> 16
-  PRINTK_TIME  n -> y
--"""
-+""")
-     sys.exit(0)
+> Please explain what problem you are trying to solve with this.
+> I do not understand the rationale behind this patch from the above.
 
- # returns a dictionary of name/value pairs for config items in the file
-@@ -54,23 +54,23 @@ def print_config(op, config, value, new_value):
-     if merge_style:
-         if new_value:
-             if new_value=="n":
--                print "# CONFIG_%s is not set" % config
-+                print("# CONFIG_%s is not set" % config)
-             else:
--                print "CONFIG_%s=%s" % (config, new_value)
-+                print("CONFIG_%s=%s" % (config, new_value))
-     else:
-         if op=="-":
--            print "-%s %s" % (config, value)
-+            print("-%s %s" % (config, value))
-         elif op=="+":
--            print "+%s %s" % (config, new_value)
-+            print("+%s %s" % (config, new_value))
-         else:
--            print " %s %s -> %s" % (config, value, new_value)
-+            print(" %s %s -> %s" % (config, value, new_value))
+OK...  I'd have thought that cross compliation was enough of a rationale
+to be honest.
 
- def main():
-     global merge_style
+--4Cp72eN6HUuZZoDF
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
 
-     # parse command line args
-     if ("-h" in sys.argv or "--help" in sys.argv):
--	usage()
-+        usage()
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.20 (GNU/Linux)
 
-     merge_style = 0
-     if "-m" in sys.argv:
-@@ -79,13 +79,13 @@ def main():
+iQIcBAEBAgAGBQJSBQQMAAoJELSic+t+oim9kjoP/jidzAcuxzpGyH9YxrXl2JjJ
+93QfFzC9zR/mv70tMAgIIWKIJ1cy5KvYJjT9wUW7BH8XyGC8xiNk8xU4rnyXuZzE
+AkQHkordpD1VF/ljw5rSSw+uUD0xMUVAM+LiT4AB7nl/MsD0vJRh4MEg+V1T9/rR
+EHYfh0p88dGnl9Zt+GtvuSgrVTgFiKyjcz/F1ayQz1tj+/5fnALbWj067FO1xqqr
+JTy02zBvapYkLOzl8GmTNX1wxThipd1A0YCyaXR6a2nhS1/nAMY1hSsuXhe6L1OG
+j8IqvRXLA45kanesXfgxqGzgER2TbeTk3OkrUNAeDaTqqToofmB31ny5zsM95Nsz
+0LoLoUcJM6VRi7tG6UAWN4n2JFDHY0zHVxvP/3m/daYKmpkUCn1DONWnGkPvN+8x
+f+/e5e4eBLSoLZw3Nf1BLz0MKefd5JVS+jQRqCnwaVQXaSCLftD2ZcxlihhwhQB4
+8pgRV09uz28XUMHXWOdpxlemCCVKedXD2s0hbCFYV0QJ78BIjZgDJJ3LZh7vLpq2
+Wq8haABfNlQqxHMUsWOd1jySL7kAYjlC8hux9Q+KqHG/8JIQdeoyilyYyMHG46QG
+O8BMiVlI5244Enbtez0Ke0ZbEGMPUelw21mo0o00FQf8dj7PbqX71OG9h7KlNdzz
+pwY+gmbaB6qemTIk2/N3
+=JT+p
+-----END PGP SIGNATURE-----
 
-     argc = len(sys.argv)
-     if not (argc==1 or argc == 3):
--        print "Error: incorrect number of arguments or unrecognized option"
-+        print("Error: incorrect number of arguments or unrecognized option")
-         usage()
-
-     if argc == 1:
-         # if no filenames given, assume .config and .config.old
-         build_dir=""
--        if os.environ.has_key("KBUILD_OUTPUT"):
-+        if 'KBUILD_OUTPUT' in os.environ:
-             build_dir = os.environ["KBUILD_OUTPUT"]+"/"
-
-         configa_filename = build_dir + ".config.old"
-@@ -94,8 +94,8 @@ def main():
-         configa_filename = sys.argv[1]
-         configb_filename = sys.argv[2]
-
--    a = readconfig(file(configa_filename))
--    b = readconfig(file(configb_filename))
-+    a = readconfig(open(configa_filename))
-+    b = readconfig(open(configb_filename))
-
-     # print items in a but not b (accumulate, sort and print)
-     old = []
-@@ -121,7 +121,7 @@ def main():
-
-     # now print items in b but not in a
-     # (items from b that were in a were removed above)
--    new = b.keys()
-+    new = list(b.keys())
-     new.sort()
-     for config in new:
-         print_config("+", config, None, b[config])
---
-1.7.9.5
-
+--4Cp72eN6HUuZZoDF--
