@@ -1,62 +1,35 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:60444 "EHLO mga09.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1030857Ab3HITpe (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 9 Aug 2013 15:45:34 -0400
+Received: from one.firstfloor.org ([193.170.194.197]:34876 "EHLO
+	one.firstfloor.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1031414Ab3HIW5i (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 9 Aug 2013 18:57:38 -0400
+Date: Sat, 10 Aug 2013 00:57:36 +0200
 From: Andi Kleen <andi@firstfloor.org>
-Subject: [PATCH] Handle non ABS crc symbols
-Date: Fri,  9 Aug 2013 12:45:24 -0700
-Message-Id: <1376077524-27573-1-git-send-email-andi@firstfloor.org>
+Subject: 32bit allyesconfig on 64bit system broke
+Message-ID: <20130809225736.GG19750@two.firstfloor.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: akpm@linux-foundation.org
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Andi Kleen <ak@linux.intel.com>
+To: linux-kbuild@vger.kernel.org
 
-From: Andi Kleen <ak@linux.intel.com>
 
-For some reason I managed to trick gcc into create CRC symbols that
-are not absolute anymore, but weak.
+% linux32 make allyesconfig
+% head .config
+% head .config
+#
+# Automatically generated file; DO NOT EDIT.
+# Linux/x86 3.11.0-rc4 Kernel Configuration
+#
+CONFIG_64BIT=y
+CONFIG_X86_64=y
+CONFIG_X86=y
 
-Make modpost handle this case.
+This used to work to give me a 32bit allyesconfig.
+How am I supposed to do this now?
 
-Andrew, this should fix the bizarre warning. Seems like a toolchain
-bug to me.
+Thanks,
 
-Signed-off-by: Andi Kleen <ak@linux.intel.com>
----
- scripts/mod/modpost.c | 15 +++++++--------
- 1 file changed, 7 insertions(+), 8 deletions(-)
-
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 6216434..b3dd735 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -599,18 +599,17 @@ static void handle_modversions(struct module *mod, struct elf_info *info,
- 	else
- 		export = export_from_sec(info, get_secindex(info, sym));
- 
-+	/* CRC'd symbol */
-+	if (strncmp(symname, CRC_PFX, strlen(CRC_PFX)) == 0) {
-+		crc = (unsigned int) sym->st_value;
-+		sym_update_crc(symname + strlen(CRC_PFX), mod, crc,
-+				export);
-+	}
-+
- 	switch (sym->st_shndx) {
- 	case SHN_COMMON:
- 		warn("\"%s\" [%s] is COMMON symbol\n", symname, mod->name);
- 		break;
--	case SHN_ABS:
--		/* CRC'd symbol */
--		if (strncmp(symname, CRC_PFX, strlen(CRC_PFX)) == 0) {
--			crc = (unsigned int) sym->st_value;
--			sym_update_crc(symname + strlen(CRC_PFX), mod, crc,
--					export);
--		}
--		break;
- 	case SHN_UNDEF:
- 		/* undefined symbol */
- 		if (ELF_ST_BIND(sym->st_info) != STB_GLOBAL &&
--- 
-1.8.3.1
-
+-Andi
