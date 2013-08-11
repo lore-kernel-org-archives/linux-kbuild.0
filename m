@@ -1,53 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:37325 "EHLO mga11.intel.com"
+Received: from mout.gmx.net ([212.227.15.15]:64974 "EHLO mout.gmx.net"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751223Ab3HKAzy (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 10 Aug 2013 20:55:54 -0400
-From: Andi Kleen <andi@firstfloor.org>
-Subject: [PATCH 3/3] kprobes: Use KSYM_NAME_LEN to size identifier buffers
-Date: Sat, 10 Aug 2013 17:55:33 -0700
-Message-Id: <1376182533-17530-3-git-send-email-andi@firstfloor.org>
-In-Reply-To: <1376182533-17530-1-git-send-email-andi@firstfloor.org>
-References: <1376182533-17530-1-git-send-email-andi@firstfloor.org>
+	id S1754862Ab3HKTzx (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 11 Aug 2013 15:55:53 -0400
+Received: from Workstation4.fritz.box ([109.90.98.31]) by mail.gmx.com
+ (mrgmx102) with ESMTPSA (Nemesis) id 0MYtId-1VcUwG2ztz-00VhKG for
+ <linux-kbuild@vger.kernel.org>; Sun, 11 Aug 2013 21:55:51 +0200
+From: Heinrich Schuchardt <xypron.glpk@gmx.de>
+Subject: [PATCH] Provide version number for Debian firmware package
+Date: Sun, 11 Aug 2013 21:55:19 +0200
+Message-Id: <1376250919-13886-1-git-send-email-xypron.glpk@gmx.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: mmarek@suse.cz, linux-kbuild@vger.kernel.org, Joe Mario <jmario@redhat.com>, ananth@in.ibm.com, Andi Kleen <ak@linux.intel.com>
+To: mmarek@suse.cz
+Cc: linux-kbuild@vger.kernel.org, xypron.glpk@gmx.de
 
-From: Joe Mario <jmario@redhat.com>
+scripts/package/builddeb is used to create Debian packages.
+Currently the firmware package always gets the same version number
+irrespective of the Kernel version.
+The paths inside the firmware package depend on the Kernel
+version.
 
-Use KSYM_NAME_LEN to size identifier buffers, so that it can
-be easier increased.
+With the patch supplied the Kernel version becomes part of the
+Debian firmware package number.
 
-Cc: ananth@in.ibm.com
-Signed-off-by: Joe Mario <jmario@redhat.com>
-Signed-off-by: Andi Kleen <ak@linux.intel.com>
+Signed-off-by: Heinrich Schuchardt <xypron.glpk@gmx.de>
 ---
- kernel/kprobes.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ scripts/package/builddeb |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/kernel/kprobes.c b/kernel/kprobes.c
-index 6e33498..e174daf 100644
---- a/kernel/kprobes.c
-+++ b/kernel/kprobes.c
-@@ -2083,7 +2083,7 @@ static int __init init_kprobes(void)
- {
- 	int i, err = 0;
- 	unsigned long offset = 0, size = 0;
--	char *modname, namebuf[128];
-+	char *modname, namebuf[KSYM_NAME_LEN];
- 	const char *symbol_name;
- 	void *addr;
- 	struct kprobe_blackpoint *kb;
-@@ -2209,7 +2209,7 @@ static int __kprobes show_kprobe_addr(struct seq_file *pi, void *v)
- 	const char *sym = NULL;
- 	unsigned int i = *(loff_t *) v;
- 	unsigned long offset = 0;
--	char *modname, namebuf[128];
-+	char *modname, namebuf[KSYM_NAME_LEN];
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index acb8650..4ca6111 100644
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -79,7 +79,7 @@ fwdir="$objtree/debian/fwtmp"
+ kernel_headers_dir="$objtree/debian/hdrtmp"
+ libc_headers_dir="$objtree/debian/headertmp"
+ packagename=linux-image-$version
+-fwpackagename=linux-firmware-image
++fwpackagename=linux-firmware-image-$version
+ kernel_headers_packagename=linux-headers-$version
+ libc_headers_packagename=linux-libc-dev
  
- 	head = &kprobe_table[i];
- 	preempt_disable();
 -- 
-1.8.3.1
+1.7.10.4
 
