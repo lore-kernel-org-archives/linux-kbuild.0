@@ -1,117 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f53.google.com ([74.125.82.53]:33561 "EHLO
-	mail-wg0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751115Ab3HKVjb (ORCPT
+Received: from e37.co.us.ibm.com ([32.97.110.158]:42844 "EHLO
+	e37.co.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754637Ab3HLEcI (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 11 Aug 2013 17:39:31 -0400
-Date: Sun, 11 Aug 2013 23:39:23 +0200
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: linux-next: build failure after merge of the ext4 tree
-Message-ID: <20130811213923.GA5312@free.fr>
-References: <20130729110816.12958c3a26400f444a9a5012@canb.auug.org.au>
- <CA+icZUUt4domktYZZn0Qp3BZoSFqmKic4qSnVP4cuTKwUww_=A@mail.gmail.com>
- <20130807153840.4f2997b603397c07aca98b2d@canb.auug.org.au>
- <87zjsted0c.fsf@linaro.org>
- <20130808102228.d2034d3a4c986d2970926ab9@canb.auug.org.au>
- <20130808103614.a039da2f236154b52329b28b@canb.auug.org.au>
- <20130808191650.GB3282@free.fr>
- <20130808215449.GD3282@free.fr>
- <20130809114248.GA5691@merkur.ravnborg.org>
+	Mon, 12 Aug 2013 00:32:08 -0400
+Received: from /spool/local
+	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-kbuild@vger.kernel.org> from <ananth@in.ibm.com>;
+	Sun, 11 Aug 2013 22:32:07 -0600
+Date: Mon, 12 Aug 2013 10:01:59 +0530
+From: Ananth N Mavinakayanahalli <ananth@in.ibm.com>
+Subject: Re: [PATCH 3/3] kprobes: Use KSYM_NAME_LEN to size identifier buffers
+Message-ID: <20130812043159.GA9278@in.ibm.com>
+Reply-To: ananth@in.ibm.com
+References: <1376182533-17530-1-git-send-email-andi@firstfloor.org>
+ <1376182533-17530-3-git-send-email-andi@firstfloor.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20130809114248.GA5691@merkur.ravnborg.org>
+In-Reply-To: <1376182533-17530-3-git-send-email-andi@firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>, Steven Rostedt <rostedt@goodmis.org>, Michal Marek <mmarek@suse.cz>, Kevin Hilman <khilman@linaro.org>, sedat.dilek@gmail.com, Theodore Ts'o <tytso@mit.edu>, linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, Linux kbuild ML <linux-kbuild@vger.kernel.org>
+To: Andi Kleen <andi@firstfloor.org>
+Cc: linux-kernel@vger.kernel.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org, Joe Mario <jmario@redhat.com>, Andi Kleen <ak@linux.intel.com>
 
-Sam, All,
-
-On 2013-08-09 13:42 +0200, Sam Ravnborg spake thusly:
-> On Thu, Aug 08, 2013 at 11:54:49PM +0200, Yann E. MORIN wrote:
-> > Stephen, All,
-> > 
-> > On 2013-08-08 21:16 +0200, Yann E. MORIN spake thusly:
-> > > On 2013-08-08 10:36 +1000, Stephen Rothwell spake thusly:
-> > > > On Thu, 8 Aug 2013 10:22:28 +1000 Stephen Rothwell <sfr@canb.auug.org.au>
-> > > > wrote:
-> > > > >
-> > > > > More quick testing with an empty file: v3.9 is OK, v3.10 gives
-> > > > > CONFIG_MODULES unset.
-> > > 
-> > > Sorry, I don't understand the above. Can you elaborate on what you did,
-> > > what you got, what expected, so I can try to reproduce and fix this,
-> > > please?
-> > 
-> > Ok, I've had a look in the linux-next archives, and I think I got it.
-> > Is the following right?
-> > 
-> >     git clean -d; git clean -dX     # To be sure tree is clean
-> >     touch empty
-> >     make KCONFIG_ALLCONFIG=empty allmodconfig
-> >     grep MODULES .config
-> >     $ CONFIG_MODULES is not set
-> > 
-> > If so, I think I found the reason: the modules symbol is _always_ set to
-> > being valid as soon as KCONFIG_ALLCONFIG is read, even if it was not
-> > present in that file.
-> > 
-> > Since it is set to be valid, the following change means it is not
-> > affected another value later on.
-> > 
-> > So, I wonder what the best option is:
-> >   1- revert the following, and find another solution,
-> >   2- de-specialise the modules symbol,
-> >   3- or further specialise the modules symbol.
+On Sat, Aug 10, 2013 at 05:55:33PM -0700, Andi Kleen wrote:
+> From: Joe Mario <jmario@redhat.com>
 > 
-> If we drop the special handling of "MODULES" and introduced
-> the following in we may fix it - hopefully:
+> Use KSYM_NAME_LEN to size identifier buffers, so that it can
+> be easier increased.
 > 
-> config MODULES
-> 	option modules
+> Cc: ananth@in.ibm.com
+> Signed-off-by: Joe Mario <jmario@redhat.com>
+> Signed-off-by: Andi Kleen <ak@linux.intel.com>
+
+Acked-by: Ananth N Mavinakayanahalli <ananth@in.ibm.com>
+
+> ---
+>  kernel/kprobes.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> The option handling is already in place. It is even documented :-)
-
-Yes, indeed, that one is pretty easy! :-)
-
-> At least we could then drop the sym_lookup here (zconf.y):
->         if (!modules_sym->prop) {
->                 struct property *prop;
+> diff --git a/kernel/kprobes.c b/kernel/kprobes.c
+> index 6e33498..e174daf 100644
+> --- a/kernel/kprobes.c
+> +++ b/kernel/kprobes.c
+> @@ -2083,7 +2083,7 @@ static int __init init_kprobes(void)
+>  {
+>  	int i, err = 0;
+>  	unsigned long offset = 0, size = 0;
+> -	char *modname, namebuf[128];
+> +	char *modname, namebuf[KSYM_NAME_LEN];
+>  	const char *symbol_name;
+>  	void *addr;
+>  	struct kprobe_blackpoint *kb;
+> @@ -2209,7 +2209,7 @@ static int __kprobes show_kprobe_addr(struct seq_file *pi, void *v)
+>  	const char *sym = NULL;
+>  	unsigned int i = *(loff_t *) v;
+>  	unsigned long offset = 0;
+> -	char *modname, namebuf[128];
+> +	char *modname, namebuf[KSYM_NAME_LEN];
 > 
->                 prop = prop_alloc(P_DEFAULT, modules_sym);
->                 prop->expr = expr_alloc_symbol(sym_lookup("MODULES", 0));
->         }
-> Without the sym_lookup I think the symbol will not be defined and tus not marked valid.
+>  	head = &kprobe_table[i];
+>  	preempt_disable();
+> -- 
+> 1.8.3.1
 
-Sorry, I don't understand what we should do here.
-
-From what I understand, here's what happens:
-  - there's no symbol that declared the 'modules' option, so the
-    modules_sym->prop is NULL;
-  - so we look for the symbol 'MODULES' and use that as the symbol used
-    to evaluate if tristates are enabled.
-
-So, now we have 'option modules' added to MODULES, we never enter this
-if() condition.
-
-But what would happen to other projects that do not have a symbol set
-with 'option modules' and no 'MODULES' symbol? Surely, those projects do
-not need tristates, but what should the code do in this case?
-
-So, I don't know what to replace this 'sym_lookup("MODULES", 0)' with.
-
-> Soory - no patch as I am busy with day-time job stuff.
-
-I hope you can share some guidnce here, please... ;-)
-
-Regards,
-Yann E. MORIN.
-
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
