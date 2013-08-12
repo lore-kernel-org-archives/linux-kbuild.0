@@ -1,67 +1,172 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from e37.co.us.ibm.com ([32.97.110.158]:42844 "EHLO
-	e37.co.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754637Ab3HLEcI (ORCPT
+Received: from 216.155.138.14.choopa.net ([216.155.138.14]:50504 "EHLO
+	hopi.mpagano.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1752290Ab3HLXmt (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 12 Aug 2013 00:32:08 -0400
-Received: from /spool/local
-	by e37.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-kbuild@vger.kernel.org> from <ananth@in.ibm.com>;
-	Sun, 11 Aug 2013 22:32:07 -0600
-Date: Mon, 12 Aug 2013 10:01:59 +0530
-From: Ananth N Mavinakayanahalli <ananth@in.ibm.com>
-Subject: Re: [PATCH 3/3] kprobes: Use KSYM_NAME_LEN to size identifier buffers
-Message-ID: <20130812043159.GA9278@in.ibm.com>
-Reply-To: ananth@in.ibm.com
-References: <1376182533-17530-1-git-send-email-andi@firstfloor.org>
- <1376182533-17530-3-git-send-email-andi@firstfloor.org>
+	Mon, 12 Aug 2013 19:42:49 -0400
+Received: from localhost (localhost [127.0.0.1])
+	by hopi.mpagano.com (Postfix) with ESMTP id 4A9411D001F
+	for <linux-kbuild@vger.kernel.org>; Mon, 12 Aug 2013 19:35:44 -0400 (EDT)
+Received: from hopi.mpagano.com ([127.0.0.1])
+	by localhost (mpagano.com [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id LoAgqqTwscDp for <linux-kbuild@vger.kernel.org>;
+	Mon, 12 Aug 2013 19:35:38 -0400 (EDT)
+Received: from comanche.localnet (pool-96-234-78-247.nwrknj.fios.verizon.net [96.234.78.247])
+	by hopi.mpagano.com (Postfix) with ESMTPA id 2C3A11D0010
+	for <linux-kbuild@vger.kernel.org>; Mon, 12 Aug 2013 19:35:38 -0400 (EDT)
+From: Mike Pagano <mpagano@gentoo.org>
+Subject: [PATCH] kconfig: Update to diffconfig to support python 2.6 and greater
+Date: Mon, 12 Aug 2013 19:36:04 -0400
+Message-ID: <2782016.fnisNIa02a@comanche>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1376182533-17530-3-git-send-email-andi@firstfloor.org>
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andi Kleen <andi@firstfloor.org>
-Cc: linux-kernel@vger.kernel.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org, Joe Mario <jmario@redhat.com>, Andi Kleen <ak@linux.intel.com>
+To: linux-kbuild@vger.kernel.org
 
-On Sat, Aug 10, 2013 at 05:55:33PM -0700, Andi Kleen wrote:
-> From: Joe Mario <jmario@redhat.com>
-> 
-> Use KSYM_NAME_LEN to size identifier buffers, so that it can
-> be easier increased.
-> 
-> Cc: ananth@in.ibm.com
-> Signed-off-by: Joe Mario <jmario@redhat.com>
-> Signed-off-by: Andi Kleen <ak@linux.intel.com>
+Modification of the diffconfig script to support python versions 2.6 and 
+greater. Added a small change to gracefully exit if the default config files 
+are not present. (.config and .config.old)
 
-Acked-by: Ananth N Mavinakayanahalli <ananth@in.ibm.com>
+Note that Linux distributions are starting to deprecate python versions < 2.5
 
-> ---
->  kernel/kprobes.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/kernel/kprobes.c b/kernel/kprobes.c
-> index 6e33498..e174daf 100644
-> --- a/kernel/kprobes.c
-> +++ b/kernel/kprobes.c
-> @@ -2083,7 +2083,7 @@ static int __init init_kprobes(void)
->  {
->  	int i, err = 0;
->  	unsigned long offset = 0, size = 0;
-> -	char *modname, namebuf[128];
-> +	char *modname, namebuf[KSYM_NAME_LEN];
->  	const char *symbol_name;
->  	void *addr;
->  	struct kprobe_blackpoint *kb;
-> @@ -2209,7 +2209,7 @@ static int __kprobes show_kprobe_addr(struct seq_file *pi, void *v)
->  	const char *sym = NULL;
->  	unsigned int i = *(loff_t *) v;
->  	unsigned long offset = 0;
-> -	char *modname, namebuf[128];
-> +	char *modname, namebuf[KSYM_NAME_LEN];
-> 
->  	head = &kprobe_table[i];
->  	preempt_disable();
-> -- 
-> 1.8.3.1
+Diffconfig is a utility script for comparing kernel configuration files.
 
+Signed-off-by: Mike Pagano <mpagano@gentoo.org>
+Signed-off-by: Tobias Klausmann <klausman@gentoo.org>
+Signed-off-by: Ewoud Kohl van Wijngaarden <ewoud@kohlvanwijngaarden.nl>
+---
+ scripts/diffconfig | 60 ++++++++++++++++++++++++++++++------------------------
+ 1 file changed, 33 insertions(+), 27 deletions(-)
+
+diff --git a/scripts/diffconfig b/scripts/diffconfig
+index b91f3e3..4829594 100755
+--- a/scripts/diffconfig
++++ b/scripts/diffconfig
+@@ -10,7 +10,7 @@
+ import sys, os
+ 
+ def usage():
+-    print """Usage: diffconfig [-h] [-m] [<config1> <config2>]
++    print("""Usage: diffconfig [-h] [-m] [<config1> <config2>]
+ 
+ Diffconfig is a simple utility for comparing two .config files.
+ Using standard diff to compare .config files often includes extraneous and
+@@ -33,7 +33,7 @@ Example usage:
+  EXT2_FS  y -> n
+  LOG_BUF_SHIFT  14 -> 16
+  PRINTK_TIME  n -> y
+-"""
++""")
+     sys.exit(0)
+ 
+ # returns a dictionary of name/value pairs for config items in the file
+@@ -54,23 +54,26 @@ def print_config(op, config, value, new_value):
+     if merge_style:
+         if new_value:
+             if new_value=="n":
+-                print "# CONFIG_%s is not set" % config
++                print("# CONFIG_%s is not set" % config)
+             else:
+-                print "CONFIG_%s=%s" % (config, new_value)
++                print("CONFIG_%s=%s" % (config, new_value))
+     else:
+         if op=="-":
+-            print "-%s %s" % (config, value)
++            print("-%s %s" % (config, value))
+         elif op=="+":
+-            print "+%s %s" % (config, new_value)
++            print("+%s %s" % (config, new_value))
+         else:
+-            print " %s %s -> %s" % (config, value, new_value)
++            print(" %s %s -> %s" % (config, value, new_value))
+ 
+ def main():
+     global merge_style
+ 
++    config_a = {}
++    config_b = {}
++
+     # parse command line args
+     if ("-h" in sys.argv or "--help" in sys.argv):
+-       usage()
++        usage()
+ 
+     merge_style = 0
+     if "-m" in sys.argv:
+@@ -79,13 +82,13 @@ def main():
+ 
+     argc = len(sys.argv)
+     if not (argc==1 or argc == 3):
+-        print "Error: incorrect number of arguments or unrecognized option"
++        print("Error: incorrect number of arguments or unrecognized option")
+         usage()
+ 
+     if argc == 1:
+         # if no filenames given, assume .config and .config.old
+         build_dir=""
+-        if os.environ.has_key("KBUILD_OUTPUT"):
++        if "KBUILD_OUTPUT" in os.environ:
+             build_dir = os.environ["KBUILD_OUTPUT"]+"/"
+ 
+         configa_filename = build_dir + ".config.old"
+@@ -94,36 +97,39 @@ def main():
+         configa_filename = sys.argv[1]
+         configb_filename = sys.argv[2]
+ 
+-    a = readconfig(file(configa_filename))
+-    b = readconfig(file(configb_filename))
++    try:
++        config_a = readconfig(open(configa_filename))
++        config_b = readconfig(open(configb_filename))
++    except IOError as e:
++        print("I/O error({0}): {1}\n".format(e.errno, e.strerror))
++        usage()
+ 
+-    # print items in a but not b (accumulate, sort and print)
++    # print items in config_a but not config_b (accumulate, sort and print)
+     old = []
+-    for config in a:
+-        if config not in b:
++    for config in config_a:
++        if config not in config_b:
+             old.append(config)
+     old.sort()
+     for config in old:
+-        print_config("-", config, a[config], None)
+-        del a[config]
++        print_config("-", config, config_a[config], None)
++        del config_a[config]
+ 
+     # print items that changed (accumulate, sort, and print)
+     changed = []
+-    for config in a:
+-        if a[config] != b[config]:
++    for config in config_a:
++        if config_a[config] != config_b[config]:
+             changed.append(config)
+         else:
+-            del b[config]
++            del config_b[config]
+     changed.sort()
+     for config in changed:
+-        print_config("->", config, a[config], b[config])
+-        del b[config]
++        print_config("->", config, config_a[config], config_b[config])
++        del config_b[config]
+ 
+-    # now print items in b but not in a
+-    # (items from b that were in a were removed above)
+-    new = b.keys()
+-    new.sort()
++    # now print items in config_b but not in config_a
++    # (items from config_b that were in config_a were removed above)
++    new = sorted(config_b.keys())
+     for config in new:
+-        print_config("+", config, None, b[config])
++        print_config("+", config, None, config_b[config])
+ 
+ main()
+-- 
+1.8.1.5
