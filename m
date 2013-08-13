@@ -1,190 +1,69 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-we0-f172.google.com ([74.125.82.172]:64583 "EHLO
-	mail-we0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932104Ab3HMQCm (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 13 Aug 2013 12:02:42 -0400
-Received: by mail-we0-f172.google.com with SMTP id t61so6893478wes.3
-        for <linux-kbuild@vger.kernel.org>; Tue, 13 Aug 2013 09:02:41 -0700 (PDT)
-Date: Tue, 13 Aug 2013 18:02:36 +0200
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH] kconfig: Update to diffconfig to support python 2.6 and
- greater
-Message-ID: <20130813160236.GA3427@free.fr>
-References: <2782016.fnisNIa02a@comanche>
+Received: from cantor2.suse.de ([195.135.220.15]:37843 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1758861Ab3HMUCz (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 13 Aug 2013 16:02:55 -0400
+Message-ID: <520A90E9.7080206@suse.cz>
+Date: Tue, 13 Aug 2013 22:02:49 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <2782016.fnisNIa02a@comanche>
+Subject: Re: [PATCH] Handle non ABS crc symbols
+References: <1376077524-27573-1-git-send-email-andi@firstfloor.org>
+In-Reply-To: <1376077524-27573-1-git-send-email-andi@firstfloor.org>
+Content-Type: text/plain; charset=ISO-8859-2
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mike Pagano <mpagano@gentoo.org>
-Cc: linux-kbuild@vger.kernel.org
+To: Andi Kleen <andi@firstfloor.org>
+Cc: akpm@linux-foundation.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Andi Kleen <ak@linux.intel.com>, Rusty Russell <rusty@rustcorp.com.au>
 
-Mike, All,
+Added Rusty to CC.
 
-On 2013-08-12 19:36 -0400, Mike Pagano spake thusly:
-> Modification of the diffconfig script to support python versions 2.6 and 
-> greater. Added a small change to gracefully exit if the default config files 
-> are not present. (.config and .config.old)
-
-Please, send two patches:
-  - one with fixes for python 2.6+
-  - one with the check for config files
-
-Regards,
-Yann E. MORIN.
-
-> Note that Linux distributions are starting to deprecate python versions < 2.5
+Dne 9.8.2013 21:45, Andi Kleen napsal(a):
+> From: Andi Kleen <ak@linux.intel.com>
 > 
-> Diffconfig is a utility script for comparing kernel configuration files.
+> For some reason I managed to trick gcc into create CRC symbols that
+> are not absolute anymore, but weak.
 > 
-> Signed-off-by: Mike Pagano <mpagano@gentoo.org>
-> Signed-off-by: Tobias Klausmann <klausman@gentoo.org>
-> Signed-off-by: Ewoud Kohl van Wijngaarden <ewoud@kohlvanwijngaarden.nl>
+> Make modpost handle this case.
+> 
+> Andrew, this should fix the bizarre warning. Seems like a toolchain
+> bug to me.
+> 
+> Signed-off-by: Andi Kleen <ak@linux.intel.com>
 > ---
->  scripts/diffconfig | 60 ++++++++++++++++++++++++++++++------------------------
->  1 file changed, 33 insertions(+), 27 deletions(-)
+>  scripts/mod/modpost.c | 15 +++++++--------
+>  1 file changed, 7 insertions(+), 8 deletions(-)
 > 
-> diff --git a/scripts/diffconfig b/scripts/diffconfig
-> index b91f3e3..4829594 100755
-> --- a/scripts/diffconfig
-> +++ b/scripts/diffconfig
-> @@ -10,7 +10,7 @@
->  import sys, os
+> diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+> index 6216434..b3dd735 100644
+> --- a/scripts/mod/modpost.c
+> +++ b/scripts/mod/modpost.c
+> @@ -599,18 +599,17 @@ static void handle_modversions(struct module *mod, struct elf_info *info,
+>  	else
+>  		export = export_from_sec(info, get_secindex(info, sym));
 >  
->  def usage():
-> -    print """Usage: diffconfig [-h] [-m] [<config1> <config2>]
-> +    print("""Usage: diffconfig [-h] [-m] [<config1> <config2>]
->  
->  Diffconfig is a simple utility for comparing two .config files.
->  Using standard diff to compare .config files often includes extraneous and
-> @@ -33,7 +33,7 @@ Example usage:
->   EXT2_FS  y -> n
->   LOG_BUF_SHIFT  14 -> 16
->   PRINTK_TIME  n -> y
-> -"""
-> +""")
->      sys.exit(0)
->  
->  # returns a dictionary of name/value pairs for config items in the file
-> @@ -54,23 +54,26 @@ def print_config(op, config, value, new_value):
->      if merge_style:
->          if new_value:
->              if new_value=="n":
-> -                print "# CONFIG_%s is not set" % config
-> +                print("# CONFIG_%s is not set" % config)
->              else:
-> -                print "CONFIG_%s=%s" % (config, new_value)
-> +                print("CONFIG_%s=%s" % (config, new_value))
->      else:
->          if op=="-":
-> -            print "-%s %s" % (config, value)
-> +            print("-%s %s" % (config, value))
->          elif op=="+":
-> -            print "+%s %s" % (config, new_value)
-> +            print("+%s %s" % (config, new_value))
->          else:
-> -            print " %s %s -> %s" % (config, value, new_value)
-> +            print(" %s %s -> %s" % (config, value, new_value))
->  
->  def main():
->      global merge_style
->  
-> +    config_a = {}
-> +    config_b = {}
+> +	/* CRC'd symbol */
+> +	if (strncmp(symname, CRC_PFX, strlen(CRC_PFX)) == 0) {
+> +		crc = (unsigned int) sym->st_value;
+> +		sym_update_crc(symname + strlen(CRC_PFX), mod, crc,
+> +				export);
+> +	}
 > +
->      # parse command line args
->      if ("-h" in sys.argv or "--help" in sys.argv):
-> -       usage()
-> +        usage()
->  
->      merge_style = 0
->      if "-m" in sys.argv:
-> @@ -79,13 +82,13 @@ def main():
->  
->      argc = len(sys.argv)
->      if not (argc==1 or argc == 3):
-> -        print "Error: incorrect number of arguments or unrecognized option"
-> +        print("Error: incorrect number of arguments or unrecognized option")
->          usage()
->  
->      if argc == 1:
->          # if no filenames given, assume .config and .config.old
->          build_dir=""
-> -        if os.environ.has_key("KBUILD_OUTPUT"):
-> +        if "KBUILD_OUTPUT" in os.environ:
->              build_dir = os.environ["KBUILD_OUTPUT"]+"/"
->  
->          configa_filename = build_dir + ".config.old"
-> @@ -94,36 +97,39 @@ def main():
->          configa_filename = sys.argv[1]
->          configb_filename = sys.argv[2]
->  
-> -    a = readconfig(file(configa_filename))
-> -    b = readconfig(file(configb_filename))
-> +    try:
-> +        config_a = readconfig(open(configa_filename))
-> +        config_b = readconfig(open(configb_filename))
-> +    except IOError as e:
-> +        print("I/O error({0}): {1}\n".format(e.errno, e.strerror))
-> +        usage()
->  
-> -    # print items in a but not b (accumulate, sort and print)
-> +    # print items in config_a but not config_b (accumulate, sort and print)
->      old = []
-> -    for config in a:
-> -        if config not in b:
-> +    for config in config_a:
-> +        if config not in config_b:
->              old.append(config)
->      old.sort()
->      for config in old:
-> -        print_config("-", config, a[config], None)
-> -        del a[config]
-> +        print_config("-", config, config_a[config], None)
-> +        del config_a[config]
->  
->      # print items that changed (accumulate, sort, and print)
->      changed = []
-> -    for config in a:
-> -        if a[config] != b[config]:
-> +    for config in config_a:
-> +        if config_a[config] != config_b[config]:
->              changed.append(config)
->          else:
-> -            del b[config]
-> +            del config_b[config]
->      changed.sort()
->      for config in changed:
-> -        print_config("->", config, a[config], b[config])
-> -        del b[config]
-> +        print_config("->", config, config_a[config], config_b[config])
-> +        del config_b[config]
->  
-> -    # now print items in b but not in a
-> -    # (items from b that were in a were removed above)
-> -    new = b.keys()
-> -    new.sort()
-> +    # now print items in config_b but not in config_a
-> +    # (items from config_b that were in config_a were removed above)
-> +    new = sorted(config_b.keys())
->      for config in new:
-> -        print_config("+", config, None, b[config])
-> +        print_config("+", config, None, config_b[config])
->  
->  main()
-> -- 
-> 1.8.1.5
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>  	switch (sym->st_shndx) {
+>  	case SHN_COMMON:
+>  		warn("\"%s\" [%s] is COMMON symbol\n", symname, mod->name);
+>  		break;
+> -	case SHN_ABS:
+> -		/* CRC'd symbol */
+> -		if (strncmp(symname, CRC_PFX, strlen(CRC_PFX)) == 0) {
+> -			crc = (unsigned int) sym->st_value;
+> -			sym_update_crc(symname + strlen(CRC_PFX), mod, crc,
+> -					export);
+> -		}
+> -		break;
+>  	case SHN_UNDEF:
+>  		/* undefined symbol */
+>  		if (ELF_ST_BIND(sym->st_info) != STB_GLOBAL &&
+> 
 
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
