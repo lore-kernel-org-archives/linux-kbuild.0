@@ -1,69 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:37843 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:38378 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1758861Ab3HMUCz (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 13 Aug 2013 16:02:55 -0400
-Message-ID: <520A90E9.7080206@suse.cz>
-Date: Tue, 13 Aug 2013 22:02:49 +0200
+	id S1759037Ab3HMUVB (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 13 Aug 2013 16:21:01 -0400
+Message-ID: <520A9528.4000309@suse.cz>
+Date: Tue, 13 Aug 2013 22:20:56 +0200
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH] Handle non ABS crc symbols
-References: <1376077524-27573-1-git-send-email-andi@firstfloor.org>
-In-Reply-To: <1376077524-27573-1-git-send-email-andi@firstfloor.org>
+Subject: Re: [PATCH] Provide version number for Debian firmware package
+References: <1376250919-13886-1-git-send-email-xypron.glpk@gmx.de>
+In-Reply-To: <1376250919-13886-1-git-send-email-xypron.glpk@gmx.de>
 Content-Type: text/plain; charset=ISO-8859-2
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andi Kleen <andi@firstfloor.org>
-Cc: akpm@linux-foundation.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Andi Kleen <ak@linux.intel.com>, Rusty Russell <rusty@rustcorp.com.au>
+To: Heinrich Schuchardt <xypron.glpk@gmx.de>
+Cc: linux-kbuild@vger.kernel.org, maximilian attems <max@stro.at>, Ben Hutchings <ben@decadent.org.uk>
 
-Added Rusty to CC.
+Dne 11.8.2013 21:55, Heinrich Schuchardt napsal(a):
+> scripts/package/builddeb is used to create Debian packages.
+> Currently the firmware package always gets the same version number
+> irrespective of the Kernel version.
+> The paths inside the firmware package depend on the Kernel
+> version.
+> 
+> With the patch supplied the Kernel version becomes part of the
+> Debian firmware package number.
 
-Dne 9.8.2013 21:45, Andi Kleen napsal(a):
-> From: Andi Kleen <ak@linux.intel.com>
+Ben, Max, is this how the official linux-firmware-image package is built
+in Debian? The change makes sense to me.
+
+Michal
+
+
 > 
-> For some reason I managed to trick gcc into create CRC symbols that
-> are not absolute anymore, but weak.
-> 
-> Make modpost handle this case.
-> 
-> Andrew, this should fix the bizarre warning. Seems like a toolchain
-> bug to me.
-> 
-> Signed-off-by: Andi Kleen <ak@linux.intel.com>
+> Signed-off-by: Heinrich Schuchardt <xypron.glpk@gmx.de>
 > ---
->  scripts/mod/modpost.c | 15 +++++++--------
->  1 file changed, 7 insertions(+), 8 deletions(-)
+>  scripts/package/builddeb |    2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-> index 6216434..b3dd735 100644
-> --- a/scripts/mod/modpost.c
-> +++ b/scripts/mod/modpost.c
-> @@ -599,18 +599,17 @@ static void handle_modversions(struct module *mod, struct elf_info *info,
->  	else
->  		export = export_from_sec(info, get_secindex(info, sym));
+> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+> index acb8650..4ca6111 100644
+> --- a/scripts/package/builddeb
+> +++ b/scripts/package/builddeb
+> @@ -79,7 +79,7 @@ fwdir="$objtree/debian/fwtmp"
+>  kernel_headers_dir="$objtree/debian/hdrtmp"
+>  libc_headers_dir="$objtree/debian/headertmp"
+>  packagename=linux-image-$version
+> -fwpackagename=linux-firmware-image
+> +fwpackagename=linux-firmware-image-$version
+>  kernel_headers_packagename=linux-headers-$version
+>  libc_headers_packagename=linux-libc-dev
 >  
-> +	/* CRC'd symbol */
-> +	if (strncmp(symname, CRC_PFX, strlen(CRC_PFX)) == 0) {
-> +		crc = (unsigned int) sym->st_value;
-> +		sym_update_crc(symname + strlen(CRC_PFX), mod, crc,
-> +				export);
-> +	}
-> +
->  	switch (sym->st_shndx) {
->  	case SHN_COMMON:
->  		warn("\"%s\" [%s] is COMMON symbol\n", symname, mod->name);
->  		break;
-> -	case SHN_ABS:
-> -		/* CRC'd symbol */
-> -		if (strncmp(symname, CRC_PFX, strlen(CRC_PFX)) == 0) {
-> -			crc = (unsigned int) sym->st_value;
-> -			sym_update_crc(symname + strlen(CRC_PFX), mod, crc,
-> -					export);
-> -		}
-> -		break;
->  	case SHN_UNDEF:
->  		/* undefined symbol */
->  		if (ELF_ST_BIND(sym->st_info) != STB_GLOBAL &&
 > 
 
