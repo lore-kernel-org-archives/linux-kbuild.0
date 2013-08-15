@@ -1,63 +1,115 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.gentoo.org ([140.211.166.183]:40661 "EHLO smtp.gentoo.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752276Ab3HOSk6 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 15 Aug 2013 14:40:58 -0400
-From: Sergei Trofimovich <slyfox@gentoo.org>
-Subject: [PATCH v2] Makefile: enable -Werror=implicit-int and -Werror=strict-prototypes by default
-Date: Thu, 15 Aug 2013 21:37:31 +0300
-Message-Id: <1376591851-31854-1-git-send-email-slyfox@gentoo.org>
+Received: from mail-we0-f171.google.com ([74.125.82.171]:35389 "EHLO
+	mail-we0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751134Ab3HOVRl (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 15 Aug 2013 17:17:41 -0400
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: [PATCH 1/4] kconfig: switch to "long long" for sanity
+Date: Thu, 15 Aug 2013 23:17:30 +0200
+Message-Id: <129784abc982ccac43322c2f175f3ca735c2ca73.1376600922.git.yann.morin.1998@free.fr>
+In-Reply-To: <cover.1376600922.git.yann.morin.1998@free.fr>
+References: <cover.1376600922.git.yann.morin.1998@free.fr>
+In-Reply-To: <cover.1376600922.git.yann.morin.1998@free.fr>
+References: <cover.1376600922.git.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: Sergei Trofimovich <slyfox@gentoo.org>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>
+To: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>
+Cc: linux-kernel@vger.kernel.org, Kees Cook <keescook@chromium.org>, "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-The common error type found in forward-ported/backported patches is missing headers.
-One recent example (files and function names are mangled):
+From: Kees Cook <keescook@chromium.org>
 
-    void foo(){}
-    EXPORT_SYMBOL(foo);
+Instead of using "long" for kconfig "hex" and "range" values, which may
+change in size depending on the host architecture, use "long long". This
+will allow values greater than INT_MAX on 32-bit hosts when cross
+compiling.
 
-gave only warning
-
-    foo.c:12345678:5: warning: function declaration isn't a prototype [-Wstrict-prototypes]
-    void foo(){}
-         ^
-
-    foo.c:12345679:5: warning: data definition has no type or storage class [enabled by default]
-    EXPORT_SYMBOL(foo);
-    foo.c:12345679:5: warning: type defaults to 'int' in declaration of 'EXORT_SYMBOL' [-Werror=implicit-int]
-
-Now it's a fata error. Tested on x86_64 allyesconfig.
-
-Signed-off-by: Sergei Trofimovich <slyfox@gentoo.org>
-Cc: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org
-Cc: Andrew Morton <akpm@linux-foundation.org>
+Signed-off-by: Kees Cook <keescook@chromium.org>
+Acked-by: Geert Uytterhoeven <geert@linux-m68k.org>
+Tested-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
 ---
- Makefile | 5 +++++
- 1 file changed, 5 insertions(+)
+ scripts/kconfig/symbol.c | 19 ++++++++++---------
+ 1 file changed, 10 insertions(+), 9 deletions(-)
 
-Change since v1:
- - use 'cc-option' to respect old gccs
- - fix typos. Thanks to Oleg Verych
-
-diff --git a/Makefile b/Makefile
-index 6e48848..53f4776 100644
---- a/Makefile
-+++ b/Makefile
-@@ -374,6 +374,11 @@ KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
- 		   -Werror-implicit-function-declaration \
- 		   -Wno-format-security \
- 		   -fno-delete-null-pointer-checks
-+
-+# not universally available, but nice to have ones
-+KBUILD_CFLAGS   +=  $(call cc-option,-Werror=implicit-int) \
-+		    $(call cc-option,-Werror=strict-prototypes)
-+
- KBUILD_AFLAGS_KERNEL :=
- KBUILD_CFLAGS_KERNEL :=
- KBUILD_AFLAGS   := -D__ASSEMBLY__
+diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
+index a76b8fd..c9a6775 100644
+--- a/scripts/kconfig/symbol.c
++++ b/scripts/kconfig/symbol.c
+@@ -136,7 +136,7 @@ static struct property *sym_get_range_prop(struct symbol *sym)
+ 	return NULL;
+ }
+ 
+-static long sym_get_range_val(struct symbol *sym, int base)
++static long long sym_get_range_val(struct symbol *sym, int base)
+ {
+ 	sym_calc_value(sym);
+ 	switch (sym->type) {
+@@ -149,13 +149,14 @@ static long sym_get_range_val(struct symbol *sym, int base)
+ 	default:
+ 		break;
+ 	}
+-	return strtol(sym->curr.val, NULL, base);
++	return strtoll(sym->curr.val, NULL, base);
+ }
+ 
+ static void sym_validate_range(struct symbol *sym)
+ {
+ 	struct property *prop;
+-	long base, val, val2;
++	int base;
++	long long val, val2;
+ 	char str[64];
+ 
+ 	switch (sym->type) {
+@@ -171,7 +172,7 @@ static void sym_validate_range(struct symbol *sym)
+ 	prop = sym_get_range_prop(sym);
+ 	if (!prop)
+ 		return;
+-	val = strtol(sym->curr.val, NULL, base);
++	val = strtoll(sym->curr.val, NULL, base);
+ 	val2 = sym_get_range_val(prop->expr->left.sym, base);
+ 	if (val >= val2) {
+ 		val2 = sym_get_range_val(prop->expr->right.sym, base);
+@@ -179,9 +180,9 @@ static void sym_validate_range(struct symbol *sym)
+ 			return;
+ 	}
+ 	if (sym->type == S_INT)
+-		sprintf(str, "%ld", val2);
++		sprintf(str, "%lld", val2);
+ 	else
+-		sprintf(str, "0x%lx", val2);
++		sprintf(str, "0x%llx", val2);
+ 	sym->curr.val = strdup(str);
+ }
+ 
+@@ -594,7 +595,7 @@ bool sym_string_valid(struct symbol *sym, const char *str)
+ bool sym_string_within_range(struct symbol *sym, const char *str)
+ {
+ 	struct property *prop;
+-	long val;
++	long long val;
+ 
+ 	switch (sym->type) {
+ 	case S_STRING:
+@@ -605,7 +606,7 @@ bool sym_string_within_range(struct symbol *sym, const char *str)
+ 		prop = sym_get_range_prop(sym);
+ 		if (!prop)
+ 			return true;
+-		val = strtol(str, NULL, 10);
++		val = strtoll(str, NULL, 10);
+ 		return val >= sym_get_range_val(prop->expr->left.sym, 10) &&
+ 		       val <= sym_get_range_val(prop->expr->right.sym, 10);
+ 	case S_HEX:
+@@ -614,7 +615,7 @@ bool sym_string_within_range(struct symbol *sym, const char *str)
+ 		prop = sym_get_range_prop(sym);
+ 		if (!prop)
+ 			return true;
+-		val = strtol(str, NULL, 16);
++		val = strtoll(str, NULL, 16);
+ 		return val >= sym_get_range_val(prop->expr->left.sym, 16) &&
+ 		       val <= sym_get_range_val(prop->expr->right.sym, 16);
+ 	case S_BOOLEAN:
 -- 
-1.8.3.2
+1.8.1.2
 
