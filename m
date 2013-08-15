@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f52.google.com ([74.125.82.52]:59120 "EHLO
-	mail-wg0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751134Ab3HOVRo (ORCPT
+Received: from mail-wg0-f45.google.com ([74.125.82.45]:38168 "EHLO
+	mail-wg0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752081Ab3HOVRn (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 15 Aug 2013 17:17:44 -0400
+	Thu, 15 Aug 2013 17:17:43 -0400
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: [PATCH 4/4] modules: do not depend on kconfig to set 'modules' option to symbol MODULES
-Date: Thu, 15 Aug 2013 23:17:33 +0200
-Message-Id: <11097a0367e48954ecf616f9b0df48d86835dd0d.1376600922.git.yann.morin.1998@free.fr>
+Subject: [PATCH 3/4] kconfig: silence warning when parsing auto.conf when a symbol has changed type
+Date: Thu, 15 Aug 2013 23:17:32 +0200
+Message-Id: <04b19b773a60d201bc1b187ba7a7c86dc237a27b.1376600922.git.yann.morin.1998@free.fr>
 In-Reply-To: <cover.1376600922.git.yann.morin.1998@free.fr>
 References: <cover.1376600922.git.yann.morin.1998@free.fr>
 In-Reply-To: <cover.1376600922.git.yann.morin.1998@free.fr>
@@ -15,58 +15,88 @@ References: <cover.1376600922.git.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>
-Cc: linux-kernel@vger.kernel.org, "Yann E. MORIN" <yann.morin.1998@free.fr>, Stephen Rothwell <sfr@canb.auug.org.au>, Sam Ravnborg <sam@ravnborg.org>, Kevin Hilman <khilman@linaro.org>, sedat.dilek@gmail.com, Theodore Ts'o <tytso@mit.edu>
+Cc: linux-kernel@vger.kernel.org, "Yann E. MORIN" <yann.morin.1998@free.fr>, Linus Torvalds <torvalds@linux-foundation.org>, Thomas Petazzoni <thomas.petazzoni@free-electrons.com>, Bjorn Helgaas <bhelgaas@google.com>, Yinghai Lu <yinghai@kernel.org>, Benjamin Herrenschmidt <benh@kernel.crashing.org>
 
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-Currently, the MODULES symbol is special-cased in different places in the
-kconfig language. For example, if no symbol is defined to enable tristates,
-then kconfig looks up for a symbol named 'MODULES', and forces the 'modules'
-option onto that symbol.
+When a symbol changes type from tristate to bool, and was previously set to
+'m', a subsequent silentoldconfig would warn about inconsistency, such as:
 
-This causes problems as such:
-  - since MODULES is special-cased, reading the configuration with
-    KCONFIG_ALLCONFIG set will forcibly set MODULES to be 'valid' (ie.
-    it has a valid value), when no such value was previously set. So
-    MODULES defaults to 'n' unless it is present in KCONFIG_ALLCONFIG
-  - other third-party projects may decide that 'MODULES' plays a different
-    role for them
+    include/config/auto.conf:3014:warning: symbol value 'm' invalid for
+    HOTPLUG_PCI_PCIE
 
-This has been exposed by cset #cfa98f2e:
-    kconfig: do not override symbols already set
-and reported by Stephen in:
-    http://marc.info/?l=linux-next&m=137592137915234&w=2
+Seen by Linus with the merge in aa8032b (sequence to reproduce by Michal):
+    git checkout 1fe0135
+    make mrproper
+    make allmodconfig
+    make silentoldconfig
+    git checkout aa8032b
+    make allmodconfig
+    make silentoldconfig
 
-As suggested by Sam, we explicitly define the MODULES symbol to be the
-tristate-enabler. This will allow us to drop special-casing of MODULES
-in the kconfig language, later.
+Since HOTPLUG_PCI_PCIE changed from tristate to bool in aa8032b, it was
+previously set to 'm' in auto.conf by the first allmodconfig+silentoldconfig,
+but then was set to 'y' by the second allmodconfig. Then the second
+silentoldconfig prints the warning.
 
-(Note: this patch is not a fix to Stephen's issue, just a first step).
+The warning in this case is a spurious warning, which happens at the time
+kconfig tries to detect symbols that have changed, to touch the empty
+header files in include/config used for dependency-tracking by make.
 
-Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
-Signed-off-by: yann.morin.1998@free.fr
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>
-Cc: Sam Ravnborg <sam@ravnborg.org>
+Silence the warning when we read the old auto.conf file, since it is
+perfectly legit that a symbol changed type since the previous call.
+
+Thread in:
+    http://marc.info/?l=linux-pci&m=137569198904000&w=2
+
+Reported-by: Linus Torvalds <torvalds@linux-foundation.org>
+Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>
 Cc: Michal Marek <mmarek@suse.cz>
-Cc: Kevin Hilman <khilman@linaro.org>
-Cc: sedat.dilek@gmail.com
-Cc: Theodore Ts'o <tytso@mit.edu>
+Cc: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+Cc: Bjorn Helgaas <bhelgaas@google.com>
+Cc: Yinghai Lu <yinghai@kernel.org>
+Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
 ---
- init/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
+ scripts/kconfig/confdata.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
-diff --git a/init/Kconfig b/init/Kconfig
-index 247084b..4d55e81 100644
---- a/init/Kconfig
-+++ b/init/Kconfig
-@@ -1666,6 +1666,7 @@ config BASE_SMALL
- 
- menuconfig MODULES
- 	bool "Enable loadable module support"
-+	option modules
- 	help
- 	  Kernel modules are small pieces of compiled code which can
- 	  be inserted in the running kernel, rather than being
+diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+index c55c227..87f7238 100644
+--- a/scripts/kconfig/confdata.c
++++ b/scripts/kconfig/confdata.c
+@@ -140,7 +140,9 @@ static int conf_set_sym_val(struct symbol *sym, int def, int def_flags, char *p)
+ 			sym->flags |= def_flags;
+ 			break;
+ 		}
+-		conf_warning("symbol value '%s' invalid for %s", p, sym->name);
++		if (def != S_DEF_AUTO)
++			conf_warning("symbol value '%s' invalid for %s",
++				     p, sym->name);
+ 		return 1;
+ 	case S_OTHER:
+ 		if (*p != '"') {
+@@ -161,7 +163,8 @@ static int conf_set_sym_val(struct symbol *sym, int def, int def_flags, char *p)
+ 			memmove(p2, p2 + 1, strlen(p2));
+ 		}
+ 		if (!p2) {
+-			conf_warning("invalid string found");
++			if (def != S_DEF_AUTO)
++				conf_warning("invalid string found");
+ 			return 1;
+ 		}
+ 		/* fall through */
+@@ -172,7 +175,9 @@ static int conf_set_sym_val(struct symbol *sym, int def, int def_flags, char *p)
+ 			sym->def[def].val = strdup(p);
+ 			sym->flags |= def_flags;
+ 		} else {
+-			conf_warning("symbol value '%s' invalid for %s", p, sym->name);
++			if (def != S_DEF_AUTO)
++				conf_warning("symbol value '%s' invalid for %s",
++					     p, sym->name);
+ 			return 1;
+ 		}
+ 		break;
 -- 
 1.8.1.2
 
