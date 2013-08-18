@@ -1,48 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.gentoo.org ([140.211.166.183]:33261 "EHLO smtp.gentoo.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753543Ab3HPSk4 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 16 Aug 2013 14:40:56 -0400
-Date: Fri, 16 Aug 2013 14:40:56 -0400
-From: Mike Pagano <mpagano@gentoo.org>
-Subject: [PATCH RESEND] diffconfig: Gracefully exit if the default config
- files are not present
-Message-ID: <20130816184056.GA30565@woodpecker.gentoo.org>
+Received: from mail-pa0-f54.google.com ([209.85.220.54]:54683 "EHLO
+	mail-pa0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751995Ab3HRIck (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 18 Aug 2013 04:32:40 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+In-Reply-To: <20130727132915.GA3655@free.fr>
+References: <alpine.DEB.2.02.1307232209510.32497@ayla.of.borg>
+	<alpine.DEB.2.02.1307232210440.32577@ayla.of.borg>
+	<20130727132915.GA3655@free.fr>
+Date: Sun, 18 Aug 2013 10:32:39 +0200
+Message-ID: <CAMuHMdVrCeZ5YPyocdvPQNQBem0X4DwO-EuygZ40zgVxa=sOMw@mail.gmail.com>
+Subject: Re: Build regressions/improvements in v3.11-rc2
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: Linux Kernel Development <linux-kernel@vger.kernel.org>, Andrew Veliath <andrewtv@usa.net>, linux-kbuild <linux-kbuild@vger.kernel.org>, Linux-sh list <linux-sh@vger.kernel.org>
 
-Handle gracefully the instance where config files are not present.
-Compatible with python versions 2.5, 2.6 and 2.7.
-The try/except is forward compatible with python version 3 once the entire script is ported.
+On Sat, Jul 27, 2013 at 3:29 PM, Yann E. MORIN <yann.morin.1998@free.fr> wrote:
+> Sorry to chime in a bit late...
+>
+> On 2013-07-23 22:20 +0200, Geert Uytterhoeven spake thusly:
+>> On Tue, 23 Jul 2013, Geert Uytterhoeven wrote:
+>> > JFYI, when comparing v3.11-rc2 to v3.11-rc1[3], the summaries are:
+>> >   - build errors: +9/-23
+> [--SNIP--]
+>> powerpc-randconfig, due to a kconfig issue:
+>>
+>> Expose SCOM controllers via debugfs (SCOM_DEBUGFS) [N/y] (NEW) aborted!
+>> Console input/output is redirected. Run 'make oldconfig' to update configuration
+>> .
+>> make[3]: *** [silentoldconfig] Error 1
+>
+> Can you give me instructions on how to reproduce this error?
+>
+> randconfig now should print the RNF seed, so that's d be nice to have to
+> reproduce the error. Also, having the problematic changeset would be
+> nice.
 
-Signed-off-by: Mike Pagano <mpagano@gentoo.org>
----
- scripts/diffconfig | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+http://kisskb.ellerman.id.au/kisskb/buildresult/9148716/
 
-diff --git a/scripts/diffconfig b/scripts/diffconfig
-index b91f3e3..0ee6583 100755
---- a/scripts/diffconfig
-+++ b/scripts/diffconfig
-@@ -94,8 +94,13 @@ def main():
-         configa_filename = sys.argv[1]
-         configb_filename = sys.argv[2]
+Gr{oetje,eeting}s,
 
--    a = readconfig(file(configa_filename))
--    b = readconfig(file(configb_filename))
-+    try:
-+        a = readconfig(file(configa_filename))
-+        b = readconfig(file(configb_filename))
-+    except (IOError):
-+        e = sys.exc_info()[1]
-+        print("I/O error[%s]: %s\n" % (e.args[0],e.args[1]))
-+        usage()
+                        Geert
 
-     # print items in a but not b (accumulate, sort and print)
-     old = []
 --
-1.8.1.5
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
