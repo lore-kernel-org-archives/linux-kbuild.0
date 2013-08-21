@@ -1,34 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from avon.wwwdotorg.org ([70.85.31.133]:38336 "EHLO
-	avon.wwwdotorg.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751743Ab3HUSYj (ORCPT
+Received: from smtp.snhosting.dk ([87.238.248.203]:18263 "EHLO
+	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751836Ab3HUTwA (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 21 Aug 2013 14:24:39 -0400
-Message-ID: <521505E2.3050308@wwwdotorg.org>
-Date: Wed, 21 Aug 2013 12:24:34 -0600
-From: Stephen Warren <swarren@wwwdotorg.org>
+	Wed, 21 Aug 2013 15:52:00 -0400
+Date: Wed, 21 Aug 2013 21:51:57 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [RFC] Get rid of SUBARCH
+Message-ID: <20130821195157.GA18191@merkur.ravnborg.org>
+References: <1377073172-3662-1-git-send-email-richard@nod.at> <CAMuHMdWk-EPTNmPB1O1+F7YVQLjhQsFJznYwA3t6UCGUU1T9PQ@mail.gmail.com>
 MIME-Version: 1.0
-Subject: Re: [PATCH] MIPS: add <dt-bindings/> symlink
-References: <1377095762-18926-1-git-send-email-james.hogan@imgtec.com>
-In-Reply-To: <1377095762-18926-1-git-send-email-james.hogan@imgtec.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAMuHMdWk-EPTNmPB1O1+F7YVQLjhQsFJznYwA3t6UCGUU1T9PQ@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: James Hogan <james.hogan@imgtec.com>
-Cc: Ralf Baechle <ralf@linux-mips.org>, Stephen Warren <swarren@nvidia.com>, Michal Marek <mmarek@suse.cz>, Shawn Guo <shawn.guo@linaro.org>, Ian Campbell <ian.campbell@citrix.com>, Mark Rutland <mark.rutland@arm.com>, Pawel Moll <pawel.moll@arm.com>, Rob Herring <rob.herring@calxeda.com>, linux-mips@linux-mips.org, devicetree@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Richard Weinberger <richard@nod.at>, Linux-Arch <linux-arch@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, Ralf Baechle <ralf@linux-mips.org>, Paul Mundt <lethal@linux-sh.org>, Jeff Dike <jdike@addtoit.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, the arch/x86 maintainers <x86@kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, linux-m68k <linux-m68k@lists.linux-m68k.org>, Linux MIPS Mailing List <linux-mips@linux-mips.org>, Linux-sh list <linux-sh@vger.kernel.org>, uml-devel <user-mode-linux-devel@lists.sourceforge.net>
 
-On 08/21/2013 08:36 AM, James Hogan wrote:
-> Add symlink to include/dt-bindings from arch/mips/boot/dts/include/ to
-> match the ones in ARM and Meta architectures so that preprocessed device
-> tree files can include various useful constant definitions.
 > 
-> See commit c58299a (kbuild: create an "include chroot" for DT bindings)
-> merged in v3.10-rc1 for details.
+> > The series touches also m68k, sh, mips and unicore32.
+> > These architectures magically select a cross compiler if ARCH != SUBARCH.
+> > Do really need that behavior?
 > 
-> MIPS structures it's dts files a little differently to other
-> architectures, having a separate dts directory for each SoC/platform,
-> but most of the definitions in the dt-bindings/ directory are common so
-> for now lets just have a single "include chroot" for all MIPS platforms.
+> This does remove functionality.
+> It allows to build a kernel using e.g. "make ARCH=m68k".
+> 
+> Perhaps this can be moved to generic code? Most (not all!) cross-toolchains
+> are called $ARCH-{unknown-,}linux{,-gnu}.
+> Exceptions are e.g. am33_2.0-linux and bfin-uclinux.
 
-Acked-by: Stephen Warren <swarren@nvidia.com>
+Today you can specify CROSS_COMPILE in Kconfig.
+With this we should be able to remove these hacks.
+
+	Sam
