@@ -1,58 +1,78 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from multi.imgtec.com ([194.200.65.239]:2004 "EHLO multi.imgtec.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751629Ab3HUOgu (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 21 Aug 2013 10:36:50 -0400
-From: James Hogan <james.hogan@imgtec.com>
-Subject: [PATCH] MIPS: add <dt-bindings/> symlink
-Date: Wed, 21 Aug 2013 15:36:02 +0100
-Message-ID: <1377095762-18926-1-git-send-email-james.hogan@imgtec.com>
+Received: from mail-ob0-f169.google.com ([209.85.214.169]:65453 "EHLO
+	mail-ob0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751688Ab3HURZO convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 21 Aug 2013 13:25:14 -0400
+Received: by mail-ob0-f169.google.com with SMTP id wc20so1406932obb.28
+        for <linux-kbuild@vger.kernel.org>; Wed, 21 Aug 2013 10:25:13 -0700 (PDT)
+Date: Wed, 21 Aug 2013 12:25:11 -0500
+From: Rob Landley <rob@landley.net>
+Subject: Re: [RFC] Get rid of SUBARCH
+In-Reply-To: <CAMuHMdWk-EPTNmPB1O1+F7YVQLjhQsFJznYwA3t6UCGUU1T9PQ@mail.gmail.com>
+	(from geert@linux-m68k.org on Wed Aug 21 07:07:33 2013)
+Message-Id: <1377105911.2737.94@driftwood>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii; DelSp=Yes; Format=Flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ralf Baechle <ralf@linux-mips.org>
-Cc: James Hogan <james.hogan@imgtec.com>, Stephen Warren <swarren@nvidia.com>, Michal Marek <mmarek@suse.cz>, Shawn Guo <shawn.guo@linaro.org>, Ian Campbell <ian.campbell@citrix.com>, Mark Rutland <mark.rutland@arm.com>, Pawel Moll <pawel.moll@arm.com>, Rob Herring <rob.herring@calxeda.com>, linux-mips@linux-mips.org, devicetree@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Richard Weinberger <richard@nod.at>, Linux-Arch <linux-arch@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, Ralf Baechle <ralf@linux-mips.org>, Paul Mundt <lethal@linux-sh.org>, Jeff Dike <jdike@addtoit.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, the arch/x86 maintainers <x86@kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, linux-m68k <linux-m68k@lists.linux-m68k.org>, Linux MIPS Mailing List <linux-mips@linux-mips.org>, Linux-sh list <linux-sh@vger.kernel.org>, uml-devel <user-mode-linux-devel@lists.sourceforge.net>
 
-Add symlink to include/dt-bindings from arch/mips/boot/dts/include/ to
-match the ones in ARM and Meta architectures so that preprocessed device
-tree files can include various useful constant definitions.
+On 08/21/2013 07:07:33 AM, Geert Uytterhoeven wrote:
+> On Wed, Aug 21, 2013 at 10:19 AM, Richard Weinberger <richard@nod.at>  
+> wrote:
+> > This series is an attempt to remove the SUBARCH make parameter.
+> > It as introduced at the times of Linux 2.5 for UML to tell the UML
+> > build system what the real architecture is.
+> >
+> > But we actually don't need SUBARCH, we can store this information
+> > in the .config file.
+> 
+> Haha, now you have OS_ARCH (shouldn't that be called HOST_ARCH?)  
+> instead,
+> which is available only for UM?
+> 
+> > The series touches also m68k, sh, mips and unicore32.
+> > These architectures magically select a cross compiler if ARCH !=  
+> SUBARCH.
+> > Do really need that behavior?
+> 
+> This does remove functionality.
+> It allows to build a kernel using e.g. "make ARCH=m68k".
 
-See commit c58299a (kbuild: create an "include chroot" for DT bindings)
-merged in v3.10-rc1 for details.
+   make ARCH=m68k CROSS_COMPILE=m68k-
+   make ARCH=arm CROSS_COMPILE=armv5l-
+   make ARCH=sparc CROSS_COMPILE=sparc-
+   make ARCH=ppc CROSS_COMPILE=powerpc-
+   make ARCH=sh CROSS_COMPILE=sh4-
+   make ARCH=mips CROSS_COMPILE=mipsel-
+   make ARCH=x86 CROSS_COMPILE=i686-
+   make ARCH=alpha CROSS_COMPILE=alpha-
 
-MIPS structures it's dts files a little differently to other
-architectures, having a separate dts directory for each SoC/platform,
-but most of the definitions in the dt-bindings/ directory are common so
-for now lets just have a single "include chroot" for all MIPS platforms.
+Works the same way on all the targets I've tried so far. You specify  
+the architecture, you specify the cross compiler prefix, you feed it a  
+config file, you build.
 
-Signed-off-by: James Hogan <james.hogan@imgtec.com>
-Reviewed-by: Steven. J. Hill <steven.hill@imgtec.com>
-Cc: Ralf Baechle <ralf@linux-mips.org>
-Cc: Stephen Warren <swarren@nvidia.com>
-Cc: Michal Marek <mmarek@suse.cz>
-Cc: Shawn Guo <shawn.guo@linaro.org>
-Cc: Ian Campbell <ian.campbell@citrix.com>
-Cc: Mark Rutland <mark.rutland@arm.com>
-Cc: Pawel Moll <pawel.moll@arm.com>
-Cc: Rob Herring <rob.herring@calxeda.com>
-Cc: linux-mips@linux-mips.org
-Cc: devicetree@vger.kernel.org
-Cc: linux-kbuild@vger.kernel.org
----
- arch/mips/boot/dts/include/dt-bindings | 1 +
- 1 file changed, 1 insertion(+)
- create mode 120000 arch/mips/boot/dts/include/dt-bindings
+(If a target supplies its own default cross compiler prefix I just have  
+to override it with what mine's called anyway...)
 
-diff --git a/arch/mips/boot/dts/include/dt-bindings b/arch/mips/boot/dts/include/dt-bindings
-new file mode 120000
-index 0000000..08c00e4
---- /dev/null
-+++ b/arch/mips/boot/dts/include/dt-bindings
-@@ -0,0 +1 @@
-+../../../../../include/dt-bindings
-\ No newline at end of file
--- 
-1.8.1.2
+> Perhaps this can be moved to generic code? Most (not all!)  
+> cross-toolchains
+> are called $ARCH-{unknown-,}linux{,-gnu}.
+> Exceptions are e.g. am33_2.0-linux and bfin-uclinux.
 
+The linaro toolchain is arm-linux-gnueabihf- and the one on kernel.org  
+is arm-unknown-linux-gnueabi- and the one I build is armv5l- (because  
+the FSF's  
+$ARCH-unknown-gnu-format-tuple-all-hail-stallman-gnu-gnu-gnu-dammit-gcc  
+is just nuts: why would I say -linux- in a linux-to-linux toolchain? Do  
+windows toolchains say -windows-?)
 
+Other toolchain sources use other prefixes (-unknown- is often  
+-$VENDORNAME-), and then of course there's llvm... which is why you  
+specify CROSS_COMPILE= on the make command line.
+
+Rob
