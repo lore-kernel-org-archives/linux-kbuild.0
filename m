@@ -1,44 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from terminus.zytor.com ([198.137.202.10]:39145 "EHLO mail.zytor.com"
+Received: from multi.imgtec.com ([194.200.65.239]:2004 "EHLO multi.imgtec.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751492Ab3HUNDz (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 21 Aug 2013 09:03:55 -0400
-In-Reply-To: <alpine.DEB.2.10.1308211452260.31430@tglase.lan.tarent.de>
-References: <1377073172-3662-1-git-send-email-richard@nod.at> <alpine.DEB.2.10.1308211452260.31430@tglase.lan.tarent.de>
+	id S1751629Ab3HUOgu (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 21 Aug 2013 10:36:50 -0400
+From: James Hogan <james.hogan@imgtec.com>
+Subject: [PATCH] MIPS: add <dt-bindings/> symlink
+Date: Wed, 21 Aug 2013 15:36:02 +0100
+Message-ID: <1377095762-18926-1-git-send-email-james.hogan@imgtec.com>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Subject: Re: [RFC] Get rid of SUBARCH
-From: "H. Peter Anvin" <hpa@zytor.com>
-Date: Wed, 21 Aug 2013 14:58:04 +0200
-Message-ID: <7813eeb3-8f96-4d3d-87ec-f2a880122804@email.android.com>
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Thorsten Glaser <t.glaser@tarent.de>, Richard Weinberger <richard@nod.at>
-Cc: linux-arch@vger.kernel.org, mmarek@suse.cz, geert@linux-m68k.org, ralf@linux-mips.org, lethal@linux-sh.org, jdike@addtoit.com, gxt@mprc.pku.edu.cn, tglx@linutronix.de, mingo@redhat.com, x86@kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-m68k@vger.kernel.org, linux-mips@linux-mips.org, linux-sh@vger.kernel.org, user-mode-linux-devel@lists.sourceforge.net
+To: Ralf Baechle <ralf@linux-mips.org>
+Cc: James Hogan <james.hogan@imgtec.com>, Stephen Warren <swarren@nvidia.com>, Michal Marek <mmarek@suse.cz>, Shawn Guo <shawn.guo@linaro.org>, Ian Campbell <ian.campbell@citrix.com>, Mark Rutland <mark.rutland@arm.com>, Pawel Moll <pawel.moll@arm.com>, Rob Herring <rob.herring@calxeda.com>, linux-mips@linux-mips.org, devicetree@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-If ARCH doesn't match uname for some definition of match?
+Add symlink to include/dt-bindings from arch/mips/boot/dts/include/ to
+match the ones in ARM and Meta architectures so that preprocessed device
+tree files can include various useful constant definitions.
 
-Thorsten Glaser <t.glaser@tarent.de> wrote:
->On Wed, 21 Aug 2013, Richard Weinberger wrote:
->
->> The series touches also m68k, sh, mips and unicore32.
->> These architectures magically select a cross compiler if ARCH !=
->SUBARCH.
->> Do really need that behavior?
->
->Not precisely that, but it’s very common in m68k land
->to just cross-build kernels with
->
->$ make ARCH=m68k menuconfig
->$ make ARCH=m68k
->
->Maybe a generalising of that feature, and making it
->independent of SUBARCH (which can then die)?
->
->bye,
->//mirabilos
+See commit c58299a (kbuild: create an "include chroot" for DT bindings)
+merged in v3.10-rc1 for details.
 
+MIPS structures it's dts files a little differently to other
+architectures, having a separate dts directory for each SoC/platform,
+but most of the definitions in the dt-bindings/ directory are common so
+for now lets just have a single "include chroot" for all MIPS platforms.
+
+Signed-off-by: James Hogan <james.hogan@imgtec.com>
+Reviewed-by: Steven. J. Hill <steven.hill@imgtec.com>
+Cc: Ralf Baechle <ralf@linux-mips.org>
+Cc: Stephen Warren <swarren@nvidia.com>
+Cc: Michal Marek <mmarek@suse.cz>
+Cc: Shawn Guo <shawn.guo@linaro.org>
+Cc: Ian Campbell <ian.campbell@citrix.com>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: Pawel Moll <pawel.moll@arm.com>
+Cc: Rob Herring <rob.herring@calxeda.com>
+Cc: linux-mips@linux-mips.org
+Cc: devicetree@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org
+---
+ arch/mips/boot/dts/include/dt-bindings | 1 +
+ 1 file changed, 1 insertion(+)
+ create mode 120000 arch/mips/boot/dts/include/dt-bindings
+
+diff --git a/arch/mips/boot/dts/include/dt-bindings b/arch/mips/boot/dts/include/dt-bindings
+new file mode 120000
+index 0000000..08c00e4
+--- /dev/null
++++ b/arch/mips/boot/dts/include/dt-bindings
+@@ -0,0 +1 @@
++../../../../../include/dt-bindings
+\ No newline at end of file
 -- 
-Sent from my mobile phone. Please excuse brevity and lack of formatting.
+1.8.1.2
+
+
