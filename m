@@ -1,68 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ob0-f171.google.com ([209.85.214.171]:56874 "EHLO
-	mail-ob0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753813Ab3HVVdG convert rfc822-to-8bit (ORCPT
+Received: from mail-pb0-f47.google.com ([209.85.160.47]:52180 "EHLO
+	mail-pb0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753251Ab3HWMSD (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 22 Aug 2013 17:33:06 -0400
-Received: by mail-ob0-f171.google.com with SMTP id tb18so4671195obb.2
-        for <linux-kbuild@vger.kernel.org>; Thu, 22 Aug 2013 14:33:05 -0700 (PDT)
-Date: Thu, 22 Aug 2013 16:32:55 -0500
-From: Rob Landley <rob@landley.net>
-Subject: Re: [RFC] Get rid of SUBARCH
-In-Reply-To: <52167AB8.4060206@gmail.com> (from ddaney.cavm@gmail.com on Thu
-	Aug 22 15:55:20 2013)
-Message-Id: <1377207175.2737.113@driftwood>
+	Fri, 23 Aug 2013 08:18:03 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; DelSp=Yes; Format=Flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: 8BIT
+In-Reply-To: <1376591851-31854-1-git-send-email-slyfox@gentoo.org>
+References: <1376591851-31854-1-git-send-email-slyfox@gentoo.org>
+Date: Fri, 23 Aug 2013 14:18:02 +0200
+Message-ID: <CAMuHMdXRb2K+WSfFGK=SASTU=+fUZ3XRQQ-+5xoDS=04HG92OQ@mail.gmail.com>
+Subject: Re: [PATCH v2] Makefile: enable -Werror=implicit-int and
+ -Werror=strict-prototypes by default
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: David Daney <ddaney.cavm@gmail.com>
-Cc: Richard Weinberger <richard@nod.at>, Geert Uytterhoeven <geert@linux-m68k.org>, Sam Ravnborg <sam@ravnborg.org>, Linux-Arch <linux-arch@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, Ralf Baechle <ralf@linux-mips.org>, Paul Mundt <lethal@linux-sh.org>, Jeff Dike <jdike@addtoit.com>, Guan Xuetao <gxt@mprc.pku.edu.cn>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, the arch/x86 maintainers <x86@kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, linux-m68k <linux-m68k@lists.linux-m68k.org>, Linux MIPS Mailing List <linux-mips@linux-mips.org>, Linux-sh list <linux-sh@vger.kernel.org>, uml-devel <user-mode-linux-devel@lists.sourceforge.net>
+To: Sergei Trofimovich <slyfox@gentoo.org>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>
 
-On 08/22/2013 03:55:20 PM, David Daney wrote:
-> On 08/22/2013 01:41 PM, Rob Landley wrote:
->> On 08/22/2013 07:58:26 AM, Geert Uytterhoeven wrote:
->>> On Wed, Aug 21, 2013 at 9:51 PM, Sam Ravnborg <sam@ravnborg.org>  
->>> wrote:
->>> >> > The series touches also m68k, sh, mips and unicore32.
->>> >> > These architectures magically select a cross compiler if ARCH  
->>> !=
->>> SUBARCH.
->>> >> > Do really need that behavior?
->>> >>
->>> >> This does remove functionality.
->>> >> It allows to build a kernel using e.g. "make ARCH=m68k".
->>> >>
->>> >> Perhaps this can be moved to generic code? Most (not all!)
->>> cross-toolchains
->>> >> are called $ARCH-{unknown-,}linux{,-gnu}.
->>> >> Exceptions are e.g. am33_2.0-linux and bfin-uclinux.
->>> >
->>> > Today you can specify CROSS_COMPILE in Kconfig.
->>> > With this we should be able to remove these hacks.
->>> 
->>> The correct CROSS_COMPILE value depends on the host environment, not
->>> on the target configuration.
->> 
->> Actually it depends on _both_.
->> 
-> 
-> I think the important issue is not the exact dependencies of the  
-> value of CROSS_COMPILE, but rather that it varies enough that  
-> automatically choosing a value based on SUBARCH often gives the wrong  
-> result.
-> 
-> Removing SUBARCH and setting CROSS_COMPILE either from the make  
-> command line (or environment) or the config file, is a good idea  
-> because it simplifies the build system, makes things clearer, and  
-> yields more predictable results.
-> 
-> David Daney
+On Thu, Aug 15, 2013 at 8:37 PM, Sergei Trofimovich <slyfox@gentoo.org> wrote:
+> diff --git a/Makefile b/Makefile
+> index 6e48848..53f4776 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -374,6 +374,11 @@ KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
+>                    -Werror-implicit-function-declaration \
+>                    -Wno-format-security \
+>                    -fno-delete-null-pointer-checks
+> +
+> +# not universally available, but nice to have ones
+> +KBUILD_CFLAGS   +=  $(call cc-option,-Werror=implicit-int) \
+> +                   $(call cc-option,-Werror=strict-prototypes)
+> +
 
-Agreed. Expecting the build to guess the right $CROSS_COMPILE is like  
-expecting it to guess the right $PATH. It should be specified, not  
-heuristically probed.
+This should be _below_ the line
 
-Rob
+    include $(srctree)/arch/$(SRCARCH)/Makefile
+
+, together with the other users of cc-option, else it detects the features of
+the host compiler instead of the cross-compiler when cross-compiling:
+
+cc1: error: unrecognized command line option "-Werror=implicit-int"
+cc1: error: unrecognized command line option "-Werror=strict-prototypes"
+
+See also commit a1f42beb8e287482d1a802731d4fb7e2bdc2c703
+("Makefile: fix up CROSS_COMPILE and READABLE_ASM interaction.").
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
