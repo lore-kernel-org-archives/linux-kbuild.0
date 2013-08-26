@@ -1,72 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.gentoo.org ([140.211.166.183]:58704 "EHLO smtp.gentoo.org"
+Received: from mga14.intel.com ([143.182.124.37]:57551 "EHLO mga14.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755730Ab3HWR7l (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 23 Aug 2013 13:59:41 -0400
-From: Sergei Trofimovich <slyfox@gentoo.org>
-Subject: [PATCH v3] Makefile: enable -Werror=implicit-int and -Werror=strict-prototypes by default
-Date: Fri, 23 Aug 2013 20:55:33 +0300
-Message-Id: <1377280533-15349-1-git-send-email-slyfox@gentoo.org>
-In-Reply-To: <CAMuHMdXRb2K+WSfFGK=SASTU=+fUZ3XRQQ-+5xoDS=04HG92OQ@mail.gmail.com>
-References: <CAMuHMdXRb2K+WSfFGK=SASTU=+fUZ3XRQQ-+5xoDS=04HG92OQ@mail.gmail.com>
+	id S1752103Ab3HZTW4 convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 26 Aug 2013 15:22:56 -0400
+From: "Yang, Fei" <fei.yang@intel.com>
+Subject: Can anyone suggest a better fix? Not sure if I understand the
+ problem, but the patch fixed it
+Date: Mon, 26 Aug 2013 19:22:46 +0000
+Message-ID: <02E7334B1630744CBDC55DA85862258348E431C1@ORSMSX102.amr.corp.intel.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+MIME-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: Sergei Trofimovich <slyfox@gentoo.org>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, Geert Uytterhoeven <geert@linux-m68k.org>
+To: "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "'linux-kernel@vger.kernel.org' (linux-kernel@vger.kernel.org)" <linux-kernel@vger.kernel.org>
 
-The common error fount in forward-ported/backported patches is missing headers.
-One recent example (files and function names are mangled):
-
-    void foo(){}
-    EXPORT_SYMBOL(foo);
-
-gave only warning
-
-    foo.c:12345678:5: warning: function declaration isn't a prototype [-Wstrict-prototypes]
-    void foo(){}
-         ^
-
-    foo.c:12345679:5: warning: data definition has no type or storage class [enabled by default]
-    EXPORT_SYMBOL(foo);
-    foo.c:12345679:5: warning: type defaults to 'int' in declaration of 'EXORT_SYMBOL' [-Werror=implicit-int]
-
-Now it's a fatal error. Tested on x86_64 allyesconfig.
-
-Signed-off-by: Sergei Trofimovich <slyfox@gentoo.org>
-Cc: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org
-Cc: Andrew Morton <akpm@linux-foundation.org>
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>
+From 5e6501efa26bc19dad0b43e3a2b0daa81408a8ae Mon Sep 17 00:00:00 2001
+From: Fei Yang <fei.yang@intel.com>
+Date: Mon, 26 Aug 2013 11:21:48 -0700
+Subject: [PATCH] FIXDEP: error opening depfile
+ 
+Met a kernel build issue where fixdep fails to open a depfile,
+fixdep: error opening depfile: drivers/driver-name/.driver-code.o.d: No such file or directory
+make[4]: *** [drivers/driver-name/driver-code.o] Error 2
+make[3]: *** [drivers/driver-name] Error 2
+Don't know why the expected file was not created, but the assumption that
+the file had been created might not be true, so simply return for such failure.
+ 
+Change-Id: I299c01f2e3f6e1d04b19ced34ebeb964e16494e6
+Signed-off-by: Fei Yang <fei.yang@intel.com>
 ---
- Makefile | 6 +++++++
- 1 file changed, 6 insertions(+)
-
-Change since v2:
- - moved CFLAGS checks lower to catch $(CROSS) case
-   as suggested by Geert
- - added comments as other warning options do
-
-Change since v1:
- - use 'cc-option' to respect old gccs
- - fix typos. Thanks to Oleg Verych
-
-diff --git a/Makefile b/Makefile
-index a5a55f4..f5f36e1 100644
---- a/Makefile
-+++ b/Makefile
-@@ -659,6 +660,12 @@ KBUILD_CFLAGS	+= $(call cc-option,-fno-strict-overflow)
- # conserve stack if available
- KBUILD_CFLAGS   += $(call cc-option,-fconserve-stack)
+ scripts/basic/fixdep.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
  
-+# disallog errors like 'EXPORT_GPL(foo);' with missing header
-+KBUILD_CFLAGS   += $(call cc-option,-Werror=implicit-int)
-+
-+# require functions to have argumens in prototypes, not empty 'int foo()'
-+KBUILD_CFLAGS   += $(call cc-option,-Werror=strict-prototypes)
-+
- # use the deterministic mode of AR if available
- KBUILD_ARFLAGS := $(call ar-option,D)
- 
+diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
+index cb1f50c..2c065e5 100644
+--- a/scripts/basic/fixdep.c
++++ b/scripts/basic/fixdep.c
+@@ -377,7 +377,7 @@ static void print_deps(void)
+        if (fd < 0) {
+                fprintf(stderr, "fixdep: error opening depfile: ");
+                perror(depfile);
+-               exit(2);
++               return;
+        }
+        if (fstat(fd, &st) < 0) {
+                 fprintf(stderr, "fixdep: error fstat'ing depfile: ");
 -- 
-1.8.3.2
-
+1.7.9.5
