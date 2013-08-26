@@ -1,52 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga14.intel.com ([143.182.124.37]:57551 "EHLO mga14.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752103Ab3HZTW4 convert rfc822-to-8bit (ORCPT
+Received: from smtp.snhosting.dk ([87.238.248.203]:26949 "EHLO
+	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751725Ab3HZUKi (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 26 Aug 2013 15:22:56 -0400
-From: "Yang, Fei" <fei.yang@intel.com>
-Subject: Can anyone suggest a better fix? Not sure if I understand the
- problem, but the patch fixed it
-Date: Mon, 26 Aug 2013 19:22:46 +0000
-Message-ID: <02E7334B1630744CBDC55DA85862258348E431C1@ORSMSX102.amr.corp.intel.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+	Mon, 26 Aug 2013 16:10:38 -0400
+Date: Mon, 26 Aug 2013 22:10:35 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: Can anyone suggest a better fix? Not sure if I understand the
+	problem, but the patch fixed it
+Message-ID: <20130826201035.GA21141@merkur.ravnborg.org>
+References: <02E7334B1630744CBDC55DA85862258348E431C1@ORSMSX102.amr.corp.intel.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <02E7334B1630744CBDC55DA85862258348E431C1@ORSMSX102.amr.corp.intel.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "'linux-kernel@vger.kernel.org' (linux-kernel@vger.kernel.org)" <linux-kernel@vger.kernel.org>
+To: "Yang, Fei" <fei.yang@intel.com>
+Cc: "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "'linux-kernel@vger.kernel.org' (linux-kernel@vger.kernel.org)" <linux-kernel@vger.kernel.org>
 
-From 5e6501efa26bc19dad0b43e3a2b0daa81408a8ae Mon Sep 17 00:00:00 2001
-From: Fei Yang <fei.yang@intel.com>
-Date: Mon, 26 Aug 2013 11:21:48 -0700
-Subject: [PATCH] FIXDEP: error opening depfile
- 
-Met a kernel build issue where fixdep fails to open a depfile,
-fixdep: error opening depfile: drivers/driver-name/.driver-code.o.d: No such file or directory
-make[4]: *** [drivers/driver-name/driver-code.o] Error 2
-make[3]: *** [drivers/driver-name] Error 2
-Don't know why the expected file was not created, but the assumption that
-the file had been created might not be true, so simply return for such failure.
- 
-Change-Id: I299c01f2e3f6e1d04b19ced34ebeb964e16494e6
-Signed-off-by: Fei Yang <fei.yang@intel.com>
----
- scripts/basic/fixdep.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
- 
-diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
-index cb1f50c..2c065e5 100644
---- a/scripts/basic/fixdep.c
-+++ b/scripts/basic/fixdep.c
-@@ -377,7 +377,7 @@ static void print_deps(void)
-        if (fd < 0) {
-                fprintf(stderr, "fixdep: error opening depfile: ");
-                perror(depfile);
--               exit(2);
-+               return;
-        }
-        if (fstat(fd, &st) < 0) {
-                 fprintf(stderr, "fixdep: error fstat'ing depfile: ");
--- 
-1.7.9.5
+On Mon, Aug 26, 2013 at 07:22:46PM +0000, Yang, Fei wrote:
+> >From 5e6501efa26bc19dad0b43e3a2b0daa81408a8ae Mon Sep 17 00:00:00 2001
+> From: Fei Yang <fei.yang@intel.com>
+> Date: Mon, 26 Aug 2013 11:21:48 -0700
+> Subject: [PATCH] FIXDEP: error opening depfile
+>  
+> Met a kernel build issue where fixdep fails to open a depfile,
+> fixdep: error opening depfile: drivers/driver-name/.driver-code.o.d: No such file or directory
+> make[4]: *** [drivers/driver-name/driver-code.o] Error 2
+> make[3]: *** [drivers/driver-name] Error 2
+> Don't know why the expected file was not created, but the assumption that
+> the file had been created might not be true, so simply return for such failure.
+
+I tried to grep:
+git grep "driver-name"
+
+No hits.
+
+Are you trying to fix a build issue with something out-of-tree - or is this only in linux-next?
+
+	Sam
