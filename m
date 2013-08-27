@@ -1,42 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.snhosting.dk ([87.238.248.203]:26949 "EHLO
-	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751725Ab3HZUKi (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 26 Aug 2013 16:10:38 -0400
-Date: Mon, 26 Aug 2013 22:10:35 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: Can anyone suggest a better fix? Not sure if I understand the
-	problem, but the patch fixed it
-Message-ID: <20130826201035.GA21141@merkur.ravnborg.org>
-References: <02E7334B1630744CBDC55DA85862258348E431C1@ORSMSX102.amr.corp.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <02E7334B1630744CBDC55DA85862258348E431C1@ORSMSX102.amr.corp.intel.com>
+Received: from cantor2.suse.de ([195.135.220.15]:42634 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753062Ab3H0Nx5 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 27 Aug 2013 09:53:57 -0400
+From: Michal Marek <mmarek@suse.cz>
+Subject: [PATCH] kbuild: Do not overwrite include/config/kernel.release needlessly
+Date: Tue, 27 Aug 2013 15:53:44 +0200
+Message-Id: <1377611624-11570-1-git-send-email-mmarek@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yang, Fei" <fei.yang@intel.com>
-Cc: "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "'linux-kernel@vger.kernel.org' (linux-kernel@vger.kernel.org)" <linux-kernel@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
 
-On Mon, Aug 26, 2013 at 07:22:46PM +0000, Yang, Fei wrote:
-> >From 5e6501efa26bc19dad0b43e3a2b0daa81408a8ae Mon Sep 17 00:00:00 2001
-> From: Fei Yang <fei.yang@intel.com>
-> Date: Mon, 26 Aug 2013 11:21:48 -0700
-> Subject: [PATCH] FIXDEP: error opening depfile
->  
-> Met a kernel build issue where fixdep fails to open a depfile,
-> fixdep: error opening depfile: drivers/driver-name/.driver-code.o.d: No such file or directory
-> make[4]: *** [drivers/driver-name/driver-code.o] Error 2
-> make[3]: *** [drivers/driver-name] Error 2
-> Don't know why the expected file was not created, but the assumption that
-> the file had been created might not be true, so simply return for such failure.
+Use filechk to detect if the content changed or not.
 
-I tried to grep:
-git grep "driver-name"
+Signed-off-by: Michal Marek <mmarek@suse.cz>
+---
+ Makefile | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-No hits.
+diff --git a/Makefile b/Makefile
+index 4e3575c..3aa232f 100644
+--- a/Makefile
++++ b/Makefile
+@@ -794,10 +794,13 @@ PHONY += $(vmlinux-dirs)
+ $(vmlinux-dirs): prepare scripts
+ 	$(Q)$(MAKE) $(build)=$@
+ 
++define filechk_kernel.release
++	echo "$(KERNELVERSION)$$($(CONFIG_SHELL) $(srctree)/scripts/setlocalversion $(srctree))"
++endef
++
+ # Store (new) KERNELRELEASE string in include/config/kernel.release
+ include/config/kernel.release: include/config/auto.conf FORCE
+-	$(Q)rm -f $@
+-	$(Q)echo "$(KERNELVERSION)$$($(CONFIG_SHELL) $(srctree)/scripts/setlocalversion $(srctree))" > $@
++	$(call filechk,kernel.release)
+ 
+ 
+ # Things we need to do before we recursively start building the kernel
+-- 
+1.8.1.4
 
-Are you trying to fix a build issue with something out-of-tree - or is this only in linux-next?
-
-	Sam
