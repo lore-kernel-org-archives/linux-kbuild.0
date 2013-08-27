@@ -1,44 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:42634 "EHLO mx2.suse.de"
+Received: from mga01.intel.com ([192.55.52.88]:5018 "EHLO mga01.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753062Ab3H0Nx5 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 27 Aug 2013 09:53:57 -0400
-From: Michal Marek <mmarek@suse.cz>
-Subject: [PATCH] kbuild: Do not overwrite include/config/kernel.release needlessly
-Date: Tue, 27 Aug 2013 15:53:44 +0200
-Message-Id: <1377611624-11570-1-git-send-email-mmarek@suse.cz>
+	id S1753298Ab3H0TFW convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 27 Aug 2013 15:05:22 -0400
+From: "Yang, Fei" <fei.yang@intel.com>
+Subject: RE: Can anyone suggest a better fix? Not sure if I understand the
+	problem, but the patch fixed it
+Date: Tue, 27 Aug 2013 19:05:20 +0000
+Message-ID: <02E7334B1630744CBDC55DA85862258348E458D8@ORSMSX102.amr.corp.intel.com>
+References: <02E7334B1630744CBDC55DA85862258348E431C1@ORSMSX102.amr.corp.intel.com>
+ <20130826201035.GA21141@merkur.ravnborg.org>
+In-Reply-To: <20130826201035.GA21141@merkur.ravnborg.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
+MIME-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "'linux-kernel@vger.kernel.org' (linux-kernel@vger.kernel.org)" <linux-kernel@vger.kernel.org>
 
-Use filechk to detect if the content changed or not.
+>> From: Fei Yang <fei.yang@intel.com>
+>> Date: Mon, 26 Aug 2013 11:21:48 -0700
+>> Subject: [PATCH] FIXDEP: error opening depfile
+>>  
+>> Met a kernel build issue where fixdep fails to open a depfile,
+>> fixdep: error opening depfile: drivers/driver-name/.driver-code.o.d: 
+>> No such file or directory
+>> make[4]: *** [drivers/driver-name/driver-code.o] Error 2
+>> make[3]: *** [drivers/driver-name] Error 2 Don't know why the expected 
+>> file was not created, but the assumption that the file had been 
+>> created might not be true, so simply return for such failure.
 
-Signed-off-by: Michal Marek <mmarek@suse.cz>
----
- Makefile | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+> I tried to grep:
+> git grep "driver-name"
+>
+> No hits.
+>
+>Are you trying to fix a build issue with something out-of-tree - or is this only in linux-next?
 
-diff --git a/Makefile b/Makefile
-index 4e3575c..3aa232f 100644
---- a/Makefile
-+++ b/Makefile
-@@ -794,10 +794,13 @@ PHONY += $(vmlinux-dirs)
- $(vmlinux-dirs): prepare scripts
- 	$(Q)$(MAKE) $(build)=$@
- 
-+define filechk_kernel.release
-+	echo "$(KERNELVERSION)$$($(CONFIG_SHELL) $(srctree)/scripts/setlocalversion $(srctree))"
-+endef
-+
- # Store (new) KERNELRELEASE string in include/config/kernel.release
- include/config/kernel.release: include/config/auto.conf FORCE
--	$(Q)rm -f $@
--	$(Q)echo "$(KERNELVERSION)$$($(CONFIG_SHELL) $(srctree)/scripts/setlocalversion $(srctree))" > $@
-+	$(call filechk,kernel.release)
- 
- 
- # Things we need to do before we recursively start building the kernel
--- 
-1.8.1.4
+Oh, I changed the driver and file name in the error message to avoid unnecessary confusion as the driver is not an upstream one. But this issue happens randomly, not 100% reproducible. And it happens on different driver sometimes. So I don't think it would be driver related and pointing out the driver name would not help much anyway.
+What I'm trying to understand is under what condition fixdep is triggered in the kernel build process. Is the .d file always generated for every driver? If that file is always created, could it be a timing issue that the .d file was actually created but then deleted when fixdep trying to find it?
+
+Thank you Sam! I'm not familiar with kernel build scripts, any idea is really appreciated.
+
+-Fei
 
