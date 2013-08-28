@@ -1,33 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:48356 "EHLO mx2.suse.de"
+Received: from mga14.intel.com ([143.182.124.37]:45358 "EHLO mga14.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754492Ab3H1PL3 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 28 Aug 2013 11:11:29 -0400
-Message-ID: <521E131E.6060503@suse.cz>
-Date: Wed, 28 Aug 2013 17:11:26 +0200
-From: Michal Marek <mmarek@suse.cz>
+	id S1753725Ab3H1Q1s convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 28 Aug 2013 12:27:48 -0400
+From: "Yang, Fei" <fei.yang@intel.com>
+Subject: RE: Can anyone suggest a better fix? Not sure if I understand the
+ problem, but the patch fixed it
+Date: Wed, 28 Aug 2013 16:27:46 +0000
+Message-ID: <02E7334B1630744CBDC55DA85862258348E4792D@ORSMSX102.amr.corp.intel.com>
+References: <02E7334B1630744CBDC55DA85862258348E431C1@ORSMSX102.amr.corp.intel.com>
+ <20130826201035.GA21141@merkur.ravnborg.org>
+ <02E7334B1630744CBDC55DA85862258348E458D8@ORSMSX102.amr.corp.intel.com>
+ <521E1232.6010501@suse.cz>
+In-Reply-To: <521E1232.6010501@suse.cz>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Subject: Re: [PATCH] kbuild: Do not overwrite include/config/kernel.release
- needlessly
-References: <1377611624-11570-1-git-send-email-mmarek@suse.cz>
-In-Reply-To: <1377611624-11570-1-git-send-email-mmarek@suse.cz>
-Content-Type: text/plain; charset=ISO-8859-2
-Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: Sam Ravnborg <sam@ravnborg.org>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "'linux-kernel@vger.kernel.org' (linux-kernel@vger.kernel.org)" <linux-kernel@vger.kernel.org>
 
-On 27.8.2013 15:53, Michal Marek wrote:
-> Use filechk to detect if the content changed or not.
-> 
-> Signed-off-by: Michal Marek <mmarek@suse.cz>
-> ---
->  Makefile | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
+>>>> From: Fei Yang <fei.yang@intel.com>
+>>>> Date: Mon, 26 Aug 2013 11:21:48 -0700
+>>>> Subject: [PATCH] FIXDEP: error opening depfile
+>>>>  
+>>>> Met a kernel build issue where fixdep fails to open a depfile,
+>>>> fixdep: error opening depfile: drivers/driver-name/.driver-code.o.d: 
+>>>> No such file or directory
+>>>> make[4]: *** [drivers/driver-name/driver-code.o] Error 2
+>>>> make[3]: *** [drivers/driver-name] Error 2 Don't know why the 
+>>>> expected file was not created, but the assumption that the file had 
+>>>> been created might not be true, so simply return for such failure.
+>>> 
+>>> I tried to grep:
+>>> git grep "driver-name"
+>>>
+>>> No hits.
+>>>
+>>> Are you trying to fix a build issue with something out-of-tree - or is this only in linux-next?
+>>> 
+>> Oh, I changed the driver and file name in the error message to avoid 
+>> unnecessary confusion
 
-I merged this to kbuild.git#kbuild now.
+>You achieved quite the opposite :-).
+Yes, that appears to be a bad idea.
 
-Thanks,
-Michal
+>> as the driver is not an upstream one. But this issue happens randomly, 
+>> not 100% reproducible. And it happens on different driver sometimes.
+
+>Are you able to reproduce this with the vanilla kernel? If so, details please.
+I have not tried vanilla kernel.
+
+>If not, then this can be something with your module's build system. Are you using anything fancier than
+>
+>$ cat Makefile
+>obj-m += my-module.o
+>$ make -C <kernel build tree> M=$PWD
+
+> Michal
+
+Nothing fancy except the kernel build is triggered by Android build system. And the driver is being built into the kernel with obj-(CONFIG_MY_DRIVER) += my-driver.o, so it's not even a loadable module.
+I thought fixdep is about finding module dependency, and it isn't needed for built-in drivers. Please correct me if I'm wrong. I want to understand if the .d file had never been generated or had been generated but deleted by the time fixdep tries to open it.
+
+
+Fei
 
