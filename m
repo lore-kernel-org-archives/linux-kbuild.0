@@ -1,70 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from one.firstfloor.org ([193.170.194.197]:56440 "EHLO
-	one.firstfloor.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752414Ab3H2GDh (ORCPT
+Received: from merlin.infradead.org ([205.233.59.134]:40515 "EHLO
+	merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754620Ab3H2PIp (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 29 Aug 2013 02:03:37 -0400
-Date: Thu, 29 Aug 2013 08:03:36 +0200
-From: Andi Kleen <andi@firstfloor.org>
-Subject: Re: 32bit allyesconfig on 64bit system broke
-Message-ID: <20130829060336.GL19750@two.firstfloor.org>
-References: <20130809225736.GG19750@two.firstfloor.org>
- <520A97C1.6000708@suse.cz>
- <521E661B.1030802@zytor.com>
+	Thu, 29 Aug 2013 11:08:45 -0400
+Message-ID: <521F63E4.80809@infradead.org>
+Date: Thu, 29 Aug 2013 08:08:20 -0700
+From: Randy Dunlap <rdunlap@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <521E661B.1030802@zytor.com>
+Subject: Re: fixdep ought to be compiled with -D_FILE_OFFSET_BITS
+References: <alpine.LSU.2.10.9.1308291200240.15586@nerf07.vanv.qr>
+In-Reply-To: <alpine.LSU.2.10.9.1308291200240.15586@nerf07.vanv.qr>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "H. Peter Anvin" <hpa@zytor.com>
-Cc: Michal Marek <mmarek@suse.cz>, Andi Kleen <andi@firstfloor.org>, linux-kbuild@vger.kernel.org
+To: Jan Engelhardt <jengelh@inai.de>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
 
-On Wed, Aug 28, 2013 at 02:05:31PM -0700, H. Peter Anvin wrote:
-> On 08/13/2013 01:32 PM, Michal Marek wrote:
-> > Dne 10.8.2013 00:57, Andi Kleen napsal(a):
-> >>
-> >> % linux32 make allyesconfig
-> >> % head .config
-> >> % head .config
-> >> #
-> >> # Automatically generated file; DO NOT EDIT.
-> >> # Linux/x86 3.11.0-rc4 Kernel Configuration
-> >> #
-> >> CONFIG_64BIT=y
-> >> CONFIG_X86_64=y
-> >> CONFIG_X86=y
-> >>
-> >> This used to work to give me a 32bit allyesconfig.
-> >> How am I supposed to do this now?
-> > 
-> > This changed in ffee0de (x86: Default to ARCH=x86 to avoid overriding
-> > CONFIG_64BIT). The default $ARCH value on both ix86 and x86_64
-> > buildhosts is "x86" and CONFIG_64BIT is therefore a user-selectable
-> > knob. You can do
-> > 
-> >   make ARCH=i386 allyesconfig
-> > 
-> > to force 32bit. Or the generic way:
-> > 
-> >   echo '# CONFIG_64BIT is not set' >base.config
-> >   KCONFIG_ALLCONFIG=base.config linux32 make allyesconfig
-> > 
+adding linux-kbuild list...
+
+
+On 08/29/13 03:04, Jan Engelhardt wrote:
 > 
-> "make ARCH=i386 allyesconfig" has been the standard way to do this for
-> quite a few years, so that is the forward and backwards compatible way.
+> Because fixdep is compiled without -D_FILE_OFFSET_BITS=64,
+> a 32-bit fixdep (in a chroot build root, for example) may fail to run
+> on a 64-bit host system if any file has an inode larger than 2^32,
+> which can easily happen (in my case, on xfs):
+> 
+> 
+> [ares07:~/rpmbuild/BUILD/kernel-pae-3.10.9~jng20/linux-obj]
+> $ make silentoldconfig -C $PWD/../linux-3.10 O=$PWD V=1
+> 
+> make: Entering directory `/home/abuild/rpmbuild/BUILD/kernel-pae-3.10.9~jng20/linux-3.10'
+> make -C /home/abuild/rpmbuild/BUILD/kernel-pae-3.10.9~jng20/linux-obj \
+> KBUILD_SRC=/home/abuild/rpmbuild/BUILD/kernel-pae-3.10.9~jng20/linux-3.10 \
+> KBUILD_EXTMOD="" -f /home/abuild/rpmbuild/BUILD/kernel-pae-3.10.9~jng20/linux-3.10/Makefile \
+> silentoldconfig
+> make -f /home/abuild/rpmbuild/BUILD/kernel-pae-3.10.9~jng20/linux-3.10/scripts/Makefile.build obj=scripts/basic
+>   gcc -Wp,-MD,scripts/basic/.fixdep.d -Iscripts/basic -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -o scripts/basic/fixdep /home/abuild/rpmbuild/BUILD/kernel-pae-3.10.9~jng20/linux-3.10/scripts/basic/fixdep.c  
+> fixdep: error fstat'ing depfile: scripts/basic/.fixdep.d: Value too large for defined data type
+> make[2]: *** [scripts/basic/fixdep] Error 2
+> make[1]: *** [scripts_basic] Error 2
+> make: *** [sub-make] Error 2
+> make: Leaving directory `/home/abuild/rpmbuild/BUILD/kernel-pae-3.10.9~jng20/linux-3.10'
+> --
 
-I've always used "linux32 ..."
 
-Well it broke all my scripts and seems to be a totally pointless
-change as far as I can tell.
-
-The worse thing is that I didn't notice initially because it's
-a silent problem -- the 64bit kernel still boots fine on any
-system with lm support, even with 32bit userland.
-
-So silently breaking long established practice ... no excuse for things
-like that really in a project like Linux. If you break things
-please always do it in a obvious way.
-
--Andi
+-- 
+~Randy
