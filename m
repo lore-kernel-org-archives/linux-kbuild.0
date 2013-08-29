@@ -1,51 +1,135 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from merlin.infradead.org ([205.233.59.134]:40515 "EHLO
-	merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754620Ab3H2PIp (ORCPT
+Received: from mail1.bemta5.messagelabs.com ([195.245.231.146]:39640 "EHLO
+	mail1.bemta5.messagelabs.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752214Ab3H2PRG (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 29 Aug 2013 11:08:45 -0400
-Message-ID: <521F63E4.80809@infradead.org>
-Date: Thu, 29 Aug 2013 08:08:20 -0700
-From: Randy Dunlap <rdunlap@infradead.org>
+	Thu, 29 Aug 2013 11:17:06 -0400
+Date: Thu, 29 Aug 2013 17:10:37 +0200
+From: Johannes Thumshirn <johannes.thumshirn@men.de>
+Subject: Re: [PATCH] kconfig: Make diffconfig work with Python 3
+Message-ID: <20130829151037.GB32730@jtlinux>
+References: <20130809122655.GA7108@jtlinux>
+ <CA+bK7J4g04AumqDSznWbxeAUCrrV-ewMN=YenFSc=HQHNVae4Q@mail.gmail.com>
 MIME-Version: 1.0
-Subject: Re: fixdep ought to be compiled with -D_FILE_OFFSET_BITS
-References: <alpine.LSU.2.10.9.1308291200240.15586@nerf07.vanv.qr>
-In-Reply-To: <alpine.LSU.2.10.9.1308291200240.15586@nerf07.vanv.qr>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <CA+bK7J4g04AumqDSznWbxeAUCrrV-ewMN=YenFSc=HQHNVae4Q@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jan Engelhardt <jengelh@inai.de>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
+To: Tim Bird <tbird20d@gmail.com>
+Cc: Johannes Thumshirn <johannes.thumshirn@men.de>, Sam Ravnborg <sam@ravnborg.org>, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
-adding linux-kbuild list...
+On Wed, Aug 28, 2013 at 07:29:53AM -0700, Tim Bird wrote:
+> On Fri, Aug 9, 2013 at 5:27 AM, Johannes Thumshirn
+> <johannes.thumshirn@men.de> wrote:
+> > Adjust diffconfig to run cleanly on Python 3 (Tested with 3.3.2) and
+> > Python 2 (2.7.5)
+> >
+> > Signed-off-by: Johannes Thumshirn <johannes.thumshirn@men.de>
+> > ---
+> >  scripts/diffconfig |   26 +++++++++++++-------------
+> >  1 file changed, 13 insertions(+), 13 deletions(-)
+> >
+> > diff --git a/scripts/diffconfig b/scripts/diffconfig
+> > index b91f3e3..dd0e75b 100755
+> > --- a/scripts/diffconfig
+> > +++ b/scripts/diffconfig
+> > @@ -10,7 +10,7 @@
+> >  import sys, os
+> >
+> >  def usage():
+> > -    print """Usage: diffconfig [-h] [-m] [<config1> <config2>]
+> > +    print ("""Usage: diffconfig [-h] [-m] [<config1> <config2>]
+> >
+> >  Diffconfig is a simple utility for comparing two .config files.
+> >  Using standard diff to compare .config files often includes extraneous and
+> > @@ -33,7 +33,7 @@ Example usage:
+> >   EXT2_FS  y -> n
+> >   LOG_BUF_SHIFT  14 -> 16
+> >   PRINTK_TIME  n -> y
+> > -"""
+> > +""")
+> >      sys.exit(0)
+> >
+> >  # returns a dictionary of name/value pairs for config items in the file
+> > @@ -54,23 +54,23 @@ def print_config(op, config, value, new_value):
+> >      if merge_style:
+> >          if new_value:
+> >              if new_value=="n":
+> > -                print "# CONFIG_%s is not set" % config
+> > +                print("# CONFIG_%s is not set" % config)
+> >              else:
+> > -                print "CONFIG_%s=%s" % (config, new_value)
+> > +                print("CONFIG_%s=%s" % (config, new_value))
+> >      else:
+> >          if op=="-":
+> > -            print "-%s %s" % (config, value)
+> > +            print("-%s %s" % (config, value))
+> >          elif op=="+":
+> > -            print "+%s %s" % (config, new_value)
+> > +            print("+%s %s" % (config, new_value))
+> >          else:
+> > -            print " %s %s -> %s" % (config, value, new_value)
+> > +            print(" %s %s -> %s" % (config, value, new_value))
+> >
+> >  def main():
+> >      global merge_style
+> >
+> >      # parse command line args
+> >      if ("-h" in sys.argv or "--help" in sys.argv):
+> > -       usage()
+> > +        usage()
+> >
+> >      merge_style = 0
+> >      if "-m" in sys.argv:
+> > @@ -79,13 +79,13 @@ def main():
+> >
+> >      argc = len(sys.argv)
+> >      if not (argc==1 or argc == 3):
+> > -        print "Error: incorrect number of arguments or unrecognized option"
+> > +        print("Error: incorrect number of arguments or unrecognized option")
+> >          usage()
+> >
+> >      if argc == 1:
+> >          # if no filenames given, assume .config and .config.old
+> >          build_dir=""
+> > -        if os.environ.has_key("KBUILD_OUTPUT"):
+> > +        if 'KBUILD_OUTPUT' in os.environ:
+> >              build_dir = os.environ["KBUILD_OUTPUT"]+"/"
+> >
+> >          configa_filename = build_dir + ".config.old"
+> > @@ -94,8 +94,8 @@ def main():
+> >          configa_filename = sys.argv[1]
+> >          configb_filename = sys.argv[2]
+> >
+> > -    a = readconfig(file(configa_filename))
+> > -    b = readconfig(file(configb_filename))
+> > +    a = readconfig(open(configa_filename))
+> > +    b = readconfig(open(configb_filename))
+> >
+> >      # print items in a but not b (accumulate, sort and print)
+> >      old = []
+> > @@ -121,7 +121,7 @@ def main():
+> >
+> >      # now print items in b but not in a
+> >      # (items from b that were in a were removed above)
+> > -    new = b.keys()
+> > +    new = list(b.keys())
+> >      new.sort()
+> >      for config in new:
+> >          print_config("+", config, None, b[config])
+> > --
+> > 1.7.9.5
+>
+> Sorry I missed this earlier.  My new e-mail is tim.bird@sonymobile.com, and
+> my old am.sony.com address doesn't work any more.
+>
+> Thanks - this looks great.
+>
+> Acked-by Tim Bird <tim.bird@sonymobile.com>
+>
+>  -- Tim Bird
+> Senior Software Engineer, Sony Mobile
+> Architecture Group Chair, CE Workgroup, Linux Foundation
 
-
-On 08/29/13 03:04, Jan Engelhardt wrote:
-> 
-> Because fixdep is compiled without -D_FILE_OFFSET_BITS=64,
-> a 32-bit fixdep (in a chroot build root, for example) may fail to run
-> on a 64-bit host system if any file has an inode larger than 2^32,
-> which can easily happen (in my case, on xfs):
-> 
-> 
-> [ares07:~/rpmbuild/BUILD/kernel-pae-3.10.9~jng20/linux-obj]
-> $ make silentoldconfig -C $PWD/../linux-3.10 O=$PWD V=1
-> 
-> make: Entering directory `/home/abuild/rpmbuild/BUILD/kernel-pae-3.10.9~jng20/linux-3.10'
-> make -C /home/abuild/rpmbuild/BUILD/kernel-pae-3.10.9~jng20/linux-obj \
-> KBUILD_SRC=/home/abuild/rpmbuild/BUILD/kernel-pae-3.10.9~jng20/linux-3.10 \
-> KBUILD_EXTMOD="" -f /home/abuild/rpmbuild/BUILD/kernel-pae-3.10.9~jng20/linux-3.10/Makefile \
-> silentoldconfig
-> make -f /home/abuild/rpmbuild/BUILD/kernel-pae-3.10.9~jng20/linux-3.10/scripts/Makefile.build obj=scripts/basic
->   gcc -Wp,-MD,scripts/basic/.fixdep.d -Iscripts/basic -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -o scripts/basic/fixdep /home/abuild/rpmbuild/BUILD/kernel-pae-3.10.9~jng20/linux-3.10/scripts/basic/fixdep.c  
-> fixdep: error fstat'ing depfile: scripts/basic/.fixdep.d: Value too large for defined data type
-> make[2]: *** [scripts/basic/fixdep] Error 2
-> make[1]: *** [scripts_basic] Error 2
-> make: *** [sub-make] Error 2
-> make: Leaving directory `/home/abuild/rpmbuild/BUILD/kernel-pae-3.10.9~jng20/linux-3.10'
-> --
-
-
--- 
-~Randy
+Is there any comments from the kbuild maintainers?
