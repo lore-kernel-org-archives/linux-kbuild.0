@@ -1,135 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail1.bemta5.messagelabs.com ([195.245.231.146]:39640 "EHLO
-	mail1.bemta5.messagelabs.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752214Ab3H2PRG (ORCPT
+Received: from smtp.snhosting.dk ([87.238.248.203]:43156 "EHLO
+	smtp.domainteam.dk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754525Ab3H2RzN (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 29 Aug 2013 11:17:06 -0400
-Date: Thu, 29 Aug 2013 17:10:37 +0200
-From: Johannes Thumshirn <johannes.thumshirn@men.de>
-Subject: Re: [PATCH] kconfig: Make diffconfig work with Python 3
-Message-ID: <20130829151037.GB32730@jtlinux>
-References: <20130809122655.GA7108@jtlinux>
- <CA+bK7J4g04AumqDSznWbxeAUCrrV-ewMN=YenFSc=HQHNVae4Q@mail.gmail.com>
+	Thu, 29 Aug 2013 13:55:13 -0400
+Date: Thu, 29 Aug 2013 19:55:11 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: Can anyone suggest a better fix? Not sure if I understand the
+	problem, but the patch fixed it
+Message-ID: <20130829175511.GA23620@merkur.ravnborg.org>
+References: <02E7334B1630744CBDC55DA85862258348E431C1@ORSMSX102.amr.corp.intel.com> <20130826201035.GA21141@merkur.ravnborg.org> <02E7334B1630744CBDC55DA85862258348E458D8@ORSMSX102.amr.corp.intel.com> <521E1232.6010501@suse.cz> <02E7334B1630744CBDC55DA85862258348E4792D@ORSMSX102.amr.corp.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CA+bK7J4g04AumqDSznWbxeAUCrrV-ewMN=YenFSc=HQHNVae4Q@mail.gmail.com>
+In-Reply-To: <02E7334B1630744CBDC55DA85862258348E4792D@ORSMSX102.amr.corp.intel.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Tim Bird <tbird20d@gmail.com>
-Cc: Johannes Thumshirn <johannes.thumshirn@men.de>, Sam Ravnborg <sam@ravnborg.org>, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+To: "Yang, Fei" <fei.yang@intel.com>
+Cc: Michal Marek <mmarek@suse.cz>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "'linux-kernel@vger.kernel.org' (linux-kernel@vger.kernel.org)" <linux-kernel@vger.kernel.org>
 
-On Wed, Aug 28, 2013 at 07:29:53AM -0700, Tim Bird wrote:
-> On Fri, Aug 9, 2013 at 5:27 AM, Johannes Thumshirn
-> <johannes.thumshirn@men.de> wrote:
-> > Adjust diffconfig to run cleanly on Python 3 (Tested with 3.3.2) and
-> > Python 2 (2.7.5)
-> >
-> > Signed-off-by: Johannes Thumshirn <johannes.thumshirn@men.de>
-> > ---
-> >  scripts/diffconfig |   26 +++++++++++++-------------
-> >  1 file changed, 13 insertions(+), 13 deletions(-)
-> >
-> > diff --git a/scripts/diffconfig b/scripts/diffconfig
-> > index b91f3e3..dd0e75b 100755
-> > --- a/scripts/diffconfig
-> > +++ b/scripts/diffconfig
-> > @@ -10,7 +10,7 @@
-> >  import sys, os
-> >
-> >  def usage():
-> > -    print """Usage: diffconfig [-h] [-m] [<config1> <config2>]
-> > +    print ("""Usage: diffconfig [-h] [-m] [<config1> <config2>]
-> >
-> >  Diffconfig is a simple utility for comparing two .config files.
-> >  Using standard diff to compare .config files often includes extraneous and
-> > @@ -33,7 +33,7 @@ Example usage:
-> >   EXT2_FS  y -> n
-> >   LOG_BUF_SHIFT  14 -> 16
-> >   PRINTK_TIME  n -> y
-> > -"""
-> > +""")
-> >      sys.exit(0)
-> >
-> >  # returns a dictionary of name/value pairs for config items in the file
-> > @@ -54,23 +54,23 @@ def print_config(op, config, value, new_value):
-> >      if merge_style:
-> >          if new_value:
-> >              if new_value=="n":
-> > -                print "# CONFIG_%s is not set" % config
-> > +                print("# CONFIG_%s is not set" % config)
-> >              else:
-> > -                print "CONFIG_%s=%s" % (config, new_value)
-> > +                print("CONFIG_%s=%s" % (config, new_value))
-> >      else:
-> >          if op=="-":
-> > -            print "-%s %s" % (config, value)
-> > +            print("-%s %s" % (config, value))
-> >          elif op=="+":
-> > -            print "+%s %s" % (config, new_value)
-> > +            print("+%s %s" % (config, new_value))
-> >          else:
-> > -            print " %s %s -> %s" % (config, value, new_value)
-> > +            print(" %s %s -> %s" % (config, value, new_value))
-> >
-> >  def main():
-> >      global merge_style
-> >
-> >      # parse command line args
-> >      if ("-h" in sys.argv or "--help" in sys.argv):
-> > -       usage()
-> > +        usage()
-> >
-> >      merge_style = 0
-> >      if "-m" in sys.argv:
-> > @@ -79,13 +79,13 @@ def main():
-> >
-> >      argc = len(sys.argv)
-> >      if not (argc==1 or argc == 3):
-> > -        print "Error: incorrect number of arguments or unrecognized option"
-> > +        print("Error: incorrect number of arguments or unrecognized option")
-> >          usage()
-> >
-> >      if argc == 1:
-> >          # if no filenames given, assume .config and .config.old
-> >          build_dir=""
-> > -        if os.environ.has_key("KBUILD_OUTPUT"):
-> > +        if 'KBUILD_OUTPUT' in os.environ:
-> >              build_dir = os.environ["KBUILD_OUTPUT"]+"/"
-> >
-> >          configa_filename = build_dir + ".config.old"
-> > @@ -94,8 +94,8 @@ def main():
-> >          configa_filename = sys.argv[1]
-> >          configb_filename = sys.argv[2]
-> >
-> > -    a = readconfig(file(configa_filename))
-> > -    b = readconfig(file(configb_filename))
-> > +    a = readconfig(open(configa_filename))
-> > +    b = readconfig(open(configb_filename))
-> >
-> >      # print items in a but not b (accumulate, sort and print)
-> >      old = []
-> > @@ -121,7 +121,7 @@ def main():
-> >
-> >      # now print items in b but not in a
-> >      # (items from b that were in a were removed above)
-> > -    new = b.keys()
-> > +    new = list(b.keys())
-> >      new.sort()
-> >      for config in new:
-> >          print_config("+", config, None, b[config])
-> > --
-> > 1.7.9.5
->
-> Sorry I missed this earlier.  My new e-mail is tim.bird@sonymobile.com, and
-> my old am.sony.com address doesn't work any more.
->
-> Thanks - this looks great.
->
-> Acked-by Tim Bird <tim.bird@sonymobile.com>
->
->  -- Tim Bird
-> Senior Software Engineer, Sony Mobile
-> Architecture Group Chair, CE Workgroup, Linux Foundation
+> 
+> I thought fixdep is about finding module dependency, and
+> it isn't needed for built-in drivers.
+> Please correct me if I'm wrong.
 
-Is there any comments from the kbuild maintainers?
+You are wrong...
+
+Fixdep conatins all the dependencies used to determine if we shall rebuild foo.o.
+It has nothing to do with modules or not.
+
+Following happens when you build foo.o from foo.c:
+
+1) gcc -Wp,-MD,foo.o.d  foo.c -o foo.o
+This produces two files:
+foo.o.d - contains all files included by foo.c, recursive (try it out!)
+foo.o - the object file
+
+2) fixdep foo.o.d foo.o gcc -Wp,-MD,foo.o.d  foo.c -o foo.o > foo.o.tmp
+fixdep now does the following:
+- Assign the comandline to a variable
+- List all dependencies (files included)
+   - Scan the dependen file for CONFIG_* symbols
+      - for each CONFIG_* symbol add a $(wildcard ...) reference to a symbol in
+        include/generated/config/... that represents the CONFIG_ symbol
+Everything is stored in foo.o.tmp
+
+3) delete foo.o.cmd
+4) rename foo.o.tmp to foo.o.cmd
+
+
+Magic happens in Kbuild.include, Makefile.lib and Makefile.build.
+But it make take some cup of coffee to grasp it.
+
+For find and fix whatever race condition you hit.
+
+	Sam
