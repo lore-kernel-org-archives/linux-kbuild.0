@@ -1,37 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:46899 "EHLO mx2.suse.de"
+Received: from smtp.gentoo.org ([140.211.166.183]:49005 "EHLO smtp.gentoo.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752653Ab3H3PKS (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 30 Aug 2013 11:10:18 -0400
-Message-ID: <5220B5D4.1080807@suse.cz>
-Date: Fri, 30 Aug 2013 17:10:12 +0200
-From: Michal Marek <mmarek@suse.cz>
+	id S1756845Ab3H3Tlp (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 30 Aug 2013 15:41:45 -0400
+Date: Fri, 30 Aug 2013 15:41:45 -0400
+From: Mike Pagano <mpagano@gentoo.org>
+Subject: Re: [PATCH RESEND] diffconfig: Update script to support python
+ versions 2.5 through 3.3
+Message-ID: <20130830194145.GA6522@woodpecker.gentoo.org>
+References: <20130820184112.GA18525@woodpecker.gentoo.org>
+ <20130828115706.GA17212@woodpecker.gentoo.org>
+ <5220B236.1040009@suse.cz>
 MIME-Version: 1.0
-Subject: Re: Can anyone suggest a better fix? Not sure if I understand the
- problem, but the patch fixed it
-References: <02E7334B1630744CBDC55DA85862258348E431C1@ORSMSX102.amr.corp.intel.com> <20130826201035.GA21141@merkur.ravnborg.org> <02E7334B1630744CBDC55DA85862258348E458D8@ORSMSX102.amr.corp.intel.com> <521E1232.6010501@suse.cz> <02E7334B1630744CBDC55DA85862258348E4792D@ORSMSX102.amr.corp.intel.com> <20130829175511.GA23620@merkur.ravnborg.org>
-In-Reply-To: <20130829175511.GA23620@merkur.ravnborg.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5220B236.1040009@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yang, Fei" <fei.yang@intel.com>
-Cc: Sam Ravnborg <sam@ravnborg.org>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "'linux-kernel@vger.kernel.org' (linux-kernel@vger.kernel.org)" <linux-kernel@vger.kernel.org>
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org
 
-On 29.8.2013 19:55, Sam Ravnborg wrote:
-> Magic happens in Kbuild.include, Makefile.lib and Makefile.build.
-> But it make take some cup of coffee to grasp it.
+On Fri, Aug 30, 2013 at 04:54:46PM +0200, Michal Marek wrote:
+> On 28.8.2013 13:57, Mike Pagano wrote:
+> > On Tue, Aug 20, 2013 at 02:41:12PM -0400, Mike Pagano wrote:
+> >> Support past and active versions of python while maintaining backward compatibility.
+> > Any feedback or thoughts on this patch?
 > 
-> For find and fix whatever race condition you hit.
+> Sorry for the delay. It works great, even with 2.4. You just forgot to
+> add your signoff, can I add
+> 
+> Signed-off-by: Mike Pagano <mpagano@gentoo.org>
+> 
+> ?
+> 
+> Michal
 
-BTW, there is a fix in 3.11 that might be relevant for you:
 
-commit 4d47dde47f7dd95042fa56283d948f50dd4b509c
-Author: 张忠山 <zzs0213@gmail.com>
-Date:   Sun Jun 30 17:09:28 2013 +0800
-
-    kbuild: create directory for dir/file.o
-
-At least, it's worth trying.
-
-Michal
+Yes, sorry about that and thanks for taking the time to look at it.
