@@ -1,47 +1,92 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from eddie.linux-mips.org ([78.24.191.182]:56815 "EHLO
-	cvs.linux-mips.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752648Ab3ICPMQ (ORCPT
+Received: from mail-wi0-f169.google.com ([209.85.212.169]:53833 "EHLO
+	mail-wi0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755562Ab3ICVEy (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 3 Sep 2013 11:12:16 -0400
-Received: from localhost.localdomain ([127.0.0.1]:59114 "EHLO linux-mips.org"
-        rhost-flags-OK-OK-OK-FAIL) by eddie.linux-mips.org with ESMTP
-        id S6827351Ab3ICPMOsdzYE (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org> + 1 other);
-        Tue, 3 Sep 2013 17:12:14 +0200
-Date: Tue, 3 Sep 2013 17:11:58 +0200
-From: Ralf Baechle <ralf@linux-mips.org>
-Subject: Re: [PATCH] MIPS: add <dt-bindings/> symlink
-Message-ID: <20130903151158.GB14258@linux-mips.org>
-References: <1377095762-18926-1-git-send-email-james.hogan@imgtec.com>
- <521505E2.3050308@wwwdotorg.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <521505E2.3050308@wwwdotorg.org>
+	Tue, 3 Sep 2013 17:04:54 -0400
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: [PATCH 1/3] kconfig: do not special-case 'MODULES' symbol
+Date: Tue,  3 Sep 2013 23:04:45 +0200
+Message-Id: <1378242287-12759-1-git-send-email-yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Stephen Warren <swarren@wwwdotorg.org>
-Cc: James Hogan <james.hogan@imgtec.com>, Stephen Warren <swarren@nvidia.com>, Michal Marek <mmarek@suse.cz>, Shawn Guo <shawn.guo@linaro.org>, Ian Campbell <ian.campbell@citrix.com>, Mark Rutland <mark.rutland@arm.com>, Pawel Moll <pawel.moll@arm.com>, Rob Herring <rob.herring@calxeda.com>, linux-mips@linux-mips.org, devicetree@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, "Yann E. MORIN" <yann.morin.1998@free.fr>, Sam Ravnborg <sam@ravnborg.org>
 
-On Wed, Aug 21, 2013 at 12:24:34PM -0600, Stephen Warren wrote:
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-> On 08/21/2013 08:36 AM, James Hogan wrote:
-> > Add symlink to include/dt-bindings from arch/mips/boot/dts/include/ to
-> > match the ones in ARM and Meta architectures so that preprocessed device
-> > tree files can include various useful constant definitions.
-> > 
-> > See commit c58299a (kbuild: create an "include chroot" for DT bindings)
-> > merged in v3.10-rc1 for details.
-> > 
-> > MIPS structures it's dts files a little differently to other
-> > architectures, having a separate dts directory for each SoC/platform,
-> > but most of the definitions in the dt-bindings/ directory are common so
-> > for now lets just have a single "include chroot" for all MIPS platforms.
-> 
-> Acked-by: Stephen Warren <swarren@nvidia.com>
+Currently, the 'MODULES' symbol is hard-coded to be the default symbol
+that enables/disables tristates, if no other symbol was declared with
+'option modules'.
 
-Applied - but I'd be happier if there was a way of achiving the same thing
-without symlinks.
+While this used to be needed for the Linux kernel, we now have an
+explicit 'option modules' attached to the 'MODULES' symbol (since
+cset 11097a036), so we no longer need to special-case it in the
+kconfig code.
 
-  Ralf
+Furthermore, kconfig is extensively used out of the Linux kernel, and
+other projects may have another meaning for a symbol named 'MODULES'.
+
+This patch changes the way we enable/disable tristates: if a symbol was
+found with 'option modules' attached to it, then that symbol controls
+enabling tristates. Otherwise, tristates are disabled, even if a symbol
+named 'MODULES' exists.
+
+Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: Sam Ravnborg <sam@ravnborg.org>
+Cc: Michal Marek <mmarek@suse.cz>
+---
+ scripts/kconfig/menu.c  |  5 +----
+ scripts/kconfig/zconf.y | 11 ++---------
+ 2 files changed, 3 insertions(+), 13 deletions(-)
+
+diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+index 7e233a6..3a9c674 100644
+--- a/scripts/kconfig/menu.c
++++ b/scripts/kconfig/menu.c
+@@ -197,12 +197,9 @@ void menu_add_symbol(enum prop_type type, struct symbol *sym, struct expr *dep)
+ 
+ void menu_add_option(int token, char *arg)
+ {
+-	struct property *prop;
+-
+ 	switch (token) {
+ 	case T_OPT_MODULES:
+-		prop = prop_alloc(P_DEFAULT, modules_sym);
+-		prop->expr = expr_alloc_symbol(current_entry->sym);
++		modules_sym = current_entry->sym;
+ 		break;
+ 	case T_OPT_DEFCONFIG_LIST:
+ 		if (!sym_defconfig_list)
+diff --git a/scripts/kconfig/zconf.y b/scripts/kconfig/zconf.y
+index 864da07..0653886 100644
+--- a/scripts/kconfig/zconf.y
++++ b/scripts/kconfig/zconf.y
+@@ -493,9 +493,6 @@ void conf_parse(const char *name)
+ 
+ 	sym_init();
+ 	_menu_init();
+-	modules_sym = sym_lookup(NULL, 0);
+-	modules_sym->type = S_BOOLEAN;
+-	modules_sym->flags |= SYMBOL_AUTO;
+ 	rootmenu.prompt = menu_add_prompt(P_MENU, "Linux Kernel Configuration", NULL);
+ 
+ 	if (getenv("ZCONF_DEBUG"))
+@@ -503,12 +500,8 @@ void conf_parse(const char *name)
+ 	zconfparse();
+ 	if (zconfnerrs)
+ 		exit(1);
+-	if (!modules_sym->prop) {
+-		struct property *prop;
+-
+-		prop = prop_alloc(P_DEFAULT, modules_sym);
+-		prop->expr = expr_alloc_symbol(sym_lookup("MODULES", 0));
+-	}
++	if (!modules_sym)
++		modules_sym = sym_find( "n" );
+ 
+ 	rootmenu.prompt->text = _(rootmenu.prompt->text);
+ 	rootmenu.prompt->text = sym_expand_string_value(rootmenu.prompt->text);
+-- 
+1.8.1.2
+
