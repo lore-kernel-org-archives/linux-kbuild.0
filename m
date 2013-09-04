@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f176.google.com ([209.85.212.176]:40173 "EHLO
-	mail-wi0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1762428Ab3IDK7a (ORCPT
+Received: from mail-wi0-f181.google.com ([209.85.212.181]:57951 "EHLO
+	mail-wi0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1762398Ab3IDK71 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 4 Sep 2013 06:59:30 -0400
+	Wed, 4 Sep 2013 06:59:27 -0400
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: [PATCH 3/3] kconfig: do not allow more than one symbol to have 'option modules'
-Date: Wed,  4 Sep 2013 12:59:17 +0200
-Message-Id: <2c15d81f712791d3eae9a15414c83780a8dd6ac1.1378292314.git.yann.morin.1998@free.fr>
+Subject: [PATCH 1/3] kconfig: do not special-case 'MODULES' symbol
+Date: Wed,  4 Sep 2013 12:59:15 +0200
+Message-Id: <b1a4fe311c048e595ecaefc0286d61baa6ff2d7f.1378292314.git.yann.morin.1998@free.fr>
 In-Reply-To: <cover.1378292314.git.yann.morin.1998@free.fr>
 References: <cover.1378292314.git.yann.morin.1998@free.fr>
 In-Reply-To: <cover.1378292314.git.yann.morin.1998@free.fr>
@@ -19,63 +19,78 @@ Cc: Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, Sam Ravnborg <s
 
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-Previously, it was possible to have more than one symbol with the
-'option modules' attached to them, although only the last one would
-in fact control tristates.
+Currently, the 'MODULES' symbol is hard-coded to be the default symbol
+that enables/disables tristates, if no other symbol was declared with
+'option modules'.
 
-Since this does not make much sense, only allow at most one symbol to
-control tristates.
+While this used to be needed for the Linux kernel, we now have an
+explicit 'option modules' attached to the 'MODULES' symbol (since
+cset 11097a036), so we no longer need to special-case it in the
+kconfig code.
 
-Note: it is still possible to have more than one symbol that control
-tristates, but indirectly:
+Furthermore, kconfig is extensively used out of the Linux kernel, and
+other projects may have another meaning for a symbol named 'MODULES'.
 
-    config MOD1
-        bool "mod1"
-        select MODULES
-    config MOD2
-        bool "mod2"
-        select MODULES
-    config MODULES
-        bool
-        option modules
+This patch changes the way we enable/disable tristates: if a symbol was
+found with 'option modules' attached to it, then that symbol controls
+enabling tristates. Otherwise, tristates are disabled, even if a symbol
+named 'MODULES' exists.
 
 Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
 Cc: Sam Ravnborg <sam@ravnborg.org>
 Cc: Michal Marek <mmarek@suse.cz>
 ---
- Documentation/kbuild/kconfig-language.txt | 1 +
- scripts/kconfig/menu.c                    | 6 ++++++
- 2 files changed, 7 insertions(+)
+ scripts/kconfig/menu.c  |  5 +----
+ scripts/kconfig/zconf.y | 11 ++---------
+ 2 files changed, 3 insertions(+), 13 deletions(-)
 
-diff --git a/Documentation/kbuild/kconfig-language.txt b/Documentation/kbuild/kconfig-language.txt
-index c858f84..c420676 100644
---- a/Documentation/kbuild/kconfig-language.txt
-+++ b/Documentation/kbuild/kconfig-language.txt
-@@ -147,6 +147,7 @@ applicable everywhere (see syntax).
-   - "modules"
-     This declares the symbol to be used as the MODULES symbol, which
-     enables the third modular state for all config symbols.
-+    At most one symbol may have the "modules" option set.
- 
-   - "env"=<value>
-     This imports the environment variable into Kconfig. It behaves like
 diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
-index 3a9c674..c1d5320 100644
+index 7e233a6..3a9c674 100644
 --- a/scripts/kconfig/menu.c
 +++ b/scripts/kconfig/menu.c
-@@ -199,6 +199,12 @@ void menu_add_option(int token, char *arg)
+@@ -197,12 +197,9 @@ void menu_add_symbol(enum prop_type type, struct symbol *sym, struct expr *dep)
+ 
+ void menu_add_option(int token, char *arg)
  {
+-	struct property *prop;
+-
  	switch (token) {
  	case T_OPT_MODULES:
-+		if (modules_sym)
-+			zconf_error("symbol '%s' redefines option 'modules'"
-+				    " already defined by symbol '%s'",
-+				    current_entry->sym->name,
-+				    modules_sym->name
-+				    );
- 		modules_sym = current_entry->sym;
+-		prop = prop_alloc(P_DEFAULT, modules_sym);
+-		prop->expr = expr_alloc_symbol(current_entry->sym);
++		modules_sym = current_entry->sym;
  		break;
  	case T_OPT_DEFCONFIG_LIST:
+ 		if (!sym_defconfig_list)
+diff --git a/scripts/kconfig/zconf.y b/scripts/kconfig/zconf.y
+index 864da07..0653886 100644
+--- a/scripts/kconfig/zconf.y
++++ b/scripts/kconfig/zconf.y
+@@ -493,9 +493,6 @@ void conf_parse(const char *name)
+ 
+ 	sym_init();
+ 	_menu_init();
+-	modules_sym = sym_lookup(NULL, 0);
+-	modules_sym->type = S_BOOLEAN;
+-	modules_sym->flags |= SYMBOL_AUTO;
+ 	rootmenu.prompt = menu_add_prompt(P_MENU, "Linux Kernel Configuration", NULL);
+ 
+ 	if (getenv("ZCONF_DEBUG"))
+@@ -503,12 +500,8 @@ void conf_parse(const char *name)
+ 	zconfparse();
+ 	if (zconfnerrs)
+ 		exit(1);
+-	if (!modules_sym->prop) {
+-		struct property *prop;
+-
+-		prop = prop_alloc(P_DEFAULT, modules_sym);
+-		prop->expr = expr_alloc_symbol(sym_lookup("MODULES", 0));
+-	}
++	if (!modules_sym)
++		modules_sym = sym_find( "n" );
+ 
+ 	rootmenu.prompt->text = _(rootmenu.prompt->text);
+ 	rootmenu.prompt->text = sym_expand_string_value(rootmenu.prompt->text);
 -- 
 1.8.1.2
 
