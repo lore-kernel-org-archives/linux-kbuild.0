@@ -1,62 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f53.google.com ([74.125.82.53]:52676 "EHLO
-	mail-wg0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1760334Ab3ICVMm (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 3 Sep 2013 17:12:42 -0400
-Date: Tue, 3 Sep 2013 23:12:37 +0200
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH 1/3] kconfig: do not special-case 'MODULES' symbol
-Message-ID: <20130903211237.GA3681@free.fr>
-References: <1378242287-12759-1-git-send-email-yann.morin.1998@free.fr>
+Received: from cantor2.suse.de ([195.135.220.15]:43769 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753377Ab3IDIWv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 4 Sep 2013 04:22:51 -0400
+Message-ID: <5226EDD4.9090300@suse.cz>
+Date: Wed, 04 Sep 2013 10:22:44 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1378242287-12759-1-git-send-email-yann.morin.1998@free.fr>
+Subject: Re: [PATCH 1/3] kconfig: do not special-case 'MODULES' symbol
+References: <1378242287-12759-1-git-send-email-yann.morin.1998@free.fr> <20130903211237.GA3681@free.fr>
+In-Reply-To: <20130903211237.GA3681@free.fr>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>
 
-Michal, All,
+Dne 3.9.2013 23:12, Yann E. MORIN napsal(a):
+> Doh... I forgot to send an intro mail first. Seems holidays really were
+> a good break! :-)
 
-On 2013-09-03 23:04 +0200, Yann E. MORIN spake thusly:
-> Currently, the 'MODULES' symbol is hard-coded to be the default symbol
-> that enables/disables tristates, if no other symbol was declared with
-> 'option modules'.
+:-)
+
+
+> Anyway, this series might be a bit late to go in for 3.12, but it has
+> previously been discussed with you and Sam.
 > 
-> While this used to be needed for the Linux kernel, we now have an
-> explicit 'option modules' attached to the 'MODULES' symbol (since
-> cset 11097a036), so we no longer need to special-case it in the
-> kconfig code.
+> If you feel it's too touchy for 3.12, then I believe it can easily wait
+> for 3.13.
 > 
-> Furthermore, kconfig is extensively used out of the Linux kernel, and
-> other projects may have another meaning for a symbol named 'MODULES'.
-> 
-> This patch changes the way we enable/disable tristates: if a symbol was
-> found with 'option modules' attached to it, then that symbol controls
-> enabling tristates. Otherwise, tristates are disabled, even if a symbol
-> named 'MODULES' exists.
+> If you want it for 3.12, I can send a pull-request if that's easier for
+> you.
 
-Doh... I forgot to send an intro mail first. Seems holidays really were
-a good break! :-)
+Please send me a pull request regardless, so that the second commit's
+changelog references the right commit id. I'll play with this and will
+merge it into kbuild.git if there are no problems. It's two days into
+the merge window, so no big deal (shh!).
 
-Anyway, this series might be a bit late to go in for 3.12, but it has
-previously been discussed with you and Sam.
-
-If you feel it's too touchy for 3.12, then I believe it can easily wait
-for 3.13.
-
-If you want it for 3.12, I can send a pull-request if that's easier for
-you.
-
-Regards,
-Yann E. MORIN.
-
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+Michal
