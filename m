@@ -1,41 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:43769 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753377Ab3IDIWv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 4 Sep 2013 04:22:51 -0400
-Message-ID: <5226EDD4.9090300@suse.cz>
-Date: Wed, 04 Sep 2013 10:22:44 +0200
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: [PATCH 1/3] kconfig: do not special-case 'MODULES' symbol
-References: <1378242287-12759-1-git-send-email-yann.morin.1998@free.fr> <20130903211237.GA3681@free.fr>
-In-Reply-To: <20130903211237.GA3681@free.fr>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Received: from mail-wg0-f50.google.com ([74.125.82.50]:61341 "EHLO
+	mail-wg0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756996Ab3IDK7Z (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 4 Sep 2013 06:59:25 -0400
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: [pull request] Pull request for branch yem/kconfig-for-next
+Date: Wed,  4 Sep 2013 12:59:14 +0200
+Message-Id: <cover.1378292314.git.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-Dne 3.9.2013 23:12, Yann E. MORIN napsal(a):
-> Doh... I forgot to send an intro mail first. Seems holidays really were
-> a good break! :-)
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-:-)
+Hello All!
+
+Michal, please pull for 3.12 this series that removes special-casing of
+the 'MODULES' symbol, as previously discussed with Sam and you.
+
+Regards,
+Yann E. MORIN.
 
 
-> Anyway, this series might be a bit late to go in for 3.12, but it has
-> previously been discussed with you and Sam.
-> 
-> If you feel it's too touchy for 3.12, then I believe it can easily wait
-> for 3.13.
-> 
-> If you want it for 3.12, I can send a pull-request if that's easier for
-> you.
+The following changes since commit b020bae0467b490797d61e6a658fb7df4568c074:
 
-Please send me a pull request regardless, so that the second commit's
-changelog references the right commit id. I'll play with this and will
-merge it into kbuild.git if there are no problems. It's two days into
-the merge window, so no big deal (shh!).
+  Merge branch 'kbuild/kconfig' into kbuild/for-next (2013-09-01 21:25:45 +0200)
 
-Michal
+are available in the git repository at:
+
+
+  git://gitorious.org/linux-kconfig/linux-kconfig.git yem/kconfig-for-next
+
+for you to fetch changes up to 2c15d81f712791d3eae9a15414c83780a8dd6ac1:
+
+  kconfig: do not allow more than one symbol to have 'option modules' (2013-09-04 12:57:48 +0200)
+
+----------------------------------------------------------------
+Yann E. MORIN (3):
+      kconfig: do not special-case 'MODULES' symbol
+      kconfig: regenerate bison parser
+      kconfig: do not allow more than one symbol to have 'option modules'
+
+ Documentation/kbuild/kconfig-language.txt |   1 +
+ scripts/kconfig/menu.c                    |  11 +-
+ scripts/kconfig/zconf.tab.c_shipped       | 562 ++++++++++++++++--------------
+ scripts/kconfig/zconf.y                   |  11 +-
+ 4 files changed, 308 insertions(+), 277 deletions(-)
+
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
