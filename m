@@ -1,39 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from georges.telenet-ops.be ([195.130.137.68]:43100 "EHLO
-	georges.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1763367Ab3IEItw (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 5 Sep 2013 04:49:52 -0400
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: [PATCH] staging/lustre: Correct default for LUSTRE_TRANSLATE_ERRNOS
-Date: Thu,  5 Sep 2013 10:49:01 +0200
-Message-Id: <1378370941-4493-1-git-send-email-geert@linux-m68k.org>
+Received: from cantor2.suse.de ([195.135.220.15]:34660 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756998Ab3IEJiY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 5 Sep 2013 05:38:24 -0400
+Message-ID: <5228510C.1020906@suse.cz>
+Date: Thu, 05 Sep 2013 11:38:20 +0200
+From: Michal Marek <mmarek@suse.cz>
+MIME-Version: 1.0
+Subject: Re: [PATCH 1/3] kconfig: do not special-case 'MODULES' symbol
+References: <1378242287-12759-1-git-send-email-yann.morin.1998@free.fr>
+In-Reply-To: <1378242287-12759-1-git-send-email-yann.morin.1998@free.fr>
+Content-Type: text/plain; charset=ISO-8859-2
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Li Wei <wei.g.li@intel.com>, Andreas Dilger <andreas.dilger@intel.com>, Peng Tao <tao.peng@emc.com>
-Cc: devel@driverdev.osuosl.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Geert Uytterhoeven <geert@linux-m68k.org>
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>
 
-LUSTRE_TRANSLATE_ERRNOS is never enabled, a "true" is not a valid value.
-Use "default y" instead of "default true" to fix this.
+On 3.9.2013 23:04, Yann E. MORIN wrote:
+> From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+> 
+> Currently, the 'MODULES' symbol is hard-coded to be the default symbol
+> that enables/disables tristates, if no other symbol was declared with
+> 'option modules'.
+> 
+> While this used to be needed for the Linux kernel, we now have an
+> explicit 'option modules' attached to the 'MODULES' symbol (since
+> cset 11097a036), so we no longer need to special-case it in the
+> kconfig code.
+> 
+> Furthermore, kconfig is extensively used out of the Linux kernel, and
+> other projects may have another meaning for a symbol named 'MODULES'.
+> 
+> This patch changes the way we enable/disable tristates: if a symbol was
+> found with 'option modules' attached to it, then that symbol controls
+> enabling tristates. Otherwise, tristates are disabled, even if a symbol
+> named 'MODULES' exists.
 
-Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
----
- drivers/staging/lustre/lustre/Kconfig |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Wasn't this change supposed to fix allmodconfig with KCONFIG_ALLCONFIG
+(http://lkml.org/lkml/2013/8/8/573)? Or is there still more to do?
+Because I'm still getting:
 
-diff --git a/drivers/staging/lustre/lustre/Kconfig b/drivers/staging/lustre/lustre/Kconfig
-index 4e898e4..e44965b 100644
---- a/drivers/staging/lustre/lustre/Kconfig
-+++ b/drivers/staging/lustre/lustre/Kconfig
-@@ -52,7 +52,7 @@ config LUSTRE_DEBUG_EXPENSIVE_CHECK
- config LUSTRE_TRANSLATE_ERRNOS
- 	bool
- 	depends on LUSTRE_FS && !X86
--	default true
-+	default y
- 
- config LUSTRE_LLITE_LLOOP
- 	bool "Lustre virtual block device"
--- 
-1.7.9.5
+$ touch empty
+$ make KCONFIG_ALLCONFIG=empty allmodconfig
+  HOSTCC  scripts/basic/fixdep
+  HOSTCC  scripts/kconfig/conf.o
+  SHIPPED scripts/kconfig/zconf.tab.c
+  SHIPPED scripts/kconfig/zconf.lex.c
+  SHIPPED scripts/kconfig/zconf.hash.c
+  HOSTCC  scripts/kconfig/zconf.tab.o
+  HOSTLD  scripts/kconfig/conf
+scripts/kconfig/conf --allmodconfig Kconfig
+#
+# configuration written to .config
+#
+$ grep MODULES .config
+CONFIG_MODULES_USE_ELF_RELA=y
+# CONFIG_MODULES is not set
+$
 
+Michal
