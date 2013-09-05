@@ -1,96 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f181.google.com ([209.85.212.181]:57951 "EHLO
-	mail-wi0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1762398Ab3IDK71 (ORCPT
+Received: from georges.telenet-ops.be ([195.130.137.68]:43100 "EHLO
+	georges.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1763367Ab3IEItw (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 4 Sep 2013 06:59:27 -0400
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: [PATCH 1/3] kconfig: do not special-case 'MODULES' symbol
-Date: Wed,  4 Sep 2013 12:59:15 +0200
-Message-Id: <b1a4fe311c048e595ecaefc0286d61baa6ff2d7f.1378292314.git.yann.morin.1998@free.fr>
-In-Reply-To: <cover.1378292314.git.yann.morin.1998@free.fr>
-References: <cover.1378292314.git.yann.morin.1998@free.fr>
-In-Reply-To: <cover.1378292314.git.yann.morin.1998@free.fr>
-References: <cover.1378292314.git.yann.morin.1998@free.fr>
+	Thu, 5 Sep 2013 04:49:52 -0400
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: [PATCH] staging/lustre: Correct default for LUSTRE_TRANSLATE_ERRNOS
+Date: Thu,  5 Sep 2013 10:49:01 +0200
+Message-Id: <1378370941-4493-1-git-send-email-geert@linux-m68k.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, "Yann E. MORIN" <yann.morin.1998@free.fr>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Li Wei <wei.g.li@intel.com>, Andreas Dilger <andreas.dilger@intel.com>, Peng Tao <tao.peng@emc.com>
+Cc: devel@driverdev.osuosl.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Geert Uytterhoeven <geert@linux-m68k.org>
 
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+LUSTRE_TRANSLATE_ERRNOS is never enabled, a "true" is not a valid value.
+Use "default y" instead of "default true" to fix this.
 
-Currently, the 'MODULES' symbol is hard-coded to be the default symbol
-that enables/disables tristates, if no other symbol was declared with
-'option modules'.
-
-While this used to be needed for the Linux kernel, we now have an
-explicit 'option modules' attached to the 'MODULES' symbol (since
-cset 11097a036), so we no longer need to special-case it in the
-kconfig code.
-
-Furthermore, kconfig is extensively used out of the Linux kernel, and
-other projects may have another meaning for a symbol named 'MODULES'.
-
-This patch changes the way we enable/disable tristates: if a symbol was
-found with 'option modules' attached to it, then that symbol controls
-enabling tristates. Otherwise, tristates are disabled, even if a symbol
-named 'MODULES' exists.
-
-Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: Sam Ravnborg <sam@ravnborg.org>
-Cc: Michal Marek <mmarek@suse.cz>
+Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
 ---
- scripts/kconfig/menu.c  |  5 +----
- scripts/kconfig/zconf.y | 11 ++---------
- 2 files changed, 3 insertions(+), 13 deletions(-)
+ drivers/staging/lustre/lustre/Kconfig |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
-index 7e233a6..3a9c674 100644
---- a/scripts/kconfig/menu.c
-+++ b/scripts/kconfig/menu.c
-@@ -197,12 +197,9 @@ void menu_add_symbol(enum prop_type type, struct symbol *sym, struct expr *dep)
+diff --git a/drivers/staging/lustre/lustre/Kconfig b/drivers/staging/lustre/lustre/Kconfig
+index 4e898e4..e44965b 100644
+--- a/drivers/staging/lustre/lustre/Kconfig
++++ b/drivers/staging/lustre/lustre/Kconfig
+@@ -52,7 +52,7 @@ config LUSTRE_DEBUG_EXPENSIVE_CHECK
+ config LUSTRE_TRANSLATE_ERRNOS
+ 	bool
+ 	depends on LUSTRE_FS && !X86
+-	default true
++	default y
  
- void menu_add_option(int token, char *arg)
- {
--	struct property *prop;
--
- 	switch (token) {
- 	case T_OPT_MODULES:
--		prop = prop_alloc(P_DEFAULT, modules_sym);
--		prop->expr = expr_alloc_symbol(current_entry->sym);
-+		modules_sym = current_entry->sym;
- 		break;
- 	case T_OPT_DEFCONFIG_LIST:
- 		if (!sym_defconfig_list)
-diff --git a/scripts/kconfig/zconf.y b/scripts/kconfig/zconf.y
-index 864da07..0653886 100644
---- a/scripts/kconfig/zconf.y
-+++ b/scripts/kconfig/zconf.y
-@@ -493,9 +493,6 @@ void conf_parse(const char *name)
- 
- 	sym_init();
- 	_menu_init();
--	modules_sym = sym_lookup(NULL, 0);
--	modules_sym->type = S_BOOLEAN;
--	modules_sym->flags |= SYMBOL_AUTO;
- 	rootmenu.prompt = menu_add_prompt(P_MENU, "Linux Kernel Configuration", NULL);
- 
- 	if (getenv("ZCONF_DEBUG"))
-@@ -503,12 +500,8 @@ void conf_parse(const char *name)
- 	zconfparse();
- 	if (zconfnerrs)
- 		exit(1);
--	if (!modules_sym->prop) {
--		struct property *prop;
--
--		prop = prop_alloc(P_DEFAULT, modules_sym);
--		prop->expr = expr_alloc_symbol(sym_lookup("MODULES", 0));
--	}
-+	if (!modules_sym)
-+		modules_sym = sym_find( "n" );
- 
- 	rootmenu.prompt->text = _(rootmenu.prompt->text);
- 	rootmenu.prompt->text = sym_expand_string_value(rootmenu.prompt->text);
+ config LUSTRE_LLITE_LLOOP
+ 	bool "Lustre virtual block device"
 -- 
-1.8.1.2
+1.7.9.5
 
