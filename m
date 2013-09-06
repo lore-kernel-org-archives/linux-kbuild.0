@@ -1,119 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from e31.co.us.ibm.com ([32.97.110.149]:33950 "EHLO
-	e31.co.us.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750801Ab3IFRaz (ORCPT
+Received: from mail-pb0-f42.google.com ([209.85.160.42]:51834 "EHLO
+	mail-pb0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750891Ab3IFSun (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 6 Sep 2013 13:30:55 -0400
-Received: from /spool/local
-	by e31.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-kbuild@vger.kernel.org> from <paulmck@linux.vnet.ibm.com>;
-	Fri, 6 Sep 2013 11:30:54 -0600
-Date: Fri, 6 Sep 2013 10:30:47 -0700
-From: "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>
-Subject: Re: [PATCH tip/core/rcu 8/9] nohz_full: Add full-system-idle state
- machine
-Message-ID: <20130906173047.GT3966@linux.vnet.ibm.com>
-Reply-To: paulmck@linux.vnet.ibm.com
-References: <20130820024700.GA31075@linux.vnet.ibm.com>
- <1376966841-31774-1-git-send-email-paulmck@linux.vnet.ibm.com>
- <1376966841-31774-8-git-send-email-paulmck@linux.vnet.ibm.com>
- <CAMuHMdWtZAD3G_miFOT9DPZpfTO3nJ9J4aG_zvHV_6eVf2jdQg@mail.gmail.com>
+	Fri, 6 Sep 2013 14:50:43 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAMuHMdWtZAD3G_miFOT9DPZpfTO3nJ9J4aG_zvHV_6eVf2jdQg@mail.gmail.com>
+In-Reply-To: <20130906173047.GT3966@linux.vnet.ibm.com>
+References: <20130820024700.GA31075@linux.vnet.ibm.com>
+	<1376966841-31774-1-git-send-email-paulmck@linux.vnet.ibm.com>
+	<1376966841-31774-8-git-send-email-paulmck@linux.vnet.ibm.com>
+	<CAMuHMdWtZAD3G_miFOT9DPZpfTO3nJ9J4aG_zvHV_6eVf2jdQg@mail.gmail.com>
+	<20130906173047.GT3966@linux.vnet.ibm.com>
+Date: Fri, 6 Sep 2013 20:50:41 +0200
+Message-ID: <CAMuHMdVS4jGFOuysknJ_4BcdWRrYU=7KVfO8o_gxf-pVg=5gKA@mail.gmail.com>
+Subject: Re: [PATCH tip/core/rcu 8/9] nohz_full: Add full-system-idle state machine
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Ingo Molnar <mingo@elte.hu>, laijs@cn.fujitsu.com, dipankar@in.ibm.com, Andrew Morton <akpm@linux-foundation.org>, Mathieu Desnoyers <mathieu.desnoyers@polymtl.ca>, josh@joshtriplett.org, niv@us.ibm.com, Thomas Gleixner <tglx@linutronix.de>, Peter Zijlstra <peterz@infradead.org>, Steven Rostedt <rostedt@goodmis.org>, David Howells <dhowells@redhat.com>, edumazet@google.com, darren@dvhart.com, =?iso-8859-1?Q?Fr=E9d=E9ric?= Weisbecker <fweisbec@gmail.com>, sbw@mit.edu, Linux-Arch <linux-arch@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Paul McKenney <paulmck@linux.vnet.ibm.com>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Ingo Molnar <mingo@elte.hu>, laijs@cn.fujitsu.com, dipankar@in.ibm.com, Andrew Morton <akpm@linux-foundation.org>, Mathieu Desnoyers <mathieu.desnoyers@polymtl.ca>, josh@joshtriplett.org, niv@us.ibm.com, Thomas Gleixner <tglx@linutronix.de>, Peter Zijlstra <peterz@infradead.org>, Steven Rostedt <rostedt@goodmis.org>, David Howells <dhowells@redhat.com>, edumazet@google.com, darren@dvhart.com, =?UTF-8?B?RnLDqWTDqXJpYyBXZWlzYmVja2Vy?= <fweisbec@gmail.com>, sbw@mit.edu, Linux-Arch <linux-arch@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On Fri, Sep 06, 2013 at 10:08:22AM +0200, Geert Uytterhoeven wrote:
-> On Tue, Aug 20, 2013 at 4:47 AM, Paul E. McKenney
-> <paulmck@linux.vnet.ibm.com> wrote:
-> > --- a/kernel/time/Kconfig
-> > +++ b/kernel/time/Kconfig
-> > @@ -157,6 +157,33 @@ config NO_HZ_FULL_SYSIDLE
-> >
-> >          Say N if you are unsure.
-> >
-> > +config NO_HZ_FULL_SYSIDLE_SMALL
-> > +       int "Number of CPUs above which large-system approach is used"
-> > +       depends on NO_HZ_FULL_SYSIDLE
-> > +       range 1 NR_CPUS
-> 
-> This causes "kernel/time/Kconfig:162:warning: range is invalid" on m68k and
-> all other architectures that do not support SMP.
-> 
-> How to reproduce:
->     make ARCH=m68k defconfig
+On Fri, Sep 6, 2013 at 7:30 PM, Paul E. McKenney
+<paulmck@linux.vnet.ibm.com> wrote:
+>> Furthermore, it seems only hexagon, metag, mips, and x86 set NR_CPUS to 1
+>> if !SMP. On other architectures, NR_CPUS is not defined and presumed to be 0.
+>
+> Would it make sense to require that NR_CPUS=1 for !SMP?
 
-OK, this does complain, but seems to give a reasonable .config file.
-(From what I can tell.)  It would clearly be good to get rid of the
-complaint.
+Yes, this looks reasonable to me.
 
-> Furthermore, it seems only hexagon, metag, mips, and x86 set NR_CPUS to 1
-> if !SMP. On other architectures, NR_CPUS is not defined and presumed to be 0.
+> I tried creating a NR_CPUS_REALLY as follows:
+>
+> config NR_CPUS_REALLY
+>         int "Fixed version of NR_CPUS"
+>         default NR_CPUS if NR_CPUS
+>         default 1 if !NR_CPUS
+>
+> But this still gave a warning on the first "default" even though it
+> was not in effect.  I also tried using Kconfig "if":
 
-Would it make sense to require that NR_CPUS=1 for !SMP?
-
-> Hence in non-interactive configs (e.g. "make defconfig"),
-> NO_HZ_FULL_SYSIDLE_SMALL will end up as 0.
-> In interactive configs (e.g. "make oldconfig") Kconfig suggest "0" as
-> the default,
-> but refuses to accept it as it doesn't fall within the range 1..0.
-> 
-> How to reproduce:
->     Remove the "depends on NO_HZ_FULL_SYSIDLE"
->     make ARCH=powerpc mpc83xx_defconfig
->     grep NO_HZ_FULL_SYSIDLE_SMALL .config
->     -> CONFIG_NO_HZ_FULL_SYSIDLE_SMALL=0
->     sed 's/CONFIG_NO_HZ_FULL_SYSIDLE_SMALL=0//g' -i .config
->     make ARCH=powerpc oldconfig
->     -> no value is accepted
-
-If it turns out that there is some reason by NR_CPUS=1 is impossible,
-there are a few things that I could do:
-
-I could just leave the range off, which would allow people to give
-nonsense values.  This would be harmless in the code, for example,
-a negative value would simply disable small-system handling, while
-a too-large value would similarly disable large-system handling.
-Might be a bit obnoxious for the guy who typoed and then wasted a
-kernel build/boot/test cycle, but it is an option.
-
-I could use a small fixed range (say from 1 to 64), which would
-provide at least some checking.  In the unlikely event that someone
-really wants more than 64 CPUs handled with small-system handling,
-we could revisit at that point.
-
-I tried creating a NR_CPUS_REALLY as follows:
+IIRC, it tries to use the first default first, so the below may work
+(the "if SMP" is probably not needed):
 
 config NR_CPUS_REALLY
-	int "Fixed version of NR_CPUS"
-	default NR_CPUS if NR_CPUS
-	default 1 if !NR_CPUS
+        int "Fixed version of NR_CPUS"
+        default 1 if !SMP
+        default NR_CPUS if SMP
 
-But this still gave a warning on the first "default" even though it
-was not in effect.  I also tried using Kconfig "if":
+> Defining NR_CPUS=1 if !SMP is looking pretty good to me just now.
+> This would probably have other benefits -- I cannot be the only
+> person who ever wanted this.  ;-)
 
-if SMP
-config NR_CPUS_REALLY
-	int "Fixed version of NR_CPUS"
-	default NR_CPUS
-endif
-if !SMP
-config NR_CPUS_REALLY
-	int "Fixed version of NR_CPUS"
-	default 1 if !SMP
-endif
+Sure. I just didn't want to create patches for all architectures without
+having a discussion first.
 
-However, Kconfig complained about the use of NR_CPUS even though this
-was under an "if" whose condition was not set.  Perhaps someone with
-better Kconfig-fu than I have can come up with something.
+And it would be nice if it cuould be done in a central place, without
+touching all architectures.
 
-Defining NR_CPUS=1 if !SMP is looking pretty good to me just now.
-This would probably have other benefits -- I cannot be the only
-person who ever wanted this.  ;-)
+Gr{oetje,eeting}s,
 
-							Thanx, Paul
+                        Geert
 
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
