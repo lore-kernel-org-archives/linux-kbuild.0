@@ -1,40 +1,68 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:35755 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S935570Ab3IEKCz (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 5 Sep 2013 06:02:55 -0400
-Message-ID: <522856C9.3030106@suse.cz>
-Date: Thu, 05 Sep 2013 12:02:49 +0200
-From: Michal Marek <mmarek@suse.cz>
+Received: from mail-pb0-f47.google.com ([209.85.160.47]:35709 "EHLO
+	mail-pb0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750808Ab3IFIIX (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 6 Sep 2013 04:08:23 -0400
 MIME-Version: 1.0
-Subject: Re: [PATCH 1/3] kconfig: do not special-case 'MODULES' symbol
-References: <1378242287-12759-1-git-send-email-yann.morin.1998@free.fr> <5228510C.1020906@suse.cz>
-In-Reply-To: <5228510C.1020906@suse.cz>
-Content-Type: text/plain; charset=ISO-8859-2
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <1376966841-31774-8-git-send-email-paulmck@linux.vnet.ibm.com>
+References: <20130820024700.GA31075@linux.vnet.ibm.com>
+	<1376966841-31774-1-git-send-email-paulmck@linux.vnet.ibm.com>
+	<1376966841-31774-8-git-send-email-paulmck@linux.vnet.ibm.com>
+Date: Fri, 6 Sep 2013 10:08:22 +0200
+Message-ID: <CAMuHMdWtZAD3G_miFOT9DPZpfTO3nJ9J4aG_zvHV_6eVf2jdQg@mail.gmail.com>
+Subject: Re: [PATCH tip/core/rcu 8/9] nohz_full: Add full-system-idle state machine
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>
+To: "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Ingo Molnar <mingo@elte.hu>, laijs@cn.fujitsu.com, dipankar@in.ibm.com, Andrew Morton <akpm@linux-foundation.org>, Mathieu Desnoyers <mathieu.desnoyers@polymtl.ca>, josh@joshtriplett.org, niv@us.ibm.com, Thomas Gleixner <tglx@linutronix.de>, Peter Zijlstra <peterz@infradead.org>, Steven Rostedt <rostedt@goodmis.org>, David Howells <dhowells@redhat.com>, edumazet@google.com, darren@dvhart.com, =?UTF-8?B?RnLDqWTDqXJpYyBXZWlzYmVja2Vy?= <fweisbec@gmail.com>, sbw@mit.edu, Linux-Arch <linux-arch@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On 5.9.2013 11:38, Michal Marek wrote:
-> On 3.9.2013 23:04, Yann E. MORIN wrote:
->> From: "Yann E. MORIN" <yann.morin.1998@free.fr>
->> This patch changes the way we enable/disable tristates: if a symbol was
->> found with 'option modules' attached to it, then that symbol controls
->> enabling tristates. Otherwise, tristates are disabled, even if a symbol
->> named 'MODULES' exists.
-> 
-> Wasn't this change supposed to fix allmodconfig with KCONFIG_ALLCONFIG
-> (http://lkml.org/lkml/2013/8/8/573)? Or is there still more to do?
-> Because I'm still getting:
-> [...]
-> $ grep MODULES .config
-> CONFIG_MODULES_USE_ELF_RELA=y
-> # CONFIG_MODULES is not set
-> $
+On Tue, Aug 20, 2013 at 4:47 AM, Paul E. McKenney
+<paulmck@linux.vnet.ibm.com> wrote:
+> --- a/kernel/time/Kconfig
+> +++ b/kernel/time/Kconfig
+> @@ -157,6 +157,33 @@ config NO_HZ_FULL_SYSIDLE
+>
+>          Say N if you are unsure.
+>
+> +config NO_HZ_FULL_SYSIDLE_SMALL
+> +       int "Number of CPUs above which large-system approach is used"
+> +       depends on NO_HZ_FULL_SYSIDLE
+> +       range 1 NR_CPUS
 
-Otherwise, I have no problem merging this series. I'm just curious what
-to do with the allmodconfig with KCONFIG_ALLCONFIG bug.
+This causes "kernel/time/Kconfig:162:warning: range is invalid" on m68k and
+all other architectures that do not support SMP.
 
-Michal
+How to reproduce:
+    make ARCH=m68k defconfig
+
+Furthermore, it seems only hexagon, metag, mips, and x86 set NR_CPUS to 1
+if !SMP. On other architectures, NR_CPUS is not defined and presumed to be 0.
+
+Hence in non-interactive configs (e.g. "make defconfig"),
+NO_HZ_FULL_SYSIDLE_SMALL will end up as 0.
+In interactive configs (e.g. "make oldconfig") Kconfig suggest "0" as
+the default,
+but refuses to accept it as it doesn't fall within the range 1..0.
+
+How to reproduce:
+    Remove the "depends on NO_HZ_FULL_SYSIDLE"
+    make ARCH=powerpc mpc83xx_defconfig
+    grep NO_HZ_FULL_SYSIDLE_SMALL .config
+    -> CONFIG_NO_HZ_FULL_SYSIDLE_SMALL=0
+    sed 's/CONFIG_NO_HZ_FULL_SYSIDLE_SMALL=0//g' -i .config
+    make ARCH=powerpc oldconfig
+    -> no value is accepted
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
