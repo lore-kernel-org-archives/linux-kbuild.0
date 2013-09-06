@@ -1,68 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pb0-f47.google.com ([209.85.160.47]:35709 "EHLO
-	mail-pb0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750808Ab3IFIIX (ORCPT
+Received: from mail-we0-f179.google.com ([74.125.82.179]:38621 "EHLO
+	mail-we0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750777Ab3IFJrU (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 6 Sep 2013 04:08:23 -0400
+	Fri, 6 Sep 2013 05:47:20 -0400
+Date: Fri, 6 Sep 2013 11:47:15 +0200
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: Re: [PATCH 1/3] kconfig: do not special-case 'MODULES' symbol
+Message-ID: <20130906094715.GD3271@free.fr>
+References: <1378242287-12759-1-git-send-email-yann.morin.1998@free.fr>
+ <5228510C.1020906@suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <1376966841-31774-8-git-send-email-paulmck@linux.vnet.ibm.com>
-References: <20130820024700.GA31075@linux.vnet.ibm.com>
-	<1376966841-31774-1-git-send-email-paulmck@linux.vnet.ibm.com>
-	<1376966841-31774-8-git-send-email-paulmck@linux.vnet.ibm.com>
-Date: Fri, 6 Sep 2013 10:08:22 +0200
-Message-ID: <CAMuHMdWtZAD3G_miFOT9DPZpfTO3nJ9J4aG_zvHV_6eVf2jdQg@mail.gmail.com>
-Subject: Re: [PATCH tip/core/rcu 8/9] nohz_full: Add full-system-idle state machine
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <5228510C.1020906@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Ingo Molnar <mingo@elte.hu>, laijs@cn.fujitsu.com, dipankar@in.ibm.com, Andrew Morton <akpm@linux-foundation.org>, Mathieu Desnoyers <mathieu.desnoyers@polymtl.ca>, josh@joshtriplett.org, niv@us.ibm.com, Thomas Gleixner <tglx@linutronix.de>, Peter Zijlstra <peterz@infradead.org>, Steven Rostedt <rostedt@goodmis.org>, David Howells <dhowells@redhat.com>, edumazet@google.com, darren@dvhart.com, =?UTF-8?B?RnLDqWTDqXJpYyBXZWlzYmVja2Vy?= <fweisbec@gmail.com>, sbw@mit.edu, Linux-Arch <linux-arch@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>
 
-On Tue, Aug 20, 2013 at 4:47 AM, Paul E. McKenney
-<paulmck@linux.vnet.ibm.com> wrote:
-> --- a/kernel/time/Kconfig
-> +++ b/kernel/time/Kconfig
-> @@ -157,6 +157,33 @@ config NO_HZ_FULL_SYSIDLE
->
->          Say N if you are unsure.
->
-> +config NO_HZ_FULL_SYSIDLE_SMALL
-> +       int "Number of CPUs above which large-system approach is used"
-> +       depends on NO_HZ_FULL_SYSIDLE
-> +       range 1 NR_CPUS
+Michal, All,
 
-This causes "kernel/time/Kconfig:162:warning: range is invalid" on m68k and
-all other architectures that do not support SMP.
+On 2013-09-05 11:38 +0200, Michal Marek spake thusly:
+> On 3.9.2013 23:04, Yann E. MORIN wrote:
+> > From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+> > 
+> > Currently, the 'MODULES' symbol is hard-coded to be the default symbol
+> > that enables/disables tristates, if no other symbol was declared with
+> > 'option modules'.
+> > 
+> > While this used to be needed for the Linux kernel, we now have an
+> > explicit 'option modules' attached to the 'MODULES' symbol (since
+> > cset 11097a036), so we no longer need to special-case it in the
+> > kconfig code.
+> > 
+> > Furthermore, kconfig is extensively used out of the Linux kernel, and
+> > other projects may have another meaning for a symbol named 'MODULES'.
+> > 
+> > This patch changes the way we enable/disable tristates: if a symbol was
+> > found with 'option modules' attached to it, then that symbol controls
+> > enabling tristates. Otherwise, tristates are disabled, even if a symbol
+> > named 'MODULES' exists.
+> 
+> Wasn't this change supposed to fix allmodconfig with KCONFIG_ALLCONFIG
+> (http://lkml.org/lkml/2013/8/8/573)? Or is there still more to do?
 
-How to reproduce:
-    make ARCH=m68k defconfig
+This is part of the fix, and there are still things to change, yes.
 
-Furthermore, it seems only hexagon, metag, mips, and x86 set NR_CPUS to 1
-if !SMP. On other architectures, NR_CPUS is not defined and presumed to be 0.
+I'm not done with it yet, since I was unavailable for some time, and I
+just wanted this part to be reviewed/upstreamed before continuing, just
+in case I was going the wrong way.
 
-Hence in non-interactive configs (e.g. "make defconfig"),
-NO_HZ_FULL_SYSIDLE_SMALL will end up as 0.
-In interactive configs (e.g. "make oldconfig") Kconfig suggest "0" as
-the default,
-but refuses to accept it as it doesn't fall within the range 1..0.
+I'll be further working on this, and hope to have something at the
+beginning of next week.
 
-How to reproduce:
-    Remove the "depends on NO_HZ_FULL_SYSIDLE"
-    make ARCH=powerpc mpc83xx_defconfig
-    grep NO_HZ_FULL_SYSIDLE_SMALL .config
-    -> CONFIG_NO_HZ_FULL_SYSIDLE_SMALL=0
-    sed 's/CONFIG_NO_HZ_FULL_SYSIDLE_SMALL=0//g' -i .config
-    make ARCH=powerpc oldconfig
-    -> no value is accepted
+Regards,
+Yann E. MORIN.
 
-Gr{oetje,eeting}s,
-
-                        Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
