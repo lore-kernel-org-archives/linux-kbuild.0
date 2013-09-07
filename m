@@ -1,62 +1,82 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:42088 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750810Ab3IFU3O (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 6 Sep 2013 16:29:14 -0400
-Date: Fri, 6 Sep 2013 22:29:12 +0200
-From: Michal Marek <mmarek@suse.cz>
-Subject: [GIT] kbuild misc updates for v3.12-rc1
-Message-ID: <20130906202912.GA11225@pobox.suse.cz>
+Received: from mail-wg0-f43.google.com ([74.125.82.43]:49531 "EHLO
+	mail-wg0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750751Ab3IGJNy (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 7 Sep 2013 05:13:54 -0400
+Date: Sat, 7 Sep 2013 11:13:48 +0200
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: Re: [PATCH tip/core/rcu 8/9] nohz_full: Add full-system-idle state
+ machine
+Message-ID: <20130907091348.GA3487@free.fr>
+References: <20130820024700.GA31075@linux.vnet.ibm.com>
+ <1376966841-31774-1-git-send-email-paulmck@linux.vnet.ibm.com>
+ <1376966841-31774-8-git-send-email-paulmck@linux.vnet.ibm.com>
+ <CAMuHMdWtZAD3G_miFOT9DPZpfTO3nJ9J4aG_zvHV_6eVf2jdQg@mail.gmail.com>
+ <20130906173047.GT3966@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
+In-Reply-To: <20130906173047.GT3966@linux.vnet.ibm.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: anisse@astier.eu, jcmvbkbc@gmail.com, linux@rasmusvillemoes.dk, mike.marciniszyn@intel.com, xypron.glpk@gmx.de, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Ingo Molnar <mingo@elte.hu>, laijs@cn.fujitsu.com, dipankar@in.ibm.com, Andrew Morton <akpm@linux-foundation.org>, Mathieu Desnoyers <mathieu.desnoyers@polymtl.ca>, josh@joshtriplett.org, niv@us.ibm.com, Thomas Gleixner <tglx@linutronix.de>, Peter Zijlstra <peterz@infradead.org>, Steven Rostedt <rostedt@goodmis.org>, David Howells <dhowells@redhat.com>, edumazet@google.com, darren@dvhart.com, =?utf-8?B?RnLDqWTDqXJpYw==?= Weisbecker <fweisbec@gmail.com>, sbw@mit.edu, Linux-Arch <linux-arch@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-Hi Linus,
+Paul, All,
 
-in the kbuild misc branch, I have:
-- make rpm-pkg updates, most importantly the rpm package now calls
-  /sbin/installkernel
-- make deb-pkg: debuginfo split, correct kernel image path for parisc,
-  mips and powerpc and a couple more minor fixes
-- New coccinelle check
+On 2013-09-06 10:30 -0700, Paul E. McKenney spake thusly:
+[--SNIP--]
+> I also tried using Kconfig "if":
+> 
+> if SMP
+> config NR_CPUS_REALLY
+> 	int "Fixed version of NR_CPUS"
+> 	default NR_CPUS
+> endif
+> if !SMP
+> config NR_CPUS_REALLY
+> 	int "Fixed version of NR_CPUS"
+> 	default 1 if !SMP
 
-Thanks,
-Michal
+The 'if !SMP' here is unneeded, you're already in a 'if !SMP' if-block.
 
-The following changes since commit ad81f0545ef01ea651886dddac4bef6cec930092:
+> endif
+> 
+> However, Kconfig complained about the use of NR_CPUS even though this
+> was under an "if" whose condition was not set.  Perhaps someone with
+> better Kconfig-fu than I have can come up with something.
 
-  Linux 3.11-rc1 (2013-07-14 15:18:27 -0700)
+That's because the 'if' condition is added to the dependency list of the
+symbol(s) that is(are) enclosed in the if.
 
-are available in the git repository at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git misc
+'if' in Kconfig behaves the same way as an 'if' in C. What you expected
+(I believe) was the behaviour of '#ifdef', which is not the case. From
+Documentation/kbuild/kconfig-language.txt:
 
-Anisse Astier (4):
-      deb-pkg: use KCONFIG_CONFIG instead of .config file directly
-      deb-pkg: split debug symbols in their own package
-      deb-pkg: fix installed image path on parisc, mips and powerpc
-      deb-pkg: add a hook argument to match debian hooks parameters
+    ---8<---
+    if:
 
-Heinrich Schuchardt (1):
-      Provide version number for Debian firmware package
+            "if" <expr>
+            <if block>
+            "endif"
 
-Max Filippov (1):
-      scripts/checkkconfigsymbols.sh: replace echo -e with printf
+    This defines an if block. The dependency expression <expr> is appended
+    to all enclosed menu entries.
+    ---8<---
 
-Mike Marciniszyn (3):
-      rpm-pkg: add %post section to create initramfs and grub hooks
-      rpm-pkg: install firmware files in kernel relative directory
-      rpm-pkg: add generation of kernel-devel
+There's no equivlaent to '#ifdef' in Kconfig.
 
-Rasmus Villemoes (1):
-      coccinelle: replace 0/1 with false/true in functions returning bool
+I'll see if I can come up with a meaningfull construct that fixes your
+use-case. Don't hold your breath, though! ;-)
 
- scripts/checkkconfigsymbols.sh           |    4 +-
- scripts/coccinelle/misc/boolreturn.cocci |   58 ++++++++++++++++++
- scripts/package/builddeb                 |   94 +++++++++++++++++++++++++-----
- scripts/package/mkspec                   |   46 +++++++++++++--
- 4 files changed, 178 insertions(+), 24 deletions(-)
- create mode 100644 scripts/coccinelle/misc/boolreturn.cocci
+Regards,
+Yann E. MORIN.
+
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
