@@ -1,71 +1,85 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-we0-f177.google.com ([74.125.82.177]:40659 "EHLO
-	mail-we0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752155Ab3IHKqp (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 8 Sep 2013 06:46:45 -0400
-Date: Sun, 8 Sep 2013 12:46:41 +0200
-From: Frederic Weisbecker <fweisbec@gmail.com>
-Subject: Re: [PATCH tip/core/rcu 8/9] nohz_full: Add full-system-idle state
- machine
-Message-ID: <20130908104639.GC4501@somewhere>
-References: <20130820024700.GA31075@linux.vnet.ibm.com>
- <1376966841-31774-1-git-send-email-paulmck@linux.vnet.ibm.com>
- <1376966841-31774-8-git-send-email-paulmck@linux.vnet.ibm.com>
- <CAMuHMdWtZAD3G_miFOT9DPZpfTO3nJ9J4aG_zvHV_6eVf2jdQg@mail.gmail.com>
- <20130906173047.GT3966@linux.vnet.ibm.com>
- <20130907091348.GA3487@free.fr>
- <20130907185710.GF3966@linux.vnet.ibm.com>
- <20130908103250.GA3698@free.fr>
+Received: from cantor2.suse.de ([195.135.220.15]:53374 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751942Ab3IKIi4 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 11 Sep 2013 04:38:56 -0400
+Date: Wed, 11 Sep 2013 10:38:52 +0200
+From: Michal Marek <mmarek@suse.cz>
+Subject: [GIT] kconfig updates for v3.12-rc1
+Message-ID: <20130911083852.GA28217@sepie.suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20130908103250.GA3698@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Geert Uytterhoeven <geert@linux-m68k.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Ingo Molnar <mingo@elte.hu>, laijs@cn.fujitsu.com, dipankar@in.ibm.com, Andrew Morton <akpm@linux-foundation.org>, Mathieu Desnoyers <mathieu.desnoyers@polymtl.ca>, josh@joshtriplett.org, niv@us.ibm.com, Thomas Gleixner <tglx@linutronix.de>, Peter Zijlstra <peterz@infradead.org>, Steven Rostedt <rostedt@goodmis.org>, David Howells <dhowells@redhat.com>, edumazet@google.com, darren@dvhart.com, sbw@mit.edu, Linux-Arch <linux-arch@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: chauplac@gmail.com, keescook@chromium.org, mmarek@suse.cz, mpagano@gentoo.org, yann.morin.1998@free.fr, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Sun, Sep 08, 2013 at 12:32:50PM +0200, Yann E. MORIN wrote:
-> Paul, All,
-> 
-> On 2013-09-07 11:57 -0700, Paul E. McKenney spake thusly:
-> > On Sat, Sep 07, 2013 at 11:13:48AM +0200, Yann E. MORIN wrote:
-> [--SNIP--]
-> > > I'll see if I can come up with a meaningfull construct that fixes your
-> > > use-case. Don't hold your breath, though! ;-)
-> > 
-> > If not, we need to add NR_CPUS to the architectures lacking them...
-> 
-> Unfortunately, I was not able to come up with anything suitable.
-> 
-> I think your proposal to always define NR_CPUS=1 for architectures
-> without SMP support is a good solution.
-> 
-> After all, if !SMP because the architecture does not support it, I
-> believe it makes sense that NR_CPUS be defined to 1.
-> 
-> Unless NR_CPUS carries with it a hidden meaning about SMP being
-> possible, that is, which would probably be wrong anyway, since we have
-> SMP for this.
+Hi Linus,
 
-Right, if possible, the best would be to define CONFIG_NR_CPUS to a single
-central place, like arch/Kconfig:
+this is the kconfig part of kbuild for v3.12-rc1:
+- post-3.11 search code fixes and micro-optimizations
+- CONFIG_MODULES is no longer a special case; this is needed to
+  eventually fix the bug that using KCONFIG_ALLCONFIG breaks
+  allmodconfig
+- long long is used to store hex and int values
+- make silentoldconfig no longer warns when a symbol changes from
+  tristate to bool (it's a job for make oldconfig)
+- scripts/diffconfig updated to work with newer Pythons
+- scripts/config does not rely on GNU sed extensions
 
-	config NR_CPUS
-	default 1 if !SMP
+Michal
 
-It's a single int after all. Specific arch constraints can probably be overriden
-from the arch.
 
-> 
-> Regards,
-> Yann E. MORIN.
-> 
-> -- 
-> .-----------------.--------------------.------------------.--------------------.
-> |  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-> | +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-> | +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-> | http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-> '------------------------------^-------^------------------^--------------------'
+The following changes since commit ad81f0545ef01ea651886dddac4bef6cec930092:
+
+  Linux 3.11-rc1 (2013-07-14 15:18:27 -0700)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git kconfig
+
+for you to fetch changes up to e062781397e5bebc6c1b8dd4bf466136e13ae4c5:
+
+  kconfig: do not allow more than one symbol to have 'option modules' (2013-09-05 11:10:08 +0200)
+
+----------------------------------------------------------------
+Clement Chauplannaz (1):
+      scripts/config: use sed's POSIX interface
+
+Kees Cook (1):
+      kconfig: switch to "long long" for sanity
+
+Michal Marek (1):
+      Merge branch 'yem-kconfig-rc-fixes' of git://gitorious.org/linux-kconfig/linux-kconfig into kbuild/kconfig
+
+Mike Pagano (2):
+      diffconfig: Gracefully exit if the default config files are not present
+      diffconfig: Update script to support python versions 2.5 through 3.3
+
+Yann E. MORIN (11):
+      Documentation/kconfig: more concise and straightforward search explanation
+      kconfig: avoid multiple calls to strlen
+      kconfig/[mn]conf: shorten title in search-box
+      kconfig: minor style fixes in symbol-search code
+      kconfig: don't allocate n+1 elements in temporary array
+      kconfig: simplify symbol-search code
+      kconfig: silence warning when parsing auto.conf when a symbol has changed type
+      modules: do not depend on kconfig to set 'modules' option to symbol MODULES
+      kconfig: do not special-case 'MODULES' symbol
+      kconfig: regenerate bison parser
+      kconfig: do not allow more than one symbol to have 'option modules'
+
+ Documentation/kbuild/kconfig-language.txt |   1 +
+ Documentation/kbuild/kconfig.txt          |   8 +-
+ init/Kconfig                              |   1 +
+ scripts/config                            |  44 ++-
+ scripts/diffconfig                        |  33 +-
+ scripts/kconfig/confdata.c                |  11 +-
+ scripts/kconfig/mconf.c                   |   4 +-
+ scripts/kconfig/menu.c                    |  11 +-
+ scripts/kconfig/nconf.c                   |   4 +-
+ scripts/kconfig/symbol.c                  |  68 ++--
+ scripts/kconfig/zconf.tab.c_shipped       | 562 ++++++++++++++++--------------
+ scripts/kconfig/zconf.y                   |  11 +-
+ 12 files changed, 413 insertions(+), 345 deletions(-)
