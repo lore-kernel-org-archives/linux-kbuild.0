@@ -1,85 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:53374 "EHLO mx2.suse.de"
+Received: from mail.nt1.in ([62.90.139.210]:41792 "EHLO mail.nt1.in"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751942Ab3IKIi4 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 11 Sep 2013 04:38:56 -0400
-Date: Wed, 11 Sep 2013 10:38:52 +0200
-From: Michal Marek <mmarek@suse.cz>
-Subject: [GIT] kconfig updates for v3.12-rc1
-Message-ID: <20130911083852.GA28217@sepie.suse.cz>
+	id S1750974Ab3ILBMG (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 11 Sep 2013 21:12:06 -0400
+Date: Thu, 12 Sep 2013 03:35:48 +0300
+From: Regid Ichira <regid23@nt1.in>
+Subject: [PATCH] Documentation/kbuild/kconfig.txt: Doesn't make listnewconfig
+ replacing yes "" | make oldconfig ?
+Message-ID: <20130912003548.GF8821@nt1.in>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: chauplac@gmail.com, keescook@chromium.org, mmarek@suse.cz, mpagano@gentoo.org, yann.morin.1998@free.fr, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>, Rob Landley <rob@landley.net>
+Cc: linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hi Linus,
+Signed-off-by: Regid Ichira <regid23@nt1.in>
+---
+ Documentation/kbuild/kconfig.txt | 11 ++---------
+ 1 file changed, 2 insertions(+), 9 deletions(-)
 
-this is the kconfig part of kbuild for v3.12-rc1:
-- post-3.11 search code fixes and micro-optimizations
-- CONFIG_MODULES is no longer a special case; this is needed to
-  eventually fix the bug that using KCONFIG_ALLCONFIG breaks
-  allmodconfig
-- long long is used to store hex and int values
-- make silentoldconfig no longer warns when a symbol changes from
-  tristate to bool (it's a job for make oldconfig)
-- scripts/diffconfig updated to work with newer Pythons
-- scripts/config does not rely on GNU sed extensions
-
-Michal
-
-
-The following changes since commit ad81f0545ef01ea651886dddac4bef6cec930092:
-
-  Linux 3.11-rc1 (2013-07-14 15:18:27 -0700)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git kconfig
-
-for you to fetch changes up to e062781397e5bebc6c1b8dd4bf466136e13ae4c5:
-
-  kconfig: do not allow more than one symbol to have 'option modules' (2013-09-05 11:10:08 +0200)
-
-----------------------------------------------------------------
-Clement Chauplannaz (1):
-      scripts/config: use sed's POSIX interface
-
-Kees Cook (1):
-      kconfig: switch to "long long" for sanity
-
-Michal Marek (1):
-      Merge branch 'yem-kconfig-rc-fixes' of git://gitorious.org/linux-kconfig/linux-kconfig into kbuild/kconfig
-
-Mike Pagano (2):
-      diffconfig: Gracefully exit if the default config files are not present
-      diffconfig: Update script to support python versions 2.5 through 3.3
-
-Yann E. MORIN (11):
-      Documentation/kconfig: more concise and straightforward search explanation
-      kconfig: avoid multiple calls to strlen
-      kconfig/[mn]conf: shorten title in search-box
-      kconfig: minor style fixes in symbol-search code
-      kconfig: don't allocate n+1 elements in temporary array
-      kconfig: simplify symbol-search code
-      kconfig: silence warning when parsing auto.conf when a symbol has changed type
-      modules: do not depend on kconfig to set 'modules' option to symbol MODULES
-      kconfig: do not special-case 'MODULES' symbol
-      kconfig: regenerate bison parser
-      kconfig: do not allow more than one symbol to have 'option modules'
-
- Documentation/kbuild/kconfig-language.txt |   1 +
- Documentation/kbuild/kconfig.txt          |   8 +-
- init/Kconfig                              |   1 +
- scripts/config                            |  44 ++-
- scripts/diffconfig                        |  33 +-
- scripts/kconfig/confdata.c                |  11 +-
- scripts/kconfig/mconf.c                   |   4 +-
- scripts/kconfig/menu.c                    |  11 +-
- scripts/kconfig/nconf.c                   |   4 +-
- scripts/kconfig/symbol.c                  |  68 ++--
- scripts/kconfig/zconf.tab.c_shipped       | 562 ++++++++++++++++--------------
- scripts/kconfig/zconf.y                   |  11 +-
- 12 files changed, 413 insertions(+), 345 deletions(-)
+diff --git a/Documentation/kbuild/kconfig.txt b/Documentation/kbuild/kconfig.txt
+index 8ef6dbb..14cc40c 100644
+--- a/Documentation/kbuild/kconfig.txt
++++ b/Documentation/kbuild/kconfig.txt
+@@ -20,16 +20,9 @@ symbols have been introduced.
+ To see a list of new config symbols when using "make oldconfig", use
+ 
+ 	cp user/some/old.config .config
+-	yes "" | make oldconfig >conf.new
++	make listnewconfig 
+ 
+-and the config program will list as (NEW) any new symbols that have
+-unknown values.  Of course, the .config file is also updated with
+-new (default) values, so you can use:
+-
+-	grep "(NEW)" conf.new
+-
+-to see the new config symbols or you can use diffconfig to see the
+-differences between the previous and new .config files:
++and the config program will list any new symbols, one per line.
+ 
+ 	scripts/diffconfig .config.old .config | less
+ 
+-- 
+1.8.4.rc3
