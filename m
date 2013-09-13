@@ -1,78 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vc0-f171.google.com ([209.85.220.171]:62149 "EHLO
-	mail-vc0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755753Ab3IMIio convert rfc822-to-8bit (ORCPT
+Received: from mail-wg0-f54.google.com ([74.125.82.54]:56376 "EHLO
+	mail-wg0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754469Ab3IMIqB (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 13 Sep 2013 04:38:44 -0400
-MIME-Version: 1.0
-In-Reply-To: <CACRpkdYjzGwaV0Eg5KZ7W_9YYkyiAXDc-9oagU49XWJUooVKdQ@mail.gmail.com>
-References: <cover.1376600922.git.yann.morin.1998@free.fr>
-	<83e8b90e1d2cc5ff5d2443f2486c2d786a4997ce.1376600922.git.yann.morin.1998@free.fr>
-	<CACRpkdYjzGwaV0Eg5KZ7W_9YYkyiAXDc-9oagU49XWJUooVKdQ@mail.gmail.com>
-Date: Fri, 13 Sep 2013 10:38:43 +0200
-Message-ID: <CACW0xKXOKJXW+5m7JirKbsj4Em4SbVV0NeyK2x88x46dfJ4akw@mail.gmail.com>
-Subject: Re: [PATCH 2/4] scripts/config: use sed's POSIX interface
-From: =?ISO-8859-1?Q?Cl=E9ment_Chauplannaz?= <chauplac@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 8BIT
+	Fri, 13 Sep 2013 04:46:01 -0400
+From: Clement Chauplannaz <chauplac@gmail.com>
+Subject: [PATCH] scripts/config: fix variable substitution command
+Date: Fri, 13 Sep 2013 10:45:13 +0200
+Message-Id: <1379061913-17604-1-git-send-email-chauplac@gmail.com>
+In-Reply-To: <CACW0xKXOKJXW+5m7JirKbsj4Em4SbVV0NeyK2x88x46dfJ4akw@mail.gmail.com>
+References: <CACW0xKXOKJXW+5m7JirKbsj4Em4SbVV0NeyK2x88x46dfJ4akw@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Walleij <linus.walleij@linaro.org>
-Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: linus.walleij@linaro.org, mmarek@suse.cz, yann.morin.1998@free.fr
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-2013/9/12 Linus Walleij <linus.walleij@linaro.org>:
-> On Thu, Aug 15, 2013 at 11:17 PM, Yann E. MORIN <yann.morin.1998@free.fr> wrote:
->
->> From: Clement Chauplannaz <chauplac@gmail.com>
->>
->> Script `config' relies on extensions of `GNU sed', and is thus not
->> working on all Unixes:
->>   - in-place edition of files (-i), which can be replaced with
->>     a temporary file;
->>   - extended-regexps (-r), which can be split into basic regexps;
->>   - single-line calls to `a' command, while some implementations
->>     require a leading newline before the parameter.
->>
->> Rewrite calls to `sed' to comply with POSIX interface, and move them
->> to helper functions.
->>
->> Signed-off-by: Clement Chauplannaz <chauplac@gmail.com>
->> Tested-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
->> Reviewed-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
->> Signed-off-by: Yann E. MORIN <yann.morin.1998@free.fr>
->
-> This patch totally breaks my usage of the --set-str
-> argument to "config".
->
-> Reverting this patch solves the problem.
->
-> Reproduce:
-> make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi-
-> KBUILD_OUTPUT=build-nomadik nhk8815_defconfig
-> scripts/config --file build-nomadik/.config --set-str CMDLINE
-> "root=/dev/ram0 console=ttyAMA1,115200n8 earlyprintk"
-> sed: -e uttryck #1, tecken 44: flaggan okänd för "s"
-> sed: -e uttryck #1, tecken 54: flaggan okänd för "s"
->
-> Swedish messages meaning "unknown flag for "s""
->
-> After reverting the patch these messages no longer appear.
->
-> At failure my config file is scratched :-O
->
-> Yours,
-> Linus Walleij
+Commit 229455bc02b87f7128f190c4491b4ceffff38648 accidentally changed the
+separator between sed `s' command and its parameters from ':' to '/'.
 
-Hello Linus,
+Revert this change.
 
-Thank you for this report. I was able to reproduce this bug and fix it.
+Signed-off-by: Clement Chauplannaz <chauplac@gmail.com>
+---
+ scripts/config | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-My previous commit changed the separator between sed's substitute
-command and its parameters, from ':' to '/'. The latter conflicted
-with the slashes found in the value of variable CMDLINE, as provided
-in your email.
+diff --git a/scripts/config b/scripts/config
+index 58383e2..ae85564 100755
+--- a/scripts/config
++++ b/scripts/config
+@@ -80,7 +80,7 @@ txt_subst() {
+ 	local infile="$3"
+ 	local tmpfile="$infile.swp"
+ 
+-	sed -e "s/$before/$after/" "$infile" >"$tmpfile"
++	sed -e "s:$before:$after:" "$infile" >"$tmpfile"
+ 	# replace original file with the edited one
+ 	mv "$tmpfile" "$infile"
+ }
+-- 
+1.8.3.2.dirty
 
-I'm sending a patch right now to revert to previous behavior.
-
-Best regards,
-Clement Chauplannaz
