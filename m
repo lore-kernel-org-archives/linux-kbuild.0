@@ -1,42 +1,120 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:53016 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750842Ab3IMMi0 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 13 Sep 2013 08:38:26 -0400
-Date: Fri, 13 Sep 2013 14:38:24 +0200
-From: Michal Marek <mmarek@suse.cz>
-Subject: [GIT] kconfig fix for v3.12-rc1
-Message-ID: <20130913123824.GA8397@pobox.suse.cz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Received: from mail-pd0-f182.google.com ([209.85.192.182]:64601 "EHLO
+	mail-pd0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755009Ab3IMVu0 (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 13 Sep 2013 17:50:26 -0400
+From: Afzal Mohammed <afzal.mohd.ma@gmail.com>
+Subject: [PATCH RFC] kbuild: prevent git private tag altering kernelrelease
+Date: Sat, 14 Sep 2013 03:19:58 +0530
+Message-Id: <1379109004-2411-1-git-send-email-afzal.mohd.ma@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: chauplac@gmail.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Afzal Mohammed <afzal.mohd.ma@gmail.com>, Michal Marek <mmarek@suse.cz>, Christophe Leroy <christophe.leroy@c-s.fr>, Christian Kujau <lists@nerdbynature.de>
 
-Hi Linus,
+If a private tag is created after the most recent kernelversion tag, a
+commit after this private tag would feed kernelrelease with commits
+after private tag and kernelversion tag. This may confuse user relying
+on kernelrelease (mostly a developer while debugging), mainly if HEAD
+has a private tag and otherwise w.r.t git distance from kernelversion
+tag.
 
-there is a fix for a regression caused by my previous pull request. A
-sed command in scripts/config that used colons as separator was
-accidentally changed to use slashes, which fails when you use slashes in
-a value. Changing it back to colons is of course not a proper fix, but
-at least it will be broken in the same way it had been for four years. A
-proper fix is pending.
+Suppose the Kernel is 18 commits after v3.11-rc1, kernelrelease would be
+something like '3.11.0-rc1-00018-gdeadbeef'.
 
-Michal
+And if an annotated(or signed) tag is created at HEAD, kernelrelease
+would become 3.11.0-rc1, which makes one feel that source corresponds to
+v3.11-rc1 tag.
 
+Instead if such a tag is created at say HEAD~, kernelrelease would be
+v3.11.0-rc1-00001-gdeadbeef, misleading the observer w.r.t git distance
+from nearest kernelversion tag.
 
-The following changes since commit 5b4197845ad1a33bc57da7ee5ea41de58c2f86bf:
+Here an attempt is made to prevent private tag from altering
+kernelrelease.
 
-  Merge branch 'kconfig' of git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild (2013-09-11 08:34:25 -0700)
+Signed-off-by: Afzal Mohammed <afzal.mohd.ma@gmail.com>
+---
 
-are available in the git repository at:
+Hi,
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git kconfig
+This seems to work on different scenarios that could be readily thought
+of. I am shaky about this change, but acheives the purpose.
 
-Clement Chauplannaz (1):
-      scripts/config: fix variable substitution command
+Regards
+Afzal
 
- scripts/config |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
+ Makefile                |  4 ++--
+ scripts/setlocalversion | 12 ++++++++----
+ 2 files changed, 10 insertions(+), 6 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index e73f758..923e492 100644
+--- a/Makefile
++++ b/Makefile
+@@ -795,7 +795,7 @@ $(vmlinux-dirs): prepare scripts
+ 	$(Q)$(MAKE) $(build)=$@
+ 
+ define filechk_kernel.release
+-	echo "$(KERNELVERSION)$$($(CONFIG_SHELL) $(srctree)/scripts/setlocalversion $(srctree))"
++	echo "$(KERNELVERSION)$$($(CONFIG_SHELL) $(srctree)/scripts/setlocalversion $(srctree) $(KERNELVERSION))" > $@
+ endef
+ 
+ # Store (new) KERNELRELEASE string in include/config/kernel.release
+@@ -1330,7 +1330,7 @@ checkstack:
+ 	$(PERL) $(src)/scripts/checkstack.pl $(CHECKSTACK_ARCH)
+ 
+ kernelrelease:
+-	@echo "$(KERNELVERSION)$$($(CONFIG_SHELL) $(srctree)/scripts/setlocalversion $(srctree))"
++	@echo "$(KERNELVERSION)$$($(CONFIG_SHELL) $(srctree)/scripts/setlocalversion $(srctree) $(KERNELVERSION))"
+ 
+ kernelversion:
+ 	@echo $(KERNELVERSION)
+diff --git a/scripts/setlocalversion b/scripts/setlocalversion
+index d105a44..2c4552c 100755
+--- a/scripts/setlocalversion
++++ b/scripts/setlocalversion
+@@ -10,7 +10,7 @@
+ #
+ 
+ usage() {
+-	echo "Usage: $0 [--save-scmversion] [srctree]" >&2
++	echo "Usage: $0 [--save-scmversion] [srctree] [kernelversion]" >&2
+ 	exit 1
+ }
+ 
+@@ -24,7 +24,11 @@ if test $# -gt 0; then
+ 	srctree=$1
+ 	shift
+ fi
+-if test $# -gt 0 -o ! -d "$srctree"; then
++if test $# -gt 0; then
++	kernelversion=`echo $1 | sed -e 's/[.]0//' -e 's/^/v/'`
++	shift
++fi
++if test $# -gt 0 -o ! -d "$srctree" -o -z "$kernelversion"; then
+ 	usage
+ fi
+ 
+@@ -47,7 +51,7 @@ scm_version()
+ 
+ 		# If we are at a tagged commit (like "v2.6.30-rc6"), we ignore
+ 		# it, because this version is defined in the top level Makefile.
+-		if [ -z "`git describe --exact-match 2>/dev/null`" ]; then
++		if [ -z "`git describe --exact-match --match $kernelversion 2>/dev/null`" ]; then
+ 
+ 			# If only the short version is requested, don't bother
+ 			# running further git commands
+@@ -57,7 +61,7 @@ scm_version()
+ 			fi
+ 			# If we are past a tagged commit (like
+ 			# "v2.6.30-rc5-302-g72357d5"), we pretty print it.
+-			if atag="`git describe 2>/dev/null`"; then
++			if atag="`git describe --match $kernelversion 2>/dev/null`"; then
+ 				echo "$atag" | awk -F- '{printf("-%05d-%s", $(NF-1),$(NF))}'
+ 
+ 			# If we don't have a tag at all we print -g{commitish}.
+-- 
+1.8.2.135.g7b592fa
+
