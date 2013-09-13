@@ -1,43 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f54.google.com ([74.125.82.54]:56376 "EHLO
-	mail-wg0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754469Ab3IMIqB (ORCPT
+Received: from mail-oa0-f47.google.com ([209.85.219.47]:44752 "EHLO
+	mail-oa0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755442Ab3IMJ3s (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 13 Sep 2013 04:46:01 -0400
-From: Clement Chauplannaz <chauplac@gmail.com>
-Subject: [PATCH] scripts/config: fix variable substitution command
-Date: Fri, 13 Sep 2013 10:45:13 +0200
-Message-Id: <1379061913-17604-1-git-send-email-chauplac@gmail.com>
-In-Reply-To: <CACW0xKXOKJXW+5m7JirKbsj4Em4SbVV0NeyK2x88x46dfJ4akw@mail.gmail.com>
+	Fri, 13 Sep 2013 05:29:48 -0400
+Received: by mail-oa0-f47.google.com with SMTP id g12so905515oah.20
+        for <linux-kbuild@vger.kernel.org>; Fri, 13 Sep 2013 02:29:48 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <1379061913-17604-1-git-send-email-chauplac@gmail.com>
 References: <CACW0xKXOKJXW+5m7JirKbsj4Em4SbVV0NeyK2x88x46dfJ4akw@mail.gmail.com>
+	<1379061913-17604-1-git-send-email-chauplac@gmail.com>
+Date: Fri, 13 Sep 2013 11:29:48 +0200
+Message-ID: <CACRpkdbra_X7x=hdeVaoAe2vJndSUS_Cu7__tUnKUAwCV5wpDA@mail.gmail.com>
+Subject: Re: [PATCH] scripts/config: fix variable substitution command
+From: Linus Walleij <linus.walleij@linaro.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linus.walleij@linaro.org, mmarek@suse.cz, yann.morin.1998@free.fr
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Clement Chauplannaz <chauplac@gmail.com>
+Cc: Michal Marek <mmarek@suse.cz>, "Yann E. MORIN" <yann.morin.1998@free.fr>, linux-kbuild <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 
-Commit 229455bc02b87f7128f190c4491b4ceffff38648 accidentally changed the
-separator between sed `s' command and its parameters from ':' to '/'.
+On Fri, Sep 13, 2013 at 10:45 AM, Clement Chauplannaz
+<chauplac@gmail.com> wrote:
 
-Revert this change.
+> Commit 229455bc02b87f7128f190c4491b4ceffff38648 accidentally changed the
+> separator between sed `s' command and its parameters from ':' to '/'.
+>
+> Revert this change.
+>
+> Signed-off-by: Clement Chauplannaz <chauplac@gmail.com>
 
-Signed-off-by: Clement Chauplannaz <chauplac@gmail.com>
----
- scripts/config | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This patch fixes my issue with --set-str, thanks!
 
-diff --git a/scripts/config b/scripts/config
-index 58383e2..ae85564 100755
---- a/scripts/config
-+++ b/scripts/config
-@@ -80,7 +80,7 @@ txt_subst() {
- 	local infile="$3"
- 	local tmpfile="$infile.swp"
- 
--	sed -e "s/$before/$after/" "$infile" >"$tmpfile"
-+	sed -e "s:$before:$after:" "$infile" >"$tmpfile"
- 	# replace original file with the edited one
- 	mv "$tmpfile" "$infile"
- }
--- 
-1.8.3.2.dirty
+Tested-by: Linus Walleij <linus.walleij@linaro.org>
 
+Yours,
+Linus Walleij
