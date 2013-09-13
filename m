@@ -1,48 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:49799 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:53016 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753428Ab3IMLAL (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 13 Sep 2013 07:00:11 -0400
-Message-ID: <5232F037.4090504@suse.cz>
-Date: Fri, 13 Sep 2013 13:00:07 +0200
+	id S1750842Ab3IMMi0 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 13 Sep 2013 08:38:26 -0400
+Date: Fri, 13 Sep 2013 14:38:24 +0200
 From: Michal Marek <mmarek@suse.cz>
+Subject: [GIT] kconfig fix for v3.12-rc1
+Message-ID: <20130913123824.GA8397@pobox.suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH 2/4] scripts/config: use sed's POSIX interface
-References: <cover.1376600922.git.yann.morin.1998@free.fr> <83e8b90e1d2cc5ff5d2443f2486c2d786a4997ce.1376600922.git.yann.morin.1998@free.fr> <CACRpkdYjzGwaV0Eg5KZ7W_9YYkyiAXDc-9oagU49XWJUooVKdQ@mail.gmail.com> <CACW0xKXOKJXW+5m7JirKbsj4Em4SbVV0NeyK2x88x46dfJ4akw@mail.gmail.com> <CACRpkdY8nLnH5RG94kXuWBv=qb6osRSvGRODy3ywKDdHSGae5w@mail.gmail.com> <B58F4964-E48A-4D56-ABEE-C8E9514B2651@gmail.com>
-In-Reply-To: <B58F4964-E48A-4D56-ABEE-C8E9514B2651@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: =?UTF-8?B?Q2zDqW1lbnQgQ2hhdXBsYW5uYXo=?= <chauplac@gmail.com>
-Cc: Linus Walleij <linus.walleij@linaro.org>, "Yann E. MORIN" <yann.morin.1998@free.fr>, linux-kbuild <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: chauplac@gmail.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Dne 13.9.2013 11:54, Clément Chauplannaz napsal(a):
-> On Sep 13, 2013, at 11:32 AM, Linus Walleij <linus.walleij@linaro.org> wrote:
-> 
->> On Fri, Sep 13, 2013 at 10:38 AM, Clément Chauplannaz
->> <chauplac@gmail.com> wrote:
->>
->>> Thank you for this report. I was able to reproduce this bug and fix it.
->>
->> Thanks! Tested and works fine.
-> Glad to read the patch solves your issue. Thanks for the quick feedback!
->>
->>> My previous commit changed the separator between sed's substitute
->>> command and its parameters, from ':' to '/'. The latter conflicted
->>> with the slashes found in the value of variable CMDLINE, as provided
->>> in your email.
->>
->> Hm it could actually be useful to be able to have colons in a CMDLINE,
->> I wonder if we can think about some better separator ... oh well that
->> is another issue, all old scripts work now anyway.
-> Indeed config script may not work with all possible string values.
-> My
-> first concern for now was to fallback to previous interface. We may look
-> into hardening the script later on.
+Hi Linus,
 
-Right. I will merge the patch because it reverts a regression. But feel
-free to submit another patch that escapes the colons in $after. The
-script already uses #!/bin/bash, so a "${after//:/\:}" should work.
+there is a fix for a regression caused by my previous pull request. A
+sed command in scripts/config that used colons as separator was
+accidentally changed to use slashes, which fails when you use slashes in
+a value. Changing it back to colons is of course not a proper fix, but
+at least it will be broken in the same way it had been for four years. A
+proper fix is pending.
 
 Michal
+
+
+The following changes since commit 5b4197845ad1a33bc57da7ee5ea41de58c2f86bf:
+
+  Merge branch 'kconfig' of git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild (2013-09-11 08:34:25 -0700)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git kconfig
+
+Clement Chauplannaz (1):
+      scripts/config: fix variable substitution command
+
+ scripts/config |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
