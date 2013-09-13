@@ -1,69 +1,78 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-we0-f169.google.com ([74.125.82.169]:34469 "EHLO
-	mail-we0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754669Ab3ILVke (ORCPT
+Received: from mail-vc0-f171.google.com ([209.85.220.171]:62149 "EHLO
+	mail-vc0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755753Ab3IMIio convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 12 Sep 2013 17:40:34 -0400
-Date: Thu, 12 Sep 2013 23:40:29 +0200
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH] Documentation/kbuild/kconfig.txt: Doesn't make
- listnewconfig replacing yes "" | make oldconfig ?
-Message-ID: <20130912214028.GA3362@free.fr>
-References: <20130912003548.GF8821@nt1.in>
+	Fri, 13 Sep 2013 04:38:44 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20130912003548.GF8821@nt1.in>
+In-Reply-To: <CACRpkdYjzGwaV0Eg5KZ7W_9YYkyiAXDc-9oagU49XWJUooVKdQ@mail.gmail.com>
+References: <cover.1376600922.git.yann.morin.1998@free.fr>
+	<83e8b90e1d2cc5ff5d2443f2486c2d786a4997ce.1376600922.git.yann.morin.1998@free.fr>
+	<CACRpkdYjzGwaV0Eg5KZ7W_9YYkyiAXDc-9oagU49XWJUooVKdQ@mail.gmail.com>
+Date: Fri, 13 Sep 2013 10:38:43 +0200
+Message-ID: <CACW0xKXOKJXW+5m7JirKbsj4Em4SbVV0NeyK2x88x46dfJ4akw@mail.gmail.com>
+Subject: Re: [PATCH 2/4] scripts/config: use sed's POSIX interface
+From: =?ISO-8859-1?Q?Cl=E9ment_Chauplannaz?= <chauplac@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Regid Ichira <regid23@nt1.in>
-Cc: Michal Marek <mmarek@suse.cz>, Rob Landley <rob@landley.net>, linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 
-Regid, All,
+2013/9/12 Linus Walleij <linus.walleij@linaro.org>:
+> On Thu, Aug 15, 2013 at 11:17 PM, Yann E. MORIN <yann.morin.1998@free.fr> wrote:
+>
+>> From: Clement Chauplannaz <chauplac@gmail.com>
+>>
+>> Script `config' relies on extensions of `GNU sed', and is thus not
+>> working on all Unixes:
+>>   - in-place edition of files (-i), which can be replaced with
+>>     a temporary file;
+>>   - extended-regexps (-r), which can be split into basic regexps;
+>>   - single-line calls to `a' command, while some implementations
+>>     require a leading newline before the parameter.
+>>
+>> Rewrite calls to `sed' to comply with POSIX interface, and move them
+>> to helper functions.
+>>
+>> Signed-off-by: Clement Chauplannaz <chauplac@gmail.com>
+>> Tested-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+>> Reviewed-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+>> Signed-off-by: Yann E. MORIN <yann.morin.1998@free.fr>
+>
+> This patch totally breaks my usage of the --set-str
+> argument to "config".
+>
+> Reverting this patch solves the problem.
+>
+> Reproduce:
+> make ARCH=arm CROSS_COMPILE=arm-linux-gnueabi-
+> KBUILD_OUTPUT=build-nomadik nhk8815_defconfig
+> scripts/config --file build-nomadik/.config --set-str CMDLINE
+> "root=/dev/ram0 console=ttyAMA1,115200n8 earlyprintk"
+> sed: -e uttryck #1, tecken 44: flaggan okänd för "s"
+> sed: -e uttryck #1, tecken 54: flaggan okänd för "s"
+>
+> Swedish messages meaning "unknown flag for "s""
+>
+> After reverting the patch these messages no longer appear.
+>
+> At failure my config file is scratched :-O
+>
+> Yours,
+> Linus Walleij
 
-On 2013-09-12 03:35 +0300, Regid Ichira spake thusly:
-> Signed-off-by: Regid Ichira <regid23@nt1.in>
+Hello Linus,
 
-Acked-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Thank you for this report. I was able to reproduce this bug and fix it.
 
-> ---
->  Documentation/kbuild/kconfig.txt | 11 ++---------
->  1 file changed, 2 insertions(+), 9 deletions(-)
-> 
-> diff --git a/Documentation/kbuild/kconfig.txt b/Documentation/kbuild/kconfig.txt
-> index 8ef6dbb..14cc40c 100644
-> --- a/Documentation/kbuild/kconfig.txt
-> +++ b/Documentation/kbuild/kconfig.txt
-> @@ -20,16 +20,9 @@ symbols have been introduced.
->  To see a list of new config symbols when using "make oldconfig", use
->  
->  	cp user/some/old.config .config
-> -	yes "" | make oldconfig >conf.new
-> +	make listnewconfig 
->  
-> -and the config program will list as (NEW) any new symbols that have
-> -unknown values.  Of course, the .config file is also updated with
-> -new (default) values, so you can use:
-> -
-> -	grep "(NEW)" conf.new
-> -
-> -to see the new config symbols or you can use diffconfig to see the
-> -differences between the previous and new .config files:
-> +and the config program will list any new symbols, one per line.
->  
->  	scripts/diffconfig .config.old .config | less
->  
-> -- 
-> 1.8.4.rc3
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+My previous commit changed the separator between sed's substitute
+command and its parameters, from ':' to '/'. The latter conflicted
+with the slashes found in the value of variable CMDLINE, as provided
+in your email.
 
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+I'm sending a patch right now to revert to previous behavior.
+
+Best regards,
+Clement Chauplannaz
