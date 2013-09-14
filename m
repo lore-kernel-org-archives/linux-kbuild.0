@@ -1,101 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-we0-f172.google.com ([74.125.82.172]:42615 "EHLO
-	mail-we0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756512Ab3INOnE convert rfc822-to-8bit (ORCPT
+Received: from mail-wg0-f45.google.com ([74.125.82.45]:50693 "EHLO
+	mail-wg0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932434Ab3INXbo (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 14 Sep 2013 10:43:04 -0400
-MIME-Version: 1.0
-Reply-To: sedat.dilek@gmail.com
-In-Reply-To: <CACW0xKV-jh2Zfz1-s0xX-NxYBixEF8Hf90jEbo0oouFE18CdyQ@mail.gmail.com>
-References: <CA+icZUUkJgeUaJmNzAZQysV9dUHzwPzU7k3pn8vrThSD780xaQ@mail.gmail.com>
-	<CACW0xKV-jh2Zfz1-s0xX-NxYBixEF8Hf90jEbo0oouFE18CdyQ@mail.gmail.com>
-Date: Sat, 14 Sep 2013 16:43:02 +0200
-Message-ID: <CA+icZUW6Z+exg9wm_up3wta9qX6Wp5WUZa-n+1q8a98-Kt-7Zg@mail.gmail.com>
+	Sat, 14 Sep 2013 19:31:44 -0400
+Date: Sun, 15 Sep 2013 01:31:39 +0200
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
 Subject: Re: scripts/config: fix variable substitution command
-From: Sedat Dilek <sedat.dilek@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Message-ID: <20130914233139.GC3444@free.fr>
+References: <CA+icZUUkJgeUaJmNzAZQysV9dUHzwPzU7k3pn8vrThSD780xaQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CA+icZUUkJgeUaJmNzAZQysV9dUHzwPzU7k3pn8vrThSD780xaQ@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: =?UTF-8?Q?Cl=C3=A9ment_Chauplannaz?= <chauplac@gmail.com>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Linus Walleij <linus.walleij@linaro.org>
+To: Sedat Dilek <sedat.dilek@gmail.com>
+Cc: Clement Chauplannaz <chauplac@gmail.com>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Linus Walleij <linus.walleij@linaro.org>
 
-On Sat, Sep 14, 2013 at 4:21 PM, Clément Chauplannaz <chauplac@gmail.com> wrote:
-> 2013/9/14 Sedat Dilek <sedat.dilek@gmail.com>:
->> Hi,
->>
->> The ChangeLog from [1] says:
->>
->> Commit 229455bc02b87f7128f190c4491b4ceffff38648 accidentally changed
->> the separator between sed `s' command and its parameters from ':' to
->> '/'.
->> Revert this change.
->>
->> Reported-and-tested-by: Linus Walleij <linus.walleij@linaro.org>
->> Signed-off-by: Clement Chauplannaz <chauplac@gmail.com>
->> Signed-off-by: Michal Marek <mmarek@suse.cz>
->>
->> *** Bad commit reference: 229455bc02b87f7128f190c4491b4ceffff38648 ***
->> (Linus-tree)
->>
->> To quote [2] and see its EXAMPLE:
->>
->> "If you want to refer to a specific commit, don't just refer to the
->> SHA-1 ID of the commit. Please also include the oneline summary of
->> the commit, to make it easier for reviewers to know what it is about.
->>
->> Example:
->>
->> Commit e21d2170f36602ae2708 ("video: remove unnecessary
->> platform_set_drvdata()") removed the unnecessary
->> platform_set_drvdata(), but left the variable "dev" unused,
->> delete it."
->>
->> That's why the commit-id without the subject-line is no good help.
->> It does not help anyone when you reference a local GIT or linux-kbuild
->> GIT related commit-id.
->>
->> So, can you point me/us to the correct commit with subject, please?!
->> Is this patch even "CC: stable"?
->>
->> Thanks.
->>
->> Regards,
->> - Sedat -
->>
->>
->> [1] http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=86eb781889ec31f6421b86ab252ea609d456322d
->> [2] http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/Documentation/SubmittingPatches#n112
->
->
-> Hi Sedat,
->
-> My apologies for that mistake. The initial commit, as present in Linus tree, is:
-> 83e8b90e1d2cc5ff5d2443f2486c2d786a4997ce - scripts/config: use sed's
-> POSIX interface
->
-> Thus, the commit message for this patch should read:
-> scripts/config: fix variable substitution command
->
-> Commit 83e8b90e1d2cc5ff5d2443f2486c2d786a4997ce ("scripts/config: use sed's
-> POSIX interface") accidentally changed the separator between sed `s' command
-> and its parameters from ':' to '/'.
->
+Sedat, All,
+
+On 2013-09-14 14:21 +0200, Sedat Dilek spake thusly:
+> The ChangeLog from [1] says:
+> 
+> Commit 229455bc02b87f7128f190c4491b4ceffff38648 accidentally changed
+> the separator between sed `s' command and its parameters from ':' to
+> '/'.
 > Revert this change.
->
-> Reported-and-tested-by: Linus Walleij <linus.walleij@linaro.org>
-> Signed-off-by: Clement Chauplannaz <chauplac@gmail.com>
-> Signed-off-by: Michal Marek <mmarek@suse.cz>
->
+[--SNIP--]
+> Is this patch even "CC: stable"?
 
-What means "pending" [1]?
-Pending in sense of "we are working on it" or in the sense of
-"exists-but-not-published".
-I did not found a hint on the offline linux-kbuild ML.
-BTW, the GIT repo of Yann is not browsable (which is sh*t for checking
-commits quickl, I don't want to be forced to checkout).
+It was not in any previous released version, since it went in Linus'
+tree for 3.12. As such, it does not make sense to Cc: stable.
 
-- Sedat -
+Regards,
+Yann E. MORIN.
 
-[1] http://marc.info/?l=linux-kbuild&m=137907590807755&w=2
-[2] https://www.gitorious.org/linux-kconfig/linux-kconfig/
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
