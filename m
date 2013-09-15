@@ -1,90 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f174.google.com ([209.85.212.174]:55330 "EHLO
-	mail-wi0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756791Ab3INXjI convert rfc822-to-8bit (ORCPT
+Received: from mail-pd0-f171.google.com ([209.85.192.171]:65090 "EHLO
+	mail-pd0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932465Ab3IOEjV (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 14 Sep 2013 19:39:08 -0400
-Date: Sun, 15 Sep 2013 01:39:03 +0200
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: scripts/config: fix variable substitution command
-Message-ID: <20130914233903.GD3444@free.fr>
-References: <CA+icZUUkJgeUaJmNzAZQysV9dUHzwPzU7k3pn8vrThSD780xaQ@mail.gmail.com>
- <CACW0xKV-jh2Zfz1-s0xX-NxYBixEF8Hf90jEbo0oouFE18CdyQ@mail.gmail.com>
- <CA+icZUW6Z+exg9wm_up3wta9qX6Wp5WUZa-n+1q8a98-Kt-7Zg@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8BIT
-In-Reply-To: <CA+icZUW6Z+exg9wm_up3wta9qX6Wp5WUZa-n+1q8a98-Kt-7Zg@mail.gmail.com>
+	Sun, 15 Sep 2013 00:39:21 -0400
+From: Guenter Roeck <linux@roeck-us.net>
+Subject: [PATCH] modpost: Fix secondary errors seen if a single module build fails
+Date: Sat, 14 Sep 2013 21:39:02 -0700
+Message-Id: <1379219942-31545-1-git-send-email-linux@roeck-us.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sedat Dilek <sedat.dilek@gmail.com>
-Cc: =?utf-8?Q?Cl=C3=A9ment?= Chauplannaz <chauplac@gmail.com>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Linus Walleij <linus.walleij@linaro.org>
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Guenter Roeck <linux@roeck-us.net>, Rusty Russell <rusty@rustcorp.com.au>
 
-Sedat, All,
+Commit ea4054a23 (modpost: handle huge numbers of modules) added
+support for building a large number of modules.
 
-On 2013-09-14 16:43 +0200, Sedat Dilek spake thusly:
-> On Sat, Sep 14, 2013 at 4:21 PM, Clément Chauplannaz <chauplac@gmail.com> wrote:
-> > 2013/9/14 Sedat Dilek <sedat.dilek@gmail.com>:
-[--SNIP--]
-> >> So, can you point me/us to the correct commit with subject, please?!
-> >
-> > My apologies for that mistake. The initial commit, as present in Linus tree, is:
-> > 83e8b90e1d2cc5ff5d2443f2486c2d786a4997ce - scripts/config: use sed's
-> > POSIX interface
-> >
-> > Thus, the commit message for this patch should read:
-> > scripts/config: fix variable substitution command
-> >
-> > Commit 83e8b90e1d2cc5ff5d2443f2486c2d786a4997ce ("scripts/config: use sed's
-> > POSIX interface") accidentally changed the separator between sed `s' command
-> > and its parameters from ':' to '/'.
-> >
-> > Revert this change.
-> >
-> > Reported-and-tested-by: Linus Walleij <linus.walleij@linaro.org>
-> > Signed-off-by: Clement Chauplannaz <chauplac@gmail.com>
-> > Signed-off-by: Michal Marek <mmarek@suse.cz>
-> >
-> 
-> What means "pending" [1]?
+Unfortunately, the commit changed the semantics of the makefile: Instead of
+passing only existing object files to modpost, make now passes all expected
+object files. If make was started with option -i, this results in a modpost
+error if a single file failed to build.
 
-The current script had a latent bug that would trigger when the user want
-to set a string that contains a colon ':'.
+Example with the current btrfs build falure on m68k:
 
-This behaviour was changed by Clément, and the bug was then about strings
-with a '/' instead. This was a regression for some users.
+fs/btrfs/btrfs.o: No such file or directory
+make[1]: [__modpost] Error 1 (ignored)
 
-The behaviour was then reverted to break on strings containing ':'.
+This error is followed by lots of errors such as:
 
-What is pending is a final fix that will fix both cases.
+m68k-linux-gcc: error: arch/m68k/emu/nfcon.mod.c: No such file or directory
+m68k-linux-gcc: fatal error: no input files
+compilation terminated.
+make[1]: [arch/m68k/emu/nfcon.mod.o] Error 1 (ignored)
 
-> Pending in sense of "we are working on it" or in the sense of
-> "exists-but-not-published".
+This doesn't matter much for normal builds, but it is annoying for builds
+started with "make -i" due to the large number of secondary errors.
+Those errors unnececessarily clog any error log and make it difficult
+to find the real errors in the build.
 
-The final fix is trivial and identified, so I guess that Clément has yet
-had time to send the patch.
+Fix the problem by only passing existing object files to modpost.
 
-> I did not found a hint on the offline linux-kbuild ML.
+Cc: Rusty Russell <rusty@rustcorp.com.au>
+Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+---
+ scripts/Makefile.modpost |    3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-That would be Michal's suggestion there:
-    http://marc.info/?l=linux-kbuild&m=137907001305533&w=2
-
-> BTW, the GIT repo of Yann is not browsable (which is sh*t for checking
-> commits quickl, I don't want to be forced to checkout).
-
-Yes, I know about that one. I've already notified the gitorious guys
-about the issue, they supposedly fixed it, but it is broken again.
-
-I will re-open my ticket in a moment.
-
-Regards,
-Yann E. MORIN.
-
+diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
+index 8dcdca2..387c806 100644
+--- a/scripts/Makefile.modpost
++++ b/scripts/Makefile.modpost
+@@ -81,7 +81,8 @@ modpost = scripts/mod/modpost                    \
+ 
+ # We can go over command line length here, so be careful.
+ quiet_cmd_modpost = MODPOST $(words $(filter-out vmlinux FORCE, $^)) modules
+-      cmd_modpost = $(MODLISTCMD) | sed 's/\.ko$$/.o/' | $(modpost) -s -T -
++      cmd_modpost = $(MODLISTCMD) | sed 's/\.ko$$/.o/' | \
++	while read a; do [ -f $$a ] && echo $$a; done | $(modpost) -s -T -
+ 
+ PHONY += __modpost
+ __modpost: $(modules:.ko=.o) FORCE
 -- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+1.7.9.7
+
