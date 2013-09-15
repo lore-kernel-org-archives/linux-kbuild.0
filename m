@@ -1,65 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pd0-f171.google.com ([209.85.192.171]:65090 "EHLO
-	mail-pd0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932465Ab3IOEjV (ORCPT
+Received: from mail-pd0-f181.google.com ([209.85.192.181]:44414 "EHLO
+	mail-pd0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753250Ab3IOIPr (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 15 Sep 2013 00:39:21 -0400
-From: Guenter Roeck <linux@roeck-us.net>
-Subject: [PATCH] modpost: Fix secondary errors seen if a single module build fails
-Date: Sat, 14 Sep 2013 21:39:02 -0700
-Message-Id: <1379219942-31545-1-git-send-email-linux@roeck-us.net>
+	Sun, 15 Sep 2013 04:15:47 -0400
+MIME-Version: 1.0
+In-Reply-To: <1379219942-31545-1-git-send-email-linux@roeck-us.net>
+References: <1379219942-31545-1-git-send-email-linux@roeck-us.net>
+Date: Sun, 15 Sep 2013 10:15:47 +0200
+Message-ID: <CAMuHMdWJ6w5WnY-80SQpYWiVkvaPNbU7w5-UAxqFxPfFVjB1+w@mail.gmail.com>
+Subject: Re: [PATCH] modpost: Fix secondary errors seen if a single module
+ build fails
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Guenter Roeck <linux@roeck-us.net>, Rusty Russell <rusty@rustcorp.com.au>
+To: Guenter Roeck <linux@roeck-us.net>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, Rusty Russell <rusty@rustcorp.com.au>
 
-Commit ea4054a23 (modpost: handle huge numbers of modules) added
-support for building a large number of modules.
+On Sun, Sep 15, 2013 at 6:39 AM, Guenter Roeck <linux@roeck-us.net> wrote:
+> -      cmd_modpost = $(MODLISTCMD) | sed 's/\.ko$/.o/' | $(modpost) -s -T -
+> +      cmd_modpost = $(MODLISTCMD) | sed 's/\.ko$/.o/' | \
+> +       while read a; do [ -f $a ] && echo $a; done | $(modpost) -s -T -
 
-Unfortunately, the commit changed the semantics of the makefile: Instead of
-passing only existing object files to modpost, make now passes all expected
-object files. If make was started with option -i, this results in a modpost
-error if a single file failed to build.
+I'm wondering whether this can be filtered without using a shell while loop?
+E.g. using "ls"?
 
-Example with the current btrfs build falure on m68k:
+Gr{oetje,eeting}s,
 
-fs/btrfs/btrfs.o: No such file or directory
-make[1]: [__modpost] Error 1 (ignored)
+                        Geert
 
-This error is followed by lots of errors such as:
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
-m68k-linux-gcc: error: arch/m68k/emu/nfcon.mod.c: No such file or directory
-m68k-linux-gcc: fatal error: no input files
-compilation terminated.
-make[1]: [arch/m68k/emu/nfcon.mod.o] Error 1 (ignored)
-
-This doesn't matter much for normal builds, but it is annoying for builds
-started with "make -i" due to the large number of secondary errors.
-Those errors unnececessarily clog any error log and make it difficult
-to find the real errors in the build.
-
-Fix the problem by only passing existing object files to modpost.
-
-Cc: Rusty Russell <rusty@rustcorp.com.au>
-Signed-off-by: Guenter Roeck <linux@roeck-us.net>
----
- scripts/Makefile.modpost |    3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
-index 8dcdca2..387c806 100644
---- a/scripts/Makefile.modpost
-+++ b/scripts/Makefile.modpost
-@@ -81,7 +81,8 @@ modpost = scripts/mod/modpost                    \
- 
- # We can go over command line length here, so be careful.
- quiet_cmd_modpost = MODPOST $(words $(filter-out vmlinux FORCE, $^)) modules
--      cmd_modpost = $(MODLISTCMD) | sed 's/\.ko$$/.o/' | $(modpost) -s -T -
-+      cmd_modpost = $(MODLISTCMD) | sed 's/\.ko$$/.o/' | \
-+	while read a; do [ -f $$a ] && echo $$a; done | $(modpost) -s -T -
- 
- PHONY += __modpost
- __modpost: $(modules:.ko=.o) FORCE
--- 
-1.7.9.7
-
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
