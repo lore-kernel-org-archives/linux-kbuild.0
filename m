@@ -1,129 +1,71 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-we0-f172.google.com ([74.125.82.172]:65268 "EHLO
-	mail-we0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751852Ab3IOS24 (ORCPT
+Received: from perceval.ideasonboard.com ([95.142.166.194]:39677 "EHLO
+	perceval.ideasonboard.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750893Ab3IPQOe convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 15 Sep 2013 14:28:56 -0400
+	Mon, 16 Sep 2013 12:14:34 -0400
+From: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
+Subject: Re: [PATCH] [media] media/v4l2: VIDEO_RENESAS_VSP1 should depend on HAS_DMA
+Date: Mon, 16 Sep 2013 18:14:36 +0200
+Message-ID: <1824528.Vfxhey5Hfr@avalon>
+In-Reply-To: <CAMuHMdV6QrVcHfxwnS7EDQF6J6DjLTTZRNPP-VkWuJOv4HFweg@mail.gmail.com>
+References: <1378471436-7045-1-git-send-email-geert@linux-m68k.org> <2886273.7m0Ub6qIMh@avalon> <CAMuHMdV6QrVcHfxwnS7EDQF6J6DjLTTZRNPP-VkWuJOv4HFweg@mail.gmail.com>
 MIME-Version: 1.0
-Reply-To: sedat.dilek@gmail.com
-In-Reply-To: <20130914233903.GD3444@free.fr>
-References: <CA+icZUUkJgeUaJmNzAZQysV9dUHzwPzU7k3pn8vrThSD780xaQ@mail.gmail.com>
-	<CACW0xKV-jh2Zfz1-s0xX-NxYBixEF8Hf90jEbo0oouFE18CdyQ@mail.gmail.com>
-	<CA+icZUW6Z+exg9wm_up3wta9qX6Wp5WUZa-n+1q8a98-Kt-7Zg@mail.gmail.com>
-	<20130914233903.GD3444@free.fr>
-Date: Sun, 15 Sep 2013 20:28:54 +0200
-Message-ID: <CA+icZUXihARzNZPPHw8X+-xpwxumKBBHcPSPL4hUM1mRSQ9DaQ@mail.gmail.com>
-Subject: Re: scripts/config: fix variable substitution command
-From: Sedat Dilek <sedat.dilek@gmail.com>
-Content-Type: multipart/mixed; boundary=f46d043c7c5699f29c04e67042f3
+Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: =?UTF-8?Q?Cl=C3=A9ment_Chauplannaz?= <chauplac@gmail.com>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Linus Walleij <linus.walleij@linaro.org>, Thorsten Glaser <tg@mirbsd.de>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Laurent Pinchart <laurent.pinchart+renesas@ideasonboard.com>, Mauro Carvalho Chehab <m.chehab@samsung.com>, Linux Media Mailing List <linux-media@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
---f46d043c7c5699f29c04e67042f3
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Hi Geert,
 
-On Sun, Sep 15, 2013 at 1:39 AM, Yann E. MORIN <yann.morin.1998@free.fr> wr=
-ote:
-> Sedat, All,
->
-> On 2013-09-14 16:43 +0200, Sedat Dilek spake thusly:
->> On Sat, Sep 14, 2013 at 4:21 PM, Cl=C3=A9ment Chauplannaz <chauplac@gmai=
-l.com> wrote:
->> > 2013/9/14 Sedat Dilek <sedat.dilek@gmail.com>:
-> [--SNIP--]
->> >> So, can you point me/us to the correct commit with subject, please?!
->> >
->> > My apologies for that mistake. The initial commit, as present in Linus=
- tree, is:
->> > 83e8b90e1d2cc5ff5d2443f2486c2d786a4997ce - scripts/config: use sed's
->> > POSIX interface
->> >
->> > Thus, the commit message for this patch should read:
->> > scripts/config: fix variable substitution command
->> >
->> > Commit 83e8b90e1d2cc5ff5d2443f2486c2d786a4997ce ("scripts/config: use =
-sed's
->> > POSIX interface") accidentally changed the separator between sed `s' c=
-ommand
->> > and its parameters from ':' to '/'.
->> >
->> > Revert this change.
->> >
->> > Reported-and-tested-by: Linus Walleij <linus.walleij@linaro.org>
->> > Signed-off-by: Clement Chauplannaz <chauplac@gmail.com>
->> > Signed-off-by: Michal Marek <mmarek@suse.cz>
->> >
->>
->> What means "pending" [1]?
->
-> The current script had a latent bug that would trigger when the user want
-> to set a string that contains a colon ':'.
->
-> This behaviour was changed by Cl=C3=A9ment, and the bug was then about st=
-rings
-> with a '/' instead. This was a regression for some users.
->
-> The behaviour was then reverted to break on strings containing ':'.
->
-> What is pending is a final fix that will fix both cases.
->
->> Pending in sense of "we are working on it" or in the sense of
->> "exists-but-not-published".
->
-> The final fix is trivial and identified, so I guess that Cl=C3=A9ment has=
- yet
-> had time to send the patch.
->
->> I did not found a hint on the offline linux-kbuild ML.
->
-> That would be Michal's suggestion there:
->     http://marc.info/?l=3Dlinux-kbuild&m=3D137907001305533&w=3D2
->
+On Friday 06 September 2013 19:07:50 Geert Uytterhoeven wrote:
+> On Fri, Sep 6, 2013 at 5:20 PM, Laurent Pinchart wrote:
+> > On Friday 06 September 2013 14:43:56 Geert Uytterhoeven wrote:
+> >> If NO_DMA=y:
+> >> 
+> >> warning: (... && VIDEO_RENESAS_VSP1 && ...) selects VIDEOBUF2_DMA_CONTIG
+> >> which has unmet direct dependencies (MEDIA_SUPPORT && HAS_DMA)
+> >> 
+> >> drivers/media/v4l2-core/videobuf2-dma-contig.c: In function
+> >> ‘vb2_dc_mmap’:
+> >> drivers/media/v4l2-core/videobuf2-dma-contig.c:202: error: implicit
+> >> declaration of function ‘dma_mmap_coherent’
+> >> drivers/media/v4l2-core/videobuf2-dma-contig.c: In function
+> >> ‘vb2_dc_get_base_sgt’:
+> >> drivers/media/v4l2-core/videobuf2-dma-contig.c:385:
+> >> error: implicit declaration of function ‘dma_get_sgtable’ make[7]: ***
+> >> [drivers/media/v4l2-core/videobuf2-dma-contig.o] Error 1
+> >> 
+> >> VIDEO_RENESAS_VSP1 (which doesn't have a platform dependency) selects
+> >> VIDEOBUF2_DMA_CONTIG, but the latter depends on HAS_DMA.
+> >> 
+> >> Make VIDEO_RENESAS_VSP1 depend on HAS_DMA to fix this.
+> > 
+> > Is there a chance we could fix the Kconfig infrastructure instead ? It
+> > warns about the unmet dependency, shouldn't it disallow selecting the
+> > driver in the first place ? I have a vague feeling that this topic has
+> > been discussed before though.
+> 
+> This has come up several times before.
+> Unfortunately "select" was "designed" to circumvent all dependencies of
+> the target symbol.
 
-I talked with Thorsten (MirBSD and Debian developer) and he suggested:
+I suppose that fixing this "design bug" (or feature, depending on how one sees 
+it) has been discussed extensively in the past and that the behaviour will not 
+change in the near future.
 
-$ sed -e "s^A$before^A$after^A" "$infile" >"$tmpfile" <--- see
-attached Text-File
+I'll take your patch in and push it to v3.12.
 
-NOTE: Control character "^A" <--- ASCII 0x01 aka SOH (Start Of Heading)
+> > If that's not possible,
+> > 
+> >> Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+> > 
+> > Acked-by: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
 
-- Sedat -
+-- 
+Regards,
 
-P.S.: Note2myself: vi/vim: Insert-mode: Ctrl-v Ctrl-a
+Laurent Pinchart
 
->> BTW, the GIT repo of Yann is not browsable (which is sh*t for checking
->> commits quickl, I don't want to be forced to checkout).
->
-> Yes, I know about that one. I've already notified the gitorious guys
-> about the issue, they supposedly fixed it, but it is broken again.
->
-> I will re-open my ticket in a moment.
->
-> Regards,
-> Yann E. MORIN.
->
-> --
-> .-----------------.--------------------.------------------.--------------=
-------.
-> |  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspi=
-racy: |
-> | +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___         =
-      |
-> | +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There i=
-s no  |
-> | http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspir=
-acy.  |
-> '------------------------------^-------^------------------^--------------=
-------'
-
---f46d043c7c5699f29c04e67042f3
-Content-Type: application/octet-stream; name=Text-File
-Content-Disposition: attachment; filename=Text-File
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_hlmlc8aw0
-
-c2VkIC1lICJzASRiZWZvcmUBJGFmdGVyASIgIiRpbmZpbGUiID4iJHRtcGZpbGUiCg==
---f46d043c7c5699f29c04e67042f3--
