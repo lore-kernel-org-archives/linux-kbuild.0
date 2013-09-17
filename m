@@ -1,46 +1,35 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from nm25-vm1.access.bullet.mail.gq1.yahoo.com ([216.39.63.23]:37186
-	"EHLO nm25-vm1.access.bullet.mail.gq1.yahoo.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752890Ab3IQXPf (ORCPT
+Received: from nm15-vm7.access.bullet.mail.gq1.yahoo.com ([216.39.63.193]:21711
+	"EHLO nm15-vm7.access.bullet.mail.gq1.yahoo.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752890Ab3IQXSa (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 17 Sep 2013 19:15:35 -0400
-From: danielfsantos@att.net
-Subject: [PATCH 0/5] Preliminary: Add error names & descrptions to printks
-Date: Tue, 17 Sep 2013 18:08:32 -0500
-Message-Id: <1379459317-13046-1-git-send-email-daniel.santos@pobox.com>
+	Tue, 17 Sep 2013 19:18:30 -0400
+Message-ID: <5238E35F.3060206@att.net>
+Date: Tue, 17 Sep 2013 18:18:55 -0500
+From: Daniel Santos <danielfsantos@att.net>
+Reply-To: Daniel Santos <daniel.santos@pobox.com>
+MIME-Version: 1.0
+Subject: Re: [PATCH 2/5] lib: Add .config options for error strings in printks
+References: <1379459317-13046-1-git-send-email-daniel.santos@pobox.com> <1379459317-13046-3-git-send-email-daniel.santos@pobox.com>
+In-Reply-To: <1379459317-13046-3-git-send-email-daniel.santos@pobox.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, Andrew Morton <akpm@linux-foundation.org>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, David Howells <dhowells@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Michael Kerrisk <mtk.manpages@gmail.com>, Dave Hansen <dave.hansen@linux.intel.com>, George Spelvin <linux@horizon.com>
+To: Daniel Santos <daniel.santos@pobox.com>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, Andrew Morton <akpm@linux-foundation.org>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, David Howells <dhowells@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Michael Kerrisk <mtk.manpages@gmail.com>, Dave Hansen <dave.hansen@linux.intel.com>, George Spelvin <linux@horizon.com>
 
-
-This is a preliminary patch set as the root Makefile changes are not yet
-correct.
-
-Summary
-
-Typically, we don't care about error messages or names in the kernel because
-userspace will manage that.  But sometimes we need to output an error number
-to printks and that creates a situation where a user, system admistrator or
-developer must find an error number reference to figure out what went wrong
-with a particular driver or whatever.  This patch adds two alternatives at
-increasing memory costs:
-
-1. print the number in addition to the name for 2k extra or
-2. print the number, name and description for 6k extra.
-
-This is fairly low cost for the person who wants to make life just a little
-bit easier. The format of each is respectively the same as the following:
-
-  printk("%d (%s)", err, err_name);
-  printk("%d (%s: %s)", err, err_name, err_desc);
-
-Theory
-
-Error messages aren't printed often, so this data and code is designed to be
-compact at the expense of speed.  Rather than using an array of strings that
-would require both the text and a pointer to that text, we just cram a range
-of error names or descriptions into a single string with null character
-delimiters.  When we want to retrieve a string, we just iterate through that
-string and count nulls.  This is slow, but it keeps it compact. (If this
-becomes a bottleneck then something else is seriously wrong! :)
+On 09/17/2013 06:08 PM, danielfsantos@att.net wrote:
+> --- a/lib/Kconfig.debug
+> +++ b/lib/Kconfig.debug
+> @@ -58,6 +58,7 @@ config DYNAMIC_DEBUG
+>   	  implicitly compiles in all pr_debug() and dev_dbg() calls, which
+>   	  enlarges the kernel text size by about 2%.
+>   
+> +
+>   	  If a source file is compiled with DEBUG flag set, any
+>   	  pr_debug() calls in it are enabled by default, but can be
+>   	  disabled at runtime as below.  Note that DEBUG flag is
+> @@ -113,6 +114,58 @@ config DYNAMIC_DEBUG
+whoops! Please ignore this carriage return! :)
 
