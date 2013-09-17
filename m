@@ -1,85 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.active-venture.com ([67.228.131.205]:57030 "EHLO
-	mail.active-venture.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752683Ab3IQNRD (ORCPT
+Received: from mail-pd0-f171.google.com ([209.85.192.171]:52712 "EHLO
+	mail-pd0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752790Ab3IQOXv (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 17 Sep 2013 09:17:03 -0400
-Message-ID: <5238564D.6010307@roeck-us.net>
-Date: Tue, 17 Sep 2013 06:17:01 -0700
-From: Guenter Roeck <linux@roeck-us.net>
+	Tue, 17 Sep 2013 10:23:51 -0400
 MIME-Version: 1.0
-Subject: Re: [PATCH] modpost: Fix secondary errors seen if a single module
- build fails
-References: <1379219942-31545-1-git-send-email-linux@roeck-us.net> <52384C72.4040403@suse.cz>
-In-Reply-To: <52384C72.4040403@suse.cz>
-Content-Type: text/plain; charset=ISO-8859-2; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <1379421817-15759-5-git-send-email-Russ.Dill@ti.com>
+References: <1379421817-15759-1-git-send-email-Russ.Dill@ti.com>
+	<1379421817-15759-5-git-send-email-Russ.Dill@ti.com>
+Date: Tue, 17 Sep 2013 16:23:51 +0200
+Message-ID: <CAMuHMdVT-hhJnww64mFa6nubHrHk-ZHuoe9GwGgBCEA2G0B2Bg@mail.gmail.com>
+Subject: Re: [RFC PATCH 04/11] asm-generic: fncpy: Add function copying macros
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Rusty Russell <rusty@rustcorp.com.au>
+To: Russ Dill <Russ.Dill@ti.com>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "linux-omap@vger.kernel.org" <linux-omap@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, mans@mansr.com, Shawn Guo <shawn.guo@linaro.org>, Dave Martin <Dave.Martin@arm.com>, Russell King - ARM Linux <linux@arm.linux.org.uk>
 
-On 09/17/2013 05:34 AM, Michal Marek wrote:
-> Dne 15.9.2013 06:39, Guenter Roeck napsal(a):
->> Commit ea4054a23 (modpost: handle huge numbers of modules) added
->> support for building a large number of modules.
->>
->> Unfortunately, the commit changed the semantics of the makefile: Instead of
->> passing only existing object files to modpost, make now passes all expected
->> object files. If make was started with option -i, this results in a modpost
->> error if a single file failed to build.
->>
->> Example with the current btrfs build falure on m68k:
->>
->> fs/btrfs/btrfs.o: No such file or directory
->> make[1]: [__modpost] Error 1 (ignored)
->>
->> This error is followed by lots of errors such as:
->>
->> m68k-linux-gcc: error: arch/m68k/emu/nfcon.mod.c: No such file or directory
->> m68k-linux-gcc: fatal error: no input files
->> compilation terminated.
->> make[1]: [arch/m68k/emu/nfcon.mod.o] Error 1 (ignored)
->>
->> This doesn't matter much for normal builds, but it is annoying for builds
->> started with "make -i" due to the large number of secondary errors.
->> Those errors unnececessarily clog any error log and make it difficult
->> to find the real errors in the build.
->>
->> Fix the problem by only passing existing object files to modpost.
->>
->> Cc: Rusty Russell <rusty@rustcorp.com.au>
->> Signed-off-by: Guenter Roeck <linux@roeck-us.net>
->> ---
->>   scripts/Makefile.modpost |    3 ++-
->>   1 file changed, 2 insertions(+), 1 deletion(-)
->>
->> diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
->> index 8dcdca2..387c806 100644
->> --- a/scripts/Makefile.modpost
->> +++ b/scripts/Makefile.modpost
->> @@ -81,7 +81,8 @@ modpost = scripts/mod/modpost                    \
->>
->>   # We can go over command line length here, so be careful.
->>   quiet_cmd_modpost = MODPOST $(words $(filter-out vmlinux FORCE, $^)) modules
->> -      cmd_modpost = $(MODLISTCMD) | sed 's/\.ko$$/.o/' | $(modpost) -s -T -
->> +      cmd_modpost = $(MODLISTCMD) | sed 's/\.ko$$/.o/' | \
->> +	while read a; do [ -f $$a ] && echo $$a; done | $(modpost) -s -T -
->
-> Can you do this filtering only if make -i is used ('i' is present in
-> $(MAKEFLAGS)), to not hide potential buildsystem bugs? Regarding shell
-> loop vs. ls, maybe the cleanest way would be to add an option to modpost
-> to ignore missing files.
->
+On Tue, Sep 17, 2013 at 2:43 PM, Russ Dill <Russ.Dill@ti.com> wrote:
+> +++ b/arch/alpha/include/asm/fncpy.h
+> @@ -0,0 +1 @@
+> +#include <asm-generic/fncpy.h>
 
-Possibly, but I don't really see the point, as the rest of the makefile
-does and always did the same filtering already (using $(wildcard ...)
-and it doesn't make sense to even try to run modpost on a file that
-does not exist.
+Please add
 
-Sure, it might be a possibility to drop all the wildcard and other filtering
-conditionally and only keep it if -i was specified, but I think that should
-be a separate patch as it would add its own risks and complexities.
+    generic-y += fncpy.h
 
-Guenter
+to arch/<arch>/include/asm/Kbuild instead.
 
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
