@@ -1,59 +1,85 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pd0-f171.google.com ([209.85.192.171]:33357 "EHLO
-	mail-pd0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752835Ab3IQMny (ORCPT
+Received: from mail.active-venture.com ([67.228.131.205]:57030 "EHLO
+	mail.active-venture.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752683Ab3IQNRD (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 17 Sep 2013 08:43:54 -0400
-From: Russ Dill <Russ.Dill@ti.com>
-Subject: [RFC PATCH 01/11] asm-generic: io: Add exec versions of ioremap
-Date: Tue, 17 Sep 2013 05:43:27 -0700
-Message-Id: <1379421817-15759-2-git-send-email-Russ.Dill@ti.com>
-In-Reply-To: <1379421817-15759-1-git-send-email-Russ.Dill@ti.com>
-References: <1379421817-15759-1-git-send-email-Russ.Dill@ti.com>
+	Tue, 17 Sep 2013 09:17:03 -0400
+Message-ID: <5238564D.6010307@roeck-us.net>
+Date: Tue, 17 Sep 2013 06:17:01 -0700
+From: Guenter Roeck <linux@roeck-us.net>
+MIME-Version: 1.0
+Subject: Re: [PATCH] modpost: Fix secondary errors seen if a single module
+ build fails
+References: <1379219942-31545-1-git-send-email-linux@roeck-us.net> <52384C72.4040403@suse.cz>
+In-Reply-To: <52384C72.4040403@suse.cz>
+Content-Type: text/plain; charset=ISO-8859-2; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-omap@vger.kernel.org
-Cc: linux-kbuild@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, mans@mansr.com, Shawn Guo <shawn.guo@linaro.org>, Dave Martin <Dave.Martin@arm.com>, Russell King - ARM Linux <linux@arm.linux.org.uk>
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Rusty Russell <rusty@rustcorp.com.au>
 
-If code is to be copied into and area (such as SRAM) and run,
-it needs to be marked as exec. Currently only an ARM version
-of this exists.
+On 09/17/2013 05:34 AM, Michal Marek wrote:
+> Dne 15.9.2013 06:39, Guenter Roeck napsal(a):
+>> Commit ea4054a23 (modpost: handle huge numbers of modules) added
+>> support for building a large number of modules.
+>>
+>> Unfortunately, the commit changed the semantics of the makefile: Instead of
+>> passing only existing object files to modpost, make now passes all expected
+>> object files. If make was started with option -i, this results in a modpost
+>> error if a single file failed to build.
+>>
+>> Example with the current btrfs build falure on m68k:
+>>
+>> fs/btrfs/btrfs.o: No such file or directory
+>> make[1]: [__modpost] Error 1 (ignored)
+>>
+>> This error is followed by lots of errors such as:
+>>
+>> m68k-linux-gcc: error: arch/m68k/emu/nfcon.mod.c: No such file or directory
+>> m68k-linux-gcc: fatal error: no input files
+>> compilation terminated.
+>> make[1]: [arch/m68k/emu/nfcon.mod.o] Error 1 (ignored)
+>>
+>> This doesn't matter much for normal builds, but it is annoying for builds
+>> started with "make -i" due to the large number of secondary errors.
+>> Those errors unnececessarily clog any error log and make it difficult
+>> to find the real errors in the build.
+>>
+>> Fix the problem by only passing existing object files to modpost.
+>>
+>> Cc: Rusty Russell <rusty@rustcorp.com.au>
+>> Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+>> ---
+>>   scripts/Makefile.modpost |    3 ++-
+>>   1 file changed, 2 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
+>> index 8dcdca2..387c806 100644
+>> --- a/scripts/Makefile.modpost
+>> +++ b/scripts/Makefile.modpost
+>> @@ -81,7 +81,8 @@ modpost = scripts/mod/modpost                    \
+>>
+>>   # We can go over command line length here, so be careful.
+>>   quiet_cmd_modpost = MODPOST $(words $(filter-out vmlinux FORCE, $^)) modules
+>> -      cmd_modpost = $(MODLISTCMD) | sed 's/\.ko$$/.o/' | $(modpost) -s -T -
+>> +      cmd_modpost = $(MODLISTCMD) | sed 's/\.ko$$/.o/' | \
+>> +	while read a; do [ -f $$a ] && echo $$a; done | $(modpost) -s -T -
+>
+> Can you do this filtering only if make -i is used ('i' is present in
+> $(MAKEFLAGS)), to not hide potential buildsystem bugs? Regarding shell
+> loop vs. ls, maybe the cleanest way would be to add an option to modpost
+> to ignore missing files.
+>
 
-Signed-off-by: Russ Dill <Russ.Dill@ti.com>
----
- arch/arm/include/asm/io.h   | 2 ++
- include/asm-generic/iomap.h | 5 +++++
- 2 files changed, 7 insertions(+)
+Possibly, but I don't really see the point, as the rest of the makefile
+does and always did the same filtering already (using $(wildcard ...)
+and it doesn't make sense to even try to run modpost on a file that
+does not exist.
 
-diff --git a/arch/arm/include/asm/io.h b/arch/arm/include/asm/io.h
-index d070741..212d095 100644
---- a/arch/arm/include/asm/io.h
-+++ b/arch/arm/include/asm/io.h
-@@ -329,6 +329,8 @@ extern void _memset_io(volatile void __iomem *, int, size_t);
- #define ioremap_nocache(cookie,size)	__arm_ioremap((cookie), (size), MT_DEVICE)
- #define ioremap_cached(cookie,size)	__arm_ioremap((cookie), (size), MT_DEVICE_CACHED)
- #define ioremap_wc(cookie,size)		__arm_ioremap((cookie), (size), MT_DEVICE_WC)
-+#define ioremap_exec(cookie,size)	__arm_ioremap_exec((cookie), (size), true)
-+#define ioremap_exec_nocache(cookie,size) __arm_ioremap_exec((cookie), (size), false)
- #define iounmap				__arm_iounmap
- 
- /*
-diff --git a/include/asm-generic/iomap.h b/include/asm-generic/iomap.h
-index 6afd7d6..e72c451 100644
---- a/include/asm-generic/iomap.h
-+++ b/include/asm-generic/iomap.h
-@@ -66,6 +66,11 @@ extern void ioport_unmap(void __iomem *);
- #define ioremap_wc ioremap_nocache
- #endif
- 
-+#ifndef ARCH_HAS_IOREMAP_EXEC
-+#define ioremap_exec ioremap
-+#define ioremap_exec_nocache ioremap_nocache
-+#endif
-+
- #ifdef CONFIG_PCI
- /* Destroy a virtual mapping cookie for a PCI BAR (memory or IO) */
- struct pci_dev;
--- 
-1.8.3.2
+Sure, it might be a possibility to drop all the wildcard and other filtering
+conditionally and only keep it if -i was specified, but I think that should
+be a separate patch as it would add its own risks and complexities.
+
+Guenter
 
