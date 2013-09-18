@@ -1,45 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:41737 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:19935 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752383Ab3IRLGi (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 18 Sep 2013 07:06:38 -0400
+	id S1751948Ab3IRLI6 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 18 Sep 2013 07:08:58 -0400
 From: David Howells <dhowells@redhat.com>
-In-Reply-To: <1379482610.1787.7.camel@joe-AO722>
-References: <1379482610.1787.7.camel@joe-AO722> <1379459317-13046-1-git-send-email-daniel.santos@pobox.com> <1379459317-13046-6-git-send-email-daniel.santos@pobox.com>
-Subject: Re: [PATCH 5/5] lib: Add error string support to printks
-Date: Wed, 18 Sep 2013 12:04:55 +0100
-Message-ID: <22238.1379502295@warthog.procyon.org.uk>
+In-Reply-To: <1379459317-13046-1-git-send-email-daniel.santos@pobox.com>
+References: <1379459317-13046-1-git-send-email-daniel.santos@pobox.com>
+Subject: Re: [PATCH 0/5] Preliminary: Add error names & descrptions to printks
+Date: Wed, 18 Sep 2013 12:08:38 +0100
+Message-ID: <22288.1379502518@warthog.procyon.org.uk>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Joe Perches <joe@perches.com>
-Cc: dhowells@redhat.com, Daniel Santos <daniel.santos@pobox.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, Andrew Morton <akpm@linux-foundation.org>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Thomas Gleixner <tglx@linutronix.de>, Michael Kerrisk <mtk.manpages@gmail.com>, Dave Hansen <dave.hansen@linux.intel.com>, George Spelvin <linux@horizon.com>
+To: danielfsantos@att.net
+Cc: dhowells@redhat.com, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, Andrew Morton <akpm@linux-foundation.org>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Thomas Gleixner <tglx@linutronix.de>, Michael Kerrisk <mtk.manpages@gmail.com>, Dave Hansen <dave.hansen@linux.intel.com>, George Spelvin <linux@horizon.com>
 
-Joe Perches <joe@perches.com> wrote:
+danielfsantos@att.net wrote:
 
-> On Tue, 2013-09-17 at 18:08 -0500, danielfsantos@att.net wrote:
-> > This adds an extension for the integral format specifier suffix of 'e',
-> > so that the format %[duxXo]e will result in printing an number (as
-> > before) in addition to a name and descrption for an error code, if such
-> > support is enabled and a name and descrption is found.
-> > 
-> > My initial thought was to use the glibc extension of '%m', but this
-> > format specifier uses the value of libc's errno and adding a value
-> > breaks gcc's printf parsing.  I'm not convinced that the 'e' extension
-> > is optimal, although there are only four instances of this pattern in
-> > the kernel that would need to be changed.
-> > 
-> >     git grep -E '".*%[#0\ +\-]*[0-9]*[hljzt]*[idoxXu]e'
-> > 
-> > Alternatively, 'E' was another thought for a suffix as well.
+> Typically, we don't care about error messages or names in the kernel because
+> userspace will manage that.  But sometimes we need to output an error number
+> to printks and that creates a situation where a user, system admistrator or
+> developer must find an error number reference to figure out what went wrong
+> with a particular driver or whatever.  This patch adds two alternatives at
+> increasing memory costs:
 > 
-> I'd much rather see another %p extension used instead
-> of generating odd output given normal printf formats.
-> 
-> %pE might work
+> 1. print the number in addition to the name for 2k extra or
+> 2. print the number, name and description for 6k extra.
 
-I guess you'd use that with ERR_PTR().  On one hand, it would look decidedly
-odd, but on the other hand, we have errors in pointers in a lot of places
-already which wouldn't then need converting back - so it doesn't seem entirely
-unreasonable.
+I like the idea generally - and have occasionally entertained the idea of
+implementing it myself.  However, I wouldn't bother with the "human readable"
+description if we're going to do this.  Generally, the symbolic representation
+is good enough - and that's what you're going to grep the code for anyway.
 
 David
