@@ -1,38 +1,81 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from avon.wwwdotorg.org ([70.85.31.133]:33476 "EHLO
-	avon.wwwdotorg.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751797Ab3ISUgx (ORCPT
+Received: from nm19-vm1.access.bullet.mail.gq1.yahoo.com ([216.39.63.17]:34474
+	"EHLO nm19-vm1.access.bullet.mail.gq1.yahoo.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752183Ab3ISWfJ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 19 Sep 2013 16:36:53 -0400
-Message-ID: <523B605F.8090402@wwwdotorg.org>
-Date: Thu, 19 Sep 2013 14:36:47 -0600
-From: Stephen Warren <swarren@wwwdotorg.org>
+	Thu, 19 Sep 2013 18:35:09 -0400
+Message-ID: <523B7C38.8050609@att.net>
+Date: Thu, 19 Sep 2013 17:35:36 -0500
+From: Daniel Santos <danielfsantos@att.net>
+Reply-To: Daniel Santos <daniel.santos@pobox.com>
 MIME-Version: 1.0
-Subject: Re: git issue / [PATCH] MIPS: fix invalid symbolic link file
-References: <1379596148-32520-1-git-send-email-maddy@linux.vnet.ibm.com> <20130919133920.GA22468@linux-mips.org> <523B555E.2070508@kdbg.org>
-In-Reply-To: <523B555E.2070508@kdbg.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH 1/5] scripts: Add mkstrerror.sh
+References: <1379459317-13046-2-git-send-email-daniel.santos@pobox.com> <1379459317-13046-1-git-send-email-daniel.santos@pobox.com> <29168.1379504300@warthog.procyon.org.uk>
+In-Reply-To: <29168.1379504300@warthog.procyon.org.uk>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Johannes Sixt <j6t@kdbg.org>
-Cc: Ralf Baechle <ralf@linux-mips.org>, Madhavan Srinivasan <maddy@linux.vnet.ibm.com>, Grant Likely <grant.likely@linaro.org>, Rob Herring <rob.herring@calxeda.com>, devicetree@vger.kernel.org, git@vger.kernel.org, steven.hill@imgtec.com, mmarek@suse.cz, swarren@nvidia.com, linux-mips@linux-mips.org, linux-kbuild@vger.kernel.org, james.hogan@imgtec.com
+To: David Howells <dhowells@redhat.com>, linux-kbuild <linux-kbuild@vger.kernel.org>
+Cc: Daniel Santos <daniel.santos@pobox.com>, LKML <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, Andrew Morton <akpm@linux-foundation.org>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Thomas Gleixner <tglx@linutronix.de>, Michael Kerrisk <mtk.manpages@gmail.com>, Dave Hansen <dave.hansen@linux.intel.com>, George Spelvin <linux@horizon.com>
 
-On 09/19/2013 01:49 PM, Johannes Sixt wrote:
-> Am 19.09.2013 15:39, schrieb Ralf Baechle:
->> The original patch that introduced the symlink with the \n is kernel
->> commit 3b29aa5ba204c62b3ec8f9f5b1ebd6e5d74f75d3 and is archived in
->> patchwork at http://patchwork.linux-mips.org/patch/5745/  The patch
->> file contains a \n at the end - but one would expect that from a
->> patch file that has been transfered via email, so I'm not sure how this
->> is supposed to work with emailed patches?!?
-> 
-> The mbox file I downloaded from this link looks like this:
-...
-> but it should look like this:
-...
-> Whoever or whatever moved the '\ No newline at end of file' line above
-> the patch text is to blame.
+On 09/18/2013 06:38 AM, David Howells wrote:
+> danielfsantos@att.net wrote:
+>
+>> This is a simple bash script that parses our errno*.h files and formats
+>> them into the error_strings.h header that our strerror and strerror_name
+>> functions will use later.
+> I presume you haven't tried building with a "make O=foo" build directory?  I
+> see:
+>
+>        /bin/sh: /data/fs/linux-2.6-fscache/include/generated/error_strings.h: No such file or directory
+>
+> when I try it.
 
-That sounds like a patchwork problem; the original copy of the message I
-received looks correct.
+Hmm, I cannot reproduce the error. :( I'm using next-20130919 currently 
+(x86_64), and if I try to just "make O=lib" it fails w/o my patches.  
+The only file that should depend upon error_strings.h is lib/string.c.
+
+/home/daniel/proj/kernel/git
+(daniel@loudmouth)$ make mrproper -j4
+/home/daniel/proj/kernel/git
+(daniel@loudmouth)$ make defconfig -j4
+   HOSTCC  scripts/basic/fixdep
+   HOSTCC  scripts/kconfig/conf.o
+   SHIPPED scripts/kconfig/zconf.tab.c
+   SHIPPED scripts/kconfig/zconf.lex.c
+   SHIPPED scripts/kconfig/zconf.hash.c
+   HOSTCC  scripts/kconfig/zconf.tab.o
+   HOSTLD  scripts/kconfig/conf
+*** Default configuration is based on 'x86_64_defconfig'
+#
+# configuration written to .config
+#
+/home/daniel/proj/kernel/git
+(daniel@loudmouth)$ make O=lib -j4
+   HOSTCC  scripts/basic/fixdep
+   HOSTCC  scripts/kconfig/conf.o
+   HOSTCC  scripts/kconfig/zconf.tab.o
+   HOSTLD  scripts/kconfig/conf
+scripts/kconfig/conf --silentoldconfig Kconfig
+***
+*** Configuration file ".config" not found!
+***
+*** Please run some configurator (e.g. "make oldconfig" or
+*** "make menuconfig" or "make xconfig").
+***
+make[3]: *** [silentoldconfig] Error 1
+make[2]: *** [silentoldconfig] Error 2
+make[2]: Nothing to be done for `all'.
+make[1]: *** No rule to make target `include/config/auto.conf', needed 
+by `include/config/kernel.release'.  Stop.
+make[1]: *** Waiting for unfinished jobs....
+make: *** [sub-make] Error 2
+
+Is this some other subtle bug currently in -next or are you just 
+supposed to run "make prepare" first? I injected the generation of 
+error_names.h as a dependency of prepare1 (rightly or wrongly).  I'm 
+still studying the kbuild process to try to find a better place for it 
+or to at least clean up the way it's generated.
+
+Daniel
