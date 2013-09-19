@@ -1,95 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f44.google.com ([74.125.82.44]:63294 "EHLO
-	mail-wg0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752628Ab3ISUEf convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 19 Sep 2013 16:04:35 -0400
-Date: Thu, 19 Sep 2013 22:04:30 +0200
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH]kconfig/menu.c: fix uninitialized variable warning
-Message-ID: <20130919200430.GC3317@free.fr>
-References: <1379575697-6740-1-git-send-email-maddy@linux.vnet.ibm.com>
- <20130919152227.GB19364@d2.synalogic.ca>
- <20130919172751.GA3317@free.fr>
- <20130919191315.GA19703@d2.synalogic.ca>
+Received: from bsmtp4.bon.at ([195.3.86.186]:64027 "EHLO lbmfmo03.bon.at"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1752602Ab3ISUQa (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 19 Sep 2013 16:16:30 -0400
+Message-ID: <523B555E.2070508@kdbg.org>
+Date: Thu, 19 Sep 2013 21:49:50 +0200
+From: Johannes Sixt <j6t@kdbg.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8BIT
-In-Reply-To: <20130919191315.GA19703@d2.synalogic.ca>
+Subject: Re: git issue / [PATCH] MIPS: fix invalid symbolic link file
+References: <1379596148-32520-1-git-send-email-maddy@linux.vnet.ibm.com> <20130919133920.GA22468@linux-mips.org>
+In-Reply-To: <20130919133920.GA22468@linux-mips.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Benjamin Poirier <bpoirier@suse.de>
-Cc: Madhavan Srinivasan <maddy@linux.vnet.ibm.com>, mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Ralf Baechle <ralf@linux-mips.org>
+Cc: Madhavan Srinivasan <maddy@linux.vnet.ibm.com>, Grant Likely <grant.likely@linaro.org>, Rob Herring <rob.herring@calxeda.com>, devicetree@vger.kernel.org, git@vger.kernel.org, steven.hill@imgtec.com, mmarek@suse.cz, swarren@nvidia.com, linux-mips@linux-mips.org, linux-kbuild@vger.kernel.org, james.hogan@imgtec.com
 
-Benjamin, All,
+Am 19.09.2013 15:39, schrieb Ralf Baechle:
+> The original patch that introduced the symlink with the \n is kernel
+> commit 3b29aa5ba204c62b3ec8f9f5b1ebd6e5d74f75d3 and is archived in
+> patchwork at http://patchwork.linux-mips.org/patch/5745/  The patch
+> file contains a \n at the end - but one would expect that from a
+> patch file that has been transfered via email, so I'm not sure how this
+> is supposed to work with emailed patches?!?
 
-On 2013-09-19 15:13 -0400, Benjamin Poirier spake thusly:
-> On 2013/09/19 19:27, Yann E. MORIN wrote:
-> > Benjamin, Madhavan, All,
-> > 
-> > On 2013-09-19 11:22 -0400, Benjamin Poirier spake thusly:
-> > > On 2013/09/19 12:58, Madhavan Srinivasan wrote:
-> > > > In file included from scripts/kconfig/zconf.tab.c:2537:0:
-> > > > scripts/kconfig/menu.c: In function ‘get_symbol_str’:
-> > > > scripts/kconfig/menu.c:586:18: warning: ‘jump’ may be used uninitialized in
-> > > > this function [-Wmaybe-uninitialized]
-> > >                    ^^^^^
-> > > 
-> > > from gcc(1):
-> > > 	"These warnings are made optional because GCC is not smart
-> > > 	enough to see all the reasons why the code might be correct
-> > > 	despite appearing to have an error."
-> > > 
-> > > I do not see this warning with gcc 4.7.2 or 4.8.1. Which version are you
-> > > using?
-> > > 
-> > > The code does:
-> > > 
-> > > static void get_prompt_str(struct gstr *r, struct property *prop,
-> > > [...]
-> > > 	if (head && location) {
-> > > 		jump = xmalloc(sizeof(struct jump_key));
-> > > [... different basic block ...]
-> > > 			if (head && location && menu == location)
-> > > 				jump->offset = r->len - 1;
-> > > 
-> > > If the second "if" is true, then the first one was true as well, and
-> > > "jump" is initilized.
-> > 
-> > Exactly what I was going to say.
-> > 
-> > However:
-> >   - I believe we should strive for a warning-free code whenever possible
-> >   - while still getting help from gcc to pinpoint potential issues.
-> > 
-> > Clearly, gcc is wrong here. Setting jump to NULL will cause fault if we
-> > try to dereference it. Since this should never happen given the code as
-> > it currently is, I'm slightly in favour of acking this patch.
-> > 
-> > Any other reason not to apply it?
-> 
-> Did you manage to get that warning as well? I didn't. If it's only from
-> old versions of gcc I'd feel better leaving the warning there than
-> masking it, in case a future code change does really introduce a use
-> before initialize.
+The mbox file I downloaded from this link looks like this:
 
-No, I was not able to reproduce it with either gcc-4.4.7, gcc-4.6.4 or
-gcc-4.7.3 on my Ubuntu 13.04. Neither gcc-4.5 nor 4.8 are packaged, so
-I could not test them.
 
-Anyway, -Wmaybe-uninitialized is new with 4.7. So, the warning can't
-happen with gcc < 4.7.
+arch/mips/boot/dts/include/dt-bindings | 1 +
+ 1 file changed, 1 insertion(+)
+ create mode 120000 arch/mips/boot/dts/include/dt-bindings
 
-Madhavan, what gcc version are you using?
+\ No newline at end of file
 
-Regards,
-Yann E. MORIN.
+diff --git a/.../include/dt-bindings b/.../include/dt-bindings
+new file mode 120000
+index 0000000..08c00e4
+--- /dev/null
++++ b/arch/mips/boot/dts/include/dt-bindings
+@@ -0,0 +1 @@
++../../../../../include/dt-bindings
 
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+
+but it should look like this:
+
+
+arch/mips/boot/dts/include/dt-bindings | 1 +
+ 1 file changed, 1 insertion(+)
+ create mode 120000 arch/mips/boot/dts/include/dt-bindings
+
+diff --git a/.../include/dt-bindings b/.../include/dt-bindings
+new file mode 120000
+index 0000000..08c00e4
+--- /dev/null
++++ b/arch/mips/boot/dts/include/dt-bindings
+@@ -0,0 +1 @@
++../../../../../include/dt-bindings
+\ No newline at end of file
+
+
+Whoever or whatever moved the '\ No newline at end of file' line above
+the patch text is to blame.
+
+-- Hannes
+
