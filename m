@@ -1,30 +1,60 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:63552 "EHLO mx1.redhat.com"
+Received: from cantor2.suse.de ([195.135.220.15]:50153 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753194Ab3ITNIH (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 20 Sep 2013 09:08:07 -0400
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <1379677551.2021.25.camel@joe-AO722>
-References: <1379677551.2021.25.camel@joe-AO722> <1379482610.1787.7.camel@joe-AO722> <1379459317-13046-1-git-send-email-daniel.santos@pobox.com> <1379459317-13046-6-git-send-email-daniel.santos@pobox.com> <22238.1379502295@warthog.procyon.org.uk> <523A5316.50405@att.net> <1379639226.5862.9.camel@joe-AO722> <523BDB55.2000008@att.net>
-Subject: Re: [PATCH 5/5] lib: Add error string support to printks
-Date: Fri, 20 Sep 2013 14:07:38 +0100
-Message-ID: <23301.1379682458@warthog.procyon.org.uk>
+	id S1752363Ab3ITR6t (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 20 Sep 2013 13:58:49 -0400
+Date: Fri, 20 Sep 2013 13:58:40 -0400
+From: Benjamin Poirier <bpoirier@suse.de>
+Subject: Re: [PATCH]kconfig/menu.c: fix uninitialized variable warning
+Message-ID: <20130920175840.GA31609@d2.synalogic.ca>
+References: <1379575697-6740-1-git-send-email-maddy@linux.vnet.ibm.com>
+ <20130919152227.GB19364@d2.synalogic.ca>
+ <20130919172751.GA3317@free.fr>
+ <20130919191315.GA19703@d2.synalogic.ca>
+ <20130919200430.GC3317@free.fr>
+ <523BB48F.9020403@linux.vnet.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <523BB48F.9020403@linux.vnet.ibm.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Joe Perches <joe@perches.com>
-Cc: dhowells@redhat.com, Daniel Santos <daniel.santos@pobox.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, Andrew Morton <akpm@linux-foundation.org>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Thomas Gleixner <tglx@linutronix.de>, Michael Kerrisk <mtk.manpages@gmail.com>, Dave Hansen <dave.hansen@linux.intel.com>, George Spelvin <linux@horizon.com>
+To: Madhavan Srinivasan <maddy@linux.vnet.ibm.com>
+Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Joe Perches <joe@perches.com> wrote:
+On 2013/09/20 08:05, Madhavan Srinivasan wrote:
+> On Friday 20 September 2013 01:34 AM, Yann E. MORIN wrote:
+> > Benjamin, All,
+> > 
+> > On 2013-09-19 15:13 -0400, Benjamin Poirier spake thusly:
+> >> On 2013/09/19 19:27, Yann E. MORIN wrote:
+> >>> Benjamin, Madhavan, All,
+> >>>
+> >>> On 2013-09-19 11:22 -0400, Benjamin Poirier spake thusly:
+> >>>> On 2013/09/19 12:58, Madhavan Srinivasan wrote:
+> >>>>> In file included from scripts/kconfig/zconf.tab.c:2537:0:
+> >>>>> scripts/kconfig/menu.c: In function ‘get_symbol_str’:
+> >>>>> scripts/kconfig/menu.c:586:18: warning: ‘jump’ may be used uninitialized in
+> >>>>> this function [-Wmaybe-uninitialized]
+[...]
+> >>>>
+> >>>> I do not see this warning with gcc 4.7.2 or 4.8.1. Which version are you
+> >>>> using?
+> >>>>
+[...]
+> > 
+> > No, I was not able to reproduce it with either gcc-4.4.7, gcc-4.6.4 or
+> > gcc-4.7.3 on my Ubuntu 13.04. Neither gcc-4.5 nor 4.8 are packaged, so
+> > I could not test them.
+> > 
+> > Anyway, -Wmaybe-uninitialized is new with 4.7. So, the warning can't
+> > happen with gcc < 4.7.
+> > 
+> > Madhavan, what gcc version are you using?
+> gcc i have is gcc version 4.8.0 20130526
 
-> > Yeah, I do agree, I just don't see how to do it without introducing 
-> > unnecessary bloat.
-> 
-> I think the code size cost of %pE is pretty trivial
-> compared to the log size/runtime cost.
-> 
-> I would not want to see it used generically.
-
-I suspect he doesn't really need to implement a "strerror()" function but
-should rather build it straight into printk()/vsprintf().
-
-David
+In that case, I don't have a strong opinion whether the patch should be
+merged or not, but if it is merged, I think a comment should be added to
+the code or the changelog stating that this is to work around a
+deficiency observed in gcc 4.8.0.
