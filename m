@@ -1,44 +1,91 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtprelay0214.hostedemail.com ([216.40.44.214]:40875 "EHLO
-	smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1751604Ab3ITBHN (ORCPT
+Received: from e28smtp07.in.ibm.com ([122.248.162.7]:53303 "EHLO
+	e28smtp07.in.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752771Ab3ITCgI (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 19 Sep 2013 21:07:13 -0400
-Message-ID: <1379639226.5862.9.camel@joe-AO722>
-Subject: Re: [PATCH 5/5] lib: Add error string support to printks
-From: Joe Perches <joe@perches.com>
-Date: Thu, 19 Sep 2013 18:07:06 -0700
-In-Reply-To: <523A5316.50405@att.net>
-References: <1379482610.1787.7.camel@joe-AO722>
-	 <1379459317-13046-1-git-send-email-daniel.santos@pobox.com>
-	 <1379459317-13046-6-git-send-email-daniel.santos@pobox.com>
-	 <22238.1379502295@warthog.procyon.org.uk> <523A5316.50405@att.net>
-Content-Type: text/plain; charset="ISO-8859-1"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+	Thu, 19 Sep 2013 22:36:08 -0400
+Received: from /spool/local
+	by e28smtp07.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-kbuild@vger.kernel.org> from <maddy@linux.vnet.ibm.com>;
+	Fri, 20 Sep 2013 08:06:04 +0530
+Message-ID: <523BB48F.9020403@linux.vnet.ibm.com>
+Date: Fri, 20 Sep 2013 08:05:59 +0530
+From: Madhavan Srinivasan <maddy@linux.vnet.ibm.com>
+MIME-Version: 1.0
+Subject: Re: [PATCH]kconfig/menu.c: fix uninitialized variable warning
+References: <1379575697-6740-1-git-send-email-maddy@linux.vnet.ibm.com> <20130919152227.GB19364@d2.synalogic.ca> <20130919172751.GA3317@free.fr> <20130919191315.GA19703@d2.synalogic.ca> <20130919200430.GC3317@free.fr>
+In-Reply-To: <20130919200430.GC3317@free.fr>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Daniel Santos <daniel.santos@pobox.com>
-Cc: David Howells <dhowells@redhat.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, Andrew Morton <akpm@linux-foundation.org>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Thomas Gleixner <tglx@linutronix.de>, Michael Kerrisk <mtk.manpages@gmail.com>, Dave Hansen <dave.hansen@linux.intel.com>, George Spelvin <linux@horizon.com>
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: Benjamin Poirier <bpoirier@suse.de>, mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Wed, 2013-09-18 at 20:27 -0500, Daniel Santos wrote:
-> if I use ERR_PTR() on a signed int on a x86_64 where pointer 
-> is 64 bits and int is 32, wouldn't that mean a signed conversion 
-> instruction where the sign bit has to be moved from bit 31 to 63?
-
-No.  It's cast to long
-
-static inline void * __must_check ERR_PTR(long error)
-{
-	return (void *) error;
-}
-
-> Either way, %pE does seem to make a lot of sense for conditions where we 
-> already have a pointer that we would otherwise use PTR_ERR() to convert, 
-> but it just seems klunky to use it on an int, to have it treated like a 
-> pointer and then re-interpreted as an int.  Maybe we can add %pE as well 
-> as %dE and leave [ioxXu] out of it?
-
-I think having just one way to format is better.
-
+On Friday 20 September 2013 01:34 AM, Yann E. MORIN wrote:
+> Benjamin, All,
+> 
+> On 2013-09-19 15:13 -0400, Benjamin Poirier spake thusly:
+>> On 2013/09/19 19:27, Yann E. MORIN wrote:
+>>> Benjamin, Madhavan, All,
+>>>
+>>> On 2013-09-19 11:22 -0400, Benjamin Poirier spake thusly:
+>>>> On 2013/09/19 12:58, Madhavan Srinivasan wrote:
+>>>>> In file included from scripts/kconfig/zconf.tab.c:2537:0:
+>>>>> scripts/kconfig/menu.c: In function ‘get_symbol_str’:
+>>>>> scripts/kconfig/menu.c:586:18: warning: ‘jump’ may be used uninitialized in
+>>>>> this function [-Wmaybe-uninitialized]
+>>>>                    ^^^^^
+>>>>
+>>>> from gcc(1):
+>>>> 	"These warnings are made optional because GCC is not smart
+>>>> 	enough to see all the reasons why the code might be correct
+>>>> 	despite appearing to have an error."
+>>>>
+>>>> I do not see this warning with gcc 4.7.2 or 4.8.1. Which version are you
+>>>> using?
+>>>>
+>>>> The code does:
+>>>>
+>>>> static void get_prompt_str(struct gstr *r, struct property *prop,
+>>>> [...]
+>>>> 	if (head && location) {
+>>>> 		jump = xmalloc(sizeof(struct jump_key));
+>>>> [... different basic block ...]
+>>>> 			if (head && location && menu == location)
+>>>> 				jump->offset = r->len - 1;
+>>>>
+>>>> If the second "if" is true, then the first one was true as well, and
+>>>> "jump" is initilized.
+>>>
+>>> Exactly what I was going to say.
+>>>
+>>> However:
+>>>   - I believe we should strive for a warning-free code whenever possible
+>>>   - while still getting help from gcc to pinpoint potential issues.
+>>>
+>>> Clearly, gcc is wrong here. Setting jump to NULL will cause fault if we
+>>> try to dereference it. Since this should never happen given the code as
+>>> it currently is, I'm slightly in favour of acking this patch.
+>>>
+>>> Any other reason not to apply it?
+>>
+>> Did you manage to get that warning as well? I didn't. If it's only from
+>> old versions of gcc I'd feel better leaving the warning there than
+>> masking it, in case a future code change does really introduce a use
+>> before initialize.
+> 
+> No, I was not able to reproduce it with either gcc-4.4.7, gcc-4.6.4 or
+> gcc-4.7.3 on my Ubuntu 13.04. Neither gcc-4.5 nor 4.8 are packaged, so
+> I could not test them.
+> 
+> Anyway, -Wmaybe-uninitialized is new with 4.7. So, the warning can't
+> happen with gcc < 4.7.
+> 
+> Madhavan, what gcc version are you using?
+gcc i have is gcc version 4.8.0 20130526
+> 
+> Regards,
+> Yann E. MORIN.
+> 
 
