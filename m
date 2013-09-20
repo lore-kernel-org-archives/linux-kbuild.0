@@ -1,38 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from nm4-vm3.access.bullet.mail.bf1.yahoo.com ([216.109.114.114]:39686
-	"EHLO nm4-vm3.access.bullet.mail.bf1.yahoo.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1753852Ab3ISWxR (ORCPT
+Received: from smtprelay0214.hostedemail.com ([216.40.44.214]:40875 "EHLO
+	smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1751604Ab3ITBHN (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 19 Sep 2013 18:53:17 -0400
-Message-ID: <523B8078.1070401@att.net>
-Date: Thu, 19 Sep 2013 17:53:44 -0500
-From: Daniel Santos <danielfsantos@att.net>
-Reply-To: Daniel Santos <daniel.santos@pobox.com>
-MIME-Version: 1.0
-Subject: Re: [PATCH 1/5] scripts: Add mkstrerror.sh
-References: <1379459317-13046-2-git-send-email-daniel.santos@pobox.com> <1379459317-13046-1-git-send-email-daniel.santos@pobox.com> <29168.1379504300@warthog.procyon.org.uk> <523B7C38.8050609@att.net>
-In-Reply-To: <523B7C38.8050609@att.net>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+	Thu, 19 Sep 2013 21:07:13 -0400
+Message-ID: <1379639226.5862.9.camel@joe-AO722>
+Subject: Re: [PATCH 5/5] lib: Add error string support to printks
+From: Joe Perches <joe@perches.com>
+Date: Thu, 19 Sep 2013 18:07:06 -0700
+In-Reply-To: <523A5316.50405@att.net>
+References: <1379482610.1787.7.camel@joe-AO722>
+	 <1379459317-13046-1-git-send-email-daniel.santos@pobox.com>
+	 <1379459317-13046-6-git-send-email-daniel.santos@pobox.com>
+	 <22238.1379502295@warthog.procyon.org.uk> <523A5316.50405@att.net>
+Content-Type: text/plain; charset="ISO-8859-1"
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Daniel Santos <daniel.santos@pobox.com>
 Cc: David Howells <dhowells@redhat.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, Andrew Morton <akpm@linux-foundation.org>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Thomas Gleixner <tglx@linutronix.de>, Michael Kerrisk <mtk.manpages@gmail.com>, Dave Hansen <dave.hansen@linux.intel.com>, George Spelvin <linux@horizon.com>
 
+On Wed, 2013-09-18 at 20:27 -0500, Daniel Santos wrote:
+> if I use ERR_PTR() on a signed int on a x86_64 where pointer 
+> is 64 bits and int is 32, wouldn't that mean a signed conversion 
+> instruction where the sign bit has to be moved from bit 31 to 63?
 
-On 09/19/2013 05:35 PM, Daniel Santos wrote:
->
-> Hmm, I cannot reproduce the error. :( I'm using next-20130919 
-> currently (x86_64), and if I try to just "make O=lib" it fails w/o my 
-> patches.  The only file that should depend upon error_strings.h is 
-> lib/string.c.
+No.  It's cast to long
 
-Ahh! I've never seen the "make O=foo" before and just presumed it was an 
-alternate directive to specify a directory of the source tree to build.  
-I'm certainly glad to learn that the kernel supports out of tree builds! :)
+static inline void * __must_check ERR_PTR(long error)
+{
+	return (void *) error;
+}
 
-So I am getting the error now and this is because the script expects to 
-run in the root of the source tree. This will be an easy fix and I think 
-I've figured out the correct place to put the make target for it as well.
+> Either way, %pE does seem to make a lot of sense for conditions where we 
+> already have a pointer that we would otherwise use PTR_ERR() to convert, 
+> but it just seems klunky to use it on an int, to have it treated like a 
+> pointer and then re-interpreted as an int.  Maybe we can add %pE as well 
+> as %dE and leave [ioxXu] out of it?
 
-Daniel
+I think having just one way to format is better.
+
+
