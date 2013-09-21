@@ -1,85 +1,137 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-we0-f175.google.com ([74.125.82.175]:37069 "EHLO
-	mail-we0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752419Ab3ITTCX convert rfc822-to-8bit (ORCPT
+Received: from mail-pb0-f50.google.com ([209.85.160.50]:33719 "EHLO
+	mail-pb0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752456Ab3IURpH (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 20 Sep 2013 15:02:23 -0400
-Date: Fri, 20 Sep 2013 21:02:17 +0200
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH]kconfig/menu.c: fix uninitialized variable warning
-Message-ID: <20130920190217.GA3376@free.fr>
-References: <1379575697-6740-1-git-send-email-maddy@linux.vnet.ibm.com>
- <20130919152227.GB19364@d2.synalogic.ca>
- <20130919172751.GA3317@free.fr>
- <20130919191315.GA19703@d2.synalogic.ca>
- <20130919200430.GC3317@free.fr>
- <523BB48F.9020403@linux.vnet.ibm.com>
- <20130920175840.GA31609@d2.synalogic.ca>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8BIT
-In-Reply-To: <20130920175840.GA31609@d2.synalogic.ca>
+	Sat, 21 Sep 2013 13:45:07 -0400
+From: Guenter Roeck <linux@roeck-us.net>
+Subject: [PATCH] modpost: Optionally ignore secondary errors seen if a single module build fails
+Date: Sat, 21 Sep 2013 10:44:56 -0700
+Message-Id: <1379785496-20209-1-git-send-email-linux@roeck-us.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Benjamin Poirier <bpoirier@suse.de>
-Cc: Madhavan Srinivasan <maddy@linux.vnet.ibm.com>, mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Rusty Russell <rusty@rustcorp.com.au>, Geert Uytterhoeven <geert@linux-m68k.org>, Guenter Roeck <linux@roeck-us.net>
 
-Benjamin, Madhavan, All,
+Commit ea4054a23 (modpost: handle huge numbers of modules) added
+support for building a large number of modules.
 
-On 2013-09-20 13:58 -0400, Benjamin Poirier spake thusly:
-> On 2013/09/20 08:05, Madhavan Srinivasan wrote:
-> > On Friday 20 September 2013 01:34 AM, Yann E. MORIN wrote:
-> > > Benjamin, All,
-> > > 
-> > > On 2013-09-19 15:13 -0400, Benjamin Poirier spake thusly:
-> > >> On 2013/09/19 19:27, Yann E. MORIN wrote:
-> > >>> Benjamin, Madhavan, All,
-> > >>>
-> > >>> On 2013-09-19 11:22 -0400, Benjamin Poirier spake thusly:
-> > >>>> On 2013/09/19 12:58, Madhavan Srinivasan wrote:
-> > >>>>> In file included from scripts/kconfig/zconf.tab.c:2537:0:
-> > >>>>> scripts/kconfig/menu.c: In function ‘get_symbol_str’:
-> > >>>>> scripts/kconfig/menu.c:586:18: warning: ‘jump’ may be used uninitialized in
-> > >>>>> this function [-Wmaybe-uninitialized]
-> [...]
-> > >>>>
-> > >>>> I do not see this warning with gcc 4.7.2 or 4.8.1. Which version are you
-> > >>>> using?
-> > >>>>
-> [...]
-> > > 
-> > > No, I was not able to reproduce it with either gcc-4.4.7, gcc-4.6.4 or
-> > > gcc-4.7.3 on my Ubuntu 13.04. Neither gcc-4.5 nor 4.8 are packaged, so
-> > > I could not test them.
-> > > 
-> > > Anyway, -Wmaybe-uninitialized is new with 4.7. So, the warning can't
-> > > happen with gcc < 4.7.
-> > > 
-> > > Madhavan, what gcc version are you using?
-> > gcc i have is gcc version 4.8.0 20130526
-> 
-> In that case, I don't have a strong opinion whether the patch should be
-> merged or not, but if it is merged, I think a comment should be added to
-> the code or the changelog stating that this is to work around a
-> deficiency observed in gcc 4.8.0.
+Unfortunately, the commit changed the semantics of the makefile: Instead of
+passing only existing object files to modpost, make now passes all expected
+object files. If make was started with option -i, this results in a modpost
+error if a single file failed to build.
 
-If it is /fixed/ in gcc 4.8.1 (as you imply since you tested it), I
-don't see a reason to apply this patch, in the end.
+Example with the current btrfs build falure on m68k:
 
-Rather, I would just put a comment in the code stating this is a
-spurious warning, and keep the code as-is.
+fs/btrfs/btrfs.o: No such file or directory
+make[1]: [__modpost] Error 1 (ignored)
 
-Madhavan, care to resend your patch with such a comment instead of
-setting jump=NULL, please?
+This error is followed by lots of errors such as:
 
-Regards,
-Yann E. MORIN.
+m68k-linux-gcc: error: arch/m68k/emu/nfcon.mod.c: No such file or directory
+m68k-linux-gcc: fatal error: no input files
+compilation terminated.
+make[1]: [arch/m68k/emu/nfcon.mod.o] Error 1 (ignored)
 
+This doesn't matter much for normal builds, but it is annoying for builds
+started with "make -i" due to the large number of secondary errors.
+Those errors unnececessarily clog any error log and make it difficult
+to find the real errors in the build.
+
+Fix the problem by adding a new parameter '-n' to modpost. If this parameter
+is specified, modpost reports but ignores missing object files.
+
+With this patch, error output from above problem is (with make -i):
+
+m68k-linux-ld: cannot find fs/btrfs/ioctl.o: No such file or directory
+make[2]: [fs/btrfs/btrfs.o] Error 1 (ignored)
+...
+fs/btrfs/btrfs.o: No such file or directory (ignored)
+
+Cc: Rusty Russell <rusty@rustcorp.com.au>
+Cc: Michael Marek <mmarek@suse.cz>
+Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+---
+Yet another attempt to fix this problem. I'll be happy to change the modpost
+flag to something else if so desired. Note that -i is already taken, though.
+
+I also did not change any of the existing object name filtering in
+Makefile.modpost. This is on purpose; I am concerned about introducing
+some other problem.
+
+ scripts/Makefile.modpost |    4 +++-
+ scripts/mod/modpost.c    |   13 ++++++++++++-
+ 2 files changed, 15 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
+index 8dcdca2..69f0a14 100644
+--- a/scripts/Makefile.modpost
++++ b/scripts/Makefile.modpost
+@@ -79,9 +79,11 @@ modpost = scripts/mod/modpost                    \
+  $(if $(CONFIG_DEBUG_SECTION_MISMATCH),,-S)      \
+  $(if $(KBUILD_EXTMOD)$(KBUILD_MODPOST_WARN),-w)
+ 
++MODPOST_OPT=$(subst -i,-n,$(filter -i,$(MAKEFLAGS)))
++
+ # We can go over command line length here, so be careful.
+ quiet_cmd_modpost = MODPOST $(words $(filter-out vmlinux FORCE, $^)) modules
+-      cmd_modpost = $(MODLISTCMD) | sed 's/\.ko$$/.o/' | $(modpost) -s -T -
++      cmd_modpost = $(MODLISTCMD) | sed 's/\.ko$$/.o/' | $(modpost) $(MODPOST_OPT) -s -T -
+ 
+ PHONY += __modpost
+ __modpost: $(modules:.ko=.o) FORCE
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index 8247979..393706b 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -17,6 +17,7 @@
+ #include <string.h>
+ #include <limits.h>
+ #include <stdbool.h>
++#include <errno.h>
+ #include "modpost.h"
+ #include "../../include/generated/autoconf.h"
+ #include "../../include/linux/license.h"
+@@ -37,6 +38,8 @@ static int warn_unresolved = 0;
+ /* How a symbol is exported */
+ static int sec_mismatch_count = 0;
+ static int sec_mismatch_verbose = 1;
++/* ignore missing files */
++static int ignore_missing_files;
+ 
+ enum export {
+ 	export_plain,      export_unused,     export_gpl,
+@@ -407,6 +410,11 @@ static int parse_elf(struct elf_info *info, const char *filename)
+ 
+ 	hdr = grab_file(filename, &info->size);
+ 	if (!hdr) {
++		if (ignore_missing_files) {
++			fprintf(stderr, "%s: %s (ignored)\n", filename,
++				strerror(errno));
++			return 0;
++		}
+ 		perror(filename);
+ 		exit(1);
+ 	}
+@@ -2119,7 +2127,7 @@ int main(int argc, char **argv)
+ 	struct ext_sym_list *extsym_iter;
+ 	struct ext_sym_list *extsym_start = NULL;
+ 
+-	while ((opt = getopt(argc, argv, "i:I:e:msST:o:awM:K:")) != -1) {
++	while ((opt = getopt(argc, argv, "i:I:e:mnsST:o:awM:K:")) != -1) {
+ 		switch (opt) {
+ 		case 'i':
+ 			kernel_read = optarg;
+@@ -2139,6 +2147,9 @@ int main(int argc, char **argv)
+ 		case 'm':
+ 			modversions = 1;
+ 			break;
++		case 'n':
++			ignore_missing_files = 1;
++			break;
+ 		case 'o':
+ 			dump_write = optarg;
+ 			break;
 -- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+1.7.9.7
+
