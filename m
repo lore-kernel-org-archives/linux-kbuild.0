@@ -1,86 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f177.google.com ([209.85.212.177]:45883 "EHLO
-	mail-wi0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751906Ab3IUXVH (ORCPT
+Received: from e28smtp04.in.ibm.com ([122.248.162.4]:54525 "EHLO
+	e28smtp04.in.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752527Ab3IVRGI (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 21 Sep 2013 19:21:07 -0400
-Received: by mail-wi0-f177.google.com with SMTP id cb5so906152wib.10
-        for <linux-kbuild@vger.kernel.org>; Sat, 21 Sep 2013 16:21:06 -0700 (PDT)
-Date: Sun, 22 Sep 2013 01:21:02 +0200
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH] kconfig: fix allmodconfig
-Message-ID: <20130921232102.GC3221@free.fr>
-References: <1379805443-10945-1-git-send-email-yann.morin.1998@free.fr>
+	Sun, 22 Sep 2013 13:06:08 -0400
+Received: from /spool/local
+	by e28smtp04.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-kbuild@vger.kernel.org> from <maddy@linux.vnet.ibm.com>;
+	Sun, 22 Sep 2013 22:36:06 +0530
+From: Madhavan Srinivasan <maddy@linux.vnet.ibm.com>
+Subject: =?y?q?=5BPATCH=20V2=5D=20kconfig/menu=2Ec=3A=20fix=20uninitialized=20variable=20warning?=
+Date: Sun, 22 Sep 2013 22:35:57 +0530
+Message-Id: <1379869557-23116-1-git-send-email-maddy@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1379805443-10945-1-git-send-email-yann.morin.1998@free.fr>
+Content-Type: text/plain; charset=y
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>
+To: mmarek@suse.cz
+Cc: yann.morin.1998@free.fr, bpoirier@suse.de, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Madhavan Srinivasan <maddy@linux.vnet.ibm.com>
 
-Stephen, All,
+In file included from scripts/kconfig/zconf.tab.c:2537:0:
+scripts/kconfig/menu.c: In function ‘get_symbol_str’:
+scripts/kconfig/menu.c:586:18: warning: ‘jump’ may be used uninitialized in
+this function [-Wmaybe-uninitialized]
+     jump->offset = r->len - 1;
+                  ^
+scripts/kconfig/menu.c:547:19: note: ‘jump’ was declared here
+  struct jump_key *jump;
+                   ^
+Change V2:
 
-Please, test this patch to fix the allmodconfig issue reported by
-Stephen.
+1)Added comment as suggested.
 
-From my little testing (some randconfig followed by silentoldconfig, as
-well as allmodconfig), this patch seems to fix the issue without any
-regression I could ientify.
+Signed-off-by: Madhavan Srinivasan <maddy@linux.vnet.ibm.com>
+---
+ scripts/kconfig/menu.c |    3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-But since this is sensitive code, I'd like some feedback before this
-gets applied.
-
-Thank you!
-
-Regards,
-Yann E. MORIN.
-
-On 2013-09-22 01:17 +0200, Yann E. MORIN spake thusly:
-> From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-> 
-> Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
-> Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
-> Cc: Stephen Rothwell <sfr@canb.auug.org.au>
-> Cc: Sam Ravnborg <sam@ravnborg.org>
-> Cc: Michal Marek <mmarek@suse.cz>
-> ---
->  scripts/kconfig/confdata.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-> index 87f7238..0cbfc67 100644
-> --- a/scripts/kconfig/confdata.c
-> +++ b/scripts/kconfig/confdata.c
-> @@ -399,8 +399,6 @@ setsym:
->  	free(line);
->  	fclose(in);
->  
-> -	if (modules_sym)
-> -		sym_calc_value(modules_sym);
->  	return 0;
->  }
->  
-> @@ -1175,6 +1173,10 @@ bool conf_set_all_new_symbols(enum conf_def_mode mode)
->  				sym->def[S_DEF_USER].tri = yes;
->  				break;
->  			case def_mod:
-> +				/* Note: although modules_sym must be 'yes' to
-> +				 * enable tristates, 'mod' is promoted to 'yes'
-> +				 * when applied to a boolean, which modules_sym
-> +				 * is. So we need not special-case it here. */
->  				sym->def[S_DEF_USER].tri = mod;
->  				break;
->  			case def_no:
-> -- 
-> 1.8.1.2
-> 
-
+diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+index c1d5320..32ee2d5 100644
+--- a/scripts/kconfig/menu.c
++++ b/scripts/kconfig/menu.c
+@@ -544,7 +544,8 @@ static void get_prompt_str(struct gstr *r, struct property *prop,
+ {
+ 	int i, j;
+ 	struct menu *submenu[8], *menu, *location = NULL;
+-	struct jump_key *jump;
++	/* Initializing to avoid a spurious warning observed in gcc 4.8.0 */
++	struct jump_key *jump = NULL;
+ 
+ 	str_printf(r, _("Prompt: %s\n"), _(prop->text));
+ 	menu = prop->menu->parent;
 -- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+1.7.10.4
+
