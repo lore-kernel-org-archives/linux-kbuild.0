@@ -1,163 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pb0-f42.google.com ([209.85.160.42]:52190 "EHLO
-	mail-pb0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752298Ab3IWP1o (ORCPT
+Received: from nm7-vm1.access.bullet.mail.bf1.yahoo.com ([216.109.114.160]:33998
+	"EHLO nm7-vm1.access.bullet.mail.bf1.yahoo.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751650Ab3IWTji (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 23 Sep 2013 11:27:44 -0400
-Date: Mon, 23 Sep 2013 08:27:38 -0700
-From: Guenter Roeck <linux@roeck-us.net>
-Subject: Re: [PATCH] modpost: Optionally ignore secondary errors seen if a
- single module build fails
-Message-ID: <20130923152738.GA22100@roeck-us.net>
-References: <1379785496-20209-1-git-send-email-linux@roeck-us.net>
- <87fvswxeuy.fsf@rustcorp.com.au>
+	Mon, 23 Sep 2013 15:39:38 -0400
+Message-ID: <52409917.2080506@att.net>
+Date: Mon, 23 Sep 2013 14:40:07 -0500
+From: Daniel Santos <danielfsantos@att.net>
+Reply-To: Daniel Santos <daniel.santos@pobox.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87fvswxeuy.fsf@rustcorp.com.au>
+Subject: Re: [PATCH 5/5] lib: Add error string support to printks
+References: <1379482610.1787.7.camel@joe-AO722>  <1379459317-13046-1-git-send-email-daniel.santos@pobox.com>  <1379459317-13046-6-git-send-email-daniel.santos@pobox.com>  <22238.1379502295@warthog.procyon.org.uk> <523A5316.50405@att.net>  <1379639226.5862.9.camel@joe-AO722> <523BDB55.2000008@att.net> <1379677551.2021.25.camel@joe-AO722>
+In-Reply-To: <1379677551.2021.25.camel@joe-AO722>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rusty Russell <rusty@rustcorp.com.au>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Geert Uytterhoeven <geert@linux-m68k.org>
+To: Joe Perches <joe@perches.com>
+Cc: Daniel Santos <daniel.santos@pobox.com>, David Howells <dhowells@redhat.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, Andrew Morton <akpm@linux-foundation.org>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Thomas Gleixner <tglx@linutronix.de>, Michael Kerrisk <mtk.manpages@gmail.com>, Dave Hansen <dave.hansen@linux.intel.com>, George Spelvin <linux@horizon.com>
 
-On Mon, Sep 23, 2013 at 03:24:13PM +0930, Rusty Russell wrote:
-> Guenter Roeck <linux@roeck-us.net> writes:
-> > Commit ea4054a23 (modpost: handle huge numbers of modules) added
-> > support for building a large number of modules.
-> 
-> Wow, this is a lot of work for a trivial fix.
-> 
-I agree, but it was important for me to get the problem fixed,
-as it affects my automated testing quite seriously. This one
-may be overkill, but the other attempts seemed to go nowhere.
+On 09/20/2013 06:45 AM, Joe Perches wrote:
+> On Fri, 2013-09-20 at 00:21 -0500, Daniel Santos wrote:
+>
+> [nice example about bloat]
+>
+>> Yeah, I do agree, I just don't see how to do it without introducing
+>> unnecessary bloat.
+> I think the code size cost of %pE is pretty trivial
+> compared to the log size/runtime cost.
 
-> I was happy with any of the approaches, but I'll accept this.  I'm not
-> even going to bikeshed over the abuse of '-n' :)
-> 
-> Applied,
+I suppose that would depend upon the conditions.  If no printks with 
+error codes/names/messages are triggered, then the cost on the syslog is 
+zero. Either way, we're already looking at adding one byte to the format 
+string for the extra 'E' character and the 3-4 bytes for sign extend 
+instruction would not exist on arm and most other archs.  I guess I'm 
+usually trying to consider the memory constrained system where you 
+wouldn't enable this feature but still suffer the sign extend bloat -- 
+then again, I don't know of many embedded x86_64 systems. :)
 
-Thanks a lot!
+> I would not want to see it used generically.
 
-Guenter
+Hmm, I had considered this as a new mechanism to emit error codes to the 
+ring buffer.  What sort of guidelines do you think are reasonable for 
+when to use this proposed extension and when not to? Maybe on printks 
+for error conditions that are most likely?
 
-> Rusty.
-> 
-> > Unfortunately, the commit changed the semantics of the makefile: Instead of
-> > passing only existing object files to modpost, make now passes all expected
-> > object files. If make was started with option -i, this results in a modpost
-> > error if a single file failed to build.
-> >
-> > Example with the current btrfs build falure on m68k:
-> >
-> > fs/btrfs/btrfs.o: No such file or directory
-> > make[1]: [__modpost] Error 1 (ignored)
-> >
-> > This error is followed by lots of errors such as:
-> >
-> > m68k-linux-gcc: error: arch/m68k/emu/nfcon.mod.c: No such file or directory
-> > m68k-linux-gcc: fatal error: no input files
-> > compilation terminated.
-> > make[1]: [arch/m68k/emu/nfcon.mod.o] Error 1 (ignored)
-> >
-> > This doesn't matter much for normal builds, but it is annoying for builds
-> > started with "make -i" due to the large number of secondary errors.
-> > Those errors unnececessarily clog any error log and make it difficult
-> > to find the real errors in the build.
-> >
-> > Fix the problem by adding a new parameter '-n' to modpost. If this parameter
-> > is specified, modpost reports but ignores missing object files.
-> >
-> > With this patch, error output from above problem is (with make -i):
-> >
-> > m68k-linux-ld: cannot find fs/btrfs/ioctl.o: No such file or directory
-> > make[2]: [fs/btrfs/btrfs.o] Error 1 (ignored)
-> > ...
-> > fs/btrfs/btrfs.o: No such file or directory (ignored)
-> >
-> > Cc: Rusty Russell <rusty@rustcorp.com.au>
-> > Cc: Michael Marek <mmarek@suse.cz>
-> > Signed-off-by: Guenter Roeck <linux@roeck-us.net>
-> > ---
-> > Yet another attempt to fix this problem. I'll be happy to change the modpost
-> > flag to something else if so desired. Note that -i is already taken, though.
-> >
-> > I also did not change any of the existing object name filtering in
-> > Makefile.modpost. This is on purpose; I am concerned about introducing
-> > some other problem.
-> >
-> >  scripts/Makefile.modpost |    4 +++-
-> >  scripts/mod/modpost.c    |   13 ++++++++++++-
-> >  2 files changed, 15 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
-> > index 8dcdca2..69f0a14 100644
-> > --- a/scripts/Makefile.modpost
-> > +++ b/scripts/Makefile.modpost
-> > @@ -79,9 +79,11 @@ modpost = scripts/mod/modpost                    \
-> >   $(if $(CONFIG_DEBUG_SECTION_MISMATCH),,-S)      \
-> >   $(if $(KBUILD_EXTMOD)$(KBUILD_MODPOST_WARN),-w)
-> >  
-> > +MODPOST_OPT=$(subst -i,-n,$(filter -i,$(MAKEFLAGS)))
-> > +
-> >  # We can go over command line length here, so be careful.
-> >  quiet_cmd_modpost = MODPOST $(words $(filter-out vmlinux FORCE, $^)) modules
-> > -      cmd_modpost = $(MODLISTCMD) | sed 's/\.ko$$/.o/' | $(modpost) -s -T -
-> > +      cmd_modpost = $(MODLISTCMD) | sed 's/\.ko$$/.o/' | $(modpost) $(MODPOST_OPT) -s -T -
-> >  
-> >  PHONY += __modpost
-> >  __modpost: $(modules:.ko=.o) FORCE
-> > diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-> > index 8247979..393706b 100644
-> > --- a/scripts/mod/modpost.c
-> > +++ b/scripts/mod/modpost.c
-> > @@ -17,6 +17,7 @@
-> >  #include <string.h>
-> >  #include <limits.h>
-> >  #include <stdbool.h>
-> > +#include <errno.h>
-> >  #include "modpost.h"
-> >  #include "../../include/generated/autoconf.h"
-> >  #include "../../include/linux/license.h"
-> > @@ -37,6 +38,8 @@ static int warn_unresolved = 0;
-> >  /* How a symbol is exported */
-> >  static int sec_mismatch_count = 0;
-> >  static int sec_mismatch_verbose = 1;
-> > +/* ignore missing files */
-> > +static int ignore_missing_files;
-> >  
-> >  enum export {
-> >  	export_plain,      export_unused,     export_gpl,
-> > @@ -407,6 +410,11 @@ static int parse_elf(struct elf_info *info, const char *filename)
-> >  
-> >  	hdr = grab_file(filename, &info->size);
-> >  	if (!hdr) {
-> > +		if (ignore_missing_files) {
-> > +			fprintf(stderr, "%s: %s (ignored)\n", filename,
-> > +				strerror(errno));
-> > +			return 0;
-> > +		}
-> >  		perror(filename);
-> >  		exit(1);
-> >  	}
-> > @@ -2119,7 +2127,7 @@ int main(int argc, char **argv)
-> >  	struct ext_sym_list *extsym_iter;
-> >  	struct ext_sym_list *extsym_start = NULL;
-> >  
-> > -	while ((opt = getopt(argc, argv, "i:I:e:msST:o:awM:K:")) != -1) {
-> > +	while ((opt = getopt(argc, argv, "i:I:e:mnsST:o:awM:K:")) != -1) {
-> >  		switch (opt) {
-> >  		case 'i':
-> >  			kernel_read = optarg;
-> > @@ -2139,6 +2147,9 @@ int main(int argc, char **argv)
-> >  		case 'm':
-> >  			modversions = 1;
-> >  			break;
-> > +		case 'n':
-> > +			ignore_missing_files = 1;
-> > +			break;
-> >  		case 'o':
-> >  			dump_write = optarg;
-> >  			break;
-> > -- 
-> > 1.7.9.7
-> 
+Daniel
