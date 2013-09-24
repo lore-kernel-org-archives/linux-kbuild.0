@@ -1,48 +1,33 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from caramon.arm.linux.org.uk ([78.32.30.218]:39934 "EHLO
-	caramon.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750771Ab3IXMT5 (ORCPT
+Received: from mail-lb0-f181.google.com ([209.85.217.181]:58537 "EHLO
+	mail-lb0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753270Ab3IXMew (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 24 Sep 2013 08:19:57 -0400
-Date: Tue, 24 Sep 2013 13:19:39 +0100
-From: Russell King - ARM Linux <linux@arm.linux.org.uk>
-Subject: Re: [PATCH RESEND] ARM: add dtbImage.<dt> and dtbuImage.<dt> rules
-Message-ID: <20130924121939.GD12758@n2100.arm.linux.org.uk>
-References: <504DFBBF.5010202@free-electrons.com> <1348733441-11626-1-git-send-email-richard.genoud@gmail.com> <20120927082955.GR17667@game.jcrosoft.org> <CACQ1gAgwv4pBFZBrVZiWM2_=OneUO-s16LufSENx27gMC3DUig@mail.gmail.com> <52416F97.802@keymile.com> <20130924120152.GI11119@titan.lakedaemon.net>
+	Tue, 24 Sep 2013 08:34:52 -0400
+Received: by mail-lb0-f181.google.com with SMTP id u14so3709379lbd.40
+        for <linux-kbuild@vger.kernel.org>; Tue, 24 Sep 2013 05:34:50 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20130924120152.GI11119@titan.lakedaemon.net>
+In-Reply-To: <20130924121939.GD12758@n2100.arm.linux.org.uk>
+References: <504DFBBF.5010202@free-electrons.com> <1348733441-11626-1-git-send-email-richard.genoud@gmail.com>
+ <20120927082955.GR17667@game.jcrosoft.org> <CACQ1gAgwv4pBFZBrVZiWM2_=OneUO-s16LufSENx27gMC3DUig@mail.gmail.com>
+ <52416F97.802@keymile.com> <20130924120152.GI11119@titan.lakedaemon.net> <20130924121939.GD12758@n2100.arm.linux.org.uk>
+From: Richard Genoud <richard.genoud@gmail.com>
+Date: Tue, 24 Sep 2013 14:34:30 +0200
+Message-ID: <CACQ1gAjNNszH3fOf-=RcuCQRrqu53i8ss40OrHQxd-Uah_ESZg@mail.gmail.com>
+Subject: Re: [PATCH RESEND] ARM: add dtbImage.<dt> and dtbuImage.<dt> rules
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jason Cooper <jason@lakedaemon.net>, Gerlando Falauto <gerlando.falauto@keymile.com>
-Cc: Richard Genoud <richard.genoud@gmail.com>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, devicetree-discuss@lists.ozlabs.org, Rob Herring <rob.herring@calxeda.com>, Grant Likely <grant.likely@secretlab.ca>, Gregory CLEMENT <gregory.clement@free-electrons.com>, Jean-Christophe PLAGNIOL-VILLARD <plagnioj@jcrosoft.com>, linux-arm-kernel@lists.infradead.org
+To: Russell King - ARM Linux <linux@arm.linux.org.uk>
+Cc: Jason Cooper <jason@lakedaemon.net>, Gerlando Falauto <gerlando.falauto@keymile.com>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, devicetree-discuss@lists.ozlabs.org, Rob Herring <rob.herring@calxeda.com>, Grant Likely <grant.likely@secretlab.ca>, Gregory CLEMENT <gregory.clement@free-electrons.com>, Jean-Christophe PLAGNIOL-VILLARD <plagnioj@jcrosoft.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 
-On Tue, Sep 24, 2013 at 08:01:52AM -0400, Jason Cooper wrote:
-> On Tue, Sep 24, 2013 at 12:55:19PM +0200, Gerlando Falauto wrote:
-> > So it shouldn't be such a crazy idea to create a dtbuImage.<dtb>
-> > within Kbuild (as opposed to from an external wrapper for make).
-> 
-> Yes :)  The problem is that we are moving to multiplatform zImages.  In
-> that scenario, the uImage target isn't very helpful because it needs to
-> be custom to each board.  Additionally, appended-dtb was intended as a
-> developer tool and isn't intended as a deployable item.  It also
-> defeats the purpose of multiplatform.
+2013/9/24 Russell King - ARM Linux <linux@arm.linux.org.uk>:
+> Modern platforms
+> should be using a DT compatible boot loader, which means you don't
+> want to use the DTB appended to zImage method.
 
-And we've already taken the decision that we will not be augmenting
-kbuild with any more ubooot specific stuff, especially with anything
-that goes against the long term goal of having a single kernel image
-which is bootable across multiple platforms.
+Even small bootloaders like at91bootstrap can handle DT blob now (that
+was my main problem at the time I wrote this patch)
+So I don't use it anymore. (but as a developer tool, this can be convenient).
 
-Having kbuild wrap the zImage + DTB up into a uImage goes directly
-against this goal, because it turns the produced kernel into something
-which is specific to a single target.  It's much worse than what we
-had before we went to DT, because with this it can only be used on a
-_single_ target, whereas prior to DT we could boot a single kernel
-on a variety of compatible targets.
-
-Moreover, the support for appending the DTB to the zImage is a stop-gap
-solution for the transition to a full DT based environment - don't
-expect it to be around into the long term future.  Modern platforms
-should be using a DT compatible boot loader, which means you don't
-want to use the DTB appended to zImage method.
+Richard.
