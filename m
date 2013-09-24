@@ -1,41 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-de.keymile.com ([195.8.104.250]:38521 "EHLO
-	mail-de.keymile.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753689Ab3IXPOv (ORCPT
+Received: from mho-02-ewr.mailhop.org ([204.13.248.72]:39312 "EHLO
+	mho-02-ewr.mailhop.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753860Ab3IXPyk (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 24 Sep 2013 11:14:51 -0400
-Message-ID: <5241AC66.8020109@keymile.com>
-Date: Tue, 24 Sep 2013 17:14:46 +0200
-From: Gerlando Falauto <gerlando.falauto@keymile.com>
-MIME-Version: 1.0
+	Tue, 24 Sep 2013 11:54:40 -0400
+Date: Tue, 24 Sep 2013 11:54:18 -0400
+From: Jason Cooper <jason@lakedaemon.net>
 Subject: Re: [PATCH RESEND] ARM: add dtbImage.<dt> and dtbuImage.<dt> rules
-References: <504DFBBF.5010202@free-electrons.com> <1348733441-11626-1-git-send-email-richard.genoud@gmail.com> <20120927082955.GR17667@game.jcrosoft.org> <CACQ1gAgwv4pBFZBrVZiWM2_=OneUO-s16LufSENx27gMC3DUig@mail.gmail.com> <52416F97.802@keymile.com> <20130924120152.GI11119@titan.lakedaemon.net> <20130924121939.GD12758@n2100.arm.linux.org.uk> <CACQ1gAjNNszH3fOf-=RcuCQRrqu53i8ss40OrHQxd-Uah_ESZg@mail.gmail.com>
-In-Reply-To: <CACQ1gAjNNszH3fOf-=RcuCQRrqu53i8ss40OrHQxd-Uah_ESZg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Message-ID: <20130924155418.GJ11119@titan.lakedaemon.net>
+References: <504DFBBF.5010202@free-electrons.com>
+ <1348733441-11626-1-git-send-email-richard.genoud@gmail.com>
+ <20120927082955.GR17667@game.jcrosoft.org>
+ <CACQ1gAgwv4pBFZBrVZiWM2_=OneUO-s16LufSENx27gMC3DUig@mail.gmail.com>
+ <52416F97.802@keymile.com>
+ <20130924120152.GI11119@titan.lakedaemon.net>
+ <5241AC52.7000808@keymile.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5241AC52.7000808@keymile.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Richard Genoud <richard.genoud@gmail.com>
-Cc: Russell King - ARM Linux <linux@arm.linux.org.uk>, Jason Cooper <jason@lakedaemon.net>, Michal Marek <mmarek@suse.cz>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "devicetree-discuss@lists.ozlabs.org" <devicetree-discuss@lists.ozlabs.org>, Rob Herring <rob.herring@calxeda.com>, Grant Likely <grant.likely@secretlab.ca>, Gregory CLEMENT <gregory.clement@free-electrons.com>, Jean-Christophe PLAGNIOL-VILLARD <plagnioj@jcrosoft.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+To: Gerlando Falauto <gerlando.falauto@keymile.com>
+Cc: Richard Genoud <richard.genoud@gmail.com>, Michal Marek <mmarek@suse.cz>, Russell King <linux@arm.linux.org.uk>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "devicetree-discuss@lists.ozlabs.org" <devicetree-discuss@lists.ozlabs.org>, Rob Herring <rob.herring@calxeda.com>, Grant Likely <grant.likely@secretlab.ca>, Gregory CLEMENT <gregory.clement@free-electrons.com>, Jean-Christophe PLAGNIOL-VILLARD <plagnioj@jcrosoft.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 
-Hi guys,
+On Tue, Sep 24, 2013 at 05:14:26PM +0200, Gerlando Falauto wrote:
+> On 09/24/2013 02:01 PM, Jason Cooper wrote:
+> >We are strongly encouraging all vendors to upgrade their bootloaders to
+> >support field upgradeable dtbs.  eg having the dtb on a separate
+> >partition of the flash (or whereever the bootloader environment is)
+> 
+> This will most definitely be the case for future boards, but we sort
+> of follow the unspoken guideline of not upgrading u-boot on
+> field-deployed units. Arguable at least, but that's the way it is.
 
-On 09/24/2013 02:34 PM, Richard Genoud wrote:
-> 2013/9/24 Russell King - ARM Linux <linux@arm.linux.org.uk>:
->> Modern platforms
->> should be using a DT compatible boot loader, which means you don't
->> want to use the DTB appended to zImage method.
->
-> Even small bootloaders like at91bootstrap can handle DT blob now (that
-> was my main problem at the time I wrote this patch)
-> So I don't use it anymore. (but as a developer tool, this can be convenient).
->
-> Richard.
->
+Understandable.
 
-Thanks a lot for your replies.
-I now understand your point, your reasons and, most importantly, where 
-we're headed and what to expect in the future.
+> >Have you tried kwboot over serial?  It can be found in barebox and u-boot source repositories.
+> 
+> Uhm, yes, I've used it a few times... but what are you suggesting?
+> That u-boot can be upgraded? Yes, I believe that... ;-)
 
-Thanks a lot!
-Gerlando
+I'm suggesting that I primarily talk to hobbyists and tinkerers, and
+occasionally forget there are people that have jtag access :-P
+
+> >The above is the long-term goal, in the short term, please take a look
+> >at:
+> >
+> >https://github.com/zonque/pxa-impedance-matcher
+> >
+> >You can use this to boot a modern fdt kernel on a legacy bootloader,
+> >with one or more dtb's linked in.  I tested it on the dreamplug, so it's
+> >mostly there for you.
+> >
+> >The big outstanding TODO I have on it is to parse the atags and modify
+> >the selected dtb before passing off to the kernel.  Patches welcome! :)
+> 
+> Thank you, I had a quick look at the README and it sounds great!
+> But CONFIG_APPENDED_DTB already does the job of filling this gap for me...
+
+Right, it's intended as a replacement for APPENDED_DTB since it can
+handle multiple dtbs (so you can do one multiplatform zImage), and you
+can hack around custom vendor atags.  eg ethernet mac addresses, Thomas'
+CP15 register base address hack, etc.  All that goodness without
+polluting the kernel source.  :)
+
+thx,
+
+Jason.
