@@ -1,70 +1,32 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mho-02-ewr.mailhop.org ([204.13.248.72]:39312 "EHLO
-	mho-02-ewr.mailhop.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753860Ab3IXPyk (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 24 Sep 2013 11:54:40 -0400
-Date: Tue, 24 Sep 2013 11:54:18 -0400
-From: Jason Cooper <jason@lakedaemon.net>
-Subject: Re: [PATCH RESEND] ARM: add dtbImage.<dt> and dtbuImage.<dt> rules
-Message-ID: <20130924155418.GJ11119@titan.lakedaemon.net>
-References: <504DFBBF.5010202@free-electrons.com>
- <1348733441-11626-1-git-send-email-richard.genoud@gmail.com>
- <20120927082955.GR17667@game.jcrosoft.org>
- <CACQ1gAgwv4pBFZBrVZiWM2_=OneUO-s16LufSENx27gMC3DUig@mail.gmail.com>
- <52416F97.802@keymile.com>
- <20130924120152.GI11119@titan.lakedaemon.net>
- <5241AC52.7000808@keymile.com>
+Received: from cantor2.suse.de ([195.135.220.15]:34808 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750949Ab3IYJPy (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 25 Sep 2013 05:15:54 -0400
+Message-ID: <5242A9C6.9040606@suse.cz>
+Date: Wed, 25 Sep 2013 11:15:50 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5241AC52.7000808@keymile.com>
+Subject: Re: [PATCH] modpost: Fix secondary errors seen if a single module
+ build fails
+References: <1379219942-31545-1-git-send-email-linux@roeck-us.net> <52384C72.4040403@suse.cz> <20130918140549.GA15490@roeck-us.net>
+In-Reply-To: <20130918140549.GA15490@roeck-us.net>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Gerlando Falauto <gerlando.falauto@keymile.com>
-Cc: Richard Genoud <richard.genoud@gmail.com>, Michal Marek <mmarek@suse.cz>, Russell King <linux@arm.linux.org.uk>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "devicetree-discuss@lists.ozlabs.org" <devicetree-discuss@lists.ozlabs.org>, Rob Herring <rob.herring@calxeda.com>, Grant Likely <grant.likely@secretlab.ca>, Gregory CLEMENT <gregory.clement@free-electrons.com>, Jean-Christophe PLAGNIOL-VILLARD <plagnioj@jcrosoft.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+To: Guenter Roeck <linux@roeck-us.net>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Rusty Russell <rusty@rustcorp.com.au>
 
-On Tue, Sep 24, 2013 at 05:14:26PM +0200, Gerlando Falauto wrote:
-> On 09/24/2013 02:01 PM, Jason Cooper wrote:
-> >We are strongly encouraging all vendors to upgrade their bootloaders to
-> >support field upgradeable dtbs.  eg having the dtb on a separate
-> >partition of the flash (or whereever the bootloader environment is)
-> 
-> This will most definitely be the case for future boards, but we sort
-> of follow the unspoken guideline of not upgrading u-boot on
-> field-deployed units. Arguable at least, but that's the way it is.
+On 18.9.2013 16:05, Guenter Roeck wrote:
+> To follow up on this - are you at the Linux Plumbers conference ?
+> If yes maybe we can meet briefly and discuss how to proceed.
+> I'd volunteer to create a patch to add the above functionality if
+> people think it is valuable, but I would like to keep it as
+> separate patch.
 
-Understandable.
+Sorry, I was not at the LPC and had vacation at that time. I see Rusty
+already merged your patch, that's great.
 
-> >Have you tried kwboot over serial?  It can be found in barebox and u-boot source repositories.
-> 
-> Uhm, yes, I've used it a few times... but what are you suggesting?
-> That u-boot can be upgraded? Yes, I believe that... ;-)
+Michal
 
-I'm suggesting that I primarily talk to hobbyists and tinkerers, and
-occasionally forget there are people that have jtag access :-P
-
-> >The above is the long-term goal, in the short term, please take a look
-> >at:
-> >
-> >https://github.com/zonque/pxa-impedance-matcher
-> >
-> >You can use this to boot a modern fdt kernel on a legacy bootloader,
-> >with one or more dtb's linked in.  I tested it on the dreamplug, so it's
-> >mostly there for you.
-> >
-> >The big outstanding TODO I have on it is to parse the atags and modify
-> >the selected dtb before passing off to the kernel.  Patches welcome! :)
-> 
-> Thank you, I had a quick look at the README and it sounds great!
-> But CONFIG_APPENDED_DTB already does the job of filling this gap for me...
-
-Right, it's intended as a replacement for APPENDED_DTB since it can
-handle multiple dtbs (so you can do one multiplatform zImage), and you
-can hack around custom vendor atags.  eg ethernet mac addresses, Thomas'
-CP15 register base address hack, etc.  All that goodness without
-polluting the kernel source.  :)
-
-thx,
-
-Jason.
