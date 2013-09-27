@@ -1,65 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from b.ns.miles-group.at ([95.130.255.144]:1664 "EHLO radon.swed.at"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1752825Ab3I0J00 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 27 Sep 2013 05:26:26 -0400
-Message-ID: <52454F38.60902@nod.at>
-Date: Fri, 27 Sep 2013 11:26:16 +0200
-From: Richard Weinberger <richard@nod.at>
+Received: from cantor2.suse.de ([195.135.220.15]:47729 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750929Ab3I0KTU (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 27 Sep 2013 06:19:20 -0400
+Message-ID: <52455BA2.2020805@suse.cz>
+Date: Fri, 27 Sep 2013 12:19:14 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH 1/8] um: Create defconfigs for i386 and x86_64
-References: <1377073172-3662-1-git-send-email-richard@nod.at> <1377073172-3662-2-git-send-email-richard@nod.at> <CALkWK0=W38JpZoGVkPYD4qd=+Pt1G7oYPEK_R=c8TAW6W=wxyg@mail.gmail.com> <52440DE0.1030807@nod.at> <52454E58.3010305@gmx.de>
-In-Reply-To: <52454E58.3010305@gmx.de>
+Subject: Re: [PATCH] kconfig: fix allmodconfig
+References: <1379805443-10945-1-git-send-email-yann.morin.1998@free.fr> <20130921232102.GC3221@free.fr> <20130926213621.GF3418@free.fr>
+In-Reply-To: <20130926213621.GF3418@free.fr>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: =?UTF-8?B?VG9yYWxmIEbDtnJzdGVy?= <toralf.foerster@gmx.de>
-Cc: Ramkumar Ramachandra <artagnon@gmail.com>, linux-arch@vger.kernel.org, Michal Marek <mmarek@suse.cz>, geert@linux-m68k.org, ralf@linux-mips.org, lethal@linux-sh.org, Jeff Dike <jdike@addtoit.com>, gxt@mprc.pku.edu.cn, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org, linux-kbuild@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, linux-m68k@lists.linux-m68k.org, linux-mips@linux-mips.org, linux-sh@vger.kernel.org, user-mode-linux-devel@lists.sourceforge.net
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: linux-kbuild@vger.kernel.org, Stephen Rothwell <sfr@canb.auug.org.au>, Sam Ravnborg <sam@ravnborg.org>
 
-Am 27.09.2013 11:22, schrieb Toralf Förster:
-> On 09/26/2013 12:35 PM, Richard Weinberger wrote:
->> Am 26.09.2013 12:20, schrieb Ramkumar Ramachandra:
->>> Richard Weinberger wrote:
->>>> This patch is based on: https://lkml.org/lkml/2013/7/4/396
->>>>
->>>> Cc: Ramkumar Ramachandra <artagnon@gmail.com>
->>>> Signed-off-by: Richard Weinberger <richard@nod.at>
->>>> ---
->>>>  arch/um/configs/i386_defconfig   | 954 +++++++++++++++++++++++++++++++++++++++
->>>>  arch/um/configs/x86_64_defconfig | 943 ++++++++++++++++++++++++++++++++++++++
->>>>  2 files changed, 1897 insertions(+)
->>>>  create mode 100644 arch/um/configs/i386_defconfig
->>>>  create mode 100644 arch/um/configs/x86_64_defconfig
->>>
->>> First, I'm pissed that the upstream tree doesn't build and run out of
->>> the box months after I submitted a fix in July (and it's September
->>> now). Fact that you dropped my sane patches aside and decided to write
->>> a much larger series aside, user-mode Linux in upstream is broken.
->>> This means that any user who does:
->>>
->>> $ ARCH=um make defconfig
->>> $ ARCH=um make
->>>
->>> will end up with a *broken* Linux _today_. Unless the user is living
->>> in the Stone Age with a 32-bit computer, this is what she will see
->>> when she attempts to boot up Linux:
+On 26.9.2013 23:36, Yann E. MORIN wrote:
+> Hello All!
 > 
-> :-{
+> On 2013-09-22 01:21 +0200, Yann E. MORIN spake thusly:
+>> Stephen, All,
+>>
+>> Please, test this patch to fix the allmodconfig issue reported by
+>> Stephen.
+>>
+>> From my little testing (some randconfig followed by silentoldconfig, as
+>> well as allmodconfig), this patch seems to fix the issue without any
+>> regression I could ientify.
+>>
+>> But since this is sensitive code, I'd like some feedback before this
+>> gets applied.
 > 
-> Grmpf
+> Ping? :-)
 > 
-> There are a lot of 32 bit user land linux installation (beside my own,
-> look at the x86 Gentoo world) in the wild - even running on modern 64bit
-> CPUs. The simple reason is that those installations run fine and the
-> performance "boost" of 64bit often isn't worth a new reinstallation.
+> I wanted to push this right after -rc3 is out. If any one has an issue
+> with that patch, you've got a few days to chime in! ;-)
 
-You *can* of course run 32bit userland on UML. Just create a 32bit UML on x86_64.
+It works for me, you can add my Tested-by: if you like. The only issue I
+have is that a more verbose changelog is missing.
 
-make defconfig ARCH=um SUBARCH=i386
-make linux ARCH=um SUBARCH=i386
-
-This will work on x86_64 and x86 hosts.
-
-Thanks,
-//richard
+Michal
