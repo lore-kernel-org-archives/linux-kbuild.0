@@ -1,49 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-we0-f178.google.com ([74.125.82.178]:62715 "EHLO
-	mail-we0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755418Ab3I3Qbq (ORCPT
+Received: from mail-we0-f180.google.com ([74.125.82.180]:35795 "EHLO
+	mail-we0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753938Ab3I3RBe (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 30 Sep 2013 12:31:46 -0400
-Date: Mon, 30 Sep 2013 18:31:39 +0200
+	Mon, 30 Sep 2013 13:01:34 -0400
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH] arm, kbuild: make "make install" not depend on vmlinux
-Message-ID: <20130930163139.GA12450@free.fr>
-References: <CA+55aFxtvT3Yvbxe5JGBThZS13payymFJ7jCLyEiE2iNDvsZtQ@mail.gmail.com>
- <20130711135445.GA21500@sepie.suse.cz>
- <CA+55aFyVjugxM7cUDWi0ASWttYthCxa6e7X3CADknBcSFxWgew@mail.gmail.com>
- <20130712105721.GF8731@rric.localhost>
- <20130717160506.GI8731@rric.localhost>
- <CA+55aFx4G5gME3ByqE0Wr-_t2x_6WkP3Ta4k1z4jfW+PrcK0og@mail.gmail.com>
- <20130717165743.GK8731@rric.localhost>
- <CA+55aFzhmV7iq+Pv37trMCmdNzk53ORAoj0a6rV14fzKta3Dhw@mail.gmail.com>
- <51E7B3D0.4060609@suse.cz>
- <20130930084945.GA1963@rric.localhost>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20130930084945.GA1963@rric.localhost>
+Subject: [pull request] Pull request for branch yem/kconfig-rc-fixes
+Date: Mon, 30 Sep 2013 19:01:18 +0200
+Message-Id: <cover.1380560241.git.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Robert Richter <rric@kernel.org>
-Cc: Michal Marek <mmarek@suse.cz>, Linus Torvalds <torvalds@linux-foundation.org>, Russell King <linux@arm.linux.org.uk>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+To: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>
+Cc: Robert Richter <rric@kernel.org>, linux-kernel@vger.kernel.org, "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-Robert, All,
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-On 2013-09-30 10:49 +0200, Robert Richter spake thusly:
-> On 18.07.13 11:22:24, Michal Marek wrote:
-> > > So Michal (or ARM people - whoever wants to take the patch), just take
-> > > my ack. No objections.
-> > 
-> > I can add it to the kbuild tree if needed. Otherwise you can add
-> > Acked-by: Michal Marek <mmarek@suse.cz>.
-> 
-> This didn't make it upstream yet, can somebody at it to a tree?
+Michal,
 
-Since it's been acked-by Linus, I'll queue it in my tree, for Michal to
-pull from. Expect a pull-request soon.
+Please pull these two changes for 3.12-rc:
+  - a fix for "make install" on ARM, by Robert Richter, acked by Linus
+    and yourself;
+  - a fix for "make allmodconfig" when KCONFIG_ALLCONFIG is set, which
+    already flew on the list, but with a better commit log now.
 
 Regards,
 Yann E. MORIN.
+
+
+The following changes since commit 86eb781889ec31f6421b86ab252ea609d456322d:
+
+  scripts/config: fix variable substitution command (2013-09-13 13:06:59 +0200)
+
+are available in the git repository at:
+
+  git://gitorious.org/linux-kconfig/linux-kconfig.git yem/kconfig-rc-fixes
+
+for you to fetch changes up to 3b03272a6e6f0f2c8d4b7751d35baa1ce41984aa:
+
+  arm, kbuild: make "make install" not depend on vmlinux (2013-09-30 18:48:50 +0200)
+
+----------------------------------------------------------------
+Robert Richter (1):
+      arm, kbuild: make "make install" not depend on vmlinux
+
+Yann E. MORIN (1):
+      kconfig: fix allmodconfig in presence of KCONFIG_ALLCONFIG
+
+ arch/arm/Makefile          |  9 +++++++--
+ arch/arm/boot/Makefile     | 16 ++++++++--------
+ arch/arm/boot/install.sh   | 14 ++++++++++++++
+ scripts/kconfig/confdata.c |  6 ++++--
+ 4 files changed, 33 insertions(+), 12 deletions(-)
 
 -- 
 .-----------------.--------------------.------------------.--------------------.
