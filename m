@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.web.de ([212.227.17.11]:49975 "EHLO mout.web.de"
+Received: from mout.web.de ([212.227.17.11]:62169 "EHLO mout.web.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752928Ab3JBFYb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 2 Oct 2013 01:24:31 -0400
+	id S1752928Ab3JBFYh (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 2 Oct 2013 01:24:37 -0400
 Received: from tacticalops.localnet ([93.132.133.153]) by smtp.web.de
- (mrweb101) with ESMTPSA (Nemesis) id 0MF3nL-1VbO4s1u5j-00GJCU for
- <linux-kbuild@vger.kernel.org>; Wed, 02 Oct 2013 07:24:29 +0200
+ (mrweb004) with ESMTPSA (Nemesis) id 0MapFS-1V6wv33T7y-00KQtS for
+ <linux-kbuild@vger.kernel.org>; Wed, 02 Oct 2013 07:24:36 +0200
 From: Martin Walch <walch.martin@web.de>
-Subject: [PATCH 2/4] kconfig: trivial: fix typos
-Date: Wed, 02 Oct 2013 07:24:27 +0200
-Message-ID: <1438881.BpsG90UED0@tacticalops>
+Subject: [PATCH 3/4] kconfig: adjust warning message for conflicting types
+Date: Wed, 02 Oct 2013 07:24:33 +0200
+Message-ID: <2865108.QhoiiS6j3s@tacticalops>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7Bit
 Content-Type: text/plain; charset="UTF-8"
@@ -18,57 +18,29 @@ List-ID: <linux-kbuild.vger.kernel.org>
 Cc: Michal Marek <mmarek@suse.cz>, Jiri Kosina <trivial@kernel.org>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Arve =?ISO-8859-1?Q?Hj=F8nnev=E5g?= <arve@android.com>, Benjamin Poirier <bpoirier@suse.de>, Dirk Gouders <dirk@gouders.net>, Wang YanQing <udknight@gmail.com>, Andrew Morton <akpm@linux-foundation.org>, Jean Delvare <jdelvare@suse.de>, Kees Cook <keescook@chromium.org>, Alan Cox <alan@linux.intel.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
 From: Martin Walch <walch.martin@web.de>
-Date: Wed, 2 Oct 2013 06:56:45 +0200
-Subject: [PATCH 2/4] kconfig: trivial: fix typos
+Date: Wed, 2 Oct 2013 06:58:01 +0200
+Subject: [PATCH 3/4] kconfig: adjust warning message for conflicting types
 
-inser() -> insert(), tell -> tells, peoperty -> property
+Adjust warning: a second symbol type does *not* replace the first one.
 
 Signed-off-by: Martin Walch <walch.martin@web.de>
 ---
- scripts/kconfig/mconf.c  | 2 +-
- scripts/kconfig/menu.c   | 2 +-
- scripts/kconfig/symbol.c | 2 +-
- 3 files changed, 3 insertions(+), 3 deletions(-)
+ scripts/kconfig/menu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
-index 2c39631..39abdae 100644
---- a/scripts/kconfig/mconf.c
-+++ b/scripts/kconfig/mconf.c
-@@ -263,7 +263,7 @@ search_help[] = N_(
- 	"    Press the key in the (#) prefix to jump directly to that\n"
- 	"    location. You will be returned to the current search results\n"
- 	"    after exiting this new menu.\n"
--	"o The 'Selects:' line tell what symbol will be automatically\n"
-+	"o The 'Selects:' line tells what symbols will be automatically\n"
- 	"  selected if this symbol is selected (y or m)\n"
- 	"o The 'Selected by' line tell what symbol has selected this symbol\n"
- 	"\n"
 diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
-index c1d5320..b970101 100644
+index b970101..e511df5 100644
 --- a/scripts/kconfig/menu.c
 +++ b/scripts/kconfig/menu.c
-@@ -597,7 +597,7 @@ static void get_prompt_str(struct gstr *r, struct property *prop,
+@@ -119,7 +119,7 @@ void menu_set_type(int type)
+ 		sym->type = type;
+ 		return;
+ 	}
+-	menu_warn(current_entry, "type of '%s' redefined from '%s' to '%s'",
++	menu_warn(current_entry, "type of '%s' not redefined from '%s' to '%s'",
+ 	    sym->name ? sym->name : "<choice>",
+ 	    sym_type_name(sym->type), sym_type_name(type));
  }
- 
- /*
-- * get peoperty of type P_SYMBOL
-+ * get property of type P_SYMBOL
-  */
- static struct property *get_symbol_prop(struct symbol *sym)
- {
-diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
-index c9a6775..7caabdb 100644
---- a/scripts/kconfig/symbol.c
-+++ b/scripts/kconfig/symbol.c
-@@ -1047,7 +1047,7 @@ sym_re_search_free:
-  * When we check for recursive dependencies we use a stack to save
-  * current state so we can print out relevant info to user.
-  * The entries are located on the call stack so no need to free memory.
-- * Note inser() remove() must always match to properly clear the stack.
-+ * Note insert() remove() must always match to properly clear the stack.
-  */
- static struct dep_stack {
- 	struct dep_stack *prev, *next;
 -- 
 1.8.1.5
 
