@@ -1,84 +1,72 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:59686 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752351Ab3JBG1n (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 2 Oct 2013 02:27:43 -0400
-Date: Wed, 2 Oct 2013 08:27:35 +0200
-From: Jean Delvare <jdelvare@suse.de>
-Subject: Re: [PATCH 2/4] kconfig: trivial: fix typos
-Message-ID: <20131002082735.0fc885ca@endymion.delvare>
-In-Reply-To: <1438881.BpsG90UED0@tacticalops>
-References: <1438881.BpsG90UED0@tacticalops>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Received: from p-mail1.rd.orange.com ([195.101.245.15]:25208 "EHLO
+	p-mail1.rd.orange.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752743Ab3JBHFV (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 2 Oct 2013 03:05:21 -0400
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: Re: [PATCH 4/4] kconfig: remove unused definition from scanner
+Date: Wed, 2 Oct 2013 08:57:54 +0200
+References: <6249343.9Mjtul3lu5@tacticalops> <ghk3hwjhqk.fsf@lena.gouders.net>
+In-Reply-To: <ghk3hwjhqk.fsf@lena.gouders.net>
+MIME-Version: 1.0
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
 Content-Transfer-Encoding: 7bit
+Message-Id: <201310020857.54800.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Martin Walch <walch.martin@web.de>
-Cc: Michal Marek <mmarek@suse.cz>, Jiri Kosina <trivial@kernel.org>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Arve =?UTF-8?B?SGrDuG5uZXbDpWc=?= <arve@android.com>, Benjamin Poirier <bpoirier@suse.de>, Dirk Gouders <dirk@gouders.net>, Wang YanQing <udknight@gmail.com>, Andrew Morton <akpm@linux-foundation.org>, Kees Cook <keescook@chromium.org>, Alan Cox <alan@linux.intel.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Dirk Gouders <dirk@gouders.net>
+Cc: Martin Walch <walch.martin@web.de>, Michal Marek <mmarek@suse.cz>, Jiri Kosina <trivial@kernel.org>, Arve =?iso-8859-1?q?Hj=F8nnev=E5g?= <arve@android.com>, Benjamin Poirier <bpoirier@suse.de>, Wang YanQing <udknight@gmail.com>, Andrew Morton <akpm@linux-foundation.org>, Jean Delvare <jdelvare@suse.de>, Kees Cook <keescook@chromium.org>, Alan Cox <alan@linux.intel.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hi Martin,
+Martin, All,
 
-On Wed, 02 Oct 2013 07:24:27 +0200, Martin Walch wrote:
-> From: Martin Walch <walch.martin@web.de>
-> Date: Wed, 2 Oct 2013 06:56:45 +0200
-> Subject: [PATCH 2/4] kconfig: trivial: fix typos
+On Wednesday 02 October 2013 08:42:59 Dirk Gouders wrote:
+> Martin Walch <walch.martin@web.de> writes:
 > 
-> inser() -> insert(), tell -> tells, peoperty -> property
+> > From: Martin Walch <walch.martin@web.de>
+> > Date: Wed, 2 Oct 2013 06:58:46 +0200
+> > Subject: [PATCH 4/4] kconfig: remove unused definition from scanner
+> >
+> > The definition ws [ \n\t] is not used anywhere. Drop it to avoid confusion.
 > 
-> Signed-off-by: Martin Walch <walch.martin@web.de>
-> ---
->  scripts/kconfig/mconf.c  | 2 +-
->  scripts/kconfig/menu.c   | 2 +-
->  scripts/kconfig/symbol.c | 2 +-
->  3 files changed, 3 insertions(+), 3 deletions(-)
+> Hi Martin,
 > 
-> diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
-> index 2c39631..39abdae 100644
-> --- a/scripts/kconfig/mconf.c
-> +++ b/scripts/kconfig/mconf.c
-> @@ -263,7 +263,7 @@ search_help[] = N_(
->  	"    Press the key in the (#) prefix to jump directly to that\n"
->  	"    location. You will be returned to the current search results\n"
->  	"    after exiting this new menu.\n"
-> -	"o The 'Selects:' line tell what symbol will be automatically\n"
-> +	"o The 'Selects:' line tells what symbols will be automatically\n"
->  	"  selected if this symbol is selected (y or m)\n"
->  	"o The 'Selected by' line tell what symbol has selected this symbol\n"
->  	"\n"
+> I think you should also regenerate the scanner and add
+> the new zconf.lex.c_shipped to this patch.
 
-There are 5 occurrences of this spelling mistake in the paragraph.
-Please fix them all. And while you're here, you may find that "what
-symbols needs" has a spelling mistake too.
+I think sending the re-generated parser as a separate patch helps
+in reviewing. Ie. I'd prefer a fifth patch.
 
-> diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
-> index c1d5320..b970101 100644
-> --- a/scripts/kconfig/menu.c
-> +++ b/scripts/kconfig/menu.c
-> @@ -597,7 +597,7 @@ static void get_prompt_str(struct gstr *r, struct property *prop,
->  }
->  
->  /*
-> - * get peoperty of type P_SYMBOL
-> + * get property of type P_SYMBOL
->   */
->  static struct property *get_symbol_prop(struct symbol *sym)
->  {
-> diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
-> index c9a6775..7caabdb 100644
-> --- a/scripts/kconfig/symbol.c
-> +++ b/scripts/kconfig/symbol.c
-> @@ -1047,7 +1047,7 @@ sym_re_search_free:
->   * When we check for recursive dependencies we use a stack to save
->   * current state so we can print out relevant info to user.
->   * The entries are located on the call stack so no need to free memory.
-> - * Note inser() remove() must always match to properly clear the stack.
-> + * Note insert() remove() must always match to properly clear the stack.
->   */
->  static struct dep_stack {
->  	struct dep_stack *prev, *next;
+BTW, regenerating the parser can be done with:
+    make REGENERATE_PARSERS=1 config
 
-Thanks,
+Regards,
+Yann E. MORIN.
+
+> > Signed-off-by: Martin Walch <walch.martin@web.de>
+> > ---
+> >  scripts/kconfig/zconf.l | 1 -
+> >  1 file changed, 1 deletion(-)
+> >
+> > diff --git a/scripts/kconfig/zconf.l b/scripts/kconfig/zconf.l
+> > index 6555a47..1a9f53e 100644
+> > --- a/scripts/kconfig/zconf.l
+> > +++ b/scripts/kconfig/zconf.l
+> > @@ -68,7 +68,6 @@ static void alloc_string(const char *str, int size)
+> >  }
+> >  %}
+> >  
+> > -ws	[ \n\t]
+> >  n	[A-Za-z0-9_]
+> >  
+> >  %%
+> 
+
 -- 
-Jean Delvare
-Suse L3
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +0/33 662376056 | Software  Designer | \ / CAMPAIGN     |   ^                |
+| --==< O_o >==-- '------------.-------:  X  AGAINST      |  /e\  There is no  |
+| http://ymorin.is-a-geek.org/ | (*_*) | / \ HTML MAIL    |  """  conspiracy.  |
+'------------------------------'-------'------------------'--------------------'
