@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.web.de ([212.227.15.3]:55950 "EHLO mout.web.de"
+Received: from mout.web.de ([212.227.17.11]:49975 "EHLO mout.web.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753089Ab3JBFYo (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 2 Oct 2013 01:24:44 -0400
+	id S1752928Ab3JBFYb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 2 Oct 2013 01:24:31 -0400
 Received: from tacticalops.localnet ([93.132.133.153]) by smtp.web.de
- (mrweb101) with ESMTPSA (Nemesis) id 0MgOL4-1VEfcK2UGE-00NgMC for
- <linux-kbuild@vger.kernel.org>; Wed, 02 Oct 2013 07:24:42 +0200
+ (mrweb101) with ESMTPSA (Nemesis) id 0MF3nL-1VbO4s1u5j-00GJCU for
+ <linux-kbuild@vger.kernel.org>; Wed, 02 Oct 2013 07:24:29 +0200
 From: Martin Walch <walch.martin@web.de>
-Subject: [PATCH 4/4] kconfig: remove unused definition from scanner
-Date: Wed, 02 Oct 2013 07:24:40 +0200
-Message-ID: <6249343.9Mjtul3lu5@tacticalops>
+Subject: [PATCH 2/4] kconfig: trivial: fix typos
+Date: Wed, 02 Oct 2013 07:24:27 +0200
+Message-ID: <1438881.BpsG90UED0@tacticalops>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7Bit
 Content-Type: text/plain; charset="UTF-8"
@@ -18,28 +18,57 @@ List-ID: <linux-kbuild.vger.kernel.org>
 Cc: Michal Marek <mmarek@suse.cz>, Jiri Kosina <trivial@kernel.org>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Arve =?ISO-8859-1?Q?Hj=F8nnev=E5g?= <arve@android.com>, Benjamin Poirier <bpoirier@suse.de>, Dirk Gouders <dirk@gouders.net>, Wang YanQing <udknight@gmail.com>, Andrew Morton <akpm@linux-foundation.org>, Jean Delvare <jdelvare@suse.de>, Kees Cook <keescook@chromium.org>, Alan Cox <alan@linux.intel.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
 From: Martin Walch <walch.martin@web.de>
-Date: Wed, 2 Oct 2013 06:58:46 +0200
-Subject: [PATCH 4/4] kconfig: remove unused definition from scanner
+Date: Wed, 2 Oct 2013 06:56:45 +0200
+Subject: [PATCH 2/4] kconfig: trivial: fix typos
 
-The definition ws [ \n\t] is not used anywhere. Drop it to avoid confusion.
+inser() -> insert(), tell -> tells, peoperty -> property
 
 Signed-off-by: Martin Walch <walch.martin@web.de>
 ---
- scripts/kconfig/zconf.l | 1 -
- 1 file changed, 1 deletion(-)
+ scripts/kconfig/mconf.c  | 2 +-
+ scripts/kconfig/menu.c   | 2 +-
+ scripts/kconfig/symbol.c | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/scripts/kconfig/zconf.l b/scripts/kconfig/zconf.l
-index 6555a47..1a9f53e 100644
---- a/scripts/kconfig/zconf.l
-+++ b/scripts/kconfig/zconf.l
-@@ -68,7 +68,6 @@ static void alloc_string(const char *str, int size)
+diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
+index 2c39631..39abdae 100644
+--- a/scripts/kconfig/mconf.c
++++ b/scripts/kconfig/mconf.c
+@@ -263,7 +263,7 @@ search_help[] = N_(
+ 	"    Press the key in the (#) prefix to jump directly to that\n"
+ 	"    location. You will be returned to the current search results\n"
+ 	"    after exiting this new menu.\n"
+-	"o The 'Selects:' line tell what symbol will be automatically\n"
++	"o The 'Selects:' line tells what symbols will be automatically\n"
+ 	"  selected if this symbol is selected (y or m)\n"
+ 	"o The 'Selected by' line tell what symbol has selected this symbol\n"
+ 	"\n"
+diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+index c1d5320..b970101 100644
+--- a/scripts/kconfig/menu.c
++++ b/scripts/kconfig/menu.c
+@@ -597,7 +597,7 @@ static void get_prompt_str(struct gstr *r, struct property *prop,
  }
- %}
  
--ws	[ \n\t]
- n	[A-Za-z0-9_]
- 
- %%
+ /*
+- * get peoperty of type P_SYMBOL
++ * get property of type P_SYMBOL
+  */
+ static struct property *get_symbol_prop(struct symbol *sym)
+ {
+diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
+index c9a6775..7caabdb 100644
+--- a/scripts/kconfig/symbol.c
++++ b/scripts/kconfig/symbol.c
+@@ -1047,7 +1047,7 @@ sym_re_search_free:
+  * When we check for recursive dependencies we use a stack to save
+  * current state so we can print out relevant info to user.
+  * The entries are located on the call stack so no need to free memory.
+- * Note inser() remove() must always match to properly clear the stack.
++ * Note insert() remove() must always match to properly clear the stack.
+  */
+ static struct dep_stack {
+ 	struct dep_stack *prev, *next;
 -- 
 1.8.1.5
 
