@@ -1,18 +1,17 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pb0-f48.google.com ([209.85.160.48]:45790 "EHLO
-	mail-pb0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752416Ab3JBFdu (ORCPT
+Received: from mail-pa0-f45.google.com ([209.85.220.45]:48388 "EHLO
+	mail-pa0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752614Ab3JBFhE (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 2 Oct 2013 01:33:50 -0400
-Received: by mail-pb0-f48.google.com with SMTP id ma3so396964pbc.21
-        for <linux-kbuild@vger.kernel.org>; Tue, 01 Oct 2013 22:33:50 -0700 (PDT)
-Date: Tue, 1 Oct 2013 22:33:48 -0700 (PDT)
+	Wed, 2 Oct 2013 01:37:04 -0400
+Received: by mail-pa0-f45.google.com with SMTP id rd3so544168pab.32
+        for <linux-kbuild@vger.kernel.org>; Tue, 01 Oct 2013 22:37:04 -0700 (PDT)
+Date: Tue, 1 Oct 2013 22:37:02 -0700 (PDT)
 From: David Rientjes <rientjes@google.com>
-Subject: Re: [PATCH 3/4] kconfig: adjust warning message for conflicting
- types
-In-Reply-To: <2865108.QhoiiS6j3s@tacticalops>
-Message-ID: <alpine.DEB.2.02.1310012230090.5682@chino.kir.corp.google.com>
-References: <2865108.QhoiiS6j3s@tacticalops>
+Subject: Re: [PATCH 1/4] kconfig: add short explanation to SYMBOL_WRITE
+In-Reply-To: <4542076.yVG8YKgu5r@tacticalops>
+Message-ID: <alpine.DEB.2.02.1310012236360.5682@chino.kir.corp.google.com>
+References: <4542076.yVG8YKgu5r@tacticalops>
 MIME-Version: 1.0
 Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -22,22 +21,18 @@ Cc: Michal Marek <mmarek@suse.cz>, Jiri Kosina <trivial@kernel.org>, "Yann E. MO
 
 On Wed, 2 Oct 2013, Martin Walch wrote:
 
-> diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
-> index b970101..e511df5 100644
-> --- a/scripts/kconfig/menu.c
-> +++ b/scripts/kconfig/menu.c
-> @@ -119,7 +119,7 @@ void menu_set_type(int type)
->  		sym->type = type;
->  		return;
->  	}
-> -	menu_warn(current_entry, "type of '%s' redefined from '%s' to '%s'",
-> +	menu_warn(current_entry, "type of '%s' not redefined from '%s' to '%s'",
->  	    sym->name ? sym->name : "<choice>",
->  	    sym_type_name(sym->type), sym_type_name(type));
->  }
+> diff --git a/scripts/kconfig/expr.h b/scripts/kconfig/expr.h
+> index df198a5..ba663e1 100644
+> --- a/scripts/kconfig/expr.h
+> +++ b/scripts/kconfig/expr.h
+> @@ -93,7 +93,7 @@ struct symbol {
+>  #define SYMBOL_CHOICEVAL  0x0020  /* used as a value in a choice block */
+>  #define SYMBOL_VALID      0x0080  /* set when symbol.curr is calculated */
+>  #define SYMBOL_OPTIONAL   0x0100  /* choice is optional - values can be 'n' */
+> -#define SYMBOL_WRITE      0x0200  /* ? */
+> +#define SYMBOL_WRITE      0x0200  /* write symbol to file (KCONFIG_CONFIG) */
+>  #define SYMBOL_CHANGED    0x0400  /* ? */
+>  #define SYMBOL_AUTO       0x1000  /* value from environment variable */
+>  #define SYMBOL_CHECKED    0x2000  /* used during dependency checking */
 
-The warning is stating that the symbol was attempted to be redefined from 
-one type to another, not that it was successful, so I don't think this 
-patch actually helps make anything clearer.  (gcc warns when a symbol is 
-redefined by saying "redefintion of `blah`".)  Perhaps include that the 
-redefinition was ignored?
+Perhaps stating that the choice is writable by the user?
