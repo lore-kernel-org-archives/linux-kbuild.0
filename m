@@ -1,133 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-we0-f177.google.com ([74.125.82.177]:35948 "EHLO
-	mail-we0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755454Ab3JCWCy (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 3 Oct 2013 18:02:54 -0400
-Received: by mail-we0-f177.google.com with SMTP id t60so3426025wes.8
-        for <linux-kbuild@vger.kernel.org>; Thu, 03 Oct 2013 15:02:52 -0700 (PDT)
-Date: Fri, 4 Oct 2013 00:02:48 +0200
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH] kconfig: fix allmodconfig
-Message-ID: <20131003220248.GA17186@free.fr>
-References: <1379805443-10945-1-git-send-email-yann.morin.1998@free.fr>
- <20130921232102.GC3221@free.fr>
- <20130926213621.GF3418@free.fr>
- <52455BA2.2020805@suse.cz>
- <524C8242.2080405@suse.cz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <524C8242.2080405@suse.cz>
+Received: from cantor2.suse.de ([195.135.220.15]:46979 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751244Ab3JDHDg (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 4 Oct 2013 03:03:36 -0400
+Subject: Re: [PATCH v2 2/5] kconfig: fix trivial typos and update mconf
+ documentation
+From: Jean Delvare <jdelvare@suse.de>
+In-Reply-To: <7686213.7MfDICRPAE@tacticalops>
+References: <7686213.7MfDICRPAE@tacticalops>
+Content-Type: text/plain; charset="UTF-8"
+Date: Fri, 04 Oct 2013 09:02:49 +0200
+Message-ID: <1380870169.4598.1.camel@chaos.site>
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, Stephen Rothwell <sfr@canb.auug.org.au>, Sam Ravnborg <sam@ravnborg.org>
+To: Martin Walch <walch.martin@web.de>
+Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Arve =?ISO-8859-1?Q?Hj=F8nnev=E5g?= <arve@android.com>, Jiri Kosina <trivial@kernel.org>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Benjamin Poirier <bpoirier@suse.de>, Dirk Gouders <dirk@gouders.net>, Wang YanQing <udknight@gmail.com>, Andrew Morton <akpm@linux-foundation.org>, Kees Cook <keescook@chromium.org>, linux-kernel@vger.kernel.org
 
-Michal, All,
+Hi Martin,
 
-On 2013-10-02 22:29 +0200, Michal Marek spake thusly:
-> Dne 27.9.2013 12:19, Michal Marek napsal(a):
-> > On 26.9.2013 23:36, Yann E. MORIN wrote:
-> >> Hello All!
-> >>
-> >> On 2013-09-22 01:21 +0200, Yann E. MORIN spake thusly:
-> >>> Stephen, All,
-> >>>
-> >>> Please, test this patch to fix the allmodconfig issue reported by
-> >>> Stephen.
-> >>>
-> >>> From my little testing (some randconfig followed by silentoldconfig, as
-> >>> well as allmodconfig), this patch seems to fix the issue without any
-> >>> regression I could ientify.
-> >>>
-> >>> But since this is sensitive code, I'd like some feedback before this
-> >>> gets applied.
-> >>
-> >> Ping? :-)
-> >>
-> >> I wanted to push this right after -rc3 is out. If any one has an issue
-> >> with that patch, you've got a few days to chime in! ;-)
-> > 
-> > It works for me, you can add my Tested-by: if you like. The only issue I
-> > have is that a more verbose changelog is missing.
+Le Thursday 03 October 2013 à 19:24 +0200, Martin Walch a écrit :
+> From: Martin Walch <walch.martin@web.de>
+> Date: Thu, 3 Oct 2013 17:28:14 +0200
+> Subject: [PATCH v2 2/5] kconfig: fix trivial typos and update mconf documentation
 > 
-> Sorry, I have to retract my Tested-by. When I merge your rc-fixes branch
-> into 3.12-rc1, I get this behavior:
+> This fixes lots of typos in comments and strings.
 > 
-> $ make mrproper
-> $ make allmodconfig
-> ...
-> scripts/kconfig/conf --allmodconfig Kconfig
-> #
-> # configuration written to .config
-> #$ make silentoldconfig
-> scripts/kconfig/conf --silentoldconfig Kconfig
-> *
-> * Restart config...
-> *
-> (this should not happen)
-> *
-> * PHY Device support and infrastructure
-> *
-> PHY Device support and infrastructure (PHYLIB) [Y/?] y
->   *
->   * MII PHY device drivers
->   *
->   Drivers for Atheros AT803X PHYs (AT803X_PHY) [M/n/y/?] m
->   Drivers for the AMD PHYs (AMD_PHY) [M/n/y/?] m
->   Drivers for Marvell PHYs (MARVELL_PHY) [M/n/y/?] m
->   Drivers for Davicom PHYs (DAVICOM_PHY) [M/n/y/?] m
->   Drivers for Quality Semiconductor PHYs (QSEMI_PHY) [M/n/y/?] m
->   Drivers for the Intel LXT PHYs (LXT_PHY) [M/n/y/?] m
->   Drivers for the Cicada PHYs (CICADA_PHY) [M/n/y/?] m
->   Drivers for the Vitesse PHYs (VITESSE_PHY) [M/n/y/?] m
->   Drivers for SMSC PHYs (SMSC_PHY) [M/y/?] m
->   Drivers for Broadcom PHYs (BROADCOM_PHY) [M/n/y/?] m
->   Driver for Broadcom BCM8706 and BCM8727 PHYs (BCM87XX_PHY) [M/n/y/?] m
->   Drivers for ICPlus PHYs (ICPLUS_PHY) [M/n/y/?] m
->   Drivers for Realtek PHYs (REALTEK_PHY) [M/n/y/?] m
->   Drivers for National Semiconductor PHYs (NATIONAL_PHY) [M/n/y/?] m
->   Driver for STMicroelectronics STe10Xp PHYs (STE10XP) [M/n/y/?] m
->   Driver for LSI ET1011C PHY (LSI_ET1011C_PHY) [M/n/y/?] m
->   Driver for Micrel PHYs (MICREL_PHY) [M/n/y/?] m
->   Driver for MDIO Bus/PHY emulation with fixed speed/link PHYs
-> (FIXED_PHY) [N/y/?] (NEW)
+> It also updates the documentation strings in mconf to reflect the changes in
+> the user interface from the two commits
 > 
-> The .config generated by make allmodconfig is identical to a .config
-> generated with plain v3.12-rc1 and thus correct. It's (silent)oldconfig
-> that has a problem.
+> 6364fd0cb1e4c7f72b974613e0cf5744ae4d2cb2
+>   menuconfig: Add Save/Load buttons
+> 1bdbac478a858d2aa73a6784c7c2e09de0f6d06b
+>   menuconfig: Get rid of the top-level entries for "Load an Alternate/Save an Alternate"
+> 
+> And it updates the layout of the example search result, i. e. moves down the
+> "Defined at" and "Depends on" lines and adds a symbol state ([=n]) to the
+> symbol in the "Selected by" line.
+> 
+> Furthermore, the help texts now should fit in 80 columns again when viewed
+> in mconf.
+> 
+> Signed-off-by: Martin Walch <walch.martin@web.de>
 
-Doh... :-(
+Looks good to me.
 
-I've played with this a bit, and I noticed that if you do:
-    $ git clean -dX; git clean -d    # Make sure tree is clean
-    $ make allmodconfig
-    $ grep PHYLIB= .config
-    CONFIG_PHYLIB=m
-    $ make menuconfig
-        Device Drivers  -->
-          Network device support  -->
-            -*-  PHY Device support and infrastructure  -->
-
-Notice how "PHY Device support and infrastructure" is forced to 'y', not
-'m'. This is expected, because it is selected by (there are other terms
-in the equation that also force it to 'y'):
-    ETHOC [=y] && NETDEVICES [=y] && ETHERNET [=y]
-    && HAS_IOMEM [=y] && HAS_DMA [=y]
-
-Hence, what we see is that "make allmodconfig" does not properly resolve
-the symbols values.
-
-I'll tackle this, but it may take some time...
-
-Regards,
-Yann E. MORIN.
+Reviewed-by: Jean Delvare <jdelvare@suse.de>
 
 -- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+Jean Delvare
+Suse L3
+
