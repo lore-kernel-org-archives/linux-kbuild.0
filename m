@@ -1,48 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pd0-f179.google.com ([209.85.192.179]:49156 "EHLO
-	mail-pd0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754024Ab3JDOTE (ORCPT
+Received: from mail-pd0-f180.google.com ([209.85.192.180]:42879 "EHLO
+	mail-pd0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754970Ab3JDOZz (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 4 Oct 2013 10:19:04 -0400
-Date: Fri, 4 Oct 2013 22:18:24 +0800
+	Fri, 4 Oct 2013 10:25:55 -0400
+Date: Fri, 4 Oct 2013 22:25:29 +0800
 From: Wang YanQing <udknight@gmail.com>
-Subject: Re: [PATCH v2 2/5] kconfig: fix trivial typos and update mconf
- documentation
-Message-ID: <20131004141824.GA3040@udknight>
-References: <7686213.7MfDICRPAE@tacticalops>
+Subject: Re: [PATCH v2 3/5] kconfig: adjust warning message for conflicting
+ types
+Message-ID: <20131004142529.GA5224@udknight>
+References: <5367004.amEGKp5Frc@tacticalops>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <7686213.7MfDICRPAE@tacticalops>
+In-Reply-To: <5367004.amEGKp5Frc@tacticalops>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Martin Walch <walch.martin@web.de>
 Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Arve =?iso-8859-1?B?SGr4bm5lduVn?= <arve@android.com>, Jiri Kosina <trivial@kernel.org>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Benjamin Poirier <bpoirier@suse.de>, Dirk Gouders <dirk@gouders.net>, Andrew Morton <akpm@linux-foundation.org>, Jean Delvare <jdelvare@suse.de>, Kees Cook <keescook@chromium.org>, linux-kernel@vger.kernel.org
 
-On Thu, Oct 03, 2013 at 07:24:29PM +0200, Martin Walch wrote:
+On Thu, Oct 03, 2013 at 07:24:46PM +0200, Martin Walch wrote:
 > From: Martin Walch <walch.martin@web.de>
-> Date: Thu, 3 Oct 2013 17:28:14 +0200
-> Subject: [PATCH v2 2/5] kconfig: fix trivial typos and update mconf documentation
+> Date: Thu, 3 Oct 2013 18:32:02 +0200
+> Subject: [PATCH v2 3/5] kconfig: adjust warning message for conflicting types
 > 
-> This fixes lots of typos in comments and strings.
+> Each symbol must have exactly one type assigned. However, if a symbol happens
+> to have two different types assigned at runtime, a warning is printed and the
+> first type is preserved while the second type is being ignored.
 > 
-> It also updates the documentation strings in mconf to reflect the changes in
-> the user interface from the two commits
+> The warning message says
 > 
-> 6364fd0cb1e4c7f72b974613e0cf5744ae4d2cb2
->   menuconfig: Add Save/Load buttons
-> 1bdbac478a858d2aa73a6784c7c2e09de0f6d06b
->   menuconfig: Get rid of the top-level entries for "Load an Alternate/Save an Alternate"
+> type of <symbol name> redefined from <first type> to <second type>
 > 
-> And it updates the layout of the example search result, i. e. moves down the
-> "Defined at" and "Depends on" lines and adds a symbol state ([=n]) to the
-> symbol in the "Selected by" line.
+> which may be misleading as it may create the impression that the second type
+> replaces the first type.
 > 
-> Furthermore, the help texts now should fit in 80 columns again when viewed
-> in mconf.
+> This patch clarifies this by changing the warning to
+> 
+> ignoring type redefinition of <symbol name> from <first type> to <second type>
 > 
 > Signed-off-by: Martin Walch <walch.martin@web.de>
 
-Reviewed-by: Wang YanQing <udknight@gmail.com>
-
-Thanks, I like it. :)
+Acked-by: Wang YanQing <udknight@gmail.com>
