@@ -1,44 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pd0-f180.google.com ([209.85.192.180]:42879 "EHLO
-	mail-pd0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754970Ab3JDOZz (ORCPT
+Received: from caramon.arm.linux.org.uk ([78.32.30.218]:40549 "EHLO
+	caramon.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751600Ab3JENRr (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 4 Oct 2013 10:25:55 -0400
-Date: Fri, 4 Oct 2013 22:25:29 +0800
-From: Wang YanQing <udknight@gmail.com>
-Subject: Re: [PATCH v2 3/5] kconfig: adjust warning message for conflicting
- types
-Message-ID: <20131004142529.GA5224@udknight>
-References: <5367004.amEGKp5Frc@tacticalops>
+	Sat, 5 Oct 2013 09:17:47 -0400
+Date: Sat, 5 Oct 2013 14:17:06 +0100
+From: Russell King - ARM Linux <linux@arm.linux.org.uk>
+Subject: Bug: kbuild always rebuilds compressed images on ARM
+Message-ID: <20131005131706.GY12758@n2100.arm.linux.org.uk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5367004.amEGKp5Frc@tacticalops>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Martin Walch <walch.martin@web.de>
-Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Arve =?iso-8859-1?B?SGr4bm5lduVn?= <arve@android.com>, Jiri Kosina <trivial@kernel.org>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Benjamin Poirier <bpoirier@suse.de>, Dirk Gouders <dirk@gouders.net>, Andrew Morton <akpm@linux-foundation.org>, Jean Delvare <jdelvare@suse.de>, Kees Cook <keescook@chromium.org>, linux-kernel@vger.kernel.org
+To: linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org
 
-On Thu, Oct 03, 2013 at 07:24:46PM +0200, Martin Walch wrote:
-> From: Martin Walch <walch.martin@web.de>
-> Date: Thu, 3 Oct 2013 18:32:02 +0200
-> Subject: [PATCH v2 3/5] kconfig: adjust warning message for conflicting types
-> 
-> Each symbol must have exactly one type assigned. However, if a symbol happens
-> to have two different types assigned at runtime, a warning is printed and the
-> first type is preserved while the second type is being ignored.
-> 
-> The warning message says
-> 
-> type of <symbol name> redefined from <first type> to <second type>
-> 
-> which may be misleading as it may create the impression that the second type
-> replaces the first type.
-> 
-> This patch clarifies this by changing the warning to
-> 
-> ignoring type redefinition of <symbol name> from <first type> to <second type>
-> 
-> Signed-off-by: Martin Walch <walch.martin@web.de>
+Hi,
 
-Acked-by: Wang YanQing <udknight@gmail.com>
+I've noticed that kbuild always rebuilds the compressed piggy image
+on ARM.  Here's the output from running make with V=2:
+
+  CALL    /home/rmk/git/linux-rmk/scripts/checksyscalls.sh - due to target missing
+  CHK     include/generated/compile.h
+  Kernel: arch/arm/boot/Image is ready
+  Building modules, stage 2.
+  LZO     arch/arm/boot/compressed/piggy.lzo - due to command line change
+  MODPOST 17 modules - due to target is PHONY
+  AS      arch/arm/boot/compressed/piggy.lzo.o - due to: arch/arm/boot/compressed/piggy.lzo
+  LD      arch/arm/boot/compressed/vmlinux - due to: arch/arm/boot/compressed/piggy.lzo.o
+  OBJCOPY arch/arm/boot/zImage - due to: arch/arm/boot/compressed/vmlinux
+  Kernel: arch/arm/boot/zImage is ready
+
+and with V=1:
+
+...
+make -f /home/rmk/git/linux-rmk/scripts/Makefile.build obj=arch/arm/boot/compressed arch/arm/boot/compressed/vmlinux
+make -f /home/rmk/git/linux-rmk/scripts/Makefile.modpost
+  find .tmp_versions -name '*.mod' | xargs -r grep -h '\.ko$' | sort -u | sed 's/\.ko$/.o/' | scripts/mod/modpost -m -a -o /home/rmk/git/build/imx6/Module.symvers    -S  -s -T -
+  (cat arch/arm/boot/compressed/../Image | lzop -9 && printf \\010\\224\\034\\002) > arch/arm/boot/compressed/piggy.lzo || (rm -f arch/arm/boot/compressed/piggy.lzo ; false)
+make -f /home/rmk/git/linux-rmk/scripts/Makefile.fwinst obj=firmware __fw_modbuild
+...
+
+The arch/arm/boot/compressed/.piggy.lzo.cmd file contains this:
+
+cmd_arch/arm/boot/compressed/piggy.lzo := (cat arch/arm/boot/compressed/../Image | lzop -9 && printf \\\\010\\\\224\\\\034\\\\002) > arch/arm/boot/compressed/piggy.lzo || (rm -f arch/arm/boot/compressed/piggy.lzo ; false)
+
+Any ideas why it thinks that the command has changed?
+
+Thanks.
