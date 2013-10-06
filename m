@@ -1,87 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:50563 "EHLO
+Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:50574 "EHLO
 	shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751203Ab3JFREK (ORCPT
+	by vger.kernel.org with ESMTP id S1751203Ab3JFRFR (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 6 Oct 2013 13:04:10 -0400
-Message-ID: <1381079041.2788.25.camel@deadeye.wl.decadent.org.uk>
-Subject: [PATCH 1/2] deb-pkg: Add automatic support for armhf architecture
+	Sun, 6 Oct 2013 13:05:17 -0400
+Message-ID: <1381079114.2788.26.camel@deadeye.wl.decadent.org.uk>
+Subject: [PATCH 2/2] deb-pkg: Add automatic support for s390x architecture
 From: Ben Hutchings <ben@decadent.org.uk>
-Date: Sun, 06 Oct 2013 18:04:01 +0100
+Date: Sun, 06 Oct 2013 18:05:14 +0100
 Content-Type: multipart/signed; micalg="pgp-sha512";
-	protocol="application/pgp-signature"; boundary="=-Vg2phR3MjFsEfTSZAeRS"
+	protocol="application/pgp-signature"; boundary="=-XWenwoVHp5uKclUa50YW"
 Mime-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild <linux-kbuild@vger.kernel.org>
-Cc: maximilian attems <max@stro.at>, Michal Marek <mmarek@suse.cz>, Fathi Boudra <fathi.boudra@linaro.org>, debian-arm@lists.debian.org
+Cc: maximilian attems <max@stro.at>, Michal Marek <mmarek@suse.cz>, debian-s390@lists.debian.org
 
 
---=-Vg2phR3MjFsEfTSZAeRS
+--=-XWenwoVHp5uKclUa50YW
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-The Debian armhf architecture uses the ARM EABI hard-float variant,
-whereas armel uses the soft-float variant.  Although the kernel
-doesn't use FP itself, CONFIG_VFP must be enabled to support
-hard-float userland and will probably be disabled when supporting a
-soft-float userland.  So set the architecture to armhf by default when
-CONFIG_AEABI and CONFIG_VFP are both enabled.
+The Debian s390x architecture has 64-bit userland whereas s390 has
+32-bit userland.  A 64-bit kernel can be used with either.  Now that
+Debian supports multiarch and officially supports s390x, it makes more
+sense to assign a 64-bit kernel package to s390x.
 
 Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
 ---
- scripts/package/builddeb | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+ scripts/package/builddeb | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index 90e521f..e14c56e 100644
+index e14c56e..25c5abd 100644
 --- a/scripts/package/builddeb
 +++ b/scripts/package/builddeb
-@@ -43,7 +43,16 @@ create_package() {
- 	mips*)
- 		debarch=3Dmips$(grep -q CPU_LITTLE_ENDIAN=3Dy $KCONFIG_CONFIG && echo el=
-) ;;
- 	arm*)
--		debarch=3Darm$(grep -q CONFIG_AEABI=3Dy $KCONFIG_CONFIG && echo el) ;;
-+		if grep -q CONFIG_AEABI=3Dy $KCONFIG_CONFIG; then
-+		    if grep -q CONFIG_VFP=3Dy $KCONFIG_CONFIG; then
-+			debarch=3Darmhf
-+		    else
-+			debarch=3Darmel
-+		    fi
-+		else
-+		    debarch=3Darm
-+		fi
-+		;;
- 	*)
- 		echo "" >&2
- 		echo "** ** **  WARNING  ** ** **" >&2
-
+@@ -35,7 +35,7 @@ create_package() {
+ 	sparc*)
+ 		debarch=3Dsparc ;;
+ 	s390*)
+-		debarch=3Ds390 ;;
++		debarch=3Ds390$(grep -q CONFIG_64BIT=3Dy $KCONFIG_CONFIG && echo x) ;;
+ 	ppc*)
+ 		debarch=3Dpowerpc ;;
+ 	parisc*)
 
 --=20
 Ben Hutchings
 Who are all these weirdos? - David Bowie, reading IRC for the first time
 
---=-Vg2phR3MjFsEfTSZAeRS
+--=-XWenwoVHp5uKclUa50YW
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: This is a digitally signed message part
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1.4.14 (GNU/Linux)
 
-iQIVAwUAUlGYAee/yOyVhhEJAQosYxAAuWiDEfanAkRpuFcOu8gd/4EQlu4WKi+t
-5jEOb8AtHRfKXpGA5A/BCpfvPbZQFBXgE9NsO6wSJ/YIkg+iyq++xDfGTI9ZkD04
-3MKHLMwhN5r7E3XeVjXeRGE5H08dNftoXGoRUT0AMv80UlRwOpHC/5V7Gfp4UQdo
-8WnLqM1bEBeI8WKdKqxt4iwmXzSHRDEh9Yx48eKQYMhFK2DtlIh6i2kwPEcVmrKx
-b24niYj7GTlhs7AQ6fQDdhMIKgPbNrbLqrRz7dAa46+FhA++w5PiBqcMeXm4CSu5
-q8ni08K+Qs5V2XeBiBErTYFCz5eh04bYcBaPcnkNxtXu/jg0LytKhLBfwZvEEvK1
-oxCIl8b4X1ut+wnF+V7wF+WUpgtpb9G6piV+8ehOlZL9nwEzOqZGgs+E3axHG0zV
-rweKJHoTvZgNUc6biw/zyrd8zR0QIH3oc6YNdtIwYhHSpRoVxowXUlGa5Gk/qaJo
-en9oEJgnvGNV5bxT8yA2XXBpL7t2qHKYvSh6r/7Gdb4Ffi2mVt2e8MJvHpgZmR1k
-knuNNWOYJXbIn5m51M1wymLEGStWfMEIybdOFspZ54alZqUH6/wYqEUoFKsaM9kn
-i0izXD9fwKr7mqC07kxshYkVthOUnZmzyq01qhRuhYMcIaqbcldazM6DNKnx3ZOP
-UCNGjk5GCPk=
-=Hjhl
+iQIVAwUAUlGYSue/yOyVhhEJAQrsQg//aT0xrtzImoAM5rq4h9BEHlhwKQrfRWlR
+oYxevOEsqBC/7nBEfqoUkOIGc+xIEgXh9nktx9y2atf8OSba7uepMvp/MlxvFtlj
+FvNs8Zuu20whBso8EY5q3FiClenpu3XBcm4EKVCs/J3kp3qyOH1xTpJR1/6UqXQ6
+7MTM2XgOVkF0mIJLBMKWYV1cmu/q0VDSim7pe8zqRZAjEkQkqnfw0dt+kSoF7PdM
+joKZo9xQ5Knu6ARJB6aqckRJ0RUt7xMX67yP9dZIKL4WB8lot7J+aLEB0cU5KibY
+HHKbZOOCzhwAqYAosJE62AVgIK5X1C6GA5OR3/eMuM88eretneepZAh8nkDXbHtd
+KO5S/RN4aT408d7baF/C+znPrfDz2eSTcIXhHu+NKvKT3PBHEEvZvtMaMobtZV7r
+E1X7+pZKT1gtR4ydi8zfl7Y/Vg8UTXel15iqOIAKr0fUmT2wy3NIn9vuqZHMuiU+
+sVnG8mGzGP70unyLL9zf9vbqh8rj+zp8NcNSktqPzc63MA9TPxABkSee/xVqvfmU
+NYr0R21PgnVWd0dfS4kaPD3qKOGoI8sfZ9iSIgJteiefBxgKLegbdwl9WiGVmGN5
++QbJtq4A6S7wyurSCd3+S3n8hgXbKNDtxYHVKFbX5NvqtLdvq8h1iu4c/JLk5BsU
+bgN31lSWlsk=
+=RF13
 -----END PGP SIGNATURE-----
 
---=-Vg2phR3MjFsEfTSZAeRS--
+--=-XWenwoVHp5uKclUa50YW--
