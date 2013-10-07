@@ -1,64 +1,80 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-la0-f52.google.com ([209.85.215.52]:51150 "EHLO
-	mail-la0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752293Ab3JGPBz (ORCPT
+Received: from smtp.codeaurora.org ([198.145.11.231]:59464 "EHLO
+	smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751995Ab3JGUDO (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 7 Oct 2013 11:01:55 -0400
-Received: by mail-la0-f52.google.com with SMTP id ev20so5597151lab.39
-        for <linux-kbuild@vger.kernel.org>; Mon, 07 Oct 2013 08:01:53 -0700 (PDT)
+	Mon, 7 Oct 2013 16:03:14 -0400
+Message-ID: <52531381.8070607@codeaurora.org>
+Date: Mon, 07 Oct 2013 13:03:13 -0700
+From: Stephen Boyd <sboyd@codeaurora.org>
 MIME-Version: 1.0
-In-Reply-To: <1381079041.2788.25.camel@deadeye.wl.decadent.org.uk>
-References: <1381079041.2788.25.camel@deadeye.wl.decadent.org.uk>
-Date: Mon, 7 Oct 2013 18:01:52 +0300
-Message-ID: <CAGNsrLCWnS_DDm3GonPx9c9Pv2Qv9s6SLE=i=8vNyy7xYCuh-w@mail.gmail.com>
-Subject: Re: [PATCH 1/2] deb-pkg: Add automatic support for armhf architecture
-From: Fathi Boudra <fathi.boudra@linaro.org>
+Subject: Re: Bug: kbuild always rebuilds compressed images on ARM
+References: <20131005131706.GY12758@n2100.arm.linux.org.uk>
+In-Reply-To: <20131005131706.GY12758@n2100.arm.linux.org.uk>
 Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ben Hutchings <ben@decadent.org.uk>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, maximilian attems <max@stro.at>, Michal Marek <mmarek@suse.cz>, debian-arm@lists.debian.org
+To: Russell King - ARM Linux <linux@arm.linux.org.uk>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org
 
-On 6 October 2013 20:04, Ben Hutchings <ben@decadent.org.uk> wrote:
-> The Debian armhf architecture uses the ARM EABI hard-float variant,
-> whereas armel uses the soft-float variant.  Although the kernel
-> doesn't use FP itself, CONFIG_VFP must be enabled to support
-> hard-float userland and will probably be disabled when supporting a
-> soft-float userland.  So set the architecture to armhf by default when
-> CONFIG_AEABI and CONFIG_VFP are both enabled.
+On 10/05/13 06:17, Russell King - ARM Linux wrote:
+> Hi,
 >
-> Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+> I've noticed that kbuild always rebuilds the compressed piggy image
+> on ARM.  Here's the output from running make with V=2:
+>
+>   CALL    /home/rmk/git/linux-rmk/scripts/checksyscalls.sh - due to target missing
+>   CHK     include/generated/compile.h
+>   Kernel: arch/arm/boot/Image is ready
+>   Building modules, stage 2.
+>   LZO     arch/arm/boot/compressed/piggy.lzo - due to command line change
+>   MODPOST 17 modules - due to target is PHONY
+>   AS      arch/arm/boot/compressed/piggy.lzo.o - due to: arch/arm/boot/compressed/piggy.lzo
+>   LD      arch/arm/boot/compressed/vmlinux - due to: arch/arm/boot/compressed/piggy.lzo.o
+>   OBJCOPY arch/arm/boot/zImage - due to: arch/arm/boot/compressed/vmlinux
+>   Kernel: arch/arm/boot/zImage is ready
+>
+> and with V=1:
+>
+> ...
+> make -f /home/rmk/git/linux-rmk/scripts/Makefile.build obj=arch/arm/boot/compressed arch/arm/boot/compressed/vmlinux
+> make -f /home/rmk/git/linux-rmk/scripts/Makefile.modpost
+>   find .tmp_versions -name '*.mod' | xargs -r grep -h '\.ko$' | sort -u | sed 's/\.ko$/.o/' | scripts/mod/modpost -m -a -o /home/rmk/git/build/imx6/Module.symvers    -S  -s -T -
+>   (cat arch/arm/boot/compressed/../Image | lzop -9 && printf \\010\\224\\034\\002) > arch/arm/boot/compressed/piggy.lzo || (rm -f arch/arm/boot/compressed/piggy.lzo ; false)
 
-Acked-by: Fathi Boudra <fathi.boudra@linaro.org>
+There are double slashes here '\\'
 
-> ---
->  scripts/package/builddeb | 11 ++++++++++-
->  1 file changed, 10 insertions(+), 1 deletion(-)
+> make -f /home/rmk/git/linux-rmk/scripts/Makefile.fwinst obj=firmware __fw_modbuild
+> ...
 >
-> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-> index 90e521f..e14c56e 100644
-> --- a/scripts/package/builddeb
-> +++ b/scripts/package/builddeb
-> @@ -43,7 +43,16 @@ create_package() {
->         mips*)
->                 debarch=mips$(grep -q CPU_LITTLE_ENDIAN=y $KCONFIG_CONFIG && echo el) ;;
->         arm*)
-> -               debarch=arm$(grep -q CONFIG_AEABI=y $KCONFIG_CONFIG && echo el) ;;
-> +               if grep -q CONFIG_AEABI=y $KCONFIG_CONFIG; then
-> +                   if grep -q CONFIG_VFP=y $KCONFIG_CONFIG; then
-> +                       debarch=armhf
-> +                   else
-> +                       debarch=armel
-> +                   fi
-> +               else
-> +                   debarch=arm
-> +               fi
-> +               ;;
->         *)
->                 echo "" >&2
->                 echo "** ** **  WARNING  ** ** **" >&2
+> The arch/arm/boot/compressed/.piggy.lzo.cmd file contains this:
 >
+> cmd_arch/arm/boot/compressed/piggy.lzo := (cat arch/arm/boot/compressed/../Image | lzop -9 && printf \\\\010\\\\224\\\\034\\\\002) > arch/arm/boot/compressed/piggy.lzo || (rm -f arch/arm/boot/compressed/piggy.lzo ; false)
+
+But then there are quadruple slashes here '\\\\'. That seems to be
+causing kbuild to rebuild each time.
+
 >
-> --
-> Ben Hutchings
-> Who are all these weirdos? - David Bowie, reading IRC for the first time
+> Any ideas why it thinks that the command has changed?
+
+This hack seems to work, but I'm not convinced it's the right solution.
+
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index 547e15d..bfc0b79 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -209,7 +209,7 @@ endif
+ # >$< substitution to preserve $ when reloading .cmd file
+ # note: when using inline perl scripts [perl -e '...$$t=1;...']
+ # in $(cmd_xxx) double $$ your perl vars
+-make-cmd = $(subst \\,\\\\,$(subst \#,\\\#,$(subst $$,$$$$,$(call escsq,$(cmd_$(1))))))
++make-cmd = $(subst \#,\\\#,$(subst $$,$$$$,$(call escsq,$(cmd_$(1)))))
+ 
+ # Find any prerequisites that is newer than target or that does not exist.
+ # PHONY targets skipped in both cases.
+
+-- 
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum,
+hosted by The Linux Foundation
+
