@@ -1,80 +1,82 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.codeaurora.org ([198.145.11.231]:59464 "EHLO
-	smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751995Ab3JGUDO (ORCPT
+Received: from mail-lb0-f174.google.com ([209.85.217.174]:62214 "EHLO
+	mail-lb0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751586Ab3JHAXt convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 7 Oct 2013 16:03:14 -0400
-Message-ID: <52531381.8070607@codeaurora.org>
-Date: Mon, 07 Oct 2013 13:03:13 -0700
-From: Stephen Boyd <sboyd@codeaurora.org>
+	Mon, 7 Oct 2013 20:23:49 -0400
+Received: by mail-lb0-f174.google.com with SMTP id w6so6151225lbh.19
+        for <linux-kbuild@vger.kernel.org>; Mon, 07 Oct 2013 17:23:48 -0700 (PDT)
 MIME-Version: 1.0
-Subject: Re: Bug: kbuild always rebuilds compressed images on ARM
-References: <20131005131706.GY12758@n2100.arm.linux.org.uk>
-In-Reply-To: <20131005131706.GY12758@n2100.arm.linux.org.uk>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <1381079041.2788.25.camel@deadeye.wl.decadent.org.uk>
+References: <1381079041.2788.25.camel@deadeye.wl.decadent.org.uk>
+Date: Tue, 8 Oct 2013 02:23:48 +0200
+Message-ID: <CAODfWeFOB8ciUUTkdFn7_TUELVQC48XCC1oz+aYhZotewDtqzA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] deb-pkg: Add automatic support for armhf architecture
+From: Hector Oron <hector.oron@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Russell King - ARM Linux <linux@arm.linux.org.uk>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org
+To: Ben Hutchings <ben@decadent.org.uk>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, maximilian attems <max@stro.at>, Michal Marek <mmarek@suse.cz>, Fathi Boudra <fathi.boudra@linaro.org>, Debian ARM <debian-arm@lists.debian.org>
 
-On 10/05/13 06:17, Russell King - ARM Linux wrote:
-> Hi,
->
-> I've noticed that kbuild always rebuilds the compressed piggy image
-> on ARM.  Here's the output from running make with V=2:
->
->   CALL    /home/rmk/git/linux-rmk/scripts/checksyscalls.sh - due to target missing
->   CHK     include/generated/compile.h
->   Kernel: arch/arm/boot/Image is ready
->   Building modules, stage 2.
->   LZO     arch/arm/boot/compressed/piggy.lzo - due to command line change
->   MODPOST 17 modules - due to target is PHONY
->   AS      arch/arm/boot/compressed/piggy.lzo.o - due to: arch/arm/boot/compressed/piggy.lzo
->   LD      arch/arm/boot/compressed/vmlinux - due to: arch/arm/boot/compressed/piggy.lzo.o
->   OBJCOPY arch/arm/boot/zImage - due to: arch/arm/boot/compressed/vmlinux
->   Kernel: arch/arm/boot/zImage is ready
->
-> and with V=1:
->
-> ...
-> make -f /home/rmk/git/linux-rmk/scripts/Makefile.build obj=arch/arm/boot/compressed arch/arm/boot/compressed/vmlinux
-> make -f /home/rmk/git/linux-rmk/scripts/Makefile.modpost
->   find .tmp_versions -name '*.mod' | xargs -r grep -h '\.ko$' | sort -u | sed 's/\.ko$/.o/' | scripts/mod/modpost -m -a -o /home/rmk/git/build/imx6/Module.symvers    -S  -s -T -
->   (cat arch/arm/boot/compressed/../Image | lzop -9 && printf \\010\\224\\034\\002) > arch/arm/boot/compressed/piggy.lzo || (rm -f arch/arm/boot/compressed/piggy.lzo ; false)
+Hello,
 
-There are double slashes here '\\'
+2013/10/6 Ben Hutchings <ben@decadent.org.uk>:
+> The Debian armhf architecture uses the ARM EABI hard-float variant,
+> whereas armel uses the soft-float variant.  Although the kernel
+> doesn't use FP itself, CONFIG_VFP must be enabled to support
+> hard-float userland and will probably be disabled when supporting a
+> soft-float userland.  So set the architecture to armhf by default when
+> CONFIG_AEABI and CONFIG_VFP are both enabled.
 
-> make -f /home/rmk/git/linux-rmk/scripts/Makefile.fwinst obj=firmware __fw_modbuild
-> ...
+Debian armel userland can be run on any device, so it is suggested to
+better rely on toolchain configuration rather than kernel config
+symbols.
+
+For arm-gnueabi(hf) toolchain something like:
+  $ gcc -dumpspecs | grep multilib_defaults -A2 | grep -q soft && echo
+"This is armel"
+  $ gcc -dumpspecs | grep multilib_defaults -A2 | grep -q hard && echo
+"This is armhf"
+could be checked instead.
+
+Best regards
+
+> Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+> ---
+>  scripts/package/builddeb | 11 ++++++++++-
+>  1 file changed, 10 insertions(+), 1 deletion(-)
 >
-> The arch/arm/boot/compressed/.piggy.lzo.cmd file contains this:
+> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+> index 90e521f..e14c56e 100644
+> --- a/scripts/package/builddeb
+> +++ b/scripts/package/builddeb
+> @@ -43,7 +43,16 @@ create_package() {
+>         mips*)
+>                 debarch=mips$(grep -q CPU_LITTLE_ENDIAN=y $KCONFIG_CONFIG && echo el) ;;
+>         arm*)
+> -               debarch=arm$(grep -q CONFIG_AEABI=y $KCONFIG_CONFIG && echo el) ;;
+> +               if grep -q CONFIG_AEABI=y $KCONFIG_CONFIG; then
+> +                   if grep -q CONFIG_VFP=y $KCONFIG_CONFIG; then
+> +                       debarch=armhf
+> +                   else
+> +                       debarch=armel
+> +                   fi
+> +               else
+> +                   debarch=arm
+> +               fi
+> +               ;;
+>         *)
+>                 echo "" >&2
+>                 echo "** ** **  WARNING  ** ** **" >&2
 >
-> cmd_arch/arm/boot/compressed/piggy.lzo := (cat arch/arm/boot/compressed/../Image | lzop -9 && printf \\\\010\\\\224\\\\034\\\\002) > arch/arm/boot/compressed/piggy.lzo || (rm -f arch/arm/boot/compressed/piggy.lzo ; false)
-
-But then there are quadruple slashes here '\\\\'. That seems to be
-causing kbuild to rebuild each time.
-
 >
-> Any ideas why it thinks that the command has changed?
+> --
+> Ben Hutchings
+> Who are all these weirdos? - David Bowie, reading IRC for the first time
 
-This hack seems to work, but I'm not convinced it's the right solution.
 
-diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index 547e15d..bfc0b79 100644
---- a/scripts/Kbuild.include
-+++ b/scripts/Kbuild.include
-@@ -209,7 +209,7 @@ endif
- # >$< substitution to preserve $ when reloading .cmd file
- # note: when using inline perl scripts [perl -e '...$$t=1;...']
- # in $(cmd_xxx) double $$ your perl vars
--make-cmd = $(subst \\,\\\\,$(subst \#,\\\#,$(subst $$,$$$$,$(call escsq,$(cmd_$(1))))))
-+make-cmd = $(subst \#,\\\#,$(subst $$,$$$$,$(call escsq,$(cmd_$(1)))))
- 
- # Find any prerequisites that is newer than target or that does not exist.
- # PHONY targets skipped in both cases.
 
 -- 
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum,
-hosted by The Linux Foundation
-
+ Héctor Orón  -.. . -... .. .- -.   -.. . ...- . .-.. --- .--. . .-.
