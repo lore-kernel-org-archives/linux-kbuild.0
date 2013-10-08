@@ -1,47 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from gerard.telenet-ops.be ([195.130.132.48]:40750 "EHLO
-	gerard.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752214Ab3JHTDK (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 8 Oct 2013 15:03:10 -0400
-Date: Tue, 8 Oct 2013 21:03:08 +0200 (CEST)
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: Re: [PATCH] kbuild: warn about headers using __[us]{8, 16, 32, 64}
- types w/out linux/types.h
-In-Reply-To: <20081230104303.GA486@uranus.ravnborg.org>
-Message-ID: <alpine.DEB.2.02.1310082100020.2894@ayla.of.borg>
-References: <1230553127-953-1-git-send-email-vapier@gentoo.org> <20081229132456.GA6938@uranus.ravnborg.org> <200812291527.53317.vapier@gentoo.org> <20081230104303.GA486@uranus.ravnborg.org>
+Received: from cantor2.suse.de ([195.135.220.15]:47126 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753436Ab3JHUYY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 8 Oct 2013 16:24:24 -0400
+Date: Tue, 8 Oct 2013 22:24:22 +0200
+From: Michal Marek <mmarek@suse.cz>
+Subject: [GIT] kbuild fix for 3.12
+Message-ID: <20131008202422.GA14089@pobox.suse.cz>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Mike Frysinger <vapier@gentoo.org>, Linux Kernel Development <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: rric@kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Tue, 30 Dec 2008, Sam Ravnborg wrote:
-> Subject: [PATCH] kbuild: add checks for include of linux/types in userspace headers
+Hi Linus,
 
-> If we see __[us](8|16|32|64) then we must include <linux/types.h>
+Here is an ARM Makefile fix that you even acked. After nobody wanted to
+take it, it ended up in the kbuild tree.
 
-> +	if ($line =~ m/__[us](8|16|32|64)\b/) {
-> +		printf STDERR "$filename:$lineno: " .
-> +		              "found __[us]{8,16,32,64} type " .
-> +		              "without #include <linux/types.h>\n";
-> +		$linux_types = 2;
-> +		# Warn until headers are all fixed
-> +		#$ret = 1;
-> +	}
+Michal
 
-FWIW, this also triggers on __[us]{8,16,32,64} in comments instead of in
-actual code (just got caught ;-).
+The following changes since commit 272b98c6455f00884f0350f775c5342358ebb73f:
 
-Gr{oetje,eeting}s,
+  Linux 3.12-rc1 (2013-09-16 16:17:51 -0400)
 
-						Geert
+are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git rc-fixes
 
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+Robert Richter (1):
+      arm, kbuild: make "make install" not depend on vmlinux
 
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-							    -- Linus Torvalds
+ arch/arm/Makefile        |    9 +++++++--
+ arch/arm/boot/Makefile   |   16 ++++++++--------
+ arch/arm/boot/install.sh |   14 ++++++++++++++
+ 3 files changed, 29 insertions(+), 10 deletions(-)
