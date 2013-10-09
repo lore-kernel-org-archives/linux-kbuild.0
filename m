@@ -1,73 +1,79 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pa0-f42.google.com ([209.85.220.42]:34292 "EHLO
-	mail-pa0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756932Ab3JIKq7 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 9 Oct 2013 06:46:59 -0400
+Received: from smtp.gentoo.org ([140.211.166.183]:60890 "EHLO smtp.gentoo.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754051Ab3JIOgm (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 9 Oct 2013 10:36:42 -0400
+Date: Wed, 9 Oct 2013 10:36:42 -0400
+From: Mike Pagano <mpagano@gentoo.org>
+Subject: [PATCH] show_delta: Update script to support python versions 2.5
+ through 3.3
+Message-ID: <20131009143642.GA12462@woodpecker.gentoo.org>
 MIME-Version: 1.0
-In-Reply-To: <52552FBA.7040806@suse.cz>
-References: <CA+55aFxtvT3Yvbxe5JGBThZS13payymFJ7jCLyEiE2iNDvsZtQ@mail.gmail.com>
-	<20130711135445.GA21500@sepie.suse.cz>
-	<CA+55aFyVjugxM7cUDWi0ASWttYthCxa6e7X3CADknBcSFxWgew@mail.gmail.com>
-	<20130712105721.GF8731@rric.localhost>
-	<20130717160506.GI8731@rric.localhost>
-	<CA+55aFx4G5gME3ByqE0Wr-_t2x_6WkP3Ta4k1z4jfW+PrcK0og@mail.gmail.com>
-	<20130717165743.GK8731@rric.localhost>
-	<CA+55aFzhmV7iq+Pv37trMCmdNzk53ORAoj0a6rV14fzKta3Dhw@mail.gmail.com>
-	<51E7B3D0.4060609@suse.cz>
-	<20130930084945.GA1963@rric.localhost>
-	<20130930163139.GA12450@free.fr>
-	<CAMuHMdW-YWGgZjR9ow6FMW7BrOorbbVAEm9sYsVvPkfg-_=jag@mail.gmail.com>
-	<52552FBA.7040806@suse.cz>
-Date: Wed, 9 Oct 2013 12:46:59 +0200
-Message-ID: <CAMuHMdXwdYACK_yvH3=OrO+MWkvOXQCzZ6f35hNq-k-7gieFLQ@mail.gmail.com>
-Subject: Re: [PATCH] arm, kbuild: make "make install" not depend on vmlinux
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, Robert Richter <rric@kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Russell King <linux@arm.linux.org.uk>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+To: linux-kbuild@vger.kernel.org
 
-On Wed, Oct 9, 2013 at 12:28 PM, Michal Marek <mmarek@suse.cz> wrote:
-> On 9.10.2013 09:18, Geert Uytterhoeven wrote:
->> Sorry for chiming in that late, but I didn't think of this when reading the
->> original submission.
->>
->> Just doing "make oldconfig; make install" used to work.
->
-> On ARM and maybe other architectures.
+Support past and active versions of python while maintaining backward compatibility. Script has been tested on python versions from 2.5.x up to and including 3.3.x.
 
-Until 2009 it also worked on x86 ;-)
 
->> Removing the dependency of "make vmlinux" on vmlinux breaks this, doesn't it?
->
->> Not that I'm strongly attached to it, but there may be other users...
->
-> We can't eat the cake and have it :). What can be done is to make
+Signed-off-by: Mike Pagano <mpagano@gentoo.org>
+---
+ scripts/show_delta | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-Sure.
-
-> arch/arm/boot/install.sh print a friendlier error message, like the x86
-> version does:
->
-> if [ ! -f "$1" ]; then
->         echo ""                                                   1>&2
->         echo " *** Missing file: $1"                              1>&2
->         echo ' *** You need to run "make" before "make install".' 1>&2
->         echo ""                                                   1>&2
->         exit 1
-> fi
-
-Definitely!
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+diff --git a/scripts/show_delta b/scripts/show_delta
+index 17df305..e25732b 100755
+--- a/scripts/show_delta
++++ b/scripts/show_delta
+@@ -13,7 +13,7 @@ import sys
+ import string
+ 
+ def usage():
+-	print """usage: show_delta [<options>] <filename>
++	print ("""usage: show_delta [<options>] <filename>
+ 
+ This program parses the output from a set of printk message lines which
+ have time data prefixed because the CONFIG_PRINTK_TIME option is set, or
+@@ -35,7 +35,7 @@ ex: $ dmesg >timefile
+ 
+ will show times relative to the line in the kernel output
+ starting with "NET4".
+-"""
++""")
+ 	sys.exit(1)
+ 
+ # returns a tuple containing the seconds and text for each message line
+@@ -94,11 +94,11 @@ def main():
+ 	try:
+ 		lines = open(filein,"r").readlines()
+ 	except:
+-		print "Problem opening file: %s" % filein
++		print ("Problem opening file: %s" % filein)
+ 		sys.exit(1)
+ 
+ 	if base_str:
+-		print 'base= "%s"' % base_str
++		print ('base= "%s"' % base_str)
+ 		# assume a numeric base.  If that fails, try searching
+ 		# for a matching line.
+ 		try:
+@@ -117,13 +117,13 @@ def main():
+ 					# stop at first match
+ 					break
+ 			if not found:
+-				print 'Couldn\'t find line matching base pattern "%s"' % base_str
++				print ('Couldn\'t find line matching base pattern "%s"' % base_str)
+ 				sys.exit(1)
+ 	else:
+ 		base_time = 0.0
+ 
+ 	for line in lines:
+-		print convert_line(line, base_time),
++		print (convert_line(line, base_time),)
+ 
+ main()
+ 
+-- 
+1.8.1.5
