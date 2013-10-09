@@ -1,138 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-we0-f172.google.com ([74.125.82.172]:55414 "EHLO
-	mail-we0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753527Ab3JHVyK (ORCPT
+Received: from mail-pa0-f48.google.com ([209.85.220.48]:41132 "EHLO
+	mail-pa0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752715Ab3JIHSq (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 8 Oct 2013 17:54:10 -0400
-Received: by mail-we0-f172.google.com with SMTP id q58so4963931wes.3
-        for <linux-kbuild@vger.kernel.org>; Tue, 08 Oct 2013 14:54:08 -0700 (PDT)
-Date: Tue, 8 Oct 2013 23:54:04 +0200
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH] kconfig: fix allmodconfig
-Message-ID: <20131008215404.GD3373@free.fr>
-References: <1379805443-10945-1-git-send-email-yann.morin.1998@free.fr>
- <20130921232102.GC3221@free.fr>
- <20130926213621.GF3418@free.fr>
- <52455BA2.2020805@suse.cz>
- <524C8242.2080405@suse.cz>
- <20131003220248.GA17186@free.fr>
+	Wed, 9 Oct 2013 03:18:46 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20131003220248.GA17186@free.fr>
+In-Reply-To: <20130930163139.GA12450@free.fr>
+References: <CA+55aFxtvT3Yvbxe5JGBThZS13payymFJ7jCLyEiE2iNDvsZtQ@mail.gmail.com>
+	<20130711135445.GA21500@sepie.suse.cz>
+	<CA+55aFyVjugxM7cUDWi0ASWttYthCxa6e7X3CADknBcSFxWgew@mail.gmail.com>
+	<20130712105721.GF8731@rric.localhost>
+	<20130717160506.GI8731@rric.localhost>
+	<CA+55aFx4G5gME3ByqE0Wr-_t2x_6WkP3Ta4k1z4jfW+PrcK0og@mail.gmail.com>
+	<20130717165743.GK8731@rric.localhost>
+	<CA+55aFzhmV7iq+Pv37trMCmdNzk53ORAoj0a6rV14fzKta3Dhw@mail.gmail.com>
+	<51E7B3D0.4060609@suse.cz>
+	<20130930084945.GA1963@rric.localhost>
+	<20130930163139.GA12450@free.fr>
+Date: Wed, 9 Oct 2013 09:18:46 +0200
+Message-ID: <CAMuHMdW-YWGgZjR9ow6FMW7BrOorbbVAEm9sYsVvPkfg-_=jag@mail.gmail.com>
+Subject: Re: [PATCH] arm, kbuild: make "make install" not depend on vmlinux
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, Stephen Rothwell <sfr@canb.auug.org.au>, Sam Ravnborg <sam@ravnborg.org>
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: Robert Richter <rric@kernel.org>, Michal Marek <mmarek@suse.cz>, Linus Torvalds <torvalds@linux-foundation.org>, Russell King <linux@arm.linux.org.uk>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 
-Michal, Al,
+On Mon, Sep 30, 2013 at 6:31 PM, Yann E. MORIN <yann.morin.1998@free.fr> wrote:
+> On 2013-09-30 10:49 +0200, Robert Richter spake thusly:
+>> On 18.07.13 11:22:24, Michal Marek wrote:
+>> > > So Michal (or ARM people - whoever wants to take the patch), just take
+>> > > my ack. No objections.
+>> >
+>> > I can add it to the kbuild tree if needed. Otherwise you can add
+>> > Acked-by: Michal Marek <mmarek@suse.cz>.
+>>
+>> This didn't make it upstream yet, can somebody at it to a tree?
+>
+> Since it's been acked-by Linus, I'll queue it in my tree, for Michal to
+> pull from. Expect a pull-request soon.
 
-On 2013-10-04 00:02 +0200, Yann E. MORIN spake thusly:
-> On 2013-10-02 22:29 +0200, Michal Marek spake thusly:
-> > Dne 27.9.2013 12:19, Michal Marek napsal(a):
-> > > On 26.9.2013 23:36, Yann E. MORIN wrote:
-> > >> Hello All!
-> > >>
-> > >> On 2013-09-22 01:21 +0200, Yann E. MORIN spake thusly:
-> > >>> Stephen, All,
-> > >>>
-> > >>> Please, test this patch to fix the allmodconfig issue reported by
-> > >>> Stephen.
-> > >>>
-> > >>> From my little testing (some randconfig followed by silentoldconfig, as
-> > >>> well as allmodconfig), this patch seems to fix the issue without any
-> > >>> regression I could ientify.
-> > >>>
-> > >>> But since this is sensitive code, I'd like some feedback before this
-> > >>> gets applied.
-> > >>
-> > >> Ping? :-)
-> > >>
-> > >> I wanted to push this right after -rc3 is out. If any one has an issue
-> > >> with that patch, you've got a few days to chime in! ;-)
-> > > 
-> > > It works for me, you can add my Tested-by: if you like. The only issue I
-> > > have is that a more verbose changelog is missing.
-> > 
-> > Sorry, I have to retract my Tested-by. When I merge your rc-fixes branch
-> > into 3.12-rc1, I get this behavior:
-> > 
-> > $ make mrproper
-> > $ make allmodconfig
-> > ...
-> > scripts/kconfig/conf --allmodconfig Kconfig
-> > #
-> > # configuration written to .config
-> > #$ make silentoldconfig
-> > scripts/kconfig/conf --silentoldconfig Kconfig
-> > *
-> > * Restart config...
-> > *
-> > (this should not happen)
-> > *
-> > * PHY Device support and infrastructure
-> > *
-> > PHY Device support and infrastructure (PHYLIB) [Y/?] y
-> >   *
-> >   * MII PHY device drivers
-> >   *
-> >   Drivers for Atheros AT803X PHYs (AT803X_PHY) [M/n/y/?] m
-> >   Drivers for the AMD PHYs (AMD_PHY) [M/n/y/?] m
-> >   Drivers for Marvell PHYs (MARVELL_PHY) [M/n/y/?] m
-> >   Drivers for Davicom PHYs (DAVICOM_PHY) [M/n/y/?] m
-> >   Drivers for Quality Semiconductor PHYs (QSEMI_PHY) [M/n/y/?] m
-> >   Drivers for the Intel LXT PHYs (LXT_PHY) [M/n/y/?] m
-> >   Drivers for the Cicada PHYs (CICADA_PHY) [M/n/y/?] m
-> >   Drivers for the Vitesse PHYs (VITESSE_PHY) [M/n/y/?] m
-> >   Drivers for SMSC PHYs (SMSC_PHY) [M/y/?] m
-> >   Drivers for Broadcom PHYs (BROADCOM_PHY) [M/n/y/?] m
-> >   Driver for Broadcom BCM8706 and BCM8727 PHYs (BCM87XX_PHY) [M/n/y/?] m
-> >   Drivers for ICPlus PHYs (ICPLUS_PHY) [M/n/y/?] m
-> >   Drivers for Realtek PHYs (REALTEK_PHY) [M/n/y/?] m
-> >   Drivers for National Semiconductor PHYs (NATIONAL_PHY) [M/n/y/?] m
-> >   Driver for STMicroelectronics STe10Xp PHYs (STE10XP) [M/n/y/?] m
-> >   Driver for LSI ET1011C PHY (LSI_ET1011C_PHY) [M/n/y/?] m
-> >   Driver for Micrel PHYs (MICREL_PHY) [M/n/y/?] m
-> >   Driver for MDIO Bus/PHY emulation with fixed speed/link PHYs
-> > (FIXED_PHY) [N/y/?] (NEW)
-> > 
-> > The .config generated by make allmodconfig is identical to a .config
-> > generated with plain v3.12-rc1 and thus correct. It's (silent)oldconfig
-> > that has a problem.
-> 
-> Doh... :-(
-> 
-> I've played with this a bit, and I noticed that if you do:
->     $ git clean -dX; git clean -d    # Make sure tree is clean
->     $ make allmodconfig
->     $ grep PHYLIB= .config
->     CONFIG_PHYLIB=m
->     $ make menuconfig
->         Device Drivers  -->
->           Network device support  -->
->             -*-  PHY Device support and infrastructure  -->
-> 
-> Notice how "PHY Device support and infrastructure" is forced to 'y', not
-> 'm'. This is expected, because it is selected by (there are other terms
-> in the equation that also force it to 'y'):
->     ETHOC [=y] && NETDEVICES [=y] && ETHERNET [=y]
->     && HAS_IOMEM [=y] && HAS_DMA [=y]
-> 
-> Hence, what we see is that "make allmodconfig" does not properly resolve
-> the symbols values.
-> 
-> I'll tackle this, but it may take some time...
+Sorry for chiming in that late, but I didn't think of this when reading the
+original submission.
 
-OK, I have no clue... :-(
-Any suggestion?
+Just doing "make oldconfig; make install" used to work.
+Removing the dependency of "make vmlinux" on vmlinux breaks this, doesn't it?
 
-Regards,
-Yann E. MORIN.
+I had the habit of doing the above many years ago, when I was mostly doing
+native builds, and before I had my own custom linux-install-kernel
+script that e.g.
+knows how to copy kernels and modules around to NFS servers.
 
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+Not that I'm strongly attached to it, but there may be other users...
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
