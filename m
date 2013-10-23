@@ -1,53 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from www.linutronix.de ([62.245.132.108]:58298 "EHLO
-	Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753262Ab3JWL2W (ORCPT
+Received: from one.firstfloor.org ([193.170.194.197]:44319 "EHLO
+	one.firstfloor.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753566Ab3JWNGz (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 23 Oct 2013 07:28:22 -0400
-Message-ID: <5267B2D3.3000109@linutronix.de>
-Date: Wed, 23 Oct 2013 13:28:19 +0200
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+	Wed, 23 Oct 2013 09:06:55 -0400
+Date: Wed, 23 Oct 2013 15:06:53 +0200
+From: Andi Kleen <andi@firstfloor.org>
+Subject: [PATCH 1/3] kbuild: Increase kallsyms max symbol length v2
+Message-ID: <20131023130653.GN29695@two.firstfloor.org>
+References: <1382456783-22826-1-git-send-email-andi@firstfloor.org>
+ <1382456783-22826-2-git-send-email-andi@firstfloor.org>
+ <1382459764.2041.90.camel@joe-AO722>
 MIME-Version: 1.0
-Subject: Re: choice =y selection becomes lost after having multiple entries
- =m with depends on
-References: <5267AA3E.1040003@linutronix.de> <20131023112331.GA3869@free.fr>
-In-Reply-To: <20131023112331.GA3869@free.fr>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1382459764.2041.90.camel@joe-AO722>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Felipe Balbi <balbi@ti.com>, USB list <linux-usb@vger.kernel.org>, Tomi Valkeinen <tomi.valkeinen@ti.com>, Roger Quadros <rogerq@ti.com>
+To: Joe Perches <joe@perches.com>
+Cc: Andi Kleen <andi@firstfloor.org>, mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Joe Mario <jmario@redhat.com>, Andi Kleen <ak@linux.intel.com>
 
-On 10/23/2013 01:23 PM, Yann E. MORIN wrote:
-> Sebastian, All,
+From: Joe Mario <jmario@redhat.com>
 
-Hi Yann,
+[AK: This seems like a ticking time bomb even without LTO,
+so should be merged now. It causes very weird problems.
+Thanks to Joe for tracking them down.]
 
-> So, I've tried your tests here, and indeed it does not behave as
-> expected. Yet, I can observe a slight deviation from your observations:
-> the third time I enter the "USB Gadget Support" sub-menu, the "USB
-> Gadget Drivers" choice is back to 'M', not 'Y'. But that's still
-> considered an issue.
+With the added postfixes that LTO adds for local
+symbols, the longest name in the kernel overflows
+the namebuf[KSYM_NAME_LEN] array by two bytes.  That name is:
+__pci_fixup_resumePCI_VENDOR_ID_SERVERWORKSPCI_DEVICE_ID_SERVERWORKS_HT1000SBquirk_disable_broadcom_boot_interrupt.1488004.672802
 
-Yes, that is what I meant. Everything goes back M.
+Double the max symbol name length.
 
->> So the problem exists only if the item itself has a "depends on" line.
->> Anyone aware of such kconfig limitation?
-> 
-> I'll try to come up with a smaller test-case to investigate, but since
-> I'm at the LinuxCon Europe and ELCE this week (hey! Party tonight!), I
-> won't have much time to look at it before the start of next week. Be
-> sure to ping me later next week if you do not see any reply (and in case
-> no one else solves the issue in the meantime, that is).
+v2: Use 255  (Joe Perches)
+Signed-off-by: Andi Kleen <ak@linux.intel.com>
+---
+ include/linux/kallsyms.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Okay, thanks.
+diff --git a/include/linux/kallsyms.h b/include/linux/kallsyms.h
+index 6883e19..5648870 100644
+--- a/include/linux/kallsyms.h
++++ b/include/linux/kallsyms.h
+@@ -9,7 +9,7 @@
+ #include <linux/kernel.h>
+ #include <linux/stddef.h>
+ 
+-#define KSYM_NAME_LEN 128
++#define KSYM_NAME_LEN 255
+ #define KSYM_SYMBOL_LEN (sizeof("%s+%#lx/%#lx [%s]") + (KSYM_NAME_LEN - 1) + \
+ 			 2*(BITS_PER_LONG*3/10) + (MODULE_NAME_LEN - 1) + 1)
+ 
+-- 
+1.8.4
 
-> 
-> Thanks for this bug report.
-> 
-> Regards,
-> Yann E. MORIN.
-> 
-
-Sebastian
+-- 
+ak@linux.intel.com -- Speaking for myself only.
