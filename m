@@ -1,63 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:38472 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751166Ab3JWNVG (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 23 Oct 2013 09:21:06 -0400
-Message-ID: <5267CD3C.2020004@suse.cz>
-Date: Wed, 23 Oct 2013 15:21:00 +0200
-From: Michal Marek <mmarek@suse.cz>
+Received: from mail-ob0-f176.google.com ([209.85.214.176]:39069 "EHLO
+	mail-ob0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751736Ab3JWOLq (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 23 Oct 2013 10:11:46 -0400
+Received: by mail-ob0-f176.google.com with SMTP id uy5so819065obc.35
+        for <linux-kbuild@vger.kernel.org>; Wed, 23 Oct 2013 07:11:46 -0700 (PDT)
 MIME-Version: 1.0
-Subject: Re: [PATCH RFC] kbuild: prevent git private tag altering kernelrelease
-References: <1379109004-2411-1-git-send-email-afzal.mohd.ma@gmail.com>
-In-Reply-To: <1379109004-2411-1-git-send-email-afzal.mohd.ma@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-2
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <1379421817-15759-1-git-send-email-Russ.Dill@ti.com>
+References: <1379421817-15759-1-git-send-email-Russ.Dill@ti.com>
+Date: Wed, 23 Oct 2013 16:11:46 +0200
+Message-ID: <CACRpkdZpAqmnS5=F9va6xWECmG85TO_Lv7Gicx5qx=m6bNgohw@mail.gmail.com>
+Subject: Re: [RFC PATCH 00/11] Embeddable Position Independent Executable
+From: Linus Walleij <linus.walleij@linaro.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Afzal Mohammed <afzal.mohd.ma@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Christophe Leroy <christophe.leroy@c-s.fr>, Christian Kujau <lists@nerdbynature.de>
+To: Russ Dill <Russ.Dill@ti.com>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Linux-OMAP <linux-omap@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, mans@mansr.com, Shawn Guo <shawn.guo@linaro.org>, Dave Martin <Dave.Martin@arm.com>, Russell King - ARM Linux <linux@arm.linux.org.uk>
 
-Hi Afzal,
+On Tue, Sep 17, 2013 at 2:43 PM, Russ Dill <Russ.Dill@ti.com> wrote:
 
-sorry for the late feedback.
+> This patch adds support for and demonstrates the usage of an embedded
+> position independent executable (PIE). The goal is to allow the use of C
+> code in situations where carefully written position independent assembly
+> was previously required.
 
-On 13.9.2013 23:49, Afzal Mohammed wrote:
-> If a private tag is created after the most recent kernelversion tag, a
-> commit after this private tag would feed kernelrelease with commits
-> after private tag and kernelversion tag. This may confuse user relying
-> on kernelrelease (mostly a developer while debugging), mainly if HEAD
-> has a private tag and otherwise w.r.t git distance from kernelversion
-> tag.
+This is perfectly applicable to the ARM TCM memory as well.
 
-The solution is simple: Do not use private annotated tags. Or rather, if
-you are creating an annotated tag, modify EXTRAVERSION accordingly. Any
-automagic based on the tag name is going to fail in some way.
+Currently we have arch/arm/kernel/tcm.c and related extensions to
+kernel/vmlinux.kds.S, which enables us to tag some certain code
+to be compiled into TCM memory which we map statically to
+0xfffe0000 thru 0xfffeffff, but this is a better approach, especially
+nice since it is the solution to the multiplatform situation, as we
+need to select to copy code into that memory only on the specific
+target.
 
+I'll try to have a deeper look at this, please keep me on CC for
+this series.
 
-> Instead if such a tag is created at say HEAD~, kernelrelease would be
-> v3.11.0-rc1-00001-gdeadbeef, misleading the observer w.r.t git distance
-> from nearest kernelversion tag.
-> 
-> Here an attempt is made to prevent private tag from altering
-> kernelrelease.
-> 
-> Signed-off-by: Afzal Mohammed <afzal.mohd.ma@gmail.com>
-> ---
-> 
-> Hi,
-> 
-> This seems to work on different scenarios that could be readily thought
-> of. I am shaky about this change, but acheives the purpose.
-
-With your change, the script considers e.g. the next-YYYYMMDD tags
-"private."
-
-
->  define filechk_kernel.release
-> -	echo "$(KERNELVERSION)$$($(CONFIG_SHELL) $(srctree)/scripts/setlocalversion $(srctree))"
-> +	echo "$(KERNELVERSION)$$($(CONFIG_SHELL) $(srctree)/scripts/setlocalversion $(srctree) $(KERNELVERSION))" > $@
->  endef
-
-The >$@ should not be there.
-
-Michal
+Yours,
+Linus Walleij
