@@ -1,32 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:43322 "EHLO mx2.suse.de"
+Received: from gloria.sntech.de ([95.129.55.99]:55533 "EHLO gloria.sntech.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750936Ab3JWPOA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 23 Oct 2013 11:14:00 -0400
-Date: Wed, 23 Oct 2013 17:13:59 +0200
-From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] show_delta: Update script to support python versions 2.5
- through 3.3
-Message-ID: <20131023151359.GA28823@sepie.suse.cz>
-References: <20131009143642.GA12462@woodpecker.gentoo.org>
+	id S1753308Ab3JXIJ2 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 24 Oct 2013 04:09:28 -0400
+From: Heiko =?iso-8859-1?q?St=FCbner?= <heiko@sntech.de>
+Subject: Re: [RFC PATCH 00/11] Embeddable Position Independent Executable
+Date: Thu, 24 Oct 2013 10:09:12 +0200
+References: <1379421817-15759-1-git-send-email-Russ.Dill@ti.com>
+In-Reply-To: <1379421817-15759-1-git-send-email-Russ.Dill@ti.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20131009143642.GA12462@woodpecker.gentoo.org>
+Content-Type: Text/Plain;
+  charset="iso-8859-1"
+Content-Transfer-Encoding: 7bit
+Message-Id: <201310241009.12597.heiko@sntech.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mike Pagano <mpagano@gentoo.org>
-Cc: linux-kbuild@vger.kernel.org
+To: linux-arm-kernel@lists.infradead.org
+Cc: Russ Dill <Russ.Dill@ti.com>, linux-kernel@vger.kernel.org, linux-omap@vger.kernel.org, mans@mansr.com, Russell King - ARM Linux <linux@arm.linux.org.uk>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, linux-kbuild@vger.kernel.org, Shawn Guo <shawn.guo@linaro.org>, Dave Martin <Dave.Martin@arm.com>
 
-On Wed, Oct 09, 2013 at 10:36:42AM -0400, Mike Pagano wrote:
-> Support past and active versions of python while maintaining backward compatibility. Script has been tested on python versions from 2.5.x up to and including 3.3.x.
-> 
-> 
-> Signed-off-by: Mike Pagano <mpagano@gentoo.org>
-> ---
->  scripts/show_delta | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
+Am Dienstag, 17. September 2013, 14:43:26 schrieb Russ Dill:
+> This patch adds support for and demonstrates the usage of an embedded
+> position independent executable (PIE). The goal is to allow the use of C
+> code in situations where carefully written position independent assembly
+> was previously required.
 
-Applied to kbuild.git#misc, thanks.
+As suggested yesterday evening by Kevin Hilman, just adding my 2ct of support.
 
-Michal
+This series looks exactly like the foundation I'll need at some point in the 
+(probably still distant) future to handle suspend on my Rockchip platform - 
+where like in your example stuff like putting the ram into selfrefresh has to 
+be done by the os.
+
+
+Thanks for the work on this
+Heiko
