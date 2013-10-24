@@ -1,36 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from gloria.sntech.de ([95.129.55.99]:55533 "EHLO gloria.sntech.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753308Ab3JXIJ2 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 24 Oct 2013 04:09:28 -0400
-From: Heiko =?iso-8859-1?q?St=FCbner?= <heiko@sntech.de>
-Subject: Re: [RFC PATCH 00/11] Embeddable Position Independent Executable
-Date: Thu, 24 Oct 2013 10:09:12 +0200
-References: <1379421817-15759-1-git-send-email-Russ.Dill@ti.com>
-In-Reply-To: <1379421817-15759-1-git-send-email-Russ.Dill@ti.com>
+Received: from mail-lb0-f177.google.com ([209.85.217.177]:37328 "EHLO
+	mail-lb0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754629Ab3JXK7R (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 24 Oct 2013 06:59:17 -0400
+Received: by mail-lb0-f177.google.com with SMTP id u14so1705391lbd.8
+        for <linux-kbuild@vger.kernel.org>; Thu, 24 Oct 2013 03:59:16 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
-Content-Transfer-Encoding: 7bit
-Message-Id: <201310241009.12597.heiko@sntech.de>
+In-Reply-To: <1381694368.1301.91.camel@deadeye.wl.decadent.org.uk>
+References: <1381079041.2788.25.camel@deadeye.wl.decadent.org.uk>
+	<CAODfWeFOB8ciUUTkdFn7_TUELVQC48XCC1oz+aYhZotewDtqzA@mail.gmail.com>
+	<1381694368.1301.91.camel@deadeye.wl.decadent.org.uk>
+Date: Thu, 24 Oct 2013 12:59:16 +0200
+Message-ID: <CAODfWeF5oMfMAavXK_C9qYtDuNyfUDhfmoVwRro2HW2HG9HRgw@mail.gmail.com>
+Subject: Re: [PATCH 1/2] deb-pkg: Add automatic support for armhf architecture
+From: Hector Oron <hector.oron@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-arm-kernel@lists.infradead.org
-Cc: Russ Dill <Russ.Dill@ti.com>, linux-kernel@vger.kernel.org, linux-omap@vger.kernel.org, mans@mansr.com, Russell King - ARM Linux <linux@arm.linux.org.uk>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, linux-kbuild@vger.kernel.org, Shawn Guo <shawn.guo@linaro.org>, Dave Martin <Dave.Martin@arm.com>
+To: Ben Hutchings <ben@decadent.org.uk>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, maximilian attems <max@stro.at>, Michal Marek <mmarek@suse.cz>, Fathi Boudra <fathi.boudra@linaro.org>, Debian ARM <debian-arm@lists.debian.org>
 
-Am Dienstag, 17. September 2013, 14:43:26 schrieb Russ Dill:
-> This patch adds support for and demonstrates the usage of an embedded
-> position independent executable (PIE). The goal is to allow the use of C
-> code in situations where carefully written position independent assembly
-> was previously required.
+Hello,
 
-As suggested yesterday evening by Kevin Hilman, just adding my 2ct of support.
+2013/10/13 Ben Hutchings <ben@decadent.org.uk>:
+> On Tue, 2013-10-08 at 02:23 +0200, Hector Oron wrote:
+>> Hello,
+>>
+>> 2013/10/6 Ben Hutchings <ben@decadent.org.uk>:
+>> > The Debian armhf architecture uses the ARM EABI hard-float variant,
+>> > whereas armel uses the soft-float variant.  Although the kernel
+>> > doesn't use FP itself, CONFIG_VFP must be enabled to support
+>> > hard-float userland and will probably be disabled when supporting a
+>> > soft-float userland.  So set the architecture to armhf by default when
+>> > CONFIG_AEABI and CONFIG_VFP are both enabled.
+>>
+>> Debian armel userland can be run on any device, so it is suggested to
+>> better rely on toolchain configuration rather than kernel config
+>> symbols.
+>>
+>> For arm-gnueabi(hf) toolchain something like:
+>>   $ gcc -dumpspecs | grep multilib_defaults -A2 | grep -q soft && echo
+>> "This is armel"
+>>   $ gcc -dumpspecs | grep multilib_defaults -A2 | grep -q hard && echo
+>> "This is armhf"
+>> could be checked instead.
+> [...]
+>
+> Is the output of -dumpspecs really so stable that this is going to be
+> reliable?
 
-This series looks exactly like the foundation I'll need at some point in the 
-(probably still distant) future to handle suspend on my Rockchip platform - 
-where like in your example stuff like putting the ram into selfrefresh has to 
-be done by the os.
-
-
-Thanks for the work on this
-Heiko
+I am not sure about it... but up to date, I have never found a system
+that makes it faulty. I would be interesting to check on other
+distributions besides Debian.
