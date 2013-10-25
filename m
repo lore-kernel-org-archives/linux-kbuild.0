@@ -1,48 +1,33 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.outflux.net ([198.145.64.163]:41000 "EHLO smtp.outflux.net"
+Received: from cantor2.suse.de ([195.135.220.15]:49733 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753355Ab3JYNOu (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 25 Oct 2013 09:14:50 -0400
-Date: Fri, 25 Oct 2013 06:14:43 -0700
-From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH] kbuild: replace unbounded sprintf call in modpost
-Message-ID: <20131025131443.GA7759@www.outflux.net>
+	id S1751548Ab3JYNPR (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 25 Oct 2013 09:15:17 -0400
+Date: Fri, 25 Oct 2013 15:15:14 +0200
+From: Michal Marek <mmarek@suse.cz>
+Subject: Re: [PATCH 2/2] deb-pkg: Add automatic support for s390x architecture
+Message-ID: <20131025131513.GA8297@sepie.suse.cz>
+References: <1381079114.2788.26.camel@deadeye.wl.decadent.org.uk>
+ <20131007133835.GI11166@stro.at>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20131007133835.GI11166@stro.at>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: maximilian attems <max@stro.at>
+Cc: Ben Hutchings <ben@decadent.org.uk>, linux-kbuild <linux-kbuild@vger.kernel.org>, debian-s390@lists.debian.org
 
-The modpost tool could overflow its stack buffer if someone was running
-with an insane shell environment. Regardless, it's technically a bug,
-so this fixes it to truncate the string instead of seg-faulting.
+On Mon, Oct 07, 2013 at 03:38:35PM +0200, maximilian attems wrote:
+> On Sun, Oct 06, 2013 at 06:05:14PM +0100, Ben Hutchings wrote:
+> > The Debian s390x architecture has 64-bit userland whereas s390 has
+> > 32-bit userland.  A 64-bit kernel can be used with either.  Now that
+> > Debian supports multiarch and officially supports s390x, it makes more
+> > sense to assign a 64-bit kernel package to s390x.
+> > 
+> > Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+> Acked-by: maximilian attems <max@stro.at>
 
-Found by Coverity.
+Added to kbuild.git#misc, thanks.
 
-Signed-off-by: Kees Cook <keescook@chromium.org>
----
- scripts/mod/sumversion.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/scripts/mod/sumversion.c b/scripts/mod/sumversion.c
-index 9dfcd6d988da..deb2994b04c4 100644
---- a/scripts/mod/sumversion.c
-+++ b/scripts/mod/sumversion.c
-@@ -416,7 +416,7 @@ void get_src_version(const char *modname, char sum[], unsigned sumlen)
- 		basename = strrchr(modname, '/') + 1;
- 	else
- 		basename = modname;
--	sprintf(filelist, "%s/%.*s.mod", modverdir,
-+	snprintf(filelist, sizeof(filelist), "%s/%.*s.mod", modverdir,
- 		(int) strlen(basename) - 2, basename);
- 
- 	file = grab_file(filelist, &len);
--- 
-1.7.9.5
-
-
--- 
-Kees Cook
-Chrome OS Security
+Michal
