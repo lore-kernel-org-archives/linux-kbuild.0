@@ -1,71 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from services.gouders.net ([141.101.32.176]:56852 "EHLO
-	services.gouders.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755147Ab3JXQuV (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 24 Oct 2013 12:50:21 -0400
-From: Dirk Gouders <dirk@gouders.net>
-Subject: Re: choice =y selection becomes lost after having multiple entries =m with depends on
-In-Reply-To: <52694894.8090201@linutronix.de> (Sebastian Andrzej Siewior's
-	message of "Thu, 24 Oct 2013 18:19:32 +0200")
-References: <5267AA3E.1040003@linutronix.de> <20131023112331.GA3869@free.fr>
-	<5267B2D3.3000109@linutronix.de> <givc0mbs9b.fsf@karga.hank.lab>
-	<52694894.8090201@linutronix.de>
-Date: Thu, 24 Oct 2013 18:50:28 +0200
-Message-ID: <ghob6ebokr.fsf@lena.gouders.net>
+Received: from smtp.outflux.net ([198.145.64.163]:41000 "EHLO smtp.outflux.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753355Ab3JYNOu (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 25 Oct 2013 09:14:50 -0400
+Date: Fri, 25 Oct 2013 06:14:43 -0700
+From: Kees Cook <keescook@chromium.org>
+Subject: [PATCH] kbuild: replace unbounded sprintf call in modpost
+Message-ID: <20131025131443.GA7759@www.outflux.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Felipe Balbi <balbi@ti.com>, USB list <linux-usb@vger.kernel.org>, Tomi Valkeinen <tomi.valkeinen@ti.com>, Roger Quadros <rogerq@ti.com>
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-Sebastian Andrzej Siewior <bigeasy@linutronix.de> writes:
+The modpost tool could overflow its stack buffer if someone was running
+with an insane shell environment. Regardless, it's technically a bug,
+so this fixes it to truncate the string instead of seg-faulting.
 
-> On 10/24/2013 05:30 PM, Dirk Gouders wrote:
->> Hi Sebastian,
->
-> Hi Dirk,
->
->> I was looking at what you described and initially had a hard time to
->> reproduce the problem, probably because I tried it after `make
->> mrproper'.  I am only able to reproduce the problem with an existing
->> .config of my running kernel, for example.
->> 
->> Just to make sure that I am correctly trying to reproduce the problem:
->> did you already try to do what you described after a `make mrproper' and
->> do you then also notice the described problems?  If not, could you
->> please try that?
->
-> What is the purpose behind mrproper?
-> The key to reproduce it is to have a .config with atleast two items
-> within a choice statement which also have a "depends on" statement and
-> those set to =m. If you don't have this after mrproper (with your fresh
-> .config) then you don't see it.
+Found by Coverity.
 
-Hi Sebastian,
+Signed-off-by: Kees Cook <keescook@chromium.org>
+---
+ scripts/mod/sumversion.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-what I meant was that you start all steps that you previously described
-with one initial mrproper, i.e.:
+diff --git a/scripts/mod/sumversion.c b/scripts/mod/sumversion.c
+index 9dfcd6d988da..deb2994b04c4 100644
+--- a/scripts/mod/sumversion.c
++++ b/scripts/mod/sumversion.c
+@@ -416,7 +416,7 @@ void get_src_version(const char *modname, char sum[], unsigned sumlen)
+ 		basename = strrchr(modname, '/') + 1;
+ 	else
+ 		basename = modname;
+-	sprintf(filelist, "%s/%.*s.mod", modverdir,
++	snprintf(filelist, sizeof(filelist), "%s/%.*s.mod", modverdir,
+ 		(int) strlen(basename) - 2, basename);
+ 
+ 	file = grab_file(filelist, &len);
+-- 
+1.7.9.5
 
-1) make mrproper
-2) make menuconfig and select the gadgets with 'm', then save and exit
-3) make menuconfig and select 'y' for "USB Gadget Drivers", then save
-   and exit.
-4) Check for problems either with menuconfig or directly in .config
 
-With that initial mrproper I was not able to reproduce the problem
-and therefore I suspect some content of an existing .config causing
-the problems.
-
-Dirk
-
-PS: Probably `make mrproper' can be replaced by `rm .config' but I tested
-    it only once and cannot say for sure.)
-
->> 
->> Thanks,
->> 
->> Dirk
->
-> Sebastian
+-- 
+Kees Cook
+Chrome OS Security
