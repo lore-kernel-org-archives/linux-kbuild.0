@@ -1,101 +1,186 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.gmx.net ([212.227.15.15]:49196 "EHLO mout.gmx.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751305Ab3JZKGL (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 26 Oct 2013 06:06:11 -0400
-Received: from [92.224.82.115] ([92.224.82.115]) by mail.gmx.com (mrgmx002)
- with ESMTPSA (Nemesis) id 0LskKv-1VgJPU3zrt-012EYi for
- <linux-kbuild@vger.kernel.org>; Sat, 26 Oct 2013 12:06:10 +0200
-Message-ID: <526B940F.5090803@gmx.de>
-Date: Sat, 26 Oct 2013 12:06:07 +0200
-From: =?UTF-8?B?VG9yYWxmIEbDtnJzdGVy?= <toralf.foerster@gmx.de>
+Received: from mail-we0-f176.google.com ([74.125.82.176]:60242 "EHLO
+	mail-we0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753150Ab3JZTze (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 26 Oct 2013 15:55:34 -0400
+Received: by mail-we0-f176.google.com with SMTP id w62so5082227wes.21
+        for <linux-kbuild@vger.kernel.org>; Sat, 26 Oct 2013 12:55:32 -0700 (PDT)
+Message-ID: <526C1E31.2040604@gmail.com>
+Date: Sat, 26 Oct 2013 22:55:29 +0300
+From: "v1kt0p.rus@gmail.com" <v1kt0p.rus@gmail.com>
 MIME-Version: 1.0
-Subject: Re: [uml-devel] RFC: Shouldn't "./linux --version" always print the
- the git commit id
-References: <526AD08D.10506@gmx.de>	<CAMuHMdX+GtHDB5r6-oXyehbemqS36rVE=Agpi0w-6TcCPQotZQ@mail.gmail.com>	<526AE051.5020809@gmx.de> <CAMuHMdWotLn5NwtjxL57YVK_X_N1gb2xxB4qd+sciUTJokourQ@mail.gmail.com>
-In-Reply-To: <CAMuHMdWotLn5NwtjxL57YVK_X_N1gb2xxB4qd+sciUTJokourQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Subject: [PATCH]kconfig:qconf: Add an option to the "find" dialog for search
+ in the description.
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: UML devel <user-mode-linux-devel@lists.sourceforge.net>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: mmarek@suse.cz, james.hogan@imgtec.com, ralf@linux-mips.org, tkhai@yandex.ru
 
-On 10/26/2013 09:56 AM, Geert Uytterhoeven wrote:
-> On Fri, Oct 25, 2013 at 11:19 PM, Toralf Förster <toralf.foerster@gmx.de> wrote:
->> On 10/25/2013 10:18 PM, Geert Uytterhoeven wrote:
->>> On Fri, Oct 25, 2013 at 10:11 PM, Toralf Förster <toralf.foerster@gmx.de> wrote:
->>>> Just realized today the fact, that v3.11 reports just the tag and not
->>>> "tag-g<commit id>"
-> 
-> Actually it's "<tag>-<number>-<commit id>", with <number> indicating the
-> number of commits on top of the tag.
-> 
->>>
->>> You don't have CONFIG_LOCALVERSION_AUTO=y in your .config?
->>>
->>> Gr{oetje,eeting}s,
->>>
->> I do :
->> tfoerste@n22 ~/devel/linux $ ./linux --showconfig | grep AUTO
->> CONFIG_LOCALVERSION_AUTO=y
->>
->> pls look here :
->>
->>
->> $ ./linux --version
->> 3.11.0-00001-g65984ff-dirty
->>
->> versus
->>
->> $ git checkout HEAD~1
->> Previous HEAD position was 65984ff... um: hostfs: Fix writeback
->> HEAD is now at 6e46645... Linux 3.11
->>
->> $ make -j4 ARCH=um CC="ccache gcc"
->> ...
->>
->> $ ./linux --version
->> 3.11.0
-> 
-> If there are no additional commits on top of the tag, no number and commit
-> ID are printed. I guess the rationale is that tags are global, hence present
-> in all clones, so there's no need to tell what commit ID the tag corresponds
-> to.
-> 
->> which correlates to
->>
->> $ git describe
->> v3.11
->>
->> $ git describe --long
->> v3.11-0-g6e46645
-> 
-> This is not UML-specific. If you want to change this, you have to involve
-> the kbuild people (CC added).
-> 
-> Gr{oetje,eeting}s,
-> 
->                         Geert
+Adding the ability to search in description.
 
-Well, the reationale behind my idea comes from the (stupid) logic of one
-of my bisect scripts. I used there the commit id derived from the UML
-linux exe as a suffix for gdb back trace files created during the bisect
-process.
-Sure - logic can be easily adapted and was in the mean while.
-But IMO it would be more stringent to have always the commit id
-presented in the version string for similar cases.
+Signed-off-by: Victor Danchenko <v1kt0p.rus@gmail.com>
+---
+  scripts/kconfig/lkc_proto.h |  3 ++-
+  scripts/kconfig/mconf.c     |  2 +-
+  scripts/kconfig/nconf.c     |  2 +-
+  scripts/kconfig/qconf.cc    | 13 ++++++++++++-
+  scripts/kconfig/qconf.h     |  3 +++
+  scripts/kconfig/symbol.c    | 41 ++++++++++++++++++++++++++++++++++++++---
+  6 files changed, 57 insertions(+), 7 deletions(-)
+diff --git a/scripts/kconfig/lkc_proto.h b/scripts/kconfig/lkc_proto.h
+index ecdb965..5379647 100644
+--- a/scripts/kconfig/lkc_proto.h
++++ b/scripts/kconfig/lkc_proto.h
+@@ -35,7 +35,8 @@ P(sym_lookup,struct symbol *,(const char *name, int flags));
+  P(sym_find,struct symbol *,(const char *name));
+  P(sym_expand_string_value,const char *,(const char *in));
+  P(sym_escape_string_value, const char *,(const char *in));
+-P(sym_re_search,struct symbol **,(const char *pattern));
++P(sym_re_search, struct symbol **, (const char *pattern,
++            const bool in_description));
+  P(sym_type_name,const char *,(enum symbol_type type));
+  P(sym_calc_value,void,(struct symbol *sym));
+  P(sym_get_type,enum symbol_type,(struct symbol *sym));
+diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
+index 2c39631..e7aeb5b 100644
+--- a/scripts/kconfig/mconf.c
++++ b/scripts/kconfig/mconf.c
+@@ -430,7 +430,7 @@ again:
+      stpart.text = str_get(&sttext);
+      list_add_tail(&stpart.entries, &trail);
 
-> --
-> Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-> 
-> In personal conversations with technical people, I call myself a hacker. But
-> when I'm talking to journalists I just say "programmer" or something like that.
->                                 -- Linus Torvalds
-> 
+-    sym_arr = sym_re_search(dialog_input);
++    sym_arr = sym_re_search(dialog_input, false);
+      do {
+          LIST_HEAD(head);
+          struct menu *targets[JUMP_NB];
+diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
+index 4fbecd2..bac5054 100644
+--- a/scripts/kconfig/nconf.c
++++ b/scripts/kconfig/nconf.c
+@@ -720,7 +720,7 @@ again:
+      if (strncasecmp(dialog_input_result, CONFIG_, strlen(CONFIG_)) == 0)
+          dialog_input += strlen(CONFIG_);
 
+-    sym_arr = sym_re_search(dialog_input);
++    sym_arr = sym_re_search(dialog_input, false);
+      res = get_relations_str(sym_arr, NULL);
+      free(sym_arr);
+      show_scroll_win(main_window,
+diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
+index 1500c38..3df276a 100644
+--- a/scripts/kconfig/qconf.cc
++++ b/scripts/kconfig/qconf.cc
+@@ -1197,6 +1197,9 @@ ConfigSearchWindow::ConfigSearchWindow(ConfigMainWindow* parent, const char *nam
+      layout2->addWidget(searchButton);
+      layout1->addLayout(layout2);
 
--- 
-MfG/Sincerely
-Toralf Förster
-pgp finger print: 7B1A 07F4 EC82 0F90 D4C2 8936 872A E508 7DB6 9DA3
++    searchInDescription = new QCheckBox(_("Search in all texts."), this);
++    layout1->addWidget(searchInDescription);
++
+      split = new QSplitter(this);
+      split->setOrientation(Qt::Vertical);
+      list = new ConfigView(split, name);
+@@ -1253,7 +1256,15 @@ void ConfigSearchWindow::search(void)
+      list->list->clear();
+      info->clear();
+
+-    result = sym_re_search(editField->text().latin1());
++    bool in_description = false;
++#if QT_VERSION >= 0x040000
++    if (searchInDescription->checkState() == Qt::Checked) {
++#else
++    if (searchInDescription->isChecked() == TRUE) {
++#endif
++        in_description = true;
++    }
++    result = sym_re_search(editField->text().latin1(), in_description);
+      if (!result)
+          return;
+      for (p = result; *p; p++) {
+diff --git a/scripts/kconfig/qconf.h b/scripts/kconfig/qconf.h
+index 3715b3e..70f283e 100644
+--- a/scripts/kconfig/qconf.h
++++ b/scripts/kconfig/qconf.h
+@@ -5,8 +5,10 @@
+
+  #if QT_VERSION < 0x040000
+  #include <qlistview.h>
++#include <qcheckbox.h>
+  #else
+  #include <q3listview.h>
++#include <QCheckBox>
+  #endif
+  #include <qsettings.h>
+
+@@ -294,6 +296,7 @@ protected:
+      QSplitter* split;
+      ConfigView* list;
+      ConfigInfoView* info;
++    QCheckBox *searchInDescription;
+
+      struct symbol **result;
+  };
+diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
+index c9a6775..baa6ac3 100644
+--- a/scripts/kconfig/symbol.c
++++ b/scripts/kconfig/symbol.c
+@@ -990,7 +990,7 @@ static int sym_rel_comp(const void *sym1, const void *sym2)
+      return strcmp(s1->sym->name, s2->sym->name);
+  }
+
+-struct symbol **sym_re_search(const char *pattern)
++struct symbol **sym_re_search(const char *pattern, const bool in_description)
+  {
+      struct symbol *sym, **sym_arr = NULL;
+      struct sym_match *sym_match_arr = NULL;
+@@ -1008,8 +1008,43 @@ struct symbol **sym_re_search(const char *pattern)
+      for_all_symbols(i, sym) {
+          if (sym->flags & SYMBOL_CONST || !sym->name)
+              continue;
+-        if (regexec(&re, sym->name, 1, match, 0))
+-            continue;
++        if (in_description) {
++            struct property *prop;
++            size_t length = 1;
++            if (sym->name)
++                length += strlen(sym->name);
++            for_all_prompts(sym, prop) {
++                if (prop->text)
++                    length += strlen(prop->text) + 1;
++                if (prop->menu && prop->menu->help)
++                    length += strlen(prop->menu->help) + 1;
++            }
++            char *all_text = 0;
++            all_text = malloc(length);
++            if (!all_text)
++                goto sym_re_search_free;
++            *all_text = 0;
++            if (sym->name)
++                strcat(all_text, sym->name);
++            for_all_prompts(sym, prop) {
++                if (prop->text) {
++                    strcat(all_text, "\n");
++                    strcat(all_text, prop->text);
++                }
++                if (prop->menu && prop->menu->help) {
++                    strcat(all_text, "\n");
++                    strcat(all_text, prop->menu->help);
++                }
++            }
++            if (regexec(&re, all_text, 1, match, 0)) {
++                free(all_text);
++                continue;
++            }
++            free(all_text);
++        } else {
++            if (regexec(&re, sym->name, 1, match, 0))
++                continue;
++        }
+          if (cnt >= size) {
+              void *tmp;
+              size += 16;
+
