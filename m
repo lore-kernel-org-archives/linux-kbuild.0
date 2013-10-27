@@ -1,186 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-we0-f176.google.com ([74.125.82.176]:60242 "EHLO
-	mail-we0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753150Ab3JZTze (ORCPT
+Received: from mail-pa0-f44.google.com ([209.85.220.44]:50377 "EHLO
+	mail-pa0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752141Ab3J0TjY (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 26 Oct 2013 15:55:34 -0400
-Received: by mail-we0-f176.google.com with SMTP id w62so5082227wes.21
-        for <linux-kbuild@vger.kernel.org>; Sat, 26 Oct 2013 12:55:32 -0700 (PDT)
-Message-ID: <526C1E31.2040604@gmail.com>
-Date: Sat, 26 Oct 2013 22:55:29 +0300
-From: "v1kt0p.rus@gmail.com" <v1kt0p.rus@gmail.com>
+	Sun, 27 Oct 2013 15:39:24 -0400
+Date: Mon, 28 Oct 2013 01:09:07 +0530
+From: Afzal Mohammed <afzal.mohd.ma@gmail.com>
+Subject: Re: [PATCH RFC] kbuild: prevent git private tag altering
+ kernelrelease
+Message-ID: <20131027193907.GA2710@afzal-ThinkPad-R50e>
+References: <1379109004-2411-1-git-send-email-afzal.mohd.ma@gmail.com>
+ <5267CD3C.2020004@suse.cz>
 MIME-Version: 1.0
-Subject: [PATCH]kconfig:qconf: Add an option to the "find" dialog for search
- in the description.
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5267CD3C.2020004@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: mmarek@suse.cz, james.hogan@imgtec.com, ralf@linux-mips.org, tkhai@yandex.ru
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Christophe Leroy <christophe.leroy@c-s.fr>, Christian Kujau <lists@nerdbynature.de>
 
-Adding the ability to search in description.
+Hi Michal,
 
-Signed-off-by: Victor Danchenko <v1kt0p.rus@gmail.com>
----
-  scripts/kconfig/lkc_proto.h |  3 ++-
-  scripts/kconfig/mconf.c     |  2 +-
-  scripts/kconfig/nconf.c     |  2 +-
-  scripts/kconfig/qconf.cc    | 13 ++++++++++++-
-  scripts/kconfig/qconf.h     |  3 +++
-  scripts/kconfig/symbol.c    | 41 ++++++++++++++++++++++++++++++++++++++---
-  6 files changed, 57 insertions(+), 7 deletions(-)
-diff --git a/scripts/kconfig/lkc_proto.h b/scripts/kconfig/lkc_proto.h
-index ecdb965..5379647 100644
---- a/scripts/kconfig/lkc_proto.h
-+++ b/scripts/kconfig/lkc_proto.h
-@@ -35,7 +35,8 @@ P(sym_lookup,struct symbol *,(const char *name, int flags));
-  P(sym_find,struct symbol *,(const char *name));
-  P(sym_expand_string_value,const char *,(const char *in));
-  P(sym_escape_string_value, const char *,(const char *in));
--P(sym_re_search,struct symbol **,(const char *pattern));
-+P(sym_re_search, struct symbol **, (const char *pattern,
-+            const bool in_description));
-  P(sym_type_name,const char *,(enum symbol_type type));
-  P(sym_calc_value,void,(struct symbol *sym));
-  P(sym_get_type,enum symbol_type,(struct symbol *sym));
-diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
-index 2c39631..e7aeb5b 100644
---- a/scripts/kconfig/mconf.c
-+++ b/scripts/kconfig/mconf.c
-@@ -430,7 +430,7 @@ again:
-      stpart.text = str_get(&sttext);
-      list_add_tail(&stpart.entries, &trail);
+On Wed, Oct 23, 2013 at 03:21:00PM +0200, Michal Marek wrote:
+> On 13.9.2013 23:49, Afzal Mohammed wrote:
 
--    sym_arr = sym_re_search(dialog_input);
-+    sym_arr = sym_re_search(dialog_input, false);
-      do {
-          LIST_HEAD(head);
-          struct menu *targets[JUMP_NB];
-diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
-index 4fbecd2..bac5054 100644
---- a/scripts/kconfig/nconf.c
-+++ b/scripts/kconfig/nconf.c
-@@ -720,7 +720,7 @@ again:
-      if (strncasecmp(dialog_input_result, CONFIG_, strlen(CONFIG_)) == 0)
-          dialog_input += strlen(CONFIG_);
+> > If a private tag is created after the most recent kernelversion tag, a
+> > commit after this private tag would feed kernelrelease with commits
+> > after private tag and kernelversion tag. This may confuse user relying
+> > on kernelrelease (mostly a developer while debugging), mainly if HEAD
+> > has a private tag and otherwise w.r.t git distance from kernelversion
+> > tag.
+> 
+> The solution is simple: Do not use private annotated tags. Or rather, if
+> you are creating an annotated tag, modify EXTRAVERSION accordingly. Any
+> automagic based on the tag name is going to fail in some way.
 
--    sym_arr = sym_re_search(dialog_input);
-+    sym_arr = sym_re_search(dialog_input, false);
-      res = get_relations_str(sym_arr, NULL);
-      free(sym_arr);
-      show_scroll_win(main_window,
-diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
-index 1500c38..3df276a 100644
---- a/scripts/kconfig/qconf.cc
-+++ b/scripts/kconfig/qconf.cc
-@@ -1197,6 +1197,9 @@ ConfigSearchWindow::ConfigSearchWindow(ConfigMainWindow* parent, const char *nam
-      layout2->addWidget(searchButton);
-      layout1->addLayout(layout2);
+Here private tags, although not a proper term, (my description wasn't
+clear) was referring to any annotated/signed tag that does not match
+kernelversion.
 
-+    searchInDescription = new QCheckBox(_("Search in all texts."), this);
-+    layout1->addWidget(searchInDescription);
-+
-      split = new QSplitter(this);
-      split->setOrientation(Qt::Vertical);
-      list = new ConfigView(split, name);
-@@ -1253,7 +1256,15 @@ void ConfigSearchWindow::search(void)
-      list->list->clear();
-      info->clear();
+Reason for this patch was to determine the exact source from kernel
+logs easily while working over subystem maintainer trees (especially
+useful when checking older logs and testing). More than my private tags,
+it is the tags of subystem maintainers which never is a kernelversion
+that made it difficult to determine the source from logs. Presence of
+those tags misleads one about the source.
 
--    result = sym_re_search(editField->text().latin1());
-+    bool in_description = false;
-+#if QT_VERSION >= 0x040000
-+    if (searchInDescription->checkState() == Qt::Checked) {
-+#else
-+    if (searchInDescription->isChecked() == TRUE) {
-+#endif
-+        in_description = true;
-+    }
-+    result = sym_re_search(editField->text().latin1(), in_description);
-      if (!result)
-          return;
-      for (p = result; *p; p++) {
-diff --git a/scripts/kconfig/qconf.h b/scripts/kconfig/qconf.h
-index 3715b3e..70f283e 100644
---- a/scripts/kconfig/qconf.h
-+++ b/scripts/kconfig/qconf.h
-@@ -5,8 +5,10 @@
+Modifying EXTRAVERSION would make it dirty, else commiting only for
+the sake of avoiding dirty would be required to track the git source
+and chances are high that git gc may eat those commits.
 
-  #if QT_VERSION < 0x040000
-  #include <qlistview.h>
-+#include <qcheckbox.h>
-  #else
-  #include <q3listview.h>
-+#include <QCheckBox>
-  #endif
-  #include <qsettings.h>
+> With your change, the script considers e.g. the next-YYYYMMDD tags
+> "private."
 
-@@ -294,6 +296,7 @@ protected:
-      QSplitter* split;
-      ConfigView* list;
-      ConfigInfoView* info;
-+    QCheckBox *searchInDescription;
+Although next tags were not causing much problem (due to
+localversion-next file and as no direct development over next),
+maintainer tags like this without localversion-* files were the ones
+that was being mostly targeted by this change.
 
-      struct symbol **result;
-  };
-diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
-index c9a6775..baa6ac3 100644
---- a/scripts/kconfig/symbol.c
-+++ b/scripts/kconfig/symbol.c
-@@ -990,7 +990,7 @@ static int sym_rel_comp(const void *sym1, const void *sym2)
-      return strcmp(s1->sym->name, s2->sym->name);
-  }
+> >  define filechk_kernel.release
+> > -	echo "$(KERNELVERSION)$$($(CONFIG_SHELL) $(srctree)/scripts/setlocalversion $(srctree))"
+> > +	echo "$(KERNELVERSION)$$($(CONFIG_SHELL) $(srctree)/scripts/setlocalversion $(srctree) $(KERNELVERSION))" > $@
+> >  endef
+> 
+> The >$@ should not be there.
 
--struct symbol **sym_re_search(const char *pattern)
-+struct symbol **sym_re_search(const char *pattern, const bool in_description)
-  {
-      struct symbol *sym, **sym_arr = NULL;
-      struct sym_match *sym_match_arr = NULL;
-@@ -1008,8 +1008,43 @@ struct symbol **sym_re_search(const char *pattern)
-      for_all_symbols(i, sym) {
-          if (sym->flags & SYMBOL_CONST || !sym->name)
-              continue;
--        if (regexec(&re, sym->name, 1, match, 0))
--            continue;
-+        if (in_description) {
-+            struct property *prop;
-+            size_t length = 1;
-+            if (sym->name)
-+                length += strlen(sym->name);
-+            for_all_prompts(sym, prop) {
-+                if (prop->text)
-+                    length += strlen(prop->text) + 1;
-+                if (prop->menu && prop->menu->help)
-+                    length += strlen(prop->menu->help) + 1;
-+            }
-+            char *all_text = 0;
-+            all_text = malloc(length);
-+            if (!all_text)
-+                goto sym_re_search_free;
-+            *all_text = 0;
-+            if (sym->name)
-+                strcat(all_text, sym->name);
-+            for_all_prompts(sym, prop) {
-+                if (prop->text) {
-+                    strcat(all_text, "\n");
-+                    strcat(all_text, prop->text);
-+                }
-+                if (prop->menu && prop->menu->help) {
-+                    strcat(all_text, "\n");
-+                    strcat(all_text, prop->menu->help);
-+                }
-+            }
-+            if (regexec(&re, all_text, 1, match, 0)) {
-+                free(all_text);
-+                continue;
-+            }
-+            free(all_text);
-+        } else {
-+            if (regexec(&re, sym->name, 1, match, 0))
-+                continue;
-+        }
-          if (cnt >= size) {
-              void *tmp;
-              size += 16;
+Yes, crap, happened while rebasing - punishment for coding without
+proper understanding.
 
+Regards
+Afzal
