@@ -1,73 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pa0-f44.google.com ([209.85.220.44]:50377 "EHLO
-	mail-pa0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752141Ab3J0TjY (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 27 Oct 2013 15:39:24 -0400
-Date: Mon, 28 Oct 2013 01:09:07 +0530
-From: Afzal Mohammed <afzal.mohd.ma@gmail.com>
-Subject: Re: [PATCH RFC] kbuild: prevent git private tag altering
- kernelrelease
-Message-ID: <20131027193907.GA2710@afzal-ThinkPad-R50e>
-References: <1379109004-2411-1-git-send-email-afzal.mohd.ma@gmail.com>
- <5267CD3C.2020004@suse.cz>
+Received: from mout.web.de ([212.227.15.3]:51133 "EHLO mout.web.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754649Ab3J1CQb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 27 Oct 2013 22:16:31 -0400
+Received: from tacticalops.localnet ([95.112.250.113]) by smtp.web.de
+ (mrweb002) with ESMTPSA (Nemesis) id 0Lzrwh-1VnwK71dMB-0151eI for
+ <linux-kbuild@vger.kernel.org>; Mon, 28 Oct 2013 03:16:29 +0100
+From: Martin Walch <walch.martin@web.de>
+Subject: Segmentation Fault with 'm' Dependencies
+Date: Mon, 28 Oct 2013 03:16:27 +0100
+Message-ID: <4647748.CU0TquGsxA@tacticalops>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5267CD3C.2020004@suse.cz>
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Christophe Leroy <christophe.leroy@c-s.fr>, Christian Kujau <lists@nerdbynature.de>
+To: linux-kbuild@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.cz>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Dirk Gouders <dirk@gouders.net>, Andrew Morton <akpm@linux-foundation.org>, Libo Chen <libo.chen@huawei.com>
 
-Hi Michal,
+Hello,
 
-On Wed, Oct 23, 2013 at 03:21:00PM +0200, Michal Marek wrote:
-> On 13.9.2013 23:49, Afzal Mohammed wrote:
+this test case leads to a segmentation fault:
 
-> > If a private tag is created after the most recent kernelversion tag, a
-> > commit after this private tag would feed kernelrelease with commits
-> > after private tag and kernelversion tag. This may confuse user relying
-> > on kernelrelease (mostly a developer while debugging), mainly if HEAD
-> > has a private tag and otherwise w.r.t git distance from kernelversion
-> > tag.
-> 
-> The solution is simple: Do not use private annotated tags. Or rather, if
-> you are creating an annotated tag, modify EXTRAVERSION accordingly. Any
-> automagic based on the tag name is going to fail in some way.
+config A
+	tristate "A" if m
 
-Here private tags, although not a proper term, (my description wasn't
-clear) was referring to any annotated/signed tag that does not match
-kernelversion.
+config MODULES
+	boolean "MODULES"
+	option modules
 
-Reason for this patch was to determine the exact source from kernel
-logs easily while working over subystem maintainer trees (especially
-useful when checking older logs and testing). More than my private tags,
-it is the tags of subystem maintainers which never is a kernelversion
-that made it difficult to determine the source from logs. Presence of
-those tags misleads one about the source.
+As you can see, the MODULES symbol with the option modules is declared after
+the first occurrence of an 'm' dependency. (Actually you can drop the MODULES
+section or use a different symbol name. It does not matter.) Internally 'm' gets
+converted into (symbol_mod && modules_sym), which adds a dependency on a
+bad symbol, finally leading to dereferencing a null pointer.
 
-Modifying EXTRAVERSION would make it dirty, else commiting only for
-the sake of avoiding dirty would be required to track the git source
-and chances are high that git gc may eat those commits.
+If you move the declaration of the MODULES symbol to the top, everything
+works fine.
 
-> With your change, the script considers e.g. the next-YYYYMMDD tags
-> "private."
+The crash has been introduced last month with
 
-Although next tags were not causing much problem (due to
-localversion-next file and as no direct development over next),
-maintainer tags like this without localversion-* files were the ones
-that was being mostly targeted by this change.
+> 6902dccfda005fa4c42410fa064fdd331ab42479
+> kconfig: do not special-case 'MODULES' symbol
 
-> >  define filechk_kernel.release
-> > -	echo "$(KERNELVERSION)$$($(CONFIG_SHELL) $(srctree)/scripts/setlocalversion $(srctree))"
-> > +	echo "$(KERNELVERSION)$$($(CONFIG_SHELL) $(srctree)/scripts/setlocalversion $(srctree) $(KERNELVERSION))" > $@
-> >  endef
-> 
-> The >$@ should not be there.
+However, things were probably broken before. The problem has only
+become visible.
 
-Yes, crap, happened while rebasing - punishment for coding without
-proper understanding.
+The reason that configuring a Linux kernel does not crash the
+configuration system is that there is currently no architecture that has a
+symbol with a dependency on 'm' anywhere before the MODULES symbol.
 
 Regards
-Afzal
+Martin Walch
+-- 
+
