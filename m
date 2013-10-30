@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-we0-f178.google.com ([74.125.82.178]:34573 "EHLO
-	mail-we0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751803Ab3J3Vq0 (ORCPT
+Received: from mail-we0-f180.google.com ([74.125.82.180]:58418 "EHLO
+	mail-we0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751803Ab3J3Vq3 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 30 Oct 2013 17:46:26 -0400
-Received: by mail-we0-f178.google.com with SMTP id q59so1883264wes.37
-        for <linux-kbuild@vger.kernel.org>; Wed, 30 Oct 2013 14:46:25 -0700 (PDT)
+	Wed, 30 Oct 2013 17:46:29 -0400
+Received: by mail-we0-f180.google.com with SMTP id q59so1885375wes.39
+        for <linux-kbuild@vger.kernel.org>; Wed, 30 Oct 2013 14:46:28 -0700 (PDT)
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: [PATCH 2/7] kconfig: add short explanation to SYMBOL_WRITE
-Date: Wed, 30 Oct 2013 22:46:15 +0100
-Message-Id: <31bfb10820301b26debeb26465d5bff7b1f11a37.1383168460.git.yann.morin.1998@free.fr>
+Subject: [PATCH 4/7] kconfig: adjust warning message for conflicting types
+Date: Wed, 30 Oct 2013 22:46:17 +0100
+Message-Id: <57540f1dea6580fda0debaf3704d1b0e928a120e.1383168460.git.yann.morin.1998@free.fr>
 In-Reply-To: <cover.1383168460.git.yann.morin.1998@free.fr>
 References: <cover.1383168460.git.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -19,27 +19,47 @@ Cc: Michal Marek <mmarek@suse.cz>, Martin Walch <walch.martin@web.de>, "Yann E. 
 
 From: Martin Walch <walch.martin@web.de>
 
-replace the question mark in the comment after SYMBOL_WRITE with an explanation
+Each symbol must have exactly one type assigned. However, if a symbol happens
+to have two different types assigned at runtime, a warning is printed and the
+first type is preserved while the second type is being ignored.
+
+The warning message says
+
+type of <symbol name> redefined from <first type> to <second type>
+
+which may be misleading as it may create the impression that the second type
+replaces the first type.
+
+This patch clarifies this by changing the warning to
+
+ignoring type redefinition of <symbol name> from <first type> to <second type>
 
 Signed-off-by: Martin Walch <walch.martin@web.de>
+Acked-by: Wang YanQing <udknight@gmail.com>
+Reviewed-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
 Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
 ---
- scripts/kconfig/expr.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ scripts/kconfig/menu.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/scripts/kconfig/expr.h b/scripts/kconfig/expr.h
-index df198a5..ba663e1 100644
---- a/scripts/kconfig/expr.h
-+++ b/scripts/kconfig/expr.h
-@@ -93,7 +93,7 @@ struct symbol {
- #define SYMBOL_CHOICEVAL  0x0020  /* used as a value in a choice block */
- #define SYMBOL_VALID      0x0080  /* set when symbol.curr is calculated */
- #define SYMBOL_OPTIONAL   0x0100  /* choice is optional - values can be 'n' */
--#define SYMBOL_WRITE      0x0200  /* ? */
-+#define SYMBOL_WRITE      0x0200  /* write symbol to file (KCONFIG_CONFIG) */
- #define SYMBOL_CHANGED    0x0400  /* ? */
- #define SYMBOL_AUTO       0x1000  /* value from environment variable */
- #define SYMBOL_CHECKED    0x2000  /* used during dependency checking */
+diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+index b970101..9e69f19 100644
+--- a/scripts/kconfig/menu.c
++++ b/scripts/kconfig/menu.c
+@@ -119,9 +119,10 @@ void menu_set_type(int type)
+ 		sym->type = type;
+ 		return;
+ 	}
+-	menu_warn(current_entry, "type of '%s' redefined from '%s' to '%s'",
+-	    sym->name ? sym->name : "<choice>",
+-	    sym_type_name(sym->type), sym_type_name(type));
++	menu_warn(current_entry,
++		"ignoring type redefinition of '%s' from '%s' to '%s'",
++		sym->name ? sym->name : "<choice>",
++		sym_type_name(sym->type), sym_type_name(type));
+ }
+ 
+ struct property *menu_add_prop(enum prop_type type, char *prompt, struct expr *expr, struct expr *dep)
 -- 
 1.8.1.2
 
