@@ -1,39 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from services.gouders.net ([141.101.32.176]:37027 "EHLO
-	services.gouders.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751358Ab3J3Kko (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 30 Oct 2013 06:40:44 -0400
-From: Dirk Gouders <dirk@gouders.net>
-Subject: Re: choice =y selection becomes lost after having multiple entries =m with depends on
-In-Reply-To: <CAN_we7ME34yFJTCX-SjtYxLgd-riHz4+73meA2LEPNByzMnvmw@mail.gmail.com>
-	(Daniele Forsi's message of "Wed, 30 Oct 2013 11:30:35 +0100")
-References: <5267AA3E.1040003@linutronix.de> <20131023112331.GA3869@free.fr>
-	<5267B2D3.3000109@linutronix.de> <givc0mbs9b.fsf@karga.hank.lab>
-	<52694894.8090201@linutronix.de> <gia9hr5b9m.fsf@karga.hank.lab>
-	<CAN_we7ME34yFJTCX-SjtYxLgd-riHz4+73meA2LEPNByzMnvmw@mail.gmail.com>
-Date: Wed, 30 Oct 2013 11:41:29 +0100
-Message-ID: <gizjpr3usm.fsf@karga.hank.lab>
-MIME-Version: 1.0
-Content-Type: text/plain
+Received: from cantor2.suse.de ([195.135.220.15]:44117 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751528Ab3J3LHx (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 30 Oct 2013 07:07:53 -0400
+From: Michal Marek <mmarek@suse.cz>
+Subject: [PATCH] MAINTAINERS: New kconfig maintainer
+Date: Wed, 30 Oct 2013 12:07:44 +0100
+Message-Id: <1383131264-19233-1-git-send-email-mmarek@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Daniele Forsi <dforsi@gmail.com>
-Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Felipe Balbi <balbi@ti.com>, USB list <linux-usb@vger.kernel.org>, Tomi Valkeinen <tomi.valkeinen@ti.com>, Roger Quadros <rogerq@ti.com>
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, yann.morin.1998@free.fr
 
-Daniele Forsi <dforsi@gmail.com> writes:
+Yann has been the de facto maintainer of kconfig for some time. Update
+the KCONFIG entry with his emails address and git tree.
 
-> 2013/10/30 Dirk Gouders:
->
->> Those values are also written to the config file causing modules when
->> they should not.
->
-> this sentence of the commit message is missing something, I think you mean:
-> s/causing modules/causing modules to be built/
+Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Signed-off-by: Michal Marek <mmarek@suse.cz>
+---
+ MAINTAINERS |    5 +++--
+ 1 files changed, 3 insertions(+), 2 deletions(-)
 
-Yes, thanks, that is correct.
+diff --git a/MAINTAINERS b/MAINTAINERS
+index e61c2e8..d083982 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -4723,9 +4723,10 @@ F:	Documentation/hwmon/k8temp
+ F:	drivers/hwmon/k8temp.c
+ 
+ KCONFIG
+-M:	Michal Marek <mmarek@suse.cz>
++M:	"Yann E. MORIN" <yann.morin.1998@free.fr>
+ L:	linux-kbuild@vger.kernel.org
+-S:	Odd Fixes
++T:	git://gitorious.org/linux-kconfig/linux-kconfig
++S:	Maintained
+ F:	Documentation/kbuild/kconfig-language.txt
+ F:	scripts/kconfig/
+ 
+-- 
+1.7.3.1
 
-I will fix that in a v2 or perhaps Yann will do if he does not notice
-other problems with the patch.
-
-Dirk
