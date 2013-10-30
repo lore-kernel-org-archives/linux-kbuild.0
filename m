@@ -1,95 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.skyhub.de ([78.46.96.112]:39044 "EHLO mail.skyhub.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751371Ab3J3QGo convert rfc822-to-8bit (ORCPT
+Received: from mail-we0-f179.google.com ([74.125.82.179]:39435 "EHLO
+	mail-we0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750865Ab3J3SWq (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 30 Oct 2013 12:06:44 -0400
-Date: Wed, 30 Oct 2013 17:06:35 +0100
-From: Borislav Petkov <bp@alien8.de>
-Subject: Kbuild: Ignore GREP_OPTIONS env variable
-Message-ID: <20131030160635.GE13290@pd.tnic>
+	Wed, 30 Oct 2013 14:22:46 -0400
+Date: Wed, 30 Oct 2013 19:22:41 +0100
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: Re: [PATCH] MAINTAINERS: New kconfig maintainer
+Message-ID: <20131030182241.GB3438@free.fr>
+References: <1383131264-19233-1-git-send-email-mmarek@suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8BIT
+In-Reply-To: <1383131264-19233-1-git-send-email-mmarek@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>
-Cc: x86-ml <x86@kernel.org>
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hi,
+Michal, All,
 
-this is just a general poll of what people think about the issue here,
-just so that at least we've talked about it.
+On 2013-10-30 12:07 +0100, Michal Marek spake thusly:
+> Yann has been the de facto maintainer of kconfig for some time. Update
+> the KCONFIG entry with his emails address and git tree.
+> 
+> Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>
+> Signed-off-by: Michal Marek <mmarek@suse.cz>
 
-So I had defined GREP_OPTIONS=--color=always on one of my boxes and had
-forgotten about it and the kernel build started failing because we use
-grep quite a while in the tree and it started issuing shell color markup
-which generated garbage files, like the syscall headers on x86, for
-example.
+Acked-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-I have a fix below which seems to take care of it but what is the
-general opinion: Do we want to be more robust against the environment we
-find on a machine before building the kernel or let the user figure it
-out himself that he should be using
+Thank you for the trust you've put in me with this patch! :-)
 
-GREP_OPTIONS=--color=auto
+Shall I take this in my tree, or will you add it to yours?
 
-in the first place and it is his own moronic fault if he does 'always'?
+Regards,
+Yann E. MORIN.
 
-Opinions, comments?
-
-Thanks.
-
---
-From: Borislav Petkov <bp@suse.de>
-Subject: [PATCH] Kbuild: Ignore GREP_OPTIONS env variable
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-
-When building the kernel in a shell which defines GREP_OPTIONS so that
-grep behavior is modified, we can break the generation of the syscalls
-table like so:
-
-__SYSCALL_COMMON([01;31m[K0[m[K, sys_read, sys_read)
-__SYSCALL_COMMON([01;31m[K1[m[K, sys_write, sys_write)
-__SYSCALL_COMMON([01;31m[K1[m[K0, sys_mprotect, sys_mprotect) ...
-
-This is just the initial breakage, later we barf when generating
-modules.
-
-In this case, GREP_OPTIONS contains "--color=always" which adds the shell
-colors markup and completely fudges the headers under ...generated/asm/.
-
-Fix that by ignoring the GREP_OPTIONS variable for the whole kernel
-build as we tend to use grep at a bunch of places.
-
-Signed-off-by: Borislav Petkov <bp@suse.de>
----
- Makefile | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/Makefile b/Makefile
-index 868c0eb67b08..7a2acd9a5d1c 100644
---- a/Makefile
-+++ b/Makefile
-@@ -16,6 +16,9 @@ NAME = One Giant Leap for Frogkind
- # o  print "Entering directory ...";
- MAKEFLAGS += -rR --no-print-directory
- 
-+GREP_OPTIONS=
-+export GREP_OPTIONS
-+
- # Avoid funny character set dependencies
- unexport LC_ALL
- LC_COLLATE=C
--- 
-1.8.4
+> ---
+>  MAINTAINERS |    5 +++--
+>  1 files changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index e61c2e8..d083982 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -4723,9 +4723,10 @@ F:	Documentation/hwmon/k8temp
+>  F:	drivers/hwmon/k8temp.c
+>  
+>  KCONFIG
+> -M:	Michal Marek <mmarek@suse.cz>
+> +M:	"Yann E. MORIN" <yann.morin.1998@free.fr>
+>  L:	linux-kbuild@vger.kernel.org
+> -S:	Odd Fixes
+> +T:	git://gitorious.org/linux-kconfig/linux-kconfig
+> +S:	Maintained
+>  F:	Documentation/kbuild/kconfig-language.txt
+>  F:	scripts/kconfig/
+>  
+> -- 
+> 1.7.3.1
+> 
 
 -- 
-Regards/Gruss,
-    Boris.
-
-Sent from a fat crate under my desk. Formatting is fine.
---
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
