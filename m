@@ -1,63 +1,35 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from thoth.sbs.de ([192.35.17.2]:33028 "EHLO thoth.sbs.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751644Ab3J3K2i (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 30 Oct 2013 06:28:38 -0400
-Message-ID: <5270DF35.1040708@siemens.com>
-Date: Wed, 30 Oct 2013 11:28:05 +0100
-From: Jan Kiszka <jan.kiszka@siemens.com>
+Received: from mail-lb0-f173.google.com ([209.85.217.173]:52991 "EHLO
+	mail-lb0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751778Ab3J3Kah (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 30 Oct 2013 06:30:37 -0400
 MIME-Version: 1.0
-Subject: Re: [PATCH v6 01/21] scripts/gdb: Add infrastructure
-References: <cover.1382950737.git.jan.kiszka@siemens.com> <74596df6935455908a146314b9b42ae2d79f6712.1382950737.git.jan.kiszka@siemens.com> <20131030053521.GU29695@two.firstfloor.org>
-In-Reply-To: <20131030053521.GU29695@two.firstfloor.org>
+In-Reply-To: <gia9hr5b9m.fsf@karga.hank.lab>
+References: <5267AA3E.1040003@linutronix.de>
+	<20131023112331.GA3869@free.fr>
+	<5267B2D3.3000109@linutronix.de>
+	<givc0mbs9b.fsf@karga.hank.lab>
+	<52694894.8090201@linutronix.de>
+	<gia9hr5b9m.fsf@karga.hank.lab>
+Date: Wed, 30 Oct 2013 11:30:35 +0100
+Message-ID: <CAN_we7ME34yFJTCX-SjtYxLgd-riHz4+73meA2LEPNByzMnvmw@mail.gmail.com>
+Subject: Re: choice =y selection becomes lost after having multiple entries =m
+ with depends on
+From: Daniele Forsi <dforsi@gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andi Kleen <andi@firstfloor.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org, Jason Wessel <jason.wessel@windriver.com>, kgdb-bugreport@lists.sourceforge.net, Tom Tromey <tromey@redhat.com>, Ben Widawsky <ben@bwidawsk.net>, Borislav Petkov <bp@suse.de>, Tatiana Al-Chueyr Martins <tatiana.alchueyr@gmail.com>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+To: Dirk Gouders <dirk@gouders.net>
+Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Felipe Balbi <balbi@ti.com>, USB list <linux-usb@vger.kernel.org>, Tomi Valkeinen <tomi.valkeinen@ti.com>, Roger Quadros <rogerq@ti.com>
 
-On 2013-10-30 06:35, Andi Kleen wrote:
->> The loading mechanism is based on gdb loading for <objfile>-gdb.py when
->> opening <objfile>. Therefore, this places a corresponding link to the
->> main helper script into the output directory that contains vmlinux.
-> 
->> This feature depends on CONFIG_DEBUG_INFO.
-> 
-> Could you make this a separate config option? Having the links for
-> people who don't use gdb would be ugly.
-> 
+2013/10/30 Dirk Gouders:
 
-Like this?
+> Those values are also written to the config file causing modules when
+> they should not.
 
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index 06344d9..d66a8f8 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -143,6 +143,17 @@ config DEBUG_INFO_REDUCED
- 	  DEBUG_INFO build and compile times are reduced too.
- 	  Only works with newer gcc versions.
- 
-+config GDB_SCRIPTS
-+	bool "Provide GDB scripts for kernel debugging"
-+	select DEBUG_INFO
-+	help
-+	  This creates the required links to GDB helper scripts in the
-+	  build directory. If you load vmlinux into gdb, the helper
-+	  scripts will be automatically imported by gdb as well, and
-+	  additional functions are available to analyze a Linux kernel
-+	  instance. See Documentation/gdb-kernel-debugging.txt for further
-+	  details.
-+
- config ENABLE_WARN_DEPRECATED
- 	bool "Enable __deprecated logic"
- 	default y
-
-Will send an updated series soon, also adjusting the docs, just waiting
-for potential further comments.
-
-Jan
+this sentence of the commit message is missing something, I think you mean:
+s/causing modules/causing modules to be built/
 
 -- 
-Siemens AG, Corporate Technology, CT RTC ITP SES-DE
-Corporate Competence Center Embedded Linux
+Daniele Forsi
