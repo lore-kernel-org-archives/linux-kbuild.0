@@ -1,55 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f51.google.com ([74.125.82.51]:56525 "EHLO
-	mail-wg0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751803Ab3J3VqY (ORCPT
+Received: from mail-we0-f178.google.com ([74.125.82.178]:34573 "EHLO
+	mail-we0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751803Ab3J3Vq0 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 30 Oct 2013 17:46:24 -0400
-Received: by mail-wg0-f51.google.com with SMTP id l18so1896802wgh.6
-        for <linux-kbuild@vger.kernel.org>; Wed, 30 Oct 2013 14:46:23 -0700 (PDT)
+	Wed, 30 Oct 2013 17:46:26 -0400
+Received: by mail-we0-f178.google.com with SMTP id q59so1883264wes.37
+        for <linux-kbuild@vger.kernel.org>; Wed, 30 Oct 2013 14:46:25 -0700 (PDT)
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: [PATCH 1/7] Documentation/kbuild/kconfig.txt: 'make listnewconfig' replaces: yes "" | make oldconfig
-Date: Wed, 30 Oct 2013 22:46:14 +0100
-Message-Id: <560909d433109e3da08757237f30576c71697914.1383168460.git.yann.morin.1998@free.fr>
+Subject: [PATCH 2/7] kconfig: add short explanation to SYMBOL_WRITE
+Date: Wed, 30 Oct 2013 22:46:15 +0100
+Message-Id: <31bfb10820301b26debeb26465d5bff7b1f11a37.1383168460.git.yann.morin.1998@free.fr>
 In-Reply-To: <cover.1383168460.git.yann.morin.1998@free.fr>
 References: <cover.1383168460.git.yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Michal Marek <mmarek@suse.cz>, Regid Ichira <regid23@nt1.in>, "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: Michal Marek <mmarek@suse.cz>, Martin Walch <walch.martin@web.de>, "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-From: Regid Ichira <regid23@nt1.in>
+From: Martin Walch <walch.martin@web.de>
 
-Signed-off-by: Regid Ichira <regid23@nt1.in>
-Acked-by: Rob Landley <rob@landley.net>
-[yann.morin.1998@free.fr: fix trailing whitespace, commit subject]
+replace the question mark in the comment after SYMBOL_WRITE with an explanation
+
+Signed-off-by: Martin Walch <walch.martin@web.de>
 Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
 ---
- Documentation/kbuild/kconfig.txt | 11 ++---------
- 1 file changed, 2 insertions(+), 9 deletions(-)
+ scripts/kconfig/expr.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Documentation/kbuild/kconfig.txt b/Documentation/kbuild/kconfig.txt
-index 8ef6dbb..bbc99c0 100644
---- a/Documentation/kbuild/kconfig.txt
-+++ b/Documentation/kbuild/kconfig.txt
-@@ -20,16 +20,9 @@ symbols have been introduced.
- To see a list of new config symbols when using "make oldconfig", use
- 
- 	cp user/some/old.config .config
--	yes "" | make oldconfig >conf.new
-+	make listnewconfig
- 
--and the config program will list as (NEW) any new symbols that have
--unknown values.  Of course, the .config file is also updated with
--new (default) values, so you can use:
--
--	grep "(NEW)" conf.new
--
--to see the new config symbols or you can use diffconfig to see the
--differences between the previous and new .config files:
-+and the config program will list any new symbols, one per line.
- 
- 	scripts/diffconfig .config.old .config | less
- 
+diff --git a/scripts/kconfig/expr.h b/scripts/kconfig/expr.h
+index df198a5..ba663e1 100644
+--- a/scripts/kconfig/expr.h
++++ b/scripts/kconfig/expr.h
+@@ -93,7 +93,7 @@ struct symbol {
+ #define SYMBOL_CHOICEVAL  0x0020  /* used as a value in a choice block */
+ #define SYMBOL_VALID      0x0080  /* set when symbol.curr is calculated */
+ #define SYMBOL_OPTIONAL   0x0100  /* choice is optional - values can be 'n' */
+-#define SYMBOL_WRITE      0x0200  /* ? */
++#define SYMBOL_WRITE      0x0200  /* write symbol to file (KCONFIG_CONFIG) */
+ #define SYMBOL_CHANGED    0x0400  /* ? */
+ #define SYMBOL_AUTO       0x1000  /* value from environment variable */
+ #define SYMBOL_CHECKED    0x2000  /* used during dependency checking */
 -- 
 1.8.1.2
 
