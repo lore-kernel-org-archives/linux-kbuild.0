@@ -1,43 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from www.linutronix.de ([62.245.132.108]:37350 "EHLO
-	Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751785Ab3JaKUi (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 31 Oct 2013 06:20:38 -0400
-Date: Thu, 31 Oct 2013 11:20:30 +0100
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Subject: Re: choice =y selection becomes lost after having multiple entries
- =m with depends on
-Message-ID: <20131031102030.GB20199@linutronix.de>
-References: <5267AA3E.1040003@linutronix.de>
- <20131023112331.GA3869@free.fr>
- <5267B2D3.3000109@linutronix.de>
- <givc0mbs9b.fsf@karga.hank.lab>
- <52694894.8090201@linutronix.de>
- <gia9hr5b9m.fsf@karga.hank.lab>
- <giob664yy1.fsf@karga.hank.lab>
+Received: from cantor2.suse.de ([195.135.220.15]:57899 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753292Ab3JaKuX (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 31 Oct 2013 06:50:23 -0400
+Message-ID: <527235E7.8000202@suse.cz>
+Date: Thu, 31 Oct 2013 11:50:15 +0100
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <giob664yy1.fsf@karga.hank.lab>
+Subject: Re: [PATCH] MAINTAINERS: New kconfig maintainer
+References: <1383131264-19233-1-git-send-email-mmarek@suse.cz> <20131030182241.GB3438@free.fr>
+In-Reply-To: <20131030182241.GB3438@free.fr>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dirk Gouders <dirk@gouders.net>
-Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Felipe Balbi <balbi@ti.com>, USB list <linux-usb@vger.kernel.org>, Tomi Valkeinen <tomi.valkeinen@ti.com>, Roger Quadros <rogerq@ti.com>
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-* Dirk Gouders | 2013-10-30 15:26:30 [+0100]:
+Dne 30.10.2013 19:22, Yann E. MORIN napsal(a):
+> Michal, All,
+> 
+> On 2013-10-30 12:07 +0100, Michal Marek spake thusly:
+>> Yann has been the de facto maintainer of kconfig for some time. Update
+>> the KCONFIG entry with his emails address and git tree.
+>>
+>> Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>
+>> Signed-off-by: Michal Marek <mmarek@suse.cz>
+> 
+> Acked-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+> 
+> Thank you for the trust you've put in me with this patch! :-)
+> 
+> Shall I take this in my tree, or will you add it to yours?
 
->Hi Sebastian, Yann, all,
-Hi Dirk,
+I'll add it.
 
->below is a patch that prevents choice_values to appear in the list if
->they depend on 'm' symbols and the choice symbol is set to 'y'.  I would
->be glad if you could have a look at it.
+Michal
 
-I applied this patch (and ignored the other one in this thread) and the
-problem Tomi Valkeinen noticed and I reported here seems to be gone.
-Thank you very much.
-
->Dirk
-
-Sebastian
