@@ -1,39 +1,35 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:57899 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:58863 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753292Ab3JaKuX (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 31 Oct 2013 06:50:23 -0400
-Message-ID: <527235E7.8000202@suse.cz>
-Date: Thu, 31 Oct 2013 11:50:15 +0100
+	id S1750715Ab3JaLTE (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 31 Oct 2013 07:19:04 -0400
+Message-ID: <52723CA2.5060809@suse.cz>
+Date: Thu, 31 Oct 2013 12:18:58 +0100
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH] MAINTAINERS: New kconfig maintainer
-References: <1383131264-19233-1-git-send-email-mmarek@suse.cz> <20131030182241.GB3438@free.fr>
-In-Reply-To: <20131030182241.GB3438@free.fr>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [pull request] Pull request for branch yem/kconfig-for-next
+References: <cover.1383168460.git.yann.morin.1998@free.fr>
+In-Reply-To: <cover.1383168460.git.yann.morin.1998@free.fr>
+Content-Type: text/plain; charset=ISO-8859-2
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>, linux-kbuild@vger.kernel.org
+Cc: Ben Hutchings <ben@decadent.org.uk>, Martin Walch <walch.martin@web.de>, Regid Ichira <regid23@nt1.in>
 
-Dne 30.10.2013 19:22, Yann E. MORIN napsal(a):
-> Michal, All,
+Dne 30.10.2013 22:46, Yann E. MORIN napsal(a):
+> From: "Yann E. MORIN" <yann.morin.1998@free.fr>
 > 
-> On 2013-10-30 12:07 +0100, Michal Marek spake thusly:
->> Yann has been the de facto maintainer of kconfig for some time. Update
->> the KCONFIG entry with his emails address and git tree.
->>
->> Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>
->> Signed-off-by: Michal Marek <mmarek@suse.cz>
+> Hello All!
 > 
-> Acked-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
-> 
-> Thank you for the trust you've put in me with this patch! :-)
-> 
-> Shall I take this in my tree, or will you add it to yours?
+> Michal, please pull these changes to kconfig for 3.13:
+>   - update Documentation and mconf's help  (Martin, Regid)
+>   - remove unneeded kconfig scanner declaration  (Martin)
+>   - clarify parser warning message about type redefinition  (Martin)
+>   - fix gstr length usage  (Martin)
+>   - store our Qt config settings in a proper location  (Ben)
 
-I'll add it.
+Pulled, thanks a lot!
 
 Michal
 
