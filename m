@@ -1,92 +1,71 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from services.gouders.net ([141.101.32.176]:39519 "EHLO
-	services.gouders.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752151Ab3KAIyf (ORCPT
+Received: from mail-wi0-f175.google.com ([209.85.212.175]:44236 "EHLO
+	mail-wi0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752061Ab3KCLJe (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 1 Nov 2013 04:54:35 -0400
-From: Dirk Gouders <dirk@gouders.net>
-Subject: [PATCH v3] kconfig/symbol.c: handle choice_values that depend on 'm' symbols
-In-Reply-To: <gh4n7wzf0y.fsf@lena.gouders.net> (Dirk Gouders's message of
-	"Fri, 01 Nov 2013 09:45:33 +0100")
-Date: Fri, 1 Nov 2013 00:39:46 +0100
-Message-ID: <ghvc0cy00x.fsf@lena.gouders.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+	Sun, 3 Nov 2013 06:09:34 -0500
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: [PATCH] Makefile: fix out-of-tree builds for multiple targets with 'all'
+Date: Sun,  3 Nov 2013 12:09:24 +0100
+Message-Id: <1383476964-25815-1-git-send-email-yann.morin.1998@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Felipe Balbi <balbi@ti.com>, USB list <linux-usb@vger.kernel.org>, Tomi Valkeinen <tomi.valkeinen@ti.com>, Roger Quadros <rogerq@ti.com>
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Ryan Barnett <rjbarnet@rockwellcollins.com>
 
-If choices consist of choice_values that depend on symbols set to 'm',
-those choice_values are not set to 'n' if the choice is changed from
-'m' to 'y' (in which case only one active choice_value is allowed).
-Those values are also written to the config file causing modules to be
-built when they should not.
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-The following config can be used to reproduce and examine the problem:
+For out-of-tree builds, this use-case fails to build:
+    $ make clean all
 
-config modules
-	boolean modules
-	default y
-	option modules
+This is because 'all' is filtered-out in the Makefile wrapper, since
+the wrapper itself has a 'all' target.
 
-config dependency
-	tristate "Dependency"
-	default m
+The 'all' target is just the usual naming for the default target in a
+Makefile. In fact, the first target is the default one, so we can name
+it whatever we want.
 
-choice
-	prompt "Tristate Choice"
-	default choice0
+Rename the Makefile wrapper 'all' target to avoid name-clashing.
 
-config choice0
-	tristate "Choice 0"
+Reported-by: Ryan Barnett <rjbarnet@rockwellcollins.com>
+Signed-off-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: Ryan Barnett <rjbarnet@rockwellcollins.com>
 
-config choice1
-	tristate "Choice 1"
-	depends on dependency
-
-endchoice
-
-This patch sets choice_values' visibility that depend on symbols set
-to 'm' to 'n' if the corresponding choice is set to 'y'.  This makes
-them disappear from the choice list and will also cause the
-choice_values' value set to 'n' in sym_calc_value() and as a result
-they are written as "not set" to the resulting .config file.
-
-Reported-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Signed-off-by: Dirk Gouders <dirk@gouders.net>
 ---
- scripts/kconfig/symbol.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+Note: this still does not allow 'make menuconfig all', but that is not
+even working for in-tree builds either.
+---
+ scripts/mkmakefile | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
-index 22a3c40..32bbaa3 100644
---- a/scripts/kconfig/symbol.c
-+++ b/scripts/kconfig/symbol.c
-@@ -188,12 +188,23 @@ static void sym_validate_range(struct symbol *sym)
- static void sym_calc_visibility(struct symbol *sym)
- {
- 	struct property *prop;
-+	struct symbol *choice_sym = NULL;
- 	tristate tri;
+diff --git a/scripts/mkmakefile b/scripts/mkmakefile
+index 0cc0442..28583bc 100644
+--- a/scripts/mkmakefile
++++ b/scripts/mkmakefile
+@@ -42,18 +42,18 @@ MAKEARGS += O=\$(if \$(patsubst /%,,\$(makedir)),\$(CURDIR)/)\$(patsubst %/,%,\$
  
- 	/* any prompt visible? */
- 	tri = no;
-+
-+	if (sym_is_choice_value(sym))
-+		choice_sym = prop_get_symbol(sym_get_choice_prop(sym));
-+
- 	for_all_prompts(sym, prop) {
- 		prop->visible.tri = expr_calc_value(prop->visible.expr);
-+		/*
-+		 * choice_values with visibility 'mod' are not visible if the
-+		 * corresponding choice's value is 'yes'.
-+		 */
-+		if (prop->visible.tri == mod && (choice_sym && choice_sym->curr.tri == yes))
-+			prop->visible.tri = no;
- 		tri = EXPR_OR(tri, prop->visible.tri);
- 	}
- 	if (tri == mod && (sym->type != S_TRISTATE || modules_val == no))
+ MAKEFLAGS += --no-print-directory
+ 
+-.PHONY: all \$(MAKECMDGOALS)
++.PHONY: _all \$(MAKECMDGOALS)
+ 
+-all	:= \$(filter-out all Makefile,\$(MAKECMDGOALS))
++all	:= \$(filter-out Makefile,\$(MAKECMDGOALS))
+ 
+-all:
++_all:
+ 	\$(Q)\$(MAKE) \$(MAKEARGS) \$(all)
+ 
+ Makefile:;
+ 
+-\$(all): all
++\$(all): _all
+ 	@:
+ 
+-%/: all
++%/: _all
+ 	@:
+ EOF
 -- 
-1.8.4
+1.8.1.2
 
