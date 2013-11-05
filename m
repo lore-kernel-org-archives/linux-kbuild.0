@@ -1,52 +1,80 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f41.google.com ([74.125.82.41]:65507 "EHLO
-	mail-wg0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750748Ab3KDUrC (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 4 Nov 2013 15:47:02 -0500
-Date: Mon, 4 Nov 2013 21:46:55 +0100
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH v3] kconfig/symbol.c: handle choice_values that depend on
- 'm' symbols
-Message-ID: <20131104204655.GC32603@free.fr>
-References: <gh4n7wzf0y.fsf@lena.gouders.net>
- <ghvc0cy00x.fsf@lena.gouders.net>
- <20131104172702.GA11719@linutronix.de>
+Received: from ozlabs.org ([203.10.76.45]:60762 "EHLO ozlabs.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750819Ab3KED12 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 4 Nov 2013 22:27:28 -0500
+From: Rusty Russell <rusty@rustcorp.com.au>
+Subject: Re: linux-next: build warnings after merge of the modules tree
+In-Reply-To: <20131104134134.48665968dd006e3310333993@canb.auug.org.au>
+References: <20131104134134.48665968dd006e3310333993@canb.auug.org.au>
+Date: Tue, 05 Nov 2013 12:50:33 +1030
+Message-ID: <87fvrba8su.fsf@rustcorp.com.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20131104172702.GA11719@linutronix.de>
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: Dirk Gouders <dirk@gouders.net>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Felipe Balbi <balbi@ti.com>, USB list <linux-usb@vger.kernel.org>, Tomi Valkeinen <tomi.valkeinen@ti.com>, Roger Quadros <rogerq@ti.com>
+To: Stephen Rothwell <sfr@canb.auug.org.au>
+Cc: linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, Andi Kleen <ak@linux.intel.com>, linux-kbuild@vger.kernel.org
 
-Sebastian, All,
+Stephen Rothwell <sfr@canb.auug.org.au> writes:
+> Hi Rusty,
+>
+> After merging the modules tree, today's linux-next build (x86_64
+> allmodconfig) produced these warning:
+>
+> WARNING: vmlinux: 'pci_restore_msi_state' exported twice. Previous export was in vmlinux
+> WARNING: vmlinux: '__mod_zone_page_state' exported twice. Previous export was in vmlinux
+> WARNING: vmlinux: 'scsi_prep_return' exported twice. Previous export was in vmlinux
+> WARNING: vmlinux: 'hvc_poll' exported twice. Previous export was in vmlinux
+> WARNING: vmlinux: 'nfs_clear_inode' exported twice. Previous export was in vmlinux
+>
+> (just some samples ... it scrolled off my scrollback :-()
+>
+> Presumably caused by commit e0f244c63fc9 ("asmlinkage, module: Make
+> ksymtab and kcrctab symbols and __this_module __visible").  (reverting
+> that commit makes the warnings go away.)
 
-On 2013-11-04 18:27 +0100, Sebastian Andrzej Siewior spake thusly:
-> * Dirk Gouders | 2013-11-01 00:39:46 [+0100]:
-> 
-> >This patch sets choice_values' visibility that depend on symbols set
-> >to 'm' to 'n' if the corresponding choice is set to 'y'.  This makes
-> >them disappear from the choice list and will also cause the
-> >choice_values' value set to 'n' in sym_calc_value() and as a result
-> >they are written as "not set" to the resulting .config file.
-> >
-> >Reported-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-> 
-> Still solves the issue for me :)
+This works for me.... feedback please!
 
-Should I consider this as:
-    Tested-by: <you>
-?
+Cheers,
+Rusty.
 
-Regards,
-Yann E. MORIN.
+modpost: fix bogus 'exported twice' warnings.
 
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+Andi's change in e0f244c63fc9 ("asmlinkage, module: Make ksymtab and
+kcrctab symbols and __this_module __visible") make the crc appear
+first in the symbol table.
+
+modpost creates an entry when it sees the CRC, then when it sees the
+actual symbol, it complains that it's seen it before.  The preloaded
+flag already exists for the equivalent case where we loaded from
+Module.symvers, so use that.
+
+Signed-off-by: Rusty Russell <rusty@rustcorp.com.au>
+
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index 9b873ac6ed7b..5c677a3e7487 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -164,7 +164,7 @@ struct symbol {
+ 	unsigned int vmlinux:1;    /* 1 if symbol is defined in vmlinux */
+ 	unsigned int kernel:1;     /* 1 if symbol is from kernel
+ 				    *  (only for external modules) **/
+-	unsigned int preloaded:1;  /* 1 if symbol from Module.symvers */
++	unsigned int preloaded:1;  /* 1 if symbol from Module.symvers, or crc */
+ 	enum export  export;       /* Type of export */
+ 	char name[0];
+ };
+@@ -332,8 +332,11 @@ static void sym_update_crc(const char *name, struct module *mod,
+ {
+ 	struct symbol *s = find_symbol(name);
+ 
+-	if (!s)
++	if (!s) {
+ 		s = new_symbol(name, mod, export);
++		/* Don't complain when we find it later. */
++		s->preloaded = 1;
++	}
+ 	s->crc = crc;
+ 	s->crc_valid = 1;
+ }
