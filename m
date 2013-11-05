@@ -1,41 +1,28 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from www.linutronix.de ([62.245.132.108]:33445 "EHLO
-	Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754251Ab3KEIqB (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 5 Nov 2013 03:46:01 -0500
-Message-ID: <5278B042.7000307@linutronix.de>
-Date: Tue, 05 Nov 2013 09:45:54 +0100
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Received: from mga02.intel.com ([134.134.136.20]:51670 "EHLO mga02.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754932Ab3KEORP (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 5 Nov 2013 09:17:15 -0500
+Date: Tue, 5 Nov 2013 06:17:02 -0800
+From: Andi Kleen <ak@linux.intel.com>
+Subject: Re: linux-next: build warnings after merge of the modules tree
+Message-ID: <20131105141702.GE1962@tassilo.jf.intel.com>
+References: <20131104134134.48665968dd006e3310333993@canb.auug.org.au>
+ <87fvrba8su.fsf@rustcorp.com.au>
 MIME-Version: 1.0
-Subject: Re: [PATCH v3] kconfig/symbol.c: handle choice_values that depend
- on 'm' symbols
-References: <gh4n7wzf0y.fsf@lena.gouders.net> <ghvc0cy00x.fsf@lena.gouders.net> <20131104172702.GA11719@linutronix.de> <20131104204655.GC32603@free.fr>
-In-Reply-To: <20131104204655.GC32603@free.fr>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87fvrba8su.fsf@rustcorp.com.au>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: Dirk Gouders <dirk@gouders.net>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Felipe Balbi <balbi@ti.com>, USB list <linux-usb@vger.kernel.org>, Tomi Valkeinen <tomi.valkeinen@ti.com>, Roger Quadros <rogerq@ti.com>
+To: Rusty Russell <rusty@rustcorp.com.au>
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>, linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On 11/04/2013 09:46 PM, Yann E. MORIN wrote:
-> Sebastian, All,
+> modpost creates an entry when it sees the CRC, then when it sees the
+> actual symbol, it complains that it's seen it before.  The preloaded
+> flag already exists for the equivalent case where we loaded from
+> Module.symvers, so use that.
 
-Hi Yann,
+Looks good. Thanks for fixing.
 
->> Still solves the issue for me :)
-> 
-> Should I consider this as:
->     Tested-by: <you>
-> ?
-
-Yes, please.
-Tested-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-
-> 
-> Regards,
-> Yann E. MORIN.
-> 
-
-Sebastian
+-Andi
