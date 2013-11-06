@@ -1,29 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:37063 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:38679 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750867Ab3KGE0X (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 6 Nov 2013 23:26:23 -0500
-Date: Wed, 6 Nov 2013 22:27:02 +0100
+	id S1750766Ab3KGEns (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 6 Nov 2013 23:43:48 -0500
+Message-ID: <527AB7D1.9080307@suse.cz>
+Date: Wed, 06 Nov 2013 22:42:41 +0100
 From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH 2/3] Kbuild: Handle longer symbols in kallsyms.c v2
-Message-ID: <20131106212702.GC22142@pobox.suse.cz>
-References: <1382456783-22826-1-git-send-email-andi@firstfloor.org> <1382456783-22826-3-git-send-email-andi@firstfloor.org> <1382459794.2041.91.camel@joe-AO722> <20131023130753.GO29695@two.firstfloor.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20131023130753.GO29695@two.firstfloor.org>
+Subject: Re: Kbuild: Ignore GREP_OPTIONS env variable
+References: <20131030160635.GE13290@pd.tnic>
+In-Reply-To: <20131030160635.GE13290@pd.tnic>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andi Kleen <andi@firstfloor.org>
-Cc: Joe Perches <joe@perches.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Andi Kleen <ak@linux.intel.com>
+To: Borislav Petkov <bp@alien8.de>, linux-kbuild@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>
+Cc: x86-ml <x86@kernel.org>
 
-On Wed, Oct 23, 2013 at 03:07:53PM +0200, Andi Kleen wrote:
+Dne 30.10.2013 17:06, Borislav Petkov napsal(a):
+> So I had defined GREP_OPTIONS=--color=always on one of my boxes and had
+> forgotten about it and the kernel build started failing because we use
+> grep quite a while in the tree and it started issuing shell color markup
+> which generated garbage files, like the syscall headers on x86, for
+> example.
 > 
-> Also warn for too long symbols
+> I have a fix below which seems to take care of it but what is the
+> general opinion: Do we want to be more robust against the environment we
+> find on a machine before building the kernel or let the user figure it
+> out himself that he should be using
 > 
-> v2: Add missing newline. Use 255 max (Joe Perches)
-> Signed-off-by: Andi Kleen <ak@linux.intel.com>
+> GREP_OPTIONS=--color=auto
+> 
+> in the first place and it is his own moronic fault if he does 'always'?
 
-Applied to kbuild.git#kbuild.
+I think that on a scale from one to ten, building with
+GREP_OPTIONS=--color=always and building with LC_COLLATE=<language with
+non-ASCII sorting rules> score about the same. And are already
+sanitizing the LC_* variables.
+
+
+> +GREP_OPTIONS=
+> +export GREP_OPTIONS
+
+Just remove it from the enviromnet completely, like the next statement does:
+
+> +
+>  # Avoid funny character set dependencies
+>  unexport LC_ALL
+>  LC_COLLATE=C
 
 Michal
+
