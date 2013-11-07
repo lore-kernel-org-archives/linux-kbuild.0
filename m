@@ -1,18 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from services.gouders.net ([141.101.32.176]:47317 "EHLO
+Received: from services.gouders.net ([141.101.32.176]:47327 "EHLO
 	services.gouders.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751083Ab3KGOBs (ORCPT
+	with ESMTP id S1754325Ab3KGOFM (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 7 Nov 2013 09:01:48 -0500
+	Thu, 7 Nov 2013 09:05:12 -0500
 From: Dirk Gouders <dirk@gouders.net>
-Subject: Re: [PATCH v3] kconfig/symbol.c: handle choice_values that depend on 'm' symbols
-In-Reply-To: <20131106185900.GA3482@free.fr> (Yann E. MORIN's message of "Wed,
-	6 Nov 2013 19:59:00 +0100")
-References: <gh4n7wzf0y.fsf@lena.gouders.net>
-	<ghvc0cy00x.fsf@lena.gouders.net> <20131105230414.GB3337@free.fr>
-	<giob5xioal.fsf@karga.hank.lab> <20131106185900.GA3482@free.fr>
-Date: Thu, 07 Nov 2013 15:02:01 +0100
-Message-ID: <ghr4asl38m.fsf@lena.gouders.net>
+Subject: [PATCH v4] kconfig/symbol.c: handle choice_values that depend on 'm' symbols
+In-Reply-To: <ghr4asl38m.fsf@lena.gouders.net> (Dirk Gouders's message of
+	"Thu, 07 Nov 2013 15:02:01 +0100")
+Date: Thu, 07 Nov 2013 15:05:29 +0100
+Message-ID: <ghk3gkl32u.fsf@lena.gouders.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -20,49 +17,79 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: "Yann E. MORIN" <yann.morin.1998@free.fr>
 Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Felipe Balbi <balbi@ti.com>, USB list <linux-usb@vger.kernel.org>, Tomi Valkeinen <tomi.valkeinen@ti.com>, Roger Quadros <rogerq@ti.com>
 
-"Yann E. MORIN" <yann.morin.1998@free.fr> writes:
+If choices consist of choice_values that depend on symbols set to 'm',
+those choice_values are not set to 'n' if the choice is changed from
+'m' to 'y' (in which case only one active choice_value is allowed).
+Those values are also written to the config file causing modules to be
+built when they should not.
 
-> Dirk, All,
->
-> On 2013-11-06 15:43 +0100, Dirk Gouders spake thusly:
->> "Yann E. MORIN" <yann.morin.1998@free.fr> writes:
-> [--SNIP--]
->> > It seems I'm missing something here.
-> [--SNIP--]
->> Yes, but obviously, I did not describe it very clearly.  The steps to
->> reproduce the problem are:
->> 
->>      $ ./scripts/kconfig/mconf test.in
->>        --> change c0 and c1 to 'm'        # This is the missing part!
->
-> Aha! Gotcha. Thanks.
->
->> I spontaneously planned to answer with a modified config file with
->> default values 'm' specified for 'c0' and 'c1' (complete file below) but
->> I noticed that my latest patch does not help in that case.  The first
->> patch that modifies sym_calc_value() would handle it nicely but the
->> latter one that modifies sym_calc_visibility() does not.  The
->> combination also does not work, because sym_calc_visibility() influences
->> sym_calc_value().
->> 
->> So, I have to say that I am no longer really satisfied with the patch.
->> It fixes the reported problem but I think it should fix related
->> obvious problems as well (see config below).  I'd prefer I take some
->> more time and try to find a more sensible fix.
->
-> Please, one patch to fix one bug.
->
-> It does not matter if you need to touch the same part of the code, but
-> please keep fixes for different bugs, separate (unless of course, the
-> bugs are just different manifestations of the same deficiency in the
-> code).
+The following config can be used to reproduce and examine the problem;
+with the frontend of your choice set "Choice 0" and "Choice 1" to 'm',
+then set "Tristate Choice" to 'y' and save the configuration:
 
-I understand.  I will send a v4 with a clearer description of the steps
-needed to trigger the problem and also the added Tested-by: line, in
-case you see a need for it.
+config modules
+	boolean modules
+	default y
+	option modules
 
-The other two problems I mentioned are concerning default values of
-tristate choices and I am quite confident that those fixes will touch
-other parts of the code.
+config dependency
+	tristate "Dependency"
+	default m
 
-Dirk
+choice
+	prompt "Tristate Choice"
+	default choice0
+
+config choice0
+	tristate "Choice 0"
+
+config choice1
+	tristate "Choice 1"
+	depends on dependency
+
+endchoice
+
+This patch sets choice_values' visibility that depend on symbols set
+to 'm' to 'n' if the corresponding choice is set to 'y'.  This makes
+them disappear from the choice list and will also cause the
+choice_values' value set to 'n' in sym_calc_value() and as a result
+they are written as "not set" to the resulting .config file.
+
+Reported-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Signed-off-by: Dirk Gouders <dirk@gouders.net>
+Tested-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+---
+ scripts/kconfig/symbol.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
+index c9a6775..06d96c9 100644
+--- a/scripts/kconfig/symbol.c
++++ b/scripts/kconfig/symbol.c
+@@ -189,12 +189,23 @@ static void sym_validate_range(struct symbol *sym)
+ static void sym_calc_visibility(struct symbol *sym)
+ {
+ 	struct property *prop;
++	struct symbol *choice_sym = NULL;
+ 	tristate tri;
+ 
+ 	/* any prompt visible? */
+ 	tri = no;
++
++	if (sym_is_choice_value(sym))
++		choice_sym = prop_get_symbol(sym_get_choice_prop(sym));
++
+ 	for_all_prompts(sym, prop) {
+ 		prop->visible.tri = expr_calc_value(prop->visible.expr);
++		/*
++		 * choice_values with visibility 'mod' are not visible if the
++		 * corresponding choice's value is 'yes'.
++		 */
++		if (prop->visible.tri == mod && (choice_sym && choice_sym->curr.tri == yes))
++			prop->visible.tri = no;
+ 		tri = EXPR_OR(tri, prop->visible.tri);
+ 	}
+ 	if (tri == mod && (sym->type != S_TRISTATE || modules_val == no))
+-- 
+1.8.4
+
