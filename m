@@ -1,95 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from services.gouders.net ([141.101.32.176]:47327 "EHLO
-	services.gouders.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754325Ab3KGOFM (ORCPT
+Received: from mail-we0-f178.google.com ([74.125.82.178]:36645 "EHLO
+	mail-we0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755745Ab3KGX3l (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 7 Nov 2013 09:05:12 -0500
-From: Dirk Gouders <dirk@gouders.net>
-Subject: [PATCH v4] kconfig/symbol.c: handle choice_values that depend on 'm' symbols
-In-Reply-To: <ghr4asl38m.fsf@lena.gouders.net> (Dirk Gouders's message of
-	"Thu, 07 Nov 2013 15:02:01 +0100")
-Date: Thu, 07 Nov 2013 15:05:29 +0100
-Message-ID: <ghk3gkl32u.fsf@lena.gouders.net>
+	Thu, 7 Nov 2013 18:29:41 -0500
+Received: by mail-we0-f178.google.com with SMTP id q59so1241210wes.37
+        for <linux-kbuild@vger.kernel.org>; Thu, 07 Nov 2013 15:29:39 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1379421817-15759-1-git-send-email-Russ.Dill@ti.com>
+References: <1379421817-15759-1-git-send-email-Russ.Dill@ti.com>
+Date: Thu, 7 Nov 2013 15:29:38 -0800
+Message-ID: <CAGa+x85AJ6e4W3S73cv_ZJtb+uCLYTMk_DPmQO3Nj656-7QJMg@mail.gmail.com>
+Subject: Re: [RFC PATCH 00/11] Embeddable Position Independent Executable
+From: Kevin Hilman <khilman@linaro.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Felipe Balbi <balbi@ti.com>, USB list <linux-usb@vger.kernel.org>, Tomi Valkeinen <tomi.valkeinen@ti.com>, Roger Quadros <rogerq@ti.com>
+To: Russ Dill <Russ.Dill@ti.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, linux-omap <linux-omap@vger.kernel.org>, linux-kbuild@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, mans@mansr.com, Shawn Guo <shawn.guo@linaro.org>, Dave Martin <Dave.Martin@arm.com>, Russell King - ARM Linux <linux@arm.linux.org.uk>
 
-If choices consist of choice_values that depend on symbols set to 'm',
-those choice_values are not set to 'n' if the choice is changed from
-'m' to 'y' (in which case only one active choice_value is allowed).
-Those values are also written to the config file causing modules to be
-built when they should not.
+On Tue, Sep 17, 2013 at 5:43 AM, Russ Dill <Russ.Dill@ti.com> wrote:
+> This patch adds support for and demonstrates the usage of an embedded
+> position independent executable (PIE). The goal is to allow the use of C
+> code in situations where carefully written position independent assembly
+> was previously required.
 
-The following config can be used to reproduce and examine the problem;
-with the frontend of your choice set "Choice 0" and "Choice 1" to 'm',
-then set "Tristate Choice" to 'y' and save the configuration:
+Hmm, I thought I had already replied to this but it appears that I haven't.
 
-config modules
-	boolean modules
-	default y
-	option modules
+I really like this approach and think it's a major improvement on what
+we're already doing on OMAP and a few other ARM platforms.  This
+approach is done in a way that's significantly easier to maintain and
+extend IMO.
 
-config dependency
-	tristate "Dependency"
-	default m
+As a next step, I think you should drop the RFC and split it up into a
+few series that can go via the right trees:
 
-choice
-	prompt "Tristate Choice"
-	default choice0
+- asm-generic and lib/devres (patches 1, 2, 4)
+- drivers/sram (patch 3)
+- generic PIE: (patch 5)
+- core PIE: (patch 5-8)
+- AM33xx support (patch 9-11)
 
-config choice0
-	tristate "Choice 0"
-
-config choice1
-	tristate "Choice 1"
-	depends on dependency
-
-endchoice
-
-This patch sets choice_values' visibility that depend on symbols set
-to 'm' to 'n' if the corresponding choice is set to 'y'.  This makes
-them disappear from the choice list and will also cause the
-choice_values' value set to 'n' in sym_calc_value() and as a result
-they are written as "not set" to the resulting .config file.
-
-Reported-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Signed-off-by: Dirk Gouders <dirk@gouders.net>
-Tested-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
----
- scripts/kconfig/symbol.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
-
-diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
-index c9a6775..06d96c9 100644
---- a/scripts/kconfig/symbol.c
-+++ b/scripts/kconfig/symbol.c
-@@ -189,12 +189,23 @@ static void sym_validate_range(struct symbol *sym)
- static void sym_calc_visibility(struct symbol *sym)
- {
- 	struct property *prop;
-+	struct symbol *choice_sym = NULL;
- 	tristate tri;
- 
- 	/* any prompt visible? */
- 	tri = no;
-+
-+	if (sym_is_choice_value(sym))
-+		choice_sym = prop_get_symbol(sym_get_choice_prop(sym));
-+
- 	for_all_prompts(sym, prop) {
- 		prop->visible.tri = expr_calc_value(prop->visible.expr);
-+		/*
-+		 * choice_values with visibility 'mod' are not visible if the
-+		 * corresponding choice's value is 'yes'.
-+		 */
-+		if (prop->visible.tri == mod && (choice_sym && choice_sym->curr.tri == yes))
-+			prop->visible.tri = no;
- 		tri = EXPR_OR(tri, prop->visible.tri);
- 	}
- 	if (tri == mod && (sym->type != S_TRISTATE || modules_val == no))
--- 
-1.8.4
-
+Kevin
