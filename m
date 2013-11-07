@@ -1,39 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:41101 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751144Ab3KGFNu (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 7 Nov 2013 00:13:50 -0500
-Date: Wed, 6 Nov 2013 22:26:44 +0100
-From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH 1/3] kbuild: Increase kallsyms max symbol length v2
-Message-ID: <20131106212644.GB22142@pobox.suse.cz>
-References: <1382456783-22826-1-git-send-email-andi@firstfloor.org> <1382456783-22826-2-git-send-email-andi@firstfloor.org> <1382459764.2041.90.camel@joe-AO722> <20131023130653.GN29695@two.firstfloor.org>
+Received: from merlin.infradead.org ([205.233.59.134]:45568 "EHLO
+	merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750843Ab3KGFjF (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 7 Nov 2013 00:39:05 -0500
+Received: from static-50-53-39-157.bvtn.or.frontiernet.net ([50.53.39.157] helo=dragon.site)
+	by merlin.infradead.org with esmtpsa (Exim 4.80.1 #2 (Red Hat Linux))
+	id 1VeIJ6-0004aX-RU
+	for linux-kbuild@vger.kernel.org; Thu, 07 Nov 2013 05:39:04 +0000
+Message-ID: <527B2778.4000502@infradead.org>
+Date: Wed, 06 Nov 2013 21:39:04 -0800
+From: Randy Dunlap <rdunlap@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20131023130653.GN29695@two.firstfloor.org>
+Subject: bugzilla #43067: kconfig is 8-bit characters only?
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andi Kleen <andi@firstfloor.org>
-Cc: Joe Perches <joe@perches.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Joe Mario <jmario@redhat.com>, Andi Kleen <ak@linux.intel.com>
+To: linux-kbuild@vger.kernel.org
 
-On Wed, Oct 23, 2013 at 03:06:53PM +0200, Andi Kleen wrote:
-> From: Joe Mario <jmario@redhat.com>
-> 
-> [AK: This seems like a ticking time bomb even without LTO,
-> so should be merged now. It causes very weird problems.
-> Thanks to Joe for tracking them down.]
-> 
-> With the added postfixes that LTO adds for local
-> symbols, the longest name in the kernel overflows
-> the namebuf[KSYM_NAME_LEN] array by two bytes.  That name is:
-> __pci_fixup_resumePCI_VENDOR_ID_SERVERWORKSPCI_DEVICE_ID_SERVERWORKS_HT1000SBquirk_disable_broadcom_boot_interrupt.1488004.672802
-> 
-> Double the max symbol name length.
-> 
-> v2: Use 255  (Joe Perches)
-> Signed-off-by: Andi Kleen <ak@linux.intel.com>
+Hi,
 
-Applied to kbuild.git#kbuild.
+https://bugzilla.kernel.org/show_bug.cgi?id=43067 asserts that
 
-Michal
+"The Linux Kernel Configuration system (lkc) expects 8 bit characters only (declared in scripts/kconfig/zconf.l: %option 8bit)."
+
+but that drivers/mtd/nand/Kconfig uses a UTF-8 acute accented capital E 2 times.
+I have confirmed that this does indeed muck up nconfig's output as described there.
+
+Do we want to update Documentation/kbuild/kconfig-language.txt to require that
+Kconfig text be 8-bit characters only (as zconf.l seems to expect) [and then update
+this offending Kconfig file] or is someone interested in making *config support
+UTF-8 characters?
+
+thanks,
+-- 
+~Randy
