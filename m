@@ -1,121 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:34577 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:49251 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753314Ab3KKNk7 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 11 Nov 2013 08:40:59 -0500
+	id S1753646Ab3KKRer convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 11 Nov 2013 12:34:47 -0500
+Date: Mon, 11 Nov 2013 18:00:41 +0100
 From: Michal Marek <mmarek@suse.cz>
-Subject: [PATCH 1/2] PCI: Do not use PCI ID macros in quirk names
-Date: Mon, 11 Nov 2013 14:40:35 +0100
-Message-Id: <1384177236-8371-1-git-send-email-mmarek@suse.cz>
+Subject: Re: [PATCH -v1.1] Kbuild: Ignore GREP_OPTIONS env variable
+Message-ID: <20131111170041.GA18517@pobox.suse.cz>
+References: <20131030160635.GE13290@pd.tnic> <527AB7D1.9080307@suse.cz> <20131111142743.GE28219@pd.tnic>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: 8BIT
+In-Reply-To: <20131111142743.GE28219@pd.tnic>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: linux-kbuild@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>, linux-pci@vger.kernel.org, Andi Kleen <ak@linux.intel.com>, Joe Mario <jmario@redhat.com>
+To: Borislav Petkov <bp@alien8.de>
+Cc: linux-kbuild@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>, x86-ml <x86@kernel.org>
 
-Pasting the verbatim PCI_(VENDOR|DEVICE)_* macros in the __pci_fixup_*
-symbol names results in insanely long names such as
+On Mon, Nov 11, 2013 at 03:27:43PM +0100, Borislav Petkov wrote:
+> From: Borislav Petkov <bp@suse.de>
+> Subject: [PATCH] Kbuild: Ignore GREP_OPTIONS env variable
+> 
+> When building the kernel in a shell which defines GREP_OPTIONS so that
+> grep behavior is modified, we can break the generation of the syscalls
+> table like so:
+> 
+> __SYSCALL_COMMON([01;31m[K0[m[K, sys_read, sys_read)
+> __SYSCALL_COMMON([01;31m[K1[m[K, sys_write, sys_write)
+> __SYSCALL_COMMON([01;31m[K1[m[K0, sys_mprotect, sys_mprotect) ...
 
-__pci_fixup_resumePCI_VENDOR_ID_SERVERWORKSPCI_DEVICE_ID_SERVERWORKS_HT1000SBquirk_disable_broadcom_boot_interrupt
+The email had literal escape sequences and git am preserved them, so git
+show displayed red zeros and onces. That was quite scary, so I replaced
+the escape character with ^[.
 
-When LTO adds its numeric suffix to such symbol, it overflows the
-namebuf[KSYM_NAME_LEN] array. Use the line number instead to create
-(nearly) unique symbol names.
+Anyway, applied to kbuild.git#kbuild now.
 
-Reported-by: Joe Mario <jmario@redhat.com>
-Cc: Bjorn Helgaas <bhelgaas@google.com>
-Cc: linux-pci@vger.kernel.org
-Cc: Andi Kleen <ak@linux.intel.com>
-Cc: Joe Mario <jmario@redhat.com>
-Signed-off-by: Michal Marek <mmarek@suse.cz>
----
- include/linux/pci.h | 30 +++++++++++++++---------------
- 1 file changed, 15 insertions(+), 15 deletions(-)
-
-diff --git a/include/linux/pci.h b/include/linux/pci.h
-index da172f9..1ff4dec 100644
---- a/include/linux/pci.h
-+++ b/include/linux/pci.h
-@@ -1557,65 +1557,65 @@ enum pci_fixup_pass {
- /* Anonymous variables would be nice... */
- #define DECLARE_PCI_FIXUP_SECTION(section, name, vendor, device, class,	\
- 				  class_shift, hook)			\
--	static const struct pci_fixup __pci_fixup_##name __used		\
-+	static const struct pci_fixup __PASTE(__pci_fixup_##name,__LINE__) __used	\
- 	__attribute__((__section__(#section), aligned((sizeof(void *)))))    \
- 		= { vendor, device, class, class_shift, hook };
- 
- #define DECLARE_PCI_FIXUP_CLASS_EARLY(vendor, device, class,		\
- 					 class_shift, hook)		\
- 	DECLARE_PCI_FIXUP_SECTION(.pci_fixup_early,			\
--		vendor##device##hook, vendor, device, class, class_shift, hook)
-+		hook, vendor, device, class, class_shift, hook)
- #define DECLARE_PCI_FIXUP_CLASS_HEADER(vendor, device, class,		\
- 					 class_shift, hook)		\
- 	DECLARE_PCI_FIXUP_SECTION(.pci_fixup_header,			\
--		vendor##device##hook, vendor, device, class, class_shift, hook)
-+		hook, vendor, device, class, class_shift, hook)
- #define DECLARE_PCI_FIXUP_CLASS_FINAL(vendor, device, class,		\
- 					 class_shift, hook)		\
- 	DECLARE_PCI_FIXUP_SECTION(.pci_fixup_final,			\
--		vendor##device##hook, vendor, device, class, class_shift, hook)
-+		hook, vendor, device, class, class_shift, hook)
- #define DECLARE_PCI_FIXUP_CLASS_ENABLE(vendor, device, class,		\
- 					 class_shift, hook)		\
- 	DECLARE_PCI_FIXUP_SECTION(.pci_fixup_enable,			\
--		vendor##device##hook, vendor, device, class, class_shift, hook)
-+		hook, vendor, device, class, class_shift, hook)
- #define DECLARE_PCI_FIXUP_CLASS_RESUME(vendor, device, class,		\
- 					 class_shift, hook)		\
- 	DECLARE_PCI_FIXUP_SECTION(.pci_fixup_resume,			\
--		resume##vendor##device##hook, vendor, device, class,	\
-+		resume##hook, vendor, device, class,	\
- 		class_shift, hook)
- #define DECLARE_PCI_FIXUP_CLASS_RESUME_EARLY(vendor, device, class,	\
- 					 class_shift, hook)		\
- 	DECLARE_PCI_FIXUP_SECTION(.pci_fixup_resume_early,		\
--		resume_early##vendor##device##hook, vendor, device,	\
-+		resume_early##hook, vendor, device,	\
- 		class, class_shift, hook)
- #define DECLARE_PCI_FIXUP_CLASS_SUSPEND(vendor, device, class,		\
- 					 class_shift, hook)		\
- 	DECLARE_PCI_FIXUP_SECTION(.pci_fixup_suspend,			\
--		suspend##vendor##device##hook, vendor, device, class,	\
-+		suspend##hook, vendor, device, class,	\
- 		class_shift, hook)
- 
- #define DECLARE_PCI_FIXUP_EARLY(vendor, device, hook)			\
- 	DECLARE_PCI_FIXUP_SECTION(.pci_fixup_early,			\
--		vendor##device##hook, vendor, device, PCI_ANY_ID, 0, hook)
-+		hook, vendor, device, PCI_ANY_ID, 0, hook)
- #define DECLARE_PCI_FIXUP_HEADER(vendor, device, hook)			\
- 	DECLARE_PCI_FIXUP_SECTION(.pci_fixup_header,			\
--		vendor##device##hook, vendor, device, PCI_ANY_ID, 0, hook)
-+		hook, vendor, device, PCI_ANY_ID, 0, hook)
- #define DECLARE_PCI_FIXUP_FINAL(vendor, device, hook)			\
- 	DECLARE_PCI_FIXUP_SECTION(.pci_fixup_final,			\
--		vendor##device##hook, vendor, device, PCI_ANY_ID, 0, hook)
-+		hook, vendor, device, PCI_ANY_ID, 0, hook)
- #define DECLARE_PCI_FIXUP_ENABLE(vendor, device, hook)			\
- 	DECLARE_PCI_FIXUP_SECTION(.pci_fixup_enable,			\
--		vendor##device##hook, vendor, device, PCI_ANY_ID, 0, hook)
-+		hook, vendor, device, PCI_ANY_ID, 0, hook)
- #define DECLARE_PCI_FIXUP_RESUME(vendor, device, hook)			\
- 	DECLARE_PCI_FIXUP_SECTION(.pci_fixup_resume,			\
--		resume##vendor##device##hook, vendor, device,		\
-+		resume##hook, vendor, device,		\
- 		PCI_ANY_ID, 0, hook)
- #define DECLARE_PCI_FIXUP_RESUME_EARLY(vendor, device, hook)		\
- 	DECLARE_PCI_FIXUP_SECTION(.pci_fixup_resume_early,		\
--		resume_early##vendor##device##hook, vendor, device,	\
-+		resume_early##hook, vendor, device,	\
- 		PCI_ANY_ID, 0, hook)
- #define DECLARE_PCI_FIXUP_SUSPEND(vendor, device, hook)			\
- 	DECLARE_PCI_FIXUP_SECTION(.pci_fixup_suspend,			\
--		suspend##vendor##device##hook, vendor, device,		\
-+		suspend##hook, vendor, device,		\
- 		PCI_ANY_ID, 0, hook)
- 
- #ifdef CONFIG_PCI_QUIRKS
--- 
-1.8.1.4
-
+Michal
