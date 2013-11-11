@@ -1,33 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:16113 "EHLO mga01.intel.com"
+Received: from plane.gmane.org ([80.91.229.3]:54894 "EHLO plane.gmane.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754081Ab3KKORR (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 11 Nov 2013 09:17:17 -0500
-Date: Mon, 11 Nov 2013 06:17:15 -0800
-From: Andi Kleen <ak@linux.intel.com>
-Subject: Re: [PATCH 2/2] kallsyms: Revert back to 128 max symbol length
-Message-ID: <20131111141715.GM1962@tassilo.jf.intel.com>
-References: <1384177236-8371-1-git-send-email-mmarek@suse.cz>
- <1384177236-8371-2-git-send-email-mmarek@suse.cz>
+	id S1754197Ab3KKPLL convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 11 Nov 2013 10:11:11 -0500
+Received: from public by plane.gmane.org with local (Exim 4.69)
+	(envelope-from <public@plane.gmane.org>)
+	id 1Vft8s-0008H2-2y
+	for linux-kbuild@vger.kernel.org; Mon, 11 Nov 2013 16:11:06 +0100
+Date: Mon, 11 Nov 2013 14:59:12 +0000 (UTC)
+From: Thorsten Glaser <tg@mirbsd.de>
+Subject: Re: [PATCH] Use __unused0 instead of __unused for user visible struct
+ member names
+In-Reply-To: <20120103065659.GA32216@merkur.ravnborg.org>
+Message-ID: <Pine.BSM.4.64L.1311111448490.23723@herc.mirbsd.org>
+References: <20120102024418.GA10483@gaara.hadrons.org>
+ <20120102202243.GA31103@elie.hsd1.il.comcast.net> <20120103065659.GA32216@merkur.ravnborg.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1384177236-8371-2-git-send-email-mmarek@suse.cz>
+Content-Type: TEXT/PLAIN; charset=utf-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Joe Mario <jmario@redhat.com>
-
-On Mon, Nov 11, 2013 at 02:40:36PM +0100, Michal Marek wrote:
-> This reverts commits
-> f3462aa (Kbuild: Handle longer symbols in kallsyms.c) and
-> eea0e9c (kbuild: Increase kallsyms max symbol length)
-> except for the added overflow check. The reason is a regression caused
-> by increasing the buffer:
-> http://marc.info/?l=linux-kernel&m=138387700415675.
-
-Can you please wait a bit until we tracked down the problem?
+To: Sam Ravnborg <public-sam-uyr5N9Q2VtJg9hUCZPvPmw@plane.gmane.org>
+Cc: Jonathan Nieder <public-jrnieder-Re5JQEeQqe8AvxtiuMwx3w@plane.gmane.org>, Guillem Jover <public-guillem-+FW4gsLVM0RAfugRpC6u6w@plane.gmane.org>, public-linux-kernel-u79uwXL29TY76Z2rM5mHXA@plane.gmane.org, public-linux-kbuild-u79uwXL29TY76Z2rM5mHXA@plane.gmane.org, public-linux-api-u79uwXL29TY76Z2rM5mHXA@plane.gmane.org, Michal Marek <public-mmarek-AlSwsSmVLrQ@plane.gmane.org>, Justin Cormack <justin@specialbusservice.com>
 
 
--Andi
+
+
+Sam Ravnborg dixit:
+
+>> Guillem Jover wrote:
+
+>> > On BSD systems __unused has traditionally been defined to mean the
+>> > equivalent of gcc's __attribute__((__unused__)), some parts of the
+[…]
+>^__ is reserved for libc internal stuff and there is no reason to
+>name the unused/padding members "__unused".
+
+Considering that glibc has seen the light¹ now too, can we please
+do something about these now? The BSD tools (not just NetBSD®) have
+been using this for far longer after all…
+
+
+Currently (git pull --ff torvalds master), we have:
+
+• 2 occurrences of files *inside* the Linux kernel defining __unused
+  to² __attribute__((unused)) themselves
+
+• 68 struct members and function arguments called __unused
+
+>So one or a set of patches that rename them all to something more
+>sensible would be fine.
+
+I think __unused0 is okay as it matches current __unused[0-9] in
+use by other parts of the Linux kernel – although glibc now uses
+__glibc_reserved[0-9], I think this doesn’t look like the Linux
+kernel should use it ☻☺
+
+
+① http://thread.gmane.org/gmane.comp.lib.glibc.alpha/36439
+
+② I’ve recently come to the belief that this should be
+  __attribute__((__unused__)) in all cases, i.e. all those
+  attribute namings need double underscores before and after,
+  as some software likes to #define printf to something else,
+  lighttpd does #define bounded something else, so there’s
+  probably software out there containing #define unused foo.
+
 
