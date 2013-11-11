@@ -1,70 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from plane.gmane.org ([80.91.229.3]:54894 "EHLO plane.gmane.org"
+Received: from mail.skyhub.de ([78.46.96.112]:53568 "EHLO mail.skyhub.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754197Ab3KKPLL convert rfc822-to-8bit (ORCPT
+	id S1753345Ab3KKO2G convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 11 Nov 2013 10:11:11 -0500
-Received: from public by plane.gmane.org with local (Exim 4.69)
-	(envelope-from <public@plane.gmane.org>)
-	id 1Vft8s-0008H2-2y
-	for linux-kbuild@vger.kernel.org; Mon, 11 Nov 2013 16:11:06 +0100
-Date: Mon, 11 Nov 2013 14:59:12 +0000 (UTC)
-From: Thorsten Glaser <tg@mirbsd.de>
-Subject: Re: [PATCH] Use __unused0 instead of __unused for user visible struct
- member names
-In-Reply-To: <20120103065659.GA32216@merkur.ravnborg.org>
-Message-ID: <Pine.BSM.4.64L.1311111448490.23723@herc.mirbsd.org>
-References: <20120102024418.GA10483@gaara.hadrons.org>
- <20120102202243.GA31103@elie.hsd1.il.comcast.net> <20120103065659.GA32216@merkur.ravnborg.org>
+	Mon, 11 Nov 2013 09:28:06 -0500
+Date: Mon, 11 Nov 2013 15:27:43 +0100
+From: Borislav Petkov <bp@alien8.de>
+Subject: [PATCH -v1.1] Kbuild: Ignore GREP_OPTIONS env variable
+Message-ID: <20131111142743.GE28219@pd.tnic>
+References: <20131030160635.GE13290@pd.tnic>
+ <527AB7D1.9080307@suse.cz>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=utf-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8BIT
+In-Reply-To: <527AB7D1.9080307@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <public-sam-uyr5N9Q2VtJg9hUCZPvPmw@plane.gmane.org>
-Cc: Jonathan Nieder <public-jrnieder-Re5JQEeQqe8AvxtiuMwx3w@plane.gmane.org>, Guillem Jover <public-guillem-+FW4gsLVM0RAfugRpC6u6w@plane.gmane.org>, public-linux-kernel-u79uwXL29TY76Z2rM5mHXA@plane.gmane.org, public-linux-kbuild-u79uwXL29TY76Z2rM5mHXA@plane.gmane.org, public-linux-api-u79uwXL29TY76Z2rM5mHXA@plane.gmane.org, Michal Marek <public-mmarek-AlSwsSmVLrQ@plane.gmane.org>, Justin Cormack <justin@specialbusservice.com>
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>, x86-ml <x86@kernel.org>
 
+From: Borislav Petkov <bp@suse.de>
+Subject: [PATCH] Kbuild: Ignore GREP_OPTIONS env variable
 
+When building the kernel in a shell which defines GREP_OPTIONS so that
+grep behavior is modified, we can break the generation of the syscalls
+table like so:
 
+__SYSCALL_COMMON([01;31m[K0[m[K, sys_read, sys_read)
+__SYSCALL_COMMON([01;31m[K1[m[K, sys_write, sys_write)
+__SYSCALL_COMMON([01;31m[K1[m[K0, sys_mprotect, sys_mprotect) ...
 
-Sam Ravnborg dixit:
+This is just the initial breakage, later we barf when generating
+modules.
 
->> Guillem Jover wrote:
+In this case, GREP_OPTIONS contains "--color=always" which adds the shell
+colors markup and completely fudges the headers under ...generated/asm/.
 
->> > On BSD systems __unused has traditionally been defined to mean the
->> > equivalent of gcc's __attribute__((__unused__)), some parts of the
-[…]
->^__ is reserved for libc internal stuff and there is no reason to
->name the unused/padding members "__unused".
+Fix that by unexporting the GREP_OPTIONS variable for the whole kernel
+build as we tend to use grep at a bunch of places.
 
-Considering that glibc has seen the light¹ now too, can we please
-do something about these now? The BSD tools (not just NetBSD®) have
-been using this for far longer after all…
+Signed-off-by: Borislav Petkov <bp@suse.de>
+---
+ Makefile | 3 +++
+ 1 file changed, 3 insertions(+)
 
+diff --git a/Makefile b/Makefile
+index 868c0eb67b08..73503a7755fd 100644
+--- a/Makefile
++++ b/Makefile
+@@ -22,6 +22,9 @@ LC_COLLATE=C
+ LC_NUMERIC=C
+ export LC_COLLATE LC_NUMERIC
+ 
++# Avoid interference with shell env settings
++unexport GREP_OPTIONS
++
+ # We are using a recursive build, so we need to do a little thinking
+ # to get the ordering right.
+ #
+-- 
+1.8.4
 
-Currently (git pull --ff torvalds master), we have:
+-- 
+Regards/Gruss,
+    Boris.
 
-• 2 occurrences of files *inside* the Linux kernel defining __unused
-  to² __attribute__((unused)) themselves
-
-• 68 struct members and function arguments called __unused
-
->So one or a set of patches that rename them all to something more
->sensible would be fine.
-
-I think __unused0 is okay as it matches current __unused[0-9] in
-use by other parts of the Linux kernel – although glibc now uses
-__glibc_reserved[0-9], I think this doesn’t look like the Linux
-kernel should use it ☻☺
-
-
-① http://thread.gmane.org/gmane.comp.lib.glibc.alpha/36439
-
-② I’ve recently come to the belief that this should be
-  __attribute__((__unused__)) in all cases, i.e. all those
-  attribute namings need double underscores before and after,
-  as some software likes to #define printf to something else,
-  lighttpd does #define bounded something else, so there’s
-  probably software out there containing #define unused foo.
-
-
+Sent from a fat crate under my desk. Formatting is fine.
+--
