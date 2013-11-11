@@ -1,70 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.skyhub.de ([78.46.96.112]:53568 "EHLO mail.skyhub.de"
+Received: from cantor2.suse.de ([195.135.220.15]:34585 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753345Ab3KKO2G convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 11 Nov 2013 09:28:06 -0500
-Date: Mon, 11 Nov 2013 15:27:43 +0100
-From: Borislav Petkov <bp@alien8.de>
-Subject: [PATCH -v1.1] Kbuild: Ignore GREP_OPTIONS env variable
-Message-ID: <20131111142743.GE28219@pd.tnic>
-References: <20131030160635.GE13290@pd.tnic>
- <527AB7D1.9080307@suse.cz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8BIT
-In-Reply-To: <527AB7D1.9080307@suse.cz>
+	id S1753520Ab3KKNlD (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 11 Nov 2013 08:41:03 -0500
+From: Michal Marek <mmarek@suse.cz>
+Subject: [PATCH 2/2] kallsyms: Revert back to 128 max symbol length
+Date: Mon, 11 Nov 2013 14:40:36 +0100
+Message-Id: <1384177236-8371-2-git-send-email-mmarek@suse.cz>
+In-Reply-To: <1384177236-8371-1-git-send-email-mmarek@suse.cz>
+References: <1384177236-8371-1-git-send-email-mmarek@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>, x86-ml <x86@kernel.org>
+To: linux-kernel@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org, Andi Kleen <ak@linux.intel.com>, Joe Mario <jmario@redhat.com>
 
-From: Borislav Petkov <bp@suse.de>
-Subject: [PATCH] Kbuild: Ignore GREP_OPTIONS env variable
+This reverts commits
+f3462aa (Kbuild: Handle longer symbols in kallsyms.c) and
+eea0e9c (kbuild: Increase kallsyms max symbol length)
+except for the added overflow check. The reason is a regression caused
+by increasing the buffer:
+http://marc.info/?l=linux-kernel&m=138387700415675.
 
-When building the kernel in a shell which defines GREP_OPTIONS so that
-grep behavior is modified, we can break the generation of the syscalls
-table like so:
-
-__SYSCALL_COMMON([01;31m[K0[m[K, sys_read, sys_read)
-__SYSCALL_COMMON([01;31m[K1[m[K, sys_write, sys_write)
-__SYSCALL_COMMON([01;31m[K1[m[K0, sys_mprotect, sys_mprotect) ...
-
-This is just the initial breakage, later we barf when generating
-modules.
-
-In this case, GREP_OPTIONS contains "--color=always" which adds the shell
-colors markup and completely fudges the headers under ...generated/asm/.
-
-Fix that by unexporting the GREP_OPTIONS variable for the whole kernel
-build as we tend to use grep at a bunch of places.
-
-Signed-off-by: Borislav Petkov <bp@suse.de>
+Reported-by: Fengguang Wu <fengguang.wu@intel.com>
+Cc: Andi Kleen <ak@linux.intel.com>
+Cc: Joe Mario <jmario@redhat.com>
+Signed-off-by: Michal Marek <mmarek@suse.cz>
 ---
- Makefile | 3 +++
- 1 file changed, 3 insertions(+)
+ include/linux/kallsyms.h | 2 +-
+ scripts/kallsyms.c       | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 868c0eb67b08..73503a7755fd 100644
---- a/Makefile
-+++ b/Makefile
-@@ -22,6 +22,9 @@ LC_COLLATE=C
- LC_NUMERIC=C
- export LC_COLLATE LC_NUMERIC
+diff --git a/include/linux/kallsyms.h b/include/linux/kallsyms.h
+index 5648870..6883e19 100644
+--- a/include/linux/kallsyms.h
++++ b/include/linux/kallsyms.h
+@@ -9,7 +9,7 @@
+ #include <linux/kernel.h>
+ #include <linux/stddef.h>
  
-+# Avoid interference with shell env settings
-+unexport GREP_OPTIONS
-+
- # We are using a recursive build, so we need to do a little thinking
- # to get the ordering right.
- #
+-#define KSYM_NAME_LEN 255
++#define KSYM_NAME_LEN 128
+ #define KSYM_SYMBOL_LEN (sizeof("%s+%#lx/%#lx [%s]") + (KSYM_NAME_LEN - 1) + \
+ 			 2*(BITS_PER_LONG*3/10) + (MODULE_NAME_LEN - 1) + 1)
+ 
+diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
+index 48afa20..518da86c 100644
+--- a/scripts/kallsyms.c
++++ b/scripts/kallsyms.c
+@@ -27,7 +27,7 @@
+ #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof(arr[0]))
+ #endif
+ 
+-#define KSYM_NAME_LEN		255
++#define KSYM_NAME_LEN		128
+ 
+ struct sym_entry {
+ 	unsigned long long addr;
 -- 
-1.8.4
+1.8.1.4
 
--- 
-Regards/Gruss,
-    Boris.
-
-Sent from a fat crate under my desk. Formatting is fine.
---
