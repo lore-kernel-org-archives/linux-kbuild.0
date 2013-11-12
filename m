@@ -1,48 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:56718 "EHLO mx2.suse.de"
+Received: from mx1.redhat.com ([209.132.183.28]:44519 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753516Ab3KLMw0 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 12 Nov 2013 07:52:26 -0500
-Message-ID: <52822486.9090209@suse.cz>
-Date: Tue, 12 Nov 2013 13:52:22 +0100
-From: Michal Marek <mmarek@suse.cz>
+	id S932205Ab3KLVzv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 12 Nov 2013 16:55:51 -0500
+Message-ID: <5282A3E2.30103@redhat.com>
+Date: Tue, 12 Nov 2013 16:55:46 -0500
+From: Joe Mario <jmario@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [patch 1/1] deb-pkg: Add device tree blobs to the package
-References: <20131107151746.950612598@rtp-net.org> <1383921387.8136.30.camel@deadeye.wl.decadent.org.uk>
-In-Reply-To: <1383921387.8136.30.camel@deadeye.wl.decadent.org.uk>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH 2/2] kallsyms: Revert back to 128 max symbol length
+References: <1384177236-8371-1-git-send-email-mmarek@suse.cz> <1384177236-8371-2-git-send-email-mmarek@suse.cz> <20131111141715.GM1962@tassilo.jf.intel.com>
+In-Reply-To: <20131111141715.GM1962@tassilo.jf.intel.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaud Patard <arnaud.patard@rtp-net.org>
-Cc: Ben Hutchings <ben@decadent.org.uk>, linux-kbuild@vger.kernel.org, maximilian attems <max@stro.at>
+To: Andi Kleen <ak@linux.intel.com>, Michal Marek <mmarek@suse.cz>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Don Zickus <dzickus@redhat.com>
 
-On 8.11.2013 15:36, Ben Hutchings wrote:
-> On Thu, 2013-11-07 at 16:17 +0100, Arnaud Patard wrote:
->> When building a package with make deb-pkg (say, for arm), the dtb files are
->> not added to the package. Given that things are still evolving on arm, it
->> make sense to have them along with the kernel and modules.
->>
->> Signed-off-by: Arnaud Patard <arnaud.patard@rtp-net.org>
->> ---
->>
->> Index: linux-next/scripts/package/builddeb
->> ===================================================================
->> --- linux-next.orig/scripts/package/builddeb	2013-11-06 12:51:49.548299578 +0100
->> +++ linux-next/scripts/package/builddeb	2013-11-06 12:52:24.152298055 +0100
->> @@ -140,6 +140,10 @@ if [ -e $KBUILD_IMAGE ]; then
->>  else
->>  	cp arch/$ARCH/boot/$KBUILD_IMAGE "$tmpdir/$installed_image_path"
->>  fi
->> +if grep -q "^CONFIG_OF=y" .config ; then
->> +	mkdir -p "$tmpdir/usr/lib/$packagename"
->> +	find arch/$ARCH -name *.dtb -exec cp {} "$tmpdir/usr/lib/$packagename" \;
->> +fi
-> 
-> I would quote the '*.dtb'.  Otherwise I think this is reasonable.
+On 11/11/2013 09:17 AM, Andi Kleen wrote:
+> On Mon, Nov 11, 2013 at 02:40:36PM +0100, Michal Marek wrote:
+>> This reverts commits
+>> f3462aa (Kbuild: Handle longer symbols in kallsyms.c) and
+>> eea0e9c (kbuild: Increase kallsyms max symbol length)
+>> except for the added overflow check. The reason is a regression caused
+>> by increasing the buffer:
+>> http://marc.info/?l=linux-kernel&m=138387700415675.
+>
+> Can you please wait a bit until we tracked down the problem?
+>
+>
+> -Andi
+>
 
-Good catch. Arnaud, can you send a v2 with this fix?
+Andi:
+  Don Zickus and I have been trying to reproduce the problem with
+  the config file Fengguang Wu sent to us, but so far have been unsuccessful.
 
-Thanks,
-Michal
+  Given there are 5 other locations in the code that need to be changed
+  from [128] to [KSYM_NAME_LEN], and that we still haven't found Fengguang's
+  problem yet, I'd be in favor of letting Michal's revert patch 2/2 go forward.
+
+  That would give us time to find the issue Fengguang reported.
+
+Joe  
+
+
+
 
