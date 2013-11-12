@@ -1,33 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:45894 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:56718 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750979Ab3KLIke (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 12 Nov 2013 03:40:34 -0500
-Message-ID: <5281E97D.6090806@suse.cz>
-Date: Tue, 12 Nov 2013 09:40:29 +0100
+	id S1753516Ab3KLMw0 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 12 Nov 2013 07:52:26 -0500
+Message-ID: <52822486.9090209@suse.cz>
+Date: Tue, 12 Nov 2013 13:52:22 +0100
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH 1/2] PCI: Do not use PCI ID macros in quirk names
-References: <1384177236-8371-1-git-send-email-mmarek@suse.cz>
-In-Reply-To: <1384177236-8371-1-git-send-email-mmarek@suse.cz>
-Content-Type: text/plain; charset=ISO-8859-2
+Subject: Re: [patch 1/1] deb-pkg: Add device tree blobs to the package
+References: <20131107151746.950612598@rtp-net.org> <1383921387.8136.30.camel@deadeye.wl.decadent.org.uk>
+In-Reply-To: <1383921387.8136.30.camel@deadeye.wl.decadent.org.uk>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: linux-kbuild@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>, linux-pci@vger.kernel.org, Andi Kleen <ak@linux.intel.com>, Joe Mario <jmario@redhat.com>
+To: Arnaud Patard <arnaud.patard@rtp-net.org>
+Cc: Ben Hutchings <ben@decadent.org.uk>, linux-kbuild@vger.kernel.org, maximilian attems <max@stro.at>
 
-On 11.11.2013 14:40, Michal Marek wrote:
-> Pasting the verbatim PCI_(VENDOR|DEVICE)_* macros in the __pci_fixup_*
-> symbol names results in insanely long names such as
+On 8.11.2013 15:36, Ben Hutchings wrote:
+> On Thu, 2013-11-07 at 16:17 +0100, Arnaud Patard wrote:
+>> When building a package with make deb-pkg (say, for arm), the dtb files are
+>> not added to the package. Given that things are still evolving on arm, it
+>> make sense to have them along with the kernel and modules.
+>>
+>> Signed-off-by: Arnaud Patard <arnaud.patard@rtp-net.org>
+>> ---
+>>
+>> Index: linux-next/scripts/package/builddeb
+>> ===================================================================
+>> --- linux-next.orig/scripts/package/builddeb	2013-11-06 12:51:49.548299578 +0100
+>> +++ linux-next/scripts/package/builddeb	2013-11-06 12:52:24.152298055 +0100
+>> @@ -140,6 +140,10 @@ if [ -e $KBUILD_IMAGE ]; then
+>>  else
+>>  	cp arch/$ARCH/boot/$KBUILD_IMAGE "$tmpdir/$installed_image_path"
+>>  fi
+>> +if grep -q "^CONFIG_OF=y" .config ; then
+>> +	mkdir -p "$tmpdir/usr/lib/$packagename"
+>> +	find arch/$ARCH -name *.dtb -exec cp {} "$tmpdir/usr/lib/$packagename" \;
+>> +fi
 > 
-> __pci_fixup_resumePCI_VENDOR_ID_SERVERWORKSPCI_DEVICE_ID_SERVERWORKS_HT1000SBquirk_disable_broadcom_boot_interrupt
-> 
-> When LTO adds its numeric suffix to such symbol, it overflows the
-> namebuf[KSYM_NAME_LEN] array. Use the line number instead to create
+> I would quote the '*.dtb'.  Otherwise I think this is reasonable.
 
-"... the namebuf[KSYM_NAME_LEN] array in kernel/kallsyms.c."
+Good catch. Arnaud, can you send a v2 with this fix?
 
-That way, the changelog is hopefully more clear.
-
+Thanks,
 Michal
+
