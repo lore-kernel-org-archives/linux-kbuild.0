@@ -1,28 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:59431 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757601Ab3KMPM6 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 13 Nov 2013 10:12:58 -0500
-Message-ID: <528396F4.1060005@suse.cz>
-Date: Wed, 13 Nov 2013 16:12:52 +0100
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: [PATCH 2/2] kallsyms: Revert back to 128 max symbol length
-References: <1384177236-8371-1-git-send-email-mmarek@suse.cz> <1384177236-8371-2-git-send-email-mmarek@suse.cz> <20131111141715.GM1962@tassilo.jf.intel.com> <5282A3E2.30103@redhat.com>
-In-Reply-To: <5282A3E2.30103@redhat.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Received: from georges.telenet-ops.be ([195.130.137.68]:48001 "EHLO
+	georges.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755391Ab3KNWOt (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 14 Nov 2013 17:14:49 -0500
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: [PATCH] [RFC] initramfs: Prefix simple paths with $(srctree)
+Date: Thu, 14 Nov 2013 23:14:43 +0100
+Message-Id: <1384467283-14806-1-git-send-email-geert@linux-m68k.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Joe Mario <jmario@redhat.com>
-Cc: Andi Kleen <ak@linux.intel.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Don Zickus <dzickus@redhat.com>
+To: Jonas Bonn <jonas@southpole.se>, linux-kbuild@vger.kernel.org
+Cc: linux@lists.openrisc.net, linux-kernel@vger.kernel.org, Geert Uytterhoeven <geert@linux-m68k.org>
 
-On 12.11.2013 22:55, Joe Mario wrote:
->   Given there are 5 other locations in the code that need to be changed
->   from [128] to [KSYM_NAME_LEN], and that we still haven't found Fengguang's
->   problem yet, I'd be in favor of letting Michal's revert patch 2/2 go forward.
+If CONFIG_INITRAMFS_SOURCE contains relative paths inside the source tree
+(e.g. in a defconfig pointing to arch-specific files), the corresponding
+file system entries are not found when building outside the source tree.
 
-It's in kbuild.git#kbuild now. If Bjorn merges the PCI patch, then the
-issue with LTO will be resolved even without increasing the symbol length.
+Prefix all simple paths (paths not starting with "/", "../", or "./") with
+$(srctree) to fix this.
 
-Michal
+Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+---
+This issue happens when building an OpenRISC defconfig from
+git://openrisc.net/jonas/linux. Mainline doesn't have the OpenRISC
+initramfs.
+
+Questions:
+  1. Is this an acceptable solution for mainline?
+  2. My make-foo is limited. is there a better way to accomplish this, than
+     by prefixing all paths and removing the prefixes again where they're
+     not wanted?
+   
+ usr/Makefile |    6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/usr/Makefile b/usr/Makefile
+index e767f019accf..2170c38936ce 100644
+--- a/usr/Makefile
++++ b/usr/Makefile
+@@ -41,6 +41,12 @@ hostprogs-y := gen_init_cpio
+ initramfs   := $(CONFIG_SHELL) $(srctree)/scripts/gen_initramfs_list.sh
+ ramfs-input := $(if $(filter-out "",$(CONFIG_INITRAMFS_SOURCE)), \
+ 			$(shell echo $(CONFIG_INITRAMFS_SOURCE)),-d)
++ifneq ("$(ramfs-input)", "-d")
++ramfs-input := $(patsubst %, $(srctree)/%, $(ramfs-input))
++ramfs-input := $(patsubst $(srctree)//%, /%, $(ramfs-input))
++ramfs-input := $(patsubst $(srctree)/../%, ../%, $(ramfs-input))
++ramfs-input := $(patsubst $(srctree)/./%, ./%, $(ramfs-input))
++endif
+ ramfs-args  := \
+         $(if $(CONFIG_INITRAMFS_ROOT_UID), -u $(CONFIG_INITRAMFS_ROOT_UID)) \
+         $(if $(CONFIG_INITRAMFS_ROOT_GID), -g $(CONFIG_INITRAMFS_ROOT_GID))
+-- 
+1.7.9.5
+
