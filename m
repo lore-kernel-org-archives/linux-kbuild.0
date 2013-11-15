@@ -1,66 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from kiruna.synopsys.com ([198.182.44.80]:52800 "EHLO
-	kiruna.synopsys.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751939Ab3KOFzZ (ORCPT
+Received: from cdptpa-outbound-snat.email.rr.com ([107.14.166.226]:38243 "EHLO
+	cdptpa-oedge-vip.email.rr.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1751172Ab3KOOgx (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 15 Nov 2013 00:55:25 -0500
-Message-ID: <5285B739.9060000@synopsys.com>
-Date: Fri, 15 Nov 2013 11:25:05 +0530
-From: Vineet Gupta <Vineet.Gupta1@synopsys.com>
-MIME-Version: 1.0
-Subject: Re: [PATCH] [RFC] initramfs: Prefix simple paths with $(srctree)
-References: <1384467283-14806-1-git-send-email-geert@linux-m68k.org>
-In-Reply-To: <1384467283-14806-1-git-send-email-geert@linux-m68k.org>
-Content-Type: text/plain; charset="ISO-8859-1"
+	Fri, 15 Nov 2013 09:36:53 -0500
+Date: Fri, 15 Nov 2013 09:36:45 -0500
+From: Steven Rostedt <rostedt@goodmis.org>
+Subject: [PATCH] scripts: Have make TAGS not include structure members
+Message-ID: <20131115093645.6dc03918@gandalf.local.home>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Geert Uytterhoeven <geert@linux-m68k.org>, Jonas Bonn <jonas@southpole.se>, linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, linux@lists.openrisc.net
+To: LKML <linux-kernel@vger.kernel.org>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Yang Bai <hamo.by@gmail.com>, Stephen Boyd <sboyd@codeaurora.org>, Andrew Morton <akpm@linux-foundation.org>
 
-On 11/15/2013 03:44 AM, Geert Uytterhoeven wrote:
-> If CONFIG_INITRAMFS_SOURCE contains relative paths inside the source tree
-> (e.g. in a defconfig pointing to arch-specific files), the corresponding
-> file system entries are not found when building outside the source tree.
-> 
-> Prefix all simple paths (paths not starting with "/", "../", or "./") with
-> $(srctree) to fix this.
-> 
-> Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
-> ---
-> This issue happens when building an OpenRISC defconfig from
-> git://openrisc.net/jonas/linux. Mainline doesn't have the OpenRISC
-> initramfs.
+It is really annoying when I use emacs TAGS to search for something
+like "dev_name" and have to go through 12 iterations before I find the
+function "dev_name". I really do not care about structures that include
+"dev_name" as one of its fields, and I'm sure pretty much all other
+developers do not care either.
 
-+1.
-This applies to ARC defconfig too.
+There's a "remove_structs" variable used by the scripts/tags.sh, which
+I'm guessing is suppose to remove these structures from the TAGS file,
+but it must do a poor job at it, as I'm always hitting structures when
+I want the actual declaration.
 
-> 
-> Questions:
->   1. Is this an acceptable solution for mainline?
->   2. My make-foo is limited. is there a better way to accomplish this, than
->      by prefixing all paths and removing the prefixes again where they're
->      not wanted?
->    
->  usr/Makefile |    6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/usr/Makefile b/usr/Makefile
-> index e767f019accf..2170c38936ce 100644
-> --- a/usr/Makefile
-> +++ b/usr/Makefile
-> @@ -41,6 +41,12 @@ hostprogs-y := gen_init_cpio
->  initramfs   := $(CONFIG_SHELL) $(srctree)/scripts/gen_initramfs_list.sh
->  ramfs-input := $(if $(filter-out "",$(CONFIG_INITRAMFS_SOURCE)), \
->  			$(shell echo $(CONFIG_INITRAMFS_SOURCE)),-d)
-> +ifneq ("$(ramfs-input)", "-d")
-> +ramfs-input := $(patsubst %, $(srctree)/%, $(ramfs-input))
-> +ramfs-input := $(patsubst $(srctree)//%, /%, $(ramfs-input))
-> +ramfs-input := $(patsubst $(srctree)/../%, ../%, $(ramfs-input))
-> +ramfs-input := $(patsubst $(srctree)/./%, ./%, $(ramfs-input))
-> +endif
->  ramfs-args  := \
->          $(if $(CONFIG_INITRAMFS_ROOT_UID), -u $(CONFIG_INITRAMFS_ROOT_UID)) \
->          $(if $(CONFIG_INITRAMFS_ROOT_GID), -g $(CONFIG_INITRAMFS_ROOT_GID))
-> 
+Luckily, the etags and ctags program comes with an option
+"--no-members", which does exactly what I want, and I'm sure all other
+kernel developers want too.
 
+Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
+
+diff --git a/scripts/tags.sh b/scripts/tags.sh
+index 74f02e4..b985371 100755
+--- a/scripts/tags.sh
++++ b/scripts/tags.sh
+@@ -218,7 +218,7 @@ exuberant()
+ 
+ emacs()
+ {
+-	all_target_sources | xargs $1 -a                        \
++	all_target_sources | xargs $1 -a --no-members           \
+ 	--regex='/^\(ENTRY\|_GLOBAL\)(\([^)]*\)).*/\2/'         \
+ 	--regex='/^SYSCALL_DEFINE[0-9]?(\([^,)]*\).*/sys_\1/'   \
+ 	--regex='/^TRACE_EVENT(\([^,)]*\).*/trace_\1/'		\
+@@ -248,13 +248,13 @@ emacs()
+ 	--regex='/PCI_OP_READ(\([a-z]*[a-z]\).*[1-4])/pci_bus_read_config_\1/' \
+ 	--regex='/PCI_OP_WRITE(\([a-z]*[a-z]\).*[1-4])/pci_bus_write_config_\1/'
+ 
+-	all_kconfigs | xargs $1 -a                              \
++	all_kconfigs | xargs $1 -a --no-members                 \
+ 	--regex='/^[ \t]*\(\(menu\)*config\)[ \t]+\([a-zA-Z0-9_]+\)/\3/'
+ 
+-	all_kconfigs | xargs $1 -a                              \
++	all_kconfigs | xargs $1 -a --no-members                 \
+ 	--regex='/^[ \t]*\(\(menu\)*config\)[ \t]+\([a-zA-Z0-9_]+\)/CONFIG_\3/'
+ 
+-	all_defconfigs | xargs -r $1 -a                         \
++	all_defconfigs | xargs -r $1 -a --no-members            \
+ 	--regex='/^#?[ \t]?\(CONFIG_[a-zA-Z0-9_]+\)/\1/'
+ }
+ 
