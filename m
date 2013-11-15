@@ -1,65 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cdptpa-outbound-snat.email.rr.com ([107.14.166.226]:38243 "EHLO
-	cdptpa-oedge-vip.email.rr.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1751172Ab3KOOgx (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 15 Nov 2013 09:36:53 -0500
-Date: Fri, 15 Nov 2013 09:36:45 -0500
-From: Steven Rostedt <rostedt@goodmis.org>
-Subject: [PATCH] scripts: Have make TAGS not include structure members
-Message-ID: <20131115093645.6dc03918@gandalf.local.home>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Received: from cantor2.suse.de ([195.135.220.15]:48627 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752101Ab3KOQJ5 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 15 Nov 2013 11:09:57 -0500
+Date: Fri, 15 Nov 2013 17:09:52 +0100
+From: Michal Marek <mmarek@suse.cz>
+Subject: [GIT] kbuild changes for v3.13-rc1
+Message-ID: <20131115160952.GA19669@sepie.suse.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: LKML <linux-kernel@vger.kernel.org>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Yang Bai <hamo.by@gmail.com>, Stephen Boyd <sboyd@codeaurora.org>, Andrew Morton <akpm@linux-foundation.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: ak@linux.intel.com, andi@firstfloor.org, bp@suse.de, fabio.estevam@freescale.com, jmario@redhat.com, josh@joshtriplett.org, keescook@chromium.org, mmarek@suse.cz, slyfox@gentoo.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-It is really annoying when I use emacs TAGS to search for something
-like "dev_name" and have to go through 12 iterations before I find the
-function "dev_name". I really do not care about structures that include
-"dev_name" as one of its fields, and I'm sure pretty much all other
-developers do not care either.
+Hi Linus,
 
-There's a "remove_structs" variable used by the scripts/tags.sh, which
-I'm guessing is suppose to remove these structures from the TAGS file,
-but it must do a poor job at it, as I'm always hitting structures when
-I want the actual declaration.
+please pull these kbuild commits for v3.13-rc1:
+- LTO fixes, but the kallsyms part had to be reverted
+- -Werror=implicit-int and -Werror=strict-prototypes is passsed to the
+  compiler by default
+- snprintf fix in modpost
+- GREP_OPTIONS is removed from the environment to be immune against
+  exotic grep option settings
 
-Luckily, the etags and ctags program comes with an option
-"--no-members", which does exactly what I want, and I'm sure all other
-kernel developers want too.
+Thanks,
+Michal
 
-Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
 
-diff --git a/scripts/tags.sh b/scripts/tags.sh
-index 74f02e4..b985371 100755
---- a/scripts/tags.sh
-+++ b/scripts/tags.sh
-@@ -218,7 +218,7 @@ exuberant()
- 
- emacs()
- {
--	all_target_sources | xargs $1 -a                        \
-+	all_target_sources | xargs $1 -a --no-members           \
- 	--regex='/^\(ENTRY\|_GLOBAL\)(\([^)]*\)).*/\2/'         \
- 	--regex='/^SYSCALL_DEFINE[0-9]?(\([^,)]*\).*/sys_\1/'   \
- 	--regex='/^TRACE_EVENT(\([^,)]*\).*/trace_\1/'		\
-@@ -248,13 +248,13 @@ emacs()
- 	--regex='/PCI_OP_READ(\([a-z]*[a-z]\).*[1-4])/pci_bus_read_config_\1/' \
- 	--regex='/PCI_OP_WRITE(\([a-z]*[a-z]\).*[1-4])/pci_bus_write_config_\1/'
- 
--	all_kconfigs | xargs $1 -a                              \
-+	all_kconfigs | xargs $1 -a --no-members                 \
- 	--regex='/^[ \t]*\(\(menu\)*config\)[ \t]+\([a-zA-Z0-9_]+\)/\3/'
- 
--	all_kconfigs | xargs $1 -a                              \
-+	all_kconfigs | xargs $1 -a --no-members                 \
- 	--regex='/^[ \t]*\(\(menu\)*config\)[ \t]+\([a-zA-Z0-9_]+\)/CONFIG_\3/'
- 
--	all_defconfigs | xargs -r $1 -a                         \
-+	all_defconfigs | xargs -r $1 -a --no-members            \
- 	--regex='/^#?[ \t]?\(CONFIG_[a-zA-Z0-9_]+\)/\1/'
- }
- 
+The following changes since commit 272b98c6455f00884f0350f775c5342358ebb73f:
+
+  Linux 3.12-rc1 (2013-09-16 16:17:51 -0400)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git kbuild
+
+for you to fetch changes up to 480f439c3db0d45d817d66caf3fa8e81a6fac01a:
+
+  kallsyms: Revert back to 128 max symbol length (2013-11-13 15:58:19 +0100)
+
+----------------------------------------------------------------
+Andi Kleen (2):
+      Kbuild: Handle longer symbols in kallsyms.c
+      kbuild, bloat-o-meter: fix static detection
+
+Borislav Petkov (1):
+      Kbuild: Ignore GREP_OPTIONS env variable
+
+Fabio Estevam (1):
+      scripts: kallsyms: Use %zu to print 'size_t'
+
+Joe Mario (1):
+      kbuild: Increase kallsyms max symbol length
+
+Josh Triplett (2):
+      scripts/bloat-o-meter: ignore changes in the size of linux_banner
+      scripts/bloat-o-meter: use .startswith rather than fragile slicing
+
+Kees Cook (1):
+      kbuild: replace unbounded sprintf call in modpost
+
+Michal Marek (1):
+      kallsyms: Revert back to 128 max symbol length
+
+Sergei Trofimovich (1):
+      Makefile: enable -Werror=implicit-int and -Werror=strict-prototypes by default
+
+ Makefile                 | 9 +++++++++
+ scripts/bloat-o-meter    | 7 ++++---
+ scripts/kallsyms.c       | 6 ++++++
+ scripts/mod/sumversion.c | 2 +-
+ 4 files changed, 20 insertions(+), 4 deletions(-)
