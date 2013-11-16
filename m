@@ -1,62 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:48955 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751053Ab3KOQSH (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 15 Nov 2013 11:18:07 -0500
-Date: Fri, 15 Nov 2013 17:18:01 +0100
-From: Michal Marek <mmarek@suse.cz>
-Subject: [GIT] kbuild misc changes for v3.13-rc1
-Message-ID: <20131115161801.GA20232@sepie.suse.cz>
+Received: from smtp.codeaurora.org ([198.145.11.231]:48084 "EHLO
+	smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751456Ab3KPBCi (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 15 Nov 2013 20:02:38 -0500
+Message-ID: <5286C42C.4050800@codeaurora.org>
+Date: Fri, 15 Nov 2013 17:02:36 -0800
+From: Stephen Boyd <sboyd@codeaurora.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Subject: Re: [PATCH] scripts: Have make TAGS not include structure members
+References: <20131115093645.6dc03918@gandalf.local.home>
+In-Reply-To: <20131115093645.6dc03918@gandalf.local.home>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: michael.opdenacker@free-electrons.com, mpagano@gentoo.org, rdunlap@infradead.org, tkhai@yandex.ru, wsa@the-dreams.de, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Steven Rostedt <rostedt@goodmis.org>, LKML <linux-kernel@vger.kernel.org>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Yang Bai <hamo.by@gmail.com>, Andrew Morton <akpm@linux-foundation.org>
 
-Hi Linus,
+On 11/15/13 06:36, Steven Rostedt wrote:
+> diff --git a/scripts/tags.sh b/scripts/tags.sh
+> index 74f02e4..b985371 100755
+> --- a/scripts/tags.sh
+> +++ b/scripts/tags.sh
+> @@ -218,7 +218,7 @@ exuberant()
+>  
+>  emacs()
+>  {
+> -	all_target_sources | xargs $1 -a                        \
+> +	all_target_sources | xargs $1 -a --no-members           \
+>  	--regex='/^\(ENTRY\|_GLOBAL\)(\([^)]*\)).*/\2/'         \
+>  	--regex='/^SYSCALL_DEFINE[0-9]?(\([^,)]*\).*/sys_\1/'   \
+>  	--regex='/^TRACE_EVENT(\([^,)]*\).*/trace_\1/'		\
+> @@ -248,13 +248,13 @@ emacs()
+>  	--regex='/PCI_OP_READ(\([a-z]*[a-z]\).*[1-4])/pci_bus_read_config_\1/' \
+>  	--regex='/PCI_OP_WRITE(\([a-z]*[a-z]\).*[1-4])/pci_bus_write_config_\1/'
+>  
+> -	all_kconfigs | xargs $1 -a                              \
+> +	all_kconfigs | xargs $1 -a --no-members                 \
+>  	--regex='/^[ \t]*\(\(menu\)*config\)[ \t]+\([a-zA-Z0-9_]+\)/\3/'
+>  
+> -	all_kconfigs | xargs $1 -a                              \
+> +	all_kconfigs | xargs $1 -a --no-members                 \
+>  	--regex='/^[ \t]*\(\(menu\)*config\)[ \t]+\([a-zA-Z0-9_]+\)/CONFIG_\3/'
+>  
+> -	all_defconfigs | xargs -r $1 -a                         \
+> +	all_defconfigs | xargs -r $1 -a --no-members            \
+>  	--regex='/^#?[ \t]?\(CONFIG_[a-zA-Z0-9_]+\)/\1/'
+>  }
+>  
 
-please pull these script updates for v3.13-rc1:
-- make tags fixes again
-- scripts/show_delta fix for newer python
-- scripts/kernel-doc does not fail on unknown function prototype
-- One less coccinelle check this time
+Does it actually matter for the kconfigs and defconfigs?
 
-Thanks,
-Michal
+-- 
+Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum,
+hosted by The Linux Foundation
 
-The following changes since commit 272b98c6455f00884f0350f775c5342358ebb73f:
-
-  Linux 3.12-rc1 (2013-09-16 16:17:51 -0400)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git misc
-
-for you to fetch changes up to 6cf3a6eff77273a55b996a5a43f342b150cfba09:
-
-  scripts/tags.sh: remove obsolete __devinit[const|data] (2013-11-08 10:57:20 +0100)
-
-----------------------------------------------------------------
-Kirill Tkhai (1):
-      scripts/tags.sh: Increase identifier list
-
-Michael Opdenacker (1):
-      scripts/tags.sh: remove obsolete __devinit[const|data]
-
-Mike Pagano (1):
-      show_delta: Update script to support python versions 2.5 through 3.3
-
-Randy Dunlap (1):
-      scripts/kernel-doc: make unknown function prototype a Warning instead of an Error
-
-Wolfram Sang (1):
-      scripts/coccinelle/api: remove devm_request_and_ioremap.cocci
-
- .../coccinelle/api/devm_request_and_ioremap.cocci  | 105 ---------------------
- scripts/kernel-doc                                 |   3 +-
- scripts/show_delta                                 |  12 +--
- scripts/tags.sh                                    |   9 +-
- 4 files changed, 12 insertions(+), 117 deletions(-)
- delete mode 100644 scripts/coccinelle/api/devm_request_and_ioremap.cocci
