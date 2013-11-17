@@ -1,56 +1,110 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pb0-f47.google.com ([209.85.160.47]:61182 "EHLO
-	mail-pb0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751168Ab3KQPTy (ORCPT
+Received: from cdptpa-outbound-snat.email.rr.com ([107.14.166.226]:33166 "EHLO
+	cdptpa-oedge-vip.email.rr.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1751702Ab3KQRIT (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 17 Nov 2013 10:19:54 -0500
-MIME-Version: 1.0
-In-Reply-To: <20131117092731.75b091bd@gandalf.local.home>
+	Sun, 17 Nov 2013 12:08:19 -0500
+Date: Sun, 17 Nov 2013 12:08:16 -0500
+From: Steven Rostedt <rostedt@goodmis.org>
+Subject: Re: [PATCH] scripts: Have make TAGS not include structure members
+Message-ID: <20131117120816.41fe2528@gandalf.local.home>
+In-Reply-To: <CAMuHMdWNh2L56FhDbKfC7TtdHp8=EY2ms_T+=9Xyczz3D-PF=w@mail.gmail.com>
 References: <20131115093645.6dc03918@gandalf.local.home>
 	<CAMuHMdXSBSOkfd2MGbn=rpXQRZYw5TKLsR=3SoeSyrcD2CzunA@mail.gmail.com>
 	<20131117092731.75b091bd@gandalf.local.home>
-Date: Sun, 17 Nov 2013 16:19:53 +0100
-Message-ID: <CAMuHMdWNh2L56FhDbKfC7TtdHp8=EY2ms_T+=9Xyczz3D-PF=w@mail.gmail.com>
-Subject: Re: [PATCH] scripts: Have make TAGS not include structure members
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Content-Type: text/plain; charset=UTF-8
+	<CAMuHMdWNh2L56FhDbKfC7TtdHp8=EY2ms_T+=9Xyczz3D-PF=w@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Steven Rostedt <rostedt@goodmis.org>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
 Cc: LKML <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>, Yang Bai <hamo.by@gmail.com>, Stephen Boyd <sboyd@codeaurora.org>, Andrew Morton <akpm@linux-foundation.org>
 
-On Sun, Nov 17, 2013 at 3:27 PM, Steven Rostedt <rostedt@goodmis.org> wrote:
->> On Fri, Nov 15, 2013 at 3:36 PM, Steven Rostedt <rostedt@goodmis.org> wrote:
->> > It is really annoying when I use emacs TAGS to search for something
->> > like "dev_name" and have to go through 12 iterations before I find the
->> > function "dev_name". I really do not care about structures that include
->> > "dev_name" as one of its fields, and I'm sure pretty much all other
->> > developers do not care either.
->>
->> While I'm also annoyed by this (although with vim/tags), I regularly do search
->> for struct members, so losing this ability would hurt, too.
->>
->> Is there a solution, without throwing out the baby with the bath water?
->>
->
-> Or perhaps make it only do it for TAGS. vim gives you a list of
-> locations that you can go to, and even marks if it is a member of a
-> structure or a function or whatever. With emacs, you have to iterate
-> over each location. That is, with my devname example, I had to hit M^.
-> then Ctrl^U M^. another 12 times before I got to the function name.
-> It makes it absolutely worthless, that after two or three misses, I
-> give up and just grep for it.
+On Sun, 17 Nov 2013 16:19:53 +0100
+Geert Uytterhoeven <geert@linux-m68k.org> wrote:
 
-Thanks! Now I have to look into my vim setup, why it doesn't do the
-above...
+ 
+> Thanks! Now I have to look into my vim setup, why it doesn't do the
+> above...
+> 
 
-Gr{oetje,eeting}s,
+$ vim --version
+VIM - Vi IMproved 7.4 (2013 Aug 10, compiled Sep 11 2013 12:28:07)
 
-                        Geert
+And from the ctags man pages, I did:
 
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+:ta dev_name
 
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+and it gave me a list of tags.
+
+  # pri kind tag               file
+  1 F   m    dev_name          drivers/clk/samsung/clk.h
+               struct:samsung_clock_alias
+               const char  *dev_name;
+  2 F   m    dev_name          drivers/clk/samsung/clk.h
+               struct:samsung_div_clock
+               const char  *dev_name;
+  3 F   m    dev_name          drivers/clk/samsung/clk.h
+               struct:samsung_gate_clock
+               const char  *dev_name;
+  4 F   m    dev_name          drivers/clk/samsung/clk.h
+               struct:samsung_mux_clock
+               const char  *dev_name;
+  5 F   m    dev_name          drivers/clk/samsung/clk.h
+               struct:samsung_pll_clock
+               const char  *dev_name;
+  6 F   m    dev_name          drivers/edac/edac_core.h
+               struct:edac_device_ctl_info
+               const char *dev_name; /* pci/platform/etc... name */
+  7 F   m    dev_name          drivers/edac/edac_core.h
+               struct:edac_pci_ctl_info
+               const char *dev_name; /* pci/platform/etc... name */
+  8 F   m    dev_name          drivers/infiniband/hw/cxgb3/cxio_hal.h
+               struct:cxio_rdev
+               char dev_name[T3_MAX_DEV_NAME_LEN];
+  9 F   m    dev_name          drivers/pinctrl/core.h
+               struct:pinctrl_setting
+               const char *dev_name;
+ 10 F   m    dev_name          drivers/scsi/dpt/dpti_i2o.h
+               struct:i2o_device
+               char dev_name[8];  /* linux /dev name if available */
+ 11 F   v    dev_name          drivers/target/target_core_stat.c
+               DEV_STAT_SCSI_TRANSPORT_ATTR_RO(dev_name);
+ 12 F   m    dev_name          drivers/video/cyber2000fb.h
+               struct:cyberpro_info
+               char  dev_name[32];
+ 13 F   m    dev_name          drivers/video/sticore.h
+               struct:sti_conf_outptr
+               u8 dev_name[STI_DEV_NAME_LENGTH]; /* null terminated product name */
+ 14 F   m    dev_name          include/linux/device.h
+               struct:bus_type
+               const char  *dev_name;
+ 15 F   f    dev_name          include/linux/device.h
+               static inline const char *dev_name(const struct device *dev)
+ 16 F   m    dev_name          include/linux/edac.h
+               struct:mem_ctl_info
+               const char *dev_name;
+ 17 F   m    dev_name          include/linux/mfd/ti_ssp.h
+               struct:ti_ssp_dev_data
+               const char *dev_name;
+ 18 F   m    dev_name          include/linux/netpoll.h
+               struct:netpoll
+               char dev_name[IFNAMSIZ];
+ 19 F   m    dev_name          include/linux/omap-dma.h
+               struct:omap_dma_lch
+               const char *dev_name;
+ 20 F   m    dev_name          include/linux/phy/phy.h
+               struct:phy_consumer
+               const char *dev_name;
+ 21 F   m    dev_name          include/linux/pinctrl/machine.h
+               struct:pinctrl_map
+               const char *dev_name;
+ 22 F   m    dev_name          include/linux/regulator/machine.h
+               struct:regulator_consumer_supply
+-- More --
+
+
+
+-- Steve
+
