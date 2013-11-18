@@ -1,35 +1,69 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:58357 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751363Ab3KROJW (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 18 Nov 2013 09:09:22 -0500
-Date: Mon, 18 Nov 2013 15:09:20 +0100
-From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] deb-pkg: Inhibit initramfs builders if
-	CONFIG_BLK_DEV_INITRD is not set
-Message-ID: <20131118140920.GA31395@pobox.suse.cz>
-References: <1384484605.2771.13.camel@deadeye.wl.decadent.org.uk>
+Received: from mail-we0-f171.google.com ([74.125.82.171]:60882 "EHLO
+	mail-we0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751301Ab3KRSGZ convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 18 Nov 2013 13:06:25 -0500
+Date: Mon, 18 Nov 2013 19:06:19 +0100
+From: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Subject: Re: [PATCH] scripts/config: allow setting a string which value
+ contains a colon
+Message-ID: <20131118180619.GA3458@free.fr>
+References: <1384689334-6979-1-git-send-email-chauplac@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1384484605.2771.13.camel@deadeye.wl.decadent.org.uk>
+Content-Transfer-Encoding: 8BIT
+In-Reply-To: <1384689334-6979-1-git-send-email-chauplac@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ben Hutchings <ben@decadent.org.uk>
-Cc: Petr Baudis <pasky@ucw.cz>, linux-kbuild@vger.kernel.org, Thomas Lange <lange@debian.org>, debian-kernel@lists.debian.org, initramfs@vger.kernel.org
+To: Clement Chauplannaz <chauplac@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, mmarek@suse.cz, sedat.dilek@gmail.com, linus.walleij@linaro.org, linux-kernel@vger.kernel.org
 
-On Fri, Nov 15, 2013 at 03:03:25AM +0000, Ben Hutchings wrote:
-> The kernel postinst hook for initramfs-tools will build an initramfs
-> on installation unless $INITRD is set to 'No'.  make-kpkg generates a
-> postinst script that sets this variable appropriately, but we don't.
-> Set it based on CONFIG_BLK_DEV_INITRD.
+Clément, All,
+
+On 2013-11-17 12:55 +0100, Clement Chauplannaz spake thusly:
+> A bug in script `config' prevented from modifying an existing variable's
+> value to a string that contains a colon ':'.  The reason behind it is that
+> colons are used as a separator in `sed' commands that script `config'
+> relies on.
 > 
-> This should also work with dracut when <http://bugs.debian.org/729622>
-> is fixed.
+> Escape colons in `sed' commands to allow values containing colons.
 > 
-> Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+> Signed-off-by: Clement Chauplannaz <chauplac@gmail.com>
+
+Acked-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
+
+It'll be in my tree soon, as a rc-fix. Thank you.
+
+Regards,
+Yann E. MORIN.
+
 > ---
+>  scripts/config | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/scripts/config b/scripts/config
+> index 6804179..4b16260 100755
+> --- a/scripts/config
+> +++ b/scripts/config
+> @@ -78,7 +78,7 @@ txt_append() {
+>  
+>  txt_subst() {
+>  	local before="$1"
+> -	local after="$2"
+> +	local after="${2//:/\:}"
+>  	local infile="$3"
+>  	local tmpfile="$infile.swp"
+>  
+> -- 
+> 1.8.3.2.dirty
+> 
 
-Applied to kbuild.git#misc, thanks.
-
-Michal
+-- 
+.-----------------.--------------------.------------------.--------------------.
+|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
+| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
+| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
+| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
+'------------------------------^-------^------------------^--------------------'
