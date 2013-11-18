@@ -1,40 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f51.google.com ([74.125.82.51]:43985 "EHLO
-	mail-wg0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751420Ab3KRSSM (ORCPT
+Received: from mail-we0-f182.google.com ([74.125.82.182]:53523 "EHLO
+	mail-we0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754040Ab3KRTAk (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 18 Nov 2013 13:18:12 -0500
-Received: by mail-wg0-f51.google.com with SMTP id m15so6475308wgh.6
-        for <linux-kbuild@vger.kernel.org>; Mon, 18 Nov 2013 10:18:11 -0800 (PST)
-Date: Mon, 18 Nov 2013 19:18:06 +0100
+	Mon, 18 Nov 2013 14:00:40 -0500
+Received: by mail-we0-f182.google.com with SMTP id q59so4660993wes.13
+        for <linux-kbuild@vger.kernel.org>; Mon, 18 Nov 2013 11:00:37 -0800 (PST)
+Date: Mon, 18 Nov 2013 20:00:33 +0100
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH v3 0/5] Kconfig Gtk/Qt interface flavours ported to
- newest toolkit versions
-Message-ID: <20131118181806.GD3458@free.fr>
-References: <kconfig-port-gtk-qt>
- <1376922591-37504-1-git-send-email-david.graeff@web.de>
+Subject: Re: [PATCH]kconfig:qconf: Add an option to the "find" dialog for
+ search in the description.
+Message-ID: <20131118190033.GE3458@free.fr>
+References: <526C1E31.2040604@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1376922591-37504-1-git-send-email-david.graeff@web.de>
+In-Reply-To: <526C1E31.2040604@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: David Graeff <david.graeff@web.de>
-Cc: linux-kbuild@vger.kernel.org, sam@ravnborg.org, mmarek@suse.cz
+To: "v1kt0p.rus@gmail.com" <v1kt0p.rus@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, mmarek@suse.cz, james.hogan@imgtec.com, ralf@linux-mips.org, tkhai@yandex.ru
 
-David, All,
+Victor, All,
 
-On 2013-08-19 16:29 +0200, David Graeff spake thusly:
-> David Graeff (5):
->   kconfig: Move flavours into their own subdirectories.
->   kconfig: Add qconfig makefile target additionally to the xconfig
->     target
->   kconfig: Update/Port Gtk flavour to use Gtk3
->   kconfig: Qt interface port to Qt4/Qt5, removed Qt3 Support
->   kconfig: images.c for gtk/qt gui flavour reoganized
+On 2013-10-26 22:55 +0300, v1kt0p.rus@gmail.com spake thusly:
+> Adding the ability to search in description.
+> 
+> Signed-off-by: Victor Danchenko <v1kt0p.rus@gmail.com>
 
-Are you still interested in this series? If so, could you please rebase
-it on top of the current tree, so it is easier to apply?
+Your patch is space-mangled, and does not apply:
+
+$ pwclient git-am 3098691
+Applying patch #3098691 using 'git am'
+Description: kconfig:qconf: Add an option to the "find" dialog for search in the description.
+Applying: kconfig:qconf: Add an option to the "find" dialog for search in the description.
+error: patch failed: scripts/kconfig/lkc_proto.h:35
+error: scripts/kconfig/lkc_proto.h: patch does not apply
+error: patch failed: scripts/kconfig/mconf.c:430
+error: scripts/kconfig/mconf.c: patch does not apply
+error: patch failed: scripts/kconfig/nconf.c:720
+error: scripts/kconfig/nconf.c: patch does not apply
+error: patch failed: scripts/kconfig/qconf.cc:1197
+error: scripts/kconfig/qconf.cc: patch does not apply
+error: patch failed: scripts/kconfig/qconf.h:5
+error: scripts/kconfig/qconf.h: patch does not apply
+error: patch failed: scripts/kconfig/symbol.c:990
+error: scripts/kconfig/symbol.c: patch does not apply
+Patch failed at 0001 kconfig:qconf: Add an option to the "find" dialog
+for search in the description.
+The copy of the patch that failed is found in:
+   /home/ymorin/dev/linux/linux-kconfig/.git/rebase-apply/patch
+When you have resolved this problem, run "git am --resolved".
+If you prefer to skip this patch, run "git am --skip" instead.
+To restore the original branch and stop patching, run "git am --abort".
+
+Sending via a webmail (eg. gmail) is broken. Please use git 'send-email'
+to send your patch.
 
 Regards,
 Yann E. MORIN.
