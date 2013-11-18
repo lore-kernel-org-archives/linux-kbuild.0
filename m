@@ -1,112 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-we0-f170.google.com ([74.125.82.170]:42890 "EHLO
-	mail-we0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751301Ab3KRSIW (ORCPT
+Received: from mail-wg0-f51.google.com ([74.125.82.51]:43985 "EHLO
+	mail-wg0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751420Ab3KRSSM (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 18 Nov 2013 13:08:22 -0500
-Date: Mon, 18 Nov 2013 19:08:13 +0100
+	Mon, 18 Nov 2013 13:18:12 -0500
+Received: by mail-wg0-f51.google.com with SMTP id m15so6475308wgh.6
+        for <linux-kbuild@vger.kernel.org>; Mon, 18 Nov 2013 10:18:11 -0800 (PST)
+Date: Mon, 18 Nov 2013 19:18:06 +0100
 From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: [PATCH v4] kconfig/symbol.c: handle choice_values that depend on
- 'm' symbols
-Message-ID: <20131118180813.GB3458@free.fr>
-References: <ghr4asl38m.fsf@lena.gouders.net>
- <ghk3gkl32u.fsf@lena.gouders.net>
+Subject: Re: [PATCH v3 0/5] Kconfig Gtk/Qt interface flavours ported to
+ newest toolkit versions
+Message-ID: <20131118181806.GD3458@free.fr>
+References: <kconfig-port-gtk-qt>
+ <1376922591-37504-1-git-send-email-david.graeff@web.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <ghk3gkl32u.fsf@lena.gouders.net>
+In-Reply-To: <1376922591-37504-1-git-send-email-david.graeff@web.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dirk Gouders <dirk@gouders.net>
-Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Felipe Balbi <balbi@ti.com>, USB list <linux-usb@vger.kernel.org>, Tomi Valkeinen <tomi.valkeinen@ti.com>, Roger Quadros <rogerq@ti.com>
+To: David Graeff <david.graeff@web.de>
+Cc: linux-kbuild@vger.kernel.org, sam@ravnborg.org, mmarek@suse.cz
 
-Dirk, All,
+David, All,
 
-On 2013-11-07 15:05 +0100, Dirk Gouders spake thusly:
-> If choices consist of choice_values that depend on symbols set to 'm',
-> those choice_values are not set to 'n' if the choice is changed from
-> 'm' to 'y' (in which case only one active choice_value is allowed).
-> Those values are also written to the config file causing modules to be
-> built when they should not.
-> 
-> The following config can be used to reproduce and examine the problem;
-> with the frontend of your choice set "Choice 0" and "Choice 1" to 'm',
-> then set "Tristate Choice" to 'y' and save the configuration:
-> 
-> config modules
-> 	boolean modules
-> 	default y
-> 	option modules
-> 
-> config dependency
-> 	tristate "Dependency"
-> 	default m
-> 
-> choice
-> 	prompt "Tristate Choice"
-> 	default choice0
-> 
-> config choice0
-> 	tristate "Choice 0"
-> 
-> config choice1
-> 	tristate "Choice 1"
-> 	depends on dependency
-> 
-> endchoice
-> 
-> This patch sets choice_values' visibility that depend on symbols set
-> to 'm' to 'n' if the corresponding choice is set to 'y'.  This makes
-> them disappear from the choice list and will also cause the
-> choice_values' value set to 'n' in sym_calc_value() and as a result
-> they are written as "not set" to the resulting .config file.
-> 
-> Reported-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-> Signed-off-by: Dirk Gouders <dirk@gouders.net>
-> Tested-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+On 2013-08-19 16:29 +0200, David Graeff spake thusly:
+> David Graeff (5):
+>   kconfig: Move flavours into their own subdirectories.
+>   kconfig: Add qconfig makefile target additionally to the xconfig
+>     target
+>   kconfig: Update/Port Gtk flavour to use Gtk3
+>   kconfig: Qt interface port to Qt4/Qt5, removed Qt3 Support
+>   kconfig: images.c for gtk/qt gui flavour reoganized
 
-Acked-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
-
-It will be in my tree soon. Thanks!
+Are you still interested in this series? If so, could you please rebase
+it on top of the current tree, so it is easier to apply?
 
 Regards,
 Yann E. MORIN.
-
-> ---
->  scripts/kconfig/symbol.c | 11 +++++++++++
->  1 file changed, 11 insertions(+)
-> 
-> diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
-> index c9a6775..06d96c9 100644
-> --- a/scripts/kconfig/symbol.c
-> +++ b/scripts/kconfig/symbol.c
-> @@ -189,12 +189,23 @@ static void sym_validate_range(struct symbol *sym)
->  static void sym_calc_visibility(struct symbol *sym)
->  {
->  	struct property *prop;
-> +	struct symbol *choice_sym = NULL;
->  	tristate tri;
->  
->  	/* any prompt visible? */
->  	tri = no;
-> +
-> +	if (sym_is_choice_value(sym))
-> +		choice_sym = prop_get_symbol(sym_get_choice_prop(sym));
-> +
->  	for_all_prompts(sym, prop) {
->  		prop->visible.tri = expr_calc_value(prop->visible.expr);
-> +		/*
-> +		 * choice_values with visibility 'mod' are not visible if the
-> +		 * corresponding choice's value is 'yes'.
-> +		 */
-> +		if (prop->visible.tri == mod && (choice_sym && choice_sym->curr.tri == yes))
-> +			prop->visible.tri = no;
->  		tri = EXPR_OR(tri, prop->visible.tri);
->  	}
->  	if (tri == mod && (sym->type != S_TRISTATE || modules_val == no))
-> -- 
-> 1.8.4
-> 
 
 -- 
 .-----------------.--------------------.------------------.--------------------.
