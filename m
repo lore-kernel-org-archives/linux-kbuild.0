@@ -1,16 +1,17 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from services.gouders.net ([141.101.32.176]:40738 "EHLO
+Received: from services.gouders.net ([141.101.32.176]:40753 "EHLO
 	services.gouders.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752807Ab3KSU5j (ORCPT
+	with ESMTP id S1751788Ab3KSVIs (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 19 Nov 2013 15:57:39 -0500
+	Tue, 19 Nov 2013 16:08:48 -0500
 From: Dirk Gouders <dirk@gouders.net>
-Subject: Re: Segmentation Fault with 'm' Dependencies
-In-Reply-To: <20131105230619.GC3337@free.fr> (Yann E. MORIN's message of "Wed,
-	6 Nov 2013 00:06:19 +0100")
+Subject: [PATCH] scripts/kconfig: handle cases with 'option modules' defined after reference
+In-Reply-To: <gheh6c155v.fsf@lena.gouders.net> (Dirk Gouders's message of
+	"Tue, 19 Nov 2013 21:57:00 +0100")
 References: <4647748.CU0TquGsxA@tacticalops> <20131105230619.GC3337@free.fr>
-Date: Tue, 19 Nov 2013 21:57:00 +0100
-Message-ID: <gheh6c155v.fsf@lena.gouders.net>
+	<gheh6c155v.fsf@lena.gouders.net>
+Date: Tue, 19 Nov 2013 22:08:24 +0100
+Message-ID: <gh7gc414mv.fsf_-_@lena.gouders.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -18,76 +19,89 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: "Yann E. MORIN" <yann.morin.1998@free.fr>
 Cc: Martin Walch <walch.martin@web.de>, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Andrew Morton <akpm@linux-foundation.org>, Libo Chen <libo.chen@huawei.com>
 
-"Yann E. MORIN" <yann.morin.1998@free.fr> writes:
+Currently, the following test-case causes a segfault:
 
-> Martin, All,
->
-> On 2013-10-28 03:16 +0100, Martin Walch spake thusly:
->> this test case leads to a segmentation fault:
->> 
->> config A
->> 	tristate "A" if m
->> 
->> config MODULES
->> 	boolean "MODULES"
->> 	option modules
->> 
->> As you can see, the MODULES symbol with the option modules is declared after
->> the first occurrence of an 'm' dependency. (Actually you can drop the MODULES
->> section or use a different symbol name. It does not matter.) Internally 'm' gets
->> converted into (symbol_mod && modules_sym), which adds a dependency on a
->> bad symbol, finally leading to dereferencing a null pointer.
->
-> Indeed, reproduced here. I'll investigate further (although anyone is
-> free to hack it, too! :-p)
+config A
+	tristate "A" if m
 
-Hi Yann, all,
+config MODULES
+	boolean "MODULES"
+	option modules
 
-I had a look at the problem, Martin reported and found out that menu_check_dep()
-is causing the problem:
+This is, because modules_sym is NULL until 'option modules' appears,
+since commit
+6902dccfda (kconfig: do not special-case 'MODULES' symbol).
 
-...
-	case E_SYMBOL:
-		/* change 'm' into 'm' && MODULES */
-		if (e->left.sym == &symbol_mod)
-			return expr_alloc_and(e, expr_alloc_symbol(modules_sym));
-		break;
-...
+The above example causes an expression of type symbol being generated
+with NULL as the pointer to the symbol in menu_check_dep(), later
+causing a segfault when that pointer is dereferenced.
 
-It generates an expression that uses modules_sym which is NULL at that
-time.
+This patch basically reverts commit 6902dccfda keeping only the change
+that modules_sym references symbol 'n' as a default when 'option
+modules' is not used in the config files.
 
-The problem seems to be that since commit 6902dccfda005fa modules_sym is
-NULL until an "option modules" is found or the default is set but part
-of the code needs a valid pointer at any time.
+Reported-by: Martin Walch <walch.martin@web.de>
+Signed-off-by: Dirk Gouders <dirk@gouders.net>
+---
+ scripts/kconfig/menu.c  |  9 ++++++---
+ scripts/kconfig/zconf.y | 11 +++++++++--
+ 2 files changed, 15 insertions(+), 5 deletions(-)
 
-I played with other possible fixes but got the impression that these
-would add even more complicated code and I decided to propose the patch
-that I will send in a minute.  That patch basically reverts commit
-6902dccfda005fa keeping the changes that (as far as I understood) are
-the important part of that commit.  The parser also needs to be
-regenerated but that should happen in a separate commit if I remember
-corretly.  So, for now and until a review, I left it out.
+diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+index db1512a..c4ec1ff 100644
+--- a/scripts/kconfig/menu.c
++++ b/scripts/kconfig/menu.c
+@@ -198,15 +198,18 @@ void menu_add_symbol(enum prop_type type, struct symbol *sym, struct expr *dep)
+ 
+ void menu_add_option(int token, char *arg)
+ {
++	struct property *prop;
++
+ 	switch (token) {
+ 	case T_OPT_MODULES:
+-		if (modules_sym)
++		if (modules_sym->prop)
+ 			zconf_error("symbol '%s' redefines option 'modules'"
+ 				    " already defined by symbol '%s'",
+ 				    current_entry->sym->name,
+-				    modules_sym->name
++				    prop_get_symbol(modules_sym->prop)->name
+ 				    );
+-		modules_sym = current_entry->sym;
++		prop = prop_alloc(P_DEFAULT, modules_sym);
++		prop->expr = expr_alloc_symbol(current_entry->sym);
+ 		break;
+ 	case T_OPT_DEFCONFIG_LIST:
+ 		if (!sym_defconfig_list)
+diff --git a/scripts/kconfig/zconf.y b/scripts/kconfig/zconf.y
+index 0653886..941ec32 100644
+--- a/scripts/kconfig/zconf.y
++++ b/scripts/kconfig/zconf.y
+@@ -493,6 +493,9 @@ void conf_parse(const char *name)
+ 
+ 	sym_init();
+ 	_menu_init();
++	modules_sym = sym_lookup(NULL, 0);
++	modules_sym->type = S_BOOLEAN;
++	modules_sym->flags |= SYMBOL_AUTO;
+ 	rootmenu.prompt = menu_add_prompt(P_MENU, "Linux Kernel Configuration", NULL);
+ 
+ 	if (getenv("ZCONF_DEBUG"))
+@@ -500,8 +503,12 @@ void conf_parse(const char *name)
+ 	zconfparse();
+ 	if (zconfnerrs)
+ 		exit(1);
+-	if (!modules_sym)
+-		modules_sym = sym_find( "n" );
++	if (!modules_sym->prop) {
++		struct property *prop;
++
++		prop = prop_alloc(P_DEFAULT, modules_sym);
++		prop->expr = expr_alloc_symbol(sym_find("n"));
++	}
+ 
+ 	rootmenu.prompt->text = _(rootmenu.prompt->text);
+ 	rootmenu.prompt->text = sym_expand_string_value(rootmenu.prompt->text);
+-- 
+1.8.4
 
-I would be glad if you could have a look at the patch.
-
-Dirk
-
-
->> If you move the declaration of the MODULES symbol to the top, everything
->> works fine.
->> 
->> The crash has been introduced last month with
->> 
->> > 6902dccfda005fa4c42410fa064fdd331ab42479
->> > kconfig: do not special-case 'MODULES' symbol
->> 
->> However, things were probably broken before. The problem has only
->> become visible.
->> 
->> The reason that configuring a Linux kernel does not crash the
->> configuration system is that there is currently no architecture that has a
->> symbol with a dependency on 'm' anywhere before the MODULES symbol.
->
-> Regards,
-> Yann E. MORIN.
