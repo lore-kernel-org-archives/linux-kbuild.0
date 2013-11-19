@@ -1,50 +1,93 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:42726 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753341Ab3KSQLF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 19 Nov 2013 11:11:05 -0500
-Date: Tue, 19 Nov 2013 11:10:57 -0500
-From: Benjamin Poirier <bpoirier@suse.de>
-Subject: Re: [PATCH] kconfig: add comment about 'jump maybe used unitialized'
-Message-ID: <20131119161057.GA7736@d2.synalogic.ca>
-References: <1384808595-26028-1-git-send-email-yann.morin.1998@free.fr>
- <528B12CB.60407@linux.vnet.ibm.com>
- <528B39C0.2000703@suse.cz>
+Received: from services.gouders.net ([141.101.32.176]:40738 "EHLO
+	services.gouders.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752807Ab3KSU5j (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 19 Nov 2013 15:57:39 -0500
+From: Dirk Gouders <dirk@gouders.net>
+Subject: Re: Segmentation Fault with 'm' Dependencies
+In-Reply-To: <20131105230619.GC3337@free.fr> (Yann E. MORIN's message of "Wed,
+	6 Nov 2013 00:06:19 +0100")
+References: <4647748.CU0TquGsxA@tacticalops> <20131105230619.GC3337@free.fr>
+Date: Tue, 19 Nov 2013 21:57:00 +0100
+Message-ID: <gheh6c155v.fsf@lena.gouders.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <528B39C0.2000703@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, Madhavan Srinivasan <maddy@linux.vnet.ibm.com>, linux-kbuild@vger.kernel.org, Christian Kujau <lists@nerdbynature.de>
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: Martin Walch <walch.martin@web.de>, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Andrew Morton <akpm@linux-foundation.org>, Libo Chen <libo.chen@huawei.com>
 
-On 2013/11/19 11:13, Michal Marek wrote:
-> On 19.11.2013 08:27, Madhavan Srinivasan wrote:
-> > On Tuesday 19 November 2013 02:33 AM, Yann E. MORIN wrote:
-> >>
-> >> Madhavan, Christian, if you could give a bit ;ore details on the distro
-> >> you're using, that be nice so we can have a more descriptive commit log.
-> > 
-> > When I initially reported this issue, it was in gcc version 4.8.0
-> > 20130526. And I am trying this now in a beta release of RHEL7 with gcc
-> > version 4.8.1 20131002 (Red Hat 4.8.1-11) (GCC) and I still see the
-> > reported issue.
-> 
-> In that case, I'd just give up and initialize jump to NULL. Worst case,
-> we will get a segfault at runtime if a genuine bug is introduced into
-> the function. What do you think?
+"Yann E. MORIN" <yann.morin.1998@free.fr> writes:
 
-I've tried it again on openSUSE 13.1 which has
-gcc (SUSE Linux) 4.8.1 20130909 [gcc-4_8-branch revision 202388]
-and I don't see the warning. I may be missing something because I've
-also tried on Debian Wheezy (as reported by Christian Kujau) but I don't
-see a warning either. It was on x86 however, not ppc.
+> Martin, All,
+>
+> On 2013-10-28 03:16 +0100, Martin Walch spake thusly:
+>> this test case leads to a segmentation fault:
+>> 
+>> config A
+>> 	tristate "A" if m
+>> 
+>> config MODULES
+>> 	boolean "MODULES"
+>> 	option modules
+>> 
+>> As you can see, the MODULES symbol with the option modules is declared after
+>> the first occurrence of an 'm' dependency. (Actually you can drop the MODULES
+>> section or use a different symbol name. It does not matter.) Internally 'm' gets
+>> converted into (symbol_mod && modules_sym), which adds a dependency on a
+>> bad symbol, finally leading to dereferencing a null pointer.
+>
+> Indeed, reproduced here. I'll investigate further (although anyone is
+> free to hack it, too! :-p)
 
-In any case, given that it's been reported a few times I agree with
-Michal and I'd do something like this:
+Hi Yann, all,
 
--	struct jump_key *jump;
-+	/* Initialize jump to work around a spurious warning emitted by
-+	 * certain versions of gcc */
-+	struct jump_key *jump = NULL;
+I had a look at the problem, Martin reported and found out that menu_check_dep()
+is causing the problem:
+
+...
+	case E_SYMBOL:
+		/* change 'm' into 'm' && MODULES */
+		if (e->left.sym == &symbol_mod)
+			return expr_alloc_and(e, expr_alloc_symbol(modules_sym));
+		break;
+...
+
+It generates an expression that uses modules_sym which is NULL at that
+time.
+
+The problem seems to be that since commit 6902dccfda005fa modules_sym is
+NULL until an "option modules" is found or the default is set but part
+of the code needs a valid pointer at any time.
+
+I played with other possible fixes but got the impression that these
+would add even more complicated code and I decided to propose the patch
+that I will send in a minute.  That patch basically reverts commit
+6902dccfda005fa keeping the changes that (as far as I understood) are
+the important part of that commit.  The parser also needs to be
+regenerated but that should happen in a separate commit if I remember
+corretly.  So, for now and until a review, I left it out.
+
+I would be glad if you could have a look at the patch.
+
+Dirk
+
+
+>> If you move the declaration of the MODULES symbol to the top, everything
+>> works fine.
+>> 
+>> The crash has been introduced last month with
+>> 
+>> > 6902dccfda005fa4c42410fa064fdd331ab42479
+>> > kconfig: do not special-case 'MODULES' symbol
+>> 
+>> However, things were probably broken before. The problem has only
+>> become visible.
+>> 
+>> The reason that configuring a Linux kernel does not crash the
+>> configuration system is that there is currently no architecture that has a
+>> symbol with a dependency on 'm' anywhere before the MODULES symbol.
+>
+> Regards,
+> Yann E. MORIN.
