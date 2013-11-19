@@ -1,55 +1,35 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pd0-f172.google.com ([209.85.192.172]:44411 "EHLO
-	mail-pd0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750818Ab3KSIUm (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 19 Nov 2013 03:20:42 -0500
+Received: from cantor2.suse.de ([195.135.220.15]:48012 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750823Ab3KSKNb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 19 Nov 2013 05:13:31 -0500
+Message-ID: <528B39C0.2000703@suse.cz>
+Date: Tue, 19 Nov 2013 11:13:20 +0100
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <528AA08C.6080608@wwwdotorg.org>
-References: <1384795559-2116-1-git-send-email-mmarek@suse.cz>
-	<528AA08C.6080608@wwwdotorg.org>
-Date: Tue, 19 Nov 2013 09:20:41 +0100
-Message-ID: <CAMuHMdVkWmYGM5XvH0f41JdwK_g-PdvdDBzR8uJWn0wYBQrAcg@mail.gmail.com>
-Subject: Re: [PATCH] mfd: Make MFD_AS3722 depend on I2C=y
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH] kconfig: add comment about 'jump maybe used unitialized'
+References: <1384808595-26028-1-git-send-email-yann.morin.1998@free.fr> <528B12CB.60407@linux.vnet.ibm.com>
+In-Reply-To: <528B12CB.60407@linux.vnet.ibm.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Stephen Warren <swarren@wwwdotorg.org>
-Cc: Michal Marek <mmarek@suse.cz>, Samuel Ortiz <sameo@linux.intel.com>, Lee Jones <lee.jones@linaro.org>, ldewangan@nvidia.com, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: Madhavan Srinivasan <maddy@linux.vnet.ibm.com>, linux-kbuild@vger.kernel.org, Christian Kujau <lists@nerdbynature.de>, Benjamin Poirier <bpoirier@suse.de>
 
-On Tue, Nov 19, 2013 at 12:19 AM, Stephen Warren <swarren@wwwdotorg.org> wrote:
-> On 11/18/2013 10:25 AM, Michal Marek wrote:
->> MFD_AS3722 can only be builtin, so it needs I2C builtin as well.
->> With I2C=m, we get:
+On 19.11.2013 08:27, Madhavan Srinivasan wrote:
+> On Tuesday 19 November 2013 02:33 AM, Yann E. MORIN wrote:
 >>
->> drivers/mfd/as3722.c:372: undefined reference to `devm_regmap_init_i2c'
->> drivers/built-in.o: In function `as3722_i2c_driver_init':
->> drivers/mfd/as3722.c:444: undefined reference to `i2c_register_driver'
->> drivers/built-in.o: In function `as3722_i2c_driver_exit':
->> drivers/mfd/as3722.c:444: undefined reference to `i2c_del_driver'
->
-> Shouldn't Kconfig handle this; if a Boolean config option depends on a
-> tri-state config option, shouldn't it automatically validate that the
-> tri-state is "y" not "m"?
+>> Madhavan, Christian, if you could give a bit ;ore details on the distro
+>> you're using, that be nice so we can have a more descriptive commit log.
+> 
+> When I initially reported this issue, it was in gcc version 4.8.0
+> 20130526. And I am trying this now in a beta release of RHEL7 with gcc
+> version 4.8.1 20131002 (Red Hat 4.8.1-11) (GCC) and I still see the
+> reported issue.
 
-Unfortunately not. While tristate is always used to declare code modules,
-bool can be used to declare two different things: code modules or optional
-features.
+In that case, I'd just give up and initialize jump to NULL. Worst case,
+we will get a segfault at runtime if a genuine bug is introduced into
+the function. What do you think?
 
-For optional features, "depends on x" means "depends on x=y or x=m".
-For code modules, "depends on x" should really by "depends on x=y".
-
-To handle this automatically, we need to introduce a new Kconfig symbol,
-and convert all the thousands existing ones...
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+Michal
