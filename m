@@ -1,46 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from e28smtp01.in.ibm.com ([122.248.162.1]:41373 "EHLO
-	e28smtp01.in.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751652Ab3KSH1O (ORCPT
+Received: from mail-pd0-f172.google.com ([209.85.192.172]:44411 "EHLO
+	mail-pd0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750818Ab3KSIUm (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 19 Nov 2013 02:27:14 -0500
-Received: from /spool/local
-	by e28smtp01.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-kbuild@vger.kernel.org> from <maddy@linux.vnet.ibm.com>;
-	Tue, 19 Nov 2013 12:57:12 +0530
-Received: from d28relay01.in.ibm.com (d28relay01.in.ibm.com [9.184.220.58])
-	by d28dlp02.in.ibm.com (Postfix) with ESMTP id CA7AF394005B
-	for <linux-kbuild@vger.kernel.org>; Tue, 19 Nov 2013 12:57:09 +0530 (IST)
-Received: from d28av03.in.ibm.com (d28av03.in.ibm.com [9.184.220.65])
-	by d28relay01.in.ibm.com (8.13.8/8.13.8/NCO v10.0) with ESMTP id rAJ7R5q149021108
-	for <linux-kbuild@vger.kernel.org>; Tue, 19 Nov 2013 12:57:05 +0530
-Received: from d28av03.in.ibm.com (localhost [127.0.0.1])
-	by d28av03.in.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id rAJ7R8Gc032459
-	for <linux-kbuild@vger.kernel.org>; Tue, 19 Nov 2013 12:57:08 +0530
-Message-ID: <528B12CB.60407@linux.vnet.ibm.com>
-Date: Tue, 19 Nov 2013 12:57:07 +0530
-From: Madhavan Srinivasan <maddy@linux.vnet.ibm.com>
+	Tue, 19 Nov 2013 03:20:42 -0500
 MIME-Version: 1.0
-Subject: Re: [PATCH] kconfig: add comment about 'jump maybe used unitialized'
-References: <1384808595-26028-1-git-send-email-yann.morin.1998@free.fr>
-In-Reply-To: <1384808595-26028-1-git-send-email-yann.morin.1998@free.fr>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <528AA08C.6080608@wwwdotorg.org>
+References: <1384795559-2116-1-git-send-email-mmarek@suse.cz>
+	<528AA08C.6080608@wwwdotorg.org>
+Date: Tue, 19 Nov 2013 09:20:41 +0100
+Message-ID: <CAMuHMdVkWmYGM5XvH0f41JdwK_g-PdvdDBzR8uJWn0wYBQrAcg@mail.gmail.com>
+Subject: Re: [PATCH] mfd: Make MFD_AS3722 depend on I2C=y
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>, linux-kbuild@vger.kernel.org
-Cc: Christian Kujau <lists@nerdbynature.de>, Benjamin Poirier <bpoirier@suse.de>
+To: Stephen Warren <swarren@wwwdotorg.org>
+Cc: Michal Marek <mmarek@suse.cz>, Samuel Ortiz <sameo@linux.intel.com>, Lee Jones <lee.jones@linaro.org>, ldewangan@nvidia.com, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On Tuesday 19 November 2013 02:33 AM, Yann E. MORIN wrote:
-> 
-> Madhavan, Christian, if you could give a bit ;ore details on the distro
-> you're using, that be nice so we can have a more descriptive commit log.
+On Tue, Nov 19, 2013 at 12:19 AM, Stephen Warren <swarren@wwwdotorg.org> wrote:
+> On 11/18/2013 10:25 AM, Michal Marek wrote:
+>> MFD_AS3722 can only be builtin, so it needs I2C builtin as well.
+>> With I2C=m, we get:
+>>
+>> drivers/mfd/as3722.c:372: undefined reference to `devm_regmap_init_i2c'
+>> drivers/built-in.o: In function `as3722_i2c_driver_init':
+>> drivers/mfd/as3722.c:444: undefined reference to `i2c_register_driver'
+>> drivers/built-in.o: In function `as3722_i2c_driver_exit':
+>> drivers/mfd/as3722.c:444: undefined reference to `i2c_del_driver'
+>
+> Shouldn't Kconfig handle this; if a Boolean config option depends on a
+> tri-state config option, shouldn't it automatically validate that the
+> tri-state is "y" not "m"?
 
-When I initially reported this issue, it was in gcc version 4.8.0
-20130526. And I am trying this now in a beta release of RHEL7 with gcc
-version 4.8.1 20131002 (Red Hat 4.8.1-11) (GCC) and I still see the
-reported issue.
+Unfortunately not. While tristate is always used to declare code modules,
+bool can be used to declare two different things: code modules or optional
+features.
 
---Maddy
+For optional features, "depends on x" means "depends on x=y or x=m".
+For code modules, "depends on x" should really by "depends on x=y".
 
+To handle this automatically, we need to introduce a new Kconfig symbol,
+and convert all the thousands existing ones...
 
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
