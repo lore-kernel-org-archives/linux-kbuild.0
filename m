@@ -1,109 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f43.google.com ([74.125.82.43]:34671 "EHLO
-	mail-wg0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752267Ab3KSVj0 (ORCPT
+Received: from mail.linuxfoundation.org ([140.211.169.12]:42741 "EHLO
+	mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752211Ab3KSX7J (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 19 Nov 2013 16:39:26 -0500
-Received: by mail-wg0-f43.google.com with SMTP id n12so8108147wgh.34
-        for <linux-kbuild@vger.kernel.org>; Tue, 19 Nov 2013 13:39:25 -0800 (PST)
-Date: Tue, 19 Nov 2013 22:39:18 +0100
-From: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Subject: Re: Segmentation Fault with 'm' Dependencies
-Message-ID: <20131119213918.GA3422@free.fr>
-References: <4647748.CU0TquGsxA@tacticalops>
- <20131105230619.GC3337@free.fr>
- <gheh6c155v.fsf@lena.gouders.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <gheh6c155v.fsf@lena.gouders.net>
+	Tue, 19 Nov 2013 18:59:09 -0500
+Date: Tue, 19 Nov 2013 15:59:07 -0800
+From: Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH] scripts: Have make TAGS not include structure members
+Message-Id: <20131119155907.11fbdecea0aa40764a3d927a@linux-foundation.org>
+In-Reply-To: <CAMuHMdXSBSOkfd2MGbn=rpXQRZYw5TKLsR=3SoeSyrcD2CzunA@mail.gmail.com>
+References: <20131115093645.6dc03918@gandalf.local.home>
+	<CAMuHMdXSBSOkfd2MGbn=rpXQRZYw5TKLsR=3SoeSyrcD2CzunA@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dirk Gouders <dirk@gouders.net>
-Cc: Martin Walch <walch.martin@web.de>, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Andrew Morton <akpm@linux-foundation.org>, Libo Chen <libo.chen@huawei.com>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Steven Rostedt <rostedt@goodmis.org>, LKML <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>, Yang Bai <hamo.by@gmail.com>, Stephen Boyd <sboyd@codeaurora.org>
 
-Dirk, All,
+On Sun, 17 Nov 2013 10:14:46 +0100 Geert Uytterhoeven <geert@linux-m68k.org> wrote:
 
-On 2013-11-19 21:57 +0100, Dirk Gouders spake thusly:
-> "Yann E. MORIN" <yann.morin.1998@free.fr> writes:
-> > On 2013-10-28 03:16 +0100, Martin Walch spake thusly:
-> >> this test case leads to a segmentation fault:
-> >> 
-> >> config A
-> >> 	tristate "A" if m
-> >> 
-> >> config MODULES
-> >> 	boolean "MODULES"
-> >> 	option modules
-> >> 
-> >> As you can see, the MODULES symbol with the option modules is declared after
-> >> the first occurrence of an 'm' dependency. (Actually you can drop the MODULES
-> >> section or use a different symbol name. It does not matter.) Internally 'm' gets
-> >> converted into (symbol_mod && modules_sym), which adds a dependency on a
-> >> bad symbol, finally leading to dereferencing a null pointer.
-> >
-> > Indeed, reproduced here. I'll investigate further (although anyone is
-> > free to hack it, too! :-p)
+> On Fri, Nov 15, 2013 at 3:36 PM, Steven Rostedt <rostedt@goodmis.org> wrote:
+> > It is really annoying when I use emacs TAGS to search for something
+> > like "dev_name" and have to go through 12 iterations before I find the
+> > function "dev_name". I really do not care about structures that include
+> > "dev_name" as one of its fields, and I'm sure pretty much all other
+> > developers do not care either.
 > 
-> Hi Yann, all,
-> 
-> I had a look at the problem, Martin reported and found out that menu_check_dep()
-> is causing the problem:
-> 
-> ...
-> 	case E_SYMBOL:
-> 		/* change 'm' into 'm' && MODULES */
-> 		if (e->left.sym == &symbol_mod)
-> 			return expr_alloc_and(e, expr_alloc_symbol(modules_sym));
-> 		break;
-> ...
-> 
-> It generates an expression that uses modules_sym which is NULL at that
-> time.
-> 
-> The problem seems to be that since commit 6902dccfda005fa modules_sym is
-> NULL until an "option modules" is found or the default is set but part
-> of the code needs a valid pointer at any time.
+> While I'm also annoyed by this (although with vim/tags), I regularly do search
+> for struct members, so losing this ability would hurt, too.
 
-Indeed. The idea behind that patch was that we would post-pone
-allocating modules_sym until we either see the actual 'modules' option,
-or until the end of the parsing, since checking the value of the symbol
-is not needed until we actually display the menu.
+metoo.
 
-But that's wrong, since we do need that symbol at the time of parsing,
-to generate the dependency list, as Martin discovered.
+> Is there a solution, without throwing out the baby with the bath water?
 
-I missed that since no architecture in the kernel has any option that
-depends on 'MODULES' before it is defined in Kconfig.
-
-> I played with other possible fixes but got the impression that these
-> would add even more complicated code and I decided to propose the patch
-> that I will send in a minute.  That patch basically reverts commit
-> 6902dccfda005fa keeping the changes that (as far as I understood) are
-> the important part of that commit.  The parser also needs to be
-> regenerated but that should happen in a separate commit if I remember
-> corretly.  So, for now and until a review, I left it out.
-
-Yes, for a first review, it is OK not to regenerate it.
-But on final submission, you should regenerate the parser in the same
-patch. It is a single, self-contained and semantically-related change,
-so it makes sense to group them in a single patch.
-
-> I would be glad if you could have a look at the patch.
-
-I've had a quick look, and it looks OK at first sight. I'll look into it
-more in depth in a moment, and will comment directly as a reply to the
-patch.
-
-Thank you! :-)
-
-Regards,
-Yann E. MORIN.
-
--- 
-.-----------------.--------------------.------------------.--------------------.
-|  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
-| +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
-| +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
-| http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
-'------------------------------^-------^------------------^--------------------'
+Remove the tags for those struct members whose name duplicates some
+other symbol?
