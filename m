@@ -1,79 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cdptpa-outbound-snat.email.rr.com ([107.14.166.226]:6668 "EHLO
-	cdptpa-oedge-vip.email.rr.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1752199Ab3KTAeR (ORCPT
+Received: from mail-pb0-f54.google.com ([209.85.160.54]:57261 "EHLO
+	mail-pb0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751330Ab3KTI3u (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 19 Nov 2013 19:34:17 -0500
-Date: Tue, 19 Nov 2013 19:34:14 -0500
-From: Steven Rostedt <rostedt@goodmis.org>
-Subject: Re: [PATCH] scripts: Have make TAGS not include structure members
-Message-ID: <20131119193414.48912cbd@gandalf.local.home>
-In-Reply-To: <528BFFBF.4050807@codeaurora.org>
+	Wed, 20 Nov 2013 03:29:50 -0500
+MIME-Version: 1.0
+In-Reply-To: <20131117120816.41fe2528@gandalf.local.home>
 References: <20131115093645.6dc03918@gandalf.local.home>
 	<CAMuHMdXSBSOkfd2MGbn=rpXQRZYw5TKLsR=3SoeSyrcD2CzunA@mail.gmail.com>
-	<20131119155907.11fbdecea0aa40764a3d927a@linux-foundation.org>
-	<20131119190426.27b010e4@gandalf.local.home>
-	<20131119160855.2527630f87d060801d9ee3bb@linux-foundation.org>
-	<20131119191435.4dce1499@gandalf.local.home>
-	<528BFFBF.4050807@codeaurora.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+	<20131117092731.75b091bd@gandalf.local.home>
+	<CAMuHMdWNh2L56FhDbKfC7TtdHp8=EY2ms_T+=9Xyczz3D-PF=w@mail.gmail.com>
+	<20131117120816.41fe2528@gandalf.local.home>
+Date: Wed, 20 Nov 2013 09:29:50 +0100
+Message-ID: <CAMuHMdWLqC1ihx_AifUpF166tpuv0fLwj34trm65BzLw_-kRKA@mail.gmail.com>
+Subject: Re: [PATCH] scripts: Have make TAGS not include structure members
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Stephen Boyd <sboyd@codeaurora.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Geert Uytterhoeven <geert@linux-m68k.org>, LKML <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>, Yang Bai <hamo.by@gmail.com>
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>, Yang Bai <hamo.by@gmail.com>, Stephen Boyd <sboyd@codeaurora.org>, Andrew Morton <akpm@linux-foundation.org>
 
-On Tue, 19 Nov 2013 16:18:07 -0800
-Stephen Boyd <sboyd@codeaurora.org> wrote:
- 
-> I didn't have exuberant-ctags installed so 'make tags' was building the
-> emacs tag file as 'tags' and vim was using it just fine. Please note
-> that you may be affecting vim users with this change if they haven't
-> installed exuberant-ctags.
+On Sun, Nov 17, 2013 at 6:08 PM, Steven Rostedt <rostedt@goodmis.org> wrote:
+> On Sun, 17 Nov 2013 16:19:53 +0100
+> Geert Uytterhoeven <geert@linux-m68k.org> wrote:
+>
+>> Thanks! Now I have to look into my vim setup, why it doesn't do the
+>> above...
+>
+> $ vim --version
+> VIM - Vi IMproved 7.4 (2013 Aug 10, compiled Sep 11 2013 12:28:07)
 
-I'm aware of that, as one of my boxes I tested this on also doesn't have
-exuberant-ctags either.
+I have 7.3.
 
-I wasn't going to use this change, but instead add this change:
+> And from the ctags man pages, I did:
+>
+> :ta dev_name
+>
+> and it gave me a list of tags.
 
+Not for me.
 
----
- scripts/tags.sh |    6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+>   # pri kind tag               file
+>   1 F   m    dev_name          drivers/clk/samsung/clk.h
+>                struct:samsung_clock_alias
+>                const char  *dev_name;
 
-Index: linux-trace.git/scripts/tags.sh
-===================================================================
---- linux-trace.git.orig/scripts/tags.sh	2013-11-19 19:29:34.352371615 -0500
-+++ linux-trace.git/scripts/tags.sh	2013-11-19 19:32:37.821152204 -0500
-@@ -218,7 +218,7 @@ exuberant()
- 
- emacs()
- {
--	all_target_sources | xargs $1 -a                        \
-+	all_target_sources | xargs $@ -a                        \
- 	--regex='/^\(ENTRY\|_GLOBAL\)(\([^)]*\)).*/\2/'         \
- 	--regex='/^SYSCALL_DEFINE[0-9]?(\([^,)]*\).*/sys_\1/'   \
- 	--regex='/^TRACE_EVENT(\([^,)]*\).*/trace_\1/'		\
-@@ -263,7 +263,7 @@ xtags()
- 	if $1 --version 2>&1 | grep -iq exuberant; then
- 		exuberant $1
- 	elif $1 --version 2>&1 | grep -iq emacs; then
--		emacs $1
-+		emacs $@
- 	else
- 		all_target_sources | xargs $1 -a
-         fi
-@@ -313,7 +313,7 @@ case "$1" in
- 
- 	"TAGS")
- 		rm -f TAGS
--		xtags etags
-+		xtags etags --no-members
- 		remove_structs=y
- 		;;
- esac
+I do remember seeing such a list on a different machine, though.
 
+However,  this encouraged me to dive into some docs.
+":ts <tag>" (or just ":ts" after a previous ":ta") does give me the list.
+ The same for "g CTRL-]" instead of plain "CTRL-]", so I'm happy now ;-)
 
+Gr{oetje,eeting}s,
 
--- Steve
+                        Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
