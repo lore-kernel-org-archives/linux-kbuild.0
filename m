@@ -1,64 +1,96 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pb0-f54.google.com ([209.85.160.54]:57261 "EHLO
-	mail-pb0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751330Ab3KTI3u (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 20 Nov 2013 03:29:50 -0500
+Received: from mga11.intel.com ([192.55.52.93]:61600 "EHLO mga11.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750856Ab3KUScX (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 21 Nov 2013 13:32:23 -0500
+Message-ID: <528E52C8.5000508@linux.intel.com>
+Date: Thu, 21 Nov 2013 10:36:56 -0800
+From: David Cohen <david.a.cohen@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20131117120816.41fe2528@gandalf.local.home>
-References: <20131115093645.6dc03918@gandalf.local.home>
-	<CAMuHMdXSBSOkfd2MGbn=rpXQRZYw5TKLsR=3SoeSyrcD2CzunA@mail.gmail.com>
-	<20131117092731.75b091bd@gandalf.local.home>
-	<CAMuHMdWNh2L56FhDbKfC7TtdHp8=EY2ms_T+=9Xyczz3D-PF=w@mail.gmail.com>
-	<20131117120816.41fe2528@gandalf.local.home>
-Date: Wed, 20 Nov 2013 09:29:50 +0100
-Message-ID: <CAMuHMdWLqC1ihx_AifUpF166tpuv0fLwj34trm65BzLw_-kRKA@mail.gmail.com>
-Subject: Re: [PATCH] scripts: Have make TAGS not include structure members
-From: Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: Re: make oldnoconfig fix?
+References: <52811DDD.3030609@linux.intel.com> <20131111181304.GB3510@free.fr> <52812829.4080508@linux.intel.com>
+In-Reply-To: <52812829.4080508@linux.intel.com>
 Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>, Yang Bai <hamo.by@gmail.com>, Stephen Boyd <sboyd@codeaurora.org>, Andrew Morton <akpm@linux-foundation.org>
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: linux-kbuild@vger.kernel.org, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, mmarek@suse.cz, rostedt@goodmis.org
 
-On Sun, Nov 17, 2013 at 6:08 PM, Steven Rostedt <rostedt@goodmis.org> wrote:
-> On Sun, 17 Nov 2013 16:19:53 +0100
-> Geert Uytterhoeven <geert@linux-m68k.org> wrote:
->
->> Thanks! Now I have to look into my vim setup, why it doesn't do the
->> above...
->
-> $ vim --version
-> VIM - Vi IMproved 7.4 (2013 Aug 10, compiled Sep 11 2013 12:28:07)
+On 11/11/2013 10:55 AM, David Cohen wrote:
+> On 11/11/2013 10:13 AM, Yann E. MORIN wrote:
+>> David, All,
+> 
+> Hi Yann,
+> 
+>>
+>> On 2013-11-11 10:11 -0800, David Cohen spake thusly:
+>>> Is there a plan to fix 'make oldnoconfig' option?
+>>> I currently have need to it :)
+>>> I've tracked a thread fixing 'make olddefconfig' where 'oldnoconfig'
+>>> option is reported as a known bug, right?
+>>
+>> Sorry, I don't understand what your problem is.
+> 
+> Maybe I assumed it was more 'known' then it actually is :)
+> 
+>>
+>> Care to explain in details what problem you have:
+>>    - what you start with
+>>    - what you do
+>>    - what you get
+>>    - what you expected
+> 
+> The bug with 'oldnoconfig' is: 'make oldnoconfig' is just an alias to
+> 'olddefconfig'. Any non-existent config is defined with its default
+> value instead of 'N'.
+> 
+> I work with embedded platforms. I need to maintain a set of defconfigs
+> for different products (customers some times want tailored configs, so
+> creating a generic one isn't an option always).
+> 
+> In order to have full control of the .config generated out of
+> defconfigs, I don't allow any CONFIG_ to be selected implicitly. So
+> everytime a Kconfig is changed in our internal tree, we need to update
+> all defconfigs either with CONFIG_... = [y|n] or # CONFIG_... is not set
+> 
+> If I managed to get 'make oldnoconfig' working, I could not care about
+> # CONFIG_... is not set and internal and changes to defconfigs would be
+> easily to understand and review.
+> 
+>>
+>> So we can try to reproduce the issue and investigate what is wrong.
+> 
+> All we need to know is explained in this commit:
+> 
+> commit fb16d8912db5268f29706010ecafff74b971c58d
+> Author: Adam Lee <adam8157@gmail.com>
+> Date:   Sat Sep 1 01:05:17 2012 +0800
+> 
+>     kconfig: replace 'oldnoconfig' with 'olddefconfig', and keep the old
+> name as an alias
+> 
+>     As 67d34a6a391369269a2e5dba8a5f42cc4cd50231 said, 'oldnoconfig' doesn't
+>     set new symbols to 'n', but instead sets it to their default values.
+> 
+>     So, this patch replaces 'oldnoconfig' with 'olddefconfig', stop making
+>     people confused, and keep the old name 'oldnoconfig' as an alias,
+>     because people already are dependent on its behavior with the
+>     counter-intuitive name.
+> 
+>     Signed-off-by: Adam Lee <adam8157@gmail.com>
+>     Signed-off-by: Michal Marek <mmarek@suse.cz>
+> 
+> 
+>>
+>> Since you mention an existing thread, please add a pointer (URL) to
+>> this thread in the archives (Use: http://marc.info/?l=linux-kbuild ).
+> 
+> This is the thread I was talking about:
+> http://comments.gmane.org/gmane.linux.kbuild.devel/8560
+> 
+> Master Yoda promised to fix it when the problem gets bigger :)
 
-I have 7.3.
+Any comments here? :)
 
-> And from the ctags man pages, I did:
->
-> :ta dev_name
->
-> and it gave me a list of tags.
-
-Not for me.
-
->   # pri kind tag               file
->   1 F   m    dev_name          drivers/clk/samsung/clk.h
->                struct:samsung_clock_alias
->                const char  *dev_name;
-
-I do remember seeing such a list on a different machine, though.
-
-However,  this encouraged me to dive into some docs.
-":ts <tag>" (or just ":ts" after a previous ":ta") does give me the list.
- The same for "g CTRL-]" instead of plain "CTRL-]", so I'm happy now ;-)
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+Br, David Cohen
