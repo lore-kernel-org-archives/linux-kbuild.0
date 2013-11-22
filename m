@@ -1,96 +1,25 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:61600 "EHLO mga11.intel.com"
+Received: from mga02.intel.com ([134.134.136.20]:34517 "EHLO mga02.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750856Ab3KUScX (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 21 Nov 2013 13:32:23 -0500
-Message-ID: <528E52C8.5000508@linux.intel.com>
-Date: Thu, 21 Nov 2013 10:36:56 -0800
-From: David Cohen <david.a.cohen@linux.intel.com>
+	id S1755745Ab3KVOfl (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 22 Nov 2013 09:35:41 -0500
+From: "Ursulin, Tvrtko" <tvrtko.ursulin@intel.com>
+Subject: olddefconfig ate my hamster
+Date: Fri, 22 Nov 2013 14:34:12 +0000
+Message-ID: <9108028B3EB68E4CA5158371AB76E6015EC064@IRSMSX102.ger.corp.intel.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Subject: Re: make oldnoconfig fix?
-References: <52811DDD.3030609@linux.intel.com> <20131111181304.GB3510@free.fr> <52812829.4080508@linux.intel.com>
-In-Reply-To: <52812829.4080508@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: linux-kbuild@vger.kernel.org, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, mmarek@suse.cz, rostedt@goodmis.org
+To: "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
 
-On 11/11/2013 10:55 AM, David Cohen wrote:
-> On 11/11/2013 10:13 AM, Yann E. MORIN wrote:
->> David, All,
-> 
-> Hi Yann,
-> 
->>
->> On 2013-11-11 10:11 -0800, David Cohen spake thusly:
->>> Is there a plan to fix 'make oldnoconfig' option?
->>> I currently have need to it :)
->>> I've tracked a thread fixing 'make olddefconfig' where 'oldnoconfig'
->>> option is reported as a known bug, right?
->>
->> Sorry, I don't understand what your problem is.
-> 
-> Maybe I assumed it was more 'known' then it actually is :)
-> 
->>
->> Care to explain in details what problem you have:
->>    - what you start with
->>    - what you do
->>    - what you get
->>    - what you expected
-> 
-> The bug with 'oldnoconfig' is: 'make oldnoconfig' is just an alias to
-> 'olddefconfig'. Any non-existent config is defined with its default
-> value instead of 'N'.
-> 
-> I work with embedded platforms. I need to maintain a set of defconfigs
-> for different products (customers some times want tailored configs, so
-> creating a generic one isn't an option always).
-> 
-> In order to have full control of the .config generated out of
-> defconfigs, I don't allow any CONFIG_ to be selected implicitly. So
-> everytime a Kconfig is changed in our internal tree, we need to update
-> all defconfigs either with CONFIG_... = [y|n] or # CONFIG_... is not set
-> 
-> If I managed to get 'make oldnoconfig' working, I could not care about
-> # CONFIG_... is not set and internal and changes to defconfigs would be
-> easily to understand and review.
-> 
->>
->> So we can try to reproduce the issue and investigate what is wrong.
-> 
-> All we need to know is explained in this commit:
-> 
-> commit fb16d8912db5268f29706010ecafff74b971c58d
-> Author: Adam Lee <adam8157@gmail.com>
-> Date:   Sat Sep 1 01:05:17 2012 +0800
-> 
->     kconfig: replace 'oldnoconfig' with 'olddefconfig', and keep the old
-> name as an alias
-> 
->     As 67d34a6a391369269a2e5dba8a5f42cc4cd50231 said, 'oldnoconfig' doesn't
->     set new symbols to 'n', but instead sets it to their default values.
-> 
->     So, this patch replaces 'oldnoconfig' with 'olddefconfig', stop making
->     people confused, and keep the old name 'oldnoconfig' as an alias,
->     because people already are dependent on its behavior with the
->     counter-intuitive name.
-> 
->     Signed-off-by: Adam Lee <adam8157@gmail.com>
->     Signed-off-by: Michal Marek <mmarek@suse.cz>
-> 
-> 
->>
->> Since you mention an existing thread, please add a pointer (URL) to
->> this thread in the archives (Use: http://marc.info/?l=linux-kbuild ).
-> 
-> This is the thread I was talking about:
-> http://comments.gmane.org/gmane.linux.kbuild.devel/8560
-> 
-> Master Yoda promised to fix it when the problem gets bigger :)
-
-Any comments here? :)
-
-Br, David Cohen
+SGkgYWxsLA0KDQpJcyBpdCBleHBlY3RlZCB0aGF0IGNvbmZpZyBlbnRyaWVzIGxpa2UgZm9yIGV4
+YW1wbGUgQ09ORklHX01NVV9OT1RJRklFUiwgd2hpY2ggYXJlIG5vdCB2aXNpYmxlIGluIG1lbnUg
+Y29uZmlnIGR1ZSB0aGUgZmFjdCB0aGV5IGhhdmUgbm8gdXNlciB2aXNpYmxlIGRlc2NyaXB0aW9u
+IChpcyB0aGVyZSBhIHNwZWNpYWwgdGVybSBmb3IgdGhlc2UgQlRXPyksIGdldCBkcm9wcGVkIGZy
+b20gLmNvbmZpZyBpZiBtYW51YWxseSBhZGRlZD8NCg0KV2hhdCBpcyB0aGUgaW50ZW5kZWQgcGF0
+aCBpZiBvbmUgd2FudGVkIHRvIGVuYWJsZSBvbmUgb2YgdGhlc2U/IEFkZCBzb21ldGhpbmcgbmV3
+IHRvIEtjb25maWcgc29tZXdoZXJlIHdoaWNoIHdpbGwgc2VsZWN0IGl0PyBPciBwcm9tb3RlIHRo
+ZSBvcHRpb24gdG8gdXNlciB2aXNpYmxlIHN0YXR1cz8NCg0KVGhhbmtzLA0KDQpUdnJ0a28NCg0K
