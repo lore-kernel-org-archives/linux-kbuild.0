@@ -1,25 +1,26 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:34517 "EHLO mga02.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755745Ab3KVOfl (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 22 Nov 2013 09:35:41 -0500
-From: "Ursulin, Tvrtko" <tvrtko.ursulin@intel.com>
-Subject: olddefconfig ate my hamster
-Date: Fri, 22 Nov 2013 14:34:12 +0000
-Message-ID: <9108028B3EB68E4CA5158371AB76E6015EC064@IRSMSX102.ger.corp.intel.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Received: from mail-lb0-f195.google.com ([209.85.217.195]:50376 "EHLO
+	mail-lb0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755684Ab3KWKgj (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 23 Nov 2013 05:36:39 -0500
+Received: by mail-lb0-f195.google.com with SMTP id l4so407351lbv.2
+        for <linux-kbuild@vger.kernel.org>; Sat, 23 Nov 2013 02:36:38 -0800 (PST)
 MIME-Version: 1.0
+Reply-To: Osbornes@mail2world.com
+Date: Sat, 23 Nov 2013 11:36:37 +0100
+Message-ID: <CAES10a717CqU=CM7sp160n9k2z+rs7xRjJ1-0ygc_+a+ofv0Lw@mail.gmail.com>
+Subject: PRIVATE MESSAGE
+From: OSBORNES SOLICITORS LLP <djholditch@crimson.ua.edu>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
 
-SGkgYWxsLA0KDQpJcyBpdCBleHBlY3RlZCB0aGF0IGNvbmZpZyBlbnRyaWVzIGxpa2UgZm9yIGV4
-YW1wbGUgQ09ORklHX01NVV9OT1RJRklFUiwgd2hpY2ggYXJlIG5vdCB2aXNpYmxlIGluIG1lbnUg
-Y29uZmlnIGR1ZSB0aGUgZmFjdCB0aGV5IGhhdmUgbm8gdXNlciB2aXNpYmxlIGRlc2NyaXB0aW9u
-IChpcyB0aGVyZSBhIHNwZWNpYWwgdGVybSBmb3IgdGhlc2UgQlRXPyksIGdldCBkcm9wcGVkIGZy
-b20gLmNvbmZpZyBpZiBtYW51YWxseSBhZGRlZD8NCg0KV2hhdCBpcyB0aGUgaW50ZW5kZWQgcGF0
-aCBpZiBvbmUgd2FudGVkIHRvIGVuYWJsZSBvbmUgb2YgdGhlc2U/IEFkZCBzb21ldGhpbmcgbmV3
-IHRvIEtjb25maWcgc29tZXdoZXJlIHdoaWNoIHdpbGwgc2VsZWN0IGl0PyBPciBwcm9tb3RlIHRo
-ZSBvcHRpb24gdG8gdXNlciB2aXNpYmxlIHN0YXR1cz8NCg0KVGhhbmtzLA0KDQpUdnJ0a28NCg0K
+-- 
+This is to inform you that an inheritance was bequeathed in your
+favour. Letters were posted to you to this regards, but returned
+undelivered. Kindly contact me once you recieve this email for more
+information.
+
+Sincerely
+Barr Mark Freedman
