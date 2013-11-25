@@ -1,37 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ie0-f180.google.com ([209.85.223.180]:40575 "EHLO
-	mail-ie0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752853Ab3KYWTD (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 25 Nov 2013 17:19:03 -0500
-Received: by mail-ie0-f180.google.com with SMTP id tp5so7592995ieb.25
-        for <linux-kbuild@vger.kernel.org>; Mon, 25 Nov 2013 14:19:02 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <5281E97D.6090806@suse.cz>
-References: <1384177236-8371-1-git-send-email-mmarek@suse.cz> <5281E97D.6090806@suse.cz>
-From: Bjorn Helgaas <bhelgaas@google.com>
-Date: Mon, 25 Nov 2013 15:18:42 -0700
-Message-ID: <CAErSpo6sCvDuSA3Bw0LY7D6QYC=xhPP05f966kjDP0mvqu5wEg@mail.gmail.com>
+Received: from mga09.intel.com ([134.134.136.24]:56755 "EHLO mga09.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751147Ab3KYXCZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 25 Nov 2013 18:02:25 -0500
+Date: Mon, 25 Nov 2013 15:02:20 -0800
+From: Andi Kleen <ak@linux.intel.com>
 Subject: Re: [PATCH 1/2] PCI: Do not use PCI ID macros in quirk names
-Content-Type: text/plain; charset=ISO-8859-1
+Message-ID: <20131125230220.GH19762@tassilo.jf.intel.com>
+References: <1384177236-8371-1-git-send-email-mmarek@suse.cz>
+ <5281E97D.6090806@suse.cz>
+ <CAErSpo6sCvDuSA3Bw0LY7D6QYC=xhPP05f966kjDP0mvqu5wEg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAErSpo6sCvDuSA3Bw0LY7D6QYC=xhPP05f966kjDP0mvqu5wEg@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>, Andi Kleen <ak@linux.intel.com>, Joe Mario <jmario@redhat.com>
+To: Bjorn Helgaas <bhelgaas@google.com>
+Cc: Michal Marek <mmarek@suse.cz>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>, Joe Mario <jmario@redhat.com>
 
-On Tue, Nov 12, 2013 at 1:40 AM, Michal Marek <mmarek@suse.cz> wrote:
-> On 11.11.2013 14:40, Michal Marek wrote:
->> Pasting the verbatim PCI_(VENDOR|DEVICE)_* macros in the __pci_fixup_*
->> symbol names results in insanely long names such as
->>
->> __pci_fixup_resumePCI_VENDOR_ID_SERVERWORKSPCI_DEVICE_ID_SERVERWORKS_HT1000SBquirk_disable_broadcom_boot_interrupt
->>
->> When LTO adds its numeric suffix to such symbol, it overflows the
->> namebuf[KSYM_NAME_LEN] array. Use the line number instead to create
->
-> "... the namebuf[KSYM_NAME_LEN] array in kernel/kallsyms.c."
+> What's LTO?  I guess it's Link Time Optimization?  Is there any
 
-What's LTO?  I guess it's Link Time Optimization?  Is there any
-documentation about how it works or how to use it?
+Yes. Link Time Optimization with modern gcc.
 
-Bjorn
+> documentation about how it works or how to use it?
+
+It's still a separate tree, but bits'n'pieces are slowly
+making it into the kernel.
+
+https://github.com/andikleen/linux-misc/tree/lto-3.12
+
+https://github.com/andikleen/linux-misc/blob/5a18e33264321b01816a220ab14207a5f26ae16e/Documentation/lto-build
+
+http://halobates.de/kernel-lto.pdf
+
+-Andi
