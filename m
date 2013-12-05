@@ -1,68 +1,104 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oa0-f50.google.com ([209.85.219.50]:35047 "EHLO
-	mail-oa0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751982Ab3LCC6S convert rfc822-to-8bit (ORCPT
+Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:34160 "EHLO
+	shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1756106Ab3LEOhp (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 2 Dec 2013 21:58:18 -0500
-Received: by mail-oa0-f50.google.com with SMTP id n16so14243596oag.37
-        for <linux-kbuild@vger.kernel.org>; Mon, 02 Dec 2013 18:58:18 -0800 (PST)
-Date: Mon, 02 Dec 2013 20:58:13 -0600
-From: Rob Landley <rob@landley.net>
-Subject: Re: make oldnoconfig fix?
-In-Reply-To: <52812829.4080508@linux.intel.com> (from
-	david.a.cohen@linux.intel.com on Mon Nov 11 12:55:37 2013)
-Message-Id: <1386039493.1974.305@driftwood>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; DelSp=Yes; Format=Flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: 8BIT
+	Thu, 5 Dec 2013 09:37:45 -0500
+Message-ID: <1386254255.3000.20.camel@deadeye.wl.decadent.org.uk>
+Subject: [PATCH 1/2] deb-pkg: Fix cross-building linux-headers package
+From: Ben Hutchings <ben@decadent.org.uk>
+Date: Thu, 05 Dec 2013 14:37:35 +0000
+Content-Type: multipart/signed; micalg="pgp-sha512";
+	protocol="application/pgp-signature"; boundary="=-iGrOf77sXbjyQCgJCAEM"
+Mime-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: David Cohen <david.a.cohen@linux.intel.com>
-Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, linux-kbuild@vger.kernel.org, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, mmarek@suse.cz, rostedt@goodmis.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, debian-kernel@lists.debian.org, "Niew, Sh." <shniew@gmail.com>
 
-On 11/11/2013 12:55:37 PM, David Cohen wrote:
-> On 11/11/2013 10:13 AM, Yann E. MORIN wrote:
->> David, All,
-> 
-> Hi Yann,
-> 
->> 
->> On 2013-11-11 10:11 -0800, David Cohen spake thusly:
->>> Is there a plan to fix 'make oldnoconfig' option?
->>> I currently have need to it :)
->>> I've tracked a thread fixing 'make olddefconfig' where 'oldnoconfig'
->>> option is reported as a known bug, right?
->> 
->> Sorry, I don't understand what your problem is.
-> 
-> Maybe I assumed it was more 'known' then it actually is :)
-> 
->> 
->> Care to explain in details what problem you have:
->>    - what you start with
->>    - what you do
->>    - what you get
->>    - what you expected
-> 
-> The bug with 'oldnoconfig' is: 'make oldnoconfig' is just an alias to
-> 'olddefconfig'. Any non-existent config is defined with its default
-> value instead of 'N'.
-> 
-> I work with embedded platforms. I need to maintain a set of defconfigs
-> for different products (customers some times want tailored configs, so
-> creating a generic one isn't an option always).
 
-make allnoconfig KCONFIG_ALLCONFIG=oldconfigfile
+--=-iGrOf77sXbjyQCgJCAEM
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-I use this trick in  
-http://landley.net/aboriginal/FAQ.html#dev_miniconfig
+builddeb generates a control file that says the linux-headers package
+can only be built for the build system primary architecture.  This
+breaks cross-building configurations.  We should use $debarch for this
+instead.
 
-And yes, I submitted it upstream a couple times last decade, with  
-documentation and everything:
+Since $debarch is not yet set when generating the control file, set
+Architecture: any and use control file variables to fill in the
+description.
 
-   https://lwn.net/Articles/160497/
-   https://lwn.net/Articles/161086/
-   http://lkml.indiana.edu/hypermail/linux/kernel/0607.0/1805.html
+Fixes: cd8d60a20a45 ('kbuild: create linux-headers package in deb-pkg')
+Reported-by: "Niew, Sh." <shniew@gmail.com>
+Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+---
+ scripts/package/builddeb | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-Rob
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index 90e521f..301acdc 100644
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -62,7 +62,7 @@ create_package() {
+ 	fi
+=20
+ 	# Create the package
+-	dpkg-gencontrol -isp $forcearch -p$pname -P"$pdir"
++	dpkg-gencontrol -isp $forcearch -Vkernel:debarch=3D"${debarch:-$(dpkg --p=
+rint-architecture)}" -p$pname -P"$pdir"
+ 	dpkg --build "$pdir" ..
+ }
+=20
+@@ -288,15 +288,14 @@ mkdir -p "$destdir"
+ (cd $objtree; cp $KCONFIG_CONFIG $destdir/.config) # copy .config manually=
+ to be where it's expected to be
+ ln -sf "/usr/src/linux-headers-$version" "$kernel_headers_dir/lib/modules/=
+$version/build"
+ rm -f "$objtree/debian/hdrsrcfiles" "$objtree/debian/hdrobjfiles"
+-arch=3D$(dpkg --print-architecture)
+=20
+ cat <<EOF >> debian/control
+=20
+ Package: $kernel_headers_packagename
+ Provides: linux-headers, linux-headers-2.6
+-Architecture: $arch
+-Description: Linux kernel headers for $KERNELRELEASE on $arch
+- This package provides kernel header files for $KERNELRELEASE on $arch
++Architecture: any
++Description: Linux kernel headers for $KERNELRELEASE on \${kernel:debarch}
++ This package provides kernel header files for $KERNELRELEASE on \${kernel=
+:debarch}
+  .
+  This is useful for people who need to build external modules
+ EOF
+
+
+--=20
+Ben Hutchings
+Knowledge is power.  France is bacon.
+
+--=-iGrOf77sXbjyQCgJCAEM
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.15 (GNU/Linux)
+
+iQIVAwUAUqCPr+e/yOyVhhEJAQrwyBAAnVW9hrQpaP7Xqldx80PmAtqDC8A4Tg8t
+B5Ib3Mp8py+MtEuaAzkeG2r7hEqOhCHy6JJ1NaaYoV0yRf3rbJ8zSYf3iwrozmyK
+4KSmZpZyNXwwvwODM41KQjkkK4sX04OlHytF0MCMTFPuW6a7JmMZ7sbJ532dRcaw
+uDD5Cx6oOCGCWRHnp1XK5dYs7griuRt5cX1yV/Db7ltqLwdtDnP1cLRDJpDkP2vB
+103tn1OFlDS0tvO31Gm15c+4PTP/VGd0HDO1OyY2PHBTJWcJD28jnSabRE300G3k
+HE+Jk1mpuEOgSZs+tQqdSGKMywEPstweo5Csq9lHtChumYRrwdtf5vU7AOgyvCIu
+b8oo4icTxXPY0m3QXFrtvQ24TMQv/XZalnGq3VaYtcD665cTqrvg8SwDuZx1dR5M
+gk+jMUrSYAIGiNvkiOZrlNMLOTslep0aMfuYaYa4tlTEWx6HFxu2tfEjBPTgV5CY
+EfXVkLWBFCqTM0ujr5M4rBDOeyWFaX4AQo6GQ3X4ZBc+/ehDEblFhe1bfjVTS7Uh
+a+wGTiEl3kn54PQF1BoSZeKXupBjztwr7lAlQllzLPbsdtBt8zVgcxrSAh6gdXUN
+r/TgvUPHQE7gFb2OtbXY/WFzR8ifuUgD6HQ7G2me20wnGBK0hdy7zm7cy4lc/N5z
+VsYVROu9ND8=
+=p1kR
+-----END PGP SIGNATURE-----
+
+--=-iGrOf77sXbjyQCgJCAEM--
