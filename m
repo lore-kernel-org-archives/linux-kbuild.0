@@ -1,74 +1,77 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga03.intel.com ([143.182.124.21]:30695 "EHLO mga03.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752756Ab3LFAGE (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 5 Dec 2013 19:06:04 -0500
-Message-ID: <52A11604.8000702@linux.intel.com>
-Date: Thu, 05 Dec 2013 16:10:44 -0800
-From: David Cohen <david.a.cohen@linux.intel.com>
+Received: from mail-qc0-f175.google.com ([209.85.216.175]:48911 "EHLO
+	mail-qc0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751895Ab3LFBfj (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 5 Dec 2013 20:35:39 -0500
+Received: by mail-qc0-f175.google.com with SMTP id e9so22693qcy.20
+        for <linux-kbuild@vger.kernel.org>; Thu, 05 Dec 2013 17:35:38 -0800 (PST)
 MIME-Version: 1.0
-Subject: Re: make oldnoconfig fix?
-References: <1386039493.1974.305@driftwood>
-In-Reply-To: <1386039493.1974.305@driftwood>
+In-Reply-To: <1386254255.3000.20.camel@deadeye.wl.decadent.org.uk>
+References: <1386254255.3000.20.camel@deadeye.wl.decadent.org.uk>
+Date: Fri, 6 Dec 2013 09:35:38 +0800
+Message-ID: <CABsPBHr2geiFPL9QtgBb4c6UnABxdpt=VpEEh_ue8a7_VQdLjA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] deb-pkg: Fix cross-building linux-headers package
+From: "Niew, Sh." <shniew@gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rob Landley <rob@landley.net>
-Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, linux-kbuild@vger.kernel.org, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, mmarek@suse.cz, rostedt@goodmis.org
+To: Ben Hutchings <ben@decadent.org.uk>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, debian-kernel@lists.debian.org
 
-On 12/02/2013 06:58 PM, Rob Landley wrote:
-> On 11/11/2013 12:55:37 PM, David Cohen wrote:
->> On 11/11/2013 10:13 AM, Yann E. MORIN wrote:
->>> David, All,
->>
->> Hi Yann,
->>
->>>
->>> On 2013-11-11 10:11 -0800, David Cohen spake thusly:
->>>> Is there a plan to fix 'make oldnoconfig' option?
->>>> I currently have need to it :)
->>>> I've tracked a thread fixing 'make olddefconfig' where 'oldnoconfig'
->>>> option is reported as a known bug, right?
->>>
->>> Sorry, I don't understand what your problem is.
->>
->> Maybe I assumed it was more 'known' then it actually is :)
->>
->>>
->>> Care to explain in details what problem you have:
->>>    - what you start with
->>>    - what you do
->>>    - what you get
->>>    - what you expected
->>
->> The bug with 'oldnoconfig' is: 'make oldnoconfig' is just an alias to
->> 'olddefconfig'. Any non-existent config is defined with its default
->> value instead of 'N'.
->>
->> I work with embedded platforms. I need to maintain a set of defconfigs
->> for different products (customers some times want tailored configs, so
->> creating a generic one isn't an option always).
-> 
-> make allnoconfig KCONFIG_ALLCONFIG=oldconfigfile
+On Thu, Dec 5, 2013 at 10:37 PM, Ben Hutchings <ben@decadent.org.uk> wrote:
+> builddeb generates a control file that says the linux-headers package
+> can only be built for the build system primary architecture.  This
+> breaks cross-building configurations.  We should use $debarch for this
+> instead.
+>
+> Since $debarch is not yet set when generating the control file, set
+> Architecture: any and use control file variables to fill in the
+> description.
+>
+> Fixes: cd8d60a20a45 ('kbuild: create linux-headers package in deb-pkg')
+> Reported-by: "Niew, Sh." <shniew@gmail.com>
+> Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+> ---
+>  scripts/package/builddeb | 9 ++++-----
+>  1 file changed, 4 insertions(+), 5 deletions(-)
+>
+> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+> index 90e521f..301acdc 100644
+> --- a/scripts/package/builddeb
+> +++ b/scripts/package/builddeb
+> @@ -62,7 +62,7 @@ create_package() {
+>         fi
+>
+>         # Create the package
+> -       dpkg-gencontrol -isp $forcearch -p$pname -P"$pdir"
+> +       dpkg-gencontrol -isp $forcearch -Vkernel:debarch="${debarch:-$(dpkg --print-architecture)}" -p$pname -P"$pdir"
+>         dpkg --build "$pdir" ..
+>  }
+>
+> @@ -288,15 +288,14 @@ mkdir -p "$destdir"
+>  (cd $objtree; cp $KCONFIG_CONFIG $destdir/.config) # copy .config manually to be where it's expected to be
+>  ln -sf "/usr/src/linux-headers-$version" "$kernel_headers_dir/lib/modules/$version/build"
+>  rm -f "$objtree/debian/hdrsrcfiles" "$objtree/debian/hdrobjfiles"
+> -arch=$(dpkg --print-architecture)
+>
+>  cat <<EOF >> debian/control
+>
+>  Package: $kernel_headers_packagename
+>  Provides: linux-headers, linux-headers-2.6
+> -Architecture: $arch
+> -Description: Linux kernel headers for $KERNELRELEASE on $arch
+> - This package provides kernel header files for $KERNELRELEASE on $arch
+> +Architecture: any
+> +Description: Linux kernel headers for $KERNELRELEASE on \${kernel:debarch}
+> + This package provides kernel header files for $KERNELRELEASE on \${kernel:debarch}
+>   .
+>   This is useful for people who need to build external modules
+>  EOF
 
-I'll give it a try. Thanks!
+I can't patch this to my linux-3.2.y tree which i clone from linux-stable
+I check that the patches number line are different...
+What i missed?
 
-> 
-> I use this trick in http://landley.net/aboriginal/FAQ.html#dev_miniconfig
-> 
-> And yes, I submitted it upstream a couple times last decade, with
-> documentation and everything:
 
-You could send it again.
-But maybe oldnoconfig would be a better name WRT current standard.
-
-Br, David
-
-> 
->   https://lwn.net/Articles/160497/
->   https://lwn.net/Articles/161086/
->   http://lkml.indiana.edu/hypermail/linux/kernel/0607.0/1805.html
-> 
-> Rob
-
+Sh. Niew
