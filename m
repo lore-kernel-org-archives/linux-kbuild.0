@@ -1,72 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qc0-f172.google.com ([209.85.216.172]:51506 "EHLO
-	mail-qc0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752440Ab3LFEU0 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 5 Dec 2013 23:20:26 -0500
-Received: by mail-qc0-f172.google.com with SMTP id e16so116715qcx.31
-        for <linux-kbuild@vger.kernel.org>; Thu, 05 Dec 2013 20:20:26 -0800 (PST)
+Received: from ozlabs.org ([203.10.76.45]:52501 "EHLO ozlabs.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750789Ab3LJHOS (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 10 Dec 2013 02:14:18 -0500
+From: Rusty Russell <rusty@rustcorp.com.au>
+Subject: [PATCH] scripts/gcc-version.sh: handle CC="gcc -m32"
+Date: Tue, 10 Dec 2013 17:43:29 +1030
+Message-ID: <87d2l5ji06.fsf@rustcorp.com.au>
 MIME-Version: 1.0
-In-Reply-To: <1386302655.3000.48.camel@deadeye.wl.decadent.org.uk>
-References: <1386254255.3000.20.camel@deadeye.wl.decadent.org.uk>
-	<CABsPBHr2geiFPL9QtgBb4c6UnABxdpt=VpEEh_ue8a7_VQdLjA@mail.gmail.com>
-	<1386294039.3000.29.camel@deadeye.wl.decadent.org.uk>
-	<CABsPBHob2cYEVhBT8=jaJXE=oZ_c-b2iv-sLTQQthX_EZPwPpg@mail.gmail.com>
-	<1386295673.3000.35.camel@deadeye.wl.decadent.org.uk>
-	<CABsPBHq+hUCo4twA0ypVekBBj_pdXpaKFxKROGmA1hTnMdcGCg@mail.gmail.com>
-	<1386302655.3000.48.camel@deadeye.wl.decadent.org.uk>
-Date: Fri, 6 Dec 2013 12:20:25 +0800
-Message-ID: <CABsPBHpyRmkz+51Jiz9FqGZtqvbm-E9qvu5PA_kuMbnr=7Oenw@mail.gmail.com>
-Subject: Re: [PATCH 1/2] deb-pkg: Fix cross-building linux-headers package
-From: "Niew, Sh." <shniew@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ben Hutchings <ben@decadent.org.uk>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, debian-kernel@lists.debian.org
+To: LKML <linux-kernel@vger.kernel.org>
+Cc: linux-kbuild@vger.kernel.org
 
-On Fri, Dec 6, 2013 at 12:04 PM, Ben Hutchings <ben@decadent.org.uk> wrote:
-> On Fri, 2013-12-06 at 11:29 +0800, Niew, Sh. wrote:
->> On Fri, Dec 6, 2013 at 10:07 AM, Ben Hutchings <ben@decadent.org.uk> wrote:
->> > On Fri, 2013-12-06 at 09:45 +0800, Niew, Sh. wrote:
->> >> On Fri, Dec 6, 2013 at 9:40 AM, Ben Hutchings <ben@decadent.org.uk> wrote:
->> >> > On Fri, 2013-12-06 at 09:35 +0800, Niew, Sh. wrote:
->> >> >> On Thu, Dec 5, 2013 at 10:37 PM, Ben Hutchings <ben@decadent.org.uk> wrote:
->> >> >> > builddeb generates a control file that says the linux-headers package
->> >> >> > can only be built for the build system primary architecture.  This
->> >> >> > breaks cross-building configurations.  We should use $debarch for this
->> >> >> > instead.
->> >> >> >
->> >> >> > Since $debarch is not yet set when generating the control file, set
->> >> >> > Architecture: any and use control file variables to fill in the
->> >> >> > description.
->> >> >> >
->> >> >> > Fixes: cd8d60a20a45 ('kbuild: create linux-headers package in deb-pkg')
->> >> >> > Reported-by: "Niew, Sh." <shniew@gmail.com>
->> >> >> > Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
->> >> > [...]
->> >> >> I can't patch this to my linux-3.2.y tree which i clone from linux-stable
->> >> >> I check that the patches number line are different...
->> >> >> What i missed?
->> >> >
->> >> > This is for mainline; it should apply cleanly to 3.12.
->>
->> What ever i try, is failed. Even with 3.12 tree of debian.
->> I check the failure, the following part can't be patch:
->>
->> @@ -62,7 +62,7 @@ create_package() {
->>         fi
->>
->>         # Create the package
->> -       dpkg-gencontrol -isp $forcearch -p$pname -P"$pdir"
->> +       dpkg-gencontrol -isp $forcearch -Vkernel:debarch="${debarch:-$
->> (dpkg --print-architecture)}" -p$pname -P"$pdir"
->>         dpkg --build "$pdir" ..
->>  }
->
-> I think this has been word-wrapped by your mail program.  Here is the
-> patch as an attachment; that should avoid the problem.
+Without it we get ugly warnings (though build still succeeds).
 
-Thanks, the attach patch is applied.
-And i just make it on linux-3.2.y by hand, and is successfully cross-build.
-Haven't test in 3.12
+$ make -j8 CC="gcc -m32"
+In file included from <command-line>:0:0:
+/usr/include/stdc-predef.h:30:26: fatal error: bits/predefs.h: No such file or directory
+ #include <bits/predefs.h>
+                          ^
+compilation terminated.
+In file included from <command-line>:0:0:
+/usr/include/stdc-predef.h:30:26: fatal error: bits/predefs.h: No such file or directory
+ #include <bits/predefs.h>
+                          ^
+compilation terminated.
+/home/rusty/devel/kernel/linux/scripts/gcc-version.sh: line 31: printf: #: invalid number
+/home/rusty/devel/kernel/linux/scripts/gcc-version.sh: line 31: printf: #: invalid number
+/bin/sh: 1: [: 0001: unexpected operator
+  CHK     include/config/kernel.release
+  CHK     include/generated/uapi/linux/version.h
+make[1]: Nothing to be done for `all'.
+...
+
+Signed-off-by: Rusty Russell <rusty@rustcorp.com.au>
+
+diff --git a/scripts/gcc-version.sh b/scripts/gcc-version.sh
+index 7f2126df91f2..d48b0cbaf246 100644
+--- a/scripts/gcc-version.sh
++++ b/scripts/gcc-version.sh
+@@ -14,7 +14,7 @@ if [ "$1" = "-p" ] ; then
+ 	shift;
+ fi
+ 
+-compiler="$*"
++compiler="$1"
+ 
+ if [ ${#compiler} -eq 0 ]; then
+ 	echo "Error: No compiler specified."
