@@ -1,294 +1,161 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.outflux.net ([198.145.64.163]:57531 "EHLO smtp.outflux.net"
+Received: from smtp.mei.co.jp ([133.183.100.20]:59747 "EHLO smtp.mei.co.jp"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751008Ab3LQWq5 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 17 Dec 2013 17:46:57 -0500
-From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH v3 1/2] create HAVE_CC_STACKPROTECTOR for centralized use
-Date: Tue, 17 Dec 2013 14:43:13 -0800
-Message-Id: <1387320194-24185-2-git-send-email-keescook@chromium.org>
-In-Reply-To: <1387320194-24185-1-git-send-email-keescook@chromium.org>
-References: <1387320194-24185-1-git-send-email-keescook@chromium.org>
+	id S1751259Ab3LRFyN (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 18 Dec 2013 00:54:13 -0500
+Received: from mail-gw.jp.panasonic.com ([157.8.1.157])
+	by smtp.mei.co.jp (8.12.11.20060614/3.7W/kc-maile12) with ESMTP id rBI5sBE6003562
+	for <linux-kbuild@vger.kernel.org>; Wed, 18 Dec 2013 14:54:11 +0900 (JST)
+Received: from epochmail.jp.panasonic.com ([157.8.1.130])
+	by mail.jp.panasonic.com (8.11.6p2/3.7W/kc-maili15) with ESMTP id rBI5sCB29773
+	for <linux-kbuild@vger.kernel.org>; Wed, 18 Dec 2013 14:54:12 +0900
+From: Masahiro Yamada <yamada.m@jp.panasonic.com>
+Subject: [PATCH] Kbuild: Move extra gcc check flags to the top Makefile
+Date: Wed, 18 Dec 2013 14:53:57 +0900
+Message-Id: <1387346037-25688-1-git-send-email-yamada.m@jp.panasonic.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: Michal Marek <mmarek@suse.cz>, Russell King <linux@arm.linux.org.uk>, Ralf Baechle <ralf@linux-mips.org>, Paul Mundt <lethal@linux-sh.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Andrew Morton <akpm@linux-foundation.org>, James Hogan <james.hogan@imgtec.com>, Stephen Rothwell <sfr@canb.auug.org.au>, Shawn Guo <shawn.guo@linaro.org>, x86@kernel.org, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-mips@linux-mips.org, linux-sh@vger.kernel.org, keescook@chromium.org
+To: linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <yamada.m@jp.panasonic.com>
 
-Instead of duplicating the CC_STACKPROTECTOR Kconfig and Makefile logic
-in each architecture, switch to using HAVE_CC_STACKPROTECTOR and keep
-everything in one place. This retains the x86-specific bug verification
-scripts.
+If W=... given to the command line, extra gcc check flags
+are added to KBUILD_CFLAGS.
 
-Signed-off-by: Kees Cook <keescook@chromium.org>
+If we have such code in scripts/Makefile.build,
+the same flags are added mutiple times
+becuase scripts/Makefile.build is invoked
+every time kbuild descends into the subdirectories.
+
+Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
 ---
- Makefile           |   14 +++++++++++---
- arch/Kconfig       |   22 ++++++++++++++++++++++
- arch/arm/Kconfig   |   13 +------------
- arch/arm/Makefile  |    4 ----
- arch/mips/Kconfig  |   14 +-------------
- arch/mips/Makefile |    4 ----
- arch/sh/Kconfig    |   15 +--------------
- arch/sh/Makefile   |    4 ----
- arch/x86/Kconfig   |   17 +----------------
- arch/x86/Makefile  |    8 +++-----
- 10 files changed, 40 insertions(+), 75 deletions(-)
+ Makefile               | 51 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ scripts/Makefile.build | 51 --------------------------------------------------
+ 2 files changed, 51 insertions(+), 51 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 858a147fd836..27ed3ff7cf4c 100644
+index 2f6c0e9..9deeb0c 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -595,10 +595,18 @@ ifneq ($(CONFIG_FRAME_WARN),0)
- KBUILD_CFLAGS += $(call cc-option,-Wframe-larger-than=${CONFIG_FRAME_WARN})
- endif
+@@ -573,6 +573,57 @@ endif # $(dot-config)
+ # Defaults to vmlinux, but the arch makefile usually adds further targets
+ all: vmlinux
  
--# Force gcc to behave correct even for buggy distributions
--ifndef CONFIG_CC_STACKPROTECTOR
--KBUILD_CFLAGS += $(call cc-option, -fno-stack-protector)
-+# Handle stack protector mode.
-+ifdef CONFIG_CC_STACKPROTECTOR
-+  stackp-flag := $(call cc-option, -fstack-protector)
-+  ifeq ($(stackp-flag),)
-+   $(error Cannot use CONFIG_CC_STACKPROTECTOR: \
-+	   -fstack-protector not supported by compiler))
-+  endif
-+else
-+  # Force off for distro compilers that enable stack protector by default.
-+  stackp-flag := $(call cc-option, -fno-stack-protector)
- endif
-+KBUILD_CFLAGS += $(stackp-flag)
- 
- # This warning generated too much noise in a regular build.
- # Use make W=1 to enable this warning (see scripts/Makefile.build)
-diff --git a/arch/Kconfig b/arch/Kconfig
-index f1cf895c040f..24e026d83072 100644
---- a/arch/Kconfig
-+++ b/arch/Kconfig
-@@ -336,6 +336,28 @@ config SECCOMP_FILTER
- 
- 	  See Documentation/prctl/seccomp_filter.txt for details.
- 
-+config HAVE_CC_STACKPROTECTOR
-+	bool
-+	help
-+	  An arch should select this symbol if:
-+	  - its compiler supports the -fstack-protector option
-+	  - it has implemented a stack canary (e.g. __stack_chk_guard)
++#
++# make W=... settings
++#
++# W=1 - warnings that may be relevant and does not occur too often
++# W=2 - warnings that occur quite often but may still be relevant
++# W=3 - the more obscure warnings, can most likely be ignored
++#
++# $(call cc-option, -W...) handles gcc -W.. options which
++# are not supported by all versions of the compiler
++ifdef KBUILD_ENABLE_EXTRA_GCC_CHECKS
++warning-  := $(empty)
 +
-+config CC_STACKPROTECTOR
-+	bool "Enable -fstack-protector buffer overflow detection"
-+	depends on HAVE_CC_STACKPROTECTOR
-+	help
-+	  This option turns on the -fstack-protector GCC feature. This
-+	  feature puts, at the beginning of functions, a canary value on
-+	  the stack just before the return address, and validates
-+	  the value just before actually returning.  Stack based buffer
-+	  overflows (that need to overwrite this return address) now also
-+	  overwrite the canary, which gets detected and the attack is then
-+	  neutralized via a kernel panic.
++warning-1 := -Wextra -Wunused -Wno-unused-parameter
++warning-1 += -Wmissing-declarations
++warning-1 += -Wmissing-format-attribute
++warning-1 += -Wmissing-prototypes
++warning-1 += -Wold-style-definition
++warning-1 += $(call cc-option, -Wmissing-include-dirs)
++warning-1 += $(call cc-option, -Wunused-but-set-variable)
++warning-1 += $(call cc-disable-warning, missing-field-initializers)
 +
-+	  This feature requires gcc version 4.2 or above, or a distribution
-+	  gcc with the feature backported.
++warning-2 := -Waggregate-return
++warning-2 += -Wcast-align
++warning-2 += -Wdisabled-optimization
++warning-2 += -Wnested-externs
++warning-2 += -Wshadow
++warning-2 += $(call cc-option, -Wlogical-op)
++warning-2 += $(call cc-option, -Wmissing-field-initializers)
 +
- config HAVE_CONTEXT_TRACKING
- 	bool
- 	help
-diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
-index c1f1a7eee953..9c909fc29272 100644
---- a/arch/arm/Kconfig
-+++ b/arch/arm/Kconfig
-@@ -30,6 +30,7 @@ config ARM
- 	select HAVE_BPF_JIT
- 	select HAVE_CONTEXT_TRACKING
- 	select HAVE_C_RECORDMCOUNT
-+	select HAVE_CC_STACKPROTECTOR
- 	select HAVE_DEBUG_KMEMLEAK
- 	select HAVE_DMA_API_DEBUG
- 	select HAVE_DMA_ATTRS
-@@ -1856,18 +1857,6 @@ config SECCOMP
- 	  and the task is only allowed to execute a few safe syscalls
- 	  defined by each seccomp mode.
- 
--config CC_STACKPROTECTOR
--	bool "Enable -fstack-protector buffer overflow detection (EXPERIMENTAL)"
--	help
--	  This option turns on the -fstack-protector GCC feature. This
--	  feature puts, at the beginning of functions, a canary value on
--	  the stack just before the return address, and validates
--	  the value just before actually returning.  Stack based buffer
--	  overflows (that need to overwrite this return address) now also
--	  overwrite the canary, which gets detected and the attack is then
--	  neutralized via a kernel panic.
--	  This feature requires gcc version 4.2 or above.
--
- config SWIOTLB
- 	def_bool y
- 
-diff --git a/arch/arm/Makefile b/arch/arm/Makefile
-index c99b1086d83d..55b4255ad6ed 100644
---- a/arch/arm/Makefile
-+++ b/arch/arm/Makefile
-@@ -40,10 +40,6 @@ ifeq ($(CONFIG_FRAME_POINTER),y)
- KBUILD_CFLAGS	+=-fno-omit-frame-pointer -mapcs -mno-sched-prolog
- endif
- 
--ifeq ($(CONFIG_CC_STACKPROTECTOR),y)
--KBUILD_CFLAGS	+=-fstack-protector
--endif
--
- ifeq ($(CONFIG_CPU_BIG_ENDIAN),y)
- KBUILD_CPPFLAGS	+= -mbig-endian
- AS		+= -EB
-diff --git a/arch/mips/Kconfig b/arch/mips/Kconfig
-index 650de3976e7a..c93d92beb3d6 100644
---- a/arch/mips/Kconfig
-+++ b/arch/mips/Kconfig
-@@ -47,6 +47,7 @@ config MIPS
- 	select MODULES_USE_ELF_RELA if MODULES && 64BIT
- 	select CLONE_BACKWARDS
- 	select HAVE_DEBUG_STACKOVERFLOW
-+	select HAVE_CC_STACKPROTECTOR
- 
- menu "Machine selection"
- 
-@@ -2322,19 +2323,6 @@ config SECCOMP
- 
- 	  If unsure, say Y. Only embedded should say N here.
- 
--config CC_STACKPROTECTOR
--	bool "Enable -fstack-protector buffer overflow detection (EXPERIMENTAL)"
--	help
--	  This option turns on the -fstack-protector GCC feature. This
--	  feature puts, at the beginning of functions, a canary value on
--	  the stack just before the return address, and validates
--	  the value just before actually returning.  Stack based buffer
--	  overflows (that need to overwrite this return address) now also
--	  overwrite the canary, which gets detected and the attack is then
--	  neutralized via a kernel panic.
--
--	  This feature requires gcc version 4.2 or above.
--
- config USE_OF
- 	bool
- 	select OF
-diff --git a/arch/mips/Makefile b/arch/mips/Makefile
-index de300b993607..efe50787cd89 100644
---- a/arch/mips/Makefile
-+++ b/arch/mips/Makefile
-@@ -232,10 +232,6 @@ bootvars-y	= VMLINUX_LOAD_ADDRESS=$(load-y) \
- 
- LDFLAGS			+= -m $(ld-emul)
- 
--ifdef CONFIG_CC_STACKPROTECTOR
--  KBUILD_CFLAGS += -fstack-protector
--endif
--
- ifdef CONFIG_MIPS
- CHECKFLAGS += $(shell $(CC) $(KBUILD_CFLAGS) -dM -E -x c /dev/null | \
- 	egrep -vw '__GNUC_(|MINOR_|PATCHLEVEL_)_' | \
-diff --git a/arch/sh/Kconfig b/arch/sh/Kconfig
-index 9b0979f4df7a..ce298317a73e 100644
---- a/arch/sh/Kconfig
-+++ b/arch/sh/Kconfig
-@@ -66,6 +66,7 @@ config SUPERH32
- 	select PERF_EVENTS
- 	select ARCH_HIBERNATION_POSSIBLE if MMU
- 	select SPARSE_IRQ
-+	select HAVE_CC_STACKPROTECTOR
- 
- config SUPERH64
- 	def_bool ARCH = "sh64"
-@@ -695,20 +696,6 @@ config SECCOMP
- 
- 	  If unsure, say N.
- 
--config CC_STACKPROTECTOR
--	bool "Enable -fstack-protector buffer overflow detection (EXPERIMENTAL)"
--	depends on SUPERH32
--	help
--	  This option turns on the -fstack-protector GCC feature. This
--	  feature puts, at the beginning of functions, a canary value on
--	  the stack just before the return address, and validates
--	  the value just before actually returning.  Stack based buffer
--	  overflows (that need to overwrite this return address) now also
--	  overwrite the canary, which gets detected and the attack is then
--	  neutralized via a kernel panic.
--
--	  This feature requires gcc version 4.2 or above.
--
- config SMP
- 	bool "Symmetric multi-processing support"
- 	depends on SYS_SUPPORTS_SMP
-diff --git a/arch/sh/Makefile b/arch/sh/Makefile
-index aed701c7b11b..d4d16e4be07c 100644
---- a/arch/sh/Makefile
-+++ b/arch/sh/Makefile
-@@ -199,10 +199,6 @@ ifeq ($(CONFIG_DWARF_UNWINDER),y)
-   KBUILD_CFLAGS += -fasynchronous-unwind-tables
- endif
- 
--ifeq ($(CONFIG_CC_STACKPROTECTOR),y)
--  KBUILD_CFLAGS += -fstack-protector
--endif
--
- libs-$(CONFIG_SUPERH32)		:= arch/sh/lib/	$(libs-y)
- libs-$(CONFIG_SUPERH64)		:= arch/sh/lib64/ $(libs-y)
- 
-diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-index e903c71f7e69..4a814e6c526b 100644
---- a/arch/x86/Kconfig
-+++ b/arch/x86/Kconfig
-@@ -124,6 +124,7 @@ config X86
- 	select RTC_LIB
- 	select HAVE_DEBUG_STACKOVERFLOW
- 	select HAVE_IRQ_EXIT_ON_IRQ_STACK if X86_64
-+	select HAVE_CC_STACKPROTECTOR
- 
- config INSTRUCTION_DECODER
- 	def_bool y
-@@ -1616,22 +1617,6 @@ config SECCOMP
- 
- 	  If unsure, say Y. Only embedded should say N here.
- 
--config CC_STACKPROTECTOR
--	bool "Enable -fstack-protector buffer overflow detection"
--	---help---
--	  This option turns on the -fstack-protector GCC feature. This
--	  feature puts, at the beginning of functions, a canary value on
--	  the stack just before the return address, and validates
--	  the value just before actually returning.  Stack based buffer
--	  overflows (that need to overwrite this return address) now also
--	  overwrite the canary, which gets detected and the attack is then
--	  neutralized via a kernel panic.
--
--	  This feature requires gcc version 4.2 or above, or a distribution
--	  gcc with the feature backported. Older versions are automatically
--	  detected and for those versions, this configuration option is
--	  ignored. (and a warning is printed during bootup)
--
- source kernel/Kconfig.hz
- 
- config KEXEC
-diff --git a/arch/x86/Makefile b/arch/x86/Makefile
-index 57d021507120..66d126ab9942 100644
---- a/arch/x86/Makefile
-+++ b/arch/x86/Makefile
-@@ -89,13 +89,11 @@ else
-         KBUILD_CFLAGS += -maccumulate-outgoing-args
- endif
- 
-+# Make sure compiler does not have buggy stackprotector support.
- ifdef CONFIG_CC_STACKPROTECTOR
- 	cc_has_sp := $(srctree)/scripts/gcc-x86_$(BITS)-has-stack-protector.sh
--        ifeq ($(shell $(CONFIG_SHELL) $(cc_has_sp) $(CC) $(KBUILD_CPPFLAGS) $(biarch)),y)
--                stackp-y := -fstack-protector
--                KBUILD_CFLAGS += $(stackp-y)
--        else
--                $(warning stack protector enabled but no compiler support)
-+        ifneq ($(shell $(CONFIG_SHELL) $(cc_has_sp) $(CC) $(KBUILD_CPPFLAGS) $(biarch)),y)
-+                $(error stack protector enabled but compiler support is broken)
++warning-3 := -Wbad-function-cast
++warning-3 += -Wcast-qual
++warning-3 += -Wconversion
++warning-3 += -Wpacked
++warning-3 += -Wpadded
++warning-3 += -Wpointer-arith
++warning-3 += -Wredundant-decls
++warning-3 += -Wswitch-default
++warning-3 += $(call cc-option, -Wpacked-bitfield-compat)
++warning-3 += $(call cc-option, -Wvla)
++
++warning := $(warning-$(findstring 1, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)))
++warning += $(warning-$(findstring 2, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)))
++warning += $(warning-$(findstring 3, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)))
++
++ifeq ("$(strip $(warning))","")
++        $(error W=$(KBUILD_ENABLE_EXTRA_GCC_CHECKS) is unknown)
++endif
++
++KBUILD_CFLAGS += $(warning)
++endif
++
+ ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
+ KBUILD_CFLAGS	+= -Os $(call cc-disable-warning,maybe-uninitialized,)
+ else
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index d5d859c..6498c47 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -50,57 +50,6 @@ ifeq ($(KBUILD_NOPEDANTIC),)
          endif
  endif
  
+-#
+-# make W=... settings
+-#
+-# W=1 - warnings that may be relevant and does not occur too often
+-# W=2 - warnings that occur quite often but may still be relevant
+-# W=3 - the more obscure warnings, can most likely be ignored
+-#
+-# $(call cc-option, -W...) handles gcc -W.. options which
+-# are not supported by all versions of the compiler
+-ifdef KBUILD_ENABLE_EXTRA_GCC_CHECKS
+-warning-  := $(empty)
+-
+-warning-1 := -Wextra -Wunused -Wno-unused-parameter
+-warning-1 += -Wmissing-declarations
+-warning-1 += -Wmissing-format-attribute
+-warning-1 += -Wmissing-prototypes
+-warning-1 += -Wold-style-definition
+-warning-1 += $(call cc-option, -Wmissing-include-dirs)
+-warning-1 += $(call cc-option, -Wunused-but-set-variable)
+-warning-1 += $(call cc-disable-warning, missing-field-initializers)
+-
+-warning-2 := -Waggregate-return
+-warning-2 += -Wcast-align
+-warning-2 += -Wdisabled-optimization
+-warning-2 += -Wnested-externs
+-warning-2 += -Wshadow
+-warning-2 += $(call cc-option, -Wlogical-op)
+-warning-2 += $(call cc-option, -Wmissing-field-initializers)
+-
+-warning-3 := -Wbad-function-cast
+-warning-3 += -Wcast-qual
+-warning-3 += -Wconversion
+-warning-3 += -Wpacked
+-warning-3 += -Wpadded
+-warning-3 += -Wpointer-arith
+-warning-3 += -Wredundant-decls
+-warning-3 += -Wswitch-default
+-warning-3 += $(call cc-option, -Wpacked-bitfield-compat)
+-warning-3 += $(call cc-option, -Wvla)
+-
+-warning := $(warning-$(findstring 1, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)))
+-warning += $(warning-$(findstring 2, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)))
+-warning += $(warning-$(findstring 3, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)))
+-
+-ifeq ("$(strip $(warning))","")
+-        $(error W=$(KBUILD_ENABLE_EXTRA_GCC_CHECKS) is unknown)
+-endif
+-
+-KBUILD_CFLAGS += $(warning)
+-endif
+-
+ include scripts/Makefile.lib
+ 
+ ifdef host-progs
 -- 
-1.7.9.5
+1.8.3.2
 
