@@ -1,161 +1,88 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.mei.co.jp ([133.183.100.20]:59747 "EHLO smtp.mei.co.jp"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751259Ab3LRFyN (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 18 Dec 2013 00:54:13 -0500
-Received: from mail-gw.jp.panasonic.com ([157.8.1.157])
-	by smtp.mei.co.jp (8.12.11.20060614/3.7W/kc-maile12) with ESMTP id rBI5sBE6003562
-	for <linux-kbuild@vger.kernel.org>; Wed, 18 Dec 2013 14:54:11 +0900 (JST)
-Received: from epochmail.jp.panasonic.com ([157.8.1.130])
-	by mail.jp.panasonic.com (8.11.6p2/3.7W/kc-maili15) with ESMTP id rBI5sCB29773
-	for <linux-kbuild@vger.kernel.org>; Wed, 18 Dec 2013 14:54:12 +0900
-From: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Subject: [PATCH] Kbuild: Move extra gcc check flags to the top Makefile
-Date: Wed, 18 Dec 2013 14:53:57 +0900
-Message-Id: <1387346037-25688-1-git-send-email-yamada.m@jp.panasonic.com>
+Received: from mail-ee0-f53.google.com ([74.125.83.53]:53558 "EHLO
+	mail-ee0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752099Ab3LRJ7V (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 18 Dec 2013 04:59:21 -0500
+Date: Wed, 18 Dec 2013 10:59:05 +0100
+From: Ingo Molnar <mingo@kernel.org>
+Subject: Re: [PATCH v3 2/2] provide -fstack-protector-strong build option
+Message-ID: <20131218095905.GB19319@gmail.com>
+References: <1387320194-24185-1-git-send-email-keescook@chromium.org>
+ <1387320194-24185-3-git-send-email-keescook@chromium.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1387320194-24185-3-git-send-email-keescook@chromium.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.m@jp.panasonic.com>
+To: Kees Cook <keescook@chromium.org>
+Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Russell King <linux@arm.linux.org.uk>, Ralf Baechle <ralf@linux-mips.org>, Paul Mundt <lethal@linux-sh.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Andrew Morton <akpm@linux-foundation.org>, James Hogan <james.hogan@imgtec.com>, Stephen Rothwell <sfr@canb.auug.org.au>, Shawn Guo <shawn.guo@linaro.org>, x86@kernel.org, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-mips@linux-mips.org, linux-sh@vger.kernel.org
 
-If W=... given to the command line, extra gcc check flags
-are added to KBUILD_CFLAGS.
 
-If we have such code in scripts/Makefile.build,
-the same flags are added mutiple times
-becuase scripts/Makefile.build is invoked
-every time kbuild descends into the subdirectories.
+* Kees Cook <keescook@chromium.org> wrote:
 
-Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
----
- Makefile               | 51 ++++++++++++++++++++++++++++++++++++++++++++++++++
- scripts/Makefile.build | 51 --------------------------------------------------
- 2 files changed, 51 insertions(+), 51 deletions(-)
+> This changes the stack protector config option into a choice of "None",
+> "Regular", and "Strong". For "Strong", the kernel is built with
+> -fstack-protector-strong (gcc 4.9 and later). This options increases
+> the coverage of the stack protector without the heavy performance hit
+> of -fstack-protector-all.
+> 
+> For reference, the stack protector options available in gcc are:
+> 
+> -fstack-protector-all:
+> Adds the stack-canary saving prefix and stack-canary checking suffix to
+> _all_ function entry and exit. Results in substantial use of stack space
+> for saving the canary for deep stack users (e.g. historically xfs), and
+> measurable (though shockingly still low) performance hit due to all the
+> saving/checking. Really not suitable for sane systems, and was entirely
+> removed as an option from the kernel many years ago.
+> 
+> -fstack-protector:
+> Adds the canary save/check to functions that define an 8
+> (--param=ssp-buffer-size=N, N=8 by default) or more byte local char
+> array. Traditionally, stack overflows happened with string-based
+> manipulations, so this was a way to find those functions. Very few
+> total functions actually get the canary; no measurable performance or
+> size overhead.
+> 
+> -fstack-protector-strong
+> Adds the canary for a wider set of functions, since it's not just those
+> with strings that have ultimately been vulnerable to stack-busting. With
+> this superset, more functions end up with a canary, but it still
+> remains small compared to all functions with no measurable change in
+> performance. Based on the original design document, a function gets the
+> canary when it contains any of:
+> - local variable's address used as part of the RHS of an assignment or
+>   function argument
+> - local variable is an array (or union containing an array), regardless
+>   of array type or length
+> - uses register local variables
+> https://docs.google.com/a/google.com/document/d/1xXBH6rRZue4f296vGt9YQcuLVQHeE516stHwt8M9xyU
+> 
+> Comparison of "size" output when built with gcc-4.9 in three configurations:
+> - defconfig
+> - defconfig + CONFIG_CC_STACKPROTECTOR (+0.33%)
+> - defconfig + CONFIG_CC_STACKPROTECTOR_STRONG via this patch (+2.24%)
+> 
+> text      data     bss      dec       hex     filename
+> 11430641  1457584  1191936  14080161  d6d8a1  vmlinux
+> 11468490  1457584  1191936  14118010  d76c7a  vmlinux.stackprotector
+> 11692790  1457584  1191936  14342310  dad8a6  vmlinux.stackprotector-strong
 
-diff --git a/Makefile b/Makefile
-index 2f6c0e9..9deeb0c 100644
---- a/Makefile
-+++ b/Makefile
-@@ -573,6 +573,57 @@ endif # $(dot-config)
- # Defaults to vmlinux, but the arch makefile usually adds further targets
- all: vmlinux
- 
-+#
-+# make W=... settings
-+#
-+# W=1 - warnings that may be relevant and does not occur too often
-+# W=2 - warnings that occur quite often but may still be relevant
-+# W=3 - the more obscure warnings, can most likely be ignored
-+#
-+# $(call cc-option, -W...) handles gcc -W.. options which
-+# are not supported by all versions of the compiler
-+ifdef KBUILD_ENABLE_EXTRA_GCC_CHECKS
-+warning-  := $(empty)
-+
-+warning-1 := -Wextra -Wunused -Wno-unused-parameter
-+warning-1 += -Wmissing-declarations
-+warning-1 += -Wmissing-format-attribute
-+warning-1 += -Wmissing-prototypes
-+warning-1 += -Wold-style-definition
-+warning-1 += $(call cc-option, -Wmissing-include-dirs)
-+warning-1 += $(call cc-option, -Wunused-but-set-variable)
-+warning-1 += $(call cc-disable-warning, missing-field-initializers)
-+
-+warning-2 := -Waggregate-return
-+warning-2 += -Wcast-align
-+warning-2 += -Wdisabled-optimization
-+warning-2 += -Wnested-externs
-+warning-2 += -Wshadow
-+warning-2 += $(call cc-option, -Wlogical-op)
-+warning-2 += $(call cc-option, -Wmissing-field-initializers)
-+
-+warning-3 := -Wbad-function-cast
-+warning-3 += -Wcast-qual
-+warning-3 += -Wconversion
-+warning-3 += -Wpacked
-+warning-3 += -Wpadded
-+warning-3 += -Wpointer-arith
-+warning-3 += -Wredundant-decls
-+warning-3 += -Wswitch-default
-+warning-3 += $(call cc-option, -Wpacked-bitfield-compat)
-+warning-3 += $(call cc-option, -Wvla)
-+
-+warning := $(warning-$(findstring 1, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)))
-+warning += $(warning-$(findstring 2, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)))
-+warning += $(warning-$(findstring 3, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)))
-+
-+ifeq ("$(strip $(warning))","")
-+        $(error W=$(KBUILD_ENABLE_EXTRA_GCC_CHECKS) is unknown)
-+endif
-+
-+KBUILD_CFLAGS += $(warning)
-+endif
-+
- ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
- KBUILD_CFLAGS	+= -Os $(call cc-disable-warning,maybe-uninitialized,)
- else
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index d5d859c..6498c47 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -50,57 +50,6 @@ ifeq ($(KBUILD_NOPEDANTIC),)
-         endif
- endif
- 
--#
--# make W=... settings
--#
--# W=1 - warnings that may be relevant and does not occur too often
--# W=2 - warnings that occur quite often but may still be relevant
--# W=3 - the more obscure warnings, can most likely be ignored
--#
--# $(call cc-option, -W...) handles gcc -W.. options which
--# are not supported by all versions of the compiler
--ifdef KBUILD_ENABLE_EXTRA_GCC_CHECKS
--warning-  := $(empty)
--
--warning-1 := -Wextra -Wunused -Wno-unused-parameter
--warning-1 += -Wmissing-declarations
--warning-1 += -Wmissing-format-attribute
--warning-1 += -Wmissing-prototypes
--warning-1 += -Wold-style-definition
--warning-1 += $(call cc-option, -Wmissing-include-dirs)
--warning-1 += $(call cc-option, -Wunused-but-set-variable)
--warning-1 += $(call cc-disable-warning, missing-field-initializers)
--
--warning-2 := -Waggregate-return
--warning-2 += -Wcast-align
--warning-2 += -Wdisabled-optimization
--warning-2 += -Wnested-externs
--warning-2 += -Wshadow
--warning-2 += $(call cc-option, -Wlogical-op)
--warning-2 += $(call cc-option, -Wmissing-field-initializers)
--
--warning-3 := -Wbad-function-cast
--warning-3 += -Wcast-qual
--warning-3 += -Wconversion
--warning-3 += -Wpacked
--warning-3 += -Wpadded
--warning-3 += -Wpointer-arith
--warning-3 += -Wredundant-decls
--warning-3 += -Wswitch-default
--warning-3 += $(call cc-option, -Wpacked-bitfield-compat)
--warning-3 += $(call cc-option, -Wvla)
--
--warning := $(warning-$(findstring 1, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)))
--warning += $(warning-$(findstring 2, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)))
--warning += $(warning-$(findstring 3, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)))
--
--ifeq ("$(strip $(warning))","")
--        $(error W=$(KBUILD_ENABLE_EXTRA_GCC_CHECKS) is unknown)
--endif
--
--KBUILD_CFLAGS += $(warning)
--endif
--
- include scripts/Makefile.lib
- 
- ifdef host-progs
--- 
-1.8.3.2
+Beyond the kernel size calculation, could you please also provide an 
+estimation about the _number_ of functions affected, out of N kernel 
+functions, so that the user has a rough picture about the scope and 
+distribution of these variants?
 
+I.e. something like:
+
+                                                 # of canary checks
+ ..................................................................................
+ - defconfig                                     0 functions out of 100k functions
+ - defconfig + STACKPROTECTOR                   1k functions out of 100k functions  
+ - defconfig + STACKPROTECTOR_STRONG           20k functions out of 100k functions
+	
+Thanks,
+
+	Ingo
