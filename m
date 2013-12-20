@@ -1,37 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from www.linutronix.de ([62.245.132.108]:60708 "EHLO
-	Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932338Ab3LTMql (ORCPT
+Received: from mail-qe0-f43.google.com ([209.85.128.43]:52911 "EHLO
+	mail-qe0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755267Ab3LTRCX (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 20 Dec 2013 07:46:41 -0500
-Message-ID: <52B43C1B.9010406@linutronix.de>
-Date: Fri, 20 Dec 2013 13:46:19 +0100
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-MIME-Version: 1.0
-Subject: Re: [PATCH v4] kconfig/symbol.c: handle choice_values that depend
- on 'm' symbols
-References: <ghr4asl38m.fsf@lena.gouders.net> <ghk3gkl32u.fsf@lena.gouders.net> <20131118180813.GB3458@free.fr>
-In-Reply-To: <20131118180813.GB3458@free.fr>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+	Fri, 20 Dec 2013 12:02:23 -0500
+Received: by mail-qe0-f43.google.com with SMTP id jy17so2583779qeb.2
+        for <linux-kbuild@vger.kernel.org>; Fri, 20 Dec 2013 09:02:22 -0800 (PST)
+From: Jeff Layton <jlayton@redhat.com>
+Subject: [PATCH] Makefile: fix order of INITRD_COMPRESS-y assignments
+Date: Fri, 20 Dec 2013 12:02:07 -0500
+Message-Id: <1387558927-17674-1-git-send-email-jlayton@redhat.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: Dirk Gouders <dirk@gouders.net>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Felipe Balbi <balbi@ti.com>, USB list <linux-usb@vger.kernel.org>, Tomi Valkeinen <tomi.valkeinen@ti.com>, Roger Quadros <rogerq@ti.com>
+To: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+Cc: Jan Beulich <jbeulich@suse.com>, P J P <ppandit@redhat.com>, Andrew Morton <akpm@linux-foundation.org>
 
-On 11/18/2013 07:08 PM, Yann E. MORIN wrote:
-> Dirk, All,
+Commit 7ac181568342ec (fix build with make 3.80) changed how the
+Makefile handles the INITRD_COMPRESS-y assignment in order to make it
+work properly with older versions of make. Unfortunately, it also
+changes the behavior of how that assignment works when multiple
+CONFIG_RD_* options are set, such that they are now preferred in the
+reverse order of the way they were before.
 
-Hi Yann,
+Reverse the order of assignments to try and preserve the earlier
+precedence in this situation.
 
-> Acked-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
-> 
-> It will be in my tree soon. Thanks!
+Cc: Jan Beulich <jbeulich@suse.com>
+Cc: P J P <ppandit@redhat.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Signed-off-by: Jeff Layton <jlayton@redhat.com>
+---
+ Makefile | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-I've been looking at gitorious.org:linux-kconfig/linux-kconfig.git into
-the yem/kconfig-for-next and kconfig-rc-fixes branch and haven't found
-it. Didn't you push your tree out or do you use another git tree for
-that?
-
-Sebastian
+diff --git a/Makefile b/Makefile
+index 89cee86..fb76899 100644
+--- a/Makefile
++++ b/Makefile
+@@ -733,11 +733,11 @@ export mod_strip_cmd
+ # This shall be used by the dracut(8) tool while creating an initramfs image.
+ #
+ INITRD_COMPRESS-y                  := gzip
+-INITRD_COMPRESS-$(CONFIG_RD_BZIP2) := bzip2
+-INITRD_COMPRESS-$(CONFIG_RD_LZMA)  := lzma
+-INITRD_COMPRESS-$(CONFIG_RD_XZ)    := xz
+-INITRD_COMPRESS-$(CONFIG_RD_LZO)   := lzo
+ INITRD_COMPRESS-$(CONFIG_RD_LZ4)   := lz4
++INITRD_COMPRESS-$(CONFIG_RD_LZO)   := lzo
++INITRD_COMPRESS-$(CONFIG_RD_XZ)    := xz
++INITRD_COMPRESS-$(CONFIG_RD_LZMA)  := lzma
++INITRD_COMPRESS-$(CONFIG_RD_BZIP2) := bzip2
+ export INITRD_COMPRESS := $(INITRD_COMPRESS-y)
+ 
+ ifdef CONFIG_MODULE_SIG_ALL
+-- 
+1.8.4.2
 
