@@ -1,65 +1,115 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pd0-f173.google.com ([209.85.192.173]:50538 "EHLO
-	mail-pd0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753604Ab3LVHgt (ORCPT
+Received: from mail-ob0-f169.google.com ([209.85.214.169]:44407 "EHLO
+	mail-ob0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750711Ab3LWFmK (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 22 Dec 2013 02:36:49 -0500
-From: Masanari Iida <standby24x7@gmail.com>
-Subject: [PATCH 2/2] [trivial] scripts: kconfig: Fix trailing whitespace in zconf.tab.c_shipped
-Date: Sun, 22 Dec 2013 16:36:25 +0900
-Message-Id: <1387697785-29767-2-git-send-email-standby24x7@gmail.com>
-In-Reply-To: <1387697785-29767-1-git-send-email-standby24x7@gmail.com>
-References: <1387697785-29767-1-git-send-email-standby24x7@gmail.com>
+	Mon, 23 Dec 2013 00:42:10 -0500
+Received: by mail-ob0-f169.google.com with SMTP id wm4so5075946obc.28
+        for <linux-kbuild@vger.kernel.org>; Sun, 22 Dec 2013 21:42:10 -0800 (PST)
+Message-ID: <52B7CD29.9010806@landley.net>
+Date: Sun, 22 Dec 2013 23:42:01 -0600
+From: Rob Landley <rob@landley.net>
+MIME-Version: 1.0
+Subject: Re: make oldnoconfig fix?
+References: <1386039493.1974.305@driftwood> <52A11604.8000702@linux.intel.com>
+In-Reply-To: <52A11604.8000702@linux.intel.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org, trivial@kernel.org, yann.morin.1998@free.fr, linux-kbuild@vger.kernel.org
-Cc: Masanari Iida <standby24x7@gmail.com>
+To: David Cohen <david.a.cohen@linux.intel.com>
+Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, linux-kbuild@vger.kernel.org, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, mmarek@suse.cz, rostedt@goodmis.org
 
-This patch fixed "ERROR: trailing whitespace" found by
-checkpatch.pl, in zconf.tab.c_shipped
+On 12/05/13 18:10, David Cohen wrote:
+> On 12/02/2013 06:58 PM, Rob Landley wrote:
+>> On 11/11/2013 12:55:37 PM, David Cohen wrote:
+>>> On 11/11/2013 10:13 AM, Yann E. MORIN wrote:
+>>>> David, All,
+>>>
+>>> Hi Yann,
+>>>
+>>>>
+>>>> On 2013-11-11 10:11 -0800, David Cohen spake thusly:
+>>>>> Is there a plan to fix 'make oldnoconfig' option?
+>>>>> I currently have need to it :)
+>>>>> I've tracked a thread fixing 'make olddefconfig' where 'oldnoconfig'
+>>>>> option is reported as a known bug, right?
+>>>>
+>>>> Sorry, I don't understand what your problem is.
+>>>
+>>> Maybe I assumed it was more 'known' then it actually is :)
+>>>
+>>>>
+>>>> Care to explain in details what problem you have:
+>>>>     - what you start with
+>>>>     - what you do
+>>>>     - what you get
+>>>>     - what you expected
+>>>
+>>> The bug with 'oldnoconfig' is: 'make oldnoconfig' is just an alias to
+>>> 'olddefconfig'. Any non-existent config is defined with its default
+>>> value instead of 'N'.
+>>>
+>>> I work with embedded platforms. I need to maintain a set of defconfigs
+>>> for different products (customers some times want tailored configs, so
+>>> creating a generic one isn't an option always).
+>>
+>> make allnoconfig KCONFIG_ALLCONFIG=oldconfigfile
+>
+> I'll give it a try. Thanks!
+>
+>>
+>> I use this trick in http://landley.net/aboriginal/FAQ.html#dev_miniconfig
+>>
+>> And yes, I submitted it upstream a couple times last decade, with
+>> documentation and everything:
+>
+> You could send it again.
 
-Signed-off-by: Masanari Iida <standby24x7@gmail.com>
----
- scripts/kconfig/zconf.tab.c_shipped | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+I linked you to three times I sent it:
 
-diff --git a/scripts/kconfig/zconf.tab.c_shipped b/scripts/kconfig/zconf.tab.c_shipped
-index 25ae16a..c7b7639 100644
---- a/scripts/kconfig/zconf.tab.c_shipped
-+++ b/scripts/kconfig/zconf.tab.c_shipped
-@@ -1,19 +1,19 @@
- /* A Bison parser, made by GNU Bison 2.5.  */
- 
- /* Bison implementation for Yacc-like parsers in C
--   
-+
-       Copyright (C) 1984, 1989-1990, 2000-2011 Free Software Foundation, Inc.
--   
-+
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
--   
-+
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
--   
-+
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
- 
-@@ -26,7 +26,7 @@
-    special exception, which will cause the skeleton and the resulting
-    Bison output files to be licensed under the GNU General Public
-    License without this special exception.
--   
-+
-    This special exception was added by the Free Software Foundation in
-    version 2.2 of Bison.  */
- 
--- 
-1.8.5.2.192.g7794a68
+ >>    https://lwn.net/Articles/160497/
+ >>    https://lwn.net/Articles/161086/
+ >>    http://lkml.indiana.edu/hypermail/linux/kernel/0607.0/1805.html
 
+Plus I made sure it worked in busybox and uClibc:
+
+http://lists.uclibc.org/pipermail/uclibc/2007-March/038469.html
+
+Other people picked up on it:
+
+http://www.brain-dump.org/blog/show-entry.php?id=109
+http://techoverflow.net/blog/2013/07/09/user-mode-linux-for-beginners-part-1-setup-and-first-vm/
+
+Somebody even added it to the Documentation directory a few years back 
+(while I wasn't looking):
+
+https://www.kernel.org/doc/Documentation/kbuild/kconfig.txt
+
+The problem was the kbuild maintainer at the time categorically rejected 
+the idea in a very long thread. (The replies to that "take 2" lasted two 
+weeks.) He was the maintainer, his no was final, so I went off and did 
+other things.
+
+> But maybe oldnoconfig would be a better name WRT current standard.
+>
+> Br, David
+
+As you can see from the rapid response time, I'm a touch overwhelmed of 
+late.
+
+I've been offering miniconfig stuff to people for years, but the 
+upstream guys had zero interest when I pinged 'em and still don't, last 
+I checked. When Linus yanked the giant forest of arm defconfigs he 
+decided to have kconfig snippets generate different defconfigs instead 
+of miniconfig (which turns out not to be particularly maintainable, but 
+oh well).
+
+If somebody else wanted to take the basic concept and push it upstream, 
+I'd happily review and ack, but I haven't got it in me to replicate the 
+7 years the initramfs guy spent convincing upstream to Do It My Way. I 
+scratch my own itch, offer it to other people, they say no, and after 
+about the third attempt I go do other things. My todo list runneth over, 
+no shortage of other things...
+
+Rob
