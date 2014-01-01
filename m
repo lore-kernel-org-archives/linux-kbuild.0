@@ -1,36 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga03.intel.com ([143.182.124.21]:45005 "EHLO mga03.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753532Ab3LaOjR (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 31 Dec 2013 09:39:17 -0500
-Message-ID: <52C2D713.5050501@linux.intel.com>
-Date: Tue, 31 Dec 2013 06:39:15 -0800
-From: Arjan van de Ven <arjan@linux.intel.com>
+Received: from mail-ee0-f50.google.com ([74.125.83.50]:51147 "EHLO
+	mail-ee0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756701AbaAAAQE (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 31 Dec 2013 19:16:04 -0500
 MIME-Version: 1.0
-Subject: Re: [patch core/stackprotector] stackprotector: Fix build when compiler
- lacks support
-References: <1387481759-14535-3-git-send-email-keescook@chromium.org> <tip-8779657d29c0ebcc0c94ede4df2f497baf1b563f@git.kernel.org> <alpine.DEB.2.02.1312301331520.10482@chino.kir.corp.google.com>
-In-Reply-To: <alpine.DEB.2.02.1312301331520.10482@chino.kir.corp.google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAGXu5jJxkD7rS0gFAS3mAhwxP05UMW8KNW00C_e2v=Keqj7k3Q@mail.gmail.com>
+References: <1387481759-14535-3-git-send-email-keescook@chromium.org>
+	<tip-8779657d29c0ebcc0c94ede4df2f497baf1b563f@git.kernel.org>
+	<alpine.DEB.2.02.1312301331520.10482@chino.kir.corp.google.com>
+	<CAGXu5jJxkD7rS0gFAS3mAhwxP05UMW8KNW00C_e2v=Keqj7k3Q@mail.gmail.com>
+Date: Tue, 31 Dec 2013 16:16:01 -0800
+Message-ID: <CA+55aFy65HwuqjsZhhTDBy1GYyxig8De=3XZxn8ixnGN7xWMFQ@mail.gmail.com>
+Subject: Re: [patch core/stackprotector] stackprotector: Fix build when
+ compiler lacks support
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: David Rientjes <rientjes@google.com>, Ingo Molnar <mingo@kernel.org>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, peterz@infradead.org, Andrew Morton <akpm@linux-foundation.org>, linux@arm.linux.org.uk, ralf@linux-mips.org, tglx@linutronix.de, "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org, james.hogan@imgtec.com, Michal Marek <mmarek@suse.cz>, lethal@linux-sh.org, shawn.guo@linaro.org, Kees Cook <keescook@chromium.org>, sfr@canb.auug.org.au, linux-kbuild@vger.kernel.org, linux-tip-commits@vger.kernel.org
+To: Kees Cook <keescook@chromium.org>
+Cc: David Rientjes <rientjes@google.com>, Ingo Molnar <mingo@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Andrew Morton <akpm@linux-foundation.org>, Russell King - ARM Linux <linux@arm.linux.org.uk>, Ralf Baechle <ralf@linux-mips.org>, Thomas Gleixner <tglx@linutronix.de>, "H. Peter Anvin" <hpa@zytor.com>, LKML <linux-kernel@vger.kernel.org>, Arjan van de Ven <arjan@linux.intel.com>, James Hogan <james.hogan@imgtec.com>, Michal Marek <mmarek@suse.cz>, Paul Mundt <lethal@linux-sh.org>, Shawn Guo <shawn.guo@linaro.org>, Stephen Rothwell <sfr@canb.auug.org.au>, linux-kbuild <linux-kbuild@vger.kernel.org>, "linux-tip-commits@vger.kernel.org" <linux-tip-commits@vger.kernel.org>
 
-On 12/30/2013 1:37 PM, David Rientjes wrote:
-> 8779657d29c0 ("stackprotector: Introduce CONFIG_CC_STACKPROTECTOR_STRONG")
-> causes the build to break when the compiler doesn't support
-> -fstack-protector-strong:
+On Mon, Dec 30, 2013 at 4:45 PM, Kees Cook <keescook@chromium.org> wrote:
 >
-> 	cc1: error: unrecognized command line option ‘-fstack-protector-strong’
-> 	cc1: error: unrecognized command line option ‘-fstack-protector-strong’
->
-> with at least gcc 4.6.3.
->
-> Instead of breaking the build, just warn of the failure and disable the
-> feature.
+> NAK. If you have selected CONFIG_CC_STACKPROTECTOR_STRONG, the build
+> the fail hard. Without this, it means you'll end up with kernels that
+> build and show a stackprotector option in their config, which is
+> false.
 
-ideally it also falls back to the less strict one, rather than not using stack protector at all...
+What we really really want to do is to have some way to add config
+options based on shell scripts and compiler support. That would also
+get rid of a lot of Makefile trickery etc.
 
+Then we could just make CC_STACKPROTECTOR_STRONG depend on
+CC_SUPPORTS_STACKPROTECTOR_STRONG or whatever.
 
+                Linus
