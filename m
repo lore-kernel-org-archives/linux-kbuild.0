@@ -1,61 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:33399 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752488AbaACRLA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 3 Jan 2014 12:11:00 -0500
-Message-ID: <52C6EF1C.9070809@suse.cz>
-Date: Fri, 03 Jan 2014 18:10:52 +0100
-From: Michal Marek <mmarek@suse.cz>
+Received: from relay4-d.mail.gandi.net ([217.70.183.196]:48885 "EHLO
+	relay4-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753064AbaACU3Y (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 3 Jan 2014 15:29:24 -0500
+Date: Fri, 3 Jan 2014 12:29:15 -0800
+From: Josh Triplett <josh@joshtriplett.org>
+Subject: Re: [PATCH 7/7] Makefile: Build with -Werror=date-time if the
+ compiler supports it
+Message-ID: <20140103202915.GB12111@leaf>
+References: <cover.1387833347.git.josh@joshtriplett.org>
+ <106ff2bbebe0c2c75bedf1c52a666d638b4dc20e.1387833347.git.josh@joshtriplett.org>
+ <52C6E814.7090301@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH] scripts/gcc-version.sh: handle CC="gcc -m32"
-References: <87d2l5ji06.fsf@rustcorp.com.au>
-In-Reply-To: <87d2l5ji06.fsf@rustcorp.com.au>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <52C6E814.7090301@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rusty Russell <rusty@rustcorp.com.au>, LKML <linux-kernel@vger.kernel.org>
-Cc: linux-kbuild@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 2013-12-10 08:13, Rusty Russell wrote:
-> Without it we get ugly warnings (though build still succeeds).
+On Fri, Jan 03, 2014 at 05:40:52PM +0100, Michal Marek wrote:
+> On 2013-12-23 22:56, Josh Triplett wrote:
+> > GCC 4.9 and newer have a new warning -Wdate-time, which warns on any use
+> > of __DATE__, __TIME__, or __TIMESTAMP__, which would make the build
+> > non-deterministic.  Now that the kernel does not use any of those
+> > macros, turn on -Werror=date-time if available, to keep it that way.
 > 
-> $ make -j8 CC="gcc -m32"
-> In file included from <command-line>:0:0:
-> /usr/include/stdc-predef.h:30:26: fatal error: bits/predefs.h: No such file or directory
->  #include <bits/predefs.h>
->                           ^
-> compilation terminated.
-> In file included from <command-line>:0:0:
-> /usr/include/stdc-predef.h:30:26: fatal error: bits/predefs.h: No such file or directory
->  #include <bits/predefs.h>
->                           ^
-> compilation terminated.
-> /home/rusty/devel/kernel/linux/scripts/gcc-version.sh: line 31: printf: #: invalid number
-> /home/rusty/devel/kernel/linux/scripts/gcc-version.sh: line 31: printf: #: invalid number
-> /bin/sh: 1: [: 0001: unexpected operator
->   CHK     include/config/kernel.release
->   CHK     include/generated/uapi/linux/version.h
-> make[1]: Nothing to be done for `all'.
-> ...
+> Nice, I didn't know about -Wdate-time. Do you want me to merge the
+> entire series, or do you want individual maintainers merge the patches?
+> In the latter case, I'd wait with applying 7/7 in order not to break the
+> build. At any rate, you can add
 > 
-> Signed-off-by: Rusty Russell <rusty@rustcorp.com.au>
-> 
-> diff --git a/scripts/gcc-version.sh b/scripts/gcc-version.sh
-> index 7f2126df91f2..d48b0cbaf246 100644
-> --- a/scripts/gcc-version.sh
-> +++ b/scripts/gcc-version.sh
-> @@ -14,7 +14,7 @@ if [ "$1" = "-p" ] ; then
->  	shift;
->  fi
->  
-> -compiler="$*"
-> +compiler="$1"
+> Acked-by: Michal Marek <mmarek@suse.cz>
 
-But this will break things like CC="ccache gcc". Your problem is that
-you do not have the 32bit glibc headers, right? How about invoking the
-compiler with $NOSTDINC_FLAGS, so that it does not depend on any
-userspace stuff?
+Please feel free to take the entire series through your tree; I received
+some maintainer acks, but no indications that the patches are going
+through their trees.
+
+Patch 1 should have:
+Reviewed-by: Jingoo Han <jg1.han@samsung.com>
+
+and patch 3 should have:
+Acked-by: Larry Finger <Larry.Finger@lwfinger.net>
 
 Thanks,
-Michal
+Josh Triplett
