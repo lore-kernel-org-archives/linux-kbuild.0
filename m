@@ -1,85 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from tx2ehsobe001.messaging.microsoft.com ([65.55.88.11]:26153 "EHLO
-	tx2outboundpool.messaging.microsoft.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751358AbaACQXU (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 3 Jan 2014 11:23:20 -0500
-Message-ID: <52C6E2E9.6000309@Freescale.com>
-Date: Fri, 3 Jan 2014 10:18:49 -0600
-From: Emil Medve <Emilian.Medve@Freescale.com>
+Received: from cantor2.suse.de ([195.135.220.15]:60830 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750914AbaACQZD (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 3 Jan 2014 11:25:03 -0500
+Message-ID: <52C6E45A.2040507@suse.cz>
+Date: Fri, 03 Jan 2014 17:24:58 +0100
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH] kbuild: Fix silent builds with make-4
-References: <1386280583-2735-1-git-send-email-Emilian.Medve@Freescale.com> <52C6DEE0.20600@suse.cz>
-In-Reply-To: <52C6DEE0.20600@suse.cz>
-Content-Type: text/plain; charset="ISO-8859-1"
+Subject: Re: [PATCH 1/2] deb-pkg: Fix cross-building linux-headers package
+References: <1386254255.3000.20.camel@deadeye.wl.decadent.org.uk>	<CABsPBHr2geiFPL9QtgBb4c6UnABxdpt=VpEEh_ue8a7_VQdLjA@mail.gmail.com>	<1386294039.3000.29.camel@deadeye.wl.decadent.org.uk>	<CABsPBHob2cYEVhBT8=jaJXE=oZ_c-b2iv-sLTQQthX_EZPwPpg@mail.gmail.com>	<1386295673.3000.35.camel@deadeye.wl.decadent.org.uk>	<CABsPBHq+hUCo4twA0ypVekBBj_pdXpaKFxKROGmA1hTnMdcGCg@mail.gmail.com>	<1386302655.3000.48.camel@deadeye.wl.decadent.org.uk> <CABsPBHpyRmkz+51Jiz9FqGZtqvbm-E9qvu5PA_kuMbnr=7Oenw@mail.gmail.com>
+In-Reply-To: <CABsPBHpyRmkz+51Jiz9FqGZtqvbm-E9qvu5PA_kuMbnr=7Oenw@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: "Niew, Sh." <shniew@gmail.com>, Ben Hutchings <ben@decadent.org.uk>
+Cc: linux-kbuild@vger.kernel.org, debian-kernel@lists.debian.org
 
-Hello Michal,
+On 2013-12-06 05:20, Niew, Sh. wrote:
+>>>>>>> On Thu, Dec 5, 2013 at 10:37 PM, Ben Hutchings <ben@decadent.org.uk> wrote:
+>>>>>>>> builddeb generates a control file that says the linux-headers package
+>>>>>>>> can only be built for the build system primary architecture.  This
+>>>>>>>> breaks cross-building configurations.  We should use $debarch for this
+>>>>>>>> instead.
+>>>>>>>>
+>>>>>>>> Since $debarch is not yet set when generating the control file, set
+>>>>>>>> Architecture: any and use control file variables to fill in the
+>>>>>>>> description.
+>>>>>>>>
+>>>>>>>> Fixes: cd8d60a20a45 ('kbuild: create linux-headers package in deb-pkg')
+>>>>>>>> Reported-by: "Niew, Sh." <shniew@gmail.com>
+>>>>>>>> Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+[...]
+> Thanks, the attach patch is applied.
+> And i just make it on linux-3.2.y by hand, and is successfully cross-build.
+> Haven't test in 3.12
 
+Thanks, applied to kbuild.git#misc.
 
-On 01/03/2014 10:01 AM, Michal Marek wrote:
-> On 2013-12-05 22:56, Emil Medve wrote:
->> make-4 changed the way/order it presents the command line options
->> into MAKEFLAGS
->>
->> In make-3.8x, '-s' would always be first into a group of options
->> with the '-'/hyphen removed
->>
->> $ make -p -s 2>/dev/null | grep ^MAKEFLAGS
->> MAKEFLAGS = sp
->>
->> In make-4, '-s' seems to always be last into a group of options
->> with the '-'/hyphen removed
->>
->> $ make -s -p 2>/dev/null | grep ^MAKEFLAGS
->> MAKEFLAGS = ps
->>
->> Signed-off-by: Emil Medve <Emilian.Medve@Freescale.com>
->> ---
->>  Makefile | 6 ++++++
->>  1 file changed, 6 insertions(+)
->>
->> diff --git a/Makefile b/Makefile
->> index 2c88e44..0332949 100644
->> --- a/Makefile
->> +++ b/Makefile
->> @@ -311,9 +311,15 @@ endif
->>  # If the user is running make -s (silent mode), suppress echoing of
->>  # commands
->>  
->> +ifneq ($(filter 4.%,$(MAKE_VERSION)),)	# make-4
->> +ifneq ($(filter %s -s%,$(MAKEFLAGS)),)
-> 
-> The -s% here is unnecessary for two reasons: as you say, s is always at
-> the end with make 4, and even if a long option is used, the hyphen is
-> omitted:
-> 
-> 3.82:
-> $ make -s -p --no-print-directory | grep MAKEFLAGS
-> MAKEFLAGS =  --no-print-directory -sp
-
-I was wondering how to account for the '-s%' pattern so I just preserved
-it for make-4
-
-> $ ./make/make -s -p --no-print-directory | grep MAKEFLAGS
-> GNUMAKEFLAGS :=
-> MAKEFLAGS = ps --no-print-directory
-> 
-> And according to
-> http://git.savannah.gnu.org/cgit/make.git/commit/?id=a674abe702cc0c017209a3186c32df050ff21f41,
-> the space character is always there, even if there are no single-letter
-> options. So we can do something like
-> 
-> ifneq ($(filter %s ,$(firstword x$(MAKEFLAGS))),)
-> 
-> and avoid accidentally matching things like --debug=jobs. Does the above
-> work for you?
-
-That's fine. I'll resubmit
-
-
-Cheers,
-
+Michal
