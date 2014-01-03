@@ -1,64 +1,29 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:36515 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:36697 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754021AbaACUem (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 3 Jan 2014 15:34:42 -0500
-Message-ID: <52C71EDA.6090706@suse.cz>
-Date: Fri, 03 Jan 2014 21:34:34 +0100
+	id S1753166AbaACUzV (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 3 Jan 2014 15:55:21 -0500
+Message-ID: <52C723B4.1080902@suse.cz>
+Date: Fri, 03 Jan 2014 21:55:16 +0100
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH] scripts/gcc-version.sh: handle CC="gcc -m32"
-References: <87d2l5ji06.fsf@rustcorp.com.au> <52C6EF1C.9070809@suse.cz>
-In-Reply-To: <52C6EF1C.9070809@suse.cz>
+Subject: Re: [PATCH 7/7] Makefile: Build with -Werror=date-time if the compiler
+ supports it
+References: <cover.1387833347.git.josh@joshtriplett.org> <106ff2bbebe0c2c75bedf1c52a666d638b4dc20e.1387833347.git.josh@joshtriplett.org> <52C6E814.7090301@suse.cz> <20140103202915.GB12111@leaf>
+In-Reply-To: <20140103202915.GB12111@leaf>
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rusty Russell <rusty@rustcorp.com.au>, LKML <linux-kernel@vger.kernel.org>
-Cc: linux-kbuild@vger.kernel.org
+To: Josh Triplett <josh@joshtriplett.org>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 3.1.2014 18:10, Michal Marek wrote:
-> On 2013-12-10 08:13, Rusty Russell wrote:
->> Without it we get ugly warnings (though build still succeeds).
->>
->> $ make -j8 CC="gcc -m32"
->> In file included from <command-line>:0:0:
->> /usr/include/stdc-predef.h:30:26: fatal error: bits/predefs.h: No such file or directory
->>  #include <bits/predefs.h>
->>                           ^
->> compilation terminated.
->> In file included from <command-line>:0:0:
->> /usr/include/stdc-predef.h:30:26: fatal error: bits/predefs.h: No such file or directory
->>  #include <bits/predefs.h>
->>                           ^
->> compilation terminated.
->> /home/rusty/devel/kernel/linux/scripts/gcc-version.sh: line 31: printf: #: invalid number
->> /home/rusty/devel/kernel/linux/scripts/gcc-version.sh: line 31: printf: #: invalid number
->> /bin/sh: 1: [: 0001: unexpected operator
->>   CHK     include/config/kernel.release
->>   CHK     include/generated/uapi/linux/version.h
->> make[1]: Nothing to be done for `all'.
->> ...
->>
->> Signed-off-by: Rusty Russell <rusty@rustcorp.com.au>
->>
->> diff --git a/scripts/gcc-version.sh b/scripts/gcc-version.sh
->> index 7f2126df91f2..d48b0cbaf246 100644
->> --- a/scripts/gcc-version.sh
->> +++ b/scripts/gcc-version.sh
->> @@ -14,7 +14,7 @@ if [ "$1" = "-p" ] ; then
->>  	shift;
->>  fi
->>  
->> -compiler="$*"
->> +compiler="$1"
-> 
-> But this will break things like CC="ccache gcc". Your problem is that
-> you do not have the 32bit glibc headers, right?
+On 3.1.2014 21:29, Josh Triplett wrote:
+> Please feel free to take the entire series through your tree; I received
+> some maintainer acks, but no indications that the patches are going
+> through their trees.
 
-BTW, what is the usecase for CC="gcc -m32"? AFAICS, at least x86 and
-powerpc do this for you when building a 32bit kernel.
+OK. I will wait until mid next week and commit with any acks received.
 
-Thanks,
 Michal
 
