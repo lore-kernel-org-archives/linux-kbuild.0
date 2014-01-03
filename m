@@ -1,93 +1,72 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:58425 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:60509 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751085AbaACNhP (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 3 Jan 2014 08:37:15 -0500
-Date: Fri, 3 Jan 2014 14:24:32 +0100
-From: mmarek <mmarek@suse.cz>
-Subject: Re: [PATCH] scripts: Have make TAGS not include structure members
-Message-ID: <20140103132432.GA32469@sepie.suse.cz>
-References: <20131115093645.6dc03918@gandalf.local.home>
- <CAMuHMdXSBSOkfd2MGbn=rpXQRZYw5TKLsR=3SoeSyrcD2CzunA@mail.gmail.com>
- <20131119155907.11fbdecea0aa40764a3d927a@linux-foundation.org>
- <20131119190426.27b010e4@gandalf.local.home>
- <20131119160855.2527630f87d060801d9ee3bb@linux-foundation.org>
- <20131119191435.4dce1499@gandalf.local.home>
- <528BFFBF.4050807@codeaurora.org>
- <20131119193414.48912cbd@gandalf.local.home>
+	id S1750820AbaACQBl (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 3 Jan 2014 11:01:41 -0500
+Message-ID: <52C6DEE0.20600@suse.cz>
+Date: Fri, 03 Jan 2014 17:01:36 +0100
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20131119193414.48912cbd@gandalf.local.home>
+Subject: Re: [PATCH] kbuild: Fix silent builds with make-4
+References: <1386280583-2735-1-git-send-email-Emilian.Medve@Freescale.com>
+In-Reply-To: <1386280583-2735-1-git-send-email-Emilian.Medve@Freescale.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: Stephen Boyd <sboyd@codeaurora.org>, Andrew Morton <akpm@linux-foundation.org>, Geert Uytterhoeven <geert@linux-m68k.org>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Yang Bai <hamo.by@gmail.com>
+To: Emil Medve <Emilian.Medve@Freescale.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Tue, Nov 19, 2013 at 07:34:14PM -0500, Steven Rostedt wrote:
-> I wasn't going to use this change, but instead add this change:
-[...]
-> --- linux-trace.git.orig/scripts/tags.sh	2013-11-19 19:29:34.352371615 -0500
-> +++ linux-trace.git/scripts/tags.sh	2013-11-19 19:32:37.821152204 -0500
-> @@ -218,7 +218,7 @@ exuberant()
+On 2013-12-05 22:56, Emil Medve wrote:
+> make-4 changed the way/order it presents the command line options
+> into MAKEFLAGS
+> 
+> In make-3.8x, '-s' would always be first into a group of options
+> with the '-'/hyphen removed
+> 
+> $ make -p -s 2>/dev/null | grep ^MAKEFLAGS
+> MAKEFLAGS = sp
+> 
+> In make-4, '-s' seems to always be last into a group of options
+> with the '-'/hyphen removed
+> 
+> $ make -s -p 2>/dev/null | grep ^MAKEFLAGS
+> MAKEFLAGS = ps
+> 
+> Signed-off-by: Emil Medve <Emilian.Medve@Freescale.com>
+> ---
+>  Makefile | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/Makefile b/Makefile
+> index 2c88e44..0332949 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -311,9 +311,15 @@ endif
+>  # If the user is running make -s (silent mode), suppress echoing of
+>  # commands
 >  
->  emacs()
->  {
-> -	all_target_sources | xargs $1 -a                        \
-> +	all_target_sources | xargs $@ -a                        \
->  	--regex='/^\(ENTRY\|_GLOBAL\)(\([^)]*\)).*/\2/'         \
->  	--regex='/^SYSCALL_DEFINE[0-9]?(\([^,)]*\).*/sys_\1/'   \
->  	--regex='/^TRACE_EVENT(\([^,)]*\).*/trace_\1/'		\
-> @@ -263,7 +263,7 @@ xtags()
->  	if $1 --version 2>&1 | grep -iq exuberant; then
->  		exuberant $1
->  	elif $1 --version 2>&1 | grep -iq emacs; then
-> -		emacs $1
-> +		emacs $@
->  	else
->  		all_target_sources | xargs $1 -a
->          fi
-> @@ -313,7 +313,7 @@ case "$1" in
->  
->  	"TAGS")
->  		rm -f TAGS
-> -		xtags etags
-> +		xtags etags --no-members
->  		remove_structs=y
+> +ifneq ($(filter 4.%,$(MAKE_VERSION)),)	# make-4
+> +ifneq ($(filter %s -s%,$(MAKEFLAGS)),)
 
+The -s% here is unnecessary for two reasons: as you say, s is always at
+the end with make 4, and even if a long option is used, the hyphen is
+omitted:
 
-The logic looks OK, but it is not completely obvious that $@ means
-'etags --no-members, iff called as etags'. How about using a more
-descriptive variable like this?
+3.82:
+$ make -s -p --no-print-directory | grep MAKEFLAGS
+MAKEFLAGS =  --no-print-directory -sp
+$ ./make/make -s -p --no-print-directory | grep MAKEFLAGS
+GNUMAKEFLAGS :=
+MAKEFLAGS = ps --no-print-directory
 
-diff --git a/scripts/tags.sh b/scripts/tags.sh
-index 58c4559..3afc479 100755
---- a/scripts/tags.sh
-+++ b/scripts/tags.sh
-@@ -219,7 +219,7 @@ exuberant()
- 
- emacs()
- {
--	all_target_sources | xargs $1 -a                        \
-+	all_target_sources | xargs $1 $no_members -a            \
- 	--regex='/^\(ENTRY\|_GLOBAL\)(\([^)]*\)).*/\2/'         \
- 	--regex='/^SYSCALL_DEFINE[0-9]?(\([^,)]*\).*/sys_\1/'   \
- 	--regex='/^TRACE_EVENT(\([^,)]*\).*/trace_\1/'		\
-@@ -308,12 +308,15 @@ case "$1" in
- 
- 	"tags")
- 		rm -f tags
-+		no_members=
- 		xtags ctags
- 		remove_structs=y
- 		;;
- 
- 	"TAGS")
- 		rm -f TAGS
-+		# Do not index struct members when generating Emacs TAGS
-+		no_members=--no-members
- 		xtags etags
- 		remove_structs=y
- 		;;
+And according to
+http://git.savannah.gnu.org/cgit/make.git/commit/?id=a674abe702cc0c017209a3186c32df050ff21f41,
+the space character is always there, even if there are no single-letter
+options. So we can do something like
+
+ifneq ($(filter %s ,$(firstword x$(MAKEFLAGS))),)
+
+and avoid accidentally matching things like --debug=jobs. Does the above
+work for you?
 
 Michal
