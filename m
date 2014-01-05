@@ -1,36 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from relay3-d.mail.gandi.net ([217.70.183.195]:36124 "EHLO
-	relay3-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753202AbaACVAi (ORCPT
+Received: from mail-pa0-f51.google.com ([209.85.220.51]:39707 "EHLO
+	mail-pa0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751293AbaAESa0 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 3 Jan 2014 16:00:38 -0500
-Date: Fri, 3 Jan 2014 13:00:30 -0800
-From: Josh Triplett <josh@joshtriplett.org>
-Subject: Re: [PATCH 7/7] Makefile: Build with -Werror=date-time if the
- compiler supports it
-Message-ID: <20140103210030.GE12111@leaf>
-References: <cover.1387833347.git.josh@joshtriplett.org>
- <106ff2bbebe0c2c75bedf1c52a666d638b4dc20e.1387833347.git.josh@joshtriplett.org>
- <52C6E814.7090301@suse.cz>
- <20140103202915.GB12111@leaf>
- <52C723B4.1080902@suse.cz>
+	Sun, 5 Jan 2014 13:30:26 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <52C723B4.1080902@suse.cz>
+In-Reply-To: <1388944204-13008-1-git-send-email-linux@roeck-us.net>
+References: <1388944204-13008-1-git-send-email-linux@roeck-us.net>
+Date: Sun, 5 Jan 2014 19:30:25 +0100
+Message-ID: <CAMuHMdVfr0ExtrU7bNUttJwkMXv-ZRo0A=j3gJ-=9nakP0uP+g@mail.gmail.com>
+Subject: Re: [PATCH] isdn: Build telespci and hfc_pci only for little endian CPUs
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Guenter Roeck <linux@roeck-us.net>
+Cc: Karsten Keil <isdn@linux-pingi.de>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On Fri, Jan 03, 2014 at 09:55:16PM +0100, Michal Marek wrote:
-> On 3.1.2014 21:29, Josh Triplett wrote:
-> > Please feel free to take the entire series through your tree; I received
-> > some maintainer acks, but no indications that the patches are going
-> > through their trees.
-> 
-> OK. I will wait until mid next week and commit with any acks received.
+On Sun, Jan 5, 2014 at 6:50 PM, Guenter Roeck <linux@roeck-us.net> wrote:
+> -       depends on PCI && (BROKEN || !(SPARC || PPC || PARISC || M68K || (MIPS && !CPU_LITTLE_ENDIAN) || FRV || (XTENSA && !CPU_LITTLE_ENDIAN)))
+> +       depends on CPU_LITTLE_ENDIAN && PCI && (BROKEN || !(SPARC || PPC || PARISC || M68K || MIPS || FRV || XTENSA))
 
-Thanks!
+Unfortunately CPU_LITTLE_ENDIAN is only available on architectures
+that support two endiannesses. So the above will preclude e.g. x86, which is
+where most ISDN users are.
 
-- Josh Triplett
+One solution is to move CPU_LITTLE_ENDIAN and CPU_BIG_ENDIAN to the
+common Kconfig parts. After that, the dependency above can just become
+
+    depends on CPU_LITTLE_ENDIAN && PCI.
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
