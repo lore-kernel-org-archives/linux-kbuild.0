@@ -1,68 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from slow1-d.mail.gandi.net ([217.70.178.86]:33541 "EHLO
-	slow1-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750951AbaAGLAB (ORCPT
+Received: from mail-wi0-f195.google.com ([209.85.212.195]:56040 "EHLO
+	mail-wi0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932290AbaAHVPL (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 7 Jan 2014 06:00:01 -0500
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
-	by slow1-d.mail.gandi.net (Postfix) with ESMTP id 440E747AE1E
-	for <linux-kbuild@vger.kernel.org>; Tue,  7 Jan 2014 11:38:26 +0100 (CET)
-Date: Tue, 7 Jan 2014 02:38:06 -0800
-From: Josh Triplett <josh@joshtriplett.org>
-Subject: Re: #pragma once?
-Message-ID: <20140107103806.GA4891@leaf>
-References: <20140106204706.GA16924@leaf>
- <20140107055532.GA16581@ravnborg.org>
- <CAMuHMdWPq4YgUoxE1GvQbsEJQu-wjhpra2fRDgkNfEZP0sqpVQ@mail.gmail.com>
- <52CBD247.8080508@suse.cz>
+	Wed, 8 Jan 2014 16:15:11 -0500
+Received: by mail-wi0-f195.google.com with SMTP id hm19so655790wib.2
+        for <linux-kbuild@vger.kernel.org>; Wed, 08 Jan 2014 13:15:10 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <52CBD247.8080508@suse.cz>
+Date: Wed, 8 Jan 2014 21:47:31 +0100
+Message-ID: <CALS90i9nMs6jMoH2O5S68sPF=juYOV2sfMAwaBekL8ccz3eSOQ@mail.gmail.com>
+Subject: I have a very lucrative Business
+From: "Dr. Musa Hamed" <drmusahamed01@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Andrew Morton <akpm@linux-foundation.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Rashika Kheria <rashika.kheria@gmail.com>
 
-On Tue, Jan 07, 2014 at 11:09:11AM +0100, Michal Marek wrote:
-> On 2014-01-07 10:48, Geert Uytterhoeven wrote:
-> > Furthermore some userspace may rely on doing #define XXX to avoid
-> > including a specific kernel header (yes, it's ugly).
-> 
-> This pattern is also sometimes used:
-> $ head -6 include/linux/spinlock_up.h
-> #ifndef __LINUX_SPINLOCK_UP_H
-> #define __LINUX_SPINLOCK_UP_H
-> 
-> #ifndef __LINUX_SPINLOCK_H
-> # error "please don't include this file directly"
-> #endif
-> 
-> And there is nothing ugly about it.
+ATTN: Dear,
 
-That's debatable, but it's certainly reasonable to try to enforce
-non-inclusion of "internal" headers directly.  However, for headers not
-exposed to userspace, it'd be easy to write that as:
+I am Dr. Musa Hamed Executive Director of the Bank of Africa
+Plc B.O.A,Cotonou Benin Rep. I have a very lucrative Business proposal
+worth of 21,500,000.00 USD.
 
-include/linux/spinlock.h:
-#pragma once
-#define LINUX_SPINLOCK_H_INCLUDED
+An Iraqi named Hamadi Hashem a business man made a fixed deposit of
+21,500,000.00 USD . Upon maturity several notices was sent to him,
+even during the war,eleven years ago (2003) up till this date. Again
+after the war another notification was sent and still no response came
+from him. it has been found out that Hamadi Hashem and his family had
+been killed during the war in bomb blast that hit their home at
+Mukaradeeb where his personal oil well was. I am prepared to split the
+funds with you 50%:50%.By placing you as the NEXT OF KIN to his
+deposit.
 
-include/linux/spinlock_up.h:
-#pragma once
-#ifndef LINUX_SPINLOCK_H_INCLUDED
-#error "Only include this file via spinlock.h, never directly"
-#endif
+Should you be interested in doing this deal with me, please send me
+the following information:
 
-> So #pragma once is probably a good
-> idea for most headers that are not exposed to userspace. But making it a
-> requirement in scripts/checkpatch.pl or Documentation/CodingStyle means
-> that it will become hard to defend the few legitimate uses of ifndef
-> guards against people who have a printed copy of checkpatch.pl under
-> their pillow.
+(1) Your Name
+(2) Resident Address
+(3) Your Occupation
+(4) Your Phone Number
+(5) Date of Birth
+(6) Resident Country
 
-Any mention in CodingStyle or check in checkpatch would need to cover
-the two exceptions: uapi, and headers that are intentionally parsed
-multiple times for preprocessor magic (TRACE_HEADER_MULTI_READ).
+And I will prefer you to reach me privately and securely on my personal
+email address: dr.musahamed30@yahoo.fr
+Tel: +229-988-400-97
 
-- Josh Triplett
+I will provide you with further information as soon as I hear
+positively from you.
+
+Regards,
+Dr. Musa Hamed
