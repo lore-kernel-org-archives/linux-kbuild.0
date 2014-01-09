@@ -1,52 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f195.google.com ([209.85.212.195]:56040 "EHLO
-	mail-wi0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932290AbaAHVPL (ORCPT
+Received: from mail-ve0-f180.google.com ([209.85.128.180]:40352 "EHLO
+	mail-ve0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754334AbaAIQBH (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 8 Jan 2014 16:15:11 -0500
-Received: by mail-wi0-f195.google.com with SMTP id hm19so655790wib.2
-        for <linux-kbuild@vger.kernel.org>; Wed, 08 Jan 2014 13:15:10 -0800 (PST)
+	Thu, 9 Jan 2014 11:01:07 -0500
+Received: by mail-ve0-f180.google.com with SMTP id jz11so2506761veb.25
+        for <linux-kbuild@vger.kernel.org>; Thu, 09 Jan 2014 08:01:06 -0800 (PST)
 MIME-Version: 1.0
-Date: Wed, 8 Jan 2014 21:47:31 +0100
-Message-ID: <CALS90i9nMs6jMoH2O5S68sPF=juYOV2sfMAwaBekL8ccz3eSOQ@mail.gmail.com>
-Subject: I have a very lucrative Business
-From: "Dr. Musa Hamed" <drmusahamed01@gmail.com>
+In-Reply-To: <CAAZheXmEuSB0C-xDS1HWa2npX13s5TdPfpxfmnYQU6y4r9T66A@mail.gmail.com>
+References: <jim_baxter@mentor.com>
+	<1373999390-14548-1-git-send-email-jim_baxter@mentor.com>
+	<20130716193714.GA19924@merkur.ravnborg.org>
+	<51E5B7FF.9080004@mentor.com>
+	<CAAZheXmEuSB0C-xDS1HWa2npX13s5TdPfpxfmnYQU6y4r9T66A@mail.gmail.com>
+Date: Thu, 9 Jan 2014 21:01:06 +0500
+Message-ID: <CAAZheX=QjTQtp_BPE=e1U3ZwFiWTRPbE=T0yYnsxHf05t1DvsQ@mail.gmail.com>
+Subject: Fwd: [RFC] kbuild: Build samples directory with make modules
+From: Syed Muhammad Mohsin Kazmi <08beesmmkazmi@seecs.edu.pk>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: Jim Baxter <jim_baxter@mentor.com>, "cc: Sam Ravnborg" <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-ATTN: Dear,
+Is there any specific reason that this patch is ignored still yet?
+Compiling the uImage and modules together add the support of samples?
+Shouldn't it be compiled as a module separately and that is correct
+behavior in case of if samples are compiled as loadable modules?
 
-I am Dr. Musa Hamed Executive Director of the Bank of Africa
-Plc B.O.A,Cotonou Benin Rep. I have a very lucrative Business proposal
-worth of 21,500,000.00 USD.
+Thanks,
+Mohsin Kazmi
 
-An Iraqi named Hamadi Hashem a business man made a fixed deposit of
-21,500,000.00 USD . Upon maturity several notices was sent to him,
-even during the war,eleven years ago (2003) up till this date. Again
-after the war another notification was sent and still no response came
-from him. it has been found out that Hamadi Hashem and his family had
-been killed during the war in bomb blast that hit their home at
-Mukaradeeb where his personal oil well was. I am prepared to split the
-funds with you 50%:50%.By placing you as the NEXT OF KIN to his
-deposit.
 
-Should you be interested in doing this deal with me, please send me
-the following information:
-
-(1) Your Name
-(2) Resident Address
-(3) Your Occupation
-(4) Your Phone Number
-(5) Date of Birth
-(6) Resident Country
-
-And I will prefer you to reach me privately and securely on my personal
-email address: dr.musahamed30@yahoo.fr
-Tel: +229-988-400-97
-
-I will provide you with further information as soon as I hear
-positively from you.
-
-Regards,
-Dr. Musa Hamed
+On Wed, Jul 17, 2013 at 2:15 AM, Jim Baxter <jim_baxter@mentor.com> wrote:
+>
+> On 16/07/13 20:37, Sam Ravnborg wrote:
+> > On Tue, Jul 16, 2013 at 07:29:50PM +0100, Jim Baxter wrote:
+> >> If CONFIG_SAMPLES is enabled with any of the sample
+> >> modules enabled, they are only built if the make command
+> >> includes uImage and modules (i.e. make uImage modules).
+> >
+> > With the current location samples are built when you build vmlinux.
+> > And vmlinux is implicit when you just type "make".
+> >
+> > With the suggestion you have samples are built when you do "make modules".
+> > IMO this is less logical than to built them with vmlinux as we do today.
+> >
+> >       Sam
+> >
+>
+> Hi,
+>
+> I am building it with:
+> make uImage
+> make modules
+>
+> At least bitbake in Yocto and Openembedded is.
+>
+> Running make on it's own is the equivalent of:
+> make vmlinux modules
+>
+> which builds the samples directory, however if you run:
+> make vmlinux
+> make modules
+>
+> Then the Samples are not built, that is what I am trying to fix.
+>
+> Thank you,
+> Jim
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Please read the FAQ at  http://www.tux.org/lkml/
