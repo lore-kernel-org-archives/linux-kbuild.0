@@ -1,74 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ve0-f180.google.com ([209.85.128.180]:40352 "EHLO
-	mail-ve0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754334AbaAIQBH (ORCPT
+Received: from dpocron.diepresse.apa.net ([194.232.102.6]:42153 "EHLO
+	dpocron.diepresse.apa.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754146AbaAJMop convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 9 Jan 2014 11:01:07 -0500
-Received: by mail-ve0-f180.google.com with SMTP id jz11so2506761veb.25
-        for <linux-kbuild@vger.kernel.org>; Thu, 09 Jan 2014 08:01:06 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <CAAZheXmEuSB0C-xDS1HWa2npX13s5TdPfpxfmnYQU6y4r9T66A@mail.gmail.com>
-References: <jim_baxter@mentor.com>
-	<1373999390-14548-1-git-send-email-jim_baxter@mentor.com>
-	<20130716193714.GA19924@merkur.ravnborg.org>
-	<51E5B7FF.9080004@mentor.com>
-	<CAAZheXmEuSB0C-xDS1HWa2npX13s5TdPfpxfmnYQU6y4r9T66A@mail.gmail.com>
-Date: Thu, 9 Jan 2014 21:01:06 +0500
-Message-ID: <CAAZheX=QjTQtp_BPE=e1U3ZwFiWTRPbE=T0yYnsxHf05t1DvsQ@mail.gmail.com>
-Subject: Fwd: [RFC] kbuild: Build samples directory with make modules
-From: Syed Muhammad Mohsin Kazmi <08beesmmkazmi@seecs.edu.pk>
-Content-Type: text/plain; charset=ISO-8859-1
+	Fri, 10 Jan 2014 07:44:45 -0500
+Received: from dpoportal4.diepresse.apa.net (dpoportal4.diepresse.local [192.168.0.20])
+	by dpocron.diepresse.apa.net (Postfix) with ESMTP id 8696944769
+	for <linux-kbuild@vger.kernel.org>; Fri, 10 Jan 2014 13:34:30 +0100 (CET)
+Message-ID: <1077058499.1389357270539.JavaMail.root@dpoportal4.diepresse.apa.net>
+Date: Fri, 10 Jan 2014 13:34:30 +0100 (CET)
+From: franklinbuthelezi1@yahoo.com
+Reply-To: franklinbuthelezi1@yahoo.com
+Subject: =?UTF-8?Q?DiePresse.com_Mein_Freund,_der_Fahrradh=C3=A4ndler?=
+Mime-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jim Baxter <jim_baxter@mentor.com>, "cc: Sam Ravnborg" <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
 
-Is there any specific reason that this patch is ignored still yet?
-Compiling the uImage and modules together add the support of samples?
-Shouldn't it be compiled as a module separately and that is correct
-behavior in case of if samples are compiled as loadable modules?
+Folgender Artikel auf http://diepresse.com wird Ihnen von Franklin Buthelezi empfohlen:
 
-Thanks,
-Mohsin Kazmi
+Mein Freund, der Fahrradhändler
+Manche Dinge verändern sich über die langen Wintermonate hinweg. 
+
+http://diepresse.com/home/leben/mode/kolumnezumtag/548717/index.do
+
+Notiz:
+Dear friend,
+ 
+I am the international operations manager of ABSA bank South Africa. My name is Franklin Buthelezi. I have a sensitive and private offer from the top executive to seek your partnership in re-profiling some offshore investment funds worth 11.5M U.S.D (Eleven Million five hundred thousand United States Dollars) I am constrained however to withhold most of the details for now. This is a legitimate transaction. 
+ 
+If we agree on the terms you will be given 15% of the total funds, if you are interested please write back via email providing me your personal details and phone number for further directives.
+ 
+If you are interested and willing to render your assistance please respond via my private email address stated below.
+ 
+I look forward to your response.
+ 
+Best regards
+Franklin Buthelezi
+Email: franklinbuthelezi1@yahoo.com
 
 
-On Wed, Jul 17, 2013 at 2:15 AM, Jim Baxter <jim_baxter@mentor.com> wrote:
->
-> On 16/07/13 20:37, Sam Ravnborg wrote:
-> > On Tue, Jul 16, 2013 at 07:29:50PM +0100, Jim Baxter wrote:
-> >> If CONFIG_SAMPLES is enabled with any of the sample
-> >> modules enabled, they are only built if the make command
-> >> includes uImage and modules (i.e. make uImage modules).
-> >
-> > With the current location samples are built when you build vmlinux.
-> > And vmlinux is implicit when you just type "make".
-> >
-> > With the suggestion you have samples are built when you do "make modules".
-> > IMO this is less logical than to built them with vmlinux as we do today.
-> >
-> >       Sam
-> >
->
-> Hi,
->
-> I am building it with:
-> make uImage
-> make modules
->
-> At least bitbake in Yocto and Openembedded is.
->
-> Running make on it's own is the equivalent of:
-> make vmlinux modules
->
-> which builds the samples directory, however if you run:
-> make vmlinux
-> make modules
->
-> Then the Samples are not built, that is what I am trying to fix.
->
-> Thank you,
-> Jim
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> Please read the FAQ at  http://www.tux.org/lkml/
+------------------------------------
+DiePresse.com übernimmt keine Haftung für den Inhalt der persönlichen Nachricht.
+
+© DiePresse.com - http://diepresse.com
+
