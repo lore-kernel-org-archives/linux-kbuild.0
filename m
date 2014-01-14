@@ -1,49 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from relay4-d.mail.gandi.net ([217.70.183.196]:53540 "EHLO
-	relay4-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751131AbaAMFx5 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 13 Jan 2014 00:53:57 -0500
-Date: Sun, 12 Jan 2014 21:53:45 -0800
-From: Josh Triplett <josh@joshtriplett.org>
-Subject: Re: #pragma once?
-Message-ID: <20140113055344.GA12319@leaf>
-References: <20140106204706.GA16924@leaf>
- <CA+C-WL_Z6TuWTO00gzgJo3+D-kHfjFBrfACqpaDCNxP23-LN_g@mail.gmail.com>
+Received: from cantor2.suse.de ([195.135.220.15]:35234 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751633AbaANU47 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 14 Jan 2014 15:56:59 -0500
+Message-ID: <52D5A495.80500@suse.cz>
+Date: Tue, 14 Jan 2014 21:56:53 +0100
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CA+C-WL_Z6TuWTO00gzgJo3+D-kHfjFBrfACqpaDCNxP23-LN_g@mail.gmail.com>
+Subject: Re: [PATCH 7/7] Makefile: Build with -Werror=date-time if the compiler
+ supports it
+References: <cover.1387833347.git.josh@joshtriplett.org> <106ff2bbebe0c2c75bedf1c52a666d638b4dc20e.1387833347.git.josh@joshtriplett.org> <52C6E814.7090301@suse.cz> <20140103202915.GB12111@leaf> <52C723B4.1080902@suse.cz> <20140103210030.GE12111@leaf>
+In-Reply-To: <20140103210030.GE12111@leaf>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Patrick Palka <patrick@parcs.ath.cx>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>, Andrew Morton <akpm@linux-foundation.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Michal Marek <mmarek@suse.cz>, Sam Ravnborg <sam@ravnborg.org>, Rashika Kheria <rashika.kheria@gmail.com>
+To: Josh Triplett <josh@joshtriplett.org>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Sun, Jan 12, 2014 at 11:14:56AM -0500, Patrick Palka wrote:
-> On Mon, Jan 6, 2014 at 3:47 PM, Josh Triplett <josh@joshtriplett.org> wrote:
-> > Does anyone have any objection to the use of "#pragma once" instead of
-> > the usual #ifndef-#define-...-#endif include guard?  GCC, LLVM/clang,
-> > and the latest Sparse all support either method just fine.  (I added
-> > support to Sparse myself.)  Both have equivalent performance.  "#pragma
-> > once" is simpler, and avoids the possibility of a typo in the defined
-> > guard symbol.
+Dne 3.1.2014 22:00, Josh Triplett napsal(a):
+> On Fri, Jan 03, 2014 at 09:55:16PM +0100, Michal Marek wrote:
+>> On 3.1.2014 21:29, Josh Triplett wrote:
+>>> Please feel free to take the entire series through your tree; I received
+>>> some maintainer acks, but no indications that the patches are going
+>>> through their trees.
+>>
+>> OK. I will wait until mid next week and commit with any acks received.
 > 
-> Unfortunately in GCC #pragma once is slower and slightly buggier than
-> regular include guards:
-> 
-> http://gcc.gnu.org/bugzilla/show_bug.cgi?id=52566
-> http://gcc.gnu.org/bugzilla/show_bug.cgi?id=58770
+> Thanks!
 
-The bug in question doesn't seem to apply to any likely use in the Linux
-kernel.
+I did not find time last week and Greg was faster and merged the driver
+patches. But I'm reluctant to only merge the Makefile patch now, because
+the kbuild branch would not build. I think I will send the patch to
+Linus after 3.14-rc1.
 
-As for performance, that benchmark seems somewhat odd to me, and I'm not
-entirely convinced that it's representative of real-world projects,
-which don't typically include ten thousand include files in one
-compilation.  I've benchmarked the case of a single main.c including a
-single guarded.h with both types of guards, and found the two guard
-types indistinguishable in performance.  Beyond that, I'd say real-world
-benchmarks would be preferable to artificial ones before declaring a
-performance difference between the two types of guards.
-
-- Josh Trpilett
+Michal
