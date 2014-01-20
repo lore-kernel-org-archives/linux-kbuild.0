@@ -1,76 +1,92 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.mei.co.jp ([133.183.100.20]:40943 "EHLO smtp.mei.co.jp"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750707AbaATFLC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 20 Jan 2014 00:11:02 -0500
-Received: from mail-gw.jp.panasonic.com ([157.8.1.157])
-	by smtp.mei.co.jp (8.12.11.20060614/3.7W/kc-maile11) with ESMTP id s0K5B0Zc006254
-	for <linux-kbuild@vger.kernel.org>; Mon, 20 Jan 2014 14:11:00 +0900 (JST)
-Received: from epochmail.jp.panasonic.com ([157.8.1.130])
-	by mail.jp.panasonic.com (8.11.6p2/3.7W/kc-maili16) with ESMTP id s0K5B0M23755
-	for <linux-kbuild@vger.kernel.org>; Mon, 20 Jan 2014 14:11:00 +0900
-From: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Subject: [PATCH] kbuild: docbook: use $(obj) and $(src) rather than specific path
-Date: Mon, 20 Jan 2014 14:10:59 +0900
-Message-Id: <1390194659-15155-1-git-send-email-yamada.m@jp.panasonic.com>
+Received: from cdptpa-outbound-snat.email.rr.com ([107.14.166.226]:32085 "EHLO
+	cdptpa-oedge-vip.email.rr.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1753737AbaATPeH (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 20 Jan 2014 10:34:07 -0500
+Date: Mon, 20 Jan 2014 10:34:03 -0500
+From: Steven Rostedt <rostedt@goodmis.org>
+Subject: [GIT PULL] localmodconfig: Add config depends by default settings
+Message-ID: <20140120103403.33012eb2@gandalf.local.home>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.m@jp.panasonic.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org
 
-Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
----
- Documentation/DocBook/Makefile | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/Documentation/DocBook/Makefile b/Documentation/DocBook/Makefile
-index bc3d9f8..6ea50a3 100644
---- a/Documentation/DocBook/Makefile
-+++ b/Documentation/DocBook/Makefile
-@@ -16,7 +16,7 @@ DOCBOOKS := z8530book.xml device-drivers.xml \
- 	    alsa-driver-api.xml writing-an-alsa-driver.xml \
- 	    tracepoint.xml drm.xml media_api.xml
- 
--include $(srctree)/Documentation/DocBook/media/Makefile
-+include $(srctree)/$(src)/media/Makefile
- 
- ###
- # The build process is as follows (targets):
-@@ -57,14 +57,14 @@ mandocs: $(MAN)
- 
- installmandocs: mandocs
- 	mkdir -p /usr/local/man/man9/
--	install Documentation/DocBook/man/*.9.gz /usr/local/man/man9/
-+	install $(obj)/man/*.9.gz /usr/local/man/man9/
- 
- ###
- #External programs used
- KERNELDOC = $(srctree)/scripts/kernel-doc
- DOCPROC   = $(objtree)/scripts/docproc
- 
--XMLTOFLAGS = -m $(srctree)/Documentation/DocBook/stylesheet.xsl
-+XMLTOFLAGS = -m $(srctree)/$(src)/stylesheet.xsl
- XMLTOFLAGS += --skip-validation
- 
- ###
-@@ -138,7 +138,7 @@ quiet_cmd_db2pdf = PDF     $@
- 
- 
- index = index.html
--main_idx = Documentation/DocBook/$(index)
-+main_idx = $(obj)/$(index)
- build_main_index = rm -rf $(main_idx); \
- 		   echo '<h1>Linux Kernel HTML Documentation</h1>' >> $(main_idx) && \
- 		   echo '<h2>Kernel Version: $(KERNELVERSION)</h2>' >> $(main_idx) && \
-@@ -147,7 +147,7 @@ build_main_index = rm -rf $(main_idx); \
- quiet_cmd_db2html = HTML    $@
-       cmd_db2html = xmlto xhtml $(XMLTOFLAGS) -o $(patsubst %.html,%,$@) $< && \
- 		echo '<a HREF="$(patsubst %.html,%,$(notdir $@))/index.html"> \
--        $(patsubst %.html,%,$(notdir $@))</a><p>' > $@
-+		$(patsubst %.html,%,$(notdir $@))</a><p>' > $@
- 
- %.html:	%.xml
- 	@(which xmlto > /dev/null 2>&1) || \
--- 
-1.8.3.2
+Linus,
 
+While debugging the problem with localmodconfig and the ALSA codec
+modules all being set, I discovered a small bug in the dependency
+logic.
+
+If a config has a dependency based on its setting value, localmodcondig
+misses it.
+
+For example:
+
+config FOO
+    default y if BAR || ZOO
+
+If FOO is needed for a module and is set to '=m', and so are BAR or ZOO,
+localmodconfig will not see that BAR or ZOO are also needed for the foo
+module, and will incorrectly disable them.
+
+Please pull the latest localmodconfig-v3.14 tree, which can be found at:
+
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/rostedt/linux-kconfig.git
+localmodconfig-v3.14
+
+Tag SHA1: 3e4892e9201af46ba6df30b7bb8925da06f28cbc
+Head SHA1: 95edca5c523c4b404dd60baa0a1bea0e4c38fd72
+
+
+Steven Rostedt (Red Hat) (1):
+      localmodconfig: Add config depends by default settings
+
+----
+ scripts/kconfig/streamline_config.pl | 7 +++++++
+ 1 file changed, 7 insertions(+)
+---------------------------
+commit 95edca5c523c4b404dd60baa0a1bea0e4c38fd72
+Author: Steven Rostedt (Red Hat) <rostedt@goodmis.org>
+Date:   Wed Dec 18 12:35:20 2013 -0500
+
+    localmodconfig: Add config depends by default settings
+    
+    Currently localmodconfig will miss dependencies from the default option.
+    For example:
+    
+    config FOO
+    	default y if BAR || ZOO
+    
+    If FOO is needed for a module and is set to '=m', and so are BAR or ZOO,
+    localmodconfig will not see that BOO or ZOO are also needed for the foo
+    module, and will incorrectly disable them.
+    
+    Link: http://lkml.kernel.org/r/20131218175137.162937350@goodmis.org
+    
+    Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
+
+diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
+index 4606cdf..3133172 100644
+--- a/scripts/kconfig/streamline_config.pl
++++ b/scripts/kconfig/streamline_config.pl
+@@ -219,6 +219,13 @@ sub read_kconfig {
+ 	    $depends{$config} = $1;
+ 	} elsif ($state eq "DEP" && /^\s*depends\s+on\s+(.*)$/) {
+ 	    $depends{$config} .= " " . $1;
++	} elsif ($state eq "DEP" && /^\s*def(_(bool|tristate)|ault)\s+(\S.*)$/) {
++	    my $dep = $3;
++	    if ($dep !~ /^\s*(y|m|n)\s*$/) {
++		$dep =~ s/.*\sif\s+//;
++		$depends{$config} .= " " . $dep;
++		dprint "Added default depends $dep to $config\n";
++	    }
+ 
+ 	# Get the configs that select this config
+ 	} elsif ($state ne "NONE" && /^\s*select\s+(\S+)/) {
