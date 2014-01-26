@@ -1,18 +1,18 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.standardelectronics.com ([74.92.67.124]:55453 "EHLO
+Received: from mail.standardelectronics.com ([74.92.67.124]:55337 "EHLO
 	mail.standardelectronics.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1753497AbaAZXjI convert rfc822-to-8bit
+	by vger.kernel.org with ESMTP id S1753414AbaAZXjB convert rfc822-to-8bit
 	(ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 26 Jan 2014 18:39:08 -0500
+	Sun, 26 Jan 2014 18:39:01 -0500
 Content-Type: text/plain; charset=US-ASCII
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7BIT
 Content-Description: Mail message body
 Subject: Kind Regards
 From: Abdul Nasser <abdulnas500@justin.ddo.jp>
-Date: Sun, 26 Jan 2014 21:52:40 +0000
+Date: Sun, 26 Jan 2014 22:31:19 +0000
 Reply-To: s.abdulnasser@yahoo.com.hk
-Message-ID: <SECEXCHANGE3MSi6xzm000040c4@mail.standardelectronics.com>
+Message-ID: <SECEXCHANGESZ2wleBC000062cb@mail.standardelectronics.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Recipients <abdulnas500@justin.ddo.jp>
