@@ -1,26 +1,33 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.standardelectronics.com ([74.92.67.124]:55337 "EHLO
-	mail.standardelectronics.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1753414AbaAZXjB convert rfc822-to-8bit
-	(ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 26 Jan 2014 18:39:01 -0500
-Content-Type: text/plain; charset=US-ASCII
+Received: from cantor2.suse.de ([195.135.220.15]:47195 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754237AbaA0U7P (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 27 Jan 2014 15:59:15 -0500
+Message-ID: <52E6C89E.3010406@suse.cz>
+Date: Mon, 27 Jan 2014 21:59:10 +0100
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Description: Mail message body
-Subject: Kind Regards
-From: Abdul Nasser <abdulnas500@justin.ddo.jp>
-Date: Sun, 26 Jan 2014 22:31:19 +0000
-Reply-To: s.abdulnasser@yahoo.com.hk
-Message-ID: <SECEXCHANGESZ2wleBC000062cb@mail.standardelectronics.com>
+Subject: Re: Patch tracking tool used?
+References: <20131212123936.0714.AA925319@jp.panasonic.com>
+In-Reply-To: <20131212123936.0714.AA925319@jp.panasonic.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Recipients <abdulnas500@justin.ddo.jp>
+To: Masahiro Yamada <yamada.m@jp.panasonic.com>, linux-kbuild@vger.kernel.org
 
-Greetings,
-My name is Abdul Nasser Sokariah and I am writing you from Syria, I choose to contact you directly as I need a reliable person to trust who can help me handle my huge deposit  with a vault company in EUROPE, and based on my present situation in Syria, I need you urgently to take possession of everything and further modalities/directives will follow.Please reply to my private  Email: nasserabdul190@yahoo.com
+Dne 12.12.2013 04:39, Masahiro Yamada napsal(a):
+> Hi.
+> 
+> I am a new subscriber of this ML.
+> (And a new Linux developer too.)
+> 
+> Is there any patch tracking tool such as Patchwork
+> used for linux-kbuild subsystem?
 
-I wait for your response.
+No, because many of the kbuild-related patches are only sent to lkml and
+not linux-kbuild.
 
-Yours truly,
-Abdul Nasser Sokariah
+
+Michal
+
