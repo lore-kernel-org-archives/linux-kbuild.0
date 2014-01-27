@@ -1,45 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:47343 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:48503 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754297AbaA0VIo (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 27 Jan 2014 16:08:44 -0500
-Message-ID: <52E6CAD7.2020208@suse.cz>
-Date: Mon, 27 Jan 2014 22:08:39 +0100
+	id S1753861AbaA0W5i (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 27 Jan 2014 17:57:38 -0500
+Message-ID: <52E6E45C.1010805@suse.cz>
+Date: Mon, 27 Jan 2014 23:57:32 +0100
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH 3/3] mn10300: Remove redundent debugging info flag
-References: <cover.1386804405.git.geoff@infradead.org> <e9d530c5b8b1c9a8510d9c8db8663aedc393de8f.1386804405.git.geoff@infradead.org>
-In-Reply-To: <e9d530c5b8b1c9a8510d9c8db8663aedc393de8f.1386804405.git.geoff@infradead.org>
-Content-Type: text/plain; charset=ISO-8859-2
+Subject: Re: [PATCH 7/7] Makefile: Build with -Werror=date-time if the compiler
+ supports it
+References: <cover.1387833347.git.josh@joshtriplett.org> <106ff2bbebe0c2c75bedf1c52a666d638b4dc20e.1387833347.git.josh@joshtriplett.org> <52C6E814.7090301@suse.cz> <20140103202915.GB12111@leaf> <52C723B4.1080902@suse.cz> <20140103210030.GE12111@leaf> <52D5A495.80500@suse.cz> <20140114214014.GA10837@jtriplet-mobl1> <20140114214614.GA26965@kroah.com>
+In-Reply-To: <20140114214614.GA26965@kroah.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Geoff Levand <geoff@infradead.org>
-Cc: linux-kbuild@vger.kernel.org, David Howells <dhowells@redhat.com>
+To: Josh Triplett <josh@joshtriplett.org>
+Cc: Greg KH <gregkh@linux-foundation.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Dne 12.12.2013 00:34, Geoff Levand napsal(a):
-> The gereric makefile now sets '-Wa,--gdwarf2' in KBUILD_AFLAGS, so
-> this setting is no longer needed in arch makefiles.
+On 14.1.2014 22:46, Greg KH wrote:
+> On Tue, Jan 14, 2014 at 01:40:15PM -0800, Josh Triplett wrote:
+>> On Tue, Jan 14, 2014 at 09:56:53PM +0100, Michal Marek wrote:
+>>> Dne 3.1.2014 22:00, Josh Triplett napsal(a):
+>>>> On Fri, Jan 03, 2014 at 09:55:16PM +0100, Michal Marek wrote:
+>>>>> On 3.1.2014 21:29, Josh Triplett wrote:
+>>>>>> Please feel free to take the entire series through your tree; I received
+>>>>>> some maintainer acks, but no indications that the patches are going
+>>>>>> through their trees.
+>>>>>
+>>>>> OK. I will wait until mid next week and commit with any acks received.
+>>>>
+>>>> Thanks!
+>>>
+>>> I did not find time last week and Greg was faster and merged the driver
+>>> patches. But I'm reluctant to only merge the Makefile patch now, because
+>>> the kbuild branch would not build. I think I will send the patch to
+>>> Linus after 3.14-rc1.
+>>
+>> Greg, if you already have all the driver patches in your tree, perhaps
+>> you could go ahead and take the Makefile patch through your tree as
+>> well?  (Assuming that's OK with you, Michal?)
 > 
-> Cc: David Howells <dhowells@redhat.com>
-> Signed-off-by: Geoff Levand <geoff@infradead.org> for Huawei, Linaro
-> ---
->  arch/mn10300/Makefile | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/arch/mn10300/Makefile b/arch/mn10300/Makefile
-> index a3d0fef..f5a9db9 100644
-> --- a/arch/mn10300/Makefile
-> +++ b/arch/mn10300/Makefile
-> @@ -97,7 +97,6 @@ endef
->  # that are unhelpful whilst debugging.
->  ifdef CONFIG_DEBUG_INFO
->  #KBUILD_CFLAGS	+= -O1
-> -KBUILD_AFLAGS	+= -Wa,--gdwarf2
->  endif
+> Did I really grab all of the other patches?  I don't remember how many
+> there were in this series for stuff I maintain.  If I have them all,
+> sure, I'll be glad to take it, otherwise I agree with Michal, it should
+> be sent to Linus after 3.14-rc1 is out to make sure everything is
+> properly synced up and you didn't miss any new drivers coming in that
+> missed getting converted.
 
-This leaves only a commented-out assignment in the ifdef block. Just
-remove it completely together with the outdated comment above. Same for
-the frv Makefile.
+FYI: The remaining patches are now in the kbuild.git#drop-time branch
+and also in the for-next branch.
 
+Thanks,
 Michal
