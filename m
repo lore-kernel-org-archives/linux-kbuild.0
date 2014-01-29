@@ -1,35 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:54889 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:59206 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753775AbaA1KQt (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 28 Jan 2014 05:16:49 -0500
-Message-ID: <52E7838E.2070503@suse.cz>
-Date: Tue, 28 Jan 2014 11:16:46 +0100
+	id S1750851AbaA2Va5 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 29 Jan 2014 16:30:57 -0500
+Date: Wed, 29 Jan 2014 22:30:56 +0100
 From: Michal Marek <mmarek@suse.cz>
+Subject: [GIT] kbuild changes for v3.14-rc1
+Message-ID: <20140129213056.GA1335@pobox.suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH V2 2/3] frv: Remove redundant debugging info flag
-References: <cover.1386804405.git.geoff@infradead.org>	 <fb11b985956d286c2cece8a843c2ff6121c0e78a.1386804405.git.geoff@infradead.org> <1390873714.5027.55.camel@smoke>
-In-Reply-To: <1390873714.5027.55.camel@smoke>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Geoff Levand <geoff@infradead.org>
-Cc: linux-kbuild@vger.kernel.org, David Howells <dhowells@redhat.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Emilian.Medve@Freescale.com, fbuihuu@gmail.com, gang.chen.5i5j@gmail.com, geoff@infradead.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 28.1.2014 02:48, Geoff Levand wrote:
-> The generic makefile now sets '-Wa,--gdwarf2' in KBUILD_AFLAGS, so
-> this setting is no longer needed in arch makefiles.
-> 
-> Also remove a commented out addition of a -O1 to KBUILD_CFLAGS, and
-> comment text relating to these removed lines.
-> 
-> Cc: David Howells <dhowells@redhat.com>
-> Signed-off-by: Geoff Levand <geoff@infradead.org> for Huawei, Linaro
-> ---
-> v2: Removed unused CONFIG_DEBUG_INFO conditional and related text comment.
+Hi Linus,
 
-Thanks, I added v2 of 2/3 and 3/3 to kbuild.git#kbuild.
+please pull these kbuild bits for v3.14-rc1:
+- Fix make -s detection with make-4.0
+- Fix for scripts/setlocalversion when the kernel repository is a
+  submodule
+- Do not hardcode ';' in macros that expand to assembler code, as some
+  architectures' assemblers use a different character for newline
+- Fix passing --gdwarf-2 to the assembler
 
+Thanks,
 Michal
 
+The following changes since commit 6ce4eac1f600b34f2f7f58f9cd8f0503d79e42ae:
+
+  Linux 3.13-rc1 (2013-11-22 11:30:55 -0800)
+
+are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git kbuild
+
+Chen Gang (1):
+      arch: use ASM_NL instead of ';' for assembler new line character in the macro
+
+Emil Medve (1):
+      kbuild: Fix silent builds with make-4
+
+Franck Bui-Huu (1):
+      Fix detectition of kernel git repository in setlocalversion script [take #2]
+
+Geoff Levand (3):
+      kbuild: Fix debugging info generation for .S files
+      mn10300: Remove redundant debugging info flag
+      frv: Remove redundant debugging info flag
+
+ Makefile                       |    8 +++++++-
+ arch/arc/include/asm/linkage.h |    2 ++
+ arch/frv/Makefile              |    7 -------
+ arch/mn10300/Makefile          |    8 --------
+ include/linux/linkage.h        |   19 ++++++++++++-------
+ scripts/setlocalversion        |    3 ++-
+ 6 files changed, 23 insertions(+), 24 deletions(-)
