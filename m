@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:23866 "EHLO mga09.intel.com"
+Received: from mga14.intel.com ([143.182.124.37]:2453 "EHLO mga14.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751386AbaBHICO (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	id S1751818AbaBHICO (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
 	Sat, 8 Feb 2014 03:02:14 -0500
 From: Andi Kleen <ak@linux.intel.com>
-Subject: [PATCH 11/17] Kbuild, lto: Disable LTO for asm-offsets.c
-Date: Sat,  8 Feb 2014 09:01:15 +0100
-Message-Id: <1391846481-31491-11-git-send-email-ak@linux.intel.com>
+Subject: [PATCH 12/17] Kbuild, lto: Set TMPDIR for LTO
+Date: Sat,  8 Feb 2014 09:01:16 +0100
+Message-Id: <1391846481-31491-12-git-send-email-ak@linux.intel.com>
 In-Reply-To: <1391846481-31491-1-git-send-email-ak@linux.intel.com>
 References: <1391846481-31491-1-git-send-email-ak@linux.intel.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -14,27 +14,44 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
 Cc: linux-kbuild@vger.kernel.org, x86@kernel.org, Andi Kleen <ak@linux.intel.com>
 
-The asm-offset.c technique to fish data out of the assembler file
-does not work with LTO. Just disable for the asm-offset.c build.
+LTO gcc puts a lot of data into $TMPDIR, essentially another copy
+of the object directory to pass the repartitioned object files
+to the code generation processes.
+
+TMPDIR defaults to /tmp With /tmp as tmpfs it's easy to drive systems to
+out of memory, because they will compete with the already high anonymous
+memory consumption of the wpa LTO pass.
+
+When LTO is set always set TMPDIR to the object directory. This could
+be slightly slower, but is far safer and eliminates another parameter
+the LTO user would need to set manually.
+
+I made it conditional on LTO for now.
 
 Signed-off-by: Andi Kleen <ak@linux.intel.com>
 ---
- scripts/Makefile.build | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ Makefile | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index d5d859c..9f0ee22 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -198,7 +198,7 @@ $(multi-objs-y:.o=.s)   : modname = $(modname-multi)
- $(multi-objs-y:.o=.lst) : modname = $(modname-multi)
+diff --git a/Makefile b/Makefile
+index 606ef7c..d1189ea 100644
+--- a/Makefile
++++ b/Makefile
+@@ -407,6 +407,14 @@ export KBUILD_AFLAGS_MODULE KBUILD_CFLAGS_MODULE KBUILD_LDFLAGS_MODULE
+ export KBUILD_AFLAGS_KERNEL KBUILD_CFLAGS_KERNEL
+ export KBUILD_ARFLAGS
  
- quiet_cmd_cc_s_c = CC $(quiet_modtag)  $@
--cmd_cc_s_c       = $(CC) $(c_flags) -fverbose-asm -S -o $@ $<
-+cmd_cc_s_c       = $(CC) $(c_flags) $(DISABLE_LTO) -fverbose-asm -S -o $@ $<
- 
- $(obj)/%.s: $(src)/%.c FORCE
- 	$(call if_changed_dep,cc_s_c)
++ifdef CONFIG_LTO
++# LTO gcc creates a lot of files in TMPDIR, and with /tmp as tmpfs
++# it's easy to drive the machine OOM. Use the object directory
++# instead
++TMPDIR := ${objtree}
++export TMPDIR
++endif
++
+ # When compiling out-of-tree modules, put MODVERDIR in the module
+ # tree rather than in the kernel tree. The kernel tree might
+ # even be read-only.
 -- 
 1.8.5.2
 
