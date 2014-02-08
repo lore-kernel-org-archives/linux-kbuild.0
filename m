@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga14.intel.com ([143.182.124.37]:48866 "EHLO mga14.intel.com"
+Received: from mga01.intel.com ([192.55.52.88]:35074 "EHLO mga01.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751823AbaBHICO (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	id S1751831AbaBHICO (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
 	Sat, 8 Feb 2014 03:02:14 -0500
 From: Andi Kleen <ak@linux.intel.com>
-Subject: [PATCH 09/17] Kbuild, lto: add ld-version and ld-ifversion macros
-Date: Sat,  8 Feb 2014 09:01:13 +0100
-Message-Id: <1391846481-31491-9-git-send-email-ak@linux.intel.com>
+Subject: [PATCH 15/17] Kbuild, lto: Add LTO build Documentation
+Date: Sat,  8 Feb 2014 09:01:19 +0100
+Message-Id: <1391846481-31491-15-git-send-email-ak@linux.intel.com>
 In-Reply-To: <1391846481-31491-1-git-send-email-ak@linux.intel.com>
 References: <1391846481-31491-1-git-send-email-ak@linux.intel.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -14,49 +14,141 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
 Cc: linux-kbuild@vger.kernel.org, x86@kernel.org, Andi Kleen <ak@linux.intel.com>
 
-To check the linker version. Used by the LTO makefile.
+Add build documentation for LTO.
 
 Signed-off-by: Andi Kleen <ak@linux.intel.com>
 ---
- scripts/Kbuild.include | 9 +++++++++
- scripts/ld-version.sh  | 8 ++++++++
- 2 files changed, 17 insertions(+)
- create mode 100755 scripts/ld-version.sh
+ Documentation/lto-build | 121 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 121 insertions(+)
+ create mode 100644 Documentation/lto-build
 
-diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index 547e15d..93a0da2 100644
---- a/scripts/Kbuild.include
-+++ b/scripts/Kbuild.include
-@@ -155,6 +155,15 @@ ld-option = $(call try-run,\
- # Important: no spaces around options
- ar-option = $(call try-run, $(AR) rc$(1) "$$TMP",$(1),$(2))
- 
-+# ld-version
-+# Usage: $(call ld-version)
-+# Note this is mainly for HJ Lu's 3 number binutil versions
-+ld-version = $(shell $(LD) --version | $(srctree)/scripts/ld-version.sh)
-+
-+# ld-ifversion
-+# Usage:  $(call ld-ifversion, -ge, 22252, y)
-+ld-ifversion = $(shell [ $(call ld-version) $(1) $(2) ] && echo $(3))
-+
- ######
- 
- ###
-diff --git a/scripts/ld-version.sh b/scripts/ld-version.sh
-new file mode 100755
-index 0000000..198580d
+diff --git a/Documentation/lto-build b/Documentation/lto-build
+new file mode 100644
+index 0000000..4c8a713
 --- /dev/null
-+++ b/scripts/ld-version.sh
-@@ -0,0 +1,8 @@
-+#!/usr/bin/awk -f
-+# extract linker version number from stdin and turn into single number
-+	{
-+	gsub(".*)", "");
-+	split($1,a, ".");
-+	print a[1]*10000000 + a[2]*100000 + a[3]*10000 + a[4]*100 + a[5];
-+	exit
-+	}
++++ b/Documentation/lto-build
+@@ -0,0 +1,121 @@
++Link time optimization (LTO) for the Linux kernel
++
++This is an experimental feature which still has various problems.
++
++Link Time Optimization allows the compiler to optimize the complete program
++instead of just each file.  Link Time Optimization was a new feature in gcc 4.6,
++but only really works with gcc 4.7. The kernel LTO build also requires
++the Linux binutils (the normal FSF releases do not work at the moment)
++
++The compiler can inline functions between files and do some other global
++optimizations.  It will also drop unused functions which can make the kernel
++image smaller in some circumstances.  The binary gets somewhat larger.
++In return the resulting kernels (usually) have better performance.
++
++Build time and memory consumption at build time will increase.
++The build time penalty depends on the size of the vmlinux. Reasonable
++sized vmlinux build about twice as long, much larger monolithic kernels
++like allyesconfig ~4x as long. Modular kernels are less affected.
++
++Normal "reasonable" builds work with less than 4GB of RAM, but very large
++configurations like allyesconfig may need more memory. The actual
++memory needed depends on the available memory (gcc sizes its garbage
++collector pools based on that or on the ulimit -m limits)
++
++Issues:
++- Various workarounds in kernel needed for toolchain problems.
++- A few kernel features are currently incompatible with LTO, in particular
++function tracing, because they require special compiler flags for
++specific files, which is not supported in LTO right now.
++- The build is faster with LTO_SLIM enabled, but this still triggers
++problems in some circumstances (currently disabled)
++- Jobserver control for -j does not work correctly for the final
++LTO phase. The makefiles hardcodes -j<number of online cpus>
++
++Configuration:
++- Enable CONFIG_LTO_MENU and then disable CONFIG_LTO_DISABLE.
++This is mainly to not have allyesconfig default to LTO.
++- FUNCTION_TRACER, STACK_TRACER, FUNCTION_GRAPH_TRACER have to disabled
++because they are currently incompatible with LTO.
++- MODVERSIONS have to be disabled because they are not fixed for LTO
++yet.
++
++Requirements:
++- Enough memory: 4GB for a standard build, more for allyesconfig
++If you are tight on memory and use tmpfs as /tmp define TMPDIR and
++point it to a directory on disk.  The peak memory usage
++happens single threaded (when lto-wpa merges types), so dialing
++back -j options will not help much.
++
++A 32bit compiler is unlikely to work due to the memory requirements.
++You can however build a kernel targetted at 32bit on a 64bit host.
++
++- Get the Linux binutils from
++http://www.kernel.org/pub/linux/devel/binutils/
++Sorry standard binutils releases don't work
++The kernel build has to use this linker, so if it is installed
++in a non standard location use LD=... on the make line.
++
++- gcc 4.7 built with plugin ld (--with-plugin-ld) also pointing to the
++linker from the Linux binutils and LTO
++
++If the gcc is not built with this option it may also work to put the correct
++binutils linker first in $PATH when building. I haven't tested
++this however.
++
++Example build procedure for the tool chain and kernel. This does not
++overwrite the standard compiler toolchain on the system. If you already
++have a suitable gcc 4.7+ compiler and linker the toolchain build can
++be skipped (note that a distribution gcc 4.7 is not necessarily
++correctly configured for LTO)
++
++Get the Linux binutils from http://www.kernel.org/pub/linux/devel/binutils/
++The standard binutils do not work at this point!
++
++Unpack binutils
++
++cd binutils-VERSION  (or plain binutils in some versions)
++./configure --prefix=/opt/binutils-VERSION --enable-plugins
++nice -n20 make -j$(getconf _NPROCESSORS_ONLN)
++sudo make install
++sudo ln -sf /opt/binutils-VERSION/bin/ld /usr/local/bin/ld-plugin
++
++Unpack gcc-4.7
++
++mkdir obj-gcc
++# please don't skip this cd. the build will not work correctly in the
++# source dir, you have to use the separate object dir
++cd obj-gcc
++# make sure to install gmp-devel and mpfr-devel
++# and the 32bit glibc package if you have a multilib system
++# if mpc-devel is not there get it from
++# http://www.multiprecision.org/mpc/download/mpc-0.8.2.tar.gz
++# and install in gcc-4.7*/mpc
++../gcc-4.7*/configure --prefix=/opt/gcc-4.7 --enable-lto \
++--with-plugin-ld=/usr/local/bin/ld-plugin  \
++--disable-nls --enable-languages=c,c++ \
++--disable-libstdcxx-pch
++nice -n20 make -j$(getconf _NPROCESSORS_ONLN)
++sudo make install-no-fixedincludes
++sudo ln -sf /opt/gcc-4.7/bin/gcc /usr/local/bin/gcc47
++sudo ln -sf /opt/gcc-4.7/bin/gcc-ar /usr/local/bin/gcc-ar47
++
++# get lto tree in linux-lto
++
++mkdir obj-lto
++cd obj-lto
++# copy a suitable kernel config file into .config
++make -C ../linux-lto O=$(pwd)  oldconfig
++./source/scripts/config --disable function_tracer --disable function_graph_tracer \
++			 --disable stack_tracer --enable lto_menu \
++                         --disable lto_disable --disable lto_debug --disable lto_slim
++export TMPDIR=$(pwd)
++# this lowers memory usage with /tmp=tmpfs
++# note the special ar is only needed if CONFIG_LTO_SLIM is enabled
++# The PATH is that gcc-ar finds a plugin aware ar, if your standard
++# binutils doesn't support that. If the standard ar supports --plugin
++# it is not needed
++PATH=/opt/binutils-VERSION:$PATH nice -n20 make CC=gcc47 LD=ld-plugin AR=gcc-ar47 \
++-j $(getconf _NPROCESSORS_ONLN)
++
++Andi Kleen
 -- 
 1.8.5.2
 
