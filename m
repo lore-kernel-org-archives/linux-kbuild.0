@@ -1,44 +1,96 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from terminus.zytor.com ([198.137.202.10]:42798 "EHLO mail.zytor.com"
+Received: from mga01.intel.com ([192.55.52.88]:8397 "EHLO mga01.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751022AbaBHVoT (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 8 Feb 2014 16:44:19 -0500
-In-Reply-To: <20140208202124.GK12219@tassilo.jf.intel.com>
-References: <1391846481-31491-1-git-send-email-ak@linux.intel.com> <1391846481-31491-2-git-send-email-ak@linux.intel.com> <52F67CD7.5090609@zytor.com> <20140208202124.GK12219@tassilo.jf.intel.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain;
- charset=UTF-8
-Subject: Re: [PATCH 02/17] x86, lto: Disable fancy hweight optimizations for LTO v2
-From: "H. Peter Anvin" <hpa@zytor.com>
-Date: Sat, 08 Feb 2014 13:43:29 -0800
-Message-ID: <bbf468ff-4a69-4e51-afc4-d894f459ded7@email.android.com>
+	id S1751224AbaBHXFy (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 8 Feb 2014 18:05:54 -0500
+From: Andi Kleen <ak@linux.intel.com>
+Subject: [PATCH] kbuild: Support split debug info
+Date: Sun,  9 Feb 2014 00:05:03 +0100
+Message-Id: <1391900703-18163-1-git-send-email-ak@linux.intel.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andi Kleen <ak@linux.intel.com>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org
+To: linux-kernel@vger.kernel.org
+Cc: mmarek@suse.cz, linux-kbuild@vger.kernel.org, torvalds@linux-foundation.org, Andi Kleen <ak@linux.intel.com>
 
-That's fine.
+This is an alternative approach to lower the overhead of debug info
+(as we discussed a few days ago)
 
-On February 8, 2014 12:21:24 PM PST, Andi Kleen <ak@linux.intel.com> wrote:
->On Sat, Feb 08, 2014 at 10:52:07AM -0800, H. Peter Anvin wrote:
->> On 02/08/2014 12:01 AM, Andi Kleen wrote:
->> > The fancy x86 hweight uses different compiler options for the
->> > hweight file. This does not work with LTO. Just disable the
->optimization
->> > with LTO
->> 
->> No, I'm going to NAK this.  This means not using the POPCNT
->instruction
->> if LTO is enabled, and that really isn't an acceptable option.
->
->I thought the use was obscure?
->
->Ok, suppose can just disable LTO for the file.
->The only drawback is that the functions will not be optimized away when
->not used, as they'll need to be __visible.
->
->-Andi
+gcc 4.7+ and newer binutils have a new "split debug info" debug info
+model where the debug info is only written once into central ".dwo" files.
 
+This avoids having to copy it around multiple times, from the object
+files to the final executable. It also lowers the disk space
+requirement. In addition it defaults to compressed debug data.
+
+More details here: http://gcc.gnu.org/wiki/DebugFission
+
+This patch adds a new option to enable it. It has to be an option,
+because it'll undoubtedly break everyone's debuginfo packaging scheme.
+gdb/objdump/etc. all still work, if you have new enough versions.
+
+I don't see big compile wins (maybe a second or two faster or so), but the
+object dirs with debuginfo get significantly smaller. My standard kernel
+config (slightly bigger than defconfig) goes from 2.9G disk space
+to 1.1G objdir (without debuginfo reduced). I presume if you are IO limited
+it will also compile faster.
+
+Only problem I've seen so far is that it doesn't play well with ccache.
+
+Signed-off-by: Andi Kleen <ak@linux.intel.com>
+---
+ Makefile          |  6 ++++++
+ lib/Kconfig.debug | 13 +++++++++++++
+ 2 files changed, 19 insertions(+)
+
+diff --git a/Makefile b/Makefile
+index 606ef7c..2f3d9d1 100644
+--- a/Makefile
++++ b/Makefile
+@@ -638,7 +638,11 @@ endif
+ endif
+ 
+ ifdef CONFIG_DEBUG_INFO
++ifdef CONFIG_DEBUG_INFO_SPLIT
++KBUILD_CFLAGS   += $(call cc-option, -gsplit-dwarf, -g)
++else
+ KBUILD_CFLAGS	+= -g
++endif
+ KBUILD_AFLAGS	+= -Wa,--gdwarf-2
+ endif
+ 
+@@ -1072,6 +1076,8 @@ MRPROPER_FILES += .config .config.old .version .old_version $(version_h) \
+ 		  extra_certificates signing_key.x509.keyid		\
+ 		  signing_key.x509.signer
+ 
++CLEAN_FILES += .*.dwo
++
+ # clean - Delete most, but leave enough to build external modules
+ #
+ clean: rm-dirs  := $(CLEAN_DIRS)
+diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+index a48abea..367a6ba 100644
+--- a/lib/Kconfig.debug
++++ b/lib/Kconfig.debug
+@@ -143,6 +143,19 @@ config DEBUG_INFO_REDUCED
+ 	  DEBUG_INFO build and compile times are reduced too.
+ 	  Only works with newer gcc versions.
+ 
++config DEBUG_INFO_SPLIT
++	bool "Produce split debuginfo in .dwo files"
++	depends on DEBUG_INFO
++	help
++	  Generate debug info into separate .dwo files. This can be
++	  faster for building than including the debug information directly
++	  in the object files and the vmlinux, as it only needs to 
++	  be stored once to disk, not multiple times in object files.
++	  Requires recent gcc (4.8+) and recent gdb/binutils.
++	  Any tool that packages or reads debug information would need
++	  to know about the .dwo files and include them.
++	  Currently incompatible with ccache.
++
+ config ENABLE_WARN_DEPRECATED
+ 	bool "Enable __deprecated logic"
+ 	default y
 -- 
-Sent from my mobile phone.  Please pardon brevity and lack of formatting.
+1.8.5.2
+
