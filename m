@@ -1,49 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:35074 "EHLO mga01.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751199AbaBHICG (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 8 Feb 2014 03:02:06 -0500
-From: Andi Kleen <ak@linux.intel.com>
-Subject: [PATCH 05/17] lto: Handle LTO common symbols in module loader
-Date: Sat,  8 Feb 2014 09:01:09 +0100
-Message-Id: <1391846481-31491-5-git-send-email-ak@linux.intel.com>
-In-Reply-To: <1391846481-31491-1-git-send-email-ak@linux.intel.com>
-References: <1391846481-31491-1-git-send-email-ak@linux.intel.com>
+Received: from ud10.udmedia.de ([194.117.254.50]:41741 "EHLO
+	mail.ud10.udmedia.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750841AbaBHJ0D (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 8 Feb 2014 04:26:03 -0500
+Date: Sat, 8 Feb 2014 10:19:20 +0100
+From: Markus Trippelsdorf <markus@trippelsdorf.de>
+Subject: Re: [PATCH 5/6] kbuild: Use single pass kallsyms
+Message-ID: <20140208091920.GA400@x4>
+References: <1391845840-28514-1-git-send-email-ak@linux.intel.com>
+ <1391845840-28514-5-git-send-email-ak@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1391845840-28514-5-git-send-email-ak@linux.intel.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: linux-kbuild@vger.kernel.org, x86@kernel.org, Joe Mario <jmario@redhat.com>, rusty@rustcorp.com.au, Andi Kleen <ak@linux.intel.com>
+To: Andi Kleen <ak@linux.intel.com>
+Cc: mmarek@suse.cz, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-From: Joe Mario <jmario@redhat.com>
+On 2014.02.08 at 08:50 +0100, Andi Kleen wrote:
+> -vmlinux_link "${kallsymso}" vmlinux
+> +vmlinux_link "${kallsymsso}" vmlinux
+> +if [ -n "${CONFIG_KALLSYMS}" ] ; then
+> +	# Now regenerate the kallsyms table and patch it into the
+> +	# previously linked file. We tell kallsyms to pad it
+> +	# to the previous length, so that no symbol changes.
+> +	info KALLSYMS2 .tmp_kallsyms2.o
+> +	kallsyms vmlinux .tmp_kallsyms2.o $(<.kallsyms_pad)
+> +
+> +	info OBJCOPY .tmp_kallsyms2.bin
+> +	${OBJCOPY} -O binary .tmp_kallsyms2.o .tmp_kallsyms2.bin
+> +
+> +	info PATCHFILE vmlinux
+> +	OFF=$(${OBJDUMP} --section-headers vmlinux |
+> +	     gawk -f ./source/scripts/elf_file_offset \
+> +	-v section=.kallsyms -v filesize=$(stat -c%s .tmp_kallsyms2.bin) )
+> +	if [ -z "$OFF" ] ; then
+> +		echo "Cannot find .kallsyms section in vmlinux binary"
+> +		exit 1
+> +	fi
+> +	scripts/patchfile vmlinux $OFF .tmp_kallsyms2.bin
+> +fi
 
-Here is the workaround I made for having the kernel not reject modules
-built with -flto.  The clean solution would be to get the compiler to not
-emit the symbol.  Or if it has to emit the symbol, then emit it as
-initialized data but put it into a comdat/linkonce section.
+This causes: 
+ gawk: fatal: can't open source file `./source/scripts/elf_file_offset' for reading (No such file or directory)
 
-Minor tweaks by AK over Joe's patch.
-
-Cc: rusty@rustcorp.com.au
-Signed-off-by: Andi Kleen <ak@linux.intel.com>
----
- kernel/module.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/kernel/module.c b/kernel/module.c
-index d24fcf2..b99e801 100644
---- a/kernel/module.c
-+++ b/kernel/module.c
-@@ -1948,6 +1948,10 @@ static int simplify_symbols(struct module *mod, const struct load_info *info)
+diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
+index 4c5435f420a6..06469556c580 100644
+--- a/scripts/link-vmlinux.sh
++++ b/scripts/link-vmlinux.sh
+@@ -213,7 +213,7 @@ if [ -n "${CONFIG_KALLSYMS}" ] ; then
  
- 		switch (sym[i].st_shndx) {
- 		case SHN_COMMON:
-+			/* Ignore common symbols */
-+			if (!strncmp(name, "__gnu_lto", 9))
-+				break;
-+
- 			/* We compiled with -fno-common.  These are not
- 			   supposed to happen.  */
- 			pr_debug("Common symbol: %s\n", name);
--- 
-1.8.5.2
+ 	info PATCHFILE vmlinux
+ 	OFF=$(${OBJDUMP} --section-headers vmlinux |
+-	     gawk -f ./source/scripts/elf_file_offset \
++	     gawk -f ./scripts/elf_file_offset \
+ 	-v section=.kallsyms -v filesize=$(stat -c%s .tmp_kallsyms2.bin) )
+ 	if [ -z "$OFF" ] ; then
+ 		echo "Cannot find .kallsyms section in vmlinux binary"
 
+-- 
+Markus
