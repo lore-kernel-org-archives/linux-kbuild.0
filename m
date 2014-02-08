@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:8677 "EHLO mga02.intel.com"
+Received: from mga01.intel.com ([192.55.52.88]:35074 "EHLO mga01.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750837AbaBHICI (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 8 Feb 2014 03:02:08 -0500
+	id S1750907AbaBHICG (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 8 Feb 2014 03:02:06 -0500
 From: Andi Kleen <ak@linux.intel.com>
-Subject: [PATCH 10/17] Kbuild, lto: Add a gcc-ld script to let run gcc as ld
-Date: Sat,  8 Feb 2014 09:01:14 +0100
-Message-Id: <1391846481-31491-10-git-send-email-ak@linux.intel.com>
+Subject: [PATCH 04/17] lto, workaround: Add workaround for initcall reordering
+Date: Sat,  8 Feb 2014 09:01:08 +0100
+Message-Id: <1391846481-31491-4-git-send-email-ak@linux.intel.com>
 In-Reply-To: <1391846481-31491-1-git-send-email-ak@linux.intel.com>
 References: <1391846481-31491-1-git-send-email-ak@linux.intel.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -14,51 +14,59 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
 Cc: linux-kbuild@vger.kernel.org, x86@kernel.org, Andi Kleen <ak@linux.intel.com>
 
-For LTO we need to run the link step with gcc, not ld.
-Since there are a lot of linker options passed to it, add a gcc-ld wrapper
-that wraps them as -Wl,
+Work around a LTO gcc problem: when there is no reference to a variable
+in a module it will be moved to the end of the program. This causes
+reordering of initcalls which the kernel does not like.
+Add a dummy reference function to avoid this. The function is
+deleted by the linker.
+
+This replaces a previous much slower workaround.
+
+Thanks to Honza Hubicka for suggesting this technique.
 
 Signed-off-by: Andi Kleen <ak@linux.intel.com>
 ---
- scripts/gcc-ld | 29 +++++++++++++++++++++++++++++
- 1 file changed, 29 insertions(+)
- create mode 100644 scripts/gcc-ld
+ include/linux/init.h | 20 +++++++++++++++++++-
+ 1 file changed, 19 insertions(+), 1 deletion(-)
 
-diff --git a/scripts/gcc-ld b/scripts/gcc-ld
-new file mode 100644
-index 0000000..cadab9a
---- /dev/null
-+++ b/scripts/gcc-ld
-@@ -0,0 +1,29 @@
-+#!/bin/sh
-+# run gcc with ld options
-+# used as a wrapper to execute link time optimizations
-+# yes virginia, this is not pretty
+diff --git a/include/linux/init.h b/include/linux/init.h
+index e168880..a3ba270 100644
+--- a/include/linux/init.h
++++ b/include/linux/init.h
+@@ -163,6 +163,23 @@ extern bool initcall_debug;
+ 
+ #ifndef __ASSEMBLY__
+ 
++#ifdef CONFIG_LTO
++/* Work around a LTO gcc problem: when there is no reference to a variable
++ * in a module it will be moved to the end of the program. This causes
++ * reordering of initcalls which the kernel does not like.
++ * Add a dummy reference function to avoid this. The function is
++ * deleted by the linker.
++ */
++#define LTO_REFERENCE_INITCALL(x) \
++	; /* yes this is needed */			\
++	static __used __exit void *reference_##x(void)	\
++	{						\
++		return &x;				\
++	}
++#else
++#define LTO_REFERENCE_INITCALL(x)
++#endif
 +
-+ARGS="-nostdlib"
-+
-+while [ "$1" != "" ] ; do
-+	case "$1" in
-+	-save-temps|-m32|-m64) N="$1" ;;
-+	-r) N="$1" ;;
-+	-[Wg]*) N="$1" ;;
-+	-[olv]|-[Ofd]*|-nostdlib) N="$1" ;;
-+	--end-group|--start-group)
-+		 N="-Wl,$1" ;;
-+	-[RTFGhIezcbyYu]*|\
-+--script|--defsym|-init|-Map|--oformat|-rpath|\
-+-rpath-link|--sort-section|--section-start|-Tbss|-Tdata|-Ttext|\
-+--version-script|--dynamic-list|--version-exports-symbol|--wrap|-m)
-+		A="$1" ; shift ; N="-Wl,$A,$1" ;;
-+	-[m]*) N="$1" ;;
-+	-*) N="-Wl,$1" ;;
-+	*)  N="$1" ;;
-+	esac
-+	ARGS="$ARGS $N"
-+	shift
-+done
-+
-+exec $CC $ARGS
+ /* initcalls are now grouped by functionality into separate 
+  * subsections. Ordering inside the subsections is determined
+  * by link order. 
+@@ -175,7 +192,8 @@ extern bool initcall_debug;
+ 
+ #define __define_initcall(fn, id) \
+ 	static initcall_t __initcall_##fn##id __used \
+-	__attribute__((__section__(".initcall" #id ".init"))) = fn
++	__attribute__((__section__(".initcall" #id ".init"))) = fn; \
++	LTO_REFERENCE_INITCALL(__initcall_##fn##id)
+ 
+ /*
+  * Early initcalls run before initializing SMP.
 -- 
 1.8.5.2
 
