@@ -1,45 +1,161 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.linuxfoundation.org ([140.211.169.12]:58633 "EHLO
-	mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751150AbaBGTZP (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 7 Feb 2014 14:25:15 -0500
-Date: Fri, 7 Feb 2014 11:26:25 -0800
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH] Modpost: fixed USB alias generation for ranges including
- 0x9 and 0xA
-Message-ID: <20140207192625.GA13470@kroah.com>
-References: <1391796911-23456-1-git-send-email-mq@suse.cz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1391796911-23456-1-git-send-email-mq@suse.cz>
+Received: from mga01.intel.com ([192.55.52.88]:63847 "EHLO mga01.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750773AbaBHHvZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 8 Feb 2014 02:51:25 -0500
+From: Andi Kleen <ak@linux.intel.com>
+Subject: [PATCH 1/6] kbuild: Remove relocations from kallsyms table
+Date: Sat,  8 Feb 2014 08:50:35 +0100
+Message-Id: <1391845840-28514-1-git-send-email-ak@linux.intel.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jan Moskyto Matejka <mq@suse.cz>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Nathaniel McCallum <nathaniel@natemccallum.com>, linux-kernel@vger.kernel.org
+To: mmarek@suse.cz
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Andi Kleen <ak@linux.intel.com>
 
-On Fri, Feb 07, 2014 at 07:15:11PM +0100, Jan Moskyto Matejka wrote:
-> Commit afe2dab4f6 ("USB: add hex/bcd detection to usb modalias generation")
-> changed the routine that generates alias ranges. Before that change, only
-> digits 0-9 were supported; the commit tried to fix the case when the range
-> includes higher values than 0x9.
-> 
-> Unfortunately, the commit didn't fix the case when the range includes both
-> 0x9 and 0xA, meaning that the final range must look like [x-9A-y] where
-> x <= 0x9 and y >= 0xA -- instead the [x-9A-x] range was produced.
-> 
-> Modprobe doesn't complain as it sees no difference between no-match and
-> bad-pattern results of fnmatch().
-> 
-> Fixing this simple bug to fix the aliases.
-> Also changing the hardcoded beginning of the range to uppercase as all the
-> other letters are also uppercase in the device version numbers.
-> 
-> Fortunately, this affects only the dvb-usb-dib0700 module, AFAIK.
+Remove the ELF relocations from the kallsyms_address[] table.
+Instead we just store offsets to _text and relocate that while
+accessing the kallsyms table. This is done with a new
+kallsyms_offsets[] table. With these changes .tmp_kallsyms*.o
+becomes relocation free.
 
-Thanks, I'll take this through the usb tree.
+In theory this would also allow to shrink the kallsyms table
+on 64bit by using offsets.
 
-Odd that it's taken years for this to show up as an issue.
+Signed-off-by: Andi Kleen <ak@linux.intel.com>
+---
+ kernel/kallsyms.c  | 27 ++++++++++++++++-----------
+ scripts/kallsyms.c | 18 ++++++------------
+ 2 files changed, 22 insertions(+), 23 deletions(-)
 
-greg k-h
+diff --git a/kernel/kallsyms.c b/kernel/kallsyms.c
+index 3127ad5..e7d7844 100644
+--- a/kernel/kallsyms.c
++++ b/kernel/kallsyms.c
+@@ -36,7 +36,7 @@
+  * These will be re-linked against their real values
+  * during the second link stage.
+  */
+-extern const unsigned long kallsyms_addresses[] __attribute__((weak));
++extern const long kallsyms_offsets[] __attribute__((weak));
+ extern const u8 kallsyms_names[] __attribute__((weak));
+ 
+ /*
+@@ -51,6 +51,11 @@ extern const u16 kallsyms_token_index[] __attribute__((weak));
+ 
+ extern const unsigned long kallsyms_markers[] __attribute__((weak));
+ 
++static inline unsigned long kallsyms_address(int ind)
++{
++	return (unsigned long)RELOC_HIDE(&_text, kallsyms_offsets[ind]);
++}
++
+ static inline int is_kernel_inittext(unsigned long addr)
+ {
+ 	if (addr >= (unsigned long)_sinittext
+@@ -186,7 +191,7 @@ unsigned long kallsyms_lookup_name(const char *name)
+ 		off = kallsyms_expand_symbol(off, namebuf, ARRAY_SIZE(namebuf));
+ 
+ 		if (strcmp(namebuf, name) == 0)
+-			return kallsyms_addresses[i];
++			return kallsyms_address(i);
+ 	}
+ 	return module_kallsyms_lookup_name(name);
+ }
+@@ -203,7 +208,7 @@ int kallsyms_on_each_symbol(int (*fn)(void *, const char *, struct module *,
+ 
+ 	for (i = 0, off = 0; i < kallsyms_num_syms; i++) {
+ 		off = kallsyms_expand_symbol(off, namebuf, ARRAY_SIZE(namebuf));
+-		ret = fn(data, namebuf, NULL, kallsyms_addresses[i]);
++		ret = fn(data, namebuf, NULL, kallsyms_address(i));
+ 		if (ret != 0)
+ 			return ret;
+ 	}
+@@ -219,15 +224,15 @@ static unsigned long get_symbol_pos(unsigned long addr,
+ 	unsigned long i, low, high, mid;
+ 
+ 	/* This kernel should never had been booted. */
+-	BUG_ON(!kallsyms_addresses);
++	BUG_ON(!kallsyms_offsets);
+ 
+-	/* Do a binary search on the sorted kallsyms_addresses array. */
++	/* Do a binary search on the sorted kallsyms_offsets array. */
+ 	low = 0;
+ 	high = kallsyms_num_syms;
+ 
+ 	while (high - low > 1) {
+ 		mid = low + (high - low) / 2;
+-		if (kallsyms_addresses[mid] <= addr)
++		if (kallsyms_address(mid) <= addr)
+ 			low = mid;
+ 		else
+ 			high = mid;
+@@ -237,15 +242,15 @@ static unsigned long get_symbol_pos(unsigned long addr,
+ 	 * Search for the first aliased symbol. Aliased
+ 	 * symbols are symbols with the same address.
+ 	 */
+-	while (low && kallsyms_addresses[low-1] == kallsyms_addresses[low])
++	while (low && kallsyms_address(low - 1) == kallsyms_address(low))
+ 		--low;
+ 
+-	symbol_start = kallsyms_addresses[low];
++	symbol_start = kallsyms_address(low);
+ 
+ 	/* Search for next non-aliased symbol. */
+ 	for (i = low + 1; i < kallsyms_num_syms; i++) {
+-		if (kallsyms_addresses[i] > symbol_start) {
+-			symbol_end = kallsyms_addresses[i];
++		if (kallsyms_address(i) > symbol_start) {
++			symbol_end = kallsyms_address(i);
+ 			break;
+ 		}
+ 	}
+@@ -469,7 +474,7 @@ static unsigned long get_ksymbol_core(struct kallsym_iter *iter)
+ 	unsigned off = iter->nameoff;
+ 
+ 	iter->module_name[0] = '\0';
+-	iter->value = kallsyms_addresses[iter->pos];
++	iter->value = kallsyms_address(iter->pos);
+ 
+ 	iter->type = kallsyms_get_symbol_type(off);
+ 
+diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
+index 10085de..56f5986 100644
+--- a/scripts/kallsyms.c
++++ b/scripts/kallsyms.c
+@@ -190,7 +190,7 @@ static int symbol_valid(struct sym_entry *s)
+ 	 * specified so exclude them to get a stable symbol list.
+ 	 */
+ 	static char *special_symbols[] = {
+-		"kallsyms_addresses",
++		"kallsyms_offsets",
+ 		"kallsyms_num_syms",
+ 		"kallsyms_names",
+ 		"kallsyms_markers",
+@@ -322,19 +322,13 @@ static void write_src(void)
+ 	 * symbols that are declared static and are private to their
+ 	 * .o files.  This prevents .tmp_kallsyms.o or any other
+ 	 * object from referencing them.
++	 *
++	 * We do the offsets to _text now in kallsyms.c at runtime,
++	 * to get a relocationless symbol table.
+ 	 */
+-	output_label("kallsyms_addresses");
++	output_label("kallsyms_offsets");
+ 	for (i = 0; i < table_cnt; i++) {
+-		if (toupper(table[i].sym[0]) != 'A') {
+-			if (_text <= table[i].addr)
+-				printf("\tPTR\t_text + %#llx\n",
+-					table[i].addr - _text);
+-			else
+-				printf("\tPTR\t_text - %#llx\n",
+-					_text - table[i].addr);
+-		} else {
+-			printf("\tPTR\t%#llx\n", table[i].addr);
+-		}
++		printf("\tPTR\t%#llx\n", table[i].addr - _text);
+ 	}
+ 	printf("\n");
+ 
+-- 
+1.8.5.2
+
