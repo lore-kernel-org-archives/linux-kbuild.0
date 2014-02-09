@@ -1,102 +1,151 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:23158 "EHLO mga11.intel.com"
+Received: from mx01.mykolab.com ([95.128.36.1]:60874 "EHLO mx03.mykolab.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750823AbaBIRSn (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 9 Feb 2014 12:18:43 -0500
-From: Andi Kleen <andi@firstfloor.org>
-Subject: [PATCH] kbuild: Support split debug info v2
-Date: Sun,  9 Feb 2014 18:17:58 +0100
-Message-Id: <1391966278-23036-1-git-send-email-andi@firstfloor.org>
+	id S1751707AbaBIWpV (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 9 Feb 2014 17:45:21 -0500
+Message-ID: <52F8034B.8080303@mykolab.com>
+Date: Sun, 09 Feb 2014 17:38:03 -0500
+From: Emily Maier <emilymaier@mykolab.com>
+Subject: [PATCH RFC] kernel build: enable use of password-protected signing
+ keys
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ protocol="application/pgp-signature";
+ boundary="LhQGxMXRiw2afUAEchD917mJ640trmRUF"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mmarek@suse.cz
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Andi Kleen <ak@linux.intel.com>, Dirk Gouders <dirk@gouders.net>
+To: Rob Landley <rob@landley.net>, Michal Marek <mmarek@suse.cz>
+Cc: linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-From: Andi Kleen <ak@linux.intel.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--LhQGxMXRiw2afUAEchD917mJ640trmRUF
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-This is an alternative approach to lower the overhead of debug info
-(as we discussed a few days ago)
+Currently, the module signing script assumes that the private key is=20
+not password-protected. This patch makes it slightly more secure by=20
+allowing it to be passed in on the command line as "make=20
+modules_install MOD_PASSWORD=3Dabc". It's vulnerable to snooping during=20
+the build of course, but so is an unprotected signing key.
 
-gcc 4.7+ and newer binutils have a new "split debug info" debug info
-model where the debug info is only written once into central ".dwo" files.
+I'm not sure how to securely give the password to the perl signing=20
+script. OpenSSL will prompt you for it in stdin if one isn't provided,=20
+but that's obviously not reasonable if you're building many modules.
 
-This avoids having to copy it around multiple times, from the object
-files to the final executable. It also lowers the disk space
-requirements. In addition it defaults to compressed debug data.
-
-More details here: http://gcc.gnu.org/wiki/DebugFission
-
-This patch adds a new option to enable it. It has to be an option,
-because it'll undoubtedly break everyone's debuginfo packaging scheme.
-gdb/objdump/etc. all still work, if you have new enough versions.
-
-I don't see big compile wins (maybe a second or two faster or so), but the
-object dirs with debuginfo get significantly smaller. My standard kernel
-config (slightly bigger than defconfig) shrinks from 2.9G disk space
-to 1.1G objdir (with non reduced debuginfo). I presume if you are IO limited
-the compile time difference will be larger.
-
-Only problem I've seen so far is that it doesn't play well with older
-versions of ccache (apparently fixed, see
-https://bugzilla.samba.org/show_bug.cgi?id=10005)
-
-v2: various fixes from Dirk Gouders. Improve commit message slightly.
-Cc: Dirk Gouders <dirk@gouders.net>
-Signed-off-by: Andi Kleen <ak@linux.intel.com>
+Signed-off-by: Emily Maier <emilymaier@mykolab.com>
 ---
- Makefile          |  6 ++++++
- lib/Kconfig.debug | 13 +++++++++++++
- 2 files changed, 19 insertions(+)
+ Documentation/dontdiff |    1 +
+ Makefile               |    7 ++++++-
+ scripts/sign-file      |   18 +++++++++++++-----
+ 3 files changed, 20 insertions(+), 6 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 606ef7c..2f3d9d1 100644
---- a/Makefile
-+++ b/Makefile
-@@ -638,7 +638,11 @@ endif
- endif
- 
- ifdef CONFIG_DEBUG_INFO
-+ifdef CONFIG_DEBUG_INFO_SPLIT
-+KBUILD_CFLAGS   += $(call cc-option, -gsplit-dwarf, -g)
+diff -uprN -X linux-3.13.2-devel/Documentation/dontdiff linux-3.13.2/Docu=
+mentation/dontdiff linux-3.13.2-devel/Documentation/dontdiff
+--- linux-3.13.2/Documentation/dontdiff	2014-02-06 14:42:22.000000000 -05=
+00
++++ linux-3.13.2-devel/Documentation/dontdiff	2014-02-09 15:30:41.7194480=
+65 -0500
+@@ -214,6 +214,7 @@ setup
+ setup.bin
+ setup.elf
+ sImage
++signing_key.*
+ sm_tbl*
+ split-include
+ syscalltab.h
+diff -uprN -X linux-3.13.2-devel/Documentation/dontdiff linux-3.13.2/Make=
+file linux-3.13.2-devel/Makefile
+--- linux-3.13.2/Makefile	2014-02-06 14:42:22.000000000 -0500
++++ linux-3.13.2-devel/Makefile	2014-02-09 16:34:19.727020032 -0500
+@@ -742,11 +742,16 @@ INITRD_COMPRESS-$(CONFIG_RD_LZ4)   :=3D lz
+ # choose a sane default compression above.
+ # export INITRD_COMPRESS :=3D $(INITRD_COMPRESS-y)
+ +ifdef MOD_PASSWORD
++mod_sign_cmd =3D perl $(srctree)/scripts/sign-file -p $(MOD_PASSWORD)
 +else
- KBUILD_CFLAGS	+= -g
++mod_sign_cmd =3D perl $(srctree)/scripts/sign-file
 +endif
- KBUILD_AFLAGS	+= -Wa,--gdwarf-2
+ ifdef CONFIG_MODULE_SIG_ALL
+ MODSECKEY =3D ./signing_key.priv
+ MODPUBKEY =3D ./signing_key.x509
+ export MODPUBKEY
+-mod_sign_cmd =3D perl $(srctree)/scripts/sign-file $(CONFIG_MODULE_SIG_H=
+ASH) $(MODSECKEY) $(MODPUBKEY)
++mod_sign_cmd +=3D $(CONFIG_MODULE_SIG_HASH) $(MODSECKEY) $(MODPUBKEY)
+ else
+ mod_sign_cmd =3D true
  endif
- 
-@@ -1072,6 +1076,8 @@ MRPROPER_FILES += .config .config.old .version .old_version $(version_h) \
- 		  extra_certificates signing_key.x509.keyid		\
- 		  signing_key.x509.signer
- 
-+CLEAN_FILES += .*.dwo
-+
- # clean - Delete most, but leave enough to build external modules
- #
- clean: rm-dirs  := $(CLEAN_DIRS)
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index a48abea..367a6ba 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -143,6 +143,19 @@ config DEBUG_INFO_REDUCED
- 	  DEBUG_INFO build and compile times are reduced too.
- 	  Only works with newer gcc versions.
- 
-+config DEBUG_INFO_SPLIT
-+	bool "Produce split debuginfo in .dwo files"
-+	depends on DEBUG_INFO
-+	help
-+	  Generate debug info into separate .dwo files. This can be
-+	  faster for building than including the debug information directly
-+	  in the object files and the vmlinux, as it only needs to 
-+	  be stored once to disk, not multiple times in object files.
-+	  Requires recent gcc (4.8+) and recent gdb/binutils.
-+	  Any tool that packages or reads debug information would need
-+	  to know about the .dwo files and include them.
-+	  Currently incompatible with ccache.
-+
- config ENABLE_WARN_DEPRECATED
- 	bool "Enable __deprecated logic"
- 	default y
--- 
-1.8.5.2
+diff -uprN -X linux-3.13.2-devel/Documentation/dontdiff linux-3.13.2/scri=
+pts/sign-file linux-3.13.2-devel/scripts/sign-file
+--- linux-3.13.2/scripts/sign-file	2014-02-06 14:42:22.000000000 -0500
++++ linux-3.13.2-devel/scripts/sign-file	2014-02-09 15:16:22.198684877 -0=
+500
+@@ -5,7 +5,8 @@
+  my $USAGE =3D
+ "Usage: scripts/sign-file [-v] <hash algo> <key> <x509> <module> [<dest>=
+]\n" .
+-"       scripts/sign-file [-v] -s <raw sig> <hash algo> <x509> <module> =
+[<dest>]\n";
++"       scripts/sign-file [-v] -s <raw sig> <hash algo> <x509> <module> =
+[<dest>]\n" .
++"	scripts/sign-file [-v] -p <password> <hash algo> <x509> <module> [<des=
+t>]";
+  use strict;
+ use FileHandle;
+@@ -13,9 +14,10 @@ use IPC::Open2;
+ use Getopt::Std;
+  my %opts;
+-getopts('vs:', \%opts) or die $USAGE;
++getopts('vs:p:', \%opts) or die $USAGE;
+ my $verbose =3D $opts{'v'};
+ my $signature_file =3D $opts{'s'};
++my $password =3D $opts{'p'};
+  die $USAGE if ($#ARGV > 4);
+ die $USAGE if (!$signature_file && $#ARGV < 3 || $signature_file && $#AR=
+GV < 2);
+@@ -365,9 +367,15 @@ if ($signature_file) {
+ 	# comprises the signature with no metadata attached.
+ 	#
+ 	my $pid;
+-	$pid =3D open2(*read_from, *write_to,
+-		     "openssl rsautl -sign -inkey $private_key -keyform PEM") ||
+-	    die "openssl rsautl";
++	if ($password) {
++		$pid =3D open2(*read_from, *write_to,
++		             "openssl rsautl -sign -inkey $private_key -keyform PEM \\=
 
++		              -passin pass:$password") || die "openssl rsautl";
++	} else {
++		$pid =3D open2(*read_from, *write_to,
++			     "openssl rsautl -sign -inkey $private_key -keyform PEM") ||
++		    die "openssl rsautl";
++	}
+ 	binmode write_to;
+ 	print write_to $prologue . $digest || die "pipe to openssl rsautl";
+ 	close(write_to) || die "pipe to openssl rsautl";
+
+
+--LhQGxMXRiw2afUAEchD917mJ640trmRUF
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.22 (GNU/Linux)
+Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
+
+iQIcBAEBAgAGBQJS+ANLAAoJEOcmnllJ9/EeVAYQAJr2wHzu8E80ECgD7QDADBsn
+Eavt+eCL1D3JMNxpOd3Qh3wft7Y8nmNfb2XYpQRm0W5dB4njEGqKT0w6EThsESWd
+KYLs5djZhfuszEzWIQF0U0qPLneSm5GN0CEW4XBUEmoYNucOumj3rVy2oi5UUQ9c
+JV6gr3xgy12Qz097+AUesiDSs/wSqtABaOOrON0ri3uRrE79q9kNloEKm+YuwpJ5
+DA4AnqRyvXxwTqQ+FlJ9/EnYqCmtvHfmdaRc9UsNXUTGtArdvrKA0zSXxNdGGS3V
+9sbSKSu2ML8C1WYCkEaKom92S2SU4gnBB6WWEv18dKxsNh9k5aQWlBJ6ZyrFKmyh
+UlA1g5Pj9dVnfD7blsfgfBxON6ecuMqFu1ciea71qZT6DGcA9iEU+59Rt7b6DehJ
+L1U964XvDlUCldrl6MUNa5TzPDcL7oljKdZXWiQK17DaR9hReOyqIp4uioLG2UKg
+A6u0z+07vsbcQ7iK8z6uZ6NSYF2G6zZ6QqeVSSHC70Y4r73Irc+ZVnWLwn3KuHVs
+pxl5B6JJjNAnJZMSsPB7vb/duX60KTKw+FsnWQ4GleJR4aXqC1i4ll/qoqNDbrw8
+1LawhfI0d070wUZ1Enls4BylwO2f9+WLJV44dxAIFamBtJzyLdNpeJkNbeDC+HvM
+vt5Gv3TOHv6ezKwqNUCQ
+=Mz0E
+-----END PGP SIGNATURE-----
+
+--LhQGxMXRiw2afUAEchD917mJ640trmRUF--
