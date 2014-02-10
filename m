@@ -1,35 +1,31 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from one.firstfloor.org ([193.170.194.197]:49520 "EHLO
-	one.firstfloor.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751738AbaBJFys (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 10 Feb 2014 00:54:48 -0500
-Date: Mon, 10 Feb 2014 06:54:46 +0100
-From: Andi Kleen <andi@firstfloor.org>
-Subject: ifdef CONFIG in top level makefile
-Message-ID: <20140210055446.GQ11821@two.firstfloor.org>
+Received: from cantor2.suse.de ([195.135.220.15]:48962 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751791AbaBJNvO (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 10 Feb 2014 08:51:14 -0500
+Message-ID: <52F8D94D.4040307@suse.cz>
+Date: Mon, 10 Feb 2014 14:51:09 +0100
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Subject: Re: [PATCH RFC] kernel build: enable use of password-protected signing
+ keys
+References: <52F8034B.8080303@mykolab.com>
+In-Reply-To: <52F8034B.8080303@mykolab.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
+To: Emily Maier <emilymaier@mykolab.com>, Rob Landley <rob@landley.net>
+Cc: linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
+On 9.2.2014 23:38, Emily Maier wrote:
+> Currently, the module signing script assumes that the private key is 
+> not password-protected. This patch makes it slightly more secure by 
+> allowing it to be passed in on the command line as "make 
+> modules_install MOD_PASSWORD=abc". It's vulnerable to snooping during 
+> the build of course, but so is an unprotected signing key.
 
-Here's one interesting problem I hit with LTO:
+The key's permissions can be set to 0600, while the make commandline is
+visible in ps.
 
-I added some ifdef CONFIG_.... checks early in the top level Makefile.
-But I noticed that when a config is first generated these CONFIGs 
-seem to be ignored, it's only read later. I assume that is because
-the Makefile is no re-parsed after the config is fully set up.
-
-Correct theory? If yes is there a workaround for this?
-
-I assume this could hit other ifdefs in that Makefile too.
-
-Thanks.
-
--Andi
-
--- 
-ak@linux.intel.com -- Speaking for myself only.
+Michal
