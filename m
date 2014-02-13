@@ -1,45 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([203.10.76.45]:57647 "EHLO ozlabs.org"
+Received: from cantor2.suse.de ([195.135.220.15]:33174 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751664AbaBMBXw (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 12 Feb 2014 20:23:52 -0500
-From: Rusty Russell <rusty@rustcorp.com.au>
-Subject: Re: [PATCH 05/17] lto: Handle LTO common symbols in module loader
-In-Reply-To: <1391846481-31491-5-git-send-email-ak@linux.intel.com>
-References: <1391846481-31491-1-git-send-email-ak@linux.intel.com> <1391846481-31491-5-git-send-email-ak@linux.intel.com>
-Date: Wed, 12 Feb 2014 11:34:12 +1030
-Message-ID: <87zjlxf8fn.fsf@rustcorp.com.au>
+	id S1751440AbaBMKV5 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 13 Feb 2014 05:21:57 -0500
+Message-ID: <52FC9CBD.5010702@suse.cz>
+Date: Thu, 13 Feb 2014 11:21:49 +0100
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Subject: Re: [PATCH RFC] kernel build: enable use of password-protected signing
+ keys
+References: <52F8034B.8080303@mykolab.com> <52F8D94D.4040307@suse.cz> <52FBF8A8.1010304@mykolab.com>
+In-Reply-To: <52FBF8A8.1010304@mykolab.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andi Kleen <ak@linux.intel.com>, linux-kernel@vger.kernel.org
-Cc: linux-kbuild@vger.kernel.org, x86@kernel.org, Joe Mario <jmario@redhat.com>
+To: Emily Maier <emilymaier@mykolab.com>
+Cc: lkml <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-Andi Kleen <ak@linux.intel.com> writes:
-> From: Joe Mario <jmario@redhat.com>
->
-> Here is the workaround I made for having the kernel not reject modules
-> built with -flto.  The clean solution would be to get the compiler to not
-> emit the symbol.  Or if it has to emit the symbol, then emit it as
-> initialized data but put it into a comdat/linkonce section.
->
-> Minor tweaks by AK over Joe's patch.
+On 2014-02-12 23:41, Emily Maier wrote:
+> On 02/10/2014 08:51 AM, Michal Marek wrote:
+>> On 9.2.2014 23:38, Emily Maier wrote:
+>>> Currently, the module signing script assumes that the private key is 
+>>> not password-protected. This patch makes it slightly more secure by 
+>>> allowing it to be passed in on the command line as "make 
+>>> modules_install MOD_PASSWORD=abc". It's vulnerable to snooping during 
+>>> the build of course, but so is an unprotected signing key.
+>>
+>> The key's permissions can be set to 0600, while the make commandline is
+>> visible in ps.
+> 
+> Ok, I'll change it to that and look into other options as well. I think
+> there may be a way to pass it to OpenSSL off disk and the command line
+> entirely.
+> 
+> Would it be appropriate to add Kconfig options for this or try to
+> autodetect the password file?
 
-Patch is fine, but what's with the comment?
+What some vendors do is that they have the modules signed by a signing
+machine that is separated from the build farm. So they typically unset
+MODULE_SIG_ALL and handle the signing outside kbuild. The other option
+is to have a wrapper for the openssl command, not sure if anybody is
+doing that.
 
->  		switch (sym[i].st_shndx) {
->  		case SHN_COMMON:
-> +			/* Ignore common symbols */
-> +			if (!strncmp(name, "__gnu_lto", 9))
-> +				break;
-> +
-
-You mean, "/* Ignore symbols from -flto */"?
-
-Other than that, I'm happy for this to go via some other tree:
-
-Acked-by: Rusty Russell <rusty@rustcorp.com.au>
-
-Thanks,
-Rusty.
+Michal
