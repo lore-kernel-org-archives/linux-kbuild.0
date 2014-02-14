@@ -1,54 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:6596 "EHLO mga09.intel.com"
+Received: from mga11.intel.com ([192.55.52.93]:38604 "EHLO mga11.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753195AbaBNVW3 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 14 Feb 2014 16:22:29 -0500
+	id S1752583AbaBNVW1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 14 Feb 2014 16:22:27 -0500
 From: Andi Kleen <andi@firstfloor.org>
-Subject: [PATCH 14/19] Kbuild, lto: Handle basic LTO in modpost
-Date: Fri, 14 Feb 2014 22:21:38 +0100
-Message-Id: <1392412903-25733-15-git-send-email-andi@firstfloor.org>
+Subject: [PATCH 05/19] lto: Handle LTO common symbols in module loader
+Date: Fri, 14 Feb 2014 22:21:29 +0100
+Message-Id: <1392412903-25733-6-git-send-email-andi@firstfloor.org>
 In-Reply-To: <1392412903-25733-1-git-send-email-andi@firstfloor.org>
 References: <1392412903-25733-1-git-send-email-andi@firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
-Cc: x86@kernel.org, linux-kbuild@vger.kernel.org, mmarek@suse.cz, Andi Kleen <ak@linux.intel.com>
+Cc: x86@kernel.org, linux-kbuild@vger.kernel.org, mmarek@suse.cz, Joe Mario <jmario@redhat.com>, rusty@rustcorp.com.au, Andi Kleen <ak@linux.intel.com>
 
-From: Andi Kleen <ak@linux.intel.com>
+From: Joe Mario <jmario@redhat.com>
 
-- Don't warn about LTO marker symbols. modpost runs before
-the linker, so the module is not necessarily LTOed yet.
-- Don't complain about .gnu.lto* sections
+Here is the workaround I made for having the kernel not reject modules
+built with -flto.  The clean solution would be to get the compiler to not
+emit the symbol.  Or if it has to emit the symbol, then emit it as
+initialized data but put it into a comdat/linkonce section.
 
+Minor tweaks by AK over Joe's patch.
+
+Cc: rusty@rustcorp.com.au
 Signed-off-by: Andi Kleen <ak@linux.intel.com>
 ---
- scripts/mod/modpost.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ kernel/module.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index f91dd45..63804a1 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -623,7 +623,10 @@ static void handle_modversions(struct module *mod, struct elf_info *info,
+diff --git a/kernel/module.c b/kernel/module.c
+index d24fcf2..b99e801 100644
+--- a/kernel/module.c
++++ b/kernel/module.c
+@@ -1948,6 +1948,10 @@ static int simplify_symbols(struct module *mod, const struct load_info *info)
  
- 	switch (sym->st_shndx) {
- 	case SHN_COMMON:
--		warn("\"%s\" [%s] is COMMON symbol\n", symname, mod->name);
-+		if (!strncmp(symname, "__gnu_lto_", sizeof("__gnu_lto_")-1)) {
-+			/* Should warn here, but modpost runs before the linker */
-+		} else
-+			warn("\"%s\" [%s] is COMMON symbol\n", symname, mod->name);
- 		break;
- 	case SHN_UNDEF:
- 		/* undefined symbol */
-@@ -849,6 +852,7 @@ static const char *section_white_list[] =
- 	".xt.lit",         /* xtensa */
- 	".arcextmap*",			/* arc */
- 	".gnu.linkonce.arcext*",	/* arc : modules */
-+	".gnu.lto*",
- 	NULL
- };
- 
+ 		switch (sym[i].st_shndx) {
+ 		case SHN_COMMON:
++			/* Ignore common symbols */
++			if (!strncmp(name, "__gnu_lto", 9))
++				break;
++
+ 			/* We compiled with -fno-common.  These are not
+ 			   supposed to happen.  */
+ 			pr_debug("Common symbol: %s\n", name);
 -- 
 1.8.5.2
 
