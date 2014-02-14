@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:38604 "EHLO mga11.intel.com"
+Received: from mga01.intel.com ([192.55.52.88]:9979 "EHLO mga01.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752583AbaBNVWa (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 14 Feb 2014 16:22:30 -0500
+	id S1753200AbaBNVW3 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 14 Feb 2014 16:22:29 -0500
 From: Andi Kleen <andi@firstfloor.org>
-Subject: [PATCH 15/19] Kbuild, lto: Fix single pass kallsyms for LTO
-Date: Fri, 14 Feb 2014 22:21:39 +0100
-Message-Id: <1392412903-25733-16-git-send-email-andi@firstfloor.org>
+Subject: [PATCH 13/19] Kbuild, lto: Set TMPDIR for LTO v2
+Date: Fri, 14 Feb 2014 22:21:37 +0100
+Message-Id: <1392412903-25733-14-git-send-email-andi@firstfloor.org>
 In-Reply-To: <1392412903-25733-1-git-send-email-andi@firstfloor.org>
 References: <1392412903-25733-1-git-send-email-andi@firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -16,88 +16,45 @@ Cc: x86@kernel.org, linux-kbuild@vger.kernel.org, mmarek@suse.cz, Andi Kleen <ak
 
 From: Andi Kleen <ak@linux.intel.com>
 
-gcc-nm on slim LTO objects does not output static functions or variables.
+LTO gcc puts a lot of data into $TMPDIR, essentially another copy
+of the object directory to pass the repartitioned object files
+to the code generation processes.
 
-This causes the first pass estimation of the kallsyms table
-to be off too much. Add a hack using the LTO function sections
-to retrieve all functions instead. I wrote that hack in perl,
-as it exceeded my awk-fu (this adds a build dependency on perl,
-but only if LTO is active). The hack also doesn't support
-variables, but we handle that by disable KALLSYMS_ALL with LTO.
-The hack is also somewhat depending on the internal LTO
-object format.
+TMPDIR defaults to /tmp With /tmp as tmpfs it's easy to drive systems to
+out of memory, because they will compete with the already high anonymous
+memory consumption of the wpa LTO pass.
 
-Hopefully at some future point gcc-nm will be fixed and this
-won't be necessary anymore.
+When LTO is set always set TMPDIR to the object directory. This could
+be slightly slower, but is far safer and eliminates another parameter
+the LTO user would need to set manually.
 
-One issue is that LTO can generate new symbols in the
-final link, for example when cloning functions. These clones
-are just copies of existing names with a postfix (which
-we remove), so they compress well in the kallsyms compression.
+I made it conditional on LTO for now.
 
-With that we can get away by just adding a 5% safety factor
-to the first pass kallsyms estimation, and hope all clones
-fit into that.  If some obscure build has more clones than that
-the PAD_RATIO value in kallsyms.c can be lowered to increase it.
-
+v2: Allow user to override (H. Peter Anvin)
 Signed-off-by: Andi Kleen <ak@linux.intel.com>
 ---
- init/Kconfig            |  5 ++++-
- scripts/link-vmlinux.sh | 24 +++++++++++++++++++++---
- 2 files changed, 25 insertions(+), 4 deletions(-)
+ Makefile | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/init/Kconfig b/init/Kconfig
-index 009a797..ea00c0e 100644
---- a/init/Kconfig
-+++ b/init/Kconfig
-@@ -1317,7 +1317,10 @@ config KALLSYMS
+diff --git a/Makefile b/Makefile
+index 933e1de..23629a9 100644
+--- a/Makefile
++++ b/Makefile
+@@ -407,6 +407,14 @@ export KBUILD_AFLAGS_MODULE KBUILD_CFLAGS_MODULE KBUILD_LDFLAGS_MODULE
+ export KBUILD_AFLAGS_KERNEL KBUILD_CFLAGS_KERNEL
+ export KBUILD_ARFLAGS
  
- config KALLSYMS_ALL
- 	bool "Include all symbols in kallsyms"
--	depends on DEBUG_KERNEL && KALLSYMS
-+	# the method LTO uses to predict the symbol table
-+	# only supports functions for now
-+	# This can be removed once http://gcc.gnu.org/PR60016 is fixed
-+	depends on DEBUG_KERNEL && KALLSYMS && !LTO
- 	help
- 	   Normally kallsyms only contains the symbols of functions for nicer
- 	   OOPS messages and backtraces (i.e., symbols from the text and inittext
-diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
-index b299fdd..5a28f2a 100644
---- a/scripts/link-vmlinux.sh
-+++ b/scripts/link-vmlinux.sh
-@@ -90,10 +90,28 @@ kallsyms()
- 	local aflags="${KBUILD_AFLAGS} ${KBUILD_AFLAGS_KERNEL}               \
- 		      ${NOSTDINC_FLAGS} ${LINUXINCLUDE} ${KBUILD_CPPFLAGS}"
- 
--	${NM} -n ${1} | \
--		awk 'NF == 3 { print}' |
--		scripts/kallsyms ${kallsymopt} | \
-+	# workaround for slim LTO gcc-nm not outputing static symbols
-+	# http://gcc.gnu.org/PR60016
-+	# generate a fake symbol table based on the LTO function sections.
-+	# This unfortunately "knows" about the internal LTO file format
-+	# and only works for functions
-+	# needs perl for now when building for LTO
-+	(
-+	if $OBJDUMP --section-headers ${1} | grep -q \.gnu\.lto_ ; then
-+		${OBJDUMP} --section-headers ${1} |
-+		perl -ne '
-+@n = split;
-+next unless $n[1] =~ /\.gnu\.lto_([_a-zA-Z][^.]+)/;
-+next if $n[1] eq $prev;
-+$prev = $n[1];
-+print "0 T ",$1,"\n"'
-+	fi
-+	${NM} -n ${1} | awk 'NF == 3 { print }'
-+	)  > ${2}_sym
-+	# run without pipe to make kallsyms errors stop the script
-+	./scripts/kallsyms ${kallsymopt} < ${2}_sym |
- 		${CC} ${aflags} -c -o ${2} -x assembler-with-cpp -
++ifdef CONFIG_LTO
++# LTO gcc creates a lot of files in TMPDIR, and with /tmp as tmpfs
++# it's easy to drive the machine OOM. Use the object directory
++# instead
++TMPDIR ?= ${objtree}
++export TMPDIR
++endif
 +
- }
- 
- # Create map file with all symbols from ${1}
+ # When compiling out-of-tree modules, put MODVERDIR in the module
+ # tree rather than in the kernel tree. The kernel tree might
+ # even be read-only.
 -- 
 1.8.5.2
 
