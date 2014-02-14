@@ -1,125 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx01.mykolab.com ([95.128.36.1]:50058 "EHLO mx03.mykolab.com"
+Received: from terminus.zytor.com ([198.137.202.10]:48089 "EHLO mail.zytor.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751199AbaBMXAw (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 13 Feb 2014 18:00:52 -0500
-Message-ID: <52FD4E8F.2030905@mykolab.com>
-Date: Thu, 13 Feb 2014 18:00:31 -0500
-From: Emily Maier <emilymaier@mykolab.com>
-Subject: [PATCH v2] kbuild: enable use of password-protected signing keys
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature";
- boundary="3SqrHviVU0d67Jq9txMCnN4RV9JsNbk2w"
+	id S1751630AbaBNE07 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 13 Feb 2014 23:26:59 -0500
+Message-ID: <52FD9B0A.8030309@zytor.com>
+Date: Thu, 13 Feb 2014 20:26:50 -0800
+From: "H. Peter Anvin" <hpa@zytor.com>
+MIME-Version: 1.0
+Subject: Re: [PATCH 12/17] Kbuild, lto: Set TMPDIR for LTO
+References: <1391846481-31491-1-git-send-email-ak@linux.intel.com> <1391846481-31491-12-git-send-email-ak@linux.intel.com>
+In-Reply-To: <1391846481-31491-12-git-send-email-ak@linux.intel.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rob Landley <rob@landley.net>, Michal Marek <mmarek@suse.cz>
-Cc: linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Andi Kleen <ak@linux.intel.com>, linux-kernel@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org, x86@kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---3SqrHviVU0d67Jq9txMCnN4RV9JsNbk2w
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+On 02/08/2014 12:01 AM, Andi Kleen wrote:
+> LTO gcc puts a lot of data into $TMPDIR, essentially another copy
+> of the object directory to pass the repartitioned object files
+> to the code generation processes.
+> 
+> TMPDIR defaults to /tmp With /tmp as tmpfs it's easy to drive systems to
+> out of memory, because they will compete with the already high anonymous
+> memory consumption of the wpa LTO pass.
+> 
+> When LTO is set always set TMPDIR to the object directory. This could
+> be slightly slower, but is far safer and eliminates another parameter
+> the LTO user would need to set manually.
+> 
+> I made it conditional on LTO for now.
 
-Currently, the module signing script assumes that the private key is=20
-not password-protected. This patch makes it somewhat more secure by=20
-checking of a password file ("signing_key.pass") exists and passing it=20
-to OpenSSL if so.
+I think this really ought to use ?= so it doesn't override a TMPDIR
+explicitly set by the user.
 
-Version 2 changes: removed command line password passing from the=20
-Makefile, the password file is now autodetected by the Perl signing=20
-script.
-
-Signed-off-by: Emily Maier <emilymaier@mykolab.com>
----
- Documentation/dontdiff                          |    1 +
- Documentation/module-signing.txt                |    3 +++
- scripts/sign-file                               |   13 ++++++++++---
- 5 files changed, 15 insertions(+), 4 deletions(-)
-
-diff -uprN -X linux-3.13.2-devel/Documentation/dontdiff linux-3.13.2/Docu=
-mentation/dontdiff linux-3.13.2-devel/Documentation/dontdiff
---- linux-3.13.2/Documentation/dontdiff	2014-02-06 14:42:22.000000000 -05=
-00
-+++ linux-3.13.2-devel/Documentation/dontdiff	2014-02-09 15:30:41.7194480=
-65 -0500
-@@ -214,6 +214,7 @@ setup
- setup.bin
- setup.elf
- sImage
-+signing_key.*
- sm_tbl*
- split-include
- syscalltab.h
-diff -uprN -X linux-3.13.2-devel/Documentation/dontdiff linux-3.13.2/Docu=
-mentation/module-signing.txt linux-3.13.2-devel/Documentation/module-sign=
-ing.txt
---- linux-3.13.2/Documentation/module-signing.txt	2014-02-06 14:42:22.000=
-000000 -0500
-+++ linux-3.13.2-devel/Documentation/module-signing.txt	2014-02-13 17:29:=
-54.412512011 -0500
-@@ -137,6 +137,9 @@ generate the public/private key files:
- 	   -config x509.genkey -outform DER -out signing_key.x509 \
- 	   -keyout signing_key.priv
-=20
-+If you want to use a signing key with a password, write it to a file cal=
-led
-+"signing_key.pass". For security, make sure it is owned by root with 600=
-
-+permissions.
-=20
- =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D
- PUBLIC KEYS IN THE KERNEL
-diff -uprN -X linux-3.13.2-devel/Documentation/dontdiff linux-3.13.2/scri=
-pts/sign-file linux-3.13.2-devel/scripts/sign-file
---- linux-3.13.2/scripts/sign-file	2014-02-06 14:42:22.000000000 -0500
-+++ linux-3.13.2-devel/scripts/sign-file	2014-02-13 17:40:26.003859486 -0=
-500
-@@ -365,9 +365,16 @@ if ($signature_file) {
- 	# comprises the signature with no metadata attached.
- 	#
- 	my $pid;
--	$pid =3D open2(*read_from, *write_to,
--		     "openssl rsautl -sign -inkey $private_key -keyform PEM") ||
--	    die "openssl rsautl";
-+	my $passfile =3D "signing_key.pass";
-+	if (-e $passfile) {
-+		$pid =3D open2(*read_from, *write_to,
-+		             "openssl rsautl -sign -inkey $private_key -keyform PEM \\=
-
-+		              -passin file:$passfile") || die "openssl rsautl";
-+	} else {
-+		$pid =3D open2(*read_from, *write_to,
-+			     "openssl rsautl -sign -inkey $private_key -keyform PEM") ||
-+		    die "openssl rsautl";
-+	}
- 	binmode write_to;
- 	print write_to $prologue . $digest || die "pipe to openssl rsautl";
- 	close(write_to) || die "pipe to openssl rsautl";
+	-hpa
 
 
---3SqrHviVU0d67Jq9txMCnN4RV9JsNbk2w
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQIbBAEBAgAGBQJS/U6XAAoJEOcmnllJ9/EeHhMP9RT58gCvzkE/vyvbyTR0mCm1
-iTRocXPYbeJ4ZuHdUEody4B681jrcp2+T7HQpaXWlWs0y+d4fGSIZ/NLmTthcldl
-7aA7rZMUspWb89fB56vY+YEXe0fS6sMdTBjHMnjelQYB+xU3ZBMYqJ2bfAoicQBW
-ItHZqpveC75K1TibXpUEjINhkCTHUUxgQKg64abY2bCbEPJJ5I86x5xXn9Tgk9wi
-Bdon2ITHK4uuBhwRdFDr3xrxqUkxbvN0M6e0M18Y8kyefr6orlHToZ5ETwMXszsY
-VWM0cAN8p3RWf/r6Ikjo5eAOOWDetM3/d3Cu0KMFsEJAV34JhaUoPmJpEMb7gFdR
-HIWGz4JSJ/JFCZPyXhndkH8+MB+YMDbqWVRGaP/Vf8CyPYgG5yWnsBRQBIYbhzun
-HLbtmr41wNOYRXzxgqtl3fvBbMEj0u/zVvxEYoYi6MYC1/a3Kop9oeO7vTYO2+VA
-wR62/kqnAbPAa5+pnpCckAtM30shsfWv7lUrEW+peb7XjU8BhQCSdRdwbJm4JRqS
-0O4lGSkLlUqKpfvUc6EKnEj16Ve17o5nZJ3UkNAzvxUFYKRMHyBVWkrYPR/Hk651
-K5NDmtm96djrT04yjATgr57P5N2rxcHVgtY3H3c2OmNDiT8D3F1FSEwA5jJQDfKf
-SsPqbiEp96M1l+WcEgw=
-=Ock3
------END PGP SIGNATURE-----
-
---3SqrHviVU0d67Jq9txMCnN4RV9JsNbk2w--
