@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:38604 "EHLO mga11.intel.com"
+Received: from mga09.intel.com ([134.134.136.24]:6596 "EHLO mga09.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753183AbaBNVW2 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 14 Feb 2014 16:22:28 -0500
+	id S1753195AbaBNVW3 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 14 Feb 2014 16:22:29 -0500
 From: Andi Kleen <andi@firstfloor.org>
-Subject: [PATCH 07/19] lto: Don't let LATENCYTOP and LOCKDEP select KALLSYMS_ALL
-Date: Fri, 14 Feb 2014 22:21:31 +0100
-Message-Id: <1392412903-25733-8-git-send-email-andi@firstfloor.org>
+Subject: [PATCH 14/19] Kbuild, lto: Handle basic LTO in modpost
+Date: Fri, 14 Feb 2014 22:21:38 +0100
+Message-Id: <1392412903-25733-15-git-send-email-andi@firstfloor.org>
 In-Reply-To: <1392412903-25733-1-git-send-email-andi@firstfloor.org>
 References: <1392412903-25733-1-git-send-email-andi@firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -16,43 +16,39 @@ Cc: x86@kernel.org, linux-kbuild@vger.kernel.org, mmarek@suse.cz, Andi Kleen <ak
 
 From: Andi Kleen <ak@linux.intel.com>
 
-KALLSYMS_ALL enables including data variables into KALLSYMS.
-With plain KALLSYMS only functions are included.
-
-LATENCYTOP and LOCKDEP select KALLSYMS_ALL in addition to KALLSYMS.
-It's unclear what they actually need _ALL for; they should
-only need function backtraces and afaik never touch variables.
-
-LTO currently does not support KALLSYMS_ALL, which prevents
-LATENCYTOP and LOCKDEP from working and gives Kconfig errors.
-Disable the requirement for KALLSYMS_ALL for them, just use
-KALLSYMS.
+- Don't warn about LTO marker symbols. modpost runs before
+the linker, so the module is not necessarily LTOed yet.
+- Don't complain about .gnu.lto* sections
 
 Signed-off-by: Andi Kleen <ak@linux.intel.com>
 ---
- lib/Kconfig.debug | 2 --
- 1 file changed, 2 deletions(-)
+ scripts/mod/modpost.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index a48abea..5cbf0c5 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -928,7 +928,6 @@ config LOCKDEP
- 	select STACKTRACE
- 	select FRAME_POINTER if !MIPS && !PPC && !ARM_UNWIND && !S390 && !MICROBLAZE && !ARC
- 	select KALLSYMS
--	select KALLSYMS_ALL
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index f91dd45..63804a1 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -623,7 +623,10 @@ static void handle_modversions(struct module *mod, struct elf_info *info,
  
- config LOCK_STAT
- 	bool "Lock usage statistics"
-@@ -1396,7 +1395,6 @@ config LATENCYTOP
- 	depends on PROC_FS
- 	select FRAME_POINTER if !MIPS && !PPC && !S390 && !MICROBLAZE && !ARM_UNWIND && !ARC
- 	select KALLSYMS
--	select KALLSYMS_ALL
- 	select STACKTRACE
- 	select SCHEDSTATS
- 	select SCHED_DEBUG
+ 	switch (sym->st_shndx) {
+ 	case SHN_COMMON:
+-		warn("\"%s\" [%s] is COMMON symbol\n", symname, mod->name);
++		if (!strncmp(symname, "__gnu_lto_", sizeof("__gnu_lto_")-1)) {
++			/* Should warn here, but modpost runs before the linker */
++		} else
++			warn("\"%s\" [%s] is COMMON symbol\n", symname, mod->name);
+ 		break;
+ 	case SHN_UNDEF:
+ 		/* undefined symbol */
+@@ -849,6 +852,7 @@ static const char *section_white_list[] =
+ 	".xt.lit",         /* xtensa */
+ 	".arcextmap*",			/* arc */
+ 	".gnu.linkonce.arcext*",	/* arc : modules */
++	".gnu.lto*",
+ 	NULL
+ };
+ 
 -- 
 1.8.5.2
 
