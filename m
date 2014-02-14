@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:58150 "EHLO mga02.intel.com"
+Received: from mga02.intel.com ([134.134.136.20]:47111 "EHLO mga02.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752474AbaBNVWt (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 14 Feb 2014 16:22:49 -0500
+	id S1752882AbaBNVWu (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 14 Feb 2014 16:22:50 -0500
 From: Andi Kleen <andi@firstfloor.org>
-Subject: [PATCH 01/19] x86, lto: Disable LTO for the x86 VDSO
-Date: Fri, 14 Feb 2014 22:21:25 +0100
-Message-Id: <1392412903-25733-2-git-send-email-andi@firstfloor.org>
+Subject: [PATCH 12/19] Kbuild, lto: Disable LTO for asm-offsets.c
+Date: Fri, 14 Feb 2014 22:21:36 +0100
+Message-Id: <1392412903-25733-13-git-send-email-andi@firstfloor.org>
 In-Reply-To: <1392412903-25733-1-git-send-email-andi@firstfloor.org>
 References: <1392412903-25733-1-git-send-email-andi@firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -16,57 +16,27 @@ Cc: x86@kernel.org, linux-kbuild@vger.kernel.org, mmarek@suse.cz, Andi Kleen <ak
 
 From: Andi Kleen <ak@linux.intel.com>
 
-The VDSO does not play well with LTO, so just disable LTO for it.
-Also pass a 32bit linker flag for the 32bit version.
+The asm-offset.c technique to fish data out of the assembler file
+does not work with LTO. Just disable for the asm-offset.c build.
 
-Cc: x86@kernel.org
 Signed-off-by: Andi Kleen <ak@linux.intel.com>
 ---
- arch/x86/vdso/Makefile | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+ scripts/Makefile.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/x86/vdso/Makefile b/arch/x86/vdso/Makefile
-index fd14be1..598f163 100644
---- a/arch/x86/vdso/Makefile
-+++ b/arch/x86/vdso/Makefile
-@@ -2,6 +2,8 @@
- # Building vDSO images for x86.
- #
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index d5d859c..9f0ee22 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -198,7 +198,7 @@ $(multi-objs-y:.o=.s)   : modname = $(modname-multi)
+ $(multi-objs-y:.o=.lst) : modname = $(modname-multi)
  
-+KBUILD_CFLAGS += ${DISABLE_LTO}
-+
- VDSO64-$(CONFIG_X86_64)		:= y
- VDSOX32-$(CONFIG_X86_X32_ABI)	:= y
- VDSO32-$(CONFIG_X86_32)		:= y
-@@ -35,7 +37,8 @@ export CPPFLAGS_vdso.lds += -P -C
+ quiet_cmd_cc_s_c = CC $(quiet_modtag)  $@
+-cmd_cc_s_c       = $(CC) $(c_flags) -fverbose-asm -S -o $@ $<
++cmd_cc_s_c       = $(CC) $(c_flags) $(DISABLE_LTO) -fverbose-asm -S -o $@ $<
  
- VDSO_LDFLAGS_vdso.lds = -m64 -Wl,-soname=linux-vdso.so.1 \
- 			-Wl,--no-undefined \
--		      	-Wl,-z,max-page-size=4096 -Wl,-z,common-page-size=4096
-+			-Wl,-z,max-page-size=4096 -Wl,-z,common-page-size=4096 \
-+			$(DISABLE_LTO)
- 
- $(obj)/vdso.o: $(src)/vdso.S $(obj)/vdso.so
- 
-@@ -127,7 +130,7 @@ vdso32.so-$(VDSO32-y)		+= sysenter
- vdso32-images			= $(vdso32.so-y:%=vdso32-%.so)
- 
- CPPFLAGS_vdso32.lds = $(CPPFLAGS_vdso.lds)
--VDSO_LDFLAGS_vdso32.lds = -m32 -Wl,-soname=linux-gate.so.1
-+VDSO_LDFLAGS_vdso32.lds = -m32 -Wl,-m,elf_i386 -Wl,-soname=linux-gate.so.1
- 
- # This makes sure the $(obj) subdirectory exists even though vdso32/
- # is not a kbuild sub-make subdirectory.
-@@ -181,7 +184,8 @@ quiet_cmd_vdso = VDSO    $@
- 		       -Wl,-T,$(filter %.lds,$^) $(filter %.o,$^) && \
- 		 sh $(srctree)/$(src)/checkundef.sh '$(NM)' '$@'
- 
--VDSO_LDFLAGS = -fPIC -shared $(call cc-ldoption, -Wl$(comma)--hash-style=sysv)
-+VDSO_LDFLAGS = -fPIC -shared $(call cc-ldoption, -Wl$(comma)--hash-style=sysv) \
-+		${LTO_CFLAGS}
- GCOV_PROFILE := n
- 
- #
+ $(obj)/%.s: $(src)/%.c FORCE
+ 	$(call if_changed_dep,cc_s_c)
 -- 
 1.8.5.2
 
