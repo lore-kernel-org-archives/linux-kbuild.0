@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:47111 "EHLO mga02.intel.com"
+Received: from mga02.intel.com ([134.134.136.20]:58150 "EHLO mga02.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753284AbaBNVWv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 14 Feb 2014 16:22:51 -0500
+	id S1752845AbaBNVWt (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 14 Feb 2014 16:22:49 -0500
 From: Andi Kleen <andi@firstfloor.org>
-Subject: [PATCH 19/19] lto: Don't inline __const_udelay
-Date: Fri, 14 Feb 2014 22:21:43 +0100
-Message-Id: <1392412903-25733-20-git-send-email-andi@firstfloor.org>
+Subject: [PATCH 09/19] Kbuild, lto: Drop .number postfixes in modpost
+Date: Fri, 14 Feb 2014 22:21:33 +0100
+Message-Id: <1392412903-25733-10-git-send-email-andi@firstfloor.org>
 In-Reply-To: <1392412903-25733-1-git-send-email-andi@firstfloor.org>
 References: <1392412903-25733-1-git-send-email-andi@firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -16,29 +16,62 @@ Cc: x86@kernel.org, linux-kbuild@vger.kernel.org, mmarek@suse.cz, Andi Kleen <ak
 
 From: Andi Kleen <ak@linux.intel.com>
 
-__const_udelay is marked inline, and LTO will happily inline it everywhere
-Dropping the inline saves ~44k text in a non LTO build.
-
-13999560        1740864 1499136 17239560        1070e08 vmlinux-with-udelay-inline
-13954764        1736768 1499136 17190668        1064f0c vmlinux-wo-udelay-inline
+LTO turns all global symbols effectively into statics. This
+has the side effect that they all have a .NUMBER postfix to make
+them unique. In modpost drop this postfix because it confuses
+it.
 
 Signed-off-by: Andi Kleen <ak@linux.intel.com>
 ---
- arch/x86/lib/delay.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ scripts/mod/modpost.c | 15 ++++++++++++++-
+ scripts/mod/modpost.h |  2 +-
+ 2 files changed, 15 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/lib/delay.c b/arch/x86/lib/delay.c
-index 39d6a3d..540a320 100644
---- a/arch/x86/lib/delay.c
-+++ b/arch/x86/lib/delay.c
-@@ -112,7 +112,7 @@ void __delay(unsigned long loops)
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index 1f1b154..f91dd45 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -1684,6 +1684,19 @@ static void check_sec_ref(struct module *mod, const char *modname,
+ 	}
  }
- EXPORT_SYMBOL(__delay);
  
--inline void __const_udelay(unsigned long xloops)
-+void __const_udelay(unsigned long xloops)
++static char *remove_dot(char *s)
++{
++	char *end;
++	int n = strcspn(s, ".");
++
++	if (n > 0 && s[n] != 0) {
++		strtoul(s + n + 1, &end, 10);
++		if  (end > s + n + 1 && (*end == '.' || *end == 0))
++			s[n] = 0;
++	}
++	return s;
++}
++
+ static void read_symbols(char *modname)
  {
- 	int d0;
+ 	const char *symname;
+@@ -1722,7 +1735,7 @@ static void read_symbols(char *modname)
+ 	}
+ 
+ 	for (sym = info.symtab_start; sym < info.symtab_stop; sym++) {
+-		symname = info.strtab + sym->st_name;
++		symname = remove_dot(info.strtab + sym->st_name);
+ 
+ 		handle_modversions(mod, &info, sym, symname);
+ 		handle_moddevtable(mod, &info, sym, symname);
+diff --git a/scripts/mod/modpost.h b/scripts/mod/modpost.h
+index 51207e4..168b43d 100644
+--- a/scripts/mod/modpost.h
++++ b/scripts/mod/modpost.h
+@@ -127,7 +127,7 @@ struct elf_info {
+ 	Elf_Section  export_gpl_sec;
+ 	Elf_Section  export_unused_gpl_sec;
+ 	Elf_Section  export_gpl_future_sec;
+-	const char   *strtab;
++	char         *strtab;
+ 	char	     *modinfo;
+ 	unsigned int modinfo_len;
  
 -- 
 1.8.5.2
