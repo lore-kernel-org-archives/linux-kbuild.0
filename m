@@ -1,47 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from asav12.altibox.net ([81.167.36.146]:57823 "EHLO
-	asav12.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753891AbaBOVfu (ORCPT
+Received: from asavdk3.altibox.net ([109.247.116.14]:52895 "EHLO
+	asavdk3.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753600AbaBOVgo (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 15 Feb 2014 16:35:50 -0500
-Date: Sat, 15 Feb 2014 22:35:45 +0100
+	Sat, 15 Feb 2014 16:36:44 -0500
+Date: Sat, 15 Feb 2014 22:36:40 +0100
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH 14/19] Kbuild, lto: Handle basic LTO in modpost
-Message-ID: <20140215213545.GB27587@ravnborg.org>
+Subject: Re: [PATCH 08/19] Kbuild, lto, workaround: Don't warn for
+ initcall_reference in modpost
+Message-ID: <20140215213640.GC27587@ravnborg.org>
 References: <1392412903-25733-1-git-send-email-andi@firstfloor.org>
- <1392412903-25733-15-git-send-email-andi@firstfloor.org>
+ <1392412903-25733-9-git-send-email-andi@firstfloor.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1392412903-25733-15-git-send-email-andi@firstfloor.org>
+In-Reply-To: <1392412903-25733-9-git-send-email-andi@firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Andi Kleen <andi@firstfloor.org>
 Cc: linux-kernel@vger.kernel.org, x86@kernel.org, linux-kbuild@vger.kernel.org, mmarek@suse.cz, Andi Kleen <ak@linux.intel.com>
 
-On Fri, Feb 14, 2014 at 10:21:38PM +0100, Andi Kleen wrote:
+On Fri, Feb 14, 2014 at 10:21:32PM +0100, Andi Kleen wrote:
 > From: Andi Kleen <ak@linux.intel.com>
 > 
-> - Don't warn about LTO marker symbols. modpost runs before
-> the linker, so the module is not necessarily LTOed yet.
-> - Don't complain about .gnu.lto* sections
+> This reference is discarded, but can cause warnings when it refers to
+> exit. Ignore for now.
+> 
+> This is a workaround and can be removed once we get rid of
+> -fno-toplevel-reorder
 > 
 > Signed-off-by: Andi Kleen <ak@linux.intel.com>
 > ---
->  scripts/mod/modpost.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
+>  scripts/mod/modpost.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 > 
 > diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-> index f91dd45..63804a1 100644
+> index 4061098..1f1b154 100644
 > --- a/scripts/mod/modpost.c
 > +++ b/scripts/mod/modpost.c
-> @@ -623,7 +623,10 @@ static void handle_modversions(struct module *mod, struct elf_info *info,
+> @@ -1455,6 +1455,10 @@ static void check_section_mismatch(const char *modname, struct elf_info *elf,
+>  		to = find_elf_symbol(elf, r->r_addend, sym);
+>  		tosym = sym_name(elf, to);
 >  
->  	switch (sym->st_shndx) {
->  	case SHN_COMMON:
-> -		warn("\"%s\" [%s] is COMMON symbol\n", symname, mod->name);
-> +		if (!strncmp(symname, "__gnu_lto_", sizeof("__gnu_lto_")-1)) {
+> +		if (!strncmp(fromsym, "reference___initcall",
+> +				sizeof("reference___initcall")-1))
 
-Please use space around "-".
+Please use spaces around "-"
 
 	Sam
