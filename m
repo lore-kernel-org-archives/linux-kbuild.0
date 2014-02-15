@@ -1,43 +1,30 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:6596 "EHLO mga09.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752890AbaBNVW0 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 14 Feb 2014 16:22:26 -0500
-From: Andi Kleen <andi@firstfloor.org>
-Subject: [PATCH 06/19] lto: Disable LTO for sys_ni
-Date: Fri, 14 Feb 2014 22:21:30 +0100
-Message-Id: <1392412903-25733-7-git-send-email-andi@firstfloor.org>
-In-Reply-To: <1392412903-25733-1-git-send-email-andi@firstfloor.org>
+Received: from ud10.udmedia.de ([194.117.254.50]:53964 "EHLO
+	mail.ud10.udmedia.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752189AbaBONiR (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 15 Feb 2014 08:38:17 -0500
+Date: Sat, 15 Feb 2014 14:38:14 +0100
+From: Markus Trippelsdorf <markus@trippelsdorf.de>
+Subject: Re: Updated Link-Time-Optimization patchkit
+Message-ID: <20140215133814.GA287@x4>
 References: <1392412903-25733-1-git-send-email-andi@firstfloor.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1392412903-25733-1-git-send-email-andi@firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: x86@kernel.org, linux-kbuild@vger.kernel.org, mmarek@suse.cz, Andi Kleen <ak@linux.intel.com>
+To: Andi Kleen <andi@firstfloor.org>
+Cc: linux-kernel@vger.kernel.org, x86@kernel.org, linux-kbuild@vger.kernel.org, mmarek@suse.cz
 
-From: Andi Kleen <ak@linux.intel.com>
+On 2014.02.14 at 22:21 +0100, Andi Kleen wrote:
+> This is the updated LTO patchkit for 3.14-rc2.  LTO allows
+> the compiler to do global optimization over the whole kernel.
 
-The assembler alias code in cond_syscall does not work
-when compiled for LTO. Just disable LTO for that file.
+It is mildly annoying that one couldn't use vanilla binutils. Have you
+already opened bugs on sourceware.org/bugzilla/ to get this fixed for
+gold and ld.bfd?
 
-Signed-off-by: Andi Kleen <ak@linux.intel.com>
----
- kernel/Makefile | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/kernel/Makefile b/kernel/Makefile
-index bc010ee..31c26c6 100644
---- a/kernel/Makefile
-+++ b/kernel/Makefile
-@@ -18,6 +18,9 @@ CFLAGS_REMOVE_cgroup-debug.o = -pg
- CFLAGS_REMOVE_irq_work.o = -pg
- endif
- 
-+# cond_syscall is currently not LTO compatible
-+CFLAGS_sys_ni.o = $(DISABLE_LTO)
-+
- obj-y += sched/
- obj-y += locking/
- obj-y += power/
 -- 
-1.8.5.2
-
+Markus
