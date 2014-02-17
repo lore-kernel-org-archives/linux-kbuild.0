@@ -1,122 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from asavdk3.altibox.net ([109.247.116.14]:37900 "EHLO
-	asavdk3.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753320AbaBPUhq (ORCPT
+Received: from mail-lb0-f171.google.com ([209.85.217.171]:58701 "EHLO
+	mail-lb0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751154AbaBQJmv (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 16 Feb 2014 15:37:46 -0500
-Date: Sun, 16 Feb 2014 21:37:24 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [RFC] kbuild: drop use of "ld -r" for intermediate links of vmlinux
-Message-ID: <20140216203724.GA19216@ravnborg.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+	Mon, 17 Feb 2014 04:42:51 -0500
+Received: by mail-lb0-f171.google.com with SMTP id c11so11305272lbj.30
+        for <linux-kbuild@vger.kernel.org>; Mon, 17 Feb 2014 01:42:50 -0800 (PST)
+From: Fathi Boudra <fathi.boudra@linaro.org>
+Subject: [PATCH] Makefile: fix extra parenthesis typo when CC_STACKPROTECTOR_REGULAR is enabled
+Date: Mon, 17 Feb 2014 11:42:47 +0200
+Message-Id: <1392630167-26317-1-git-send-email-fathi.boudra@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Andi Kleen <andi@firstfloor.org>, mmarek@suse.cz, Cary Coutant <ccoutant@google.com>, Alan Modra <amodra@gmail.com>
+To: linux-kbuild <linux-kbuild@vger.kernel.org>
+Cc: Michal Marek <mmarek@suse.cz>, Kees Cook <keescook@chromium.org>, Fathi Boudra <fathi.boudra@linaro.org>
 
-The approach today is that all files that ends up in vmlinux are
-linked directory by directory using "ld -r".
+extra parenthesis typo introduced in commit 19952a9203 is causing
+the following error when CONFIG_CC_STACKPROTECTOR_REGULAR is enabled:
+Makefile:608: Cannot use CONFIG_CC_STACKPROTECTOR: -fstack-protector not
+supported by compiler
+Makefile:608: *** missing separator.  Stop.
 
-The following patch moves away from all the intermediate links
-and do one huge link of all the .o files used for the final vmlinux.
+Signed-off-by: Fathi Boudra <fathi.boudra@linaro.org>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-The trick used is that for each directory a linker script is
-generated that name all the file to be linked - and for
-sub-directories this is just the linker script for that directory.
-
-The file continue to be named "built-in.o" but it is really a linker script.
-
-A limitation using linker scripts like this is that this introduces
-a maximum depth of 10 levels (ld limitation when using INPUT).
-And the final link will for a kernel likely involves > 1000 .o files.
-
-For now this is an experimental path - and I have not even tried
-to boot the kernel (as this is not simple in my current setup).
-
-Feedback from the binutils people would be great if this is
-actually a good way to get rid of the use of "ld -r" in the kernel.
-Copied a few binutils people to hopefully get some feedback.
-
-A typical file looks like this:
-
-$cat kernel/built-in.o
-INPUT(kernel/fork.o kernel/exec_domain.o ... kernel/locking/built-in.o ...)
-
-kernel/locking/built-in.o is another linker script that again reference some .o files.
-
-The background for this patch was that the LTO patch-kit that Andi Kleen is
-working on referenced a thread in binutils mailing list that complained
-about the use of "ld -r" in the kernel build and that LTO support for
-"ld -r" builds would likely not be accepted in binutils.
-
-I had woked on the following some years ago and recreated the patch.
-I recall the idea is from someone else - but have long lost memory of
-from where I saw it.
-
-	Sam
-
-
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index a48abea..b6ca48a 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -249,14 +249,6 @@ config DEBUG_SECTION_MISMATCH
- 	    the analysis would not catch the illegal reference.
- 	    This option tells gcc to inline less (but it does result in
- 	    a larger kernel).
--	  - Run the section mismatch analysis for each module/built-in.o file.
--	    When we run the section mismatch analysis on vmlinux.o, we
--	    lose valueble information about where the mismatch was
--	    introduced.
--	    Running the analysis for each module/built-in.o file
--	    tells where the mismatch happens much closer to the
--	    source. The drawback is that the same mismatch is
--	    reported at least twice.
- 	  - Enable verbose reporting from modpost in order to help resolve
- 	    the section mismatches that are reported.
- 
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index d5d859c..a568276 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -158,11 +158,6 @@ ifneq ($(KBUILD_CHECKSRC),0)
+diff --git a/Makefile b/Makefile
+index 893d6f0..eeaf3e7 100644
+--- a/Makefile
++++ b/Makefile
+@@ -606,7 +606,7 @@ ifdef CONFIG_CC_STACKPROTECTOR_REGULAR
+   stackp-flag := -fstack-protector
+   ifeq ($(call cc-option, $(stackp-flag)),)
+     $(warning Cannot use CONFIG_CC_STACKPROTECTOR: \
+-	      -fstack-protector not supported by compiler))
++	      -fstack-protector not supported by compiler)
    endif
- endif
- 
--# Do section mismatch analysis for each module/built-in.o
--ifdef CONFIG_DEBUG_SECTION_MISMATCH
--  cmd_secanalysis = ; scripts/mod/modpost $@
--endif
--
- # Compile C sources (.c)
- # ---------------------------------------------------------------------------
- 
-@@ -378,10 +373,9 @@ $(sort $(subdir-obj-y)): $(subdir-ym) ;
- ifdef builtin-target
- quiet_cmd_link_o_target = LD      $@
- # If the list of objects to link is empty, just create an empty built-in.o
--cmd_link_o_target = $(if $(strip $(obj-y)),\
--		      $(LD) $(ld_flags) -r -o $@ $(filter $(obj-y), $^) \
--		      $(cmd_secanalysis),\
--		      rm -f $@; $(AR) rcs$(KBUILD_ARFLAGS) $@)
-+cmd_link_o_target = $(if $(filter $(obj-y), $^),                   \
-+			echo INPUT\($(filter $(obj-y), $^)\) > $@, \
-+			echo "/* empty */" > $@)
- 
- $(builtin-target): $(obj-y) FORCE
- 	$(call if_changed,link_o_target)
-@@ -428,10 +422,10 @@ $($(subst $(obj)/,,$(@:.o=-objs)))    \
- $($(subst $(obj)/,,$(@:.o=-y)))), $^)
-  
- quiet_cmd_link_multi-y = LD      $@
--cmd_link_multi-y = $(LD) $(ld_flags) -r -o $@ $(link_multi_deps) $(cmd_secanalysis)
-+cmd_link_multi-y = echo INPUT\($(link_multi_deps)\) > $@
- 
- quiet_cmd_link_multi-m = LD [M]  $@
--cmd_link_multi-m = $(cmd_link_multi-y)
-+cmd_link_multi-m = $(LD) $(ld_flags) -r -o $@ $(link_multi_deps)
- 
- # We would rather have a list of rules like
- # 	foo.o: $(foo-objs)
+ else ifdef CONFIG_CC_STACKPROTECTOR_STRONG
+   stackp-flag := -fstack-protector-strong
+-- 
+1.8.1.2
+
