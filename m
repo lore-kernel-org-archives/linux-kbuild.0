@@ -1,47 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:60260 "EHLO mga11.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755987AbaBRO3s (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 18 Feb 2014 09:29:48 -0500
-From: Andi Kleen <andi@firstfloor.org>
-Subject: [PATCH 08/20] Kbuild, lto, workaround: Don't warn for initcall_reference in modpost
-Date: Tue, 18 Feb 2014 15:28:46 +0100
-Message-Id: <1392733738-8290-9-git-send-email-andi@firstfloor.org>
-In-Reply-To: <1392733738-8290-1-git-send-email-andi@firstfloor.org>
+Received: from userp1040.oracle.com ([156.151.31.81]:44028 "EHLO
+	userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755478AbaBROvU (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 18 Feb 2014 09:51:20 -0500
+Date: Tue, 18 Feb 2014 09:50:39 -0500
+From: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Subject: Re: [PATCH 19/20] lto, module: Warn about modules that are not fully
+ LTOed
+Message-ID: <20140218145039.GA5339@phenom.dumpdata.com>
 References: <1392733738-8290-1-git-send-email-andi@firstfloor.org>
+ <1392733738-8290-20-git-send-email-andi@firstfloor.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1392733738-8290-20-git-send-email-andi@firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: sam@ravnborg.org, x86@kernel.org, linux-kbuild@vger.kernel.org, Andi Kleen <ak@linux.intel.com>
+To: Andi Kleen <andi@firstfloor.org>
+Cc: linux-kernel@vger.kernel.org, sam@ravnborg.org, x86@kernel.org, linux-kbuild@vger.kernel.org, Andi Kleen <ak@linux.intel.com>, rusty@rustcorp.com.au
 
-From: Andi Kleen <ak@linux.intel.com>
+On Tue, Feb 18, 2014 at 03:28:57PM +0100, Andi Kleen wrote:
+> From: Andi Kleen <ak@linux.intel.com>
+> 
+> When __gnu_lto_* is present that means that the module hasn't run with
+> LTO yet.
 
-This reference is discarded, but can cause warnings when it refers to
-exit. Ignore for now.
+The title says 'warn' but this is not a warning just information.
 
-This is a workaround and can be removed once we get rid of
--fno-toplevel-reorder
+Can you actually build modules against the kernel with different compiler
+options? I thought it would complain when trying to load about some
+form of mismatch?
 
-Signed-off-by: Andi Kleen <ak@linux.intel.com>
----
- scripts/mod/modpost.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 4061098..bd06857 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -1455,6 +1455,10 @@ static void check_section_mismatch(const char *modname, struct elf_info *elf,
- 		to = find_elf_symbol(elf, r->r_addend, sym);
- 		tosym = sym_name(elf, to);
- 
-+		if (!strncmp(fromsym, "reference___initcall",
-+				sizeof("reference___initcall") - 1))
-+			return;
-+
- 		/* check whitelist - we may ignore it */
- 		if (secref_whitelist(mismatch,
- 					fromsec, fromsym, tosec, tosym)) {
--- 
-1.8.5.2
-
+> 
+> Cc: rusty@rustcorp.com.au
+> Signed-off-by: Andi Kleen <ak@linux.intel.com>
+> ---
+>  kernel/module.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/kernel/module.c b/kernel/module.c
+> index b99e801..4f3eff7 100644
+> --- a/kernel/module.c
+> +++ b/kernel/module.c
+> @@ -1949,8 +1949,11 @@ static int simplify_symbols(struct module *mod, const struct load_info *info)
+>  		switch (sym[i].st_shndx) {
+>  		case SHN_COMMON:
+>  			/* Ignore common symbols */
+> -			if (!strncmp(name, "__gnu_lto", 9))
+> +			if (!strncmp(name, "__gnu_lto", 9)) {
+> +				pr_info("%s: module not link time optimized\n",
+> +				       mod->name);
+>  				break;
+> +			}
+>  
+>  			/* We compiled with -fno-common.  These are not
+>  			   supposed to happen.  */
+> -- 
+> 1.8.5.2
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Please read the FAQ at  http://www.tux.org/lkml/
