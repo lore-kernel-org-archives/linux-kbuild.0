@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:5554 "EHLO mga02.intel.com"
+Received: from mga02.intel.com ([134.134.136.20]:2070 "EHLO mga02.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755996AbaBRO3u (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 18 Feb 2014 09:29:50 -0500
+	id S1755992AbaBRO3t (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 18 Feb 2014 09:29:49 -0500
 From: Andi Kleen <andi@firstfloor.org>
-Subject: [PATCH 09/20] Kbuild, lto: Drop .number postfixes in modpost
-Date: Tue, 18 Feb 2014 15:28:47 +0100
-Message-Id: <1392733738-8290-10-git-send-email-andi@firstfloor.org>
+Subject: [PATCH 10/20] Kbuild, lto: add ld-version and ld-ifversion macros
+Date: Tue, 18 Feb 2014 15:28:48 +0100
+Message-Id: <1392733738-8290-11-git-send-email-andi@firstfloor.org>
 In-Reply-To: <1392733738-8290-1-git-send-email-andi@firstfloor.org>
 References: <1392733738-8290-1-git-send-email-andi@firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -16,63 +16,71 @@ Cc: sam@ravnborg.org, x86@kernel.org, linux-kbuild@vger.kernel.org, Andi Kleen <
 
 From: Andi Kleen <ak@linux.intel.com>
 
-LTO turns all global symbols effectively into statics. This
-has the side effect that they all have a .NUMBER postfix to make
-them unique. In modpost drop this postfix because it confuses
-it.
+To check the linker version. Used by the LTO makefile.
 
 Signed-off-by: Andi Kleen <ak@linux.intel.com>
 ---
- scripts/mod/modpost.c | 15 ++++++++++++++-
- scripts/mod/modpost.h |  2 +-
- 2 files changed, 15 insertions(+), 2 deletions(-)
+ Documentation/kbuild/makefiles.txt | 10 ++++++++++
+ scripts/Kbuild.include             |  9 +++++++++
+ scripts/ld-version.sh              |  8 ++++++++
+ 3 files changed, 27 insertions(+)
+ create mode 100755 scripts/ld-version.sh
 
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index bd06857..d0fc656 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -1684,6 +1684,19 @@ static void check_sec_ref(struct module *mod, const char *modname,
- 	}
- }
+diff --git a/Documentation/kbuild/makefiles.txt b/Documentation/kbuild/makefiles.txt
+index d567a7c..40d51f3 100644
+--- a/Documentation/kbuild/makefiles.txt
++++ b/Documentation/kbuild/makefiles.txt
+@@ -595,6 +595,16 @@ more details, with real examples.
+ 		#Makefile
+ 		LDFLAGS_vmlinux += $(call ld-option, -X)
  
-+static char *remove_dot(char *s)
-+{
-+	char *end;
-+	int n = strcspn(s, ".");
++    ld-version
++	ld-version returns the full version number of $(LD), for three
++	number binutils versions, like the Linux binutils
 +
-+	if (n > 0 && s[n] != 0) {
-+		strtoul(s + n + 1, &end, 10);
-+		if  (end > s + n + 1 && (*end == '.' || *end == 0))
-+			s[n] = 0;
++    ld-ifversion
++	Check the version number of the $(LD) linker in an if.
++
++	Example:
++		#Makefile.lto
++		ifeq ($(call ld-ifversion,-ge,22710001,y),y)
+ 
+ === 4 Host Program support
+ 
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index 547e15d..93a0da2 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -155,6 +155,15 @@ ld-option = $(call try-run,\
+ # Important: no spaces around options
+ ar-option = $(call try-run, $(AR) rc$(1) "$$TMP",$(1),$(2))
+ 
++# ld-version
++# Usage: $(call ld-version)
++# Note this is mainly for HJ Lu's 3 number binutil versions
++ld-version = $(shell $(LD) --version | $(srctree)/scripts/ld-version.sh)
++
++# ld-ifversion
++# Usage:  $(call ld-ifversion, -ge, 22252, y)
++ld-ifversion = $(shell [ $(call ld-version) $(1) $(2) ] && echo $(3))
++
+ ######
+ 
+ ###
+diff --git a/scripts/ld-version.sh b/scripts/ld-version.sh
+new file mode 100755
+index 0000000..198580d
+--- /dev/null
++++ b/scripts/ld-version.sh
+@@ -0,0 +1,8 @@
++#!/usr/bin/awk -f
++# extract linker version number from stdin and turn into single number
++	{
++	gsub(".*)", "");
++	split($1,a, ".");
++	print a[1]*10000000 + a[2]*100000 + a[3]*10000 + a[4]*100 + a[5];
++	exit
 +	}
-+	return s;
-+}
-+
- static void read_symbols(char *modname)
- {
- 	const char *symname;
-@@ -1722,7 +1735,7 @@ static void read_symbols(char *modname)
- 	}
- 
- 	for (sym = info.symtab_start; sym < info.symtab_stop; sym++) {
--		symname = info.strtab + sym->st_name;
-+		symname = remove_dot(info.strtab + sym->st_name);
- 
- 		handle_modversions(mod, &info, sym, symname);
- 		handle_moddevtable(mod, &info, sym, symname);
-diff --git a/scripts/mod/modpost.h b/scripts/mod/modpost.h
-index 51207e4..168b43d 100644
---- a/scripts/mod/modpost.h
-+++ b/scripts/mod/modpost.h
-@@ -127,7 +127,7 @@ struct elf_info {
- 	Elf_Section  export_gpl_sec;
- 	Elf_Section  export_unused_gpl_sec;
- 	Elf_Section  export_gpl_future_sec;
--	const char   *strtab;
-+	char         *strtab;
- 	char	     *modinfo;
- 	unsigned int modinfo_len;
- 
 -- 
 1.8.5.2
 
