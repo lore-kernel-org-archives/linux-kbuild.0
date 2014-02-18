@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:12903 "EHLO mga11.intel.com"
+Received: from mga02.intel.com ([134.134.136.20]:5554 "EHLO mga02.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755977AbaBRO3r (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 18 Feb 2014 09:29:47 -0500
+	id S1755996AbaBRO3u (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 18 Feb 2014 09:29:50 -0500
 From: Andi Kleen <andi@firstfloor.org>
-Subject: [PATCH 04/20] lto, workaround: Add workaround for initcall reordering
-Date: Tue, 18 Feb 2014 15:28:42 +0100
-Message-Id: <1392733738-8290-5-git-send-email-andi@firstfloor.org>
+Subject: [PATCH 09/20] Kbuild, lto: Drop .number postfixes in modpost
+Date: Tue, 18 Feb 2014 15:28:47 +0100
+Message-Id: <1392733738-8290-10-git-send-email-andi@firstfloor.org>
 In-Reply-To: <1392733738-8290-1-git-send-email-andi@firstfloor.org>
 References: <1392733738-8290-1-git-send-email-andi@firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -16,59 +16,63 @@ Cc: sam@ravnborg.org, x86@kernel.org, linux-kbuild@vger.kernel.org, Andi Kleen <
 
 From: Andi Kleen <ak@linux.intel.com>
 
-Work around a LTO gcc problem: when there is no reference to a variable
-in a module it will be moved to the end of the program. This causes
-reordering of initcalls which the kernel does not like.
-Add a dummy reference function to avoid this. The function is
-deleted by the linker.
-
-This replaces a previous much slower workaround.
-
-Thanks to Honza Hubicka for suggesting this technique.
+LTO turns all global symbols effectively into statics. This
+has the side effect that they all have a .NUMBER postfix to make
+them unique. In modpost drop this postfix because it confuses
+it.
 
 Signed-off-by: Andi Kleen <ak@linux.intel.com>
 ---
- include/linux/init.h | 20 +++++++++++++++++++-
- 1 file changed, 19 insertions(+), 1 deletion(-)
+ scripts/mod/modpost.c | 15 ++++++++++++++-
+ scripts/mod/modpost.h |  2 +-
+ 2 files changed, 15 insertions(+), 2 deletions(-)
 
-diff --git a/include/linux/init.h b/include/linux/init.h
-index e168880..a3ba270 100644
---- a/include/linux/init.h
-+++ b/include/linux/init.h
-@@ -163,6 +163,23 @@ extern bool initcall_debug;
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index bd06857..d0fc656 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -1684,6 +1684,19 @@ static void check_sec_ref(struct module *mod, const char *modname,
+ 	}
+ }
  
- #ifndef __ASSEMBLY__
- 
-+#ifdef CONFIG_LTO
-+/* Work around a LTO gcc problem: when there is no reference to a variable
-+ * in a module it will be moved to the end of the program. This causes
-+ * reordering of initcalls which the kernel does not like.
-+ * Add a dummy reference function to avoid this. The function is
-+ * deleted by the linker.
-+ */
-+#define LTO_REFERENCE_INITCALL(x) \
-+	; /* yes this is needed */			\
-+	static __used __exit void *reference_##x(void)	\
-+	{						\
-+		return &x;				\
-+	}
-+#else
-+#define LTO_REFERENCE_INITCALL(x)
-+#endif
++static char *remove_dot(char *s)
++{
++	char *end;
++	int n = strcspn(s, ".");
 +
- /* initcalls are now grouped by functionality into separate 
-  * subsections. Ordering inside the subsections is determined
-  * by link order. 
-@@ -175,7 +192,8 @@ extern bool initcall_debug;
++	if (n > 0 && s[n] != 0) {
++		strtoul(s + n + 1, &end, 10);
++		if  (end > s + n + 1 && (*end == '.' || *end == 0))
++			s[n] = 0;
++	}
++	return s;
++}
++
+ static void read_symbols(char *modname)
+ {
+ 	const char *symname;
+@@ -1722,7 +1735,7 @@ static void read_symbols(char *modname)
+ 	}
  
- #define __define_initcall(fn, id) \
- 	static initcall_t __initcall_##fn##id __used \
--	__attribute__((__section__(".initcall" #id ".init"))) = fn
-+	__attribute__((__section__(".initcall" #id ".init"))) = fn; \
-+	LTO_REFERENCE_INITCALL(__initcall_##fn##id)
+ 	for (sym = info.symtab_start; sym < info.symtab_stop; sym++) {
+-		symname = info.strtab + sym->st_name;
++		symname = remove_dot(info.strtab + sym->st_name);
  
- /*
-  * Early initcalls run before initializing SMP.
+ 		handle_modversions(mod, &info, sym, symname);
+ 		handle_moddevtable(mod, &info, sym, symname);
+diff --git a/scripts/mod/modpost.h b/scripts/mod/modpost.h
+index 51207e4..168b43d 100644
+--- a/scripts/mod/modpost.h
++++ b/scripts/mod/modpost.h
+@@ -127,7 +127,7 @@ struct elf_info {
+ 	Elf_Section  export_gpl_sec;
+ 	Elf_Section  export_unused_gpl_sec;
+ 	Elf_Section  export_gpl_future_sec;
+-	const char   *strtab;
++	char         *strtab;
+ 	char	     *modinfo;
+ 	unsigned int modinfo_len;
+ 
 -- 
 1.8.5.2
 
