@@ -1,46 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from one.firstfloor.org ([193.170.194.197]:55389 "EHLO
-	one.firstfloor.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751823AbaBRSwR (ORCPT
+Received: from asavdk3.altibox.net ([109.247.116.14]:44421 "EHLO
+	asavdk3.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751335AbaBRVsS (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 18 Feb 2014 13:52:17 -0500
-Date: Tue, 18 Feb 2014 19:52:16 +0100
-From: Andi Kleen <andi@firstfloor.org>
-Subject: Re: [PATCH 19/20] lto, module: Warn about modules that are not
- fully LTOed
-Message-ID: <20140218185216.GC22728@two.firstfloor.org>
-References: <1392733738-8290-1-git-send-email-andi@firstfloor.org>
- <1392733738-8290-20-git-send-email-andi@firstfloor.org>
- <20140218145039.GA5339@phenom.dumpdata.com>
+	Tue, 18 Feb 2014 16:48:18 -0500
+Date: Tue, 18 Feb 2014 22:48:01 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [RFC] kbuild: drop use of "ld -r" for intermediate links of
+ vmlinux
+Message-ID: <20140218214801.GA25163@ravnborg.org>
+References: <20140216203724.GA19216@ravnborg.org>
+ <20140218145856.GZ3386@bubble.grove.modra.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20140218145039.GA5339@phenom.dumpdata.com>
+In-Reply-To: <20140218145856.GZ3386@bubble.grove.modra.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
-Cc: Andi Kleen <andi@firstfloor.org>, linux-kernel@vger.kernel.org, sam@ravnborg.org, x86@kernel.org, linux-kbuild@vger.kernel.org, Andi Kleen <ak@linux.intel.com>, rusty@rustcorp.com.au
+To: Alan Modra <amodra@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Andi Kleen <andi@firstfloor.org>, mmarek@suse.cz, Cary Coutant <ccoutant@google.com>, Stephen Rothwell <sfr@canb.auug.org.au>
 
-On Tue, Feb 18, 2014 at 09:50:39AM -0500, Konrad Rzeszutek Wilk wrote:
-> On Tue, Feb 18, 2014 at 03:28:57PM +0100, Andi Kleen wrote:
-> > From: Andi Kleen <ak@linux.intel.com>
+On Wed, Feb 19, 2014 at 01:28:56AM +1030, Alan Modra wrote:
+> On Sun, Feb 16, 2014 at 09:37:24PM +0100, Sam Ravnborg wrote:
+> > The trick used is that for each directory a linker script is
+> > generated that name all the file to be linked - and for
+> > sub-directories this is just the linker script for that directory.
 > > 
-> > When __gnu_lto_* is present that means that the module hasn't run with
-> > LTO yet.
+> > The file continue to be named "built-in.o" but it is really a linker script.
 > 
-> The title says 'warn' but this is not a warning just information.
+> You'll need binutils newer than 2012-06-25
+> https://sourceware.org/ml/binutils/2012-06/msg00201.html
 > 
-> Can you actually build modules against the kernel with different compiler
-> options? I thought it would complain when trying to load about some
-> form of mismatch?
+> > I recall the idea is from someone else - but have long lost memory of
+> > from where I saw it.
+> 
+> I think it might have been my idea originally, implemented by Stephen
+> Rothwell.
+Sounds right - added in cc:
 
-Sure it has worked forever (I think the only reason we still check
-compiler versions was some ancient long obsolete ABI problem)
+> 
+> Another possibility is to use thin archives to package up the objects.
+> Thin archives are like normal archives except they just contain paths
+> to the objects, not the object contents.  Paths are flattened when
+> adding one thin archive to another.  I think Stephen may have tried
+> that idea too.
+I just coded this in a similar simple fashion.
+It broke building vdso - needs to look into that and will get back when I may
+understand why my link suddenly broke.
 
-LTO is also fully ABI compatible.
+Thanks for the feedback!
 
-Hmm I think this patch can be actually removed now because I default
-to slim LTO, and with that it wouldn't even load if this happens.
-I'll remove it.
-
--Andi
+	Sam
