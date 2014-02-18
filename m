@@ -1,43 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from one.firstfloor.org ([193.170.194.197]:55378 "EHLO
+Received: from one.firstfloor.org ([193.170.194.197]:55389 "EHLO
 	one.firstfloor.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750939AbaBRSuK (ORCPT
+	with ESMTP id S1751823AbaBRSwR (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 18 Feb 2014 13:50:10 -0500
-Date: Tue, 18 Feb 2014 19:50:08 +0100
+	Tue, 18 Feb 2014 13:52:17 -0500
+Date: Tue, 18 Feb 2014 19:52:16 +0100
 From: Andi Kleen <andi@firstfloor.org>
-Subject: Re: [PATCH 1/6] kbuild: Remove relocations from kallsyms table
-Message-ID: <20140218185007.GB22728@two.firstfloor.org>
-References: <1392733470-8228-1-git-send-email-andi@firstfloor.org>
- <1392733470-8228-2-git-send-email-andi@firstfloor.org>
- <53036E26.1040701@zytor.com>
+Subject: Re: [PATCH 19/20] lto, module: Warn about modules that are not
+ fully LTOed
+Message-ID: <20140218185216.GC22728@two.firstfloor.org>
+References: <1392733738-8290-1-git-send-email-andi@firstfloor.org>
+ <1392733738-8290-20-git-send-email-andi@firstfloor.org>
+ <20140218145039.GA5339@phenom.dumpdata.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <53036E26.1040701@zytor.com>
+In-Reply-To: <20140218145039.GA5339@phenom.dumpdata.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "H. Peter Anvin" <hpa@zytor.com>
-Cc: Andi Kleen <andi@firstfloor.org>, linux-kernel@vger.kernel.org, sam@ravnborg.org, x86@kernel.org, linux-kbuild@vger.kernel.org, Andi Kleen <ak@linux.intel.com>
+To: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Cc: Andi Kleen <andi@firstfloor.org>, linux-kernel@vger.kernel.org, sam@ravnborg.org, x86@kernel.org, linux-kbuild@vger.kernel.org, Andi Kleen <ak@linux.intel.com>, rusty@rustcorp.com.au
 
-On Tue, Feb 18, 2014 at 06:28:54AM -0800, H. Peter Anvin wrote:
-> On 02/18/2014 06:24 AM, Andi Kleen wrote:
+On Tue, Feb 18, 2014 at 09:50:39AM -0500, Konrad Rzeszutek Wilk wrote:
+> On Tue, Feb 18, 2014 at 03:28:57PM +0100, Andi Kleen wrote:
 > > From: Andi Kleen <ak@linux.intel.com>
 > > 
-> > Remove the ELF relocations from the kallsyms_address[] table.
-> > Instead we just store offsets to _text and relocate that while
-> > accessing the kallsyms table. This is done with a new
-> > kallsyms_offsets[] table. With these changes .tmp_kallsyms*.o
-> > becomes relocation free.
-> > 
-> > In theory this would also allow to shrink the kallsyms table
-> > on 64bit by using offsets.
-> > 
+> > When __gnu_lto_* is present that means that the module hasn't run with
+> > LTO yet.
 > 
-> Why not do that, then?
+> The title says 'warn' but this is not a warning just information.
+> 
+> Can you actually build modules against the kernel with different compiler
+> options? I thought it would complain when trying to load about some
+> form of mismatch?
 
-I tried it once, but it didn't boot for some reason. Didn't have
-time to track it down so I removed it. Could be done as followon
-work.
+Sure it has worked forever (I think the only reason we still check
+compiler versions was some ancient long obsolete ABI problem)
+
+LTO is also fully ABI compatible.
+
+Hmm I think this patch can be actually removed now because I default
+to slim LTO, and with that it wouldn't even load if this happens.
+I'll remove it.
 
 -Andi
