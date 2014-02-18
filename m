@@ -1,43 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:60260 "EHLO mga11.intel.com"
+Received: from mga02.intel.com ([134.134.136.20]:27315 "EHLO mga02.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755980AbaBRO3r (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 18 Feb 2014 09:29:47 -0500
+	id S1755989AbaBRO3t (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 18 Feb 2014 09:29:49 -0500
 From: Andi Kleen <andi@firstfloor.org>
-Subject: [PATCH 06/20] lto: Disable LTO for sys_ni
-Date: Tue, 18 Feb 2014 15:28:44 +0100
-Message-Id: <1392733738-8290-7-git-send-email-andi@firstfloor.org>
+Subject: [PATCH 05/20] lto: Handle LTO common symbols in module loader
+Date: Tue, 18 Feb 2014 15:28:43 +0100
+Message-Id: <1392733738-8290-6-git-send-email-andi@firstfloor.org>
 In-Reply-To: <1392733738-8290-1-git-send-email-andi@firstfloor.org>
 References: <1392733738-8290-1-git-send-email-andi@firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
-Cc: sam@ravnborg.org, x86@kernel.org, linux-kbuild@vger.kernel.org, Andi Kleen <ak@linux.intel.com>
+Cc: sam@ravnborg.org, x86@kernel.org, linux-kbuild@vger.kernel.org, Joe Mario <jmario@redhat.com>, rusty@rustcorp.com.au, Andi Kleen <ak@linux.intel.com>
 
-From: Andi Kleen <ak@linux.intel.com>
+From: Joe Mario <jmario@redhat.com>
 
-The assembler alias code in cond_syscall does not work
-when compiled for LTO. Just disable LTO for that file.
+Here is the workaround I made for having the kernel not reject modules
+built with -flto.  The clean solution would be to get the compiler to not
+emit the symbol.  Or if it has to emit the symbol, then emit it as
+initialized data but put it into a comdat/linkonce section.
 
+Minor tweaks by AK over Joe's patch.
+
+Cc: rusty@rustcorp.com.au
 Signed-off-by: Andi Kleen <ak@linux.intel.com>
 ---
- kernel/Makefile | 3 +++
- 1 file changed, 3 insertions(+)
+ kernel/module.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/kernel/Makefile b/kernel/Makefile
-index bc010ee..31c26c6 100644
---- a/kernel/Makefile
-+++ b/kernel/Makefile
-@@ -18,6 +18,9 @@ CFLAGS_REMOVE_cgroup-debug.o = -pg
- CFLAGS_REMOVE_irq_work.o = -pg
- endif
+diff --git a/kernel/module.c b/kernel/module.c
+index d24fcf2..b99e801 100644
+--- a/kernel/module.c
++++ b/kernel/module.c
+@@ -1948,6 +1948,10 @@ static int simplify_symbols(struct module *mod, const struct load_info *info)
  
-+# cond_syscall is currently not LTO compatible
-+CFLAGS_sys_ni.o = $(DISABLE_LTO)
+ 		switch (sym[i].st_shndx) {
+ 		case SHN_COMMON:
++			/* Ignore common symbols */
++			if (!strncmp(name, "__gnu_lto", 9))
++				break;
 +
- obj-y += sched/
- obj-y += locking/
- obj-y += power/
+ 			/* We compiled with -fno-common.  These are not
+ 			   supposed to happen.  */
+ 			pr_debug("Common symbol: %s\n", name);
 -- 
 1.8.5.2
 
