@@ -1,46 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pa0-f46.google.com ([209.85.220.46]:54983 "EHLO
-	mail-pa0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755330AbaBRO7E (ORCPT
+Received: from one.firstfloor.org ([193.170.194.197]:55378 "EHLO
+	one.firstfloor.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750939AbaBRSuK (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 18 Feb 2014 09:59:04 -0500
-Date: Wed, 19 Feb 2014 01:28:56 +1030
-From: Alan Modra <amodra@gmail.com>
-Subject: Re: [RFC] kbuild: drop use of "ld -r" for intermediate links of
- vmlinux
-Message-ID: <20140218145856.GZ3386@bubble.grove.modra.org>
-References: <20140216203724.GA19216@ravnborg.org>
+	Tue, 18 Feb 2014 13:50:10 -0500
+Date: Tue, 18 Feb 2014 19:50:08 +0100
+From: Andi Kleen <andi@firstfloor.org>
+Subject: Re: [PATCH 1/6] kbuild: Remove relocations from kallsyms table
+Message-ID: <20140218185007.GB22728@two.firstfloor.org>
+References: <1392733470-8228-1-git-send-email-andi@firstfloor.org>
+ <1392733470-8228-2-git-send-email-andi@firstfloor.org>
+ <53036E26.1040701@zytor.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20140216203724.GA19216@ravnborg.org>
+In-Reply-To: <53036E26.1040701@zytor.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Andi Kleen <andi@firstfloor.org>, mmarek@suse.cz, Cary Coutant <ccoutant@google.com>
+To: "H. Peter Anvin" <hpa@zytor.com>
+Cc: Andi Kleen <andi@firstfloor.org>, linux-kernel@vger.kernel.org, sam@ravnborg.org, x86@kernel.org, linux-kbuild@vger.kernel.org, Andi Kleen <ak@linux.intel.com>
 
-On Sun, Feb 16, 2014 at 09:37:24PM +0100, Sam Ravnborg wrote:
-> The trick used is that for each directory a linker script is
-> generated that name all the file to be linked - and for
-> sub-directories this is just the linker script for that directory.
+On Tue, Feb 18, 2014 at 06:28:54AM -0800, H. Peter Anvin wrote:
+> On 02/18/2014 06:24 AM, Andi Kleen wrote:
+> > From: Andi Kleen <ak@linux.intel.com>
+> > 
+> > Remove the ELF relocations from the kallsyms_address[] table.
+> > Instead we just store offsets to _text and relocate that while
+> > accessing the kallsyms table. This is done with a new
+> > kallsyms_offsets[] table. With these changes .tmp_kallsyms*.o
+> > becomes relocation free.
+> > 
+> > In theory this would also allow to shrink the kallsyms table
+> > on 64bit by using offsets.
+> > 
 > 
-> The file continue to be named "built-in.o" but it is really a linker script.
+> Why not do that, then?
 
-You'll need binutils newer than 2012-06-25
-https://sourceware.org/ml/binutils/2012-06/msg00201.html
+I tried it once, but it didn't boot for some reason. Didn't have
+time to track it down so I removed it. Could be done as followon
+work.
 
-> I recall the idea is from someone else - but have long lost memory of
-> from where I saw it.
-
-I think it might have been my idea originally, implemented by Stephen
-Rothwell.
-
-Another possibility is to use thin archives to package up the objects.
-Thin archives are like normal archives except they just contain paths
-to the objects, not the object contents.  Paths are flattened when
-adding one thin archive to another.  I think Stephen may have tried
-that idea too.
-
--- 
-Alan Modra
-Australia Development Lab, IBM
+-Andi
