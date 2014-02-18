@@ -1,30 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:2070 "EHLO mga02.intel.com"
+Received: from mga11.intel.com ([192.55.52.93]:60260 "EHLO mga11.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755981AbaBRO3r (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 18 Feb 2014 09:29:47 -0500
+	id S1755987AbaBRO3s (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 18 Feb 2014 09:29:48 -0500
 From: Andi Kleen <andi@firstfloor.org>
-Subject: Link Time Optimization patchkit v3
-Date: Tue, 18 Feb 2014 15:28:38 +0100
-Message-Id: <1392733738-8290-1-git-send-email-andi@firstfloor.org>
+Subject: [PATCH 08/20] Kbuild, lto, workaround: Don't warn for initcall_reference in modpost
+Date: Tue, 18 Feb 2014 15:28:46 +0100
+Message-Id: <1392733738-8290-9-git-send-email-andi@firstfloor.org>
+In-Reply-To: <1392733738-8290-1-git-send-email-andi@firstfloor.org>
+References: <1392733738-8290-1-git-send-email-andi@firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
-Cc: sam@ravnborg.org, x86@kernel.org, linux-kbuild@vger.kernel.org
+Cc: sam@ravnborg.org, x86@kernel.org, linux-kbuild@vger.kernel.org, Andi Kleen <ak@linux.intel.com>
 
-LTO allows the compiler to do global optimization over the whole kernel.
+From: Andi Kleen <ak@linux.intel.com>
 
-Updated version of the LTO patchkit, mainly for fixing Sam's review
-comments.  I also rebased to 3.14-rc3 and added a fix for bloat-o-meter
-with gcc 4.9
+This reference is discarded, but can cause warnings when it refers to
+exit. Ignore for now.
 
-See the individual patches for a detailed description
+This is a workaround and can be removed once we get rid of
+-fno-toplevel-reorder
 
-Dependencies: asmlinkage patchkit (posted two weeks ago), kallsyms patchkit
-(plus LTO capable toolchain, see documentation)
+Signed-off-by: Andi Kleen <ak@linux.intel.com>
+---
+ scripts/mod/modpost.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-Full git tree is in
-git://git.kernel.org/pub/scm/linux/kernel/git/ak/linux-misc lto-3.14
-
--Andi
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index 4061098..bd06857 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -1455,6 +1455,10 @@ static void check_section_mismatch(const char *modname, struct elf_info *elf,
+ 		to = find_elf_symbol(elf, r->r_addend, sym);
+ 		tosym = sym_name(elf, to);
+ 
++		if (!strncmp(fromsym, "reference___initcall",
++				sizeof("reference___initcall") - 1))
++			return;
++
+ 		/* check whitelist - we may ignore it */
+ 		if (secref_whitelist(mismatch,
+ 					fromsec, fromsym, tosec, tosym)) {
+-- 
+1.8.5.2
 
