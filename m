@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.linuxfoundation.org ([140.211.169.12]:51710 "EHLO
+Received: from mail.linuxfoundation.org ([140.211.169.12]:51719 "EHLO
 	mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751026AbaBSAG7 (ORCPT
+	with ESMTP id S1750871AbaBSAI5 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 18 Feb 2014 19:06:59 -0500
-Date: Tue, 18 Feb 2014 16:06:58 -0800
+	Tue, 18 Feb 2014 19:08:57 -0500
+Date: Tue, 18 Feb 2014 16:08:56 -0800
 From: Andrew Morton <akpm@linux-foundation.org>
 Subject: Re: [PATCH] Fix flags for initramfs LZ4 compression
-Message-Id: <20140218160658.fa2802ce37e5169c5b7cf296@linux-foundation.org>
+Message-Id: <20140218160856.235f259bc5865e05e8f24a36@linux-foundation.org>
 In-Reply-To: <20140215231447.GA30803@dev.danweeks.net>
 References: <20140215231447.GA30803@dev.danweeks.net>
 Mime-Version: 1.0
@@ -25,9 +25,9 @@ On Sat, 15 Feb 2014 18:14:57 -0500 "Daniel M. Weeks" <dan@danweeks.net> wrote:
 > is updated to support the new default, passing the legacy flag (-l) to
 > the compressor is necessary. Without this flag the kernel-generated,
 > LZ4-compressed initramfs is junk.
-
-Well that's bad.  Kyungsik, cuold you please comment?
-
+> 
+> ...
+>
 > --- a/scripts/gen_initramfs_list.sh
 > +++ b/scripts/gen_initramfs_list.sh
 > @@ -257,7 +257,7 @@ case "$arg" in
@@ -39,4 +39,9 @@ Well that's bad.  Kyungsik, cuold you please comment?
 >  		echo "$output_file" | grep -q "\.cpio$" && compr="cat"
 >  		shift
 >  		;;
+
+What happens is the user is running an old version of /bin/lz4?  A
+version which predates this switch to a new format?  Do those earlier
+versions accept -l, even though they don't need it?  Or will the kernel
+build fail?
 
