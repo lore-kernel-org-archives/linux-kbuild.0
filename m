@@ -1,53 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from asavdk3.altibox.net ([109.247.116.14]:44421 "EHLO
-	asavdk3.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751335AbaBRVsS (ORCPT
+Received: from mail.linuxfoundation.org ([140.211.169.12]:51710 "EHLO
+	mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751026AbaBSAG7 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 18 Feb 2014 16:48:18 -0500
-Date: Tue, 18 Feb 2014 22:48:01 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [RFC] kbuild: drop use of "ld -r" for intermediate links of
- vmlinux
-Message-ID: <20140218214801.GA25163@ravnborg.org>
-References: <20140216203724.GA19216@ravnborg.org>
- <20140218145856.GZ3386@bubble.grove.modra.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20140218145856.GZ3386@bubble.grove.modra.org>
+	Tue, 18 Feb 2014 19:06:59 -0500
+Date: Tue, 18 Feb 2014 16:06:58 -0800
+From: Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH] Fix flags for initramfs LZ4 compression
+Message-Id: <20140218160658.fa2802ce37e5169c5b7cf296@linux-foundation.org>
+In-Reply-To: <20140215231447.GA30803@dev.danweeks.net>
+References: <20140215231447.GA30803@dev.danweeks.net>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Alan Modra <amodra@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Andi Kleen <andi@firstfloor.org>, mmarek@suse.cz, Cary Coutant <ccoutant@google.com>, Stephen Rothwell <sfr@canb.auug.org.au>
+To: "Daniel M. Weeks" <dan@danweeks.net>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Kyungsik Lee <kyungsik.lee@lge.com>
 
-On Wed, Feb 19, 2014 at 01:28:56AM +1030, Alan Modra wrote:
-> On Sun, Feb 16, 2014 at 09:37:24PM +0100, Sam Ravnborg wrote:
-> > The trick used is that for each directory a linker script is
-> > generated that name all the file to be linked - and for
-> > sub-directories this is just the linker script for that directory.
-> > 
-> > The file continue to be named "built-in.o" but it is really a linker script.
-> 
-> You'll need binutils newer than 2012-06-25
-> https://sourceware.org/ml/binutils/2012-06/msg00201.html
-> 
-> > I recall the idea is from someone else - but have long lost memory of
-> > from where I saw it.
-> 
-> I think it might have been my idea originally, implemented by Stephen
-> Rothwell.
-Sounds right - added in cc:
+On Sat, 15 Feb 2014 18:14:57 -0500 "Daniel M. Weeks" <dan@danweeks.net> wrote:
 
-> 
-> Another possibility is to use thin archives to package up the objects.
-> Thin archives are like normal archives except they just contain paths
-> to the objects, not the object contents.  Paths are flattened when
-> adding one thin archive to another.  I think Stephen may have tried
-> that idea too.
-I just coded this in a similar simple fashion.
-It broke building vdso - needs to look into that and will get back when I may
-understand why my link suddenly broke.
+> LZ4 as implemented in the kernel differs from the default method now
+> used by the reference implementation of LZ4. Until the in-kernel method
+> is updated to support the new default, passing the legacy flag (-l) to
+> the compressor is necessary. Without this flag the kernel-generated,
+> LZ4-compressed initramfs is junk.
 
-Thanks for the feedback!
+Well that's bad.  Kyungsik, cuold you please comment?
 
-	Sam
+> --- a/scripts/gen_initramfs_list.sh
+> +++ b/scripts/gen_initramfs_list.sh
+> @@ -257,7 +257,7 @@ case "$arg" in
+>                  && compr="lzop -9 -f"
+>  		echo "$output_file" | grep -q "\.lz4$" \
+>                  && [ -x "`which lz4 2> /dev/null`" ] \
+> -                && compr="lz4 -9 -f"
+> +                && compr="lz4 -l -9 -f"
+>  		echo "$output_file" | grep -q "\.cpio$" && compr="cat"
+>  		shift
+>  		;;
+
