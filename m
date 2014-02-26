@@ -1,75 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pb0-f44.google.com ([209.85.160.44]:34461 "EHLO
-	mail-pb0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751976AbaBZBJi (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 25 Feb 2014 20:09:38 -0500
-Received: by mail-pb0-f44.google.com with SMTP id rp16so217263pbb.31
-        for <linux-kbuild@vger.kernel.org>; Tue, 25 Feb 2014 17:09:38 -0800 (PST)
-From: behanw@converseincode.com
-Subject: [PATCH 4/5] LLVMLinux: Add support for clang to compiler.h and new compiler-clang.h
-Date: Tue, 25 Feb 2014 17:08:42 -0800
-Message-Id: <1393376923-21892-5-git-send-email-behanw@converseincode.com>
-In-Reply-To: <1393376923-21892-1-git-send-email-behanw@converseincode.com>
+Received: from mx1.redhat.com ([209.132.183.28]:64454 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750724AbaBZBSd (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 25 Feb 2014 20:18:33 -0500
+Date: Tue, 25 Feb 2014 20:17:37 -0500
+From: Dave Jones <davej@redhat.com>
+Subject: Re: [PATCH 2/5] kbuild: LLVMLinux: Adapt warnings for compilation
+ with clang
+Message-ID: <20140226011737.GA4564@redhat.com>
 References: <1393376923-21892-1-git-send-email-behanw@converseincode.com>
+ <1393376923-21892-3-git-send-email-behanw@converseincode.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1393376923-21892-3-git-send-email-behanw@converseincode.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mmarek@suse.cz, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com, x86@kernel.org, sparse@chrisli.org
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-sparse@vger.kernel.org, torvalds@linux-foundation.org, dwmw2@infradead.org, pageexec@freemail.hu, Mark Charlebois <charlebm@gmail.com>, Behan Webster <behanw@converseincode.com>
+To: behanw@converseincode.com
+Cc: mmarek@suse.cz, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com, x86@kernel.org, sparse@chrisli.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-sparse@vger.kernel.org, torvalds@linux-foundation.org, dwmw2@infradead.org, pageexec@freemail.hu, Jan-Simon =?iso-8859-1?Q?M=F6ller?= <dl9pf@gmx.de>, Mark Charlebois <mcharleb@gmail.com>
 
-From: Mark Charlebois <charlebm@gmail.com>
-
-Add a compiler-clang.h file to add specific macros needed for compiling the
-kernel with clang.
-
-Initially the only override required is the macro for silencing the
-compiler for a purposefully uninintialized variable.
-
-Author: Mark Charlebois <charlebm@gmail.com>
-Signed-off-by: Mark Charlebois <charlebm@gmail.com>
-Signed-off-by: Behan Webster <behanw@converseincode.com>
----
- include/linux/compiler-clang.h | 12 ++++++++++++
- include/linux/compiler.h       |  7 +++++++
- 2 files changed, 19 insertions(+)
- create mode 100644 include/linux/compiler-clang.h
-
-diff --git a/include/linux/compiler-clang.h b/include/linux/compiler-clang.h
-new file mode 100644
-index 0000000..d1e49d5
---- /dev/null
-+++ b/include/linux/compiler-clang.h
-@@ -0,0 +1,12 @@
-+#ifndef __LINUX_COMPILER_H
-+#error "Please don't include <linux/compiler-clang.h> directly, include <linux/compiler.h> instead."
-+#endif
-+
-+/* Some compiler specific definitions are overwritten here
-+ * for Clang compiler
-+ */
-+
-+#ifdef uninitialized_var
-+#undef uninitialized_var
-+#define uninitialized_var(x) x = *(&(x))
-+#endif
-diff --git a/include/linux/compiler.h b/include/linux/compiler.h
-index 2472740..ee7239e 100644
---- a/include/linux/compiler.h
-+++ b/include/linux/compiler.h
-@@ -63,6 +63,13 @@ extern void __chk_io_ptr(const volatile void __iomem *);
- # include <linux/compiler-intel.h>
- #endif
+On Tue, Feb 25, 2014 at 05:08:40PM -0800, behanw@converseincode.com wrote:
  
-+/* Clang compiler defines __GNUC__. So we will overwrite implementations
-+ * coming from above header files here
-+ */
-+#ifdef __clang__
-+#include <linux/compiler-clang.h>
-+#endif
-+
- /*
-  * Generic compiler-dependent macros required for kernel
-  * build go below this comment. Actual compiler/compiler version
--- 
-1.8.3.2
+ > When compiling kernel with clang, disable warnings which are too noisy, and
+ > add the clang flag catch-undefined-behavior.
+ >  
+ > +# Clang
+ > +warning-1 += $(call cc-disable-warning, initializer-overrides)
+ > +warning-1 += $(call cc-disable-warning, unused-value)
+ > +warning-1 += $(call cc-disable-warning, format)
+ > +warning-1 += $(call cc-disable-warning, unknown-warning-option)
+ > +warning-1 += $(call cc-disable-warning, self-assign)
+ > +warning-1 += $(call cc-disable-warning, sign-compare)
+ > +warning-1 += $(call cc-disable-warning, format-zero-length)
+ > +warning-1 += $(call cc-disable-warning, uninitialized)
+ > +warning-1 += $(call cc-option, -fcatch-undefined-behavior)
+
+Do you have a pointer to an example log-file from before this change ?
+I'm curious for eg, which self-assign warnings are showing up,
+because I've been fixing up the ones that Coverity found, of which
+there are only a dozen or so left iirc.
+
+Some of the others may also be interesting.
+
+	Dave
 
