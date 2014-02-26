@@ -1,53 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from relay3-d.mail.gandi.net ([217.70.183.195]:40616 "EHLO
-	relay3-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750800AbaBZBpT (ORCPT
+Received: from mail-pd0-f176.google.com ([209.85.192.176]:58943 "EHLO
+	mail-pd0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751075AbaBZCi4 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 25 Feb 2014 20:45:19 -0500
-Date: Tue, 25 Feb 2014 17:45:03 -0800
-From: Josh Triplett <josh@joshtriplett.org>
-Subject: Re: [PATCH] kconfig: Make allnoconfig disable options behind
- EMBEDDED and EXPERT
-Message-ID: <20140226014502.GA6641@thin>
-References: <20140224022021.GA12665@thin>
- <20140225130925.813f29105079cbd3d5a9ba30@linux-foundation.org>
+	Tue, 25 Feb 2014 21:38:56 -0500
+Received: by mail-pd0-f176.google.com with SMTP id r10so298476pdi.21
+        for <linux-kbuild@vger.kernel.org>; Tue, 25 Feb 2014 18:38:55 -0800 (PST)
+Message-ID: <530D53BB.2020702@converseincode.com>
+Date: Tue, 25 Feb 2014 18:38:51 -0800
+From: Behan Webster <behanw@converseincode.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20140225130925.813f29105079cbd3d5a9ba30@linux-foundation.org>
+Subject: Re: [PATCH 2/5] kbuild: LLVMLinux: Adapt warnings for compilation
+ with clang
+References: <1393376923-21892-1-git-send-email-behanw@converseincode.com> <1393376923-21892-3-git-send-email-behanw@converseincode.com> <20140226011737.GA4564@redhat.com>
+In-Reply-To: <20140226011737.GA4564@redhat.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Dwight Engen <dwight.engen@oracle.com>, Eric Paris <eparis@redhat.com>, Frederic Weisbecker <fweisbec@gmail.com>, Jiri Slaby <jslaby@suse.cz>, Kyungsik Lee <kyungsik.lee@lge.com>, Michal Hocko <mhocko@suse.cz>, Michal Marek <mmarek@suse.cz>, Mike Frysinger <vapier@gentoo.org>, Paul Gortmaker <paul.gortmaker@windriver.com>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Rob Landley <rob@landley.net>, "Yann E. MORIN" <yann.morin.1998@free.fr>, linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Dave Jones <davej@redhat.com>, mmarek@suse.cz, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com, x86@kernel.org, sparse@chrisli.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-sparse@vger.kernel.org, torvalds@linux-foundation.org, dwmw2@infradead.org, pageexec@freemail.hu, =?ISO-8859-1?Q?Jan-Simon_M=F6?= =?ISO-8859-1?Q?ller?= <dl9pf@gmx.de>, Mark Charlebois <mcharleb@gmail.com>
 
-On Tue, Feb 25, 2014 at 01:09:25PM -0800, Andrew Morton wrote:
-> On Sun, 23 Feb 2014 18:20:26 -0800 Josh Triplett <josh@joshtriplett.org> wrote:
-> > "make allnoconfig" exists to ease testing of minimal configurations.
-> > Documentation/SubmitChecklist includes a note to test with allnoconfig.
-> > This helps catch missing dependencies on common-but-not-required
-> > functionality, which might otherwise go unnoticed.
-> > 
-> > However, allnoconfig still leaves many symbols enabled, because they're
-> > hidden behind CONFIG_EMBEDDED or CONFIG_EXPERT.  For instance,
-> > allnoconfig still has CONFIG_PRINTK and CONFIG_BLOCK enabled, so drivers
-> > don't typically get build-tested with those disabled.
-> > 
-> > To address this, introduce a new Kconfig option "allnoconfig_y", used on
-> > symbols which only exist to hide other symbols.  Set it on
-> > CONFIG_EMBEDDED (which then selects CONFIG_EXPERT).  allnoconfig will
-> > then disable all the symbols hidden behind those.
-> 
-> Now look what you've done!
-> 
-> kernel/sched/core.c: In function 'pick_next_task':
-> kernel/sched/core.c:2613: warning: control reaches end of non-void function
+On 02/25/14 17:17, Dave Jones wrote:
+> On Tue, Feb 25, 2014 at 05:08:40PM -0800, behanw@converseincode.com wrote:
+>   
+>   > When compiling kernel with clang, disable warnings which are too noisy, and
+>   > add the clang flag catch-undefined-behavior.
+>   >
+>   > +# Clang
+>   > +warning-1 += $(call cc-disable-warning, initializer-overrides)
+>   > +warning-1 += $(call cc-disable-warning, unused-value)
+>   > +warning-1 += $(call cc-disable-warning, format)
+>   > +warning-1 += $(call cc-disable-warning, unknown-warning-option)
+>   > +warning-1 += $(call cc-disable-warning, self-assign)
+>   > +warning-1 += $(call cc-disable-warning, sign-compare)
+>   > +warning-1 += $(call cc-disable-warning, format-zero-length)
+>   > +warning-1 += $(call cc-disable-warning, uninitialized)
+>   > +warning-1 += $(call cc-option, -fcatch-undefined-behavior)
+>
+> Do you have a pointer to an example log-file from before this change ?
+> I'm curious for eg, which self-assign warnings are showing up,
+> because I've been fixing up the ones that Coverity found, of which
+> there are only a dozen or so left iirc.
+I count 22 in this particular x86 kernel build (some of which you may 
+well have fixed already). Enjoy.
 
-Hey, look, now allnoconfig turns off more of the more-rarely-disabled
-options, and turns up bugs and warnings that most people don't see!
-Yay! ;)
+http://buildbot.llvm.linuxfoundation.org/self-assign-build.log.txt
 
-So, yes, we should go ahead and get BUG() fixed properly, at a minimum
-by using __builtin_unreachable().  I'll send a patch for that, as a
-followup to the thread where Arnd mentioned how to do so.
+Perhaps I should re-enable that warning, considering the number has 
+dropped so dramatically from when I last checked over a year ago.
 
-- Josh Triplett
+Thanks,
+
+Behan
+
+-- 
+Behan Webster
+behanw@converseincode.com
+
