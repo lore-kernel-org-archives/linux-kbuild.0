@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pb0-f46.google.com ([209.85.160.46]:39572 "EHLO
-	mail-pb0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751858AbaBZBJ0 (ORCPT
+Received: from mail-pd0-f177.google.com ([209.85.192.177]:38097 "EHLO
+	mail-pd0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751491AbaBZBJd (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 25 Feb 2014 20:09:26 -0500
-Received: by mail-pb0-f46.google.com with SMTP id um1so218905pbc.33
-        for <linux-kbuild@vger.kernel.org>; Tue, 25 Feb 2014 17:09:26 -0800 (PST)
+	Tue, 25 Feb 2014 20:09:33 -0500
+Received: by mail-pd0-f177.google.com with SMTP id g10so211817pdj.22
+        for <linux-kbuild@vger.kernel.org>; Tue, 25 Feb 2014 17:09:33 -0800 (PST)
 From: behanw@converseincode.com
-Subject: [PATCH 1/5] kbuild: LLVMLinux: Add Kbuild support for building kernel with Clang
-Date: Tue, 25 Feb 2014 17:08:39 -0800
-Message-Id: <1393376923-21892-2-git-send-email-behanw@converseincode.com>
+Subject: [PATCH 3/5] kbuild: LLVMLinux: Fix LINUX_COMPILER definition script for compilation with clang
+Date: Tue, 25 Feb 2014 17:08:41 -0800
+Message-Id: <1393376923-21892-4-git-send-email-behanw@converseincode.com>
 In-Reply-To: <1393376923-21892-1-git-send-email-behanw@converseincode.com>
 References: <1393376923-21892-1-git-send-email-behanw@converseincode.com>
 MIME-Version: 1.0
@@ -18,93 +18,35 @@ Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: mmarek@suse.cz, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com, x86@kernel.org, sparse@chrisli.org
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-sparse@vger.kernel.org, torvalds@linux-foundation.org, dwmw2@infradead.org, pageexec@freemail.hu, Behan Webster <behanw@converseincode.com>, =?UTF-8?q?Jan-Simon=20M=C3=B6ller?= <dl9pf@gmx.de>, Mark Charlebois <charlebm@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-sparse@vger.kernel.org, torvalds@linux-foundation.org, dwmw2@infradead.org, pageexec@freemail.hu, =?UTF-8?q?Jan-Simon=20M=C3=B6ller?= <dl9pf@gmx.de>, Behan Webster <behanw@converseincode.com>, Mark Charlebois <charlebm@gmail.com>
 
-From: Behan Webster <behanw@converseincode.com>
+From: Jan-Simon Möller <dl9pf@gmx.de>
 
-Add support to toplevel Makefile for compiling with clang, both for
-HOSTCC and CC. Use cc-option to prevent gcc option from breaking clang, and
-from clang options from breaking gcc.
+When building the LINUX_COMPILER definition, instead of merely taking the last
+line from "$(CC) -v", grep for ' version ' in the output. This supports both
+gcc and clang.
 
-Clang 3.4 semantics are the same as gcc semantics for unsupported flags. For
-unsupported warnings clang 3.4 returns true but shows a warning and gcc shows
-a warning and returns false.
-
-Signed-off-by: Behan Webster <behanw@converseincode.com>
 Signed-off-by: Jan-Simon Möller <dl9pf@gmx.de>
+Signed-off-by: Behan Webster <behanw@converseincode.com>
 Signed-off-by: Mark Charlebois <charlebm@gmail.com>
 Cc: PaX Team <pageexec@freemail.hu>
 ---
- Makefile | 32 +++++++++++++++++++++++++++++++-
- 1 file changed, 31 insertions(+), 1 deletion(-)
+ scripts/mkcompile_h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Makefile b/Makefile
-index 831b36a..c4ab30d 100644
---- a/Makefile
-+++ b/Makefile
-@@ -247,6 +247,15 @@ HOSTCXX      = g++
- HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer
- HOSTCXXFLAGS = -O2
+diff --git a/scripts/mkcompile_h b/scripts/mkcompile_h
+index f221ddf..cfb8440 100755
+--- a/scripts/mkcompile_h
++++ b/scripts/mkcompile_h
+@@ -76,7 +76,7 @@ UTS_TRUNCATE="cut -b -$UTS_LEN"
+   echo \#define LINUX_COMPILE_BY \"`echo $LINUX_COMPILE_BY | $UTS_TRUNCATE`\"
+   echo \#define LINUX_COMPILE_HOST \"`echo $LINUX_COMPILE_HOST | $UTS_TRUNCATE`\"
  
-+ifeq ($(shell $(HOSTCC) -v 2>&1 | grep -c "clang version"), 1)
-+HOSTCOMPILER := clang
-+HOSTCFLAGS  += -Wno-unused-value -Wno-unused-parameter \
-+		-Wno-missing-field-initializers -fno-delete-null-pointer-checks
-+else
-+HOSTCOMPILER := gcc
-+endif
-+export HOSTCOMPILER
-+
- # Decide whether to build built-in, modular, or both.
- # Normally, just do built-in.
+-  echo \#define LINUX_COMPILER \"`$CC -v 2>&1 | tail -n 1`\"
++  echo \#define LINUX_COMPILER \"`$CC -v 2>&1 | grep ' version '`\"
+ ) > .tmpcompile
  
-@@ -323,6 +332,12 @@ endif
- 
- export quiet Q KBUILD_VERBOSE
- 
-+ifeq ($(shell $(CC) -v 2>&1 | grep -c "clang version"), 1)
-+COMPILER := clang
-+else
-+COMPILER := gcc
-+endif
-+export COMPILER
- 
- # Look for make include files relative to root of kernel src
- MAKEFLAGS += --include-dir=$(srctree)
-@@ -382,7 +397,7 @@ KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
- 		   -fno-strict-aliasing -fno-common \
- 		   -Werror-implicit-function-declaration \
- 		   -Wno-format-security \
--		   -fno-delete-null-pointer-checks
-+		   $(call cc-option,-fno-delete-null-pointer-checks,)
- KBUILD_AFLAGS_KERNEL :=
- KBUILD_CFLAGS_KERNEL :=
- KBUILD_AFLAGS   := -D__ASSEMBLY__
-@@ -620,9 +635,24 @@ else
- endif
- KBUILD_CFLAGS += $(stackp-flag)
- 
-+ifeq ($(COMPILER),clang)
-+KBUILD_CPPFLAGS += $(call cc-option,-Qunused-arguments,)
-+KBUILD_CPPFLAGS += $(call cc-option,-Wno-unknown-warning-option,)
-+KBUILD_CFLAGS += $(call cc-disable-warning, unused-variable)
-+KBUILD_CFLAGS += $(call cc-disable-warning, format-invalid-specifier)
-+KBUILD_CFLAGS += $(call cc-disable-warning, gnu)
-+# Quiet clang warning: comparison of unsigned expression < 0 is always false
-+KBUILD_CFLAGS += $(call cc-disable-warning, tautological-compare)
-+# CLANG uses a _MergedGlobals as optimization, but this breaks modpost, as the
-+# source of a reference will be _MergedGlobals and not on of the whitelisted names.
-+# See modpost pattern 2
-+KBUILD_CFLAGS += $(call cc-option, -mno-global-merge,)
-+else
-+
- # This warning generated too much noise in a regular build.
- # Use make W=1 to enable this warning (see scripts/Makefile.build)
- KBUILD_CFLAGS += $(call cc-disable-warning, unused-but-set-variable)
-+endif
- 
- ifdef CONFIG_FRAME_POINTER
- KBUILD_CFLAGS	+= -fno-omit-frame-pointer -fno-optimize-sibling-calls
+ # Only replace the real compile.h if the new one is different,
 -- 
 1.8.3.2
 
