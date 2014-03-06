@@ -1,59 +1,69 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pd0-f176.google.com ([209.85.192.176]:58943 "EHLO
-	mail-pd0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751075AbaBZCi4 (ORCPT
+Received: from mail-pd0-f174.google.com ([209.85.192.174]:55904 "EHLO
+	mail-pd0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753058AbaCFR7c (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 25 Feb 2014 21:38:56 -0500
-Received: by mail-pd0-f176.google.com with SMTP id r10so298476pdi.21
-        for <linux-kbuild@vger.kernel.org>; Tue, 25 Feb 2014 18:38:55 -0800 (PST)
-Message-ID: <530D53BB.2020702@converseincode.com>
-Date: Tue, 25 Feb 2014 18:38:51 -0800
-From: Behan Webster <behanw@converseincode.com>
+	Thu, 6 Mar 2014 12:59:32 -0500
+Received: by mail-pd0-f174.google.com with SMTP id y13so2839422pdi.19
+        for <linux-kbuild@vger.kernel.org>; Thu, 06 Mar 2014 09:59:31 -0800 (PST)
+From: behanw@converseincode.com
+Subject: [PATCH 2/5 v2] kbuild: LLVMLinux: Adapt warnings for compilation with clang
+Date: Thu,  6 Mar 2014 09:59:23 -0800
+Message-Id: <1394128763-2976-1-git-send-email-behanw@converseincode.com>
+In-Reply-To: <1393376923-21892-3-git-send-email-behanw@converseincode.com>
+References: <1393376923-21892-3-git-send-email-behanw@converseincode.com>
 MIME-Version: 1.0
-Subject: Re: [PATCH 2/5] kbuild: LLVMLinux: Adapt warnings for compilation
- with clang
-References: <1393376923-21892-1-git-send-email-behanw@converseincode.com> <1393376923-21892-3-git-send-email-behanw@converseincode.com> <20140226011737.GA4564@redhat.com>
-In-Reply-To: <20140226011737.GA4564@redhat.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dave Jones <davej@redhat.com>, mmarek@suse.cz, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com, x86@kernel.org, sparse@chrisli.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-sparse@vger.kernel.org, torvalds@linux-foundation.org, dwmw2@infradead.org, pageexec@freemail.hu, =?ISO-8859-1?Q?Jan-Simon_M=F6?= =?ISO-8859-1?Q?ller?= <dl9pf@gmx.de>, Mark Charlebois <mcharleb@gmail.com>
+To: mmarek@suse.cz
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, dwmw2@infradead.org, pageexec@freemail.hu, =?UTF-8?q?Jan-Simon=20M=C3=B6ller?= <dl9pf@gmx.de>, Behan Webster <behanw@converseincode.com>, Mark Charlebois <mcharleb@gmail.com>
 
-On 02/25/14 17:17, Dave Jones wrote:
-> On Tue, Feb 25, 2014 at 05:08:40PM -0800, behanw@converseincode.com wrote:
->   
->   > When compiling kernel with clang, disable warnings which are too noisy, and
->   > add the clang flag catch-undefined-behavior.
->   >
->   > +# Clang
->   > +warning-1 += $(call cc-disable-warning, initializer-overrides)
->   > +warning-1 += $(call cc-disable-warning, unused-value)
->   > +warning-1 += $(call cc-disable-warning, format)
->   > +warning-1 += $(call cc-disable-warning, unknown-warning-option)
->   > +warning-1 += $(call cc-disable-warning, self-assign)
->   > +warning-1 += $(call cc-disable-warning, sign-compare)
->   > +warning-1 += $(call cc-disable-warning, format-zero-length)
->   > +warning-1 += $(call cc-disable-warning, uninitialized)
->   > +warning-1 += $(call cc-option, -fcatch-undefined-behavior)
->
-> Do you have a pointer to an example log-file from before this change ?
-> I'm curious for eg, which self-assign warnings are showing up,
-> because I've been fixing up the ones that Coverity found, of which
-> there are only a dozen or so left iirc.
-I count 22 in this particular x86 kernel build (some of which you may 
-well have fixed already). Enjoy.
+From: Jan-Simon Möller <dl9pf@gmx.de>
 
-http://buildbot.llvm.linuxfoundation.org/self-assign-build.log.txt
+When compiling kernel with clang, disable warnings which are too noisy, and
+add the clang flag catch-undefined-behavior.
 
-Perhaps I should re-enable that warning, considering the number has 
-dropped so dramatically from when I last checked over a year ago.
+Re-enable warnings for self-assigns due to David Jones removing most of them
+already from the kernel code base.
 
-Thanks,
+Signed-off-by: Jan-Simon Möller <dl9pf@gmx.de>
+Signed-off-by: Behan Webster <behanw@converseincode.com>
+Signed-off-by: Mark Charlebois <mcharleb@gmail.com>
+Cc: PaX Team <pageexec@freemail.hu>
+---
+ scripts/Makefile.build | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
-Behan
-
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index d5d859c..5cd6651 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -65,12 +65,22 @@ warning-  := $(empty)
+ warning-1 := -Wextra -Wunused -Wno-unused-parameter
+ warning-1 += -Wmissing-declarations
+ warning-1 += -Wmissing-format-attribute
+-warning-1 += -Wmissing-prototypes
++warning-1 += $(call cc-option, -Wmissing-prototypes)
+ warning-1 += -Wold-style-definition
+ warning-1 += $(call cc-option, -Wmissing-include-dirs)
+ warning-1 += $(call cc-option, -Wunused-but-set-variable)
+ warning-1 += $(call cc-disable-warning, missing-field-initializers)
+ 
++# Clang
++warning-1 += $(call cc-disable-warning, initializer-overrides)
++warning-1 += $(call cc-disable-warning, unused-value)
++warning-1 += $(call cc-disable-warning, format)
++warning-1 += $(call cc-disable-warning, unknown-warning-option)
++warning-1 += $(call cc-disable-warning, sign-compare)
++warning-1 += $(call cc-disable-warning, format-zero-length)
++warning-1 += $(call cc-disable-warning, uninitialized)
++warning-1 += $(call cc-option, -fcatch-undefined-behavior)
++
+ warning-2 := -Waggregate-return
+ warning-2 += -Wcast-align
+ warning-2 += -Wdisabled-optimization
 -- 
-Behan Webster
-behanw@converseincode.com
+1.8.3.2
 
