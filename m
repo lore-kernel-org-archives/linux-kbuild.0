@@ -1,69 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pd0-f174.google.com ([209.85.192.174]:55904 "EHLO
-	mail-pd0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753058AbaCFR7c (ORCPT
+Received: from mail-yh0-f41.google.com ([209.85.213.41]:59537 "EHLO
+	mail-yh0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751880AbaCHPE7 convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 6 Mar 2014 12:59:32 -0500
-Received: by mail-pd0-f174.google.com with SMTP id y13so2839422pdi.19
-        for <linux-kbuild@vger.kernel.org>; Thu, 06 Mar 2014 09:59:31 -0800 (PST)
-From: behanw@converseincode.com
-Subject: [PATCH 2/5 v2] kbuild: LLVMLinux: Adapt warnings for compilation with clang
-Date: Thu,  6 Mar 2014 09:59:23 -0800
-Message-Id: <1394128763-2976-1-git-send-email-behanw@converseincode.com>
-In-Reply-To: <1393376923-21892-3-git-send-email-behanw@converseincode.com>
-References: <1393376923-21892-3-git-send-email-behanw@converseincode.com>
+	Sat, 8 Mar 2014 10:04:59 -0500
+Received: by mail-yh0-f41.google.com with SMTP id v1so881803yhn.0
+        for <linux-kbuild@vger.kernel.org>; Sat, 08 Mar 2014 07:04:58 -0800 (PST)
 MIME-Version: 1.0
+In-Reply-To: <1388448270-28832-1-git-send-email-bjorn.forsman@gmail.com>
+References: <1388448270-28832-1-git-send-email-bjorn.forsman@gmail.com>
+Date: Sat, 8 Mar 2014 16:04:58 +0100
+Message-ID: <CAEYzJUESb2OCz+MX-uWYa_M6Nu4CMWJ3C4YrpwFj0YXZkg7r=g@mail.gmail.com>
+Subject: Re: [PATCH] kconfig/lxdialog: get ncurses CFLAGS with pkg-config
+From: =?UTF-8?Q?Bj=C3=B8rn_Forsman?= <bjorn.forsman@gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mmarek@suse.cz
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, dwmw2@infradead.org, pageexec@freemail.hu, =?UTF-8?q?Jan-Simon=20M=C3=B6ller?= <dl9pf@gmx.de>, Behan Webster <behanw@converseincode.com>, Mark Charlebois <mcharleb@gmail.com>
+To: linux-kbuild@vger.kernel.org
+Cc: =?UTF-8?Q?Bj=C3=B8rn_Forsman?= <bjorn.forsman@gmail.com>, "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-From: Jan-Simon Möller <dl9pf@gmx.de>
+On 31 December 2013 01:04, Bjørn Forsman <bjorn.forsman@gmail.com> wrote:
+> check-lxdialog.sh has functions for finding ncurses linker and compiler
+> flags; ldflags() and ccflags().
+>
+> ldflags() tries to get linker flags from pkg-config and has a fallback
+> if pkg-config fails. But ccflags() currently doesn't use pkg-config at
+> all, instead it does manual checks like this:
+>
+>   if [ -f /usr/include/ncursesw/curses.h ]; then
+>       echo '-I/usr/include/ncursesw -DCURSES_LOC="<curses.h>"'
+>       echo ' -DNCURSES_WIDECHAR=1'
+>   elif [ -f /usr/include/ncurses/ncurses.h ]; then
+>       echo '-I/usr/include/ncurses -DCURSES_LOC="<ncurses.h>"'
+>   [...]
+>
+> This patch changes ccflags() so that it also tries pkg-config first, and
+> only if pkg-config fails does it go back to the fallback/manual checks.
+>
+> This makes ldflags()/ccflags() symmetric (both try to use pkg-config
+> before falling back to manual checks) and has the nice side-effect of
+> making "make menuconfig" work on systems where ncurses is not installed
+> in a standard location (such as on NixOS).
+>
+> Signed-off-by: Bjørn Forsman <bjorn.forsman@gmail.com>
+> ---
+>  scripts/kconfig/lxdialog/check-lxdialog.sh | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+>
+> diff --git a/scripts/kconfig/lxdialog/check-lxdialog.sh b/scripts/kconfig/lxdialog/check-lxdialog.sh
+> index 9d2a4c5..5075ebf 100644
+> --- a/scripts/kconfig/lxdialog/check-lxdialog.sh
+> +++ b/scripts/kconfig/lxdialog/check-lxdialog.sh
+> @@ -21,7 +21,11 @@ ldflags()
+>  # Where is ncurses.h?
+>  ccflags()
+>  {
+> -       if [ -f /usr/include/ncursesw/curses.h ]; then
+> +       if pkg-config --cflags ncursesw 2>/dev/null; then
+> +               echo '-DCURSES_LOC="<ncurses.h>" -DNCURSES_WIDECHAR=1'
+> +       elif pkg-config --cflags ncurses 2>/dev/null; then
+> +               echo '-DCURSES_LOC="<ncurses.h>"'
+> +       elif [ -f /usr/include/ncursesw/curses.h ]; then
+>                 echo '-I/usr/include/ncursesw -DCURSES_LOC="<curses.h>"'
+>                 echo ' -DNCURSES_WIDECHAR=1'
+>         elif [ -f /usr/include/ncurses/ncurses.h ]; then
+> --
+> 1.8.5.2
 
-When compiling kernel with clang, disable warnings which are too noisy, and
-add the clang flag catch-undefined-behavior.
+Ping. No comments?
 
-Re-enable warnings for self-assigns due to David Jones removing most of them
-already from the kernel code base.
-
-Signed-off-by: Jan-Simon Möller <dl9pf@gmx.de>
-Signed-off-by: Behan Webster <behanw@converseincode.com>
-Signed-off-by: Mark Charlebois <mcharleb@gmail.com>
-Cc: PaX Team <pageexec@freemail.hu>
----
- scripts/Makefile.build | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
-
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index d5d859c..5cd6651 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -65,12 +65,22 @@ warning-  := $(empty)
- warning-1 := -Wextra -Wunused -Wno-unused-parameter
- warning-1 += -Wmissing-declarations
- warning-1 += -Wmissing-format-attribute
--warning-1 += -Wmissing-prototypes
-+warning-1 += $(call cc-option, -Wmissing-prototypes)
- warning-1 += -Wold-style-definition
- warning-1 += $(call cc-option, -Wmissing-include-dirs)
- warning-1 += $(call cc-option, -Wunused-but-set-variable)
- warning-1 += $(call cc-disable-warning, missing-field-initializers)
- 
-+# Clang
-+warning-1 += $(call cc-disable-warning, initializer-overrides)
-+warning-1 += $(call cc-disable-warning, unused-value)
-+warning-1 += $(call cc-disable-warning, format)
-+warning-1 += $(call cc-disable-warning, unknown-warning-option)
-+warning-1 += $(call cc-disable-warning, sign-compare)
-+warning-1 += $(call cc-disable-warning, format-zero-length)
-+warning-1 += $(call cc-disable-warning, uninitialized)
-+warning-1 += $(call cc-option, -fcatch-undefined-behavior)
-+
- warning-2 := -Waggregate-return
- warning-2 += -Wcast-align
- warning-2 += -Wdisabled-optimization
--- 
-1.8.3.2
-
+Best regards,
+Bjørn Forsman
