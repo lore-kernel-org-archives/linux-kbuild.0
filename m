@@ -1,74 +1,121 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-yh0-f41.google.com ([209.85.213.41]:59537 "EHLO
-	mail-yh0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751880AbaCHPE7 convert rfc822-to-8bit (ORCPT
+Received: from asavdk4.altibox.net ([109.247.116.15]:44477 "EHLO
+	asavdk4.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750931AbaCIV6n (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 8 Mar 2014 10:04:59 -0500
-Received: by mail-yh0-f41.google.com with SMTP id v1so881803yhn.0
-        for <linux-kbuild@vger.kernel.org>; Sat, 08 Mar 2014 07:04:58 -0800 (PST)
+	Sun, 9 Mar 2014 17:58:43 -0400
+Date: Sun, 9 Mar 2014 22:58:34 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH 1/5] kbuild: LLVMLinux: Add Kbuild support for building
+ kernel with Clang
+Message-ID: <20140309215834.GA29655@ravnborg.org>
+References: <1393376923-21892-1-git-send-email-behanw@converseincode.com>
+ <1393376923-21892-2-git-send-email-behanw@converseincode.com>
 MIME-Version: 1.0
-In-Reply-To: <1388448270-28832-1-git-send-email-bjorn.forsman@gmail.com>
-References: <1388448270-28832-1-git-send-email-bjorn.forsman@gmail.com>
-Date: Sat, 8 Mar 2014 16:04:58 +0100
-Message-ID: <CAEYzJUESb2OCz+MX-uWYa_M6Nu4CMWJ3C4YrpwFj0YXZkg7r=g@mail.gmail.com>
-Subject: Re: [PATCH] kconfig/lxdialog: get ncurses CFLAGS with pkg-config
-From: =?UTF-8?Q?Bj=C3=B8rn_Forsman?= <bjorn.forsman@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1393376923-21892-2-git-send-email-behanw@converseincode.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: =?UTF-8?Q?Bj=C3=B8rn_Forsman?= <bjorn.forsman@gmail.com>, "Yann E. MORIN" <yann.morin.1998@free.fr>
+To: behanw@converseincode.com
+Cc: mmarek@suse.cz, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com, x86@kernel.org, sparse@chrisli.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-sparse@vger.kernel.org, torvalds@linux-foundation.org, dwmw2@infradead.org, pageexec@freemail.hu, Jan-Simon =?iso-8859-1?Q?M=F6ller?= <dl9pf@gmx.de>, Mark Charlebois <charlebm@gmail.com>
 
-On 31 December 2013 01:04, Bjørn Forsman <bjorn.forsman@gmail.com> wrote:
-> check-lxdialog.sh has functions for finding ncurses linker and compiler
-> flags; ldflags() and ccflags().
->
-> ldflags() tries to get linker flags from pkg-config and has a fallback
-> if pkg-config fails. But ccflags() currently doesn't use pkg-config at
-> all, instead it does manual checks like this:
->
->   if [ -f /usr/include/ncursesw/curses.h ]; then
->       echo '-I/usr/include/ncursesw -DCURSES_LOC="<curses.h>"'
->       echo ' -DNCURSES_WIDECHAR=1'
->   elif [ -f /usr/include/ncurses/ncurses.h ]; then
->       echo '-I/usr/include/ncurses -DCURSES_LOC="<ncurses.h>"'
->   [...]
->
-> This patch changes ccflags() so that it also tries pkg-config first, and
-> only if pkg-config fails does it go back to the fallback/manual checks.
->
-> This makes ldflags()/ccflags() symmetric (both try to use pkg-config
-> before falling back to manual checks) and has the nice side-effect of
-> making "make menuconfig" work on systems where ncurses is not installed
-> in a standard location (such as on NixOS).
->
-> Signed-off-by: Bjørn Forsman <bjorn.forsman@gmail.com>
+On Tue, Feb 25, 2014 at 05:08:39PM -0800, behanw@converseincode.com wrote:
+> From: Behan Webster <behanw@converseincode.com>
+> 
+> Add support to toplevel Makefile for compiling with clang, both for
+> HOSTCC and CC. Use cc-option to prevent gcc option from breaking clang, and
+> from clang options from breaking gcc.
+> 
+> Clang 3.4 semantics are the same as gcc semantics for unsupported flags. For
+> unsupported warnings clang 3.4 returns true but shows a warning and gcc shows
+> a warning and returns false.
+> 
+> Signed-off-by: Behan Webster <behanw@converseincode.com>
+> Signed-off-by: Jan-Simon M�ller <dl9pf@gmx.de>
+> Signed-off-by: Mark Charlebois <charlebm@gmail.com>
+> Cc: PaX Team <pageexec@freemail.hu>
 > ---
->  scripts/kconfig/lxdialog/check-lxdialog.sh | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
->
-> diff --git a/scripts/kconfig/lxdialog/check-lxdialog.sh b/scripts/kconfig/lxdialog/check-lxdialog.sh
-> index 9d2a4c5..5075ebf 100644
-> --- a/scripts/kconfig/lxdialog/check-lxdialog.sh
-> +++ b/scripts/kconfig/lxdialog/check-lxdialog.sh
-> @@ -21,7 +21,11 @@ ldflags()
->  # Where is ncurses.h?
->  ccflags()
->  {
-> -       if [ -f /usr/include/ncursesw/curses.h ]; then
-> +       if pkg-config --cflags ncursesw 2>/dev/null; then
-> +               echo '-DCURSES_LOC="<ncurses.h>" -DNCURSES_WIDECHAR=1'
-> +       elif pkg-config --cflags ncurses 2>/dev/null; then
-> +               echo '-DCURSES_LOC="<ncurses.h>"'
-> +       elif [ -f /usr/include/ncursesw/curses.h ]; then
->                 echo '-I/usr/include/ncursesw -DCURSES_LOC="<curses.h>"'
->                 echo ' -DNCURSES_WIDECHAR=1'
->         elif [ -f /usr/include/ncurses/ncurses.h ]; then
-> --
-> 1.8.5.2
+>  Makefile | 32 +++++++++++++++++++++++++++++++-
+>  1 file changed, 31 insertions(+), 1 deletion(-)
+> 
+> diff --git a/Makefile b/Makefile
+> index 831b36a..c4ab30d 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -247,6 +247,15 @@ HOSTCXX      = g++
+>  HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer
+>  HOSTCXXFLAGS = -O2
+>  
+> +ifeq ($(shell $(HOSTCC) -v 2>&1 | grep -c "clang version"), 1)
+> +HOSTCOMPILER := clang
+> +HOSTCFLAGS  += -Wno-unused-value -Wno-unused-parameter \
+> +		-Wno-missing-field-initializers -fno-delete-null-pointer-checks
+> +else
+> +HOSTCOMPILER := gcc
+> +endif
+> +export HOSTCOMPILER
+I see no use of HOSTCOMPLIER anywhere in this patchset not in the kernel. Can we drop this?
 
-Ping. No comments?
+> +
+>  # Decide whether to build built-in, modular, or both.
+>  # Normally, just do built-in.
+>  
+> @@ -323,6 +332,12 @@ endif
+>  
+>  export quiet Q KBUILD_VERBOSE
+>  
+> +ifeq ($(shell $(CC) -v 2>&1 | grep -c "clang version"), 1)
+> +COMPILER := clang
+> +else
+> +COMPILER := gcc
+> +endif
+> +export COMPILER
+Likewise - COMPILER seems unsued- can it be dropped?
 
-Best regards,
-Bjørn Forsman
+>  
+>  # Look for make include files relative to root of kernel src
+>  MAKEFLAGS += --include-dir=$(srctree)
+> @@ -382,7 +397,7 @@ KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
+>  		   -fno-strict-aliasing -fno-common \
+>  		   -Werror-implicit-function-declaration \
+>  		   -Wno-format-security \
+> -		   -fno-delete-null-pointer-checks
+> +		   $(call cc-option,-fno-delete-null-pointer-checks,)
+>  KBUILD_AFLAGS_KERNEL :=
+>  KBUILD_CFLAGS_KERNEL :=
+>  KBUILD_AFLAGS   := -D__ASSEMBLY__
+> @@ -620,9 +635,24 @@ else
+>  endif
+>  KBUILD_CFLAGS += $(stackp-flag)
+>  
+> +ifeq ($(COMPILER),clang)
+Except that COMPILER is used here. But this does not warrant the export.
+
+> +KBUILD_CPPFLAGS += $(call cc-option,-Qunused-arguments,)
+Is this really needed today?
+https://bugzilla.mozilla.org/show_bug.cgi?id=717713 suggest that this is default.
+
+> +KBUILD_CPPFLAGS += $(call cc-option,-Wno-unknown-warning-option,)
+https://bugzilla.mozilla.org/show_bug.cgi?id=731316 seems to suggest this is default
+
+
+> +KBUILD_CFLAGS += $(call cc-disable-warning, unused-variable)
+> +KBUILD_CFLAGS += $(call cc-disable-warning, format-invalid-specifier)
+> +KBUILD_CFLAGS += $(call cc-disable-warning, gnu)
+Is it really justified to disable these warnings?
+# of warnign for a defconfig build would be a nice figure to judge from.
+
+> +# Quiet clang warning: comparison of unsigned expression < 0 is always false
+> +KBUILD_CFLAGS += $(call cc-disable-warning, tautological-compare)
+Same with this.
+
+> +# CLANG uses a _MergedGlobals as optimization, but this breaks modpost, as the
+> +# source of a reference will be _MergedGlobals and not on of the whitelisted names.
+> +# See modpost pattern 2
+> +KBUILD_CFLAGS += $(call cc-option, -mno-global-merge,)
+Should we fix modpost?
+
+
+	Sam
