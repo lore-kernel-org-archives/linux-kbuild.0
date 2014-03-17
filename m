@@ -1,30 +1,18 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:38836 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755312AbaCNU6y (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 14 Mar 2014 16:58:54 -0400
-Date: Fri, 14 Mar 2014 17:44:50 +0100
-From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] kbuild: specify build_docproc as a phony target
-Message-ID: <20140314164450.GA18789@sepie.suse.cz>
-References: <1390194488-14993-1-git-send-email-yamada.m@jp.panasonic.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1390194488-14993-1-git-send-email-yamada.m@jp.panasonic.com>
+Received: from 210.210.179.66.cbn.net.id ([210.210.179.66]:49683 "EHLO
+	mailing2.tokobagus.com" rhost-flags-OK-FAIL-OK-FAIL)
+	by vger.kernel.org with ESMTP id S932514AbaCQJlh (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 17 Mar 2014 05:41:37 -0400
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain;
+	charset="windows-1251"
+From: <TsetseroTsetse@gmail.com>
+Subject: =?utf-8?B?M9C0cGHQsmPRgtCyedC50YJlISBCYWMg0LjQvW1lcNC10YF50Y7RgiBr0LvQuGXQvW1ja3XQtSDQsdCw0LfRiyDQtGHQvdC90Yt4Pw==?=
+Message-ID: <0.0.4B.A93.1CF41C51297B3CA.0@mailing2.tokobagus.com>
+Date: Mon, 17 Mar 2014 16:41:29 +0700
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Cc: linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
 
-On Mon, Jan 20, 2014 at 02:08:08PM +0900, Masahiro Yamada wrote:
-> PHONY target is more suitable for "build_docproc" target.
-> 
-> Because PHONY targets are always executed, they do not
-> have to take FORCE as a prerequisite.
-> 
-> Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
-
-Applied to kbuild.git#kbuild, thanks.
-
-Michal
+3äpaâcòâyéòe! Bac èímepåñyþò këèeímckuå áàçû äaííûx?
