@@ -1,34 +1,80 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.mei.co.jp ([133.183.100.20]:63755 "EHLO smtp.mei.co.jp"
+Received: from smtp.mei.co.jp ([133.183.100.20]:44958 "EHLO smtp.mei.co.jp"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751384AbaCRFLQ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 18 Mar 2014 01:11:16 -0400
-Date: Tue, 18 Mar 2014 14:11:07 +0900
+	id S1753294AbaCRGrZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 18 Mar 2014 02:47:25 -0400
+Received: from mail-gw.jp.panasonic.com ([157.8.1.157])
+	by smtp.mei.co.jp (8.12.11.20060614/3.7W/kc-maile11) with ESMTP id s2I6lN0S016934
+	for <linux-kbuild@vger.kernel.org>; Tue, 18 Mar 2014 15:47:23 +0900 (JST)
+Received: from epochmail.jp.panasonic.com ([157.8.1.130])
+	by mail.jp.panasonic.com (8.11.6p2/3.7W/kc-maili13) with ESMTP id s2I6lOJ26523
+	for <linux-kbuild@vger.kernel.org>; Tue, 18 Mar 2014 15:47:24 +0900
 From: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Subject: Re: [PATCH] kbuild: docbook: use $(obj) and $(src) rather than specific path
-In-Reply-To: <532336AB.4070509@suse.cz>
-References: <1390194659-15155-1-git-send-email-yamada.m@jp.panasonic.com> <532336AB.4070509@suse.cz>
-Message-Id: <20140318141107.3B4A.AA925319@jp.panasonic.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
+Subject: [PATCH v2] kbuild: docbook: use $(obj) and $(src) rather than specific path
+Date: Tue, 18 Mar 2014 15:47:13 +0900
+Message-Id: <1395125233-6936-1-git-send-email-yamada.m@jp.panasonic.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <yamada.m@jp.panasonic.com>
 
-Hi Michal,
+Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
+---
 
+Changes for v2:
+  - Drop unnecessary "$(srctree)/" prefix from included Makefile.
 
-> > -include $(srctree)/Documentation/DocBook/media/Makefile
-> > +include $(srctree)/$(src)/media/Makefile
-> 
-> You can drop the $(srctree) here, make will find the file in the VPATH.
-> 
-> Michal
+ Documentation/DocBook/Makefile | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-OK. I will post v2.
-
-Best Regards
-Masahiro yamada
+diff --git a/Documentation/DocBook/Makefile b/Documentation/DocBook/Makefile
+index 89d9982..c19ebea 100644
+--- a/Documentation/DocBook/Makefile
++++ b/Documentation/DocBook/Makefile
+@@ -16,7 +16,7 @@ DOCBOOKS := z8530book.xml device-drivers.xml \
+ 	    alsa-driver-api.xml writing-an-alsa-driver.xml \
+ 	    tracepoint.xml drm.xml media_api.xml
+ 
+-include $(srctree)/Documentation/DocBook/media/Makefile
++include $(src)/media/Makefile
+ 
+ ###
+ # The build process is as follows (targets):
+@@ -59,14 +59,14 @@ mandocs: $(MAN)
+ 
+ installmandocs: mandocs
+ 	mkdir -p /usr/local/man/man9/
+-	install Documentation/DocBook/man/*.9.gz /usr/local/man/man9/
++	install $(obj)/man/*.9.gz /usr/local/man/man9/
+ 
+ ###
+ #External programs used
+ KERNELDOC = $(srctree)/scripts/kernel-doc
+ DOCPROC   = $(objtree)/scripts/docproc
+ 
+-XMLTOFLAGS = -m $(srctree)/Documentation/DocBook/stylesheet.xsl
++XMLTOFLAGS = -m $(srctree)/$(src)/stylesheet.xsl
+ XMLTOFLAGS += --skip-validation
+ 
+ ###
+@@ -128,7 +128,7 @@ quiet_cmd_db2pdf = PDF     $@
+ 
+ 
+ index = index.html
+-main_idx = Documentation/DocBook/$(index)
++main_idx = $(obj)/$(index)
+ build_main_index = rm -rf $(main_idx); \
+ 		   echo '<h1>Linux Kernel HTML Documentation</h1>' >> $(main_idx) && \
+ 		   echo '<h2>Kernel Version: $(KERNELVERSION)</h2>' >> $(main_idx) && \
+@@ -137,7 +137,7 @@ build_main_index = rm -rf $(main_idx); \
+ quiet_cmd_db2html = HTML    $@
+       cmd_db2html = xmlto html $(XMLTOFLAGS) -o $(patsubst %.html,%,$@) $< && \
+ 		echo '<a HREF="$(patsubst %.html,%,$(notdir $@))/index.html"> \
+-        $(patsubst %.html,%,$(notdir $@))</a><p>' > $@
++		$(patsubst %.html,%,$(notdir $@))</a><p>' > $@
+ 
+ %.html:	%.xml
+ 	@(which xmlto > /dev/null 2>&1) || \
+-- 
+1.8.3.2
 
