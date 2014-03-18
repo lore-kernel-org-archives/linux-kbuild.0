@@ -1,80 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.mei.co.jp ([133.183.100.20]:44958 "EHLO smtp.mei.co.jp"
+Received: from smtp.mei.co.jp ([133.183.100.20]:50212 "EHLO smtp.mei.co.jp"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753294AbaCRGrZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 18 Mar 2014 02:47:25 -0400
+	id S1752127AbaCRG6F (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 18 Mar 2014 02:58:05 -0400
 Received: from mail-gw.jp.panasonic.com ([157.8.1.157])
-	by smtp.mei.co.jp (8.12.11.20060614/3.7W/kc-maile11) with ESMTP id s2I6lN0S016934
-	for <linux-kbuild@vger.kernel.org>; Tue, 18 Mar 2014 15:47:23 +0900 (JST)
+	by smtp.mei.co.jp (8.12.11.20060614/3.7W/kc-maile12) with ESMTP id s2I6w33p019560
+	for <linux-kbuild@vger.kernel.org>; Tue, 18 Mar 2014 15:58:03 +0900 (JST)
 Received: from epochmail.jp.panasonic.com ([157.8.1.130])
-	by mail.jp.panasonic.com (8.11.6p2/3.7W/kc-maili13) with ESMTP id s2I6lOJ26523
-	for <linux-kbuild@vger.kernel.org>; Tue, 18 Mar 2014 15:47:24 +0900
+	by mail.jp.panasonic.com (8.11.6p2/3.7W/kc-maili12) with ESMTP id s2I6w3o22468
+	for <linux-kbuild@vger.kernel.org>; Tue, 18 Mar 2014 15:58:03 +0900
 From: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Subject: [PATCH v2] kbuild: docbook: use $(obj) and $(src) rather than specific path
-Date: Tue, 18 Mar 2014 15:47:13 +0900
-Message-Id: <1395125233-6936-1-git-send-email-yamada.m@jp.panasonic.com>
+Subject: [PATCH] kbuild: move "quote" to Kbuild.include to be consistent
+Date: Tue, 18 Mar 2014 15:58:01 +0900
+Message-Id: <1395125881-14928-1-git-send-email-yamada.m@jp.panasonic.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Masahiro Yamada <yamada.m@jp.panasonic.com>
 
-Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
 ---
+ scripts/Kbuild.include | 1 +
+ scripts/Makefile.lib   | 4 ----
+ 2 files changed, 1 insertion(+), 4 deletions(-)
 
-Changes for v2:
-  - Drop unnecessary "$(srctree)/" prefix from included Makefile.
-
- Documentation/DocBook/Makefile | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/Documentation/DocBook/Makefile b/Documentation/DocBook/Makefile
-index 89d9982..c19ebea 100644
---- a/Documentation/DocBook/Makefile
-+++ b/Documentation/DocBook/Makefile
-@@ -16,7 +16,7 @@ DOCBOOKS := z8530book.xml device-drivers.xml \
- 	    alsa-driver-api.xml writing-an-alsa-driver.xml \
- 	    tracepoint.xml drm.xml media_api.xml
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index 547e15d..2ec6829 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -3,6 +3,7 @@
  
--include $(srctree)/Documentation/DocBook/media/Makefile
-+include $(src)/media/Makefile
- 
- ###
- # The build process is as follows (targets):
-@@ -59,14 +59,14 @@ mandocs: $(MAN)
- 
- installmandocs: mandocs
- 	mkdir -p /usr/local/man/man9/
--	install Documentation/DocBook/man/*.9.gz /usr/local/man/man9/
-+	install $(obj)/man/*.9.gz /usr/local/man/man9/
- 
- ###
- #External programs used
- KERNELDOC = $(srctree)/scripts/kernel-doc
- DOCPROC   = $(objtree)/scripts/docproc
- 
--XMLTOFLAGS = -m $(srctree)/Documentation/DocBook/stylesheet.xsl
-+XMLTOFLAGS = -m $(srctree)/$(src)/stylesheet.xsl
- XMLTOFLAGS += --skip-validation
- 
- ###
-@@ -128,7 +128,7 @@ quiet_cmd_db2pdf = PDF     $@
- 
- 
- index = index.html
--main_idx = Documentation/DocBook/$(index)
-+main_idx = $(obj)/$(index)
- build_main_index = rm -rf $(main_idx); \
- 		   echo '<h1>Linux Kernel HTML Documentation</h1>' >> $(main_idx) && \
- 		   echo '<h2>Kernel Version: $(KERNELVERSION)</h2>' >> $(main_idx) && \
-@@ -137,7 +137,7 @@ build_main_index = rm -rf $(main_idx); \
- quiet_cmd_db2html = HTML    $@
-       cmd_db2html = xmlto html $(XMLTOFLAGS) -o $(patsubst %.html,%,$@) $< && \
- 		echo '<a HREF="$(patsubst %.html,%,$(notdir $@))/index.html"> \
--        $(patsubst %.html,%,$(notdir $@))</a><p>' > $@
-+		$(patsubst %.html,%,$(notdir $@))</a><p>' > $@
- 
- %.html:	%.xml
- 	@(which xmlto > /dev/null 2>&1) || \
+ # Convenient variables
+ comma   := ,
++quote   := "
+ squote  := '
+ empty   :=
+ space   := $(empty) $(empty)
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index 79c059e..a4ee8d2 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -368,7 +368,3 @@ quiet_cmd_xzmisc = XZMISC  $@
+ cmd_xzmisc = (cat $(filter-out FORCE,$^) | \
+ 	xz --check=crc32 --lzma2=dict=1MiB) > $@ || \
+ 	(rm -f $@ ; false)
+-
+-# misc stuff
+-# ---------------------------------------------------------------------------
+-quote:="
 -- 
 1.8.3.2
 
