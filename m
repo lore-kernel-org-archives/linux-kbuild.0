@@ -1,30 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:52437 "EHLO mx2.suse.de"
+Received: from smtp.mei.co.jp ([133.183.100.20]:55588 "EHLO smtp.mei.co.jp"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751999AbaC2VEZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 29 Mar 2014 17:04:25 -0400
-Message-ID: <53373557.1070205@suse.cz>
-Date: Sat, 29 Mar 2014 22:04:23 +0100
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: [PATCH v2] kbuild: move "quote" to Kbuild.include to be consistent
-References: <1395281300-4330-1-git-send-email-yamada.m@jp.panasonic.com>
-In-Reply-To: <1395281300-4330-1-git-send-email-yamada.m@jp.panasonic.com>
-Content-Type: text/plain; charset=ISO-8859-2
-Content-Transfer-Encoding: 7bit
+	id S1751562AbaCaHlt (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 31 Mar 2014 03:41:49 -0400
+From: Masahiro Yamada <yamada.m@jp.panasonic.com>
+Subject: [PATCH] kbuild: create a build directory automatically for out-of-tree build
+Date: Mon, 31 Mar 2014 16:41:36 +0900
+Message-Id: <1396251696-14815-1-git-send-email-yamada.m@jp.panasonic.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.m@jp.panasonic.com>, linux-kbuild@vger.kernel.org
+To: linux-kernel@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.m@jp.panasonic.com>
 
-Dne 20.3.2014 03:08, Masahiro Yamada napsal(a):
-> Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
-> ---
-> 
-> Changes in v2:
->  - I forgot to add Signed-off-by in v1.
->    I am resending this.
+Kbuild supports saving output files in a separate directory.
+But the build directory must be created beforehand. For example,
 
-Applied to kbuild.git#kbuild, thanks.
+  $ mkdir -p dir/to/store/output/files
+  $ make O=dir/to/store/output/files defconfig
 
-Michal
+Creating a build directory automatically would be useful.
+
+Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
+---
+ Makefile | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 575e1f8..35b5b7e 100644
+--- a/Makefile
++++ b/Makefile
+@@ -120,9 +120,10 @@ ifneq ($(KBUILD_OUTPUT),)
+ # Invoke a second make in the output directory, passing relevant variables
+ # check that the output directory actually exists
+ saved-output := $(KBUILD_OUTPUT)
+-KBUILD_OUTPUT := $(shell cd $(KBUILD_OUTPUT) && /bin/pwd)
++KBUILD_OUTPUT := $(shell mkdir -p $(KBUILD_OUTPUT) && cd $(KBUILD_OUTPUT) \
++								&& /bin/pwd)
+ $(if $(KBUILD_OUTPUT),, \
+-     $(error output directory "$(saved-output)" does not exist))
++     $(error failed to create output directory "$(saved-output)"))
+ 
+ PHONY += $(MAKECMDGOALS) sub-make
+ 
+-- 
+1.8.3.2
 
