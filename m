@@ -1,47 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.mei.co.jp ([133.183.100.20]:55588 "EHLO smtp.mei.co.jp"
+Received: from mga11.intel.com ([192.55.52.93]:54403 "EHLO mga11.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751562AbaCaHlt (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 31 Mar 2014 03:41:49 -0400
-From: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Subject: [PATCH] kbuild: create a build directory automatically for out-of-tree build
-Date: Mon, 31 Mar 2014 16:41:36 +0900
-Message-Id: <1396251696-14815-1-git-send-email-yamada.m@jp.panasonic.com>
+	id S1752565AbaCaLeZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 31 Mar 2014 07:34:25 -0400
+Date: Mon, 31 Mar 2014 19:34:12 +0800
+From: Fengguang Wu <fengguang.wu@intel.com>
+Subject: Re: [mtd/sbc_gxx] kernel BUG at include/linux/mtd/map.h:148!
+Message-ID: <20140331113412.GA13548@localhost>
+References: <20140327140140.GA9083@localhost>
+ <CAErSpo7b+OJUoRcMY0edZPgEKG6DbwdLcq5M0-9B6JKALpm+QQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAErSpo7b+OJUoRcMY0edZPgEKG6DbwdLcq5M0-9B6JKALpm+QQ@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.m@jp.panasonic.com>
+To: Bjorn Helgaas <bhelgaas@google.com>
+Cc: "linux-mtd@lists.infradead.org" <linux-mtd@lists.infradead.org>, LKML <linux-kernel@vger.kernel.org>, David Woodhouse <dwmw2@infradead.org>, Brian Norris <computersforpeace@gmail.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.cz>
 
-Kbuild supports saving output files in a separate directory.
-But the build directory must be created beforehand. For example,
+CC Michal and kbuild list.
 
-  $ mkdir -p dir/to/store/output/files
-  $ make O=dir/to/store/output/files defconfig
+On Thu, Mar 27, 2014 at 04:51:53PM -0600, Bjorn Helgaas wrote:
+> [+cc David, Brian]
+> 
+> On Thu, Mar 27, 2014 at 8:01 AM, Fengguang Wu <fengguang.wu@intel.com> wrote:
+> > FYI, here is a very old warning, too old to be bisected.
+> >
+> > [    5.282127] sd 0:0:0:0: [sda] Write cache: enabled, read cache: enabled, supports DPO and FUA
+> > [    5.286079] SBC-GXx flash: IO:0x258-0x259 MEM:0xdc000-0xdffff
+> > [    5.288723] ------------[ cut here ]------------
+> > [    5.289649] kernel BUG at include/linux/mtd/map.h:148!
+> 
+> I think the problem is that your randconfig happens to have none of
+> CONFIG_MTD_MAP_BANK_WIDTH_* set (you should have played the lottery
+> today!), and the default implementation of map_bankwidth() in that
+> case is just "BUG()":
+> 
+>   $ grep MTD_MAP config-3.14.0-rc8-wl-03045-gdf16ea4
+>   # CONFIG_MTD_MAP_BANK_WIDTH_1 is not set
+>   # CONFIG_MTD_MAP_BANK_WIDTH_2 is not set
+>   # CONFIG_MTD_MAP_BANK_WIDTH_4 is not set
+>   # CONFIG_MTD_MAP_BANK_WIDTH_8 is not set
+>   # CONFIG_MTD_MAP_BANK_WIDTH_16 is not set
+>   # CONFIG_MTD_MAP_BANK_WIDTH_32 is not set
+> 
+> I don't know enough Kconfig or MTD to fix this.
 
-Creating a build directory automatically would be useful.
+Michal, the problem we run into is, how to select one of the above
+CONFIG_MTD_MAP_BANK_WIDTH_xx in "make randconfig".
 
-Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
----
- Makefile | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index 575e1f8..35b5b7e 100644
---- a/Makefile
-+++ b/Makefile
-@@ -120,9 +120,10 @@ ifneq ($(KBUILD_OUTPUT),)
- # Invoke a second make in the output directory, passing relevant variables
- # check that the output directory actually exists
- saved-output := $(KBUILD_OUTPUT)
--KBUILD_OUTPUT := $(shell cd $(KBUILD_OUTPUT) && /bin/pwd)
-+KBUILD_OUTPUT := $(shell mkdir -p $(KBUILD_OUTPUT) && cd $(KBUILD_OUTPUT) \
-+								&& /bin/pwd)
- $(if $(KBUILD_OUTPUT),, \
--     $(error output directory "$(saved-output)" does not exist))
-+     $(error failed to create output directory "$(saved-output)"))
- 
- PHONY += $(MAKECMDGOALS) sub-make
- 
--- 
-1.8.3.2
-
+Thanks,
+Fengguang
