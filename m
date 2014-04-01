@@ -1,11 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:58222 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751061AbaCaUuz (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 31 Mar 2014 16:50:55 -0400
-Message-ID: <5339D52E.4040206@suse.cz>
-Date: Mon, 31 Mar 2014 22:50:54 +0200
-From: Michal Marek <mmarek@suse.cz>
+Received: from merlin.infradead.org ([205.233.59.134]:39538 "EHLO
+	merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751660AbaDARoz (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 1 Apr 2014 13:44:55 -0400
+Message-ID: <533AFB06.6020207@infradead.org>
+Date: Tue, 01 Apr 2014 10:44:38 -0700
+From: Randy Dunlap <rdunlap@infradead.org>
 MIME-Version: 1.0
 Subject: Re: [PATCH] kbuild: create a build directory automatically for out-of-tree
  build
@@ -18,7 +19,7 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.m@jp.panasonic.com>
 Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-Dne 31.3.2014 22:36, Sam Ravnborg napsal(a):
+On 03/31/2014 01:36 PM, Sam Ravnborg wrote:
 > On Mon, Mar 31, 2014 at 04:41:36PM +0900, Masahiro Yamada wrote:
 >> Kbuild supports saving output files in a separate directory.
 >> But the build directory must be created beforehand. For example,
@@ -53,13 +54,22 @@ Dne 31.3.2014 22:36, Sam Ravnborg napsal(a):
 > Hi Masahiro.
 > 
 > In the past I have rejected such patches - but today I fail to recall why.
+
+I believe that it was due this kind of patch allowing typos to cause
+builds that one does not want to make.
+
+E.g., if I already have O=OUT1 directory and I mistype O=OUT2, this will cause
+a full build (potentially) in OUT2, even if it should do a small rebuild in
+OUT1 instead.
+
+I think this is bad, but I won't exactly nak it.
+
 > I did a very quick test-spin on this and worked nicely.
 > 
 > So you get my:
 > 
 > Acked-by: Sam Ravnborg <sam@ravnborg.org>
 
-Applied to kbuild.git#kbuild, thanks.
 
-Michal
-
+-- 
+~Randy
