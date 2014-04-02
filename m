@@ -1,75 +1,104 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from merlin.infradead.org ([205.233.59.134]:39538 "EHLO
-	merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751660AbaDARoz (ORCPT
+Received: from mailrelay012.isp.belgacom.be ([195.238.6.179]:21298 "EHLO
+	mailrelay012.isp.belgacom.be" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S932723AbaDBTRr (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 1 Apr 2014 13:44:55 -0400
-Message-ID: <533AFB06.6020207@infradead.org>
-Date: Tue, 01 Apr 2014 10:44:38 -0700
-From: Randy Dunlap <rdunlap@infradead.org>
-MIME-Version: 1.0
-Subject: Re: [PATCH] kbuild: create a build directory automatically for out-of-tree
- build
-References: <1396251696-14815-1-git-send-email-yamada.m@jp.panasonic.com> <20140331203615.GA22334@ravnborg.org>
-In-Reply-To: <20140331203615.GA22334@ravnborg.org>
-Content-Type: text/plain; charset=ISO-8859-1
+	Wed, 2 Apr 2014 15:17:47 -0400
+Date: Wed, 2 Apr 2014 21:19:33 +0200
+From: Fabian Frederick <fabf@skynet.be>
+Subject: [PATCH 1/1] scripts/bootgraph.pl: Add graphic header
+Message-Id: <20140402211933.00d5e51ae27dc46318d2c9f7@skynet.be>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.m@jp.panasonic.com>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: linux-kernel <linux-kernel@vger.kernel.org>
+Cc: akpm <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org
 
-On 03/31/2014 01:36 PM, Sam Ravnborg wrote:
-> On Mon, Mar 31, 2014 at 04:41:36PM +0900, Masahiro Yamada wrote:
->> Kbuild supports saving output files in a separate directory.
->> But the build directory must be created beforehand. For example,
->>
->>   $ mkdir -p dir/to/store/output/files
->>   $ make O=dir/to/store/output/files defconfig
->>
->> Creating a build directory automatically would be useful.
->>
->> Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
->> ---
->>  Makefile | 5 +++--
->>  1 file changed, 3 insertions(+), 2 deletions(-)
->>
->> diff --git a/Makefile b/Makefile
->> index 575e1f8..35b5b7e 100644
->> --- a/Makefile
->> +++ b/Makefile
->> @@ -120,9 +120,10 @@ ifneq ($(KBUILD_OUTPUT),)
->>  # Invoke a second make in the output directory, passing relevant variables
->>  # check that the output directory actually exists
->>  saved-output := $(KBUILD_OUTPUT)
->> -KBUILD_OUTPUT := $(shell cd $(KBUILD_OUTPUT) && /bin/pwd)
->> +KBUILD_OUTPUT := $(shell mkdir -p $(KBUILD_OUTPUT) && cd $(KBUILD_OUTPUT) \
->> +								&& /bin/pwd)
->>  $(if $(KBUILD_OUTPUT),, \
->> -     $(error output directory "$(saved-output)" does not exist))
->> +     $(error failed to create output directory "$(saved-output)"))
->>  
->>  PHONY += $(MAKECMDGOALS) sub-make
-> 
-> Hi Masahiro.
-> 
-> In the past I have rejected such patches - but today I fail to recall why.
+Adding -header + help function like other .pl in /scripts.
 
-I believe that it was due this kind of patch allowing typos to cause
-builds that one does not want to make.
+Cc: linux-kbuild@vger.kernel.org
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Signed-off-by: Fabian Frederick <fabf@skynet.be>
+---
+ scripts/bootgraph.pl | 42 ++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 40 insertions(+), 2 deletions(-)
 
-E.g., if I already have O=OUT1 directory and I mistype O=OUT2, this will cause
-a full build (potentially) in OUT2, even if it should do a small rebuild in
-OUT1 instead.
-
-I think this is bad, but I won't exactly nak it.
-
-> I did a very quick test-spin on this and worked nicely.
-> 
-> So you get my:
-> 
-> Acked-by: Sam Ravnborg <sam@ravnborg.org>
-
-
+diff --git a/scripts/bootgraph.pl b/scripts/bootgraph.pl
+index b78fca9..b8f2cd3 100644
+--- a/scripts/bootgraph.pl
++++ b/scripts/bootgraph.pl
+@@ -38,6 +38,31 @@
+ #
+ 
+ use strict;
++use Getopt::Long;
++my $header = 0;
++
++sub help {
++	my $text = << "EOM";
++Usage:
++1) dmesg | perl scripts/bootgraph.pl [OPTION] > output.svg
++2) perl scripts/bootgraph.pl -h
++
++Options:
++	-header	Insert kernel version and date
++EOM
++	my $std=shift;
++	if ($std == 1){
++		print STDERR $text;
++	} else {
++		print $text;
++	}
++	exit;
++}
++
++GetOptions(
++	'h|help'	=>\&help,
++	'header'	=>\$header
++);
+ 
+ my %start;
+ my %end;
+@@ -49,6 +74,11 @@ my $count = 0;
+ my %pids;
+ my %pidctr;
+ 
++my $headerstep=20;
++my $xheader=15;
++my $yheader=25;
++my $cyheader=0;
++
+ while (<>) {
+ 	my $line = $_;
+ 	if ($line =~ /([0-9\.]+)\] calling  ([a-zA-Z0-9\_\.]+)\+/) {
+@@ -112,15 +142,23 @@ if ($count == 0) {
+     print STDERR <<END;
+ No data found in the dmesg. Make sure that 'printk.time=1' and
+ 'initcall_debug' are passed on the kernel command line.
+-Usage:
+-      dmesg | perl scripts/bootgraph.pl > output.svg
+ END
++	help(1);
+     exit 1;
+ }
+ 
+ print "<?xml version=\"1.0\" standalone=\"no\"?> \n";
+ print "<svg width=\"2000\" height=\"100%\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\">\n";
+ 
++
++if ($header) {
++	my $version = `uname -a`;
++	my $date = `date`;
++	print "<text transform=\"translate($xheader,$yheader)\">Kernel version: $version</text>\n";
++	$cyheader = $yheader+$headerstep;
++	print "<text transform=\"translate($xheader,$cyheader)\">Date: $date</text>\n";
++}
++
+ my @styles;
+ 
+ $styles[0] = "fill:rgb(0,0,255);fill-opacity:0.5;stroke-width:1;stroke:rgb(0,0,0)";
 -- 
-~Randy
+1.8.4.5
+
