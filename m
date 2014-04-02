@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mailrelay012.isp.belgacom.be ([195.238.6.179]:21298 "EHLO
-	mailrelay012.isp.belgacom.be" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S932723AbaDBTRr (ORCPT
+Received: from mailrelay003.isp.belgacom.be ([195.238.6.53]:8291 "EHLO
+	mailrelay003.isp.belgacom.be" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S932768AbaDBTiG (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 2 Apr 2014 15:17:47 -0400
-Date: Wed, 2 Apr 2014 21:19:33 +0200
+	Wed, 2 Apr 2014 15:38:06 -0400
+Date: Wed, 2 Apr 2014 21:39:52 +0200
 From: Fabian Frederick <fabf@skynet.be>
-Subject: [PATCH 1/1] scripts/bootgraph.pl: Add graphic header
-Message-Id: <20140402211933.00d5e51ae27dc46318d2c9f7@skynet.be>
+Subject: [PATCH v2] scripts/bootgraph.pl: Add graphic header
+Message-Id: <20140402213952.7c05ff6d77a85f97b3b3e19e@skynet.be>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
@@ -19,14 +19,15 @@ Cc: akpm <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org
 Adding -header + help function like other .pl in /scripts.
 
 Cc: linux-kbuild@vger.kernel.org
-Cc: Andrew Morton <akpm@linux-foundation.org>
 Signed-off-by: Fabian Frederick <fabf@skynet.be>
 ---
+ v2: fix some typos
+
  scripts/bootgraph.pl | 42 ++++++++++++++++++++++++++++++++++++++++--
  1 file changed, 40 insertions(+), 2 deletions(-)
 
 diff --git a/scripts/bootgraph.pl b/scripts/bootgraph.pl
-index b78fca9..b8f2cd3 100644
+index b78fca9..9ca667b 100644
 --- a/scripts/bootgraph.pl
 +++ b/scripts/bootgraph.pl
 @@ -38,6 +38,31 @@
@@ -46,7 +47,7 @@ index b78fca9..b8f2cd3 100644
 +	-header	Insert kernel version and date
 +EOM
 +	my $std=shift;
-+	if ($std == 1){
++	if ($std == 1) {
 +		print STDERR $text;
 +	} else {
 +		print $text;
@@ -65,10 +66,10 @@ index b78fca9..b8f2cd3 100644
  my %pids;
  my %pidctr;
  
-+my $headerstep=20;
-+my $xheader=15;
-+my $yheader=25;
-+my $cyheader=0;
++my $headerstep = 20;
++my $xheader = 15;
++my $yheader = 25;
++my $cyheader = 0;
 +
  while (<>) {
  	my $line = $_;
