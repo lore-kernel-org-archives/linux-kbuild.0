@@ -1,105 +1,121 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mailrelay003.isp.belgacom.be ([195.238.6.53]:8291 "EHLO
-	mailrelay003.isp.belgacom.be" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S932768AbaDBTiG (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 2 Apr 2014 15:38:06 -0400
-Date: Wed, 2 Apr 2014 21:39:52 +0200
-From: Fabian Frederick <fabf@skynet.be>
-Subject: [PATCH v2] scripts/bootgraph.pl: Add graphic header
-Message-Id: <20140402213952.7c05ff6d77a85f97b3b3e19e@skynet.be>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Received: from mga01.intel.com ([192.55.52.88]:18593 "EHLO mga01.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751422AbaDCJOI (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 3 Apr 2014 05:14:08 -0400
+Message-ID: <533D262A.2040602@intel.com>
+Date: Thu, 03 Apr 2014 17:13:14 +0800
+From: Jet Chen <jet.chen@intel.com>
+MIME-Version: 1.0
+Subject: Re: [mtd/sbc_gxx] kernel BUG at include/linux/mtd/map.h:148!
+References: <20140327140140.GA9083@localhost> <CAErSpo7b+OJUoRcMY0edZPgEKG6DbwdLcq5M0-9B6JKALpm+QQ@mail.gmail.com> <20140331113412.GA13548@localhost> <20140331143543.GA9764@sepie.suse.cz>
+In-Reply-To: <20140331143543.GA9764@sepie.suse.cz>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel <linux-kernel@vger.kernel.org>
-Cc: akpm <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>, "Wu, Fengguang" <fengguang.wu@intel.com>
+Cc: Bjorn Helgaas <bhelgaas@google.com>, "linux-mtd@lists.infradead.org" <linux-mtd@lists.infradead.org>, LKML <linux-kernel@vger.kernel.org>, David Woodhouse <dwmw2@infradead.org>, Brian Norris <computersforpeace@gmail.com>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-Adding -header + help function like other .pl in /scripts.
+Hi Michal,
 
-Cc: linux-kbuild@vger.kernel.org
-Signed-off-by: Fabian Frederick <fabf@skynet.be>
----
- v2: fix some typos
+Your patch fixes the problem.
 
- scripts/bootgraph.pl | 42 ++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 40 insertions(+), 2 deletions(-)
+Tested-by: Jet Chen <jet.chen@intel.com>
 
-diff --git a/scripts/bootgraph.pl b/scripts/bootgraph.pl
-index b78fca9..9ca667b 100644
---- a/scripts/bootgraph.pl
-+++ b/scripts/bootgraph.pl
-@@ -38,6 +38,31 @@
- #
- 
- use strict;
-+use Getopt::Long;
-+my $header = 0;
-+
-+sub help {
-+	my $text = << "EOM";
-+Usage:
-+1) dmesg | perl scripts/bootgraph.pl [OPTION] > output.svg
-+2) perl scripts/bootgraph.pl -h
-+
-+Options:
-+	-header	Insert kernel version and date
-+EOM
-+	my $std=shift;
-+	if ($std == 1) {
-+		print STDERR $text;
-+	} else {
-+		print $text;
-+	}
-+	exit;
-+}
-+
-+GetOptions(
-+	'h|help'	=>\&help,
-+	'header'	=>\$header
-+);
- 
- my %start;
- my %end;
-@@ -49,6 +74,11 @@ my $count = 0;
- my %pids;
- my %pidctr;
- 
-+my $headerstep = 20;
-+my $xheader = 15;
-+my $yheader = 25;
-+my $cyheader = 0;
-+
- while (<>) {
- 	my $line = $_;
- 	if ($line =~ /([0-9\.]+)\] calling  ([a-zA-Z0-9\_\.]+)\+/) {
-@@ -112,15 +142,23 @@ if ($count == 0) {
-     print STDERR <<END;
- No data found in the dmesg. Make sure that 'printk.time=1' and
- 'initcall_debug' are passed on the kernel command line.
--Usage:
--      dmesg | perl scripts/bootgraph.pl > output.svg
- END
-+	help(1);
-     exit 1;
- }
- 
- print "<?xml version=\"1.0\" standalone=\"no\"?> \n";
- print "<svg width=\"2000\" height=\"100%\" version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\">\n";
- 
-+
-+if ($header) {
-+	my $version = `uname -a`;
-+	my $date = `date`;
-+	print "<text transform=\"translate($xheader,$yheader)\">Kernel version: $version</text>\n";
-+	$cyheader = $yheader+$headerstep;
-+	print "<text transform=\"translate($xheader,$cyheader)\">Date: $date</text>\n";
-+}
-+
- my @styles;
- 
- $styles[0] = "fill:rgb(0,0,255);fill-opacity:0.5;stroke-width:1;stroke:rgb(0,0,0)";
--- 
-1.8.4.5
+Thanks,
+-Jet
 
+On 03/31/2014 10:35 PM, Michal Marek wrote:
+> On Mon, Mar 31, 2014 at 07:34:12PM +0800, Fengguang Wu wrote:
+>> CC Michal and kbuild list.
+>>
+>> On Thu, Mar 27, 2014 at 04:51:53PM -0600, Bjorn Helgaas wrote:
+>>> [+cc David, Brian]
+>>>
+>>> On Thu, Mar 27, 2014 at 8:01 AM, Fengguang Wu <fengguang.wu@intel.com> wrote:
+>>>> FYI, here is a very old warning, too old to be bisected.
+>>>>
+>>>> [    5.282127] sd 0:0:0:0: [sda] Write cache: enabled, read cache: enabled, supports DPO and FUA
+>>>> [    5.286079] SBC-GXx flash: IO:0x258-0x259 MEM:0xdc000-0xdffff
+>>>> [    5.288723] ------------[ cut here ]------------
+>>>> [    5.289649] kernel BUG at include/linux/mtd/map.h:148!
+>>>
+>>> I think the problem is that your randconfig happens to have none of
+>>> CONFIG_MTD_MAP_BANK_WIDTH_* set (you should have played the lottery
+>>> today!), and the default implementation of map_bankwidth() in that
+>>> case is just "BUG()":
+>>>
+>>>    $ grep MTD_MAP config-3.14.0-rc8-wl-03045-gdf16ea4
+>>>    # CONFIG_MTD_MAP_BANK_WIDTH_1 is not set
+>>>    # CONFIG_MTD_MAP_BANK_WIDTH_2 is not set
+>>>    # CONFIG_MTD_MAP_BANK_WIDTH_4 is not set
+>>>    # CONFIG_MTD_MAP_BANK_WIDTH_8 is not set
+>>>    # CONFIG_MTD_MAP_BANK_WIDTH_16 is not set
+>>>    # CONFIG_MTD_MAP_BANK_WIDTH_32 is not set
+>>>
+>>> I don't know enough Kconfig or MTD to fix this.
+>>
+>> Michal, the problem we run into is, how to select one of the above
+>> CONFIG_MTD_MAP_BANK_WIDTH_xx in "make randconfig".
+>
+> You can't enforce this in Kconfig. What you can do is to make the logic
+> more fool-proof and fall back to some sensible default if none of the
+> CONFIG_MTD_MAP_BANK_WIDTH_* options is enabled. Like this
+>
+>
+>  From 76e66ceea7e2ffbb1d39c01af2eaf6f2b66c2be3 Mon Sep 17 00:00:00 2001
+> From: Michal Marek <mmarek@suse.cz>
+> Date: Mon, 31 Mar 2014 16:25:32 +0200
+> Subject: [PATCH] mtd: Fall back to MTD_MAP_BANK_WIDTH_1 if none is specified
+>
+> This is mainly to fix make randconfig errors.
+>
+> Signed-off-by: Michal Marek <mmarek@suse.cz>
+> ---
+>   drivers/mtd/chips/Kconfig | 8 ++++++++
+>   include/linux/mtd/map.h   | 4 ++--
+>   2 files changed, 10 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/mtd/chips/Kconfig b/drivers/mtd/chips/Kconfig
+> index e4696b3..219de49 100644
+> --- a/drivers/mtd/chips/Kconfig
+> +++ b/drivers/mtd/chips/Kconfig
+> @@ -115,6 +115,14 @@ config MTD_MAP_BANK_WIDTH_32
+>   	  If you wish to support CFI devices on a physical bus which is
+>   	  256 bits wide, say 'Y'.
+>
+> +config HAVE_MTD_MAP_BANK_WIDTH_1
+> +	bool
+> +	default MTD_MAP_BANK_WIDTH_1 || (!MTD_MAP_BANK_WIDTH_2 && !MTD_MAP_BANK_WIDTH_4 && !MTD_MAP_BANK_WIDTH_8 && !MTD_MAP_BANK_WIDTH_16 && !MTD_MAP_BANK_WIDTH_32)
+> +
+> +if HAVE_MTD_MAP_BANK_WIDTH_1 && !MTD_MAP_BANK_WIDTH_1
+> +comment "no buswidth selected, using 8-bit as a fallback "
+> +endif
+> +
+>   config MTD_CFI_I1
+>   	bool "Support 1-chip flash interleave" if MTD_CFI_GEOMETRY
+>   	default y
+> diff --git a/include/linux/mtd/map.h b/include/linux/mtd/map.h
+> index 5f487d7..d4f4f49 100644
+> --- a/include/linux/mtd/map.h
+> +++ b/include/linux/mtd/map.h
+> @@ -32,7 +32,7 @@
+>   #include <asm/io.h>
+>   #include <asm/barrier.h>
+>
+> -#ifdef CONFIG_MTD_MAP_BANK_WIDTH_1
+> +#ifdef CONFIG_HAVE_MTD_MAP_BANK_WIDTH_1
+>   #define map_bankwidth(map) 1
+>   #define map_bankwidth_is_1(map) (map_bankwidth(map) == 1)
+>   #define map_bankwidth_is_large(map) (0)
+> @@ -156,7 +156,7 @@ static inline int map_bankwidth(void *map)
+>   static inline int map_bankwidth_supported(int w)
+>   {
+>   	switch (w) {
+> -#ifdef CONFIG_MTD_MAP_BANK_WIDTH_1
+> +#ifdef CONFIG_HAVE_MTD_MAP_BANK_WIDTH_1
+>   	case 1:
+>   #endif
+>   #ifdef CONFIG_MTD_MAP_BANK_WIDTH_2
+>
