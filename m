@@ -1,121 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:18593 "EHLO mga01.intel.com"
+Received: from mout.gmx.net ([212.227.15.18]:65523 "EHLO mout.gmx.net"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751422AbaDCJOI (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 3 Apr 2014 05:14:08 -0400
-Message-ID: <533D262A.2040602@intel.com>
-Date: Thu, 03 Apr 2014 17:13:14 +0800
-From: Jet Chen <jet.chen@intel.com>
-MIME-Version: 1.0
-Subject: Re: [mtd/sbc_gxx] kernel BUG at include/linux/mtd/map.h:148!
-References: <20140327140140.GA9083@localhost> <CAErSpo7b+OJUoRcMY0edZPgEKG6DbwdLcq5M0-9B6JKALpm+QQ@mail.gmail.com> <20140331113412.GA13548@localhost> <20140331143543.GA9764@sepie.suse.cz>
-In-Reply-To: <20140331143543.GA9764@sepie.suse.cz>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Content-Transfer-Encoding: 7bit
+	id S1753778AbaDEWhB (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 5 Apr 2014 18:37:01 -0400
+Date: Sun, 6 Apr 2014 00:36:49 +0200
+From: Christian Engelmayer <cengelma@gmx.at>
+Subject: [PATCH] modpost: Fix ressource leak in read_dump()
+Message-ID: <20140406003649.1ba3c993@spike>
+Mime-Version: 1.0
+Content-Type: multipart/signed; micalg=PGP-SHA1;
+ boundary="Sig_/K/Q6=w.Begg1bhk1B4iX5RC"; protocol="application/pgp-signature"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>, "Wu, Fengguang" <fengguang.wu@intel.com>
-Cc: Bjorn Helgaas <bhelgaas@google.com>, "linux-mtd@lists.infradead.org" <linux-mtd@lists.infradead.org>, LKML <linux-kernel@vger.kernel.org>, David Woodhouse <dwmw2@infradead.org>, Brian Norris <computersforpeace@gmail.com>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Rusty Russell <rusty@rustcorp.com.au>, Andi Kleen <ak@linux.intel.com>
 
-Hi Michal,
+--Sig_/K/Q6=w.Begg1bhk1B4iX5RC
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Your patch fixes the problem.
+Function read_dump() memory maps the input via grab_file(), but fails to ca=
+ll
+the corresponding unmap function. Add the missing call to release_file().
+Detected by Coverity: CID 1192419
 
-Tested-by: Jet Chen <jet.chen@intel.com>
+Signed-off-by: Christian Engelmayer <cengelma@gmx.at>
+---
+Compile tested - Applies against v3.14 as well as linux-next.
+---
+ scripts/mod/modpost.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Thanks,
--Jet
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index 0663556..ea3e2bd 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -2113,8 +2113,10 @@ static void read_dump(const char *fname, unsigned in=
+t kernel)
+ 		s->preloaded =3D 1;
+ 		sym_update_crc(symname, mod, crc, export_no(export));
+ 	}
++	release_file(file, size);
+ 	return;
+ fail:
++	release_file(file, size);
+ 	fatal("parse error in symbol dump file\n");
+ }
+=20
+--=20
+1.8.3.2
 
-On 03/31/2014 10:35 PM, Michal Marek wrote:
-> On Mon, Mar 31, 2014 at 07:34:12PM +0800, Fengguang Wu wrote:
->> CC Michal and kbuild list.
->>
->> On Thu, Mar 27, 2014 at 04:51:53PM -0600, Bjorn Helgaas wrote:
->>> [+cc David, Brian]
->>>
->>> On Thu, Mar 27, 2014 at 8:01 AM, Fengguang Wu <fengguang.wu@intel.com> wrote:
->>>> FYI, here is a very old warning, too old to be bisected.
->>>>
->>>> [    5.282127] sd 0:0:0:0: [sda] Write cache: enabled, read cache: enabled, supports DPO and FUA
->>>> [    5.286079] SBC-GXx flash: IO:0x258-0x259 MEM:0xdc000-0xdffff
->>>> [    5.288723] ------------[ cut here ]------------
->>>> [    5.289649] kernel BUG at include/linux/mtd/map.h:148!
->>>
->>> I think the problem is that your randconfig happens to have none of
->>> CONFIG_MTD_MAP_BANK_WIDTH_* set (you should have played the lottery
->>> today!), and the default implementation of map_bankwidth() in that
->>> case is just "BUG()":
->>>
->>>    $ grep MTD_MAP config-3.14.0-rc8-wl-03045-gdf16ea4
->>>    # CONFIG_MTD_MAP_BANK_WIDTH_1 is not set
->>>    # CONFIG_MTD_MAP_BANK_WIDTH_2 is not set
->>>    # CONFIG_MTD_MAP_BANK_WIDTH_4 is not set
->>>    # CONFIG_MTD_MAP_BANK_WIDTH_8 is not set
->>>    # CONFIG_MTD_MAP_BANK_WIDTH_16 is not set
->>>    # CONFIG_MTD_MAP_BANK_WIDTH_32 is not set
->>>
->>> I don't know enough Kconfig or MTD to fix this.
->>
->> Michal, the problem we run into is, how to select one of the above
->> CONFIG_MTD_MAP_BANK_WIDTH_xx in "make randconfig".
->
-> You can't enforce this in Kconfig. What you can do is to make the logic
-> more fool-proof and fall back to some sensible default if none of the
-> CONFIG_MTD_MAP_BANK_WIDTH_* options is enabled. Like this
->
->
->  From 76e66ceea7e2ffbb1d39c01af2eaf6f2b66c2be3 Mon Sep 17 00:00:00 2001
-> From: Michal Marek <mmarek@suse.cz>
-> Date: Mon, 31 Mar 2014 16:25:32 +0200
-> Subject: [PATCH] mtd: Fall back to MTD_MAP_BANK_WIDTH_1 if none is specified
->
-> This is mainly to fix make randconfig errors.
->
-> Signed-off-by: Michal Marek <mmarek@suse.cz>
-> ---
->   drivers/mtd/chips/Kconfig | 8 ++++++++
->   include/linux/mtd/map.h   | 4 ++--
->   2 files changed, 10 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/mtd/chips/Kconfig b/drivers/mtd/chips/Kconfig
-> index e4696b3..219de49 100644
-> --- a/drivers/mtd/chips/Kconfig
-> +++ b/drivers/mtd/chips/Kconfig
-> @@ -115,6 +115,14 @@ config MTD_MAP_BANK_WIDTH_32
->   	  If you wish to support CFI devices on a physical bus which is
->   	  256 bits wide, say 'Y'.
->
-> +config HAVE_MTD_MAP_BANK_WIDTH_1
-> +	bool
-> +	default MTD_MAP_BANK_WIDTH_1 || (!MTD_MAP_BANK_WIDTH_2 && !MTD_MAP_BANK_WIDTH_4 && !MTD_MAP_BANK_WIDTH_8 && !MTD_MAP_BANK_WIDTH_16 && !MTD_MAP_BANK_WIDTH_32)
-> +
-> +if HAVE_MTD_MAP_BANK_WIDTH_1 && !MTD_MAP_BANK_WIDTH_1
-> +comment "no buswidth selected, using 8-bit as a fallback "
-> +endif
-> +
->   config MTD_CFI_I1
->   	bool "Support 1-chip flash interleave" if MTD_CFI_GEOMETRY
->   	default y
-> diff --git a/include/linux/mtd/map.h b/include/linux/mtd/map.h
-> index 5f487d7..d4f4f49 100644
-> --- a/include/linux/mtd/map.h
-> +++ b/include/linux/mtd/map.h
-> @@ -32,7 +32,7 @@
->   #include <asm/io.h>
->   #include <asm/barrier.h>
->
-> -#ifdef CONFIG_MTD_MAP_BANK_WIDTH_1
-> +#ifdef CONFIG_HAVE_MTD_MAP_BANK_WIDTH_1
->   #define map_bankwidth(map) 1
->   #define map_bankwidth_is_1(map) (map_bankwidth(map) == 1)
->   #define map_bankwidth_is_large(map) (0)
-> @@ -156,7 +156,7 @@ static inline int map_bankwidth(void *map)
->   static inline int map_bankwidth_supported(int w)
->   {
->   	switch (w) {
-> -#ifdef CONFIG_MTD_MAP_BANK_WIDTH_1
-> +#ifdef CONFIG_HAVE_MTD_MAP_BANK_WIDTH_1
->   	case 1:
->   #endif
->   #ifdef CONFIG_MTD_MAP_BANK_WIDTH_2
->
+--Sig_/K/Q6=w.Begg1bhk1B4iX5RC
+Content-Type: application/pgp-signature; name=signature.asc
+Content-Disposition: attachment; filename=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.14 (GNU/Linux)
+
+iQIcBAEBAgAGBQJTQIWBAAoJEKssnEpaPQKEZY8P/17wdX2Cn53C6G1U3yZouFd8
+dLiJ6vyqhJ0Esg0E9aZr4VKDFB+ZMm1+ihqe/Tnks+cjRKFjEnlwjYOrKUNS4sMS
+jaiFjztlkwiZksr/LXMYS7Ta7xEbCG/6nPXaJhGf4l24Wn5331uVDd9hRanwuqVX
+v8mDjTfK/IPczJmh9H6+Q38oH1EHzo+G+9FAKa9xgioOHQJW9nv3yrawqJxUe//i
+htb2hUsGQaGNRRJ1NI3hMp6X4aJ2VAW+wdmjW227wDLjlihw5PHM1kSNReEHp52c
+Gh8i9sBP1UDaV160rxWYJXBy2wAl8wWzrO+zAvYCbNf3gLp84UQHqBagmpDE4YBV
+/t5SIug0YJZmL7XHbjufgXGMNwo67xr3siLd/JjRDSV9lFCNrLA0r1qTaNG71Nfc
+1auywMifZ3TChdv5+VHl6mtADvEZi/iBVOCVS3X7frMDBSP4okPJnw7j34VowlWj
+MBlJheILYDwEaw1DdmX8+W4lhsTy9GbR8cgQzN2FzkBzGQJj3s+aCAhQDTbBBKQC
+EV3ZWqC5rQVf2rLKjy8xjUh75IRfWTbMSU67aHBqyLFeSbt1ZTpIjv+gbuE0ihhE
+3KHTfIXzFmvkk5x5NTksidPtUGCw7oT8APFIOd0j1tgfJEofwJI5fjwCeulLmNjw
+4x/KJyzIFSyAj9zmDbiP
+=UjVE
+-----END PGP SIGNATURE-----
+
+--Sig_/K/Q6=w.Begg1bhk1B4iX5RC--
