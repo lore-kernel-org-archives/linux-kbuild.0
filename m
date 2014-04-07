@@ -1,60 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:39513 "EHLO mx2.suse.de"
+Received: from mga09.intel.com ([134.134.136.24]:19445 "EHLO mga09.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753162AbaDGUTV (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 7 Apr 2014 16:19:21 -0400
-Date: Mon, 7 Apr 2014 22:19:19 +0200
-From: Michal Marek <mmarek@suse.cz>
-Subject: [GIT] kbuild/lto changes for 3.15-rc1
-Message-ID: <20140407201919.GA15838@sepie.suse.cz>
+	id S1753771AbaDGXQx (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 7 Apr 2014 19:16:53 -0400
+Date: Mon, 7 Apr 2014 13:59:25 -0700
+From: Andi Kleen <ak@linux.intel.com>
+Subject: Re: [GIT] kbuild/lto changes for 3.15-rc1
+Message-ID: <20140407205925.GX32556@tassilo.jf.intel.com>
+References: <20140407201919.GA15838@sepie.suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20140407201919.GA15838@sepie.suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: ak@linux.intel.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hi Linus,
+On Mon, Apr 07, 2014 at 10:19:19PM +0200, Michal Marek wrote:
+> Hi Linus,
+> 
+> besides the kbuild branch, here is the LTO build support by Andi. It is
+> a separate branch, because it depends on other patches by Andi which
+> were merged through other trees. The link-time-optimization build is an
+> experimental feature, so there one kconfig option to enable it and
+> another kconfig option to disable it (behind a door with a sign "Beware
+> of the Leopard"...), so that it is not enabled by
+> allmodconfig/allyesconfig.
 
-besides the kbuild branch, here is the LTO build support by Andi. It is
-a separate branch, because it depends on other patches by Andi which
-were merged through other trees. The link-time-optimization build is an
-experimental feature, so there one kconfig option to enable it and
-another kconfig option to disable it (behind a door with a sign "Beware
-of the Leopard"...), so that it is not enabled by
-allmodconfig/allyesconfig.
+Thanks Michal,
 
-Thanks,
-Michal
+I should add this version builds quite a bit slower than other LTO trees,
+because the single pass kallsyms didn't quite make it, so the Link
+Time Optimization is re-done 2-3 times if KALLSYMS is enabled. That 
+will be hopefully fixed next cycle.
 
-The following changes since commit 176ab02d4916f09d5d8cb63372d142df4378cdea:
+LTO will always be somewhat slower than a normal build, but right now 
+it's a lot slower because of this, depending on the size of the vmlinux.
 
-  Merge branch 'x86-asmlinkage-for-linus' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip (2014-03-31 14:13:25 -0700)
-
-are available in the git repository at:
-
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git lto
-
-for you to fetch changes up to 19a3cc83353e3bb4bc28769f8606139a3d350d2d:
-
-  Kbuild, lto: Add Link Time Optimization support v3 (2014-04-07 21:51:13 +0200)
-
-----------------------------------------------------------------
-Andi Kleen (2):
-      Kbuild, lto: Set TMPDIR for LTO v4
-      Kbuild, lto: Add Link Time Optimization support v3
-
- Documentation/lto-build  | 173 +++++++++++++++++++++++++++++++++++++++++++++++
- Makefile                 |  20 +++++-
- arch/x86/Kconfig         |   2 +-
- init/Kconfig             |  73 ++++++++++++++++++++
- kernel/gcov/Kconfig      |   2 +-
- lib/Kconfig.debug        |   2 +-
- scripts/Makefile.lto     |  84 +++++++++++++++++++++++
- scripts/Makefile.modpost |   7 +-
- scripts/link-vmlinux.sh  |   2 +-
- 9 files changed, 357 insertions(+), 8 deletions(-)
- create mode 100644 Documentation/lto-build
- create mode 100644 scripts/Makefile.lto
+-Andi
