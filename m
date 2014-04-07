@@ -1,63 +1,20 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:60351 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754044AbaDGTt0 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 7 Apr 2014 15:49:26 -0400
-Date: Mon, 7 Apr 2014 21:49:22 +0200
-From: Michal Marek <mmarek@suse.cz>
-Subject: [GIT] kbuild changes for v3.15-rc1
-Message-ID: <20140407194922.GA13995@sepie.suse.cz>
+Received: from mail.ssp.ma.gov.br ([201.18.153.71]:45583 "EHLO
+	sspslssdmail-31.ssp.ma.gov.br" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1754309AbaDGUDS convert rfc822-to-8bit
+	(ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 7 Apr 2014 16:03:18 -0400
+Content-Type: text/plain; charset=US-ASCII
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 7BIT
+Content-Description: Mail message body
+Subject: LOANS
+From: LOANS@sspslssdmail-31.ssp.ma.gov.br, info@att.net
+Date: Tue, 08 Apr 2014 01:12:32 +0530
+Reply-To: payloanday1@gmail.com
+Message-Id: <20140407193716.2FFD75D2555@sspslssdmail-31.ssp.ma.gov.br>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: haokexin@gmail.com, paul.gortmaker@windriver.com, yamada.m@jp.panasonic.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Recipients <LOANSinfo@att.net>
 
-Hi Linus,
-
-please pull these kbuild bits for v3.15-rc1:
-- Cleanups in the main Makefiles and Documentation/DocBook/Makefile
-- make O=... directory is automatically created if needed
-- mrproper/distclean removes the old include/linux/version.h to make
-  life easier when bisecting across the commit that moved the version.h
-  file
-
-Thanks,
-Michal
-
-The following changes since commit 38dbfb59d1175ef458d006556061adeaa8751b72:
-
-  Linus 3.14-rc1 (2014-02-02 16:42:13 -0800)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git kbuild
-
-for you to fetch changes up to b12f73740b8764952a112a677991300545e98c06:
-
-  kbuild: docbook: fix the include error when executing "make help" (2014-04-01 10:49:21 +0200)
-
-----------------------------------------------------------------
-Kevin Hao (1):
-      kbuild: docbook: fix the include error when executing "make help"
-
-Masahiro Yamada (7):
-      kbuild: specify build_docproc as a phony target
-      kbuild: docbook: include cmd files more simply
-      kbuild: docbook: specify KERNELDOC dependency correctly
-      kbuild: docbook: use $(obj) and $(src) rather than specific path
-      kbuild: move "quote" to Kbuild.include to be consistent
-      kbuild: remove redundant '.*.cmd' pattern from make distclean
-      kbuild: create a build directory automatically for out-of-tree build
-
-Paul Gortmaker (1):
-      kbuild: unconditionally clobber include/linux/version.h on distclean
-
- Documentation/DocBook/Makefile | 25 +++++++------------------
- Makefile                       | 10 +++++-----
- scripts/Kbuild.include         |  1 +
- scripts/Makefile               |  6 +++---
- scripts/Makefile.lib           |  4 ----
- 5 files changed, 16 insertions(+), 30 deletions(-)
+Do you need a loan at 2% with fast approval?If interested Email us:via paydayloans17@yahoo.com
