@@ -1,154 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.mei.co.jp ([133.183.100.20]:49730 "EHLO smtp.mei.co.jp"
+Received: from cantor2.suse.de ([195.135.220.15]:60351 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754636AbaDGDXh (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 6 Apr 2014 23:23:37 -0400
-From: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Subject: [PATCH] Kbuild: move extra gcc check flags to the top Makefile
-Date: Mon,  7 Apr 2014 12:22:19 +0900
-Message-Id: <1396840939-24512-1-git-send-email-yamada.m@jp.panasonic.com>
+	id S1754044AbaDGTt0 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 7 Apr 2014 15:49:26 -0400
+Date: Mon, 7 Apr 2014 21:49:22 +0200
+From: Michal Marek <mmarek@suse.cz>
+Subject: [GIT] kbuild changes for v3.15-rc1
+Message-ID: <20140407194922.GA13995@sepie.suse.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.m@jp.panasonic.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: haokexin@gmail.com, paul.gortmaker@windriver.com, yamada.m@jp.panasonic.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-If W=... given to the command line, extra gcc check flags are added
-to KBUILD_CFLAGS.
+Hi Linus,
 
-If we have such code in scripts/Makefile.build, the same flags are
-added to KBUILD_CFLAGS multiple times becuase scripts/Makefile.build
-is invoked every time Kbuild descends into the subdirectories.
+please pull these kbuild bits for v3.15-rc1:
+- Cleanups in the main Makefiles and Documentation/DocBook/Makefile
+- make O=... directory is automatically created if needed
+- mrproper/distclean removes the old include/linux/version.h to make
+  life easier when bisecting across the commit that moved the version.h
+  file
 
-Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
----
- Makefile               | 51 ++++++++++++++++++++++++++++++++++++++++++++++++++
- scripts/Makefile.build | 51 --------------------------------------------------
- 2 files changed, 51 insertions(+), 51 deletions(-)
+Thanks,
+Michal
 
-diff --git a/Makefile b/Makefile
-index 00a933b..6588a03 100644
---- a/Makefile
-+++ b/Makefile
-@@ -579,6 +579,57 @@ endif # $(dot-config)
- # Defaults to vmlinux, but the arch makefile usually adds further targets
- all: vmlinux
- 
-+#
-+# make W=... settings
-+#
-+# W=1 - warnings that may be relevant and does not occur too often
-+# W=2 - warnings that occur quite often but may still be relevant
-+# W=3 - the more obscure warnings, can most likely be ignored
-+#
-+# $(call cc-option, -W...) handles gcc -W.. options which
-+# are not supported by all versions of the compiler
-+ifdef KBUILD_ENABLE_EXTRA_GCC_CHECKS
-+warning-  := $(empty)
-+
-+warning-1 := -Wextra -Wunused -Wno-unused-parameter
-+warning-1 += -Wmissing-declarations
-+warning-1 += -Wmissing-format-attribute
-+warning-1 += -Wmissing-prototypes
-+warning-1 += -Wold-style-definition
-+warning-1 += $(call cc-option, -Wmissing-include-dirs)
-+warning-1 += $(call cc-option, -Wunused-but-set-variable)
-+warning-1 += $(call cc-disable-warning, missing-field-initializers)
-+
-+warning-2 := -Waggregate-return
-+warning-2 += -Wcast-align
-+warning-2 += -Wdisabled-optimization
-+warning-2 += -Wnested-externs
-+warning-2 += -Wshadow
-+warning-2 += $(call cc-option, -Wlogical-op)
-+warning-2 += $(call cc-option, -Wmissing-field-initializers)
-+
-+warning-3 := -Wbad-function-cast
-+warning-3 += -Wcast-qual
-+warning-3 += -Wconversion
-+warning-3 += -Wpacked
-+warning-3 += -Wpadded
-+warning-3 += -Wpointer-arith
-+warning-3 += -Wredundant-decls
-+warning-3 += -Wswitch-default
-+warning-3 += $(call cc-option, -Wpacked-bitfield-compat)
-+warning-3 += $(call cc-option, -Wvla)
-+
-+warning := $(warning-$(findstring 1, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)))
-+warning += $(warning-$(findstring 2, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)))
-+warning += $(warning-$(findstring 3, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)))
-+
-+ifeq ("$(strip $(warning))","")
-+        $(error W=$(KBUILD_ENABLE_EXTRA_GCC_CHECKS) is unknown)
-+endif
-+
-+KBUILD_CFLAGS += $(warning)
-+endif
-+
- ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
- KBUILD_CFLAGS	+= -Os $(call cc-disable-warning,maybe-uninitialized,)
- else
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 9f0ee22..b5e02b6 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -50,57 +50,6 @@ ifeq ($(KBUILD_NOPEDANTIC),)
-         endif
- endif
- 
--#
--# make W=... settings
--#
--# W=1 - warnings that may be relevant and does not occur too often
--# W=2 - warnings that occur quite often but may still be relevant
--# W=3 - the more obscure warnings, can most likely be ignored
--#
--# $(call cc-option, -W...) handles gcc -W.. options which
--# are not supported by all versions of the compiler
--ifdef KBUILD_ENABLE_EXTRA_GCC_CHECKS
--warning-  := $(empty)
--
--warning-1 := -Wextra -Wunused -Wno-unused-parameter
--warning-1 += -Wmissing-declarations
--warning-1 += -Wmissing-format-attribute
--warning-1 += -Wmissing-prototypes
--warning-1 += -Wold-style-definition
--warning-1 += $(call cc-option, -Wmissing-include-dirs)
--warning-1 += $(call cc-option, -Wunused-but-set-variable)
--warning-1 += $(call cc-disable-warning, missing-field-initializers)
--
--warning-2 := -Waggregate-return
--warning-2 += -Wcast-align
--warning-2 += -Wdisabled-optimization
--warning-2 += -Wnested-externs
--warning-2 += -Wshadow
--warning-2 += $(call cc-option, -Wlogical-op)
--warning-2 += $(call cc-option, -Wmissing-field-initializers)
--
--warning-3 := -Wbad-function-cast
--warning-3 += -Wcast-qual
--warning-3 += -Wconversion
--warning-3 += -Wpacked
--warning-3 += -Wpadded
--warning-3 += -Wpointer-arith
--warning-3 += -Wredundant-decls
--warning-3 += -Wswitch-default
--warning-3 += $(call cc-option, -Wpacked-bitfield-compat)
--warning-3 += $(call cc-option, -Wvla)
--
--warning := $(warning-$(findstring 1, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)))
--warning += $(warning-$(findstring 2, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)))
--warning += $(warning-$(findstring 3, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)))
--
--ifeq ("$(strip $(warning))","")
--        $(error W=$(KBUILD_ENABLE_EXTRA_GCC_CHECKS) is unknown)
--endif
--
--KBUILD_CFLAGS += $(warning)
--endif
--
- include scripts/Makefile.lib
- 
- ifdef host-progs
--- 
-1.8.3.2
+The following changes since commit 38dbfb59d1175ef458d006556061adeaa8751b72:
 
+  Linus 3.14-rc1 (2014-02-02 16:42:13 -0800)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git kbuild
+
+for you to fetch changes up to b12f73740b8764952a112a677991300545e98c06:
+
+  kbuild: docbook: fix the include error when executing "make help" (2014-04-01 10:49:21 +0200)
+
+----------------------------------------------------------------
+Kevin Hao (1):
+      kbuild: docbook: fix the include error when executing "make help"
+
+Masahiro Yamada (7):
+      kbuild: specify build_docproc as a phony target
+      kbuild: docbook: include cmd files more simply
+      kbuild: docbook: specify KERNELDOC dependency correctly
+      kbuild: docbook: use $(obj) and $(src) rather than specific path
+      kbuild: move "quote" to Kbuild.include to be consistent
+      kbuild: remove redundant '.*.cmd' pattern from make distclean
+      kbuild: create a build directory automatically for out-of-tree build
+
+Paul Gortmaker (1):
+      kbuild: unconditionally clobber include/linux/version.h on distclean
+
+ Documentation/DocBook/Makefile | 25 +++++++------------------
+ Makefile                       | 10 +++++-----
+ scripts/Kbuild.include         |  1 +
+ scripts/Makefile               |  6 +++---
+ scripts/Makefile.lib           |  4 ----
+ 5 files changed, 16 insertions(+), 30 deletions(-)
