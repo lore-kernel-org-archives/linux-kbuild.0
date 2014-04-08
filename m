@@ -1,37 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:36002 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756369AbaDHPTx (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 8 Apr 2014 11:19:53 -0400
-Message-ID: <53441398.2020709@suse.cz>
-Date: Tue, 08 Apr 2014 17:19:52 +0200
-From: Michal Marek <mmarek@suse.cz>
+Received: from mail-ve0-f174.google.com ([209.85.128.174]:52656 "EHLO
+	mail-ve0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756382AbaDHP0K (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 8 Apr 2014 11:26:10 -0400
 MIME-Version: 1.0
-Subject: Re: [PATCH] kbuild: create a build directory automatically for out-of-tree
- build
-References: <1396251696-14815-1-git-send-email-yamada.m@jp.panasonic.com> <20140331203615.GA22334@ravnborg.org> <533AFB06.6020207@infradead.org>
-In-Reply-To: <533AFB06.6020207@infradead.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20140407201919.GA15838@sepie.suse.cz>
+References: <20140407201919.GA15838@sepie.suse.cz>
+Date: Tue, 8 Apr 2014 08:26:09 -0700
+Message-ID: <CA+55aFy8hWqBpF1TXOPvA2rRaZp=H2LTO3wd3AERspmcGZhAeQ@mail.gmail.com>
+Subject: Re: [GIT] kbuild/lto changes for 3.15-rc1
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.m@jp.panasonic.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: Andi Kleen <ak@linux.intel.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On 2014-04-01 19:44, Randy Dunlap wrote:
-> On 03/31/2014 01:36 PM, Sam Ravnborg wrote:
->> In the past I have rejected such patches - but today I fail to recall why.
-> 
-> I believe that it was due this kind of patch allowing typos to cause
-> builds that one does not want to make.
-> 
-> E.g., if I already have O=OUT1 directory and I mistype O=OUT2, this will cause
-> a full build (potentially) in OUT2, even if it should do a small rebuild in
-> OUT1 instead.
+On Mon, Apr 7, 2014 at 1:19 PM, Michal Marek <mmarek@suse.cz> wrote:
+>
+> besides the kbuild branch, here is the LTO build support by Andi. It is
+> a separate branch, because it depends on other patches by Andi which
+> were merged through other trees. The link-time-optimization build is an
+> experimental feature, so there one kconfig option to enable it and
+> another kconfig option to disable it (behind a door with a sign "Beware
+> of the Leopard"...), so that it is not enabled by
+> allmodconfig/allyesconfig.
 
-I thought about this possibility before applying the patch. But if this
-happens, then a build in the mistyped directory will immediately fail
-due to lack of .config.
+So right now, I see several reasons not to merge it ("It's so
+experimental that we don't even want to encourage people to test it"
+to "it's not fully fleshed out yet and makes compile times _much_
+longer").
 
-Michal
+And yet nobody has actually talked about why I *should* merge it.
 
+Which - I think understandably - makes me less than enthusiastic.
+
+So I think I'll let this wait a bit longer, _unless_ people start
+talking about the upsides. How much smaller is the end result? How
+much faster is it? How much more beautiful is it? Does it make new
+cool things possible? Are those cool things really close on the
+horizon and really want this merged even though it's not really quite
+ready yet?
+
+So please: convince me. Andi?
+
+              Linus
