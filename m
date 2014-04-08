@@ -1,40 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from asavdk4.altibox.net ([109.247.116.15]:37380 "EHLO
-	asavdk4.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756788AbaDHPSa (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 8 Apr 2014 11:18:30 -0400
-Date: Tue, 8 Apr 2014 17:18:25 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH] Kbuild: move extra gcc check flags to the top Makefile
-Message-ID: <20140408151824.GA31595@ravnborg.org>
-References: <1396840939-24512-1-git-send-email-yamada.m@jp.panasonic.com>
- <53441091.2060706@suse.cz>
+Received: from cantor2.suse.de ([195.135.220.15]:36002 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756369AbaDHPTx (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 8 Apr 2014 11:19:53 -0400
+Message-ID: <53441398.2020709@suse.cz>
+Date: Tue, 08 Apr 2014 17:19:52 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <53441091.2060706@suse.cz>
+Subject: Re: [PATCH] kbuild: create a build directory automatically for out-of-tree
+ build
+References: <1396251696-14815-1-git-send-email-yamada.m@jp.panasonic.com> <20140331203615.GA22334@ravnborg.org> <533AFB06.6020207@infradead.org>
+In-Reply-To: <533AFB06.6020207@infradead.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Masahiro Yamada <yamada.m@jp.panasonic.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: Sam Ravnborg <sam@ravnborg.org>, Masahiro Yamada <yamada.m@jp.panasonic.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Tue, Apr 08, 2014 at 05:06:57PM +0200, Michal Marek wrote:
-> On 2014-04-07 05:22, Masahiro Yamada wrote:
-> > If W=... given to the command line, extra gcc check flags are added
-> > to KBUILD_CFLAGS.
-> > 
-> > If we have such code in scripts/Makefile.build, the same flags are
-> > added to KBUILD_CFLAGS multiple times becuase scripts/Makefile.build
-> > is invoked every time Kbuild descends into the subdirectories.
+On 2014-04-01 19:44, Randy Dunlap wrote:
+> On 03/31/2014 01:36 PM, Sam Ravnborg wrote:
+>> In the past I have rejected such patches - but today I fail to recall why.
 > 
-> Indeed. For three years, nobody has noticed that the gcc commandline is
-> growing with every subdirectory.
-I once had a patchset that moved all this out - to avoid this.
-It was lost for various reasons.
+> I believe that it was due this kind of patch allowing typos to cause
+> builds that one does not want to make.
+> 
+> E.g., if I already have O=OUT1 directory and I mistype O=OUT2, this will cause
+> a full build (potentially) in OUT2, even if it should do a small rebuild in
+> OUT1 instead.
 
-The top-level Makefile is already too cluttered - so adding all this
-is not good.
-Moving it all to a dedicated file would be better.
+I thought about this possibility before applying the patch. But if this
+happens, then a build in the mistyped directory will immediately fail
+due to lack of .config.
 
-	Sam
+Michal
+
