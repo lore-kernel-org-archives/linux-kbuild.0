@@ -1,41 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:19445 "EHLO mga09.intel.com"
+Received: from cantor2.suse.de ([195.135.220.15]:35759 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753771AbaDGXQx (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 7 Apr 2014 19:16:53 -0400
-Date: Mon, 7 Apr 2014 13:59:25 -0700
-From: Andi Kleen <ak@linux.intel.com>
-Subject: Re: [GIT] kbuild/lto changes for 3.15-rc1
-Message-ID: <20140407205925.GX32556@tassilo.jf.intel.com>
-References: <20140407201919.GA15838@sepie.suse.cz>
+	id S1757267AbaDHPHA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 8 Apr 2014 11:07:00 -0400
+Message-ID: <53441091.2060706@suse.cz>
+Date: Tue, 08 Apr 2014 17:06:57 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20140407201919.GA15838@sepie.suse.cz>
+Subject: Re: [PATCH] Kbuild: move extra gcc check flags to the top Makefile
+References: <1396840939-24512-1-git-send-email-yamada.m@jp.panasonic.com>
+In-Reply-To: <1396840939-24512-1-git-send-email-yamada.m@jp.panasonic.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Masahiro Yamada <yamada.m@jp.panasonic.com>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Mon, Apr 07, 2014 at 10:19:19PM +0200, Michal Marek wrote:
-> Hi Linus,
+On 2014-04-07 05:22, Masahiro Yamada wrote:
+> If W=... given to the command line, extra gcc check flags are added
+> to KBUILD_CFLAGS.
 > 
-> besides the kbuild branch, here is the LTO build support by Andi. It is
-> a separate branch, because it depends on other patches by Andi which
-> were merged through other trees. The link-time-optimization build is an
-> experimental feature, so there one kconfig option to enable it and
-> another kconfig option to disable it (behind a door with a sign "Beware
-> of the Leopard"...), so that it is not enabled by
-> allmodconfig/allyesconfig.
+> If we have such code in scripts/Makefile.build, the same flags are
+> added to KBUILD_CFLAGS multiple times becuase scripts/Makefile.build
+> is invoked every time Kbuild descends into the subdirectories.
 
-Thanks Michal,
+Indeed. For three years, nobody has noticed that the gcc commandline is
+growing with every subdirectory.
 
-I should add this version builds quite a bit slower than other LTO trees,
-because the single pass kallsyms didn't quite make it, so the Link
-Time Optimization is re-done 2-3 times if KALLSYMS is enabled. That 
-will be hopefully fixed next cycle.
+> 
+> Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
+> ---
+>  Makefile               | 51 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>  scripts/Makefile.build | 51 --------------------------------------------------
+>  2 files changed, 51 insertions(+), 51 deletions(-)
+> 
+> diff --git a/Makefile b/Makefile
+> index 00a933b..6588a03 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -579,6 +579,57 @@ endif # $(dot-config)
+>  # Defaults to vmlinux, but the arch makefile usually adds further targets
+>  all: vmlinux
+>  
+> +#
+> +# make W=... settings
 
-LTO will always be somewhat slower than a normal build, but right now 
-it's a lot slower because of this, depending on the size of the vmlinux.
+I don't think it's a good idea to add this to the main Makefile. First
+of all, this option
 
--Andi
+> +warning-1 += $(call cc-option, -Wunused-but-set-variable)
+
+gets overridden by
+
+KBUILD_CFLAGS += $(call cc-disable-warning, unused-but-set-variable)
+
+couple of lines later. This is easily fixed by moving the whole block
+down. However, the main Makefile is quite complex already, so please
+move this to a new Makefile fragment in scripts/ and include this from
+the main Makefile instead.
+
+Thanks,
+Michal
