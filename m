@@ -1,31 +1,30 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:35825 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:35916 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757065AbaDHPKC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 8 Apr 2014 11:10:02 -0400
-Message-ID: <53441149.8010902@suse.cz>
-Date: Tue, 08 Apr 2014 17:10:01 +0200
+	id S1756533AbaDHPQI (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 8 Apr 2014 11:16:08 -0400
+Date: Tue, 8 Apr 2014 17:16:06 +0200
 From: Michal Marek <mmarek@suse.cz>
+Subject: Re: [PATCH v2] scripts/bootgraph.pl: Add graphic header
+Message-ID: <20140408151606.GB4894@sepie.suse.cz>
+References: <20140402213952.7c05ff6d77a85f97b3b3e19e@skynet.be>
 MIME-Version: 1.0
-Subject: Re: [PATCH] modpost: Fix ressource leak in read_dump()
-References: <20140406003649.1ba3c993@spike> <20140406000512.GS32556@tassilo.jf.intel.com>
-In-Reply-To: <20140406000512.GS32556@tassilo.jf.intel.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20140402213952.7c05ff6d77a85f97b3b3e19e@skynet.be>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andi Kleen <ak@linux.intel.com>, Christian Engelmayer <cengelma@gmx.at>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Rusty Russell <rusty@rustcorp.com.au>
+To: Fabian Frederick <fabf@skynet.be>
+Cc: linux-kernel <linux-kernel@vger.kernel.org>, akpm <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org
 
-On 2014-04-06 02:05, Andi Kleen wrote:
-> On Sun, Apr 06, 2014 at 12:36:49AM +0200, Christian Engelmayer wrote:
->> Function read_dump() memory maps the input via grab_file(), but fails to call
->> the corresponding unmap function. Add the missing call to release_file().
->> Detected by Coverity: CID 1192419
+On Wed, Apr 02, 2014 at 09:39:52PM +0200, Fabian Frederick wrote:
+> Adding -header + help function like other .pl in /scripts.
 > 
-> It doesn't matter at all. All memory is freed on exit() in this program.
+> Cc: linux-kbuild@vger.kernel.org
+> Signed-off-by: Fabian Frederick <fabf@skynet.be>
+> ---
+>  v2: fix some typos
 
-The leak can disturb in valgrind output.
+Applied to kbuild.git#misc, thanks.
 
 Michal
-
