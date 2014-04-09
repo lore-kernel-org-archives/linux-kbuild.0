@@ -1,56 +1,114 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.mei.co.jp ([133.183.100.20]:40386 "EHLO smtp.mei.co.jp"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751279AbaDIHQF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 9 Apr 2014 03:16:05 -0400
-From: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Subject: [PATCH] x86: suppress "Nothing to be done for ..." messages
-Date: Wed,  9 Apr 2014 16:15:53 +0900
-Message-Id: <1397027753-15444-1-git-send-email-yamada.m@jp.panasonic.com>
+Received: from ud10.udmedia.de ([194.117.254.50]:48058 "EHLO
+	mail.ud10.udmedia.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752444AbaDIIRM (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 9 Apr 2014 04:17:12 -0400
+Date: Wed, 9 Apr 2014 10:17:09 +0200
+From: Markus Trippelsdorf <markus@trippelsdorf.de>
+Subject: Re: [GIT] kbuild/lto changes for 3.15-rc1
+Message-ID: <20140409081709.GA283@x4>
+References: <20140407201919.GA15838@sepie.suse.cz>
+ <CA+55aFy8hWqBpF1TXOPvA2rRaZp=H2LTO3wd3AERspmcGZhAeQ@mail.gmail.com>
+ <20140408204906.GA3616@cloud>
+ <CA+55aFzhyvZRPjXy7PkUxQO_AMqLSTehh-GNRP+Dx3yKnv-eCA@mail.gmail.com>
+ <20140409013557.GA32556@tassilo.jf.intel.com>
+ <20140409060133.GA6766@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20140409060133.GA6766@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.m@jp.panasonic.com>
+To: Ingo Molnar <mingo@kernel.org>
+Cc: Andi Kleen <ak@linux.intel.com>, Linus Torvalds <torvalds@linux-foundation.org>, Josh Triplett <josh@joshtriplett.org>, Michal Marek <mmarek@suse.cz>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>
 
-When we compiled again, arch/x86/syscalls/Makefile and
-arch/x86/tools/Makefile emitted "Nothing to be done for ..." messages.
+On 2014.04.09 at 08:01 +0200, Ingo Molnar wrote:
+> 
+> * Andi Kleen <ak@linux.intel.com> wrote:
+> 
+> > On Tue, Apr 08, 2014 at 03:44:25PM -0700, Linus Torvalds wrote:
+> > > On Tue, Apr 8, 2014 at 1:49 PM,  <josh@joshtriplett.org> wrote:
+> > > >
+> > > > In addition to making the kernel smaller and such (I'll leave the
+> > > > specific stats there to Andi), here's the key awesomeness of LTO that
+> > > > you, personally, should find useful and compelling: LTO will eliminate
+> > > > the need to add many lower-level Kconfig symbols to compile out bits of
+> > > > the kernel.
+> > > 
+> > > Actually that, to me, is a negative right now.
+> > > 
+> > > Since there's no way we'll make LTO the default in the foreseeable
+> > > future, people starting to use it like that is just a bad bad thing.
+> > > 
+> > > So really, the main advantage of LTO would be any actual 
+> > > optimizations it can do. And call me anal, but I want *numbers* 
+> > > for that before I merge it. Not handwaving. I'm not actually aware 
+> > > of how well - if at all - code generation actually improves.
+> > 
+> > Well it looks very different if you look at the generated code. gcc 
+> > becomes a lot more aggressive.
+> > 
+> > But as I said there's currently no significant performance 
+> > improvement known, so if your only goal is better performance this 
+> > patch (as currently) known is not a big winner.  My suspicion is 
+> > that's mostly because the standard benchmarks we run are not too 
+> > compiler sensitive.
+> > 
+> > However the users seem to care about the other benefits, like code 
+> > size.
+> > 
+> > And there may well be loads that are compiler sensitive. As Honza 
+> > posted, for non kernel workloads LTO is known to have large 
+> > benefits.
+> > 
+> > Besides at this point it's pretty much just some additions to the 
+> > Makefiles.
+> 
+> So the reason I've been mostly ignoring the LTO patches myself (I only 
+> took LTO related changes that had other justifications such as 
+> cleanups) is that I've actually implemented full LTO in a userspace 
+> project myself, and my experience was:
+> 
+>   1) There was very little if any measurable LTO runtime speedup, 
+>      despite agressive GCC options and despite user-space generally 
+>      offering more optimizations opportunities than kernel space.
+> 
+>   2) LTO with current build tools meant a 1.5x-3x build speed
+>      slowdown (on a very fast box with tons of CPUs and RAM),
+>      which made LTO essentially a non-starter for development
+>      work. (And that was with the Gold linker.)
+> 
+> and looking at your characterisation of LTO you only conceded
+> #1 much after you started pushing LTO and you are clearly trying
+> to avoid talking about #2 while it's very much relevant...
+> 
+> I'm willing to be convinced by actual numbers, and LTO tooling might 
+> eventually improve, etc., but right now LTO is much ado about very 
+> little, being pushed in a somewhat dishonest way.
 
-Here is the command log:
+I did some measurements on Andi's lto-3.14 branch:
 
-  $ make defconfig
-     [ snip ]
-  $ make
-     [ snip ]
-  $ make
-  make[1]: Nothing to be done for `all'.            <-----
-  make[1]: Nothing to be done for `relocs'.         <-----
-    CHK     include/config/kernel.release
-    CHK     include/generated/uapi/linux/version.h
+options    size     build time
+------------------------------
+-O2        4408880  1:56.98
+-flto -O2  4213072  2:36.22
+-Os        3833248  1:45.13         
+-flto -Os  3651504  2:34.51
 
-Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
----
- arch/x86/syscalls/Makefile | 1 +
- arch/x86/tools/Makefile    | 1 +
- 2 files changed, 2 insertions(+)
+This was measured on my AMD 4 core machine with a monolithic .config
+where "CONFIG_MODULES is not set". The compiler is gcc trunk (4.9).
+So on x86_86 you get 5% size reduction for 25-30% build time slowdown.
 
-diff --git a/arch/x86/syscalls/Makefile b/arch/x86/syscalls/Makefile
-index f325af2..b6c923a 100644
---- a/arch/x86/syscalls/Makefile
-+++ b/arch/x86/syscalls/Makefile
-@@ -56,3 +56,4 @@ targets	+= $(uapisyshdr-y) $(syshdr-y)
- 
- all: $(addprefix $(uapi)/,$(uapisyshdr-y))
- all: $(addprefix $(out)/,$(syshdr-y))
-+	@:
-diff --git a/arch/x86/tools/Makefile b/arch/x86/tools/Makefile
-index e812034..95e3ed7 100644
---- a/arch/x86/tools/Makefile
-+++ b/arch/x86/tools/Makefile
-@@ -41,3 +41,4 @@ HOST_EXTRACFLAGS += -I$(srctree)/tools/include
- hostprogs-y	+= relocs
- relocs-objs     := relocs_32.o relocs_64.o relocs_common.o
- relocs: $(obj)/relocs
-+	@:
+The huge RAM requirements of LTO are solved with gcc-4.9.
+
+As for tooling support, the next version of binutils will support
+automatic loading of the liblto_plugin and that will allow one to get
+rid of the gcc wrappers (gcc-ar, etc.). 
+
+It is unfortunate that a special version of binutils is still required
+to build the kernel, but that will change as soon as all "ld -r"
+invocations are eliminated (I think Sam Ravnborg has a patch for this).
+
 -- 
-1.8.3.2
-
+Markus
