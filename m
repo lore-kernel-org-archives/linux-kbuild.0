@@ -1,42 +1,60 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:23974 "EHLO mga09.intel.com"
+Received: from mga02.intel.com ([134.134.136.20]:14502 "EHLO mga02.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756235AbaDIBYA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 8 Apr 2014 21:24:00 -0400
-Date: Tue, 8 Apr 2014 18:23:33 -0700
+	id S1756628AbaDIBf6 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 8 Apr 2014 21:35:58 -0400
+Date: Tue, 8 Apr 2014 18:35:57 -0700
 From: Andi Kleen <ak@linux.intel.com>
 Subject: Re: [GIT] kbuild/lto changes for 3.15-rc1
-Message-ID: <20140409012333.GZ32556@tassilo.jf.intel.com>
+Message-ID: <20140409013557.GA32556@tassilo.jf.intel.com>
 References: <20140407201919.GA15838@sepie.suse.cz>
  <CA+55aFy8hWqBpF1TXOPvA2rRaZp=H2LTO3wd3AERspmcGZhAeQ@mail.gmail.com>
- <20140408224926.GY32556@tassilo.jf.intel.com>
- <20140409001013.GB8795@kam.mff.cuni.cz>
+ <20140408204906.GA3616@cloud>
+ <CA+55aFzhyvZRPjXy7PkUxQO_AMqLSTehh-GNRP+Dx3yKnv-eCA@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20140409001013.GB8795@kam.mff.cuni.cz>
+In-Reply-To: <CA+55aFzhyvZRPjXy7PkUxQO_AMqLSTehh-GNRP+Dx3yKnv-eCA@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jan Hubicka <hubicka@ucw.cz>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, jmario@redhat.com, mliska@suse.cz, vmakarov@redhat.com, markus@trippelsdorf.de, tglek@mozilla.com
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Josh Triplett <josh@joshtriplett.org>, Michal Marek <mmarek@suse.cz>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-Thanks Honza. Just one comment:
+On Tue, Apr 08, 2014 at 03:44:25PM -0700, Linus Torvalds wrote:
+> On Tue, Apr 8, 2014 at 1:49 PM,  <josh@joshtriplett.org> wrote:
+> >
+> > In addition to making the kernel smaller and such (I'll leave the
+> > specific stats there to Andi), here's the key awesomeness of LTO that
+> > you, personally, should find useful and compelling: LTO will eliminate
+> > the need to add many lower-level Kconfig symbols to compile out bits of
+> > the kernel.
+> 
+> Actually that, to me, is a negative right now.
+> 
+> Since there's no way we'll make LTO the default in the foreseeable
+> future, people starting to use it like that is just a bad bad thing.
+> 
+> So really, the main advantage of LTO would be any actual optimizations
+> it can do. And call me anal, but I want *numbers* for that before I
+> merge it. Not handwaving. I'm not actually aware of how well - if at
+> all - code generation actually improves.
 
->     The runtime benefits are more visible on bigger, bloated and less
->     optimized projects than on hand tuned video encoder implementation.
->     I believe Kernel largely falls into hand tuned category despite its size.
+Well it looks very different if you look at the generated code. gcc becomes
+a lot more aggressive.
 
-In my experience there's a lot of badly tuned code in the kernel these days,
-especially when you go outside the core code (i.e. into drivers/*)
+But as I said there's currently no significant performance improvement known,
+so if your only goal is better performance this patch (as currently) 
+known is not a big winner.  My suspicion is that's mostly because
+the standard benchmarks we run are not too compiler sensitive.
 
-Or code that used to be tuned, but isn't aftermore after several years
-of feature additions and bug fixes. The kernel code quality is also quite varying.
+However the users seem to care about the other benefits, like code size.
 
-So anything the compiler can do helps.
+And there may well be loads that are compiler sensitive.
+As Honza posted, for non kernel workloads LTO is known to have large benefits.
 
->     I would be curious about the results on Kernel.
-
-We saw some upsides in performance with some standard tests, but nothing 
-too significant.
+Besides at this point it's pretty much just some additions to the Makefiles.
 
 -Andi
+
+-- 
+ak@linux.intel.com -- Speaking for myself only
