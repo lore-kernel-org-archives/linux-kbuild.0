@@ -1,90 +1,97 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ee0-f44.google.com ([74.125.83.44]:33076 "EHLO
-	mail-ee0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758175AbaDIGBh (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 9 Apr 2014 02:01:37 -0400
-Date: Wed, 9 Apr 2014 08:01:33 +0200
-From: Ingo Molnar <mingo@kernel.org>
-Subject: Re: [GIT] kbuild/lto changes for 3.15-rc1
-Message-ID: <20140409060133.GA6766@gmail.com>
-References: <20140407201919.GA15838@sepie.suse.cz>
- <CA+55aFy8hWqBpF1TXOPvA2rRaZp=H2LTO3wd3AERspmcGZhAeQ@mail.gmail.com>
- <20140408204906.GA3616@cloud>
- <CA+55aFzhyvZRPjXy7PkUxQO_AMqLSTehh-GNRP+Dx3yKnv-eCA@mail.gmail.com>
- <20140409013557.GA32556@tassilo.jf.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20140409013557.GA32556@tassilo.jf.intel.com>
+Received: from smtp.mei.co.jp ([133.183.100.20]:60866 "EHLO smtp.mei.co.jp"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750841AbaDIGv7 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 9 Apr 2014 02:51:59 -0400
+From: Masahiro Yamada <yamada.m@jp.panasonic.com>
+Subject: [PATCH] kbuild: support simultaneous "make %config" and "make all"
+Date: Wed,  9 Apr 2014 15:51:35 +0900
+Message-Id: <1397026295-13822-1-git-send-email-yamada.m@jp.panasonic.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andi Kleen <ak@linux.intel.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, Josh Triplett <josh@joshtriplett.org>, Michal Marek <mmarek@suse.cz>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: linux-kernel@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.m@jp.panasonic.com>, Michal Marek <mmarek@suse.cz>, Sam Ravnborg <sam@ravnborg.org>
 
+Kbuild is supposed to support mixed targets. (%config and build targets)
 
-* Andi Kleen <ak@linux.intel.com> wrote:
+But "make all" did nothing if it was run with configuration targets.
+For example,
 
-> On Tue, Apr 08, 2014 at 03:44:25PM -0700, Linus Torvalds wrote:
-> > On Tue, Apr 8, 2014 at 1:49 PM,  <josh@joshtriplett.org> wrote:
-> > >
-> > > In addition to making the kernel smaller and such (I'll leave the
-> > > specific stats there to Andi), here's the key awesomeness of LTO that
-> > > you, personally, should find useful and compelling: LTO will eliminate
-> > > the need to add many lower-level Kconfig symbols to compile out bits of
-> > > the kernel.
-> > 
-> > Actually that, to me, is a negative right now.
-> > 
-> > Since there's no way we'll make LTO the default in the foreseeable
-> > future, people starting to use it like that is just a bad bad thing.
-> > 
-> > So really, the main advantage of LTO would be any actual 
-> > optimizations it can do. And call me anal, but I want *numbers* 
-> > for that before I merge it. Not handwaving. I'm not actually aware 
-> > of how well - if at all - code generation actually improves.
-> 
-> Well it looks very different if you look at the generated code. gcc 
-> becomes a lot more aggressive.
-> 
-> But as I said there's currently no significant performance 
-> improvement known, so if your only goal is better performance this 
-> patch (as currently) known is not a big winner.  My suspicion is 
-> that's mostly because the standard benchmarks we run are not too 
-> compiler sensitive.
-> 
-> However the users seem to care about the other benefits, like code 
-> size.
-> 
-> And there may well be loads that are compiler sensitive. As Honza 
-> posted, for non kernel workloads LTO is known to have large 
-> benefits.
-> 
-> Besides at this point it's pretty much just some additions to the 
-> Makefiles.
+  $ LANG=C make defconfig all
+    HOSTCC  scripts/basic/fixdep
+    HOSTCC  scripts/kconfig/conf.o
+    SHIPPED scripts/kconfig/zconf.tab.c
+    SHIPPED scripts/kconfig/zconf.lex.c
+    SHIPPED scripts/kconfig/zconf.hash.c
+    HOSTCC  scripts/kconfig/zconf.tab.o
+    HOSTLD  scripts/kconfig/conf
+  *** Default configuration is based on 'x86_64_defconfig'
+  #
+  # configuration written to .config
+  #
+  make: Nothing to be done for `all'.
 
-So the reason I've been mostly ignoring the LTO patches myself (I only 
-took LTO related changes that had other justifications such as 
-cleanups) is that I've actually implemented full LTO in a userspace 
-project myself, and my experience was:
+This commits allows "make %config all" and makes sure
+mixed targets are built one by one in the given order.
 
-  1) There was very little if any measurable LTO runtime speedup, 
-     despite agressive GCC options and despite user-space generally 
-     offering more optimizations opportunities than kernel space.
+Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
+Cc: Michal Marek <mmarek@suse.cz>
+CC: Sam Ravnborg <sam@ravnborg.org>
+---
+ Makefile           | 12 ++++++++++--
+ scripts/mkmakefile | 15 ++++-----------
+ 2 files changed, 14 insertions(+), 13 deletions(-)
 
-  2) LTO with current build tools meant a 1.5x-3x build speed
-     slowdown (on a very fast box with tons of CPUs and RAM),
-     which made LTO essentially a non-starter for development
-     work. (And that was with the Gold linker.)
+diff --git a/Makefile b/Makefile
+index 4eadf2d..40f731b 100644
+--- a/Makefile
++++ b/Makefile
+@@ -486,8 +486,16 @@ ifeq ($(mixed-targets),1)
+ # We're called with mixed targets (*config and build targets).
+ # Handle them one by one.
+ 
+-%:: FORCE
+-	$(Q)$(MAKE) -C $(srctree) KBUILD_SRC= $@
++PHONY += $(MAKECMDGOALS) __build_one_by_one
++
++$(filter-out __build_one_by_one, $(MAKECMDGOALS)): __build_one_by_one
++	@:
++
++__build_one_by_one:
++	$(Q)set -e; \
++	for i in $(MAKECMDGOALS); do \
++		$(MAKE) -f $(srctree)/Makefile $$i; \
++	done
+ 
+ else
+ ifeq ($(config-targets),1)
+diff --git a/scripts/mkmakefile b/scripts/mkmakefile
+index 0cc0442..84af27b 100644
+--- a/scripts/mkmakefile
++++ b/scripts/mkmakefile
+@@ -42,18 +42,11 @@ MAKEARGS += O=\$(if \$(patsubst /%,,\$(makedir)),\$(CURDIR)/)\$(patsubst %/,%,\$
+ 
+ MAKEFLAGS += --no-print-directory
+ 
+-.PHONY: all \$(MAKECMDGOALS)
++.PHONY: __sub-make \$(MAKECMDGOALS)
+ 
+-all	:= \$(filter-out all Makefile,\$(MAKECMDGOALS))
++__sub-make:
++	\$(Q)\$(MAKE) \$(MAKEARGS) \$(MAKECMDGOALS)
+ 
+-all:
+-	\$(Q)\$(MAKE) \$(MAKEARGS) \$(all)
+-
+-Makefile:;
+-
+-\$(all): all
+-	@:
+-
+-%/: all
++\$(filter-out __sub-make, \$(MAKECMDGOALS)): __sub-make
+ 	@:
+ EOF
+-- 
+1.8.3.2
 
-and looking at your characterisation of LTO you only conceded
-#1 much after you started pushing LTO and you are clearly trying
-to avoid talking about #2 while it's very much relevant...
-
-I'm willing to be convinced by actual numbers, and LTO tooling might 
-eventually improve, etc., but right now LTO is much ado about very 
-little, being pushed in a somewhat dishonest way.
-
-Thanks,
-
-	Ingo
