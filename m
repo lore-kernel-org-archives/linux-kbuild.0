@@ -1,59 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oa0-f42.google.com ([209.85.219.42]:39904 "EHLO
-	mail-oa0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932761AbaDIOZe (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 9 Apr 2014 10:25:34 -0400
-Received: by mail-oa0-f42.google.com with SMTP id i4so2811353oah.29
-        for <linux-kbuild@vger.kernel.org>; Wed, 09 Apr 2014 07:25:33 -0700 (PDT)
+Received: from mga09.intel.com ([134.134.136.24]:62814 "EHLO mga09.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S932461AbaDIPng (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 9 Apr 2014 11:43:36 -0400
+Date: Wed, 9 Apr 2014 08:40:11 -0700
+From: Andi Kleen <ak@linux.intel.com>
+Subject: Re: [GIT] kbuild/lto changes for 3.15-rc1
+Message-ID: <20140409154011.GB32556@tassilo.jf.intel.com>
+References: <20140407201919.GA15838@sepie.suse.cz>
+ <CA+55aFy8hWqBpF1TXOPvA2rRaZp=H2LTO3wd3AERspmcGZhAeQ@mail.gmail.com>
+ <20140408204906.GA3616@cloud>
+ <CA+55aFzhyvZRPjXy7PkUxQO_AMqLSTehh-GNRP+Dx3yKnv-eCA@mail.gmail.com>
+ <20140409013557.GA32556@tassilo.jf.intel.com>
+ <20140409060133.GA6766@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <534555E2.6030506@suse.cz>
-References: <1397027753-15444-1-git-send-email-yamada.m@jp.panasonic.com> <534555E2.6030506@suse.cz>
-From: Peter Foley <pefoley2@pefoley.com>
-Date: Wed, 9 Apr 2014 10:25:13 -0400
-Message-ID: <CAOFdcFN6+KB-3Am0q9Pd6EYY1U4ckWSDrUDC7WgYz3RH6T81xg@mail.gmail.com>
-Subject: Re: [PATCH] x86: suppress "Nothing to be done for ..." messages
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20140409060133.GA6766@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Masahiro Yamada <yamada.m@jp.panasonic.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, the arch/x86 maintainers <x86@kernel.org>
+To: Ingo Molnar <mingo@kernel.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, Josh Triplett <josh@joshtriplett.org>, Michal Marek <mmarek@suse.cz>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Wed, Apr 9, 2014 at 10:14 AM, Michal Marek <mmarek@suse.cz> wrote:
-> ccing x86 maintainers
->
-> On 2014-04-09 09:15, Masahiro Yamada wrote:
->> When we compiled again, arch/x86/syscalls/Makefile and
->> arch/x86/tools/Makefile emitted "Nothing to be done for ..." messages.
->>
->> Here is the command log:
->>
->>   $ make defconfig
->>      [ snip ]
->>   $ make
->>      [ snip ]
->>   $ make
->>   make[1]: Nothing to be done for `all'.            <-----
->>   make[1]: Nothing to be done for `relocs'.         <-----
->>     CHK     include/config/kernel.release
->>     CHK     include/generated/uapi/linux/version.h
->>
->> Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
->> ---
->>  arch/x86/syscalls/Makefile | 1 +
->>  arch/x86/tools/Makefile    | 1 +
->>  2 files changed, 2 insertions(+)
->>
->> diff --git a/arch/x86/syscalls/Makefile b/arch/x86/syscalls/Makefile
->> index f325af2..b6c923a 100644
->> --- a/arch/x86/syscalls/Makefile
->> +++ b/arch/x86/syscalls/Makefile
->> @@ -56,3 +56,4 @@ targets     += $(uapisyshdr-y) $(syshdr-y)
->>
->>  all: $(addprefix $(uapi)/,$(uapisyshdr-y))
->>  all: $(addprefix $(out)/,$(syshdr-y))
->> +     @:
->
-> The "all" target should also be added to the PHONY variable.
+>   1) There was very little if any measurable LTO runtime speedup, 
+>      despite agressive GCC options and despite user-space generally 
+>      offering more optimizations opportunities than kernel space.
 
-relocs should be PHONY too.
+See Honza's email. There are lots of benefits in various
+large projects.
+
+Also BTW compiler technology is not static. It's often
+hard to interpolate from older releases, and to see
+project benefits for different projects.
+
+>   2) LTO with current build tools meant a 1.5x-3x build speed
+>      slowdown (on a very fast box with tons of CPUs and RAM),
+
+I see about 40-60% build time penalty with gcc 4.9 / single link.
+
+>      which made LTO essentially a non-starter for development
+>      work. (And that was with the Gold linker.)
+
+I see LTO as a "release build", as opposed to a development build.
+I don't think it's a big problem in such a model. If you don't
+like that model, just don't enable it.
+
+> I'm willing to be convinced by actual numbers, and LTO tooling might 
+> eventually improve, etc., but right now LTO is much ado about very 
+> little, being pushed in a somewhat dishonest way.
+
+The concrete tangible advantages at this point are code size
+on smaller configs.  There are a variety of users who use it for that.
+
+I think it's worth merging for that alone.
+
+-Andi
