@@ -1,194 +1,90 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.mei.co.jp ([133.183.100.20]:39852 "EHLO smtp.mei.co.jp"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750831AbaDIF4F (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 9 Apr 2014 01:56:05 -0400
-From: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Subject: [PATCH v2] kbuild: move extra gcc checks to scripts/Makefile.extrawarn
-Date: Wed,  9 Apr 2014 14:55:30 +0900
-Message-Id: <1397022930-13098-1-git-send-email-yamada.m@jp.panasonic.com>
+Received: from mail-ee0-f44.google.com ([74.125.83.44]:33076 "EHLO
+	mail-ee0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758175AbaDIGBh (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 9 Apr 2014 02:01:37 -0400
+Date: Wed, 9 Apr 2014 08:01:33 +0200
+From: Ingo Molnar <mingo@kernel.org>
+Subject: Re: [GIT] kbuild/lto changes for 3.15-rc1
+Message-ID: <20140409060133.GA6766@gmail.com>
+References: <20140407201919.GA15838@sepie.suse.cz>
+ <CA+55aFy8hWqBpF1TXOPvA2rRaZp=H2LTO3wd3AERspmcGZhAeQ@mail.gmail.com>
+ <20140408204906.GA3616@cloud>
+ <CA+55aFzhyvZRPjXy7PkUxQO_AMqLSTehh-GNRP+Dx3yKnv-eCA@mail.gmail.com>
+ <20140409013557.GA32556@tassilo.jf.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20140409013557.GA32556@tassilo.jf.intel.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.m@jp.panasonic.com>, Michal Marek <mmarek@suse.cz>, Sam Ravnborg <sam@ravnborg.org>
-
-W=... provides extra gcc checks.
-
-Having such code in scripts/Makefile.build results in the same flags
-being added to KBUILD_CFLAGS multiple times becuase
-scripts/Makefile.build is invoked every time Kbuild descends into
-the subdirectories.
-
-Since the top Makefile is already too cluttered, this commit moves
-all of extra gcc check stuff to a new file scripts/Makefile.extrawarn,
-which is included from the top Makefile.
-
-Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Cc: Michal Marek <mmarek@suse.cz>
-CC: Sam Ravnborg <sam@ravnborg.org>
----
-
-Changes in v2:
-  - Move the code to a new file scripts/Makefile.extrawarn
-  - Move also "KBUILD_ENABLE_EXTRA_GCC_CHECKS" definition
+To: Andi Kleen <ak@linux.intel.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, Josh Triplett <josh@joshtriplett.org>, Michal Marek <mmarek@suse.cz>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
 
+* Andi Kleen <ak@linux.intel.com> wrote:
 
- Makefile                   |  6 ++---
- scripts/Makefile.build     | 51 -----------------------------------------
- scripts/Makefile.extrawarn | 57 ++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 59 insertions(+), 55 deletions(-)
- create mode 100644 scripts/Makefile.extrawarn
+> On Tue, Apr 08, 2014 at 03:44:25PM -0700, Linus Torvalds wrote:
+> > On Tue, Apr 8, 2014 at 1:49 PM,  <josh@joshtriplett.org> wrote:
+> > >
+> > > In addition to making the kernel smaller and such (I'll leave the
+> > > specific stats there to Andi), here's the key awesomeness of LTO that
+> > > you, personally, should find useful and compelling: LTO will eliminate
+> > > the need to add many lower-level Kconfig symbols to compile out bits of
+> > > the kernel.
+> > 
+> > Actually that, to me, is a negative right now.
+> > 
+> > Since there's no way we'll make LTO the default in the foreseeable
+> > future, people starting to use it like that is just a bad bad thing.
+> > 
+> > So really, the main advantage of LTO would be any actual 
+> > optimizations it can do. And call me anal, but I want *numbers* 
+> > for that before I merge it. Not handwaving. I'm not actually aware 
+> > of how well - if at all - code generation actually improves.
+> 
+> Well it looks very different if you look at the generated code. gcc 
+> becomes a lot more aggressive.
+> 
+> But as I said there's currently no significant performance 
+> improvement known, so if your only goal is better performance this 
+> patch (as currently) known is not a big winner.  My suspicion is 
+> that's mostly because the standard benchmarks we run are not too 
+> compiler sensitive.
+> 
+> However the users seem to care about the other benefits, like code 
+> size.
+> 
+> And there may well be loads that are compiler sensitive. As Honza 
+> posted, for non kernel workloads LTO is known to have large 
+> benefits.
+> 
+> Besides at this point it's pretty much just some additions to the 
+> Makefiles.
 
-diff --git a/Makefile b/Makefile
-index cf3e075..4eadf2d 100644
---- a/Makefile
-+++ b/Makefile
-@@ -105,10 +105,6 @@ ifeq ("$(origin O)", "command line")
-   KBUILD_OUTPUT := $(O)
- endif
- 
--ifeq ("$(origin W)", "command line")
--  export KBUILD_ENABLE_EXTRA_GCC_CHECKS := $(W)
--endif
--
- # That's our default target when none is given on the command line
- PHONY := _all
- _all:
-@@ -702,6 +698,8 @@ ifeq ($(shell $(CONFIG_SHELL) $(srctree)/scripts/gcc-goto.sh $(CC)), y)
- 	KBUILD_CFLAGS += -DCC_HAVE_ASM_GOTO
- endif
- 
-+include $(srctree)/scripts/Makefile.extrawarn
-+
- # Add user supplied CPPFLAGS, AFLAGS and CFLAGS as the last assignments
- KBUILD_CPPFLAGS += $(KCPPFLAGS)
- KBUILD_AFLAGS += $(KAFLAGS)
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 9f0ee22..b5e02b6 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -50,57 +50,6 @@ ifeq ($(KBUILD_NOPEDANTIC),)
-         endif
- endif
- 
--#
--# make W=... settings
--#
--# W=1 - warnings that may be relevant and does not occur too often
--# W=2 - warnings that occur quite often but may still be relevant
--# W=3 - the more obscure warnings, can most likely be ignored
--#
--# $(call cc-option, -W...) handles gcc -W.. options which
--# are not supported by all versions of the compiler
--ifdef KBUILD_ENABLE_EXTRA_GCC_CHECKS
--warning-  := $(empty)
--
--warning-1 := -Wextra -Wunused -Wno-unused-parameter
--warning-1 += -Wmissing-declarations
--warning-1 += -Wmissing-format-attribute
--warning-1 += -Wmissing-prototypes
--warning-1 += -Wold-style-definition
--warning-1 += $(call cc-option, -Wmissing-include-dirs)
--warning-1 += $(call cc-option, -Wunused-but-set-variable)
--warning-1 += $(call cc-disable-warning, missing-field-initializers)
--
--warning-2 := -Waggregate-return
--warning-2 += -Wcast-align
--warning-2 += -Wdisabled-optimization
--warning-2 += -Wnested-externs
--warning-2 += -Wshadow
--warning-2 += $(call cc-option, -Wlogical-op)
--warning-2 += $(call cc-option, -Wmissing-field-initializers)
--
--warning-3 := -Wbad-function-cast
--warning-3 += -Wcast-qual
--warning-3 += -Wconversion
--warning-3 += -Wpacked
--warning-3 += -Wpadded
--warning-3 += -Wpointer-arith
--warning-3 += -Wredundant-decls
--warning-3 += -Wswitch-default
--warning-3 += $(call cc-option, -Wpacked-bitfield-compat)
--warning-3 += $(call cc-option, -Wvla)
--
--warning := $(warning-$(findstring 1, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)))
--warning += $(warning-$(findstring 2, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)))
--warning += $(warning-$(findstring 3, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)))
--
--ifeq ("$(strip $(warning))","")
--        $(error W=$(KBUILD_ENABLE_EXTRA_GCC_CHECKS) is unknown)
--endif
--
--KBUILD_CFLAGS += $(warning)
--endif
--
- include scripts/Makefile.lib
- 
- ifdef host-progs
-diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
-new file mode 100644
-index 0000000..54aaddb
---- /dev/null
-+++ b/scripts/Makefile.extrawarn
-@@ -0,0 +1,57 @@
-+# ==========================================================================
-+#
-+# make W=... settings
-+#
-+# W=1 - warnings that may be relevant and does not occur too often
-+# W=2 - warnings that occur quite often but may still be relevant
-+# W=3 - the more obscure warnings, can most likely be ignored
-+#
-+# $(call cc-option, -W...) handles gcc -W.. options which
-+# are not supported by all versions of the compiler
-+# ==========================================================================
-+
-+ifeq ("$(origin W)", "command line")
-+  export KBUILD_ENABLE_EXTRA_GCC_CHECKS := $(W)
-+endif
-+
-+ifdef KBUILD_ENABLE_EXTRA_GCC_CHECKS
-+warning-  := $(empty)
-+
-+warning-1 := -Wextra -Wunused -Wno-unused-parameter
-+warning-1 += -Wmissing-declarations
-+warning-1 += -Wmissing-format-attribute
-+warning-1 += -Wmissing-prototypes
-+warning-1 += -Wold-style-definition
-+warning-1 += $(call cc-option, -Wmissing-include-dirs)
-+warning-1 += $(call cc-option, -Wunused-but-set-variable)
-+warning-1 += $(call cc-disable-warning, missing-field-initializers)
-+
-+warning-2 := -Waggregate-return
-+warning-2 += -Wcast-align
-+warning-2 += -Wdisabled-optimization
-+warning-2 += -Wnested-externs
-+warning-2 += -Wshadow
-+warning-2 += $(call cc-option, -Wlogical-op)
-+warning-2 += $(call cc-option, -Wmissing-field-initializers)
-+
-+warning-3 := -Wbad-function-cast
-+warning-3 += -Wcast-qual
-+warning-3 += -Wconversion
-+warning-3 += -Wpacked
-+warning-3 += -Wpadded
-+warning-3 += -Wpointer-arith
-+warning-3 += -Wredundant-decls
-+warning-3 += -Wswitch-default
-+warning-3 += $(call cc-option, -Wpacked-bitfield-compat)
-+warning-3 += $(call cc-option, -Wvla)
-+
-+warning := $(warning-$(findstring 1, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)))
-+warning += $(warning-$(findstring 2, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)))
-+warning += $(warning-$(findstring 3, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)))
-+
-+ifeq ("$(strip $(warning))","")
-+        $(error W=$(KBUILD_ENABLE_EXTRA_GCC_CHECKS) is unknown)
-+endif
-+
-+KBUILD_CFLAGS += $(warning)
-+endif
--- 
-1.8.3.2
+So the reason I've been mostly ignoring the LTO patches myself (I only 
+took LTO related changes that had other justifications such as 
+cleanups) is that I've actually implemented full LTO in a userspace 
+project myself, and my experience was:
 
+  1) There was very little if any measurable LTO runtime speedup, 
+     despite agressive GCC options and despite user-space generally 
+     offering more optimizations opportunities than kernel space.
+
+  2) LTO with current build tools meant a 1.5x-3x build speed
+     slowdown (on a very fast box with tons of CPUs and RAM),
+     which made LTO essentially a non-starter for development
+     work. (And that was with the Gold linker.)
+
+and looking at your characterisation of LTO you only conceded
+#1 much after you started pushing LTO and you are clearly trying
+to avoid talking about #2 while it's very much relevant...
+
+I'm willing to be convinced by actual numbers, and LTO tooling might 
+eventually improve, etc., but right now LTO is much ado about very 
+little, being pushed in a somewhat dishonest way.
+
+Thanks,
+
+	Ingo
