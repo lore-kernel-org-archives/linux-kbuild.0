@@ -1,72 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from terminus.zytor.com ([198.137.202.10]:49449 "EHLO mail.zytor.com"
+Received: from smtp.mei.co.jp ([133.183.100.20]:37926 "EHLO smtp.mei.co.jp"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S933143AbaDITV4 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 9 Apr 2014 15:21:56 -0400
-In-Reply-To: <20140409182324.GA778@thunk.org>
-References: <20140404134429.GB26806@quack.suse.cz> <CAJfpegsJd9d8NTmwozJ+u_ZS-SnUwAQFwAne6P1KqG=VZeZSTA@mail.gmail.com> <20140404234358.GE10275@thunk.org> <CAJfpegv_Ng1cXbpCqicG4e3UdGK3uiDtVB4KzfRQOhDq_uhZOw@mail.gmail.com> <20140407140745.GA8855@thunk.org> <CAMuHMdVHyAJwJv5nh+nQUOQJk6=2+Rr+pEqAZPgJUsA7A9A3hQ@mail.gmail.com> <20140408134740.GB28822@thunk.org> <CAMuHMdW8xkBFJ5-E04rVhDk+CSubHut+kx3P6cYCn0dMhQdb-Q@mail.gmail.com> <53457B80.1080307@zytor.com> <CAMuHMdU9ZcCzRWk2NWfdx54Uox=C=MaR5t8sD2icUpE_xtr8cA@mail.gmail.com> <20140409182324.GA778@thunk.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain;
- charset=UTF-8
-Subject: Re: [GIT PULL] ext4 changes for 3.15
-From: "H. Peter Anvin" <hpa@zytor.com>
-Date: Wed, 09 Apr 2014 12:19:52 -0700
-Message-ID: <7cc6f198-832f-4af7-82ea-2b89ad737885@email.android.com>
+	id S933287AbaDJBiD (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 9 Apr 2014 21:38:03 -0400
+From: Masahiro Yamada <yamada.m@jp.panasonic.com>
+Subject: [PATCH v2] x86: suppress "Nothing to be done for ..." messages
+Date: Thu, 10 Apr 2014 10:35:42 +0900
+Message-Id: <1397093742-11144-1-git-send-email-yamada.m@jp.panasonic.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Theodore Ts'o <tytso@mit.edu>, Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Arnd Bergmann <arnd@arndb.de>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Miklos Szeredi <miklos@szeredi.hu>, Jan Kara <jack@suse.cz>, Linus Torvalds <torvalds@linux-foundation.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "linux-ext4@vger.kernel.org" <linux-ext4@vger.kernel.org>, Al Viro <viro@zeniv.linux.org.uk>, "Michael Kerrisk (man-pages)" <mtk.manpages@gmail.com>
+To: linux-kernel@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.m@jp.panasonic.com>, x86 <x86@kernel.org>
 
-It is quite frankly ridiculous how much work it takes to wire up a new system call.  It should be possible to do it across architectures without all this crap.
+When we compiled again, arch/x86/syscalls/Makefile and
+arch/x86/tools/Makefile emitted "Nothing to be done for ..." messages.
 
-On April 9, 2014 11:23:24 AM PDT, Theodore Ts'o <tytso@mit.edu> wrote:
->On Wed, Apr 09, 2014 at 07:48:32PM +0200, Geert Uytterhoeven wrote:
->> >
->> > I'm missing context here, but as an x86 maintainer I have no
->intention
->> > of allowing system calls that aren't x86-specific to be added to
->x86-64
->> > only.
->> 
->> commit 520c8b16505236fc82daa352e6c5e73cd9870cff
->> Author: Miklos Szeredi <mszeredi@suse.cz>
->> Date:   Tue Apr 1 17:08:42 2014 +0200
->> 
->>     vfs: add renameat2 syscall
->> 
->> It was added to arch/x86/syscalls/syscall_64.tbl only.
->
->To be fair, part of the problem is that we don't have good
->documentation about best practices in what people should do if adding
->new system calls.  (i.e., creating a man page and pulling in Michael
->Kerrisk, adding tests, wiring up both x86_64 and i386, sending mail to
->linux-arch, the scripts/checksyscalls.sh script, etc.)
->
->I'll confess to being ignorant about the checksyscalls.sh script, and
->while I had known about the existence of the linux-arch list, I had
->forgotten about it, so if I had tried to add a new system call, it's
->likely I would have missed at one or more of these steps.
->
->       	       	    	      	     - Ted
->
->
->
->
->> 
->> Gr{oetje,eeting}s,
->> 
->>                         Geert
->> 
->> --
->> Geert Uytterhoeven -- There's lots of Linux beyond ia32 --
->geert@linux-m68k.org
->> 
->> In personal conversations with technical people, I call myself a
->hacker. But
->> when I'm talking to journalists I just say "programmer" or something
->like that.
->>                                 -- Linus Torvalds
+Here is the command log:
 
+  $ make defconfig
+     [ snip ]
+  $ make
+     [ snip ]
+  $ make
+  make[1]: Nothing to be done for `all'.            <-----
+  make[1]: Nothing to be done for `relocs'.         <-----
+    CHK     include/config/kernel.release
+    CHK     include/generated/uapi/linux/version.h
+
+Besides those fixes, "all" and "relocs" should be added to PHONY.
+
+Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
+Acked-by: Peter Foley <pefoley2@pefoley.com>
+Acked-by: Michal Marek <mmarek@suse.cz>
+Cc: x86 <x86@kernel.org>
+---
+
+Changes in v2:
+  - Add "all" and "relocs" to PHONY.
+
+ arch/x86/syscalls/Makefile | 2 ++
+ arch/x86/tools/Makefile    | 2 ++
+ 2 files changed, 4 insertions(+)
+
+diff --git a/arch/x86/syscalls/Makefile b/arch/x86/syscalls/Makefile
+index f325af2..3323c27 100644
+--- a/arch/x86/syscalls/Makefile
++++ b/arch/x86/syscalls/Makefile
+@@ -54,5 +54,7 @@ syshdr-$(CONFIG_X86_64)		+= syscalls_64.h
+ 
+ targets	+= $(uapisyshdr-y) $(syshdr-y)
+ 
++PHONY += all
+ all: $(addprefix $(uapi)/,$(uapisyshdr-y))
+ all: $(addprefix $(out)/,$(syshdr-y))
++	@:
+diff --git a/arch/x86/tools/Makefile b/arch/x86/tools/Makefile
+index e812034..604a37e 100644
+--- a/arch/x86/tools/Makefile
++++ b/arch/x86/tools/Makefile
+@@ -40,4 +40,6 @@ $(obj)/insn_sanity.o: $(srctree)/arch/x86/lib/insn.c $(srctree)/arch/x86/lib/ina
+ HOST_EXTRACFLAGS += -I$(srctree)/tools/include
+ hostprogs-y	+= relocs
+ relocs-objs     := relocs_32.o relocs_64.o relocs_common.o
++PHONY += relocs
+ relocs: $(obj)/relocs
++	@:
 -- 
-Sent from my mobile phone.  Please pardon brevity and lack of formatting.
+1.8.3.2
+
