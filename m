@@ -1,70 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.mei.co.jp ([133.183.100.20]:37926 "EHLO smtp.mei.co.jp"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S933287AbaDJBiD (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 9 Apr 2014 21:38:03 -0400
-From: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Subject: [PATCH v2] x86: suppress "Nothing to be done for ..." messages
-Date: Thu, 10 Apr 2014 10:35:42 +0900
-Message-Id: <1397093742-11144-1-git-send-email-yamada.m@jp.panasonic.com>
+Received: from mail-la0-f54.google.com ([209.85.215.54]:41702 "EHLO
+	mail-la0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754027AbaDLKNs (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 12 Apr 2014 06:13:48 -0400
+Received: by mail-la0-f54.google.com with SMTP id mc6so4241907lab.41
+        for <linux-kbuild@vger.kernel.org>; Sat, 12 Apr 2014 03:13:46 -0700 (PDT)
+From: Fathi Boudra <fathi.boudra@linaro.org>
+Subject: [PATCH] builddeb: use $OBJCOPY variable instead of objcopy
+Date: Sat, 12 Apr 2014 13:13:24 +0300
+Message-Id: <1397297604-4271-1-git-send-email-fathi.boudra@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.m@jp.panasonic.com>, x86 <x86@kernel.org>
+To: linux-kbuild <linux-kbuild@vger.kernel.org>
+Cc: Michal Marek <mmarek@suse.cz>, Ben Hutchings <ben@decadent.org.uk>, Maximilian Attems <max@stro.at>, Fathi Boudra <fathi.boudra@linaro.org>
 
-When we compiled again, arch/x86/syscalls/Makefile and
-arch/x86/tools/Makefile emitted "Nothing to be done for ..." messages.
+In cross-build environment, we expect to use the cross-compiler objcopy
+instead of the host objcopy.
 
-Here is the command log:
+It fixes following build failures:
+objcopy --only-keep-debug lib/modules/3.14/kernel/net/ipv6/xfrm6_mode_tunnel.ko /srv/build/linux/debian/dbgtmp/usr/lib/debug/lib/modules/3.14/kernel/net/ipv6/xfrm6_mode_tunnel.ko
+objcopy: Unable to recognise the format of the input file `lib/modules/3.14/kernel/net/ipv6/xfrm6_mode_tunnel.ko'
 
-  $ make defconfig
-     [ snip ]
-  $ make
-     [ snip ]
-  $ make
-  make[1]: Nothing to be done for `all'.            <-----
-  make[1]: Nothing to be done for `relocs'.         <-----
-    CHK     include/config/kernel.release
-    CHK     include/generated/uapi/linux/version.h
-
-Besides those fixes, "all" and "relocs" should be added to PHONY.
-
-Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Acked-by: Peter Foley <pefoley2@pefoley.com>
-Acked-by: Michal Marek <mmarek@suse.cz>
-Cc: x86 <x86@kernel.org>
+Signed-off-by: Fathi Boudra <fathi.boudra@linaro.org>
 ---
+ scripts/package/builddeb | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Changes in v2:
-  - Add "all" and "relocs" to PHONY.
-
- arch/x86/syscalls/Makefile | 2 ++
- arch/x86/tools/Makefile    | 2 ++
- 2 files changed, 4 insertions(+)
-
-diff --git a/arch/x86/syscalls/Makefile b/arch/x86/syscalls/Makefile
-index f325af2..3323c27 100644
---- a/arch/x86/syscalls/Makefile
-+++ b/arch/x86/syscalls/Makefile
-@@ -54,5 +54,7 @@ syshdr-$(CONFIG_X86_64)		+= syscalls_64.h
- 
- targets	+= $(uapisyshdr-y) $(syshdr-y)
- 
-+PHONY += all
- all: $(addprefix $(uapi)/,$(uapisyshdr-y))
- all: $(addprefix $(out)/,$(syshdr-y))
-+	@:
-diff --git a/arch/x86/tools/Makefile b/arch/x86/tools/Makefile
-index e812034..604a37e 100644
---- a/arch/x86/tools/Makefile
-+++ b/arch/x86/tools/Makefile
-@@ -40,4 +40,6 @@ $(obj)/insn_sanity.o: $(srctree)/arch/x86/lib/insn.c $(srctree)/arch/x86/lib/ina
- HOST_EXTRACFLAGS += -I$(srctree)/tools/include
- hostprogs-y	+= relocs
- relocs-objs     := relocs_32.o relocs_64.o relocs_common.o
-+PHONY += relocs
- relocs: $(obj)/relocs
-+	@:
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index f46e4dd..152d4d2 100644
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -155,11 +155,11 @@ if grep -q '^CONFIG_MODULES=y' $KCONFIG_CONFIG ; then
+ 			for module in $(find lib/modules/ -name *.ko); do
+ 				mkdir -p $(dirname $dbg_dir/usr/lib/debug/$module)
+ 				# only keep debug symbols in the debug file
+-				objcopy --only-keep-debug $module $dbg_dir/usr/lib/debug/$module
++				$OBJCOPY --only-keep-debug $module $dbg_dir/usr/lib/debug/$module
+ 				# strip original module from debug symbols
+-				objcopy --strip-debug $module
++				$OBJCOPY --strip-debug $module
+ 				# then add a link to those
+-				objcopy --add-gnu-debuglink=$dbg_dir/usr/lib/debug/$module $module
++				$OBJCOPY --add-gnu-debuglink=$dbg_dir/usr/lib/debug/$module $module
+ 			done
+ 		)
+ 	fi
 -- 
-1.8.3.2
+1.9.1
 
