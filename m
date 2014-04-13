@@ -1,41 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-la0-f48.google.com ([209.85.215.48]:58411 "EHLO
-	mail-la0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754628AbaDLRPn (ORCPT
+Received: from mail-vc0-f169.google.com ([209.85.220.169]:56728 "EHLO
+	mail-vc0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754483AbaDMBd2 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 12 Apr 2014 13:15:43 -0400
-Received: by mail-la0-f48.google.com with SMTP id gf5so4386813lab.7
-        for <linux-kbuild@vger.kernel.org>; Sat, 12 Apr 2014 10:15:41 -0700 (PDT)
-From: Fathi Boudra <fathi.boudra@linaro.org>
-Subject: [PATCH] deb-pkg: install device tree blobs in linux-image package
-Date: Sat, 12 Apr 2014 20:15:31 +0300
-Message-Id: <1397322931-16688-1-git-send-email-fathi.boudra@linaro.org>
+	Sat, 12 Apr 2014 21:33:28 -0400
+MIME-Version: 1.0
+In-Reply-To: <20140409155934.GA27116@sepie.suse.cz>
+References: <20140409155934.GA27116@sepie.suse.cz>
+Date: Sat, 12 Apr 2014 18:33:27 -0700
+Message-ID: <CA+55aFx_idf7XmBoBDsg81dwo9ufW24Ka_-zz1ru-ACAt+yJGw@mail.gmail.com>
+Subject: Re: [GIT] kbuild misc changes for v3.15-rc1
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild <linux-kbuild@vger.kernel.org>
-Cc: Michal Marek <mmarek@suse.cz>, Ben Hutchings <ben@decadent.org.uk>, Maximilian Attems <maks@debian.org>, Fathi Boudra <fathi.boudra@linaro.org>
+To: Michal Marek <mmarek@suse.cz>
+Cc: fabf@skynet.be, jason@lakedaemon.net, Peter Senna Tschudin <peter.senna@gmail.com>, Prarit Bhargava <prarit@redhat.com>, Sachin Kamat <sachin.kamat@linaro.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-Signed-off-by: Fathi Boudra <fathi.boudra@linaro.org>
----
- scripts/package/builddeb | 5 +++++
- 1 file changed, 5 insertions(+)
+On Wed, Apr 9, 2014 at 8:59 AM, Michal Marek <mmarek@suse.cz> wrote:
+>
+> here is the non-critical part of kbuild:
 
-diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index f46e4dd..24cb3b1 100644
---- a/scripts/package/builddeb
-+++ b/scripts/package/builddeb
-@@ -165,6 +165,11 @@ if grep -q '^CONFIG_MODULES=y' $KCONFIG_CONFIG ; then
- 	fi
- fi
- 
-+if grep -q '^CONFIG_OF=y' $KCONFIG_CONFIG ; then
-+	mkdir -p "$tmpdir/boot/dtb/$version"
-+	INSTALL_DTBS_PATH="$tmpdir/boot/dtb/$version" $MAKE KBUILD_SRC= dtbs_install
-+fi
-+
- if [ "$ARCH" != "um" ]; then
- 	$MAKE headers_check KBUILD_SRC=
- 	$MAKE headers_install KBUILD_SRC= INSTALL_HDR_PATH="$libc_headers_dir/usr"
--- 
-1.9.1
+Michal, please make your pull request script clearly say both "git"
+and "pull" somewhere. Your emails don't trigger my search criteria, so
+they end up not being visible in my list of pull requests.
 
+Most people do it in the subject, with "[GIT PULL]" at the beginning
+of the subject line.
+
+Others (like David Miller) end up having just "[GIT]" like you, but
+then have a "Please pull" in the message body, making it match my
+pattern. As it is, you only have that "git" part, although sometimes
+occasionally you have "please pull" in the free-form section. But not
+always, and not in this case, for example.
+
+This pull request literally almost dropped through the cracks due to
+this, so this is not some theoretical issue.
+
+            Linus
