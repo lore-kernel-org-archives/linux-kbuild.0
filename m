@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ee0-f42.google.com ([74.125.83.42]:39468 "EHLO
-	mail-ee0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750790AbaDOGAm (ORCPT
+Received: from eddie.linux-mips.org ([78.24.191.182]:48175 "EHLO
+	cvs.linux-mips.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753775AbaDOJgn (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 15 Apr 2014 02:00:42 -0400
-Date: Tue, 15 Apr 2014 08:00:38 +0200
-From: Ingo Molnar <mingo@kernel.org>
+	Tue, 15 Apr 2014 05:36:43 -0400
+Date: Tue, 15 Apr 2014 11:36:22 +0200
+From: Ralf Baechle <ralf@linux-mips.org>
 Subject: Re: [GIT] kbuild/lto changes for 3.15-rc1
-Message-ID: <20140415060038.GA29649@gmail.com>
+Message-ID: <20140415093622.GB27556@linux-mips.org>
 References: <20140407201919.GA15838@sepie.suse.cz>
  <CA+55aFy8hWqBpF1TXOPvA2rRaZp=H2LTO3wd3AERspmcGZhAeQ@mail.gmail.com>
  <20140408204906.GA3616@cloud>
@@ -24,44 +24,32 @@ In-Reply-To: <20140415010003.GA2765@jtriplet-mobl1>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Josh Triplett <josh@joshtriplett.org>
-Cc: Markus Trippelsdorf <markus@trippelsdorf.de>, Andi Kleen <ak@linux.intel.com>, Linus Torvalds <torvalds@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>
+Cc: Ingo Molnar <mingo@kernel.org>, Markus Trippelsdorf <markus@trippelsdorf.de>, Andi Kleen <ak@linux.intel.com>, Linus Torvalds <torvalds@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, John Crispin <blogic@openwrt.org>
 
+On Mon, Apr 14, 2014 at 06:00:04PM -0700, Josh Triplett wrote:
 
-* Josh Triplett <josh@joshtriplett.org> wrote:
+> > and it slows down 
+> > kernel development'.
+> 
+> No, it doesn't slow down development builds; it makes kernel builds
+> slower if and only if LTO is turned on, which most kernel developers
+> won't need to do.  On the other hand, distro and embedded kernels can do
+> so for final builds, and developers pushing to minimize the kernel can
 
-> > and it slows down kernel development'.
->
-> No, it doesn't slow down development builds; it makes kernel builds 
-> slower if and only if LTO is turned on, which most kernel developers 
-> won't need to do.
->
-> On the other hand, distro and embedded kernels can do so for final 
-> builds, and developers pushing to minimize the kernel can turn it on 
-> for their own work as needed.
+LTO inherently is going to slow down development because it does inflate
+the testing matrix - a developer really should test an LTO build.
 
-1)
+That said, the increased checking of the source code for validity across
+compilation units done by the LTO final link is a benefit by itself.  With
+my MIPS maintainer head on I can say it's required fixes / cleanups of
+several thousand lines which have already been merged several kernel
+versions ago because they all were beneficial even without LTO.  A mere
+three small commits preparing arch/mips for LTO support and that don't
+make sense without LTO are remaining.  So it's not a support/testing
+nightmare.
 
-If LTO will be as fragile for the kernel as it is for user space, then 
-low level developers will be advised to enable it during testing.
+And while the code size reduction is less for MIPS than what others have
+reported for their platforms (I'm still investigating) is still is enough
+that embedded developers would commit murder for.
 
-2)
-
-Developers and testers tend to clone distro configs to get to a 
-working .config: via 'make localconfig' and similar methods. This 
-means that options like this tend to spread into development 
-environments.
-
-I saw that with DEBUG_INFO frequently: I detest the option with a 
-passion because it's such a drag on build time (but not as slow as 
-LTO), still time and time again it shows up in a .config of mine.
-
-So the "it does not slow down development" argument is simply not 
-true. It clearly has such a cost.
-
-LTO might still be a net win in the end, if the upsides are strong 
-enough, but I am wary of arguments that try to ignore or underestimate 
-the weak points.
-
-Thanks,
-
-	Ingo
+  Ralf
