@@ -1,78 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-la0-f43.google.com ([209.85.215.43]:53397 "EHLO
-	mail-la0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750865AbaDOFGm (ORCPT
+Received: from mail-ee0-f42.google.com ([74.125.83.42]:39468 "EHLO
+	mail-ee0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750790AbaDOGAm (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 15 Apr 2014 01:06:42 -0400
-Received: by mail-la0-f43.google.com with SMTP id e16so6467830lan.16
-        for <linux-kbuild@vger.kernel.org>; Mon, 14 Apr 2014 22:06:41 -0700 (PDT)
+	Tue, 15 Apr 2014 02:00:42 -0400
+Date: Tue, 15 Apr 2014 08:00:38 +0200
+From: Ingo Molnar <mingo@kernel.org>
+Subject: Re: [GIT] kbuild/lto changes for 3.15-rc1
+Message-ID: <20140415060038.GA29649@gmail.com>
+References: <20140407201919.GA15838@sepie.suse.cz>
+ <CA+55aFy8hWqBpF1TXOPvA2rRaZp=H2LTO3wd3AERspmcGZhAeQ@mail.gmail.com>
+ <20140408204906.GA3616@cloud>
+ <CA+55aFzhyvZRPjXy7PkUxQO_AMqLSTehh-GNRP+Dx3yKnv-eCA@mail.gmail.com>
+ <20140409013557.GA32556@tassilo.jf.intel.com>
+ <20140409060133.GA6766@gmail.com>
+ <20140409081709.GA283@x4>
+ <20140414103205.GA2846@gmail.com>
+ <20140415010003.GA2765@jtriplet-mobl1>
 MIME-Version: 1.0
-In-Reply-To: <1397503641.31481.10.camel@deadeye.wl.decadent.org.uk>
-References: <1397477996-24575-1-git-send-email-fathi.boudra@linaro.org>
-	<1397503641.31481.10.camel@deadeye.wl.decadent.org.uk>
-Date: Tue, 15 Apr 2014 08:06:41 +0300
-Message-ID: <CAGNsrLBDidU9mW-Mz2bD4F2ZPMQzkFc4172ocUsd1S41v8_z-w@mail.gmail.com>
-Subject: Re: [PATCH] builddeb: fix missing headers in linux-headers package on
- arm architecture
-From: Fathi Boudra <fathi.boudra@linaro.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20140415010003.GA2765@jtriplet-mobl1>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ben Hutchings <ben@decadent.org.uk>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, Maximilian Attems <maks@debian.org>
+To: Josh Triplett <josh@joshtriplett.org>
+Cc: Markus Trippelsdorf <markus@trippelsdorf.de>, Andi Kleen <ak@linux.intel.com>, Linus Torvalds <torvalds@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>
 
-On 14 April 2014 22:27, Ben Hutchings <ben@decadent.org.uk> wrote:
-> On Mon, 2014-04-14 at 15:19 +0300, Fathi Boudra wrote:
->> The kernel headers package (linux-headers) doesn't include
->> the arch/arm/mach-*/include header files.
->>
->> It makes the package unusable on ARM architecture and prevent
->> out-of-tree modules build:
->>  /usr/src/linux-headers-3.14.0/arch/arm/include/asm/memory.h:24:25:
->>  fatal error: mach/memory.h: No such file or directory
->>  #include <mach/memory.h>
->>  ^
->>  compilation terminated.
->>
->> While this patch explicitely test arm architecture, avr32 and blackfin are
->> affected since they ship mach-* headers. However, they haven't been included
->> in the test because they aren't official architectures supported by Debian.
+
+* Josh Triplett <josh@joshtriplett.org> wrote:
+
+> > and it slows down kernel development'.
 >
-> I don't see why you can't generically look for all include directories
-> in arch/$SRCARCH.
-
-If you think that we should all include dirs independently from their
-support in the official archive, that's fine to me.
-The header package is a bit bigger but it's still reasonable. I'll fix in v2.
-
-> There also seem to be some files missing for several
-> other architectures:
+> No, it doesn't slow down development builds; it makes kernel builds 
+> slower if and only if LTO is turned on, which most kernel developers 
+> won't need to do.
 >
-> arch/ia64/module.lds
-> arch/m68k/kernel/module.lds
-> arch/mips/Kbuild.platforms
-> arch/mips/*/Platform
->
-> In the Debian official packages we use these commands to find
-> arch-specific headers and scripts:
->
->           find arch/$(KERNEL_ARCH) -maxdepth 1 -name 'Makefile*' -print; \
->           find arch/$(KERNEL_ARCH) \( -name 'module.lds' -o -name 'Kbuild.platforms' -o -name 'Platform' \) -print; \
->           find $$(find arch/$(KERNEL_ARCH) \( -name include -o -name scripts \) -type d -print) -print; \
+> On the other hand, distro and embedded kernels can do so for final 
+> builds, and developers pushing to minimize the kernel can turn it on 
+> for their own work as needed.
 
-It will be fixed in v2.
+1)
 
->> minor tweak: clean up the linux-headers package by using tar exclude option.
-> [...]
->
-> Shouldn't that be a separate patch?
+If LTO will be as fragile for the kernel as it is for user space, then 
+low level developers will be advised to enable it during testing.
 
-Ack.
+2)
 
-> Ben.
->
-> --
-> Ben Hutchings
-> I say we take off; nuke the site from orbit.  It's the only way to be sure.
+Developers and testers tend to clone distro configs to get to a 
+working .config: via 'make localconfig' and similar methods. This 
+means that options like this tend to spread into development 
+environments.
 
-Thanks for the review.
+I saw that with DEBUG_INFO frequently: I detest the option with a 
+passion because it's such a drag on build time (but not as slow as 
+LTO), still time and time again it shows up in a .config of mine.
+
+So the "it does not slow down development" argument is simply not 
+true. It clearly has such a cost.
+
+LTO might still be a net win in the end, if the upsides are strong 
+enough, but I am wary of arguments that try to ignore or underestimate 
+the weak points.
+
+Thanks,
+
+	Ingo
