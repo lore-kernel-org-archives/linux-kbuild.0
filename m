@@ -1,20 +1,20 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:56214 "EHLO
+Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:56745 "EHLO
 	shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1750951AbaDOMGb (ORCPT
+	by vger.kernel.org with ESMTP id S1750993AbaDORTx (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 15 Apr 2014 08:06:31 -0400
-Message-ID: <1397563579.31481.43.camel@deadeye.wl.decadent.org.uk>
-Subject: Re: [PATCH] builddeb: fix missing headers in linux-headers package
- on arm architecture
+	Tue, 15 Apr 2014 13:19:53 -0400
+Message-ID: <1397582380.31481.48.camel@deadeye.wl.decadent.org.uk>
+Subject: Re: [PATCH] deb-pkg: install device tree blobs in linux-image
+ package
 From: Ben Hutchings <ben@decadent.org.uk>
-Date: Tue, 15 Apr 2014 13:06:19 +0100
-In-Reply-To: <CAGNsrLBDidU9mW-Mz2bD4F2ZPMQzkFc4172ocUsd1S41v8_z-w@mail.gmail.com>
-References: <1397477996-24575-1-git-send-email-fathi.boudra@linaro.org>
-	 <1397503641.31481.10.camel@deadeye.wl.decadent.org.uk>
-	 <CAGNsrLBDidU9mW-Mz2bD4F2ZPMQzkFc4172ocUsd1S41v8_z-w@mail.gmail.com>
+Date: Tue, 15 Apr 2014 18:19:40 +0100
+In-Reply-To: <CAGNsrLCjsF+PipsREXX5kziZRJrGh8qGwQfD6ZXR+Buew14nWA@mail.gmail.com>
+References: <1397322931-16688-1-git-send-email-fathi.boudra@linaro.org>
+	 <1397505357.31481.24.camel@deadeye.wl.decadent.org.uk>
+	 <CAGNsrLCjsF+PipsREXX5kziZRJrGh8qGwQfD6ZXR+Buew14nWA@mail.gmail.com>
 Content-Type: multipart/signed; micalg="pgp-sha512";
-	protocol="application/pgp-signature"; boundary="=-z/BuvVynQozCxzeb7U7V"
+	protocol="application/pgp-signature"; boundary="=-K5ui7sZSMx7L0QTHtLZI"
 Mime-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
@@ -22,40 +22,68 @@ To: Fathi Boudra <fathi.boudra@linaro.org>
 Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, Maximilian Attems <maks@debian.org>
 
 
---=-z/BuvVynQozCxzeb7U7V
+--=-K5ui7sZSMx7L0QTHtLZI
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, 2014-04-15 at 08:06 +0300, Fathi Boudra wrote:
-> On 14 April 2014 22:27, Ben Hutchings <ben@decadent.org.uk> wrote:
-> > On Mon, 2014-04-14 at 15:19 +0300, Fathi Boudra wrote:
-> >> The kernel headers package (linux-headers) doesn't include
-> >> the arch/arm/mach-*/include header files.
+On Tue, 2014-04-15 at 08:02 +0300, Fathi Boudra wrote:
+> On 14 April 2014 22:55, Ben Hutchings <ben@decadent.org.uk> wrote:
+> > On Sat, 2014-04-12 at 20:15 +0300, Fathi Boudra wrote:
+> >> Signed-off-by: Fathi Boudra <fathi.boudra@linaro.org>
+> >> ---
+> >>  scripts/package/builddeb | 5 +++++
+> >>  1 file changed, 5 insertions(+)
 > >>
-> >> It makes the package unusable on ARM architecture and prevent
-> >> out-of-tree modules build:
-> >>  /usr/src/linux-headers-3.14.0/arch/arm/include/asm/memory.h:24:25:
-> >>  fatal error: mach/memory.h: No such file or directory
-> >>  #include <mach/memory.h>
-> >>  ^
-> >>  compilation terminated.
+> >> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+> >> index f46e4dd..24cb3b1 100644
+> >> --- a/scripts/package/builddeb
+> >> +++ b/scripts/package/builddeb
+> >> @@ -165,6 +165,11 @@ if grep -q '^CONFIG_MODULES=3Dy' $KCONFIG_CONFIG =
+; then
+> >>       fi
+> >>  fi
 > >>
-> >> While this patch explicitely test arm architecture, avr32 and blackfin=
- are
-> >> affected since they ship mach-* headers. However, they haven't been in=
-cluded
-> >> in the test because they aren't official architectures supported by De=
-bian.
+> >> +if grep -q '^CONFIG_OF=3Dy' $KCONFIG_CONFIG ; then
+> >> +     mkdir -p "$tmpdir/boot/dtb/$version"
 > >
-> > I don't see why you can't generically look for all include directories
-> > in arch/$SRCARCH.
+> > The boot loader only needs to read at most one of the installed DTB
+> > files on any given system, and you can't in general expect it to read a
+> > DTB from the filesystem.  So why not install them in
+> > /usr/lib/linux-image-$version where flash-kernel expects?
 >=20
-> If you think that we should all include dirs independently from their
-> support in the official archive, that's fine to me.
+> From various discussions, I think it's agreed that /usr/lib/... isn't
+> the right path to use (and we use it since years in Linaro images
+> unfortunately).
+> The consensus seems to follow bootloader spec:
+> http://www.freedesktop.org/wiki/Specifications/BootLoaderSpec/
+> and install the DTBs under /boot.
+
+I wasn't aware of such consensus.  I have seen an earlier version of
+this spec and it seemed to be only supported by one distribution.
+
+> Get it versioned is preferable.
+> It should address the various bootloaders (U-boot, UEFI, GRUB,
+> barebox, etc...) requirements, except the VFAT file system.
+
+It seems to me that:
+- It might work with U-boot, except for the many exising versions that
+it doesn't work with.
+- It might work with GRUB, though that doesn't seem to be widely used
+yet on ARM.
+- It won't work with UEFI because /boot/dtb will not be on the ESP.
+(And dpkg can't upgrade on a filesystem that doesn't support hard links
+so you should never expect to install files directly on the ESP.)
+
+> IMO we should support the distribution wide consensus in this case,
+> instead of flash-kernel (Debian/Ubuntu specific tool) expectations.
+> We'll probably end up by adding a symlink to keep compatibility with
+> older systems or fix flash-kernel.
+>=20
+> Any other feedback on this topic is appreciated.
 [...]
 
-I think it's a reasonable starting point.  If that later turns out to be
-insufficient for some new-to-Debian architecture, we can fix it then.
+flash-kernel works today and you are proposing to do something that
+might eventually work some time in the future.
 
 Ben.
 
@@ -64,26 +92,26 @@ Ben Hutchings
 The obvious mathematical breakthrough [to break modern encryption] would be
 development of an easy way to factor large prime numbers. - Bill Gates
 
---=-z/BuvVynQozCxzeb7U7V
+--=-K5ui7sZSMx7L0QTHtLZI
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: This is a digitally signed message part
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1
 
-iQIVAwUAU00gu+e/yOyVhhEJAQrJYA/+JXGj1Rqln1MN4uq1Q4axt25rLKX/FVk3
-i/H/Zwy/AigJ8RlSIk0NoyONYCDRmtiUuxt4UZ8iXa9iPglZs6my1ZM2O5BUl/J7
-XxtOxh1P0FdSQ6n5lLaJapRVtqFQPbeQ77Fq4OmbG7EUkLVMiWd3zCZYW6ow37Dg
-73pvWpV3R3AsHgLpaUAgSl9zlc/X6hCP80waW9WI5KxpKA4apd/174ZjWCg+aqjJ
-s9P7vbkzTZe82KQZh8r1Klzt7/saRSZDrxdcX6tcX+hVG2kePxy0Zskw/JSAfru9
-cJzLg89jQIJubya0RPB+mhovH5KlnFYh3VE6ePEabS60FOiElieV5++pUa2pODPW
-cftKzs0ry4IbcXz1mfpXFevoxredg709oV6nQgsnlmzm2TOME+6TyNwrUUjwhsvN
-BiSKKvgQY3/TxcHiEOdZhPIF1OYefRRIgMAOAje8Mym97WBA5MArxhoWJn7jVTvq
-Ej1nciBmwXnHtziJj7SH8wkXk08H0UGx9tBo+/qQQ8EXw2C7hYatfkWiT/sSfL26
-1FXqq9RpjDbBetzVXeZwSkC4bR7KD/GYuwttmNYLUO4+0nT4E72heRjPyw7pOUHJ
-8kKcLGl9hi9PQzXQrA4sVbveXSrPanE8Tw7QBADdLcDhFLQSC/B59Zfh4G17pFvh
-rQbtTh03chw=
-=TYOq
+iQIVAwUAU01qLOe/yOyVhhEJAQp/YA/7BlKWQSmUMvKj1Ezz7heJoKWzDql4tNrm
+7PnI0VTp95hRmsyi4evBHhrtg6RJWudd0hSyaSgkNyF3/FDq1dG5763/VrjGah0v
+9hAI9dtqCl0M2FdtmPUC8D5upJXUx1v4HwboguYddtuoK2Jt0TKC3gxIvp7jEvBW
+jFbr4V9HSZ29qoYY3mtBtTLIww25DW+ZPMI4IFBE+LsvFy4jx0ntw+WjTnYFbmG6
+j0o6Fr28ZscSkdBynouXf3JFVAne7DSWJG7pUc/xwxyhL7nvsxn73ouydXukJ0da
+4vddwFhlQQA/P+41TLc6kNesIAtSg6exzsCuBQjnjZugMymVbSvFveXaK4mrXwdB
+TjszofvtqGyrJjpWKbeApQLKp10QgLaEDwVtasG4fJAJlEFDKCnWHz7oaqyCar1m
+H1+nB/s9l/l+0QiwwyWbo4ILTCQWQjXTxWyzuXrDTM0jQvpH6AXd9hxgzX2DhvGh
+72dZl8yM5FPpZ/dT3tYSCzh2hMXTQaWKv4Ks0a9CqCvmrlyCXJC4kssHVb6AzcNO
+t2ee0/Fj7JuqdjIZVVIaC0jqzGG1FO4DemI+BkPrjd2vLLnalO1DuQH9uv0bfWOs
+8Lm1jxT0MPiK9yFsgarw2+vpU1HQOUFogW/oK6TP94R5T8+LKzl9kroT4ybNYfo7
+tNAuru4nlUQ=
+=t0X3
 -----END PGP SIGNATURE-----
 
---=-z/BuvVynQozCxzeb7U7V--
+--=-K5ui7sZSMx7L0QTHtLZI--
