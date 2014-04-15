@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from eddie.linux-mips.org ([78.24.191.182]:48175 "EHLO
-	cvs.linux-mips.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753775AbaDOJgn (ORCPT
+Received: from asavdk3.altibox.net ([109.247.116.14]:33539 "EHLO
+	asavdk3.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752807AbaDOLTn (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 15 Apr 2014 05:36:43 -0400
-Date: Tue, 15 Apr 2014 11:36:22 +0200
-From: Ralf Baechle <ralf@linux-mips.org>
+	Tue, 15 Apr 2014 07:19:43 -0400
+Date: Tue, 15 Apr 2014 13:19:16 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
 Subject: Re: [GIT] kbuild/lto changes for 3.15-rc1
-Message-ID: <20140415093622.GB27556@linux-mips.org>
+Message-ID: <20140415111916.GA9390@ravnborg.org>
 References: <20140407201919.GA15838@sepie.suse.cz>
  <CA+55aFy8hWqBpF1TXOPvA2rRaZp=H2LTO3wd3AERspmcGZhAeQ@mail.gmail.com>
  <20140408204906.GA3616@cloud>
@@ -17,39 +17,38 @@ References: <20140407201919.GA15838@sepie.suse.cz>
  <20140409081709.GA283@x4>
  <20140414103205.GA2846@gmail.com>
  <20140415010003.GA2765@jtriplet-mobl1>
+ <20140415093622.GB27556@linux-mips.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20140415010003.GA2765@jtriplet-mobl1>
+In-Reply-To: <20140415093622.GB27556@linux-mips.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Josh Triplett <josh@joshtriplett.org>
-Cc: Ingo Molnar <mingo@kernel.org>, Markus Trippelsdorf <markus@trippelsdorf.de>, Andi Kleen <ak@linux.intel.com>, Linus Torvalds <torvalds@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, John Crispin <blogic@openwrt.org>
+To: Ralf Baechle <ralf@linux-mips.org>
+Cc: Josh Triplett <josh@joshtriplett.org>, Ingo Molnar <mingo@kernel.org>, Markus Trippelsdorf <markus@trippelsdorf.de>, Andi Kleen <ak@linux.intel.com>, Linus Torvalds <torvalds@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, John Crispin <blogic@openwrt.org>
 
-On Mon, Apr 14, 2014 at 06:00:04PM -0700, Josh Triplett wrote:
-
-> > and it slows down 
-> > kernel development'.
 > 
-> No, it doesn't slow down development builds; it makes kernel builds
-> slower if and only if LTO is turned on, which most kernel developers
-> won't need to do.  On the other hand, distro and embedded kernels can do
-> so for final builds, and developers pushing to minimize the kernel can
+> And while the code size reduction is less for MIPS than what others have
+> reported for their platforms (I'm still investigating) is still is enough
+> that embedded developers would commit murder for.
 
-LTO inherently is going to slow down development because it does inflate
-the testing matrix - a developer really should test an LTO build.
+I have experimented a little with a patch that links all of vmlinux in one step.
+I compared the text size of vmlinux without and with -ffunction-sections.
 
-That said, the increased checking of the source code for validity across
-compilation units done by the LTO final link is a benefit by itself.  With
-my MIPS maintainer head on I can say it's required fixes / cleanups of
-several thousand lines which have already been merged several kernel
-versions ago because they all were beneficial even without LTO.  A mere
-three small commits preparing arch/mips for LTO support and that don't
-make sense without LTO are remaining.  So it's not a support/testing
-nightmare.
+With a defconfig build on x86 (32 bit) I got following results:
 
-And while the code size reduction is less for MIPS than what others have
-reported for their platforms (I'm still investigating) is still is enough
-that embedded developers would commit murder for.
+                        size     difference
+singlelink          10266506
+function-sections    9487369         779137  7,5%
 
-  Ralf
+So this is a reduction of ~800 kb by enabling -ffunction-sections which
+allows the linker to throw away unused sections.
+
+I have not boot tested the kernel so chances are that too much was thrown out by the linker.
+But this is an option that has much smaller cost to use than lto.
+And seems to benefit nicely in size.
+
+I have not tried this wihtout my singlelink patch - but I assume similar results.
+[My dev box is an Intel atom - so things are slow to build]
+
+	Sam
