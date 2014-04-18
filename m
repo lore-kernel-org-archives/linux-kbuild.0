@@ -1,59 +1,201 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qa0-f51.google.com ([209.85.216.51]:49556 "EHLO
-	mail-qa0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750893AbaDRBl4 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 17 Apr 2014 21:41:56 -0400
-Received: by mail-qa0-f51.google.com with SMTP id j7so1080301qaq.24
-        for <linux-kbuild@vger.kernel.org>; Thu, 17 Apr 2014 18:41:56 -0700 (PDT)
-From: Paul Moore <paul@paul-moore.com>
-Subject: Re: [PATCH] selinux, kbuild: remove unnecessary $(hostprogs-y) from clean-files
-Date: Thu, 17 Apr 2014 21:41:53 -0400
-Message-ID: <5709743.58aAPSG601@sifl>
-In-Reply-To: <1397702546-25349-1-git-send-email-yamada.m@jp.panasonic.com>
-References: <1397702546-25349-1-git-send-email-yamada.m@jp.panasonic.com>
+Received: from mout.web.de ([212.227.15.4]:55772 "EHLO mout.web.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1161025AbaDRVkp (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 18 Apr 2014 17:40:45 -0400
+From: Martin Walch <walch.martin@web.de>
+Subject: [PATCH v2 2/2] kconfig: trivial - adjust comments
+Date: Fri, 18 Apr 2014 23:34:26 +0200
+Message-ID: <2160545.7ZIeUE2WQO@tacticalops>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: selinux@tycho.nsa.gov, linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.m@jp.panasonic.com>
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-On Thursday, April 17, 2014 11:42:26 AM Masahiro Yamada wrote:
-> Files added to hostprogs-y are cleaned. (See scripts/Makefile.clean)
-> Adding them to clean-files is redundant.
-> 
-> Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
-> ---
-> 
->  scripts/selinux/genheaders/Makefile | 1 -
->  scripts/selinux/mdp/Makefile        | 2 +-
->  2 files changed, 1 insertion(+), 2 deletions(-)
+From: Martin Walch <walch.martin@web.de>
+Date: Fri, 18 Apr 2014 22:15:37 +0200
+Subject: [PATCH v2 2/2] kconfig: trivial - adjust comments
 
-Acked-by: Paul Moore <paul@paul-moore.com>
+Replace any C99 comments with traditional ones (/*...*/).
+
+Also fix the contents of two comments:
+
+1) the second occurrence of
+(a='b') && (a!='c') -> 'b'='c' ? 'n' : a='b'
+is probably copy & paste from above, missing the adjustment corresponding
+to the code.
+It should probably read
+(a!='b') && (a='c') -> 'b'='c' ? 'n' : a='c'
+
+2) that one is similar:
+(a!='m') && (a!='n') -> (a='m')
+it should be
+(a!='m') && (a!='n') -> (a='y')
+
+Signed-off-by: Martin Walch <walch.martin@web.de>
+---
+ scripts/kconfig/expr.c | 38 +++++++++++++++++++-------------------
+ 1 file changed, 19 insertions(+), 19 deletions(-)
+
+diff --git a/scripts/kconfig/expr.c b/scripts/kconfig/expr.c
+index 4aa171b..c840e52 100644
+--- a/scripts/kconfig/expr.c
++++ b/scripts/kconfig/expr.c
+@@ -326,7 +326,7 @@ struct expr *expr_trans_bool(struct expr *e)
+ 		e->right.expr = expr_trans_bool(e->right.expr);
+ 		break;
+ 	case E_UNEQUAL:
+-		// FOO!=n -> FOO
++		/* FOO!=n -> FOO */
+ 		if (e->left.sym->type == S_TRISTATE) {
+ 			if (e->right.sym == &symbol_no) {
+ 				e->type = E_SYMBOL;
+@@ -375,19 +375,19 @@ static struct expr *expr_join_or(struct expr *e1, struct expr *e2)
+ 		if (e1->type == E_EQUAL && e2->type == E_EQUAL &&
+ 		    ((e1->right.sym == &symbol_yes && e2->right.sym == &symbol_mod) ||
+ 		     (e1->right.sym == &symbol_mod && e2->right.sym == &symbol_yes))) {
+-			// (a='y') || (a='m') -> (a!='n')
++			/* (a='y') || (a='m') -> (a!='n') */
+ 			return expr_alloc_comp(E_UNEQUAL, sym1, &symbol_no);
+ 		}
+ 		if (e1->type == E_EQUAL && e2->type == E_EQUAL &&
+ 		    ((e1->right.sym == &symbol_yes && e2->right.sym == &symbol_no) ||
+ 		     (e1->right.sym == &symbol_no && e2->right.sym == &symbol_yes))) {
+-			// (a='y') || (a='n') -> (a!='m')
++			/* (a='y') || (a='n') -> (a!='m') */
+ 			return expr_alloc_comp(E_UNEQUAL, sym1, &symbol_mod);
+ 		}
+ 		if (e1->type == E_EQUAL && e2->type == E_EQUAL &&
+ 		    ((e1->right.sym == &symbol_mod && e2->right.sym == &symbol_no) ||
+ 		     (e1->right.sym == &symbol_no && e2->right.sym == &symbol_mod))) {
+-			// (a='m') || (a='n') -> (a!='y')
++			/* (a='m') || (a='n') -> (a!='y') */
+ 			return expr_alloc_comp(E_UNEQUAL, sym1, &symbol_yes);
+ 		}
+ 	}
+@@ -438,29 +438,29 @@ static struct expr *expr_join_and(struct expr *e1, struct expr *e2)
  
-> diff --git a/scripts/selinux/genheaders/Makefile
-> b/scripts/selinux/genheaders/Makefile index 417b165..1d1ac51 100644
-> --- a/scripts/selinux/genheaders/Makefile
-> +++ b/scripts/selinux/genheaders/Makefile
-> @@ -2,4 +2,3 @@ hostprogs-y	:= genheaders
->  HOST_EXTRACFLAGS += -Isecurity/selinux/include
-> 
->  always		:= $(hostprogs-y)
-> -clean-files	:= $(hostprogs-y)
-> diff --git a/scripts/selinux/mdp/Makefile b/scripts/selinux/mdp/Makefile
-> index eb365b3..dba7eff 100644
-> --- a/scripts/selinux/mdp/Makefile
-> +++ b/scripts/selinux/mdp/Makefile
-> @@ -2,4 +2,4 @@ hostprogs-y	:= mdp
->  HOST_EXTRACFLAGS += -Isecurity/selinux/include
-> 
->  always		:= $(hostprogs-y)
-> -clean-files	:= $(hostprogs-y) policy.* file_contexts
-> +clean-files	:= policy.* file_contexts
-
+ 	if ((e1->type == E_SYMBOL && e2->type == E_EQUAL && e2->right.sym == &symbol_yes) ||
+ 	    (e2->type == E_SYMBOL && e1->type == E_EQUAL && e1->right.sym == &symbol_yes))
+-		// (a) && (a='y') -> (a='y')
++		/* (a) && (a='y') -> (a='y') */
+ 		return expr_alloc_comp(E_EQUAL, sym1, &symbol_yes);
+ 
+ 	if ((e1->type == E_SYMBOL && e2->type == E_UNEQUAL && e2->right.sym == &symbol_no) ||
+ 	    (e2->type == E_SYMBOL && e1->type == E_UNEQUAL && e1->right.sym == &symbol_no))
+-		// (a) && (a!='n') -> (a)
++		/* (a) && (a!='n') -> (a) */
+ 		return expr_alloc_symbol(sym1);
+ 
+ 	if ((e1->type == E_SYMBOL && e2->type == E_UNEQUAL && e2->right.sym == &symbol_mod) ||
+ 	    (e2->type == E_SYMBOL && e1->type == E_UNEQUAL && e1->right.sym == &symbol_mod))
+-		// (a) && (a!='m') -> (a='y')
++		/* (a) && (a!='m') -> (a='y') */
+ 		return expr_alloc_comp(E_EQUAL, sym1, &symbol_yes);
+ 
+ 	if (sym1->type == S_TRISTATE) {
+ 		if (e1->type == E_EQUAL && e2->type == E_UNEQUAL) {
+-			// (a='b') && (a!='c') -> 'b'='c' ? 'n' : a='b'
++			/* (a='b') && (a!='c') -> 'b'='c' ? 'n' : a='b' */
+ 			sym2 = e1->right.sym;
+ 			if ((e2->right.sym->flags & SYMBOL_CONST) && (sym2->flags & SYMBOL_CONST))
+ 				return sym2 != e2->right.sym ? expr_alloc_comp(E_EQUAL, sym1, sym2)
+ 							     : expr_alloc_symbol(&symbol_no);
+ 		}
+ 		if (e1->type == E_UNEQUAL && e2->type == E_EQUAL) {
+-			// (a='b') && (a!='c') -> 'b'='c' ? 'n' : a='b'
++			/* (a!='b') && (a='c') -> 'b'='c' ? 'n' : a='c' */
+ 			sym2 = e2->right.sym;
+ 			if ((e1->right.sym->flags & SYMBOL_CONST) && (sym2->flags & SYMBOL_CONST))
+ 				return sym2 != e1->right.sym ? expr_alloc_comp(E_EQUAL, sym1, sym2)
+@@ -469,19 +469,19 @@ static struct expr *expr_join_and(struct expr *e1, struct expr *e2)
+ 		if (e1->type == E_UNEQUAL && e2->type == E_UNEQUAL &&
+ 			   ((e1->right.sym == &symbol_yes && e2->right.sym == &symbol_no) ||
+ 			    (e1->right.sym == &symbol_no && e2->right.sym == &symbol_yes)))
+-			// (a!='y') && (a!='n') -> (a='m')
++			/* (a!='y') && (a!='n') -> (a='m') */
+ 			return expr_alloc_comp(E_EQUAL, sym1, &symbol_mod);
+ 
+ 		if (e1->type == E_UNEQUAL && e2->type == E_UNEQUAL &&
+ 			   ((e1->right.sym == &symbol_yes && e2->right.sym == &symbol_mod) ||
+ 			    (e1->right.sym == &symbol_mod && e2->right.sym == &symbol_yes)))
+-			// (a!='y') && (a!='m') -> (a='n')
++			/* (a!='y') && (a!='m') -> (a='n') */
+ 			return expr_alloc_comp(E_EQUAL, sym1, &symbol_no);
+ 
+ 		if (e1->type == E_UNEQUAL && e2->type == E_UNEQUAL &&
+ 			   ((e1->right.sym == &symbol_mod && e2->right.sym == &symbol_no) ||
+ 			    (e1->right.sym == &symbol_no && e2->right.sym == &symbol_mod)))
+-			// (a!='m') && (a!='n') -> (a='m')
++			/* (a!='m') && (a!='n') -> (a='y') */
+ 			return expr_alloc_comp(E_EQUAL, sym1, &symbol_yes);
+ 
+ 		if ((e1->type == E_SYMBOL && e2->type == E_EQUAL && e2->right.sym == &symbol_mod) ||
+@@ -641,7 +641,7 @@ struct expr *expr_transform(struct expr *e)
+ 	case E_NOT:
+ 		switch (e->left.expr->type) {
+ 		case E_NOT:
+-			// !!a -> a
++			/* !!a -> a */
+ 			tmp = e->left.expr->left.expr;
+ 			free(e->left.expr);
+ 			free(e);
+@@ -650,14 +650,14 @@ struct expr *expr_transform(struct expr *e)
+ 			break;
+ 		case E_EQUAL:
+ 		case E_UNEQUAL:
+-			// !a='x' -> a!='x'
++			/* !a='x' -> a!='x' */
+ 			tmp = e->left.expr;
+ 			free(e);
+ 			e = tmp;
+ 			e->type = e->type == E_EQUAL ? E_UNEQUAL : E_EQUAL;
+ 			break;
+ 		case E_OR:
+-			// !(a || b) -> !a && !b
++			/* !(a || b) -> !a && !b */
+ 			tmp = e->left.expr;
+ 			e->type = E_AND;
+ 			e->right.expr = expr_alloc_one(E_NOT, tmp->right.expr);
+@@ -666,7 +666,7 @@ struct expr *expr_transform(struct expr *e)
+ 			e = expr_transform(e);
+ 			break;
+ 		case E_AND:
+-			// !(a && b) -> !a || !b
++			/* !(a && b) -> !a || !b */
+ 			tmp = e->left.expr;
+ 			e->type = E_OR;
+ 			e->right.expr = expr_alloc_one(E_NOT, tmp->right.expr);
+@@ -676,7 +676,7 @@ struct expr *expr_transform(struct expr *e)
+ 			break;
+ 		case E_SYMBOL:
+ 			if (e->left.expr->left.sym == &symbol_yes) {
+-				// !'y' -> 'n'
++				/* !'y' -> 'n' */
+ 				tmp = e->left.expr;
+ 				free(e);
+ 				e = tmp;
+@@ -685,7 +685,7 @@ struct expr *expr_transform(struct expr *e)
+ 				break;
+ 			}
+ 			if (e->left.expr->left.sym == &symbol_mod) {
+-				// !'m' -> 'm'
++				/* !'m' -> 'm' */
+ 				tmp = e->left.expr;
+ 				free(e);
+ 				e = tmp;
+@@ -694,7 +694,7 @@ struct expr *expr_transform(struct expr *e)
+ 				break;
+ 			}
+ 			if (e->left.expr->left.sym == &symbol_no) {
+-				// !'n' -> 'y'
++				/* !'n' -> 'y' */
+ 				tmp = e->left.expr;
+ 				free(e);
+ 				e = tmp;
 -- 
-paul moore
-www.paul-moore.com
+1.8.3.2
 
