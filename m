@@ -1,50 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.mei.co.jp ([133.183.100.20]:57246 "EHLO smtp.mei.co.jp"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754235AbaDQCsD (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 16 Apr 2014 22:48:03 -0400
-Received: from mail-gw.jp.panasonic.com ([157.8.1.157])
-	by smtp.mei.co.jp (8.12.11.20060614/3.7W/kc-maile14) with ESMTP id s3H2m1eR021176
-	for <linux-kbuild@vger.kernel.org>; Thu, 17 Apr 2014 11:48:01 +0900 (JST)
-Received: from epochmail.jp.panasonic.com ([157.8.1.130])
-	by mail.jp.panasonic.com (8.11.6p2/3.7W/kc-maili17) with ESMTP id s3H2m1310138
-	for <linux-kbuild@vger.kernel.org>; Thu, 17 Apr 2014 11:48:01 +0900
-From: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Subject: [PATCH] kbuild: do not add "selinux" to subdir- twice
-Date: Thu, 17 Apr 2014 11:47:47 +0900
-Message-Id: <1397702867-973-1-git-send-email-yamada.m@jp.panasonic.com>
+Received: from mail-qa0-f51.google.com ([209.85.216.51]:49556 "EHLO
+	mail-qa0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750893AbaDRBl4 (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 17 Apr 2014 21:41:56 -0400
+Received: by mail-qa0-f51.google.com with SMTP id j7so1080301qaq.24
+        for <linux-kbuild@vger.kernel.org>; Thu, 17 Apr 2014 18:41:56 -0700 (PDT)
+From: Paul Moore <paul@paul-moore.com>
+Subject: Re: [PATCH] selinux, kbuild: remove unnecessary $(hostprogs-y) from clean-files
+Date: Thu, 17 Apr 2014 21:41:53 -0400
+Message-ID: <5709743.58aAPSG601@sifl>
+In-Reply-To: <1397702546-25349-1-git-send-email-yamada.m@jp.panasonic.com>
+References: <1397702546-25349-1-git-send-email-yamada.m@jp.panasonic.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
+To: selinux@tycho.nsa.gov, linux-kbuild@vger.kernel.org
 Cc: Masahiro Yamada <yamada.m@jp.panasonic.com>
 
-scripts/Makefile adds "selinux" to subdir-y or subdir- twice.
+On Thursday, April 17, 2014 11:42:26 AM Masahiro Yamada wrote:
+> Files added to hostprogs-y are cleaned. (See scripts/Makefile.clean)
+> Adding them to clean-files is redundant.
+> 
+> Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
+> ---
+> 
+>  scripts/selinux/genheaders/Makefile | 1 -
+>  scripts/selinux/mdp/Makefile        | 2 +-
+>  2 files changed, 1 insertion(+), 2 deletions(-)
 
-  subdir-$(CONFIG_MODVERSIONS) += genksyms
-  subdir-y                     += mod
-  subdir-$(CONFIG_SECURITY_SELINUX) += selinux    <--- here
-  subdir-$(CONFIG_DTC)         += dtc
-
-  # Let clean descend into subdirs
-  subdir- += basic kconfig package selinux        <--- again
-
-The latter is redundant.
-
-Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
----
- scripts/Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/scripts/Makefile b/scripts/Makefile
-index 1d07860..890df5c 100644
---- a/scripts/Makefile
-+++ b/scripts/Makefile
-@@ -39,4 +39,4 @@ subdir-$(CONFIG_SECURITY_SELINUX) += selinux
- subdir-$(CONFIG_DTC)         += dtc
+Acked-by: Paul Moore <paul@paul-moore.com>
  
- # Let clean descend into subdirs
--subdir-	+= basic kconfig package selinux
-+subdir-	+= basic kconfig package
+> diff --git a/scripts/selinux/genheaders/Makefile
+> b/scripts/selinux/genheaders/Makefile index 417b165..1d1ac51 100644
+> --- a/scripts/selinux/genheaders/Makefile
+> +++ b/scripts/selinux/genheaders/Makefile
+> @@ -2,4 +2,3 @@ hostprogs-y	:= genheaders
+>  HOST_EXTRACFLAGS += -Isecurity/selinux/include
+> 
+>  always		:= $(hostprogs-y)
+> -clean-files	:= $(hostprogs-y)
+> diff --git a/scripts/selinux/mdp/Makefile b/scripts/selinux/mdp/Makefile
+> index eb365b3..dba7eff 100644
+> --- a/scripts/selinux/mdp/Makefile
+> +++ b/scripts/selinux/mdp/Makefile
+> @@ -2,4 +2,4 @@ hostprogs-y	:= mdp
+>  HOST_EXTRACFLAGS += -Isecurity/selinux/include
+> 
+>  always		:= $(hostprogs-y)
+> -clean-files	:= $(hostprogs-y) policy.* file_contexts
+> +clean-files	:= policy.* file_contexts
+
 -- 
-1.8.3.2
+paul moore
+www.paul-moore.com
 
