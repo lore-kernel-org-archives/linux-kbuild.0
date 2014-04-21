@@ -1,44 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.web.de ([212.227.17.11]:56321 "EHLO mout.web.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1161026AbaDRVkr (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 18 Apr 2014 17:40:47 -0400
-From: Martin Walch <walch.martin@web.de>
-Subject: [PATCH v2 0/2] kconfig: Remove bad inference rules expr_eliminate_dups2()
-Date: Fri, 18 Apr 2014 23:33:55 +0200
-Message-ID: <6889353.LzkExyTh9u@tacticalops>
+Received: from mail-lb0-f181.google.com ([209.85.217.181]:55899 "EHLO
+	mail-lb0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750774AbaDUIDR (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 21 Apr 2014 04:03:17 -0400
+Subject: [PATCH] scripts/tags.sh: ignore code of user space tools
+From: Konstantin Khlebnikov <koct9i@gmail.com>
+Date: Mon, 21 Apr 2014 12:03:08 +0400
+Message-ID: <20140421080308.14562.30914.stgit@zurg>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, "Yann E. MORIN" <yann.morin.1998@free.fr>
+To: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.cz>, Andrew Morton <akpm@linux-foundation.org>, Ingo Molnar <mingo@kernel.org>
 
-So far, I have not seen any answers to the first version of this patch.
-Accordingly, v2 contains only few changes.
+User space code in tools/ often reuses names of kernel constructions,
+this confuses navigation in the normal kernel code. Let's fix this mess.
 
-PATCH 1: Remove expr_eliminate_dups2() and other related code.
-This does not seem to actually affect the behaviour when using Kconfig files
-from the mainline kernel. But there is a slight possibility that there are
-configuration files in other branches or in other projects that use the Linux
-Kernel configuration system that may be affected or may even rely on the
-behaviour. So, there is a small chance to break something somewhere (on the
-other hand, there is also a small chance to fix something somewhere). Maybe
-some warning should be documented in case this patch gets accepted?
-v2 updates line numbers after latest changes
+Signed-off-by: Konstantin Khlebnikov <koct9i@gmail.com>
+---
+ scripts/tags.sh |    3 +++
+ 1 file changed, 3 insertions(+)
 
-PATCH 2: Fix some comments when touching expr.c anyway. No code changes.
-v2 additionally converts C99 style comments to traditional ones.
-
-Martin Walch (2):
-  kconfig: completely remove expr_eliminate_dups2() and related code
-  kconfig: trivial - adjust comments
-
- scripts/kconfig/expr.c | 146 +++++++------------------------------------------
- scripts/kconfig/expr.h |   3 -
- 2 files changed, 19 insertions(+), 130 deletions(-)
-
--- 
-1.8.3.2
+diff --git a/scripts/tags.sh b/scripts/tags.sh
+index f2c5b00..7f506e0 100755
+--- a/scripts/tags.sh
++++ b/scripts/tags.sh
+@@ -25,6 +25,9 @@ else
+ 	tree=${srctree}/
+ fi
+ 
++# ignore userspace tools
++ignore="$ignore ( -path ${tree}tools ) -prune -o"
++
+ # Find all available archs
+ find_all_archs()
+ {
 
