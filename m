@@ -1,41 +1,35 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lb0-f181.google.com ([209.85.217.181]:55899 "EHLO
-	mail-lb0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750774AbaDUIDR (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 21 Apr 2014 04:03:17 -0400
-Subject: [PATCH] scripts/tags.sh: ignore code of user space tools
-From: Konstantin Khlebnikov <koct9i@gmail.com>
-Date: Mon, 21 Apr 2014 12:03:08 +0400
-Message-ID: <20140421080308.14562.30914.stgit@zurg>
+Received: from ozlabs.org ([103.22.144.67]:39356 "EHLO ozlabs.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752329AbaDVHjL (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 22 Apr 2014 03:39:11 -0400
+From: Rusty Russell <rusty@rustcorp.com.au>
+Subject: Re: [PATCH] modpost: Fix ressource leak in read_dump()
+In-Reply-To: <53441149.8010902@suse.cz>
+References: <20140406003649.1ba3c993@spike> <20140406000512.GS32556@tassilo.jf.intel.com> <53441149.8010902@suse.cz>
+Date: Tue, 22 Apr 2014 16:56:41 +0930
+Message-ID: <87sip5hlji.fsf@rustcorp.com.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
-Cc: Michal Marek <mmarek@suse.cz>, Andrew Morton <akpm@linux-foundation.org>, Ingo Molnar <mingo@kernel.org>
+To: Michal Marek <mmarek@suse.cz>, Andi Kleen <ak@linux.intel.com>, Christian Engelmayer <cengelma@gmx.at>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-User space code in tools/ often reuses names of kernel constructions,
-this confuses navigation in the normal kernel code. Let's fix this mess.
+Michal Marek <mmarek@suse.cz> writes:
 
-Signed-off-by: Konstantin Khlebnikov <koct9i@gmail.com>
----
- scripts/tags.sh |    3 +++
- 1 file changed, 3 insertions(+)
+> On 2014-04-06 02:05, Andi Kleen wrote:
+>> On Sun, Apr 06, 2014 at 12:36:49AM +0200, Christian Engelmayer wrote:
+>>> Function read_dump() memory maps the input via grab_file(), but fails to call
+>>> the corresponding unmap function. Add the missing call to release_file().
+>>> Detected by Coverity: CID 1192419
+>> 
+>> It doesn't matter at all. All memory is freed on exit() in this program.
+>
+> The leak can disturb in valgrind output.
 
-diff --git a/scripts/tags.sh b/scripts/tags.sh
-index f2c5b00..7f506e0 100755
---- a/scripts/tags.sh
-+++ b/scripts/tags.sh
-@@ -25,6 +25,9 @@ else
- 	tree=${srctree}/
- fi
- 
-+# ignore userspace tools
-+ignore="$ignore ( -path ${tree}tools ) -prune -o"
-+
- # Find all available archs
- find_all_archs()
- {
+Yeah.  If release_file() didn't exist at all, I'd agree with Andi.  As
+it is, I've queued the patch (with typo in title fixed).
 
+Thanks!
+Rusty.
