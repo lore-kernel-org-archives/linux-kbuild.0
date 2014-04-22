@@ -1,35 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([103.22.144.67]:39356 "EHLO ozlabs.org"
+Received: from gloria.sntech.de ([95.129.55.99]:38855 "EHLO gloria.sntech.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752329AbaDVHjL (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 22 Apr 2014 03:39:11 -0400
-From: Rusty Russell <rusty@rustcorp.com.au>
-Subject: Re: [PATCH] modpost: Fix ressource leak in read_dump()
-In-Reply-To: <53441149.8010902@suse.cz>
-References: <20140406003649.1ba3c993@spike> <20140406000512.GS32556@tassilo.jf.intel.com> <53441149.8010902@suse.cz>
-Date: Tue, 22 Apr 2014 16:56:41 +0930
-Message-ID: <87sip5hlji.fsf@rustcorp.com.au>
+	id S1752183AbaDVINe convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 22 Apr 2014 04:13:34 -0400
+From: Heiko =?ISO-8859-1?Q?St=FCbner?= <heiko@sntech.de>
+Subject: Re: [RFC PATCH 00/11] Embeddable Position Independent Executable
+Date: Tue, 22 Apr 2014 10:15:09 +0200
+Message-ID: <1441820.DP5PYDOd2T@phil>
+In-Reply-To: <201310241009.12597.heiko@sntech.de>
+References: <1379421817-15759-1-git-send-email-Russ.Dill@ti.com> <201310241009.12597.heiko@sntech.de>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>, Andi Kleen <ak@linux.intel.com>, Christian Engelmayer <cengelma@gmx.at>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Russ Dill <Russ.Dill@ti.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-omap@vger.kernel.org, mans@mansr.com, Russell King - ARM Linux <linux@arm.linux.org.uk>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, linux-kbuild@vger.kernel.org, Shawn Guo <shawn.guo@linaro.org>, Dave Martin <Dave.Martin@arm.com>
 
-Michal Marek <mmarek@suse.cz> writes:
+Hi Russ,
 
-> On 2014-04-06 02:05, Andi Kleen wrote:
->> On Sun, Apr 06, 2014 at 12:36:49AM +0200, Christian Engelmayer wrote:
->>> Function read_dump() memory maps the input via grab_file(), but fails to call
->>> the corresponding unmap function. Add the missing call to release_file().
->>> Detected by Coverity: CID 1192419
->> 
->> It doesn't matter at all. All memory is freed on exit() in this program.
->
-> The leak can disturb in valgrind output.
+Am Donnerstag, 24. Oktober 2013, 10:09:12 schrieb Heiko Stübner:
+> Am Dienstag, 17. September 2013, 14:43:26 schrieb Russ Dill:
+> > This patch adds support for and demonstrates the usage of an embedded
+> > position independent executable (PIE). The goal is to allow the use of C
+> > code in situations where carefully written position independent assembly
+> > was previously required.
+> 
+> As suggested yesterday evening by Kevin Hilman, just adding my 2ct of
+> support.
+> 
+> This series looks exactly like the foundation I'll need at some point in the
+> (probably still distant) future to handle suspend on my Rockchip platform -
+> where like in your example stuff like putting the ram into selfrefresh has
+> to be done by the os.
 
-Yeah.  If release_file() didn't exist at all, I'd agree with Andi.  As
-it is, I've queued the patch (with typo in title fixed).
+just as it came up recently again for me and I couldn't find any newer version, 
+ist this series still on the table?
 
-Thanks!
-Rusty.
+
+Thanks
+Heiko
