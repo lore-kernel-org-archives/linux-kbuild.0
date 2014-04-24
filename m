@@ -1,43 +1,29 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from gloria.sntech.de ([95.129.55.99]:38855 "EHLO gloria.sntech.de"
+Received: from cantor2.suse.de ([195.135.220.15]:52248 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752183AbaDVINe convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 22 Apr 2014 04:13:34 -0400
-From: Heiko =?ISO-8859-1?Q?St=FCbner?= <heiko@sntech.de>
-Subject: Re: [RFC PATCH 00/11] Embeddable Position Independent Executable
-Date: Tue, 22 Apr 2014 10:15:09 +0200
-Message-ID: <1441820.DP5PYDOd2T@phil>
-In-Reply-To: <201310241009.12597.heiko@sntech.de>
-References: <1379421817-15759-1-git-send-email-Russ.Dill@ti.com> <201310241009.12597.heiko@sntech.de>
+	id S1753211AbaDXNR3 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 24 Apr 2014 09:17:29 -0400
+Message-ID: <53590EE7.9070108@suse.cz>
+Date: Thu, 24 Apr 2014 15:17:27 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8BIT
-Content-Type: text/plain; charset="iso-8859-1"
+Subject: Re: [PATCH] scripts/tags.sh: ignore code of user space tools
+References: <20140421080308.14562.30914.stgit@zurg>
+In-Reply-To: <20140421080308.14562.30914.stgit@zurg>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Russ Dill <Russ.Dill@ti.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-omap@vger.kernel.org, mans@mansr.com, Russell King - ARM Linux <linux@arm.linux.org.uk>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, linux-kbuild@vger.kernel.org, Shawn Guo <shawn.guo@linaro.org>, Dave Martin <Dave.Martin@arm.com>
+To: Konstantin Khlebnikov <koct9i@gmail.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+Cc: Andrew Morton <akpm@linux-foundation.org>, Ingo Molnar <mingo@kernel.org>
 
-Hi Russ,
-
-Am Donnerstag, 24. Oktober 2013, 10:09:12 schrieb Heiko Stübner:
-> Am Dienstag, 17. September 2013, 14:43:26 schrieb Russ Dill:
-> > This patch adds support for and demonstrates the usage of an embedded
-> > position independent executable (PIE). The goal is to allow the use of C
-> > code in situations where carefully written position independent assembly
-> > was previously required.
+On 2014-04-21 10:03, Konstantin Khlebnikov wrote:
+> User space code in tools/ often reuses names of kernel constructions,
+> this confuses navigation in the normal kernel code. Let's fix this mess.
 > 
-> As suggested yesterday evening by Kevin Hilman, just adding my 2ct of
-> support.
-> 
-> This series looks exactly like the foundation I'll need at some point in the
-> (probably still distant) future to handle suspend on my Rockchip platform -
-> where like in your example stuff like putting the ram into selfrefresh has
-> to be done by the os.
+> Signed-off-by: Konstantin Khlebnikov <koct9i@gmail.com>
 
-just as it came up recently again for me and I couldn't find any newer version, 
-ist this series still on the table?
+Applied to kbuild.git#misc, thanks.
 
+Michal
 
-Thanks
-Heiko
