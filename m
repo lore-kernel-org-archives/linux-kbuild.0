@@ -1,28 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:47980 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1759366AbaD3Pgh (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 30 Apr 2014 11:36:37 -0400
-Date: Wed, 30 Apr 2014 17:36:36 +0200
-From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] kbuild: trivial - fix comment block indent
-Message-ID: <20140430153636.GC31256@sepie.suse.cz>
-References: <1398670363-30879-1-git-send-email-yamada.m@jp.panasonic.com>
+Received: from asavdk3.altibox.net ([109.247.116.14]:41763 "EHLO
+	asavdk3.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1422657AbaD3QMJ (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 30 Apr 2014 12:12:09 -0400
+Date: Wed, 30 Apr 2014 18:12:04 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH 1/5] firmware: Simplify directory creation
+Message-ID: <20140430161204.GA15320@ravnborg.org>
+References: <1398780493-15391-1-git-send-email-mmarek@suse.cz>
+ <1398780493-15391-2-git-send-email-mmarek@suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1398670363-30879-1-git-send-email-yamada.m@jp.panasonic.com>
+In-Reply-To: <1398780493-15391-2-git-send-email-mmarek@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Cc: linux-kbuild@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, David Woodhouse <dwmw2@infradead.org>
 
-On Mon, Apr 28, 2014 at 04:32:43PM +0900, Masahiro Yamada wrote:
-> Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
-> ---
->  Makefile | 33 ++++++++++++++++-----------------
->  1 file changed, 16 insertions(+), 17 deletions(-)
+On Tue, Apr 29, 2014 at 04:08:09PM +0200, Michal Marek wrote:
+> When building the firmware blobs, use a simple loop to create
+> directories in $(objtree), like in Makefile.build. This simplifies the
+> rules and also makes it possible to set $(objtree) to '.' later. Before
+> this change, a dependency on $(objtree)/<dir> would be satisfied by
+> <dir> in $(srctree).
+> 
+> When installing the firmware blobs, call mkdir like in Makefile.modinst.
+> 
+> Cc: David Woodhouse <dwmw2@infradead.org>
+> Signed-off-by: Michal Marek <mmarek@suse.cz>
 
-Applied to kbuild.git#kbuild, thanks.
+Hi Michal.
 
-Michal
+The patch looks good. I di not stare enough to fully grasp it,
+but it is a nice cleanup.
+
+	Sam
