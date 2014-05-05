@@ -1,27 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from [162.222.106.162] ([162.222.106.162]:37834 "EHLO ns1.bing.com"
-	rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1751128AbaECNiE (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 3 May 2014 09:38:04 -0400
-Message-ID: <281f66fefbbe04055c78ea619c75c388.squirrel@162.222.106.162>
-Date: Sat, 3 May 2014 12:20:40 -0000
-Subject: Please Acknowledge My Proposal
-From: "Gva Abogados" <Molly.Mee@acf.hhs.gov>
-Reply-To: jdomingosanchez@aim.com
+Received: from cantor2.suse.de ([195.135.220.15]:44303 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S932448AbaEEOw2 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 5 May 2014 10:52:28 -0400
+Message-ID: <5367A5AA.5070502@suse.cz>
+Date: Mon, 05 May 2014 16:52:26 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
+Subject: Re: [PATCH 1/5] firmware: Simplify directory creation
+References: <1398780493-15391-1-git-send-email-mmarek@suse.cz> <1398780493-15391-2-git-send-email-mmarek@suse.cz> <20140430161204.GA15320@ravnborg.org>
+In-Reply-To: <20140430161204.GA15320@ravnborg.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, David Woodhouse <dwmw2@infradead.org>
 
-Please Acknowledge My Proposal!!
+On 2014-04-30 18:12, Sam Ravnborg wrote:
+> On Tue, Apr 29, 2014 at 04:08:09PM +0200, Michal Marek wrote:
+>> When building the firmware blobs, use a simple loop to create
+>> directories in $(objtree), like in Makefile.build. This simplifies the
+>> rules and also makes it possible to set $(objtree) to '.' later. Before
+>> this change, a dependency on $(objtree)/<dir> would be satisfied by
+>> <dir> in $(srctree).
+>>
+>> When installing the firmware blobs, call mkdir like in Makefile.modinst.
+>>
+>> Cc: David Woodhouse <dwmw2@infradead.org>
+>> Signed-off-by: Michal Marek <mmarek@suse.cz>
+> 
+> Hi Michal.
+> 
+> The patch looks good. I di not stare enough to fully grasp it,
+> but it is a nice cleanup.
 
-My name is Mr. Juan Martin Domingo a lawyer resident in Spain. I am
-writing to let you know I have some FUNDS I want to transfer and am
-seeking if you can be a beneficiary...Do not hesitate to Contact me for
-more information if interested: gva_abogados@aim.com
+Previously, there were make rules for
 
-Sincerely
-Juan Martin Domingo.
-Domijdo@aim.com
+$(objtree)/firmware/<dir>
+
+to create each <dir> under firmware. If we change $(objtree) to '.', the
+rule becomes ./firmware/<dir>, but since there already is
+$(srctree)/firmware/<dir> and VPATH is set to $(srctree), the rule will
+be satisfied by the directory in the $(srctree) and no directory in
+$(objtree) will be created. So I changed it to create the directories
+unconditionally when parsing the Makefile, just like
+scripts/Makefile.build does it.
+
+Michal
 
