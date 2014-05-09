@@ -1,71 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:34653 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752840AbaEHUoK (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 8 May 2014 16:44:10 -0400
-Date: Thu, 8 May 2014 22:44:08 +0200
-From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH 0/5] kbuild: Use relative paths if possible
-Message-ID: <20140508204408.GA1184@pobox.suse.cz>
-References: <1398780493-15391-1-git-send-email-mmarek@suse.cz> <20140430161358.GB15320@ravnborg.org>
+Received: from mail-la0-f46.google.com ([209.85.215.46]:49206 "EHLO
+	mail-la0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751221AbaEIGml (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 9 May 2014 02:42:41 -0400
+Received: by mail-la0-f46.google.com with SMTP id ec20so119543lab.33
+        for <linux-kbuild@vger.kernel.org>; Thu, 08 May 2014 23:42:40 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20140430161358.GB15320@ravnborg.org>
+In-Reply-To: <CAGNsrLB++mnabWRofV=L1f7dhMeuK13vtXvV29u8jN8FZKxTrA@mail.gmail.com>
+References: <1397562708-7531-1-git-send-email-fathi.boudra@linaro.org>
+	<CAGNsrLB++mnabWRofV=L1f7dhMeuK13vtXvV29u8jN8FZKxTrA@mail.gmail.com>
+Date: Fri, 9 May 2014 09:42:39 +0300
+Message-ID: <CAGNsrLAGM1+RDWX0+bq5gHP13sm1vaoFXiAy_95=VF6NiijyWg@mail.gmail.com>
+Subject: Re: [PATCH v2] builddeb: fix missing headers in linux-headers package
+From: Fathi Boudra <fathi.boudra@linaro.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-kbuild <linux-kbuild@vger.kernel.org>
+Cc: Michal Marek <mmarek@suse.cz>, Ben Hutchings <ben@decadent.org.uk>, Fathi Boudra <fathi.boudra@linaro.org>
 
-On Wed, Apr 30, 2014 at 06:13:59PM +0200, Sam Ravnborg wrote:
-> On Tue, Apr 29, 2014 at 04:08:08PM +0200, Michal Marek wrote:
-> > Hi,
-> > 
-> > This series changes the Makefile to use relative paths for $(objtree),
-> > always setting it to '.', and for $(srctree) setting either to '.' or
-> > '..', when building in the source tree or a subdirectory thereof,
-> > respectively. The goal is to make compiler messages and Ooopses more
-> > readable by avoiding the full path to the source/object directory.
-> > 
-> > Patch 2/5 is just an unrelated cleanup.
-> > 
-> > Michal
-> > 
-> > Michal Marek (5):
-> >   firmware: Simplify directory creation
-> >   firmware: Use $(quote) in the Makefile
-> >   kbuild: Use relative path for $(objtree)
-> >   kbuild: Use relative path when building in the source tree
-> >   kbuild: Use relative path when building in a subdir of the source tree
-> 
-> For patch 2,3,4 and 5 you can add my:
-> Acked-by: Sam Ravnborg <sam@ravnborg.org>
-> 
-> Patch 1 also looks good, but I did not fully grasp it and this is MO
-> implied by an ack. So please do not hold it back due to this as
-> the cleanup looked good.
+gentle ping
 
-I found a bug caused by 3/5 and 4/5: The source and build symlinks
-created by modules_install were wrong. The fix is simple:
-
-diff --git a/Makefile b/Makefile
-index 3d311b6..9872c53 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1064,10 +1064,10 @@ _modinst_:
- 	@rm -rf $(MODLIB)/kernel
- 	@rm -f $(MODLIB)/source
- 	@mkdir -p $(MODLIB)/kernel
--	@ln -s $(srctree) $(MODLIB)/source
-+	@ln -s `cd $(srctree) && /bin/pwd` $(MODLIB)/source
- 	@if [ ! $(objtree) -ef  $(MODLIB)/build ]; then \
- 		rm -f $(MODLIB)/build ; \
--		ln -s $(objtree) $(MODLIB)/build ; \
-+		ln -s $(CURDIR) $(MODLIB)/build ; \
- 	fi
- 	@cp -f $(objtree)/modules.order $(MODLIB)/
- 	@cp -f $(objtree)/modules.builtin $(MODLIB)/
-
-I will fold it into the respective patches and send a V2.
-
-Michal
+On 25 April 2014 09:12, Fathi Boudra <fathi.boudra@linaro.org> wrote:
+> Ben, Michal, what about this patch?
+>
+> On 15 April 2014 14:51, Fathi Boudra <fathi.boudra@linaro.org> wrote:
+>> The kernel headers package (linux-headers) doesn't include several
+>> header files required to build out-of-tree modules.
+>>
+>> It makes the package unusable on e.g. ARM architecture:
+>>  /usr/src/linux-headers-3.14.0/arch/arm/include/asm/memory.h:24:25:
+>>  fatal error: mach/memory.h: No such file or directory
+>>  #include <mach/memory.h>
+>>  ^
+>>  compilation terminated.
+>>
+>> Signed-off-by: Fathi Boudra <fathi.boudra@linaro.org>
+>> ---
+>>  Changes from v1:
+>>  - add missing module.lds, mips/Kbuild.platforms and Platform files
+>>  - generically look for all include directories in arch/$SRCARCH
+>>
+>>  scripts/package/builddeb | 4 +++-
+>>  1 file changed, 3 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+>> index f46e4dd..42b1e20 100644
+>> --- a/scripts/package/builddeb
+>> +++ b/scripts/package/builddeb
+>> @@ -287,9 +287,11 @@ EOF
+>>
+>>  fi
+>>
+>> -# Build header package
+>> +# Build kernel header package
+>>  (cd $srctree; find . -name Makefile\* -o -name Kconfig\* -o -name \*.pl > "$objtree/debian/hdrsrcfiles")
+>>  (cd $srctree; find arch/$SRCARCH/include include scripts -type f >> "$objtree/debian/hdrsrcfiles")
+>> +(cd $srctree; find arch/$SRCARCH -name module.lds -o -name Kbuild.platforms -o -name Platform >> "$objtree/debian/hdrsrcfiles")
+>> +(cd $srctree; find $(find arch/$SRCARCH -name include -o -name scripts -type d) -type f >> "$objtree/debian/hdrsrcfiles")
+>>  (cd $objtree; find arch/$SRCARCH/include Module.symvers include scripts -type f >> "$objtree/debian/hdrobjfiles")
+>>  destdir=$kernel_headers_dir/usr/src/linux-headers-$version
+>>  mkdir -p "$destdir"
+>> --
+>> 1.9.1
