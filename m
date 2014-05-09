@@ -1,41 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:43997 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:44003 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750887AbaEIMwg (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 9 May 2014 08:52:36 -0400
+	id S1750887AbaEIMwj (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 9 May 2014 08:52:39 -0400
 From: Michal Marek <mmarek@suse.cz>
-Subject: [PATCH v2 0/5] kbuild: Use relative paths if possible
-Date: Fri,  9 May 2014 14:52:19 +0200
-Message-Id: <1399639944-20551-1-git-send-email-mmarek@suse.cz>
+Subject: [PATCH v2 2/5] firmware: Use $(quote) in the Makefile
+Date: Fri,  9 May 2014 14:52:21 +0200
+Message-Id: <1399639944-20551-3-git-send-email-mmarek@suse.cz>
+In-Reply-To: <1399639944-20551-1-git-send-email-mmarek@suse.cz>
+References: <1399639944-20551-1-git-send-email-mmarek@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>
+Cc: linux-kernel@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, David Woodhouse <dwmw2@infradead.org>
 
-Hi,
+The literal " confuses syntax highlighting in vim.
 
-This series changes the Makefile to use relative paths for $(objtree),
-always setting it to '.', and for $(srctree) setting either to '.' or
-'..', when building in the source tree or a subdirectory thereof,
-respectively. The goal is to make compiler messages and Oopses more
-readable by avoiding the full path to the source/object directory.
+Cc: David Woodhouse <dwmw2@infradead.org>
+Acked-by: Sam Ravnborg <sam@ravnborg.org>
+Signed-off-by: Michal Marek <mmarek@suse.cz>
+---
+v1->v2: No changes
 
-Patch 2/5 is just an unrelated cleanup.
+ firmware/Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-v1->v2: Fix the 'build' and 'source' symlinks in /lib/modules
-
-Michal Marek (5):
-  firmware: Simplify directory creation
-  firmware: Use $(quote) in the Makefile
-  kbuild: Use relative path for $(objtree)
-  kbuild: Use relative path when building in the source tree
-  kbuild: Use relative path when building in a subdir of the source tree
-
- Makefile                | 18 ++++++++++++++----
- firmware/Makefile       | 34 +++++++---------------------------
- scripts/Makefile.fwinst | 24 +++++++++++-------------
- 3 files changed, 32 insertions(+), 44 deletions(-)
-
+diff --git a/firmware/Makefile b/firmware/Makefile
+index 6af62cf..5747417 100644
+--- a/firmware/Makefile
++++ b/firmware/Makefile
+@@ -4,10 +4,10 @@
+ 
+ # Create $(fwabs) from $(CONFIG_EXTRA_FIRMWARE_DIR) -- if it doesn't have a
+ # leading /, it's relative to $(srctree).
+-fwdir := $(subst ",,$(CONFIG_EXTRA_FIRMWARE_DIR))
++fwdir := $(subst $(quote),,$(CONFIG_EXTRA_FIRMWARE_DIR))
+ fwabs := $(addprefix $(srctree)/,$(filter-out /%,$(fwdir)))$(filter /%,$(fwdir))
+ 
+-fw-external-y := $(subst ",,$(CONFIG_EXTRA_FIRMWARE))
++fw-external-y := $(subst $(quote),,$(CONFIG_EXTRA_FIRMWARE))
+ 
+ # There are three cases to care about:
+ # 1. Building kernel with CONFIG_FIRMWARE_IN_KERNEL=y -- $(fw-shipped-y) should
 -- 
 1.8.4.5
 
