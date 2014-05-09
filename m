@@ -1,55 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:44008 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755997AbaEIMwm (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 9 May 2014 08:52:42 -0400
-From: Michal Marek <mmarek@suse.cz>
-Subject: [PATCH v2 4/5] kbuild: Use relative path when building in the source tree
-Date: Fri,  9 May 2014 14:52:23 +0200
-Message-Id: <1399639944-20551-5-git-send-email-mmarek@suse.cz>
-In-Reply-To: <1399639944-20551-1-git-send-email-mmarek@suse.cz>
+Received: from asavdk4.altibox.net ([109.247.116.15]:40396 "EHLO
+	asavdk4.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755271AbaEIQwX (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 9 May 2014 12:52:23 -0400
+Date: Fri, 9 May 2014 18:51:58 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH v2 1/5] firmware: Simplify directory creation
+Message-ID: <20140509165158.GA9486@ravnborg.org>
 References: <1399639944-20551-1-git-send-email-mmarek@suse.cz>
+ <1399639944-20551-2-git-send-email-mmarek@suse.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1399639944-20551-2-git-send-email-mmarek@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, David Woodhouse <dwmw2@infradead.org>
 
-When not using O=, $(srctree) refers to the same directory as
-$(objtree), so we can set it to '.' as well. This makes the default
-include path more compact and results in more readable messages from the
-compiler. The only case where we need the absolute path is when creating
-the 'source' symlink in /lib/modules.
+On Fri, May 09, 2014 at 02:52:20PM +0200, Michal Marek wrote:
+> When building the firmware blobs, use a simple loop to create
+> directories in $(objtree), like in Makefile.build. This simplifies the
+> rules and also makes it possible to set $(objtree) to '.' later. Before
+> this change, a dependency on $(objtree)/<dir> would be satisfied by
+> <dir> in $(srctree).
+> 
+> When installing the firmware blobs, call mkdir like in Makefile.modinst.
+> 
+> Cc: David Woodhouse <dwmw2@infradead.org>
+> Cc: Sam Ravnborg <sam@ravnborg.org>
+> Signed-off-by: Michal Marek <mmarek@suse.cz>
+Looks good!
+This time I spent a little time to actually look through the code - and it
+end up being much simpler than before.
 
 Acked-by: Sam Ravnborg <sam@ravnborg.org>
-Signed-off-by: Michal Marek <mmarek@suse.cz>
----
-v1->v2: Fix the 'source' symlink
 
- Makefile | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 480503a..4da1c4b 100644
---- a/Makefile
-+++ b/Makefile
-@@ -153,7 +153,7 @@ else
- _all: modules
- endif
- 
--srctree		:= $(if $(KBUILD_SRC),$(KBUILD_SRC),$(CURDIR))
-+srctree		:= $(if $(KBUILD_SRC),$(KBUILD_SRC),.)
- objtree		:= .
- src		:= $(srctree)
- obj		:= $(objtree)
-@@ -1054,7 +1054,7 @@ _modinst_:
- 	@rm -rf $(MODLIB)/kernel
- 	@rm -f $(MODLIB)/source
- 	@mkdir -p $(MODLIB)/kernel
--	@ln -s $(srctree) $(MODLIB)/source
-+	@ln -s `cd $(srctree) && /bin/pwd` $(MODLIB)/source
- 	@if [ ! $(objtree) -ef  $(MODLIB)/build ]; then \
- 		rm -f $(MODLIB)/build ; \
- 		ln -s $(CURDIR) $(MODLIB)/build ; \
--- 
-1.8.4.5
-
+	Sam
