@@ -1,82 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from asavdk4.altibox.net ([109.247.116.15]:33391 "EHLO
-	asavdk4.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754825AbaEKHbi (ORCPT
+Received: from mail-qa0-f41.google.com ([209.85.216.41]:50606 "EHLO
+	mail-qa0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757245AbaEKMeX (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 11 May 2014 03:31:38 -0400
-Date: Sun, 11 May 2014 09:31:22 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
+	Sun, 11 May 2014 08:34:23 -0400
+Received: by mail-qa0-f41.google.com with SMTP id dc16so6010852qab.28
+        for <linux-kbuild@vger.kernel.org>; Sun, 11 May 2014 05:34:23 -0700 (PDT)
+Date: Sun, 11 May 2014 08:34:20 -0400
+From: Tejun Heo <tj@kernel.org>
 Subject: Re: Searching for insight into lib-y and lib-m
-Message-ID: <20140511073121.GA31169@ravnborg.org>
+Message-ID: <20140511123420.GA22945@htj.dyndns.org>
 References: <20140511022458.12073.qmail@ns.horizon.com>
+ <536EFC71.3070209@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20140511022458.12073.qmail@ns.horizon.com>
+In-Reply-To: <536EFC71.3070209@infradead.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: George Spelvin <linux@horizon.com>
-Cc: linux-kbuild@vger.kernel.org, tj@kernel.org
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: George Spelvin <linux@horizon.com>, linux-kbuild@vger.kernel.org
 
-Hi George.
+On Sat, May 10, 2014 at 09:28:33PM -0700, Randy Dunlap wrote:
+> > Documentation/kbuild/makefiles.txt suggests that CONFIG_GLOB=m would
+> > be synonymous with CONFIG_GLOB=y in this case, so the net effect would
+> > be identical to case 3.  Am I right?
+> > 
+> 
+> 'git log lib/Makefile' shows me patches that I have submitted where
+> kernel modules were built as loadable modules (=m) and library code was
+> built but then apparently discarded, so the "driver" modules could not
+> load (were missing some needed symbols).
 
-> I'm working on a patch to factor out some useful helper code
-> (specifically, the glob_match() function) from drivers/ata/libata-core.c
-> to a separate file lib/glob.c, so other drivers can use it.  But I'm
-> having a hard time figuring out how to arrange for every caller to be
-> able to call it.
-> 
-> In particular, suppose that CONFIG_ATA=m.  I'm trying to figure out
-> what the various options I have are for handling my new option CONFIG_GLOB.
-> 
-> Here are the four basic possibilities (all combined with "select GLOB"
-> by ATA):
-> 
-> 1) bool GLOB; obj-$(CONFIG_GLOB) += glob.o
-> 
-> I think this will atatically link the glob.o code into the kernel if
-> CONFIG_ATA=y or CONFIG_ATA=m.  So everything will work, but there's no
-> way for an out-of-tree driver to depend on the code if CONFIG_ATA=n.
-> (Not supporting that case for now is definitely an option.)A
-This is the typical way to solve this problem.
-If you prepare your kernel for using a module that uses glob.c then
-you pull in the required function in lib.
-If out-of-tree modles has problems with this solution they
-can fix this by becoming in-tree modules (via staging for example).
+Shouldn't we fix that?  At least for in-kernel modules?
 
-> 2) tristate GLOB; obj-$(CONFIG_GLOB) += glob.o
+> See fcd40d69afea8700eda8cbf381f6d160cf757ebf
+> and b4d3ba3346f092b9185da991414775281ceacaac.
+> I'm sure that there have been others that were similar.
+> These are just the most recent two patches in that category.
+> > 
+> > May I humbly beg some guidance as to the best way to proceed?  My current code
+> > takes option 2 and builds its own module if CONFIG_ATA=m, but people are asking if
+> > that's really necessary.
 > 
-> In this case, if CONFIG_ATA=m, I'll create a separate module glob.ko.
-> I'd need to include <linux/module.h> and add the appropriate module
-> declarations to glob.c.  Lots of code in lib/ seems to do this, but a
-> proliferation if microscopic modules is annoying
-This is overkill for glob.c
+> I don't see a problem with that, but Michal should be able to speak about that.
 
-> 3) bool GLOB; lib-$(CONFIG_GLOB) += glob.o
-> 
-> This is where I get confused.  Documentation/kbuild/makefiles.txt says
-> that glob.o will be included in the library lib.a.
-> 
-> But it then doesn't say anything about what (if anything) is linked
-> against lib.a.  I assume (although it's not actually stated) that vmlinux
-> is linked against it, so the linker will import any called functions.
-This feature is made to support generic implmentations where the
-architecture can provide there own implmentation.
-This is not for drivers to use - becasue this prevents modles from being
-loaded as you also conclude.
+It's more cumbersome and involved.  It's kinda sad to have to do this
+because our lib-* can't handle in-kernel modules.
 
-> 4) tristate GLOB; lib-$(CONFIG_GLOB) += glob.o
-> 
-> Documentation/kbuild/makefiles.txt suggests that CONFIG_GLOB=m would
-> be synonymous with CONFIG_GLOB=y in this case, so the net effect would
-> be identical to case 3.  Am I right?
-Right
+Thanks.
 
-> The follow-on question is how to integrate the self-test code.  I had defined
-> a preprocessor symbol which allowed a standalone "gcc -DUNITTEST glob.c" to
-> make a user-space test driver, but I've been asked to kernelize it.  If using
-> the full module route, I can just use __init code for it, like lib/list_sort.c.
-> But for other options, its less clear.
-Take a look at tools/testing/selftest - this should be the best "kernel" way to do this.
-
-	Sam
+-- 
+tejun
