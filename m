@@ -1,55 +1,35 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f47.google.com ([74.125.82.47]:34803 "EHLO
-	mail-wg0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755144AbaEMWFO (ORCPT
+Received: from asavdk3.altibox.net ([109.247.116.14]:43578 "EHLO
+	asavdk3.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750989AbaENFAl (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 13 May 2014 18:05:14 -0400
-From: Alexis Berlemont <alexis.berlemont@gmail.com>
-Subject: [PATCH 01/34] kbuild: Introduce KBUILD_AUTOCONF variable for auto.conf include
-Date: Wed, 14 May 2014 00:02:56 +0200
-Message-Id: <1400018609-20486-2-git-send-email-alexis.berlemont@gmail.com>
-In-Reply-To: <1400018609-20486-1-git-send-email-alexis.berlemont@gmail.com>
+	Wed, 14 May 2014 01:00:41 -0400
+Date: Wed, 14 May 2014 07:00:21 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH 01/34] kbuild: Introduce KBUILD_AUTOCONF variable for
+ auto.conf include
+Message-ID: <20140514050021.GA13791@ravnborg.org>
 References: <1400018609-20486-1-git-send-email-alexis.berlemont@gmail.com>
+ <1400018609-20486-2-git-send-email-alexis.berlemont@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1400018609-20486-2-git-send-email-alexis.berlemont@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: Jiri Olsa <jolsa@redhat.com>, acme@ghostprotocols.net, dsahern@gmail.com, mingo@kernel.org, Peter Zijlstra <a.p.zijlstra@chello.nl>, Ingo Molnar <mingo@elte.hu>, Paul Mackerras <paulus@samba.org>, Corey Ashford <cjashfor@linux.vnet.ibm.com>, Frederic Weisbecker <fweisbec@gmail.com>, Namhyung Kim <namhyung@kernel.org>, Borislav Petkov <bp@alien8.de>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Stephane Eranian <eranian@google.com>
+To: Alexis Berlemont <alexis.berlemont@gmail.com>
+Cc: linux-kernel@vger.kernel.org, Jiri Olsa <jolsa@redhat.com>, acme@ghostprotocols.net, dsahern@gmail.com, mingo@kernel.org, Peter Zijlstra <a.p.zijlstra@chello.nl>, Ingo Molnar <mingo@elte.hu>, Paul Mackerras <paulus@samba.org>, Corey Ashford <cjashfor@linux.vnet.ibm.com>, Frederic Weisbecker <fweisbec@gmail.com>, Namhyung Kim <namhyung@kernel.org>, Borislav Petkov <bp@alien8.de>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Stephane Eranian <eranian@google.com>
 
-From: Jiri Olsa <jolsa@redhat.com>
+On Wed, May 14, 2014 at 12:02:56AM +0200, Alexis Berlemont wrote:
+> From: Jiri Olsa <jolsa@redhat.com>
+> 
+> Introducing KBUILD_AUTOCONF variable for auto.conf include
+> allowing to specify custom auto.conf file.
 
-Introducing KBUILD_AUTOCONF variable for auto.conf include
-allowing to specify custom auto.conf file.
+What do you need this for?
+And please remember to documet this variable in Documentation/kbuild/...
 
-Signed-off-by: Jiri Olsa <jolsa@redhat.com>
-Cc: Arnaldo Carvalho de Melo <acme@ghostprotocols.net>
-Cc: Peter Zijlstra <a.p.zijlstra@chello.nl>
-Cc: Ingo Molnar <mingo@elte.hu>
-Cc: Paul Mackerras <paulus@samba.org>
-Cc: Corey Ashford <cjashfor@linux.vnet.ibm.com>
-Cc: Frederic Weisbecker <fweisbec@gmail.com>
-Cc: Namhyung Kim <namhyung@kernel.org>
-Cc: Borislav Petkov <bp@alien8.de>
-Cc: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org
-Cc: Stephane Eranian <eranian@google.com>
----
- scripts/Makefile.build | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Have you considered to let kbuild use KCONFIG_AUTOCONFIG that is already
+used by kconfig for the same purpose?
 
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 003bc26..7602c01 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -31,7 +31,8 @@ subdir-asflags-y :=
- subdir-ccflags-y :=
- 
- # Read auto.conf if it exists, otherwise ignore
---include include/config/auto.conf
-+kbuild-autoconf := $(if $(KBUILD_AUTOCONF),$(KBUILD_AUTOCONF),include/config/auto.conf)
-+-include $(kbuild-autoconf)
- 
- include scripts/Kbuild.include
- 
--- 
-1.9.2
-
+	Sam
