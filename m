@@ -1,18 +1,18 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.mei.co.jp ([133.183.100.20]:35851 "EHLO smtp.mei.co.jp"
+Received: from smtp.mei.co.jp ([133.183.100.20]:38008 "EHLO smtp.mei.co.jp"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932714AbaE2FLN (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 29 May 2014 01:11:13 -0400
+	id S932413AbaE2FMc (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 29 May 2014 01:12:32 -0400
 Received: from mail-gw.jp.panasonic.com ([157.8.1.157])
-	by smtp.mei.co.jp (8.12.11.20060614/3.7W/kc-maile11) with ESMTP id s4T5BA6P004729
-	for <linux-kbuild@vger.kernel.org>; Thu, 29 May 2014 14:11:10 +0900 (JST)
+	by smtp.mei.co.jp (8.12.11.20060614/3.7W/kc-maile12) with ESMTP id s4T5CUQg000651
+	for <linux-kbuild@vger.kernel.org>; Thu, 29 May 2014 14:12:30 +0900 (JST)
 Received: from epochmail.jp.panasonic.com ([157.8.1.130])
-	by mail.jp.panasonic.com (8.11.6p2/3.7W/kc-maili15) with ESMTP id s4T5BBB28114
-	for <linux-kbuild@vger.kernel.org>; Thu, 29 May 2014 14:11:11 +0900
+	by mail.jp.panasonic.com (8.11.6p2/3.7W/kc-maili16) with ESMTP id s4T5CUM17404
+	for <linux-kbuild@vger.kernel.org>; Thu, 29 May 2014 14:12:30 +0900
 From: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Subject: [PATCH] kbuild: trivial - use tabs for code indent where possible
-Date: Thu, 29 May 2014 14:11:04 +0900
-Message-Id: <1401340264-15507-1-git-send-email-yamada.m@jp.panasonic.com>
+Subject: [PATCH] kbuild: trivial - remove trailing empty lines
+Date: Thu, 29 May 2014 14:12:29 +0900
+Message-Id: <1401340349-15575-1-git-send-email-yamada.m@jp.panasonic.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
@@ -20,505 +20,272 @@ Cc: Masahiro Yamada <yamada.m@jp.panasonic.com>
 
 Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
 ---
- scripts/basic/fixdep.c               |  8 +++---
- scripts/docproc.c                    | 56 ++++++++++++++++++------------------
- scripts/kallsyms.c                   |  2 +-
- scripts/kconfig/conf.c               |  2 +-
- scripts/kconfig/gconf.c              |  2 +-
- scripts/kconfig/lxdialog/checklist.c |  4 +--
- scripts/kconfig/lxdialog/inputbox.c  |  2 +-
- scripts/kconfig/lxdialog/menubox.c   |  4 +--
- scripts/kconfig/lxdialog/util.c      |  2 +-
- scripts/kconfig/mconf.c              |  2 +-
- scripts/kconfig/menu.c               |  6 ++--
- scripts/kconfig/zconf.l              |  4 +--
- scripts/kconfig/zconf.y              |  2 +-
- scripts/mod/file2alias.c             | 42 +++++++++++++--------------
- scripts/mod/modpost.c                | 30 +++++++++----------
- scripts/mod/sumversion.c             |  4 +--
- scripts/tags.sh                      |  2 +-
- 17 files changed, 86 insertions(+), 88 deletions(-)
+ scripts/Makefile.asm-generic        | 1 -
+ scripts/Makefile.host               | 1 -
+ scripts/checkstack.pl               | 1 -
+ scripts/config                      | 1 -
+ scripts/dtc/.gitignore              | 1 -
+ scripts/dtc/fstree.c                | 1 -
+ scripts/dtc/libfdt/fdt_empty_tree.c | 1 -
+ scripts/dtc/treesource.c            | 1 -
+ scripts/headers.sh                  | 2 --
+ scripts/kconfig/Makefile            | 1 -
+ scripts/kconfig/check.sh            | 1 -
+ scripts/kconfig/mconf.c             | 1 -
+ scripts/kconfig/nconf.c             | 1 -
+ scripts/kconfig/util.c              | 2 --
+ scripts/markup_oops.pl              | 1 -
+ scripts/mksysmap                    | 1 -
+ scripts/mod/.gitignore              | 1 -
+ scripts/mod/mk_elfconfig.c          | 1 -
+ scripts/package/Makefile            | 1 -
+ scripts/package/buildtar            | 1 -
+ scripts/pnmtologo.c                 | 1 -
+ scripts/recordmcount.c              | 2 --
+ scripts/rt-tester/check-all.sh      | 1 -
+ scripts/rt-tester/rt-tester.py      | 2 --
+ scripts/selinux/install_policy.sh   | 1 -
+ scripts/show_delta                  | 1 -
+ 26 files changed, 30 deletions(-)
 
-diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
-index 078fe1d..b304068 100644
---- a/scripts/basic/fixdep.c
-+++ b/scripts/basic/fixdep.c
-@@ -409,10 +409,10 @@ static void print_deps(void)
- 		exit(2);
- 	}
- 	if (fstat(fd, &st) < 0) {
--                fprintf(stderr, "fixdep: error fstat'ing depfile: ");
--                perror(depfile);
--                exit(2);
--        }
-+		fprintf(stderr, "fixdep: error fstat'ing depfile: ");
-+		perror(depfile);
-+		exit(2);
-+	}
- 	if (st.st_size == 0) {
- 		fprintf(stderr,"fixdep: %s is empty\n",depfile);
- 		close(fd);
-diff --git a/scripts/docproc.c b/scripts/docproc.c
-index 2b69eaf..e267e621 100644
---- a/scripts/docproc.c
-+++ b/scripts/docproc.c
-@@ -154,7 +154,7 @@ int symfilecnt = 0;
- static void add_new_symbol(struct symfile *sym, char * symname)
- {
- 	sym->symbollist =
--          realloc(sym->symbollist, (sym->symbolcnt + 1) * sizeof(char *));
-+	  realloc(sym->symbollist, (sym->symbolcnt + 1) * sizeof(char *));
- 	sym->symbollist[sym->symbolcnt++].name = strdup(symname);
+diff --git a/scripts/Makefile.asm-generic b/scripts/Makefile.asm-generic
+index d17e0ea..045e0098 100644
+--- a/scripts/Makefile.asm-generic
++++ b/scripts/Makefile.asm-generic
+@@ -21,4 +21,3 @@ all: $(patsubst %, $(obj)/%, $(generic-y))
+ 
+ $(obj)/%.h:
+ 	$(call cmd,wrap)
+-
+diff --git a/scripts/Makefile.host b/scripts/Makefile.host
+index 0f0d6ba..6689364 100644
+--- a/scripts/Makefile.host
++++ b/scripts/Makefile.host
+@@ -167,4 +167,3 @@ $(host-cshlib): $(obj)/%: $(host-cshobjs) FORCE
+ 
+ targets += $(host-csingle)  $(host-cmulti) $(host-cobjs)\
+ 	   $(host-cxxmulti) $(host-cxxobjs) $(host-cshlib) $(host-cshobjs)
+-
+diff --git a/scripts/checkstack.pl b/scripts/checkstack.pl
+index 544aa56..c05d586 100755
+--- a/scripts/checkstack.pl
++++ b/scripts/checkstack.pl
+@@ -173,4 +173,3 @@ while (my $line = <STDIN>) {
+ 
+ # Sort output by size (last field)
+ print sort { ($b =~ /:\t*(\d+)$/)[0] <=> ($a =~ /:\t*(\d+)$/)[0] } @stack;
+-
+diff --git a/scripts/config b/scripts/config
+index 6804179..026aeb4 100755
+--- a/scripts/config
++++ b/scripts/config
+@@ -223,4 +223,3 @@ while [ "$1" != "" ] ; do
+ 		;;
+ 	esac
+ done
+-
+diff --git a/scripts/dtc/.gitignore b/scripts/dtc/.gitignore
+index 095acb4..cdabdc9 100644
+--- a/scripts/dtc/.gitignore
++++ b/scripts/dtc/.gitignore
+@@ -2,4 +2,3 @@ dtc
+ dtc-lexer.lex.c
+ dtc-parser.tab.c
+ dtc-parser.tab.h
+-
+diff --git a/scripts/dtc/fstree.c b/scripts/dtc/fstree.c
+index f377453..e464727 100644
+--- a/scripts/dtc/fstree.c
++++ b/scripts/dtc/fstree.c
+@@ -88,4 +88,3 @@ struct boot_info *dt_from_fs(const char *dirname)
+ 
+ 	return build_boot_info(NULL, tree, guess_boot_cpuid(tree));
  }
+-
+diff --git a/scripts/dtc/libfdt/fdt_empty_tree.c b/scripts/dtc/libfdt/fdt_empty_tree.c
+index f72d13b..f2ae9b7 100644
+--- a/scripts/dtc/libfdt/fdt_empty_tree.c
++++ b/scripts/dtc/libfdt/fdt_empty_tree.c
+@@ -81,4 +81,3 @@ int fdt_create_empty_tree(void *buf, int bufsize)
  
-@@ -215,7 +215,7 @@ static void find_export_symbols(char * filename)
- 			char *p;
- 			char *e;
- 			if (((p = strstr(line, "EXPORT_SYMBOL_GPL")) != NULL) ||
--                            ((p = strstr(line, "EXPORT_SYMBOL")) != NULL)) {
-+			    ((p = strstr(line, "EXPORT_SYMBOL")) != NULL)) {
- 				/* Skip EXPORT_SYMBOL{_GPL} */
- 				while (isalnum(*p) || *p == '_')
- 					p++;
-@@ -291,28 +291,28 @@ static void extfunc(char * filename) { docfunctions(filename, FUNCTION);   }
- static void singfunc(char * filename, char * line)
- {
- 	char *vec[200]; /* Enough for specific functions */
--        int i, idx = 0;
--        int startofsym = 1;
-+	int i, idx = 0;
-+	int startofsym = 1;
- 	vec[idx++] = KERNELDOC;
- 	vec[idx++] = DOCBOOK;
- 	vec[idx++] = SHOWNOTFOUND;
+ 	return fdt_open_into(buf, buf, bufsize);
+ }
+-
+diff --git a/scripts/dtc/treesource.c b/scripts/dtc/treesource.c
+index 33eeba5..5740e69 100644
+--- a/scripts/dtc/treesource.c
++++ b/scripts/dtc/treesource.c
+@@ -281,4 +281,3 @@ void dt_to_source(FILE *f, struct boot_info *bi)
  
--        /* Split line up in individual parameters preceded by FUNCTION */
--        for (i=0; line[i]; i++) {
--                if (isspace(line[i])) {
--                        line[i] = '\0';
--                        startofsym = 1;
--                        continue;
--                }
--                if (startofsym) {
--                        startofsym = 0;
--                        vec[idx++] = FUNCTION;
--                        vec[idx++] = &line[i];
--                }
--        }
-+	/* Split line up in individual parameters preceded by FUNCTION */
-+	for (i=0; line[i]; i++) {
-+		if (isspace(line[i])) {
-+			line[i] = '\0';
-+			startofsym = 1;
-+			continue;
-+		}
-+		if (startofsym) {
-+			startofsym = 0;
-+			vec[idx++] = FUNCTION;
-+			vec[idx++] = &line[i];
-+		}
-+	}
- 	for (i = 0; i < idx; i++) {
--        	if (strcmp(vec[i], FUNCTION))
--        		continue;
-+		if (strcmp(vec[i], FUNCTION))
-+			continue;
- 		consume_symbol(vec[i + 1]);
- 	}
- 	vec[idx++] = filename;
-@@ -460,14 +460,14 @@ static void parse_file(FILE *infile)
- 					break;
- 				case 'D':
- 					while (*s && !isspace(*s)) s++;
--                                        *s = '\0';
--                                        symbolsonly(line+2);
--                                        break;
-+					*s = '\0';
-+					symbolsonly(line+2);
-+					break;
- 				case 'F':
- 					/* filename */
- 					while (*s && !isspace(*s)) s++;
- 					*s++ = '\0';
--                                        /* function names */
-+					/* function names */
- 					while (isspace(*s))
- 						s++;
- 					singlefunctions(line +2, s);
-@@ -515,11 +515,11 @@ int main(int argc, char *argv[])
- 	}
- 	/* Open file, exit on error */
- 	infile = fopen(argv[2], "r");
--        if (infile == NULL) {
--                fprintf(stderr, "docproc: ");
--                perror(argv[2]);
--                exit(2);
--        }
-+	if (infile == NULL) {
-+		fprintf(stderr, "docproc: ");
-+		perror(argv[2]);
-+		exit(2);
-+	}
- 
- 	if (strcmp("doc", argv[1]) == 0) {
- 		/* Need to do this in two passes.
-diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
-index 1237dd7..dc7aa45 100644
---- a/scripts/kallsyms.c
-+++ b/scripts/kallsyms.c
-@@ -123,7 +123,7 @@ static int read_symbol(FILE *in, struct sym_entry *s)
- 	}
- 	if (strlen(str) > KSYM_NAME_LEN) {
- 		fprintf(stderr, "Symbol %s too long for kallsyms (%zu vs %d).\n"
--                                "Please increase KSYM_NAME_LEN both in kernel and kallsyms.c\n",
-+				"Please increase KSYM_NAME_LEN both in kernel and kallsyms.c\n",
- 			str, strlen(str), KSYM_NAME_LEN);
- 		return -1;
- 	}
-diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
-index d19944f..fef75fc 100644
---- a/scripts/kconfig/conf.c
-+++ b/scripts/kconfig/conf.c
-@@ -696,7 +696,7 @@ int main(int ac, char **av)
- 	} else if (input_mode == savedefconfig) {
- 		if (conf_write_defconfig(defconfig_file)) {
- 			fprintf(stderr, _("n*** Error while saving defconfig to: %s\n\n"),
--			        defconfig_file);
-+				defconfig_file);
- 			return 1;
- 		}
- 	} else if (input_mode != listnewconfig) {
-diff --git a/scripts/kconfig/gconf.c b/scripts/kconfig/gconf.c
-index f2bee70..d0a35b2 100644
---- a/scripts/kconfig/gconf.c
-+++ b/scripts/kconfig/gconf.c
-@@ -1404,7 +1404,7 @@ static void display_tree(struct menu *menu)
- 		    && (tree == tree2))
- 			continue;
- /*
--                if (((menu != &rootmenu) && !(menu->flags & MENU_ROOT))
-+		if (((menu != &rootmenu) && !(menu->flags & MENU_ROOT))
- 		    || (view_mode == FULL_VIEW)
- 		    || (view_mode == SPLIT_VIEW))*/
- 
-diff --git a/scripts/kconfig/lxdialog/checklist.c b/scripts/kconfig/lxdialog/checklist.c
-index 3b15c08..8d016fa 100644
---- a/scripts/kconfig/lxdialog/checklist.c
-+++ b/scripts/kconfig/lxdialog/checklist.c
-@@ -168,13 +168,13 @@ do_resize:
- 
- 	/* create new window for the list */
- 	list = subwin(dialog, list_height, list_width, y + box_y + 1,
--	              x + box_x + 1);
-+		      x + box_x + 1);
- 
- 	keypad(list, TRUE);
- 
- 	/* draw a box around the list items */
- 	draw_box(dialog, box_y, box_x, list_height + 2, list_width + 2,
--	         dlg.menubox_border.atr, dlg.menubox.atr);
-+		 dlg.menubox_border.atr, dlg.menubox.atr);
- 
- 	/* Find length of longest item in order to center checklist */
- 	check_x = 0;
-diff --git a/scripts/kconfig/lxdialog/inputbox.c b/scripts/kconfig/lxdialog/inputbox.c
-index 447a582..d58de1d 100644
---- a/scripts/kconfig/lxdialog/inputbox.c
-+++ b/scripts/kconfig/lxdialog/inputbox.c
-@@ -42,7 +42,7 @@ static void print_buttons(WINDOW * dialog, int height, int width, int selected)
-  * Display a dialog box for inputing a string
-  */
- int dialog_inputbox(const char *title, const char *prompt, int height, int width,
--                    const char *init)
-+		    const char *init)
- {
- 	int i, x, y, box_y, box_x, box_width;
- 	int input_x = 0, key = 0, button = -1;
-diff --git a/scripts/kconfig/lxdialog/menubox.c b/scripts/kconfig/lxdialog/menubox.c
-index c93de0b..11ae9ad7 100644
---- a/scripts/kconfig/lxdialog/menubox.c
-+++ b/scripts/kconfig/lxdialog/menubox.c
-@@ -64,7 +64,7 @@ static int menu_width, item_x;
-  * Print menu item
-  */
- static void do_print_item(WINDOW * win, const char *item, int line_y,
--                          int selected, int hotkey)
-+			  int selected, int hotkey)
- {
- 	int j;
- 	char *menu_item = malloc(menu_width + 1);
-@@ -182,7 +182,7 @@ static void do_scroll(WINDOW *win, int *scroll, int n)
-  * Display a menu for choosing among a number of options
-  */
- int dialog_menu(const char *title, const char *prompt,
--                const void *selected, int *s_scroll)
-+		const void *selected, int *s_scroll)
- {
- 	int i, j, x, y, box_x, box_y;
- 	int height, width, menu_height;
-diff --git a/scripts/kconfig/lxdialog/util.c b/scripts/kconfig/lxdialog/util.c
-index 58a8289..f7abdeb 100644
---- a/scripts/kconfig/lxdialog/util.c
-+++ b/scripts/kconfig/lxdialog/util.c
-@@ -623,7 +623,7 @@ void item_make(const char *fmt, ...)
- void item_add_str(const char *fmt, ...)
- {
- 	va_list ap;
--        size_t avail;
-+	size_t avail;
- 
- 	avail = sizeof(item_cur->node.str) - strlen(item_cur->node.str);
- 
+ 	write_tree_source_node(f, bi->dt, 0);
+ }
+-
+diff --git a/scripts/headers.sh b/scripts/headers.sh
+index 978b42b..95ece06 100755
+--- a/scripts/headers.sh
++++ b/scripts/headers.sh
+@@ -28,5 +28,3 @@ for arch in ${archs}; do
+ 		;;
+ 	esac
+ done
+-
+-
+diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+index 844bc9d..e57478aa 100644
+--- a/scripts/kconfig/Makefile
++++ b/scripts/kconfig/Makefile
+@@ -319,4 +319,3 @@ $(obj)/%.moc: $(src)/%.h $(obj)/.tmp_qtcheck
+ $(obj)/gconf.glade.h: $(obj)/gconf.glade
+ 	$(Q)intltool-extract --type=gettext/glade --srcdir=$(srctree) \
+ 	$(obj)/gconf.glade
+-
+diff --git a/scripts/kconfig/check.sh b/scripts/kconfig/check.sh
+index 854d9c7..55b79ba 100755
+--- a/scripts/kconfig/check.sh
++++ b/scripts/kconfig/check.sh
+@@ -11,4 +11,3 @@ EOF
+ if [ ! "$?" -eq "0"  ]; then
+ 	echo -DKBUILD_NO_NLS;
+ fi
+-
 diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
-index 59184bb..9c08fc9 100644
+index 9c08fc9..14cea74 100644
 --- a/scripts/kconfig/mconf.c
 +++ b/scripts/kconfig/mconf.c
-@@ -299,7 +299,7 @@ static void set_config_filename(const char *config_filename)
- 	int size;
+@@ -1034,4 +1034,3 @@ int main(int ac, char **av)
  
- 	size = snprintf(menu_backtitle, sizeof(menu_backtitle),
--	                "%s - %s", config_filename, rootmenu.prompt->text);
-+			"%s - %s", config_filename, rootmenu.prompt->text);
- 	if (size >= sizeof(menu_backtitle))
- 		menu_backtitle[sizeof(menu_backtitle)-1] = '\0';
- 	set_dialog_backtitle(menu_backtitle);
-diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
-index 3ac2c9c..a26cc5d 100644
---- a/scripts/kconfig/menu.c
-+++ b/scripts/kconfig/menu.c
-@@ -258,8 +258,8 @@ static void sym_check_prop(struct symbol *sym)
- 				    "config symbol '%s' uses select, but is "
- 				    "not boolean or tristate", sym->name);
- 			else if (sym2->type != S_UNKNOWN &&
--			         sym2->type != S_BOOLEAN &&
--			         sym2->type != S_TRISTATE)
-+				 sym2->type != S_BOOLEAN &&
-+				 sym2->type != S_TRISTATE)
- 				prop_warn(prop,
- 				    "'%s' has wrong type. 'select' only "
- 				    "accept arguments of boolean and "
-@@ -268,7 +268,7 @@ static void sym_check_prop(struct symbol *sym)
- 		case P_RANGE:
- 			if (sym->type != S_INT && sym->type != S_HEX)
- 				prop_warn(prop, "range is only allowed "
--				                "for int or hex symbols");
-+						"for int or hex symbols");
- 			if (!menu_validate_number(sym, prop->expr->left.sym) ||
- 			    !menu_validate_number(sym, prop->expr->right.sym))
- 				prop_warn(prop, "range is invalid");
-diff --git a/scripts/kconfig/zconf.l b/scripts/kconfig/zconf.l
-index 1a9f53e..6c62d93 100644
---- a/scripts/kconfig/zconf.l
-+++ b/scripts/kconfig/zconf.l
-@@ -27,8 +27,8 @@ static char *text;
- static int text_size, text_asize;
- 
- struct buffer {
--        struct buffer *parent;
--        YY_BUFFER_STATE state;
-+	struct buffer *parent;
-+	YY_BUFFER_STATE state;
- };
- 
- struct buffer *current_buf;
-diff --git a/scripts/kconfig/zconf.y b/scripts/kconfig/zconf.y
-index 0653886..0f683cf 100644
---- a/scripts/kconfig/zconf.y
-+++ b/scripts/kconfig/zconf.y
-@@ -510,7 +510,7 @@ void conf_parse(const char *name)
- 	for_all_symbols(i, sym) {
- 		if (sym_check_deps(sym))
- 			zconfnerrs++;
--        }
-+	}
- 	if (zconfnerrs)
- 		exit(1);
- 	sym_set_change_count(1);
-diff --git a/scripts/mod/file2alias.c b/scripts/mod/file2alias.c
-index 1924990..e614ef6 100644
---- a/scripts/mod/file2alias.c
-+++ b/scripts/mod/file2alias.c
-@@ -644,28 +644,26 @@ ADD_TO_DEVTABLE("pcmcia", pcmcia_device_id, do_pcmcia_entry);
- 
- static int do_of_entry (const char *filename, void *symval, char *alias)
- {
--    int len;
--    char *tmp;
--    DEF_FIELD_ADDR(symval, of_device_id, name);
--    DEF_FIELD_ADDR(symval, of_device_id, type);
--    DEF_FIELD_ADDR(symval, of_device_id, compatible);
+ 	return res;
+ }
 -
--    len = sprintf (alias, "of:N%sT%s",
--                    (*name)[0] ? *name : "*",
--                    (*type)[0] ? *type : "*");
+diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
+index 4fbecd2..984489e 100644
+--- a/scripts/kconfig/nconf.c
++++ b/scripts/kconfig/nconf.c
+@@ -1554,4 +1554,3 @@ int main(int ac, char **av)
+ 	endwin();
+ 	return 0;
+ }
 -
--    if (compatible[0])
--        sprintf (&alias[len], "%sC%s",
--                     (*type)[0] ? "*" : "",
--                     *compatible);
+diff --git a/scripts/kconfig/util.c b/scripts/kconfig/util.c
+index 6e7fbf1..94f9c83 100644
+--- a/scripts/kconfig/util.c
++++ b/scripts/kconfig/util.c
+@@ -155,5 +155,3 @@ void *xcalloc(size_t nmemb, size_t size)
+ 	fprintf(stderr, "Out of memory.\n");
+ 	exit(1);
+ }
 -
--    /* Replace all whitespace with underscores */
--    for (tmp = alias; tmp && *tmp; tmp++)
--        if (isspace (*tmp))
--            *tmp = '_';
 -
--    add_wildcard(alias);
--    return 1;
-+	int len;
-+	char *tmp;
-+	DEF_FIELD_ADDR(symval, of_device_id, name);
-+	DEF_FIELD_ADDR(symval, of_device_id, type);
-+	DEF_FIELD_ADDR(symval, of_device_id, compatible);
-+
-+	len = sprintf(alias, "of:N%sT%s", (*name)[0] ? *name : "*",
-+		      (*type)[0] ? *type : "*");
-+
-+	if (compatible[0])
-+		sprintf(&alias[len], "%sC%s", (*type)[0] ? "*" : "",
-+			*compatible);
-+
-+	/* Replace all whitespace with underscores */
-+	for (tmp = alias; tmp && *tmp; tmp++)
-+		if (isspace (*tmp))
-+			*tmp = '_';
-+
-+	add_wildcard(alias);
-+	return 1;
+diff --git a/scripts/markup_oops.pl b/scripts/markup_oops.pl
+index 827896f..c21d163 100644
+--- a/scripts/markup_oops.pl
++++ b/scripts/markup_oops.pl
+@@ -367,4 +367,3 @@ OPTION:
+ EOT
+ 	exit;
  }
- ADD_TO_DEVTABLE("of", of_device_id, do_of_entry);
+-
+diff --git a/scripts/mksysmap b/scripts/mksysmap
+index c1b6191..7ada35a 100644
+--- a/scripts/mksysmap
++++ b/scripts/mksysmap
+@@ -42,4 +42,3 @@
+ # (At least sparc64 has __crc_ in the middle).
  
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 0663556..cd76687 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -862,7 +862,7 @@ static const char *section_white_list[] =
-  * without "ax" / "aw".
-  */
- static void check_section(const char *modname, struct elf_info *elf,
--                          Elf_Shdr *sechdr)
-+			  Elf_Shdr *sechdr)
- {
- 	const char *sec = sech_name(elf, sechdr);
+ $NM -n $1 | grep -v '\( [aNUw] \)\|\(__crc_\)\|\( \$[adt]\)' > $2
+-
+diff --git a/scripts/mod/.gitignore b/scripts/mod/.gitignore
+index 33bae0d..3bd11b6 100644
+--- a/scripts/mod/.gitignore
++++ b/scripts/mod/.gitignore
+@@ -2,4 +2,3 @@ elfconfig.h
+ mk_elfconfig
+ modpost
+ devicetable-offsets.h
+-
+diff --git a/scripts/mod/mk_elfconfig.c b/scripts/mod/mk_elfconfig.c
+index 639bca7..a4fd71d 100644
+--- a/scripts/mod/mk_elfconfig.c
++++ b/scripts/mod/mk_elfconfig.c
+@@ -54,4 +54,3 @@ main(int argc, char **argv)
  
-@@ -1296,12 +1296,12 @@ static void print_section_list(const char * const list[20])
-  */
- static void report_sec_mismatch(const char *modname,
- 				const struct sectioncheck *mismatch,
--                                const char *fromsec,
--                                unsigned long long fromaddr,
--                                const char *fromsym,
--                                int from_is_func,
--                                const char *tosec, const char *tosym,
--                                int to_is_func)
-+				const char *fromsec,
-+				unsigned long long fromaddr,
-+				const char *fromsym,
-+				int from_is_func,
-+				const char *tosec, const char *tosym,
-+				int to_is_func)
- {
- 	const char *from, *from_p;
- 	const char *to, *to_p;
-@@ -1441,7 +1441,7 @@ static void report_sec_mismatch(const char *modname,
+ 	return 0;
  }
+-
+diff --git a/scripts/package/Makefile b/scripts/package/Makefile
+index c5d4733..99ca6e7 100644
+--- a/scripts/package/Makefile
++++ b/scripts/package/Makefile
+@@ -143,4 +143,3 @@ help: FORCE
+ 	@echo '  perf-targz-src-pkg  - Build $(perf-tar).tar.gz source tarball'
+ 	@echo '  perf-tarbz2-src-pkg - Build $(perf-tar).tar.bz2 source tarball'
+ 	@echo '  perf-tarxz-src-pkg  - Build $(perf-tar).tar.xz source tarball'
+-
+diff --git a/scripts/package/buildtar b/scripts/package/buildtar
+index aa22f94..995c1ea 100644
+--- a/scripts/package/buildtar
++++ b/scripts/package/buildtar
+@@ -136,4 +136,3 @@ esac
+ echo "Tarball successfully created in ${tarball}${file_ext}"
  
- static void check_section_mismatch(const char *modname, struct elf_info *elf,
--                                   Elf_Rela *r, Elf_Sym *sym, const char *fromsec)
-+				   Elf_Rela *r, Elf_Sym *sym, const char *fromsec)
- {
- 	const char *tosec;
- 	const struct sectioncheck *mismatch;
-@@ -1528,7 +1528,7 @@ static int addend_arm_rel(struct elf_info *elf, Elf_Shdr *sechdr, Elf_Rela *r)
- 	case R_ARM_ABS32:
- 		/* From ARM ABI: (S + A) | T */
- 		r->r_addend = (int)(long)
--		              (elf->symtab_start + ELF_R_SYM(r->r_info));
-+			      (elf->symtab_start + ELF_R_SYM(r->r_info));
- 		break;
- 	case R_ARM_PC24:
- 	case R_ARM_CALL:
-@@ -1538,8 +1538,8 @@ static int addend_arm_rel(struct elf_info *elf, Elf_Shdr *sechdr, Elf_Rela *r)
- 	case R_ARM_THM_JUMP19:
- 		/* From ARM ABI: ((S + A) | T) - P */
- 		r->r_addend = (int)(long)(elf->hdr +
--		              sechdr->sh_offset +
--		              (r->r_offset - sechdr->sh_addr));
-+			      sechdr->sh_offset +
-+			      (r->r_offset - sechdr->sh_addr));
- 		break;
- 	default:
- 		return 1;
-@@ -1571,7 +1571,7 @@ static int addend_mips_rel(struct elf_info *elf, Elf_Shdr *sechdr, Elf_Rela *r)
+ exit 0
+-
+diff --git a/scripts/pnmtologo.c b/scripts/pnmtologo.c
+index 68bb4ef..4718d78 100644
+--- a/scripts/pnmtologo.c
++++ b/scripts/pnmtologo.c
+@@ -512,4 +512,3 @@ int main(int argc, char *argv[])
+     }
+     exit(0);
  }
- 
- static void section_rela(const char *modname, struct elf_info *elf,
--                         Elf_Shdr *sechdr)
-+			 Elf_Shdr *sechdr)
- {
- 	Elf_Sym  *sym;
- 	Elf_Rela *rela;
-@@ -1615,7 +1615,7 @@ static void section_rela(const char *modname, struct elf_info *elf,
+-
+diff --git a/scripts/recordmcount.c b/scripts/recordmcount.c
+index 9c22317..c085306 100644
+--- a/scripts/recordmcount.c
++++ b/scripts/recordmcount.c
+@@ -480,5 +480,3 @@ main(int argc, char *argv[])
+ 	}
+ 	return !!n_error;
  }
+-
+-
+diff --git a/scripts/rt-tester/check-all.sh b/scripts/rt-tester/check-all.sh
+index 43098af..6b5c83b 100644
+--- a/scripts/rt-tester/check-all.sh
++++ b/scripts/rt-tester/check-all.sh
+@@ -19,4 +19,3 @@ testit t3-l2-pi.tst
+ testit t4-l2-pi-deboost.tst
+ testit t5-l4-pi-boost-deboost.tst
+ testit t5-l4-pi-boost-deboost-setsched.tst
+-
+diff --git a/scripts/rt-tester/rt-tester.py b/scripts/rt-tester/rt-tester.py
+index 34186ca..6d916c2 100644
+--- a/scripts/rt-tester/rt-tester.py
++++ b/scripts/rt-tester/rt-tester.py
+@@ -216,5 +216,3 @@ while 1:
+ # Normal exit pass
+ print "Pass"
+ sys.exit(0)
+-
+-
+diff --git a/scripts/selinux/install_policy.sh b/scripts/selinux/install_policy.sh
+index 7b9ccf6..f6a0ce7 100644
+--- a/scripts/selinux/install_policy.sh
++++ b/scripts/selinux/install_policy.sh
+@@ -66,4 +66,3 @@ if [ "eq$dodev" != "eq" ]; then
+ 	$SF file_contexts /dev
+ 	mount --move /mnt /dev
+ fi
+-
+diff --git a/scripts/show_delta b/scripts/show_delta
+index e25732b..5b36500 100755
+--- a/scripts/show_delta
++++ b/scripts/show_delta
+@@ -126,4 +126,3 @@ def main():
+ 		print (convert_line(line, base_time),)
  
- static void section_rel(const char *modname, struct elf_info *elf,
--                        Elf_Shdr *sechdr)
-+			Elf_Shdr *sechdr)
- {
- 	Elf_Sym *sym;
- 	Elf_Rel *rel;
-@@ -1685,7 +1685,7 @@ static void section_rel(const char *modname, struct elf_info *elf,
-  * be discarded and warns about it.
-  **/
- static void check_sec_ref(struct module *mod, const char *modname,
--                          struct elf_info *elf)
-+			  struct elf_info *elf)
- {
- 	int i;
- 	Elf_Shdr *sechdrs = elf->sechdrs;
-@@ -1945,7 +1945,7 @@ static int add_versions(struct buffer *b, struct module *mod)
- 					     s->name, mod->name);
- 				} else {
- 					merror("\"%s\" [%s.ko] undefined!\n",
--					          s->name, mod->name);
-+					       s->name, mod->name);
- 					err = 1;
- 				}
- 			}
-diff --git a/scripts/mod/sumversion.c b/scripts/mod/sumversion.c
-index deb2994..944418d 100644
---- a/scripts/mod/sumversion.c
-+++ b/scripts/mod/sumversion.c
-@@ -214,7 +214,7 @@ static void md4_final_ascii(struct md4_ctx *mctx, char *out, unsigned int len)
- 	mctx->block[14] = mctx->byte_count << 3;
- 	mctx->block[15] = mctx->byte_count >> 29;
- 	le32_to_cpu_array(mctx->block, (sizeof(mctx->block) -
--	                  sizeof(uint64_t)) / sizeof(uint32_t));
-+			  sizeof(uint64_t)) / sizeof(uint32_t));
- 	md4_transform(mctx->hash, mctx->block);
- 	cpu_to_le32_array(mctx->hash, sizeof(mctx->hash) / sizeof(uint32_t));
- 
-@@ -367,7 +367,7 @@ static int parse_source_files(const char *objfile, struct md4_ctx *md)
- 			break;
- 		/* Terminate line at first space, to get rid of final ' \' */
- 		while (*p) {
--                       if (isspace(*p)) {
-+			if (isspace(*p)) {
- 				*p = '\0';
- 				break;
- 			}
-diff --git a/scripts/tags.sh b/scripts/tags.sh
-index f2c5b00..05b8978 100755
---- a/scripts/tags.sh
-+++ b/scripts/tags.sh
-@@ -266,7 +266,7 @@ xtags()
- 		emacs $1
- 	else
- 		all_target_sources | xargs $1 -a
--        fi
-+	fi
- }
- 
- # Support um (which uses SUBARCH)
+ main()
+-
 -- 
 1.9.1
 
