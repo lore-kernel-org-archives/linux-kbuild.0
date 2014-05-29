@@ -1,68 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.mei.co.jp ([133.183.100.20]:48291 "EHLO smtp.mei.co.jp"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756288AbaE2Fdg (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 29 May 2014 01:33:36 -0400
-Received: from mail-gw.jp.panasonic.com ([157.8.1.157])
-	by smtp.mei.co.jp (8.12.11.20060614/3.7W/kc-maile12) with ESMTP id s4T5XU91028408
-	for <linux-kbuild@vger.kernel.org>; Thu, 29 May 2014 14:33:30 +0900 (JST)
-Received: from epochmail.jp.panasonic.com ([157.8.1.130])
-	by mail.jp.panasonic.com (8.11.6p2/3.7W/kc-maili17) with ESMTP id s4T5XU331840
-	for <linux-kbuild@vger.kernel.org>; Thu, 29 May 2014 14:33:30 +0900
-From: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Subject: [PATCH 2/2] kbuild: create include/config directory in scripts/kconfig/Makefile
-Date: Thu, 29 May 2014 14:33:03 +0900
-Message-Id: <1401341583-308-2-git-send-email-yamada.m@jp.panasonic.com>
-In-Reply-To: <1401341583-308-1-git-send-email-yamada.m@jp.panasonic.com>
-References: <1401341583-308-1-git-send-email-yamada.m@jp.panasonic.com>
+Received: from avon.wwwdotorg.org ([70.85.31.133]:57032 "EHLO
+	avon.wwwdotorg.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S965074AbaE2Pzj (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 29 May 2014 11:55:39 -0400
+Message-ID: <53875876.2020001@wwwdotorg.org>
+Date: Thu, 29 May 2014 09:55:34 -0600
+From: Stephen Warren <swarren@wwwdotorg.org>
+MIME-Version: 1.0
+Subject: Re: [PATCH] scripts/dtc: pad DTBs to facilitate later modification
+References: <1400888507-11637-1-git-send-email-khilman@linaro.org>
+In-Reply-To: <1400888507-11637-1-git-send-email-khilman@linaro.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.m@jp.panasonic.com>
+To: Kevin Hilman <khilman@linaro.org>, linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org
+Cc: Arnd Bergmann <arnd@arndb.de>, Olof Johansson <olof@lixom.net>, linaro-kernel@lists.linaro.org, Nicolas Pitre <nico@linaro.org>, Thomas Petazzoni <thomas.petazzoni@free-electrons.com>, Michal Marek <mmarek@suse.cz>, "open list:KERNEL BUILD + fi..." <linux-kbuild@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
 
-The directory include/config is used only for
-silentoldconfig, localmodconfig, localyesconfig.
+On 05/23/2014 05:41 PM, Kevin Hilman wrote:
+> By default, add some padding to the DT blobs to facilitate later
+> patching.
+> 
+> An example need for DTB patching is the need to modifiy the command
+> line on platforms where ATAGS are not (or cannot) be used to pass the
+> commandline.  For example, we do not support a big-endian kernel
+> reading ATAGS from a little-endian u-boot, so the only way to pass a
+> command line in the DT.
+> 
+> Also, without ATAG support (or if u-boot was built without
+> CONFIG_INITRD_TAG) the only way to pass an initrd is by adding an
+> initrd= option to command line (in the DT).
+> 
+> Therefore, to facilitate adding to the DT command line directly in the
+> DTB, add some padding.
+> 
+> Cc: Nicolas Pitre <nico@linaro.org>
+> Cc: Stephen Warren <swarren@wwwdotorg.org>
+> Cc: Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
+> Signed-off-by: Kevin Hilman <khilman@linaro.org>
+> ---
+> I kinda pulled 64 bytes out of the air here since it's enough to add
+> some common things to the commandline like debug, earlyprink
+> initrd=<addr>,<size>, etc., but I'm certainlly not opposed to more
+> padding.
 
-Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
----
- Makefile                 | 2 --
- scripts/kconfig/Makefile | 4 ++--
- 2 files changed, 2 insertions(+), 4 deletions(-)
+Conceptually,
+Acked-by: Stephen Warren <swarren@nvidia.com>
 
-diff --git a/Makefile b/Makefile
-index e3c88f3..2c8db44 100644
---- a/Makefile
-+++ b/Makefile
-@@ -523,11 +523,9 @@ include $(srctree)/arch/$(SRCARCH)/Makefile
- export KBUILD_DEFCONFIG KBUILD_KCONFIG
- 
- config: scripts_basic outputmakefile FORCE
--	$(Q)mkdir -p include/config
- 	$(Q)$(MAKE) $(build)=scripts/kconfig $@
- 
- %config: scripts_basic outputmakefile FORCE
--	$(Q)mkdir -p include/config
- 	$(Q)$(MAKE) $(build)=scripts/kconfig $@
- 
- else
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index e57478aa..9c4d241 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -33,11 +33,11 @@ oldconfig: $(obj)/conf
- 	$< --$@ $(Kconfig)
- 
- silentoldconfig: $(obj)/conf
--	$(Q)mkdir -p include/generated
-+	$(Q)mkdir -p include/config include/generated
- 	$< --$@ $(Kconfig)
- 
- localyesconfig localmodconfig: $(obj)/streamline_config.pl $(obj)/conf
--	$(Q)mkdir -p include/generated
-+	$(Q)mkdir -p include/config include/generated
- 	$(Q)perl $< --$@ $(srctree) $(Kconfig) > .tmp.config
- 	$(Q)if [ -f .config ]; then 					\
- 			cmp -s .tmp.config .config ||			\
--- 
-1.9.1
+But I would expect a pad of something like 4KB to be more future-proof.
+U-Boot appears to use 4KB on ARM at least:
 
+./arch/arm/dts/Makefile:37:DTC_FLAGS += -R 4 -p 0x1000
