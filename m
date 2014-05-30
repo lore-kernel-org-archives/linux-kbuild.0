@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.mei.co.jp ([133.183.100.20]:38175 "EHLO smtp.mei.co.jp"
+Received: from smtp.mei.co.jp ([133.183.100.20]:38179 "EHLO smtp.mei.co.jp"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751919AbaE3LMH (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	id S1752358AbaE3LMH (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
 	Fri, 30 May 2014 07:12:07 -0400
 From: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Subject: [PATCH 1/7] scripts: objdiff: get the path to .tmp_objdiff more simply
-Date: Fri, 30 May 2014 20:11:49 +0900
-Message-Id: <1401448315-800-2-git-send-email-yamada.m@jp.panasonic.com>
+Subject: [PATCH 4/7] scripts: objdiff: improve path flexibility for record command
+Date: Fri, 30 May 2014 20:11:52 +0900
+Message-Id: <1401448315-800-5-git-send-email-yamada.m@jp.panasonic.com>
 In-Reply-To: <1401448315-800-1-git-send-email-yamada.m@jp.panasonic.com>
 References: <1401448315-800-1-git-send-email-yamada.m@jp.panasonic.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -14,57 +14,89 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Masahiro Yamada <yamada.m@jp.panasonic.com>, Jason Cooper <jason@lakedaemon.net>
 
-This commit is a minor refactoring.
+Prior to this commit, scripts/objdiff expected to be run at the top
+directory and only the reltive path of objects.
 
-Temporary files for objdiff are stored in .tmp_objdiff directory
-which is located at the top directory.
+This commit provides more flexibility in terms of object path:
 
-To get the path to this directory,
+[1] scripts/objdiff can be run at any directory
 
-  SRCTREE=`git rev-parse --show-toplevel`
-  TMPD=$SRCTREE/.tmp_objdiff
+For example,
 
-seems easier to understand than
+  $ scripts/objdiff record init/main.o
 
-  GIT_DIR=`git rev-parse --git-dir`
-  TMPD=${GIT_DIR%git}tmp_objdiff
+and
 
-Besides, it is not always necessary to create .tmp_objdiff dicrectory.
-It should be created only for "record" command.
+  $ cd init; ../scripts/objdiff record main.o
+
+produce the same result.
+
+[2] Support absolute path for objects
+
+  $ scripts/objdiff record /home/foo/bar/linux/init/main.o
+
+work as well.
 
 Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
 Cc: Jason Cooper <jason@lakedaemon.net>
 ---
- scripts/objdiff | 12 +++++-------
- 1 file changed, 5 insertions(+), 7 deletions(-)
+ scripts/objdiff | 22 ++++++++++++++++------
+ 1 file changed, 16 insertions(+), 6 deletions(-)
 
 diff --git a/scripts/objdiff b/scripts/objdiff
-index b3e4f10..b8f7fc6 100755
+index 6e72f96..499eb4b 100755
 --- a/scripts/objdiff
 +++ b/scripts/objdiff
-@@ -25,17 +25,15 @@
+@@ -25,7 +25,7 @@
  #
  # Note: 'make mrproper' will also remove .tmp_objdiff
  
--GIT_DIR="`git rev-parse --git-dir`"
-+SRCTREE=$(git rev-parse --show-toplevel 2>/dev/null)
+-SRCTREE=$(git rev-parse --show-toplevel 2>/dev/null)
++SRCTREE=$(cd $(git rev-parse --show-toplevel 2>/dev/null); pwd)
  
--if [ -d "$GIT_DIR" ]; then
--	TMPD="${GIT_DIR%git}tmp_objdiff"
--
--	[ -d "$TMPD" ] || mkdir "$TMPD"
--else
--	echo "ERROR: git directory not found."
-+if [ -z "$SRCTREE" ]; then
-+	echo "ERROR: Not a git repository."
+ if [ -z "$SRCTREE" ]; then
+ 	echo >&2 "ERROR: Not a git repository."
+@@ -42,6 +42,18 @@ usage() {
  	exit 1
- fi
+ }
  
-+TMPD=$SRCTREE/.tmp_objdiff
++get_output_dir() {
++	dir=${1%/*}
 +
- usage() {
- 	echo "Usage: $0 <command> <args>"
- 	echo "  record    <list of object files>"
++	if [ "$dir" = "$1" ]; then
++		dir=.
++	fi
++
++	dir=$(cd $dir; pwd)
++
++	echo $TMPD/$CMT${dir#$SRCTREE}
++}
++
+ dorecord() {
+ 	[ $# -eq 0 ] && usage
+ 
+@@ -50,18 +62,16 @@ dorecord() {
+ 	CMT="`git rev-parse --short HEAD`"
+ 
+ 	OBJDUMP="${CROSS_COMPILE}objdump"
+-	OBJDIFFD="$TMPD/$CMT"
+ 
+ 	for f in $FILES; do
+-		dn="${f%/*}"
++		dir=$(get_output_dir $f)
+ 		bn="${f##*/}"
+ 
+-		[ ! -d "$OBJDIFFD/$dn" ] && mkdir -p "$OBJDIFFD/$dn"
++		[ ! -d "$dir" ] && mkdir -p $dir
+ 
+ 		# remove addresses for a more clear diff
+ 		# http://dummdida.tumblr.com/post/60924060451/binary-diff-between-libc-from-scientificlinux-and
+-		$OBJDUMP -D "$f" | sed "s/^[[:space:]]\+[0-9a-f]\+//" \
+-			>"$OBJDIFFD/$dn/$bn"
++		$OBJDUMP -D $f | sed "s/^[[:space:]]\+[0-9a-f]\+//" > $dir/$bn
+ 	done
+ }
+ 
 -- 
 1.9.1
 
