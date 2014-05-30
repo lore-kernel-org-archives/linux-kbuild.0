@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.mei.co.jp ([133.183.100.20]:53342 "EHLO smtp.mei.co.jp"
+Received: from smtp.mei.co.jp ([133.183.100.20]:53343 "EHLO smtp.mei.co.jp"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752703AbaE3LMI (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	id S1753089AbaE3LMI (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
 	Fri, 30 May 2014 07:12:08 -0400
 From: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Subject: [PATCH 7/7] scripts: objdiff: support directories for the augument of record command
-Date: Fri, 30 May 2014 20:11:55 +0900
-Message-Id: <1401448315-800-8-git-send-email-yamada.m@jp.panasonic.com>
+Subject: [PATCH 5/7] scripts: objdiff: change the extension of disassembly from .o to .dis
+Date: Fri, 30 May 2014 20:11:53 +0900
+Message-Id: <1401448315-800-6-git-send-email-yamada.m@jp.panasonic.com>
 In-Reply-To: <1401448315-800-1-git-send-email-yamada.m@jp.panasonic.com>
 References: <1401448315-800-1-git-send-email-yamada.m@jp.panasonic.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -14,76 +14,37 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Masahiro Yamada <yamada.m@jp.panasonic.com>, Jason Cooper <jason@lakedaemon.net>
 
-For example,
+Prior to this commit, the command "scripts/objdiff record path/to/*.o"
+disassembles the given object into ".tmp_objdiff/path/to/*.o" file.
 
-  $ scripts/objdiff record init drivers/usb
-
-disassembles all the objects under init and drivers/usb directories.
-
-This feature would be useful when we change various files under the
-specific directory.
+The problem here is that recorded disassemblies are lost if we run
+"make clean" because "make clean" removes all the *.o files.
+Disassembled code should be dumped into *.dis instead of *.o file.
 
 Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
 Cc: Jason Cooper <jason@lakedaemon.net>
 ---
- scripts/objdiff | 33 ++++++++++++++++++++++-----------
- 1 file changed, 22 insertions(+), 11 deletions(-)
+ scripts/objdiff | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/scripts/objdiff b/scripts/objdiff
-index 4d3a197..661f6fe 100755
+index 499eb4b..c997e44 100755
 --- a/scripts/objdiff
 +++ b/scripts/objdiff
-@@ -36,7 +36,7 @@ TMPD=$SRCTREE/.tmp_objdiff
+@@ -65,13 +65,14 @@ dorecord() {
  
- usage() {
- 	echo >&2 "Usage: $0 <command> <args>"
--	echo >&2 "  record    <list of object files>"
-+	echo >&2 "  record    <list of object files or directories>"
- 	echo >&2 "  diff      <commitA> <commitB>"
- 	echo >&2 "  clean     all | <commit>"
- 	exit 1
-@@ -54,6 +54,18 @@ get_output_dir() {
- 	echo $TMPD/$CMT${dir#$SRCTREE}
- }
+ 	for f in $FILES; do
+ 		dir=$(get_output_dir $f)
+-		bn="${f##*/}"
++		base=${f##*/}
++		dis=$dir/${base%.o}.dis
  
-+do_objdump() {
-+	dir=$(get_output_dir $1)
-+	base=${1##*/}
-+	dis=$dir/${base%.o}.dis
-+
-+	[ ! -d "$dir" ] && mkdir -p $dir
-+
-+	# remove addresses for a clearer diff
-+	# http://dummdida.tumblr.com/post/60924060451/binary-diff-between-libc-from-scientificlinux-and
-+	$OBJDUMP -D $1 | sed "s/^[[:space:]]\+[0-9a-f]\+//" > $dis
-+}
-+
- dorecord() {
- 	[ $# -eq 0 ] && usage
+ 		[ ! -d "$dir" ] && mkdir -p $dir
  
-@@ -63,16 +75,15 @@ dorecord() {
- 
- 	OBJDUMP="${CROSS_COMPILE}objdump"
- 
--	for f in $FILES; do
--		dir=$(get_output_dir $f)
--		base=${f##*/}
--		dis=$dir/${base%.o}.dis
--
--		[ ! -d "$dir" ] && mkdir -p $dir
--
--		# remove addresses for a clearer diff
--		# http://dummdida.tumblr.com/post/60924060451/binary-diff-between-libc-from-scientificlinux-and
--		$OBJDUMP -D $f | sed "s/^[[:space:]]\+[0-9a-f]\+//" > $dis
-+	for d in $FILES; do
-+		if [ -d "$d" ]; then
-+			for f in $(find $d -name '*.o')
-+			do
-+				do_objdump $f
-+			done
-+		else
-+			do_objdump $d
-+		fi
+ 		# remove addresses for a more clear diff
+ 		# http://dummdida.tumblr.com/post/60924060451/binary-diff-between-libc-from-scientificlinux-and
+-		$OBJDUMP -D $f | sed "s/^[[:space:]]\+[0-9a-f]\+//" > $dir/$bn
++		$OBJDUMP -D $f | sed "s/^[[:space:]]\+[0-9a-f]\+//" > $dis
  	done
  }
  
