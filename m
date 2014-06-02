@@ -1,53 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-we0-f169.google.com ([74.125.82.169]:38164 "EHLO
-	mail-we0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751380AbaFAIkS (ORCPT
+Received: from benson.vm.bytemark.co.uk ([212.110.190.137]:45409 "EHLO
+	benson.vm.bytemark.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751567AbaFBHQ3 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 1 Jun 2014 04:40:18 -0400
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: [PATCH] um: Generate "generic-y" header files for $(HEADER_ARCH)
-Date: Sun,  1 Jun 2014 10:40:09 +0200
-Message-Id: <1401612009-9572-1-git-send-email-geert@linux-m68k.org>
+	Mon, 2 Jun 2014 03:16:29 -0400
+From: Ian Campbell <ijc@hellion.org.uk>
+Subject: [PATCH] deb-pkg: Apply $(CROSS_COMPILE) when calling objcopy
+Date: Mon,  2 Jun 2014 07:47:37 +0100
+Message-Id: <1401691657-12222-1-git-send-email-ijc@hellion.org.uk>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Richard Weinberger <richard@nod.at>
-Cc: user-mode-linux-devel@lists.sourceforge.net, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Geert Uytterhoeven <geert@linux-m68k.org>
+To: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+Cc: Ben Hutchings <ben@decadent.org.uk>, maximilian attems <max@stro.at>, debian-kernel@lists.debian.org, Ian Campbell <ijc@hellion.org.uk>
 
-UM needs to perform header file generation for $(HEADER_ARCH), in addition
-to the standard $(ARCH).
+Allows me to cross build an armhf package from amd64.
 
-Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+Signed-off-by: Ian Campbell <ijc@hellion.org.uk>
 ---
-Prerequisite for "x86/uapi: Use Kbuild logic to include <asm-generic/types.h>"
-https://lkml.org/lkml/2013/11/25/229
+ scripts/package/builddeb | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Else it fails with:
-
-In file included from include/linux/types.h:5:0,
-                 from include/linux/page-flags.h:8,
-                 from kernel/bounds.c:9:
-include/uapi/linux/types.h:4:23: fatal error: asm/types.h: No such file or directory
-
- arch/um/Makefile | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/arch/um/Makefile b/arch/um/Makefile
-index 36e658a4291c..4a6caa4bc633 100644
---- a/arch/um/Makefile
-+++ b/arch/um/Makefile
-@@ -113,6 +113,12 @@ KBUILD_KCONFIG := $(HOST_DIR)/um/Kconfig
- archheaders:
- 	$(Q)$(MAKE) -C '$(srctree)' KBUILD_SRC= \
- 		ARCH=$(HEADER_ARCH) O='$(objtree)' archheaders
-+	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.asm-generic \
-+		    SRCARCH=$(HEADER_ARCH) src=asm \
-+		    obj=arch/$(HEADER_ARCH)/include/generated/asm
-+	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.asm-generic \
-+		    SRCARCH=$(HEADER_ARCH) src=uapi/asm \
-+		    obj=arch/$(HEADER_ARCH)/include/generated/uapi/asm
- 
- archprepare: include/generated/user_constants.h
- 
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index f46e4dd..c22ab79 100644
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -155,11 +155,11 @@ if grep -q '^CONFIG_MODULES=y' $KCONFIG_CONFIG ; then
+ 			for module in $(find lib/modules/ -name *.ko); do
+ 				mkdir -p $(dirname $dbg_dir/usr/lib/debug/$module)
+ 				# only keep debug symbols in the debug file
+-				objcopy --only-keep-debug $module $dbg_dir/usr/lib/debug/$module
++				${CROSS_COMPILE}objcopy --only-keep-debug $module $dbg_dir/usr/lib/debug/$module
+ 				# strip original module from debug symbols
+-				objcopy --strip-debug $module
++				${CROSS_COMPILE}objcopy --strip-debug $module
+ 				# then add a link to those
+-				objcopy --add-gnu-debuglink=$dbg_dir/usr/lib/debug/$module $module
++				${CROSS_COMPILE}objcopy --add-gnu-debuglink=$dbg_dir/usr/lib/debug/$module $module
+ 			done
+ 		)
+ 	fi
 -- 
-1.9.1
+1.9.0
 
