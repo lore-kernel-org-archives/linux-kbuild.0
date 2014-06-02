@@ -1,53 +1,32 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-la0-f51.google.com ([209.85.215.51]:42179 "EHLO
-	mail-la0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752724AbaFBJ33 (ORCPT
+Received: from benson.vm.bytemark.co.uk ([212.110.190.137]:59736 "EHLO
+	benson.vm.bytemark.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752784AbaFBJjT (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 2 Jun 2014 05:29:29 -0400
-Received: by mail-la0-f51.google.com with SMTP id gf5so2383919lab.38
-        for <linux-kbuild@vger.kernel.org>; Mon, 02 Jun 2014 02:29:27 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <1401691657-12222-1-git-send-email-ijc@hellion.org.uk>
-References: <1401691657-12222-1-git-send-email-ijc@hellion.org.uk>
-Date: Mon, 2 Jun 2014 12:29:27 +0300
-Message-ID: <CAGNsrLB+6Z12=ysQBd8AgvCaZCF+WRZ9T7S7WfAXa5Wapt8F1g@mail.gmail.com>
+	Mon, 2 Jun 2014 05:39:19 -0400
+Message-ID: <1401701956.15871.138.camel@hastur.hellion.org.uk>
 Subject: Re: [PATCH] deb-pkg: Apply $(CROSS_COMPILE) when calling objcopy
-From: Fathi Boudra <fathi.boudra@linaro.org>
-Content-Type: text/plain; charset=UTF-8
+From: Ian Campbell <ijc@hellion.org.uk>
+Date: Mon, 02 Jun 2014 10:39:16 +0100
+In-Reply-To: <CAGNsrLB+6Z12=ysQBd8AgvCaZCF+WRZ9T7S7WfAXa5Wapt8F1g@mail.gmail.com>
+References: <1401691657-12222-1-git-send-email-ijc@hellion.org.uk>
+	 <CAGNsrLB+6Z12=ysQBd8AgvCaZCF+WRZ9T7S7WfAXa5Wapt8F1g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ian Campbell <ijc@hellion.org.uk>
+To: Fathi Boudra <fathi.boudra@linaro.org>
 Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>, Ben Hutchings <ben@decadent.org.uk>, maximilian attems <max@stro.at>, debian-kernel@lists.debian.org
 
-On 2 June 2014 09:47, Ian Campbell <ijc@hellion.org.uk> wrote:
-> Allows me to cross build an armhf package from amd64.
->
-> Signed-off-by: Ian Campbell <ijc@hellion.org.uk>
-> ---
->  scripts/package/builddeb | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
->
-> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-> index f46e4dd..c22ab79 100644
-> --- a/scripts/package/builddeb
-> +++ b/scripts/package/builddeb
-> @@ -155,11 +155,11 @@ if grep -q '^CONFIG_MODULES=y' $KCONFIG_CONFIG ; then
->                         for module in $(find lib/modules/ -name *.ko); do
->                                 mkdir -p $(dirname $dbg_dir/usr/lib/debug/$module)
->                                 # only keep debug symbols in the debug file
-> -                               objcopy --only-keep-debug $module $dbg_dir/usr/lib/debug/$module
-> +                               ${CROSS_COMPILE}objcopy --only-keep-debug $module $dbg_dir/usr/lib/debug/$module
->                                 # strip original module from debug symbols
-> -                               objcopy --strip-debug $module
-> +                               ${CROSS_COMPILE}objcopy --strip-debug $module
->                                 # then add a link to those
-> -                               objcopy --add-gnu-debuglink=$dbg_dir/usr/lib/debug/$module $module
-> +                               ${CROSS_COMPILE}objcopy --add-gnu-debuglink=$dbg_dir/usr/lib/debug/$module $module
->                         done
->                 )
->         fi
-> --
-> 1.9.0
+On Mon, 2014-06-02 at 12:29 +0300, Fathi Boudra wrote:
+> I submitted it a month ago. It's already applied to kbuild.git#misc:
+> http://www.spinics.net/lists/linux-kbuild/msg09273.html
 
-I submitted it a month ago. It's already applied to kbuild.git#misc:
-http://www.spinics.net/lists/linux-kbuild/msg09273.html
+I must have missed it, thanks!
+
+Your version looks better (correctly uses $OBJCOPY)
+
+Ian.
+
+
