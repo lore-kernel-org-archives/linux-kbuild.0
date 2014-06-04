@@ -1,61 +1,72 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qa0-f50.google.com ([209.85.216.50]:56230 "EHLO
-	mail-qa0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932445AbaFCW1p (ORCPT
+Received: from mail-pd0-f173.google.com ([209.85.192.173]:62274 "EHLO
+	mail-pd0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751510AbaFDBtk (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 3 Jun 2014 18:27:45 -0400
-Received: by mail-qa0-f50.google.com with SMTP id j15so5776904qaq.23
-        for <linux-kbuild@vger.kernel.org>; Tue, 03 Jun 2014 15:27:44 -0700 (PDT)
-From: Paul Moore <paul@paul-moore.com>
-Subject: Re: [PATCH] selinux, kbuild: remove unnecessary $(hostprogs-y) from clean-files
-Date: Tue, 03 Jun 2014 18:27:41 -0400
-Message-ID: <5995003.J2pCs3i8WU@sifl>
-In-Reply-To: <20140603144739.321C.AA925319@jp.panasonic.com>
-References: <1397702546-25349-1-git-send-email-yamada.m@jp.panasonic.com> <5709743.58aAPSG601@sifl> <20140603144739.321C.AA925319@jp.panasonic.com>
+	Tue, 3 Jun 2014 21:49:40 -0400
+Message-ID: <538E7B2F.2000100@gmail.com>
+Date: Tue, 03 Jun 2014 19:49:35 -0600
+From: David Ahern <dsahern@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Subject: Re: [PATCH 03/32] perf tools: Kbuild source related fixies
+References: <1401833185-10347-1-git-send-email-alexis.berlemont@gmail.com> <1401833185-10347-4-git-send-email-alexis.berlemont@gmail.com>
+In-Reply-To: <1401833185-10347-4-git-send-email-alexis.berlemont@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Cc: selinux@tycho.nsa.gov, linux-kbuild@vger.kernel.org
+To: Alexis Berlemont <alexis.berlemont@gmail.com>, linux-kernel@vger.kernel.org
+Cc: Jiri Olsa <jolsa@redhat.com>, mingo@kernel.org, sam@ravnborg.org, mmarek@suse.cz, Arnaldo Carvalho de Melo <acme@ghostprotocols.net>, Peter Zijlstra <a.p.zijlstra@chello.nl>, Ingo Molnar <mingo@elte.hu>, Paul Mackerras <paulus@samba.org>, Corey Ashford <cjashfor@linux.vnet.ibm.com>, Frederic Weisbecker <fweisbec@gmail.com>, Namhyung Kim <namhyung@kernel.org>, Borislav Petkov <bp@alien8.de>, linux-kbuild@vger.kernel.org, Stephane Eranian <eranian@google.com>
 
-On Tuesday, June 03, 2014 02:47:39 PM Masahiro Yamada wrote:
-> Hi Paul Moore,
+On 6/3/14, 4:05 PM, Alexis Berlemont wrote:
+> From: Jiri Olsa <jolsa@redhat.com>
+>
+> Fixing several sources config dependencies to allow
+> separate config builds.
+>
+> Signed-off-by: Jiri Olsa <jolsa@redhat.com>
+> Cc: Arnaldo Carvalho de Melo <acme@ghostprotocols.net>
+> Cc: Peter Zijlstra <a.p.zijlstra@chello.nl>
+> Cc: Ingo Molnar <mingo@elte.hu>
+> Cc: Paul Mackerras <paulus@samba.org>
+> Cc: Corey Ashford <cjashfor@linux.vnet.ibm.com>
+> Cc: Frederic Weisbecker <fweisbec@gmail.com>
+> Cc: Namhyung Kim <namhyung@kernel.org>
+> Cc: Borislav Petkov <bp@alien8.de>
+> Cc: Michal Marek <mmarek@suse.cz>
+> Cc: linux-kbuild@vger.kernel.org
+> Cc: Stephane Eranian <eranian@google.com>
+> ---
+>   tools/perf/builtin-lock.c        |  4 +++-
+>   tools/perf/builtin-sched.c       |  2 ++
+>   tools/perf/perf.c                |  6 ++++++
+>   tools/perf/perf.h                |  2 ++
+>   tools/perf/ui/browsers/scripts.c |  4 ++++
+>   tools/perf/ui/setup.c            | 10 +++++++++-
+>   6 files changed, 26 insertions(+), 2 deletions(-)
+>
+> diff --git a/tools/perf/builtin-lock.c b/tools/perf/builtin-lock.c
+> index c852c7a..b255c20 100644
+> --- a/tools/perf/builtin-lock.c
+> +++ b/tools/perf/builtin-lock.c
+> @@ -992,9 +992,11 @@ int cmd_lock(int argc, const char **argv, const char *prefix __maybe_unused)
+>   				usage_with_options(report_usage, report_options);
+>   		}
+>   		rc = __cmd_report(false);
+> +#ifdef CONFIG_BULTIN_SCRIPT
+>   	} else if (!strcmp(argv[0], "script")) {
+>   		/* Aliased to 'perf script' */
+> -		return cmd_script(argc, argv, prefix);
+> +		rc = cmd_script(argc, argv, prefix);
+> +#endif
+>   	} else if (!strcmp(argv[0], "info")) {
+>   		if (argc) {
+>   			argc = parse_options(argc, argv,
 
-Hello.
+Since you are not adding builtin-cmds.h as an included file this change 
+takes away functionality. Each patch should ensure that existing options 
+continue to work after the change.
 
-> On Thu, 17 Apr 2014 21:41:53 -0400 Paul Moore <paul@paul-moore.com> wrote:
-> > On Thursday, April 17, 2014 11:42:26 AM Masahiro Yamada wrote:
-> > > Files added to hostprogs-y are cleaned. (See scripts/Makefile.clean)
-> > > Adding them to clean-files is redundant.
-> > > 
-> > > Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
-> > > ---
-> > > 
-> > >  scripts/selinux/genheaders/Makefile | 1 -
-> > >  scripts/selinux/mdp/Makefile        | 2 +-
-> > >  2 files changed, 1 insertion(+), 2 deletions(-)
-> > 
-> > Acked-by: Paul Moore <paul@paul-moore.com>
-> 
-> It looks like this patch was not included into
-> GIT-PULL of "SELinux patches for 3.16".
-> 
-> Is it possible to apply this and send another pull request?
+ditto for all of the other changes to other files.
 
-My apologies, I thought the kbuild people were going to merge this patch; this 
-is why I sent my Acked-by instead of a note that I've merged the patch.  
-Considering that this patch doesn't actually fix any runtime problems and it 
-hasn't been in any of the different "next" trees, I think it is best to wait 
-until 3.17 for this patch.
-
-I've added this patch to my queue of patches to be added to the SELinux #next 
-branch after the 3.16 merge window closes.
-
-Thanks again for the patch, I'm sorry that we didn't get it merged sooner.
-
--- 
-paul moore
-www.paul-moore.com
-
+David
