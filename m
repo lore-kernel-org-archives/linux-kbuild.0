@@ -1,56 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pd0-f170.google.com ([209.85.192.170]:49928 "EHLO
-	mail-pd0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932176AbaFDHwv (ORCPT
+Received: from mail-vc0-f175.google.com ([209.85.220.175]:60653 "EHLO
+	mail-vc0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751807AbaFDJDz (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 4 Jun 2014 03:52:51 -0400
-Received: by mail-pd0-f170.google.com with SMTP id g10so5774416pdj.1
-        for <linux-kbuild@vger.kernel.org>; Wed, 04 Jun 2014 00:52:50 -0700 (PDT)
-From: Brian Norris <computersforpeace@gmail.com>
-Subject: [PATCH 2/2] kconfig: nconfig: fix multi-byte UTF handling
-Date: Wed,  4 Jun 2014 00:52:31 -0700
-Message-Id: <1401868351-24014-3-git-send-email-computersforpeace@gmail.com>
-In-Reply-To: <1401868351-24014-1-git-send-email-computersforpeace@gmail.com>
-References: <1401868351-24014-1-git-send-email-computersforpeace@gmail.com>
+	Wed, 4 Jun 2014 05:03:55 -0400
+MIME-Version: 1.0
+In-Reply-To: <1399639944-20551-4-git-send-email-mmarek@suse.cz>
+References: <1399639944-20551-1-git-send-email-mmarek@suse.cz>
+	<1399639944-20551-4-git-send-email-mmarek@suse.cz>
+Date: Wed, 4 Jun 2014 11:03:54 +0200
+Message-ID: <CAFLxGvyz-aX8rTveo9W3mqsQxPeg8cb7Oq59UiC1kMz4qTiYwg@mail.gmail.com>
+Subject: Re: [PATCH v2 3/5] kbuild: Use relative path for $(objtree)
+From: Richard Weinberger <richard.weinberger@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Brian Norris <computersforpeace@gmail.com>, Artem Bityutskiy <dedekind1@gmail.com>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Martin Walch <walch.martin@web.de>
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, rdunlap@infradead.org
 
-Currently, Kconfig descriptions that use multi-byte UTF-8 characters
-(such as MTD_NAND_CAFE) will have their menu entries dropped from the
-'make nconfig' ncurses menu, and all subsequent entries in the same
-window will be omitted. This seems to be due to the ncurses 'menu'
-library, which does not traditionally handle UTF-8 >8-bit characters
-properly.
+On Fri, May 9, 2014 at 2:52 PM, Michal Marek <mmarek@suse.cz> wrote:
+> The main Makefile sets its working directory to the object tree and
+> never changes it again. Therefore, we can use '.' instead of the
+> absolute path. The only case where we need the absolute path is when
+> creating the 'build' symlink in /lib/modules.
+>
+> Acked-by: Sam Ravnborg <sam@ravnborg.org>
+> Signed-off-by: Michal Marek <mmarek@suse.cz>
+> ---
+> v1->v2: Fix the 'build' symlink
+>
+>  Makefile | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/Makefile b/Makefile
+> index 60ccbfe..480503a 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -154,7 +154,7 @@ _all: modules
+>  endif
+>
+>  srctree                := $(if $(KBUILD_SRC),$(KBUILD_SRC),$(CURDIR))
+> -objtree                := $(CURDIR)
+> +objtree                := .
+>  src            := $(srctree)
+>  obj            := $(objtree)
+>
+> @@ -1057,7 +1057,7 @@ _modinst_:
+>         @ln -s $(srctree) $(MODLIB)/source
+>         @if [ ! $(objtree) -ef  $(MODLIB)/build ]; then \
+>                 rm -f $(MODLIB)/build ; \
+> -               ln -s $(objtree) $(MODLIB)/build ; \
+> +               ln -s $(CURDIR) $(MODLIB)/build ; \
+>         fi
+>         @cp -f $(objtree)/modules.order $(MODLIB)/
+>         @cp -f $(objtree)/modules.builtin $(MODLIB)/
 
-The ncursesw library ('w' is for "wide") is written to handle these
-UTF-8 characters, and is practically a drop-in replacement at the source
-level. Use it by default, if available.
+This commit breaks the of-of-tree build of UML.
 
-Link: https://bugzilla.kernel.org/show_bug.cgi?id=43067
-Signed-off-by: Brian Norris <computersforpeace@gmail.com>
-Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: linux-kbuild@vger.kernel.org
-Cc: Martin Walch <walch.martin@web.de>
----
- scripts/kconfig/Makefile |    3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+  CC      arch/x86/um/user-offsets.s
+/home/rw/linux-next/arch/x86/um/user-offsets.c:21:29: fatal error:
+asm/syscalls_64.h: No such file or directory
+compilation terminated.
+make[2]: *** [arch/x86/um/user-offsets.s] Error 1
+make[1]: *** [arch/x86/um/user-offsets.s] Error 2
+make: *** [sub-make] Error 2
 
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index 844bc9da08da..0171566cc12a 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -220,7 +220,8 @@ HOSTCFLAGS_gconf.o	= `pkg-config --cflags gtk+-2.0 gmodule-2.0 libglade-2.0` \
- HOSTLOADLIBES_mconf   = $(shell $(CONFIG_SHELL) $(check-lxdialog) -ldflags $(HOSTCC))
- 
- HOSTLOADLIBES_nconf	= $(shell \
--				pkg-config --libs menu panel ncurses 2>/dev/null \
-+				pkg-config --libs menuw panelw ncursesw 2>/dev/null \
-+				|| pkg-config --libs menu panel ncurses 2>/dev/null \
- 				|| echo "-lmenu -lpanel -lncurses"  )
- $(obj)/qconf.o: $(obj)/.tmp_qtcheck
- 
+To reproduce run:
+make defconfig ARCH=um O=/mnt/o && make linux ARCH=um O=/mnt/
+
+If there is anything in UML which needs fixing, please tell. :-)
+
 -- 
-1.7.9.5
-
+Thanks,
+//richard
