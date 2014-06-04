@@ -1,83 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:33768 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753029AbaFDNa5 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 4 Jun 2014 09:30:57 -0400
-Message-ID: <538F1B41.3060904@suse.cz>
-Date: Wed, 04 Jun 2014 15:12:33 +0200
-From: Michal Marek <mmarek@suse.cz>
+Received: from mail-wi0-f172.google.com ([209.85.212.172]:65180 "EHLO
+	mail-wi0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752383AbaFDNgb (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 4 Jun 2014 09:36:31 -0400
+Message-ID: <538F20D6.7030207@gmail.com>
+Date: Wed, 04 Jun 2014 15:36:22 +0200
+From: =?ISO-8859-1?Q?Pascal_H=FCrst?= <pascal.huerst@gmail.com>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 3/5] kbuild: Use relative path for $(objtree)
-References: <1399639944-20551-1-git-send-email-mmarek@suse.cz>	<1399639944-20551-4-git-send-email-mmarek@suse.cz> <CAFLxGvyz-aX8rTveo9W3mqsQxPeg8cb7Oq59UiC1kMz4qTiYwg@mail.gmail.com> <538EEA3D.1080105@suse.cz>
-In-Reply-To: <538EEA3D.1080105@suse.cz>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Subject: Re: [RFC PATCH 00/11] Embeddable Position Independent Executable
+References: <1379421817-15759-1-git-send-email-Russ.Dill@ti.com> <201310241009.12597.heiko@sntech.de> <1441820.DP5PYDOd2T@phil>
+In-Reply-To: <1441820.DP5PYDOd2T@phil>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Richard Weinberger <richard.weinberger@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, rdunlap@infradead.org
+To: =?ISO-8859-1?Q?Heiko_St=FCbner?= <heiko@sntech.de>, Russ Dill <Russ.Dill@ti.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-omap@vger.kernel.org, mans@mansr.com, Russell King - ARM Linux <linux@arm.linux.org.uk>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, linux-kbuild@vger.kernel.org
 
-On 2014-06-04 11:43, Michal Marek wrote:
-> On 2014-06-04 11:03, Richard Weinberger wrote:
->> On Fri, May 9, 2014 at 2:52 PM, Michal Marek <mmarek@suse.cz> wrote:
->>> The main Makefile sets its working directory to the object tree and
->>> never changes it again. Therefore, we can use '.' instead of the
->>> absolute path. The only case where we need the absolute path is when
->>> creating the 'build' symlink in /lib/modules.
->>>
->>> Acked-by: Sam Ravnborg <sam@ravnborg.org>
->>> Signed-off-by: Michal Marek <mmarek@suse.cz>
->>> ---
->>> v1->v2: Fix the 'build' symlink
->>>
->>>  Makefile | 4 ++--
->>>  1 file changed, 2 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/Makefile b/Makefile
->>> index 60ccbfe..480503a 100644
->>> --- a/Makefile
->>> +++ b/Makefile
->>> @@ -154,7 +154,7 @@ _all: modules
->>>  endif
->>>
->>>  srctree                := $(if $(KBUILD_SRC),$(KBUILD_SRC),$(CURDIR))
->>> -objtree                := $(CURDIR)
->>> +objtree                := .
->>>  src            := $(srctree)
->>>  obj            := $(objtree)
->>>
->>> @@ -1057,7 +1057,7 @@ _modinst_:
->>>         @ln -s $(srctree) $(MODLIB)/source
->>>         @if [ ! $(objtree) -ef  $(MODLIB)/build ]; then \
->>>                 rm -f $(MODLIB)/build ; \
->>> -               ln -s $(objtree) $(MODLIB)/build ; \
->>> +               ln -s $(CURDIR) $(MODLIB)/build ; \
->>>         fi
->>>         @cp -f $(objtree)/modules.order $(MODLIB)/
->>>         @cp -f $(objtree)/modules.builtin $(MODLIB)/
->>
->> This commit breaks the of-of-tree build of UML.
->>
->>   CC      arch/x86/um/user-offsets.s
->> /home/rw/linux-next/arch/x86/um/user-offsets.c:21:29: fatal error:
->> asm/syscalls_64.h: No such file or directory
->> compilation terminated.
->> make[2]: *** [arch/x86/um/user-offsets.s] Error 1
->> make[1]: *** [arch/x86/um/user-offsets.s] Error 2
->> make: *** [sub-make] Error 2
->>
->> To reproduce run:
->> make defconfig ARCH=um O=/mnt/o && make linux ARCH=um O=/mnt/
->>
->> If there is anything in UML which needs fixing, please tell. :-)
-> 
-> I'll have a look, thanks for the report.
+Hi Ru
 
-Findings so far: For some reason, syscalls_32.h is generated in the
-source tree (which is wrong) and syscalls_64.h is not generated at all.
-Looking further.
+On 22.04.2014 10:15, Heiko Stübner wrote:
+> Hi Russ,
+>
+> Am Donnerstag, 24. Oktober 2013, 10:09:12 schrieb Heiko Stübner:
+>> Am Dienstag, 17. September 2013, 14:43:26 schrieb Russ Dill:
+>>> This patch adds support for and demonstrates the usage of an embedded
+>>> position independent executable (PIE). The goal is to allow the use of C
+>>> code in situations where carefully written position independent assembly
+>>> was previously required.
+>>
+>> As suggested yesterday evening by Kevin Hilman, just adding my 2ct of
+>> support.
+>>
+>> This series looks exactly like the foundation I'll need at some point in the
+>> (probably still distant) future to handle suspend on my Rockchip platform -
+>> where like in your example stuff like putting the ram into selfrefresh has
+>> to be done by the os.
+>
+> just as it came up recently again for me and I couldn't find any newer version,
+> ist this series still on the table?
 
-Also, it looks like make O=/dir bzImage on x86_64 non-um has been broken
-even before this commit. 'make all' works fine. Not sure if it is related.
+We have to maintain quite some patches, to keep pm working for our 
+project, so we're interested to get this mainline, too. Is someone 
+taking care of these issues? Or is there something i can do to help 
+getting this done?
 
-Michal
+regards
+pascal
