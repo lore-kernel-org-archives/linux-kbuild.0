@@ -1,103 +1,115 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mho-02-ewr.mailhop.org ([204.13.248.72]:27186 "EHLO
-	mho-02-ewr.mailhop.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752377AbaFFP2v (ORCPT
+Received: from mho-03-ewr.mailhop.org ([204.13.248.66]:46714 "EHLO
+	mho-01-ewr.mailhop.org" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1752117AbaFFPdV (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 6 Jun 2014 11:28:51 -0400
-Date: Fri, 6 Jun 2014 11:28:47 -0400
+	Fri, 6 Jun 2014 11:33:21 -0400
+Date: Fri, 6 Jun 2014 11:33:18 -0400
 From: Jason Cooper <jason@lakedaemon.net>
-Subject: Re: [PATCH 2/7] scripts: objdiff: direct error messages to stderr
-Message-ID: <20140606152847.GJ8664@titan.lakedaemon.net>
+Subject: Re: [PATCH 4/7] scripts: objdiff: improve path flexibility for
+ record command
+Message-ID: <20140606153318.GK8664@titan.lakedaemon.net>
 References: <1401448315-800-1-git-send-email-yamada.m@jp.panasonic.com>
- <1401448315-800-3-git-send-email-yamada.m@jp.panasonic.com>
+ <1401448315-800-5-git-send-email-yamada.m@jp.panasonic.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1401448315-800-3-git-send-email-yamada.m@jp.panasonic.com>
+In-Reply-To: <1401448315-800-5-git-send-email-yamada.m@jp.panasonic.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.m@jp.panasonic.com>
 Cc: linux-kbuild@vger.kernel.org
 
-Masahiro,
+On Fri, May 30, 2014 at 08:11:52PM +0900, Masahiro Yamada wrote:
+> Prior to this commit, scripts/objdiff expected to be run at the top
+> directory and only the reltive path of objects.
 
-Thanks for the patch series!
-
-On Fri, May 30, 2014 at 08:11:50PM +0900, Masahiro Yamada wrote:
-> Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
-> Cc: Jason Cooper <jason@lakedaemon.net>
-> ---
->  scripts/objdiff | 18 +++++++++---------
->  1 file changed, 9 insertions(+), 9 deletions(-)
-> 
-> diff --git a/scripts/objdiff b/scripts/objdiff
-> index b8f7fc6..cc67365 100755
-> --- a/scripts/objdiff
-> +++ b/scripts/objdiff
-> @@ -28,17 +28,17 @@
->  SRCTREE=$(git rev-parse --show-toplevel 2>/dev/null)
->  
->  if [ -z "$SRCTREE" ]; then
-> -	echo "ERROR: Not a git repository."
-> +	echo >&2 "ERROR: Not a git repository."
->  	exit 1
->  fi
->  
->  TMPD=$SRCTREE/.tmp_objdiff
->  
->  usage() {
-> -	echo "Usage: $0 <command> <args>"
-> -	echo "  record    <list of object files>"
-> -	echo "  diff      <commitA> <commitB>"
-> -	echo "  clean     all | <commit>"
-> +	echo >&2 "Usage: $0 <command> <args>"
-> +	echo >&2 "  record    <list of object files>"
-> +	echo >&2 "  diff      <commitA> <commitB>"
-> +	echo >&2 "  clean     all | <commit>"
-
-I must admit I've never seen it written this way, but my CDO [1]
-definitely likes it :)
-
->  	exit 1
->  }
->  
-> @@ -88,12 +88,12 @@ dodiff() {
->  	DSTD="$TMPD/$DST"
->  
->  	if [ ! -d "$SRCD" ]; then
-> -		echo "ERROR: $SRCD doesn't exist"
-> +		echo >&2 "ERROR: $SRCD doesn't exist"
->  		exit 1
->  	fi
->  
->  	if [ ! -d "$DSTD" ]; then
-> -		echo "ERROR: $DSTD doesn't exist"
-> +		echo >&2 "ERROR: $DSTD doesn't exist"
->  		exit 1
->  	fi
->  
-> @@ -112,7 +112,7 @@ doclean() {
->  		if [ -d "$TMPD/$CMT" ]; then
->  			rm -rf $TMPD/$CMT
->  		else
-> -			echo "$CMT not found"
-> +			echo >&2 "$CMT not found"
->  		fi
->  	fi
->  }
-> @@ -133,7 +133,7 @@ case "$1" in
->  		doclean $*
->  		;;
->  	*)
-> -		echo "Unrecognized command '$1'"
-> +		echo >&2 "Unrecognized command '$1'"
->  		exit 1
->  		;;
->  esac
-
+nit: s/reltive/relative/
 
 thx,
 
 Jason.
 
-[1] CDO: OCD with the letters neatly arranged in alphabetical order.
+> This commit provides more flexibility in terms of object path:
+> 
+> [1] scripts/objdiff can be run at any directory
+> 
+> For example,
+> 
+>   $ scripts/objdiff record init/main.o
+> 
+> and
+> 
+>   $ cd init; ../scripts/objdiff record main.o
+> 
+> produce the same result.
+> 
+> [2] Support absolute path for objects
+> 
+>   $ scripts/objdiff record /home/foo/bar/linux/init/main.o
+> 
+> work as well.
+> 
+> Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
+> Cc: Jason Cooper <jason@lakedaemon.net>
+> ---
+>  scripts/objdiff | 22 ++++++++++++++++------
+>  1 file changed, 16 insertions(+), 6 deletions(-)
+> 
+> diff --git a/scripts/objdiff b/scripts/objdiff
+> index 6e72f96..499eb4b 100755
+> --- a/scripts/objdiff
+> +++ b/scripts/objdiff
+> @@ -25,7 +25,7 @@
+>  #
+>  # Note: 'make mrproper' will also remove .tmp_objdiff
+>  
+> -SRCTREE=$(git rev-parse --show-toplevel 2>/dev/null)
+> +SRCTREE=$(cd $(git rev-parse --show-toplevel 2>/dev/null); pwd)
+>  
+>  if [ -z "$SRCTREE" ]; then
+>  	echo >&2 "ERROR: Not a git repository."
+> @@ -42,6 +42,18 @@ usage() {
+>  	exit 1
+>  }
+>  
+> +get_output_dir() {
+> +	dir=${1%/*}
+> +
+> +	if [ "$dir" = "$1" ]; then
+> +		dir=.
+> +	fi
+> +
+> +	dir=$(cd $dir; pwd)
+> +
+> +	echo $TMPD/$CMT${dir#$SRCTREE}
+> +}
+> +
+>  dorecord() {
+>  	[ $# -eq 0 ] && usage
+>  
+> @@ -50,18 +62,16 @@ dorecord() {
+>  	CMT="`git rev-parse --short HEAD`"
+>  
+>  	OBJDUMP="${CROSS_COMPILE}objdump"
+> -	OBJDIFFD="$TMPD/$CMT"
+>  
+>  	for f in $FILES; do
+> -		dn="${f%/*}"
+> +		dir=$(get_output_dir $f)
+>  		bn="${f##*/}"
+>  
+> -		[ ! -d "$OBJDIFFD/$dn" ] && mkdir -p "$OBJDIFFD/$dn"
+> +		[ ! -d "$dir" ] && mkdir -p $dir
+>  
+>  		# remove addresses for a more clear diff
+>  		# http://dummdida.tumblr.com/post/60924060451/binary-diff-between-libc-from-scientificlinux-and
+> -		$OBJDUMP -D "$f" | sed "s/^[[:space:]]\+[0-9a-f]\+//" \
+> -			>"$OBJDIFFD/$dn/$bn"
+> +		$OBJDUMP -D $f | sed "s/^[[:space:]]\+[0-9a-f]\+//" > $dir/$bn
+>  	done
+>  }
+>  
+> -- 
+> 1.9.1
+> 
