@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.mei.co.jp ([133.183.100.20]:53922 "EHLO smtp.mei.co.jp"
+Received: from smtp.mei.co.jp ([133.183.100.20]:53939 "EHLO smtp.mei.co.jp"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754257AbaFICRt (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 8 Jun 2014 22:17:49 -0400
+	id S1754268AbaFICRv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 8 Jun 2014 22:17:51 -0400
 From: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Subject: [PATCH v2 2/7] scripts: objdiff: direct error messages to stderr
-Date: Mon,  9 Jun 2014 11:16:35 +0900
-Message-Id: <1402280200-21834-3-git-send-email-yamada.m@jp.panasonic.com>
+Subject: [PATCH v2 4/7] scripts: objdiff: improve path flexibility for record command
+Date: Mon,  9 Jun 2014 11:16:37 +0900
+Message-Id: <1402280200-21834-5-git-send-email-yamada.m@jp.panasonic.com>
 In-Reply-To: <1402280200-21834-1-git-send-email-yamada.m@jp.panasonic.com>
 References: <1402280200-21834-1-git-send-email-yamada.m@jp.panasonic.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -14,76 +14,94 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Jason Cooper <jason@lakedaemon.net>, Masahiro Yamada <yamada.m@jp.panasonic.com>
 
+Prior to this commit, scripts/objdiff expected to be run at the top
+directory and only the relative path of objects.
+
+This commit provides more flexibility in terms of object path:
+
+[1] scripts/objdiff can be run in any directory
+
+For example,
+
+  $ scripts/objdiff record init/main.o
+
+and
+
+  $ cd init; ../scripts/objdiff record main.o
+
+produce the same result.
+
+[2] Support absolute path for objects
+
+  $ scripts/objdiff record /home/foo/bar/linux/init/main.o
+
+work as well.
+
 Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
 Cc: Jason Cooper <jason@lakedaemon.net>
 Acked-by: Jason Cooper <jason@lakedaemon.net>
 ---
 
-Changes in v2: None
+Changes in v2:
+  - Fix a typo in commit description:  s/reltive/relative/
 
- scripts/objdiff | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+ scripts/objdiff | 22 ++++++++++++++++------
+ 1 file changed, 16 insertions(+), 6 deletions(-)
 
 diff --git a/scripts/objdiff b/scripts/objdiff
-index b8f7fc6..cc67365 100755
+index 6e72f96..499eb4b 100755
 --- a/scripts/objdiff
 +++ b/scripts/objdiff
-@@ -28,17 +28,17 @@
- SRCTREE=$(git rev-parse --show-toplevel 2>/dev/null)
+@@ -25,7 +25,7 @@
+ #
+ # Note: 'make mrproper' will also remove .tmp_objdiff
+ 
+-SRCTREE=$(git rev-parse --show-toplevel 2>/dev/null)
++SRCTREE=$(cd $(git rev-parse --show-toplevel 2>/dev/null); pwd)
  
  if [ -z "$SRCTREE" ]; then
--	echo "ERROR: Not a git repository."
-+	echo >&2 "ERROR: Not a git repository."
- 	exit 1
- fi
- 
- TMPD=$SRCTREE/.tmp_objdiff
- 
- usage() {
--	echo "Usage: $0 <command> <args>"
--	echo "  record    <list of object files>"
--	echo "  diff      <commitA> <commitB>"
--	echo "  clean     all | <commit>"
-+	echo >&2 "Usage: $0 <command> <args>"
-+	echo >&2 "  record    <list of object files>"
-+	echo >&2 "  diff      <commitA> <commitB>"
-+	echo >&2 "  clean     all | <commit>"
+ 	echo >&2 "ERROR: Not a git repository."
+@@ -42,6 +42,18 @@ usage() {
  	exit 1
  }
  
-@@ -88,12 +88,12 @@ dodiff() {
- 	DSTD="$TMPD/$DST"
++get_output_dir() {
++	dir=${1%/*}
++
++	if [ "$dir" = "$1" ]; then
++		dir=.
++	fi
++
++	dir=$(cd $dir; pwd)
++
++	echo $TMPD/$CMT${dir#$SRCTREE}
++}
++
+ dorecord() {
+ 	[ $# -eq 0 ] && usage
  
- 	if [ ! -d "$SRCD" ]; then
--		echo "ERROR: $SRCD doesn't exist"
-+		echo >&2 "ERROR: $SRCD doesn't exist"
- 		exit 1
- 	fi
+@@ -50,18 +62,16 @@ dorecord() {
+ 	CMT="`git rev-parse --short HEAD`"
  
- 	if [ ! -d "$DSTD" ]; then
--		echo "ERROR: $DSTD doesn't exist"
-+		echo >&2 "ERROR: $DSTD doesn't exist"
- 		exit 1
- 	fi
+ 	OBJDUMP="${CROSS_COMPILE}objdump"
+-	OBJDIFFD="$TMPD/$CMT"
  
-@@ -112,7 +112,7 @@ doclean() {
- 		if [ -d "$TMPD/$CMT" ]; then
- 			rm -rf $TMPD/$CMT
- 		else
--			echo "$CMT not found"
-+			echo >&2 "$CMT not found"
- 		fi
- 	fi
+ 	for f in $FILES; do
+-		dn="${f%/*}"
++		dir=$(get_output_dir $f)
+ 		bn="${f##*/}"
+ 
+-		[ ! -d "$OBJDIFFD/$dn" ] && mkdir -p "$OBJDIFFD/$dn"
++		[ ! -d "$dir" ] && mkdir -p $dir
+ 
+ 		# remove addresses for a more clear diff
+ 		# http://dummdida.tumblr.com/post/60924060451/binary-diff-between-libc-from-scientificlinux-and
+-		$OBJDUMP -D "$f" | sed "s/^[[:space:]]\+[0-9a-f]\+//" \
+-			>"$OBJDIFFD/$dn/$bn"
++		$OBJDUMP -D $f | sed "s/^[[:space:]]\+[0-9a-f]\+//" > $dir/$bn
+ 	done
  }
-@@ -133,7 +133,7 @@ case "$1" in
- 		doclean $*
- 		;;
- 	*)
--		echo "Unrecognized command '$1'"
-+		echo >&2 "Unrecognized command '$1'"
- 		exit 1
- 		;;
- esac
+ 
 -- 
 1.9.1
 
