@@ -1,53 +1,95 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:45244 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:45315 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932246AbaFIWIR (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 9 Jun 2014 18:08:17 -0400
-Message-ID: <5396304F.5000107@suse.cz>
-Date: Tue, 10 Jun 2014 00:08:15 +0200
+	id S932344AbaFIWOj (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 9 Jun 2014 18:14:39 -0400
+Message-ID: <539631CC.9040002@suse.cz>
+Date: Tue, 10 Jun 2014 00:14:36 +0200
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH] kbuild: trivial - remove trailing empty lines
-References: <1401340349-15575-1-git-send-email-yamada.m@jp.panasonic.com>
-In-Reply-To: <1401340349-15575-1-git-send-email-yamada.m@jp.panasonic.com>
-Content-Type: text/plain; charset=ISO-8859-2
+Subject: Re: [PATCH v2 3/5] kbuild: Use relative path for $(objtree)
+References: <1399639944-20551-1-git-send-email-mmarek@suse.cz> <1399639944-20551-4-git-send-email-mmarek@suse.cz> <CAFLxGvyz-aX8rTveo9W3mqsQxPeg8cb7Oq59UiC1kMz4qTiYwg@mail.gmail.com> <538EEA3D.1080105@suse.cz> <538F1B41.3060904@suse.cz> <20140605155614.GA18376@sepie.suse.cz> <539625D1.2090905@infradead.org>
+In-Reply-To: <539625D1.2090905@infradead.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.m@jp.panasonic.com>, linux-kbuild@vger.kernel.org
+To: Randy Dunlap <rdunlap@infradead.org>, Richard Weinberger <richard.weinberger@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>
 
-Dne 29.5.2014 07:12, Masahiro Yamada napsal(a):
-> Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
-> ---
->  scripts/Makefile.asm-generic        | 1 -
->  scripts/Makefile.host               | 1 -
->  scripts/checkstack.pl               | 1 -
->  scripts/config                      | 1 -
->  scripts/dtc/.gitignore              | 1 -
->  scripts/dtc/fstree.c                | 1 -
->  scripts/dtc/libfdt/fdt_empty_tree.c | 1 -
->  scripts/dtc/treesource.c            | 1 -
->  scripts/headers.sh                  | 2 --
->  scripts/kconfig/Makefile            | 1 -
->  scripts/kconfig/check.sh            | 1 -
->  scripts/kconfig/mconf.c             | 1 -
->  scripts/kconfig/nconf.c             | 1 -
->  scripts/kconfig/util.c              | 2 --
->  scripts/markup_oops.pl              | 1 -
->  scripts/mksysmap                    | 1 -
->  scripts/mod/.gitignore              | 1 -
->  scripts/mod/mk_elfconfig.c          | 1 -
->  scripts/package/Makefile            | 1 -
->  scripts/package/buildtar            | 1 -
->  scripts/pnmtologo.c                 | 1 -
->  scripts/recordmcount.c              | 2 --
->  scripts/rt-tester/check-all.sh      | 1 -
->  scripts/rt-tester/rt-tester.py      | 2 --
->  scripts/selinux/install_policy.sh   | 1 -
->  scripts/show_delta                  | 1 -
->  26 files changed, 30 deletions(-)
+Dne 9.6.2014 23:23, Randy Dunlap napsal(a):
+> On 06/05/14 08:56, Michal Marek wrote:
+>> On Wed, Jun 04, 2014 at 03:12:33PM +0200, Michal Marek wrote:
+>>> On 2014-06-04 11:43, Michal Marek wrote:
+>>>> On 2014-06-04 11:03, Richard Weinberger wrote:
+>>>>> To reproduce run:
+>>>>> make defconfig ARCH=um O=/mnt/o && make linux ARCH=um O=/mnt/
+>>>>>
+>>>>> If there is anything in UML which needs fixing, please tell. :-)
+>>>>
+>>>> I'll have a look, thanks for the report.
+>>>
+>>> Findings so far: For some reason, syscalls_32.h is generated in the
+>>> source tree (which is wrong) and syscalls_64.h is not generated at all.
+>>> Looking further.
+>>
+>> Can you try the below patch? The same pattern is used in the rules for
+>> tools/ and tools/% in the main Makefile, need to look into that as well.
+>> But UML should work now.
+>>
+>> Michal
+>>
+>> From d4bc590f8716f7dde6b7bca319097ac30a8cb0b4 Mon Sep 17 00:00:00 2001
+>> From: Michal Marek <mmarek@suse.cz>
+>> Date: Thu, 5 Jun 2014 17:44:44 +0200
+>> Subject: [PATCH] um: Fix for relative objtree when generating x86 headers
+>>
+>> In an O= build, rely on the generated Makefile to call the main Makefile
+>> properly. When building in the source tree, we do not need to specify
+>> the -C and O= either. This fixes the problem when $(objtree) is a
+>> relative path and the -C changes the directory.
+>>
+>> Reported-by: Richard Weinberger <richard.weinberger@gmail.com>
+>> Signed-off-by: Michal Marek <mmarek@suse.cz>
+>> ---
+>>  arch/um/Makefile | 3 +--
+>>  1 file changed, 1 insertion(+), 2 deletions(-)
+>>
+>> diff --git a/arch/um/Makefile b/arch/um/Makefile
+>> index 36e658a..e4b1a96 100644
+>> --- a/arch/um/Makefile
+>> +++ b/arch/um/Makefile
+>> @@ -111,8 +111,7 @@ endef
+>>  KBUILD_KCONFIG := $(HOST_DIR)/um/Kconfig
+>>  
+>>  archheaders:
+>> -	$(Q)$(MAKE) -C '$(srctree)' KBUILD_SRC= \
+>> -		ARCH=$(HEADER_ARCH) O='$(objtree)' archheaders
+>> +	$(Q)$(MAKE) KBUILD_SRC= ARCH=$(HEADER_ARCH) archheaders
+>>  
+>>  archprepare: include/generated/user_constants.h
+>>  
+>>
+> 
+> I still get this build error when building uml for i386:
+> 
+>   CC      arch/x86/um/user-offsets.s
+> ../arch/x86/um/user-offsets.c:14:29: fatal error: asm/syscalls_32.h: No such file or directory
+> compilation terminated.
+> make[2]: *** [arch/x86/um/user-offsets.s] Error 1
 
-Applied to kbuild.git#misc, thanks.
+Thanks for testing the patch. I cannot reproduce it though:
 
+  make ARCH=um SUBARCH=i386 O=/dev/shm/li defconfig
+  make ARCH=um SUBARCH=i386 O=/dev/shm/li
+
+works fine (at least it gets to the point when it starts compiling the
+actual kernel source). This is the previous kbuild/kbuild branch (commit
+9da0763) with the above fix applied.
+
+Also, you pointed out i386 -- Does it mean that the fix worked for you
+on x86_64?
+
+Thanks,
 Michal
 
