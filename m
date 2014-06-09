@@ -1,63 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.mei.co.jp ([133.183.100.20]:55410 "EHLO smtp.mei.co.jp"
+Received: from smtp.mei.co.jp ([133.183.100.20]:44125 "EHLO smtp.mei.co.jp"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753878AbaFICVJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 8 Jun 2014 22:21:09 -0400
-Date: Mon, 09 Jun 2014 11:21:05 +0900
+	id S1750747AbaFIERC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 9 Jun 2014 00:17:02 -0400
 From: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Subject: Re: [PATCH 0/7] scripts: objdiff: various clean-up, fix and new features
-In-Reply-To: <20140606153851.GM8664@titan.lakedaemon.net>
-References: <1401448315-800-1-git-send-email-yamada.m@jp.panasonic.com> <20140606153851.GM8664@titan.lakedaemon.net>
-Message-Id: <20140609112104.95AF.AA925319@jp.panasonic.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
+Subject: [PATCH v2 2/5] kbuild: fix a bug of C++ host program handling
+Date: Mon,  9 Jun 2014 13:16:31 +0900
+Message-Id: <1402287394-31133-3-git-send-email-yamada.m@jp.panasonic.com>
+In-Reply-To: <1402287394-31133-1-git-send-email-yamada.m@jp.panasonic.com>
+References: <1402287394-31133-1-git-send-email-yamada.m@jp.panasonic.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jason Cooper <jason@lakedaemon.net>
-Cc: linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>, Masahiro Yamada <yamada.m@jp.panasonic.com>
 
-Hi Jason,
+The comment claims:
+  C++ executables compiled from at least one .cc file
+  and zero or more .c files
 
-On Fri, 6 Jun 2014 11:38:51 -0400
-Jason Cooper <jason@lakedaemon.net> wrote:
+But C++ executables with zero .c file fail in build.
 
-> Masahiro,
-> 
-> On Fri, May 30, 2014 at 08:11:48PM +0900, Masahiro Yamada wrote:
-> > Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
-> > Cc: Jason Cooper <jason@lakedaemon.net>
-> > 
-> > Masahiro Yamada (7):
-> >   scripts: objdiff: get the path to .tmp_objdiff more simply
-> >   scripts: objdiff: direct error messages to stderr
-> >   scripts: objdiff: remove unnecessary code
-> >   scripts: objdiff: improve path flexibility for record command
-> >   scripts: objdiff: change the extension of disassembly from .o to .dis
-> >   scripts: objdiff: fix a comment
-> >   scripts: objdiff: support directories for the augument of record
-> >     command
-> > 
-> >  scripts/objdiff | 74 +++++++++++++++++++++++++++++++++++----------------------
-> >  1 file changed, 46 insertions(+), 28 deletions(-)
-> 
-> Other than the few minor things I noted on the individual patches,
-> 
-> Acked-by: Jason Cooper <jason@lakedaemon.net>
-> 
-> Great patch series!
-> 
-> thx,
-> 
-> Jason.
+For example, assume we have a Makefile like this:
 
-Thanks for your review!
+  hostprogs-y := foo
+  foo-cxxobjs := bar.o
 
-I've sent v2 with minor fixes:
-  - s/reltive/relative/
-  - s/clearer/cleaner/
+In this case, foo is treated as host-csingle
+and Kbuild tries to search non-existing foo.c source.
 
+Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
+---
 
-Best Regards
-Masahiro Yamada
+Changes in v2: None
+
+ scripts/Makefile.host | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/scripts/Makefile.host b/scripts/Makefile.host
+index 395a240..bf44e79 100644
+--- a/scripts/Makefile.host
++++ b/scripts/Makefile.host
+@@ -34,7 +34,8 @@ __hostprogs := $(sort $(hostprogs-y) $(hostprogs-m))
+ 
+ # C code
+ # Executables compiled from a single .c file
+-host-csingle	:= $(foreach m,$(__hostprogs),$(if $($(m)-objs),,$(m)))
++host-csingle	:= $(foreach m,$(__hostprogs), \
++			$(if $($(m)-objs)$($(m)-cxxobjs),,$(m)))
+ 
+ # C executables linked based on several .o files
+ host-cmulti	:= $(foreach m,$(__hostprogs),\
+-- 
+1.9.1
 
