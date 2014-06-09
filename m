@@ -1,69 +1,31 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from benson.vm.bytemark.co.uk ([212.110.190.137]:53658 "EHLO
-	benson.vm.bytemark.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751247AbaFIHEw (ORCPT
+Received: from asavdk3.altibox.net ([109.247.116.14]:40655 "EHLO
+	asavdk3.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751052AbaFIHqs (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 9 Jun 2014 03:04:52 -0400
-Message-ID: <1402297488.31087.5.camel@dagon.hellion.org.uk>
-Subject: Re: [PATCH v2 1/2] deb-pkg: Add automatic support for armhf
- architecture
-From: Ian Campbell <ijc@hellion.org.uk>
-Date: Mon, 09 Jun 2014 08:04:48 +0100
-In-Reply-To: <1402273294.23860.59.camel@deadeye.wl.decadent.org.uk>
-References: <1402273294.23860.59.camel@deadeye.wl.decadent.org.uk>
-Content-Type: text/plain; charset="ISO-8859-1"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+	Mon, 9 Jun 2014 03:46:48 -0400
+Date: Mon, 9 Jun 2014 09:46:30 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: possible typo
+Message-ID: <20140609074630.GA15826@ravnborg.org>
+References: <539548E7.9070908@penguintechs.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <539548E7.9070908@penguintechs.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ben Hutchings <ben@decadent.org.uk>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, maximilian attems <max@stro.at>, Michal Marek <mmarek@suse.cz>, Fathi Boudra <fathi.boudra@linaro.org>, debian-arm@lists.debian.org, Hector Oron <hector.oron@gmail.com>
+To: Warren Turkal <wt@penguintechs.org>
+Cc: linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Mon, 2014-06-09 at 01:21 +0100, Ben Hutchings wrote:
-> The Debian armhf architecture uses the ARM EABI hard-float variant,
-> whereas armel uses the soft-float variant.  Although the kernel
-> doesn't use FP itself, CONFIG_VFP must be enabled to support
-> hard-float userland and will probably be disabled when supporting a
-> soft-float userland.  So set the architecture to armhf by default when
-> CONFIG_AEABI and CONFIG_VFP are both enabled.
+On Sun, Jun 08, 2014 at 10:40:55PM -0700, Warren Turkal wrote:
+> Hey,
 > 
-> Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+> I think I found a typo in the kbuild docs. A one line commit can be pulled
+> from the "fix_typo" branch from the git repo @ git@github.com:wt/linux.git.
+> 
+> Can someone please take a look at this branch at some point?
+No.
+Please submit this as a regular patch - see Documentation/SubmittingPatches
 
-Acked-by: Ian Campbell <ijc@hellion.org.uk>
-
-We should also add the following. If there is some reason to do a v3
-feel free to squash it into you patch (if you wish).
-
-8<-------------------------
-
-From 3746add23576c58ca567e53b65c4c0cb40f48deb Mon Sep 17 00:00:00 2001
-From: Ian Campbell <ijc@hellion.org.uk>
-Date: Mon, 9 Jun 2014 08:00:56 +0100
-Subject: [PATCH] deb-pkg: Add automatic support for arm64 architecture.
-
-The Debian arch corresponding the kernel ARCH=arm64 is arm64. List this
-explicitly to prevent falling through to the 32-bit ARM autodetection.
-
-Signed-off-by: Ian Campbell <ijc@hellion.org.uk>
----
- scripts/package/builddeb | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index d035df4..8d97fa8 100644
---- a/scripts/package/builddeb
-+++ b/scripts/package/builddeb
-@@ -28,7 +28,7 @@ create_package() {
- 	# Attempt to find the correct Debian architecture
- 	local forcearch="" debarch=""
- 	case "$UTS_MACHINE" in
--	i386|ia64|alpha)
-+	i386|ia64|alpha|arm64)
- 		debarch="$UTS_MACHINE" ;;
- 	x86_64)
- 		debarch=amd64 ;;
--- 
-1.9.0
-
-
-
+	Sam
