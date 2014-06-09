@@ -1,60 +1,79 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pb0-f52.google.com ([209.85.160.52]:43466 "EHLO
-	mail-pb0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752570AbaFIIHH (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 9 Jun 2014 04:07:07 -0400
-Received: by mail-pb0-f52.google.com with SMTP id rr13so4661846pbb.25
-        for <linux-kbuild@vger.kernel.org>; Mon, 09 Jun 2014 01:07:06 -0700 (PDT)
-Message-ID: <53956B28.7040404@penguintechs.org>
-Date: Mon, 09 Jun 2014 01:07:04 -0700
-From: Warren Turkal <wt@penguintechs.org>
+Received: from smtp.mei.co.jp ([133.183.100.20]:34469 "EHLO smtp.mei.co.jp"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752948AbaFIKZ6 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 9 Jun 2014 06:25:58 -0400
+Date: Mon, 09 Jun 2014 19:25:48 +0900
+From: Masahiro Yamada <yamada.m@jp.panasonic.com>
+Subject: Re: [Question] Why CONFIG_SHELL
+In-Reply-To: <20140609074934.GB15826@ravnborg.org>
+References: <20140609140411.95B6.AA925319@jp.panasonic.com> <20140609074934.GB15826@ravnborg.org>
+Message-Id: <20140609192548.95CA.AA925319@jp.panasonic.com>
 MIME-Version: 1.0
-Subject: Re: possible typo
-References: <539548E7.9070908@penguintechs.org> <20140609074630.GA15826@ravnborg.org>
-In-Reply-To: <20140609074630.GA15826@ravnborg.org>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, trivial@kernel.org
+Cc: linux-kernel <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
 
-commit 4ce2f36b4b06b7df569b1875c7ab834270786882
-Author: Warren Turkal <wt@penguintechs.org>
-Date:   Sun Jun 8 22:19:29 2014 -0700
+Hi Sam,
 
-     Fix a typo.
 
-     Signed-off-by: Warren Turkal <wt@penguintechs.org>
+On Mon, 9 Jun 2014 09:49:35 +0200
+Sam Ravnborg <sam@ravnborg.org> wrote:
 
-diff --git a/Documentation/kbuild/modules.txt 
-b/Documentation/kbuild/modules.txt
-index 69372fb..3fb39e0 100644
---- a/Documentation/kbuild/modules.txt
-+++ b/Documentation/kbuild/modules.txt
-@@ -470,7 +470,7 @@ build.
+> On Mon, Jun 09, 2014 at 02:04:12PM +0900, Masahiro Yamada wrote:
+> > Hi experts.
+> > 
+> > I think all the macros with CONFIG_ prefix are supposed to be
+> > defined in Kconfig.
+> > But I've been long wondering why there exists one exception:
+> > CONFIG_SHELL.
+> > 
+> > Is there any historical, or special reason?
+> It has been like this as far back as I remmeber.
+> I assume that one has planned to set the shell in Kconfig back then.
+>  
+> > Is it good to rename it to KBUILD_SHELL or something else?
+> Please do so, to free up the CONFIG_ namespace.
+> 
+> I the end Michal will decide if he want this cleanup.
+> On the top of my head I see no problems in doing this,
+> but maybe there are some out-of-tree modules or similar
+> we need to consider...
 
-  	Sometimes, an external module uses exported symbols from
-  	another external module. kbuild needs to have full knowledge of
--	all symbols to avoid spliitting out warnings about undefined
-+	all symbols to avoid spitting out warnings about undefined
-  	symbols. Three solutions exist for this situation.
+Thanks for your commet.
 
-  	NOTE: The method with a top-level kbuild file is recommended
+Another question popped up.
 
-wt
 
-On 06/09/2014 12:46 AM, Sam Ravnborg wrote:
-> On Sun, Jun 08, 2014 at 10:40:55PM -0700, Warren Turkal wrote:
->> Hey,
->>
->> I think I found a typo in the kbuild docs. A one line commit can be pulled
->> from the "fix_typo" branch from the git repo @ git@github.com:wt/linux.git.
->>
->> Can someone please take a look at this branch at some point?
-> No.
-> Please submit this as a regular patch - see Documentation/SubmittingPatches
->
-> 	Sam
->
+CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
+          else if [ -x /bin/bash ]; then echo /bin/bash; \
+          else echo sh; fi ; fi)
+
+
+If  bash is not found on the system,  CONFIG_SHELL falls back to  "sh".
+
+Does it mean,  all shell scripts are written as  sh-compatible ?
+
+I guess bash is installed on the almost all system.
+It is difficult to detect the problem even if some scripts don't work
+on sh.
+
+
+If we allow bash-specific syntax in shell scripts,
+we should stop the build immedately if bash is missing,
+like this?
+
+KBUILD_SHELL := /bin/bash
+if [ ! -x "$$BASH" ]; then
+   $(error   $KBUILD_SHELL  not found)
+fi
+
+
+
+
+Best Regards
+Masahiro Yamada
+
