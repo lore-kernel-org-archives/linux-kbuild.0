@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.mei.co.jp ([133.183.100.20]:53264 "EHLO smtp.mei.co.jp"
+Received: from smtp.mei.co.jp ([133.183.100.20]:50798 "EHLO smtp.mei.co.jp"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754288AbaFICRw (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	id S1754290AbaFICRw (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
 	Sun, 8 Jun 2014 22:17:52 -0400
 From: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Subject: [PATCH v2 6/7] scripts: objdiff: fix a comment
-Date: Mon,  9 Jun 2014 11:16:39 +0900
-Message-Id: <1402280200-21834-7-git-send-email-yamada.m@jp.panasonic.com>
+Subject: [PATCH v2 3/7] scripts: objdiff: remove unnecessary code
+Date: Mon,  9 Jun 2014 11:16:36 +0900
+Message-Id: <1402280200-21834-4-git-send-email-yamada.m@jp.panasonic.com>
 In-Reply-To: <1402280200-21834-1-git-send-email-yamada.m@jp.panasonic.com>
 References: <1402280200-21834-1-git-send-email-yamada.m@jp.panasonic.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -14,30 +14,34 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Jason Cooper <jason@lakedaemon.net>, Masahiro Yamada <yamada.m@jp.panasonic.com>
 
+The directories for objdump is created by the code
+a few lines below:
+
+  [ ! -d "$OBJDIFFD/$dn" ] && mkdir -p "$OBJDIFFD/$dn"
+
 Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
 Cc: Jason Cooper <jason@lakedaemon.net>
 Acked-by: Jason Cooper <jason@lakedaemon.net>
 ---
 
-Changes in v2:
-  - Minor change:  s/clearer/cleaner/
+Changes in v2: None
 
- scripts/objdiff | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ scripts/objdiff | 2 --
+ 1 file changed, 2 deletions(-)
 
 diff --git a/scripts/objdiff b/scripts/objdiff
-index c997e44..0644898 100755
+index cc67365..6e72f96 100755
 --- a/scripts/objdiff
 +++ b/scripts/objdiff
-@@ -70,7 +70,7 @@ dorecord() {
+@@ -52,8 +52,6 @@ dorecord() {
+ 	OBJDUMP="${CROSS_COMPILE}objdump"
+ 	OBJDIFFD="$TMPD/$CMT"
  
- 		[ ! -d "$dir" ] && mkdir -p $dir
- 
--		# remove addresses for a more clear diff
-+		# remove addresses for a cleaner diff
- 		# http://dummdida.tumblr.com/post/60924060451/binary-diff-between-libc-from-scientificlinux-and
- 		$OBJDUMP -D $f | sed "s/^[[:space:]]\+[0-9a-f]\+//" > $dis
- 	done
+-	[ ! -d "$OBJDIFFD" ] && mkdir -p "$OBJDIFFD"
+-
+ 	for f in $FILES; do
+ 		dn="${f%/*}"
+ 		bn="${f##*/}"
 -- 
 1.9.1
 
