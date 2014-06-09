@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.mei.co.jp ([133.183.100.20]:41982 "EHLO smtp.mei.co.jp"
+Received: from smtp.mei.co.jp ([133.183.100.20]:42012 "EHLO smtp.mei.co.jp"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750756AbaFIERD (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 9 Jun 2014 00:17:03 -0400
+	id S1750729AbaFIERF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 9 Jun 2014 00:17:05 -0400
 From: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Subject: [PATCH v2 4/5] kbuild: clean up scripts/Makefile.host
-Date: Mon,  9 Jun 2014 13:16:33 +0900
-Message-Id: <1402287394-31133-5-git-send-email-yamada.m@jp.panasonic.com>
+Subject: [PATCH v2 1/5] kbuild: fix a typo in scripts/Makefile.host
+Date: Mon,  9 Jun 2014 13:16:30 +0900
+Message-Id: <1402287394-31133-2-git-send-email-yamada.m@jp.panasonic.com>
 In-Reply-To: <1402287394-31133-1-git-send-email-yamada.m@jp.panasonic.com>
 References: <1402287394-31133-1-git-send-email-yamada.m@jp.panasonic.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -14,54 +14,26 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>, Masahiro Yamada <yamada.m@jp.panasonic.com>
 
-The directory creation can be more simplified by two levels.
-
-[1] Drop $(dir ...)
-
- $(dir $(f)) always returns non-empty string.
-
-So, $(if $(dir $(f)),$(dir $(f)) is equivalent to $(dir $(f)).
-
-[2] Unroll $(foreach ...) loop
-
-$(dir ...) can have one or more paths and returns a list of
-directories of them.
-
-$(foreach f, $(progs), $(dir $(f))) can be unrolled as
-
-$(dir $(progs))
-
 Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
 ---
 
-Changes in v2:
-  - Further more clean-up by enrolling $(foreach ) loop
+Changes in v2: None
 
- scripts/Makefile.host | 10 +++-------
- 1 file changed, 3 insertions(+), 7 deletions(-)
+ scripts/Makefile.host | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/scripts/Makefile.host b/scripts/Makefile.host
-index 1c2e570..bb6a11f 100644
+index 6689364..395a240 100644
 --- a/scripts/Makefile.host
 +++ b/scripts/Makefile.host
-@@ -44,15 +44,11 @@ host-cxxobjs	:= $(sort $(foreach m,$(host-cxxmulti),$($(m)-cxxobjs)))
+@@ -44,7 +44,7 @@ host-cmulti	:= $(foreach m,$(__hostprogs),\
+ host-cobjs	:= $(sort $(foreach m,$(__hostprogs),$($(m)-objs)))
  
- # output directory for programs/.o files
- # hostprogs-y := tools/build may have been specified. Retrieve directory
--host-objdirs := $(foreach f,$(__hostprogs), $(if $(dir $(f)),$(dir $(f))))
-+host-objdirs := $(dir $(__hostprogs))
- # directory of .o files from prog-objs notation
--host-objdirs += $(foreach f,$(host-cmulti),                  \
--                    $(foreach m,$($(f)-objs),                \
--                        $(if $(dir $(m)),$(dir $(m)))))
-+host-objdirs += $(dir $(foreach f,$(host-cmulti), $($(f)-objs)))
- # directory of .o files from prog-cxxobjs notation
--host-objdirs += $(foreach f,$(host-cxxmulti),                  \
--                    $(foreach m,$($(f)-cxxobjs),                \
--                        $(if $(dir $(m)),$(dir $(m)))))
-+host-objdirs += $(dir $(foreach f,$(host-cxxmulti), $($(f)-cxxobjs)))
- 
- host-objdirs := $(strip $(sort $(filter-out ./,$(host-objdirs))))
+ # C++ code
+-# C++ executables compiled from at least on .cc file
++# C++ executables compiled from at least one .cc file
+ # and zero or more .c files
+ host-cxxmulti	:= $(foreach m,$(__hostprogs),$(if $($(m)-cxxobjs),$(m)))
  
 -- 
 1.9.1
