@@ -1,66 +1,78 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.mei.co.jp ([133.183.100.20]:41105 "EHLO smtp.mei.co.jp"
+Received: from afflict.kos.to ([92.243.29.197]:55815 "EHLO afflict.kos.to"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751748AbaFJMzU (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 10 Jun 2014 08:55:20 -0400
-Date: Tue, 10 Jun 2014 21:55:03 +0900
-From: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Subject: Re: [PATCH] kbuild: document KBUILD_SHELL
-In-Reply-To: <5396F868.1090609@suse.cz>
-References: <20140610210249.961B.AA925319@jp.panasonic.com> <5396F868.1090609@suse.cz>
-Message-Id: <20140610215503.962B.AA925319@jp.panasonic.com>
+	id S1750924AbaFJNQT (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 10 Jun 2014 09:16:19 -0400
+Date: Tue, 10 Jun 2014 16:06:39 +0300
+From: Riku Voipio <riku.voipio@iki.fi>
+Subject: Re: [PATCH v2 1/2] deb-pkg: Add automatic support for armhf
+ architecture
+Message-ID: <20140610130639.GA25366@afflict.kos.to>
+References: <1402273294.23860.59.camel@deadeye.wl.decadent.org.uk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1402273294.23860.59.camel@deadeye.wl.decadent.org.uk>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org
+To: Ben Hutchings <ben@decadent.org.uk>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, maximilian attems <max@stro.at>, Michal Marek <mmarek@suse.cz>, Fathi Boudra <fathi.boudra@linaro.org>, debian-arm@lists.debian.org, Hector Oron <hector.oron@gmail.com>
 
-Hi Michal,
-
-
-On Tue, 10 Jun 2014 14:22:00 +0200
-Michal Marek <mmarek@suse.cz> wrote:
-
-> On 2014-06-10 14:02, Masahiro Yamada wrote:
-> > Hi Michal,
-> > 
-> > On Tue, 10 Jun 2014 13:36:48 +0200
-> > Michal Marek <mmarek@suse.cz> wrote:
-> > 
-> >> On 2014-06-10 13:17, Masahiro Yamada wrote:
-> >>> IMHO:
-> >>> If all shell scripts invoked by $KBUILD_SHELL should be sh-compatible,
-> >>>  "KBUILD_SHELL" should always be set to "/bin/sh" and
-> >>> users should not change it.
-> >>>
-> >>> I still don't understand why bash is preferable for KBUILD_SHELL.
-> >>
-> >> I'm just speculating, but the reason might have been that if you are
-> >> compiling Linux on some oddball UNIX system, the POSIX shell might not
-> >> be "/bin/sh", but some other path, who knows which. But if $BASH is
-> >> defined or if there is /bin/bash, then it's very likely the familiar GNU
-> >> Bash. Hence the preference. Of course, the side effect is that it makes
-> >> it easy to introduce bash-only constructs into the scripts :-/.
-> > 
-> > Hmm, 
-> > We set the default value to /bin/sh  (KBUILD_SHELL ?= /bin/sh)
-> > but allowing oddball system users to override it like,
-> > export  KBUILD_SHELL=/bin/bash; make
-> > 
-> > Does this sounds reasonable?
+On Mon, Jun 09, 2014 at 01:21:34AM +0100, Ben Hutchings wrote:
+> The Debian armhf architecture uses the ARM EABI hard-float variant,
+> whereas armel uses the soft-float variant.  Although the kernel
+> doesn't use FP itself, CONFIG_VFP must be enabled to support
+> hard-float userland and will probably be disabled when supporting a
+> soft-float userland.  So set the architecture to armhf by default when
+> CONFIG_AEABI and CONFIG_VFP are both enabled.
 > 
-> I'm not against it in principle, but it will have to wait for the next
-> merge window, so that it sees more testing in linux-next. I'd like to
-> push the current set of changes to Linus and time is getting tight.
+> Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+> ---
+> v2: rebased
 > 
+> After discussion with Hector, we agreed this would be a worthwhile
+> change.  Hector may later improve this by using gcc specs.
 
-Right.
+That should be easy:
 
-We do not need to rush to apply this patch now.
+-if grep -q CONFIG_VFP=y $KCONFIG_CONFIG; then
++if $CC -dM -E - < /dev/null|grep -q __ARM_PCS_VFP; then
 
+It worked at least for my cross-compile test a minute ago.
 
-Best Regards
-Masahiro Yamada
+Riku
+
+> Ben.
+> 
+>  scripts/package/builddeb | 11 ++++++++++-
+>  1 file changed, 10 insertions(+), 1 deletion(-)
+> 
+> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+> index f46e4dd..6756ed6 100644
+> --- a/scripts/package/builddeb
+> +++ b/scripts/package/builddeb
+> @@ -43,7 +43,16 @@ create_package() {
+>  	mips*)
+>  		debarch=mips$(grep -q CPU_LITTLE_ENDIAN=y $KCONFIG_CONFIG && echo el || true) ;;
+>  	arm*)
+> -		debarch=arm$(grep -q CONFIG_AEABI=y $KCONFIG_CONFIG && echo el || true) ;;
+> +		if grep -q CONFIG_AEABI=y $KCONFIG_CONFIG; then
+> +		    if grep -q CONFIG_VFP=y $KCONFIG_CONFIG; then
+> +			debarch=armhf
+> +		    else
+> +			debarch=armel
+> +		    fi
+> +		else
+> +		    debarch=arm
+> +		fi
+> +		;;
+>  	*)
+>  		echo "" >&2
+>  		echo "** ** **  WARNING  ** ** **" >&2
+> 
+> 
+> -- 
+> Ben Hutchings
+> One of the nice things about standards is that there are so many of them.
+
 
