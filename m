@@ -1,41 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.mei.co.jp ([133.183.100.20]:34010 "EHLO smtp.mei.co.jp"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754401AbaFJHgZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 10 Jun 2014 03:36:25 -0400
-Received: from mail-gw.jp.panasonic.com ([157.8.1.157])
-	by smtp.mei.co.jp (8.12.11.20060614/3.7W/kc-maile11) with ESMTP id s5A7aNfF028738
-	for <linux-kbuild@vger.kernel.org>; Tue, 10 Jun 2014 16:36:23 +0900 (JST)
-Received: from epochmail.jp.panasonic.com ([157.8.1.130])
-	by mail.jp.panasonic.com (8.11.6p2/3.7W/kc-maili15) with ESMTP id s5A7aOB08880
-	for <linux-kbuild@vger.kernel.org>; Tue, 10 Jun 2014 16:36:24 +0900
-From: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Subject: [PATCH] kbuild: fix a typo in a kbuild document
-Date: Tue, 10 Jun 2014 16:36:14 +0900
-Message-Id: <1402385774-3748-1-git-send-email-yamada.m@jp.panasonic.com>
+Received: from mail-la0-f45.google.com ([209.85.215.45]:57606 "EHLO
+	mail-la0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933993AbaFJHk2 (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 10 Jun 2014 03:40:28 -0400
+MIME-Version: 1.0
+In-Reply-To: <20140605155614.GA18376@sepie.suse.cz>
+References: <1399639944-20551-1-git-send-email-mmarek@suse.cz>
+	<1399639944-20551-4-git-send-email-mmarek@suse.cz>
+	<CAFLxGvyz-aX8rTveo9W3mqsQxPeg8cb7Oq59UiC1kMz4qTiYwg@mail.gmail.com>
+	<538EEA3D.1080105@suse.cz>
+	<538F1B41.3060904@suse.cz>
+	<20140605155614.GA18376@sepie.suse.cz>
+Date: Tue, 10 Jun 2014 09:40:26 +0200
+Message-ID: <CAMuHMdU0PQsKkYuFpxca1u7+tPbkxQsnNJ1b5-L-aJG9ZCyyEA@mail.gmail.com>
+Subject: Re: [PATCH v2 3/5] kbuild: Use relative path for $(objtree)
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.m@jp.panasonic.com>
+To: Michal Marek <mmarek@suse.cz>
+Cc: Richard Weinberger <richard.weinberger@gmail.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Randy Dunlap <rdunlap@infradead.org>
 
-Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
----
- Documentation/kbuild/makefiles.txt | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi Michael,
 
-diff --git a/Documentation/kbuild/makefiles.txt b/Documentation/kbuild/makefiles.txt
-index d567a7c..c600e2f 100644
---- a/Documentation/kbuild/makefiles.txt
-+++ b/Documentation/kbuild/makefiles.txt
-@@ -1171,7 +1171,7 @@ When kbuild executes, the following steps are followed (roughly):
- 	      obvious reason.
- 
-     dtc
--	Create flattend device tree blob object suitable for linking
-+	Create flattened device tree blob object suitable for linking
- 	into vmlinux. Device tree blobs linked into vmlinux are placed
- 	in an init section in the image. Platform code *must* copy the
- 	blob to non-init memory prior to calling unflatten_device_tree().
--- 
-1.9.1
+On Thu, Jun 5, 2014 at 5:56 PM, Michal Marek <mmarek@suse.cz> wrote:
+> --- a/arch/um/Makefile
+> +++ b/arch/um/Makefile
+> @@ -111,8 +111,7 @@ endef
+>  KBUILD_KCONFIG := $(HOST_DIR)/um/Kconfig
+>
+>  archheaders:
+> -       $(Q)$(MAKE) -C '$(srctree)' KBUILD_SRC= \
+> -               ARCH=$(HEADER_ARCH) O='$(objtree)' archheaders
+> +       $(Q)$(MAKE) KBUILD_SRC= ARCH=$(HEADER_ARCH) archheaders
 
+Should the logic in https://lkml.org/lkml/2014/6/1/17 be changed as well?
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
