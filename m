@@ -1,58 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.mei.co.jp ([133.183.100.20]:44234 "EHLO smtp.mei.co.jp"
+Received: from cantor2.suse.de ([195.135.220.15]:55170 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751144AbaFJK1m (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 10 Jun 2014 06:27:42 -0400
-From: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Subject: [PATCH v2] kbuild: make KBUILD_SHELL overridable and document it
-Date: Tue, 10 Jun 2014 19:27:23 +0900
-Message-Id: <1402396043-31532-1-git-send-email-yamada.m@jp.panasonic.com>
+	id S1750773AbaFJLAr (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 10 Jun 2014 07:00:47 -0400
+Message-ID: <5396E55D.8000202@suse.cz>
+Date: Tue, 10 Jun 2014 13:00:45 +0200
+From: Michal Marek <mmarek@suse.cz>
+MIME-Version: 1.0
+Subject: Re: [PATCH] kbuild: document KBUILD_SHELL
+References: <1402368710-31648-1-git-send-email-yamada.m@jp.panasonic.com> <5396CF99.1070309@suse.cz> <20140610095016.GA5528@ravnborg.org>
+In-Reply-To: <20140610095016.GA5528@ravnborg.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.m@jp.panasonic.com>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Masahiro Yamada <yamada.m@jp.panasonic.com>, linux-kbuild@vger.kernel.org
 
-It seems reasonable enough to allow users to change KBUILD_SHELL from
-environments. Also describe it in Documentation/kbuild/kbuild.txt.
+On 2014-06-10 11:50, Sam Ravnborg wrote:
+>>
+>> The variable is assinged with a ":=", not a "?=", so you can't change it
+>> from outside, can you?
+> 
+> Variables assigned with ":=" can be changed like this:
+> 
+> $ cat Makefile
+> FOO := fisk
+> $(info FOO=$(FOO))
+> all:
+> 	@:
+> 
+> $ FOO=bar make
+> FOO=fisk
+> 
+> $ make FOO=bar
+> FOO=bar
+> 
+> 
+> The first is the same as using an environment variable.
+> The latter is a special make syntax.
 
-Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Cc: Sam Ravnborg <sam@ravnborg.org>
-Cc: Michal Marek <mmarek@suse.cz>
----
+I see. But do we want to encourage people to change the value? IMO There
+should be some "change this variable only if you know what you are
+doing" warning.
 
-Changes in v2:
-  - set KBUILD_SHELL by "?="
-
- Documentation/kbuild/kbuild.txt | 5 +++++
- Makefile                        | 2 +-
- 2 files changed, 6 insertions(+), 1 deletion(-)
-
-diff --git a/Documentation/kbuild/kbuild.txt b/Documentation/kbuild/kbuild.txt
-index 6466704..425cd2e 100644
---- a/Documentation/kbuild/kbuild.txt
-+++ b/Documentation/kbuild/kbuild.txt
-@@ -233,3 +233,8 @@ KBUILD_VMLINUX_MAIN
- All object files for the main part of vmlinux.
- KBUILD_VMLINUX_INIT and KBUILD_VMLINUX_MAIN together specify
- all the object files used to link vmlinux.
-+
-+KBUILD_SHELL
-+--------------------------------------------------
-+Specify which shell to use to run shell scripts in Kbuild.
-+Assigned by the top-level Makefile.
-diff --git a/Makefile b/Makefile
-index f691dc2..079f663 100644
---- a/Makefile
-+++ b/Makefile
-@@ -235,7 +235,7 @@ KCONFIG_CONFIG	?= .config
- export KCONFIG_CONFIG
- 
- # SHELL used by kbuild
--KBUILD_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
-+KBUILD_SHELL ?= $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
- 	  else if [ -x /bin/bash ]; then echo /bin/bash; \
- 	  else echo sh; fi ; fi)
- 
--- 
-1.9.1
-
+Michal
