@@ -1,34 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.mei.co.jp ([133.183.100.20]:42580 "EHLO smtp.mei.co.jp"
+Received: from smtp.mei.co.jp ([133.183.100.20]:44234 "EHLO smtp.mei.co.jp"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751383AbaFJKKY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 10 Jun 2014 06:10:24 -0400
-Date: Tue, 10 Jun 2014 19:10:12 +0900
+	id S1751144AbaFJK1m (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 10 Jun 2014 06:27:42 -0400
 From: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Subject: Re: [PATCH] kbuild: trivial - use tabs for code indent where possible
-In-Reply-To: <5396CB40.6030509@suse.cz>
-References: <20140610105308.95F4.AA925319@jp.panasonic.com> <5396CB40.6030509@suse.cz>
-Message-Id: <20140610191012.960D.AA925319@jp.panasonic.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
+Subject: [PATCH v2] kbuild: make KBUILD_SHELL overridable and document it
+Date: Tue, 10 Jun 2014 19:27:23 +0900
+Message-Id: <1402396043-31532-1-git-send-email-yamada.m@jp.panasonic.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <yamada.m@jp.panasonic.com>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>
 
-Hi Michal,
+It seems reasonable enough to allow users to change KBUILD_SHELL from
+environments. Also describe it in Documentation/kbuild/kbuild.txt.
 
+Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
+Cc: Sam Ravnborg <sam@ravnborg.org>
+Cc: Michal Marek <mmarek@suse.cz>
+---
 
-> > Anyway, I think updating indents by hand would be easier and safer.
-> 
-> Yeah, it probably is.
+Changes in v2:
+  - set KBUILD_SHELL by "?="
 
-I chose this way.
+ Documentation/kbuild/kbuild.txt | 5 +++++
+ Makefile                        | 2 +-
+ 2 files changed, 6 insertions(+), 1 deletion(-)
 
-I've posted v2.
-
-
-Best Regards
-Masahiro Yamada
+diff --git a/Documentation/kbuild/kbuild.txt b/Documentation/kbuild/kbuild.txt
+index 6466704..425cd2e 100644
+--- a/Documentation/kbuild/kbuild.txt
++++ b/Documentation/kbuild/kbuild.txt
+@@ -233,3 +233,8 @@ KBUILD_VMLINUX_MAIN
+ All object files for the main part of vmlinux.
+ KBUILD_VMLINUX_INIT and KBUILD_VMLINUX_MAIN together specify
+ all the object files used to link vmlinux.
++
++KBUILD_SHELL
++--------------------------------------------------
++Specify which shell to use to run shell scripts in Kbuild.
++Assigned by the top-level Makefile.
+diff --git a/Makefile b/Makefile
+index f691dc2..079f663 100644
+--- a/Makefile
++++ b/Makefile
+@@ -235,7 +235,7 @@ KCONFIG_CONFIG	?= .config
+ export KCONFIG_CONFIG
+ 
+ # SHELL used by kbuild
+-KBUILD_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
++KBUILD_SHELL ?= $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
+ 	  else if [ -x /bin/bash ]; then echo /bin/bash; \
+ 	  else echo sh; fi ; fi)
+ 
+-- 
+1.9.1
 
