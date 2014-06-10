@@ -1,49 +1,71 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-la0-f45.google.com ([209.85.215.45]:57606 "EHLO
-	mail-la0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933993AbaFJHk2 (ORCPT
+Received: from mail-la0-f41.google.com ([209.85.215.41]:40990 "EHLO
+	mail-la0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751109AbaFJIKC (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 10 Jun 2014 03:40:28 -0400
+	Tue, 10 Jun 2014 04:10:02 -0400
+Received: by mail-la0-f41.google.com with SMTP id e16so3793284lan.28
+        for <linux-kbuild@vger.kernel.org>; Tue, 10 Jun 2014 01:10:01 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20140605155614.GA18376@sepie.suse.cz>
-References: <1399639944-20551-1-git-send-email-mmarek@suse.cz>
-	<1399639944-20551-4-git-send-email-mmarek@suse.cz>
-	<CAFLxGvyz-aX8rTveo9W3mqsQxPeg8cb7Oq59UiC1kMz4qTiYwg@mail.gmail.com>
-	<538EEA3D.1080105@suse.cz>
-	<538F1B41.3060904@suse.cz>
-	<20140605155614.GA18376@sepie.suse.cz>
-Date: Tue, 10 Jun 2014 09:40:26 +0200
-Message-ID: <CAMuHMdU0PQsKkYuFpxca1u7+tPbkxQsnNJ1b5-L-aJG9ZCyyEA@mail.gmail.com>
-Subject: Re: [PATCH v2 3/5] kbuild: Use relative path for $(objtree)
-From: Geert Uytterhoeven <geert@linux-m68k.org>
+In-Reply-To: <1402273294.23860.59.camel@deadeye.wl.decadent.org.uk>
+References: <1402273294.23860.59.camel@deadeye.wl.decadent.org.uk>
+Date: Tue, 10 Jun 2014 11:10:01 +0300
+Message-ID: <CAGNsrLBtKRXL7gZqd-P65ycOmK8ipHiDw7=s-Z8S=pFp1=8HMw@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] deb-pkg: Add automatic support for armhf architecture
+From: Fathi Boudra <fathi.boudra@linaro.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Richard Weinberger <richard.weinberger@gmail.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, Randy Dunlap <rdunlap@infradead.org>
+To: Ben Hutchings <ben@decadent.org.uk>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, maximilian attems <max@stro.at>, Michal Marek <mmarek@suse.cz>, debian-arm@lists.debian.org, Hector Oron <hector.oron@gmail.com>
 
-Hi Michael,
-
-On Thu, Jun 5, 2014 at 5:56 PM, Michal Marek <mmarek@suse.cz> wrote:
-> --- a/arch/um/Makefile
-> +++ b/arch/um/Makefile
-> @@ -111,8 +111,7 @@ endef
->  KBUILD_KCONFIG := $(HOST_DIR)/um/Kconfig
+On 9 June 2014 03:21, Ben Hutchings <ben@decadent.org.uk> wrote:
+> The Debian armhf architecture uses the ARM EABI hard-float variant,
+> whereas armel uses the soft-float variant.  Although the kernel
+> doesn't use FP itself, CONFIG_VFP must be enabled to support
+> hard-float userland and will probably be disabled when supporting a
+> soft-float userland.  So set the architecture to armhf by default when
+> CONFIG_AEABI and CONFIG_VFP are both enabled.
 >
->  archheaders:
-> -       $(Q)$(MAKE) -C '$(srctree)' KBUILD_SRC= \
-> -               ARCH=$(HEADER_ARCH) O='$(objtree)' archheaders
-> +       $(Q)$(MAKE) KBUILD_SRC= ARCH=$(HEADER_ARCH) archheaders
+> Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
 
-Should the logic in https://lkml.org/lkml/2014/6/1/17 be changed as well?
+Acked-by: Fathi Boudra <fathi.boudra@linaro.org>
 
-Gr{oetje,eeting}s,
-
-                        Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+> ---
+> v2: rebased
+>
+> After discussion with Hector, we agreed this would be a worthwhile
+> change.  Hector may later improve this by using gcc specs.
+>
+> Ben.
+>
+>  scripts/package/builddeb | 11 ++++++++++-
+>  1 file changed, 10 insertions(+), 1 deletion(-)
+>
+> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+> index f46e4dd..6756ed6 100644
+> --- a/scripts/package/builddeb
+> +++ b/scripts/package/builddeb
+> @@ -43,7 +43,16 @@ create_package() {
+>         mips*)
+>                 debarch=mips$(grep -q CPU_LITTLE_ENDIAN=y $KCONFIG_CONFIG && echo el || true) ;;
+>         arm*)
+> -               debarch=arm$(grep -q CONFIG_AEABI=y $KCONFIG_CONFIG && echo el || true) ;;
+> +               if grep -q CONFIG_AEABI=y $KCONFIG_CONFIG; then
+> +                   if grep -q CONFIG_VFP=y $KCONFIG_CONFIG; then
+> +                       debarch=armhf
+> +                   else
+> +                       debarch=armel
+> +                   fi
+> +               else
+> +                   debarch=arm
+> +               fi
+> +               ;;
+>         *)
+>                 echo "" >&2
+>                 echo "** ** **  WARNING  ** ** **" >&2
+>
+>
+> --
+> Ben Hutchings
+> One of the nice things about standards is that there are so many of them.
