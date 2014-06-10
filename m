@@ -1,32 +1,84 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:59939 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751979AbaFJNVJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 10 Jun 2014 09:21:09 -0400
-Message-ID: <53970642.7050104@suse.cz>
-Date: Tue, 10 Jun 2014 15:21:06 +0200
-From: Michal Marek <mmarek@suse.cz>
+Received: from casper.infradead.org ([85.118.1.10]:49643 "EHLO
+	casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751979AbaFJOJi (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 10 Jun 2014 10:09:38 -0400
+Message-ID: <5397119C.9080402@infradead.org>
+Date: Tue, 10 Jun 2014 07:09:32 -0700
+From: Randy Dunlap <rdunlap@infradead.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 0/5] kbuild: Clean-up and bug fixes of scripts/Makefile.host
-References: <1402287394-31133-1-git-send-email-yamada.m@jp.panasonic.com>
-In-Reply-To: <1402287394-31133-1-git-send-email-yamada.m@jp.panasonic.com>
+Subject: Re: [PATCH v2 3/5] kbuild: Use relative path for $(objtree)
+References: <1399639944-20551-1-git-send-email-mmarek@suse.cz> <1399639944-20551-4-git-send-email-mmarek@suse.cz> <CAFLxGvyz-aX8rTveo9W3mqsQxPeg8cb7Oq59UiC1kMz4qTiYwg@mail.gmail.com> <538EEA3D.1080105@suse.cz> <538F1B41.3060904@suse.cz> <20140605155614.GA18376@sepie.suse.cz> <539625D1.2090905@infradead.org> <539631CC.9040002@suse.cz> <5396340B.6060804@infradead.org> <20140609223922.GA3409@pobox.suse.cz> <5396479F.6030809@infradead.org> <5396C98E.8050501@suse.cz>
+In-Reply-To: <5396C98E.8050501@suse.cz>
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Cc: linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>
+To: Michal Marek <mmarek@suse.cz>
+Cc: Richard Weinberger <richard.weinberger@gmail.com>, linux-kbuild@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>
 
-On 2014-06-09 06:16, Masahiro Yamada wrote:
-> Masahiro Yamada (5):
->   kbuild: fix a typo in scripts/Makefile.host
->   kbuild: fix a bug of C++ host program handling
->   kbuild: drop shared library support from Makefile.host
->   kbuild: clean up scripts/Makefile.host
->   kbuild: clean-up and bug fix of scripts/Makefile.host
+On 06/10/14 02:02, Michal Marek wrote:
+> On 2014-06-10 01:47, Randy Dunlap wrote:
+>> sure.  I did mkdir /tmp/O then
+>> make ARCH=um SUBARCH=i386 O=/tmp/O defconfig
+>> make ARCH=um SUBARCH=i386 V=1 O=/tmp/O
+> 
+> So I tried with the exact same paths and it worked for me:
+> $ mkdir -p /local/lnx/next/linux-next-20140606
+> $ git archive d4bc590f8716f7dde6b7bca319097ac30a8cb0b4 | tar xf - -C
+> /local/lnx/next/linux-next-20140606/
+> $ cd /local/lnx/next/linux-next-20140606/
+> $ make ARCH=um SUBARCH=i386 O=/tmp/O defconfig
+> $ make ARCH=um SUBARCH=i386 V=1 O=/tmp/O
+> 
+> and it worked.
+> 
+> 
+>> make KBUILD_SRC= ARCH=x86 archheaders
+>> make -C /local/lnx/next/linux-next-20140606 O=/tmp/O/. archheaders
+>> make -C /tmp/O \
+>> KBUILD_SRC=/local/lnx/next/linux-next-20140606 \
+>> KBUILD_EXTMOD="" -f /local/lnx/next/linux-next-20140606/Makefile \
+>> archheaders
+>> make -f /local/lnx/next/linux-next-20140606/scripts/Makefile.build obj=arch/x86/syscalls all
+> 
+> Here, it should do
+> 
+>   /bin/sh
+> '/local/lnx/next/linux-next-20140606/arch/x86/syscalls/syscallhdr.sh'
+> '/local/lnx/next/linux-next-20140606/arch/x86/syscalls/syscall_32.tbl'
+> 'arch/x86/syscalls/../include/generated/uapi/asm/unistd_32.h' 'i386' '' ''
+>   /bin/sh
+> '/local/lnx/next/linux-next-20140606/arch/x86/syscalls/syscallhdr.sh'
+> '/local/lnx/next/linux-next-20140606/arch/x86/syscalls/syscall_64.tbl'
+> 'arch/x86/syscalls/../include/generated/uapi/asm/unistd_64.h'
+> 'common,64' '' ''
+>   /bin/sh
+> '/local/lnx/next/linux-next-20140606/arch/x86/syscalls/syscallhdr.sh'
+> '/local/lnx/next/linux-next-20140606/arch/x86/syscalls/syscall_64.tbl'
+> 'arch/x86/syscalls/../include/generated/uapi/asm/unistd_x32.h'
+> 'common,x32' '' '__X32_SYSCALL_BIT'
+>   /bin/sh
+> '/local/lnx/next/linux-next-20140606/arch/x86/syscalls/syscalltbl.sh'
+> /local/lnx/next/linux-next-20140606/arch/x86/syscalls/syscall_32.tbl
+> arch/x86/syscalls/../include/generated/asm/syscalls_32.h
+> 
+> which is not happening in your case for some reason. Can you please
+> check if you have some stale files in include/generated in the *source*
+> tree?
+> 
+>     git ls-file -o --directory
+
+I'm not using git, just tarballs.  I don't have an include/generated
+subdirectory at all in my source tree.
+
+However, today's linux-next builds OK for me (both i386 and x86_64),
+so let's go with your patch.
+
+> It could be that there is some include/generated directory from a
+> previous in-tree build.
 
 
-Thanks for the cleanup, but I'll postpone it for the next merge window.
-Thanks for your understanding.
-
-Michal
+-- 
+~Randy
