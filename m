@@ -1,69 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from benson.vm.bytemark.co.uk ([212.110.190.137]:57681 "EHLO
-	benson.vm.bytemark.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751894AbaFJIbm (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 10 Jun 2014 04:31:42 -0400
-Message-ID: <1402389097.1823.14.camel@kazak.uk.xensource.com>
-Subject: Re: [PATCH v2 1/1] builddeb: add arm64 in the supported
- architectures
-From: Ian Campbell <ijc@hellion.org.uk>
-Date: Tue, 10 Jun 2014 09:31:37 +0100
-In-Reply-To: <CAGNsrLAiK88Lfz1nhZgB8FUgCDO88g462uJG+yKZ139_AZymeA@mail.gmail.com>
-References: <1397307186-3977-1-git-send-email-fathi.boudra@linaro.org>
-	 <1397307186-3977-2-git-send-email-fathi.boudra@linaro.org>
-	 <1397395563.10849.79.camel@deadeye.wl.decadent.org.uk>
-	 <1402272928.23860.55.camel@deadeye.wl.decadent.org.uk>
-	 <CAGNsrLAiK88Lfz1nhZgB8FUgCDO88g462uJG+yKZ139_AZymeA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Received: from cantor2.suse.de ([195.135.220.15]:52821 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751320AbaFJJCH (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 10 Jun 2014 05:02:07 -0400
+Message-ID: <5396C98E.8050501@suse.cz>
+Date: Tue, 10 Jun 2014 11:02:06 +0200
+From: Michal Marek <mmarek@suse.cz>
+MIME-Version: 1.0
+Subject: Re: [PATCH v2 3/5] kbuild: Use relative path for $(objtree)
+References: <1399639944-20551-1-git-send-email-mmarek@suse.cz> <1399639944-20551-4-git-send-email-mmarek@suse.cz> <CAFLxGvyz-aX8rTveo9W3mqsQxPeg8cb7Oq59UiC1kMz4qTiYwg@mail.gmail.com> <538EEA3D.1080105@suse.cz> <538F1B41.3060904@suse.cz> <20140605155614.GA18376@sepie.suse.cz> <539625D1.2090905@infradead.org> <539631CC.9040002@suse.cz> <5396340B.6060804@infradead.org> <20140609223922.GA3409@pobox.suse.cz> <5396479F.6030809@infradead.org>
+In-Reply-To: <5396479F.6030809@infradead.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Fathi Boudra <fathi.boudra@linaro.org>
-Cc: Ben Hutchings <ben@decadent.org.uk>, linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, Maximilian Attems <maks@debian.org>
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: Richard Weinberger <richard.weinberger@gmail.com>, linux-kbuild@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>
 
-On Tue, 2014-06-10 at 11:15 +0300, Fathi Boudra wrote:
-> On 9 June 2014 03:15, Ben Hutchings <ben@decadent.org.uk> wrote:
-> > On Sun, 2014-04-13 at 14:26 +0100, Ben Hutchings wrote:
-> >> On Sat, 2014-04-12 at 15:53 +0300, Fathi Boudra wrote:
-> >> > Signed-off-by: Fathi Boudra <fathi.boudra@linaro.org>
-> >>
-> >> Reviewed-by: Ben Hutchings <ben@decadent.org.uk>
-> >>
-> >> > ---
-> >> >  scripts/package/builddeb | 2 ++
-> >> >  1 file changed, 2 insertions(+)
-> >> >
-> >> > diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-> >> > index f46e4dd..0bf29a6 100644
-> >> > --- a/scripts/package/builddeb
-> >> > +++ b/scripts/package/builddeb
-> >> > @@ -42,6 +42,8 @@ create_package() {
-> >> >             debarch=hppa ;;
-> >> >     mips*)
-> >> >             debarch=mips$(grep -q CPU_LITTLE_ENDIAN=y $KCONFIG_CONFIG && echo el || true) ;;
-> >> > +   arm64)
-> >
-> > Now I'm not so sure.  As we are comparing with the 'machine' name
-> > ($UTS_MACHINE, not $ARCH or $SRCARCH), shouldn't this actually check for
-> > aarch64?
-> 
-> not sure. I've seen Ian comment (added to the cc list).
+On 2014-06-10 01:47, Randy Dunlap wrote:
+> sure.  I did mkdir /tmp/O then
+> make ARCH=um SUBARCH=i386 O=/tmp/O defconfig
+> make ARCH=um SUBARCH=i386 V=1 O=/tmp/O
 
-The patch above produced the right thing when crossbuilt with
-ARCH=arm64. e.g. linux-image-3.14.5+_3.14.5+-2_arm64.deb
+So I tried with the exact same paths and it worked for me:
+$ mkdir -p /local/lnx/next/linux-next-20140606
+$ git archive d4bc590f8716f7dde6b7bca319097ac30a8cb0b4 | tar xf - -C
+/local/lnx/next/linux-next-20140606/
+$ cd /local/lnx/next/linux-next-20140606/
+$ make ARCH=um SUBARCH=i386 O=/tmp/O defconfig
+$ make ARCH=um SUBARCH=i386 V=1 O=/tmp/O
 
-With just Ben's original patch it produced linux-image-3.14.5+_3.14.5
-+-2_arm.deb instead.
+and it worked.
 
-I think UTS_MACHINE is correct because:
 
-Makefile:UTS_MACHINE    := $(ARCH)
+> make KBUILD_SRC= ARCH=x86 archheaders
+> make -C /local/lnx/next/linux-next-20140606 O=/tmp/O/. archheaders
+> make -C /tmp/O \
+> KBUILD_SRC=/local/lnx/next/linux-next-20140606 \
+> KBUILD_EXTMOD="" -f /local/lnx/next/linux-next-20140606/Makefile \
+> archheaders
+> make -f /local/lnx/next/linux-next-20140606/scripts/Makefile.build obj=arch/x86/syscalls all
 
-and there is no override in arch/arm*/Makefile.
+Here, it should do
 
-So the kernel arch is the correct thing to use here.
+  /bin/sh
+'/local/lnx/next/linux-next-20140606/arch/x86/syscalls/syscallhdr.sh'
+'/local/lnx/next/linux-next-20140606/arch/x86/syscalls/syscall_32.tbl'
+'arch/x86/syscalls/../include/generated/uapi/asm/unistd_32.h' 'i386' '' ''
+  /bin/sh
+'/local/lnx/next/linux-next-20140606/arch/x86/syscalls/syscallhdr.sh'
+'/local/lnx/next/linux-next-20140606/arch/x86/syscalls/syscall_64.tbl'
+'arch/x86/syscalls/../include/generated/uapi/asm/unistd_64.h'
+'common,64' '' ''
+  /bin/sh
+'/local/lnx/next/linux-next-20140606/arch/x86/syscalls/syscallhdr.sh'
+'/local/lnx/next/linux-next-20140606/arch/x86/syscalls/syscall_64.tbl'
+'arch/x86/syscalls/../include/generated/uapi/asm/unistd_x32.h'
+'common,x32' '' '__X32_SYSCALL_BIT'
+  /bin/sh
+'/local/lnx/next/linux-next-20140606/arch/x86/syscalls/syscalltbl.sh'
+/local/lnx/next/linux-next-20140606/arch/x86/syscalls/syscall_32.tbl
+arch/x86/syscalls/../include/generated/asm/syscalls_32.h
 
-Ian.
+which is not happening in your case for some reason. Can you please
+check if you have some stale files in include/generated in the *source*
+tree?
 
+    git ls-file -o --directory
+
+It could be that there is some include/generated directory from a
+previous in-tree build.
+
+Michal
