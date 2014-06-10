@@ -1,29 +1,199 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:33609 "EHLO mx2.suse.de"
+Received: from mout.web.de ([212.227.15.14]:49899 "EHLO mout.web.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750717AbaFJOaO (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 10 Jun 2014 10:30:14 -0400
-Message-ID: <53971674.603@suse.cz>
-Date: Tue, 10 Jun 2014 16:30:12 +0200
-From: Michal Marek <mmarek@suse.cz>
+	id S1750861AbaFJOdc (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 10 Jun 2014 10:33:32 -0400
+From: Martin Walch <walch.martin@web.de>
+Subject: [RESEND PATCH v2 2/2] kconfig: trivial - adjust comments in expr.c
+Date: Tue, 10 Jun 2014 16:31:36 +0200
+Message-ID: <2619793.8KROnVCE99@tacticalops>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 3/5] kbuild: Use relative path for $(objtree)
-References: <1399639944-20551-1-git-send-email-mmarek@suse.cz> <1399639944-20551-4-git-send-email-mmarek@suse.cz> <CAFLxGvyz-aX8rTveo9W3mqsQxPeg8cb7Oq59UiC1kMz4qTiYwg@mail.gmail.com> <538EEA3D.1080105@suse.cz> <538F1B41.3060904@suse.cz> <20140605155614.GA18376@sepie.suse.cz> <539625D1.2090905@infradead.org> <539631CC.9040002@suse.cz> <5396340B.6060804@infradead.org> <20140609223922.GA3409@pobox.suse.cz> <5396479F.6030809@infradead.org> <5396C98E.8050501@suse.cz> <5397119C.9080402@infradead.org>
-In-Reply-To: <5397119C.9080402@infradead.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: Richard Weinberger <richard.weinberger@gmail.com>, linux-kbuild@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-On 2014-06-10 16:09, Randy Dunlap wrote:
-> I'm not using git, just tarballs.  I don't have an include/generated
-> subdirectory at all in my source tree.
-> 
-> However, today's linux-next builds OK for me (both i386 and x86_64),
-> so let's go with your patch.
+From: Martin Walch <walch.martin@web.de>
 
-OK, then let's hope this does not reoccur.
+Replace any C99 comments with traditional ones (/*...*/).
 
-Michal
+Also fix the contents of two comments:
+
+1) the second occurrence of
+(a='b') && (a!='c') -> 'b'='c' ? 'n' : a='b'
+is probably copy & paste from above, missing the adjustment corresponding
+to the code.
+It should probably read
+(a!='b') && (a='c') -> 'b'='c' ? 'n' : a='c'
+
+2) that one is similar:
+(a!='m') && (a!='n') -> (a='m')
+it should be
+(a!='m') && (a!='n') -> (a='y')
+
+Signed-off-by: Martin Walch <walch.martin@web.de>
+---
+ scripts/kconfig/expr.c | 38 +++++++++++++++++++-------------------
+ 1 file changed, 19 insertions(+), 19 deletions(-)
+
+diff --git a/scripts/kconfig/expr.c b/scripts/kconfig/expr.c
+index 4aa171b..c840e52 100644
+--- a/scripts/kconfig/expr.c
++++ b/scripts/kconfig/expr.c
+@@ -326,7 +326,7 @@ struct expr *expr_trans_bool(struct expr *e)
+ 		e->right.expr = expr_trans_bool(e->right.expr);
+ 		break;
+ 	case E_UNEQUAL:
+-		// FOO!=n -> FOO
++		/* FOO!=n -> FOO */
+ 		if (e->left.sym->type == S_TRISTATE) {
+ 			if (e->right.sym == &symbol_no) {
+ 				e->type = E_SYMBOL;
+@@ -375,19 +375,19 @@ static struct expr *expr_join_or(struct expr *e1, struct expr *e2)
+ 		if (e1->type == E_EQUAL && e2->type == E_EQUAL &&
+ 		    ((e1->right.sym == &symbol_yes && e2->right.sym == &symbol_mod) ||
+ 		     (e1->right.sym == &symbol_mod && e2->right.sym == &symbol_yes))) {
+-			// (a='y') || (a='m') -> (a!='n')
++			/* (a='y') || (a='m') -> (a!='n') */
+ 			return expr_alloc_comp(E_UNEQUAL, sym1, &symbol_no);
+ 		}
+ 		if (e1->type == E_EQUAL && e2->type == E_EQUAL &&
+ 		    ((e1->right.sym == &symbol_yes && e2->right.sym == &symbol_no) ||
+ 		     (e1->right.sym == &symbol_no && e2->right.sym == &symbol_yes))) {
+-			// (a='y') || (a='n') -> (a!='m')
++			/* (a='y') || (a='n') -> (a!='m') */
+ 			return expr_alloc_comp(E_UNEQUAL, sym1, &symbol_mod);
+ 		}
+ 		if (e1->type == E_EQUAL && e2->type == E_EQUAL &&
+ 		    ((e1->right.sym == &symbol_mod && e2->right.sym == &symbol_no) ||
+ 		     (e1->right.sym == &symbol_no && e2->right.sym == &symbol_mod))) {
+-			// (a='m') || (a='n') -> (a!='y')
++			/* (a='m') || (a='n') -> (a!='y') */
+ 			return expr_alloc_comp(E_UNEQUAL, sym1, &symbol_yes);
+ 		}
+ 	}
+@@ -438,29 +438,29 @@ static struct expr *expr_join_and(struct expr *e1, struct expr *e2)
+ 
+ 	if ((e1->type == E_SYMBOL && e2->type == E_EQUAL && e2->right.sym == &symbol_yes) ||
+ 	    (e2->type == E_SYMBOL && e1->type == E_EQUAL && e1->right.sym == &symbol_yes))
+-		// (a) && (a='y') -> (a='y')
++		/* (a) && (a='y') -> (a='y') */
+ 		return expr_alloc_comp(E_EQUAL, sym1, &symbol_yes);
+ 
+ 	if ((e1->type == E_SYMBOL && e2->type == E_UNEQUAL && e2->right.sym == &symbol_no) ||
+ 	    (e2->type == E_SYMBOL && e1->type == E_UNEQUAL && e1->right.sym == &symbol_no))
+-		// (a) && (a!='n') -> (a)
++		/* (a) && (a!='n') -> (a) */
+ 		return expr_alloc_symbol(sym1);
+ 
+ 	if ((e1->type == E_SYMBOL && e2->type == E_UNEQUAL && e2->right.sym == &symbol_mod) ||
+ 	    (e2->type == E_SYMBOL && e1->type == E_UNEQUAL && e1->right.sym == &symbol_mod))
+-		// (a) && (a!='m') -> (a='y')
++		/* (a) && (a!='m') -> (a='y') */
+ 		return expr_alloc_comp(E_EQUAL, sym1, &symbol_yes);
+ 
+ 	if (sym1->type == S_TRISTATE) {
+ 		if (e1->type == E_EQUAL && e2->type == E_UNEQUAL) {
+-			// (a='b') && (a!='c') -> 'b'='c' ? 'n' : a='b'
++			/* (a='b') && (a!='c') -> 'b'='c' ? 'n' : a='b' */
+ 			sym2 = e1->right.sym;
+ 			if ((e2->right.sym->flags & SYMBOL_CONST) && (sym2->flags & SYMBOL_CONST))
+ 				return sym2 != e2->right.sym ? expr_alloc_comp(E_EQUAL, sym1, sym2)
+ 							     : expr_alloc_symbol(&symbol_no);
+ 		}
+ 		if (e1->type == E_UNEQUAL && e2->type == E_EQUAL) {
+-			// (a='b') && (a!='c') -> 'b'='c' ? 'n' : a='b'
++			/* (a!='b') && (a='c') -> 'b'='c' ? 'n' : a='c' */
+ 			sym2 = e2->right.sym;
+ 			if ((e1->right.sym->flags & SYMBOL_CONST) && (sym2->flags & SYMBOL_CONST))
+ 				return sym2 != e1->right.sym ? expr_alloc_comp(E_EQUAL, sym1, sym2)
+@@ -469,19 +469,19 @@ static struct expr *expr_join_and(struct expr *e1, struct expr *e2)
+ 		if (e1->type == E_UNEQUAL && e2->type == E_UNEQUAL &&
+ 			   ((e1->right.sym == &symbol_yes && e2->right.sym == &symbol_no) ||
+ 			    (e1->right.sym == &symbol_no && e2->right.sym == &symbol_yes)))
+-			// (a!='y') && (a!='n') -> (a='m')
++			/* (a!='y') && (a!='n') -> (a='m') */
+ 			return expr_alloc_comp(E_EQUAL, sym1, &symbol_mod);
+ 
+ 		if (e1->type == E_UNEQUAL && e2->type == E_UNEQUAL &&
+ 			   ((e1->right.sym == &symbol_yes && e2->right.sym == &symbol_mod) ||
+ 			    (e1->right.sym == &symbol_mod && e2->right.sym == &symbol_yes)))
+-			// (a!='y') && (a!='m') -> (a='n')
++			/* (a!='y') && (a!='m') -> (a='n') */
+ 			return expr_alloc_comp(E_EQUAL, sym1, &symbol_no);
+ 
+ 		if (e1->type == E_UNEQUAL && e2->type == E_UNEQUAL &&
+ 			   ((e1->right.sym == &symbol_mod && e2->right.sym == &symbol_no) ||
+ 			    (e1->right.sym == &symbol_no && e2->right.sym == &symbol_mod)))
+-			// (a!='m') && (a!='n') -> (a='m')
++			/* (a!='m') && (a!='n') -> (a='y') */
+ 			return expr_alloc_comp(E_EQUAL, sym1, &symbol_yes);
+ 
+ 		if ((e1->type == E_SYMBOL && e2->type == E_EQUAL && e2->right.sym == &symbol_mod) ||
+@@ -641,7 +641,7 @@ struct expr *expr_transform(struct expr *e)
+ 	case E_NOT:
+ 		switch (e->left.expr->type) {
+ 		case E_NOT:
+-			// !!a -> a
++			/* !!a -> a */
+ 			tmp = e->left.expr->left.expr;
+ 			free(e->left.expr);
+ 			free(e);
+@@ -650,14 +650,14 @@ struct expr *expr_transform(struct expr *e)
+ 			break;
+ 		case E_EQUAL:
+ 		case E_UNEQUAL:
+-			// !a='x' -> a!='x'
++			/* !a='x' -> a!='x' */
+ 			tmp = e->left.expr;
+ 			free(e);
+ 			e = tmp;
+ 			e->type = e->type == E_EQUAL ? E_UNEQUAL : E_EQUAL;
+ 			break;
+ 		case E_OR:
+-			// !(a || b) -> !a && !b
++			/* !(a || b) -> !a && !b */
+ 			tmp = e->left.expr;
+ 			e->type = E_AND;
+ 			e->right.expr = expr_alloc_one(E_NOT, tmp->right.expr);
+@@ -666,7 +666,7 @@ struct expr *expr_transform(struct expr *e)
+ 			e = expr_transform(e);
+ 			break;
+ 		case E_AND:
+-			// !(a && b) -> !a || !b
++			/* !(a && b) -> !a || !b */
+ 			tmp = e->left.expr;
+ 			e->type = E_OR;
+ 			e->right.expr = expr_alloc_one(E_NOT, tmp->right.expr);
+@@ -676,7 +676,7 @@ struct expr *expr_transform(struct expr *e)
+ 			break;
+ 		case E_SYMBOL:
+ 			if (e->left.expr->left.sym == &symbol_yes) {
+-				// !'y' -> 'n'
++				/* !'y' -> 'n' */
+ 				tmp = e->left.expr;
+ 				free(e);
+ 				e = tmp;
+@@ -685,7 +685,7 @@ struct expr *expr_transform(struct expr *e)
+ 				break;
+ 			}
+ 			if (e->left.expr->left.sym == &symbol_mod) {
+-				// !'m' -> 'm'
++				/* !'m' -> 'm' */
+ 				tmp = e->left.expr;
+ 				free(e);
+ 				e = tmp;
+@@ -694,7 +694,7 @@ struct expr *expr_transform(struct expr *e)
+ 				break;
+ 			}
+ 			if (e->left.expr->left.sym == &symbol_no) {
+-				// !'n' -> 'y'
++				/* !'n' -> 'y' */
+ 				tmp = e->left.expr;
+ 				free(e);
+ 				e = tmp;
+-- 
+1.8.5.5
+
