@@ -1,77 +1,122 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:48676 "EHLO
-	shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1754378AbaFJVmc (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 10 Jun 2014 17:42:32 -0400
-Message-ID: <1402436539.23860.116.camel@deadeye.wl.decadent.org.uk>
-Subject: Re: [PATCH v2 1/2] deb-pkg: Add automatic support for armhf
- architecture
-From: Ben Hutchings <ben@decadent.org.uk>
-Date: Tue, 10 Jun 2014 22:42:19 +0100
-In-Reply-To: <1402297488.31087.5.camel@dagon.hellion.org.uk>
-References: <1402273294.23860.59.camel@deadeye.wl.decadent.org.uk>
-	 <1402297488.31087.5.camel@dagon.hellion.org.uk>
-Content-Type: multipart/signed; micalg="pgp-sha512";
-	protocol="application/pgp-signature"; boundary="=-QLMd1xphOevC7YSY14fX"
-Mime-Version: 1.0
+Received: from terminus.zytor.com ([198.137.202.10]:38708 "EHLO mail.zytor.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752030AbaFJXNt (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 10 Jun 2014 19:13:49 -0400
+From: "H. Peter Anvin" <hpa@zytor.com>
+Subject: [PATCH RFC 05/10] tools: Add <endian.h> libc support for unaligned references
+Date: Tue, 10 Jun 2014 16:13:09 -0700
+Message-Id: <1402441994-16780-6-git-send-email-hpa@zytor.com>
+In-Reply-To: <1402441994-16780-1-git-send-email-hpa@zytor.com>
+References: <1402441994-16780-1-git-send-email-hpa@zytor.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ian Campbell <ijc@hellion.org.uk>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, maximilian attems <max@stro.at>, Michal Marek <mmarek@suse.cz>, Fathi Boudra <fathi.boudra@linaro.org>, debian-arm@lists.debian.org, Hector Oron <hector.oron@gmail.com>
+To: Sam Ravnborg <sam@ravnborg.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org
+Cc: Andy Lutomirski <luto@amacapital.net>, Andrew Morton <akpm@linux-foundation.org>, Ingo Molnar <mingo@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, "H. Peter Anvin" <hpa@zytor.com>
 
+Add support for the <endian.h> byteswap macros for unaligned
+references.
 
---=-QLMd1xphOevC7YSY14fX
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: H. Peter Anvin <hpa@zytor.com>
+---
+ tools/include/tools/unaligned/be_endian.h | 40 +++++++++++++++++++++++++++++++
+ tools/include/tools/unaligned/le_endian.h | 40 +++++++++++++++++++++++++++++++
+ 2 files changed, 80 insertions(+)
+ create mode 100644 tools/include/tools/unaligned/be_endian.h
+ create mode 100644 tools/include/tools/unaligned/le_endian.h
 
-On Mon, 2014-06-09 at 08:04 +0100, Ian Campbell wrote:
-> On Mon, 2014-06-09 at 01:21 +0100, Ben Hutchings wrote:
-> > The Debian armhf architecture uses the ARM EABI hard-float variant,
-> > whereas armel uses the soft-float variant.  Although the kernel
-> > doesn't use FP itself, CONFIG_VFP must be enabled to support
-> > hard-float userland and will probably be disabled when supporting a
-> > soft-float userland.  So set the architecture to armhf by default when
-> > CONFIG_AEABI and CONFIG_VFP are both enabled.
-> >=20
-> > Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
->=20
-> Acked-by: Ian Campbell <ijc@hellion.org.uk>
->=20
-> We should also add the following. If there is some reason to do a v3
-> feel free to squash it into you patch (if you wish).
-[...]
+diff --git a/tools/include/tools/unaligned/be_endian.h b/tools/include/tools/unaligned/be_endian.h
+new file mode 100644
+index 000000000000..4106c082855e
+--- /dev/null
++++ b/tools/include/tools/unaligned/be_endian.h
+@@ -0,0 +1,40 @@
++#ifndef _TOOLS_BE_ENDIAN_H
++#define _TOOLS_BE_ENDIAN_H
++
++#ifndef _BSD_SOURCE
++# define _BSD_SOURCE 1
++#endif
++#include <endian.h>
++#include <stdint.h>
++
++static inline uint16_t get_unaligned_be16(const void *_p)
++{
++	return be16toh(get_unaligned_le16(_p));
++}
++
++static inline uint32_t get_unaligned_be32(const void *_p)
++{
++	return be32toh(get_unaligned_le32(_p));
++}
++
++static inline uint64_t get_unaligned_be64(const void *_p)
++{
++	return be64toh(get_unaligned_le64(_p));
++}
++
++static inline void put_unaligned_be16(uint16_t val, void *_p)
++{
++	put_unaligned_le16(htobe16(val), _p);
++}
++
++static inline void put_unaligned_be32(uint32_t val, void *_p)
++{
++	put_unaligned_le32(htobe32(val), _p);
++}
++
++static inline void put_unaligned_be64(uint64_t val, void *_p)
++{
++	put_unaligned_le64(htobe64(val), _p);
++}
++
++#endif /* _TOOLS_BE_ENDIAN_H */
+diff --git a/tools/include/tools/unaligned/le_endian.h b/tools/include/tools/unaligned/le_endian.h
+new file mode 100644
+index 000000000000..0429f1b29250
+--- /dev/null
++++ b/tools/include/tools/unaligned/le_endian.h
+@@ -0,0 +1,40 @@
++#ifndef _TOOLS_LE_ENDIAN_H
++#define _TOOLS_LE_ENDIAN_H
++
++#ifndef _BSD_SOURCE
++# define _BSD_SOURCE 1
++#endif
++#include <endian.h>
++#include <stdint.h>
++
++static inline uint16_t get_unaligned_le16(const void *_p)
++{
++	return le16toh(get_unaligned_be16(_p));
++}
++
++static inline uint32_t get_unaligned_le32(const void *_p)
++{
++	return le32toh(get_unaligned_be32(_p));
++}
++
++static inline uint64_t get_unaligned_le64(const void *_p)
++{
++	return le64toh(get_unaligned_be64(_p));
++}
++
++static inline void put_unaligned_le16(uint16_t val, void *_p)
++{
++	put_unaligned_be16(htole16(val), _p);
++}
++
++static inline void put_unaligned_le32(uint32_t val, void *_p)
++{
++	put_unaligned_be32(htole32(val), _p);
++}
++
++static inline void put_unaligned_le64(uint64_t val, void *_p)
++{
++	put_unaligned_be64(htole64(val), _p);
++}
++
++#endif /* _TOOLS_LE_ENDIAN_H */
+-- 
+1.9.3
 
-arm64 is already in -next.  Actually, that means my patch is fuzzy as
-it's based on v3.15.  I hope that's OK.
-
-Ben.
-
---=20
-Ben Hutchings
-DNRC Motto:  I can please only one person per day.
-Today is not your day.  Tomorrow isn't looking good either.
-
---=-QLMd1xphOevC7YSY14fX
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
-
-iQIVAwUAU5d7wee/yOyVhhEJAQpzphAAgUIP7WtkaKSVV6ldp6FpQik+iYOMQVYG
-iSKdu4zGICoQeabe8BqDorzye1Xm5Y4dYQ7QPzmmkE34WZ+sskVTQRxeo67zWiLF
-SA45uuiqqosX9rbgF0aRxTIufjMttL/e0Q5FZG20pUBCi2LSUEfQ3WlC4nVuOILY
-zU08pTmqrYUtr4qbFLyf2WCepKW5HqYtO7aQLVRgsf6IjmmyustFbXkNZuYgGfUk
-R0W2smxVADxye2XFjqKaEStoPApEgMg2OorsQhrAYpI3Pq5i3IjYMPSN1Ez3JVgJ
-oJrDr3syfTFTaaq+pBmHyqhPy3R7d0aRnvTusR3xK8DUzXXMAHRHYZz+8eLxCXQf
-9QGbHvIkCz5shloiY1HryphUkYsaxjVgEYzPYHk1vS7Tu4BOx5mW0YUvJCD5sV7E
-klYQMXQ51yZOw0Kmk7b4QPMWiA7SVSEhtrFU8D/gGcq4fS/xqbMrs8DMuq2i4VL5
-dIwMFQDWY9VH2RfE4P/rGjVs9g5AtZ056znzD7E39kTieIp+bnBlWGVVpjIsyX8E
-tG5fXM824hI82fT2Ou7kjqwI54INW5dW95eD8yl+JHqqki9OcxILR5gUr1tfS32L
-0inswWHX76j/d1GsUMVSPQZsQcyIdshq4FlWqlpzg9+2vVIVF8U+d+QaCI2dJxx7
-HRyYAzy2qcg=
-=EUkf
------END PGP SIGNATURE-----
-
---=-QLMd1xphOevC7YSY14fX--
