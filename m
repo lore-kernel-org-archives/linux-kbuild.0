@@ -1,65 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from casper.infradead.org ([85.118.1.10]:46475 "EHLO
-	casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932524AbaFJA3x (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 9 Jun 2014 20:29:53 -0400
-Message-ID: <5396517C.4070108@infradead.org>
-Date: Mon, 09 Jun 2014 17:29:48 -0700
-From: Randy Dunlap <rdunlap@infradead.org>
+Received: from smtp.mei.co.jp ([133.183.100.20]:45898 "EHLO smtp.mei.co.jp"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752750AbaFJBLZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 9 Jun 2014 21:11:25 -0400
+Date: Tue, 10 Jun 2014 10:11:09 +0900
+From: Masahiro Yamada <yamada.m@jp.panasonic.com>
+Subject: Re: [PATCH] kbuild: rename CONFIG_SHELL to KBUILD_SHELL
+In-Reply-To: <53963B97.1060807@suse.cz>
+References: <20140609211858.GA2025@ravnborg.org> <53963B97.1060807@suse.cz>
+Message-Id: <20140610101109.95ED.AA925319@jp.panasonic.com>
 MIME-Version: 1.0
-Subject: Re: possible typo
-References: <539548E7.9070908@penguintechs.org> <20140609074630.GA15826@ravnborg.org> <53956B28.7040404@penguintechs.org>
-In-Reply-To: <53956B28.7040404@penguintechs.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Warren Turkal <wt@penguintechs.org>, Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, trivial@kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org
 
-On 06/09/14 01:07, Warren Turkal wrote:
-> commit 4ce2f36b4b06b7df569b1875c7ab834270786882
-> Author: Warren Turkal <wt@penguintechs.org>
-> Date:   Sun Jun 8 22:19:29 2014 -0700
-> 
->     Fix a typo.
-> 
->     Signed-off-by: Warren Turkal <wt@penguintechs.org>
-
-Acked-by: Randy Dunlap <rdunlap@infradead.org>
-
-Thanks.
-
-> diff --git a/Documentation/kbuild/modules.txt b/Documentation/kbuild/modules.txt
-> index 69372fb..3fb39e0 100644
-> --- a/Documentation/kbuild/modules.txt
-> +++ b/Documentation/kbuild/modules.txt
-> @@ -470,7 +470,7 @@ build.
-> 
->      Sometimes, an external module uses exported symbols from
->      another external module. kbuild needs to have full knowledge of
-> -    all symbols to avoid spliitting out warnings about undefined
-> +    all symbols to avoid spitting out warnings about undefined
->      symbols. Three solutions exist for this situation.
-> 
->      NOTE: The method with a top-level kbuild file is recommended
-> 
-> wt
-> 
-> On 06/09/2014 12:46 AM, Sam Ravnborg wrote:
->> On Sun, Jun 08, 2014 at 10:40:55PM -0700, Warren Turkal wrote:
->>> Hey,
->>>
->>> I think I found a typo in the kbuild docs. A one line commit can be pulled
->>> from the "fix_typo" branch from the git repo @ git@github.com:wt/linux.git.
->>>
->>> Can someone please take a look at this branch at some point?
->> No.
->> Please submit this as a regular patch - see Documentation/SubmittingPatches
->>
->>     Sam
+Hi Michal,
 
 
--- 
-~Randy
+On Tue, 10 Jun 2014 00:56:23 +0200
+Michal Marek <mmarek@suse.cz> wrote:
+
+> Dne 9.6.2014 23:18, Sam Ravnborg napsal(a):
+> > On Mon, Jun 09, 2014 at 10:50:46PM +0200, Michal Marek wrote:
+> >> Dne 9.6.2014 20:15, Sam Ravnborg napsal(a):
+> >>> And please cc: the x86 people - thay have some patches that
+> >>> uses CONFIG_SHELL IIRC.
+> >>
+> >> Do you remember which patches? Looking at
+> >>
+> >>   git diff kbuild/kbuild linux-next -- arch/x86
+> >>
+> >> The only occurrence of CONFIG_SHELL is in the rule for make kvmconfig.
+> >> Which is a conflict that is trivially solved.
+> > Yep - these were the ones I had in mind.
+> 
+> Thanks, this is a trivial conflict. I'll have one more look and apply
+> the rename tomorrow.
+
+
+I found a typo in the commit description.
+
+s/Is is impossible/It is impossible/
+
+Could you fix it when you apply this patch, please?
+
+
+Thanks in advance.
+
+
+Best Regards
+Masahiro Yamada
+
