@@ -1,88 +1,77 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ve0-f170.google.com ([209.85.128.170]:40360 "EHLO
-	mail-ve0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755795AbaFKSp0 (ORCPT
+Received: from asavdk4.altibox.net ([109.247.116.15]:37297 "EHLO
+	asavdk4.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752640AbaFKSvX (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 11 Jun 2014 14:45:26 -0400
-Received: by mail-ve0-f170.google.com with SMTP id oz11so345156veb.15
-        for <linux-kbuild@vger.kernel.org>; Wed, 11 Jun 2014 11:45:25 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <CA+5PVA6ohJ3JpSptk7m629aoLjxh9zfYQ459-HPeggFpE0fFvA@mail.gmail.com>
-References: <5398749B.4090209@zytor.com> <cover.1402503408.git.luto@amacapital.net>
+	Wed, 11 Jun 2014 14:51:23 -0400
+Date: Wed, 11 Jun 2014 20:51:19 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH 2/2] x86,vdso: Fix vdso_install
+Message-ID: <20140611185119.GA13412@ravnborg.org>
+References: <5398749B.4090209@zytor.com>
+ <cover.1402503408.git.luto@amacapital.net>
  <fe51e9f5c338d33b1a8b20813441538df5e17add.1402503408.git.luto@amacapital.net>
  <CA+5PVA5uPj0JiTLXJAtBt9b9e6aEcJh7ApFRbaCAP0=se89GKA@mail.gmail.com>
- <53989190.9010806@zytor.com> <CA+5PVA7_B20q6mzq9yrbcQZEw0Z785pOCFeuTjKo7_9tn4_EsA@mail.gmail.com>
- <CALCETrXNLTL_VGo-epSdGY9ApXsmo_HLx90ncSsG1o18SmGTMg@mail.gmail.com> <CA+5PVA6ohJ3JpSptk7m629aoLjxh9zfYQ459-HPeggFpE0fFvA@mail.gmail.com>
-From: Andy Lutomirski <luto@amacapital.net>
-Date: Wed, 11 Jun 2014 11:45:05 -0700
-Message-ID: <CALCETrXC2ihRWhcAPRGchuRrO3ZPmfrEzS9CemxsM_TeWfTqZA@mail.gmail.com>
-Subject: Re: [PATCH 2/2] x86,vdso: Fix vdso_install
-Content-Type: text/plain; charset=UTF-8
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+5PVA5uPj0JiTLXJAtBt9b9e6aEcJh7ApFRbaCAP0=se89GKA@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Josh Boyer <jwboyer@fedoraproject.org>
-Cc: "H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "Linux-Kernel@Vger. Kernel. Org" <linux-kernel@vger.kernel.org>
+Cc: Andy Lutomirski <luto@amacapital.net>, "H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, "Linux-Kernel@Vger. Kernel. Org" <linux-kernel@vger.kernel.org>
 
-On Wed, Jun 11, 2014 at 10:45 AM, Josh Boyer <jwboyer@fedoraproject.org> wrote:
-> On Wed, Jun 11, 2014 at 1:42 PM, Andy Lutomirski <luto@amacapital.net> wrote:
->> On Wed, Jun 11, 2014 at 10:33 AM, Josh Boyer <jwboyer@fedoraproject.org> wrote:
->>> On Wed, Jun 11, 2014 at 1:27 PM, H. Peter Anvin <hpa@zytor.com> wrote:
->>>> On 06/11/2014 10:23 AM, Josh Boyer wrote:
->>>>>
->>>>> So this does fix the invocation of 'make vdso_install' and the
->>>>> resulting files look to be accurate to me, with the glaring exception
->>>>> that now we get e.g. vdso64.so on x86_64 as the installed file instead
->>>>> of vdso.so.  How much that actually matters, I have no idea.
->>>>> Plausibly fixed with a symlink if we really need to perhaps.
->>>>>
->>>>
->>>> You have that problem anyway, no?  After all, there are three different
->>>> vdso images for 32 bits, and you can run 32-bit apps on 64-bit systems, too.
->>>
->>> Yeah, true.
->>>
->>>> Is there realistically any way for the debugger to pick up the correct one?
->>>
->>> Probably not.
->>
->> Sure there is: build ids.  See /usr/lib/debug/.build-id.
->
-> Oh, duh.
->
->> It would be great if we could teach the various debugging tools
->> (libdw?  gdb?  I don't know what's responsible for the search path) to
->> search both /usr/lib/debug/.build-id and /lib/modules/`uname
->> -r`/build-id or something like that.
->>
->>>
->>> I'm planning on pushing out our first 3.16 build with
->>> these two patches with no symlink.  I very much doubt anyone is going
->>> to complain.  It was just something I noticed.
->>
->> Does the Fedora RPM magic debuginfo script notice these files and
->> symlink them into the .build-id directory?
->>
->> Of course, we don't seem to be generating build ids right now.  I
->> thought we were.  I'll see if I can fix it.
->
-> My builds have it:
->
-> [jwboyer@sb ~]$ file /lib/modules/3.16.0-0.rc0.git1.1.fc21.x86_64/vdso/vdso64.so
-> /lib/modules/3.16.0-0.rc0.git1.1.fc21.x86_64/vdso/vdso64.so: ELF
-> 64-bit LSB shared object, x86-64, version 1 (SYSV), dynamically
-> linked, BuildID[sha1]=0x85ab0014891b5be97871e5e1183b761b9d2e8d9d,
-> stripped
-> [jwboyer@sb ~]$
->
-> I forget if we're doing something special to get that or not.
+On Wed, Jun 11, 2014 at 01:23:59PM -0400, Josh Boyer wrote:
+> On Wed, Jun 11, 2014 at 12:20 PM, Andy Lutomirski <luto@amacapital.net> wrote:
+> > Rather than monkeying with barely-comprehensible static pattern
+> > rules, just use an explicit loop.
+> >
+> > Signed-off-by: Andy Lutomirski <luto@amacapital.net>
+> > ---
+> >  arch/x86/vdso/Makefile | 20 +++++++-------------
+> >  1 file changed, 7 insertions(+), 13 deletions(-)
+> >
+> > diff --git a/arch/x86/vdso/Makefile b/arch/x86/vdso/Makefile
+> > index 9769df0..b1c70cc 100644
+> > --- a/arch/x86/vdso/Makefile
+> > +++ b/arch/x86/vdso/Makefile
+> > @@ -9,11 +9,6 @@ VDSOX32-$(CONFIG_X86_X32_ABI)  := y
+> >  VDSO32-$(CONFIG_X86_32)                := y
+> >  VDSO32-$(CONFIG_COMPAT)                := y
+> >
+> > -vdso-install-$(VDSO64-y)       += vdso.so
+> > -vdso-install-$(VDSOX32-y)      += vdsox32.so
+> > -vdso-install-$(VDSO32-y)       += $(vdso32-images)
+> > -
+> > -
+> >  # files to link into the vdso
+> >  vobjs-y := vdso-note.o vclock_gettime.o vgetcpu.o
+> >
+> > @@ -176,15 +171,14 @@ VDSO_LDFLAGS = -fPIC -shared $(call cc-ldoption, -Wl$(comma)--hash-style=sysv) \
+> >  GCOV_PROFILE := n
+> >
+> >  #
+> > -# Install the unstripped copy of vdso*.so listed in $(vdso-install-y).
+> > +# Install the unstripped copies of vdso*.so listed in $(vdso-install-y).
+> >  #
+> > -quiet_cmd_vdso_install = INSTALL $@
+> > -      cmd_vdso_install = cp $(obj)/$@.dbg $(MODLIB)/vdso/$@
+> > -$(vdso-install-y): %.so: $(obj)/%.so.dbg FORCE
+> > -       @mkdir -p $(MODLIB)/vdso
+> > -       $(call cmd,vdso_install)
+> > +quiet_cmd_vdso_install = INSTALL $(sofile)
+> > +      cmd_vdso_install = cp $(obj)/$(sofile).dbg $(MODLIB)/vdso/$(sofile)
+> >
+> > -PHONY += vdso_install $(vdso-install-y)
+> > -vdso_install: $(vdso-install-y)
+> > +PHONY += vdso_install
+> > +vdso_install: $(vdso_img_sodbg:%=$(obj)/%) FORCE
+> > +       @mkdir -p $(MODLIB)/vdso
+> > +       @$(foreach sofile,$(vdso_img_sodbg:%.dbg=%),$(call recipe-cmd,vdso_install);)
 
-Apparently not.  file can see it, but apparently objdump can't.  go figure.
-
->
-> josh
+Can we please fix this in a way where we do not need to add stuff to core kbuild.
+If the original approach was used then make took care of the looping
+and the foreach part was not needed.
 
 
-
--- 
-Andy Lutomirski
-AMA Capital Management, LLC
+	Sam
