@@ -1,34 +1,33 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oa0-f50.google.com ([209.85.219.50]:57877 "EHLO
-	mail-oa0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755738AbaFKQYc (ORCPT
+Received: from asavdk3.altibox.net ([109.247.116.14]:38792 "EHLO
+	asavdk3.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755568AbaFKQge (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 11 Jun 2014 12:24:32 -0400
-MIME-Version: 1.0
-In-Reply-To: <cover.1402503408.git.luto@amacapital.net>
-References: <5398749B.4090209@zytor.com>
-	<cover.1402503408.git.luto@amacapital.net>
-Date: Wed, 11 Jun 2014 12:24:31 -0400
-Message-ID: <CA+5PVA5Yxq83or2usv-Wog-6AMf91c_bFvCHYc=H=L-k_oXfxA@mail.gmail.com>
+	Wed, 11 Jun 2014 12:36:34 -0400
+Date: Wed, 11 Jun 2014 18:36:29 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
 Subject: Re: [PATCH 0/2] x86,vdso,kbuild: Fix vdso_install
-From: Josh Boyer <jwboyer@fedoraproject.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Message-ID: <20140611163628.GA12685@ravnborg.org>
+References: <5398749B.4090209@zytor.com>
+ <cover.1402503408.git.luto@amacapital.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cover.1402503408.git.luto@amacapital.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Andy Lutomirski <luto@amacapital.net>
-Cc: "H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, "Linux-Kernel@Vger. Kernel. Org" <linux-kernel@vger.kernel.org>
+Cc: "H. Peter Anvin" <hpa@zytor.com>, Josh Boyer <jwboyer@fedoraproject.org>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, "Linux-Kernel@Vger. Kernel. Org" <linux-kernel@vger.kernel.org>
 
-On Wed, Jun 11, 2014 at 12:20 PM, Andy Lutomirski <luto@amacapital.net> wrote:
+On Wed, Jun 11, 2014 at 09:20:05AM -0700, Andy Lutomirski wrote:
 > This changes kbuild slightly because I didn't want to fight with using
 > static pattern rules and extra obfuscated fake targets just to write a
 > loop.
->
-> Better ideas / cleanups welcome.
->
-> Andy Lutomirski (2):
->   kbuild: Add recipe-cmd, an @-less cmd variant
->   x86,vdso: Fix vdso_install
 
-You won the race :).  I'll give these a spin shortly.
+What are you trying to fix with this?
 
-josh
+On my box (32 bit Intel) "make MODLIB=~/mod vdso_install"
+works as expected.
+Two *.so files are installed as a copy of the so.dbg files.
+
+	Sam
