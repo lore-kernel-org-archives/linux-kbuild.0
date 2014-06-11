@@ -1,50 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:58398 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932468AbaFKPk4 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 11 Jun 2014 11:40:56 -0400
-From: Michal Marek <mmarek@suse.cz>
-Subject: [PATCH v2] powerpc: Avoid circular dependency with zImage.%
-Date: Wed, 11 Jun 2014 17:40:43 +0200
-Message-Id: <1402501243-28213-1-git-send-email-mmarek@suse.cz>
-In-Reply-To: <53984D4F.6040808@linux.vnet.ibm.com>
-References: <53984D4F.6040808@linux.vnet.ibm.com>
+Received: from mail-pa0-f45.google.com ([209.85.220.45]:48733 "EHLO
+	mail-pa0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932447AbaFKQUT (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 11 Jun 2014 12:20:19 -0400
+Received: by mail-pa0-f45.google.com with SMTP id hz1so2082804pad.32
+        for <linux-kbuild@vger.kernel.org>; Wed, 11 Jun 2014 09:20:18 -0700 (PDT)
+From: Andy Lutomirski <luto@amacapital.net>
+Subject: [PATCH 0/2] x86,vdso,kbuild: Fix vdso_install
+Date: Wed, 11 Jun 2014 09:20:05 -0700
+Message-Id: <cover.1402503408.git.luto@amacapital.net>
+In-Reply-To: <5398749B.4090209@zytor.com>
+References: <5398749B.4090209@zytor.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mike Qiu <qiudayu@linux.vnet.ibm.com>
-Cc: linuxppc-dev@lists.ozlabs.org, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: "H. Peter Anvin" <hpa@zytor.com>, Josh Boyer <jwboyer@fedoraproject.org>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, "Linux-Kernel@Vger. Kernel. Org" <linux-kernel@vger.kernel.org>, Andy Lutomirski <luto@amacapital.net>
 
-The rule to create the final images uses a zImage.% pattern.
-Unfortunately, this also matches the names of the zImage.*.lds linker
-scripts, which appear as a dependency of the final images. This somehow
-worked when $(srctree) used to be an absolute path, but now the pattern
-matches too much. List only the images from $(image-y) as the target of
-the rule, to avoid the circular dependency.
+This changes kbuild slightly because I didn't want to fight with using
+static pattern rules and extra obfuscated fake targets just to write a
+loop.
 
-Signed-off-by: Michal Marek <mmarek@suse.cz>
----
-v2:
-  - Filter out duplicates in the target list
-  - fix the platform argument to cmd_wrap
+Better ideas / cleanups welcome.
 
- arch/powerpc/boot/Makefile | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Andy Lutomirski (2):
+  kbuild: Add recipe-cmd, an @-less cmd variant
+  x86,vdso: Fix vdso_install
 
-diff --git a/arch/powerpc/boot/Makefile b/arch/powerpc/boot/Makefile
-index 426dce7..ccc25ed 100644
---- a/arch/powerpc/boot/Makefile
-+++ b/arch/powerpc/boot/Makefile
-@@ -333,8 +333,8 @@ $(addprefix $(obj)/, $(initrd-y)): $(obj)/ramdisk.image.gz
- $(obj)/zImage.initrd.%: vmlinux $(wrapperbits)
- 	$(call if_changed,wrap,$*,,,$(obj)/ramdisk.image.gz)
- 
--$(obj)/zImage.%: vmlinux $(wrapperbits)
--	$(call if_changed,wrap,$*)
-+$(addprefix $(obj)/, $(sort $(filter zImage.%, $(image-y)))): vmlinux $(wrapperbits)
-+	$(call if_changed,wrap,$(subst $(obj)/zImage.,,$@))
- 
- # dtbImage% - a dtbImage is a zImage with an embedded device tree blob
- $(obj)/dtbImage.initrd.%: vmlinux $(wrapperbits) $(obj)/%.dtb
+ arch/x86/vdso/Makefile | 20 +++++++-------------
+ scripts/Kbuild.include |  1 +
+ 2 files changed, 8 insertions(+), 13 deletions(-)
+
 -- 
-1.9.2
+1.9.3
 
