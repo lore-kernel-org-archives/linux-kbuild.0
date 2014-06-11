@@ -1,56 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ve0-f176.google.com ([209.85.128.176]:47860 "EHLO
-	mail-ve0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752199AbaFKTqo (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 11 Jun 2014 15:46:44 -0400
-Received: by mail-ve0-f176.google.com with SMTP id db12so508069veb.21
-        for <linux-kbuild@vger.kernel.org>; Wed, 11 Jun 2014 12:46:44 -0700 (PDT)
+Received: from terminus.zytor.com ([198.137.202.10]:53095 "EHLO mail.zytor.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750958AbaFKVxJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 11 Jun 2014 17:53:09 -0400
+Message-ID: <5398CFA4.60202@zytor.com>
+Date: Wed, 11 Jun 2014 14:52:36 -0700
+From: "H. Peter Anvin" <hpa@zytor.com>
 MIME-Version: 1.0
-In-Reply-To: <20140611194452.GA25049@ravnborg.org>
-References: <37910a32e3d223a688a2743376bdde8fbdc8ef5c.1402515662.git.luto@amacapital.net>
- <20140611194452.GA25049@ravnborg.org>
-From: Andy Lutomirski <luto@amacapital.net>
-Date: Wed, 11 Jun 2014 12:46:23 -0700
-Message-ID: <CALCETrUsmvPkJ=FvU=UcZXwuoQMXcKA3fGoofsjZ3U-gZrDtJw@mail.gmail.com>
-Subject: Re: [PATCH] x86,build: Fix make -jN modules_install install
+Subject: Re: [PATCH RFC 00/10] tools: Revamp the unaligned endian access functions
+References: <1402441994-16780-1-git-send-email-hpa@zytor.com> <20140611192111.GB16069@ravnborg.org>
+In-Reply-To: <20140611192111.GB16069@ravnborg.org>
 Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Sam Ravnborg <sam@ravnborg.org>
-Cc: "H. Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>, Michal Marek <mmarek@suse.cz>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "Linux-Kernel@Vger. Kernel. Org" <linux-kernel@vger.kernel.org>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org, Andy Lutomirski <luto@amacapital.net>, Andrew Morton <akpm@linux-foundation.org>, Ingo Molnar <mingo@kernel.org>, Thomas Gleixner <tglx@linutronix.de>
 
-On Wed, Jun 11, 2014 at 12:44 PM, Sam Ravnborg <sam@ravnborg.org> wrote:
-> On Wed, Jun 11, 2014 at 12:41:57PM -0700, Andy Lutomirski wrote:
->> Every few months, I forget why I type:
+On 06/11/2014 12:21 PM, Sam Ravnborg wrote:
+> On Tue, Jun 10, 2014 at 04:13:04PM -0700, H. Peter Anvin wrote:
+>> After a recent problem in the x86 tree, which seems to be the heaviest
+>> but not the only user of these functions, I went through and did a
+>> patchset to revamp the *user space* unaligned/endian accessor
+>> functions.  As much as I think it is downright pathetic that this
+>> functionality still isn't part of the C standard, that is life and we
+>> have to deal with it.  Furthermore, although glibc has a pretty nice
+>> set of functions for byte swapping in <endian.h>, taken from FreeBSD I
+>> believe, some older systems don't support them.
 >>
->> $ sudo make -j12 modules_install && sudo make -j12 install
+>> This variant tries to fill in all the holes.  It assumes that
+>> <endian.h> define the functions as macros if they exist, as I don't
+>> know any other way of probing for them without reaching for autoconf,
+>> but that should be valid enough of an assumption in this case.
 >>
->> instead of just:
->>
->> $ sudo make -j12 modules_install install
->>
->> I try the latter, it appears to work, and then my machine won't boot
->> because dracut got confused.  This fixes it once and for all: if you
->> ask make to install modules and a kernel, you almost certainly want
->> the modules installed *first* so that your initramfs scripts can
->> find the modules.
->
-> Is this problem x86 specific?
+>> The hope is that this should give reasonable, if not optimal, code
+>> generation on most processors, and give a hook where arch maintainers
+>> can add their own changes if needed.
+> 
+> This looks like a very complex solution to a simple problem.
+> We want a shared implementation of the *user space*
+> unaligned/endian accessor functions.
+> But do we really want *fast* versions for our use?
+> 
+> This is not a new libc that should generate optimal code,
+> but only something were we want to provide e working
+> implmentation for use in our user-space tools.
+> 
+> A much simpler approach without any fallback to arch specific
+> version etc. is everything we need.
 
-I don't know.  But I also don't want to have 'make modules_install
-install' on an arch without an install target appear to work, so I
-don't know how to do it in the kbuild core.  That is, I don't want to
-define an install target; I just want to add a dependency if the
-target is already there.
+It doesn't matter so much for things that are just done for the kernel
+compile, no, but there are some tools that are built to be used as
+standalone things, and it could matter there.
 
-Also, this patch has a repeated ifneq.  I'll fix it in v2.
+Please note that the code currently doesn't have any arch-specific bits
+at all... the code is somewhat complex in part because it is very
+generic and handles several levels of fallback.  It *can* get
+arch-specific overrides if it matters, but the intent is that it
+shouldn't be necessary in the vast majority of the cases.
 
->
->         Sam
+	-hpa
 
-
-
--- 
-Andy Lutomirski
-AMA Capital Management, LLC
