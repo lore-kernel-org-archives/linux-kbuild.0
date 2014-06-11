@@ -1,54 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from asavdk3.altibox.net ([109.247.116.14]:41206 "EHLO
-	asavdk3.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750963AbaFKTVQ (ORCPT
+Received: from mail-pb0-f46.google.com ([209.85.160.46]:48344 "EHLO
+	mail-pb0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752584AbaFKTZc (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 11 Jun 2014 15:21:16 -0400
-Date: Wed, 11 Jun 2014 21:21:11 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH RFC 00/10] tools: Revamp the unaligned endian access
- functions
-Message-ID: <20140611192111.GB16069@ravnborg.org>
-References: <1402441994-16780-1-git-send-email-hpa@zytor.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1402441994-16780-1-git-send-email-hpa@zytor.com>
+	Wed, 11 Jun 2014 15:25:32 -0400
+Received: by mail-pb0-f46.google.com with SMTP id rq2so132747pbb.19
+        for <linux-kbuild@vger.kernel.org>; Wed, 11 Jun 2014 12:25:32 -0700 (PDT)
+From: Andy Lutomirski <luto@amacapital.net>
+Subject: [PATCH v2] x86,vdso: Fix vdso_install
+Date: Wed, 11 Jun 2014 12:25:29 -0700
+Message-Id: <5d5e221e59be20a3a7ceb99452e74e233383e7b4.1402514715.git.luto@amacapital.net>
+In-Reply-To: <sam@ravnborg.org>
+References: <sam@ravnborg.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "H. Peter Anvin" <hpa@zytor.com>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org, Andy Lutomirski <luto@amacapital.net>, Andrew Morton <akpm@linux-foundation.org>, Ingo Molnar <mingo@kernel.org>, Thomas Gleixner <tglx@linutronix.de>
+To: "H. Peter Anvin" <hpa@zytor.com>, Josh Boyer <jwboyer@fedoraproject.org>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, "Linux-Kernel@Vger. Kernel. Org" <linux-kernel@vger.kernel.org>, Andy Lutomirski <luto@amacapital.net>
 
-On Tue, Jun 10, 2014 at 04:13:04PM -0700, H. Peter Anvin wrote:
-> After a recent problem in the x86 tree, which seems to be the heaviest
-> but not the only user of these functions, I went through and did a
-> patchset to revamp the *user space* unaligned/endian accessor
-> functions.  As much as I think it is downright pathetic that this
-> functionality still isn't part of the C standard, that is life and we
-> have to deal with it.  Furthermore, although glibc has a pretty nice
-> set of functions for byte swapping in <endian.h>, taken from FreeBSD I
-> believe, some older systems don't support them.
-> 
-> This variant tries to fill in all the holes.  It assumes that
-> <endian.h> define the functions as macros if they exist, as I don't
-> know any other way of probing for them without reaching for autoconf,
-> but that should be valid enough of an assumption in this case.
-> 
-> The hope is that this should give reasonable, if not optimal, code
-> generation on most processors, and give a hook where arch maintainers
-> can add their own changes if needed.
+The filenames are different now.  Inspired by a patch from
+Sam Ravnborg.
 
-This looks like a very complex solution to a simple problem.
-We want a shared implementation of the *user space*
-unaligned/endian accessor functions.
-But do we really want *fast* versions for our use?
+Reported-by: Josh Boyer <jwboyer@fedoraproject.org>
+Signed-off-by: Andy Lutomirski <luto@amacapital.net>
+---
+ arch/x86/vdso/Makefile | 22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
 
-This is not a new libc that should generate optimal code,
-but only something were we want to provide e working
-implmentation for use in our user-space tools.
-
-A much simpler approach without any fallback to arch specific
-version etc. is everything we need.
-
-	Sam
+diff --git a/arch/x86/vdso/Makefile b/arch/x86/vdso/Makefile
+index 9769df0..e3683d6 100644
+--- a/arch/x86/vdso/Makefile
++++ b/arch/x86/vdso/Makefile
+@@ -9,11 +9,6 @@ VDSOX32-$(CONFIG_X86_X32_ABI)	:= y
+ VDSO32-$(CONFIG_X86_32)		:= y
+ VDSO32-$(CONFIG_COMPAT)		:= y
+ 
+-vdso-install-$(VDSO64-y)	+= vdso.so
+-vdso-install-$(VDSOX32-y)	+= vdsox32.so
+-vdso-install-$(VDSO32-y)	+= $(vdso32-images)
+-
+-
+ # files to link into the vdso
+ vobjs-y := vdso-note.o vclock_gettime.o vgetcpu.o
+ 
+@@ -176,15 +171,20 @@ VDSO_LDFLAGS = -fPIC -shared $(call cc-ldoption, -Wl$(comma)--hash-style=sysv) \
+ GCOV_PROFILE := n
+ 
+ #
+-# Install the unstripped copy of vdso*.so listed in $(vdso-install-y).
++# Install the unstripped copies of vdso*.so.
+ #
+-quiet_cmd_vdso_install = INSTALL $@
+-      cmd_vdso_install = cp $(obj)/$@.dbg $(MODLIB)/vdso/$@
+-$(vdso-install-y): %.so: $(obj)/%.so.dbg FORCE
++quiet_cmd_vdso_install = INSTALL $(@:install_%=%)
++      cmd_vdso_install = cp $< $(MODLIB)/vdso/$(@:install_%=%)
++
++vdso_img_insttargets := $(vdso_img_sodbg:%=install_%)
++
++$(MODLIB)/vdso: FORCE
+ 	@mkdir -p $(MODLIB)/vdso
++
++$(vdso_img_insttargets): install_%: $(obj)/% $(MODLIB)/vdso FORCE
+ 	$(call cmd,vdso_install)
+ 
+-PHONY += vdso_install $(vdso-install-y)
+-vdso_install: $(vdso-install-y)
++PHONY += vdso_install $(vdso_img_insttargets)
++vdso_install: $(vdso_img_insttargets) FORCE
+ 
+ clean-files := vdso32-syscall* vdso32-sysenter* vdso32-int80*
+-- 
+1.9.3
 
