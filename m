@@ -1,137 +1,88 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:58108 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753027AbaFLQQ0 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 12 Jun 2014 12:16:26 -0400
-Date: Thu, 12 Jun 2014 18:16:22 +0200
-From: Michal Marek <mmarek@suse.cz>
-Subject: [GIT PULL] kbuild misc changes for v3.16-rc1
-Message-ID: <20140612161622.GA20405@pobox.suse.cz>
+Received: from mail-ob0-f172.google.com ([209.85.214.172]:63877 "EHLO
+	mail-ob0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933463AbaFLRBz (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 12 Jun 2014 13:01:55 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+In-Reply-To: <b10299edd8ba98d17e07dafcd895b8ecf4d99eff.1402586707.git.luto@amacapital.net>
+References: <CA+5PVA5rP4cF14-ckD4K4MgBNtfHB+xPg3whEL26JkxegE7qpg@mail.gmail.com>
+	<b10299edd8ba98d17e07dafcd895b8ecf4d99eff.1402586707.git.luto@amacapital.net>
+Date: Thu, 12 Jun 2014 13:01:54 -0400
+Message-ID: <CA+5PVA49T_hygP2O_ykqCpg6GFiJDds37LgroKvAfLSm0mkBKA@mail.gmail.com>
+Subject: Re: [PATCH v3] x86,vdso: Fix vdso_install
+From: Josh Boyer <jwboyer@fedoraproject.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: ben@decadent.org.uk, fathi.boudra@linaro.org, gamerh2o@gmail.com, koct9i@gmail.com, nasa4836@gmail.com, peter.senna@gmail.com, sboyd@codeaurora.org, wt@penguintechs.org, yamada.m@jp.panasonic.com, ydroneaud@opteya.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Andy Lutomirski <luto@amacapital.net>
+Cc: "H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "Linux-Kernel@Vger. Kernel. Org" <linux-kernel@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>
 
-Hi Linus,
+On Thu, Jun 12, 2014 at 11:28 AM, Andy Lutomirski <luto@amacapital.net> wrote:
+> The filenames are different now.  Inspired by a patch from
+> Sam Ravnborg.
+>
+> Acked-by: Sam Ravnborg <sam@ravnborg.org>
+> Reported-by: Josh Boyer <jwboyer@fedoraproject.org>
+> Signed-off-by: Andy Lutomirski <luto@amacapital.net>
 
-this is the non-critical part of kbuild for v3.16-rc1:
-- make deb-pkg can do s390x and arm64
-- New patterns in scripts/tags.sh
-- scripts/tags.sh skips userspace tools' sources (which sometimes have
-  copies of kernel structures) and symlinks
-- Improvements to the objdiff tool
-- Two new coccinelle patches
-- Other minor fixes
+Things look great with this version.  Thanks much!
 
-Michal
+Tested-by: Josh Boyer <jwboyer@fedoraproject.org>
 
-
-The following changes since commit c9eaa447e77efe77b7fa4c953bd62de8297fd6c5:
-
-  Linux 3.15-rc1 (2014-04-13 14:18:35 -0700)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git misc
-
-for you to fetch changes up to 7fa0e6db3cedc9b70d68a4170f1352e2b1aa0f90:
-
-  scripts: objdiff: support directories for the augument of record command (2014-06-10 14:59:33 +0200)
-
-----------------------------------------------------------------
-Ben Hutchings (1):
-      deb-pkg: Add automatic support for s390x architecture
-
-Fathi Boudra (2):
-      builddeb: use $OBJCOPY variable instead of objcopy
-      builddeb: add arm64 in the supported architectures
-
-Jianyu Zhan (2):
-      scripts/tags.sh: add pattern for DEFINE_HASHTABLE
-      scripts/tags.sh: add regular expression replacement pattern for memcg
-
-Konstantin Khlebnikov (1):
-      scripts/tags.sh: ignore code of user space tools
-
-Masahiro Yamada (9):
-      kbuild: trivial - remove trailing empty lines
-      kbuild: trivial - use tabs for code indent where possible
-      scripts: objdiff: get the path to .tmp_objdiff more simply
-      scripts: objdiff: direct error messages to stderr
-      scripts: objdiff: remove unnecessary code
-      scripts: objdiff: improve path flexibility for record command
-      scripts: objdiff: change the extension of disassembly from .o to .dis
-      scripts: objdiff: fix a comment
-      scripts: objdiff: support directories for the augument of record command
-
-Peter Senna Tschudin (1):
-      coccicheck: Add unneeded return variable test
-
-Stephen Boyd (1):
-      coccinelle: Check for missing NULL terminators in of_device_id tables
-
-Warren Turkal (1):
-      kbuild: Fix a typo in documentation
-
-Yann Droneaud (1):
-      scripts/tags.sh: ignore symlink'ed source files
-
-Zhao, Gang (1):
-      .gitignore: ignore Module.symvers in all directories
-
- .gitignore                              |  4 +-
- Documentation/kbuild/modules.txt        |  2 +-
- scripts/Makefile.asm-generic            |  1 -
- scripts/Makefile.host                   |  1 -
- scripts/basic/fixdep.c                  |  8 ++--
- scripts/checkstack.pl                   |  1 -
- scripts/coccinelle/misc/of_table.cocci  | 62 +++++++++++++++++++++++++++
- scripts/coccinelle/misc/returnvar.cocci | 66 +++++++++++++++++++++++++++++
- scripts/config                          |  1 -
- scripts/docproc.c                       | 56 ++++++++++++-------------
- scripts/dtc/.gitignore                  |  1 -
- scripts/dtc/fstree.c                    |  1 -
- scripts/dtc/libfdt/fdt_empty_tree.c     |  1 -
- scripts/dtc/treesource.c                |  1 -
- scripts/headers.sh                      |  2 -
- scripts/kallsyms.c                      |  2 +-
- scripts/kconfig/Makefile                |  1 -
- scripts/kconfig/check.sh                |  1 -
- scripts/kconfig/conf.c                  |  2 +-
- scripts/kconfig/gconf.c                 |  2 +-
- scripts/kconfig/lxdialog/checklist.c    |  4 +-
- scripts/kconfig/lxdialog/inputbox.c     |  2 +-
- scripts/kconfig/lxdialog/menubox.c      |  4 +-
- scripts/kconfig/lxdialog/util.c         |  2 +-
- scripts/kconfig/mconf.c                 |  3 +-
- scripts/kconfig/menu.c                  |  6 +--
- scripts/kconfig/nconf.c                 |  1 -
- scripts/kconfig/util.c                  |  2 -
- scripts/kconfig/zconf.l                 |  4 +-
- scripts/kconfig/zconf.lex.c_shipped     |  4 +-
- scripts/kconfig/zconf.tab.c_shipped     |  2 +-
- scripts/kconfig/zconf.y                 |  2 +-
- scripts/markup_oops.pl                  |  1 -
- scripts/mksysmap                        |  1 -
- scripts/mod/.gitignore                  |  1 -
- scripts/mod/file2alias.c                | 42 +++++++++----------
- scripts/mod/mk_elfconfig.c              |  1 -
- scripts/mod/modpost.c                   | 30 ++++++-------
- scripts/mod/sumversion.c                |  4 +-
- scripts/objdiff                         | 74 ++++++++++++++++++++-------------
- scripts/package/Makefile                |  1 -
- scripts/package/builddeb                | 10 +++--
- scripts/package/buildtar                |  1 -
- scripts/pnmtologo.c                     |  1 -
- scripts/recordmcount.c                  |  2 -
- scripts/rt-tester/check-all.sh          |  1 -
- scripts/rt-tester/rt-tester.py          |  2 -
- scripts/selinux/install_policy.sh       |  1 -
- scripts/show_delta                      |  1 -
- scripts/tags.sh                         | 29 +++++++++----
- 50 files changed, 293 insertions(+), 162 deletions(-)
- create mode 100644 scripts/coccinelle/misc/of_table.cocci
- create mode 100644 scripts/coccinelle/misc/returnvar.cocci
+> ---
+>
+> I kept Sam's ack from v2, since v3 has only a trivial change.
+>
+> Changes from v1: Remove core kbuild change
+> Changes from v2: Name the result .so files again, not .so.dbg
+>
+>  arch/x86/vdso/Makefile | 22 +++++++++++-----------
+>  1 file changed, 11 insertions(+), 11 deletions(-)
+>
+> diff --git a/arch/x86/vdso/Makefile b/arch/x86/vdso/Makefile
+> index 9769df0..845b45e 100644
+> --- a/arch/x86/vdso/Makefile
+> +++ b/arch/x86/vdso/Makefile
+> @@ -9,11 +9,6 @@ VDSOX32-$(CONFIG_X86_X32_ABI)  := y
+>  VDSO32-$(CONFIG_X86_32)                := y
+>  VDSO32-$(CONFIG_COMPAT)                := y
+>
+> -vdso-install-$(VDSO64-y)       += vdso.so
+> -vdso-install-$(VDSOX32-y)      += vdsox32.so
+> -vdso-install-$(VDSO32-y)       += $(vdso32-images)
+> -
+> -
+>  # files to link into the vdso
+>  vobjs-y := vdso-note.o vclock_gettime.o vgetcpu.o
+>
+> @@ -176,15 +171,20 @@ VDSO_LDFLAGS = -fPIC -shared $(call cc-ldoption, -Wl$(comma)--hash-style=sysv) \
+>  GCOV_PROFILE := n
+>
+>  #
+> -# Install the unstripped copy of vdso*.so listed in $(vdso-install-y).
+> +# Install the unstripped copies of vdso*.so.
+>  #
+> -quiet_cmd_vdso_install = INSTALL $@
+> -      cmd_vdso_install = cp $(obj)/$@.dbg $(MODLIB)/vdso/$@
+> -$(vdso-install-y): %.so: $(obj)/%.so.dbg FORCE
+> +quiet_cmd_vdso_install = INSTALL $(@:install_%=%)
+> +      cmd_vdso_install = cp $< $(MODLIB)/vdso/$(@:install_%=%)
+> +
+> +vdso_img_insttargets := $(vdso_img_sodbg:%.dbg=install_%)
+> +
+> +$(MODLIB)/vdso: FORCE
+>         @mkdir -p $(MODLIB)/vdso
+> +
+> +$(vdso_img_insttargets): install_%: $(obj)/%.dbg $(MODLIB)/vdso FORCE
+>         $(call cmd,vdso_install)
+>
+> -PHONY += vdso_install $(vdso-install-y)
+> -vdso_install: $(vdso-install-y)
+> +PHONY += vdso_install $(vdso_img_insttargets)
+> +vdso_install: $(vdso_img_insttargets) FORCE
+>
+>  clean-files := vdso32-syscall* vdso32-sysenter* vdso32-int80*
+> --
+> 1.9.3
+>
