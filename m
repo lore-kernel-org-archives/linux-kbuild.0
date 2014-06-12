@@ -1,32 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:41428 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:41480 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932785AbaFLIbk (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 12 Jun 2014 04:31:40 -0400
-Message-ID: <53996499.5010901@suse.cz>
-Date: Thu, 12 Jun 2014 10:28:09 +0200
+	id S932531AbaFLIdw (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 12 Jun 2014 04:33:52 -0400
+Message-ID: <539965EE.6050001@suse.cz>
+Date: Thu, 12 Jun 2014 10:33:50 +0200
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH] kbuild: fix a typo in a kbuild document
-References: <1402385774-3748-1-git-send-email-yamada.m@jp.panasonic.com> <20140612102400.9635.AA925319@jp.panasonic.com>
-In-Reply-To: <20140612102400.9635.AA925319@jp.panasonic.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH] x86,build: Fix make -jN modules_install install
+References: <37910a32e3d223a688a2743376bdde8fbdc8ef5c.1402515662.git.luto@amacapital.net>
+In-Reply-To: <37910a32e3d223a688a2743376bdde8fbdc8ef5c.1402515662.git.luto@amacapital.net>
+Content-Type: text/plain; charset=ISO-8859-2
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Cc: linux-kbuild@vger.kernel.org
+To: Andy Lutomirski <luto@amacapital.net>
+Cc: "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org, linux-kbuild@vger.kernel.org, "Linux-Kernel@Vger. Kernel. Org" <linux-kernel@vger.kernel.org>
 
-Dne 12.6.2014 03:24, Masahiro Yamada napsal(a):
-> Hi Michal,
+Dne 11.6.2014 21:41, Andy Lutomirski napsal(a):
+> Every few months, I forget why I type:
 > 
-> Does this patch look good?
+> $ sudo make -j12 modules_install && sudo make -j12 install
 > 
-> If it is not too late,
-> could you consider to include this trivial one in your GIT-PULL?
+> instead of just:
+> 
+> $ sudo make -j12 modules_install install
+> 
+> I try the latter, it appears to work, and then my machine won't boot
+> because dracut got confused.  This fixes it once and for all: if you
+> ask make to install modules and a kernel, you almost certainly want
+> the modules installed *first* so that your initramfs scripts can
+> find the modules.
+> 
+> Signed-off-by: Andy Lutomirski <luto@amacapital.net>
+> ---
+>  arch/x86/Makefile | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+> 
+> diff --git a/arch/x86/Makefile b/arch/x86/Makefile
+> index 33f71b0..7280d28 100644
+> --- a/arch/x86/Makefile
+> +++ b/arch/x86/Makefile
+> @@ -240,6 +240,15 @@ PHONY += install
+>  install:
+>  	$(Q)$(MAKE) $(build)=$(boot) $@
+>  
+> +# If installing modules and a kernel, it's very likely that some initramfs
+> +# script associated with installing the kernel will reference the modules,
+> +# so make sure that modules are installed first.
+> +ifneq ($(filter modules_install,$(MAKECMDGOALS)),)
+> +  ifneq ($(filter modules_install,$(MAKECMDGOALS)),)
 
-Hi Masahiro-san,
+The two conditions are identical. Did you mean to check for "install" in
+one of them?
 
-I'll send it to Linus for the next -rc.
-
+Thanks,
 Michal
