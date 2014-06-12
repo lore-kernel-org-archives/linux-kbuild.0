@@ -1,85 +1,81 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ob0-f177.google.com ([209.85.214.177]:59718 "EHLO
-	mail-ob0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755792AbaFLNTn (ORCPT
+Received: from mail-pb0-f53.google.com ([209.85.160.53]:41310 "EHLO
+	mail-pb0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753017AbaFLP2R (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 12 Jun 2014 09:19:43 -0400
-MIME-Version: 1.0
-In-Reply-To: <5d5e221e59be20a3a7ceb99452e74e233383e7b4.1402514715.git.luto@amacapital.net>
-References: <sam@ravnborg.org>
-	<5d5e221e59be20a3a7ceb99452e74e233383e7b4.1402514715.git.luto@amacapital.net>
-Date: Thu, 12 Jun 2014 09:19:43 -0400
-Message-ID: <CA+5PVA5rP4cF14-ckD4K4MgBNtfHB+xPg3whEL26JkxegE7qpg@mail.gmail.com>
-Subject: Re: [PATCH v2] x86,vdso: Fix vdso_install
-From: Josh Boyer <jwboyer@fedoraproject.org>
-Content-Type: text/plain; charset=ISO-8859-1
+	Thu, 12 Jun 2014 11:28:17 -0400
+Received: by mail-pb0-f53.google.com with SMTP id uo5so856836pbc.12
+        for <linux-kbuild@vger.kernel.org>; Thu, 12 Jun 2014 08:28:16 -0700 (PDT)
+From: Andy Lutomirski <luto@amacapital.net>
+Subject: [PATCH v3] x86,vdso: Fix vdso_install
+Date: Thu, 12 Jun 2014 08:28:10 -0700
+Message-Id: <b10299edd8ba98d17e07dafcd895b8ecf4d99eff.1402586707.git.luto@amacapital.net>
+In-Reply-To: <CA+5PVA5rP4cF14-ckD4K4MgBNtfHB+xPg3whEL26JkxegE7qpg@mail.gmail.com>
+References: <CA+5PVA5rP4cF14-ckD4K4MgBNtfHB+xPg3whEL26JkxegE7qpg@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andy Lutomirski <luto@amacapital.net>
-Cc: "H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "Linux-Kernel@Vger. Kernel. Org" <linux-kernel@vger.kernel.org>
+To: "H. Peter Anvin" <hpa@zytor.com>, Josh Boyer <jwboyer@fedoraproject.org>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, "Linux-Kernel@Vger. Kernel. Org" <linux-kernel@vger.kernel.org>, sam@ravnborg.org, Andy Lutomirski <luto@amacapital.net>
 
-On Wed, Jun 11, 2014 at 3:25 PM, Andy Lutomirski <luto@amacapital.net> wrote:
-> The filenames are different now.  Inspired by a patch from
-> Sam Ravnborg.
->
-> Reported-by: Josh Boyer <jwboyer@fedoraproject.org>
-> Signed-off-by: Andy Lutomirski <luto@amacapital.net>
-> ---
->  arch/x86/vdso/Makefile | 22 +++++++++++-----------
->  1 file changed, 11 insertions(+), 11 deletions(-)
->
-> diff --git a/arch/x86/vdso/Makefile b/arch/x86/vdso/Makefile
-> index 9769df0..e3683d6 100644
-> --- a/arch/x86/vdso/Makefile
-> +++ b/arch/x86/vdso/Makefile
-> @@ -9,11 +9,6 @@ VDSOX32-$(CONFIG_X86_X32_ABI)  := y
->  VDSO32-$(CONFIG_X86_32)                := y
->  VDSO32-$(CONFIG_COMPAT)                := y
->
-> -vdso-install-$(VDSO64-y)       += vdso.so
-> -vdso-install-$(VDSOX32-y)      += vdsox32.so
-> -vdso-install-$(VDSO32-y)       += $(vdso32-images)
-> -
-> -
->  # files to link into the vdso
->  vobjs-y := vdso-note.o vclock_gettime.o vgetcpu.o
->
-> @@ -176,15 +171,20 @@ VDSO_LDFLAGS = -fPIC -shared $(call cc-ldoption, -Wl$(comma)--hash-style=sysv) \
->  GCOV_PROFILE := n
->
->  #
-> -# Install the unstripped copy of vdso*.so listed in $(vdso-install-y).
-> +# Install the unstripped copies of vdso*.so.
->  #
-> -quiet_cmd_vdso_install = INSTALL $@
-> -      cmd_vdso_install = cp $(obj)/$@.dbg $(MODLIB)/vdso/$@
-> -$(vdso-install-y): %.so: $(obj)/%.so.dbg FORCE
-> +quiet_cmd_vdso_install = INSTALL $(@:install_%=%)
-> +      cmd_vdso_install = cp $< $(MODLIB)/vdso/$(@:install_%=%)
-> +
-> +vdso_img_insttargets := $(vdso_img_sodbg:%=install_%)
-> +
-> +$(MODLIB)/vdso: FORCE
->         @mkdir -p $(MODLIB)/vdso
-> +
-> +$(vdso_img_insttargets): install_%: $(obj)/% $(MODLIB)/vdso FORCE
->         $(call cmd,vdso_install)
->
-> -PHONY += vdso_install $(vdso-install-y)
-> -vdso_install: $(vdso-install-y)
-> +PHONY += vdso_install $(vdso_img_insttargets)
-> +vdso_install: $(vdso_img_insttargets) FORCE
+The filenames are different now.  Inspired by a patch from
+Sam Ravnborg.
 
-OK, so I can't tell from the changelog if this is intentional or not,
-but now this installs e.g. vdso64.so.dbg instead of vdso64.so.
+Acked-by: Sam Ravnborg <sam@ravnborg.org>
+Reported-by: Josh Boyer <jwboyer@fedoraproject.org>
+Signed-off-by: Andy Lutomirski <luto@amacapital.net>
+---
 
-[jwboyer@sb vdso]$ pwd
-/lib/modules/3.16.0-0.rc0.git3.1.fc21.x86_64/vdso
-[jwboyer@sb vdso]$ ls
-vdso32-int80.so.dbg  vdso32-syscall.so.dbg  vdso32-sysenter.so.dbg
-vdso64.so.dbg
-[jwboyer@sb vdso]$
+I kept Sam's ack from v2, since v3 has only a trivial change.
 
-If it's intentional, you might want to make the changelog a bit more verbose.
+Changes from v1: Remove core kbuild change
+Changes from v2: Name the result .so files again, not .so.dbg
 
-josh
+ arch/x86/vdso/Makefile | 22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
+
+diff --git a/arch/x86/vdso/Makefile b/arch/x86/vdso/Makefile
+index 9769df0..845b45e 100644
+--- a/arch/x86/vdso/Makefile
++++ b/arch/x86/vdso/Makefile
+@@ -9,11 +9,6 @@ VDSOX32-$(CONFIG_X86_X32_ABI)	:= y
+ VDSO32-$(CONFIG_X86_32)		:= y
+ VDSO32-$(CONFIG_COMPAT)		:= y
+ 
+-vdso-install-$(VDSO64-y)	+= vdso.so
+-vdso-install-$(VDSOX32-y)	+= vdsox32.so
+-vdso-install-$(VDSO32-y)	+= $(vdso32-images)
+-
+-
+ # files to link into the vdso
+ vobjs-y := vdso-note.o vclock_gettime.o vgetcpu.o
+ 
+@@ -176,15 +171,20 @@ VDSO_LDFLAGS = -fPIC -shared $(call cc-ldoption, -Wl$(comma)--hash-style=sysv) \
+ GCOV_PROFILE := n
+ 
+ #
+-# Install the unstripped copy of vdso*.so listed in $(vdso-install-y).
++# Install the unstripped copies of vdso*.so.
+ #
+-quiet_cmd_vdso_install = INSTALL $@
+-      cmd_vdso_install = cp $(obj)/$@.dbg $(MODLIB)/vdso/$@
+-$(vdso-install-y): %.so: $(obj)/%.so.dbg FORCE
++quiet_cmd_vdso_install = INSTALL $(@:install_%=%)
++      cmd_vdso_install = cp $< $(MODLIB)/vdso/$(@:install_%=%)
++
++vdso_img_insttargets := $(vdso_img_sodbg:%.dbg=install_%)
++
++$(MODLIB)/vdso: FORCE
+ 	@mkdir -p $(MODLIB)/vdso
++
++$(vdso_img_insttargets): install_%: $(obj)/%.dbg $(MODLIB)/vdso FORCE
+ 	$(call cmd,vdso_install)
+ 
+-PHONY += vdso_install $(vdso-install-y)
+-vdso_install: $(vdso-install-y)
++PHONY += vdso_install $(vdso_img_insttargets)
++vdso_install: $(vdso_img_insttargets) FORCE
+ 
+ clean-files := vdso32-syscall* vdso32-sysenter* vdso32-int80*
+-- 
+1.9.3
+
