@@ -1,81 +1,84 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pb0-f53.google.com ([209.85.160.53]:41310 "EHLO
-	mail-pb0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753017AbaFLP2R (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 12 Jun 2014 11:28:17 -0400
-Received: by mail-pb0-f53.google.com with SMTP id uo5so856836pbc.12
-        for <linux-kbuild@vger.kernel.org>; Thu, 12 Jun 2014 08:28:16 -0700 (PDT)
-From: Andy Lutomirski <luto@amacapital.net>
-Subject: [PATCH v3] x86,vdso: Fix vdso_install
-Date: Thu, 12 Jun 2014 08:28:10 -0700
-Message-Id: <b10299edd8ba98d17e07dafcd895b8ecf4d99eff.1402586707.git.luto@amacapital.net>
-In-Reply-To: <CA+5PVA5rP4cF14-ckD4K4MgBNtfHB+xPg3whEL26JkxegE7qpg@mail.gmail.com>
-References: <CA+5PVA5rP4cF14-ckD4K4MgBNtfHB+xPg3whEL26JkxegE7qpg@mail.gmail.com>
+Received: from cantor2.suse.de ([195.135.220.15]:58020 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753035AbaFLQKO (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 12 Jun 2014 12:10:14 -0400
+Date: Thu, 12 Jun 2014 18:10:11 +0200
+From: Michal Marek <mmarek@suse.cz>
+Subject: [GIT PULL] kbuild changes for v3.16-rc1
+Message-ID: <20140612161011.GA20009@pobox.suse.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "H. Peter Anvin" <hpa@zytor.com>, Josh Boyer <jwboyer@fedoraproject.org>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, "Linux-Kernel@Vger. Kernel. Org" <linux-kernel@vger.kernel.org>, sam@ravnborg.org, Andy Lutomirski <luto@amacapital.net>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: geert@linux-m68k.org, mmarek@suse.cz, yamada.m@jp.panasonic.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-The filenames are different now.  Inspired by a patch from
-Sam Ravnborg.
+Hi Linus,
 
-Acked-by: Sam Ravnborg <sam@ravnborg.org>
-Reported-by: Josh Boyer <jwboyer@fedoraproject.org>
-Signed-off-by: Andy Lutomirski <luto@amacapital.net>
----
+please pull these kbuild changes for v3.16-rc1:
+- cross-compilation fix so that cc-option is testing the right compiler
+- Fix for make defconfig all
+- Using relative paths to the object and source directory where
+  possible, plus fixes for the fallout of the change
+- several cleanups in the Makefiles and scripts
 
-I kept Sam's ack from v2, since v3 has only a trivial change.
+The powerpc fix is from today, because it was only discovered recently.
+The rest has been in linux-next for some time.
 
-Changes from v1: Remove core kbuild change
-Changes from v2: Name the result .so files again, not .so.dbg
+Michal
 
- arch/x86/vdso/Makefile | 22 +++++++++++-----------
- 1 file changed, 11 insertions(+), 11 deletions(-)
+The following changes since commit c9eaa447e77efe77b7fa4c953bd62de8297fd6c5:
 
-diff --git a/arch/x86/vdso/Makefile b/arch/x86/vdso/Makefile
-index 9769df0..845b45e 100644
---- a/arch/x86/vdso/Makefile
-+++ b/arch/x86/vdso/Makefile
-@@ -9,11 +9,6 @@ VDSOX32-$(CONFIG_X86_X32_ABI)	:= y
- VDSO32-$(CONFIG_X86_32)		:= y
- VDSO32-$(CONFIG_COMPAT)		:= y
- 
--vdso-install-$(VDSO64-y)	+= vdso.so
--vdso-install-$(VDSOX32-y)	+= vdsox32.so
--vdso-install-$(VDSO32-y)	+= $(vdso32-images)
--
--
- # files to link into the vdso
- vobjs-y := vdso-note.o vclock_gettime.o vgetcpu.o
- 
-@@ -176,15 +171,20 @@ VDSO_LDFLAGS = -fPIC -shared $(call cc-ldoption, -Wl$(comma)--hash-style=sysv) \
- GCOV_PROFILE := n
- 
- #
--# Install the unstripped copy of vdso*.so listed in $(vdso-install-y).
-+# Install the unstripped copies of vdso*.so.
- #
--quiet_cmd_vdso_install = INSTALL $@
--      cmd_vdso_install = cp $(obj)/$@.dbg $(MODLIB)/vdso/$@
--$(vdso-install-y): %.so: $(obj)/%.so.dbg FORCE
-+quiet_cmd_vdso_install = INSTALL $(@:install_%=%)
-+      cmd_vdso_install = cp $< $(MODLIB)/vdso/$(@:install_%=%)
-+
-+vdso_img_insttargets := $(vdso_img_sodbg:%.dbg=install_%)
-+
-+$(MODLIB)/vdso: FORCE
- 	@mkdir -p $(MODLIB)/vdso
-+
-+$(vdso_img_insttargets): install_%: $(obj)/%.dbg $(MODLIB)/vdso FORCE
- 	$(call cmd,vdso_install)
- 
--PHONY += vdso_install $(vdso-install-y)
--vdso_install: $(vdso-install-y)
-+PHONY += vdso_install $(vdso_img_insttargets)
-+vdso_install: $(vdso_img_insttargets) FORCE
- 
- clean-files := vdso32-syscall* vdso32-sysenter* vdso32-int80*
--- 
-1.9.3
+  Linux 3.15-rc1 (2014-04-13 14:18:35 -0700)
 
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git kbuild
+
+for you to fetch changes up to 699c659b49b5c7cf601fe454683841df16495c3e:
+
+  powerpc: Avoid circular dependency with zImage.% (2014-06-12 10:07:35 +0200)
+
+----------------------------------------------------------------
+Geert Uytterhoeven (1):
+      Makefile: Fix unrecognized cross-compiler command line options
+
+Masahiro Yamada (7):
+      kbuild: move extra gcc checks to scripts/Makefile.extrawarn
+      kbuild: support simultaneous "make %config" and "make all"
+      kbuild: trivial - remove trailing spaces
+      kbuild: trivial - fix comment block indent
+      kbuild: do not add "selinux" to subdir- twice
+      kbuild: do not create include/linux directory
+      kbuild: create include/config directory in scripts/kconfig/Makefile
+
+Michal Marek (7):
+      firmware: Simplify directory creation
+      firmware: Use $(quote) in the Makefile
+      kbuild: Use relative path for $(objtree)
+      kbuild: Use relative path when building in the source tree
+      kbuild: Use relative path when building in a subdir of the source tree
+      um: Fix for relative objtree when generating x86 headers
+      powerpc: Avoid circular dependency with zImage.%
+
+ Makefile                             | 89 +++++++++++++++++++++---------------
+ arch/powerpc/boot/Makefile           |  4 +-
+ arch/um/Makefile                     |  3 +-
+ firmware/Makefile                    | 34 +++-----------
+ scripts/Makefile                     |  2 +-
+ scripts/Makefile.build               | 65 +-------------------------
+ scripts/Makefile.extrawarn           | 67 +++++++++++++++++++++++++++
+ scripts/Makefile.fwinst              | 26 +++++------
+ scripts/Makefile.host                |  2 +-
+ scripts/Makefile.lib                 | 10 ++--
+ scripts/conmakehash.c                | 12 ++---
+ scripts/kconfig/Makefile             |  4 +-
+ scripts/kconfig/streamline_config.pl |  2 +-
+ scripts/mkcompile_h                  |  4 +-
+ scripts/mkmakefile                   | 15 ++----
+ scripts/package/builddeb             |  2 +-
+ scripts/patch-kernel                 |  4 +-
+ 17 files changed, 168 insertions(+), 177 deletions(-)
+ create mode 100644 scripts/Makefile.extrawarn
