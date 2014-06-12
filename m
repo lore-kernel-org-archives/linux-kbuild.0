@@ -1,63 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from terminus.zytor.com ([198.137.202.10]:53095 "EHLO mail.zytor.com"
+Received: from smtp.mei.co.jp ([133.183.100.20]:64028 "EHLO smtp.mei.co.jp"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750958AbaFKVxJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 11 Jun 2014 17:53:09 -0400
-Message-ID: <5398CFA4.60202@zytor.com>
-Date: Wed, 11 Jun 2014 14:52:36 -0700
-From: "H. Peter Anvin" <hpa@zytor.com>
+	id S1754284AbaFLBYM (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 11 Jun 2014 21:24:12 -0400
+Date: Thu, 12 Jun 2014 10:24:00 +0900
+From: Masahiro Yamada <yamada.m@jp.panasonic.com>
+Subject: Re: [PATCH] kbuild: fix a typo in a kbuild document
+In-Reply-To: <1402385774-3748-1-git-send-email-yamada.m@jp.panasonic.com>
+References: <1402385774-3748-1-git-send-email-yamada.m@jp.panasonic.com>
+Message-Id: <20140612102400.9635.AA925319@jp.panasonic.com>
 MIME-Version: 1.0
-Subject: Re: [PATCH RFC 00/10] tools: Revamp the unaligned endian access functions
-References: <1402441994-16780-1-git-send-email-hpa@zytor.com> <20140611192111.GB16069@ravnborg.org>
-In-Reply-To: <20140611192111.GB16069@ravnborg.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org, Andy Lutomirski <luto@amacapital.net>, Andrew Morton <akpm@linux-foundation.org>, Ingo Molnar <mingo@kernel.org>, Thomas Gleixner <tglx@linutronix.de>
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org
 
-On 06/11/2014 12:21 PM, Sam Ravnborg wrote:
-> On Tue, Jun 10, 2014 at 04:13:04PM -0700, H. Peter Anvin wrote:
->> After a recent problem in the x86 tree, which seems to be the heaviest
->> but not the only user of these functions, I went through and did a
->> patchset to revamp the *user space* unaligned/endian accessor
->> functions.  As much as I think it is downright pathetic that this
->> functionality still isn't part of the C standard, that is life and we
->> have to deal with it.  Furthermore, although glibc has a pretty nice
->> set of functions for byte swapping in <endian.h>, taken from FreeBSD I
->> believe, some older systems don't support them.
->>
->> This variant tries to fill in all the holes.  It assumes that
->> <endian.h> define the functions as macros if they exist, as I don't
->> know any other way of probing for them without reaching for autoconf,
->> but that should be valid enough of an assumption in this case.
->>
->> The hope is that this should give reasonable, if not optimal, code
->> generation on most processors, and give a hook where arch maintainers
->> can add their own changes if needed.
+Hi Michal,
+
+Does this patch look good?
+
+If it is not too late,
+could you consider to include this trivial one in your GIT-PULL?
+
+
+
+On Tue, 10 Jun 2014 16:36:14 +0900
+Masahiro Yamada <yamada.m@jp.panasonic.com> wrote:
+
+> Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
+> ---
+>  Documentation/kbuild/makefiles.txt | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> This looks like a very complex solution to a simple problem.
-> We want a shared implementation of the *user space*
-> unaligned/endian accessor functions.
-> But do we really want *fast* versions for our use?
+> diff --git a/Documentation/kbuild/makefiles.txt b/Documentation/kbuild/makefiles.txt
+> index d567a7c..c600e2f 100644
+> --- a/Documentation/kbuild/makefiles.txt
+> +++ b/Documentation/kbuild/makefiles.txt
+> @@ -1171,7 +1171,7 @@ When kbuild executes, the following steps are followed (roughly):
+>  	      obvious reason.
+>  
+>      dtc
+> -	Create flattend device tree blob object suitable for linking
+> +	Create flattened device tree blob object suitable for linking
+>  	into vmlinux. Device tree blobs linked into vmlinux are placed
+>  	in an init section in the image. Platform code *must* copy the
+>  	blob to non-init memory prior to calling unflatten_device_tree().
+> -- 
+> 1.9.1
 > 
-> This is not a new libc that should generate optimal code,
-> but only something were we want to provide e working
-> implmentation for use in our user-space tools.
-> 
-> A much simpler approach without any fallback to arch specific
-> version etc. is everything we need.
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-It doesn't matter so much for things that are just done for the kernel
-compile, no, but there are some tools that are built to be used as
-standalone things, and it could matter there.
-
-Please note that the code currently doesn't have any arch-specific bits
-at all... the code is somewhat complex in part because it is very
-generic and handles several levels of fallback.  It *can* get
-arch-specific overrides if it matters, but the intent is that it
-shouldn't be necessary in the vast majority of the cases.
-
-	-hpa
 
