@@ -1,88 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ob0-f172.google.com ([209.85.214.172]:63877 "EHLO
-	mail-ob0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933463AbaFLRBz (ORCPT
+Received: from mail-ve0-f174.google.com ([209.85.128.174]:35330 "EHLO
+	mail-ve0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752092AbaFMB2u (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 12 Jun 2014 13:01:55 -0400
+	Thu, 12 Jun 2014 21:28:50 -0400
+Received: by mail-ve0-f174.google.com with SMTP id us18so2677475veb.33
+        for <linux-kbuild@vger.kernel.org>; Thu, 12 Jun 2014 18:28:49 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <b10299edd8ba98d17e07dafcd895b8ecf4d99eff.1402586707.git.luto@amacapital.net>
-References: <CA+5PVA5rP4cF14-ckD4K4MgBNtfHB+xPg3whEL26JkxegE7qpg@mail.gmail.com>
-	<b10299edd8ba98d17e07dafcd895b8ecf4d99eff.1402586707.git.luto@amacapital.net>
-Date: Thu, 12 Jun 2014 13:01:54 -0400
-Message-ID: <CA+5PVA49T_hygP2O_ykqCpg6GFiJDds37LgroKvAfLSm0mkBKA@mail.gmail.com>
-Subject: Re: [PATCH v3] x86,vdso: Fix vdso_install
-From: Josh Boyer <jwboyer@fedoraproject.org>
-Content-Type: text/plain; charset=ISO-8859-1
+In-Reply-To: <539965EE.6050001@suse.cz>
+References: <37910a32e3d223a688a2743376bdde8fbdc8ef5c.1402515662.git.luto@amacapital.net>
+ <539965EE.6050001@suse.cz>
+From: Andy Lutomirski <luto@amacapital.net>
+Date: Thu, 12 Jun 2014 18:28:29 -0700
+Message-ID: <CALCETrWSX1nVqyfe0Ee2rUvpHosTRyW8GSJfr52UCpT566-eWA@mail.gmail.com>
+Subject: Re: [PATCH] x86,build: Fix make -jN modules_install install
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andy Lutomirski <luto@amacapital.net>
-Cc: "H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "Linux-Kernel@Vger. Kernel. Org" <linux-kernel@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>
+To: Michal Marek <mmarek@suse.cz>
+Cc: "H. Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "Linux-Kernel@Vger. Kernel. Org" <linux-kernel@vger.kernel.org>
 
-On Thu, Jun 12, 2014 at 11:28 AM, Andy Lutomirski <luto@amacapital.net> wrote:
-> The filenames are different now.  Inspired by a patch from
-> Sam Ravnborg.
+On Thu, Jun 12, 2014 at 1:33 AM, Michal Marek <mmarek@suse.cz> wrote:
+> Dne 11.6.2014 21:41, Andy Lutomirski napsal(a):
+>> Every few months, I forget why I type:
+>>
+>> $ sudo make -j12 modules_install && sudo make -j12 install
+>>
+>> instead of just:
+>>
+>> $ sudo make -j12 modules_install install
+>>
+>> I try the latter, it appears to work, and then my machine won't boot
+>> because dracut got confused.  This fixes it once and for all: if you
+>> ask make to install modules and a kernel, you almost certainly want
+>> the modules installed *first* so that your initramfs scripts can
+>> find the modules.
+>>
+>> Signed-off-by: Andy Lutomirski <luto@amacapital.net>
+>> ---
+>>  arch/x86/Makefile | 9 +++++++++
+>>  1 file changed, 9 insertions(+)
+>>
+>> diff --git a/arch/x86/Makefile b/arch/x86/Makefile
+>> index 33f71b0..7280d28 100644
+>> --- a/arch/x86/Makefile
+>> +++ b/arch/x86/Makefile
+>> @@ -240,6 +240,15 @@ PHONY += install
+>>  install:
+>>       $(Q)$(MAKE) $(build)=$(boot) $@
+>>
+>> +# If installing modules and a kernel, it's very likely that some initramfs
+>> +# script associated with installing the kernel will reference the modules,
+>> +# so make sure that modules are installed first.
+>> +ifneq ($(filter modules_install,$(MAKECMDGOALS)),)
+>> +  ifneq ($(filter modules_install,$(MAKECMDGOALS)),)
 >
-> Acked-by: Sam Ravnborg <sam@ravnborg.org>
-> Reported-by: Josh Boyer <jwboyer@fedoraproject.org>
-> Signed-off-by: Andy Lutomirski <luto@amacapital.net>
+> The two conditions are identical. Did you mean to check for "install" in
+> one of them?
 
-Things look great with this version.  Thanks much!
+Yes, although I think that the check for "install" is actually unnecessary.
 
-Tested-by: Josh Boyer <jwboyer@fedoraproject.org>
+Is there some way to do this in the core kbuild?
 
-> ---
+--Andy
+
 >
-> I kept Sam's ack from v2, since v3 has only a trivial change.
->
-> Changes from v1: Remove core kbuild change
-> Changes from v2: Name the result .so files again, not .so.dbg
->
->  arch/x86/vdso/Makefile | 22 +++++++++++-----------
->  1 file changed, 11 insertions(+), 11 deletions(-)
->
-> diff --git a/arch/x86/vdso/Makefile b/arch/x86/vdso/Makefile
-> index 9769df0..845b45e 100644
-> --- a/arch/x86/vdso/Makefile
-> +++ b/arch/x86/vdso/Makefile
-> @@ -9,11 +9,6 @@ VDSOX32-$(CONFIG_X86_X32_ABI)  := y
->  VDSO32-$(CONFIG_X86_32)                := y
->  VDSO32-$(CONFIG_COMPAT)                := y
->
-> -vdso-install-$(VDSO64-y)       += vdso.so
-> -vdso-install-$(VDSOX32-y)      += vdsox32.so
-> -vdso-install-$(VDSO32-y)       += $(vdso32-images)
-> -
-> -
->  # files to link into the vdso
->  vobjs-y := vdso-note.o vclock_gettime.o vgetcpu.o
->
-> @@ -176,15 +171,20 @@ VDSO_LDFLAGS = -fPIC -shared $(call cc-ldoption, -Wl$(comma)--hash-style=sysv) \
->  GCOV_PROFILE := n
->
->  #
-> -# Install the unstripped copy of vdso*.so listed in $(vdso-install-y).
-> +# Install the unstripped copies of vdso*.so.
->  #
-> -quiet_cmd_vdso_install = INSTALL $@
-> -      cmd_vdso_install = cp $(obj)/$@.dbg $(MODLIB)/vdso/$@
-> -$(vdso-install-y): %.so: $(obj)/%.so.dbg FORCE
-> +quiet_cmd_vdso_install = INSTALL $(@:install_%=%)
-> +      cmd_vdso_install = cp $< $(MODLIB)/vdso/$(@:install_%=%)
-> +
-> +vdso_img_insttargets := $(vdso_img_sodbg:%.dbg=install_%)
-> +
-> +$(MODLIB)/vdso: FORCE
->         @mkdir -p $(MODLIB)/vdso
-> +
-> +$(vdso_img_insttargets): install_%: $(obj)/%.dbg $(MODLIB)/vdso FORCE
->         $(call cmd,vdso_install)
->
-> -PHONY += vdso_install $(vdso-install-y)
-> -vdso_install: $(vdso-install-y)
-> +PHONY += vdso_install $(vdso_img_insttargets)
-> +vdso_install: $(vdso_img_insttargets) FORCE
->
->  clean-files := vdso32-syscall* vdso32-sysenter* vdso32-int80*
-> --
-> 1.9.3
->
+> Thanks,
+> Michal
+
+
+
+-- 
+Andy Lutomirski
+AMA Capital Management, LLC
