@@ -1,29 +1,32 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from r00tworld.com ([212.85.137.150]:35810 "EHLO r00tworld.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754045AbaFPPtU (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 16 Jun 2014 11:49:20 -0400
-From: "PaX Team" <pageexec@freemail.hu>
-Date: Mon, 16 Jun 2014 17:29:25 +0200
+Received: from bombadil.infradead.org ([198.137.202.9]:48713 "EHLO
+	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754930AbaFPR2H (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 16 Jun 2014 13:28:07 -0400
+Message-ID: <539F2926.4020004@infradead.org>
+Date: Mon, 16 Jun 2014 10:28:06 -0700
+From: Randy Dunlap <rdunlap@infradead.org>
 MIME-Version: 1.0
-Subject: Re: 3d3d6b847420 ("kbuild: LLVMLinux: Adapt warnings for compilation with clang")
-Reply-to: pageexec@freemail.hu
-Message-ID: <539F0D55.31207.1DF87EFF@pageexec.freemail.hu>
-In-reply-to: <20140616130751.GD8170@pd.tnic>
-References: <20140616130751.GD8170@pd.tnic>
-Content-type: text/plain; charset=US-ASCII
-Content-transfer-encoding: 7BIT
-Content-description: Mail message body
+Subject: MANY errors while building media docbooks
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: =?UTF-8?Q?Jan-Simon_M=C3=B6ller?= <dl9pf@gmx.de>, Borislav Petkov <bp@alien8.de>
-Cc: Behan Webster <behanw@converseincode.com>, Mark Charlebois <mcharleb@gmail.com>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.cz>
+Cc: linux-media <linux-media@vger.kernel.org>
 
-On 16 Jun 2014 at 15:07, Borislav Petkov wrote:
+on Linux v3.16-rc1, building docbooks to a separate build directory
+(mkdir DOC; make O=DOC htmldocs) gives me more than 12,000 lines like this:
 
-> Please fix this to have effect only for clang but not for the rest of
-> the universe.
+grep: ./Documentation/DocBook//vidioc-subdev-g-fmt.xml: No such file or directory
+grep: ./Documentation/DocBook//vidioc-subdev-g-frame-interval.xml: No such file or directory
+grep: ./Documentation/DocBook//vidioc-subdev-g-selection.xml: No such file or directory
+grep: ./Documentation/DocBook//vidioc-subscribe-event.xml: No such file or directory
+grep: ./Documentation/DocBook//media-ioc-device-info.xml: No such file or directory
+grep: ./Documentation/DocBook//media-ioc-enum-entities.xml: No such file or directory
+grep: ./Documentation/DocBook//media-ioc-enum-links.xml: No such file or directory
+grep: ./Documentation/DocBook//media-ioc-setup-link.xml: No such file or directory
 
-i'd suggest reverting it instead, there're probably some stale entries
-in there already (e.g., -fcatch-undefined-behavior).
-
+-- 
+~Randy
