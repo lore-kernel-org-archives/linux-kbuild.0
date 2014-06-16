@@ -1,43 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.skyhub.de ([78.46.96.112]:39167 "EHLO mail.skyhub.de"
+Received: from mail.skyhub.de ([78.46.96.112]:47006 "EHLO mail.skyhub.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750905AbaFPNIC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 16 Jun 2014 09:08:02 -0400
-Date: Mon, 16 Jun 2014 15:07:51 +0200
+	id S1751895AbaFPNUz (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 16 Jun 2014 09:20:55 -0400
+Date: Mon, 16 Jun 2014 15:20:45 +0200
 From: Borislav Petkov <bp@alien8.de>
-Subject: 3d3d6b847420 ("kbuild: LLVMLinux: Adapt warnings for compilation
- with clang")
-Message-ID: <20140616130751.GD8170@pd.tnic>
+Subject: [RFC] Turn off -Wmaybe-uninitialized completely and move it to W=1
+Message-ID: <20140616132045.GE8170@pd.tnic>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jan-Simon =?utf-8?Q?M=C3=B6ller?= <dl9pf@gmx.de>
-Cc: Behan Webster <behanw@converseincode.com>, Mark Charlebois <mcharleb@gmail.com>, PaX Team <pageexec@freemail.hu>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>
+To: lkml <linux-kernel@vger.kernel.org>
+Cc: Michael Matz <matz@suse.de>, linux-kbuild@vger.kernel.org, x86-ml <x86@kernel.org>
 
 Hi,
 
-the commit in $Subject breaks the purpose of the W= build to see
-additional warnings.
+so 3.16-rc1 adds this false positive from gcc, see below (triggers on
+4.9 and 4.8.2). Now, it is firing wrong and gcc people tell me there's
+no way for the compiler to know that the "from" and "to" values will NOT
+be used in the error case, i.e. thus the "maybe" aspect.
 
-With it, currently I get all that stuff disabled with gcc:
+So, we've disabled it for -Os already:
 
-$ make V=1 W=1  fs/direct-io.o
+	e74fc973b6e5 ("Turn off -Wmaybe-uninitialized when building with -Os")
 
-...
+maybe we want to disable it by default on all and move it to W=1. This
+way people can still have it fire but not by default. And from what I've
+seen so far, it is mostly firing wrong and it is becoming annoying.
 
-gcc -Wp,-MD,... -Wno-sign-compare -Wno-missing-field-initializers
--Wno-unused-value -Wno-format -Wno-sign-compare -Wno-format-zero-length
--Wno-uninitialized ...
-
-which is clearly wrong. If I'm building with W=1, I *explicitly* *want*
-those additional warnings enabled, not disabled.
-
-Please fix this to have effect only for clang but not for the rest of
-the universe.
+So what do people think, any reasons for keeping it enabled by default?
 
 Thanks.
+
+---
+
+fs/direct-io.c: In function ‘__blockdev_direct_IO’:
+fs/direct-io.c:920:9: warning: ‘to’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+   while (from < to) {
+         ^
+fs/direct-io.c:913:16: note: ‘to’ was declared here
+   size_t from, to;
+                ^
+fs/direct-io.c:1034:9: warning: ‘from’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+    from += this_chunk_bytes;
+         ^
+fs/direct-io.c:913:10: note: ‘from’ was declared here
+   size_t from, to;
+
 
 -- 
 Regards/Gruss,
