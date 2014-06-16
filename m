@@ -1,52 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:60067 "EHLO mx2.suse.de"
+Received: from mout.gmx.net ([212.227.15.19]:59529 "EHLO mout.gmx.net"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752098AbaFPOTT (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 16 Jun 2014 10:19:19 -0400
-From: Michal Marek <mmarek@suse.cz>
-Subject: [PATCH] deb-pkg: Fix for relative paths
-Date: Mon, 16 Jun 2014 16:18:59 +0200
-Message-Id: <1402928339-29785-1-git-send-email-mmarek@suse.cz>
-In-Reply-To: <CAOi1vP9YvbroujXEut6Xn-tvv07MNuxanwDrRvDFhS_-HT_5Lg@mail.gmail.com>
-References: <CAOi1vP9YvbroujXEut6Xn-tvv07MNuxanwDrRvDFhS_-HT_5Lg@mail.gmail.com>
+	id S1751448AbaFPPsG convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 16 Jun 2014 11:48:06 -0400
+From: Jan-Simon =?ISO-8859-1?Q?M=F6ller?= <dl9pf@gmx.de>
+Subject: Re: 3d3d6b847420 ("kbuild: LLVMLinux: Adapt warnings for compilation with clang")
+Date: Mon, 16 Jun 2014 17:48:01 +0200
+Message-ID: <2065274.H8oo5iWEkB@aragorn.auenland.lan>
+In-Reply-To: <539F0D55.31207.1DF87EFF@pageexec.freemail.hu>
+References: <20140616130751.GD8170@pd.tnic> <539F0D55.31207.1DF87EFF@pageexec.freemail.hu>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ilya Dryomov <idryomov@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: pageexec@freemail.hu
+Cc: Borislav Petkov <bp@alien8.de>, Behan Webster <behanw@converseincode.com>, Mark Charlebois <mcharleb@gmail.com>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>
 
-When $srctree or $objtree are relative paths, we cannot change directory
-and refer to them in the same subshell. Do the redirection outside of
-the subshell to fix this.
+Ok, let's wrap this case with 
 
-Reported-by: Ilya Dryomov <idryomov@gmail.com>
-Signed-off-by: Michal Marek <mmarek@suse.cz>
----
- scripts/package/builddeb | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ifeq ($(COMPILER),clang)
+...
+endif
 
-diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index b5f08f7..9a38e85 100644
---- a/scripts/package/builddeb
-+++ b/scripts/package/builddeb
-@@ -290,13 +290,13 @@ EOF
- fi
- 
- # Build header package
--(cd $srctree; find . -name Makefile\* -o -name Kconfig\* -o -name \*.pl > "$objtree/debian/hdrsrcfiles")
--(cd $srctree; find arch/$SRCARCH/include include scripts -type f >> "$objtree/debian/hdrsrcfiles")
--(cd $objtree; find arch/$SRCARCH/include Module.symvers include scripts -type f >> "$objtree/debian/hdrobjfiles")
-+(cd $srctree; find . -name Makefile\* -o -name Kconfig\* -o -name \*.pl) > "$objtree/debian/hdrsrcfiles"
-+(cd $srctree; find arch/$SRCARCH/include include scripts -type f) >> "$objtree/debian/hdrsrcfiles"
-+(cd $objtree; find arch/$SRCARCH/include Module.symvers include scripts -type f) >> "$objtree/debian/hdrobjfiles"
- destdir=$kernel_headers_dir/usr/src/linux-headers-$version
- mkdir -p "$destdir"
--(cd $srctree; tar -c -f - -T "$objtree/debian/hdrsrcfiles") | (cd $destdir; tar -xf -)
--(cd $objtree; tar -c -f - -T "$objtree/debian/hdrobjfiles") | (cd $destdir; tar -xf -)
-+(cd $srctree; tar -c -f - -T -) < "$objtree/debian/hdrsrcfiles" | (cd $destdir; tar -xf -)
-+(cd $objtree; tar -c -f - -T -) < "$objtree/debian/hdrobjfiles" | (cd $destdir; tar -xf -)
- (cd $objtree; cp $KCONFIG_CONFIG $destdir/.config) # copy .config manually to be where it's expected to be
- ln -sf "/usr/src/linux-headers-$version" "$kernel_headers_dir/lib/modules/$version/build"
- rm -f "$objtree/debian/hdrsrcfiles" "$objtree/debian/hdrobjfiles"
+And we'll update the stale entries.
+
+Patch to follow after some testing.
+
 -- 
-1.9.2
+
+Dipl.-Ing.
+Jan-Simon Möller
+
+jansimon.moeller@gmx.de
+Am Montag, 16. Juni 2014, 17:29:25 schrieb PaX Team:
+> On 16 Jun 2014 at 15:07, Borislav Petkov wrote:
+> > Please fix this to have effect only for clang but not for the rest of
+> > the universe.
+> 
+> i'd suggest reverting it instead, there're probably some stale entries
+> in there already (e.g., -fcatch-undefined-behavior).
 
