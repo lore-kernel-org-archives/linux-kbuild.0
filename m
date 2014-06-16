@@ -1,59 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.skyhub.de ([78.46.96.112]:47006 "EHLO mail.skyhub.de"
+Received: from cantor2.suse.de ([195.135.220.15]:60067 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751895AbaFPNUz (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 16 Jun 2014 09:20:55 -0400
-Date: Mon, 16 Jun 2014 15:20:45 +0200
-From: Borislav Petkov <bp@alien8.de>
-Subject: [RFC] Turn off -Wmaybe-uninitialized completely and move it to W=1
-Message-ID: <20140616132045.GE8170@pd.tnic>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+	id S1752098AbaFPOTT (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 16 Jun 2014 10:19:19 -0400
+From: Michal Marek <mmarek@suse.cz>
+Subject: [PATCH] deb-pkg: Fix for relative paths
+Date: Mon, 16 Jun 2014 16:18:59 +0200
+Message-Id: <1402928339-29785-1-git-send-email-mmarek@suse.cz>
+In-Reply-To: <CAOi1vP9YvbroujXEut6Xn-tvv07MNuxanwDrRvDFhS_-HT_5Lg@mail.gmail.com>
+References: <CAOi1vP9YvbroujXEut6Xn-tvv07MNuxanwDrRvDFhS_-HT_5Lg@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: lkml <linux-kernel@vger.kernel.org>
-Cc: Michael Matz <matz@suse.de>, linux-kbuild@vger.kernel.org, x86-ml <x86@kernel.org>
+To: Ilya Dryomov <idryomov@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hi,
+When $srctree or $objtree are relative paths, we cannot change directory
+and refer to them in the same subshell. Do the redirection outside of
+the subshell to fix this.
 
-so 3.16-rc1 adds this false positive from gcc, see below (triggers on
-4.9 and 4.8.2). Now, it is firing wrong and gcc people tell me there's
-no way for the compiler to know that the "from" and "to" values will NOT
-be used in the error case, i.e. thus the "maybe" aspect.
-
-So, we've disabled it for -Os already:
-
-	e74fc973b6e5 ("Turn off -Wmaybe-uninitialized when building with -Os")
-
-maybe we want to disable it by default on all and move it to W=1. This
-way people can still have it fire but not by default. And from what I've
-seen so far, it is mostly firing wrong and it is becoming annoying.
-
-So what do people think, any reasons for keeping it enabled by default?
-
-Thanks.
-
+Reported-by: Ilya Dryomov <idryomov@gmail.com>
+Signed-off-by: Michal Marek <mmarek@suse.cz>
 ---
+ scripts/package/builddeb | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-fs/direct-io.c: In function ‘__blockdev_direct_IO’:
-fs/direct-io.c:920:9: warning: ‘to’ may be used uninitialized in this function [-Wmaybe-uninitialized]
-   while (from < to) {
-         ^
-fs/direct-io.c:913:16: note: ‘to’ was declared here
-   size_t from, to;
-                ^
-fs/direct-io.c:1034:9: warning: ‘from’ may be used uninitialized in this function [-Wmaybe-uninitialized]
-    from += this_chunk_bytes;
-         ^
-fs/direct-io.c:913:10: note: ‘from’ was declared here
-   size_t from, to;
-
-
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index b5f08f7..9a38e85 100644
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -290,13 +290,13 @@ EOF
+ fi
+ 
+ # Build header package
+-(cd $srctree; find . -name Makefile\* -o -name Kconfig\* -o -name \*.pl > "$objtree/debian/hdrsrcfiles")
+-(cd $srctree; find arch/$SRCARCH/include include scripts -type f >> "$objtree/debian/hdrsrcfiles")
+-(cd $objtree; find arch/$SRCARCH/include Module.symvers include scripts -type f >> "$objtree/debian/hdrobjfiles")
++(cd $srctree; find . -name Makefile\* -o -name Kconfig\* -o -name \*.pl) > "$objtree/debian/hdrsrcfiles"
++(cd $srctree; find arch/$SRCARCH/include include scripts -type f) >> "$objtree/debian/hdrsrcfiles"
++(cd $objtree; find arch/$SRCARCH/include Module.symvers include scripts -type f) >> "$objtree/debian/hdrobjfiles"
+ destdir=$kernel_headers_dir/usr/src/linux-headers-$version
+ mkdir -p "$destdir"
+-(cd $srctree; tar -c -f - -T "$objtree/debian/hdrsrcfiles") | (cd $destdir; tar -xf -)
+-(cd $objtree; tar -c -f - -T "$objtree/debian/hdrobjfiles") | (cd $destdir; tar -xf -)
++(cd $srctree; tar -c -f - -T -) < "$objtree/debian/hdrsrcfiles" | (cd $destdir; tar -xf -)
++(cd $objtree; tar -c -f - -T -) < "$objtree/debian/hdrobjfiles" | (cd $destdir; tar -xf -)
+ (cd $objtree; cp $KCONFIG_CONFIG $destdir/.config) # copy .config manually to be where it's expected to be
+ ln -sf "/usr/src/linux-headers-$version" "$kernel_headers_dir/lib/modules/$version/build"
+ rm -f "$objtree/debian/hdrsrcfiles" "$objtree/debian/hdrobjfiles"
 -- 
-Regards/Gruss,
-    Boris.
+1.9.2
 
-Sent from a fat crate under my desk. Formatting is fine.
---
