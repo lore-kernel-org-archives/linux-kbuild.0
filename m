@@ -1,73 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qa0-f52.google.com ([209.85.216.52]:42756 "EHLO
-	mail-qa0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753719AbaFQCr6 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 16 Jun 2014 22:47:58 -0400
+Received: from cantor2.suse.de ([195.135.220.15]:55012 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755372AbaFQPc3 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 17 Jun 2014 11:32:29 -0400
+Message-ID: <53A05F8A.6060108@suse.cz>
+Date: Tue, 17 Jun 2014 17:32:26 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <1402928339-29785-1-git-send-email-mmarek@suse.cz>
-References: <CAOi1vP9YvbroujXEut6Xn-tvv07MNuxanwDrRvDFhS_-HT_5Lg@mail.gmail.com>
-	<1402928339-29785-1-git-send-email-mmarek@suse.cz>
-Date: Mon, 16 Jun 2014 19:47:57 -0700
-Message-ID: <CAADnVQJakSFP8VHJUwh6Z94XkYH7neuamUxHUZ16Q4-YP7O9OQ@mail.gmail.com>
-Subject: Re: [PATCH] deb-pkg: Fix for relative paths
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: MANY errors while building media docbooks
+References: <539F2926.4020004@infradead.org>
+In-Reply-To: <539F2926.4020004@infradead.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Ilya Dryomov <idryomov@gmail.com>, linux-kbuild@vger.kernel.org, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: Randy Dunlap <rdunlap@infradead.org>, linux-kbuild@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
+Cc: linux-media <linux-media@vger.kernel.org>
 
-On Mon, Jun 16, 2014 at 7:18 AM, Michal Marek <mmarek@suse.cz> wrote:
-> When $srctree or $objtree are relative paths, we cannot change directory
-> and refer to them in the same subshell. Do the redirection outside of
-> the subshell to fix this.
->
-> Reported-by: Ilya Dryomov <idryomov@gmail.com>
-> Signed-off-by: Michal Marek <mmarek@suse.cz>
-> ---
->  scripts/package/builddeb | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
+On 2014-06-16 19:28, Randy Dunlap wrote:
+> on Linux v3.16-rc1, building docbooks to a separate build directory
+> (mkdir DOC; make O=DOC htmldocs) gives me more than 12,000 lines like this:
+> 
+> grep: ./Documentation/DocBook//vidioc-subdev-g-fmt.xml: No such file or directory
+> grep: ./Documentation/DocBook//vidioc-subdev-g-frame-interval.xml: No such file or directory
+> grep: ./Documentation/DocBook//vidioc-subdev-g-selection.xml: No such file or directory
+> grep: ./Documentation/DocBook//vidioc-subscribe-event.xml: No such file or directory
+> grep: ./Documentation/DocBook//media-ioc-device-info.xml: No such file or directory
+> grep: ./Documentation/DocBook//media-ioc-enum-entities.xml: No such file or directory
+> grep: ./Documentation/DocBook//media-ioc-enum-links.xml: No such file or directory
+> grep: ./Documentation/DocBook//media-ioc-setup-link.xml: No such file or directory
 
-this patch didn't help to fix the broken deb-pkg for me:
 
-../scripts/Makefile.build:44: ../../scripts/package/Makefile: No such
-file or directory
-make[2]: *** No rule to make target `../../scripts/package/Makefile'.  Stop.
-make[1]: *** [deb-pkg] Error 2
+Seems to be another fallout of the relative path patches, I'll have a look.
 
-steps to reproduce:
-$ export KBUILD_OUTPUT=/make it out of src tree
-$ make deb-pkg
+Thanks,
+Michal
 
-> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-> index b5f08f7..9a38e85 100644
-> --- a/scripts/package/builddeb
-> +++ b/scripts/package/builddeb
-> @@ -290,13 +290,13 @@ EOF
->  fi
->
->  # Build header package
-> -(cd $srctree; find . -name Makefile\* -o -name Kconfig\* -o -name \*.pl > "$objtree/debian/hdrsrcfiles")
-> -(cd $srctree; find arch/$SRCARCH/include include scripts -type f >> "$objtree/debian/hdrsrcfiles")
-> -(cd $objtree; find arch/$SRCARCH/include Module.symvers include scripts -type f >> "$objtree/debian/hdrobjfiles")
-> +(cd $srctree; find . -name Makefile\* -o -name Kconfig\* -o -name \*.pl) > "$objtree/debian/hdrsrcfiles"
-> +(cd $srctree; find arch/$SRCARCH/include include scripts -type f) >> "$objtree/debian/hdrsrcfiles"
-> +(cd $objtree; find arch/$SRCARCH/include Module.symvers include scripts -type f) >> "$objtree/debian/hdrobjfiles"
->  destdir=$kernel_headers_dir/usr/src/linux-headers-$version
->  mkdir -p "$destdir"
-> -(cd $srctree; tar -c -f - -T "$objtree/debian/hdrsrcfiles") | (cd $destdir; tar -xf -)
-> -(cd $objtree; tar -c -f - -T "$objtree/debian/hdrobjfiles") | (cd $destdir; tar -xf -)
-> +(cd $srctree; tar -c -f - -T -) < "$objtree/debian/hdrsrcfiles" | (cd $destdir; tar -xf -)
-> +(cd $objtree; tar -c -f - -T -) < "$objtree/debian/hdrobjfiles" | (cd $destdir; tar -xf -)
->  (cd $objtree; cp $KCONFIG_CONFIG $destdir/.config) # copy .config manually to be where it's expected to be
->  ln -sf "/usr/src/linux-headers-$version" "$kernel_headers_dir/lib/modules/$version/build"
->  rm -f "$objtree/debian/hdrsrcfiles" "$objtree/debian/hdrobjfiles"
-> --
-> 1.9.2
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> Please read the FAQ at  http://www.tux.org/lkml/
