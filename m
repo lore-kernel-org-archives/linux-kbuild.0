@@ -1,38 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:55012 "EHLO mx2.suse.de"
+Received: from fieldses.org ([174.143.236.118]:53693 "EHLO fieldses.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755372AbaFQPc3 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 17 Jun 2014 11:32:29 -0400
-Message-ID: <53A05F8A.6060108@suse.cz>
-Date: Tue, 17 Jun 2014 17:32:26 +0200
-From: Michal Marek <mmarek@suse.cz>
+	id S965461AbaFQWiz (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 17 Jun 2014 18:38:55 -0400
+Date: Tue, 17 Jun 2014 18:38:54 -0400
+Subject: relative objtree change broke tar builds?
+Message-ID: <20140617223854.GC6168@fieldses.org>
 MIME-Version: 1.0
-Subject: Re: MANY errors while building media docbooks
-References: <539F2926.4020004@infradead.org>
-In-Reply-To: <539F2926.4020004@infradead.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+From: "J. Bruce Fields" <bfields@fieldses.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@infradead.org>, linux-kbuild@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
-Cc: linux-media <linux-media@vger.kernel.org>
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 2014-06-16 19:28, Randy Dunlap wrote:
-> on Linux v3.16-rc1, building docbooks to a separate build directory
-> (mkdir DOC; make O=DOC htmldocs) gives me more than 12,000 lines like this:
-> 
-> grep: ./Documentation/DocBook//vidioc-subdev-g-fmt.xml: No such file or directory
-> grep: ./Documentation/DocBook//vidioc-subdev-g-frame-interval.xml: No such file or directory
-> grep: ./Documentation/DocBook//vidioc-subdev-g-selection.xml: No such file or directory
-> grep: ./Documentation/DocBook//vidioc-subscribe-event.xml: No such file or directory
-> grep: ./Documentation/DocBook//media-ioc-device-info.xml: No such file or directory
-> grep: ./Documentation/DocBook//media-ioc-enum-entities.xml: No such file or directory
-> grep: ./Documentation/DocBook//media-ioc-enum-links.xml: No such file or directory
-> grep: ./Documentation/DocBook//media-ioc-setup-link.xml: No such file or directory
+The scripts I use for my kernel testing rely on the targz-pkg make
+target.  After updating to 3.16-rc1 my scripts started failing.  In
+scripts/package/buildtar:
+
+  tmpdir="${objtree}/tar-install"
+  tarball="${objtree}/linux-${KERNELRELEASE}-${ARCH}.tar"
+..
+  #
+  # Create the tarball
+  #
+  (
+        cd "${tmpdir}"
+        opts=
+        if tar --owner=root --group=root --help >/dev/null 2>&1; then
+                opts="--owner=root --group=root"
+        fi
+        tar cf - boot/* lib/* $opts | ${compress} > "${tarball}${file_ext}"
+  )
 
 
-Seems to be another fallout of the relative path patches, I'll have a look.
+After 7e1c04779efd511 "kbuild: Use relative path for $(objtree)", that's a
+relative instead of absolute path so the tarball's dumped by default into
+tmpdir, not what was intended.
 
-Thanks,
-Michal
+The changelog there says
 
+	The main Makefile sets its working directory to the object tree
+	and never changes it again. Therefore, we can use '.' instead of
+	the absolute path.
+
+But the main Makefile also exports objtree, and a quick grep suggests
+lots of other uses outside the main Makefile.
+
+--b.
