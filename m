@@ -1,47 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:41837 "EHLO mx2.suse.de"
+Received: from fieldses.org ([174.143.236.118]:44121 "EHLO fieldses.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S965568AbaFRLI7 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 18 Jun 2014 07:08:59 -0400
-Message-ID: <53A17347.9010607@suse.cz>
-Date: Wed, 18 Jun 2014 13:08:55 +0200
-From: Michal Marek <mmarek@suse.cz>
+	id S966474AbaFRMUb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 18 Jun 2014 08:20:31 -0400
+Date: Wed, 18 Jun 2014 08:20:30 -0400
+From: "J. Bruce Fields" <bfields@fieldses.org>
+Subject: Re: relative objtree change broke tar builds?
+Message-ID: <20140618122029.GA17790@fieldses.org>
+References: <20140617223854.GC6168@fieldses.org>
+ <53A15684.9000002@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH] deb-pkg: Fix for relative paths
-References: <CAOi1vP9YvbroujXEut6Xn-tvv07MNuxanwDrRvDFhS_-HT_5Lg@mail.gmail.com>	<1402928339-29785-1-git-send-email-mmarek@suse.cz>	<CAADnVQJakSFP8VHJUwh6Z94XkYH7neuamUxHUZ16Q4-YP7O9OQ@mail.gmail.com> <CAOi1vP8udouMMHLYUAFT6xo1nQu4RXJkbTBBjpwG3ivNHVWDVw@mail.gmail.com>
-In-Reply-To: <CAOi1vP8udouMMHLYUAFT6xo1nQu4RXJkbTBBjpwG3ivNHVWDVw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <53A15684.9000002@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ilya Dryomov <idryomov@gmail.com>
-Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>, linux-kbuild@vger.kernel.org, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Dne 18.6.2014 09:52, Ilya Dryomov napsal(a):
-> On Tue, Jun 17, 2014 at 6:47 AM, Alexei Starovoitov
-> <alexei.starovoitov@gmail.com> wrote:
->> On Mon, Jun 16, 2014 at 7:18 AM, Michal Marek <mmarek@suse.cz> wrote:
->>> When $srctree or $objtree are relative paths, we cannot change directory
->>> and refer to them in the same subshell. Do the redirection outside of
->>> the subshell to fix this.
->>>
->>> Reported-by: Ilya Dryomov <idryomov@gmail.com>
->>> Signed-off-by: Michal Marek <mmarek@suse.cz>
->>> ---
->>>  scripts/package/builddeb | 10 +++++-----
->>>  1 file changed, 5 insertions(+), 5 deletions(-)
->>
->> this patch didn't help to fix the broken deb-pkg for me:
+On Wed, Jun 18, 2014 at 11:06:12AM +0200, Michal Marek wrote:
+> Dne 18.6.2014 00:38, J. Bruce Fields napsal(a):
+> > The scripts I use for my kernel testing rely on the targz-pkg make
+> > target.  After updating to 3.16-rc1 my scripts started failing.  In
+> > scripts/package/buildtar:
+> > 
+> >   tmpdir="${objtree}/tar-install"
+> >   tarball="${objtree}/linux-${KERNELRELEASE}-${ARCH}.tar"
+> > ..
+> >   #
+> >   # Create the tarball
+> >   #
+> >   (
+> >         cd "${tmpdir}"
+> >         opts=
+> >         if tar --owner=root --group=root --help >/dev/null 2>&1; then
+> >                 opts="--owner=root --group=root"
+> >         fi
+> >         tar cf - boot/* lib/* $opts | ${compress} > "${tarball}${file_ext}"
+> >   )
 > 
-> Alexei, you must have some other issue with your environment.  This
-> patch fixes it for me, and in fact I had almost the exact same patch
-> committed internally in the interim.  (I wanted to give Michal the
-> opportunity to fix this perhaps in a more general way, since tar
-> targets seems to misbehave too.)
+> Thanks for the report, I'll fix it.
 
-So can I add your Tested-by: and send it to Linus? I haven't managed to
-set up a debian building environment yesterday and I'm a bit busy today.
+Thanks!
 
-Thanks,
-Michal
+> > The changelog there says
+> > 
+> > 	The main Makefile sets its working directory to the object tree
+> > 	and never changes it again. Therefore, we can use '.' instead of
+> > 	the absolute path.
+> > 
+> > But the main Makefile also exports objtree, and a quick grep suggests
+> > lots of other uses outside the main Makefile.
+> 
+> Do you have examples? Besides your report, I'm only aware of make
+> deb-pkg and make *docs. What else?
 
+I haven't looked.
+
+I only note that grep finds 47 files referencing that variable, and
+absent some argument that the remaining ones are correct, I'd be
+inclined to revert.  But I don't know if there's other work that now
+depends on the change.
+
+In any case, your call.
+
+--b.
