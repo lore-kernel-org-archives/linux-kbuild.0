@@ -1,51 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from fieldses.org ([174.143.236.118]:53693 "EHLO fieldses.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S965461AbaFQWiz (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 17 Jun 2014 18:38:55 -0400
-Date: Tue, 17 Jun 2014 18:38:54 -0400
-Subject: relative objtree change broke tar builds?
-Message-ID: <20140617223854.GC6168@fieldses.org>
+Received: from mail-we0-f178.google.com ([74.125.82.178]:59882 "EHLO
+	mail-we0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932818AbaFRHwH (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 18 Jun 2014 03:52:07 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-From: "J. Bruce Fields" <bfields@fieldses.org>
+In-Reply-To: <CAADnVQJakSFP8VHJUwh6Z94XkYH7neuamUxHUZ16Q4-YP7O9OQ@mail.gmail.com>
+References: <CAOi1vP9YvbroujXEut6Xn-tvv07MNuxanwDrRvDFhS_-HT_5Lg@mail.gmail.com>
+	<1402928339-29785-1-git-send-email-mmarek@suse.cz>
+	<CAADnVQJakSFP8VHJUwh6Z94XkYH7neuamUxHUZ16Q4-YP7O9OQ@mail.gmail.com>
+Date: Wed, 18 Jun 2014 11:52:04 +0400
+Message-ID: <CAOi1vP8udouMMHLYUAFT6xo1nQu4RXJkbTBBjpwG3ivNHVWDVw@mail.gmail.com>
+Subject: Re: [PATCH] deb-pkg: Fix for relative paths
+From: Ilya Dryomov <idryomov@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 
-The scripts I use for my kernel testing rely on the targz-pkg make
-target.  After updating to 3.16-rc1 my scripts started failing.  In
-scripts/package/buildtar:
+On Tue, Jun 17, 2014 at 6:47 AM, Alexei Starovoitov
+<alexei.starovoitov@gmail.com> wrote:
+> On Mon, Jun 16, 2014 at 7:18 AM, Michal Marek <mmarek@suse.cz> wrote:
+>> When $srctree or $objtree are relative paths, we cannot change directory
+>> and refer to them in the same subshell. Do the redirection outside of
+>> the subshell to fix this.
+>>
+>> Reported-by: Ilya Dryomov <idryomov@gmail.com>
+>> Signed-off-by: Michal Marek <mmarek@suse.cz>
+>> ---
+>>  scripts/package/builddeb | 10 +++++-----
+>>  1 file changed, 5 insertions(+), 5 deletions(-)
+>
+> this patch didn't help to fix the broken deb-pkg for me:
 
-  tmpdir="${objtree}/tar-install"
-  tarball="${objtree}/linux-${KERNELRELEASE}-${ARCH}.tar"
-..
-  #
-  # Create the tarball
-  #
-  (
-        cd "${tmpdir}"
-        opts=
-        if tar --owner=root --group=root --help >/dev/null 2>&1; then
-                opts="--owner=root --group=root"
-        fi
-        tar cf - boot/* lib/* $opts | ${compress} > "${tarball}${file_ext}"
-  )
+Alexei, you must have some other issue with your environment.  This
+patch fixes it for me, and in fact I had almost the exact same patch
+committed internally in the interim.  (I wanted to give Michal the
+opportunity to fix this perhaps in a more general way, since tar
+targets seems to misbehave too.)
 
+Thanks,
 
-After 7e1c04779efd511 "kbuild: Use relative path for $(objtree)", that's a
-relative instead of absolute path so the tarball's dumped by default into
-tmpdir, not what was intended.
-
-The changelog there says
-
-	The main Makefile sets its working directory to the object tree
-	and never changes it again. Therefore, we can use '.' instead of
-	the absolute path.
-
-But the main Makefile also exports objtree, and a quick grep suggests
-lots of other uses outside the main Makefile.
-
---b.
+                Ilya
