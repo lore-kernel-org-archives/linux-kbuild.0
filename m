@@ -1,87 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:49029 "EHLO
-	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755725AbaFRVUI (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 18 Jun 2014 17:20:08 -0400
-Message-ID: <53A20283.5070900@infradead.org>
-Date: Wed, 18 Jun 2014 14:20:03 -0700
-From: Randy Dunlap <rdunlap@infradead.org>
+Received: from cantor2.suse.de ([195.135.220.15]:52561 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756317AbaFRVgY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 18 Jun 2014 17:36:24 -0400
+Date: Wed, 18 Jun 2014 23:36:22 +0200
+From: Michal Marek <mmarek@suse.cz>
+Subject: [GIT PULL] kbuild fixes for v3.16-rc2
+Message-ID: <20140618213622.GA21153@pobox.suse.cz>
 MIME-Version: 1.0
-Subject: Re: relative objtree change broke tar builds?
-References: <20140617223854.GC6168@fieldses.org> <53A15684.9000002@suse.cz> <20140618122029.GA17790@fieldses.org> <53A18712.6030907@suse.cz> <20140618131452.GB17790@fieldses.org> <53A1B72E.7030907@infradead.org> <53A1ECD0.2030001@suse.cz>
-In-Reply-To: <53A1ECD0.2030001@suse.cz>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: "J. Bruce Fields" <bfields@fieldses.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: fathi.boudra@linaro.org, mmarek@suse.cz, yamada.m@jp.panasonic.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 06/18/14 12:47, Michal Marek wrote:
-> Dne 18.6.2014 17:58, Randy Dunlap napsal(a):
->> On 06/18/14 06:14, J. Bruce Fields wrote:
->>> On Wed, Jun 18, 2014 at 02:33:22PM +0200, Michal Marek wrote:
->>>> Dne 18.6.2014 14:20, J. Bruce Fields napsal(a):
->>>>> On Wed, Jun 18, 2014 at 11:06:12AM +0200, Michal Marek wrote:
->>>>>> Dne 18.6.2014 00:38, J. Bruce Fields napsal(a):
->>>>>>> The changelog there says
->>>>>>>
->>>>>>> 	The main Makefile sets its working directory to the object tree
->>>>>>> 	and never changes it again. Therefore, we can use '.' instead of
->>>>>>> 	the absolute path.
->>>>>>>
->>>>>>> But the main Makefile also exports objtree, and a quick grep suggests
->>>>>>> lots of other uses outside the main Makefile.
->>>>>>
->>>>>> Do you have examples? Besides your report, I'm only aware of make
->>>>>> deb-pkg and make *docs. What else?
->>>>>
->>>>> I haven't looked.
->>>>>
->>>>> I only note that grep finds 47 files referencing that variable, and
->>>>> absent some argument that the remaining ones are correct, I'd be
->>>>> inclined to revert.
->>>>
->>>> Do these 47 files change the working directory before referencing the
->>>> variable?
->>>
->>> Sorry, I'm not volunteering to check.
->>>
->>> Note also that other variables are defined in terms of objtree, and they
->>> may be exported or passed to other scripts.
->>
->>
->> I'll note one side effect that I really dislike:
->> If not in silent mode, scripts/mkmakefile tells me that the it is
->> generating ./Makefile.  I want to see the real path there instead of '.'.
-> 
-> The idea is that one should be able to compare as much as possible
-> between the build of /usr/src/linux-<version_a> built in
-> /usr/src/linux-<version_a>/build and /usr/src/linux-<version_b> built in
-> /usr/src/linux-<version_b>/build. One can now even compare the build log
-> with -j1, although that was not the primary goal. So if the changed
-> message is considered problematic, I can change it to show the full path
-> again, like
-> 
-> diff --git a/scripts/mkmakefile b/scripts/mkmakefile
-> index 84af27b..9d291f5 100644
-> --- a/scripts/mkmakefile
-> +++ b/scripts/mkmakefile
-> @@ -18,7 +18,7 @@ then
->         exit 0
->  fi
->  if [ "${quiet}" != "silent_" ]; then
-> -       echo "  GEN     $2/Makefile"
-> +       echo "  GEN     $(cd $2 && /bin/pwd)/Makefile"
->  fi
-> 
->  cat << EOF > $2/Makefile
-> 
-> Opinions?
+Hi Linus,
 
-works for me.  Thanks.
+There are three fixes for regressions caused by the relative paths
+series: deb-pkg, tar-pkg and *docs did not work with O=. Plus, there is
+a fix for the linux-headers deb package and a fixed typo. These are not
+regression fixes but are safe enough.
 
+Thanks,
+Michal
 
--- 
-~Randy
+The following changes since commit 7171511eaec5bf23fb06078f59784a3a0626b38f:
+
+  Linux 3.16-rc1 (2014-06-15 17:45:28 -1000)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git rc-fixes
+
+for you to fetch changes up to c14105628b2e2eee04b2d6950e068eeddf49f2f1:
+
+  kbuild: fix a typo in a kbuild document (2014-06-18 21:38:18 +0200)
+
+----------------------------------------------------------------
+Fathi Boudra (1):
+      builddeb: fix missing headers in linux-headers package
+
+Masahiro Yamada (1):
+      kbuild: fix a typo in a kbuild document
+
+Michal Marek (3):
+      deb-pkg: Fix for relative paths
+      kbuild: Fix tar-pkg with relative $(objtree)
+      Documentation: Fix DocBook build with relative $(srctree)
+
+ Documentation/DocBook/media/Makefile |  4 ++--
+ Documentation/kbuild/makefiles.txt   |  2 +-
+ scripts/package/builddeb             | 14 ++++++++------
+ scripts/package/buildtar             |  3 +--
+ 4 files changed, 12 insertions(+), 11 deletions(-)
