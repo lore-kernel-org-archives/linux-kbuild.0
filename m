@@ -1,63 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:33371 "EHLO
-	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752491AbaFRQMd (ORCPT
+Received: from mail-qa0-f42.google.com ([209.85.216.42]:50563 "EHLO
+	mail-qa0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751722AbaFRQZH (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 18 Jun 2014 12:12:33 -0400
-Message-ID: <53A1BA70.2070702@infradead.org>
-Date: Wed, 18 Jun 2014 09:12:32 -0700
-From: Randy Dunlap <rdunlap@infradead.org>
+	Wed, 18 Jun 2014 12:25:07 -0400
 MIME-Version: 1.0
-Subject: Re: [PATCH] Documentation: Fix DocBook build with relative $(srctree)
-References: <539F2926.4020004@infradead.org> <1403105262-16367-1-git-send-email-mmarek@suse.cz>
-In-Reply-To: <1403105262-16367-1-git-send-email-mmarek@suse.cz>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <53A1A354.7030107@suse.cz>
+References: <CAF1_xX2oeG0YCLaLZR9ZUY2qiD0-sVB6L10dZppnae7iZV_U3g@mail.gmail.com>
+	<53A1A354.7030107@suse.cz>
+Date: Wed, 18 Jun 2014 18:25:05 +0200
+Message-ID: <CAF1_xX38AWEK5sW8v_RrL=HzAg7JRNyCzgKNuZFzCGV4y2O7Og@mail.gmail.com>
+Subject: Re: Regression: firmware: Simplify directory creation + b43 = fails
+ to build
+From: Ronald <ronald645@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-media@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 06/18/14 08:27, Michal Marek wrote:
-> After commits 890676c6 (kbuild: Use relative path when building in the source
-> tree) and 9da0763b (kbuild: Use relative path when building in a subdir
-> of the source tree), the $(srctree) variable can be a relative path.
-> This breaks Documentation/DocBook/media/Makefile, because it tries to
-> create symlinks from a subdirectory of the object tree to the source
-> tree. Fix this by using a full path in this case.
-> 
-> Reported-by: Randy Dunlap <rdunlap@infradead.org>
-> Signed-off-by: Michal Marek <mmarek@suse.cz>
+From my .config
 
-Thanks.
+ ==> cat /usr/src/config | grep -i b43
+CONFIG_EXTRA_FIRMWARE="b43/ucode5.fw b43/b0g0initvals5.fw
+b43/b0g0bsinitvals5.fw b43/pcm5.fw"
+... snip ...
 
-Acked-by: Randy Dunlap <rdunlap@infradead.org>
-Tested-by: Randy Dunlap <rdunlap@infradead.org>
-
-Please merge to Linus sooner instead of later.
-
-
-> ---
->  Documentation/DocBook/media/Makefile | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/Documentation/DocBook/media/Makefile b/Documentation/DocBook/media/Makefile
-> index 1d27f0a..639e748 100644
-> --- a/Documentation/DocBook/media/Makefile
-> +++ b/Documentation/DocBook/media/Makefile
-> @@ -202,8 +202,8 @@ $(MEDIA_OBJ_DIR)/%: $(MEDIA_SRC_DIR)/%.b64
->  
->  $(MEDIA_OBJ_DIR)/v4l2.xml: $(OBJIMGFILES)
->  	@$($(quiet)gen_xml)
-> -	@(ln -sf $(MEDIA_SRC_DIR)/v4l/*xml $(MEDIA_OBJ_DIR)/)
-> -	@(ln -sf $(MEDIA_SRC_DIR)/dvb/*xml $(MEDIA_OBJ_DIR)/)
-> +	@(ln -sf `cd $(MEDIA_SRC_DIR) && /bin/pwd`/v4l/*xml $(MEDIA_OBJ_DIR)/)
-> +	@(ln -sf `cd $(MEDIA_SRC_DIR) && /bin/pwd`/dvb/*xml $(MEDIA_OBJ_DIR)/)
->  
->  $(MEDIA_OBJ_DIR)/videodev2.h.xml: $(srctree)/include/uapi/linux/videodev2.h $(MEDIA_OBJ_DIR)/v4l2.xml
->  	@$($(quiet)gen_xml)
-> 
-
-
--- 
-~Randy
+2014-06-18 16:33 GMT+02:00 Michal Marek <mmarek@suse.cz>:
+> Dne 18.6.2014 10:46, Ronald napsal(a):
+>> Dear kernel developers,
+>>
+>> Latest git HEAD (from Torvalds):
+>>
+>>   CC      drivers/base/firmware_class.o
+>>   LD      drivers/base/built-in.o
+>>   MK_FW   firmware/b43/ucode5.fw.gen.S
+>> /bin/sh: firmware/b43/ucode5.fw.gen.S: Bestand of map bestaat niet
+>> (file or directory does not exist, it should not have the .gen.S
+>> suffix)
+>> /bin/sh: firmware/b43/ucode5.fw.gen.S: Bestand of map bestaat niet
+>> ... snip ...
+>> /bin/sh: firmware/b43/ucode5.fw.gen.S: Bestand of map bestaat niet
+>> firmware/Makefile:185: recept voor doel 'firmware/b43/ucode5.fw.gen.S'
+>> is mislukt
+>> make[1]: *** [firmware/b43/ucode5.fw.gen.S] Fout 1
+>> Makefile:893: recept voor doel 'firmware' is mislukt
+>> make: *** [firmware] Fout 2
+>> make: *** Wachten op onvoltooide taken...
+>
+> Where does firmware/b43 come from?
+>
+> Thanks,
+> Michal
+>
