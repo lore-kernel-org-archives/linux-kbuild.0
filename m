@@ -1,55 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qg0-f53.google.com ([209.85.192.53]:47616 "EHLO
-	mail-qg0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S965039AbaFRIqg (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 18 Jun 2014 04:46:36 -0400
+Received: from cantor2.suse.de ([195.135.220.15]:39777 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S964813AbaFRJGR (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 18 Jun 2014 05:06:17 -0400
+Message-ID: <53A15684.9000002@suse.cz>
+Date: Wed, 18 Jun 2014 11:06:12 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Date: Wed, 18 Jun 2014 10:46:35 +0200
-Message-ID: <CAF1_xX2oeG0YCLaLZR9ZUY2qiD0-sVB6L10dZppnae7iZV_U3g@mail.gmail.com>
-Subject: Regression: firmware: Simplify directory creation + b43 = fails to build
-From: Ronald <ronald645@gmail.com>
+Subject: Re: relative objtree change broke tar builds?
+References: <20140617223854.GC6168@fieldses.org>
+In-Reply-To: <20140617223854.GC6168@fieldses.org>
 Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, mmarek@suse.cz
+To: "J. Bruce Fields" <bfields@fieldses.org>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Dear kernel developers,
+Dne 18.6.2014 00:38, J. Bruce Fields napsal(a):
+> The scripts I use for my kernel testing rely on the targz-pkg make
+> target.  After updating to 3.16-rc1 my scripts started failing.  In
+> scripts/package/buildtar:
+> 
+>   tmpdir="${objtree}/tar-install"
+>   tarball="${objtree}/linux-${KERNELRELEASE}-${ARCH}.tar"
+> ..
+>   #
+>   # Create the tarball
+>   #
+>   (
+>         cd "${tmpdir}"
+>         opts=
+>         if tar --owner=root --group=root --help >/dev/null 2>&1; then
+>                 opts="--owner=root --group=root"
+>         fi
+>         tar cf - boot/* lib/* $opts | ${compress} > "${tarball}${file_ext}"
+>   )
 
-Latest git HEAD (from Torvalds):
+Thanks for the report, I'll fix it.
 
-  CC      drivers/base/firmware_class.o
-  LD      drivers/base/built-in.o
-  MK_FW   firmware/b43/ucode5.fw.gen.S
-/bin/sh: firmware/b43/ucode5.fw.gen.S: Bestand of map bestaat niet
-(file or directory does not exist, it should not have the .gen.S
-suffix)
-/bin/sh: firmware/b43/ucode5.fw.gen.S: Bestand of map bestaat niet
-... snip ...
-/bin/sh: firmware/b43/ucode5.fw.gen.S: Bestand of map bestaat niet
-firmware/Makefile:185: recept voor doel 'firmware/b43/ucode5.fw.gen.S'
-is mislukt
-make[1]: *** [firmware/b43/ucode5.fw.gen.S] Fout 1
-Makefile:893: recept voor doel 'firmware' is mislukt
-make: *** [firmware] Fout 2
-make: *** Wachten op onvoltooide taken...
 
- ==> git revert 5180d5f
-[bleed 55a169f] Revert "firmware: Simplify directory creation"
- 2 files changed, 38 insertions(+), 16 deletions(-)
-09:57 ronald@Charlie /usr/src/linux :)
- ==> time make -j2
-... snip ...
-  LD      drivers/base/built-in.o
-  MKDIR   firmware/b43/
-  MK_FW   firmware/b43/ucode5.fw.gen.S
-  MK_FW   firmware/b43/b0g0initvals5.fw.gen.S
-  MK_FW   firmware/b43/b0g0bsinitvals5.fw.gen.S
-  MK_FW   firmware/b43/pcm5.fw.gen.S
-  AS      firmware/b43/ucode5.fw.gen.o
-  AS      firmware/b43/b0g0initvals5.fw.gen.o
-  AS      firmware/b43/b0g0bsinitvals5.fw.gen.o
-  AS      firmware/b43/pcm5.fw.gen.o
-  LD      firmware/built-in.o
+> The changelog there says
+> 
+> 	The main Makefile sets its working directory to the object tree
+> 	and never changes it again. Therefore, we can use '.' instead of
+> 	the absolute path.
+> 
+> But the main Makefile also exports objtree, and a quick grep suggests
+> lots of other uses outside the main Makefile.
 
-If you require more info, please let me know.
+Do you have examples? Besides your report, I'm only aware of make
+deb-pkg and make *docs. What else?
+
+Thanks,
+Michal
+
