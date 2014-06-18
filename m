@@ -1,50 +1,90 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:50948 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754523AbaFRTxD (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 18 Jun 2014 15:53:03 -0400
-Message-ID: <53A1EE1E.3090906@suse.cz>
-Date: Wed, 18 Jun 2014 21:53:02 +0200
-From: Michal Marek <mmarek@suse.cz>
+Received: from asavdk4.altibox.net ([109.247.116.15]:41013 "EHLO
+	asavdk4.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754523AbaFRTxG (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 18 Jun 2014 15:53:06 -0400
+Date: Wed, 18 Jun 2014 21:52:59 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: relative objtree change broke tar builds?
+Message-ID: <20140618195259.GA21939@ravnborg.org>
+References: <20140617223854.GC6168@fieldses.org>
+ <53A15684.9000002@suse.cz>
+ <20140618122029.GA17790@fieldses.org>
+ <53A18712.6030907@suse.cz>
+ <20140618131452.GB17790@fieldses.org>
+ <53A1B72E.7030907@infradead.org>
+ <53A1ECD0.2030001@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH] scripts/Makefile.clean: clean also $(extra-m) and $(extra-)
-References: <1402019035-2190-1-git-send-email-yamada.m@jp.panasonic.com> <539963D4.3040409@suse.cz>
-In-Reply-To: <539963D4.3040409@suse.cz>
-Content-Type: text/plain; charset=ISO-8859-2
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <53A1ECD0.2030001@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Cc: linux-kbuild@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: Randy Dunlap <rdunlap@infradead.org>, "J. Bruce Fields" <bfields@fieldses.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Dne 12.6.2014 10:24, Michal Marek napsal(a):
-> Dne 6.6.2014 03:43, Masahiro Yamada napsal(a):
->> Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
->> ---
->>  scripts/Makefile.clean | 4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/scripts/Makefile.clean b/scripts/Makefile.clean
->> index 686cb0d..a651cee 100644
->> --- a/scripts/Makefile.clean
->> +++ b/scripts/Makefile.clean
->> @@ -40,8 +40,8 @@ subdir-ymn	:= $(addprefix $(obj)/,$(subdir-ymn))
->>  # build a list of files to remove, usually relative to the current
->>  # directory
->>  
->> -__clean-files	:= $(extra-y) $(always)                  \
->> -		   $(targets) $(clean-files)             \
->> +__clean-files	:= $(extra-y) $(extra-m) $(extra-)       \
->> +		   $(always) $(targets) $(clean-files)   \
+On Wed, Jun 18, 2014 at 09:47:28PM +0200, Michal Marek wrote:
+> Dne 18.6.2014 17:58, Randy Dunlap napsal(a):
+> > On 06/18/14 06:14, J. Bruce Fields wrote:
+> >> On Wed, Jun 18, 2014 at 02:33:22PM +0200, Michal Marek wrote:
+> >>> Dne 18.6.2014 14:20, J. Bruce Fields napsal(a):
+> >>>> On Wed, Jun 18, 2014 at 11:06:12AM +0200, Michal Marek wrote:
+> >>>>> Dne 18.6.2014 00:38, J. Bruce Fields napsal(a):
+> >>>>>> The changelog there says
+> >>>>>>
+> >>>>>> 	The main Makefile sets its working directory to the object tree
+> >>>>>> 	and never changes it again. Therefore, we can use '.' instead of
+> >>>>>> 	the absolute path.
+> >>>>>>
+> >>>>>> But the main Makefile also exports objtree, and a quick grep suggests
+> >>>>>> lots of other uses outside the main Makefile.
+> >>>>>
+> >>>>> Do you have examples? Besides your report, I'm only aware of make
+> >>>>> deb-pkg and make *docs. What else?
+> >>>>
+> >>>> I haven't looked.
+> >>>>
+> >>>> I only note that grep finds 47 files referencing that variable, and
+> >>>> absent some argument that the remaining ones are correct, I'd be
+> >>>> inclined to revert.
+> >>>
+> >>> Do these 47 files change the working directory before referencing the
+> >>> variable?
+> >>
+> >> Sorry, I'm not volunteering to check.
+> >>
+> >> Note also that other variables are defined in terms of objtree, and they
+> >> may be exported or passed to other scripts.
+> > 
+> > 
+> > I'll note one side effect that I really dislike:
+> > If not in silent mode, scripts/mkmakefile tells me that the it is
+> > generating ./Makefile.  I want to see the real path there instead of '.'.
 > 
-> Do you have an example where generated files are left in the tree after
-> make clean? This should go into the changelog.
+> The idea is that one should be able to compare as much as possible
+> between the build of /usr/src/linux-<version_a> built in
+> /usr/src/linux-<version_a>/build and /usr/src/linux-<version_b> built in
+> /usr/src/linux-<version_b>/build. One can now even compare the build log
+> with -j1, although that was not the primary goal. So if the changed
+> message is considered problematic, I can change it to show the full path
+> again, like
+> 
+> diff --git a/scripts/mkmakefile b/scripts/mkmakefile
+> index 84af27b..9d291f5 100644
+> --- a/scripts/mkmakefile
+> +++ b/scripts/mkmakefile
+> @@ -18,7 +18,7 @@ then
+>         exit 0
+>  fi
+>  if [ "${quiet}" != "silent_" ]; then
+> -       echo "  GEN     $2/Makefile"
+> +       echo "  GEN     $(cd $2 && /bin/pwd)/Makefile"
+>  fi
+> 
+>  cat << EOF > $2/Makefile
+> 
+> Opinions?
+I agree with Randy - the full path is more informative.
 
-Hi Masahiro,
-
-do you have a reproducer, i.e. an example where make clean leaves
-generated files in the tree?
-
-Thanks,
-Michal
-
+	Sam
