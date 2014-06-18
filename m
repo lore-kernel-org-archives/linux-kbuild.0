@@ -1,97 +1,90 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qg0-f42.google.com ([209.85.192.42]:48448 "EHLO
-	mail-qg0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754769AbaFRT4z convert rfc822-to-8bit (ORCPT
+Received: from bombadil.infradead.org ([198.137.202.9]:46535 "EHLO
+	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755815AbaFRVNJ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 18 Jun 2014 15:56:55 -0400
+	Wed, 18 Jun 2014 17:13:09 -0400
+Message-ID: <53A200DD.3060004@infradead.org>
+Date: Wed, 18 Jun 2014 14:13:01 -0700
+From: Randy Dunlap <rdunlap@infradead.org>
 MIME-Version: 1.0
-In-Reply-To: <53A1D3A1.70202@gmail.com>
-References: <53A1D3A1.70202@gmail.com>
-Date: Wed, 18 Jun 2014 12:56:53 -0700
-Message-ID: <CAADnVQJVmtkvdGTDmLh9YDvLvDF+-SQ9WW0H_pp7HwfWciLS3A@mail.gmail.com>
-Subject: Re: 9da0763 "kbuild: Use relative path ..." Broke my IDE
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Subject: Re: relative objtree change broke tar builds?
+References: <20140617223854.GC6168@fieldses.org> <53A15684.9000002@suse.cz> <20140618122029.GA17790@fieldses.org> <53A18712.6030907@suse.cz> <20140618131452.GB17790@fieldses.org> <53A1B72E.7030907@infradead.org> <53A1ECD0.2030001@suse.cz> <20140618195259.GA21939@ravnborg.org>
+In-Reply-To: <20140618195259.GA21939@ravnborg.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Boaz Harrosh <openosd@gmail.com>, Ilya Dryomov <idryomov@gmail.com>, Randy Dunlap <rdunlap@infradead.org>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kernel <linux-kernel@vger.kernel.org>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org
+To: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>
+Cc: "J. Bruce Fields" <bfields@fieldses.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Wed, Jun 18, 2014 at 11:00 AM, Boaz Harrosh <openosd@gmail.com> wrote:
-> Hi Sir Michal
->
-> Below patch broke my stupid yet useful IDE tool. I use kdevelop.
->
-> kdevelop now gets confused on warnings and errors because it now comes out
-> as (for example):
-> ../fs/ext4/fsync.c:63:3: error: implicit declaration of function ‘iputddd’ [-Werror=implicit-function-declaration]
->
-> From what I understand kdevelop picks up the "[make] cd ..." outputs from make and
-> will interpret those for finding gcc files output. But Linux Makefile will suppress
-> these messages and kdevelop as no way to interpret the "../xxxx"
->
-> I do not know what other IDEs do, but this one here is not smart enough.
->
-> Could we please define a new input to Makefile that will revert to
-> old behavior. like:
->         KBUILD_FULL_PATH
->
-> let me cook up a patch tomorrow (getting late here)
-> Thanks
-> Boaz
->
-> The patch that broke it
+On 06/18/14 12:52, Sam Ravnborg wrote:
+> On Wed, Jun 18, 2014 at 09:47:28PM +0200, Michal Marek wrote:
+>> Dne 18.6.2014 17:58, Randy Dunlap napsal(a):
+>>> On 06/18/14 06:14, J. Bruce Fields wrote:
+>>>> On Wed, Jun 18, 2014 at 02:33:22PM +0200, Michal Marek wrote:
+>>>>> Dne 18.6.2014 14:20, J. Bruce Fields napsal(a):
+>>>>>> On Wed, Jun 18, 2014 at 11:06:12AM +0200, Michal Marek wrote:
+>>>>>>> Dne 18.6.2014 00:38, J. Bruce Fields napsal(a):
+>>>>>>>> The changelog there says
+>>>>>>>>
+>>>>>>>> 	The main Makefile sets its working directory to the object tree
+>>>>>>>> 	and never changes it again. Therefore, we can use '.' instead of
+>>>>>>>> 	the absolute path.
+>>>>>>>>
+>>>>>>>> But the main Makefile also exports objtree, and a quick grep suggests
+>>>>>>>> lots of other uses outside the main Makefile.
+>>>>>>>
+>>>>>>> Do you have examples? Besides your report, I'm only aware of make
+>>>>>>> deb-pkg and make *docs. What else?
+>>>>>>
+>>>>>> I haven't looked.
+>>>>>>
+>>>>>> I only note that grep finds 47 files referencing that variable, and
+>>>>>> absent some argument that the remaining ones are correct, I'd be
+>>>>>> inclined to revert.
+>>>>>
+>>>>> Do these 47 files change the working directory before referencing the
+>>>>> variable?
+>>>>
+>>>> Sorry, I'm not volunteering to check.
+>>>>
+>>>> Note also that other variables are defined in terms of objtree, and they
+>>>> may be exported or passed to other scripts.
+>>>
+>>>
+>>> I'll note one side effect that I really dislike:
+>>> If not in silent mode, scripts/mkmakefile tells me that the it is
+>>> generating ./Makefile.  I want to see the real path there instead of '.'.
+>>
+>> The idea is that one should be able to compare as much as possible
+>> between the build of /usr/src/linux-<version_a> built in
+>> /usr/src/linux-<version_a>/build and /usr/src/linux-<version_b> built in
+>> /usr/src/linux-<version_b>/build. One can now even compare the build log
+>> with -j1, although that was not the primary goal. So if the changed
+>> message is considered problematic, I can change it to show the full path
+>> again, like
+>>
+>> diff --git a/scripts/mkmakefile b/scripts/mkmakefile
+>> index 84af27b..9d291f5 100644
+>> --- a/scripts/mkmakefile
+>> +++ b/scripts/mkmakefile
+>> @@ -18,7 +18,7 @@ then
+>>         exit 0
+>>  fi
+>>  if [ "${quiet}" != "silent_" ]; then
+>> -       echo "  GEN     $2/Makefile"
+>> +       echo "  GEN     $(cd $2 && /bin/pwd)/Makefile"
+>>  fi
+>>
+>>  cat << EOF > $2/Makefile
+>>
+>> Opinions?
+> I agree with Randy - the full path is more informative.
+> 
+> 	Sam
 
-Boaz, thanks for the bisect.
-reverting it also helps to solve 'make deb-pkg' problem I reported in
-the other thread.
+Yes, just '.' discards some very useful information.
 
-> ----
-> From 9da0763bdd82572be243fcf5161734f11568960f Mon Sep 17 00:00:00 2001
-> From: Michal Marek <mmarek@suse.cz>
-> Date: Fri, 25 Apr 2014 23:25:18 +0200
-> Subject: [PATCH] kbuild: Use relative path when building in a subdir of the
->  source tree
->
-> When doing make O=<subdir>, use '..' to refer to the source tree. This
-> allows for more readable compiler messages, and, more importantly, it
-> sets the VPATH to '..', so filenames in WARN_ON() etc. will be shorter.
->
-> Acked-by: Sam Ravnborg <sam@ravnborg.org>
-> Signed-off-by: Michal Marek <mmarek@suse.cz>
-> ---
->  Makefile | 12 +++++++++++-
->  1 file changed, 11 insertions(+), 1 deletion(-)
->
-> diff --git a/Makefile b/Makefile
-> index 3e134ec..f4702c1 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -149,7 +149,17 @@ else
->  _all: modules
->  endif
->
-> -srctree                := $(if $(KBUILD_SRC),$(KBUILD_SRC),.)
-> +ifeq ($(KBUILD_SRC),)
-> +        # building in the source tree
-> +        srctree := .
-> +else
-> +        ifeq ($(KBUILD_SRC)/,$(dir $(CURDIR)))
-> +                # building in a subdirectory of the source tree
-> +                srctree := ..
-> +        else
-> +                srctree := $(KBUILD_SRC)
-> +        endif
-> +endif
->  objtree                := .
->  src            := $(srctree)
->  obj            := $(objtree)
-> --
-> 1.9.3
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> Please read the FAQ at  http://www.tux.org/lkml/
+-- 
+~Randy
