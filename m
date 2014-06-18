@@ -1,46 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:43172 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S966138AbaFRMdZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 18 Jun 2014 08:33:25 -0400
-Message-ID: <53A18712.6030907@suse.cz>
-Date: Wed, 18 Jun 2014 14:33:22 +0200
-From: Michal Marek <mmarek@suse.cz>
+Received: from mail-we0-f181.google.com ([74.125.82.181]:36105 "EHLO
+	mail-we0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S966306AbaFRMnZ (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 18 Jun 2014 08:43:25 -0400
 MIME-Version: 1.0
-Subject: Re: relative objtree change broke tar builds?
-References: <20140617223854.GC6168@fieldses.org> <53A15684.9000002@suse.cz> <20140618122029.GA17790@fieldses.org>
-In-Reply-To: <20140618122029.GA17790@fieldses.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <53A17347.9010607@suse.cz>
+References: <CAOi1vP9YvbroujXEut6Xn-tvv07MNuxanwDrRvDFhS_-HT_5Lg@mail.gmail.com>
+	<1402928339-29785-1-git-send-email-mmarek@suse.cz>
+	<CAADnVQJakSFP8VHJUwh6Z94XkYH7neuamUxHUZ16Q4-YP7O9OQ@mail.gmail.com>
+	<CAOi1vP8udouMMHLYUAFT6xo1nQu4RXJkbTBBjpwG3ivNHVWDVw@mail.gmail.com>
+	<53A17347.9010607@suse.cz>
+Date: Wed, 18 Jun 2014 16:43:23 +0400
+Message-ID: <CAOi1vP9XoZTc4y=N7Q6WD3RS7ZamtWkzvzWGSahBx4ENOjpuEg@mail.gmail.com>
+Subject: Re: [PATCH] deb-pkg: Fix for relative paths
+From: Ilya Dryomov <idryomov@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "J. Bruce Fields" <bfields@fieldses.org>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>, linux-kbuild@vger.kernel.org, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 
-Dne 18.6.2014 14:20, J. Bruce Fields napsal(a):
-> On Wed, Jun 18, 2014 at 11:06:12AM +0200, Michal Marek wrote:
->> Dne 18.6.2014 00:38, J. Bruce Fields napsal(a):
->>> The changelog there says
+> Dne 18.6.2014 09:52, Ilya Dryomov napsal(a):
+>> On Tue, Jun 17, 2014 at 6:47 AM, Alexei Starovoitov
+>> <alexei.starovoitov@gmail.com> wrote:
+>>> On Mon, Jun 16, 2014 at 7:18 AM, Michal Marek <mmarek@suse.cz> wrote:
+>>>> When $srctree or $objtree are relative paths, we cannot change directory
+>>>> and refer to them in the same subshell. Do the redirection outside of
+>>>> the subshell to fix this.
+>>>>
+>>>> Reported-by: Ilya Dryomov <idryomov@gmail.com>
+>>>> Signed-off-by: Michal Marek <mmarek@suse.cz>
+>>>> ---
+>>>>  scripts/package/builddeb | 10 +++++-----
+>>>>  1 file changed, 5 insertions(+), 5 deletions(-)
 >>>
->>> 	The main Makefile sets its working directory to the object tree
->>> 	and never changes it again. Therefore, we can use '.' instead of
->>> 	the absolute path.
->>>
->>> But the main Makefile also exports objtree, and a quick grep suggests
->>> lots of other uses outside the main Makefile.
+>>> this patch didn't help to fix the broken deb-pkg for me:
 >>
->> Do you have examples? Besides your report, I'm only aware of make
->> deb-pkg and make *docs. What else?
-> 
-> I haven't looked.
-> 
-> I only note that grep finds 47 files referencing that variable, and
-> absent some argument that the remaining ones are correct, I'd be
-> inclined to revert.
+>> Alexei, you must have some other issue with your environment.  This
+>> patch fixes it for me, and in fact I had almost the exact same patch
+>> committed internally in the interim.  (I wanted to give Michal the
+>> opportunity to fix this perhaps in a more general way, since tar
+>> targets seems to misbehave too.)
+>
+> So can I add your Tested-by: and send it to Linus? I haven't managed to
+> set up a debian building environment yesterday and I'm a bit busy today.
 
-Do these 47 files change the working directory before referencing the
-variable?
+Yes, Tested-by: Ilya Dryomov <idryomov@gmail.com>
 
 Thanks,
-Michal
 
+                Ilya
