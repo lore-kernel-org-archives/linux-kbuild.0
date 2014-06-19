@@ -1,56 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:52561 "EHLO mx2.suse.de"
+Received: from know-smtprelay-omc-10.server.virginmedia.net ([80.0.253.74]:47772
+	"EHLO know-smtprelay-omc-10.server.virginmedia.net"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756317AbaFRVgY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 18 Jun 2014 17:36:24 -0400
-Date: Wed, 18 Jun 2014 23:36:22 +0200
-From: Michal Marek <mmarek@suse.cz>
-Subject: [GIT PULL] kbuild fixes for v3.16-rc2
-Message-ID: <20140618213622.GA21153@pobox.suse.cz>
+	id S1757173AbaFSCua (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 18 Jun 2014 22:50:30 -0400
+Date: Thu, 19 Jun 2014 02:21:16 +0100
+From: Ken Moffat <zarniwhoop@ntlworld.com>
+Subject: Re: relative objtree change broke tar builds?
+Message-ID: <20140619012116.GA10046@milliways>
+References: <20140617223854.GC6168@fieldses.org>
+ <53A15684.9000002@suse.cz>
+ <20140618122029.GA17790@fieldses.org>
+ <53A18712.6030907@suse.cz>
+ <20140618131452.GB17790@fieldses.org>
+ <53A1B72E.7030907@infradead.org>
+ <53A1ECD0.2030001@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <53A1ECD0.2030001@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: fathi.boudra@linaro.org, mmarek@suse.cz, yamada.m@jp.panasonic.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: Randy Dunlap <rdunlap@infradead.org>, "J. Bruce Fields" <bfields@fieldses.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hi Linus,
+On Wed, Jun 18, 2014 at 09:47:28PM +0200, Michal Marek wrote:
+> 
+> The idea is that one should be able to compare as much as possible
+> between the build of /usr/src/linux-<version_a> built in
+> /usr/src/linux-<version_a>/build and /usr/src/linux-<version_b> built in
+> /usr/src/linux-<version_b>/build.
 
-There are three fixes for regressions caused by the relative paths
-series: deb-pkg, tar-pkg and *docs did not work with O=. Plus, there is
-a fix for the linux-headers deb package and a fixed typo. These are not
-regression fixes but are safe enough.
+Michal,
 
-Thanks,
-Michal
+ Now that you have sent a pull request to Linus, and therefore
+addressed the main problem, may I dare to question your example ?
 
-The following changes since commit 7171511eaec5bf23fb06078f59784a3a0626b38f:
+ I only started building kernels in (approximately) spring 2000, so I
+am sure that I am missing a lot of history.  But /usr/src/linux*
+smells of "tradition" in the Scots sense of "whit ma faither telt me
+that his faither telt him" ("what my father told me that his father
+told him" in english).  I am sure that /usr/src/linux might have been
+an expectation in the distant past, but it tends to bring along the
+assumption that kernels are _built_ by that dangerous guy called
+'root'.
 
-  Linux 3.16-rc1 (2014-06-15 17:45:28 -1000)
+ Some of us (me included) often build things as root, but it has
+many risks and people ought not to be led to believe it is
+necessarily the correct way to do things.  Over the past 14 years I
+have built kernels in ~/ as well as in other user-writable
+directories and I am puzzled about why the idea of /usr/src/linux*
+continues to exist.
 
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git rc-fixes
-
-for you to fetch changes up to c14105628b2e2eee04b2d6950e068eeddf49f2f1:
-
-  kbuild: fix a typo in a kbuild document (2014-06-18 21:38:18 +0200)
-
-----------------------------------------------------------------
-Fathi Boudra (1):
-      builddeb: fix missing headers in linux-headers package
-
-Masahiro Yamada (1):
-      kbuild: fix a typo in a kbuild document
-
-Michal Marek (3):
-      deb-pkg: Fix for relative paths
-      kbuild: Fix tar-pkg with relative $(objtree)
-      Documentation: Fix DocBook build with relative $(srctree)
-
- Documentation/DocBook/media/Makefile |  4 ++--
- Documentation/kbuild/makefiles.txt   |  2 +-
- scripts/package/builddeb             | 14 ++++++++------
- scripts/package/buildtar             |  3 +--
- 4 files changed, 12 insertions(+), 11 deletions(-)
+ĸen
+-- 
+Nanny Ogg usually went to bed early. After all, she was an old lady.
+Sometimes she went to bed as early as 6 a.m.
