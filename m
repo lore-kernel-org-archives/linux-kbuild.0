@@ -1,59 +1,60 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from know-smtprelay-omc-10.server.virginmedia.net ([80.0.253.74]:47772
-	"EHLO know-smtprelay-omc-10.server.virginmedia.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757173AbaFSCua (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 18 Jun 2014 22:50:30 -0400
-Date: Thu, 19 Jun 2014 02:21:16 +0100
-From: Ken Moffat <zarniwhoop@ntlworld.com>
-Subject: Re: relative objtree change broke tar builds?
-Message-ID: <20140619012116.GA10046@milliways>
-References: <20140617223854.GC6168@fieldses.org>
- <53A15684.9000002@suse.cz>
- <20140618122029.GA17790@fieldses.org>
- <53A18712.6030907@suse.cz>
- <20140618131452.GB17790@fieldses.org>
- <53A1B72E.7030907@infradead.org>
- <53A1ECD0.2030001@suse.cz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <53A1ECD0.2030001@suse.cz>
+Received: from youngberry.canonical.com ([91.189.89.112]:39580 "EHLO
+	youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756435AbaFSOoX (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 19 Jun 2014 10:44:23 -0400
+From: Kamal Mostafa <kamal@canonical.com>
+Subject: [PATCH] Makefile: version.h macros KERNEL_EXTRAVERSION, LINUX_EXTRAVERSION_CODE
+Date: Thu, 19 Jun 2014 07:44:18 -0700
+Message-Id: <1403189058-24103-1-git-send-email-kamal@canonical.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Randy Dunlap <rdunlap@infradead.org>, "J. Bruce Fields" <bfields@fieldses.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Wed, Jun 18, 2014 at 09:47:28PM +0200, Michal Marek wrote:
-> 
-> The idea is that one should be able to compare as much as possible
-> between the build of /usr/src/linux-<version_a> built in
-> /usr/src/linux-<version_a>/build and /usr/src/linux-<version_b> built in
-> /usr/src/linux-<version_b>/build.
+Adds new macro KERNEL_EXTRAVERSION(a,b,c,d) and value
+LINUX_EXTRAVERSION_CODE to version.h, allowing ranged version checks of
+extended-stable versions that use a numeric EXTRAVERSION value.
 
-Michal,
+The new KERNEL_EXTRAVERSION(a,b,c,d) works like KERNEL_VERSION(a,b,c)...
+If EXTRAVERSION is set to ".{integer}" (the common extended-stable kernel
+version number scheme) then {integer} corresponds to KERNEL_EXTRAVERSION's
+fourth arg.  If EXTRAVERSION is blank or a non-".{integer}" string like
+"-rc5", that corresponds to a fourth parameter of 0.
 
- Now that you have sent a pull request to Linus, and therefore
-addressed the main problem, may I dare to question your example ?
+Example usage:
 
- I only started building kernels in (approximately) spring 2000, so I
-am sure that I am missing a lot of history.  But /usr/src/linux*
-smells of "tradition" in the Scots sense of "whit ma faither telt me
-that his faither telt him" ("what my father told me that his father
-told him" in english).  I am sure that /usr/src/linux might have been
-an expectation in the distant past, but it tends to bring along the
-assumption that kernels are _built_ by that dangerous guy called
-'root'.
+  #if ( LINUX_EXTRAVERSION_CODE >= KERNEL_EXTRAVERSION(3,13,11,5) )
+      // compiles for (3.13.11 with "EXTRAVERSION = .5") or greater value
+  #endif
 
- Some of us (me included) often build things as root, but it has
-many risks and people ought not to be led to believe it is
-necessarily the correct way to do things.  Over the past 14 years I
-have built kernels in ~/ as well as in other user-writable
-directories and I am puzzled about why the idea of /usr/src/linux*
-continues to exist.
+Cc: stable@vger.kernel.org
+Signed-off-by: Kamal Mostafa <kamal@canonical.com>
+---
+ Makefile | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-ĸen
+diff --git a/Makefile b/Makefile
+index 97b2861..e579628 100644
+--- a/Makefile
++++ b/Makefile
+@@ -953,10 +953,15 @@ define filechk_utsrelease.h
+ 	(echo \#define UTS_RELEASE \"$(KERNELRELEASE)\";)
+ endef
+ 
++extraversionnum := $(shell \
++	echo "$(EXTRAVERSION)" | sed -n '/\.\([0-9]*\).*/s//\1/p')
+ define filechk_version.h
+ 	(echo \#define LINUX_VERSION_CODE $(shell                         \
+ 	expr $(VERSION) \* 65536 + 0$(PATCHLEVEL) \* 256 + 0$(SUBLEVEL)); \
+-	echo '#define KERNEL_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))';)
++	echo '#define KERNEL_VERSION(a,b,c) (((a) << 16) + ((b) << 8) + (c))'; \
++	echo \#define LINUX_EXTRAVERSION_CODE $(shell                      \
++	expr $(VERSION) \* 268435456 + 0$(PATCHLEVEL) \* 1048576 + 0$(SUBLEVEL) \* 4096 + 0$(extraversionnum)); \
++	echo '#define KERNEL_EXTRAVERSION(a,b,c,d) (((a)<<28) + ((b)<<20) + ((c)<<12) + (d))';)
+ endef
+ 
+ $(version_h): $(srctree)/Makefile FORCE
 -- 
-Nanny Ogg usually went to bed early. After all, she was an old lady.
-Sometimes she went to bed as early as 6 a.m.
+1.9.1
+
