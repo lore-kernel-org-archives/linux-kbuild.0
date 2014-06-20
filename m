@@ -1,48 +1,35 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from youngberry.canonical.com ([91.189.89.112]:47239 "EHLO
-	youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933764AbaFTPsD (ORCPT
+Received: from mail-gw1-out.broadcom.com ([216.31.210.62]:42115 "EHLO
+	mail-gw1-out.broadcom.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S966118AbaFTSbg (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 20 Jun 2014 11:48:03 -0400
-Message-ID: <1403279278.14743.64.camel@fourier>
-Subject: Re: [PATCH] Makefile: version.h macros KERNEL_EXTRAVERSION,
- LINUX_EXTRAVERSION_CODE
-From: Kamal Mostafa <kamal@canonical.com>
-Date: Fri, 20 Jun 2014 08:47:58 -0700
-In-Reply-To: <53A4016E.9040108@suse.cz>
-References: <1403189058-24103-1-git-send-email-kamal@canonical.com>
-	 <53A4016E.9040108@suse.cz>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+	Fri, 20 Jun 2014 14:31:36 -0400
+From: Markus Mayer <markus.mayer@linaro.org>
+Subject: [RFC PATCH 0/2] Make host compiler and linker flags modifyable
+Date: Fri, 20 Jun 2014 11:31:27 -0700
+Message-ID: <1403289089-11299-1-git-send-email-markus.mayer@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Greg KH <greg@kroah.com>, Luis Henriques <luis.henriques@canonical.com>
+Cc: Linux Build List <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Fri, 2014-06-20 at 11:39 +0200, Michal Marek wrote:
-> Dne 19.6.2014 16:44, Kamal Mostafa napsal(a):
-> > Adds new macro KERNEL_EXTRAVERSION(a,b,c,d) and value
-> > LINUX_EXTRAVERSION_CODE to version.h, allowing ranged version checks of
-> > extended-stable versions that use a numeric EXTRAVERSION value.
-> > 
-> > The new KERNEL_EXTRAVERSION(a,b,c,d) works like KERNEL_VERSION(a,b,c)...
-> > If EXTRAVERSION is set to ".{integer}" (the common extended-stable kernel
-> > version number scheme) then {integer} corresponds to KERNEL_EXTRAVERSION's
-> > fourth arg.  If EXTRAVERSION is blank or a non-".{integer}" string like
-> > "-rc5", that corresponds to a fourth parameter of 0.
-> 
-> Why don't you guys simply increment the third digit in the extended
-> stable tree and get support for KERNEL_VERSION() for free? You always
-> start after the respective stable branch has reached EOL, don't you?
+Being able to pass in extra compiler or linker flags for the host
+compiler can be quite helpful. This proposed series would allow a user
+to do just that.
 
-Yes, we only start after the stable branch has reached EOL.
+Please let me know if you would consider this kind of change for
+inclusion or if there is an alternate approach to achieve the same
+goal.
 
-We don't increment the third integer for the extended-stable branches
-(we add a fourth integer instead) in order to avoid the possibility of a
-collision if Greg KH were to ever release a "special" post-EOL version
-of one of his branches.
+Markus Mayer (2):
+  Makefile: Make HOSTCFLAGS and HOSTCXXFLAGS user modifyable
+  Makefile: Introduce HOSTLDFLAGS environment variable
 
- -Kamal
+ Makefile | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
+-- 
+1.9.1
 
