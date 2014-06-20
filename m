@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-gw3-out.broadcom.com ([216.31.210.64]:41977 "EHLO
+Received: from mail-gw3-out.broadcom.com ([216.31.210.64]:50518 "EHLO
 	mail-gw3-out.broadcom.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756985AbaFTSbu (ORCPT
+	with ESMTP id S1757087AbaFTScC (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 20 Jun 2014 14:31:50 -0400
+	Fri, 20 Jun 2014 14:32:02 -0400
 From: Markus Mayer <markus.mayer@linaro.org>
-Subject: [RFC PATCH 1/2] Makefile: Make HOSTCFLAGS and HOSTCXXFLAGS user modifyable
-Date: Fri, 20 Jun 2014 11:31:28 -0700
-Message-ID: <1403289089-11299-2-git-send-email-markus.mayer@linaro.org>
+Subject: [RFC PATCH 2/2] Makefile: Introduce HOSTLDFLAGS environment variable
+Date: Fri, 20 Jun 2014 11:31:29 -0700
+Message-ID: <1403289089-11299-3-git-send-email-markus.mayer@linaro.org>
 In-Reply-To: <1403289089-11299-1-git-send-email-markus.mayer@linaro.org>
 References: <1403289089-11299-1-git-send-email-markus.mayer@linaro.org>
 MIME-Version: 1.0
@@ -17,9 +17,12 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.cz>
 Cc: Linux Build List <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-In order to allow the user to pass extra arguments to the host
-compiler, we no longer overwrite the host compiler flags in the
-makefile, but append them to what was passed in.
+By default we don't need HOSTLDFLAGS. However, providing it gives the
+user the ability to pass extra flags to the host linker should they be
+required.
+
+The variables AS LD CC are moved to the next line to keep line length
+in check.
 
 Signed-off-by: Markus Mayer <markus.mayer@linaro.org>
 ---
@@ -27,20 +30,20 @@ Signed-off-by: Markus Mayer <markus.mayer@linaro.org>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 97b2861..5795eea 100644
+index 5795eea..f6e2f53 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -251,8 +251,8 @@ CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
+@@ -414,8 +414,8 @@ KERNELRELEASE = $(shell cat include/config/kernel.release 2> /dev/null)
+ KERNELVERSION = $(VERSION)$(if $(PATCHLEVEL),.$(PATCHLEVEL)$(if $(SUBLEVEL),.$(SUBLEVEL)))$(EXTRAVERSION)
  
- HOSTCC       = gcc
- HOSTCXX      = g++
--HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer
--HOSTCXXFLAGS = -O2
-+HOSTCFLAGS   += -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer
-+HOSTCXXFLAGS += -O2
+ export VERSION PATCHLEVEL SUBLEVEL KERNELRELEASE KERNELVERSION
+-export ARCH SRCARCH CONFIG_SHELL HOSTCC HOSTCFLAGS CROSS_COMPILE AS LD CC
+-export CPP AR NM STRIP OBJCOPY OBJDUMP
++export ARCH SRCARCH CONFIG_SHELL HOSTCC HOSTCFLAGS HOSTLDFLAGS CROSS_COMPILE
++export AS LD CC CPP AR NM STRIP OBJCOPY OBJDUMP
+ export MAKE AWK GENKSYMS INSTALLKERNEL PERL UTS_MACHINE
+ export HOSTCXX HOSTCXXFLAGS LDFLAGS_MODULE CHECK CHECKFLAGS
  
- ifeq ($(shell $(HOSTCC) -v 2>&1 | grep -c "clang version"), 1)
- HOSTCFLAGS  += -Wno-unused-value -Wno-unused-parameter \
 -- 
 1.9.1
 
