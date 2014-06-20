@@ -1,67 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:55539 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S966834AbaFTNXH (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 20 Jun 2014 09:23:07 -0400
-Message-ID: <53A435B9.605@suse.cz>
-Date: Fri, 20 Jun 2014 15:23:05 +0200
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: [PATCH] scripts/Makefile.clean: clean also $(extra-m) and $(extra-)
-References: <539963D4.3040409@suse.cz> <53A1EE1E.3090906@suse.cz> <20140620212212.9339.AA925319@jp.panasonic.com>
-In-Reply-To: <20140620212212.9339.AA925319@jp.panasonic.com>
-Content-Type: text/plain; charset=US-ASCII
+Received: from youngberry.canonical.com ([91.189.89.112]:47239 "EHLO
+	youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933764AbaFTPsD (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 20 Jun 2014 11:48:03 -0400
+Message-ID: <1403279278.14743.64.camel@fourier>
+Subject: Re: [PATCH] Makefile: version.h macros KERNEL_EXTRAVERSION,
+ LINUX_EXTRAVERSION_CODE
+From: Kamal Mostafa <kamal@canonical.com>
+Date: Fri, 20 Jun 2014 08:47:58 -0700
+In-Reply-To: <53A4016E.9040108@suse.cz>
+References: <1403189058-24103-1-git-send-email-kamal@canonical.com>
+	 <53A4016E.9040108@suse.cz>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Cc: linux-kbuild@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Greg KH <greg@kroah.com>, Luis Henriques <luis.henriques@canonical.com>
 
-Dne 20.6.2014 14:22, Masahiro Yamada napsal(a):
-> Hi Michal,
+On Fri, 2014-06-20 at 11:39 +0200, Michal Marek wrote:
+> Dne 19.6.2014 16:44, Kamal Mostafa napsal(a):
+> > Adds new macro KERNEL_EXTRAVERSION(a,b,c,d) and value
+> > LINUX_EXTRAVERSION_CODE to version.h, allowing ranged version checks of
+> > extended-stable versions that use a numeric EXTRAVERSION value.
+> > 
+> > The new KERNEL_EXTRAVERSION(a,b,c,d) works like KERNEL_VERSION(a,b,c)...
+> > If EXTRAVERSION is set to ".{integer}" (the common extended-stable kernel
+> > version number scheme) then {integer} corresponds to KERNEL_EXTRAVERSION's
+> > fourth arg.  If EXTRAVERSION is blank or a non-".{integer}" string like
+> > "-rc5", that corresponds to a fourth parameter of 0.
 > 
-> 
-> On Wed, 18 Jun 2014 21:53:02 +0200
-> Michal Marek <mmarek@suse.cz> wrote:
-> 
->> Dne 12.6.2014 10:24, Michal Marek napsal(a):
->>> Dne 6.6.2014 03:43, Masahiro Yamada napsal(a):
->>>> Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
->>>> ---
->>>>  scripts/Makefile.clean | 4 ++--
->>>>  1 file changed, 2 insertions(+), 2 deletions(-)
->>>>
->>>> diff --git a/scripts/Makefile.clean b/scripts/Makefile.clean
->>>> index 686cb0d..a651cee 100644
->>>> --- a/scripts/Makefile.clean
->>>> +++ b/scripts/Makefile.clean
->>>> @@ -40,8 +40,8 @@ subdir-ymn	:= $(addprefix $(obj)/,$(subdir-ymn))
->>>>  # build a list of files to remove, usually relative to the current
->>>>  # directory
->>>>  
->>>> -__clean-files	:= $(extra-y) $(always)                  \
->>>> -		   $(targets) $(clean-files)             \
->>>> +__clean-files	:= $(extra-y) $(extra-m) $(extra-)       \
->>>> +		   $(always) $(targets) $(clean-files)   \
->>>
->>> Do you have an example where generated files are left in the tree after
->>> make clean? This should go into the changelog.
->>
->> Hi Masahiro,
->>
->> do you have a reproducer, i.e. an example where make clean leaves
->> generated files in the tree?
-> 
-> No, I don't.
-> 
-> I thought
-> arch/powerpc/kernel/Makefile is using
-> extra-$(CONFIG_...) += ...
-> but  *.o  files are simply cleaned-up.  So this isn't the case.
+> Why don't you guys simply increment the third digit in the extended
+> stable tree and get support for KERNEL_VERSION() for free? You always
+> start after the respective stable branch has reached EOL, don't you?
 
-OK, so there is no urgent need to add this to 'rc-fixes'. I'll queue it
-up in 'kbuild' for 3.17-rc1.
+Yes, we only start after the stable branch has reached EOL.
 
-Thanks,
-Michal
+We don't increment the third integer for the extended-stable branches
+(we add a fourth integer instead) in order to avoid the possibility of a
+collision if Greg KH were to ever release a "special" post-EOL version
+of one of his branches.
+
+ -Kamal
+
 
