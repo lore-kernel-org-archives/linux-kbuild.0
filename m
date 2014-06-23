@@ -1,51 +1,20 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ie0-f181.google.com ([209.85.223.181]:58381 "EHLO
-	mail-ie0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752631AbaFWJ3q (ORCPT
+Received: from mail06.syd.iprimus.net.au ([210.50.76.229]:7220 "EHLO
+	mail06.syd.iprimus.net.au" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750767AbaFWJzg (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 23 Jun 2014 05:29:46 -0400
-Received: by mail-ie0-f181.google.com with SMTP id y20so5566789ier.12
-        for <linux-kbuild@vger.kernel.org>; Mon, 23 Jun 2014 02:29:44 -0700 (PDT)
-Date: Mon, 23 Jun 2014 02:29:42 -0700 (PDT)
-From: David Rientjes <rientjes@google.com>
-Subject: Re: [PATCH] kconfig: plug false-positive warning in get_prompt_str()
- seen with gcc-4.9
-In-Reply-To: <20140623054813.GG13440@pengutronix.de>
-Message-ID: <alpine.DEB.2.02.1406230228370.8821@chino.kir.corp.google.com>
-References: <20140525164751.28577.74072.stgit@zurg> <20140623054813.GG13440@pengutronix.de>
+	Mon, 23 Jun 2014 05:55:36 -0400
+Date: Mon, 23 Jun 2014 19:42:34 +1000
+Message-ID: <5378E399000417BA@cpms01.int.iprimus.net.au>
+From: yorkshire@iprimus.com.au
+Subject: My Last Wish
 MIME-Version: 1.0
-Content-Type: MULTIPART/MIXED; BOUNDARY="531381512-1459598461-1403515783=:8821"
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-Cc: Konstantin Khlebnikov <koct9i@gmail.com>, "Yann E. MORIN" <yann.morin.1998@free.fr>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+I am Aisha EI Umar, It's time for me to discuss my last wish before I depart
+to join my creator and I need to know I can trust you with this, please reply
+immediately.
 
---531381512-1459598461-1403515783=:8821
-Content-Type: TEXT/PLAIN; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
-
-On Mon, 23 Jun 2014, Uwe Kleine-König wrote:
-
-> > scripts/kconfig/menu.c: In function ‘get_symbol_str’:
-> > scripts/kconfig/menu.c:590:18: warning: ‘jump’ may be used uninitialized in this function [-Wmaybe-uninitialized]
-> >      jump->offset = strlen(r->s);
-> >                   ^
-> > scripts/kconfig/menu.c:551:19: note: ‘jump’ was declared here
-> >   struct jump_key *jump;
-> >                    ^
-> 
-> I'm seeing that problem with a 4.8.2 toolchain on next-20140623 with
-> ARCH=arm, too.
-> 
-> Maybe better use uninitialized_var? And point out the commit that
-> introduced the issue please.
-> 
-
-If the compiler can't figure out if a variable is always intialized before 
-its referenced, then it indicates the code is poorly written and isn't 
-clear to the code reader either.  uninitialized_var() would be a lazy way 
-to solve this particular issue.
---531381512-1459598461-1403515783=:8821--
