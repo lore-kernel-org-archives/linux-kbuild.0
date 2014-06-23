@@ -1,51 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:57382 "EHLO
-	out1-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1756469AbaFTUwU (ORCPT
+Received: from metis.ext.pengutronix.de ([92.198.50.35]:52775 "EHLO
+	metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751144AbaFWFsQ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 20 Jun 2014 16:52:20 -0400
-Received: from compute3.internal (compute3.nyi.mail.srv.osa [10.202.2.43])
-	by gateway1.nyi.mail.srv.osa (Postfix) with ESMTP id 6E8DC213AE
-	for <linux-kbuild@vger.kernel.org>; Fri, 20 Jun 2014 16:52:18 -0400 (EDT)
-Date: Fri, 20 Jun 2014 13:56:19 -0700
-From: Greg KH <greg@kroah.com>
-Subject: Re: [PATCH] Makefile: version.h macros KERNEL_EXTRAVERSION,
- LINUX_EXTRAVERSION_CODE
-Message-ID: <20140620205619.GB17904@kroah.com>
-References: <1403189058-24103-1-git-send-email-kamal@canonical.com>
- <53A4016E.9040108@suse.cz>
- <1403279278.14743.64.camel@fourier>
- <53A49ABB.8070704@suse.cz>
+	Mon, 23 Jun 2014 01:48:16 -0400
+Date: Mon, 23 Jun 2014 07:48:14 +0200
+From: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?=
+	<u.kleine-koenig@pengutronix.de>
+Subject: Re: [PATCH] kconfig: plug false-positive warning in get_prompt_str()
+ seen with gcc-4.9
+Message-ID: <20140623054813.GG13440@pengutronix.de>
+References: <20140525164751.28577.74072.stgit@zurg>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <53A49ABB.8070704@suse.cz>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20140525164751.28577.74072.stgit@zurg>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Kamal Mostafa <kamal@canonical.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Luis Henriques <luis.henriques@canonical.com>
+To: Konstantin Khlebnikov <koct9i@gmail.com>
+Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Fri, Jun 20, 2014 at 10:34:03PM +0200, Michal Marek wrote:
-> Dne 20.6.2014 17:47, Kamal Mostafa napsal(a):
-> > On Fri, 2014-06-20 at 11:39 +0200, Michal Marek wrote:
-> >> Why don't you guys simply increment the third digit in the extended
-> >> stable tree and get support for KERNEL_VERSION() for free? You always
-> >> start after the respective stable branch has reached EOL, don't you?
-> > 
-> > Yes, we only start after the stable branch has reached EOL.
-> > 
-> > We don't increment the third integer for the extended-stable branches
-> > (we add a fourth integer instead) in order to avoid the possibility of a
-> > collision if Greg KH were to ever release a "special" post-EOL version
-> > of one of his branches.
-> 
-> The maintainers of 2.6.32.y, 3.2.y and 3.12.y have taken that risk and
-> it has been working fine so far ;-).
+Hello,
 
-Those maintainers are doing so on the kernel.org infrastructure, with my
-help and encouragement, unlike these Canonical "stable" trees, so their
-risk was a lot less :)
+On Sun, May 25, 2014 at 08:47:51PM +0400, Konstantin Khlebnikov wrote:
+> scripts/kconfig/menu.c: In function ‘get_symbol_str’:
+> scripts/kconfig/menu.c:590:18: warning: ‘jump’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+>      jump->offset = strlen(r->s);
+>                   ^
+> scripts/kconfig/menu.c:551:19: note: ‘jump’ was declared here
+>   struct jump_key *jump;
+>                    ^
 
-thanks,
+I'm seeing that problem with a 4.8.2 toolchain on next-20140623 with
+ARCH=arm, too.
 
-greg k-h
+Maybe better use uninitialized_var? And point out the commit that
+introduced the issue please.
+
+Best regards
+Uwe
+
+-- 
+Pengutronix e.K.                           | Uwe Kleine-König            |
+Industrial Linux Solutions                 | http://www.pengutronix.de/  |
