@@ -1,102 +1,252 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.skyhub.de ([78.46.96.112]:38447 "EHLO mail.skyhub.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752730AbaFXVii (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 24 Jun 2014 17:38:38 -0400
-Date: Tue, 24 Jun 2014 23:38:35 +0200
-From: Borislav Petkov <bp@alien8.de>
-Subject: [PATCH] Kbuild: Move -Wmaybe-uninitialized to W=1
-Message-ID: <20140624213835.GD15068@pd.tnic>
-References: <20140616132045.GE8170@pd.tnic>
- <20140616211405.GA7914@ravnborg.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20140616211405.GA7914@ravnborg.org>
+Received: from mail-wi0-f174.google.com ([209.85.212.174]:42721 "EHLO
+	mail-wi0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753713AbaFXWuN (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 24 Jun 2014 18:50:13 -0400
+From: Alexis Berlemont <alexis.berlemont@gmail.com>
+Subject: [PATCH 03/13] perf tools: Kbuild source related fixies
+Date: Wed, 25 Jun 2014 00:47:50 +0200
+Message-Id: <1403650080-3130-4-git-send-email-alexis.berlemont@gmail.com>
+In-Reply-To: <1403650080-3130-1-git-send-email-alexis.berlemont@gmail.com>
+References: <1403650080-3130-1-git-send-email-alexis.berlemont@gmail.com>
+In-Reply-To: <CAMesUR4175wXt-Pov8Yu-ke7KG4FRaBCTYouCs=jK3n0CWi3zw@mail.gmail.com>
+References: <CAMesUR4175wXt-Pov8Yu-ke7KG4FRaBCTYouCs=jK3n0CWi3zw@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: lkml <linux-kernel@vger.kernel.org>, Michael Matz <matz@suse.de>, linux-kbuild@vger.kernel.org, x86-ml <x86@kernel.org>
+To: linux-kernel@vger.kernel.org
+Cc: Jiri Olsa <jolsa@redhat.com>, dsahern@gmail.com, mingo@kernel.org, sam@ravnborg.org, mmarek@suse.cz, namhyung@kernel.org, Arnaldo Carvalho de Melo <acme@ghostprotocols.net>, Peter Zijlstra <a.p.zijlstra@chello.nl>, Ingo Molnar <mingo@elte.hu>, Paul Mackerras <paulus@samba.org>, Corey Ashford <cjashfor@linux.vnet.ibm.com>, Frederic Weisbecker <fweisbec@gmail.com>, Borislav Petkov <bp@alien8.de>, linux-kbuild@vger.kernel.org, Stephane Eranian <eranian@google.com>
 
-On Mon, Jun 16, 2014 at 11:14:05PM +0200, Sam Ravnborg wrote:
-> Agreed.
-> The noise ratio is too high - so move it to W=1.
+From: Jiri Olsa <jolsa@redhat.com>
 
-Ok, how about the below?
+Fixing several sources config dependencies to allow
+separate config builds.
 
-It still needs this hunk to work:
+This commit was originally created by Jiri Olsa in 2013. Minor changes
+were needed to get it working one year later:
+* Remove #ifdef directives related with GUI / TUI (because of code
+  changes in ui/setup.c)
+* Fix a link issue if the option BUILTIN_TRACE is disabled.
+* Fix typo (CONFIG_BULTIN_ instead CONFIG_BUILTIN_)
 
-@@ -33,7 +34,7 @@ warning-1 += $(call cc-disable-warning, format)
- warning-1 += $(call cc-disable-warning, unknown-warning-option)
- warning-1 += $(call cc-disable-warning, sign-compare)
- warning-1 += $(call cc-disable-warning, format-zero-length)
--warning-1 += $(call cc-disable-warning, uninitialized)
-+#warning-1 += $(call cc-disable-warning, uninitialized)
- warning-1 += $(call cc-option, -fcatch-undefined-behavior)
- 
- warning-2 := -Waggregate-return
-
-but that's another story which is still WIP here:
-http://lkml.kernel.org/r/20140616130751.GD8170@pd.tnic
-
-After it is sorted out, we can do something like the below. (Note:
-I'm not filtering out the previous -Wno-maybe-uninitialized from
-KBUILD_CFLAGS because it is not necessary - apparently the following
--Wmaybe-uninitialized reenables it again).
-
+Signed-off-by: Jiri Olsa <jolsa@redhat.com>
+Cc: Arnaldo Carvalho de Melo <acme@ghostprotocols.net>
+Cc: Peter Zijlstra <a.p.zijlstra@chello.nl>
+Cc: Ingo Molnar <mingo@elte.hu>
+Cc: Paul Mackerras <paulus@samba.org>
+Cc: Corey Ashford <cjashfor@linux.vnet.ibm.com>
+Cc: Frederic Weisbecker <fweisbec@gmail.com>
+Cc: Namhyung Kim <namhyung@kernel.org>
+Cc: Borislav Petkov <bp@alien8.de>
+Cc: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org
+Cc: Stephane Eranian <eranian@google.com>
 ---
-From: Borislav Petkov <bp@suse.de>
-Subject: [PATCH] Kbuild: Move -Wmaybe-uninitialized to W=1
+ tools/perf/builtin-annotate.c    |  6 +++---
+ tools/perf/builtin-lock.c        |  5 ++++-
+ tools/perf/builtin-report.c      |  2 +-
+ tools/perf/builtin-sched.c       |  3 +++
+ tools/perf/builtin-top.c         |  4 ++--
+ tools/perf/perf.c                | 10 ++++++++--
+ tools/perf/ui/browsers/scripts.c |  4 ++++
+ tools/perf/ui/setup.c            |  6 +++---
+ 8 files changed, 28 insertions(+), 12 deletions(-)
 
-This warning is enabled by -Wall or -Wextra, says the gcc manpage. It
-also says that gcc cannot always know whether the warning is issued
-correctly:
-
-"These warnings are made optional because GCC is not smart enough to see
-all the reasons why the code might be correct in spite of appearing to
-have an error."
-
-And, as expected, it fires for perfectly valid use cases, thus making it
-not really useful. Let's move it to the W=1 bunch in case people want to
-enable it with the additional checks.
-
-Signed-off-by: Borislav Petkov <bp@suse.de>
----
- Makefile                   | 2 ++
- scripts/Makefile.extrawarn | 1 +
- 2 files changed, 3 insertions(+)
-
-diff --git a/Makefile b/Makefile
-index b11e2d504a00..63033545d7f6 100644
---- a/Makefile
-+++ b/Makefile
-@@ -402,6 +402,8 @@ KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
- 		   -Werror-implicit-function-declaration \
- 		   -Wno-format-security
+diff --git a/tools/perf/builtin-annotate.c b/tools/perf/builtin-annotate.c
+index d40070f..aea56c5 100644
+--- a/tools/perf/builtin-annotate.c
++++ b/tools/perf/builtin-annotate.c
+@@ -154,7 +154,7 @@ find_next:
  
-+KBUILD_CFLAGS   += $(call cc-disable-warning, maybe-uninitialized)
-+
- KBUILD_AFLAGS_KERNEL :=
- KBUILD_CFLAGS_KERNEL :=
- KBUILD_AFLAGS   := -D__ASSEMBLY__
-diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
-index 65643506c71c..e61678c40d41 100644
---- a/scripts/Makefile.extrawarn
-+++ b/scripts/Makefile.extrawarn
-@@ -25,6 +25,7 @@ warning-1 += -Wold-style-definition
- warning-1 += $(call cc-option, -Wmissing-include-dirs)
- warning-1 += $(call cc-option, -Wunused-but-set-variable)
- warning-1 += $(call cc-disable-warning, missing-field-initializers)
-+warning-1 += $(call cc-option, -Wmaybe-uninitialized)
+ 			/* skip missing symbols */
+ 			nd = rb_next(nd);
+-#ifdef CONFIG_TUI
++#if defined(CONFIG_TUI) || !defined(CONFIG_KBUILD)
+ 		} else if (use_browser == 1) {
+ 			struct rb_node *next = NULL;
+ 			key = hist_entry__tui_annotate(he, evsel, NULL);
+@@ -318,9 +318,9 @@ int cmd_annotate(int argc, const char **argv, const char *prefix __maybe_unused)
+ 	OPT_BOOLEAN('D', "dump-raw-trace", &dump_trace,
+ 		    "dump raw trace in ASCII"),
+ 	OPT_BOOLEAN(0, "gtk", &annotate.use_gtk, "Use the GTK interface"),
+-#ifdef CONFIG_TUI
++#if defined(CONFIG_TUI) || !defined(CONFIG_KBUILD)
+ 	OPT_BOOLEAN(0, "tui", &annotate.use_tui, "Use the TUI interface"),
+-#endif /* CONFIG_TUI */
++#endif
+ 	OPT_BOOLEAN(0, "stdio", &annotate.use_stdio, "Use the stdio interface"),
+ 	OPT_STRING('k', "vmlinux", &symbol_conf.vmlinux_name,
+ 		   "file", "vmlinux pathname"),
+diff --git a/tools/perf/builtin-lock.c b/tools/perf/builtin-lock.c
+index 6148afc..f5404dc 100644
+--- a/tools/perf/builtin-lock.c
++++ b/tools/perf/builtin-lock.c
+@@ -1,4 +1,5 @@
+ #include "builtin.h"
++#include "builtin-cmds.h"
+ #include "perf.h"
  
- # Clang
- warning-1 += $(call cc-disable-warning, initializer-overrides)
+ #include "util/evlist.h"
+@@ -994,9 +995,11 @@ int cmd_lock(int argc, const char **argv, const char *prefix __maybe_unused)
+ 				usage_with_options(report_usage, report_options);
+ 		}
+ 		rc = __cmd_report(false);
++#ifdef CONFIG_BUILTIN_SCRIPT
+ 	} else if (!strcmp(argv[0], "script")) {
+ 		/* Aliased to 'perf script' */
+-		return cmd_script(argc, argv, prefix);
++		rc = cmd_script(argc, argv, prefix);
++#endif
+ 	} else if (!strcmp(argv[0], "info")) {
+ 		if (argc) {
+ 			argc = parse_options(argc, argv,
+diff --git a/tools/perf/builtin-report.c b/tools/perf/builtin-report.c
+index c97410a..8dc8077 100644
+--- a/tools/perf/builtin-report.c
++++ b/tools/perf/builtin-report.c
+@@ -392,7 +392,7 @@ static int report__browse_hists(struct report *rep)
+ 	const char *help = "For a higher level overview, try: perf report --sort comm,dso";
+ 
+ 	switch (use_browser) {
+-#ifdef CONFIG_TUI
++#if defined(CONFIG_TUI) || !defined(CONFIG_KBUILD)
+ 	case 1:
+ 		ret = perf_evlist__tui_browse_hists(evlist, help, NULL,
+ 						    rep->min_percent,
+diff --git a/tools/perf/builtin-sched.c b/tools/perf/builtin-sched.c
+index c38d06c..80515e0 100644
+--- a/tools/perf/builtin-sched.c
++++ b/tools/perf/builtin-sched.c
+@@ -1,4 +1,5 @@
+ #include "builtin.h"
++#include "builtin-cmds.h"
+ #include "perf.h"
+ 
+ #include "util/util.h"
+@@ -1739,11 +1740,13 @@ int cmd_sched(int argc, const char **argv, const char *prefix __maybe_unused)
+ 	if (!argc)
+ 		usage_with_options(sched_usage, sched_options);
+ 
++#ifdef CONFIG_BUILTIN_SCRIPT
+ 	/*
+ 	 * Aliased to 'perf script' for now:
+ 	 */
+ 	if (!strcmp(argv[0], "script"))
+ 		return cmd_script(argc, argv, prefix);
++#endif
+ 
+ 	symbol__init();
+ 	if (!strncmp(argv[0], "rec", 3)) {
+diff --git a/tools/perf/builtin-top.c b/tools/perf/builtin-top.c
+index c668b0a..1c807c3 100644
+--- a/tools/perf/builtin-top.c
++++ b/tools/perf/builtin-top.c
+@@ -535,7 +535,7 @@ static bool perf_top__handle_keypress(struct perf_top *top, int c)
+ 	return ret;
+ }
+ 
+-#ifdef CONFIG_TUI
++#if defined(CONFIG_TUI) || !defined(CONFIG_KBUILD)
+ static void perf_top__sort_new_samples(void *arg)
+ {
+ 	struct perf_top *t = arg;
+@@ -958,7 +958,7 @@ static int __cmd_top(struct perf_top *top)
+ 
+ 	ret = -1;
+ 
+-#ifdef CONFIG_TUI
++#if defined(CONFIG_TUI) || !defined(CONFIG_KBUILD)
+ 	if (use_browser > 0)
+ 		display_fn = display_thread_tui;
+ #endif
+diff --git a/tools/perf/perf.c b/tools/perf/perf.c
+index 8dd6f6f..b094379 100644
+--- a/tools/perf/perf.c
++++ b/tools/perf/perf.c
+@@ -92,8 +92,10 @@ static struct cmd_struct commands[] = {
+ #ifdef CONFIG_BUILTIN_KVM
+ 	{ "kvm",	cmd_kvm,	0 },
+ #endif
++#ifdef CONFIG_BUILTIN_TEST
+ 	{ "test",	cmd_test,	0 },
+-#if defined HAVE_LIBAUDIT_SUPPORT && defined CONFIG_BUILTIN_TRACE
++#endif
++#ifdef CONFIG_BUILTIN_TRACE
+ 	{ "trace",	cmd_trace,	0 },
+ #endif
+ #ifdef CONFIG_BUILTIN_INJECT
+@@ -524,7 +526,7 @@ int main(int argc, const char **argv)
+ 		goto out;
+ 	}
+ 	if (!prefixcmp(cmd, "trace")) {
+-#ifdef HAVE_LIBAUDIT_SUPPORT
++#ifdef CONFIG_BUILTIN_TRACE
+ 		set_buildid_dir();
+ 		setup_path();
+ 		argv[0] = "trace";
+@@ -548,13 +550,17 @@ int main(int argc, const char **argv)
+ 	} else {
+ 		/* The user didn't specify a command; give them help */
+ 		printf("\n usage: %s\n\n", perf_usage_string);
++#ifdef CONFIG_BUILTIN_HELP
+ 		list_common_cmds_help();
+ 		printf("\n %s\n\n", perf_more_info_string);
++#endif
+ 		goto out;
+ 	}
+ 	cmd = argv[0];
+ 
++#ifdef CONFIG_BUILTIN_TEST
+ 	test_attr__init();
++#endif
+ 
+ 	/*
+ 	 * We use PATH to find perf commands, but we prepend some higher
+diff --git a/tools/perf/ui/browsers/scripts.c b/tools/perf/ui/browsers/scripts.c
+index 402d2bd..128988d 100644
+--- a/tools/perf/ui/browsers/scripts.c
++++ b/tools/perf/ui/browsers/scripts.c
+@@ -59,7 +59,11 @@ static int list_scripts(char *script_name)
+ 		paths[i] = names[i] + SCRIPT_NAMELEN;
+ 	}
+ 
++#ifdef CONFIG_BUILTIN_SCRIPT
+ 	num = find_scripts(names, paths);
++#else
++	num = 0;
++#endif
+ 	if (num > 0) {
+ 		choice = ui__popup_menu(num, names);
+ 		if (choice < num && choice >= 0) {
+diff --git a/tools/perf/ui/setup.c b/tools/perf/ui/setup.c
+index ec7fd36..efc2b21 100644
+--- a/tools/perf/ui/setup.c
++++ b/tools/perf/ui/setup.c
+@@ -77,7 +77,7 @@ void setup_browser(bool fallback_to_pager)
+ 		       PERF_GTK_DSO);
+ 		sleep(1);
+ 		/* fall through */
+-#ifdef CONFIG_TUI
++#if defined(CONFIG_TUI) || !defined(CONFIG_KBUILD)
+ 	case 1:
+ 		use_browser = 1;
+ 		if (ui__init() == 0)
+@@ -92,13 +92,13 @@ void setup_browser(bool fallback_to_pager)
+ 	}
+ }
+ 
+-void exit_browser(bool wait_for_ok)
++void exit_browser(bool wait_for_ok __maybe_unused)
+ {
+ 	switch (use_browser) {
+ 	case 2:
+ 		exit_gtk_browser(wait_for_ok);
+ 		break;
+-#ifdef CONFIG_TUI
++#if defined(CONFIG_TUI) || !defined(CONFIG_KBUILD)
+ 	case 1:
+ 		ui__exit(wait_for_ok);
+ 		break;
 -- 
-2.0.0
+1.9.3
 
--- 
-Regards/Gruss,
-    Boris.
-
-Sent from a fat crate under my desk. Formatting is fine.
---
