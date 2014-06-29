@@ -1,96 +1,219 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from outrelay06.libero.it ([212.52.84.110]:43741 "EHLO
-	outrelay06.libero.it" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752851AbaF0UV5 (ORCPT
+Received: from bombadil.infradead.org ([198.137.202.9]:58756 "EHLO
+	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751614AbaF2CXg (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 27 Jun 2014 16:21:57 -0400
-Message-ID: <53A16E6603332939@outrelay06.libero.it> (added by
-	    postmaster@outrelay06.libero.it)
-Reply-To: <mrsjacquelinemurchi@gmail.com>
-From: "Frau Jacqueline Benett-Baggs Murchie"
-	<mrsjacquelinegt_2010@libero.it>
-Subject: KANN ICH DEPONIEREN 18.000.000,00 GBP IN IHREM KONTO ?
-Date: Sat, 28 Jun 2014 01:51:42 +0530
+	Sat, 28 Jun 2014 22:23:36 -0400
+Message-ID: <53AF78A7.8050106@infradead.org>
+Date: Sat, 28 Jun 2014 19:23:35 -0700
+From: Randy Dunlap <rdunlap@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="Windows-1251"
+Subject: Re: [PATCH 1/4] Documentation: use subdir-y to avoid unnecessary
+ built-in.o files
+References: <1397743910-18391-1-git-send-email-pefoley2@pefoley.com>
+In-Reply-To: <1397743910-18391-1-git-send-email-pefoley2@pefoley.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: Peter Foley <pefoley2@pefoley.com>, linux-kernel@vger.kernel.org
+Cc: linux-doc@vger.kernel.org, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
-Guten Tag ,
+On 04/17/14 07:11, Peter Foley wrote:
+> Change the Documentation makefiles from obj-m to subdir-y
+> to avoid generating unnecessary built-in.o files since nothing
+> in Documentation/ is ever linked in to vmlinux.
+> 
+> Signed-off-by: Peter Foley <pefoley2@pefoley.com>
+
+Hi Michal,
+
+Does this look good to you?
+I don't have enough makefile fu (or is it foo?) to judge this.
+
+Thanks.
+
+> ---
+>  Documentation/Makefile                         | 6 +++---
+>  Documentation/accounting/Makefile              | 3 ---
+>  Documentation/auxdisplay/Makefile              | 3 ---
+>  Documentation/filesystems/Makefile             | 3 ---
+>  Documentation/ia64/Makefile                    | 3 ---
+>  Documentation/laptops/Makefile                 | 3 ---
+>  Documentation/misc-devices/Makefile            | 1 +
+>  Documentation/misc-devices/mei/Makefile        | 3 ---
+>  Documentation/networking/Makefile              | 8 +-------
+>  Documentation/networking/timestamping/Makefile | 3 ---
+>  Documentation/pcmcia/Makefile                  | 3 ---
+>  Documentation/spi/Makefile                     | 3 ---
+>  Documentation/timers/Makefile                  | 3 ---
+>  Documentation/watchdog/Makefile                | 1 +
+>  Documentation/watchdog/src/Makefile            | 3 ---
+>  15 files changed, 6 insertions(+), 43 deletions(-)
+>  create mode 100644 Documentation/misc-devices/Makefile
+>  create mode 100644 Documentation/watchdog/Makefile
+> 
+> diff --git a/Documentation/Makefile b/Documentation/Makefile
+> index 31d302b..605f84f 100644
+> --- a/Documentation/Makefile
+> +++ b/Documentation/Makefile
+> @@ -1,3 +1,3 @@
+> -obj-m := DocBook/ accounting/ auxdisplay/ connector/ \
+> -	filesystems/ filesystems/configfs/ ia64/ laptops/ networking/ \
+> -	pcmcia/ spi/ timers/ watchdog/src/ misc-devices/mei/
+> +subdir-y := DocBook accounting auxdisplay connector \
+> +	filesystems filesystems ia64 laptops networking \
+> +	pcmcia spi timers watchdog misc-devices
+> diff --git a/Documentation/accounting/Makefile b/Documentation/accounting/Makefile
+> index 31929eb..7e232cb 100644
+> --- a/Documentation/accounting/Makefile
+> +++ b/Documentation/accounting/Makefile
+> @@ -1,6 +1,3 @@
+> -# kbuild trick to avoid linker error. Can be omitted if a module is built.
+> -obj- := dummy.o
+> -
+>  # List of programs to build
+>  hostprogs-y := getdelays
+>  
+> diff --git a/Documentation/auxdisplay/Makefile b/Documentation/auxdisplay/Makefile
+> index 51fe233..ada4dac 100644
+> --- a/Documentation/auxdisplay/Makefile
+> +++ b/Documentation/auxdisplay/Makefile
+> @@ -1,6 +1,3 @@
+> -# kbuild trick to avoid linker error. Can be omitted if a module is built.
+> -obj- := dummy.o
+> -
+>  # List of programs to build
+>  hostprogs-y := cfag12864b-example
+>  
+> diff --git a/Documentation/filesystems/Makefile b/Documentation/filesystems/Makefile
+> index a5dd114..883010c 100644
+> --- a/Documentation/filesystems/Makefile
+> +++ b/Documentation/filesystems/Makefile
+> @@ -1,6 +1,3 @@
+> -# kbuild trick to avoid linker error. Can be omitted if a module is built.
+> -obj- := dummy.o
+> -
+>  # List of programs to build
+>  hostprogs-y := dnotify_test
+>  
+> diff --git a/Documentation/ia64/Makefile b/Documentation/ia64/Makefile
+> index b75db69..d493163 100644
+> --- a/Documentation/ia64/Makefile
+> +++ b/Documentation/ia64/Makefile
+> @@ -1,6 +1,3 @@
+> -# kbuild trick to avoid linker error. Can be omitted if a module is built.
+> -obj- := dummy.o
+> -
+>  # List of programs to build
+>  hostprogs-y := aliasing-test
+>  
+> diff --git a/Documentation/laptops/Makefile b/Documentation/laptops/Makefile
+> index 5cb144a..0abe44f 100644
+> --- a/Documentation/laptops/Makefile
+> +++ b/Documentation/laptops/Makefile
+> @@ -1,6 +1,3 @@
+> -# kbuild trick to avoid linker error. Can be omitted if a module is built.
+> -obj- := dummy.o
+> -
+>  # List of programs to build
+>  hostprogs-y := dslm
+>  
+> diff --git a/Documentation/misc-devices/Makefile b/Documentation/misc-devices/Makefile
+> new file mode 100644
+> index 0000000..e2b7aa4
+> --- /dev/null
+> +++ b/Documentation/misc-devices/Makefile
+> @@ -0,0 +1 @@
+> +subdir-y := mei
+> diff --git a/Documentation/misc-devices/mei/Makefile b/Documentation/misc-devices/mei/Makefile
+> index 00e8c3e..d758047 100644
+> --- a/Documentation/misc-devices/mei/Makefile
+> +++ b/Documentation/misc-devices/mei/Makefile
+> @@ -1,6 +1,3 @@
+> -# kbuild trick to avoid linker error. Can be omitted if a module is built.
+> -obj- := dummy.o
+> -
+>  # List of programs to build
+>  hostprogs-y := mei-amt-version
+>  HOSTCFLAGS_mei-amt-version.o += -I$(objtree)/usr/include
+> diff --git a/Documentation/networking/Makefile b/Documentation/networking/Makefile
+> index 0aa1ac9..4c5d7c4 100644
+> --- a/Documentation/networking/Makefile
+> +++ b/Documentation/networking/Makefile
+> @@ -1,7 +1 @@
+> -# kbuild trick to avoid linker error. Can be omitted if a module is built.
+> -obj- := dummy.o
+> -
+> -# Tell kbuild to always build the programs
+> -always := $(hostprogs-y)
+> -
+> -obj-m := timestamping/
+> +subdir-y := timestamping
+> diff --git a/Documentation/networking/timestamping/Makefile b/Documentation/networking/timestamping/Makefile
+> index d934afc..bbe6f81 100644
+> --- a/Documentation/networking/timestamping/Makefile
+> +++ b/Documentation/networking/timestamping/Makefile
+> @@ -1,6 +1,3 @@
+> -# kbuild trick to avoid linker error. Can be omitted if a module is built.
+> -obj- := dummy.o
+> -
+>  # List of programs to build
+>  hostprogs-y := timestamping hwtstamp_config
+>  
+> diff --git a/Documentation/pcmcia/Makefile b/Documentation/pcmcia/Makefile
+> index accde87..47a8fa1 100644
+> --- a/Documentation/pcmcia/Makefile
+> +++ b/Documentation/pcmcia/Makefile
+> @@ -1,6 +1,3 @@
+> -# kbuild trick to avoid linker error. Can be omitted if a module is built.
+> -obj- := dummy.o
+> -
+>  # List of programs to build
+>  hostprogs-y := crc32hash
+>  
+> diff --git a/Documentation/spi/Makefile b/Documentation/spi/Makefile
+> index a5b03c8..efa2558 100644
+> --- a/Documentation/spi/Makefile
+> +++ b/Documentation/spi/Makefile
+> @@ -1,6 +1,3 @@
+> -# kbuild trick to avoid linker error. Can be omitted if a module is built.
+> -obj- := dummy.o
+> -
+>  # List of programs to build
+>  hostprogs-y := spidev_test spidev_fdx
+>  
+> diff --git a/Documentation/timers/Makefile b/Documentation/timers/Makefile
+> index 73f75f8..6c09ee6 100644
+> --- a/Documentation/timers/Makefile
+> +++ b/Documentation/timers/Makefile
+> @@ -1,6 +1,3 @@
+> -# kbuild trick to avoid linker error. Can be omitted if a module is built.
+> -obj- := dummy.o
+> -
+>  # List of programs to build
+>  hostprogs-$(CONFIG_X86) := hpet_example
+>  
+> diff --git a/Documentation/watchdog/Makefile b/Documentation/watchdog/Makefile
+> new file mode 100644
+> index 0000000..6018f45
+> --- /dev/null
+> +++ b/Documentation/watchdog/Makefile
+> @@ -0,0 +1 @@
+> +subdir-y := src
+> diff --git a/Documentation/watchdog/src/Makefile b/Documentation/watchdog/src/Makefile
+> index 40e5f46..4a892c3 100644
+> --- a/Documentation/watchdog/src/Makefile
+> +++ b/Documentation/watchdog/src/Makefile
+> @@ -1,6 +1,3 @@
+> -# kbuild trick to avoid linker error. Can be omitted if a module is built.
+> -obj- := dummy.o
+> -
+>  # List of programs to build
+>  hostprogs-y := watchdog-simple watchdog-test
+>  
+> 
 
 
-  Bitte nehmen Sie meine aufrichtigen Entschuldigungen an, wenn meine E-mail Ihre
- pers?nliche Ethik nicht trifft.
-
-
-  F?r ich wei?, dass dies wie ein vollst?ndiges Eindringen zu Ihrer Ruhe scheinen
- kann, aber zurzeit ,dies ist meine Option f?r Kommunikation zu Ihnen.
-  Dies k?nnte fremd oder wahrscheinlich unwahr scheinen,wegen der Hoehe von
- Ausschuss E-mail,die wir t?glich empfangen, aber ich glaube, dass dies noch der
- echteste Weg ist, einen wahren Charakter zu kontaktieren.Ich heisse Frau
- Jacqueline Benett-Baggs Murchie {Eine Vereinigten Staaten von amerikanischer
- Frau},eine Witwe zu Sp?tem Herrn Benett-Baggs Murchie {Mein Ehemann hat mit
- einem ?l refinary Lukoil in Russland f?r 31 Jahre gearbeitet} Vor seinem
- tragischen Tod in Japan 11. M?rz. 2011.
-
-
-  Mein Ehemann war auf einer Gesch?ftsreise nach Japan Wenn der h?ssliche
- Vorfall, der ihn von mir weggenommen hat, gestreikt hat. Hier ist eine
- Verbindung f?r Fotos der Katastrophe {http://www.boston.com/bigpicture/2011/03/massive_earthquake_hits_japan.h
- tml}Ich
- bin 74years alt und leide an lange Zeit Krebs von der Speiser?hre. Ich bin jetzt
- im Krankenhaus {NCI Hospital PT 13717, Jalan BBN 2/1, Putra Nilai, Negeri
- Sembilan, 71800], Malaysia.
-
-
-  Von allen Anzeigen verschlechtert sich meine Bedingung wirklich und es ist
- ziemlich offensichtlich, dass ich mehr als zwei Monate {gem?? medizinischen
- Berichten von einem Arzt}nicht leben werde.Dies ist, weil die Krebsphase zu
- einer sehr schlechten Phase erreichen hat.Mein sp?ter Ehemann war sehr
- wohlhabend und reich und nach seinem Tod,ich habe alle sein Gesch?ft und
- Reichtum geerbt.
-
-
-  Mein Ehemann hat die Summe von ?18.000.000,00 GBP mit einer Bank in Schottland
- deponiert, Mein Ehemann und ich haben geplant, dieses Geld Zu Benutzen, Und
- ?ffnungs-h?he Eine Gewebefirma Vor Dem Japan Tsunami Krise. Mein Ehemann hat
- mich der Nutznie?er des Treuhandverm?gens genannt, weil wir keine Kinder gehabt
- haben.
-  Da ich nichts habe, f?r mehr zu leben.Der Arzt hat mir geraten,dass ich f?r
- mehr als zwei Monate nicht leben kann,so habe ich mich jetzt entschieden, Teil
- von diesem Reichtum zu teilen,zur Entwicklung von dem wenigen privilegierten
- Leute in Europa beizutragen,da dies die Wunsch von meinem Ehemann Herrn
- Benett-Baggs Murchie bevor seinem Tod ist.
-
-
-  Ich habe Behandlung f?r meinen ?sophagealen Krebs erlebt. Ich habe, da meine
- F?higkeit verloren hat, zu reden, und meine ?rzte haben mir erz?hlt, dass ich
- nur ein paar Wochen habe, zu leben.Des meines Ehemanns Familienwunsch mich
- Verstorbene Um diesen Reichtum zu erlangen. Ich kann mit der Qual nicht leben,
- von dieser riesigen Verantwortung zu welchem des meines sp?ten Ehemanns
- Familienmitglieds anzuvertrauen Weil sie Ungl?ubigen sind. Ich will diesen
- Fonds, zu WOHLT?TIGKEITEN ORGANISATIONEN verteilt zu werden. Bitte, Ich will
- Sie, mir Vertreter zu helfen, als der Nutznie?er, die Fonds von der Bank zu
- sammeln und verteilen Sie zu Wohlt?tigkeit.
-
-
-  Ich bete ehrlich,dass dieses Geld,wenn es zu Ihnen ?berweist ist,sollen Sie
- versichern,dass es f?r den gesagten Zweck benutzt werden muss.Weil ich darauf
- gekommen bin,dass jene Reichtumerwerbung ohne Christus zu erfahren, ist
- Eitelkeit auf Eitelkeit.F?r Ihre Hilfe,habe ich 30% von diesem gesamten Geld
- {?18.000.000,00}f?r Sie gelegt, auf Grund Ihrer pers?nlichen Bem?hung, die Sie
- f?r Ihren pers?nlichen Gebrauch sofort das Geld auf Sie ?berweist ist,
- abziehenwerden.Zuletzt,ich bete und hoffe, dass wenn das Geld schlie?lich auf
- Sie ?berweisen ist, werden Sie es umsichtig gem?? meinem Willen und Gott
- benutzen {der 70% vom Geld zum wenigen privilegierten in Europa zu spenden}.
-
-
-
-
- Ihres in Christus.
-
-
- Frau Jacqueline Benett-Baggs Murchie
- E-MAIL : mrsjacquelinemurchi@gmail.com
+-- 
+~Randy
