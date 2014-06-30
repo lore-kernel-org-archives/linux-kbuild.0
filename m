@@ -1,46 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.skyhub.de ([78.46.96.112]:44492 "EHLO mail.skyhub.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753384AbaF2UNM (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 29 Jun 2014 16:13:12 -0400
-Date: Sun, 29 Jun 2014 22:13:08 +0200
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: 3d3d6b847420 ("kbuild: LLVMLinux: Adapt warnings for compilation
- with clang")
-Message-ID: <20140629201308.GC12943@pd.tnic>
-References: <20140616130751.GD8170@pd.tnic>
- <539F0D55.31207.1DF87EFF@pageexec.freemail.hu>
- <2065274.H8oo5iWEkB@aragorn.auenland.lan>
+Received: from g4t3425.houston.hp.com ([15.201.208.53]:28902 "EHLO
+	g4t3425.houston.hp.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753367AbaF3DRr (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 29 Jun 2014 23:17:47 -0400
+From: "Li, Zhen-Hua" <zhen-hual@hp.com>
+Subject: [PATCH 1/1] script/kconfig: remove a warning for menucofig
+Date: Mon, 30 Jun 2014 11:16:27 +0800
+Message-Id: <1404098187-9638-1-git-send-email-zhen-hual@hp.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <2065274.H8oo5iWEkB@aragorn.auenland.lan>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jan-Simon =?utf-8?Q?M=C3=B6ller?= <dl9pf@gmx.de>
-Cc: pageexec@freemail.hu, Behan Webster <behanw@converseincode.com>, Mark Charlebois <mcharleb@gmail.com>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: "Li, Zhen-Hua" <zhen-hual@hp.com>
 
-Hi,
+There is a warning when run "make menuconfig".
 
-On Mon, Jun 16, 2014 at 05:48:01PM +0200, Jan-Simon Möller wrote:
-> Ok, let's wrap this case with 
-> 
-> ifeq ($(COMPILER),clang)
-> ...
-> endif
-> 
-> And we'll update the stale entries.
-> 
-> Patch to follow after some testing.
+scripts/kconfig/menu.c: In function ‘get_symbol_str’:
+scripts/kconfig/menu.c:591:18: warning: ‘jump’ may be used uninitialized in
+this function [-Wmaybe-uninitialized]
+     jump->offset = strlen(r->s);
+                  ^
+scripts/kconfig/menu.c:551:19: note: ‘jump’ was declared here
+  struct jump_key *jump;
+                   ^
 
-any progress with the testing or should we simply revert?
+It is because the compiler think "jump" is not initialized, though in fact
+it is already initialized.
 
-Thanks.
+Signed-off-by: Li, Zhen-Hua <zhen-hual@hp.com>
+---
+ scripts/kconfig/menu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+index a26cc5d..584e0fc 100644
+--- a/scripts/kconfig/menu.c
++++ b/scripts/kconfig/menu.c
+@@ -548,7 +548,7 @@ static void get_prompt_str(struct gstr *r, struct property *prop,
+ {
+ 	int i, j;
+ 	struct menu *submenu[8], *menu, *location = NULL;
+-	struct jump_key *jump;
++	struct jump_key *jump = NULL;
+ 
+ 	str_printf(r, _("Prompt: %s\n"), _(prop->text));
+ 	menu = prop->menu->parent;
 -- 
-Regards/Gruss,
-    Boris.
+2.0.0-rc0
 
-Sent from a fat crate under my desk. Formatting is fine.
---
