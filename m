@@ -1,70 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp2-g21.free.fr ([212.27.42.2]:5991 "EHLO smtp2-g21.free.fr"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756501AbaF3TNW (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 30 Jun 2014 15:13:22 -0400
-From: Yann Droneaud <ydroneaud@opteya.com>
-Subject: [PATCH] Documentation/make/headers_install.txt: update documentation
-Date: Mon, 30 Jun 2014 21:11:19 +0200
-Message-Id: <1404155479-5638-1-git-send-email-ydroneaud@opteya.com>
+Received: from g4t3425.houston.hp.com ([15.201.208.53]:5646 "EHLO
+	g4t3425.houston.hp.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751563AbaF3XLi (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 30 Jun 2014 19:11:38 -0400
+From: "Li, Zhen-Hua" <zhen-hual@hp.com>
+Subject: RE: [PATCH 1/1] script/kconfig: remove a warning for menucofig
+Date: Mon, 30 Jun 2014 23:10:32 +0000
+Message-ID: <1267BB84A242B24E81E0C0C8955CFFC061A30C1D@G9W0343.americas.hpqcorp.net>
+References: <1404098187-9638-1-git-send-email-zhen-hual@hp.com>
+ <53B1982F.4030504@gmx.de>
+In-Reply-To: <53B1982F.4030504@gmx.de>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org
-Cc: Yann Droneaud <ydroneaud@opteya.com>, "Kirill A. Shutemov" <kirill@shutemov.name>, Michal Marek <mmarek@suse.cz>, David Woodhouse <dwmw2@infradead.org>, Rob Landley <rob@landley.net>, Sam Ravnborg <sam@ravnborg.org>
+To: Heinrich Schuchardt <xypron.glpk@gmx.de>, "Yann E. MORIN" <yann.morin.1998@free.fr>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 
-Documentation in make/headers_install.txt is not
-up to date regarding:
-- way to list the various architectures;
-- path where the headers are installed.
-
-This patch try to fix these issues.
-
-Cc: Kirill A. Shutemov <kirill@shutemov.name>
-Cc: Michal Marek <mmarek@suse.cz>
-Cc: David Woodhouse <dwmw2@infradead.org>
-Cc: Rob Landley <rob@landley.net>
-Cc: Sam Ravnborg <sam@ravnborg.org>
-Signed-off-by: Yann Droneaud <ydroneaud@opteya.com>
----
- Documentation/make/headers_install.txt | 15 ++++++++-------
- 1 file changed, 8 insertions(+), 7 deletions(-)
-
-diff --git a/Documentation/make/headers_install.txt b/Documentation/make/headers_install.txt
-index 951eb9f1e040..8b6751f10dd3 100644
---- a/Documentation/make/headers_install.txt
-+++ b/Documentation/make/headers_install.txt
-@@ -24,23 +24,24 @@ The "make headers_install" command can be run in the top level directory of the
- kernel source code (or using a standard out-of-tree build).  It takes two
- optional arguments:
- 
--  make headers_install ARCH=i386 INSTALL_HDR_PATH=/usr/include
-+  make headers_install ARCH=i386 INSTALL_HDR_PATH=/usr
- 
- ARCH indicates which architecture to produce headers for, and defaults to the
--current architecture.  The linux/asm directory of the exported kernel headers
--is platform-specific, to see a complete list of supported architectures use
-+current architecture.  The asm/ directory of the exported kernel headers
-+is platform-specific, to see a list of supported architectures use
- the command:
- 
--  ls -d include/asm-* | sed 's/.*-//'
-+  /bin/ls -1 arch/*/include/asm/Kbuild | sed -e 's,^arch/,,' \
-+                                             -e 's,/include/asm/Kbuild$,,'
- 
--INSTALL_HDR_PATH indicates where to install the headers.  It defaults to
--"./usr/include".
-+INSTALL_HDR_PATH indicates where to create include/ directory to install the
-+headers. It defaults to "./usr/".
- 
- The command "make headers_install_all" exports headers for all architectures
- simultaneously.  (This is mostly of interest to distribution maintainers,
- who create an architecture-independent tarball from the resulting include
- directory.)  You also can use HDR_ARCH_LIST to specify list of architectures.
--Remember to provide the appropriate linux/asm directory via "mv" or "ln -s"
-+Remember to provide the appropriate asm/ directory via "mv" or "ln -s"
- before building a C library with headers exported this way.
- 
- The kernel header export infrastructure is maintained by David Woodhouse
--- 
-1.9.3
-
+V2hlbiBtYWxsb2MgZm9yIGp1bXAsIA0KaWYgKGhlYWQgJiYgbG9jYXRpb24pIHsNCglqdW1wID0g
+eG1hbGxvYyhzaXplb2Yoc3RydWN0IGp1bXBfa2V5KSk7DQoJLi4uLg0KfQ0KQW5kIGhlcmUgaXQg
+aXMgdXNlZDoNCmlmIChoZWFkICYmIGxvY2F0aW9uICYmIG1lbnUgPT0gbG9jYXRpb24pDQoJanVt
+cC0+b2Zmc2V0ID0gc3RybGVuKHItPnMpOw0KDQoNClNvIEkgdGhpbmsgd2hlbiBqdW1wIGlzIHVz
+ZWQsIGl0IG11c3Qgbm90IGJlIE5VTEw7IHRoZW4gIT1OVUxMIGlzIG5vdCBuZWVkZWQuDQotLS0t
+LU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KRnJvbTogSGVpbnJpY2ggU2NodWNoYXJkdCBbbWFpbHRv
+Onh5cHJvbi5nbHBrQGdteC5kZV0gDQpTZW50OiBUdWVzZGF5LCBKdWx5IDAxLCAyMDE0IDE6MDMg
+QU0NClRvOiBMaSwgWmhlbi1IdWE7IFlhbm4gRS4gTU9SSU47IGxpbnV4LWtidWlsZEB2Z2VyLmtl
+cm5lbC5vcmc7IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmcNClN1YmplY3Q6IFJlOiBbUEFU
+Q0ggMS8xXSBzY3JpcHQva2NvbmZpZzogcmVtb3ZlIGEgd2FybmluZyBmb3IgbWVudWNvZmlnDQoN
+Ck9uIDMwLjA2LjIwMTQgMDU6MTYsIExpLCBaaGVuLUh1YSB3cm90ZToNCj4gVGhlcmUgaXMgYSB3
+YXJuaW5nIHdoZW4gcnVuICJtYWtlIG1lbnVjb25maWciLg0KPg0KPiBzY3JpcHRzL2tjb25maWcv
+bWVudS5jOiBJbiBmdW5jdGlvbiDigJhnZXRfc3ltYm9sX3N0cuKAmToNCj4gc2NyaXB0cy9rY29u
+ZmlnL21lbnUuYzo1OTE6MTg6IHdhcm5pbmc6IOKAmGp1bXDigJkgbWF5IGJlIHVzZWQgdW5pbml0
+aWFsaXplZCBpbg0KPiB0aGlzIGZ1bmN0aW9uIFstV21heWJlLXVuaW5pdGlhbGl6ZWRdDQo+ICAg
+ICAgIGp1bXAtPm9mZnNldCA9IHN0cmxlbihyLT5zKTsNCj4gICAgICAgICAgICAgICAgICAgIF4N
+Cj4gc2NyaXB0cy9rY29uZmlnL21lbnUuYzo1NTE6MTk6IG5vdGU6IOKAmGp1bXDigJkgd2FzIGRl
+Y2xhcmVkIGhlcmUNCj4gICAgc3RydWN0IGp1bXBfa2V5ICpqdW1wOw0KPiAgICAgICAgICAgICAg
+ICAgICAgIF4NCj4NCj4gSXQgaXMgYmVjYXVzZSB0aGUgY29tcGlsZXIgdGhpbmsgImp1bXAiIGlz
+IG5vdCBpbml0aWFsaXplZCwgdGhvdWdoIGluIGZhY3QNCj4gaXQgaXMgYWxyZWFkeSBpbml0aWFs
+aXplZC4NCj4NCj4gU2lnbmVkLW9mZi1ieTogTGksIFpoZW4tSHVhIDx6aGVuLWh1YWxAaHAuY29t
+Pg0KPiAtLS0NCj4gICBzY3JpcHRzL2tjb25maWcvbWVudS5jIHwgMiArLQ0KPiAgIDEgZmlsZSBj
+aGFuZ2VkLCAxIGluc2VydGlvbigrKSwgMSBkZWxldGlvbigtKQ0KPg0KPiBkaWZmIC0tZ2l0IGEv
+c2NyaXB0cy9rY29uZmlnL21lbnUuYyBiL3NjcmlwdHMva2NvbmZpZy9tZW51LmMNCj4gaW5kZXgg
+YTI2Y2M1ZC4uNTg0ZTBmYyAxMDA2NDQNCj4gLS0tIGEvc2NyaXB0cy9rY29uZmlnL21lbnUuYw0K
+PiArKysgYi9zY3JpcHRzL2tjb25maWcvbWVudS5jDQo+IEBAIC01NDgsNyArNTQ4LDcgQEAgc3Rh
+dGljIHZvaWQgZ2V0X3Byb21wdF9zdHIoc3RydWN0IGdzdHIgKnIsIHN0cnVjdCBwcm9wZXJ0eSAq
+cHJvcCwNCj4gICB7DQo+ICAgCWludCBpLCBqOw0KPiAgIAlzdHJ1Y3QgbWVudSAqc3VibWVudVs4
+XSwgKm1lbnUsICpsb2NhdGlvbiA9IE5VTEw7DQo+IC0Jc3RydWN0IGp1bXBfa2V5ICpqdW1wOw0K
+PiArCXN0cnVjdCBqdW1wX2tleSAqanVtcCA9IE5VTEw7DQo+DQo+ICAgCXN0cl9wcmludGYociwg
+XygiUHJvbXB0OiAlc1xuIiksIF8ocHJvcC0+dGV4dCkpOw0KPiAgIAltZW51ID0gcHJvcC0+bWVu
+dS0+cGFyZW50Ow0KPg0KSGVsbG8gWmhlbi1IdWEsDQoNCnRoZSBwYXRjaCBsb29rcyBpbmNvbXBs
+ZXRlIHRvIG1lLiBBIGNoZWNrDQpqdW1wICE9IE5VTEwNCnNob3VsZCBiZSBhZGRlZCBiZWZvcmUg
+YWNjZXNzaW5nIHBhcnRzIG9mIHN0cnVjdHVyZSBqdW1wX2tleS4NCg0KQmVzdCByZWdhcmRzDQoN
+CkhlaW5yaWNoIFNjaHVjaGFyZHQNCg==
