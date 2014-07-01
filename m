@@ -1,56 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from g4t3425.houston.hp.com ([15.201.208.53]:5646 "EHLO
-	g4t3425.houston.hp.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751563AbaF3XLi (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 30 Jun 2014 19:11:38 -0400
-From: "Li, Zhen-Hua" <zhen-hual@hp.com>
-Subject: RE: [PATCH 1/1] script/kconfig: remove a warning for menucofig
-Date: Mon, 30 Jun 2014 23:10:32 +0000
-Message-ID: <1267BB84A242B24E81E0C0C8955CFFC061A30C1D@G9W0343.americas.hpqcorp.net>
-References: <1404098187-9638-1-git-send-email-zhen-hual@hp.com>
- <53B1982F.4030504@gmx.de>
-In-Reply-To: <53B1982F.4030504@gmx.de>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+Received: from mail.skyhub.de ([78.46.96.112]:49737 "EHLO mail.skyhub.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751417AbaGAKMU (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 1 Jul 2014 06:12:20 -0400
+Date: Tue, 1 Jul 2014 12:12:14 +0200
+From: Borislav Petkov <bp@alien8.de>
+Subject: Re: [PATCH] kbuild, LLVMLinux: only use warnings when using clang
+Message-ID: <20140701101214.GA14882@pd.tnic>
+References: <20140629201308.GC12943@pd.tnic>
+ <1404175346-12330-1-git-send-email-behanw@converseincode.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1404175346-12330-1-git-send-email-behanw@converseincode.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Heinrich Schuchardt <xypron.glpk@gmx.de>, "Yann E. MORIN" <yann.morin.1998@free.fr>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: behanw@converseincode.com
+Cc: mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, dl9pf@gmx.de, pageexec@freemail.hu, mcharleb@gmail.com
 
-V2hlbiBtYWxsb2MgZm9yIGp1bXAsIA0KaWYgKGhlYWQgJiYgbG9jYXRpb24pIHsNCglqdW1wID0g
-eG1hbGxvYyhzaXplb2Yoc3RydWN0IGp1bXBfa2V5KSk7DQoJLi4uLg0KfQ0KQW5kIGhlcmUgaXQg
-aXMgdXNlZDoNCmlmIChoZWFkICYmIGxvY2F0aW9uICYmIG1lbnUgPT0gbG9jYXRpb24pDQoJanVt
-cC0+b2Zmc2V0ID0gc3RybGVuKHItPnMpOw0KDQoNClNvIEkgdGhpbmsgd2hlbiBqdW1wIGlzIHVz
-ZWQsIGl0IG11c3Qgbm90IGJlIE5VTEw7IHRoZW4gIT1OVUxMIGlzIG5vdCBuZWVkZWQuDQotLS0t
-LU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KRnJvbTogSGVpbnJpY2ggU2NodWNoYXJkdCBbbWFpbHRv
-Onh5cHJvbi5nbHBrQGdteC5kZV0gDQpTZW50OiBUdWVzZGF5LCBKdWx5IDAxLCAyMDE0IDE6MDMg
-QU0NClRvOiBMaSwgWmhlbi1IdWE7IFlhbm4gRS4gTU9SSU47IGxpbnV4LWtidWlsZEB2Z2VyLmtl
-cm5lbC5vcmc7IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmcNClN1YmplY3Q6IFJlOiBbUEFU
-Q0ggMS8xXSBzY3JpcHQva2NvbmZpZzogcmVtb3ZlIGEgd2FybmluZyBmb3IgbWVudWNvZmlnDQoN
-Ck9uIDMwLjA2LjIwMTQgMDU6MTYsIExpLCBaaGVuLUh1YSB3cm90ZToNCj4gVGhlcmUgaXMgYSB3
-YXJuaW5nIHdoZW4gcnVuICJtYWtlIG1lbnVjb25maWciLg0KPg0KPiBzY3JpcHRzL2tjb25maWcv
-bWVudS5jOiBJbiBmdW5jdGlvbiDigJhnZXRfc3ltYm9sX3N0cuKAmToNCj4gc2NyaXB0cy9rY29u
-ZmlnL21lbnUuYzo1OTE6MTg6IHdhcm5pbmc6IOKAmGp1bXDigJkgbWF5IGJlIHVzZWQgdW5pbml0
-aWFsaXplZCBpbg0KPiB0aGlzIGZ1bmN0aW9uIFstV21heWJlLXVuaW5pdGlhbGl6ZWRdDQo+ICAg
-ICAgIGp1bXAtPm9mZnNldCA9IHN0cmxlbihyLT5zKTsNCj4gICAgICAgICAgICAgICAgICAgIF4N
-Cj4gc2NyaXB0cy9rY29uZmlnL21lbnUuYzo1NTE6MTk6IG5vdGU6IOKAmGp1bXDigJkgd2FzIGRl
-Y2xhcmVkIGhlcmUNCj4gICAgc3RydWN0IGp1bXBfa2V5ICpqdW1wOw0KPiAgICAgICAgICAgICAg
-ICAgICAgIF4NCj4NCj4gSXQgaXMgYmVjYXVzZSB0aGUgY29tcGlsZXIgdGhpbmsgImp1bXAiIGlz
-IG5vdCBpbml0aWFsaXplZCwgdGhvdWdoIGluIGZhY3QNCj4gaXQgaXMgYWxyZWFkeSBpbml0aWFs
-aXplZC4NCj4NCj4gU2lnbmVkLW9mZi1ieTogTGksIFpoZW4tSHVhIDx6aGVuLWh1YWxAaHAuY29t
-Pg0KPiAtLS0NCj4gICBzY3JpcHRzL2tjb25maWcvbWVudS5jIHwgMiArLQ0KPiAgIDEgZmlsZSBj
-aGFuZ2VkLCAxIGluc2VydGlvbigrKSwgMSBkZWxldGlvbigtKQ0KPg0KPiBkaWZmIC0tZ2l0IGEv
-c2NyaXB0cy9rY29uZmlnL21lbnUuYyBiL3NjcmlwdHMva2NvbmZpZy9tZW51LmMNCj4gaW5kZXgg
-YTI2Y2M1ZC4uNTg0ZTBmYyAxMDA2NDQNCj4gLS0tIGEvc2NyaXB0cy9rY29uZmlnL21lbnUuYw0K
-PiArKysgYi9zY3JpcHRzL2tjb25maWcvbWVudS5jDQo+IEBAIC01NDgsNyArNTQ4LDcgQEAgc3Rh
-dGljIHZvaWQgZ2V0X3Byb21wdF9zdHIoc3RydWN0IGdzdHIgKnIsIHN0cnVjdCBwcm9wZXJ0eSAq
-cHJvcCwNCj4gICB7DQo+ICAgCWludCBpLCBqOw0KPiAgIAlzdHJ1Y3QgbWVudSAqc3VibWVudVs4
-XSwgKm1lbnUsICpsb2NhdGlvbiA9IE5VTEw7DQo+IC0Jc3RydWN0IGp1bXBfa2V5ICpqdW1wOw0K
-PiArCXN0cnVjdCBqdW1wX2tleSAqanVtcCA9IE5VTEw7DQo+DQo+ICAgCXN0cl9wcmludGYociwg
-XygiUHJvbXB0OiAlc1xuIiksIF8ocHJvcC0+dGV4dCkpOw0KPiAgIAltZW51ID0gcHJvcC0+bWVu
-dS0+cGFyZW50Ow0KPg0KSGVsbG8gWmhlbi1IdWEsDQoNCnRoZSBwYXRjaCBsb29rcyBpbmNvbXBs
-ZXRlIHRvIG1lLiBBIGNoZWNrDQpqdW1wICE9IE5VTEwNCnNob3VsZCBiZSBhZGRlZCBiZWZvcmUg
-YWNjZXNzaW5nIHBhcnRzIG9mIHN0cnVjdHVyZSBqdW1wX2tleS4NCg0KQmVzdCByZWdhcmRzDQoN
-CkhlaW5yaWNoIFNjaHVjaGFyZHQNCg==
+On Mon, Jun 30, 2014 at 05:42:26PM -0700, behanw@converseincode.com wrote:
+> From: Behan Webster <behanw@converseincode.com>
+> 
+> Only consider clang warnings in Kbuild when using the clang compiler.
+> 
+> Signed-off-by: Behan Webster <behanw@converseincode.com>
+> ---
+>  scripts/Makefile.extrawarn | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
+> index 6564350..e350127 100644
+> --- a/scripts/Makefile.extrawarn
+> +++ b/scripts/Makefile.extrawarn
+> @@ -26,7 +26,7 @@ warning-1 += $(call cc-option, -Wmissing-include-dirs)
+>  warning-1 += $(call cc-option, -Wunused-but-set-variable)
+>  warning-1 += $(call cc-disable-warning, missing-field-initializers)
+>  
+> -# Clang
+> +ifeq ($(COMPILER),clang)
+>  warning-1 += $(call cc-disable-warning, initializer-overrides)
+>  warning-1 += $(call cc-disable-warning, unused-value)
+>  warning-1 += $(call cc-disable-warning, format)
+> @@ -35,6 +35,7 @@ warning-1 += $(call cc-disable-warning, sign-compare)
+>  warning-1 += $(call cc-disable-warning, format-zero-length)
+>  warning-1 += $(call cc-disable-warning, uninitialized)
+>  warning-1 += $(call cc-option, -fcatch-undefined-behavior)
+> +endif
+
+Ok, just to make sure I understand that whole use case correctly:
+
+The disabling of those warnings is really intended for the case where
+people build the kernel with "W=1" on the make cmdline *and* clang?
+
+Thanks.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+Sent from a fat crate under my desk. Formatting is fine.
+--
