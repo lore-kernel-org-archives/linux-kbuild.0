@@ -1,246 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from relay6-d.mail.gandi.net ([217.70.183.198]:52798 "EHLO
-	relay6-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753173AbaGaXsB (ORCPT
+Received: from mail-pa0-f54.google.com ([209.85.220.54]:60287 "EHLO
+	mail-pa0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750815AbaGAAm7 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 31 Jul 2014 19:48:01 -0400
-Date: Thu, 31 Jul 2014 16:47:46 -0700
-From: Josh Triplett <josh@joshtriplett.org>
-Subject: [PATCH 3/5] fs: Require designated initialization of structures
-Message-ID: <4f1751d0f5c25be383d09272d05dc7b24ea4f577.1406850006.git.josh@joshtriplett.org>
-References: <3130b0553b15518e3bef6d14c80280beed0f5ff9.1406850006.git.josh@joshtriplett.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3130b0553b15518e3bef6d14c80280beed0f5ff9.1406850006.git.josh@joshtriplett.org>
+	Mon, 30 Jun 2014 20:42:59 -0400
+Received: by mail-pa0-f54.google.com with SMTP id et14so9561502pad.13
+        for <linux-kbuild@vger.kernel.org>; Mon, 30 Jun 2014 17:42:59 -0700 (PDT)
+From: behanw@converseincode.com
+Subject: [PATCH] kbuild, LLVMLinux: only use warnings when using clang
+Date: Mon, 30 Jun 2014 17:42:26 -0700
+Message-Id: <1404175346-12330-1-git-send-email-behanw@converseincode.com>
+In-Reply-To: <20140629201308.GC12943@pd.tnic>
+References: <20140629201308.GC12943@pd.tnic>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: akpm@linux-foundation.org, "J. Bruce Fields" <bfields@fieldses.org>, Alexander Viro <viro@zeniv.linux.org.uk>, Christopher Li <sparse@chrisli.org>, Ingo Molnar <mingo@redhat.com>, Jeff Layton <jlayton@poochiereds.net>, Michal Marek <mmarek@suse.cz>, Neil Brown <neilb@suse.de>, Steven Rostedt <rostedt@goodmis.org>, linux-api@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org, linux-sparse@vger.kernel.org
+To: mmarek@suse.cz, bp@alien8.de
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, dl9pf@gmx.de, pageexec@freemail.hu, mcharleb@gmail.com, Behan Webster <behanw@converseincode.com>
 
-Mark various filesystem structures with __designated_init.  Fix the one
-and only instance of positional initialization of those structures.
+From: Behan Webster <behanw@converseincode.com>
 
-Signed-off-by: Josh Triplett <josh@joshtriplett.org>
+Only consider clang warnings in Kbuild when using the clang compiler.
+
+Signed-off-by: Behan Webster <behanw@converseincode.com>
 ---
- fs/ioctl.c         |  2 +-
- include/linux/fs.h | 45 +++++++++++++++++++++++----------------------
- 2 files changed, 24 insertions(+), 23 deletions(-)
+ scripts/Makefile.extrawarn | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/fs/ioctl.c b/fs/ioctl.c
-index 8ac3fad..2151968 100644
---- a/fs/ioctl.c
-+++ b/fs/ioctl.c
-@@ -174,7 +174,7 @@ static int ioctl_fiemap(struct file *filp, unsigned long arg)
- {
- 	struct fiemap fiemap;
- 	struct fiemap __user *ufiemap = (struct fiemap __user *) arg;
--	struct fiemap_extent_info fieinfo = { 0, };
-+	struct fiemap_extent_info fieinfo = { };
- 	struct inode *inode = file_inode(filp);
- 	struct super_block *sb = inode->i_sb;
- 	u64 len;
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index e11d60c..cec614b 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -366,7 +366,7 @@ struct address_space_operations {
- 	int (*swap_activate)(struct swap_info_struct *sis, struct file *file,
- 				sector_t *span);
- 	void (*swap_deactivate)(struct file *file);
--};
-+} __designated_init;
+diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
+index 6564350..e350127 100644
+--- a/scripts/Makefile.extrawarn
++++ b/scripts/Makefile.extrawarn
+@@ -26,7 +26,7 @@ warning-1 += $(call cc-option, -Wmissing-include-dirs)
+ warning-1 += $(call cc-option, -Wunused-but-set-variable)
+ warning-1 += $(call cc-disable-warning, missing-field-initializers)
  
- extern const struct address_space_operations empty_aops;
+-# Clang
++ifeq ($(COMPILER),clang)
+ warning-1 += $(call cc-disable-warning, initializer-overrides)
+ warning-1 += $(call cc-disable-warning, unused-value)
+ warning-1 += $(call cc-disable-warning, format)
+@@ -35,6 +35,7 @@ warning-1 += $(call cc-disable-warning, sign-compare)
+ warning-1 += $(call cc-disable-warning, format-zero-length)
+ warning-1 += $(call cc-disable-warning, uninitialized)
+ warning-1 += $(call cc-option, -fcatch-undefined-behavior)
++endif
  
-@@ -401,7 +401,7 @@ struct address_space {
- 	spinlock_t		private_lock;	/* for use by the address_space */
- 	struct list_head	private_list;	/* ditto */
- 	void			*private_data;	/* ditto */
--} __attribute__((aligned(sizeof(long))));
-+} __designated_init __attribute__((aligned(sizeof(long))));
- 	/*
- 	 * On most architectures that alignment is already the case; but
- 	 * must be enforced here for CRIS, to let the least significant bit
-@@ -444,7 +444,7 @@ struct block_device {
- 	int			bd_fsfreeze_count;
- 	/* Mutex for freeze */
- 	struct mutex		bd_fsfreeze_mutex;
--};
-+} __designated_init;
- 
- /*
-  * Radix-tree tags, for tagging dirty and writeback pages within the pagecache
-@@ -588,7 +588,7 @@ struct inode {
- #endif
- 
- 	void			*i_private; /* fs or device private pointer */
--};
-+} __designated_init;
- 
- static inline int inode_unhashed(struct inode *inode)
- {
-@@ -719,7 +719,7 @@ struct fown_struct {
- 	enum pid_type pid_type;	/* Kind of process group SIGIO should be sent to */
- 	kuid_t uid, euid;	/* uid/euid of process setting the owner */
- 	int signum;		/* posix.1b rt signal to be delivered on IO */
--};
-+} __designated_init;
- 
- /*
-  * Track a single file's readahead state
-@@ -733,7 +733,7 @@ struct file_ra_state {
- 	unsigned int ra_pages;		/* Maximum readahead window */
- 	unsigned int mmap_miss;		/* Cache miss stat for mmap accesses */
- 	loff_t prev_pos;		/* Cache last read() position */
--};
-+} __designated_init;
- 
- /*
-  * Check if @index falls in the readahead windows.
-@@ -781,14 +781,15 @@ struct file {
- 	struct list_head	f_tfile_llink;
- #endif /* #ifdef CONFIG_EPOLL */
- 	struct address_space	*f_mapping;
--} __attribute__((aligned(4)));	/* lest something weird decides that 2 is OK */
-+} __designated_init __attribute__((aligned(4)));
-+/* lest something weird decides that 2 is OK */
- 
- struct file_handle {
- 	__u32 handle_bytes;
- 	int handle_type;
- 	/* file identifier */
- 	unsigned char f_handle[0];
--};
-+} __designated_init;
- 
- static inline struct file *get_file(struct file *f)
- {
-@@ -838,7 +839,7 @@ typedef struct files_struct *fl_owner_t;
- struct file_lock_operations {
- 	void (*fl_copy_lock)(struct file_lock *, struct file_lock *);
- 	void (*fl_release_private)(struct file_lock *);
--};
-+} __designated_init;
- 
- struct lock_manager_operations {
- 	int (*lm_compare_owner)(struct file_lock *, struct file_lock *);
-@@ -847,7 +848,7 @@ struct lock_manager_operations {
- 	int (*lm_grant)(struct file_lock *, struct file_lock *, int);
- 	void (*lm_break)(struct file_lock *);
- 	int (*lm_change)(struct file_lock **, int);
--};
-+} __designated_init;
- 
- struct lock_manager {
- 	struct list_head list;
-@@ -909,7 +910,7 @@ struct file_lock {
- 			int state;		/* state of grant or error if -ve */
- 		} afs;
- 	} fl_u;
--};
-+} __designated_init;
- 
- /* The following constant reflects the upper bound of the file/locking space */
- #ifndef OFFSET_MAX
-@@ -1112,7 +1113,7 @@ struct fasync_struct {
- 	struct fasync_struct	*fa_next; /* singly linked list */
- 	struct file		*fa_file;
- 	struct rcu_head		fa_rcu;
--};
-+} __designated_init;
- 
- #define FASYNC_MAGIC 0x4601
- 
-@@ -1170,7 +1171,7 @@ struct sb_writers {
- #ifdef CONFIG_DEBUG_LOCK_ALLOC
- 	struct lockdep_map	lock_map[SB_FREEZE_LEVELS];
- #endif
--};
-+} __designated_init;
- 
- struct super_block {
- 	struct list_head	s_list;		/* Keep this first */
-@@ -1258,7 +1259,7 @@ struct super_block {
- 	struct list_lru		s_dentry_lru ____cacheline_aligned_in_smp;
- 	struct list_lru		s_inode_lru ____cacheline_aligned_in_smp;
- 	struct rcu_head		rcu;
--};
-+} __designated_init;
- 
- extern struct timespec current_fs_time(struct super_block *sb);
- 
-@@ -1410,7 +1411,7 @@ struct fiemap_extent_info {
- 	unsigned int fi_extents_max;	/* Size of fiemap_extent array */
- 	struct fiemap_extent __user *fi_extents_start; /* Start of
- 							fiemap_extent array */
--};
-+} __designated_init;
- int fiemap_fill_next_extent(struct fiemap_extent_info *info, u64 logical,
- 			    u64 phys, u64 len, u32 flags);
- int fiemap_check_flags(struct fiemap_extent_info *fieinfo, u32 fs_flags);
-@@ -1441,7 +1442,7 @@ typedef int (*filldir_t)(void *, const char *, int, loff_t, u64, unsigned);
- struct dir_context {
- 	const filldir_t actor;
- 	loff_t pos;
--};
-+} __designated_init;
- 
- struct block_device_operations;
- 
-@@ -1484,7 +1485,7 @@ struct file_operations {
- 	long (*fallocate)(struct file *file, int mode, loff_t offset,
- 			  loff_t len);
- 	int (*show_fdinfo)(struct seq_file *m, struct file *f);
--};
-+} __designated_init;
- 
- struct inode_operations {
- 	struct dentry * (*lookup) (struct inode *,struct dentry *, unsigned int);
-@@ -1520,7 +1521,7 @@ struct inode_operations {
- 			   umode_t create_mode, int *opened);
- 	int (*tmpfile) (struct inode *, struct dentry *, umode_t);
- 	int (*set_acl)(struct inode *, struct posix_acl *, int);
--} ____cacheline_aligned;
-+} __designated_init ____cacheline_aligned;
- 
- ssize_t rw_copy_check_uvector(int type, const struct iovec __user * uvector,
- 			      unsigned long nr_segs, unsigned long fast_segs,
-@@ -1561,7 +1562,7 @@ struct super_operations {
- 	int (*bdev_try_to_free_page)(struct super_block*, struct page*, gfp_t);
- 	long (*nr_cached_objects)(struct super_block *, int);
- 	long (*free_cached_objects)(struct super_block *, long, int);
--};
-+} __designated_init;
- 
- /*
-  * Inode flags - they have no relation to superblock flags now
-@@ -1771,7 +1772,7 @@ struct file_system_type {
- 	struct lock_class_key i_lock_key;
- 	struct lock_class_key i_mutex_key;
- 	struct lock_class_key i_mutex_dir_key;
--};
-+} __designated_init;
- 
- #define MODULE_ALIAS_FS(NAME) MODULE_ALIAS("fs-" NAME)
- 
-@@ -2018,7 +2019,7 @@ struct filename {
- 	const __user char	*uptr;	/* original userland pointer */
- 	struct audit_names	*aname;
- 	bool			separate; /* should "name" be freed? */
--};
-+} __designated_init;
- 
- extern long vfs_truncate(struct path *, loff_t);
- extern int do_truncate(struct dentry *, loff_t start, unsigned int time_attrs,
-@@ -2647,7 +2648,7 @@ static inline ino_t parent_ino(struct dentry *dentry)
- struct simple_transaction_argresp {
- 	ssize_t size;
- 	char data[0];
--};
-+} __designated_init;
- 
- #define SIMPLE_TRANSACTION_LIMIT (PAGE_SIZE - sizeof(struct simple_transaction_argresp))
- 
+ warning-2 := -Waggregate-return
+ warning-2 += -Wcast-align
 -- 
-2.0.1
+1.9.1
 
