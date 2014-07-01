@@ -1,62 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.skyhub.de ([78.46.96.112]:49737 "EHLO mail.skyhub.de"
+Received: from zimbra.vipri.net ([89.207.250.15]:40984 "EHLO zimbra.vipri.net"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751417AbaGAKMU (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 1 Jul 2014 06:12:20 -0400
-Date: Tue, 1 Jul 2014 12:12:14 +0200
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH] kbuild, LLVMLinux: only use warnings when using clang
-Message-ID: <20140701101214.GA14882@pd.tnic>
-References: <20140629201308.GC12943@pd.tnic>
- <1404175346-12330-1-git-send-email-behanw@converseincode.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1404175346-12330-1-git-send-email-behanw@converseincode.com>
+	id S1752065AbaGAQMu (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 1 Jul 2014 12:12:50 -0400
+From: Phil Sutter <phil.sutter@viprinet.com>
+Subject: [PATCH] drivers/Makefile: always enter hid/ subdirectory
+Date: Tue,  1 Jul 2014 18:04:59 +0200
+Message-Id: <1404230699-22037-1-git-send-email-phil.sutter@viprinet.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: behanw@converseincode.com
-Cc: mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, dl9pf@gmx.de, pageexec@freemail.hu, mcharleb@gmail.com
+To: Jiri Kosina <jkosina@suse.cz>
+Cc: linux-input@vger.kernel.org, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
-On Mon, Jun 30, 2014 at 05:42:26PM -0700, behanw@converseincode.com wrote:
-> From: Behan Webster <behanw@converseincode.com>
-> 
-> Only consider clang warnings in Kbuild when using the clang compiler.
-> 
-> Signed-off-by: Behan Webster <behanw@converseincode.com>
-> ---
->  scripts/Makefile.extrawarn | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
-> index 6564350..e350127 100644
-> --- a/scripts/Makefile.extrawarn
-> +++ b/scripts/Makefile.extrawarn
-> @@ -26,7 +26,7 @@ warning-1 += $(call cc-option, -Wmissing-include-dirs)
->  warning-1 += $(call cc-option, -Wunused-but-set-variable)
->  warning-1 += $(call cc-disable-warning, missing-field-initializers)
->  
-> -# Clang
-> +ifeq ($(COMPILER),clang)
->  warning-1 += $(call cc-disable-warning, initializer-overrides)
->  warning-1 += $(call cc-disable-warning, unused-value)
->  warning-1 += $(call cc-disable-warning, format)
-> @@ -35,6 +35,7 @@ warning-1 += $(call cc-disable-warning, sign-compare)
->  warning-1 += $(call cc-disable-warning, format-zero-length)
->  warning-1 += $(call cc-disable-warning, uninitialized)
->  warning-1 += $(call cc-option, -fcatch-undefined-behavior)
-> +endif
+Depending the subdir traversal on CONFIG_HID does not suffice for USB
+boot protocol drivers residing in drivers/hid/usbhid/ and being
+independent of the full HID system.
 
-Ok, just to make sure I understand that whole use case correctly:
+Signed-off-by: Phil Sutter <phil.sutter@viprinet.com>
+---
+ drivers/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-The disabling of those warnings is really intended for the case where
-people build the kernel with "W=1" on the make cmdline *and* clang?
-
-Thanks.
-
+diff --git a/drivers/Makefile b/drivers/Makefile
+index f98b50d..9f12999 100644
+--- a/drivers/Makefile
++++ b/drivers/Makefile
+@@ -126,7 +126,7 @@ ifndef CONFIG_ARCH_USES_GETTIMEOFFSET
+ obj-y				+= clocksource/
+ endif
+ obj-$(CONFIG_DCA)		+= dca/
+-obj-$(CONFIG_HID)		+= hid/
++obj-y				+= hid/
+ obj-$(CONFIG_PPC_PS3)		+= ps3/
+ obj-$(CONFIG_OF)		+= of/
+ obj-$(CONFIG_SSB)		+= ssb/
 -- 
-Regards/Gruss,
-    Boris.
+1.8.5.5
 
-Sent from a fat crate under my desk. Formatting is fine.
---
