@@ -1,53 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:36921 "EHLO mx1.redhat.com"
+Received: from smtp.outflux.net ([198.145.64.163]:57555 "EHLO smtp.outflux.net"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752030AbaGBNfO (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 2 Jul 2014 09:35:14 -0400
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20140702124016.GA26965@sepie.suse.cz>
-References: <20140702124016.GA26965@sepie.suse.cz> <20140702105645.17220.92338.stgit@warthog.procyon.org.uk>
-Subject: Re: [PATCH] Fix compiler message generation
-Date: Wed, 02 Jul 2014 14:34:10 +0100
-Message-ID: <2690.1404308050@warthog.procyon.org.uk>
+	id S1750809AbaGCBMF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 2 Jul 2014 21:12:05 -0400
+Date: Wed, 2 Jul 2014 18:10:59 -0700
+From: Kees Cook <keescook@chromium.org>
+Subject: [PATCH] kbuild: explain stack-protector-strong CONFIG logic
+Message-ID: <20140703011059.GA6331@www.outflux.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20140702175635.79d54c44.akpm@linux-foundation.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: dhowells@redhat.com, torvalds@linux-foundation.org, sam@ravnborg.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Boaz Harrosh <boaz@plexistor.com>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Andi Kleen <ak@linux.intel.com>, Randy Dunlap <rdunlap@infradead.org>, linux-next@vger.kernel.org, sfr@canb.auug.org.au, mhocko@suse.cz, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
-Michal Marek <mmarek@suse.cz> wrote:
+This adds a hopefully helpful comment above the (seemingly weird)
+compiler flag selection logic.
 
-> From 5b59dcacf358f143b9fb39d2f788142ab9ba3e00 Mon Sep 17 00:00:00 2001
-> From: Michal Marek <mmarek@suse.cz>
-> Date: Wed, 2 Jul 2014 14:28:26 +0200
-> Subject: [PATCH] kbuild: Print the name of the build directory
-> 
-> With commit 9da0763b (kbuild: Use relative path when building in a
-> subdir of the source tree), the compiler messages include relative
-> paths. These are however relative to the build directory, not the
-> directory where make was started. Print the "Entering directory ..."
-> message once, so that IDEs/editors can find the source files.
-> 
-> Signed-off-by: Michal Marek <mmarek@suse.cz>
-> ---
->  Makefile | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/Makefile b/Makefile
-> index 97b2861..40544a0 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -126,7 +126,10 @@ PHONY += $(MAKECMDGOALS) sub-make
->  $(filter-out _all sub-make $(CURDIR)/Makefile, $(MAKECMDGOALS)) _all: sub-make
->  	@:
->  
-> +# Fake the "Entering directory" message once, so that IDEs/editors are
-> +# able to understand relative filenames.
->  sub-make: FORCE
-> +	@echo "make[1]: Entering directory \`$(KBUILD_OUTPUT)'"
->  	$(if $(KBUILD_VERBOSE:1=),@)$(MAKE) -C $(KBUILD_OUTPUT) \
->  	KBUILD_SRC=$(CURDIR) \
->  	KBUILD_EXTMOD="$(KBUILD_EXTMOD)" -f $(CURDIR)/Makefile \
+Suggested-by: Andrew Morton <akpm@linux-foundation.org>
+Signed-off-by: Kees Cook <keescook@chromium.org>
+---
+ Makefile |   16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-Works for me with emacs.
+diff --git a/Makefile b/Makefile
+index 13175632137f..ea88e68d121e 100644
+--- a/Makefile
++++ b/Makefile
+@@ -630,6 +630,22 @@ KBUILD_CFLAGS += $(call cc-option,-Wframe-larger-than=${CONFIG_FRAME_WARN})
+ endif
+ 
+ # Handle stack protector mode.
++#
++# Since kbuild can potentially perform two passes (first with the old
++# .config values and then with updated .config values), we cannot error out
++# if a desired compiler option is unsupported. If we were to error, kbuild
++# could never get to the second pass and actually notice that we changed
++# the option to something that was supported.
++#
++# Additionally, we don't want to fallback and/or silently change which compiler
++# flags will be used, since that leads to producing kernels with different
++# security feature characteristics depending on the compiler used. ("But I
++# selected CC_STACKPROTECTOR_STRONG! Why did it build with _REGULAR?!")
++#
++# The middle ground is to warn here so that the failed option is obvious, but
++# to let the build fail with bad compiler flags so that we can't produce a
++# kernel when there is a CONFIG and compiler mismatch.
++#
+ ifdef CONFIG_CC_STACKPROTECTOR_REGULAR
+   stackp-flag := -fstack-protector
+   ifeq ($(call cc-option, $(stackp-flag)),)
+-- 
+1.7.9.5
 
-Acked-by: David Howells <dhowells@redhat.com>
+
+-- 
+Kees Cook
+Chrome OS Security
