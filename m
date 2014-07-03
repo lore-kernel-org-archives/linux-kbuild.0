@@ -1,90 +1,165 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:43244 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:43804 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753979AbaGCVMY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 3 Jul 2014 17:12:24 -0400
-Message-ID: <53B5C734.9020507@suse.cz>
-Date: Thu, 03 Jul 2014 23:12:20 +0200
+	id S1754150AbaGCVtx (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 3 Jul 2014 17:49:53 -0400
+Message-ID: <53B5CFFE.1000405@suse.cz>
+Date: Thu, 03 Jul 2014 23:49:50 +0200
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH] Documentation/make/headers_install.txt: update documentation
-References: <1404155479-5638-1-git-send-email-ydroneaud@opteya.com>
-In-Reply-To: <1404155479-5638-1-git-send-email-ydroneaud@opteya.com>
-Content-Type: text/plain; charset=ISO-8859-2
+Subject: Re: [RFC PATCH] kbuild: move cc_c_o logic to a shell script
+References: <20140609162343.GA1052@ravnborg.org>
+In-Reply-To: <20140609162343.GA1052@ravnborg.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Yann Droneaud <ydroneaud@opteya.com>, linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, "Kirill A. Shutemov" <kirill@shutemov.name>, David Woodhouse <dwmw2@infradead.org>, Rob Landley <rob@landley.net>, Sam Ravnborg <sam@ravnborg.org>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: kbuild <linux-kbuild@vger.kernel.org>
 
-Dne 30.6.2014 21:11, Yann Droneaud napsal(a):
-> Documentation in make/headers_install.txt is not
-> up to date regarding:
-> - way to list the various architectures;
-> - path where the headers are installed.
+Dne 9.6.2014 18:23, Sam Ravnborg napsal(a):
+> From b92cb72f08908a718da05318975545e988bfdaf9 Mon Sep 17 00:00:00 2001
+> From: Sam Ravnborg <sam@ravnborg.org>
+> Date: Mon, 9 Jun 2014 18:03:22 +0200
+> Subject: [PATCH] kbuild: move cc_c_o logic to a shell script
 > 
-> This patch try to fix these issues.
-> 
-> Cc: Kirill A. Shutemov <kirill@shutemov.name>
-> Cc: Michal Marek <mmarek@suse.cz>
-> Cc: David Woodhouse <dwmw2@infradead.org>
-> Cc: Rob Landley <rob@landley.net>
-> Cc: Sam Ravnborg <sam@ravnborg.org>
-> Signed-off-by: Yann Droneaud <ydroneaud@opteya.com>
-> ---
->  Documentation/make/headers_install.txt | 15 ++++++++-------
+> The amount of makefile magic required when building a
+> .o file from a .c file had grown far too much.
+> Move all the logic to a shell script where it is much
+> easier to follow the sequence and thus easier to debug/enhance.
 
-I have never noticed this file :). How about moving it to
-Documentation/kbuild?
+That's a nice cleanup! Some review below, but I'll have to do one more pass.
 
 
->  1 file changed, 8 insertions(+), 7 deletions(-)
-> 
-> diff --git a/Documentation/make/headers_install.txt b/Documentation/make/headers_install.txt
-> index 951eb9f1e040..8b6751f10dd3 100644
-> --- a/Documentation/make/headers_install.txt
-> +++ b/Documentation/make/headers_install.txt
-> @@ -24,23 +24,24 @@ The "make headers_install" command can be run in the top level directory of the
->  kernel source code (or using a standard out-of-tree build).  It takes two
->  optional arguments:
->  
-> -  make headers_install ARCH=i386 INSTALL_HDR_PATH=/usr/include
-> +  make headers_install ARCH=i386 INSTALL_HDR_PATH=/usr
+> This transition has following impact on the current functionality:
+> - We no longer rebuild the kernel if the source for recordmount is changed
+>   The source filehas not changed for a couple of years
 
-ARCH=x86 maybe?
+Yeah, that should not be an issue.
 
 
->  ARCH indicates which architecture to produce headers for, and defaults to the
-> -current architecture.  The linux/asm directory of the exported kernel headers
-> -is platform-specific, to see a complete list of supported architectures use
-> +current architecture.  The asm/ directory of the exported kernel headers
-> +is platform-specific, to see a list of supported architectures use
->  the command:
->  
-> -  ls -d include/asm-* | sed 's/.*-//'
-> +  /bin/ls -1 arch/*/include/asm/Kbuild | sed -e 's,^arch/,,' \
-> +                                             -e 's,/include/asm/Kbuild$,,'
+> - A shortcut to build symtypes files is lost. It was never
+>   supported by the top-level Makefile anyway
 
-Or, more simply, 'ls arch/'.
+There is a rule for that:
+%.symtypes: %.c prepare scripts FORCE
+        $(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+
+But it could be added to the script, e.g. if $outfile ends in .symtypes,
+do just the genksyms run.
 
 
-> -INSTALL_HDR_PATH indicates where to install the headers.  It defaults to
-> -"./usr/include".
-> +INSTALL_HDR_PATH indicates where to create include/ directory to install the
-> +headers. It defaults to "./usr/".
->  
->  The command "make headers_install_all" exports headers for all architectures
->  simultaneously.  (This is mostly of interest to distribution maintainers,
->  who create an architecture-independent tarball from the resulting include
->  directory.)  You also can use HDR_ARCH_LIST to specify list of architectures.
-> -Remember to provide the appropriate linux/asm directory via "mv" or "ln -s"
-> +Remember to provide the appropriate asm/ directory via "mv" or "ln -s"
->  before building a C library with headers exported this way.
->  
->  The kernel header export infrastructure is maintained by David Woodhouse
-> 
+> diff --git a/scripts/kcc.sh b/scripts/kcc.sh
+> new file mode 100644
+> index 0000000..2b0bad6
+> --- /dev/null
+> +++ b/scripts/kcc.sh
+> @@ -0,0 +1,187 @@
+> +#!/bin/sh
+> +# kernel wrapper for cc
+> +# In the simple case we just call cc with the supplied arguments.
+> +# But we may check the source with sparse before we call cc.
+> +# And we may postprocess the source or the .o file to support
+> +# module versioning and function tracing.
+> +
+> +# Error out on error
+> +set -e
+> +
+> +# Print command and execute
+> +# ${quiet} determine which command to print (if any)
+> +run()
+> +{
+> +	case "${quiet}" in
+> +		"silent_")
+> +			shift
+> +			;;
+> +		"quiet_")
+> +			printf "  %s \n" "$1 ${why}"
+> +			shift
+> +			;;
+> +		*)
+> +			shift
+> +			echo "$*"
 
-Looks good,
+While there is no -n or -e option to gcc, I'd use printf just to be on
+the safe side:
+                        printf '%s\n' "$*"
 
-Thanks,
+> +	esac
+> +
+> +	# Run the command
+> +	$*
+> +}
+> +
+> +# Calculate symbol versions on the preprocessed source
+> +# using genksyms and postprocess the output in a way
+> +# that it is usable as a linker script.
+> +# Then generate the .o file with the __crc_exported_symbol replaced.
+> +gen_sym_types()
+> +{
+> +	if [ "${KBUILD_SYMTYPES}" = "y" ]; then
+> +		dump_types="-T $1.symtypes"
+> +	fi
+> +
+> +	if [ "${CONFIG_HAVE_UNDERSCORE_SYMBOL_PREFIX}" = "y" ]; then
+> +		mod_prefix="-s _"
+> +	fi
+> +
+> +	if [ "${KBUILD_PRESERVE}" != "" ]; then
+> +		preserve="-p";
+> +		if [ -f $1.symref ]; then
+> +			reference="-r $1.symref"
+> +		fi
+> +	fi
+
+The -r <file>.symref should not depend on KBUILD_PRESERVE
+
+
+> +
+> +	out=$1.ver
+> +	shift
+> +
+> +	${CPP} -D__GENKSYMS__ $* ${infile} | \
+> +	    ${GENKSYMS} ${dump_types} ${mod_prefix} ${preserve} ${reference} > ${out}
+> +
+> +	# Generate <file>.o from .tmp_<file>.o using the linker to
+> +	# replace the unresolved symbols __crc_exported_symbol with
+> +	# the actual value of the checksum generated by genksyms
+> +	${LD} ${LDFLAGS} -r -o ${outfile} ${tmpfile}.o -T ${out}
+> +	rm -f ${tmpfile}.o ${out}
+> +}
+> +
+> +# Create __mcount_loc section with pointers to all calls to mcount
+> +record_mcount()
+> +{
+> +	# Due to recursion, we must skip empty.o.
+> +	# The empty.o file is created in the make process in order to determine
+> +	# the target endianness and word size. It is made before all other C
+> +	# files, including recordmcount.
+> +
+> +	if [ "$(basename ${outfile})" = "empty.o" ]; then
+> +		return
+> +	fi
+> +
+> +	if [ "${BUILD_C_RECORDMCOUNT}" != "" ]; then
+> +		if [ "${RECORDMCOUNT_WARN}" != "" ]; then
+
+In the Makefile, there was a check for RECORDMCOUNT_WARN coming from the
+make command line, but that's not a big deal. Just document it in the
+changelog.
+
+
+> +# Do we have to run record_mcount?
+> +if [ "${CONFIG_FTRACE_MCOUNT_RECORD}" != "" ]; then
+> +	if [ $(echo $* | grep -c -e "-pg") -gt 0 ]; then
+
+case " $* " in
+" -pg ")
+    record_mcount
+esac
+
+This has the advantage over the Makefile version that it checks a whole
+word "-pg". Also, it saves some forking.
+
 Michal
+
