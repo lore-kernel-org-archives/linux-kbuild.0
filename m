@@ -1,61 +1,69 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.outflux.net ([198.145.64.163]:57555 "EHLO smtp.outflux.net"
+Received: from cantor2.suse.de ([195.135.220.15]:42875 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750809AbaGCBMF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 2 Jul 2014 21:12:05 -0400
-Date: Wed, 2 Jul 2014 18:10:59 -0700
-From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH] kbuild: explain stack-protector-strong CONFIG logic
-Message-ID: <20140703011059.GA6331@www.outflux.net>
+	id S1751399AbaGCUzp (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 3 Jul 2014 16:55:45 -0400
+Message-ID: <53B5C34C.3060505@suse.cz>
+Date: Thu, 03 Jul 2014 22:55:40 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20140702175635.79d54c44.akpm@linux-foundation.org>
+Subject: Re: [PATCH] scripts/Makefile.clean: clean also $(extra-m) and $(extra-)
+References: <539963D4.3040409@suse.cz> <53A1EE1E.3090906@suse.cz> <20140620212212.9339.AA925319@jp.panasonic.com> <53A435B9.605@suse.cz>
+In-Reply-To: <53A435B9.605@suse.cz>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Andi Kleen <ak@linux.intel.com>, Randy Dunlap <rdunlap@infradead.org>, linux-next@vger.kernel.org, sfr@canb.auug.org.au, mhocko@suse.cz, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+To: Masahiro Yamada <yamada.m@jp.panasonic.com>
+Cc: linux-kbuild@vger.kernel.org
 
-This adds a hopefully helpful comment above the (seemingly weird)
-compiler flag selection logic.
+Dne 20.6.2014 15:23, Michal Marek napsal(a):
+> Dne 20.6.2014 14:22, Masahiro Yamada napsal(a):
+>> Hi Michal,
+>>
+>>
+>> On Wed, 18 Jun 2014 21:53:02 +0200
+>> Michal Marek <mmarek@suse.cz> wrote:
+>>
+>>> Dne 12.6.2014 10:24, Michal Marek napsal(a):
+>>>> Dne 6.6.2014 03:43, Masahiro Yamada napsal(a):
+>>>>> Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
+>>>>> ---
+>>>>>  scripts/Makefile.clean | 4 ++--
+>>>>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>>>>
+>>>>> diff --git a/scripts/Makefile.clean b/scripts/Makefile.clean
+>>>>> index 686cb0d..a651cee 100644
+>>>>> --- a/scripts/Makefile.clean
+>>>>> +++ b/scripts/Makefile.clean
+>>>>> @@ -40,8 +40,8 @@ subdir-ymn	:= $(addprefix $(obj)/,$(subdir-ymn))
+>>>>>  # build a list of files to remove, usually relative to the current
+>>>>>  # directory
+>>>>>  
+>>>>> -__clean-files	:= $(extra-y) $(always)                  \
+>>>>> -		   $(targets) $(clean-files)             \
+>>>>> +__clean-files	:= $(extra-y) $(extra-m) $(extra-)       \
+>>>>> +		   $(always) $(targets) $(clean-files)   \
+>>>>
+>>>> Do you have an example where generated files are left in the tree after
+>>>> make clean? This should go into the changelog.
+>>>
+>>> Hi Masahiro,
+>>>
+>>> do you have a reproducer, i.e. an example where make clean leaves
+>>> generated files in the tree?
+>>
+>> No, I don't.
+>>
+>> I thought
+>> arch/powerpc/kernel/Makefile is using
+>> extra-$(CONFIG_...) += ...
+>> but  *.o  files are simply cleaned-up.  So this isn't the case.
+> 
+> OK, so there is no urgent need to add this to 'rc-fixes'. I'll queue it
+> up in 'kbuild' for 3.17-rc1.
 
-Suggested-by: Andrew Morton <akpm@linux-foundation.org>
-Signed-off-by: Kees Cook <keescook@chromium.org>
----
- Makefile |   16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+It's in kbuild.git#kbuild now.
 
-diff --git a/Makefile b/Makefile
-index 13175632137f..ea88e68d121e 100644
---- a/Makefile
-+++ b/Makefile
-@@ -630,6 +630,22 @@ KBUILD_CFLAGS += $(call cc-option,-Wframe-larger-than=${CONFIG_FRAME_WARN})
- endif
- 
- # Handle stack protector mode.
-+#
-+# Since kbuild can potentially perform two passes (first with the old
-+# .config values and then with updated .config values), we cannot error out
-+# if a desired compiler option is unsupported. If we were to error, kbuild
-+# could never get to the second pass and actually notice that we changed
-+# the option to something that was supported.
-+#
-+# Additionally, we don't want to fallback and/or silently change which compiler
-+# flags will be used, since that leads to producing kernels with different
-+# security feature characteristics depending on the compiler used. ("But I
-+# selected CC_STACKPROTECTOR_STRONG! Why did it build with _REGULAR?!")
-+#
-+# The middle ground is to warn here so that the failed option is obvious, but
-+# to let the build fail with bad compiler flags so that we can't produce a
-+# kernel when there is a CONFIG and compiler mismatch.
-+#
- ifdef CONFIG_CC_STACKPROTECTOR_REGULAR
-   stackp-flag := -fstack-protector
-   ifeq ($(call cc-option, $(stackp-flag)),)
--- 
-1.7.9.5
+Michal
 
-
--- 
-Kees Cook
-Chrome OS Security
