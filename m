@@ -1,80 +1,77 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-la0-f49.google.com ([209.85.215.49]:65048 "EHLO
-	mail-la0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1760215AbaGDXqQ (ORCPT
+Received: from mail-la0-f47.google.com ([209.85.215.47]:52947 "EHLO
+	mail-la0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751316AbaGELWr (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 4 Jul 2014 19:46:16 -0400
-Received: by mail-la0-f49.google.com with SMTP id gf5so1466137lab.22
-        for <linux-kbuild@vger.kernel.org>; Fri, 04 Jul 2014 16:46:15 -0700 (PDT)
+	Sat, 5 Jul 2014 07:22:47 -0400
+Subject: [PATCH] checkstack: use $UTS_MACHINE as target architecture
+From: Konstantin Khlebnikov <koct9i@gmail.com>
+Date: Sat, 05 Jul 2014 15:22:38 +0400
+Message-ID: <20140705112238.16142.42735.stgit@zurg>
 MIME-Version: 1.0
-In-Reply-To: <53B72780.4000302@suse.cz>
-References: <CALCETrWSX1nVqyfe0Ee2rUvpHosTRyW8GSJfr52UCpT566-eWA@mail.gmail.com>
- <1402652395-28779-1-git-send-email-mmarek@suse.cz> <539AC82B.4070505@suse.cz>
- <CALCETrVbq3kQtq0jOsE0fBAkrSB=UxbB2P9F9iVd1896wO+f-g@mail.gmail.com> <53B72780.4000302@suse.cz>
-From: Andy Lutomirski <luto@amacapital.net>
-Date: Fri, 4 Jul 2014 16:45:54 -0700
-Message-ID: <CALCETrWRo9B=q04dqGZZS0ojXaRxdA4kQ6UQWSaeq-Z6yD=7oQ@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: Do not run modules_install and install in paralel
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: "H. Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org
+Cc: x86@kernel.org, user-mode-linux-devel@lists.sourceforge.net, linux-kbuild@vger.kernel.org
 
-On Fri, Jul 4, 2014 at 3:15 PM, Michal Marek <mmarek@suse.cz> wrote:
-> Dne 13.6.2014 19:29, Andy Lutomirski napsal(a):
->> On Fri, Jun 13, 2014 at 2:45 AM, Michal Marek <mmarek@suse.cz> wrote:
->>> Dne 13.6.2014 11:39, Michal Marek napsal(a):
->>>> Based on a x86-only patch by Andy Lutomirski <luto@amacapital.net>
->>>>
->>>> With modular kernels, 'make install' is going to need the installed
->>>> modules at some point to generate the initramfs.
->>>>
->>>> Signed-off-by: Michal Marek <mmarek@suse.cz>
->>>> ---
->>>>  Makefile | 6 ++++++
->>>>  1 file changed, 6 insertions(+)
->>>>
->>>> diff --git a/Makefile b/Makefile
->>>> index 7680d7c..7e5e483 100644
->>>> --- a/Makefile
->>>> +++ b/Makefile
->>>> @@ -503,6 +503,12 @@ ifeq ($(KBUILD_EXTMOD),)
->>>>                  endif
->>>>          endif
->>>>  endif
->>>> +# install and module_install need also be processed one by one
->>>> +ifneq ($(filter install,$(MAKECMDGOALS)),)
->>>> +        ifneq ($(filter modules_install,$(MAKECMDGOALS)),)
->>>> +             mixed-targets := 1
->>>> +        endif
->>>> +endif
->>>
->>> Note that this version does not enforce the ordering, it just avoids the
->>> interleaved execution. It can be added if desired.
->>
->> Hmm.  This will fix 'make modules_install install' but will not fix
->> 'make install modules_install'.  I don't know how many people would
->> type the latter.
->
-> Resuming a thread from last month -- As I said, it does not enforce the
-> ordering. So it's not as bullet-proof as your patch, but it works on all
-> architectures. I'm thinking about adding the patch to kbuild.git for
-> 3.17. But if you want to fix the ordering as well, feel free to change
-> the __build_one_by_one rule to do this.
+This fixes command # make checkstack for i386/x86_64.
+Looks like $UTS_MACHINE is exactly what scripts/checkstack.pl needs.
 
-Sounds good to me.
+By default $UTS_MACHINE is equal to $ARCH, but some arch/${ARCH}/Makefile
+overrides it. This patch updates it also in arch/x86/Makefile.um
 
-Where's __build_one_by_one?
+broken in ffee0de ("x86: Default to ARCH=x86 to avoid overriding CONFIG_64BIT")
 
---Andy
+Signed-off-by: Konstantin Khlebnikov <koct9i@gmail.com>
+---
+ Makefile             |   11 +----------
+ arch/x86/Makefile.um |    2 ++
+ 2 files changed, 3 insertions(+), 10 deletions(-)
 
->
-> Thanks,
-> Michal
+diff --git a/Makefile b/Makefile
+index b0ee945..50fb690 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1416,18 +1416,9 @@ endif #ifeq ($(mixed-targets),1)
+ 
+ PHONY += checkstack kernelrelease kernelversion image_name
+ 
+-# UML needs a little special treatment here.  It wants to use the host
+-# toolchain, so needs $(SUBARCH) passed to checkstack.pl.  Everyone
+-# else wants $(ARCH), including people doing cross-builds, which means
+-# that $(SUBARCH) doesn't work here.
+-ifeq ($(ARCH), um)
+-CHECKSTACK_ARCH := $(SUBARCH)
+-else
+-CHECKSTACK_ARCH := $(ARCH)
+-endif
+ checkstack:
+ 	$(OBJDUMP) -d vmlinux $$(find . -name '*.ko') | \
+-	$(PERL) $(src)/scripts/checkstack.pl $(CHECKSTACK_ARCH)
++	$(PERL) $(src)/scripts/checkstack.pl $(UTS_MACHINE)
+ 
+ kernelrelease:
+ 	@echo "$(KERNELVERSION)$$($(CONFIG_SHELL) $(srctree)/scripts/setlocalversion $(srctree))"
+diff --git a/arch/x86/Makefile.um b/arch/x86/Makefile.um
+index 36b62bc..8fc912b 100644
+--- a/arch/x86/Makefile.um
++++ b/arch/x86/Makefile.um
+@@ -3,6 +3,7 @@ core-y += arch/x86/crypto/
+ ifeq ($(CONFIG_X86_32),y)
+ START := 0x8048000
+ 
++UTS_MACHINE		:= i386
+ LDFLAGS			+= -m elf_i386
+ ELF_ARCH		:= i386
+ ELF_FORMAT 		:= elf32-i386
+@@ -47,6 +48,7 @@ KBUILD_AFLAGS += -m64
+ LDFLAGS += -m elf_x86_64
+ KBUILD_CPPFLAGS += -m64
+ 
++UTS_MACHINE := x86_64
+ ELF_ARCH := i386:x86-64
+ ELF_FORMAT := elf64-x86-64
+ 
 
-
-
--- 
-Andy Lutomirski
-AMA Capital Management, LLC
