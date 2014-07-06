@@ -1,50 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cpsmtpb-ews01.kpnxchange.com ([213.75.39.4]:49717 "EHLO
-	cpsmtpb-ews01.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1750904AbaGFKTU (ORCPT
+Received: from mail-oa0-f52.google.com ([209.85.219.52]:55465 "EHLO
+	mail-oa0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751492AbaGFRLR (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 6 Jul 2014 06:19:20 -0400
-Message-ID: <1404641957.24853.14.camel@x220>
-Subject: Re: [PATCH] kconfig: store default ARCH in .config
-From: Paul Bolle <pebolle@tiscali.nl>
-Date: Sun, 06 Jul 2014 12:19:17 +0200
-In-Reply-To: <CALYGNiP3EREk4yDqnduuDhOsJLHFwZK4D1QGLd+u5edEk2JFOA@mail.gmail.com>
-References: <20140706080234.19520.96704.stgit@zurg>
-	 <1404637557.24853.12.camel@x220>
-	 <CAMuHMdWUpqz0W_znrrm2Qp+QjKExQ5Gcv0OsuA4gJa1Wvjv06A@mail.gmail.com>
-	 <CALYGNiP3EREk4yDqnduuDhOsJLHFwZK4D1QGLd+u5edEk2JFOA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+	Sun, 6 Jul 2014 13:11:17 -0400
+Message-ID: <53B9833D.4000600@lwfinger.net>
+Date: Sun, 06 Jul 2014 12:11:25 -0500
+From: Larry Finger <Larry.Finger@lwfinger.net>
+MIME-Version: 1.0
+Subject: Possible bug in kbuild
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Konstantin Khlebnikov <koct9i@gmail.com>
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>, Michal Marek <mmarek@suse.cz>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Andrew Morton <akpm@linux-foundation.org>, Linus Torvalds <torvalds@linux-foundation.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: linux-kbuild@vger.kernel.org, linux-wireless <linux-wireless@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Emmanuel Grumbach <emmanuel.grumbach@intel.com>
 
-On Sun, 2014-07-06 at 14:02 +0400, Konstantin Khlebnikov wrote:
-> On Sun, Jul 6, 2014 at 1:08 PM, Geert Uytterhoeven <geert@linux-m68k.org> wrote:
-> > On Sun, Jul 6, 2014 at 11:05 AM, Paul Bolle <pebolle@tiscali.nl> wrote:
-> >> Could the same result be had by saving CONFIG_ARCH in .config (I suppose
-> >> it actually already is) and then use its value on builds with
-> >
-> > No, currently it's not saved in .config, so I guess that's why this convoluted
-> > approach is needed.
-> 
-> Yep, kconfig neither reads nor writres symbols with option env=...
-> 
-> >
-> >> that .config unless ARCH is specified in the environment again? Ie,
-> >> change the "option env=[...]" semantics a bit, perhaps by special casing
-> >> CONFIG_ARCH.
-> >
-> > Indeed.
-> 
-> If it's saved in config value might be out of sync with actual environment:
-> ARCH != CONFIG_ARCH. So, behaviour becomes too complicated.
+A problem with configuration of IWLWIFI has been bisected to commit 48e2934, 
+where a new section was added to drivers/net/wireless/iwlwifi/Kconfig with the 
+following code:
 
-So let the environment overrules what is saved in the .config. What
-makes that complicated?
+# don't call it _MODULE -- will confuse Kconfig/fixdep/...
+config IWLWIFI_OPMODE_MODULAR
+         bool
+         default y if IWLDVM=m
+         default y if IWLMVM=m
 
+When the above section is present, 'make xconfig' fails to show a "Debugging 
+options" menu' even though 'make menuconfig' displays correctly. despite the 
+incorrect on-screen display, xconfig does not delete the affected info in 
+.config after it was set by menuconfig, thus the bug only seems to affect the 
+display in xconfig.
 
-Paul Bolle
+Is there anything wrong with that section in iwlwifi's Kconfig, or is it a bug 
+in xconfig?
 
+Thanks,
+
+Larry
