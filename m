@@ -1,72 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lb0-f178.google.com ([209.85.217.178]:43255 "EHLO
-	mail-lb0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751578AbaGGTCK (ORCPT
+Received: from mail.linuxfoundation.org ([140.211.169.12]:54407 "EHLO
+	mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750979AbaGGWFY (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 7 Jul 2014 15:02:10 -0400
-MIME-Version: 1.0
-In-Reply-To: <CAF1_xX38AWEK5sW8v_RrL=HzAg7JRNyCzgKNuZFzCGV4y2O7Og@mail.gmail.com>
-References: <CAF1_xX2oeG0YCLaLZR9ZUY2qiD0-sVB6L10dZppnae7iZV_U3g@mail.gmail.com>
-	<53A1A354.7030107@suse.cz>
-	<CAF1_xX38AWEK5sW8v_RrL=HzAg7JRNyCzgKNuZFzCGV4y2O7Og@mail.gmail.com>
-Date: Mon, 7 Jul 2014 21:02:08 +0200
-Message-ID: <CAPVoSvSmzRWSJeR9dyBO0qS6-9SWA_d-CjGuQeULGS_MRUY77w@mail.gmail.com>
-Subject: Re: Regression: firmware: Simplify directory creation + b43 = fails
- to build
-From: Torsten Kaiser <just.for.lkml@googlemail.com>
-Content-Type: text/plain; charset=UTF-8
+	Mon, 7 Jul 2014 18:05:24 -0400
+Date: Mon, 7 Jul 2014 15:05:23 -0700
+From: Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH] checkstack: use $UTS_MACHINE as target architecture
+Message-Id: <20140707150523.cc671116bf366e8db73209c5@linux-foundation.org>
+In-Reply-To: <20140705112238.16142.42735.stgit@zurg>
+References: <20140705112238.16142.42735.stgit@zurg>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ronald <ronald645@gmail.com>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: Konstantin Khlebnikov <koct9i@gmail.com>
+Cc: linux-kernel@vger.kernel.org, x86@kernel.org, user-mode-linux-devel@lists.sourceforge.net, linux-kbuild@vger.kernel.org
 
-On Wed, Jun 18, 2014 at 6:25 PM, Ronald <ronald645@gmail.com> wrote:
-> From my .config
->
->  ==> cat /usr/src/config | grep -i b43
-> CONFIG_EXTRA_FIRMWARE="b43/ucode5.fw b43/b0g0initvals5.fw
-> b43/b0g0bsinitvals5.fw b43/pcm5.fw"
-> ... snip ...
+On Sat, 05 Jul 2014 15:22:38 +0400 Konstantin Khlebnikov <koct9i@gmail.com> wrote:
 
-That might be rather later, but I seem to have the same problem:
-  CHK     kernel/config_data.h
-  MK_FW   firmware/amd-ucode/microcode_amd.bin.gen.S
-/bin/sh: firmware/amd-ucode/microcode_amd.bin.gen.S: No such file or directory
-/bin/sh: firmware/amd-ucode/microcode_amd.bin.gen.S: No such file or directory
-/bin/sh: firmware/amd-ucode/microcode_amd.bin.gen.S: No such file or directory
-/bin/sh: firmware/amd-ucode/microcode_amd.bin.gen.S: No such file or directory
-/bin/sh: firmware/amd-ucode/microcode_amd.bin.gen.S: No such file or directory
-/bin/sh: firmware/amd-ucode/microcode_amd.bin.gen.S: No such file or directory
-/bin/sh: firmware/amd-ucode/microcode_amd.bin.gen.S: No such file or directory
-/bin/sh: firmware/amd-ucode/microcode_amd.bin.gen.S: No such file or directory
-/bin/sh: firmware/amd-ucode/microcode_amd.bin.gen.S: No such file or directory
-/bin/sh: firmware/amd-ucode/microcode_amd.bin.gen.S: No such file or directory
-/bin/sh: firmware/amd-ucode/microcode_amd.bin.gen.S: No such file or directory
-/bin/sh: firmware/amd-ucode/microcode_amd.bin.gen.S: No such file or directory
-/bin/sh: firmware/amd-ucode/microcode_amd.bin.gen.S: No such file or directory
-/bin/sh: firmware/amd-ucode/microcode_amd.bin.gen.S: No such file or directory
-/bin/sh: firmware/amd-ucode/microcode_amd.bin.gen.S: No such file or directory
-firmware/Makefile:185: recipe for target
-'firmware/amd-ucode/microcode_amd.bin.gen.S' failed
-make[1]: *** [firmware/amd-ucode/microcode_amd.bin.gen.S] Error 1
-Makefile:896: recipe for target 'firmware' failed
-make: *** [firmware] Error 2
+> This fixes command # make checkstack for i386/x86_64.
+> Looks like $UTS_MACHINE is exactly what scripts/checkstack.pl needs.
+> 
+> By default $UTS_MACHINE is equal to $ARCH, but some arch/${ARCH}/Makefile
+> overrides it. This patch updates it also in arch/x86/Makefile.um
+> 
+> broken in ffee0de ("x86: Default to ARCH=x86 to avoid overriding CONFIG_64BIT")
 
-The directory firmware/amd-ucode does not exist in the kernel source
-tree, but my .config seems to need it:
-CONFIG_EXTRA_FIRMWARE="radeon/R700_rlc.bin radeon/RV710_uvd.bin
-radeon/RV730_smc.bin amd-ucode/microcode_amd.bin"
-CONFIG_EXTRA_FIRMWARE_DIR="/lib/firmware"
+The changelog doesn't describe the bug which is being fixed.  It should
+do so please.  If there are any compiler/make error messages then those
+should be included.
 
-Just doing a "mkdir firmware/amd-ucode" lets the build continue and I
-get a working 3.16 kernel.
-
-With 3.15 and earlier I never had a problem with this, but 3.16-rc4
-just failed with above message.
-
-Do you need my full .config or any other information about my system?
-I would be happy to provide that and/or test a patch.
-
-Thanks for looking into this!
-
-Torsten
