@@ -1,157 +1,80 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:29140 "EHLO mga11.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751223AbaGGFn0 convert rfc822-to-8bit (ORCPT
+Received: from metis.ext.pengutronix.de ([92.198.50.35]:42406 "EHLO
+	metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751223AbaGGGvr (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 7 Jul 2014 01:43:26 -0400
-From: "Grumbach, Emmanuel" <emmanuel.grumbach@intel.com>
-Subject: RE: [patch] iwlwifi: fix Kconfig option continuity
-Date: Mon, 7 Jul 2014 05:43:15 +0000
-Message-ID: <0BA3FCBA62E2DC44AF3030971E174FB3111FC8F0@hasmsx107.ger.corp.intel.com>
-References: <53B9833D.4000600@lwfinger.net> <53B997D5.1060001@infradead.org>
-In-Reply-To: <53B997D5.1060001@infradead.org>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+	Mon, 7 Jul 2014 02:51:47 -0400
+Date: Mon, 7 Jul 2014 08:51:41 +0200
+From: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?=
+	<u.kleine-koenig@pengutronix.de>
+Subject: Re: [PATCH 3/3] ARM: only select ARM_PATCH_PHYS_VIRT if MMU is
+ enabled
+Message-ID: <20140707065141.GC7827@pengutronix.de>
+References: <1404295043-6661-1-git-send-email-u.kleine-koenig@pengutronix.de>
+ <1404295043-6661-3-git-send-email-u.kleine-koenig@pengutronix.de>
+ <20140702103512.GG32514@n2100.arm.linux.org.uk>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20140702103512.GG32514@n2100.arm.linux.org.uk>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@infradead.org>, Larry Finger <Larry.Finger@lwfinger.net>, "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, linux-wireless <linux-wireless@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>, linux-kbuild@vger.kernel.org
+Cc: kernel@pengutronix.de, linux-arm-kernel@lists.infradead.org, Russell King - ARM Linux <linux@arm.linux.org.uk>
 
-> 
-> On 07/06/2014 10:11 AM, Larry Finger wrote:
-> > A problem with configuration of IWLWIFI has been bisected to commit
-> 48e2934, where a new section was added to
-> drivers/net/wireless/iwlwifi/Kconfig with the following code:
-> >
-> > # don't call it _MODULE -- will confuse Kconfig/fixdep/...
-> > config IWLWIFI_OPMODE_MODULAR
-> >         bool
-> >         default y if IWLDVM=m
-> >         default y if IWLMVM=m
-> >
-> > When the above section is present, 'make xconfig' fails to show a
-> "Debugging options" menu' even though 'make menuconfig' displays
-> correctly. despite the incorrect on-screen display, xconfig does not delete
-> the affected info in .config after it was set by menuconfig, thus the bug only
-> seems to affect the display in xconfig.
-> >
-> > Is there anything wrong with that section in iwlwifi's Kconfig, or is it a bug in
-> xconfig?
-> 
-> in menuconfig or nconfig:
-> Notice that 'Debugging options' is not indented under iwlwifi, but listed at
-> the same indent level.  That is a huge clue.
-> 
-> 
-> in xconfig:
-> The 'Debugging options' menu is displayed, but it's not where you expect or
-> want it to be found.  Look under 'Wireless LAN' and immediately under
-> 'Atheros Wireless Cards'
-> and it says 'Debugging options' (on the left panel).  Then the debugging
-> options are displayed in the right hand panel.
-> 
-> This is a common problem.  I have made Kconfig patches for it several times.
-> Here is another one.  Works for me.
-> 
-> ---
-> Fix iwlwifi options so that they all depend on IWLWIFI and are displayed
-> under the iwlwifi driver instead of in other unexpected places.
-> 
-> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-> Reported-by: Larry Finger <Larry.Finger@lwfinger.net>
-> ---
+Hello,
 
-Thanks for the patch. I'll add a commit message and submit it.
+(adding Yann and linux-kbuild to recipents)
 
->  drivers/net/wireless/iwlwifi/Kconfig |   17 ++++++++---------
->  1 file changed, 8 insertions(+), 9 deletions(-)
+On Wed, Jul 02, 2014 at 11:35:12AM +0100, Russell King - ARM Linux wrote:
+> On Wed, Jul 02, 2014 at 11:57:23AM +0200, Uwe Kleine-König wrote:
+> > This fixes the following warning:
+> > 
+> > 	warning: (ARCH_MULTIPLATFORM && ARCH_INTEGRATOR && ARCH_SHMOBILE_LEGACY) selects ARM_PATCH_PHYS_VIRT which has unmet direct dependencies (!XIP_KERNEL && MMU && (!ARCH_REALVIEW || !SPARSEMEM))
+> > 
+> > Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+> > ---
+> > I'm not sure why ARCH_MULTIPLATFORM appears here. It depends on MMU,
+> > isn't selectable at the same time as ARCH_REALVIEW and XIP_KERNEL
+> > depends on !ARCH_MULTIPLATFORM.
 > 
-> Index: lnx-316-rc3/drivers/net/wireless/iwlwifi/Kconfig
-> ==========================================================
-> =========
-> --- lnx-316-rc3.orig/drivers/net/wireless/iwlwifi/Kconfig
-> +++ lnx-316-rc3/drivers/net/wireless/iwlwifi/Kconfig
-> @@ -39,9 +39,10 @@ config IWLWIFI
->  	  say M here and read <file:Documentation/kbuild/modules.txt>.
-> The
->  	  module will be called iwlwifi.
+> The message is extremely confusing.  It would read better if those
+> && were || - because ARM_PATCH_PHYS_VIRT is selected by
+> ARCH_MULTIPLATFORM _or_ ARCH_INTEGRATOR _or_ ARCH_SHMOBILE_LEGACY:
+right, so there are two things that could be improved here. The
+resolution I'd prefer is to make this two warnings:
+
+   ARCH_INTEGRATOR selects ARM_PATCH_PHYS_VIRT which has unmet direct dependencies (!XIP_KERNEL && MMU)
+   ARCH_SHMOBILE_LEGACY selects ARM_PATCH_PHYS_VIRT which has unmet direct dependencies (!XIP_KERNEL && MMU)
+
+ARCH_REALVIEW cannot be selected at the same time as ARCH_INTEGRATOR or
+ARCH_SHMOBILE_LEGACY, so that can be dropped. And as stated above
+ARCH_MULTIPLATFORM isn't an issue.
+
+This doesn't have the natural language problem that ARCH_MULTIPLATFORM
+*and* ARCH_INTEGRATOR *and* ARCH_SHMOBILE_LEGACY all select
+ARM_PATCH_PHYS_VIRT.
+
+> config ARCH_MULTIPLATFORM
+>         select ARM_PATCH_PHYS_VIRT
 > 
-> +if IWLWIFI
-> +
->  config IWLWIFI_LEDS
->  	bool
-> -	depends on IWLWIFI
->  	depends on LEDS_CLASS=y || LEDS_CLASS=IWLWIFI
->  	select LEDS_TRIGGERS
->  	select MAC80211_LEDS
-> @@ -49,7 +50,6 @@ config IWLWIFI_LEDS
+> config ARCH_INTEGRATOR
+>         select ARM_PATCH_PHYS_VIRT
 > 
->  config IWLDVM
->  	tristate "Intel Wireless WiFi DVM Firmware support"
-> -	depends on IWLWIFI
->  	default IWLWIFI
->  	help
->  	  This is the driver that supports the DVM firmware which is @@ -58,7
-> +58,6 @@ config IWLDVM
+> config ARCH_SHMOBILE_LEGACY
+>         select ARM_PATCH_PHYS_VIRT
 > 
->  config IWLMVM
->  	tristate "Intel Wireless WiFi MVM Firmware support"
-> -	depends on IWLWIFI
->  	help
->  	  This is the driver that supports the MVM firmware which is
->  	  currently only available for 7260 and 3160 devices.
-> @@ -70,7 +69,7 @@ config IWLWIFI_OPMODE_MODULAR
->  	default y if IWLMVM=m
-> 
->  comment "WARNING: iwlwifi is useless without IWLDVM or IWLMVM"
-> -	depends on IWLWIFI && IWLDVM=n && IWLMVM=n
-> +	depends on IWLDVM=n && IWLMVM=n
-> 
->  config IWLWIFI_BCAST_FILTERING
->  	bool "Enable broadcast filtering"
-> @@ -86,11 +85,9 @@ config IWLWIFI_BCAST_FILTERING
->  	  expect incoming broadcasts for their normal operations.
-> 
->  menu "Debugging Options"
-> -	depends on IWLWIFI
-> 
->  config IWLWIFI_DEBUG
->  	bool "Enable full debugging output in the iwlwifi driver"
-> -	depends on IWLWIFI
->  	---help---
->  	  This option will enable debug tracing output for the iwlwifi drivers
-> 
-> @@ -115,7 +112,7 @@ config IWLWIFI_DEBUG
-> 
->  config IWLWIFI_DEBUGFS
->          bool "iwlwifi debugfs support"
-> -        depends on IWLWIFI && MAC80211_DEBUGFS
-> +        depends on MAC80211_DEBUGFS
->          ---help---
->  	  Enable creation of debugfs files for the iwlwifi drivers. This
->  	  is a low-impact option that allows getting insight into the @@ -
-> 123,13 +120,12 @@ config IWLWIFI_DEBUGFS
-> 
->  config IWLWIFI_DEBUG_EXPERIMENTAL_UCODE
->          bool "Experimental uCode support"
-> -        depends on IWLWIFI && IWLWIFI_DEBUG
-> +        depends on IWLWIFI_DEBUG
->          ---help---
->  	  Enable use of experimental ucode for testing and debugging.
-> 
->  config IWLWIFI_DEVICE_TRACING
->  	bool "iwlwifi device access tracing"
-> -	depends on IWLWIFI
->  	depends on EVENT_TRACING
->  	help
->  	  Say Y here to trace all commands, including TX frames and IO @@ -
-> 144,4 +140,7 @@ config IWLWIFI_DEVICE_TRACING
-> 
->  	  If unsure, say Y so we can help you better when problems
->  	  occur.
-> +
->  endmenu
-> +
-> +endif
+(For reference, the patch did:
+
+	-       select ARM_PATCH_PHYS_VIRT
+	+       select ARM_PATCH_PHYS_VIRT if MMU
+
+for ARCH_INTEGRATOR and ARCH_SHMOBILE_LEGACY)
+
+Best regards
+Uwe
+
+-- 
+Pengutronix e.K.                           | Uwe Kleine-König            |
+Industrial Linux Solutions                 | http://www.pengutronix.de/  |
