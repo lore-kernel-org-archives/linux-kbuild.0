@@ -1,106 +1,88 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.skyhub.de ([78.46.96.112]:48941 "EHLO mail.skyhub.de"
+Received: from cantor2.suse.de ([195.135.220.15]:57338 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751409AbaGGKxm (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 7 Jul 2014 06:53:42 -0400
-Date: Mon, 7 Jul 2014 12:53:39 +0200
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH] Kbuild: Move -Wmaybe-uninitialized to W=1
-Message-ID: <20140707105339.GA4776@pd.tnic>
-References: <20140616132045.GE8170@pd.tnic>
- <20140616211405.GA7914@ravnborg.org>
- <20140624213835.GD15068@pd.tnic>
+	id S1751409AbaGGLDl (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 7 Jul 2014 07:03:41 -0400
+Message-ID: <53BA7E8B.6090603@suse.cz>
+Date: Mon, 07 Jul 2014 13:03:39 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20140624213835.GD15068@pd.tnic>
+Subject: Re: [PATCH] kbuild: Do not run modules_install and install in paralel
+References: <CALCETrWSX1nVqyfe0Ee2rUvpHosTRyW8GSJfr52UCpT566-eWA@mail.gmail.com> <1402652395-28779-1-git-send-email-mmarek@suse.cz> <539AC82B.4070505@suse.cz> <CALCETrVbq3kQtq0jOsE0fBAkrSB=UxbB2P9F9iVd1896wO+f-g@mail.gmail.com> <53B72780.4000302@suse.cz> <CALCETrWRo9B=q04dqGZZS0ojXaRxdA4kQ6UQWSaeq-Z6yD=7oQ@mail.gmail.com>
+In-Reply-To: <CALCETrWRo9B=q04dqGZZS0ojXaRxdA4kQ6UQWSaeq-Z6yD=7oQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: lkml <linux-kernel@vger.kernel.org>, Michael Matz <matz@suse.de>, linux-kbuild@vger.kernel.org, x86-ml <x86@kernel.org>
+To: Andy Lutomirski <luto@amacapital.net>
+Cc: "H. Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 
-Ok, here's a v2 which goes ontop of
+On 2014-07-05 01:45, Andy Lutomirski wrote:
+> On Fri, Jul 4, 2014 at 3:15 PM, Michal Marek <mmarek@suse.cz> wrote:
+>> Dne 13.6.2014 19:29, Andy Lutomirski napsal(a):
+>>> On Fri, Jun 13, 2014 at 2:45 AM, Michal Marek <mmarek@suse.cz> wrote:
+>>>> Dne 13.6.2014 11:39, Michal Marek napsal(a):
+>>>>> Based on a x86-only patch by Andy Lutomirski <luto@amacapital.net>
+>>>>>
+>>>>> With modular kernels, 'make install' is going to need the installed
+>>>>> modules at some point to generate the initramfs.
+>>>>>
+>>>>> Signed-off-by: Michal Marek <mmarek@suse.cz>
+>>>>> ---
+>>>>>  Makefile | 6 ++++++
+>>>>>  1 file changed, 6 insertions(+)
+>>>>>
+>>>>> diff --git a/Makefile b/Makefile
+>>>>> index 7680d7c..7e5e483 100644
+>>>>> --- a/Makefile
+>>>>> +++ b/Makefile
+>>>>> @@ -503,6 +503,12 @@ ifeq ($(KBUILD_EXTMOD),)
+>>>>>                  endif
+>>>>>          endif
+>>>>>  endif
+>>>>> +# install and module_install need also be processed one by one
+>>>>> +ifneq ($(filter install,$(MAKECMDGOALS)),)
+>>>>> +        ifneq ($(filter modules_install,$(MAKECMDGOALS)),)
+>>>>> +             mixed-targets := 1
+>>>>> +        endif
+>>>>> +endif
+>>>>
+>>>> Note that this version does not enforce the ordering, it just avoids the
+>>>> interleaved execution. It can be added if desired.
+>>>
+>>> Hmm.  This will fix 'make modules_install install' but will not fix
+>>> 'make install modules_install'.  I don't know how many people would
+>>> type the latter.
+>>
+>> Resuming a thread from last month -- As I said, it does not enforce the
+>> ordering. So it's not as bullet-proof as your patch, but it works on all
+>> architectures. I'm thinking about adding the patch to kbuild.git for
+>> 3.17. But if you want to fix the ordering as well, feel free to change
+>> the __build_one_by_one rule to do this.
+> 
+> Sounds good to me.
+> 
+> Where's __build_one_by_one?
 
-http://lkml.kernel.org/r/1404175346-12330-1-git-send-email-behanw@converseincode.com
+A few lines below in the main Makefile:
 
-After this, all warnings stuff should be back to normal.
+   513  ifeq ($(mixed-targets),1)
+   514  #
+======================================================================
+=====
+   515  # We're called with mixed targets (*config and build targets).
+   516  # Handle them one by one.
+   517
+   518  PHONY += $(MAKECMDGOALS) __build_one_by_one
+   519
+   520  $(filter-out __build_one_by_one, $(MAKECMDGOALS)):
+__build_one_by_one
+   521          @:
+   522
+   523  __build_one_by_one:
+   524          $(Q)set -e; \
+   525          for i in $(MAKECMDGOALS); do \
+   526                  $(MAKE) -f $(srctree)/Makefile $$i; \
+   527          done
 
----
-From: Borislav Petkov <bp@suse.de>
-Subject: [PATCH -v2] Kbuild: Move -Wmaybe-uninitialized to W=1
-
-This warning is enabled by -Wall or -Wextra, says the gcc manpage. It
-also says that gcc cannot always know whether the warning is issued
-correctly:
-
-"These warnings are made optional because GCC is not smart enough to see
-all the reasons why the code might be correct in spite of appearing to
-have an error."
-
-And, as expected, it fires for perfectly valid use cases, thus making it
-not really useful. Let's move it to the W=1 bunch in case people want to
-enable it with the additional checks.
-
-Signed-off-by: Borislav Petkov <bp@suse.de>
----
- Makefile                   | 5 ++++-
- scripts/Makefile           | 1 +
- scripts/Makefile.extrawarn | 1 +
- 3 files changed, 6 insertions(+), 1 deletion(-)
-
-diff --git a/Makefile b/Makefile
-index 4d75b4bceedd..b58c94261960 100644
---- a/Makefile
-+++ b/Makefile
-@@ -613,7 +613,7 @@ include $(srctree)/arch/$(SRCARCH)/Makefile
- KBUILD_CFLAGS	+= $(call cc-option,-fno-delete-null-pointer-checks,)
- 
- ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
--KBUILD_CFLAGS	+= -Os $(call cc-disable-warning,maybe-uninitialized,)
-+KBUILD_CFLAGS	+= -Os
- else
- KBUILD_CFLAGS	+= -O2
- endif
-@@ -742,6 +742,9 @@ KBUILD_CFLAGS   += $(call cc-option,-Werror=date-time)
- # use the deterministic mode of AR if available
- KBUILD_ARFLAGS := $(call ar-option,D)
- 
-+# disable -Wmaybe-uninitialized as too noisy, see Makefile.extrawarn instead
-+KBUILD_CFLAGS   += $(call cc-disable-warning, maybe-uninitialized)
-+
- # check for 'asm goto'
- ifeq ($(shell $(CONFIG_SHELL) $(srctree)/scripts/gcc-goto.sh $(CC)), y)
- 	KBUILD_CFLAGS += -DCC_HAVE_ASM_GOTO
-diff --git a/scripts/Makefile b/scripts/Makefile
-index 890df5c6adfb..a483d9988a2e 100644
---- a/scripts/Makefile
-+++ b/scripts/Makefile
-@@ -19,6 +19,7 @@ hostprogs-$(CONFIG_BUILDTIME_EXTABLE_SORT) += sortextable
- hostprogs-$(CONFIG_ASN1)	 += asn1_compiler
- 
- HOSTCFLAGS_sortextable.o = -I$(srctree)/tools/include
-+HOSTCFLAGS_sortextable.o += $(call cc-disable-warning, maybe-uninitialized)
- HOSTCFLAGS_asn1_compiler.o = -I$(srctree)/include
- 
- always		:= $(hostprogs-y) $(hostprogs-m)
-diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
-index e3501272cd93..9657d5778e06 100644
---- a/scripts/Makefile.extrawarn
-+++ b/scripts/Makefile.extrawarn
-@@ -25,6 +25,7 @@ warning-1 += -Wold-style-definition
- warning-1 += $(call cc-option, -Wmissing-include-dirs)
- warning-1 += $(call cc-option, -Wunused-but-set-variable)
- warning-1 += $(call cc-disable-warning, missing-field-initializers)
-+warning-1 += $(call cc-option, -Wmaybe-uninitialized)
- 
- ifeq ($(COMPILER),clang)
- warning-1 += $(call cc-disable-warning, initializer-overrides)
--- 
-2.0.0
-
--- 
-Regards/Gruss,
-    Boris.
-
-Sent from a fat crate under my desk. Formatting is fine.
---
+Michal
