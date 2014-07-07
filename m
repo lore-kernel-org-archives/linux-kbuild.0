@@ -1,80 +1,106 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from metis.ext.pengutronix.de ([92.198.50.35]:42406 "EHLO
-	metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751223AbaGGGvr (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 7 Jul 2014 02:51:47 -0400
-Date: Mon, 7 Jul 2014 08:51:41 +0200
-From: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?=
-	<u.kleine-koenig@pengutronix.de>
-Subject: Re: [PATCH 3/3] ARM: only select ARM_PATCH_PHYS_VIRT if MMU is
- enabled
-Message-ID: <20140707065141.GC7827@pengutronix.de>
-References: <1404295043-6661-1-git-send-email-u.kleine-koenig@pengutronix.de>
- <1404295043-6661-3-git-send-email-u.kleine-koenig@pengutronix.de>
- <20140702103512.GG32514@n2100.arm.linux.org.uk>
+Received: from mail.skyhub.de ([78.46.96.112]:48941 "EHLO mail.skyhub.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751409AbaGGKxm (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 7 Jul 2014 06:53:42 -0400
+Date: Mon, 7 Jul 2014 12:53:39 +0200
+From: Borislav Petkov <bp@alien8.de>
+Subject: Re: [PATCH] Kbuild: Move -Wmaybe-uninitialized to W=1
+Message-ID: <20140707105339.GA4776@pd.tnic>
+References: <20140616132045.GE8170@pd.tnic>
+ <20140616211405.GA7914@ravnborg.org>
+ <20140624213835.GD15068@pd.tnic>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20140702103512.GG32514@n2100.arm.linux.org.uk>
+In-Reply-To: <20140624213835.GD15068@pd.tnic>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>, linux-kbuild@vger.kernel.org
-Cc: kernel@pengutronix.de, linux-arm-kernel@lists.infradead.org, Russell King - ARM Linux <linux@arm.linux.org.uk>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: lkml <linux-kernel@vger.kernel.org>, Michael Matz <matz@suse.de>, linux-kbuild@vger.kernel.org, x86-ml <x86@kernel.org>
 
-Hello,
+Ok, here's a v2 which goes ontop of
 
-(adding Yann and linux-kbuild to recipents)
+http://lkml.kernel.org/r/1404175346-12330-1-git-send-email-behanw@converseincode.com
 
-On Wed, Jul 02, 2014 at 11:35:12AM +0100, Russell King - ARM Linux wrote:
-> On Wed, Jul 02, 2014 at 11:57:23AM +0200, Uwe Kleine-König wrote:
-> > This fixes the following warning:
-> > 
-> > 	warning: (ARCH_MULTIPLATFORM && ARCH_INTEGRATOR && ARCH_SHMOBILE_LEGACY) selects ARM_PATCH_PHYS_VIRT which has unmet direct dependencies (!XIP_KERNEL && MMU && (!ARCH_REALVIEW || !SPARSEMEM))
-> > 
-> > Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
-> > ---
-> > I'm not sure why ARCH_MULTIPLATFORM appears here. It depends on MMU,
-> > isn't selectable at the same time as ARCH_REALVIEW and XIP_KERNEL
-> > depends on !ARCH_MULTIPLATFORM.
-> 
-> The message is extremely confusing.  It would read better if those
-> && were || - because ARM_PATCH_PHYS_VIRT is selected by
-> ARCH_MULTIPLATFORM _or_ ARCH_INTEGRATOR _or_ ARCH_SHMOBILE_LEGACY:
-right, so there are two things that could be improved here. The
-resolution I'd prefer is to make this two warnings:
+After this, all warnings stuff should be back to normal.
 
-   ARCH_INTEGRATOR selects ARM_PATCH_PHYS_VIRT which has unmet direct dependencies (!XIP_KERNEL && MMU)
-   ARCH_SHMOBILE_LEGACY selects ARM_PATCH_PHYS_VIRT which has unmet direct dependencies (!XIP_KERNEL && MMU)
+---
+From: Borislav Petkov <bp@suse.de>
+Subject: [PATCH -v2] Kbuild: Move -Wmaybe-uninitialized to W=1
 
-ARCH_REALVIEW cannot be selected at the same time as ARCH_INTEGRATOR or
-ARCH_SHMOBILE_LEGACY, so that can be dropped. And as stated above
-ARCH_MULTIPLATFORM isn't an issue.
+This warning is enabled by -Wall or -Wextra, says the gcc manpage. It
+also says that gcc cannot always know whether the warning is issued
+correctly:
 
-This doesn't have the natural language problem that ARCH_MULTIPLATFORM
-*and* ARCH_INTEGRATOR *and* ARCH_SHMOBILE_LEGACY all select
-ARM_PATCH_PHYS_VIRT.
+"These warnings are made optional because GCC is not smart enough to see
+all the reasons why the code might be correct in spite of appearing to
+have an error."
 
-> config ARCH_MULTIPLATFORM
->         select ARM_PATCH_PHYS_VIRT
-> 
-> config ARCH_INTEGRATOR
->         select ARM_PATCH_PHYS_VIRT
-> 
-> config ARCH_SHMOBILE_LEGACY
->         select ARM_PATCH_PHYS_VIRT
-> 
-(For reference, the patch did:
+And, as expected, it fires for perfectly valid use cases, thus making it
+not really useful. Let's move it to the W=1 bunch in case people want to
+enable it with the additional checks.
 
-	-       select ARM_PATCH_PHYS_VIRT
-	+       select ARM_PATCH_PHYS_VIRT if MMU
+Signed-off-by: Borislav Petkov <bp@suse.de>
+---
+ Makefile                   | 5 ++++-
+ scripts/Makefile           | 1 +
+ scripts/Makefile.extrawarn | 1 +
+ 3 files changed, 6 insertions(+), 1 deletion(-)
 
-for ARCH_INTEGRATOR and ARCH_SHMOBILE_LEGACY)
-
-Best regards
-Uwe
+diff --git a/Makefile b/Makefile
+index 4d75b4bceedd..b58c94261960 100644
+--- a/Makefile
++++ b/Makefile
+@@ -613,7 +613,7 @@ include $(srctree)/arch/$(SRCARCH)/Makefile
+ KBUILD_CFLAGS	+= $(call cc-option,-fno-delete-null-pointer-checks,)
+ 
+ ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
+-KBUILD_CFLAGS	+= -Os $(call cc-disable-warning,maybe-uninitialized,)
++KBUILD_CFLAGS	+= -Os
+ else
+ KBUILD_CFLAGS	+= -O2
+ endif
+@@ -742,6 +742,9 @@ KBUILD_CFLAGS   += $(call cc-option,-Werror=date-time)
+ # use the deterministic mode of AR if available
+ KBUILD_ARFLAGS := $(call ar-option,D)
+ 
++# disable -Wmaybe-uninitialized as too noisy, see Makefile.extrawarn instead
++KBUILD_CFLAGS   += $(call cc-disable-warning, maybe-uninitialized)
++
+ # check for 'asm goto'
+ ifeq ($(shell $(CONFIG_SHELL) $(srctree)/scripts/gcc-goto.sh $(CC)), y)
+ 	KBUILD_CFLAGS += -DCC_HAVE_ASM_GOTO
+diff --git a/scripts/Makefile b/scripts/Makefile
+index 890df5c6adfb..a483d9988a2e 100644
+--- a/scripts/Makefile
++++ b/scripts/Makefile
+@@ -19,6 +19,7 @@ hostprogs-$(CONFIG_BUILDTIME_EXTABLE_SORT) += sortextable
+ hostprogs-$(CONFIG_ASN1)	 += asn1_compiler
+ 
+ HOSTCFLAGS_sortextable.o = -I$(srctree)/tools/include
++HOSTCFLAGS_sortextable.o += $(call cc-disable-warning, maybe-uninitialized)
+ HOSTCFLAGS_asn1_compiler.o = -I$(srctree)/include
+ 
+ always		:= $(hostprogs-y) $(hostprogs-m)
+diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
+index e3501272cd93..9657d5778e06 100644
+--- a/scripts/Makefile.extrawarn
++++ b/scripts/Makefile.extrawarn
+@@ -25,6 +25,7 @@ warning-1 += -Wold-style-definition
+ warning-1 += $(call cc-option, -Wmissing-include-dirs)
+ warning-1 += $(call cc-option, -Wunused-but-set-variable)
+ warning-1 += $(call cc-disable-warning, missing-field-initializers)
++warning-1 += $(call cc-option, -Wmaybe-uninitialized)
+ 
+ ifeq ($(COMPILER),clang)
+ warning-1 += $(call cc-disable-warning, initializer-overrides)
+-- 
+2.0.0
 
 -- 
-Pengutronix e.K.                           | Uwe Kleine-König            |
-Industrial Linux Solutions                 | http://www.pengutronix.de/  |
+Regards/Gruss,
+    Boris.
+
+Sent from a fat crate under my desk. Formatting is fine.
+--
