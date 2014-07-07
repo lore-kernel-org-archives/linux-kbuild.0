@@ -1,164 +1,102 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ob0-f174.google.com ([209.85.214.174]:51263 "EHLO
-	mail-ob0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751812AbaGFSyq (ORCPT
+Received: from casper.infradead.org ([85.118.1.10]:47627 "EHLO
+	casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752318AbaGGBES (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 6 Jul 2014 14:54:46 -0400
-Message-ID: <53B99B7F.2080602@lwfinger.net>
-Date: Sun, 06 Jul 2014 13:54:55 -0500
-From: Larry Finger <Larry.Finger@lwfinger.net>
+	Sun, 6 Jul 2014 21:04:18 -0400
+Message-ID: <53B9F20C.2020901@infradead.org>
+Date: Sun, 06 Jul 2014 18:04:12 -0700
+From: Randy Dunlap <rdunlap@infradead.org>
 MIME-Version: 1.0
-Subject: Re: [patch] iwlwifi: fix Kconfig option continuity
-References: <53B9833D.4000600@lwfinger.net> <53B997D5.1060001@infradead.org>
-In-Reply-To: <53B997D5.1060001@infradead.org>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Subject: Re: relative objtree change broke tar builds?
+References: <20140617223854.GC6168@fieldses.org> <53A15684.9000002@suse.cz> <20140618122029.GA17790@fieldses.org> <53A18712.6030907@suse.cz> <20140618131452.GB17790@fieldses.org> <53A1B72E.7030907@infradead.org> <53A1ECD0.2030001@suse.cz> <20140618195259.GA21939@ravnborg.org> <53A200DD.3060004@infradead.org> <53B71E83.3010005@suse.cz>
+In-Reply-To: <53B71E83.3010005@suse.cz>
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@infradead.org>, "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: linux-kbuild@vger.kernel.org, linux-wireless <linux-wireless@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Emmanuel Grumbach <emmanuel.grumbach@intel.com>
+To: Michal Marek <mmarek@suse.cz>, Sam Ravnborg <sam@ravnborg.org>
+Cc: "J. Bruce Fields" <bfields@fieldses.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 07/06/2014 01:39 PM, Randy Dunlap wrote:
-> Hi,
->
-> Please use a newline every 70-72 characters.  Some email clients don't do automatic
-> line wrapping -- they just make the user scroll to the right to see very long lines.
->
->
-> On 07/06/2014 10:11 AM, Larry Finger wrote:
->> A problem with configuration of IWLWIFI has been bisected to commit 48e2934, where a new section was added to drivers/net/wireless/iwlwifi/Kconfig with the following code:
+On 07/04/2014 02:37 PM, Michal Marek wrote:
+> Dne 18.6.2014 23:13, Randy Dunlap napsal(a):
+>> On 06/18/14 12:52, Sam Ravnborg wrote:
+>>> On Wed, Jun 18, 2014 at 09:47:28PM +0200, Michal Marek wrote:
+>>>> Dne 18.6.2014 17:58, Randy Dunlap napsal(a):
+>>>>> On 06/18/14 06:14, J. Bruce Fields wrote:
+>>>>>> On Wed, Jun 18, 2014 at 02:33:22PM +0200, Michal Marek wrote:
+>>>>>>> Dne 18.6.2014 14:20, J. Bruce Fields napsal(a):
+>>>>>>>> On Wed, Jun 18, 2014 at 11:06:12AM +0200, Michal Marek wrote:
+>>>>>>>>> Dne 18.6.2014 00:38, J. Bruce Fields napsal(a):
+>>>>>>>>>> The changelog there says
+>>>>>>>>>>
+>>>>>>>>>> 	The main Makefile sets its working directory to the object tree
+>>>>>>>>>> 	and never changes it again. Therefore, we can use '.' instead of
+>>>>>>>>>> 	the absolute path.
+>>>>>>>>>>
+>>>>>>>>>> But the main Makefile also exports objtree, and a quick grep suggests
+>>>>>>>>>> lots of other uses outside the main Makefile.
+>>>>>>>>>
+>>>>>>>>> Do you have examples? Besides your report, I'm only aware of make
+>>>>>>>>> deb-pkg and make *docs. What else?
+>>>>>>>>
+>>>>>>>> I haven't looked.
+>>>>>>>>
+>>>>>>>> I only note that grep finds 47 files referencing that variable, and
+>>>>>>>> absent some argument that the remaining ones are correct, I'd be
+>>>>>>>> inclined to revert.
+>>>>>>>
+>>>>>>> Do these 47 files change the working directory before referencing the
+>>>>>>> variable?
+>>>>>>
+>>>>>> Sorry, I'm not volunteering to check.
+>>>>>>
+>>>>>> Note also that other variables are defined in terms of objtree, and they
+>>>>>> may be exported or passed to other scripts.
+>>>>>
+>>>>>
+>>>>> I'll note one side effect that I really dislike:
+>>>>> If not in silent mode, scripts/mkmakefile tells me that the it is
+>>>>> generating ./Makefile.  I want to see the real path there instead of '.'.
+>>>>
+>>>> The idea is that one should be able to compare as much as possible
+>>>> between the build of /usr/src/linux-<version_a> built in
+>>>> /usr/src/linux-<version_a>/build and /usr/src/linux-<version_b> built in
+>>>> /usr/src/linux-<version_b>/build. One can now even compare the build log
+>>>> with -j1, although that was not the primary goal. So if the changed
+>>>> message is considered problematic, I can change it to show the full path
+>>>> again, like
+>>>>
+>>>> diff --git a/scripts/mkmakefile b/scripts/mkmakefile
+>>>> index 84af27b..9d291f5 100644
+>>>> --- a/scripts/mkmakefile
+>>>> +++ b/scripts/mkmakefile
+>>>> @@ -18,7 +18,7 @@ then
+>>>>         exit 0
+>>>>  fi
+>>>>  if [ "${quiet}" != "silent_" ]; then
+>>>> -       echo "  GEN     $2/Makefile"
+>>>> +       echo "  GEN     $(cd $2 && /bin/pwd)/Makefile"
+>>>>  fi
+>>>>
+>>>>  cat << EOF > $2/Makefile
+>>>>
+>>>> Opinions?
+>>> I agree with Randy - the full path is more informative.
+>>>
+>>> 	Sam
 >>
->> # don't call it _MODULE -- will confuse Kconfig/fixdep/...
->> config IWLWIFI_OPMODE_MODULAR
->>          bool
->>          default y if IWLDVM=m
->>          default y if IWLMVM=m
->>
->> When the above section is present, 'make xconfig' fails to show a "Debugging options" menu' even though 'make menuconfig' displays correctly. despite the incorrect on-screen display, xconfig does not delete the affected info in .config after it was set by menuconfig, thus the bug only seems to affect the display in xconfig.
->>
->> Is there anything wrong with that section in iwlwifi's Kconfig, or is it a bug in xconfig?
->
-> in menuconfig or nconfig:
-> Notice that 'Debugging options' is not indented under iwlwifi, but listed at the
-> same indent level.  That is a huge clue.
->
->
-> in xconfig:
-> The 'Debugging options' menu is displayed, but it's not where you expect or want
-> it to be found.  Look under 'Wireless LAN' and immediately under 'Atheros Wireless Cards'
-> and it says 'Debugging options' (on the left panel).  Then the debugging options are
-> displayed in the right hand panel.
->
-> This is a common problem.  I have made Kconfig patches for it several times.
-> Here is another one.  Works for me.
->
-> ---
-> Fix iwlwifi options so that they all depend on IWLWIFI and are
-> displayed under the iwlwifi driver instead of in other unexpected
-> places.
->
-> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-> Reported-by: Larry Finger <Larry.Finger@lwfinger.net>
-> ---
->   drivers/net/wireless/iwlwifi/Kconfig |   17 ++++++++---------
->   1 file changed, 8 insertions(+), 9 deletions(-)
->
-> Index: lnx-316-rc3/drivers/net/wireless/iwlwifi/Kconfig
-> ===================================================================
-> --- lnx-316-rc3.orig/drivers/net/wireless/iwlwifi/Kconfig
-> +++ lnx-316-rc3/drivers/net/wireless/iwlwifi/Kconfig
-> @@ -39,9 +39,10 @@ config IWLWIFI
->   	  say M here and read <file:Documentation/kbuild/modules.txt>.  The
->   	  module will be called iwlwifi.
->
-> +if IWLWIFI
-> +
->   config IWLWIFI_LEDS
->   	bool
-> -	depends on IWLWIFI
->   	depends on LEDS_CLASS=y || LEDS_CLASS=IWLWIFI
->   	select LEDS_TRIGGERS
->   	select MAC80211_LEDS
-> @@ -49,7 +50,6 @@ config IWLWIFI_LEDS
->
->   config IWLDVM
->   	tristate "Intel Wireless WiFi DVM Firmware support"
-> -	depends on IWLWIFI
->   	default IWLWIFI
->   	help
->   	  This is the driver that supports the DVM firmware which is
-> @@ -58,7 +58,6 @@ config IWLDVM
->
->   config IWLMVM
->   	tristate "Intel Wireless WiFi MVM Firmware support"
-> -	depends on IWLWIFI
->   	help
->   	  This is the driver that supports the MVM firmware which is
->   	  currently only available for 7260 and 3160 devices.
-> @@ -70,7 +69,7 @@ config IWLWIFI_OPMODE_MODULAR
->   	default y if IWLMVM=m
->
->   comment "WARNING: iwlwifi is useless without IWLDVM or IWLMVM"
-> -	depends on IWLWIFI && IWLDVM=n && IWLMVM=n
-> +	depends on IWLDVM=n && IWLMVM=n
->
->   config IWLWIFI_BCAST_FILTERING
->   	bool "Enable broadcast filtering"
-> @@ -86,11 +85,9 @@ config IWLWIFI_BCAST_FILTERING
->   	  expect incoming broadcasts for their normal operations.
->
->   menu "Debugging Options"
-> -	depends on IWLWIFI
->
->   config IWLWIFI_DEBUG
->   	bool "Enable full debugging output in the iwlwifi driver"
-> -	depends on IWLWIFI
->   	---help---
->   	  This option will enable debug tracing output for the iwlwifi drivers
->
-> @@ -115,7 +112,7 @@ config IWLWIFI_DEBUG
->
->   config IWLWIFI_DEBUGFS
->           bool "iwlwifi debugfs support"
-> -        depends on IWLWIFI && MAC80211_DEBUGFS
-> +        depends on MAC80211_DEBUGFS
->           ---help---
->   	  Enable creation of debugfs files for the iwlwifi drivers. This
->   	  is a low-impact option that allows getting insight into the
-> @@ -123,13 +120,12 @@ config IWLWIFI_DEBUGFS
->
->   config IWLWIFI_DEBUG_EXPERIMENTAL_UCODE
->           bool "Experimental uCode support"
-> -        depends on IWLWIFI && IWLWIFI_DEBUG
-> +        depends on IWLWIFI_DEBUG
->           ---help---
->   	  Enable use of experimental ucode for testing and debugging.
->
->   config IWLWIFI_DEVICE_TRACING
->   	bool "iwlwifi device access tracing"
-> -	depends on IWLWIFI
->   	depends on EVENT_TRACING
->   	help
->   	  Say Y here to trace all commands, including TX frames and IO
-> @@ -144,4 +140,7 @@ config IWLWIFI_DEVICE_TRACING
->
->   	  If unsure, say Y so we can help you better when problems
->   	  occur.
-> +
->   endmenu
-> +
-> +endif
->
+>> Yes, just '.' discards some very useful information.
+> 
+> With commit c2e28dc9 ("kbuild: Print the name of the build directory"),
+> it now prints the full path at the beginning of each make invocation. So
+> I think it is not necessary to repeat the full path a few lines later,
+> do you agree?
 
-Rabdy,
+Yes, I am OK with this directory output now.
 
-Sorry about the long lines. I thought Thunderbird was inserting a newline after 
-72 characters. At least, that is what shows on my screen.
-
-I can report that your fix does take care of the problem for me.
-
-Thanks,
-
-Larry
+Thanks.
 
 
+-- 
+~Randy
