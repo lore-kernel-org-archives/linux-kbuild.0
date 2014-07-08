@@ -1,64 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ie0-f169.google.com ([209.85.223.169]:58912 "EHLO
-	mail-ie0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751300AbaGHIQt (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 8 Jul 2014 04:16:49 -0400
+Received: from a.ns.miles-group.at ([95.130.255.143]:65275 "EHLO radon.swed.at"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753893AbaGHI0w (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 8 Jul 2014 04:26:52 -0400
+Message-ID: <53BBA9B4.7050609@nod.at>
+Date: Tue, 08 Jul 2014 10:20:04 +0200
+From: Richard Weinberger <richard@nod.at>
 MIME-Version: 1.0
-In-Reply-To: <CAFLxGvzxvuizdHyjQ0SjUm8jJcj=w+qS5ut-u76Xo-m2sftvvw@mail.gmail.com>
-References: <20140705112238.16142.42735.stgit@zurg>
-	<20140707150523.cc671116bf366e8db73209c5@linux-foundation.org>
-	<CALYGNiMjL_GYqqkid4yQsubpnbydVXxTPnKW0GqJcg05x9zbHQ@mail.gmail.com>
-	<CAFLxGvzxvuizdHyjQ0SjUm8jJcj=w+qS5ut-u76Xo-m2sftvvw@mail.gmail.com>
-Date: Tue, 8 Jul 2014 12:16:48 +0400
-Message-ID: <CALYGNiOTC8KOxWwRo+f=6JmtUYhJ=1cQNq-Us1BZbW85r4P+ug@mail.gmail.com>
 Subject: Re: [uml-devel] [PATCH] checkstack: use $UTS_MACHINE as target architecture
-From: Konstantin Khlebnikov <koct9i@gmail.com>
+References: <20140705112238.16142.42735.stgit@zurg>	<20140707150523.cc671116bf366e8db73209c5@linux-foundation.org>	<CALYGNiMjL_GYqqkid4yQsubpnbydVXxTPnKW0GqJcg05x9zbHQ@mail.gmail.com>	<CAFLxGvzxvuizdHyjQ0SjUm8jJcj=w+qS5ut-u76Xo-m2sftvvw@mail.gmail.com> <CALYGNiOTC8KOxWwRo+f=6JmtUYhJ=1cQNq-Us1BZbW85r4P+ug@mail.gmail.com>
+In-Reply-To: <CALYGNiOTC8KOxWwRo+f=6JmtUYhJ=1cQNq-Us1BZbW85r4P+ug@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Richard Weinberger <richard.weinberger@gmail.com>
+To: Konstantin Khlebnikov <koct9i@gmail.com>
 Cc: Andrew Morton <akpm@linux-foundation.org>, "x86@kernel.org" <x86@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, UML devel <user-mode-linux-devel@lists.sourceforge.net>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On Tue, Jul 8, 2014 at 12:01 PM, Richard Weinberger
-<richard.weinberger@gmail.com> wrote:
-> On Tue, Jul 8, 2014 at 7:48 AM, Konstantin Khlebnikov <koct9i@gmail.com> wrote:
->> On Tue, Jul 8, 2014 at 2:05 AM, Andrew Morton <akpm@linux-foundation.org> wrote:
->>> On Sat, 05 Jul 2014 15:22:38 +0400 Konstantin Khlebnikov <koct9i@gmail.com> wrote:
->>>
->>>> This fixes command # make checkstack for i386/x86_64.
->>>> Looks like $UTS_MACHINE is exactly what scripts/checkstack.pl needs.
+Am 08.07.2014 10:16, schrieb Konstantin Khlebnikov:
+> On Tue, Jul 8, 2014 at 12:01 PM, Richard Weinberger
+> <richard.weinberger@gmail.com> wrote:
+>> On Tue, Jul 8, 2014 at 7:48 AM, Konstantin Khlebnikov <koct9i@gmail.com> wrote:
+>>> On Tue, Jul 8, 2014 at 2:05 AM, Andrew Morton <akpm@linux-foundation.org> wrote:
+>>>> On Sat, 05 Jul 2014 15:22:38 +0400 Konstantin Khlebnikov <koct9i@gmail.com> wrote:
 >>>>
->>>> By default $UTS_MACHINE is equal to $ARCH, but some arch/${ARCH}/Makefile
->>>> overrides it. This patch updates it also in arch/x86/Makefile.um
+>>>>> This fixes command # make checkstack for i386/x86_64.
+>>>>> Looks like $UTS_MACHINE is exactly what scripts/checkstack.pl needs.
+>>>>>
+>>>>> By default $UTS_MACHINE is equal to $ARCH, but some arch/${ARCH}/Makefile
+>>>>> overrides it. This patch updates it also in arch/x86/Makefile.um
+>>>>>
+>>>>> broken in ffee0de ("x86: Default to ARCH=x86 to avoid overriding CONFIG_64BIT")
 >>>>
->>>> broken in ffee0de ("x86: Default to ARCH=x86 to avoid overriding CONFIG_64BIT")
+>>>> The changelog doesn't describe the bug which is being fixed.  It should
+>>>> do so please.  If there are any compiler/make error messages then those
+>>>> should be included.
+>>>>
 >>>
->>> The changelog doesn't describe the bug which is being fixed.  It should
->>> do so please.  If there are any compiler/make error messages then those
->>> should be included.
+>>> Oh, ok. checkstalk.pl needs either i386 or x86_64, x86 isn't enough.
 >>>
+>>> $ make checkstack
+>>> objdump -d vmlinux $(find . -name '*.ko') | \
+>>> perl /home/blind/src/linux-stable/scripts/checkstack.pl x86
+>>> wrong or unknown architecture "x86"
 >>
->> Oh, ok. checkstalk.pl needs either i386 or x86_64, x86 isn't enough.
->>
->> $ make checkstack
->> objdump -d vmlinux $(find . -name '*.ko') | \
->> perl /home/blind/src/linux-stable/scripts/checkstack.pl x86
->> wrong or unknown architecture "x86"
->
-> And now we need ARCH, SUBARCH and UTS_MACHINE on UML? :-(
+>> And now we need ARCH, SUBARCH and UTS_MACHINE on UML? :-(
+> 
+> Nope UTS_MACHINE is autodetected, see hunk Makefile.x86 in my patch.
+> 
+> I thought about cleaning this part of UML.
+> For example we could move arch/x86/um into arch/um/x86 and use # make
+> ARCH=um/x86
 
-Nope UTS_MACHINE is autodetected, see hunk Makefile.x86 in my patch.
+No way. We moved the x86 stuff to arch/x86/ a few Years ago by design.
 
-I thought about cleaning this part of UML.
-For example we could move arch/x86/um into arch/um/x86 and use # make
-ARCH=um/x86
-after collecting this stuff together it woud be easier to get rid of
-forever-broken parts.
-As I see UML has been designed to work everywhere but SMP seem never worked
-as well as any host os except of linux or other arch except x86.
+> after collecting this stuff together it woud be easier to get rid of
+> forever-broken parts.
+> As I see UML has been designed to work everywhere but SMP seem never worked
+> as well as any host os except of linux or other arch except x86.
 
->
-> --
-> Thanks,
-> //richard
+Currently UML runs only on x86_32/64.
+Adding/fixing SMP support should be doable.
+
+Thanks,
+//richard
