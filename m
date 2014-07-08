@@ -1,95 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vc0-f180.google.com ([209.85.220.180]:62968 "EHLO
-	mail-vc0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754111AbaGHABf (ORCPT
+Received: from mail-ig0-f176.google.com ([209.85.213.176]:42548 "EHLO
+	mail-ig0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750927AbaGHFss (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 7 Jul 2014 20:01:35 -0400
-Received: by mail-vc0-f180.google.com with SMTP id im17so4612851vcb.25
-        for <linux-kbuild@vger.kernel.org>; Mon, 07 Jul 2014 17:01:34 -0700 (PDT)
+	Tue, 8 Jul 2014 01:48:48 -0400
 MIME-Version: 1.0
-In-Reply-To: <20140704123847.GA3513@sepie.suse.cz>
-References: <20140702124016.GA26965@sepie.suse.cz>
-	<20140702105645.17220.92338.stgit@warthog.procyon.org.uk>
-	<2690.1404308050@warthog.procyon.org.uk>
-	<20140704123847.GA3513@sepie.suse.cz>
-Date: Mon, 7 Jul 2014 17:01:34 -0700
-Message-ID: <CAD=FV=VbR8GZ7V3RfDRRt_fFXa9aZK6joGgYPOMWTSVbhyvi3A@mail.gmail.com>
-Subject: Re: [PATCH] Fix compiler message generation
-From: Doug Anderson <dianders@chromium.org>
+In-Reply-To: <20140707150523.cc671116bf366e8db73209c5@linux-foundation.org>
+References: <20140705112238.16142.42735.stgit@zurg>
+	<20140707150523.cc671116bf366e8db73209c5@linux-foundation.org>
+Date: Tue, 8 Jul 2014 09:48:47 +0400
+Message-ID: <CALYGNiMjL_GYqqkid4yQsubpnbydVXxTPnKW0GqJcg05x9zbHQ@mail.gmail.com>
+Subject: Re: [PATCH] checkstack: use $UTS_MACHINE as target architecture
+From: Konstantin Khlebnikov <koct9i@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: David Howells <dhowells@redhat.com>, Linus Torvalds <torvalds@linux-foundation.org>, sam@ravnborg.org, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, Boaz Harrosh <boaz@plexistor.com>, Olof Johansson <olof@lixom.net>, Andrew Bresticker <abrestic@chromium.org>, Mike Frysinger <vapier@gentoo.org>, Sonny Rao <sonnyrao@chromium.org>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, x86@kernel.org, UML devel <user-mode-linux-devel@lists.sourceforge.net>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-Michal
-
-On Fri, Jul 4, 2014 at 5:38 AM, Michal Marek <mmarek@suse.cz> wrote:
-> On Wed, Jul 02, 2014 at 02:34:10PM +0100, David Howells wrote:
->> Michal Marek <mmarek@suse.cz> wrote:
+On Tue, Jul 8, 2014 at 2:05 AM, Andrew Morton <akpm@linux-foundation.org> wrote:
+> On Sat, 05 Jul 2014 15:22:38 +0400 Konstantin Khlebnikov <koct9i@gmail.com> wrote:
+>
+>> This fixes command # make checkstack for i386/x86_64.
+>> Looks like $UTS_MACHINE is exactly what scripts/checkstack.pl needs.
 >>
->> > From 5b59dcacf358f143b9fb39d2f788142ab9ba3e00 Mon Sep 17 00:00:00 2001
->> > From: Michal Marek <mmarek@suse.cz>
->> > Date: Wed, 2 Jul 2014 14:28:26 +0200
->> > Subject: [PATCH] kbuild: Print the name of the build directory
->> >
->> > With commit 9da0763b (kbuild: Use relative path when building in a
->> > subdir of the source tree), the compiler messages include relative
->> > paths. These are however relative to the build directory, not the
->> > directory where make was started. Print the "Entering directory ..."
->> > message once, so that IDEs/editors can find the source files.
->> >
->> > Signed-off-by: Michal Marek <mmarek@suse.cz>
->> > ---
->> >  Makefile | 3 +++
->> >  1 file changed, 3 insertions(+)
->> >
->> > diff --git a/Makefile b/Makefile
->> > index 97b2861..40544a0 100644
->> > --- a/Makefile
->> > +++ b/Makefile
->> > @@ -126,7 +126,10 @@ PHONY += $(MAKECMDGOALS) sub-make
->> >  $(filter-out _all sub-make $(CURDIR)/Makefile, $(MAKECMDGOALS)) _all: sub-make
->> >     @:
->> >
->> > +# Fake the "Entering directory" message once, so that IDEs/editors are
->> > +# able to understand relative filenames.
->> >  sub-make: FORCE
->> > +   @echo "make[1]: Entering directory \`$(KBUILD_OUTPUT)'"
->> >     $(if $(KBUILD_VERBOSE:1=),@)$(MAKE) -C $(KBUILD_OUTPUT) \
->> >     KBUILD_SRC=$(CURDIR) \
->> >     KBUILD_EXTMOD="$(KBUILD_EXTMOD)" -f $(CURDIR)/Makefile \
+>> By default $UTS_MACHINE is equal to $ARCH, but some arch/${ARCH}/Makefile
+>> overrides it. This patch updates it also in arch/x86/Makefile.um
 >>
->> Works for me with emacs.
->>
->> Acked-by: David Howells <dhowells@redhat.com>
+>> broken in ffee0de ("x86: Default to ARCH=x86 to avoid overriding CONFIG_64BIT")
 >
-> I found a regression today... after I had sent a pull request to Linus
-> yesterday :-/. The message is also printed by 'make -s', which is not
-> what the user expects from a silent mode. The following patch fixes it:
+> The changelog doesn't describe the bug which is being fixed.  It should
+> do so please.  If there are any compiler/make error messages then those
+> should be included.
 >
->
-> From 066b7ed9558087a7957a1128f27d7a3462ff117f Mon Sep 17 00:00:00 2001
-> From: Michal Marek <mmarek@suse.cz>
-> Date: Fri, 4 Jul 2014 14:29:30 +0200
-> Subject: [PATCH] kbuild: Do not print the build directory with make -s
->
-> Commit c2e28dc9 (kbuild: Print the name of the build directory) prints
-> the name of the build directory for O= builds, but we should not be
-> doing this in make -s mode, so that commands like
->
->   make -s O=<dir> kernelrelease
->
-> can be used by scripts. This matches the behavior of make itself, where
-> the -s option implies --no-print-directory.
->
-> Signed-off-by: Michal Marek <mmarek@suse.cz>
-> ---
->  Makefile | 97 +++++++++++++++++++++++++++++++++-------------------------------
->  1 file changed, 50 insertions(+), 47 deletions(-)
 
-This fixes the build error I was running into.  Our build system
-effectively calls "make -s kernelrelease" and was getting tripped up.
-I haven't extensively reviewed your fix but I have tested it.
+Oh, ok. checkstalk.pl needs either i386 or x86_64, x86 isn't enough.
 
-Tested-by: Doug Anderson <dianders@chromium.org>
+$ make checkstack
+objdump -d vmlinux $(find . -name '*.ko') | \
+perl /home/blind/src/linux-stable/scripts/checkstack.pl x86
+wrong or unknown architecture "x86"
