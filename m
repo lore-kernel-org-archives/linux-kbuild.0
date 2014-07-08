@@ -1,62 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ie0-f173.google.com ([209.85.223.173]:61735 "EHLO
-	mail-ie0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753063AbaGHKbh (ORCPT
+Received: from mail-lb0-f178.google.com ([209.85.217.178]:39589 "EHLO
+	mail-lb0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753443AbaGHKgG (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 8 Jul 2014 06:31:37 -0400
-MIME-Version: 1.0
-In-Reply-To: <CALYGNiMjL_GYqqkid4yQsubpnbydVXxTPnKW0GqJcg05x9zbHQ@mail.gmail.com>
-References: <20140705112238.16142.42735.stgit@zurg>
-	<20140707150523.cc671116bf366e8db73209c5@linux-foundation.org>
-	<CALYGNiMjL_GYqqkid4yQsubpnbydVXxTPnKW0GqJcg05x9zbHQ@mail.gmail.com>
-Date: Tue, 8 Jul 2014 14:31:36 +0400
-Message-ID: <CALYGNiOkiBWfT1+SeAkx1qEZKFm2y9G1gXhVEyNC0OrewB2ktA@mail.gmail.com>
-Subject: Re: [PATCH] checkstack: use $UTS_MACHINE as target architecture
+	Tue, 8 Jul 2014 06:36:06 -0400
+Subject: [PATCH] scripts/checkstack.pl: automatically handle 32-bit and
+ 64-bit mode for ARCH=x86
 From: Konstantin Khlebnikov <koct9i@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Date: Tue, 08 Jul 2014 14:35:57 +0400
+Message-ID: <20140708103557.4408.87822.stgit@zurg>
+In-Reply-To: <CALYGNiOkiBWfT1+SeAkx1qEZKFm2y9G1gXhVEyNC0OrewB2ktA@mail.gmail.com>
+References: <CALYGNiOkiBWfT1+SeAkx1qEZKFm2y9G1gXhVEyNC0OrewB2ktA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "x86@kernel.org" <x86@kernel.org>, UML devel <user-mode-linux-devel@lists.sourceforge.net>, linux-kbuild <linux-kbuild@vger.kernel.org>
+Cc: "x86@kernel.org" <x86@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, user-mode-linux-devel@lists.sourceforge.net, linux-kbuild@vger.kernel.org
 
-On Tue, Jul 8, 2014 at 9:48 AM, Konstantin Khlebnikov <koct9i@gmail.com> wrote:
-> On Tue, Jul 8, 2014 at 2:05 AM, Andrew Morton <akpm@linux-foundation.org> wrote:
->> On Sat, 05 Jul 2014 15:22:38 +0400 Konstantin Khlebnikov <koct9i@gmail.com> wrote:
->>
->>> This fixes command # make checkstack for i386/x86_64.
->>> Looks like $UTS_MACHINE is exactly what scripts/checkstack.pl needs.
->>>
->>> By default $UTS_MACHINE is equal to $ARCH, but some arch/${ARCH}/Makefile
->>> overrides it. This patch updates it also in arch/x86/Makefile.um
->>>
->>> broken in ffee0de ("x86: Default to ARCH=x86 to avoid overriding CONFIG_64BIT")
->>
->> The changelog doesn't describe the bug which is being fixed.  It should
->> do so please.  If there are any compiler/make error messages then those
->> should be included.
->>
->
-> Oh, ok. checkstalk.pl needs either i386 or x86_64, x86 isn't enough.
->
-> $ make checkstack
-> objdump -d vmlinux $(find . -name '*.ko') | \
-> perl /home/blind/src/linux-stable/scripts/checkstack.pl x86
-> wrong or unknown architecture "x86"
+This patch adds support for ARCH=x86 into checkstack.
 
-I guess it still not descriptive enough.
-
-checkstack.pl searches patterns of machine instructions which are
-usually used for allocating stack frames. commit ffee0de
-("x86: Default to ARCH=x86 to avoid overriding CONFIG_64BIT")
-had merged ARCH=i386 and ARCH=x86_64 into one ARCH=x86.
-checkstalk.pl needs either i386 or x86_64, x86 isn't enough.
+commit ffee0de ("x86: Default to ARCH=x86 to avoid overriding CONFIG_64BIT")
+had merged ARCH=i386 and ARCH=x86_64 into one ARCH=x86. checkstack.pl searches
+patterns of machine instructions which are usually used for allocating stack
+frames. checkstalk.pl needs either i386 or x86_64, x86 isn't enough:
 
 $ make checkstack
 objdump -d vmlinux $(find . -name '*.ko') | \
 perl linux/scripts/checkstack.pl x86
 wrong or unknown architecture "x86"
 
+Signed-off-by: Konstantin Khlebnikov <koct9i@gmail.com>
+---
+ scripts/checkstack.pl |   12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
 
+diff --git a/scripts/checkstack.pl b/scripts/checkstack.pl
+index c05d586..899b423 100755
+--- a/scripts/checkstack.pl
++++ b/scripts/checkstack.pl
+@@ -52,14 +52,12 @@ my (@stack, $re, $dre, $x, $xs, $funcre);
+ 		#8000008a:       20 1d           sub sp,4
+ 		#80000ca8:       fa cd 05 b0     sub sp,sp,1456
+ 		$re = qr/^.*sub.*sp.*,([0-9]{1,8})/o;
+-	} elsif ($arch =~ /^i[3456]86$/) {
++	} elsif ($arch =~ /^x86(_64)?$/ || $arch =~ /^i[3456]86$/) {
+ 		#c0105234:       81 ec ac 05 00 00       sub    $0x5ac,%esp
+-		$re = qr/^.*[as][du][db]    \$(0x$x{1,8}),\%esp$/o;
+-		$dre = qr/^.*[as][du][db]    (%.*),\%esp$/o;
+-	} elsif ($arch eq 'x86_64') {
+-		#    2f60:	48 81 ec e8 05 00 00 	sub    $0x5e8,%rsp
+-		$re = qr/^.*[as][du][db]    \$(0x$x{1,8}),\%rsp$/o;
+-		$dre = qr/^.*[as][du][db]    (\%.*),\%rsp$/o;
++		# or
++		#    2f60:    48 81 ec e8 05 00 00       sub    $0x5e8,%rsp
++		$re = qr/^.*[as][du][db]    \$(0x$x{1,8}),\%(e|r)sp$/o;
++		$dre = qr/^.*[as][du][db]    (%.*),\%(e|r)sp$/o;
+ 	} elsif ($arch eq 'ia64') {
+ 		#e0000000044011fc:       01 0f fc 8c     adds r12=-384,r12
+ 		$re = qr/.*adds.*r12=-(([0-9]{2}|[3-9])[0-9]{2}),r12/o;
 
-This also might be fixed in checkstack.pl: i386 and x86_64 differs only
-in name of  sp register: %esp/%rsp.
