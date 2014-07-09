@@ -1,16 +1,16 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from qmta08.emeryville.ca.mail.comcast.net ([76.96.30.80]:48478 "EHLO
-	qmta08.emeryville.ca.mail.comcast.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751082AbaGIO30 (ORCPT
+Received: from qmta13.emeryville.ca.mail.comcast.net ([76.96.27.243]:40822
+	"EHLO qmta13.emeryville.ca.mail.comcast.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1754666AbaGIOcZ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 9 Jul 2014 10:29:26 -0400
-Date: Wed, 9 Jul 2014 09:29:22 -0500 (CDT)
+	Wed, 9 Jul 2014 10:32:25 -0400
+Date: Wed, 9 Jul 2014 09:32:21 -0500 (CDT)
 From: Christoph Lameter <cl@gentwo.org>
-Subject: Re: [RFC/PATCH RESEND -next 11/21] mm: slub: share slab_err and
- object_err functions
-In-Reply-To: <1404905415-9046-12-git-send-email-a.ryabinin@samsung.com>
-Message-ID: <alpine.DEB.2.11.1407090928530.1384@gentwo.org>
-References: <1404905415-9046-1-git-send-email-a.ryabinin@samsung.com> <1404905415-9046-12-git-send-email-a.ryabinin@samsung.com>
+Subject: Re: [RFC/PATCH RESEND -next 12/21] mm: util: move krealloc/kzfree
+ to slab_common.c
+In-Reply-To: <1404905415-9046-13-git-send-email-a.ryabinin@samsung.com>
+Message-ID: <alpine.DEB.2.11.1407090931350.1384@gentwo.org>
+References: <1404905415-9046-1-git-send-email-a.ryabinin@samsung.com> <1404905415-9046-13-git-send-email-a.ryabinin@samsung.com>
 Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
@@ -19,53 +19,17 @@ Cc: linux-kernel@vger.kernel.org, Dmitry Vyukov <dvyukov@google.com>, Konstantin
 
 On Wed, 9 Jul 2014, Andrey Ryabinin wrote:
 
-> Remove static and add function declarations to mm/slab.h so they
-> could be used by kernel address sanitizer.
+> To avoid false positive reports in kernel address sanitizer krealloc/kzfree
+> functions shouldn't be instrumented. Since we want to instrument other
+> functions in mm/util.c, krealloc/kzfree moved to slab_common.c which is not
+> instrumented.
+>
+> Unfortunately we can't completely disable instrumentation for one function.
+> We could disable compiler's instrumentation for one function by using
+> __atribute__((no_sanitize_address)).
+> But the problem here is that memset call will be replaced by instumented
+> version kasan_memset since currently it's implemented as define:
 
-Hmmm... This is allocator specific. At some future point it would be good
-to move error reporting to slab_common.c and use those from all
-allocators.
+Looks good to me and useful regardless of the sanitizer going in.
 
-> Signed-off-by: Andrey Ryabinin <a.ryabinin@samsung.com>
-> ---
->  mm/slab.h | 5 +++++
->  mm/slub.c | 4 ++--
->  2 files changed, 7 insertions(+), 2 deletions(-)
->
-> diff --git a/mm/slab.h b/mm/slab.h
-> index 1257ade..912af7f 100644
-> --- a/mm/slab.h
-> +++ b/mm/slab.h
-> @@ -339,5 +339,10 @@ static inline struct kmem_cache_node *get_node(struct kmem_cache *s, int node)
->
->  void *slab_next(struct seq_file *m, void *p, loff_t *pos);
->  void slab_stop(struct seq_file *m, void *p);
-> +void slab_err(struct kmem_cache *s, struct page *page,
-> +		const char *fmt, ...);
-> +void object_err(struct kmem_cache *s, struct page *page,
-> +		u8 *object, char *reason);
-> +
->
->  #endif /* MM_SLAB_H */
-> diff --git a/mm/slub.c b/mm/slub.c
-> index 6641a8f..3bdd9ac 100644
-> --- a/mm/slub.c
-> +++ b/mm/slub.c
-> @@ -635,14 +635,14 @@ static void print_trailer(struct kmem_cache *s, struct page *page, u8 *p)
->  	dump_stack();
->  }
->
-> -static void object_err(struct kmem_cache *s, struct page *page,
-> +void object_err(struct kmem_cache *s, struct page *page,
->  			u8 *object, char *reason)
->  {
->  	slab_bug(s, "%s", reason);
->  	print_trailer(s, page, object);
->  }
->
-> -static void slab_err(struct kmem_cache *s, struct page *page,
-> +void slab_err(struct kmem_cache *s, struct page *page,
->  			const char *fmt, ...)
->  {
->  	va_list args;
->
+Acked-by: Christoph Lameter <cl@linux.com>
