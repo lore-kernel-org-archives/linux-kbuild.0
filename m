@@ -1,39 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from asavdk3.altibox.net ([109.247.116.14]:51156 "EHLO
-	asavdk3.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750854AbaGIUwY (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 9 Jul 2014 16:52:24 -0400
-Date: Wed, 9 Jul 2014 22:52:20 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH 1/4] Documentation: use subdir-y to avoid unnecessary
- built-in.o files
-Message-ID: <20140709205219.GC32335@ravnborg.org>
-References: <1397743910-18391-1-git-send-email-pefoley2@pefoley.com>
- <53AF78A7.8050106@infradead.org>
+Received: from mga02.intel.com ([134.134.136.20]:26174 "EHLO mga02.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750889AbaGIVTj (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 9 Jul 2014 17:19:39 -0400
+Message-ID: <53BDB1D6.1090605@intel.com>
+Date: Wed, 09 Jul 2014 14:19:18 -0700
+From: Dave Hansen <dave.hansen@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <53AF78A7.8050106@infradead.org>
+Subject: Re: [RFC/PATCH RESEND -next 00/21] Address sanitizer for kernel (kasan)
+ - dynamic memory error detector.
+References: <1404905415-9046-1-git-send-email-a.ryabinin@samsung.com>
+In-Reply-To: <1404905415-9046-1-git-send-email-a.ryabinin@samsung.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: Peter Foley <pefoley2@pefoley.com>, linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+To: Andrey Ryabinin <a.ryabinin@samsung.com>, linux-kernel@vger.kernel.org
+Cc: Dmitry Vyukov <dvyukov@google.com>, Konstantin Serebryany <kcc@google.com>, Alexey Preobrazhensky <preobr@google.com>, Andrey Konovalov <adech.fo@gmail.com>, Yuri Gribov <tetra2005@gmail.com>, Konstantin Khlebnikov <koct9i@gmail.com>, Sasha Levin <sasha.levin@oracle.com>, Michal Marek <mmarek@suse.cz>, Russell King <linux@arm.linux.org.uk>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Christoph Lameter <cl@linux.com>, Pekka Enberg <penberg@kernel.org>, David Rientjes <rientjes@google.com>, Joonsoo Kim <iamjoonsoo.kim@lge.com>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org, x86@kernel.org, linux-mm@kvack.org
 
-On Sat, Jun 28, 2014 at 07:23:35PM -0700, Randy Dunlap wrote:
-> On 04/17/14 07:11, Peter Foley wrote:
-> > Change the Documentation makefiles from obj-m to subdir-y
-> > to avoid generating unnecessary built-in.o files since nothing
-> > in Documentation/ is ever linked in to vmlinux.
-> > 
-> > Signed-off-by: Peter Foley <pefoley2@pefoley.com>
-> 
-> Hi Michal,
-> 
-> Does this look good to you?
-> I don't have enough makefile fu (or is it foo?) to judge this.
-Looks OK.
-Please add my:
-Acked-by: Sam Ravnborg <sam@ravnborg.org>
+This is totally self-serving (and employer-serving), but has anybody
+thought about this large collection of memory debugging tools that we
+are growing?  It helps to have them all in the same places in the menus
+(thanks for adding it to Memory Debugging, btw!).
 
-	Sam
+But, this gives us at least four things that overlap with kasan's
+features on some level.  Each of these has its own advantages and
+disadvantages, of course:
+
+1. DEBUG_PAGEALLOC
+2. SLUB debugging / DEBUG_OBJECTS
+3. kmemcheck
+4. kasan
+... and there are surely more coming down pike.  Like Intel MPX:
+
+> https://software.intel.com/en-us/articles/introduction-to-intel-memory-protection-extensions
+
+Or, do we just keep adding these overlapping tools and their associated
+code over and over and fragment their user bases?
+
+You're also claiming that "KASAN is better than all of
+CONFIG_DEBUG_PAGEALLOC".  So should we just disallow (or hide)
+DEBUG_PAGEALLOC on kernels where KASAN is available?
+
+Maybe we just need to keep these out of mainline and make Andrew carry
+it in -mm until the end of time. :)
