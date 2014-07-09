@@ -1,10 +1,10 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:61362 "EHLO mga02.intel.com"
+Received: from mga09.intel.com ([134.134.136.24]:55049 "EHLO mga09.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932144AbaGIU0g (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 9 Jul 2014 16:26:36 -0400
-Message-ID: <53BDA568.5030607@intel.com>
-Date: Wed, 09 Jul 2014 13:26:16 -0700
+	id S1751271AbaGIUhl (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 9 Jul 2014 16:37:41 -0400
+Message-ID: <53BDA80E.9060602@intel.com>
+Date: Wed, 09 Jul 2014 13:37:34 -0700
 From: Dave Hansen <dave.hansen@intel.com>
 MIME-Version: 1.0
 Subject: Re: [RFC/PATCH RESEND -next 01/21] Add kernel address sanitizer infrastructure.
@@ -18,16 +18,26 @@ To: Andrey Ryabinin <a.ryabinin@samsung.com>, linux-kernel@vger.kernel.org
 Cc: Dmitry Vyukov <dvyukov@google.com>, Konstantin Serebryany <kcc@google.com>, Alexey Preobrazhensky <preobr@google.com>, Andrey Konovalov <adech.fo@gmail.com>, Yuri Gribov <tetra2005@gmail.com>, Konstantin Khlebnikov <koct9i@gmail.com>, Sasha Levin <sasha.levin@oracle.com>, Michal Marek <mmarek@suse.cz>, Russell King <linux@arm.linux.org.uk>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Christoph Lameter <cl@linux.com>, Pekka Enberg <penberg@kernel.org>, David Rientjes <rientjes@google.com>, Joonsoo Kim <iamjoonsoo.kim@lge.com>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org, x86@kernel.org, linux-mm@kvack.org
 
 On 07/09/2014 04:29 AM, Andrey Ryabinin wrote:
-> Address sanitizer dedicates 1/8 of the low memory to the shadow memory and uses direct
-> mapping with a scale and offset to translate a memory address to its corresponding
-> shadow address.
-> 
-> Here is function to translate address to corresponding shadow address:
-> 
->      unsigned long kasan_mem_to_shadow(unsigned long addr)
->      {
->                 return ((addr - PAGE_OFFSET) >> KASAN_SHADOW_SCALE_SHIFT)
->                              + kasan_shadow_start;
->      }
+> +void __init kasan_alloc_shadow(void)
+> +{
+> +	unsigned long lowmem_size = (unsigned long)high_memory - PAGE_OFFSET;
+> +	unsigned long shadow_size;
+> +	phys_addr_t shadow_phys_start;
+> +
+> +	shadow_size = lowmem_size >> KASAN_SHADOW_SCALE_SHIFT;
 
-How does this interact with vmalloc() addresses or those from a kmap()?
+This calculation is essentially meaningless, and it's going to break
+when we have sparse memory situations like having big holes.  This code
+attempts to allocate non-sparse data for backing what might be very
+sparse memory ranges.
+
+It's quite OK for us to handle configurations today where we have 2GB of
+RAM with 1GB at 0x0 and 1GB at 0x10000000000.  This code would attempt
+to allocate a 128GB shadow area for this configuration with 2GB of RAM. :)
+
+You're probably going to get stuck doing something similar to the
+sparsemem-vmemmap code does.  You could handle this for normal sparsemem
+by adding a shadow area pointer to the memory section.
+Or, just vmalloc() (get_vm_area() really) the virtual space and then
+make sure to allocate the backing store before you need it (handling the
+faults would probably get too tricky).
