@@ -1,30 +1,29 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:55265 "EHLO mga09.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750889AbaGIUiu (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 9 Jul 2014 16:38:50 -0400
-Message-ID: <53BDA841.4000400@intel.com>
-Date: Wed, 09 Jul 2014 13:38:25 -0700
-From: Dave Hansen <dave.hansen@intel.com>
+Received: from mail-wi0-f173.google.com ([209.85.212.173]:50602 "EHLO
+	mail-wi0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752594AbaGIUlA (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 9 Jul 2014 16:41:00 -0400
 MIME-Version: 1.0
+In-Reply-To: <87pphenxex.fsf@tassilo.jf.intel.com>
+References: <1404905415-9046-1-git-send-email-a.ryabinin@samsung.com>
+	<1404905415-9046-2-git-send-email-a.ryabinin@samsung.com>
+	<87pphenxex.fsf@tassilo.jf.intel.com>
+Date: Thu, 10 Jul 2014 00:40:58 +0400
+Message-ID: <CAJOtW+5=5EGwLyAA+33y4E9UGuGHuXQkf6rTEsh0e7rqoNBKCg@mail.gmail.com>
 Subject: Re: [RFC/PATCH RESEND -next 01/21] Add kernel address sanitizer infrastructure.
-References: <1404905415-9046-1-git-send-email-a.ryabinin@samsung.com> <1404905415-9046-2-git-send-email-a.ryabinin@samsung.com>
-In-Reply-To: <1404905415-9046-2-git-send-email-a.ryabinin@samsung.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+From: Yuri Gribov <tetra2005@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrey Ryabinin <a.ryabinin@samsung.com>, linux-kernel@vger.kernel.org
-Cc: Dmitry Vyukov <dvyukov@google.com>, Konstantin Serebryany <kcc@google.com>, Alexey Preobrazhensky <preobr@google.com>, Andrey Konovalov <adech.fo@gmail.com>, Yuri Gribov <tetra2005@gmail.com>, Konstantin Khlebnikov <koct9i@gmail.com>, Sasha Levin <sasha.levin@oracle.com>, Michal Marek <mmarek@suse.cz>, Russell King <linux@arm.linux.org.uk>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Christoph Lameter <cl@linux.com>, Pekka Enberg <penberg@kernel.org>, David Rientjes <rientjes@google.com>, Joonsoo Kim <iamjoonsoo.kim@lge.com>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org, x86@kernel.org, linux-mm@kvack.org
+To: Andi Kleen <andi@firstfloor.org>
+Cc: Andrey Ryabinin <a.ryabinin@samsung.com>, linux-kernel@vger.kernel.org, Dmitry Vyukov <dvyukov@google.com>, Konstantin Serebryany <kcc@google.com>, Alexey Preobrazhensky <preobr@google.com>, Andrey Konovalov <adech.fo@gmail.com>, Konstantin Khlebnikov <koct9i@gmail.com>, Sasha Levin <sasha.levin@oracle.com>, Michal Marek <mmarek@suse.cz>, Russell King <linux@arm.linux.org.uk>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Christoph Lameter <cl@linux.com>, Pekka Enberg <penberg@kernel.org>, David Rientjes <rientjes@google.com>, Joonsoo Kim <iamjoonsoo.kim@lge.com>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org, x86@kernel.org, linux-mm@kvack.org
 
-On 07/09/2014 04:29 AM, Andrey Ryabinin wrote:
-> +config KASAN
-> +	bool "AddressSanitizer: dynamic memory error detector"
-> +	default n
-> +	help
-> +	  Enables AddressSanitizer - dynamic memory error detector,
-> +	  that finds out-of-bounds and use-after-free bugs.
+On Wed, Jul 9, 2014 at 11:29 PM, Andi Kleen <andi@firstfloor.org> wrote:
+> Hardcoding --param is not very nice. They can change from compiler
+> to compiler version. Need some version checking?
 
-This definitely needs some more text like "This option eats boatloads of
-memory and will slow your system down enough that it should never be
-used in production unless you are crazy".
+We plan to address this soon. CFLAGS will look more like
+-fsanitize=kernel-address but this flag is not yet in gcc.
+
+-Y
