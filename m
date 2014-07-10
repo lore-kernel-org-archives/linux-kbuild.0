@@ -1,104 +1,103 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f173.google.com ([209.85.212.173]:44473 "EHLO
-	mail-wi0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751420AbaGJJz3 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 10 Jul 2014 05:55:29 -0400
-Date: Thu, 10 Jul 2014 11:55:26 +0200
-From: Thierry Reding <thierry.reding@gmail.com>
-Subject: Re: [RFC] dma-buf: Implement test module
-Message-ID: <20140710095524.GB21583@ulmo>
-References: <1386858989-1487-1-git-send-email-treding@nvidia.com>
- <20131212144210.GA1527@ulmo.nvidia.com>
- <20131213020258.GC13333@kroah.com>
- <20140325161722.GA23842@ulmo>
- <20140325180110.GA3532@ravnborg.org>
- <20140326083247.GA9512@ulmo>
+Received: from mail.skyhub.de ([78.46.96.112]:38588 "EHLO mail.skyhub.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750958AbaGJKmc (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 10 Jul 2014 06:42:32 -0400
+Date: Thu, 10 Jul 2014 12:42:23 +0200
+From: Borislav Petkov <bp@alien8.de>
+Subject: Re: [PATCH] Kbuild: Move -Wmaybe-uninitialized to W=1
+Message-ID: <20140710104223.GD2970@pd.tnic>
+References: <20140616132045.GE8170@pd.tnic>
+ <20140616211405.GA7914@ravnborg.org>
+ <20140624213835.GD15068@pd.tnic>
+ <20140707105339.GA4776@pd.tnic>
+ <1404811520.26126.38.camel@x220>
+ <20140708113724.GA27659@pd.tnic>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="Pd0ReVV5GZGQvF3a"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20140326083247.GA9512@ulmo>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20140708113724.GA27659@pd.tnic>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Sumit Semwal <sumit.semwal@linaro.org>, dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: Paul Bolle <pebolle@tiscali.nl>, Sam Ravnborg <sam@ravnborg.org>, lkml <linux-kernel@vger.kernel.org>, Michael Matz <matz@suse.de>, x86-ml <x86@kernel.org>
 
+And,
 
---Pd0ReVV5GZGQvF3a
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I haven't even wished for it but just to prove everybody my point: just
+built rc4+ from Linus' repo with gcc 4.9.0, see below.
 
-On Wed, Mar 26, 2014 at 09:32:47AM +0100, Thierry Reding wrote:
-> On Tue, Mar 25, 2014 at 07:01:10PM +0100, Sam Ravnborg wrote:
-> > >=20
-> > > There are two things that don't work too well with this. First this
-> > > causes the build to break if the build machine doesn't have the new
-> > > public header (include/uapi/linux/dma-buf.h) installed yet. So the on=
-ly
-> > > way to make this work would be by building the kernel once with SAMPL=
-ES
-> > > disabled, install the headers and then build again with SAMPLES enabl=
-ed.
-> > > Which really isn't very nice.
-> > >=20
-> > > One other option that I've tried is to modify the include path so that
-> > > the test program would get the in-tree copy of the public header file,
-> > > but that didn't build properly either because the header files aren't
-> > > properly sanitized and therefore the compiler complains about it
-> > > (include/uapi/linux/types.h).
-> > >=20
-> > > One other disadvantage of carrying the sample program in the tree is
-> > > that there's only infrastructure to build programs natively on the bu=
-ild
-> > > machine. That's somewhat unfortunate because if you want to run the t=
-est
-> > > program on a different architecture you have to either compile the
-> > > kernel natively on that architecture (which isn't very practical on m=
-any
-> > > embedded devices) or cross-compile manually.
-> > >=20
-> > > I think a much nicer solution would be to add infrastructure to cross-
-> > > compile these test programs, so that they end up being built for the
-> > > same architecture as the kernel image (i.e. using CROSS_COMPILE).
-> > >=20
-> > > Adding Michal and the linux-kbuild mailing list, perhaps this has been
-> > > discussed before, or maybe somebody has a better idea on how to solve
-> > > this.
-> > I actually looked into this some time ago.
-> > May try to dust off the patch.
-> > IIRC the kernel provided headers were used for building - not the one i=
-nstalled on the machine.
-> > And crosscompile were supported.
->=20
-> That sounds exactly like what I'd want for this. If you need any help,
-> please let me know.
+Now all of a sudden there's more noise, maybe because this is a
+different .config. However, I doubt those are real bugs.
 
-Did you have any time to look into dusting off the patch? If not I'll
-gladly take whatever you have and dust it off myself.
+A cursory look through those shows that they're not really bugs -
+gcc simply can't know with all the ifdeffery, partial usage based on
+conditionals, etc, etc.
 
-Thierry
+---
+In file included from scripts/sortextable.c:194:0:
+scripts/sortextable.c: In function ‘main’:
+scripts/sortextable.h:176:3: warning: ‘relocs_size’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+   memset(relocs, 0, relocs_size);
+   ^
+scripts/sortextable.h:106:6: note: ‘relocs_size’ was declared here
+  int relocs_size;
+      ^
+In file included from scripts/sortextable.c:192:0:
+scripts/sortextable.h:176:3: warning: ‘relocs_size’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+   memset(relocs, 0, relocs_size);
+   ^
+scripts/sortextable.h:106:6: note: ‘relocs_size’ was declared here
+  int relocs_size;
+      ^
+fs/namespace.c: In function ‘SyS_mount’:
+fs/namespace.c:2647:8: warning: ‘kernel_dev’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+  ret = do_mount(kernel_dev, kernel_dir->name, kernel_type, flags,
+        ^
+fs/namespace.c:2626:8: note: ‘kernel_dev’ was declared here
+  char *kernel_dev;
+        ^
+fs/namespace.c:2647:8: warning: ‘kernel_type’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+  ret = do_mount(kernel_dev, kernel_dir->name, kernel_type, flags,
+        ^
+fs/namespace.c:2624:8: note: ‘kernel_type’ was declared here
+  char *kernel_type;
+        ^
+fs/direct-io.c: In function ‘do_blockdev_direct_IO’:
+fs/direct-io.c:920:9: warning: ‘to’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+   while (from < to) {
+         ^
+fs/direct-io.c:913:16: note: ‘to’ was declared here
+   size_t from, to;
+                ^
+fs/direct-io.c:1034:9: warning: ‘from’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+    from += this_chunk_bytes;
+         ^
+fs/direct-io.c:913:10: note: ‘from’ was declared here
+   size_t from, to;
+          ^
+In file included from include/net/inetpeer.h:15:0,
+                 from net/ipv4/tcp_metrics.c:16:
+net/ipv4/tcp_metrics.c: In function ‘tcp_peer_is_proven’:
+include/net/ipv6.h:422:38: warning: ‘*((void *)&daddr+8)’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+  return ((ul1[0] ^ ul2[0]) | (ul1[1] ^ ul2[1])) == 0UL;
+                                      ^
+net/ipv4/tcp_metrics.c:231:30: note: ‘*((void *)&daddr+8)’ was declared here
+  struct inetpeer_addr saddr, daddr;
+                              ^
+In file included from include/net/inetpeer.h:15:0,
+                 from net/ipv4/tcp_metrics.c:16:
+include/net/ipv6.h:422:38: warning: ‘*((void *)&saddr+8)’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+  return ((ul1[0] ^ ul2[0]) | (ul1[1] ^ ul2[1])) == 0UL;
+                                      ^
+net/ipv4/tcp_metrics.c:231:23: note: ‘*((void *)&saddr+8)’ was declared here
+  struct inetpeer_addr saddr, daddr;
+                       ^
 
---Pd0ReVV5GZGQvF3a
-Content-Type: application/pgp-signature
+-- 
+Regards/Gruss,
+    Boris.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBAgAGBQJTvmMMAAoJEN0jrNd/PrOhWWYP/jkfcqw8FhB4vzkrHasCVQHZ
-W/A7reVGrIH+PqF1IpDwN7RPqAWj3VfVFiyIImID2qLP5V0G5DbCdXgmnOXf/TQp
-n7Vj5eqn0t6TyxjviMpaMeUHAb7p7jV0HDh+hk+Qw1tipNNai+1IxR7K48WnL9Gs
-Oo6u3cUACj/AImsEa56d/FHK7ehQ0JkgpsAi3CY+6BGiVGbUDtrRQ01wHeAOupSu
-9ngpVR+BFOpRBzCPHkgtTuvVBLG7gl9jHZeTZR94szqVBTc2omFdnKJYKww9YNB+
-fbSDCq/m2fNgdzDw0BL9uKuNEA7mg5kIegAIYtaAYFp4Ar3YneBLc7Cjij8JYpG3
-teZP8IL21CVIqzM54RYJi33Ccdh3yDP0FitkvjyiXhTWMDOqxzLpBdd2IJZcOErT
-CddiAJA8sXyRleZu8dFFUE+a0bzw0/hlyJo59uoad3rpfHD57re33dcJdXo5csEM
-HhNGATpT6+1Gml/alqcP/0J6T1vawMSGeS0VExCOXbaW2Uqsgg+CpgGEkzRgNDba
-IfmoZC+58BKx6i+I8cC3voro8JyRoBNa6o2HjXd4PQphi97J3Sqg3z56QMhdyuW3
-kee9GlV+4T9HMyELeGgIbhR0liAFk73SDUQtBq964mdKe0ietbEVvZFRVDGUtyXC
-EJCNC81PQjgsOdC9MitX
-=JPmc
------END PGP SIGNATURE-----
-
---Pd0ReVV5GZGQvF3a--
+Sent from a fat crate under my desk. Formatting is fine.
+--
