@@ -1,26 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from qmta15.emeryville.ca.mail.comcast.net ([76.96.27.228]:58783
-	"EHLO qmta15.emeryville.ca.mail.comcast.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1753083AbaGJOIn (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 10 Jul 2014 10:08:43 -0400
-Date: Thu, 10 Jul 2014 09:08:40 -0500 (CDT)
-From: Christoph Lameter <cl@gentwo.org>
-Subject: Re: [RFC/PATCH RESEND -next 12/21] mm: util: move krealloc/kzfree
- to slab_common.c
-In-Reply-To: <53BE4412.6030707@samsung.com>
-Message-ID: <alpine.DEB.2.11.1407100908090.12483@gentwo.org>
-References: <1404905415-9046-1-git-send-email-a.ryabinin@samsung.com> <1404905415-9046-13-git-send-email-a.ryabinin@samsung.com> <alpine.DEB.2.11.1407090931350.1384@gentwo.org> <53BE4412.6030707@samsung.com>
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Received: from mga02.intel.com ([134.134.136.20]:25852 "EHLO mga02.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752605AbaGJP6I (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 10 Jul 2014 11:58:08 -0400
+Message-ID: <53BEB77A.6020003@intel.com>
+Date: Thu, 10 Jul 2014 08:55:38 -0700
+From: Dave Hansen <dave.hansen@intel.com>
+MIME-Version: 1.0
+Subject: Re: [RFC/PATCH RESEND -next 01/21] Add kernel address sanitizer infrastructure.
+References: <1404905415-9046-1-git-send-email-a.ryabinin@samsung.com> <1404905415-9046-2-git-send-email-a.ryabinin@samsung.com> <53BDA568.5030607@intel.com> <53BE8333.6060404@samsung.com>
+In-Reply-To: <53BE8333.6060404@samsung.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrey Ryabinin <a.ryabinin@samsung.com>
-Cc: linux-kernel@vger.kernel.org, Dmitry Vyukov <dvyukov@google.com>, Konstantin Serebryany <kcc@google.com>, Alexey Preobrazhensky <preobr@google.com>, Andrey Konovalov <adech.fo@gmail.com>, Yuri Gribov <tetra2005@gmail.com>, Konstantin Khlebnikov <koct9i@gmail.com>, Sasha Levin <sasha.levin@oracle.com>, Michal Marek <mmarek@suse.cz>, Russell King <linux@arm.linux.org.uk>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Pekka Enberg <penberg@kernel.org>, David Rientjes <rientjes@google.com>, Joonsoo Kim <iamjoonsoo.kim@lge.com>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org, x86@kernel.org, linux-mm@kvack.org
+To: Andrey Ryabinin <a.ryabinin@samsung.com>, linux-kernel@vger.kernel.org
+Cc: Dmitry Vyukov <dvyukov@google.com>, Konstantin Serebryany <kcc@google.com>, Alexey Preobrazhensky <preobr@google.com>, Andrey Konovalov <adech.fo@gmail.com>, Yuri Gribov <tetra2005@gmail.com>, Konstantin Khlebnikov <koct9i@gmail.com>, Sasha Levin <sasha.levin@oracle.com>, Michal Marek <mmarek@suse.cz>, Russell King <linux@arm.linux.org.uk>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Christoph Lameter <cl@linux.com>, Pekka Enberg <penberg@kernel.org>, David Rientjes <rientjes@google.com>, Joonsoo Kim <iamjoonsoo.kim@lge.com>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org, x86@kernel.org, linux-mm@kvack.org
 
-On Thu, 10 Jul 2014, Andrey Ryabinin wrote:
+On 07/10/2014 05:12 AM, Andrey Ryabinin wrote:
+> On 07/10/14 00:26, Dave Hansen wrote:
+>> On 07/09/2014 04:29 AM, Andrey Ryabinin wrote:
+>>> Address sanitizer dedicates 1/8 of the low memory to the shadow memory and uses direct
+>>> mapping with a scale and offset to translate a memory address to its corresponding
+>>> shadow address.
+>>>
+>>> Here is function to translate address to corresponding shadow address:
+>>>
+>>>      unsigned long kasan_mem_to_shadow(unsigned long addr)
+>>>      {
+>>>                 return ((addr - PAGE_OFFSET) >> KASAN_SHADOW_SCALE_SHIFT)
+>>>                              + kasan_shadow_start;
+>>>      }
+>>
+>> How does this interact with vmalloc() addresses or those from a kmap()?
+>> 
+> It's used only for lowmem:
+> 
+> static inline bool addr_is_in_mem(unsigned long addr)
+> {
+> 	return likely(addr >= PAGE_OFFSET && addr < (unsigned long)high_memory);
+> }
 
-> Should I send another patch to move this to slab_common.c?
+That's fine, and definitely covers the common cases.  Could you make
+sure to call this out explicitly?  Also, there's nothing to _keep_ this
+approach working for things out of the direct map, right?  It would just
+be a matter of updating the shadow memory to have entries for the other
+virtual address ranges.
 
-Send one patch that is separte from this patchset to all slab
-maintainers and include my ack.
+addr_is_in_mem() is a pretty bad name for what it's doing. :)
 
+I'd probably call it something like kasan_tracks_vaddr().
