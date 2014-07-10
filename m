@@ -1,72 +1,78 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vc0-f178.google.com ([209.85.220.178]:58290 "EHLO
-	mail-vc0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751987AbaGJTEf convert rfc822-to-8bit (ORCPT
+Received: from mail-vc0-f179.google.com ([209.85.220.179]:56842 "EHLO
+	mail-vc0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752575AbaGJTsq (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 10 Jul 2014 15:04:35 -0400
+	Thu, 10 Jul 2014 15:48:46 -0400
 MIME-Version: 1.0
-In-Reply-To: <53BE9CED.4090103@oracle.com>
+In-Reply-To: <53BEB77A.6020003@intel.com>
 References: <1404905415-9046-1-git-send-email-a.ryabinin@samsung.com>
 	<1404905415-9046-2-git-send-email-a.ryabinin@samsung.com>
-	<53BE7F29.20304@oracle.com>
-	<53BE8EA5.2030402@samsung.com>
-	<53BE959A.4010206@oracle.com>
-	<53BE9786.4060700@samsung.com>
-	<53BE9CED.4090103@oracle.com>
-Date: Thu, 10 Jul 2014 23:04:34 +0400
-Message-ID: <CAPAsAGy279XqO0Yq9v1q1OoW4TLv2iFKC0UjY+fOh31LxYOB+w@mail.gmail.com>
+	<53BDA568.5030607@intel.com>
+	<53BE8333.6060404@samsung.com>
+	<53BEB77A.6020003@intel.com>
+Date: Thu, 10 Jul 2014 23:48:45 +0400
+Message-ID: <CAPAsAGwYZ9AVUoOMipZEe8jdmJfd=aULR+yoVH5FqzW1Qa75AQ@mail.gmail.com>
 Subject: Re: [RFC/PATCH RESEND -next 01/21] Add kernel address sanitizer infrastructure.
 From: Andrey Ryabinin <ryabinin.a.a@gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sasha Levin <sasha.levin@oracle.com>
-Cc: Andrey Ryabinin <a.ryabinin@samsung.com>, linux-kernel@vger.kernel.org, Dmitry Vyukov <dvyukov@google.com>, Konstantin Serebryany <kcc@google.com>, Alexey Preobrazhensky <preobr@google.com>, Andrey Konovalov <adech.fo@gmail.com>, Yuri Gribov <tetra2005@gmail.com>, Konstantin Khlebnikov <koct9i@gmail.com>, Michal Marek <mmarek@suse.cz>, Russell King <linux@arm.linux.org.uk>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Christoph Lameter <cl@linux.com>, Pekka Enberg <penberg@kernel.org>, David Rientjes <rientjes@google.com>, Joonsoo Kim <iamjoonsoo.kim@lge.com>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org, x86@kernel.org, linux-mm@kvack.org, Dave Hansen <dave.hansen@intel.com>
+To: Dave Hansen <dave.hansen@intel.com>
+Cc: Andrey Ryabinin <a.ryabinin@samsung.com>, linux-kernel@vger.kernel.org, Dmitry Vyukov <dvyukov@google.com>, Konstantin Serebryany <kcc@google.com>, Alexey Preobrazhensky <preobr@google.com>, Andrey Konovalov <adech.fo@gmail.com>, Yuri Gribov <tetra2005@gmail.com>, Konstantin Khlebnikov <koct9i@gmail.com>, Sasha Levin <sasha.levin@oracle.com>, Michal Marek <mmarek@suse.cz>, Russell King <linux@arm.linux.org.uk>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Christoph Lameter <cl@linux.com>, Pekka Enberg <penberg@kernel.org>, David Rientjes <rientjes@google.com>, Joonsoo Kim <iamjoonsoo.kim@lge.com>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org, x86@kernel.org, linux-mm@kvack.org
 
-2014-07-10 18:02 GMT+04:00 Sasha Levin <sasha.levin@oracle.com>:
-> On 07/10/2014 09:39 AM, Andrey Ryabinin wrote:
->>> Anyways, the machine won't boot with more than 1GB of RAM, is there a solution to
->>> > get KASAN running on my machine?
->>> >
->> Could you share you .config? I'll try to boot it by myself. It could be that some options conflicting with kasan.
->> Also boot cmdline might help.
+2014-07-10 19:55 GMT+04:00 Dave Hansen <dave.hansen@intel.com>:
+> On 07/10/2014 05:12 AM, Andrey Ryabinin wrote:
+>> On 07/10/14 00:26, Dave Hansen wrote:
+>>> On 07/09/2014 04:29 AM, Andrey Ryabinin wrote:
+>>>> Address sanitizer dedicates 1/8 of the low memory to the shadow memory and uses direct
+>>>> mapping with a scale and offset to translate a memory address to its corresponding
+>>>> shadow address.
+>>>>
+>>>> Here is function to translate address to corresponding shadow address:
+>>>>
+>>>>      unsigned long kasan_mem_to_shadow(unsigned long addr)
+>>>>      {
+>>>>                 return ((addr - PAGE_OFFSET) >> KASAN_SHADOW_SCALE_SHIFT)
+>>>>                              + kasan_shadow_start;
+>>>>      }
+>>>
+>>> How does this interact with vmalloc() addresses or those from a kmap()?
+>>>
+>> It's used only for lowmem:
 >>
+>> static inline bool addr_is_in_mem(unsigned long addr)
+>> {
+>>       return likely(addr >= PAGE_OFFSET && addr < (unsigned long)high_memory);
+>> }
 >
-> Sure. It's the .config I use for fuzzing so it's rather big (attached).
->
-> The cmdline is:
->
-> [    0.000000] Command line: noapic noacpi pci=conf1 reboot=k panic=1 i8042.direct=1 i8042.dumbkbd=1 i8042.nopnp=1 console=ttyS0 earlyprintk=serial i8042.noaux=1 numa=fake=32 init=/virt/init zcache ftrace_dump_on_oops debugpat kvm.mmu_audit=1 slub_debug=FZPU rcutorture.rcutorture_runnable=0 loop.max_loop=64 zram.num_devices=4 rcutorture.nreaders=8 oops=panic nr_hugepages=1000 numa_balancing=enable softlockup_all_cpu_backtrace=1 root=/dev/root rw rootflags=rw,trans=virtio,version=9p2000.L rootfstype=9p init=/virt/init
->
-> And the memory map:
->
-> [    0.000000] e820: BIOS-provided physical RAM map:
-> [    0.000000] BIOS-e820: [mem 0x0000000000000000-0x000000000009fbff] usable
-> [    0.000000] BIOS-e820: [mem 0x000000000009fc00-0x000000000009ffff] reserved
-> [    0.000000] BIOS-e820: [mem 0x00000000000f0000-0x00000000000ffffe] reserved
-> [    0.000000] BIOS-e820: [mem 0x0000000000100000-0x00000000cfffffff] usable
-> [    0.000000] BIOS-e820: [mem 0x0000000100000000-0x0000000705ffffff] usable
->
->
-> On 07/10/2014 09:50 AM, Andrey Ryabinin wrote:>> Anyways, the machine won't boot with more than 1GB of RAM, is there a solution to
->>> > get KASAN running on my machine?
->>> >
->> It's not boot with the same Failed to allocate error?
->
-> I think I misunderstood your question here. With >1GB is triggers a panic() when
-> KASAN fails the memblock allocation. With <=1GB it fails a bit later in boot just
-> because 1GB isn't enough to load everything - so it fails in some other random
-> spot as it runs on out memory.
->
->
-> Thanks,
-> Sasha
+> That's fine, and definitely covers the common cases.  Could you make
+> sure to call this out explicitly?  Also, there's nothing to _keep_ this
+> approach working for things out of the direct map, right?  It would just
+> be a matter of updating the shadow memory to have entries for the other
+> virtual address ranges.
 
-Looks like I found where is a problem. memblock_alloc cannot allocate
-accross numa nodes,
-therefore kasan fails for numa=fake>=8.
-You should succeed with numa=fake=7 or less.
+Why do you want shadow for things out of the direct map?
+If you want to catch use-after-free in vmalloc than DEBUG_PAGEALLOC
+will be enough.
+If you want catch out-of-bounds in vmalloc you don't need anything,
+because vmalloc
+allocates guarding hole in the end.
+Or do you want something else?
+
+>
+> addr_is_in_mem() is a pretty bad name for what it's doing. :)
+>
+> I'd probably call it something like kasan_tracks_vaddr().
+>
+Agree
+
+> --
+> To unsubscribe, send a message with 'unsubscribe linux-mm' in
+> the body to majordomo@kvack.org.  For more info on Linux MM,
+> see: http://www.linux-mm.org/ .
+> Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
+
 
 
 -- 
