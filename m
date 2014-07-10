@@ -1,49 +1,104 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mailout1.w1.samsung.com ([210.118.77.11]:64285 "EHLO
-	mailout1.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751942AbaGJJ3p (ORCPT
+Received: from mail-wi0-f173.google.com ([209.85.212.173]:44473 "EHLO
+	mail-wi0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751420AbaGJJz3 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 10 Jul 2014 05:29:45 -0400
-Message-id: <53BE5BC1.6050802@samsung.com>
-Date: Thu, 10 Jul 2014 13:24:17 +0400
-From: Andrey Ryabinin <a.ryabinin@samsung.com>
-MIME-version: 1.0
-Subject: Re: [RFC/PATCH RESEND -next 15/21] mm: slub: add kernel address
- sanitizer hooks to slub allocator
-References: <1404905415-9046-1-git-send-email-a.ryabinin@samsung.com>
- <1404905415-9046-16-git-send-email-a.ryabinin@samsung.com>
- <alpine.DEB.2.11.1407090947020.1384@gentwo.org>
-In-reply-to: <alpine.DEB.2.11.1407090947020.1384@gentwo.org>
-Content-type: text/plain; charset=ISO-8859-1
-Content-transfer-encoding: 7bit
+	Thu, 10 Jul 2014 05:55:29 -0400
+Date: Thu, 10 Jul 2014 11:55:26 +0200
+From: Thierry Reding <thierry.reding@gmail.com>
+Subject: Re: [RFC] dma-buf: Implement test module
+Message-ID: <20140710095524.GB21583@ulmo>
+References: <1386858989-1487-1-git-send-email-treding@nvidia.com>
+ <20131212144210.GA1527@ulmo.nvidia.com>
+ <20131213020258.GC13333@kroah.com>
+ <20140325161722.GA23842@ulmo>
+ <20140325180110.GA3532@ravnborg.org>
+ <20140326083247.GA9512@ulmo>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="Pd0ReVV5GZGQvF3a"
+Content-Disposition: inline
+In-Reply-To: <20140326083247.GA9512@ulmo>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Christoph Lameter <cl@gentwo.org>
-Cc: linux-kernel@vger.kernel.org, Dmitry Vyukov <dvyukov@google.com>, Konstantin Serebryany <kcc@google.com>, Alexey Preobrazhensky <preobr@google.com>, Andrey Konovalov <adech.fo@gmail.com>, Yuri Gribov <tetra2005@gmail.com>, Konstantin Khlebnikov <koct9i@gmail.com>, Sasha Levin <sasha.levin@oracle.com>, Michal Marek <mmarek@suse.cz>, Russell King <linux@arm.linux.org.uk>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Pekka Enberg <penberg@kernel.org>, David Rientjes <rientjes@google.com>, Joonsoo Kim <iamjoonsoo.kim@lge.com>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org, x86@kernel.org, linux-mm@kvack.org
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Sumit Semwal <sumit.semwal@linaro.org>, dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
-On 07/09/14 18:48, Christoph Lameter wrote:
-> On Wed, 9 Jul 2014, Andrey Ryabinin wrote:
-> 
->> With this patch kasan will be able to catch bugs in memory allocated
->> by slub.
->> Allocated slab page, this whole page marked as unaccessible
->> in corresponding shadow memory.
->> On allocation of slub object requested allocation size marked as
->> accessible, and the rest of the object (including slub's metadata)
->> marked as redzone (unaccessible).
->>
->> We also mark object as accessible if ksize was called for this object.
->> There is some places in kernel where ksize function is called to inquire
->> size of really allocated area. Such callers could validly access whole
->> allocated memory, so it should be marked as accessible by kasan_krealloc call.
-> 
-> Do you really need to go through all of this? Add the hooks to
-> kmem_cache_alloc_trace() instead and use the existing instrumentation
-> that is there for other purposes?
-> 
 
-I could move kasan_kmalloc hooks kmem_cache_alloc_trace(), and I think it will look better.
-Hovewer I will require two hooks instead of one (for CONFIG_TRACING=y and CONFIG_TRACING=n).
+--Pd0ReVV5GZGQvF3a
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Btw, seems I broke CONFIG_SL[AO]B configurations in this patch by  introducing __ksize function
-which used in krealloc now.
+On Wed, Mar 26, 2014 at 09:32:47AM +0100, Thierry Reding wrote:
+> On Tue, Mar 25, 2014 at 07:01:10PM +0100, Sam Ravnborg wrote:
+> > >=20
+> > > There are two things that don't work too well with this. First this
+> > > causes the build to break if the build machine doesn't have the new
+> > > public header (include/uapi/linux/dma-buf.h) installed yet. So the on=
+ly
+> > > way to make this work would be by building the kernel once with SAMPL=
+ES
+> > > disabled, install the headers and then build again with SAMPLES enabl=
+ed.
+> > > Which really isn't very nice.
+> > >=20
+> > > One other option that I've tried is to modify the include path so that
+> > > the test program would get the in-tree copy of the public header file,
+> > > but that didn't build properly either because the header files aren't
+> > > properly sanitized and therefore the compiler complains about it
+> > > (include/uapi/linux/types.h).
+> > >=20
+> > > One other disadvantage of carrying the sample program in the tree is
+> > > that there's only infrastructure to build programs natively on the bu=
+ild
+> > > machine. That's somewhat unfortunate because if you want to run the t=
+est
+> > > program on a different architecture you have to either compile the
+> > > kernel natively on that architecture (which isn't very practical on m=
+any
+> > > embedded devices) or cross-compile manually.
+> > >=20
+> > > I think a much nicer solution would be to add infrastructure to cross-
+> > > compile these test programs, so that they end up being built for the
+> > > same architecture as the kernel image (i.e. using CROSS_COMPILE).
+> > >=20
+> > > Adding Michal and the linux-kbuild mailing list, perhaps this has been
+> > > discussed before, or maybe somebody has a better idea on how to solve
+> > > this.
+> > I actually looked into this some time ago.
+> > May try to dust off the patch.
+> > IIRC the kernel provided headers were used for building - not the one i=
+nstalled on the machine.
+> > And crosscompile were supported.
+>=20
+> That sounds exactly like what I'd want for this. If you need any help,
+> please let me know.
+
+Did you have any time to look into dusting off the patch? If not I'll
+gladly take whatever you have and dust it off myself.
+
+Thierry
+
+--Pd0ReVV5GZGQvF3a
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBAgAGBQJTvmMMAAoJEN0jrNd/PrOhWWYP/jkfcqw8FhB4vzkrHasCVQHZ
+W/A7reVGrIH+PqF1IpDwN7RPqAWj3VfVFiyIImID2qLP5V0G5DbCdXgmnOXf/TQp
+n7Vj5eqn0t6TyxjviMpaMeUHAb7p7jV0HDh+hk+Qw1tipNNai+1IxR7K48WnL9Gs
+Oo6u3cUACj/AImsEa56d/FHK7ehQ0JkgpsAi3CY+6BGiVGbUDtrRQ01wHeAOupSu
+9ngpVR+BFOpRBzCPHkgtTuvVBLG7gl9jHZeTZR94szqVBTc2omFdnKJYKww9YNB+
+fbSDCq/m2fNgdzDw0BL9uKuNEA7mg5kIegAIYtaAYFp4Ar3YneBLc7Cjij8JYpG3
+teZP8IL21CVIqzM54RYJi33Ccdh3yDP0FitkvjyiXhTWMDOqxzLpBdd2IJZcOErT
+CddiAJA8sXyRleZu8dFFUE+a0bzw0/hlyJo59uoad3rpfHD57re33dcJdXo5csEM
+HhNGATpT6+1Gml/alqcP/0J6T1vawMSGeS0VExCOXbaW2Uqsgg+CpgGEkzRgNDba
+IfmoZC+58BKx6i+I8cC3voro8JyRoBNa6o2HjXd4PQphi97J3Sqg3z56QMhdyuW3
+kee9GlV+4T9HMyELeGgIbhR0liAFk73SDUQtBq964mdKe0ietbEVvZFRVDGUtyXC
+EJCNC81PQjgsOdC9MitX
+=JPmc
+-----END PGP SIGNATURE-----
+
+--Pd0ReVV5GZGQvF3a--
