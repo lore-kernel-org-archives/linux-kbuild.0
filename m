@@ -1,48 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:1470 "EHLO mga09.intel.com"
+Received: from cantor2.suse.de ([195.135.220.15]:44113 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751587AbaGJUE5 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 10 Jul 2014 16:04:57 -0400
-Message-ID: <53BEF1E5.2000502@intel.com>
-Date: Thu, 10 Jul 2014 13:04:53 -0700
-From: Dave Hansen <dave.hansen@intel.com>
+	id S1753104AbaGJVnu (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 10 Jul 2014 17:43:50 -0400
+Date: Thu, 10 Jul 2014 23:43:47 +0200
+From: Michal Marek <mmarek@suse.cz>
+Subject: [GIT] kbuild fixed for v3.16-rc5
+Message-ID: <20140710214347.GA21256@sepie.suse.cz>
 MIME-Version: 1.0
-Subject: Re: [RFC/PATCH RESEND -next 01/21] Add kernel address sanitizer infrastructure.
-References: <1404905415-9046-1-git-send-email-a.ryabinin@samsung.com>	<1404905415-9046-2-git-send-email-a.ryabinin@samsung.com>	<53BDA568.5030607@intel.com>	<53BE8333.6060404@samsung.com>	<53BEB77A.6020003@intel.com> <CAPAsAGwYZ9AVUoOMipZEe8jdmJfd=aULR+yoVH5FqzW1Qa75AQ@mail.gmail.com>
-In-Reply-To: <CAPAsAGwYZ9AVUoOMipZEe8jdmJfd=aULR+yoVH5FqzW1Qa75AQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrey Ryabinin <ryabinin.a.a@gmail.com>
-Cc: Andrey Ryabinin <a.ryabinin@samsung.com>, linux-kernel@vger.kernel.org, Dmitry Vyukov <dvyukov@google.com>, Konstantin Serebryany <kcc@google.com>, Alexey Preobrazhensky <preobr@google.com>, Andrey Konovalov <adech.fo@gmail.com>, Yuri Gribov <tetra2005@gmail.com>, Konstantin Khlebnikov <koct9i@gmail.com>, Sasha Levin <sasha.levin@oracle.com>, Michal Marek <mmarek@suse.cz>, Russell King <linux@arm.linux.org.uk>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Christoph Lameter <cl@linux.com>, Pekka Enberg <penberg@kernel.org>, David Rientjes <rientjes@google.com>, Joonsoo Kim <iamjoonsoo.kim@lge.com>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org, x86@kernel.org, linux-mm@kvack.org
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 07/10/2014 12:48 PM, Andrey Ryabinin wrote:
->>>> How does this interact with vmalloc() addresses or those from a kmap()?
->>>>
->>> It's used only for lowmem:
->>>
->>> static inline bool addr_is_in_mem(unsigned long addr)
->>> {
->>>       return likely(addr >= PAGE_OFFSET && addr < (unsigned long)high_memory);
->>> }
->>
->> That's fine, and definitely covers the common cases.  Could you make
->> sure to call this out explicitly?  Also, there's nothing to _keep_ this
->> approach working for things out of the direct map, right?  It would just
->> be a matter of updating the shadow memory to have entries for the other
->> virtual address ranges.
-> 
-> Why do you want shadow for things out of the direct map? If you want
-> to catch use-after-free in vmalloc than DEBUG_PAGEALLOC will be
-> enough. If you want catch out-of-bounds in vmalloc you don't need
-> anything, because vmalloc allocates guarding hole in the end. Or do
-> you want something else?
+Hi Linus,
 
-That's all true for page-size accesses.  Address sanitizer's biggest
-advantage over using the page tables is that it can do checks at
-sub-page granularity.  But, we don't have any APIs that I can think of
-that _care_ about <PAGE_SIZE outside of the direct map (maybe zsmalloc,
-but that's pretty obscure).
+there are three more fixes for the relative build dir feature:
 
-So I guess it doesn't matter.
+- Shut up make -s again
+- Fix for rpm/deb/tar-pkg with O=<subdir>
+- Fix for CONFIG_EXTRA_FIRMWARE
+
+I hope that's it for 3.16.
+
+Michal
+
+The following changes since commit c2e28dc975ea87feed84415006ae143424912ac7:
+
+  kbuild: Print the name of the build directory (2014-07-03 15:25:11 +0200)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git rc-fixes
+
+for you to fetch changes up to dd5a6752ae7df4e0ba6ce3bcd0c3b4489bb3537f:
+
+  firmware: Create directories for external firmware (2014-07-09 15:16:35 +0200)
+
+----------------------------------------------------------------
+Michal Marek (3):
+      kbuild: Do not print the build directory with make -s
+      kbuild: Fix packaging targets with relative $(srctree)
+      firmware: Create directories for external firmware
+
+ Makefile          | 99 ++++++++++++++++++++++++++++---------------------------
+ firmware/Makefile |  6 ++++
+ 2 files changed, 57 insertions(+), 48 deletions(-)
