@@ -1,11 +1,11 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mailout2.w1.samsung.com ([210.118.77.12]:50016 "EHLO
-	mailout2.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750945AbaGJNor (ORCPT
+Received: from mailout3.w1.samsung.com ([210.118.77.13]:60004 "EHLO
+	mailout3.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751728AbaGJN4E (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 10 Jul 2014 09:44:47 -0400
-Message-id: <53BE9786.4060700@samsung.com>
-Date: Thu, 10 Jul 2014 17:39:18 +0400
+	Thu, 10 Jul 2014 09:56:04 -0400
+Message-id: <53BE9A2B.5090104@samsung.com>
+Date: Thu, 10 Jul 2014 17:50:35 +0400
 From: Andrey Ryabinin <a.ryabinin@samsung.com>
 MIME-version: 1.0
 Subject: Re: [RFC/PATCH RESEND -next 01/21] Add kernel address sanitizer
@@ -114,16 +114,11 @@ On 07/10/14 17:31, Sasha Levin wrote:
 > However, I'm a bit confused here, I thought highmem/lowmem split was a 32bit
 > thing, so I'm not sure how it applies here.
 > 
-Right. By lowmemsize here I mean size of direct
-mapping of all phys. memory (which usually called as lowmem on 32bit systems).
-
-
-
 > Anyways, the machine won't boot with more than 1GB of RAM, is there a solution to
 > get KASAN running on my machine?
 > 
-Could you share you .config? I'll try to boot it by myself. It could be that some options conflicting with kasan.
-Also boot cmdline might help.
+
+It's not boot with the same Failed to allocate error?
 
 > 
 > Thanks,
