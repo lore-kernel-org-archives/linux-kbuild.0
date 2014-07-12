@@ -1,73 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from asavdk3.altibox.net ([109.247.116.14]:48113 "EHLO
-	asavdk3.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752360AbaGKUdo (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 11 Jul 2014 16:33:44 -0400
-Date: Fri, 11 Jul 2014 22:33:23 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [RFC] dma-buf: Implement test module
-Message-ID: <20140711203323.GA10328@ravnborg.org>
-References: <1386858989-1487-1-git-send-email-treding@nvidia.com>
- <20131212144210.GA1527@ulmo.nvidia.com>
- <20131213020258.GC13333@kroah.com>
- <20140325161722.GA23842@ulmo>
- <20140325180110.GA3532@ravnborg.org>
- <20140326083247.GA9512@ulmo>
- <20140710095524.GB21583@ulmo>
+Received: from terminus.zytor.com ([198.137.202.10]:41303 "EHLO mail.zytor.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751416AbaGLBAe (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 11 Jul 2014 21:00:34 -0400
+Message-ID: <53C08876.10209@zytor.com>
+Date: Fri, 11 Jul 2014 17:59:34 -0700
+From: "H. Peter Anvin" <hpa@zytor.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20140710095524.GB21583@ulmo>
+Subject: Re: [RFC/PATCH -next 00/21] Address sanitizer for kernel (kasan)
+ - dynamic memory error detector.
+References: <1404903678-8257-1-git-send-email-a.ryabinin@samsung.com>
+In-Reply-To: <1404903678-8257-1-git-send-email-a.ryabinin@samsung.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Thierry Reding <thierry.reding@gmail.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Sumit Semwal <sumit.semwal@linaro.org>, dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+To: Andrey Ryabinin <a.ryabinin@samsung.com>, linux-kernel@vger.kernel.org
+Cc: Dmitry Vyukov <dvyukov@google.com>, Konstantin Serebryany <kcc@google.com>, Alexey Preobrazhensky <preobr@google.com>, Andrey Konovalov <adech.fo@gmail.com>, Yuri Gribov <tetra2005@gmail.com>, Konstantin Khlebnikov <koct9i@gmail.com>, Sasha Levin <sasha.levin@oracle.com>, Michal Marek <mmarek@suse.cz>, Russell King <linux@arm.linux.org.uk>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Christoph Lameter <cl@linux.com>, Pekka Enberg <penberg@kernel.org>, David Rientjes <rientjes@google.com>, Joonsoo Kim <iamjoonsoo.kim@lge.com>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org, x86@kernel.org, linux-mm@kvack.org
 
-On Thu, Jul 10, 2014 at 11:55:26AM +0200, Thierry Reding wrote:
-> On Wed, Mar 26, 2014 at 09:32:47AM +0100, Thierry Reding wrote:
-> > On Tue, Mar 25, 2014 at 07:01:10PM +0100, Sam Ravnborg wrote:
-> > > > 
-> > > > There are two things that don't work too well with this. First this
-> > > > causes the build to break if the build machine doesn't have the new
-> > > > public header (include/uapi/linux/dma-buf.h) installed yet. So the only
-> > > > way to make this work would be by building the kernel once with SAMPLES
-> > > > disabled, install the headers and then build again with SAMPLES enabled.
-> > > > Which really isn't very nice.
-> > > > 
-> > > > One other option that I've tried is to modify the include path so that
-> > > > the test program would get the in-tree copy of the public header file,
-> > > > but that didn't build properly either because the header files aren't
-> > > > properly sanitized and therefore the compiler complains about it
-> > > > (include/uapi/linux/types.h).
-> > > > 
-> > > > One other disadvantage of carrying the sample program in the tree is
-> > > > that there's only infrastructure to build programs natively on the build
-> > > > machine. That's somewhat unfortunate because if you want to run the test
-> > > > program on a different architecture you have to either compile the
-> > > > kernel natively on that architecture (which isn't very practical on many
-> > > > embedded devices) or cross-compile manually.
-> > > > 
-> > > > I think a much nicer solution would be to add infrastructure to cross-
-> > > > compile these test programs, so that they end up being built for the
-> > > > same architecture as the kernel image (i.e. using CROSS_COMPILE).
-> > > > 
-> > > > Adding Michal and the linux-kbuild mailing list, perhaps this has been
-> > > > discussed before, or maybe somebody has a better idea on how to solve
-> > > > this.
-> > > I actually looked into this some time ago.
-> > > May try to dust off the patch.
-> > > IIRC the kernel provided headers were used for building - not the one installed on the machine.
-> > > And crosscompile were supported.
-> > 
-> > That sounds exactly like what I'd want for this. If you need any help,
-> > please let me know.
+On 07/09/2014 04:00 AM, Andrey Ryabinin wrote:
 > 
-> Did you have any time to look into dusting off the patch? If not I'll
-> gladly take whatever you have and dust it off myself.
-Thanks for the reminder.
-I got it almost working after simplifying it a lot.
-I will be travelling for the next few days but will continue to work on this
-after the weekend.
+> Address sanitizer dedicates 1/8 of the low memory to the shadow memory and uses direct
+> mapping with a scale and offset to translate a memory address to its corresponding
+> shadow address.
+> 
+> Here is function to translate address to corresponding shadow address:
+> 
+>      unsigned long kasan_mem_to_shadow(unsigned long addr)
+>      {
+> 		return ((addr) >> KASAN_SHADOW_SCALE_SHIFT)
+>        	             + kasan_shadow_start - (PAGE_OFFSET >> KASAN_SHADOW_SCALE_SHIFT);
+>      }
+> 
+> where KASAN_SHADOW_SCALE_SHIFT = 3.
+> 
 
-	Sam
+How does that work when memory is sparsely populated?
+
+	-hpa
+
