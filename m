@@ -1,161 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ie0-f170.google.com ([209.85.223.170]:64680 "EHLO
-	mail-ie0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750941AbaGMKWa (ORCPT
+Received: from mail-vc0-f182.google.com ([209.85.220.182]:46652 "EHLO
+	mail-vc0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750941AbaGMKjW (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 13 Jul 2014 06:22:30 -0400
+	Sun, 13 Jul 2014 06:39:22 -0400
 MIME-Version: 1.0
-In-Reply-To: <20140713093124.GA27389@ravnborg.org>
-References: <20140712200136.15788.17192.stgit@zurg>
-	<20140712202449.16082.46103.stgit@zurg>
-	<20140713093124.GA27389@ravnborg.org>
-Date: Sun, 13 Jul 2014 14:22:29 +0400
-Message-ID: <CALYGNiO5U=Bf3yxgoJRDmJMgMt_6KW5AS63F-9eryhkfGrs8Kg@mail.gmail.com>
-Subject: Re: [PATCH v2] lib/Kconfig.debug: introduce CONFIG_CC_STACK_USAGE
-From: Konstantin Khlebnikov <koct9i@gmail.com>
+In-Reply-To: <53C08876.10209@zytor.com>
+References: <1404903678-8257-1-git-send-email-a.ryabinin@samsung.com>
+	<53C08876.10209@zytor.com>
+Date: Sun, 13 Jul 2014 14:39:21 +0400
+Message-ID: <CAPAsAGwb2sLmu0o_o-pFP5pXhMs-1sZSJbA3ji=W+JPOZRepgg@mail.gmail.com>
+Subject: Re: [RFC/PATCH -next 00/21] Address sanitizer for kernel (kasan) -
+ dynamic memory error detector.
+From: Andrey Ryabinin <ryabinin.a.a@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Michal Marek <mmarek@suse.cz>, Andrew Morton <akpm@linux-foundation.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: "H. Peter Anvin" <hpa@zytor.com>
+Cc: Andrey Ryabinin <a.ryabinin@samsung.com>, linux-kernel@vger.kernel.org, Dmitry Vyukov <dvyukov@google.com>, Konstantin Serebryany <kcc@google.com>, Alexey Preobrazhensky <preobr@google.com>, Andrey Konovalov <adech.fo@gmail.com>, Yuri Gribov <tetra2005@gmail.com>, Konstantin Khlebnikov <koct9i@gmail.com>, Sasha Levin <sasha.levin@oracle.com>, Michal Marek <mmarek@suse.cz>, Russell King <linux@arm.linux.org.uk>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Christoph Lameter <cl@linux.com>, Pekka Enberg <penberg@kernel.org>, David Rientjes <rientjes@google.com>, Joonsoo Kim <iamjoonsoo.kim@lge.com>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org, x86@kernel.org, linux-mm@kvack.org
 
-On Sun, Jul 13, 2014 at 1:31 PM, Sam Ravnborg <sam@ravnborg.org> wrote:
-> Hi Konstantin.
+2014-07-12 4:59 GMT+04:00 H. Peter Anvin <hpa@zytor.com>:
+> On 07/09/2014 04:00 AM, Andrey Ryabinin wrote:
+>>
+>> Address sanitizer dedicates 1/8 of the low memory to the shadow memory and uses direct
+>> mapping with a scale and offset to translate a memory address to its corresponding
+>> shadow address.
+>>
+>> Here is function to translate address to corresponding shadow address:
+>>
+>>      unsigned long kasan_mem_to_shadow(unsigned long addr)
+>>      {
+>>               return ((addr) >> KASAN_SHADOW_SCALE_SHIFT)
+>>                            + kasan_shadow_start - (PAGE_OFFSET >> KASAN_SHADOW_SCALE_SHIFT);
+>>      }
+>>
+>> where KASAN_SHADOW_SCALE_SHIFT = 3.
+>>
 >
-> On Sun, Jul 13, 2014 at 12:24:50AM +0400, Konstantin Khlebnikov wrote:
->> This patch adds option for collecting stack usage statistics
->> via gcc option '-fstack-usage' (needs gcc 4.6 or newer).
->> For each .o file gcc dumps stack-frame sizes into .su file.
->>
->> File format:
->> <file>:<line>:<column>:<function>     <size>  <qualifiers>
->>
->> select.c:870:5:do_sys_poll    1040    static
->> rtnetlink.c:1880:12:rtnl_newlink        552     dynamic
->> random.c:1334:1:random_read   664     dynamic,bounded
->>
->> Quote from the gcc manpage about qualifiers:
->>
->>     The qualifier "static" means that the function
->>     manipulates the stack statically: a fixed number of bytes
->>     are allocated for the frame on function entry and
->>     released on function exit; no stack adjustments are
->>     otherwise made in the function.  The second field is this
->>     fixed number of bytes.
->>
->>     The qualifier "dynamic" means that the function
->>     manipulates the stack dynamically: in addition to the
->>     static allocation described above, stack adjustments are
->>     made in the body of the function, for example to push/pop
->>     arguments around function calls.  If the qualifier
->>     "bounded" is also present, the amount of these
->>     adjustments is bounded at compile time and the second
->>     field is an upper bound of the total amount of stack used
->>     by the function.  If it is not present, the amount of
->>     these adjustments is not bounded at compile time and the
->>     second field only represents the bounded part.
->>
->> In comparison to the scripts/checkstack.pl this method is more accurate.
->> It takes into account function arguments, push/pop pairs, frame
->> pointers and saved return address. It gives information about all
->> functions except purely assember (for example sha1_transform_avx2).
->>
->> Also this patch adds make target 'stack-usage' which combines all .su
->> files into one sorted 'stack-usage'. Also prints top 100 and all unbounded
->> dynamic stack frames.
->>
->> Signed-off-by: Konstantin Khlebnikov <koct9i@gmail.com>
->> ---
->>  .gitignore        |    3 +++
->>  Makefile          |   23 ++++++++++++++++++++++-
->>  lib/Kconfig.debug |    9 +++++++++
->>  3 files changed, 34 insertions(+), 1 deletion(-)
->>
->> diff --git a/.gitignore b/.gitignore
->> index f4c0b09..96b8984 100644
->> --- a/.gitignore
->> +++ b/.gitignore
->> @@ -85,6 +85,9 @@ GTAGS
->>  *~
->>  \#*#
->>
->> +*.su
->> +/stack-usage
->> +
->>  #
->>  # Leavings from module signing
->>  #
->> diff --git a/Makefile b/Makefile
->> index 2167084..29fe588 100644
->> --- a/Makefile
->> +++ b/Makefile
->> @@ -635,6 +635,11 @@ ifneq ($(CONFIG_FRAME_WARN),0)
->>  KBUILD_CFLAGS += $(call cc-option,-Wframe-larger-than=${CONFIG_FRAME_WARN})
->>  endif
->>
->> +ifdef CONFIG_CC_STACK_USAGE
->> +KBUILD_CFLAGS += $(call cc-option,-fstack-usage)
->> +endif
->> +CLEAN_FILES += stack-usage
->> +
->>  # Handle stack protector mode.
->>  ifdef CONFIG_CC_STACKPROTECTOR_REGULAR
->>    stackp-flag := -fstack-protector
->> @@ -1228,6 +1233,7 @@ help:
->>        echo  ''
->>       @echo  'Static analysers'
->>       @echo  '  checkstack      - Generate a list of stack hogs'
->> +     @echo  '  stack-usage     - Alternative list of stack hogs'
->>       @echo  '  namespacecheck  - Name space analysis on compiled kernel'
->>       @echo  '  versioncheck    - Sanity check on version.h usage'
->>       @echo  '  includecheck    - Check for duplicate included header files'
-> The other "check" targets have check in their name.
-> Can we follow this naming convention and call it checkstackusage?
+> How does that work when memory is sparsely populated?
+>
 
-Most of them, not all of them. export_report and headerdep dont have it.
-And it's not just a check it generates file as result.
-So, since I haven't found better name I decided to use the same words
-as in the gcc option.
+Sparsemem configurations currently may not work with kasan.
+I suppose I will have to move shadow area to vmalloc address space and
+make it (shadow) sparse too if needed.
 
+>         -hpa
 >
->
->> @@ -1376,7 +1382,7 @@ clean: $(clean-dirs)
->>       $(call cmd,rmfiles)
->>       @find $(if $(KBUILD_EXTMOD), $(KBUILD_EXTMOD), .) $(RCS_FIND_IGNORE) \
->>               \( -name '*.[oas]' -o -name '*.ko' -o -name '.*.cmd' \
->> -             -o -name '*.ko.*' \
->> +             -o -name '*.ko.*' -o -name '*.su' \
->>               -o -name '.*.d' -o -name '.*.tmp' -o -name '*.mod.c' \
->>               -o -name '*.symtypes' -o -name 'modules.order' \
->>               -o -name modules.builtin -o -name '.tmp_*.o.*' \
->> @@ -1432,6 +1438,21 @@ checkstack:
->>       $(OBJDUMP) -d vmlinux $$(find . -name '*.ko') | \
->>       $(PERL) $(src)/scripts/checkstack.pl $(CHECKSTACK_ARCH)
->>
->> +quiet_cmd_cc_stack_usage = SORTING $@
->> +cmd_cc_stack_usage = find -name '*.su' | xargs cat | sort -k 2 -n -r > $@
->> +
->> +stack-usage: FORCE
->> +ifndef CONFIG_CC_STACK_USAGE
->> +     $(Q)echo >&2 'Please rebuild with CONFIG_CC_STACK_USAGE=y' && false
->> +endif
->> +     $(call cmd,cc_stack_usage)
->> +     $(Q)echo ''
->> +     $(Q)echo 'Unbounded dynamic stack frames:'
->> +     $(Q)grep '\bdynamic$$' $@ || true
->> +     $(Q)echo ''
->> +     $(Q)echo 'Top 100 stack frames:'
->> +     $(Q)head -100 < $@
->> +
->
-> All this belongs to a script - for example named
->
->     scripts/checkstackusage.sh
->
-> The top-level Makefile shall be a thin driver and there are too much functionality
-> in that file. but this is no excuse for adding more.
+> --
+> To unsubscribe, send a message with 'unsubscribe linux-mm' in
+> the body to majordomo@kvack.org.  For more info on Linux MM,
+> see: http://www.linux-mm.org/ .
+> Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
 
-Ok, I'll think about it.
 
->
->         Sam
+
+-- 
+Best regards,
+Andrey Ryabinin
