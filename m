@@ -1,59 +1,86 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from asavdk4.altibox.net ([109.247.116.15]:60652 "EHLO
-	asavdk4.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751520AbaGMSn2 (ORCPT
+Received: from bombadil.infradead.org ([198.137.202.9]:55173 "EHLO
+	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751284AbaGMTX4 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 13 Jul 2014 14:43:28 -0400
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 4/6] samples: use uapiprogs support for hidraw
-Date: Sun, 13 Jul 2014 20:42:52 +0200
-Message-Id: <1405276974-17323-4-git-send-email-sam@ravnborg.org>
+	Sun, 13 Jul 2014 15:23:56 -0400
+Message-ID: <53C2DCC6.4070209@infradead.org>
+Date: Sun, 13 Jul 2014 12:23:50 -0700
+From: Randy Dunlap <rdunlap@infradead.org>
+MIME-Version: 1.0
+Subject: Re: [PATCH 1/6] kbuild: add support for building userspace api programs
+References: <20140713183636.GA17241@ravnborg.org> <1405276974-17323-1-git-send-email-sam@ravnborg.org>
 In-Reply-To: <1405276974-17323-1-git-send-email-sam@ravnborg.org>
-References: <20140713183636.GA17241@ravnborg.org>
- <1405276974-17323-1-git-send-email-sam@ravnborg.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>
-Cc: lkml <linux-kernel@vger.kernel.org>, Thierry Reding <thierry.reding@gmail.com>, Stephen Rothwell <sfr@canb.auug.org.au>, David Herrmann <dh.herrmann@googlemail.com>, Jiri Kosina <jkosina@suse.cz>, Sam Ravnborg <sam@ravnborg.org>
+To: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>
+Cc: lkml <linux-kernel@vger.kernel.org>, Thierry Reding <thierry.reding@gmail.com>, Stephen Rothwell <sfr@canb.auug.org.au>, David Herrmann <dh.herrmann@googlemail.com>, Jiri Kosina <jkosina@suse.cz>
 
-Reduce complexity of hidraw Makefile by introducing use of uapiprogs support.
-Build testet with i386 + sparc32.
+Hi Sam,
 
-Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
-Cc: David Herrmann <dh.herrmann@googlemail.com>
-Cc: Jiri Kosina <jkosina@suse.cz>
+On 07/13/14 11:42, Sam Ravnborg wrote:
+> 
+> diff --git a/Documentation/kbuild/makefiles.txt b/Documentation/kbuild/makefiles.txt
+> index c600e2f..713ea10 100644
+> --- a/Documentation/kbuild/makefiles.txt
+> +++ b/Documentation/kbuild/makefiles.txt
+> @@ -761,7 +763,43 @@ Both possibilities are described in the following.
+>  	like hostprogs-y. But only hostprogs-y is recommended to be used
+>  	when no CONFIG symbols are involved.
+>  
+> -=== 5 Kbuild clean infrastructure
+> +=== 5 Samples support (uapiprogs-y)
+> +
+> +Kbuild support building sample modules and sample binaries.
 
----
- samples/Makefile        |  2 +-
- samples/hidraw/Makefile | 11 +----------
- 2 files changed, 2 insertions(+), 11 deletions(-)
+          supports
 
-diff --git a/samples/Makefile b/samples/Makefile
-index b4d7d66..8fc6c45 100644
---- a/samples/Makefile
-+++ b/samples/Makefile
-@@ -12,4 +12,4 @@ obj-$(CONFIG_SAMPLES) += kdb/
- 
- # user space programs
- subdir-$(CONFIG_SAMPLES) += seccomp
--obj-$(CONFIG_SAMPLES) += hidraw/
-+subdir-$(CONFIG_SAMPLES) += hidraw
-diff --git a/samples/hidraw/Makefile b/samples/hidraw/Makefile
-index 382eeae..c2d2544 100644
---- a/samples/hidraw/Makefile
-+++ b/samples/hidraw/Makefile
-@@ -1,10 +1 @@
--# kbuild trick to avoid linker error. Can be omitted if a module is built.
--obj- := dummy.o
--
--# List of programs to build
--hostprogs-y := hid-example
--
--# Tell kbuild to always build the programs
--always := $(hostprogs-y)
--
--HOSTCFLAGS_hid-example.o += -I$(objtree)/usr/include
-+uapiprogs-y := hid-example
+> +To build sample modules the existing infrastructure is used, but
+> +to build sample binaries kbuild adds dedicated suppport.
+> +
+> +The sample binaries are build for the same host and bit-size as the kernel.
+
+                           built
+
+> +
+> +The samples may demonstrate facilities not yet available
+> +in the installed libc therefore they are build so they include
+
+                    libc;                   built
+
+> +headers from the exported uapi headers before the libc headers
+> +are searched.
+> +
+> +The sample binaries are usually placed in sub-directories
+> +below samples/ and specified in samples/Makefile.
+> +The directories containing sample binaries are listed using
+> +subdir-y - usually like this: subdir-$(CONFIG_SAMPLES) += dir
+> +
+> +The individual binaries may be defined as single .c file per binary
+> +or several .c files for a single binary.
+> +See the following examples.
+> +
+> +	Example:
+> +		# samples/hid/Makefile
+> +		uapiprogs-y := hid-example
+> +
+> +	This will compile hid-example.c and create an executable named hid-example.
+> +
+> +	Example:
+> +		# samples/seccomp/Makefile
+> +		uapiprogs-y := bpf-fancy
+> +		bpf-fancy-y := bpf-fancy.o bpf-helper.o
+> +
+> +This will compile bpf-fancy.c and bpf-helper.c, and then link the executable
+> +bpf-fancy, based on bpf-fancy.o bpf-helper.o.
+> +
+> +=== 6 Kbuild clean infrastructure
+>  
+>  "make clean" deletes most generated files in the obj tree where the kernel
+>  is compiled. This includes generated files such as host programs.
+
+
 -- 
-1.9.3
-
+~Randy
