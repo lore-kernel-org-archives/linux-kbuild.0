@@ -1,63 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from asavdk4.altibox.net ([109.247.116.15]:60661 "EHLO
+Received: from asavdk4.altibox.net ([109.247.116.15]:60634 "EHLO
 	asavdk4.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751522AbaGMSn2 (ORCPT
+	with ESMTP id S1751503AbaGMSn1 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 13 Jul 2014 14:43:28 -0400
+	Sun, 13 Jul 2014 14:43:27 -0400
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: [PATCH 5/6] samples: fix warnings in uhid-example
-Date: Sun, 13 Jul 2014 20:42:53 +0200
-Message-Id: <1405276974-17323-5-git-send-email-sam@ravnborg.org>
+Subject: [PATCH 2/6] samples: refactor Makefile
+Date: Sun, 13 Jul 2014 20:42:50 +0200
+Message-Id: <1405276974-17323-2-git-send-email-sam@ravnborg.org>
 In-Reply-To: <1405276974-17323-1-git-send-email-sam@ravnborg.org>
 References: <20140713183636.GA17241@ravnborg.org>
  <1405276974-17323-1-git-send-email-sam@ravnborg.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>
 Cc: lkml <linux-kernel@vger.kernel.org>, Thierry Reding <thierry.reding@gmail.com>, Stephen Rothwell <sfr@canb.auug.org.au>, David Herrmann <dh.herrmann@googlemail.com>, Jiri Kosina <jkosina@suse.cz>, Sam Ravnborg <sam@ravnborg.org>
 
-Fix following warnings seen when building using i686:
-uhid-example.c: In function ‘uhid_write’:
-uhid-example.c:168:4: warning: format ‘%ld’ expects argument of type ‘long int’, but argument 3 has type ‘ssize_t’ [-Wformat=]
-uhid-example.c:168:4: warning: format ‘%lu’ expects argument of type ‘long unsigned int’, but argument 4 has type ‘unsigned int’ [-Wformat=]
-uhid-example.c: In function ‘event’:
-uhid-example.c:239:4: warning: format ‘%ld’ expects argument of type ‘long int’, but argument 3 has type ‘ssize_t’ [-Wformat=]
-uhid-example.c:239:4: warning: format ‘%lu’ expects argument of type ‘long unsigned int’, but argument 4 has type ‘unsigned int’ [-Wformat=]
+Use one line per module/program in Makefile.
+This style is easier to read/extend.
 
-Use "%xd" for arguments of type size_t to fix the warnings.
+Introduce inverse xmas style sorting.
+This may prevent some merge conflicts in the future
 
 Signed-off-by: Sam Ravnborg <sam@ravnborg.org>
-Cc: David Herrmann <dh.herrmann@googlemail.com>
-Cc: Jiri Kosina <jkosina@suse.cz>
 ---
- samples/uhid/uhid-example.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ samples/Makefile | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
 
-diff --git a/samples/uhid/uhid-example.c b/samples/uhid/uhid-example.c
-index 7d58a4b..f25a5ef 100644
---- a/samples/uhid/uhid-example.c
-+++ b/samples/uhid/uhid-example.c
-@@ -164,7 +164,7 @@ static int uhid_write(int fd, const struct uhid_event *ev)
- 		fprintf(stderr, "Cannot write to uhid: %m\n");
- 		return -errno;
- 	} else if (ret != sizeof(*ev)) {
--		fprintf(stderr, "Wrong size written to uhid: %ld != %lu\n",
-+		fprintf(stderr, "Wrong size written to uhid: %zd != %zd\n",
- 			ret, sizeof(ev));
- 		return -EFAULT;
- 	} else {
-@@ -235,7 +235,7 @@ static int event(int fd)
- 		fprintf(stderr, "Cannot read uhid-cdev: %m\n");
- 		return -errno;
- 	} else if (ret != sizeof(ev)) {
--		fprintf(stderr, "Invalid size read from uhid-dev: %ld != %lu\n",
-+		fprintf(stderr, "Invalid size read from uhid-dev: %zd != %zd\n",
- 			ret, sizeof(ev));
- 		return -EFAULT;
- 	}
+diff --git a/samples/Makefile b/samples/Makefile
+index 1a60c62..7c08028 100644
+--- a/samples/Makefile
++++ b/samples/Makefile
+@@ -1,4 +1,15 @@
+ # Makefile for Linux samples code
++# Sort entries using inverse xmas style
++#
++# kernel modules
++obj-$(CONFIG_SAMPLES) += hw_breakpoint/
++obj-$(CONFIG_SAMPLES) += trace_events/
++obj-$(CONFIG_SAMPLES) += kprobes/
++obj-$(CONFIG_SAMPLES) += kobject/
++obj-$(CONFIG_SAMPLES) += kfifo/
++obj-$(CONFIG_SAMPLES) += rpmsg/
++obj-$(CONFIG_SAMPLES) += kdb/
+ 
+-obj-$(CONFIG_SAMPLES)	+= kobject/ kprobes/ trace_events/ \
+-			   hw_breakpoint/ kfifo/ kdb/ hidraw/ rpmsg/ seccomp/
++# user space programs
++obj-$(CONFIG_SAMPLES) += seccomp/
++obj-$(CONFIG_SAMPLES) += hidraw/
 -- 
 1.9.3
 
