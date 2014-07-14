@@ -1,82 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from asavdk4.altibox.net ([109.247.116.15]:34282 "EHLO
-	asavdk4.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751837AbaGMV0N (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 13 Jul 2014 17:26:13 -0400
-Date: Sun, 13 Jul 2014 23:26:08 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCHv1 2/2] Documentation/kbuild/headers_install.txt: update
- documentation
-Message-ID: <20140713212608.GB16496@ravnborg.org>
-References: <20140709204915.GB32335@ravnborg.org>
- <cover.1405246007.git.ydroneaud@opteya.com>
- <3e0d73d0ca3ead75624b552105ce8adf3d63684e.1405246009.git.ydroneaud@opteya.com>
+Received: from ozlabs.org ([103.22.144.67]:50520 "EHLO ozlabs.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751225AbaGNA0W (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 13 Jul 2014 20:26:22 -0400
+Date: Mon, 14 Jul 2014 10:26:13 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+Subject: Re: [PATCH 2/6] samples: refactor Makefile
+Message-ID: <20140714102613.00495ec5@canb.auug.org.au>
+In-Reply-To: <20140713195236.GA8711@ravnborg.org>
+References: <20140713183636.GA17241@ravnborg.org>
+	<1405276974-17323-1-git-send-email-sam@ravnborg.org>
+	<1405276974-17323-2-git-send-email-sam@ravnborg.org>
+	<53C2DD2D.2030902@infradead.org>
+	<20140713195236.GA8711@ravnborg.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3e0d73d0ca3ead75624b552105ce8adf3d63684e.1405246009.git.ydroneaud@opteya.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ boundary="Sig_/z0VQ57x7yw6c3_G4joHBkLv"; protocol="application/pgp-signature"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Yann Droneaud <ydroneaud@opteya.com>
-Cc: linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, "Kirill A. Shutemov" <kirill@shutemov.name>, Michal Marek <mmarek@suse.cz>, David Woodhouse <dwmw2@infradead.org>, Rob Landley <rob@landley.net>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Randy Dunlap <rdunlap@infradead.org>, Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, Thierry Reding <thierry.reding@gmail.com>, David Herrmann <dh.herrmann@googlemail.com>, Jiri Kosina <jkosina@suse.cz>
 
-On Sun, Jul 13, 2014 at 12:15:30PM +0200, Yann Droneaud wrote:
-> Documentation in kbuild/headers_install.txt is not
-> up to date regarding:
-> - way to list the various architectures;
-> - path where the headers are installed.
-> 
-> This patch try to fix these issues.
-> 
-> Cc: Kirill A. Shutemov <kirill@shutemov.name>
-> Cc: Michal Marek <mmarek@suse.cz>
-> Cc: David Woodhouse <dwmw2@infradead.org>
-> Cc: Rob Landley <rob@landley.net>
-> Cc: Sam Ravnborg <sam@ravnborg.org>
-> Signed-off-by: Yann Droneaud <ydroneaud@opteya.com>
-> ---
->  Documentation/kbuild/headers_install.txt | 15 ++++++++-------
->  1 file changed, 8 insertions(+), 7 deletions(-)
-> 
-> diff --git a/Documentation/kbuild/headers_install.txt b/Documentation/kbuild/headers_install.txt
-> index 951eb9f1e040..8b6751f10dd3 100644
-> --- a/Documentation/kbuild/headers_install.txt
-> +++ b/Documentation/kbuild/headers_install.txt
-> @@ -24,23 +24,24 @@ The "make headers_install" command can be run in the top level directory of the
->  kernel source code (or using a standard out-of-tree build).  It takes two
->  optional arguments:
->  
-> -  make headers_install ARCH=i386 INSTALL_HDR_PATH=/usr/include
-> +  make headers_install ARCH=i386 INSTALL_HDR_PATH=/usr
-OK
+--Sig_/z0VQ57x7yw6c3_G4joHBkLv
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
->  
+Hi Sam,
 
-> to see a list of supported architectures use
->  the command:
->  
-> -  ls -d include/asm-* | sed 's/.*-//'
-> +  /bin/ls -1 arch/*/include/asm/Kbuild | sed -e 's,^arch/,,' \
-> +                                             -e 's,/include/asm/Kbuild$,,'
-This information is nor relevant these days as all architectures support exporting userspace headers.
-So drop this part of the documentation.
-cris is broken - I will send a patch to fix this.
-In reality um does not support exporting headers - but it makes no sense either.
-We do not want to do anything special just to mention that um is not included.
+On Sun, 13 Jul 2014 21:52:36 +0200 Sam Ravnborg <sam@ravnborg.org> wrote:
+>
+> On Sun, Jul 13, 2014 at 12:25:33PM -0700, Randy Dunlap wrote:
+> > On 07/13/14 11:42, Sam Ravnborg wrote:
+> > > Use one line per module/program in Makefile.
+> > > This style is easier to read/extend.
+> > >=20
+> > > Introduce inverse xmas style sorting.
+> >=20
+> > google search couldn't tell me what that means and I cannot
+> > deduce it from the new Makefile ordering (if there is some ordering).
+> > Please explain.
+>=20
+> Sort by length - with longest entry first. Like an xmas tree upside-down.
+> For entries with same lenght sort alphabetically.
 
->  The command "make headers_install_all" exports headers for all architectures
->  simultaneously.  (This is mostly of interest to distribution maintainers,
->  who create an architecture-independent tarball from the resulting include
->  directory.)
-I have seriously considered dropping the "headers_install_all" target.
-It does not make any sense as some files are optional for the individual archs
-and only pure luck will define if the relevant fiels are included or not.
+If you are going to sort, just sort alphabetically ... this length
+based sorting just means you have to search to find anything ... It
+looks pretty, but that is about all.
 
-We would still like the "headers_check_all" feature but this is better done in
-a small shell script than as it is today where we need special handling
-to support it in Makefile.headersinst - and it adds complexity
-to the top-level Makefile which we shall avoid.
-But this is unrelated to your documentation clean-up.
+--=20
+Cheers,
+Stephen Rothwell                    sfr@canb.auug.org.au
 
-	Sam
+--Sig_/z0VQ57x7yw6c3_G4joHBkLv
+Content-Type: application/pgp-signature; name=signature.asc
+Content-Disposition: attachment; filename=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCAAGBQJTwyOpAAoJEMDTa8Ir7ZwVkkoP/R/AhctE4Aq0+2wwcORErQx+
+0H5tRTKFk4lMiXqgWHYutq5vRi/g0kiJPK9u+EoKVSAGtDHAXQOrRgypPVO45SZj
+H1XkNDEZi6JRGabn0VApA+J6CHr6ZfTHeUbO7BYsRP2PHTzX1NWw9T5HXaL30Vqe
+ouJo1ivtQcvBmKiWMTb5nYFa1tM7NJtU5+K7pWednybnfKm4c6Fopvq9/Pqwm+/5
+W1Pw3ThIdkTwXlh2vmg87Fmzu0UbNEHtC5eYJ7rIxh0nnfVM9pbeEmvRq0A2ijZe
+KOMItxPVKOA0LcOZrDBgVUkNglbwSx5uok8Z5vrbuO1PgCrfuSvrEsPqX9Jgr5P6
+AreV/I9BNexBOsYbyzf3CN8/VvXf5HIcL2Z7MWx4u6NtHXR1OrAsu9Oj5qZIaMcm
+mqBj38khdnjAYOejP2nIt1f1KEfuOYmG8+Sfl7t3YCKtGqpNWlEXimn3s7fMDZUi
+rq8+2X+pCJMKhnFHaD16sQh08AfpejFj+IjfSva10eWFswPwQaqiwWynJTqgAgfN
+EI5JxCbhijpWPZYXOJTNblQHOhgTD10Rm6bHQ2bh/9YGWV4sJzrqFKpRx724+MhM
+TPzSKu0vsgjjPZjrzdKfhUBnhnJWXEjQr2vwfrGvE2gb1zVGnv6zhQIlTjQs+MUO
+/MBrVWSEZGB3CNd2YjGk
+=1/+w
+-----END PGP SIGNATURE-----
+
+--Sig_/z0VQ57x7yw6c3_G4joHBkLv--
