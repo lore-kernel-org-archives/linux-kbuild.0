@@ -1,31 +1,93 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from qmta08.emeryville.ca.mail.comcast.net ([76.96.30.80]:42580 "EHLO
-	qmta08.emeryville.ca.mail.comcast.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1756377AbaGNPOA (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 14 Jul 2014 11:14:00 -0400
-Date: Mon, 14 Jul 2014 10:13:56 -0500 (CDT)
-From: Christoph Lameter <cl@gentwo.org>
-Subject: Re: [RFC/PATCH -next 00/21] Address sanitizer for kernel (kasan) -
- dynamic memory error detector.
-In-Reply-To: <CAPAsAGwb2sLmu0o_o-pFP5pXhMs-1sZSJbA3ji=W+JPOZRepgg@mail.gmail.com>
-Message-ID: <alpine.DEB.2.11.1407141012520.25405@gentwo.org>
-References: <1404903678-8257-1-git-send-email-a.ryabinin@samsung.com> <53C08876.10209@zytor.com> <CAPAsAGwb2sLmu0o_o-pFP5pXhMs-1sZSJbA3ji=W+JPOZRepgg@mail.gmail.com>
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+Received: from mout.gmx.net ([212.227.15.15]:58013 "EHLO mout.gmx.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756350AbaGNQaK (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 14 Jul 2014 12:30:10 -0400
+Message-ID: <53C40589.8050202@gmx.de>
+Date: Mon, 14 Jul 2014 18:30:01 +0200
+From: Heinrich Schuchardt <xypron.glpk@gmx.de>
+MIME-Version: 1.0
+Subject: Re: [PATCH 1/1] script/kconfig: remove a warning for menucofig
+References: <1404098187-9638-1-git-send-email-zhen-hual@hp.com> <53B1982F.4030504@gmx.de> <1267BB84A242B24E81E0C0C8955CFFC061A30C1D@G9W0343.americas.hpqcorp.net>
+In-Reply-To: <1267BB84A242B24E81E0C0C8955CFFC061A30C1D@G9W0343.americas.hpqcorp.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrey Ryabinin <ryabinin.a.a@gmail.com>
-Cc: "H. Peter Anvin" <hpa@zytor.com>, Andrey Ryabinin <a.ryabinin@samsung.com>, linux-kernel@vger.kernel.org, Dmitry Vyukov <dvyukov@google.com>, Konstantin Serebryany <kcc@google.com>, Alexey Preobrazhensky <preobr@google.com>, Andrey Konovalov <adech.fo@gmail.com>, Yuri Gribov <tetra2005@gmail.com>, Konstantin Khlebnikov <koct9i@gmail.com>, Sasha Levin <sasha.levin@oracle.com>, Michal Marek <mmarek@suse.cz>, Russell King <linux@arm.linux.org.uk>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Pekka Enberg <penberg@kernel.org>, David Rientjes <rientjes@google.com>, Joonsoo Kim <iamjoonsoo.kim@lge.com>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org, x86@kernel.org, linux-mm@kvack.org
+To: "Li, Zhen-Hua" <zhen-hual@hp.com>, "Yann E. MORIN" <yann.morin.1998@free.fr>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 
-On Sun, 13 Jul 2014, Andrey Ryabinin wrote:
-
-> > How does that work when memory is sparsely populated?
-> >
+On 01.07.2014 01:10, Li, Zhen-Hua wrote:
+> When malloc for jump,
+> if (head && location) {
+> 	jump = xmalloc(sizeof(struct jump_key));
+> 	....
+> }
+> And here it is used:
+> if (head && location && menu == location)
+> 	jump->offset = strlen(r->s);
 >
-> Sparsemem configurations currently may not work with kasan.
-> I suppose I will have to move shadow area to vmalloc address space and
-> make it (shadow) sparse too if needed.
+>
+> So I think when jump is used, it must not be NULL; then !=NULL is not needed.
 
-Well it seems to work with sparsemem / vmemmap? So non vmmemmapped configs
-of sparsemem only. vmemmmap can also handle holes in memory.
+I tested the patch against v13.6-rc5. It fixes the problem with the warning.
+
+You can add
+
+Reviewed-by: Heinrich Schuchardt <xypron.glpk@gmx.de>
+
+Best regards
+
+Heinrich
+
+
+> -----Original Message-----
+> From: Heinrich Schuchardt [mailto:xypron.glpk@gmx.de]
+> Sent: Tuesday, July 01, 2014 1:03 AM
+> To: Li, Zhen-Hua; Yann E. MORIN; linux-kbuild@vger.kernel.org; linux-kernel@vger.kernel.org
+> Subject: Re: [PATCH 1/1] script/kconfig: remove a warning for menucofig
+>
+> On 30.06.2014 05:16, Li, Zhen-Hua wrote:
+>> There is a warning when run "make menuconfig".
+>>
+>> scripts/kconfig/menu.c: In function ‘get_symbol_str’:
+>> scripts/kconfig/menu.c:591:18: warning: ‘jump’ may be used uninitialized in
+>> this function [-Wmaybe-uninitialized]
+>>        jump->offset = strlen(r->s);
+>>                     ^
+>> scripts/kconfig/menu.c:551:19: note: ‘jump’ was declared here
+>>     struct jump_key *jump;
+>>                      ^
+>>
+>> It is because the compiler think "jump" is not initialized, though in fact
+>> it is already initialized.
+>>
+>> Signed-off-by: Li, Zhen-Hua <zhen-hual@hp.com>
+>> ---
+>>    scripts/kconfig/menu.c | 2 +-
+>>    1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+>> index a26cc5d..584e0fc 100644
+>> --- a/scripts/kconfig/menu.c
+>> +++ b/scripts/kconfig/menu.c
+>> @@ -548,7 +548,7 @@ static void get_prompt_str(struct gstr *r, struct property *prop,
+>>    {
+>>    	int i, j;
+>>    	struct menu *submenu[8], *menu, *location = NULL;
+>> -	struct jump_key *jump;
+>> +	struct jump_key *jump = NULL;
+>>
+>>    	str_printf(r, _("Prompt: %s\n"), _(prop->text));
+>>    	menu = prop->menu->parent;
+>>
+> Hello Zhen-Hua,
+>
+> the patch looks incomplete to me. A check
+> jump != NULL
+> should be added before accessing parts of structure jump_key.
+>
+> Best regards
+>
+> Heinrich Schuchardt
+>
 
