@@ -1,69 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([103.22.144.67]:37326 "EHLO ozlabs.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751509AbaGNAeI (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 13 Jul 2014 20:34:08 -0400
-Date: Mon, 14 Jul 2014 10:33:57 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-Subject: Re: [PATCH v2 0/6] kbuild: use target compiler for user binaries in
- samples/
-Message-ID: <20140714103357.33d3bdc7@canb.auug.org.au>
-In-Reply-To: <20140714102936.73f43591@canb.auug.org.au>
-References: <20140713183636.GA17241@ravnborg.org>
-	<20140714102936.73f43591@canb.auug.org.au>
+Received: from g4t3426.houston.hp.com ([15.201.208.54]:56131 "EHLO
+	g4t3426.houston.hp.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750892AbaGNG0l (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 14 Jul 2014 02:26:41 -0400
+Message-ID: <53C377CC.8030909@hp.com>
+Date: Mon, 14 Jul 2014 14:25:16 +0800
+From: "Li, ZhenHua" <zhen-hual@hp.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- boundary="Sig_/m+IcKUJ_qzpK53kAz=R3N91"; protocol="application/pgp-signature"
+Subject: Re: [PATCH 1/1] script/kconfig: remove a warning for menucofig
+References: <1404098187-9638-1-git-send-email-zhen-hual@hp.com> <53B1982F.4030504@gmx.de>
+In-Reply-To: <53B1982F.4030504@gmx.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, Thierry Reding <thierry.reding@gmail.com>, David Herrmann <dh.herrmann@googlemail.com>, Jiri Kosina <jkosina@suse.cz>
+To: Heinrich Schuchardt <xypron.glpk@gmx.de>, "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
---Sig_/m+IcKUJ_qzpK53kAz=R3N91
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Any update?
 
-Hi Sam,
+On 07/01/2014 01:02 AM, Heinrich Schuchardt wrote:
+> On 30.06.2014 05:16, Li, Zhen-Hua wrote:
+>> There is a warning when run "make menuconfig".
+>>
+>> scripts/kconfig/menu.c: In function ‘get_symbol_str’:
+>> scripts/kconfig/menu.c:591:18: warning: ‘jump’ may be used 
+>> uninitialized in
+>> this function [-Wmaybe-uninitialized]
+>>       jump->offset = strlen(r->s);
+>>                    ^
+>> scripts/kconfig/menu.c:551:19: note: ‘jump’ was declared here
+>>    struct jump_key *jump;
+>>                     ^
+>>
+>> It is because the compiler think "jump" is not initialized, though in 
+>> fact
+>> it is already initialized.
+>>
+>> Signed-off-by: Li, Zhen-Hua <zhen-hual@hp.com>
+>> ---
+>>   scripts/kconfig/menu.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+>> index a26cc5d..584e0fc 100644
+>> --- a/scripts/kconfig/menu.c
+>> +++ b/scripts/kconfig/menu.c
+>> @@ -548,7 +548,7 @@ static void get_prompt_str(struct gstr *r, struct 
+>> property *prop,
+>>   {
+>>       int i, j;
+>>       struct menu *submenu[8], *menu, *location = NULL;
+>> -    struct jump_key *jump;
+>> +    struct jump_key *jump = NULL;
+>>
+>>       str_printf(r, _("Prompt: %s\n"), _(prop->text));
+>>       menu = prop->menu->parent;
+>>
+> Hello Zhen-Hua,
+>
+> the patch looks incomplete to me. A check
+> jump != NULL
+> should be added before accessing parts of structure jump_key.
+>
+> Best regards
+>
+> Heinrich Schuchardt
 
-On Mon, 14 Jul 2014 10:29:36 +1000 Stephen Rothwell <sfr@canb.auug.org.au> =
-wrote:
->=20
-> On Sun, 13 Jul 2014 20:36:37 +0200 Sam Ravnborg <sam@ravnborg.org> wrote:
-> >
-> > NOTE: This will likely break the build if the toolchain used do
-> > not include a libc. Let's see how much noise this creates.
->=20
-> Then I will drop them from linux-next.  Until someone supplies lots of
-> cross compilers with libc support, the samples can not (must not) be
-> built by default.
-
-Just to be clear: for my current build infrastructure, this means
-powerpc and x86_64 hosted cross compilers.
-
---=20
-Cheers,
-Stephen Rothwell                    sfr@canb.auug.org.au
-
---Sig_/m+IcKUJ_qzpK53kAz=R3N91
-Content-Type: application/pgp-signature; name=signature.asc
-Content-Disposition: attachment; filename=signature.asc
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJTwyV+AAoJEMDTa8Ir7ZwVurAP/ReIj4zT+kfMqVsxNd/Tm+0W
-T9Nb6aAbR/K/wkMxpZYXUeMSz8xzam5YCxjGTUFkCCXtE0oA7BQHR6Wx0NUyZfxw
-Xx8UXnpv4hmwrUE+uBeMGEeRM2+NqNYMX5yvIgvOZjvH75GQHPaN3EU0xmqEIHyA
-NljmUcutnBcmXfLt3i4dzce9h1oA49dB0LRh1rai6GvnIe7jnvLD704cGIzaaAc2
-sHaX+Fkdu5Y/d4i2gWfD8EbLVRGbkrMsGAp+BvgKx05Pg418cq89zHcm+8egQYdR
-n60/0XiZbVPGYwti3lh6wg5ioq8kx59t71Q/xfj5g5VJYltqq56D8bQehIYKiutv
-cz7IeDS80qXiBuqm3ClHqauEADbONUUkaVAGWMShgpQ+P+GNtV0LqJrMj7Ghhjee
-bicy5vgnnP0hGfbhhorTu5cp08S8NE+keF/z0FeAiWiBqICJ9wqCIBns3AUPUmUH
-7lkAbV22nUWNyRh9PHYoeCpq1lcfG8btyQyXA33imiIvPFCImAAbuiRUMWAazDZ/
-H4vmpNef/awtplCSVOavrIxmmZfkMEQaiGhQXvIF0KAgLOkiwzi18/2M6fYIWPIc
-lOtfQidezgiZgBeIdljbYvzRRlvwQesMLkGQgLgM9rQSNvcZv5bT1yyhEXsz8hk0
-qnwsEdbq2W1fAvEkDSH3
-=ciI6
------END PGP SIGNATURE-----
-
---Sig_/m+IcKUJ_qzpK53kAz=R3N91--
