@@ -1,70 +1,91 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from g4t3426.houston.hp.com ([15.201.208.54]:56131 "EHLO
-	g4t3426.houston.hp.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750892AbaGNG0l (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 14 Jul 2014 02:26:41 -0400
-Message-ID: <53C377CC.8030909@hp.com>
-Date: Mon, 14 Jul 2014 14:25:16 +0800
-From: "Li, ZhenHua" <zhen-hual@hp.com>
+Received: from afflict.kos.to ([92.243.29.197]:51203 "EHLO afflict.kos.to"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755593AbaGNOOs (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 14 Jul 2014 10:14:48 -0400
+Date: Mon, 14 Jul 2014 17:14:46 +0300
+From: Riku Voipio <riku.voipio@iki.fi>
+Subject: Re: [PATCH v2 1/2] deb-pkg: Add automatic support for armhf
+ architecture
+Message-ID: <20140714141446.GA26374@afflict.kos.to>
+References: <1402273294.23860.59.camel@deadeye.wl.decadent.org.uk>
+ <20140610130639.GA25366@afflict.kos.to>
 MIME-Version: 1.0
-Subject: Re: [PATCH 1/1] script/kconfig: remove a warning for menucofig
-References: <1404098187-9638-1-git-send-email-zhen-hual@hp.com> <53B1982F.4030504@gmx.de>
-In-Reply-To: <53B1982F.4030504@gmx.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20140610130639.GA25366@afflict.kos.to>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Heinrich Schuchardt <xypron.glpk@gmx.de>, "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Riku Voipio <riku.voipio@iki.fi>
+Cc: Ben Hutchings <ben@decadent.org.uk>, linux-kbuild <linux-kbuild@vger.kernel.org>, maximilian attems <max@stro.at>, Michal Marek <mmarek@suse.cz>, Fathi Boudra <fathi.boudra@linaro.org>, debian-arm@lists.debian.org, Hector Oron <hector.oron@gmail.com>
 
-Any update?
+On Tue, Jun 10, 2014 at 04:06:39PM +0300, Riku Voipio wrote:
+> On Mon, Jun 09, 2014 at 01:21:34AM +0100, Ben Hutchings wrote:
+> > The Debian armhf architecture uses the ARM EABI hard-float variant,
+> > whereas armel uses the soft-float variant.  Although the kernel
+> > doesn't use FP itself, CONFIG_VFP must be enabled to support
+> > hard-float userland and will probably be disabled when supporting a
+> > soft-float userland.  So set the architecture to armhf by default when
+> > CONFIG_AEABI and CONFIG_VFP are both enabled.
+> > 
+> > Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+> > ---
+> > v2: rebased
+> > 
+> > After discussion with Hector, we agreed this would be a worthwhile
+> > change.  Hector may later improve this by using gcc specs.
+> 
+> That should be easy:
+> 
+> -if grep -q CONFIG_VFP=y $KCONFIG_CONFIG; then
+> +if $CC -dM -E - < /dev/null|grep -q __ARM_PCS_VFP; then
+ 
+> It worked at least for my cross-compile test a minute ago.
 
-On 07/01/2014 01:02 AM, Heinrich Schuchardt wrote:
-> On 30.06.2014 05:16, Li, Zhen-Hua wrote:
->> There is a warning when run "make menuconfig".
->>
->> scripts/kconfig/menu.c: In function ‘get_symbol_str’:
->> scripts/kconfig/menu.c:591:18: warning: ‘jump’ may be used 
->> uninitialized in
->> this function [-Wmaybe-uninitialized]
->>       jump->offset = strlen(r->s);
->>                    ^
->> scripts/kconfig/menu.c:551:19: note: ‘jump’ was declared here
->>    struct jump_key *jump;
->>                     ^
->>
->> It is because the compiler think "jump" is not initialized, though in 
->> fact
->> it is already initialized.
->>
->> Signed-off-by: Li, Zhen-Hua <zhen-hual@hp.com>
->> ---
->>   scripts/kconfig/menu.c | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
->> index a26cc5d..584e0fc 100644
->> --- a/scripts/kconfig/menu.c
->> +++ b/scripts/kconfig/menu.c
->> @@ -548,7 +548,7 @@ static void get_prompt_str(struct gstr *r, struct 
->> property *prop,
->>   {
->>       int i, j;
->>       struct menu *submenu[8], *menu, *location = NULL;
->> -    struct jump_key *jump;
->> +    struct jump_key *jump = NULL;
->>
->>       str_printf(r, _("Prompt: %s\n"), _(prop->text));
->>       menu = prop->menu->parent;
->>
-> Hello Zhen-Hua,
->
-> the patch looks incomplete to me. A check
-> jump != NULL
-> should be added before accessing parts of structure jump_key.
->
-> Best regards
->
-> Heinrich Schuchardt
+It would be nice to have this change scheduled in any form to 3.17.
+Most people building kernels these days do armhf, so Bens version is
+already a material improvement for everyone.
 
+Riku
+
+> Riku
+> 
+> > Ben.
+> > 
+> >  scripts/package/builddeb | 11 ++++++++++-
+> >  1 file changed, 10 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+> > index f46e4dd..6756ed6 100644
+> > --- a/scripts/package/builddeb
+> > +++ b/scripts/package/builddeb
+> > @@ -43,7 +43,16 @@ create_package() {
+> >  	mips*)
+> >  		debarch=mips$(grep -q CPU_LITTLE_ENDIAN=y $KCONFIG_CONFIG && echo el || true) ;;
+> >  	arm*)
+> > -		debarch=arm$(grep -q CONFIG_AEABI=y $KCONFIG_CONFIG && echo el || true) ;;
+> > +		if grep -q CONFIG_AEABI=y $KCONFIG_CONFIG; then
+> > +		    if grep -q CONFIG_VFP=y $KCONFIG_CONFIG; then
+> > +			debarch=armhf
+> > +		    else
+> > +			debarch=armel
+> > +		    fi
+> > +		else
+> > +		    debarch=arm
+> > +		fi
+> > +		;;
+> >  	*)
+> >  		echo "" >&2
+> >  		echo "** ** **  WARNING  ** ** **" >&2
+> > 
+> > 
+> > -- 
+> > Ben Hutchings
+> > One of the nice things about standards is that there are so many of them.
+> 
+> 
+> 
+> -- 
+> To UNSUBSCRIBE, email to debian-arm-REQUEST@lists.debian.org
+> with a subject of "unsubscribe". Trouble? Contact listmaster@lists.debian.org
+> Archive: https://lists.debian.org/20140610130639.GA25366@afflict.kos.to
