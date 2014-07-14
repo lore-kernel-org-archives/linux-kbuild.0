@@ -1,91 +1,31 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from afflict.kos.to ([92.243.29.197]:51203 "EHLO afflict.kos.to"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755593AbaGNOOs (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 14 Jul 2014 10:14:48 -0400
-Date: Mon, 14 Jul 2014 17:14:46 +0300
-From: Riku Voipio <riku.voipio@iki.fi>
-Subject: Re: [PATCH v2 1/2] deb-pkg: Add automatic support for armhf
- architecture
-Message-ID: <20140714141446.GA26374@afflict.kos.to>
-References: <1402273294.23860.59.camel@deadeye.wl.decadent.org.uk>
- <20140610130639.GA25366@afflict.kos.to>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20140610130639.GA25366@afflict.kos.to>
+Received: from qmta08.emeryville.ca.mail.comcast.net ([76.96.30.80]:42580 "EHLO
+	qmta08.emeryville.ca.mail.comcast.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1756377AbaGNPOA (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 14 Jul 2014 11:14:00 -0400
+Date: Mon, 14 Jul 2014 10:13:56 -0500 (CDT)
+From: Christoph Lameter <cl@gentwo.org>
+Subject: Re: [RFC/PATCH -next 00/21] Address sanitizer for kernel (kasan) -
+ dynamic memory error detector.
+In-Reply-To: <CAPAsAGwb2sLmu0o_o-pFP5pXhMs-1sZSJbA3ji=W+JPOZRepgg@mail.gmail.com>
+Message-ID: <alpine.DEB.2.11.1407141012520.25405@gentwo.org>
+References: <1404903678-8257-1-git-send-email-a.ryabinin@samsung.com> <53C08876.10209@zytor.com> <CAPAsAGwb2sLmu0o_o-pFP5pXhMs-1sZSJbA3ji=W+JPOZRepgg@mail.gmail.com>
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Riku Voipio <riku.voipio@iki.fi>
-Cc: Ben Hutchings <ben@decadent.org.uk>, linux-kbuild <linux-kbuild@vger.kernel.org>, maximilian attems <max@stro.at>, Michal Marek <mmarek@suse.cz>, Fathi Boudra <fathi.boudra@linaro.org>, debian-arm@lists.debian.org, Hector Oron <hector.oron@gmail.com>
+To: Andrey Ryabinin <ryabinin.a.a@gmail.com>
+Cc: "H. Peter Anvin" <hpa@zytor.com>, Andrey Ryabinin <a.ryabinin@samsung.com>, linux-kernel@vger.kernel.org, Dmitry Vyukov <dvyukov@google.com>, Konstantin Serebryany <kcc@google.com>, Alexey Preobrazhensky <preobr@google.com>, Andrey Konovalov <adech.fo@gmail.com>, Yuri Gribov <tetra2005@gmail.com>, Konstantin Khlebnikov <koct9i@gmail.com>, Sasha Levin <sasha.levin@oracle.com>, Michal Marek <mmarek@suse.cz>, Russell King <linux@arm.linux.org.uk>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Pekka Enberg <penberg@kernel.org>, David Rientjes <rientjes@google.com>, Joonsoo Kim <iamjoonsoo.kim@lge.com>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org, x86@kernel.org, linux-mm@kvack.org
 
-On Tue, Jun 10, 2014 at 04:06:39PM +0300, Riku Voipio wrote:
-> On Mon, Jun 09, 2014 at 01:21:34AM +0100, Ben Hutchings wrote:
-> > The Debian armhf architecture uses the ARM EABI hard-float variant,
-> > whereas armel uses the soft-float variant.  Although the kernel
-> > doesn't use FP itself, CONFIG_VFP must be enabled to support
-> > hard-float userland and will probably be disabled when supporting a
-> > soft-float userland.  So set the architecture to armhf by default when
-> > CONFIG_AEABI and CONFIG_VFP are both enabled.
-> > 
-> > Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
-> > ---
-> > v2: rebased
-> > 
-> > After discussion with Hector, we agreed this would be a worthwhile
-> > change.  Hector may later improve this by using gcc specs.
-> 
-> That should be easy:
-> 
-> -if grep -q CONFIG_VFP=y $KCONFIG_CONFIG; then
-> +if $CC -dM -E - < /dev/null|grep -q __ARM_PCS_VFP; then
- 
-> It worked at least for my cross-compile test a minute ago.
+On Sun, 13 Jul 2014, Andrey Ryabinin wrote:
 
-It would be nice to have this change scheduled in any form to 3.17.
-Most people building kernels these days do armhf, so Bens version is
-already a material improvement for everyone.
+> > How does that work when memory is sparsely populated?
+> >
+>
+> Sparsemem configurations currently may not work with kasan.
+> I suppose I will have to move shadow area to vmalloc address space and
+> make it (shadow) sparse too if needed.
 
-Riku
+Well it seems to work with sparsemem / vmemmap? So non vmmemmapped configs
+of sparsemem only. vmemmmap can also handle holes in memory.
 
-> Riku
-> 
-> > Ben.
-> > 
-> >  scripts/package/builddeb | 11 ++++++++++-
-> >  1 file changed, 10 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-> > index f46e4dd..6756ed6 100644
-> > --- a/scripts/package/builddeb
-> > +++ b/scripts/package/builddeb
-> > @@ -43,7 +43,16 @@ create_package() {
-> >  	mips*)
-> >  		debarch=mips$(grep -q CPU_LITTLE_ENDIAN=y $KCONFIG_CONFIG && echo el || true) ;;
-> >  	arm*)
-> > -		debarch=arm$(grep -q CONFIG_AEABI=y $KCONFIG_CONFIG && echo el || true) ;;
-> > +		if grep -q CONFIG_AEABI=y $KCONFIG_CONFIG; then
-> > +		    if grep -q CONFIG_VFP=y $KCONFIG_CONFIG; then
-> > +			debarch=armhf
-> > +		    else
-> > +			debarch=armel
-> > +		    fi
-> > +		else
-> > +		    debarch=arm
-> > +		fi
-> > +		;;
-> >  	*)
-> >  		echo "" >&2
-> >  		echo "** ** **  WARNING  ** ** **" >&2
-> > 
-> > 
-> > -- 
-> > Ben Hutchings
-> > One of the nice things about standards is that there are so many of them.
-> 
-> 
-> 
-> -- 
-> To UNSUBSCRIBE, email to debian-arm-REQUEST@lists.debian.org
-> with a subject of "unsubscribe". Trouble? Contact listmaster@lists.debian.org
-> Archive: https://lists.debian.org/20140610130639.GA25366@afflict.kos.to
