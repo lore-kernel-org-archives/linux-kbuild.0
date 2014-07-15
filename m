@@ -1,39 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mailout1.w1.samsung.com ([210.118.77.11]:33385 "EHLO
-	mailout1.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757767AbaGOHCr (ORCPT
+Received: from benson.vm.bytemark.co.uk ([212.110.190.137]:35941 "EHLO
+	benson.vm.bytemark.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752949AbaGOHiR (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 15 Jul 2014 03:02:47 -0400
-Message-id: <53C4D0BB.2020107@samsung.com>
-Date: Tue, 15 Jul 2014 10:56:59 +0400
-From: Andrey Ryabinin <a.ryabinin@samsung.com>
-MIME-version: 1.0
-Subject: Re: [RFC/PATCH RESEND -next 10/21] mm: slab: share virt_to_cache()
- between slab and slub
-References: <1404905415-9046-1-git-send-email-a.ryabinin@samsung.com>
- <1404905415-9046-11-git-send-email-a.ryabinin@samsung.com>
- <20140715055342.GH11317@js1304-P5Q-DELUXE>
-In-reply-to: <20140715055342.GH11317@js1304-P5Q-DELUXE>
-Content-type: text/plain; charset=ISO-8859-1
-Content-transfer-encoding: 7bit
+	Tue, 15 Jul 2014 03:38:17 -0400
+From: Ian Campbell <ijc@hellion.org.uk>
+Subject: [PATCH] arm64: Align the kbuild output for VDSOL and VDSOA
+Date: Tue, 15 Jul 2014 08:38:08 +0100
+Message-Id: <1405409888-791-1-git-send-email-ijc@hellion.org.uk>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Joonsoo Kim <iamjoonsoo.kim@lge.com>
-Cc: linux-kernel@vger.kernel.org, Dmitry Vyukov <dvyukov@google.com>, Konstantin Serebryany <kcc@google.com>, Alexey Preobrazhensky <preobr@google.com>, Andrey Konovalov <adech.fo@gmail.com>, Yuri Gribov <tetra2005@gmail.com>, Konstantin Khlebnikov <koct9i@gmail.com>, Sasha Levin <sasha.levin@oracle.com>, Michal Marek <mmarek@suse.cz>, Russell King <linux@arm.linux.org.uk>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Christoph Lameter <cl@linux.com>, Pekka Enberg <penberg@kernel.org>, David Rientjes <rientjes@google.com>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org, x86@kernel.org, linux-mm@kvack.org
+To: linux-arm-kernel@vger.kernel.org
+Cc: Ian Campbell <ijc@hellion.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Michal Marek <mmarek@suse.cz>, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org
 
-On 07/15/14 09:53, Joonsoo Kim wrote:
-> On Wed, Jul 09, 2014 at 03:30:04PM +0400, Andrey Ryabinin wrote:
->> This patch shares virt_to_cache() between slab and slub and
->> it used in cache_from_obj() now.
->> Later virt_to_cache() will be kernel address sanitizer also.
-> 
-> I think that this patch won't be needed.
-> See comment in 15/21.
-> 
+Signed-off-by: Ian Campbell <ijc@hellion.org.uk>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will.deacon@arm.com>
+Cc: Michal Marek <mmarek@suse.cz>
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: linux-kbuild@vger.kernel.org
+---
+ arch/arm64/kernel/vdso/Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Ok, I'll drop it.
-
-> Thanks.
-> 
-> 
+diff --git a/arch/arm64/kernel/vdso/Makefile b/arch/arm64/kernel/vdso/Makefile
+index 6d20b7d..84b9426 100644
+--- a/arch/arm64/kernel/vdso/Makefile
++++ b/arch/arm64/kernel/vdso/Makefile
+@@ -47,9 +47,9 @@ $(obj-vdso): %.o: %.S
+ 	$(call if_changed_dep,vdsoas)
+ 
+ # Actual build commands
+-quiet_cmd_vdsold = VDSOL $@
++quiet_cmd_vdsold = VDSOL   $@
+       cmd_vdsold = $(CC) $(c_flags) -Wl,-n -Wl,-T $^ -o $@
+-quiet_cmd_vdsoas = VDSOA $@
++quiet_cmd_vdsoas = VDSOA   $@
+       cmd_vdsoas = $(CC) $(a_flags) -c -o $@ $<
+ 
+ # Install commands for the unstripped file
+-- 
+2.0.1
 
