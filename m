@@ -1,106 +1,109 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lgeamrelo02.lge.com ([156.147.1.126]:58217 "EHLO
-	lgeamrelo02.lge.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752949AbaGOIMx (ORCPT
+Received: from g4t3427.houston.hp.com ([15.201.208.55]:40635 "EHLO
+	g4t3427.houston.hp.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757584AbaGOIzV (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 15 Jul 2014 04:12:53 -0400
-Date: Tue, 15 Jul 2014 17:18:52 +0900
-From: Joonsoo Kim <iamjoonsoo.kim@lge.com>
-Subject: Re: [RFC/PATCH RESEND -next 14/21] mm: slub: kasan: disable kasan
- when touching unaccessible memory
-Message-ID: <20140715081852.GL11317@js1304-P5Q-DELUXE>
-References: <1404905415-9046-1-git-send-email-a.ryabinin@samsung.com>
- <1404905415-9046-15-git-send-email-a.ryabinin@samsung.com>
- <20140715060405.GI11317@js1304-P5Q-DELUXE>
- <53C4DA54.3010502@samsung.com>
+	Tue, 15 Jul 2014 04:55:21 -0400
+Message-ID: <53C4EC23.4060309@hp.com>
+Date: Tue, 15 Jul 2014 16:53:55 +0800
+From: "Li, ZhenHua" <zhen-hual@hp.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <53C4DA54.3010502@samsung.com>
+Subject: Re: [PATCH 1/1] script/kconfig: remove a warning for menucofig
+References: <1404098187-9638-1-git-send-email-zhen-hual@hp.com> <53B1982F.4030504@gmx.de> <1267BB84A242B24E81E0C0C8955CFFC061A30C1D@G9W0343.americas.hpqcorp.net> <53C40589.8050202@gmx.de>
+In-Reply-To: <53C40589.8050202@gmx.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrey Ryabinin <a.ryabinin@samsung.com>
-Cc: linux-kernel@vger.kernel.org, Dmitry Vyukov <dvyukov@google.com>, Konstantin Serebryany <kcc@google.com>, Alexey Preobrazhensky <preobr@google.com>, Andrey Konovalov <adech.fo@gmail.com>, Yuri Gribov <tetra2005@gmail.com>, Konstantin Khlebnikov <koct9i@gmail.com>, Sasha Levin <sasha.levin@oracle.com>, Michal Marek <mmarek@suse.cz>, Russell King <linux@arm.linux.org.uk>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Christoph Lameter <cl@linux.com>, Pekka Enberg <penberg@kernel.org>, David Rientjes <rientjes@google.com>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org, x86@kernel.org, linux-mm@kvack.org
+To: Heinrich Schuchardt <xypron.glpk@gmx.de>
+Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 
-On Tue, Jul 15, 2014 at 11:37:56AM +0400, Andrey Ryabinin wrote:
-> On 07/15/14 10:04, Joonsoo Kim wrote:
-> > On Wed, Jul 09, 2014 at 03:30:08PM +0400, Andrey Ryabinin wrote:
-> >> Some code in slub could validly touch memory marked by kasan as unaccessible.
-> >> Even though slub.c doesn't instrumented, functions called in it are instrumented,
-> >> so to avoid false positive reports such places are protected by
-> >> kasan_disable_local()/kasan_enable_local() calls.
-> >>
-> >> Signed-off-by: Andrey Ryabinin <a.ryabinin@samsung.com>
-> >> ---
-> >>  mm/slub.c | 21 +++++++++++++++++++--
-> >>  1 file changed, 19 insertions(+), 2 deletions(-)
-> >>
-> >> diff --git a/mm/slub.c b/mm/slub.c
-> >> index 6ddedf9..c8dbea7 100644
-> >> --- a/mm/slub.c
-> >> +++ b/mm/slub.c
-> >> @@ -560,8 +560,10 @@ static void print_tracking(struct kmem_cache *s, void *object)
-> >>  	if (!(s->flags & SLAB_STORE_USER))
-> >>  		return;
-> >>  
-> >> +	kasan_disable_local();
-> >>  	print_track("Allocated", get_track(s, object, TRACK_ALLOC));
-> >>  	print_track("Freed", get_track(s, object, TRACK_FREE));
-> >> +	kasan_enable_local();
-> > 
-> > I don't think that this is needed since print_track() doesn't call
-> > external function with object pointer. print_track() call pr_err(), but,
-> > before calling, it retrieve t->addrs[i] so memory access only occurs
-> > in slub.c.
-> > 
-> Agree.
-> 
-> >>  }
-> >>  
-> >>  static void print_page_info(struct page *page)
-> >> @@ -604,6 +606,8 @@ static void print_trailer(struct kmem_cache *s, struct page *page, u8 *p)
-> >>  	unsigned int off;	/* Offset of last byte */
-> >>  	u8 *addr = page_address(page);
-> >>  
-> >> +	kasan_disable_local();
-> >> +
-> >>  	print_tracking(s, p);
-> >>  
-> >>  	print_page_info(page);
-> >> @@ -632,6 +636,8 @@ static void print_trailer(struct kmem_cache *s, struct page *page, u8 *p)
-> >>  		/* Beginning of the filler is the free pointer */
-> >>  		print_section("Padding ", p + off, s->size - off);
-> >>  
-> >> +	kasan_enable_local();
-> >> +
-> >>  	dump_stack();
-> >>  }
-> > 
-> > And, I recommend that you put this hook on right place.
-> > At a glance, the problematic function is print_section() which have
-> > external function call, print_hex_dump(), with object pointer.
-> > If you disable kasan in print_section, all the below thing won't be
-> > needed, I guess.
-> > 
-> 
-> Nope, at least memchr_inv() call in slab_pad_check will be a problem.
-> 
-> I think putting disable/enable only where we strictly need them might be a problem for future maintenance of slub.
-> If someone is going to add a new function call somewhere, he must ensure that it this call won't be a problem
-> for kasan.
+Heinrich,
+Thank you very much for reviewing. But seems the maintainer will not 
+accept it.
 
-I don't agree with this.
+Zhenhua
 
-If someone is going to add a slab_pad_check() in other places in
-slub.c, we should disable/enable kasan there, too. This looks same
-maintenance problem to me. Putting disable/enable only where we
-strictly need at least ensures that we don't need to care when using
-slub internal functions.
+On 07/15/2014 12:30 AM, Heinrich Schuchardt wrote:
+> On 01.07.2014 01:10, Li, Zhen-Hua wrote:
+>> When malloc for jump,
+>> if (head && location) {
+>>     jump = xmalloc(sizeof(struct jump_key));
+>>     ....
+>> }
+>> And here it is used:
+>> if (head && location && menu == location)
+>>     jump->offset = strlen(r->s);
+>>
+>>
+>> So I think when jump is used, it must not be NULL; then !=NULL is not 
+>> needed.
+>
+> I tested the patch against v13.6-rc5. It fixes the problem with the 
+> warning.
+>
+> You can add
+>
+> Reviewed-by: Heinrich Schuchardt <xypron.glpk@gmx.de>
+>
+> Best regards
+>
+> Heinrich
+>
+>
+>> -----Original Message-----
+>> From: Heinrich Schuchardt [mailto:xypron.glpk@gmx.de]
+>> Sent: Tuesday, July 01, 2014 1:03 AM
+>> To: Li, Zhen-Hua; Yann E. MORIN; linux-kbuild@vger.kernel.org; 
+>> linux-kernel@vger.kernel.org
+>> Subject: Re: [PATCH 1/1] script/kconfig: remove a warning for menucofig
+>>
+>> On 30.06.2014 05:16, Li, Zhen-Hua wrote:
+>>> There is a warning when run "make menuconfig".
+>>>
+>>> scripts/kconfig/menu.c: In function ‘get_symbol_str’:
+>>> scripts/kconfig/menu.c:591:18: warning: ‘jump’ may be used 
+>>> uninitialized in
+>>> this function [-Wmaybe-uninitialized]
+>>>        jump->offset = strlen(r->s);
+>>>                     ^
+>>> scripts/kconfig/menu.c:551:19: note: ‘jump’ was declared here
+>>>     struct jump_key *jump;
+>>>                      ^
+>>>
+>>> It is because the compiler think "jump" is not initialized, though 
+>>> in fact
+>>> it is already initialized.
+>>>
+>>> Signed-off-by: Li, Zhen-Hua <zhen-hual@hp.com>
+>>> ---
+>>>    scripts/kconfig/menu.c | 2 +-
+>>>    1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+>>> index a26cc5d..584e0fc 100644
+>>> --- a/scripts/kconfig/menu.c
+>>> +++ b/scripts/kconfig/menu.c
+>>> @@ -548,7 +548,7 @@ static void get_prompt_str(struct gstr *r, 
+>>> struct property *prop,
+>>>    {
+>>>        int i, j;
+>>>        struct menu *submenu[8], *menu, *location = NULL;
+>>> -    struct jump_key *jump;
+>>> +    struct jump_key *jump = NULL;
+>>>
+>>>        str_printf(r, _("Prompt: %s\n"), _(prop->text));
+>>>        menu = prop->menu->parent;
+>>>
+>> Hello Zhen-Hua,
+>>
+>> the patch looks incomplete to me. A check
+>> jump != NULL
+>> should be added before accessing parts of structure jump_key.
+>>
+>> Best regards
+>>
+>> Heinrich Schuchardt
+>>
+>
 
-And, if memchr_inv() is problem, I think that you also need to add hook
-into validate_slab_cache().
-
-validate_slab_cache() -> validate_slab_slab() -> validate_slab() ->
-check_object() -> check_bytes_and_report() -> memchr_inv()
-
-Thanks.
