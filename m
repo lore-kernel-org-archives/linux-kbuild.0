@@ -1,69 +1,118 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mailout3.w1.samsung.com ([210.118.77.13]:40000 "EHLO
-	mailout3.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752939AbaGOPIb (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 15 Jul 2014 11:08:31 -0400
-Message-id: <53C542A0.5050107@samsung.com>
-Date: Tue, 15 Jul 2014 19:02:56 +0400
-From: Andrey Ryabinin <a.ryabinin@samsung.com>
-MIME-version: 1.0
-Subject: Re: [RFC/PATCH RESEND -next 14/21] mm: slub: kasan: disable kasan when
- touching unaccessible memory
-References: <1404905415-9046-1-git-send-email-a.ryabinin@samsung.com>
- <1404905415-9046-15-git-send-email-a.ryabinin@samsung.com>
- <20140715060405.GI11317@js1304-P5Q-DELUXE> <53C4DA54.3010502@samsung.com>
- <20140715081852.GL11317@js1304-P5Q-DELUXE>
- <alpine.DEB.2.11.1407150924320.10593@gentwo.org>
-In-reply-to: <alpine.DEB.2.11.1407150924320.10593@gentwo.org>
-Content-type: text/plain; charset=ISO-8859-1
-Content-transfer-encoding: 7bit
+Received: from mga11.intel.com ([192.55.52.93]:35966 "EHLO mga11.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1759407AbaGOXRL (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 15 Jul 2014 19:17:11 -0400
+From: Andi Kleen <andi@firstfloor.org>
+Subject: [PATCH 1/2] kbuild: Support split debug info v3
+Date: Wed, 16 Jul 2014 01:16:11 +0200
+Message-Id: <1405466172-17055-1-git-send-email-andi@firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Christoph Lameter <cl@gentwo.org>, Joonsoo Kim <iamjoonsoo.kim@lge.com>
-Cc: linux-kernel@vger.kernel.org, Dmitry Vyukov <dvyukov@google.com>, Konstantin Serebryany <kcc@google.com>, Alexey Preobrazhensky <preobr@google.com>, Andrey Konovalov <adech.fo@gmail.com>, Yuri Gribov <tetra2005@gmail.com>, Konstantin Khlebnikov <koct9i@gmail.com>, Sasha Levin <sasha.levin@oracle.com>, Michal Marek <mmarek@suse.cz>, Russell King <linux@arm.linux.org.uk>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Pekka Enberg <penberg@kernel.org>, David Rientjes <rientjes@google.com>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org, x86@kernel.org, linux-mm@kvack.org
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Andi Kleen <ak@linux.intel.com>, Dirk Gouders <dirk@gouders.net>, mmarek@suse.cz
 
-On 07/15/14 18:26, Christoph Lameter wrote:
-> On Tue, 15 Jul 2014, Joonsoo Kim wrote:
-> 
->>> I think putting disable/enable only where we strictly need them might be a problem for future maintenance of slub.
->>> If someone is going to add a new function call somewhere, he must ensure that it this call won't be a problem
->>> for kasan.
->>
->> I don't agree with this.
->>
->> If someone is going to add a slab_pad_check() in other places in
->> slub.c, we should disable/enable kasan there, too. This looks same
->> maintenance problem to me. Putting disable/enable only where we
->> strictly need at least ensures that we don't need to care when using
->> slub internal functions.
->>
->> And, if memchr_inv() is problem, I think that you also need to add hook
->> into validate_slab_cache().
->>
->> validate_slab_cache() -> validate_slab_slab() -> validate_slab() ->
->> check_object() -> check_bytes_and_report() -> memchr_inv()
-> 
-> I think adding disable/enable is good because it separates the payload
-> access from metadata accesses. This may be useful for future checkers.
-> Maybe call it something different so that this is more generic.
-> 
-> metadata_access_enable()
-> 
-> metadata_access_disable()
-> 
-> ?
-> 
-It sounds like a good idea to me. However in this patch, besides from protecting metadata accesses,
-this calls also used in setup_objects for wrapping ctor call. It used there because all pages in allocate_slab
-are poisoned, so at the time when ctors are called all object's memory marked as poisoned.
+From: Andi Kleen <ak@linux.intel.com>
 
-I think this could be solved by removing kasan_alloc_slab_pages() hook form allocate_slab() and adding
-kasan_slab_free() hook after ctor call.
-But I guess in that case padding at the end of slab will be unpoisoined.
+This is an alternative approach to lower the overhead of debug info
+(as we discussed a few days ago)
 
-> Maybe someone else has a better idea?
-> 
-> 
-> 
+gcc 4.7+ and newer binutils have a new "split debug info" debug info
+model where the debug info is only written once into central ".dwo" files.
+
+This avoids having to copy it around multiple times, from the object
+files to the final executable. It also lowers the disk space
+requirements. In addition it defaults to compressed debug data.
+
+More details here: http://gcc.gnu.org/wiki/DebugFission
+
+This patch adds a new option to enable it. It has to be an option,
+because it'll undoubtedly break everyone's debuginfo packaging scheme.
+gdb/objdump/etc. all still work, if you have new enough versions.
+
+I don't see big compile wins (maybe a second or two faster or so), but the
+object dirs with debuginfo get significantly smaller. My standard kernel
+config (slightly bigger than defconfig) shrinks from 2.9G disk space
+to 1.1G objdir (with non reduced debuginfo). I presume if you are IO limited
+the compile time difference will be larger.
+
+Only problem I've seen so far is that it doesn't play well with older
+versions of ccache (apparently fixed, see
+https://bugzilla.samba.org/show_bug.cgi?id=10005)
+
+v2: various fixes from Dirk Gouders. Improve commit message slightly.
+v3: Fix clean rules and improve Kconfig slightly
+Cc: Dirk Gouders <dirk@gouders.net>
+Cc: mmarek@suse.cz
+Signed-off-by: Andi Kleen <ak@linux.intel.com>
+---
+ .gitignore        |  1 +
+ Makefile          |  5 +++++
+ lib/Kconfig.debug | 13 +++++++++++++
+ 3 files changed, 19 insertions(+)
+
+diff --git a/.gitignore b/.gitignore
+index f4c0b09..e213b27 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -34,6 +34,7 @@
+ *.gcno
+ modules.builtin
+ Module.symvers
++*.dwo
+ 
+ #
+ # Top-level generic files
+diff --git a/Makefile b/Makefile
+index 1317563..953659e 100644
+--- a/Makefile
++++ b/Makefile
+@@ -683,9 +683,13 @@ endif
+ endif
+ 
+ ifdef CONFIG_DEBUG_INFO
++ifdef CONFIG_DEBUG_INFO_SPLIT
++KBUILD_CFLAGS   += $(call cc-option, -gsplit-dwarf, -g)
++else
+ KBUILD_CFLAGS	+= -g
+ KBUILD_AFLAGS	+= -Wa,-gdwarf-2
+ endif
++endif
+ 
+ ifdef CONFIG_DEBUG_INFO_REDUCED
+ KBUILD_CFLAGS 	+= $(call cc-option, -femit-struct-debug-baseonly) \
+@@ -1371,6 +1375,7 @@ clean: $(clean-dirs)
+ 	@find $(if $(KBUILD_EXTMOD), $(KBUILD_EXTMOD), .) $(RCS_FIND_IGNORE) \
+ 		\( -name '*.[oas]' -o -name '*.ko' -o -name '.*.cmd' \
+ 		-o -name '*.ko.*' \
++		-o -name '*.dwo'  \
+ 		-o -name '.*.d' -o -name '.*.tmp' -o -name '*.mod.c' \
+ 		-o -name '*.symtypes' -o -name 'modules.order' \
+ 		-o -name modules.builtin -o -name '.tmp_*.o.*' \
+diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+index 7a638aa..fb07c33 100644
+--- a/lib/Kconfig.debug
++++ b/lib/Kconfig.debug
+@@ -143,6 +143,19 @@ config DEBUG_INFO_REDUCED
+ 	  DEBUG_INFO build and compile times are reduced too.
+ 	  Only works with newer gcc versions.
+ 
++config DEBUG_INFO_SPLIT
++	bool "Produce split debuginfo in .dwo files"
++	depends on DEBUG_INFO
++	help
++	  Generate debug info into separate .dwo files. This can be
++	  faster for building than including the debug information directly
++	  in the object files and the vmlinux, as it only needs to
++	  be stored once to disk, not multiple times in object files.
++	  Requires recent gcc (4.7+) and recent gdb/binutils.
++	  Any tool that packages or reads debug information would need
++	  to know about the .dwo files and include them.
++	  Incompatible with older versions of ccache.
++
+ config ENABLE_WARN_DEPRECATED
+ 	bool "Enable __deprecated logic"
+ 	default y
+-- 
+1.8.5.2
 
