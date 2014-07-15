@@ -1,51 +1,69 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mailout3.w1.samsung.com ([210.118.77.13]:38543 "EHLO
+Received: from mailout3.w1.samsung.com ([210.118.77.13]:40000 "EHLO
 	mailout3.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752985AbaGOOh6 (ORCPT
+	with ESMTP id S1752939AbaGOPIb (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 15 Jul 2014 10:37:58 -0400
-MIME-version: 1.0
-Content-type: text/plain; charset=UTF-8
-Content-transfer-encoding: 8BIT
-Message-id: <53C53B77.3080000@samsung.com>
-Date: Tue, 15 Jul 2014 18:32:23 +0400
+	Tue, 15 Jul 2014 11:08:31 -0400
+Message-id: <53C542A0.5050107@samsung.com>
+Date: Tue, 15 Jul 2014 19:02:56 +0400
 From: Andrey Ryabinin <a.ryabinin@samsung.com>
-Subject: Re: [RFC/PATCH -next 00/21] Address sanitizer for kernel (kasan) -
- dynamic memory error detector.
-References: <1404903678-8257-1-git-send-email-a.ryabinin@samsung.com>
- <53C08876.10209@zytor.com>
- <CAPAsAGwb2sLmu0o_o-pFP5pXhMs-1sZSJbA3ji=W+JPOZRepgg@mail.gmail.com>
- <alpine.DEB.2.11.1407141012520.25405@gentwo.org>
-In-reply-to: <alpine.DEB.2.11.1407141012520.25405@gentwo.org>
+MIME-version: 1.0
+Subject: Re: [RFC/PATCH RESEND -next 14/21] mm: slub: kasan: disable kasan when
+ touching unaccessible memory
+References: <1404905415-9046-1-git-send-email-a.ryabinin@samsung.com>
+ <1404905415-9046-15-git-send-email-a.ryabinin@samsung.com>
+ <20140715060405.GI11317@js1304-P5Q-DELUXE> <53C4DA54.3010502@samsung.com>
+ <20140715081852.GL11317@js1304-P5Q-DELUXE>
+ <alpine.DEB.2.11.1407150924320.10593@gentwo.org>
+In-reply-to: <alpine.DEB.2.11.1407150924320.10593@gentwo.org>
+Content-type: text/plain; charset=ISO-8859-1
+Content-transfer-encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Christoph Lameter <cl@gentwo.org>, Andrey Ryabinin <ryabinin.a.a@gmail.com>
-Cc: "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org, Dmitry Vyukov <dvyukov@google.com>, Konstantin Serebryany <kcc@google.com>, Alexey Preobrazhensky <preobr@google.com>, Andrey Konovalov <adech.fo@gmail.com>, Yuri Gribov <tetra2005@gmail.com>, Konstantin Khlebnikov <koct9i@gmail.com>, Sasha Levin <sasha.levin@oracle.com>, Michal Marek <mmarek@suse.cz>, Russell King <linux@arm.linux.org.uk>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Pekka Enberg <penberg@kernel.org>, David Rientjes <rientjes@google.com>, Joonsoo Kim <iamjoonsoo.kim@lge.com>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org, x86@kernel.org, linux-mm@kvack.org
+To: Christoph Lameter <cl@gentwo.org>, Joonsoo Kim <iamjoonsoo.kim@lge.com>
+Cc: linux-kernel@vger.kernel.org, Dmitry Vyukov <dvyukov@google.com>, Konstantin Serebryany <kcc@google.com>, Alexey Preobrazhensky <preobr@google.com>, Andrey Konovalov <adech.fo@gmail.com>, Yuri Gribov <tetra2005@gmail.com>, Konstantin Khlebnikov <koct9i@gmail.com>, Sasha Levin <sasha.levin@oracle.com>, Michal Marek <mmarek@suse.cz>, Russell King <linux@arm.linux.org.uk>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Pekka Enberg <penberg@kernel.org>, David Rientjes <rientjes@google.com>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org, x86@kernel.org, linux-mm@kvack.org
 
-On 07/14/14 19:13, Christoph Lameter wrote:
-> On Sun, 13 Jul 2014, Andrey Ryabinin wrote:
+On 07/15/14 18:26, Christoph Lameter wrote:
+> On Tue, 15 Jul 2014, Joonsoo Kim wrote:
 > 
->>> How does that work when memory is sparsely populated?
->>>
+>>> I think putting disable/enable only where we strictly need them might be a problem for future maintenance of slub.
+>>> If someone is going to add a new function call somewhere, he must ensure that it this call won't be a problem
+>>> for kasan.
 >>
->> Sparsemem configurations currently may not work with kasan.
->> I suppose I will have to move shadow area to vmalloc address space and
->> make it (shadow) sparse too if needed.
+>> I don't agree with this.
+>>
+>> If someone is going to add a slab_pad_check() in other places in
+>> slub.c, we should disable/enable kasan there, too. This looks same
+>> maintenance problem to me. Putting disable/enable only where we
+>> strictly need at least ensures that we don't need to care when using
+>> slub internal functions.
+>>
+>> And, if memchr_inv() is problem, I think that you also need to add hook
+>> into validate_slab_cache().
+>>
+>> validate_slab_cache() -> validate_slab_slab() -> validate_slab() ->
+>> check_object() -> check_bytes_and_report() -> memchr_inv()
 > 
-> Well it seems to work with sparsemem / vmemmap? So non vmmemmapped configs
-> of sparsemem only. vmemmmap can also handle holes in memory.
+> I think adding disable/enable is good because it separates the payload
+> access from metadata accesses. This may be useful for future checkers.
+> Maybe call it something different so that this is more generic.
+> 
+> metadata_access_enable()
+> 
+> metadata_access_disable()
+> 
+> ?
+> 
+It sounds like a good idea to me. However in this patch, besides from protecting metadata accesses,
+this calls also used in setup_objects for wrapping ctor call. It used there because all pages in allocate_slab
+are poisoned, so at the time when ctors are called all object's memory marked as poisoned.
+
+I think this could be solved by removing kasan_alloc_slab_pages() hook form allocate_slab() and adding
+kasan_slab_free() hook after ctor call.
+But I guess in that case padding at the end of slab will be unpoisoined.
+
+> Maybe someone else has a better idea?
 > 
 > 
-
-Not sure. This sparsemem/vmemmap thing is kinda new to me, so I need to dig some more
-to understand how it iтteracts with kasan.
-
-As far as I understand the main problem with sparsemem & kasan is shadow allocation:
-
-	unsigned long lowmem_size = (unsigned long)high_memory - PAGE_OFFSET;
-	shadow_size = lowmem_size >> KASAN_SHADOW_SCALE_SHIFT;
-
-	shadow_phys_start = memblock_alloc(shadow_size, PAGE_SIZE);
-
-If we don't have one big enough physically contiguous block for shadow it will fail.
+> 
 
