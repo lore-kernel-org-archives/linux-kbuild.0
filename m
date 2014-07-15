@@ -1,109 +1,91 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from g4t3427.houston.hp.com ([15.201.208.55]:40635 "EHLO
-	g4t3427.houston.hp.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757584AbaGOIzV (ORCPT
+Received: from mailout3.w1.samsung.com ([210.118.77.13]:21688 "EHLO
+	mailout3.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752738AbaGOJkH (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 15 Jul 2014 04:55:21 -0400
-Message-ID: <53C4EC23.4060309@hp.com>
-Date: Tue, 15 Jul 2014 16:53:55 +0800
-From: "Li, ZhenHua" <zhen-hual@hp.com>
-MIME-Version: 1.0
-Subject: Re: [PATCH 1/1] script/kconfig: remove a warning for menucofig
-References: <1404098187-9638-1-git-send-email-zhen-hual@hp.com> <53B1982F.4030504@gmx.de> <1267BB84A242B24E81E0C0C8955CFFC061A30C1D@G9W0343.americas.hpqcorp.net> <53C40589.8050202@gmx.de>
-In-Reply-To: <53C40589.8050202@gmx.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+	Tue, 15 Jul 2014 05:40:07 -0400
+Message-id: <53C4F5A9.6030202@samsung.com>
+Date: Tue, 15 Jul 2014 13:34:33 +0400
+From: Andrey Ryabinin <a.ryabinin@samsung.com>
+MIME-version: 1.0
+Subject: Re: [RFC/PATCH RESEND -next 20/21] fs: dcache: manually unpoison dname
+ after allocation to shut up kasan's reports
+References: <1404905415-9046-1-git-send-email-a.ryabinin@samsung.com>
+ <1404905415-9046-21-git-send-email-a.ryabinin@samsung.com>
+ <20140715061219.GK11317@js1304-P5Q-DELUXE>
+In-reply-to: <20140715061219.GK11317@js1304-P5Q-DELUXE>
+Content-type: text/plain; charset=ISO-8859-1
+Content-transfer-encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Heinrich Schuchardt <xypron.glpk@gmx.de>
-Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: Joonsoo Kim <iamjoonsoo.kim@lge.com>
+Cc: linux-kernel@vger.kernel.org, Dmitry Vyukov <dvyukov@google.com>, Konstantin Serebryany <kcc@google.com>, Alexey Preobrazhensky <preobr@google.com>, Andrey Konovalov <adech.fo@gmail.com>, Yuri Gribov <tetra2005@gmail.com>, Konstantin Khlebnikov <koct9i@gmail.com>, Sasha Levin <sasha.levin@oracle.com>, Michal Marek <mmarek@suse.cz>, Russell King <linux@arm.linux.org.uk>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Christoph Lameter <cl@linux.com>, Pekka Enberg <penberg@kernel.org>, David Rientjes <rientjes@google.com>, Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org, x86@kernel.org, linux-mm@kvack.org
 
-Heinrich,
-Thank you very much for reviewing. But seems the maintainer will not 
-accept it.
+On 07/15/14 10:12, Joonsoo Kim wrote:
+> On Wed, Jul 09, 2014 at 03:30:14PM +0400, Andrey Ryabinin wrote:
+>> We need to manually unpoison rounded up allocation size for dname
+>> to avoid kasan's reports in __d_lookup_rcu.
+>> __d_lookup_rcu may validly read a little beyound allocated size.
+> 
+> If it read a little beyond allocated size, IMHO, it is better to
+> allocate correct size.
+> 
+> kmalloc(name->len + 1, GFP_KERNEL); -->
+> kmalloc(roundup(name->len + 1, sizeof(unsigned long ), GFP_KERNEL);
+> 
+> Isn't it?
+> 
 
-Zhenhua
+It's not needed here because kmalloc always roundup allocation size.
 
-On 07/15/2014 12:30 AM, Heinrich Schuchardt wrote:
-> On 01.07.2014 01:10, Li, Zhen-Hua wrote:
->> When malloc for jump,
->> if (head && location) {
->>     jump = xmalloc(sizeof(struct jump_key));
->>     ....
->> }
->> And here it is used:
->> if (head && location && menu == location)
->>     jump->offset = strlen(r->s);
+This out of bound access happens in dentry_string_cmp() if CONFIG_DCACHE_WORD_ACCESS=y.
+dentry_string_cmp() relays on fact that kmalloc always round up allocation size,
+in other words it's by design.
+
+That was discussed some time ago here - https://lkml.org/lkml/2013/10/3/493.
+Since filesystem's maintainer don't want to add needless round up here, I'm not going to do it.
+
+I think this patch needs only more detailed description why we not simply allocate more.
+Also I think it would be better to rename unpoisoin_shadow to something like kasan_mark_allocated().
+
+
+> Thanks.
+> 
 >>
+>> Reported-by: Dmitry Vyukov <dvyukov@google.com>
+>> Signed-off-by: Andrey Ryabinin <a.ryabinin@samsung.com>
+>> ---
+>>  fs/dcache.c | 3 +++
+>>  1 file changed, 3 insertions(+)
 >>
->> So I think when jump is used, it must not be NULL; then !=NULL is not 
->> needed.
->
-> I tested the patch against v13.6-rc5. It fixes the problem with the 
-> warning.
->
-> You can add
->
-> Reviewed-by: Heinrich Schuchardt <xypron.glpk@gmx.de>
->
-> Best regards
->
-> Heinrich
->
->
->> -----Original Message-----
->> From: Heinrich Schuchardt [mailto:xypron.glpk@gmx.de]
->> Sent: Tuesday, July 01, 2014 1:03 AM
->> To: Li, Zhen-Hua; Yann E. MORIN; linux-kbuild@vger.kernel.org; 
->> linux-kernel@vger.kernel.org
->> Subject: Re: [PATCH 1/1] script/kconfig: remove a warning for menucofig
+>> diff --git a/fs/dcache.c b/fs/dcache.c
+>> index b7e8b20..dff64f2 100644
+>> --- a/fs/dcache.c
+>> +++ b/fs/dcache.c
+>> @@ -38,6 +38,7 @@
+>>  #include <linux/prefetch.h>
+>>  #include <linux/ratelimit.h>
+>>  #include <linux/list_lru.h>
+>> +#include <linux/kasan.h>
+>>  #include "internal.h"
+>>  #include "mount.h"
+>>  
+>> @@ -1412,6 +1413,8 @@ struct dentry *__d_alloc(struct super_block *sb, const struct qstr *name)
+>>  			kmem_cache_free(dentry_cache, dentry); 
+>>  			return NULL;
+>>  		}
+>> +		unpoison_shadow(dname,
+>> +				roundup(name->len + 1, sizeof(unsigned long)));
+>>  	} else  {
+>>  		dname = dentry->d_iname;
+>>  	}	
+>> -- 
+>> 1.8.5.5
 >>
->> On 30.06.2014 05:16, Li, Zhen-Hua wrote:
->>> There is a warning when run "make menuconfig".
->>>
->>> scripts/kconfig/menu.c: In function ‘get_symbol_str’:
->>> scripts/kconfig/menu.c:591:18: warning: ‘jump’ may be used 
->>> uninitialized in
->>> this function [-Wmaybe-uninitialized]
->>>        jump->offset = strlen(r->s);
->>>                     ^
->>> scripts/kconfig/menu.c:551:19: note: ‘jump’ was declared here
->>>     struct jump_key *jump;
->>>                      ^
->>>
->>> It is because the compiler think "jump" is not initialized, though 
->>> in fact
->>> it is already initialized.
->>>
->>> Signed-off-by: Li, Zhen-Hua <zhen-hual@hp.com>
->>> ---
->>>    scripts/kconfig/menu.c | 2 +-
->>>    1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
->>> index a26cc5d..584e0fc 100644
->>> --- a/scripts/kconfig/menu.c
->>> +++ b/scripts/kconfig/menu.c
->>> @@ -548,7 +548,7 @@ static void get_prompt_str(struct gstr *r, 
->>> struct property *prop,
->>>    {
->>>        int i, j;
->>>        struct menu *submenu[8], *menu, *location = NULL;
->>> -    struct jump_key *jump;
->>> +    struct jump_key *jump = NULL;
->>>
->>>        str_printf(r, _("Prompt: %s\n"), _(prop->text));
->>>        menu = prop->menu->parent;
->>>
->> Hello Zhen-Hua,
->>
->> the patch looks incomplete to me. A check
->> jump != NULL
->> should be added before accessing parts of structure jump_key.
->>
->> Best regards
->>
->> Heinrich Schuchardt
->>
->
+>> --
+>> To unsubscribe, send a message with 'unsubscribe linux-mm' in
+>> the body to majordomo@kvack.org.  For more info on Linux MM,
+>> see: http://www.linux-mm.org/ .
+>> Don't email: <a href=mailto:"dont@kvack.org"> email@kvack.org </a>
+> 
 
