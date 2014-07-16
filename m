@@ -1,58 +1,35 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from asavdk3.altibox.net ([109.247.116.14]:49159 "EHLO
-	asavdk3.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751016AbaGPKb3 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 16 Jul 2014 06:31:29 -0400
-Date: Wed, 16 Jul 2014 12:31:21 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH 3/6] samples: use uapiprogs support for seccomp
-Message-ID: <20140716103120.GA4710@ravnborg.org>
-References: <1405276974-17323-1-git-send-email-sam@ravnborg.org>
- <1405276974-17323-3-git-send-email-sam@ravnborg.org>
- <20140716184351.AC2E.AA925319@jp.panasonic.com>
+Received: from cantor2.suse.de ([195.135.220.15]:32892 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S964942AbaGPP37 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 16 Jul 2014 11:29:59 -0400
+Message-ID: <53C69A75.4060906@suse.cz>
+Date: Wed, 16 Jul 2014 17:29:57 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20140716184351.AC2E.AA925319@jp.panasonic.com>
+Subject: Re: [PATCH v3 0/5] kbuild: Clean-up and bug fixes of scripts/Makefile.host
+References: <1405494743-29566-1-git-send-email-yamada.m@jp.panasonic.com>
+In-Reply-To: <1405494743-29566-1-git-send-email-yamada.m@jp.panasonic.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, Thierry Reding <thierry.reding@gmail.com>, Stephen Rothwell <sfr@canb.auug.org.au>, David Herrmann <dh.herrmann@googlemail.com>, Jiri Kosina <jkosina@suse.cz>
+To: Masahiro Yamada <yamada.m@jp.panasonic.com>, linux-kbuild@vger.kernel.org
+Cc: Sam Ravnborg <sam@ravnborg.org>
 
-On Wed, Jul 16, 2014 at 06:43:51PM +0900, Masahiro Yamada wrote:
-> Hi Sam,
+On 2014-07-16 09:12, Masahiro Yamada wrote:
+> Masahiro Yamada (5):
+>   kbuild: fix a typo in scripts/Makefile.host
+>   kbuild: fix a bug of C++ host program handling
+>   kbuild: drop shared library support from Makefile.host
+>   kbuild: clean up scripts/Makefile.host
+>   kbuild: clean-up and bug fix of scripts/Makefile.host
 > 
-> 
-> On Sun, 13 Jul 2014 20:42:51 +0200
-> Sam Ravnborg <sam@ravnborg.org> wrote:
-> 
-> > Reduce complexity of seccomp Makefile by introducing use of uapiprogs support.
-> > Build testet with i686 only.
-> 
-> tested ?
-> 
-> (Ditto in 4/6)
-Thanks - will fix.
+>  Documentation/kbuild/makefiles.txt | 39 +++++-------------------
+>  scripts/Makefile.host              | 61 ++++++--------------------------------
+>  2 files changed, 17 insertions(+), 83 deletions(-)
 
-> I am interested in this series.
-> 
-> Forgive me if I am asking a stupid question..
-> 
-> 
-> How can I build hostprogs for the same host as the kernel?
-> (I mean, how can I override $(HOSTCC) for cross-compiling ?)
+Applied to kbuild.git#kbuild, thanks!
 
-One way to do this:
+Michal
 
-make ARCH=sparc CROSS_COMPILE=sparc-leon-linux-gnu- HOSTCC=sparc-leon-linux-gnu-gcc
-
-Notice that I override HOSTCC as part of the make comand line.
-This allows me to override the "=" assignment in the top-level Makefile.
-
-But then my build breaks as fixdep do not run on my host.
-
-If you in general want to build a binary for the target then uapiprogs come in handy.
-Only caveat here is that you will be using the exported kernel headers.
-
-	Sam
