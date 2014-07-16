@@ -1,52 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.mei.co.jp ([133.183.100.20]:43025 "EHLO smtp.mei.co.jp"
+Received: from smtp.mei.co.jp ([133.183.100.20]:48575 "EHLO smtp.mei.co.jp"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751091AbaGPHQT (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 16 Jul 2014 03:16:19 -0400
-Date: Wed, 16 Jul 2014 16:16:07 +0900
+	id S1750935AbaGPJoV (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 16 Jul 2014 05:44:21 -0400
+Date: Wed, 16 Jul 2014 18:43:51 +0900
 From: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Subject: Re: [PATCH v2 5/5] kbuild: clean-up and bug fix of scripts/Makefile.host
-In-Reply-To: <53BFEAC4.9040407@suse.cz>
-References: <1402287394-31133-6-git-send-email-yamada.m@jp.panasonic.com> <53BFEAC4.9040407@suse.cz>
-Message-Id: <20140716161607.AC20.AA925319@jp.panasonic.com>
+Subject: Re: [PATCH 3/6] samples: use uapiprogs support for seccomp
+In-Reply-To: <1405276974-17323-3-git-send-email-sam@ravnborg.org>
+References: <1405276974-17323-1-git-send-email-sam@ravnborg.org> <1405276974-17323-3-git-send-email-sam@ravnborg.org>
+Message-Id: <20140716184351.AC2E.AA925319@jp.panasonic.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>, lkml <linux-kernel@vger.kernel.org>, Thierry Reding <thierry.reding@gmail.com>, Stephen Rothwell <sfr@canb.auug.org.au>, David Herrmann <dh.herrmann@googlemail.com>, Jiri Kosina <jkosina@suse.cz>
 
-Hi Michal,
-
-
-
-On Fri, 11 Jul 2014 15:46:44 +0200
-Michal Marek <mmarek@suse.cz> wrote:
-
-> On 2014-06-09 06:16, Masahiro Yamada wrote:
-> > -# hostprogs-y := tools/build may have been specified. Retrieve directory
-> > -host-objdirs := $(dir $(__hostprogs))
-> > -# directory of .o files from prog-objs notation
-> > -host-objdirs += $(dir $(foreach f,$(host-cmulti), $($(f)-objs)))
-> > -# directory of .o files from prog-cxxobjs notation
-> > -host-objdirs += $(dir $(foreach f,$(host-cxxmulti), $($(f)-cxxobjs)))
-> > +# hostprogs-y := tools/build may have been specified.
-> > +# Retrieve also directory of .o files from prog-objs or prog-cxxobjs notation
-> > +host-objdirs := $(dir \
-> > +	     $(foreach f, $(__hostprogs), $(f) $($(f)-objs) $($(f)-cxxobjs)))
-> 
-> You could also use the $(host-cobjs) and $(host-cxxobjs) variables
-> defined earlier and write
-> 
-> host-objdirs := $(dir $(__hostprogs) $(host-cobjs) $(host-cxxobjs))
-> 
+Hi Sam,
 
 
-Yup, this is much cleaner.
-Fixed in v3.
+On Sun, 13 Jul 2014 20:42:51 +0200
+Sam Ravnborg <sam@ravnborg.org> wrote:
 
-Thanks!
+> Reduce complexity of seccomp Makefile by introducing use of uapiprogs support.
+> Build testet with i686 only.
+
+tested ?
+
+(Ditto in 4/6)
+
+
+
+> --- a/samples/seccomp/Makefile
+> +++ b/samples/seccomp/Makefile
+> @@ -1,48 +1,4 @@
+> -# kbuild trick to avoid linker error. Can be omitted if a module is built.
+> -obj- := dummy.o
+> +uapiprogs-$(CONFIG_SECCOMP_FILTER) := bpf-fancy dropper bpf-direct
+>  
+> -hostprogs-$(CONFIG_SECCOMP_FILTER) := bpf-fancy dropper bpf-direct
+> +bpf-fancy-y := bpf-fancy.o bpf-helper.o
+>  
+> -HOSTCFLAGS_bpf-fancy.o += -I$(objtree)/usr/include
+> -HOSTCFLAGS_bpf-fancy.o += -idirafter $(objtree)/include
+> -HOSTCFLAGS_bpf-helper.o += -I$(objtree)/usr/include
+> -HOSTCFLAGS_bpf-helper.o += -idirafter $(objtree)/include
+> -bpf-fancy-objs := bpf-fancy.o bpf-helper.o
+> -
+
+
+
+I am interested in this series.
+
+Forgive me if I am asking a stupid question..
+
+
+How can I build hostprogs for the same host as the kernel?
+(I mean, how can I override $(HOSTCC) for cross-compiling ?)
 
 
 Best Regards
