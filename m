@@ -1,67 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:13406 "EHLO mga09.intel.com"
+Received: from smtp.mei.co.jp ([133.183.100.20]:34722 "EHLO smtp.mei.co.jp"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755932AbaGOXRI (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 15 Jul 2014 19:17:08 -0400
-From: Andi Kleen <andi@firstfloor.org>
-Subject: [PATCH 2/2] Kbuild: Add a option to enable dwarf4
-Date: Wed, 16 Jul 2014 01:16:12 +0200
-Message-Id: <1405466172-17055-2-git-send-email-andi@firstfloor.org>
-In-Reply-To: <1405466172-17055-1-git-send-email-andi@firstfloor.org>
-References: <1405466172-17055-1-git-send-email-andi@firstfloor.org>
+	id S1759080AbaGPHMh (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 16 Jul 2014 03:12:37 -0400
+From: Masahiro Yamada <yamada.m@jp.panasonic.com>
+Subject: [PATCH v3 4/5] kbuild: clean up scripts/Makefile.host
+Date: Wed, 16 Jul 2014 16:12:22 +0900
+Message-Id: <1405494743-29566-5-git-send-email-yamada.m@jp.panasonic.com>
+In-Reply-To: <1405494743-29566-1-git-send-email-yamada.m@jp.panasonic.com>
+References: <1405494743-29566-1-git-send-email-yamada.m@jp.panasonic.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Andi Kleen <ak@linux.intel.com>
+Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>, Masahiro Yamada <yamada.m@jp.panasonic.com>
 
-From: Andi Kleen <ak@linux.intel.com>
+The directory creation can be more simplified by two levels.
 
-I found that a lot of unresolvable variables when using gdb on the kernel
-become resolvable when dwarf4 is enabled. So add a Kconfig flag to enable it.
+[1] Drop $(dir ...)
 
-It definitely increases the debug information size, but on the other
-hand this isn't so bad when debug fusion is used.
+ $(dir $(f)) always returns non-empty string.
 
-Signed-off-by: Andi Kleen <ak@linux.intel.com>
+So, $(if $(dir $(f)),$(dir $(f)) is equivalent to $(dir $(f)).
+
+[2] Unroll $(foreach ...) loop
+
+$(dir ...) can take one or more arguments and returns a list of
+directories of them.
+
+$(foreach f, $(progs), $(dir $(f))) can be unrolled as $(dir $(progs)).
+
+Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
 ---
- Makefile          | 3 +++
- lib/Kconfig.debug | 9 +++++++++
- 2 files changed, 12 insertions(+)
 
-diff --git a/Makefile b/Makefile
-index 953659e..9c4080b 100644
---- a/Makefile
-+++ b/Makefile
-@@ -690,6 +690,9 @@ KBUILD_CFLAGS	+= -g
- KBUILD_AFLAGS	+= -Wa,-gdwarf-2
- endif
- endif
-+ifdef CONFIG_DEBUG_INFO_DWARF4
-+KBUILD_CFLAGS	+= -gdwarf-4
-+endif
+Changes in v3: None
+Changes in v2:
+  - Further more clean-up by enrolling $(foreach ) loop
+
+ scripts/Makefile.host | 10 +++-------
+ 1 file changed, 3 insertions(+), 7 deletions(-)
+
+diff --git a/scripts/Makefile.host b/scripts/Makefile.host
+index 1c2e570..bb6a11f 100644
+--- a/scripts/Makefile.host
++++ b/scripts/Makefile.host
+@@ -44,15 +44,11 @@ host-cxxobjs	:= $(sort $(foreach m,$(host-cxxmulti),$($(m)-cxxobjs)))
  
- ifdef CONFIG_DEBUG_INFO_REDUCED
- KBUILD_CFLAGS 	+= $(call cc-option, -femit-struct-debug-baseonly) \
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index fb07c33..1af4d96 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -156,6 +156,15 @@ config DEBUG_INFO_SPLIT
- 	  to know about the .dwo files and include them.
- 	  Incompatible with older versions of ccache.
+ # output directory for programs/.o files
+ # hostprogs-y := tools/build may have been specified. Retrieve directory
+-host-objdirs := $(foreach f,$(__hostprogs), $(if $(dir $(f)),$(dir $(f))))
++host-objdirs := $(dir $(__hostprogs))
+ # directory of .o files from prog-objs notation
+-host-objdirs += $(foreach f,$(host-cmulti),                  \
+-                    $(foreach m,$($(f)-objs),                \
+-                        $(if $(dir $(m)),$(dir $(m)))))
++host-objdirs += $(dir $(foreach f,$(host-cmulti), $($(f)-objs)))
+ # directory of .o files from prog-cxxobjs notation
+-host-objdirs += $(foreach f,$(host-cxxmulti),                  \
+-                    $(foreach m,$($(f)-cxxobjs),                \
+-                        $(if $(dir $(m)),$(dir $(m)))))
++host-objdirs += $(dir $(foreach f,$(host-cxxmulti), $($(f)-cxxobjs)))
  
-+config DEBUG_INFO_DWARF4
-+	bool "Generate dwarf4 debuginfo"
-+	depends on DEBUG_INFO
-+	help
-+	  Generate dwarf4 debug info. This requires recent versions
-+	  of gcc and gdb. It makes the debug information larger.
-+	  But it significantly improves the success of resolving
-+	  variables in gdb on optimized code.
-+
- config ENABLE_WARN_DEPRECATED
- 	bool "Enable __deprecated logic"
- 	default y
+ host-objdirs := $(strip $(sort $(filter-out ./,$(host-objdirs))))
+ 
 -- 
-1.8.5.2
+1.9.1
 
