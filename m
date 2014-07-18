@@ -1,48 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:47866 "EHLO mx2.suse.de"
+Received: from smtp.mei.co.jp ([133.183.100.20]:50110 "EHLO smtp.mei.co.jp"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932908AbaGQPWW (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 17 Jul 2014 11:22:22 -0400
-Message-ID: <53C7EA2A.6050301@suse.cz>
-Date: Thu, 17 Jul 2014 17:22:18 +0200
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: [PATCH v2 0/6] kbuild: use target compiler for user binaries
- in samples/
-References: <20140713183636.GA17241@ravnborg.org>	<20140714102936.73f43591@canb.auug.org.au> <20140714103357.33d3bdc7@canb.auug.org.au>
-In-Reply-To: <20140714103357.33d3bdc7@canb.auug.org.au>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+	id S1750735AbaGREky (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 18 Jul 2014 00:40:54 -0400
+From: Masahiro Yamada <yamada.m@jp.panasonic.com>
+Subject: [PATCH] kbuild: allow to override Python command name
+Date: Fri, 18 Jul 2014 13:40:11 +0900
+Message-Id: <1405658411-27346-1-git-send-email-yamada.m@jp.panasonic.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Stephen Rothwell <sfr@canb.auug.org.au>, Sam Ravnborg <sam@ravnborg.org>
-Cc: kbuild <linux-kbuild@vger.kernel.org>, Thierry Reding <thierry.reding@gmail.com>, David Herrmann <dh.herrmann@googlemail.com>, Jiri Kosina <jkosina@suse.cz>
+To: linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <yamada.m@jp.panasonic.com>, linux-ia64@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Tony Luck <tony.luck@intel.com>, Fenghua Yu <fenghua.yu@intel.com>, linux-kernel@vger.kernel.org
 
-On 2014-07-14 02:33, Stephen Rothwell wrote:
-> Hi Sam,
-> 
-> On Mon, 14 Jul 2014 10:29:36 +1000 Stephen Rothwell <sfr@canb.auug.org.au> wrote:
->>
->> On Sun, 13 Jul 2014 20:36:37 +0200 Sam Ravnborg <sam@ravnborg.org> wrote:
->>>
->>> NOTE: This will likely break the build if the toolchain used do
->>> not include a libc. Let's see how much noise this creates.
->>
->> Then I will drop them from linux-next.  Until someone supplies lots of
->> cross compilers with libc support, the samples can not (must not) be
->> built by default.
-> 
-> Just to be clear: for my current build infrastructure, this means
-> powerpc and x86_64 hosted cross compilers.
+The specification of Python 3 is largely different from that of
+Python 2.
 
-So we basically can have zero, one or both of
-A) target toolchain with libc support
-B) host toolchain with recent enough kernel headers
+For example, arch/ia64/scripts/unwcheck.py seems to be written
+in Python 2, not compatible with Python 3.
 
-Just can idea - in case we have B, but not A, would it make sense to
-build $(uapiprogs-y) with the host compiler, but without the
--Iusr/include flag? The question is whether to add a kconfig knob for
-this, or some automatic detection for libc support of the target
-toolchain. I'll come up with a patch later.
+It is not a good idea to invoke python scripts with the hard-coded
+command name 'python'. The command 'python' could possibly be
+Python 3 on some systems.
+For that case, it is reasonable to allow to override the command name
+by giving 'PYTHON=python2' from the command line.
 
-Michal
+The 'python' in arch/ia64/Makefile should be replaced with '$(PYTHON)'.
+
+Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
+Cc: linux-ia64@vger.kernel.org
+---
+
+ Makefile           | 3 ++-
+ arch/ia64/Makefile | 2 +-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index f3c543d..7f5f301 100644
+--- a/Makefile
++++ b/Makefile
+@@ -372,6 +372,7 @@ GENKSYMS	= scripts/genksyms/genksyms
+ INSTALLKERNEL  := installkernel
+ DEPMOD		= /sbin/depmod
+ PERL		= perl
++PYTHON		= python
+ CHECK		= sparse
+ 
+ CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
+@@ -422,7 +423,7 @@ KERNELVERSION = $(VERSION)$(if $(PATCHLEVEL),.$(PATCHLEVEL)$(if $(SUBLEVEL),.$(S
+ export VERSION PATCHLEVEL SUBLEVEL KERNELRELEASE KERNELVERSION
+ export ARCH SRCARCH CONFIG_SHELL HOSTCC HOSTCFLAGS CROSS_COMPILE AS LD CC
+ export CPP AR NM STRIP OBJCOPY OBJDUMP
+-export MAKE AWK GENKSYMS INSTALLKERNEL PERL UTS_MACHINE
++export MAKE AWK GENKSYMS INSTALLKERNEL PERL PYTHON UTS_MACHINE
+ export HOSTCXX HOSTCXXFLAGS LDFLAGS_MODULE CHECK CHECKFLAGS
+ 
+ export KBUILD_CPPFLAGS NOSTDINC_FLAGS LINUXINCLUDE OBJCOPYFLAGS LDFLAGS
+diff --git a/arch/ia64/Makefile b/arch/ia64/Makefile
+index f37238f..5441b14 100644
+--- a/arch/ia64/Makefile
++++ b/arch/ia64/Makefile
+@@ -76,7 +76,7 @@ vmlinux.gz: vmlinux
+ 	$(Q)$(MAKE) $(build)=$(boot) $@
+ 
+ unwcheck: vmlinux
+-	-$(Q)READELF=$(READELF) python $(srctree)/arch/ia64/scripts/unwcheck.py $<
++	-$(Q)READELF=$(READELF) $(PYTHON) $(srctree)/arch/ia64/scripts/unwcheck.py $<
+ 
+ archclean:
+ 	$(Q)$(MAKE) $(clean)=$(boot)
+-- 
+1.9.1
+
