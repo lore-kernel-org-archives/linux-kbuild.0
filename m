@@ -1,53 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from asavdk4.altibox.net ([109.247.116.15]:60043 "EHLO
-	asavdk4.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S965321AbaGRXaS (ORCPT
+Received: from mailout1.w2.samsung.com ([211.189.100.11]:41731 "EHLO
+	usmailout1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752143AbaGSANM (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 18 Jul 2014 19:30:18 -0400
-Date: Sat, 19 Jul 2014 01:29:58 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
+	Fri, 18 Jul 2014 20:13:12 -0400
+Message-id: <53C9B814.4020809@samsung.com>
+Date: Fri, 18 Jul 2014 18:13:08 -0600
+From: Shuah Khan <shuah.kh@samsung.com>
+Reply-to: shuah.kh@samsung.com
+MIME-version: 1.0
 Subject: Re: [PATCH] kbuild: devtest - new make target for build all and run
  tests
-Message-ID: <20140718232958.GA22487@ravnborg.org>
 References: <1405716274-24420-1-git-send-email-shuah.kh@samsung.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1405716274-24420-1-git-send-email-shuah.kh@samsung.com>
+ <20140718232958.GA22487@ravnborg.org>
+In-reply-to: <20140718232958.GA22487@ravnborg.org>
+Content-type: text/plain; charset=ISO-8859-1; format=flowed
+Content-transfer-encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Shuah Khan <shuah.kh@samsung.com>
+To: Sam Ravnborg <sam@ravnborg.org>
 Cc: mmarek@suse.cz, gregkh@linuxfoundation.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Fri, Jul 18, 2014 at 02:44:34PM -0600, Shuah Khan wrote:
-> Add a new devtest make target to enable developer testing. This
-> new target does full build (make all) and then runs selftests.
-> 
-> Signed-off-by: Shuah Khan <shuah.kh@samsung.com>
-> ---
->  Makefile | 11 +++++++++++
->  1 file changed, 11 insertions(+)
-> 
-> diff --git a/Makefile b/Makefile
-> index f3c543d..1ef3128 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -1034,6 +1034,14 @@ headers_check: headers_install
->  	$(Q)$(MAKE) $(hdr-inst)=arch/$(hdr-arch)/include/uapi/asm $(hdr-dst) HDRCHECK=1
->  
->  # ---------------------------------------------------------------------------
-> +# Kernel devtest
-> +
-> +PHONY += devtest
-> +devtest:
-> +	make all
-> +	make -C tools/testing/selftests run_tests
+On 07/18/2014 05:29 PM, Sam Ravnborg wrote:
+> On Fri, Jul 18, 2014 at 02:44:34PM -0600, Shuah Khan wrote:
+>> Add a new devtest make target to enable developer testing. This
+>> new target does full build (make all) and then runs selftests.
+>>
+>> Signed-off-by: Shuah Khan <shuah.kh@samsung.com>
+>> ---
+>>   Makefile | 11 +++++++++++
+>>   1 file changed, 11 insertions(+)
+>>
+>> diff --git a/Makefile b/Makefile
+>> index f3c543d..1ef3128 100644
+>> --- a/Makefile
+>> +++ b/Makefile
+>> @@ -1034,6 +1034,14 @@ headers_check: headers_install
+>>   	$(Q)$(MAKE) $(hdr-inst)=arch/$(hdr-arch)/include/uapi/asm $(hdr-dst) HDRCHECK=1
+>>
+>>   # ---------------------------------------------------------------------------
+>> +# Kernel devtest
+>> +
+>> +PHONY += devtest
+>> +devtest:
+>> +	make all
+>> +	make -C tools/testing/selftests run_tests
+>
+> The name "devtest" does not give any hints that we are actually
+> running the suite of selftest programs.
+>
+> Is it so because the plan is to extend devtest to cover more than just selftest?
+> If not please fix it so it is logical for the user what happens - in other
+> words name is selftest or something like that.
+>
 
-The name "devtest" does not give any hints that we are actually
-running the suite of selftest programs.
+Yes the intent is to cover more than just selftests in the future.
+That is why the target is called devtest.
 
-Is it so because the plan is to extend devtest to cover more than just selftest?
-If not please fix it so it is logical for the user what happens - in other
-words name is selftest or something like that.
+-- Shuah
 
-	Sam
+
+-- 
+Shuah Khan
+Senior Linux Kernel Developer - Open Source Group
+Samsung Research America(Silicon Valley)
+shuah.kh@samsung.com | (970) 672-0658
