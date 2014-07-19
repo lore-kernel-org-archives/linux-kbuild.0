@@ -1,67 +1,91 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mailout1.w2.samsung.com ([211.189.100.11]:41731 "EHLO
-	usmailout1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752143AbaGSANM (ORCPT
+Received: from mail-yh0-f50.google.com ([209.85.213.50]:47935 "EHLO
+	mail-yh0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757378AbaGSBfI (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 18 Jul 2014 20:13:12 -0400
-Message-id: <53C9B814.4020809@samsung.com>
-Date: Fri, 18 Jul 2014 18:13:08 -0600
-From: Shuah Khan <shuah.kh@samsung.com>
-Reply-to: shuah.kh@samsung.com
-MIME-version: 1.0
-Subject: Re: [PATCH] kbuild: devtest - new make target for build all and run
- tests
-References: <1405716274-24420-1-git-send-email-shuah.kh@samsung.com>
- <20140718232958.GA22487@ravnborg.org>
-In-reply-to: <20140718232958.GA22487@ravnborg.org>
-Content-type: text/plain; charset=ISO-8859-1; format=flowed
-Content-transfer-encoding: 7bit
+	Fri, 18 Jul 2014 21:35:08 -0400
+From: =?UTF-8?q?Vin=C3=ADcius=20Tinti?= <viniciustinti@gmail.com>
+Subject: [PATCH] kbuild: add support to generate LLVM bitcode files
+Date: Fri, 18 Jul 2014 22:34:37 -0300
+Message-Id: <1405733677-16650-1-git-send-email-viniciustinti@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: mmarek@suse.cz, gregkh@linuxfoundation.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, =?UTF-8?q?Vin=C3=ADcius=20Tinti?= <viniciustinti@gmail.com>, Behan Webster <behanw@converseincode.com>
 
-On 07/18/2014 05:29 PM, Sam Ravnborg wrote:
-> On Fri, Jul 18, 2014 at 02:44:34PM -0600, Shuah Khan wrote:
->> Add a new devtest make target to enable developer testing. This
->> new target does full build (make all) and then runs selftests.
->>
->> Signed-off-by: Shuah Khan <shuah.kh@samsung.com>
->> ---
->>   Makefile | 11 +++++++++++
->>   1 file changed, 11 insertions(+)
->>
->> diff --git a/Makefile b/Makefile
->> index f3c543d..1ef3128 100644
->> --- a/Makefile
->> +++ b/Makefile
->> @@ -1034,6 +1034,14 @@ headers_check: headers_install
->>   	$(Q)$(MAKE) $(hdr-inst)=arch/$(hdr-arch)/include/uapi/asm $(hdr-dst) HDRCHECK=1
->>
->>   # ---------------------------------------------------------------------------
->> +# Kernel devtest
->> +
->> +PHONY += devtest
->> +devtest:
->> +	make all
->> +	make -C tools/testing/selftests run_tests
->
-> The name "devtest" does not give any hints that we are actually
-> running the suite of selftest programs.
->
-> Is it so because the plan is to extend devtest to cover more than just selftest?
-> If not please fix it so it is logical for the user what happens - in other
-> words name is selftest or something like that.
->
+Allows kbuild to generate LLVM bitcode files with the .ll extension when
+building with Clang.
 
-Yes the intent is to cover more than just selftests in the future.
-That is why the target is called devtest.
+  # c code
+  CC=clang make kernel/pid.ll
 
--- Shuah
+  # asm code
+  CC=clang make arch/arm/kernel/calls.ll
 
+Signed-off-by: Vinícius Tinti <viniciustinti@gmail.com>
+Signed-off-by: Behan Webster <behanw@converseincode.com>
+---
+ Makefile               |  7 +++++++
+ scripts/Makefile.build | 18 ++++++++++++++++++
+ 2 files changed, 25 insertions(+)
 
+diff --git a/Makefile b/Makefile
+index f3c543d..4eb0d14 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1484,6 +1484,13 @@ endif
+ %.symtypes: %.c prepare scripts FORCE
+ 	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+ 
++ifeq ($(COMPILER),clang)
++%.ll: %.c prepare scripts FORCE
++	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
++%.ll: %.S prepare scripts FORCE
++	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
++endif
++
+ # Modules
+ /: prepare scripts FORCE
+ 	$(cmd_crmodverdir)
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index bf3e677..9ea19d6 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -174,6 +174,14 @@ cmd_cc_symtypes_c =                                                         \
+ $(obj)/%.symtypes : $(src)/%.c FORCE
+ 	$(call cmd,cc_symtypes_c)
+ 
++ifeq ($(COMPILER),clang)
++quiet_cmd_cc_ll_c = CC $(quiet_modtag)  $@
++cmd_cc_ll_c       = $(CC) $(c_flags) $(DISABLE_LTO) -fverbose-asm -emit-llvm -S -o $@ $<
++
++$(obj)/%.ll: $(src)/%.c FORCE
++	$(call if_changed_dep,cc_ll_c)
++endif
++
+ # C (.c) files
+ # The C file is compiled and updated dependency information is generated.
+ # (See cmd_cc_o_c + relevant part of rule_cc_o_c)
+@@ -315,6 +323,16 @@ quiet_cmd_asn1_compiler = ASN.1   $@
+ $(obj)/%-asn1.c $(obj)/%-asn1.h: $(src)/%.asn1 $(objtree)/scripts/asn1_compiler
+ 	$(call cmd,asn1_compiler)
+ 
++# LLVM bitcode
++# ---------------------------------------------------------------------------
++ifeq ($(COMPILER),clang)
++quiet_cmd_as_ll_S = CPP $(quiet_modtag) $@
++cmd_as_ll_S       = $(CPP) $(a_flags)   -o $@ $<
++
++$(obj)/%.ll: $(src)/%.S FORCE
++	$(call if_changed_dep,as_ll_S)
++endif
++
+ # Build the compiled-in targets
+ # ---------------------------------------------------------------------------
+ 
 -- 
-Shuah Khan
-Senior Linux Kernel Developer - Open Source Group
-Samsung Research America(Silicon Valley)
-shuah.kh@samsung.com | (970) 672-0658
+2.0.1
+
