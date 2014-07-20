@@ -1,91 +1,138 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from asavdk3.altibox.net ([109.247.116.14]:32827 "EHLO
-	asavdk3.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751358AbaGTKCr (ORCPT
+Received: from asavdk4.altibox.net ([109.247.116.15]:42947 "EHLO
+	asavdk4.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752802AbaGTTEl (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 20 Jul 2014 06:02:47 -0400
-Date: Sun, 20 Jul 2014 12:02:39 +0200
+	Sun, 20 Jul 2014 15:04:41 -0400
+Date: Sun, 20 Jul 2014 21:04:20 +0200
 From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH] kbuild: add support to generate LLVM bitcode files
-Message-ID: <20140720100239.GA3496@ravnborg.org>
-References: <1405733677-16650-1-git-send-email-viniciustinti@gmail.com>
+Subject: Re: [PATCH 1/2] kbuild: Support split debug info v3
+Message-ID: <20140720190420.GA4630@ravnborg.org>
+References: <1405466172-17055-1-git-send-email-andi@firstfloor.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1405733677-16650-1-git-send-email-viniciustinti@gmail.com>
+In-Reply-To: <1405466172-17055-1-git-send-email-andi@firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: =?iso-8859-1?Q?Vin=EDcius?= Tinti <viniciustinti@gmail.com>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Behan Webster <behanw@converseincode.com>
+To: Andi Kleen <andi@firstfloor.org>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Andi Kleen <ak@linux.intel.com>, Dirk Gouders <dirk@gouders.net>, mmarek@suse.cz
 
-On Fri, Jul 18, 2014 at 10:34:37PM -0300, Vinícius Tinti wrote:
-> Allows kbuild to generate LLVM bitcode files with the .ll extension when
-> building with Clang.
+Hi Andi.
+
+On Wed, Jul 16, 2014 at 01:16:11AM +0200, Andi Kleen wrote:
+> From: Andi Kleen <ak@linux.intel.com>
 > 
->   # c code
->   CC=clang make kernel/pid.ll
+> This is an alternative approach to lower the overhead of debug info
+> (as we discussed a few days ago)
 > 
->   # asm code
->   CC=clang make arch/arm/kernel/calls.ll
+> gcc 4.7+ and newer binutils have a new "split debug info" debug info
+> model where the debug info is only written once into central ".dwo" files.
 > 
-> Signed-off-by: Vinícius Tinti <viniciustinti@gmail.com>
-> Signed-off-by: Behan Webster <behanw@converseincode.com>
+> This avoids having to copy it around multiple times, from the object
+> files to the final executable. It also lowers the disk space
+> requirements. In addition it defaults to compressed debug data.
+> 
+> More details here: http://gcc.gnu.org/wiki/DebugFission
+> 
+> This patch adds a new option to enable it. It has to be an option,
+> because it'll undoubtedly break everyone's debuginfo packaging scheme.
+> gdb/objdump/etc. all still work, if you have new enough versions.
+> 
+> I don't see big compile wins (maybe a second or two faster or so), but the
+> object dirs with debuginfo get significantly smaller. My standard kernel
+> config (slightly bigger than defconfig) shrinks from 2.9G disk space
+> to 1.1G objdir (with non reduced debuginfo). I presume if you are IO limited
+> the compile time difference will be larger.
+> 
+> Only problem I've seen so far is that it doesn't play well with older
+> versions of ccache (apparently fixed, see
+> https://bugzilla.samba.org/show_bug.cgi?id=10005)
+> 
+> v2: various fixes from Dirk Gouders. Improve commit message slightly.
+> v3: Fix clean rules and improve Kconfig slightly
+> Cc: Dirk Gouders <dirk@gouders.net>
+> Cc: mmarek@suse.cz
+> Signed-off-by: Andi Kleen <ak@linux.intel.com>
 > ---
->  Makefile               |  7 +++++++
->  scripts/Makefile.build | 18 ++++++++++++++++++
->  2 files changed, 25 insertions(+)
+>  .gitignore        |  1 +
+>  Makefile          |  5 +++++
+>  lib/Kconfig.debug | 13 +++++++++++++
+>  3 files changed, 19 insertions(+)
 > 
+> diff --git a/.gitignore b/.gitignore
+> index f4c0b09..e213b27 100644
+> --- a/.gitignore
+> +++ b/.gitignore
+> @@ -34,6 +34,7 @@
+>  *.gcno
+>  modules.builtin
+>  Module.symvers
+> +*.dwo
+>  
+>  #
+>  # Top-level generic files
 > diff --git a/Makefile b/Makefile
-> index f3c543d..4eb0d14 100644
+> index 1317563..953659e 100644
 > --- a/Makefile
 > +++ b/Makefile
-> @@ -1484,6 +1484,13 @@ endif
->  %.symtypes: %.c prepare scripts FORCE
->  	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+> @@ -683,9 +683,13 @@ endif
+>  endif
 >  
-> +ifeq ($(COMPILER),clang)
-> +%.ll: %.c prepare scripts FORCE
-> +	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
-> +%.ll: %.S prepare scripts FORCE
-> +	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+>  ifdef CONFIG_DEBUG_INFO
+> +ifdef CONFIG_DEBUG_INFO_SPLIT
+> +KBUILD_CFLAGS   += $(call cc-option, -gsplit-dwarf, -g)
+> +else
+>  KBUILD_CFLAGS	+= -g
+>  KBUILD_AFLAGS	+= -Wa,-gdwarf-2
+>  endif
 > +endif
-Can we drop the test for $(COMPILER) here?
-If one try this with gcc then gcc will just fail if it do not support the clang flags supplied.
 
-And help section should be updated to list .ll too.
+Why are as only called with -Wa,-gdwarf-2 in the non-split case?
+Is this a bug or intentional?
+If it is intentional then it is not explained.
 
 
-> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-> index bf3e677..9ea19d6 100644
-> --- a/scripts/Makefile.build
-> +++ b/scripts/Makefile.build
-> @@ -174,6 +174,14 @@ cmd_cc_symtypes_c =                                                         \
->  $(obj)/%.symtypes : $(src)/%.c FORCE
->  	$(call cmd,cc_symtypes_c)
 >  
-> +ifeq ($(COMPILER),clang)
-> +quiet_cmd_cc_ll_c = CC $(quiet_modtag)  $@
-> +cmd_cc_ll_c       = $(CC) $(c_flags) $(DISABLE_LTO) -fverbose-asm -emit-llvm -S -o $@ $<
+>  ifdef CONFIG_DEBUG_INFO_REDUCED
+>  KBUILD_CFLAGS 	+= $(call cc-option, -femit-struct-debug-baseonly) \
+> @@ -1371,6 +1375,7 @@ clean: $(clean-dirs)
+>  	@find $(if $(KBUILD_EXTMOD), $(KBUILD_EXTMOD), .) $(RCS_FIND_IGNORE) \
+>  		\( -name '*.[oas]' -o -name '*.ko' -o -name '.*.cmd' \
+>  		-o -name '*.ko.*' \
+> +		-o -name '*.dwo'  \
+>  		-o -name '.*.d' -o -name '.*.tmp' -o -name '*.mod.c' \
+>  		-o -name '*.symtypes' -o -name 'modules.order' \
+>  		-o -name modules.builtin -o -name '.tmp_*.o.*' \
+> diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+> index 7a638aa..fb07c33 100644
+> --- a/lib/Kconfig.debug
+> +++ b/lib/Kconfig.debug
+> @@ -143,6 +143,19 @@ config DEBUG_INFO_REDUCED
+>  	  DEBUG_INFO build and compile times are reduced too.
+>  	  Only works with newer gcc versions.
+>  
+> +config DEBUG_INFO_SPLIT
+> +	bool "Produce split debuginfo in .dwo files"
 
-Can we drop the test for COMPILER here too?
-Do -fverbose-asm make sense when generating .ll files?
-It looks like a leftover from what you copied.
+Jut nitpicking here - but please be consistent with debuginfo.
+If it is one or two words.
 
+> +	depends on DEBUG_INFO
+> +	help
+> +	  Generate debug info into separate .dwo files. This can be
+> +	  faster for building than including the debug information directly
+Here the "faster" part is promoted.
+But in your cover letter you actually highlight the "smaller" case
+as more significant.
+Maybe include info on both positive items.
 
-> +# LLVM bitcode
-> +# ---------------------------------------------------------------------------
-> +ifeq ($(COMPILER),clang)
-> +quiet_cmd_as_ll_S = CPP $(quiet_modtag) $@
-> +cmd_as_ll_S       = $(CPP) $(a_flags)   -o $@ $<
-> +
-> +$(obj)/%.ll: $(src)/%.S FORCE
-> +	$(call if_changed_dep,as_ll_S)
-> +endif
-This chunk belongs together with the other chunk.
-There is no reason to separate .S => .ll and .c => .ll rules.
+> +	  in the object files and the vmlinux, as it only needs to
+> +	  be stored once to disk, not multiple times in object files.
+> +	  Requires recent gcc (4.7+) and recent gdb/binutils.
+> +	  Any tool that packages or reads debug information would need
+> +	  to know about the .dwo files and include them.
+> +	  Incompatible with older versions of ccache.
 
-The current rules for .c => .lst etc is a mess and not something to be too
-much inspired from.
 
 	Sam
