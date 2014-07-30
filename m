@@ -1,67 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:29589 "EHLO mga02.intel.com"
+Received: from cantor2.suse.de ([195.135.220.15]:38113 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751889AbaG2XMk (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 29 Jul 2014 19:12:40 -0400
-From: Andi Kleen <andi@firstfloor.org>
-Subject: [PATCH 2/2] Kbuild: Add a option to enable dwarf4
-Date: Wed, 30 Jul 2014 01:11:33 +0200
-Message-Id: <1406675493-2539-2-git-send-email-andi@firstfloor.org>
-In-Reply-To: <1406675493-2539-1-git-send-email-andi@firstfloor.org>
-References: <1406675493-2539-1-git-send-email-andi@firstfloor.org>
+	id S1752823AbaG3NEc (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 30 Jul 2014 09:04:32 -0400
+Message-ID: <53D8ED5D.8070604@suse.cz>
+Date: Wed, 30 Jul 2014 15:04:29 +0200
+From: Michal Marek <mmarek@suse.cz>
+MIME-Version: 1.0
+Subject: Re: [PATCH] kbuild, LLVMLinux: only use warnings when using clang
+References: <20140629201308.GC12943@pd.tnic> <1404175346-12330-1-git-send-email-behanw@converseincode.com> <20140701101214.GA14882@pd.tnic>
+In-Reply-To: <20140701101214.GA14882@pd.tnic>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mmarek@suse.cz
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Andi Kleen <ak@linux.intel.com>
+To: behanw@converseincode.com, dl9pf@gmx.de
+Cc: Borislav Petkov <bp@alien8.de>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, pageexec@freemail.hu, mcharleb@gmail.com
 
-From: Andi Kleen <ak@linux.intel.com>
+On 2014-07-01 12:12, Borislav Petkov wrote:
+> On Mon, Jun 30, 2014 at 05:42:26PM -0700, behanw@converseincode.com wrote:
+>> From: Behan Webster <behanw@converseincode.com>
+>>
+>> Only consider clang warnings in Kbuild when using the clang compiler.
+>>
+>> Signed-off-by: Behan Webster <behanw@converseincode.com>
+>> ---
+>>  scripts/Makefile.extrawarn | 3 ++-
+>>  1 file changed, 2 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
+>> index 6564350..e350127 100644
+>> --- a/scripts/Makefile.extrawarn
+>> +++ b/scripts/Makefile.extrawarn
+>> @@ -26,7 +26,7 @@ warning-1 += $(call cc-option, -Wmissing-include-dirs)
+>>  warning-1 += $(call cc-option, -Wunused-but-set-variable)
+>>  warning-1 += $(call cc-disable-warning, missing-field-initializers)
+>>  
+>> -# Clang
+>> +ifeq ($(COMPILER),clang)
+>>  warning-1 += $(call cc-disable-warning, initializer-overrides)
+>>  warning-1 += $(call cc-disable-warning, unused-value)
+>>  warning-1 += $(call cc-disable-warning, format)
+>> @@ -35,6 +35,7 @@ warning-1 += $(call cc-disable-warning, sign-compare)
+>>  warning-1 += $(call cc-disable-warning, format-zero-length)
+>>  warning-1 += $(call cc-disable-warning, uninitialized)
+>>  warning-1 += $(call cc-option, -fcatch-undefined-behavior)
+>> +endif
+> 
+> Ok, just to make sure I understand that whole use case correctly:
+> 
+> The disabling of those warnings is really intended for the case where
+> people build the kernel with "W=1" on the make cmdline *and* clang?
 
-I found that a lot of unresolvable variables when using gdb on the kernel
-become resolvable when dwarf4 is enabled. So add a Kconfig flag to enable it.
+Behan, Jan-Simon,
 
-It definitely increases the debug information size, but on the other
-hand this isn't so bad when debug fusion is used.
+can you explain why are those -Wno-... options needed in the W=1 case?
+The whole point of the W= option is to enable noisy warnings, so I don't
+quite get why you want to silence these.
 
-Signed-off-by: Andi Kleen <ak@linux.intel.com>
----
- Makefile          | 3 +++
- lib/Kconfig.debug | 9 +++++++++
- 2 files changed, 12 insertions(+)
-
-diff --git a/Makefile b/Makefile
-index 6a717cd..6cdf3f0 100644
---- a/Makefile
-+++ b/Makefile
-@@ -696,6 +696,9 @@ KBUILD_CFLAGS	+= -g
- endif
- KBUILD_AFLAGS	+= -Wa,-gdwarf-2
- endif
-+ifdef CONFIG_DEBUG_INFO_DWARF4
-+KBUILD_CFLAGS	+= -gdwarf-4
-+endif
- 
- ifdef CONFIG_DEBUG_INFO_REDUCED
- KBUILD_CFLAGS 	+= $(call cc-option, -femit-struct-debug-baseonly) \
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index 0360468..a2dcf97 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -158,6 +158,15 @@ config DEBUG_INFO_SPLIT
- 	  to know about the .dwo files and include them.
- 	  Incompatible with older versions of ccache.
- 
-+config DEBUG_INFO_DWARF4
-+	bool "Generate dwarf4 debuginfo"
-+	depends on DEBUG_INFO
-+	help
-+	  Generate dwarf4 debug info. This requires recent versions
-+	  of gcc and gdb. It makes the debug information larger.
-+	  But it significantly improves the success of resolving
-+	  variables in gdb on optimized code.
-+
- config ENABLE_WARN_DEPRECATED
- 	bool "Enable __deprecated logic"
- 	default y
--- 
-1.8.5.2
+Thanks,
+Michal
 
