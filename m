@@ -1,50 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:38956 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:39141 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751427AbaG3Ni0 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 30 Jul 2014 09:38:26 -0400
-Message-ID: <53D8F550.2070800@suse.cz>
-Date: Wed, 30 Jul 2014 15:38:24 +0200
+	id S1751472AbaG3NuQ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 30 Jul 2014 09:50:16 -0400
+Message-ID: <53D8F816.7040104@suse.cz>
+Date: Wed, 30 Jul 2014 15:50:14 +0200
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH 2/2] Kbuild: Add a option to enable dwarf4
-References: <1406675493-2539-1-git-send-email-andi@firstfloor.org> <1406675493-2539-2-git-send-email-andi@firstfloor.org>
-In-Reply-To: <1406675493-2539-2-git-send-email-andi@firstfloor.org>
+Subject: Re: [PATCH 1/2] kbuild: Support split debug info v4
+References: <1406675493-2539-1-git-send-email-andi@firstfloor.org>
+In-Reply-To: <1406675493-2539-1-git-send-email-andi@firstfloor.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Andi Kleen <andi@firstfloor.org>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Andi Kleen <ak@linux.intel.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Andi Kleen <ak@linux.intel.com>, Dirk Gouders <dirk@gouders.net>
 
 On 2014-07-30 01:11, Andi Kleen wrote:
 > From: Andi Kleen <ak@linux.intel.com>
 > 
-> I found that a lot of unresolvable variables when using gdb on the kernel
-> become resolvable when dwarf4 is enabled. So add a Kconfig flag to enable it.
+> This is an alternative approach to lower the overhead of debug info
+> (as we discussed a few days ago)
 > 
-> It definitely increases the debug information size, but on the other
-> hand this isn't so bad when debug fusion is used.
+> gcc 4.7+ and newer binutils have a new "split debug info" debug info
+> model where the debug info is only written once into central ".dwo" files.
 > 
-> Signed-off-by: Andi Kleen <ak@linux.intel.com>
-> ---
->  Makefile          | 3 +++
->  lib/Kconfig.debug | 9 +++++++++
->  2 files changed, 12 insertions(+)
+> This avoids having to copy it around multiple times, from the object
+> files to the final executable. It lowers the disk space
+> requirements. In addition it defaults to compressed debug data.
 > 
-> diff --git a/Makefile b/Makefile
-> index 6a717cd..6cdf3f0 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -696,6 +696,9 @@ KBUILD_CFLAGS	+= -g
->  endif
->  KBUILD_AFLAGS	+= -Wa,-gdwarf-2
->  endif
-> +ifdef CONFIG_DEBUG_INFO_DWARF4
-> +KBUILD_CFLAGS	+= -gdwarf-4
-> +endif
+> More details here: http://gcc.gnu.org/wiki/DebugFission
+> 
+> This patch adds a new option to enable it. It has to be an option,
+> because it'll undoubtedly break everyone's debuginfo packaging scheme.
+> gdb/objdump/etc. all still work, if you have new enough versions.
+> 
+> I don't see big compile wins (maybe a second or two faster or so), but the
+> object dirs with debuginfo get significantly smaller. My standard kernel
+> config (slightly bigger than defconfig) shrinks from 2.9G disk space
+> to 1.1G objdir (with non reduced debuginfo). I presume if you are IO limited
+> the compile time difference will be larger.
+> 
+> Only problem I've seen so far is that it doesn't play well with older
+> versions of ccache (apparently fixed, see
+> https://bugzilla.samba.org/show_bug.cgi?id=10005)
 
-Make it $(call cc-option,-gdwarf-4), so as not to break allmodconfig
-with older GCCs. Otherwise the patch is OK.
+The failure mode with ccache is that the *.dwo files are not stored, but
+the build proceeds, right? This is at least what I'm seeing. I'm just
+wondering if the config option should be inverted to make
+all{yes,mod}config builds happy. But it's probably not necessary if the
+build passes.
 
+Thanks,
 Michal
