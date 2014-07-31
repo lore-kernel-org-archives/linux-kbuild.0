@@ -1,60 +1,97 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from orange.myspectrum.nl ([149.210.134.247]:51347 "EHLO
-	orange.myspectrum.nl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750945AbaGaWVr (ORCPT
+Received: from relay4-d.mail.gandi.net ([217.70.183.196]:55347 "EHLO
+	relay4-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751322AbaGaXrj (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 31 Jul 2014 18:21:47 -0400
-Message-ID: <53DAC16F.7030301@myspectrum.nl>
-Date: Fri, 01 Aug 2014 00:21:35 +0200
-From: Jeroen Hofstee <dasuboot@myspectrum.nl>
+	Thu, 31 Jul 2014 19:47:39 -0400
+Date: Thu, 31 Jul 2014 16:47:23 -0700
+From: Josh Triplett <josh@joshtriplett.org>
+Subject: [PATCH 1/5] Add __designated_init, wrapping
+ __attribute__((designated_init))
+Message-ID: <3130b0553b15518e3bef6d14c80280beed0f5ff9.1406850006.git.josh@joshtriplett.org>
 MIME-Version: 1.0
-Subject: Re: [U-Boot] [PATCH] kconfig: Fix compiler warning in menu.c
-References: <1406816503-31963-1-git-send-email-hdegoede@redhat.com>
-In-Reply-To: <1406816503-31963-1-git-send-email-hdegoede@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Hans de Goede <hdegoede@redhat.com>, "Yann E. MORIN" <yann.morin.1998@free.fr>, u-boot@lists.denx.de
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: akpm@linux-foundation.org, "J. Bruce Fields" <bfields@fieldses.org>, Alexander Viro <viro@zeniv.linux.org.uk>, Christopher Li <sparse@chrisli.org>, Ingo Molnar <mingo@redhat.com>, Jeff Layton <jlayton@poochiereds.net>, Michal Marek <mmarek@suse.cz>, Neil Brown <neilb@suse.de>, Steven Rostedt <rostedt@goodmis.org>, linux-api@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org, linux-sparse@vger.kernel.org
 
-Hello Hans,
+GCC 4.10 and newer, and Sparse, supports
+__attribute__((designated_init)), which marks a structure as requiring
+a designated initializer rather than a positional one.  This helps
+reduce churn and errors when used with _ops structures and similar
+structures designed for future extension.
 
-On 31-07-14 16:21, Hans de Goede wrote:
-> This fixes the following compiler warning:
->
-> In file included from scripts/kconfig/zconf.tab.c:2537:0:
-> scripts/kconfig/menu.c: In function ‘get_symbol_str’:
-> scripts/kconfig/menu.c:590:18: warning: ‘jump’ may be used uninitialized in this function [-Wmaybe-uninitialized]
->       jump->offset = strlen(r->s);
->                    ^
-> In file included from scripts/kconfig/zconf.tab.c:2537:0:
-> scripts/kconfig/menu.c:551:19: note: ‘jump’ was declared here
->    struct jump_key *jump;
->
-> Signed-off-by: Hans de Goede <hdegoede@redhat.com>
-> ---
->   scripts/kconfig/menu.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
-> index a26cc5d..584e0fc 100644
-> --- a/scripts/kconfig/menu.c
-> +++ b/scripts/kconfig/menu.c
-> @@ -548,7 +548,7 @@ static void get_prompt_str(struct gstr *r, struct property *prop,
->   {
->   	int i, j;
->   	struct menu *submenu[8], *menu, *location = NULL;
-> -	struct jump_key *jump;
-> +	struct jump_key *jump = NULL;
->   
->   	str_printf(r, _("Prompt: %s\n"), _(prop->text));
->   	menu = prop->menu->parent;
+Add a wrapper __designated_init, which turns into
+__attribute__((designated_init)) for Sparse or sufficiently new GCC.
+Enable the corresponding warning as an error.
 
-And if you combine head && location into a single boolean,
-does this warning still occur? Not that it matters that much
-in this case, since it is a host tool, but I guess the compiler
-does intend to assign NULL while there is no reason to do so.
+The following semantic patch can help mark structures containing
+function pointers as requiring designated initializers:
 
-Regards,
-Jeroen
+@@
+identifier I, f;
+type T;
+@@
+
+struct I {
+	...
+	T (*f)(...);
+	...
+}
++ __designated_init
+;
+
+Signed-off-by: Josh Triplett <josh@joshtriplett.org>
+---
+ Makefile                      | 3 +++
+ include/linux/compiler-gcc4.h | 4 ++++
+ include/linux/compiler.h      | 5 +++++
+ 3 files changed, 12 insertions(+)
+
+diff --git a/Makefile b/Makefile
+index f6a7794..83773c2 100644
+--- a/Makefile
++++ b/Makefile
+@@ -744,6 +744,9 @@ KBUILD_CFLAGS   += $(call cc-option,-Werror=strict-prototypes)
+ # Prohibit date/time macros, which would make the build non-deterministic
+ KBUILD_CFLAGS   += $(call cc-option,-Werror=date-time)
+ 
++# Disallow positional initialization of designated structs
++KBUILD_CFLAGS += $(call cc-option,-Werror=designated-init)
++
+ # use the deterministic mode of AR if available
+ KBUILD_ARFLAGS := $(call ar-option,D)
+ 
+diff --git a/include/linux/compiler-gcc4.h b/include/linux/compiler-gcc4.h
+index 2507fd2..5cd3c26 100644
+--- a/include/linux/compiler-gcc4.h
++++ b/include/linux/compiler-gcc4.h
+@@ -85,4 +85,8 @@
+ #if GCC_VERSION >= 40800 || (defined(__powerpc__) && GCC_VERSION >= 40600)
+ #define __HAVE_BUILTIN_BSWAP16__
+ #endif
++
++#if GCC_VERSION >= 41000 || defined(__CHECKER__)
++#define __designated_init __attribute__((designated_init))
++#endif
+ #endif /* CONFIG_ARCH_USE_BUILTIN_BSWAP */
+diff --git a/include/linux/compiler.h b/include/linux/compiler.h
+index d5ad7b1..c2334b2 100644
+--- a/include/linux/compiler.h
++++ b/include/linux/compiler.h
+@@ -266,6 +266,11 @@ void ftrace_likely_update(struct ftrace_branch_data *f, int val, int expect);
+ #define __always_inline inline
+ #endif
+ 
++/* Marks a struct as requiring designated initializers, never positional. */
++#ifndef __designated_init
++#define __designated_init
++#endif
++
+ #endif /* __KERNEL__ */
+ 
+ /*
+-- 
+2.0.1
+
