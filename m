@@ -1,33 +1,92 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qg0-f67.google.com ([209.85.192.67]:64714 "EHLO
-	mail-qg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751605AbaG3Xvm (ORCPT
+Received: from mail-pa0-f46.google.com ([209.85.220.46]:42845 "EHLO
+	mail-pa0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750783AbaGaEQ3 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 30 Jul 2014 19:51:42 -0400
-Received: by mail-qg0-f67.google.com with SMTP id f51so799230qge.6
-        for <linux-kbuild@vger.kernel.org>; Wed, 30 Jul 2014 16:51:42 -0700 (PDT)
+	Thu, 31 Jul 2014 00:16:29 -0400
+Received: by mail-pa0-f46.google.com with SMTP id lj1so2807238pab.33
+        for <linux-kbuild@vger.kernel.org>; Wed, 30 Jul 2014 21:16:28 -0700 (PDT)
+From: behanw@converseincode.com
+Subject: [PATCH v2] kbuild, LLVMLinux: Supress warnings unless W=1-3
+Date: Wed, 30 Jul 2014 21:16:21 -0700
+Message-Id: <1406780181-7973-1-git-send-email-behanw@converseincode.com>
+In-Reply-To: <53D8ED5D.8070604@suse.cz>
+References: <53D8ED5D.8070604@suse.cz>
 MIME-Version: 1.0
-Date: Thu, 31 Jul 2014 01:27:03 +0200
-Message-ID: <CABfGM6_nBUSgO_4D4Wi_h67VQOty+jYQXqE0JDvRx0gL-rj_bw@mail.gmail.com>
-Subject: -- Re: Very Urgent............
-From: Fabian Morision <fmorision1@gmail.com>
 Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: mmarek@suse.cz
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, dwmw2@infradead.org, Behan Webster <behanw@converseincode.com>, =?UTF-8?q?Jan-Simon=20M=C3=B6ller?= <dl9pf@gmx.de>, Mark Charlebois <charlebm@gmail.com>, bp@alien8.de
 
-Greetings from gulf region
+From: Behan Webster <behanw@converseincode.com>
 
-Thanks for the e-mail. I am very interested on funding lucrative
-business partnership with you acting as the manager and sole
-controller of the investment while i remain a silent investor for a
-period of ten yrs , though I am only looking at investment
-opportunities within the range you specified for a start. You can
-reply me here (fmorision@yahoo.com)
+clang has more warnings enabled by default. Turn them off unless W is set.
+This patch fixes a logic bug where warnings in clang were disabled when W was set.
 
-Let me know your thought asap
+Signed-off-by: Behan Webster <behanw@converseincode.com>
+Signed-off-by: Jan-Simon Möller <dl9pf@gmx.de>
+Signed-off-by: Mark Charlebois <charlebm@gmail.com>
+Cc: mmarek@suse.cz
+Cc: bp@alien8.de
+---
+ Makefile                   |  1 +
+ scripts/Makefile.extrawarn | 22 ++++++++++++----------
+ 2 files changed, 13 insertions(+), 10 deletions(-)
 
-Regards
+diff --git a/Makefile b/Makefile
+index f6a7794..f343e17 100644
+--- a/Makefile
++++ b/Makefile
+@@ -668,6 +668,7 @@ KBUILD_CFLAGS += $(call cc-disable-warning, tautological-compare)
+ # source of a reference will be _MergedGlobals and not on of the whitelisted names.
+ # See modpost pattern 2
+ KBUILD_CFLAGS += $(call cc-option, -mno-global-merge,)
++KBUILD_CFLAGS += $(call cc-option, -fcatch-undefined-behavior)
+ else
+ 
+ # This warning generated too much noise in a regular build.
+diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
+index 6564350..b5b0751 100644
+--- a/scripts/Makefile.extrawarn
++++ b/scripts/Makefile.extrawarn
+@@ -26,16 +26,6 @@ warning-1 += $(call cc-option, -Wmissing-include-dirs)
+ warning-1 += $(call cc-option, -Wunused-but-set-variable)
+ warning-1 += $(call cc-disable-warning, missing-field-initializers)
+ 
+-# Clang
+-warning-1 += $(call cc-disable-warning, initializer-overrides)
+-warning-1 += $(call cc-disable-warning, unused-value)
+-warning-1 += $(call cc-disable-warning, format)
+-warning-1 += $(call cc-disable-warning, unknown-warning-option)
+-warning-1 += $(call cc-disable-warning, sign-compare)
+-warning-1 += $(call cc-disable-warning, format-zero-length)
+-warning-1 += $(call cc-disable-warning, uninitialized)
+-warning-1 += $(call cc-option, -fcatch-undefined-behavior)
+-
+ warning-2 := -Waggregate-return
+ warning-2 += -Wcast-align
+ warning-2 += -Wdisabled-optimization
+@@ -55,6 +45,18 @@ warning-3 += -Wswitch-default
+ warning-3 += $(call cc-option, -Wpacked-bitfield-compat)
+ warning-3 += $(call cc-option, -Wvla)
+ 
++ifeq ($(COMPILER),clang)
++ifndef $(W)
++KBUILD_CFLAGS += $(call cc-disable-warning, initializer-overrides)
++KBUILD_CFLAGS += $(call cc-disable-warning, unused-value)
++KBUILD_CFLAGS += $(call cc-disable-warning, format)
++KBUILD_CFLAGS += $(call cc-disable-warning, unknown-warning-option)
++KBUILD_CFLAGS += $(call cc-disable-warning, sign-compare)
++KBUILD_CFLAGS += $(call cc-disable-warning, format-zero-length)
++KBUILD_CFLAGS += $(call cc-disable-warning, uninitialized)
++endif
++endif
++
+ warning := $(warning-$(findstring 1, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)))
+ warning += $(warning-$(findstring 2, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)))
+ warning += $(warning-$(findstring 3, $(KBUILD_ENABLE_EXTRA_GCC_CHECKS)))
+-- 
+1.9.1
 
-Financial Consultant
-
-Mr.Fabian Morision
