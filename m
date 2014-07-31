@@ -1,94 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:53571 "EHLO mx2.suse.de"
+Received: from mx1.redhat.com ([209.132.183.28]:56558 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932093AbaGaISR (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 31 Jul 2014 04:18:17 -0400
-Message-ID: <53D9FBC6.9070908@suse.cz>
-Date: Thu, 31 Jul 2014 10:18:14 +0200
-From: Michal Marek <mmarek@suse.cz>
+	id S1751540AbaGaOVz (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 31 Jul 2014 10:21:55 -0400
+From: Hans de Goede <hdegoede@redhat.com>
+Subject: [PATCH] kconfig: Fix compiler warning in menu.c
+Date: Thu, 31 Jul 2014 16:21:43 +0200
+Message-Id: <1406816503-31963-1-git-send-email-hdegoede@redhat.com>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2] kbuild, LLVMLinux: Supress warnings unless W=1-3
-References: <53D8ED5D.8070604@suse.cz> <1406780181-7973-1-git-send-email-behanw@converseincode.com>
-In-Reply-To: <1406780181-7973-1-git-send-email-behanw@converseincode.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: behanw@converseincode.com
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, dwmw2@infradead.org, =?UTF-8?B?SmFuLVNpbW9uIE3DtmxsZXI=?= <dl9pf@gmx.de>, Mark Charlebois <charlebm@gmail.com>, bp@alien8.de
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>, u-boot@lists.denx.de
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Hans de Goede <hdegoede@redhat.com>
 
-Dne 31.7.2014 06:16, behanw@converseincode.com napsal(a):
-> From: Behan Webster <behanw@converseincode.com>
-> 
-> clang has more warnings enabled by default. Turn them off unless W is set.
-> This patch fixes a logic bug where warnings in clang were disabled when W was set.
-> 
-> Signed-off-by: Behan Webster <behanw@converseincode.com>
-> Signed-off-by: Jan-Simon Möller <dl9pf@gmx.de>
-> Signed-off-by: Mark Charlebois <charlebm@gmail.com>
-> Cc: mmarek@suse.cz
-> Cc: bp@alien8.de
-> ---
->  Makefile                   |  1 +
->  scripts/Makefile.extrawarn | 22 ++++++++++++----------
->  2 files changed, 13 insertions(+), 10 deletions(-)
-> 
-> diff --git a/Makefile b/Makefile
-> index f6a7794..f343e17 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -668,6 +668,7 @@ KBUILD_CFLAGS += $(call cc-disable-warning, tautological-compare)
->  # source of a reference will be _MergedGlobals and not on of the whitelisted names.
->  # See modpost pattern 2
->  KBUILD_CFLAGS += $(call cc-option, -mno-global-merge,)
-> +KBUILD_CFLAGS += $(call cc-option, -fcatch-undefined-behavior)
->  else
->  
->  # This warning generated too much noise in a regular build.
-> diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
-> index 6564350..b5b0751 100644
-> --- a/scripts/Makefile.extrawarn
-> +++ b/scripts/Makefile.extrawarn
-> @@ -26,16 +26,6 @@ warning-1 += $(call cc-option, -Wmissing-include-dirs)
->  warning-1 += $(call cc-option, -Wunused-but-set-variable)
->  warning-1 += $(call cc-disable-warning, missing-field-initializers)
->  
-> -# Clang
-> -warning-1 += $(call cc-disable-warning, initializer-overrides)
-> -warning-1 += $(call cc-disable-warning, unused-value)
-> -warning-1 += $(call cc-disable-warning, format)
-> -warning-1 += $(call cc-disable-warning, unknown-warning-option)
-> -warning-1 += $(call cc-disable-warning, sign-compare)
-> -warning-1 += $(call cc-disable-warning, format-zero-length)
-> -warning-1 += $(call cc-disable-warning, uninitialized)
-> -warning-1 += $(call cc-option, -fcatch-undefined-behavior)
-> -
+This fixes the following compiler warning:
 
-OK.
+In file included from scripts/kconfig/zconf.tab.c:2537:0:
+scripts/kconfig/menu.c: In function ‘get_symbol_str’:
+scripts/kconfig/menu.c:590:18: warning: ‘jump’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+     jump->offset = strlen(r->s);
+                  ^
+In file included from scripts/kconfig/zconf.tab.c:2537:0:
+scripts/kconfig/menu.c:551:19: note: ‘jump’ was declared here
+  struct jump_key *jump;
 
+Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+---
+ scripts/kconfig/menu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
->  warning-2 := -Waggregate-return
->  warning-2 += -Wcast-align
->  warning-2 += -Wdisabled-optimization
-> @@ -55,6 +45,18 @@ warning-3 += -Wswitch-default
->  warning-3 += $(call cc-option, -Wpacked-bitfield-compat)
->  warning-3 += $(call cc-option, -Wvla)
->  
-> +ifeq ($(COMPILER),clang)
-> +ifndef $(W)
-> +KBUILD_CFLAGS += $(call cc-disable-warning, initializer-overrides)
-> +KBUILD_CFLAGS += $(call cc-disable-warning, unused-value)
-> +KBUILD_CFLAGS += $(call cc-disable-warning, format)
-> +KBUILD_CFLAGS += $(call cc-disable-warning, unknown-warning-option)
-> +KBUILD_CFLAGS += $(call cc-disable-warning, sign-compare)
-> +KBUILD_CFLAGS += $(call cc-disable-warning, format-zero-length)
-> +KBUILD_CFLAGS += $(call cc-disable-warning, uninitialized)
-> +endif
-> +endif
-> +
+diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+index a26cc5d..584e0fc 100644
+--- a/scripts/kconfig/menu.c
++++ b/scripts/kconfig/menu.c
+@@ -548,7 +548,7 @@ static void get_prompt_str(struct gstr *r, struct property *prop,
+ {
+ 	int i, j;
+ 	struct menu *submenu[8], *menu, *location = NULL;
+-	struct jump_key *jump;
++	struct jump_key *jump = NULL;
+ 
+ 	str_printf(r, _("Prompt: %s\n"), _(prop->text));
+ 	menu = prop->menu->parent;
+-- 
+2.0.3
 
-Please remove this part, it has no effect. I assume that if it works for
-you, these warning are not as annoying so they do not need to be disabled?
-
-Thanks,
-Michal
