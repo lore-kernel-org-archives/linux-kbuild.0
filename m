@@ -1,90 +1,123 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pa0-f41.google.com ([209.85.220.41]:40954 "EHLO
-	mail-pa0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750721AbaHAEIa (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 1 Aug 2014 00:08:30 -0400
-Received: by mail-pa0-f41.google.com with SMTP id rd3so4963028pab.0
-        for <linux-kbuild@vger.kernel.org>; Thu, 31 Jul 2014 21:08:30 -0700 (PDT)
-From: behanw@converseincode.com
-Subject: [PATCH v3] kbuild, LLVMLinux: Supress warnings unless W=1-3
-Date: Thu, 31 Jul 2014 21:08:25 -0700
-Message-Id: <1406866105-24980-1-git-send-email-behanw@converseincode.com>
-In-Reply-To: <53DAAB35.8080206@suse.cz>
-References: <53DAAB35.8080206@suse.cz>
+Received: from smtp.mei.co.jp ([133.183.100.20]:40181 "EHLO smtp.mei.co.jp"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751337AbaHAL4q (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 1 Aug 2014 07:56:46 -0400
+Date: Fri, 01 Aug 2014 20:55:50 +0900
+From: Masahiro Yamada <yamada.m@jp.panasonic.com>
+Subject: Re: [PATCH,RESEND] arm: Do not define "comma" twice
+In-Reply-To: <20140711205900.E6FA.AA925319@jp.panasonic.com>
+References: <1396228057-1488-1-git-send-email-yamada.m@jp.panasonic.com> <20140711205900.E6FA.AA925319@jp.panasonic.com>
+Message-Id: <20140801205550.D532.AA925319@jp.panasonic.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="ISO-2022-JP"
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mmarek@suse.cz
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, dwmw2@infradead.org, Behan Webster <behanw@converseincode.com>, =?UTF-8?q?Jan-Simon=20M=C3=B6ller?= <dl9pf@gmx.de>, Mark Charlebois <charlebm@gmail.com>, bp@alien8.de
+To: Russell King <linux@arm.linux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org
+Cc: linux-kbuild@vger.kernel.org
 
-From: Behan Webster <behanw@converseincode.com>
+Hello Russel King,
 
-clang has more warnings enabled by default. Turn them off unless W is set.
-This patch fixes a logic bug where warnings in clang were disabled when W was set.
 
-Signed-off-by: Behan Webster <behanw@converseincode.com>
-Signed-off-by: Jan-Simon Möller <dl9pf@gmx.de>
-Signed-off-by: Mark Charlebois <charlebm@gmail.com>
-Cc: mmarek@suse.cz
-Cc: bp@alien8.de
----
- Makefile                   |  1 +
- scripts/Makefile.extrawarn | 22 ++++++++++++----------
- 2 files changed, 13 insertions(+), 10 deletions(-)
+Could you apply this trivial patch for 3.17 merge window, please?
 
-diff --git a/Makefile b/Makefile
-index f6a7794..f343e17 100644
---- a/Makefile
-+++ b/Makefile
-@@ -668,6 +668,7 @@ KBUILD_CFLAGS += $(call cc-disable-warning, tautological-compare)
- # source of a reference will be _MergedGlobals and not on of the whitelisted names.
- # See modpost pattern 2
- KBUILD_CFLAGS += $(call cc-option, -mno-global-merge,)
-+KBUILD_CFLAGS += $(call cc-option, -fcatch-undefined-behavior)
- else
- 
- # This warning generated too much noise in a regular build.
-diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
-index 6564350..4315d34 100644
---- a/scripts/Makefile.extrawarn
-+++ b/scripts/Makefile.extrawarn
-@@ -26,16 +26,6 @@ warning-1 += $(call cc-option, -Wmissing-include-dirs)
- warning-1 += $(call cc-option, -Wunused-but-set-variable)
- warning-1 += $(call cc-disable-warning, missing-field-initializers)
- 
--# Clang
--warning-1 += $(call cc-disable-warning, initializer-overrides)
--warning-1 += $(call cc-disable-warning, unused-value)
--warning-1 += $(call cc-disable-warning, format)
--warning-1 += $(call cc-disable-warning, unknown-warning-option)
--warning-1 += $(call cc-disable-warning, sign-compare)
--warning-1 += $(call cc-disable-warning, format-zero-length)
--warning-1 += $(call cc-disable-warning, uninitialized)
--warning-1 += $(call cc-option, -fcatch-undefined-behavior)
--
- warning-2 := -Waggregate-return
- warning-2 += -Wcast-align
- warning-2 += -Wdisabled-optimization
-@@ -64,4 +54,16 @@ ifeq ("$(strip $(warning))","")
- endif
- 
- KBUILD_CFLAGS += $(warning)
-+else
-+
-+ifeq ($(COMPILER),clang)
-+KBUILD_CFLAGS += $(call cc-disable-warning, initializer-overrides)
-+KBUILD_CFLAGS += $(call cc-disable-warning, unused-value)
-+KBUILD_CFLAGS += $(call cc-disable-warning, format)
-+KBUILD_CFLAGS += $(call cc-disable-warning, unknown-warning-option)
-+KBUILD_CFLAGS += $(call cc-disable-warning, sign-compare)
-+KBUILD_CFLAGS += $(call cc-disable-warning, format-zero-length)
-+KBUILD_CFLAGS += $(call cc-disable-warning, uninitialized)
- endif
-+endif
-+
+Thanks.
+
+Masahiro Yamada
+
+
+
+On Fri, 11 Jul 2014 20:59:00 +0900
+Masahiro Yamada <yamada.m@jp.panasonic.com> wrote:
+
+> Hi.
+> 
+> 
+> 
+> This is a ping.
+> 
+> It has been three months since I posted this trivial patch.
+> Any comments?
+> 
+> If this patch looks good, could you apply it
+> for Linux 3.17-rc1 ?
+> 
+> Thanks,
+> 
+> Masahiro Yamada
+> 
+> 
+> 
+> On Mon, 31 Mar 2014 10:07:37 +0900
+> Masahiro Yamada <yamada.m@jp.panasonic.com> wrote:
+> 
+> > We have the definition of "comma" in scripts/Kbuild.include.
+> > We should not double it.
+> > 
+> > Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
+> > ---
+> > 
+> > First I posted this patch to linux-kbuild ML.
+> > But, Michal Marek recommended me to send it to linux-arm-kernel ML.
+> > 
+> > So this is here now.
+> > 
+> > 
+> >  arch/arm/Makefile   | 2 --
+> >  arch/arm64/Makefile | 2 --
+> >  2 files changed, 4 deletions(-)
+> > 
+> > diff --git a/arch/arm/Makefile b/arch/arm/Makefile
+> > index 08a9ef5..72f7b8c 100644
+> > --- a/arch/arm/Makefile
+> > +++ b/arch/arm/Makefile
+> > @@ -50,8 +50,6 @@ AS		+= -EL
+> >  LD		+= -EL
+> >  endif
+> >  
+> > -comma = ,
+> > -
+> >  # This selects which instruction set is used.
+> >  # Note that GCC does not numerically define an architecture version
+> >  # macro, but instead defines a whole series of macros which makes
+> > diff --git a/arch/arm64/Makefile b/arch/arm64/Makefile
+> > index 2fceb71..473a050 100644
+> > --- a/arch/arm64/Makefile
+> > +++ b/arch/arm64/Makefile
+> > @@ -30,8 +30,6 @@ AS		+= -EL
+> >  LD		+= -EL
+> >  endif
+> >  
+> > -comma = ,
+> > -
+> >  CHECKFLAGS	+= -D__aarch64__
+> >  
+> >  # Default value
+> > -- 
+> > 1.8.3.2
+> > 
+> > 
+> > _______________________________________________
+> > linux-arm-kernel mailing list
+> > linux-arm-kernel@lists.infradead.org
+> > http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+> 
+> 
+> 
+> _______________________________________________
+> linux-arm-kernel mailing list
+> linux-arm-kernel@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+
+
+
 -- 
-1.9.1
+$B%Q%J%=%K%C%/!J3t!K(B $B%7%9%F%`(BLSI$B%S%8%M%9%f%K%C%H(B
+$BBhFs;v6H%G%#%S%8%g%s(B
+$B3+H/%0%k!<%W(B $BBh;03+H/%A!<%`(B
+$B;3ED!!??90(B <yamada.m@jp.panasonic.com>
+$B")(B617-8520  $B5~ETI\D92,5~;T?@B->FD.(B1$BHVCO(B
+$B30@~(B : 050-3783-5420
+$BFb@~(B : 7-664-2813, $B<RFb%]%9%H(B: 664-772
 
