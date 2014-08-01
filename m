@@ -1,169 +1,374 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from thoth.sbs.de ([192.35.17.2]:40275 "EHLO thoth.sbs.de"
+Received: from cantor2.suse.de ([195.135.220.15]:44099 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S935241AbaH0PWV (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 27 Aug 2014 11:22:21 -0400
-From: Jan Kiszka <jan.kiszka@siemens.com>
-Subject: [PATCH v9 01/23] scripts/gdb: Add infrastructure
-Date: Wed, 27 Aug 2014 17:21:16 +0200
-Message-Id: <ba953a7332312d3e36421cc8b2dcb3fc33365ee7.1409152897.git.jan.kiszka@siemens.com>
-In-Reply-To: <cover.1409152897.git.jan.kiszka@siemens.com>
-References: <cover.1409152897.git.jan.kiszka@siemens.com>
-In-Reply-To: <cover.1409152897.git.jan.kiszka@siemens.com>
-References: <cover.1409152897.git.jan.kiszka@siemens.com>
+	id S1750977AbaHABLN (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 31 Jul 2014 21:11:13 -0400
+Date: Fri, 1 Aug 2014 11:10:55 +1000
+From: NeilBrown <neilb@suse.de>
+Subject: Re: [PATCH 2/5] raid: Require designated initialization of
+ structures
+Message-ID: <20140801111055.59419950@notabene.brown>
+In-Reply-To: <1d468224409ef2bf46874f817d19389ac5d1b26d.1406850006.git.josh@joshtriplett.org>
+References: <3130b0553b15518e3bef6d14c80280beed0f5ff9.1406850006.git.josh@joshtriplett.org>
+	<1d468224409ef2bf46874f817d19389ac5d1b26d.1406850006.git.josh@joshtriplett.org>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+ boundary="Sig_/M7cuTxQ/DXhWJ+vQv/kDnyh"; protocol="application/pgp-signature"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Thomas Gleixner <tglx@linutronix.de>, Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org
-Cc: Jason Wessel <jason.wessel@windriver.com>, kgdb-bugreport@lists.sourceforge.net, Andi Kleen <andi@firstfloor.org>, Tom Tromey <tromey@redhat.com>, Ben Widawsky <ben@bwidawsk.net>, Borislav Petkov <bp@suse.de>, Tatiana Al-Chueyr Martins <tatiana.alchueyr@gmail.com>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+To: Josh Triplett <josh@joshtriplett.org>
+Cc: akpm@linux-foundation.org, "J. Bruce Fields" <bfields@fieldses.org>, Alexander Viro <viro@zeniv.linux.org.uk>, Christopher Li <sparse@chrisli.org>, Ingo Molnar <mingo@redhat.com>, Jeff Layton <jlayton@poochiereds.net>, Michal Marek <mmarek@suse.cz>, Steven Rostedt <rostedt@goodmis.org>, linux-api@vger.kernel.org, linux-fsdevel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org, linux-sparse@vger.kernel.org
 
-This provides the basic infrastructure to load kernel-specific python
-helper scripts when debugging the kernel in gdb.
+--Sig_/M7cuTxQ/DXhWJ+vQv/kDnyh
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-The loading mechanism is based on gdb loading for <objfile>-gdb.py when
-opening <objfile>. Therefore, this places a corresponding link to the
-main helper script into the output directory that contains vmlinux.
+On Thu, 31 Jul 2014 16:47:35 -0700 Josh Triplett <josh@joshtriplett.org>
+wrote:
 
-The main scripts will pull in submodules containing Linux specific gdb
-commands and functions. To avoid polluting the source directory with
-compiled python modules, we link to them from the object directory.
+> Mark raid6_calls and other structures containing function pointers with
+> __designated_init.  Fix implementations in lib/raid6/ to use designated
+> initializers; this also simplifies those initializers using the default
+> initialization of fields to 0.
+>=20
+> Signed-off-by: Josh Triplett <josh@joshtriplett.org>
 
-Due to gdb.parse_and_eval and string redirection for gdb.execute, we
-depend on gdb >= 7.2.
+Looks like an excellent idea!
+Feel free to forward this upstream on my behalf, or remind me once the first
+patch is in -next, and I'll take this one myself - whichever you prefer.
 
-This feature is enabled via CONFIG_GDB_SCRIPTS.
+ Acked-by: NeilBrown <neilb@suse.de>
 
-CC: Michal Marek <mmarek@suse.cz>
-CC: linux-kbuild@vger.kernel.org
-Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
----
- Makefile                      |  6 +++++-
- lib/Kconfig.debug             | 11 +++++++++++
- scripts/Makefile              |  3 ++-
- scripts/gdb/Makefile          |  1 +
- scripts/gdb/linux/Makefile    | 11 +++++++++++
- scripts/gdb/linux/__init__.py |  0
- scripts/gdb/vmlinux-gdb.py    | 23 +++++++++++++++++++++++
- 7 files changed, 53 insertions(+), 2 deletions(-)
- create mode 100644 scripts/gdb/Makefile
- create mode 100644 scripts/gdb/linux/Makefile
- create mode 100644 scripts/gdb/linux/__init__.py
- create mode 100644 scripts/gdb/vmlinux-gdb.py
+Thanks,
+NeilBrown
 
-diff --git a/Makefile b/Makefile
-index f64fc78..6cddc6f 100644
---- a/Makefile
-+++ b/Makefile
-@@ -912,6 +912,9 @@ endif
- ifdef CONFIG_BUILD_DOCSRC
- 	$(Q)$(MAKE) $(build)=Documentation
- endif
-+ifdef CONFIG_GDB_SCRIPTS
-+	$(Q)ln -fsn `cd $(srctree) && /bin/pwd`/scripts/gdb/vmlinux-gdb.py
-+endif
- 	+$(call if_changed,link-vmlinux)
- 
- # The actual objects are generated when descending,
-@@ -1167,7 +1170,8 @@ MRPROPER_FILES += .config .config.old .version .old_version $(version_h) \
- 		  Module.symvers tags TAGS cscope* GPATH GTAGS GRTAGS GSYMS \
- 		  signing_key.priv signing_key.x509 x509.genkey		\
- 		  extra_certificates signing_key.x509.keyid		\
--		  signing_key.x509.signer include/linux/version.h
-+		  signing_key.x509.signer include/linux/version.h	\
-+		  vmlinux-gdb.py
- 
- # clean - Delete most, but leave enough to build external modules
- #
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index 07c2832..ab79d9b 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -167,6 +167,17 @@ config DEBUG_INFO_DWARF4
- 	  But it significantly improves the success of resolving
- 	  variables in gdb on optimized code.
- 
-+config GDB_SCRIPTS
-+	bool "Provide GDB scripts for kernel debugging"
-+	select DEBUG_INFO
-+	help
-+	  This creates the required links to GDB helper scripts in the
-+	  build directory. If you load vmlinux into gdb, the helper
-+	  scripts will be automatically imported by gdb as well, and
-+	  additional functions are available to analyze a Linux kernel
-+	  instance. See Documentation/gdb-kernel-debugging.txt for further
-+	  details.
-+
- config ENABLE_WARN_DEPRECATED
- 	bool "Enable __deprecated logic"
- 	default y
-diff --git a/scripts/Makefile b/scripts/Makefile
-index 72902b5..7413b1b 100644
---- a/scripts/Makefile
-+++ b/scripts/Makefile
-@@ -36,6 +36,7 @@ subdir-$(CONFIG_MODVERSIONS) += genksyms
- subdir-y                     += mod
- subdir-$(CONFIG_SECURITY_SELINUX) += selinux
- subdir-$(CONFIG_DTC)         += dtc
-+subdir-$(CONFIG_GDB_SCRIPTS) += gdb
- 
- # Let clean descend into subdirs
--subdir-	+= basic kconfig package
-+subdir-	+= basic kconfig package gdb
-diff --git a/scripts/gdb/Makefile b/scripts/gdb/Makefile
-new file mode 100644
-index 0000000..62f5f65
---- /dev/null
-+++ b/scripts/gdb/Makefile
-@@ -0,0 +1 @@
-+subdir-y := linux
-diff --git a/scripts/gdb/linux/Makefile b/scripts/gdb/linux/Makefile
-new file mode 100644
-index 0000000..dcb63ab
---- /dev/null
-+++ b/scripts/gdb/linux/Makefile
-@@ -0,0 +1,11 @@
-+always := gdb-scripts
-+
-+SRCTREE := $(shell cd $(srctree) && /bin/pwd)
-+
-+$(obj)/gdb-scripts:
-+ifneq ($(KBUILD_SRC),)
-+	$(Q)ln -fsn $(SRCTREE)/$(obj)/*.py $(objtree)/$(obj)
-+endif
-+	@:
-+
-+clean-files := *.pyc $(if $(KBUILD_SRC),*.py)
-diff --git a/scripts/gdb/linux/__init__.py b/scripts/gdb/linux/__init__.py
-new file mode 100644
-index 0000000..e69de29
-diff --git a/scripts/gdb/vmlinux-gdb.py b/scripts/gdb/vmlinux-gdb.py
-new file mode 100644
-index 0000000..c1d90ce
---- /dev/null
-+++ b/scripts/gdb/vmlinux-gdb.py
-@@ -0,0 +1,23 @@
-+#
-+# gdb helper commands and functions for Linux kernel debugging
-+#
-+#  loader module
-+#
-+# Copyright (c) Siemens AG, 2012, 2013
-+#
-+# Authors:
-+#  Jan Kiszka <jan.kiszka@siemens.com>
-+#
-+# This work is licensed under the terms of the GNU GPL version 2.
-+#
-+
-+import os
-+
-+sys.path.insert(0, os.path.dirname(__file__) + "/scripts/gdb")
-+
-+try:
-+    gdb.parse_and_eval("0")
-+    gdb.execute("", to_string=True)
-+except:
-+    gdb.write("NOTE: gdb 7.2 or later required for Linux helper scripts to "
-+              "work.\n")
--- 
-1.8.1.1.298.ge7eed54
+> ---
+>  include/linux/raid/pq.h    |  4 ++--
+>  include/linux/raid/xor.h   |  2 +-
+>  include/linux/raid_class.h |  2 +-
+>  lib/raid6/altivec.uc       |  7 +++----
+>  lib/raid6/avx2.c           | 24 ++++++++++++------------
+>  lib/raid6/int.uc           |  6 ++----
+>  lib/raid6/mmx.c            | 14 ++++++--------
+>  lib/raid6/neon.c           |  7 +++----
+>  lib/raid6/sse1.c           | 16 ++++++++--------
+>  lib/raid6/sse2.c           | 24 ++++++++++++------------
+>  lib/raid6/tilegx.uc        |  6 ++----
+>  11 files changed, 52 insertions(+), 60 deletions(-)
+>=20
+> diff --git a/include/linux/raid/pq.h b/include/linux/raid/pq.h
+> index 73069cb..2147bff 100644
+> --- a/include/linux/raid/pq.h
+> +++ b/include/linux/raid/pq.h
+> @@ -75,7 +75,7 @@ struct raid6_calls {
+>  	int  (*valid)(void);	/* Returns 1 if this routine set is usable */
+>  	const char *name;	/* Name of this routine set */
+>  	int prefer;		/* Has special performance attribute */
+> -};
+> +} __designated_init;
+> =20
+>  /* Selected algorithm */
+>  extern struct raid6_calls raid6_call;
+> @@ -109,7 +109,7 @@ struct raid6_recov_calls {
+>  	int  (*valid)(void);
+>  	const char *name;
+>  	int priority;
+> -};
+> +} __designated_init;
+> =20
+>  extern const struct raid6_recov_calls raid6_recov_intx1;
+>  extern const struct raid6_recov_calls raid6_recov_ssse3;
+> diff --git a/include/linux/raid/xor.h b/include/linux/raid/xor.h
+> index 5a21095..c7df59f 100644
+> --- a/include/linux/raid/xor.h
+> +++ b/include/linux/raid/xor.h
+> @@ -17,6 +17,6 @@ struct xor_block_template {
+>  		     unsigned long *, unsigned long *);
+>  	void (*do_5)(unsigned long, unsigned long *, unsigned long *,
+>  		     unsigned long *, unsigned long *, unsigned long *);
+> -};
+> +} __designated_init;
+> =20
+>  #endif
+> diff --git a/include/linux/raid_class.h b/include/linux/raid_class.h
+> index 31e1ff6..603af94 100644
+> --- a/include/linux/raid_class.h
+> +++ b/include/linux/raid_class.h
+> @@ -16,7 +16,7 @@ struct raid_function_template {
+>  	int (*is_raid)(struct device *);
+>  	void (*get_resync)(struct device *);
+>  	void (*get_state)(struct device *);
+> -};
+> +} __designated_init;
+> =20
+>  enum raid_state {
+>  	RAID_STATE_UNKNOWN =3D 0,
+> diff --git a/lib/raid6/altivec.uc b/lib/raid6/altivec.uc
+> index 7cc12b5..4ff138c 100644
+> --- a/lib/raid6/altivec.uc
+> +++ b/lib/raid6/altivec.uc
+> @@ -118,10 +118,9 @@ int raid6_have_altivec(void)
+>  #endif
+> =20
+>  const struct raid6_calls raid6_altivec$# =3D {
+> -	raid6_altivec$#_gen_syndrome,
+> -	raid6_have_altivec,
+> -	"altivecx$#",
+> -	0
+> +	.gen_syndrome =3D raid6_altivec$#_gen_syndrome,
+> +	.valid =3D raid6_have_altivec,
+> +	.name =3D "altivecx$#",
+>  };
+> =20
+>  #endif /* CONFIG_ALTIVEC */
+> diff --git a/lib/raid6/avx2.c b/lib/raid6/avx2.c
+> index bc3b1dd..e56fa06 100644
+> --- a/lib/raid6/avx2.c
+> +++ b/lib/raid6/avx2.c
+> @@ -88,10 +88,10 @@ static void raid6_avx21_gen_syndrome(int disks, size_=
+t bytes, void **ptrs)
+>  }
+> =20
+>  const struct raid6_calls raid6_avx2x1 =3D {
+> -	raid6_avx21_gen_syndrome,
+> -	raid6_have_avx2,
+> -	"avx2x1",
+> -	1			/* Has cache hints */
+> +	.gen_syndrome =3D raid6_avx21_gen_syndrome,
+> +	.valid =3D raid6_have_avx2,
+> +	.name =3D "avx2x1",
+> +	.prefer =3D 1,		/* Has cache hints */
+>  };
+> =20
+>  /*
+> @@ -149,10 +149,10 @@ static void raid6_avx22_gen_syndrome(int disks, siz=
+e_t bytes, void **ptrs)
+>  }
+> =20
+>  const struct raid6_calls raid6_avx2x2 =3D {
+> -	raid6_avx22_gen_syndrome,
+> -	raid6_have_avx2,
+> -	"avx2x2",
+> -	1			/* Has cache hints */
+> +	.gen_syndrome =3D raid6_avx22_gen_syndrome,
+> +	.valid =3D raid6_have_avx2,
+> +	.name =3D "avx2x2",
+> +	.prefer =3D 1,		/* Has cache hints */
+>  };
+> =20
+>  #ifdef CONFIG_X86_64
+> @@ -241,10 +241,10 @@ static void raid6_avx24_gen_syndrome(int disks, siz=
+e_t bytes, void **ptrs)
+>  }
+> =20
+>  const struct raid6_calls raid6_avx2x4 =3D {
+> -	raid6_avx24_gen_syndrome,
+> -	raid6_have_avx2,
+> -	"avx2x4",
+> -	1			/* Has cache hints */
+> +	.gen_syndrome =3D raid6_avx24_gen_syndrome,
+> +	.valid =3D raid6_have_avx2,
+> +	.name =3D "avx2x4",
+> +	.prefer =3D 1,		/* Has cache hints */
+>  };
+>  #endif
+> =20
+> diff --git a/lib/raid6/int.uc b/lib/raid6/int.uc
+> index 5b50f8d..35ad01a 100644
+> --- a/lib/raid6/int.uc
+> +++ b/lib/raid6/int.uc
+> @@ -108,10 +108,8 @@ static void raid6_int$#_gen_syndrome(int disks, size=
+_t bytes, void **ptrs)
+>  }
+> =20
+>  const struct raid6_calls raid6_intx$# =3D {
+> -	raid6_int$#_gen_syndrome,
+> -	NULL,		/* always valid */
+> -	"int" NSTRING "x$#",
+> -	0
+> +	.gen_syndrome =3D raid6_int$#_gen_syndrome,
+> +	.name =3D "int" NSTRING "x$#",
+>  };
+> =20
+>  #endif
+> diff --git a/lib/raid6/mmx.c b/lib/raid6/mmx.c
+> index 590c71c..cdd7d02 100644
+> --- a/lib/raid6/mmx.c
+> +++ b/lib/raid6/mmx.c
+> @@ -75,10 +75,9 @@ static void raid6_mmx1_gen_syndrome(int disks, size_t =
+bytes, void **ptrs)
+>  }
+> =20
+>  const struct raid6_calls raid6_mmxx1 =3D {
+> -	raid6_mmx1_gen_syndrome,
+> -	raid6_have_mmx,
+> -	"mmxx1",
+> -	0
+> +	.gen_syndrome =3D raid6_mmx1_gen_syndrome,
+> +	.valid =3D raid6_have_mmx,
+> +	.name =3D "mmxx1",
+>  };
+> =20
+>  /*
+> @@ -133,10 +132,9 @@ static void raid6_mmx2_gen_syndrome(int disks, size_=
+t bytes, void **ptrs)
+>  }
+> =20
+>  const struct raid6_calls raid6_mmxx2 =3D {
+> -	raid6_mmx2_gen_syndrome,
+> -	raid6_have_mmx,
+> -	"mmxx2",
+> -	0
+> +	.gen_syndrome =3D raid6_mmx2_gen_syndrome,
+> +	.valid =3D raid6_have_mmx,
+> +	.name =3D "mmxx2",
+>  };
+> =20
+>  #endif
+> diff --git a/lib/raid6/neon.c b/lib/raid6/neon.c
+> index 36ad470..99100dd 100644
+> --- a/lib/raid6/neon.c
+> +++ b/lib/raid6/neon.c
+> @@ -41,10 +41,9 @@
+>  		kernel_neon_end();					\
+>  	}								\
+>  	struct raid6_calls const raid6_neonx ## _n =3D {			\
+> -		raid6_neon ## _n ## _gen_syndrome,			\
+> -		raid6_have_neon,					\
+> -		"neonx" #_n,						\
+> -		0							\
+> +		.gen_syndrome =3D raid6_neon ## _n ## _gen_syndrome,	\
+> +		.valid =3D raid6_have_neon,				\
+> +		.name =3D "neonx" #_n,					\
+>  	}
+> =20
+>  static int raid6_have_neon(void)
+> diff --git a/lib/raid6/sse1.c b/lib/raid6/sse1.c
+> index f762971..a9de46e 100644
+> --- a/lib/raid6/sse1.c
+> +++ b/lib/raid6/sse1.c
+> @@ -91,10 +91,10 @@ static void raid6_sse11_gen_syndrome(int disks, size_=
+t bytes, void **ptrs)
+>  }
+> =20
+>  const struct raid6_calls raid6_sse1x1 =3D {
+> -	raid6_sse11_gen_syndrome,
+> -	raid6_have_sse1_or_mmxext,
+> -	"sse1x1",
+> -	1			/* Has cache hints */
+> +	.gen_syndrome =3D raid6_sse11_gen_syndrome,
+> +	.valid =3D raid6_have_sse1_or_mmxext,
+> +	.name =3D "sse1x1",
+> +	.prefer =3D 1,		/* Has cache hints */
+>  };
+> =20
+>  /*
+> @@ -153,10 +153,10 @@ static void raid6_sse12_gen_syndrome(int disks, siz=
+e_t bytes, void **ptrs)
+>  }
+> =20
+>  const struct raid6_calls raid6_sse1x2 =3D {
+> -	raid6_sse12_gen_syndrome,
+> -	raid6_have_sse1_or_mmxext,
+> -	"sse1x2",
+> -	1			/* Has cache hints */
+> +	.gen_syndrome =3D raid6_sse12_gen_syndrome,
+> +	.valid =3D raid6_have_sse1_or_mmxext,
+> +	.name =3D "sse1x2",
+> +	.prefer =3D 1,		/* Has cache hints */
+>  };
+> =20
+>  #endif
+> diff --git a/lib/raid6/sse2.c b/lib/raid6/sse2.c
+> index 85b82c8..cd262518aa 100644
+> --- a/lib/raid6/sse2.c
+> +++ b/lib/raid6/sse2.c
+> @@ -89,10 +89,10 @@ static void raid6_sse21_gen_syndrome(int disks, size_=
+t bytes, void **ptrs)
+>  }
+> =20
+>  const struct raid6_calls raid6_sse2x1 =3D {
+> -	raid6_sse21_gen_syndrome,
+> -	raid6_have_sse2,
+> -	"sse2x1",
+> -	1			/* Has cache hints */
+> +	.gen_syndrome =3D raid6_sse21_gen_syndrome,
+> +	.valid =3D raid6_have_sse2,
+> +	.name =3D "sse2x1",
+> +	.prefer =3D 1,		/* Has cache hints */
+>  };
+> =20
+>  /*
+> @@ -151,10 +151,10 @@ static void raid6_sse22_gen_syndrome(int disks, siz=
+e_t bytes, void **ptrs)
+>  }
+> =20
+>  const struct raid6_calls raid6_sse2x2 =3D {
+> -	raid6_sse22_gen_syndrome,
+> -	raid6_have_sse2,
+> -	"sse2x2",
+> -	1			/* Has cache hints */
+> +	.gen_syndrome =3D raid6_sse22_gen_syndrome,
+> +	.valid =3D raid6_have_sse2,
+> +	.name =3D "sse2x2",
+> +	.prefer =3D 1,		/* Has cache hints */
+>  };
+> =20
+>  #ifdef CONFIG_X86_64
+> @@ -249,10 +249,10 @@ static void raid6_sse24_gen_syndrome(int disks, siz=
+e_t bytes, void **ptrs)
+>  }
+> =20
+>  const struct raid6_calls raid6_sse2x4 =3D {
+> -	raid6_sse24_gen_syndrome,
+> -	raid6_have_sse2,
+> -	"sse2x4",
+> -	1			/* Has cache hints */
+> +	.gen_syndrome =3D raid6_sse24_gen_syndrome,
+> +	.valid =3D raid6_have_sse2,
+> +	.name =3D "sse2x4",
+> +	.prefer =3D 1,		/* Has cache hints */
+>  };
+> =20
+>  #endif /* CONFIG_X86_64 */
+> diff --git a/lib/raid6/tilegx.uc b/lib/raid6/tilegx.uc
+> index e7c2945..3077722 100644
+> --- a/lib/raid6/tilegx.uc
+> +++ b/lib/raid6/tilegx.uc
+> @@ -79,8 +79,6 @@ void raid6_tilegx$#_gen_syndrome(int disks, size_t byte=
+s, void **ptrs)
+>  }
+> =20
+>  const struct raid6_calls raid6_tilegx$# =3D {
+> -	raid6_tilegx$#_gen_syndrome,
+> -	NULL,
+> -	"tilegx$#",
+> -	0
+> +	.gen_syndrome =3D raid6_tilegx$#_gen_syndrome,
+> +	.name =3D "tilegx$#",
+>  };
 
+
+--Sig_/M7cuTxQ/DXhWJ+vQv/kDnyh
+Content-Type: application/pgp-signature; name=signature.asc
+Content-Disposition: attachment; filename=signature.asc
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.22 (GNU/Linux)
+
+iQIVAwUBU9rpHznsnt1WYoG5AQKbPA/+OcPpQdH7YF9IW003H72axTgVavamvgQT
+SvQCGc3EBeBlErW+49TBvvRadNe81X4Qz4SKhFZxcC5S2QJU/bETohcm/72Zm5HX
+H79y1yWD2CIxYPOlPGCas0lLMY16w75vTQ/e7pTgk/ItNd5oRWaxvMNGoKhVk+e6
+cmhtAO44uN1+J6pf5dsSnAi9tBXcE1PqvyOwodkguoY52SrY8hRPeICokrkPfInt
+/2hB43PmTfKfYsGl6RwxIMGmQ31V8AzyZ6nkVzMzszw9DzKls+xDCYfteSp6KgtZ
+5G04FeF7h/LKXo9llPgu/VwPcmR+5Si55N+KoQehyi+XuV4yTQYzE0LfhPf18PZg
+5iBssYeGketzAWg54/aB9ZIpjfPmUA8diWjrIw0azUOoarutoKw9QUkA3pkJJndb
+X4t+nwDZQy3xOcx/vPL7gWeHylapugyOSjZBHD9SE/Xa9ZsvRcI2RemFzoqdPsyK
+6+GY+MP6zyEnXp85Y2Ry1paJkdy/cAf8XVPrcBi1GNziDeZHJxt6qYtQ5oMjkzZd
+/Fb6Kx7xN+qoyMkcZijtsJgZWgQk/EzsoeoR+aD5Zqz29HIprQUfWmGBcZ1/aIpw
+PJeWm8VI9l4DYXun/5j0oB7BZB8DQbM9KGFDZfpndWdeCrrAZe5Uu4K4uX/otG5N
+N5qXmEZVyO0=
+=XH/S
+-----END PGP SIGNATURE-----
+
+--Sig_/M7cuTxQ/DXhWJ+vQv/kDnyh--
