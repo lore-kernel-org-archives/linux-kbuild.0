@@ -1,46 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ig0-f175.google.com ([209.85.213.175]:36006 "EHLO
-	mail-ig0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751209AbaHDOlM (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 4 Aug 2014 10:41:12 -0400
-Date: Mon, 4 Aug 2014 10:43:20 -0400
-From: "Devin J. Pohly" <djpohly@gmail.com>
+Received: from cantor2.suse.de ([195.135.220.15]:33120 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752385AbaHDOxY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 4 Aug 2014 10:53:24 -0400
+Message-ID: <53DF9E62.2090007@suse.cz>
+Date: Mon, 04 Aug 2014 16:53:22 +0200
+From: Michal Marek <mmarek@suse.cz>
+MIME-Version: 1.0
 Subject: Re: [PATCH 1/1] kbuild: use $(srctree) to locate config headers from
  external modules
-Message-ID: <20140804144320.GA4379@chiri>
-References: <1406922443-22770-1-git-send-email-djpohly+linux@gmail.com>
- <53DF944C.2090207@suse.cz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <53DF944C.2090207@suse.cz>
+References: <1406922443-22770-1-git-send-email-djpohly+linux@gmail.com> <53DF944C.2090207@suse.cz> <20140804144320.GA4379@chiri>
+In-Reply-To: <20140804144320.GA4379@chiri>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
+To: "Devin J. Pohly" <djpohly@gmail.com>
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Mon, Aug 04, 2014 at 04:10:20PM +0200, Michal Marek wrote:
-> include/generated is located in $(KBUILD_OUTPUT), which is different
-> from $(srctree) when using O=. Can you post a sequence of commands that
-> leads to the error you are seeing?
+On 2014-08-04 16:43, Devin J. Pohly wrote:
+> On Mon, Aug 04, 2014 at 04:10:20PM +0200, Michal Marek wrote:
+>> include/generated is located in $(KBUILD_OUTPUT), which is different
+>> from $(srctree) when using O=. Can you post a sequence of commands that
+>> leads to the error you are seeing?
+>>
+>> Thanks,
+>> Michal
 > 
-> Thanks,
-> Michal
+> Well, I was attempting to do something like this:
+> 
+> $ make -C $KDIR M=$PWD modules
+> $ make -C $KDIR M=$PWD O=$pkgdir modules_install
+> 
+> ... but I your statement just made the problem really obvious: I don't
+> need to be using O= at all in this case.  Duh.
 
-Well, I was attempting to do something like this:
+Right, the directory you use in make -C ... M=$PWD when building an out
+of tree module is the directory you used in make O=... when building the
+kernel.
 
-$ make -C $KDIR M=$PWD modules
-$ make -C $KDIR M=$PWD O=$pkgdir modules_install
-
-... but I your statement just made the problem really obvious: I don't
-need to be using O= at all in this case.  Duh.
-
-$ make -C $KDIR M=$PWD modules
-$ make -C $KDIR M=$PWD INSTALL_MOD_PATH=$pkgdir modules_install
-
-works as expected, and the only patch needed was to my brain. :)  Mea
-culpa.
-
-*dp
-
+Michal
