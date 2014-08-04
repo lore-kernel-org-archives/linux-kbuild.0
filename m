@@ -1,34 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:60521 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751375AbaHDOKW (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 4 Aug 2014 10:10:22 -0400
-Message-ID: <53DF944C.2090207@suse.cz>
-Date: Mon, 04 Aug 2014 16:10:20 +0200
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
+Received: from mail-ig0-f175.google.com ([209.85.213.175]:36006 "EHLO
+	mail-ig0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751209AbaHDOlM (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 4 Aug 2014 10:41:12 -0400
+Date: Mon, 4 Aug 2014 10:43:20 -0400
+From: "Devin J. Pohly" <djpohly@gmail.com>
 Subject: Re: [PATCH 1/1] kbuild: use $(srctree) to locate config headers from
  external modules
+Message-ID: <20140804144320.GA4379@chiri>
 References: <1406922443-22770-1-git-send-email-djpohly+linux@gmail.com>
-In-Reply-To: <1406922443-22770-1-git-send-email-djpohly+linux@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+ <53DF944C.2090207@suse.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <53DF944C.2090207@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Devin J. Pohly" <djpohly@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, "Devin J. Pohly" <djpohly+linux@gmail.com>
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 2014-08-01 21:47, Devin J. Pohly wrote:
-> When making modules_install for an out-of-tree module, the current
-> directory is $(KBUILD_OUTPUT), and the Makefile recipe which verifies
-> the existence of files in include/config is unable to find them using a
-> relative path.  This leads to a spurious and puzzling "Kernel
-> configuration is invalid" warning when no configuration is actually
-> needed.
+On Mon, Aug 04, 2014 at 04:10:20PM +0200, Michal Marek wrote:
+> include/generated is located in $(KBUILD_OUTPUT), which is different
+> from $(srctree) when using O=. Can you post a sequence of commands that
+> leads to the error you are seeing?
+> 
+> Thanks,
+> Michal
 
-include/generated is located in $(KBUILD_OUTPUT), which is different
-from $(srctree) when using O=. Can you post a sequence of commands that
-leads to the error you are seeing?
+Well, I was attempting to do something like this:
 
-Thanks,
-Michal
+$ make -C $KDIR M=$PWD modules
+$ make -C $KDIR M=$PWD O=$pkgdir modules_install
+
+... but I your statement just made the problem really obvious: I don't
+need to be using O= at all in this case.  Duh.
+
+$ make -C $KDIR M=$PWD modules
+$ make -C $KDIR M=$PWD INSTALL_MOD_PATH=$pkgdir modules_install
+
+works as expected, and the only patch needed was to my brain. :)  Mea
+culpa.
+
+*dp
+
