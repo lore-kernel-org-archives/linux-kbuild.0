@@ -1,41 +1,92 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:50013 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:52014 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751933AbaHEOJH (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 5 Aug 2014 10:09:07 -0400
-Message-ID: <53E0E57B.8010600@suse.cz>
-Date: Tue, 05 Aug 2014 16:08:59 +0200
+	id S1751885AbaHEPzn (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 5 Aug 2014 11:55:43 -0400
+Message-ID: <53E0FE7C.6030002@suse.cz>
+Date: Tue, 05 Aug 2014 17:55:40 +0200
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCHv1 1/2] Documentation: headers_install.txt is part of kbuild
-References: <20140709204915.GB32335@ravnborg.org> <cover.1405246007.git.ydroneaud@opteya.com> <bba4e1dd32c0e30b70443d70ff79187683fed9b3.1405246009.git.ydroneaud@opteya.com> <20140713211819.GA16496@ravnborg.org>
-In-Reply-To: <20140713211819.GA16496@ravnborg.org>
+Subject: Re: [PATCH] kbuild: Use symbolic link to the source tree for out-of-tree
+ build
+References: <1404887241-14455-1-git-send-email-yamada.m@jp.panasonic.com> <53BD048F.4000800@suse.cz> <20140709182542.B0CB.AA925319@jp.panasonic.com>
+In-Reply-To: <20140709182542.B0CB.AA925319@jp.panasonic.com>
 Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>, Yann Droneaud <ydroneaud@opteya.com>
-Cc: linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, "Kirill A. Shutemov" <kirill@shutemov.name>, David Woodhouse <dwmw2@infradead.org>, Rob Landley <rob@landley.net>
+To: Masahiro Yamada <yamada.m@jp.panasonic.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>
 
-On 2014-07-13 23:18, Sam Ravnborg wrote:
-> On Sun, Jul 13, 2014 at 12:15:29PM +0200, Yann Droneaud wrote:
->> 'headers_install.txt' from Documentation/make/ is related to Kbuild
->> so it must be moved in Documentation/kbuild/ directory.
->>
->> As Documentation/make/ directory has only one file, it will be removed
->> as a consequence of moving 'headers_install.txt'.
->>
->> Cc: Kirill A. Shutemov <kirill@shutemov.name>
->> Cc: Michal Marek <mmarek@suse.cz>
->> Cc: David Woodhouse <dwmw2@infradead.org>
->> Cc: Rob Landley <rob@landley.net>
->> Cc: Sam Ravnborg <sam@ravnborg.org>
->> Signed-off-by: Yann Droneaud <ydroneaud@opteya.com>
+On 2014-07-09 11:25, Masahiro Yamada wrote:
+> Hi Michal,
 > 
-> This is much better - thanks.
-> Acked-by: Sam Ravnborg <sam@ravnborg.org>
+> 
+> On Wed, 09 Jul 2014 10:59:59 +0200
+> Michal Marek <mmarek@suse.cz> wrote:
+> 
+>> On 2014-07-09 08:27, Masahiro Yamada wrote:
+>>> Since commit 9da0763bd, the variable 'srctree' is set as follows:
+>>>
+>>> [1] Building in the source tree
+>>>       => srctree is set to '.'
+>>> [2] Building in a subdir right under the source tree
+>>>       => srctree is set to '..'
+>>> [3] Other cases
+>>>       => srctree is set to the absolute path to the source tree
+>>>
+>>> Pros are more readable compiler messages, WARN_ON() etc.
+>>> for case [1] and [2]. (but not [3])
+>>>
+>>> Cons are we have to do build-test for 3 cases when adding
+>>> some changes to the build infrastructure.
+>>>
+>>> We want to treat case [2] and [3] in the same way like prior to
+>>> commit 9da0763bd, keeping the compact log messages.
+>>>
+>>> The idea here is to create a symbolic link 'srctree' pointing
+>>> to $(KBUILD_SRC) at the very early stage of the build process.
+>>
+>> If the symlink points to an absolute path, then you can't move the
+>> source and build tree around anymore.
+> 
+> 
+> In which cases do we need to do this?
 
-Applied to kbuild.git#misc, thanks.
+Sorry for the late response.
+
+You might want to nfs-export the build and source tree and mount it on a
+different machine. Up to 3.16, one had to make sure that the paths match
+on both machines. 3.16 removes this limitation.
+
+
+> Anyway, even if we move the source and build tree around,
+> it is much faster to rebuild it.
+> 
+> The point here is that the absolute paths do not appear
+> in .*.cmd files.
+
+If you either do not use O= or use O=<subdir>, then there won't be any
+absolute paths either. It could be extended to handle
+O=subdir1/subdir1/... if needed.
+
+
+> For example,
+> 
+> $ make O=foo/bar defconfig all
+>   [ full build ]
+> $ cd ..
+> $ mkdir baz
+> $ move linux baz
+> $ cd baz/linux
+> $ make O=foo/bar
+>   [ much faster re-build ]
+
+I now noticed that the patch unconditionally recreates the symlink on
+every make O= invocation. While this nicely fixes the problem with moved
+build directory, it also means that a 'make O=... modules_install' ran
+as root will try to recreate the symlink. This will fail on nfs. So I'd
+rather keep the current logic with $(SRCTREE) containing either an
+absolute or relative path.
 
 Michal
-
