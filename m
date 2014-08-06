@@ -1,92 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:52014 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:39338 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751885AbaHEPzn (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 5 Aug 2014 11:55:43 -0400
-Message-ID: <53E0FE7C.6030002@suse.cz>
-Date: Tue, 05 Aug 2014 17:55:40 +0200
+	id S1755476AbaHFLpx (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 6 Aug 2014 07:45:53 -0400
+Message-ID: <53E2156E.9060700@suse.cz>
+Date: Wed, 06 Aug 2014 13:45:50 +0200
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH] kbuild: Use symbolic link to the source tree for out-of-tree
- build
-References: <1404887241-14455-1-git-send-email-yamada.m@jp.panasonic.com> <53BD048F.4000800@suse.cz> <20140709182542.B0CB.AA925319@jp.panasonic.com>
-In-Reply-To: <20140709182542.B0CB.AA925319@jp.panasonic.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: Re: [PATCH] kbuild: escape single backslashes in macro make-cmd
+References: <20140726163551.19857.17737.stgit@zurg>
+In-Reply-To: <20140726163551.19857.17737.stgit@zurg>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>
+To: Konstantin Khlebnikov <koct9i@gmail.com>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Sascha Hauer <s.hauer@pengutronix.de>, x86@kernel.org, Andrew Morton <akpm@linux-foundation.org>
 
-On 2014-07-09 11:25, Masahiro Yamada wrote:
-> Hi Michal,
+On 2014-07-26 18:35, Konstantin Khlebnikov wrote:
+> This already has been fixed in commit c353acba28fb3fa1fd05fd
+> ("kbuild: make: fix if_changed when command contains backslashes")
+> but escaping still isn't perfect and triggers false-positive rebuilds.
 > 
+> For x86 problem happens every time, because rules in arch/x86/realmode/rm/
+> and arch/x86/boot/ contains commands like sed -n -e 's/foo\(.*\)/\1/p'.
+> Backslash in \1 isn't escaped and turns into ascii symbol with code 1.
+> Macro if_changed detects command change and rebuilds target again and again.
 > 
-> On Wed, 09 Jul 2014 10:59:59 +0200
-> Michal Marek <mmarek@suse.cz> wrote:
+> Backslash escaping conflicts with other passes because it's used for escaping
+> other symbols. To avoid that current macro handles only double backslashes.
+> Obviously this doesn't work for \1 like above.
 > 
->> On 2014-07-09 08:27, Masahiro Yamada wrote:
->>> Since commit 9da0763bd, the variable 'srctree' is set as follows:
->>>
->>> [1] Building in the source tree
->>>       => srctree is set to '.'
->>> [2] Building in a subdir right under the source tree
->>>       => srctree is set to '..'
->>> [3] Other cases
->>>       => srctree is set to the absolute path to the source tree
->>>
->>> Pros are more readable compiler messages, WARN_ON() etc.
->>> for case [1] and [2]. (but not [3])
->>>
->>> Cons are we have to do build-test for 3 cases when adding
->>> some changes to the build infrastructure.
->>>
->>> We want to treat case [2] and [3] in the same way like prior to
->>> commit 9da0763bd, keeping the compact log messages.
->>>
->>> The idea here is to create a symbolic link 'srctree' pointing
->>> to $(KBUILD_SRC) at the very early stage of the build process.
->>
->> If the symlink points to an absolute path, then you can't move the
->> source and build tree around anymore.
+> This patch reorders passes. It doubles all backslashes before escaping # and '
 > 
+> Visible effect in rebuilding x86/defconfig without changes, before patch:
 > 
-> In which cases do we need to do this?
+> blind@zurg:~/src/linux$ make V=2
+>   CHK     include/config/kernel.release
+>   CHK     include/generated/uapi/linux/version.h
+>   CHK     include/generated/utsrelease.h
+>   CALL    scripts/checksyscalls.sh - due to target missing
+>   CHK     include/generated/compile.h
+>   PASYMS  arch/x86/realmode/rm/pasyms.h - due to command line change
 
-Sorry for the late response.
+With which make and shell version are you seeing this? While the patch
+looks correct, I can't reproduce the error here:
 
-You might want to nfs-export the build and source tree and mount it on a
-different machine. Up to 3.16, one had to make sure that the paths match
-on both machines. 3.16 removes this limitation.
+$ make V=2
+  CHK     include/config/kernel.release
+  CHK     include/generated/uapi/linux/version.h
+  CHK     include/generated/utsrelease.h
+  CALL    scripts/checksyscalls.sh - due to target missing
+  CHK     include/generated/compile.h
+Kernel: arch/x86/boot/bzImage is ready  (#1)
+  Building modules, stage 2.
+  MODPOST 12 modules - due to target is PHONY
+$ cat arch/x86/realmode/rm/.pasyms.h.cmd
+cmd_arch/x86/realmode/rm/pasyms.h := nm arch/x86/realmode/rm/header.o
+arch/x86/realmode/rm/trampoline_64.o arch/x86/realmode/rm/stack.o
+arch/x86/realmode/rm/reboot.o arch/x86/realmode/rm/wakeup_asm.o
+arch/x86/realmode/rm/wakemain.o arch/x86/realmode/rm/video-mode.o
+arch/x86/realmode/rm/copy.o arch/x86/realmode/rm/bioscall.o
+arch/x86/realmode/rm/regs.o arch/x86/realmode/rm/video-vga.o
+arch/x86/realmode/rm/video-vesa.o arch/x86/realmode/rm/video-bios.o |
+sed -n -r -e 's/^([0-9a-fA-F]+) [ABCDGRSTVW] (.+)$$/pa_\2 = \2;/p' |
+sort | uniq > arch/x86/realmode/rm/pasyms.h
 
-
-> Anyway, even if we move the source and build tree around,
-> it is much faster to rebuild it.
-> 
-> The point here is that the absolute paths do not appear
-> in .*.cmd files.
-
-If you either do not use O= or use O=<subdir>, then there won't be any
-absolute paths either. It could be extended to handle
-O=subdir1/subdir1/... if needed.
-
-
-> For example,
-> 
-> $ make O=foo/bar defconfig all
->   [ full build ]
-> $ cd ..
-> $ mkdir baz
-> $ move linux baz
-> $ cd baz/linux
-> $ make O=foo/bar
->   [ much faster re-build ]
-
-I now noticed that the patch unconditionally recreates the symlink on
-every make O= invocation. While this nicely fixes the problem with moved
-build directory, it also means that a 'make O=... modules_install' ran
-as root will try to recreate the symlink. This will fail on nfs. So I'd
-rather keep the current logic with $(SRCTREE) containing either an
-absolute or relative path.
+This is with both 3.16 and my kbuild branch, which is based on 3.16-rc1.
+Also, in the description, you say that backslash escaping conflicts with
+escaping # and ', but this has nothing to do with the \2 backreference
+in the sed command.
 
 Michal
