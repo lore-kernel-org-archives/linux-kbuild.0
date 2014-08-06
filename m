@@ -1,70 +1,72 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:42400 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751382AbaHFOGi (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 6 Aug 2014 10:06:38 -0400
-Message-ID: <53E23669.5050309@suse.cz>
-Date: Wed, 06 Aug 2014 16:06:33 +0200
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: [PATCH] kbuild: devtest - new make target for build all and run
- tests
-References: <1405716274-24420-1-git-send-email-shuah.kh@samsung.com> <53E232E6.8060506@suse.cz> <53E235DE.70604@samsung.com>
-In-Reply-To: <53E235DE.70604@samsung.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Received: from mail-wi0-f172.google.com ([209.85.212.172]:50290 "EHLO
+	mail-wi0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753862AbaHFO2I (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 6 Aug 2014 10:28:08 -0400
+Received: by mail-wi0-f172.google.com with SMTP id n3so9021265wiv.17
+        for <linux-kbuild@vger.kernel.org>; Wed, 06 Aug 2014 07:28:07 -0700 (PDT)
+From: Daniel Thompson <daniel.thompson@linaro.org>
+Subject: [PATCH gdb/scripts] scripts/gdb: Ignore byte-compiled python files
+Date: Wed,  6 Aug 2014 15:27:49 +0100
+Message-Id: <1407335269-9533-1-git-send-email-daniel.thompson@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: shuah.kh@samsung.com, gregkh@linuxfoundation.org
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Jan Kiszka <jan.kiszka@siemens.com>
+Cc: Daniel Thompson <daniel.thompson@linaro.org>, linux-kernel@vger.kernel.org, patches@linaro.org, linaro-kernel@lists.linaro.org, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
-On 2014-08-06 16:04, Shuah Khan wrote:
-> On 08/06/2014 07:51 AM, Michal Marek wrote:
->> On 2014-07-18 22:44, Shuah Khan wrote:
->>> Add a new devtest make target to enable developer testing. This
->>> new target does full build (make all) and then runs selftests.
->>
->> I agree with Sam that the name is rather ambiguous, but I can't suggest
->> a better alternative right now.
-> 
-> Does kselftest or kern_selftest sound better?
+Using the gdb scripts leaves byte-compiled python files in the scripts/
+directory. These should be ignored by git and cleaned up by mrproper.
 
-It does sound better to me than dev(ice)test, but I'm not a native
-English speaker. Greg?
+Signed-off-by: Daniel Thompson <daniel.thompson@linaro.org>
+Cc: Jan Kiszka <jan.kiszka@siemens.com>
+Cc: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org
+---
 
+Notes:
+    Relies upon (and intended for incorporation into) Jan Kiszka's gdb/scripts
+    patch series.
 
->>> Signed-off-by: Shuah Khan <shuah.kh@samsung.com>
->>> ---
->>>   Makefile | 11 +++++++++++
->>>   1 file changed, 11 insertions(+)
->>>
->>> diff --git a/Makefile b/Makefile
->>> index f3c543d..1ef3128 100644
->>> --- a/Makefile
->>> +++ b/Makefile
->>> @@ -1034,6 +1034,14 @@ headers_check: headers_install
->>>   	$(Q)$(MAKE) $(hdr-inst)=arch/$(hdr-arch)/include/uapi/asm $(hdr-dst) HDRCHECK=1
->>>
->>>   # ---------------------------------------------------------------------------
->>> +# Kernel devtest
->>> +
->>> +PHONY += devtest
->>> +devtest:
->>> +	make all
->>
->> devtest: all
->>
->>
->>> +	make -C tools/testing/selftests run_tests
->>
->> Please use $(Q)$(MAKE), to keep the build silent by default and to
->> consistently use the same make program with the same options throughout
->> the build.
->>
-> 
-> Working on the change - send v2 patch.
+ .gitignore                   | 1 +
+ Makefile                     | 2 +-
+ scripts/gdb/linux/.gitignore | 2 ++
+ 3 files changed, 4 insertions(+), 1 deletion(-)
+ create mode 100644 scripts/gdb/linux/.gitignore
 
-Great!
-
-Michal
+diff --git a/.gitignore b/.gitignore
+index f4c0b09..a04486e 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -42,6 +42,7 @@ Module.symvers
+ /TAGS
+ /linux
+ /vmlinux
++/vmlinux-gdb.py
+ /vmlinuz
+ /System.map
+ /Module.markers
+diff --git a/Makefile b/Makefile
+index 7105eb2a..a3ca8ba 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1136,7 +1136,7 @@ MRPROPER_FILES += .config .config.old .version .old_version $(version_h) \
+ 		  signing_key.priv signing_key.x509 x509.genkey		\
+ 		  extra_certificates signing_key.x509.keyid		\
+ 		  signing_key.x509.signer include/linux/version.h	\
+-		  vmlinux-gdb.py
++		  vmlinux-gdb.py scripts/gdb/linux/*.py[co]
+ 
+ # clean - Delete most, but leave enough to build external modules
+ #
+diff --git a/scripts/gdb/linux/.gitignore b/scripts/gdb/linux/.gitignore
+new file mode 100644
+index 0000000..52e4e61
+--- /dev/null
++++ b/scripts/gdb/linux/.gitignore
+@@ -0,0 +1,2 @@
++*.pyc
++*.pyo
+-- 
+1.9.3
 
