@@ -1,72 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f172.google.com ([209.85.212.172]:50290 "EHLO
-	mail-wi0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753862AbaHFO2I (ORCPT
+Received: from mail.linuxfoundation.org ([140.211.169.12]:34856 "EHLO
+	mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751382AbaHFOcX (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 6 Aug 2014 10:28:08 -0400
-Received: by mail-wi0-f172.google.com with SMTP id n3so9021265wiv.17
-        for <linux-kbuild@vger.kernel.org>; Wed, 06 Aug 2014 07:28:07 -0700 (PDT)
-From: Daniel Thompson <daniel.thompson@linaro.org>
-Subject: [PATCH gdb/scripts] scripts/gdb: Ignore byte-compiled python files
-Date: Wed,  6 Aug 2014 15:27:49 +0100
-Message-Id: <1407335269-9533-1-git-send-email-daniel.thompson@linaro.org>
+	Wed, 6 Aug 2014 10:32:23 -0400
+Date: Wed, 6 Aug 2014 07:31:49 -0700
+From: Greg KH <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH] kbuild: devtest - new make target for build all and run
+ tests
+Message-ID: <20140806143149.GA13552@kroah.com>
+References: <1405716274-24420-1-git-send-email-shuah.kh@samsung.com>
+ <53E232E6.8060506@suse.cz>
+ <53E235DE.70604@samsung.com>
+ <53E23669.5050309@suse.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <53E23669.5050309@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jan Kiszka <jan.kiszka@siemens.com>
-Cc: Daniel Thompson <daniel.thompson@linaro.org>, linux-kernel@vger.kernel.org, patches@linaro.org, linaro-kernel@lists.linaro.org, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: shuah.kh@samsung.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Using the gdb scripts leaves byte-compiled python files in the scripts/
-directory. These should be ignored by git and cleaned up by mrproper.
+On Wed, Aug 06, 2014 at 04:06:33PM +0200, Michal Marek wrote:
+> On 2014-08-06 16:04, Shuah Khan wrote:
+> > On 08/06/2014 07:51 AM, Michal Marek wrote:
+> >> On 2014-07-18 22:44, Shuah Khan wrote:
+> >>> Add a new devtest make target to enable developer testing. This
+> >>> new target does full build (make all) and then runs selftests.
+> >>
+> >> I agree with Sam that the name is rather ambiguous, but I can't suggest
+> >> a better alternative right now.
+> > 
+> > Does kselftest or kern_selftest sound better?
+> 
+> It does sound better to me than dev(ice)test, but I'm not a native
+> English speaker. Greg?
 
-Signed-off-by: Daniel Thompson <daniel.thompson@linaro.org>
-Cc: Jan Kiszka <jan.kiszka@siemens.com>
-Cc: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org
----
+Either is fine with me, but I don't think we have '_' as any make target
+today, so perhaps "kselftest" is best?
 
-Notes:
-    Relies upon (and intended for incorporation into) Jan Kiszka's gdb/scripts
-    patch series.
+thanks,
 
- .gitignore                   | 1 +
- Makefile                     | 2 +-
- scripts/gdb/linux/.gitignore | 2 ++
- 3 files changed, 4 insertions(+), 1 deletion(-)
- create mode 100644 scripts/gdb/linux/.gitignore
-
-diff --git a/.gitignore b/.gitignore
-index f4c0b09..a04486e 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -42,6 +42,7 @@ Module.symvers
- /TAGS
- /linux
- /vmlinux
-+/vmlinux-gdb.py
- /vmlinuz
- /System.map
- /Module.markers
-diff --git a/Makefile b/Makefile
-index 7105eb2a..a3ca8ba 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1136,7 +1136,7 @@ MRPROPER_FILES += .config .config.old .version .old_version $(version_h) \
- 		  signing_key.priv signing_key.x509 x509.genkey		\
- 		  extra_certificates signing_key.x509.keyid		\
- 		  signing_key.x509.signer include/linux/version.h	\
--		  vmlinux-gdb.py
-+		  vmlinux-gdb.py scripts/gdb/linux/*.py[co]
- 
- # clean - Delete most, but leave enough to build external modules
- #
-diff --git a/scripts/gdb/linux/.gitignore b/scripts/gdb/linux/.gitignore
-new file mode 100644
-index 0000000..52e4e61
---- /dev/null
-+++ b/scripts/gdb/linux/.gitignore
-@@ -0,0 +1,2 @@
-+*.pyc
-+*.pyo
--- 
-1.9.3
-
+greg k-h
