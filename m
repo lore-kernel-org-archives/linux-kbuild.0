@@ -1,71 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:43511 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753558AbaHFPCB (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 6 Aug 2014 11:02:01 -0400
-Message-ID: <53E24365.6020405@suse.cz>
-Date: Wed, 06 Aug 2014 17:01:57 +0200
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: [PATCH] kbuild: escape single backslashes in macro make-cmd
-References: <20140726163551.19857.17737.stgit@zurg>	<53E2156E.9060700@suse.cz> <CALYGNiO=oiiLgJRrpycO=CWyMMf8-AiDyW=Ch3ajV5W=9dtZfA@mail.gmail.com>
-In-Reply-To: <CALYGNiO=oiiLgJRrpycO=CWyMMf8-AiDyW=Ch3ajV5W=9dtZfA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Received: from mail.emea.novell.com ([130.57.118.101]:55526 "EHLO
+	mail.emea.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754037AbaHGH64 convert rfc822-to-8bit (ORCPT
+	<rfc822;groupwise-linux-kbuild@vger.kernel.org:2:1>);
+	Thu, 7 Aug 2014 03:58:56 -0400
+Message-Id: <53E34DDC020000780002A045@mail.emea.novell.com>
+Date: Thu, 07 Aug 2014 08:58:52 +0100
+From: "Jan Beulich" <JBeulich@suse.com>
+Subject: firmware: fix build of external firmware
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8BIT
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Konstantin Khlebnikov <koct9i@gmail.com>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>, "x86@kernel.org" <x86@kernel.org>, Andrew Morton <akpm@linux-foundation.org>
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org
 
-On 2014-08-06 14:19, Konstantin Khlebnikov wrote:
-> On Wed, Aug 6, 2014 at 3:45 PM, Michal Marek <mmarek@suse.cz> wrote:
->> On 2014-07-26 18:35, Konstantin Khlebnikov wrote:
->>> This already has been fixed in commit c353acba28fb3fa1fd05fd
->>> ("kbuild: make: fix if_changed when command contains backslashes")
->>> but escaping still isn't perfect and triggers false-positive rebuilds.
->>>
->>> For x86 problem happens every time, because rules in arch/x86/realmode/rm/
->>> and arch/x86/boot/ contains commands like sed -n -e 's/foo\(.*\)/\1/p'.
->>> Backslash in \1 isn't escaped and turns into ascii symbol with code 1.
->>> Macro if_changed detects command change and rebuilds target again and again.
->>>
->>> Backslash escaping conflicts with other passes because it's used for escaping
->>> other symbols. To avoid that current macro handles only double backslashes.
->>> Obviously this doesn't work for \1 like above.
->>>
->>> This patch reorders passes. It doubles all backslashes before escaping # and '
->>>
->>> Visible effect in rebuilding x86/defconfig without changes, before patch:
->>>
->>> blind@zurg:~/src/linux$ make V=2
->>>   CHK     include/config/kernel.release
->>>   CHK     include/generated/uapi/linux/version.h
->>>   CHK     include/generated/utsrelease.h
->>>   CALL    scripts/checksyscalls.sh - due to target missing
->>>   CHK     include/generated/compile.h
->>>   PASYMS  arch/x86/realmode/rm/pasyms.h - due to command line change
->>
->> With which make and shell version are you seeing this? While the patch
->> looks correct, I can't reproduce the error here:
-> 
-> /bin/sh points to dash (debian default setup).
-> 
-> I cannot reproduce this using bash. That explains why this bug is still here.
+It looks like commit 5180d5f483 ("firmware: Simplify directory
+creation") uncovered a latent bug: The cmd_fwbin make macro, which is
+being called without any arguments, referenced argument 2, which I
+suppose previously just happened to be set to the right value (from an
+enclosing macro invocation - some make versions don't always properly
+clear unused macro arguments on nested macro invocations). In 3.16 with
+such make versions it now points into the source tree instead,
+resulting in build failure when building outside the source tree. And
+obviously on make versions properly clearing unused arguments it would
+have resolved to empty.
 
-So the difference between the shells is that their 'echo' builtin treats
-\<number> differently:
-$ ./dash -c "echo '\2'"
-
-$ ./dash -c "echo '\2'" | xxd
-0000000: 020a                                     ..
-$ /bin/bash -c "echo '\2'"
-\2
+Signed-off-by: Jan Beulich <jbeulich@suse.com>
 
-For some reason we fail to escape the \ and dash treats \2 as \02. POSIX
-says that this is implementation-defined, so none of the shells is wrong.
+--- a/firmware/Makefile
++++ b/firmware/Makefile
+@@ -159,7 +159,7 @@ quiet_cmd_fwbin = MK_FW   $@
+ 		  echo "    .section .rodata"				>>$@;\
+ 		  echo "    .p2align $${ASM_ALIGN}"			>>$@;\
+ 		  echo "_fw_$${FWSTR}_bin:"				>>$@;\
+-		  echo "    .incbin \"$(2)\""				>>$@;\
++		  echo "    .incbin \"$(obj)/$$FWNAME\""		>>$@;\
+ 		  echo "_fw_end:"					>>$@;\
+ 		  echo "   .section .rodata.str,\"aMS\",$${PROGBITS},1"	>>$@;\
+ 		  echo "    .p2align $${ASM_ALIGN}"			>>$@;\
 
-I need to look into this a bit further. I'll most likely end up applying
-your patch, but I'd like to understand the fix in detail first.
 
-Thanks,
-Michal
+
