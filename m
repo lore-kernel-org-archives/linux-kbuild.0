@@ -1,64 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from asavdk3.altibox.net ([109.247.116.14]:60122 "EHLO
-	asavdk3.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932537AbaHGRIG (ORCPT
+Received: from qmta11.emeryville.ca.mail.comcast.net ([76.96.27.211]:49615
+	"EHLO qmta11.emeryville.ca.mail.comcast.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1750760AbaHGTHv (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 7 Aug 2014 13:08:06 -0400
-Date: Thu, 7 Aug 2014 19:08:00 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH] kbuild: escape single backslashes in macro make-cmd
-Message-ID: <20140807170800.GA1542@ravnborg.org>
-References: <20140726163551.19857.17737.stgit@zurg>
- <53E2156E.9060700@suse.cz>
- <CALYGNiO=oiiLgJRrpycO=CWyMMf8-AiDyW=Ch3ajV5W=9dtZfA@mail.gmail.com>
- <53E24365.6020405@suse.cz>
- <20140807160739.GA29726@sepie.suse.cz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20140807160739.GA29726@sepie.suse.cz>
+	Thu, 7 Aug 2014 15:07:51 -0400
+From: Shuah Khan <shuah.kh@samsung.com>
+Subject: [PATCH v3] kbuild: kselftest - new make target to build and run kernel selftests
+Date: Thu,  7 Aug 2014 13:07:46 -0600
+Message-Id: <1407438466-7196-1-git-send-email-shuah.kh@samsung.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Konstantin Khlebnikov <koct9i@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>, "x86@kernel.org" <x86@kernel.org>, Andrew Morton <akpm@linux-foundation.org>
+To: mmarek@suse.cz, gregkh@linuxfoundation.org, sam@ravnborg.org
+Cc: Shuah Khan <shuah.kh@samsung.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-> 
-> The problem is that the bash echo does not interpred _any_ \-sequences
-> without -e. So the nicely escaped \\ stays a \\ and we get spurious
-> rebuilds with bash instead. It previously worked with bash, because the
-> backslash escaping was completely broken. You not only moved it up in
-> the chain, but also fixed it by removing one superflous level of
-> escaping.
-> 
-> I'm now testing this, i.e. dropping the backslash escaping completely
-> and doing a printf '%s\n' instead. Can you try if it works for you?
-> 
-> 
-> diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-> index 122f95c..8a9a4e1 100644
-> --- a/scripts/Kbuild.include
-> +++ b/scripts/Kbuild.include
-> @@ -215,11 +215,13 @@ else
->  arg-check = $(if $(strip $(cmd_$@)),,1)
->  endif
->  
-> -# >'< substitution is for echo to work,
-> -# >$< substitution to preserve $ when reloading .cmd file
-> -# note: when using inline perl scripts [perl -e '...$$t=1;...']
-> -# in $(cmd_xxx) double $$ your perl vars
-> -make-cmd = $(subst \\,\\\\,$(subst \#,\\\#,$(subst $$,$$$$,$(call escsq,$(cmd_$(1))))))
-> +# Replace >$< with >$$< to preserve $ when reloading the .cmd file
-> +# (needed for make)
-> +# Replace >#< with >\#< to avoid starting a comment in the .cmd file
-> +# (needed for make)
-> +# Replace >'< with >'\''< to be able to enclose the whole string in '...'
-> +# (needed for the shell)
-> +make-cmd = $(call escsq,$(subst \#,\\\#,$(subst $$,$$$$,$(cmd_$(1)))))
-This is simpler and remotely readble - nice!
-As a bonus you added more descriptive comments
+Add a new make target "kselftest" to enable kernel testing. This
+new target builds and runs kernel selftests. Running as root is
+recommended for a complete test run as some tests don't run when
+run by non-root user. Build, install, and boot kernel before
+running kselftest on it.
 
-Looks good.
-You may add my:
-Reviewed-by: Sam Ravnborg <sam@ravnborg.org>
+Signed-off-by: Shuah Khan <shuah.kh@samsung.com>
+---
+ Makefile | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-	Sam
+diff --git a/Makefile b/Makefile
+index d0901b4..574e8da 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1036,6 +1036,13 @@ headers_check: headers_install
+ 	$(Q)$(MAKE) $(hdr-inst)=arch/$(hdr-arch)/include/uapi/asm $(hdr-dst) HDRCHECK=1
+ 
+ # ---------------------------------------------------------------------------
++# Kernel selftest
++
++PHONY += kselftest
++kselftest:
++	$(Q)$(MAKE) -C tools/testing/selftests run_tests
++
++# ---------------------------------------------------------------------------
+ # Modules
+ 
+ ifdef CONFIG_MODULES
+@@ -1238,6 +1245,11 @@ help:
+ 	@echo  '  headerdep       - Detect inclusion cycles in headers'
+ 	@$(MAKE) -f $(srctree)/scripts/Makefile.help checker-help
+ 	@echo  ''
++	@echo  'Kernel selftest'
++	@echo  '  kselftest       - Build and run kernel selftest (run as root)'
++	@echo  '                    Build, install, and boot kernel before'
++	@echo  '                    running kselftest on it'
++	@echo  ''
+ 	@echo  'Kernel packaging:'
+ 	@$(MAKE) $(build)=$(package-dir) help
+ 	@echo  ''
+-- 
+1.9.1
+
