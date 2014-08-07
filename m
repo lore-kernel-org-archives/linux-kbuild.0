@@ -1,61 +1,118 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mailout2.w2.samsung.com ([211.189.100.12]:47032 "EHLO
-	usmailout2.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932082AbaHGQNR (ORCPT
+Received: from mail-ig0-f170.google.com ([209.85.213.170]:49655 "EHLO
+	mail-ig0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932330AbaHGQzA (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 7 Aug 2014 12:13:17 -0400
-Message-id: <53E3A599.6090008@samsung.com>
-Date: Thu, 07 Aug 2014 10:13:13 -0600
-From: Shuah Khan <shuah.kh@samsung.com>
-Reply-to: shuah.kh@samsung.com
-MIME-version: 1.0
-Subject: Re: [PATCH v2] kbuild: kselftest - new make target to build and run
- kernel selftests
-References: <1407420192-4928-1-git-send-email-shuah.kh@samsung.com>
- <20140807155713.GA1382@ravnborg.org>
-In-reply-to: <20140807155713.GA1382@ravnborg.org>
-Content-type: text/plain; charset=ISO-8859-1; format=flowed
-Content-transfer-encoding: 7bit
+	Thu, 7 Aug 2014 12:55:00 -0400
+MIME-Version: 1.0
+In-Reply-To: <20140807160739.GA29726@sepie.suse.cz>
+References: <20140726163551.19857.17737.stgit@zurg>
+	<53E2156E.9060700@suse.cz>
+	<CALYGNiO=oiiLgJRrpycO=CWyMMf8-AiDyW=Ch3ajV5W=9dtZfA@mail.gmail.com>
+	<53E24365.6020405@suse.cz>
+	<20140807160739.GA29726@sepie.suse.cz>
+Date: Thu, 7 Aug 2014 20:54:59 +0400
+Message-ID: <CALYGNiOUwnqSYgd=TYOSjcFvz0wW87kXG5DvFtg8M3nomELL0w@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: escape single backslashes in macro make-cmd
+From: Konstantin Khlebnikov <koct9i@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: mmarek@suse.cz, gregkh@linuxfoundation.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Shuah Khan <shuah.kh@samsung.com>
+To: Michal Marek <mmarek@suse.cz>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Sascha Hauer <s.hauer@pengutronix.de>, "x86@kernel.org" <x86@kernel.org>, Andrew Morton <akpm@linux-foundation.org>
 
-On 08/07/2014 09:57 AM, Sam Ravnborg wrote:
-> On Thu, Aug 07, 2014 at 08:03:12AM -0600, Shuah Khan wrote:
->> Add a new make target "kselftest" to enable kernel testing. This
->> new target builds and runs kernel selftests. Running as root is
->> recommended for a complete test run as some tests don't run when
->> run by non-root user.
+On Thu, Aug 7, 2014 at 8:07 PM, Michal Marek <mmarek@suse.cz> wrote:
+> On Wed, Aug 06, 2014 at 05:01:57PM +0200, Michal Marek wrote:
+>> On 2014-08-06 14:19, Konstantin Khlebnikov wrote:
+>> > On Wed, Aug 6, 2014 at 3:45 PM, Michal Marek <mmarek@suse.cz> wrote:
+>> >> On 2014-07-26 18:35, Konstantin Khlebnikov wrote:
+>> >>> This already has been fixed in commit c353acba28fb3fa1fd05fd
+>> >>> ("kbuild: make: fix if_changed when command contains backslashes")
+>> >>> but escaping still isn't perfect and triggers false-positive rebuilds.
+>> >>>
+>> >>> For x86 problem happens every time, because rules in arch/x86/realmode/rm/
+>> >>> and arch/x86/boot/ contains commands like sed -n -e 's/foo\(.*\)/\1/p'.
+>> >>> Backslash in \1 isn't escaped and turns into ascii symbol with code 1.
+>> >>> Macro if_changed detects command change and rebuilds target again and again.
+>> >>>
+>> >>> Backslash escaping conflicts with other passes because it's used for escaping
+>> >>> other symbols. To avoid that current macro handles only double backslashes.
+>> >>> Obviously this doesn't work for \1 like above.
+>> >>>
+>> >>> This patch reorders passes. It doubles all backslashes before escaping # and '
+>> >>>
+>> >>> Visible effect in rebuilding x86/defconfig without changes, before patch:
+>> >>>
+>> >>> blind@zurg:~/src/linux$ make V=2
+>> >>>   CHK     include/config/kernel.release
+>> >>>   CHK     include/generated/uapi/linux/version.h
+>> >>>   CHK     include/generated/utsrelease.h
+>> >>>   CALL    scripts/checksyscalls.sh - due to target missing
+>> >>>   CHK     include/generated/compile.h
+>> >>>   PASYMS  arch/x86/realmode/rm/pasyms.h - due to command line change
+>> >>
+>> >> With which make and shell version are you seeing this? While the patch
+>> >> looks correct, I can't reproduce the error here:
+>> >
+>> > /bin/sh points to dash (debian default setup).
+>> >
+>> > I cannot reproduce this using bash. That explains why this bug is still here.
+>>
+>> So the difference between the shells is that their 'echo' builtin treats
+>> \<number> differently:
+>> $ ./dash -c "echo '\2'"
+>>
+>> $ ./dash -c "echo '\2'" | xxd
+>> 0000000: 020a                                     ..
+>> $ /bin/bash -c "echo '\2'"
+>> \2
 >
-> kselftest will run the test - but will not build the kerenl.
-> That is does not build the kernel is IMO a good thing -
-> as one may re-run the test while doing work on the kernel, and triggering
-> a rebuild to re-run the test is not nice.
+> The problem is that the bash echo does not interpred _any_ \-sequences
+> without -e. So the nicely escaped \\ stays a \\ and we get spurious
+> rebuilds with bash instead. It previously worked with bash, because the
+> backslash escaping was completely broken. You not only moved it up in
+> the chain, but also fixed it by removing one superflous level of
+> escaping.
+>
+> I'm now testing this, i.e. dropping the backslash escaping completely
+> and doing a printf '%s\n' instead. Can you try if it works for you?
 
-Good. That is the reason why I made the change to not run make all.
-Result of an aha moment when I was working on the v2 :)
+Yes, it works. I completely forgot about printf, it's much more
+reliable than echo.
+
+So, you can add my Acked-by/Tested-by
 
 >
-> The changelog + help text needs to be updated to reflect that the kernel is not
-> built when you use "make kselftest".
-
-I will update the changelog and re-send the patch.
-
 >
-> On top of this - can you please tell what plans exists to extend this.
-> When we discussed "devtest" it was said that it would not be a wrapper
-> for selftests run_tests only, but more was planned to be added.
+> diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+> index 122f95c..8a9a4e1 100644
+> --- a/scripts/Kbuild.include
+> +++ b/scripts/Kbuild.include
+> @@ -215,11 +215,13 @@ else
+>  arg-check = $(if $(strip $(cmd_$@)),,1)
+>  endif
 >
-
-I posted agenda item to ksummit-discuss this morning outlining the
-progress made in 3.17 and what's planned for 3.18 and beyond. I think
-the post is waiting for moderator approval.
-
--- Shuah
-
--- 
-Shuah Khan
-Senior Linux Kernel Developer - Open Source Group
-Samsung Research America(Silicon Valley)
-shuah.kh@samsung.com | (970) 672-0658
+> -# >'< substitution is for echo to work,
+> -# >$< substitution to preserve $ when reloading .cmd file
+> -# note: when using inline perl scripts [perl -e '...$$t=1;...']
+> -# in $(cmd_xxx) double $$ your perl vars
+> -make-cmd = $(subst \\,\\\\,$(subst \#,\\\#,$(subst $$,$$$$,$(call escsq,$(cmd_$(1))))))
+> +# Replace >$< with >$$< to preserve $ when reloading the .cmd file
+> +# (needed for make)
+> +# Replace >#< with >\#< to avoid starting a comment in the .cmd file
+> +# (needed for make)
+> +# Replace >'< with >'\''< to be able to enclose the whole string in '...'
+> +# (needed for the shell)
+> +make-cmd = $(call escsq,$(subst \#,\\\#,$(subst $$,$$$$,$(cmd_$(1)))))
+>
+>  # Find any prerequisites that is newer than target or that does not exist.
+>  # PHONY targets skipped in both cases.
+> @@ -230,7 +232,7 @@ any-prereq = $(filter-out $(PHONY),$?) $(filter-out $(PHONY) $(wildcard $^),$^)
+>  if_changed = $(if $(strip $(any-prereq) $(arg-check)),                       \
+>         @set -e;                                                             \
+>         $(echo-cmd) $(cmd_$(1));                                             \
+> -       echo 'cmd_$@ := $(make-cmd)' > $(dot-target).cmd)
+> +       printf '%s\n' 'cmd_$@ := $(make-cmd)' > $(dot-target).cmd)
+>
+>  # Execute the command and also postprocess generated .d dependencies file.
+>  if_changed_dep = $(if $(strip $(any-prereq) $(arg-check) ),                  \
