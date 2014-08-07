@@ -1,13 +1,14 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:41995 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750760AbaHGULc (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 7 Aug 2014 16:11:32 -0400
-Date: Thu, 7 Aug 2014 22:11:28 +0200
-From: Michal Marek <mmarek@suse.cz>
+Received: from asavdk4.altibox.net ([109.247.116.15]:44205 "EHLO
+	asavdk4.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750760AbaHGUSl (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 7 Aug 2014 16:18:41 -0400
+Date: Thu, 7 Aug 2014 22:18:35 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
 Subject: Re: [PATCH v3] kbuild: kselftest - new make target to build and run
  kernel selftests
-Message-ID: <20140807201128.GA31774@sepie.suse.cz>
+Message-ID: <20140807201835.GA2503@ravnborg.org>
 References: <1407438466-7196-1-git-send-email-shuah.kh@samsung.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -16,7 +17,7 @@ In-Reply-To: <1407438466-7196-1-git-send-email-shuah.kh@samsung.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Shuah Khan <shuah.kh@samsung.com>
-Cc: gregkh@linuxfoundation.org, sam@ravnborg.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: mmarek@suse.cz, gregkh@linuxfoundation.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
 On Thu, Aug 07, 2014 at 01:07:46PM -0600, Shuah Khan wrote:
 > Add a new make target "kselftest" to enable kernel testing. This
@@ -26,15 +27,6 @@ On Thu, Aug 07, 2014 at 01:07:46PM -0600, Shuah Khan wrote:
 > running kselftest on it.
 > 
 > Signed-off-by: Shuah Khan <shuah.kh@samsung.com>
-
-When sending updated versions of patches, plese include a short revision
-history in the email, to make it obvious what has changed in each version.
-
-Anyway, v3 looks good, I applied it to kbuild.git#misc now.
-
-Thanks,
-Michal
-
 > ---
 >  Makefile | 12 ++++++++++++
 >  1 file changed, 12 insertions(+)
@@ -65,10 +57,9 @@ Michal
 > +	@echo  '  kselftest       - Build and run kernel selftest (run as root)'
 > +	@echo  '                    Build, install, and boot kernel before'
 > +	@echo  '                    running kselftest on it'
-> +	@echo  ''
->  	@echo  'Kernel packaging:'
->  	@$(MAKE) $(build)=$(package-dir) help
->  	@echo  ''
-> -- 
-> 1.9.1
-> 
+It is never good to advertise to run something as root.
+But I see that this is recommended for now so the patch has my:
+Acked-by: Sam Ravnborg <sam@ravnborg.org>
+
+	Sam
+
