@@ -1,56 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from qmta12.emeryville.ca.mail.comcast.net ([76.96.27.227]:44301
-	"EHLO qmta12.emeryville.ca.mail.comcast.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1757795AbaHGODR (ORCPT
+Received: from asavdk3.altibox.net ([109.247.116.14]:58829 "EHLO
+	asavdk3.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757488AbaHGP5V (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 7 Aug 2014 10:03:17 -0400
-From: Shuah Khan <shuah.kh@samsung.com>
-Subject: [PATCH v2] kbuild: kselftest - new make target to build and run kernel selftests
-Date: Thu,  7 Aug 2014 08:03:12 -0600
-Message-Id: <1407420192-4928-1-git-send-email-shuah.kh@samsung.com>
+	Thu, 7 Aug 2014 11:57:21 -0400
+Date: Thu, 7 Aug 2014 17:57:14 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH v2] kbuild: kselftest - new make target to build and run
+ kernel selftests
+Message-ID: <20140807155713.GA1382@ravnborg.org>
+References: <1407420192-4928-1-git-send-email-shuah.kh@samsung.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1407420192-4928-1-git-send-email-shuah.kh@samsung.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mmarek@suse.cz, gregkh@linuxfoundation.org, sam@ravnborg.org
-Cc: Shuah Khan <shuah.kh@samsung.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Shuah Khan <shuah.kh@samsung.com>
+Cc: mmarek@suse.cz, gregkh@linuxfoundation.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Add a new make target "kselftest" to enable kernel testing. This
-new target builds and runs kernel selftests. Running as root is
-recommended for a complete test run as some tests don't run when
-run by non-root user.
+On Thu, Aug 07, 2014 at 08:03:12AM -0600, Shuah Khan wrote:
+> Add a new make target "kselftest" to enable kernel testing. This
+> new target builds and runs kernel selftests. Running as root is
+> recommended for a complete test run as some tests don't run when
+> run by non-root user.
 
-Signed-off-by: Shuah Khan <shuah.kh@samsung.com>
----
- Makefile | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+kselftest will run the test - but will not build the kerenl.
+That is does not build the kernel is IMO a good thing -
+as one may re-run the test while doing work on the kernel, and triggering
+a rebuild to re-run the test is not nice.
 
-diff --git a/Makefile b/Makefile
-index d0901b4..7eda9fb 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1036,6 +1036,13 @@ headers_check: headers_install
- 	$(Q)$(MAKE) $(hdr-inst)=arch/$(hdr-arch)/include/uapi/asm $(hdr-dst) HDRCHECK=1
- 
- # ---------------------------------------------------------------------------
-+# Kernel selftest
-+
-+PHONY += kselftest
-+kselftest:
-+	$(Q)$(MAKE) -C tools/testing/selftests run_tests
-+
-+# ---------------------------------------------------------------------------
- # Modules
- 
- ifdef CONFIG_MODULES
-@@ -1238,6 +1245,9 @@ help:
- 	@echo  '  headerdep       - Detect inclusion cycles in headers'
- 	@$(MAKE) -f $(srctree)/scripts/Makefile.help checker-help
- 	@echo  ''
-+	@echo  'Kernel selftest'
-+	@echo  '  kselftest       - Build and run kernel selftest (run as root)'
-+	@echo  ''
- 	@echo  'Kernel packaging:'
- 	@$(MAKE) $(build)=$(package-dir) help
- 	@echo  ''
--- 
-1.9.1
+The changelog + help text needs to be updated to reflect that the kernel is not
+built when you use "make kselftest".
 
+On top of this - can you please tell what plans exists to extend this.
+When we discussed "devtest" it was said that it would not be a wrapper
+for selftests run_tests only, but more was planned to be added.
+
+
+	Sam
