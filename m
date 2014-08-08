@@ -1,43 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.emea.novell.com ([130.57.118.101]:55265 "EHLO
-	mail.emea.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752322AbaHHNbJ convert rfc822-to-8bit (ORCPT
-	<rfc822;groupwise-linux-kbuild@vger.kernel.org:2:1>);
-	Fri, 8 Aug 2014 09:31:09 -0400
-Message-Id: <53E4ECDE020000780002A9A8@mail.emea.novell.com>
-Date: Fri, 08 Aug 2014 14:29:34 +0100
-From: "Jan Beulich" <JBeulich@suse.com>
-Subject: Re: firmware: fix build of external firmware
-References: <53E34DDC020000780002A045@mail.emea.novell.com>
- <53E4CEA1.8090207@suse.cz>
-In-Reply-To: <53E4CEA1.8090207@suse.cz>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8BIT
-Content-Disposition: inline
+Received: from mail-wi0-f176.google.com ([209.85.212.176]:61023 "EHLO
+	mail-wi0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752782AbaHHPXW (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 8 Aug 2014 11:23:22 -0400
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: [PATCH 1/4] Documentation: kbuild: Remove obsolete include/asm symlink step
+Date: Fri,  8 Aug 2014 17:23:07 +0200
+Message-Id: <1407511390-5429-1-git-send-email-geert@linux-m68k.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>, Randy Dunlap <rdunlap@infradead.org>
+Cc: linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, Geert Uytterhoeven <geert@linux-m68k.org>
 
->>> On 08.08.14 at 15:20, <mmarek@suse.cz> wrote:
-> On 2014-08-07 09:58, Jan Beulich wrote:
->> It looks like commit 5180d5f483 ("firmware: Simplify directory
->> creation") uncovered a latent bug: The cmd_fwbin make macro, which is
->> being called without any arguments, referenced argument 2, which I
->> suppose previously just happened to be set to the right value (from an
->> enclosing macro invocation - some make versions don't always properly
->> clear unused macro arguments on nested macro invocations). In 3.16 with
->> such make versions it now points into the source tree instead,
->> resulting in build failure when building outside the source tree. And
->> obviously on make versions properly clearing unused arguments it would
->> have resolved to empty.
-> 
-> With which make version are you seeing the error?
+As of commit f7f16b7799ed68654850ab340ef812895aebcf4c ("kbuild: drop
+include/asm"), the include/asm symlink is no longer created.
 
-3.80 and 3.81, albeit with the latter I can't construct a simple
-repro Makefile to demonstrate the problem (hence the mentioning
-of "make versions" _and_ "don't always").
+Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+---
+ Documentation/kbuild/makefiles.txt | 9 ++++-----
+ 1 file changed, 4 insertions(+), 5 deletions(-)
 
-Jan
+diff --git a/Documentation/kbuild/makefiles.txt b/Documentation/kbuild/makefiles.txt
+index c600e2f44a62..3b416592cc44 100644
+--- a/Documentation/kbuild/makefiles.txt
++++ b/Documentation/kbuild/makefiles.txt
+@@ -841,17 +841,16 @@ a few targets.
+ When kbuild executes, the following steps are followed (roughly):
+ 1) Configuration of the kernel => produce .config
+ 2) Store kernel version in include/linux/version.h
+-3) Symlink include/asm to include/asm-$(ARCH)
+-4) Updating all other prerequisites to the target prepare:
++3) Updating all other prerequisites to the target prepare:
+    - Additional prerequisites are specified in arch/$(ARCH)/Makefile
+-5) Recursively descend down in all directories listed in
++4) Recursively descend down in all directories listed in
+    init-* core* drivers-* net-* libs-* and build all targets.
+    - The values of the above variables are expanded in arch/$(ARCH)/Makefile.
+-6) All object files are then linked and the resulting file vmlinux is
++5) All object files are then linked and the resulting file vmlinux is
+    located at the root of the obj tree.
+    The very first objects linked are listed in head-y, assigned by
+    arch/$(ARCH)/Makefile.
+-7) Finally, the architecture-specific part does any required post processing
++6) Finally, the architecture-specific part does any required post processing
+    and builds the final bootimage.
+    - This includes building boot records
+    - Preparing initrd images and the like
+-- 
+1.9.1
 
