@@ -1,40 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from e24smtp05.br.ibm.com ([32.104.18.26]:49215 "EHLO
-	e24smtp05.br.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750874AbaHGUdM (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 7 Aug 2014 16:33:12 -0400
-Received: from /spool/local
-	by e24smtp05.br.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-kbuild@vger.kernel.org> from <cascardo@linux.vnet.ibm.com>;
-	Thu, 7 Aug 2014 17:33:10 -0300
-From: Thadeu Lima de Souza Cascardo <cascardo@linux.vnet.ibm.com>
-Subject: [PATCH] deb-pkg: support ppc64 and ppc64el Debian archs
-Date: Thu,  7 Aug 2014 17:32:53 -0300
-Message-Id: <1407443573-21522-1-git-send-email-cascardo@linux.vnet.ibm.com>
+Received: from cantor2.suse.de ([195.135.220.15]:53516 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752322AbaHHNUg (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 8 Aug 2014 09:20:36 -0400
+Received: from relay1.suse.de (charybdis-ext.suse.de [195.135.220.254])
+	by mx2.suse.de (Postfix) with ESMTP id 6952975022
+	for <linux-kbuild@vger.kernel.org>; Fri,  8 Aug 2014 13:20:33 +0000 (UTC)
+Message-ID: <53E4CEA1.8090207@suse.cz>
+Date: Fri, 08 Aug 2014 15:20:33 +0200
+From: Michal Marek <mmarek@suse.cz>
+MIME-Version: 1.0
+Subject: Re: firmware: fix build of external firmware
+References: <53E34DDC020000780002A045@mail.emea.novell.com>
+In-Reply-To: <53E34DDC020000780002A045@mail.emea.novell.com>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mmarek@suse.cz
-Cc: linux-kbuild@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org, brenohl@br.ibm.com, Thadeu Lima de Souza Cascardo <cascardo@linux.vnet.ibm.com>
+To: Jan Beulich <JBeulich@suse.com>
+Cc: linux-kbuild@vger.kernel.org
 
-Signed-off-by: Thadeu Lima de Souza Cascardo <cascardo@linux.vnet.ibm.com>
----
- scripts/package/builddeb |    2 ++
- 1 files changed, 2 insertions(+), 0 deletions(-)
+On 2014-08-07 09:58, Jan Beulich wrote:
+> It looks like commit 5180d5f483 ("firmware: Simplify directory
+> creation") uncovered a latent bug: The cmd_fwbin make macro, which is
+> being called without any arguments, referenced argument 2, which I
+> suppose previously just happened to be set to the right value (from an
+> enclosing macro invocation - some make versions don't always properly
+> clear unused macro arguments on nested macro invocations). In 3.16 with
+> such make versions it now points into the source tree instead,
+> resulting in build failure when building outside the source tree. And
+> obviously on make versions properly clearing unused arguments it would
+> have resolved to empty.
 
-diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index 35d5a58..c26c28b 100644
---- a/scripts/package/builddeb
-+++ b/scripts/package/builddeb
-@@ -36,6 +36,8 @@ create_package() {
- 		debarch=sparc ;;
- 	s390*)
- 		debarch=s390$(grep -q CONFIG_64BIT=y $KCONFIG_CONFIG && echo x || true) ;;
-+	ppc64*)
-+		debarch=ppc64$(grep -q CPU_LITTLE_ENDIAN=y $KCONFIG_CONFIG && echo el || true) ;;
- 	ppc*)
- 		debarch=powerpc ;;
- 	parisc*)
--- 
-1.7.1
+With which make version are you seeing the error?
 
+Thanks,
+Michal
