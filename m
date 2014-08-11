@@ -1,71 +1,82 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:43589 "EHLO mx2.suse.de"
+Received: from smtp.gentoo.org ([140.211.166.183]:47516 "EHLO smtp.gentoo.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754039AbaHKPXf (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 11 Aug 2014 11:23:35 -0400
-Date: Mon, 11 Aug 2014 17:23:32 +0200
-From: Michal Marek <mmarek@suse.cz>
-Subject: [GIT] kbuild misc changes for 3.17-rc1
-Message-ID: <20140811152332.GA4629@sepie.suse.cz>
+	id S1751276AbaHKRXY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 11 Aug 2014 13:23:24 -0400
+Message-ID: <53E8FC07.1090609@gentoo.org>
+Date: Mon, 11 Aug 2014 19:23:19 +0200
+From: justin <jlec@gentoo.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Subject: Re: [RFC] [PATCH] pkg-config default search pathes
+References: <cover.1407766447.git.silvio.fricke@gmail.com>
+In-Reply-To: <cover.1407766447.git.silvio.fricke@gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha512;
+ protocol="application/pgp-signature";
+ boundary="xpuBKw8q4QSLP9mFn2jttWOafpCxTDi41"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: himangi774@gmail.com, mmarek@suse.cz, shuah.kh@samsung.com, ydroneaud@opteya.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Silvio Fricke <silvio.fricke@gmail.com>, "Yann E . MORIN" <yann.morin.1998@free.fr>
+Cc: linux-kbuild@vger.kernel.org
 
-Hi Linus,
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--xpuBKw8q4QSLP9mFn2jttWOafpCxTDi41
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
 
-this is the non-critical part of kbuild for 3.17-rc1:
-- make help hint to use make -s with make kernelrelease et al.
-- Moved a kbuild document to Documentation/kbuild where it belongs
-- four new Coccinelle scripts, one dropped and one fixed
-- new make kselftest target to run various tests on the kernel
+On 11/08/14 16:22, Silvio Fricke wrote:
+> Hi,
+>=20
+> please review this patch.
+> I'm a little bit unsure if this patch is technicaly state-of-the-art be=
+cause
+> kbuild does it right. The problem is that some cross-toolchains (on my =
+box is
+> yocto installed) change the pkg-config search pathes to do some package=
+-config
+> setups for cross compiling.
+> But the init of the toolchain manipulates PKG_CONFIG_SYSROOT_DIR and
+> PKG_CONFIG_PATH variables that a pkg-config call searches in the wrong =
+place to
+> find the package and gives back the wrong values which we use to test t=
+he
+> availability of ncurses installation and this break the [x,g,menu]confi=
+g.
+>=20
+> Some recommendations for this?
+>=20
+>=20
 
-Michal
+Hi Silvio,
+
+What would happen in a real crosscompile case?
+
+Justin
 
 
-The following changes since commit 7171511eaec5bf23fb06078f59784a3a0626b38f:
 
-  Linux 3.16-rc1 (2014-06-15 17:45:28 -1000)
+--xpuBKw8q4QSLP9mFn2jttWOafpCxTDi41
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-are available in the git repository at:
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG/MacGPG2 v2.0
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git misc
+iQJ8BAEBCgBmBQJT6PwIXxSAAAAAAC4AKGlzc3Vlci1mcHJAbm90YXRpb25zLm9w
+ZW5wZ3AuZmlmdGhob3JzZW1hbi5uZXQyQ0JDQjFGMzBDQ0UxMjFGNENDNDgxMDdC
+OUQ0RjIzMUJEMTU1OEFCAAoJELnU8jG9FVirdQ0P/jRuxmMN3m/+8qiP5Ilk7uVw
+/zwojC2czG5g8ATJEWlQuo5u/ZDAJCldo4dfzbrzG9nrIT2cd4/wpLAT+vTz/XO9
+PSVxILnZ1+xfnGrzS1yqKsAjg8c+RlM+vAbw6Ickn9Lg8ZZ/0N6r2Sp8dWXRy2n/
+2pxVj6QacMp/8s7Gk4uTY3eujni99Thoz3sSVileQsW1PU8j0oBi4UlgpKZ8DLtn
+H9hwX98Id1WUkRv49AnC22xqctzSm931u0kPMrkMAowGtPscDpsYrQVqcpCM6eph
+VIcD5c8MWkuscjO+ASnUN4ezQKFP2jvvuplvsZpq1yAOE99ZQDpcXVInMOSNi+wm
+qzqmk9tECIauUDcpwIvApC7/v1rqw+KkznJVMn/IpvumNajPa7E85Y/v333Abbi3
+tFvGqAVaX4dY0Mo57rAFWnrjOVHVh99jCHW0LjJYalZsseSV26+q4In2qXkXVLh5
+O0PH45Qc5L5Q6WqbmHa2PqPBz6RYe0Rgw0RjSQY9fNaAklNOLu6H0WOb4PbCwF0h
+vaNRkCDb65ytb0yUS8SFqmwTNZXvUGjO8yt1CwM/tbQFrgPTk4doDiocjtNFLsDP
+pgWpI8QDh99jpZtR4E96Eyw1mizH2fa8xyuxGb7uVDRkhrXM0FnM1q4WsmlntdTb
+kk5jMztEcVVQtT6MEAPr
+=iwPA
+-----END PGP SIGNATURE-----
 
-for you to fetch changes up to 5a5da78b3a48120d942c8a18ecc645f6acdf7da6:
-
-  kbuild: kselftest - new make target to build and run kernel selftests (2014-08-07 22:30:01 +0200)
-
-----------------------------------------------------------------
-Himangi Saraogi (5):
-      coccinelle/null: solve parse error
-      Coccinelle: Script to detect cast after memory allocation
-      Coccinelle: Script to use ARRAY_SIZE instead of division of two sizeofs
-      Coccinelle: Script to detect incorrect argument to sizeof
-      Coccinelle: Script to replace if and BUG with BUG_ON
-
-Michal Marek (1):
-      kbuild: make -s should be used with kernelrelease/kernelversion/image_name
-
-Shuah Khan (1):
-      kbuild: kselftest - new make target to build and run kernel selftests
-
-Yann Droneaud (1):
-      Documentation: headers_install.txt is part of kbuild
-
- Documentation/kbuild/00-INDEX                      |  2 +
- Documentation/{make => kbuild}/headers_install.txt |  0
- Makefile                                           | 18 ++++-
- scripts/coccinelle/api/alloc/alloc_cast.cocci      | 72 ++++++++++++++++++
- scripts/coccinelle/misc/array_size.cocci           | 87 ++++++++++++++++++++++
- scripts/coccinelle/misc/badty.cocci                | 76 +++++++++++++++++++
- .../drop_kmalloc_cast.cocci => misc/bugon.cocci}   | 47 ++++++------
- scripts/coccinelle/null/badzero.cocci              |  3 +-
- 8 files changed, 275 insertions(+), 30 deletions(-)
- rename Documentation/{make => kbuild}/headers_install.txt (100%)
- create mode 100644 scripts/coccinelle/api/alloc/alloc_cast.cocci
- create mode 100644 scripts/coccinelle/misc/array_size.cocci
- create mode 100644 scripts/coccinelle/misc/badty.cocci
- rename scripts/coccinelle/{api/alloc/drop_kmalloc_cast.cocci => misc/bugon.cocci} (50%)
+--xpuBKw8q4QSLP9mFn2jttWOafpCxTDi41--
