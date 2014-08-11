@@ -1,61 +1,83 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f174.google.com ([209.85.212.174]:49535 "EHLO
-	mail-wi0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752782AbaHHPXZ (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 8 Aug 2014 11:23:25 -0400
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Subject: [PATCH 2/4] Documentation: kbuild: Improve if_changed documentation
-Date: Fri,  8 Aug 2014 17:23:08 +0200
-Message-Id: <1407511390-5429-2-git-send-email-geert@linux-m68k.org>
-In-Reply-To: <1407511390-5429-1-git-send-email-geert@linux-m68k.org>
-References: <1407511390-5429-1-git-send-email-geert@linux-m68k.org>
+Received: from thoth.sbs.de ([192.35.17.2]:57337 "EHLO thoth.sbs.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752371AbaHKFwq (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 11 Aug 2014 01:52:46 -0400
+Message-ID: <53E85731.3000507@siemens.com>
+Date: Mon, 11 Aug 2014 07:40:01 +0200
+From: Jan Kiszka <jan.kiszka@siemens.com>
+MIME-Version: 1.0
+Subject: Re: [PATCH gdb/scripts] scripts/gdb: Ignore byte-compiled python
+ files
+References: <1407335269-9533-1-git-send-email-daniel.thompson@linaro.org>
+In-Reply-To: <1407335269-9533-1-git-send-email-daniel.thompson@linaro.org>
+Content-Type: text/plain; charset=ISO-8859-15
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>, Randy Dunlap <rdunlap@infradead.org>
-Cc: linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, Geert Uytterhoeven <geert@linux-m68k.org>
+To: Daniel Thompson <daniel.thompson@linaro.org>
+Cc: linux-kernel@vger.kernel.org, patches@linaro.org, linaro-kernel@lists.linaro.org, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
-  - These days if_changed is used with many more commands than ld,
-    objcopy, and gzip, hence add an ellipsis,
-  - Any target that utilises if_changed must be listed in $(targets),
-    so it needs an assignment to "targets", not "target".
+On 2014-08-06 16:27, Daniel Thompson wrote:
+> Using the gdb scripts leaves byte-compiled python files in the scripts/
+> directory. These should be ignored by git and cleaned up by mrproper.
+> 
+> Signed-off-by: Daniel Thompson <daniel.thompson@linaro.org>
+> Cc: Jan Kiszka <jan.kiszka@siemens.com>
+> Cc: Michal Marek <mmarek@suse.cz>
+> Cc: linux-kbuild@vger.kernel.org
+> ---
+> 
+> Notes:
+>     Relies upon (and intended for incorporation into) Jan Kiszka's gdb/scripts
+>     patch series.
+> 
+>  .gitignore                   | 1 +
+>  Makefile                     | 2 +-
+>  scripts/gdb/linux/.gitignore | 2 ++
+>  3 files changed, 4 insertions(+), 1 deletion(-)
+>  create mode 100644 scripts/gdb/linux/.gitignore
+> 
+> diff --git a/.gitignore b/.gitignore
+> index f4c0b09..a04486e 100644
+> --- a/.gitignore
+> +++ b/.gitignore
+> @@ -42,6 +42,7 @@ Module.symvers
+>  /TAGS
+>  /linux
+>  /vmlinux
+> +/vmlinux-gdb.py
+>  /vmlinuz
+>  /System.map
+>  /Module.markers
+> diff --git a/Makefile b/Makefile
+> index 7105eb2a..a3ca8ba 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -1136,7 +1136,7 @@ MRPROPER_FILES += .config .config.old .version .old_version $(version_h) \
+>  		  signing_key.priv signing_key.x509 x509.genkey		\
+>  		  extra_certificates signing_key.x509.keyid		\
+>  		  signing_key.x509.signer include/linux/version.h	\
+> -		  vmlinux-gdb.py
+> +		  vmlinux-gdb.py scripts/gdb/linux/*.py[co]
+>  
+>  # clean - Delete most, but leave enough to build external modules
+>  #
+> diff --git a/scripts/gdb/linux/.gitignore b/scripts/gdb/linux/.gitignore
+> new file mode 100644
+> index 0000000..52e4e61
+> --- /dev/null
+> +++ b/scripts/gdb/linux/.gitignore
+> @@ -0,0 +1,2 @@
+> +*.pyc
+> +*.pyo
+> 
 
-Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
----
- Documentation/kbuild/makefiles.txt | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Thanks, picked up into my queue. Rebased version pushed. I'll repost the
+series once again soon.
 
-diff --git a/Documentation/kbuild/makefiles.txt b/Documentation/kbuild/makefiles.txt
-index 3b416592cc44..1c6056f1b95f 100644
---- a/Documentation/kbuild/makefiles.txt
-+++ b/Documentation/kbuild/makefiles.txt
-@@ -1115,7 +1115,7 @@ When kbuild executes, the following steps are followed (roughly):
- 
- 	Usage:
- 		target: source(s) FORCE
--			$(call if_changed,ld/objcopy/gzip)
-+			$(call if_changed,ld/objcopy/gzip/...)
- 
- 	When the rule is evaluated, it is checked to see if any files
- 	need an update, or the command line has changed since the last
-@@ -1133,7 +1133,7 @@ When kbuild executes, the following steps are followed (roughly):
- 	significant; for instance, the below will fail (note the extra space
- 	after the comma):
- 		target: source(s) FORCE
--	#WRONG!#	$(call if_changed, ld/objcopy/gzip)
-+	#WRONG!#	$(call if_changed, ld/objcopy/gzip/...)
- 
-     ld
- 	Link target. Often, LDFLAGS_$@ is used to set specific options to ld.
-@@ -1165,7 +1165,7 @@ When kbuild executes, the following steps are followed (roughly):
- 
- 	The ": %: %.o" part of the prerequisite is a shorthand that
- 	free us from listing the setup.o and bootsect.o files.
--	Note: It is a common mistake to forget the "target :=" assignment,
-+	Note: It is a common mistake to forget the "targets :=" assignment,
- 	      resulting in the target file being recompiled for no
- 	      obvious reason.
- 
+Jan
+
 -- 
-1.9.1
-
+Siemens AG, Corporate Technology, CT RTC ITP SES-DE
+Corporate Competence Center Embedded Linux
