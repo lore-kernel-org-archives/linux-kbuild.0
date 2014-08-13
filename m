@@ -1,71 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from asavdk3.altibox.net ([109.247.116.14]:60263 "EHLO
-	asavdk3.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750717AbaHMFFz (ORCPT
+Received: from mail-lb0-f175.google.com ([209.85.217.175]:36810 "EHLO
+	mail-lb0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751907AbaHMIDM (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 13 Aug 2014 01:05:55 -0400
-Date: Wed, 13 Aug 2014 07:05:49 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: Problem building 3.16 with make O=...
-Message-ID: <20140813050549.GA30459@ravnborg.org>
-References: <CA+r1Zhg5=9Ff90Ur0Bfgrc3eCr404Ym_amn-0SDpnndYSHV++w@mail.gmail.com>
+	Wed, 13 Aug 2014 04:03:12 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CA+r1Zhg5=9Ff90Ur0Bfgrc3eCr404Ym_amn-0SDpnndYSHV++w@mail.gmail.com>
+In-Reply-To: <53EA99C3.90203@gmail.com>
+References: <53EA99C3.90203@gmail.com>
+Date: Wed, 13 Aug 2014 10:03:09 +0200
+Message-ID: <CAMuHMdV_2b-A+eE--cXEFA68=72HK6mqx8+TCXRMVkyhESLYxQ@mail.gmail.com>
+Subject: Re: [PATCH v2] arch: Kconfig: Let all little endian architectures
+ define CPU_LITTLE_ENDIAN explicitly
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jim Davis <jim.epost@gmail.com>
-Cc: linux-kbuild@vger.kernel.org
+To: Chen Gang <gang.chen.5i5j@gmail.com>
+Cc: Arnd Bergmann <arnd@arndb.de>, Andrew Morton <akpm@linux-foundation.org>, Jean Delvare <jdelvare@suse.de>, Russell King <linux@arm.linux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Mark Salter <msalter@redhat.com>, "a-jacquiot@ti.com" <a-jacquiot@ti.com>, Tony Luck <tony.luck@intel.com>, Fenghua Yu <fenghua.yu@intel.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, the arch/x86 maintainers <x86@kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, linux-c6x-dev@linux-c6x.org, "linux-ia64@vger.kernel.org" <linux-ia64@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Linux-Arch <linux-arch@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On Tue, Aug 12, 2014 at 05:22:46PM -0700, Jim Davis wrote:
-> I'm trying to build 3.16 on my Ubuntu 14.04 system, starting with the
-> stock kernel config file.  This works just fine:
-> 
-> make distclean && git clean -fdx
-> git describe (and check that it is indeed v3.16)
-> make mrproper (just in case)
-> cp /boot/config*24-generic .config
-> yes "" | make oldconfig >/dev/null
-> make
-> 
-> But changing that recipe to
-> 
-> yes "" | make O=/tmp/$$ oldconfig >/dev/null
-> make O=/tmp/$$
-> 
-> fails with
-> 
-> make[1]: Entering directory `/tmp/29520'
->   GEN     ./Makefile
-> scripts/kconfig/conf --silentoldconfig Kconfig
->   SYSTBL  arch/x86/syscalls/../include/generated/asm/syscalls_32.h
->   SYSHDR  arch/x86/syscalls/../include/generated/asm/unistd_32_ia32.h
->   SYSHDR  arch/x86/syscalls/../include/generated/asm/unistd_64_x32.h
->   SYSTBL  arch/x86/syscalls/../include/generated/asm/syscalls_64.h
->   SYSHDR  arch/x86/syscalls/../include/generated/uapi/asm/unistd_32.h
->   SYSHDR  arch/x86/syscalls/../include/generated/uapi/asm/unistd_64.h
->   SYSHDR  arch/x86/syscalls/../include/generated/uapi/asm/unistd_x32.h
->   HOSTCC  arch/x86/tools/relocs_32.o
->   HOSTCC  arch/x86/tools/relocs_64.o
->   HOSTCC  arch/x86/tools/relocs_common.o
->   HOSTLD  arch/x86/tools/relocs
->   CHK     include/config/kernel.release
->   UPD     include/config/kernel.release
->   Using /home/jim/linux-rc as source for kernel
->   /home/jim/linux-rc is not clean, please run 'make mrproper'
->   in the '/home/jim/linux-rc' directory.
-> make[1]: *** [prepare3] Error 1
-> make: *** [sub-make] Error 2
-> 
-> What am I missing?
-You need to copy the config to the output directory - not the source directory.
-Change this line:
-    cp /boot/config*24-generic .config
-to something like this:
-    cp /boot/config*24-generic /tmp/$$/.config
+CC kbuild
 
-Should do the trick.
-Make sure the dir exist before you copy.
+On Wed, Aug 13, 2014 at 12:48 AM, Chen Gang <gang.chen.5i5j@gmail.com> wrote:
+> diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
+> index c49a775..0510a5d 100644
+> --- a/arch/arm/Kconfig
+> +++ b/arch/arm/Kconfig
+> @@ -199,6 +199,11 @@ config NEED_DMA_MAP_STATE
+>  config ARCH_SUPPORTS_UPROBES
+>         def_bool y
+>
+> +config CPU_LITTLE_ENDIAN
+> +       depends on !CPU_BIG_ENDIAN
+> +       def_bool y
+> +
+> +
+>  config ARCH_HAS_DMA_SET_COHERENT_MASK
+>         bool
 
-	Sam
+As this is a common symbol, and replicated for all affected architectures,
+I'm wondering if we should have the "config CPU_LITTLE_ENDIAN" in
+common Kconfig code instead, and make the individual architectures do a
+"select CPU_LITTLE_ENDIAN"?
+
+Also we could have "config CPU_BIG_ENDIAN", too, and error out
+if none or both are selected (can Kconfig error out?).
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
