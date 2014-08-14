@@ -1,155 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ig0-f173.google.com ([209.85.213.173]:47499 "EHLO
-	mail-ig0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754544AbaHNNyJ (ORCPT
+Received: from mail-pd0-f181.google.com ([209.85.192.181]:37663 "EHLO
+	mail-pd0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754601AbaHNWVX (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 14 Aug 2014 09:54:09 -0400
+	Thu, 14 Aug 2014 18:21:23 -0400
+Date: Thu, 14 Aug 2014 15:21:19 -0700
+From: Brian Norris <computersforpeace@gmail.com>
+Subject: Overriding -Werror
+Message-ID: <20140814222119.GD18411@ld-irv-0074>
 MIME-Version: 1.0
-In-Reply-To: <ghd2c3h8bc.fsf@quad.gouders.net>
-References: <ghr4asl38m.fsf@lena.gouders.net>
-	<ghk3gkl32u.fsf@lena.gouders.net>
-	<20131118180813.GB3458@free.fr>
-	<CADYTM3YPscaS18KqAOkymRqWKGp4vQFsrefZNtuZddpkDoBWkg@mail.gmail.com>
-	<ghd2c3h8bc.fsf@quad.gouders.net>
-Date: Thu, 14 Aug 2014 08:54:08 -0500
-Message-ID: <CADYTM3b6iL3xqoZTkHxbS3aUfZMywDkYekZVmGQy2TQt-4SnTA@mail.gmail.com>
-Subject: Re: [PATCH v4] kconfig/symbol.c: handle choice_values that depend on
- 'm' symbols
-From: Bin Liu <binmlist@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dirk Gouders <dirk@gouders.net>
-Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Felipe Balbi <balbi@ti.com>, USB list <linux-usb@vger.kernel.org>, Tomi Valkeinen <tomi.valkeinen@ti.com>, Roger Quadros <rogerq@ti.com>
+To: Linux Kernel <linux-kernel@vger.kernel.org>
+Cc: linux-kbuild@vger.kernel.org, Brian Norris <computersforpeace@gmail.com>, Ralf Baechle <ralf@linux-mips.org>, Artem Bityutskiy <dedekind1@gmail.com>
 
-Dirk,
+Hi all,
 
-On Thu, Aug 14, 2014 at 1:52 AM, Dirk Gouders <dirk@gouders.net> wrote:
-> Bin Liu <binmlist@gmail.com> writes:
->
->> All,
->>
->> On Mon, Nov 18, 2013 at 12:08 PM, Yann E. MORIN <yann.morin.1998@free.fr> wrote:
->>> Dirk, All,
->>>
->>> On 2013-11-07 15:05 +0100, Dirk Gouders spake thusly:
->>>> If choices consist of choice_values that depend on symbols set to 'm',
->>>> those choice_values are not set to 'n' if the choice is changed from
->>>> 'm' to 'y' (in which case only one active choice_value is allowed).
->>>> Those values are also written to the config file causing modules to be
->>>> built when they should not.
->>>>
->>>> The following config can be used to reproduce and examine the problem;
->>>> with the frontend of your choice set "Choice 0" and "Choice 1" to 'm',
->>>> then set "Tristate Choice" to 'y' and save the configuration:
->>>>
->>>> config modules
->>>>       boolean modules
->>>>       default y
->>>>       option modules
->>>>
->>>> config dependency
->>>>       tristate "Dependency"
->>>>       default m
->>>>
->>>> choice
->>>>       prompt "Tristate Choice"
->>>>       default choice0
->>>>
->>>> config choice0
->>>>       tristate "Choice 0"
->>>>
->>>> config choice1
->>>>       tristate "Choice 1"
->>>>       depends on dependency
->>>>
->>>> endchoice
->>>>
->>>> This patch sets choice_values' visibility that depend on symbols set
->>>> to 'm' to 'n' if the corresponding choice is set to 'y'.  This makes
->>>> them disappear from the choice list and will also cause the
->>>> choice_values' value set to 'n' in sym_calc_value() and as a result
->>>> they are written as "not set" to the resulting .config file.
->>>>
->>>> Reported-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
->>>> Signed-off-by: Dirk Gouders <dirk@gouders.net>
->>>> Tested-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
->>>
->>> Acked-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
->>>
->>> It will be in my tree soon. Thanks!
->>
->> I don't see this patch in 3.16 but 3.16 does not have the issue any
->> more. Anyone has an idea how the issue got fixed? I am trying to find
->> the right patch to backport.
->
-> With the above sample kconfig I still see the issue.  How did you
-> notice the issue got fixed?
+I'm interested in being able to build-test kernels on various
+architectures while enabling extra warnings (make W=[123]). I'd like to
+be able to finish the builds and see all warnings, rather than seeing a
+failed build. However, GCC's -Werror is incompatible with this. There is
+plenty of code that will produce at least one warning, when warning
+verbosity is turned up. And GCC's -Werror is not guaranteed to remain
+stable over time; new versions may develop new warnings that may or may
+not be legitimate.
 
-I did not pay much attention on the above sample kconfig, but just
-focused on the USB gadget driver kconfig issue initially reported by
-Sebastian. I saw the issue exists in 3.14, but does not in 3.16,
-unless I messed up with my test. I will test 3.16 again some time next
-week.
+It seems that there are a few problem ARCHes that enable -Werror by
+default: SuperH (orphaned), SPARC, and MIPS. There are also a few
+scattered Makefiles throughout the build tree. Developers have
+previously tried to remove some of the worst offenders [1], but were
+mostly rejected [2]. It doesn't seem like we can fully prevent
+maintainers from enabling -Werror on their code--or even on their entire
+ARCH build, as with MIPS--for better or worse, so I look to other
+alternatives.
+
+For the easiest approach, I considered how one might add -Wno-error to
+the CFLAGS. 'make KCFLAGS=-Wno-error' looked promising, but
+KBUILD_CFLAGS is applied before the sub-directory Makefiles add their
+own options to ccflags-y. So it seems like others have come to the same
+conclusion as me: that Kbuild doesn't seem to provide a way to override
+the -Werror behvaior from the top level. [3][4]
+
+So, how can we fix this? -Werror may be useful in some cases to
+encourage developers to fix up their code immediately, but it is
+decidedly unhelpful when running code through analysis tools.
+
+Possibilities include:
+
+1. make -Werror be applied only when we do not have W=[123]. [5]
+
+2. develop a top-level override for CFLAGS that is applied *after* all
+   sub-directory modifications
+
+3. make -Werror opt-in / configurable, like PPC's CONFIG_PPC_WERROR
+   (maybe make it a generic CONFIG_WERROR?), and prevent its
+   unconditional use in Makefiles
+
+4. better ideas?
 
 Regards,
--Bin.
+Brian
 
->
-> Dirk
->
->>
->> Thanks,
->> -Bin.
->>
->>>
->>> Regards,
->>> Yann E. MORIN.
->>>
->>>> ---
->>>>  scripts/kconfig/symbol.c | 11 +++++++++++
->>>>  1 file changed, 11 insertions(+)
->>>>
->>>> diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
->>>> index c9a6775..06d96c9 100644
->>>> --- a/scripts/kconfig/symbol.c
->>>> +++ b/scripts/kconfig/symbol.c
->>>> @@ -189,12 +189,23 @@ static void sym_validate_range(struct symbol *sym)
->>>>  static void sym_calc_visibility(struct symbol *sym)
->>>>  {
->>>>       struct property *prop;
->>>> +     struct symbol *choice_sym = NULL;
->>>>       tristate tri;
->>>>
->>>>       /* any prompt visible? */
->>>>       tri = no;
->>>> +
->>>> +     if (sym_is_choice_value(sym))
->>>> +             choice_sym = prop_get_symbol(sym_get_choice_prop(sym));
->>>> +
->>>>       for_all_prompts(sym, prop) {
->>>>               prop->visible.tri = expr_calc_value(prop->visible.expr);
->>>> +             /*
->>>> +              * choice_values with visibility 'mod' are not visible if the
->>>> +              * corresponding choice's value is 'yes'.
->>>> +              */
->>>> +             if (prop->visible.tri == mod && (choice_sym && choice_sym->curr.tri == yes))
->>>> +                     prop->visible.tri = no;
->>>>               tri = EXPR_OR(tri, prop->visible.tri);
->>>>       }
->>>>       if (tri == mod && (sym->type != S_TRISTATE || modules_val == no))
->>>> --
->>>> 1.8.4
->>>>
->>>
->>> --
->>> .-----------------.--------------------.------------------.--------------------.
->>> |  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
->>> | +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
->>> | +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
->>> | http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
->>> '------------------------------^-------^------------------^--------------------'
->>> --
->>> To unsubscribe from this list: send the line "unsubscribe linux-usb" in
->>> the body of a message to majordomo@vger.kernel.org
->>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+[1] http://www.linux-mips.org/archives/linux-mips/2012-04/msg00179.html
+    http://patchwork.ozlabs.org/patch/146297/
+
+[2] http://www.linux-mips.org/archives/linux-mips/2012-05/msg00064.html
+
+[3] http://lists.linaro.org/pipermail/linaro-toolchain/2011-November/001869.html
+
+[4] http://lists.linaro.org/pipermail/linaro-dev/2011-December/008880.html
+
+[5] http://www.linux-mips.org/archives/linux-mips/2012-05/msg00070.html
