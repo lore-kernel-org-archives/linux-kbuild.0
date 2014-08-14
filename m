@@ -1,140 +1,79 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from services.gouders.net ([141.101.32.176]:46633 "EHLO
-	services.gouders.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753595AbaHNGx1 (ORCPT
+Received: from mail-la0-f49.google.com ([209.85.215.49]:60656 "EHLO
+	mail-la0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752196AbaHNJCZ convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 14 Aug 2014 02:53:27 -0400
-From: Dirk Gouders <dirk@gouders.net>
-Subject: Re: [PATCH v4] kconfig/symbol.c: handle choice_values that depend on 'm' symbols
-In-Reply-To: <CADYTM3YPscaS18KqAOkymRqWKGp4vQFsrefZNtuZddpkDoBWkg@mail.gmail.com>
-	(Bin Liu's message of "Wed, 13 Aug 2014 10:35:59 -0500")
-References: <ghr4asl38m.fsf@lena.gouders.net>
-	<ghk3gkl32u.fsf@lena.gouders.net> <20131118180813.GB3458@free.fr>
-	<CADYTM3YPscaS18KqAOkymRqWKGp4vQFsrefZNtuZddpkDoBWkg@mail.gmail.com>
-Date: Thu, 14 Aug 2014 08:52:23 +0200
-Message-ID: <ghd2c3h8bc.fsf@quad.gouders.net>
+	Thu, 14 Aug 2014 05:02:25 -0400
+Received: by mail-la0-f49.google.com with SMTP id hz20so728524lab.8
+        for <linux-kbuild@vger.kernel.org>; Thu, 14 Aug 2014 02:02:21 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <53EC7839.3010704@roeck-us.net>
+References: <F5184659D418E34EA12B1903EE5EF5FD0130D4AC5B90@seldmbx02.corpusers.net>
+	<20140813180743.GB16662@roeck-us.net>
+	<CAMuHMdVEYEsk1EtBbAAinJ=7m5SRh-w4DZb=_N0gaMgpvtRadw@mail.gmail.com>
+	<20140813224507.GA29606@roeck-us.net>
+	<CAMuHMdXZWhLtTzUnPymSt-P=viz7O7fq8nFaM-mHLT+XMnRJcA@mail.gmail.com>
+	<53EC7839.3010704@roeck-us.net>
+Date: Thu, 14 Aug 2014 11:02:21 +0200
+Message-ID: <CAMuHMdVQkqiE_S3ZAFziYXT4qESeofvC-6MsXfo_pYJxez2udQ@mail.gmail.com>
+Subject: Re: [Ksummit-discuss] RFC: Kernel tinification - kernel config reduction
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Bin Liu <binmlist@gmail.com>
-Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Felipe Balbi <balbi@ti.com>, USB list <linux-usb@vger.kernel.org>, Tomi Valkeinen <tomi.valkeinen@ti.com>, Roger Quadros <rogerq@ti.com>
+To: Guenter Roeck <linux@roeck-us.net>
+Cc: "Bird, Tim" <Tim.Bird@sonymobile.com>, "ksummit-discuss@lists.linuxfoundation.org" <ksummit-discuss@lists.linuxfoundation.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-Bin Liu <binmlist@gmail.com> writes:
+Hi Günther,
 
-> All,
+CC kbuild
+
+On Thu, Aug 14, 2014 at 10:50 AM, Guenter Roeck <linux@roeck-us.net> wrote:
+> On 08/14/2014 12:40 AM, Geert Uytterhoeven wrote:
+>>> Maybe something like
+>>>
+>>> make PCI=n allmodconfig
+>>> make GPIOLIB=n allmodconfig
+>>>
+>>> which would let me disable key options selectively so I can improve
+>>> compile
+>>> coverage without having to go through all configurations (or randconfig).
+>>
+>>
+>> That's doable, using KCONFIG_ALLCONFIG.
+>>
+> I'll play with it some more, but a quick glance (and test) suggests that I
+> can
+> only use it to force a configuration option to be true, not to force it to
+> be false. Also, there seems to be an odd side effect.
 >
-> On Mon, Nov 18, 2013 at 12:08 PM, Yann E. MORIN <yann.morin.1998@free.fr> wrote:
->> Dirk, All,
->>
->> On 2013-11-07 15:05 +0100, Dirk Gouders spake thusly:
->>> If choices consist of choice_values that depend on symbols set to 'm',
->>> those choice_values are not set to 'n' if the choice is changed from
->>> 'm' to 'y' (in which case only one active choice_value is allowed).
->>> Those values are also written to the config file causing modules to be
->>> built when they should not.
->>>
->>> The following config can be used to reproduce and examine the problem;
->>> with the frontend of your choice set "Choice 0" and "Choice 1" to 'm',
->>> then set "Tristate Choice" to 'y' and save the configuration:
->>>
->>> config modules
->>>       boolean modules
->>>       default y
->>>       option modules
->>>
->>> config dependency
->>>       tristate "Dependency"
->>>       default m
->>>
->>> choice
->>>       prompt "Tristate Choice"
->>>       default choice0
->>>
->>> config choice0
->>>       tristate "Choice 0"
->>>
->>> config choice1
->>>       tristate "Choice 1"
->>>       depends on dependency
->>>
->>> endchoice
->>>
->>> This patch sets choice_values' visibility that depend on symbols set
->>> to 'm' to 'n' if the corresponding choice is set to 'y'.  This makes
->>> them disappear from the choice list and will also cause the
->>> choice_values' value set to 'n' in sym_calc_value() and as a result
->>> they are written as "not set" to the resulting .config file.
->>>
->>> Reported-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
->>> Signed-off-by: Dirk Gouders <dirk@gouders.net>
->>> Tested-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
->>
->> Acked-by: "Yann E. MORIN" <yann.morin.1998@free.fr>
->>
->> It will be in my tree soon. Thanks!
+> With
+>         kconfig.gpio:   "CONFIG_GPIOLIB=y"
+> and
+>         kconfig.nogpio: "# CONFIG_GPIOLIB is not set"
 >
-> I don't see this patch in 3.16 but 3.16 does not have the issue any
-> more. Anyone has an idea how the issue got fixed? I am trying to find
-> the right patch to backport.
-
-With the above sample kconfig I still see the issue.  How did you
-notice the issue got fixed?
-
-Dirk
-
+> KCONFIG_ALLCONFIG=kconfig.gpio make allnoconfig
+>         causes CONFIG_GPIOLIB to be set.
 >
-> Thanks,
-> -Bin.
->
->>
->> Regards,
->> Yann E. MORIN.
->>
->>> ---
->>>  scripts/kconfig/symbol.c | 11 +++++++++++
->>>  1 file changed, 11 insertions(+)
->>>
->>> diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
->>> index c9a6775..06d96c9 100644
->>> --- a/scripts/kconfig/symbol.c
->>> +++ b/scripts/kconfig/symbol.c
->>> @@ -189,12 +189,23 @@ static void sym_validate_range(struct symbol *sym)
->>>  static void sym_calc_visibility(struct symbol *sym)
->>>  {
->>>       struct property *prop;
->>> +     struct symbol *choice_sym = NULL;
->>>       tristate tri;
->>>
->>>       /* any prompt visible? */
->>>       tri = no;
->>> +
->>> +     if (sym_is_choice_value(sym))
->>> +             choice_sym = prop_get_symbol(sym_get_choice_prop(sym));
->>> +
->>>       for_all_prompts(sym, prop) {
->>>               prop->visible.tri = expr_calc_value(prop->visible.expr);
->>> +             /*
->>> +              * choice_values with visibility 'mod' are not visible if the
->>> +              * corresponding choice's value is 'yes'.
->>> +              */
->>> +             if (prop->visible.tri == mod && (choice_sym && choice_sym->curr.tri == yes))
->>> +                     prop->visible.tri = no;
->>>               tri = EXPR_OR(tri, prop->visible.tri);
->>>       }
->>>       if (tri == mod && (sym->type != S_TRISTATE || modules_val == no))
->>> --
->>> 1.8.4
->>>
->>
->> --
->> .-----------------.--------------------.------------------.--------------------.
->> |  Yann E. MORIN  | Real-Time Embedded | /"\ ASCII RIBBON | Erics' conspiracy: |
->> | +33 662 376 056 | Software  Designer | \ / CAMPAIGN     |  ___               |
->> | +33 223 225 172 `------------.-------:  X  AGAINST      |  \e/  There is no  |
->> | http://ymorin.is-a-geek.org/ | _/*\_ | / \ HTML MAIL    |   v   conspiracy.  |
->> '------------------------------^-------^------------------^--------------------'
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-usb" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> KCONFIG_ALLCONFIG=kconfig.gpio make allmodconfig
+> KCONFIG_ALLCONFIG=kconfig.nogpio make allmodconfig
+>         both have the odd and at least for me unexpected effect of disabling
+>         CONFIG_MODULES, but do not affect CONFIG_GPIOLIB.
+
+Strange...
+
+I also saw strange things with randconfig, needing config input during the
+subsequent build, or "make oldconfig" asking new questions, just after
+having done a randconfig.
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
