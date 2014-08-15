@@ -1,215 +1,79 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ob0-f175.google.com ([209.85.214.175]:46479 "EHLO
-	mail-ob0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752908AbaHOJau (ORCPT
+Received: from mail.active-venture.com ([67.228.131.205]:51737 "EHLO
+	mail.active-venture.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750954AbaHOLE7 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 15 Aug 2014 05:30:50 -0400
+	Fri, 15 Aug 2014 07:04:59 -0400
+Message-ID: <53EDE958.1040200@roeck-us.net>
+Date: Fri, 15 Aug 2014 04:04:56 -0700
+From: Guenter Roeck <linux@roeck-us.net>
 MIME-Version: 1.0
-In-Reply-To: <20140814222119.GD18411@ld-irv-0074>
-References: <20140814222119.GD18411@ld-irv-0074>
-Date: Fri, 15 Aug 2014 02:30:49 -0700
-Message-ID: <CAL3LdT7-Ai7Dv93vrDP1o2BSVrmFAyTN=UAwE8n5+PVjpN1h0Q@mail.gmail.com>
-Subject: Re: Overriding -Werror
-From: Jeff Kirsher <jeffrey.t.kirsher@intel.com>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Ksummit-discuss] RFC: Kernel tinification - kernel config reduction
+References: <F5184659D418E34EA12B1903EE5EF5FD0130D4AC5B90@seldmbx02.corpusers.net>	<20140813180743.GB16662@roeck-us.net>	<CAMuHMdVEYEsk1EtBbAAinJ=7m5SRh-w4DZb=_N0gaMgpvtRadw@mail.gmail.com>	<20140813224507.GA29606@roeck-us.net>	<CAMuHMdXZWhLtTzUnPymSt-P=viz7O7fq8nFaM-mHLT+XMnRJcA@mail.gmail.com>	<53EC7839.3010704@roeck-us.net> <CAMuHMdVQkqiE_S3ZAFziYXT4qESeofvC-6MsXfo_pYJxez2udQ@mail.gmail.com>
+In-Reply-To: <CAMuHMdVQkqiE_S3ZAFziYXT4qESeofvC-6MsXfo_pYJxez2udQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Brian Norris <computersforpeace@gmail.com>
-Cc: Linux Kernel <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, Ralf Baechle <ralf@linux-mips.org>, Artem Bityutskiy <dedekind1@gmail.com>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: "Bird, Tim" <Tim.Bird@sonymobile.com>, "ksummit-discuss@lists.linuxfoundation.org" <ksummit-discuss@lists.linuxfoundation.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On Thu, Aug 14, 2014 at 3:21 PM, Brian Norris
-<computersforpeace@gmail.com> wrote:
-> Hi all,
+On 08/14/2014 02:02 AM, Geert Uytterhoeven wrote:
+> Hi Günther,
 >
-> I'm interested in being able to build-test kernels on various
-> architectures while enabling extra warnings (make W=[123]). I'd like to
-> be able to finish the builds and see all warnings, rather than seeing a
-> failed build. However, GCC's -Werror is incompatible with this. There is
-> plenty of code that will produce at least one warning, when warning
-> verbosity is turned up. And GCC's -Werror is not guaranteed to remain
-> stable over time; new versions may develop new warnings that may or may
-> not be legitimate.
+> CC kbuild
 >
-> It seems that there are a few problem ARCHes that enable -Werror by
-> default: SuperH (orphaned), SPARC, and MIPS. There are also a few
-> scattered Makefiles throughout the build tree. Developers have
-> previously tried to remove some of the worst offenders [1], but were
-> mostly rejected [2]. It doesn't seem like we can fully prevent
-> maintainers from enabling -Werror on their code--or even on their entire
-> ARCH build, as with MIPS--for better or worse, so I look to other
-> alternatives.
+> On Thu, Aug 14, 2014 at 10:50 AM, Guenter Roeck <linux@roeck-us.net> wrote:
+>> On 08/14/2014 12:40 AM, Geert Uytterhoeven wrote:
+>>>> Maybe something like
+>>>>
+>>>> make PCI=n allmodconfig
+>>>> make GPIOLIB=n allmodconfig
+>>>>
+>>>> which would let me disable key options selectively so I can improve
+>>>> compile
+>>>> coverage without having to go through all configurations (or randconfig).
+>>>
+>>>
+>>> That's doable, using KCONFIG_ALLCONFIG.
+>>>
+>> I'll play with it some more, but a quick glance (and test) suggests that I
+>> can
+>> only use it to force a configuration option to be true, not to force it to
+>> be false. Also, there seems to be an odd side effect.
+>>
+>> With
+>>          kconfig.gpio:   "CONFIG_GPIOLIB=y"
+>> and
+>>          kconfig.nogpio: "# CONFIG_GPIOLIB is not set"
+>>
+>> KCONFIG_ALLCONFIG=kconfig.gpio make allnoconfig
+>>          causes CONFIG_GPIOLIB to be set.
+>>
+>> KCONFIG_ALLCONFIG=kconfig.gpio make allmodconfig
+>> KCONFIG_ALLCONFIG=kconfig.nogpio make allmodconfig
+>>          both have the odd and at least for me unexpected effect of disabling
+>>          CONFIG_MODULES, but do not affect CONFIG_GPIOLIB.
 >
-> For the easiest approach, I considered how one might add -Wno-error to
-> the CFLAGS. 'make KCFLAGS=-Wno-error' looked promising, but
-> KBUILD_CFLAGS is applied before the sub-directory Makefiles add their
-> own options to ccflags-y. So it seems like others have come to the same
-> conclusion as me: that Kbuild doesn't seem to provide a way to override
-> the -Werror behvaior from the top level. [3][4]
+> Strange...
 >
-> So, how can we fix this? -Werror may be useful in some cases to
-> encourage developers to fix up their code immediately, but it is
-> decidedly unhelpful when running code through analysis tools.
+> I also saw strange things with randconfig, needing config input during the
+> subsequent build, or "make oldconfig" asking new questions, just after
+> having done a randconfig.
 >
-> Possibilities include:
->
-> 1. make -Werror be applied only when we do not have W=[123]. [5]
->
-> 2. develop a top-level override for CFLAGS that is applied *after* all
->    sub-directory modifications
->
-> 3. make -Werror opt-in / configurable, like PPC's CONFIG_PPC_WERROR
->    (maybe make it a generic CONFIG_WERROR?), and prevent its
->    unconditional use in Makefiles
->
-> 4. better ideas?
->
-> Regards,
-> Brian
->
-> [1] http://www.linux-mips.org/archives/linux-mips/2012-04/msg00179.html
->     http://patchwork.ozlabs.org/patch/146297/
->
-> [2] http://www.linux-mips.org/archives/linux-mips/2012-05/msg00064.html
->
-> [3] http://lists.linaro.org/pipermail/linaro-toolchain/2011-November/001869.html
->
-> [4] http://lists.linaro.org/pipermail/linaro-dev/2011-December/008880.html
->
-> [5] http://www.linux-mips.org/archives/linux-mips/2012-05/msg00070.html
-> --
 
-Funny that you bring this up because I have ~60 patches in my queue to
-resolve several thousand of these warnings.  Half of the patches
-actually resolve warnings that can be resolved and the other half
-implement compiler diagnostic control macros to help silence warnings.
-All these were the work of a co-worker Mark Rustad, below is the patch
-he put together to implement the compiler diagnostic control macros.
+I made some progress. The following KCONFIG_ALLCONFIG file lets me disable GPIOLIB
+with x86_64, and still build everything as modules.
 
-commit 7b9aace02b2405f0714bc08c424b72e6962f1c2e
-Author: Mark Rustad <mark.d.rustad@intel.com>
-Date:   Fri Aug 15 01:43:44 2014 -0700
+# CONFIG_FB_VIA is not set
+# CONFIG_MFD_AAT2870_CORE is not set
+# CONFIG_MFD_ASIC3 is not set
+# CONFIG_GPIOLIB is not set
+CONFIG_MODULES=y
 
-    compiler: Add diagnostic control macros
+I had to deselect everything which explicitly selects GPIOLIB. Kind of makes sense.
+For some reason it is necessary to specify "CONFIG_MODULES=y" even with "allmodconfig"
+when using a KCONFIG_ALLCONFIG file.
 
-    Add macros to control diagnostic messages where needed. These
-    are used to silence warning messages that are expected, normal
-    and do not indicate any sort of problem. Reducing the stream
-    of messages in this way helps possible problems to stand out.
+Guenter
 
-    The macros provided are:
-        DIAG_PUSH() - to save diagnostic settings
-        DIAG_POP() - to restore diagnostic settings
-        DIAG_IGNORE(option) - to ignore a particular warning
-        DIAG_GCC_IGNORE(option) - DIAG_IGNORE for gcc only
-        DIAG_CLANG_IGNORE(option) - DIAG_IGNORE for clang only
-
-    Signed-off-by: Mark Rustad <mark.d.rustad@intel.com>
-
-diff --git a/include/linux/compiler-clang.h b/include/linux/compiler-clang.h
-index d1e49d5..039b112 100644
---- a/include/linux/compiler-clang.h
-+++ b/include/linux/compiler-clang.h
-@@ -10,3 +10,29 @@
- #undef uninitialized_var
- #define uninitialized_var(x) x = *(&(x))
- #endif
-+
-+/*
-+ * Provide macros to manipulate diagnostic messages when possible.
-+ * DIAG_PUSH pushes the diagnostic settings
-+ * DIAG_POP pops the diagnostic settings
-+ * DIAG_IGNORE(x) changes the given diagnostic setting to ignore
-+ *
-+ * Example:
-+ *    DIAG_PUSH DIAG_IGNORE(aggregate-return)
-+ *    struct timespec ns_to_timespec(const s64 nsec)
-+ *    {
-+ *        ...
-+ *    }
-+ *    DIAG_POP
-+ *
-+ * Will prevent the warning on compilation of the function. Other
-+ * steps are necessary to do the same thing for the call sites.
-+ */
-+#define DIAG_STR(x) #x
-+#define DIAG_CAT(x, y) DIAG_STR(x##y)
-+#define DIAG_DO_PRAGMA(x) _Pragma(#x)
-+#define DIAG_PRAGMA(x) DIAG_DO_PRAGMA(clang diagnostic x)
-+#define DIAG_IGNORE(x) DIAG_PRAGMA(ignored DIAG_CAT(-W, x))
-+#define DIAG_PUSH DIAG_PRAGMA(push)
-+#define DIAG_POP DIAG_PRAGMA(pop)
-+#define DIAG_CLANG_IGNORE(x) DIAG_IGNORE(x)
-diff --git a/include/linux/compiler-gcc4.h b/include/linux/compiler-gcc4.h
-index 2507fd2..78387f6 100644
---- a/include/linux/compiler-gcc4.h
-+++ b/include/linux/compiler-gcc4.h
-@@ -86,3 +86,34 @@
- #define __HAVE_BUILTIN_BSWAP16__
- #endif
- #endif /* CONFIG_ARCH_USE_BUILTIN_BSWAP */
-+
-+/*
-+ * Provide macros to manipulate diagnostic messages when possible.
-+ * DIAG_PUSH pushes the diagnostic settings
-+ * DIAG_POP pops the diagnostic settings
-+ * DIAG_IGNORE(x) changes the given diagnostic setting to ignore
-+ *
-+ * Example:
-+ *    DIAG_PUSH DIAG_IGNORE(aggregate-return)
-+ *    struct timespec ns_to_timespec(const s64 nsec)
-+ *    {
-+ *        ...
-+ *    }
-+ *    DIAG_POP
-+ *
-+ * Will prevent the warning on compilation of the function. Other
-+ * steps are necessary to do the same thing for the call sites.
-+ */
-+#if GCC_VERSION >= 40600
-+#define DIAG_STR(x) #x
-+#define DIAG_CAT(x, y) DIAG_STR(x##y)
-+#define DIAG_DO_PRAGMA(x) _Pragma(#x)
-+#define DIAG_PRAGMA(x) DIAG_DO_PRAGMA(GCC diagnostic x)
-+#define DIAG_IGNORE(x) DIAG_PRAGMA(ignored DIAG_CAT(-W, x))
-+/* GCC 4.8 - 4.8.2 has issues with pop, so do not define push or pop */
-+#if GCC_VERSION < 40800 || GCC_VERSION >= 40803
-+#define DIAG_PUSH DIAG_PRAGMA(push)
-+#define DIAG_POP DIAG_PRAGMA(pop)
-+#endif /* GCC_VERSION < 40800 || GCC_VERSION >= 40803 */
-+#define DIAG_GCC_IGNORE(x) DIAG_IGNORE(x)
-+#endif /* GCC_VERSION >= 40600 */
-diff --git a/include/linux/compiler.h b/include/linux/compiler.h
-index d5ad7b1..fde7b21 100644
---- a/include/linux/compiler.h
-+++ b/include/linux/compiler.h
-@@ -94,6 +94,26 @@ struct ftrace_branch_data {
- };
-
- /*
-+ * Provide null definitions for diagnostic manipulation macros not provided
-+ * for a particular compiler.
-+ */
-+#ifndef DIAG_PUSH
-+#define DIAG_PUSH
-+#endif
-+#ifndef DIAG_POP
-+#define DIAG_POP
-+#endif
-+#ifndef DIAG_IGNORE
-+#define DIAG_IGNORE(x)
-+#endif
-+#ifndef DIAG_CLANG_IGNORE
-+#define DIAG_CLANG_IGNORE(x)
-+#endif
-+#ifndef DIAG_GCC_IGNORE
-+#define DIAG_GCC_IGNORE(x)
-+#endif
-+
-+/*
-  * Note: DISABLE_BRANCH_PROFILING can be used by special lowlevel code
-  * to disable branch tracing on a per file basis.
-  */
-
--- 
-Cheers,
-Jeff
