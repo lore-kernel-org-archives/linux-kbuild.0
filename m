@@ -1,97 +1,69 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-la0-f49.google.com ([209.85.215.49]:36253 "EHLO
-	mail-la0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751133AbaHQKEA (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 17 Aug 2014 06:04:00 -0400
-MIME-Version: 1.0
-Date: Sun, 17 Aug 2014 12:03:58 +0200
-Message-ID: <CAMuHMdW+pGpnwhBGnLCiZ8FXw3wBvtrEwi3JRN6SBrgakRsRJw@mail.gmail.com>
-Subject: Generating .config from DTS
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Content-Type: text/plain; charset=UTF-8
+Received: from mx1.redhat.com ([209.132.183.28]:23092 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751332AbaHQPFV (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 17 Aug 2014 11:05:21 -0400
+Date: Mon, 18 Aug 2014 00:05:02 +0900 (JST)
+Message-Id: <20140818.000502.1530201188174773807.yamato@redhat.com>
+Subject: Re: v flags/modifiers in scripts/tags.sh
+From: Masatake YAMATO <yamato@redhat.com>
+In-Reply-To: <gh61htovas.fsf@quad.gouders.net>
+References: <20140815.134310.1330792325830869384.yamato@redhat.com>
+	<gh61htovas.fsf@quad.gouders.net>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: dirk@gouders.net
+Cc: linux-kbuild@vger.kernel.org
 
-Introduction
-------------
-
-As a Device Tree provides a description of the hardware, it should be
-possible to derive a Linux kernel .config file from a DTS or DTB file.
-
-This would allow developers, users, and distributions to start from a
-hardware-independant "base" .config file (containing software features and
-policies (IPv4, NFS, initrd, ...), and drivers for discoverable hardware
-(PCI expansion cards, USB devices, ...)), and automatically add the options
-needed to support their Linux devices.
-
-To get the ball rolling, I wrote a simple script to generate a list of
-CONFIG_* options from one or more preprocessed DTS files or DTB files.
-
-
-Theory of operation
--------------------
-
-The script performs the following steps:
-
-  1. Run dtc to convert DTB input to DTS, or convert DTS to canonical DTS for
-     simpler parsing,
-  2. Find all (lists of) "compatible" properties,
-  3. For each (list of) "compatible" properties, find driver sources that
-     provide support for it,
-  4. For each driver source, find the CONFIG_* option that needs to be enabled
-     to build the driver.
-
-
-Limitations
------------
-
-  - Driver sources are found by grepping "*.c" files in the kernel source tree.
-    This may show false positives, like mfd drivers instantiating platform
-    devices with the same name as a compatible entry (e.g. "gpio-keys").
-    Parsing MODULE_DEVICE_TABLEs would be more accurate, but that would
-    requiring building an allmodconfig kernel first.
-    However, that would miss of_device_is_compatible() calls.
-    Perhaps the entries in a MODULE_DEVICE_TABLE should be created by a
-    cpp macro, so we can grep for users of that macro?
-  - CONFIG_* symbols are found by grepping Makefiles in the kernel source tree
-    for the typical "obj-$(CONFIG_FOO) += foo.o" pattern, which causes false
-    negatives if that pattern isn't used.
-  - Some properties are checked for in multiple places, causing false positives
-    in platform-support on different platforms (e.g. "arm,cortex-a9").
-  - Some drivers can be enabled by multiple distinct CONFIG_* symbols, causing
-    false positives.
-  - Drivers that rely on partial matching, i.e. by dropping the vendor-specific
-    prefix, may not be found. This affects several i2c and spi drivers, e.g.
-    at24 and m25p80.
-  - Knowing that a CONFIG_* option needs to be enabled is not sufficient.
-    Kconfig dependencies should be tracked as well, as manually finding which
-    dependencies need to be fulfilled can be a tedious task.
+On Sat, 16 Aug 2014 07:30:51 +0200, Dirk Gouders <dirk@gouders.net> wrote:
+> Masatake YAMATO <yamato@redhat.com> writes:
+> 
+>> Hi,
+>>
+>> I have a question about v flags/modifiers in scripts/tags.sh.
+>>
+>> quoted from scripts/tags.sh:
+>>
+>>     exuberant()
+>>     {
+>> 	    ...
+>> 	    --regex-c='/DEFINE_(MUTEX|SEMAPHORE|SPINLOCK)\((\w*)/\2/v/'	\
+>> 	    ...
+>>     }
+>>
+>>     emacs()
+>>     {
+>> 	    ...
+>> 	    --regex='/DEFINE_HASHTABLE\((\w*)/\1/v/'
+>> 	    ...
+>>     }
+>>
+>>
+>> v is specified at the end of the regular expressions.
+>>
+>> As far as I read the man pages of ctags and etags.  there is no such
+>> flags/modifiers. What is v?
+>>
+>> (I am a co-maintainer of fishman-ctags, a fork of exuberant-ctags.
+>>  So I'm interested in implementing v flags in ctags if it is useful.)
+> 
+> 'v' is called a 'kind-spec' in exuberant ctags/etags; the emacs
+> incarnations don't know about it and actually produce warnings.
+> 
+> As you are co-maintaining a fork of exuberant-ctags, I wonder if your
+> fork probably already knows about kind-specs.
 
 
-Download
---------
+man ctags:
+       ...
+       --regex-<LANG>=/regexp/replacement/[kind-spec/][flags]
+            The /regexp/replacement/ pair define a regular expression replacement pattern, similar in style  to  sed
+        ...
 
-You can find the script at
-https://github.com/geertu/linux-scripts/blob/master/linux-config-from-dt
-It must be run from a Linux kernel git repository.
+I misunderstood it as a flag. I now understood it means variable.
+Sorry for making noise.
 
-Examples:
-
-    linux-config-from-dt arch/arm/boot/dts/.r8a7791-koelsch.dtb.dts.tmp
-    linux-config-from-dt arch/arm/boot/dts/*dtb
-
-Enjoy, and thanks for your comments!
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+Masatake YAMATO
