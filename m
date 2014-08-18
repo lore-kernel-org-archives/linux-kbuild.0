@@ -1,59 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:54998 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751613AbaHRCuh (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 17 Aug 2014 22:50:37 -0400
-Date: Mon, 18 Aug 2014 11:50:16 +0900 (JST)
-Message-Id: <20140818.115016.704988435865155160.yamato@redhat.com>
-Subject: Re: [PATCH 1/3] scripts/tags.sh: Don't specify kind-spec for
- emacs' ctags/etags
-From: Masatake YAMATO <yamato@redhat.com>
-In-Reply-To: <1408168618-6269-2-git-send-email-dirk@gouders.net>
-References: <gh61htovas.fsf@quad.gouders.net>
-	<1408168618-6269-1-git-send-email-dirk@gouders.net>
-	<1408168618-6269-2-git-send-email-dirk@gouders.net>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+Received: from mail.data-modul.de ([212.184.205.171]:38039 "HELO
+	mailgw1.data-modul.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with SMTP id S1751057AbaHRLFa (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 18 Aug 2014 07:05:30 -0400
+From: Silvio Fricke <silvio.fricke@gmail.com>
+Subject: [PATCH v2] kconfig: menuconfig: pkg-config should base upon default configuration
+Date: Mon, 18 Aug 2014 13:05:10 +0200
+Message-Id: <1408359910-17394-2-git-send-email-silvio.fricke@gmail.com>
+In-Reply-To: <1408359910-17394-1-git-send-email-silvio.fricke@gmail.com>
+References: <1408359910-17394-1-git-send-email-silvio.fricke@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: dirk@gouders.net
-Cc: mmarek@suse.cz, linux-kbuild@vger.kernel.org, nasa4836@gmail.com
+To: "Yann E . MORIN" <yann.morin.1998@free.fr>
+Cc: Silvio Fricke <silvio.fricke@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Warnings are gone.
+Since fc9c6e0 "menuconfig: optionally use pkg-config to detect ncurses
+libs" we use pkg-config, but some cross toolchains (like yocto tc)
+change the search pathes for pc files with some PKG_CONFIG_* environment
+variables.
 
-Tested-by: Masatake YAMATO <yamato@redhat.com>
+With this patch we ensure that we only get the host config options for
+ncurses and don't mix with others not relevant settings.
 
-On Sat, 16 Aug 2014 07:56:56 +0200, Dirk Gouders <dirk@gouders.net> wrote:
-> Emacs' ctags/etags don't know about kind-spec in --regex and
-> produce warnings:
-> 
-> etags: invalid regexp modifier `v', ignoring
-> etags: invalid regexp modifier `/', ignoring
-> 
-> Fix it by removing kind-spec for the emacs case.
-> 
-> Signed-off-by: Dirk Gouders <dirk@gouders.net>
-> Inspired-by: Masatake YAMATO <yamato@redhat.com>
-> ---
->  scripts/tags.sh | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/scripts/tags.sh b/scripts/tags.sh
-> index cbfd269..7279897 100755
-> --- a/scripts/tags.sh
-> +++ b/scripts/tags.sh
-> @@ -263,7 +263,7 @@ emacs()
->  	--regex='/_PE(\([^,)]*\).*/PEVENT_ERRNO__\1/'		\
->  	--regex='/PCI_OP_READ(\([a-z]*[a-z]\).*[1-4])/pci_bus_read_config_\1/' \
->  	--regex='/PCI_OP_WRITE(\([a-z]*[a-z]\).*[1-4])/pci_bus_write_config_\1/'\
-> -	--regex='/DEFINE_HASHTABLE\((\w*)/\1/v/'
-> +	--regex='/DEFINE_HASHTABLE\((\w*)/\1/'
->  
->  	all_kconfigs | xargs $1 -a                              \
->  	--regex='/^[ \t]*\(\(menu\)*config\)[ \t]+\([a-zA-Z0-9_]+\)/\3/'
-> -- 
-> 2.0.2
-> 
+Signed-off-by: Silvio Fricke <silvio.fricke@gmail.com>
+---
+ scripts/kconfig/lxdialog/check-lxdialog.sh | 3 +++
+ 1 file changed, 3 insertions(+)
 
+diff --git a/scripts/kconfig/lxdialog/check-lxdialog.sh b/scripts/kconfig/lxdialog/check-lxdialog.sh
+index 9d2a4c5..a067d3c 100644
+--- a/scripts/kconfig/lxdialog/check-lxdialog.sh
++++ b/scripts/kconfig/lxdialog/check-lxdialog.sh
+@@ -1,6 +1,9 @@
+ #!/bin/sh
+ # Check ncurses compatibility
+ 
++unset PKG_CONFIG_PATH
++unset PKG_CONFIG_SYSROOT_DIR
++
+ # What library to link
+ ldflags()
+ {
+-- 
+2.0.4
 
