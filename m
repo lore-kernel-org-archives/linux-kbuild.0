@@ -1,40 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:14302 "EHLO mga11.intel.com"
+Received: from ozlabs.org ([103.22.144.67]:46881 "EHLO ozlabs.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752527AbaHSNSH (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 19 Aug 2014 09:18:07 -0400
-From: Andi Kleen <andi@firstfloor.org>
-Subject: Re: [PATCH 2/3] kbuild: handle module compression while running 'make modules_install'.
-References: <1408215016-1848-1-git-send-email-beber@meleeweb.net>
-	<1408215016-1848-3-git-send-email-beber@meleeweb.net>
-Date: Tue, 19 Aug 2014 06:17:58 -0700
-In-Reply-To: <1408215016-1848-3-git-send-email-beber@meleeweb.net> (Bertrand
-	Jacquin's message of "Sat, 16 Aug 2014 20:50:15 +0200")
-Message-ID: <87lhqkmxdl.fsf@tassilo.jf.intel.com>
+	id S1753092AbaHSOCt (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 19 Aug 2014 10:02:49 -0400
+From: Rusty Russell <rusty@rustcorp.com.au>
+Subject: Re: [PATCH 3/3] modsign: lookup lines ending in .ko in .mod files
+In-Reply-To: <1408215016-1848-4-git-send-email-beber@meleeweb.net>
+References: <1408215016-1848-1-git-send-email-beber@meleeweb.net> <1408215016-1848-4-git-send-email-beber@meleeweb.net>
+Date: Tue, 19 Aug 2014 06:30:10 +0930
+Message-ID: <8761hp8qed.fsf@rustcorp.com.au>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Bertrand Jacquin <beber@meleeweb.net>
-Cc: Rusty Russell <rusty@rustcorp.com.au>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Willy Tarreau <w@1wt.eu>
+To: Bertrand Jacquin <beber@meleeweb.net>, linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Willy Tarreau <w@1wt.eu>, David Woodhouse <dwmw2@infradead.org>
 
 Bertrand Jacquin <beber@meleeweb.net> writes:
+> This does the same as commit ef591a5 (scripts/Makefile.modpost: error
+> in finding modules from .mod files), but for scripts/Makefile.modsign
+>
+> Maybe we should also apply to Makefile.modsign and Makefile.modinst
+> the change applied to Makefile.modpost by commit ea4054a (modpost:
+> handle huge numbers of modules) ?
+
+Good question.  David Woodhose cc'd...
+
+Cheers,
+Rusty.
+
+> Reviewed-by: Willy Tarreau <w@1wt.eu>
+> Signed-off-by: Bertrand Jacquin <beber@meleeweb.net>
+> ---
+>  scripts/Makefile.modsign | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/scripts/Makefile.modsign b/scripts/Makefile.modsign
+> index abfda62..b6ac708 100644
+> --- a/scripts/Makefile.modsign
+> +++ b/scripts/Makefile.modsign
+> @@ -7,7 +7,7 @@ __modsign:
 >  
-> +# CONFIG_MODULE_COMPRESS, if defined, will cause module to be compressed
-> +# after they are installed in agreement with CONFIG_MODULE_COMPRESS_GZIP
-> +# or CONFIG_MODULE_COMPRESS_XZ.
-> +
-> +mod_compress_cmd = true
-> +ifdef CONFIG_MODULE_COMPRESS
-> +  ifdef CONFIG_MODULE_COMPRESS_GZIP
-> +    mod_compress_cmd = gzip -n -9
-
-Please don't use gzip -9. The gain is very small, but it can make
-the time to compress much longer. Just use plain gzip.
-
-I suspect it doesn't make sense either for xz.
-
--Andi
-
--- 
-ak@linux.intel.com -- Speaking for myself only
+>  include scripts/Kbuild.include
+>  
+> -__modules := $(sort $(shell grep -h '\.ko' /dev/null $(wildcard $(MODVERDIR)/*.mod)))
+> +__modules := $(sort $(shell grep -h '\.ko$$' /dev/null $(wildcard $(MODVERDIR)/*.mod)))
+>  modules := $(patsubst %.o,%.ko,$(wildcard $(__modules:.ko=.o)))
+>  
+>  PHONY += $(modules)
+> -- 
+> 2.0.4
