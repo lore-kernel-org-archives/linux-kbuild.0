@@ -1,63 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.mei.co.jp ([133.183.100.20]:52689 "EHLO smtp.mei.co.jp"
+Received: from cantor2.suse.de ([195.135.220.15]:44730 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752767AbaHSHet (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 19 Aug 2014 03:34:49 -0400
-From: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Subject: [PATCH 2/4] kbuild: handle the dependency of multi-objs hostprogs appropriately
-Date: Tue, 19 Aug 2014 16:34:21 +0900
-Message-Id: <1408433663-17435-3-git-send-email-yamada.m@jp.panasonic.com>
-In-Reply-To: <1408433663-17435-1-git-send-email-yamada.m@jp.panasonic.com>
-References: <1408433663-17435-1-git-send-email-yamada.m@jp.panasonic.com>
+	id S1750834AbaHSIGH (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 19 Aug 2014 04:06:07 -0400
+Message-ID: <53F3056C.7040705@suse.cz>
+Date: Tue, 19 Aug 2014 10:06:04 +0200
+From: Michal Marek <mmarek@suse.cz>
+MIME-Version: 1.0
+Subject: Re: [PATCH 4/4] Documentation: kbuild: Improve grammar
+References: <1407511390-5429-1-git-send-email-geert@linux-m68k.org> <1407511390-5429-4-git-send-email-geert@linux-m68k.org> <53EA48F2.6060003@infradead.org> <53EB4F39.6030501@suse.cz>
+In-Reply-To: <53EB4F39.6030501@suse.cz>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.m@jp.panasonic.com>, Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org
+To: Randy Dunlap <rdunlap@infradead.org>, Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Assume we have a Makefile like:
+On 2014-08-13 13:42, Michal Marek wrote:
+> On 2014-08-12 19:03, Randy Dunlap wrote:
+>> On 08/08/14 08:23, Geert Uytterhoeven wrote:
+>>>   - singular versus plural,
+>>>   - "by" versus "of",
+>>>   - missing "if", "it", "the",
+>>>   - consistent use of "xxx-specific" versus "xxx specific".
+>>>
+>>> Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+>>> ---
+>>>  Documentation/kbuild/makefiles.txt | 58 +++++++++++++++++++-------------------
+>>>  1 file changed, 29 insertions(+), 29 deletions(-)
+>>
+>> Acked-by: Randy Dunlap <rdunlap@infradead.org>
+>>
+>> Michal, are you going to pick up Geert's 4 kbuild doc. patches
+>> or should I do it?
+> 
+> I can do it. I'm just waiting for Linus to merge what is currently in
+> the kbuild branches, before pushing anything else.
 
-hostprogs-y := foo bar
-foo-objs := foo1.o foo2.o
-bar-objs := bar1.o bar2.o
+Applied to kbuild.git#misc now.
 
-Without this commit, the host program foo depends on all of
-foo1.o foo2.o bar1.o bar2.o.
-
-This commit allows to handle the dependency of each host program
-separately.
-
-Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
----
-
- scripts/Makefile.host | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/scripts/Makefile.host b/scripts/Makefile.host
-index ab5980f..133edfa 100644
---- a/scripts/Makefile.host
-+++ b/scripts/Makefile.host
-@@ -96,8 +96,9 @@ quiet_cmd_host-cmulti	= HOSTLD  $@
-       cmd_host-cmulti	= $(HOSTCC) $(HOSTLDFLAGS) -o $@ \
- 			  $(addprefix $(obj)/,$($(@F)-objs)) \
- 			  $(HOST_LOADLIBES) $(HOSTLOADLIBES_$(@F))
--$(host-cmulti): $(obj)/%: $(host-cobjs) FORCE
-+$(host-cmulti): FORCE
- 	$(call if_changed,host-cmulti)
-+$(call multi_depend, $(host-cmulti), , -objs)
- 
- # Create .o file from a single .c file
- # host-cobjs -> .o
-@@ -113,8 +114,9 @@ quiet_cmd_host-cxxmulti	= HOSTLD  $@
- 			  $(foreach o,objs cxxobjs,\
- 			  $(addprefix $(obj)/,$($(@F)-$(o)))) \
- 			  $(HOST_LOADLIBES) $(HOSTLOADLIBES_$(@F))
--$(host-cxxmulti): $(obj)/%: $(host-cobjs) $(host-cxxobjs) FORCE
-+$(host-cxxmulti): FORCE
- 	$(call if_changed,host-cxxmulti)
-+$(call multi_depend, $(host-cxxmulti), , -objs -cxxobjs)
- 
- # Create .o file from a single .cc (C++) file
- quiet_cmd_host-cxxobjs	= HOSTCXX $@
--- 
-1.9.1
+Thanks,
+Michal
 
