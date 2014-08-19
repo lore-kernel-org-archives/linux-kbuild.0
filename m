@@ -1,68 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([103.22.144.67]:39113 "EHLO ozlabs.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753058AbaHSSLf (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 19 Aug 2014 14:11:35 -0400
-From: Rusty Russell <rusty@rustcorp.com.au>
-Subject: Re: [PATCH 2/3] kbuild: handle module compression while running 'make modules_install'.
-In-Reply-To: <87lhqkmxdl.fsf@tassilo.jf.intel.com>
-References: <1408215016-1848-1-git-send-email-beber@meleeweb.net> <1408215016-1848-3-git-send-email-beber@meleeweb.net> <87lhqkmxdl.fsf@tassilo.jf.intel.com>
-Date: Wed, 20 Aug 2014 03:25:45 +0930
-Message-ID: <87iolojrdq.fsf@rustcorp.com.au>
+Received: from mail-pd0-f180.google.com ([209.85.192.180]:63782 "EHLO
+	mail-pd0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753796AbaHSSnO (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 19 Aug 2014 14:43:14 -0400
+Date: Tue, 19 Aug 2014 11:43:03 -0700
+From: Brian Norris <computersforpeace@gmail.com>
+Subject: Re: Overriding -Werror
+Message-ID: <20140819184303.GT18411@ld-irv-0074>
+References: <20140814222119.GD18411@ld-irv-0074>
+ <87ppfwmxic.fsf@tassilo.jf.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87ppfwmxic.fsf@tassilo.jf.intel.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andi Kleen <andi@firstfloor.org>, Bertrand Jacquin <beber@meleeweb.net>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Willy Tarreau <w@1wt.eu>
+To: Andi Kleen <andi@firstfloor.org>
+Cc: Linux Kernel <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, Ralf Baechle <ralf@linux-mips.org>, Artem Bityutskiy <dedekind1@gmail.com>
 
-Andi Kleen <andi@firstfloor.org> writes:
-> Bertrand Jacquin <beber@meleeweb.net> writes:
->>  
->> +# CONFIG_MODULE_COMPRESS, if defined, will cause module to be compressed
->> +# after they are installed in agreement with CONFIG_MODULE_COMPRESS_GZIP
->> +# or CONFIG_MODULE_COMPRESS_XZ.
->> +
->> +mod_compress_cmd = true
->> +ifdef CONFIG_MODULE_COMPRESS
->> +  ifdef CONFIG_MODULE_COMPRESS_GZIP
->> +    mod_compress_cmd = gzip -n -9
->
-> Please don't use gzip -9. The gain is very small, but it can make
-> the time to compress much longer. Just use plain gzip.
+On Tue, Aug 19, 2014 at 06:15:07AM -0700, Andi Kleen wrote:
+> Brian Norris <computersforpeace@gmail.com> writes:
+> >
+> > 4. better ideas?
+> 
+> Just send patches to remove -Werror in all architectures
+> as a tree sweep (and anywhere else where someone misguided add it)
 
-Interesting:
+I cited at least one example in which this was attempted but rejected.
+(Or at least, it was semi-deliberately stalled.)
 
-$ time find * -name '*.ko' | xargs -n 1 gzip
-real	0m9.404s
-user	0m7.283s
-sys	0m1.667s
-$ du -c `find * -name '*.ko.gz'` | tail -n1
-56412	total
+> Having -Werror anywhere in a shipping release is just plainly a bug,
+> as it makes it often impossible to build on newer gcc versions.
 
-time find * -name '*.ko' | xargs -n 1 gzip -9
-real	1m1.968s
-user	0m58.850s
-sys	0m1.786s
-$ du -c `find * -name '*.ko.gz'` | tail -n1
-55764	total
+I also feel it is misguided, for other reasons. But there are at least a
+few who seem to disagree. They seem to feel it is important/necessary
+for enforcing good practices during development. I'm not sure how to
+bridge the disagreement, other than to provide workarounds for disabling
+-Werror.
 
-$ time find * -name '*.ko' | xargs -n 1 xz
-real	1m23.396s
-user	1m13.893s
-sys	0m9.134s
-$ du -c `find * -name '*.ko.xz` | tail -n1
-46868	total
+I could try sending -Werror removal patches, but I'm not confident that
+will go over well.
 
-$ time find * -name '*.ko' | xargs -n 1 xz -9
-real	1m47.202s
-user	1m25.962s
-sys	0m21.298s
-$ du -c `find * -name '*.ko.xz` | tail -n1
-46868	total
-
-So, Andi is right.  Please skip -9 for both options: it makes little
-(.gz) or no (.xz) difference and it slows things down.
-
-Cheers,
-Rusty.
+Brian
