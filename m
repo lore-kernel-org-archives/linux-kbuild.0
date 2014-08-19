@@ -1,52 +1,80 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([103.22.144.67]:46881 "EHLO ozlabs.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753092AbaHSOCt (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 19 Aug 2014 10:02:49 -0400
-From: Rusty Russell <rusty@rustcorp.com.au>
-Subject: Re: [PATCH 3/3] modsign: lookup lines ending in .ko in .mod files
-In-Reply-To: <1408215016-1848-4-git-send-email-beber@meleeweb.net>
-References: <1408215016-1848-1-git-send-email-beber@meleeweb.net> <1408215016-1848-4-git-send-email-beber@meleeweb.net>
-Date: Tue, 19 Aug 2014 06:30:10 +0930
-Message-ID: <8761hp8qed.fsf@rustcorp.com.au>
+Received: from fr1.as29.net ([62.210.131.231]:18357 "EHLO
+	toothrot.meleeweb.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751976AbaHSPWz (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 19 Aug 2014 11:22:55 -0400
+Date: Tue, 19 Aug 2014 17:22:38 +0200
+From: Bertrand Jacquin <beber@meleeweb.net>
+Subject: Re: [PATCH 2/3] kbuild: handle module compression while running
+ 'make modules_install'.
+Message-ID: <20140819152238.GB2164@lady-voodoo.exosec.local>
+References: <1408215016-1848-1-git-send-email-beber@meleeweb.net>
+ <1408215016-1848-3-git-send-email-beber@meleeweb.net>
+ <87lhqkmxdl.fsf@tassilo.jf.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <87lhqkmxdl.fsf@tassilo.jf.intel.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Bertrand Jacquin <beber@meleeweb.net>, linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Willy Tarreau <w@1wt.eu>, David Woodhouse <dwmw2@infradead.org>
+To: Andi Kleen <andi@firstfloor.org>
+Cc: Rusty Russell <rusty@rustcorp.com.au>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Willy Tarreau <w@1wt.eu>
 
-Bertrand Jacquin <beber@meleeweb.net> writes:
-> This does the same as commit ef591a5 (scripts/Makefile.modpost: error
-> in finding modules from .mod files), but for scripts/Makefile.modsign
->
-> Maybe we should also apply to Makefile.modsign and Makefile.modinst
-> the change applied to Makefile.modpost by commit ea4054a (modpost:
-> handle huge numbers of modules) ?
+Hi,
 
-Good question.  David Woodhose cc'd...
+D'ar meurzh 19 a viz Eost 2014 e 15 eur 17, « Andi Kleen » he deus skrivet :
+> Bertrand Jacquin <beber@meleeweb.net> writes:
+> >  
+> > +# CONFIG_MODULE_COMPRESS, if defined, will cause module to be compressed
+> > +# after they are installed in agreement with CONFIG_MODULE_COMPRESS_GZIP
+> > +# or CONFIG_MODULE_COMPRESS_XZ.
+> > +
+> > +mod_compress_cmd = true
+> > +ifdef CONFIG_MODULE_COMPRESS
+> > +  ifdef CONFIG_MODULE_COMPRESS_GZIP
+> > +    mod_compress_cmd = gzip -n -9
+> 
+> Please don't use gzip -9. The gain is very small, but it can make
+> the time to compress much longer. Just use plain gzip.
+> 
+> I suspect it doesn't make sense either for xz.
 
-Cheers,
-Rusty.
+I understand your concern about this, but does is make sense to not use
+-9 when then following files use gzip or other compression tools with -9 :
 
-> Reviewed-by: Willy Tarreau <w@1wt.eu>
-> Signed-off-by: Bertrand Jacquin <beber@meleeweb.net>
-> ---
->  scripts/Makefile.modsign | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/scripts/Makefile.modsign b/scripts/Makefile.modsign
-> index abfda62..b6ac708 100644
-> --- a/scripts/Makefile.modsign
-> +++ b/scripts/Makefile.modsign
-> @@ -7,7 +7,7 @@ __modsign:
->  
->  include scripts/Kbuild.include
->  
-> -__modules := $(sort $(shell grep -h '\.ko' /dev/null $(wildcard $(MODVERDIR)/*.mod)))
-> +__modules := $(sort $(shell grep -h '\.ko$$' /dev/null $(wildcard $(MODVERDIR)/*.mod)))
->  modules := $(patsubst %.o,%.ko,$(wildcard $(__modules:.ko=.o)))
->  
->  PHONY += $(modules)
-> -- 
-> 2.0.4
+  arch/blackfin/Makefile:14:GZFLAGS          := -9
+
+  arch/powerpc/boot/wrapper:297:        gzip -n -f -9 "$vmz.$$"
+  arch/powerpc/boot/wrapper:422:    gzip -n -f -9 "$ofile"
+  arch/powerpc/boot/wrapper:469:    gzip -n --force -9 --stdout "$ofile.bin" > "$odir/otheros.bld"
+
+  arch/arm/Makefile:23:GZFLAGS            :=-9
+  arch/arm64/Makefile:16:GZFLAGS          :=-9
+
+  arch/m68k/Makefile:138: gzip -9c vmlinux.tmp >vmlinux.gz
+  arch/m68k/Makefile:141: gzip -9c vmlinux >vmlinux.gz
+
+  arch/mips/lasat/image/Makefile:46:      gzip -cf -9 $< > $@
+
+  arch/parisc/Makefile:121:       @gzip -cf -9 $< > $@
+
+  scripts/package/mkspec:115:echo 'bzip2 -9 vmlinux'
+  scripts/package/builddeb:20:    gzip -9 "$pdir/usr/share/doc/$pname/changelog.Debian"
+  scripts/package/Makefile:127:   -f -9 $(perf-tar).tar)
+
+  scripts/gen_initramfs_list.sh:229:compr="gzip -n -9 -f"
+  scripts/gen_initramfs_list.sh:245:                && compr="gzip -n -9 -f"
+  scripts/gen_initramfs_list.sh:248:                && compr="bzip2 -9 -f"
+  scripts/gen_initramfs_list.sh:251:                && compr="lzma -9 -f"
+  scripts/gen_initramfs_list.sh:257:                && compr="lzop -9 -f"
+  scripts/gen_initramfs_list.sh:260:                && compr="lz4 -l -9 -f"
+
+  scripts/Makefile.lib:241:cmd_gzip = (cat $(filter-out FORCE,$^) | gzip -n -f -9 > $@) || \
+  scripts/Makefile.lib:311:       bzip2 -9 && $(call size_append, $(filter-out FORCE,$^))) > $@ || \
+  scripts/Makefile.lib:319:       lzma -9 && $(call size_append, $(filter-out FORCE,$^))) > $@ || \
+  scripts/Makefile.lib:324:       lzop -9 && $(call size_append, $(filter-out FORCE,$^))) > $@ || \
+
+-- 
+Beber
