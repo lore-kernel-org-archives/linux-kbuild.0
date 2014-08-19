@@ -1,80 +1,31 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from fr1.as29.net ([62.210.131.231]:18357 "EHLO
-	toothrot.meleeweb.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751976AbaHSPWz (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 19 Aug 2014 11:22:55 -0400
-Date: Tue, 19 Aug 2014 17:22:38 +0200
-From: Bertrand Jacquin <beber@meleeweb.net>
-Subject: Re: [PATCH 2/3] kbuild: handle module compression while running
- 'make modules_install'.
-Message-ID: <20140819152238.GB2164@lady-voodoo.exosec.local>
-References: <1408215016-1848-1-git-send-email-beber@meleeweb.net>
- <1408215016-1848-3-git-send-email-beber@meleeweb.net>
- <87lhqkmxdl.fsf@tassilo.jf.intel.com>
+Received: from zene.cmpxchg.org ([85.214.230.12]:59178 "EHLO zene.cmpxchg.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753157AbaHSQEU (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 19 Aug 2014 12:04:20 -0400
+Date: Tue, 19 Aug 2014 10:56:40 -0500
+From: Johannes Weiner <hannes@cmpxchg.org>
+Subject: Re: [PATCH 2/3] scripts/tags.sh: remove *PCGFLAGS regular expressions
+Message-ID: <20140819155640.GA11853@cmpxchg.org>
+References: <gh61htovas.fsf@quad.gouders.net>
+ <1408168618-6269-1-git-send-email-dirk@gouders.net>
+ <1408168618-6269-3-git-send-email-dirk@gouders.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <87lhqkmxdl.fsf@tassilo.jf.intel.com>
+In-Reply-To: <1408168618-6269-3-git-send-email-dirk@gouders.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andi Kleen <andi@firstfloor.org>
-Cc: Rusty Russell <rusty@rustcorp.com.au>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Willy Tarreau <w@1wt.eu>
+To: Dirk Gouders <dirk@gouders.net>
+Cc: Michal Marek <mmarek@suse.cz>, Masatake YAMATO <yamato@redhat.com>, linux-kbuild@vger.kernel.org
 
-Hi,
-
-D'ar meurzh 19 a viz Eost 2014 e 15 eur 17, « Andi Kleen » he deus skrivet :
-> Bertrand Jacquin <beber@meleeweb.net> writes:
-> >  
-> > +# CONFIG_MODULE_COMPRESS, if defined, will cause module to be compressed
-> > +# after they are installed in agreement with CONFIG_MODULE_COMPRESS_GZIP
-> > +# or CONFIG_MODULE_COMPRESS_XZ.
-> > +
-> > +mod_compress_cmd = true
-> > +ifdef CONFIG_MODULE_COMPRESS
-> > +  ifdef CONFIG_MODULE_COMPRESS_GZIP
-> > +    mod_compress_cmd = gzip -n -9
+On Sat, Aug 16, 2014 at 07:56:57AM +0200, Dirk Gouders wrote:
+> Commit 0a31bc97c80c3fa8 (mm: memcontrol: rewrite uncharge API)
+> removed the macros {TEST,SET,CLEAR,TESTCLEAR}PCFLAG.  Remove
+> corresponding entries from tags.sh -- in the emacs case they also
+> produced warnigs because of unmatched '\('.
 > 
-> Please don't use gzip -9. The gain is very small, but it can make
-> the time to compress much longer. Just use plain gzip.
-> 
-> I suspect it doesn't make sense either for xz.
+> Signed-off-by: Dirk Gouders <dirk@gouders.net>
+> Inspired-by: Masatake YAMATO <yamato@redhat.com>
 
-I understand your concern about this, but does is make sense to not use
--9 when then following files use gzip or other compression tools with -9 :
-
-  arch/blackfin/Makefile:14:GZFLAGS          := -9
-
-  arch/powerpc/boot/wrapper:297:        gzip -n -f -9 "$vmz.$$"
-  arch/powerpc/boot/wrapper:422:    gzip -n -f -9 "$ofile"
-  arch/powerpc/boot/wrapper:469:    gzip -n --force -9 --stdout "$ofile.bin" > "$odir/otheros.bld"
-
-  arch/arm/Makefile:23:GZFLAGS            :=-9
-  arch/arm64/Makefile:16:GZFLAGS          :=-9
-
-  arch/m68k/Makefile:138: gzip -9c vmlinux.tmp >vmlinux.gz
-  arch/m68k/Makefile:141: gzip -9c vmlinux >vmlinux.gz
-
-  arch/mips/lasat/image/Makefile:46:      gzip -cf -9 $< > $@
-
-  arch/parisc/Makefile:121:       @gzip -cf -9 $< > $@
-
-  scripts/package/mkspec:115:echo 'bzip2 -9 vmlinux'
-  scripts/package/builddeb:20:    gzip -9 "$pdir/usr/share/doc/$pname/changelog.Debian"
-  scripts/package/Makefile:127:   -f -9 $(perf-tar).tar)
-
-  scripts/gen_initramfs_list.sh:229:compr="gzip -n -9 -f"
-  scripts/gen_initramfs_list.sh:245:                && compr="gzip -n -9 -f"
-  scripts/gen_initramfs_list.sh:248:                && compr="bzip2 -9 -f"
-  scripts/gen_initramfs_list.sh:251:                && compr="lzma -9 -f"
-  scripts/gen_initramfs_list.sh:257:                && compr="lzop -9 -f"
-  scripts/gen_initramfs_list.sh:260:                && compr="lz4 -l -9 -f"
-
-  scripts/Makefile.lib:241:cmd_gzip = (cat $(filter-out FORCE,$^) | gzip -n -f -9 > $@) || \
-  scripts/Makefile.lib:311:       bzip2 -9 && $(call size_append, $(filter-out FORCE,$^))) > $@ || \
-  scripts/Makefile.lib:319:       lzma -9 && $(call size_append, $(filter-out FORCE,$^))) > $@ || \
-  scripts/Makefile.lib:324:       lzop -9 && $(call size_append, $(filter-out FORCE,$^))) > $@ || \
-
--- 
-Beber
+Looks good, thanks.
