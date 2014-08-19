@@ -1,43 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from asavdk4.altibox.net ([109.247.116.15]:35565 "EHLO
-	asavdk4.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752380AbaHSEfX (ORCPT
+Received: from aserp1040.oracle.com ([141.146.126.69]:47126 "EHLO
+	aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751624AbaHSFtd (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 19 Aug 2014 00:35:23 -0400
-Date: Tue, 19 Aug 2014 06:35:18 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH] kbuild: fix bug with modpost Makefile warn flag inclusion
-Message-ID: <20140819043517.GA21121@ravnborg.org>
-References: <53F26025.4010902@gmail.com>
+	Tue, 19 Aug 2014 01:49:33 -0400
+Date: Mon, 18 Aug 2014 22:49:28 -0700
+From: "Darrick J. Wong" <darrick.wong@oracle.com>
+Subject: [PATCH] builddeb: put the dbg files into the correct directory
+Message-ID: <20140819054928.GO2808@birch.djwong.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <53F26025.4010902@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michael Ton <linuxham@gmail.com>
-Cc: linux-kbuild@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Mon, Aug 18, 2014 at 02:20:53PM -0600, Michael Ton wrote:
-> From: Michael Ton <linuxham@gmail.com>
-> 
-> The current Makefile.modpost file includes a warn (-w) flag to modpost if
-> KBUILD_EXTMOD or KBUILD_MODPOST_WARN.  This flag should only be added if
-> both flags are true.  Whenever KBUILD_MODPOST is true, modpost currently
-> only prints warnings and does not exit on error (such as on an undefined
-> symbol).
+Since the conversion of objtree to use relative pathnames (commit
+7e1c04779e, "kbuild: Use relative path for $(objtree)"), the debug
+info files have been ending up in /debian/dbgtmp/ in the regular
+linux-image package instead of the debug files package.  Fix up the
+paths so that the debug files end up in the -dbg package.
 
-From the documentation:
-KBUILD_MODPOST_WARN
---------------------------------------------------
-KBUILD_MODPOST_WARN can be set to avoid errors in case of undefined
-symbols in the final module linking stage. It changes such errors
-into warnings.
+Signed-off-by: Darrick J. Wong <darrick.wong@oracle.com>
+---
+ scripts/package/builddeb |    7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-Nothing here say that we need KBUILD_EXTMOD to use this.
-
-Why did you conclude that KBUILD_MODPOST_WARN is only relevant for
-KBUILD_EXTMOD? Something must have triggerede the patch...
-
-
-	Sam
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index 5707466..0456322 100644
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -153,15 +153,16 @@ if grep -q '^CONFIG_MODULES=y' $KCONFIG_CONFIG ; then
+ 	fi
+ 	if [ -n "$BUILD_DEBUG" ] ; then
+ 		(
++			old_dir="$(pwd)"
+ 			cd $tmpdir
+ 			for module in $(find lib/modules/ -name *.ko); do
+-				mkdir -p $(dirname $dbg_dir/usr/lib/debug/$module)
++				mkdir -p $(dirname $old_dir/$dbg_dir/usr/lib/debug/$module)
+ 				# only keep debug symbols in the debug file
+-				$OBJCOPY --only-keep-debug $module $dbg_dir/usr/lib/debug/$module
++				$OBJCOPY --only-keep-debug $module $old_dir/$dbg_dir/usr/lib/debug/$module
+ 				# strip original module from debug symbols
+ 				$OBJCOPY --strip-debug $module
+ 				# then add a link to those
+-				$OBJCOPY --add-gnu-debuglink=$dbg_dir/usr/lib/debug/$module $module
++				$OBJCOPY --add-gnu-debuglink=$old_dir/$dbg_dir/usr/lib/debug/$module $module
+ 			done
+ 		)
+ 	fi
