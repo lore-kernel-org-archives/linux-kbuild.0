@@ -1,37 +1,33 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:45793 "EHLO mx2.suse.de"
+Received: from mga09.intel.com ([134.134.136.24]:17422 "EHLO mga09.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751633AbaHSI6K (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 19 Aug 2014 04:58:10 -0400
-Message-ID: <53F311A0.4050302@suse.cz>
-Date: Tue, 19 Aug 2014 10:58:08 +0200
-From: Michal Marek <mmarek@suse.cz>
+	id S1752616AbaHSNP2 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 19 Aug 2014 09:15:28 -0400
+From: Andi Kleen <andi@firstfloor.org>
+Subject: Re: Overriding -Werror
+References: <20140814222119.GD18411@ld-irv-0074>
+Date: Tue, 19 Aug 2014 06:15:07 -0700
+In-Reply-To: <20140814222119.GD18411@ld-irv-0074> (Brian Norris's message of
+	"Thu, 14 Aug 2014 15:21:19 -0700")
+Message-ID: <87ppfwmxic.fsf@tassilo.jf.intel.com>
 MIME-Version: 1.0
-Subject: Re: [PATCH 0/4] kbuild: Fix the dependency handling of multi-objs
- targets
-References: <1408433663-17435-1-git-send-email-yamada.m@jp.panasonic.com>
-In-Reply-To: <1408433663-17435-1-git-send-email-yamada.m@jp.panasonic.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.m@jp.panasonic.com>, linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, "Yann E. MORIN" <yann.morin.1998@free.fr>
+To: Brian Norris <computersforpeace@gmail.com>
+Cc: Linux Kernel <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, Ralf Baechle <ralf@linux-mips.org>, Artem Bityutskiy <dedekind1@gmail.com>
 
-On 2014-08-19 09:34, Masahiro Yamada wrote:
-> 1/4 and 2/4 fix the core scripts.
-> 
-> 3/4 and 4/4 refactors scripts/kconfig/Makefile based on 2/4.
-> 
-> 
-> 
-> Masahiro Yamada (4):
->   kbuild: handle multi-objs dependency appropriately
->   kbuild: handle the dependency of multi-objs hostprogs appropriately
->   kbuild: refactor script/kconfig/Makefile
->   kbuild: remove redundant clean-files from scripts/kconfig/Makefile
+Brian Norris <computersforpeace@gmail.com> writes:
+>
+> 4. better ideas?
 
-Applied to kbuild.git#kbuild, thanks!
+Just send patches to remove -Werror in all architectures
+as a tree sweep (and anywhere else where someone misguided add it)
 
-Michal
+Having -Werror anywhere in a shipping release is just plainly a bug,
+as it makes it often impossible to build on newer gcc versions.
 
+-Andi
+
+-- 
+ak@linux.intel.com -- Speaking for myself only
