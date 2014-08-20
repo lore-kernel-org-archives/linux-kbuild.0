@@ -1,32 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from one.firstfloor.org ([193.170.194.197]:48374 "EHLO
-	one.firstfloor.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750939AbaHSXtN (ORCPT
+Received: from asavdk3.altibox.net ([109.247.116.14]:57903 "EHLO
+	asavdk3.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750866AbaHTFKu (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 19 Aug 2014 19:49:13 -0400
-Date: Wed, 20 Aug 2014 01:49:12 +0200
-From: Andi Kleen <andi@firstfloor.org>
-Subject: Re: [PATCH 2/3] kbuild: handle module compression while running
- 'make modules_install'.
-Message-ID: <20140819234912.GL4120@two.firstfloor.org>
-References: <1408215016-1848-1-git-send-email-beber@meleeweb.net>
- <1408215016-1848-3-git-send-email-beber@meleeweb.net>
- <87lhqkmxdl.fsf@tassilo.jf.intel.com>
- <20140819152238.GB2164@lady-voodoo.exosec.local>
+	Wed, 20 Aug 2014 01:10:50 -0400
+Date: Wed, 20 Aug 2014 07:10:44 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: Overriding -Werror
+Message-ID: <20140820051044.GA27828@ravnborg.org>
+References: <20140814222119.GD18411@ld-irv-0074>
+ <87ppfwmxic.fsf@tassilo.jf.intel.com>
+ <20140819201129.GA24217@ravnborg.org>
+ <20140819234359.GJ4120@two.firstfloor.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20140819152238.GB2164@lady-voodoo.exosec.local>
+In-Reply-To: <20140819234359.GJ4120@two.firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Bertrand Jacquin <beber@meleeweb.net>
-Cc: Andi Kleen <andi@firstfloor.org>, Rusty Russell <rusty@rustcorp.com.au>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Willy Tarreau <w@1wt.eu>
+To: Andi Kleen <andi@firstfloor.org>
+Cc: Brian Norris <computersforpeace@gmail.com>, Linux Kernel <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, Ralf Baechle <ralf@linux-mips.org>, Artem Bityutskiy <dedekind1@gmail.com>
 
-> I understand your concern about this, but does is make sense to not use
-> -9 when then following files use gzip or other compression tools with -9 :
+On Wed, Aug 20, 2014 at 01:43:59AM +0200, Andi Kleen wrote:
+> On Tue, Aug 19, 2014 at 10:11:30PM +0200, Sam Ravnborg wrote:
+> > On Tue, Aug 19, 2014 at 06:15:07AM -0700, Andi Kleen wrote:
+> > > Brian Norris <computersforpeace@gmail.com> writes:
+> > > >
+> > > > 4. better ideas?
+> > > 
+> > > Just send patches to remove -Werror in all architectures
+> > > as a tree sweep (and anywhere else where someone misguided add it)
+> > In arch/sparc/ we have -Werror and this has never troubled us.
+> > In fact more than once people had tried to provide sloppy code that
+> > failed due to -Werror so it got fixed up front.
+> 
+> It's a major mistake to not support future gccs for released source.
+Until now this has not been an issue - for the sparc bits.
 
-Just because someone else makes mistakes doesn't mean that you should
-make them too.
+If newer gcc's turn out to give legit warnings then if someone provides
+a little help (configure command-line to build gcc) the warnings will
+be fixed. And that should hold true for any decent maintained piece of SW.
 
--Andi
+If the intent is to use bleeding edge gcc then -Werrror can be annoying
+and the right fix would be to make it possible to diable it on the
+command-line.
 
+	Sam
