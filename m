@@ -1,139 +1,30 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:47487 "EHLO mx2.suse.de"
+Received: from ozlabs.org ([103.22.144.67]:33186 "EHLO ozlabs.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751800AbaHTOKy (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 20 Aug 2014 10:10:54 -0400
-From: Michal Marek <mmarek@suse.cz>
-Subject: [PATCH] kbuild: Make scripts executable
-Date: Wed, 20 Aug 2014 16:10:48 +0200
-Message-Id: <1408543848-24977-1-git-send-email-mmarek@suse.cz>
+	id S1752519AbaHTP6P (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 20 Aug 2014 11:58:15 -0400
+From: Rusty Russell <rusty@rustcorp.com.au>
+Subject: Re: [PATCH 2/3] kbuild: handle module compression while running 'make modules_install'.
+In-Reply-To: <20140819234912.GL4120@two.firstfloor.org>
+References: <1408215016-1848-1-git-send-email-beber@meleeweb.net> <1408215016-1848-3-git-send-email-beber@meleeweb.net> <87lhqkmxdl.fsf@tassilo.jf.intel.com> <20140819152238.GB2164@lady-voodoo.exosec.local> <20140819234912.GL4120@two.firstfloor.org>
+Date: Thu, 21 Aug 2014 00:34:13 +0930
+Message-ID: <8738crjj82.fsf@rustcorp.com.au>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
+To: Andi Kleen <andi@firstfloor.org>, Bertrand Jacquin <beber@meleeweb.net>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Willy Tarreau <w@1wt.eu>
 
-The Makefiles call the respective interpreter explicitly, but this makes
-it easier to use the scripts manually.
+Andi Kleen <andi@firstfloor.org> writes:
+>> I understand your concern about this, but does is make sense to not use
+>> -9 when then following files use gzip or other compression tools with -9 :
+>
+> Just because someone else makes mistakes doesn't mean that you should
+> make them too.
 
-Signed-off-by: Michal Marek <mmarek@suse.cz>
----
- scripts/bootgraph.pl                       | 0
- scripts/export_report.pl                   | 0
- scripts/gcc-goto.sh                        | 0
- scripts/gcc-ld                             | 0
- scripts/gcc-version.sh                     | 0
- scripts/gcc-x86_32-has-stack-protector.sh  | 0
- scripts/gcc-x86_64-has-stack-protector.sh  | 0
- scripts/gen_initramfs_list.sh              | 0
- scripts/headers_check.pl                   | 0
- scripts/headers_install.sh                 | 0
- scripts/kconfig/lxdialog/check-lxdialog.sh | 0
- scripts/kconfig/streamline_config.pl       | 0
- scripts/link-vmlinux.sh                    | 0
- scripts/markup_oops.pl                     | 0
- scripts/mkmakefile                         | 0
- scripts/mksysmap                           | 0
- scripts/package/builddeb                   | 0
- scripts/package/buildtar                   | 0
- scripts/profile2linkerlist.pl              | 0
- scripts/rt-tester/rt-tester.py             | 0
- scripts/selinux/install_policy.sh          | 0
- scripts/tracing/draw_functrace.py          | 0
- scripts/xz_wrap.sh                         | 0
- 23 files changed, 0 insertions(+), 0 deletions(-)
- mode change 100644 => 100755 scripts/bootgraph.pl
- mode change 100644 => 100755 scripts/export_report.pl
- mode change 100644 => 100755 scripts/gcc-goto.sh
- mode change 100644 => 100755 scripts/gcc-ld
- mode change 100644 => 100755 scripts/gcc-version.sh
- mode change 100644 => 100755 scripts/gcc-x86_32-has-stack-protector.sh
- mode change 100644 => 100755 scripts/gcc-x86_64-has-stack-protector.sh
- mode change 100644 => 100755 scripts/gen_initramfs_list.sh
- mode change 100644 => 100755 scripts/headers_check.pl
- mode change 100644 => 100755 scripts/headers_install.sh
- mode change 100644 => 100755 scripts/kconfig/lxdialog/check-lxdialog.sh
- mode change 100644 => 100755 scripts/kconfig/streamline_config.pl
- mode change 100644 => 100755 scripts/link-vmlinux.sh
- mode change 100644 => 100755 scripts/markup_oops.pl
- mode change 100644 => 100755 scripts/mkmakefile
- mode change 100644 => 100755 scripts/mksysmap
- mode change 100644 => 100755 scripts/package/builddeb
- mode change 100644 => 100755 scripts/package/buildtar
- mode change 100644 => 100755 scripts/profile2linkerlist.pl
- mode change 100644 => 100755 scripts/rt-tester/rt-tester.py
- mode change 100644 => 100755 scripts/selinux/install_policy.sh
- mode change 100644 => 100755 scripts/tracing/draw_functrace.py
- mode change 100644 => 100755 scripts/xz_wrap.sh
+To be fair, you didn't provide hard numbers: *I* was surprised by the
+results when I tested it.
 
-diff --git a/scripts/bootgraph.pl b/scripts/bootgraph.pl
-old mode 100644
-new mode 100755
-diff --git a/scripts/export_report.pl b/scripts/export_report.pl
-old mode 100644
-new mode 100755
-diff --git a/scripts/gcc-goto.sh b/scripts/gcc-goto.sh
-old mode 100644
-new mode 100755
-diff --git a/scripts/gcc-ld b/scripts/gcc-ld
-old mode 100644
-new mode 100755
-diff --git a/scripts/gcc-version.sh b/scripts/gcc-version.sh
-old mode 100644
-new mode 100755
-diff --git a/scripts/gcc-x86_32-has-stack-protector.sh b/scripts/gcc-x86_32-has-stack-protector.sh
-old mode 100644
-new mode 100755
-diff --git a/scripts/gcc-x86_64-has-stack-protector.sh b/scripts/gcc-x86_64-has-stack-protector.sh
-old mode 100644
-new mode 100755
-diff --git a/scripts/gen_initramfs_list.sh b/scripts/gen_initramfs_list.sh
-old mode 100644
-new mode 100755
-diff --git a/scripts/headers_check.pl b/scripts/headers_check.pl
-old mode 100644
-new mode 100755
-diff --git a/scripts/headers_install.sh b/scripts/headers_install.sh
-old mode 100644
-new mode 100755
-diff --git a/scripts/kconfig/lxdialog/check-lxdialog.sh b/scripts/kconfig/lxdialog/check-lxdialog.sh
-old mode 100644
-new mode 100755
-diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
-old mode 100644
-new mode 100755
-diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
-old mode 100644
-new mode 100755
-diff --git a/scripts/markup_oops.pl b/scripts/markup_oops.pl
-old mode 100644
-new mode 100755
-diff --git a/scripts/mkmakefile b/scripts/mkmakefile
-old mode 100644
-new mode 100755
-diff --git a/scripts/mksysmap b/scripts/mksysmap
-old mode 100644
-new mode 100755
-diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-old mode 100644
-new mode 100755
-diff --git a/scripts/package/buildtar b/scripts/package/buildtar
-old mode 100644
-new mode 100755
-diff --git a/scripts/profile2linkerlist.pl b/scripts/profile2linkerlist.pl
-old mode 100644
-new mode 100755
-diff --git a/scripts/rt-tester/rt-tester.py b/scripts/rt-tester/rt-tester.py
-old mode 100644
-new mode 100755
-diff --git a/scripts/selinux/install_policy.sh b/scripts/selinux/install_policy.sh
-old mode 100644
-new mode 100755
-diff --git a/scripts/tracing/draw_functrace.py b/scripts/tracing/draw_functrace.py
-old mode 100644
-new mode 100755
-diff --git a/scripts/xz_wrap.sh b/scripts/xz_wrap.sh
-old mode 100644
-new mode 100755
--- 
-1.8.4.5
-
+Cheers,
+Rusty.
