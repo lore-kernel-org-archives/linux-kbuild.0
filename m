@@ -1,53 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([103.22.144.67]:51684 "EHLO ozlabs.org"
+Received: from smtp.mei.co.jp ([133.183.100.20]:53217 "EHLO smtp.mei.co.jp"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751744AbaHTTrE (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 20 Aug 2014 15:47:04 -0400
-From: Rusty Russell <rusty@rustcorp.com.au>
-Subject: Re: [PATCH 3/3] modsign: lookup lines ending in .ko in .mod files
-In-Reply-To: <1408474660-24999-4-git-send-email-beber@meleeweb.net>
-References: <1408474660-24999-1-git-send-email-beber@meleeweb.net> <1408474660-24999-4-git-send-email-beber@meleeweb.net>
-Date: Thu, 21 Aug 2014 01:36:50 +0930
-Message-ID: <87wqa3i1r9.fsf@rustcorp.com.au>
+	id S1753717AbaHUDZc (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 20 Aug 2014 23:25:32 -0400
+Date: Thu, 21 Aug 2014 12:25:21 +0900
+From: Masahiro Yamada <yamada.m@jp.panasonic.com>
+Subject: Re: [PATCH] kbuild: Make scripts executable
+In-Reply-To: <1408543848-24977-1-git-send-email-mmarek@suse.cz>
+References: <1408543848-24977-1-git-send-email-mmarek@suse.cz>
+Message-Id: <20140821122521.2D67.AA925319@jp.panasonic.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Bertrand Jacquin <beber@meleeweb.net>, linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Willy Tarreau <w@1wt.eu>
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Bertrand Jacquin <beber@meleeweb.net> writes:
-> This does the same as commit ef591a5 (scripts/Makefile.modpost: error
-> in finding modules from .mod files), but for scripts/Makefile.modsign
->
-> Maybe we should also apply to Makefile.modsign and Makefile.modinst
-> the change applied to Makefile.modpost by commit ea4054a (modpost:
-> handle huge numbers of modules) ?
+Hi Michal,
 
-Probably, yes.
 
-Applied!
-Rusty.
+On Wed, 20 Aug 2014 16:10:48 +0200
+Michal Marek <mmarek@suse.cz> wrote:
 
->
-> Reviewed-by: Willy Tarreau <w@1wt.eu>
-> Signed-off-by: Bertrand Jacquin <beber@meleeweb.net>
-> ---
->  scripts/Makefile.modsign | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/scripts/Makefile.modsign b/scripts/Makefile.modsign
-> index abfda62..b6ac708 100644
-> --- a/scripts/Makefile.modsign
-> +++ b/scripts/Makefile.modsign
-> @@ -7,7 +7,7 @@ __modsign:
->  
->  include scripts/Kbuild.include
->  
-> -__modules := $(sort $(shell grep -h '\.ko' /dev/null $(wildcard $(MODVERDIR)/*.mod)))
-> +__modules := $(sort $(shell grep -h '\.ko$$' /dev/null $(wildcard $(MODVERDIR)/*.mod)))
->  modules := $(patsubst %.o,%.ko,$(wildcard $(__modules:.ko=.o)))
->  
->  PHONY += $(modules)
-> -- 
-> 2.0.4
+> The Makefiles call the respective interpreter explicitly, but this makes
+> it easier to use the scripts manually.
+> 
+> Signed-off-by: Michal Marek <mmarek@suse.cz>
+
+
+I am not sure at all, but
+it seems scripts/checkpatch.pl has a rule
+to ban execute permissions.
+
+
+# Check for incorrect file permissions
+                if ($line =~ /^new (file )?mode.*[7531]\d{0,2}$/) {
+                        my $permhere = $here . "FILE: $realfile\n";
+                        if ($realfile !~ m@scripts/@ &&
+                            $realfile !~ /\.(py|pl|awk|sh)$/) {
+                                ERROR("EXECUTE_PERMISSIONS",
+                                      "do not set execute permissions for source files\n" . $permhere);
+                        }
+                }
+
+
+
+Best Regards
+Masahiro Yamada
