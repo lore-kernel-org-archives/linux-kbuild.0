@@ -1,50 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.mei.co.jp ([133.183.100.20]:53217 "EHLO smtp.mei.co.jp"
+Received: from cantor2.suse.de ([195.135.220.15]:34896 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753717AbaHUDZc (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 20 Aug 2014 23:25:32 -0400
-Date: Thu, 21 Aug 2014 12:25:21 +0900
-From: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Subject: Re: [PATCH] kbuild: Make scripts executable
-In-Reply-To: <1408543848-24977-1-git-send-email-mmarek@suse.cz>
-References: <1408543848-24977-1-git-send-email-mmarek@suse.cz>
-Message-Id: <20140821122521.2D67.AA925319@jp.panasonic.com>
+	id S1751007AbaHUJdA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 21 Aug 2014 05:33:00 -0400
+Message-ID: <53F5BCC8.4060000@suse.cz>
+Date: Thu, 21 Aug 2014 11:32:56 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
+Subject: Re: [PATCH] kbuild: Make scripts executable
+References: <1408543848-24977-1-git-send-email-mmarek@suse.cz> <20140821122521.2D67.AA925319@jp.panasonic.com>
+In-Reply-To: <20140821122521.2D67.AA925319@jp.panasonic.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
+To: Masahiro Yamada <yamada.m@jp.panasonic.com>
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hi Michal,
-
-
-On Wed, 20 Aug 2014 16:10:48 +0200
-Michal Marek <mmarek@suse.cz> wrote:
-
-> The Makefiles call the respective interpreter explicitly, but this makes
-> it easier to use the scripts manually.
+On 2014-08-21 05:25, Masahiro Yamada wrote:
+> Hi Michal,
 > 
-> Signed-off-by: Michal Marek <mmarek@suse.cz>
+> 
+> On Wed, 20 Aug 2014 16:10:48 +0200
+> Michal Marek <mmarek@suse.cz> wrote:
+> 
+>> The Makefiles call the respective interpreter explicitly, but this makes
+>> it easier to use the scripts manually.
+>>
+>> Signed-off-by: Michal Marek <mmarek@suse.cz>
+> 
+> 
+> I am not sure at all, but
+> it seems scripts/checkpatch.pl has a rule
+> to ban execute permissions.
+
+I didn't know about this, but the intent of the rule seems to be to
+avoid *.c files with execute permissions.
 
 
-I am not sure at all, but
-it seems scripts/checkpatch.pl has a rule
-to ban execute permissions.
+> # Check for incorrect file permissions
+>                 if ($line =~ /^new (file )?mode.*[7531]\d{0,2}$/) {
+>                         my $permhere = $here . "FILE: $realfile\n";
+>                         if ($realfile !~ m@scripts/@ &&
+>                             $realfile !~ /\.(py|pl|awk|sh)$/) {
 
+Here it explicitly skips files below scripts/ and files with known
+script suffixes.
 
-# Check for incorrect file permissions
-                if ($line =~ /^new (file )?mode.*[7531]\d{0,2}$/) {
-                        my $permhere = $here . "FILE: $realfile\n";
-                        if ($realfile !~ m@scripts/@ &&
-                            $realfile !~ /\.(py|pl|awk|sh)$/) {
-                                ERROR("EXECUTE_PERMISSIONS",
-                                      "do not set execute permissions for source files\n" . $permhere);
-                        }
-                }
-
-
-
-Best Regards
-Masahiro Yamada
+Michal
