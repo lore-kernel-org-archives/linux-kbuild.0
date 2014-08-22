@@ -1,54 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:57044 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:57063 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751974AbaHVLHS (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 22 Aug 2014 07:07:18 -0400
-Message-ID: <53F72464.6060401@suse.cz>
-Date: Fri, 22 Aug 2014 13:07:16 +0200
+	id S1751974AbaHVLJX (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 22 Aug 2014 07:09:23 -0400
+Message-ID: <53F724DD.1080605@suse.cz>
+Date: Fri, 22 Aug 2014 13:09:17 +0200
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [RFC] [PATCH] kconfig: menuconfig: pkg-config should base upon
- default configuration
-References: <cover.1407766447.git.silvio.fricke@gmail.com> <1a72fd7040a988e84a81c0e5aaef50c33064f576.1407766447.git.silvio.fricke@gmail.com>
-In-Reply-To: <1a72fd7040a988e84a81c0e5aaef50c33064f576.1407766447.git.silvio.fricke@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-2
+Subject: Re: [PATCH v2] arch: Kconfig: Let all little endian architectures
+ define CPU_LITTLE_ENDIAN explicitly
+References: <53EA99C3.90203@gmail.com> <CAMuHMdV_2b-A+eE--cXEFA68=72HK6mqx8+TCXRMVkyhESLYxQ@mail.gmail.com>
+In-Reply-To: <CAMuHMdV_2b-A+eE--cXEFA68=72HK6mqx8+TCXRMVkyhESLYxQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Silvio Fricke <silvio.fricke@gmail.com>, "Yann E . MORIN" <yann.morin.1998@free.fr>
-Cc: linux-kbuild@vger.kernel.org, Justin Lecher <jlec@gentoo.org>
+To: Geert Uytterhoeven <geert@linux-m68k.org>, Chen Gang <gang.chen.5i5j@gmail.com>
+Cc: Arnd Bergmann <arnd@arndb.de>, Andrew Morton <akpm@linux-foundation.org>, Jean Delvare <jdelvare@suse.de>, Russell King <linux@arm.linux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Mark Salter <msalter@redhat.com>, "a-jacquiot@ti.com" <a-jacquiot@ti.com>, Tony Luck <tony.luck@intel.com>, Fenghua Yu <fenghua.yu@intel.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, the arch/x86 maintainers <x86@kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, linux-c6x-dev@linux-c6x.org, "linux-ia64@vger.kernel.org" <linux-ia64@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Linux-Arch <linux-arch@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-Dne 11.8.2014 16:22, Silvio Fricke napsal(a):
-> Since fc9c6e0 "menuconfig: optionally use pkg-config to detect ncurses
-> libs" we use pkg-config, but some cross toolchains (like yocto tc)
-> change the search pathes for pc files with some PKG_CONFIG_* environment
-> variables.
+Dne 13.8.2014 10:03, Geert Uytterhoeven napsal(a):
+> CC kbuild
 > 
-> With this patch we ensure that we only get the host config options for
-> ncurses and don't mix with others not relevant settings.
+> On Wed, Aug 13, 2014 at 12:48 AM, Chen Gang <gang.chen.5i5j@gmail.com> wrote:
+>> diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
+>> index c49a775..0510a5d 100644
+>> --- a/arch/arm/Kconfig
+>> +++ b/arch/arm/Kconfig
+>> @@ -199,6 +199,11 @@ config NEED_DMA_MAP_STATE
+>>  config ARCH_SUPPORTS_UPROBES
+>>         def_bool y
+>>
+>> +config CPU_LITTLE_ENDIAN
+>> +       depends on !CPU_BIG_ENDIAN
+>> +       def_bool y
+>> +
+>> +
+>>  config ARCH_HAS_DMA_SET_COHERENT_MASK
+>>         bool
 > 
-> Signed-off-by: Silvio Fricke <silvio.fricke@gmail.com>
-> ---
->  scripts/kconfig/lxdialog/check-lxdialog.sh | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/scripts/kconfig/lxdialog/check-lxdialog.sh b/scripts/kconfig/lxdialog/check-lxdialog.sh
-> index 9d2a4c5..a067d3c 100644
-> --- a/scripts/kconfig/lxdialog/check-lxdialog.sh
-> +++ b/scripts/kconfig/lxdialog/check-lxdialog.sh
-> @@ -1,6 +1,9 @@
->  #!/bin/sh
->  # Check ncurses compatibility
->  
-> +unset PKG_CONFIG_PATH
-> +unset PKG_CONFIG_SYSROOT_DIR
+> As this is a common symbol, and replicated for all affected architectures,
+> I'm wondering if we should have the "config CPU_LITTLE_ENDIAN" in
+> common Kconfig code instead, and make the individual architectures do a
+> "select CPU_LITTLE_ENDIAN"?
 
-PKG_CONFIG_SYSROOT_DIR is clearly meant for cross-compiling and we are
-never cross-compiling kconfig. However, PKG_CONFIG_PATH has valid use
-cases even when not cross-compiling. Which variables exactly does yocto set?
+Yes!
 
-It might also be a good idea for yocto to special case the kernel and do
-not set the variables, because we are not cross-compiling any userspace
-programs.
+
+> Also we could have "config CPU_BIG_ENDIAN", too, and error out
+> if none or both are selected (can Kconfig error out?).
+
+We can error out in the Makefile, if there is consensus that we should
+be doing so.
 
 Michal
