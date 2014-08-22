@@ -1,62 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.mei.co.jp ([133.183.100.20]:42518 "EHLO smtp.mei.co.jp"
+Received: from smtp.mei.co.jp ([133.183.100.20]:33967 "EHLO smtp.mei.co.jp"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755604AbaHVB1P (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 21 Aug 2014 21:27:15 -0400
-Date: Fri, 22 Aug 2014 10:27:01 +0900
+	id S1751725AbaHVKw5 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 22 Aug 2014 06:52:57 -0400
 From: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Subject: Re: [PATCH] kbuild: Make scripts executable
-In-Reply-To: <53F5BCC8.4060000@suse.cz>
-References: <20140821122521.2D67.AA925319@jp.panasonic.com> <53F5BCC8.4060000@suse.cz>
-Message-Id: <20140822102701.2D80.AA925319@jp.panasonic.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
+Subject: [PATCH] kbuild: arm: Do not define "comma" twice
+Date: Fri, 22 Aug 2014 19:52:17 +0900
+Message-Id: <1408704737-16973-1-git-send-email-yamada.m@jp.panasonic.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <yamada.m@jp.panasonic.com>, linux-arm-kernel@lists.infradead.org
 
-Hi Michal,
+The definition of "comma" exists in scripts/Kbuild.include.
+We should not double it.
 
-On Thu, 21 Aug 2014 11:32:56 +0200
-Michal Marek <mmarek@suse.cz> wrote:
+Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
+Cc: linux-arm-kernel@lists.infradead.org
+---
+ arch/arm/Makefile   | 2 --
+ arch/arm64/Makefile | 2 --
+ 2 files changed, 4 deletions(-)
 
-> On 2014-08-21 05:25, Masahiro Yamada wrote:
-> > Hi Michal,
-> > 
-> > 
-> > On Wed, 20 Aug 2014 16:10:48 +0200
-> > Michal Marek <mmarek@suse.cz> wrote:
-> > 
-> >> The Makefiles call the respective interpreter explicitly, but this makes
-> >> it easier to use the scripts manually.
-> >>
-> >> Signed-off-by: Michal Marek <mmarek@suse.cz>
-> > 
-> > 
-> > I am not sure at all, but
-> > it seems scripts/checkpatch.pl has a rule
-> > to ban execute permissions.
-> 
-> I didn't know about this, but the intent of the rule seems to be to
-> avoid *.c files with execute permissions.
-> 
-> 
-> > # Check for incorrect file permissions
-> >                 if ($line =~ /^new (file )?mode.*[7531]\d{0,2}$/) {
-> >                         my $permhere = $here . "FILE: $realfile\n";
-> >                         if ($realfile !~ m@scripts/@ &&
-> >                             $realfile !~ /\.(py|pl|awk|sh)$/) {
-> 
-> Here it explicitly skips files below scripts/ and files with known
-> script suffixes.
-> 
-
-OK then. I replied without understanding this code well.
-My appologies.
-
-
-Best Regards
-Masahiro Yamada
+diff --git a/arch/arm/Makefile b/arch/arm/Makefile
+index 0ce9d0f..8568b6fb 100644
+--- a/arch/arm/Makefile
++++ b/arch/arm/Makefile
+@@ -50,8 +50,6 @@ AS		+= -EL
+ LD		+= -EL
+ endif
+ 
+-comma = ,
+-
+ # This selects which instruction set is used.
+ # Note that GCC does not numerically define an architecture version
+ # macro, but instead defines a whole series of macros which makes
+diff --git a/arch/arm64/Makefile b/arch/arm64/Makefile
+index 5783354..ebd0659 100644
+--- a/arch/arm64/Makefile
++++ b/arch/arm64/Makefile
+@@ -30,8 +30,6 @@ AS		+= -EL
+ LD		+= -EL
+ endif
+ 
+-comma = ,
+-
+ CHECKFLAGS	+= -D__aarch64__
+ 
+ # Default value
+-- 
+1.9.1
 
