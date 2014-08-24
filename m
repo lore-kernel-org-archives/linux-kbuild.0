@@ -1,33 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-la0-f66.google.com ([209.85.215.66]:52068 "EHLO
-	mail-la0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750935AbaHWOd6 (ORCPT
+Received: from mail-pa0-f49.google.com ([209.85.220.49]:34019 "EHLO
+	mail-pa0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750883AbaHXFRy (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 23 Aug 2014 10:33:58 -0400
-Received: by mail-la0-f66.google.com with SMTP id mc6so3785071lab.9
-        for <linux-kbuild@vger.kernel.org>; Sat, 23 Aug 2014 07:33:57 -0700 (PDT)
+	Sun, 24 Aug 2014 01:17:54 -0400
+Received: by mail-pa0-f49.google.com with SMTP id hz1so18545023pad.36
+        for <linux-kbuild@vger.kernel.org>; Sat, 23 Aug 2014 22:17:54 -0700 (PDT)
+Date: Sat, 23 Aug 2014 22:17:50 -0700
+From: Brian Norris <computersforpeace@gmail.com>
+Subject: Re: [PATCH 0/2] kconfig: fix multi-byte UTF handling in nconfig
+Message-ID: <20140824051750.GM11952@brian-ubuntu>
+References: <1401868351-24014-1-git-send-email-computersforpeace@gmail.com>
+ <CAN8TOE8MqH9D=R-8FJdE52syY7uU8oBbu+5MtXAdtQEdBGZjkA@mail.gmail.com>
+ <20140820164003.GB3246@norris-Latitude-E6410>
+ <53F72350.8090704@suse.cz>
 MIME-Version: 1.0
-Reply-To: nabdul247@gmail.com
-Date: Sat, 23 Aug 2014 07:08:56 -0700
-Message-ID: <CAOCHuvzL5xwmNy0kbtDzuJHdyKb9sE4tpZJEA0MTbc0=dzTv8w@mail.gmail.com>
-Subject: Urgent Assistance from Syria
-From: Abdul Nasser Sokariah <abdulsokariah10@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <53F72350.8090704@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: Michal Marek <mmarek@suse.cz>
+Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, Artem Bityutskiy <dedekind1@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org
 
--- 
-Good Day From Syria,
+On Fri, Aug 22, 2014 at 01:02:40PM +0200, Michal Marek wrote:
+> Dne 20.8.2014 18:40, Brian Norris napsal(a):
+> > Hi Yan,
+> > 
+> > On Thu, Jul 10, 2014 at 01:52:29AM -0700, Brian Norris wrote:
+> >> Ping? The patches are simple.
+> > 
+> > Ping.
+> 
+> I applied the patches to my kbuild tree.
 
-My name is Abdul Nasser Sokariah and I am writing you from Syria, I
-choose to contact you directly as I need a reliable person to trust
-who can help me make claims to my huge deposit with a vault company in
-AFRICA, and based on my present situation in Syria, I need you
-urgently to take  possession of everything and further
-modalities/directives will follow.
+Great, thanks!
 
-Contact me  only on my private Email:nabdul247@gmail.com for
-clarifications,I await your response.
-
-Yours truly, Abdul Nasser Sokariah
-Contact Email:nabdul247@gmail.com
+Brian
