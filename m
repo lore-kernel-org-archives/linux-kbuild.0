@@ -1,39 +1,95 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pa0-f49.google.com ([209.85.220.49]:34019 "EHLO
-	mail-pa0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750883AbaHXFRy (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 24 Aug 2014 01:17:54 -0400
-Received: by mail-pa0-f49.google.com with SMTP id hz1so18545023pad.36
-        for <linux-kbuild@vger.kernel.org>; Sat, 23 Aug 2014 22:17:54 -0700 (PDT)
-Date: Sat, 23 Aug 2014 22:17:50 -0700
-From: Brian Norris <computersforpeace@gmail.com>
-Subject: Re: [PATCH 0/2] kconfig: fix multi-byte UTF handling in nconfig
-Message-ID: <20140824051750.GM11952@brian-ubuntu>
-References: <1401868351-24014-1-git-send-email-computersforpeace@gmail.com>
- <CAN8TOE8MqH9D=R-8FJdE52syY7uU8oBbu+5MtXAdtQEdBGZjkA@mail.gmail.com>
- <20140820164003.GB3246@norris-Latitude-E6410>
- <53F72350.8090704@suse.cz>
+Received: from cantor2.suse.de ([195.135.220.15]:44987 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755071AbaHZNkX (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 26 Aug 2014 09:40:23 -0400
+Message-ID: <53FC8E45.9060401@suse.cz>
+Date: Tue, 26 Aug 2014 15:40:21 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <53F72350.8090704@suse.cz>
+Subject: Re: [PATCH] builddeb: put the dbg files into the correct directory
+References: <20140819054928.GO2808@birch.djwong.org> <20140822135607.GA15255@sepie.suse.cz> <20140822171000.GA10183@birch.djwong.org>
+In-Reply-To: <20140822171000.GA10183@birch.djwong.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, Artem Bityutskiy <dedekind1@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org
+To: "Darrick J. Wong" <darrick.wong@oracle.com>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Fri, Aug 22, 2014 at 01:02:40PM +0200, Michal Marek wrote:
-> Dne 20.8.2014 18:40, Brian Norris napsal(a):
-> > Hi Yan,
-> > 
-> > On Thu, Jul 10, 2014 at 01:52:29AM -0700, Brian Norris wrote:
-> >> Ping? The patches are simple.
-> > 
-> > Ping.
+On 2014-08-22 19:10, Darrick J. Wong wrote:
+> On Fri, Aug 22, 2014 at 03:56:07PM +0200, Michal Marek wrote:
+>> On Mon, Aug 18, 2014 at 10:49:28PM -0700, Darrick J. Wong wrote:
+>>> Since the conversion of objtree to use relative pathnames (commit
+>>> 7e1c04779e, "kbuild: Use relative path for $(objtree)"), the debug
+>>> info files have been ending up in /debian/dbgtmp/ in the regular
+>>> linux-image package instead of the debug files package.  Fix up the
+>>> paths so that the debug files end up in the -dbg package.
+>>>
+>>> Signed-off-by: Darrick J. Wong <darrick.wong@oracle.com>
+>>> ---
+>>>  scripts/package/builddeb |    7 ++++---
+>>>  1 file changed, 4 insertions(+), 3 deletions(-)
+>>>
+>>> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+>>> index 5707466..0456322 100644
+>>> --- a/scripts/package/builddeb
+>>> +++ b/scripts/package/builddeb
+>>> @@ -153,15 +153,16 @@ if grep -q '^CONFIG_MODULES=y' $KCONFIG_CONFIG ; then
+>>>  	fi
+>>>  	if [ -n "$BUILD_DEBUG" ] ; then
+>>>  		(
+>>> +			old_dir="$(pwd)"
+>>>  			cd $tmpdir
+>>
+>> Can you try the patch below? I'd rather get rid of the directory change,
+>> if possible.
+>>
+>> Michal
+>>
+>> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+>> index 35d5a58..dcfdbda 100755
+>> --- a/scripts/package/builddeb
+>> +++ b/scripts/package/builddeb
+>> @@ -152,18 +152,16 @@ if grep -q '^CONFIG_MODULES=y' $KCONFIG_CONFIG ; then
+>>  		rmdir "$tmpdir/lib/modules/$version"
+>>  	fi
+>>  	if [ -n "$BUILD_DEBUG" ] ; then
+>> -		(
+>> -			cd $tmpdir
+>> -			for module in $(find lib/modules/ -name *.ko); do
+>> -				mkdir -p $(dirname $dbg_dir/usr/lib/debug/$module)
+>> -				# only keep debug symbols in the debug file
+>> -				$OBJCOPY --only-keep-debug $module $dbg_dir/usr/lib/debug/$module
+>> -				# strip original module from debug symbols
+>> -				$OBJCOPY --strip-debug $module
+>> -				# then add a link to those
+>> -				$OBJCOPY --add-gnu-debuglink=$dbg_dir/usr/lib/debug/$module $module
+>> -			done
+>> -		)
+>> +		for module in $(find $tmpdir/lib/modules/ -name *.ko -printf '%P\n'); do
+>> +			module=lib/modules/$module
+>> +			mkdir -p $(dirname $dbg_dir/usr/lib/debug/$module)
+>> +			# only keep debug symbols in the debug file
+>> +			$OBJCOPY --only-keep-debug $tmpdir/$module $dbg_dir/usr/lib/debug/$module
+>> +			# strip original module from debug symbols
+>> +			$OBJCOPY --strip-debug $tmpdir/$module
+>> +			# then add a link to those
+>> +			$OBJCOPY --add-gnu-debuglink=$dbg_dir/usr/lib/debug/$module $module
 > 
-> I applied the patches to my kbuild tree.
+> This should read:
+> 
+> $OBJCOPY --add-gnu-debuglink=$dbg_dir/usr/lib/debug/$module $tmpdir/$module
+> 
+> (The last argument needs "$tmpdir/".)
 
-Great, thanks!
+Oops, you are right.
 
-Brian
+
+> but otherwise it's ok, so you can add:
+> Tested-by: Darrick J. Wong <darrick.wong@oracle.com>
+
+Thanks!
+
+Michal
+
