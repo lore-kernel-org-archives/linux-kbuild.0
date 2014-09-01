@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kapsi.fi ([217.30.184.167]:49145 "EHLO mail.kapsi.fi"
+Received: from mail.kapsi.fi ([217.30.184.167]:59552 "EHLO mail.kapsi.fi"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752614AbaIAG0k (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	id S1752611AbaIAG0k (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
 	Mon, 1 Sep 2014 02:26:40 -0400
 From: Mikko Rapeli <mikko.rapeli@iki.fi>
-Subject: [RFC PATCH v2 23/27] r128_drm.h: include drm/drm.h
-Date: Mon,  1 Sep 2014 09:26:14 +0300
-Message-Id: <1409552778-2537-24-git-send-email-mikko.rapeli@iki.fi>
+Subject: [RFC PATCH v2 25/27] via_drm.h: hide struct via_file_private in userspace
+Date: Mon,  1 Sep 2014 09:26:16 +0300
+Message-Id: <1409552778-2537-26-git-send-email-mikko.rapeli@iki.fi>
 In-Reply-To: <1409552778-2537-1-git-send-email-mikko.rapeli@iki.fi>
 References: <1408660449-4011-1-git-send-email-mikko.rapeli@iki.fi>
  <1409552778-2537-1-git-send-email-mikko.rapeli@iki.fi>
@@ -15,29 +15,28 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
 Cc: linux-kbuild@vger.kernel.org, mikko.rapeli@iki.fi
 
-Fixes compile error:
-
-drm/r128_drm.h:156:23: error: array type has incomplete element type
-  struct drm_clip_rect boxes[R128_NR_SAREA_CLIPRECTS];
+Fixes compiler error since list_head is not exported to userspace headers.
 
 Signed-off-by: Mikko Rapeli <mikko.rapeli@iki.fi>
 ---
- include/uapi/drm/r128_drm.h | 2 ++
+ include/uapi/drm/via_drm.h | 2 ++
  1 file changed, 2 insertions(+)
 
-diff --git a/include/uapi/drm/r128_drm.h b/include/uapi/drm/r128_drm.h
-index 8d8878b..76b0aa3 100644
---- a/include/uapi/drm/r128_drm.h
-+++ b/include/uapi/drm/r128_drm.h
-@@ -33,6 +33,8 @@
- #ifndef __R128_DRM_H__
- #define __R128_DRM_H__
+diff --git a/include/uapi/drm/via_drm.h b/include/uapi/drm/via_drm.h
+index 791531e..34ce658 100644
+--- a/include/uapi/drm/via_drm.h
++++ b/include/uapi/drm/via_drm.h
+@@ -272,8 +272,10 @@ typedef struct drm_via_dmablit {
+ 	drm_via_blitsync_t sync;
+ } drm_via_dmablit_t;
  
-+#include <drm/drm.h>
-+
- /* WARNING: If you change any of these defines, make sure to change the
-  * defines in the X server file (r128_sarea.h)
-  */
++#ifdef __KERNEL__
+ struct via_file_private {
+ 	struct list_head obj_list;
+ };
++#endif
+ 
+ #endif				/* _VIA_DRM_H_ */
 -- 
 2.1.0
 
