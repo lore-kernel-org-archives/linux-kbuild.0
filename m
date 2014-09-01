@@ -1,82 +1,68 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lb0-f181.google.com ([209.85.217.181]:37299 "EHLO
-	mail-lb0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752591AbaIAHQr (ORCPT
+Received: from mail-la0-f45.google.com ([209.85.215.45]:59660 "EHLO
+	mail-la0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751542AbaIAHYr (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 1 Sep 2014 03:16:47 -0400
-Subject: [PATCH v2 2/4] scripts/config: add option for changing output for
- undefined options
-From: Konstantin Khlebnikov <koct9i@gmail.com>
-Date: Mon, 01 Sep 2014 11:16:32 +0400
-Message-ID: <20140901071632.28909.31322.stgit@zurg>
+	Mon, 1 Sep 2014 03:24:47 -0400
+MIME-Version: 1.0
 In-Reply-To: <20140901065916.28909.35097.stgit@zurg>
 References: <20140901065916.28909.35097.stgit@zurg>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+Date: Mon, 1 Sep 2014 09:24:45 +0200
+Message-ID: <CAMuHMdXKyTJZM9fwcCZ+-vCX3SZ9JuhPiNNAhyu=vrZuOjsw8w@mail.gmail.com>
+Subject: Re: [PATCH v2 0/4] kconfig: store default ARCH in .config
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
-Cc: Paul Bolle <pebolle@tiscali.nl>, Geert Uytterhoeven <geert@linux-m68k.org>
+To: Konstantin Khlebnikov <koct9i@gmail.com>
+Cc: Michal Marek <mmarek@suse.cz>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Paul Bolle <pebolle@tiscali.nl>
 
-This patch adds command line option '--if-undef' which replaces string 'undef'
-in output of next command '--state' with whatever you want.
+Hi Konstantin,
 
-Also it adds grep key -s to suppress error messages about nonexistent file.
+On Mon, Sep 1, 2014 at 9:16 AM, Konstantin Khlebnikov <koct9i@gmail.com> wrote:
+> This is second attempt of fixing target archecture amnesia.
+> v1 patch: http://lkml.kernel.org/r/20140706080234.19520.96704.stgit@zurg
+>
+> First version saved ARCH as CONFIG_DEFAULT_ARCH and used it as defult ARCH.
+>
+> This version changes semantic of Kconfig option env="...", now it acts more
+> like the user input, except that the value comes from the environment.
+> Variable from environment overrides all defaults and value from config file.
+> If environment variable is not defined this option has no effect.
+>
+> So, now ARCH is saved as CONFIG_ARCH.
+>
+> Also this patchset links CONFIG_CROSS_COMPILE and CROSS_COMPILE in the same way.
+> Changing it in command line/environment also updates value in the config file.
 
-Signed-off-by: Konstantin Khlebnikov <koct9i@gmail.com>
----
- scripts/config |   15 ++++++++++++---
- 1 file changed, 12 insertions(+), 3 deletions(-)
+Thanks, I haven't tried this yet, but it looks promising!
 
-diff --git a/scripts/config b/scripts/config
-index 026aeb4..178652c 100755
---- a/scripts/config
-+++ b/scripts/config
-@@ -6,6 +6,9 @@ myname=${0##*/}
- # If no prefix forced, use the default CONFIG_
- CONFIG_="${CONFIG_-CONFIG_}"
- 
-+# Output for undefined options
-+UNDEF="undef"
-+
- usage() {
- 	cat >&2 <<EOL
- Manipulate options in a .config file from the command line.
-@@ -34,6 +37,7 @@ commands:
- options:
- 	--file config-file   .config file to change (default .config)
- 	--keep-case|-k       Keep next symbols' case (dont' upper-case it)
-+	--if-undef string    Print this string instead of state "undef"
- 
- $myname doesn't check the validity of the .config file. This is done at next
- make time.
-@@ -152,6 +156,11 @@ while [ "$1" != "" ] ; do
- 		B=$ARG
- 		shift 2
- 		;;
-+	--if-undef)
-+		UNDEF=$1
-+		shift
-+		continue
-+		;;
- 	-*)
- 		checkarg "$1"
- 		shift
-@@ -185,12 +194,12 @@ while [ "$1" != "" ] ; do
- 		;;
- 
- 	--state|-s)
--		if grep -q "# ${CONFIG_}$ARG is not set" $FN ; then
-+		if grep -sq "# ${CONFIG_}$ARG is not set" $FN ; then
- 			echo n
- 		else
--			V="$(grep "^${CONFIG_}$ARG=" $FN)"
-+			V="$(grep -s "^${CONFIG_}$ARG=" $FN)"
- 			if [ $? != 0 ] ; then
--				echo undef
-+				echo "${UNDEF}"
- 			else
- 				V="${V/#${CONFIG_}$ARG=/}"
- 				V="${V/#\"/}"
+For the record, right now I use a GNUmakefile (which takes precedence over
+the Makefile) in the build directory containing e.g.
 
+MAKEARGS = ARCH=arm CROSS_COMPILE=arm-unknown-linux-gnueabi-
+
+MAKEFLAGS += --no-print-directory
+
+.PHONY: all $(MAKECMDGOALS)
+
+all := $(filter-out all Makefile,$(MAKECMDGOALS))
+
+all:
+        $(MAKE) $(MAKEARGS) $(all) -f Makefile
+
+Makefile:;
+
+$(all) %/: all
+        @:
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
