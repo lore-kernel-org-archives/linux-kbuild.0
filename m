@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kapsi.fi ([217.30.184.167]:58417 "EHLO mail.kapsi.fi"
+Received: from mail.kapsi.fi ([217.30.184.167]:35731 "EHLO mail.kapsi.fi"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752617AbaIAG0k (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	id S1752618AbaIAG0k (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
 	Mon, 1 Sep 2014 02:26:40 -0400
 From: Mikko Rapeli <mikko.rapeli@iki.fi>
-Subject: [RFC PATCH v2 21/27] gntalloc.h: include stdint.h in userspace
-Date: Mon,  1 Sep 2014 09:26:12 +0300
-Message-Id: <1409552778-2537-22-git-send-email-mikko.rapeli@iki.fi>
+Subject: [RFC PATCH v2 20/27] hdspm.h: include stdint.h in userspace
+Date: Mon,  1 Sep 2014 09:26:11 +0300
+Message-Id: <1409552778-2537-21-git-send-email-mikko.rapeli@iki.fi>
 In-Reply-To: <1409552778-2537-1-git-send-email-mikko.rapeli@iki.fi>
 References: <1408660449-4011-1-git-send-email-mikko.rapeli@iki.fi>
  <1409552778-2537-1-git-send-email-mikko.rapeli@iki.fi>
@@ -20,20 +20,20 @@ Cc: linux-kbuild@vger.kernel.org, mikko.rapeli@iki.fi
 
 Fixes compilation error:
 
-xen/gntalloc.h:22:2: error: unknown type name ‘uint16_t’
+sound/hdspm.h:43:2: error: unknown type name ‘uint32_t’
 
 Signed-off-by: Mikko Rapeli <mikko.rapeli@iki.fi>
 ---
- include/uapi/xen/gntalloc.h | 6 ++++++
+ include/uapi/sound/hdspm.h | 6 ++++++
  1 file changed, 6 insertions(+)
 
-diff --git a/include/uapi/xen/gntalloc.h b/include/uapi/xen/gntalloc.h
-index 76bd580..184df7e 100644
---- a/include/uapi/xen/gntalloc.h
-+++ b/include/uapi/xen/gntalloc.h
-@@ -11,6 +11,12 @@
- #ifndef __LINUX_PUBLIC_GNTALLOC_H__
- #define __LINUX_PUBLIC_GNTALLOC_H__
+diff --git a/include/uapi/sound/hdspm.h b/include/uapi/sound/hdspm.h
+index d956c35..f799828 100644
+--- a/include/uapi/sound/hdspm.h
++++ b/include/uapi/sound/hdspm.h
+@@ -20,6 +20,12 @@
+  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+  */
  
 +#ifdef __KERNEL__
 +#include <linux/types.h>
@@ -41,9 +41,9 @@ index 76bd580..184df7e 100644
 +#include <stdint.h>
 +#endif
 +
- /*
-  * Allocates a new page and creates a new grant reference.
-  */
+ /* Maximum channels is 64 even on 56Mode you have 64playbacks to matrix */
+ #define HDSPM_MAX_CHANNELS      64
+ 
 -- 
 2.1.0
 
