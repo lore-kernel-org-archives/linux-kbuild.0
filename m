@@ -1,13 +1,16 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-la0-f51.google.com ([209.85.215.51]:41041 "EHLO
-	mail-la0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752524AbaIAHQk (ORCPT
+Received: from mail-lb0-f169.google.com ([209.85.217.169]:34319 "EHLO
+	mail-lb0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752570AbaIAHQn (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 1 Sep 2014 03:16:40 -0400
-Subject: [PATCH v2 0/4] kconfig: store default ARCH in .config
+	Mon, 1 Sep 2014 03:16:43 -0400
+Subject: [PATCH v2 1/4] kconfig: save values imported from environment into
+ config file
 From: Konstantin Khlebnikov <koct9i@gmail.com>
-Date: Mon, 01 Sep 2014 11:16:25 +0400
-Message-ID: <20140901065916.28909.35097.stgit@zurg>
+Date: Mon, 01 Sep 2014 11:16:29 +0400
+Message-ID: <20140901071629.28909.20328.stgit@zurg>
+In-Reply-To: <20140901065916.28909.35097.stgit@zurg>
+References: <20140901065916.28909.35097.stgit@zurg>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
@@ -16,39 +19,117 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 Cc: Paul Bolle <pebolle@tiscali.nl>, Geert Uytterhoeven <geert@linux-m68k.org>
 
-This is second attempt of fixing target archecture amnesia.
-v1 patch: http://lkml.kernel.org/r/20140706080234.19520.96704.stgit@zurg
+After this patch option env="..." behaves more like user input.
+Environment variable becomes optional, its last state is saved in config.
 
-First version saved ARCH as CONFIG_DEFAULT_ARCH and used it as defult ARCH.
+Impact of this change is minimal. This option is used only three times:
+for ARCH, SRCARCH and KERNELVERSION. All of them are always defined by
+root Makefile.
 
-This version changes semantic of Kconfig option env="...", now it acts more
-like the user input, except that the value comes from the environment.
-Variable from environment overrides all defaults and value from config file.
-If environment variable is not defined this option has no effect.
-
-So, now ARCH is saved as CONFIG_ARCH.
-
-Also this patchset links CONFIG_CROSS_COMPILE and CROSS_COMPILE in the same way.
-Changing it in command line/environment also updates value in the config file.
-
+Signed-off-by: Konstantin Khlebnikov <koct9i@gmail.com>
 ---
-
-Konstantin Khlebnikov (4):
-      kconfig: save values imported from environment into config file
-      scripts/config: add option for changing output for undefined options
-      kconfig: get target architecture from config file
-      kconfig: link CONFIG_CROSS_COMPILE with environment variable
-
-
  Documentation/kbuild/kconfig-language.txt |   10 ++++------
- Documentation/kbuild/makefiles.txt        |    3 ++-
- Makefile                                  |   21 +++++++++++++++------
- init/Kconfig                              |    1 +
- scripts/config                            |   15 ++++++++++++---
  scripts/kconfig/confdata.c                |   26 ++++++++++++++++++++++++++
  scripts/kconfig/expr.h                    |    2 +-
  scripts/kconfig/symbol.c                  |    3 ---
- 8 files changed, 61 insertions(+), 20 deletions(-)
+ 4 files changed, 31 insertions(+), 10 deletions(-)
 
---
-Signature
+diff --git a/Documentation/kbuild/kconfig-language.txt b/Documentation/kbuild/kconfig-language.txt
+index 350f733..0dad00a 100644
+--- a/Documentation/kbuild/kconfig-language.txt
++++ b/Documentation/kbuild/kconfig-language.txt
+@@ -149,13 +149,11 @@ applicable everywhere (see syntax).
+     enables the third modular state for all config symbols.
+     At most one symbol may have the "modules" option set.
+ 
+-  - "env"=<value>
++  - "env"=<varname>
+     This imports the environment variable into Kconfig. It behaves like
+-    a default, except that the value comes from the environment, this
+-    also means that the behaviour when mixing it with normal defaults is
+-    undefined at this point. The symbol is currently not exported back
+-    to the build environment (if this is desired, it can be done via
+-    another symbol).
++    the user input, except that the value comes from the environment.
++    Environment variable overrides all defaults and value from the file.
++    If environment variable is not defined this option has no effect.
+ 
+   - "allnoconfig_y"
+     This declares the symbol as one that should have the value y when
+diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+index f88d90f..5cb0034 100644
+--- a/scripts/kconfig/confdata.c
++++ b/scripts/kconfig/confdata.c
+@@ -404,6 +404,30 @@ setsym:
+ 	return 0;
+ }
+ 
++static void conf_read_env(void)
++{
++	struct symbol *sym, *env_sym;
++	struct property *prop;
++	struct expr *expr;
++	char *value;
++
++	expr_list_for_each_sym(sym_env_list, expr, sym) {
++		prop = sym_get_env_prop(sym);
++		env_sym = prop_get_symbol(prop);
++		value = getenv(env_sym->name);
++		if (value) {
++			sym_calc_value(sym);
++			if (!sym_set_string_value(sym, value))
++				conf_warning("evironment variable %s value "
++					      "'%s' invalid for %s",
++					      env_sym->name, value, sym->name);
++		} else if (!(sym->flags & SYMBOL_DEF_USER))
++			conf_warning("neither symbol %s nor evironment "
++					"variable %s are defined",
++				       sym->name, env_sym->name);
++	}
++}
++
+ int conf_read(const char *name)
+ {
+ 	struct symbol *sym;
+@@ -414,6 +438,8 @@ int conf_read(const char *name)
+ 	if (conf_read_simple(name, S_DEF_USER))
+ 		return 1;
+ 
++	conf_read_env();
++
+ 	for_all_symbols(i, sym) {
+ 		sym_calc_value(sym);
+ 		if (sym_is_choice(sym) || (sym->flags & SYMBOL_AUTO))
+diff --git a/scripts/kconfig/expr.h b/scripts/kconfig/expr.h
+index 412ea8a..8d9bbc9 100644
+--- a/scripts/kconfig/expr.h
++++ b/scripts/kconfig/expr.h
+@@ -95,7 +95,7 @@ struct symbol {
+ #define SYMBOL_OPTIONAL   0x0100  /* choice is optional - values can be 'n' */
+ #define SYMBOL_WRITE      0x0200  /* write symbol to file (KCONFIG_CONFIG) */
+ #define SYMBOL_CHANGED    0x0400  /* ? */
+-#define SYMBOL_AUTO       0x1000  /* value from environment variable */
++#define SYMBOL_AUTO       0x1000  /* calculated value - not saved into file */
+ #define SYMBOL_CHECKED    0x2000  /* used during dependency checking */
+ #define SYMBOL_WARNED     0x8000  /* warning has been issued */
+ 
+diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
+index 7caabdb..9dce811 100644
+--- a/scripts/kconfig/symbol.c
++++ b/scripts/kconfig/symbol.c
+@@ -1350,7 +1350,6 @@ static void prop_add_env(const char *env)
+ 	char *p;
+ 
+ 	sym = current_entry->sym;
+-	sym->flags |= SYMBOL_AUTO;
+ 	for_all_properties(sym, prop, P_ENV) {
+ 		sym2 = prop_get_symbol(prop);
+ 		if (strcmp(sym2->name, env))
+@@ -1368,6 +1367,4 @@ static void prop_add_env(const char *env)
+ 	p = getenv(env);
+ 	if (p)
+ 		sym_add_default(sym, p);
+-	else
+-		menu_warn(current_entry, "environment variable %s undefined", env);
+ }
+
