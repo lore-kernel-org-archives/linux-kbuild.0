@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kapsi.fi ([217.30.184.167]:34719 "EHLO mail.kapsi.fi"
+Received: from mail.kapsi.fi ([217.30.184.167]:46121 "EHLO mail.kapsi.fi"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752729AbaIAG0u (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	id S1752730AbaIAG0u (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
 	Mon, 1 Sep 2014 02:26:50 -0400
 From: Mikko Rapeli <mikko.rapeli@iki.fi>
-Subject: [RFC PATCH v2 15/27] rds.h: include stdint.h in userspace
-Date: Mon,  1 Sep 2014 09:26:06 +0300
-Message-Id: <1409552778-2537-16-git-send-email-mikko.rapeli@iki.fi>
+Subject: [RFC PATCH v2 16/27] sctp.h: include stdint.h in userspace
+Date: Mon,  1 Sep 2014 09:26:07 +0300
+Message-Id: <1409552778-2537-17-git-send-email-mikko.rapeli@iki.fi>
 In-Reply-To: <1409552778-2537-1-git-send-email-mikko.rapeli@iki.fi>
 References: <1408660449-4011-1-git-send-email-mikko.rapeli@iki.fi>
  <1409552778-2537-1-git-send-email-mikko.rapeli@iki.fi>
@@ -20,29 +20,29 @@ Cc: linux-kbuild@vger.kernel.org, mikko.rapeli@iki.fi
 
 Fixes compilation error:
 
-linux/rds.h:96:2: error: unknown type name ‘uint8_t’
+linux/sctp.h:652:2: error: unknown type name ‘uint32_t’
 
 Signed-off-by: Mikko Rapeli <mikko.rapeli@iki.fi>
 ---
- include/uapi/linux/rds.h | 4 ++++
+ include/uapi/linux/sctp.h | 4 ++++
  1 file changed, 4 insertions(+)
 
-diff --git a/include/uapi/linux/rds.h b/include/uapi/linux/rds.h
-index 9195095..7ff0c70 100644
---- a/include/uapi/linux/rds.h
-+++ b/include/uapi/linux/rds.h
-@@ -34,7 +34,11 @@
- #ifndef _LINUX_RDS_H
- #define _LINUX_RDS_H
+diff --git a/include/uapi/linux/sctp.h b/include/uapi/linux/sctp.h
+index 266022a..f68d79a 100644
+--- a/include/uapi/linux/sctp.h
++++ b/include/uapi/linux/sctp.h
+@@ -53,7 +53,11 @@
+ #ifndef _UAPI_SCTP_H
+ #define _UAPI_SCTP_H
  
 +#ifdef __KERNEL__
  #include <linux/types.h>
 +#else
 +#include <stdint.h>
 +#endif
+ #include <linux/socket.h>
  
- #define RDS_IB_ABI_VERSION		0x301
- 
+ typedef __s32 sctp_assoc_t;
 -- 
 2.1.0
 
