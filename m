@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kapsi.fi ([217.30.184.167]:47105 "EHLO mail.kapsi.fi"
+Received: from mail.kapsi.fi ([217.30.184.167]:33478 "EHLO mail.kapsi.fi"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752731AbaIAG0u (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 1 Sep 2014 02:26:50 -0400
+	id S1752737AbaIAG0v (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 1 Sep 2014 02:26:51 -0400
 From: Mikko Rapeli <mikko.rapeli@iki.fi>
-Subject: [RFC PATCH v2 14/27] cld.h: include stdint.h in userspace
-Date: Mon,  1 Sep 2014 09:26:05 +0300
-Message-Id: <1409552778-2537-15-git-send-email-mikko.rapeli@iki.fi>
+Subject: [RFC PATCH v2 11/27] dm-log-userspace.h: include stdint.h in userspace
+Date: Mon,  1 Sep 2014 09:26:02 +0300
+Message-Id: <1409552778-2537-12-git-send-email-mikko.rapeli@iki.fi>
 In-Reply-To: <1409552778-2537-1-git-send-email-mikko.rapeli@iki.fi>
 References: <1408660449-4011-1-git-send-email-mikko.rapeli@iki.fi>
  <1409552778-2537-1-git-send-email-mikko.rapeli@iki.fi>
@@ -20,30 +20,29 @@ Cc: linux-kbuild@vger.kernel.org, mikko.rapeli@iki.fi
 
 Fixes compilation error:
 
-linux/nfsd/cld.h:40:2: error: unknown type name ‘uint16_t’
+linux/dm-log-userspace.h:416:2: error: unknown type name ‘uint64_t’
 
 Signed-off-by: Mikko Rapeli <mikko.rapeli@iki.fi>
 ---
- include/uapi/linux/nfsd/cld.h | 6 ++++++
- 1 file changed, 6 insertions(+)
+ include/uapi/linux/dm-log-userspace.h | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/include/uapi/linux/nfsd/cld.h b/include/uapi/linux/nfsd/cld.h
-index f14a9ab..9f60f9c 100644
---- a/include/uapi/linux/nfsd/cld.h
-+++ b/include/uapi/linux/nfsd/cld.h
-@@ -22,6 +22,12 @@
- #ifndef _NFSD_CLD_H
- #define _NFSD_CLD_H
+diff --git a/include/uapi/linux/dm-log-userspace.h b/include/uapi/linux/dm-log-userspace.h
+index 0fa0d9e..7b9684e 100644
+--- a/include/uapi/linux/dm-log-userspace.h
++++ b/include/uapi/linux/dm-log-userspace.h
+@@ -7,6 +7,11 @@
+ #ifndef __DM_LOG_USERSPACE_H__
+ #define __DM_LOG_USERSPACE_H__
  
 +#ifdef __KERNEL__
 +#include <linux/types.h>
 +#else
 +#include <stdint.h>
 +#endif
-+
- /* latest upcall version available */
- #define CLD_UPCALL_VERSION 1
+ #include <linux/dm-ioctl.h> /* For DM_UUID_LEN */
  
+ /*
 -- 
 2.1.0
 
