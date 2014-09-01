@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kapsi.fi ([217.30.184.167]:46121 "EHLO mail.kapsi.fi"
+Received: from mail.kapsi.fi ([217.30.184.167]:47490 "EHLO mail.kapsi.fi"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752730AbaIAG0u (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	id S1752619AbaIAG0u (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
 	Mon, 1 Sep 2014 02:26:50 -0400
 From: Mikko Rapeli <mikko.rapeli@iki.fi>
-Subject: [RFC PATCH v2 16/27] sctp.h: include stdint.h in userspace
-Date: Mon,  1 Sep 2014 09:26:07 +0300
-Message-Id: <1409552778-2537-17-git-send-email-mikko.rapeli@iki.fi>
+Subject: [RFC PATCH v2 17/27] scsi_bsg_fc.h: include stdint.h in userspace
+Date: Mon,  1 Sep 2014 09:26:08 +0300
+Message-Id: <1409552778-2537-18-git-send-email-mikko.rapeli@iki.fi>
 In-Reply-To: <1409552778-2537-1-git-send-email-mikko.rapeli@iki.fi>
 References: <1408660449-4011-1-git-send-email-mikko.rapeli@iki.fi>
  <1409552778-2537-1-git-send-email-mikko.rapeli@iki.fi>
@@ -20,29 +20,30 @@ Cc: linux-kbuild@vger.kernel.org, mikko.rapeli@iki.fi
 
 Fixes compilation error:
 
-linux/sctp.h:652:2: error: unknown type name ‘uint32_t’
+scsi/scsi_bsg_fc.h:83:2: error: unknown type name ‘uint8_t’
 
 Signed-off-by: Mikko Rapeli <mikko.rapeli@iki.fi>
 ---
- include/uapi/linux/sctp.h | 4 ++++
- 1 file changed, 4 insertions(+)
+ include/uapi/scsi/scsi_bsg_fc.h | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/include/uapi/linux/sctp.h b/include/uapi/linux/sctp.h
-index 266022a..f68d79a 100644
---- a/include/uapi/linux/sctp.h
-+++ b/include/uapi/linux/sctp.h
-@@ -53,7 +53,11 @@
- #ifndef _UAPI_SCTP_H
- #define _UAPI_SCTP_H
+diff --git a/include/uapi/scsi/scsi_bsg_fc.h b/include/uapi/scsi/scsi_bsg_fc.h
+index 3031b90..5cc25df 100644
+--- a/include/uapi/scsi/scsi_bsg_fc.h
++++ b/include/uapi/scsi/scsi_bsg_fc.h
+@@ -22,6 +22,12 @@
+ #ifndef SCSI_BSG_FC_H
+ #define SCSI_BSG_FC_H
  
 +#ifdef __KERNEL__
- #include <linux/types.h>
++#include <linux/types.h>
 +#else
 +#include <stdint.h>
 +#endif
- #include <linux/socket.h>
- 
- typedef __s32 sctp_assoc_t;
++
+ /*
+  * This file intended to be included by both kernel and user space
+  */
 -- 
 2.1.0
 
