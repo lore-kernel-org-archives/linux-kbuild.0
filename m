@@ -1,51 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kapsi.fi ([217.30.184.167]:54961 "EHLO mail.kapsi.fi"
+Received: from mail.kapsi.fi ([217.30.184.167]:34561 "EHLO mail.kapsi.fi"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752613AbaIAG0k (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	id S1752616AbaIAG0k (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
 	Mon, 1 Sep 2014 02:26:40 -0400
 From: Mikko Rapeli <mikko.rapeli@iki.fi>
-Subject: [RFC PATCH v2 24/27] via_drm.h: include linux/types.h instead of non-existing via_drmclient.h
-Date: Mon,  1 Sep 2014 09:26:15 +0300
-Message-Id: <1409552778-2537-25-git-send-email-mikko.rapeli@iki.fi>
+Subject: [RFC PATCH v2 22/27] gntdev.h: include stdint.h in userspace
+Date: Mon,  1 Sep 2014 09:26:13 +0300
+Message-Id: <1409552778-2537-23-git-send-email-mikko.rapeli@iki.fi>
 In-Reply-To: <1409552778-2537-1-git-send-email-mikko.rapeli@iki.fi>
 References: <1408660449-4011-1-git-send-email-mikko.rapeli@iki.fi>
  <1409552778-2537-1-git-send-email-mikko.rapeli@iki.fi>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
 Cc: linux-kbuild@vger.kernel.org, mikko.rapeli@iki.fi
 
-Fixes compiler error:
+Fixes compilation error:
 
-drm/via_drm.h:36:27: fatal error: via_drmclient.h: No such file or directory
+xen/gntdev.h:38:2: error: unknown type name ‘uint32_t’
 
 Signed-off-by: Mikko Rapeli <mikko.rapeli@iki.fi>
 ---
- include/uapi/drm/via_drm.h | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ include/uapi/xen/gntdev.h | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/include/uapi/drm/via_drm.h b/include/uapi/drm/via_drm.h
-index 8b0533c..791531e 100644
---- a/include/uapi/drm/via_drm.h
-+++ b/include/uapi/drm/via_drm.h
-@@ -24,6 +24,7 @@
- #ifndef _VIA_DRM_H_
- #define _VIA_DRM_H_
+diff --git a/include/uapi/xen/gntdev.h b/include/uapi/xen/gntdev.h
+index 5304bd3..f724f75 100644
+--- a/include/uapi/xen/gntdev.h
++++ b/include/uapi/xen/gntdev.h
+@@ -33,6 +33,12 @@
+ #ifndef __LINUX_PUBLIC_GNTDEV_H__
+ #define __LINUX_PUBLIC_GNTDEV_H__
  
++#ifdef __KERNEL__
 +#include <linux/types.h>
- #include <drm/drm.h>
- 
- /* WARNING: These defines must be the same as what the Xserver uses.
-@@ -33,9 +34,6 @@
- #ifndef _VIA_DEFINES_
- #define _VIA_DEFINES_
- 
--#ifndef __KERNEL__
--#include "via_drmclient.h"
--#endif
- 
- #define VIA_NR_SAREA_CLIPRECTS		8
- #define VIA_NR_XVMC_PORTS               10
++#else
++#include <stdint.h>
++#endif
++
+ struct ioctl_gntdev_grant_ref {
+ 	/* The domain ID of the grant to be mapped. */
+ 	uint32_t domid;
 -- 
 2.1.0
 
