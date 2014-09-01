@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kapsi.fi ([217.30.184.167]:60438 "EHLO mail.kapsi.fi"
+Received: from mail.kapsi.fi ([217.30.184.167]:36232 "EHLO mail.kapsi.fi"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752619AbaIAG0k (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 1 Sep 2014 02:26:40 -0400
+	id S1752624AbaIAG0m (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 1 Sep 2014 02:26:42 -0400
 From: Mikko Rapeli <mikko.rapeli@iki.fi>
-Subject: [RFC PATCH v2 19/27] scsi_netlink_fc.h: include stdint.h in userspace
-Date: Mon,  1 Sep 2014 09:26:10 +0300
-Message-Id: <1409552778-2537-20-git-send-email-mikko.rapeli@iki.fi>
+Subject: [RFC PATCH v2 18/27] scsi_netlink.h: include stdint.h in userspace
+Date: Mon,  1 Sep 2014 09:26:09 +0300
+Message-Id: <1409552778-2537-19-git-send-email-mikko.rapeli@iki.fi>
 In-Reply-To: <1409552778-2537-1-git-send-email-mikko.rapeli@iki.fi>
 References: <1408660449-4011-1-git-send-email-mikko.rapeli@iki.fi>
  <1409552778-2537-1-git-send-email-mikko.rapeli@iki.fi>
@@ -20,29 +20,31 @@ Cc: linux-kbuild@vger.kernel.org, mikko.rapeli@iki.fi
 
 Fixes compilation error:
 
-scsi/scsi_netlink_fc.h:60:2: error: expected specifier-qualifier-list before ‘uint64_t’
+scsi/scsi_netlink.h:43:2: error: unknown type name ‘uint8_t’
 
 Signed-off-by: Mikko Rapeli <mikko.rapeli@iki.fi>
 ---
- include/uapi/scsi/scsi_netlink_fc.h | 5 +++++
- 1 file changed, 5 insertions(+)
+ include/uapi/scsi/scsi_netlink.h | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/include/uapi/scsi/scsi_netlink_fc.h b/include/uapi/scsi/scsi_netlink_fc.h
-index cbf76e4..d969337 100644
---- a/include/uapi/scsi/scsi_netlink_fc.h
-+++ b/include/uapi/scsi/scsi_netlink_fc.h
-@@ -21,6 +21,11 @@
- #ifndef SCSI_NETLINK_FC_H
- #define SCSI_NETLINK_FC_H
+diff --git a/include/uapi/scsi/scsi_netlink.h b/include/uapi/scsi/scsi_netlink.h
+index 62b4eda..9d14592 100644
+--- a/include/uapi/scsi/scsi_netlink.h
++++ b/include/uapi/scsi/scsi_netlink.h
+@@ -22,8 +22,12 @@
+ #ifndef SCSI_NETLINK_H
+ #define SCSI_NETLINK_H
  
+-#include <linux/netlink.h>
 +#ifdef __KERNEL__
-+#include <linux/types.h>
+ #include <linux/types.h>
 +#else
 +#include <stdint.h>
 +#endif
- #include <scsi/scsi_netlink.h>
++#include <linux/netlink.h>
  
  /*
+  * This file intended to be included by both kernel and user space
 -- 
 2.1.0
 
