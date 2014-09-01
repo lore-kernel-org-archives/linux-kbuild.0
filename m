@@ -1,49 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kapsi.fi ([217.30.184.167]:34561 "EHLO mail.kapsi.fi"
+Received: from mail.kapsi.fi ([217.30.184.167]:49681 "EHLO mail.kapsi.fi"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752616AbaIAG0k (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 1 Sep 2014 02:26:40 -0400
+	id S1752361AbaIAG0a (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 1 Sep 2014 02:26:30 -0400
 From: Mikko Rapeli <mikko.rapeli@iki.fi>
-Subject: [RFC PATCH v2 22/27] gntdev.h: include stdint.h in userspace
-Date: Mon,  1 Sep 2014 09:26:13 +0300
-Message-Id: <1409552778-2537-23-git-send-email-mikko.rapeli@iki.fi>
+Subject: [RFC PATCH v2 03/27] Makefile: propagate verbose options
+Date: Mon,  1 Sep 2014 09:25:54 +0300
+Message-Id: <1409552778-2537-4-git-send-email-mikko.rapeli@iki.fi>
 In-Reply-To: <1409552778-2537-1-git-send-email-mikko.rapeli@iki.fi>
 References: <1408660449-4011-1-git-send-email-mikko.rapeli@iki.fi>
  <1409552778-2537-1-git-send-email-mikko.rapeli@iki.fi>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
 Cc: linux-kbuild@vger.kernel.org, mikko.rapeli@iki.fi
 
-Fixes compilation error:
-
-xen/gntdev.h:38:2: error: unknown type name ‘uint32_t’
+Usefull when debugging the make scripts.
 
 Signed-off-by: Mikko Rapeli <mikko.rapeli@iki.fi>
 ---
- include/uapi/xen/gntdev.h | 6 ++++++
- 1 file changed, 6 insertions(+)
+ Makefile | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/include/uapi/xen/gntdev.h b/include/uapi/xen/gntdev.h
-index 5304bd3..f724f75 100644
---- a/include/uapi/xen/gntdev.h
-+++ b/include/uapi/xen/gntdev.h
-@@ -33,6 +33,12 @@
- #ifndef __LINUX_PUBLIC_GNTDEV_H__
- #define __LINUX_PUBLIC_GNTDEV_H__
+diff --git a/Makefile b/Makefile
+index 25b85ab..df0eb14 100644
+--- a/Makefile
++++ b/Makefile
+@@ -855,13 +855,13 @@ quiet_cmd_link-vmlinux = LINK    $@
+ # execute if the rest of the kernel build went well.
+ vmlinux: scripts/link-vmlinux.sh $(vmlinux-deps) FORCE
+ ifdef CONFIG_HEADERS_CHECK
+-	$(Q)$(MAKE) -f $(srctree)/Makefile headers_check
++	$(Q)$(MAKE) V=$(KBUILD_VERBOSE) -f $(srctree)/Makefile headers_check
+ endif
+ ifdef CONFIG_SAMPLES
+-	$(Q)$(MAKE) $(build)=samples
++	$(Q)$(MAKE) V=$(KBUILD_VERBOSE) $(build)=samples
+ endif
+ ifdef CONFIG_BUILD_DOCSRC
+-	$(Q)$(MAKE) $(build)=Documentation
++	$(Q)$(MAKE) V=$(KBUILD_VERBOSE) $(build)=Documentation
+ endif
+ 	+$(call if_changed,link-vmlinux)
  
-+#ifdef __KERNEL__
-+#include <linux/types.h>
-+#else
-+#include <stdint.h>
-+#endif
-+
- struct ioctl_gntdev_grant_ref {
- 	/* The domain ID of the grant to be mapped. */
- 	uint32_t domid;
+@@ -1012,7 +1012,7 @@ headers_check_all: headers_install_all
+ PHONY += headers_check
+ headers_check: headers_install
+ 	$(Q)$(MAKE) $(hdr-inst)=include/uapi HDRCHECK=1
+-	$(Q)$(MAKE) $(hdr-inst)=arch/$(hdr-arch)/include/uapi/asm $(hdr-dst) HDRCHECK=1
++	$(Q)$(MAKE) V=$(KBUILD_VERBOSE) $(hdr-inst)=arch/$(hdr-arch)/include/uapi/asm $(hdr-dst) HDRCHECK=1
+ 
+ # ---------------------------------------------------------------------------
+ # Modules
 -- 
 2.1.0
 
