@@ -1,75 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ig0-f172.google.com ([209.85.213.172]:63150 "EHLO
-	mail-ig0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752036AbaIAHfH (ORCPT
+Received: from smtp02.post.sk ([195.146.144.202]:50066 "EHLO smtp02.post.sk"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754903AbaICSop convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 1 Sep 2014 03:35:07 -0400
+	Wed, 3 Sep 2014 14:44:45 -0400
+Date: Wed, 3 Sep 2014 20:35:06 +0200 (CEST)
+From: Husam Al Sayed <oscar55@post.sk>
+Reply-To: "alsayedhusa@hotmail.com" <alsayedhusa@hotmail.com>
+Message-ID: <160445972.347162.1409769306593.JavaMail.root@mbox05>
+Subject: FROM: Husam Al Sayed.
 MIME-Version: 1.0
-In-Reply-To: <CAMuHMdXKyTJZM9fwcCZ+-vCX3SZ9JuhPiNNAhyu=vrZuOjsw8w@mail.gmail.com>
-References: <20140901065916.28909.35097.stgit@zurg>
-	<CAMuHMdXKyTJZM9fwcCZ+-vCX3SZ9JuhPiNNAhyu=vrZuOjsw8w@mail.gmail.com>
-Date: Mon, 1 Sep 2014 11:35:06 +0400
-Message-ID: <CALYGNiPUCFkx6sgLbCKrXbDVERhyaWyGJPp64fowBWpUALXqEQ@mail.gmail.com>
-Subject: Re: [PATCH v2 0/4] kconfig: store default ARCH in .config
-From: Konstantin Khlebnikov <koct9i@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Michal Marek <mmarek@suse.cz>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Paul Bolle <pebolle@tiscali.nl>
+Cc: vgoyal@redhat.com, hbabu@us.ibm.com, raven@themaw.net, autofs@vger.kernel.org, mmarek@suse.cz, linux-kbuild@vger.kernel.org, kernel-janitors@vger.kernel.org, bfields@fieldses.org, gleb@redhat.com, pbonzini@redhat.com, joro@8bytes.org, agraf@suse.de, kvm-ppc@vger.kernel.org, xiantao.zhang@intel.com, kvm-ia64@vger.kernel.org, borntraeger@de.ibm.com, cornelia.huck@de.ibm.com, christoffer.dall@linaro.org, marc.zyngier@arm.com, kvmarm@lists.cs.columbia.edu, ebiederm@xmission.com, kexec@lists.infradead.org, zohar@us.ibm.com, safford@watson.ibm.com, keyrings@linux-nfs.org, jason.wessel@windriver.com, kgdb-bugreport@lists.sourceforge.net, vegardno@ifi.uio.no, catalin.marinas@arm.com, ananth@in.ibm.com
 
-On Mon, Sep 1, 2014 at 11:24 AM, Geert Uytterhoeven
-<geert@linux-m68k.org> wrote:
-> Hi Konstantin,
->
-> On Mon, Sep 1, 2014 at 9:16 AM, Konstantin Khlebnikov <koct9i@gmail.com> wrote:
->> This is second attempt of fixing target archecture amnesia.
->> v1 patch: http://lkml.kernel.org/r/20140706080234.19520.96704.stgit@zurg
->>
->> First version saved ARCH as CONFIG_DEFAULT_ARCH and used it as defult ARCH.
->>
->> This version changes semantic of Kconfig option env="...", now it acts more
->> like the user input, except that the value comes from the environment.
->> Variable from environment overrides all defaults and value from config file.
->> If environment variable is not defined this option has no effect.
->>
->> So, now ARCH is saved as CONFIG_ARCH.
->>
->> Also this patchset links CONFIG_CROSS_COMPILE and CROSS_COMPILE in the same way.
->> Changing it in command line/environment also updates value in the config file.
->
-> Thanks, I haven't tried this yet, but it looks promising!
->
-> For the record, right now I use a GNUmakefile (which takes precedence over
-> the Makefile) in the build directory containing e.g.
+FROM: Husam Al Sayed.
 
-Heh, I've used and seen a lot of such hacks.
-GNUmakefile also might include Makefile after defining environment.
+EMAIL:alsayedhusa@hotmail.com
+ 
+Hello,
+ 
+I decided to write you this proposal in good faith, believing that you will
+not betray me. I am Mr. Husam Al Sayed, a Bank officer here in U.A.E.
+ 
+One Mr. Peter Adams, a citizen of your country and Crude Oil dealer made a fixed deposit with my bank in 2005 for 108 calendar months, valued at US$30,000,000.00 (Thirty Million United State Dollars) the due date for this deposit contract was last 22nd of January 2014. Sadly Peter was among the death victims in the May 27 2006 Earthquake disaster in Java, Indonesia that killed over 5,000 people. He was in Indonesia on a business trip and that was how he met his untimely end. My bank management is yet to know about his death, I knew about it because he was my friend and I am his Account Officer. Peter did not mention any Next of Kin/ Heir when the account was opened, he was not married and no children. Last week my Bank Management requested that Peter should give instructions on what to do about his funds, if to renew the contract.
+ 
+I know this will happen and that is why I have been looking for a means to handle the situation, because if my Bank Directors happens to know that Peter is dead and do not have any Heir, they will take the funds for their personal use, so I don't want such to happen. That is why I am seeking your co-operation to present you as the Next of Kin/ Heir to the account, since you are a foreigner and my bank head quarters will release the account to you. There is no risk involved; the transaction will be executed under a legitimate arrangement that will protect us from any breach of law. It is better that we claim the money, than allowing the Bank Directors to take it, they are rich already. I am not a greedy person, so I am suggesting we share the funds in this ratio, 50/50%, equal sharing. Let me know your mind on this and please do treat this information highly confidential. We shall go over the details once I receive your urgent response. Please Urgently get back to me through this email address as soon as possible:
+ 
+ 
+ 
+Have a nice day and God bless. Anticipating your communication.
+ 
+Regards,
+FROM: Husam Al Sayed.
+EMAIL: alsayedhusa@hotmail.com
+_____________________________________________________________________
 
->
-> MAKEARGS = ARCH=arm CROSS_COMPILE=arm-unknown-linux-gnueabi-
->
-> MAKEFLAGS += --no-print-directory
->
-> .PHONY: all $(MAKECMDGOALS)
->
-> all := $(filter-out all Makefile,$(MAKECMDGOALS))
->
-> all:
->         $(MAKE) $(MAKEARGS) $(all) -f Makefile
->
-> Makefile:;
->
-> $(all) %/: all
->         @:
->
-> Gr{oetje,eeting}s,
->
->                         Geert
->
-> --
-> Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
->
-> In personal conversations with technical people, I call myself a hacker. But
-> when I'm talking to journalists I just say "programmer" or something like that.
->                                 -- Linus Torvalds
+Hladate vazny vztah? Zaregistrujte sa na - http://dvaja.sme.sk
