@@ -1,81 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-we0-f172.google.com ([74.125.82.172]:48438 "EHLO
-	mail-we0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752447AbaIEGsw (ORCPT
+Received: from navarro.puc.rediris.es ([130.206.18.131]:39791 "EHLO
+	navarro.puc.rediris.es" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751688AbaIEHuu (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 5 Sep 2014 02:48:52 -0400
-From: Robert Richter <rric@kernel.org>
-Subject: [PATCH 1/6] dts, arm64: Add dtbs_install make target
-Date: Fri,  5 Sep 2014 08:48:07 +0200
-Message-Id: <1409899692-1455-2-git-send-email-rric@kernel.org>
-In-Reply-To: <1409899692-1455-1-git-send-email-rric@kernel.org>
-References: <1409899692-1455-1-git-send-email-rric@kernel.org>
+	Fri, 5 Sep 2014 03:50:50 -0400
+Date: Fri, 5 Sep 2014 09:13:44 +0200
+From: Gabriel Paubert <paubert@iram.es>
+Subject: Re: deb-pkg: Add support for powerpc little endian
+Message-ID: <20140905071344.GA16024@visitor2.iram.es>
+References: <1409894927.11359.26.camel@ale.ozlabs.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1409894927.11359.26.camel@ale.ozlabs.ibm.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Olof Johansson <olof@lixom.net>, Rob Herring <robh+dt@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Arnd Bergmann <arnd@arndb.de>, Michal Marek <mmarek@suse.cz>
-Cc: linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Robert Richter <rrichter@cavium.com>
+To: Michael Neuling <mikey@neuling.org>
+Cc: Michal Marek <mmarek@suse.cz>, Ben Hutchings <ben@decadent.org.uk>, Leann Ogasawara <leann.ogasawara@canonical.com>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, linux-kernel <linux-kernel@vger.kernel.org>, Anton Blanchard <anton@samba.org>, linux-kbuild@vger.kernel.org
 
-From: Robert Richter <rrichter@cavium.com>
+On Fri, Sep 05, 2014 at 03:28:47PM +1000, Michael Neuling wrote:
+> The Debian powerpc little endian architecture is called ppc64le.  This
 
-This adds the dtbs_install make target to arm64. The target has been
-introduced already to arch/arm with the following commit:
+Huh? ppc64le or ppc64el?
 
- f4d4ffc03efc kbuild: dtbs_install: new make target
+> is the default architecture used by Ubuntu for powerpc.
+> 
+> The below checks the kernel config to see if we are compiling little
+> endian and sets the Debian arch appropriately.
+> 
+> Signed-off-by: Michael Neuling <mikey@neuling.org>
+> 
+> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+> index 35d5a58..6f4a1af 100644
+> --- a/scripts/package/builddeb
+> +++ b/scripts/package/builddeb
+> @@ -37,7 +37,7 @@ create_package() {
+>  	s390*)
+>  		debarch=s390$(grep -q CONFIG_64BIT=y $KCONFIG_CONFIG && echo x || true) ;;
+>  	ppc*)
+> -		debarch=powerpc ;;
+> +		debarch=$(grep -q CPU_LITTLE_ENDIAN=y $KCONFIG_CONFIG && echo ppc64el || echo powerpc) ;;
+>  	parisc*)
+>  		debarch=hppa ;;
+>  	mips*)
 
-Implementation for arm64 is the same as for arm.
 
-With 'dtbs_install' all config enabled dtb files are installed to
-either the INSTALL_DTBS_PATH directory or the default location:
-
- $INSTALL_PATH/dtbs/$KERNELRELEASE
-
-Signed-off-by: Robert Richter <rrichter@cavium.com>
----
- arch/arm64/Makefile          | 6 ++++--
- arch/arm64/boot/dts/Makefile | 4 +++-
- 2 files changed, 7 insertions(+), 3 deletions(-)
-
-diff --git a/arch/arm64/Makefile b/arch/arm64/Makefile
-index 2df5e5daeebe..e0a8292bc832 100644
---- a/arch/arm64/Makefile
-+++ b/arch/arm64/Makefile
-@@ -71,8 +71,9 @@ zinstall install: vmlinux
- %.dtb: scripts
- 	$(Q)$(MAKE) $(build)=$(boot)/dts $(boot)/dts/$@
- 
--dtbs: scripts
--	$(Q)$(MAKE) $(build)=$(boot)/dts dtbs
-+PHONY += dtbs dtbs_install
-+dtbs dtbs_install: prepare scripts
-+	$(Q)$(MAKE) $(build)=$(boot)/dts $@
- 
- PHONY += vdso_install
- vdso_install:
-@@ -86,6 +87,7 @@ define archhelp
-   echo  '* Image.gz      - Compressed kernel image (arch/$(ARCH)/boot/Image.gz)'
-   echo  '  Image         - Uncompressed kernel image (arch/$(ARCH)/boot/Image)'
-   echo  '* dtbs          - Build device tree blobs for enabled boards'
-+  echo  '  dtbs_install  - Install dtbs to $(INSTALL_DTBS_PATH)'
-   echo  '  install       - Install uncompressed kernel'
-   echo  '  zinstall      - Install compressed kernel'
-   echo  '                  Install using (your) ~/bin/installkernel or'
-diff --git a/arch/arm64/boot/dts/Makefile b/arch/arm64/boot/dts/Makefile
-index c52bdb051f66..82e1c4cf8780 100644
---- a/arch/arm64/boot/dts/Makefile
-+++ b/arch/arm64/boot/dts/Makefile
-@@ -1,9 +1,11 @@
- dtb-$(CONFIG_ARCH_VEXPRESS) += rtsm_ve-aemv8a.dtb foundation-v8.dtb
- dtb-$(CONFIG_ARCH_XGENE) += apm-mustang.dtb
- 
--targets += dtbs
-+targets += dtbs dtbs_install
- targets += $(dtb-y)
- 
- dtbs: $(addprefix $(obj)/, $(dtb-y))
- 
- clean-files := *.dtb
-+
-+dtbs_install: $(addsuffix _dtbinst_, $(dtb-y))
--- 
-2.0.1
-
+	Gabriel
