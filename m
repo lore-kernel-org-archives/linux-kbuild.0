@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-we0-f170.google.com ([74.125.82.170]:49332 "EHLO
-	mail-we0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755837AbaIEGs5 (ORCPT
+Received: from mail-wi0-f172.google.com ([209.85.212.172]:39371 "EHLO
+	mail-wi0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755821AbaIEGs4 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 5 Sep 2014 02:48:57 -0400
+	Fri, 5 Sep 2014 02:48:56 -0400
 From: Robert Richter <rric@kernel.org>
-Subject: [PATCH 4/6] dts, kbuild: Implement support for dtb vendor subdirs
-Date: Fri,  5 Sep 2014 08:48:10 +0200
-Message-Id: <1409899692-1455-5-git-send-email-rric@kernel.org>
+Subject: [PATCH 3/6] dts, arm/arm64: Remove dtbs build rules in sub-makes
+Date: Fri,  5 Sep 2014 08:48:09 +0200
+Message-Id: <1409899692-1455-4-git-send-email-rric@kernel.org>
 In-Reply-To: <1409899692-1455-1-git-send-email-rric@kernel.org>
 References: <1409899692-1455-1-git-send-email-rric@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -17,83 +17,80 @@ Cc: linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org, linux-kbui
 
 From: Robert Richter <rrichter@cavium.com>
 
-This patch adds support of vendor sub directories for dtb files.
-Subdirectories can be specified in $(dts-dirs). Kbuild traverses over
-all directories while building and installing dtb files. The directory
-tree is also reflected in the install path.
+Add dtb files to build targets and let kbuild handle them. Thus,
+special dtbs rules can be removed. This eases Makefiles and the
+implementation of the support of vendor dtb subdirectories.
 
 Signed-off-by: Robert Richter <rrichter@cavium.com>
 ---
- arch/arm64/boot/dts/Makefile |  1 +
- scripts/Makefile.dtbinst     | 23 ++++++++++++++++++-----
- 2 files changed, 19 insertions(+), 5 deletions(-)
+ arch/arm/Makefile            |  2 +-
+ arch/arm/boot/dts/Makefile   | 10 ++--------
+ arch/arm64/Makefile          |  2 +-
+ arch/arm64/boot/dts/Makefile |  8 ++------
+ 4 files changed, 6 insertions(+), 16 deletions(-)
 
+diff --git a/arch/arm/Makefile b/arch/arm/Makefile
+index 1963d9a9a2c4..4d13c6d0a0cc 100644
+--- a/arch/arm/Makefile
++++ b/arch/arm/Makefile
+@@ -315,7 +315,7 @@ $(BOOT_TARGETS): vmlinux
+ PHONY += dtbs dtbs_install
+ 
+ dtbs: prepare scripts
+-	$(Q)$(MAKE) $(build)=$(boot)/dts MACHINE=$(MACHINE) $@
++	$(Q)$(MAKE) $(build)=$(boot)/dts MACHINE=$(MACHINE)
+ 
+ dtbs_install:
+ 	$(Q)$(MAKE) $(dtbinst)=$(boot)/dts MACHINE=$(MACHINE)
+diff --git a/arch/arm/boot/dts/Makefile b/arch/arm/boot/dts/Makefile
+index ab40afb87fb2..cb63c515247c 100644
+--- a/arch/arm/boot/dts/Makefile
++++ b/arch/arm/boot/dts/Makefile
+@@ -492,13 +492,7 @@ dtb-$(CONFIG_MACH_DOVE) += dove-cm-a510.dtb \
+ 	dove-d3plug.dtb \
+ 	dove-dove-db.dtb
+ 
+-targets += dtbs dtbs_install
+-targets += $(dtb-y)
+ endif
+ 
+-# *.dtb used to be generated in the directory above. Clean out the
+-# old build results so people don't accidentally use them.
+-dtbs: $(addprefix $(obj)/, $(dtb-y))
+-	$(Q)rm -f $(obj)/../*.dtb
+-
+-clean-files := *.dtb
++always		:= $(dtb-y)
++clean-files	:= *.dtb
+diff --git a/arch/arm64/Makefile b/arch/arm64/Makefile
+index 1627861e9bbd..c21b21d6e72d 100644
+--- a/arch/arm64/Makefile
++++ b/arch/arm64/Makefile
+@@ -74,7 +74,7 @@ zinstall install: vmlinux
+ PHONY += dtbs dtbs_install
+ 
+ dtbs: prepare scripts
+-	$(Q)$(MAKE) $(build)=$(boot)/dts $@
++	$(Q)$(MAKE) $(build)=$(boot)/dts
+ 
+ dtbs_install:
+ 	$(Q)$(MAKE) $(dtbinst)=$(boot)/dts
 diff --git a/arch/arm64/boot/dts/Makefile b/arch/arm64/boot/dts/Makefile
-index d116da5f2f20..9b8622532068 100644
+index 0a14c3828301..d116da5f2f20 100644
 --- a/arch/arm64/boot/dts/Makefile
 +++ b/arch/arm64/boot/dts/Makefile
-@@ -2,4 +2,5 @@ dtb-$(CONFIG_ARCH_VEXPRESS) += rtsm_ve-aemv8a.dtb foundation-v8.dtb
+@@ -1,9 +1,5 @@
+ dtb-$(CONFIG_ARCH_VEXPRESS) += rtsm_ve-aemv8a.dtb foundation-v8.dtb
  dtb-$(CONFIG_ARCH_XGENE) += apm-mustang.dtb
  
- always		:= $(dtb-y)
-+subdir-y	:= $(dts-dirs)
- clean-files	:= *.dtb
-diff --git a/scripts/Makefile.dtbinst b/scripts/Makefile.dtbinst
-index 54286cccc289..909ed7a2ac61 100644
---- a/scripts/Makefile.dtbinst
-+++ b/scripts/Makefile.dtbinst
-@@ -6,6 +6,7 @@
- #
- #   $INSTALL_PATH/dtbs/$KERNELRELEASE
- #
-+# Traverse through subdirectories listed in $(dts-dirs).
- # ==========================================================================
- 
- src := $(obj)
-@@ -13,26 +14,38 @@ src := $(obj)
- PHONY := __dtbs_install
- __dtbs_install:
- 
-+export dtbinst-root ?= $(obj)
-+
- include include/config/auto.conf
- include scripts/Kbuild.include
- include $(srctree)/$(obj)/Makefile
- 
- PHONY += __dtbs_install_prep
- __dtbs_install_prep:
-+ifeq ("$(dtbinst-root)", "$(obj)")
- 	$(Q)if [ -d $(INSTALL_DTBS_PATH).old ]; then rm -rf $(INSTALL_DTBS_PATH).old; fi
- 	$(Q)if [ -d $(INSTALL_DTBS_PATH) ]; then mv $(INSTALL_DTBS_PATH) $(INSTALL_DTBS_PATH).old; fi
- 	$(Q)mkdir -p $(INSTALL_DTBS_PATH)
-+endif
- 
- dtbinst-files	:= $(dtb-y)
-+dtbinst-dirs	:= $(dts-dirs)
- 
- # Helper targets for Installing DTBs into the boot directory
- quiet_cmd_dtb_install =	INSTALL $<
--      cmd_dtb_install =	cp $< $(2)
-+      cmd_dtb_install =	mkdir -p $(2); cp $< $(2)
-+
-+install-dir = $(patsubst $(dtbinst-root)%,$(INSTALL_DTBS_PATH)%,$(obj))
-+
-+$(dtbinst-files) $(dtbinst-dirs): | __dtbs_install_prep
-+
-+$(dtbinst-files): %.dtb: $(obj)/%.dtb
-+	$(call cmd,dtb_install,$(install-dir))
- 
--$(dtbinst-files): %.dtb: $(obj)/%.dtb | __dtbs_install_prep
--	$(call cmd,dtb_install,$(INSTALL_DTBS_PATH))
-+$(dtbinst-dirs):
-+	$(Q)$(MAKE) $(dtbinst)=$(obj)/$@
- 
--PHONY += $(dtbinst-files)
--__dtbs_install: $(dtbinst-files)
-+PHONY += $(dtbinst-files) $(dtbinst-dirs)
-+__dtbs_install: $(dtbinst-files) $(dtbinst-dirs)
- 
- .PHONY: $(PHONY)
+-targets += dtbs dtbs_install
+-targets += $(dtb-y)
+-
+-dtbs: $(addprefix $(obj)/, $(dtb-y))
+-
+-clean-files := *.dtb
++always		:= $(dtb-y)
++clean-files	:= *.dtb
 -- 
 2.0.1
 
