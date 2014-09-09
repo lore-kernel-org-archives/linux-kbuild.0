@@ -1,51 +1,77 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.mei.co.jp ([133.183.100.20]:38738 "EHLO smtp.mei.co.jp"
+Received: from smtp.mei.co.jp ([133.183.100.20]:64535 "EHLO smtp.mei.co.jp"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755955AbaIIK05 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 9 Sep 2014 06:26:57 -0400
+	id S1752352AbaIILCa (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 9 Sep 2014 07:02:30 -0400
 From: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Subject: [PATCH 0/3] kbuild: Clean up makefiles and then drop obj-n an obj-n
-Date: Tue,  9 Sep 2014 19:26:18 +0900
-Message-Id: <1410258381-7088-1-git-send-email-yamada.m@jp.panasonic.com>
+Subject: [PATCH 1/3] kbuild: fake the "Entering directory ..." message more simply
+Date: Tue,  9 Sep 2014 20:02:22 +0900
+Message-Id: <1410260544-22657-2-git-send-email-yamada.m@jp.panasonic.com>
+In-Reply-To: <1410260544-22657-1-git-send-email-yamada.m@jp.panasonic.com>
+References: <1410260544-22657-1-git-send-email-yamada.m@jp.panasonic.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.m@jp.panasonic.com>, Mike Turquette <mturquette@linaro.org>, Linus Walleij <linus.walleij@linaro.org>, Takashi Yoshii <takasi-y@ops.dti.ne.jp>, Jean-Christophe Plagniol-Villard <plagnioj@jcrosoft.com>, Hartley Sweeten <hsweeten@visionengravers.com>, Greg Ungerer <gerg@uclinux.org>, Ryan Mallon <rmallon@gmail.com>, Geert Uytterhoeven <geert@linux-m68k.org>, Laurent Pinchart <laurent.pinchart+renesas@ideasonboard.com>, Wolfram Sang <wsa@sang-engineering.com>, Andrew Victor <linux@maxim.org.za>, linux-samsung-soc@vger.kernel.org, Kukjin Kim <kgene.kim@samsung.com>, Russell King <linux@arm.linux.org.uk>, Ben Dooks <ben-linux@fluff.org>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.cz>, linux-omap@vger.kernel.org, Ulrich Hecht <ulrich.hecht@gmail.com>, linux-arm-kernel@lists.infradead.org, Simon Horman <horms+renesas@verge.net.au>, Nicolas Ferre <nicolas.ferre@atmel.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Tony Lindgren <tony@atomide.com>
+Cc: Masahiro Yamada <yamada.m@jp.panasonic.com>, Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org
 
+Commit c2e28dc975ea87feed84415006ae143424912ac7
+(kbuild: Print the name of the build directory)
+added a gimmick to show the "Entering directory ...".
 
+Instead of echoing the hard-coded message (that is, we need to know
+the exact message), moving --no-print-directory would be easier.
 
+Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
+---
 
-Masahiro Yamada (3):
-  kbuild: remove unnecessary "obj- := dummy.o" trick
-  kbuild: remove unnecessary variable initializaions
-  kbuild: remove obj-n and lib-n handling
+ Makefile | 19 ++++++++-----------
+ 1 file changed, 8 insertions(+), 11 deletions(-)
 
- arch/arm/mach-at91/Makefile       | 3 ---
- arch/arm/mach-ebsa110/Makefile    | 3 ---
- arch/arm/mach-ep93xx/Makefile     | 3 ---
- arch/arm/mach-exynos/Makefile     | 5 -----
- arch/arm/mach-footbridge/Makefile | 3 ---
- arch/arm/mach-iop13xx/Makefile    | 5 -----
- arch/arm/mach-iop32x/Makefile     | 3 ---
- arch/arm/mach-iop33x/Makefile     | 3 ---
- arch/arm/mach-ks8695/Makefile     | 3 ---
- arch/arm/mach-rpc/Makefile        | 4 ----
- arch/arm/mach-s3c24xx/Makefile    | 5 -----
- arch/arm/mach-s3c64xx/Makefile    | 5 -----
- arch/arm/mach-s5pv210/Makefile    | 5 -----
- arch/arm/mach-sa1100/Makefile     | 3 ---
- arch/arm/mach-u300/Makefile       | 3 ---
- arch/arm/plat-iop/Makefile        | 6 ------
- arch/arm/plat-omap/Makefile       | 3 ---
- arch/arm/plat-samsung/Makefile    | 5 -----
- drivers/clk/shmobile/Makefile     | 2 --
- drivers/net/wimax/Makefile        | 4 ----
- firmware/Makefile                 | 2 +-
- scripts/Makefile.build            | 4 ++--
- scripts/Makefile.clean            | 4 +---
- scripts/Makefile.fwinst           | 2 +-
- 24 files changed, 5 insertions(+), 83 deletions(-)
-
+diff --git a/Makefile b/Makefile
+index f7b9174..c1bd5a4 100644
+--- a/Makefile
++++ b/Makefile
+@@ -10,11 +10,9 @@ NAME = Shuffling Zombie Juror
+ # Comments in this file are targeted only to the developer, do not
+ # expect to learn how to build the kernel reading this file.
+ 
+-# Do not:
+-# o  use make's built-in rules and variables
+-#    (this increases performance and avoids hard-to-debug behaviour);
+-# o  print "Entering directory ...";
+-MAKEFLAGS += -rR --no-print-directory
++# Do not use make's built-in rules and variables
++# (this increases performance and avoids hard-to-debug behaviour);
++MAKEFLAGS += -rR
+ 
+ # Avoid funny character set dependencies
+ unexport LC_ALL
+@@ -172,13 +170,7 @@ PHONY += $(MAKECMDGOALS) sub-make
+ $(filter-out _all sub-make $(CURDIR)/Makefile, $(MAKECMDGOALS)) _all: sub-make
+ 	@:
+ 
+-# Fake the "Entering directory" message once, so that IDEs/editors are
+-# able to understand relative filenames.
+-       echodir := @echo
+- quiet_echodir := @echo
+-silent_echodir := @:
+ sub-make: FORCE
+-	$($(quiet)echodir) "make[1]: Entering directory \`$(KBUILD_OUTPUT)'"
+ 	$(if $(KBUILD_VERBOSE:1=),@)$(MAKE) -C $(KBUILD_OUTPUT) \
+ 	KBUILD_SRC=$(CURDIR) \
+ 	KBUILD_EXTMOD="$(KBUILD_EXTMOD)" -f $(CURDIR)/Makefile \
+@@ -192,6 +184,11 @@ endif # ifeq ($(KBUILD_SRC),)
+ # We process the rest of the Makefile if this is the final invocation of make
+ ifeq ($(skip-makefile),)
+ 
++# Do not print "Entering directory ...",
++# but we want to display it when entering to the output directory
++# so that IDEs/editors are able to understand relative filenames.
++MAKEFLAGS += --no-print-directory
++
+ # If building an external module we do not care about the all: rule
+ # but instead _all depend on modules
+ PHONY += all
 -- 
 1.9.1
 
