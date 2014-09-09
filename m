@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.mei.co.jp ([133.183.100.20]:64535 "EHLO smtp.mei.co.jp"
+Received: from smtp.mei.co.jp ([133.183.100.20]:49096 "EHLO smtp.mei.co.jp"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752352AbaIILCa (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 9 Sep 2014 07:02:30 -0400
+	id S1756129AbaIILCc (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 9 Sep 2014 07:02:32 -0400
 From: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Subject: [PATCH 1/3] kbuild: fake the "Entering directory ..." message more simply
-Date: Tue,  9 Sep 2014 20:02:22 +0900
-Message-Id: <1410260544-22657-2-git-send-email-yamada.m@jp.panasonic.com>
+Subject: [PATCH 3/3] kbuild: handle C=... and M=... after entering into build directory
+Date: Tue,  9 Sep 2014 20:02:24 +0900
+Message-Id: <1410260544-22657-4-git-send-email-yamada.m@jp.panasonic.com>
 In-Reply-To: <1410260544-22657-1-git-send-email-yamada.m@jp.panasonic.com>
 References: <1410260544-22657-1-git-send-email-yamada.m@jp.panasonic.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -14,60 +14,106 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Masahiro Yamada <yamada.m@jp.panasonic.com>, Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org
 
-Commit c2e28dc975ea87feed84415006ae143424912ac7
-(kbuild: Print the name of the build directory)
-added a gimmick to show the "Entering directory ...".
+This commit avoids processing C=... and M=... twice
+when O=... is also given.
 
-Instead of echoing the hard-coded message (that is, we need to know
-the exact message), moving --no-print-directory would be easier.
+Besides, we can also remove KBUILD_EXTMOD="$(KBUILD_EXTMOD)"
+in the sub-make target.
 
 Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
 ---
 
- Makefile | 19 ++++++++-----------
- 1 file changed, 8 insertions(+), 11 deletions(-)
+ Makefile | 60 +++++++++++++++++++++++++++++-------------------------------
+ 1 file changed, 29 insertions(+), 31 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index f7b9174..c1bd5a4 100644
+index 105919a..48c8ee1 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -10,11 +10,9 @@ NAME = Shuffling Zombie Juror
- # Comments in this file are targeted only to the developer, do not
- # expect to learn how to build the kernel reading this file.
+@@ -95,34 +95,6 @@ endif
  
--# Do not:
--# o  use make's built-in rules and variables
--#    (this increases performance and avoids hard-to-debug behaviour);
--# o  print "Entering directory ...";
--MAKEFLAGS += -rR --no-print-directory
-+# Do not use make's built-in rules and variables
-+# (this increases performance and avoids hard-to-debug behaviour);
-+MAKEFLAGS += -rR
+ export quiet Q KBUILD_VERBOSE
  
- # Avoid funny character set dependencies
- unexport LC_ALL
-@@ -172,13 +170,7 @@ PHONY += $(MAKECMDGOALS) sub-make
- $(filter-out _all sub-make $(CURDIR)/Makefile, $(MAKECMDGOALS)) _all: sub-make
- 	@:
+-# Call a source code checker (by default, "sparse") as part of the
+-# C compilation.
+-#
+-# Use 'make C=1' to enable checking of only re-compiled files.
+-# Use 'make C=2' to enable checking of *all* source files, regardless
+-# of whether they are re-compiled or not.
+-#
+-# See the file "Documentation/sparse.txt" for more details, including
+-# where to get the "sparse" utility.
+-
+-ifeq ("$(origin C)", "command line")
+-  KBUILD_CHECKSRC = $(C)
+-endif
+-ifndef KBUILD_CHECKSRC
+-  KBUILD_CHECKSRC = 0
+-endif
+-
+-# Use make M=dir to specify directory of external module to build
+-# Old syntax make ... SUBDIRS=$PWD is still supported
+-# Setting the environment variable KBUILD_EXTMOD take precedence
+-ifdef SUBDIRS
+-  KBUILD_EXTMOD ?= $(SUBDIRS)
+-endif
+-
+-ifeq ("$(origin M)", "command line")
+-  KBUILD_EXTMOD := $(M)
+-endif
+-
+ # kbuild supports saving output files in a separate directory.
+ # To locate output files in a separate directory two syntaxes are supported.
+ # In both cases the working directory must be the root of the kernel src.
+@@ -138,7 +110,6 @@ endif
+ # The O= assignment takes precedence over the KBUILD_OUTPUT environment
+ # variable.
  
--# Fake the "Entering directory" message once, so that IDEs/editors are
--# able to understand relative filenames.
--       echodir := @echo
-- quiet_echodir := @echo
--silent_echodir := @:
+-
+ # KBUILD_SRC is set on invocation of make in OBJ directory
+ # KBUILD_SRC is not intended to be used by the regular user (for now)
+ ifeq ($(KBUILD_SRC),)
+@@ -172,8 +143,7 @@ $(filter-out _all sub-make $(CURDIR)/Makefile, $(MAKECMDGOALS)) _all: sub-make
+ 
  sub-make: FORCE
--	$($(quiet)echodir) "make[1]: Entering directory \`$(KBUILD_OUTPUT)'"
- 	$(if $(KBUILD_VERBOSE:1=),@)$(MAKE) -C $(KBUILD_OUTPUT) \
- 	KBUILD_SRC=$(CURDIR) \
- 	KBUILD_EXTMOD="$(KBUILD_EXTMOD)" -f $(CURDIR)/Makefile \
-@@ -192,6 +184,11 @@ endif # ifeq ($(KBUILD_SRC),)
- # We process the rest of the Makefile if this is the final invocation of make
- ifeq ($(skip-makefile),)
+ 	$(Q)$(MAKE) -C $(KBUILD_OUTPUT) KBUILD_SRC=$(CURDIR) \
+-	KBUILD_EXTMOD="$(KBUILD_EXTMOD)" -f $(CURDIR)/Makefile \
+-	$(filter-out _all sub-make,$(MAKECMDGOALS))
++	-f $(CURDIR)/Makefile $(filter-out _all sub-make,$(MAKECMDGOALS))
  
-+# Do not print "Entering directory ...",
-+# but we want to display it when entering to the output directory
-+# so that IDEs/editors are able to understand relative filenames.
-+MAKEFLAGS += --no-print-directory
+ # Leave processing to above invocation of make
+ skip-makefile := 1
+@@ -188,6 +158,34 @@ ifeq ($(skip-makefile),)
+ # so that IDEs/editors are able to understand relative filenames.
+ MAKEFLAGS += --no-print-directory
+ 
++# Call a source code checker (by default, "sparse") as part of the
++# C compilation.
++#
++# Use 'make C=1' to enable checking of only re-compiled files.
++# Use 'make C=2' to enable checking of *all* source files, regardless
++# of whether they are re-compiled or not.
++#
++# See the file "Documentation/sparse.txt" for more details, including
++# where to get the "sparse" utility.
++
++ifeq ("$(origin C)", "command line")
++  KBUILD_CHECKSRC = $(C)
++endif
++ifndef KBUILD_CHECKSRC
++  KBUILD_CHECKSRC = 0
++endif
++
++# Use make M=dir to specify directory of external module to build
++# Old syntax make ... SUBDIRS=$PWD is still supported
++# Setting the environment variable KBUILD_EXTMOD take precedence
++ifdef SUBDIRS
++  KBUILD_EXTMOD ?= $(SUBDIRS)
++endif
++
++ifeq ("$(origin M)", "command line")
++  KBUILD_EXTMOD := $(M)
++endif
 +
  # If building an external module we do not care about the all: rule
  # but instead _all depend on modules
