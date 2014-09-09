@@ -1,67 +1,98 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f172.google.com ([209.85.212.172]:40822 "EHLO
-	mail-wi0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751424AbaIHHOS (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 8 Sep 2014 03:14:18 -0400
-Date: Mon, 8 Sep 2014 09:14:09 +0200
-From: Robert Richter <rric@kernel.org>
-Subject: Re: [PATCH 2/6] dts, kbuild: Factor out dtbs install rules to
- Makefile.dtbinst
-Message-ID: <20140908071409.GV4703@rric.localhost>
-References: <1409899692-1455-1-git-send-email-rric@kernel.org>
- <1409899692-1455-3-git-send-email-rric@kernel.org>
- <CAL_Jsq+NYU9c0Jw8DX_iH6G5_9tom9DGcP548q4tKQsdkb-s0A@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAL_Jsq+NYU9c0Jw8DX_iH6G5_9tom9DGcP548q4tKQsdkb-s0A@mail.gmail.com>
+Received: from smtp.mei.co.jp ([133.183.100.20]:55816 "EHLO smtp.mei.co.jp"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752521AbaIIK0w (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 9 Sep 2014 06:26:52 -0400
+From: Masahiro Yamada <yamada.m@jp.panasonic.com>
+Subject: [PATCH 3/3] kbuild: remove obj-n and lib-n handling
+Date: Tue,  9 Sep 2014 19:26:21 +0900
+Message-Id: <1410258381-7088-4-git-send-email-yamada.m@jp.panasonic.com>
+In-Reply-To: <1410258381-7088-1-git-send-email-yamada.m@jp.panasonic.com>
+References: <1410258381-7088-1-git-send-email-yamada.m@jp.panasonic.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rob Herring <robherring2@gmail.com>
-Cc: Olof Johansson <olof@lixom.net>, Rob Herring <robh+dt@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Arnd Bergmann <arnd@arndb.de>, Michal Marek <mmarek@suse.cz>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, linux-kbuild@vger.kernel.org, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Robert Richter <rrichter@cavium.com>
+To: linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <yamada.m@jp.panasonic.com>, Michal Marek <mmarek@suse.cz>, Sam Ravnborg <sam@ravnborg.org>, linux-kernel@vger.kernel.org
 
-On 05.09.14 07:48:30, Rob Herring wrote:
-> On Fri, Sep 5, 2014 at 1:48 AM, Robert Richter <rric@kernel.org> wrote:
-> > From: Robert Richter <rrichter@cavium.com>
-> >
-> > Move dtbs install rules to Makefile.dtbinst. This change is needed to
-> > implement support for dts vendor subdirs. The change makes Makefiles
-> > easier and smaller as no longer the dtbs_install rule needs to be
-> > defined. Another advantage is that install goals are not encoded in
-> > targets anymore (%.dtb_dtbinst_).
-> >
-> > Signed-off-by: Robert Richter <rrichter@cavium.com>
-> > ---
-> >  arch/arm/Makefile            |  6 +++++-
-> >  arch/arm/boot/dts/Makefile   |  2 --
-> >  arch/arm64/Makefile          |  6 +++++-
-> >  arch/arm64/boot/dts/Makefile |  2 --
-> >  scripts/Kbuild.include       |  6 ++++++
-> >  scripts/Makefile.dtbinst     | 38 ++++++++++++++++++++++++++++++++++++++
-> >  scripts/Makefile.lib         | 12 ------------
-> >  7 files changed, 54 insertions(+), 18 deletions(-)
-> >  create mode 100644 scripts/Makefile.dtbinst
-> >
-> > diff --git a/arch/arm/Makefile b/arch/arm/Makefile
-> > index 0ce9d0f71f2a..1963d9a9a2c4 100644
-> > --- a/arch/arm/Makefile
-> > +++ b/arch/arm/Makefile
-> > @@ -313,9 +313,13 @@ $(BOOT_TARGETS): vmlinux
-> >         $(Q)$(MAKE) $(build)=$(boot)/dts MACHINE=$(MACHINE) $(boot)/dts/$@
-> >
-> >  PHONY += dtbs dtbs_install
-> > -dtbs dtbs_install: prepare scripts
-> > +
-> > +dtbs: prepare scripts
-> >         $(Q)$(MAKE) $(build)=$(boot)/dts MACHINE=$(MACHINE) $@
-> >
-> > +dtbs_install:
-> > +       $(Q)$(MAKE) $(dtbinst)=$(boot)/dts MACHINE=$(MACHINE)
-> 
-> Can't you get rid of MACHINE here, too?
+Kconfig never defines CONFIG_* as 'n'.
+Now obj-n is only used in firmware/Makefile and it can be
+replaced with obj-.  No makefile uses lib-n.
 
-I moved this change to the end of this patch series to let maintainers
-the choise to drop the change if they are not fine with it.
+Let's rip off obj-n and lib-n.
 
--Robert
+Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
+---
+
+ firmware/Makefile       | 2 +-
+ scripts/Makefile.build  | 4 ++--
+ scripts/Makefile.clean  | 4 +---
+ scripts/Makefile.fwinst | 2 +-
+ 4 files changed, 5 insertions(+), 7 deletions(-)
+
+diff --git a/firmware/Makefile b/firmware/Makefile
+index 0862d34..e297e1b 100644
+--- a/firmware/Makefile
++++ b/firmware/Makefile
+@@ -232,6 +232,6 @@ targets := $(fw-shipped-) $(patsubst $(obj)/%,%, \
+ 
+ # Without this, built-in.o won't be created when it's empty, and the
+ # final vmlinux link will fail.
+-obj-n := dummy
++obj- := dummy
+ 
+ hostprogs-y := ihex2fw
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index 5b09d36..649ce68 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -79,11 +79,11 @@ endif
+ 
+ # ===========================================================================
+ 
+-ifneq ($(strip $(lib-y) $(lib-m) $(lib-n) $(lib-)),)
++ifneq ($(strip $(lib-y) $(lib-m) $(lib-)),)
+ lib-target := $(obj)/lib.a
+ endif
+ 
+-ifneq ($(strip $(obj-y) $(obj-m) $(obj-n) $(obj-) $(subdir-m) $(lib-target)),)
++ifneq ($(strip $(obj-y) $(obj-m) $(obj-) $(subdir-m) $(lib-target)),)
+ builtin-target := $(obj)/built-in.o
+ endif
+ 
+diff --git a/scripts/Makefile.clean b/scripts/Makefile.clean
+index a651cee..c630ab5 100644
+--- a/scripts/Makefile.clean
++++ b/scripts/Makefile.clean
+@@ -23,15 +23,13 @@ __subdir-y	:= $(patsubst %/,%,$(filter %/, $(obj-y)))
+ subdir-y	+= $(__subdir-y)
+ __subdir-m	:= $(patsubst %/,%,$(filter %/, $(obj-m)))
+ subdir-m	+= $(__subdir-m)
+-__subdir-n	:= $(patsubst %/,%,$(filter %/, $(obj-n)))
+-subdir-n	+= $(__subdir-n)
+ __subdir-	:= $(patsubst %/,%,$(filter %/, $(obj-)))
+ subdir-		+= $(__subdir-)
+ 
+ # Subdirectories we need to descend into
+ 
+ subdir-ym	:= $(sort $(subdir-y) $(subdir-m))
+-subdir-ymn      := $(sort $(subdir-ym) $(subdir-n) $(subdir-))
++subdir-ymn      := $(sort $(subdir-ym) $(subdir-))
+ 
+ # Add subdir path
+ 
+diff --git a/scripts/Makefile.fwinst b/scripts/Makefile.fwinst
+index d8e335e..5b698ad 100644
+--- a/scripts/Makefile.fwinst
++++ b/scripts/Makefile.fwinst
+@@ -2,7 +2,7 @@
+ # Installing firmware
+ #
+ # We don't include the .config, so all firmware files are in $(fw-shipped-)
+-# rather than in $(fw-shipped-y) or $(fw-shipped-n).
++# rather than in $(fw-shipped-y) or $(fw-shipped-m).
+ # ==========================================================================
+ 
+ INSTALL := install
+-- 
+1.9.1
+
