@@ -1,38 +1,100 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from userp1040.oracle.com ([156.151.31.81]:21099 "EHLO
-	userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751490AbaIJPOA (ORCPT
+Received: from mail-qc0-f173.google.com ([209.85.216.173]:40102 "EHLO
+	mail-qc0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752368AbaIKXNU (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 10 Sep 2014 11:14:00 -0400
-Message-ID: <54106A58.50802@oracle.com>
-Date: Wed, 10 Sep 2014 11:12:24 -0400
-From: Sasha Levin <sasha.levin@oracle.com>
+	Thu, 11 Sep 2014 19:13:20 -0400
+From: =?UTF-8?q?Vin=C3=ADcius=20Tinti?= <viniciustinti@gmail.com>
+Subject: [PATCH v3] kbuild: add support to generate LLVM bitcode files
+Date: Thu, 11 Sep 2014 20:13:00 -0300
+Message-Id: <1410477180-1328-1-git-send-email-viniciustinti@gmail.com>
+In-Reply-To: <CALD9WKzGmCeCPdwO4hCMtAjEjFoB8=oiQjUktT4PN4ewtDY7XA@mail.gmail.com>
+References: <CALD9WKzGmCeCPdwO4hCMtAjEjFoB8=oiQjUktT4PN4ewtDY7XA@mail.gmail.com>
 MIME-Version: 1.0
-Subject: Re: [RFC/PATCH v2 00/10] Kernel address sainitzer (KASan) - dynamic
- memory error deetector.
-References: <1404905415-9046-1-git-send-email-a.ryabinin@samsung.com> <1410359487-31938-1-git-send-email-a.ryabinin@samsung.com>
-In-Reply-To: <1410359487-31938-1-git-send-email-a.ryabinin@samsung.com>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrey Ryabinin <a.ryabinin@samsung.com>, linux-kernel@vger.kernel.org
-Cc: Dmitry Vyukov <dvyukov@google.com>, Konstantin Serebryany <kcc@google.com>, Dmitry Chernenkov <dmitryc@google.com>, Andrey Konovalov <adech.fo@gmail.com>, Yuri Gribov <tetra2005@gmail.com>, Konstantin Khlebnikov <koct9i@gmail.com>, Michal Marek <mmarek@suse.cz>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Christoph Lameter <cl@linux.com>, Pekka Enberg <penberg@kernel.org>, David Rientjes <rientjes@google.com>, Joonsoo Kim <iamjoonsoo.kim@lge.com>, Andrew Morton <akpm@linux-foundation.org>, Dave Hansen <dave.hansen@intel.com>, Andi Kleen <andi@firstfloor.org>, Vegard Nossum <vegard.nossum@gmail.com>, "H. Peter Anvin" <hpa@zytor.com>, linux-kbuild@vger.kernel.org, x86@kernel.org, linux-mm@kvack.org, Randy Dunlap <rdunlap@infradead.org>, Peter Zijlstra <peterz@infradead.org>, Alexander Viro <viro@zeniv.linux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>
+To: Michal Marek <mmarek@suse.cz>, Andrew Morton <akpm@linux-foundation.org>, Behan Webster <behanw@converseincode.com>, Zhao Gang <gamerh2o@gmail.com>, Borislav Petkov <bp@suse.de>, Andi Kleen <ak@linux.intel.com>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, =?UTF-8?q?Vin=C3=ADcius=20Tinti?= <viniciustinti@gmail.com>
 
-On 09/10/2014 10:31 AM, Andrey Ryabinin wrote:
-> Hi,
-> This is a second iteration of kerenel address sanitizer (KASan).
+Allows kbuild to generate LLVM bitcode files using '.ll' suffix.
 
-FWIW, I've been using v1 for a while and it has uncovered quite a few
-real bugs across the kernel.
+  # from c code
+  CC=clang make kernel/pid.ll
 
-Some of them (I didn't go beyond the first page on google):
+  # from asm code
+  CC=clang make arch/x86/kernel/preempt.ll
 
-* https://lkml.org/lkml/2014/8/9/162 - Which resulted in major changes to
-ballooning.
-* https://lkml.org/lkml/2014/7/13/192
-* https://lkml.org/lkml/2014/7/24/359
+Signed-off-by: Vinícius Tinti <viniciustinti@gmail.com>
+Signed-off-by: Behan Webster <behanw@converseincode.com>
+---
+ .gitignore             |  1 +
+ Makefile               |  6 ++++++
+ scripts/Makefile.build | 14 ++++++++++++++
+ 3 files changed, 21 insertions(+)
 
+diff --git a/.gitignore b/.gitignore
+index e213b27..823b9d6 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -32,6 +32,7 @@
+ *.lzo
+ *.patch
+ *.gcno
++*.ll
+ modules.builtin
+ Module.symvers
+ *.dwo
+diff --git a/Makefile b/Makefile
+index 1a60bdd..cd4a120 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1250,6 +1250,8 @@ help:
+ 	@echo  '                    (default: $$(INSTALL_MOD_PATH)/lib/firmware)'
+ 	@echo  '  dir/            - Build all files in dir and below'
+ 	@echo  '  dir/file.[oisS] - Build specified target only'
++	@echo  '  dir/file.ll     - Build the LLVM bitcode file'
++	@echo  '                    (requires compiler support for LLVM bitcode generation)'
+ 	@echo  '  dir/file.lst    - Build specified mixed source/assembly target only'
+ 	@echo  '                    (requires a recent binutils and recent build (System.map))'
+ 	@echo  '  dir/file.ko     - Build module including final link'
+@@ -1526,6 +1528,10 @@ endif
+ 	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+ %.symtypes: %.c prepare scripts FORCE
+ 	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
++%.ll: %.c prepare scripts FORCE
++	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
++%.ll: %.S prepare scripts FORCE
++	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+ 
+ # Modules
+ /: prepare scripts FORCE
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index bf3e677..4d97e4f 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -174,6 +174,20 @@ cmd_cc_symtypes_c =                                                         \
+ $(obj)/%.symtypes : $(src)/%.c FORCE
+ 	$(call cmd,cc_symtypes_c)
+ 
++# LLVM bitcode
++# Generate .ll files from .s and .c
++quiet_cmd_cc_ll_c = CC $(quiet_modtag)  $@
++      cmd_cc_ll_c = $(CC) $(c_flags) -emit-llvm -S -o $@ $<
++
++$(obj)/%.ll: $(src)/%.c FORCE
++	$(call if_changed_dep,cc_ll_c)
++
++quiet_cmd_as_ll_S = CPP $(quiet_modtag) $@
++      cmd_as_ll_S = $(CPP) $(a_flags)   -o $@ $<
++
++$(obj)/%.ll: $(src)/%.S FORCE
++	$(call if_changed_dep,as_ll_S)
++
+ # C (.c) files
+ # The C file is compiled and updated dependency information is generated.
+ # (See cmd_cc_o_c + relevant part of rule_cc_o_c)
+-- 
+2.1.0
 
-Thanks,
-Sasha
