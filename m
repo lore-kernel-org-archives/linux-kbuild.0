@@ -1,52 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:60189 "EHLO mx2.suse.de"
+Received: from mout.web.de ([212.227.17.12]:65396 "EHLO mout.web.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754644AbaILOMZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 12 Sep 2014 10:12:25 -0400
-Message-ID: <5412FF45.30208@suse.cz>
-Date: Fri, 12 Sep 2014 16:12:21 +0200
-From: Michal Marek <mmarek@suse.cz>
+	id S1751056AbaILWcO (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 12 Sep 2014 18:32:14 -0400
+From: Martin Walch <walch.martin@web.de>
+Subject: kconfig: NEW: syntax highlighting for Kconfig files in KDE
+Date: Sat, 13 Sep 2014 00:32:09 +0200
+Message-ID: <27129446.btpinNW7pO@tacticalops>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2] deb-pkg: Add support for powerpc little endian
-References: <1409894927.11359.26.camel@ale.ozlabs.ibm.com>	 <20140905071344.GA16024@visitor2.iram.es>	 <1409903718.11359.30.camel@ale.ozlabs.ibm.com>	 <20140905120925.GB3846@oc0268524204.ibm.com> <1410057728.7389.24.camel@decadent.org.uk>
-In-Reply-To: <1410057728.7389.24.camel@decadent.org.uk>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ben Hutchings <ben@decadent.org.uk>, Michael Neuling <mikey@neuling.org>
-Cc: Thadeu Lima de Souza Cascardo <cascardo@linux.vnet.ibm.com>, Gabriel Paubert <paubert@iram.es>, linux-kbuild@vger.kernel.org, linux-kernel <linux-kernel@vger.kernel.org>, Anton Blanchard <anton@samba.org>, Leann Ogasawara <leann.ogasawara@canonical.com>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
 
-On 2014-09-07 04:42, Ben Hutchings wrote:
-> On Fri, 2014-09-05 at 09:09 -0300, Thadeu Lima de Souza Cascardo wrote:
->> On Fri, Sep 05, 2014 at 05:55:18PM +1000, Michael Neuling wrote:
->>> On Fri, 2014-09-05 at 09:13 +0200, Gabriel Paubert wrote:
->>>> On Fri, Sep 05, 2014 at 03:28:47PM +1000, Michael Neuling wrote:
->>>>> The Debian powerpc little endian architecture is called ppc64le.  This
->>>>
->>>> Huh? ppc64le or ppc64el?
->>>
->>> ppc64el.  Commit message is wrong.  Fixed below.
->>>
->>> Mikey
->>>
->>>
->>
->> What about ppc64?
->>
->> Also, I sent that already a month ago. Both linuxppc-dev and Michal
->> Marek were on cc.
->>
->> http://marc.info/?l=linux-kernel&m=140744360328562&w=2
-> 
-> Anyone using powerpc (32-bit) will then need to add ppc64 as a foreign
-> architecture before they can install a 64-bit custom kernel.  This is
-> fine in principle, except that ppc64 is not an official Debian port and
-> its packages are not mirrored on the same servers.
-[...]
-> So I think Michael's version, leaving big-endian kernels as powerpc by
-> default, is preferable for now.
+The text editors in KDE (Kate, KWrite, KDevelop, etc.) now support
+highlighting Kconfig files. This will ship with KDE SC 4.14.1, older versions
+back to KDE 4.4.0 can easily get it by running Kate and using the download
+dialog at >Settings >Configure Kate... >Editor Component: Open/Save
+>Modes & Filetypes >Download Highlighting Files...
 
-I applied v2 of Michael's patch to kbuild.git#misc.
+Kate automatically applies this highlighting style to all files with names
+that start with "Kconfig" unless some other pattern applies (e.g. *.c).
 
-Michal
+The highlighting should be pretty accurate with the usual formatting
+scheme that most syntax highlighters of KDE apply and it comes with code
+folding support and spell checking. However, it still lacks an indenter.
+It also has no other fancy stuff like accurate auto-completion or jumping
+to a declaration.
+
+While the infrastructure of Kate Part primarily targets highlighting
+syntactically valid files (not caring about invalid syntax), this highlighter
+also underlines anything that will lead to a syntax error when running *conf.
+Bad characters that do not lead up to a syntax error, but which will be
+silently ignored, are red with a light red background.
+
+This all comes at the cost of rather high cpu usage. You may notice when
+loading large files, depending on your hardware. Also, automatic spell
+checking on large files may slow things down. If you intend to open hundreds
+of Kconfig files at once, expect it to take a long time.
+
+Please report bugs either to me via email (subject start [kconfig.xml]) or
+in the bug tracker of KDE at https://bugs.kde.org/
+
+Regards
+Martin Walch
+-- 
+
