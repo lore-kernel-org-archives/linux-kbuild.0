@@ -1,13 +1,16 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from forward5l.mail.yandex.net ([84.201.143.138]:57285 "EHLO
-	forward5l.mail.yandex.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752396AbaINKYN (ORCPT
+Received: from forward7l.mail.yandex.net ([84.201.143.140]:53265 "EHLO
+	forward7l.mail.yandex.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752396AbaINKY0 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 14 Sep 2014 06:24:13 -0400
-Subject: [PATCH 0/3] Implement /proc/built-in file similar to /proc/modules
+	Sun, 14 Sep 2014 06:24:26 -0400
+Subject: [PATCH 3/3] core: create /proc/built-in file to show the list of
+ built-in drivers
 From: Kirill Tkhai <tkhai@yandex.ru>
-Date: Sun, 14 Sep 2014 14:18:13 +0400
-Message-ID: <20140914100545.3745.23394.stgit@localhost>
+Date: Sun, 14 Sep 2014 14:19:37 +0400
+Message-ID: <20140914101933.3745.29648.stgit@localhost>
+In-Reply-To: <20140914100545.3745.23394.stgit@localhost>
+References: <20140914100545.3745.23394.stgit@localhost>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
@@ -15,32 +18,99 @@ Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: mmarek@suse.cz, arnd@arndb.de, linux-kbuild@vger.kernel.org, gregkh@linuxfoundation.org, linux-kernel@vger.kernel.org, oleg@redhat.com, grant.likely@secretlab.ca, ebiederm@xmission.com, akpm@linux-foundation.org, ktkhai@parallels.com, sam@ravnborg.org
 
-This series implements a possibility to show the list of built-in drivers
-to userspace. The names of drivers will be the same as when they are modules.
-So, if your system has "loop" driver then it appears either in /proc/modules
-or in /proc/built-in and userspace will be able to know about this.
-
-Now this is impossible. The only way to get kernel configuration is
-/proc/config.gz, but CONFIG_* names can change from time to time. Module
-names are more or less standardized.
-
+Signed-off-by: kirill tkhai <ktkhai@parallels.com>
 ---
-
-Kirill Tkhai (3):
-      kbuild: Make targets names tree-wide unique on x86
-      core: Save list of built-in drivers names
-      core: create /proc/built-in file to show the list of built-in drivers
-
-
- drivers/acpi/acpica/Makefile      |   28 +++++++--------
- drivers/pnp/pnpacpi/Makefile      |    4 +-
- fs/proc/Makefile                  |    1 +
- fs/proc/builtin.c                 |   70 +++++++++++++++++++++++++++++++++++++
- include/asm-generic/vmlinux.lds.h |    3 ++
- init/Makefile                     |   19 ++++++----
- scripts/Makefile.build            |   14 +++++--
- 7 files changed, 112 insertions(+), 27 deletions(-)
+ fs/proc/Makefile  |    1 +
+ fs/proc/builtin.c |   70 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 71 insertions(+)
  create mode 100644 fs/proc/builtin.c
 
---
-Signed-off-by: Kirill Tkhai <kthai@parallels.com>
+diff --git a/fs/proc/Makefile b/fs/proc/Makefile
+index 7151ea4..1e13361 100644
+--- a/fs/proc/Makefile
++++ b/fs/proc/Makefile
+@@ -10,6 +10,7 @@ proc-$(CONFIG_MMU)	:= task_mmu.o
+ proc-y       += inode.o root.o base.o generic.o array.o \
+ 		fd.o
+ proc-$(CONFIG_TTY)      += proc_tty.o
++proc-y	+= builtin.o
+ proc-y	+= cmdline.o
+ proc-y	+= consoles.o
+ proc-y	+= cpuinfo.o
+diff --git a/fs/proc/builtin.c b/fs/proc/builtin.c
+new file mode 100644
+index 0000000..2d49980
+--- /dev/null
++++ b/fs/proc/builtin.c
+@@ -0,0 +1,70 @@
++#include <linux/init.h>
++#include <linux/kernel.h>
++#include <linux/proc_fs.h>
++#include <linux/seq_file.h>
++
++extern char __start_builtin_drivers_list[], __stop_builtin_drivers_list[];
++
++static void *b_start(struct seq_file *m, loff_t *pos)
++{
++	unsigned long size = (unsigned long)__stop_builtin_drivers_list -
++			     (unsigned long)__start_builtin_drivers_list;
++	if (*pos) {
++		/* Skip all !'\0' symbols */
++		while (*pos <= size &&  *(__start_builtin_drivers_list + *pos))
++			++*pos;
++		/* Skip all  '\0' symbols */
++		while (*pos <= size && !*(__start_builtin_drivers_list + *pos))
++			++*pos;
++	}
++
++	if (*pos >= size)
++		return NULL;
++
++	return __start_builtin_drivers_list + *pos;
++}
++
++static void *b_next(struct seq_file *m, void *cur, loff_t *pos)
++{
++	++*pos;
++
++	return b_start(m, pos);
++}
++
++static void b_stop(struct seq_file *m, void *p)
++{
++}
++
++static int b_show(struct seq_file *m, void *p)
++{
++	seq_printf(m, "%s\n", (const char *)p);
++
++	return 0;
++}
++
++static const struct seq_operations builtin_op = {
++	.start = b_start,
++	.next = b_next,
++	.stop = b_stop,
++	.show = b_show
++};
++
++static int builtin_open(struct inode *inode, struct file *file)
++{
++	return seq_open(file, &builtin_op);
++}
++
++static const struct file_operations builtin_operations = {
++	.open = builtin_open,
++	.read = seq_read,
++	.llseek = seq_lseek,
++	.release = seq_release_private,
++};
++
++static int __init proc_builtin_init(void)
++{
++	proc_create("built-in", S_IRUGO, NULL, &builtin_operations);
++	return 0;
++}
++
++fs_initcall(proc_builtin_init);
+
