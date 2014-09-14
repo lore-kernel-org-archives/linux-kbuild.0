@@ -1,62 +1,60 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:40705 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752863AbaINRaD (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 14 Sep 2014 13:30:03 -0400
-Date: Sun, 14 Sep 2014 19:27:09 +0200
-From: Oleg Nesterov <oleg@redhat.com>
-Subject: Re: [PATCH 0/3] Implement /proc/built-in file similar to
-	/proc/modules
-Message-ID: <20140914172709.GA1569@redhat.com>
-References: <20140914100545.3745.23394.stgit@localhost> <20140914153832.GC4064@kroah.com>
+Received: from forward3l.mail.yandex.net ([84.201.143.136]:55727 "EHLO
+	forward3l.mail.yandex.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753114AbaINRcL (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 14 Sep 2014 13:32:11 -0400
+Message-ID: <5415D10E.90809@yandex.ru>
+Date: Sun, 14 Sep 2014 21:31:58 +0400
+From: Kirill Tkhai <tkhai@yandex.ru>
+Reply-To: tkhai@yandex.ru
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Subject: Re: [PATCH 0/3] Implement /proc/built-in file similar to /proc/modules
+References: <20140914100545.3745.23394.stgit@localhost> <20140914153832.GC4064@kroah.com>
 In-Reply-To: <20140914153832.GC4064@kroah.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Greg KH <gregkh@linuxfoundation.org>
-Cc: Kirill Tkhai <tkhai@yandex.ru>, mmarek@suse.cz, arnd@arndb.de, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, grant.likely@secretlab.ca, ebiederm@xmission.com, akpm@linux-foundation.org, ktkhai@parallels.com, sam@ravnborg.org
+Cc: mmarek@suse.cz, arnd@arndb.de, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, oleg@redhat.com, grant.likely@secretlab.ca, ebiederm@xmission.com, akpm@linux-foundation.org, ktkhai@parallels.com, sam@ravnborg.org
 
-On 09/14, Greg KH wrote:
->
+On 14.09.2014 19:38, Greg KH wrote:
 > On Sun, Sep 14, 2014 at 02:18:13PM +0400, Kirill Tkhai wrote:
-> > This series implements a possibility to show the list of built-in drivers
-> > to userspace. The names of drivers will be the same as when they are modules.
->
+>> This series implements a possibility to show the list of built-in drivers
+>> to userspace. The names of drivers will be the same as when they are modules.
+> 
 > Have you looked at /sys/modules/ ?  Doesn't that show what you want
 > here?
 
-Well, /sys/module/ doesn't list the modules (drivers) compiled in. Say,
-/sys/module/kernel. And it can't help a user to figure out that, say, the
-loop driver is already "loaded" because CONFIG_BLK_DEV_LOOP=y.
+There are only the drivers in "/sys/module" which have parameters.
+Drivers without parameters do not appear there.
 
+>> So, if your system has "loop" driver then it appears either in /proc/modules
+>> or in /proc/built-in and userspace will be able to know about this.
+>>
+>> Now this is impossible. The only way to get kernel configuration is
+>> /proc/config.gz, but CONFIG_* names can change from time to time. Module
+>> names are more or less standardized.
+> 
 > Module names aren't "standardized", we change them at times when needed,
 > just like CONFIG_ names.
-
-OK, but still the name will be the same, in /proc/modules or /proc/builtin.
-
+> 
 > What is your end goal here?  As you say, config.gz is the real kernel
 > configuration, just having a list of modules built in isn't going to
 > help much in getting a working kernel config without it.
 
-Perhaps you are right... but otoh perhaps this can can be useful anyway.
-Again, a user can know about "insmod loop", but he can know nothing
-about CONFIG_ names.
+It looks like userspace applications oriented on modules names rather
+than on CONFIG_XXX parameters. /proc/config.gz is optional and userspace
+applications can't base on it.
 
-That said, I do not really understand 2/3. Not only I do not understand
-this kbuild magic, I am not sure I understand what /proc/built-in will
-actually show.
+For example, when I compile "loop" module built-in and "loop" is in
+/etc/modules, init script warns about this module is not present and
+can't be autoloaded. The script does not store CONFIG_XXX <-> module_xxx
+conformity. And nobody stores it.
 
-To me it would be better to change the "ifndef MODULE" version of
-module_init() to add KBUILD_MODNAME into __builtin_drivers_list[].
+When iptables wants extra functionality, it requests a module. Etc.
 
-Yes, module_init() is overused. Say, why does kernel/kprobes.c use
-module_init() ? This looks confusing, this code can't be compiled as a
-module. And it seems that it has a lot more users which should have used
-__initcall() instead.
-
-In short, I dunno ;)
-
-Oleg.
-
+Nobody is oriented on CONFIG_XXX parameters. It would be simple for
+userspace to add a support of /proc/built-in analysing. It's very
+similar to /proc/modules.
