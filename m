@@ -1,50 +1,84 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.web.de ([212.227.17.12]:65396 "EHLO mout.web.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751056AbaILWcO (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 12 Sep 2014 18:32:14 -0400
-From: Martin Walch <walch.martin@web.de>
-Subject: kconfig: NEW: syntax highlighting for Kconfig files in KDE
-Date: Sat, 13 Sep 2014 00:32:09 +0200
-Message-ID: <27129446.btpinNW7pO@tacticalops>
+Received: from forward4l.mail.yandex.net ([84.201.143.137]:48217 "EHLO
+	forward4l.mail.yandex.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752343AbaINKYM (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 14 Sep 2014 06:24:12 -0400
+Subject: [PATCH 2/3] core: Save list of built-in drivers names
+From: Kirill Tkhai <tkhai@yandex.ru>
+Date: Sun, 14 Sep 2014 14:18:35 +0400
+Message-ID: <20140914101831.3745.78412.stgit@localhost>
+In-Reply-To: <20140914100545.3745.23394.stgit@localhost>
+References: <20140914100545.3745.23394.stgit@localhost>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
+To: mmarek@suse.cz, arnd@arndb.de, linux-kbuild@vger.kernel.org, gregkh@linuxfoundation.org, linux-kernel@vger.kernel.org, oleg@redhat.com, grant.likely@secretlab.ca, ebiederm@xmission.com, akpm@linux-foundation.org, ktkhai@parallels.com, sam@ravnborg.org
 
-The text editors in KDE (Kate, KWrite, KDevelop, etc.) now support
-highlighting Kconfig files. This will ship with KDE SC 4.14.1, older versions
-back to KDE 4.4.0 can easily get it by running Kate and using the download
-dialog at >Settings >Configure Kate... >Editor Component: Open/Save
->Modes & Filetypes >Download Highlighting Files...
+Create section *(__builtin_drivers_list) to store the list of drivers names.
 
-Kate automatically applies this highlighting style to all files with names
-that start with "Kconfig" unless some other pattern applies (e.g. *.c).
+Every driver name "modname" from directory "moddir" will be stored in array:
 
-The highlighting should be pretty accurate with the usual formatting
-scheme that most syntax highlighters of KDE apply and it comes with code
-folding support and spell checking. However, it still lacks an indenter.
-It also has no other fancy stuff like accurate auto-completion or jumping
-to a declaration.
+const char moddir_modname[] __attribute__((section("__builtin_drivers_list")) = "modname";
 
-While the infrastructure of Kate Part primarily targets highlighting
-syntactically valid files (not caring about invalid syntax), this highlighter
-also underlines anything that will lead to a syntax error when running *conf.
-Bad characters that do not lead up to a syntax error, but which will be
-silently ignored, are red with a light red background.
+Using moddir prefix for variables names to prevent linking breakage
+on the set of all architectures where dupricate names present.
+The name template should be transmormed in something like __modname__name
+in the future to catch duplicates, but now it's impossible.
 
-This all comes at the cost of rather high cpu usage. You may notice when
-loading large files, depending on your hardware. Also, automatic spell
-checking on large files may slow things down. If you intend to open hundreds
-of Kconfig files at once, expect it to take a long time.
+Signed-off-by: Kirill Tkhai <ktkhai@parallels.com>
+---
+ include/asm-generic/vmlinux.lds.h |    3 +++
+ scripts/Makefile.build            |   14 ++++++++++----
+ 2 files changed, 13 insertions(+), 4 deletions(-)
 
-Please report bugs either to me via email (subject start [kconfig.xml]) or
-in the bug tracker of KDE at https://bugs.kde.org/
-
-Regards
-Martin Walch
--- 
+diff --git a/include/asm-generic/vmlinux.lds.h b/include/asm-generic/vmlinux.lds.h
+index 5ba0360..5bc6d56 100644
+--- a/include/asm-generic/vmlinux.lds.h
++++ b/include/asm-generic/vmlinux.lds.h
+@@ -237,6 +237,9 @@
+ 		*(__tracepoints_ptrs)	/* Tracepoints: pointer array */\
+ 		VMLINUX_SYMBOL(__stop___tracepoints_ptrs) = .;		\
+ 		*(__tracepoints_strings)/* Tracepoints: strings */	\
++		VMLINUX_SYMBOL(__start_builtin_drivers_list) = .;	\
++		*(__builtin_drivers_list)				\
++		VMLINUX_SYMBOL(__stop_builtin_drivers_list) = .;	\
+ 	}								\
+ 									\
+ 	.rodata1          : AT(ADDR(.rodata1) - LOAD_OFFSET) {		\
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index bf3e677..e158a4d 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -136,6 +136,7 @@ $(obj-m)              : quiet_modtag := [M]
+ 
+ # Default for not multi-part modules
+ modname = $(basetarget)
++modname_c_var = `echo $(kbuild-dir)/$(modname) | sed 's/\.\///g' | sed 's/-/_/g' | sed 's/\//__/g'`
+ 
+ $(multi-objs-m)         : modname = $(modname-multi)
+ $(multi-objs-m:.o=.i)   : modname = $(modname-multi)
+@@ -376,11 +377,16 @@ $(filter $(addprefix $(obj)/,         \
+ $($(subst $(obj)/,,$(@:.o=-objs)))    \
+ $($(subst $(obj)/,,$(@:.o=-y)))), $^)
+ 
+-quiet_cmd_link_multi-y = LD      $@
+-cmd_link_multi-y = $(LD) $(ld_flags) -r -o $@ $(link_multi_deps) $(cmd_secanalysis)
+-
+ quiet_cmd_link_multi-m = LD [M]  $@
+-cmd_link_multi-m = $(cmd_link_multi-y)
++cmd_link_multi-m = $(LD) $(ld_flags) -r -o $@ $(link_multi_deps) $(cmd_secanalysis)
++
++quiet_cmd_link_multi-y = LD      $@
++cmd_link_multi-y = \
++	echo "const char "$(modname_c_var)"[] __attribute__((section(\"__builtin_drivers_list\"))) " \
++	     "__attribute__ ((aligned(sizeof(unsigned long)))) = \""$(modname)"\";" > $(kbuild-dir)/.$(modname).c; \
++	$(CC) $(c_flags) -c $(kbuild-dir)/.$(modname).c -o $(kbuild-dir)/.$(modname).o; \
++	$(LD) $(ld_flags) -r -o $@ $(link_multi_deps) $(kbuild-dir)/.$(modname).o $(cmd_secanalysis); \
++	rm -f $(kbuild-dir)/.$(modname).c
+ 
+ # We would rather have a list of rules like
+ # 	foo.o: $(foo-objs)
 
