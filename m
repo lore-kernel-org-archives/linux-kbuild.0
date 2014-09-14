@@ -1,14 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from forward7l.mail.yandex.net ([84.201.143.140]:53265 "EHLO
-	forward7l.mail.yandex.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752396AbaINKY0 (ORCPT
+Received: from forward4l.mail.yandex.net ([84.201.143.137]:49452 "EHLO
+	forward4l.mail.yandex.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752343AbaINK3N (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 14 Sep 2014 06:24:26 -0400
-Subject: [PATCH 3/3] core: create /proc/built-in file to show the list of
- built-in drivers
+	Sun, 14 Sep 2014 06:29:13 -0400
+Subject: [PATCH 1/3] kbuild: Make targets names tree-wide unique on x86
 From: Kirill Tkhai <tkhai@yandex.ru>
-Date: Sun, 14 Sep 2014 14:19:37 +0400
-Message-ID: <20140914101933.3745.29648.stgit@localhost>
+Date: Sun, 14 Sep 2014 14:18:24 +0400
+Message-ID: <20140914101821.3745.21235.stgit@localhost>
 In-Reply-To: <20140914100545.3745.23394.stgit@localhost>
 References: <20140914100545.3745.23394.stgit@localhost>
 MIME-Version: 1.0
@@ -18,99 +17,178 @@ Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: mmarek@suse.cz, arnd@arndb.de, linux-kbuild@vger.kernel.org, gregkh@linuxfoundation.org, linux-kernel@vger.kernel.org, oleg@redhat.com, grant.likely@secretlab.ca, ebiederm@xmission.com, akpm@linux-foundation.org, ktkhai@parallels.com, sam@ravnborg.org
 
-Signed-off-by: kirill tkhai <ktkhai@parallels.com>
----
- fs/proc/Makefile  |    1 +
- fs/proc/builtin.c |   70 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 71 insertions(+)
- create mode 100644 fs/proc/builtin.c
+These are the duplicate targets names found on x86 allyesconfig.
 
-diff --git a/fs/proc/Makefile b/fs/proc/Makefile
-index 7151ea4..1e13361 100644
---- a/fs/proc/Makefile
-+++ b/fs/proc/Makefile
-@@ -10,6 +10,7 @@ proc-$(CONFIG_MMU)	:= task_mmu.o
- proc-y       += inode.o root.o base.o generic.o array.o \
- 		fd.o
- proc-$(CONFIG_TTY)      += proc_tty.o
-+proc-y	+= builtin.o
- proc-y	+= cmdline.o
- proc-y	+= consoles.o
- proc-y	+= cpuinfo.o
-diff --git a/fs/proc/builtin.c b/fs/proc/builtin.c
-new file mode 100644
-index 0000000..2d49980
---- /dev/null
-+++ b/fs/proc/builtin.c
-@@ -0,0 +1,70 @@
-+#include <linux/init.h>
-+#include <linux/kernel.h>
-+#include <linux/proc_fs.h>
-+#include <linux/seq_file.h>
+Change "acpi" on "acpica" in drivers/acpi/acpica/Makefile.
+
+Change "pnp" on "pnpacpi" in drivers/pnp/pnpacpi/Makefile.
+
+Also remove "mounts" target from init/Makefile. It's artificial
+driver name, let's do not litter namespace.
+
+Signed-off-by: Kirill Tkhai <ktkhai@parallels.com>
+---
+ drivers/acpi/acpica/Makefile |   28 ++++++++++++++--------------
+ drivers/pnp/pnpacpi/Makefile |    4 ++--
+ init/Makefile                |   19 ++++++++++++-------
+ 3 files changed, 28 insertions(+), 23 deletions(-)
+
+diff --git a/drivers/acpi/acpica/Makefile b/drivers/acpi/acpica/Makefile
+index c1a9635..c425735 100644
+--- a/drivers/acpi/acpica/Makefile
++++ b/drivers/acpi/acpica/Makefile
+@@ -5,10 +5,10 @@
+ ccflags-y			:= -Os -DBUILDING_ACPICA
+ ccflags-$(CONFIG_ACPI_DEBUG)	+= -DACPI_DEBUG_OUTPUT
+ 
+-# use acpi.o to put all files here into acpi.o modparam namespace
+-obj-y	+= acpi.o
++# use acpica.o to put all files here into acpica.o modparam namespace
++obj-y	+= acpica.o
+ 
+-acpi-y :=		\
++acpica-y :=		\
+ 	dsargs.o	\
+ 	dscontrol.o	\
+ 	dsfield.o	\
+@@ -24,7 +24,7 @@ acpi-y :=		\
+ 	dswscope.o	\
+ 	dswstate.o
+ 
+-acpi-y +=		\
++acpica-y +=		\
+ 	evevent.o	\
+ 	evgpe.o		\
+ 	evgpeblk.o	\
+@@ -41,7 +41,7 @@ acpi-y +=		\
+ 	evxfgpe.o	\
+ 	evxfregn.o
+ 
+-acpi-y +=		\
++acpica-y +=		\
+ 	exconfig.o	\
+ 	exconvrt.o	\
+ 	excreate.o	\
+@@ -67,7 +67,7 @@ acpi-y +=		\
+ 	exsystem.o	\
+ 	exutils.o
+ 
+-acpi-y +=		\
++acpica-y +=		\
+ 	hwacpi.o	\
+ 	hwesleep.o	\
+ 	hwgpe.o		\
+@@ -78,9 +78,9 @@ acpi-y +=		\
+ 	hwxface.o	\
+ 	hwxfsleep.o
+ 
+-acpi-$(ACPI_FUTURE_USAGE) += hwtimer.o
++acpica-$(ACPI_FUTURE_USAGE) += hwtimer.o
+ 
+-acpi-y +=		\
++acpica-y +=		\
+ 	nsaccess.o	\
+ 	nsalloc.o	\
+ 	nsarguments.o	\
+@@ -103,9 +103,9 @@ acpi-y +=		\
+ 	nsxfname.o	\
+ 	nsxfobj.o
+ 
+-acpi-$(ACPI_FUTURE_USAGE) += nsdumpdv.o
++acpica-$(ACPI_FUTURE_USAGE) += nsdumpdv.o
+ 
+-acpi-y +=		\
++acpica-y +=		\
+ 	psargs.o	\
+ 	psloop.o	\
+ 	psobject.o	\
+@@ -118,7 +118,7 @@ acpi-y +=		\
+ 	pswalk.o	\
+ 	psxface.o
+ 
+-acpi-y +=		\
++acpica-y +=		\
+ 	rsaddr.o	\
+ 	rscalc.o	\
+ 	rscreate.o	\
+@@ -134,7 +134,7 @@ acpi-y +=		\
+ 	rsutils.o	\
+ 	rsxface.o
+ 
+-acpi-y +=		\
++acpica-y +=		\
+ 	tbdata.o	\
+ 	tbfadt.o	\
+ 	tbfind.o	\
+@@ -145,7 +145,7 @@ acpi-y +=		\
+ 	tbxfload.o	\
+ 	tbxfroot.o
+ 
+-acpi-y +=		\
++acpica-y +=		\
+ 	utaddress.o	\
+ 	utalloc.o	\
+ 	utbuffer.o	\
+@@ -176,7 +176,7 @@ acpi-y +=		\
+ 	utxferror.o	\
+ 	utxfmutex.o
+ 
+-acpi-$(ACPI_FUTURE_USAGE) +=	\
++acpica-$(ACPI_FUTURE_USAGE) +=	\
+ 	utcache.o		\
+ 	utfileio.o		\
+ 	utprint.o		\
+diff --git a/drivers/pnp/pnpacpi/Makefile b/drivers/pnp/pnpacpi/Makefile
+index 40c93da..2a7ae46 100644
+--- a/drivers/pnp/pnpacpi/Makefile
++++ b/drivers/pnp/pnpacpi/Makefile
+@@ -1,6 +1,6 @@
+ #
+ # Makefile for the kernel PNPACPI driver.
+ #
+-obj-y += pnp.o
++obj-y += pnpacpi.o
+ 
+-pnp-y := core.o rsparser.o
++pnpacpi-y := core.o rsparser.o
+diff --git a/init/Makefile b/init/Makefile
+index 7bc47ee..566a9ff 100644
+--- a/init/Makefile
++++ b/init/Makefile
+@@ -2,23 +2,28 @@
+ # Makefile for the linux kernel.
+ #
+ 
+-obj-y                          := main.o version.o mounts.o
++obj-y                          := main.o version.o do_mounts.o
 +
-+extern char __start_builtin_drivers_list[], __stop_builtin_drivers_list[];
+ ifneq ($(CONFIG_BLK_DEV_INITRD),y)
+ obj-y                          += noinitramfs.o
+ else
+-obj-$(CONFIG_BLK_DEV_INITRD)   += initramfs.o
++obj-y                          += initramfs.o do_mounts_initrd.o
++endif
 +
-+static void *b_start(struct seq_file *m, loff_t *pos)
-+{
-+	unsigned long size = (unsigned long)__stop_builtin_drivers_list -
-+			     (unsigned long)__start_builtin_drivers_list;
-+	if (*pos) {
-+		/* Skip all !'\0' symbols */
-+		while (*pos <= size &&  *(__start_builtin_drivers_list + *pos))
-+			++*pos;
-+		/* Skip all  '\0' symbols */
-+		while (*pos <= size && !*(__start_builtin_drivers_list + *pos))
-+			++*pos;
-+	}
++ifeq ($(CONFIG_BLK_DEV_RAM),y)
++obj-y                          += do_mounts_rd.o
+ endif
 +
-+	if (*pos >= size)
-+		return NULL;
++ifeq ($(CONFIG_BLK_DEV_MD),y)
++obj-y                          += do_mounts_md.o
++endif
 +
-+	return __start_builtin_drivers_list + *pos;
-+}
-+
-+static void *b_next(struct seq_file *m, void *cur, loff_t *pos)
-+{
-+	++*pos;
-+
-+	return b_start(m, pos);
-+}
-+
-+static void b_stop(struct seq_file *m, void *p)
-+{
-+}
-+
-+static int b_show(struct seq_file *m, void *p)
-+{
-+	seq_printf(m, "%s\n", (const char *)p);
-+
-+	return 0;
-+}
-+
-+static const struct seq_operations builtin_op = {
-+	.start = b_start,
-+	.next = b_next,
-+	.stop = b_stop,
-+	.show = b_show
-+};
-+
-+static int builtin_open(struct inode *inode, struct file *file)
-+{
-+	return seq_open(file, &builtin_op);
-+}
-+
-+static const struct file_operations builtin_operations = {
-+	.open = builtin_open,
-+	.read = seq_read,
-+	.llseek = seq_lseek,
-+	.release = seq_release_private,
-+};
-+
-+static int __init proc_builtin_init(void)
-+{
-+	proc_create("built-in", S_IRUGO, NULL, &builtin_operations);
-+	return 0;
-+}
-+
-+fs_initcall(proc_builtin_init);
+ obj-$(CONFIG_GENERIC_CALIBRATE_DELAY) += calibrate.o
+ 
+ ifneq ($(CONFIG_ARCH_INIT_TASK),y)
+ obj-y                          += init_task.o
+ endif
+ 
+-mounts-y			:= do_mounts.o
+-mounts-$(CONFIG_BLK_DEV_RAM)	+= do_mounts_rd.o
+-mounts-$(CONFIG_BLK_DEV_INITRD)	+= do_mounts_initrd.o
+-mounts-$(CONFIG_BLK_DEV_MD)	+= do_mounts_md.o
+-
+ # dependencies on generated files need to be listed explicitly
+ $(obj)/version.o: include/generated/compile.h
+ 
 
