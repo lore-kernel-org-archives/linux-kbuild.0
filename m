@@ -1,15 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from forward4l.mail.yandex.net ([84.201.143.137]:48217 "EHLO
-	forward4l.mail.yandex.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752343AbaINKYM (ORCPT
+Received: from forward5l.mail.yandex.net ([84.201.143.138]:57285 "EHLO
+	forward5l.mail.yandex.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752396AbaINKYN (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 14 Sep 2014 06:24:12 -0400
-Subject: [PATCH 2/3] core: Save list of built-in drivers names
+	Sun, 14 Sep 2014 06:24:13 -0400
+Subject: [PATCH 0/3] Implement /proc/built-in file similar to /proc/modules
 From: Kirill Tkhai <tkhai@yandex.ru>
-Date: Sun, 14 Sep 2014 14:18:35 +0400
-Message-ID: <20140914101831.3745.78412.stgit@localhost>
-In-Reply-To: <20140914100545.3745.23394.stgit@localhost>
-References: <20140914100545.3745.23394.stgit@localhost>
+Date: Sun, 14 Sep 2014 14:18:13 +0400
+Message-ID: <20140914100545.3745.23394.stgit@localhost>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
@@ -17,68 +15,32 @@ Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: mmarek@suse.cz, arnd@arndb.de, linux-kbuild@vger.kernel.org, gregkh@linuxfoundation.org, linux-kernel@vger.kernel.org, oleg@redhat.com, grant.likely@secretlab.ca, ebiederm@xmission.com, akpm@linux-foundation.org, ktkhai@parallels.com, sam@ravnborg.org
 
-Create section *(__builtin_drivers_list) to store the list of drivers names.
+This series implements a possibility to show the list of built-in drivers
+to userspace. The names of drivers will be the same as when they are modules.
+So, if your system has "loop" driver then it appears either in /proc/modules
+or in /proc/built-in and userspace will be able to know about this.
 
-Every driver name "modname" from directory "moddir" will be stored in array:
+Now this is impossible. The only way to get kernel configuration is
+/proc/config.gz, but CONFIG_* names can change from time to time. Module
+names are more or less standardized.
 
-const char moddir_modname[] __attribute__((section("__builtin_drivers_list")) = "modname";
-
-Using moddir prefix for variables names to prevent linking breakage
-on the set of all architectures where dupricate names present.
-The name template should be transmormed in something like __modname__name
-in the future to catch duplicates, but now it's impossible.
-
-Signed-off-by: Kirill Tkhai <ktkhai@parallels.com>
 ---
- include/asm-generic/vmlinux.lds.h |    3 +++
- scripts/Makefile.build            |   14 ++++++++++----
- 2 files changed, 13 insertions(+), 4 deletions(-)
 
-diff --git a/include/asm-generic/vmlinux.lds.h b/include/asm-generic/vmlinux.lds.h
-index 5ba0360..5bc6d56 100644
---- a/include/asm-generic/vmlinux.lds.h
-+++ b/include/asm-generic/vmlinux.lds.h
-@@ -237,6 +237,9 @@
- 		*(__tracepoints_ptrs)	/* Tracepoints: pointer array */\
- 		VMLINUX_SYMBOL(__stop___tracepoints_ptrs) = .;		\
- 		*(__tracepoints_strings)/* Tracepoints: strings */	\
-+		VMLINUX_SYMBOL(__start_builtin_drivers_list) = .;	\
-+		*(__builtin_drivers_list)				\
-+		VMLINUX_SYMBOL(__stop_builtin_drivers_list) = .;	\
- 	}								\
- 									\
- 	.rodata1          : AT(ADDR(.rodata1) - LOAD_OFFSET) {		\
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index bf3e677..e158a4d 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -136,6 +136,7 @@ $(obj-m)              : quiet_modtag := [M]
- 
- # Default for not multi-part modules
- modname = $(basetarget)
-+modname_c_var = `echo $(kbuild-dir)/$(modname) | sed 's/\.\///g' | sed 's/-/_/g' | sed 's/\//__/g'`
- 
- $(multi-objs-m)         : modname = $(modname-multi)
- $(multi-objs-m:.o=.i)   : modname = $(modname-multi)
-@@ -376,11 +377,16 @@ $(filter $(addprefix $(obj)/,         \
- $($(subst $(obj)/,,$(@:.o=-objs)))    \
- $($(subst $(obj)/,,$(@:.o=-y)))), $^)
- 
--quiet_cmd_link_multi-y = LD      $@
--cmd_link_multi-y = $(LD) $(ld_flags) -r -o $@ $(link_multi_deps) $(cmd_secanalysis)
--
- quiet_cmd_link_multi-m = LD [M]  $@
--cmd_link_multi-m = $(cmd_link_multi-y)
-+cmd_link_multi-m = $(LD) $(ld_flags) -r -o $@ $(link_multi_deps) $(cmd_secanalysis)
-+
-+quiet_cmd_link_multi-y = LD      $@
-+cmd_link_multi-y = \
-+	echo "const char "$(modname_c_var)"[] __attribute__((section(\"__builtin_drivers_list\"))) " \
-+	     "__attribute__ ((aligned(sizeof(unsigned long)))) = \""$(modname)"\";" > $(kbuild-dir)/.$(modname).c; \
-+	$(CC) $(c_flags) -c $(kbuild-dir)/.$(modname).c -o $(kbuild-dir)/.$(modname).o; \
-+	$(LD) $(ld_flags) -r -o $@ $(link_multi_deps) $(kbuild-dir)/.$(modname).o $(cmd_secanalysis); \
-+	rm -f $(kbuild-dir)/.$(modname).c
- 
- # We would rather have a list of rules like
- # 	foo.o: $(foo-objs)
+Kirill Tkhai (3):
+      kbuild: Make targets names tree-wide unique on x86
+      core: Save list of built-in drivers names
+      core: create /proc/built-in file to show the list of built-in drivers
 
+
+ drivers/acpi/acpica/Makefile      |   28 +++++++--------
+ drivers/pnp/pnpacpi/Makefile      |    4 +-
+ fs/proc/Makefile                  |    1 +
+ fs/proc/builtin.c                 |   70 +++++++++++++++++++++++++++++++++++++
+ include/asm-generic/vmlinux.lds.h |    3 ++
+ init/Makefile                     |   19 ++++++----
+ scripts/Makefile.build            |   14 +++++--
+ 7 files changed, 112 insertions(+), 27 deletions(-)
+ create mode 100644 fs/proc/builtin.c
+
+--
+Signed-off-by: Kirill Tkhai <kthai@parallels.com>
