@@ -1,85 +1,33 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:50835 "EHLO mx1.redhat.com"
+Received: from cantor2.suse.de ([195.135.220.15]:60342 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752771AbaINUDI (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 14 Sep 2014 16:03:08 -0400
-Date: Sun, 14 Sep 2014 22:00:07 +0200
-From: Oleg Nesterov <oleg@redhat.com>
-Subject: Re: [PATCH 0/3] Implement /proc/built-in file similar to
-	/proc/modules
-Message-ID: <20140914200007.GA13254@redhat.com>
-References: <20140914100545.3745.23394.stgit@localhost> <20140914153832.GC4064@kroah.com> <20140914172709.GA1569@redhat.com> <5415D6ED.30508@yandex.ru>
+	id S1753252AbaIOJNF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 15 Sep 2014 05:13:05 -0400
+Message-ID: <5416AD96.7070306@suse.cz>
+Date: Mon, 15 Sep 2014 11:12:54 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5415D6ED.30508@yandex.ru>
+Subject: Re: [PATCH 0/3] Implement /proc/built-in file similar to /proc/modules
+References: <20140914100545.3745.23394.stgit@localhost> <20140914153832.GC4064@kroah.com>
+In-Reply-To: <20140914153832.GC4064@kroah.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Kirill Tkhai <tkhai@yandex.ru>
-Cc: Greg KH <gregkh@linuxfoundation.org>, mmarek@suse.cz, arnd@arndb.de, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, grant.likely@secretlab.ca, ebiederm@xmission.com, akpm@linux-foundation.org, ktkhai@parallels.com, sam@ravnborg.org
+Cc: Greg KH <gregkh@linuxfoundation.org>, arnd@arndb.de, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, oleg@redhat.com, grant.likely@secretlab.ca, ebiederm@xmission.com, akpm@linux-foundation.org, ktkhai@parallels.com, sam@ravnborg.org
 
-On 09/14, Kirill Tkhai wrote:
->
-> On 14.09.2014 21:27, Oleg Nesterov wrote:
-> >
-> > That said, I do not really understand 2/3. Not only I do not understand
-> > this kbuild magic, I am not sure I understand what /proc/built-in will
-> > actually show.
->
-> It's a list of drivers, one driver per line:
->
-> loop
-> ipv4
-> ipv5
-> ipv6
-> ipv7
-> ipv8
-> etc ;)
+On 2014-09-14 17:38, Greg KH wrote:
+> On Sun, Sep 14, 2014 at 02:18:13PM +0400, Kirill Tkhai wrote:
+>> This series implements a possibility to show the list of built-in drivers
+>> to userspace. The names of drivers will be the same as when they are modules.
+> 
+> Have you looked at /sys/modules/ ?  Doesn't that show what you want
+> here?
 
-which drivers ? ;)
+Plus, we have /lib/modules/.../modules.builtin, which is already
+understood by kmod. And if you badly need to display the list in /proc,
+then please just reuse the modules.builtin file.
 
-OK, I blindly applied this series to my test kernel tree and the
-output is:
-
-	$ cat /proc/built-in
-	proc
-	devpts
-	ext3
-	jbd
-	ramfs
-	hugetlbfs
-	debugfs
-	crypto
-	crypto_algapi
-	pcieportdrv
-	acpi
-	acpica
-	pnp
-	pnpacpi
-	8250
-	input-core
-	netfilter
-	unix
-
-and where is, say, af_packet driver? I have CONFIG_PACKET=y. Or, where
-is my deadline_iosched/cfq_iosched modules compiled in?
-
-> > To me it would be better to change the "ifndef MODULE" version of
-> > module_init() to add KBUILD_MODNAME into __builtin_drivers_list[].
-> >
-> > Yes, module_init() is overused. Say, why does kernel/kprobes.c use
-> > module_init() ? This looks confusing, this code can't be compiled as a
-> > module. And it seems that it has a lot more users which should have used
-> > __initcall() instead
->
-> Yeh, the realization may be different. I do not insist on additional
-> section.
-
-The additional sction is fine, I think. I only meant that module_init()
-itself can be used to add a module name into that section.
-
-But of course I won't insist. And again, module_init() is abused by the
-non-modular kernel code.
-
-Oleg.
+Michal
 
