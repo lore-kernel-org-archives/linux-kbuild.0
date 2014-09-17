@@ -1,59 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pa0-f51.google.com ([209.85.220.51]:46588 "EHLO
-	mail-pa0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754928AbaIPSuy (ORCPT
+Received: from mail-vc0-f173.google.com ([209.85.220.173]:43842 "EHLO
+	mail-vc0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753617AbaIQDtT (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 16 Sep 2014 14:50:54 -0400
-Received: by mail-pa0-f51.google.com with SMTP id kx10so356897pab.38
-        for <linux-kbuild@vger.kernel.org>; Tue, 16 Sep 2014 11:50:53 -0700 (PDT)
-From: tim.gardner@canonical.com
-Subject: [PATCH 3.17-rc5] =?UTF-8?q?kconfig:=20Suppress=20warning:=20=E2=80=98j?= =?UTF-8?q?ump=E2=80=99=20may=20be=20used=20uninitialized?=
-Date: Tue, 16 Sep 2014 12:50:42 -0600
-Message-Id: <1410893442-17181-1-git-send-email-tim.gardner@canonical.com>
+	Tue, 16 Sep 2014 23:49:19 -0400
+Received: by mail-vc0-f173.google.com with SMTP id le20so777281vcb.32
+        for <linux-kbuild@vger.kernel.org>; Tue, 16 Sep 2014 20:49:18 -0700 (PDT)
 MIME-Version: 1.0
+In-Reply-To: <1409899692-1455-1-git-send-email-rric@kernel.org>
+References: <1409899692-1455-1-git-send-email-rric@kernel.org>
+Date: Tue, 16 Sep 2014 20:49:18 -0700
+Message-ID: <CAL1qeaGCeRyeKLo70E264bZcamOfBKoN9Y8_NDCjV5j4DoOw1Q@mail.gmail.com>
+Subject: Re: [PATCH 0/6] dts, kbuild: Implement support for dtb vendor subdirs
+From: Andrew Bresticker <abrestic@google.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Tim Gardner <tim.gardner@canonical.com>, "Yann E. MORIN" <yann.morin.1998@free.fr>
+To: Robert Richter <rric@kernel.org>
+Cc: Olof Johansson <olof@lixom.net>, Rob Herring <robh+dt@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Arnd Bergmann <arnd@arndb.de>, Michal Marek <mmarek@suse.cz>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, linux-kbuild@vger.kernel.org, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Robert Richter <rrichter@cavium.com>
 
-From: Tim Gardner <tim.gardner@canonical.com>
+Robert,
 
-In file included from scripts/kconfig/zconf.tab.c:2537:0:
-scripts/kconfig/menu.c: In function ‘get_symbol_str’:
-scripts/kconfig/menu.c:590:18: warning: ‘jump’ may be used uninitialized in this function [-Wmaybe-uninitialized]
-     jump->offset = strlen(r->s);
-                  ^
-scripts/kconfig/menu.c:551:19: note: ‘jump’ was declared here
-  struct jump_key *jump;
-                   ^
-  HOSTLD  scripts/kconfig/conf
+> For arm64 we want to put dts files into vendor's subdirectories from
+> the beginning. This patch set implements this. As this is a generic
+> kbuild implementation, vendor subdirs will be also available for
+> arch/arm and other architectures. The subdirectory tree is also
+> reflected in the install path.
+>
+> A new makefile variable dts-dirs is introduced to point to dts
+> subdirs. This variable is used by kbuild for building and installation
+> of dtb files.
+>
+> A dts Makefile looks now as follows:
+>
+> ----
+> dtb-$(CONFIG_...) += some_file_1.dtb
+> dtb-$(CONFIG_...) += some_file_2.dtb
+>
+> dts-dirs          += dir_vendor_a
+> dts-dirs          += dir_vendor_b
+>
+> # come always afterwards:
+> always         := $(dtb-y)
+> subdir-y       := $(dts-dirs)
+> clean-files    := *.dtb
+> ----
+>
+> This patches also introduces the dtbs_install make target for
+> arm64. Install rules are moved to Makefile.dtbinst using the same
+> style and calling convention like for modinst and fwinst.
+>
+> Robert Richter (6):
+>   dts, arm64: Add dtbs_install make target
+>   dts, kbuild: Factor out dtbs install rules to Makefile.dtbinst
+>   dts, arm/arm64: Remove dtbs build rules in sub-makes
+>   dts, kbuild: Implement support for dtb vendor subdirs
+>   dts, arm64: Move dts files to vendor subdirs
+>   dts, arm: Remove $(MACHINE) variable from dtbs make recipes
 
-gcc 4.9.1
+I've tested this for arm64 and by adding a vendor sub-directory
+locally for arm.  This series is also the base for my MIPS DT vendor
+sub-directory series
+(http://www.linux-mips.org/archives/linux-mips/2014-09/msg00217.html).
+So, for the entire series,
 
-Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Signed-off-by: Tim Gardner <tim.gardner@canonical.com>
----
-
-Is gcc 4.9 dumber then 4.8 ? gcc 4.8 doesn't produce this warning.
-
- scripts/kconfig/menu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
-index a26cc5d..584e0fc 100644
---- a/scripts/kconfig/menu.c
-+++ b/scripts/kconfig/menu.c
-@@ -548,7 +548,7 @@ static void get_prompt_str(struct gstr *r, struct property *prop,
- {
- 	int i, j;
- 	struct menu *submenu[8], *menu, *location = NULL;
--	struct jump_key *jump;
-+	struct jump_key *jump = NULL;
- 
- 	str_printf(r, _("Prompt: %s\n"), _(prop->text));
- 	menu = prop->menu->parent;
--- 
-2.1.0
-
+Tested-by: Andrew Bresticker <abrestic@chromium.org>
