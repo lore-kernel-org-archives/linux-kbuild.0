@@ -1,43 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ob0-f173.google.com ([209.85.214.173]:46381 "EHLO
-	mail-ob0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757378AbaISHKX (ORCPT
+Received: from mail-we0-f173.google.com ([74.125.82.173]:59846 "EHLO
+	mail-we0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756107AbaISMbC (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 19 Sep 2014 03:10:23 -0400
-Date: Fri, 19 Sep 2014 02:10:18 -0500
-From: Chuck Ebbert <cebbert.lkml@gmail.com>
-Subject: Re: How to build the kernel with Clang?
-Message-ID: <20140919021018.16c117c5@as>
-In-Reply-To: <20140919131021.EE3E.AA925319@jp.panasonic.com>
-References: <20140919131021.EE3E.AA925319@jp.panasonic.com>
+	Fri, 19 Sep 2014 08:31:02 -0400
+Date: Fri, 19 Sep 2014 14:30:56 +0200
+From: Robert Richter <rric@kernel.org>
+Subject: Re: [PATCH 0/6] dts, kbuild: Implement support for dtb vendor subdirs
+Message-ID: <20140919123056.GC20170@rric.localhost>
+References: <1409899692-1455-1-git-send-email-rric@kernel.org>
+ <CAL1qeaGCeRyeKLo70E264bZcamOfBKoN9Y8_NDCjV5j4DoOw1Q@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAL1qeaGCeRyeKLo70E264bZcamOfBKoN9Y8_NDCjV5j4DoOw1Q@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Cc: linux-kbuild@vger.kernel.org, llvmlinux@lists.linuxfoundation.org, Vinicius Tinti <viniciustinti@gmail.com>, Behan Webster <behanw@converseincode.com>, linux-kernel@vger.kernel.org
+To: Andrew Bresticker <abrestic@google.com>
+Cc: Olof Johansson <olof@lixom.net>, Rob Herring <robh+dt@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Arnd Bergmann <arnd@arndb.de>, Michal Marek <mmarek@suse.cz>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, linux-kbuild@vger.kernel.org, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Robert Richter <rrichter@cavium.com>
 
-On Fri, 19 Sep 2014 13:10:21 +0900
-Masahiro Yamada <yamada.m@jp.panasonic.com> wrote:
+On 16.09.14 20:49:18, Andrew Bresticker wrote:
 
-> Hi Clang folks,
+> > Robert Richter (6):
+> >   dts, arm64: Add dtbs_install make target
+> >   dts, kbuild: Factor out dtbs install rules to Makefile.dtbinst
+> >   dts, arm/arm64: Remove dtbs build rules in sub-makes
+> >   dts, kbuild: Implement support for dtb vendor subdirs
+> >   dts, arm64: Move dts files to vendor subdirs
+> >   dts, arm: Remove $(MACHINE) variable from dtbs make recipes
 > 
+> I've tested this for arm64 and by adding a vendor sub-directory
+> locally for arm.  This series is also the base for my MIPS DT vendor
+> sub-directory series
+> (http://www.linux-mips.org/archives/linux-mips/2014-09/msg00217.html).
+> So, for the entire series,
 > 
-> I'd like to know the status of Clang support
-> in the Linux mainline.
-> 
-> 
-> I can see some "clang" specific parts in makefiles,
-> so I guess Clang is already supported to a certain extent.
-> 
-> 
-> I just tried to build with "HOSTCC=clang CC=clang"
-> but it would not work.
-> 
-> Is there any tips I am missing here?
-> 
+> Tested-by: Andrew Bresticker <abrestic@chromium.org>
 
-Let Me Google That For You:
+Andrew, thanks for testing and great this also works on mips.
 
-http://llvm.linuxfoundation.org/index.php/Main_Page
+Anyone willing to take the patches for 3.18? Are any further acks
+needed?
+
+Thanks,
+
+-Robert
