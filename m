@@ -1,197 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.web.de ([212.227.17.11]:54051 "EHLO mout.web.de"
+Received: from mout.web.de ([212.227.17.12]:53361 "EHLO mout.web.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754017AbaIVROK (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 22 Sep 2014 13:14:10 -0400
+	id S1754213AbaIVROC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 22 Sep 2014 13:14:02 -0400
 From: Martin Walch <walch.martin@web.de>
-Subject: [PATCH v2 2/2] kconfig: trivial - adjust comments
-Date: Mon, 22 Sep 2014 19:13:19 +0200
-Message-Id: <1411405999-20212-3-git-send-email-walch.martin@web.de>
-In-Reply-To: <1411405999-20212-1-git-send-email-walch.martin@web.de>
+Subject: [Resending PATCH v2 0/2] kconfig: fix bad syntactic transformation
+Date: Mon, 22 Sep 2014 19:13:17 +0200
+Message-Id: <1411405999-20212-1-git-send-email-walch.martin@web.de>
+In-Reply-To: <3491939.FtiyjGE4Of@tacticalops>
 References: <3491939.FtiyjGE4Of@tacticalops>
- <1411405999-20212-1-git-send-email-walch.martin@web.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: yann.morin.1998@free.fr
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Martin Walch <walch.martin@web.de>
 
-Replace any C99 comments with traditional ones (/*...*/).
+PATCH 1: Remove these two not semantics preserving inference rules:
 
-Also fix the contents of two comments:
+(FOO || BAR) && (!FOO && !BAR) -> n
+(FOO && BAR) || (!FOO || !BAR) -> y
 
-1) the second occurrence of
-(a='b') && (a!='c') -> 'b'='c' ? 'n' : a='b'
-is probably copy & paste from above, missing the adjustment corresponding
-to the code.
-It should probably read
-(a!='b') && (a='c') -> 'b'='c' ? 'n' : a='c'
+When applied, they silently alter the meaning of symbol dependencies.
 
-2) that one is similar:
-(a!='m') && (a!='n') -> (a='m')
-it should be
-(a!='m') && (a!='n') -> (a='y')
+PATCH 2: When touching expr.c anyway, fix some comments and convert C99 style
+comments to traditional ones.
 
-Signed-off-by: Martin Walch <walch.martin@web.de>
----
- scripts/kconfig/expr.c | 38 +++++++++++++++++++-------------------
- 1 file changed, 19 insertions(+), 19 deletions(-)
+Martin Walch (2):
+  kconfig: fix bad syntactic transformation in expr.c
+  kconfig: trivial - adjust comments
 
-diff --git a/scripts/kconfig/expr.c b/scripts/kconfig/expr.c
-index 4aa171b..c840e52 100644
---- a/scripts/kconfig/expr.c
-+++ b/scripts/kconfig/expr.c
-@@ -326,7 +326,7 @@ struct expr *expr_trans_bool(struct expr *e)
- 		e->right.expr = expr_trans_bool(e->right.expr);
- 		break;
- 	case E_UNEQUAL:
--		// FOO!=n -> FOO
-+		/* FOO!=n -> FOO */
- 		if (e->left.sym->type == S_TRISTATE) {
- 			if (e->right.sym == &symbol_no) {
- 				e->type = E_SYMBOL;
-@@ -375,19 +375,19 @@ static struct expr *expr_join_or(struct expr *e1, struct expr *e2)
- 		if (e1->type == E_EQUAL && e2->type == E_EQUAL &&
- 		    ((e1->right.sym == &symbol_yes && e2->right.sym == &symbol_mod) ||
- 		     (e1->right.sym == &symbol_mod && e2->right.sym == &symbol_yes))) {
--			// (a='y') || (a='m') -> (a!='n')
-+			/* (a='y') || (a='m') -> (a!='n') */
- 			return expr_alloc_comp(E_UNEQUAL, sym1, &symbol_no);
- 		}
- 		if (e1->type == E_EQUAL && e2->type == E_EQUAL &&
- 		    ((e1->right.sym == &symbol_yes && e2->right.sym == &symbol_no) ||
- 		     (e1->right.sym == &symbol_no && e2->right.sym == &symbol_yes))) {
--			// (a='y') || (a='n') -> (a!='m')
-+			/* (a='y') || (a='n') -> (a!='m') */
- 			return expr_alloc_comp(E_UNEQUAL, sym1, &symbol_mod);
- 		}
- 		if (e1->type == E_EQUAL && e2->type == E_EQUAL &&
- 		    ((e1->right.sym == &symbol_mod && e2->right.sym == &symbol_no) ||
- 		     (e1->right.sym == &symbol_no && e2->right.sym == &symbol_mod))) {
--			// (a='m') || (a='n') -> (a!='y')
-+			/* (a='m') || (a='n') -> (a!='y') */
- 			return expr_alloc_comp(E_UNEQUAL, sym1, &symbol_yes);
- 		}
- 	}
-@@ -438,29 +438,29 @@ static struct expr *expr_join_and(struct expr *e1, struct expr *e2)
- 
- 	if ((e1->type == E_SYMBOL && e2->type == E_EQUAL && e2->right.sym == &symbol_yes) ||
- 	    (e2->type == E_SYMBOL && e1->type == E_EQUAL && e1->right.sym == &symbol_yes))
--		// (a) && (a='y') -> (a='y')
-+		/* (a) && (a='y') -> (a='y') */
- 		return expr_alloc_comp(E_EQUAL, sym1, &symbol_yes);
- 
- 	if ((e1->type == E_SYMBOL && e2->type == E_UNEQUAL && e2->right.sym == &symbol_no) ||
- 	    (e2->type == E_SYMBOL && e1->type == E_UNEQUAL && e1->right.sym == &symbol_no))
--		// (a) && (a!='n') -> (a)
-+		/* (a) && (a!='n') -> (a) */
- 		return expr_alloc_symbol(sym1);
- 
- 	if ((e1->type == E_SYMBOL && e2->type == E_UNEQUAL && e2->right.sym == &symbol_mod) ||
- 	    (e2->type == E_SYMBOL && e1->type == E_UNEQUAL && e1->right.sym == &symbol_mod))
--		// (a) && (a!='m') -> (a='y')
-+		/* (a) && (a!='m') -> (a='y') */
- 		return expr_alloc_comp(E_EQUAL, sym1, &symbol_yes);
- 
- 	if (sym1->type == S_TRISTATE) {
- 		if (e1->type == E_EQUAL && e2->type == E_UNEQUAL) {
--			// (a='b') && (a!='c') -> 'b'='c' ? 'n' : a='b'
-+			/* (a='b') && (a!='c') -> 'b'='c' ? 'n' : a='b' */
- 			sym2 = e1->right.sym;
- 			if ((e2->right.sym->flags & SYMBOL_CONST) && (sym2->flags & SYMBOL_CONST))
- 				return sym2 != e2->right.sym ? expr_alloc_comp(E_EQUAL, sym1, sym2)
- 							     : expr_alloc_symbol(&symbol_no);
- 		}
- 		if (e1->type == E_UNEQUAL && e2->type == E_EQUAL) {
--			// (a='b') && (a!='c') -> 'b'='c' ? 'n' : a='b'
-+			/* (a!='b') && (a='c') -> 'b'='c' ? 'n' : a='c' */
- 			sym2 = e2->right.sym;
- 			if ((e1->right.sym->flags & SYMBOL_CONST) && (sym2->flags & SYMBOL_CONST))
- 				return sym2 != e1->right.sym ? expr_alloc_comp(E_EQUAL, sym1, sym2)
-@@ -469,19 +469,19 @@ static struct expr *expr_join_and(struct expr *e1, struct expr *e2)
- 		if (e1->type == E_UNEQUAL && e2->type == E_UNEQUAL &&
- 			   ((e1->right.sym == &symbol_yes && e2->right.sym == &symbol_no) ||
- 			    (e1->right.sym == &symbol_no && e2->right.sym == &symbol_yes)))
--			// (a!='y') && (a!='n') -> (a='m')
-+			/* (a!='y') && (a!='n') -> (a='m') */
- 			return expr_alloc_comp(E_EQUAL, sym1, &symbol_mod);
- 
- 		if (e1->type == E_UNEQUAL && e2->type == E_UNEQUAL &&
- 			   ((e1->right.sym == &symbol_yes && e2->right.sym == &symbol_mod) ||
- 			    (e1->right.sym == &symbol_mod && e2->right.sym == &symbol_yes)))
--			// (a!='y') && (a!='m') -> (a='n')
-+			/* (a!='y') && (a!='m') -> (a='n') */
- 			return expr_alloc_comp(E_EQUAL, sym1, &symbol_no);
- 
- 		if (e1->type == E_UNEQUAL && e2->type == E_UNEQUAL &&
- 			   ((e1->right.sym == &symbol_mod && e2->right.sym == &symbol_no) ||
- 			    (e1->right.sym == &symbol_no && e2->right.sym == &symbol_mod)))
--			// (a!='m') && (a!='n') -> (a='m')
-+			/* (a!='m') && (a!='n') -> (a='y') */
- 			return expr_alloc_comp(E_EQUAL, sym1, &symbol_yes);
- 
- 		if ((e1->type == E_SYMBOL && e2->type == E_EQUAL && e2->right.sym == &symbol_mod) ||
-@@ -641,7 +641,7 @@ struct expr *expr_transform(struct expr *e)
- 	case E_NOT:
- 		switch (e->left.expr->type) {
- 		case E_NOT:
--			// !!a -> a
-+			/* !!a -> a */
- 			tmp = e->left.expr->left.expr;
- 			free(e->left.expr);
- 			free(e);
-@@ -650,14 +650,14 @@ struct expr *expr_transform(struct expr *e)
- 			break;
- 		case E_EQUAL:
- 		case E_UNEQUAL:
--			// !a='x' -> a!='x'
-+			/* !a='x' -> a!='x' */
- 			tmp = e->left.expr;
- 			free(e);
- 			e = tmp;
- 			e->type = e->type == E_EQUAL ? E_UNEQUAL : E_EQUAL;
- 			break;
- 		case E_OR:
--			// !(a || b) -> !a && !b
-+			/* !(a || b) -> !a && !b */
- 			tmp = e->left.expr;
- 			e->type = E_AND;
- 			e->right.expr = expr_alloc_one(E_NOT, tmp->right.expr);
-@@ -666,7 +666,7 @@ struct expr *expr_transform(struct expr *e)
- 			e = expr_transform(e);
- 			break;
- 		case E_AND:
--			// !(a && b) -> !a || !b
-+			/* !(a && b) -> !a || !b */
- 			tmp = e->left.expr;
- 			e->type = E_OR;
- 			e->right.expr = expr_alloc_one(E_NOT, tmp->right.expr);
-@@ -676,7 +676,7 @@ struct expr *expr_transform(struct expr *e)
- 			break;
- 		case E_SYMBOL:
- 			if (e->left.expr->left.sym == &symbol_yes) {
--				// !'y' -> 'n'
-+				/* !'y' -> 'n' */
- 				tmp = e->left.expr;
- 				free(e);
- 				e = tmp;
-@@ -685,7 +685,7 @@ struct expr *expr_transform(struct expr *e)
- 				break;
- 			}
- 			if (e->left.expr->left.sym == &symbol_mod) {
--				// !'m' -> 'm'
-+				/* !'m' -> 'm' */
- 				tmp = e->left.expr;
- 				free(e);
- 				e = tmp;
-@@ -694,7 +694,7 @@ struct expr *expr_transform(struct expr *e)
- 				break;
- 			}
- 			if (e->left.expr->left.sym == &symbol_no) {
--				// !'n' -> 'y'
-+				/* !'n' -> 'y' */
- 				tmp = e->left.expr;
- 				free(e);
- 				e = tmp;
+ scripts/kconfig/expr.c | 146 +++++++------------------------------------------
+ scripts/kconfig/expr.h |   3 -
+ 2 files changed, 19 insertions(+), 130 deletions(-)
+
 -- 
 1.8.5.5
 
