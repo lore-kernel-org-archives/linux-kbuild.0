@@ -1,31 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:39100 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756058AbaIWOIF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 23 Sep 2014 10:08:05 -0400
-Date: Tue, 23 Sep 2014 16:08:03 +0200
-From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] kconfig/lxdialog: get ncurses CFLAGS with pkg-config
-Message-ID: <20140923140803.GB13913@sepie.suse.cz>
-References: <1410692270-3225-1-git-send-email-bjorn.forsman@gmail.com>
+Received: from mail-ig0-f175.google.com ([209.85.213.175]:49878 "EHLO
+	mail-ig0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932433AbaIWO4D (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 23 Sep 2014 10:56:03 -0400
+Received: by mail-ig0-f175.google.com with SMTP id h18so4736481igc.2
+        for <linux-kbuild@vger.kernel.org>; Tue, 23 Sep 2014 07:56:01 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1410692270-3225-1-git-send-email-bjorn.forsman@gmail.com>
+In-Reply-To: <1410258381-7088-3-git-send-email-yamada.m@jp.panasonic.com>
+References: <1410258381-7088-1-git-send-email-yamada.m@jp.panasonic.com>
+	<1410258381-7088-3-git-send-email-yamada.m@jp.panasonic.com>
+Date: Tue, 23 Sep 2014 16:56:01 +0200
+Message-ID: <CACRpkdZxLrdvPPwrXgTn_oVntxz_f+GCdsdSbDZ0R0Mre6F_Dg@mail.gmail.com>
+Subject: Re: [PATCH 2/3] kbuild: remove unnecessary variable initializaions
+From: Linus Walleij <linus.walleij@linaro.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: =?iso-8859-1?Q?Bj=F8rn?= Forsman <bjorn.forsman@gmail.com>
-Cc: yann.morin.1998@free.fr, linux-kbuild@vger.kernel.org
+To: Masahiro Yamada <yamada.m@jp.panasonic.com>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Andrew Victor <linux@maxim.org.za>, Nicolas Ferre <nicolas.ferre@atmel.com>, Jean-Christophe Plagniol-Villard <plagnioj@jcrosoft.com>, Russell King <linux@arm.linux.org.uk>, Hartley Sweeten <hsweeten@visionengravers.com>, Ryan Mallon <rmallon@gmail.com>, Kukjin Kim <kgene.kim@samsung.com>, Greg Ungerer <gerg@uclinux.org>, Ben Dooks <ben-linux@fluff.org>, Tony Lindgren <tony@atomide.com>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, linux-samsung-soc <linux-samsung-soc@vger.kernel.org>, Linux-OMAP <linux-omap@vger.kernel.org>
 
-On Sun, Sep 14, 2014 at 12:57:50PM +0200, Bjørn Forsman wrote:
-> This makes "make menuconfig" also work on systems where ncurses is not
-> installed in a standard location (such as on NixOS).
-> 
-> This patch changes ccflags() so that it tries pkg-config first, and only
-> if pkg-config fails does it go back to the fallback/manual checks. This
-> is the same algorithm that ldflags() already uses.
+On Tue, Sep 9, 2014 at 12:26 PM, Masahiro Yamada
+<yamada.m@jp.panasonic.com> wrote:
 
-Applied to kbuild.git#kbuild, thanks.
+> Clearing obj-y, obj-m, obj-n, obj- in each Makefile is
+> a useless habit.
+>
+> They are non-exported variables; therefore they are always empty
+> whenever descending into each subdirectory.
+> (Moreorver, obj-y and obj-m are also set to empty at the beginning
+> of scripts/Makefile.build)
+>
+> Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
 
-Michal
+Acked-by: Linus Walleij <linus.walleij@linaro.org>
+
+Yours,
+Linus Walleij
