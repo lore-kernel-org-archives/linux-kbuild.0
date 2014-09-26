@@ -1,26 +1,25 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qc0-f181.google.com ([209.85.216.181]:64269 "EHLO
-	mail-qc0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753872AbaIZRHZ (ORCPT
+Received: from mail-vc0-f174.google.com ([209.85.220.174]:43200 "EHLO
+	mail-vc0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755278AbaIZRRf (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 26 Sep 2014 13:07:25 -0400
-Received: by mail-qc0-f181.google.com with SMTP id w7so4085212qcr.26
-        for <linux-kbuild@vger.kernel.org>; Fri, 26 Sep 2014 10:07:24 -0700 (PDT)
+	Fri, 26 Sep 2014 13:17:35 -0400
 MIME-Version: 1.0
 In-Reply-To: <54259BD4.8090508@oracle.com>
 References: <1404905415-9046-1-git-send-email-a.ryabinin@samsung.com>
- <1411562649-28231-1-git-send-email-a.ryabinin@samsung.com> <54259BD4.8090508@oracle.com>
-From: Dmitry Vyukov <dvyukov@google.com>
-Date: Fri, 26 Sep 2014 10:07:04 -0700
-Message-ID: <CACT4Y+Y0fzbs4DPt3n30R33cYqXEZ8E86tzCfzL6RUE9f+-r=w@mail.gmail.com>
+	<1411562649-28231-1-git-send-email-a.ryabinin@samsung.com>
+	<54259BD4.8090508@oracle.com>
+Date: Fri, 26 Sep 2014 21:17:34 +0400
+Message-ID: <CAPAsAGzZyFfhK890hUpecrKWowCUW+TiZ32PK2Vb7rFB18+u3A@mail.gmail.com>
 Subject: Re: [PATCH v3 00/13] Kernel address sanitizer - runtime memory debugger.
+From: Andrey Ryabinin <ryabinin.a.a@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Sasha Levin <sasha.levin@oracle.com>
-Cc: Andrey Ryabinin <a.ryabinin@samsung.com>, LKML <linux-kernel@vger.kernel.org>, Konstantin Serebryany <kcc@google.com>, Dmitry Chernenkov <dmitryc@google.com>, Andrey Konovalov <adech.fo@gmail.com>, Yuri Gribov <tetra2005@gmail.com>, Konstantin Khlebnikov <koct9i@gmail.com>, Michal Marek <mmarek@suse.cz>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Christoph Lameter <cl@linux.com>, Pekka Enberg <penberg@kernel.org>, David Rientjes <rientjes@google.com>, Joonsoo Kim <iamjoonsoo.kim@lge.com>, Andrew Morton <akpm@linux-foundation.org>, Dave Hansen <dave.hansen@intel.com>, Andi Kleen <andi@firstfloor.org>, Vegard Nossum <vegard.nossum@gmail.com>, "H. Peter Anvin" <hpa@zytor.com>, linux-kbuild@vger.kernel.org, x86@kernel.org, linux-mm@kvack.org, Randy Dunlap <rdunlap@infradead.org>, Peter Zijlstra <peterz@infradead.org>, Alexander Viro <viro@zeniv.linux.org.uk>, Dave Jones <davej@redhat.com>
+Cc: Andrey Ryabinin <a.ryabinin@samsung.com>, LKML <linux-kernel@vger.kernel.org>, Dmitry Vyukov <dvyukov@google.com>, Konstantin Serebryany <kcc@google.com>, Dmitry Chernenkov <dmitryc@google.com>, Andrey Konovalov <adech.fo@gmail.com>, Yuri Gribov <tetra2005@gmail.com>, Konstantin Khlebnikov <koct9i@gmail.com>, Michal Marek <mmarek@suse.cz>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Christoph Lameter <cl@linux.com>, Pekka Enberg <penberg@kernel.org>, David Rientjes <rientjes@google.com>, Joonsoo Kim <iamjoonsoo.kim@lge.com>, Andrew Morton <akpm@linux-foundation.org>, Dave Hansen <dave.hansen@intel.com>, Andi Kleen <andi@firstfloor.org>, Vegard Nossum <vegard.nossum@gmail.com>, "H. Peter Anvin" <hpa@zytor.com>, linux-kbuild@vger.kernel.org, x86@kernel.org, "linux-mm@kvack.org" <linux-mm@kvack.org>, Randy Dunlap <rdunlap@infradead.org>, Peter Zijlstra <peterz@infradead.org>, Alexander Viro <viro@zeniv.linux.org.uk>, Dave Jones <davej@redhat.com>
 
-On Fri, Sep 26, 2014 at 10:01 AM, Sasha Levin <sasha.levin@oracle.com> wrote:
+2014-09-26 21:01 GMT+04:00 Sasha Levin <sasha.levin@oracle.com>:
 > On 09/24/2014 08:43 AM, Andrey Ryabinin wrote:
 >> Hi.
 >>
@@ -52,10 +51,28 @@ On Fri, Sep 26, 2014 at 10:01 AM, Sasha Levin <sasha.levin@oracle.com> wrote:
 >
 >
 > What am I missing?
+>
+
+__asan_init_v* is a version of compiler's api. Recently it was changed
+in gcc - https://gcc.gnu.org/ml/gcc-patches/2014-09/msg01872.html
+
+To fix this, just add:
+
+void __asan_init_v4(void) {}
+EXPORT_SYMBOL(__asan_init_v4);
+
+ to the mm/kasan/kasan.c
+
+I'll fix this in next spin.
+
+>
+> Thanks,
+> Sasha
+>
+> --
 
 
-Emission of __asan_init_vx needs to be disabled when
--fsanitize=kernel-address. Our kernel does not boot with them at all.
-It probably hits some limit for something that can be increased. But I
-don't want to investigate what that limit is, as __asan_init is not
-needed for kasan at all.
+
+-- 
+Best regards,
+Andrey Ryabinin
