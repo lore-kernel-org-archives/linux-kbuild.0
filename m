@@ -1,77 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ig0-f171.google.com ([209.85.213.171]:37937 "EHLO
-	mail-ig0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755913AbaIZPHq convert rfc822-to-8bit (ORCPT
+Received: from userp1040.oracle.com ([156.151.31.81]:42581 "EHLO
+	userp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754888AbaIZRCW (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 26 Sep 2014 11:07:46 -0400
-Received: by mail-ig0-f171.google.com with SMTP id h3so134463igd.16
-        for <linux-kbuild@vger.kernel.org>; Fri, 26 Sep 2014 08:07:45 -0700 (PDT)
+	Fri, 26 Sep 2014 13:02:22 -0400
+Message-ID: <54259BD4.8090508@oracle.com>
+Date: Fri, 26 Sep 2014 13:01:08 -0400
+From: Sasha Levin <sasha.levin@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <54256BEA.8020004@elproma.com.pl>
-References: <542064F1.4000601@elproma.com.pl> <20140926120917.B60B4C40FEB@trevor.secretlab.ca>
- <54256BEA.8020004@elproma.com.pl>
-From: Grant Likely <grant.likely@linaro.org>
-Date: Fri, 26 Sep 2014 16:07:24 +0100
-Message-ID: <CACxGe6th9NxNc8u-SsiGOASre-=1TK8V9gk7U1YPhRhpHBYt7Q@mail.gmail.com>
-Subject: Re: Adding selftest testdata dynamically into live tree
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Subject: Re: [PATCH v3 00/13] Kernel address sanitizer - runtime memory debugger.
+References: <1404905415-9046-1-git-send-email-a.ryabinin@samsung.com> <1411562649-28231-1-git-send-email-a.ryabinin@samsung.com>
+In-Reply-To: <1411562649-28231-1-git-send-email-a.ryabinin@samsung.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: =?ISO-8859-2?Q?Janusz_U=BFycki?= <j.uzycki@elproma.com.pl>
-Cc: Gaurav Minocha <gaurav.minocha.os@gmail.com>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>
+To: Andrey Ryabinin <a.ryabinin@samsung.com>, linux-kernel@vger.kernel.org
+Cc: Dmitry Vyukov <dvyukov@google.com>, Konstantin Serebryany <kcc@google.com>, Dmitry Chernenkov <dmitryc@google.com>, Andrey Konovalov <adech.fo@gmail.com>, Yuri Gribov <tetra2005@gmail.com>, Konstantin Khlebnikov <koct9i@gmail.com>, Michal Marek <mmarek@suse.cz>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Christoph Lameter <cl@linux.com>, Pekka Enberg <penberg@kernel.org>, David Rientjes <rientjes@google.com>, Joonsoo Kim <iamjoonsoo.kim@lge.com>, Andrew Morton <akpm@linux-foundation.org>, Dave Hansen <dave.hansen@intel.com>, Andi Kleen <andi@firstfloor.org>, Vegard Nossum <vegard.nossum@gmail.com>, "H. Peter Anvin" <hpa@zytor.com>, linux-kbuild@vger.kernel.org, x86@kernel.org, linux-mm@kvack.org, Randy Dunlap <rdunlap@infradead.org>, Peter Zijlstra <peterz@infradead.org>, Alexander Viro <viro@zeniv.linux.org.uk>, Dave Jones <davej@redhat.com>
 
-On Fri, Sep 26, 2014 at 2:36 PM, Janusz Użycki <j.uzycki@elproma.com.pl> wrote:
-> The patch didn't help. Exactly the same.
+On 09/24/2014 08:43 AM, Andrey Ryabinin wrote:
+> Hi.
+> 
+> This is a third iteration of kerenel address sanitizer (KASan).
+> 
+> KASan is a runtime memory debugger designed to find use-after-free
+> and out-of-bounds bugs.
+> 
+> Currently KASAN supported only for x86_64 architecture and requires kernel
+> to be build with SLUB allocator.
+> KASAN uses compile-time instrumentation for checking every memory access, therefore you
+> will need a fresh GCC >= v5.0.0.
 
-Odd it worked here. It's moot anyway though because it breaks checking
-dependencies on .dts files. I need someone stronger on kbuild-foo to
-figure this out out. I've cc'd Michal and the kbuild mailing list.
-Hopefully someone there can help figure this out.
+Hi Andrey,
 
-g.
+I tried this patchset, with the latest gcc, and I'm seeing the following:
 
->
-> best regards
-> Janusz
->
-> W dniu 2014-09-26 14:09, Grant Likely pisze:
->
->> On Mon, 22 Sep 2014 20:05:37 +0200, Janusz Użycki
->> <j.uzycki@elproma.com.pl> wrote:
->>>
->>> Hi.
->>>
->>> On 3.17.0-rc6-next-20140922+ with CONFIG_OF_SELFTEST enabled
->>> zImage is recreated every time I call "make" despite I've not done
->>> any change in source files and zImage was the same.
->>> This is caused by the rm line:
->>>     CALL    scripts/checksyscalls.sh
->>>     CHK     include/generated/compile.h
->>>     DTC     drivers/of/testcase-data/testcases.dtb
->>>     DTB     drivers/of/testcase-data/testcases.dtb.S
->>>     AS      drivers/of/testcase-data/testcases.dtb.o
->>>     LD      drivers/of/of_selftest.o
->>>     LD      drivers/of/built-in.o
->>> rm drivers/of/testcase-data/testcases.dtb.S
->>> drivers/of/testcase-data/testcases.dtb
->>>     LD      drivers/built-in.o
->>>     LINK    vmlinux
->>>     LD      vmlinux.o
->>
->> Try this change:
->>
->> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
->> index 260bf8acfce9..4555e2e1b4ed 100644
->> --- a/scripts/Makefile.lib
->> +++ b/scripts/Makefile.lib
->> @@ -269,7 +269,7 @@ cmd_dtc = $(CPP) $(dtc_cpp_flags) -x
->> assembler-with-cpp -o $(dtc-tmp) $< ; \
->>                 -d $(depfile).dtc.tmp $(dtc-tmp) ; \
->>         cat $(depfile).pre.tmp $(depfile).dtc.tmp > $(depfile)
->>   -$(obj)/%.dtb: $(src)/%.dts FORCE
->> +$(obj)/%.dtb: $(src)/%.dts
->>         $(call if_changed_dep,dtc)
->>     dtc-tmp = $(subst $(comma),_,$(dot-target).dts.tmp)
->>
->
+arch/x86/kernel/head.o: In function `_GLOBAL__sub_I_00099_0_reserve_ebda_region':
+/home/sasha/linux-next/arch/x86/kernel/head.c:71: undefined reference to `__asan_init_v4'
+init/built-in.o: In function `_GLOBAL__sub_I_00099_0___ksymtab_system_state':
+/home/sasha/linux-next/init/main.c:1034: undefined reference to `__asan_init_v4'
+init/built-in.o: In function `_GLOBAL__sub_I_00099_0_init_uts_ns':
+/home/sasha/linux-next/init/version.c:50: undefined reference to `__asan_init_v4'
+init/built-in.o: In function `_GLOBAL__sub_I_00099_0_root_mountflags':
+/home/sasha/linux-next/init/do_mounts.c:638: undefined reference to `__asan_init_v4'
+init/built-in.o: In function `_GLOBAL__sub_I_00099_0_rd_prompt':
+/home/sasha/linux-next/init/do_mounts_rd.c:361: undefined reference to `__asan_init_v4'
+init/built-in.o:/home/sasha/linux-next/init/do_mounts_md.c:312: more undefined references to `__asan_init_v4' follow
+
+
+What am I missing?
+
+
+Thanks,
+Sasha
