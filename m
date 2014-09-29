@@ -1,85 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cpsmtpb-ews04.kpnxchange.com ([213.75.39.7]:53767 "EHLO
-	cpsmtpb-ews04.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1753509AbaI2MpO (ORCPT
+Received: from mail-qc0-f170.google.com ([209.85.216.170]:36189 "EHLO
+	mail-qc0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752602AbaI2OXI (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 29 Sep 2014 08:45:14 -0400
-Message-ID: <1411994711.6334.57.camel@x220>
-Subject: Re: [PATCH v7] checkkconfigsymbols.sh: reimplementation in python
-From: Paul Bolle <pebolle@tiscali.nl>
-Date: Mon, 29 Sep 2014 14:45:11 +0200
-In-Reply-To: <CAD3Xx4+REZ4gy=q6ywDy=b6NXOvfSrBWHG9NCnQdQanMvB6pKw@mail.gmail.com>
-References: <1411222524-7850-1-git-send-email-valentinrothberg@gmail.com>
-	 <1411919729-5800-1-git-send-email-valentinrothberg@gmail.com>
-	 <1411986525.6334.32.camel@x220>
-	 <CAD3Xx4+REZ4gy=q6ywDy=b6NXOvfSrBWHG9NCnQdQanMvB6pKw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+	Mon, 29 Sep 2014 10:23:08 -0400
+Received: by mail-qc0-f170.google.com with SMTP id m20so1389192qcx.1
+        for <linux-kbuild@vger.kernel.org>; Mon, 29 Sep 2014 07:23:06 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <CAJOtW+7UJQ2=66vELbyfXumQ=c9LknRAzXmd6Z6ea7i4oy6FwA@mail.gmail.com>
+References: <1404905415-9046-1-git-send-email-a.ryabinin@samsung.com>
+ <1411562649-28231-1-git-send-email-a.ryabinin@samsung.com>
+ <54259BD4.8090508@oracle.com> <CACT4Y+Y0fzbs4DPt3n30R33cYqXEZ8E86tzCfzL6RUE9f+-r=w@mail.gmail.com>
+ <CAPAsAGyDpnhpMquXi-K4wdDEbj-5W44uJLircsok7ziOO_m66g@mail.gmail.com>
+ <CACT4Y+bptO341KQAQMSzUVV22KsjuomdTeDip=HaHJ3+1kvraQ@mail.gmail.com> <CAJOtW+7UJQ2=66vELbyfXumQ=c9LknRAzXmd6Z6ea7i4oy6FwA@mail.gmail.com>
+From: Dmitry Vyukov <dvyukov@google.com>
+Date: Mon, 29 Sep 2014 18:22:46 +0400
+Message-ID: <CACT4Y+ZGXV_+J7sR-6_HX5eAOWQAXw5gSvjh1rw_mCxt90iNtQ@mail.gmail.com>
+Subject: Re: [PATCH v3 00/13] Kernel address sanitizer - runtime memory debugger.
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Valentin Rothberg <valentinrothberg@gmail.com>
-Cc: akpm@linux-foundation.org, Stefan Hengelein <stefan.hengelein@fau.de>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Yuri Gribov <tetra2005@gmail.com>
+Cc: Andrey Ryabinin <ryabinin.a.a@gmail.com>, Sasha Levin <sasha.levin@oracle.com>, Andrey Ryabinin <a.ryabinin@samsung.com>, LKML <linux-kernel@vger.kernel.org>, Konstantin Serebryany <kcc@google.com>, Dmitry Chernenkov <dmitryc@google.com>, Andrey Konovalov <adech.fo@gmail.com>, Konstantin Khlebnikov <koct9i@gmail.com>, Michal Marek <mmarek@suse.cz>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Christoph Lameter <cl@linux.com>, Pekka Enberg <penberg@kernel.org>, David Rientjes <rientjes@google.com>, Joonsoo Kim <iamjoonsoo.kim@lge.com>, Andrew Morton <akpm@linux-foundation.org>, Dave Hansen <dave.hansen@intel.com>, Andi Kleen <andi@firstfloor.org>, Vegard Nossum <vegard.nossum@gmail.com>, "H. Peter Anvin" <hpa@zytor.com>, linux-kbuild@vger.kernel.org, x86@kernel.org, "linux-mm@kvack.org" <linux-mm@kvack.org>, Randy Dunlap <rdunlap@infradead.org>, Peter Zijlstra <peterz@infradead.org>, Alexander Viro <viro@zeniv.linux.org.uk>, Dave Jones <davej@redhat.com>
 
-On Mon, 2014-09-29 at 14:08 +0200, Valentin Rothberg wrote:
-> On Mon, Sep 29, 2014 at 12:28 PM, Paul Bolle <pebolle@tiscali.nl> wrote:
-> > On Sun, 2014-09-28 at 17:55 +0200, Valentin Rothberg wrote:
-> >>     (d) only checks files under version control ('git ls-files')
-> >
-> > (The shell script is .git unaware. If you happen to have one or more
-> > branches with "Kconfig" in their name, as I do, it generates a lot of
-> > noise on stderr.)
-> 
-> Do you prefer to use os.walk() then?
+On Fri, Sep 26, 2014 at 10:48 PM, Yuri Gribov <tetra2005@gmail.com> wrote:
+> On Fri, Sep 26, 2014 at 9:29 PM, Dmitry Vyukov <dvyukov@google.com> wrote:
+>> So in kernel we will need to support all API versions, and the
+>> following looks like a much simpler way to identify current API
+>> version:
+>>> #if __GNUC__ == 5
+>>> #define ASAN_V4
+>
+> What about having compiler(s) predefine some __SANITIZE_ADDRESS_ABI__
+> macro for this? Hacking on __GNUC__ may not work given the zoo of GCC
+> versions out there (FSF, Linaro, vendor toolchains, etc.)?
 
-It seems I was unclear: this described a problem with the shell script
-and not a problem with your python rewrite.
+I don't have strong preference here... well, actually just not competent :)
 
-> I just don't want to assume that
-> the script is called in a clean tree. 'git ls-files' avoids to filter
-> files. How do you solve this issue in your script?
-
-This is getting off topic, but I choose to not care about the state of
-the tree on disk. My script basically does "git ls-tree -r $SOME_TAG",
-filters out symlinks, and generates a long list of (blob, path) pairs to
-work with.
-
-(You may remember from https://lkml.org/lkml/2014/9/26/485 that my
-script uses git notes for each blob it parses. Different approach,
-different pros and cons.)
-
-> >> +STMT = r"^\s*(?:if|select|depends\s+on)\s+" + EXPR
-> >
-> > Could please make that "depends on"? Yes, it seems the yacc grammar
-> > accepts any amount of whitespace, but that doesn't make it right to use
-> > anything other than a single space. (Can the yacc grammar be tweaked to
-> > see "depends on" as one, well, token?)
-> 
-> I don't know if yacc can do that. Usually the lexer trims whitespaces.
-> If I change the regex to "depends on", we will miss potential
-> statements as Kconfig accepts multiple spaces between the "depends"
-> and the "on".
-
-Your choice. (The expectation behind my request is that bogus results
-from this script might help catch uses of this misfeature. But every use
-of "depends on" is currently sane, anyway.)
-
-> >> +REGEX_SOURCE_FEATURE = re.compile(r"(?:D|\W|\b)+CONFIG_(" + FEATURE + r")")
-> >
-> > That should be "-D", because now you get a hit on
-> >     TPS6507X_ADCONFIG_CONVERT_TS
-> >
-> > and friends. What does \W do, by the way?
-> 
-> (?:\W|\b)+[D]{,1}CONFIG_... will do the trick. "-D" would fail in
-> getting DCONFIG_ in the build files. "\W" matches not "\w", which is
-> [A-Za-z0-9_].
-
-The joy of regular expressions! You now know what wrong, and you'll
-surely come up with something better than my idea to fix it.
-
-Thanks,
-
-
-Paul Bolle
-
+But on the second though... what do we want to do with pre-build
+modules? Can you envision that somebody distributes binary modules
+built with asan?
