@@ -1,43 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:35152 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:35405 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754143AbaI2Olq (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 29 Sep 2014 10:41:46 -0400
-Message-ID: <54296FA3.8080902@suse.cz>
-Date: Mon, 29 Sep 2014 16:41:39 +0200
+	id S1754045AbaI2OsE (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 29 Sep 2014 10:48:04 -0400
+Message-ID: <5429711C.4060008@suse.cz>
+Date: Mon, 29 Sep 2014 16:47:56 +0200
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH 1/1] [RFC] kconfig: warn if an unknown symbol is selected
-References: <1411769309.15241.37.camel@x220>
-In-Reply-To: <1411769309.15241.37.camel@x220>
+Subject: Re: [PATCH v7] checkkconfigsymbols.sh: reimplementation in python
+References: <1411222524-7850-1-git-send-email-valentinrothberg@gmail.com>	 <1411919729-5800-1-git-send-email-valentinrothberg@gmail.com> <1411986525.6334.32.camel@x220>
+In-Reply-To: <1411986525.6334.32.camel@x220>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Paul Bolle <pebolle@tiscali.nl>
-Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Valentin Rothberg <valentinrothberg@gmail.com>, akpm@linux-foundation.org, Stefan Hengelein <stefan.hengelein@fau.de>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 2014-09-27 00:08, Paul Bolle wrote:
-> A select of an unknown symbol is basically treated as a nop and is
-> silently skipped. This is annoying if the selected symbol contains a
-> typo. It can also hide the fact that a treewide symbol cleanup was only
-> done partially.
+On 2014-09-29 12:28, Paul Bolle wrote:
+>> +STMT = r"^\s*(?:if|select|depends\s+on)\s+" + EXPR
 > 
-> There are also a few cases were this might have been done on purpose.
-> But that anti-pattern should be discouraged. Almost all select
-> statements point to a known and reachable symbol. So people will likely
-> assume that any selected symbol is actually set. Violating that
-> assumption might lead to (subtle) bugs.
-> 
-> So let's warn when we notice a select of a symbol that is not known in
-> the configuration we're creating.
-> 
-> Rfced-by: Paul Bolle <pebolle@tiscali.nl>
+> Could please make that "depends on"? Yes, it seems the yacc grammar
+> accepts any amount of whitespace, but that doesn't make it right to use
+> anything other than a single space.
 
-I think this is a good idea, it fits well next to the already present
-warning about selecting symbols with unmet dependencies. Feel free to
-submit as a regular patch with
+But then lines that violate coding style would not be checked for real
+errors.
 
-Acked-by: Michal Marek <mmarek@suse.cz>
+
+> (Can the yacc grammar be tweaked to
+> see "depends on" as one, well, token?)
+
+I don't think this is a good idea. This is a style issue, why make it a
+grammar issue.
 
 Michal
