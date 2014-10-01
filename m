@@ -1,108 +1,90 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cpsmtpb-ews09.kpnxchange.com ([213.75.39.14]:57470 "EHLO
-	cpsmtpb-ews09.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751347AbaI3SJq (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 30 Sep 2014 14:09:46 -0400
-Message-ID: <1412100583.21730.31.camel@x220>
-Subject: [PATCH 1/1] kconfig: warn if an unknown symbol is selected
-From: Paul Bolle <pebolle@tiscali.nl>
-Date: Tue, 30 Sep 2014 20:09:44 +0200
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Received: from cantor2.suse.de ([195.135.220.15]:38937 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751367AbaJAO6a (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 1 Oct 2014 10:58:30 -0400
+Message-ID: <542C1692.5060007@suse.cz>
+Date: Wed, 01 Oct 2014 16:58:26 +0200
+From: Michal Marek <mmarek@suse.cz>
+MIME-Version: 1.0
+Subject: Re: [PATCH v8] checkkconfigsymbols.sh: reimplementation in python
+References: <1411222524-7850-1-git-send-email-valentinrothberg@gmail.com> <1412010341-13902-1-git-send-email-valentinrothberg@gmail.com>
+In-Reply-To: <1412010341-13902-1-git-send-email-valentinrothberg@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Valentin Rothberg <valentinrothberg@gmail.com>
+Cc: linux-kernel@vger.kernel.org, akpm@linux-foundation.org, linux-kbuild@vger.kernel.org, pebolle@tiscali.nl, Stefan Hengelein <stefan.hengelein@fau.de>
 
-A select of an unknown symbol is basically treated as a nop and is
-silently skipped. This is annoying if the selected symbol contains a
-typo. It can also hide the fact that a treewide symbol cleanup was only
-done partially.
+On 2014-09-29 19:05, Valentin Rothberg wrote:
+> The scripts/checkkconfigsymbols.sh script searches Kconfig features
+> in the source code that are not defined in Kconfig. Such identifiers
+> always evaluate to false and are the source of various kinds of bugs.
+> However, the shell script is slow and it does not detect such broken
+> references in Kbuild and Kconfig files (e.g., ``depends on UNDEFINED´´).
+> Furthermore, it generates false positives. The script is also hard to
+> read and understand, and is thereby difficult to maintain.
+> 
+> This patch replaces the shell script with an implementation in Python,
+> which:
+>     (a) detects the same bugs, but does not report previous false positives
+>     (b) additionally detects broken references in Kconfig and all
+>         non-Kconfig files, such as Kbuild, .[cSh], .txt, .sh, defconfig, etc.
+>     (c) is up to 75 times faster than the shell script
+>     (d) only checks files under version control ('git ls-files')
+> 
+> The new script reduces the runtime on my machine (i7-2620M, 8GB RAM, SSD)
+> from 3m47s to 0m3s, and reports 912 broken references in Linux v3.17-rc1;
+> 424 additional reports of which 16 are located in Kconfig files,
+> 287 in defconfigs, 63 in ./Documentation, 1 in Kbuild.
+> 
+> Moreover, we intentionally include references in comments, which have been
+> ignored until now. Such comments may be leftovers of features that have
+> been removed or renamed in Kconfig (e.g., ``#endif /* CONFIG_MPC52xx */´´).
+> These references can be misleading and should be removed or replaced.
+> 
+> Note that the output format changed from (file list <tab> feature) to
+> (feature <tab> file list) as it simplifies the detection of the Kconfig
+> feature for long file lists.
+> 
+> Signed-off-by: Valentin Rothberg <valentinrothberg@gmail.com>
+> Signed-off-by: Stefan Hengelein <stefan.hengelein@fau.de>
+> Acked-by: Paul Bolle <pebolle@tiscali.nl>
+> ---
+> Changelog:
+> v2: Fix of regular expressions
+> v3: Changelog replacement, and add changes of v2
+> v4: Based on comments from Paul Bolle <pebolle@tiscali.nl>
+>   - Inclusion of all non-Kconfig files, such as .txt, .sh, etc.
+>   - Changes of regular expressions
+>   - Increases additional reports from 49 to 229 compared to v3
+>   - Change of output format from (file list <tab> feature) to
+>         (feature <tab> file list)
+> v5: Only analyze files under version control ('git ls-files')
+> v6: Cover features with numbers and small letters (e.g., 4xx)
+> v7: Add changes of v6 (lost 'git add') and filter FOO/BAR features
+> v8: Based on comments from Paul Bolle <pebolle@tiscali.nl>
+>   - Fix of [D]{,1}CONFIG_ regex to exclude false positives
+>   - Exclude ".log" files of analysis
+>   - Filter "XXX" feature
+> ---
+>  scripts/checkkconfigsymbols.py | 139 +++++++++++++++++++++++++++++++++++++++++
+>  scripts/checkkconfigsymbols.sh |  59 -----------------
+>  2 files changed, 139 insertions(+), 59 deletions(-)
+>  create mode 100644 scripts/checkkconfigsymbols.py
+>  delete mode 100755 scripts/checkkconfigsymbols.sh
 
-There are also a few cases were this might have been done on purpose.
-But that anti-pattern should be discouraged. Almost all select
-statements point to a known and reachable symbol. So people will likely
-assume that any selected symbol is actually set. Selects that violate
-this assumption can only be spotted by checking multiple Kconfig files,
-often across architectures. It is unlikely that people will do this
-regularly.
+Please make the new file executable as well.
 
-So let's warn when we notice a select of a symbol that is not known in
-the configuration we're creating.
 
-Signed-off-by: Paul Bolle <pebolle@tiscali.nl>
-Acked-by: Michal Marek <mmarek@suse.cz>
----
-First sent as an RFC in https://lkml.org/lkml/2014/9/26/887 (and
-https://lkml.org/lkml/2014/9/26/886 for the cover letter).
+> +    for gitfile in stdout.rsplit("\n"):
+> +        if ".git" in gitfile or "ChangeLog" in gitfile or \
+> +                ".log" in gitfile or os.path.isdir(gitfile):
+> +            continue
 
-Small modification to the commit explanation in comparison to the RFC,
-but identical patch. Minor edits to the cover-letter too.
+Can you also skip arch/*/configs? A significant part of the output are
+defconfig files, but there is little value in reporting them. The stale
+options will go away automatically as soon as the defconfig is refreshed.
 
- scripts/kconfig/conf.c | 41 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 41 insertions(+)
-
-diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
-index fef75fc756f4..de8406287531 100644
---- a/scripts/kconfig/conf.c
-+++ b/scripts/kconfig/conf.c
-@@ -446,6 +446,45 @@ static void check_conf(struct menu *menu)
- 		check_conf(child);
- }
- 
-+static void check_selects(struct menu *menu)
-+{
-+	struct symbol *sym, *sel;
-+	struct property *prop;
-+
-+	while (menu) {
-+		sym = menu->sym;
-+
-+		if (sym && !sym_is_choice(sym) &&
-+		    sym->type != S_UNKNOWN &&
-+		    sym->flags & SYMBOL_WRITE) {
-+			for_all_properties(sym, prop, P_SELECT) {
-+				sel = prop->expr->left.sym;
-+				if (sel->type == S_UNKNOWN &&
-+				    expr_calc_value(prop->visible.expr) != no) {
-+					fprintf(stderr, "%s:%d:warning: ",
-+						prop->file->name,
-+						prop->lineno);
-+					fprintf(stderr,
-+						"'%s' selects unknown symbol '%s'\n",
-+						sym->name,
-+						sel->name);
-+				}
-+			}
-+		}
-+
-+		if (menu->list) {
-+			menu = menu->list;
-+		} else if (menu->next) {
-+			menu = menu->next;
-+		} else while ((menu = menu->parent)) {
-+			if (menu->next) {
-+				menu = menu->next;
-+				break;
-+			}
-+		}
-+	}
-+}
-+
- static struct option long_opts[] = {
- 	{"oldaskconfig",    no_argument,       NULL, oldaskconfig},
- 	{"oldconfig",       no_argument,       NULL, oldconfig},
-@@ -681,6 +720,8 @@ int main(int ac, char **av)
- 		break;
- 	}
- 
-+	check_selects(rootmenu.list);
-+
- 	if (sync_kconfig) {
- 		/* silentoldconfig is used during the build so we shall update autoconf.
- 		 * All other commands are only used to generate a config.
--- 
-1.9.3
-
+Michal
