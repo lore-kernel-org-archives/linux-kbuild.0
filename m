@@ -1,55 +1,115 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.mei.co.jp ([133.183.100.20]:56727 "EHLO smtp.mei.co.jp"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751448AbaJBNz1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 2 Oct 2014 09:55:27 -0400
-Date: Thu, 02 Oct 2014 22:55:14 +0900
-From: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Subject: Re: [PATCH] kbuild: Do not reference *-n variables in the Makefile
-In-Reply-To: <542D54A7.604@suse.cz>
-References: <1412256796-4111-1-git-send-email-mmarek@suse.cz> <542D54A7.604@suse.cz>
-Message-Id: <20141002225513.350B.AA925319@jp.panasonic.com>
+Received: from mail-wg0-f51.google.com ([74.125.82.51]:40083 "EHLO
+	mail-wg0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752502AbaJBPIL (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 2 Oct 2014 11:08:11 -0400
+Date: Thu, 2 Oct 2014 17:08:04 +0200
+From: Robert Richter <rric@kernel.org>
+Subject: [GIT PULL] dts, kbuild: Implement support for dtb vendor subdirs
+Message-ID: <20141002150804.GP20170@rric.localhost>
+References: <1409899692-1455-1-git-send-email-rric@kernel.org>
+ <CAL1qeaGCeRyeKLo70E264bZcamOfBKoN9Y8_NDCjV5j4DoOw1Q@mail.gmail.com>
+ <20140919123056.GC20170@rric.localhost>
+ <20140919140856.GG2295@e104818-lin.cambridge.arm.com>
+ <20140923112619.GG20170@rric.localhost>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20140923112619.GG20170@rric.localhost>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, sam@ravnborg.org, linux-kernel@vger.kernel.org
+To: Olof Johansson <olof@lixom.net>, Arnd Bergmann <arnd@arndb.de>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Andrew Bresticker <abrestic@google.com>, Michal Marek <mmarek@suse.cz>, Mark Rutland <Mark.Rutland@arm.com>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Robert Richter <rrichter@cavium.com>, Rob Herring <robh+dt@kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 
-Hi Michal,
-
-On Thu, 02 Oct 2014 15:35:35 +0200
-Michal Marek <mmarek@suse.cz> wrote:
-
-> On 2014-10-02 15:33, Michal Marek wrote:
-> > Kconfig options are either 'y', 'm', or undefined.
+On 23.09.14 13:26:19, Robert Richter wrote:
+> On 19.09.14 15:08:56, Catalin Marinas wrote:
+> > On Fri, Sep 19, 2014 at 01:30:56PM +0100, Robert Richter wrote:
+> > > On 16.09.14 20:49:18, Andrew Bresticker wrote:
+> > > > > Robert Richter (6):
+> > > > >   dts, arm64: Add dtbs_install make target
+> > > > >   dts, kbuild: Factor out dtbs install rules to Makefile.dtbinst
+> > > > >   dts, arm/arm64: Remove dtbs build rules in sub-makes
+> > > > >   dts, kbuild: Implement support for dtb vendor subdirs
+> > > > >   dts, arm64: Move dts files to vendor subdirs
+> > > > >   dts, arm: Remove $(MACHINE) variable from dtbs make recipes
+> > > > 
+> > > > I've tested this for arm64 and by adding a vendor sub-directory
+> > > > locally for arm.  This series is also the base for my MIPS DT vendor
+> > > > sub-directory series
+> > > > (http://www.linux-mips.org/archives/linux-mips/2014-09/msg00217.html).
+> > > > So, for the entire series,
+> > > > 
+> > > > Tested-by: Andrew Bresticker <abrestic@chromium.org>
+> > > 
+> > > Andrew, thanks for testing and great this also works on mips.
+> > > 
+> > > Anyone willing to take the patches for 3.18? Are any further acks
+> > > needed?
 > > 
-> > Signed-off-by: Michal Marek <mmarek@suse.cz>
-> > ---
-> >  Makefile | 4 +---
-> >  1 file changed, 1 insertion(+), 3 deletions(-)
+> > For the arm64 bits in this series:
 > > 
-> > diff --git a/Makefile b/Makefile
-> > index efbd2cb..106f300 100644
-> > --- a/Makefile
-> > +++ b/Makefile
-> > @@ -868,9 +868,7 @@ vmlinux-dirs	:= $(patsubst %/,%,$(filter %/, $(init-y) $(init-m) \
-> >  		     $(net-y) $(net-m) $(libs-y) $(libs-m)))
-> >  
-> >  vmlinux-alldirs	:= $(sort $(vmlinux-dirs) $(patsubst %/,%,$(filter %/, \
-> > -		     $(init-n) $(init-) \
-> > -		     $(core-n) $(core-) $(drivers-n) $(drivers-) \
-> > -		     $(net-n)  $(net-)  $(libs-n)    $(libs-))))
-> > +		     $(init-) $(core-) $(drivers-) $(net-) $(libs-))))
+> > Acked-by: Catalin Marinas <catalin.marinas@arm.com>
+> > 
+> > I think the patches can be merged via arm-soc.
 > 
-> Actually, all the directories are hardcoded in
-> {init,code,drivers,net,libs}-y; there are currently no Kconfig variables
-> involved. But let's keep this generic and handle *-m and *- just in case.
+> Olof,
 > 
+> please apply the patches.
 
-Agreed and thank you!
+Olof, Arnd,
 
-Best Regards
-Masahiro Yamada
+you may want to pull from here alternatively.
 
+Thanks,
+
+-Robert
+
+
+The following changes since commit a497c3ba1d97fc69c1e78e7b96435ba8c2cb42ee:
+
+  Linux 3.16-rc2 (2014-06-21 19:02:54 -1000)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/rric/linux.git tags/dts-subdirs-for-arm-soc-v3.18
+
+for you to fetch changes up to 87bdf4d8625e50d99b56aa2590a2261049a5fd48:
+
+  dts, arm: Remove $(MACHINE) variable from dtbs make recipes (2014-09-03 21:46:49 +0200)
+
+----------------------------------------------------------------
+dts, kbuild: Implement support for dtb vendor subdirs
+
+----------------------------------------------------------------
+Robert Richter (6):
+      dts, arm64: Add dtbs_install make target
+      dts, kbuild: Factor out dtbs install rules to Makefile.dtbinst
+      dts, arm/arm64: Remove dtbs build rules in sub-makes
+      dts, kbuild: Implement support for dtb vendor subdirs
+      dts, arm64: Move dts files to vendor subdirs
+      dts, arm: Remove $(MACHINE) variable from dtbs make recipes
+
+ arch/arm/Makefile                                  |  8 +++-
+ arch/arm/boot/dts/Makefile                         | 12 +-----
+ arch/arm64/Makefile                                | 10 ++++-
+ arch/arm64/boot/dts/Makefile                       | 13 +++---
+ arch/arm64/boot/dts/apm/Makefile                   |  5 +++
+ arch/arm64/boot/dts/{ => apm}/apm-mustang.dts      |  0
+ arch/arm64/boot/dts/{ => apm}/apm-storm.dtsi       |  0
+ arch/arm64/boot/dts/arm/Makefile                   |  6 +++
+ arch/arm64/boot/dts/{ => arm}/foundation-v8.dts    |  0
+ arch/arm64/boot/dts/{ => arm}/rtsm_ve-aemv8a.dts   |  0
+ .../boot/dts/{ => arm}/rtsm_ve-motherboard.dtsi    |  0
+ scripts/Kbuild.include                             |  6 +++
+ scripts/Makefile.dtbinst                           | 50 ++++++++++++++++++++++
+ scripts/Makefile.lib                               | 12 ------
+ 14 files changed, 88 insertions(+), 34 deletions(-)
+ create mode 100644 arch/arm64/boot/dts/apm/Makefile
+ rename arch/arm64/boot/dts/{ => apm}/apm-mustang.dts (100%)
+ rename arch/arm64/boot/dts/{ => apm}/apm-storm.dtsi (100%)
+ create mode 100644 arch/arm64/boot/dts/arm/Makefile
+ rename arch/arm64/boot/dts/{ => arm}/foundation-v8.dts (100%)
+ rename arch/arm64/boot/dts/{ => arm}/rtsm_ve-aemv8a.dts (100%)
+ rename arch/arm64/boot/dts/{ => arm}/rtsm_ve-motherboard.dtsi (100%)
+ create mode 100644 scripts/Makefile.dtbinst
