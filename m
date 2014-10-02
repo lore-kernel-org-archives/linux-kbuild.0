@@ -1,36 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:34996 "EHLO mx2.suse.de"
+Received: from smtp.mei.co.jp ([133.183.100.20]:46731 "EHLO smtp.mei.co.jp"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752205AbaJBNOW (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 2 Oct 2014 09:14:22 -0400
-Message-ID: <542D4FAC.5080706@suse.cz>
-Date: Thu, 02 Oct 2014 15:14:20 +0200
-From: Michal Marek <mmarek@suse.cz>
+	id S1752789AbaJBNSO (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 2 Oct 2014 09:18:14 -0400
+Date: Thu, 02 Oct 2014 22:17:54 +0900
+From: Masahiro Yamada <yamada.m@jp.panasonic.com>
+Subject: Re: [PATCH 3/3] kbuild: remove obj-n and lib-n handling
+In-Reply-To: <542D4D6C.9000505@suse.cz>
+References: <1410258381-7088-4-git-send-email-yamada.m@jp.panasonic.com> <542D4D6C.9000505@suse.cz>
+Message-Id: <20141002221754.3504.AA925319@jp.panasonic.com>
 MIME-Version: 1.0
-Subject: Re: [PATCH] kbuild: simplify build, clean, modbuiltin shorthands
-References: <1410260638-23559-1-git-send-email-yamada.m@jp.panasonic.com>
-In-Reply-To: <1410260638-23559-1-git-send-email-yamada.m@jp.panasonic.com>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.m@jp.panasonic.com>, linux-kbuild@vger.kernel.org
-Cc: Sam Ravnborg <sam@ravnborg.org>, "H. Peter Anvin" <hpa@linux.intel.com>, Andi Kleen <ak@linux.intel.com>, linux-kernel@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, linux-kernel@vger.kernel.org
 
-On 2014-09-09 13:03, Masahiro Yamada wrote:
-> $(if $(KBUILD_SRC),$(srctree)/) was a useful strategy
-> to omit a long absolute path for in-source-tree build
-> prior to commit 890676c65d699db3ad82e7dddd0cf8fb449031af
-> (kbuild: Use relative path when building in the source tree).
-
-I think it was quite pointless even back then :).
+Hi Michal,
 
 
-> Now $(srctree) is "." when building in the source tree.
-> It would not be annoying to add "$(srctree)/" all the time.
+On Thu, 02 Oct 2014 15:04:44 +0200
+Michal Marek <mmarek@suse.cz> wrote:
+
+> On 2014-09-09 12:26, Masahiro Yamada wrote:
+> > Kconfig never defines CONFIG_* as 'n'.
+> > Now obj-n is only used in firmware/Makefile and it can be
+> > replaced with obj-.  No makefile uses lib-n.
 > 
-> Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
+> BTW, there are a few more instances of *-n, none of which seem useful:
+> 
+> $ git --no-pager grep -e '[a-z]-n\>'  -- '*Makefile*' '*Kbuild*'
+> Makefile:		     $(init-n) $(init-) \
+> Makefile:		     $(core-n) $(core-) $(drivers-n) $(drivers-) \
+> Makefile:		     $(net-n)  $(net-)  $(libs-n)    $(libs-))))
+> arch/arm/mach-ixp4xx/Makefile:obj-pci-n	:=
+> arch/powerpc/boot/Makefile:initrd-  := $(patsubst zImage%,
+> zImage.initrd%, $(image-n) $(image-))
 
-Applied to kbuild.git#kbuild, thanks.
+Uh, I missed them.
 
-Michal
+Anyway, it should be done in a separate patch
+even if we fix them.
+
+Can you fix them, please?
+(I do not want to steal what you found.)
+
+Simpler makefiles seem better.
+
+
+
+Best Regards
+Masahiro Yamada
+
