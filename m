@@ -1,10 +1,10 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:34638 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:34710 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751344AbaJBNCc (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 2 Oct 2014 09:02:32 -0400
-Message-ID: <542D4CE4.8080001@suse.cz>
-Date: Thu, 02 Oct 2014 15:02:28 +0200
+	id S1752889AbaJBNEq (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 2 Oct 2014 09:04:46 -0400
+Message-ID: <542D4D6C.9000505@suse.cz>
+Date: Thu, 02 Oct 2014 15:04:44 +0200
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
 Subject: Re: [PATCH 3/3] kbuild: remove obj-n and lib-n handling
@@ -22,15 +22,14 @@ On 2014-09-09 12:26, Masahiro Yamada wrote:
 > Now obj-n is only used in firmware/Makefile and it can be
 > replaced with obj-.  No makefile uses lib-n.
 
-A possible usecase would be overriding CONFIG_ options on the commandline:
+BTW, there are a few more instances of *-n, none of which seem useful:
 
-make CONFIG_FOOBAR=n
-
-but CONFIG_FOOBAR= works as well.
-
-
-> Let's rip off obj-n and lib-n.
-
-Agreed, I applied your series to kbuild.git#kbuild now.
+$ git --no-pager grep -e '[a-z]-n\>'  -- '*Makefile*' '*Kbuild*'
+Makefile:		     $(init-n) $(init-) \
+Makefile:		     $(core-n) $(core-) $(drivers-n) $(drivers-) \
+Makefile:		     $(net-n)  $(net-)  $(libs-n)    $(libs-))))
+arch/arm/mach-ixp4xx/Makefile:obj-pci-n	:=
+arch/powerpc/boot/Makefile:initrd-  := $(patsubst zImage%,
+zImage.initrd%, $(image-n) $(image-))
 
 Michal
