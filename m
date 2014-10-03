@@ -1,13 +1,14 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from relay5-d.mail.gandi.net ([217.70.183.197]:36410 "EHLO
-	relay5-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755339AbaJCX3o (ORCPT
+Received: from relay6-d.mail.gandi.net ([217.70.183.198]:38774 "EHLO
+	relay6-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757374AbaJCXcB (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 3 Oct 2014 19:29:44 -0400
-Date: Fri, 3 Oct 2014 16:29:21 -0700
+	Fri, 3 Oct 2014 19:32:01 -0400
+Date: Fri, 3 Oct 2014 16:31:44 -0700
 From: Josh Triplett <josh@joshtriplett.org>
-Subject: [PATCH 1/2] init/Kconfig: Hide printk log config if CONFIG_PRINTK=n
-Message-ID: <20141003232916.GA15905@thin>
+Subject: [PATCH 2/2] init/Kconfig: Fix HAVE_FUTEX_CMPXCHG to not break up the
+ EXPERT menu
+Message-ID: <20141003233139.GA16079@thin>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
@@ -15,38 +16,46 @@ Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: "Yann E. MORIN" <yann.morin.1998@free.fr>, Andrew Morton <akpm@linux-foundation.org>, Eric Paris <eparis@redhat.com>, Michal Hocko <mhocko@suse.cz>, Matt Turner <mattst88@gmail.com>, Paul Gortmaker <paul.gortmaker@windriver.com>, =?utf-8?B?6JSh5q2j6b6Z?= <zhenglong.cai@cs2c.com.cn>, Tejun Heo <tj@kernel.org>, Fabian Frederick <fabf@skynet.be>, "Luis R. Rodriguez" <mcgrof@suse.com>, Peter Foley <pefoley2@pefoley.com>, Konstantin Khlebnikov <koct9i@gmail.com>, "Eric W. Biederman" <ebiederm@xmission.com>, "H. Peter Anvin" <hpa@zytor.com>, Oleg Nesterov <oleg@redhat.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-The buffers sized by CONFIG_LOG_BUF_SHIFT and
-CONFIG_LOG_CPU_MAX_BUF_SHIFT do not exist if CONFIG_PRINTK=n, so don't
-ask about their size at all.
+commit 03b8c7b623c80af264c4c8d6111e5c6289933666 ("futex: Allow
+architectures to skip futex_atomic_cmpxchg_inatomic() test") added the
+HAVE_FUTEX_CMPXCHG symbol right below FUTEX.  This placed it right in
+the middle of the options for the EXPERT menu.  However,
+HAVE_FUTEX_CMPXCHG does not depend on EXPERT or FUTEX, so Kconfig stops
+placing items in the EXPERT menu, and displays the remaining several
+EXPERT items (starting with EPOLL) directly in the General Setup menu.
+
+Since both users of HAVE_FUTEX_CMPXCHG only select it "if FUTEX", make
+HAVE_FUTEX_CMPXCHG itself depend on FUTEX.  With this change, the
+subsequent items display as part of the EXPERT menu again; the EMBEDDED
+menu now appears as the next top-level item in the General Setup menu,
+which makes General Setup much shorter and more usable.
 
 Signed-off-by: Josh Triplett <josh@joshtriplett.org>
 ---
 
 Posting for review.  I can upstream this through the tiny tree.
 
- init/Kconfig | 2 ++
- 1 file changed, 2 insertions(+)
+Personally, I'd consider this a bit of a bug in Kconfig; ideally,
+Kconfig should only consider symbols with prompt strings when
+considering what to display in a menu.  However, in the interim, this
+one-line patch drastically improves the usability of the "General Setup"
+config menu.
+
+ init/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/init/Kconfig b/init/Kconfig
-index e84c642..31505a5 100644
+index 31505a5..80a6907 100644
 --- a/init/Kconfig
 +++ b/init/Kconfig
-@@ -811,6 +811,7 @@ config LOG_BUF_SHIFT
- 	int "Kernel log buffer size (16 => 64KB, 17 => 128KB)"
- 	range 12 21
- 	default 17
-+	depends on PRINTK
+@@ -1477,6 +1477,7 @@ config FUTEX
+ 
+ config HAVE_FUTEX_CMPXCHG
+ 	bool
++	depends on FUTEX
  	help
- 	  Select the minimal kernel log buffer size as a power of 2.
- 	  The final size is affected by LOG_CPU_MAX_BUF_SHIFT config
-@@ -830,6 +831,7 @@ config LOG_CPU_MAX_BUF_SHIFT
- 	range 0 21
- 	default 12 if !BASE_SMALL
- 	default 0 if BASE_SMALL
-+	depends on PRINTK
- 	help
- 	  This option allows to increase the default ring buffer size
- 	  according to the number of CPUs. The value defines the contribution
+ 	  Architectures should select this if futex_atomic_cmpxchg_inatomic()
+ 	  is implemented and always working. This removes a couple of runtime
 -- 
 2.1.1
 
