@@ -1,101 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.skyhub.de ([78.46.96.112]:38105 "EHLO mail.skyhub.de"
+Received: from mail.asbjorn.biz ([81.7.185.110]:54974 "EHLO mail.asbjorn.biz"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751555AbaJEP6X (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 5 Oct 2014 11:58:23 -0400
-Date: Sun, 5 Oct 2014 17:58:16 +0200
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH] Kbuild: Check for CONFIG_READABLE_ASM when building .s
- targets
-Message-ID: <20141005155816.GB9377@pd.tnic>
-References: <1412523154-25602-1-git-send-email-bp@alien8.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1412523154-25602-1-git-send-email-bp@alien8.de>
+	id S1751827AbaJERtA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 5 Oct 2014 13:49:00 -0400
+From: Asbjoern Sloth Toennesen <asbjorn@asbjorn.biz>
+Subject: [PATCH] deb-pkg: remove obsolete -isp option to dpkg-gencontrol
+Date: Sun,  5 Oct 2014 17:43:18 +0000
+Message-Id: <1412530998-31193-1-git-send-email-asbjorn@asbjorn.biz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Michal Marek <mmarek@suse.cz>, LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Sun, Oct 05, 2014 at 05:32:34PM +0200, Borislav Petkov wrote:
-> From: Borislav Petkov <bp@suse.de>
-> 
-> We do need to look at the asm output of c files for various reasons. In
-> order to do so, we do make <path-to-filename>.s.
-> 
-> However, it can happen that the Kconfig option which enables the
-> creation of readable asm CONFIG_READABLE_ASM is disabled. What is more,
-> we want this option enabled because it indirectly enables the issue of
-> line numbers in the asm done by gcc's switch -g.
+The -isp option has been deprecated, after it became the default
+behaviour back in 2006.
 
-Not really: so this is enabled by CONFIG_DEBUG_INFO and there are two
-options: we make CONFIG_READABLE_ASM depend on it which makes people
-answer a couple more questions or we simply add it to the command
-building the .s file.
+Since dpkg 1.17.11, dpkg-gencontrol emits a warning on -isp usage.
 
-I say we do the second thing:
-
---
-From: Borislav Petkov <bp@suse.de>
-Subject: [PATCH -v1.1] Kbuild: Check for CONFIG_READABLE_ASM when building .s targets
-
-We do need to look at the asm output of c files for various reasons. In
-order to do so, we do make <path-to-filename>.s.
-
-However, it can happen that the Kconfig option which enables the
-creation of readable asm CONFIG_READABLE_ASM is disabled.
-
-So issue a warning that the asm output might not be optimally readable
-if that option is disabled.
-
-Additionally, add the -g switch to the .s build command so that gcc
-issues line numbers too.
-
-Signed-off-by: Borislav Petkov <bp@suse.de>
+References: https://bugs.debian.org/215233
+Signed-off-by: Asbjoern Sloth Toennesen <asbjorn@asbjorn.biz>
 ---
- Makefile               | 2 +-
- scripts/Makefile.build | 7 ++++++-
- 2 files changed, 7 insertions(+), 2 deletions(-)
+ scripts/package/builddeb | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Makefile b/Makefile
-index e43244263306..d9b505360c2a 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1513,7 +1513,7 @@ else
- endif
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index 35d5a58..1453a55 100644
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -64,7 +64,7 @@ create_package() {
+ 	fi
  
- %.s: %.c prepare scripts FORCE
--	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
-+	$(Q)$(MAKE) $(build)=$(build-dir) asm_target=$@ $(target-dir)$(notdir $@)
- %.i: %.c prepare scripts FORCE
- 	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
- %.o: %.c prepare scripts FORCE
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index bf3e6778cd71..d55651d39638 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -147,7 +147,12 @@ $(multi-objs-y:.o=.s)   : modname = $(modname-multi)
- $(multi-objs-y:.o=.lst) : modname = $(modname-multi)
+ 	# Create the package
+-	dpkg-gencontrol -isp $forcearch -Vkernel:debarch="${debarch:-$(dpkg --print-architecture)}" -p$pname -P"$pdir"
++	dpkg-gencontrol $forcearch -Vkernel:debarch="${debarch:-$(dpkg --print-architecture)}" -p$pname -P"$pdir"
+ 	dpkg --build "$pdir" ..
+ }
  
- quiet_cmd_cc_s_c = CC $(quiet_modtag)  $@
--cmd_cc_s_c       = $(CC) $(c_flags) $(DISABLE_LTO) -fverbose-asm -S -o $@ $<
-+cmd_cc_s_c       = $(CC) $(c_flags) $(DISABLE_LTO) -fverbose-asm -g -S -o $@ $< \
-+		   $(if $(findstring $(asm_target),$@),\
-+			$(if $(__cmd_cc_s_c_once),,\
-+				$(if $(CONFIG_READABLE_ASM),,\
-+					$(warning Enable CONFIG_READABLE_ASM for more helpful asm); \
-+					$(eval __cmd_cc_s_c_once=1)))) \
- 
- $(obj)/%.s: $(src)/%.c FORCE
- 	$(call if_changed_dep,cc_s_c)
 -- 
-2.0.0
+2.1.1
 
-
--- 
-Regards/Gruss,
-    Boris.
-
-Sent from a fat crate under my desk. Formatting is fine.
---
