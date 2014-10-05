@@ -1,29 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.skyhub.de ([78.46.96.112]:60826 "EHLO mail.skyhub.de"
+Received: from mail.skyhub.de ([78.46.96.112]:38105 "EHLO mail.skyhub.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751672AbaJEPck (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 5 Oct 2014 11:32:40 -0400
+	id S1751555AbaJEP6X (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 5 Oct 2014 11:58:23 -0400
+Date: Sun, 5 Oct 2014 17:58:16 +0200
 From: Borislav Petkov <bp@alien8.de>
-Subject: [PATCH] Kbuild: Check for CONFIG_READABLE_ASM when building .s targets
-Date: Sun,  5 Oct 2014 17:32:34 +0200
-Message-Id: <1412523154-25602-1-git-send-email-bp@alien8.de>
+Subject: Re: [PATCH] Kbuild: Check for CONFIG_READABLE_ASM when building .s
+ targets
+Message-ID: <20141005155816.GB9377@pd.tnic>
+References: <1412523154-25602-1-git-send-email-bp@alien8.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1412523154-25602-1-git-send-email-bp@alien8.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Michal Marek <mmarek@suse.cz>, LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>
 
+On Sun, Oct 05, 2014 at 05:32:34PM +0200, Borislav Petkov wrote:
+> From: Borislav Petkov <bp@suse.de>
+> 
+> We do need to look at the asm output of c files for various reasons. In
+> order to do so, we do make <path-to-filename>.s.
+> 
+> However, it can happen that the Kconfig option which enables the
+> creation of readable asm CONFIG_READABLE_ASM is disabled. What is more,
+> we want this option enabled because it indirectly enables the issue of
+> line numbers in the asm done by gcc's switch -g.
+
+Not really: so this is enabled by CONFIG_DEBUG_INFO and there are two
+options: we make CONFIG_READABLE_ASM depend on it which makes people
+answer a couple more questions or we simply add it to the command
+building the .s file.
+
+I say we do the second thing:
+
+--
 From: Borislav Petkov <bp@suse.de>
+Subject: [PATCH -v1.1] Kbuild: Check for CONFIG_READABLE_ASM when building .s targets
 
 We do need to look at the asm output of c files for various reasons. In
 order to do so, we do make <path-to-filename>.s.
 
 However, it can happen that the Kconfig option which enables the
-creation of readable asm CONFIG_READABLE_ASM is disabled. What is more,
-we want this option enabled because it indirectly enables the issue of
-line numbers in the asm done by gcc's switch -g.
+creation of readable asm CONFIG_READABLE_ASM is disabled.
 
 So issue a warning that the asm output might not be optimally readable
 if that option is disabled.
+
+Additionally, add the -g switch to the .s build command so that gcc
+issues line numbers too.
 
 Signed-off-by: Borislav Petkov <bp@suse.de>
 ---
@@ -45,7 +72,7 @@ index e43244263306..d9b505360c2a 100644
  	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
  %.o: %.c prepare scripts FORCE
 diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index bf3e6778cd71..8aaf1c04fe18 100644
+index bf3e6778cd71..d55651d39638 100644
 --- a/scripts/Makefile.build
 +++ b/scripts/Makefile.build
 @@ -147,7 +147,12 @@ $(multi-objs-y:.o=.s)   : modname = $(modname-multi)
@@ -53,7 +80,7 @@ index bf3e6778cd71..8aaf1c04fe18 100644
  
  quiet_cmd_cc_s_c = CC $(quiet_modtag)  $@
 -cmd_cc_s_c       = $(CC) $(c_flags) $(DISABLE_LTO) -fverbose-asm -S -o $@ $<
-+cmd_cc_s_c       = $(CC) $(c_flags) $(DISABLE_LTO) -fverbose-asm -S -o $@ $< \
++cmd_cc_s_c       = $(CC) $(c_flags) $(DISABLE_LTO) -fverbose-asm -g -S -o $@ $< \
 +		   $(if $(findstring $(asm_target),$@),\
 +			$(if $(__cmd_cc_s_c_once),,\
 +				$(if $(CONFIG_READABLE_ASM),,\
@@ -65,3 +92,10 @@ index bf3e6778cd71..8aaf1c04fe18 100644
 -- 
 2.0.0
 
+
+-- 
+Regards/Gruss,
+    Boris.
+
+Sent from a fat crate under my desk. Formatting is fine.
+--
