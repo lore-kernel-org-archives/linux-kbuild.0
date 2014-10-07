@@ -1,41 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.asbjorn.biz ([81.7.185.110]:54974 "EHLO mail.asbjorn.biz"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751827AbaJERtA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 5 Oct 2014 13:49:00 -0400
-From: Asbjoern Sloth Toennesen <asbjorn@asbjorn.biz>
-Subject: [PATCH] deb-pkg: remove obsolete -isp option to dpkg-gencontrol
-Date: Sun,  5 Oct 2014 17:43:18 +0000
-Message-Id: <1412530998-31193-1-git-send-email-asbjorn@asbjorn.biz>
+Received: from cpsmtpb-ews04.kpnxchange.com ([213.75.39.7]:60298 "EHLO
+	cpsmtpb-ews04.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753186AbaJGIKp (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 7 Oct 2014 04:10:45 -0400
+Message-ID: <1412669443.18874.16.camel@x220>
+Subject: Re: [PATCH v2 1/2] kconfig: fix bad syntactic transformation in
+ expr.c
+From: Paul Bolle <pebolle@tiscali.nl>
+Date: Tue, 07 Oct 2014 10:10:43 +0200
+In-Reply-To: <1411405999-20212-2-git-send-email-walch.martin@web.de>
+References: <3491939.FtiyjGE4Of@tacticalops>
+	 <1411405999-20212-1-git-send-email-walch.martin@web.de>
+	 <1411405999-20212-2-git-send-email-walch.martin@web.de>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Martin Walch <walch.martin@web.de>
+Cc: yann.morin.1998@free.fr, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-The -isp option has been deprecated, after it became the default
-behaviour back in 2006.
+On Mon, 2014-09-22 at 19:13 +0200, Martin Walch wrote:
+> expr_eliminate_dups2() in scripts/kconfig/expr.c applies two bad
+> inference rules:
+> 
+> (FOO || BAR) && (!FOO && !BAR) -> n
+> (FOO && BAR) || (!FOO || !BAR) -> y
+> 
+> They would be correct in propositional logic, but this is a three-valued
+> logic, and here it is wrong in that it changes semantics. It becomes
+> immediately visible when substituting FOO and BAR with m.
 
-Since dpkg 1.17.11, dpkg-gencontrol emits a warning on -isp usage.
+Well, not to me. When I apply the rules under "Menu dependencies" in
+Documentation/kbuild/kconfig-language.txt, in embarrassingly small
+steps, I get:
+    (m || m) && (!m && !m) ->
+    (1 || 1) && ((2 - 1) && (2 - 1)) ->
+    (1 || 1) && (1 && 1) ->
+    max(1, 1) && min(1, 1) ->
+    1 && 1 ->
+    min(1, 1) ->
+    1 -> m
 
-References: https://bugs.debian.org/215233
-Signed-off-by: Asbjoern Sloth Toennesen <asbjorn@asbjorn.biz>
----
- scripts/package/builddeb | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+and
+    (m && m) || (!m || !m) ->
+    (1 && 1) || ((2 - 1) || (2 - 1)) ->
+    (1 && 1) || (1 || 1) ->
+    min(1, 1) || max(1, 1) ->
+    1 || 1 ->
+    max(1, 1) ->
+    1 -> m
 
-diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index 35d5a58..1453a55 100644
---- a/scripts/package/builddeb
-+++ b/scripts/package/builddeb
-@@ -64,7 +64,7 @@ create_package() {
- 	fi
- 
- 	# Create the package
--	dpkg-gencontrol -isp $forcearch -Vkernel:debarch="${debarch:-$(dpkg --print-architecture)}" -p$pname -P"$pdir"
-+	dpkg-gencontrol $forcearch -Vkernel:debarch="${debarch:-$(dpkg --print-architecture)}" -p$pname -P"$pdir"
- 	dpkg --build "$pdir" ..
- }
- 
--- 
-2.1.1
+Did I do that right? Anyway, perhaps you'd like to add a line or two how
+these two expressions actually evaluate when FOO and BAR are m.
+
+> Fix it by removing expr_eliminate_dups2() and the functions that have no use
+> anywhere else: expr_extract_eq_and(), expr_extract_eq_or(),
+> and expr_extract_eq() from scripts/kconfig/expr.[ch]
+> 
+> Currently the bug is not triggered in mainline, so this patch does not modify
+> the configuration space there.
+> 
+> As a side effect, this reduces code size in expr.c by roughly 10% and slightly
+> improves startup time for all configuration frontends.
+> 
+> Signed-off-by: Martin Walch <walch.martin@web.de>
+
+Does Yann still care about Kconfig? Yann has been rather quiet for a
+while now.
+
+
+Paul Bolle
 
