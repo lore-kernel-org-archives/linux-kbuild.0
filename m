@@ -1,109 +1,88 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from services.gouders.net ([141.101.32.176]:58728 "EHLO
-	services.gouders.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753180AbaJGJj4 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 7 Oct 2014 05:39:56 -0400
-From: Dirk Gouders <dirk@gouders.net>
-Subject: Re: [PATCH v2 1/2] kconfig: fix bad syntactic transformation in expr.c
-In-Reply-To: <1412669443.18874.16.camel@x220> (Paul Bolle's message of "Tue,
-	07 Oct 2014 10:10:43 +0200")
-References: <3491939.FtiyjGE4Of@tacticalops>
-	<1411405999-20212-1-git-send-email-walch.martin@web.de>
-	<1411405999-20212-2-git-send-email-walch.martin@web.de>
-	<1412669443.18874.16.camel@x220>
-Date: Tue, 07 Oct 2014 11:21:51 +0200
-Message-ID: <ghzjd8tets.fsf@lena.gouders.net>
+Received: from cantor2.suse.de ([195.135.220.15]:47392 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753678AbaJGMN7 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 7 Oct 2014 08:13:59 -0400
+Date: Tue, 7 Oct 2014 14:13:56 +0200
+From: Michal Marek <mmarek@suse.cz>
+Subject: Re: [PATCH] Kbuild: Check for CONFIG_READABLE_ASM when building .s
+ targets
+Message-ID: <20141007121356.GA18003@sepie.suse.cz>
+References: <1412523154-25602-1-git-send-email-bp@alien8.de>
+ <20141005155816.GB9377@pd.tnic>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20141005155816.GB9377@pd.tnic>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Paul Bolle <pebolle@tiscali.nl>
-Cc: Martin Walch <walch.martin@web.de>, yann.morin.1998@free.fr, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Borislav Petkov <bp@alien8.de>, linux-kbuild@vger.kernel.org
+Cc: LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>
 
-CC: Michal added
-
-Paul Bolle <pebolle@tiscali.nl> writes:
-
-> On Mon, 2014-09-22 at 19:13 +0200, Martin Walch wrote:
->> expr_eliminate_dups2() in scripts/kconfig/expr.c applies two bad
->> inference rules:
->> 
->> (FOO || BAR) && (!FOO && !BAR) -> n
->> (FOO && BAR) || (!FOO || !BAR) -> y
->> 
->> They would be correct in propositional logic, but this is a three-valued
->> logic, and here it is wrong in that it changes semantics. It becomes
->> immediately visible when substituting FOO and BAR with m.
->
-> Well, not to me. When I apply the rules under "Menu dependencies" in
-> Documentation/kbuild/kconfig-language.txt, in embarrassingly small
-> steps, I get:
->     (m || m) && (!m && !m) ->
->     (1 || 1) && ((2 - 1) && (2 - 1)) ->
->     (1 || 1) && (1 && 1) ->
->     max(1, 1) && min(1, 1) ->
->     1 && 1 ->
->     min(1, 1) ->
->     1 -> m
->
-> and
->     (m && m) || (!m || !m) ->
->     (1 && 1) || ((2 - 1) || (2 - 1)) ->
->     (1 && 1) || (1 || 1) ->
->     min(1, 1) || max(1, 1) ->
->     1 || 1 ->
->     max(1, 1) ->
->     1 -> m
->
-> Did I do that right? Anyway, perhaps you'd like to add a line or two how
-> these two expressions actually evaluate when FOO and BAR are m.
-
-Perhaps, it helps to use a Kconfig file that visualizes the problem:
-
-mainmenu "Expr Test"
-
-config expr-config
-	bool "Expr Config"
-	depends on (m || m) && (!m && !m)
-#	depends on (m && m) || (!m || !m)
-
-config dummy
-       bool "Dummy"
-
-config modules
-       bool
-       option modules
-       default y
-
-Those two depends, according to your calculation and if I understood
-correctly also to Martin's, should evaluate to 'm' and thus the menu
-entry should always be visible, because both depends should evaluate to
-'m'.  But because of expr_eliminate_dups2() it is either invisible (the
-first depends becomes 'n') or always visible (the second depends becomes
-'y').
-
-Dirk
-
->> Fix it by removing expr_eliminate_dups2() and the functions that have no use
->> anywhere else: expr_extract_eq_and(), expr_extract_eq_or(),
->> and expr_extract_eq() from scripts/kconfig/expr.[ch]
->> 
->> Currently the bug is not triggered in mainline, so this patch does not modify
->> the configuration space there.
->> 
->> As a side effect, this reduces code size in expr.c by roughly 10% and slightly
->> improves startup time for all configuration frontends.
->> 
->> Signed-off-by: Martin Walch <walch.martin@web.de>
->
-> Does Yann still care about Kconfig? Yann has been rather quiet for a
-> while now.
->
->
-> Paul Bolle
->
+On 2014-10-05 17:58, Borislav Petkov wrote:
+> On Sun, Oct 05, 2014 at 05:32:34PM +0200, Borislav Petkov wrote:
+>> From: Borislav Petkov <bp@suse.de>
+>>
+>> We do need to look at the asm output of c files for various reasons. In
+>> order to do so, we do make <path-to-filename>.s.
+>>
+>> However, it can happen that the Kconfig option which enables the
+>> creation of readable asm CONFIG_READABLE_ASM is disabled. What is more,
+>> we want this option enabled because it indirectly enables the issue of
+>> line numbers in the asm done by gcc's switch -g.
+> 
+> Not really: so this is enabled by CONFIG_DEBUG_INFO and there are two
+> options: we make CONFIG_READABLE_ASM depend on it which makes people
+> answer a couple more questions or we simply add it to the command
+> building the .s file.
+> 
+> I say we do the second thing:
+> 
 > --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> From: Borislav Petkov <bp@suse.de>
+> Subject: [PATCH -v1.1] Kbuild: Check for CONFIG_READABLE_ASM when building .s targets
+> 
+> We do need to look at the asm output of c files for various reasons. In
+> order to do so, we do make <path-to-filename>.s.
+> 
+> However, it can happen that the Kconfig option which enables the
+> creation of readable asm CONFIG_READABLE_ASM is disabled.
+> 
+> So issue a warning that the asm output might not be optimally readable
+> if that option is disabled.
+> 
+> Additionally, add the -g switch to the .s build command so that gcc
+> issues line numbers too.
+
+This violates the principle of least surprise:
+
+make $file.s
+as -o $file.o $file.s
+
+should be equivalent to
+
+make $file.o
+
+Why not simply check both READABLE_ASM and DEBUG_INFO?  Also, it's more
+straightforward to print the warning in the top-level Makefile rule than
+to add a conditional to the generic rule, like this:
+
+diff --git a/Makefile b/Makefile
+index 106f300..2b4f62f 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1505,6 +1505,9 @@ else
+ endif
+ 
+ %.s: %.c prepare scripts FORCE
++ifeq ($(CONFIG_READABLE_ASM)$(CONFIG_DEBUG_INFO),)
++       $(warning Enable CONFIG_READABLE_ASM and CONFIG_DEBUG_INFO more helpful asm)
++endif
+        $(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+ %.i: %.c prepare scripts FORCE
+        $(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+
+I wonder if the whole check shouldn't be wrapped in an ifdef
+CONFIG_DEBUG_KERNEL.
+
+Michal
