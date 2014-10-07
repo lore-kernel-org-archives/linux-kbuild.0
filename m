@@ -1,60 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.skyhub.de ([78.46.96.112]:46060 "EHLO mail.skyhub.de"
+Received: from cantor2.suse.de ([195.135.220.15]:49269 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753152AbaJGM1P (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 7 Oct 2014 08:27:15 -0400
-Date: Tue, 7 Oct 2014 14:27:07 +0200
-From: Borislav Petkov <bp@alien8.de>
+	id S1753256AbaJGNpp (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 7 Oct 2014 09:45:45 -0400
+Message-ID: <5433EE87.2090000@suse.cz>
+Date: Tue, 07 Oct 2014 15:45:43 +0200
+From: Michal Marek <mmarek@suse.cz>
+MIME-Version: 1.0
 Subject: Re: [PATCH] Kbuild: Check for CONFIG_READABLE_ASM when building .s
  targets
-Message-ID: <20141007122707.GD30146@pd.tnic>
-References: <1412523154-25602-1-git-send-email-bp@alien8.de>
- <20141005155816.GB9377@pd.tnic>
- <20141007121356.GA18003@sepie.suse.cz>
-MIME-Version: 1.0
+References: <1412523154-25602-1-git-send-email-bp@alien8.de> <20141005155816.GB9377@pd.tnic> <20141007121356.GA18003@sepie.suse.cz> <20141007122707.GD30146@pd.tnic>
+In-Reply-To: <20141007122707.GD30146@pd.tnic>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20141007121356.GA18003@sepie.suse.cz>
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
+To: Borislav Petkov <bp@alien8.de>
 Cc: linux-kbuild@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>
 
-On Tue, Oct 07, 2014 at 02:13:56PM +0200, Michal Marek wrote:
-> This violates the principle of least surprise:
+On 2014-10-07 14:27, Borislav Petkov wrote:
+> On Tue, Oct 07, 2014 at 02:13:56PM +0200, Michal Marek wrote:
+>> This violates the principle of least surprise:
+>>
+>> make $file.s
+>> as -o $file.o $file.s
+>>
+>> should be equivalent to
+>>
+>> make $file.o
 > 
-> make $file.s
-> as -o $file.o $file.s
+> I know but we need to enable -g for .s targets so that we get the .loc
+> annotation (i.e., line numbers) in asm which is very helpful.
 > 
-> should be equivalent to
+> But the least surprise principle is a valid point. Maybe we should warn
+> about it too when building .s targets...?
 > 
-> make $file.o
+> Or, maybe I should try to find out whether there's another gcc option
+> which adds ".loc" annotations alone...
 
-I know but we need to enable -g for .s targets so that we get the .loc
-annotation (i.e., line numbers) in asm which is very helpful.
+Such option would be best of course. BTW, do you know about make
+$file.lst to produce an 'annotated disassembly'?
 
-But the least surprise principle is a valid point. Maybe we should warn
-about it too when building .s targets...?
 
-Or, maybe I should try to find out whether there's another gcc option
-which adds ".loc" annotations alone...
+>> Why not simply check both READABLE_ASM and DEBUG_INFO?  Also, it's more
+>> straightforward to print the warning in the top-level Makefile rule than
+>> to add a conditional to the generic rule, like this:
+> 
+> The problem here is that we're building a couple of .s targets
+> regardless of what the make command contains, like bounds.s and such.
 
-> Why not simply check both READABLE_ASM and DEBUG_INFO?  Also, it's more
-> straightforward to print the warning in the top-level Makefile rule than
-> to add a conditional to the generic rule, like this:
+The toplevel Makefile rule (where your patch adds the asm_target=$@
+variable) is only used for manual invocation. bounds.s and the like are
+handled by Makefile.build directly.
 
-The problem here is that we're building a couple of .s targets
-regardless of what the make command contains, like bounds.s and such.
-
-And we want to issue the warning only when we have an .s file as
-an explicit target on the command line. That's why I'm doing that
-asm_target assignment dance and something similar to WARN_ON_ONCE...
-
-Thanks.
-
--- 
-Regards/Gruss,
-    Boris.
-
-Sent from a fat crate under my desk. Formatting is fine.
---
+Michal
