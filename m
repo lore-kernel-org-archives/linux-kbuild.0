@@ -1,91 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cpsmtpb-ews08.kpnxchange.com ([213.75.39.13]:52499 "EHLO
-	cpsmtpb-ews08.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752607AbaJJNOt (ORCPT
+Received: from maxwell.derobert.net ([72.83.229.69]:49331 "EHLO
+	Maxwell.derobert.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751765AbaJJSei (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 10 Oct 2014 09:14:49 -0400
-Message-ID: <1412946102.2037.13.camel@x220>
-Subject: Re: [PATCH v2 2/2] kconfig: trivial - adjust comments
-From: Paul Bolle <pebolle@tiscali.nl>
-Date: Fri, 10 Oct 2014 15:01:42 +0200
-In-Reply-To: <1411405999-20212-3-git-send-email-walch.martin@web.de>
-References: <3491939.FtiyjGE4Of@tacticalops>
-	 <1411405999-20212-1-git-send-email-walch.martin@web.de>
-	 <1411405999-20212-3-git-send-email-walch.martin@web.de>
-Content-Type: text/plain; charset="UTF-8"
+	Fri, 10 Oct 2014 14:34:38 -0400
+Date: Fri, 10 Oct 2014 13:49:43 -0400
+From: Anthony DeRobertis <anthony@derobert.net>
+Subject: [PATCH] deb-pkg: Another fix for relative paths.
+Message-ID: <20141010174943.GQ19800@derobert.net>
 Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Martin Walch <walch.martin@web.de>
-Cc: yann.morin.1998@free.fr, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-
-Hi Martin,
-
-I haven't yet dared to review 1/2, which is the interesting change. So I
-cheated and skipped to 2/2.
-
-On Mon, 2014-09-22 at 19:13 +0200, Martin Walch wrote:
-> Replace any C99 comments with traditional ones (/*...*/).
-
-Perhaps you could split those changes off in a separate, trivial patch.
-
-> Also fix the contents of two comments:
-> 
-> 1) the second occurrence of
-> (a='b') && (a!='c') -> 'b'='c' ? 'n' : a='b'
-> is probably copy & paste from above, missing the adjustment corresponding
-> to the code.
-> It should probably read
-> (a!='b') && (a='c') -> 'b'='c' ? 'n' : a='c'
-> 
-> 2) that one is similar:
-> (a!='m') && (a!='n') -> (a='m')
-> it should be
-> (a!='m') && (a!='n') -> (a='y')
-
-And perhaps even send these two changes as two separate patches. Not
-sure, as I don't review much, but it should make it easier to review.
-
-> Signed-off-by: Martin Walch <walch.martin@web.de>
-> ---
->  scripts/kconfig/expr.c | 38 +++++++++++++++++++-------------------
->  1 file changed, 19 insertions(+), 19 deletions(-)
-> 
-> diff --git a/scripts/kconfig/expr.c b/scripts/kconfig/expr.c
-> index 4aa171b..c840e52 100644
-> --- a/scripts/kconfig/expr.c
-> +++ b/scripts/kconfig/expr.c
-> [...] 
->  	if (sym1->type == S_TRISTATE) {
->  		if (e1->type == E_EQUAL && e2->type == E_UNEQUAL) {
-> -			// (a='b') && (a!='c') -> 'b'='c' ? 'n' : a='b'
-> +			/* (a='b') && (a!='c') -> 'b'='c' ? 'n' : a='b' */
-
-Could you make this match the code? Ie,
-                         /* (a='b') && (a!='c') -> 'b'!='c' ? a='b' : 'n' */
-
-if I'm reading the code right.
-
->  			sym2 = e1->right.sym;
->  			if ((e2->right.sym->flags & SYMBOL_CONST) && (sym2->flags & SYMBOL_CONST))
->  				return sym2 != e2->right.sym ? expr_alloc_comp(E_EQUAL, sym1, sym2)
->  							     : expr_alloc_symbol(&symbol_no);
->  		}
->  		if (e1->type == E_UNEQUAL && e2->type == E_EQUAL) {
-> -			// (a='b') && (a!='c') -> 'b'='c' ? 'n' : a='b'
-> +			/* (a!='b') && (a='c') -> 'b'='c' ? 'n' : a='c' */
-
-Likewise:
-                         /* (a!='b') && (a='c') -> 'b'!='c' ? a='c' : 'n' */
-
->  			sym2 = e2->right.sym;
->  			if ((e1->right.sym->flags & SYMBOL_CONST) && (sym2->flags & SYMBOL_CONST))
->  				return sym2 != e1->right.sym ? expr_alloc_comp(E_EQUAL, sym1, sym2)
-
-(You could also make the code match the comments. But that would make
-the patch less trivial.)
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org
 
 
-Paul Bolle
+Similar to a765a7ce293aa0a072728790ce11088b2f7030e2, the -dbg package
+build did a cd, breaking relative paths. This resulted in the debug
+symbols being part of the kernel image package and further installed
+under /debian instead of /.
+
+Signed-off-by: Anthony DeRobertis <anthony@derobert.net>
+---
+ scripts/package/builddeb | 21 +++++++++------------
+ 1 file changed, 9 insertions(+), 12 deletions(-)
+
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index 35d5a58..e6d70d8 100644
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -152,18 +152,15 @@ if grep -q '^CONFIG_MODULES=y' $KCONFIG_CONFIG ; then
+ 		rmdir "$tmpdir/lib/modules/$version"
+ 	fi
+ 	if [ -n "$BUILD_DEBUG" ] ; then
+-		(
+-			cd $tmpdir
+-			for module in $(find lib/modules/ -name *.ko); do
+-				mkdir -p $(dirname $dbg_dir/usr/lib/debug/$module)
+-				# only keep debug symbols in the debug file
+-				$OBJCOPY --only-keep-debug $module $dbg_dir/usr/lib/debug/$module
+-				# strip original module from debug symbols
+-				$OBJCOPY --strip-debug $module
+-				# then add a link to those
+-				$OBJCOPY --add-gnu-debuglink=$dbg_dir/usr/lib/debug/$module $module
+-			done
+-		)
++		for module in $(cd $tmpdir && find lib/modules/ -name *.ko); do
++			mkdir -p $(dirname $dbg_dir/usr/lib/debug/$module)
++			# only keep debug symbols in the debug file
++			$OBJCOPY --only-keep-debug $tmpdir/$module $dbg_dir/usr/lib/debug/$module
++			# strip original module from debug symbols
++			$OBJCOPY --strip-debug $tmpdir/$module
++			# then add a link to those
++			$OBJCOPY --add-gnu-debuglink=$dbg_dir/usr/lib/debug/$module $tmpdir/$module
++		done
+ 	fi
+ fi
+ 
+-- 
+2.1.1
+
 
