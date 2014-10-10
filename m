@@ -1,29 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:46348 "EHLO mx2.suse.de"
+Received: from mga01.intel.com ([192.55.52.88]:39237 "EHLO mga01.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750810AbaJJWzQ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 10 Oct 2014 18:55:16 -0400
-Message-ID: <543863D1.4020509@suse.cz>
-Date: Sat, 11 Oct 2014 00:55:13 +0200
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: [PATCH] deb-pkg: Another fix for relative paths.
-References: <20141010174943.GQ19800@derobert.net>
-In-Reply-To: <20141010174943.GQ19800@derobert.net>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+	id S1751795AbaJJXUx (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 10 Oct 2014 19:20:53 -0400
+From: Andi Kleen <andi@firstfloor.org>
+Subject: [PATCH] kbuild: Fix cleanpatch to always replace leading space with tab
+Date: Fri, 10 Oct 2014 16:20:46 -0700
+Message-Id: <1412983246-12118-1-git-send-email-andi@firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Anthony DeRobertis <anthony@derobert.net>, linux-kbuild@vger.kernel.org
+To: mmarek@suse.cz
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Andi Kleen <ak@linux.intel.com>, hpa@zytor.com
 
-Dne 10.10.2014 v 19:49 Anthony DeRobertis napsal(a):
-> 
-> Similar to a765a7ce293aa0a072728790ce11088b2f7030e2, the -dbg package
-> build did a cd, breaking relative paths. This resulted in the debug
-> symbols being part of the kernel image package and further installed
-> under /debian instead of /.
+From: Andi Kleen <ak@linux.intel.com>
 
-Linux-next has a fix already: 2d087139 (builddeb: put the dbg files into
-the correct directory).
+If you have something like
 
-Michal
+<sp><sp><sp><sp><sp><sp><sp><sp>blabla
+
+in a patch cleanpatch does not replace the spaces with tabs.
+That is because it only handles space in front of tab.
+
+But it's more convenient if it also replaces space with tabs,
+even if there is no tab at all, as that is what checkpatch
+and other pedants expect.
+
+Cc: hpa@zytor.com
+Signed-off-by: Andi Kleen <ak@linux.intel.com>
+---
+ scripts/cleanpatch | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/scripts/cleanpatch b/scripts/cleanpatch
+index 9680d03..d14aac9 100755
+--- a/scripts/cleanpatch
++++ b/scripts/cleanpatch
+@@ -39,6 +39,10 @@ sub clean_space_tabs($)
+ 	} elsif ($c eq " ") {
+ 	    $nsp++;
+ 	} else {
++	    while ($nsp >= 8) {
++	        $lo .= "\t";
++		$nsp -= 8;
++	    }
+ 	    $lo .= " " x $nsp;
+ 	    $pos += $nsp;
+ 	    $nsp = 0;
+-- 
+1.9.3
+
