@@ -1,51 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:10327 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751096AbaJLKZi (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 12 Oct 2014 06:25:38 -0400
-From: Hans de Goede <hdegoede@redhat.com>
-Subject: [PATCH resend] kconfig: Fix compiler warning in menu.c
-Date: Sun, 12 Oct 2014 12:25:27 +0200
-Message-Id: <1413109527-10718-2-git-send-email-hdegoede@redhat.com>
-In-Reply-To: <1413109527-10718-1-git-send-email-hdegoede@redhat.com>
-References: <1413109527-10718-1-git-send-email-hdegoede@redhat.com>
+Received: from orange.myspectrum.nl ([149.210.134.247]:59605 "EHLO
+	orange.myspectrum.nl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751626AbaJLQVn (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 12 Oct 2014 12:21:43 -0400
+Message-ID: <543AA8BF.7090809@myspectrum.nl>
+Date: Sun, 12 Oct 2014 18:13:51 +0200
+From: Jeroen Hofstee <jeroen@myspectrum.nl>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Subject: Re: [U-Boot] [PATCH resend] kconfig: Fix compiler warning in menu.c
+References: <1413109527-10718-1-git-send-email-hdegoede@redhat.com>
+In-Reply-To: <1413109527-10718-1-git-send-email-hdegoede@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>, u-boot@lists.denx.de
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Hans de Goede <hdegoede@redhat.com>
+To: Hans de Goede <hdegoede@redhat.com>, "Yann E. MORIN" <yann.morin.1998@free.fr>, u-boot@lists.denx.de
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-This fixes the following compiler warning:
+Hello Hans,
 
-In file included from scripts/kconfig/zconf.tab.c:2537:0:
-scripts/kconfig/menu.c: In function ‘get_symbol_str’:
-scripts/kconfig/menu.c:590:18: warning: ‘jump’ may be used uninitialized in this function [-Wmaybe-uninitialized]
-     jump->offset = strlen(r->s);
-                  ^
-In file included from scripts/kconfig/zconf.tab.c:2537:0:
-scripts/kconfig/menu.c:551:19: note: ‘jump’ was declared here
-  struct jump_key *jump;
+On 12-10-14 12:25, Hans de Goede wrote:
+> Hi,
+>
+> This one seems to have fallen through the cracks.
+>
+> Regards,
+>
+> Hans
+>
+(for U-boot)
 
-Signed-off-by: Hans de Goede <hdegoede@redhat.com>
----
- scripts/kconfig/menu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+nope, you replace an innocent warning (_might_ be) with
+bad code, without any comment it is just because gcc failed
+to recognize it is fine. Nor did you respond to the suggestion
+if it helps gcc to recognize that if the two booleans are merged
+into a single one. [or even split it in an if () if ()]. With this patch
+you prevent any serious warning in case the variable is actually
+used but not initialized, which is even worse if you ask me.
 
-diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
-index a26cc5d..584e0fc 100644
---- a/scripts/kconfig/menu.c
-+++ b/scripts/kconfig/menu.c
-@@ -548,7 +548,7 @@ static void get_prompt_str(struct gstr *r, struct property *prop,
- {
- 	int i, j;
- 	struct menu *submenu[8], *menu, *location = NULL;
--	struct jump_key *jump;
-+	struct jump_key *jump = NULL;
- 
- 	str_printf(r, _("Prompt: %s\n"), _(prop->text));
- 	menu = prop->menu->parent;
--- 
-2.1.0
+Regards,
+Jeroen
+
 
