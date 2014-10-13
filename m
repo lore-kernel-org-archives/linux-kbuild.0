@@ -1,58 +1,80 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ig0-f174.google.com ([209.85.213.174]:42612 "EHLO
-	mail-ig0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752427AbaJLRGg (ORCPT
+Received: from orange.myspectrum.nl ([149.210.134.247]:33574 "EHLO
+	orange.myspectrum.nl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751505AbaJMGsm (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 12 Oct 2014 13:06:36 -0400
+	Mon, 13 Oct 2014 02:48:42 -0400
+Message-ID: <543B75C7.60105@myspectrum.nl>
+Date: Mon, 13 Oct 2014 08:48:39 +0200
+From: Jeroen Hofstee <jeroen@myspectrum.nl>
 MIME-Version: 1.0
-In-Reply-To: <20141012164023.GA13217@1wt.eu>
-References: <1408474660-24999-1-git-send-email-beber@meleeweb.net>
-	<1408474660-24999-3-git-send-email-beber@meleeweb.net>
-	<CAJUuVQ7eEn8r2mAQKmydTDvDgSXYKjUH15VPEQfOVPJxNtU9ag@mail.gmail.com>
-	<20141012164023.GA13217@1wt.eu>
-Date: Sun, 12 Oct 2014 13:06:35 -0400
-Message-ID: <CAJUuVQ6vCxBkBAZbRsw+zOh4==Y7AYnJ8_5-HEx9unsyuO1V4Q@mail.gmail.com>
-Subject: Re: [PATCH 2/3] kbuild: handle module compression while running 'make modules_install'.
-From: Andev <debiandev@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [U-Boot] [PATCH resend] kconfig: Fix compiler warning in menu.c
+References: <1413109527-10718-1-git-send-email-hdegoede@redhat.com>	<543AA8BF.7090809@myspectrum.nl> <CAPnjgZ1KvytMYp3RHkMiuW8x6_x4uf=GUUUMoL9RAGsgP_cXrQ@mail.gmail.com>
+In-Reply-To: <CAPnjgZ1KvytMYp3RHkMiuW8x6_x4uf=GUUUMoL9RAGsgP_cXrQ@mail.gmail.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Willy Tarreau <w@1wt.eu>
-Cc: Bertrand Jacquin <beber@meleeweb.net>, Rusty Russell <rusty@rustcorp.com.au>, linux-kbuild@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
+To: Simon Glass <sjg@chromium.org>, Jeroen Hofstee <jeroen@myspectrum.nl>
+Cc: linux-kbuild@vger.kernel.org, "Yann E. MORIN" <yann.morin.1998@free.fr>, lk <linux-kernel@vger.kernel.org>, U-Boot Mailing List <u-boot@lists.denx.de>
 
-On Sun, Oct 12, 2014 at 12:40 PM, Willy Tarreau <w@1wt.eu> wrote:
-> Hi,
+Hello Simon,
+
+On 13-10-14 07:14, Simon Glass wrote:
+> Hi Jeroen,
 >
-> On Sun, Oct 12, 2014 at 11:50:59AM -0400, Andev wrote:
->> Hello Bertrand,
+> On 12 October 2014 10:13, Jeroen Hofstee <jeroen@myspectrum.nl> wrote:
+>
+>> Hello Hans,
 >>
->> Does this need any user space support? Cos currently on a debian
->> testing box(powerpc) enabling this options causes a boot hang while
->> mounting the root file system.
->
-> I suspect that your module-ini-tools/kmod are built without support for
-> compressed modules. One method to verify this is to run it against ldd :
->
-> $ ldd /sbin/modprobe
->         linux-vdso.so.1 (0x00007fff918ed000)
->         libkmod.so.2 => /lib64/libkmod.so.2 (0x00007ff9317f1000)
->         libpthread.so.0 => /lib64/libpthread.so.0 (0x00007ff9315d5000)
->         libc.so.6 => /lib64/libc.so.6 (0x00007ff931214000)
->         liblzma.so.5 => /lib64/liblzma.so.5 (0x00007ff930ff2000)
->         libz.so.1 => /usr/lib64/libz.so.1 (0x00007ff930ddd000)
->         /lib64/ld-linux-x86-64.so.2 (0x00007ff931a06000)
->
-> As you can see, mine depends on liblzma and libz so it was clearly built
-> with support for both of them.
->
+>> On 12-10-14 12:25, Hans de Goede wrote:
+>>
+>>> Hi,
+>>>
+>>> This one seems to have fallen through the cracks.
+>>>
+>>> Regards,
+>>>
+>>> Hans
+>>>
+>>>   (for U-boot)
+>> nope, you replace an innocent warning (_might_ be) with
+>> bad code, without any comment it is just because gcc failed
+>> to recognize it is fine. Nor did you respond to the suggestion
+>> if it helps gcc to recognize that if the two booleans are merged
+>> into a single one. [or even split it in an if () if ()]. With this patch
+>> you prevent any serious warning in case the variable is actually
+>> used but not initialized, which is even worse if you ask me.
+>>
+> That is a pretty acerbic tone to take on the U-Boot list at least. Are you
+> two drinking buddies or something?
 
-Yes, that indeed seems to be the problem. On my machine:
+no, it is because we have discussed this patch before and resending
+it won't address the issue raised. But you are right, it is likely done with
+less evil intends then I took it for, so let me explain my concern again
+in a politer way. The problem is that gcc 4.9 starts warning in the
+following case:
 
-$ ldd /sbin/modprobe
-linux-vdso32.so.1 (0x00100000)
-libc.so.6 => /lib/powerpc-linux-gnu/libc.so.6 (0x6fe17000)
-/lib/ld.so.1 (0x20229000)
+int *ptr;
 
-Thanks!
--- 
-Andev
+if (a)
+     ptr = something;
+
+if (a && b)
+     ptr->bla = value;
+else
+    do_something_else();
+
+
+it will warn that ptr _might_ be used uninitialized (but it always is).
+This is fixed in this patch by assigning NULL to ptr, and while that makes
+the warning go away it actually prevents the valid warning, ptr _is_ used
+uninitialized if you start using it in the else case. Hence my request if we
+can't find a better solution for this.
+
+Does anyone know a better solution for this or should we consider
+disabling the might be unused warning?
+
+Regards,
+Jeroen
+
