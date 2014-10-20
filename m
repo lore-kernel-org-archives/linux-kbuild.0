@@ -1,55 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mailout3.w1.samsung.com ([210.118.77.13]:8973 "EHLO
-	mailout3.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751749AbaJTOmX (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 20 Oct 2014 10:42:23 -0400
-Message-id: <54451F4B.8020900@samsung.com>
-Date: Mon, 20 Oct 2014 18:42:19 +0400
-From: Andrey Ryabinin <a.ryabinin@samsung.com>
-MIME-version: 1.0
-Subject: Re: drivers: random: Shift out-of-bounds in _mix_pool_bytes
-References: <1413802499-17928-1-git-send-email-a.ryabinin@samsung.com>
- <5444EBFA.5030103@samsung.com> <20141020124929.GA23177@thunk.org>
- <54451501.2070700@samsung.com> <5445179A.4080804@redhat.com>
- <20141020141635.GA4499@thunk.org>
-In-reply-to: <20141020141635.GA4499@thunk.org>
-Content-type: text/plain; charset=ISO-8859-1
-Content-transfer-encoding: 7bit
+Received: from mail-bn1on0084.outbound.protection.outlook.com ([157.56.110.84]:56760
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1750807AbaJTQ7M (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 20 Oct 2014 12:59:12 -0400
+Date: Mon, 20 Oct 2014 17:24:25 +0200
+From: Robert Richter <robert.richter@caviumnetworks.com>
+Subject: Re: [GIT PULL] dts, kbuild: Implement support for dtb vendor subdirs
+Message-ID: <20141020152425.GY31556@rric.localhost>
+References: <1409899692-1455-1-git-send-email-rric@kernel.org>
+ <CAL1qeaGCeRyeKLo70E264bZcamOfBKoN9Y8_NDCjV5j4DoOw1Q@mail.gmail.com>
+ <20140919123056.GC20170@rric.localhost>
+ <20140919140856.GG2295@e104818-lin.cambridge.arm.com>
+ <20140923112619.GG20170@rric.localhost>
+ <20141002150804.GP20170@rric.localhost>
+ <CAM4voakQnY1JMnjrXfTSNTyzA6_f6jtUgJZXXz2N0YRjq3kXRg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <CAM4voakQnY1JMnjrXfTSNTyzA6_f6jtUgJZXXz2N0YRjq3kXRg@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Theodore Ts'o <tytso@mit.edu>
-Cc: Daniel Borkmann <dborkman@redhat.com>, Andrew Morton <akpm@linux-foundation.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Peter Zijlstra <peterz@infradead.org>, Michal Marek <mmarek@suse.cz>, Sasha Levin <sasha.levin@oracle.com>, x86@kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Andreas Dilger <adilger.kernel@dilger.ca>, Dmitry Vyukov <dvyukov@google.com>, Konstantin Khlebnikov <koct9i@gmail.com>
+To: Abhilash Kesavan <kesavan.abhilash@gmail.com>
+Cc: Robert Richter <rric@kernel.org>, Olof Johansson <olof@lixom.net>, Arnd Bergmann <arnd@arndb.de>, Catalin Marinas <catalin.marinas@arm.com>, Andrew Bresticker <abrestic@google.com>, Michal Marek <mmarek@suse.cz>, Mark Rutland <Mark.Rutland@arm.com>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Rob Herring <robh+dt@kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 
-On 10/20/2014 06:16 PM, Theodore Ts'o wrote:
-> On Mon, Oct 20, 2014 at 04:09:30PM +0200, Daniel Borkmann wrote:
->>>
->>> It's triggering when input_rotate == 0, so UBSan complains about right shift in rol32()
->>>
->>> static inline __u32 rol32(__u32 word, unsigned int shift)
->>> {
->>> 	return (word << shift) | (word >> (32 - shift));
->>> }
->>
->> So that would be the case when the entropy store's input_rotate calls
->> _mix_pool_bytes() for the very first time ... I don't think it's an
->> issue though.
-> 
-> I'm sure it's not an issue, but it's still true that 
-> 
-> 	return (word << 0) | (word >> 32);
-> 
-> is technically not undefined, and while it would be unfortunate (and
-> highly unlikely) if gcc were to say, start nethack, it's technically
-> allowed by the C spec.  :-)
-> 
+On 20.10.14 19:26:32, Abhilash Kesavan wrote:
 
-There are plenty of such technically not defined but really
-harmless things in kernel.
-I've reported only few UBs which seemed to me like a real bugs.
-So if it's not an issue we could ignore it, OTOH it would be nice
-to fix it to shut up ubsan.
+> >> > > > > Robert Richter (6):
+> >> > > > >   dts, arm64: Add dtbs_install make target
+> >> > > > >   dts, kbuild: Factor out dtbs install rules to Makefile.dtbinst
+> >> > > > >   dts, arm/arm64: Remove dtbs build rules in sub-makes
+> >> > > > >   dts, kbuild: Implement support for dtb vendor subdirs
+> >> > > > >   dts, arm64: Move dts files to vendor subdirs
+> >> > > > >   dts, arm: Remove $(MACHINE) variable from dtbs make recipes
 
->      	     	   	    	 	     - Ted
+> > you may want to pull from here alternatively.
 > 
+> I have been using your patchset as the base for my new arm64 SoC
+> support (http://www.spinics.net/lists/linux-samsung-soc/msg37047.html).
+> Are you planning to rebase and send this again as some of the patches
+> did not apply cleanly for me on linux-next.
 
+Yes, I will rebase it and resend the pull request this week.
+
+-Robert
