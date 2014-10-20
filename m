@@ -1,56 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mailout3.w1.samsung.com ([210.118.77.13]:51658 "EHLO
-	mailout3.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752909AbaJTLDh (ORCPT
+Received: from mailout1.w1.samsung.com ([210.118.77.11]:55718 "EHLO
+	mailout1.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753542AbaJTLHy (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 20 Oct 2014 07:03:37 -0400
-Message-id: <5444EBFA.5030103@samsung.com>
-Date: Mon, 20 Oct 2014 15:03:22 +0400
+	Mon, 20 Oct 2014 07:07:54 -0400
+Message-id: <5444ED06.6030008@samsung.com>
+Date: Mon, 20 Oct 2014 15:07:50 +0400
 From: Andrey Ryabinin <a.ryabinin@samsung.com>
 MIME-version: 1.0
-Subject: drivers: random: Shift out-of-bounds in _mix_pool_bytes
+Subject: kernel: clockevents: shift out-of-bounds
 References: <1413802499-17928-1-git-send-email-a.ryabinin@samsung.com>
 In-reply-to: <1413802499-17928-1-git-send-email-a.ryabinin@samsung.com>
 Content-type: text/plain; charset=UTF-8
 Content-transfer-encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Theodore Ts'o <tytso@mit.edu>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Peter Zijlstra <peterz@infradead.org>, Michal Marek <mmarek@suse.cz>, Sasha Levin <sasha.levin@oracle.com>, x86@kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Andreas Dilger <adilger.kernel@dilger.ca>, Dmitry Vyukov <dvyukov@google.com>, Konstantin Khlebnikov <koct9i@gmail.com>
+To: Thomas Gleixner <tglx@linutronix.de>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Peter Zijlstra <peterz@infradead.org>, Michal Marek <mmarek@suse.cz>, Sasha Levin <sasha.levin@oracle.com>, x86@kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Theodore Ts'o <tytso@mit.edu>, Andreas Dilger <adilger.kernel@dilger.ca>, Dmitry Vyukov <dvyukov@google.com>, Konstantin Khlebnikov <koct9i@gmail.com>
 
-Hi, Theodore.
 
-I've got this while booting kernel with ubsan:
+On kernel with UBSan enabled I've got following:
 
-    [    0.000000] ================================================================================
-    [    0.000000] UBSan: Undefined behaviour in ../include/linux/bitops.h:107:33
-    [    0.000000] shift exponent 32 is to large for 32-bit type 'unsigned int'
-    [    0.000000] CPU: 0 PID: 0 Comm: swapper Not tainted 3.18.0-rc1+ #64
-    [    0.000000]  0000000000000020 0000000000000000 0000000000000000 ffffffff83003c68
-    [    0.000000]  ffffffff82add58a 000000000000009f 0000000000000020 ffffffff83003c78
-    [    0.000000]  ffffffff819a4519 ffffffff83003d28 ffffffff819a4a05 ffffffff82df889d
-    [    0.000000] Call Trace:
-    [    0.000000] dump_stack (/home/andrew/linux/ubsan_x86//lib/dump_stackc:52)
-    [    0.000000] ubsan_epilogue (/home/andrew/linux/ubsan_x86//lib/ubsanc:159)
-    [    0.000000] __ubsan_handle_shift_out_of_bounds (/home/andrew/linux/ubsan_x86//lib/ubsanc:458)
-    [    0.000000] ? dmi_string_nosave (/home/andrew/linux/ubsan_x86//drivers/firmware/dmi_scanc:51)
-    [    0.000000] ? dmi_string (/home/andrew/linux/ubsan_x86//drivers/firmware/dmi_scanc:72)
-    [    0.000000] ? dmi_save_ident (/home/andrew/linux/ubsan_x86//drivers/firmware/dmi_scanc:159)
-    [    0.000000] _mix_pool_bytes (/home/andrew/linux/ubsan_x86//include/linux/bitopsh:107 /home/andrew/linux/ubsan_x86//drivers/char/randomc:509)
-    [    0.000000] ? dmi_decode (/home/andrew/linux/ubsan_x86//drivers/firmware/dmi_scanc:376)
-    [    0.000000] ? dmi_walk_early (/home/andrew/linux/ubsan_x86//drivers/firmware/dmi_scanc:127)
-    [    0.000000] add_device_randomness (/home/andrew/linux/ubsan_x86//drivers/char/randomc:747)
-    [    0.000000] ? dmi_save_one_device (/home/andrew/linux/ubsan_x86//drivers/firmware/dmi_scanc:375)
-    [    0.000000] ? dmi_save_one_device (/home/andrew/linux/ubsan_x86//drivers/firmware/dmi_scanc:375)
-    [    0.000000] dmi_walk_early (/home/andrew/linux/ubsan_x86//drivers/firmware/dmi_scanc:127)
-    [    0.000000] dmi_present (/home/andrew/linux/ubsan_x86//drivers/firmware/dmi_scanc:497)
-    [    0.000000] dmi_scan_machine (/home/andrew/linux/ubsan_x86//drivers/firmware/dmi_scanc:555)
-    [    0.000000] setup_arch (/home/andrew/linux/ubsan_x86//arch/x86/kernel/setupc:1022)
-    [    0.000000] ? printk (/home/andrew/linux/ubsan_x86//kernel/printk/printkc:1849)
-    [    0.000000] ? early_idt_handlers (/home/andrew/linux/ubsan_x86//arch/x86/kernel/head_64S:344)
-    [    0.000000] start_kernel (/home/andrew/linux/ubsan_x86//include/linux/bitmaph:162 /home/andrew/linux/ubsan_x86//include/linux/cpumaskh:333
-/home/andrew/linux/ubsan_x86//include/linux/mm_typesh:464 /home/andrew/linux/ubsan_x86//init/mainc:532)
-    [    0.000000] ? early_idt_handlers (/home/andrew/linux/ubsan_x86//arch/x86/kernel/head_64S:344)
-    [    0.000000] x86_64_start_reservations (/home/andrew/linux/ubsan_x86//arch/x86/kernel/head64c:194)
-    [    0.000000] x86_64_start_kernel (/home/andrew/linux/ubsan_x86//arch/x86/kernel/head64c:183)
-    [    0.000000] ================================================================================
+     UBSan: Undefined behaviour in ../kernel/time/clockevents.c:75:34
+     shift exponent 32 is to large for 32-bit type 'unsigned int'
+     CPU: 0 PID: 0 Comm: swapper/0 Not tainted 3.17.0-rc7+ #39
+     Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.7.5-0-ge51488c-20140602_164612-nilsson.home.kraxel.org 04/01/2014
+      0000000000000000 0000000000000000 0000000000000001 ffffffff83003db0
+      ffffffff82a30940 0000000000000020 ffffffff83003dc0 ffffffff819502e9
+      ffffffff83003e40 ffffffff81950735 ffff88013f003233 0000000000000000
+     Call Trace:
+     dump_stack (/home/andrew/linux/lib/dump_stack.c:52)
+     ubsan_epilogue (/home/andrew/linux/lib/ubsan.c:122)
+     __ubsan_handle_shift_out_of_bounds (/home/andrew/linux/lib/ubsan.c:390)
+     ? hpet_enable (/home/andrew/linux/arch/x86/kernel/hpet.c:862)
+     cev_delta2ns (/home/andrew/linux/kernel/time/clockevents.c:75 (discriminator 1))
+     clockevents_config.part.2 (/home/andrew/linux/kernel/time/clockevents.c:421)
+     ? __clocksource_select (/home/andrew/linux/kernel/time/clocksource.c:607 /home/andrew/linux/kernel/time/clocksource.c:631)
+     clockevents_config_and_register (/home/andrew/linux/kernel/time/clockevents.c:440)
+     hpet_enable (/home/andrew/linux/arch/x86/kernel/hpet.c:305 /home/andrew/linux/arch/x86/kernel/hpet.c:891)
+     hpet_time_init (/home/andrew/linux/arch/x86/kernel/time.c:79)
+     x86_late_time_init (/home/andrew/linux/arch/x86/kernel/time.c:87)
+     start_kernel (/home/andrew/linux/init/main.c:637)
+     ? early_idt_handlers (/home/andrew/linux/arch/x86/kernel/head_64.S:344)
+     x86_64_start_reservations (/home/andrew/linux/arch/x86/kernel/head64.c:194)
+     x86_64_start_kernel (/home/andrew/linux/arch/x86/kernel/head64.c:183)
+
+I guess it should be 1ULL here instead of 1U:
+            (!ismax || evt->mult <= (1U << evt->shift)))
+
