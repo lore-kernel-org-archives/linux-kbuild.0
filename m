@@ -1,48 +1,72 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mailout2.w1.samsung.com ([210.118.77.12]:63067 "EHLO
-	mailout2.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755170AbaJUKJS (ORCPT
+Received: from bombadil.infradead.org ([198.137.202.9]:47119 "EHLO
+	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932849AbaJURGb (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 21 Oct 2014 06:09:18 -0400
-Message-id: <544630CA.2000502@samsung.com>
-Date: Tue, 21 Oct 2014 14:09:14 +0400
-From: Andrey Ryabinin <a.ryabinin@samsung.com>
-MIME-version: 1.0
+	Tue, 21 Oct 2014 13:06:31 -0400
+Message-ID: <54469291.8000906@infradead.org>
+Date: Tue, 21 Oct 2014 10:06:25 -0700
+From: Randy Dunlap <rdunlap@infradead.org>
+MIME-Version: 1.0
 Subject: Re: [RFC PATCH] UBSan: run-time undefined behavior sanity checker
-References: <1413802499-17928-1-git-send-email-a.ryabinin@samsung.com>
- <1413802499-17928-2-git-send-email-a.ryabinin@samsung.com>
- <20141021094714.GR23531@worktop.programming.kicks-ass.net>
-In-reply-to: <20141021094714.GR23531@worktop.programming.kicks-ass.net>
-Content-type: text/plain; charset=windows-1252
-Content-transfer-encoding: 7bit
+References: <1413802499-17928-1-git-send-email-a.ryabinin@samsung.com> <1413802499-17928-2-git-send-email-a.ryabinin@samsung.com>
+In-Reply-To: <1413802499-17928-2-git-send-email-a.ryabinin@samsung.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>, Sasha Levin <sasha.levin@oracle.com>, x86@kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Theodore Ts'o <tytso@mit.edu>, Andreas Dilger <adilger.kernel@dilger.ca>, Dmitry Vyukov <dvyukov@google.com>, Konstantin Khlebnikov <koct9i@gmail.com>
+To: Andrey Ryabinin <a.ryabinin@samsung.com>, Andrew Morton <akpm@linux-foundation.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Peter Zijlstra <peterz@infradead.org>, Michal Marek <mmarek@suse.cz>, Sasha Levin <sasha.levin@oracle.com>, x86@kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Theodore Ts'o <tytso@mit.edu>, Andreas Dilger <adilger.kernel@dilger.ca>, Dmitry Vyukov <dvyukov@google.com>, Konstantin Khlebnikov <koct9i@gmail.com>
 
-On 10/21/2014 01:47 PM, Peter Zijlstra wrote:
-> On Mon, Oct 20, 2014 at 02:54:59PM +0400, Andrey Ryabinin wrote:
->>
->> UBSan uses compile-time instrumentation to catch undefined behavior (UB).
->> Compiler inserts code that perform certain kinds of
->> checks before operations that could cause UB.
->> If check fails (i.e. UB detected) __ubsan_handle_* function called.
->> to print error message.
->>
->> So the most of the work is done by compiler.
->> This patch just implements ubsan handlers printing errors.
->>
->> GCC supports this since 4.9, however upcoming GCC 5.0 has
->> more checkers implemented.
+On 10/20/14 03:54, Andrey Ryabinin wrote:
 > 
-> It might be useful if you've got a link to the relevant GCC
-> documentation of this new shiny stuf.
-> 
+> diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+> index 4e35a5d..7dc9b89 100644
+> --- a/lib/Kconfig.debug
+> +++ b/lib/Kconfig.debug
+> @@ -646,6 +646,29 @@ config DEBUG_SHIRQ
+>  	  Drivers ought to be able to handle interrupts coming in at those
+>  	  points; some don't and need to be caught.
+>  
+> +config HAVE_ARCH_UBSAN_SANTIZE_ALL
+> +	bool
+> +
+> +config UBSAN
+> +	bool "Undefined behaviour sanity checker"
+> +	help
+> +	  This option enables undefined behaviour sanity checker
 
-Documentation is very brief (look for fsanitize=undefined): https://gcc.gnu.org/onlinedocs/gcc/Debugging-Options.html
-GCC 4.9.1 doc: https://gcc.gnu.org/onlinedocs/gcc-4.9.1/gcc/Debugging-Options.html
+	                                                 checker.
 
-And there is an article which might be interesting: http://developerblog.redhat.com/2014/10/16/gcc-undefined-behavior-sanitizer-ubsan/
+> +	  Compile-time instrumentataion used to detect various undefined
+
+	               instrumentation is used
+
+> +	  behaviours in runtime. Different kinds of checks could be enabled
+
+prefer:	                                                   may be enabled
+
+> +	  via boot parameter ubsan_handle (see: Documentation/ubsan.txt).
+> +	  (TODO: write docs).
+> +
+> +config UBSAN_SANITIZE_ALL
+> +	bool "Enable instrumentation for the entire kernel"
+> +	depends on UBSAN
+> +	depends on HAVE_ARCH_UBSAN_SANTIZE_ALL
+> +	default y
+> +	help
+> +	  This option acitivates instrumentation for the entire kernel.
+
+	              activates
+
+> +	  If you don't enable this option, you have to explicitly specify
+> +	  UBSAN_SANITIZE := y for the files/directories you want to check for UB.
+> +
+> +
+>  menu "Debug Lockups and Hangs"
+>  
+>  config LOCKUP_DETECTOR
 
 
-
+-- 
+~Randy
