@@ -1,128 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f178.google.com ([209.85.212.178]:40246 "EHLO
-	mail-wi0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750750AbaJUSPL (ORCPT
+Received: from mail-lb0-f169.google.com ([209.85.217.169]:33747 "EHLO
+	mail-lb0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754305AbaJVJ65 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 21 Oct 2014 14:15:11 -0400
-Date: Tue, 21 Oct 2014 20:15:04 +0200
-From: Robert Richter <rric@kernel.org>
-Subject: [GIT PULL] dts, kbuild: Implement support for dtb vendor subdirs
-Message-ID: <20141021181504.GV20170@rric.localhost>
-References: <1409899692-1455-1-git-send-email-rric@kernel.org>
+	Wed, 22 Oct 2014 05:58:57 -0400
+Received: by mail-lb0-f169.google.com with SMTP id 10so2558280lbg.28
+        for <linux-kbuild@vger.kernel.org>; Wed, 22 Oct 2014 02:58:56 -0700 (PDT)
+From: Rasmus Villemoes <linux@rasmusvillemoes.dk>
+Subject: Re: [RFC PATCH] UBSan: run-time undefined behavior sanity checker
+References: <1413802499-17928-1-git-send-email-a.ryabinin@samsung.com>
+	<1413802499-17928-2-git-send-email-a.ryabinin@samsung.com>
+Date: Wed, 22 Oct 2014 11:58:54 +0200
+In-Reply-To: <1413802499-17928-2-git-send-email-a.ryabinin@samsung.com>
+	(Andrey Ryabinin's message of "Mon, 20 Oct 2014 14:54:59 +0400")
+Message-ID: <871tq077dt.fsf@rasmusvillemoes.dk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1409899692-1455-1-git-send-email-rric@kernel.org>
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Olof Johansson <olof@lixom.net>, Rob Herring <robh+dt@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Arnd Bergmann <arnd@arndb.de>, Michal Marek <mmarek@suse.cz>
-Cc: linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Robert Richter <rrichter@cavium.com>, Andrew Bresticker <abrestic@google.com>, Abhilash Kesavan <kesavan.abhilash@gmail.com>
+To: Andrey Ryabinin <a.ryabinin@samsung.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Peter Zijlstra <peterz@infradead.org>, Michal Marek <mmarek@suse.cz>, Sasha Levin <sasha.levin@oracle.com>, x86@kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Theodore Ts'o <tytso@mit.edu>, Andreas Dilger <adilger.kernel@dilger.ca>, Dmitry Vyukov <dvyukov@google.com>, Konstantin Khlebnikov <koct9i@gmail.com>
 
-Arnd,
+On Mon, Oct 20 2014, Andrey Ryabinin <a.ryabinin@samsung.com> wrote:
 
-On 05.09.14 08:48:06, Robert Richter wrote:
-> From: Robert Richter <rrichter@cavium.com>
-> 
-> For arm64 we want to put dts files into vendor's subdirectories from
-> the beginning. This patch set implements this. As this is a generic
-> kbuild implementation, vendor subdirs will be also available for
-> arch/arm and other architectures. The subdirectory tree is also
-> reflected in the install path.
-> 
-> A new makefile variable dts-dirs is introduced to point to dts
-> subdirs. This variable is used by kbuild for building and installation
-> of dtb files.
-> 
-> A dts Makefile looks now as follows:
-> 
-> ----
-> dtb-$(CONFIG_...) += some_file_1.dtb
-> dtb-$(CONFIG_...) += some_file_2.dtb
-> 
-> dts-dirs          += dir_vendor_a
-> dts-dirs          += dir_vendor_b
-> 
-> # come always afterwards:
-> always         := $(dtb-y)
-> subdir-y       := $(dts-dirs)
-> clean-files    := *.dtb
-> ----
-> 
-> This patches also introduces the dtbs_install make target for
-> arm64. Install rules are moved to Makefile.dtbinst using the same
-> style and calling convention like for modinst and fwinst.
-> 
-> Robert Richter (6):
->   dts, arm64: Add dtbs_install make target
->   dts, kbuild: Factor out dtbs install rules to Makefile.dtbinst
->   dts, arm/arm64: Remove dtbs build rules in sub-makes
->   dts, kbuild: Implement support for dtb vendor subdirs
->   dts, arm64: Move dts files to vendor subdirs
->   dts, arm: Remove $(MACHINE) variable from dtbs make recipes
+> UBSan uses compile-time instrumentation to catch undefined behavior (UB).
+> Compiler inserts code that perform certain kinds of
+> checks before operations that could cause UB.
+> If check fails (i.e. UB detected) __ubsan_handle_* function called.
+> to print error message.
+>
+> So the most of the work is done by compiler.
+> This patch just implements ubsan handlers printing errors.
+>
+> GCC supports this since 4.9, however upcoming GCC 5.0 has
+> more checkers implemented.
 
-please pull this series for inclusion into v3.19 from:
+[...]
 
- git://git.kernel.org/pub/scm/linux/kernel/git/rric/linux.git dts-subdirs-for-arm-soc-v3.19
+> +
+> +#define REPORTED_BIT 31
+> +#define COLUMN_MASK (~(1U << REPORTED_BIT))
+> +
+> +static bool is_disabled(struct source_location *location)
+> +{
+> +	return test_and_set_bit(REPORTED_BIT,
+> +				(unsigned long *)&location->column);
+> +}
 
-I have updated and rebased the patches to v3.18-rc1. No changes except
-conflict resolution of patch 5/6.
+[...]
 
-Thanks,
-
--Robert
+> +struct source_location {
+> +	const char *file_name;
+> +	u32 line;
+> +	u32 column;
+> +};
 
 
+AFAICT, this introduces UB and/or memory corruption on big-endian
+systems with BITS_PER_LONG==64. (Also, on both LE and BE 64 bit systems,
+there's the issue of the alignment of location->column, which is likely
+to be 4-but-not-8 byte aligned).
 
-The following changes since commit f114040e3ea6e07372334ade75d1ee0775c355e1:
+Is the layout of struct source_location dictated by gcc? 
 
-  Linux 3.18-rc1 (2014-10-19 18:08:38 -0700)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/rric/linux.git dts-subdirs-for-arm-soc-v3.19
-
-for you to fetch changes up to 6f889d8ba125693778e05f0166b963cf08fed930:
-
-  dts, arm: Remove $(MACHINE) variable from dtbs make recipes (2014-10-21 18:07:00 +0200)
-
-----------------------------------------------------------------
-dts, kbuild: Implement support for dtb vendor subdirs
-
-----------------------------------------------------------------
-Robert Richter (6):
-      dts, arm64: Add dtbs_install make target
-      dts, kbuild: Factor out dtbs install rules to Makefile.dtbinst
-      dts, arm/arm64: Remove dtbs build rules in sub-makes
-      dts, kbuild: Implement support for dtb vendor subdirs
-      dts, arm64: Move dts files to vendor subdirs
-      dts, arm: Remove $(MACHINE) variable from dtbs make recipes
-
- arch/arm/Makefile                                  |  8 +++-
- arch/arm/boot/dts/Makefile                         | 12 +----
- arch/arm64/Makefile                                | 10 ++++-
- arch/arm64/boot/dts/Makefile                       | 15 +++----
- arch/arm64/boot/dts/apm/Makefile                   |  5 +++
- arch/arm64/boot/dts/{ => apm}/apm-mustang.dts      |  0
- arch/arm64/boot/dts/{ => apm}/apm-storm.dtsi       |  0
- arch/arm64/boot/dts/arm/Makefile                   |  6 +++
- arch/arm64/boot/dts/{ => arm}/foundation-v8.dts    |  0
- arch/arm64/boot/dts/{ => arm}/rtsm_ve-aemv8a.dts   |  0
- .../boot/dts/{ => arm}/rtsm_ve-motherboard.dtsi    |  0
- arch/arm64/boot/dts/cavium/Makefile                |  5 +++
- arch/arm64/boot/dts/{ => cavium}/thunder-88xx.dts  |  0
- arch/arm64/boot/dts/{ => cavium}/thunder-88xx.dtsi |  0
- scripts/Kbuild.include                             |  6 +++
- scripts/Makefile.dtbinst                           | 51 ++++++++++++++++++++++
- scripts/Makefile.lib                               | 12 -----
- 17 files changed, 95 insertions(+), 35 deletions(-)
- create mode 100644 arch/arm64/boot/dts/apm/Makefile
- rename arch/arm64/boot/dts/{ => apm}/apm-mustang.dts (100%)
- rename arch/arm64/boot/dts/{ => apm}/apm-storm.dtsi (100%)
- create mode 100644 arch/arm64/boot/dts/arm/Makefile
- rename arch/arm64/boot/dts/{ => arm}/foundation-v8.dts (100%)
- rename arch/arm64/boot/dts/{ => arm}/rtsm_ve-aemv8a.dts (100%)
- rename arch/arm64/boot/dts/{ => arm}/rtsm_ve-motherboard.dtsi (100%)
- create mode 100644 arch/arm64/boot/dts/cavium/Makefile
- rename arch/arm64/boot/dts/{ => cavium}/thunder-88xx.dts (100%)
- rename arch/arm64/boot/dts/{ => cavium}/thunder-88xx.dtsi (100%)
- create mode 100644 scripts/Makefile.dtbinst
+Rasmus
