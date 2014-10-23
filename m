@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-la0-f46.google.com ([209.85.215.46]:55223 "EHLO
-	mail-la0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751615AbaJWV7A (ORCPT
+Received: from mail-la0-f42.google.com ([209.85.215.42]:52399 "EHLO
+	mail-la0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752109AbaJWV7B (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 23 Oct 2014 17:59:00 -0400
+	Thu, 23 Oct 2014 17:59:01 -0400
 From: Alexis Berlemont <alexis.berlemont@gmail.com>
-Subject: [PATCH v2 02/14] perf tools: Kbuild builtin source related fixies
-Date: Thu, 23 Oct 2014 23:56:00 +0200
-Message-Id: <1414101372-14443-3-git-send-email-alexis.berlemont@gmail.com>
+Subject: [PATCH v2 03/14] perf tools: Kbuild source related fixies
+Date: Thu, 23 Oct 2014 23:56:01 +0200
+Message-Id: <1414101372-14443-4-git-send-email-alexis.berlemont@gmail.com>
 In-Reply-To: <1414101372-14443-1-git-send-email-alexis.berlemont@gmail.com>
 References: <1414101372-14443-1-git-send-email-alexis.berlemont@gmail.com>
 In-Reply-To: <54216F39.9030902@suse.cz>
@@ -19,8 +19,15 @@ Cc: Jiri Olsa <jolsa@redhat.com>, Arnaldo Carvalho de Melo <acme@ghostprotocols.
 
 From: Jiri Olsa <jolsa@redhat.com>
 
-Adding CONFIG_BUILTIN_* defines to govern builtin commands.
-This will be useful for kbuild process switch.
+Fixing several sources config dependencies to allow
+separate config builds.
+
+This commit was originally created by Jiri Olsa in 2013. Minor changes
+were needed to get it working one year later:
+* Remove #ifdef directives related with GUI / TUI (because of code
+  changes in ui/setup.c)
+* Fix a link issue if the option BUILTIN_TRACE is disabled.
+* Fix typo (CONFIG_BULTIN_ instead CONFIG_BUILTIN_)
 
 Signed-off-by: Jiri Olsa <jolsa@redhat.com>
 Cc: Arnaldo Carvalho de Melo <acme@ghostprotocols.net>
@@ -36,414 +43,211 @@ Cc: linux-kbuild@vger.kernel.org
 Cc: Stephane Eranian <eranian@google.com>
 Signed-off-by: Alexis Berlemont <alexis.berlemont@gmail.com>
 ---
- tools/perf/builtin-annotate.c       |  8 ++++++-
- tools/perf/builtin-cmds.h           | 27 ++++++++++++++++++++++
- tools/perf/builtin-help.c           |  1 +
- tools/perf/builtin-kvm.c            | 19 ++++++++++------
- tools/perf/builtin-report.c         |  3 +++
- tools/perf/builtin-top.c            | 19 ++++++++++++----
- tools/perf/perf.c                   | 45 +++++++++++++++++++++++++++++++++++--
- tools/perf/ui/setup.c               |  6 +++--
- tools/perf/util/generate-cmdlist.sh | 10 +++++++++
- 9 files changed, 122 insertions(+), 16 deletions(-)
- create mode 100644 tools/perf/builtin-cmds.h
+ tools/perf/builtin-annotate.c    |  6 +++---
+ tools/perf/builtin-lock.c        |  5 ++++-
+ tools/perf/builtin-report.c      |  2 +-
+ tools/perf/builtin-sched.c       |  3 +++
+ tools/perf/builtin-top.c         |  4 ++--
+ tools/perf/perf.c                | 10 ++++++++--
+ tools/perf/ui/browsers/scripts.c |  4 ++++
+ tools/perf/ui/setup.c            |  6 +++---
+ 8 files changed, 28 insertions(+), 12 deletions(-)
 
 diff --git a/tools/perf/builtin-annotate.c b/tools/perf/builtin-annotate.c
-index e7417fe..19cb967 100644
+index 19cb967..a46af8f 100644
 --- a/tools/perf/builtin-annotate.c
 +++ b/tools/perf/builtin-annotate.c
-@@ -5,6 +5,7 @@
-  * look up and read DSOs and symbol information and display
-  * a histogram of results, along various sorting keys.
-  */
-+#include "generated/autoconf.h"
- #include "builtin.h"
- 
- #include "util/util.h"
-@@ -115,7 +116,7 @@ static void hists__find_annotations(struct hists *hists,
- 				    struct perf_evsel *evsel,
- 				    struct perf_annotate *ann)
- {
--	struct rb_node *nd = rb_first(&hists->entries), *next;
-+	struct rb_node *nd = rb_first(&hists->entries);
- 	int key = K_RIGHT;
- 
- 	while (nd) {
-@@ -154,7 +155,9 @@ find_next:
+@@ -155,7 +155,7 @@ find_next:
  
  			/* skip missing symbols */
  			nd = rb_next(nd);
-+#ifdef CONFIG_TUI
+-#ifdef CONFIG_TUI
++#if defined(CONFIG_TUI) || !defined(CONFIG_KBUILD)
  		} else if (use_browser == 1) {
-+			struct rb_node *next = NULL;
+ 			struct rb_node *next = NULL;
  			key = hist_entry__tui_annotate(he, evsel, NULL);
- 			switch (key) {
- 			case -1:
-@@ -173,6 +176,7 @@ find_next:
- 
- 			if (next != NULL)
- 				nd = next;
-+#endif /* CONFIG_TUI */
- 		} else {
- 			hist_entry__tty_annotate(he, evsel, ann);
- 			nd = rb_next(nd);
-@@ -299,7 +303,9 @@ int cmd_annotate(int argc, const char **argv, const char *prefix __maybe_unused)
+@@ -303,9 +303,9 @@ int cmd_annotate(int argc, const char **argv, const char *prefix __maybe_unused)
  	OPT_BOOLEAN('D', "dump-raw-trace", &dump_trace,
  		    "dump raw trace in ASCII"),
  	OPT_BOOLEAN(0, "gtk", &annotate.use_gtk, "Use the GTK interface"),
-+#ifdef CONFIG_TUI
+-#ifdef CONFIG_TUI
++#if defined(CONFIG_TUI) || !defined(CONFIG_KBUILD)
  	OPT_BOOLEAN(0, "tui", &annotate.use_tui, "Use the TUI interface"),
-+#endif /* CONFIG_TUI */
+-#endif /* CONFIG_TUI */
++#endif
  	OPT_BOOLEAN(0, "stdio", &annotate.use_stdio, "Use the stdio interface"),
  	OPT_STRING('k', "vmlinux", &symbol_conf.vmlinux_name,
  		   "file", "vmlinux pathname"),
-diff --git a/tools/perf/builtin-cmds.h b/tools/perf/builtin-cmds.h
-new file mode 100644
-index 0000000..fec342a
---- /dev/null
-+++ b/tools/perf/builtin-cmds.h
-@@ -0,0 +1,27 @@
-+#ifndef BUILTIN_CMDS_H
-+#define BUILTIN_CMDS_H
-+
-+#define CONFIG_BUILTIN_REPORT 1
-+#define CONFIG_BUILTIN_SCRIPT 1
-+#define CONFIG_BUILTIN_BENCH 1
-+#define CONFIG_BUILTIN_SCHED 1
-+#define CONFIG_BUILTIN_TRACE 1
-+#define CONFIG_BUILTIN_TOP 1
-+#define CONFIG_BUILTIN_RECORD 1
-+#define CONFIG_BUILTIN_BUILDID_LIST 1
-+#define CONFIG_BUILTIN_INJECT 1
-+#define CONFIG_BUILTIN_LOCK 1
-+#define CONFIG_BUILTIN_KVM 1
-+#define CONFIG_BUILTIN_BUILDID_CACHE 1
-+#define CONFIG_BUILTIN_EVLIST 1
-+#define CONFIG_BUILTIN_KMEM 1
-+#define CONFIG_BUILTIN_STAT 1
-+#define CONFIG_BUILTIN_DIFF 1
-+#define CONFIG_BUILTIN_ANNOTATE 1
-+#define CONFIG_BUILTIN_TIMECHART 1
-+#define CONFIG_BUILTIN_LIST 1
-+#define CONFIG_BUILTIN_HELP 1
-+#define CONFIG_BUILTIN_PROBE 1
-+#define CONFIG_BUILTIN_MEM 1
-+
-+#endif /* BUILTIN_CMDS_H */
-diff --git a/tools/perf/builtin-help.c b/tools/perf/builtin-help.c
-index 25d2062..fbbbaa4 100644
---- a/tools/perf/builtin-help.c
-+++ b/tools/perf/builtin-help.c
-@@ -7,6 +7,7 @@
- #include "util/cache.h"
+diff --git a/tools/perf/builtin-lock.c b/tools/perf/builtin-lock.c
+index e7ec715..05c0e1c 100644
+--- a/tools/perf/builtin-lock.c
++++ b/tools/perf/builtin-lock.c
+@@ -1,4 +1,5 @@
  #include "builtin.h"
- #include "util/exec_cmd.h"
 +#include "builtin-cmds.h"
- #include "common-cmds.h"
- #include "util/parse-options.h"
- #include "util/run-command.h"
-diff --git a/tools/perf/builtin-kvm.c b/tools/perf/builtin-kvm.c
-index b65eb050..400e92e 100644
---- a/tools/perf/builtin-kvm.c
-+++ b/tools/perf/builtin-kvm.c
-@@ -1531,20 +1531,25 @@ int cmd_kvm(int argc, const char **argv, const char *prefix __maybe_unused)
+ #include "perf.h"
  
- 	if (!strncmp(argv[0], "rec", 3))
- 		return __cmd_record(file_name, argc, argv);
--	else if (!strncmp(argv[0], "rep", 3))
-+
-+	if (!strncmp(argv[0], "rep", 3))
- 		return __cmd_report(file_name, argc, argv);
--	else if (!strncmp(argv[0], "diff", 4))
-+
-+	if (!strncmp(argv[0], "diff", 4))
- 		return cmd_diff(argc, argv, NULL);
--	else if (!strncmp(argv[0], "top", 3))
-+
-+	if (!strncmp(argv[0], "top", 3))
- 		return cmd_top(argc, argv, NULL);
--	else if (!strncmp(argv[0], "buildid-list", 12))
-+
-+	if (!strncmp(argv[0], "buildid-list", 12))
- 		return __cmd_buildid_list(file_name, argc, argv);
-+
- #ifdef HAVE_KVM_STAT_SUPPORT
--	else if (!strncmp(argv[0], "stat", 4))
-+	if (!strncmp(argv[0], "stat", 4))
- 		return kvm_cmd_stat(file_name, argc, argv);
- #endif
--	else
--		usage_with_options(kvm_usage, kvm_options);
-+
-+	usage_with_options(kvm_usage, kvm_options);
- 
- 	return 0;
- }
+ #include "util/evlist.h"
+@@ -995,9 +996,11 @@ int cmd_lock(int argc, const char **argv, const char *prefix __maybe_unused)
+ 				usage_with_options(report_usage, report_options);
+ 		}
+ 		rc = __cmd_report(false);
++#ifdef CONFIG_BUILTIN_SCRIPT
+ 	} else if (!strcmp(argv[0], "script")) {
+ 		/* Aliased to 'perf script' */
+-		return cmd_script(argc, argv, prefix);
++		rc = cmd_script(argc, argv, prefix);
++#endif
+ 	} else if (!strcmp(argv[0], "info")) {
+ 		if (argc) {
+ 			argc = parse_options(argc, argv,
 diff --git a/tools/perf/builtin-report.c b/tools/perf/builtin-report.c
-index 140a6cd..00d93ff 100644
+index 00d93ff..b639e58 100644
 --- a/tools/perf/builtin-report.c
 +++ b/tools/perf/builtin-report.c
-@@ -5,6 +5,7 @@
-  * look up and read DSOs and symbol information and display
-  * a histogram of results, along various sorting keys.
-  */
-+#include "generated/autoconf.h"
- #include "builtin.h"
- 
- #include "util/util.h"
-@@ -406,6 +407,7 @@ static int report__browse_hists(struct report *rep)
+@@ -407,7 +407,7 @@ static int report__browse_hists(struct report *rep)
  	const char *help = "For a higher level overview, try: perf report --sort comm,dso";
  
  	switch (use_browser) {
-+#ifdef CONFIG_TUI
+-#ifdef CONFIG_TUI
++#if defined(CONFIG_TUI) || !defined(CONFIG_KBUILD)
  	case 1:
  		ret = perf_evlist__tui_browse_hists(evlist, help, NULL,
  						    rep->min_percent,
-@@ -417,6 +419,7 @@ static int report__browse_hists(struct report *rep)
- 		if (ret != K_SWITCH_INPUT_DATA)
- 			ret = 0;
- 		break;
-+#endif /* CONFIG_TUI */
- 	case 2:
- 		ret = report__gtk_browse_hists(rep, help);
- 		break;
+diff --git a/tools/perf/builtin-sched.c b/tools/perf/builtin-sched.c
+index 891c393..e38b021 100644
+--- a/tools/perf/builtin-sched.c
++++ b/tools/perf/builtin-sched.c
+@@ -1,4 +1,5 @@
+ #include "builtin.h"
++#include "builtin-cmds.h"
+ #include "perf.h"
+ 
+ #include "util/util.h"
+@@ -1742,11 +1743,13 @@ int cmd_sched(int argc, const char **argv, const char *prefix __maybe_unused)
+ 	if (!argc)
+ 		usage_with_options(sched_usage, sched_options);
+ 
++#ifdef CONFIG_BUILTIN_SCRIPT
+ 	/*
+ 	 * Aliased to 'perf script' for now:
+ 	 */
+ 	if (!strcmp(argv[0], "script"))
+ 		return cmd_script(argc, argv, prefix);
++#endif
+ 
+ 	if (!strncmp(argv[0], "rec", 3)) {
+ 		return __cmd_record(argc, argv);
 diff --git a/tools/perf/builtin-top.c b/tools/perf/builtin-top.c
-index 0aa7747..a2ff8b7 100644
+index a2ff8b7..6f04452 100644
 --- a/tools/perf/builtin-top.c
 +++ b/tools/perf/builtin-top.c
-@@ -17,6 +17,7 @@
-  *
-  * Released under the GPL v2. (and only v2, not any later version)
-  */
-+#include "generated/autoconf.h"
- #include "builtin.h"
- 
- #include "perf.h"
-@@ -534,6 +535,7 @@ static bool perf_top__handle_keypress(struct perf_top *top, int c)
+@@ -535,7 +535,7 @@ static bool perf_top__handle_keypress(struct perf_top *top, int c)
  	return ret;
  }
  
-+#ifdef CONFIG_TUI
+-#ifdef CONFIG_TUI
++#if defined(CONFIG_TUI) || !defined(CONFIG_KBUILD)
  static void perf_top__sort_new_samples(void *arg)
  {
  	struct perf_top *t = arg;
-@@ -586,6 +588,7 @@ static void *display_thread_tui(void *arg)
- 	done = 1;
- 	return NULL;
- }
-+#endif /* CONFIG_TUI */
- 
- static void display_sig(int sig __maybe_unused)
- {
-@@ -926,9 +929,12 @@ static int perf_top__setup_sample_type(struct perf_top *top __maybe_unused)
- 	return 0;
- }
- 
-+typedef void* (*display_fn_t)(void *);
-+
- static int __cmd_top(struct perf_top *top)
- {
- 	struct record_opts *opts = &top->record_opts;
-+	display_fn_t display_fn = display_thread;
- 	pthread_t thread;
- 	int ret;
- 
-@@ -965,8 +971,8 @@ static int __cmd_top(struct perf_top *top)
- 	 * XXX 'top' still doesn't start workloads like record, trace, but should,
- 	 * so leave the check here.
- 	 */
--        if (!target__none(&opts->target))
--                perf_evlist__enable(top->evlist);
-+	if (!target__none(&opts->target))
-+		perf_evlist__enable(top->evlist);
- 
- 	/* Wait for a minimal set of events before starting the snapshot */
- 	perf_evlist__poll(top->evlist, 100);
-@@ -974,8 +980,13 @@ static int __cmd_top(struct perf_top *top)
- 	perf_top__mmap_read(top);
+@@ -981,7 +981,7 @@ static int __cmd_top(struct perf_top *top)
  
  	ret = -1;
--	if (pthread_create(&thread, NULL, (use_browser > 0 ? display_thread_tui :
--							    display_thread), top)) {
-+
-+#ifdef CONFIG_TUI
-+	if (use_browser > 0)
-+		display_fn = display_thread_tui;
-+#endif
-+
-+	if (pthread_create(&thread, NULL, display_fn, top)) {
- 		ui__error("Could not create display thread.\n");
- 		goto out_delete;
- 	}
+ 
+-#ifdef CONFIG_TUI
++#if defined(CONFIG_TUI) || !defined(CONFIG_KBUILD)
+ 	if (use_browser > 0)
+ 		display_fn = display_thread_tui;
+ #endif
 diff --git a/tools/perf/perf.c b/tools/perf/perf.c
-index 452a847..ab363b5 100644
+index ab363b5..976ded6 100644
 --- a/tools/perf/perf.c
 +++ b/tools/perf/perf.c
-@@ -7,6 +7,7 @@
-  * perf top, perf record, perf report, etc.) are started.
-  */
- #include "builtin.h"
-+#include "builtin-cmds.h"
- 
- #include "util/exec_cmd.h"
- #include "util/cache.h"
-@@ -34,34 +35,74 @@ struct cmd_struct {
- };
- 
- static struct cmd_struct commands[] = {
-+#ifdef CONFIG_BUILTIN_BUILDID_CACHE
- 	{ "buildid-cache", cmd_buildid_cache, 0 },
-+#endif
-+#ifdef CONFIG_BUILTIN_BUILDID_LIST
- 	{ "buildid-list", cmd_buildid_list, 0 },
-+#endif
-+#ifdef CONFIG_BUILTIN_DIFF
- 	{ "diff",	cmd_diff,	0 },
-+#endif
-+#ifdef CONFIG_BUILTIN_EVLIST
- 	{ "evlist",	cmd_evlist,	0 },
-+#endif
-+#ifdef CONFIG_BUILTIN_HELP
- 	{ "help",	cmd_help,	0 },
-+#endif
-+#ifdef CONFIG_BUILTIN_LIST
- 	{ "list",	cmd_list,	0 },
-+#endif
-+#ifdef CONFIG_BUILTIN_RECORD
- 	{ "record",	cmd_record,	0 },
-+#endif
-+#ifdef CONFIG_BUILTIN_REPORT
- 	{ "report",	cmd_report,	0 },
-+#endif
-+#ifdef CONFIG_BUILTIN_BENCH
- 	{ "bench",	cmd_bench,	0 },
-+#endif
-+#ifdef CONFIG_BUILTIN_STAT
- 	{ "stat",	cmd_stat,	0 },
-+#endif
-+#ifdef CONFIG_BUILTIN_TIMECHART
- 	{ "timechart",	cmd_timechart,	0 },
-+#endif
-+#ifdef CONFIG_BUILTIN_TOP
- 	{ "top",	cmd_top,	0 },
-+#endif
-+#ifdef CONFIG_BUILTIN_ANNOTATE
- 	{ "annotate",	cmd_annotate,	0 },
-+#endif
- 	{ "version",	cmd_version,	0 },
-+#ifdef CONFIG_BUILTIN_SCRIPT
- 	{ "script",	cmd_script,	0 },
-+#endif
-+#ifdef CONFIG_BUILTIN_SCHED
- 	{ "sched",	cmd_sched,	0 },
--#ifdef HAVE_LIBELF_SUPPORT
-+#endif
-+#if defined HAVE_LIBELF_SUPPORT && defined CONFIG_BUILTIN_PROBE
- 	{ "probe",	cmd_probe,	0 },
- #endif
-+#ifdef CONFIG_BUILTIN_KMEM
- 	{ "kmem",	cmd_kmem,	0 },
-+#endif
-+#ifdef CONFIG_BUILTIN_LOCK
- 	{ "lock",	cmd_lock,	0 },
-+#endif
-+#ifdef CONFIG_BUILTIN_KVM
+@@ -93,8 +93,10 @@ static struct cmd_struct commands[] = {
+ #ifdef CONFIG_BUILTIN_KVM
  	{ "kvm",	cmd_kvm,	0 },
-+#endif
+ #endif
++#ifdef CONFIG_BUILTIN_TEST
  	{ "test",	cmd_test,	0 },
--#ifdef HAVE_LIBAUDIT_SUPPORT
-+#if defined HAVE_LIBAUDIT_SUPPORT && defined CONFIG_BUILTIN_TRACE
+-#if defined HAVE_LIBAUDIT_SUPPORT && defined CONFIG_BUILTIN_TRACE
++#endif
++#ifdef CONFIG_BUILTIN_TRACE
  	{ "trace",	cmd_trace,	0 },
  #endif
-+#ifdef CONFIG_BUILTIN_INJECT
- 	{ "inject",	cmd_inject,	0 },
+ #ifdef CONFIG_BUILTIN_INJECT
+@@ -539,7 +541,7 @@ int main(int argc, const char **argv)
+ 		goto out;
+ 	}
+ 	if (!prefixcmp(cmd, "trace")) {
+-#ifdef HAVE_LIBAUDIT_SUPPORT
++#ifdef CONFIG_BUILTIN_TRACE
+ 		set_buildid_dir();
+ 		setup_path();
+ 		argv[0] = "trace";
+@@ -563,13 +565,17 @@ int main(int argc, const char **argv)
+ 	} else {
+ 		/* The user didn't specify a command; give them help */
+ 		printf("\n usage: %s\n\n", perf_usage_string);
++#ifdef CONFIG_BUILTIN_HELP
+ 		list_common_cmds_help();
+ 		printf("\n %s\n\n", perf_more_info_string);
 +#endif
-+#ifdef CONFIG_BUILTIN_MEM
- 	{ "mem",	cmd_mem,	0 },
-+#endif
- };
+ 		goto out;
+ 	}
+ 	cmd = argv[0];
  
- struct pager_config {
++#ifdef CONFIG_BUILTIN_TEST
+ 	test_attr__init();
++#endif
+ 
+ 	/*
+ 	 * We use PATH to find perf commands, but we prepend some higher
+diff --git a/tools/perf/ui/browsers/scripts.c b/tools/perf/ui/browsers/scripts.c
+index 402d2bd..128988d 100644
+--- a/tools/perf/ui/browsers/scripts.c
++++ b/tools/perf/ui/browsers/scripts.c
+@@ -59,7 +59,11 @@ static int list_scripts(char *script_name)
+ 		paths[i] = names[i] + SCRIPT_NAMELEN;
+ 	}
+ 
++#ifdef CONFIG_BUILTIN_SCRIPT
+ 	num = find_scripts(names, paths);
++#else
++	num = 0;
++#endif
+ 	if (num > 0) {
+ 		choice = ui__popup_menu(num, names);
+ 		if (choice < num && choice >= 0) {
 diff --git a/tools/perf/ui/setup.c b/tools/perf/ui/setup.c
-index ba51fa8..ec7fd36 100644
+index ec7fd36..efc2b21 100644
 --- a/tools/perf/ui/setup.c
 +++ b/tools/perf/ui/setup.c
-@@ -77,11 +77,13 @@ void setup_browser(bool fallback_to_pager)
+@@ -77,7 +77,7 @@ void setup_browser(bool fallback_to_pager)
  		       PERF_GTK_DSO);
  		sleep(1);
  		/* fall through */
-+#ifdef CONFIG_TUI
+-#ifdef CONFIG_TUI
++#if defined(CONFIG_TUI) || !defined(CONFIG_KBUILD)
  	case 1:
  		use_browser = 1;
  		if (ui__init() == 0)
- 			break;
- 		/* fall through */
-+#endif
- 	default:
- 		use_browser = 0;
- 		if (fallback_to_pager)
-@@ -96,11 +98,11 @@ void exit_browser(bool wait_for_ok)
+@@ -92,13 +92,13 @@ void setup_browser(bool fallback_to_pager)
+ 	}
+ }
+ 
+-void exit_browser(bool wait_for_ok)
++void exit_browser(bool wait_for_ok __maybe_unused)
+ {
+ 	switch (use_browser) {
  	case 2:
  		exit_gtk_browser(wait_for_ok);
  		break;
--
-+#ifdef CONFIG_TUI
+-#ifdef CONFIG_TUI
++#if defined(CONFIG_TUI) || !defined(CONFIG_KBUILD)
  	case 1:
  		ui__exit(wait_for_ok);
  		break;
--
-+#endif
- 	default:
- 		break;
- 	}
-diff --git a/tools/perf/util/generate-cmdlist.sh b/tools/perf/util/generate-cmdlist.sh
-index 36a885d..05ee30f 100755
---- a/tools/perf/util/generate-cmdlist.sh
-+++ b/tools/perf/util/generate-cmdlist.sh
-@@ -1,5 +1,11 @@
- #!/bin/sh
- 
-+function cfg()
-+{
-+     cfg=`echo $1 | tr '[:lower:]' '[:upper:]' | sed 's/-/_/g'`
-+     echo "$cfg"
-+}
-+
- echo "/* Automatically generated by $0 */
- struct cmdname_help
- {
-@@ -13,6 +19,7 @@ sed -n -e 's/^perf-\([^ 	]*\)[ 	].* common.*/\1/p' command-list.txt |
- sort |
- while read cmd
- do
-+     echo "#ifdef CONFIG_BUILTIN_$(cfg $cmd)"
-      sed -n '
-      /^NAME/,/perf-'"$cmd"'/H
-      ${
-@@ -20,6 +27,7 @@ do
-             s/.*perf-'"$cmd"' - \(.*\)/  {"'"$cmd"'", "\1"},/
- 	    p
-      }' "Documentation/perf-$cmd.txt"
-+     echo "#endif"
- done
- 
- echo "#ifdef HAVE_LIBELF_SUPPORT"
-@@ -27,6 +35,7 @@ sed -n -e 's/^perf-\([^ 	]*\)[ 	].* full.*/\1/p' command-list.txt |
- sort |
- while read cmd
- do
-+     echo "#ifdef CONFIG_BUILTIN_$(cfg $cmd)"
-      sed -n '
-      /^NAME/,/perf-'"$cmd"'/H
-      ${
-@@ -34,6 +43,7 @@ do
-             s/.*perf-'"$cmd"' - \(.*\)/  {"'"$cmd"'", "\1"},/
- 	    p
-      }' "Documentation/perf-$cmd.txt"
-+     echo "#endif"
- done
- echo "#endif /* HAVE_LIBELF_SUPPORT */"
- echo "};"
 -- 
 2.1.1
 
