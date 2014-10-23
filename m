@@ -1,72 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cdptpa-outbound-snat.email.rr.com ([107.14.166.230]:21113 "EHLO
-	cdptpa-oedge-vip.email.rr.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1753674AbaJWKvS (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 23 Oct 2014 06:51:18 -0400
-Date: Thu, 23 Oct 2014 06:51:07 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-Subject: Re: [PATCH] kbuild: Fix output of make kernelrelease
-Message-ID: <20141023065107.587ab9f6@gandalf.local.home>
-In-Reply-To: <5448C315.9000001@suse.cz>
-References: <20141022101944.70d637cc@gandalf.local.home>
-	<20141022194408.GA20989@pobox.suse.cz>
-	<20141022211115.576b0053@gandalf.local.home>
-	<5448C315.9000001@suse.cz>
+Received: from mail.skyhub.de ([78.46.96.112]:41503 "EHLO mail.skyhub.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S932258AbaJWTZA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 23 Oct 2014 15:25:00 -0400
+Date: Thu, 23 Oct 2014 21:24:56 +0200
+From: Borislav Petkov <bp@alien8.de>
+Subject: Re: [PATCH] Kbuild: Check for CONFIG_READABLE_ASM when building .s
+ targets
+Message-ID: <20141023192456.GC4619@pd.tnic>
+References: <1412523154-25602-1-git-send-email-bp@alien8.de>
+ <20141005155816.GB9377@pd.tnic>
+ <20141007121356.GA18003@sepie.suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20141007121356.GA18003@sepie.suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.cz>
-Cc: LKML <linux-kernel@vger.kernel.org>, Masahiro Yamada <yamada.m@jp.panasonic.com>, Peter Foley <pefoley2@pefoley.com>, linux-kbuild@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, Linus Torvalds <torvalds@linux-foundation.org>
+Cc: linux-kbuild@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, X86 ML <x86@kernel.org>
 
-On Thu, 23 Oct 2014 10:57:57 +0200
-Michal Marek <mmarek@suse.cz> wrote:
+Hey Michal,
 
-> On 2014-10-23 03:11, Steven Rostedt wrote:
-> > On Wed, 22 Oct 2014 21:44:08 +0200
-> > Michal Marek <mmarek@suse.cz> wrote:
-> > 
-> >> Dne 22.10.2014 v 16:19 Steven Rostedt napsal(a):
-> >>>
-> >>> Commit 7ff525712acf "kbuild: fake the "Entering directory ..." message
-> >>> more simply" changed the output of "make kernelrelease" such that the
-> >>> kernel release version was not the last line printed. This broke various
-> >>> tools that would find the kernel release with "make kernelrelease | tail -1".
-> >>
-> >> The cleaner and recommended (see recent make help) way is to use make -s:
-> >>
-> >> $ make O=build -s kernelrelease
-> >> 3.18.0-rc1+
-> >>
-> >> no further processing is needed.
-> > 
-> > 
-> > I don't mind changing my script with your patch. But this does break
-> > other scripts of mine that I need to hunt down and change. My fear is
-> > why do we need the '-s' when there may be other methods to preserve the
-> > old functionality.
+On Tue, Oct 07, 2014 at 02:13:56PM +0200, Michal Marek wrote:
+> This violates the principle of least surprise:
 > 
-> If you have scripts that only do x=$(make kernelrelease), then you
-> should definitely fix them. You are right that the make kernelrelease |
-> tail -1 trick had always been working until 7ff525712acf, so I can apply
-> your patch.
+> make $file.s
+> as -o $file.o $file.s
+> 
+> should be equivalent to
+> 
+> make $file.o
 
-Thanks, because that's what my scripts indeed do ;-)
+on a second thought, I think we don't care about this. Because we build
+the objects in kbuild with make and not with gas directly. IOW, we never
+use the intermittent product file.s when building file.o but we start
+again from file.c.
 
-> But please fix ktest.pl so that it's consistent with what
-> the help text says.
+And besides, even if we did use gas, we would still need to pass
+KBUILD_AFLAGS to it.
 
-Yeah, regardless I was planning on applying your patch as it needs to
-handle bisects, and without it, ktest will fail to bisect after
-7ff525712acf.
+Hmmm.
 
-> Also, the Makefile patch should cover kernelversion
-> and image_name as well.
+-- 
+Regards/Gruss,
+    Boris.
 
-OK, I'll make the update.
-
-Thanks!
-
--- Steve
+Sent from a fat crate under my desk. Formatting is fine.
+--
