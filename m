@@ -1,23 +1,23 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:54873 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:54957 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753356AbaJWIuk (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 23 Oct 2014 04:50:40 -0400
-Message-ID: <5448C15D.9060505@suse.cz>
-Date: Thu, 23 Oct 2014 10:50:37 +0200
+	id S1753894AbaJWI57 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 23 Oct 2014 04:57:59 -0400
+Message-ID: <5448C315.9000001@suse.cz>
+Date: Thu, 23 Oct 2014 10:57:57 +0200
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
 Subject: Re: [PATCH] kbuild: Fix output of make kernelrelease
-References: <20141022101944.70d637cc@gandalf.local.home>	<20141022194408.GA20989@pobox.suse.cz> <20141022163507.6e2162d1@gandalf.local.home>
-In-Reply-To: <20141022163507.6e2162d1@gandalf.local.home>
+References: <20141022101944.70d637cc@gandalf.local.home>	<20141022194408.GA20989@pobox.suse.cz> <20141022211115.576b0053@gandalf.local.home>
+In-Reply-To: <20141022211115.576b0053@gandalf.local.home>
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Steven Rostedt <rostedt@goodmis.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, Masahiro Yamada <yamada.m@jp.panasonic.com>, Peter Foley <pefoley2@pefoley.com>, linux-kbuild@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, Masahiro Yamada <yamada.m@jp.panasonic.com>, Peter Foley <pefoley2@pefoley.com>, linux-kbuild@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, Linus Torvalds <torvalds@linux-foundation.org>
 
-On 2014-10-22 22:35, Steven Rostedt wrote:
+On 2014-10-23 03:11, Steven Rostedt wrote:
 > On Wed, 22 Oct 2014 21:44:08 +0200
 > Michal Marek <mmarek@suse.cz> wrote:
 > 
@@ -32,11 +32,20 @@ On 2014-10-22 22:35, Steven Rostedt wrote:
 >>
 >> $ make O=build -s kernelrelease
 >> 3.18.0-rc1+
+>>
+>> no further processing is needed.
 > 
-> Hmm, I see the help index was recently updated to include that.
 > 
-> Does this work with older kernels too? That's very important.
+> I don't mind changing my script with your patch. But this does break
+> other scripts of mine that I need to hunt down and change. My fear is
+> why do we need the '-s' when there may be other methods to preserve the
+> old functionality.
 
-Yes. Except for a few bugs in the history, make -s has always been silent.
+If you have scripts that only do x=$(make kernelrelease), then you
+should definitely fix them. You are right that the make kernelrelease |
+tail -1 trick had always been working until 7ff525712acf, so I can apply
+your patch. But please fix ktest.pl so that it's consistent with what
+the help text says. Also, the Makefile patch should cover kernelversion
+and image_name as well.
 
 Michal
