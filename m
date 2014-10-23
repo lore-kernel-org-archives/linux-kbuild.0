@@ -1,22 +1,21 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-la0-f43.google.com ([209.85.215.43]:59650 "EHLO
-	mail-la0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752729AbaJWWOD (ORCPT
+Received: from mail-lb0-f180.google.com ([209.85.217.180]:40355 "EHLO
+	mail-lb0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753869AbaJWWbL (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 23 Oct 2014 18:14:03 -0400
-Received: by mail-la0-f43.google.com with SMTP id mc6so1692641lab.16
-        for <linux-kbuild@vger.kernel.org>; Thu, 23 Oct 2014 15:14:00 -0700 (PDT)
+	Thu, 23 Oct 2014 18:31:11 -0400
 From: Alexis Berlemont <alexis.berlemont@gmail.com>
 Subject: [PATCH v3 04/14] perf tools: Add kbuild support into Makefile.kbuild
-Date: Fri, 24 Oct 2014 00:11:18 +0200
-Message-Id: <1414102288-14695-5-git-send-email-alexis.berlemont@gmail.com>
-In-Reply-To: <1414102288-14695-1-git-send-email-alexis.berlemont@gmail.com>
-References: <1414102288-14695-1-git-send-email-alexis.berlemont@gmail.com>
+Date: Fri, 24 Oct 2014 00:28:12 +0200
+Message-Id: <1414103302-14906-5-git-send-email-alexis.berlemont@gmail.com>
+In-Reply-To: <1414103302-14906-1-git-send-email-alexis.berlemont@gmail.com>
+References: <1414103302-14906-1-git-send-email-alexis.berlemont@gmail.com>
 In-Reply-To: <1414101372-14443-1-git-send-email-alexis.berlemont@gmail.com>
 References: <1414101372-14443-1-git-send-email-alexis.berlemont@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-Cc: Jiri Olsa <jolsa@redhat.com>, Arnaldo Carvalho de Melo <acme@ghostprotocols.net>, Peter Zijlstra <a.p.zijlstra@chello.nl>, Ingo Molnar <mingo@elte.hu>, Paul Mackerras <paulus@samba.org>, Corey Ashford <cjashfor@linux.vnet.ibm.com>, Frederic Weisbecker <fweisbec@gmail.com>, Namhyung Kim <namhyung@kernel.org>, Borislav Petkov <bp@alien8.de>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Stephane Eranian <eranian@google.com>, Alexis Berlemont <alexis.berlemont@gmail.com>
+To: linux-kernel@vger.kernel.org
+Cc: Jiri Olsa <jolsa@redhat.com>, dsahern@gmail.com, mingo@redhat.com, a.p.zijlstra@chello.nl, paulus@samba.org, acme@kernel.org, namhyung@kernel.org, mmarek@suse.cz, Arnaldo Carvalho de Melo <acme@ghostprotocols.net>, Ingo Molnar <mingo@elte.hu>, Corey Ashford <cjashfor@linux.vnet.ibm.com>, Frederic Weisbecker <fweisbec@gmail.com>, Borislav Petkov <bp@alien8.de>, linux-kbuild@vger.kernel.org, Stephane Eranian <eranian@google.com>, Alexis Berlemont <alexis.berlemont@gmail.com>
 
 From: Jiri Olsa <jolsa@redhat.com>
 
