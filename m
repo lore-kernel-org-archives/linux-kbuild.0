@@ -1,50 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:47613 "EHLO
-	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752195AbaJXKaq (ORCPT
+Received: from mail-yh0-f53.google.com ([209.85.213.53]:36860 "EHLO
+	mail-yh0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756066AbaJXKg0 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 24 Oct 2014 06:30:46 -0400
-Date: Fri, 24 Oct 2014 12:30:30 +0200
-From: Peter Zijlstra <peterz@infradead.org>
-Subject: Re: [RFC PATCH] UBSan: run-time undefined behavior sanity checker
-Message-ID: <20141024103030.GH12706@worktop.programming.kicks-ass.net>
-References: <1413802499-17928-1-git-send-email-a.ryabinin@samsung.com>
- <1413802499-17928-2-git-send-email-a.ryabinin@samsung.com>
- <20141021094714.GR23531@worktop.programming.kicks-ass.net>
- <544630CA.2000502@samsung.com>
+	Fri, 24 Oct 2014 06:36:26 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <544630CA.2000502@samsung.com>
+In-Reply-To: <1414139506040-968477.post@n7.nabble.com>
+References: <1413802499-17928-1-git-send-email-a.ryabinin@samsung.com>
+	<1413802499-17928-2-git-send-email-a.ryabinin@samsung.com>
+	<5445640F.10000@oracle.com>
+	<5446135E.9020101@samsung.com>
+	<1414139506040-968477.post@n7.nabble.com>
+Date: Fri, 24 Oct 2014 14:36:25 +0400
+Message-ID: <CAPAsAGxuJJYwS2fQ5r63U=xY_MSSb=5vc_tUBvTjkq=JoXhd8A@mail.gmail.com>
+Subject: Re: [RFC PATCH] UBSan: run-time undefined behavior sanity checker
+From: Andrey Ryabinin <ryabinin.a.a@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrey Ryabinin <a.ryabinin@samsung.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>, Sasha Levin <sasha.levin@oracle.com>, x86@kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Theodore Ts'o <tytso@mit.edu>, Andreas Dilger <adilger.kernel@dilger.ca>, Dmitry Vyukov <dvyukov@google.com>, Konstantin Khlebnikov <koct9i@gmail.com>
+To: "y.gribov" <y.gribov@samsung.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, Konstantin Khlebnikov <koct9i@gmail.com>, Randy Dunlap <rdunlap@infradead.org>, Peter Zijlstra <peterz@infradead.org>, Andrew Morton <akpm@linux-foundation.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Sasha Levin <sasha.levin@oracle.com>, Michal Marek <mmarek@suse.cz>, linux@rasmusvillemoes.dk, x86@kernel.org, linux-kbuild@vger.kernel.org, Theodore Ts'o <tytso@mit.edu>, Andreas Dilger <adilger.kernel@dilger.ca>, Dmitry Vyukov <dvyukov@google.com>
 
-On Tue, Oct 21, 2014 at 02:09:14PM +0400, Andrey Ryabinin wrote:
-> On 10/21/2014 01:47 PM, Peter Zijlstra wrote:
-> > On Mon, Oct 20, 2014 at 02:54:59PM +0400, Andrey Ryabinin wrote:
-> >>
-> >> UBSan uses compile-time instrumentation to catch undefined behavior (UB).
-> >> Compiler inserts code that perform certain kinds of
-> >> checks before operations that could cause UB.
-> >> If check fails (i.e. UB detected) __ubsan_handle_* function called.
-> >> to print error message.
-> >>
-> >> So the most of the work is done by compiler.
-> >> This patch just implements ubsan handlers printing errors.
-> >>
-> >> GCC supports this since 4.9, however upcoming GCC 5.0 has
-> >> more checkers implemented.
-> > 
-> > It might be useful if you've got a link to the relevant GCC
-> > documentation of this new shiny stuf.
-> > 
-> 
-> Documentation is very brief (look for fsanitize=undefined): https://gcc.gnu.org/onlinedocs/gcc/Debugging-Options.html
-> GCC 4.9.1 doc: https://gcc.gnu.org/onlinedocs/gcc-4.9.1/gcc/Debugging-Options.html
-> 
-> And there is an article which might be interesting: http://developerblog.redhat.com/2014/10/16/gcc-undefined-behavior-sanitizer-ubsan/
+2014-10-24 12:31 GMT+04:00 y.gribov <y.gribov@samsung.com>:
+>> Unaligned accesses disabled because they are allowed on some arches (see
+> HAVE_EFFICIENT_UNALIGNED_ACCESS).
+>> Another reason is that there are to many reports. Not because there are
+>> lot of bugs, but because
+>> there are many reports for one bug.
+>
+> A side note - unaligned accesses would prevent KASan from doing it's job
+> well because instrumentation code relies on address alignment when
+> performing the check.
+>
 
-Thanks, please consider including these in the changelog of future
-postings of this patch set.
+I guess it only matters for inline instrumentation, right?
+Because in outline case I've taken care about unaligned accesses.
+
+We could do following trick in Kconfig:
+      select HAVE_EFFICIENT_UNALIGNED_ACCESS if !KASAN
+
+This will prevent a lot of unaligned accesses, but surely not all of them
+
+
+
+-- 
+Best regards,
+Andrey Ryabinin
