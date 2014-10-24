@@ -1,48 +1,72 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-yh0-f53.google.com ([209.85.213.53]:36860 "EHLO
-	mail-yh0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756066AbaJXKg0 (ORCPT
+Received: from aserp1040.oracle.com ([141.146.126.69]:31622 "EHLO
+	aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756723AbaJXNYf (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 24 Oct 2014 06:36:26 -0400
+	Fri, 24 Oct 2014 09:24:35 -0400
+Message-ID: <544A52D7.6000202@oracle.com>
+Date: Fri, 24 Oct 2014 09:23:35 -0400
+From: Sasha Levin <sasha.levin@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <1414139506040-968477.post@n7.nabble.com>
-References: <1413802499-17928-1-git-send-email-a.ryabinin@samsung.com>
-	<1413802499-17928-2-git-send-email-a.ryabinin@samsung.com>
-	<5445640F.10000@oracle.com>
-	<5446135E.9020101@samsung.com>
-	<1414139506040-968477.post@n7.nabble.com>
-Date: Fri, 24 Oct 2014 14:36:25 +0400
-Message-ID: <CAPAsAGxuJJYwS2fQ5r63U=xY_MSSb=5vc_tUBvTjkq=JoXhd8A@mail.gmail.com>
-Subject: Re: [RFC PATCH] UBSan: run-time undefined behavior sanity checker
-From: Andrey Ryabinin <ryabinin.a.a@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: drivers: random: Shift out-of-bounds in _mix_pool_bytes
+References: <1413802499-17928-1-git-send-email-a.ryabinin@samsung.com> <5444EBFA.5030103@samsung.com> <20141020124929.GA23177@thunk.org> <54451501.2070700@samsung.com> <5445179A.4080804@redhat.com> <20141020141635.GA4499@thunk.org> <20141024100108.GF12706@worktop.programming.kicks-ass.net>
+In-Reply-To: <20141024100108.GF12706@worktop.programming.kicks-ass.net>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "y.gribov" <y.gribov@samsung.com>
-Cc: LKML <linux-kernel@vger.kernel.org>, Konstantin Khlebnikov <koct9i@gmail.com>, Randy Dunlap <rdunlap@infradead.org>, Peter Zijlstra <peterz@infradead.org>, Andrew Morton <akpm@linux-foundation.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Sasha Levin <sasha.levin@oracle.com>, Michal Marek <mmarek@suse.cz>, linux@rasmusvillemoes.dk, x86@kernel.org, linux-kbuild@vger.kernel.org, Theodore Ts'o <tytso@mit.edu>, Andreas Dilger <adilger.kernel@dilger.ca>, Dmitry Vyukov <dvyukov@google.com>
+To: Peter Zijlstra <peterz@infradead.org>, Theodore Ts'o <tytso@mit.edu>, Daniel Borkmann <dborkman@redhat.com>, Andrey Ryabinin <a.ryabinin@samsung.com>, Andrew Morton <akpm@linux-foundation.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>, x86@kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Andreas Dilger <adilger.kernel@dilger.ca>, Dmitry Vyukov <dvyukov@google.com>, Konstantin Khlebnikov <koct9i@gmail.com>
 
-2014-10-24 12:31 GMT+04:00 y.gribov <y.gribov@samsung.com>:
->> Unaligned accesses disabled because they are allowed on some arches (see
-> HAVE_EFFICIENT_UNALIGNED_ACCESS).
->> Another reason is that there are to many reports. Not because there are
->> lot of bugs, but because
->> there are many reports for one bug.
->
-> A side note - unaligned accesses would prevent KASan from doing it's job
-> well because instrumentation code relies on address alignment when
-> performing the check.
->
+On 10/24/2014 06:01 AM, Peter Zijlstra wrote:
+> On Mon, Oct 20, 2014 at 10:16:35AM -0400, Theodore Ts'o wrote:
+>> > On Mon, Oct 20, 2014 at 04:09:30PM +0200, Daniel Borkmann wrote:
+>>>> > > >
+>>>> > > >It's triggering when input_rotate == 0, so UBSan complains about right shift in rol32()
+>>>> > > >
+>>>> > > >static inline __u32 rol32(__u32 word, unsigned int shift)
+>>>> > > >{
+>>>> > > >	return (word << shift) | (word >> (32 - shift));
+>>>> > > >}
+>>> > > 
+>>> > > So that would be the case when the entropy store's input_rotate calls
+>>> > > _mix_pool_bytes() for the very first time ... I don't think it's an
+>>> > > issue though.
+>> > 
+>> > I'm sure it's not an issue, but it's still true that 
+>> > 
+>> > 	return (word << 0) | (word >> 32);
+>> > 
+>> > is technically not undefined, and while it would be unfortunate (and
+>> > highly unlikely) if gcc were to say, start nethack, it's technically
+>> > allowed by the C spec.  :-)
+> In fact, n >> 32 == n.
+> 
+> #include <stdio.h>
+> 
+> int main(int argc, char **argv)
+> {
+> 	int i = atoi(argv[1]);
+> 	int shift = atoi(argv[2]);
+> 	printf("%x\n", i >> shift);
+> 	return 0;
+> }
+> 
+> $ ./shift 5 32
+> 5
+> 
+> On x86 at least the shift ops simply mask out the upper bits and
+> therefore the 32 == 0.
+> 
+> So you end up OR-ing the same value twice, which is harmless.
+> 
+> So no misbehaviour on the rol32() function.
+> 
+> I think I've ran into this before, in that case I did get fail because I
+> did indeed expect the 0 and things didn't work out.
 
-I guess it only matters for inline instrumentation, right?
-Because in outline case I've taken care about unaligned accesses.
-
-We could do following trick in Kconfig:
-      select HAVE_EFFICIENT_UNALIGNED_ACCESS if !KASAN
-
-This will prevent a lot of unaligned accesses, but surely not all of them
+i >> 32 may happen to be "i", but is there anything that prevents the compiler
+from returning, let's say, 42?
 
 
-
--- 
-Best regards,
-Andrey Ryabinin
+Thanks,
+Sasha
