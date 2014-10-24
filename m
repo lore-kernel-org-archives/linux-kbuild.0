@@ -1,72 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from aserp1040.oracle.com ([141.146.126.69]:31622 "EHLO
-	aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756723AbaJXNYf (ORCPT
+Received: from bombadil.infradead.org ([198.137.202.9]:60138 "EHLO
+	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756787AbaJXNmN (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 24 Oct 2014 09:24:35 -0400
-Message-ID: <544A52D7.6000202@oracle.com>
-Date: Fri, 24 Oct 2014 09:23:35 -0400
-From: Sasha Levin <sasha.levin@oracle.com>
-MIME-Version: 1.0
+	Fri, 24 Oct 2014 09:42:13 -0400
+Date: Fri, 24 Oct 2014 15:42:05 +0200
+From: Peter Zijlstra <peterz@infradead.org>
 Subject: Re: drivers: random: Shift out-of-bounds in _mix_pool_bytes
-References: <1413802499-17928-1-git-send-email-a.ryabinin@samsung.com> <5444EBFA.5030103@samsung.com> <20141020124929.GA23177@thunk.org> <54451501.2070700@samsung.com> <5445179A.4080804@redhat.com> <20141020141635.GA4499@thunk.org> <20141024100108.GF12706@worktop.programming.kicks-ass.net>
-In-Reply-To: <20141024100108.GF12706@worktop.programming.kicks-ass.net>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Message-ID: <20141024134205.GB21513@worktop.programming.kicks-ass.net>
+References: <1413802499-17928-1-git-send-email-a.ryabinin@samsung.com>
+ <5444EBFA.5030103@samsung.com>
+ <20141020124929.GA23177@thunk.org>
+ <54451501.2070700@samsung.com>
+ <5445179A.4080804@redhat.com>
+ <20141020141635.GA4499@thunk.org>
+ <20141024100108.GF12706@worktop.programming.kicks-ass.net>
+ <544A52D7.6000202@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <544A52D7.6000202@oracle.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Peter Zijlstra <peterz@infradead.org>, Theodore Ts'o <tytso@mit.edu>, Daniel Borkmann <dborkman@redhat.com>, Andrey Ryabinin <a.ryabinin@samsung.com>, Andrew Morton <akpm@linux-foundation.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>, x86@kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Andreas Dilger <adilger.kernel@dilger.ca>, Dmitry Vyukov <dvyukov@google.com>, Konstantin Khlebnikov <koct9i@gmail.com>
+To: Sasha Levin <sasha.levin@oracle.com>
+Cc: Theodore Ts'o <tytso@mit.edu>, Daniel Borkmann <dborkman@redhat.com>, Andrey Ryabinin <a.ryabinin@samsung.com>, Andrew Morton <akpm@linux-foundation.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>, x86@kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Andreas Dilger <adilger.kernel@dilger.ca>, Dmitry Vyukov <dvyukov@google.com>, Konstantin Khlebnikov <koct9i@gmail.com>
 
-On 10/24/2014 06:01 AM, Peter Zijlstra wrote:
-> On Mon, Oct 20, 2014 at 10:16:35AM -0400, Theodore Ts'o wrote:
->> > On Mon, Oct 20, 2014 at 04:09:30PM +0200, Daniel Borkmann wrote:
->>>> > > >
->>>> > > >It's triggering when input_rotate == 0, so UBSan complains about right shift in rol32()
->>>> > > >
->>>> > > >static inline __u32 rol32(__u32 word, unsigned int shift)
->>>> > > >{
->>>> > > >	return (word << shift) | (word >> (32 - shift));
->>>> > > >}
->>> > > 
->>> > > So that would be the case when the entropy store's input_rotate calls
->>> > > _mix_pool_bytes() for the very first time ... I don't think it's an
->>> > > issue though.
->> > 
->> > I'm sure it's not an issue, but it's still true that 
->> > 
->> > 	return (word << 0) | (word >> 32);
->> > 
->> > is technically not undefined, and while it would be unfortunate (and
->> > highly unlikely) if gcc were to say, start nethack, it's technically
->> > allowed by the C spec.  :-)
-> In fact, n >> 32 == n.
+On Fri, Oct 24, 2014 at 09:23:35AM -0400, Sasha Levin wrote:
 > 
-> #include <stdio.h>
-> 
-> int main(int argc, char **argv)
-> {
-> 	int i = atoi(argv[1]);
-> 	int shift = atoi(argv[2]);
-> 	printf("%x\n", i >> shift);
-> 	return 0;
-> }
-> 
-> $ ./shift 5 32
-> 5
-> 
-> On x86 at least the shift ops simply mask out the upper bits and
-> therefore the 32 == 0.
-> 
-> So you end up OR-ing the same value twice, which is harmless.
-> 
-> So no misbehaviour on the rol32() function.
-> 
-> I think I've ran into this before, in that case I did get fail because I
-> did indeed expect the 0 and things didn't work out.
+> i >> 32 may happen to be "i", but is there anything that prevents the compiler
+> from returning, let's say, 42?
 
-i >> 32 may happen to be "i", but is there anything that prevents the compiler
-from returning, let's say, 42?
+Not really, although gcc seems to opt for the 'sane' option and emit the
+instruction and let the arch figure out how to deal with it. Hence the
+'fun' difference between x86 and ARM.
 
 
-Thanks,
-Sasha
