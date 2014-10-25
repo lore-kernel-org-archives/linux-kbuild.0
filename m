@@ -1,39 +1,79 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from aserp1040.oracle.com ([141.146.126.69]:18588 "EHLO
-	aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754825AbaJYAvv (ORCPT
+Received: from 251.110.2.81.in-addr.arpa ([81.2.110.251]:41870 "EHLO
+	lxorguk.ukuu.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750997AbaJYUd5 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 24 Oct 2014 20:51:51 -0400
-Message-ID: <544AF3E6.7090003@oracle.com>
-Date: Fri, 24 Oct 2014 20:50:46 -0400
-From: Sasha Levin <sasha.levin@oracle.com>
-MIME-Version: 1.0
+	Sat, 25 Oct 2014 16:33:57 -0400
+Date: Sat, 25 Oct 2014 21:30:17 +0100
+From: One Thousand Gnomes <gnomes@lxorguk.ukuu.org.uk>
 Subject: Re: drivers: random: Shift out-of-bounds in _mix_pool_bytes
-References: <1413802499-17928-1-git-send-email-a.ryabinin@samsung.com> <5444EBFA.5030103@samsung.com> <20141020124929.GA23177@thunk.org> <54451501.2070700@samsung.com> <5445179A.4080804@redhat.com> <20141020141635.GA4499@thunk.org> <20141024100108.GF12706@worktop.programming.kicks-ass.net> <544A52D7.6000202@oracle.com> <20141024134205.GB21513@worktop.programming.kicks-ass.net> <544A6A6B.3040602@oracle.com> <CACT4Y+boMTKpTovCWYQa6baSAWjagCN=mwXBZGAjbobzG80oWA@mail.gmail.com> <2E512EF7-577C-43C2-AB95-30DC25AD059D@dilger.ca> <544AD123.1010304@zytor.com>
-In-Reply-To: <544AD123.1010304@zytor.com>
-Content-Type: text/plain; charset=utf-8
+Message-ID: <20141025213017.2da2f819@alan.etchedpixels.co.uk>
+In-Reply-To: <544AF3E6.7090003@oracle.com>
+References: <1413802499-17928-1-git-send-email-a.ryabinin@samsung.com>
+	<5444EBFA.5030103@samsung.com>
+	<20141020124929.GA23177@thunk.org>
+	<54451501.2070700@samsung.com>
+	<5445179A.4080804@redhat.com>
+	<20141020141635.GA4499@thunk.org>
+	<20141024100108.GF12706@worktop.programming.kicks-ass.net>
+	<544A52D7.6000202@oracle.com>
+	<20141024134205.GB21513@worktop.programming.kicks-ass.net>
+	<544A6A6B.3040602@oracle.com>
+	<CACT4Y+boMTKpTovCWYQa6baSAWjagCN=mwXBZGAjbobzG80oWA@mail.gmail.com>
+	<2E512EF7-577C-43C2-AB95-30DC25AD059D@dilger.ca>
+	<544AD123.1010304@zytor.com>
+	<544AF3E6.7090003@oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "H. Peter Anvin" <hpa@zytor.com>, Andreas Dilger <adilger@dilger.ca>, Dmitry Vyukov <dvyukov@google.com>
-Cc: Peter Zijlstra <peterz@infradead.org>, Theodore Ts'o <tytso@mit.edu>, Daniel Borkmann <dborkman@redhat.com>, Andrey Ryabinin <a.ryabinin@samsung.com>, Andrew Morton <akpm@linux-foundation.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Michal Marek <mmarek@suse.cz>, "x86@kernel.org" <x86@kernel.org>, linux-kbuild@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, Andreas Dilger <adilger.kernel@dilger.ca>, Konstantin Khlebnikov <koct9i@gmail.com>
+To: Sasha Levin <sasha.levin@oracle.com>
+Cc: "H. Peter Anvin" <hpa@zytor.com>, Andreas Dilger <adilger@dilger.ca>, Dmitry Vyukov <dvyukov@google.com>, Peter Zijlstra <peterz@infradead.org>, Theodore Ts'o <tytso@mit.edu>, Daniel Borkmann <dborkman@redhat.com>, Andrey Ryabinin <a.ryabinin@samsung.com>, Andrew Morton <akpm@linux-foundation.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Michal Marek <mmarek@suse.cz>, "x86@kernel.org" <x86@kernel.org>, linux-kbuild@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, Andreas Dilger <adilger.kernel@dilger.ca>, Konstantin Khlebnikov <koct9i@gmail.com>
 
-On 10/24/2014 06:22 PM, H. Peter Anvin wrote:
->> By the principle of least surprise, I would expect "__u32 >> N", where
->> > N >= 32 to return zero instead of random garbage.  For N < 32 it will
->> > return progressively smaller numbers, until it has shifted away all of
->> > the set bits, at which turn it will return 0.  For it suddenly to jump
->> > up once N = 32 is used, is counter-intuitive.
->> > 
-> That's why it is undefined.
+On Fri, 24 Oct 2014 20:50:46 -0400
+Sasha Levin <sasha.levin@oracle.com> wrote:
 
-Now I'm curious about things like "memcpy(ptr, NULL, 0)". According to the
-standard they're undefined, and since we're using gcc's implementation for
-memcpy() we are doing "undefined memcpy" in quite a few places in the kernel.
+> On 10/24/2014 06:22 PM, H. Peter Anvin wrote:
+> >> By the principle of least surprise, I would expect "__u32 >> N", where
+> >> > N >= 32 to return zero instead of random garbage.  For N < 32 it will
+> >> > return progressively smaller numbers, until it has shifted away all of
+> >> > the set bits, at which turn it will return 0.  For it suddenly to jump
+> >> > up once N = 32 is used, is counter-intuitive.
+> >> > 
+> > That's why it is undefined.
+> 
+> Now I'm curious about things like "memcpy(ptr, NULL, 0)". According to the
+> standard they're undefined, and since we're using gcc's implementation for
+> memcpy() we are doing "undefined memcpy" in quite a few places in the kernel.
+> 
+> Is it an issue, or would you expect memcpy() to not deref the "from" ptr
+> since length is 0?
 
-Is it an issue, or would you expect memcpy() to not deref the "from" ptr
-since length is 0?
+No. Furthermore gcc 4.9 actually has optimiser magic around this. See the
+"Porting to gcc 4.9" notes.
+
+--------
+
+ GCC might now optimize away the null pointer check in code like:
 
 
-Thanks,
-Sasha
+  int copy (int* dest, int* src, size_t nbytes) {
+    memmove (dest, src, nbytes);
+    if (src != NULL)
+      return *src;
+    return 0;
+  }
+
+The pointers passed to memmove (and similar functions in <string.h>) must
+be non-null even when nbytes==0, so GCC can use that information to
+remove the check after the memmove call. Calling copy(p, NULL, 0) can
+therefore deference a null pointer and crash.
+
+-------------
+
+Which is unfortunate because an operating system has a lot of legitimate
+reasons to copy data to address 0 (on many processors its the exception
+vectors for example)
+
+Alan
