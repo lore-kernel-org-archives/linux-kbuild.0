@@ -1,51 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f193.google.com ([209.85.212.193]:56343 "EHLO
-	mail-wi0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753335AbaJ0TTI (ORCPT
+Received: from mailout3.w1.samsung.com ([210.118.77.13]:34447 "EHLO
+	mailout3.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751375AbaJ1OSZ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 27 Oct 2014 15:19:08 -0400
-From: Nikos Giotis <nikos.giotis@gmail.com>
-Subject: [PATCH] scripts/kconfig: Add tinfo library to linker library search
-Date: Mon, 27 Oct 2014 21:18:37 +0200
-Message-Id: <1414437517-23558-1-git-send-email-nikos.giotis@gmail.com>
+	Tue, 28 Oct 2014 10:18:25 -0400
+Subject: [PATCH] Makefile: sort list of defconfig targets in make help output
+From: Konstantin Khlebnikov <k.khlebnikov@samsung.com>
+Date: Tue, 28 Oct 2014 17:18:20 +0400
+Message-id: <20141028141820.14137.64256.stgit@buzz>
+MIME-version: 1.0
+Content-type: text/plain; charset=utf-8
+Content-transfer-encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: yann.morin.1998@free.fr
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Nikos Giotis <nikos.giotis@gmail.com>
+To: Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-For systems that have ncurses library configured with the
-"--with termlib=tinfo" option the linker reports errors when
-running "make menuconfig" due to undefined reference to symbol
-'acs_map'. The change does not change the behaviour when
-building against ncurses configured without this option. The
-tinfo library is included in the lists of libraries that are
-searched when buidling lxdialog sources.
+Without sorting this list is completely unreadable for ARCH=arm.
 
-Tested with kernel 3.14.22 and latest master from git
-
-Signed-off-by: Nikos Giotis <nikos.giotis@gmail.com>
+Signed-off-by: Konstantin Khlebnikov <k.khlebnikov@samsung.com>
 ---
- scripts/kconfig/lxdialog/check-lxdialog.sh | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ Makefile |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/scripts/kconfig/lxdialog/check-lxdialog.sh b/scripts/kconfig/lxdialog/check-lxdialog.sh
-index 5075ebf..202e4bf 100755
---- a/scripts/kconfig/lxdialog/check-lxdialog.sh
-+++ b/scripts/kconfig/lxdialog/check-lxdialog.sh
-@@ -4,10 +4,10 @@
- # What library to link
- ldflags()
- {
--	pkg-config --libs ncursesw 2>/dev/null && exit
--	pkg-config --libs ncurses 2>/dev/null && exit
-+	pkg-config --libs ncursesw tinfo 2>/dev/null && exit
-+	pkg-config --libs ncurses tinfo 2>/dev/null && exit
- 	for ext in so a dll.a dylib ; do
--		for lib in ncursesw ncurses curses ; do
-+		for lib in ncursesw ncurses curses tinfo ; do
- 			$cc -print-file-name=lib${lib}.${ext} | grep -q /
- 			if [ $? -eq 0 ]; then
- 				echo "-l${lib}"
--- 
-1.8.4
+diff --git a/Makefile b/Makefile
+index 52c1297..63f05dc 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1234,7 +1234,7 @@ rpm: include/config/kernel.release FORCE
+ # ---------------------------------------------------------------------------
+ 
+ boards := $(wildcard $(srctree)/arch/$(SRCARCH)/configs/*_defconfig)
+-boards := $(notdir $(boards))
++boards := $(sort $(notdir $(boards)))
+ board-dirs := $(dir $(wildcard $(srctree)/arch/$(SRCARCH)/configs/*/*_defconfig))
+ board-dirs := $(sort $(notdir $(board-dirs:/=)))
+ 
 
