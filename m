@@ -1,129 +1,87 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.mei.co.jp ([133.183.100.20]:49546 "EHLO smtp.mei.co.jp"
+Received: from mx1.redhat.com ([209.132.183.28]:41933 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752283AbaJ2H1z (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 29 Oct 2014 03:27:55 -0400
-From: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Subject: [PATCH] kbuild: collect shorthands into the top Makefile
-Date: Wed, 29 Oct 2014 16:27:31 +0900
-Message-Id: <1414567651-2503-1-git-send-email-yamada.m@jp.panasonic.com>
+	id S1752071AbaJ2IRo (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 29 Oct 2014 04:17:44 -0400
+Date: Wed, 29 Oct 2014 09:16:03 +0100
+From: Jiri Olsa <jolsa@redhat.com>
+Subject: Re: [PATCH v4 04/14] perf tools: Add kbuild support into
+ Makefile.kbuild
+Message-ID: <20141029081603.GC3538@krava.brq.redhat.com>
+References: <20141024124601.GX14687@kernel.org>
+ <1414275639-1053-5-git-send-email-alexis.berlemont@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1414275639-1053-5-git-send-email-alexis.berlemont@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.m@jp.panasonic.com>, Michal Marek <mmarek@suse.cz>, "H. Peter Anvin" <hpa@linux.intel.com>, Andi Kleen <ak@linux.intel.com>, Sam Ravnborg <sam@ravnborg.org>, linux-kernel@vger.kernel.org
+To: Alexis Berlemont <alexis.berlemont@gmail.com>
+Cc: linux-kernel@vger.kernel.org, dsahern@gmail.com, mingo@redhat.com, a.p.zijlstra@chello.nl, paulus@samba.org, acme@kernel.org, namhyung@kernel.org, mmarek@suse.cz, Arnaldo Carvalho de Melo <acme@ghostprotocols.net>, Ingo Molnar <mingo@elte.hu>, Corey Ashford <cjashfor@linux.vnet.ibm.com>, Frederic Weisbecker <fweisbec@gmail.com>, Borislav Petkov <bp@alien8.de>, linux-kbuild@vger.kernel.org, Stephane Eranian <eranian@google.com>
 
-The motivation of this commit is to avoid duplicated definitions
-of "clean" and "hdr-inst" shorthands.
+On Sun, Oct 26, 2014 at 12:20:29AM +0200, Alexis Berlemont wrote:
+> From: Jiri Olsa <jolsa@redhat.com>
 
-The shorthand "clean" is defined in both the top Makefile and
-scripts/Makefile.clean.
+SNIP
 
-Likewise, "hdr-inst" is defined in both the top Makefile and
-scripts/Makefile.headersinst.
+> ---
+>  tools/perf/Kbuild                                  |  47 +++
+>  tools/perf/Kconfig                                 | 284 ++++++++++++++
+>  tools/perf/Makefile.kbuild                         | 431 +++++++++++++++++++++
+>  tools/perf/Makefile.perf                           |   2 +-
+>  tools/perf/arch/Kbuild                             |   3 +
+>  tools/perf/arch/arm/Kbuild                         |   2 +
+>  tools/perf/arch/arm/Makefile                       |  14 -
+>  tools/perf/arch/arm/tests/Kbuild                   |   2 +
+>  tools/perf/arch/arm/util/Kbuild                    |   3 +
+>  tools/perf/arch/arm64/Kbuild                       |   1 +
+>  tools/perf/arch/arm64/Makefile                     |   7 -
+>  tools/perf/arch/arm64/util/Kbuild                  |   2 +
+>  tools/perf/arch/powerpc/Kbuild                     |   1 +
+>  tools/perf/arch/powerpc/Makefile                   |   6 -
+>  tools/perf/arch/powerpc/util/Kbuild                |   3 +
+>  tools/perf/arch/s390/Kbuild                        |   1 +
+>  tools/perf/arch/s390/Makefile                      |   7 -
+>  tools/perf/arch/s390/util/Kbuild                   |   2 +
+>  tools/perf/arch/sh/Kbuild                          |   1 +
+>  tools/perf/arch/sh/Makefile                        |   4 -
+>  tools/perf/arch/sh/util/Kbuild                     |   1 +
+>  tools/perf/arch/sparc/Kbuild                       |   1 +
+>  tools/perf/arch/sparc/Makefile                     |   4 -
+>  tools/perf/arch/sparc/util/Kbuild                  |   1 +
+>  tools/perf/arch/x86/Kbuild                         |   1 +
+>  tools/perf/arch/x86/tests/Kbuild                   |   3 +
+>  tools/perf/{ => arch/x86}/tests/perf-time-to-tsc.c |   0
+>  tools/perf/arch/x86/util/Kbuild                    |   5 +
+>  tools/perf/bench/Kbuild                            |  12 +
+>  tools/perf/builtin-cmds.h                          |   4 +
+>  tools/perf/config/Makefile                         |  55 ++-
+>  tools/perf/config/Makefile.fix-config              | 104 +++++
+>  tools/perf/config/Makefile.fix-legacy              |  46 +++
+>  tools/perf/config/defconfig                        |  54 +++
+>  tools/perf/perf-sys.h                              |   4 +-
+>  tools/perf/scripts/perl/Perf-Trace-Util/Kbuild     |   6 +
+>  tools/perf/scripts/python/Perf-Trace-Util/Kbuild   |   5 +
+>  tools/perf/tests/Kbuild                            |  38 ++
+>  tools/perf/ui/Kbuild                               |  15 +
+>  tools/perf/ui/browsers/Kbuild                      |   9 +
+>  tools/perf/ui/gtk/Kbuild                           |   9 +
+>  tools/perf/ui/stdio/Kbuild                         |   1 +
+>  tools/perf/ui/tui/Kbuild                           |   4 +
+>  tools/perf/util/Kbuild                             | 126 ++++++
+>  tools/perf/util/PERF-VERSION-GEN                   |   4 +
+>  tools/perf/util/generate-cmdlist.sh                |   8 +-
+>  tools/perf/util/scripting-engines/Kbuild           |  11 +
+>  tools/perf/util/setup.py                           |   8 +-
 
-The idea here is define and export them in the top Makefile
-because $(srctree) is constant during the build process.
+so this patch took the perf Makefile (at that time) and changed it to
+use the kbuild.. but since that time the Makefile.perf came and many
+other changes, which need to be reflected in Makefile.kbuild
 
-For consistency, "build" and "modbuiltin" should be also moved.
+I need to revisit the logic and split the change into more incremental
+patches (the patchset is too big)
 
-Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
----
+I can redo patches 2,3,4 and get back to you, sounds ok?
 
- Makefile                     | 13 ++++++-------
- scripts/Kbuild.include       | 12 ------------
- scripts/Makefile.clean       |  5 -----
- scripts/Makefile.headersinst |  1 -
- 4 files changed, 6 insertions(+), 25 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index 52c1297..cb29318 100644
---- a/Makefile
-+++ b/Makefile
-@@ -440,6 +440,12 @@ export RCS_FIND_IGNORE := \( -name SCCS -o -name BitKeeper -o -name .svn -o    \
- export RCS_TAR_IGNORE := --exclude SCCS --exclude BitKeeper --exclude .svn \
- 			 --exclude CVS --exclude .pc --exclude .hg --exclude .git
- 
-+# Shorthands
-+export build := -f $(srctree)/scripts/Makefile.build obj
-+export modbuiltin := -f $(srctree)/scripts/Makefile.modbuiltin obj
-+export clean := -f $(srctree)/scripts/Makefile.clean obj
-+export hdr-inst := -rR -f $(srctree)/scripts/Makefile.headersinst obj
-+
- # ===========================================================================
- # Rules shared between *config targets and build targets
- 
-@@ -1035,8 +1041,6 @@ firmware_install: FORCE
- #Default location for installed headers
- export INSTALL_HDR_PATH = $(objtree)/usr
- 
--hdr-inst := -rR -f $(srctree)/scripts/Makefile.headersinst obj
--
- # If we do an all arch process set dst to asm-$(hdr-arch)
- hdr-dst = $(if $(KBUILD_HEADERS), dst=include/asm-$(hdr-arch), dst=include/asm)
- 
-@@ -1580,11 +1584,6 @@ ifneq ($(cmd_files),)
-   include $(cmd_files)
- endif
- 
--# Shorthand for $(Q)$(MAKE) -f scripts/Makefile.clean obj=dir
--# Usage:
--# $(Q)$(MAKE) $(clean)=dir
--clean := -f $(srctree)/scripts/Makefile.clean obj
--
- endif	# skip-makefile
- 
- PHONY += FORCE
-diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index 65e7b08..98f081b 100644
---- a/scripts/Kbuild.include
-+++ b/scripts/Kbuild.include
-@@ -167,18 +167,6 @@ ld-ifversion = $(shell [ $(call ld-version) $(1) $(2) ] && echo $(3))
- 
- ######
- 
--###
--# Shorthand for $(Q)$(MAKE) -f scripts/Makefile.build obj=
--# Usage:
--# $(Q)$(MAKE) $(build)=dir
--build := -f $(srctree)/scripts/Makefile.build obj
--
--###
--# Shorthand for $(Q)$(MAKE) -f scripts/Makefile.modbuiltin obj=
--# Usage:
--# $(Q)$(MAKE) $(modbuiltin)=dir
--modbuiltin := -f $(srctree)/scripts/Makefile.modbuiltin obj
--
- # Prefix -I with $(srctree) if it is not an absolute path.
- # skip if -I has no parameter
- addtree = $(if $(patsubst -I%,%,$(1)), \
-diff --git a/scripts/Makefile.clean b/scripts/Makefile.clean
-index b1c668d..2acaabd 100644
---- a/scripts/Makefile.clean
-+++ b/scripts/Makefile.clean
-@@ -7,11 +7,6 @@ src := $(obj)
- PHONY := __clean
- __clean:
- 
--# Shorthand for $(Q)$(MAKE) scripts/Makefile.clean obj=dir
--# Usage:
--# $(Q)$(MAKE) $(clean)=dir
--clean := -f $(srctree)/scripts/Makefile.clean obj
--
- # The filename Kbuild has precedence over Makefile
- kbuild-dir := $(if $(filter /%,$(src)),$(src),$(srctree)/$(src))
- include $(if $(wildcard $(kbuild-dir)/Kbuild), $(kbuild-dir)/Kbuild, $(kbuild-dir)/Makefile)
-diff --git a/scripts/Makefile.headersinst b/scripts/Makefile.headersinst
-index 8ccf830..1106d6c 100644
---- a/scripts/Makefile.headersinst
-+++ b/scripts/Makefile.headersinst
-@@ -122,7 +122,6 @@ $(check-file): scripts/headers_check.pl $(output-files) FORCE
- endif
- 
- # Recursion
--hdr-inst := -rR -f $(srctree)/scripts/Makefile.headersinst obj
- .PHONY: $(subdirs)
- $(subdirs):
- 	$(Q)$(MAKE) $(hdr-inst)=$(obj)/$@ dst=$(_dst)/$@
--- 
-1.9.1
-
+thanks,
+jirka
