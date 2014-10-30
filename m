@@ -1,98 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f44.google.com ([74.125.82.44]:40711 "EHLO
-	mail-wg0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757077AbaJ2XHe (ORCPT
+Received: from mail-wg0-f50.google.com ([74.125.82.50]:40447 "EHLO
+	mail-wg0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752318AbaJ3T0o (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 29 Oct 2014 19:07:34 -0400
-Date: Thu, 30 Oct 2014 00:05:07 +0100
-From: Alexis Berlemont <alexis.berlemont@gmail.com>
-Subject: Re: [PATCH v4 04/14] perf tools: Add kbuild support into
- Makefile.kbuild
-Message-ID: <20141029230507.GA15701@marx-slim.home>
-References: <20141024124601.GX14687@kernel.org>
- <1414275639-1053-5-git-send-email-alexis.berlemont@gmail.com>
- <20141029081603.GC3538@krava.brq.redhat.com>
+	Thu, 30 Oct 2014 15:26:44 -0400
+Date: Thu, 30 Oct 2014 20:26:38 +0100
+From: Robert Richter <rric@kernel.org>
+Subject: Re: [GIT PULL] dts, kbuild: Implement support for dtb vendor subdirs
+Message-ID: <20141030192638.GX20170@rric.localhost>
+References: <1409899692-1455-1-git-send-email-rric@kernel.org>
+ <20141021181504.GV20170@rric.localhost>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20141029081603.GC3538@krava.brq.redhat.com>
+In-Reply-To: <20141021181504.GV20170@rric.localhost>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jiri Olsa <jolsa@redhat.com>
-Cc: linux-kernel@vger.kernel.org, dsahern@gmail.com, mingo@redhat.com, a.p.zijlstra@chello.nl, paulus@samba.org, acme@kernel.org, namhyung@kernel.org, mmarek@suse.cz, Arnaldo Carvalho de Melo <acme@ghostprotocols.net>, Ingo Molnar <mingo@elte.hu>, Corey Ashford <cjashfor@linux.vnet.ibm.com>, Frederic Weisbecker <fweisbec@gmail.com>, Borislav Petkov <bp@alien8.de>, linux-kbuild@vger.kernel.org, Stephane Eranian <eranian@google.com>
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Olof Johansson <olof@lixom.net>, Rob Herring <robh+dt@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Michal Marek <mmarek@suse.cz>, linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Robert Richter <rrichter@cavium.com>, Andrew Bresticker <abrestic@google.com>, Abhilash Kesavan <kesavan.abhilash@gmail.com>
 
-Jiri Olsa wrote:
-> On Sun, Oct 26, 2014 at 12:20:29AM +0200, Alexis Berlemont wrote:
-> > From: Jiri Olsa <jolsa@redhat.com>
-> 
-> SNIP
-> 
-> > ---
-> >  tools/perf/Kbuild                                  |  47 +++
-> >  tools/perf/Kconfig                                 | 284 ++++++++++++++
-> >  tools/perf/Makefile.kbuild                         | 431 +++++++++++++++++++++
-> >  tools/perf/Makefile.perf                           |   2 +-
-> >  tools/perf/arch/Kbuild                             |   3 +
-> >  tools/perf/arch/arm/Kbuild                         |   2 +
-> >  tools/perf/arch/arm/Makefile                       |  14 -
-> >  tools/perf/arch/arm/tests/Kbuild                   |   2 +
-> >  tools/perf/arch/arm/util/Kbuild                    |   3 +
-> >  tools/perf/arch/arm64/Kbuild                       |   1 +
-> >  tools/perf/arch/arm64/Makefile                     |   7 -
-> >  tools/perf/arch/arm64/util/Kbuild                  |   2 +
-> >  tools/perf/arch/powerpc/Kbuild                     |   1 +
-> >  tools/perf/arch/powerpc/Makefile                   |   6 -
-> >  tools/perf/arch/powerpc/util/Kbuild                |   3 +
-> >  tools/perf/arch/s390/Kbuild                        |   1 +
-> >  tools/perf/arch/s390/Makefile                      |   7 -
-> >  tools/perf/arch/s390/util/Kbuild                   |   2 +
-> >  tools/perf/arch/sh/Kbuild                          |   1 +
-> >  tools/perf/arch/sh/Makefile                        |   4 -
-> >  tools/perf/arch/sh/util/Kbuild                     |   1 +
-> >  tools/perf/arch/sparc/Kbuild                       |   1 +
-> >  tools/perf/arch/sparc/Makefile                     |   4 -
-> >  tools/perf/arch/sparc/util/Kbuild                  |   1 +
-> >  tools/perf/arch/x86/Kbuild                         |   1 +
-> >  tools/perf/arch/x86/tests/Kbuild                   |   3 +
-> >  tools/perf/{ => arch/x86}/tests/perf-time-to-tsc.c |   0
-> >  tools/perf/arch/x86/util/Kbuild                    |   5 +
-> >  tools/perf/bench/Kbuild                            |  12 +
-> >  tools/perf/builtin-cmds.h                          |   4 +
-> >  tools/perf/config/Makefile                         |  55 ++-
-> >  tools/perf/config/Makefile.fix-config              | 104 +++++
-> >  tools/perf/config/Makefile.fix-legacy              |  46 +++
-> >  tools/perf/config/defconfig                        |  54 +++
-> >  tools/perf/perf-sys.h                              |   4 +-
-> >  tools/perf/scripts/perl/Perf-Trace-Util/Kbuild     |   6 +
-> >  tools/perf/scripts/python/Perf-Trace-Util/Kbuild   |   5 +
-> >  tools/perf/tests/Kbuild                            |  38 ++
-> >  tools/perf/ui/Kbuild                               |  15 +
-> >  tools/perf/ui/browsers/Kbuild                      |   9 +
-> >  tools/perf/ui/gtk/Kbuild                           |   9 +
-> >  tools/perf/ui/stdio/Kbuild                         |   1 +
-> >  tools/perf/ui/tui/Kbuild                           |   4 +
-> >  tools/perf/util/Kbuild                             | 126 ++++++
-> >  tools/perf/util/PERF-VERSION-GEN                   |   4 +
-> >  tools/perf/util/generate-cmdlist.sh                |   8 +-
-> >  tools/perf/util/scripting-engines/Kbuild           |  11 +
-> >  tools/perf/util/setup.py                           |   8 +-
-> 
-> so this patch took the perf Makefile (at that time) and changed it to
-> use the kbuild.. but since that time the Makefile.perf came and many
-> other changes, which need to be reflected in Makefile.kbuild
-> 
-> I need to revisit the logic and split the change into more incremental
-> patches (the patchset is too big)
-> 
-> I can redo patches 2,3,4 and get back to you, sounds ok?
+Arnd,
 
-Of course. 
+On 21.10.14 20:15:04, Robert Richter wrote:
+> please pull this series for inclusion into v3.19 from:
+> 
+>  git://git.kernel.org/pub/scm/linux/kernel/git/rric/linux.git dts-subdirs-for-arm-soc-v3.19
+> 
+> I have updated and rebased the patches to v3.18-rc1. No changes except
+> conflict resolution of patch 5/6.
 
-Which changes in Makefile.perf do you have in mind ? I thought that
-Makefile.kbuild was just supposed to build the few extra dependencies
-(libtraceevent, etc.). I thought that I updated your original patch
-accordingly with the changes before and after the add of
-Makefile.perf.
+have you had the chance to look at this?
 
-Alexis.
+Thanks,
 
+-Robert
