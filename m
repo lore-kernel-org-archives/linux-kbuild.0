@@ -1,55 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.mei.co.jp ([133.183.100.20]:39102 "EHLO smtp.mei.co.jp"
+Received: from mx1.redhat.com ([209.132.183.28]:38068 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1422665AbaJaCNe (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 30 Oct 2014 22:13:34 -0400
-Date: Fri, 31 Oct 2014 11:12:55 +0900
-From: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Subject: Re: [PATCH] kbuild: collect shorthands into the top Makefile
-In-Reply-To: <20141029185907.GA701@ravnborg.org>
-References: <1414567651-2503-1-git-send-email-yamada.m@jp.panasonic.com> <20141029185907.GA701@ravnborg.org>
-Message-Id: <20141031111254.8FF3.AA925319@jp.panasonic.com>
+	id S1750912AbaJaIgL (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 31 Oct 2014 04:36:11 -0400
+Date: Fri, 31 Oct 2014 09:34:27 +0100
+From: Jiri Olsa <jolsa@redhat.com>
+Subject: Re: [PATCH v4 04/14] perf tools: Add kbuild support into
+ Makefile.kbuild
+Message-ID: <20141031083427.GB27472@krava.brq.redhat.com>
+References: <20141024124601.GX14687@kernel.org>
+ <1414275639-1053-5-git-send-email-alexis.berlemont@gmail.com>
+ <20141029081603.GC3538@krava.brq.redhat.com>
+ <20141029230507.GA15701@marx-slim.home>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20141029230507.GA15701@marx-slim.home>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, "H. Peter Anvin" <hpa@linux.intel.com>, Andi Kleen <ak@linux.intel.com>, linux-kernel@vger.kernel.org
+To: Alexis Berlemont <alexis.berlemont@gmail.com>
+Cc: linux-kernel@vger.kernel.org, dsahern@gmail.com, mingo@redhat.com, a.p.zijlstra@chello.nl, paulus@samba.org, acme@kernel.org, namhyung@kernel.org, mmarek@suse.cz, Arnaldo Carvalho de Melo <acme@ghostprotocols.net>, Ingo Molnar <mingo@elte.hu>, Corey Ashford <cjashfor@linux.vnet.ibm.com>, Frederic Weisbecker <fweisbec@gmail.com>, Borislav Petkov <bp@alien8.de>, linux-kbuild@vger.kernel.org, Stephane Eranian <eranian@google.com>
 
-Hi Sam,
+On Thu, Oct 30, 2014 at 12:05:07AM +0100, Alexis Berlemont wrote:
 
-On Wed, 29 Oct 2014 19:59:07 +0100
-Sam Ravnborg <sam@ravnborg.org> wrote:
+SNIP
 
-> On Wed, Oct 29, 2014 at 04:27:31PM +0900, Masahiro Yamada wrote:
-> > The motivation of this commit is to avoid duplicated definitions
-> > of "clean" and "hdr-inst" shorthands.
+> > >  tools/perf/util/Kbuild                             | 126 ++++++
+> > >  tools/perf/util/PERF-VERSION-GEN                   |   4 +
+> > >  tools/perf/util/generate-cmdlist.sh                |   8 +-
+> > >  tools/perf/util/scripting-engines/Kbuild           |  11 +
+> > >  tools/perf/util/setup.py                           |   8 +-
 > > 
-> > The shorthand "clean" is defined in both the top Makefile and
-> > scripts/Makefile.clean.
+> > so this patch took the perf Makefile (at that time) and changed it to
+> > use the kbuild.. but since that time the Makefile.perf came and many
+> > other changes, which need to be reflected in Makefile.kbuild
 > > 
-> > Likewise, "hdr-inst" is defined in both the top Makefile and
-> > scripts/Makefile.headersinst.
+> > I need to revisit the logic and split the change into more incremental
+> > patches (the patchset is too big)
 > > 
-> > The idea here is define and export them in the top Makefile
-> > because $(srctree) is constant during the build process.
-> > 
-> > For consistency, "build" and "modbuiltin" should be also moved.
+> > I can redo patches 2,3,4 and get back to you, sounds ok?
 > 
-> As a general rule the exported names are always UPPERCASE, and local variables
-> are lowercase. (srctree, objtree are the exceptions).
-> This patch define new lowercase variables that conflicts with this.
+> Of course. 
 > 
-> And it is not that logical these are picked up from the enviroment.
-> Could you find a central place to define them rahter than using
-> the environemnt to export them?
+> Which changes in Makefile.perf do you have in mind ? I thought that
+> Makefile.kbuild was just supposed to build the few extra dependencies
+> (libtraceevent, etc.). I thought that I updated your original patch
+> accordingly with the changes before and after the add of
+> Makefile.perf.
 
-Maybe we can collect them into scripts/Kbuild.include
-although it might be too much for Makefile.clean to include
-the whole things in Kbuild.include.
+hm, I just stumbled on QUIET_* stuff definitions in Makefile.kbuild,
+(which got moved into scripts some time ago) and assumed this was
+the case for the rest of the file ;-)
 
-
-Best Regards
-Masahiro Yamada
-
+jirka
