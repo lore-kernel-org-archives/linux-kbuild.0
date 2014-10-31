@@ -1,36 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f50.google.com ([74.125.82.50]:40447 "EHLO
-	mail-wg0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752318AbaJ3T0o (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 30 Oct 2014 15:26:44 -0400
-Date: Thu, 30 Oct 2014 20:26:38 +0100
-From: Robert Richter <rric@kernel.org>
-Subject: Re: [GIT PULL] dts, kbuild: Implement support for dtb vendor subdirs
-Message-ID: <20141030192638.GX20170@rric.localhost>
-References: <1409899692-1455-1-git-send-email-rric@kernel.org>
- <20141021181504.GV20170@rric.localhost>
+Received: from smtp.mei.co.jp ([133.183.100.20]:39102 "EHLO smtp.mei.co.jp"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1422665AbaJaCNe (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 30 Oct 2014 22:13:34 -0400
+Date: Fri, 31 Oct 2014 11:12:55 +0900
+From: Masahiro Yamada <yamada.m@jp.panasonic.com>
+Subject: Re: [PATCH] kbuild: collect shorthands into the top Makefile
+In-Reply-To: <20141029185907.GA701@ravnborg.org>
+References: <1414567651-2503-1-git-send-email-yamada.m@jp.panasonic.com> <20141029185907.GA701@ravnborg.org>
+Message-Id: <20141031111254.8FF3.AA925319@jp.panasonic.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20141021181504.GV20170@rric.localhost>
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Olof Johansson <olof@lixom.net>, Rob Herring <robh+dt@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Michal Marek <mmarek@suse.cz>, linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Robert Richter <rrichter@cavium.com>, Andrew Bresticker <abrestic@google.com>, Abhilash Kesavan <kesavan.abhilash@gmail.com>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, "H. Peter Anvin" <hpa@linux.intel.com>, Andi Kleen <ak@linux.intel.com>, linux-kernel@vger.kernel.org
 
-Arnd,
+Hi Sam,
 
-On 21.10.14 20:15:04, Robert Richter wrote:
-> please pull this series for inclusion into v3.19 from:
+On Wed, 29 Oct 2014 19:59:07 +0100
+Sam Ravnborg <sam@ravnborg.org> wrote:
+
+> On Wed, Oct 29, 2014 at 04:27:31PM +0900, Masahiro Yamada wrote:
+> > The motivation of this commit is to avoid duplicated definitions
+> > of "clean" and "hdr-inst" shorthands.
+> > 
+> > The shorthand "clean" is defined in both the top Makefile and
+> > scripts/Makefile.clean.
+> > 
+> > Likewise, "hdr-inst" is defined in both the top Makefile and
+> > scripts/Makefile.headersinst.
+> > 
+> > The idea here is define and export them in the top Makefile
+> > because $(srctree) is constant during the build process.
+> > 
+> > For consistency, "build" and "modbuiltin" should be also moved.
 > 
->  git://git.kernel.org/pub/scm/linux/kernel/git/rric/linux.git dts-subdirs-for-arm-soc-v3.19
+> As a general rule the exported names are always UPPERCASE, and local variables
+> are lowercase. (srctree, objtree are the exceptions).
+> This patch define new lowercase variables that conflicts with this.
 > 
-> I have updated and rebased the patches to v3.18-rc1. No changes except
-> conflict resolution of patch 5/6.
+> And it is not that logical these are picked up from the enviroment.
+> Could you find a central place to define them rahter than using
+> the environemnt to export them?
 
-have you had the chance to look at this?
+Maybe we can collect them into scripts/Kbuild.include
+although it might be too much for Makefile.clean to include
+the whole things in Kbuild.include.
 
-Thanks,
 
--Robert
+Best Regards
+Masahiro Yamada
+
