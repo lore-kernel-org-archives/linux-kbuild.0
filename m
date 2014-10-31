@@ -1,55 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:38068 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750912AbaJaIgL (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 31 Oct 2014 04:36:11 -0400
-Date: Fri, 31 Oct 2014 09:34:27 +0100
-From: Jiri Olsa <jolsa@redhat.com>
-Subject: Re: [PATCH v4 04/14] perf tools: Add kbuild support into
- Makefile.kbuild
-Message-ID: <20141031083427.GB27472@krava.brq.redhat.com>
-References: <20141024124601.GX14687@kernel.org>
- <1414275639-1053-5-git-send-email-alexis.berlemont@gmail.com>
- <20141029081603.GC3538@krava.brq.redhat.com>
- <20141029230507.GA15701@marx-slim.home>
+Received: from mail-qa0-f51.google.com ([209.85.216.51]:55331 "EHLO
+	mail-qa0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750710AbaJaTFt (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 31 Oct 2014 15:05:49 -0400
+From: j.glisse@gmail.com
+Subject: [PATCH] scripts/package: binrpm-pkg do not build source tar file
+Date: Fri, 31 Oct 2014 15:05:31 -0400
+Message-Id: <1414782331-7987-1-git-send-email-j.glisse@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20141029230507.GA15701@marx-slim.home>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Alexis Berlemont <alexis.berlemont@gmail.com>
-Cc: linux-kernel@vger.kernel.org, dsahern@gmail.com, mingo@redhat.com, a.p.zijlstra@chello.nl, paulus@samba.org, acme@kernel.org, namhyung@kernel.org, mmarek@suse.cz, Arnaldo Carvalho de Melo <acme@ghostprotocols.net>, Ingo Molnar <mingo@elte.hu>, Corey Ashford <cjashfor@linux.vnet.ibm.com>, Frederic Weisbecker <fweisbec@gmail.com>, Borislav Petkov <bp@alien8.de>, linux-kbuild@vger.kernel.org, Stephane Eranian <eranian@google.com>
+To: linux-kernel@vger.kernel.org
+Cc: =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Linus Torvalds <torvalds@linux-foundation.org>
 
-On Thu, Oct 30, 2014 at 12:05:07AM +0100, Alexis Berlemont wrote:
+From: Jérôme Glisse <jglisse@redhat.com>
 
-SNIP
+When doing make binrpm-pkg we do not want to build the source tar
+file. This patch avoid doing the gigantic tar file.
 
-> > >  tools/perf/util/Kbuild                             | 126 ++++++
-> > >  tools/perf/util/PERF-VERSION-GEN                   |   4 +
-> > >  tools/perf/util/generate-cmdlist.sh                |   8 +-
-> > >  tools/perf/util/scripting-engines/Kbuild           |  11 +
-> > >  tools/perf/util/setup.py                           |   8 +-
-> > 
-> > so this patch took the perf Makefile (at that time) and changed it to
-> > use the kbuild.. but since that time the Makefile.perf came and many
-> > other changes, which need to be reflected in Makefile.kbuild
-> > 
-> > I need to revisit the logic and split the change into more incremental
-> > patches (the patchset is too big)
-> > 
-> > I can redo patches 2,3,4 and get back to you, sounds ok?
-> 
-> Of course. 
-> 
-> Which changes in Makefile.perf do you have in mind ? I thought that
-> Makefile.kbuild was just supposed to build the few extra dependencies
-> (libtraceevent, etc.). I thought that I updated your original patch
-> accordingly with the changes before and after the add of
-> Makefile.perf.
+Signed-off-by: Jérôme Glisse <jglisse@redhat.com>
+Cc: linux-kbuild@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.cz>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>
+---
+ scripts/package/mkspec | 2 ++
+ 1 file changed, 2 insertions(+)
 
-hm, I just stumbled on QUIET_* stuff definitions in Makefile.kbuild,
-(which got moved into scripts some time ago) and assumed this was
-the case for the rest of the file ;-)
+diff --git a/scripts/package/mkspec b/scripts/package/mkspec
+index 1395760..b6f5e31 100755
+--- a/scripts/package/mkspec
++++ b/scripts/package/mkspec
+@@ -119,8 +119,10 @@ echo "%endif"
+ 
+ echo 'rm -f $RPM_BUILD_ROOT'"/lib/modules/$KERNELRELEASE/{build,source}"
+ echo "mkdir -p "'$RPM_BUILD_ROOT'"/usr/src/kernels/$KERNELRELEASE"
++if ! $PREBUILT; then
+ echo "EXCLUDES=\"$RCS_TAR_IGNORE --exclude .tmp_versions --exclude=*vmlinux* --exclude=*.o --exclude=*.ko --exclude=*.cmd --exclude=Documentation --exclude=firmware --exclude .config.old --exclude .missing-syscalls.d\""
+ echo "tar "'$EXCLUDES'" -cf- . | (cd "'$RPM_BUILD_ROOT'"/usr/src/kernels/$KERNELRELEASE;tar xvf -)"
++fi
+ echo 'cd $RPM_BUILD_ROOT'"/lib/modules/$KERNELRELEASE"
+ echo "ln -sf /usr/src/kernels/$KERNELRELEASE build"
+ echo "ln -sf /usr/src/kernels/$KERNELRELEASE source"
+-- 
+1.9.3
 
-jirka
