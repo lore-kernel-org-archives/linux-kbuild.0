@@ -1,49 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qa0-f51.google.com ([209.85.216.51]:55331 "EHLO
-	mail-qa0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750710AbaJaTFt (ORCPT
+Received: from mail-wg0-f50.google.com ([74.125.82.50]:36038 "EHLO
+	mail-wg0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751078AbaKBK27 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 31 Oct 2014 15:05:49 -0400
-From: j.glisse@gmail.com
-Subject: [PATCH] scripts/package: binrpm-pkg do not build source tar file
-Date: Fri, 31 Oct 2014 15:05:31 -0400
-Message-Id: <1414782331-7987-1-git-send-email-j.glisse@gmail.com>
+	Sun, 2 Nov 2014 05:28:59 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <5455E871.7080700@suse.de>
+References: <1414454639-7491-1-git-send-email-agraf@suse.de>
+ <CAOFdcFOChK9Jdw9mQGL7Zdc=89GU4hmuPE=Mn_vvWJFDYEtQBw@mail.gmail.com>
+ <20141028084735.6338d01b@lwn.net> <CF6E40FB-3CB1-43BD-8691-46AD21DA62A0@suse.de>
+ <5454CC07.1070605@gmail.com> <54554DBC.3050607@suse.de> <CAJs94EaS5EQ=X9vRJzzApMuj9uiqH78Qq01HFNnRSXHNjeHRGw@mail.gmail.com>
+ <5455E871.7080700@suse.de>
+From: "Matwey V. Kornilov" <matwey.kornilov@gmail.com>
+Date: Sun, 2 Nov 2014 14:28:36 +0400
+Message-ID: <CAJs94EYdLNy5MjgvXPLYQGhzFtA5NdsuQJcmKcSunpGJhc8H0Q@mail.gmail.com>
+Subject: Re: [PATCH] Documentation: Restrict TSC test code to x86
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Linus Torvalds <torvalds@linux-foundation.org>
+To: Alexander Graf <agraf@suse.de>, yann.morin.1998@free.fr, linux-kbuild@vger.kernel.org, mmarek@suse.cz
+Cc: Jonathan Corbet <corbet@lwn.net>, Peter Foley <pefoley2@pefoley.com>, LKML <linux-kernel@vger.kernel.org>, "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, Jiri Kosina <jkosina@suse.cz>, Randy Dunlap <rdunlap@infradead.org>, "afaerber@suse.de" <afaerber@suse.de>
 
-From: Jérôme Glisse <jglisse@redhat.com>
+I've added Yann and Michal to the discussion.
 
-When doing make binrpm-pkg we do not want to build the source tar
-file. This patch avoid doing the gigantic tar file.
+The issue is that we have
 
-Signed-off-by: Jérôme Glisse <jglisse@redhat.com>
-Cc: linux-kbuild@vger.kernel.org
-Cc: Michal Marek <mmarek@suse.cz>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>
----
- scripts/package/mkspec | 2 ++
- 1 file changed, 2 insertions(+)
+hostprogs-y := disable-tsc-ctxt-sw-stress-test
+disable-tsc-on-off-stress-test disable-tsc-test
 
-diff --git a/scripts/package/mkspec b/scripts/package/mkspec
-index 1395760..b6f5e31 100755
---- a/scripts/package/mkspec
-+++ b/scripts/package/mkspec
-@@ -119,8 +119,10 @@ echo "%endif"
- 
- echo 'rm -f $RPM_BUILD_ROOT'"/lib/modules/$KERNELRELEASE/{build,source}"
- echo "mkdir -p "'$RPM_BUILD_ROOT'"/usr/src/kernels/$KERNELRELEASE"
-+if ! $PREBUILT; then
- echo "EXCLUDES=\"$RCS_TAR_IGNORE --exclude .tmp_versions --exclude=*vmlinux* --exclude=*.o --exclude=*.ko --exclude=*.cmd --exclude=Documentation --exclude=firmware --exclude .config.old --exclude .missing-syscalls.d\""
- echo "tar "'$EXCLUDES'" -cf- . | (cd "'$RPM_BUILD_ROOT'"/usr/src/kernels/$KERNELRELEASE;tar xvf -)"
-+fi
- echo 'cd $RPM_BUILD_ROOT'"/lib/modules/$KERNELRELEASE"
- echo "ln -sf /usr/src/kernels/$KERNELRELEASE build"
- echo "ln -sf /usr/src/kernels/$KERNELRELEASE source"
+in Documentation/prctl/Makefile
+
+and disable-tsc-ctxt-sw-stress-test has x86 assembler inside and must
+be restricted only to this host architecture.
+
+
+2014-11-02 11:16 GMT+03:00 Alexander Graf <agraf@suse.de>:
+>
+>
+> On 02.11.14 08:46, Matwey V. Kornilov wrote:
+>> I wish I knew. We need KBuild guru to ask how to take into account
+>> host architecture.
+>
+> Hrm. At least this patch makes things more consistent with the other
+> Documentation makefiles:
+>
+> Documentation/timers/Makefile:hostprogs-$(CONFIG_X86) := hpet_example
+> Documentation/vDSO/Makefile:hostprogs-$(CONFIG_X86) :=
+> vdso_standalone_test_x86
+>
+> But I agree, it is wrong in general - hostprogs should make sure the
+> host arch matches.
+>
+> We could maybe just evaluate the host uname output:
+>
+>   ifeq ($(shell uname -m),x86_64)
+>     hostprogs-$(CONFIG_X86) := ...
+>   endif
+>
+> Then we're double safe ;). Not sure how to easily add x86 to the mix as
+> well here, but I'm not sure anyone cares. Do people still compile on
+> 32bit x86 hosts? And expect Documentation/ examples to build?
+>
+>
+> Alex
+
+
+
 -- 
-1.9.3
-
+With best regards,
+Matwey V. Kornilov
+http://blog.matwey.name
+xmpp://0x2207@jabber.ru
