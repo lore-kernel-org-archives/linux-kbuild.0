@@ -1,73 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f50.google.com ([74.125.82.50]:36038 "EHLO
-	mail-wg0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751078AbaKBK27 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 2 Nov 2014 05:28:59 -0500
+Received: from mout.web.de ([212.227.17.12]:64916 "EHLO mout.web.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751454AbaKBTmg (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 2 Nov 2014 14:42:36 -0500
+Message-ID: <54568924.5010008@users.sourceforge.net>
+Date: Sun, 02 Nov 2014 20:42:28 +0100
+From: SF Markus Elfring <elfring@users.sourceforge.net>
 MIME-Version: 1.0
-In-Reply-To: <5455E871.7080700@suse.de>
-References: <1414454639-7491-1-git-send-email-agraf@suse.de>
- <CAOFdcFOChK9Jdw9mQGL7Zdc=89GU4hmuPE=Mn_vvWJFDYEtQBw@mail.gmail.com>
- <20141028084735.6338d01b@lwn.net> <CF6E40FB-3CB1-43BD-8691-46AD21DA62A0@suse.de>
- <5454CC07.1070605@gmail.com> <54554DBC.3050607@suse.de> <CAJs94EaS5EQ=X9vRJzzApMuj9uiqH78Qq01HFNnRSXHNjeHRGw@mail.gmail.com>
- <5455E871.7080700@suse.de>
-From: "Matwey V. Kornilov" <matwey.kornilov@gmail.com>
-Date: Sun, 2 Nov 2014 14:28:36 +0400
-Message-ID: <CAJs94EYdLNy5MjgvXPLYQGhzFtA5NdsuQJcmKcSunpGJhc8H0Q@mail.gmail.com>
-Subject: Re: [PATCH] Documentation: Restrict TSC test code to x86
-Content-Type: text/plain; charset=ISO-8859-1
+Subject: [PATCH 1/1] kconfig: Deletion of unnecessary checks before the function
+ call "sym_calc_value"
+References: <5307CAA2.8060406@users.sourceforge.net> <alpine.DEB.2.02.1402212321410.2043@localhost6.localdomain6> <530A086E.8010901@users.sourceforge.net> <alpine.DEB.2.02.1402231635510.1985@localhost6.localdomain6> <530A72AA.3000601@users.sourceforge.net> <alpine.DEB.2.02.1402240658210.2090@localhost6.localdomain6> <530B5FB6.6010207@users.sourceforge.net> <alpine.DEB.2.10.1402241710370.2074@hadrien> <530C5E18.1020800@users.sourceforge.net> <alpine.DEB.2.10.1402251014170.2080@hadrien> <530CD2C4.4050903@users.sourceforge.net> <alpine.DEB.2.10.1402251840450.7035@hadrien> <530CF8FF.8080600@users.sourceforge.net> <alpine.DEB.2.02.1402252117150.2047@localhost6.localdomain6> <530DD06F.4090703@users.sourceforge.net> <alpine.DEB.2.02.1402262129250.2221@localhost6.localdomain6> <5317A59D.4@users.sourceforge.net>
+In-Reply-To: <5317A59D.4@users.sourceforge.net>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Alexander Graf <agraf@suse.de>, yann.morin.1998@free.fr, linux-kbuild@vger.kernel.org, mmarek@suse.cz
-Cc: Jonathan Corbet <corbet@lwn.net>, Peter Foley <pefoley2@pefoley.com>, LKML <linux-kernel@vger.kernel.org>, "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, Jiri Kosina <jkosina@suse.cz>, Randy Dunlap <rdunlap@infradead.org>, "afaerber@suse.de" <afaerber@suse.de>
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>, linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org, trivial@kernel.org, Coccinelle <cocci@systeme.lip6.fr>
 
-I've added Yann and Michal to the discussion.
+The sym_calc_value() function tests whether its argument is NULL and then
+returns immediately. Thus the test around the call is not needed.
 
-The issue is that we have
+This issue was detected by using the Coccinelle software.
 
-hostprogs-y := disable-tsc-ctxt-sw-stress-test
-disable-tsc-on-off-stress-test disable-tsc-test
+Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+---
+ scripts/kconfig/confdata.c | 6 ++----
+ scripts/kconfig/symbol.c   | 3 +--
+ 2 files changed, 3 insertions(+), 6 deletions(-)
 
-in Documentation/prctl/Makefile
+diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+index f88d90f..3073cb6 100644
+--- a/scripts/kconfig/confdata.c
++++ b/scripts/kconfig/confdata.c
+@@ -262,8 +262,7 @@ int conf_read_simple(const char *name, int def)
+ 			goto load;
+ 		sym_add_change_count(1);
+ 		if (!sym_defconfig_list) {
+-			if (modules_sym)
+-				sym_calc_value(modules_sym);
++			sym_calc_value(modules_sym);
+ 			return 1;
+ 		}
 
-and disable-tsc-ctxt-sw-stress-test has x86 assembler inside and must
-be restricted only to this host architecture.
+@@ -399,8 +398,7 @@ setsym:
+ 	free(line);
+ 	fclose(in);
 
+-	if (modules_sym)
+-		sym_calc_value(modules_sym);
++	sym_calc_value(modules_sym);
+ 	return 0;
+ }
 
-2014-11-02 11:16 GMT+03:00 Alexander Graf <agraf@suse.de>:
->
->
-> On 02.11.14 08:46, Matwey V. Kornilov wrote:
->> I wish I knew. We need KBuild guru to ask how to take into account
->> host architecture.
->
-> Hrm. At least this patch makes things more consistent with the other
-> Documentation makefiles:
->
-> Documentation/timers/Makefile:hostprogs-$(CONFIG_X86) := hpet_example
-> Documentation/vDSO/Makefile:hostprogs-$(CONFIG_X86) :=
-> vdso_standalone_test_x86
->
-> But I agree, it is wrong in general - hostprogs should make sure the
-> host arch matches.
->
-> We could maybe just evaluate the host uname output:
->
->   ifeq ($(shell uname -m),x86_64)
->     hostprogs-$(CONFIG_X86) := ...
->   endif
->
-> Then we're double safe ;). Not sure how to easily add x86 to the mix as
-> well here, but I'm not sure anyone cares. Do people still compile on
-> 32bit x86 hosts? And expect Documentation/ examples to build?
->
->
-> Alex
+diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
+index 7caabdb..3f7797b 100644
+--- a/scripts/kconfig/symbol.c
++++ b/scripts/kconfig/symbol.c
+@@ -447,8 +447,7 @@ void sym_clear_all_valid(void)
+ 	for_all_symbols(i, sym)
+ 		sym->flags &= ~SYMBOL_VALID;
+ 	sym_add_change_count(1);
+-	if (modules_sym)
+-		sym_calc_value(modules_sym);
++	sym_calc_value(modules_sym);
+ }
 
-
-
+ void sym_set_changed(struct symbol *sym)
 -- 
-With best regards,
-Matwey V. Kornilov
-http://blog.matwey.name
-xmpp://0x2207@jabber.ru
+2.1.3
+
+
