@@ -1,110 +1,123 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cpsmtpb-ews08.kpnxchange.com ([213.75.39.13]:51613 "EHLO
-	cpsmtpb-ews08.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751305AbaKCKfZ (ORCPT
+Received: from cpsmtpb-ews04.kpnxchange.com ([213.75.39.7]:62270 "EHLO
+	cpsmtpb-ews04.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751081AbaKCLiR (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 3 Nov 2014 05:35:25 -0500
-Message-ID: <1415010921.20372.35.camel@x220>
-Subject: Re: [PATCH 1/1] kconfig: Deletion of unnecessary checks before the
- function call "sym_calc_value"
+	Mon, 3 Nov 2014 06:38:17 -0500
+Message-ID: <1415014691.20372.49.camel@x220>
+Subject: Re: [PATCH 1/1] kconfig: warn if an unknown symbol is selected
 From: Paul Bolle <pebolle@tiscali.nl>
-Date: Mon, 03 Nov 2014 11:35:21 +0100
-In-Reply-To: <54568924.5010008@users.sourceforge.net>
-References: <5307CAA2.8060406@users.sourceforge.net>
-	 <alpine.DEB.2.02.1402212321410.2043@localhost6.localdomain6>
-	 <530A086E.8010901@users.sourceforge.net>
-	 <alpine.DEB.2.02.1402231635510.1985@localhost6.localdomain6>
-	 <530A72AA.3000601@users.sourceforge.net>
-	 <alpine.DEB.2.02.1402240658210.2090@localhost6.localdomain6>
-	 <530B5FB6.6010207@users.sourceforge.net>
-	 <alpine.DEB.2.10.1402241710370.2074@hadrien>
-	 <530C5E18.1020800@users.sourceforge.net>
-	 <alpine.DEB.2.10.1402251014170.2080@hadrien>
-	 <530CD2C4.4050903@users.sourceforge.net>
-	 <alpine.DEB.2.10.1402251840450.7035@hadrien>
-	 <530CF8FF.8080600@users.sourceforge.net>
-	 <alpine.DEB.2.02.1402252117150.2047@localhost6.localdomain6>
-	 <530DD06F.4090703@users.sourceforge.net>
-	 <alpine.DEB.2.02.1402262129250.2221@localhost6.localdomain6>
-	 <5317A59D.4@users.sourceforge.net> <54568924.5010008@users.sourceforge.net>
+Date: Mon, 03 Nov 2014 12:38:11 +0100
+In-Reply-To: <1412100583.21730.31.camel@x220>
+References: <1412100583.21730.31.camel@x220>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Markus Elfring <elfring@users.sourceforge.net>
-Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org, trivial@kernel.org, Coccinelle <cocci@systeme.lip6.fr>
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Since you use "SF Markus Elfring", this patch should start with:
+Hi Yann,
 
-From: Markus Elfring <elfring@users.sourceforge.net>
-
-We don't care that you used a sourceforge.net address. Or has SF another
-meaning? 
-
-On Sun, 2014-11-02 at 20:42 +0100, SF Markus Elfring wrote:
-> The sym_calc_value() function tests whether its argument is NULL and then
-> returns immediately. Thus the test around the call is not needed.
+On Tue, 2014-09-30 at 20:09 +0200, Paul Bolle wrote:
+> A select of an unknown symbol is basically treated as a nop and is
+> silently skipped. This is annoying if the selected symbol contains a
+> typo. It can also hide the fact that a treewide symbol cleanup was only
+> done partially.
 > 
-> This issue was detected by using the Coccinelle software.
-
-Side note: I guess the coccinelle script you use just skips cases like
-    if (sym) {
-        sym_calc_value(sym);
-        do_foo_bar():
-    }
-
-Or did you filter those manually?
-
-> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+> There are also a few cases were this might have been done on purpose.
+> But that anti-pattern should be discouraged. Almost all select
+> statements point to a known and reachable symbol. So people will likely
+> assume that any selected symbol is actually set. Selects that violate
+> this assumption can only be spotted by checking multiple Kconfig files,
+> often across architectures. It is unlikely that people will do this
+> regularly.
+> 
+> So let's warn when we notice a select of a symbol that is not known in
+> the configuration we're creating.
+> 
+> Signed-off-by: Paul Bolle <pebolle@tiscali.nl>
+> Acked-by: Michal Marek <mmarek@suse.cz>
 > ---
->  scripts/kconfig/confdata.c | 6 ++----
->  scripts/kconfig/symbol.c   | 3 +--
->  2 files changed, 3 insertions(+), 6 deletions(-)
+> First sent as an RFC in https://lkml.org/lkml/2014/9/26/887 (and
+> https://lkml.org/lkml/2014/9/26/886 for the cover letter).
 > 
-> diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-> index f88d90f..3073cb6 100644
-> --- a/scripts/kconfig/confdata.c
-> +++ b/scripts/kconfig/confdata.c
-> @@ -262,8 +262,7 @@ int conf_read_simple(const char *name, int def)
->  			goto load;
->  		sym_add_change_count(1);
->  		if (!sym_defconfig_list) {
-> -			if (modules_sym)
-> -				sym_calc_value(modules_sym);
-> +			sym_calc_value(modules_sym);
->  			return 1;
->  		}
-> 
-> @@ -399,8 +398,7 @@ setsym:
->  	free(line);
->  	fclose(in);
-> 
-> -	if (modules_sym)
-> -		sym_calc_value(modules_sym);
-> +	sym_calc_value(modules_sym);
->  	return 0;
->  }
-> 
-> diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
-> index 7caabdb..3f7797b 100644
-> --- a/scripts/kconfig/symbol.c
-> +++ b/scripts/kconfig/symbol.c
-> @@ -447,8 +447,7 @@ void sym_clear_all_valid(void)
->  	for_all_symbols(i, sym)
->  		sym->flags &= ~SYMBOL_VALID;
->  	sym_add_change_count(1);
-> -	if (modules_sym)
-> -		sym_calc_value(modules_sym);
-> +	sym_calc_value(modules_sym);
->  }
-> 
->  void sym_set_changed(struct symbol *sym)
+> Small modification to the commit explanation in comparison to the RFC,
+> but identical patch. Minor edits to the cover-letter too.
 
-Please resend with
-    Acked-by: Paul Bolle <pebolle@tiscali.nl>
+I've gotten no reaction from you yet on this patch nor on the preceding
+RFC. There have been a handful of other kconfig patches flying by the
+last half year or so (at least, that I know of). None of those have
+gotten any reaction from you, as far as I can tell.
 
-added.
+Do you expect to handle this patch (and whatever has been submitted
+lately by other people) in the near future?
+
+>  scripts/kconfig/conf.c | 41 +++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 41 insertions(+)
+> 
+> diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
+> index fef75fc756f4..de8406287531 100644
+> --- a/scripts/kconfig/conf.c
+> +++ b/scripts/kconfig/conf.c
+> @@ -446,6 +446,45 @@ static void check_conf(struct menu *menu)
+>  		check_conf(child);
+>  }
+>  
+> +static void check_selects(struct menu *menu)
+> +{
+> +	struct symbol *sym, *sel;
+> +	struct property *prop;
+> +
+> +	while (menu) {
+> +		sym = menu->sym;
+> +
+> +		if (sym && !sym_is_choice(sym) &&
+> +		    sym->type != S_UNKNOWN &&
+> +		    sym->flags & SYMBOL_WRITE) {
+> +			for_all_properties(sym, prop, P_SELECT) {
+> +				sel = prop->expr->left.sym;
+> +				if (sel->type == S_UNKNOWN &&
+> +				    expr_calc_value(prop->visible.expr) != no) {
+> +					fprintf(stderr, "%s:%d:warning: ",
+> +						prop->file->name,
+> +						prop->lineno);
+> +					fprintf(stderr,
+> +						"'%s' selects unknown symbol '%s'\n",
+> +						sym->name,
+> +						sel->name);
+> +				}
+> +			}
+> +		}
+> +
+> +		if (menu->list) {
+> +			menu = menu->list;
+> +		} else if (menu->next) {
+> +			menu = menu->next;
+> +		} else while ((menu = menu->parent)) {
+> +			if (menu->next) {
+> +				menu = menu->next;
+> +				break;
+> +			}
+> +		}
+> +	}
+> +}
+> +
+>  static struct option long_opts[] = {
+>  	{"oldaskconfig",    no_argument,       NULL, oldaskconfig},
+>  	{"oldconfig",       no_argument,       NULL, oldconfig},
+> @@ -681,6 +720,8 @@ int main(int ac, char **av)
+>  		break;
+>  	}
+>  
+> +	check_selects(rootmenu.list);
+> +
+>  	if (sync_kconfig) {
+>  		/* silentoldconfig is used during the build so we shall update autoconf.
+>  		 * All other commands are only used to generate a config.
+
+Regards,
 
 
 Paul Bolle
