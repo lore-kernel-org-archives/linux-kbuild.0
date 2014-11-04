@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mailout.easymail.ca ([64.68.201.169]:50517 "EHLO
+Received: from mailout.easymail.ca ([64.68.201.169]:50515 "EHLO
 	mailout.easymail.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752042AbaKDRSO (ORCPT
+	with ESMTP id S1750914AbaKDRSO (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Tue, 4 Nov 2014 12:18:14 -0500
 From: Shuah Khan <shuahkh@osg.samsung.com>
-Subject: [PATCH 19/20] selftests/vm: add install target to enable installing test
-Date: Tue,  4 Nov 2014 10:11:15 -0700
-Message-Id: <271b880cb8efb17078c090715c6b0c729c61dbbc.1415117102.git.shuahkh@osg.samsung.com>
+Subject: [PATCH 07/20] selftests/efivarfs: add install target to enable installing test
+Date: Tue,  4 Nov 2014 10:11:03 -0700
+Message-Id: <3d28ab3098e26044a5ef7f60b620c7dfe66cc3fa.1415117102.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1415117102.git.shuahkh@osg.samsung.com>
 References: <cover.1415117102.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1415117102.git.shuahkh@osg.samsung.com>
@@ -23,27 +23,33 @@ kselftest script to run the test.
 
 Signed-off-by: Shuah Khan <shuahkh@osg.samsung.com>
 ---
- tools/testing/selftests/vm/Makefile | 7 +++++++
- 1 file changed, 7 insertions(+)
+ tools/testing/selftests/efivarfs/Makefile | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/vm/Makefile b/tools/testing/selftests/vm/Makefile
-index 4c4b1f6..254ce92 100644
---- a/tools/testing/selftests/vm/Makefile
-+++ b/tools/testing/selftests/vm/Makefile
-@@ -9,6 +9,13 @@ all: $(BINARIES)
- %: %.c
- 	$(CC) $(CFLAGS) -o $@ $^
+diff --git a/tools/testing/selftests/efivarfs/Makefile b/tools/testing/selftests/efivarfs/Makefile
+index 29e8c6b..a668728 100644
+--- a/tools/testing/selftests/efivarfs/Makefile
++++ b/tools/testing/selftests/efivarfs/Makefile
+@@ -3,7 +3,18 @@ CFLAGS = -Wall
  
-+install: all
-+	install run_vmtests $(BINARIES) $(INSTALL_KSFT_PATH)
-+	echo "\necho \"Start vm test ....\"" >> $(KSELFTEST)
-+	echo "/bin/sh ./run_vmtests || echo \"vmtests: [FAIL]\"" >> $(KSELFTEST)
-+	echo "echo \"End vm test ....\"" >> $(KSELFTEST)
-+	echo "echo \"==============================\"" >> $(KSELFTEST)
+ test_objs = open-unlink create-read
+ 
+-all: $(test_objs)
++TEST_STR = "/bin/bash ./efivarfs.sh || echo \"efivarfs selftests: [FAIL]\""
 +
- run_tests: all
- 	@/bin/sh ./run_vmtests || (echo "vmtests: [FAIL]"; exit 1)
++all:
++	gcc open-unlink.c -o open-unlink
++	gcc create-read.c -o create-read
++
++install: all
++	install ./efivarfs.sh $(test_objs) $(INSTALL_KSFT_PATH)
++	echo "\necho \"Start efivarfs test ....\"" >> $(KSELFTEST)
++	echo $(TEST_STR) >> $(KSELFTEST)
++	echo "echo \"End efivarfs test ....\"" >> $(KSELFTEST)
++	echo "echo \"==============================\"" >> $(KSELFTEST)
  
+ run_tests: all
+ 	@/bin/bash ./efivarfs.sh || echo "efivarfs selftests: [FAIL]"
 -- 
 1.9.1
 
