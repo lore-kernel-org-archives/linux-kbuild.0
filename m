@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mailout.easymail.ca ([64.68.201.169]:50516 "EHLO
+Received: from mailout.easymail.ca ([64.68.201.169]:50541 "EHLO
 	mailout.easymail.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752037AbaKDRSO (ORCPT
+	with ESMTP id S1752056AbaKDRSQ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 4 Nov 2014 12:18:14 -0500
+	Tue, 4 Nov 2014 12:18:16 -0500
 From: Shuah Khan <shuahkh@osg.samsung.com>
-Subject: [PATCH 09/20] selftests/ipc: add install target to enable installing test
-Date: Tue,  4 Nov 2014 10:11:05 -0700
-Message-Id: <3b90e49219f215a333306778fe2683e997b44ec9.1415117102.git.shuahkh@osg.samsung.com>
+Subject: [PATCH 17/20] selftests/sysctl: add install target to enable installing test
+Date: Tue,  4 Nov 2014 10:11:13 -0700
+Message-Id: <2eeb9fe120aac0bcd50a0644e4b9f81db856ed52.1415117102.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1415117102.git.shuahkh@osg.samsung.com>
 References: <cover.1415117102.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1415117102.git.shuahkh@osg.samsung.com>
@@ -23,31 +23,37 @@ kselftest script to run the test.
 
 Signed-off-by: Shuah Khan <shuahkh@osg.samsung.com>
 ---
- tools/testing/selftests/ipc/Makefile | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ tools/testing/selftests/sysctl/Makefile | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/tools/testing/selftests/ipc/Makefile b/tools/testing/selftests/ipc/Makefile
-index 74bbefd..cd1c5af 100644
---- a/tools/testing/selftests/ipc/Makefile
-+++ b/tools/testing/selftests/ipc/Makefile
-@@ -18,6 +18,17 @@ else
- 	echo "Not an x86 target, can't build msgque selftest"
- endif
+diff --git a/tools/testing/selftests/sysctl/Makefile b/tools/testing/selftests/sysctl/Makefile
+index 0a92ada..c8d9b2b 100644
+--- a/tools/testing/selftests/sysctl/Makefile
++++ b/tools/testing/selftests/sysctl/Makefile
+@@ -4,6 +4,8 @@
+ # No binaries, but make sure arg-less "make" doesn't trigger "run_tests".
+ all:
+ 
++INSTALL_PROGS = common_tests run_numerictests run_stringtests
++
+ # Allow specific tests to be selected.
+ test_num:
+ 	@/bin/sh ./run_numerictests
+@@ -11,6 +13,14 @@ test_num:
+ test_string:
+ 	@/bin/sh ./run_stringtests
  
 +install: all
-+ifeq ($(ARCH),x86)
-+	install ./msgque_test $(INSTALL_KSFT_PATH)
-+	echo "\necho \"Start ipc msgque test ....\"" >> $(KSELFTEST)
-+	echo "./msgque_test || echo \"ipc msgque test: [FAIL]\"" >> $(KSELFTEST)
-+	echo "echo \"End msgque test ....\"" >> $(KSELFTEST)
++	install $(INSTALL_PROGS) $(INSTALL_KSFT_PATH)
++	echo "\necho \"Start sysctl test ....\"" >> $(KSELFTEST)
++	echo "/bin/sh ./run_numerictests" >> $(KSELFTEST)
++	echo "/bin/sh ./run_stringtests" >> $(KSELFTEST)
++	echo "echo \"End sysctl test ....\"" >> $(KSELFTEST)
 +	echo "echo \"==============================\"" >> $(KSELFTEST)
-+else
-+	echo "Not an x86 target, can't install ipc msgque selftests"
-+endif
 +
- run_tests: all
- 	./msgque_test
+ run_tests: all test_num test_string
  
+ # Nothing to clean up.
 -- 
 1.9.1
 
