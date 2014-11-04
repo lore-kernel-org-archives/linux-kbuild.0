@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mailout.easymail.ca ([64.68.201.169]:50543 "EHLO
+Received: from mailout.easymail.ca ([64.68.201.169]:50552 "EHLO
 	mailout.easymail.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752067AbaKDRSR (ORCPT
+	with ESMTP id S1752161AbaKDRSV (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 4 Nov 2014 12:18:17 -0500
+	Tue, 4 Nov 2014 12:18:21 -0500
 From: Shuah Khan <shuahkh@osg.samsung.com>
-Subject: [PATCH 02/20] selftests/net: move test out of Makefile into a shell script
-Date: Tue,  4 Nov 2014 10:10:58 -0700
-Message-Id: <51d57725e89809806bd8af5555af341296cc4dd7.1415117102.git.shuahkh@osg.samsung.com>
+Subject: [PATCH 18/20] selftests/timers: add install target to enable installing test
+Date: Tue,  4 Nov 2014 10:11:14 -0700
+Message-Id: <bec2beda6c834a49bd9c24479ab167156c10b8c9.1415117102.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1415117102.git.shuahkh@osg.samsung.com>
 References: <cover.1415117102.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1415117102.git.shuahkh@osg.samsung.com>
@@ -17,52 +17,33 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: gregkh@linuxfoundation.org, akpm@linux-foundation.org, mmarek@suse.cz, davem@davemloft.net, keescook@chromium.org, tranmanphong@gmail.com, dh.herrmann@gmail.com, hughd@google.com, bobby.prani@gmail.com, ebiederm@xmission.com, serge.hallyn@ubuntu.com
 Cc: Shuah Khan <shuahkh@osg.samsung.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-api@vger.kernel.org, netdev@vger.kernel.org
 
-Currently bpf test run from the Makefile. Move it out of the
-Makefile to be run from a shell script to allow the test to
-be run as stand-alone test, in addition to allowing the test
-run from a make target.
+Add a new make target to enable installing test. This target
+installs test in the kselftest install location and add to the
+kselftest script to run the test.
 
 Signed-off-by: Shuah Khan <shuahkh@osg.samsung.com>
 ---
- tools/testing/selftests/net/Makefile    |  8 +-------
- tools/testing/selftests/net/test_bpf.sh | 10 ++++++++++
- 2 files changed, 11 insertions(+), 7 deletions(-)
- create mode 100755 tools/testing/selftests/net/test_bpf.sh
+ tools/testing/selftests/timers/Makefile | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index c7493b8..62f22cc 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -14,12 +14,6 @@ all: $(NET_PROGS)
- run_tests: all
- 	@/bin/sh ./run_netsocktests || echo "sockettests: [FAIL]"
- 	@/bin/sh ./run_afpackettests || echo "afpackettests: [FAIL]"
--	@if /sbin/modprobe test_bpf ; then \
--		/sbin/rmmod test_bpf; \
--		echo "test_bpf: ok"; \
--	else \
--		echo "test_bpf: [FAIL]"; \
--		exit 1; \
--	fi
-+	./test_bpf.sh
- clean:
- 	$(RM) $(NET_PROGS)
-diff --git a/tools/testing/selftests/net/test_bpf.sh b/tools/testing/selftests/net/test_bpf.sh
-new file mode 100755
-index 0000000..8b29796
---- /dev/null
-+++ b/tools/testing/selftests/net/test_bpf.sh
-@@ -0,0 +1,10 @@
-+#!/bin/sh
-+# Runs bpf test using test_bpf kernel module
+diff --git a/tools/testing/selftests/timers/Makefile b/tools/testing/selftests/timers/Makefile
+index eb2859f..5fce7ae 100644
+--- a/tools/testing/selftests/timers/Makefile
++++ b/tools/testing/selftests/timers/Makefile
+@@ -1,6 +1,13 @@
+ all:
+ 	gcc posix_timers.c -o posix_timers -lrt
+ 
++install: all
++	install ./posix_timers $(INSTALL_KSFT_PATH)
++	echo "\necho \"Start timers test ....\"" >> $(KSELFTEST)
++	echo "./posix_timers" >> $(KSELFTEST)
++	echo "echo \"End timers test ....\"" >> $(KSELFTEST)
++	echo "echo \"==============================\"" >> $(KSELFTEST)
 +
-+if /sbin/modprobe -q test_bpf ; then
-+	/sbin/modprobe -q -r test_bpf;
-+	echo "test_bpf: ok";
-+else
-+	echo "test_bpf: [FAIL]";
-+	exit 1;
-+fi
+ run_tests: all
+ 	./posix_timers
+ 
 -- 
 1.9.1
 
