@@ -1,54 +1,119 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mailout.easymail.ca ([64.68.201.169]:50542 "EHLO
-	mailout.easymail.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752047AbaKDRSQ (ORCPT
+Received: from mail-ob0-f180.google.com ([209.85.214.180]:35386 "EHLO
+	mail-ob0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751581AbaKDTW6 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 4 Nov 2014 12:18:16 -0500
-From: Shuah Khan <shuahkh@osg.samsung.com>
-Subject: [PATCH 10/20] selftests/kcmp: add install target to enable installing test
-Date: Tue,  4 Nov 2014 10:11:06 -0700
-Message-Id: <1dc6f2a853bd645cdb64b904b5a3b90ff7be9ad2.1415117102.git.shuahkh@osg.samsung.com>
+	Tue, 4 Nov 2014 14:22:58 -0500
+Received: by mail-ob0-f180.google.com with SMTP id wp4so11195704obc.25
+        for <linux-kbuild@vger.kernel.org>; Tue, 04 Nov 2014 11:22:58 -0800 (PST)
+MIME-Version: 1.0
 In-Reply-To: <cover.1415117102.git.shuahkh@osg.samsung.com>
 References: <cover.1415117102.git.shuahkh@osg.samsung.com>
-In-Reply-To: <cover.1415117102.git.shuahkh@osg.samsung.com>
-References: <cover.1415117102.git.shuahkh@osg.samsung.com>
+Date: Tue, 4 Nov 2014 11:22:57 -0800
+Message-ID: <CAGXu5jK9-TpOF4SFX2bkU2UJMXk-3W+-_we0BTxu4Ga+7bYXSQ@mail.gmail.com>
+Subject: Re: [PATCH 00/20] kselftest install target feature
+From: Kees Cook <keescook@chromium.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: gregkh@linuxfoundation.org, akpm@linux-foundation.org, mmarek@suse.cz, davem@davemloft.net, keescook@chromium.org, tranmanphong@gmail.com, dh.herrmann@gmail.com, hughd@google.com, bobby.prani@gmail.com, ebiederm@xmission.com, serge.hallyn@ubuntu.com
-Cc: Shuah Khan <shuahkh@osg.samsung.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-api@vger.kernel.org, netdev@vger.kernel.org
+To: Shuah Khan <shuahkh@osg.samsung.com>
+Cc: Greg KH <gregkh@linuxfoundation.org>, Andrew Morton <akpm@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, "David S. Miller" <davem@davemloft.net>, tranmanphong@gmail.com, David Herrmann <dh.herrmann@gmail.com>, Hugh Dickins <hughd@google.com>, bobby.prani@gmail.com, "Eric W. Biederman" <ebiederm@xmission.com>, "Serge E. Hallyn" <serge.hallyn@ubuntu.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linux API <linux-api@vger.kernel.org>, Network Development <netdev@vger.kernel.org>
 
-Add a new make target to enable installing test. This target
-installs test in the kselftest install location and add to the
-kselftest script to run the test.
+On Tue, Nov 4, 2014 at 9:10 AM, Shuah Khan <shuahkh@osg.samsung.com> wrote:
+> This patch series adds a new kselftest_install make target
+> to enable selftest install. When make kselftest_install is
+> run, selftests are installed on the system. A new install
+> target is added to selftests Makefile which will install
+> targets for the tests that are specified in INSTALL_TARGETS.
+> During install, a script is generated to run tests that are
+> installed. This script will be installed in the selftest install
+> directory. Individual test Makefiles are changed to add to the
+> script. This will allow new tests to add install and run test
+> commands to the generated kselftest script.
 
-Signed-off-by: Shuah Khan <shuahkh@osg.samsung.com>
----
- tools/testing/selftests/kcmp/Makefile | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+I'm all for making the self tests more available, but I don't think
+this is the right approach. My primary objection is that it creates a
+second way to run tests, and that means any changes and additions need
+to be updated in two places. I'd much rather just maintain the single
+"make" targets instead. Having "make" available on the target device
+doesn't seem too bad to me. Is there a reason that doesn't work for
+your situation?
 
-diff --git a/tools/testing/selftests/kcmp/Makefile b/tools/testing/selftests/kcmp/Makefile
-index 8aabd82..e105619 100644
---- a/tools/testing/selftests/kcmp/Makefile
-+++ b/tools/testing/selftests/kcmp/Makefile
-@@ -21,6 +21,18 @@ else
- 	echo "Not an x86 target, can't build kcmp selftest"
- endif
- 
-+install: all
-+ifeq ($(ARCH),x86)
-+	install ./kcmp_test $(INSTALL_KSFT_PATH)
-+	echo "\necho \"Start kcmp test ....\"" >> $(KSELFTEST)
-+	echo "./kcmp_test || echo \"kcmp_test: [FAIL]\"" >> $(KSELFTEST)
-+	echo "rm -f kcmp-test-file" >> $(KSELFTEST)
-+	echo "echo \"End kcmp test ....\"" >> $(KSELFTEST)
-+	echo "echo \"==============================\"" >> $(KSELFTEST)
-+else
-+	echo "Not an x86 target, can't install kcmp selftests"
-+endif
-+
- run_tests: all
- 	@./kcmp_test || echo "kcmp_test: [FAIL]"
- 
+I would, however, like to see some better standardization of the test
+"framework" that we've got in there already. (For example, some
+failures fail the "make", some don't, there are various reporting
+methods for success/failure depending on the test, etc.)
+
+-Kees
+
+> Approach:
+>
+> make kselftest_target:
+> -- exports kselftest INSTALL_KSFT_PATH
+>    default $(INSTALL_MOD_PATH)/lib/kselftest/$(KERNELRELEASE)
+> -- exports path for ksefltest.sh
+> -- runs selftests make install target:
+>
+> selftests make install target
+> -- creates kselftest.sh script in install install dir
+> -- runs install targets for all INSTALL_TARGETS
+>
+> Individual test make install targets:
+> -- install test programs and/or scripts in install dir
+> -- append to the ksefltest.sh file to add commands to run test
+>
+> Shuah Khan (20):
+>   selftests/user: move test out of Makefile into a shell script
+>   selftests/net: move test out of Makefile into a shell script
+>   kbuild: kselftest_install - add a new make target to install selftests
+>   selftests: add install target to enable installing selftests
+>   selftests/breakpoints: add install target to enable installing test
+>   selftests/cpu-hotplug: add install target to enable installing test
+>   selftests/efivarfs: add install target to enable installing test
+>   selftests/firmware: add install target to enable installing test
+>   selftests/ipc: add install target to enable installing test
+>   selftests/kcmp: add install target to enable installing test
+>   selftests/memfd: add install target to enable installing test
+>   selftests/memory-hotplug: add install target to enable installing test
+>   selftests/mount: add install target to enable installing test
+>   selftests/mqueue: add install target to enable installing test
+>   selftests/net: add install target to enable installing test
+>   selftests/ptrace: add install target to enable installing test
+>   selftests/sysctl: add install target to enable installing test
+>   selftests/timers: add install target to enable installing test
+>   selftests/vm: add install target to enable installing test
+>   selftests/user: add install target to enable installing test
+>
+>  Makefile                                        | 17 +++++++++++++++++
+>  tools/testing/selftests/Makefile                | 14 ++++++++++++++
+>  tools/testing/selftests/breakpoints/Makefile    | 12 ++++++++++++
+>  tools/testing/selftests/cpu-hotplug/Makefile    |  9 +++++++++
+>  tools/testing/selftests/efivarfs/Makefile       | 13 ++++++++++++-
+>  tools/testing/selftests/firmware/Makefile       | 20 ++++++++++++++++++++
+>  tools/testing/selftests/ipc/Makefile            | 11 +++++++++++
+>  tools/testing/selftests/kcmp/Makefile           | 12 ++++++++++++
+>  tools/testing/selftests/memfd/Makefile          | 10 ++++++++++
+>  tools/testing/selftests/memory-hotplug/Makefile |  9 +++++++++
+>  tools/testing/selftests/mount/Makefile          |  7 +++++++
+>  tools/testing/selftests/mqueue/Makefile         |  8 ++++++++
+>  tools/testing/selftests/net/Makefile            | 18 +++++++++++-------
+>  tools/testing/selftests/net/test_bpf.sh         | 10 ++++++++++
+>  tools/testing/selftests/ptrace/Makefile         | 11 +++++++++--
+>  tools/testing/selftests/sysctl/Makefile         | 10 ++++++++++
+>  tools/testing/selftests/timers/Makefile         |  7 +++++++
+>  tools/testing/selftests/user/Makefile           | 15 ++++++++-------
+>  tools/testing/selftests/user/test_user_copy.sh  | 10 ++++++++++
+>  tools/testing/selftests/vm/Makefile             |  7 +++++++
+>  20 files changed, 213 insertions(+), 17 deletions(-)
+>  create mode 100755 tools/testing/selftests/net/test_bpf.sh
+>  create mode 100755 tools/testing/selftests/user/test_user_copy.sh
+>
+> --
+> 1.9.1
+>
+
+
+
 -- 
-1.9.1
-
+Kees Cook
+Chrome OS Security
