@@ -1,36 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f169.google.com ([209.85.212.169]:45604 "EHLO
-	mail-wi0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751732AbaKDO72 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 4 Nov 2014 09:59:28 -0500
-Received: by mail-wi0-f169.google.com with SMTP id n3so8925921wiv.2
-        for <linux-kbuild@vger.kernel.org>; Tue, 04 Nov 2014 06:59:27 -0800 (PST)
-Received: from localhost (spybox.legeek.net. [88.188.175.165])
-        by mx.google.com with ESMTPSA id l4sm818138wjx.14.2014.11.04.06.59.26
-        for <linux-kbuild@vger.kernel.org>
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 04 Nov 2014 06:59:26 -0800 (PST)
-Date: Tue, 4 Nov 2014 15:59:25 +0100
-From: Sylvain BERTRAND <sylvain.bertrand@gmail.com>
-Subject: scripts/link-vmlinux.sh bash-ism
-Message-ID: <20141104145925.GA3962@localhost.localdomain>
+Received: from [157.56.110.82] ([157.56.110.82]:17824 "EHLO
+	na01-bn1-obe.outbound.protection.outlook.com"
+	rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1751999AbaKDPvX (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 4 Nov 2014 10:51:23 -0500
+Date: Tue, 4 Nov 2014 16:49:17 +0100
+From: Robert Richter <robert.richter@caviumnetworks.com>
+Subject: Re: [GIT PULL] dts, kbuild: Implement support for dtb vendor subdirs
+Message-ID: <20141104154917.GP31556@rric.localhost>
+References: <1409899692-1455-1-git-send-email-rric@kernel.org>
+ <20141021181504.GV20170@rric.localhost>
+ <20141104044717.GA13562@quad.lixom.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
+In-Reply-To: <20141104044717.GA13562@quad.lixom.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
+To: Olof Johansson <olof@lixom.net>
+Cc: Robert Richter <rric@kernel.org>, Rob Herring <robh+dt@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Arnd Bergmann <arnd@arndb.de>, Michal Marek <mmarek@suse.cz>, linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Andrew Bresticker <abrestic@google.com>, Abhilash Kesavan <kesavan.abhilash@gmail.com>
 
-Hi,
+On 03.11.14 20:47:17, Olof Johansson wrote:
+> > > Robert Richter (6):
+> > >   dts, arm64: Add dtbs_install make target
+> > >   dts, kbuild: Factor out dtbs install rules to Makefile.dtbinst
+> > >   dts, arm/arm64: Remove dtbs build rules in sub-makes
+> > >   dts, kbuild: Implement support for dtb vendor subdirs
+> > >   dts, arm64: Move dts files to vendor subdirs
+> > >   dts, arm: Remove $(MACHINE) variable from dtbs make recipes
+> > 
+> > please pull this series for inclusion into v3.19 from:
+> > 
+> >  git://git.kernel.org/pub/scm/linux/kernel/git/rric/linux.git dts-subdirs-for-arm-soc-v3.19
+> > 
+> > I have updated and rebased the patches to v3.18-rc1. No changes except
+> > conflict resolution of patch 5/6.
+> 
+> Pulled, and I added the description from 0/6 as the merge text -- feel free to
+> add it to the tag if you do something like this in the future.
 
-scripts/link-vmlinux.sh line 114 has a bash-ist trap built-in instruction.
+Thanks for pulling and the hint on the tag description (I was
+wondering what to put in there).
 
-The signal names should be without the SIG prefix, and the ERR condition seems specific to bash.
-
-Bug revealed using dash.
-
-regards,
-
--- 
-Sylvain BERTRAND
+-Robert
