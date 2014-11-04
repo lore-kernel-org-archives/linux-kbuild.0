@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mailout.easymail.ca ([64.68.201.169]:50551 "EHLO
+Received: from mailout.easymail.ca ([64.68.201.169]:50543 "EHLO
 	mailout.easymail.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752164AbaKDRSV (ORCPT
+	with ESMTP id S1752170AbaKDRSW (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 4 Nov 2014 12:18:21 -0500
+	Tue, 4 Nov 2014 12:18:22 -0500
 From: Shuah Khan <shuahkh@osg.samsung.com>
-Subject: [PATCH 03/20] kbuild: kselftest_install - add a new make target to install selftests
-Date: Tue,  4 Nov 2014 10:10:59 -0700
-Message-Id: <66ccc558465313d98f3742c7b428efa0efdfbc3f.1415117102.git.shuahkh@osg.samsung.com>
+Subject: [PATCH 14/20] selftests/mqueue: add install target to enable installing test
+Date: Tue,  4 Nov 2014 10:11:10 -0700
+Message-Id: <05a2c2d380f841eb25d5840edccb6778541af832.1415117102.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1415117102.git.shuahkh@osg.samsung.com>
 References: <cover.1415117102.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1415117102.git.shuahkh@osg.samsung.com>
@@ -17,65 +17,34 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: gregkh@linuxfoundation.org, akpm@linux-foundation.org, mmarek@suse.cz, davem@davemloft.net, keescook@chromium.org, tranmanphong@gmail.com, dh.herrmann@gmail.com, hughd@google.com, bobby.prani@gmail.com, ebiederm@xmission.com, serge.hallyn@ubuntu.com
 Cc: Shuah Khan <shuahkh@osg.samsung.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-api@vger.kernel.org, netdev@vger.kernel.org
 
-Add a new make target to install to install kernel selftests.
-This new target will build and install selftests.
-
-Approach:
-
-make kselftest_target:
--- exports kselftest INSTALL_KSFT_PATH
-   default $(INSTALL_MOD_PATH)/lib/kselftest/$(KERNELRELEASE)
--- exports path for ksefltest.sh
--- runs selftests make install target:
-
-selftests make install target
--- creates kselftest.sh script in install install dir
--- runs install targets for all INSTALL_TARGETS
-
-Individual test make install targets:
--- install test programs and/or scripts in install dir
--- append to the ksefltest.sh file to add commands to run test
+Add a new make target to enable installing test. This target
+installs test in the kselftest install location and add to the
+kselftest script to run the test.
 
 Signed-off-by: Shuah Khan <shuahkh@osg.samsung.com>
 ---
- Makefile | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ tools/testing/selftests/mqueue/Makefile | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/Makefile b/Makefile
-index 05d67af..291aff7 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1078,6 +1078,20 @@ kselftest:
- 	$(Q)$(MAKE) -C tools/testing/selftests run_tests
+diff --git a/tools/testing/selftests/mqueue/Makefile b/tools/testing/selftests/mqueue/Makefile
+index 8056e2e..b0b5ef7 100644
+--- a/tools/testing/selftests/mqueue/Makefile
++++ b/tools/testing/selftests/mqueue/Makefile
+@@ -2,6 +2,14 @@ all:
+ 	gcc -O2 mq_open_tests.c -o mq_open_tests -lrt
+ 	gcc -O2 -o mq_perf_tests mq_perf_tests.c -lrt -lpthread -lpopt
  
- # ---------------------------------------------------------------------------
-+# Kernel selftest install
-+INSTALL_KSFT_PATH=$(INSTALL_MOD_PATH)/lib/kselftest/$(KERNELRELEASE)
-+export INSTALL_KSFT_PATH
-+KSELFTEST=$(INSTALL_KSFT_PATH)/kselftest.sh
-+export KSELFTEST
++install: all
++	install ./mq_open_tests $(INSTALL_KSFT_PATH)
++	install ./mq_perf_tests $(INSTALL_KSFT_PATH)
++	echo "\necho \"Start mqueue test ....\"" >> $(KSELFTEST)
++	echo "./mq_open_tests /test1 || echo \"mq_open_tests: [FAIL]\"" >> $(KSELFTEST)
++	echo "./mq_perf_tests || echo \"mq_perf_tests: [FAIL]\"" >> $(KSELFTEST)
++	echo "echo \"==============================\"" >> $(KSELFTEST)
 +
-+PHONY += kselftest_install
-+kselftest_install:
-+	@rm -rf $(INSTALL_KSFT_PATH)
-+	@mkdir -p $(INSTALL_KSFT_PATH)
-+	$(Q)$(MAKE) -C tools/testing/selftests install
-+	chmod +x $(KSELFTEST)
-+
-+# ---------------------------------------------------------------------------
- # Modules
- 
- ifdef CONFIG_MODULES
-@@ -1285,6 +1299,9 @@ help:
- 	@echo  '                    Build, install, and boot kernel before'
- 	@echo  '                    running kselftest on it'
- 	@echo  ''
-+	@echo  '  kselftest_install - Install Kselftests to INSTALL_KSFT_PATH'
-+	@echo  '                      default: $(INSTALL_MOD_PATH)/lib/kselftest/$(KERNELRELEASE)'
-+	@echo  ''
- 	@echo  'Kernel packaging:'
- 	@$(MAKE) $(build)=$(package-dir) help
- 	@echo  ''
+ run_tests:
+ 	@./mq_open_tests /test1 || echo "mq_open_tests: [FAIL]"
+ 	@./mq_perf_tests || echo "mq_perf_tests: [FAIL]"
 -- 
 1.9.1
 
