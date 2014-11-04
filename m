@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mailout.easymail.ca ([64.68.201.169]:50518 "EHLO
+Received: from mailout.easymail.ca ([64.68.201.169]:50541 "EHLO
 	mailout.easymail.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752039AbaKDRSO (ORCPT
+	with ESMTP id S1752155AbaKDRSV (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 4 Nov 2014 12:18:14 -0500
+	Tue, 4 Nov 2014 12:18:21 -0500
 From: Shuah Khan <shuahkh@osg.samsung.com>
-Subject: [PATCH 16/20] selftests/ptrace: add install target to enable installing test
-Date: Tue,  4 Nov 2014 10:11:12 -0700
-Message-Id: <c29ba0f8dcdd2bf345a7e92496d17413c7a4acb4.1415117102.git.shuahkh@osg.samsung.com>
+Subject: [PATCH 20/20] selftests/user: add install target to enable installing test
+Date: Tue,  4 Nov 2014 10:11:16 -0700
+Message-Id: <8492c16c4963938f3f289f06885ff9029478065c.1415117102.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1415117102.git.shuahkh@osg.samsung.com>
 References: <cover.1415117102.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1415117102.git.shuahkh@osg.samsung.com>
@@ -23,30 +23,26 @@ kselftest script to run the test.
 
 Signed-off-by: Shuah Khan <shuahkh@osg.samsung.com>
 ---
- tools/testing/selftests/ptrace/Makefile | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+ tools/testing/selftests/user/Makefile | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/tools/testing/selftests/ptrace/Makefile b/tools/testing/selftests/ptrace/Makefile
-index 47ae2d3..7826045 100644
---- a/tools/testing/selftests/ptrace/Makefile
-+++ b/tools/testing/selftests/ptrace/Makefile
-@@ -1,7 +1,14 @@
- CFLAGS += -iquote../../../../include/uapi -Wall
--peeksiginfo: peeksiginfo.c
+diff --git a/tools/testing/selftests/user/Makefile b/tools/testing/selftests/user/Makefile
+index 12c9d15..c8e3863 100644
+--- a/tools/testing/selftests/user/Makefile
++++ b/tools/testing/selftests/user/Makefile
+@@ -3,5 +3,12 @@
+ # No binaries, but make sure arg-less "make" doesn't trigger "run_tests"
+ all:
  
--all: peeksiginfo
-+all:
-+	gcc peeksiginfo.c -o peeksiginfo
-+
 +install: all
-+	install ./peeksiginfo $(INSTALL_KSFT_PATH)
-+	echo "\necho \"Start ptrace test ....\"" >> $(KSELFTEST)
-+	echo "./peeksiginfo || echo \"peeksiginfo selftests: [FAIL]\"" >> $(KSELFTEST)
-+	echo "echo \"End ptrace test ....\"" >> $(KSELFTEST)
++	install ./test_user_copy.sh $(INSTALL_KSFT_PATH)
++	echo "\necho \"Start user copy test ....\"" >> $(KSELFTEST)
++	echo "./test_user_copy.sh" >> $(KSELFTEST)
++	echo "echo \"End user copy test ....\"" >> $(KSELFTEST)
 +	echo "echo \"==============================\"" >> $(KSELFTEST)
- 
- clean:
- 	rm -f peeksiginfo
++
+ run_tests: all
+ 	./test_user_copy.sh
 -- 
 1.9.1
 
