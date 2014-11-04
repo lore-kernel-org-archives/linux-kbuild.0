@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mailout.easymail.ca ([64.68.201.169]:50543 "EHLO
+Received: from mailout.easymail.ca ([64.68.201.169]:50518 "EHLO
 	mailout.easymail.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752170AbaKDRSW (ORCPT
+	with ESMTP id S1752039AbaKDRSO (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 4 Nov 2014 12:18:22 -0500
+	Tue, 4 Nov 2014 12:18:14 -0500
 From: Shuah Khan <shuahkh@osg.samsung.com>
-Subject: [PATCH 14/20] selftests/mqueue: add install target to enable installing test
-Date: Tue,  4 Nov 2014 10:11:10 -0700
-Message-Id: <05a2c2d380f841eb25d5840edccb6778541af832.1415117102.git.shuahkh@osg.samsung.com>
+Subject: [PATCH 16/20] selftests/ptrace: add install target to enable installing test
+Date: Tue,  4 Nov 2014 10:11:12 -0700
+Message-Id: <c29ba0f8dcdd2bf345a7e92496d17413c7a4acb4.1415117102.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1415117102.git.shuahkh@osg.samsung.com>
 References: <cover.1415117102.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1415117102.git.shuahkh@osg.samsung.com>
@@ -23,28 +23,30 @@ kselftest script to run the test.
 
 Signed-off-by: Shuah Khan <shuahkh@osg.samsung.com>
 ---
- tools/testing/selftests/mqueue/Makefile | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ tools/testing/selftests/ptrace/Makefile | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/tools/testing/selftests/mqueue/Makefile b/tools/testing/selftests/mqueue/Makefile
-index 8056e2e..b0b5ef7 100644
---- a/tools/testing/selftests/mqueue/Makefile
-+++ b/tools/testing/selftests/mqueue/Makefile
-@@ -2,6 +2,14 @@ all:
- 	gcc -O2 mq_open_tests.c -o mq_open_tests -lrt
- 	gcc -O2 -o mq_perf_tests mq_perf_tests.c -lrt -lpthread -lpopt
+diff --git a/tools/testing/selftests/ptrace/Makefile b/tools/testing/selftests/ptrace/Makefile
+index 47ae2d3..7826045 100644
+--- a/tools/testing/selftests/ptrace/Makefile
++++ b/tools/testing/selftests/ptrace/Makefile
+@@ -1,7 +1,14 @@
+ CFLAGS += -iquote../../../../include/uapi -Wall
+-peeksiginfo: peeksiginfo.c
  
-+install: all
-+	install ./mq_open_tests $(INSTALL_KSFT_PATH)
-+	install ./mq_perf_tests $(INSTALL_KSFT_PATH)
-+	echo "\necho \"Start mqueue test ....\"" >> $(KSELFTEST)
-+	echo "./mq_open_tests /test1 || echo \"mq_open_tests: [FAIL]\"" >> $(KSELFTEST)
-+	echo "./mq_perf_tests || echo \"mq_perf_tests: [FAIL]\"" >> $(KSELFTEST)
-+	echo "echo \"==============================\"" >> $(KSELFTEST)
+-all: peeksiginfo
++all:
++	gcc peeksiginfo.c -o peeksiginfo
 +
- run_tests:
- 	@./mq_open_tests /test1 || echo "mq_open_tests: [FAIL]"
- 	@./mq_perf_tests || echo "mq_perf_tests: [FAIL]"
++install: all
++	install ./peeksiginfo $(INSTALL_KSFT_PATH)
++	echo "\necho \"Start ptrace test ....\"" >> $(KSELFTEST)
++	echo "./peeksiginfo || echo \"peeksiginfo selftests: [FAIL]\"" >> $(KSELFTEST)
++	echo "echo \"End ptrace test ....\"" >> $(KSELFTEST)
++	echo "echo \"==============================\"" >> $(KSELFTEST)
+ 
+ clean:
+ 	rm -f peeksiginfo
 -- 
 1.9.1
 
