@@ -1,45 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from [157.56.110.82] ([157.56.110.82]:17824 "EHLO
-	na01-bn1-obe.outbound.protection.outlook.com"
-	rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1751999AbaKDPvX (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 4 Nov 2014 10:51:23 -0500
-Date: Tue, 4 Nov 2014 16:49:17 +0100
-From: Robert Richter <robert.richter@caviumnetworks.com>
-Subject: Re: [GIT PULL] dts, kbuild: Implement support for dtb vendor subdirs
-Message-ID: <20141104154917.GP31556@rric.localhost>
-References: <1409899692-1455-1-git-send-email-rric@kernel.org>
- <20141021181504.GV20170@rric.localhost>
- <20141104044717.GA13562@quad.lixom.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20141104044717.GA13562@quad.lixom.net>
+Received: from mailout.easymail.ca ([64.68.201.169]:50517 "EHLO
+	mailout.easymail.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752042AbaKDRSO (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 4 Nov 2014 12:18:14 -0500
+From: Shuah Khan <shuahkh@osg.samsung.com>
+Subject: [PATCH 19/20] selftests/vm: add install target to enable installing test
+Date: Tue,  4 Nov 2014 10:11:15 -0700
+Message-Id: <271b880cb8efb17078c090715c6b0c729c61dbbc.1415117102.git.shuahkh@osg.samsung.com>
+In-Reply-To: <cover.1415117102.git.shuahkh@osg.samsung.com>
+References: <cover.1415117102.git.shuahkh@osg.samsung.com>
+In-Reply-To: <cover.1415117102.git.shuahkh@osg.samsung.com>
+References: <cover.1415117102.git.shuahkh@osg.samsung.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Olof Johansson <olof@lixom.net>
-Cc: Robert Richter <rric@kernel.org>, Rob Herring <robh+dt@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Arnd Bergmann <arnd@arndb.de>, Michal Marek <mmarek@suse.cz>, linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Andrew Bresticker <abrestic@google.com>, Abhilash Kesavan <kesavan.abhilash@gmail.com>
+To: gregkh@linuxfoundation.org, akpm@linux-foundation.org, mmarek@suse.cz, davem@davemloft.net, keescook@chromium.org, tranmanphong@gmail.com, dh.herrmann@gmail.com, hughd@google.com, bobby.prani@gmail.com, ebiederm@xmission.com, serge.hallyn@ubuntu.com
+Cc: Shuah Khan <shuahkh@osg.samsung.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-api@vger.kernel.org, netdev@vger.kernel.org
 
-On 03.11.14 20:47:17, Olof Johansson wrote:
-> > > Robert Richter (6):
-> > >   dts, arm64: Add dtbs_install make target
-> > >   dts, kbuild: Factor out dtbs install rules to Makefile.dtbinst
-> > >   dts, arm/arm64: Remove dtbs build rules in sub-makes
-> > >   dts, kbuild: Implement support for dtb vendor subdirs
-> > >   dts, arm64: Move dts files to vendor subdirs
-> > >   dts, arm: Remove $(MACHINE) variable from dtbs make recipes
-> > 
-> > please pull this series for inclusion into v3.19 from:
-> > 
-> >  git://git.kernel.org/pub/scm/linux/kernel/git/rric/linux.git dts-subdirs-for-arm-soc-v3.19
-> > 
-> > I have updated and rebased the patches to v3.18-rc1. No changes except
-> > conflict resolution of patch 5/6.
-> 
-> Pulled, and I added the description from 0/6 as the merge text -- feel free to
-> add it to the tag if you do something like this in the future.
+Add a new make target to enable installing test. This target
+installs test in the kselftest install location and add to the
+kselftest script to run the test.
 
-Thanks for pulling and the hint on the tag description (I was
-wondering what to put in there).
+Signed-off-by: Shuah Khan <shuahkh@osg.samsung.com>
+---
+ tools/testing/selftests/vm/Makefile | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
--Robert
+diff --git a/tools/testing/selftests/vm/Makefile b/tools/testing/selftests/vm/Makefile
+index 4c4b1f6..254ce92 100644
+--- a/tools/testing/selftests/vm/Makefile
++++ b/tools/testing/selftests/vm/Makefile
+@@ -9,6 +9,13 @@ all: $(BINARIES)
+ %: %.c
+ 	$(CC) $(CFLAGS) -o $@ $^
+ 
++install: all
++	install run_vmtests $(BINARIES) $(INSTALL_KSFT_PATH)
++	echo "\necho \"Start vm test ....\"" >> $(KSELFTEST)
++	echo "/bin/sh ./run_vmtests || echo \"vmtests: [FAIL]\"" >> $(KSELFTEST)
++	echo "echo \"End vm test ....\"" >> $(KSELFTEST)
++	echo "echo \"==============================\"" >> $(KSELFTEST)
++
+ run_tests: all
+ 	@/bin/sh ./run_vmtests || (echo "vmtests: [FAIL]"; exit 1)
+ 
+-- 
+1.9.1
+
