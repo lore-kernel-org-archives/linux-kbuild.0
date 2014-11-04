@@ -1,84 +1,87 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cpsmtpb-ews08.kpnxchange.com ([213.75.39.13]:50658 "EHLO
-	cpsmtpb-ews08.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1753495AbaKDULO (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 4 Nov 2014 15:11:14 -0500
-Message-ID: <1415131872.20372.200.camel@x220>
-Subject: Re: [PATCH] xconfig: Search text should have focus after search and
- reopen
-From: Paul Bolle <pebolle@tiscali.nl>
-Date: Tue, 04 Nov 2014 21:11:12 +0100
-In-Reply-To: <1415097323-20991-1-git-send-email-syntheticpp@gmx.net>
-References: <1415097323-20991-1-git-send-email-syntheticpp@gmx.net>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Received: from lists.s-osg.org ([54.187.51.154]:43468 "EHLO lists.s-osg.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751804AbaKDXpW (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 4 Nov 2014 18:45:22 -0500
+Message-ID: <5459650E.6070201@osg.samsung.com>
+Date: Tue, 04 Nov 2014 16:45:18 -0700
+From: Shuah Khan <shuahkh@osg.samsung.com>
+MIME-Version: 1.0
+Subject: Re: [PATCH 00/20] kselftest install target feature
+References: <cover.1415117102.git.shuahkh@osg.samsung.com> <CAGXu5jK9-TpOF4SFX2bkU2UJMXk-3W+-_we0BTxu4Ga+7bYXSQ@mail.gmail.com>
+In-Reply-To: <CAGXu5jK9-TpOF4SFX2bkU2UJMXk-3W+-_we0BTxu4Ga+7bYXSQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Peter =?ISO-8859-1?Q?K=FCmmel?= <syntheticpp@gmx.net>
-Cc: linux-kbuild@vger.kernel.org, yann.morin.1998@free.fr
+To: Kees Cook <keescook@chromium.org>
+Cc: Greg KH <gregkh@linuxfoundation.org>, Andrew Morton <akpm@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, "David S. Miller" <davem@davemloft.net>, tranmanphong@gmail.com, David Herrmann <dh.herrmann@gmail.com>, Hugh Dickins <hughd@google.com>, bobby.prani@gmail.com, "Eric W. Biederman" <ebiederm@xmission.com>, "Serge E. Hallyn" <serge.hallyn@ubuntu.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linux API <linux-api@vger.kernel.org>, Network Development <netdev@vger.kernel.org>
 
-On Tue, 2014-11-04 at 11:35 +0100, Peter Kümmel wrote:
-
-Again, this patch, though smaller that the previous, is not obviously
-trivial. So, could you please add a few lines describing current
-behavior, why it's wrong, and how this patch fixes it? That might
-increase the chance this patch gets some review.
-
-> Signed-off-by: Peter Kümmel <syntheticpp@gmx.net>
-> ---
->  scripts/kconfig/qconf.cc | 7 +++++++
->  scripts/kconfig/qconf.h  | 1 +
->  2 files changed, 8 insertions(+)
+On 11/04/2014 12:22 PM, Kees Cook wrote:
+> On Tue, Nov 4, 2014 at 9:10 AM, Shuah Khan <shuahkh@osg.samsung.com> wrote:
+>> This patch series adds a new kselftest_install make target
+>> to enable selftest install. When make kselftest_install is
+>> run, selftests are installed on the system. A new install
+>> target is added to selftests Makefile which will install
+>> targets for the tests that are specified in INSTALL_TARGETS.
+>> During install, a script is generated to run tests that are
+>> installed. This script will be installed in the selftest install
+>> directory. Individual test Makefiles are changed to add to the
+>> script. This will allow new tests to add install and run test
+>> commands to the generated kselftest script.
 > 
-> diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
-> index 9d3b04b..014df76c 100644
-> --- a/scripts/kconfig/qconf.cc
-> +++ b/scripts/kconfig/qconf.cc
-> @@ -1198,6 +1198,7 @@ ConfigSearchWindow::ConfigSearchWindow(ConfigMainWindow* parent, const char *nam
->  	layout2->addWidget(editField);
->  	searchButton = new QPushButton(_("Search"), this);
->  	searchButton->setAutoDefault(FALSE);
-> +	searchButton->setFocusPolicy(Qt::NoFocus);
->  	connect(searchButton, SIGNAL(clicked()), SLOT(search()));
->  	layout2->addWidget(searchButton);
->  	layout1->addLayout(layout2);
-> @@ -1235,6 +1236,11 @@ ConfigSearchWindow::ConfigSearchWindow(ConfigMainWindow* parent, const char *nam
->  	}
->  }
->  
-> +void ConfigSearchWindow::setFocusOnLineEdit()
-> +{
-> +	editField->setFocus(Qt::OtherFocusReason);
-> +}
-> +
->  void ConfigSearchWindow::saveSettings(void)
->  {
->  	if (name()) {
-> @@ -1506,6 +1512,7 @@ void ConfigMainWindow::searchConfig(void)
->  	if (!searchWindow)
->  		searchWindow = new ConfigSearchWindow(this, "search");
->  	searchWindow->show();
-> +	searchWindow->setFocusOnLineEdit();
->  }
->  
->  void ConfigMainWindow::changeMenu(struct menu *menu)
-> diff --git a/scripts/kconfig/qconf.h b/scripts/kconfig/qconf.h
-> index bde0c6b..6f2c4d6 100644
-> --- a/scripts/kconfig/qconf.h
-> +++ b/scripts/kconfig/qconf.h
-> @@ -288,6 +288,7 @@ public:
->  public slots:
->  	void saveSettings(void);
->  	void search(void);
-> +	void setFocusOnLineEdit(void);
->  
->  protected:
->  	QLineEdit* editField;
+> I'm all for making the self tests more available, but I don't think
+> this is the right approach. My primary objection is that it creates a
+> second way to run tests, and that means any changes and additions need
+> to be updated in two places. I'd much rather just maintain the single
+> "make" targets instead. Having "make" available on the target device
+> doesn't seem too bad to me. Is there a reason that doesn't work for
+> your situation?
 
-Thanks,
+Kees,
+
+My primary objective is to provide a way to install selftests for a
+specific kernel release. This will allow developers to run tests for
+a specific release and look for regressions. Adding an install target
+will also help support local execution of tests in a virtualized
+environments. In some cases such as qemu, it is not practical to
+expect the target to have support for "make". Once tests are installed
+to be run outside the git environment, we need a master script that
+can run the tests. Hence the need for a master script that can run
+tests.
+
+We have the ability to run all tests via make kselftest target or
+run a specific test using the individual test's run_tests target.
+Both of above are necessary to support running tests from the tree.
+Embedding run_tests logic in the makefiles doesn't work very well
+in the long run.
+
+We also need a way to run them outside tree. I agree with you that
+the way I added the script generation, duplicates the code in individual
+run_tests targets and that changes/updates need to be made in both
+places.
+
+Would you be ok with the approach if I fixed the duplicating
+problem? I can address the duplication concern easily.
+
+> 
+> I would, however, like to see some better standardization of the test
+> "framework" that we've got in there already. (For example, some
+> failures fail the "make", some don't, there are various reporting
+> methods for success/failure depending on the test, etc.)
+
+This is being addressed and I have the framework in linux-kselftest
+git next branch at the moment. I do think the above work is part of
+addressing the larger framework issues such as being able to run tests
+on a target system that might not have "make" support and makes it
+easier to use.
+
+thanks,
+-- Shuah
 
 
-Paul Bolle
-
+-- 
+Shuah Khan
+Sr. Linux Kernel Developer
+Samsung Research America (Silicon Valley)
+shuahkh@osg.samsung.com | (970) 217-8978
