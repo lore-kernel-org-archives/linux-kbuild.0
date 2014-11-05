@@ -1,60 +1,103 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cpsmtpb-ews04.kpnxchange.com ([213.75.39.7]:58510 "EHLO
-	cpsmtpb-ews04.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751447AbaKEKgc (ORCPT
+Received: from mail-ob0-f173.google.com ([209.85.214.173]:45643 "EHLO
+	mail-ob0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750926AbaKEXXP (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 5 Nov 2014 05:36:32 -0500
-Message-ID: <1415183789.20372.243.camel@x220>
-Subject: Re: [PATCH 1/2] kconfig: don't silently ignore unhandled characters
-From: Paul Bolle <pebolle@tiscali.nl>
-Date: Wed, 05 Nov 2014 11:36:29 +0100
-In-Reply-To: <5458ED470200007800044DA7@mail.emea.novell.com>
-References: <5458A4FC0200007800044AC1@mail.emea.novell.com>
-	 <1415110006.20372.165.camel@x220>
-	 <5458ED470200007800044DA7@mail.emea.novell.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+	Wed, 5 Nov 2014 18:23:15 -0500
+Received: by mail-ob0-f173.google.com with SMTP id wn1so1469525obc.32
+        for <linux-kbuild@vger.kernel.org>; Wed, 05 Nov 2014 15:23:15 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <5459650E.6070201@osg.samsung.com>
+References: <cover.1415117102.git.shuahkh@osg.samsung.com>
+	<CAGXu5jK9-TpOF4SFX2bkU2UJMXk-3W+-_we0BTxu4Ga+7bYXSQ@mail.gmail.com>
+	<5459650E.6070201@osg.samsung.com>
+Date: Wed, 5 Nov 2014 15:23:14 -0800
+Message-ID: <CAGXu5jKs0ym5sqsPRFD_MJd05-+nS0v+oiscwUQ5JzvgsZTe=Q@mail.gmail.com>
+Subject: Re: [PATCH 00/20] kselftest install target feature
+From: Kees Cook <keescook@chromium.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jan Beulich <JBeulich@suse.com>
-Cc: yann.morin.1998@free.fr, linux-kbuild@vger.kernel.org
+To: Shuah Khan <shuahkh@osg.samsung.com>
+Cc: Greg KH <gregkh@linuxfoundation.org>, Andrew Morton <akpm@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, "David S. Miller" <davem@davemloft.net>, Phong Tran <tranmanphong@gmail.com>, David Herrmann <dh.herrmann@gmail.com>, Hugh Dickins <hughd@google.com>, pranith kumar <bobby.prani@gmail.com>, "Eric W. Biederman" <ebiederm@xmission.com>, "Serge E. Hallyn" <serge.hallyn@ubuntu.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linux API <linux-api@vger.kernel.org>, Network Development <netdev@vger.kernel.org>
 
-On Tue, 2014-11-04 at 14:14 +0000, Jan Beulich wrote:
-> >>> On 04.11.14 at 15:06, <pebolle@tiscali.nl> wrote:
-> > On Tue, 2014-11-04 at 09:05 +0000, Jan Beulich wrote:
-> >> @@ -920,7 +931,7 @@ static int input (void );
-> >>  /* This used to be an fputs(), but since the string might contain NUL's,
-> >>   * we now use fwrite().
-> >>   */
-> >> -#define ECHO do { if (fwrite( zconftext, zconfleng, 1, zconfout )) {} } while (0)
-> >> +#define ECHO fwrite( zconftext, zconfleng, 1, zconfout )
-> >>  #endif
-> >>  
-> >>  /* Gets input and stuffs it into "buf".  number of characters read, or YY_NULL,
-> > 
-> > But this hunk looks unrelated. Is this needed?
-> 
-> I think it should stay, even if my flex version may be slightly different
-> from the one that was used originally. As above - it's simply a result
-> of re-generating.
+On Tue, Nov 4, 2014 at 3:45 PM, Shuah Khan <shuahkh@osg.samsung.com> wrote:
+> On 11/04/2014 12:22 PM, Kees Cook wrote:
+>> On Tue, Nov 4, 2014 at 9:10 AM, Shuah Khan <shuahkh@osg.samsung.com> wrote:
+>>> This patch series adds a new kselftest_install make target
+>>> to enable selftest install. When make kselftest_install is
+>>> run, selftests are installed on the system. A new install
+>>> target is added to selftests Makefile which will install
+>>> targets for the tests that are specified in INSTALL_TARGETS.
+>>> During install, a script is generated to run tests that are
+>>> installed. This script will be installed in the selftest install
+>>> directory. Individual test Makefiles are changed to add to the
+>>> script. This will allow new tests to add install and run test
+>>> commands to the generated kselftest script.
+>>
+>> I'm all for making the self tests more available, but I don't think
+>> this is the right approach. My primary objection is that it creates a
+>> second way to run tests, and that means any changes and additions need
+>> to be updated in two places. I'd much rather just maintain the single
+>> "make" targets instead. Having "make" available on the target device
+>> doesn't seem too bad to me. Is there a reason that doesn't work for
+>> your situation?
+>
+> Kees,
+>
+> My primary objective is to provide a way to install selftests for a
+> specific kernel release. This will allow developers to run tests for
+> a specific release and look for regressions. Adding an install target
+> will also help support local execution of tests in a virtualized
+> environments. In some cases such as qemu, it is not practical to
+> expect the target to have support for "make". Once tests are installed
+> to be run outside the git environment, we need a master script that
+> can run the tests. Hence the need for a master script that can run
+> tests.
+>
+> We have the ability to run all tests via make kselftest target or
+> run a specific test using the individual test's run_tests target.
+> Both of above are necessary to support running tests from the tree.
+> Embedding run_tests logic in the makefiles doesn't work very well
+> in the long run.
+>
+> We also need a way to run them outside tree. I agree with you that
+> the way I added the script generation, duplicates the code in individual
+> run_tests targets and that changes/updates need to be made in both
+> places.
+>
+> Would you be ok with the approach if I fixed the duplicating
+> problem? I can address the duplication concern easily.
 
-(This annoyed me enough to dive a bit deeper. This message is mainly to
-archive my notes publicly.)
+Yeah, getting rid of duplication would be much preferred. Thanks!
 
-This #define was added in v3.1. See commit 2f76b358f9fb ("kconfig: regen
-parser"). Commit explanations were probably a bit expensive then since
-this is all the info we have: we don't know why this was done, nor how
-(which program, which options, etc.).
+-Kees
 
-Anyhow, I don't think ECHO is used anywhere. grepping for ECHO in
-scripts/ finds dtc-lexer.lex.c_shipped, lex.lex.c_shipped, and this
-file. In the other two _shipped files ECHO is actually used. So,
-apparently it's not a bit of lex magic. The #define might as well be
-removed.
+>
+>>
+>> I would, however, like to see some better standardization of the test
+>> "framework" that we've got in there already. (For example, some
+>> failures fail the "make", some don't, there are various reporting
+>> methods for success/failure depending on the test, etc.)
+>
+> This is being addressed and I have the framework in linux-kselftest
+> git next branch at the moment. I do think the above work is part of
+> addressing the larger framework issues such as being able to run tests
+> on a target system that might not have "make" support and makes it
+> easier to use.
+>
+> thanks,
+> -- Shuah
+>
+>
+> --
+> Shuah Khan
+> Sr. Linux Kernel Developer
+> Samsung Research America (Silicon Valley)
+> shuahkh@osg.samsung.com | (970) 217-8978
 
-I personally wouldn't bother to add this hunk, but who cares.
 
 
-Paul Bolle
-
+-- 
+Kees Cook
+Chrome OS Security
