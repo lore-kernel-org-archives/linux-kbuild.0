@@ -1,87 +1,71 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lists.s-osg.org ([54.187.51.154]:43468 "EHLO lists.s-osg.org"
+Received: from mout.gmx.net ([212.227.15.18]:53794 "EHLO mout.gmx.net"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751804AbaKDXpW (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 4 Nov 2014 18:45:22 -0500
-Message-ID: <5459650E.6070201@osg.samsung.com>
-Date: Tue, 04 Nov 2014 16:45:18 -0700
-From: Shuah Khan <shuahkh@osg.samsung.com>
+	id S1750760AbaKEGX0 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 5 Nov 2014 01:23:26 -0500
+From: =?UTF-8?q?Peter=20K=C3=BCmmel?= <syntheticpp@gmx.net>
+Subject: [PATCH] xconfig: Set keyboard focus to line edit whenever the search dialog opens
+Date: Wed,  5 Nov 2014 07:23:18 +0100
+Message-Id: <1415168598-3867-1-git-send-email-syntheticpp@gmx.net>
 MIME-Version: 1.0
-Subject: Re: [PATCH 00/20] kselftest install target feature
-References: <cover.1415117102.git.shuahkh@osg.samsung.com> <CAGXu5jK9-TpOF4SFX2bkU2UJMXk-3W+-_we0BTxu4Ga+7bYXSQ@mail.gmail.com>
-In-Reply-To: <CAGXu5jK9-TpOF4SFX2bkU2UJMXk-3W+-_we0BTxu4Ga+7bYXSQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kees Cook <keescook@chromium.org>
-Cc: Greg KH <gregkh@linuxfoundation.org>, Andrew Morton <akpm@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, "David S. Miller" <davem@davemloft.net>, tranmanphong@gmail.com, David Herrmann <dh.herrmann@gmail.com>, Hugh Dickins <hughd@google.com>, bobby.prani@gmail.com, "Eric W. Biederman" <ebiederm@xmission.com>, "Serge E. Hallyn" <serge.hallyn@ubuntu.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linux API <linux-api@vger.kernel.org>, Network Development <netdev@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: yann.morin.1998@free.fr, =?UTF-8?q?Peter=20K=C3=BCmmel?= <syntheticpp@gmx.net>
 
-On 11/04/2014 12:22 PM, Kees Cook wrote:
-> On Tue, Nov 4, 2014 at 9:10 AM, Shuah Khan <shuahkh@osg.samsung.com> wrote:
->> This patch series adds a new kselftest_install make target
->> to enable selftest install. When make kselftest_install is
->> run, selftests are installed on the system. A new install
->> target is added to selftests Makefile which will install
->> targets for the tests that are specified in INSTALL_TARGETS.
->> During install, a script is generated to run tests that are
->> installed. This script will be installed in the selftest install
->> directory. Individual test Makefiles are changed to add to the
->> script. This will allow new tests to add install and run test
->> commands to the generated kselftest script.
-> 
-> I'm all for making the self tests more available, but I don't think
-> this is the right approach. My primary objection is that it creates a
-> second way to run tests, and that means any changes and additions need
-> to be updated in two places. I'd much rather just maintain the single
-> "make" targets instead. Having "make" available on the target device
-> doesn't seem too bad to me. Is there a reason that doesn't work for
-> your situation?
+When after a search on a result is clicked the focus jumps to
+the result list. So after closing and reopening the dialog the
+field does not have the focus any more. This is annoying when
+you press Ctrl-F and start typing for a new search because
+the text shows not up in the edit field but gets lost. You
+have to click additionally into the edit field to move the
+focus to this field. With this patch the focus is always set
+to the edit field when the dialog opens.
 
-Kees,
+Signed-off-by: Peter Kümmel <syntheticpp@gmx.net>
+---
+ scripts/kconfig/qconf.cc | 6 ++++++
+ scripts/kconfig/qconf.h  | 1 +
+ 2 files changed, 7 insertions(+)
 
-My primary objective is to provide a way to install selftests for a
-specific kernel release. This will allow developers to run tests for
-a specific release and look for regressions. Adding an install target
-will also help support local execution of tests in a virtualized
-environments. In some cases such as qemu, it is not practical to
-expect the target to have support for "make". Once tests are installed
-to be run outside the git environment, we need a master script that
-can run the tests. Hence the need for a master script that can run
-tests.
-
-We have the ability to run all tests via make kselftest target or
-run a specific test using the individual test's run_tests target.
-Both of above are necessary to support running tests from the tree.
-Embedding run_tests logic in the makefiles doesn't work very well
-in the long run.
-
-We also need a way to run them outside tree. I agree with you that
-the way I added the script generation, duplicates the code in individual
-run_tests targets and that changes/updates need to be made in both
-places.
-
-Would you be ok with the approach if I fixed the duplicating
-problem? I can address the duplication concern easily.
-
-> 
-> I would, however, like to see some better standardization of the test
-> "framework" that we've got in there already. (For example, some
-> failures fail the "make", some don't, there are various reporting
-> methods for success/failure depending on the test, etc.)
-
-This is being addressed and I have the framework in linux-kselftest
-git next branch at the moment. I do think the above work is part of
-addressing the larger framework issues such as being able to run tests
-on a target system that might not have "make" support and makes it
-easier to use.
-
-thanks,
--- Shuah
-
-
+diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
+index 9d3b04b..7ef498d 100644
+--- a/scripts/kconfig/qconf.cc
++++ b/scripts/kconfig/qconf.cc
+@@ -1235,6 +1235,11 @@ ConfigSearchWindow::ConfigSearchWindow(ConfigMainWindow* parent, const char *nam
+ 	}
+ }
+ 
++void ConfigSearchWindow::setFocusOnLineEdit()
++{
++	editField->setFocus(Qt::OtherFocusReason);
++}
++
+ void ConfigSearchWindow::saveSettings(void)
+ {
+ 	if (name()) {
+@@ -1506,6 +1511,7 @@ void ConfigMainWindow::searchConfig(void)
+ 	if (!searchWindow)
+ 		searchWindow = new ConfigSearchWindow(this, "search");
+ 	searchWindow->show();
++	searchWindow->setFocusOnLineEdit();
+ }
+ 
+ void ConfigMainWindow::changeMenu(struct menu *menu)
+diff --git a/scripts/kconfig/qconf.h b/scripts/kconfig/qconf.h
+index bde0c6b..6f2c4d6 100644
+--- a/scripts/kconfig/qconf.h
++++ b/scripts/kconfig/qconf.h
+@@ -288,6 +288,7 @@ public:
+ public slots:
+ 	void saveSettings(void);
+ 	void search(void);
++	void setFocusOnLineEdit(void);
+ 
+ protected:
+ 	QLineEdit* editField;
 -- 
-Shuah Khan
-Sr. Linux Kernel Developer
-Samsung Research America (Silicon Valley)
-shuahkh@osg.samsung.com | (970) 217-8978
+1.9.1
+
