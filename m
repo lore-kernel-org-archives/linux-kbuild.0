@@ -1,101 +1,96 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.gmx.net ([212.227.17.22]:60605 "EHLO mout.gmx.net"
+Received: from mout.gmx.net ([212.227.17.21]:63998 "EHLO mout.gmx.net"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752530AbaKEGxv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 5 Nov 2014 01:53:51 -0500
-From: =?UTF-8?q?Peter=20K=C3=BCmmel?= <syntheticpp@gmx.net>
-Subject: [PATCH] xconfig: Set configuration strings on focus lost
-Date: Wed,  5 Nov 2014 07:53:42 +0100
-Message-Id: <1415170422-6421-1-git-send-email-syntheticpp@gmx.net>
+	id S1751302AbaKEGzm convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 5 Nov 2014 01:55:42 -0500
 MIME-Version: 1.0
+Message-ID: <trinity-36be2af2-1224-4ba4-941f-3d8373e34039-1415170537264@3capp-gmx-bs04>
+From: "Peter Kuemmel" <syntheticpp@gmx.net>
+Subject: Aw: Re: [PATCH] xconfig: Search text should have focus after search
+ and reopen
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Date: Wed, 5 Nov 2014 07:55:37 +0100
+In-Reply-To: <1415131872.20372.200.camel@x220>
+References: <1415097323-20991-1-git-send-email-syntheticpp@gmx.net>,
+ <1415131872.20372.200.camel@x220>
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: yann.morin.1998@free.fr, =?UTF-8?q?Peter=20K=C3=BCmmel?= <syntheticpp@gmx.net>
+To: Paul Bolle <pebolle@tiscali.nl>
+Cc: linux-kbuild@vger.kernel.org, yann.morin.1998@free.fr
 
-A change to a string configuration is currently only
-recogniized by pressing enter/return. When you just
-click to another entry after the string was edited
-the change is not set. Additionally when you come
-back to the string configuration your changes are lost.
-With this patch the string changes are automatically set
-when the focus leaves the edit field. There is still
-the possibility to drop any changes by pressing ESC.
+Thx for the hints, hope patches are better now.
 
-Signed-off-by: Peter Kümmel <syntheticpp@gmx.net>
----
- scripts/kconfig/qconf.cc | 23 +++++++++++++++++++----
- scripts/kconfig/qconf.h  |  2 ++
- 2 files changed, 21 insertions(+), 4 deletions(-)
+Peter
 
-diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
-index 9d3b04b..f08472e 100644
---- a/scripts/kconfig/qconf.cc
-+++ b/scripts/kconfig/qconf.cc
-@@ -302,13 +302,18 @@ ConfigLineEdit::ConfigLineEdit(ConfigView* parent)
- 	connect(this, SIGNAL(lostFocus()), SLOT(hide()));
- }
- 
--void ConfigLineEdit::show(ConfigItem* i)
-+void ConfigLineEdit::updateLineEditText(ConfigItem* i)
- {
--	item = i;
--	if (sym_get_string_value(item->menu->sym))
--		setText(QString::fromLocal8Bit(sym_get_string_value(item->menu->sym)));
-+	if (sym_get_string_value(i->menu->sym))
-+		setText(QString::fromLocal8Bit(sym_get_string_value(i->menu->sym)));
- 	else
- 		setText(QString::null);
-+}
-+
-+void ConfigLineEdit::show(ConfigItem* i)
-+{
-+	item = i;
-+	updateLineEditText(item);
- 	Parent::show();
- 	setFocus();
- }
-@@ -317,6 +322,7 @@ void ConfigLineEdit::keyPressEvent(QKeyEvent* e)
- {
- 	switch (e->key()) {
- 	case Qt::Key_Escape:
-+		updateLineEditText(item);
- 		break;
- 	case Qt::Key_Return:
- 	case Qt::Key_Enter:
-@@ -332,6 +338,15 @@ void ConfigLineEdit::keyPressEvent(QKeyEvent* e)
- 	hide();
- }
- 
-+void ConfigLineEdit::focusOutEvent(QFocusEvent *e)
-+{
-+	if (e->lostFocus()) {
-+		sym_set_string_value(item->menu->sym, text().latin1());
-+		parent()->updateList(item);
-+	}
-+	Parent::focusOutEvent(e);
-+}
-+
- ConfigList::ConfigList(ConfigView* p, const char *name)
- 	: Parent(p, name),
- 	  updateAll(false),
-diff --git a/scripts/kconfig/qconf.h b/scripts/kconfig/qconf.h
-index bde0c6b..11efb71 100644
---- a/scripts/kconfig/qconf.h
-+++ b/scripts/kconfig/qconf.h
-@@ -209,8 +209,10 @@ public:
- 	{
- 		return (ConfigView*)Parent::parent();
- 	}
-+	void updateLineEditText(ConfigItem *i);
- 	void show(ConfigItem *i);
- 	void keyPressEvent(QKeyEvent *e);
-+	void focusOutEvent(QFocusEvent *e);
- 
- public:
- 	ConfigItem *item;
--- 
-1.9.1
-
+> Gesendet: Dienstag, 04. November 2014 um 21:11 Uhr
+> Von: "Paul Bolle" <pebolle@tiscali.nl>
+> An: "Peter Kümmel" <syntheticpp@gmx.net>
+> Cc: linux-kbuild@vger.kernel.org, yann.morin.1998@free.fr
+> Betreff: Re: [PATCH] xconfig: Search text should have focus after search and reopen
+>
+> On Tue, 2014-11-04 at 11:35 +0100, Peter Kümmel wrote:
+> 
+> Again, this patch, though smaller that the previous, is not obviously
+> trivial. So, could you please add a few lines describing current
+> behavior, why it's wrong, and how this patch fixes it? That might
+> increase the chance this patch gets some review.
+> 
+> > Signed-off-by: Peter Kümmel <syntheticpp@gmx.net>
+> > ---
+> >  scripts/kconfig/qconf.cc | 7 +++++++
+> >  scripts/kconfig/qconf.h  | 1 +
+> >  2 files changed, 8 insertions(+)
+> > 
+> > diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
+> > index 9d3b04b..014df76c 100644
+> > --- a/scripts/kconfig/qconf.cc
+> > +++ b/scripts/kconfig/qconf.cc
+> > @@ -1198,6 +1198,7 @@ ConfigSearchWindow::ConfigSearchWindow(ConfigMainWindow* parent, const char *nam
+> >  	layout2->addWidget(editField);
+> >  	searchButton = new QPushButton(_("Search"), this);
+> >  	searchButton->setAutoDefault(FALSE);
+> > +	searchButton->setFocusPolicy(Qt::NoFocus);
+> >  	connect(searchButton, SIGNAL(clicked()), SLOT(search()));
+> >  	layout2->addWidget(searchButton);
+> >  	layout1->addLayout(layout2);
+> > @@ -1235,6 +1236,11 @@ ConfigSearchWindow::ConfigSearchWindow(ConfigMainWindow* parent, const char *nam
+> >  	}
+> >  }
+> >  
+> > +void ConfigSearchWindow::setFocusOnLineEdit()
+> > +{
+> > +	editField->setFocus(Qt::OtherFocusReason);
+> > +}
+> > +
+> >  void ConfigSearchWindow::saveSettings(void)
+> >  {
+> >  	if (name()) {
+> > @@ -1506,6 +1512,7 @@ void ConfigMainWindow::searchConfig(void)
+> >  	if (!searchWindow)
+> >  		searchWindow = new ConfigSearchWindow(this, "search");
+> >  	searchWindow->show();
+> > +	searchWindow->setFocusOnLineEdit();
+> >  }
+> >  
+> >  void ConfigMainWindow::changeMenu(struct menu *menu)
+> > diff --git a/scripts/kconfig/qconf.h b/scripts/kconfig/qconf.h
+> > index bde0c6b..6f2c4d6 100644
+> > --- a/scripts/kconfig/qconf.h
+> > +++ b/scripts/kconfig/qconf.h
+> > @@ -288,6 +288,7 @@ public:
+> >  public slots:
+> >  	void saveSettings(void);
+> >  	void search(void);
+> > +	void setFocusOnLineEdit(void);
+> >  
+> >  protected:
+> >  	QLineEdit* editField;
+> 
+> Thanks,
+> 
+> 
+> Paul Bolle
+> 
+>
