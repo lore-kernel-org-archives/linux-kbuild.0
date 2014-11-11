@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mailout.easymail.ca ([64.68.201.169]:48058 "EHLO
+Received: from mailout.easymail.ca ([64.68.201.169]:48074 "EHLO
 	mailout.easymail.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751771AbaKKU2W (ORCPT
+	with ESMTP id S1751882AbaKKU2W (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Tue, 11 Nov 2014 15:28:22 -0500
 From: Shuah Khan <shuahkh@osg.samsung.com>
-Subject: [PATCH v2 06/19] selftests/efivarfs: add install target to enable installing test
-Date: Tue, 11 Nov 2014 13:27:46 -0700
-Message-Id: <f37035baef13b3a585170e06c26073892897eef8.1415735831.git.shuahkh@osg.samsung.com>
+Subject: [PATCH v2 09/19] selftests/kcmp: add install target to enable installing test
+Date: Tue, 11 Nov 2014 13:27:49 -0700
+Message-Id: <5f77ee88e61e41399beb12cc52862bedbe934f92.1415735831.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1415735831.git.shuahkh@osg.samsung.com>
 References: <cover.1415735831.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1415735831.git.shuahkh@osg.samsung.com>
@@ -24,41 +24,50 @@ only from top level source dir.
 
 Signed-off-by: Shuah Khan <shuahkh@osg.samsung.com>
 ---
- tools/testing/selftests/efivarfs/Makefile | 19 +++++++++++++++++--
- 1 file changed, 17 insertions(+), 2 deletions(-)
+ tools/testing/selftests/kcmp/Makefile | 22 +++++++++++++++++++++-
+ 1 file changed, 21 insertions(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/efivarfs/Makefile b/tools/testing/selftests/efivarfs/Makefile
-index 29e8c6b..d34c4c2 100644
---- a/tools/testing/selftests/efivarfs/Makefile
-+++ b/tools/testing/selftests/efivarfs/Makefile
-@@ -3,10 +3,25 @@ CFLAGS = -Wall
+diff --git a/tools/testing/selftests/kcmp/Makefile b/tools/testing/selftests/kcmp/Makefile
+index 8aabd82..753890f 100644
+--- a/tools/testing/selftests/kcmp/Makefile
++++ b/tools/testing/selftests/kcmp/Makefile
+@@ -14,6 +14,8 @@ CFLAGS += -I../../../../include/
+ CFLAGS += -I../../../../usr/include/
+ CFLAGS += -I../../../../arch/x86/include/
  
- test_objs = open-unlink create-read
++TEST_STR = ./kcmp_test || echo kcmp_test: [FAIL]
++
+ all:
+ ifeq ($(ARCH),x86)
+ 	gcc $(CFLAGS) kcmp_test.c -o kcmp_test
+@@ -21,8 +23,26 @@ else
+ 	echo "Not an x86 target, can't build kcmp selftest"
+ endif
  
--all: $(test_objs)
-+TEST_STR = /bin/bash ./efivarfs.sh || echo efivarfs selftests: [FAIL]
-+
-+all:
-+	gcc open-unlink.c -o open-unlink
-+	gcc create-read.c -o create-read
-+
 +install:
 +ifdef INSTALL_KSFT_PATH
-+	install ./efivarfs.sh $(test_objs) $(INSTALL_KSFT_PATH)
-+	@echo echo Start efivarfs test .... >> $(KSELFTEST)
++ifeq ($(ARCH),x86)
++	install ./kcmp_test $(INSTALL_KSFT_PATH)
++	@echo echo Start kcmp test .... >> $(KSELFTEST)
 +	@echo "$(TEST_STR)" >> $(KSELFTEST)
-+	@echo echo End efivarfs test .... >> $(KSELFTEST)
++	@echo rm -f kcmp-test-file >> $(KSELFTEST)
++	@echo echo End kcmp test .... >> $(KSELFTEST)
 +	@echo echo ============================== >> $(KSELFTEST)
++else
++	@echo Not an x86 target, unable install kcmp selftests
++endif
 +else
 +	@echo Run make kselftest_install in top level source directory
 +endif
- 
++
  run_tests: all
--	@/bin/bash ./efivarfs.sh || echo "efivarfs selftests: [FAIL]"
+-	@./kcmp_test || echo "kcmp_test: [FAIL]"
++ifeq ($(ARCH),x86)
 +	@$(TEST_STR)
++endif
  
  clean:
- 	rm -f $(test_objs)
+ 	$(RM) kcmp_test kcmp-test-file
 -- 
 1.9.1
 
