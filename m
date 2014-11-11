@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mailout.easymail.ca ([64.68.201.169]:48174 "EHLO
+Received: from mailout.easymail.ca ([64.68.201.169]:48140 "EHLO
 	mailout.easymail.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751771AbaKKU2d (ORCPT
+	with ESMTP id S1751882AbaKKU2b (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 11 Nov 2014 15:28:33 -0500
+	Tue, 11 Nov 2014 15:28:31 -0500
 From: Shuah Khan <shuahkh@osg.samsung.com>
-Subject: [PATCH v2 19/19] selftests/user: add install target to enable installing test
-Date: Tue, 11 Nov 2014 13:27:59 -0700
-Message-Id: <a7dbde4f89edb93ca8c3ebfc9eb12c759e5f1ed7.1415735831.git.shuahkh@osg.samsung.com>
+Subject: [PATCH v2 17/19] selftests/timers: add install target to enable installing test
+Date: Tue, 11 Nov 2014 13:27:57 -0700
+Message-Id: <a3dc7d2d654474fe8e0aa731f15948dfa88bca51.1415735831.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1415735831.git.shuahkh@osg.samsung.com>
 References: <cover.1415735831.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1415735831.git.shuahkh@osg.samsung.com>
@@ -24,35 +24,36 @@ only from top level source dir.
 
 Signed-off-by: Shuah Khan <shuahkh@osg.samsung.com>
 ---
- tools/testing/selftests/user/Makefile | 15 ++++++++++++++-
+ tools/testing/selftests/timers/Makefile | 15 ++++++++++++++-
  1 file changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/user/Makefile b/tools/testing/selftests/user/Makefile
-index 12c9d15..b62962a 100644
---- a/tools/testing/selftests/user/Makefile
-+++ b/tools/testing/selftests/user/Makefile
-@@ -1,7 +1,20 @@
- # Makefile for user memory selftests
- 
-+TEST_STR = ./test_user_copy.sh
+diff --git a/tools/testing/selftests/timers/Makefile b/tools/testing/selftests/timers/Makefile
+index eb2859f..0c3c67b 100644
+--- a/tools/testing/selftests/timers/Makefile
++++ b/tools/testing/selftests/timers/Makefile
+@@ -1,8 +1,21 @@
++TEST_STR = ./posix_timers
 +
- # No binaries, but make sure arg-less "make" doesn't trigger "run_tests"
  all:
+ 	gcc posix_timers.c -o posix_timers -lrt
  
 +install:
 +ifdef INSTALL_KSFT_PATH
-+	install ./test_user_copy.sh $(INSTALL_KSFT_PATH)
-+	@echo echo Start user copy test .... >> $(KSELFTEST)
++	install ./posix_timers $(INSTALL_KSFT_PATH)
++	@echo echo Start timers test .... >> $(KSELFTEST)
 +	@echo "$(TEST_STR)" >> $(KSELFTEST)
-+	@echo echo End user copy test .... >> $(KSELFTEST)
++	@echo echo End timers test .... >> $(KSELFTEST)
 +	@echo echo ============================== >> $(KSELFTEST)
 +else
 +	@echo Run make kselftest_install in top level source directory
 +endif
 +
  run_tests: all
--	./test_user_copy.sh
+-	./posix_timers
 +	@$(TEST_STR)
+ 
+ clean:
+ 	rm -f ./posix_timers
 -- 
 1.9.1
 
