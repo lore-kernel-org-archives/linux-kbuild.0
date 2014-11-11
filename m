@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mailout.easymail.ca ([64.68.201.169]:48128 "EHLO
+Received: from mailout.easymail.ca ([64.68.201.169]:48058 "EHLO
 	mailout.easymail.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751976AbaKKU23 (ORCPT
+	with ESMTP id S1751771AbaKKU2W (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 11 Nov 2014 15:28:29 -0500
+	Tue, 11 Nov 2014 15:28:22 -0500
 From: Shuah Khan <shuahkh@osg.samsung.com>
-Subject: [PATCH v2 13/19] selftests/mqueue: add install target to enable installing test
-Date: Tue, 11 Nov 2014 13:27:53 -0700
-Message-Id: <9d545d554e9159d67a31403bdef39db8c75225a4.1415735831.git.shuahkh@osg.samsung.com>
+Subject: [PATCH v2 06/19] selftests/efivarfs: add install target to enable installing test
+Date: Tue, 11 Nov 2014 13:27:46 -0700
+Message-Id: <f37035baef13b3a585170e06c26073892897eef8.1415735831.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1415735831.git.shuahkh@osg.samsung.com>
 References: <cover.1415735831.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1415735831.git.shuahkh@osg.samsung.com>
@@ -24,41 +24,41 @@ only from top level source dir.
 
 Signed-off-by: Shuah Khan <shuahkh@osg.samsung.com>
 ---
- tools/testing/selftests/mqueue/Makefile | 20 +++++++++++++++++---
- 1 file changed, 17 insertions(+), 3 deletions(-)
+ tools/testing/selftests/efivarfs/Makefile | 19 +++++++++++++++++--
+ 1 file changed, 17 insertions(+), 2 deletions(-)
 
-diff --git a/tools/testing/selftests/mqueue/Makefile b/tools/testing/selftests/mqueue/Makefile
-index 8056e2e..7a7e5d3 100644
---- a/tools/testing/selftests/mqueue/Makefile
-+++ b/tools/testing/selftests/mqueue/Makefile
-@@ -1,10 +1,24 @@
-+MQ_OPEN_TEST_STR = ./mq_open_tests /test1 || echo mq_open_tests: [FAIL]
-+MQ_PERF_TEST_STR = ./mq_perf_tests || echo mq_perf_tests: [FAIL]
-+
- all:
- 	gcc -O2 mq_open_tests.c -o mq_open_tests -lrt
- 	gcc -O2 -o mq_perf_tests mq_perf_tests.c -lrt -lpthread -lpopt
+diff --git a/tools/testing/selftests/efivarfs/Makefile b/tools/testing/selftests/efivarfs/Makefile
+index 29e8c6b..d34c4c2 100644
+--- a/tools/testing/selftests/efivarfs/Makefile
++++ b/tools/testing/selftests/efivarfs/Makefile
+@@ -3,10 +3,25 @@ CFLAGS = -Wall
  
--run_tests:
--	@./mq_open_tests /test1 || echo "mq_open_tests: [FAIL]"
--	@./mq_perf_tests || echo "mq_perf_tests: [FAIL]"
+ test_objs = open-unlink create-read
+ 
+-all: $(test_objs)
++TEST_STR = /bin/bash ./efivarfs.sh || echo efivarfs selftests: [FAIL]
++
++all:
++	gcc open-unlink.c -o open-unlink
++	gcc create-read.c -o create-read
++
 +install:
 +ifdef INSTALL_KSFT_PATH
-+	install ./mq_open_tests ./mq_perf_tests $(INSTALL_KSFT_PATH)
-+	@echo echo Start mqueue test .... >> $(KSELFTEST)
-+	@echo "$(MQ_OPEN_TEST_STR)" >> $(KSELFTEST)
-+	@echo "$(MQ_PERF_TEST_STR)" >> $(KSELFTEST)
++	install ./efivarfs.sh $(test_objs) $(INSTALL_KSFT_PATH)
++	@echo echo Start efivarfs test .... >> $(KSELFTEST)
++	@echo "$(TEST_STR)" >> $(KSELFTEST)
++	@echo echo End efivarfs test .... >> $(KSELFTEST)
 +	@echo echo ============================== >> $(KSELFTEST)
 +else
 +	@echo Run make kselftest_install in top level source directory
 +endif
-+
-+run_tests: all
-+	@$(MQ_OPEN_TEST_STR)
-+	@$(MQ_PERF_TEST_STR)
+ 
+ run_tests: all
+-	@/bin/bash ./efivarfs.sh || echo "efivarfs selftests: [FAIL]"
++	@$(TEST_STR)
  
  clean:
- 	rm -f mq_open_tests mq_perf_tests
+ 	rm -f $(test_objs)
 -- 
 1.9.1
 
