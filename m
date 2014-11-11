@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mailout.easymail.ca ([64.68.201.169]:47997 "EHLO
+Received: from mailout.easymail.ca ([64.68.201.169]:48003 "EHLO
 	mailout.easymail.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751771AbaKKU2S (ORCPT
+	with ESMTP id S1751772AbaKKU2S (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Tue, 11 Nov 2014 15:28:18 -0500
 From: Shuah Khan <shuahkh@osg.samsung.com>
-Subject: [PATCH v2 07/19] selftests/firmware: add install target to enable installing test
-Date: Tue, 11 Nov 2014 13:27:47 -0700
-Message-Id: <1d2d13556ddbbbbb13989cdcb08447909bc4afaf.1415735831.git.shuahkh@osg.samsung.com>
+Subject: [PATCH v2 04/19] selftests/breakpoints: add install target to enable installing test
+Date: Tue, 11 Nov 2014 13:27:44 -0700
+Message-Id: <37441d357f68dc157701a5606a9c953cea671500.1415735831.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1415735831.git.shuahkh@osg.samsung.com>
 References: <cover.1415735831.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1415735831.git.shuahkh@osg.samsung.com>
@@ -24,71 +24,49 @@ only from top level source dir.
 
 Signed-off-by: Shuah Khan <shuahkh@osg.samsung.com>
 ---
- tools/testing/selftests/firmware/Makefile | 49 ++++++++++++++++++++-----------
- 1 file changed, 32 insertions(+), 17 deletions(-)
+ tools/testing/selftests/breakpoints/Makefile | 22 ++++++++++++++++++++--
+ 1 file changed, 20 insertions(+), 2 deletions(-)
 
-diff --git a/tools/testing/selftests/firmware/Makefile b/tools/testing/selftests/firmware/Makefile
-index e23cce0..2286dbb 100644
---- a/tools/testing/selftests/firmware/Makefile
-+++ b/tools/testing/selftests/firmware/Makefile
-@@ -1,25 +1,40 @@
- # Makefile for firmware loading selftests
+diff --git a/tools/testing/selftests/breakpoints/Makefile b/tools/testing/selftests/breakpoints/Makefile
+index e18b42b..9a70aeb 100644
+--- a/tools/testing/selftests/breakpoints/Makefile
++++ b/tools/testing/selftests/breakpoints/Makefile
+@@ -8,6 +8,7 @@ ifeq ($(ARCH),x86_64)
+ 	ARCH := x86
+ endif
  
- # No binaries, but make sure arg-less "make" doesn't trigger "run_tests"
-+
-+__fw_filesystem:
-+fw_filesystem  = if /bin/sh ./fw_filesystem.sh ; then
-+fw_filesystem += echo fw_filesystem: ok;
-+fw_filesystem += else echo fw_filesystem: [FAIL];
-+fw_filesystem += fi
-+
-+__fw_userhelper:
-+fw_userhelper  = if /bin/sh ./fw_userhelper.sh ; then
-+fw_userhelper += echo fw_userhelper: ok;
-+fw_userhelper += else
-+fw_userhelper += echo fw_userhelper: [FAIL];
-+fw_userhelper += fi
-+
++TEST_STR = ./breakpoint_test || echo breakpoints selftests: [FAIL]
+ 
  all:
+ ifeq ($(ARCH),x86)
+@@ -16,8 +17,25 @@ else
+ 	echo "Not an x86 target, can't build breakpoints selftests"
+ endif
  
--fw_filesystem:
--	@if /bin/sh ./fw_filesystem.sh ; then \
--                echo "fw_filesystem: ok"; \
--        else \
--                echo "fw_filesystem: [FAIL]"; \
--                exit 1; \
--        fi
--
--fw_userhelper:
--	@if /bin/sh ./fw_userhelper.sh ; then \
--                echo "fw_userhelper: ok"; \
--        else \
--                echo "fw_userhelper: [FAIL]"; \
--                exit 1; \
--        fi
--
--run_tests: all fw_filesystem fw_userhelper
+-run_tests:
+-	@./breakpoint_test || echo "breakpoints selftests: [FAIL]"
 +install:
 +ifdef INSTALL_KSFT_PATH
-+	install ./fw_filesystem.sh ./fw_userhelper.sh $(INSTALL_KSFT_PATH)
-+	@echo echo Start firmware filesystem test .... >> $(KSELFTEST)
-+	@echo "$(fw_filesystem)" >> $(KSELFTEST)
-+	@echo echo End firmware filesystem test .... >> $(KSELFTEST)
-+	@echo echo -------------------- >> $(KSELFTEST)
-+	@echo echo Start firmware userhelper test .... >> $(KSELFTEST)
-+	@echo "$(fw_userhelper)" >> $(KSELFTEST)
-+	@echo echo End firmware userhelper test .... >> $(KSELFTEST)
++ifeq ($(ARCH),x86)
++	install ./breakpoint_test $(INSTALL_KSFT_PATH)
++	@echo echo Start breakpoints test .... >> $(KSELFTEST)
++	@echo "$(TEST_STR)" >> $(KSELFTEST)
++	@echo echo End breakpoints test .... >> $(KSELFTEST)
 +	@echo echo ============================== >> $(KSELFTEST)
++else
++	@echo Not an x86 target, unable to install breakpoints selftests
++endif
 +else
 +	@echo Run make kselftest_install in top level source directory
 +endif
 +
-+run_tests:
-+	@$(fw_filesystem)
-+	@$(fw_userhelper)
++run_tests: all
++ifeq ($(ARCH),x86)
++	@$(TEST_STR)
++endif
  
- # Nothing to clean up.
  clean:
+ 	rm -fr breakpoint_test
 -- 
 1.9.1
 
