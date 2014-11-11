@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mailout.easymail.ca ([64.68.201.169]:48140 "EHLO
+Received: from mailout.easymail.ca ([64.68.201.169]:48150 "EHLO
 	mailout.easymail.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751882AbaKKU2b (ORCPT
+	with ESMTP id S1752017AbaKKU2a (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 11 Nov 2014 15:28:31 -0500
+	Tue, 11 Nov 2014 15:28:30 -0500
 From: Shuah Khan <shuahkh@osg.samsung.com>
-Subject: [PATCH v2 17/19] selftests/timers: add install target to enable installing test
-Date: Tue, 11 Nov 2014 13:27:57 -0700
-Message-Id: <a3dc7d2d654474fe8e0aa731f15948dfa88bca51.1415735831.git.shuahkh@osg.samsung.com>
+Subject: [PATCH v2 18/19] selftests/vm: add install target to enable installing test
+Date: Tue, 11 Nov 2014 13:27:58 -0700
+Message-Id: <86ae024c4591a8775f82975b69182fdc29f234d2.1415735831.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1415735831.git.shuahkh@osg.samsung.com>
 References: <cover.1415735831.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1415735831.git.shuahkh@osg.samsung.com>
@@ -24,36 +24,40 @@ only from top level source dir.
 
 Signed-off-by: Shuah Khan <shuahkh@osg.samsung.com>
 ---
- tools/testing/selftests/timers/Makefile | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
+ tools/testing/selftests/vm/Makefile | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/timers/Makefile b/tools/testing/selftests/timers/Makefile
-index eb2859f..0c3c67b 100644
---- a/tools/testing/selftests/timers/Makefile
-+++ b/tools/testing/selftests/timers/Makefile
-@@ -1,8 +1,21 @@
-+TEST_STR = ./posix_timers
-+
- all:
- 	gcc posix_timers.c -o posix_timers -lrt
+diff --git a/tools/testing/selftests/vm/Makefile b/tools/testing/selftests/vm/Makefile
+index 4c4b1f6..7fbe551 100644
+--- a/tools/testing/selftests/vm/Makefile
++++ b/tools/testing/selftests/vm/Makefile
+@@ -4,13 +4,25 @@ CC = $(CROSS_COMPILE)gcc
+ CFLAGS = -Wall
+ BINARIES = hugepage-mmap hugepage-shm map_hugetlb thuge-gen hugetlbfstest
+ BINARIES += transhuge-stress
++TEST_STR = /bin/sh ./run_vmtests || echo vmtests: [FAIL]
+ 
+ all: $(BINARIES)
+ %: %.c
+ 	$(CC) $(CFLAGS) -o $@ $^
  
 +install:
 +ifdef INSTALL_KSFT_PATH
-+	install ./posix_timers $(INSTALL_KSFT_PATH)
-+	@echo echo Start timers test .... >> $(KSELFTEST)
++	install run_vmtests $(BINARIES) $(INSTALL_KSFT_PATH)
++	@echo echo Start vm test .... >> $(KSELFTEST)
 +	@echo "$(TEST_STR)" >> $(KSELFTEST)
-+	@echo echo End timers test .... >> $(KSELFTEST)
++	@echo echo End vm test .... >> $(KSELFTEST)
 +	@echo echo ============================== >> $(KSELFTEST)
 +else
 +	@echo Run make kselftest_install in top level source directory
 +endif
 +
  run_tests: all
--	./posix_timers
+-	@/bin/sh ./run_vmtests || (echo "vmtests: [FAIL]"; exit 1)
 +	@$(TEST_STR)
  
  clean:
- 	rm -f ./posix_timers
+ 	$(RM) $(BINARIES)
 -- 
 1.9.1
 
