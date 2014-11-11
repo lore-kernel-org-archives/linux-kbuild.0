@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mailout.easymail.ca ([64.68.201.169]:48040 "EHLO
+Received: from mailout.easymail.ca ([64.68.201.169]:47997 "EHLO
 	mailout.easymail.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751793AbaKKU2U (ORCPT
+	with ESMTP id S1751771AbaKKU2S (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 11 Nov 2014 15:28:20 -0500
+	Tue, 11 Nov 2014 15:28:18 -0500
 From: Shuah Khan <shuahkh@osg.samsung.com>
-Subject: [PATCH v2 12/19] selftests/mount: add install target to enable installing test
-Date: Tue, 11 Nov 2014 13:27:52 -0700
-Message-Id: <63e46a7d9157cde01206cd6be43678f85ac4268c.1415735831.git.shuahkh@osg.samsung.com>
+Subject: [PATCH v2 07/19] selftests/firmware: add install target to enable installing test
+Date: Tue, 11 Nov 2014 13:27:47 -0700
+Message-Id: <1d2d13556ddbbbbb13989cdcb08447909bc4afaf.1415735831.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1415735831.git.shuahkh@osg.samsung.com>
 References: <cover.1415735831.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1415735831.git.shuahkh@osg.samsung.com>
@@ -24,41 +24,71 @@ only from top level source dir.
 
 Signed-off-by: Shuah Khan <shuahkh@osg.samsung.com>
 ---
- tools/testing/selftests/mount/Makefile | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
+ tools/testing/selftests/firmware/Makefile | 49 ++++++++++++++++++++-----------
+ 1 file changed, 32 insertions(+), 17 deletions(-)
 
-diff --git a/tools/testing/selftests/mount/Makefile b/tools/testing/selftests/mount/Makefile
-index 337d853..7533097 100644
---- a/tools/testing/selftests/mount/Makefile
-+++ b/tools/testing/selftests/mount/Makefile
-@@ -1,5 +1,7 @@
- # Makefile for mount selftests.
+diff --git a/tools/testing/selftests/firmware/Makefile b/tools/testing/selftests/firmware/Makefile
+index e23cce0..2286dbb 100644
+--- a/tools/testing/selftests/firmware/Makefile
++++ b/tools/testing/selftests/firmware/Makefile
+@@ -1,25 +1,40 @@
+ # Makefile for firmware loading selftests
  
-+TEST_STR = if [ -f /proc/self/uid_map ] ; then ./unprivileged-remount-test ; fi
+ # No binaries, but make sure arg-less "make" doesn't trigger "run_tests"
 +
- all: unprivileged-remount-test
- 
- unprivileged-remount-test: unprivileged-remount-test.c
-@@ -7,7 +9,18 @@ unprivileged-remount-test: unprivileged-remount-test.c
- 
- # Allow specific tests to be selected.
- test_unprivileged_remount: unprivileged-remount-test
--	@if [ -f /proc/self/uid_map ] ; then ./unprivileged-remount-test ; fi
-+	@$(TEST_STR)
++__fw_filesystem:
++fw_filesystem  = if /bin/sh ./fw_filesystem.sh ; then
++fw_filesystem += echo fw_filesystem: ok;
++fw_filesystem += else echo fw_filesystem: [FAIL];
++fw_filesystem += fi
 +
++__fw_userhelper:
++fw_userhelper  = if /bin/sh ./fw_userhelper.sh ; then
++fw_userhelper += echo fw_userhelper: ok;
++fw_userhelper += else
++fw_userhelper += echo fw_userhelper: [FAIL];
++fw_userhelper += fi
++
+ all:
+ 
+-fw_filesystem:
+-	@if /bin/sh ./fw_filesystem.sh ; then \
+-                echo "fw_filesystem: ok"; \
+-        else \
+-                echo "fw_filesystem: [FAIL]"; \
+-                exit 1; \
+-        fi
+-
+-fw_userhelper:
+-	@if /bin/sh ./fw_userhelper.sh ; then \
+-                echo "fw_userhelper: ok"; \
+-        else \
+-                echo "fw_userhelper: [FAIL]"; \
+-                exit 1; \
+-        fi
+-
+-run_tests: all fw_filesystem fw_userhelper
 +install:
 +ifdef INSTALL_KSFT_PATH
-+	install ./unprivileged-remount-test $(INSTALL_KSFT_PATH)
-+	@echo echo Start mount test .... >> $(KSELFTEST)
-+	@echo "$(TEST_STR)" >> $(KSELFTEST)
-+	@echo echo End mount test .... >> $(KSELFTEST)
++	install ./fw_filesystem.sh ./fw_userhelper.sh $(INSTALL_KSFT_PATH)
++	@echo echo Start firmware filesystem test .... >> $(KSELFTEST)
++	@echo "$(fw_filesystem)" >> $(KSELFTEST)
++	@echo echo End firmware filesystem test .... >> $(KSELFTEST)
++	@echo echo -------------------- >> $(KSELFTEST)
++	@echo echo Start firmware userhelper test .... >> $(KSELFTEST)
++	@echo "$(fw_userhelper)" >> $(KSELFTEST)
++	@echo echo End firmware userhelper test .... >> $(KSELFTEST)
 +	@echo echo ============================== >> $(KSELFTEST)
 +else
 +	@echo Run make kselftest_install in top level source directory
 +endif
++
++run_tests:
++	@$(fw_filesystem)
++	@$(fw_userhelper)
  
- run_tests: all test_unprivileged_remount
- 
+ # Nothing to clean up.
+ clean:
 -- 
 1.9.1
 
