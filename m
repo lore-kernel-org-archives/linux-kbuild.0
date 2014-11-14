@@ -1,55 +1,82 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lists.s-osg.org ([54.187.51.154]:44994 "EHLO lists.s-osg.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752632AbaKNUYR (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 14 Nov 2014 15:24:17 -0500
-Date: Fri, 14 Nov 2014 18:24:05 -0200
-From: Mauro Carvalho Chehab <mchehab@osg.samsung.com>
-Subject: Re: [RESUBMIT] [PATCH] Replace mentions of "list_struct" to
- "list_head"
-Message-ID: <20141114182405.233f0fe3@recife.lan>
-In-Reply-To: <20141113204841.18898f4e@gandalf.local.home>
-References: <20141107214100.GA1640@kroah.com>
-	<1415927395-11556-1-git-send-email-andrey.krieger.utkin@gmail.com>
-	<20141113204841.18898f4e@gandalf.local.home>
+Received: from mail-la0-f51.google.com ([209.85.215.51]:50633 "EHLO
+	mail-la0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932635AbaKNUy0 (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 14 Nov 2014 15:54:26 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <1415985728.5912.17.camel@perches.com>
+References: <1415969446-26356-1-git-send-email-a.ryabinin@samsung.com>
+	<1415969446-26356-2-git-send-email-a.ryabinin@samsung.com>
+	<1415985728.5912.17.camel@perches.com>
+Date: Sat, 15 Nov 2014 00:54:24 +0400
+Message-ID: <CAPAsAGwCJqBeoQRb5AwNdkFDRLvqk8WhE3tKcAYXWs5W_r-fDA@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] kernel: printk: specify alignment for struct printk_log
+From: Andrey Ryabinin <ryabinin.a.a@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: Andrey Utkin <andrey.krieger.utkin@gmail.com>, linux-usb@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-media@vger.kernel.org, linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org, kernel-janitors@vger.kernel.org, gregkh@linuxfoundation.org, mgorman@suse.de, ddstreet@ieee.org, jeffrey.t.kirsher@intel.com, yamada.m@jp.panasonic.com, kenhelias@firemail.de, oleg@redhat.com, akpm@linux-foundation.org, shuah.kh@samsung.com, valentina.manea.m@gmail.com, yann.morin.1998@free.fr, laijs@cn.fujitsu.com, mathieu.desnoyers@efficios.com, josh@joshtriplett.org, paulmck@linux.vnet.ibm.com, awalls@md.metrocast.net, airlied@linux.ie, christian.koenig@amd.com, alexander.deucher@amd.com, trivial@kernel.org
+To: Joe Perches <joe@perches.com>
+Cc: Andrey Ryabinin <a.ryabinin@samsung.com>, LKML <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Peter Zijlstra <peterz@infradead.org>, Sasha Levin <sasha.levin@oracle.com>, Randy Dunlap <rdunlap@infradead.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Jonathan Corbet <corbet@lwn.net>, Michal Marek <mmarek@suse.cz>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Yury Gribov <y.gribov@samsung.com>, Dmitry Vyukov <dvyukov@google.com>, Konstantin Khlebnikov <koct9i@gmail.com>, "x86@kernel.org" <x86@kernel.org>, linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-Em Thu, 13 Nov 2014 20:48:41 -0500
-Steven Rostedt <rostedt@goodmis.org> escreveu:
+2014-11-14 20:22 GMT+03:00 Joe Perches <joe@perches.com>:
+> On Fri, 2014-11-14 at 15:50 +0300, Andrey Ryabinin wrote:
+>> On architectures that have support for efficient unaligned access
+>> struct printk_log has 4-byte alignment.
+>> Specify alignment attribute in type declaration.
+>>
+>> The whole point of this patch is to fix deadlock which happening
+>> when UBSan detects unaligned access in printk() thus UBSan recursively
+>> calls printk() with logbuf_lock held by top printk() call.
+> []
+>> diff --git a/kernel/printk/printk.c b/kernel/printk/printk.c
+> []
+>> @@ -223,7 +223,11 @@ struct printk_log {
+>>       u8 facility;            /* syslog facility */
+>>       u8 flags:5;             /* internal record flags */
+>>       u8 level:3;             /* syslog level */
+>> -};
+>> +}
+>> +#ifdef CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
+>> +__packed __aligned(4)
+>> +#endif
+>
+> Why is adding __packed useful or __aligned(4) useful?
+>
 
-> On Fri, 14 Nov 2014 05:09:55 +0400
-> Andrey Utkin <andrey.krieger.utkin@gmail.com> wrote:
-> 
-> > There's no such thing as "list_struct".
-> 
-> I guess there isn't.
+On x86_64, from compiler's point of view, 'struct printk_log' should
+be 8-byte aligned.
+But it stored in log buffer only with 4-byte alignment (LOG_ALIGN define).
 
-Indeed ;)
-> 
-> > 
-> > Signed-off-by: Andrey Utkin <andrey.krieger.utkin@gmail.com>
-> 
-> Acked-by: Steven Rostedt <rostedt@goodmis.org>
+This inconsistency makes UBSAN unhappy.  UBSAN uses printk to report errors,
+thus any access to 4-byte aligned 'struct printk_log' causing
+recursive printk() call from ubsan handler.
+And if logbuf_lock was taken we end up with deadlock.
+Specifying alignment removes this inconsistency. Now compiler knows
+that 'printk_log'
+actually aligned on 4, and it makes UBSAN happy and silent.
 
-Acked-by: Mauro Carvalho Chehab <mchehab@osg.samsung.com>
+Attribute 'aligned' without attribute 'packed' can only increase alignment.
+So __packed is used here because we need to decrease alignment from 8 to 4.
 
-> 
-> -- Steve
-> 
-> > ---
-> >  drivers/gpu/drm/radeon/mkregtable.c  | 24 ++++++++++++------------
-> >  drivers/media/pci/cx18/cx18-driver.h |  2 +-
-> >  include/linux/list.h                 | 34 +++++++++++++++++-----------------
-> >  include/linux/plist.h                | 10 +++++-----
-> >  include/linux/rculist.h              |  8 ++++----
-> >  scripts/kconfig/list.h               |  6 +++---
-> >  tools/usb/usbip/libsrc/list.h        |  2 +-
-> >  7 files changed, 43 insertions(+), 43 deletions(-)
-> > 
-> 
+
+> The struct is naturally aligned on u64 and should be
+
+Not, always. On 32-bits it will be 4-bytes aligned, on 64-bits - 8-bytes aligned
+
+> the size of 2 u64s.
+>
+> struct printk_log {
+>         u64 ts_nsec;            /* timestamp in nanoseconds */
+>         u16 len;                /* length of entire record */
+>         u16 text_len;           /* length of text buffer */
+>         u16 dict_len;           /* length of dictionary buffer */
+>         u8 facility;            /* syslog facility */
+>         u8 flags:5;             /* internal record flags */
+>         u8 level:3;             /* syslog level */
+> };
+>
+> Is there any case when it's not sizeof(u64) * 2?
+>
+
+I think no. As I said __packed used for decreasing alignment only.
