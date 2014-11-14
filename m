@@ -1,82 +1,534 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-la0-f51.google.com ([209.85.215.51]:50633 "EHLO
-	mail-la0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932635AbaKNUy0 (ORCPT
+Received: from mail-bn1bon0139.outbound.protection.outlook.com ([157.56.111.139]:42201
+	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1422662AbaKNXIN convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 14 Nov 2014 15:54:26 -0500
+	Fri, 14 Nov 2014 18:08:13 -0500
+From: "Deucher, Alexander" <Alexander.Deucher@amd.com>
+Subject: RE: [RESUBMIT] [PATCH] Replace mentions of "list_struct" to
+ "list_head"
+Date: Fri, 14 Nov 2014 22:37:56 +0000
+Message-ID: <A3397C8B8B789E45844E7EC5DEAD89D05995A36C@satlexdag05.amd.com>
+References: <20141107214100.GA1640@kroah.com>
+ <1415927395-11556-1-git-send-email-andrey.krieger.utkin@gmail.com>
+In-Reply-To: <1415927395-11556-1-git-send-email-andrey.krieger.utkin@gmail.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-In-Reply-To: <1415985728.5912.17.camel@perches.com>
-References: <1415969446-26356-1-git-send-email-a.ryabinin@samsung.com>
-	<1415969446-26356-2-git-send-email-a.ryabinin@samsung.com>
-	<1415985728.5912.17.camel@perches.com>
-Date: Sat, 15 Nov 2014 00:54:24 +0400
-Message-ID: <CAPAsAGwCJqBeoQRb5AwNdkFDRLvqk8WhE3tKcAYXWs5W_r-fDA@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] kernel: printk: specify alignment for struct printk_log
-From: Andrey Ryabinin <ryabinin.a.a@gmail.com>
-Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Joe Perches <joe@perches.com>
-Cc: Andrey Ryabinin <a.ryabinin@samsung.com>, LKML <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, Peter Zijlstra <peterz@infradead.org>, Sasha Levin <sasha.levin@oracle.com>, Randy Dunlap <rdunlap@infradead.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Jonathan Corbet <corbet@lwn.net>, Michal Marek <mmarek@suse.cz>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Yury Gribov <y.gribov@samsung.com>, Dmitry Vyukov <dvyukov@google.com>, Konstantin Khlebnikov <koct9i@gmail.com>, "x86@kernel.org" <x86@kernel.org>, linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Andrey Utkin <andrey.krieger.utkin@gmail.com>, "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-media@vger.kernel.org" <linux-media@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>, "kernel-janitors@vger.kernel.org" <kernel-janitors@vger.kernel.org>, "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>, "mgorman@suse.de" <mgorman@suse.de>, "ddstreet@ieee.org" <ddstreet@ieee.org>, "jeffrey.t.kirsher@intel.com" <jeffrey.t.kirsher@intel.com>, "yamada.m@jp.panasonic.com" <yamada.m@jp.panasonic.com>, "kenhelias@firemail.de" <kenhelias@firemail.de>, "oleg@redhat.com" <oleg@redhat.com>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "shuah.kh@samsung.com" <shuah.kh@samsung.com>, "valentina.manea.m@gmail.com" <valentina.manea.m@gmail.com>, "yann.morin.1998@free.fr" <yann.morin.1998@free.fr>, "laijs@cn.fujitsu.com" <laijs@cn.fujitsu.com>, "mathieu.desnoyers@efficios.com" <mathieu.desnoyers@efficios.com>, "rostedt@goodmis.org" <rostedt@goodmis.org>, "josh@joshtriplett.org" <josh@joshtriplett.org>, "paulmck@linux.vnet.ibm.com" <paulmck@linux.vnet.ibm.com>, "m.chehab@samsung.com" <m.chehab@samsung.com>, "awalls@md.metrocast.net" <awalls@md.metrocast.net>, "airlied@linux.ie" <airlied@linux.ie>, "Koenig, Christian" <Christian.Koenig@amd.com>, "trivial@kernel.org" <trivial@kernel.org>
 
-2014-11-14 20:22 GMT+03:00 Joe Perches <joe@perches.com>:
-> On Fri, 2014-11-14 at 15:50 +0300, Andrey Ryabinin wrote:
->> On architectures that have support for efficient unaligned access
->> struct printk_log has 4-byte alignment.
->> Specify alignment attribute in type declaration.
->>
->> The whole point of this patch is to fix deadlock which happening
->> when UBSan detects unaligned access in printk() thus UBSan recursively
->> calls printk() with logbuf_lock held by top printk() call.
-> []
->> diff --git a/kernel/printk/printk.c b/kernel/printk/printk.c
-> []
->> @@ -223,7 +223,11 @@ struct printk_log {
->>       u8 facility;            /* syslog facility */
->>       u8 flags:5;             /* internal record flags */
->>       u8 level:3;             /* syslog level */
->> -};
->> +}
->> +#ifdef CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
->> +__packed __aligned(4)
->> +#endif
->
-> Why is adding __packed useful or __aligned(4) useful?
->
+> -----Original Message-----
+> From: Andrey Utkin [mailto:andrey.krieger.utkin@gmail.com]
+> Sent: Thursday, November 13, 2014 8:10 PM
+> To: linux-usb@vger.kernel.org; linux-kbuild@vger.kernel.org; linux-
+> media@vger.kernel.org; linux-kernel@vger.kernel.org; dri-
+> devel@lists.freedesktop.org; kernel-janitors@vger.kernel.org;
+> gregkh@linuxfoundation.org; mgorman@suse.de; ddstreet@ieee.org;
+> jeffrey.t.kirsher@intel.com; yamada.m@jp.panasonic.com;
+> kenhelias@firemail.de; oleg@redhat.com; akpm@linux-foundation.org;
+> shuah.kh@samsung.com; valentina.manea.m@gmail.com;
+> yann.morin.1998@free.fr; laijs@cn.fujitsu.com;
+> mathieu.desnoyers@efficios.com; rostedt@goodmis.org;
+> josh@joshtriplett.org; paulmck@linux.vnet.ibm.com;
+> m.chehab@samsung.com; awalls@md.metrocast.net; airlied@linux.ie;
+> Koenig, Christian; Deucher, Alexander; trivial@kernel.org
+> Cc: Andrey Utkin
+> Subject: [RESUBMIT] [PATCH] Replace mentions of "list_struct" to
+> "list_head"
+> 
+> There's no such thing as "list_struct".
+> 
+> Signed-off-by: Andrey Utkin <andrey.krieger.utkin@gmail.com>
 
-On x86_64, from compiler's point of view, 'struct printk_log' should
-be 8-byte aligned.
-But it stored in log buffer only with 4-byte alignment (LOG_ALIGN define).
+Acked-by: Alex Deucher <alexander.deucher@amd.com>
 
-This inconsistency makes UBSAN unhappy.  UBSAN uses printk to report errors,
-thus any access to 4-byte aligned 'struct printk_log' causing
-recursive printk() call from ubsan handler.
-And if logbuf_lock was taken we end up with deadlock.
-Specifying alignment removes this inconsistency. Now compiler knows
-that 'printk_log'
-actually aligned on 4, and it makes UBSAN happy and silent.
+> ---
+>  drivers/gpu/drm/radeon/mkregtable.c  | 24 ++++++++++++------------
+>  drivers/media/pci/cx18/cx18-driver.h |  2 +-
+>  include/linux/list.h                 | 34 +++++++++++++++++-----------------
+>  include/linux/plist.h                | 10 +++++-----
+>  include/linux/rculist.h              |  8 ++++----
+>  scripts/kconfig/list.h               |  6 +++---
+>  tools/usb/usbip/libsrc/list.h        |  2 +-
+>  7 files changed, 43 insertions(+), 43 deletions(-)
+> 
+> diff --git a/drivers/gpu/drm/radeon/mkregtable.c
+> b/drivers/gpu/drm/radeon/mkregtable.c
+> index 4a85bb6..b928c17 100644
+> --- a/drivers/gpu/drm/radeon/mkregtable.c
+> +++ b/drivers/gpu/drm/radeon/mkregtable.c
+> @@ -347,7 +347,7 @@ static inline void list_splice_tail_init(struct list_head
+> *list,
+>   * list_entry - get the struct for this entry
+>   * @ptr:	the &struct list_head pointer.
+>   * @type:	the type of the struct this is embedded in.
+> - * @member:	the name of the list_struct within the struct.
+> + * @member:	the name of the list_head within the struct.
+>   */
+>  #define list_entry(ptr, type, member) \
+>  	container_of(ptr, type, member)
+> @@ -356,7 +356,7 @@ static inline void list_splice_tail_init(struct list_head
+> *list,
+>   * list_first_entry - get the first element from a list
+>   * @ptr:	the list head to take the element from.
+>   * @type:	the type of the struct this is embedded in.
+> - * @member:	the name of the list_struct within the struct.
+> + * @member:	the name of the list_head within the struct.
+>   *
+>   * Note, that list is expected to be not empty.
+>   */
+> @@ -406,7 +406,7 @@ static inline void list_splice_tail_init(struct list_head
+> *list,
+>   * list_for_each_entry	-	iterate over list of given type
+>   * @pos:	the type * to use as a loop cursor.
+>   * @head:	the head for your list.
+> - * @member:	the name of the list_struct within the struct.
+> + * @member:	the name of the list_head within the struct.
+>   */
+>  #define list_for_each_entry(pos, head, member)
+> 	\
+>  	for (pos = list_entry((head)->next, typeof(*pos), member);	\
+> @@ -417,7 +417,7 @@ static inline void list_splice_tail_init(struct list_head
+> *list,
+>   * list_for_each_entry_reverse - iterate backwards over list of given type.
+>   * @pos:	the type * to use as a loop cursor.
+>   * @head:	the head for your list.
+> - * @member:	the name of the list_struct within the struct.
+> + * @member:	the name of the list_head within the struct.
+>   */
+>  #define list_for_each_entry_reverse(pos, head, member)
+> 	\
+>  	for (pos = list_entry((head)->prev, typeof(*pos), member);	\
+> @@ -428,7 +428,7 @@ static inline void list_splice_tail_init(struct list_head
+> *list,
+>   * list_prepare_entry - prepare a pos entry for use in
+> list_for_each_entry_continue()
+>   * @pos:	the type * to use as a start point
+>   * @head:	the head of the list
+> - * @member:	the name of the list_struct within the struct.
+> + * @member:	the name of the list_head within the struct.
+>   *
+>   * Prepares a pos entry for use as a start point in
+> list_for_each_entry_continue().
+>   */
+> @@ -439,7 +439,7 @@ static inline void list_splice_tail_init(struct list_head
+> *list,
+>   * list_for_each_entry_continue - continue iteration over list of given type
+>   * @pos:	the type * to use as a loop cursor.
+>   * @head:	the head for your list.
+> - * @member:	the name of the list_struct within the struct.
+> + * @member:	the name of the list_head within the struct.
+>   *
+>   * Continue to iterate over list of given type, continuing after
+>   * the current position.
+> @@ -453,7 +453,7 @@ static inline void list_splice_tail_init(struct list_head
+> *list,
+>   * list_for_each_entry_continue_reverse - iterate backwards from the given
+> point
+>   * @pos:	the type * to use as a loop cursor.
+>   * @head:	the head for your list.
+> - * @member:	the name of the list_struct within the struct.
+> + * @member:	the name of the list_head within the struct.
+>   *
+>   * Start to iterate over list of given type backwards, continuing after
+>   * the current position.
+> @@ -467,7 +467,7 @@ static inline void list_splice_tail_init(struct list_head
+> *list,
+>   * list_for_each_entry_from - iterate over list of given type from the current
+> point
+>   * @pos:	the type * to use as a loop cursor.
+>   * @head:	the head for your list.
+> - * @member:	the name of the list_struct within the struct.
+> + * @member:	the name of the list_head within the struct.
+>   *
+>   * Iterate over list of given type, continuing from current position.
+>   */
+> @@ -480,7 +480,7 @@ static inline void list_splice_tail_init(struct list_head
+> *list,
+>   * @pos:	the type * to use as a loop cursor.
+>   * @n:		another type * to use as temporary storage
+>   * @head:	the head for your list.
+> - * @member:	the name of the list_struct within the struct.
+> + * @member:	the name of the list_head within the struct.
+>   */
+>  #define list_for_each_entry_safe(pos, n, head, member)
+> 	\
+>  	for (pos = list_entry((head)->next, typeof(*pos), member),	\
+> @@ -493,7 +493,7 @@ static inline void list_splice_tail_init(struct list_head
+> *list,
+>   * @pos:	the type * to use as a loop cursor.
+>   * @n:		another type * to use as temporary storage
+>   * @head:	the head for your list.
+> - * @member:	the name of the list_struct within the struct.
+> + * @member:	the name of the list_head within the struct.
+>   *
+>   * Iterate over list of given type, continuing after current point,
+>   * safe against removal of list entry.
+> @@ -509,7 +509,7 @@ static inline void list_splice_tail_init(struct list_head
+> *list,
+>   * @pos:	the type * to use as a loop cursor.
+>   * @n:		another type * to use as temporary storage
+>   * @head:	the head for your list.
+> - * @member:	the name of the list_struct within the struct.
+> + * @member:	the name of the list_head within the struct.
+>   *
+>   * Iterate over list of given type from current point, safe against
+>   * removal of list entry.
+> @@ -524,7 +524,7 @@ static inline void list_splice_tail_init(struct list_head
+> *list,
+>   * @pos:	the type * to use as a loop cursor.
+>   * @n:		another type * to use as temporary storage
+>   * @head:	the head for your list.
+> - * @member:	the name of the list_struct within the struct.
+> + * @member:	the name of the list_head within the struct.
+>   *
+>   * Iterate backwards over list of given type, safe against removal
+>   * of list entry.
+> diff --git a/drivers/media/pci/cx18/cx18-driver.h
+> b/drivers/media/pci/cx18/cx18-driver.h
+> index 57f4688..da59ec3 100644
+> --- a/drivers/media/pci/cx18/cx18-driver.h
+> +++ b/drivers/media/pci/cx18/cx18-driver.h
+> @@ -290,7 +290,7 @@ struct cx18_options {
+>   * list_entry_is_past_end - check if a previous loop cursor is off list end
+>   * @pos:	the type * previously used as a loop cursor.
+>   * @head:	the head for your list.
+> - * @member:	the name of the list_struct within the struct.
+> + * @member:	the name of the list_head within the struct.
+>   *
+>   * Check if the entry's list_head is the head of the list, thus it's not a
+>   * real entry but was the loop cursor that walked past the end
+> diff --git a/include/linux/list.h b/include/linux/list.h
+> index f33f831..feb773c 100644
+> --- a/include/linux/list.h
+> +++ b/include/linux/list.h
+> @@ -346,7 +346,7 @@ static inline void list_splice_tail_init(struct list_head
+> *list,
+>   * list_entry - get the struct for this entry
+>   * @ptr:	the &struct list_head pointer.
+>   * @type:	the type of the struct this is embedded in.
+> - * @member:	the name of the list_struct within the struct.
+> + * @member:	the name of the list_head within the struct.
+>   */
+>  #define list_entry(ptr, type, member) \
+>  	container_of(ptr, type, member)
+> @@ -355,7 +355,7 @@ static inline void list_splice_tail_init(struct list_head
+> *list,
+>   * list_first_entry - get the first element from a list
+>   * @ptr:	the list head to take the element from.
+>   * @type:	the type of the struct this is embedded in.
+> - * @member:	the name of the list_struct within the struct.
+> + * @member:	the name of the list_head within the struct.
+>   *
+>   * Note, that list is expected to be not empty.
+>   */
+> @@ -366,7 +366,7 @@ static inline void list_splice_tail_init(struct list_head
+> *list,
+>   * list_last_entry - get the last element from a list
+>   * @ptr:	the list head to take the element from.
+>   * @type:	the type of the struct this is embedded in.
+> - * @member:	the name of the list_struct within the struct.
+> + * @member:	the name of the list_head within the struct.
+>   *
+>   * Note, that list is expected to be not empty.
+>   */
+> @@ -377,7 +377,7 @@ static inline void list_splice_tail_init(struct list_head
+> *list,
+>   * list_first_entry_or_null - get the first element from a list
+>   * @ptr:	the list head to take the element from.
+>   * @type:	the type of the struct this is embedded in.
+> - * @member:	the name of the list_struct within the struct.
+> + * @member:	the name of the list_head within the struct.
+>   *
+>   * Note that if the list is empty, it returns NULL.
+>   */
+> @@ -387,7 +387,7 @@ static inline void list_splice_tail_init(struct list_head
+> *list,
+>  /**
+>   * list_next_entry - get the next element in list
+>   * @pos:	the type * to cursor
+> - * @member:	the name of the list_struct within the struct.
+> + * @member:	the name of the list_head within the struct.
+>   */
+>  #define list_next_entry(pos, member) \
+>  	list_entry((pos)->member.next, typeof(*(pos)), member)
+> @@ -395,7 +395,7 @@ static inline void list_splice_tail_init(struct list_head
+> *list,
+>  /**
+>   * list_prev_entry - get the prev element in list
+>   * @pos:	the type * to cursor
+> - * @member:	the name of the list_struct within the struct.
+> + * @member:	the name of the list_head within the struct.
+>   */
+>  #define list_prev_entry(pos, member) \
+>  	list_entry((pos)->member.prev, typeof(*(pos)), member)
+> @@ -441,7 +441,7 @@ static inline void list_splice_tail_init(struct list_head
+> *list,
+>   * list_for_each_entry	-	iterate over list of given type
+>   * @pos:	the type * to use as a loop cursor.
+>   * @head:	the head for your list.
+> - * @member:	the name of the list_struct within the struct.
+> + * @member:	the name of the list_head within the struct.
+>   */
+>  #define list_for_each_entry(pos, head, member)
+> 	\
+>  	for (pos = list_first_entry(head, typeof(*pos), member);	\
+> @@ -452,7 +452,7 @@ static inline void list_splice_tail_init(struct list_head
+> *list,
+>   * list_for_each_entry_reverse - iterate backwards over list of given type.
+>   * @pos:	the type * to use as a loop cursor.
+>   * @head:	the head for your list.
+> - * @member:	the name of the list_struct within the struct.
+> + * @member:	the name of the list_head within the struct.
+>   */
+>  #define list_for_each_entry_reverse(pos, head, member)
+> 	\
+>  	for (pos = list_last_entry(head, typeof(*pos), member);
+> 	\
+> @@ -463,7 +463,7 @@ static inline void list_splice_tail_init(struct list_head
+> *list,
+>   * list_prepare_entry - prepare a pos entry for use in
+> list_for_each_entry_continue()
+>   * @pos:	the type * to use as a start point
+>   * @head:	the head of the list
+> - * @member:	the name of the list_struct within the struct.
+> + * @member:	the name of the list_head within the struct.
+>   *
+>   * Prepares a pos entry for use as a start point in
+> list_for_each_entry_continue().
+>   */
+> @@ -474,7 +474,7 @@ static inline void list_splice_tail_init(struct list_head
+> *list,
+>   * list_for_each_entry_continue - continue iteration over list of given type
+>   * @pos:	the type * to use as a loop cursor.
+>   * @head:	the head for your list.
+> - * @member:	the name of the list_struct within the struct.
+> + * @member:	the name of the list_head within the struct.
+>   *
+>   * Continue to iterate over list of given type, continuing after
+>   * the current position.
+> @@ -488,7 +488,7 @@ static inline void list_splice_tail_init(struct list_head
+> *list,
+>   * list_for_each_entry_continue_reverse - iterate backwards from the given
+> point
+>   * @pos:	the type * to use as a loop cursor.
+>   * @head:	the head for your list.
+> - * @member:	the name of the list_struct within the struct.
+> + * @member:	the name of the list_head within the struct.
+>   *
+>   * Start to iterate over list of given type backwards, continuing after
+>   * the current position.
+> @@ -502,7 +502,7 @@ static inline void list_splice_tail_init(struct list_head
+> *list,
+>   * list_for_each_entry_from - iterate over list of given type from the current
+> point
+>   * @pos:	the type * to use as a loop cursor.
+>   * @head:	the head for your list.
+> - * @member:	the name of the list_struct within the struct.
+> + * @member:	the name of the list_head within the struct.
+>   *
+>   * Iterate over list of given type, continuing from current position.
+>   */
+> @@ -515,7 +515,7 @@ static inline void list_splice_tail_init(struct list_head
+> *list,
+>   * @pos:	the type * to use as a loop cursor.
+>   * @n:		another type * to use as temporary storage
+>   * @head:	the head for your list.
+> - * @member:	the name of the list_struct within the struct.
+> + * @member:	the name of the list_head within the struct.
+>   */
+>  #define list_for_each_entry_safe(pos, n, head, member)
+> 	\
+>  	for (pos = list_first_entry(head, typeof(*pos), member),	\
+> @@ -528,7 +528,7 @@ static inline void list_splice_tail_init(struct list_head
+> *list,
+>   * @pos:	the type * to use as a loop cursor.
+>   * @n:		another type * to use as temporary storage
+>   * @head:	the head for your list.
+> - * @member:	the name of the list_struct within the struct.
+> + * @member:	the name of the list_head within the struct.
+>   *
+>   * Iterate over list of given type, continuing after current point,
+>   * safe against removal of list entry.
+> @@ -544,7 +544,7 @@ static inline void list_splice_tail_init(struct list_head
+> *list,
+>   * @pos:	the type * to use as a loop cursor.
+>   * @n:		another type * to use as temporary storage
+>   * @head:	the head for your list.
+> - * @member:	the name of the list_struct within the struct.
+> + * @member:	the name of the list_head within the struct.
+>   *
+>   * Iterate over list of given type from current point, safe against
+>   * removal of list entry.
+> @@ -559,7 +559,7 @@ static inline void list_splice_tail_init(struct list_head
+> *list,
+>   * @pos:	the type * to use as a loop cursor.
+>   * @n:		another type * to use as temporary storage
+>   * @head:	the head for your list.
+> - * @member:	the name of the list_struct within the struct.
+> + * @member:	the name of the list_head within the struct.
+>   *
+>   * Iterate backwards over list of given type, safe against removal
+>   * of list entry.
+> @@ -574,7 +574,7 @@ static inline void list_splice_tail_init(struct list_head
+> *list,
+>   * list_safe_reset_next - reset a stale list_for_each_entry_safe loop
+>   * @pos:	the loop cursor used in the list_for_each_entry_safe loop
+>   * @n:		temporary storage used in list_for_each_entry_safe
+> - * @member:	the name of the list_struct within the struct.
+> + * @member:	the name of the list_head within the struct.
+>   *
+>   * list_safe_reset_next is not safe to use in general if the list may be
+>   * modified concurrently (eg. the lock is dropped in the loop body). An
+> diff --git a/include/linux/plist.h b/include/linux/plist.h
+> index 8b6c970..9788360 100644
+> --- a/include/linux/plist.h
+> +++ b/include/linux/plist.h
+> @@ -176,7 +176,7 @@ extern void plist_requeue(struct plist_node *node,
+> struct plist_head *head);
+>   * plist_for_each_entry	- iterate over list of given type
+>   * @pos:	the type * to use as a loop counter
+>   * @head:	the head for your list
+> - * @mem:	the name of the list_struct within the struct
+> + * @mem:	the name of the list_head within the struct
+>   */
+>  #define plist_for_each_entry(pos, head, mem)	\
+>  	 list_for_each_entry(pos, &(head)->node_list, mem.node_list)
+> @@ -185,7 +185,7 @@ extern void plist_requeue(struct plist_node *node,
+> struct plist_head *head);
+>   * plist_for_each_entry_continue - continue iteration over list of given type
+>   * @pos:	the type * to use as a loop cursor
+>   * @head:	the head for your list
+> - * @m:		the name of the list_struct within the struct
+> + * @m:		the name of the list_head within the struct
+>   *
+>   * Continue to iterate over list of given type, continuing after
+>   * the current position.
+> @@ -198,7 +198,7 @@ extern void plist_requeue(struct plist_node *node,
+> struct plist_head *head);
+>   * @pos:	the type * to use as a loop counter
+>   * @n:		another type * to use as temporary storage
+>   * @head:	the head for your list
+> - * @m:		the name of the list_struct within the struct
+> + * @m:		the name of the list_head within the struct
+>   *
+>   * Iterate over list of given type, safe against removal of list entry.
+>   */
+> @@ -229,7 +229,7 @@ static inline int plist_node_empty(const struct
+> plist_node *node)
+>   * plist_first_entry - get the struct for the first entry
+>   * @head:	the &struct plist_head pointer
+>   * @type:	the type of the struct this is embedded in
+> - * @member:	the name of the list_struct within the struct
+> + * @member:	the name of the list_head within the struct
+>   */
+>  #ifdef CONFIG_DEBUG_PI_LIST
+>  # define plist_first_entry(head, type, member)	\
+> @@ -246,7 +246,7 @@ static inline int plist_node_empty(const struct
+> plist_node *node)
+>   * plist_last_entry - get the struct for the last entry
+>   * @head:	the &struct plist_head pointer
+>   * @type:	the type of the struct this is embedded in
+> - * @member:	the name of the list_struct within the struct
+> + * @member:	the name of the list_head within the struct
+>   */
+>  #ifdef CONFIG_DEBUG_PI_LIST
+>  # define plist_last_entry(head, type, member)	\
+> diff --git a/include/linux/rculist.h b/include/linux/rculist.h
+> index 372ad5e..664060b 100644
+> --- a/include/linux/rculist.h
+> +++ b/include/linux/rculist.h
+> @@ -241,7 +241,7 @@ static inline void list_splice_init_rcu(struct list_head
+> *list,
+>   * list_entry_rcu - get the struct for this entry
+>   * @ptr:        the &struct list_head pointer.
+>   * @type:       the type of the struct this is embedded in.
+> - * @member:     the name of the list_struct within the struct.
+> + * @member:     the name of the list_head within the struct.
+>   *
+>   * This primitive may safely run concurrently with the _rcu list-mutation
+>   * primitives such as list_add_rcu() as long as it's guarded by rcu_read_lock().
+> @@ -278,7 +278,7 @@ static inline void list_splice_init_rcu(struct list_head
+> *list,
+>   * list_first_or_null_rcu - get the first element from a list
+>   * @ptr:        the list head to take the element from.
+>   * @type:       the type of the struct this is embedded in.
+> - * @member:     the name of the list_struct within the struct.
+> + * @member:     the name of the list_head within the struct.
+>   *
+>   * Note that if the list is empty, it returns NULL.
+>   *
+> @@ -296,7 +296,7 @@ static inline void list_splice_init_rcu(struct list_head
+> *list,
+>   * list_for_each_entry_rcu	-	iterate over rcu list of given type
+>   * @pos:	the type * to use as a loop cursor.
+>   * @head:	the head for your list.
+> - * @member:	the name of the list_struct within the struct.
+> + * @member:	the name of the list_head within the struct.
+>   *
+>   * This list-traversal primitive may safely run concurrently with
+>   * the _rcu list-mutation primitives such as list_add_rcu()
+> @@ -311,7 +311,7 @@ static inline void list_splice_init_rcu(struct list_head
+> *list,
+>   * list_for_each_entry_continue_rcu - continue iteration over list of given
+> type
+>   * @pos:	the type * to use as a loop cursor.
+>   * @head:	the head for your list.
+> - * @member:	the name of the list_struct within the struct.
+> + * @member:	the name of the list_head within the struct.
+>   *
+>   * Continue to iterate over list of given type, continuing after
+>   * the current position.
+> diff --git a/scripts/kconfig/list.h b/scripts/kconfig/list.h
+> index 685d80e..2cf23f0 100644
+> --- a/scripts/kconfig/list.h
+> +++ b/scripts/kconfig/list.h
+> @@ -34,7 +34,7 @@ struct list_head {
+>   * list_entry - get the struct for this entry
+>   * @ptr:	the &struct list_head pointer.
+>   * @type:	the type of the struct this is embedded in.
+> - * @member:	the name of the list_struct within the struct.
+> + * @member:	the name of the list_head within the struct.
+>   */
+>  #define list_entry(ptr, type, member) \
+>  	container_of(ptr, type, member)
+> @@ -43,7 +43,7 @@ struct list_head {
+>   * list_for_each_entry	-	iterate over list of given type
+>   * @pos:	the type * to use as a loop cursor.
+>   * @head:	the head for your list.
+> - * @member:	the name of the list_struct within the struct.
+> + * @member:	the name of the list_head within the struct.
+>   */
+>  #define list_for_each_entry(pos, head, member)
+> 	\
+>  	for (pos = list_entry((head)->next, typeof(*pos), member);	\
+> @@ -55,7 +55,7 @@ struct list_head {
+>   * @pos:	the type * to use as a loop cursor.
+>   * @n:		another type * to use as temporary storage
+>   * @head:	the head for your list.
+> - * @member:	the name of the list_struct within the struct.
+> + * @member:	the name of the list_head within the struct.
+>   */
+>  #define list_for_each_entry_safe(pos, n, head, member)
+> 	\
+>  	for (pos = list_entry((head)->next, typeof(*pos), member),	\
+> diff --git a/tools/usb/usbip/libsrc/list.h b/tools/usb/usbip/libsrc/list.h
+> index 8d0c936..5eaaa78 100644
+> --- a/tools/usb/usbip/libsrc/list.h
+> +++ b/tools/usb/usbip/libsrc/list.h
+> @@ -98,7 +98,7 @@ static inline void list_del(struct list_head *entry)
+>   * list_entry - get the struct for this entry
+>   * @ptr:	the &struct list_head pointer.
+>   * @type:	the type of the struct this is embedded in.
+> - * @member:	the name of the list_struct within the struct.
+> + * @member:	the name of the list_head within the struct.
+>   */
+>  #define list_entry(ptr, type, member) \
+>  	container_of(ptr, type, member)
+> --
+> 1.8.5.5
 
-Attribute 'aligned' without attribute 'packed' can only increase alignment.
-So __packed is used here because we need to decrease alignment from 8 to 4.
-
-
-> The struct is naturally aligned on u64 and should be
-
-Not, always. On 32-bits it will be 4-bytes aligned, on 64-bits - 8-bytes aligned
-
-> the size of 2 u64s.
->
-> struct printk_log {
->         u64 ts_nsec;            /* timestamp in nanoseconds */
->         u16 len;                /* length of entire record */
->         u16 text_len;           /* length of text buffer */
->         u16 dict_len;           /* length of dictionary buffer */
->         u8 facility;            /* syslog facility */
->         u8 flags:5;             /* internal record flags */
->         u8 level:3;             /* syslog level */
-> };
->
-> Is there any case when it's not sizeof(u64) * 2?
->
-
-I think no. As I said __packed used for decreasing alignment only.
