@@ -1,47 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cdptpa-outbound-snat.email.rr.com ([107.14.166.226]:11320 "EHLO
-	cdptpa-oedge-vip.email.rr.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S934020AbaKNBsy (ORCPT
+Received: from mailout2.w1.samsung.com ([210.118.77.12]:50681 "EHLO
+	mailout2.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754140AbaKNMvJ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 13 Nov 2014 20:48:54 -0500
-Date: Thu, 13 Nov 2014 20:48:41 -0500
-From: Steven Rostedt <rostedt@goodmis.org>
-Subject: Re: [RESUBMIT] [PATCH] Replace mentions of "list_struct" to
- "list_head"
-Message-ID: <20141113204841.18898f4e@gandalf.local.home>
-In-Reply-To: <1415927395-11556-1-git-send-email-andrey.krieger.utkin@gmail.com>
-References: <20141107214100.GA1640@kroah.com>
-	<1415927395-11556-1-git-send-email-andrey.krieger.utkin@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+	Fri, 14 Nov 2014 07:51:09 -0500
+From: Andrey Ryabinin <a.ryabinin@samsung.com>
+Subject: [PATCH v2 0/2] UBSan: run-time undefined behavior sanity checker
+Date: Fri, 14 Nov 2014 15:50:44 +0300
+Message-id: <1415969446-26356-1-git-send-email-a.ryabinin@samsung.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrey Utkin <andrey.krieger.utkin@gmail.com>
-Cc: linux-usb@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-media@vger.kernel.org, linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org, kernel-janitors@vger.kernel.org, gregkh@linuxfoundation.org, mgorman@suse.de, ddstreet@ieee.org, jeffrey.t.kirsher@intel.com, yamada.m@jp.panasonic.com, kenhelias@firemail.de, oleg@redhat.com, akpm@linux-foundation.org, shuah.kh@samsung.com, valentina.manea.m@gmail.com, yann.morin.1998@free.fr, laijs@cn.fujitsu.com, mathieu.desnoyers@efficios.com, josh@joshtriplett.org, paulmck@linux.vnet.ibm.com, m.chehab@samsung.com, awalls@md.metrocast.net, airlied@linux.ie, christian.koenig@amd.com, alexander.deucher@amd.com, trivial@kernel.org
+To: linux-kernel@vger.kernel.org
+Cc: Andrey Ryabinin <a.ryabinin@samsung.com>, Andrew Morton <akpm@linux-foundation.org>, Peter Zijlstra <peterz@infradead.org>, Sasha Levin <sasha.levin@oracle.com>, Randy Dunlap <rdunlap@infradead.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Jonathan Corbet <corbet@lwn.net>, Michal Marek <mmarek@suse.cz>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Yury Gribov <y.gribov@samsung.com>, Dmitry Vyukov <dvyukov@google.com>, Konstantin Khlebnikov <koct9i@gmail.com>, x86@kernel.org, linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Fri, 14 Nov 2014 05:09:55 +0400
-Andrey Utkin <andrey.krieger.utkin@gmail.com> wrote:
+Next spin of UBSan and there are two patches from now.
+"Two there should be; no more, no less. One to embody the UBSan,
+the other to not deadlock it."
 
-> There's no such thing as "list_struct".
+Patches on top of v3.18-rc4. As usual they are available in git:
+	git://github.com/aryabinin/linux ubsan/v2
 
-I guess there isn't.
+Changes since v1:
+   - Refactoring and cleanups in lib/ubsan.c including Sasha's complains.
+   - Some spelling fixes from Randy
+   - Fixed possible memory corruption on 64 big endian machines, spotted by Rasmus.
+   - Links to the relevant GCC documentation added into changelog (Peter).
+   - Added documentation.
+   - Fix deadlock caused by kernel/printk/printk.c instrumentation
+        (patch "kernel: printk: specify alignment for struct printk_log").
+   - Dropped useless 'Indirect call of a function through a function pointer of the wrong type'
+     checker. GCC doesn't support this, and as clang manual says it's for C++ only.
+   - Added checker for __builtin_unreachable() calls.
+   - Removed redundant -fno-sanitize=float-cast-overflow from CFLAGS.
+   - Added lock to prevent mixing reports.
 
-> 
-> Signed-off-by: Andrey Utkin <andrey.krieger.utkin@gmail.com>
+Andrey Ryabinin (2):
+  kernel: printk: specify alignment for struct printk_log
+  UBSan: run-time undefined behavior sanity checker
 
-Acked-by: Steven Rostedt <rostedt@goodmis.org>
+ Documentation/ubsan.txt               |  69 +++++
+ Makefile                              |  10 +-
+ arch/x86/Kconfig                      |   1 +
+ arch/x86/boot/Makefile                |   1 +
+ arch/x86/boot/compressed/Makefile     |   1 +
+ arch/x86/realmode/rm/Makefile         |   1 +
+ arch/x86/vdso/Makefile                |   2 +
+ drivers/firmware/efi/libstub/Makefile |   1 +
+ include/linux/sched.h                 |   3 +
+ kernel/printk/printk.c                |  10 +-
+ lib/Kconfig.debug                     |  22 ++
+ lib/Makefile                          |   3 +
+ lib/ubsan.c                           | 567 ++++++++++++++++++++++++++++++++++
+ lib/ubsan.h                           |  84 +++++
+ scripts/Makefile.lib                  |   6 +
+ 15 files changed, 775 insertions(+), 6 deletions(-)
+ create mode 100644 Documentation/ubsan.txt
+ create mode 100644 lib/ubsan.c
+ create mode 100644 lib/ubsan.h
 
--- Steve
-
-> ---
->  drivers/gpu/drm/radeon/mkregtable.c  | 24 ++++++++++++------------
->  drivers/media/pci/cx18/cx18-driver.h |  2 +-
->  include/linux/list.h                 | 34 +++++++++++++++++-----------------
->  include/linux/plist.h                | 10 +++++-----
->  include/linux/rculist.h              |  8 ++++----
->  scripts/kconfig/list.h               |  6 +++---
->  tools/usb/usbip/libsrc/list.h        |  2 +-
->  7 files changed, 43 insertions(+), 43 deletions(-)
-> 
+-- 
+2.1.3
 
