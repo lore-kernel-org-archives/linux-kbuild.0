@@ -1,77 +1,60 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lists.s-osg.org ([54.187.51.154]:49022 "EHLO lists.s-osg.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754554AbaKSQNq (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 19 Nov 2014 11:13:46 -0500
-Message-ID: <546CC1B7.70600@osg.samsung.com>
-Date: Wed, 19 Nov 2014 09:13:43 -0700
-From: Shuah Khan <shuahkh@osg.samsung.com>
+Received: from gproxy9-pub.mail.unifiedlayer.com ([69.89.20.122]:42801 "HELO
+	gproxy9-pub.mail.unifiedlayer.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with SMTP id S1750781AbaKTFvZ (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 20 Nov 2014 00:51:25 -0500
+Date: Wed, 19 Nov 2014 22:44:37 -0700
+From: Eddie Kovsky <ewk@edkovsky.org>
+Subject: [PATCH] kconfig: Fix compiler warning
+Message-ID: <20141120054437.GA30162@athena>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 07/19] selftests/firmware: add install target to enable
- installing test
-References: <cover.1415735831.git.shuahkh@osg.samsung.com> <1d2d13556ddbbbbb13989cdcb08447909bc4afaf.1415735831.git.shuahkh@osg.samsung.com> <CAGXu5j+yLqH0xj=5N90LRmK9F1xPLVWBy+cyUCzjvKJH7gE7AA@mail.gmail.com> <5462B2A3.9000007@osg.samsung.com>
-In-Reply-To: <5462B2A3.9000007@osg.samsung.com>
 Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kees Cook <keescook@chromium.org>
-Cc: Greg KH <gregkh@linuxfoundation.org>, Andrew Morton <akpm@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, "David S. Miller" <davem@davemloft.net>, Phong Tran <tranmanphong@gmail.com>, David Herrmann <dh.herrmann@gmail.com>, Hugh Dickins <hughd@google.com>, pranith kumar <bobby.prani@gmail.com>, "Eric W. Biederman" <ebiederm@xmission.com>, "Serge E. Hallyn" <serge.hallyn@ubuntu.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Linux API <linux-api@vger.kernel.org>, Network Development <netdev@vger.kernel.org>
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>, linux-kbuild@vger.kernel.org
+Cc: trivial@kernel.org, linux-kernel@vger.kernel.org
 
-On 11/11/2014 06:06 PM, Shuah Khan wrote:
-> On 11/11/2014 02:29 PM, Kees Cook wrote:
->> Hi,
->>
->> Sorry, I still really don't like this approach. While it is all in one
->> place (thank you for that), I think it isn't a form that is very
->> workable for the people maintaining the self tests. How about this,
->> instead of per-Makefile customization, why not define an execution
->> framework for these tests instead.
-> 
-> If I understand correctly, sounds like you don't like the way
-> install target is implemented in the individual test Makefiles
-> and the changes I made to run_tests targets to address the code
-> duplication concern.
-> 
-> At the moment there is no duplicate code in this patch series
-> between install and run_tests targets. This is a  first step
-> towards standardizing the framework and a definite improvement
-> over what we have currently. As I mentioned earlier, my goal
-> is to make it easier for developers to install and run the
-> existing tests and evolve the framework as we go.
-> 
-> Assuming my understanding is correct that:
-> 
-> -- install and run_tests targets in individual tests can be
->    refined and automated with a common Makefile approach you
->    proposed.
-> -- the rest of the user-interface kselftest_install and kselftest
->    are good.
-> 
-> I would like to propose that we get started with the current
-> implementation and refine it based on the following ideas you
-> suggested. The refinements you are recommending are confined
-> to selftests and can be made after the kselftest_install
-> gets added. Adding kselftest_install makes it easier to make
-> the refinements as it defines overall UI.
-> 
+Fixes gcc warning when building linux-next:
 
-Hi Kees,
+In file included from scripts/kconfig/zconf.tab.c:2537:0:
+scripts/kconfig/menu.c: In function ‘get_symbol_str’:
+scripts/kconfig/menu.c:590:18: warning: ‘jump’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+     jump->offset = strlen(r->s);
+                  ^
+scripts/kconfig/menu.c:551:19: note: ‘jump’ was declared here
+  struct jump_key *jump;
+                   ^
+  HOSTLD  scripts/kconfig/conf
 
-Are you ok with the above proposal? I understand this approach
-might not be perfect, however it is a step in the right direction
-to enable and make it easier to run them. I would like to get some
-initial work in for 3.19 if at all possible.
+Moved the initialization of struct jump_key *jump outside the first
+'if' branch so it can be available throughout the function.
 
-I plan to evolve the back-end to make it easier to write and
-maintain for developers writing tests going forward.
+Also uses the preferred pointer syntax for passing the size of a struct.
 
-thanks,
--- Shuah
+Tested on next-20141119.
 
+Signed-off-by: Eddie Kovsky <ewk@edkovsky.org>
+---
+ scripts/kconfig/menu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+index a26cc5d2a9b0..a728d23949e7 100644
+--- a/scripts/kconfig/menu.c
++++ b/scripts/kconfig/menu.c
+@@ -559,8 +559,8 @@ static void get_prompt_str(struct gstr *r, struct property *prop,
+ 		if (location == NULL && accessible)
+ 			location = menu;
+ 	}
++	jump = xmalloc(sizeof(*jump));
+ 	if (head && location) {
+-		jump = xmalloc(sizeof(struct jump_key));
+ 
+ 		if (menu_is_visible(prop->menu)) {
+ 			/*
 -- 
-Shuah Khan
-Sr. Linux Kernel Developer
-Samsung Research America (Silicon Valley)
-shuahkh@osg.samsung.com | (970) 217-8978
+2.1.0
+
