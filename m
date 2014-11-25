@@ -1,75 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cpsmtpb-ews07.kpnxchange.com ([213.75.39.10]:51297 "EHLO
-	cpsmtpb-ews07.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1755353AbaKURJ3 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 21 Nov 2014 12:09:29 -0500
-Message-ID: <1416589767.1114.9.camel@x220>
-Subject: Re: arm: pxa: CPU_PXA27x?
-From: Paul Bolle <pebolle@tiscali.nl>
-Date: Fri, 21 Nov 2014 18:09:27 +0100
-In-Reply-To: <87vbm85wjs.fsf@free.fr>
-References: <1416566627.6958.16.camel@x220> <87vbm85wjs.fsf@free.fr>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Received: from cantor2.suse.de ([195.135.220.15]:54067 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751366AbaKYVXP (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 25 Nov 2014 16:23:15 -0500
+Message-ID: <5474F33F.2030402@suse.cz>
+Date: Tue, 25 Nov 2014 22:23:11 +0100
+From: Michal Marek <mmarek@suse.cz>
+MIME-Version: 1.0
+Subject: Re: [PATCH] kbuild: collect shorthands into the top Makefile
+References: <1414567651-2503-1-git-send-email-yamada.m@jp.panasonic.com> <20141029185907.GA701@ravnborg.org> <20141031111254.8FF3.AA925319@jp.panasonic.com>
+In-Reply-To: <20141031111254.8FF3.AA925319@jp.panasonic.com>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Robert Jarzmik <robert.jarzmik@free.fr>
-Cc: Valentin Rothberg <valentinrothberg@gmail.com>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Michal Marek <mmarek@suse.cz>, Daniel Mack <daniel@zonque.org>, Haojian Zhuang <haojian.zhuang@gmail.com>, Russell King <linux@arm.linux.org.uk>, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+To: Masahiro Yamada <yamada.m@jp.panasonic.com>
+Cc: Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org, "H. Peter Anvin" <hpa@linux.intel.com>, Andi Kleen <ak@linux.intel.com>, linux-kernel@vger.kernel.org
 
-On Fri, 2014-11-21 at 17:48 +0100, Robert Jarzmik wrote:
-> Paul Bolle <pebolle@tiscali.nl> writes:
-> > Your commit 03ec7fe70c5c ("arm: pxa: add pxa27x device-tree support") is
-> > included in today's linux-next (ie, next-20141121). It adds a select
-> > statement for CPU_PXA27x. But there's no Kconfig symbol CPU_PXA27x.
-> Ah yes, you're perfectly right, CPU_PXA27x was not the one, it was PXA27x, sic
-> ..
+Dne 31.10.2014 v 03:12 Masahiro Yamada napsal(a):
+> Hi Sam,
 > 
-> >
-> > Why is that select needed? For what it's worth: __cpu_is_pxa27x()
-> > compiles to something interesting if CONFIG_PXA27x is defined.
-> You mean "is not defined", right ?
-
-Perhaps I was ambiguous. This referred to these lines in
-arch/arm/mach-pxa/include/mach/hardware.h:
-    #ifdef CONFIG_PXA27x
-    #define __cpu_is_pxa27x(id)                             \
-            ({                                              \
-                    unsigned int _id = (id) >> 4 & 0xfff;   \
-                    _id == 0x411;                           \
-            })
-    #else
-    #define __cpu_is_pxa27x(id)     (0)
-    #endif
-
-But you needed PXA27x anyway, so this seems moot now.
-
-> That (CONFIG_PXA27x) select is needed because without it the arm cpu
-> architecture is not selected, ie. CONFIG_CPU_XSCALE is not set. And this in turn
-> is needed to choose the basic arm operations like TLB handling, cache handling,
-> etc ... You cannot compile a single platform kernel without this.
+> On Wed, 29 Oct 2014 19:59:07 +0100
+> Sam Ravnborg <sam@ravnborg.org> wrote:
 > 
-> As a poor excuse, I hadn't seen this because this resulted from a poor merge
-> resolution which brought in both "select PXA27x" and "select CPU_PXA27x".
+>> On Wed, Oct 29, 2014 at 04:27:31PM +0900, Masahiro Yamada wrote:
+>>> The motivation of this commit is to avoid duplicated definitions
+>>> of "clean" and "hdr-inst" shorthands.
+>>>
+>>> The shorthand "clean" is defined in both the top Makefile and
+>>> scripts/Makefile.clean.
+>>>
+>>> Likewise, "hdr-inst" is defined in both the top Makefile and
+>>> scripts/Makefile.headersinst.
+>>>
+>>> The idea here is define and export them in the top Makefile
+>>> because $(srctree) is constant during the build process.
+>>>
+>>> For consistency, "build" and "modbuiltin" should be also moved.
+>>
+>> As a general rule the exported names are always UPPERCASE, and local variables
+>> are lowercase. (srctree, objtree are the exceptions).
+>> This patch define new lowercase variables that conflicts with this.
+>>
+>> And it is not that logical these are picked up from the enviroment.
+>> Could you find a central place to define them rahter than using
+>> the environemnt to export them?
+> 
+> Maybe we can collect them into scripts/Kbuild.include
+> although it might be too much for Makefile.clean to include
+> the whole things in Kbuild.include.
 
-Stuff happens. Would my patch have been included you might have seen the
-warning and this thread wouldn't exist.
+Kbuild.include sounds like a good idea to me. It would also allow to
+de-duplicate the $(cmd) defition in Makefile.include.
 
-> > In https://lkml.org/lkml/2014/9/30/578 I proposed a patch that emits a
-> > warning in cases like this. Like _all_ Kconfig related patches I've seen
-> > flying by lately it appears to be dropped in /dev/null. What's going on?
-> For that one I don't know.
+BTW:
+$ time -p make $(perl -e 'print "-f scripts/Kbuild.include "x1500')
+make: *** No targets.  Stop.
+real 0.44
+user 0.18
+sys 0.08
 
-Here I'm dragging you into a discussion about something that's been
-bugging me for a while now. Hence the addresses that have nothing to do
-with pxa in Cc:.
+So 0.44s in total for the 1500 or so subdirectories we visit during make
+clean. But the subprocesses can run in parallel, so the real difference
+is negligible.
 
-> Ah, and yes I'll send an update patch to remove the "select CPU_PXA27x", thanks
-> for noticing this.
-
-Great!
-
-
-Paul Bolle
-
+Michal
