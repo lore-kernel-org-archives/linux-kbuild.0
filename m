@@ -1,57 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:41795 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:42075 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750974AbaKZNzK (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 26 Nov 2014 08:55:10 -0500
-Date: Wed, 26 Nov 2014 14:55:08 +0100
+	id S1750961AbaKZOMf (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 26 Nov 2014 09:12:35 -0500
 From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] kbuild: collect shorthands into scripts/Kbuild.include
-Message-ID: <20141126135508.GA6911@sepie.suse.cz>
-References: <1416997873-3872-1-git-send-email-yamada.m@jp.panasonic.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1416997873-3872-1-git-send-email-yamada.m@jp.panasonic.com>
+Subject: [PATCH] kbuild: Remove duplicate $(cmd) definition in Makefile.clean
+Date: Wed, 26 Nov 2014 15:12:11 +0100
+Message-Id: <1417011131-19518-1-git-send-email-mmarek@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Cc: linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, "H. Peter Anvin" <hpa@linux.intel.com>, Andi Kleen <ak@linux.intel.com>, linux-kernel@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Masahiro Yamada <yamada.m@jp.panasonic.com>
 
-On Wed, Nov 26, 2014 at 07:31:13PM +0900, Masahiro Yamada wrote:
-> The shorthand "clean" is defined in both the top Makefile and
-> scripts/Makefile.clean.  Likewise, the "hdr-inst" is defined in
-> both the top Makefile and scripts/Makefile.headersinst.
-> 
-> To reduce code duplication, this commit collects them into
-> scripts/Kbuild.include like the "build" and "modbuiltin" shorthands.
-> It requires scripts/Makefile.clean to include scripts/Kbuild.include,
-> but its impact on the performance of "make clean" should be
-> negligible.
-> 
-> Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
-> ---
-> 
-> Marek, please decide if this patch should be applied or not.
-> 
-> I am not so sure if 10% of performance regression is acceptable.
-> I do not mind at all if this patch is rejected.
-> 
-> Before this commit, on my box,
-> 
-> $ time make clean
-> 
-> real	0m2.916s
-> user	0m1.040s
-> sys	0m2.005s
-> 
-> After,
-> 
-> real	0m3.221s
-> user	0m1.109s
-> sys	0m2.271s
+Makefile.clean includes Kbuild.include since commit 371fdc77
+(kbuild: collect shorthands into scripts/Kbuild.include), so there is no
+need for a local copy.
 
-0.3s is even less than my guess. And as I said, you can run make clean
-in parallel, so I'm not thrilled. Applied to kbuild.git#kbuild.
+Signed-off-by: Michal Marek <mmarek@suse.cz>
+---
+ scripts/Makefile.clean | 5 -----
+ 1 file changed, 5 deletions(-)
 
-Thanks,
-Michal
+diff --git a/scripts/Makefile.clean b/scripts/Makefile.clean
+index 0aa91a0..1bca180 100644
+--- a/scripts/Makefile.clean
++++ b/scripts/Makefile.clean
+@@ -88,11 +88,6 @@ PHONY += $(subdir-ymn)
+ $(subdir-ymn):
+ 	$(Q)$(MAKE) $(clean)=$@
+ 
+-# If quiet is set, only print short version of command
+-
+-cmd = @$(if $($(quiet)cmd_$(1)),echo '  $($(quiet)cmd_$(1))' &&) $(cmd_$(1))
+-
+-
+ # Declare the contents of the .PHONY variable as phony.  We keep that
+ # information in a variable se we can use it in if_changed and friends.
+ 
+-- 
+2.1.2
+
