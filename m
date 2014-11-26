@@ -1,72 +1,132 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:54762 "EHLO mx2.suse.de"
+Received: from smtp.mei.co.jp ([133.183.100.20]:55079 "EHLO smtp.mei.co.jp"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750913AbaKYVxJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 25 Nov 2014 16:53:09 -0500
-Message-ID: <5474FA42.20605@suse.cz>
-Date: Tue, 25 Nov 2014 22:53:06 +0100
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: [PATCH] kbuild: Use -nostdinc in compile tests
-References: <1415235534.3398.35.camel@decadent.org.uk>
-In-Reply-To: <1415235534.3398.35.camel@decadent.org.uk>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+	id S1750811AbaKZKbk (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 26 Nov 2014 05:31:40 -0500
+From: Masahiro Yamada <yamada.m@jp.panasonic.com>
+Subject: [PATCH] kbuild: collect shorthands into scripts/Kbuild.include
+Date: Wed, 26 Nov 2014 19:31:13 +0900
+Message-Id: <1416997873-3872-1-git-send-email-yamada.m@jp.panasonic.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ben Hutchings <ben@decadent.org.uk>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <yamada.m@jp.panasonic.com>, Michal Marek <mmarek@suse.cz>, Sam Ravnborg <sam@ravnborg.org>, "H. Peter Anvin" <hpa@linux.intel.com>, Andi Kleen <ak@linux.intel.com>, linux-kernel@vger.kernel.org
 
-Dne 6.11.2014 v 01:58 Ben Hutchings napsal(a):
-> gcc 4.8 and later include <stdc-predef.h> by default.  In some
-> versions of eglibc that includes <bits/predefs.h>, but that may be
-> missing when building with a biarch compiler.  Also <stdc-predef.h>
-> itself could be missing as we are only trying to build a kernel, not
-> userland.
-> 
-> The -nostdinc option disables this, though it isn't explicitly
-> documented.  This option is already used when actually building
-> the kernel, but not by cc-option and other tests.  This can result
-> in silently miscompiling the kernel.
-> 
-> References: https://bugs.debian.org/717557
-> References: https://bugs.debian.org/726861
-> Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
-> ---
-> This specific issue appeared and then was fixed in Debian about a year
-> ago, but it seems like it can also affect cross-builds.
-> 
-> It may also be worth adding some sort of sanity test, so we stop
-> immediately if $(cc-option $(empty),broken) yields 'broken'.
-> 
-> Ben.
-> 
->  Makefile               |  4 +++-
->  scripts/Kbuild.include | 15 ++++++++-------
->  2 files changed, 11 insertions(+), 8 deletions(-)
-> 
-> diff --git a/Makefile b/Makefile
-> index ffc1ce2..c0fbf67 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -619,6 +619,8 @@ endif
->  # Tell gcc to never replace conditional load with a non-conditional one
->  KBUILD_CFLAGS	+= $(call cc-option,--param=allow-store-data-races=0)
->  
-> +NOSTDINC_FLAGS += -nostdinc
-> +
->  ifdef CONFIG_READABLE_ASM
->  # Disable optimizations that make assembler listings hard to read.
->  # reorder blocks reorders the control in the function
-> @@ -742,7 +744,7 @@ KBUILD_CFLAGS += $(call cc-option, -fno-inline-functions-called-once)
->  endif
->  
->  # arch Makefile may override CC so keep this after arch Makefile is included
-> -NOSTDINC_FLAGS += -nostdinc -isystem $(shell $(CC) -print-file-name=include)
-> +NOSTDINC_FLAGS += -isystem $(shell $(CC) -print-file-name=include)
+The shorthand "clean" is defined in both the top Makefile and
+scripts/Makefile.clean.  Likewise, the "hdr-inst" is defined in
+both the top Makefile and scripts/Makefile.headersinst.
 
-Why not simply move the whole assignment up? Also, there are two
-cc-option tests and one cc-disable-warning test before the first part
-assignment. Looks like a result of a mismerge.
+To reduce code duplication, this commit collects them into
+scripts/Kbuild.include like the "build" and "modbuiltin" shorthands.
+It requires scripts/Makefile.clean to include scripts/Kbuild.include,
+but its impact on the performance of "make clean" should be
+negligible.
 
-Michal
+Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
+---
+
+Marek, please decide if this patch should be applied or not.
+
+I am not so sure if 10% of performance regression is acceptable.
+I do not mind at all if this patch is rejected.
+
+Before this commit, on my box,
+
+$ time make clean
+
+real	0m2.916s
+user	0m1.040s
+sys	0m2.005s
+
+After,
+
+real	0m3.221s
+user	0m1.109s
+sys	0m2.271s
+
+
+ Makefile                     |  7 -------
+ scripts/Kbuild.include       | 12 ++++++++++++
+ scripts/Makefile.clean       |  5 +----
+ scripts/Makefile.headersinst |  1 -
+ 4 files changed, 13 insertions(+), 12 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 2fd5c4e..257e08c 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1036,8 +1036,6 @@ firmware_install: FORCE
+ #Default location for installed headers
+ export INSTALL_HDR_PATH = $(objtree)/usr
+ 
+-hdr-inst := -rR -f $(srctree)/scripts/Makefile.headersinst obj
+-
+ # If we do an all arch process set dst to asm-$(hdr-arch)
+ hdr-dst = $(if $(KBUILD_HEADERS), dst=include/asm-$(hdr-arch), dst=include/asm)
+ 
+@@ -1581,11 +1579,6 @@ ifneq ($(cmd_files),)
+   include $(cmd_files)
+ endif
+ 
+-# Shorthand for $(Q)$(MAKE) -f scripts/Makefile.clean obj=dir
+-# Usage:
+-# $(Q)$(MAKE) $(clean)=dir
+-clean := -f $(srctree)/scripts/Makefile.clean obj
+-
+ endif	# skip-makefile
+ 
+ PHONY += FORCE
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index 65e7b08..0f90981 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -179,6 +179,18 @@ build := -f $(srctree)/scripts/Makefile.build obj
+ # $(Q)$(MAKE) $(modbuiltin)=dir
+ modbuiltin := -f $(srctree)/scripts/Makefile.modbuiltin obj
+ 
++###
++# Shorthand for $(Q)$(MAKE) -f scripts/Makefile.clean obj=
++# Usage:
++# $(Q)$(MAKE) $(clean)=dir
++clean := -f $(srctree)/scripts/Makefile.clean obj
++
++###
++# Shorthand for $(Q)$(MAKE) -rR -f scripts/Makefile.headersinst obj=
++# Usage:
++# $(Q)$(MAKE) $(hdr-inst)=dir
++hdr-inst := -rR -f $(srctree)/scripts/Makefile.headersinst obj
++
+ # Prefix -I with $(srctree) if it is not an absolute path.
+ # skip if -I has no parameter
+ addtree = $(if $(patsubst -I%,%,$(1)), \
+diff --git a/scripts/Makefile.clean b/scripts/Makefile.clean
+index b1c668d..0aa91a0 100644
+--- a/scripts/Makefile.clean
++++ b/scripts/Makefile.clean
+@@ -7,10 +7,7 @@ src := $(obj)
+ PHONY := __clean
+ __clean:
+ 
+-# Shorthand for $(Q)$(MAKE) scripts/Makefile.clean obj=dir
+-# Usage:
+-# $(Q)$(MAKE) $(clean)=dir
+-clean := -f $(srctree)/scripts/Makefile.clean obj
++include scripts/Kbuild.include
+ 
+ # The filename Kbuild has precedence over Makefile
+ kbuild-dir := $(if $(filter /%,$(src)),$(src),$(srctree)/$(src))
+diff --git a/scripts/Makefile.headersinst b/scripts/Makefile.headersinst
+index 8ccf830..1106d6c 100644
+--- a/scripts/Makefile.headersinst
++++ b/scripts/Makefile.headersinst
+@@ -122,7 +122,6 @@ $(check-file): scripts/headers_check.pl $(output-files) FORCE
+ endif
+ 
+ # Recursion
+-hdr-inst := -rR -f $(srctree)/scripts/Makefile.headersinst obj
+ .PHONY: $(subdirs)
+ $(subdirs):
+ 	$(Q)$(MAKE) $(hdr-inst)=$(obj)/$@ dst=$(_dst)/$@
+-- 
+1.9.1
+
