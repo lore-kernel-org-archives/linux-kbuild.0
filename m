@@ -1,52 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:38170 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:40024 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751510AbaK0Odn (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 27 Nov 2014 09:33:43 -0500
-Message-ID: <54773645.5010401@suse.cz>
-Date: Thu, 27 Nov 2014 15:33:41 +0100
+	id S1750895AbaK0Pib (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 27 Nov 2014 10:38:31 -0500
 From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: [PATCH] scripts/package: binrpm-pkg do not build source tar file
-References: <1414782331-7987-1-git-send-email-j.glisse@gmail.com>
-In-Reply-To: <1414782331-7987-1-git-send-email-j.glisse@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Subject: [PATCH] kbuild: Automatically remove stale <linux/version.h> file
+Date: Thu, 27 Nov 2014 16:38:09 +0100
+Message-Id: <1417102689-19040-1-git-send-email-mmarek@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: j.glisse@gmail.com
-Cc: linux-kernel@vger.kernel.org, =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>, linux-kbuild@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Paul Gortmaker <paul.gortmaker@windriver.com>, David Howells <dhowells@redhat.com>
 
-On 2014-10-31 20:05, j.glisse@gmail.com wrote:
-> From: Jérôme Glisse <jglisse@redhat.com>
-> 
-> When doing make binrpm-pkg we do not want to build the source tar
-> file. This patch avoid doing the gigantic tar file.
-> 
-> Signed-off-by: Jérôme Glisse <jglisse@redhat.com>
-> Cc: linux-kbuild@vger.kernel.org
-> Cc: Michal Marek <mmarek@suse.cz>
-> Cc: Linus Torvalds <torvalds@linux-foundation.org>
-> ---
->  scripts/package/mkspec | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/scripts/package/mkspec b/scripts/package/mkspec
-> index 1395760..b6f5e31 100755
-> --- a/scripts/package/mkspec
-> +++ b/scripts/package/mkspec
-> @@ -119,8 +119,10 @@ echo "%endif"
->  
->  echo 'rm -f $RPM_BUILD_ROOT'"/lib/modules/$KERNELRELEASE/{build,source}"
->  echo "mkdir -p "'$RPM_BUILD_ROOT'"/usr/src/kernels/$KERNELRELEASE"
-> +if ! $PREBUILT; then
->  echo "EXCLUDES=\"$RCS_TAR_IGNORE --exclude .tmp_versions --exclude=*vmlinux* --exclude=*.o --exclude=*.ko --exclude=*.cmd --exclude=Documentation --exclude=firmware --exclude .config.old --exclude .missing-syscalls.d\""
->  echo "tar "'$EXCLUDES'" -cf- . | (cd "'$RPM_BUILD_ROOT'"/usr/src/kernels/$KERNELRELEASE;tar xvf -)"
-> +fi
+In 3.7, the file moved from include/linux/ to
+include/generated/uapi/linux/. The path in the #include directive
+remained the same for compatibility reasons, but this created a problem
+when bisecting. Commit 9c8cdb71 (kbuild: unconditionally clobber
+include/linux/version.h on distclean) fixes this, provided the user does
+make distclean between builds. Better not rely on the user and delete
+the stale file each time make is invoked.
 
-This does not generate any tar file, but a /usr/src/kernels/... tree to
-be packaged in the kernel-devel package. I'm not says we should be doing
-this in make binrpm-pkg, but the change should also remove the
-kernel-devel package in the binrpm-pkg case.
+Cc: Paul Gortmaker <paul.gortmaker@windriver.com>
+Cc: David Howells <dhowells@redhat.com>
+Signed-off-by: Michal Marek <mmarek@suse.cz>
+---
+ Makefile | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Michal
+diff --git a/Makefile b/Makefile
+index 0032d1c..fc7a6d3 100644
+--- a/Makefile
++++ b/Makefile
+@@ -480,6 +480,7 @@ asm-generic:
+ # of make so .config is not included in this case either (for *config).
+ 
+ version_h := include/generated/uapi/linux/version.h
++old_version_h := include/linux/version.h
+ 
+ no-dot-config-targets := clean mrproper distclean \
+ 			 cscope gtags TAGS tags help %docs check% coccicheck \
+@@ -1004,6 +1005,7 @@ endef
+ 
+ $(version_h): $(srctree)/Makefile FORCE
+ 	$(call filechk,version.h)
++	$(Q)rm -f $(old_version_h)
+ 
+ include/generated/utsrelease.h: include/config/kernel.release FORCE
+ 	$(call filechk,utsrelease.h)
+@@ -1172,7 +1174,7 @@ MRPROPER_FILES += .config .config.old .version .old_version $(version_h) \
+ 		  Module.symvers tags TAGS cscope* GPATH GTAGS GRTAGS GSYMS \
+ 		  signing_key.priv signing_key.x509 x509.genkey		\
+ 		  extra_certificates signing_key.x509.keyid		\
+-		  signing_key.x509.signer include/linux/version.h
++		  signing_key.x509.signer
+ 
+ # clean - Delete most, but leave enough to build external modules
+ #
+-- 
+2.1.2
+
