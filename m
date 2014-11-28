@@ -1,50 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:56709 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:57181 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750919AbaK1Mwe (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 28 Nov 2014 07:52:34 -0500
+	id S1750976AbaK1NTT (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 28 Nov 2014 08:19:19 -0500
+Message-ID: <54787654.7020304@suse.cz>
+Date: Fri, 28 Nov 2014 14:19:16 +0100
 From: Michal Marek <mmarek@suse.cz>
-Subject: [PATCH] kbuild: Fix make help-<board series> on powerpc
-Date: Fri, 28 Nov 2014 13:52:25 +0100
-Message-Id: <1417179145-30789-1-git-send-email-mmarek@suse.cz>
+MIME-Version: 1.0
+Subject: Re: [PATCH] kconfig: Fix compiler warning
+References: <20141120054437.GA30162@athena>
+In-Reply-To: <20141120054437.GA30162@athena>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+To: Eddie Kovsky <ewk@edkovsky.org>
+Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, linux-kbuild@vger.kernel.org, trivial@kernel.org, linux-kernel@vger.kernel.org
 
-make ARCH=powerpc help-<board series> should not require a cofigured
-source tree. Also, sort the boards in the output.
+On 2014-11-20 06:44, Eddie Kovsky wrote:
+> diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+> index a26cc5d2a9b0..a728d23949e7 100644
+> --- a/scripts/kconfig/menu.c
+> +++ b/scripts/kconfig/menu.c
+> @@ -559,8 +559,8 @@ static void get_prompt_str(struct gstr *r, struct property *prop,
+>  		if (location == NULL && accessible)
+>  			location = menu;
+>  	}
+> +	jump = xmalloc(sizeof(*jump));
+>  	if (head && location) {
+> -		jump = xmalloc(sizeof(struct jump_key));
 
-Signed-off-by: Michal Marek <mmarek@suse.cz>
----
-Sorry for the double post to the ppc mailing list. The first version got
-rejected by the vger spam filter.
----
- Makefile | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+This creates a memory leak, because 'jump' is allocated, but not added
+to the list, if the following condition is not met.
 
-diff --git a/Makefile b/Makefile
-index 88b7fa5..0cd4e14 100644
---- a/Makefile
-+++ b/Makefile
-@@ -482,7 +482,7 @@ asm-generic:
- version_h := include/generated/uapi/linux/version.h
- 
- no-dot-config-targets := clean mrproper distclean \
--			 cscope gtags TAGS tags help %docs check% coccicheck \
-+			 cscope gtags TAGS tags help% %docs check% coccicheck \
- 			 $(version_h) headers_% archheaders archscripts \
- 			 kernelversion %src-pkg
- 
-@@ -1323,7 +1323,7 @@ help-board-dirs := $(addprefix help-,$(board-dirs))
- 
- help-boards: $(help-board-dirs)
- 
--boards-per-dir = $(notdir $(wildcard $(srctree)/arch/$(SRCARCH)/configs/$*/*_defconfig))
-+boards-per-dir = $(sort $(notdir $(wildcard $(srctree)/arch/$(SRCARCH)/configs/$*/*_defconfig)))
- 
- $(help-board-dirs): help-%:
- 	@echo  'Architecture specific targets ($(SRCARCH) $*):'
--- 
-2.1.2
+Michal
 
