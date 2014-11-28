@@ -1,30 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:56278 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:56709 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750923AbaK1MXn (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 28 Nov 2014 07:23:43 -0500
-Date: Fri, 28 Nov 2014 13:23:40 +0100
+	id S1750919AbaK1Mwe (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 28 Nov 2014 07:52:34 -0500
 From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] Makefile: sort list of defconfig targets in make help
- output
-Message-ID: <20141128122340.GA21552@sepie.suse.cz>
-References: <20141028141820.14137.64256.stgit@buzz>
- <546B3599.7080806@samsung.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <546B3599.7080806@samsung.com>
+Subject: [PATCH] kbuild: Fix make help-<board series> on powerpc
+Date: Fri, 28 Nov 2014 13:52:25 +0100
+Message-Id: <1417179145-30789-1-git-send-email-mmarek@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Konstantin Khlebnikov <k.khlebnikov@samsung.com>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
 
-On Tue, Nov 18, 2014 at 03:03:37PM +0300, Konstantin Khlebnikov wrote:
-> On 2014-10-28 16:18, Konstantin Khlebnikov wrote:
-> >Without sorting this list is completely unreadable for ARCH=arm.
-> 
-> Bump.
+make ARCH=powerpc help-<board series> should not require a cofigured
+source tree. Also, sort the boards in the output.
 
-Applied to kbuild.git#kbuild now, sorry for the delay.
+Signed-off-by: Michal Marek <mmarek@suse.cz>
+---
+Sorry for the double post to the ppc mailing list. The first version got
+rejected by the vger spam filter.
+---
+ Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Michal
+diff --git a/Makefile b/Makefile
+index 88b7fa5..0cd4e14 100644
+--- a/Makefile
++++ b/Makefile
+@@ -482,7 +482,7 @@ asm-generic:
+ version_h := include/generated/uapi/linux/version.h
+ 
+ no-dot-config-targets := clean mrproper distclean \
+-			 cscope gtags TAGS tags help %docs check% coccicheck \
++			 cscope gtags TAGS tags help% %docs check% coccicheck \
+ 			 $(version_h) headers_% archheaders archscripts \
+ 			 kernelversion %src-pkg
+ 
+@@ -1323,7 +1323,7 @@ help-board-dirs := $(addprefix help-,$(board-dirs))
+ 
+ help-boards: $(help-board-dirs)
+ 
+-boards-per-dir = $(notdir $(wildcard $(srctree)/arch/$(SRCARCH)/configs/$*/*_defconfig))
++boards-per-dir = $(sort $(notdir $(wildcard $(srctree)/arch/$(SRCARCH)/configs/$*/*_defconfig)))
+ 
+ $(help-board-dirs): help-%:
+ 	@echo  'Architecture specific targets ($(SRCARCH) $*):'
+-- 
+2.1.2
+
