@@ -1,25 +1,31 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:59564 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:59573 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751118AbaK1Pk2 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 28 Nov 2014 10:40:28 -0500
-Message-ID: <54789767.1080803@suse.cz>
-Date: Fri, 28 Nov 2014 16:40:23 +0100
+	id S1752021AbaK1Pkv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 28 Nov 2014 10:40:51 -0500
+Message-ID: <54789781.7060009@suse.cz>
+Date: Fri, 28 Nov 2014 16:40:49 +0100
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH] kbuild: Fix make help-<board series> on powerpc
-References: <1417179145-30789-1-git-send-email-mmarek@suse.cz>
-In-Reply-To: <1417179145-30789-1-git-send-email-mmarek@suse.cz>
+Subject: Re: [PATCH] kbuild: Automatically remove stale <linux/version.h>
+ file
+References: <1417102689-19040-1-git-send-email-mmarek@suse.cz>
+In-Reply-To: <1417102689-19040-1-git-send-email-mmarek@suse.cz>
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+Cc: linux-kernel@vger.kernel.org, Paul Gortmaker <paul.gortmaker@windriver.com>, David Howells <dhowells@redhat.com>
 
-On 2014-11-28 13:52, Michal Marek wrote:
-> make ARCH=powerpc help-<board series> should not require a cofigured
-> source tree. Also, sort the boards in the output.
+On 2014-11-27 16:38, Michal Marek wrote:
+> In 3.7, the file moved from include/linux/ to
+> include/generated/uapi/linux/. The path in the #include directive
+> remained the same for compatibility reasons, but this created a problem
+> when bisecting. Commit 9c8cdb71 (kbuild: unconditionally clobber
+> include/linux/version.h on distclean) fixes this, provided the user does
+> make distclean between builds. Better not rely on the user and delete
+> the stale file each time make is invoked.
 
 I added this to kbuild.git#kbuild.
 
