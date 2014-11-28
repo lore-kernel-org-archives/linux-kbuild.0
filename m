@@ -1,37 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:57181 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:57654 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750976AbaK1NTT (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 28 Nov 2014 08:19:19 -0500
-Message-ID: <54787654.7020304@suse.cz>
-Date: Fri, 28 Nov 2014 14:19:16 +0100
+	id S1750976AbaK1Nmu (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 28 Nov 2014 08:42:50 -0500
+Message-ID: <54787BD8.7050102@suse.cz>
+Date: Fri, 28 Nov 2014 14:42:48 +0100
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH] kconfig: Fix compiler warning
-References: <20141120054437.GA30162@athena>
-In-Reply-To: <20141120054437.GA30162@athena>
+Subject: Re: [PATCH v2] kconfig: Fix warning =?UTF-8?B?IuKAmGp1bXDigJkgbWE=?=
+ =?UTF-8?B?eSBiZSB1c2VkIHVuaW5pdGlhbGl6ZWQi?=
+References: <1415098919-21836-1-git-send-email-syntheticpp@gmx.net>
+In-Reply-To: <1415098919-21836-1-git-send-email-syntheticpp@gmx.net>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Eddie Kovsky <ewk@edkovsky.org>
-Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, linux-kbuild@vger.kernel.org, trivial@kernel.org, linux-kernel@vger.kernel.org
+To: =?UTF-8?B?UGV0ZXIgS8O8bW1lbA==?= <syntheticpp@gmx.net>
+Cc: linux-kbuild@vger.kernel.org, yann.morin.1998@free.fr
 
-On 2014-11-20 06:44, Eddie Kovsky wrote:
-> diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
-> index a26cc5d2a9b0..a728d23949e7 100644
-> --- a/scripts/kconfig/menu.c
-> +++ b/scripts/kconfig/menu.c
-> @@ -559,8 +559,8 @@ static void get_prompt_str(struct gstr *r, struct property *prop,
->  		if (location == NULL && accessible)
->  			location = menu;
->  	}
-> +	jump = xmalloc(sizeof(*jump));
->  	if (head && location) {
-> -		jump = xmalloc(sizeof(struct jump_key));
+On 2014-11-04 12:01, Peter Kümmel wrote:
+> Warning:
+> In file included from scripts/kconfig/zconf.tab.c:2537:0:
+> scripts/kconfig/menu.c: In function ‘get_symbol_str’:
+> scripts/kconfig/menu.c:590:18: warning: ‘jump’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+>      jump->offset = strlen(r->s);
+> 
+> Simplifies the test logic because (head && local) means (jump != 0)
+> and makes GCC happy when checking if the jump pointer was initialized.
 
-This creates a memory leak, because 'jump' is allocated, but not added
-to the list, if the following condition is not met.
+The warning is bogus, but since this has been reported by several people
+now, let's shut it up this way. Applied to kbuild.git#kbuild.
 
 Michal
-
