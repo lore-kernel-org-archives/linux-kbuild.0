@@ -1,33 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:59573 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752021AbaK1Pkv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 28 Nov 2014 10:40:51 -0500
-Message-ID: <54789781.7060009@suse.cz>
-Date: Fri, 28 Nov 2014 16:40:49 +0100
-From: Michal Marek <mmarek@suse.cz>
+Received: from a8-82.smtp-out.amazonses.com ([54.240.8.82]:35183 "EHLO
+	a8-82.smtp-out.amazonses.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751043AbaK2Rc2 (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 29 Nov 2014 12:32:28 -0500
+From: Luka Perkov <luka.perkov@sartura.hr>
+Subject: [PATCH] kconfig: fix build warning
+Date: Sat, 29 Nov 2014 17:23:31 +0000
+Message-ID: <00000149fc943418-9754cb63-3a60-4a20-be0a-73081913356c-000000@email.amazonses.com>
 MIME-Version: 1.0
-Subject: Re: [PATCH] kbuild: Automatically remove stale <linux/version.h>
- file
-References: <1417102689-19040-1-git-send-email-mmarek@suse.cz>
-In-Reply-To: <1417102689-19040-1-git-send-email-mmarek@suse.cz>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Paul Gortmaker <paul.gortmaker@windriver.com>, David Howells <dhowells@redhat.com>
+Cc: yann.morin.1998@free.fr, Luka Perkov <luka.perkov@sartura.hr>
 
-On 2014-11-27 16:38, Michal Marek wrote:
-> In 3.7, the file moved from include/linux/ to
-> include/generated/uapi/linux/. The path in the #include directive
-> remained the same for compatibility reasons, but this created a problem
-> when bisecting. Commit 9c8cdb71 (kbuild: unconditionally clobber
-> include/linux/version.h on distclean) fixes this, provided the user does
-> make distclean between builds. Better not rely on the user and delete
-> the stale file each time make is invoked.
+Patch fixes following build warning:
 
-I added this to kbuild.git#kbuild.
+In file included from scripts/kconfig/zconf.tab.c:2537:0:
+scripts/kconfig/menu.c: In function ‘get_symbol_str’:
+scripts/kconfig/menu.c:590:18: warning: ‘jump’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+     jump->offset = strlen(r->s);
+                  ^
+scripts/kconfig/menu.c:551:19: note: ‘jump’ was declared here
+  struct jump_key *jump;
 
-Michal
+Signed-off-by: Luka Perkov <luka.perkov@sartura.hr>
+---
+ scripts/kconfig/menu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+index a26cc5d..584e0fc 100644
+--- a/scripts/kconfig/menu.c
++++ b/scripts/kconfig/menu.c
+@@ -548,7 +548,7 @@ static void get_prompt_str(struct gstr *r, struct property *prop,
+ {
+ 	int i, j;
+ 	struct menu *submenu[8], *menu, *location = NULL;
+-	struct jump_key *jump;
++	struct jump_key *jump = NULL;
+ 
+ 	str_printf(r, _("Prompt: %s\n"), _(prop->text));
+ 	menu = prop->menu->parent;
+-- 
+2.1.3
 
