@@ -1,61 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from fencepost.gnu.org ([208.118.235.10]:37679 "EHLO
-	fencepost.gnu.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752878AbaLAQwo (ORCPT
+Received: from mail-qc0-f169.google.com ([209.85.216.169]:57039 "EHLO
+	mail-qc0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932112AbaLAVLQ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 1 Dec 2014 11:52:44 -0500
-Subject: [PATCH] kconfig: fix warning in get_prompt_str()
-From: Pavel Roskin <proski@gnu.org>
-Date: Mon, 01 Dec 2014 11:52:42 -0500
-Message-ID: <20141201165242.28180.22924.stgit@IRBT5387>
+	Mon, 1 Dec 2014 16:11:16 -0500
+Date: Mon, 1 Dec 2014 16:11:06 -0500
+From: Jerome Glisse <j.glisse@gmail.com>
+Subject: Re: [PATCH] scripts/package: binrpm-pkg do not build source tar file
+Message-ID: <20141201211103.GA32057@gmail.com>
+References: <1414782331-7987-1-git-send-email-j.glisse@gmail.com>
+ <54773645.5010401@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <54773645.5010401@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org, "Yann E. MORIN" <yann.morin.1998@free.fr>, linux-kbuild@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kernel@vger.kernel.org, =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>, linux-kbuild@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>
 
-gcc 4.9.1 cannot figure out that jump would be initialized if both head
-and location are not null. Initialize jump with NULL and check that it's
-not NULL before using.
+On Thu, Nov 27, 2014 at 03:33:41PM +0100, Michal Marek wrote:
+> On 2014-10-31 20:05, j.glisse@gmail.com wrote:
+> > From: Jérôme Glisse <jglisse@redhat.com>
+> > 
+> > When doing make binrpm-pkg we do not want to build the source tar
+> > file. This patch avoid doing the gigantic tar file.
+> > 
+> > Signed-off-by: Jérôme Glisse <jglisse@redhat.com>
+> > Cc: linux-kbuild@vger.kernel.org
+> > Cc: Michal Marek <mmarek@suse.cz>
+> > Cc: Linus Torvalds <torvalds@linux-foundation.org>
+> > ---
+> >  scripts/package/mkspec | 2 ++
+> >  1 file changed, 2 insertions(+)
+> > 
+> > diff --git a/scripts/package/mkspec b/scripts/package/mkspec
+> > index 1395760..b6f5e31 100755
+> > --- a/scripts/package/mkspec
+> > +++ b/scripts/package/mkspec
+> > @@ -119,8 +119,10 @@ echo "%endif"
+> >  
+> >  echo 'rm -f $RPM_BUILD_ROOT'"/lib/modules/$KERNELRELEASE/{build,source}"
+> >  echo "mkdir -p "'$RPM_BUILD_ROOT'"/usr/src/kernels/$KERNELRELEASE"
+> > +if ! $PREBUILT; then
+> >  echo "EXCLUDES=\"$RCS_TAR_IGNORE --exclude .tmp_versions --exclude=*vmlinux* --exclude=*.o --exclude=*.ko --exclude=*.cmd --exclude=Documentation --exclude=firmware --exclude .config.old --exclude .missing-syscalls.d\""
+> >  echo "tar "'$EXCLUDES'" -cf- . | (cd "'$RPM_BUILD_ROOT'"/usr/src/kernels/$KERNELRELEASE;tar xvf -)"
+> > +fi
+> 
+> This does not generate any tar file, but a /usr/src/kernels/... tree to
+> be packaged in the kernel-devel package. I'm not says we should be doing
+> this in make binrpm-pkg, but the change should also remove the
+> kernel-devel package in the binrpm-pkg case.
 
-jump is not NULL at menu.c:590 if and only if head and location are not
-NULL. Once jump is assigned a non-NULL value, head and location cannot go
-from NULL to non-NULL or vice versa. It means that (jump != NULL) is
-equal to (head && location != 0).
+Sent a v2 that also avoid building the devel package for binrpm-pkg target.
 
-Thus remove checks for head and location. The intent of the check is to
-ensure that jump is initialized, so make the code match its intent and
-easier to read.
+Cheers,
+Jérôme
 
-There should be no behavior change in get_prompt_str() regardless of the
-input.
-
-Signed-off-by: Pavel Roskin <proski@gnu.org>
----
- scripts/kconfig/menu.c |    4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
-index a26cc5d..72c9dba 100644
---- a/scripts/kconfig/menu.c
-+++ b/scripts/kconfig/menu.c
-@@ -548,7 +548,7 @@ static void get_prompt_str(struct gstr *r, struct property *prop,
- {
- 	int i, j;
- 	struct menu *submenu[8], *menu, *location = NULL;
--	struct jump_key *jump;
-+	struct jump_key *jump = NULL;
- 
- 	str_printf(r, _("Prompt: %s\n"), _(prop->text));
- 	menu = prop->menu->parent;
-@@ -586,7 +586,7 @@ static void get_prompt_str(struct gstr *r, struct property *prop,
- 		str_printf(r, _("  Location:\n"));
- 		for (j = 4; --i >= 0; j += 2) {
- 			menu = submenu[i];
--			if (head && location && menu == location)
-+			if (jump && menu == location)
- 				jump->offset = strlen(r->s);
- 			str_printf(r, "%*c-> %s", j, ' ',
- 				   _(menu_get_prompt(menu)));
-
+> 
+> Michal
