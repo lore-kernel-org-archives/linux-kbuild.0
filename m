@@ -1,41 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.mei.co.jp ([133.183.100.20]:36486 "EHLO smtp.mei.co.jp"
+Received: from smtp.mei.co.jp ([133.183.100.20]:45609 "EHLO smtp.mei.co.jp"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932899AbaLBE31 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 1 Dec 2014 23:29:27 -0500
+	id S1752636AbaLBEbF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 1 Dec 2014 23:31:05 -0500
 From: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Subject: [PATCH] kbuild: remove old information in headers_install.txt document
-Date: Tue,  2 Dec 2014 13:28:53 +0900
-Message-Id: <1417494533-24461-1-git-send-email-yamada.m@jp.panasonic.com>
+Subject: [PATCH] kbuild: remove redundant -rR flag of hdr-inst
+Date: Tue,  2 Dec 2014 13:30:46 +0900
+Message-Id: <1417494646-24528-1-git-send-email-yamada.m@jp.panasonic.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.m@jp.panasonic.com>, Michal Marek <mmarek@suse.cz>, Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Masahiro Yamada <yamada.m@jp.panasonic.com>, Michal Marek <mmarek@suse.cz>, Sam Ravnborg <sam@ravnborg.org>, Andi Kleen <ak@linux.intel.com>, "H. Peter Anvin" <hpa@linux.intel.com>, linux-kernel@vger.kernel.org
 
-The arch header directories "include/asm-*" were moved long before.
+Passing -rR for "make headers_install" is redundant because
+the top Makefile has already set -rR to MAKEFLAGS.
 
 Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
 ---
 
- Documentation/kbuild/headers_install.txt | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+ scripts/Kbuild.include | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/kbuild/headers_install.txt b/Documentation/kbuild/headers_install.txt
-index 951eb9f..0d8fe5e 100644
---- a/Documentation/kbuild/headers_install.txt
-+++ b/Documentation/kbuild/headers_install.txt
-@@ -28,10 +28,7 @@ optional arguments:
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index eb14d83..c201ff3 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -193,10 +193,10 @@ modbuiltin := -f $(srctree)/scripts/Makefile.modbuiltin obj
+ clean := -f $(srctree)/scripts/Makefile.clean obj
  
- ARCH indicates which architecture to produce headers for, and defaults to the
- current architecture.  The linux/asm directory of the exported kernel headers
--is platform-specific, to see a complete list of supported architectures use
--the command:
--
--  ls -d include/asm-* | sed 's/.*-//'
-+is platform-specific.
+ ###
+-# Shorthand for $(Q)$(MAKE) -rR -f scripts/Makefile.headersinst obj=
++# Shorthand for $(Q)$(MAKE) -f scripts/Makefile.headersinst obj=
+ # Usage:
+ # $(Q)$(MAKE) $(hdr-inst)=dir
+-hdr-inst := -rR -f $(srctree)/scripts/Makefile.headersinst obj
++hdr-inst := -f $(srctree)/scripts/Makefile.headersinst obj
  
- INSTALL_HDR_PATH indicates where to install the headers.  It defaults to
- "./usr/include".
+ # Prefix -I with $(srctree) if it is not an absolute path.
+ # skip if -I has no parameter
 -- 
 1.9.1
 
