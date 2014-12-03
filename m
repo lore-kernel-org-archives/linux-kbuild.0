@@ -1,32 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:56883 "EHLO mx2.suse.de"
+Received: from tex.lwn.net ([70.33.254.29]:35910 "EHLO vena.lwn.net"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752470AbaLCNWL (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 3 Dec 2014 08:22:11 -0500
-Date: Wed, 3 Dec 2014 14:22:06 +0100
-From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] kbuild: remove redundant -rR flag of hdr-inst
-Message-ID: <20141203132206.GA29008@sepie.suse.cz>
-References: <1417494646-24528-1-git-send-email-yamada.m@jp.panasonic.com>
+	id S1752709AbaLCOCj (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 3 Dec 2014 09:02:39 -0500
+Date: Wed, 3 Dec 2014 09:02:37 -0500
+From: Jonathan Corbet <corbet@lwn.net>
+Subject: Re: [PATCH] kbuild: update headers_install.txt document
+Message-ID: <20141203090237.62787e98@lwn.net>
+In-Reply-To: <1417589141-14814-1-git-send-email-yamada.m@jp.panasonic.com>
+References: <1417589141-14814-1-git-send-email-yamada.m@jp.panasonic.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1417494646-24528-1-git-send-email-yamada.m@jp.panasonic.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Cc: linux-kbuild@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, Andi Kleen <ak@linux.intel.com>, "H. Peter Anvin" <hpa@linux.intel.com>, linux-kernel@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Tue, Dec 02, 2014 at 01:30:46PM +0900, Masahiro Yamada wrote:
-> Passing -rR for "make headers_install" is redundant because
-> the top Makefile has already set -rR to MAKEFLAGS.
+On Wed,  3 Dec 2014 15:45:41 +0900
+Masahiro Yamada <yamada.m@jp.panasonic.com> wrote:
+
+> The arch header directories "include/asm-*" were moved long ago.
+> Now we should check the existence of arch/*/include/uapi/asm/Kbuild
+> to see if an architecture supports the headers installation.
+> (Actually, "um" is the only architecture that does not have it.)
 > 
 > Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
-> ---
-> 
->  scripts/Kbuild.include | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
 
-Thanks, applied to kbuild.git#kbuild.
+So please forgive me if I seem overly difficult and fussy, but...  while
+I'm all for fancy shell one-liners, wouldn't it be more straightforward,
+in this case, to simply say in the documentation that all architectures
+other than um have support?
 
-Michal
+Thanks,
+
+jon
