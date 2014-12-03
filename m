@@ -1,41 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.mei.co.jp ([133.183.100.20]:42034 "EHLO smtp.mei.co.jp"
+Received: from smtp.mei.co.jp ([133.183.100.20]:44993 "EHLO smtp.mei.co.jp"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750869AbaLCGp6 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 3 Dec 2014 01:45:58 -0500
+	id S1751341AbaLCGwm (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 3 Dec 2014 01:52:42 -0500
 From: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Subject: [PATCH] kbuild: update headers_install.txt document
-Date: Wed,  3 Dec 2014 15:45:41 +0900
-Message-Id: <1417589141-14814-1-git-send-email-yamada.m@jp.panasonic.com>
+Subject: [PATCH] kbuild: fix scripts/headers.sh to see the correct Kbuild path
+Date: Wed,  3 Dec 2014 15:52:15 +0900
+Message-Id: <1417589535-15867-1-git-send-email-yamada.m@jp.panasonic.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Jonathan Corbet <corbet@lwn.net>, Masahiro Yamada <yamada.m@jp.panasonic.com>, Michal Marek <mmarek@suse.cz>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Masahiro Yamada <yamada.m@jp.panasonic.com>, linux-kernel@vger.kernel.org
 
-The arch header directories "include/asm-*" were moved long ago.
-Now we should check the existence of arch/*/include/uapi/asm/Kbuild
-to see if an architecture supports the headers installation.
-(Actually, "um" is the only architecture that does not have it.)
+The exported headers were moved to "uapi" directories.
+We should check the existence of arch/*/include/uapi/asm/Kbuild.
 
 Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
 ---
 
- Documentation/kbuild/headers_install.txt | 2 +-
+ scripts/headers.sh | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Documentation/kbuild/headers_install.txt b/Documentation/kbuild/headers_install.txt
-index 951eb9f..8e668d4 100644
---- a/Documentation/kbuild/headers_install.txt
-+++ b/Documentation/kbuild/headers_install.txt
-@@ -31,7 +31,7 @@ current architecture.  The linux/asm directory of the exported kernel headers
- is platform-specific, to see a complete list of supported architectures use
- the command:
+diff --git a/scripts/headers.sh b/scripts/headers.sh
+index 95ece06..b164336 100755
+--- a/scripts/headers.sh
++++ b/scripts/headers.sh
+@@ -6,7 +6,7 @@ set -e
  
--  ls -d include/asm-* | sed 's/.*-//'
-+  for i in arch/*; do [ -e $i/include/uapi/asm/Kbuild ] && basename $i; done
- 
- INSTALL_HDR_PATH indicates where to install the headers.  It defaults to
- "./usr/include".
+ do_command()
+ {
+-	if [ -f ${srctree}/arch/$2/include/asm/Kbuild ]; then
++	if [ -f ${srctree}/arch/$2/include/uapi/asm/Kbuild ]; then
+ 		make ARCH=$2 KBUILD_HEADERS=$1 headers_$1
+ 	else
+ 		printf "Ignoring arch: %s\n" ${arch}
 -- 
 1.9.1
 
