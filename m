@@ -1,73 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lists.s-osg.org ([54.187.51.154]:39083 "EHLO lists.s-osg.org"
+Received: from ou.quest-ce.net ([195.154.187.82]:59651 "EHLO ou.quest-ce.net"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751241AbaLCOOV (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 3 Dec 2014 09:14:21 -0500
-Message-ID: <547F1ABA.5040601@osg.samsung.com>
-Date: Wed, 03 Dec 2014 07:14:18 -0700
-From: Shuah Khan <shuahkh@osg.samsung.com>
-MIME-Version: 1.0
-Subject: Re: [PATCH v2 02/19] kbuild: kselftest_install - add a new make target
- to install selftests
-References: <cover.1415735831.git.shuahkh@osg.samsung.com> <a2344d4df903d673afe1631118f40917f773cc9a.1415735831.git.shuahkh@osg.samsung.com> <547C8D81.1030605@suse.cz> <547C99B6.7070903@osg.samsung.com> <547EFD6F.2010204@suse.cz>
-In-Reply-To: <547EFD6F.2010204@suse.cz>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+	id S1750896AbaLEOY1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 5 Dec 2014 09:24:27 -0500
+Message-ID: <1417789428.11111.31.camel@opteya.com>
+From: Yann Droneaud <ydroneaud@opteya.com>
+Date: Fri, 05 Dec 2014 15:23:48 +0100
+In-Reply-To: <1417494533-24461-1-git-send-email-yamada.m@jp.panasonic.com>
+References: <1417494533-24461-1-git-send-email-yamada.m@jp.panasonic.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] kbuild: remove old information in headers_install.txt
+ document
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>, gregkh@linuxfoundation.org, akpm@linux-foundation.org, davem@davemloft.net, keescook@chromium.org, tranmanphong@gmail.com, dh.herrmann@gmail.com, hughd@google.com, bobby.prani@gmail.com, ebiederm@xmission.com, serge.hallyn@ubuntu.com
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-api@vger.kernel.org, netdev@vger.kernel.org, masami.hiramatsu.pt@hitachi.com, Shuah Khan <shuahkh@osg.samsung.com>
+To: Masahiro Yamada <yamada.m@jp.panasonic.com>
+Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, Yann Droneaud <ydroneaud@opteya.com>
 
-On 12/03/2014 05:09 AM, Michal Marek wrote:
-> On 2014-12-01 17:39, Shuah Khan wrote:
->> On 12/01/2014 08:47 AM, Michal Marek wrote:
->>> On 2014-11-11 21:27, Shuah Khan wrote:
->>>> diff --git a/Makefile b/Makefile
->>>> index 05d67af..ccbd2e1 100644
->>>> --- a/Makefile
->>>> +++ b/Makefile
->>>> @@ -1071,12 +1071,26 @@ headers_check: headers_install
->>>>  	$(Q)$(MAKE) $(hdr-inst)=arch/$(hdr-arch)/include/uapi/asm $(hdr-dst) HDRCHECK=1
->>>>  
->>>>  # ---------------------------------------------------------------------------
->>>> -# Kernel selftest
->>>> +# Kernel selftest targets
->>>> +
->>>> +PHONY += __kselftest_configure
->>>> +INSTALL_KSFT_PATH=$(INSTALL_MOD_PATH)/lib/kselftest/$(KERNELRELEASE)
->>>> +export INSTALL_KSFT_PATH
->>>> +KSELFTEST=$(INSTALL_KSFT_PATH)/kselftest.sh
->>>> +export KSELFTEST
->>>
->>> Can this be moved to tools/testing/selftests/Makefile? It's only used in
->>> this part of the tree.
->>
->> I looked into doing that. KERNELRELEASE will have to be exported for
->> tools/testing/selftests/Makefile to use it? Does that sound okay?
+Hi,
+
+Le mardi 02 décembre 2014 à 13:28 +0900, Masahiro Yamada a écrit :
+> The arch header directories "include/asm-*" were moved long before.
 > 
-> In fact, KERNELRELEASE is already exported. So go ahead.
-
-Good.
-
+> Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
+> ---
 > 
+>  Documentation/kbuild/headers_install.txt | 5 +----
+>  1 file changed, 1 insertion(+), 4 deletions(-)
 > 
->> Also, it might be easier to get this series in, if you can Ack the main
->> Makefile patch (when we are ready i.e), so I can take it through
->> kselftest tree.
-> 
-> Sure. The Makefile change will only consist of redirecting the
-> kselftest_install target to tools/testing/selftests, right?
-> 
+> diff --git a/Documentation/kbuild/headers_install.txt b/Documentation/kbuild/headers_install.txt
+> index 951eb9f..0d8fe5e 100644
+> --- a/Documentation/kbuild/headers_install.txt
+> +++ b/Documentation/kbuild/headers_install.txt
+> @@ -28,10 +28,7 @@ optional arguments:
+>  
+>  ARCH indicates which architecture to produce headers for, and defaults to the
+>  current architecture.  The linux/asm directory of the exported kernel headers
+> -is platform-specific, to see a complete list of supported architectures use
+> -the command:
+> -
+> -  ls -d include/asm-* | sed 's/.*-//'
+> +is platform-specific.
+>  
+>  INSTALL_HDR_PATH indicates where to install the headers.  It defaults to
+>  "./usr/include".
 
-Correct. I plan to keep the selftests specific work under the
-selftests related Makefiles.
+Back in september, I've already sent a patch[1] to address this,
+following a discussion with Sam Ravnborg[2]. See the mail thread[3].
 
-thanks,
--- Shuah
+Regards.
 
+[1] http://lkml.kernel.org/r/b5181cf7604baa454c11f7aa92d07dd05349ce46.1410712841.git.ydroneaud@opteya.com
+[2] http://lkml.kernel.org/r/20140713212608.GB16496@ravnborg.org
+[3] http://lkml.kernel.org/g/cover.1410712841.git.ydroneaud@opteya.com
 
 -- 
-Shuah Khan
-Sr. Linux Kernel Developer
-Samsung Research America (Silicon Valley)
-shuahkh@osg.samsung.com | (970) 217-8978
+Yann Droneaud
+OPTEYA
+
+
+
