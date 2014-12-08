@@ -1,15 +1,16 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cpsmtpb-ews10.kpnxchange.com ([213.75.39.15]:60298 "EHLO
-	cpsmtpb-ews10.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1750998AbaLHUVD (ORCPT
+Received: from cpsmtpb-ews04.kpnxchange.com ([213.75.39.7]:58946 "EHLO
+	cpsmtpb-ews04.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753901AbaLHU23 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 8 Dec 2014 15:21:03 -0500
-Message-ID: <1418070059.2058.39.camel@x220>
-Subject: Re: [PATCH 0/3] remove undocumented type definition alias
+	Mon, 8 Dec 2014 15:28:29 -0500
+Message-ID: <1418070507.2058.46.camel@x220>
+Subject: Re: [PATCH 1/3] kconfig: regenerate parser
 From: Paul Bolle <pebolle@tiscali.nl>
-Date: Mon, 08 Dec 2014 21:20:59 +0100
-In-Reply-To: <cover.1418003065.git.cj@linux.com>
+Date: Mon, 08 Dec 2014 21:28:27 +0100
+In-Reply-To: <0bf50ad9bc78f6944ebf5d5b1f8c9bdff223185f.1418003065.git.cj@linux.com>
 References: <cover.1418003065.git.cj@linux.com>
+	 <0bf50ad9bc78f6944ebf5d5b1f8c9bdff223185f.1418003065.git.cj@linux.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -19,73 +20,22 @@ To: Christoph Jaeger <cj@linux.com>
 Cc: yann.morin.1998@free.fr, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, dborkman@redhat.com
 
 On Sun, 2014-12-07 at 20:49 -0500, Christoph Jaeger wrote:
-> This patchset removes support for the undocumented type definition keyword
-> 'boolean', that is used in some config option definitions, in favor of the
-> much more widely used 'bool'. Both are semantically equivalent.
+> Regenerate the Kconfig parser with Bison 3.0.2 in preparation for a following
+
+Nit: could you please add the exact command line too? 
+
+> commit. Otherwise the changes caused by the more recent Bison version would be
+> intermingled with functional changes.
 > 
-> % git grep -w bool -- '*Kconfig*' | wc -l
-> 7065
-> % git grep -w boolean -- '*Kconfig*' | wc -l
-> 94
+> Signed-off-by: Christoph Jaeger <cj@linux.com>
+> ---
 
-(Side note: I _always_ use: $SOME_GIT_GREP $(git ls-files "*Kconfig*").
-Have I been typing too much all those years?)
+Are there any downsides to regenerating using, what looks like, a
+current version of bison? I'm not aware there are.
 
-> Having this alias is more confusing than helpful.
-
-Agree. (boolean is a better keyword than bool. Changing 7065 lines
-instead of 94 for that reason alone would be overdoing it.)
-
-> This change was suggested by Daniel Borkmann <dborkman@redhat.com>.
-> 
-> 
-> Patch 3/3 is purely cosmetic and therefore optional.
-> 
-> Christoph Jaeger (3):
->   kconfig: regenerate parser
->   kconfig: remove undocumented type definition alias 'boolean'
->   kconfig: rename S_BOOLEAN to S_BOOL for consistency
-
-For the record. I tested these three patches, on top of next-20141208,
-with this bit of perl:
-
-use 5.016;
-use warnings;
-use autodie;
-
-exit main ( @ARGV );
-
-sub main {
-	my ($tree) = @ARGV;
-
-	open( my $git_ls_tree, "-|", "git", "ls-tree", "-r", $tree );
-	my $slurp = do { local $/ = undef; <$git_ls_tree> };
-	my @lines = split( /\n/, $slurp );
-	foreach my $line ( @lines ) {
-		my ( @tmp ) = split( /\s/, $line );
-		if ($tmp[3] =~ 'defconfig$' ) {
-			my $arch;
-			my $defconfig = $tmp[3];
-			($arch = $tmp[3]) =~ s/arch\/(\w+)\/.*/$1/;
-
-			`cp $defconfig .config`;
-			`yes "" | make ARCH=$arch oldconfig`;
-			my $out = `md5sum .config`;
-			my (@tmp) = split( /\s/, $out );
-			say( $tmp[0] );
-		}
-	}
-	close( $git_ls_tree );
-
-	0;
-}
-
-Note how I have trouble following my own whitespace rules. If someone
-spots a flaw in this approach I'm all ears.
-
-I'll add further feedback on the patches themselves.
-
-Thanks,
+I've tested this on all 463 defconfig files in next-20141208. None of
+the generated .config files changed. So this patch is:
+    Tested-by: Paul Bolle <pebolle@tiscali.nl>
 
 
 Paul Bolle
