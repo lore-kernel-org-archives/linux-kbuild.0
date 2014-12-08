@@ -1,17 +1,18 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cpsmtpb-ews09.kpnxchange.com ([213.75.39.14]:58834 "EHLO
-	cpsmtpb-ews09.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1755780AbaLHSvE (ORCPT
+Received: from cpsmtpb-ews04.kpnxchange.com ([213.75.39.7]:52889 "EHLO
+	cpsmtpb-ews04.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1750998AbaLHTOD (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 8 Dec 2014 13:51:04 -0500
-Message-ID: <1418064660.2058.11.camel@x220>
+	Mon, 8 Dec 2014 14:14:03 -0500
+Message-ID: <1418066039.2058.19.camel@x220>
 Subject: Re: [PATCH 2/3] kconfig: remove undocumented type definition alias
  'boolean'
 From: Paul Bolle <pebolle@tiscali.nl>
-Date: Mon, 08 Dec 2014 19:51:00 +0100
-In-Reply-To: <1539c3778a0f3533942f69540a9b5b3d1f965bdc.1418003065.git.cj@linux.com>
+Date: Mon, 08 Dec 2014 20:13:59 +0100
+In-Reply-To: <1418064660.2058.11.camel@x220>
 References: <cover.1418003065.git.cj@linux.com>
 	 <1539c3778a0f3533942f69540a9b5b3d1f965bdc.1418003065.git.cj@linux.com>
+	 <1418064660.2058.11.camel@x220>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -20,19 +21,18 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Christoph Jaeger <cj@linux.com>
 Cc: yann.morin.1998@free.fr, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, dborkman@redhat.com
 
-On Sun, 2014-12-07 at 20:49 -0500, Christoph Jaeger wrote:
-> Having an undocumented alias for type definitions of boolean config options is
-> more confusing than helpful. Remove support for the keyword 'boolean' in favor
-> of 'bool' and convert all its users.
-> 
-> While at it, fix some minor grammar issues in warning messages.
-> 
-> Suggested-by: Daniel Borkmann <dborkman@redhat.com>
-> Signed-off-by: Christoph Jaeger <cj@linux.com>
+On Mon, 2014-12-08 at 19:51 +0100, Paul Bolle wrote:
+> This doesn't apply on next-20141208. What tree did you base this on?
 
-This doesn't apply on next-20141208. What tree did you base this on?
+I got it to apply on next-20141208 by dropping the hunk for
+arch/cris/arch-v32/drivers/Kconfig and by making (trivial) context
+changes to the hunks for init/Kconfig and net/Kconfig.
 
-Thanks,
+(My experience with actual maintainers is that they won't bother to do
+that. Anyhow, Kconfig is basically unmaintained. And I don't know which
+tree one should base ones Kconfig patches on.)
+
+I'll muddle along...
 
 
 Paul Bolle
