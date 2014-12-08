@@ -1,37 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cpsmtpb-ews09.kpnxchange.com ([213.75.39.14]:64344 "EHLO
-	cpsmtpb-ews09.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1755489AbaLHUnP (ORCPT
+Received: from cpsmtpb-ews04.kpnxchange.com ([213.75.39.7]:63691 "EHLO
+	cpsmtpb-ews04.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753148AbaLHVPC (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 8 Dec 2014 15:43:15 -0500
-Message-ID: <1418071392.2058.56.camel@x220>
-Subject: Re: [PATCH 3/3] kconfig: rename S_BOOLEAN to S_BOOL for consistency
+	Mon, 8 Dec 2014 16:15:02 -0500
+Message-ID: <1418073300.2058.63.camel@x220>
+Subject: Re: [PATCH 2/3] kconfig: remove undocumented type definition alias
+ 'boolean'
 From: Paul Bolle <pebolle@tiscali.nl>
-Date: Mon, 08 Dec 2014 21:43:12 +0100
-In-Reply-To: <7fa2d6b65dfd4d5549baf8cbc53b6940b00fe52d.1418003065.git.cj@linux.com>
+Date: Mon, 08 Dec 2014 22:15:00 +0100
+In-Reply-To: <1418070979.2058.52.camel@x220>
 References: <cover.1418003065.git.cj@linux.com>
-	 <7fa2d6b65dfd4d5549baf8cbc53b6940b00fe52d.1418003065.git.cj@linux.com>
+	 <1539c3778a0f3533942f69540a9b5b3d1f965bdc.1418003065.git.cj@linux.com>
+	 <1418064660.2058.11.camel@x220> <1418066039.2058.19.camel@x220>
+	 <5485F923.3090301@redhat.com> <1418067685.2058.27.camel@x220>
+	 <1418070979.2058.52.camel@x220>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Christoph Jaeger <cj@linux.com>
-Cc: yann.morin.1998@free.fr, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, dborkman@redhat.com
+Cc: Daniel Borkmann <dborkman@redhat.com>, yann.morin.1998@free.fr, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, akpm@linux-foundation.org
 
-On Sun, 2014-12-07 at 20:49 -0500, Christoph Jaeger wrote:
-> Rename S_BOOLEAN to S_BOOL so that it reflects the actual string as
-> S_TRISTATE, S_INT, etc., do. No functional changes.
+On Mon, 2014-12-08 at 21:36 +0100, Paul Bolle wrote:
+> On Mon, 2014-12-08 at 20:41 +0100, Paul Bolle wrote:
+> > Well, it seems the treewide "boolean" cleanup should be done first.
+> > Removing support for "boolean" could than be a second, separate step.
+> > Just to ease review.
 > 
-> Signed-off-by: Christoph Jaeger <cj@linux.com>
+> This appears to have no effect on the .config files I generated for the
+> defconfig files in next-20141208. (After porting the patch and changing
+> those last booleans to bool, that is.) So that's good.
+> 
+> If you'd resend as two patches on top of linux-next, I might add an
+> Acked-by: or a Tested-by:.
 
-If you resend this series, and take in account my comments on 2/3, feel
-free to add:
-    Acked-by: Paul Bolle <pebolle@tiscali.nl>
-
-to this patch.
-
-Thanks,
+My last mail on this series. To make sure the tree stays buildable that
+second patch to drop support for 'boolean' should only be applied a
+release or two after the cleanup patch has been applied. Otherwise we're
+bound to run into fun build errors in linux-next, and even mainline, for
+quite a few commits, aren't we? One tree still using boolean is all it
+takes...
 
 
 Paul Bolle
