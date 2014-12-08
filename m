@@ -1,63 +1,84 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ou.quest-ce.net ([195.154.187.82]:59651 "EHLO ou.quest-ce.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750896AbaLEOY1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 5 Dec 2014 09:24:27 -0500
-Message-ID: <1417789428.11111.31.camel@opteya.com>
-From: Yann Droneaud <ydroneaud@opteya.com>
-Date: Fri, 05 Dec 2014 15:23:48 +0100
-In-Reply-To: <1417494533-24461-1-git-send-email-yamada.m@jp.panasonic.com>
-References: <1417494533-24461-1-git-send-email-yamada.m@jp.panasonic.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] kbuild: remove old information in headers_install.txt
- document
+Received: from smtprelay01.ispgateway.de ([80.67.31.35]:41157 "EHLO
+	smtprelay01.ispgateway.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751072AbaLHB4P (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 7 Dec 2014 20:56:15 -0500
+From: Christoph Jaeger <cj@linux.com>
+Subject: [PATCH 0/3] remove undocumented type definition alias
+Date: Sun,  7 Dec 2014 20:49:17 -0500
+Message-Id: <cover.1418003065.git.cj@linux.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, Yann Droneaud <ydroneaud@opteya.com>
+To: yann.morin.1998@free.fr
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, dborkman@redhat.com, Christoph Jaeger <cj@linux.com>
 
-Hi,
+This patchset removes support for the undocumented type definition keyword
+'boolean', that is used in some config option definitions, in favor of the
+much more widely used 'bool'. Both are semantically equivalent.
 
-Le mardi 02 décembre 2014 à 13:28 +0900, Masahiro Yamada a écrit :
-> The arch header directories "include/asm-*" were moved long before.
-> 
-> Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
-> ---
-> 
->  Documentation/kbuild/headers_install.txt | 5 +----
->  1 file changed, 1 insertion(+), 4 deletions(-)
-> 
-> diff --git a/Documentation/kbuild/headers_install.txt b/Documentation/kbuild/headers_install.txt
-> index 951eb9f..0d8fe5e 100644
-> --- a/Documentation/kbuild/headers_install.txt
-> +++ b/Documentation/kbuild/headers_install.txt
-> @@ -28,10 +28,7 @@ optional arguments:
->  
->  ARCH indicates which architecture to produce headers for, and defaults to the
->  current architecture.  The linux/asm directory of the exported kernel headers
-> -is platform-specific, to see a complete list of supported architectures use
-> -the command:
-> -
-> -  ls -d include/asm-* | sed 's/.*-//'
-> +is platform-specific.
->  
->  INSTALL_HDR_PATH indicates where to install the headers.  It defaults to
->  "./usr/include".
+% git grep -w bool -- '*Kconfig*' | wc -l
+7065
+% git grep -w boolean -- '*Kconfig*' | wc -l
+94
 
-Back in september, I've already sent a patch[1] to address this,
-following a discussion with Sam Ravnborg[2]. See the mail thread[3].
+Having this alias is more confusing than helpful.
 
-Regards.
+This change was suggested by Daniel Borkmann <dborkman@redhat.com>.
 
-[1] http://lkml.kernel.org/r/b5181cf7604baa454c11f7aa92d07dd05349ce46.1410712841.git.ydroneaud@opteya.com
-[2] http://lkml.kernel.org/r/20140713212608.GB16496@ravnborg.org
-[3] http://lkml.kernel.org/g/cover.1410712841.git.ydroneaud@opteya.com
+
+Patch 3/3 is purely cosmetic and therefore optional.
+
+Christoph Jaeger (3):
+  kconfig: regenerate parser
+  kconfig: remove undocumented type definition alias 'boolean'
+  kconfig: rename S_BOOLEAN to S_BOOL for consistency
+
+ arch/cris/arch-v32/drivers/Kconfig   |    2 +-
+ arch/mips/pmcs-msp71xx/Kconfig       |    6 +-
+ drivers/connector/Kconfig            |    2 +-
+ drivers/hwmon/Kconfig                |    2 +-
+ drivers/i2c/Kconfig                  |    4 +-
+ drivers/iio/Kconfig                  |    4 +-
+ drivers/isdn/hardware/mISDN/Kconfig  |    2 +-
+ drivers/md/Kconfig                   |    4 +-
+ drivers/md/persistent-data/Kconfig   |    2 +-
+ drivers/net/ethernet/ti/Kconfig      |    4 +-
+ drivers/net/usb/Kconfig              |   12 +-
+ drivers/net/wireless/rt2x00/Kconfig  |    6 +-
+ drivers/pci/pcie/aer/Kconfig         |    2 +-
+ drivers/rtc/Kconfig                  |    8 +-
+ drivers/spi/Kconfig                  |    6 +-
+ drivers/staging/board/Kconfig        |    2 +-
+ drivers/staging/emxx_udc/Kconfig     |    2 +-
+ drivers/staging/iio/Kconfig          |    4 +-
+ drivers/tty/serial/Kconfig           |    2 +-
+ drivers/usb/gadget/Kconfig           |   26 +-
+ drivers/usb/gadget/legacy/Kconfig    |    2 +-
+ drivers/usb/gadget/udc/Kconfig       |    4 +-
+ drivers/usb/phy/Kconfig              |    2 +-
+ init/Kconfig                         |    4 +-
+ lib/Kconfig                          |   30 +-
+ mm/Kconfig                           |   22 +-
+ net/Kconfig                          |   14 +-
+ net/sched/Kconfig                    |    2 +-
+ scripts/kconfig/confdata.c           |   22 +-
+ scripts/kconfig/expr.c               |   10 +-
+ scripts/kconfig/expr.h               |    2 +-
+ scripts/kconfig/gconf.c              |    4 +-
+ scripts/kconfig/mconf.c              |    6 +-
+ scripts/kconfig/menu.c               |   10 +-
+ scripts/kconfig/nconf.c              |    4 +-
+ scripts/kconfig/qconf.cc             |   10 +-
+ scripts/kconfig/symbol.c             |   34 +-
+ scripts/kconfig/zconf.gperf          |    5 +-
+ scripts/kconfig/zconf.hash.c_shipped |   53 +-
+ scripts/kconfig/zconf.tab.c_shipped  | 1248 +++++++++++++++-------------------
+ scripts/kconfig/zconf.y              |    6 +-
+ security/integrity/Kconfig           |    4 +-
+ security/integrity/evm/Kconfig       |    2 +-
+ 43 files changed, 737 insertions(+), 865 deletions(-)
 
 -- 
-Yann Droneaud
-OPTEYA
-
-
+2.1.0
 
