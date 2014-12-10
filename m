@@ -1,67 +1,137 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from out3-smtp.messagingengine.com ([66.111.4.27]:46883 "EHLO
-	out3-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1754388AbaLIXOG (ORCPT
+Received: from cpsmtpb-ews02.kpnxchange.com ([213.75.39.5]:55323 "EHLO
+	cpsmtpb-ews02.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S932374AbaLJUY3 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 9 Dec 2014 18:14:06 -0500
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
-	by mailout.nyi.internal (Postfix) with ESMTP id 950092081B
-	for <linux-kbuild@vger.kernel.org>; Tue,  9 Dec 2014 18:14:05 -0500 (EST)
-Date: Tue, 9 Dec 2014 18:14:05 -0500
-From: Christoph Jaeger <cj@linux.com>
-Subject: Re: [PATCH 2/3] kconfig: remove undocumented type definition alias
- 'boolean'
-Message-ID: <20141209231405.GC9677@betelgeuse.hsd1.ma.comcast.net>
-References: <cover.1418003065.git.cj@linux.com>
- <1539c3778a0f3533942f69540a9b5b3d1f965bdc.1418003065.git.cj@linux.com>
- <1418064660.2058.11.camel@x220>
- <1418066039.2058.19.camel@x220>
- <5485F923.3090301@redhat.com>
- <1418067685.2058.27.camel@x220>
- <1418070979.2058.52.camel@x220>
- <1418073300.2058.63.camel@x220>
- <5486E1BD.4040809@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5486E1BD.4040809@redhat.com>
+	Wed, 10 Dec 2014 15:24:29 -0500
+Message-ID: <1418243066.22654.19.camel@x220>
+Subject: Re: [PATCH v2 0/4] kconfig: store default ARCH in .config
+From: Paul Bolle <pebolle@tiscali.nl>
+Date: Wed, 10 Dec 2014 21:24:26 +0100
+In-Reply-To: <CALYGNiOC7E9kPLn_+rA7Wv7AMQgzyrot9Uyd0s3DDEw+78KWGQ@mail.gmail.com>
+References: <20140901065916.28909.35097.stgit@zurg>
+	 <CALYGNiOC7E9kPLn_+rA7Wv7AMQgzyrot9Uyd0s3DDEw+78KWGQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Daniel Borkmann <dborkman@redhat.com>
-Cc: Paul Bolle <pebolle@tiscali.nl>, yann.morin.1998@free.fr, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, akpm@linux-foundation.org
+To: Konstantin Khlebnikov <koct9i@gmail.com>
+Cc: Michal Marek <mmarek@suse.cz>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Geert Uytterhoeven <geert@linux-m68k.org>
 
-On Tue, Dec 09, 2014 at 12:49:17PM +0100, Daniel Borkmann wrote:
-> On 12/08/2014 10:15 PM, Paul Bolle wrote:
-> >On Mon, 2014-12-08 at 21:36 +0100, Paul Bolle wrote:
-> >>On Mon, 2014-12-08 at 20:41 +0100, Paul Bolle wrote:
-> >>>Well, it seems the treewide "boolean" cleanup should be done first.
-> >>>Removing support for "boolean" could than be a second, separate step.
-> >>>Just to ease review.
-> >>
-> >>This appears to have no effect on the .config files I generated for the
-> >>defconfig files in next-20141208. (After porting the patch and changing
-> >>those last booleans to bool, that is.) So that's good.
-> >>
-> >>If you'd resend as two patches on top of linux-next, I might add an
-> >>Acked-by: or a Tested-by:.
+Hi Konstantin,
+
+On Mon, 2014-10-27 at 21:20 +0400, Konstantin Khlebnikov wrote:
+> Bump.
+> 
+> On Mon, Sep 1, 2014 at 11:16 AM, Konstantin Khlebnikov <koct9i@gmail.com> wrote:
+> > This is second attempt of fixing target archecture amnesia.
+> > v1 patch: http://lkml.kernel.org/r/20140706080234.19520.96704.stgit@zurg
 > >
-> >My last mail on this series. To make sure the tree stays buildable that
-> >second patch to drop support for 'boolean' should only be applied a
-> >release or two after the cleanup patch has been applied. Otherwise we're
-> >bound to run into fun build errors in linux-next, and even mainline, for
-> >quite a few commits, aren't we? One tree still using boolean is all it
-> >takes...
-> 
-> Sounds like a good plan, thanks a lot for looking into it, Paul!
-> 
-> Meanwhile, also checkpatch.pl could emit a deprecate warning in case
-> a patch carries Kconfig code with 'boolean' in it, but I leave that
-> up to Christoph to decide. ;)
+> > First version saved ARCH as CONFIG_DEFAULT_ARCH and used it as defult ARCH.
+> >
+> > This version changes semantic of Kconfig option env="...", now it acts more
+> > like the user input, except that the value comes from the environment.
+> > Variable from environment overrides all defaults and value from config file.
+> > If environment variable is not defined this option has no effect.
+> >
+> > So, now ARCH is saved as CONFIG_ARCH.
+> >
+> > Also this patchset links CONFIG_CROSS_COMPILE and CROSS_COMPILE in the same way.
+> > Changing it in command line/environment also updates value in the config file.
+> >
+> > ---
+> >
+> > Konstantin Khlebnikov (4):
+> >       kconfig: save values imported from environment into config file
+> >       scripts/config: add option for changing output for undefined options
+> >       kconfig: get target architecture from config file
+> >       kconfig: link CONFIG_CROSS_COMPILE with environment variable
+> >
+> >
+> >  Documentation/kbuild/kconfig-language.txt |   10 ++++------
+> >  Documentation/kbuild/makefiles.txt        |    3 ++-
+> >  Makefile                                  |   21 +++++++++++++++------
+> >  init/Kconfig                              |    1 +
+> >  scripts/config                            |   15 ++++++++++++---
+> >  scripts/kconfig/confdata.c                |   26 ++++++++++++++++++++++++++
+> >  scripts/kconfig/expr.h                    |    2 +-
+> >  scripts/kconfig/symbol.c                  |    3 ---
+> >  8 files changed, 61 insertions(+), 20 deletions(-)
 
-Agree. Thanks for reviewing and testing!
+It's been a few months since you submitted this series and you've
+received little feedback. So I tried to review this series. That didn't
+go too well. Mainly because the kconfig code makes answering questions
+like "What does sym_calc_value() actually do?" harder than it should be.
+(And because make and the kernel Makefiles scare me, but I don't like to
+admit that.)
 
-I'll resend a series on top of linux-next that takes all of your suggestions
-into account.
+Anyhow, I think what you want to accomplish, is basically to save make's
+ARCH as CONFIG_ARCH and, likewise, save make's CROSS_COMPILE as
+CONFIG_CROSS_COMPILE. You jump through quite a few hoops to do that in
+this series.
 
-Thanks,
-Chris
+Now I'm not clear whether saving those variables should actually be
+done. But I did cobble together a much smaller _hack_ that seems to
+achieve what you want. I've pasted it at the end of this message. It's
+lightly tested on top of today's linux-next. (Does it break building
+UML?) But does it do what you basically care about?
+
+
+Paul Bolle
+---
+diff --git a/Makefile b/Makefile
+index ec2f22615d3d..a8bc3290f2e9 100644
+--- a/Makefile
++++ b/Makefile
+@@ -228,6 +228,9 @@ SUBARCH := $(shell uname -m | sed -e s/i.86/x86/ -e s/x86_64/x86/ \
+ 				  -e s/ppc.*/powerpc/ -e s/mips.*/mips/ \
+ 				  -e s/sh[234].*/sh/ -e s/aarch64.*/arm64/ )
+ 
++KCONFIG_CONFIG	?= .config
++export KCONFIG_CONFIG
++
+ # Cross compiling and selecting different set of gcc/bin-utils
+ # ---------------------------------------------------------------------------
+ #
+@@ -248,6 +251,10 @@ SUBARCH := $(shell uname -m | sed -e s/i.86/x86/ -e s/x86_64/x86/ \
+ # "make" in the configured kernel build directory always uses that.
+ # Default value for CROSS_COMPILE is not to prefix executables
+ # Note: Some architectures assign CROSS_COMPILE in their arch/*/Makefile
++ARCH		?= $(shell grep -s ^CONFIG_ARCH= $(KCONFIG_CONFIG) | sed -e s/^CONFIG_ARCH=// -e s/\"//g)
++ifeq ($(ARCH),)
++        undefine ARCH
++endif
+ ARCH		?= $(SUBARCH)
+ CROSS_COMPILE	?= $(CONFIG_CROSS_COMPILE:"%"=%)
+ 
+@@ -287,9 +294,6 @@ endif
+ # Where to locate arch specific headers
+ hdr-arch  := $(SRCARCH)
+ 
+-KCONFIG_CONFIG	?= .config
+-export KCONFIG_CONFIG
+-
+ # SHELL used by kbuild
+ CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
+ 	  else if [ -x /bin/bash ]; then echo /bin/bash; \
+diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
+index 7d09e029a779..77c8341af494 100644
+--- a/scripts/kconfig/symbol.c
++++ b/scripts/kconfig/symbol.c
+@@ -1364,8 +1364,12 @@ static void prop_add_env(const char *env)
+ 	sym_env_list->right.sym = sym;
+ 
+ 	p = getenv(env);
+-	if (p)
++	if (p) {
+ 		sym_add_default(sym, p);
+-	else
++		if ((strcmp(sym->name, "ARCH") == 0) ||
++		    (strcmp(sym->name, "CROSS_COMPILE") == 0))
++			sym->flags &= ~SYMBOL_AUTO;
++	} else {
+ 		menu_warn(current_entry, "environment variable %s undefined", env);
++	}
+ }
+
