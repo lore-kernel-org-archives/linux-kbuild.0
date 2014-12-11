@@ -1,137 +1,82 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cpsmtpb-ews02.kpnxchange.com ([213.75.39.5]:55323 "EHLO
-	cpsmtpb-ews02.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S932374AbaLJUY3 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 10 Dec 2014 15:24:29 -0500
-Message-ID: <1418243066.22654.19.camel@x220>
-Subject: Re: [PATCH v2 0/4] kconfig: store default ARCH in .config
-From: Paul Bolle <pebolle@tiscali.nl>
-Date: Wed, 10 Dec 2014 21:24:26 +0100
-In-Reply-To: <CALYGNiOC7E9kPLn_+rA7Wv7AMQgzyrot9Uyd0s3DDEw+78KWGQ@mail.gmail.com>
-References: <20140901065916.28909.35097.stgit@zurg>
-	 <CALYGNiOC7E9kPLn_+rA7Wv7AMQgzyrot9Uyd0s3DDEw+78KWGQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Received: from smtp.mei.co.jp ([133.183.100.20]:58216 "EHLO smtp.mei.co.jp"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S932937AbaLKBl3 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 10 Dec 2014 20:41:29 -0500
+Date: Thu, 11 Dec 2014 10:41:19 +0900
+From: Masahiro Yamada <yamada.m@jp.panasonic.com>
+Subject: Re: [PATCH] kbuild: fix scripts/headers.sh to see the correct Kbuild path
+In-Reply-To: <1418075913.2058.71.camel@x220>
+References: <1417589535-15867-1-git-send-email-yamada.m@jp.panasonic.com> <1418075913.2058.71.camel@x220>
+Message-Id: <20141211104119.A482.AA925319@jp.panasonic.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Konstantin Khlebnikov <koct9i@gmail.com>
-Cc: Michal Marek <mmarek@suse.cz>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Geert Uytterhoeven <geert@linux-m68k.org>
+To: Paul Bolle <pebolle@tiscali.nl>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hi Konstantin,
+Hi Paul,
 
-On Mon, 2014-10-27 at 21:20 +0400, Konstantin Khlebnikov wrote:
-> Bump.
+
+On Mon, 08 Dec 2014 22:58:33 +0100
+Paul Bolle <pebolle@tiscali.nl> wrote:
+
+> Masahiro,
 > 
-> On Mon, Sep 1, 2014 at 11:16 AM, Konstantin Khlebnikov <koct9i@gmail.com> wrote:
-> > This is second attempt of fixing target archecture amnesia.
-> > v1 patch: http://lkml.kernel.org/r/20140706080234.19520.96704.stgit@zurg
-> >
-> > First version saved ARCH as CONFIG_DEFAULT_ARCH and used it as defult ARCH.
-> >
-> > This version changes semantic of Kconfig option env="...", now it acts more
-> > like the user input, except that the value comes from the environment.
-> > Variable from environment overrides all defaults and value from config file.
-> > If environment variable is not defined this option has no effect.
-> >
-> > So, now ARCH is saved as CONFIG_ARCH.
-> >
-> > Also this patchset links CONFIG_CROSS_COMPILE and CROSS_COMPILE in the same way.
-> > Changing it in command line/environment also updates value in the config file.
-> >
+> On Wed, 2014-12-03 at 15:52 +0900, Masahiro Yamada wrote:
+> > The exported headers were moved to "uapi" directories.
+> > We should check the existence of arch/*/include/uapi/asm/Kbuild.
+> > 
+> > Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
 > > ---
-> >
-> > Konstantin Khlebnikov (4):
-> >       kconfig: save values imported from environment into config file
-> >       scripts/config: add option for changing output for undefined options
-> >       kconfig: get target architecture from config file
-> >       kconfig: link CONFIG_CROSS_COMPILE with environment variable
-> >
-> >
-> >  Documentation/kbuild/kconfig-language.txt |   10 ++++------
-> >  Documentation/kbuild/makefiles.txt        |    3 ++-
-> >  Makefile                                  |   21 +++++++++++++++------
-> >  init/Kconfig                              |    1 +
-> >  scripts/config                            |   15 ++++++++++++---
-> >  scripts/kconfig/confdata.c                |   26 ++++++++++++++++++++++++++
-> >  scripts/kconfig/expr.h                    |    2 +-
-> >  scripts/kconfig/symbol.c                  |    3 ---
-> >  8 files changed, 61 insertions(+), 20 deletions(-)
-
-It's been a few months since you submitted this series and you've
-received little feedback. So I tried to review this series. That didn't
-go too well. Mainly because the kconfig code makes answering questions
-like "What does sym_calc_value() actually do?" harder than it should be.
-(And because make and the kernel Makefiles scare me, but I don't like to
-admit that.)
-
-Anyhow, I think what you want to accomplish, is basically to save make's
-ARCH as CONFIG_ARCH and, likewise, save make's CROSS_COMPILE as
-CONFIG_CROSS_COMPILE. You jump through quite a few hoops to do that in
-this series.
-
-Now I'm not clear whether saving those variables should actually be
-done. But I did cobble together a much smaller _hack_ that seems to
-achieve what you want. I've pasted it at the end of this message. It's
-lightly tested on top of today's linux-next. (Does it break building
-UML?) But does it do what you basically care about?
+> 
+> Does this patch fix any problems? If so, which?
 
 
-Paul Bolle
----
-diff --git a/Makefile b/Makefile
-index ec2f22615d3d..a8bc3290f2e9 100644
---- a/Makefile
-+++ b/Makefile
-@@ -228,6 +228,9 @@ SUBARCH := $(shell uname -m | sed -e s/i.86/x86/ -e s/x86_64/x86/ \
- 				  -e s/ppc.*/powerpc/ -e s/mips.*/mips/ \
- 				  -e s/sh[234].*/sh/ -e s/aarch64.*/arm64/ )
- 
-+KCONFIG_CONFIG	?= .config
-+export KCONFIG_CONFIG
-+
- # Cross compiling and selecting different set of gcc/bin-utils
- # ---------------------------------------------------------------------------
- #
-@@ -248,6 +251,10 @@ SUBARCH := $(shell uname -m | sed -e s/i.86/x86/ -e s/x86_64/x86/ \
- # "make" in the configured kernel build directory always uses that.
- # Default value for CROSS_COMPILE is not to prefix executables
- # Note: Some architectures assign CROSS_COMPILE in their arch/*/Makefile
-+ARCH		?= $(shell grep -s ^CONFIG_ARCH= $(KCONFIG_CONFIG) | sed -e s/^CONFIG_ARCH=// -e s/\"//g)
-+ifeq ($(ARCH),)
-+        undefine ARCH
-+endif
- ARCH		?= $(SUBARCH)
- CROSS_COMPILE	?= $(CONFIG_CROSS_COMPILE:"%"=%)
- 
-@@ -287,9 +294,6 @@ endif
- # Where to locate arch specific headers
- hdr-arch  := $(SRCARCH)
- 
--KCONFIG_CONFIG	?= .config
--export KCONFIG_CONFIG
--
- # SHELL used by kbuild
- CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
- 	  else if [ -x /bin/bash ]; then echo /bin/bash; \
-diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
-index 7d09e029a779..77c8341af494 100644
---- a/scripts/kconfig/symbol.c
-+++ b/scripts/kconfig/symbol.c
-@@ -1364,8 +1364,12 @@ static void prop_add_env(const char *env)
- 	sym_env_list->right.sym = sym;
- 
- 	p = getenv(env);
--	if (p)
-+	if (p) {
- 		sym_add_default(sym, p);
--	else
-+		if ((strcmp(sym->name, "ARCH") == 0) ||
-+		    (strcmp(sym->name, "CROSS_COMPILE") == 0))
-+			sym->flags &= ~SYMBOL_AUTO;
-+	} else {
- 		menu_warn(current_entry, "environment variable %s undefined", env);
-+	}
- }
+I am fixing a wrong code.
+
+Actually, the "um" architecture does not support headers install.
+
+ arch/um/include/asm/Kbuild exists
+ arch/um/include/uapi/asm/Kbuild does not exist
+
+Checking arch/*/include/asm/Kbuild does not work.
+
+
+Moreover, the top Makefile is checking  arch/*/include/uapi/asm/Kbuild
+
+
+headers_install: __headers
+        $(if $(wildcard $(srctree)/arch/$(hdr-arch)/include/uapi/asm/Kbuild),, \
+          $(error Headers not exportable for the $(SRCARCH) architecture))
+
+
+
+
+
+> And why did no one
+> notice these problems before? Perhaps the commit explanation could
+> mention that.
+
+
+You will notice the code below:
+
+for arch in ${archs}; do
+        case ${arch} in
+        um)        # no userspace export
+                ;;
+
+
+"um" has already been omitted and it never reaches do_command().
+That is why nobody has noticed this issue.
+
+Uh, OK, we do not need double-checking.
+
+
+
+
+Best Regards
+Masahiro Yamada
 
