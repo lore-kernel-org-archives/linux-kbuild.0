@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:38996 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:39022 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1758568AbaLKSGv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	id S1758574AbaLKSGv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
 	Thu, 11 Dec 2014 13:06:51 -0500
 From: Juergen Gross <jgross@suse.com>
-Subject: [PATCH 1/4] xen: build infrastructure for generating hypercall depending symbols
-Date: Thu, 11 Dec 2014 19:04:22 +0100
-Message-Id: <1418321065-10212-2-git-send-email-jgross@suse.com>
+Subject: [PATCH 4/4] xen: use generated hypercall symbols in arch/x86/xen/xen-head.S
+Date: Thu, 11 Dec 2014 19:04:25 +0100
+Message-Id: <1418321065-10212-5-git-send-email-jgross@suse.com>
 In-Reply-To: <1418321065-10212-1-git-send-email-jgross@suse.com>
 References: <1418321065-10212-1-git-send-email-jgross@suse.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -14,66 +14,101 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org, x86@kernel.org, xen-devel@lists.xensource.com, konrad.wilk@oracle.com, david.vrabel@citrix.com, boris.ostrovsky@oracle.com, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com, mmarek@suse.cz, linux-kbuild@vger.kernel.org
 Cc: Juergen Gross <jgross@suse.com>
 
-Today there are several places in the kernel which build tables
-containing one entry for each possible Xen hypercall. Create an
-infrastructure to be able to generate these tables at build time.
+Instead of manually list each hypercall in arch/x86/xen/xen-head.S
+use the auto generated symbol list.
+
+This also corrects the wrong address of xen_hypercall_mca which was
+located 32 bytes higher than it should.
+
+Symbol addresses have been verified to match the correct ones via
+objdump output.
 
 Based-on-patch-by: Jan Beulich <jbeulich@suse.com>
 Signed-off-by: Juergen Gross <jgross@suse.com>
 ---
- arch/x86/syscalls/Makefile |  9 +++++++++
- scripts/xen-hypercalls.sh  | 11 +++++++++++
- 2 files changed, 20 insertions(+)
- create mode 100644 scripts/xen-hypercalls.sh
+ arch/x86/xen/xen-head.S | 62 ++++++++-----------------------------------------
+ 1 file changed, 10 insertions(+), 52 deletions(-)
 
-diff --git a/arch/x86/syscalls/Makefile b/arch/x86/syscalls/Makefile
-index 3323c27..a55abb9 100644
---- a/arch/x86/syscalls/Makefile
-+++ b/arch/x86/syscalls/Makefile
-@@ -19,6 +19,9 @@ quiet_cmd_syshdr = SYSHDR  $@
- quiet_cmd_systbl = SYSTBL  $@
-       cmd_systbl = $(CONFIG_SHELL) '$(systbl)' $< $@
+diff --git a/arch/x86/xen/xen-head.S b/arch/x86/xen/xen-head.S
+index 674b2225..b2ba341 100644
+--- a/arch/x86/xen/xen-head.S
++++ b/arch/x86/xen/xen-head.S
+@@ -12,6 +12,8 @@
  
-+quiet_cmd_hypercalls = HYPERCALLS $@
-+      cmd_hypercalls = $(CONFIG_SHELL) '$<' $@ $(filter-out $<,$^)
-+
- syshdr_abi_unistd_32 := i386
- $(uapi)/unistd_32.h: $(syscall32) $(syshdr)
- 	$(call if_changed,syshdr)
-@@ -47,10 +50,16 @@ $(out)/syscalls_32.h: $(syscall32) $(systbl)
- $(out)/syscalls_64.h: $(syscall64) $(systbl)
- 	$(call if_changed,systbl)
+ #include <xen/interface/elfnote.h>
+ #include <xen/interface/features.h>
++#include <xen/interface/xen.h>
++#include <xen/interface/xen-mca.h>
+ #include <asm/xen/interface.h>
  
-+$(out)/xen-hypercalls.h: $(srctree)/scripts/xen-hypercalls.sh
-+	$(call if_changed,hypercalls)
+ #ifdef CONFIG_XEN_PVH
+@@ -85,58 +87,14 @@ ENTRY(xen_pvh_early_cpu_init)
+ .pushsection .text
+ 	.balign PAGE_SIZE
+ ENTRY(hypercall_page)
+-#define NEXT_HYPERCALL(x) \
+-	ENTRY(xen_hypercall_##x) \
+-	.skip 32
+-
+-NEXT_HYPERCALL(set_trap_table)
+-NEXT_HYPERCALL(mmu_update)
+-NEXT_HYPERCALL(set_gdt)
+-NEXT_HYPERCALL(stack_switch)
+-NEXT_HYPERCALL(set_callbacks)
+-NEXT_HYPERCALL(fpu_taskswitch)
+-NEXT_HYPERCALL(sched_op_compat)
+-NEXT_HYPERCALL(platform_op)
+-NEXT_HYPERCALL(set_debugreg)
+-NEXT_HYPERCALL(get_debugreg)
+-NEXT_HYPERCALL(update_descriptor)
+-NEXT_HYPERCALL(ni)
+-NEXT_HYPERCALL(memory_op)
+-NEXT_HYPERCALL(multicall)
+-NEXT_HYPERCALL(update_va_mapping)
+-NEXT_HYPERCALL(set_timer_op)
+-NEXT_HYPERCALL(event_channel_op_compat)
+-NEXT_HYPERCALL(xen_version)
+-NEXT_HYPERCALL(console_io)
+-NEXT_HYPERCALL(physdev_op_compat)
+-NEXT_HYPERCALL(grant_table_op)
+-NEXT_HYPERCALL(vm_assist)
+-NEXT_HYPERCALL(update_va_mapping_otherdomain)
+-NEXT_HYPERCALL(iret)
+-NEXT_HYPERCALL(vcpu_op)
+-NEXT_HYPERCALL(set_segment_base)
+-NEXT_HYPERCALL(mmuext_op)
+-NEXT_HYPERCALL(xsm_op)
+-NEXT_HYPERCALL(nmi_op)
+-NEXT_HYPERCALL(sched_op)
+-NEXT_HYPERCALL(callback_op)
+-NEXT_HYPERCALL(xenoprof_op)
+-NEXT_HYPERCALL(event_channel_op)
+-NEXT_HYPERCALL(physdev_op)
+-NEXT_HYPERCALL(hvm_op)
+-NEXT_HYPERCALL(sysctl)
+-NEXT_HYPERCALL(domctl)
+-NEXT_HYPERCALL(kexec_op)
+-NEXT_HYPERCALL(tmem_op) /* 38 */
+-ENTRY(xen_hypercall_rsvr)
+-	.skip 320
+-NEXT_HYPERCALL(mca) /* 48 */
+-NEXT_HYPERCALL(arch_1)
+-NEXT_HYPERCALL(arch_2)
+-NEXT_HYPERCALL(arch_3)
+-NEXT_HYPERCALL(arch_4)
+-NEXT_HYPERCALL(arch_5)
+-NEXT_HYPERCALL(arch_6)
++	.skip PAGE_SIZE
 +
-+$(out)/xen-hypercalls.h: $(srctree)/include/xen/interface/xen*.h
++#define HYPERCALL(n) \
++	.equ xen_hypercall_##n, hypercall_page + __HYPERVISOR_##n * 32; \
++	.type xen_hypercall_##n, function; .size xen_hypercall_##n, 32
++#include <asm/xen-hypercalls.h>
++#undef HYPERCALL
 +
- uapisyshdr-y			+= unistd_32.h unistd_64.h unistd_x32.h
- syshdr-y			+= syscalls_32.h
- syshdr-$(CONFIG_X86_64)		+= unistd_32_ia32.h unistd_64_x32.h
- syshdr-$(CONFIG_X86_64)		+= syscalls_64.h
-+syshdr-$(CONFIG_XEN)		+= xen-hypercalls.h
+ 	.balign PAGE_SIZE
+ .popsection
  
- targets	+= $(uapisyshdr-y) $(syshdr-y)
- 
-diff --git a/scripts/xen-hypercalls.sh b/scripts/xen-hypercalls.sh
-new file mode 100644
-index 0000000..e6447b7
---- /dev/null
-+++ b/scripts/xen-hypercalls.sh
-@@ -0,0 +1,11 @@
-+#!/bin/sh
-+out="$1"
-+shift
-+in="$@"
-+
-+for i in $in; do
-+	eval $CPP $LINUXINCLUDE -dD -imacros "$i" -x c /dev/null
-+done | \
-+awk '$1 == "#define" && $2 ~ /__HYPERVISOR_[a-z][a-z_0-9]*/ { v[$3] = $2 }
-+	END {for (i in v) if (!(v[i] in v))
-+		print "HYPERCALL("substr(v[i], 14)")"}' | sort -u >$out
 -- 
 2.1.2
 
