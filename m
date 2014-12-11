@@ -1,47 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.mei.co.jp ([133.183.100.20]:36588 "EHLO smtp.mei.co.jp"
+Received: from cantor2.suse.de ([195.135.220.15]:38999 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S965088AbaLKKMs (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 11 Dec 2014 05:12:48 -0500
-From: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Subject: [PATCH] kbuild: use mixed-targets when two or more config targets are given
-Date: Thu, 11 Dec 2014 19:12:34 +0900
-Message-Id: <1418292754-2987-1-git-send-email-yamada.m@jp.panasonic.com>
+	id S1758566AbaLKSGv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 11 Dec 2014 13:06:51 -0500
+From: Juergen Gross <jgross@suse.com>
+Subject: [PATCH 0/4] xen: auto-generate symbols for xen hypercalls
+Date: Thu, 11 Dec 2014 19:04:21 +0100
+Message-Id: <1418321065-10212-1-git-send-email-jgross@suse.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.m@jp.panasonic.com>, Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org
+To: linux-kernel@vger.kernel.org, x86@kernel.org, xen-devel@lists.xensource.com, konrad.wilk@oracle.com, david.vrabel@citrix.com, boris.ostrovsky@oracle.com, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com, mmarek@suse.cz, linux-kbuild@vger.kernel.org
+Cc: Juergen Gross <jgross@suse.com>
 
-"make kvmconfig" expects that the .config has already been created,
-but some people might want to create the .config and run kvmconfig
-in one shot command, like this:
+The Xen hypercalls are defined in include/xen/interface/xen.h. There
+are some places where for each hypercall a table element is created.
+Instead of manually add each hypercall element to these tables use
+an auto generated header built during the make process of the kernel.
 
-  $ make defconfig kvmconfig
+Juergen Gross (4):
+  xen: build infrastructure for generating hypercall depending symbols
+  xen: synchronize include/xen/interface/xen.h with xen
+  xen: use generated hypervisor symbols in arch/x86/xen/trace.c
+  xen: use generated hypercall symbols in arch/x86/xen/xen-head.S
 
-To make sure this command works correctly even if -j* option is set,
-we must handle them one by one.
-This commit turns on mixed-targets when $(MAKECMDGOALS) includes
-at least one config target and also includes another target.
+ arch/x86/syscalls/Makefile  |  9 +++++++
+ arch/x86/xen/trace.c        | 50 +++---------------------------------
+ arch/x86/xen/xen-head.S     | 62 ++++++++-------------------------------------
+ include/xen/interface/xen.h |  6 ++++-
+ scripts/xen-hypercalls.sh   | 11 ++++++++
+ 5 files changed, 39 insertions(+), 99 deletions(-)
+ create mode 100644 scripts/xen-hypercalls.sh
 
-Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
----
-
- Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/Makefile b/Makefile
-index d9af2be..3272609 100644
---- a/Makefile
-+++ b/Makefile
-@@ -500,7 +500,7 @@ endif
- ifeq ($(KBUILD_EXTMOD),)
-         ifneq ($(filter config %config,$(MAKECMDGOALS)),)
-                 config-targets := 1
--                ifneq ($(filter-out config %config,$(MAKECMDGOALS)),)
-+                ifneq ($(words $(MAKECMDGOALS)),1)
-                         mixed-targets := 1
-                 endif
-         endif
 -- 
-1.9.1
+2.1.2
 
