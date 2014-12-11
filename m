@@ -1,90 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:39014 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1758573AbaLKSGv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 11 Dec 2014 13:06:51 -0500
-From: Juergen Gross <jgross@suse.com>
-Subject: [PATCH 3/4] xen: use generated hypervisor symbols in arch/x86/xen/trace.c
-Date: Thu, 11 Dec 2014 19:04:24 +0100
-Message-Id: <1418321065-10212-4-git-send-email-jgross@suse.com>
-In-Reply-To: <1418321065-10212-1-git-send-email-jgross@suse.com>
-References: <1418321065-10212-1-git-send-email-jgross@suse.com>
+Received: from mail-pd0-f179.google.com ([209.85.192.179]:50008 "EHLO
+	mail-pd0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758931AbaLKUwt (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 11 Dec 2014 15:52:49 -0500
+Received: by mail-pd0-f179.google.com with SMTP id fp1so5717254pdb.38
+        for <linux-kbuild@vger.kernel.org>; Thu, 11 Dec 2014 12:52:49 -0800 (PST)
+From: Olof Johansson <olof@lixom.net>
+Subject: [PATCH 1/2] merge_config.sh: Display usage if given too few arguments
+Date: Thu, 11 Dec 2014 12:55:03 -0800
+Message-Id: <1418331304-4821-1-git-send-email-olof@lixom.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org, x86@kernel.org, xen-devel@lists.xensource.com, konrad.wilk@oracle.com, david.vrabel@citrix.com, boris.ostrovsky@oracle.com, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com, mmarek@suse.cz, linux-kbuild@vger.kernel.org
-Cc: Juergen Gross <jgross@suse.com>
+To: yann.morin.1998@free.fr
+Cc: linux-kbuild@vger.kernel.org, dvhart@linux.intel.com, linux-kernel@vger.kernel.org, Olof Johansson <olof@lixom.net>
 
-Instead of manually list all hypervisor calls in arch/x86/xen/trace.c
-use the auto generated list.
+Two or more arguments are always expected. Show usage and exit if
+given less.
 
-Signed-off-by: Juergen Gross <jgross@suse.com>
+Signed-off-by: Olof Johansson <olof@lixom.net>
 ---
- arch/x86/xen/trace.c | 50 ++++----------------------------------------------
- 1 file changed, 4 insertions(+), 46 deletions(-)
+ scripts/kconfig/merge_config.sh |    5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/arch/x86/xen/trace.c b/arch/x86/xen/trace.c
-index 8296cdf..a702ec2 100644
---- a/arch/x86/xen/trace.c
-+++ b/arch/x86/xen/trace.c
-@@ -1,54 +1,12 @@
- #include <linux/ftrace.h>
- #include <xen/interface/xen.h>
-+#include <xen/interface/xen-mca.h>
+diff --git a/scripts/kconfig/merge_config.sh b/scripts/kconfig/merge_config.sh
+index 81b0c61..2ab91b9 100755
+--- a/scripts/kconfig/merge_config.sh
++++ b/scripts/kconfig/merge_config.sh
+@@ -77,6 +77,11 @@ while true; do
+ 	esac
+ done
  
--#define N(x)	[__HYPERVISOR_##x] = "("#x")"
-+#define HYPERCALL(x)	[__HYPERVISOR_##x] = "("#x")",
- static const char *xen_hypercall_names[] = {
--	N(set_trap_table),
--	N(mmu_update),
--	N(set_gdt),
--	N(stack_switch),
--	N(set_callbacks),
--	N(fpu_taskswitch),
--	N(sched_op_compat),
--	N(dom0_op),
--	N(set_debugreg),
--	N(get_debugreg),
--	N(update_descriptor),
--	N(memory_op),
--	N(multicall),
--	N(update_va_mapping),
--	N(set_timer_op),
--	N(event_channel_op_compat),
--	N(xen_version),
--	N(console_io),
--	N(physdev_op_compat),
--	N(grant_table_op),
--	N(vm_assist),
--	N(update_va_mapping_otherdomain),
--	N(iret),
--	N(vcpu_op),
--	N(set_segment_base),
--	N(mmuext_op),
--	N(xsm_op),
--	N(nmi_op),
--	N(sched_op),
--	N(callback_op),
--	N(xenoprof_op),
--	N(event_channel_op),
--	N(physdev_op),
--	N(hvm_op),
--
--/* Architecture-specific hypercall definitions. */
--	N(arch_0),
--	N(arch_1),
--	N(arch_2),
--	N(arch_3),
--	N(arch_4),
--	N(arch_5),
--	N(arch_6),
--	N(arch_7),
-+#include <asm/xen-hypercalls.h>
- };
--#undef N
-+#undef HYPERCALL
++if [ "$#" -lt 2 ] ; then
++	usage
++	exit
++fi
++
+ INITFILE=$1
+ shift;
  
- static const char *xen_hypercall_name(unsigned op)
- {
 -- 
-2.1.2
+1.7.10.4
 
