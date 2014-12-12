@@ -1,59 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pa0-f48.google.com ([209.85.220.48]:52148 "EHLO
-	mail-pa0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933245AbaLKUwv (ORCPT
+Received: from aserp1040.oracle.com ([141.146.126.69]:26871 "EHLO
+	aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752790AbaLLWqt (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 11 Dec 2014 15:52:51 -0500
-Received: by mail-pa0-f48.google.com with SMTP id rd3so5765938pab.21
-        for <linux-kbuild@vger.kernel.org>; Thu, 11 Dec 2014 12:52:50 -0800 (PST)
-From: Olof Johansson <olof@lixom.net>
-Subject: [PATCH 2/2] merge_config.sh: add -? for help
-Date: Thu, 11 Dec 2014 12:55:04 -0800
-Message-Id: <1418331304-4821-2-git-send-email-olof@lixom.net>
-In-Reply-To: <1418331304-4821-1-git-send-email-olof@lixom.net>
-References: <1418331304-4821-1-git-send-email-olof@lixom.net>
+	Fri, 12 Dec 2014 17:46:49 -0500
+Message-ID: <548B70B3.7030807@oracle.com>
+Date: Fri, 12 Dec 2014 17:48:19 -0500
+From: Boris Ostrovsky <boris.ostrovsky@oracle.com>
+MIME-Version: 1.0
+Subject: Re: [PATCH 1/4] xen: build infrastructure for generating hypercall
+ depending symbols
+References: <1418321065-10212-1-git-send-email-jgross@suse.com> <1418321065-10212-2-git-send-email-jgross@suse.com>
+In-Reply-To: <1418321065-10212-2-git-send-email-jgross@suse.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: yann.morin.1998@free.fr
-Cc: linux-kbuild@vger.kernel.org, dvhart@linux.intel.com, linux-kernel@vger.kernel.org, Olof Johansson <olof@lixom.net>
+To: Juergen Gross <jgross@suse.com>, linux-kernel@vger.kernel.org, x86@kernel.org, xen-devel@lists.xensource.com, konrad.wilk@oracle.com, david.vrabel@citrix.com, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com, mmarek@suse.cz, linux-kbuild@vger.kernel.org
 
-It's usual enough for help text that it makes sense to support it.
+On 12/11/2014 01:04 PM, Juergen Gross wrote:
+> diff --git a/scripts/xen-hypercalls.sh b/scripts/xen-hypercalls.sh
+> new file mode 100644
+> index 0000000..e6447b7
+> --- /dev/null
+> +++ b/scripts/xen-hypercalls.sh
+> @@ -0,0 +1,11 @@
+> +#!/bin/sh
+> +out="$1"
+> +shift
+> +in="$@"
+> +
+> +for i in $in; do
+> +	eval $CPP $LINUXINCLUDE -dD -imacros "$i" -x c /dev/null
+> +done | \
+> +awk '$1 == "#define" && $2 ~ /__HYPERVISOR_[a-z][a-z_0-9]*/ { v[$3] = $2 }
+> +	END {for (i in v) if (!(v[i] in v))
+> +		print "HYPERCALL("substr(v[i], 14)")"}' | sort -u >$out
 
-Signed-off-by: Olof Johansson <olof@lixom.net>
----
- scripts/kconfig/merge_config.sh |   12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+Why do you 'sort -u'? Do you expect multiple definitions of the same 
+hypercall?
 
-diff --git a/scripts/kconfig/merge_config.sh b/scripts/kconfig/merge_config.sh
-index 2ab91b9..0c89537 100755
---- a/scripts/kconfig/merge_config.sh
-+++ b/scripts/kconfig/merge_config.sh
-@@ -28,11 +28,11 @@ trap clean_up HUP INT TERM
- 
- usage() {
- 	echo "Usage: $0 [OPTIONS] [CONFIG [...]]"
--	echo "  -h    display this help text"
--	echo "  -m    only merge the fragments, do not execute the make command"
--	echo "  -n    use allnoconfig instead of alldefconfig"
--	echo "  -r    list redundant entries when merging fragments"
--	echo "  -O    dir to put generated output files"
-+	echo "  -h or -? display this help text"
-+	echo "  -m       only merge the fragments, do not execute the make command"
-+	echo "  -n       use allnoconfig instead of alldefconfig"
-+	echo "  -r       list redundant entries when merging fragments"
-+	echo "  -O       dir to put generated output files"
- }
- 
- MAKE=true
-@@ -52,7 +52,7 @@ while true; do
- 		shift
- 		continue
- 		;;
--	"-h")
-+	"-h"|"-?")
- 		usage
- 		exit
- 		;;
--- 
-1.7.10.4
-
+-boris
