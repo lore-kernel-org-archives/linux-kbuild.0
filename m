@@ -1,49 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.emea.novell.com ([130.57.118.101]:56955 "EHLO
-	mail.emea.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750873AbaLOLrP convert rfc822-to-8bit (ORCPT
-	<rfc822;groupwise-linux-kbuild@vger.kernel.org:9:1>);
-	Mon, 15 Dec 2014 06:47:15 -0500
-Message-Id: <548ED84D020000780004F8FB@mail.emea.novell.com>
-Date: Mon, 15 Dec 2014 11:47:09 +0000
-From: "Jan Beulich" <JBeulich@suse.com>
-Subject: Re: [Xen-devel] [PATCH 1/4] xen: build infrastructure for
- generating hypercall depending symbols
-References: <1418321065-10212-1-git-send-email-jgross@suse.com>
- <1418321065-10212-2-git-send-email-jgross@suse.com>
- <548EC841.2000107@citrix.com>
-In-Reply-To: <548EC841.2000107@citrix.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8BIT
-Content-Disposition: inline
+Received: from smtp.citrix.com ([66.165.176.89]:19951 "EHLO SMTP.CITRIX.COM"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750704AbaLOMGI (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 15 Dec 2014 07:06:08 -0500
+Message-ID: <548ECE9B.3040105@citrix.com>
+Date: Mon, 15 Dec 2014 12:05:47 +0000
+From: David Vrabel <david.vrabel@citrix.com>
+MIME-Version: 1.0
+Subject: Re: [Xen-devel] [PATCH 4/4] xen: use generated hypercall symbols
+ in arch/x86/xen/xen-head.S
+References: <1418321065-10212-1-git-send-email-jgross@suse.com> <1418321065-10212-5-git-send-email-jgross@suse.com>
+In-Reply-To: <1418321065-10212-5-git-send-email-jgross@suse.com>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: david.vrabel@citrix.com
-Cc: x86@kernel.org, tglx@linutronix.de, xen-devel <xen-devel@lists.xenproject.org>, boris.ostrovsky@oracle.com, konrad.wilk@oracle.com, mingo@redhat.com, Juergen Gross <JGross@suse.com>, mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, hpa@zytor.com
+To: Juergen Gross <jgross@suse.com>, linux-kernel@vger.kernel.org, x86@kernel.org, xen-devel@lists.xensource.com, konrad.wilk@oracle.com, david.vrabel@citrix.com, boris.ostrovsky@oracle.com, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com, mmarek@suse.cz, linux-kbuild@vger.kernel.org
 
->>> On 15.12.14 at 12:38, <david.vrabel@citrix.com> wrote:
-> On 11/12/14 18:04, Juergen Gross wrote:
->> --- a/arch/x86/syscalls/Makefile
->> +++ b/arch/x86/syscalls/Makefile
+On 11/12/14 18:04, Juergen Gross wrote:
+> Instead of manually list each hypercall in arch/x86/xen/xen-head.S
+> use the auto generated symbol list.
 > 
-> Why are these changes here and not in arch/x86/xen/Makefile?
-
-Because this needs to be done in a step that (afaict) has no hook
-in the Xen-specific Makefile.
-
->> @@ -47,10 +50,16 @@ $(out)/syscalls_32.h: $(syscall32) $(systbl)
->>  $(out)/syscalls_64.h: $(syscall64) $(systbl)
->>  	$(call if_changed,systbl)
->>  
->> +$(out)/xen-hypercalls.h: $(srctree)/scripts/xen-hypercalls.sh
->> +	$(call if_changed,hypercalls)
->> +
->> +$(out)/xen-hypercalls.h: $(srctree)/include/xen/interface/xen*.h
+> This also corrects the wrong address of xen_hypercall_mca which was
+> located 32 bytes higher than it should.
 > 
-> The generated header should end up in asm/xen/
+> Symbol addresses have been verified to match the correct ones via
+> objdump output.
+[...]
+> +
+> +#define HYPERCALL(n) \
+> +	.equ xen_hypercall_##n, hypercall_page + __HYPERVISOR_##n * 32; \
+> +	.type xen_hypercall_##n, function; .size xen_hypercall_##n, 32
+> +#include <asm/xen-hypercalls.h>
+> +#undef HYPERCALL
 
-Why is generated/asm/ not good enough?
+The gas manual[1] suggests the syntax you've used for .type is invalid
+and suggest using .type <name>, STT_FUNC
 
-Jan
+> +
+>  	.balign PAGE_SIZE
 
+You can remove this .balign.
+
+David
+
+[1] https://sourceware.org/binutils/docs/as/Type.html#Type
