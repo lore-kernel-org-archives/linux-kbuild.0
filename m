@@ -1,77 +1,89 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:48587 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:54177 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750809AbaLPLUH (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 16 Dec 2014 06:20:07 -0500
-Message-ID: <54901564.6070201@suse.com>
-Date: Tue, 16 Dec 2014 12:20:04 +0100
+	id S1750873AbaLPOkH (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 16 Dec 2014 09:40:07 -0500
+Message-ID: <54904443.5050806@suse.com>
+Date: Tue, 16 Dec 2014 15:40:03 +0100
 From: Juergen Gross <jgross@suse.com>
 MIME-Version: 1.0
-Subject: Re: [Xen-devel] [PATCH 4/4] xen: use generated hypercall symbols
- in arch/x86/xen/xen-head.S
-References: <1418321065-10212-1-git-send-email-jgross@suse.com>	<1418321065-10212-5-git-send-email-jgross@suse.com>	<548ECE9B.3040105@citrix.com> <548FC95E.70903@suse.com> <5490086D.2060808@citrix.com>
-In-Reply-To: <5490086D.2060808@citrix.com>
+Subject: Re: [Xen-devel] [PATCH 1/4] xen: build infrastructure for generating
+ hypercall depending symbols
+References: <1418321065-10212-1-git-send-email-jgross@suse.com> <1418321065-10212-2-git-send-email-jgross@suse.com> <548EC841.2000107@citrix.com>
+In-Reply-To: <548EC841.2000107@citrix.com>
 Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: David Vrabel <david.vrabel@citrix.com>, linux-kernel@vger.kernel.org, x86@kernel.org, xen-devel@lists.xensource.com, konrad.wilk@oracle.com, boris.ostrovsky@oracle.com, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com, mmarek@suse.cz, linux-kbuild@vger.kernel.org
 
-On 12/16/2014 11:24 AM, David Vrabel wrote:
-> On 16/12/14 05:55, Juergen Gross wrote:
->> On 12/15/2014 01:05 PM, David Vrabel wrote:
->>> On 11/12/14 18:04, Juergen Gross wrote:
->>>> Instead of manually list each hypercall in arch/x86/xen/xen-head.S
->>>> use the auto generated symbol list.
->>>>
->>>> This also corrects the wrong address of xen_hypercall_mca which was
->>>> located 32 bytes higher than it should.
->>>>
->>>> Symbol addresses have been verified to match the correct ones via
->>>> objdump output.
->>> [...]
->>>> +
->>>> +#define HYPERCALL(n) \
->>>> +    .equ xen_hypercall_##n, hypercall_page + __HYPERVISOR_##n * 32; \
->>>> +    .type xen_hypercall_##n, function; .size xen_hypercall_##n, 32
->>>> +#include <asm/xen-hypercalls.h>
->>>> +#undef HYPERCALL
->>>
->>> The gas manual[1] suggests the syntax you've used for .type is invalid
->>> and suggest using .type <name>, STT_FUNC
->>
->> Really? In the link below I see:
->>
->> The types supported are:
->>
->> STT_FUNC
->> function
->>      Mark the symbol as being a function name.
->> ...
->>
->> So "function" seems to be okay.
+On 12/15/2014 12:38 PM, David Vrabel wrote:
+> On 11/12/14 18:04, Juergen Gross wrote:
+>> Today there are several places in the kernel which build tables
+>> containing one entry for each possible Xen hypercall. Create an
+>> infrastructure to be able to generate these tables at build time.
 >
->>From the manual
->
->      The syntaxes supported are:
->
->         .type <name> STT_<TYPE_IN_UPPER_CASE>
->         .type <name>,#<type>
->         .type <name>,@<type>
->         .type <name>,%<type>
->         .type <name>,"<type>"
->
-> And
->
->      The first variant will be accepted by the GNU assembler on all
->      architectures...
+> Does arm and arm64 need something similar?  If so are the tools here
+> suitable for them?
 
-grepping through the x86 assembler sources
-
-.type <name>,@function
-
-seems to be the preferred syntax (100%). I think I'll switch to that.
+I don't think arm* needs this. But in case it does, the tools would
+support arm as well.
 
 
 Juergen
+
+>
+>> --- a/arch/x86/syscalls/Makefile
+>> +++ b/arch/x86/syscalls/Makefile
+>
+> Why are these changes here and not in arch/x86/xen/Makefile?
+>
+>> @@ -19,6 +19,9 @@ quiet_cmd_syshdr = SYSHDR  $@
+>>   quiet_cmd_systbl = SYSTBL  $@
+>>         cmd_systbl = $(CONFIG_SHELL) '$(systbl)' $< $@
+>>
+>> +quiet_cmd_hypercalls = HYPERCALLS $@
+>> +      cmd_hypercalls = $(CONFIG_SHELL) '$<' $@ $(filter-out $<,$^)
+>> +
+>>   syshdr_abi_unistd_32 := i386
+>>   $(uapi)/unistd_32.h: $(syscall32) $(syshdr)
+>>   	$(call if_changed,syshdr)
+>> @@ -47,10 +50,16 @@ $(out)/syscalls_32.h: $(syscall32) $(systbl)
+>>   $(out)/syscalls_64.h: $(syscall64) $(systbl)
+>>   	$(call if_changed,systbl)
+>>
+>> +$(out)/xen-hypercalls.h: $(srctree)/scripts/xen-hypercalls.sh
+>> +	$(call if_changed,hypercalls)
+>> +
+>> +$(out)/xen-hypercalls.h: $(srctree)/include/xen/interface/xen*.h
+>
+> The generated header should end up in asm/xen/
+>
+>> --- /dev/null
+>> +++ b/scripts/xen-hypercalls.sh
+>> @@ -0,0 +1,11 @@
+>> +#!/bin/sh
+>> +out="$1"
+>> +shift
+>> +in="$@"
+>> +
+>> +for i in $in; do
+>> +	eval $CPP $LINUXINCLUDE -dD -imacros "$i" -x c /dev/null
+>> +done | \
+>> +awk '$1 == "#define" && $2 ~ /__HYPERVISOR_[a-z][a-z_0-9]*/ { v[$3] = $2 }
+>> +	END {for (i in v) if (!(v[i] in v))
+>> +		print "HYPERCALL("substr(v[i], 14)")"}' | sort -u >$out
+>
+> Include a comment in the generated output saying what generated it. e.g.,
+>
+> /* auto-generated by scripts/xen-hypercall.sh */
+>
+> David
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Please read the FAQ at  http://www.tux.org/lkml/
+>
 
