@@ -1,69 +1,84 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp02.citrix.com ([66.165.176.63]:17562 "EHLO
-	SMTP02.CITRIX.COM" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750823AbaLPKYs (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 16 Dec 2014 05:24:48 -0500
-Message-ID: <5490086D.2060808@citrix.com>
-Date: Tue, 16 Dec 2014 10:24:45 +0000
-From: David Vrabel <david.vrabel@citrix.com>
+Received: from cantor2.suse.de ([195.135.220.15]:47962 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750885AbaLPK4q (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 16 Dec 2014 05:56:46 -0500
+Message-ID: <54900FEA.3050000@suse.com>
+Date: Tue, 16 Dec 2014 11:56:42 +0100
+From: Juergen Gross <jgross@suse.com>
 MIME-Version: 1.0
-Subject: Re: [Xen-devel] [PATCH 4/4] xen: use generated hypercall symbols
- in arch/x86/xen/xen-head.S
-References: <1418321065-10212-1-git-send-email-jgross@suse.com>	<1418321065-10212-5-git-send-email-jgross@suse.com>	<548ECE9B.3040105@citrix.com> <548FC95E.70903@suse.com>
-In-Reply-To: <548FC95E.70903@suse.com>
-Content-Type: text/plain; charset="windows-1252"
+Subject: "make binrpm-pkg O=jg/master" fails
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Juergen Gross <jgross@suse.com>, David Vrabel <david.vrabel@citrix.com>, linux-kernel@vger.kernel.org, x86@kernel.org, xen-devel@lists.xensource.com, konrad.wilk@oracle.com, boris.ostrovsky@oracle.com, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com, mmarek@suse.cz, linux-kbuild@vger.kernel.org
+To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
 
-On 16/12/14 05:55, Juergen Gross wrote:
-> On 12/15/2014 01:05 PM, David Vrabel wrote:
->> On 11/12/14 18:04, Juergen Gross wrote:
->>> Instead of manually list each hypercall in arch/x86/xen/xen-head.S
->>> use the auto generated symbol list.
->>>
->>> This also corrects the wrong address of xen_hypercall_mca which was
->>> located 32 bytes higher than it should.
->>>
->>> Symbol addresses have been verified to match the correct ones via
->>> objdump output.
->> [...]
->>> +
->>> +#define HYPERCALL(n) \
->>> +    .equ xen_hypercall_##n, hypercall_page + __HYPERVISOR_##n * 32; \
->>> +    .type xen_hypercall_##n, function; .size xen_hypercall_##n, 32
->>> +#include <asm/xen-hypercalls.h>
->>> +#undef HYPERCALL
->>
->> The gas manual[1] suggests the syntax you've used for .type is invalid
->> and suggest using .type <name>, STT_FUNC
-> 
-> Really? In the link below I see:
-> 
-> The types supported are:
-> 
-> STT_FUNC
-> function
->     Mark the symbol as being a function name.
-> ...
-> 
-> So "function" seems to be okay.
+Hi,
 
-From the manual
+doing
 
-    The syntaxes supported are:
+make binrpm-pkg O=jg/master
 
-       .type <name> STT_<TYPE_IN_UPPER_CASE>
-       .type <name>,#<type>
-       .type <name>,@<type>
-       .type <name>,%<type>
-       .type <name>,"<type>"
+on latest //git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git
 
-And
+fails:
 
-    The first variant will be accepted by the GNU assembler on all
-    architectures...
+...
+   INSTALL sound/usb/usx2y/snd-usb-us122l.ko
+   INSTALL sound/usb/usx2y/snd-usb-usx2y.ko
+   DEPMOD  3.18.0+
++ 
+INSTALL_FW_PATH=/home/gross/rpmbuild/BUILDROOT/kernel-3.18.0+-6.x86_64/lib/firmware/3.18.0+
++ make 
+INSTALL_FW_PATH=/home/gross/rpmbuild/BUILDROOT/kernel-3.18.0+-6.x86_64/lib/firmware/3.18.0+ 
+firmware_install
+make[3]: warning: jobserver unavailable: using -j1.  Add '+' to parent 
+make rule.
+scripts/kconfig/conf --silentoldconfig Kconfig
+***
+*** Configuration file ".config" not found!
+***
+*** Please run some configurator (e.g. "make oldconfig" or
+*** "make menuconfig" or "make xconfig").
+***
+/home/gross/linux/scripts/kconfig/Makefile:36: recipe for target 
+'silentoldconfig' failed
+make[6]: *** [silentoldconfig] Error 1
+/home/gross/linux/Makefile:541: recipe for target 'silentoldconfig' failed
+make[5]: *** [silentoldconfig] Error 2
+   IHEX    firmware/acenic/tg1.bin
+   INSTALL 
+/home/gross/rpmbuild/BUILDROOT/kernel-3.18.0+-6.x86_64/lib/firmware/3.18.0+/acenic/tg1.bin
+...
+   IHEX    firmware/yam/9600.bin
+   INSTALL 
+/home/gross/rpmbuild/BUILDROOT/kernel-3.18.0+-6.x86_64/lib/firmware/3.18.0+/yam/9600.bin
++ cp HOSTCC scripts/basic/fixdep HOSTCC scripts/kconfig/conf.o SHIPPED 
+scripts/kconfig/zconf.tab.c SHIPPED scripts/kconfig/zconf.lex.c SHIPPED 
+scripts/kconfig/zconf.hash.c HOSTCC scripts/kconfig/zconf.tab.o HOSTLD 
+scripts/kconfig/conf scripts/kconfig/conf --silentoldconfig Kconfig 
+/home/gross/linux/scripts/kconfig/Makefile:36: recipe for target 
+''\''silentoldconfig'\''' failed /home/gross/linux/Makefile:541: recipe 
+for target ''\''silentoldconfig'\''' failed arch/x86/boot/bzImage 
+/home/gross/rpmbuild/BUILDROOT/kernel-3.18.0+-6.x86_64/boot/vmlinuz-3.18.0+
+cp: unrecognized option '--silentoldconfig'
+Try 'cp --help' for more information.
+error: Bad exit status from /var/tmp/rpm-tmp.lsGzRz (%install)
 
-David
+
+RPM build errors:
+     Bad exit status from /var/tmp/rpm-tmp.lsGzRz (%install)
+/home/gross/linux/scripts/package/Makefile:60: recipe for target 
+'binrpm-pkg' failed
+make[2]: *** [binrpm-pkg] Error 1
+/home/gross/linux/Makefile:1229: recipe for target 'binrpm-pkg' failed
+make[1]: *** [binrpm-pkg] Error 2
+make[1]: Leaving directory '/home/gross/linux/jg/master'
+Makefile:145: recipe for target 'sub-make' failed
+make: *** [sub-make] Error 2
+
+
+After that I see new objects under firmware in the source tree.
+
+Juergen
