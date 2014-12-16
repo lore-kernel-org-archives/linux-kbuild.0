@@ -1,62 +1,69 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:43685 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750796AbaLPFzz (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 16 Dec 2014 00:55:55 -0500
-Message-ID: <548FC95E.70903@suse.com>
-Date: Tue, 16 Dec 2014 06:55:42 +0100
-From: Juergen Gross <jgross@suse.com>
+Received: from smtp02.citrix.com ([66.165.176.63]:17562 "EHLO
+	SMTP02.CITRIX.COM" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750823AbaLPKYs (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 16 Dec 2014 05:24:48 -0500
+Message-ID: <5490086D.2060808@citrix.com>
+Date: Tue, 16 Dec 2014 10:24:45 +0000
+From: David Vrabel <david.vrabel@citrix.com>
 MIME-Version: 1.0
 Subject: Re: [Xen-devel] [PATCH 4/4] xen: use generated hypercall symbols
  in arch/x86/xen/xen-head.S
-References: <1418321065-10212-1-git-send-email-jgross@suse.com> <1418321065-10212-5-git-send-email-jgross@suse.com> <548ECE9B.3040105@citrix.com>
-In-Reply-To: <548ECE9B.3040105@citrix.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+References: <1418321065-10212-1-git-send-email-jgross@suse.com>	<1418321065-10212-5-git-send-email-jgross@suse.com>	<548ECE9B.3040105@citrix.com> <548FC95E.70903@suse.com>
+In-Reply-To: <548FC95E.70903@suse.com>
+Content-Type: text/plain; charset="windows-1252"
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: David Vrabel <david.vrabel@citrix.com>, linux-kernel@vger.kernel.org, x86@kernel.org, xen-devel@lists.xensource.com, konrad.wilk@oracle.com, boris.ostrovsky@oracle.com, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com, mmarek@suse.cz, linux-kbuild@vger.kernel.org
+To: Juergen Gross <jgross@suse.com>, David Vrabel <david.vrabel@citrix.com>, linux-kernel@vger.kernel.org, x86@kernel.org, xen-devel@lists.xensource.com, konrad.wilk@oracle.com, boris.ostrovsky@oracle.com, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com, mmarek@suse.cz, linux-kbuild@vger.kernel.org
 
-On 12/15/2014 01:05 PM, David Vrabel wrote:
-> On 11/12/14 18:04, Juergen Gross wrote:
->> Instead of manually list each hypercall in arch/x86/xen/xen-head.S
->> use the auto generated symbol list.
+On 16/12/14 05:55, Juergen Gross wrote:
+> On 12/15/2014 01:05 PM, David Vrabel wrote:
+>> On 11/12/14 18:04, Juergen Gross wrote:
+>>> Instead of manually list each hypercall in arch/x86/xen/xen-head.S
+>>> use the auto generated symbol list.
+>>>
+>>> This also corrects the wrong address of xen_hypercall_mca which was
+>>> located 32 bytes higher than it should.
+>>>
+>>> Symbol addresses have been verified to match the correct ones via
+>>> objdump output.
+>> [...]
+>>> +
+>>> +#define HYPERCALL(n) \
+>>> +    .equ xen_hypercall_##n, hypercall_page + __HYPERVISOR_##n * 32; \
+>>> +    .type xen_hypercall_##n, function; .size xen_hypercall_##n, 32
+>>> +#include <asm/xen-hypercalls.h>
+>>> +#undef HYPERCALL
 >>
->> This also corrects the wrong address of xen_hypercall_mca which was
->> located 32 bytes higher than it should.
->>
->> Symbol addresses have been verified to match the correct ones via
->> objdump output.
-> [...]
->> +
->> +#define HYPERCALL(n) \
->> +	.equ xen_hypercall_##n, hypercall_page + __HYPERVISOR_##n * 32; \
->> +	.type xen_hypercall_##n, function; .size xen_hypercall_##n, 32
->> +#include <asm/xen-hypercalls.h>
->> +#undef HYPERCALL
->
-> The gas manual[1] suggests the syntax you've used for .type is invalid
-> and suggest using .type <name>, STT_FUNC
+>> The gas manual[1] suggests the syntax you've used for .type is invalid
+>> and suggest using .type <name>, STT_FUNC
+> 
+> Really? In the link below I see:
+> 
+> The types supported are:
+> 
+> STT_FUNC
+> function
+>     Mark the symbol as being a function name.
+> ...
+> 
+> So "function" seems to be okay.
 
-Really? In the link below I see:
+From the manual
 
-The types supported are:
+    The syntaxes supported are:
 
-STT_FUNC
-function
-     Mark the symbol as being a function name.
-...
+       .type <name> STT_<TYPE_IN_UPPER_CASE>
+       .type <name>,#<type>
+       .type <name>,@<type>
+       .type <name>,%<type>
+       .type <name>,"<type>"
 
-So "function" seems to be okay.
+And
 
->
->> +
->>   	.balign PAGE_SIZE
->
-> You can remove this .balign.
+    The first variant will be accepted by the GNU assembler on all
+    architectures...
 
-Indeed.
-
-
-Juergen
-
+David
