@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:42405 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:42394 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751257AbaLQJup (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	id S1751082AbaLQJup (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
 	Wed, 17 Dec 2014 04:50:45 -0500
 From: Juergen Gross <jgross@suse.com>
-Subject: [Patch V2 4/4] xen: use generated hypercall symbols in arch/x86/xen/xen-head.S
-Date: Wed, 17 Dec 2014 10:50:38 +0100
-Message-Id: <1418809838-14123-5-git-send-email-jgross@suse.com>
+Subject: [Patch V2 3/4] xen: use generated hypervisor symbols in arch/x86/xen/trace.c
+Date: Wed, 17 Dec 2014 10:50:37 +0100
+Message-Id: <1418809838-14123-4-git-send-email-jgross@suse.com>
 In-Reply-To: <1418809838-14123-1-git-send-email-jgross@suse.com>
 References: <1418809838-14123-1-git-send-email-jgross@suse.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -14,102 +14,78 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org, x86@kernel.org, xen-devel@lists.xensource.com, konrad.wilk@oracle.com, david.vrabel@citrix.com, boris.ostrovsky@oracle.com, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com, mmarek@suse.cz, linux-kbuild@vger.kernel.org
 Cc: Juergen Gross <jgross@suse.com>
 
-Instead of manually list each hypercall in arch/x86/xen/xen-head.S
-use the auto generated symbol list.
+Instead of manually list all hypervisor calls in arch/x86/xen/trace.c
+use the auto generated list.
 
-This also corrects the wrong address of xen_hypercall_mca which was
-located 32 bytes higher than it should.
-
-Symbol addresses have been verified to match the correct ones via
-objdump output.
-
-Based-on-patch-by: Jan Beulich <jbeulich@suse.com>
 Signed-off-by: Juergen Gross <jgross@suse.com>
+Reviewed-by: David Vrabel <david.vrabel@citrix.com>
 ---
- arch/x86/xen/xen-head.S | 63 ++++++++-----------------------------------------
- 1 file changed, 10 insertions(+), 53 deletions(-)
+ arch/x86/xen/trace.c | 50 ++++----------------------------------------------
+ 1 file changed, 4 insertions(+), 46 deletions(-)
 
-diff --git a/arch/x86/xen/xen-head.S b/arch/x86/xen/xen-head.S
-index 674b2225..8afdfcc 100644
---- a/arch/x86/xen/xen-head.S
-+++ b/arch/x86/xen/xen-head.S
-@@ -12,6 +12,8 @@
- 
- #include <xen/interface/elfnote.h>
- #include <xen/interface/features.h>
-+#include <xen/interface/xen.h>
+diff --git a/arch/x86/xen/trace.c b/arch/x86/xen/trace.c
+index 8296cdf..a702ec2 100644
+--- a/arch/x86/xen/trace.c
++++ b/arch/x86/xen/trace.c
+@@ -1,54 +1,12 @@
+ #include <linux/ftrace.h>
+ #include <xen/interface/xen.h>
 +#include <xen/interface/xen-mca.h>
- #include <asm/xen/interface.h>
  
- #ifdef CONFIG_XEN_PVH
-@@ -85,59 +87,14 @@ ENTRY(xen_pvh_early_cpu_init)
- .pushsection .text
- 	.balign PAGE_SIZE
- ENTRY(hypercall_page)
--#define NEXT_HYPERCALL(x) \
--	ENTRY(xen_hypercall_##x) \
--	.skip 32
+-#define N(x)	[__HYPERVISOR_##x] = "("#x")"
++#define HYPERCALL(x)	[__HYPERVISOR_##x] = "("#x")",
+ static const char *xen_hypercall_names[] = {
+-	N(set_trap_table),
+-	N(mmu_update),
+-	N(set_gdt),
+-	N(stack_switch),
+-	N(set_callbacks),
+-	N(fpu_taskswitch),
+-	N(sched_op_compat),
+-	N(dom0_op),
+-	N(set_debugreg),
+-	N(get_debugreg),
+-	N(update_descriptor),
+-	N(memory_op),
+-	N(multicall),
+-	N(update_va_mapping),
+-	N(set_timer_op),
+-	N(event_channel_op_compat),
+-	N(xen_version),
+-	N(console_io),
+-	N(physdev_op_compat),
+-	N(grant_table_op),
+-	N(vm_assist),
+-	N(update_va_mapping_otherdomain),
+-	N(iret),
+-	N(vcpu_op),
+-	N(set_segment_base),
+-	N(mmuext_op),
+-	N(xsm_op),
+-	N(nmi_op),
+-	N(sched_op),
+-	N(callback_op),
+-	N(xenoprof_op),
+-	N(event_channel_op),
+-	N(physdev_op),
+-	N(hvm_op),
 -
--NEXT_HYPERCALL(set_trap_table)
--NEXT_HYPERCALL(mmu_update)
--NEXT_HYPERCALL(set_gdt)
--NEXT_HYPERCALL(stack_switch)
--NEXT_HYPERCALL(set_callbacks)
--NEXT_HYPERCALL(fpu_taskswitch)
--NEXT_HYPERCALL(sched_op_compat)
--NEXT_HYPERCALL(platform_op)
--NEXT_HYPERCALL(set_debugreg)
--NEXT_HYPERCALL(get_debugreg)
--NEXT_HYPERCALL(update_descriptor)
--NEXT_HYPERCALL(ni)
--NEXT_HYPERCALL(memory_op)
--NEXT_HYPERCALL(multicall)
--NEXT_HYPERCALL(update_va_mapping)
--NEXT_HYPERCALL(set_timer_op)
--NEXT_HYPERCALL(event_channel_op_compat)
--NEXT_HYPERCALL(xen_version)
--NEXT_HYPERCALL(console_io)
--NEXT_HYPERCALL(physdev_op_compat)
--NEXT_HYPERCALL(grant_table_op)
--NEXT_HYPERCALL(vm_assist)
--NEXT_HYPERCALL(update_va_mapping_otherdomain)
--NEXT_HYPERCALL(iret)
--NEXT_HYPERCALL(vcpu_op)
--NEXT_HYPERCALL(set_segment_base)
--NEXT_HYPERCALL(mmuext_op)
--NEXT_HYPERCALL(xsm_op)
--NEXT_HYPERCALL(nmi_op)
--NEXT_HYPERCALL(sched_op)
--NEXT_HYPERCALL(callback_op)
--NEXT_HYPERCALL(xenoprof_op)
--NEXT_HYPERCALL(event_channel_op)
--NEXT_HYPERCALL(physdev_op)
--NEXT_HYPERCALL(hvm_op)
--NEXT_HYPERCALL(sysctl)
--NEXT_HYPERCALL(domctl)
--NEXT_HYPERCALL(kexec_op)
--NEXT_HYPERCALL(tmem_op) /* 38 */
--ENTRY(xen_hypercall_rsvr)
--	.skip 320
--NEXT_HYPERCALL(mca) /* 48 */
--NEXT_HYPERCALL(arch_1)
--NEXT_HYPERCALL(arch_2)
--NEXT_HYPERCALL(arch_3)
--NEXT_HYPERCALL(arch_4)
--NEXT_HYPERCALL(arch_5)
--NEXT_HYPERCALL(arch_6)
--	.balign PAGE_SIZE
-+	.skip PAGE_SIZE
-+
-+#define HYPERCALL(n) \
-+	.equ xen_hypercall_##n, hypercall_page + __HYPERVISOR_##n * 32; \
-+	.type xen_hypercall_##n, @function; .size xen_hypercall_##n, 32
+-/* Architecture-specific hypercall definitions. */
+-	N(arch_0),
+-	N(arch_1),
+-	N(arch_2),
+-	N(arch_3),
+-	N(arch_4),
+-	N(arch_5),
+-	N(arch_6),
+-	N(arch_7),
 +#include <asm/xen-hypercalls.h>
+ };
+-#undef N
 +#undef HYPERCALL
-+
- .popsection
  
- 	ELFNOTE(Xen, XEN_ELFNOTE_GUEST_OS,       .asciz "linux")
+ static const char *xen_hypercall_name(unsigned op)
+ {
 -- 
 2.1.2
 
