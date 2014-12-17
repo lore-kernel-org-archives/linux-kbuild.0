@@ -1,67 +1,28 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:42388 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751137AbaLQJup (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 17 Dec 2014 04:50:45 -0500
-From: Juergen Gross <jgross@suse.com>
-Subject: [Patch V2 2/4] xen: synchronize include/xen/interface/xen.h with xen
-Date: Wed, 17 Dec 2014 10:50:36 +0100
-Message-Id: <1418809838-14123-3-git-send-email-jgross@suse.com>
-In-Reply-To: <1418809838-14123-1-git-send-email-jgross@suse.com>
-References: <1418809838-14123-1-git-send-email-jgross@suse.com>
+Received: from smtp02.citrix.com ([66.165.176.63]:34403 "EHLO
+	SMTP02.CITRIX.COM" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750790AbaLQK0s (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 17 Dec 2014 05:26:48 -0500
+Message-ID: <54915A65.4030605@citrix.com>
+Date: Wed, 17 Dec 2014 10:26:45 +0000
+From: David Vrabel <david.vrabel@citrix.com>
+MIME-Version: 1.0
+Subject: Re: [Xen-devel] [Patch V2 1/4] xen: build infrastructure for generating
+ hypercall depending symbols
+References: <1418809838-14123-1-git-send-email-jgross@suse.com> <1418809838-14123-2-git-send-email-jgross@suse.com>
+In-Reply-To: <1418809838-14123-2-git-send-email-jgross@suse.com>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org, x86@kernel.org, xen-devel@lists.xensource.com, konrad.wilk@oracle.com, david.vrabel@citrix.com, boris.ostrovsky@oracle.com, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com, mmarek@suse.cz, linux-kbuild@vger.kernel.org
-Cc: Juergen Gross <jgross@suse.com>
+To: Juergen Gross <jgross@suse.com>, linux-kernel@vger.kernel.org, x86@kernel.org, xen-devel@lists.xensource.com, konrad.wilk@oracle.com, david.vrabel@citrix.com, boris.ostrovsky@oracle.com, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com, mmarek@suse.cz, linux-kbuild@vger.kernel.org
 
-The header include/xen/interface/xen.h doesn't contain all definitions
-from Xen's version of that header. Update it accordingly.
+On 17/12/14 09:50, Juergen Gross wrote:
+> Today there are several places in the kernel which build tables
+> containing one entry for each possible Xen hypercall. Create an
+> infrastructure to be able to generate these tables at build time.
 
-Signed-off-by: Juergen Gross <jgross@suse.com>
 Reviewed-by: David Vrabel <david.vrabel@citrix.com>
----
- arch/x86/xen/trace.c        | 2 +-
- include/xen/interface/xen.h | 6 +++++-
- 2 files changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/xen/trace.c b/arch/x86/xen/trace.c
-index 520022d..8296cdf 100644
---- a/arch/x86/xen/trace.c
-+++ b/arch/x86/xen/trace.c
-@@ -29,7 +29,7 @@ static const char *xen_hypercall_names[] = {
- 	N(vcpu_op),
- 	N(set_segment_base),
- 	N(mmuext_op),
--	N(acm_op),
-+	N(xsm_op),
- 	N(nmi_op),
- 	N(sched_op),
- 	N(callback_op),
-diff --git a/include/xen/interface/xen.h b/include/xen/interface/xen.h
-index f68719f..a483789 100644
---- a/include/xen/interface/xen.h
-+++ b/include/xen/interface/xen.h
-@@ -67,7 +67,7 @@
- #define __HYPERVISOR_vcpu_op              24
- #define __HYPERVISOR_set_segment_base     25 /* x86/64 only */
- #define __HYPERVISOR_mmuext_op            26
--#define __HYPERVISOR_acm_op               27
-+#define __HYPERVISOR_xsm_op               27
- #define __HYPERVISOR_nmi_op               28
- #define __HYPERVISOR_sched_op             29
- #define __HYPERVISOR_callback_op          30
-@@ -75,7 +75,11 @@
- #define __HYPERVISOR_event_channel_op     32
- #define __HYPERVISOR_physdev_op           33
- #define __HYPERVISOR_hvm_op               34
-+#define __HYPERVISOR_sysctl               35
-+#define __HYPERVISOR_domctl               36
-+#define __HYPERVISOR_kexec_op             37
- #define __HYPERVISOR_tmem_op              38
-+#define __HYPERVISOR_xc_reserved_op       39 /* reserved for XenClient */
- 
- /* Architecture-specific hypercall definitions. */
- #define __HYPERVISOR_arch_0               48
--- 
-2.1.2
-
+David
