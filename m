@@ -1,52 +1,80 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.citrix.com ([66.165.176.89]:2404 "EHLO SMTP.CITRIX.COM"
+Received: from cantor2.suse.de ([195.135.220.15]:42384 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750930AbaLPOwH (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 16 Dec 2014 09:52:07 -0500
-Message-ID: <549046D4.8030304@citrix.com>
-Date: Tue, 16 Dec 2014 14:51:00 +0000
-From: David Vrabel <david.vrabel@citrix.com>
-MIME-Version: 1.0
-Subject: Re: [Xen-devel] [PATCH 1/4] xen: build infrastructure for generating
- hypercall depending symbols
-References: <1418321065-10212-1-git-send-email-jgross@suse.com>	<1418321065-10212-2-git-send-email-jgross@suse.com>	<548EC841.2000107@citrix.com> <548ED84D020000780004F8FB@mail.emea.novell.com>
-In-Reply-To: <548ED84D020000780004F8FB@mail.emea.novell.com>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
+	id S1750999AbaLQJup (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 17 Dec 2014 04:50:45 -0500
+From: Juergen Gross <jgross@suse.com>
+Subject: [Patch V2 1/4] xen: build infrastructure for generating hypercall depending symbols
+Date: Wed, 17 Dec 2014 10:50:35 +0100
+Message-Id: <1418809838-14123-2-git-send-email-jgross@suse.com>
+In-Reply-To: <1418809838-14123-1-git-send-email-jgross@suse.com>
+References: <1418809838-14123-1-git-send-email-jgross@suse.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jan Beulich <JBeulich@suse.com>, david.vrabel@citrix.com
-Cc: Juergen Gross <JGross@suse.com>, mmarek@suse.cz, x86@kernel.org, linux-kernel@vger.kernel.org, mingo@redhat.com, hpa@zytor.com, xen-devel <xen-devel@lists.xenproject.org>, tglx@linutronix.de, boris.ostrovsky@oracle.com, linux-kbuild@vger.kernel.org
+To: linux-kernel@vger.kernel.org, x86@kernel.org, xen-devel@lists.xensource.com, konrad.wilk@oracle.com, david.vrabel@citrix.com, boris.ostrovsky@oracle.com, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com, mmarek@suse.cz, linux-kbuild@vger.kernel.org
+Cc: Juergen Gross <jgross@suse.com>
 
-On 15/12/14 11:47, Jan Beulich wrote:
->>>> On 15.12.14 at 12:38, <david.vrabel@citrix.com> wrote:
->> On 11/12/14 18:04, Juergen Gross wrote:
->>> --- a/arch/x86/syscalls/Makefile
->>> +++ b/arch/x86/syscalls/Makefile
->>
->> Why are these changes here and not in arch/x86/xen/Makefile?
-> 
-> Because this needs to be done in a step that (afaict) has no hook
-> in the Xen-specific Makefile.
-> 
->>> @@ -47,10 +50,16 @@ $(out)/syscalls_32.h: $(syscall32) $(systbl)
->>>  $(out)/syscalls_64.h: $(syscall64) $(systbl)
->>>  	$(call if_changed,systbl)
->>>  
->>> +$(out)/xen-hypercalls.h: $(srctree)/scripts/xen-hypercalls.sh
->>> +	$(call if_changed,hypercalls)
->>> +
->>> +$(out)/xen-hypercalls.h: $(srctree)/include/xen/interface/xen*.h
->>
->> The generated header should end up in asm/xen/
-> 
-> Why is generated/asm/ not good enough?
+Today there are several places in the kernel which build tables
+containing one entry for each possible Xen hypercall. Create an
+infrastructure to be able to generate these tables at build time.
 
-I meant something like generated/asm/xen/hypercall-macros.h
+Based-on-patch-by: Jan Beulich <jbeulich@suse.com>
+Signed-off-by: Juergen Gross <jgross@suse.com>
+---
+ arch/x86/syscalls/Makefile |  9 +++++++++
+ scripts/xen-hypercalls.sh  | 12 ++++++++++++
+ 2 files changed, 21 insertions(+)
+ create mode 100644 scripts/xen-hypercalls.sh
 
-So a "xen/" prefix which is consistent with all the other xen specific
-headers.
+diff --git a/arch/x86/syscalls/Makefile b/arch/x86/syscalls/Makefile
+index 3323c27..a55abb9 100644
+--- a/arch/x86/syscalls/Makefile
++++ b/arch/x86/syscalls/Makefile
+@@ -19,6 +19,9 @@ quiet_cmd_syshdr = SYSHDR  $@
+ quiet_cmd_systbl = SYSTBL  $@
+       cmd_systbl = $(CONFIG_SHELL) '$(systbl)' $< $@
+ 
++quiet_cmd_hypercalls = HYPERCALLS $@
++      cmd_hypercalls = $(CONFIG_SHELL) '$<' $@ $(filter-out $<,$^)
++
+ syshdr_abi_unistd_32 := i386
+ $(uapi)/unistd_32.h: $(syscall32) $(syshdr)
+ 	$(call if_changed,syshdr)
+@@ -47,10 +50,16 @@ $(out)/syscalls_32.h: $(syscall32) $(systbl)
+ $(out)/syscalls_64.h: $(syscall64) $(systbl)
+ 	$(call if_changed,systbl)
+ 
++$(out)/xen-hypercalls.h: $(srctree)/scripts/xen-hypercalls.sh
++	$(call if_changed,hypercalls)
++
++$(out)/xen-hypercalls.h: $(srctree)/include/xen/interface/xen*.h
++
+ uapisyshdr-y			+= unistd_32.h unistd_64.h unistd_x32.h
+ syshdr-y			+= syscalls_32.h
+ syshdr-$(CONFIG_X86_64)		+= unistd_32_ia32.h unistd_64_x32.h
+ syshdr-$(CONFIG_X86_64)		+= syscalls_64.h
++syshdr-$(CONFIG_XEN)		+= xen-hypercalls.h
+ 
+ targets	+= $(uapisyshdr-y) $(syshdr-y)
+ 
+diff --git a/scripts/xen-hypercalls.sh b/scripts/xen-hypercalls.sh
+new file mode 100644
+index 0000000..676d922
+--- /dev/null
++++ b/scripts/xen-hypercalls.sh
+@@ -0,0 +1,12 @@
++#!/bin/sh
++out="$1"
++shift
++in="$@"
++
++for i in $in; do
++	eval $CPP $LINUXINCLUDE -dD -imacros "$i" -x c /dev/null
++done | \
++awk '$1 == "#define" && $2 ~ /__HYPERVISOR_[a-z][a-z_0-9]*/ { v[$3] = $2 }
++	END {   print "/* auto-generated by scripts/xen-hypercall.sh */"
++		for (i in v) if (!(v[i] in v))
++			print "HYPERCALL("substr(v[i], 14)")"}' | sort -u >$out
+-- 
+2.1.2
 
-But if this is non-trivial it's not a major issue.
-
-David
