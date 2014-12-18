@@ -1,32 +1,83 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.citrix.com ([66.165.176.89]:63860 "EHLO SMTP.CITRIX.COM"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751772AbaLQK1s (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 17 Dec 2014 05:27:48 -0500
-Message-ID: <54915A85.10403@citrix.com>
-Date: Wed, 17 Dec 2014 10:27:17 +0000
-From: David Vrabel <david.vrabel@citrix.com>
+Received: from exchange07.timesys.com ([209.114.137.116]:16000 "EHLO
+	exchange07.timesys.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751023AbaLRSNt (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 18 Dec 2014 13:13:49 -0500
+From: Andy Voltz <andy.voltz@timesys.com>
+Subject: [PATCH] kconfig: allow KCONFIG_CONFIG environment to be full path
+Date: Thu, 18 Dec 2014 13:07:52 -0500
+Message-ID: <1418926072-10014-2-git-send-email-andy.voltz@timesys.com>
+In-Reply-To: <1418926072-10014-1-git-send-email-andy.voltz@timesys.com>
+References: <1418926072-10014-1-git-send-email-andy.voltz@timesys.com>
 MIME-Version: 1.0
-Subject: Re: [Xen-devel] [Patch V2 4/4] xen: use generated hypercall symbols
- in arch/x86/xen/xen-head.S
-References: <1418809838-14123-1-git-send-email-jgross@suse.com> <1418809838-14123-5-git-send-email-jgross@suse.com>
-In-Reply-To: <1418809838-14123-5-git-send-email-jgross@suse.com>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Juergen Gross <jgross@suse.com>, linux-kernel@vger.kernel.org, x86@kernel.org, xen-devel@lists.xensource.com, konrad.wilk@oracle.com, david.vrabel@citrix.com, boris.ostrovsky@oracle.com, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com, mmarek@suse.cz, linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: Andy Voltz <andy.voltz@timesys.com>
 
-On 17/12/14 09:50, Juergen Gross wrote:
-> Instead of manually list each hypercall in arch/x86/xen/xen-head.S
-> use the auto generated symbol list.
-> 
-> This also corrects the wrong address of xen_hypercall_mca which was
-> located 32 bytes higher than it should.
-> 
-> Symbol addresses have been verified to match the correct ones via
-> objdump output.
+When no name arg is passed to conf_write, the .tmpconfig file used to
+prepare a new config is created in the working dir. If KCONFIG_CONFIG
+specifies a path which is not on the same volume, the rename fails
+with 'Invalid cross-device link'.
 
-Reviewed-by: David Vrabel <david.vrabel@citrix.com>
+This change determines the dir passed in KCONFIG_CONFIG, and uses it
+as the location for the tmpconfig.
 
-David
+Signed-off-by: Andy Voltz <andy.voltz@timesys.com>
+---
+ scripts/kconfig/confdata.c | 34 +++++++++++++++++-----------------
+ 1 file changed, 17 insertions(+), 17 deletions(-)
+
+diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+index f88d90f..072838b 100644
+--- a/scripts/kconfig/confdata.c
++++ b/scripts/kconfig/confdata.c
+@@ -743,26 +743,26 @@ int conf_write(const char *name)
+ 	char *env;
+ 
+ 	dirname[0] = 0;
+-	if (name && name[0]) {
+-		struct stat st;
+-		char *slash;
++	if (!name)
++		name = conf_get_configname();
++
++	struct stat st;
++	char *slash;
+ 
+-		if (!stat(name, &st) && S_ISDIR(st.st_mode)) {
+-			strcpy(dirname, name);
+-			strcat(dirname, "/");
++	if (!stat(name, &st) && S_ISDIR(st.st_mode)) {
++		strcpy(dirname, name);
++		strcat(dirname, "/");
++		basename = conf_get_configname();
++	} else if ((slash = strrchr(name, '/'))) {
++		int size = slash - name + 1;
++		memcpy(dirname, name, size);
++		dirname[size] = 0;
++		if (slash[1])
++			basename = slash + 1;
++		else
+ 			basename = conf_get_configname();
+-		} else if ((slash = strrchr(name, '/'))) {
+-			int size = slash - name + 1;
+-			memcpy(dirname, name, size);
+-			dirname[size] = 0;
+-			if (slash[1])
+-				basename = slash + 1;
+-			else
+-				basename = conf_get_configname();
+-		} else
+-			basename = name;
+ 	} else
+-		basename = conf_get_configname();
++		basename = name;
+ 
+ 	sprintf(newname, "%s%s", dirname, basename);
+ 	env = getenv("KCONFIG_OVERWRITECONFIG");
+-- 
+2.1.3
+
