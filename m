@@ -1,85 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:40434 "EHLO mga01.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751382AbaLSPUh (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 19 Dec 2014 10:20:37 -0500
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-Subject: [PATCH] kconfig: improve handling EOF
-Date: Fri, 19 Dec 2014 17:20:30 +0200
-Message-Id: <1419002430-164635-1-git-send-email-kirill.shutemov@linux.intel.com>
+Received: from mail.emea.novell.com ([130.57.118.101]:40678 "EHLO
+	mail.emea.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751355AbaLSQbL convert rfc822-to-8bit (ORCPT
+	<rfc822;groupwise-linux-kbuild@vger.kernel.org:3:1>);
+	Fri, 19 Dec 2014 11:31:11 -0500
+Message-Id: <549460DD0200007800051182@mail.emea.novell.com>
+Date: Fri, 19 Dec 2014 16:31:09 +0000
+From: "Jan Beulich" <JBeulich@suse.com>
+Subject: Re: [PATCH 1/2] kconfig: don't silently ignore unhandled
+ characters
+References: <5458A4FC0200007800044AC1@mail.emea.novell.com>
+ <1415110006.20372.165.camel@x220>
+ <5458ED470200007800044DA7@mail.emea.novell.com>
+ <1418120161.2058.97.camel@x220>
+In-Reply-To: <1418120161.2058.97.camel@x220>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8BIT
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org, yann.morin.1998@free.fr
-Cc: alexander.shishkin@linux.intel.com, linux-kernel@vger.kernel.org, "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
+To: Paul Bolle <pebolle@tiscali.nl>
+Cc: yann.morin.1998@free.fr, linux-kbuild@vger.kernel.org
 
-The patch fixes two EOF-related issues in kconfig lexer:
+Hi Paul,
 
-1. End of file is not valid end of string token. Currently we happily
-   accept something like
+>>> On 09.12.14 at 11:16, <pebolle@tiscali.nl> wrote:
+> It's been five weeks since you've sent this. I'm not aware of any other
+> comments beside mine. Here's what I'd suggest to get things moving:
+> 
+> Resend these patches.
 
-	config FOO
-		bool "Bar
+I guess I'll do this as soon as I got to merge my patch queue onto
+3.19-rc, i.e. hopefully early next year.
 
-   If there's EOF just after '"Bar' without newline.
+> Don't bother sending to Yann, that's pointless. Do
+> include lkml. Perhaps also include Michal Marek and/or Andrew Morton:
+> one of them might handle these patches. Who knows...
+> 
+> For 1/2 feel free to add
+>     Acked-by: Paul Bolle <pebolle@tiscali.nl>
+> 
+> _provided_ you change the printf([...]) to a fprintf(stderr, [...]).
 
-2. Kconfig produces obscure error message if we miss newline at the end
-   of file. Testcase:
+While I can do that, this will end up being inconsistent with all other
+code in zconf.l - it's all using printf(). I therefore think this would
+better be another patch changing all of them info fprintf(stderr, ).
 
-	% echo -n 'if FOO\nendif' >> drivers/Kconfig
-	% make allmodconfig
-	...
-	drivers/Kconfig:191: 'endif' in different file than 'if'
-	drivers/Kconfig:191: location of the 'if'
-	scripts/kconfig/Makefile:80: recipe for target 'allmodconfig' failed
-	make[1]: *** [allmodconfig] Error 1
-	Makefile:558: recipe for target 'allmodconfig' failed
-	make: *** [allmodconfig] Error 2
-
-   We can fix it if forbid EOF form <PARAM> context.
-
-Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
----
- kernel/Kconfig.preempt  | 2 +-
- scripts/kconfig/zconf.l | 8 ++++++--
- 2 files changed, 7 insertions(+), 3 deletions(-)
-
-diff --git a/kernel/Kconfig.preempt b/kernel/Kconfig.preempt
-index 3f9c97419f02..037284c5f723 100644
---- a/kernel/Kconfig.preempt
-+++ b/kernel/Kconfig.preempt
-@@ -55,4 +55,4 @@ config PREEMPT
- endchoice
- 
- config PREEMPT_COUNT
--       bool
-\ No newline at end of file
-+       bool
-diff --git a/scripts/kconfig/zconf.l b/scripts/kconfig/zconf.l
-index 6c62d93b4ffb..001abe8df6ce 100644
---- a/scripts/kconfig/zconf.l
-+++ b/scripts/kconfig/zconf.l
-@@ -143,7 +143,9 @@ n	[A-Za-z0-9_]
- 	\\\n	current_file->lineno++;
- 	.
- 	<<EOF>> {
--		BEGIN(INITIAL);
-+		printf("%s:%d: no newline at end of file\n",
-+				zconf_curname(), zconf_lineno());
-+		exit(1);
- 	}
- }
- 
-@@ -179,7 +181,9 @@ n	[A-Za-z0-9_]
- 		return T_EOL;
- 	}
- 	<<EOF>>	{
--		BEGIN(INITIAL);
-+		printf("%s:%d: unexpected end of file\n",
-+				zconf_curname(), zconf_lineno());
-+		exit(1);
- 	}
- }
- 
--- 
-2.1.3
+Jan
 
