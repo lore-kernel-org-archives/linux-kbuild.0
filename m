@@ -1,54 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:47232 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751165AbaLSUxT (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 19 Dec 2014 15:53:19 -0500
-Date: Fri, 19 Dec 2014 21:53:16 +0100
-From: Michal Marek <mmarek@suse.cz>
-Subject: [GIT PULL] kbuild misc changes for v3.19-rc1
-Message-ID: <20141219205316.GA4385@pobox.suse.cz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+Received: from cpsmtpb-ews02.kpnxchange.com ([213.75.39.5]:62689 "EHLO
+	cpsmtpb-ews02.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1750831AbaLTKO5 (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 20 Dec 2014 05:14:57 -0500
+Message-ID: <1419070495.26428.15.camel@x220>
+Subject: Re: arch/x86/kernel/cpu/mkcapflags.sh
+From: Paul Bolle <pebolle@tiscali.nl>
+Date: Sat, 20 Dec 2014 11:14:55 +0100
+In-Reply-To: <20141219174330.GC2286@localhost.localdomain>
+References: <20141219174330.GC2286@localhost.localdomain>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: boaz@plexistor.com, jglisse@redhat.com, mchehab@osg.samsung.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Sylvain BERTRAND <sylvain.bertrand@gmail.com>
+Cc: linux-kbuild@vger.kernel.org
 
-Hi Linus,
+Sylvain,
 
-there are only a few things in the misc branch:
+Why did you send this to linux-kbuild? It seems this is only interesting
+to the people (and lists) found with
+        scripts/get_maintainer.pl -f arch/x86/kernel/cpu/mkcapflags.sh
 
-* Fix for bugon.cocci semantic patch
-* Kdevelop4 files are .gitignored
-* Put make binrpm-pkg on diet
+On Fri, 2014-12-19 at 18:43 +0100, Sylvain BERTRAND wrote:
+> line 30:
+> [ "$VALUE" == '""' ] && continue
+> 
+> should be
+> 
+> [ "$VALUE" = '""' ] && continue
 
-Michal
+If you resend this to the x86 people you might want to add an
+_explanation_ for that suggestion. And the chances of someone looking at
+it increase if you submit it as a proper patch.
 
-The following changes since commit f114040e3ea6e07372334ade75d1ee0775c355e1:
 
-  Linux 3.18-rc1 (2014-10-19 18:08:38 -0700)
+Paul Bolle
 
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git misc
-
-for you to fetch changes up to b9a544240d265ec83241dcfaf0da0d6adead599b:
-
-  scripts/package: binrpm-pkg do not create source and devel package (2014-12-08 13:11:22 +0100)
-
-----------------------------------------------------------------
-Boaz Harrosh (1):
-      .gitignore: Add Kdevelop4 project files
-
-Jérôme Glisse (1):
-      scripts/package: binrpm-pkg do not create source and devel package
-
-Mauro Carvalho Chehab (1):
-      bugon.cocci: fix Options at the macro
-
- .gitignore                          | 3 +++
- scripts/coccinelle/misc/bugon.cocci | 2 +-
- scripts/package/mkspec              | 4 ++++
- 3 files changed, 8 insertions(+), 1 deletion(-)
