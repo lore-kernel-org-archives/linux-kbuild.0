@@ -1,121 +1,60 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.mei.co.jp ([133.183.100.20]:65523 "EHLO smtp.mei.co.jp"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751440AbaLXGuH (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 24 Dec 2014 01:50:07 -0500
-From: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Subject: [PATCH 1/2] kbuild: merge bounds.h and asm-offsets.h rules
-Date: Wed, 24 Dec 2014 15:49:24 +0900
-Message-Id: <1419403765-3377-2-git-send-email-yamada.m@jp.panasonic.com>
-In-Reply-To: <1419403765-3377-1-git-send-email-yamada.m@jp.panasonic.com>
-References: <1419403765-3377-1-git-send-email-yamada.m@jp.panasonic.com>
+Received: from resqmta-po-04v.sys.comcast.net ([96.114.154.163]:38421 "EHLO
+	resqmta-po-04v.sys.comcast.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751816AbaLXQ2N (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 24 Dec 2014 11:28:13 -0500
+From: Shuah Khan <shuahkh@osg.samsung.com>
+Subject: [PATCH v3 14/20] selftests/size: add install target to enable test install
+Date: Wed, 24 Dec 2014 09:27:50 -0700
+Message-Id: <c961f80614b02a2f3c6455518d1f6fabdaf6c7f3.1419387513.git.shuahkh@osg.samsung.com>
+In-Reply-To: <cover.1419387513.git.shuahkh@osg.samsung.com>
+References: <cover.1419387513.git.shuahkh@osg.samsung.com>
+In-Reply-To: <cover.1419387513.git.shuahkh@osg.samsung.com>
+References: <cover.1419387513.git.shuahkh@osg.samsung.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.m@jp.panasonic.com>, linux-kernel@vger.kernel.org
+To: mmarek@suse.cz, gregkh@linuxfoundation.org, akpm@linux-foundation.org, rostedt@goodmis.org, mingo@redhat.com, davem@davemloft.net, keescook@chromium.org, tranmanphong@gmail.com, mpe@ellerman.id.au, cov@codeaurora.org, dh.herrmann@gmail.com, hughd@google.com, bobby.prani@gmail.com, serge.hallyn@ubuntu.com, ebiederm@xmission.com, tim.bird@sonymobile.com, josh@joshtriplett.org, koct9i@gmail.com
+Cc: Shuah Khan <shuahkh@osg.samsung.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-api@vger.kernel.org, netdev@vger.kernel.org
 
-The rules "cmd_bounds" and "cmd_offsets" are almost the same.
-(The difference is only the include guards.)  They can be merged.
+Add a new make target to enable installing test. This target
+installs test in the kselftest install location and add to the
+kselftest script to run the test. Install target can be run
+only from top level kernel source directory.
 
-Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
+Signed-off-by: Shuah Khan <shuahkh@osg.samsung.com>
 ---
+ tools/testing/selftests/size/Makefile | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
- Kbuild | 59 +++++++++++++++++++++--------------------------------------
- 1 file changed, 21 insertions(+), 38 deletions(-)
-
-diff --git a/Kbuild b/Kbuild
-index 5d7c729..55a639f 100644
---- a/Kbuild
-+++ b/Kbuild
-@@ -5,19 +5,20 @@
- # 2) Generate asm-offsets.h (may need bounds.h)
- # 3) Check for missing system calls
+diff --git a/tools/testing/selftests/size/Makefile b/tools/testing/selftests/size/Makefile
+index 04dc25e..bb7113b 100644
+--- a/tools/testing/selftests/size/Makefile
++++ b/tools/testing/selftests/size/Makefile
+@@ -1,12 +1,22 @@
+ CC = $(CROSS_COMPILE)gcc
  
--#####
--# 1) Generate bounds.h
--
--bounds-file := include/generated/bounds.h
--
--always  := $(bounds-file)
--targets := $(bounds-file) kernel/bounds.s
-+# Default sed regexp - multiline due to syntax constraints
-+define sed-y
-+	"/^->/{s:->#\(.*\):/* \1 */:; \
-+	s:^->\([^ ]*\) [\$$#]*\([-0-9]*\) \(.*\):#define \1 \2 /* \3 */:; \
-+	s:^->\([^ ]*\) [\$$#]*\([^ ]*\) \(.*\):#define \1 \2 /* \3 */:; \
-+	s:->::; p;}"
-+endef
- 
--quiet_cmd_bounds = GEN     $@
--define cmd_bounds
-+quiet_cmd_offsets = GEN     $@
-+define cmd_offsets
- 	(set -e; \
--	 echo "#ifndef __LINUX_BOUNDS_H__"; \
--	 echo "#define __LINUX_BOUNDS_H__"; \
-+	 INCLUDE_GUARD=$$(echo __$(notdir $@)__ | tr '[a-z].-' '[A-Z]__'); \
-+	 echo "#ifndef $$INCLUDE_GUARD"; \
-+	 echo "#define $$INCLUDE_GUARD"; \
- 	 echo "/*"; \
- 	 echo " * DO NOT MODIFY."; \
- 	 echo " *"; \
-@@ -30,6 +31,14 @@ define cmd_bounds
- 	 echo "#endif" ) > $@
- endef
- 
-+#####
-+# 1) Generate bounds.h
++TEST_STR = ./get_size || echo get_size selftests: [FAIL]
 +
-+bounds-file := include/generated/bounds.h
+ all: get_size
+ 
+ get_size: get_size.c
+ 	$(CC) -static -ffreestanding -nostartfiles -s $< -o $@
+ 
++install:
++ifdef INSTALL_KSFT_PATH
++	install ./get_size $(INSTALL_KSFT_PATH)
++	@echo "$(TEST_STR)" >> $(KSELFTEST)
++else
++	@echo Run make kselftest_install in top level source directory
++endif
 +
-+always  := $(bounds-file)
-+targets := $(bounds-file) kernel/bounds.s
-+
- # We use internal kbuild rules to avoid the "is up to date" message from make
- kernel/bounds.s: kernel/bounds.c FORCE
- 	$(Q)mkdir -p $(dir $@)
-@@ -37,7 +46,7 @@ kernel/bounds.s: kernel/bounds.c FORCE
+ run_tests: all
+-	./get_size
++	@$(TEST_STR)
  
- $(obj)/$(bounds-file): kernel/bounds.s Kbuild
- 	$(Q)mkdir -p $(dir $@)
--	$(call cmd,bounds)
-+	$(call cmd,offsets)
- 
- #####
- # 2) Generate asm-offsets.h
-@@ -49,32 +58,6 @@ always  += $(offsets-file)
- targets += $(offsets-file)
- targets += arch/$(SRCARCH)/kernel/asm-offsets.s
- 
--
--# Default sed regexp - multiline due to syntax constraints
--define sed-y
--	"/^->/{s:->#\(.*\):/* \1 */:; \
--	s:^->\([^ ]*\) [\$$#]*\([-0-9]*\) \(.*\):#define \1 \2 /* \3 */:; \
--	s:^->\([^ ]*\) [\$$#]*\([^ ]*\) \(.*\):#define \1 \2 /* \3 */:; \
--	s:->::; p;}"
--endef
--
--quiet_cmd_offsets = GEN     $@
--define cmd_offsets
--	(set -e; \
--	 echo "#ifndef __ASM_OFFSETS_H__"; \
--	 echo "#define __ASM_OFFSETS_H__"; \
--	 echo "/*"; \
--	 echo " * DO NOT MODIFY."; \
--	 echo " *"; \
--	 echo " * This file was generated by Kbuild"; \
--	 echo " *"; \
--	 echo " */"; \
--	 echo ""; \
--	 sed -ne $(sed-y) $<; \
--	 echo ""; \
--	 echo "#endif" ) > $@
--endef
--
- # We use internal kbuild rules to avoid the "is up to date" message from make
- arch/$(SRCARCH)/kernel/asm-offsets.s: arch/$(SRCARCH)/kernel/asm-offsets.c \
-                                       $(obj)/$(bounds-file) FORCE
+ clean:
+ 	$(RM) get_size
 -- 
-1.9.1
+2.1.0
 
