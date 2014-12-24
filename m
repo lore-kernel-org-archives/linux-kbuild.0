@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from resqmta-po-04v.sys.comcast.net ([96.114.154.163]:38421 "EHLO
-	resqmta-po-04v.sys.comcast.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751366AbaLXQ2G (ORCPT
+Received: from resqmta-po-07v.sys.comcast.net ([96.114.154.166]:48199 "EHLO
+	resqmta-po-07v.sys.comcast.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752560AbaLXQdM (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 24 Dec 2014 11:28:06 -0500
+	Wed, 24 Dec 2014 11:33:12 -0500
 From: Shuah Khan <shuahkh@osg.samsung.com>
-Subject: [PATCH v3 05/20] selftests/ftrace: add install target to enable test install
-Date: Wed, 24 Dec 2014 09:27:41 -0700
-Message-Id: <e84eeeecde70ecb3ab82c5f825fec359f9e967ff.1419387513.git.shuahkh@osg.samsung.com>
+Subject: [PATCH v3 11/20] selftests/mqueue: add install target to enable test install
+Date: Wed, 24 Dec 2014 09:27:47 -0700
+Message-Id: <1e4aa40c42e886d36ae1bfcb93e4b8d696fa6c39.1419387513.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1419387513.git.shuahkh@osg.samsung.com>
 References: <cover.1419387513.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1419387513.git.shuahkh@osg.samsung.com>
@@ -24,31 +24,39 @@ only from top level kernel source directory.
 
 Signed-off-by: Shuah Khan <shuahkh@osg.samsung.com>
 ---
- tools/testing/selftests/ftrace/Makefile | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+ tools/testing/selftests/mqueue/Makefile | 18 +++++++++++++++---
+ 1 file changed, 15 insertions(+), 3 deletions(-)
 
-diff --git a/tools/testing/selftests/ftrace/Makefile b/tools/testing/selftests/ftrace/Makefile
-index 76cc9f1..7c7cf42 100644
---- a/tools/testing/selftests/ftrace/Makefile
-+++ b/tools/testing/selftests/ftrace/Makefile
-@@ -1,7 +1,16 @@
-+TEST_STR = /bin/sh ./ftracetest || echo ftrace selftests: [FAIL]
+diff --git a/tools/testing/selftests/mqueue/Makefile b/tools/testing/selftests/mqueue/Makefile
+index 8056e2e..27757b9 100644
+--- a/tools/testing/selftests/mqueue/Makefile
++++ b/tools/testing/selftests/mqueue/Makefile
+@@ -1,10 +1,22 @@
++MQ_OPEN_TEST_STR = ./mq_open_tests /test1 || echo mq_open_tests: [FAIL]
++MQ_PERF_TEST_STR = ./mq_perf_tests || echo mq_perf_tests: [FAIL]
 +
  all:
+ 	gcc -O2 mq_open_tests.c -o mq_open_tests -lrt
+ 	gcc -O2 -o mq_perf_tests mq_perf_tests.c -lrt -lpthread -lpopt
  
+-run_tests:
+-	@./mq_open_tests /test1 || echo "mq_open_tests: [FAIL]"
+-	@./mq_perf_tests || echo "mq_perf_tests: [FAIL]"
 +install:
 +ifdef INSTALL_KSFT_PATH
-+	install ./ftracetest $(INSTALL_KSFT_PATH)
-+	@cp -r test.d $(INSTALL_KSFT_PATH)
-+	echo "$(TEST_STR)" >> $(KSELFTEST)
++	install ./mq_open_tests ./mq_perf_tests $(INSTALL_KSFT_PATH)
++	@echo "$(MQ_OPEN_TEST_STR)" >> $(KSELFTEST)
++	@echo "$(MQ_PERF_TEST_STR)" >> $(KSELFTEST)
++else
++	@echo Run make kselftest_install in top level source directory
 +endif
 +
- run_tests:
--	@/bin/sh ./ftracetest || echo "ftrace selftests: [FAIL]"
-+	@$(TEST_STR)
++run_tests: all
++	@$(MQ_OPEN_TEST_STR)
++	@$(MQ_PERF_TEST_STR)
  
  clean:
- 	rm -rf logs/*
+ 	rm -f mq_open_tests mq_perf_tests
 -- 
 2.1.0
 
