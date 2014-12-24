@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from resqmta-po-11v.sys.comcast.net ([96.114.154.170]:35255 "EHLO
-	resqmta-po-11v.sys.comcast.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752150AbaLXQgT (ORCPT
+Received: from resqmta-po-02v.sys.comcast.net ([96.114.154.161]:50090 "EHLO
+	resqmta-po-02v.sys.comcast.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752106AbaLXQgT (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Wed, 24 Dec 2014 11:36:19 -0500
 From: Shuah Khan <shuahkh@osg.samsung.com>
-Subject: [PATCH v3 01/20] selftests/breakpoints: add install target to enable test install
-Date: Wed, 24 Dec 2014 09:27:37 -0700
-Message-Id: <0a42ee9b3e243c71927d7d71c5cb6e5f5ade510e.1419387513.git.shuahkh@osg.samsung.com>
+Subject: [PATCH v3 02/20] selftests/cpu-hotplug: add install target to enable test install
+Date: Wed, 24 Dec 2014 09:27:38 -0700
+Message-Id: <7c68362e79fa107dea168d94255228280114689e.1419387513.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1419387513.git.shuahkh@osg.samsung.com>
 References: <cover.1419387513.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1419387513.git.shuahkh@osg.samsung.com>
@@ -24,46 +24,41 @@ only from top level kernel source directory.
 
 Signed-off-by: Shuah Khan <shuahkh@osg.samsung.com>
 ---
- tools/testing/selftests/breakpoints/Makefile | 19 +++++++++++++++++--
- 1 file changed, 17 insertions(+), 2 deletions(-)
+ tools/testing/selftests/cpu-hotplug/Makefile               | 14 ++++++++++++--
+ .../cpu-hotplug/{on-off-test.sh => cpu-on-off-test.sh}     |  0
+ 2 files changed, 12 insertions(+), 2 deletions(-)
+ rename tools/testing/selftests/cpu-hotplug/{on-off-test.sh => cpu-on-off-test.sh} (100%)
 
-diff --git a/tools/testing/selftests/breakpoints/Makefile b/tools/testing/selftests/breakpoints/Makefile
-index e18b42b..b5a5fe8 100644
---- a/tools/testing/selftests/breakpoints/Makefile
-+++ b/tools/testing/selftests/breakpoints/Makefile
-@@ -8,6 +8,7 @@ ifeq ($(ARCH),x86_64)
- 	ARCH := x86
- endif
- 
-+TEST_STR = ./breakpoint_test || echo breakpoints selftests: [FAIL]
- 
+diff --git a/tools/testing/selftests/cpu-hotplug/Makefile b/tools/testing/selftests/cpu-hotplug/Makefile
+index e9c28d8..c9e15ee 100644
+--- a/tools/testing/selftests/cpu-hotplug/Makefile
++++ b/tools/testing/selftests/cpu-hotplug/Makefile
+@@ -1,9 +1,19 @@
++TEST_STR=/bin/bash ./cpu-on-off-test.sh || echo cpu-hotplug selftests: [FAIL]
++
  all:
- ifeq ($(ARCH),x86)
-@@ -16,8 +17,22 @@ else
- 	echo "Not an x86 target, can't build breakpoints selftests"
- endif
  
--run_tests:
--	@./breakpoint_test || echo "breakpoints selftests: [FAIL]"
 +install:
 +ifdef INSTALL_KSFT_PATH
-+ifeq ($(ARCH),x86)
-+	install ./breakpoint_test $(INSTALL_KSFT_PATH)
++	install ./cpu-on-off-test.sh $(INSTALL_KSFT_PATH)/cpu-on-off-test.sh
 +	@echo "$(TEST_STR)" >> $(KSELFTEST)
-+else
-+	@echo Not an x86 target, unable to install breakpoints selftests
-+endif
 +else
 +	@echo Run make kselftest_install in top level source directory
 +endif
 +
-+run_tests: all
-+ifeq ($(ARCH),x86)
+ run_tests:
+-	@/bin/bash ./on-off-test.sh || echo "cpu-hotplug selftests: [FAIL]"
 +	@$(TEST_STR)
-+endif
+ 
+ run_full_test:
+-	@/bin/bash ./on-off-test.sh -a || echo "cpu-hotplug selftests: [FAIL]"
++	@/bin/bash ./cpu-on-off-test.sh -a || echo "cpu-hotplug selftests: [FAIL]"
  
  clean:
- 	rm -fr breakpoint_test
+diff --git a/tools/testing/selftests/cpu-hotplug/on-off-test.sh b/tools/testing/selftests/cpu-hotplug/cpu-on-off-test.sh
+similarity index 100%
+rename from tools/testing/selftests/cpu-hotplug/on-off-test.sh
+rename to tools/testing/selftests/cpu-hotplug/cpu-on-off-test.sh
 -- 
 2.1.0
 
