@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
 Received: from resqmta-po-07v.sys.comcast.net ([96.114.154.166]:48197 "EHLO
 	resqmta-po-07v.sys.comcast.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752597AbaLXQdU (ORCPT
+	by vger.kernel.org with ESMTP id S1752555AbaLXQdL (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 24 Dec 2014 11:33:20 -0500
+	Wed, 24 Dec 2014 11:33:11 -0500
 From: Shuah Khan <shuahkh@osg.samsung.com>
-Subject: [PATCH v3 15/20] selftests/sysctl: add install target to enable test install
-Date: Wed, 24 Dec 2014 09:27:51 -0700
-Message-Id: <58a8e378a12f1070c9b80d3403f590d9331fd5e4.1419387513.git.shuahkh@osg.samsung.com>
+Subject: [PATCH v3 09/20] selftests/memory-hotplug: add install target to enable test install
+Date: Wed, 24 Dec 2014 09:27:45 -0700
+Message-Id: <fffca2a31f0c84931d2dc0898051503fcf1957c1.1419387513.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1419387513.git.shuahkh@osg.samsung.com>
 References: <cover.1419387513.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1419387513.git.shuahkh@osg.samsung.com>
@@ -24,41 +24,41 @@ only from top level kernel source directory.
 
 Signed-off-by: Shuah Khan <shuahkh@osg.samsung.com>
 ---
- tools/testing/selftests/sysctl/Makefile | 17 +++++++++++++++--
- 1 file changed, 15 insertions(+), 2 deletions(-)
+ tools/testing/selftests/memory-hotplug/Makefile            | 14 ++++++++++++--
+ .../memory-hotplug/{on-off-test.sh => mem-on-off-test.sh}  |  0
+ 2 files changed, 12 insertions(+), 2 deletions(-)
+ rename tools/testing/selftests/memory-hotplug/{on-off-test.sh => mem-on-off-test.sh} (100%)
 
-diff --git a/tools/testing/selftests/sysctl/Makefile b/tools/testing/selftests/sysctl/Makefile
-index 0a92ada..dfbaa58 100644
---- a/tools/testing/selftests/sysctl/Makefile
-+++ b/tools/testing/selftests/sysctl/Makefile
-@@ -4,12 +4,25 @@
- # No binaries, but make sure arg-less "make" doesn't trigger "run_tests".
+diff --git a/tools/testing/selftests/memory-hotplug/Makefile b/tools/testing/selftests/memory-hotplug/Makefile
+index d46b8d4..561ee2b 100644
+--- a/tools/testing/selftests/memory-hotplug/Makefile
++++ b/tools/testing/selftests/memory-hotplug/Makefile
+@@ -1,9 +1,19 @@
++TEST_STR=/bin/bash ./mem-on-off-test.sh -r 2 || echo memory-hotplug selftests: [FAIL]
++
  all:
  
-+INSTALL_PROGS = common_tests run_numerictests run_stringtests
-+NUMERIC_TEST_STR = /bin/sh ./run_numerictests
-+STRING_TEST_STR = /bin/sh ./run_stringtests
-+
- # Allow specific tests to be selected.
- test_num:
--	@/bin/sh ./run_numerictests
-+	@$(NUMERIC_TEST_STR)
- 
- test_string:
--	@/bin/sh ./run_stringtests
-+	@$(STRING_TEST_STR)
-+
-+install: all
++install:
 +ifdef INSTALL_KSFT_PATH
-+	install $(INSTALL_PROGS) $(INSTALL_KSFT_PATH)
-+	@echo "$(NUMERIC_TEST_STR)" >> $(KSELFTEST)
-+	@echo "$(STRING_TEST_STR)" >> $(KSELFTEST)
++	install ./mem-on-off-test.sh $(INSTALL_KSFT_PATH)/mem-on-off-test.sh
++	@echo "$(TEST_STR)" >> $(KSELFTEST) >> $(KSELFTEST)
 +else
 +	@echo Run make kselftest_install in top level source directory
 +endif
++
+ run_tests:
+-	@/bin/bash ./on-off-test.sh -r 2 || echo "memory-hotplug selftests: [FAIL]"
++	@$(TEST_STR)
  
- run_tests: all test_num test_string
+ run_full_test:
+-	@/bin/bash ./on-off-test.sh || echo "memory-hotplug selftests: [FAIL]"
++	@/bin/bash ./mem-on-off-test.sh || echo "memory-hotplug selftests: [FAIL]"
  
+ clean:
+diff --git a/tools/testing/selftests/memory-hotplug/on-off-test.sh b/tools/testing/selftests/memory-hotplug/mem-on-off-test.sh
+similarity index 100%
+rename from tools/testing/selftests/memory-hotplug/on-off-test.sh
+rename to tools/testing/selftests/memory-hotplug/mem-on-off-test.sh
 -- 
 2.1.0
 
