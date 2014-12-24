@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
 Received: from resqmta-po-04v.sys.comcast.net ([96.114.154.163]:38421 "EHLO
 	resqmta-po-04v.sys.comcast.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751816AbaLXQ2N (ORCPT
+	by vger.kernel.org with ESMTP id S1751366AbaLXQ2G (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 24 Dec 2014 11:28:13 -0500
+	Wed, 24 Dec 2014 11:28:06 -0500
 From: Shuah Khan <shuahkh@osg.samsung.com>
-Subject: [PATCH v3 14/20] selftests/size: add install target to enable test install
-Date: Wed, 24 Dec 2014 09:27:50 -0700
-Message-Id: <c961f80614b02a2f3c6455518d1f6fabdaf6c7f3.1419387513.git.shuahkh@osg.samsung.com>
+Subject: [PATCH v3 05/20] selftests/ftrace: add install target to enable test install
+Date: Wed, 24 Dec 2014 09:27:41 -0700
+Message-Id: <e84eeeecde70ecb3ab82c5f825fec359f9e967ff.1419387513.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1419387513.git.shuahkh@osg.samsung.com>
 References: <cover.1419387513.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1419387513.git.shuahkh@osg.samsung.com>
@@ -24,37 +24,31 @@ only from top level kernel source directory.
 
 Signed-off-by: Shuah Khan <shuahkh@osg.samsung.com>
 ---
- tools/testing/selftests/size/Makefile | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+ tools/testing/selftests/ftrace/Makefile | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/size/Makefile b/tools/testing/selftests/size/Makefile
-index 04dc25e..bb7113b 100644
---- a/tools/testing/selftests/size/Makefile
-+++ b/tools/testing/selftests/size/Makefile
-@@ -1,12 +1,22 @@
- CC = $(CROSS_COMPILE)gcc
- 
-+TEST_STR = ./get_size || echo get_size selftests: [FAIL]
+diff --git a/tools/testing/selftests/ftrace/Makefile b/tools/testing/selftests/ftrace/Makefile
+index 76cc9f1..7c7cf42 100644
+--- a/tools/testing/selftests/ftrace/Makefile
++++ b/tools/testing/selftests/ftrace/Makefile
+@@ -1,7 +1,16 @@
++TEST_STR = /bin/sh ./ftracetest || echo ftrace selftests: [FAIL]
 +
- all: get_size
- 
- get_size: get_size.c
- 	$(CC) -static -ffreestanding -nostartfiles -s $< -o $@
+ all:
  
 +install:
 +ifdef INSTALL_KSFT_PATH
-+	install ./get_size $(INSTALL_KSFT_PATH)
-+	@echo "$(TEST_STR)" >> $(KSELFTEST)
-+else
-+	@echo Run make kselftest_install in top level source directory
++	install ./ftracetest $(INSTALL_KSFT_PATH)
++	@cp -r test.d $(INSTALL_KSFT_PATH)
++	echo "$(TEST_STR)" >> $(KSELFTEST)
 +endif
 +
- run_tests: all
--	./get_size
+ run_tests:
+-	@/bin/sh ./ftracetest || echo "ftrace selftests: [FAIL]"
 +	@$(TEST_STR)
  
  clean:
- 	$(RM) get_size
+ 	rm -rf logs/*
 -- 
 2.1.0
 
