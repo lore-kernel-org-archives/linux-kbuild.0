@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from resqmta-po-08v.sys.comcast.net ([96.114.154.167]:50298 "EHLO
-	resqmta-po-08v.sys.comcast.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752598AbaLXQdU (ORCPT
+Received: from resqmta-po-01v.sys.comcast.net ([96.114.154.160]:58066 "EHLO
+	resqmta-po-01v.sys.comcast.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752559AbaLXQdU (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Wed, 24 Dec 2014 11:33:20 -0500
 From: Shuah Khan <shuahkh@osg.samsung.com>
-Subject: [PATCH v3 17/20] selftests/user: add install target to enable test install
-Date: Wed, 24 Dec 2014 09:27:53 -0700
-Message-Id: <5b8336fbe252deff25978dee99cb58e90e8ccd34.1419387513.git.shuahkh@osg.samsung.com>
+Subject: [PATCH v3 16/20] selftests/timers: add install target to enable test install
+Date: Wed, 24 Dec 2014 09:27:52 -0700
+Message-Id: <d504ef6ae132ef71123fdd8fd82436168c05e815.1419387513.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1419387513.git.shuahkh@osg.samsung.com>
 References: <cover.1419387513.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1419387513.git.shuahkh@osg.samsung.com>
@@ -24,32 +24,33 @@ only from top level kernel source directory.
 
 Signed-off-by: Shuah Khan <shuahkh@osg.samsung.com>
 ---
- tools/testing/selftests/user/Makefile | 12 +++++++++++-
+ tools/testing/selftests/timers/Makefile | 12 +++++++++++-
  1 file changed, 11 insertions(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/user/Makefile b/tools/testing/selftests/user/Makefile
-index 12c9d15..218c5aa 100644
---- a/tools/testing/selftests/user/Makefile
-+++ b/tools/testing/selftests/user/Makefile
-@@ -1,7 +1,17 @@
- # Makefile for user memory selftests
- 
-+TEST_STR = ./test_user_copy.sh
+diff --git a/tools/testing/selftests/timers/Makefile b/tools/testing/selftests/timers/Makefile
+index eb2859f..922bad5 100644
+--- a/tools/testing/selftests/timers/Makefile
++++ b/tools/testing/selftests/timers/Makefile
+@@ -1,8 +1,18 @@
++TEST_STR = ./posix_timers
 +
- # No binaries, but make sure arg-less "make" doesn't trigger "run_tests"
  all:
+ 	gcc posix_timers.c -o posix_timers -lrt
  
 +install:
 +ifdef INSTALL_KSFT_PATH
-+	install ./test_user_copy.sh $(INSTALL_KSFT_PATH)
++	install ./posix_timers $(INSTALL_KSFT_PATH)
 +	@echo "$(TEST_STR)" >> $(KSELFTEST)
 +else
 +	@echo Run make kselftest_install in top level source directory
 +endif
 +
  run_tests: all
--	./test_user_copy.sh
+-	./posix_timers
 +	@$(TEST_STR)
+ 
+ clean:
+ 	rm -f ./posix_timers
 -- 
 2.1.0
 
