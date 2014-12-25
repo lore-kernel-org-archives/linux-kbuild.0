@@ -1,57 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.mei.co.jp ([133.183.100.20]:55093 "EHLO smtp.mei.co.jp"
+Received: from smtp.mei.co.jp ([133.183.100.20]:32840 "EHLO smtp.mei.co.jp"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751668AbaLYFbt (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 25 Dec 2014 00:31:49 -0500
+	id S1752305AbaLYFcv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 25 Dec 2014 00:32:51 -0500
 From: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Subject: [PATCH 3/6] kbuild,gcov: remove unnecessary workaround
-Date: Thu, 25 Dec 2014 14:31:25 +0900
-Message-Id: <1419485488-22336-4-git-send-email-yamada.m@jp.panasonic.com>
-In-Reply-To: <1419485488-22336-1-git-send-email-yamada.m@jp.panasonic.com>
-References: <1419485488-22336-1-git-send-email-yamada.m@jp.panasonic.com>
+Subject: [PATCH 0/6] kbuild: refactor Makefiles related with cc-version
+Date: Thu, 25 Dec 2014 14:31:22 +0900
+Message-Id: <1419485488-22336-1-git-send-email-yamada.m@jp.panasonic.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Peter Oberparleiter <oberpar@linux.vnet.ibm.com>, Michal Marek <mmarek@suse.cz>, Masahiro Yamada <yamada.m@jp.panasonic.com>, linux-kernel@vger.kernel.org
+Cc: Peter Oberparleiter <oberpar@linux.vnet.ibm.com>, Michal Marek <mmarek@suse.cz>, Masahiro Yamada <yamada.m@jp.panasonic.com>, x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, "H. Peter Anvin" <hpa@linux.intel.com>, linux-doc@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, Robert Richter <rrichter@cavium.com>, Michael Ellerman <mpe@ellerman.id.au>, Helge Deller <deller@gmx.de>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, Andi Kleen <ak@linux.intel.com>, "James E.J. Bottomley" <jejb@parisc-linux.org>, Paul Mackerras <paulus@samba.org>, Ingo Molnar <mingo@redhat.com>, linux-parisc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
 
-Since commit 371fdc77af44 (kbuild: collect shorthands into
-scripts/Kbuild.include), scripts/Makefile.clean includes
-scripts/Kbuild.include.
 
-The workaround and the comment block in kernel/gcov/Makefile
-are no longer necessary.
 
-Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Cc: Peter Oberparleiter <oberpar@linux.vnet.ibm.com>
----
 
- kernel/gcov/Makefile | 13 +------------
- 1 file changed, 1 insertion(+), 12 deletions(-)
+Masahiro Yamada (6):
+  kbuild: fix cc-ifversion macro
+  kbuild: do not add $(call ...) to invoke cc-version or cc-fullversion
+  kbuild,gcov: remove unnecessary workaround
+  kbuild,gcov: simplify kernel/gcov/Makefile
+  kbuild: allow cc-ifversion to have the argument for false condition
+  kbuild,gcov: simplify kernel/gcov/Makefile more
 
-diff --git a/kernel/gcov/Makefile b/kernel/gcov/Makefile
-index 6f01fa3..42323c7 100644
---- a/kernel/gcov/Makefile
-+++ b/kernel/gcov/Makefile
-@@ -10,18 +10,7 @@ ifeq ($(CONFIG_GCOV_FORMAT_3_4),y)
- else ifeq ($(CONFIG_GCOV_FORMAT_4_7),y)
-   cc-ver := 0407
- else
--# Use cc-version if available, otherwise set 0
--#
--# scripts/Kbuild.include, which contains cc-version function, is not included
--# during make clean "make -f scripts/Makefile.clean obj=kernel/gcov"
--# Meaning cc-ver is empty causing if-lt test to fail with
--# "/bin/sh: line 0: [: -lt: unary operator expected" error mesage.
--# This has no affect on the clean phase, but the error message could be
--# confusing/annoying. So this dummy workaround sets cc-ver to zero if cc-version
--# is not available. We can probably move if-lt to Kbuild.include, so it's also
--# not defined during clean or to include Kbuild.include in
--# scripts/Makefile.clean. But the following workaround seems least invasive.
--  cc-ver := $(if $(cc-version),$(cc-version),0)
-+  cc-ver := $(cc-version)
- endif
- 
- obj-$(CONFIG_GCOV_KERNEL) := base.o fs.o
+ Documentation/kbuild/makefiles.txt |  9 +++++----
+ arch/parisc/Makefile               |  2 +-
+ arch/powerpc/Makefile              |  6 +++---
+ arch/x86/Makefile.um               |  2 +-
+ kernel/gcov/Makefile               | 36 +++++-------------------------------
+ scripts/Kbuild.include             |  7 ++-----
+ 6 files changed, 17 insertions(+), 45 deletions(-)
+
 -- 
 1.9.1
 
