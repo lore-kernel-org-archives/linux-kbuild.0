@@ -1,36 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.mei.co.jp ([133.183.100.20]:32840 "EHLO smtp.mei.co.jp"
+Received: from smtp.mei.co.jp ([133.183.100.20]:62781 "EHLO smtp.mei.co.jp"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752305AbaLYFcv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 25 Dec 2014 00:32:51 -0500
+	id S1751637AbaLYFbs (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 25 Dec 2014 00:31:48 -0500
 From: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Subject: [PATCH 0/6] kbuild: refactor Makefiles related with cc-version
-Date: Thu, 25 Dec 2014 14:31:22 +0900
-Message-Id: <1419485488-22336-1-git-send-email-yamada.m@jp.panasonic.com>
+Subject: [PATCH 6/6] kbuild,gcov: simplify kernel/gcov/Makefile more
+Date: Thu, 25 Dec 2014 14:31:28 +0900
+Message-Id: <1419485488-22336-7-git-send-email-yamada.m@jp.panasonic.com>
+In-Reply-To: <1419485488-22336-1-git-send-email-yamada.m@jp.panasonic.com>
+References: <1419485488-22336-1-git-send-email-yamada.m@jp.panasonic.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Peter Oberparleiter <oberpar@linux.vnet.ibm.com>, Michal Marek <mmarek@suse.cz>, Masahiro Yamada <yamada.m@jp.panasonic.com>, x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, "H. Peter Anvin" <hpa@linux.intel.com>, linux-doc@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, Robert Richter <rrichter@cavium.com>, Michael Ellerman <mpe@ellerman.id.au>, Helge Deller <deller@gmx.de>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, Andi Kleen <ak@linux.intel.com>, "James E.J. Bottomley" <jejb@parisc-linux.org>, Paul Mackerras <paulus@samba.org>, Ingo Molnar <mingo@redhat.com>, linux-parisc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+Cc: Peter Oberparleiter <oberpar@linux.vnet.ibm.com>, Michal Marek <mmarek@suse.cz>, Masahiro Yamada <yamada.m@jp.panasonic.com>, linux-kernel@vger.kernel.org
 
+CONFIG_GCOV_FORMAT_3_4 / _4_7 / _AUTODETECT are exclusive.
+Compare the CC version only when _AUTODETECT is enabled.
 
+This change should have no impact.
 
+Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
+Cc: Peter Oberparleiter <oberpar@linux.vnet.ibm.com>
+---
 
-Masahiro Yamada (6):
-  kbuild: fix cc-ifversion macro
-  kbuild: do not add $(call ...) to invoke cc-version or cc-fullversion
-  kbuild,gcov: remove unnecessary workaround
-  kbuild,gcov: simplify kernel/gcov/Makefile
-  kbuild: allow cc-ifversion to have the argument for false condition
-  kbuild,gcov: simplify kernel/gcov/Makefile more
+ kernel/gcov/Makefile | 23 ++++-------------------
+ 1 file changed, 4 insertions(+), 19 deletions(-)
 
- Documentation/kbuild/makefiles.txt |  9 +++++----
- arch/parisc/Makefile               |  2 +-
- arch/powerpc/Makefile              |  6 +++---
- arch/x86/Makefile.um               |  2 +-
- kernel/gcov/Makefile               | 36 +++++-------------------------------
- scripts/Kbuild.include             |  7 ++-----
- 6 files changed, 17 insertions(+), 45 deletions(-)
-
+diff --git a/kernel/gcov/Makefile b/kernel/gcov/Makefile
+index 69b3515..752d648 100644
+--- a/kernel/gcov/Makefile
++++ b/kernel/gcov/Makefile
+@@ -1,22 +1,7 @@
+ ccflags-y := -DSRCTREE='"$(srctree)"' -DOBJTREE='"$(objtree)"'
+ 
+-# if-lt
+-# Usage VAR := $(call if-lt, $(a), $(b))
+-# Returns 1 if (a < b)
+-if-lt = $(shell [ $(1) -lt $(2) ] && echo 1)
+-
+-ifeq ($(CONFIG_GCOV_FORMAT_3_4),y)
+-  cc-ver := 0304
+-else ifeq ($(CONFIG_GCOV_FORMAT_4_7),y)
+-  cc-ver := 0407
+-else
+-  cc-ver := $(cc-version)
+-endif
+-
+ obj-y := base.o fs.o
+-
+-ifeq ($(call if-lt, $(cc-ver), 0407),1)
+-  obj-y += gcc_3_4.o
+-else
+-  obj-y += gcc_4_7.o
+-endif
++obj-$(CONFIG_GCOV_FORMAT_3_4) += gcc_3_4.o
++obj-$(CONFIG_GCOV_FORMAT_4_7) += gcc_4_7.o
++obj-$(CONFIG_GCOV_FORMAT_AUTODETECT) += $(call cc-ifversion, -lt, 0407, \
++							gcc_3_4.o, gcc_4_7.o)
 -- 
 1.9.1
 
