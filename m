@@ -1,64 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from resqmta-po-02v.sys.comcast.net ([96.114.154.161]:50090 "EHLO
-	resqmta-po-02v.sys.comcast.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752106AbaLXQgT (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 24 Dec 2014 11:36:19 -0500
-From: Shuah Khan <shuahkh@osg.samsung.com>
-Subject: [PATCH v3 02/20] selftests/cpu-hotplug: add install target to enable test install
-Date: Wed, 24 Dec 2014 09:27:38 -0700
-Message-Id: <7c68362e79fa107dea168d94255228280114689e.1419387513.git.shuahkh@osg.samsung.com>
-In-Reply-To: <cover.1419387513.git.shuahkh@osg.samsung.com>
-References: <cover.1419387513.git.shuahkh@osg.samsung.com>
-In-Reply-To: <cover.1419387513.git.shuahkh@osg.samsung.com>
-References: <cover.1419387513.git.shuahkh@osg.samsung.com>
+Received: from smtp.mei.co.jp ([133.183.100.20]:62782 "EHLO smtp.mei.co.jp"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750788AbaLYFbs (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 25 Dec 2014 00:31:48 -0500
+From: Masahiro Yamada <yamada.m@jp.panasonic.com>
+Subject: [PATCH 4/6] kbuild,gcov: simplify kernel/gcov/Makefile
+Date: Thu, 25 Dec 2014 14:31:26 +0900
+Message-Id: <1419485488-22336-5-git-send-email-yamada.m@jp.panasonic.com>
+In-Reply-To: <1419485488-22336-1-git-send-email-yamada.m@jp.panasonic.com>
+References: <1419485488-22336-1-git-send-email-yamada.m@jp.panasonic.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mmarek@suse.cz, gregkh@linuxfoundation.org, akpm@linux-foundation.org, rostedt@goodmis.org, mingo@redhat.com, davem@davemloft.net, keescook@chromium.org, tranmanphong@gmail.com, mpe@ellerman.id.au, cov@codeaurora.org, dh.herrmann@gmail.com, hughd@google.com, bobby.prani@gmail.com, serge.hallyn@ubuntu.com, ebiederm@xmission.com, tim.bird@sonymobile.com, josh@joshtriplett.org, koct9i@gmail.com
-Cc: Shuah Khan <shuahkh@osg.samsung.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-api@vger.kernel.org, netdev@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: Peter Oberparleiter <oberpar@linux.vnet.ibm.com>, Michal Marek <mmarek@suse.cz>, Masahiro Yamada <yamada.m@jp.panasonic.com>, linux-kernel@vger.kernel.org
 
-Add a new make target to enable installing test. This target
-installs test in the kselftest install location and add to the
-kselftest script to run the test. Install target can be run
-only from top level kernel source directory.
+Kbuild descends into kernel/gcov/ directory only when
+CONFIG_GCOV_KERNEL is enabled. (See kernel/Makefile)
 
-Signed-off-by: Shuah Khan <shuahkh@osg.samsung.com>
+CONFIG_GCOV_KERNEL check can be omitted in kernel/gcov/Makefile.
+
+Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
+Cc: Peter Oberparleiter <oberpar@linux.vnet.ibm.com>
 ---
- tools/testing/selftests/cpu-hotplug/Makefile               | 14 ++++++++++++--
- .../cpu-hotplug/{on-off-test.sh => cpu-on-off-test.sh}     |  0
- 2 files changed, 12 insertions(+), 2 deletions(-)
- rename tools/testing/selftests/cpu-hotplug/{on-off-test.sh => cpu-on-off-test.sh} (100%)
 
-diff --git a/tools/testing/selftests/cpu-hotplug/Makefile b/tools/testing/selftests/cpu-hotplug/Makefile
-index e9c28d8..c9e15ee 100644
---- a/tools/testing/selftests/cpu-hotplug/Makefile
-+++ b/tools/testing/selftests/cpu-hotplug/Makefile
-@@ -1,9 +1,19 @@
-+TEST_STR=/bin/bash ./cpu-on-off-test.sh || echo cpu-hotplug selftests: [FAIL]
-+
- all:
+ kernel/gcov/Makefile | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/kernel/gcov/Makefile b/kernel/gcov/Makefile
+index 42323c7..69b3515 100644
+--- a/kernel/gcov/Makefile
++++ b/kernel/gcov/Makefile
+@@ -13,10 +13,10 @@ else
+   cc-ver := $(cc-version)
+ endif
  
-+install:
-+ifdef INSTALL_KSFT_PATH
-+	install ./cpu-on-off-test.sh $(INSTALL_KSFT_PATH)/cpu-on-off-test.sh
-+	@echo "$(TEST_STR)" >> $(KSELFTEST)
-+else
-+	@echo Run make kselftest_install in top level source directory
-+endif
-+
- run_tests:
--	@/bin/bash ./on-off-test.sh || echo "cpu-hotplug selftests: [FAIL]"
-+	@$(TEST_STR)
+-obj-$(CONFIG_GCOV_KERNEL) := base.o fs.o
++obj-y := base.o fs.o
  
- run_full_test:
--	@/bin/bash ./on-off-test.sh -a || echo "cpu-hotplug selftests: [FAIL]"
-+	@/bin/bash ./cpu-on-off-test.sh -a || echo "cpu-hotplug selftests: [FAIL]"
- 
- clean:
-diff --git a/tools/testing/selftests/cpu-hotplug/on-off-test.sh b/tools/testing/selftests/cpu-hotplug/cpu-on-off-test.sh
-similarity index 100%
-rename from tools/testing/selftests/cpu-hotplug/on-off-test.sh
-rename to tools/testing/selftests/cpu-hotplug/cpu-on-off-test.sh
+ ifeq ($(call if-lt, $(cc-ver), 0407),1)
+-  obj-$(CONFIG_GCOV_KERNEL) += gcc_3_4.o
++  obj-y += gcc_3_4.o
+ else
+-  obj-$(CONFIG_GCOV_KERNEL) += gcc_4_7.o
++  obj-y += gcc_4_7.o
+ endif
 -- 
-2.1.0
+1.9.1
 
