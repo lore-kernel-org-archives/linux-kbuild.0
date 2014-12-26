@@ -1,38 +1,78 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f51.google.com ([74.125.82.51]:56187 "EHLO
-	mail-wg0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751022AbaLZMnI (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 26 Dec 2014 07:43:08 -0500
-MIME-Version: 1.0
-Reply-To: sedat.dilek@gmail.com
-In-Reply-To: <CA+icZUXPt=GM08PD8LOpCdxCYhNMrr-2MHxPyNRWPXqUjQXFrw@mail.gmail.com>
-References: <CA+icZUXPt=GM08PD8LOpCdxCYhNMrr-2MHxPyNRWPXqUjQXFrw@mail.gmail.com>
-Date: Fri, 26 Dec 2014 13:43:07 +0100
-Message-ID: <CA+icZUVfiQ1+k2zD9HXMM40N8rwg6rEmYLdKfHGsGt3xvJu+4w@mail.gmail.com>
-Subject: Re: deb-pkg: Cleaning of debian/*tmp files when running 'make (dist)clean'
-From: Sedat Dilek <sedat.dilek@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Received: from mga01.intel.com ([192.55.52.88]:39239 "EHLO mga01.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750893AbaLZWk1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 26 Dec 2014 17:40:27 -0500
+Date: Fri, 26 Dec 2014 14:40:24 -0800
+Subject: Re: [PATCH 2/2] merge_config.sh: add -? for help
+From: Darren Hart <dvhart@linux.intel.com>
+Message-ID: <D0C32312.B56B7%dvhart@linux.intel.com>
+References: <1418331304-4821-1-git-send-email-olof@lixom.net>
+ <1418331304-4821-2-git-send-email-olof@lixom.net>
+In-Reply-To: <1418331304-4821-2-git-send-email-olof@lixom.net>
+Mime-version: 1.0
+Content-type: text/plain;
+	charset="US-ASCII"
+Content-transfer-encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>, Ben Hutchings <ben@decadent.org.uk>, maximilian attems <max@stro.at>
-Cc: LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
+To: Olof Johansson <olof@lixom.net>, yann.morin.1998@free.fr
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Fri, Dec 26, 2014 at 1:02 PM, Sedat Dilek <sedat.dilek@gmail.com> wrote:
-[...]
+No objection to the addition of -? if you find it useful.
+
+Acked-by: Darren Hart <dvhart@linux.intel.com>
+
+-- 
+Darren Hart
+Intel Open Source Technology Center
+
+
+
+
+On 12/11/14, 12:55 PM, "Olof Johansson" <olof@lixom.net> wrote:
+
+>It's usual enough for help text that it makes sense to support it.
 >
-> Any other make (PHONY) target I don't know?
+>Signed-off-by: Olof Johansson <olof@lixom.net>
+>---
+> scripts/kconfig/merge_config.sh |   12 ++++++------
+> 1 file changed, 6 insertions(+), 6 deletions(-)
+>
+>diff --git a/scripts/kconfig/merge_config.sh
+>b/scripts/kconfig/merge_config.sh
+>index 2ab91b9..0c89537 100755
+>--- a/scripts/kconfig/merge_config.sh
+>+++ b/scripts/kconfig/merge_config.sh
+>@@ -28,11 +28,11 @@ trap clean_up HUP INT TERM
+> 
+> usage() {
+> 	echo "Usage: $0 [OPTIONS] [CONFIG [...]]"
+>-	echo "  -h    display this help text"
+>-	echo "  -m    only merge the fragments, do not execute the make command"
+>-	echo "  -n    use allnoconfig instead of alldefconfig"
+>-	echo "  -r    list redundant entries when merging fragments"
+>-	echo "  -O    dir to put generated output files"
+>+	echo "  -h or -? display this help text"
+>+	echo "  -m       only merge the fragments, do not execute the make
+>command"
+>+	echo "  -n       use allnoconfig instead of alldefconfig"
+>+	echo "  -r       list redundant entries when merging fragments"
+>+	echo "  -O       dir to put generated output files"
+> }
+> 
+> MAKE=true
+>@@ -52,7 +52,7 @@ while true; do
+> 		shift
+> 		continue
+> 		;;
+>-	"-h")
+>+	"-h"|"-?")
+> 		usage
+> 		exit
+> 		;;
+>-- 
+>1.7.10.4
 >
 
-I fell over "clean-dirs"...
 
-scripts/package/Makefile:93:clean-dirs += $(objtree)/debian/
-
-...but did not really understood how it works.
-The main Makefile defines some clean-dirs PHONY#s.
-I can only speculate, someone with more skillz in Makefile handling
-should look at this.
-
-Thanks.
-
-- Sedat -
