@@ -1,78 +1,80 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:39239 "EHLO mga01.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750893AbaLZWk1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 26 Dec 2014 17:40:27 -0500
-Date: Fri, 26 Dec 2014 14:40:24 -0800
-Subject: Re: [PATCH 2/2] merge_config.sh: add -? for help
-From: Darren Hart <dvhart@linux.intel.com>
-Message-ID: <D0C32312.B56B7%dvhart@linux.intel.com>
-References: <1418331304-4821-1-git-send-email-olof@lixom.net>
- <1418331304-4821-2-git-send-email-olof@lixom.net>
-In-Reply-To: <1418331304-4821-2-git-send-email-olof@lixom.net>
-Mime-version: 1.0
-Content-type: text/plain;
-	charset="US-ASCII"
-Content-transfer-encoding: 7bit
+Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:56896 "EHLO
+	shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751079AbaL0SwO (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 27 Dec 2014 13:52:14 -0500
+Message-ID: <1419619556.4705.136.camel@decadent.org.uk>
+Subject: Re: deb-pkg: Cleaning of debian/*tmp files when running 'make
+ (dist)clean'
+From: Ben Hutchings <ben@decadent.org.uk>
+In-Reply-To: <CA+icZUVfiQ1+k2zD9HXMM40N8rwg6rEmYLdKfHGsGt3xvJu+4w@mail.gmail.com>
+References: <CA+icZUXPt=GM08PD8LOpCdxCYhNMrr-2MHxPyNRWPXqUjQXFrw@mail.gmail.com>
+	 <CA+icZUVfiQ1+k2zD9HXMM40N8rwg6rEmYLdKfHGsGt3xvJu+4w@mail.gmail.com>
+Content-Type: multipart/signed; micalg="pgp-sha512"; protocol="application/pgp-signature"; boundary="=-JedhCYh3uBvz5Pus0tMX"
+Date: Fri, 26 Dec 2014 19:46:02 +0100
+Mime-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Olof Johansson <olof@lixom.net>, yann.morin.1998@free.fr
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-
-No objection to the addition of -? if you find it useful.
-
-Acked-by: Darren Hart <dvhart@linux.intel.com>
-
--- 
-Darren Hart
-Intel Open Source Technology Center
+To: sedat.dilek@gmail.com
+Cc: Michal Marek <mmarek@suse.cz>, maximilian attems <max@stro.at>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
 
 
+--=-JedhCYh3uBvz5Pus0tMX
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Fri, 2014-12-26 at 13:43 +0100, Sedat Dilek wrote:
+> On Fri, Dec 26, 2014 at 1:02 PM, Sedat Dilek <sedat.dilek@gmail.com> wrot=
+e:
+> [...]
+> >
+> > Any other make (PHONY) target I don't know?
+> >
+>=20
+> I fell over "clean-dirs"...
+>=20
+> scripts/package/Makefile:93:clean-dirs +=3D $(objtree)/debian/
+>=20
+> ...but did not really understood how it works.
+> The main Makefile defines some clean-dirs PHONY#s.
+> I can only speculate, someone with more skillz in Makefile handling
+> should look at this.
 
-On 12/11/14, 12:55 PM, "Olof Johansson" <olof@lixom.net> wrote:
+It looks like this has not worked for a long time.  The scripts
+directory is not included in the main recursive processes; it seems to
+be special-cased for build and not for clean.  This is partly deliberate
+because clean is supposed to leave 'enough to build external modules'.
+It's not obvious to include scripts/packages/ in clean.
 
->It's usual enough for help text that it makes sense to support it.
->
->Signed-off-by: Olof Johansson <olof@lixom.net>
->---
-> scripts/kconfig/merge_config.sh |   12 ++++++------
-> 1 file changed, 6 insertions(+), 6 deletions(-)
->
->diff --git a/scripts/kconfig/merge_config.sh
->b/scripts/kconfig/merge_config.sh
->index 2ab91b9..0c89537 100755
->--- a/scripts/kconfig/merge_config.sh
->+++ b/scripts/kconfig/merge_config.sh
->@@ -28,11 +28,11 @@ trap clean_up HUP INT TERM
-> 
-> usage() {
-> 	echo "Usage: $0 [OPTIONS] [CONFIG [...]]"
->-	echo "  -h    display this help text"
->-	echo "  -m    only merge the fragments, do not execute the make command"
->-	echo "  -n    use allnoconfig instead of alldefconfig"
->-	echo "  -r    list redundant entries when merging fragments"
->-	echo "  -O    dir to put generated output files"
->+	echo "  -h or -? display this help text"
->+	echo "  -m       only merge the fragments, do not execute the make
->command"
->+	echo "  -n       use allnoconfig instead of alldefconfig"
->+	echo "  -r       list redundant entries when merging fragments"
->+	echo "  -O       dir to put generated output files"
-> }
-> 
-> MAKE=true
->@@ -52,7 +52,7 @@ while true; do
-> 		shift
-> 		continue
-> 		;;
->-	"-h")
->+	"-h"|"-?")
-> 		usage
-> 		exit
-> 		;;
->-- 
->1.7.10.4
->
+Ben.
 
+--=20
+Ben Hutchings
+Experience is directly proportional to the value of equipment destroyed.
+                                                         - Carolyn Scheppne=
+r
 
+--=-JedhCYh3uBvz5Pus0tMX
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIVAwUAVJ2s6ue/yOyVhhEJAQqH6Q//SJFgCT4s3ey4N9tMKTUXQyJVQuwKgJR6
+tqw7ssbj0+va3HKPBJ/42ipZM50csDlcwv0XRFl3ck6GdJ0Hdeoy93OUhmukx/Xk
+pbv1T7xMqwJv+YdelI9YWPkFOnMSx9Fsw++H0XDCYQEjtC6YqYrOJiPdAni1irnS
+fayRDFWUrNSitxQNvan//2dhezd1lFF4wIAV5WsFVTTT/WbLVXIWeXCxbLTz9w55
+GKnSGBuM1yaWhSjLzFuCb4DUR5XFezMAouVkBAI45mod6GjD9zM7T5ne2azgKRBY
+WqGgivH6rI4nzNIHGEcXAJM8XnKxuiKbf/tBzjZGMrBXHgWY+Bgpee8E36axTH2o
+r9cUSDDf15TxD4P8vGHtZ92Izfb9YEpLXoPsHj5afw33PFyri3ikJ8G+mCW05MuZ
+vZXv50cuu3c+erocFpGSibC7NtJyBFHTBD+Hz2Mc8xMzaKUDrE3G8VNLY+TEOn0d
+xFmV1x/QJundibKQXTeOXcbBHT38vOzfepn8EoDdHVrM4r89GQCJ2Kdu8bkd58nt
+rQCe/WVbcH+eAzP6DNxk/gV9u3PmPoemwzhXAp5g7RWHPtPVfeYBJFEkRgeC/NRo
+/5obEkEH/xqLDl08HlAnpaq/f7wRyVyWDWBKYb5NnLHvbqphEBgrwnLta+pFqpGo
+lpSYSeL6FzU=
+=9fSy
+-----END PGP SIGNATURE-----
+
+--=-JedhCYh3uBvz5Pus0tMX--
