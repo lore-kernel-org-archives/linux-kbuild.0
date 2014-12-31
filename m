@@ -1,54 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f181.google.com ([209.85.212.181]:56158 "EHLO
-	mail-wi0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750760AbaLaO0V (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 31 Dec 2014 09:26:21 -0500
-MIME-Version: 1.0
-Reply-To: sedat.dilek@gmail.com
+Received: from cantor2.suse.de ([195.135.220.15]:60173 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751317AbaLaPfa (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 31 Dec 2014 10:35:30 -0500
+From: Michal Marek <mmarek@suse.cz>
+Subject: [PATCH 1/2] kbuild: Fix removal of the debian/ directory
+Date: Wed, 31 Dec 2014 16:35:18 +0100
+Message-Id: <1420040119-32669-1-git-send-email-mmarek@suse.cz>
 In-Reply-To: <54A40743.8080401@suse.cz>
-References: <CA+icZUXPt=GM08PD8LOpCdxCYhNMrr-2MHxPyNRWPXqUjQXFrw@mail.gmail.com>
-	<CA+icZUVfiQ1+k2zD9HXMM40N8rwg6rEmYLdKfHGsGt3xvJu+4w@mail.gmail.com>
-	<1419619556.4705.136.camel@decadent.org.uk>
-	<54A40077.1080806@suse.cz>
-	<CA+icZUWzEpgoQO8MEVF2PWOy-bQ9oYMdipBe3T+s2Os4tzKVZw@mail.gmail.com>
-	<54A40743.8080401@suse.cz>
-Date: Wed, 31 Dec 2014 15:26:20 +0100
-Message-ID: <CA+icZUUvm99kS_WJkdacG-VVYLt_MCS0FjhBCsB4UK51Th4mjQ@mail.gmail.com>
-Subject: Re: deb-pkg: Cleaning of debian/*tmp files when running 'make (dist)clean'
-From: Sedat Dilek <sedat.dilek@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+References: <54A40743.8080401@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Ben Hutchings <ben@decadent.org.uk>, maximilian attems <max@stro.at>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
+To: sedat.dilek@gmail.com
+Cc: ben@decadent.org.uk, max@stro.at, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Wed, Dec 31, 2014 at 3:25 PM, Michal Marek <mmarek@suse.cz> wrote:
-> On 2014-12-31 15:16, Sedat Dilek wrote:
->> On Wed, Dec 31, 2014 at 2:56 PM, Michal Marek <mmarek@suse.cz> wrote:
->>> The problem is that
->>>
->>>   clean-dirs += $(objtree)/debian/
->>>
->>> results in
->>>
->>>   clean-dirs += ./debian/
->>>
->>> and scripts/Makefile.clean treats it as relative to scripts/package.
->>>
->>
->> Thanks for your reply.
->>
->> IIRC I looked through some commits touching this area.
->> From your description, is the simplification ("kbuild: simplify build,
->> clean, modbuiltin shorthands") in [1] the cause for this?
->
-> No, it broke with 7e1c0477 (kbuild: Use relative path for $(objtree)).
->
-> I'll problably change the logic in Makefile.clean to check for paths
-> starting with './' AKA '$(objtree)/', unless I find a more elegant solution.
->
+scripts/Makefile.clean treats absolute path specially, but
+$(objtree)/debian is no longer an absolute path since 7e1c0477 (kbuild:
+Use relative path for $(objtree). Work around this by checking if the
+path starts with $(objtree)/.
 
-Thanks /o\.
+Reported-by: Sedat Dilek <sedat.dilek@gmail.com>
+Fixes: 7e1c0477 (kbuild: Use relative path for $(objtree)
+Signed-off-by: Michal Marek <mmarek@suse.cz>
+---
+ scripts/Makefile.clean | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-- Sedat -
+diff --git a/scripts/Makefile.clean b/scripts/Makefile.clean
+index 1bca180..627f8cb 100644
+--- a/scripts/Makefile.clean
++++ b/scripts/Makefile.clean
+@@ -42,19 +42,19 @@ __clean-files	:= $(extra-y) $(extra-m) $(extra-)       \
+ 
+ __clean-files   := $(filter-out $(no-clean-files), $(__clean-files))
+ 
+-# as clean-files is given relative to the current directory, this adds
+-# a $(obj) prefix, except for absolute paths
++# clean-files is given relative to the current directory, unless it
++# starts with $(objtree)/ (which means "./", so do not add "./" unless
++# you want to delete a file from the toplevel object directory).
+ 
+ __clean-files   := $(wildcard                                               \
+-                   $(addprefix $(obj)/, $(filter-out /%, $(__clean-files))) \
+-		   $(filter /%, $(__clean-files)))
++		   $(addprefix $(obj)/, $(filter-out $(objtree)/%, $(__clean-files))) \
++		   $(filter $(objtree)/%, $(__clean-files)))
+ 
+-# as clean-dirs is given relative to the current directory, this adds
+-# a $(obj) prefix, except for absolute paths
++# same as clean-files
+ 
+ __clean-dirs    := $(wildcard                                               \
+-                   $(addprefix $(obj)/, $(filter-out /%, $(clean-dirs)))    \
+-		   $(filter /%, $(clean-dirs)))
++		   $(addprefix $(obj)/, $(filter-out $(objtree)/%, $(clean-dirs)))    \
++		   $(filter $(objtree)/%, $(clean-dirs)))
+ 
+ # ==========================================================================
+ 
+-- 
+2.1.2
+
