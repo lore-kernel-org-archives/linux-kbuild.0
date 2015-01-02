@@ -1,46 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-we0-f170.google.com ([74.125.82.170]:33031 "EHLO
-	mail-we0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750768AbbABPSw (ORCPT
+Received: from smtprelay0056.hostedemail.com ([216.40.44.56]:50319 "EHLO
+	smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1752113AbbABPyM (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 2 Jan 2015 10:18:52 -0500
-Received: by mail-we0-f170.google.com with SMTP id w61so4629622wes.29
-        for <linux-kbuild@vger.kernel.org>; Fri, 02 Jan 2015 07:18:50 -0800 (PST)
+	Fri, 2 Jan 2015 10:54:12 -0500
+Date: Fri, 2 Jan 2015 10:45:26 -0500
+From: Steven Rostedt <rostedt@goodmis.org>
+Subject: Re: [PATCH v3 05/20] selftests/ftrace: add install target to enable
+ test install
+Message-ID: <20150102104526.29df5641@gandalf.local.home>
+In-Reply-To: <e84eeeecde70ecb3ab82c5f825fec359f9e967ff.1419387513.git.shuahkh@osg.samsung.com>
+References: <cover.1419387513.git.shuahkh@osg.samsung.com>
+	<e84eeeecde70ecb3ab82c5f825fec359f9e967ff.1419387513.git.shuahkh@osg.samsung.com>
 MIME-Version: 1.0
-Reply-To: sedat.dilek@gmail.com
-In-Reply-To: <20150102151227.GA2658@sepie.suse.cz>
-References: <1420210672-12712-1-git-send-email-sedat.dilek@gmail.com>
-	<20150102151227.GA2658@sepie.suse.cz>
-Date: Fri, 2 Jan 2015 16:18:50 +0100
-Message-ID: <CA+icZUUpxLS6B2RNGdkvEzmmPRi8TtJ6ySO3N0uLQgkuEPahEQ@mail.gmail.com>
-Subject: Re: [3.19-rc2] builddeb: Update year and git repository URL in debian/copyright
-From: Sedat Dilek <sedat.dilek@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Ben Hutchings <ben@decadent.org.uk>, maximilian attems <max@stro.at>, linux-kbuild@vger.kernel.org
+To: Shuah Khan <shuahkh@osg.samsung.com>
+Cc: mmarek@suse.cz, gregkh@linuxfoundation.org, akpm@linux-foundation.org, mingo@redhat.com, davem@davemloft.net, keescook@chromium.org, tranmanphong@gmail.com, mpe@ellerman.id.au, cov@codeaurora.org, dh.herrmann@gmail.com, hughd@google.com, bobby.prani@gmail.com, serge.hallyn@ubuntu.com, ebiederm@xmission.com, tim.bird@sonymobile.com, josh@joshtriplett.org, koct9i@gmail.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-api@vger.kernel.org, netdev@vger.kernel.org
 
-On Fri, Jan 2, 2015 at 4:12 PM, Michal Marek <mmarek@suse.cz> wrote:
-> On Fri, Jan 02, 2015 at 03:57:52PM +0100, Sedat Dilek wrote:
->> Happy new 2015!
->>
->> I have combined two patches which I had already sent to linux-kbuild ML.
->
-> Applied to kbuild.git#misc, thanks.
->
+On Wed, 24 Dec 2014 09:27:41 -0700
+Shuah Khan <shuahkh@osg.samsung.com> wrote:
 
-/o\
+> Add a new make target to enable installing test. This target
+> installs test in the kselftest install location and add to the
+> kselftest script to run the test. Install target can be run
+> only from top level kernel source directory.
+> 
+> Signed-off-by: Shuah Khan <shuahkh@osg.samsung.com>
+> ---
+>  tools/testing/selftests/ftrace/Makefile | 11 ++++++++++-
+>  1 file changed, 10 insertions(+), 1 deletion(-)
+> 
+> diff --git a/tools/testing/selftests/ftrace/Makefile b/tools/testing/selftests/ftrace/Makefile
+> index 76cc9f1..7c7cf42 100644
+> --- a/tools/testing/selftests/ftrace/Makefile
+> +++ b/tools/testing/selftests/ftrace/Makefile
+> @@ -1,7 +1,16 @@
+> +TEST_STR = /bin/sh ./ftracetest || echo ftrace selftests: [FAIL]
 
-Just FYI...
-I will send out the 3rd in the original triple as "[RFC RESEND]
-builddeb: Try to determine distribution" against kbuild-next.
-From the discussion:
-max had some concerns and if I remember correctly I got no alternativ
-proposal from him.
-Today, I asked friends on #grml on how to do it better.
-I will try to find out if I can ensure lsb_release binary is available
-in all supported Debian/Ubuntu release.
-Not sure if this really necessary.
+Is it ok that this removes the quotes around the echo string? I don't
+see anything wrong about it, but I don't know if there's a shell out
+there that will fail due to it.
 
-- Sedat -
+Other than than,
+
+Acked-by: Steven Rostedt <rostedt@goodmis.org>
+
+-- Steve
+
+
+> +
+>  all:
+>  
+> +install:
+> +ifdef INSTALL_KSFT_PATH
+> +	install ./ftracetest $(INSTALL_KSFT_PATH)
+> +	@cp -r test.d $(INSTALL_KSFT_PATH)
+> +	echo "$(TEST_STR)" >> $(KSELFTEST)
+> +endif
+> +
+>  run_tests:
+> -	@/bin/sh ./ftracetest || echo "ftrace selftests: [FAIL]"
+> +	@$(TEST_STR)
+>  
+>  clean:
+>  	rm -rf logs/*
+
