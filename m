@@ -1,54 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f43.google.com ([74.125.82.43]:52941 "EHLO
-	mail-wg0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751177AbbABO6O (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 2 Jan 2015 09:58:14 -0500
-Received: by mail-wg0-f43.google.com with SMTP id k14so6410266wgh.30
-        for <linux-kbuild@vger.kernel.org>; Fri, 02 Jan 2015 06:58:13 -0800 (PST)
-From: Sedat Dilek <sedat.dilek@gmail.com>
-Subject: [3.19-rc2] builddeb: Update year and git repository URL in debian/copyright
-Date: Fri,  2 Jan 2015 15:57:52 +0100
-Message-Id: <1420210672-12712-1-git-send-email-sedat.dilek@gmail.com>
+Received: from cantor2.suse.de ([195.135.220.15]:47739 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750761AbbABPBX (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 2 Jan 2015 10:01:23 -0500
+Message-ID: <54A6B2C1.5090104@suse.cz>
+Date: Fri, 02 Jan 2015 16:01:21 +0100
+From: Michal Marek <mmarek@suse.cz>
+MIME-Version: 1.0
+Subject: Re: [PATCH 1/2] kbuild: Fix removal of the debian/ directory
+References: <54A40743.8080401@suse.cz>	<1420040119-32669-1-git-send-email-mmarek@suse.cz> <CA+icZUUpYCGTJ7mC1jCNUQi7fgw4qSAa+ga8JGPXhkYEK+Bmtw@mail.gmail.com>
+In-Reply-To: <CA+icZUUpYCGTJ7mC1jCNUQi7fgw4qSAa+ga8JGPXhkYEK+Bmtw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-Cc: Sedat Dilek <sedat.dilek@gmail.com>, Michal Marek <mmarek@suse.cz>, Ben Hutchings <ben@decadent.org.uk>, maximilian attems <max@stro.at>, linux-kbuild@vger.kernel.org
+To: sedat.dilek@gmail.com
+Cc: Ben Hutchings <ben@decadent.org.uk>, max@stro.at, LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
 
-Happy new 2015!
+On 2014-12-31 16:50, Sedat Dilek wrote:
+> On Wed, Dec 31, 2014 at 4:35 PM, Michal Marek <mmarek@suse.cz> wrote:
+>> scripts/Makefile.clean treats absolute path specially, but
+>> $(objtree)/debian is no longer an absolute path since 7e1c0477 (kbuild:
+>> Use relative path for $(objtree). Work around this by checking if the
+>> path starts with $(objtree)/.
+>>
+>> Reported-by: Sedat Dilek <sedat.dilek@gmail.com>
+>> Fixes: 7e1c0477 (kbuild: Use relative path for $(objtree)
+>> Signed-off-by: Michal Marek <mmarek@suse.cz>
+> 
+> After applying your patchset, thing work as expected.
+> 
+> Feel free to add my Tested-by.
+> 
+> Hope this will get into v3.19-rc3?
 
-I have combined two patches which I had already sent to linux-kbuild ML.
+I pushed the patch to kbuild.git#rc-fixes. The 'clean-rule' removal is
+in kbuild.git#kbuild.
 
-Today, I prefer "builddeb" as a label for such patches.
-
-[1] http://marc.info/?l=linux-kbuild&m=133521955904706
-[2] http://marc.info/?l=linux-kbuild&m=133521955004705
-
-CC: Michal Marek <mmarek@suse.cz>
-CC: Ben Hutchings <ben@decadent.org.uk>
-CC: maximilian attems <max@stro.at>
-CC: linux-kbuild@vger.kernel.org
-Signed-off-by: Sedat Dilek <sedat.dilek@gmail.com>
----
- scripts/package/builddeb | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index 5972624..2c68c8b 100755
---- a/scripts/package/builddeb
-+++ b/scripts/package/builddeb
-@@ -233,10 +233,10 @@ This is a packacked upstream version of the Linux kernel.
- The sources may be found at most Linux ftp sites, including:
- ftp://ftp.kernel.org/pub/linux/kernel
- 
--Copyright: 1991 - 2009 Linus Torvalds and others.
-+Copyright: 1991 - 2015 Linus Torvalds and others.
- 
- The git repository for mainline kernel development is at:
--git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux-2.6.git
-+git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
- 
-     This program is free software; you can redistribute it and/or modify
-     it under the terms of the GNU General Public License as published by
--- 
-2.2.1
+Michal
 
