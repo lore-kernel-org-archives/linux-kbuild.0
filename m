@@ -1,53 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f174.google.com ([209.85.212.174]:42065 "EHLO
-	mail-wi0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751143AbaLaQFh (ORCPT
+Received: from mail-wg0-f43.google.com ([74.125.82.43]:52941 "EHLO
+	mail-wg0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751177AbbABO6O (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 31 Dec 2014 11:05:37 -0500
-MIME-Version: 1.0
-Reply-To: sedat.dilek@gmail.com
-In-Reply-To: <1420040119-32669-2-git-send-email-mmarek@suse.cz>
-References: <54A40743.8080401@suse.cz>
-	<1420040119-32669-1-git-send-email-mmarek@suse.cz>
-	<1420040119-32669-2-git-send-email-mmarek@suse.cz>
-Date: Wed, 31 Dec 2014 17:05:35 +0100
-Message-ID: <CA+icZUWns7H3MWpfNJADWse-RYD+pr4_FM=CA-ydXmwL7RZL+g@mail.gmail.com>
-Subject: Re: [PATCH 2/2] kbuild: Drop support for clean-rule
+	Fri, 2 Jan 2015 09:58:14 -0500
+Received: by mail-wg0-f43.google.com with SMTP id k14so6410266wgh.30
+        for <linux-kbuild@vger.kernel.org>; Fri, 02 Jan 2015 06:58:13 -0800 (PST)
 From: Sedat Dilek <sedat.dilek@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Subject: [3.19-rc2] builddeb: Update year and git repository URL in debian/copyright
+Date: Fri,  2 Jan 2015 15:57:52 +0100
+Message-Id: <1420210672-12712-1-git-send-email-sedat.dilek@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Ben Hutchings <ben@decadent.org.uk>, max@stro.at, LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
+Cc: Sedat Dilek <sedat.dilek@gmail.com>, Michal Marek <mmarek@suse.cz>, Ben Hutchings <ben@decadent.org.uk>, maximilian attems <max@stro.at>, linux-kbuild@vger.kernel.org
 
-On Wed, Dec 31, 2014 at 4:35 PM, Michal Marek <mmarek@suse.cz> wrote:
-> clean-rule has not been used since 94869f86 (kbuild: Accept absolute
-> paths in clean-files and introduce clean-dirs) ten years ago.
->
-> Signed-off-by: Michal Marek <mmarek@suse.cz>
+Happy new 2015!
 
-Tested-by: Sedat Dilek <sedat.dilek@gmail.com>
+I have combined two patches which I had already sent to linux-kbuild ML.
 
-- Sedat -
+Today, I prefer "builddeb" as a label for such patches.
 
-> ---
->  scripts/Makefile.clean | 3 ---
->  1 file changed, 3 deletions(-)
->
-> diff --git a/scripts/Makefile.clean b/scripts/Makefile.clean
-> index 627f8cb..55c96cb 100644
-> --- a/scripts/Makefile.clean
-> +++ b/scripts/Makefile.clean
-> @@ -71,9 +71,6 @@ endif
->  ifneq ($(strip $(__clean-dirs)),)
->         +$(call cmd,cleandir)
->  endif
-> -ifneq ($(strip $(clean-rule)),)
-> -       +$(clean-rule)
-> -endif
->         @:
->
->
-> --
-> 2.1.2
->
+[1] http://marc.info/?l=linux-kbuild&m=133521955904706
+[2] http://marc.info/?l=linux-kbuild&m=133521955004705
+
+CC: Michal Marek <mmarek@suse.cz>
+CC: Ben Hutchings <ben@decadent.org.uk>
+CC: maximilian attems <max@stro.at>
+CC: linux-kbuild@vger.kernel.org
+Signed-off-by: Sedat Dilek <sedat.dilek@gmail.com>
+---
+ scripts/package/builddeb | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index 5972624..2c68c8b 100755
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -233,10 +233,10 @@ This is a packacked upstream version of the Linux kernel.
+ The sources may be found at most Linux ftp sites, including:
+ ftp://ftp.kernel.org/pub/linux/kernel
+ 
+-Copyright: 1991 - 2009 Linus Torvalds and others.
++Copyright: 1991 - 2015 Linus Torvalds and others.
+ 
+ The git repository for mainline kernel development is at:
+-git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux-2.6.git
++git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+ 
+     This program is free software; you can redistribute it and/or modify
+     it under the terms of the GNU General Public License as published by
+-- 
+2.2.1
+
