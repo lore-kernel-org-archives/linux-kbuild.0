@@ -1,70 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtprelay0056.hostedemail.com ([216.40.44.56]:50319 "EHLO
-	smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1752113AbbABPyM (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 2 Jan 2015 10:54:12 -0500
-Date: Fri, 2 Jan 2015 10:45:26 -0500
-From: Steven Rostedt <rostedt@goodmis.org>
-Subject: Re: [PATCH v3 05/20] selftests/ftrace: add install target to enable
- test install
-Message-ID: <20150102104526.29df5641@gandalf.local.home>
-In-Reply-To: <e84eeeecde70ecb3ab82c5f825fec359f9e967ff.1419387513.git.shuahkh@osg.samsung.com>
-References: <cover.1419387513.git.shuahkh@osg.samsung.com>
-	<e84eeeecde70ecb3ab82c5f825fec359f9e967ff.1419387513.git.shuahkh@osg.samsung.com>
+Received: from cantor2.suse.de ([195.135.220.15]:48397 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750962AbbABPzo (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 2 Jan 2015 10:55:44 -0500
+Message-ID: <54A6BF7E.8070003@suse.cz>
+Date: Fri, 02 Jan 2015 16:55:42 +0100
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [PATCH] scripts: fix link-vmlinux.sh bash-ism
+References: <20141229163456.GB27533@dhcppc1>
+In-Reply-To: <20141229163456.GB27533@dhcppc1>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Shuah Khan <shuahkh@osg.samsung.com>
-Cc: mmarek@suse.cz, gregkh@linuxfoundation.org, akpm@linux-foundation.org, mingo@redhat.com, davem@davemloft.net, keescook@chromium.org, tranmanphong@gmail.com, mpe@ellerman.id.au, cov@codeaurora.org, dh.herrmann@gmail.com, hughd@google.com, bobby.prani@gmail.com, serge.hallyn@ubuntu.com, ebiederm@xmission.com, tim.bird@sonymobile.com, josh@joshtriplett.org, koct9i@gmail.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-api@vger.kernel.org, netdev@vger.kernel.org
+To: Sylvain BERTRAND <sylvain.bertrand@gmail.com>, linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, mingo@kernel.org
 
-On Wed, 24 Dec 2014 09:27:41 -0700
-Shuah Khan <shuahkh@osg.samsung.com> wrote:
+On 2014-12-29 17:34, Sylvain BERTRAND wrote:
+> Chocked while compiling linux with dash shell instead of bash shell.
+> See:
+> http://pubs.opengroup.org/onlinepubs/000095399/utilities/trap.html
 
-> Add a new make target to enable installing test. This target
-> installs test in the kselftest install location and add to the
-> kselftest script to run the test. Install target can be run
-> only from top level kernel source directory.
-> 
-> Signed-off-by: Shuah Khan <shuahkh@osg.samsung.com>
+Please describe the actual problem in the changelog. I guess it's
+because of the 'ERR' trap?
+
+
+> Cc: Ingo Molnar <mingo@kernel.org>
+> Signed-off-by: Sylvain BERTRAND <sylvain.bertrand@gmail.com>
 > ---
->  tools/testing/selftests/ftrace/Makefile | 11 ++++++++++-
->  1 file changed, 10 insertions(+), 1 deletion(-)
-> 
-> diff --git a/tools/testing/selftests/ftrace/Makefile b/tools/testing/selftests/ftrace/Makefile
-> index 76cc9f1..7c7cf42 100644
-> --- a/tools/testing/selftests/ftrace/Makefile
-> +++ b/tools/testing/selftests/ftrace/Makefile
-> @@ -1,7 +1,16 @@
-> +TEST_STR = /bin/sh ./ftracetest || echo ftrace selftests: [FAIL]
-
-Is it ok that this removes the quotes around the echo string? I don't
-see anything wrong about it, but I don't know if there's a shell out
-there that will fail due to it.
-
-Other than than,
-
-Acked-by: Steven Rostedt <rostedt@goodmis.org>
-
--- Steve
-
-
-> +
->  all:
+> --- a/scripts/link-vmlinux.sh	2014-12-29 15:10:29.436431249 +0000
+> +++ b/scripts/link-vmlinux.sh	2014-12-29 16:23:06.010853608 +0000
+> @@ -111,7 +111,6 @@
+>  }
 >  
-> +install:
-> +ifdef INSTALL_KSFT_PATH
-> +	install ./ftracetest $(INSTALL_KSFT_PATH)
-> +	@cp -r test.d $(INSTALL_KSFT_PATH)
-> +	echo "$(TEST_STR)" >> $(KSELFTEST)
-> +endif
-> +
->  run_tests:
-> -	@/bin/sh ./ftracetest || echo "ftrace selftests: [FAIL]"
-> +	@$(TEST_STR)
+>  # Delete output files in case of error
+> -trap cleanup SIGHUP SIGINT SIGQUIT SIGTERM ERR
+>  cleanup()
+>  {
+>  	rm -f .old_version
+> @@ -124,6 +123,20 @@
+>  	rm -f vmlinux.o
+>  }
 >  
->  clean:
->  	rm -rf logs/*
+> +on_exit()
+> +{
+> +	if [ $? -ne 0 ]; then
+> +		cleanup
+> +	fi
+> +}
+> +trap on_exit EXIT
+> +
+> +on_signals()
+> +{
+> +	exit 1
+> +}
+> +trap on_signals HUP INT QUIT TERM
 
+Why not use 'cleanup' directly as a handler?
+
+Michal
