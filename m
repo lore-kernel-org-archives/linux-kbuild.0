@@ -1,35 +1,35 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f48.google.com ([74.125.82.48]:32776 "EHLO
-	mail-wg0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751888AbbABUjZ (ORCPT
+Received: from mail-wi0-f174.google.com ([209.85.212.174]:54692 "EHLO
+	mail-wi0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752111AbbABVRA (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 2 Jan 2015 15:39:25 -0500
-Received: by mail-wg0-f48.google.com with SMTP id y19so24487836wgg.21
-        for <linux-kbuild@vger.kernel.org>; Fri, 02 Jan 2015 12:39:24 -0800 (PST)
+	Fri, 2 Jan 2015 16:17:00 -0500
+Received: by mail-wi0-f174.google.com with SMTP id h11so162459wiw.13
+        for <linux-kbuild@vger.kernel.org>; Fri, 02 Jan 2015 13:16:59 -0800 (PST)
 From: Sedat Dilek <sedat.dilek@gmail.com>
-Subject: [RFC v2] builddeb: Try to determine distribution
-Date: Fri,  2 Jan 2015 21:39:09 +0100
-Message-Id: <1420231149-7425-1-git-send-email-sedat.dilek@gmail.com>
+Subject: [RFC v3] builddeb: Try to determine distribution
+Date: Fri,  2 Jan 2015 22:16:45 +0100
+Message-Id: <1420233405-23121-1-git-send-email-sedat.dilek@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 Cc: Sedat Dilek <sedat.dilek@gmail.com>, Ben Hutchings <ben@decadent.org.uk>, maximilian attems <max@stro.at>, Thorsten Glaser <tg@debian.org>, Alexander Wirt <formorer@debian.org>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
-This is based on ideas of me and Ben.
-Thanks goes to Thorsten and Alexander for the vital help in 2012.
-Also Thanks to maximilian for the review of my diverse patches.
-
-Like in my initial patch [1] lsb_release is used to determine
-the short codename as distribution name for debian/changelog.
+Like in my initial patch [1] lsb_release is a good choice to
+determine the distribution name for debian/changelog.
+Its installation is no precondition.
 
 Ben gave some helpful and detailed information in [2].
 There he also suggested to have an option to explicitly set the
-distribution (see $KDEB_CHANGELOG_DIST variable).
+distribution name (see $KDEB_CHANGELOG_DIST variable).
 
-I have hardcoded the script-name when the default distribution
-is used. This is a bit ugly.
+I have hardcoded the script-name into the outputs when we fallback
+to the default distribution name. This is a bit ugly.
 
-This patch is based on the snippet of Ben in [2] and tested
-against Linux v3.19-rc2.
+Based on the snippet of Ben (see [2]). 
+Tested against Linux v3.19-rc2.
+
+Thanks goes to Thorsten and Alexander for the vital help in 2012.
+Equally thanks to maximilian and Ben for the comments on my patches.
 
 [1] https://lkml.org/lkml/2012/4/23/516
 [2] http://marc.info/?l=linux-kbuild&m=142022188322321&w=2
@@ -43,6 +43,7 @@ CC: linux-kbuild@vger.kernel.org
 Suggested-by: Ben Hutchings <ben@decadent.org.uk>
 Signed-off-by: Sedat Dilek <sedat.dilek@gmail.com>
 ---
+v3: Massaged the commit-message
 v2: Suppress error messages when lsb_release is not installed.
     (Thanks maximilian and Ben.)
 
