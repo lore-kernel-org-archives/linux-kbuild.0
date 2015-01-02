@@ -1,62 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:48397 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:48469 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750962AbbABPzo (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 2 Jan 2015 10:55:44 -0500
-Message-ID: <54A6BF7E.8070003@suse.cz>
-Date: Fri, 02 Jan 2015 16:55:42 +0100
+	id S1751871AbbABQEp (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 2 Jan 2015 11:04:45 -0500
+Message-ID: <54A6C19A.3080001@suse.cz>
+Date: Fri, 02 Jan 2015 17:04:42 +0100
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH] scripts: fix link-vmlinux.sh bash-ism
-References: <20141229163456.GB27533@dhcppc1>
-In-Reply-To: <20141229163456.GB27533@dhcppc1>
+Subject: Re: [PATCH 1/2] kbuild: merge bounds.h and asm-offsets.h rules
+References: <1419403765-3377-1-git-send-email-yamada.m@jp.panasonic.com> <1419403765-3377-2-git-send-email-yamada.m@jp.panasonic.com>
+In-Reply-To: <1419403765-3377-2-git-send-email-yamada.m@jp.panasonic.com>
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sylvain BERTRAND <sylvain.bertrand@gmail.com>, linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, mingo@kernel.org
+To: Masahiro Yamada <yamada.m@jp.panasonic.com>, linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
 
-On 2014-12-29 17:34, Sylvain BERTRAND wrote:
-> Chocked while compiling linux with dash shell instead of bash shell.
-> See:
-> http://pubs.opengroup.org/onlinepubs/000095399/utilities/trap.html
+On 2014-12-24 07:49, Masahiro Yamada wrote:
+> The rules "cmd_bounds" and "cmd_offsets" are almost the same.
+> (The difference is only the include guards.)  They can be merged.
 
-Please describe the actual problem in the changelog. I guess it's
-because of the 'ERR' trap?
+Good idea.
 
 
-> Cc: Ingo Molnar <mingo@kernel.org>
-> Signed-off-by: Sylvain BERTRAND <sylvain.bertrand@gmail.com>
+> Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
 > ---
-> --- a/scripts/link-vmlinux.sh	2014-12-29 15:10:29.436431249 +0000
-> +++ b/scripts/link-vmlinux.sh	2014-12-29 16:23:06.010853608 +0000
-> @@ -111,7 +111,6 @@
->  }
+> 
+>  Kbuild | 59 +++++++++++++++++++++--------------------------------------
+>  1 file changed, 21 insertions(+), 38 deletions(-)
+> 
+> diff --git a/Kbuild b/Kbuild
+> index 5d7c729..55a639f 100644
+> --- a/Kbuild
+> +++ b/Kbuild
+> @@ -5,19 +5,20 @@
+>  # 2) Generate asm-offsets.h (may need bounds.h)
+>  # 3) Check for missing system calls
 >  
->  # Delete output files in case of error
-> -trap cleanup SIGHUP SIGINT SIGQUIT SIGTERM ERR
->  cleanup()
->  {
->  	rm -f .old_version
-> @@ -124,6 +123,20 @@
->  	rm -f vmlinux.o
->  }
+> -#####
+> -# 1) Generate bounds.h
+> -
+> -bounds-file := include/generated/bounds.h
+> -
+> -always  := $(bounds-file)
+> -targets := $(bounds-file) kernel/bounds.s
+> +# Default sed regexp - multiline due to syntax constraints
+> +define sed-y
+> +	"/^->/{s:->#\(.*\):/* \1 */:; \
+> +	s:^->\([^ ]*\) [\$$#]*\([-0-9]*\) \(.*\):#define \1 \2 /* \3 */:; \
+> +	s:^->\([^ ]*\) [\$$#]*\([^ ]*\) \(.*\):#define \1 \2 /* \3 */:; \
+> +	s:->::; p;}"
+> +endef
 >  
-> +on_exit()
-> +{
-> +	if [ $? -ne 0 ]; then
-> +		cleanup
-> +	fi
-> +}
-> +trap on_exit EXIT
-> +
-> +on_signals()
-> +{
-> +	exit 1
-> +}
-> +trap on_signals HUP INT QUIT TERM
+> -quiet_cmd_bounds = GEN     $@
+> -define cmd_bounds
+> +quiet_cmd_offsets = GEN     $@
+> +define cmd_offsets
+>  	(set -e; \
+> -	 echo "#ifndef __LINUX_BOUNDS_H__"; \
+> -	 echo "#define __LINUX_BOUNDS_H__"; \
+> +	 INCLUDE_GUARD=$$(echo __$(notdir $@)__ | tr '[a-z].-' '[A-Z]__'); \
+> +	 echo "#ifndef $$INCLUDE_GUARD"; \
+> +	 echo "#define $$INCLUDE_GUARD"; \
 
-Why not use 'cleanup' directly as a handler?
+I think it would be more readable to write it as
+
+  echo "#ifndef $(2)"; \
+  ...
+
+and pass the include guard name as an argument to cmd_offsets.
+
+Otherwise it's a great cleanup.
 
 Michal
