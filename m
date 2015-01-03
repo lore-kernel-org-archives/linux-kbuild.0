@@ -1,58 +1,98 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f180.google.com ([209.85.212.180]:50316 "EHLO
-	mail-wi0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752366AbbACA66 convert rfc822-to-8bit (ORCPT
+Received: from mail-we0-f174.google.com ([74.125.82.174]:62199 "EHLO
+	mail-we0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752366AbbACBBI (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 2 Jan 2015 19:58:58 -0500
-Received: by mail-wi0-f180.google.com with SMTP id n3so323387wiv.13
-        for <linux-kbuild@vger.kernel.org>; Fri, 02 Jan 2015 16:58:56 -0800 (PST)
-MIME-Version: 1.0
-Reply-To: sedat.dilek@gmail.com
-In-Reply-To: <Pine.BSM.4.64L.1501030039230.11222@herc.mirbsd.org>
-References: <1420244517-11139-1-git-send-email-sedat.dilek@gmail.com>
-	<Pine.BSM.4.64L.1501030039230.11222@herc.mirbsd.org>
-Date: Sat, 3 Jan 2015 01:58:56 +0100
-Message-ID: <CA+icZUVyK7_nifB7vx8j61Ce7ugXf9F_WfZpNW2hmsYbBLbO1Q@mail.gmail.com>
-Subject: Re: [RFC v4] builddeb: Try to determine distribution
+	Fri, 2 Jan 2015 20:01:08 -0500
+Received: by mail-we0-f174.google.com with SMTP id k48so5114198wev.5
+        for <linux-kbuild@vger.kernel.org>; Fri, 02 Jan 2015 17:01:06 -0800 (PST)
 From: Sedat Dilek <sedat.dilek@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Subject: [RFC v5] builddeb: Try to determine distribution
+Date: Sat,  3 Jan 2015 02:00:52 +0100
+Message-Id: <1420246852-7113-1-git-send-email-sedat.dilek@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Thorsten Glaser <tg@mirbsd.de>
-Cc: Ben Hutchings <ben@decadent.org.uk>, maximilian attems <max@stro.at>, Alexander Wirt <formorer@debian.org>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+Cc: Sedat Dilek <sedat.dilek@gmail.com>, Ben Hutchings <ben@decadent.org.uk>, maximilian attems <max@stro.at>, Thorsten Glaser <tg@mirbsd.org>, Alexander Wirt <formorer@debian.org>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
-On Sat, Jan 3, 2015 at 1:41 AM, Thorsten Glaser <tg@mirbsd.de> wrote:
-> Sedat Dilek dixit:
->
->>Dealing with this issue I learned about "The Colon in the Shell."
->
-> Beware of the pitfalls though!
-> https://www.mirbsd.org/permalinks/wlog-10_e20141209-tg.htm
->
->>Suggested-by: Thorsten Glaser <tg@debian.org>
->
-> Please make this <tg@mirbsd.org> instead. Thank you.
->
->>v4: Embed improvements suggested by Thorsten
-> […]
->>diff --git a/scripts/package/builddeb b/scripts/package/builddeb
->>index 5972624..f631c77 100755
->
-> Looks good to me. Note I did not look at the whole script,
-> only reviewed the diff, tonight (and don’t remember what I
-> did in 2012).
->
+lsb_release command is a good choice to determine the distribution
+name for the changelog file in the generated Debian packages [1].
+Its installation is no precondition.
+In Debian it is still not essential or build-essential.
 
-Thanks again.
-I have sent out a v5 with corrections.
+Ben gave some helpful informations and detailed explanations in [2].
+There he also suggested to have an option to explicitly set the
+distribution name (see $KDEB_CHANGELOG_DIST variable).
 
-- Sedat -
+Embedded the improvement as suggested by Thorsten (see [3]):
 
-> bye,
-> //mirabilos
-> --
->> Wish I had pine to hand :-( I'll give lynx a try, thanks.
->
-> Michael Schmitz on nntp://news.gmane.org/gmane.linux.debian.ports.68k
-> a.k.a. {news.gmane.org/nntp}#news.gmane.linux.debian.ports.68k in pine
+"This is suboptimal: if KDEB_CHANGELOG_DIST is defined,
+lsb_release is not necessary. The following snippet
+also omits using its output if it fails but still
+produces any:"
+
+Dealing with this issue I learned about "The Colon in the Shell." and
+possible pitfalls in this area (see [4,5]). Furthermore, refreshed my
+knowledge about redirecting outputs with the echo command (see [5]).
+Special thanks to Thorsten, I enjoyed the IRC session with you.
+
+Cooked together the snippets of Ben and Thorsten (see [2,3]).
+Tested against Linux v3.19-rc2.
+
+Thanks goes to Alexander, Ben, maximilian and Thorsten for the very
+vital help.
+
+[1] https://lkml.org/lkml/2012/4/23/516
+[2] http://marc.info/?l=linux-kbuild&m=142022188322321&w=2
+[3] http://marc.info/?l=linux-kbuild&m=142023476825460&w=2
+[4] http://blog.brlink.eu/index.html#i70
+[5] https://www.mirbsd.org/permalinks/wlog-10_e20141209-tg.htm
+[6] http://stackoverflow.com/questions/23489934/echo-2-some-text-what-does-it-mean-in-shell-scripting
+
+CC: Ben Hutchings <ben@decadent.org.uk>
+CC: maximilian attems <max@stro.at>
+CC: Thorsten Glaser <tg@mirbsd.org>
+CC: Alexander Wirt <formorer@debian.org>
+CC: Michal Marek <mmarek@suse.cz>
+CC: linux-kbuild@vger.kernel.org
+Suggested-by: Ben Hutchings <ben@decadent.org.uk>
+Suggested-by: Thorsten Glaser <tg@mirbsd.org>
+Signed-off-by: Sedat Dilek <sedat.dilek@gmail.com>
+---
+v5: Improve commit-message and fix Thorsten's email-address
+v4: Embed improvements suggested by Thorsten
+v3: Massaged the commit-message
+v2: Suppress error messages when lsb_release is not installed.
+    (Thanks maximilian and Ben.)
+
+ scripts/package/builddeb | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index 5972624..f631c77 100755
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -217,9 +217,20 @@ else
+ fi
+ maintainer="$name <$email>"
+ 
++# Try to determine distribution
++if [ -n "$KDEB_CHANGELOG_DIST" ]; then
++        distribution=$KDEB_CHANGELOG_DIST
++elif distribution=$(lsb_release -cs 2>/dev/null) && [ -n "$distribution" ]; then
++        : # nothing to do in this case
++else
++        distribution="unstable"
++        echo >&2 "Using default distribution of 'unstable' in the changelog"
++        echo >&2 "Install lsb-release or set \$KDEB_CHANGELOG_DIST explicitly"
++fi
++
+ # Generate a simple changelog template
+ cat <<EOF > debian/changelog
+-linux-upstream ($packageversion) unstable; urgency=low
++linux-upstream ($packageversion) $distribution; urgency=low
+ 
+   * Custom built Linux kernel.
+ 
+-- 
+2.2.1
+
