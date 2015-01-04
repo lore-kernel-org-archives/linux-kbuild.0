@@ -1,64 +1,95 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f176.google.com ([209.85.212.176]:47874 "EHLO
-	mail-wi0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750936AbbACKgR (ORCPT
+Received: from mail9.hitachi.co.jp ([133.145.228.44]:39348 "EHLO
+	mail9.hitachi.co.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750799AbbADFSQ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 3 Jan 2015 05:36:17 -0500
-Received: by mail-wi0-f176.google.com with SMTP id ex7so696445wid.3
-        for <linux-kbuild@vger.kernel.org>; Sat, 03 Jan 2015 02:36:16 -0800 (PST)
+	Sun, 4 Jan 2015 00:18:16 -0500
+Message-ID: <54A8CD0E.1030609@hitachi.com>
+Date: Sun, 04 Jan 2015 14:18:06 +0900
+From: Masami Hiramatsu <masami.hiramatsu.pt@hitachi.com>
 MIME-Version: 1.0
-Reply-To: sedat.dilek@gmail.com
-Date: Sat, 3 Jan 2015 11:28:44 +0100
-Message-ID: <CA+icZUVTgtSxiYz98nB30u05mzc_exLFhUttFkGwvF58sigx5Q@mail.gmail.com>
-Subject: kbuild Git tree and its branches
-From: Sedat Dilek <sedat.dilek@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: Re: [PATCH v3 05/20] selftests/ftrace: add install target
+ to enable test install
+References: <cover.1419387513.git.shuahkh@osg.samsung.com> <e84eeeecde70ecb3ab82c5f825fec359f9e967ff.1419387513.git.shuahkh@osg.samsung.com> <20150102104526.29df5641@gandalf.local.home>
+In-Reply-To: <20150102104526.29df5641@gandalf.local.home>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: Shuah Khan <shuahkh@osg.samsung.com>, mmarek@suse.cz, gregkh@linuxfoundation.org, akpm@linux-foundation.org, mingo@redhat.com, davem@davemloft.net, keescook@chromium.org, tranmanphong@gmail.com, mpe@ellerman.id.au, cov@codeaurora.org, dh.herrmann@gmail.com, hughd@google.com, bobby.prani@gmail.com, serge.hallyn@ubuntu.com, ebiederm@xmission.com, tim.bird@sonymobile.com, josh@joshtriplett.org, koct9i@gmail.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-api@vger.kernel.org, netdev@vger.kernel.org
 
-Hi Marek,
+(2015/01/03 0:45), Steven Rostedt wrote:
+> On Wed, 24 Dec 2014 09:27:41 -0700
+> Shuah Khan <shuahkh@osg.samsung.com> wrote:
+> 
+>> Add a new make target to enable installing test. This target
+>> installs test in the kselftest install location and add to the
+>> kselftest script to run the test. Install target can be run
+>> only from top level kernel source directory.
+>>
+>> Signed-off-by: Shuah Khan <shuahkh@osg.samsung.com>
+>> ---
+>>  tools/testing/selftests/ftrace/Makefile | 11 ++++++++++-
+>>  1 file changed, 10 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/tools/testing/selftests/ftrace/Makefile b/tools/testing/selftests/ftrace/Makefile
+>> index 76cc9f1..7c7cf42 100644
+>> --- a/tools/testing/selftests/ftrace/Makefile
+>> +++ b/tools/testing/selftests/ftrace/Makefile
+>> @@ -1,7 +1,16 @@
+>> +TEST_STR = /bin/sh ./ftracetest || echo ftrace selftests: [FAIL]
+> 
+> Is it ok that this removes the quotes around the echo string? I don't
+> see anything wrong about it, but I don't know if there's a shell out
+> there that will fail due to it.
 
-can you enlighten me about the usage of your Git tree and its branches?
-For me this is a bit unclear.
+Agreed, if possible, we'd better add quotes around the echo string
+as you did in 2/20 in this series.
 
-Looking into the Trees file from Linux-next I see
-***kbuild.git#rc-fixes*** [1,3] and ***kbuild.git#for-next*** [2,4]...
+Anyway, you can also add my ack to this patch.
 
-#7: kbuild-current git
-git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git#rc-fixes
+Acked-by: Masami Hiramatsu <masami.hiramatsu.pt@hitachi.com>
 
-#111: kbuild git
-git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git#for-next
+Thank you!
 
-Recently I reported some kbuild issues and sent out some own patches
-which were pushed or pending.
-This stuff is partly in kbuild.git#misc [5] and kbuild.git#kbuild [6].
+> 
+> Other than than,
+> 
+> Acked-by: Steven Rostedt <rostedt@goodmis.org>
+> 
+> -- Steve
+> 
+> 
+>> +
+>>  all:
+>>  
+>> +install:
+>> +ifdef INSTALL_KSFT_PATH
+>> +	install ./ftracetest $(INSTALL_KSFT_PATH)
+>> +	@cp -r test.d $(INSTALL_KSFT_PATH)
+>> +	echo "$(TEST_STR)" >> $(KSELFTEST)
+>> +endif
+>> +
+>>  run_tests:
+>> -	@/bin/sh ./ftracetest || echo "ftrace selftests: [FAIL]"
+>> +	@$(TEST_STR)
+>>  
+>>  clean:
+>>  	rm -rf logs/*
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Please read the FAQ at  http://www.tux.org/lkml/
+> 
 
-Are those branches for mainline?
-For example, I have seen git-pull request for "misc" stuff [7].
 
-Finally, my question which of your trees are for mainline aka upstream
-(Git) or so-called "Linus tree" [8]?
-( I would have expected some of the recent commits for "misc" and
-"kbuild" to be pulled in "rc-fixes" - this reflects the usage of
-"kbuild-current" in Linux-next for me. )
+-- 
+Masami HIRAMATSU
+Software Platform Research Dept. Linux Technology Center
+Hitachi, Ltd., Yokohama Research Laboratory
+E-mail: masami.hiramatsu.pt@hitachi.com
 
-Maybe, you can tell me how your "daily" kbuild workflow is done.
-( I am not ashamed to see I have not checked Documentation directory
-in Linux source. ]
 
-Thanks for answering my questions in advance.
-
-Regards,
-- Sedat -
-
-[1] http://git.kernel.org/cgit/linux/kernel/git/next/linux-next.git/tree/Next/Trees?id=next-20150103#n7
-[2] http://git.kernel.org/cgit/linux/kernel/git/next/linux-next.git/tree/Next/Trees?id=next-20150103#n111
-[3] http://git.kernel.org/cgit/linux/kernel/git/mmarek/kbuild.git/log/?h=rc-fixes
-[4] http://git.kernel.org/cgit/linux/kernel/git/mmarek/kbuild.git/log/?h=for-next
-[5] http://git.kernel.org/cgit/linux/kernel/git/mmarek/kbuild.git/log/?h=misc
-[6] http://git.kernel.org/cgit/linux/kernel/git/mmarek/kbuild.git/log/?h=kbuild
-[7] https://lkml.org/lkml/2014/12/19/354
-[8] http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git
