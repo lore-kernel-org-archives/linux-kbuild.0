@@ -1,11 +1,11 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail9.hitachi.co.jp ([133.145.228.44]:39348 "EHLO
+Received: from mail9.hitachi.co.jp ([133.145.228.44]:39631 "EHLO
 	mail9.hitachi.co.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750799AbbADFSQ (ORCPT
+	with ESMTP id S1750905AbbADF3n (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 4 Jan 2015 00:18:16 -0500
-Message-ID: <54A8CD0E.1030609@hitachi.com>
-Date: Sun, 04 Jan 2015 14:18:06 +0900
+	Sun, 4 Jan 2015 00:29:43 -0500
+Message-ID: <54A8CFBE.2010209@hitachi.com>
+Date: Sun, 04 Jan 2015 14:29:34 +0900
 From: Masami Hiramatsu <masami.hiramatsu.pt@hitachi.com>
 MIME-Version: 1.0
 Subject: Re: Re: [PATCH v3 05/20] selftests/ftrace: add install target
@@ -17,7 +17,7 @@ Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Steven Rostedt <rostedt@goodmis.org>
-Cc: Shuah Khan <shuahkh@osg.samsung.com>, mmarek@suse.cz, gregkh@linuxfoundation.org, akpm@linux-foundation.org, mingo@redhat.com, davem@davemloft.net, keescook@chromium.org, tranmanphong@gmail.com, mpe@ellerman.id.au, cov@codeaurora.org, dh.herrmann@gmail.com, hughd@google.com, bobby.prani@gmail.com, serge.hallyn@ubuntu.com, ebiederm@xmission.com, tim.bird@sonymobile.com, josh@joshtriplett.org, koct9i@gmail.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-api@vger.kernel.org, netdev@vger.kernel.org
+Cc: Shuah Khan <shuahkh@osg.samsung.com>, mmarek@suse.cz, gregkh@linuxfoundation.org, akpm@linux-foundation.org, mingo@redhat.com, davem@davemloft.net, keescook@chromium.org, tranmanphong@gmail.com, mpe@ellerman.id.au, cov@codeaurora.org, dh.herrmann@gmail.com, hughd@google.com, bobby.prani@gmail.com, serge.hallyn@ubuntu.com, ebiederm@xmission.com, tim.bird@sonymobile.com, josh@joshtriplett.org, koct9i@gmail.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-api@vger.kernel.org, netdev@vger.kernel.org, "yrl.pp-manager.tt@hitachi.com" <yrl.pp-manager.tt@hitachi.com>
 
 (2015/01/03 0:45), Steven Rostedt wrote:
 > On Wed, 24 Dec 2014 09:27:41 -0700
