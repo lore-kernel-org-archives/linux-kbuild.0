@@ -1,95 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-we0-f169.google.com ([74.125.82.169]:34953 "EHLO
-	mail-we0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753562AbbAESfJ (ORCPT
+Received: from mail-we0-f177.google.com ([74.125.82.177]:40359 "EHLO
+	mail-we0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754347AbbAEShq (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 5 Jan 2015 13:35:09 -0500
-Received: by mail-we0-f169.google.com with SMTP id m14so8383773wev.14
-        for <linux-kbuild@vger.kernel.org>; Mon, 05 Jan 2015 10:35:08 -0800 (PST)
+	Mon, 5 Jan 2015 13:37:46 -0500
 MIME-Version: 1.0
 Reply-To: sedat.dilek@gmail.com
-In-Reply-To: <54AA62AD.1030107@suse.cz>
-References: <CA+icZUVTgtSxiYz98nB30u05mzc_exLFhUttFkGwvF58sigx5Q@mail.gmail.com>
-	<54AA62AD.1030107@suse.cz>
-Date: Mon, 5 Jan 2015 19:35:01 +0100
-Message-ID: <CA+icZUU+gLKpX=h6aDh40iTmWP6=5DObxmYV+SJg6ZyhvOOgEg@mail.gmail.com>
-Subject: Re: kbuild Git tree and its branches
+In-Reply-To: <54A3FFCA.9030501@suse.cz>
+References: <CA+icZUXPt=GM08PD8LOpCdxCYhNMrr-2MHxPyNRWPXqUjQXFrw@mail.gmail.com>
+	<CA+icZUVfiQ1+k2zD9HXMM40N8rwg6rEmYLdKfHGsGt3xvJu+4w@mail.gmail.com>
+	<1419619556.4705.136.camel@decadent.org.uk>
+	<54A3FFCA.9030501@suse.cz>
+Date: Mon, 5 Jan 2015 19:37:45 +0100
+Message-ID: <CA+icZUWnr7_A4FbYOYyS6CVeK-Cu2AaviHF48Xfq02J72aFP9g@mail.gmail.com>
+Subject: Re: deb-pkg: Cleaning of debian/*tmp files when running 'make (dist)clean'
 From: Sedat Dilek <sedat.dilek@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org
+Cc: Ben Hutchings <ben@decadent.org.uk>, maximilian attems <max@stro.at>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
 
-On Mon, Jan 5, 2015 at 11:08 AM, Michal Marek <mmarek@suse.cz> wrote:
-> On 2015-01-03 11:28, Sedat Dilek wrote:
->> Hi Marek,
+On Wed, Dec 31, 2014 at 2:53 PM, Michal Marek <mmarek@suse.cz> wrote:
+> On 2014-12-26 19:46, Ben Hutchings wrote:
+>> On Fri, 2014-12-26 at 13:43 +0100, Sedat Dilek wrote:
+>>> On Fri, Dec 26, 2014 at 1:02 PM, Sedat Dilek <sedat.dilek@gmail.com> wrote:
+>>> [...]
+>>>>
+>>>> Any other make (PHONY) target I don't know?
+>>>>
+>>>
+>>> I fell over "clean-dirs"...
+>>>
+>>> scripts/package/Makefile:93:clean-dirs += $(objtree)/debian/
+>>>
+>>> ...but did not really understood how it works.
+>>> The main Makefile defines some clean-dirs PHONY#s.
+>>> I can only speculate, someone with more skillz in Makefile handling
+>>> should look at this.
 >>
->> can you enlighten me about the usage of your Git tree and its branches?
->> For me this is a bit unclear.
->>
->> Looking into the Trees file from Linux-next I see
->> ***kbuild.git#rc-fixes*** [1,3] and ***kbuild.git#for-next*** [2,4]...
->>
->> #7: kbuild-current git
->> git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git#rc-fixes
->>
->> #111: kbuild git
->> git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git#for-next
->>
->> Recently I reported some kbuild issues and sent out some own patches
->> which were pushed or pending.
->> This stuff is partly in kbuild.git#misc [5] and kbuild.git#kbuild [6].
+>> It looks like this has not worked for a long time.  The scripts
+>> directory is not included in the main recursive processes; it seems to
+>> be special-cased for build and not for clean.
 >
-> rc-fixes is for the current -rc phase. for-next is for the next merge
-> window and it is a merge of the topic branches. The for-next branch is
-> just a convenience so that it's always these two branches that Stephen
-> pulls into linux-next.
+> It actually is special-cased for mrproper, which is a subset if
+> distclean. The real problem is that
 >
+> clean-dirs += $(objtree)/debian/
 >
->> Finally, my question which of your trees are for mainline aka upstream
->> (Git) or so-called "Linus tree" [8]?
->> ( I would have expected some of the recent commits for "misc" and
->> "kbuild" to be pulled in "rc-fixes" - this reflects the usage of
->> "kbuild-current" in Linux-next for me. )
->>
->> Maybe, you can tell me how your "daily" kbuild workflow is done.
->> ( I am not ashamed to see I have not checked Documentation directory
->> in Linux source. ]
+> expands to
 >
-> Regression fixes are applied to the rc-fixes branch, stuff for the next
-> merge window goes to either kbuild (core changes), misc (packaging
-> targets, documentation, etc), or some other branch if it makes sense. At
-> the end of the day, I merge the topic branches into for-next, do some
-> test builds and push everything to git.kernel.org. The rc-fixes branch
-> is sent to Linus for the next -rc after some time, the other topic
-> branches are sent in the next merge window. Then I update my branches to
-> the new -rc1 and start over.
+> clean-dirs += ./debian/
 >
+> and scripts/Makefile.clean things that this is relative to the
+> scripts/package directory.
+>
+> Michal
 
-OK, thanks for the clarification and insights of your workflow.
-You can point "confused people" like me to your posting :-).
+For the sake of completeness... Issue fixed by...
 
-In other Git trees I see for example (here: linux-block)...
-
-for-3.20/core
-
-for-3.20/drivers
-
-...which are merged into the...
-
-for-next
-
-...branch.
-
-That makes it very obvious for followers.
-
-I remember I asked Daniel Vetter to enlighten about drm/i915 development.
-This resulted in a very nice blog article "drm/i915 Branches
-Explained" (see [1]).
-
-Just to give you some inspiration not taping on your nerves.
+commit a16c5f99a28c9945165c46da27fff8e6f26f8736
+"kbuild: Fix removal of the debian/ directory"
 
 - Sedat -
 
-[1] http://blog.ffwll.ch/2013/07/drmi915-branches-explained.html
+[1] http://git.kernel.org/cgit/linux/kernel/git/mmarek/kbuild.git/commit/?h=rc-fixes&id=a16c5f99a28c9945165c46da27fff8e6f26f8736
