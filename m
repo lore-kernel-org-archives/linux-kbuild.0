@@ -1,86 +1,95 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lists.s-osg.org ([54.187.51.154]:42727 "EHLO lists.s-osg.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932068AbbAESGY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 5 Jan 2015 13:06:24 -0500
-Message-ID: <54AAD295.6040208@osg.samsung.com>
-Date: Mon, 05 Jan 2015 11:06:13 -0700
-From: Shuah Khan <shuahkh@osg.samsung.com>
+Received: from mail-we0-f169.google.com ([74.125.82.169]:34953 "EHLO
+	mail-we0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753562AbbAESfJ (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 5 Jan 2015 13:35:09 -0500
+Received: by mail-we0-f169.google.com with SMTP id m14so8383773wev.14
+        for <linux-kbuild@vger.kernel.org>; Mon, 05 Jan 2015 10:35:08 -0800 (PST)
 MIME-Version: 1.0
-Subject: Re: [PATCH v3 05/20] selftests/ftrace: add install target to enable
- test install
-References: <cover.1419387513.git.shuahkh@osg.samsung.com> <e84eeeecde70ecb3ab82c5f825fec359f9e967ff.1419387513.git.shuahkh@osg.samsung.com> <20150102104526.29df5641@gandalf.local.home>
-In-Reply-To: <20150102104526.29df5641@gandalf.local.home>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8bit
+Reply-To: sedat.dilek@gmail.com
+In-Reply-To: <54AA62AD.1030107@suse.cz>
+References: <CA+icZUVTgtSxiYz98nB30u05mzc_exLFhUttFkGwvF58sigx5Q@mail.gmail.com>
+	<54AA62AD.1030107@suse.cz>
+Date: Mon, 5 Jan 2015 19:35:01 +0100
+Message-ID: <CA+icZUU+gLKpX=h6aDh40iTmWP6=5DObxmYV+SJg6ZyhvOOgEg@mail.gmail.com>
+Subject: Re: kbuild Git tree and its branches
+From: Sedat Dilek <sedat.dilek@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: mmarek@suse.cz, gregkh@linuxfoundation.org, akpm@linux-foundation.org, mingo@redhat.com, davem@davemloft.net, keescook@chromium.org, tranmanphong@gmail.com, mpe@ellerman.id.au, cov@codeaurora.org, dh.herrmann@gmail.com, hughd@google.com, bobby.prani@gmail.com, serge.hallyn@ubuntu.com, ebiederm@xmission.com, tim.bird@sonymobile.com, josh@joshtriplett.org, koct9i@gmail.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-api@vger.kernel.org, netdev@vger.kernel.org, Shuah Khan <shuahkh@osg.samsung.com>
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org
 
-On 01/02/2015 08:45 AM, Steven Rostedt wrote:
-> On Wed, 24 Dec 2014 09:27:41 -0700
-> Shuah Khan <shuahkh@osg.samsung.com> wrote:
-> 
->> Add a new make target to enable installing test. This target
->> installs test in the kselftest install location and add to the
->> kselftest script to run the test. Install target can be run
->> only from top level kernel source directory.
+On Mon, Jan 5, 2015 at 11:08 AM, Michal Marek <mmarek@suse.cz> wrote:
+> On 2015-01-03 11:28, Sedat Dilek wrote:
+>> Hi Marek,
 >>
->> Signed-off-by: Shuah Khan <shuahkh@osg.samsung.com>
->> ---
->>  tools/testing/selftests/ftrace/Makefile | 11 ++++++++++-
->>  1 file changed, 10 insertions(+), 1 deletion(-)
+>> can you enlighten me about the usage of your Git tree and its branches?
+>> For me this is a bit unclear.
 >>
->> diff --git a/tools/testing/selftests/ftrace/Makefile b/tools/testing/selftests/ftrace/Makefile
->> index 76cc9f1..7c7cf42 100644
->> --- a/tools/testing/selftests/ftrace/Makefile
->> +++ b/tools/testing/selftests/ftrace/Makefile
->> @@ -1,7 +1,16 @@
->> +TEST_STR = /bin/sh ./ftracetest || echo ftrace selftests: [FAIL]
-> 
-> Is it ok that this removes the quotes around the echo string? I don't
-> see anything wrong about it, but I don't know if there's a shell out
-> there that will fail due to it.
+>> Looking into the Trees file from Linux-next I see
+>> ***kbuild.git#rc-fixes*** [1,3] and ***kbuild.git#for-next*** [2,4]...
+>>
+>> #7: kbuild-current git
+>> git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git#rc-fixes
+>>
+>> #111: kbuild git
+>> git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git#for-next
+>>
+>> Recently I reported some kbuild issues and sent out some own patches
+>> which were pushed or pending.
+>> This stuff is partly in kbuild.git#misc [5] and kbuild.git#kbuild [6].
+>
+> rc-fixes is for the current -rc phase. for-next is for the next merge
+> window and it is a merge of the topic branches. The for-next branch is
+> just a convenience so that it's always these two branches that Stephen
+> pulls into linux-next.
+>
+>
+>> Finally, my question which of your trees are for mainline aka upstream
+>> (Git) or so-called "Linus tree" [8]?
+>> ( I would have expected some of the recent commits for "misc" and
+>> "kbuild" to be pulled in "rc-fixes" - this reflects the usage of
+>> "kbuild-current" in Linux-next for me. )
+>>
+>> Maybe, you can tell me how your "daily" kbuild workflow is done.
+>> ( I am not ashamed to see I have not checked Documentation directory
+>> in Linux source. ]
+>
+> Regression fixes are applied to the rc-fixes branch, stuff for the next
+> merge window goes to either kbuild (core changes), misc (packaging
+> targets, documentation, etc), or some other branch if it makes sense. At
+> the end of the day, I merge the topic branches into for-next, do some
+> test builds and push everything to git.kernel.org. The rc-fixes branch
+> is sent to Linus for the next -rc after some time, the other topic
+> branches are sent in the next merge window. Then I update my branches to
+> the new -rc1 and start over.
+>
 
-Right. both sh and bash are fine without the quotes. In this case there
-are no variables to interpret, so quotes don't do anything. I might as
-well play it safe. I will have to fix a few other tests to address this
-comment. Will generate v4s for a few tests in this series.
+OK, thanks for the clarification and insights of your workflow.
+You can point "confused people" like me to your posting :-).
 
-Thanks,
--- Shuah
+In other Git trees I see for example (here: linux-block)...
 
-> 
-> Other than than,
-> 
-> Acked-by: Steven Rostedt <rostedt@goodmis.org>
-> 
-> -- Steve
-> 
-> 
->> +
->>  all:
->>  
->> +install:
->> +ifdef INSTALL_KSFT_PATH
->> +	install ./ftracetest $(INSTALL_KSFT_PATH)
->> +	@cp -r test.d $(INSTALL_KSFT_PATH)
->> +	echo "$(TEST_STR)" >> $(KSELFTEST)
->> +endif
->> +
->>  run_tests:
->> -	@/bin/sh ./ftracetest || echo "ftrace selftests: [FAIL]"
->> +	@$(TEST_STR)
->>  
->>  clean:
->>  	rm -rf logs/*
-> 
+for-3.20/core
 
+for-3.20/drivers
 
--- 
-Shuah Khan
-Sr. Linux Kernel Developer
-Open Source Innovation Group
-Samsung Research America (Silicon Valley)
-shuahkh@osg.samsung.com | (970) 217-8978
+...which are merged into the...
+
+for-next
+
+...branch.
+
+That makes it very obvious for followers.
+
+I remember I asked Daniel Vetter to enlighten about drm/i915 development.
+This resulted in a very nice blog article "drm/i915 Branches
+Explained" (see [1]).
+
+Just to give you some inspiration not taping on your nerves.
+
+- Sedat -
+
+[1] http://blog.ffwll.ch/2013/07/drmi915-branches-explained.html
