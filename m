@@ -1,53 +1,86 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:48164 "EHLO mx2.suse.de"
+Received: from lists.s-osg.org ([54.187.51.154]:42727 "EHLO lists.s-osg.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751252AbbAEMNT (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 5 Jan 2015 07:13:19 -0500
-Message-ID: <54A3FFCA.9030501@suse.cz>
-Date: Wed, 31 Dec 2014 14:53:14 +0100
-From: Michal Marek <mmarek@suse.cz>
+	id S932068AbbAESGY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 5 Jan 2015 13:06:24 -0500
+Message-ID: <54AAD295.6040208@osg.samsung.com>
+Date: Mon, 05 Jan 2015 11:06:13 -0700
+From: Shuah Khan <shuahkh@osg.samsung.com>
 MIME-Version: 1.0
-Subject: Re: deb-pkg: Cleaning of debian/*tmp files when running 'make (dist)clean'
-References: <CA+icZUXPt=GM08PD8LOpCdxCYhNMrr-2MHxPyNRWPXqUjQXFrw@mail.gmail.com>	 <CA+icZUVfiQ1+k2zD9HXMM40N8rwg6rEmYLdKfHGsGt3xvJu+4w@mail.gmail.com> <1419619556.4705.136.camel@decadent.org.uk>
-In-Reply-To: <1419619556.4705.136.camel@decadent.org.uk>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH v3 05/20] selftests/ftrace: add install target to enable
+ test install
+References: <cover.1419387513.git.shuahkh@osg.samsung.com> <e84eeeecde70ecb3ab82c5f825fec359f9e967ff.1419387513.git.shuahkh@osg.samsung.com> <20150102104526.29df5641@gandalf.local.home>
+In-Reply-To: <20150102104526.29df5641@gandalf.local.home>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ben Hutchings <ben@decadent.org.uk>, sedat.dilek@gmail.com
-Cc: maximilian attems <max@stro.at>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: mmarek@suse.cz, gregkh@linuxfoundation.org, akpm@linux-foundation.org, mingo@redhat.com, davem@davemloft.net, keescook@chromium.org, tranmanphong@gmail.com, mpe@ellerman.id.au, cov@codeaurora.org, dh.herrmann@gmail.com, hughd@google.com, bobby.prani@gmail.com, serge.hallyn@ubuntu.com, ebiederm@xmission.com, tim.bird@sonymobile.com, josh@joshtriplett.org, koct9i@gmail.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-api@vger.kernel.org, netdev@vger.kernel.org, Shuah Khan <shuahkh@osg.samsung.com>
 
-On 2014-12-26 19:46, Ben Hutchings wrote:
-> On Fri, 2014-12-26 at 13:43 +0100, Sedat Dilek wrote:
->> On Fri, Dec 26, 2014 at 1:02 PM, Sedat Dilek <sedat.dilek@gmail.com> wrote:
->> [...]
->>>
->>> Any other make (PHONY) target I don't know?
->>>
->>
->> I fell over "clean-dirs"...
->>
->> scripts/package/Makefile:93:clean-dirs += $(objtree)/debian/
->>
->> ...but did not really understood how it works.
->> The main Makefile defines some clean-dirs PHONY#s.
->> I can only speculate, someone with more skillz in Makefile handling
->> should look at this.
+On 01/02/2015 08:45 AM, Steven Rostedt wrote:
+> On Wed, 24 Dec 2014 09:27:41 -0700
+> Shuah Khan <shuahkh@osg.samsung.com> wrote:
 > 
-> It looks like this has not worked for a long time.  The scripts
-> directory is not included in the main recursive processes; it seems to
-> be special-cased for build and not for clean.
+>> Add a new make target to enable installing test. This target
+>> installs test in the kselftest install location and add to the
+>> kselftest script to run the test. Install target can be run
+>> only from top level kernel source directory.
+>>
+>> Signed-off-by: Shuah Khan <shuahkh@osg.samsung.com>
+>> ---
+>>  tools/testing/selftests/ftrace/Makefile | 11 ++++++++++-
+>>  1 file changed, 10 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/tools/testing/selftests/ftrace/Makefile b/tools/testing/selftests/ftrace/Makefile
+>> index 76cc9f1..7c7cf42 100644
+>> --- a/tools/testing/selftests/ftrace/Makefile
+>> +++ b/tools/testing/selftests/ftrace/Makefile
+>> @@ -1,7 +1,16 @@
+>> +TEST_STR = /bin/sh ./ftracetest || echo ftrace selftests: [FAIL]
+> 
+> Is it ok that this removes the quotes around the echo string? I don't
+> see anything wrong about it, but I don't know if there's a shell out
+> there that will fail due to it.
 
-It actually is special-cased for mrproper, which is a subset if
-distclean. The real problem is that
+Right. both sh and bash are fine without the quotes. In this case there
+are no variables to interpret, so quotes don't do anything. I might as
+well play it safe. I will have to fix a few other tests to address this
+comment. Will generate v4s for a few tests in this series.
 
-clean-dirs += $(objtree)/debian/
+Thanks,
+-- Shuah
 
-expands to
+> 
+> Other than than,
+> 
+> Acked-by: Steven Rostedt <rostedt@goodmis.org>
+> 
+> -- Steve
+> 
+> 
+>> +
+>>  all:
+>>  
+>> +install:
+>> +ifdef INSTALL_KSFT_PATH
+>> +	install ./ftracetest $(INSTALL_KSFT_PATH)
+>> +	@cp -r test.d $(INSTALL_KSFT_PATH)
+>> +	echo "$(TEST_STR)" >> $(KSELFTEST)
+>> +endif
+>> +
+>>  run_tests:
+>> -	@/bin/sh ./ftracetest || echo "ftrace selftests: [FAIL]"
+>> +	@$(TEST_STR)
+>>  
+>>  clean:
+>>  	rm -rf logs/*
+> 
 
-clean-dirs += ./debian/
 
-and scripts/Makefile.clean things that this is relative to the
-scripts/package directory.
-
-Michal
+-- 
+Shuah Khan
+Sr. Linux Kernel Developer
+Open Source Innovation Group
+Samsung Research America (Silicon Valley)
+shuahkh@osg.samsung.com | (970) 217-8978
