@@ -1,56 +1,32 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.mei.co.jp ([133.183.100.20]:33788 "EHLO smtp.mei.co.jp"
+Received: from cantor2.suse.de ([195.135.220.15]:45758 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751121AbbAEG7H (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 5 Jan 2015 01:59:07 -0500
-Date: Mon, 05 Jan 2015 15:58:46 +0900
-From: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Subject: Re: [PATCH 1/2] kbuild: merge bounds.h and asm-offsets.h rules
-In-Reply-To: <54A6C19A.3080001@suse.cz>
-References: <1419403765-3377-2-git-send-email-yamada.m@jp.panasonic.com> <54A6C19A.3080001@suse.cz>
-Message-Id: <20150105155846.B978.AA925319@jp.panasonic.com>
+	id S1751133AbbAEJoR (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 5 Jan 2015 04:44:17 -0500
+Message-ID: <54AA5CEF.50408@suse.cz>
+Date: Mon, 05 Jan 2015 10:44:15 +0100
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
+Subject: Re: [PATCH v2 0/2] kbuild: Refactor ./Kbuild
+References: <1420441036-5289-1-git-send-email-yamada.m@jp.panasonic.com>
+In-Reply-To: <1420441036-5289-1-git-send-email-yamada.m@jp.panasonic.com>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Masahiro Yamada <yamada.m@jp.panasonic.com>, linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
 
-Hi Michal,
-
-
-
-On Fri, 02 Jan 2015 17:04:42 +0100
-Michal Marek <mmarek@suse.cz> wrote:
-
-> >  
-> > -quiet_cmd_bounds = GEN     $@
-> > -define cmd_bounds
-> > +quiet_cmd_offsets = GEN     $@
-> > +define cmd_offsets
-> >  	(set -e; \
-> > -	 echo "#ifndef __LINUX_BOUNDS_H__"; \
-> > -	 echo "#define __LINUX_BOUNDS_H__"; \
-> > +	 INCLUDE_GUARD=$$(echo __$(notdir $@)__ | tr '[a-z].-' '[A-Z]__'); \
-> > +	 echo "#ifndef $$INCLUDE_GUARD"; \
-> > +	 echo "#define $$INCLUDE_GUARD"; \
+On 2015-01-05 07:57, Masahiro Yamada wrote:
+> Changes in v2:
+>   - Pass the include guard as an argument of cmd_offsets
+>     as Michal Marek suggested.
 > 
-> I think it would be more readable to write it as
-> 
->   echo "#ifndef $(2)"; \
->   ...
-> 
-> and pass the include guard name as an argument to cmd_offsets.
-> 
-> Otherwise it's a great cleanup.
-> 
-> Michal
+> Masahiro Yamada (2):
+>   kbuild: merge bounds.h and asm-offsets.h rules
+>   kbuild: remove redundant line from bounds.h/asm-offsets.h
 
+Merged into kbuild.git#kbuild, thanks a lot!
 
-OK.  I have posted v2.
-
-
-Best Regards
-Masahiro Yamada
+Michal
 
