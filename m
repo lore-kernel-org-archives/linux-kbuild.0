@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from resqmta-ch2-01v.sys.comcast.net ([69.252.207.33]:41932 "EHLO
-	resqmta-ch2-01v.sys.comcast.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S932958AbbAFTtE (ORCPT
+Received: from resqmta-ch2-12v.sys.comcast.net ([69.252.207.44]:41219 "EHLO
+	resqmta-ch2-12v.sys.comcast.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S932570AbbAFTtD (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 6 Jan 2015 14:49:04 -0500
+	Tue, 6 Jan 2015 14:49:03 -0500
 From: Shuah Khan <shuahkh@osg.samsung.com>
-Subject: [PATCH v4 14/20] selftests/size: add install target to enable test install
-Date: Tue,  6 Jan 2015 12:43:28 -0700
-Message-Id: <5861e16e1b533cae37471a8cf18597d3e9e6b6f6.1420571615.git.shuahkh@osg.samsung.com>
+Subject: [PATCH v4 18/20] selftests/vm: add install target to enable test install
+Date: Tue,  6 Jan 2015 12:43:32 -0700
+Message-Id: <30a7adbde0f926970d0fa18e825f084a63b46940.1420571615.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1420571615.git.shuahkh@osg.samsung.com>
 References: <cover.1420571615.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1420571615.git.shuahkh@osg.samsung.com>
@@ -24,37 +24,37 @@ only from top level kernel source directory.
 
 Signed-off-by: Shuah Khan <shuahkh@osg.samsung.com>
 ---
- tools/testing/selftests/size/Makefile | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+ tools/testing/selftests/vm/Makefile | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/size/Makefile b/tools/testing/selftests/size/Makefile
-index 04dc25e..a1478fa 100644
---- a/tools/testing/selftests/size/Makefile
-+++ b/tools/testing/selftests/size/Makefile
-@@ -1,12 +1,22 @@
- CC = $(CROSS_COMPILE)gcc
+diff --git a/tools/testing/selftests/vm/Makefile b/tools/testing/selftests/vm/Makefile
+index 4c4b1f6..3312057 100644
+--- a/tools/testing/selftests/vm/Makefile
++++ b/tools/testing/selftests/vm/Makefile
+@@ -4,13 +4,22 @@ CC = $(CROSS_COMPILE)gcc
+ CFLAGS = -Wall
+ BINARIES = hugepage-mmap hugepage-shm map_hugetlb thuge-gen hugetlbfstest
+ BINARIES += transhuge-stress
++TEST_STR = /bin/sh ./run_vmtests || echo 'vmtests: [FAIL]'
  
-+TEST_STR = ./get_size || echo 'get_size selftests: [FAIL]'
-+
- all: get_size
- 
- get_size: get_size.c
- 	$(CC) -static -ffreestanding -nostartfiles -s $< -o $@
+ all: $(BINARIES)
+ %: %.c
+ 	$(CC) $(CFLAGS) -o $@ $^
  
 +install:
 +ifdef INSTALL_KSFT_PATH
-+	install ./get_size $(INSTALL_KSFT_PATH)
++	install run_vmtests $(BINARIES) $(INSTALL_KSFT_PATH)
 +	@echo "$(TEST_STR)" >> $(KSELFTEST)
 +else
 +	@echo "Run make kselftest_install in top level source directory"
 +endif
 +
  run_tests: all
--	./get_size
+-	@/bin/sh ./run_vmtests || (echo "vmtests: [FAIL]"; exit 1)
 +	@$(TEST_STR)
  
  clean:
- 	$(RM) get_size
+ 	$(RM) $(BINARIES)
 -- 
 2.1.0
 
