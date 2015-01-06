@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from resqmta-po-09v.sys.comcast.net ([96.114.154.168]:41368 "EHLO
-	resqmta-po-09v.sys.comcast.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1756603AbbAFTvq (ORCPT
+Received: from resqmta-ch2-08v.sys.comcast.net ([69.252.207.40]:60984 "EHLO
+	resqmta-ch2-08v.sys.comcast.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S932646AbbAFTnu (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 6 Jan 2015 14:51:46 -0500
+	Tue, 6 Jan 2015 14:43:50 -0500
 From: Shuah Khan <shuahkh@osg.samsung.com>
-Subject: [PATCH v4 02/20] selftests/cpu-hotplug: add install target to enable test install
-Date: Tue,  6 Jan 2015 12:43:16 -0700
-Message-Id: <83e299d0172fa4487f8cd6db6c529fbbc8ff2ca5.1420571615.git.shuahkh@osg.samsung.com>
+Subject: [PATCH v4 05/20] selftests/ftrace: add install target to enable test install
+Date: Tue,  6 Jan 2015 12:43:19 -0700
+Message-Id: <20a71af8dcebf0369890391e8587afc5ca1a8035.1420571615.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1420571615.git.shuahkh@osg.samsung.com>
 References: <cover.1420571615.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1420571615.git.shuahkh@osg.samsung.com>
@@ -23,42 +23,36 @@ kselftest script to run the test. Install target can be run
 only from top level kernel source directory.
 
 Signed-off-by: Shuah Khan <shuahkh@osg.samsung.com>
+Acked-by: Steven Rostedt <rostedt@goodmis.org>
+Acked-by: Masami Hiramatsu <masami.hiramatsu.pt@hitachi.com>
 ---
- tools/testing/selftests/cpu-hotplug/Makefile               | 14 ++++++++++++--
- .../cpu-hotplug/{on-off-test.sh => cpu-on-off-test.sh}     |  0
- 2 files changed, 12 insertions(+), 2 deletions(-)
- rename tools/testing/selftests/cpu-hotplug/{on-off-test.sh => cpu-on-off-test.sh} (100%)
+ tools/testing/selftests/ftrace/Makefile | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/cpu-hotplug/Makefile b/tools/testing/selftests/cpu-hotplug/Makefile
-index e9c28d8..c168033 100644
---- a/tools/testing/selftests/cpu-hotplug/Makefile
-+++ b/tools/testing/selftests/cpu-hotplug/Makefile
-@@ -1,9 +1,19 @@
-+TEST_STR=/bin/bash ./cpu-on-off-test.sh || echo 'cpu-hotplug selftests: [FAIL]'
+diff --git a/tools/testing/selftests/ftrace/Makefile b/tools/testing/selftests/ftrace/Makefile
+index 76cc9f1..c5c77584 100644
+--- a/tools/testing/selftests/ftrace/Makefile
++++ b/tools/testing/selftests/ftrace/Makefile
+@@ -1,7 +1,18 @@
++TEST_STR = /bin/sh ./ftracetest || echo 'ftrace selftests: [FAIL]'
 +
  all:
  
 +install:
 +ifdef INSTALL_KSFT_PATH
-+	install ./cpu-on-off-test.sh $(INSTALL_KSFT_PATH)/cpu-on-off-test.sh
-+	@echo "$(TEST_STR)" >> $(KSELFTEST)
++	install ./ftracetest $(INSTALL_KSFT_PATH)
++	@cp -r test.d $(INSTALL_KSFT_PATH)
++	echo "$(TEST_STR)" >> $(KSELFTEST)
 +else
 +	@echo "Run make kselftest_install in top level source directory"
 +endif
 +
  run_tests:
--	@/bin/bash ./on-off-test.sh || echo "cpu-hotplug selftests: [FAIL]"
+-	@/bin/sh ./ftracetest || echo "ftrace selftests: [FAIL]"
 +	@$(TEST_STR)
  
- run_full_test:
--	@/bin/bash ./on-off-test.sh -a || echo "cpu-hotplug selftests: [FAIL]"
-+	@/bin/bash ./cpu-on-off-test.sh -a || echo "cpu-hotplug selftests: [FAIL]"
- 
  clean:
-diff --git a/tools/testing/selftests/cpu-hotplug/on-off-test.sh b/tools/testing/selftests/cpu-hotplug/cpu-on-off-test.sh
-similarity index 100%
-rename from tools/testing/selftests/cpu-hotplug/on-off-test.sh
-rename to tools/testing/selftests/cpu-hotplug/cpu-on-off-test.sh
+ 	rm -rf logs/*
 -- 
 2.1.0
 
