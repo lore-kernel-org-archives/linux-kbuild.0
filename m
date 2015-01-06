@@ -1,36 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cpsmtpb-ews10.kpnxchange.com ([213.75.39.15]:64496 "EHLO
-	cpsmtpb-ews10.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1754103AbbAFBUh (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 5 Jan 2015 20:20:37 -0500
-Message-ID: <1420507235.14308.61.camel@x220>
-Subject: Re: [PATCH] kconfig: use bool instead of boolean for type
- definition attributes
-From: Paul Bolle <pebolle@tiscali.nl>
-Date: Tue, 06 Jan 2015 02:20:35 +0100
+Received: from cantor2.suse.de ([195.135.220.15]:34183 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752654AbbAFIs4 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 6 Jan 2015 03:48:56 -0500
+Message-ID: <54ABA174.70204@suse.cz>
+Date: Tue, 06 Jan 2015 09:48:52 +0100
+From: Michal Marek <mmarek@suse.cz>
+MIME-Version: 1.0
+Subject: Re: [PATCH] kconfig: use bool instead of boolean for type definition
+ attributes
+References: <1419108071-11607-1-git-send-email-cj@linux.com> <20150105194305.GB1513@betelgeuse.hsd1.ma.comcast.net> <1420499197.14308.45.camel@x220> <20150106004713.GD1513@betelgeuse.hsd1.ma.comcast.net> <20150106011131.GE1513@betelgeuse.hsd1.ma.comcast.net>
 In-Reply-To: <20150106011131.GE1513@betelgeuse.hsd1.ma.comcast.net>
-References: <1419108071-11607-1-git-send-email-cj@linux.com>
-	 <20150105194305.GB1513@betelgeuse.hsd1.ma.comcast.net>
-	 <1420499197.14308.45.camel@x220>
-	 <20150106004713.GD1513@betelgeuse.hsd1.ma.comcast.net>
-	 <20150106011131.GE1513@betelgeuse.hsd1.ma.comcast.net>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Christoph Jaeger <cj@linux.com>
-Cc: yann.morin.1998@free.fr, akpm@linux-foundation.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, dborkman@redhat.com, Michal Marek <mmarek@suse.cz>
+To: Christoph Jaeger <cj@linux.com>, Paul Bolle <pebolle@tiscali.nl>
+Cc: yann.morin.1998@free.fr, akpm@linux-foundation.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, dborkman@redhat.com
 
-On Mon, 2015-01-05 at 20:11 -0500, Christoph Jaeger wrote:
+On 2015-01-06 02:11, Christoph Jaeger wrote:
+> On Mon, Jan 05, 2015 at 07:47:13PM -0500, Christoph Jaeger wrote:
+>> On Tue, Jan 06, 2015 at 12:06:37AM +0100, Paul Bolle wrote:
+>>> On Mon, 2015-01-05 at 14:43 -0500, Christoph Jaeger wrote:
+>>>> (adding Michal Marek)
+>>>
+>>> Yann added no commits in 2014. And I actually think Yann reacted to
+>>> almost no patches last year. Perhaps none at all. What's going on?
+>>
+>> Dunno, but at least Michal seems to be up and running.
+> 
 > According to Michal, Yann was about to take over maintainership, but
 > apparently he disappeared.
 
-According to MAINTAINERS Yann already took over, at the end of 2013.
-And, on a personal note, I got fed up with the situation when a
-yann.morin.1998 did recently manage to post comments at lwn.net.
+People are free to change their interests or priorities :-).
 
+I'll merge your patch and try to keep an eye on other kconfig patches
+posted to the mailing lists.
 
-Paul Bolle
-
+Michal
