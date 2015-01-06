@@ -1,33 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:43143 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932342AbbAFTtc (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 6 Jan 2015 14:49:32 -0500
-Message-ID: <54AC3C49.305@suse.cz>
-Date: Tue, 06 Jan 2015 20:49:29 +0100
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: [PATCH v6] builddeb: Try to determine distribution
-References: <1420278619-6637-1-git-send-email-sedat.dilek@gmail.com> <CA+icZUXMUOh-P6mK4hAjPX=yVWJ9Lh=3AbWPEfmDKCpMpn9C3w@mail.gmail.com>
-In-Reply-To: <CA+icZUXMUOh-P6mK4hAjPX=yVWJ9Lh=3AbWPEfmDKCpMpn9C3w@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Received: from resqmta-ch2-09v.sys.comcast.net ([69.252.207.41]:46239 "EHLO
+	resqmta-ch2-09v.sys.comcast.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S932342AbbAFTs4 (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 6 Jan 2015 14:48:56 -0500
+From: Shuah Khan <shuahkh@osg.samsung.com>
+Subject: [PATCH v4 11/20] selftests/mqueue: add install target to enable test install
+Date: Tue,  6 Jan 2015 12:43:25 -0700
+Message-Id: <9d5b3b0d9331dc373942f62633c0a5263c40943b.1420571615.git.shuahkh@osg.samsung.com>
+In-Reply-To: <cover.1420571615.git.shuahkh@osg.samsung.com>
+References: <cover.1420571615.git.shuahkh@osg.samsung.com>
+In-Reply-To: <cover.1420571615.git.shuahkh@osg.samsung.com>
+References: <cover.1420571615.git.shuahkh@osg.samsung.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: sedat.dilek@gmail.com
-Cc: Ben Hutchings <ben@decadent.org.uk>, maximilian attems <max@stro.at>, Thorsten Glaser <tg@mirbsd.org>, Alexander Wirt <formorer@debian.org>, linux-kbuild@vger.kernel.org
+To: mmarek@suse.cz, gregkh@linuxfoundation.org, akpm@linux-foundation.org, rostedt@goodmis.org, mingo@redhat.com, davem@davemloft.net, keescook@chromium.org, tranmanphong@gmail.com, mpe@ellerman.id.au, cov@codeaurora.org, dh.herrmann@gmail.com, hughd@google.com, bobby.prani@gmail.com, serge.hallyn@ubuntu.com, ebiederm@xmission.com, tim.bird@sonymobile.com, josh@joshtriplett.org, koct9i@gmail.com, masami.hiramatsu.pt@hitachi.com
+Cc: Shuah Khan <shuahkh@osg.samsung.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-api@vger.kernel.org, netdev@vger.kernel.org
 
-Dne 6.1.2015 v 12:39 Sedat Dilek napsal(a):
-> On Sat, Jan 3, 2015 at 10:50 AM, Sedat Dilek <sedat.dilek@gmail.com> wrote:
->> lsb_release command is a good choice to determine the distribution
->> name for the changelog file in the generated Debian packages [1].
->> Its installation is no precondition.
->> In Debian it is still not essential or build-essential.
-[...]
-> According to your explanations about your development workflow and Git
-> trees this can go now to kbuild.git#misc.
+Add a new make target to enable installing test. This target
+installs test in the kselftest install location and add to the
+kselftest script to run the test. Install target can be run
+only from top level kernel source directory.
 
-I applied it to kbuild.git#misc now.
+Signed-off-by: Shuah Khan <shuahkh@osg.samsung.com>
+---
+ tools/testing/selftests/mqueue/Makefile | 18 +++++++++++++++---
+ 1 file changed, 15 insertions(+), 3 deletions(-)
 
-Michal
+diff --git a/tools/testing/selftests/mqueue/Makefile b/tools/testing/selftests/mqueue/Makefile
+index 8056e2e..813c9e2 100644
+--- a/tools/testing/selftests/mqueue/Makefile
++++ b/tools/testing/selftests/mqueue/Makefile
+@@ -1,10 +1,22 @@
++MQ_OPEN_TEST_STR = ./mq_open_tests /test1 || echo 'mq_open_tests: [FAIL]'
++MQ_PERF_TEST_STR = ./mq_perf_tests || echo 'mq_perf_tests: [FAIL]'
++
+ all:
+ 	gcc -O2 mq_open_tests.c -o mq_open_tests -lrt
+ 	gcc -O2 -o mq_perf_tests mq_perf_tests.c -lrt -lpthread -lpopt
+ 
+-run_tests:
+-	@./mq_open_tests /test1 || echo "mq_open_tests: [FAIL]"
+-	@./mq_perf_tests || echo "mq_perf_tests: [FAIL]"
++install:
++ifdef INSTALL_KSFT_PATH
++	install ./mq_open_tests ./mq_perf_tests $(INSTALL_KSFT_PATH)
++	@echo "$(MQ_OPEN_TEST_STR)" >> $(KSELFTEST)
++	@echo "$(MQ_PERF_TEST_STR)" >> $(KSELFTEST)
++else
++	@echo "Run make kselftest_install in top level source directory"
++endif
++
++run_tests: all
++	@$(MQ_OPEN_TEST_STR)
++	@$(MQ_PERF_TEST_STR)
+ 
+ clean:
+ 	rm -f mq_open_tests mq_perf_tests
+-- 
+2.1.0
 
