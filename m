@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from resqmta-ch2-04v.sys.comcast.net ([69.252.207.36]:50825 "EHLO
-	resqmta-ch2-04v.sys.comcast.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S932407AbbAFTss (ORCPT
+Received: from resqmta-ch2-03v.sys.comcast.net ([69.252.207.35]:46091 "EHLO
+	resqmta-ch2-03v.sys.comcast.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S932718AbbAFTsv (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 6 Jan 2015 14:48:48 -0500
+	Tue, 6 Jan 2015 14:48:51 -0500
 From: Shuah Khan <shuahkh@osg.samsung.com>
-Subject: [PATCH v4 08/20] selftests/memfd: add install target to enable test install
-Date: Tue,  6 Jan 2015 12:43:22 -0700
-Message-Id: <4353762c318dad84798bb9f45bb338be7bb3891f.1420571615.git.shuahkh@osg.samsung.com>
+Subject: [PATCH v4 10/20] selftests/mount: add install target to enable test install
+Date: Tue,  6 Jan 2015 12:43:24 -0700
+Message-Id: <e9ad7dee751cb83d358ddc7e2949e312db9db1ed.1420571615.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1420571615.git.shuahkh@osg.samsung.com>
 References: <cover.1420571615.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1420571615.git.shuahkh@osg.samsung.com>
@@ -24,47 +24,38 @@ only from top level kernel source directory.
 
 Signed-off-by: Shuah Khan <shuahkh@osg.samsung.com>
 ---
- tools/testing/selftests/memfd/Makefile | 17 ++++++++++++++---
- 1 file changed, 14 insertions(+), 3 deletions(-)
+ tools/testing/selftests/mount/Makefile | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/memfd/Makefile b/tools/testing/selftests/memfd/Makefile
-index b80cd10..23c84bf 100644
---- a/tools/testing/selftests/memfd/Makefile
-+++ b/tools/testing/selftests/memfd/Makefile
-@@ -2,19 +2,30 @@ CFLAGS += -D_FILE_OFFSET_BITS=64
- CFLAGS += -I../../../../include/uapi/
- CFLAGS += -I../../../../include/
+diff --git a/tools/testing/selftests/mount/Makefile b/tools/testing/selftests/mount/Makefile
+index 337d853..422a2d8 100644
+--- a/tools/testing/selftests/mount/Makefile
++++ b/tools/testing/selftests/mount/Makefile
+@@ -1,5 +1,7 @@
+ # Makefile for mount selftests.
  
-+INSTALL_PROGS = memfd_test fuse_test run_fuse_test.sh
-+MEMFD_TEST_STR = ./memfd_test || echo 'memfd_test: [FAIL]'
-+FUSE_TEST_STR = ./run_fuse_test.sh || echo 'fuse_test: [FAIL]'
++TEST_STR = if [ -f /proc/self/uid_map ] ; then ./unprivileged-remount-test ; fi
 +
- all:
- 	gcc $(CFLAGS) memfd_test.c -o memfd_test
+ all: unprivileged-remount-test
  
+ unprivileged-remount-test: unprivileged-remount-test.c
+@@ -7,7 +9,15 @@ unprivileged-remount-test: unprivileged-remount-test.c
+ 
+ # Allow specific tests to be selected.
+ test_unprivileged_remount: unprivileged-remount-test
+-	@if [ -f /proc/self/uid_map ] ; then ./unprivileged-remount-test ; fi
++	@$(TEST_STR)
++
 +install:
 +ifdef INSTALL_KSFT_PATH
-+	install $(INSTALL_PROGS) $(INSTALL_KSFT_PATH)
-+	@echo "$(MEMFD_TEST_STR)" >> $(KSELFTEST)
++	install ./unprivileged-remount-test $(INSTALL_KSFT_PATH)
++	@echo "$(TEST_STR)" >> $(KSELFTEST)
 +else
 +	@echo "Run make kselftest_install in top level source directory"
 +endif
-+
- run_tests: all
--	gcc $(CFLAGS) memfd_test.c -o memfd_test
--	@./memfd_test || echo "memfd_test: [FAIL]"
-+	@$(MEMFD_TEST_STR)
  
- build_fuse:
- 	gcc $(CFLAGS) fuse_mnt.c `pkg-config fuse --cflags --libs` -o fuse_mnt
- 	gcc $(CFLAGS) fuse_test.c -o fuse_test
+ run_tests: all test_unprivileged_remount
  
- run_fuse: build_fuse
--	@./run_fuse_test.sh || echo "fuse_test: [FAIL]"
-+	@$(FUSE_TEST_STR)
- 
- clean:
- 	$(RM) memfd_test fuse_test
 -- 
 2.1.0
 
