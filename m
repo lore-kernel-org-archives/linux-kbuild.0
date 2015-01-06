@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from resqmta-ch2-07v.sys.comcast.net ([69.252.207.39]:48429 "EHLO
-	resqmta-ch2-07v.sys.comcast.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S932987AbbAFTwE (ORCPT
+Received: from resqmta-ch2-04v.sys.comcast.net ([69.252.207.36]:52002 "EHLO
+	resqmta-ch2-04v.sys.comcast.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S932918AbbAFTwE (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Tue, 6 Jan 2015 14:52:04 -0500
 From: Shuah Khan <shuahkh@osg.samsung.com>
-Subject: [PATCH v4 03/20] selftests/efivarfs: add install target to enable test install
-Date: Tue,  6 Jan 2015 12:43:17 -0700
-Message-Id: <29ee24f8de828eb143a1756f77bc44f61c9c3692.1420571615.git.shuahkh@osg.samsung.com>
+Subject: [PATCH v4 06/20] selftests/ipc: add install target to enable test install
+Date: Tue,  6 Jan 2015 12:43:20 -0700
+Message-Id: <98cd1ee5ada03076ba9a6a615498e638bfe4a0ce.1420571615.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1420571615.git.shuahkh@osg.samsung.com>
 References: <cover.1420571615.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1420571615.git.shuahkh@osg.samsung.com>
@@ -24,38 +24,47 @@ only from top level kernel source directory.
 
 Signed-off-by: Shuah Khan <shuahkh@osg.samsung.com>
 ---
- tools/testing/selftests/efivarfs/Makefile | 16 ++++++++++++++--
- 1 file changed, 14 insertions(+), 2 deletions(-)
+ tools/testing/selftests/ipc/Makefile | 19 ++++++++++++++++++-
+ 1 file changed, 18 insertions(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/efivarfs/Makefile b/tools/testing/selftests/efivarfs/Makefile
-index 29e8c6b..c5f389d 100644
---- a/tools/testing/selftests/efivarfs/Makefile
-+++ b/tools/testing/selftests/efivarfs/Makefile
-@@ -3,10 +3,22 @@ CFLAGS = -Wall
+diff --git a/tools/testing/selftests/ipc/Makefile b/tools/testing/selftests/ipc/Makefile
+index 74bbefd..67ea3af 100644
+--- a/tools/testing/selftests/ipc/Makefile
++++ b/tools/testing/selftests/ipc/Makefile
+@@ -11,6 +11,8 @@ endif
  
- test_objs = open-unlink create-read
+ CFLAGS += -I../../../../usr/include/
  
--all: $(test_objs)
-+TEST_STR = /bin/bash ./efivarfs.sh || echo 'efivarfs selftests: [FAIL]'
++TEST_STR = ./msgque_test || echo 'ipc msgque test: [FAIL]'
 +
-+all:
-+	gcc open-unlink.c -o open-unlink
-+	gcc create-read.c -o create-read
-+
+ all:
+ ifeq ($(ARCH),x86)
+ 	gcc $(CFLAGS) msgque.c -o msgque_test
+@@ -18,8 +20,23 @@ else
+ 	echo "Not an x86 target, can't build msgque selftest"
+ endif
+ 
 +install:
 +ifdef INSTALL_KSFT_PATH
-+	install ./efivarfs.sh $(test_objs) $(INSTALL_KSFT_PATH)
++ifeq ($(ARCH),x86)
++	make all
++	install ./msgque_test $(INSTALL_KSFT_PATH)
 +	@echo "$(TEST_STR)" >> $(KSELFTEST)
++else
++	@echo "Not an x86 target, unable to install ipc msgque selftests"
++endif
 +else
 +	@echo "Run make kselftest_install in top level source directory"
 +endif
- 
++
  run_tests: all
--	@/bin/bash ./efivarfs.sh || echo "efivarfs selftests: [FAIL]"
+-	./msgque_test
++ifeq ($(ARCH),x86)
 +	@$(TEST_STR)
++endif
  
  clean:
- 	rm -f $(test_objs)
+ 	rm -fr ./msgque_test
 -- 
 2.1.0
 
