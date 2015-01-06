@@ -1,40 +1,96 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:34183 "EHLO mx2.suse.de"
+Received: from ozlabs.org ([103.22.144.67]:54707 "EHLO ozlabs.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752654AbbAFIs4 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 6 Jan 2015 03:48:56 -0500
-Message-ID: <54ABA174.70204@suse.cz>
-Date: Tue, 06 Jan 2015 09:48:52 +0100
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: [PATCH] kconfig: use bool instead of boolean for type definition
- attributes
-References: <1419108071-11607-1-git-send-email-cj@linux.com> <20150105194305.GB1513@betelgeuse.hsd1.ma.comcast.net> <1420499197.14308.45.camel@x220> <20150106004713.GD1513@betelgeuse.hsd1.ma.comcast.net> <20150106011131.GE1513@betelgeuse.hsd1.ma.comcast.net>
-In-Reply-To: <20150106011131.GE1513@betelgeuse.hsd1.ma.comcast.net>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+	id S1754011AbbAFKUc (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 6 Jan 2015 05:20:32 -0500
+From: Anton Blanchard <anton@samba.org>
+Subject: [PATCH 1/2] jump_label: Allow jump labels to be used in assembly
+Date: Tue,  6 Jan 2015 21:20:27 +1100
+Message-Id: <1420539628-17875-1-git-send-email-anton@samba.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Christoph Jaeger <cj@linux.com>, Paul Bolle <pebolle@tiscali.nl>
-Cc: yann.morin.1998@free.fr, akpm@linux-foundation.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, dborkman@redhat.com
+To: benh@kernel.crashing.org, paulus@samba.org, mpe@ellerman.id.au, mmarek@suse.cz, akpm@linux-foundation.org, jbaron@akamai.com, peterz@infradead.org, liuj97@gmail.com, mingo@kernel.org, mgorman@suse.de
+Cc: linuxppc-dev@lists.ozlabs.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 2015-01-06 02:11, Christoph Jaeger wrote:
-> On Mon, Jan 05, 2015 at 07:47:13PM -0500, Christoph Jaeger wrote:
->> On Tue, Jan 06, 2015 at 12:06:37AM +0100, Paul Bolle wrote:
->>> On Mon, 2015-01-05 at 14:43 -0500, Christoph Jaeger wrote:
->>>> (adding Michal Marek)
->>>
->>> Yann added no commits in 2014. And I actually think Yann reacted to
->>> almost no patches last year. Perhaps none at all. What's going on?
->>
->> Dunno, but at least Michal seems to be up and running.
-> 
-> According to Michal, Yann was about to take over maintainership, but
-> apparently he disappeared.
+To use jump labels in assembly we need the HAVE_JUMP_LABEL define,
+so we select a fallback version if the toolchain does not support
+them.
 
-People are free to change their interests or priorities :-).
+Modify linux/jump_label.h so it can be included by assembly files.
+We also need to add -DCC_HAVE_ASM_GOTO to KBUILD_AFLAGS.
 
-I'll merge your patch and try to keep an eye on other kconfig patches
-posted to the mailing lists.
+Signed-off-by: Anton Blanchard <anton@samba.org>
+---
+ Makefile                   |  1 +
+ include/linux/jump_label.h | 21 +++++++++++++++++----
+ 2 files changed, 18 insertions(+), 4 deletions(-)
 
-Michal
+diff --git a/Makefile b/Makefile
+index ef748e1..7b83c3f 100644
+--- a/Makefile
++++ b/Makefile
+@@ -774,6 +774,7 @@ KBUILD_ARFLAGS := $(call ar-option,D)
+ # check for 'asm goto'
+ ifeq ($(shell $(CONFIG_SHELL) $(srctree)/scripts/gcc-goto.sh $(CC)), y)
+ 	KBUILD_CFLAGS += -DCC_HAVE_ASM_GOTO
++	KBUILD_AFLAGS += -DCC_HAVE_ASM_GOTO
+ endif
+ 
+ include $(srctree)/scripts/Makefile.extrawarn
+diff --git a/include/linux/jump_label.h b/include/linux/jump_label.h
+index 98f923b6..f4de473 100644
+--- a/include/linux/jump_label.h
++++ b/include/linux/jump_label.h
+@@ -45,6 +45,12 @@
+  * same as using STATIC_KEY_INIT_FALSE.
+  */
+ 
++#if defined(CC_HAVE_ASM_GOTO) && defined(CONFIG_JUMP_LABEL)
++# define HAVE_JUMP_LABEL
++#endif
++
++#ifndef __ASSEMBLY__
++
+ #include <linux/types.h>
+ #include <linux/compiler.h>
+ #include <linux/bug.h>
+@@ -55,7 +61,7 @@ extern bool static_key_initialized;
+ 				    "%s used before call to jump_label_init", \
+ 				    __func__)
+ 
+-#if defined(CC_HAVE_ASM_GOTO) && defined(CONFIG_JUMP_LABEL)
++#ifdef HAVE_JUMP_LABEL
+ 
+ struct static_key {
+ 	atomic_t enabled;
+@@ -66,13 +72,18 @@ struct static_key {
+ #endif
+ };
+ 
+-# include <asm/jump_label.h>
+-# define HAVE_JUMP_LABEL
+ #else
+ struct static_key {
+ 	atomic_t enabled;
+ };
+-#endif	/* CC_HAVE_ASM_GOTO && CONFIG_JUMP_LABEL */
++#endif	/* HAVE_JUMP_LABEL */
++#endif /* __ASSEMBLY__ */
++
++#ifdef HAVE_JUMP_LABEL
++#include <asm/jump_label.h>
++#endif
++
++#ifndef __ASSEMBLY__
+ 
+ enum jump_label_type {
+ 	JUMP_LABEL_DISABLE = 0,
+@@ -203,3 +214,5 @@ static inline bool static_key_enabled(struct static_key *key)
+ }
+ 
+ #endif	/* _LINUX_JUMP_LABEL_H */
++
++#endif /* __ASSEMBLY__ */
+-- 
+2.1.0
+
