@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from resqmta-ch2-04v.sys.comcast.net ([69.252.207.36]:52002 "EHLO
-	resqmta-ch2-04v.sys.comcast.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S932918AbbAFTwE (ORCPT
+Received: from resqmta-ch2-06v.sys.comcast.net ([69.252.207.38]:43498 "EHLO
+	resqmta-ch2-06v.sys.comcast.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S932775AbbAFTwD (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 6 Jan 2015 14:52:04 -0500
+	Tue, 6 Jan 2015 14:52:03 -0500
 From: Shuah Khan <shuahkh@osg.samsung.com>
-Subject: [PATCH v4 06/20] selftests/ipc: add install target to enable test install
-Date: Tue,  6 Jan 2015 12:43:20 -0700
-Message-Id: <98cd1ee5ada03076ba9a6a615498e638bfe4a0ce.1420571615.git.shuahkh@osg.samsung.com>
+Subject: [PATCH v4 01/20] selftests/breakpoints: add install target to enable test install
+Date: Tue,  6 Jan 2015 12:43:15 -0700
+Message-Id: <a52b2be855825de0231e1f25cf9776af3c712fac.1420571615.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1420571615.git.shuahkh@osg.samsung.com>
 References: <cover.1420571615.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1420571615.git.shuahkh@osg.samsung.com>
@@ -24,47 +24,46 @@ only from top level kernel source directory.
 
 Signed-off-by: Shuah Khan <shuahkh@osg.samsung.com>
 ---
- tools/testing/selftests/ipc/Makefile | 19 ++++++++++++++++++-
- 1 file changed, 18 insertions(+), 1 deletion(-)
+ tools/testing/selftests/breakpoints/Makefile | 19 +++++++++++++++++--
+ 1 file changed, 17 insertions(+), 2 deletions(-)
 
-diff --git a/tools/testing/selftests/ipc/Makefile b/tools/testing/selftests/ipc/Makefile
-index 74bbefd..67ea3af 100644
---- a/tools/testing/selftests/ipc/Makefile
-+++ b/tools/testing/selftests/ipc/Makefile
-@@ -11,6 +11,8 @@ endif
- 
- CFLAGS += -I../../../../usr/include/
- 
-+TEST_STR = ./msgque_test || echo 'ipc msgque test: [FAIL]'
-+
- all:
- ifeq ($(ARCH),x86)
- 	gcc $(CFLAGS) msgque.c -o msgque_test
-@@ -18,8 +20,23 @@ else
- 	echo "Not an x86 target, can't build msgque selftest"
+diff --git a/tools/testing/selftests/breakpoints/Makefile b/tools/testing/selftests/breakpoints/Makefile
+index e18b42b..c738d4c 100644
+--- a/tools/testing/selftests/breakpoints/Makefile
++++ b/tools/testing/selftests/breakpoints/Makefile
+@@ -8,6 +8,7 @@ ifeq ($(ARCH),x86_64)
+ 	ARCH := x86
  endif
  
++TEST_STR = ./breakpoint_test || echo 'breakpoints selftests: [FAIL]'
+ 
+ all:
+ ifeq ($(ARCH),x86)
+@@ -16,8 +17,22 @@ else
+ 	echo "Not an x86 target, can't build breakpoints selftests"
+ endif
+ 
+-run_tests:
+-	@./breakpoint_test || echo "breakpoints selftests: [FAIL]"
 +install:
 +ifdef INSTALL_KSFT_PATH
 +ifeq ($(ARCH),x86)
-+	make all
-+	install ./msgque_test $(INSTALL_KSFT_PATH)
++	install ./breakpoint_test $(INSTALL_KSFT_PATH)
 +	@echo "$(TEST_STR)" >> $(KSELFTEST)
 +else
-+	@echo "Not an x86 target, unable to install ipc msgque selftests"
++	@echo "Not an x86 target, unable to install breakpoints selftests"
 +endif
 +else
 +	@echo "Run make kselftest_install in top level source directory"
 +endif
 +
- run_tests: all
--	./msgque_test
++run_tests: all
 +ifeq ($(ARCH),x86)
 +	@$(TEST_STR)
 +endif
  
  clean:
- 	rm -fr ./msgque_test
+ 	rm -fr breakpoint_test
 -- 
 2.1.0
 
