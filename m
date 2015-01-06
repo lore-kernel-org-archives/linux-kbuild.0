@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from resqmta-ch2-10v.sys.comcast.net ([69.252.207.42]:48145 "EHLO
-	resqmta-ch2-10v.sys.comcast.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S932706AbbAFToA (ORCPT
+Received: from resqmta-ch2-07v.sys.comcast.net ([69.252.207.39]:48430 "EHLO
+	resqmta-ch2-07v.sys.comcast.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S932587AbbAFTwH (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 6 Jan 2015 14:44:00 -0500
+	Tue, 6 Jan 2015 14:52:07 -0500
 From: Shuah Khan <shuahkh@osg.samsung.com>
-Subject: [PATCH v4 16/20] selftests/timers: add install target to enable test install
-Date: Tue,  6 Jan 2015 12:43:30 -0700
-Message-Id: <a7d59f0840589027970bec63241bcc084406744d.1420571615.git.shuahkh@osg.samsung.com>
+Subject: [PATCH v4 07/20] selftests/kcmp: add install target to enable test install
+Date: Tue,  6 Jan 2015 12:43:21 -0700
+Message-Id: <0ef6535b2984b1aa16144dbd06b0779d40bb2dc4.1420571615.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1420571615.git.shuahkh@osg.samsung.com>
 References: <cover.1420571615.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1420571615.git.shuahkh@osg.samsung.com>
@@ -24,33 +24,36 @@ only from top level kernel source directory.
 
 Signed-off-by: Shuah Khan <shuahkh@osg.samsung.com>
 ---
- tools/testing/selftests/timers/Makefile | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+ tools/testing/selftests/kcmp/Makefile | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/timers/Makefile b/tools/testing/selftests/timers/Makefile
-index eb2859f..6c03e92 100644
---- a/tools/testing/selftests/timers/Makefile
-+++ b/tools/testing/selftests/timers/Makefile
-@@ -1,8 +1,18 @@
-+TEST_STR = ./posix_timers
+diff --git a/tools/testing/selftests/kcmp/Makefile b/tools/testing/selftests/kcmp/Makefile
+index ff0eefd..46267c1 100644
+--- a/tools/testing/selftests/kcmp/Makefile
++++ b/tools/testing/selftests/kcmp/Makefile
+@@ -1,10 +1,21 @@
+ CC := $(CROSS_COMPILE)$(CC)
+ CFLAGS += -I../../../../usr/include/
+ 
++TEST_STR = ./kcmp_test || echo 'kcmp_test: [FAIL]'
 +
- all:
- 	gcc posix_timers.c -o posix_timers -lrt
+ all: kcmp_test
  
 +install:
 +ifdef INSTALL_KSFT_PATH
-+	install ./posix_timers $(INSTALL_KSFT_PATH)
++	install ./kcmp_test $(INSTALL_KSFT_PATH)
 +	@echo "$(TEST_STR)" >> $(KSELFTEST)
++	@echo rm -f kcmp-test-file >> $(KSELFTEST)
 +else
 +	@echo "Run make kselftest_install in top level source directory"
 +endif
 +
  run_tests: all
--	./posix_timers
+-	@./kcmp_test || echo "kcmp_test: [FAIL]"
 +	@$(TEST_STR)
  
  clean:
- 	rm -f ./posix_timers
+ 	$(RM) kcmp_test kcmp-test-file
 -- 
 2.1.0
 
