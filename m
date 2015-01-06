@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from resqmta-ch2-02v.sys.comcast.net ([69.252.207.34]:50642 "EHLO
+Received: from resqmta-ch2-02v.sys.comcast.net ([69.252.207.34]:50760 "EHLO
 	resqmta-ch2-02v.sys.comcast.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S932957AbbAFTtD (ORCPT
+	by vger.kernel.org with ESMTP id S932941AbbAFTs6 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 6 Jan 2015 14:49:03 -0500
+	Tue, 6 Jan 2015 14:48:58 -0500
 From: Shuah Khan <shuahkh@osg.samsung.com>
-Subject: [PATCH v4 20/20] kbuild: add a new kselftest_install make target to install selftests
-Date: Tue,  6 Jan 2015 12:43:34 -0700
-Message-Id: <2c5a28faaa79d9c2415854a08817ada509fcb943.1420571615.git.shuahkh@osg.samsung.com>
+Subject: [PATCH v4 13/20] selftests/ptrace: add install target to enable test install
+Date: Tue,  6 Jan 2015 12:43:27 -0700
+Message-Id: <e6e0602db98043998a0059355e4500d0c559953a.1420571615.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1420571615.git.shuahkh@osg.samsung.com>
 References: <cover.1420571615.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1420571615.git.shuahkh@osg.samsung.com>
@@ -17,60 +17,44 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: mmarek@suse.cz, gregkh@linuxfoundation.org, akpm@linux-foundation.org, rostedt@goodmis.org, mingo@redhat.com, davem@davemloft.net, keescook@chromium.org, tranmanphong@gmail.com, mpe@ellerman.id.au, cov@codeaurora.org, dh.herrmann@gmail.com, hughd@google.com, bobby.prani@gmail.com, serge.hallyn@ubuntu.com, ebiederm@xmission.com, tim.bird@sonymobile.com, josh@joshtriplett.org, koct9i@gmail.com, masami.hiramatsu.pt@hitachi.com
 Cc: Shuah Khan <shuahkh@osg.samsung.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-api@vger.kernel.org, netdev@vger.kernel.org
 
-Add a new make target to install to install kernel selftests.
-This new target will build and install selftests. kselftest
-target now depends on kselftest_install and runs the generated
-kselftest script to reduce duplicate work and for common look
-and feel when running tests.
-
-make kselftest_target:
--- exports kselftest INSTALL_KSFT_PATH
-   default $(INSTALL_MOD_PATH)/lib/kselftest/$(KERNELRELEASE)
--- exports INSTALL_KSFT_PATH
--- runs selftests make install target
+Add a new make target to enable installing test. This target
+installs test in the kselftest install location and add to the
+kselftest script to run the test. Install target can be run
+only from top level kernel source directory.
 
 Signed-off-by: Shuah Khan <shuahkh@osg.samsung.com>
 ---
- Makefile | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+ tools/testing/selftests/ptrace/Makefile | 16 +++++++++++++---
+ 1 file changed, 13 insertions(+), 3 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index b1c3254..99fac47 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1072,12 +1072,21 @@ headers_check: headers_install
- 	$(Q)$(MAKE) $(hdr-inst)=arch/$(hdr-arch)/include/uapi/asm $(hdr-dst) HDRCHECK=1
+diff --git a/tools/testing/selftests/ptrace/Makefile b/tools/testing/selftests/ptrace/Makefile
+index 47ae2d3..6fc352c 100644
+--- a/tools/testing/selftests/ptrace/Makefile
++++ b/tools/testing/selftests/ptrace/Makefile
+@@ -1,10 +1,20 @@
+ CFLAGS += -iquote../../../../include/uapi -Wall
+-peeksiginfo: peeksiginfo.c
  
- # ---------------------------------------------------------------------------
--# Kernel selftest
-+# Kernel selftest targets
+-all: peeksiginfo
++TEST_STR = ./peeksiginfo || echo 'peeksiginfo selftests: [FAIL]'
 +
-+# Default base path for kselftest install
-+INSTALL_KSFT_PATH = $(INSTALL_MOD_PATH)/lib/kselftest/$(KERNELRELEASE)
-+export INSTALL_KSFT_PATH
- 
- PHONY += kselftest
- kselftest:
- 	$(Q)$(MAKE) -C tools/testing/selftests run_tests
- 
-+# Kernel selftest install
-+PHONY += kselftest_install
-+kselftest_install:
-+	$(Q)$(MAKE) -C tools/testing/selftests install
++all:
++	gcc peeksiginfo.c -o peeksiginfo
 +
- # ---------------------------------------------------------------------------
- # Modules
++install:
++ifdef INSTALL_KSFT_PATH
++	install ./peeksiginfo $(INSTALL_KSFT_PATH)
++	@echo "$(TEST_STR)" >> $(KSELFTEST)
++else
++	@echo "Run make kselftest_install in top level source directory"
++endif
  
-@@ -1286,6 +1295,9 @@ help:
- 	@echo  '                    Build, install, and boot kernel before'
- 	@echo  '                    running kselftest on it'
- 	@echo  ''
-+	@echo  '  kselftest_install - Install Kselftests to INSTALL_KSFT_PATH'
-+	@echo  '                      default: $(INSTALL_MOD_PATH)/lib/kselftest/$(KERNELRELEASE)'
-+	@echo  ''
- 	@echo  'Kernel packaging:'
- 	@$(MAKE) $(build)=$(package-dir) help
- 	@echo  ''
+ clean:
+ 	rm -f peeksiginfo
+ 
+ run_tests: all
+-	@./peeksiginfo || echo "peeksiginfo selftests: [FAIL]"
++	@$(TEST_STR)
 -- 
 2.1.0
 
