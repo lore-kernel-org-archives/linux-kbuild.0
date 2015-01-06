@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from resqmta-ch2-12v.sys.comcast.net ([69.252.207.44]:41055 "EHLO
-	resqmta-ch2-12v.sys.comcast.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S932947AbbAFTtB (ORCPT
+Received: from resqmta-ch2-04v.sys.comcast.net ([69.252.207.36]:50807 "EHLO
+	resqmta-ch2-04v.sys.comcast.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S932940AbbAFTs6 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 6 Jan 2015 14:49:01 -0500
+	Tue, 6 Jan 2015 14:48:58 -0500
 From: Shuah Khan <shuahkh@osg.samsung.com>
-Subject: [PATCH v4 15/20] selftests/sysctl: add install target to enable test install
-Date: Tue,  6 Jan 2015 12:43:29 -0700
-Message-Id: <cfcfa29c9030a6b8d2149b3fe834d65a9069717b.1420571615.git.shuahkh@osg.samsung.com>
+Subject: [PATCH v4 12/20] selftests/net: add install target to enable test install
+Date: Tue,  6 Jan 2015 12:43:26 -0700
+Message-Id: <8fa0f55f4f3687459f018fe25a9e8d6347757c60.1420571615.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1420571615.git.shuahkh@osg.samsung.com>
 References: <cover.1420571615.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1420571615.git.shuahkh@osg.samsung.com>
@@ -24,41 +24,45 @@ only from top level kernel source directory.
 
 Signed-off-by: Shuah Khan <shuahkh@osg.samsung.com>
 ---
- tools/testing/selftests/sysctl/Makefile | 17 +++++++++++++++--
- 1 file changed, 15 insertions(+), 2 deletions(-)
+ tools/testing/selftests/net/Makefile | 20 +++++++++++++++++---
+ 1 file changed, 17 insertions(+), 3 deletions(-)
 
-diff --git a/tools/testing/selftests/sysctl/Makefile b/tools/testing/selftests/sysctl/Makefile
-index 0a92ada..9119ef1 100644
---- a/tools/testing/selftests/sysctl/Makefile
-+++ b/tools/testing/selftests/sysctl/Makefile
-@@ -4,12 +4,25 @@
- # No binaries, but make sure arg-less "make" doesn't trigger "run_tests".
- all:
+diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
+index 62f22cc..a1a8253 100644
+--- a/tools/testing/selftests/net/Makefile
++++ b/tools/testing/selftests/net/Makefile
+@@ -6,14 +6,28 @@ CFLAGS = -Wall -O2 -g
+ CFLAGS += -I../../../../usr/include/
  
-+INSTALL_PROGS = common_tests run_numerictests run_stringtests
-+NUMERIC_TEST_STR = /bin/sh ./run_numerictests
-+STRING_TEST_STR = /bin/sh ./run_stringtests
-+
- # Allow specific tests to be selected.
- test_num:
--	@/bin/sh ./run_numerictests
-+	@$(NUMERIC_TEST_STR)
+ NET_PROGS = socket psock_fanout psock_tpacket
++INSTALL_PROGS = run_netsocktests run_afpackettests test_bpf.sh $(NET_PROGS)
++NETSOCK_TEST_STR = /bin/sh ./run_netsocktests || echo 'sockettests: [FAIL]'
++AFPKT_TEST_STR = /bin/sh ./run_afpackettests || echo 'afpackettests: [FAIL]'
++BFP_TEST_STR = ./test_bpf.sh
  
- test_string:
--	@/bin/sh ./run_stringtests
-+	@$(STRING_TEST_STR)
-+
-+install: all
+ all: $(NET_PROGS)
+ %: %.c
+ 	$(CC) $(CFLAGS) -o $@ $^
+ 
++install:
 +ifdef INSTALL_KSFT_PATH
 +	install $(INSTALL_PROGS) $(INSTALL_KSFT_PATH)
-+	@echo "$(NUMERIC_TEST_STR)" >> $(KSELFTEST)
-+	@echo "$(STRING_TEST_STR)" >> $(KSELFTEST)
++	@echo "$(NETSOCK_TEST_STR)" >> $(KSELFTEST)
++	@echo "$(AFPKT_TEST_STR)" >> $(KSELFTEST)
++	@echo "$(BFP_TEST_STR)" >> $(KSELFTEST)
 +else
 +	@echo "Run make kselftest_install in top level source directory"
 +endif
- 
- run_tests: all test_num test_string
- 
++
+ run_tests: all
+-	@/bin/sh ./run_netsocktests || echo "sockettests: [FAIL]"
+-	@/bin/sh ./run_afpackettests || echo "afpackettests: [FAIL]"
+-	./test_bpf.sh
++	@$(NETSOCK_TEST_STR)
++	@$(AFPKT_TEST_STR)
++	@$(BFP_TEST_STR)
+ clean:
+ 	$(RM) $(NET_PROGS)
 -- 
 2.1.0
 
