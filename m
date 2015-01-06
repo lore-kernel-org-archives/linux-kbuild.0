@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from resqmta-ch2-12v.sys.comcast.net ([69.252.207.44]:41044 "EHLO
-	resqmta-ch2-12v.sys.comcast.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S932407AbbAFTsw (ORCPT
+Received: from resqmta-ch2-01v.sys.comcast.net ([69.252.207.33]:41932 "EHLO
+	resqmta-ch2-01v.sys.comcast.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S932958AbbAFTtE (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 6 Jan 2015 14:48:52 -0500
+	Tue, 6 Jan 2015 14:49:04 -0500
 From: Shuah Khan <shuahkh@osg.samsung.com>
-Subject: [PATCH v4 09/20] selftests/memory-hotplug: add install target to enable test install
-Date: Tue,  6 Jan 2015 12:43:23 -0700
-Message-Id: <8576f564ad9b944e7efe53f5c038ad69c6f392d5.1420571615.git.shuahkh@osg.samsung.com>
+Subject: [PATCH v4 14/20] selftests/size: add install target to enable test install
+Date: Tue,  6 Jan 2015 12:43:28 -0700
+Message-Id: <5861e16e1b533cae37471a8cf18597d3e9e6b6f6.1420571615.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1420571615.git.shuahkh@osg.samsung.com>
 References: <cover.1420571615.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1420571615.git.shuahkh@osg.samsung.com>
@@ -24,41 +24,37 @@ only from top level kernel source directory.
 
 Signed-off-by: Shuah Khan <shuahkh@osg.samsung.com>
 ---
- tools/testing/selftests/memory-hotplug/Makefile            | 14 ++++++++++++--
- .../memory-hotplug/{on-off-test.sh => mem-on-off-test.sh}  |  0
- 2 files changed, 12 insertions(+), 2 deletions(-)
- rename tools/testing/selftests/memory-hotplug/{on-off-test.sh => mem-on-off-test.sh} (100%)
+ tools/testing/selftests/size/Makefile | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/memory-hotplug/Makefile b/tools/testing/selftests/memory-hotplug/Makefile
-index d46b8d4..3bb0a99 100644
---- a/tools/testing/selftests/memory-hotplug/Makefile
-+++ b/tools/testing/selftests/memory-hotplug/Makefile
-@@ -1,9 +1,19 @@
-+TEST_STR=/bin/bash ./mem-on-off-test.sh -r 2 || echo 'memory-hotplug selftests: [FAIL]'
+diff --git a/tools/testing/selftests/size/Makefile b/tools/testing/selftests/size/Makefile
+index 04dc25e..a1478fa 100644
+--- a/tools/testing/selftests/size/Makefile
++++ b/tools/testing/selftests/size/Makefile
+@@ -1,12 +1,22 @@
+ CC = $(CROSS_COMPILE)gcc
+ 
++TEST_STR = ./get_size || echo 'get_size selftests: [FAIL]'
 +
- all:
+ all: get_size
+ 
+ get_size: get_size.c
+ 	$(CC) -static -ffreestanding -nostartfiles -s $< -o $@
  
 +install:
 +ifdef INSTALL_KSFT_PATH
-+	install ./mem-on-off-test.sh $(INSTALL_KSFT_PATH)/mem-on-off-test.sh
-+	@echo "$(TEST_STR)" >> $(KSELFTEST) >> $(KSELFTEST)
++	install ./get_size $(INSTALL_KSFT_PATH)
++	@echo "$(TEST_STR)" >> $(KSELFTEST)
 +else
 +	@echo "Run make kselftest_install in top level source directory"
 +endif
 +
- run_tests:
--	@/bin/bash ./on-off-test.sh -r 2 || echo "memory-hotplug selftests: [FAIL]"
+ run_tests: all
+-	./get_size
 +	@$(TEST_STR)
  
- run_full_test:
--	@/bin/bash ./on-off-test.sh || echo "memory-hotplug selftests: [FAIL]"
-+	@/bin/bash ./mem-on-off-test.sh || echo "memory-hotplug selftests: [FAIL]"
- 
  clean:
-diff --git a/tools/testing/selftests/memory-hotplug/on-off-test.sh b/tools/testing/selftests/memory-hotplug/mem-on-off-test.sh
-similarity index 100%
-rename from tools/testing/selftests/memory-hotplug/on-off-test.sh
-rename to tools/testing/selftests/memory-hotplug/mem-on-off-test.sh
+ 	$(RM) get_size
 -- 
 2.1.0
 
