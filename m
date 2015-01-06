@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from resqmta-ch2-02v.sys.comcast.net ([69.252.207.34]:50760 "EHLO
-	resqmta-ch2-02v.sys.comcast.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S932941AbbAFTs6 (ORCPT
+Received: from resqmta-ch2-12v.sys.comcast.net ([69.252.207.44]:41055 "EHLO
+	resqmta-ch2-12v.sys.comcast.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S932947AbbAFTtB (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 6 Jan 2015 14:48:58 -0500
+	Tue, 6 Jan 2015 14:49:01 -0500
 From: Shuah Khan <shuahkh@osg.samsung.com>
-Subject: [PATCH v4 13/20] selftests/ptrace: add install target to enable test install
-Date: Tue,  6 Jan 2015 12:43:27 -0700
-Message-Id: <e6e0602db98043998a0059355e4500d0c559953a.1420571615.git.shuahkh@osg.samsung.com>
+Subject: [PATCH v4 15/20] selftests/sysctl: add install target to enable test install
+Date: Tue,  6 Jan 2015 12:43:29 -0700
+Message-Id: <cfcfa29c9030a6b8d2149b3fe834d65a9069717b.1420571615.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1420571615.git.shuahkh@osg.samsung.com>
 References: <cover.1420571615.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1420571615.git.shuahkh@osg.samsung.com>
@@ -24,37 +24,41 @@ only from top level kernel source directory.
 
 Signed-off-by: Shuah Khan <shuahkh@osg.samsung.com>
 ---
- tools/testing/selftests/ptrace/Makefile | 16 +++++++++++++---
- 1 file changed, 13 insertions(+), 3 deletions(-)
+ tools/testing/selftests/sysctl/Makefile | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
 
-diff --git a/tools/testing/selftests/ptrace/Makefile b/tools/testing/selftests/ptrace/Makefile
-index 47ae2d3..6fc352c 100644
---- a/tools/testing/selftests/ptrace/Makefile
-+++ b/tools/testing/selftests/ptrace/Makefile
-@@ -1,10 +1,20 @@
- CFLAGS += -iquote../../../../include/uapi -Wall
--peeksiginfo: peeksiginfo.c
+diff --git a/tools/testing/selftests/sysctl/Makefile b/tools/testing/selftests/sysctl/Makefile
+index 0a92ada..9119ef1 100644
+--- a/tools/testing/selftests/sysctl/Makefile
++++ b/tools/testing/selftests/sysctl/Makefile
+@@ -4,12 +4,25 @@
+ # No binaries, but make sure arg-less "make" doesn't trigger "run_tests".
+ all:
  
--all: peeksiginfo
-+TEST_STR = ./peeksiginfo || echo 'peeksiginfo selftests: [FAIL]'
++INSTALL_PROGS = common_tests run_numerictests run_stringtests
++NUMERIC_TEST_STR = /bin/sh ./run_numerictests
++STRING_TEST_STR = /bin/sh ./run_stringtests
 +
-+all:
-+	gcc peeksiginfo.c -o peeksiginfo
+ # Allow specific tests to be selected.
+ test_num:
+-	@/bin/sh ./run_numerictests
++	@$(NUMERIC_TEST_STR)
+ 
+ test_string:
+-	@/bin/sh ./run_stringtests
++	@$(STRING_TEST_STR)
 +
-+install:
++install: all
 +ifdef INSTALL_KSFT_PATH
-+	install ./peeksiginfo $(INSTALL_KSFT_PATH)
-+	@echo "$(TEST_STR)" >> $(KSELFTEST)
++	install $(INSTALL_PROGS) $(INSTALL_KSFT_PATH)
++	@echo "$(NUMERIC_TEST_STR)" >> $(KSELFTEST)
++	@echo "$(STRING_TEST_STR)" >> $(KSELFTEST)
 +else
 +	@echo "Run make kselftest_install in top level source directory"
 +endif
  
- clean:
- 	rm -f peeksiginfo
+ run_tests: all test_num test_string
  
- run_tests: all
--	@./peeksiginfo || echo "peeksiginfo selftests: [FAIL]"
-+	@$(TEST_STR)
 -- 
 2.1.0
 
