@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from resqmta-ch2-06v.sys.comcast.net ([69.252.207.38]:43498 "EHLO
-	resqmta-ch2-06v.sys.comcast.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S932775AbbAFTwD (ORCPT
+Received: from resqmta-ch2-12v.sys.comcast.net ([69.252.207.44]:42153 "EHLO
+	resqmta-ch2-12v.sys.comcast.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S932882AbbAFTwD (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Tue, 6 Jan 2015 14:52:03 -0500
 From: Shuah Khan <shuahkh@osg.samsung.com>
-Subject: [PATCH v4 01/20] selftests/breakpoints: add install target to enable test install
-Date: Tue,  6 Jan 2015 12:43:15 -0700
-Message-Id: <a52b2be855825de0231e1f25cf9776af3c712fac.1420571615.git.shuahkh@osg.samsung.com>
+Subject: [PATCH v4 04/20] selftests/firmware: add install target to enable test install
+Date: Tue,  6 Jan 2015 12:43:18 -0700
+Message-Id: <84932e435fdf85cbbec62b35210d33178321a2a4.1420571615.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1420571615.git.shuahkh@osg.samsung.com>
 References: <cover.1420571615.git.shuahkh@osg.samsung.com>
 In-Reply-To: <cover.1420571615.git.shuahkh@osg.samsung.com>
@@ -24,46 +24,65 @@ only from top level kernel source directory.
 
 Signed-off-by: Shuah Khan <shuahkh@osg.samsung.com>
 ---
- tools/testing/selftests/breakpoints/Makefile | 19 +++++++++++++++++--
- 1 file changed, 17 insertions(+), 2 deletions(-)
+ tools/testing/selftests/firmware/Makefile | 43 +++++++++++++++++++------------
+ 1 file changed, 26 insertions(+), 17 deletions(-)
 
-diff --git a/tools/testing/selftests/breakpoints/Makefile b/tools/testing/selftests/breakpoints/Makefile
-index e18b42b..c738d4c 100644
---- a/tools/testing/selftests/breakpoints/Makefile
-+++ b/tools/testing/selftests/breakpoints/Makefile
-@@ -8,6 +8,7 @@ ifeq ($(ARCH),x86_64)
- 	ARCH := x86
- endif
+diff --git a/tools/testing/selftests/firmware/Makefile b/tools/testing/selftests/firmware/Makefile
+index e23cce0..0bdc25b 100644
+--- a/tools/testing/selftests/firmware/Makefile
++++ b/tools/testing/selftests/firmware/Makefile
+@@ -1,25 +1,34 @@
+ # Makefile for firmware loading selftests
  
-+TEST_STR = ./breakpoint_test || echo 'breakpoints selftests: [FAIL]'
- 
+ # No binaries, but make sure arg-less "make" doesn't trigger "run_tests"
++
++__fw_filesystem:
++fw_filesystem  = if /bin/sh ./fw_filesystem.sh ; then
++fw_filesystem += echo 'fw_filesystem: ok';
++fw_filesystem += else echo 'fw_filesystem: [FAIL]';
++fw_filesystem += fi
++
++__fw_userhelper:
++fw_userhelper  = if /bin/sh ./fw_userhelper.sh ; then
++fw_userhelper += echo 'fw_userhelper: ok';
++fw_userhelper += else
++fw_userhelper += echo 'fw_userhelper: [FAIL]';
++fw_userhelper += fi
++
  all:
- ifeq ($(ARCH),x86)
-@@ -16,8 +17,22 @@ else
- 	echo "Not an x86 target, can't build breakpoints selftests"
- endif
  
--run_tests:
--	@./breakpoint_test || echo "breakpoints selftests: [FAIL]"
+-fw_filesystem:
+-	@if /bin/sh ./fw_filesystem.sh ; then \
+-                echo "fw_filesystem: ok"; \
+-        else \
+-                echo "fw_filesystem: [FAIL]"; \
+-                exit 1; \
+-        fi
+-
+-fw_userhelper:
+-	@if /bin/sh ./fw_userhelper.sh ; then \
+-                echo "fw_userhelper: ok"; \
+-        else \
+-                echo "fw_userhelper: [FAIL]"; \
+-                exit 1; \
+-        fi
+-
+-run_tests: all fw_filesystem fw_userhelper
 +install:
 +ifdef INSTALL_KSFT_PATH
-+ifeq ($(ARCH),x86)
-+	install ./breakpoint_test $(INSTALL_KSFT_PATH)
-+	@echo "$(TEST_STR)" >> $(KSELFTEST)
-+else
-+	@echo "Not an x86 target, unable to install breakpoints selftests"
-+endif
++	install ./fw_filesystem.sh ./fw_userhelper.sh $(INSTALL_KSFT_PATH)
++	@echo "$(fw_filesystem)" >> $(KSELFTEST)
++	@echo "$(fw_userhelper)" >> $(KSELFTEST)
 +else
 +	@echo "Run make kselftest_install in top level source directory"
 +endif
 +
-+run_tests: all
-+ifeq ($(ARCH),x86)
-+	@$(TEST_STR)
-+endif
++run_tests:
++	@$(fw_filesystem)
++	@$(fw_userhelper)
  
+ # Nothing to clean up.
  clean:
- 	rm -fr breakpoint_test
 -- 
 2.1.0
 
