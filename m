@@ -1,27 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:54104 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752651AbbAGU35 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 7 Jan 2015 15:29:57 -0500
-Date: Wed, 7 Jan 2015 21:29:56 +0100
-From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH 2/2] merge_config.sh: add -? for help
-Message-ID: <20150107202956.GB21171@sepie.suse.cz>
-References: <1418331304-4821-1-git-send-email-olof@lixom.net>
- <1418331304-4821-2-git-send-email-olof@lixom.net>
+Received: from seldrel01.sonyericsson.com ([212.209.106.2]:16255 "EHLO
+	seldrel01.sonyericsson.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753647AbbAGXFy (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 7 Jan 2015 18:05:54 -0500
+Message-ID: <54ADBBC8.30802@sonymobile.com>
+Date: Wed, 7 Jan 2015 15:05:44 -0800
+From: Tim Bird <tim.bird@sonymobile.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1418331304-4821-2-git-send-email-olof@lixom.net>
+Subject: Re: [PATCH v4 14/20] selftests/size: add install target to enable
+ test install
+References: <cover.1420571615.git.shuahkh@osg.samsung.com> <5861e16e1b533cae37471a8cf18597d3e9e6b6f6.1420571615.git.shuahkh@osg.samsung.com>
+In-Reply-To: <5861e16e1b533cae37471a8cf18597d3e9e6b6f6.1420571615.git.shuahkh@osg.samsung.com>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Olof Johansson <olof@lixom.net>
-Cc: yann.morin.1998@free.fr, linux-kbuild@vger.kernel.org, dvhart@linux.intel.com, linux-kernel@vger.kernel.org
+To: Shuah Khan <shuahkh@osg.samsung.com>, "mmarek@suse.cz" <mmarek@suse.cz>, "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "rostedt@goodmis.org" <rostedt@goodmis.org>, "mingo@redhat.com" <mingo@redhat.com>, "davem@davemloft.net" <davem@davemloft.net>, "keescook@chromium.org" <keescook@chromium.org>, "tranmanphong@gmail.com" <tranmanphong@gmail.com>, "mpe@ellerman.id.au" <mpe@ellerman.id.au>, "cov@codeaurora.org" <cov@codeaurora.org>, "dh.herrmann@gmail.com" <dh.herrmann@gmail.com>, "hughd@google.com" <hughd@google.com>, "bobby.prani@gmail.com" <bobby.prani@gmail.com>, "serge.hallyn@ubuntu.com" <serge.hallyn@ubuntu.com>, "ebiederm@xmission.com" <ebiederm@xmission.com>, "josh@joshtriplett.org" <josh@joshtriplett.org>, "koct9i@gmail.com" <koct9i@gmail.com>, "masami.hiramatsu.pt@hitachi.com" <masami.hiramatsu.pt@hitachi.com>
+Cc: "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-api@vger.kernel.org" <linux-api@vger.kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>
 
-On Thu, Dec 11, 2014 at 12:55:04PM -0800, Olof Johansson wrote:
-> It's usual enough for help text that it makes sense to support it.
+On 01/06/2015 11:43 AM, Shuah Khan wrote:
+> Add a new make target to enable installing test. This target
+> installs test in the kselftest install location and add to the
+> kselftest script to run the test. Install target can be run
+> only from top level kernel source directory.
+> 
+> Signed-off-by: Shuah Khan <shuahkh@osg.samsung.com>
+> ---
+>  tools/testing/selftests/size/Makefile | 12 +++++++++++-
+>  1 file changed, 11 insertions(+), 1 deletion(-)
+> 
+> diff --git a/tools/testing/selftests/size/Makefile b/tools/testing/selftests/size/Makefile
+> index 04dc25e..a1478fa 100644
+> --- a/tools/testing/selftests/size/Makefile
+> +++ b/tools/testing/selftests/size/Makefile
+> @@ -1,12 +1,22 @@
+>  CC = $(CROSS_COMPILE)gcc
+>  
+> +TEST_STR = ./get_size || echo 'get_size selftests: [FAIL]'
+> +
+>  all: get_size
+>  
+>  get_size: get_size.c
+>  	$(CC) -static -ffreestanding -nostartfiles -s $< -o $@
+>  
+> +install:
+> +ifdef INSTALL_KSFT_PATH
+> +	install ./get_size $(INSTALL_KSFT_PATH)
+> +	@echo "$(TEST_STR)" >> $(KSELFTEST)
+> +else
+> +	@echo "Run make kselftest_install in top level source directory"
+> +endif
+> +
+>  run_tests: all
+> -	./get_size
+> +	@$(TEST_STR)
+>  
+>  clean:
+>  	$(RM) get_size
+> 
 
-It's quite unusual for a *nix utility to recognize '-?'. And -h is
-already supported.
-
-Michal
+Acked-by: Tim Bird <tim.bird@sonymobile.com>
