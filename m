@@ -1,98 +1,83 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([103.22.144.67]:41348 "EHLO ozlabs.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752175AbbAGKgD (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 7 Jan 2015 05:36:03 -0500
-From: Anton Blanchard <anton@samba.org>
-Subject: [PATCH 2/3] jump_label: Allow jump labels to be used in assembly
-Date: Wed,  7 Jan 2015 21:35:57 +1100
-Message-Id: <1420626958-31254-2-git-send-email-anton@samba.org>
-In-Reply-To: <1420626958-31254-1-git-send-email-anton@samba.org>
+Received: from foss-mx-na.foss.arm.com ([217.140.108.86]:56565 "EHLO
+	foss-mx-na.foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751330AbbAGLaR (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 7 Jan 2015 06:30:17 -0500
+Date: Wed, 7 Jan 2015 11:30:05 +0000
+From: Will Deacon <will.deacon@arm.com>
+Subject: Re: [PATCH 1/3] jump_label: Allow asm/jump_label.h to be included in
+ assembly
+Message-ID: <20150107113004.GJ7485@arm.com>
 References: <1420626958-31254-1-git-send-email-anton@samba.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1420626958-31254-1-git-send-email-anton@samba.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: benh@kernel.crashing.org, paulus@samba.org, mpe@ellerman.id.au, mmarek@suse.cz, akpm@linux-foundation.org, jbaron@akamai.com, peterz@infradead.org, liuj97@gmail.com, mingo@kernel.org, mgorman@suse.de, linux@arm.linux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, ralf@linux-mips.org, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, davem@davemloft.net, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com, rostedt@goodmis.org
-Cc: linuxppc-dev@lists.ozlabs.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Anton Blanchard <anton@samba.org>
+Cc: "benh@kernel.crashing.org" <benh@kernel.crashing.org>, "paulus@samba.org" <paulus@samba.org>, "mpe@ellerman.id.au" <mpe@ellerman.id.au>, "mmarek@suse.cz" <mmarek@suse.cz>, "akpm@linux-foundation.org" <akpm@linux-foundation.org>, "jbaron@akamai.com" <jbaron@akamai.com>, "peterz@infradead.org" <peterz@infradead.org>, "liuj97@gmail.com" <liuj97@gmail.com>, "mingo@kernel.org" <mingo@kernel.org>, "mgorman@suse.de" <mgorman@suse.de>, "linux@arm.linux.org.uk" <linux@arm.linux.org.uk>, Catalin Marinas <Catalin.Marinas@arm.com>, "ralf@linux-mips.org" <ralf@linux-mips.org>, "schwidefsky@de.ibm.com" <schwidefsky@de.ibm.com>, "heiko.carstens@de.ibm.com" <heiko.carstens@de.ibm.com>, "davem@davemloft.net" <davem@davemloft.net>, "tglx@linutronix.de" <tglx@linutronix.de>, "mingo@redhat.com" <mingo@redhat.com>, "hpa@zytor.com" <hpa@zytor.com>, "rostedt@goodmis.org" <rostedt@goodmis.org>, "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 
-To use jump labels in assembly we need the HAVE_JUMP_LABEL define,
-so we select a fallback version if the toolchain does not support
-them.
+On Wed, Jan 07, 2015 at 10:35:56AM +0000, Anton Blanchard wrote:
+> Wrap asm/jump_label.h for all archs with #ifndef __ASSEMBLY__.
+> Since these are kernel only headers, we don't need #ifdef __KERNEL__
+> so can simplify things a bit.
+> 
+> If an architecture wants to use jump labels in assembly, it
+> will still need to define a macro to create the __jump_table
+> entries (see ARCH_STATIC_BRANCH in the powerpc asm/jump_label.h
+> for an example).
+> 
+> Signed-off-by: Anton Blanchard <anton@samba.org>
+> ---
+>  arch/arm/include/asm/jump_label.h   | 5 ++---
+>  arch/arm64/include/asm/jump_label.h | 8 ++++----
+>  arch/mips/include/asm/jump_label.h  | 7 +++----
+>  arch/s390/include/asm/jump_label.h  | 3 +++
+>  arch/sparc/include/asm/jump_label.h | 5 ++---
+>  arch/x86/include/asm/jump_label.h   | 5 ++---
+>  6 files changed, 16 insertions(+), 17 deletions(-)
 
-Modify linux/jump_label.h so it can be included by assembly files.
-We also need to add -DCC_HAVE_ASM_GOTO to KBUILD_AFLAGS.
+[...]
 
-Signed-off-by: Anton Blanchard <anton@samba.org>
----
- Makefile                   |  1 +
- include/linux/jump_label.h | 21 +++++++++++++++++----
- 2 files changed, 18 insertions(+), 4 deletions(-)
+> diff --git a/arch/arm64/include/asm/jump_label.h b/arch/arm64/include/asm/jump_label.h
+> index 076a1c7..c0e5165 100644
+> --- a/arch/arm64/include/asm/jump_label.h
+> +++ b/arch/arm64/include/asm/jump_label.h
+> @@ -18,11 +18,12 @@
+>   */
+>  #ifndef __ASM_JUMP_LABEL_H
+>  #define __ASM_JUMP_LABEL_H
+> +
+> +#ifndef __ASSEMBLY__
+> +
+>  #include <linux/types.h>
+>  #include <asm/insn.h>
+>  
+> -#ifdef __KERNEL__
+> -
+>  #define JUMP_LABEL_NOP_SIZE		AARCH64_INSN_SIZE
+>  
+>  static __always_inline bool arch_static_branch(struct static_key *key)
+> @@ -39,8 +40,6 @@ l_yes:
+>  	return true;
+>  }
+>  
+> -#endif /* __KERNEL__ */
+> -
+>  typedef u64 jump_label_t;
+>  
+>  struct jump_entry {
+> @@ -49,4 +48,5 @@ struct jump_entry {
+>  	jump_label_t key;
+>  };
+>  
+> +#endif  /* __ASSEMBLY__ */
+>  #endif	/* __ASM_JUMP_LABEL_H */
 
-diff --git a/Makefile b/Makefile
-index ef748e1..7b83c3f 100644
---- a/Makefile
-+++ b/Makefile
-@@ -774,6 +774,7 @@ KBUILD_ARFLAGS := $(call ar-option,D)
- # check for 'asm goto'
- ifeq ($(shell $(CONFIG_SHELL) $(srctree)/scripts/gcc-goto.sh $(CC)), y)
- 	KBUILD_CFLAGS += -DCC_HAVE_ASM_GOTO
-+	KBUILD_AFLAGS += -DCC_HAVE_ASM_GOTO
- endif
- 
- include $(srctree)/scripts/Makefile.extrawarn
-diff --git a/include/linux/jump_label.h b/include/linux/jump_label.h
-index 98f923b6..f4de473 100644
---- a/include/linux/jump_label.h
-+++ b/include/linux/jump_label.h
-@@ -45,6 +45,12 @@
-  * same as using STATIC_KEY_INIT_FALSE.
-  */
- 
-+#if defined(CC_HAVE_ASM_GOTO) && defined(CONFIG_JUMP_LABEL)
-+# define HAVE_JUMP_LABEL
-+#endif
-+
-+#ifndef __ASSEMBLY__
-+
- #include <linux/types.h>
- #include <linux/compiler.h>
- #include <linux/bug.h>
-@@ -55,7 +61,7 @@ extern bool static_key_initialized;
- 				    "%s used before call to jump_label_init", \
- 				    __func__)
- 
--#if defined(CC_HAVE_ASM_GOTO) && defined(CONFIG_JUMP_LABEL)
-+#ifdef HAVE_JUMP_LABEL
- 
- struct static_key {
- 	atomic_t enabled;
-@@ -66,13 +72,18 @@ struct static_key {
- #endif
- };
- 
--# include <asm/jump_label.h>
--# define HAVE_JUMP_LABEL
- #else
- struct static_key {
- 	atomic_t enabled;
- };
--#endif	/* CC_HAVE_ASM_GOTO && CONFIG_JUMP_LABEL */
-+#endif	/* HAVE_JUMP_LABEL */
-+#endif /* __ASSEMBLY__ */
-+
-+#ifdef HAVE_JUMP_LABEL
-+#include <asm/jump_label.h>
-+#endif
-+
-+#ifndef __ASSEMBLY__
- 
- enum jump_label_type {
- 	JUMP_LABEL_DISABLE = 0,
-@@ -203,3 +214,5 @@ static inline bool static_key_enabled(struct static_key *key)
- }
- 
- #endif	/* _LINUX_JUMP_LABEL_H */
-+
-+#endif /* __ASSEMBLY__ */
--- 
-2.1.0
+The arm64 bit looks fine to me:
 
+  Acked-by: Will Deacon <will.deacon@arm.com>
+
+Will
