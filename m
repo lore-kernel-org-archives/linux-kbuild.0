@@ -1,58 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from resqmta-ch2-08v.sys.comcast.net ([69.252.207.40]:60984 "EHLO
-	resqmta-ch2-08v.sys.comcast.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S932646AbbAFTnu (ORCPT
+Received: from mail-wi0-f178.google.com ([209.85.212.178]:50091 "EHLO
+	mail-wi0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753854AbbAGGLV (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 6 Jan 2015 14:43:50 -0500
-From: Shuah Khan <shuahkh@osg.samsung.com>
-Subject: [PATCH v4 05/20] selftests/ftrace: add install target to enable test install
-Date: Tue,  6 Jan 2015 12:43:19 -0700
-Message-Id: <20a71af8dcebf0369890391e8587afc5ca1a8035.1420571615.git.shuahkh@osg.samsung.com>
-In-Reply-To: <cover.1420571615.git.shuahkh@osg.samsung.com>
-References: <cover.1420571615.git.shuahkh@osg.samsung.com>
-In-Reply-To: <cover.1420571615.git.shuahkh@osg.samsung.com>
-References: <cover.1420571615.git.shuahkh@osg.samsung.com>
+	Wed, 7 Jan 2015 01:11:21 -0500
+Received: by mail-wi0-f178.google.com with SMTP id em10so856319wid.11
+        for <linux-kbuild@vger.kernel.org>; Tue, 06 Jan 2015 22:11:20 -0800 (PST)
+MIME-Version: 1.0
+Reply-To: sedat.dilek@gmail.com
+In-Reply-To: <54AC3C49.305@suse.cz>
+References: <1420278619-6637-1-git-send-email-sedat.dilek@gmail.com>
+	<CA+icZUXMUOh-P6mK4hAjPX=yVWJ9Lh=3AbWPEfmDKCpMpn9C3w@mail.gmail.com>
+	<54AC3C49.305@suse.cz>
+Date: Wed, 7 Jan 2015 07:11:20 +0100
+Message-ID: <CA+icZUWvjK351SpgQ0NpO6W7rvC_eBbdEibN1S7ihxZOazLTsw@mail.gmail.com>
+Subject: Re: [PATCH v6] builddeb: Try to determine distribution
+From: Sedat Dilek <sedat.dilek@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mmarek@suse.cz, gregkh@linuxfoundation.org, akpm@linux-foundation.org, rostedt@goodmis.org, mingo@redhat.com, davem@davemloft.net, keescook@chromium.org, tranmanphong@gmail.com, mpe@ellerman.id.au, cov@codeaurora.org, dh.herrmann@gmail.com, hughd@google.com, bobby.prani@gmail.com, serge.hallyn@ubuntu.com, ebiederm@xmission.com, tim.bird@sonymobile.com, josh@joshtriplett.org, koct9i@gmail.com, masami.hiramatsu.pt@hitachi.com
-Cc: Shuah Khan <shuahkh@osg.samsung.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-api@vger.kernel.org, netdev@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: Ben Hutchings <ben@decadent.org.uk>, maximilian attems <max@stro.at>, Thorsten Glaser <tg@mirbsd.org>, Alexander Wirt <formorer@debian.org>, linux-kbuild@vger.kernel.org
 
-Add a new make target to enable installing test. This target
-installs test in the kselftest install location and add to the
-kselftest script to run the test. Install target can be run
-only from top level kernel source directory.
+On Tue, Jan 6, 2015 at 8:49 PM, Michal Marek <mmarek@suse.cz> wrote:
+> Dne 6.1.2015 v 12:39 Sedat Dilek napsal(a):
+>> On Sat, Jan 3, 2015 at 10:50 AM, Sedat Dilek <sedat.dilek@gmail.com> wrote:
+>>> lsb_release command is a good choice to determine the distribution
+>>> name for the changelog file in the generated Debian packages [1].
+>>> Its installation is no precondition.
+>>> In Debian it is still not essential or build-essential.
+> [...]
+>> According to your explanations about your development workflow and Git
+>> trees this can go now to kbuild.git#misc.
+>
+> I applied it to kbuild.git#misc now.
+>
 
-Signed-off-by: Shuah Khan <shuahkh@osg.samsung.com>
-Acked-by: Steven Rostedt <rostedt@goodmis.org>
-Acked-by: Masami Hiramatsu <masami.hiramatsu.pt@hitachi.com>
----
- tools/testing/selftests/ftrace/Makefile | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+Thanks.
 
-diff --git a/tools/testing/selftests/ftrace/Makefile b/tools/testing/selftests/ftrace/Makefile
-index 76cc9f1..c5c77584 100644
---- a/tools/testing/selftests/ftrace/Makefile
-+++ b/tools/testing/selftests/ftrace/Makefile
-@@ -1,7 +1,18 @@
-+TEST_STR = /bin/sh ./ftracetest || echo 'ftrace selftests: [FAIL]'
-+
- all:
- 
-+install:
-+ifdef INSTALL_KSFT_PATH
-+	install ./ftracetest $(INSTALL_KSFT_PATH)
-+	@cp -r test.d $(INSTALL_KSFT_PATH)
-+	echo "$(TEST_STR)" >> $(KSELFTEST)
-+else
-+	@echo "Run make kselftest_install in top level source directory"
-+endif
-+
- run_tests:
--	@/bin/sh ./ftracetest || echo "ftrace selftests: [FAIL]"
-+	@$(TEST_STR)
- 
- clean:
- 	rm -rf logs/*
--- 
-2.1.0
-
+- Sedat -
