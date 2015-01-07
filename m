@@ -1,35 +1,32 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:33844 "EHLO mx2.suse.de"
+Received: from ozlabs.org ([103.22.144.67]:39424 "EHLO ozlabs.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752881AbbAGJro (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 7 Jan 2015 04:47:44 -0500
-Message-ID: <54AD00BE.1030000@suse.cz>
-Date: Wed, 07 Jan 2015 10:47:42 +0100
-From: Michal Marek <mmarek@suse.cz>
+	id S1751418AbbAGKeb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 7 Jan 2015 05:34:31 -0500
+Date: Wed, 7 Jan 2015 21:34:28 +1100
+From: Anton Blanchard <anton@samba.org>
+Subject: Re: [PATCH 1/2] jump_label: Allow jump labels to be used in
+ assembly
+Message-ID: <20150107213428.5ddb2095@kryten>
+In-Reply-To: <20150106174822.GA29629@home.goodmis.org>
+References: <1420539628-17875-1-git-send-email-anton@samba.org>
+	<20150106174822.GA29629@home.goodmis.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v6] builddeb: Try to determine distribution
-References: <1420278619-6637-1-git-send-email-sedat.dilek@gmail.com>	<CA+icZUXMUOh-P6mK4hAjPX=yVWJ9Lh=3AbWPEfmDKCpMpn9C3w@mail.gmail.com> <CA+icZUWdDLDAhMLcCyJp1u08Jr6K3htGoXUc0VbaL6rzFrwZig@mail.gmail.com>
-In-Reply-To: <CA+icZUWdDLDAhMLcCyJp1u08Jr6K3htGoXUc0VbaL6rzFrwZig@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: sedat.dilek@gmail.com
-Cc: Ben Hutchings <ben@decadent.org.uk>, maximilian attems <max@stro.at>, Thorsten Glaser <tg@mirbsd.org>, Alexander Wirt <formorer@debian.org>, linux-kbuild@vger.kernel.org
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: benh@kernel.crashing.org, paulus@samba.org, mpe@ellerman.id.au, mmarek@suse.cz, akpm@linux-foundation.org, jbaron@akamai.com, peterz@infradead.org, liuj97@gmail.com, mingo@kernel.org, mgorman@suse.de, linuxppc-dev@lists.ozlabs.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 2015-01-06 14:36, Sedat Dilek wrote:
-> On Tue, Jan 6, 2015 at 12:39 PM, Sedat Dilek <sedat.dilek@gmail.com> wrote:
->> According to your explanations about your development workflow and Git
->> trees this can go now to kbuild.git#misc.
->> Or is something wrong with that one (commit message, missing credits, etc.)?
->>
->> Thanks.
->>
-> 
-> Please, push v7.
+Hi Steve,
 
-Sorry, too late. Our mailserver had some digestive problems yesterday
-and needed several hours to process incomming emails ;). So I merged v6
-without knowing that there was v7 in the queue.
+> Have you tested this on other archs? Because just looking at x86, it
+> doesn't seem that asm/jump_label.h can handle being called in
+> assembly.
 
-Michal
+Since no one is including linux/jump_label.h in assembly yet, nothing
+should break. We could however add __ASSEMBLY__ protection to all the
+asm/jump_label.h files. Patches on the way.
+
+Anton
