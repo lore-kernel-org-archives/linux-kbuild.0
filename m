@@ -1,41 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.mei.co.jp ([133.183.100.20]:38770 "EHLO smtp.mei.co.jp"
+Received: from cantor2.suse.de ([195.135.220.15]:36875 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753114AbbAHI3y (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 8 Jan 2015 03:29:54 -0500
-From: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Subject: [PATCH] kbuild: drop $(version_h) from MRPROPER_FILES
-Date: Thu,  8 Jan 2015 17:29:38 +0900
-Message-Id: <1420705778-22468-1-git-send-email-yamada.m@jp.panasonic.com>
+	id S1756299AbbAHKtf (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 8 Jan 2015 05:49:35 -0500
+Date: Thu, 8 Jan 2015 11:49:33 +0100
+From: Michal Marek <mmarek@suse.cz>
+Subject: [GIT PULL] make mrproper fix for v3.19-rc4
+Message-ID: <20150108104933.GA25083@sepie.suse.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.m@jp.panasonic.com>, Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Now $(version_h) is include/generated/uapi/linux/version.h.
+Hi Linus,
 
-$(version_h) in MRPROPER_FILES is redundant because it is covered
-by include/generated in MRPROPER_DIRS.
+make mrproper / distclean stopped removing the generated debian/
+directory in v3.16. Please pull the fix.
 
-Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
----
+Thanks,
+Michal
 
- Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+The following changes since commit 97bf6af1f928216fd6c5a66e8a57bfa95a659672:
 
-diff --git a/Makefile b/Makefile
-index eb4eca5..a34b061 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1171,7 +1171,7 @@ CLEAN_DIRS  += $(MODVERDIR)
- # Directories & files removed with 'make mrproper'
- MRPROPER_DIRS  += include/config usr/include include/generated          \
- 		  arch/*/include/generated .tmp_objdiff
--MRPROPER_FILES += .config .config.old .version .old_version $(version_h) \
-+MRPROPER_FILES += .config .config.old .version .old_version \
- 		  Module.symvers tags TAGS cscope* GPATH GTAGS GRTAGS GSYMS \
- 		  signing_key.priv signing_key.x509 x509.genkey		\
- 		  extra_certificates signing_key.x509.keyid		\
--- 
-1.9.1
+  Linux 3.19-rc1 (2014-12-20 17:08:50 -0800)
 
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git 
+
+for you to fetch changes up to a16c5f99a28c9945165c46da27fff8e6f26f8736:
+
+  kbuild: Fix removal of the debian/ directory (2015-01-02 14:51:27 +0100)
+
+----------------------------------------------------------------
+Michal Marek (1):
+      kbuild: Fix removal of the debian/ directory
+
+ scripts/Makefile.clean | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
