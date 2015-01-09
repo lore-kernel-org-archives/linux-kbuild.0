@@ -1,50 +1,210 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lb0-f170.google.com ([209.85.217.170]:43584 "EHLO
-	mail-lb0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751866AbbAHWmk (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 8 Jan 2015 17:42:40 -0500
-MIME-Version: 1.0
-In-Reply-To: <20150108104933.GA25083@sepie.suse.cz>
-References: <20150108104933.GA25083@sepie.suse.cz>
-Date: Thu, 8 Jan 2015 14:42:38 -0800
-Message-ID: <CA+55aFxrc1CiyjQfWoZHD6UgwOTgj=NVBXPPsY2eygfPMzgsPg@mail.gmail.com>
-Subject: Re: [GIT PULL] make mrproper fix for v3.19-rc4
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Content-Type: text/plain; charset=UTF-8
+Received: from ozlabs.org ([103.22.144.67]:50340 "EHLO ozlabs.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754803AbbAIJGs (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 9 Jan 2015 04:06:48 -0500
+From: Michael Ellerman <mpe@ellerman.id.au>
+Subject: [PATCH 2/6] selftests: Add install target
+Date: Fri,  9 Jan 2015 20:06:11 +1100
+Message-Id: <1420794375-31881-2-git-send-email-mpe@ellerman.id.au>
+In-Reply-To: <1420794375-31881-1-git-send-email-mpe@ellerman.id.au>
+References: <1420794375-31881-1-git-send-email-mpe@ellerman.id.au>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: linux-kernel@vger.kernel.org
+Cc: mmarek@suse.cz, gregkh@linuxfoundation.org, akpm@linux-foundation.org, rostedt@goodmis.org, mingo@redhat.com, davem@davemloft.net, keescook@chromium.org, tranmanphong@gmail.com, cov@codeaurora.org, dh.herrmann@gmail.com, hughd@google.com, bobby.prani@gmail.com, serge.hallyn@ubuntu.com, ebiederm@xmission.com, tim.bird@sonymobile.com, josh@joshtriplett.org, koct9i@gmail.com, linux-kbuild@vger.kernel.org, linux-api@vger.kernel.org, netdev@vger.kernel.org, shuahkh@osg.samsung.com
 
-On Thu, Jan 8, 2015 at 2:49 AM, Michal Marek <mmarek@suse.cz> wrote:
->
-> make mrproper / distclean stopped removing the generated debian/
-> directory in v3.16.
+This adds make install support to selftests. The basic usage is:
 
-So "make distclean" still doesn't actually clean everything.
+$ cd tools/testing/selftests
+$ make install
 
-I don't personally much care, since I've taught my fingers to just do
+That installs into tools/testing/selftests/install, which can then be
+copied where ever necessary.
 
-    git clean -dqfx
+The install destination is also configurable using eg:
 
-instead, but since I tested "make distclean" after pulling from you, I
-thought I'd just mention it.
+$ INSTALL_PATH=/mnt/selftests make install
 
-Just do
+The implementation uses two targets in the child makefiles. The first
+"install" is expected to install all files into $(INSTALL_PATH).
 
-    make allmodconfig
-    .. build the tree ..
-    make distclean
-    git ls-files -o
+The second, "emit_tests", is expected to emit the test instructions (ie.
+bash script) on stdout. Separating this from install means the child
+makefiles need no knowledge of the location of the test script.
 
-to see any files that are left-over despite the distclean ("git
-ls-files -o" basically shows all untracked files - 'o' stands for
-'others' - so anything that isn't in the actual distributed sources
-shows up)
+Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
+---
+ tools/testing/selftests/Makefile                | 32 +++++++++++++++++++++++++
+ tools/testing/selftests/exec/Makefile           |  3 +++
+ tools/testing/selftests/lib.mk                  | 23 +++++++++++++++++-
+ tools/testing/selftests/memory-hotplug/Makefile |  2 ++
+ tools/testing/selftests/mount/Makefile          |  2 ++
+ tools/testing/selftests/mqueue/Makefile         |  7 ++++++
+ tools/testing/selftests/net/Makefile            |  1 +
+ tools/testing/selftests/sysctl/Makefile         |  1 +
+ 8 files changed, 70 insertions(+), 1 deletion(-)
 
-But I really am not sure how much effort we should spend on "make
-distclean", given than "git clean" is so much easier and requires no
-effort at all.
+diff --git a/tools/testing/selftests/Makefile b/tools/testing/selftests/Makefile
+index 4e511221a0c1..4f2849b5ff77 100644
+--- a/tools/testing/selftests/Makefile
++++ b/tools/testing/selftests/Makefile
+@@ -47,7 +47,39 @@ clean_hotplug:
+ 		make -C $$TARGET clean; \
+ 	done;
+ 
++INSTALL_PATH ?= install
++INSTALL_PATH := $(abspath $(INSTALL_PATH))
++ALL_SCRIPT := $(INSTALL_PATH)/all.sh
++
++install:
++ifdef INSTALL_PATH
++	@# Ask all targets to install their files
++	mkdir -p $(INSTALL_PATH)
++	for TARGET in $(TARGETS); do \
++		mkdir -p $(INSTALL_PATH)/$$TARGET ; \
++		make -C $$TARGET INSTALL_PATH=$(INSTALL_PATH)/$$TARGET install; \
++	done;
++
++	@# Ask all targets to emit their test scripts
++	echo "#!/bin/bash\n\n" > $(ALL_SCRIPT)
++	echo "ROOT=\$$PWD\n" >> $(ALL_SCRIPT)
++
++	for TARGET in $(TARGETS); do \
++		echo "echo ; echo Running tests in $$TARGET" >> $(ALL_SCRIPT); \
++		echo "echo ========================================" >> $(ALL_SCRIPT); \
++		echo "cd $$TARGET" >> $(ALL_SCRIPT); \
++		make -s -C $$TARGET emit_tests >> $(ALL_SCRIPT); \
++		echo "cd \$$ROOT\n" >> $(ALL_SCRIPT); \
++	done;
++
++	chmod u+x $(ALL_SCRIPT)
++else
++	$(error Error: set INSTALL_PATH to use install)
++endif
++
+ clean:
+ 	for TARGET in $(TARGETS); do \
+ 		make -C $$TARGET clean; \
+ 	done;
++
++.PHONY: install
+diff --git a/tools/testing/selftests/exec/Makefile b/tools/testing/selftests/exec/Makefile
+index a0098daeb73d..886cabe307b1 100644
+--- a/tools/testing/selftests/exec/Makefile
++++ b/tools/testing/selftests/exec/Makefile
+@@ -19,8 +19,11 @@ execveat.denatured: execveat
+ 	$(CC) $(CFLAGS) -o $@ $^
+ 
+ TEST_PROGS := execveat
++TEST_FILES := $(DEPS)
+ 
+ include ../lib.mk
+ 
++override EMIT_TESTS := echo "mkdir -p subdir; (./execveat && echo \"selftests: execveat [PASS]\") || echo \"selftests: execveat [FAIL]\""
++
+ clean:
+ 	rm -rf $(BINARIES) $(DEPS) subdir.moved execveat.moved xxxxx*
+diff --git a/tools/testing/selftests/lib.mk b/tools/testing/selftests/lib.mk
+index b30c5a49cb61..7bd3dabe2846 100644
+--- a/tools/testing/selftests/lib.mk
++++ b/tools/testing/selftests/lib.mk
+@@ -7,4 +7,25 @@ endef
+ run_tests: all
+ 	$(RUN_TESTS)
+ 
+-.PHONY: run_tests all clean
++define INSTALL_RULE
++	mkdir -p $(INSTALL_PATH)
++	install -t $(INSTALL_PATH) $(TEST_PROGS) $(TEST_FILES)
++endef
++
++install: all
++ifdef INSTALL_PATH
++	$(INSTALL_RULE)
++else
++	$(error Error: set INSTALL_PATH to use install)
++endif
++
++define EMIT_TESTS
++	@for TEST in $(TEST_PROGS); do \
++		echo "(./$$TEST && echo \"selftests: $$TEST [PASS]\") || echo \"selftests: $$TEST [FAIL]\""; \
++	done;
++endef
++
++emit_tests:
++	$(EMIT_TESTS)
++
++.PHONY: run_tests all clean install emit_tests
+diff --git a/tools/testing/selftests/memory-hotplug/Makefile b/tools/testing/selftests/memory-hotplug/Makefile
+index 8f7dea66ecac..598a1f68f534 100644
+--- a/tools/testing/selftests/memory-hotplug/Makefile
++++ b/tools/testing/selftests/memory-hotplug/Makefile
+@@ -2,7 +2,9 @@ all:
+ 
+ include ../lib.mk
+ 
++TEST_PROGS := on-off-test.sh
+ override RUN_TESTS := ./on-off-test.sh -r 2 || echo "selftests: memory-hotplug [FAIL]"
++override EMIT_TESTS := echo "$(RUN_TESTS)"
+ 
+ run_full_test:
+ 	@/bin/bash ./on-off-test.sh || echo "memory-hotplug selftests: [FAIL]"
+diff --git a/tools/testing/selftests/mount/Makefile b/tools/testing/selftests/mount/Makefile
+index 06931dfd3ef0..a5b367f032ba 100644
+--- a/tools/testing/selftests/mount/Makefile
++++ b/tools/testing/selftests/mount/Makefile
+@@ -7,7 +7,9 @@ unprivileged-remount-test: unprivileged-remount-test.c
+ 
+ include ../lib.mk
+ 
++TEST_PROGS := unprivileged-remount-test
+ override RUN_TESTS := if [ -f /proc/self/uid_map ] ; then ./unprivileged-remount-test ; fi
++override EMIT_TESTS := echo "$(RUN_TESTS)"
+ 
+ clean:
+ 	rm -f unprivileged-remount-test
+diff --git a/tools/testing/selftests/mqueue/Makefile b/tools/testing/selftests/mqueue/Makefile
+index cbc300ef11bf..6ca7261b55dc 100644
+--- a/tools/testing/selftests/mqueue/Makefile
++++ b/tools/testing/selftests/mqueue/Makefile
+@@ -9,5 +9,12 @@ override define RUN_TESTS
+ 	@./mq_perf_tests || echo "selftests: mq_perf_tests [FAIL]"
+ endef
+ 
++TEST_PROGS := mq_open_tests mq_perf_tests
++
++override define EMIT_TESTS
++	echo "./mq_open_tests /test1 || echo \"selftests: mq_open_tests [FAIL]\""
++	echo "./mq_perf_tests || echo \"selftests: mq_perf_tests [FAIL]\""
++endef
++
+ clean:
+ 	rm -f mq_open_tests mq_perf_tests
+diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
+index fa8187ff15e6..6ba2ac7bbb0d 100644
+--- a/tools/testing/selftests/net/Makefile
++++ b/tools/testing/selftests/net/Makefile
+@@ -12,6 +12,7 @@ all: $(NET_PROGS)
+ 	$(CC) $(CFLAGS) -o $@ $^
+ 
+ TEST_PROGS := run_netsocktests run_afpackettests test_bpf.sh
++TEST_FILES := $(NET_PROGS)
+ 
+ include ../lib.mk
+ 
+diff --git a/tools/testing/selftests/sysctl/Makefile b/tools/testing/selftests/sysctl/Makefile
+index c9660f5ef9f9..b3c33e071f10 100644
+--- a/tools/testing/selftests/sysctl/Makefile
++++ b/tools/testing/selftests/sysctl/Makefile
+@@ -5,6 +5,7 @@
+ all:
+ 
+ TEST_PROGS := run_numerictests run_stringtests
++TEST_FILES := common_tests
+ 
+ include ../lib.mk
+ 
+-- 
+2.1.0
 
-                      Linus
