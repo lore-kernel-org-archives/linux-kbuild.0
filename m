@@ -1,43 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from youngberry.canonical.com ([91.189.89.112]:55770 "EHLO
-	youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751054AbbALNT1 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 12 Jan 2015 08:19:27 -0500
-From: Colin King <colin.king@canonical.com>
-Subject: [PATCH] kconfig: use va_end to match corresponding va_start
-Date: Mon, 12 Jan 2015 13:18:26 +0000
-Message-Id: <1421068706-3689-1-git-send-email-colin.king@canonical.com>
+Received: from smtp.mei.co.jp ([133.183.100.20]:56432 "EHLO smtp.mei.co.jp"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751065AbbAMFYZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 13 Jan 2015 00:24:25 -0500
+Date: Tue, 13 Jan 2015 14:24:04 +0900
+From: Masahiro Yamada <yamada.m@jp.panasonic.com>
+Subject: Re: [PATCH] kbuild: fix scripts/headers.sh to see the correct Kbuild path
+In-Reply-To: <1417589535-15867-1-git-send-email-yamada.m@jp.panasonic.com>
+References: <1417589535-15867-1-git-send-email-yamada.m@jp.panasonic.com>
+Message-Id: <20150113142404.CACA.AA925319@jp.panasonic.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>, linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>
 
-From: Colin Ian King <colin.king@canonical.com>
+Hi Sam,
 
-Although on some systems va_end is a no-op, it is good practice
-to use va_end, especially since the manual states:
+IIRC, you mentioned scripts/headers.sh is pointless
+and should be removed from the code base.
 
-"Each invocation of va_start() must be matched by a corresponding
-invocation of va_end() in the same function."
+If so, this patch of mine has no point.
+Could you consider removing scripts/headers.sh ?
 
-Signed-off-by: Colin Ian King <colin.king@canonical.com>
----
- scripts/kconfig/confdata.c | 1 +
- 1 file changed, 1 insertion(+)
 
-diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-index f88d90f..28df18d 100644
---- a/scripts/kconfig/confdata.c
-+++ b/scripts/kconfig/confdata.c
-@@ -59,6 +59,7 @@ static void conf_message(const char *fmt, ...)
- 	va_start(ap, fmt);
- 	if (conf_message_callback)
- 		conf_message_callback(fmt, ap);
-+	va_end(ap);
- }
- 
- const char *conf_get_configname(void)
--- 
-2.1.4
+Best Regards
+Masahiro Yamada
+
+
+
+On Wed,  3 Dec 2014 15:52:15 +0900
+Masahiro Yamada <yamada.m@jp.panasonic.com> wrote:
+
+> The exported headers were moved to "uapi" directories.
+> We should check the existence of arch/*/include/uapi/asm/Kbuild.
+> 
+> Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
+> ---
+> 
+>  scripts/headers.sh | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/scripts/headers.sh b/scripts/headers.sh
+> index 95ece06..b164336 100755
+> --- a/scripts/headers.sh
+> +++ b/scripts/headers.sh
+> @@ -6,7 +6,7 @@ set -e
+>  
+>  do_command()
+>  {
+> -	if [ -f ${srctree}/arch/$2/include/asm/Kbuild ]; then
+> +	if [ -f ${srctree}/arch/$2/include/uapi/asm/Kbuild ]; then
+>  		make ARCH=$2 KBUILD_HEADERS=$1 headers_$1
+>  	else
+>  		printf "Ignoring arch: %s\n" ${arch}
+> -- 
+> 1.9.1
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
 
