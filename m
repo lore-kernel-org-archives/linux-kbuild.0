@@ -1,43 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cpsmtpb-ews08.kpnxchange.com ([213.75.39.13]:54779 "EHLO
-	cpsmtpb-ews08.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751098AbbAMVFO (ORCPT
+Received: from mout.kundenserver.de ([212.227.17.10]:54319 "EHLO
+	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751043AbbAMVYc (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 13 Jan 2015 16:05:14 -0500
-Message-ID: <1421183111.15397.34.camel@x220>
-Subject: Re: [PATCH] headers_check: don't warn about kexec.h
-From: Paul Bolle <pebolle@tiscali.nl>
-Date: Tue, 13 Jan 2015 22:05:11 +0100
-In-Reply-To: <2363197.VbAKlSiQLX@wuerfel>
-References: <12825174.7oxZXDxNhV@wuerfel> <1421169212.15397.22.camel@x220>
-	 <2363197.VbAKlSiQLX@wuerfel>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+	Tue, 13 Jan 2015 16:24:32 -0500
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH] X.509: shut up about included cert for silent build
+Date: Tue, 13 Jan 2015 22:24 +0100
+Message-ID: <2124221.xG51kBCe6s@wuerfel>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>, Andrew Morton <akpm@linux-foundation.org>, Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Maximilian Attems <max@stro.at>, Geoff Levand <geoff@infradead.org>, Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, linux-api@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: dhowells@redhat.com
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, mmarek@suse.cz
 
-[Dragging Andrew, Linus, and Maximilian into this thread.]
+Every kernel build that includes X.509 support prints out
+a message like
 
-On Tue, 2015-01-13 at 21:27 +0100, Arnd Bergmann wrote:
-> On Tuesday 13 January 2015 18:13:32 Paul Bolle wrote:
-> > The last time that Geoff has been trying to get that patch applied
-> > should be
-> > http://lkml.kernel.org/r/b0702fc4186db21820d686e89afd6480560823db.1415837218.git.geoff@infradead.org> 
-> > I'd rather see that go in.
-> 
-> Fine with me as well. As long as we can find someone to take one of 
-> the patches, I'm happy.
+ - Including cert signing_key.x509
 
-Since Geoff's patch (and my preceding, identical patch) basically is a
-partial revert of commit 29a5c67e7a78 ("kexec: export kexec.h to user
-space") that should probably be done by either Andrew or Linus. 
+This may be useful for some cases, but when doing automated
+build tests, it just means noise.
 
-(This short thread starts at
-http://lkml.kernel.org/r/12825174.7oxZXDxNhV@wuerfel .)
+To hide the message, this uses '$(kecho)' for printing the
+message, which means we still see it when building with V=1,
+but not at the normal level or when building with 'make -s'.
 
+Signed-off-by: Arnd Bergmann <arnd@arnd.de>
 
-Paul Bolle
+diff --git a/kernel/Makefile b/kernel/Makefile
+index 6892723681d5..4e5598689058 100644
+--- a/kernel/Makefile
++++ b/kernel/Makefile
+@@ -144,7 +144,7 @@ endif
+ kernel/system_certificates.o: $(obj)/x509_certificate_list
+ 
+ quiet_cmd_x509certs  = CERTS   $@
+-      cmd_x509certs  = cat $(X509_CERTIFICATES) /dev/null >$@ $(foreach X509,$(X509_CERTIFICATES),; echo "  - Including cert $(X509)")
++      cmd_x509certs  = cat $(X509_CERTIFICATES) /dev/null >$@ $(foreach X509,$(X509_CERTIFICATES),; $(kecho) "  - Including cert $(X509)")
+ 
+ targets += $(obj)/x509_certificate_list
+ $(obj)/x509_certificate_list: $(X509_CERTIFICATES) $(obj)/.x509.list
 
