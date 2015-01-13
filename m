@@ -1,67 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.mei.co.jp ([133.183.100.20]:56432 "EHLO smtp.mei.co.jp"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751065AbbAMFYZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 13 Jan 2015 00:24:25 -0500
-Date: Tue, 13 Jan 2015 14:24:04 +0900
-From: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Subject: Re: [PATCH] kbuild: fix scripts/headers.sh to see the correct Kbuild path
-In-Reply-To: <1417589535-15867-1-git-send-email-yamada.m@jp.panasonic.com>
-References: <1417589535-15867-1-git-send-email-yamada.m@jp.panasonic.com>
-Message-Id: <20150113142404.CACA.AA925319@jp.panasonic.com>
+Received: from mout.kundenserver.de ([212.227.126.187]:62631 "EHLO
+	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752624AbbAMQTX (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 13 Jan 2015 11:19:23 -0500
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH] headers_check: don't warn about kexec.h
+Date: Tue, 13 Jan 2015 17:19:19 +0100
+Message-ID: <12825174.7oxZXDxNhV@wuerfel>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kernel@vger.kernel.org, linux-api@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-Hi Sam,
+We've been getting this warning for ages:
 
-IIRC, you mentioned scripts/headers.sh is pointless
-and should be removed from the code base.
+./usr/include/linux/kexec.h:61: userspace cannot reference function or variable defined in the kernel
 
-If so, this patch of mine has no point.
-Could you consider removing scripts/headers.sh ?
+There is no proper fix for this file, as the declaration is meant for
+user space, not for the kernel, so we should work around it the
+same way that we treat the seqbuf_dump() definition.
 
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
-Best Regards
-Masahiro Yamada
-
-
-
-On Wed,  3 Dec 2014 15:52:15 +0900
-Masahiro Yamada <yamada.m@jp.panasonic.com> wrote:
-
-> The exported headers were moved to "uapi" directories.
-> We should check the existence of arch/*/include/uapi/asm/Kbuild.
-> 
-> Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
-> ---
-> 
->  scripts/headers.sh | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/scripts/headers.sh b/scripts/headers.sh
-> index 95ece06..b164336 100755
-> --- a/scripts/headers.sh
-> +++ b/scripts/headers.sh
-> @@ -6,7 +6,7 @@ set -e
->  
->  do_command()
->  {
-> -	if [ -f ${srctree}/arch/$2/include/asm/Kbuild ]; then
-> +	if [ -f ${srctree}/arch/$2/include/uapi/asm/Kbuild ]; then
->  		make ARCH=$2 KBUILD_HEADERS=$1 headers_$1
->  	else
->  		printf "Ignoring arch: %s\n" ${arch}
-> -- 
-> 1.9.1
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
+diff --git a/scripts/headers_check.pl b/scripts/headers_check.pl
+index 62320f93e903..fb051848667c 100755
+--- a/scripts/headers_check.pl
++++ b/scripts/headers_check.pl
+@@ -69,6 +69,10 @@ sub check_declarations
+ 	if ($line =~ m/^void seqbuf_dump\(void\);/) {
+ 		return;
+ 	}
++	# user-only declaration from kexec.h
++	if ($line =~ m/^extern int kexec_load/) {
++		return;
++	}
+ 	if ($line =~ m/^(\s*extern|unsigned|char|short|int|long|void)\b/) {
+ 		printf STDERR "$filename:$lineno: " .
+ 			      "userspace cannot reference function or " .
 
