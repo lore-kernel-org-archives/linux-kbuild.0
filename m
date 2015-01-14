@@ -1,48 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.linuxfoundation.org ([140.211.169.12]:54378 "EHLO
-	mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751064AbbANAr2 (ORCPT
+Received: from lebrac.rtp-net.org ([195.154.106.105]:34774 "EHLO
+	lebrac.rtp-net.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752499AbbANMs1 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 13 Jan 2015 19:47:28 -0500
-Date: Tue, 13 Jan 2015 16:47:26 -0800
-From: Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH] headers_check: don't warn about kexec.h
-Message-Id: <20150113164726.72ab8dec58aabf332fd4e1a0@linux-foundation.org>
-In-Reply-To: <1421183111.15397.34.camel@x220>
-References: <12825174.7oxZXDxNhV@wuerfel>
-	<1421169212.15397.22.camel@x220>
-	<2363197.VbAKlSiQLX@wuerfel>
-	<1421183111.15397.34.camel@x220>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+	Wed, 14 Jan 2015 07:48:27 -0500
+Message-Id: <20150114123658.185884720@rtp-net.org>
+Date: Wed, 14 Jan 2015 13:32:02 +0100
+From: Arnaud Patard (Rtp) <arnaud.patard@rtp-net.org>
+Subject: [PATCHv2 1/1] deb-pkg: Add device tree blobs to the package
+References: <20150114123201.434698327@rtp-net.org>
+Content-Disposition: inline; filename=builddeb-install-dtbs-if-needed.patch
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Paul Bolle <pebolle@tiscali.nl>
-Cc: Arnd Bergmann <arnd@arndb.de>, Linus Torvalds <torvalds@linux-foundation.org>, Maximilian Attems <max@stro.at>, Geoff Levand <geoff@infradead.org>, Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, linux-api@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: maximilian attems <max@stro.at>, Ben Hutchings <ben@decadent.org.uk>, Michal Marek <mmarek@suse.cz>
 
-On Tue, 13 Jan 2015 22:05:11 +0100 Paul Bolle <pebolle@tiscali.nl> wrote:
+When building a package with make deb-pkg (say, for arm), the dtb files are
+not added to the package. Given that things are still evolving on arm, it
+make sense to have them along with the kernel and modules.
 
-> [Dragging Andrew, Linus, and Maximilian into this thread.]
-> 
-> On Tue, 2015-01-13 at 21:27 +0100, Arnd Bergmann wrote:
-> > On Tuesday 13 January 2015 18:13:32 Paul Bolle wrote:
-> > > The last time that Geoff has been trying to get that patch applied
-> > > should be
-> > > http://lkml.kernel.org/r/b0702fc4186db21820d686e89afd6480560823db.1415837218.git.geoff@infradead.org> 
-> > > I'd rather see that go in.
-> > 
-> > Fine with me as well. As long as we can find someone to take one of 
-> > the patches, I'm happy.
-> 
-> Since Geoff's patch (and my preceding, identical patch) basically is a
-> partial revert of commit 29a5c67e7a78 ("kexec: export kexec.h to user
-> space") that should probably be done by either Andrew or Linus. 
-> 
-> (This short thread starts at
-> http://lkml.kernel.org/r/12825174.7oxZXDxNhV@wuerfel .)
+v2: make use of dtbs_install
 
-hm, sorry, I can't imagine why I didn't process Geoff's patch series
-back in November.  They all look good - I grabbed them.
+Signed-off-by: Arnaud Patard <arnaud.patard@rtp-net.org>
+---
+
+Index: linux-next/scripts/package/builddeb
+===================================================================
+--- linux-next.orig/scripts/package/builddeb	2015-01-14 13:04:45.845922441 +0100
++++ linux-next/scripts/package/builddeb	2015-01-14 13:19:26.121883720 +0100
+@@ -143,6 +143,10 @@ else
+ 	cp arch/$ARCH/boot/$KBUILD_IMAGE "$tmpdir/$installed_image_path"
+ fi
+ 
++if grep -q "^CONFIG_OF=y" .config ; then
++	make INSTALL_DTBS_PATH="$tmpdir/usr/lib/$packagename" dtbs_install
++fi
++
+ if grep -q '^CONFIG_MODULES=y' $KCONFIG_CONFIG ; then
+ 	INSTALL_MOD_PATH="$tmpdir" $MAKE KBUILD_SRC= modules_install
+ 	rm -f "$tmpdir/lib/modules/$version/build"
 
 
