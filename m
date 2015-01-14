@@ -1,146 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.17.10]:61562 "EHLO
-	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751149AbbAMVYh (ORCPT
+Received: from mail.linuxfoundation.org ([140.211.169.12]:54378 "EHLO
+	mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751064AbbANAr2 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 13 Jan 2015 16:24:37 -0500
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH] X.509: silence asn1 compiler debug output
-Date: Tue, 13 Jan 2015 22:24:31 +0100
-Message-ID: <2620021.MFTRTXyQbt@wuerfel>
-In-Reply-To: <2124221.xG51kBCe6s@wuerfel>
-References: <2124221.xG51kBCe6s@wuerfel>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+	Tue, 13 Jan 2015 19:47:28 -0500
+Date: Tue, 13 Jan 2015 16:47:26 -0800
+From: Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH] headers_check: don't warn about kexec.h
+Message-Id: <20150113164726.72ab8dec58aabf332fd4e1a0@linux-foundation.org>
+In-Reply-To: <1421183111.15397.34.camel@x220>
+References: <12825174.7oxZXDxNhV@wuerfel>
+	<1421169212.15397.22.camel@x220>
+	<2363197.VbAKlSiQLX@wuerfel>
+	<1421183111.15397.34.camel@x220>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: dhowells@redhat.com
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, mmarek@suse.cz
+To: Paul Bolle <pebolle@tiscali.nl>
+Cc: Arnd Bergmann <arnd@arndb.de>, Linus Torvalds <torvalds@linux-foundation.org>, Maximilian Attems <max@stro.at>, Geoff Levand <geoff@infradead.org>, Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, linux-api@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-The asn1_compiler process is particularly chatty and produces
-about the only stdout output for an allmodconfig kernel.
+On Tue, 13 Jan 2015 22:05:11 +0100 Paul Bolle <pebolle@tiscali.nl> wrote:
 
-In order to follow the general concept of 'no news is good
-news' for building kernels, this hides all the existing output
-unless the KBUILD_VERBOSE environment variable is set.
+> [Dragging Andrew, Linus, and Maximilian into this thread.]
+> 
+> On Tue, 2015-01-13 at 21:27 +0100, Arnd Bergmann wrote:
+> > On Tuesday 13 January 2015 18:13:32 Paul Bolle wrote:
+> > > The last time that Geoff has been trying to get that patch applied
+> > > should be
+> > > http://lkml.kernel.org/r/b0702fc4186db21820d686e89afd6480560823db.1415837218.git.geoff@infradead.org> 
+> > > I'd rather see that go in.
+> > 
+> > Fine with me as well. As long as we can find someone to take one of 
+> > the patches, I'm happy.
+> 
+> Since Geoff's patch (and my preceding, identical patch) basically is a
+> partial revert of commit 29a5c67e7a78 ("kexec: export kexec.h to user
+> space") that should probably be done by either Andrew or Linus. 
+> 
+> (This short thread starts at
+> http://lkml.kernel.org/r/12825174.7oxZXDxNhV@wuerfel .)
 
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+hm, sorry, I can't imagine why I didn't process Geoff's patch series
+back in November.  They all look good - I grabbed them.
 
-diff --git a/scripts/asn1_compiler.c b/scripts/asn1_compiler.c
-index 91c4117637ae..048f4e2aeca9 100644
---- a/scripts/asn1_compiler.c
-+++ b/scripts/asn1_compiler.c
-@@ -311,6 +311,9 @@ struct token {
- 
- static struct token *token_list;
- static unsigned nr_tokens;
-+static _Bool verbose;
-+
-+#define debug(args ...) ({ if (verbose) printf(args); })
- 
- static int directive_compare(const void *_key, const void *_pdir)
- {
-@@ -322,21 +325,21 @@ static int directive_compare(const void *_key, const void *_pdir)
- 	dlen = strlen(dir);
- 	clen = (dlen < token->size) ? dlen : token->size;
- 
--	//printf("cmp(%*.*s,%s) = ",
-+	//debug("cmp(%*.*s,%s) = ",
- 	//       (int)token->size, (int)token->size, token->value,
- 	//       dir);
- 
- 	val = memcmp(token->value, dir, clen);
- 	if (val != 0) {
--		//printf("%d [cmp]\n", val);
-+		//debug("%d [cmp]\n", val);
- 		return val;
- 	}
- 
- 	if (dlen == token->size) {
--		//printf("0\n");
-+		//debug("0\n");
- 		return 0;
- 	}
--	//printf("%d\n", (int)dlen - (int)token->size);
-+	//debug("%d\n", (int)dlen - (int)token->size);
- 	return dlen - token->size; /* shorter -> negative */
- }
- 
-@@ -515,13 +518,13 @@ static void tokenise(char *buffer, char *end)
- 	}
- 
- 	nr_tokens = tix;
--	printf("Extracted %u tokens\n", nr_tokens);
-+	debug("Extracted %u tokens\n", nr_tokens);
- 
- #if 0
- 	{
- 		int n;
- 		for (n = 0; n < nr_tokens; n++)
--			printf("Token %3u: '%*.*s'\n",
-+			debug("Token %3u: '%*.*s'\n",
- 			       n,
- 			       (int)token_list[n].size, (int)token_list[n].size,
- 			       token_list[n].value);
-@@ -542,6 +545,7 @@ int main(int argc, char **argv)
- 	ssize_t readlen;
- 	FILE *out, *hdr;
- 	char *buffer, *p;
-+	char *kbuild_verbose;
- 	int fd;
- 
- 	if (argc != 4) {
-@@ -550,6 +554,10 @@ int main(int argc, char **argv)
- 		exit(2);
- 	}
- 
-+	kbuild_verbose = getenv("KBUILD_VERBOSE");
-+	if (kbuild_verbose)
-+		verbose = atoi(kbuild_verbose);
-+
- 	filename = argv[1];
- 	outputname = argv[2];
- 	headername = argv[3];
-@@ -748,11 +756,11 @@ static void build_type_list(void)
- 
- 	qsort(type_index, nr, sizeof(type_index[0]), type_index_compare);
- 
--	printf("Extracted %u types\n", nr_types);
-+	debug("Extracted %u types\n", nr_types);
- #if 0
- 	for (n = 0; n < nr_types; n++) {
- 		struct type *type = type_index[n];
--		printf("- %*.*s\n",
-+		debug("- %*.*s\n",
- 		       (int)type->name->size,
- 		       (int)type->name->size,
- 		       type->name->value);
-@@ -793,7 +801,7 @@ static void parse(void)
- 
- 	} while (type++, !(type->flags & TYPE_STOP_MARKER));
- 
--	printf("Extracted %u actions\n", nr_actions);
-+	debug("Extracted %u actions\n", nr_actions);
- }
- 
- static struct element *element_list;
-@@ -1284,7 +1292,7 @@ static void render(FILE *out, FILE *hdr)
- 	}
- 
- 	/* We do two passes - the first one calculates all the offsets */
--	printf("Pass 1\n");
-+	debug("Pass 1\n");
- 	nr_entries = 0;
- 	root = &type_list[0];
- 	render_element(NULL, root->element, NULL);
-@@ -1295,7 +1303,7 @@ static void render(FILE *out, FILE *hdr)
- 		e->flags &= ~ELEMENT_RENDERED;
- 
- 	/* And then we actually render */
--	printf("Pass 2\n");
-+	debug("Pass 2\n");
- 	fprintf(out, "\n");
- 	fprintf(out, "static const unsigned char %s_machine[] = {\n",
- 		grammar_name);
 
