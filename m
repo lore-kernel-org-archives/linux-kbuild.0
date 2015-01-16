@@ -1,41 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.emea.novell.com ([130.57.118.101]:42394 "EHLO
-	mail.emea.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752342AbbAPQcr convert rfc822-to-8bit (ORCPT
-	<rfc822;groupwise-linux-kbuild@vger.kernel.org:4:1>);
-	Fri, 16 Jan 2015 11:32:47 -0500
-Message-Id: <54B94B3E0200007800055F77@mail.emea.novell.com>
-Date: Fri, 16 Jan 2015 16:32:46 +0000
-From: "Jan Beulich" <JBeulich@suse.com>
-Subject: Re: [PATCH v2 1/2] kconfig: don't silently ignore unhandled
- characters
-References: <54B93FE60200007800055E84@mail.emea.novell.com>
- <1421425532.8562.32.camel@x220>
-In-Reply-To: <1421425532.8562.32.camel@x220>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8BIT
-Content-Disposition: inline
+Received: from lists.s-osg.org ([54.187.51.154]:44592 "EHLO lists.s-osg.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752166AbbAPQfT (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 16 Jan 2015 11:35:19 -0500
+Message-ID: <54B93DA1.2010601@osg.samsung.com>
+Date: Fri, 16 Jan 2015 09:34:41 -0700
+From: Shuah Khan <shuahkh@osg.samsung.com>
+MIME-Version: 1.0
+Subject: Re: [PATCH 4/6] kbuild: add a new kselftest_install make target to
+ install selftests
+References: <1420794375-31881-1-git-send-email-mpe@ellerman.id.au> <1420794375-31881-4-git-send-email-mpe@ellerman.id.au>
+In-Reply-To: <1420794375-31881-4-git-send-email-mpe@ellerman.id.au>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Paul Bolle <pebolle@tiscali.nl>
-Cc: akpm@linux-foundation.org, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+To: Michael Ellerman <mpe@ellerman.id.au>, linux-kernel@vger.kernel.org
+Cc: mmarek@suse.cz, gregkh@linuxfoundation.org, akpm@linux-foundation.org, rostedt@goodmis.org, mingo@redhat.com, davem@davemloft.net, keescook@chromium.org, tranmanphong@gmail.com, cov@codeaurora.org, dh.herrmann@gmail.com, hughd@google.com, bobby.prani@gmail.com, serge.hallyn@ubuntu.com, ebiederm@xmission.com, tim.bird@sonymobile.com, josh@joshtriplett.org, koct9i@gmail.com, linux-kbuild@vger.kernel.org, linux-api@vger.kernel.org, netdev@vger.kernel.org
 
->>> On 16.01.15 at 17:25, <pebolle@tiscali.nl> wrote:
-> On Fri, 2015-01-16 at 15:44 +0000, Jan Beulich wrote:
->>  scripts/kconfig/zconf.l             |    7 +
->>  scripts/kconfig/zconf.lex.c_shipped |  195 +++++++++++++++++++-----------------
->>  sound/soc/intel/Kconfig             |    4 
+On 01/09/2015 02:06 AM, Michael Ellerman wrote:
+> Add a new make target to install kernel selftests. This new target will
+> build and install selftests.
 > 
-> I guess Michal would like to split the c_shipped changes in this patch
-> too. (I personally don't care.) And I think the sound/soc/intel/Kconfig
-> should be a separate patch. 
+> The default is just $(objtree)/selftests. This is preferable to
+> something based on $(INSTALL_MOD_PATH) (which defaults to /), as it
+> allows a normal user to install the tests. This is similar to the
+> default behaviour of make headers_install.
 
-I simply didn't want the patch to create fallout (even if it's just
-warnings). If doing this here is deemed inappropriate, I'd likely
-drop the adjustment altogether and just mention the effect the
-patch has. Following up with the various subsystem maintainers
-until they pick up patches is, hmm, difficult.
+A normal user can install tests at any location they choose by
+overriding the default path. For example:
 
-Jan
+INSTALL_MOD_PATH=/tmp make kselftest_install
 
+will install under tmp.
+
+The approach I used also ties test installs to kernel release.
+This addresses an important use-case for kernel developers
+that want to compare results from release to release.
+
+The use-case for any user to be able to install tests at
+any location is addressed by the above example.
+
+I would like these two above use-cases continued to be supported,
+especially the one that tries the test installs to kernel release.
+Another goal is to keep changes to the main Makefile minimal and
+the rest of the install support belongs under selftests/Makefile
+and any other include file (like the one you proposed).
+
+The patch I have in patch v4 addresses the use-cases mentioned above.
+I do like the lib.mk approach in general and I am going to review that
+patch and give you feedback.
+
+thanks,
+-- Shuah
+
+-- 
+Shuah Khan
+Sr. Linux Kernel Developer
+Open Source Innovation Group
+Samsung Research America (Silicon Valley)
+shuahkh@osg.samsung.com | (970) 217-8978
