@@ -1,60 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lists.s-osg.org ([54.187.51.154]:44958 "EHLO lists.s-osg.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753220AbbAPRxN (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 16 Jan 2015 12:53:13 -0500
-Message-ID: <54B95006.3080502@osg.samsung.com>
-Date: Fri, 16 Jan 2015 10:53:10 -0700
-From: Shuah Khan <shuahkh@osg.samsung.com>
-MIME-Version: 1.0
-Subject: Re: [PATCH 1/6] selftests: Introduce minimal shared logic for running
- tests
-References: <1420794375-31881-1-git-send-email-mpe@ellerman.id.au>
-In-Reply-To: <1420794375-31881-1-git-send-email-mpe@ellerman.id.au>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8bit
+Received: from cpsmtpb-ews09.kpnxchange.com ([213.75.39.14]:64498 "EHLO
+	cpsmtpb-ews09.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752132AbbAPRxs (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 16 Jan 2015 12:53:48 -0500
+Message-ID: <1421430826.8562.42.camel@x220>
+Subject: Re: [PATCH v2 1/2] kconfig: don't silently ignore unhandled
+ characters
+From: Paul Bolle <pebolle@tiscali.nl>
+Date: Fri, 16 Jan 2015 18:53:46 +0100
+In-Reply-To: <54B94B3E0200007800055F77@mail.emea.novell.com>
+References: <54B93FE60200007800055E84@mail.emea.novell.com>
+	 <1421425532.8562.32.camel@x220>
+	 <54B94B3E0200007800055F77@mail.emea.novell.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michael Ellerman <mpe@ellerman.id.au>, linux-kernel@vger.kernel.org
-Cc: mmarek@suse.cz, gregkh@linuxfoundation.org, akpm@linux-foundation.org, rostedt@goodmis.org, mingo@redhat.com, davem@davemloft.net, keescook@chromium.org, tranmanphong@gmail.com, cov@codeaurora.org, dh.herrmann@gmail.com, hughd@google.com, bobby.prani@gmail.com, serge.hallyn@ubuntu.com, ebiederm@xmission.com, tim.bird@sonymobile.com, josh@joshtriplett.org, koct9i@gmail.com, linux-kbuild@vger.kernel.org, linux-api@vger.kernel.org, netdev@vger.kernel.org
+To: Jan Beulich <JBeulich@suse.com>
+Cc: Jiri Kosina <jkosina@suse.cz>, akpm@linux-foundation.org, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
-On 01/09/2015 02:06 AM, Michael Ellerman wrote:
-> This adds a Make include file which most selftests can then include to
-> get the run_tests logic.
+On Fri, 2015-01-16 at 16:32 +0000, Jan Beulich wrote:
+> >>> On 16.01.15 at 17:25, <pebolle@tiscali.nl> wrote:
+> > On Fri, 2015-01-16 at 15:44 +0000, Jan Beulich wrote:
+> >>  scripts/kconfig/zconf.l             |    7 +
+> >>  scripts/kconfig/zconf.lex.c_shipped |  195 +++++++++++++++++++-----------------
+> >>  sound/soc/intel/Kconfig             |    4 
+> > 
+> > I guess Michal would like to split the c_shipped changes in this patch
+> > too. (I personally don't care.) And I think the sound/soc/intel/Kconfig
+> > should be a separate patch. 
 > 
-> On its own this has the advantage of some reduction in repetition, and
-> also means the pass/fail message is defined in fewer places.
-> 
-> However the key advantage is it will allow us to implement install very
-> simply in a subsequent patch.
-> 
-> The default implementation just executes each program in $(TEST_PROGS).
-> 
-> We use a variable to hold the default implementation of $(RUN_TESTS)
-> because that gives us a clean way to override it if necessary, ie. using
-> override. The mount, memory-hotplug and mqueue tests use that to provide
-> a different implementation.
-> 
-> Tests are not run via /bin/bash, so if they are scripts they must be
-> executable, we add u+x to several.
-> 
-> Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
+> I simply didn't want the patch to create fallout (even if it's just
+> warnings). If doing this here is deemed inappropriate, I'd likely
+> drop the adjustment altogether and just mention the effect the
+> patch has. Following up with the various subsystem maintainers
+> until they pick up patches is, hmm, difficult.
 
-I like the shared logic approach in general provided it leaves the
-flexibility to not use the shared logic if a test have the need to
-do so. This series requires some patch planning. shared logic patch
-followed by individual test patches as opposed a single patch.
+Certainly. Just a few days ago I sent out a reminder to some maintainers
+that, at best, borders on counterproductive.
 
-I would like to see the shared logic work done on top of my patch v4
-series.
-
-thanks,
--- Shuah
+In this case Jiri might be the quickest road to trivial success. Jiri
+responds in a reasonable time, hardly ever misses patches, and doesn't
+bark if you dare send a reminder. Anyhow, I wish I had sent out the
+trivial patch to fix that Kconfig last year. Then we wouldn't have had
+this conversation.
 
 
--- 
-Shuah Khan
-Sr. Linux Kernel Developer
-Open Source Innovation Group
-Samsung Research America (Silicon Valley)
-shuahkh@osg.samsung.com | (970) 217-8978
+Paul Bolle
+
