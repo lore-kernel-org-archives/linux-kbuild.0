@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lists.s-osg.org ([54.187.51.154]:44616 "EHLO lists.s-osg.org"
+Received: from lists.s-osg.org ([54.187.51.154]:44910 "EHLO lists.s-osg.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752505AbbAPQhG (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 16 Jan 2015 11:37:06 -0500
-Message-ID: <54B93E30.3060002@osg.samsung.com>
-Date: Fri, 16 Jan 2015 09:37:04 -0700
+	id S1755203AbbAPRqc (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 16 Jan 2015 12:46:32 -0500
+Message-ID: <54B94E75.8030504@osg.samsung.com>
+Date: Fri, 16 Jan 2015 10:46:29 -0700
 From: Shuah Khan <shuahkh@osg.samsung.com>
 MIME-Version: 1.0
-Subject: Re: [PATCH 6/6] selftests: Set CC using CROSS_COMPILE once in lib.mk
-References: <1420794375-31881-1-git-send-email-mpe@ellerman.id.au> <1420794375-31881-6-git-send-email-mpe@ellerman.id.au>
-In-Reply-To: <1420794375-31881-6-git-send-email-mpe@ellerman.id.au>
+Subject: Re: [PATCH 2/6] selftests: Add install target
+References: <1420794375-31881-1-git-send-email-mpe@ellerman.id.au> <1420794375-31881-2-git-send-email-mpe@ellerman.id.au>
+In-Reply-To: <1420794375-31881-2-git-send-email-mpe@ellerman.id.au>
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -18,64 +18,39 @@ To: Michael Ellerman <mpe@ellerman.id.au>, linux-kernel@vger.kernel.org
 Cc: mmarek@suse.cz, gregkh@linuxfoundation.org, akpm@linux-foundation.org, rostedt@goodmis.org, mingo@redhat.com, davem@davemloft.net, keescook@chromium.org, tranmanphong@gmail.com, cov@codeaurora.org, dh.herrmann@gmail.com, hughd@google.com, bobby.prani@gmail.com, serge.hallyn@ubuntu.com, ebiederm@xmission.com, tim.bird@sonymobile.com, josh@joshtriplett.org, koct9i@gmail.com, linux-kbuild@vger.kernel.org, linux-api@vger.kernel.org, netdev@vger.kernel.org
 
 On 01/09/2015 02:06 AM, Michael Ellerman wrote:
-
-Missing commit log. Please make sure your future include
-a meaningful commit log that describes what the patch does.
-
-> Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
-> ---
->  tools/testing/selftests/efivarfs/Makefile | 1 -
->  tools/testing/selftests/exec/Makefile     | 1 -
->  tools/testing/selftests/kcmp/Makefile     | 1 -
->  tools/testing/selftests/lib.mk            | 6 ++++++
->  tools/testing/selftests/net/Makefile      | 1 -
->  tools/testing/selftests/powerpc/Makefile  | 3 +--
->  tools/testing/selftests/size/Makefile     | 2 --
->  tools/testing/selftests/vm/Makefile       | 1 -
->  8 files changed, 7 insertions(+), 9 deletions(-)
+> This adds make install support to selftests. The basic usage is:
 > 
-> diff --git a/tools/testing/selftests/efivarfs/Makefile b/tools/testing/selftests/efivarfs/Makefile
-> index 3052d0bda24b..d683486a859b 100644
-> --- a/tools/testing/selftests/efivarfs/Makefile
-> +++ b/tools/testing/selftests/efivarfs/Makefile
-> @@ -1,4 +1,3 @@
-> -CC = $(CROSS_COMPILE)gcc
->  CFLAGS = -Wall
->  
->  test_objs = open-unlink create-read
-> diff --git a/tools/testing/selftests/exec/Makefile b/tools/testing/selftests/exec/Makefile
-> index 886cabe307b1..4edb7d0da29b 100644
-> --- a/tools/testing/selftests/exec/Makefile
-> +++ b/tools/testing/selftests/exec/Makefile
-> @@ -1,4 +1,3 @@
-> -CC = $(CROSS_COMPILE)gcc
->  CFLAGS = -Wall
->  BINARIES = execveat
->  DEPS = execveat.symlink execveat.denatured script subdir
-> diff --git a/tools/testing/selftests/kcmp/Makefile b/tools/testing/selftests/kcmp/Makefile
-> index 0eecd183058c..2ae7450a9a89 100644
-> --- a/tools/testing/selftests/kcmp/Makefile
-> +++ b/tools/testing/selftests/kcmp/Makefile
-> @@ -1,4 +1,3 @@
-> -CC := $(CROSS_COMPILE)$(CC)
->  CFLAGS += -I../../../../usr/include/
->  
->  all: kcmp_test
-> diff --git a/tools/testing/selftests/lib.mk b/tools/testing/selftests/lib.mk
-> index 7bd3dabe2846..abae16396c43 100644
-> --- a/tools/testing/selftests/lib.mk
-> +++ b/tools/testing/selftests/lib.mk
-> @@ -1,3 +1,9 @@
-> +# When we're called from kbuild $(CC) already contains $(CROSS_COMPILE), so
-> +# here we need to use "cc", otherwise we'll get $(CROSS_COMPILE) twice. The
-> +# only downside is it breaks someone overriding $(CC), but that's probably OK,
-> +# they can probably cope by changing their path.
+> $ cd tools/testing/selftests
+> $ make install
+> 
+> That installs into tools/testing/selftests/install, which can then be
+> copied where ever necessary.
+> 
+> The install destination is also configurable using eg:
+> 
+> $ INSTALL_PATH=/mnt/selftests make install
 
-I don't want to see the compiles broken and users needing to
-work-around. Pleas find a way to not break the compiles.
+Please see my response to [PATCH 4/6] kbuild: add a new
+kselftest_install make target to install selftests
+
+These are addressed by the current approach to use existing
+INSTALL_MOD_PATH.
+
+> 
+> The implementation uses two targets in the child makefiles. The first
+> "install" is expected to install all files into $(INSTALL_PATH).
+> 
+> The second, "emit_tests", is expected to emit the test instructions (ie.
+> bash script) on stdout. Separating this from install means the child
+> makefiles need no knowledge of the location of the test script.
+
+Yes. Removing the need for individual makefiles to know the install
+path details would be a good improvement to make on top of my patch v4
+series.
 
 thanks,
 -- Shuah
+
 
 -- 
 Shuah Khan
