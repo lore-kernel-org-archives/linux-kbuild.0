@@ -1,79 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lists.s-osg.org ([54.187.51.154]:53317 "EHLO lists.s-osg.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750824AbbASQjL (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 19 Jan 2015 11:39:11 -0500
-Message-ID: <54BD332D.6010907@osg.samsung.com>
-Date: Mon, 19 Jan 2015 09:39:09 -0700
-From: Shuah Khan <shuahkh@osg.samsung.com>
+Received: from lebrac.rtp-net.org ([195.154.106.105]:42939 "EHLO
+	lebrac.rtp-net.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751873AbbASXOH (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 19 Jan 2015 18:14:07 -0500
+From: Arnaud Patard (Rtp) <arnaud.patard@rtp-net.org>
+Subject: Re: [PATCHv2 1/1] deb-pkg: Add device tree blobs to the package
+References: <20150114123201.434698327@rtp-net.org>
+	<20150114123658.185884720@rtp-net.org>
+	<1421239885.19708.82.camel@decadent.org.uk>
+Date: Tue, 20 Jan 2015 00:13:35 +0100
+In-Reply-To: <1421239885.19708.82.camel@decadent.org.uk> (Ben Hutchings's
+	message of "Wed, 14 Jan 2015 12:51:25 +0000")
+Message-ID: <87lhkyictc.fsf@lebrac.rtp-net.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH 1/6] selftests: Introduce minimal shared logic for running
- tests
-References: <1420794375-31881-1-git-send-email-mpe@ellerman.id.au> <54B95006.3080502@osg.samsung.com> <1421627742.3787.6.camel@ellerman.id.au>
-In-Reply-To: <1421627742.3787.6.camel@ellerman.id.au>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michael Ellerman <mpe@ellerman.id.au>
-Cc: linux-kernel@vger.kernel.org, mmarek@suse.cz, gregkh@linuxfoundation.org, akpm@linux-foundation.org, rostedt@goodmis.org, mingo@redhat.com, davem@davemloft.net, keescook@chromium.org, tranmanphong@gmail.com, cov@codeaurora.org, dh.herrmann@gmail.com, hughd@google.com, bobby.prani@gmail.com, serge.hallyn@ubuntu.com, ebiederm@xmission.com, tim.bird@sonymobile.com, josh@joshtriplett.org, koct9i@gmail.com, linux-kbuild@vger.kernel.org, linux-api@vger.kernel.org, netdev@vger.kernel.org
+To: Ben Hutchings <ben@decadent.org.uk>
+Cc: linux-kbuild@vger.kernel.org, maximilian attems <max@stro.at>, Michal Marek <mmarek@suse.cz>
 
-On 01/18/2015 05:35 PM, Michael Ellerman wrote:
-> On Fri, 2015-01-16 at 10:53 -0700, Shuah Khan wrote:
->> On 01/09/2015 02:06 AM, Michael Ellerman wrote:
->>> This adds a Make include file which most selftests can then include to
->>> get the run_tests logic.
->>>
->>> On its own this has the advantage of some reduction in repetition, and
->>> also means the pass/fail message is defined in fewer places.
->>>
->>> However the key advantage is it will allow us to implement install very
->>> simply in a subsequent patch.
->>>
->>> The default implementation just executes each program in $(TEST_PROGS).
->>>
->>> We use a variable to hold the default implementation of $(RUN_TESTS)
->>> because that gives us a clean way to override it if necessary, ie. using
->>> override. The mount, memory-hotplug and mqueue tests use that to provide
->>> a different implementation.
->>>
->>> Tests are not run via /bin/bash, so if they are scripts they must be
->>> executable, we add u+x to several.
->>>
->>> Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
->>
->> I like the shared logic approach in general provided it leaves the
->> flexibility to not use the shared logic if a test have the need to
->> do so.
-> 
-> Yes of course it does, it's entirely optional to include lib.mk.
-> 
->> This series requires some patch planning. shared logic patch
->> followed by individual test patches as opposed a single patch.
-> 
-> It could be a single patch too, but there's no reason to do it that way. The
-> series works fine as I sent it.
-> 
->> I would like to see the shared logic work done on top of my patch v4
->> series.
-> 
-> That's a waste of time. This series replaces your v4. Doing this "on top" of
-> your v4 would just mean reverting your v4 series and then applying this.
-> 
+Ben Hutchings <ben@decadent.org.uk> writes:
 
-No necessarily if the work is done as evolutionary step. In any case,
-I want the first step install target support going into the upcoming
-release and then make improvements to it. Please send separate patch
-for the shared logic and individual test patches that use the shared
-logic if you would like to make the improvements.
+> [Please submit patches inline.]
 
-thanks,
--- Shuah
+I've no way to control the way quilt is sending mails.
 
+>
+> On Wed, 2015-01-14 at 13:32 +0100, Arnaud Patard wrote:
+>> When building a package with make deb-pkg (say, for arm), the dtb files are
+>> not added to the package. Given that things are still evolving on arm, it
+>> make sense to have them along with the kernel and modules.
+>> 
+>> v2: make use of dtbs_install
+>> 
+>> Signed-off-by: Arnaud Patard <arnaud.patard@rtp-net.org>
+>> ---
+>> 
+>> Index: linux-next/scripts/package/builddeb
+>> ===================================================================
+>> --- linux-next.orig/scripts/package/builddeb    2015-01-14 13:04:45.845922441 +0100
+>> +++ linux-next/scripts/package/builddeb 2015-01-14 13:19:26.121883720 +0100
+>> @@ -143,6 +143,10 @@ else
+>>         cp arch/$ARCH/boot/$KBUILD_IMAGE "$tmpdir/$installed_image_path"
+>>  fi
+>>  
+>> +if grep -q "^CONFIG_OF=y" .config ; then
+>> +       make INSTALL_DTBS_PATH="$tmpdir/usr/lib/$packagename" dtbs_install
+>> +fi
+>
+> Only arm and arm64 support that target.  You should maybe run something
+> like 'make -n dtbs_install >/dev/null 2>&1' first to check that the
+> target is defined.
 
--- 
-Shuah Khan
-Sr. Linux Kernel Developer
-Open Source Innovation Group
-Samsung Research America (Silicon Valley)
-shuahkh@osg.samsung.com | (970) 217-8978
+There's a 'set -e' on top of the script so using make -n will likely
+result in the script failing, which wouldn't be so nice imho.
+
+From a quick untested guess, I see 2 way of solving this:
+
+make INSTALL_DTBS_PATH="$tmpdir/usr/lib/$packagename" dtbs_install || /bin/true
+
+or
+
+set +e
+make -n dtbs_install >/dev/null 2>&1
+ret=$?
+set -e
+if [ $ret -eq 0 ]; then
+   make INSTALL_DTBS_PATH="$tmpdir/usr/lib/$packagename" dtbs_install
+fi
+
+Any preference ?
+
+Arnaud
