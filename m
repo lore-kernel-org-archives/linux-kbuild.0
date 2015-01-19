@@ -1,16 +1,16 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([103.22.144.67]:37874 "EHLO ozlabs.org"
+Received: from ozlabs.org ([103.22.144.67]:49591 "EHLO ozlabs.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751045AbbASAfs (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 18 Jan 2015 19:35:48 -0500
-Message-ID: <1421627742.3787.6.camel@ellerman.id.au>
-Subject: Re: [PATCH 1/6] selftests: Introduce minimal shared logic for
- running tests
+	id S1751651AbbASAfz (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 18 Jan 2015 19:35:55 -0500
+Message-ID: <1421627752.3787.8.camel@ellerman.id.au>
+Subject: Re: [PATCH 2/6] selftests: Add install target
 From: Michael Ellerman <mpe@ellerman.id.au>
-Date: Mon, 19 Jan 2015 11:35:42 +1100
-In-Reply-To: <54B95006.3080502@osg.samsung.com>
+Date: Mon, 19 Jan 2015 11:35:52 +1100
+In-Reply-To: <54B94E75.8030504@osg.samsung.com>
 References: <1420794375-31881-1-git-send-email-mpe@ellerman.id.au>
-	 <54B95006.3080502@osg.samsung.com>
+	 <1420794375-31881-2-git-send-email-mpe@ellerman.id.au>
+	 <54B94E75.8030504@osg.samsung.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -19,46 +19,33 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Shuah Khan <shuahkh@osg.samsung.com>
 Cc: linux-kernel@vger.kernel.org, mmarek@suse.cz, gregkh@linuxfoundation.org, akpm@linux-foundation.org, rostedt@goodmis.org, mingo@redhat.com, davem@davemloft.net, keescook@chromium.org, tranmanphong@gmail.com, cov@codeaurora.org, dh.herrmann@gmail.com, hughd@google.com, bobby.prani@gmail.com, serge.hallyn@ubuntu.com, ebiederm@xmission.com, tim.bird@sonymobile.com, josh@joshtriplett.org, koct9i@gmail.com, linux-kbuild@vger.kernel.org, linux-api@vger.kernel.org, netdev@vger.kernel.org
 
-On Fri, 2015-01-16 at 10:53 -0700, Shuah Khan wrote:
+On Fri, 2015-01-16 at 10:46 -0700, Shuah Khan wrote:
 > On 01/09/2015 02:06 AM, Michael Ellerman wrote:
-> > This adds a Make include file which most selftests can then include to
-> > get the run_tests logic.
+> > This adds make install support to selftests. The basic usage is:
 > > 
-> > On its own this has the advantage of some reduction in repetition, and
-> > also means the pass/fail message is defined in fewer places.
+> > $ cd tools/testing/selftests
+> > $ make install
 > > 
-> > However the key advantage is it will allow us to implement install very
-> > simply in a subsequent patch.
+> > That installs into tools/testing/selftests/install, which can then be
+> > copied where ever necessary.
 > > 
-> > The default implementation just executes each program in $(TEST_PROGS).
+> > The install destination is also configurable using eg:
 > > 
-> > We use a variable to hold the default implementation of $(RUN_TESTS)
-> > because that gives us a clean way to override it if necessary, ie. using
-> > override. The mount, memory-hotplug and mqueue tests use that to provide
-> > a different implementation.
-> > 
-> > Tests are not run via /bin/bash, so if they are scripts they must be
-> > executable, we add u+x to several.
-> > 
-> > Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
+> > $ INSTALL_PATH=/mnt/selftests make install
 > 
-> I like the shared logic approach in general provided it leaves the
-> flexibility to not use the shared logic if a test have the need to
-> do so.
+> Please see my response to [PATCH 4/6] kbuild: add a new
+> kselftest_install make target to install selftests
+> 
+> These are addressed by the current approach to use existing
+> INSTALL_MOD_PATH.
 
-Yes of course it does, it's entirely optional to include lib.mk.
+No that's a separate issue.
 
-> This series requires some patch planning. shared logic patch
-> followed by individual test patches as opposed a single patch.
+This patch adds install support for tools/testing/selftests, *completely
+separate* from the kbuild infrastructure. 
 
-It could be a single patch too, but there's no reason to do it that way. The
-series works fine as I sent it.
-
-> I would like to see the shared logic work done on top of my patch v4
-> series.
-
-That's a waste of time. This series replaces your v4. Doing this "on top" of
-your v4 would just mean reverting your v4 series and then applying this.
+That is an existing use case, ie. using selftests on its own, which this patch
+easily continues to support.
 
 cheers
 
