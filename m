@@ -1,38 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from asavdk3.altibox.net ([109.247.116.14]:34010 "EHLO
-	asavdk3.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751447AbbAQVsW (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 17 Jan 2015 16:48:22 -0500
-Date: Sat, 17 Jan 2015 22:41:32 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH] kbuild: fix scripts/headers.sh to see the correct Kbuild
- path
-Message-ID: <20150117214132.GA21522@ravnborg.org>
-References: <1417589535-15867-1-git-send-email-yamada.m@jp.panasonic.com>
- <20150113142404.CACA.AA925319@jp.panasonic.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20150113142404.CACA.AA925319@jp.panasonic.com>
+Received: from ozlabs.org ([103.22.144.67]:37874 "EHLO ozlabs.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751045AbbASAfs (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 18 Jan 2015 19:35:48 -0500
+Message-ID: <1421627742.3787.6.camel@ellerman.id.au>
+Subject: Re: [PATCH 1/6] selftests: Introduce minimal shared logic for
+ running tests
+From: Michael Ellerman <mpe@ellerman.id.au>
+Date: Mon, 19 Jan 2015 11:35:42 +1100
+In-Reply-To: <54B95006.3080502@osg.samsung.com>
+References: <1420794375-31881-1-git-send-email-mpe@ellerman.id.au>
+	 <54B95006.3080502@osg.samsung.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>
+To: Shuah Khan <shuahkh@osg.samsung.com>
+Cc: linux-kernel@vger.kernel.org, mmarek@suse.cz, gregkh@linuxfoundation.org, akpm@linux-foundation.org, rostedt@goodmis.org, mingo@redhat.com, davem@davemloft.net, keescook@chromium.org, tranmanphong@gmail.com, cov@codeaurora.org, dh.herrmann@gmail.com, hughd@google.com, bobby.prani@gmail.com, serge.hallyn@ubuntu.com, ebiederm@xmission.com, tim.bird@sonymobile.com, josh@joshtriplett.org, koct9i@gmail.com, linux-kbuild@vger.kernel.org, linux-api@vger.kernel.org, netdev@vger.kernel.org
 
-On Tue, Jan 13, 2015 at 02:24:04PM +0900, Masahiro Yamada wrote:
-> Hi Sam,
+On Fri, 2015-01-16 at 10:53 -0700, Shuah Khan wrote:
+> On 01/09/2015 02:06 AM, Michael Ellerman wrote:
+> > This adds a Make include file which most selftests can then include to
+> > get the run_tests logic.
+> > 
+> > On its own this has the advantage of some reduction in repetition, and
+> > also means the pass/fail message is defined in fewer places.
+> > 
+> > However the key advantage is it will allow us to implement install very
+> > simply in a subsequent patch.
+> > 
+> > The default implementation just executes each program in $(TEST_PROGS).
+> > 
+> > We use a variable to hold the default implementation of $(RUN_TESTS)
+> > because that gives us a clean way to override it if necessary, ie. using
+> > override. The mount, memory-hotplug and mqueue tests use that to provide
+> > a different implementation.
+> > 
+> > Tests are not run via /bin/bash, so if they are scripts they must be
+> > executable, we add u+x to several.
+> > 
+> > Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
 > 
-> IIRC, you mentioned scripts/headers.sh is pointless
-> and should be removed from the code base.
+> I like the shared logic approach in general provided it leaves the
+> flexibility to not use the shared logic if a test have the need to
+> do so.
 
-Took a quik look at it.
-It seems that there is use for it still.
-um require some special handling.
-And the HDR_ARCH_LIST feature is also implemented here.
+Yes of course it does, it's entirely optional to include lib.mk.
 
-Both could be done in other ways and the shell script
-may be cleaned up a little.
-But we cannot get rid of it as I initally thought.
+> This series requires some patch planning. shared logic patch
+> followed by individual test patches as opposed a single patch.
 
-	Sam
+It could be a single patch too, but there's no reason to do it that way. The
+series works fine as I sent it.
+
+> I would like to see the shared logic work done on top of my patch v4
+> series.
+
+That's a waste of time. This series replaces your v4. Doing this "on top" of
+your v4 would just mean reverting your v4 series and then applying this.
+
+cheers
+
+
