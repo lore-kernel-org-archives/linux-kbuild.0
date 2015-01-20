@@ -1,14 +1,14 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.emea.novell.com ([130.57.118.101]:33410 "EHLO
+Received: from mail.emea.novell.com ([130.57.118.101]:49188 "EHLO
 	mail.emea.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752119AbbATMvR convert rfc822-to-8bit (ORCPT
-	<rfc822;groupwise-linux-kbuild@vger.kernel.org:4:1>);
-	Tue, 20 Jan 2015 07:51:17 -0500
-Message-Id: <54BE5D52020000780005705C@mail.emea.novell.com>
-Date: Tue, 20 Jan 2015 12:51:14 +0000
+	with ESMTP id S1753961AbbATMwJ convert rfc822-to-8bit (ORCPT
+	<rfc822;groupwise-linux-kbuild@vger.kernel.org:5:1>);
+	Tue, 20 Jan 2015 07:52:09 -0500
+Message-Id: <54BE5D87020000780005705F@mail.emea.novell.com>
+Date: Tue, 20 Jan 2015 12:52:07 +0000
 From: "Jan Beulich" <JBeulich@suse.com>
-Subject: [PATCH v3 0/3] kconfig: enhance parsing and operator
- recognition
+Subject: [PATCH v3 1/3] trivial: sound/soc/intel/Kconfig: use single
+ backslash for line continuation
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8BIT
@@ -16,24 +16,33 @@ Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: akpm@linux-foundation.org, Michal Marek <mmarek@suse.cz>, pebolle@tiscali.nl
-
-There being at least one case (DEBUG_UART_8250_WORD in
-arch/arm/Kconfig.debug) where the utility silently behaves other than
-what the programmer expects tells us that (a) we shouldn't silently
-ignore unrecognized characters and (b) it's not just me always having
-wanted to be able to use comparisons other than (in)equality ones.
-
-1: trivial: sound/soc/intel/Kconfig: use single backslash for line continuation
-2: kconfig: don't silently ignore unhandled characters
-3: kconfig: allow use of relations other than (in)equality
+Cc: trivial@kernel.org, akpm@linux-foundation.org, Michal Marek <mmarek@suse.cz>, pebolle@tiscali.nl
 
 Signed-off-by: Jan Beulich <jbeulich@suse.com>
 ---
-v3: Split off sound/soc/intel/Kconfig change from patch 1 (now 2).
-v2: printf() -> fprintf(stderr, ) upon Paul Bolle's request. Replace
-    two instances of double backslash line continuations with single
-    ones in sound/soc/intel/Kconfig. Drop stray debugging printf()s
-    from patch 2.
+ sound/soc/intel/Kconfig |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+--- 3.19-rc5-kconfig.orig/sound/soc/intel/Kconfig
++++ 3.19-rc5-kconfig/sound/soc/intel/Kconfig
+@@ -46,7 +46,7 @@ config SND_SOC_INTEL_BAYTRAIL
+ 
+ config SND_SOC_INTEL_HASWELL_MACH
+ 	tristate "ASoC Audio DSP support for Intel Haswell Lynxpoint"
+-	depends on SND_SOC_INTEL_SST && X86_INTEL_LPSS && I2C && \\
++	depends on SND_SOC_INTEL_SST && X86_INTEL_LPSS && I2C && \
+ 		   I2C_DESIGNWARE_PLATFORM
+ 	select SND_SOC_INTEL_HASWELL
+ 	select SND_SOC_RT5640
+@@ -76,7 +76,7 @@ config SND_SOC_INTEL_BYT_MAX98090_MACH
+ 
+ config SND_SOC_INTEL_BROADWELL_MACH
+ 	tristate "ASoC Audio DSP support for Intel Broadwell Wildcatpoint"
+-	depends on SND_SOC_INTEL_SST && X86_INTEL_LPSS && DW_DMAC && \\
++	depends on SND_SOC_INTEL_SST && X86_INTEL_LPSS && DW_DMAC && \
+ 		   I2C_DESIGNWARE_PLATFORM
+ 	select SND_SOC_INTEL_HASWELL
+ 	select SND_COMPRESS_OFFLOAD
+
 
 
