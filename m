@@ -1,111 +1,83 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cpsmtpb-ews06.kpnxchange.com ([213.75.39.9]:61985 "EHLO
-	cpsmtpb-ews06.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751493AbbAVIuR (ORCPT
+Received: from mail-lb0-f178.google.com ([209.85.217.178]:45133 "EHLO
+	mail-lb0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751851AbbAVKY5 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 22 Jan 2015 03:50:17 -0500
-Message-ID: <1421916615.13638.35.camel@x220>
-Subject: Re: [PATCH] [RFC] kconfig: menuconfig make "Selected by:" readable
-From: Paul Bolle <pebolle@tiscali.nl>
-Date: Thu, 22 Jan 2015 09:50:15 +0100
-In-Reply-To: <1421915745.13638.27.camel@x220>
-References: <1421881250.13638.10.camel@x220>
-	 <54C05F33.6070703@infradead.org> <1421915745.13638.27.camel@x220>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+	Thu, 22 Jan 2015 05:24:57 -0500
+Received: by mail-lb0-f178.google.com with SMTP id u10so706480lbd.9
+        for <linux-kbuild@vger.kernel.org>; Thu, 22 Jan 2015 02:24:56 -0800 (PST)
+MIME-Version: 1.0
+In-Reply-To: <1421769898.31046.194.camel@decadent.org.uk>
+References: <20150114123201.434698327@rtp-net.org>
+	<20150114123658.185884720@rtp-net.org>
+	<1421239885.19708.82.camel@decadent.org.uk>
+	<87lhkyictc.fsf@lebrac.rtp-net.org>
+	<1421769898.31046.194.camel@decadent.org.uk>
+Date: Thu, 22 Jan 2015 12:24:56 +0200
+Message-ID: <CAGNsrLD97yDkUxsNPb9Ni2JNuwxLEamtBxyT9A8VSDwNfZ8BWg@mail.gmail.com>
+Subject: Re: [PATCHv2 1/1] deb-pkg: Add device tree blobs to the package
+From: Fathi Boudra <fathi.boudra@linaro.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+To: Ben Hutchings <ben@decadent.org.uk>
+Cc: Arnaud Patard <arnaud.patard@rtp-net.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, maximilian attems <max@stro.at>, Michal Marek <mmarek@suse.cz>
 
-On Thu, 2015-01-22 at 09:35 +0100, Paul Bolle wrote:
-> On Wed, 2015-01-21 at 18:23 -0800, Randy Dunlap wrote:
-> > On 01/21/15 15:00, Paul Bolle wrote:
-> > > rev_dep expressions can get rather unwieldy, especially if a symbol is
-> > > selected by more than a handful of other symbols. Ie, it's possible to
-> > > have near endless expressions like:
-> > >    A && B && !C || D || F && (G || H) || [...]
-> > > 
-> > > Chop these expressions into actually readable chunks:
-> > >    - A && B && !C
-> > >    - D
-> > >    - F && (G || H)
-> > >    - [...]
-> > > 
-> > > Ie, transform the top level "||" tokens into newlines and prepend each
-> > > line with a minus. This makes the "Selected by:" blurb much easier to
-> > > read.
-> > 
-> > I agree that something like this needs to be done.
-> > 
-> > After reading these expressions for a few years, I can handle them OK, but
-> > I expect that I look at them more than most people do (with the exception of Paul).
-> 
-> That's a problem with a broader scope. The specific problem this RFC
-> targets is neatly demonstrated by this screenshot: 
->     Symbol: SERIAL_CORE_CONSOLE [=n]
->     Type  : boolean
->      Defined at drivers/tty/serial/Kconfig:805
->   Depends on: TTY [=n] && HAS_IOMEM [=y]
->   Selected by: SERIAL_8250_CONSOLE [=n] && TTY [=n] && HAS_IOMEM [=y] && SERIAL_8250 [=n]=y || SERIAL_AMBA_PL010_CONSOLE [=n] && [...]
-> 
-> That line ends about two meters to the right of your screen. Really.
-> 
-> > Here is another confusing one, at least to me:
-> > [This is for LBDAF on a 64-biy x86 kernel config.]
-> > 
-> > Depends on: BLOCK [=y] && !64BIT [=y]
-> > 
-> > I guess that the value [y,m,n] inside the square brackets is always(?) the
-> > symbol value (64BIT) and not the expression value (!64BIT), but that isn't
-> > always clear IMO.
-> 
-> I think you got that right. I guess the entire screen for LBDAF looked
-> like this _hand edited_ example:
->     Symbol: LBDAF [=n]                                      
->     Type  : boolean                                         
->     Prompt: Support for large (2TB+) block devices and files
->       Location:                                             
->     (1) -> Enable the block layer (BLOCK [=y])              
->       Defined at block/Kconfig:26                           
->       Depends on: BLOCK [=y] && !64BIT [=y]                 
-> 
-> In this case 64BIT is set to 'y' (otherwise LBDAF would have been 'y').
+Hi,
 
-This is not correct at all. If 64BIT == 'n', LBDAF can be both 'y' or
-'n'. Where's that brown paper bag again?
+On 20 January 2015 at 18:04, Ben Hutchings <ben@decadent.org.uk> wrote:
+> On Tue, 2015-01-20 at 00:13 +0100, Arnaud Patard wrote:
+>> Ben Hutchings <ben@decadent.org.uk> writes:
+>>
+>> > [Please submit patches inline.]
+>>
+>> I've no way to control the way quilt is sending mails.
+>>
+>> >
+>> > On Wed, 2015-01-14 at 13:32 +0100, Arnaud Patard wrote:
+>> >> When building a package with make deb-pkg (say, for arm), the dtb files are
+>> >> not added to the package. Given that things are still evolving on arm, it
+>> >> make sense to have them along with the kernel and modules.
+>> >>
+>> >> v2: make use of dtbs_install
+>> >>
+>> >> Signed-off-by: Arnaud Patard <arnaud.patard@rtp-net.org>
+>> >> ---
+>> >>
+>> >> Index: linux-next/scripts/package/builddeb
+>> >> ===================================================================
+>> >> --- linux-next.orig/scripts/package/builddeb    2015-01-14 13:04:45.845922441 +0100
+>> >> +++ linux-next/scripts/package/builddeb 2015-01-14 13:19:26.121883720 +0100
+>> >> @@ -143,6 +143,10 @@ else
+>> >>         cp arch/$ARCH/boot/$KBUILD_IMAGE "$tmpdir/$installed_image_path"
+>> >>  fi
+>> >>
+>> >> +if grep -q "^CONFIG_OF=y" .config ; then
+>> >> +       make INSTALL_DTBS_PATH="$tmpdir/usr/lib/$packagename" dtbs_install
+>> >> +fi
+>> >
+>> > Only arm and arm64 support that target.  You should maybe run something
+>> > like 'make -n dtbs_install >/dev/null 2>&1' first to check that the
+>> > target is defined.
+>>
+>> There's a 'set -e' on top of the script so using make -n will likely
+>> result in the script failing, which wouldn't be so nice imho.
+> [...]
+>
+> That's why you use it with the if statement:
+>
+> # Only some architectures with OF support have this target
+> if make -n dtbs_install >/dev/null 2>&1; then
+>         make INSTALL_DTBS_PATH="$tmpdir/usr/lib/$packagename" dtbs_install
+> fi
 
-> This isn't a bug issue, of course, but I still can see how this can be
-> confusing. Perhaps the last line should read:
->       Unmet dependency on: BLOCK [=y] && !64BIT [=y]
-> 
-> Would that help? Or would 
->       Depends on: BLOCK [=y] && !64BIT [=n]
-> 
-> (ie, print the value if "!64BIT") be clearer?
-> 
-> > > Not-yet-signed-off-by: Paul Bolle <pebolle@tiscali.nl>
-> 
-> I'm glad I added that!
-> 
-> > > Today I found myself wondering why a certain Kconfig was selected.
-> > > Currently menuconfig's help is of no use in complicated cases. Please
-> > > look at the help of USB or CRYPTO to see what I mean.
-> > > 
-> > > This is a _hack_ to show what might be a better way to do this. It
-> > > parses a stringified version of the reverse dependency, and not the
-> > > actual reverse dependecy expression. But that was easier to cobble
-> > > together.
-> > > 
-> > > One cool improvement would be to change to minus in front of the
-> > > subexpressions to Y or M for those that actually set the symbol. Anyhow,
-> > > other suggestions and feedback is welcome.
-> > > 
-> > >  scripts/kconfig/menu.c | 83 ++++++++++++++++++++++++++++++++++++++++++++++++--
-> > >  1 file changed, 81 insertions(+), 2 deletions(-)
+Would it be acceptable to have a fallback when dtbs_install isn't available?
+It will allow to cover e.g. LTS 3.10 kernel which don't have the target
 
+for example (i.e. can't be upstreamed as-is), I'm using this hack locally:
+https://git.linaro.org/kernel/linux-linaro-tracking.git/blob/HEAD:/scripts/package/builddeb#l334
 
-Paul Bolle
+> Ben.
 
-
+Cheers,
+Fathi
