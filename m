@@ -1,76 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lebrac.rtp-net.org ([195.154.106.105]:47421 "EHLO
-	lebrac.rtp-net.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752530AbbAVP6o (ORCPT
+Received: from h1446028.stratoserver.net ([85.214.92.142]:55283 "EHLO
+	mail.ahsoftware.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751713AbbAWB16 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 22 Jan 2015 10:58:44 -0500
-From: Arnaud Patard (Rtp) <arnaud.patard@rtp-net.org>
-Subject: Re: [PATCHv2 1/1] deb-pkg: Add device tree blobs to the package
-References: <20150114123201.434698327@rtp-net.org>
-	<20150114123658.185884720@rtp-net.org>
-	<1421239885.19708.82.camel@decadent.org.uk>
-	<87lhkyictc.fsf@lebrac.rtp-net.org>
-	<1421769898.31046.194.camel@decadent.org.uk> <54C0FDDD.10805@suse.cz>
-	<1421936376.31046.211.camel@decadent.org.uk>
-	<54C11776.2070808@suse.cz>
-Date: Thu, 22 Jan 2015 16:58:13 +0100
-In-Reply-To: <54C11776.2070808@suse.cz> (Michal Marek's message of "Thu, 22
-	Jan 2015 16:29:58 +0100")
-Message-ID: <87d266iz8q.fsf@lebrac.rtp-net.org>
-MIME-Version: 1.0
-Content-Type: text/plain
+	Thu, 22 Jan 2015 20:27:58 -0500
+From: Alexander Holler <holler@ahsoftware.de>
+Subject: [PATCH] modsign: provide option to automatically delete the key after modules were installed
+Date: Fri, 23 Jan 2015 02:20:09 +0100
+Message-Id: <1421976009-9819-1-git-send-email-holler@ahsoftware.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Ben Hutchings <ben@decadent.org.uk>, linux-kbuild@vger.kernel.org, maximilian attems <max@stro.at>
+To: linux-kernel@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, David Howells <dhowells@redhat.com>, Linus Torvalds <torvalds@linux-foundation.org>, Alexander Holler <holler@ahsoftware.de>
 
-Michal Marek <mmarek@suse.cz> writes:
+I usually throw away (delete) the key used to sign modules after having
+called make -jN (b)zImage modules && make -jN modules_install. Because I've
+got bored to always have to type rm signing_key.* afterwards, I've build
+this patch some time ago.
+As I'm not eager anymore to publish kernel patches, it rested in my private
+chest of patches until I've seen the keynote of Linux.conf.au 2015. It made
+me aware that this patch might have a chance to become included. ;)
 
-> On 2015-01-22 15:19, Ben Hutchings wrote:
->> On Thu, 2015-01-22 at 14:40 +0100, Michal Marek wrote:
->>> On 2015-01-20 17:04, Ben Hutchings wrote:
->>>> On Tue, 2015-01-20 at 00:13 +0100, Arnaud Patard wrote:
->>>>> Ben Hutchings <ben@decadent.org.uk> writes:
->>>>>> Only arm and arm64 support that target.  You should maybe run something
->>>>>> like 'make -n dtbs_install >/dev/null 2>&1' first to check that the
->>>>>> target is defined.
->>>>>
->>>>> There's a 'set -e' on top of the script so using make -n will likely
->>>>> result in the script failing, which wouldn't be so nice imho.
->>>> [...]
->>>>
->>>> That's why you use it with the if statement:
->>>>
->>>> # Only some architectures with OF support have this target
->>>> if make -n dtbs_install >/dev/null 2>&1; then
->>>
->>> The problem is that kbuild does not support make -n and some of the
->>> commands are always executed. So the command will silently build the
->>> blobs and just not install them.
->> 
->> If the dtbs_install target is defined, they should already have been
->> built at this point.  If the target is not defined, why would it do
->> anything?
->
-> The point is that make -n does not work with kbuild. It might work for
-> this specific case, but there is no guarantee that it will continue to
-> do so.
->
+Signed-off-by: Alexander Holler <holler@ahsoftware.de>
+---
+ Makefile     |  7 +++++++
+ init/Kconfig | 12 ++++++++++++
+ 2 files changed, 19 insertions(+)
 
-Ok, so a patch with make -n will be refused, right ?
+diff --git a/Makefile b/Makefile
+index fb93350..95e07ca 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1129,6 +1129,13 @@ _modinst_:
+ 	@cp -f $(objtree)/modules.order $(MODLIB)/
+ 	@cp -f $(objtree)/modules.builtin $(MODLIB)/
+ 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modinst
++ifeq ($(CONFIG_MODULE_SIG_THROW_AWAY), y)
++	@echo "###"
++	@echo "### Deleting key used to sign modules."
++	@echo "###"
++	@rm ./signing_key.priv
++	@rm ./signing_key.x509
++endif
+ 
+ # This depmod is only for convenience to give the initial
+ # boot a modules.dep even before / is mounted read-write.  However the
+diff --git a/init/Kconfig b/init/Kconfig
+index 9afb971..f29304e 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -1884,6 +1884,18 @@ config MODULE_SIG_ALL
+ 	  Sign all modules during make modules_install. Without this option,
+ 	  modules must be signed manually, using the scripts/sign-file tool.
+ 
++config MODULE_SIG_THROW_AWAY
++	bool "Automatically delete the key after modules were installed"
++	default n
++	depends on MODULE_SIG_ALL
++	help
++	  Delete the key used to sign modules after modules were installed.
++	  Be aware of the consequences. The downside is that you  won't be
++	  able to build any module for a (maybe running) kernel, but will
++	  have to rebuild the kernel and all modules in order to add or modify
++	  a module. The upside is that you don't have to secure the key in
++	  order to keep a running kernel safe from unwanted modules.
++
+ comment "Do not forget to sign required modules with scripts/sign-file"
+ 	depends on MODULE_SIG_FORCE && !MODULE_SIG_ALL
+ 
+-- 
+2.0.5
 
->
->>> if grep -q dtbs_install "arch/$SRCARCH/Makefile"; then
->>>   ...
->>>
->>> and hope that there won't be any comment causing a false positive.
->>> Another option is to grep 'make help' output.
->> 
->> Ugh.
->
-> I know that both options are ugly :).
-
-Let's go to your first options then. I feel not really motivated by
-parsing 'make help' output.
-
-Arnaud
