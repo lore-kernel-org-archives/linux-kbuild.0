@@ -1,40 +1,27 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from h1446028.stratoserver.net ([85.214.92.142]:37432 "EHLO
-	mail.ahsoftware.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751487AbbAWWQs (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 23 Jan 2015 17:16:48 -0500
-Message-ID: <54C2C836.2010300@ahsoftware.de>
-Date: Fri, 23 Jan 2015 23:16:22 +0100
-From: Alexander Holler <holler@ahsoftware.de>
-MIME-Version: 1.0
+Received: from mx1.redhat.com ([209.132.183.28]:55037 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750820AbbAWX6Y (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 23 Jan 2015 18:58:24 -0500
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <1422050221-28345-1-git-send-email-holler@ahsoftware.de>
+References: <1422050221-28345-1-git-send-email-holler@ahsoftware.de> <1421976009-9819-1-git-send-email-holler@ahsoftware.de>
 Subject: Re: [PATCH] modsign: overwrite keys with zero before deleting them
-References: <1421976009-9819-1-git-send-email-holler@ahsoftware.de>	<1422050221-28345-1-git-send-email-holler@ahsoftware.de> <CAFLxGvwQVKaB_MTpJ9LPNvY6bO_-_qCf7PYQuDrF4Q+4e3oUnQ@mail.gmail.com>
-In-Reply-To: <CAFLxGvwQVKaB_MTpJ9LPNvY6bO_-_qCf7PYQuDrF4Q+4e3oUnQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <6704.1422057490.1@warthog.procyon.org.uk>
+Date: Fri, 23 Jan 2015 23:58:10 +0000
+Message-ID: <6705.1422057490@warthog.procyon.org.uk>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Richard Weinberger <richard.weinberger@gmail.com>
-Cc: LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, David Howells <dhowells@redhat.com>, Linus Torvalds <torvalds@linux-foundation.org>
+To: Alexander Holler <holler@ahsoftware.de>
+Cc: dhowells@redhat.com, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Linus Torvalds <torvalds@linux-foundation.org>
 
-Am 23.01.2015 um 23:06 schrieb Richard Weinberger:
-> On Fri, Jan 23, 2015 at 10:57 PM, Alexander Holler <holler@ahsoftware.de> wrote:
->> This is for the more paranoid people, also it's
->> questionable what paranoid nowadays means.
-> 
-> Isn't this complete useless when modern filesystems like btrfs or
-> storage devices like SSDs are used?
+Alexander Holler <holler@ahsoftware.de> wrote:
 
-On SSDs it's likely useless, unfortunately. In regard to filesystems it
-depends (how knows what thay all do?). But it doesn't cost anything and
-might still be worth to use on conventional harddisks with several
-filesystems.
+> This is for the more paranoid people, also it's
+> questionable what paranoid nowadays means.
 
-I would like to have a secure-delete for FLASH based drives, but I
-assume it will need some time until someone established something like
-secure-trim and a userspace utility will be available.
+shred?
 
-Regards,
-
-Alexander Holler
+David
