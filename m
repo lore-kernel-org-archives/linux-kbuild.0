@@ -1,60 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vc0-f179.google.com ([209.85.220.179]:41811 "EHLO
-	mail-vc0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750717AbbAWWGz (ORCPT
+Received: from h1446028.stratoserver.net ([85.214.92.142]:37432 "EHLO
+	mail.ahsoftware.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751487AbbAWWQs (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 23 Jan 2015 17:06:55 -0500
+	Fri, 23 Jan 2015 17:16:48 -0500
+Message-ID: <54C2C836.2010300@ahsoftware.de>
+Date: Fri, 23 Jan 2015 23:16:22 +0100
+From: Alexander Holler <holler@ahsoftware.de>
 MIME-Version: 1.0
-In-Reply-To: <1422050221-28345-1-git-send-email-holler@ahsoftware.de>
-References: <1421976009-9819-1-git-send-email-holler@ahsoftware.de>
-	<1422050221-28345-1-git-send-email-holler@ahsoftware.de>
-Date: Fri, 23 Jan 2015 23:06:54 +0100
-Message-ID: <CAFLxGvwQVKaB_MTpJ9LPNvY6bO_-_qCf7PYQuDrF4Q+4e3oUnQ@mail.gmail.com>
 Subject: Re: [PATCH] modsign: overwrite keys with zero before deleting them
-From: Richard Weinberger <richard.weinberger@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+References: <1421976009-9819-1-git-send-email-holler@ahsoftware.de>	<1422050221-28345-1-git-send-email-holler@ahsoftware.de> <CAFLxGvwQVKaB_MTpJ9LPNvY6bO_-_qCf7PYQuDrF4Q+4e3oUnQ@mail.gmail.com>
+In-Reply-To: <CAFLxGvwQVKaB_MTpJ9LPNvY6bO_-_qCf7PYQuDrF4Q+4e3oUnQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Alexander Holler <holler@ahsoftware.de>
+To: Richard Weinberger <richard.weinberger@gmail.com>
 Cc: LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, David Howells <dhowells@redhat.com>, Linus Torvalds <torvalds@linux-foundation.org>
 
-On Fri, Jan 23, 2015 at 10:57 PM, Alexander Holler <holler@ahsoftware.de> wrote:
-> This is for the more paranoid people, also it's
-> questionable what paranoid nowadays means.
+Am 23.01.2015 um 23:06 schrieb Richard Weinberger:
+> On Fri, Jan 23, 2015 at 10:57 PM, Alexander Holler <holler@ahsoftware.de> wrote:
+>> This is for the more paranoid people, also it's
+>> questionable what paranoid nowadays means.
+> 
+> Isn't this complete useless when modern filesystems like btrfs or
+> storage devices like SSDs are used?
 
-Isn't this complete useless when modern filesystems like btrfs or
-storage devices like SSDs are used?
+On SSDs it's likely useless, unfortunately. In regard to filesystems it
+depends (how knows what thay all do?). But it doesn't cost anything and
+might still be worth to use on conventional harddisks with several
+filesystems.
 
-> Signed-off-by: Alexander Holler <holler@ahsoftware.de>
-> ---
->  Makefile | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/Makefile b/Makefile
-> index 7ad66de..590ff53 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -1132,7 +1132,9 @@ ifeq ($(CONFIG_MODULE_SIG_THROW_AWAY), y)
->         @echo "###"
->         @echo "### Deleting key used to sign modules."
->         @echo "###"
-> +       @dd status=none if=/dev/zero of=./signing_key.priv bs=4096 count=1
->         @rm ./signing_key.priv
-> +       @dd status=none if=/dev/zero of=./signing_key.x509 bs=4096 count=1
->         @rm ./signing_key.x509
->  endif
->
-> --
-> 2.0.5
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> Please read the FAQ at  http://www.tux.org/lkml/
+I would like to have a secure-delete for FLASH based drives, but I
+assume it will need some time until someone established something like
+secure-trim and a userspace utility will be available.
 
+Regards,
 
-
--- 
-Thanks,
-//richard
+Alexander Holler
