@@ -1,17 +1,17 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from h1446028.stratoserver.net ([85.214.92.142]:58411 "EHLO
+Received: from h1446028.stratoserver.net ([85.214.92.142]:59089 "EHLO
 	mail.ahsoftware.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752059AbbAXLhU (ORCPT
+	with ESMTP id S1751221AbbAXMJY (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 24 Jan 2015 06:37:20 -0500
-Message-ID: <54C383E0.9060408@ahsoftware.de>
-Date: Sat, 24 Jan 2015 12:37:04 +0100
+	Sat, 24 Jan 2015 07:09:24 -0500
+Message-ID: <54C38B6D.1060806@ahsoftware.de>
+Date: Sat, 24 Jan 2015 13:09:17 +0100
 From: Alexander Holler <holler@ahsoftware.de>
 MIME-Version: 1.0
 Subject: Re: [PATCH v2] modsign: use shred to overwrite the private key before
  deleting it
-References: <54C2F4F8.20809@draigBrady.com> <1422096327-4483-1-git-send-email-holler@ahsoftware.de>
-In-Reply-To: <1422096327-4483-1-git-send-email-holler@ahsoftware.de>
+References: <54C2F4F8.20809@draigBrady.com> <1422096327-4483-1-git-send-email-holler@ahsoftware.de> <54C383E0.9060408@ahsoftware.de>
+In-Reply-To: <54C383E0.9060408@ahsoftware.de>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -19,20 +19,36 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
 Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, David Howells <dhowells@redhat.com>, Linus Torvalds <torvalds@linux-foundation.org>
 
-Am 24.01.2015 um 11:45 schrieb Alexander Holler:
+Am 24.01.2015 um 12:37 schrieb Alexander Holler:
+> Am 24.01.2015 um 11:45 schrieb Alexander Holler:
+>
+>> It uses shred, in the hope it will somedays learn how to shred stuff on
+>> FLASH based devices securely too, once that has become possible.
+>
+> BTW: This is a good example where technology failed to keep the needs of
+> users in mind.
 
-> It uses shred, in the hope it will somedays learn how to shred stuff on
-> FLASH based devices securely too, once that has become possible.
+Failed completely.
 
-BTW: This is a good example where technology failed to keep the needs of 
-users in mind.
+Since ever it's a problem for people to securely delete files on storage.
 
-It should be relatively easy to make that possible: Using secure trim 
-which erases blocks instead of just marking them as free, it should be 
-possible without much effort for file systems to implement a secure 
-unlink. An obvious name would be sunlink(2). Or does such already exist? 
-I've seen secure trim already exists for some devices, but not sunlink().
+Also it should be very simple to securely erase files on block based 
+devices, people have to try cruel ways in the hope to get securely rid 
+of files nobody else should be able to see ever again.
+
+It's almost unbelievable how completely the IT industry (including the 
+field I'm working myself: SW) failed in regard to that since 30 years or 
+even more.
 
 Regards,
 
 Alexander Holler
+
+>
+> It should be relatively easy to make that possible: Using secure trim
+> which erases blocks instead of just marking them as free, it should be
+> possible without much effort for file systems to implement a secure
+> unlink. An obvious name would be sunlink(2). Or does such already exist?
+> I've seen secure trim already exists for some devices, but not sunlink().
+
+
