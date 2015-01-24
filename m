@@ -1,46 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from h1446028.stratoserver.net ([85.214.92.142]:43331 "EHLO
-	mail.ahsoftware.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750820AbbAXAN7 (ORCPT
+Received: from mail2.vodafone.ie ([213.233.128.44]:46754 "EHLO
+	mail2.vodafone.ie" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752621AbbAXB1X (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 23 Jan 2015 19:13:59 -0500
-Message-ID: <54C2E3AB.9000008@ahsoftware.de>
-Date: Sat, 24 Jan 2015 01:13:31 +0100
-From: Alexander Holler <holler@ahsoftware.de>
+	Fri, 23 Jan 2015 20:27:23 -0500
+Message-ID: <54C2F4F8.20809@draigBrady.com>
+Date: Sat, 24 Jan 2015 01:27:20 +0000
+From: =?windows-1252?Q?P=E1draig_Brady?= <P@draigBrady.com>
 MIME-Version: 1.0
 Subject: Re: [PATCH] modsign: overwrite keys with zero before deleting them
-References: <1422050221-28345-1-git-send-email-holler@ahsoftware.de> <1421976009-9819-1-git-send-email-holler@ahsoftware.de> <6705.1422057490@warthog.procyon.org.uk>
-In-Reply-To: <6705.1422057490@warthog.procyon.org.uk>
+References: <1422050221-28345-1-git-send-email-holler@ahsoftware.de> <1421976009-9819-1-git-send-email-holler@ahsoftware.de> <6705.1422057490@warthog.procyon.org.uk> <54C2E3AB.9000008@ahsoftware.de>
+In-Reply-To: <54C2E3AB.9000008@ahsoftware.de>
 Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: David Howells <dhowells@redhat.com>
+To: Alexander Holler <holler@ahsoftware.de>, David Howells <dhowells@redhat.com>
 Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Linus Torvalds <torvalds@linux-foundation.org>
 
-Am 24.01.2015 um 00:58 schrieb David Howells:
-> Alexander Holler <holler@ahsoftware.de> wrote:
+On 24/01/15 00:13, Alexander Holler wrote:
+> Am 24.01.2015 um 00:58 schrieb David Howells:
+>> Alexander Holler <holler@ahsoftware.de> wrote:
+>>
+>>> This is for the more paranoid people, also it's
+>>> questionable what paranoid nowadays means.
+>>
+>> shred?
 > 
->> This is for the more paranoid people, also it's
->> questionable what paranoid nowadays means.
+> Seems to do the same like when using dd, just that it does it moultiple
+> times.
 > 
-> shred?
+> And according to an article I've read some years ago, overwrriting a
+> blocks on harddisks multiple times doesn't really make sense because
+> doing it just once is enough (the necessity to do it multiple times
+> seems to have been one of these unexplainable myths in the IT) .
+> 
+> So I've no idea if it's worth to use shred and have no idea if it's part
+> of any GNU/Linux system (seems likely as it it's part of coreutils), how
+> it's maintained and how long it will be available.
+> 
+> But if requested, I will replace that dd with shred or just feel free to
+> do it yourself.
 
-Seems to do the same like when using dd, just that it does it moultiple
-times.
+shred is in the same package as dd (coreutils).
+It's a bit more paranoid about syncing.
+It also tries to write the exact size of the file,
+and then rounded up block sizes to decrease the
+chance of file system reallocation.
+Agreed on the multiple writes being quite futile these days.
+Generally overwriting with dd or shred etc. is only useful
+at the device level rather than at the file system level.
+Anyway to be slightly more paranoid and explicit you could:
 
-And according to an article I've read some years ago, overwrriting a
-blocks on harddisks multiple times doesn't really make sense because
-doing it just once is enough (the necessity to do it multiple times
-seems to have been one of these unexplainable myths in the IT) .
+  shred -n1 ./signing_key.priv
 
-So I've no idea if it's worth to use shred and have no idea if it's part
-of any GNU/Linux system (seems likely as it it's part of coreutils), how
-it's maintained and how long it will be available.
+Pádraig.
 
-But if requested, I will replace that dd with shred or just feel free to
-do it yourself.
-
-Regards,
-
-Alexander Holler
