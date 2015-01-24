@@ -1,44 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from h1446028.stratoserver.net ([85.214.92.142]:57613 "EHLO
+Received: from h1446028.stratoserver.net ([85.214.92.142]:58411 "EHLO
 	mail.ahsoftware.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751561AbbAXKqL (ORCPT
+	with ESMTP id S1752059AbbAXLhU (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 24 Jan 2015 05:46:11 -0500
+	Sat, 24 Jan 2015 06:37:20 -0500
+Message-ID: <54C383E0.9060408@ahsoftware.de>
+Date: Sat, 24 Jan 2015 12:37:04 +0100
 From: Alexander Holler <holler@ahsoftware.de>
-Subject: [PATCH v2] modsign: use shred to overwrite the private key before deleting it
-Date: Sat, 24 Jan 2015 11:45:27 +0100
-Message-Id: <1422096327-4483-1-git-send-email-holler@ahsoftware.de>
-In-Reply-To: <54C2F4F8.20809@draigBrady.com>
-References: <54C2F4F8.20809@draigBrady.com>
+MIME-Version: 1.0
+Subject: Re: [PATCH v2] modsign: use shred to overwrite the private key before
+ deleting it
+References: <54C2F4F8.20809@draigBrady.com> <1422096327-4483-1-git-send-email-holler@ahsoftware.de>
+In-Reply-To: <1422096327-4483-1-git-send-email-holler@ahsoftware.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org
-Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, David Howells <dhowells@redhat.com>, Linus Torvalds <torvalds@linux-foundation.org>, Alexander Holler <holler@ahsoftware.de>
+Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, David Howells <dhowells@redhat.com>, Linus Torvalds <torvalds@linux-foundation.org>
 
-This is for the more paranoid people, also it's
-questionable what paranoid nowadays means.
+Am 24.01.2015 um 11:45 schrieb Alexander Holler:
 
-It uses shred, in the hope it will somedays learn how to shred stuff on
-FLASH based devices securely too, once that has become possible.
+> It uses shred, in the hope it will somedays learn how to shred stuff on
+> FLASH based devices securely too, once that has become possible.
 
-Signed-off-by: Alexander Holler <holler@ahsoftware.de>
----
- Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+BTW: This is a good example where technology failed to keep the needs of 
+users in mind.
 
-diff --git a/Makefile b/Makefile
-index 7ad66de..733421b 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1132,7 +1132,7 @@ ifeq ($(CONFIG_MODULE_SIG_THROW_AWAY), y)
- 	@echo "###"
- 	@echo "### Deleting key used to sign modules."
- 	@echo "###"
--	@rm ./signing_key.priv
-+	@shred -n1 -u ./signing_key.priv
- 	@rm ./signing_key.x509
- endif
- 
--- 
-2.1.0
+It should be relatively easy to make that possible: Using secure trim 
+which erases blocks instead of just marking them as free, it should be 
+possible without much effort for file systems to implement a secure 
+unlink. An obvious name would be sunlink(2). Or does such already exist? 
+I've seen secure trim already exists for some devices, but not sunlink().
 
+Regards,
+
+Alexander Holler
