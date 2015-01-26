@@ -1,43 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:47410 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752114AbbAZKcF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 26 Jan 2015 05:32:05 -0500
-From: Michal Marek <mmarek@suse.cz>
-Subject: [PATCH] DocBook: Do not exceed argument list limit
-Date: Mon, 26 Jan 2015 11:31:17 +0100
-Message-Id: <1422268277-5333-1-git-send-email-mmarek@suse.cz>
+Received: from lebrac.rtp-net.org ([195.154.106.105]:53010 "EHLO
+	lebrac.rtp-net.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756843AbbAZUaE (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 26 Jan 2015 15:30:04 -0500
+Message-Id: <20150126194149.088416391@rtp-net.org>
+Date: Mon, 26 Jan 2015 20:40:59 +0100
+From: Arnaud Patard (Rtp) <arnaud.patard@rtp-net.org>
+Subject: [PATCHv3 1/1] deb-pkg: Add device tree blobs to the package
+References: <20150126194058.881319393@rtp-net.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Disposition: inline; filename=builddeb-install-dtbs-if-needed.patch
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: maximilian attems <max@stro.at>, Ben Hutchings <ben@decadent.org.uk>, Michal Marek <mmarek@suse.cz>
 
-Use find + xargs to compress the generated manpages. Without this patch,
-the build can fail with
+When building a package with make deb-pkg (say, for arm), the dtb files are
+not added to the package. Given that things are still evolving on arm, it
+make sense to have them along with the kernel and modules.
 
-    gzip -f Documentation/DocBook/man/*.9
-    /bin/bash: /usr/bin/gzip: Argument list too long
+v3: handle with OF but without dtbs_install.
+    Use $MAKE ... as done everywhere else in the script
+v2: make use of dtbs_install
 
-This happened with qemu user mode emulation on aarch64.
-
-Signed-off-by: Michal Marek <mmarek@suse.cz>
+Signed-off-by: Arnaud Patard <arnaud.patard@rtp-net.org>
 ---
- Documentation/DocBook/Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Documentation/DocBook/Makefile b/Documentation/DocBook/Makefile
-index 9c7d92d..b6a6a2e 100644
---- a/Documentation/DocBook/Makefile
-+++ b/Documentation/DocBook/Makefile
-@@ -56,7 +56,7 @@ htmldocs: $(HTML)
+Index: linux-next/scripts/package/builddeb
+===================================================================
+--- linux-next.orig/scripts/package/builddeb	2015-01-14 13:04:45.845922441 +0100
++++ linux-next/scripts/package/builddeb	2015-01-24 21:39:40.047431257 +0100
+@@ -143,6 +143,13 @@ else
+ 	cp arch/$ARCH/boot/$KBUILD_IMAGE "$tmpdir/$installed_image_path"
+ fi
  
- MAN := $(patsubst %.xml, %.9, $(BOOKS))
- mandocs: $(MAN)
--	$(if $(wildcard $(obj)/man/*.9),gzip -f $(obj)/man/*.9)
-+	find $(obj)/man -name '*.9' | xargs gzip -f
- 
- installmandocs: mandocs
- 	mkdir -p /usr/local/man/man9/
--- 
-2.1.2
++if grep -q "^CONFIG_OF=y" .config ; then
++	# Only some architectures with OF support have this target
++	if grep -q dtbs_install "${srctree}/arch/$SRCARCH/Makefile"; then
++		$MAKE KBUILD_SRC= INSTALL_DTBS_PATH="$tmpdir/usr/lib/$packagename" dtbs_install
++	fi
++fi
++
+ if grep -q '^CONFIG_MODULES=y' $KCONFIG_CONFIG ; then
+ 	INSTALL_MOD_PATH="$tmpdir" $MAKE KBUILD_SRC= modules_install
+ 	rm -f "$tmpdir/lib/modules/$version/build"
+
 
