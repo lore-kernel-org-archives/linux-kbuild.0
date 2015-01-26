@@ -1,41 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from h1446028.stratoserver.net ([85.214.92.142]:47911 "EHLO
-	mail.ahsoftware.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751771AbbAYNqp (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 25 Jan 2015 08:46:45 -0500
-Message-ID: <54C4F3BE.60600@ahsoftware.de>
-Date: Sun, 25 Jan 2015 14:46:38 +0100
-From: Alexander Holler <holler@ahsoftware.de>
-MIME-Version: 1.0
-Subject: Re: [PATCH v2] modsign: use shred to overwrite the private key before
- deleting it
-References: <54C2F4F8.20809@draigBrady.com>	<1422096327-4483-1-git-send-email-holler@ahsoftware.de>	<54C383E0.9060408@ahsoftware.de>	<54C38B6D.1060806@ahsoftware.de>	<54C3901D.8040406@ahsoftware.de>	<54C45153.2050703@draigBrady.com>	<54C4583A.5040505@ahsoftware.de>	<54C4C65A.2020403@ahsoftware.de>	<54C4CC05.9090602@ahsoftware.de>	<54C4D6BA.4080308@ahsoftware.de> <CAFLxGvzZOfhwW5hp1GDhTHLU5Z=9ozkOQgvatqhwDT982hfYcA@mail.gmail.com> <54C4E080.4020507@ahsoftware.de> <54C4E351.6010601@ahsoftware.de>
-In-Reply-To: <54C4E351.6010601@ahsoftware.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Received: from cantor2.suse.de ([195.135.220.15]:47410 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752114AbbAZKcF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 26 Jan 2015 05:32:05 -0500
+From: Michal Marek <mmarek@suse.cz>
+Subject: [PATCH] DocBook: Do not exceed argument list limit
+Date: Mon, 26 Jan 2015 11:31:17 +0100
+Message-Id: <1422268277-5333-1-git-send-email-mmarek@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Richard Weinberger <richard.weinberger@gmail.com>
-Cc: =?UTF-8?B?UMOhZHJhaWcgQnJhZHk=?= <P@draigbrady.com>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, David Howells <dhowells@redhat.com>, Linus Torvalds <torvalds@linux-foundation.org>
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Am 25.01.2015 um 13:36 schrieb Alexander Holler:
-> Am 25.01.2015 um 13:24 schrieb Alexander Holler:
->> Am 25.01.2015 um 13:08 schrieb Richard Weinberger:
->>>
->>> Or add support for the "s" chattr to major filesystems.
+Use find + xargs to compress the generated manpages. Without this patch,
+the build can fail with
 
-(...)
+    gzip -f Documentation/DocBook/man/*.9
+    /bin/bash: /usr/bin/gzip: Argument list too long
 
->> So maybe shred should first set the 's' attribute before calling unlink
->> on that file (if it doesn't already do it). I will look at it and send a
->> patch if necessary. It's at least a small bit where I can help. ;)
+This happened with qemu user mode emulation on aarch64.
 
-(...)
+Signed-off-by: Michal Marek <mmarek@suse.cz>
+---
+ Documentation/DocBook/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-That currently looks like a total waste of time. Grepping the kernel for 
-SECRM_FL looks like this flags isn't supported (used) by any fs.
+diff --git a/Documentation/DocBook/Makefile b/Documentation/DocBook/Makefile
+index 9c7d92d..b6a6a2e 100644
+--- a/Documentation/DocBook/Makefile
++++ b/Documentation/DocBook/Makefile
+@@ -56,7 +56,7 @@ htmldocs: $(HTML)
+ 
+ MAN := $(patsubst %.xml, %.9, $(BOOKS))
+ mandocs: $(MAN)
+-	$(if $(wildcard $(obj)/man/*.9),gzip -f $(obj)/man/*.9)
++	find $(obj)/man -name '*.9' | xargs gzip -f
+ 
+ installmandocs: mandocs
+ 	mkdir -p /usr/local/man/man9/
+-- 
+2.1.2
 
-Regards,
-
-Alexander Holler
