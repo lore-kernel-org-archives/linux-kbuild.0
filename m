@@ -1,54 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from casper.infradead.org ([85.118.1.10]:35408 "EHLO
-	casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751678AbbA0BgY (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 26 Jan 2015 20:36:24 -0500
-Message-ID: <54C6EB93.6080409@infradead.org>
-Date: Mon, 26 Jan 2015 17:36:19 -0800
-From: Randy Dunlap <rdunlap@infradead.org>
+Received: from cantor2.suse.de ([195.135.220.15]:41427 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753812AbbA0P7n (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 27 Jan 2015 10:59:43 -0500
+Message-ID: <54C7B5EC.1070706@suse.cz>
+Date: Tue, 27 Jan 2015 16:59:40 +0100
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH] DocBook: Do not exceed argument list limit
-References: <1422268277-5333-1-git-send-email-mmarek@suse.cz>
-In-Reply-To: <1422268277-5333-1-git-send-email-mmarek@suse.cz>
+Subject: Re: [PATCH] kconfig: use va_end to match corresponding va_start
+References: <1421068706-3689-1-git-send-email-colin.king@canonical.com>
+In-Reply-To: <1421068706-3689-1-git-send-email-colin.king@canonical.com>
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>, Jonathan Corbet <corbet@lwn.net>
-Cc: linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Colin King <colin.king@canonical.com>, "Yann E. MORIN" <yann.morin.1998@free.fr>, linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
 
-Adding Mr. Corbet.
+On 2015-01-12 14:18, Colin King wrote:
+> From: Colin Ian King <colin.king@canonical.com>
+> 
+> Although on some systems va_end is a no-op, it is good practice
+> to use va_end, especially since the manual states:
+> 
+> "Each invocation of va_start() must be matched by a corresponding
+> invocation of va_end() in the same function."
+> 
+> Signed-off-by: Colin Ian King <colin.king@canonical.com>
 
-On 01/26/15 02:31, Michal Marek wrote:
-> Use find + xargs to compress the generated manpages. Without this patch,
-> the build can fail with
-> 
->     gzip -f Documentation/DocBook/man/*.9
->     /bin/bash: /usr/bin/gzip: Argument list too long
-> 
-> This happened with qemu user mode emulation on aarch64.
-> 
-> Signed-off-by: Michal Marek <mmarek@suse.cz>
-> ---
->  Documentation/DocBook/Makefile | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/Documentation/DocBook/Makefile b/Documentation/DocBook/Makefile
-> index 9c7d92d..b6a6a2e 100644
-> --- a/Documentation/DocBook/Makefile
-> +++ b/Documentation/DocBook/Makefile
-> @@ -56,7 +56,7 @@ htmldocs: $(HTML)
->  
->  MAN := $(patsubst %.xml, %.9, $(BOOKS))
->  mandocs: $(MAN)
-> -	$(if $(wildcard $(obj)/man/*.9),gzip -f $(obj)/man/*.9)
-> +	find $(obj)/man -name '*.9' | xargs gzip -f
->  
->  installmandocs: mandocs
->  	mkdir -p /usr/local/man/man9/
-> 
+Applied to kbuild.git#kconfig, thanks.
 
+Michal
 
--- 
-~Randy
