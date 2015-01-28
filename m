@@ -1,91 +1,173 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:33286 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1762138AbbA1FLz (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 28 Jan 2015 00:11:55 -0500
-Message-ID: <54C86F97.1000907@suse.com>
-Date: Wed, 28 Jan 2015 06:11:51 +0100
-From: Juergen Gross <jgross@suse.com>
-MIME-Version: 1.0
-Subject: Re: [RESEND Patch V2 1/4] xen: build infrastructure for generating
- hypercall depending symbols
-References: <1421826565-10826-1-git-send-email-jgross@suse.com> <1421826565-10826-2-git-send-email-jgross@suse.com>
-In-Reply-To: <1421826565-10826-2-git-send-email-jgross@suse.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Received: from cpsmtpb-ews08.kpnxchange.com ([213.75.39.13]:59034 "EHLO
+	cpsmtpb-ews08.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752761AbbA2BKw (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 28 Jan 2015 20:10:52 -0500
+Message-ID: <1422480756.3621.52.camel@x220>
+Subject: Re: [PATCH 1/1] kconfig: warn if an unknown symbol is selected
+From: Paul Bolle <pebolle@tiscali.nl>
+Date: Wed, 28 Jan 2015 22:32:36 +0100
+In-Reply-To: <54C8FFBA.5040000@suse.cz>
+References: <1412100583.21730.31.camel@x220>
+		 <1415014691.20372.49.camel@x220> <1422438897.5666.23.camel@x220>
+	 <54C8FFBA.5040000@suse.cz>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org, x86@kernel.org, xen-devel@lists.xensource.com, konrad.wilk@oracle.com, david.vrabel@citrix.com, boris.ostrovsky@oracle.com, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com, mmarek@suse.cz, linux-kbuild@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-*Ping*
+On Wed, 2015-01-28 at 16:26 +0100, Michal Marek wrote:
+> On 2015-01-28 10:54, Paul Bolle wrote:
+> > Now that we've been told Yann has disappeared, would you consider taking
+> > this patch into one of your trees? It would be nice to have people
+> > actually use it for a while.
+> > 
+> > Or should we first clean up (most of) the warnings it generates? There
+> 
+> It seems your fixes have been accepted in the meantime, but there is one
+> new:
+> *** Default configuration is based on 'x86_64_defconfig'
+> drivers/misc/cxl/Kconfig:8:warning: 'CXL_BASE' selects unknown symbol
+> 'PPC_COPRO_BASE'
+> 
+> PPC_COPRO_BASE is not known on x86, but at the same time, there is no
+> way for CXL_BASE to be selected on x86:
+> 
+> config CXL_BASE
+> 	bool
+> 	default n
+> 	select PPC_COPRO_BASE
+> 
+> config CXL
+> 	tristate "Support for IBM Coherent Accelerators (CXL)"
+> 	depends on PPC_POWERNV && PCI_MSI
+> 	select CXL_BASE
+> 	default m
+> 
+> Shouldn't we only warn about a select when it is triggered? An
+> allyesconfig would still report all bogus selects for given architecture.
 
-David wants a comment from the x86 maintainers.
+Good catch! I think checking only for selects done by Kconfig symbols
+that are not "n" might do the trick. Expect a v2 one of these days.
+
+The current load of issues (for allyesconfig on all arches except um) is
+pasted at the bottom of this message (with some comments added). Looking
+at that load I think it might be preferable to first most of fix those
+issues before adding this to kconfig.
 
 
-Juergen
+Paul Bolle
 
-On 01/21/2015 08:49 AM, Juergen Gross wrote:
-> Today there are several places in the kernel which build tables
-> containing one entry for each possible Xen hypercall. Create an
-> infrastructure to be able to generate these tables at build time.
->
-> Based-on-patch-by: Jan Beulich <jbeulich@suse.com>
-> Signed-off-by: Juergen Gross <jgross@suse.com>
-> Reviewed-by: David Vrabel <david.vrabel@citrix.com>
-> ---
->   arch/x86/syscalls/Makefile |  9 +++++++++
->   scripts/xen-hypercalls.sh  | 12 ++++++++++++
->   2 files changed, 21 insertions(+)
->   create mode 100644 scripts/xen-hypercalls.sh
->
-> diff --git a/arch/x86/syscalls/Makefile b/arch/x86/syscalls/Makefile
-> index 3323c27..a55abb9 100644
-> --- a/arch/x86/syscalls/Makefile
-> +++ b/arch/x86/syscalls/Makefile
-> @@ -19,6 +19,9 @@ quiet_cmd_syshdr = SYSHDR  $@
->   quiet_cmd_systbl = SYSTBL  $@
->         cmd_systbl = $(CONFIG_SHELL) '$(systbl)' $< $@
->
-> +quiet_cmd_hypercalls = HYPERCALLS $@
-> +      cmd_hypercalls = $(CONFIG_SHELL) '$<' $@ $(filter-out $<,$^)
-> +
->   syshdr_abi_unistd_32 := i386
->   $(uapi)/unistd_32.h: $(syscall32) $(syshdr)
->   	$(call if_changed,syshdr)
-> @@ -47,10 +50,16 @@ $(out)/syscalls_32.h: $(syscall32) $(systbl)
->   $(out)/syscalls_64.h: $(syscall64) $(systbl)
->   	$(call if_changed,systbl)
->
-> +$(out)/xen-hypercalls.h: $(srctree)/scripts/xen-hypercalls.sh
-> +	$(call if_changed,hypercalls)
-> +
-> +$(out)/xen-hypercalls.h: $(srctree)/include/xen/interface/xen*.h
-> +
->   uapisyshdr-y			+= unistd_32.h unistd_64.h unistd_x32.h
->   syshdr-y			+= syscalls_32.h
->   syshdr-$(CONFIG_X86_64)		+= unistd_32_ia32.h unistd_64_x32.h
->   syshdr-$(CONFIG_X86_64)		+= syscalls_64.h
-> +syshdr-$(CONFIG_XEN)		+= xen-hypercalls.h
->
->   targets	+= $(uapisyshdr-y) $(syshdr-y)
->
-> diff --git a/scripts/xen-hypercalls.sh b/scripts/xen-hypercalls.sh
-> new file mode 100644
-> index 0000000..676d922
-> --- /dev/null
-> +++ b/scripts/xen-hypercalls.sh
-> @@ -0,0 +1,12 @@
-> +#!/bin/sh
-> +out="$1"
-> +shift
-> +in="$@"
-> +
-> +for i in $in; do
-> +	eval $CPP $LINUXINCLUDE -dD -imacros "$i" -x c /dev/null
-> +done | \
-> +awk '$1 == "#define" && $2 ~ /__HYPERVISOR_[a-z][a-z_0-9]*/ { v[$3] = $2 }
-> +	END {   print "/* auto-generated by scripts/xen-hypercall.sh */"
-> +		for (i in v) if (!(v[i] in v))
-> +			print "HYPERCALL("substr(v[i], 14)")"}' | sort -u >$out
->
+alpha:
+drivers/remoteproc/Kconfig:10:warning: 'REMOTEPROC' selects unknown symbol 'VIRTUALIZATION'
+
+REMOTEPROC should be ARM or OMAP specific?
+
+lib/Kconfig.debug:1024:warning: 'DEBUG_ATOMIC_SLEEP' selects unknown symbol 'PREEMPT_COUNT'
+
+Perhaps fixed by selecting PREEMPT_COUNT only for architectures that
+support it.
+
+arc:
+drivers/remoteproc/Kconfig:10:warning: 'REMOTEPROC' selects unknown symbol 'VIRTUALIZATION'
+arm:
+arch/arm/mach-mvebu/Kconfig:40:warning: 'MACH_ARMADA_375' selects unknown symbol 'ARM_ERRATA_753970'
+arch/arm/mach-mvebu/Kconfig:55:warning: 'MACH_ARMADA_38X' selects unknown symbol 'ARM_ERRATA_753970'
+
+I'm trying for quite some time to get this fixed.
+
+arm64:
+arch/arm64/Kconfig:183:warning: 'ARCH_TEGRA' selects unknown symbol 'HAVE_SMP'
+arch/arm64/Kconfig:193:warning: 'ARCH_TEGRA_132_SOC' selects unknown symbol 'USB_ARCH_HAS_EHCI'
+
+Patches pending, I've been told.
+
+drivers/irqchip/Kconfig:9:warning: 'ARM_GIC' selects unknown symbol 'MULTI_IRQ_HANDLER'
+drivers/irqchip/Kconfig:23:warning: 'ARM_GIC_V3' selects unknown symbol 'MULTI_IRQ_HANDLER'
+
+MULTI_IRQ_HANDLER is arm specific.
+
+avr32:
+drivers/remoteproc/Kconfig:10:warning: 'REMOTEPROC' selects unknown symbol 'VIRTUALIZATION'
+blackfin:
+drivers/remoteproc/Kconfig:10:warning: 'REMOTEPROC' selects unknown symbol 'VIRTUALIZATION'
+c6x:
+drivers/remoteproc/Kconfig:10:warning: 'REMOTEPROC' selects unknown symbol 'VIRTUALIZATION'
+cris:
+drivers/remoteproc/Kconfig:10:warning: 'REMOTEPROC' selects unknown symbol 'VIRTUALIZATION'
+frv:
+drivers/remoteproc/Kconfig:10:warning: 'REMOTEPROC' selects unknown symbol 'VIRTUALIZATION'
+lib/Kconfig.debug:1024:warning: 'DEBUG_ATOMIC_SLEEP' selects unknown symbol 'PREEMPT_COUNT'
+hexagon:
+arch/hexagon/Kconfig:22:warning: 'HEXAGON' selects unknown symbol 'NO_IOPORT_MAP'
+
+Fixing obscure architectures requires patience!
+
+drivers/remoteproc/Kconfig:10:warning: 'REMOTEPROC' selects unknown symbol 'VIRTUALIZATION'
+lib/Kconfig.debug:1024:warning: 'DEBUG_ATOMIC_SLEEP' selects unknown symbol 'PREEMPT_COUNT'
+ia64:
+drivers/acpi/Kconfig:165:warning: 'ACPI_PROCESSOR' selects unknown symbol 'CPU_IDLE'
+
+Perhaps, again, fixed by only selecting CPU_IDLE on architectures that
+support it.
+
+drivers/remoteproc/Kconfig:10:warning: 'REMOTEPROC' selects unknown symbol 'VIRTUALIZATION'
+m32r:
+m68k:
+drivers/remoteproc/Kconfig:10:warning: 'REMOTEPROC' selects unknown symbol 'VIRTUALIZATION'
+metag:
+drivers/remoteproc/Kconfig:10:warning: 'REMOTEPROC' selects unknown symbol 'VIRTUALIZATION'
+microblaze:
+drivers/remoteproc/Kconfig:10:warning: 'REMOTEPROC' selects unknown symbol 'VIRTUALIZATION'
+mips:
+mn10300:
+drivers/remoteproc/Kconfig:10:warning: 'REMOTEPROC' selects unknown symbol 'VIRTUALIZATION'
+nios2:
+drivers/remoteproc/Kconfig:10:warning: 'REMOTEPROC' selects unknown symbol 'VIRTUALIZATION'
+openrisc:
+drivers/remoteproc/Kconfig:10:warning: 'REMOTEPROC' selects unknown symbol 'VIRTUALIZATION'
+parisc:
+sound/pci/Kconfig:28:warning: 'SND_ALS300' selects unknown symbol 'ZONE_DMA'
+sound/pci/Kconfig:53:warning: 'SND_ALI5451' selects unknown symbol 'ZONE_DMA'
+sound/pci/Kconfig:158:warning: 'SND_AZT3328' selects unknown symbol 'ZONE_DMA'
+sound/pci/Kconfig:466:warning: 'SND_EMU10K1' selects unknown symbol 'ZONE_DMA'
+sound/pci/Kconfig:482:warning: 'SND_EMU10K1X' selects unknown symbol 'ZONE_DMA'
+sound/pci/Kconfig:516:warning: 'SND_ES1938' selects unknown symbol 'ZONE_DMA'
+sound/pci/Kconfig:528:warning: 'SND_ES1968' selects unknown symbol 'ZONE_DMA'
+sound/pci/Kconfig:615:warning: 'SND_ICE1712' selects unknown symbol 'ZONE_DMA'
+sound/pci/Kconfig:703:warning: 'SND_MAESTRO3' selects unknown symbol 'ZONE_DMA'
+sound/pci/Kconfig:821:warning: 'SND_SONICVIBES' selects unknown symbol 'ZONE_DMA'
+sound/pci/Kconfig:833:warning: 'SND_TRIDENT' selects unknown symbol 'ZONE_DMA'
+
+I guess one or more cases of !PARISC might do the trick. But the
+underlying problem is quite complicated. See commit 80ab8eae70e5 ("ALSA:
+Enable CONFIG_ZONE_DMA for smaller PCI DMA masks"). Rather nice quote
+from Andrew Morton about adding these selects (instead of fixing the
+underlying problem):
+    But then we'll just forget about it :(
+
+(https://bugzilla.kernel.org/show_bug.cgi?id=68221#c19 ).
+
+drivers/remoteproc/Kconfig:10:warning: 'REMOTEPROC' selects unknown symbol 'VIRTUALIZATION'
+powerpc:
+s390:
+score:
+arch/score/Kconfig:28:warning: 'MACH_SPCT6600' selects unknown symbol 'SYS_SUPPORTS_32BIT_KERNEL'
+
+Fixing obscure architectures requires patience!
+
+sh:
+drivers/remoteproc/Kconfig:10:warning: 'REMOTEPROC' selects unknown symbol 'VIRTUALIZATION'
+sparc:
+drivers/remoteproc/Kconfig:10:warning: 'REMOTEPROC' selects unknown symbol 'VIRTUALIZATION'
+tile:
+unicore32:
+drivers/remoteproc/Kconfig:10:warning: 'REMOTEPROC' selects unknown symbol 'VIRTUALIZATION'
+x86:
+xtensa:
+drivers/remoteproc/Kconfig:10:warning: 'REMOTEPROC' selects unknown symbol 'VIRTUALIZATION'
 
