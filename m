@@ -1,96 +1,91 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:37204 "EHLO
-	shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1759342AbbA1AWX (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 27 Jan 2015 19:22:23 -0500
-Message-ID: <1422404529.2709.5.camel@decadent.org.uk>
-Subject: Re: [PATCHv3 1/1] deb-pkg: Add device tree blobs to the package
-From: Ben Hutchings <ben@decadent.org.uk>
-Date: Wed, 28 Jan 2015 00:22:09 +0000
-In-Reply-To: <20150126194149.088416391@rtp-net.org>
-References: <20150126194058.881319393@rtp-net.org>
-	 <20150126194149.088416391@rtp-net.org>
-Content-Type: multipart/signed; micalg="pgp-sha512";
-	protocol="application/pgp-signature"; boundary="=-iDwTjj9Zwc3YqtNmC8LE"
-Mime-Version: 1.0
+Received: from cantor2.suse.de ([195.135.220.15]:33286 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1762138AbbA1FLz (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 28 Jan 2015 00:11:55 -0500
+Message-ID: <54C86F97.1000907@suse.com>
+Date: Wed, 28 Jan 2015 06:11:51 +0100
+From: Juergen Gross <jgross@suse.com>
+MIME-Version: 1.0
+Subject: Re: [RESEND Patch V2 1/4] xen: build infrastructure for generating
+ hypercall depending symbols
+References: <1421826565-10826-1-git-send-email-jgross@suse.com> <1421826565-10826-2-git-send-email-jgross@suse.com>
+In-Reply-To: <1421826565-10826-2-git-send-email-jgross@suse.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaud Patard <arnaud.patard@rtp-net.org>
-Cc: linux-kbuild@vger.kernel.org, maximilian attems <max@stro.at>, Michal Marek <mmarek@suse.cz>
+To: linux-kernel@vger.kernel.org, x86@kernel.org, xen-devel@lists.xensource.com, konrad.wilk@oracle.com, david.vrabel@citrix.com, boris.ostrovsky@oracle.com, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com, mmarek@suse.cz, linux-kbuild@vger.kernel.org
+
+*Ping*
+
+David wants a comment from the x86 maintainers.
 
 
---=-iDwTjj9Zwc3YqtNmC8LE
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Juergen
 
-On Mon, 2015-01-26 at 20:40 +0100, Arnaud Patard wrote:
-> When building a package with make deb-pkg (say, for arm), the dtb files a=
-re
-> not added to the package. Given that things are still evolving on arm, it
-> make sense to have them along with the kernel and modules.
->=20
-> v3: handle with OF but without dtbs_install.
->     Use $MAKE ... as done everywhere else in the script
-> v2: make use of dtbs_install
->=20
-> Signed-off-by: Arnaud Patard <arnaud.patard@rtp-net.org>
+On 01/21/2015 08:49 AM, Juergen Gross wrote:
+> Today there are several places in the kernel which build tables
+> containing one entry for each possible Xen hypercall. Create an
+> infrastructure to be able to generate these tables at build time.
+>
+> Based-on-patch-by: Jan Beulich <jbeulich@suse.com>
+> Signed-off-by: Juergen Gross <jgross@suse.com>
+> Reviewed-by: David Vrabel <david.vrabel@citrix.com>
 > ---
->=20
-> Index: linux-next/scripts/package/builddeb
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> --- linux-next.orig/scripts/package/builddeb    2015-01-14 13:04:45.84592=
-2441 +0100
-> +++ linux-next/scripts/package/builddeb 2015-01-24 21:39:40.047431257 +01=
-00
-> @@ -143,6 +143,13 @@ else
->         cp arch/$ARCH/boot/$KBUILD_IMAGE "$tmpdir/$installed_image_path"
->  fi
-> =20
-> +if grep -q "^CONFIG_OF=3Dy" .config ; then
-
-Use $KCONFIG_CONFIG not .config.
-
-Ben.
-
-> +       # Only some architectures with OF support have this target
-> +       if grep -q dtbs_install "${srctree}/arch/$SRCARCH/Makefile"; then
-> +               $MAKE KBUILD_SRC=3D INSTALL_DTBS_PATH=3D"$tmpdir/usr/lib/=
-$packagename" dtbs_install
-> +       fi
-> +fi
+>   arch/x86/syscalls/Makefile |  9 +++++++++
+>   scripts/xen-hypercalls.sh  | 12 ++++++++++++
+>   2 files changed, 21 insertions(+)
+>   create mode 100644 scripts/xen-hypercalls.sh
+>
+> diff --git a/arch/x86/syscalls/Makefile b/arch/x86/syscalls/Makefile
+> index 3323c27..a55abb9 100644
+> --- a/arch/x86/syscalls/Makefile
+> +++ b/arch/x86/syscalls/Makefile
+> @@ -19,6 +19,9 @@ quiet_cmd_syshdr = SYSHDR  $@
+>   quiet_cmd_systbl = SYSTBL  $@
+>         cmd_systbl = $(CONFIG_SHELL) '$(systbl)' $< $@
+>
+> +quiet_cmd_hypercalls = HYPERCALLS $@
+> +      cmd_hypercalls = $(CONFIG_SHELL) '$<' $@ $(filter-out $<,$^)
 > +
->  if grep -q '^CONFIG_MODULES=3Dy' $KCONFIG_CONFIG ; then
->         INSTALL_MOD_PATH=3D"$tmpdir" $MAKE KBUILD_SRC=3D modules_install
->         rm -f "$tmpdir/lib/modules/$version/build"
->=20
+>   syshdr_abi_unistd_32 := i386
+>   $(uapi)/unistd_32.h: $(syscall32) $(syshdr)
+>   	$(call if_changed,syshdr)
+> @@ -47,10 +50,16 @@ $(out)/syscalls_32.h: $(syscall32) $(systbl)
+>   $(out)/syscalls_64.h: $(syscall64) $(systbl)
+>   	$(call if_changed,systbl)
+>
+> +$(out)/xen-hypercalls.h: $(srctree)/scripts/xen-hypercalls.sh
+> +	$(call if_changed,hypercalls)
+> +
+> +$(out)/xen-hypercalls.h: $(srctree)/include/xen/interface/xen*.h
+> +
+>   uapisyshdr-y			+= unistd_32.h unistd_64.h unistd_x32.h
+>   syshdr-y			+= syscalls_32.h
+>   syshdr-$(CONFIG_X86_64)		+= unistd_32_ia32.h unistd_64_x32.h
+>   syshdr-$(CONFIG_X86_64)		+= syscalls_64.h
+> +syshdr-$(CONFIG_XEN)		+= xen-hypercalls.h
+>
+>   targets	+= $(uapisyshdr-y) $(syshdr-y)
+>
+> diff --git a/scripts/xen-hypercalls.sh b/scripts/xen-hypercalls.sh
+> new file mode 100644
+> index 0000000..676d922
+> --- /dev/null
+> +++ b/scripts/xen-hypercalls.sh
+> @@ -0,0 +1,12 @@
+> +#!/bin/sh
+> +out="$1"
+> +shift
+> +in="$@"
+> +
+> +for i in $in; do
+> +	eval $CPP $LINUXINCLUDE -dD -imacros "$i" -x c /dev/null
+> +done | \
+> +awk '$1 == "#define" && $2 ~ /__HYPERVISOR_[a-z][a-z_0-9]*/ { v[$3] = $2 }
+> +	END {   print "/* auto-generated by scripts/xen-hypercall.sh */"
+> +		for (i in v) if (!(v[i] in v))
+> +			print "HYPERCALL("substr(v[i], 14)")"}' | sort -u >$out
+>
 
---=20
-Ben Hutchings
-Teamwork is essential - it allows you to blame someone else.
-
---=-iDwTjj9Zwc3YqtNmC8LE
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIVAwUAVMgrtue/yOyVhhEJAQq0Ew/6AsC9Z6nHWLBHrRO6tAXaAv2EZghYzHJ9
-DoTz6Q2LHvOek/5dZVrN8ZN5vNOy2YAVnKKQyhL8v42hOUtZYRPJTE79gtTL02VJ
-sohI3Sx3yZ3JpdB54ezHzyUvay3tFF7+8cyzWnyNhqGrx7kKvKkZarkW9lwM59zH
-uNS33u8Yzk+oYl3/kEigww7yqlrKOzU4a99C2xeUPgSQklPlTcA+nKsmPvDviwtm
-Mo+zzYThJCIk7x0yo0Tf8A807rYCc9KZNprhgVTBYdSScDtMHOxfJk1OAKaakeO/
-NVhaQMjnU75AUUHQbst3vU0145b3rS1EP/T/JEQrDjz9mXBrQ5YzO7uAaiKuXvT0
-FePLYnaf6/onz3D+/VhRoWc3I01qh8LLlie0jYlO/jCti6/qpW5YpMryZRhmfd0c
-p931xtADHKOliMXYax47PJ7NjztCCwbCM2jtR4pP3Ffg+lJ5oeMXQMPA2yvOsKpg
-MzYIT6n63mboJBMNpLF2owUNgr3kzuvuRCBRjFt+mJOSWaYnrS3fFkaspp7YmEiL
-CVcc5vVw2pTGCHHmrorSYe0q3oUKia6xq4QrI2E0b+ZMjfKLez6q5HmX2YCN9mCW
-B8m6eo+Kbp7AXwgUW9XmTsDcrH8dO2BNEWH79vfYjgGMngCytUvQ5DApt0LdKiWb
-qFsdUEw1H+w=
-=xKf7
------END PGP SIGNATURE-----
-
---=-iDwTjj9Zwc3YqtNmC8LE--
