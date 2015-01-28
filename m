@@ -1,32 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from tex.lwn.net ([70.33.254.29]:35896 "EHLO vena.lwn.net"
+Received: from cantor2.suse.de ([195.135.220.15]:43445 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753665AbbA2B1a (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 28 Jan 2015 20:27:30 -0500
-Date: Wed, 28 Jan 2015 12:00:33 -0700
-From: Jonathan Corbet <corbet@lwn.net>
-Subject: Re: [PATCH] DocBook: Do not exceed argument list limit
-Message-ID: <20150128120033.5c1fe43f@lwn.net>
-In-Reply-To: <1422268277-5333-1-git-send-email-mmarek@suse.cz>
-References: <1422268277-5333-1-git-send-email-mmarek@suse.cz>
+	id S1754554AbbA2BYE (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 28 Jan 2015 20:24:04 -0500
+Message-ID: <54C8FFBA.5040000@suse.cz>
+Date: Wed, 28 Jan 2015 16:26:50 +0100
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH 1/1] kconfig: warn if an unknown symbol is selected
+References: <1412100583.21730.31.camel@x220>	 <1415014691.20372.49.camel@x220> <1422438897.5666.23.camel@x220>
+In-Reply-To: <1422438897.5666.23.camel@x220>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Randy Dunlap <rdunlap@infradead.org>, linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Paul Bolle <pebolle@tiscali.nl>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Mon, 26 Jan 2015 11:31:17 +0100
-Michal Marek <mmarek@suse.cz> wrote:
-
-> Use find + xargs to compress the generated manpages. Without this patch,
-> the build can fail with
+On 2015-01-28 10:54, Paul Bolle wrote:
+> Now that we've been told Yann has disappeared, would you consider taking
+> this patch into one of your trees? It would be nice to have people
+> actually use it for a while.
 > 
->     gzip -f Documentation/DocBook/man/*.9
->     /bin/bash: /usr/bin/gzip: Argument list too long
+> Or should we first clean up (most of) the warnings it generates? There
 
-That is a lot of files in that directory these days...applied to the docs
-tree, thanks.
+It seems your fixes have been accepted in the meantime, but there is one
+new:
+*** Default configuration is based on 'x86_64_defconfig'
+drivers/misc/cxl/Kconfig:8:warning: 'CXL_BASE' selects unknown symbol
+'PPC_COPRO_BASE'
 
-jon
+PPC_COPRO_BASE is not known on x86, but at the same time, there is no
+way for CXL_BASE to be selected on x86:
+
+config CXL_BASE
+	bool
+	default n
+	select PPC_COPRO_BASE
+
+config CXL
+	tristate "Support for IBM Coherent Accelerators (CXL)"
+	depends on PPC_POWERNV && PCI_MSI
+	select CXL_BASE
+	default m
+
+Shouldn't we only warn about a select when it is triggered? An
+allyesconfig would still report all bogus selects for given architecture.
+
+Michal
