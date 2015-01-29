@@ -1,181 +1,124 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mailout1.w1.samsung.com ([210.118.77.11]:19495 "EHLO
-	mailout1.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754610AbbA2PMo (ORCPT
+Received: from h1446028.stratoserver.net ([85.214.92.142]:32789 "EHLO
+	mail.ahsoftware.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751273AbbA2WjX convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 29 Jan 2015 10:12:44 -0500
-From: Andrey Ryabinin <a.ryabinin@samsung.com>
-Subject: [PATCH v10 12/17] kasan: enable stack instrumentation
-Date: Thu, 29 Jan 2015 18:11:56 +0300
-Message-id: <1422544321-24232-13-git-send-email-a.ryabinin@samsung.com>
-In-reply-to: <1422544321-24232-1-git-send-email-a.ryabinin@samsung.com>
-References: <1404905415-9046-1-git-send-email-a.ryabinin@samsung.com>
- <1422544321-24232-1-git-send-email-a.ryabinin@samsung.com>
+	Thu, 29 Jan 2015 17:39:23 -0500
+Message-ID: <54CAB68E.7080307@ahsoftware.de>
+Date: Thu, 29 Jan 2015 23:39:10 +0100
+From: Alexander Holler <holler@ahsoftware.de>
+MIME-Version: 1.0
+Subject: Re: [PATCH v2] modsign: use shred to overwrite the private key before
+ deleting it
+References: <54C2F4F8.20809@draigBrady.com> <1422096327-4483-1-git-send-email-holler@ahsoftware.de> <54C383E0.9060408@ahsoftware.de> <54C38B6D.1060806@ahsoftware.de> <54C3901D.8040406@ahsoftware.de> <54C45153.2050703@draigBrady.com> <54C4583A.5040505@ahsoftware.de> <54C4C65A.2020403@ahsoftware.de>
+In-Reply-To: <54C4C65A.2020403@ahsoftware.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: Andrey Ryabinin <a.ryabinin@samsung.com>, Dmitry Vyukov <dvyukov@google.com>, Konstantin Serebryany <kcc@google.com>, Dmitry Chernenkov <dmitryc@google.com>, Andrey Konovalov <adech.fo@gmail.com>, Yuri Gribov <tetra2005@gmail.com>, Konstantin Khlebnikov <koct9i@gmail.com>, Sasha Levin <sasha.levin@oracle.com>, Christoph Lameter <cl@linux.com>, Joonsoo Kim <iamjoonsoo.kim@lge.com>, Andrew Morton <akpm@linux-foundation.org>, Dave Hansen <dave.hansen@intel.com>, Andi Kleen <andi@firstfloor.org>, x86@kernel.org, linux-mm@kvack.org, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>, "open list:KERNEL BUILD + fi..." <linux-kbuild@vger.kernel.org>
+To: =?UTF-8?B?UMOhZHJhaWcgQnJhZHk=?= <P@draigBrady.com>, linux-kernel@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, David Howells <dhowells@redhat.com>, Linus Torvalds <torvalds@linux-foundation.org>
 
-Stack instrumentation allows to detect out of bounds
-memory accesses for variables allocated on stack.
-Compiler adds redzones around every variable on stack
-and poisons redzones in function's prologue.
+Am 25.01.2015 um 11:32 schrieb Alexander Holler:
+> Am 25.01.2015 um 03:43 schrieb Alexander Holler:
+>> Am 25.01.2015 um 03:13 schrieb Pádraig Brady:
+>>> On 24/01/15 12:29, Alexander Holler wrote:
+>>>> Am 24.01.2015 um 13:09 schrieb Alexander Holler:
+>>>>> Am 24.01.2015 um 12:37 schrieb Alexander Holler:
+>>>>>> Am 24.01.2015 um 11:45 schrieb Alexander Holler:
+>>>>>>
+>>>>>>> It uses shred, in the hope it will somedays learn how to shred
+>>>>>>> stuff on
+>>>>>>> FLASH based devices securely too, once that has become possible.
+>>>>>>
+>>>>>> BTW: This is a good example where technology failed to keep the
+>>>>>> needs of
+>>>>>> users in mind.
+>>>>>
+>>>>> Failed completely.
+>>>>>
+>>>>> Since ever it's a problem for people to securely delete files on
+>>>>> storage.
+>>>>>
+>>>>> Also it should be very simple to securely erase files on block based
+>>>>> devices, people have to try cruel ways in the hope to get securely rid
+>>>>> of files nobody else should be able to see ever again.
+>>>>>
+>>>>> It's almost unbelievable how completely the IT industry (including the
+>>>>> field I'm working myself: SW) failed in regard to that since 30
+>>>>> years or
+>>>>> even more.
+>>>>
+>>>> And it isn't such that this is a new requirement. Humans are doing such
+>>>> since thousands of years. They use fire to get rid of paper documents
+>>>> and even the old egypts were able to destroyed stuff on stones by using
+>>>> simple steps. Just the IT failed completely.
+>>>>
+>>>> Really unbelievable.
+>>>>
+>>>> So, sorry if anyone got bored by this mail, but I think that really has
+>>>> to be said and repeated.
+>>>
+>>> Well not failed completely, just used a different method (encryption).
+>>>
+>>> As for "shredding", that improves in effectiveness the lower you go.
+>>> I.E. it's effective for the whole file system (SSD range), or whole
+>>> device.
+>>
+>> That's the usual broken way to go by adding another layer. And if you
+>> encrypt your whole device, it won't help if you want to delete one file.
+>> As long as the encrypted device is mounted and the blocks aren't
+>> overwritten, the stuff is still there. So your solution would end up
+>> with:
+>>
+>> - mount encrypted device
+>> - build kernel and secret key
+>> - install kernel and secret key
+>
+> That's wrong, of course it should read "and signed modules".
+>
+>> - unmount encrypted device
+>>
+>> That's almost the same as shredding a whole device just to securely
+>> delete one file, with the added complication that the encryption
+>> requires an authentication, which usually is very uncomfortable to do,
+>> at least if the authentication is somewhat secure.
+>>
+>> Or what do you have in mind?
+>>
+>> Sorry, but deleting a file such that it isn't readable anymore by anyone
+>> shouldn't be a complicated sequence of geek-stuff and all filesystem and
+>> storage designers should be ashamed that they haven't managed it in
+>> around 30 years to accomplish that simple goal. (imho) ;)
+>
+> By the way, I still remember the time when people learned that if they
+> delete a file on a FAT file system, it isn't really gone. Afterwards all
+> kinds of device-shredding software and hardware appeared.
+>
+> But instead of fixing that broken design, now, around 30 years later,
+> this stupid and broken design is almost part of any storage and filesystem.
+>
+> And even worse, because storage is nowadays often fixed to device (no
+> floppy anymore you can easily destroy), it often has become almost
+> impossible to really delete stuff on devices.
+> E.g. how do you overwrite an eMMC which is soldered, without the
+> possibility to boot from something else in order to launch the shredding
+> software?
+>
+> So we are now at the point that the only way to keep some information
+> private (forever) is to not store it on any computer.
+>
+> How crazy or userfriendly is that?
 
-Such approach significantly increases stack usage,
-so all in-kernel stacks size were doubled.
+I've filed bugs #92271 (ext4) and #92261 (btrfs) in the kernels
+bugzilla. That might be a more appropriate place for discussion. Here
+are the links:
 
-Signed-off-by: Andrey Ryabinin <a.ryabinin@samsung.com>
----
- arch/x86/include/asm/page_64_types.h | 12 +++++++++---
- arch/x86/kernel/Makefile             |  2 ++
- arch/x86/mm/kasan_init_64.c          |  8 ++++++++
- include/linux/init_task.h            |  8 ++++++++
- mm/kasan/kasan.h                     |  9 +++++++++
- mm/kasan/report.c                    |  6 ++++++
- scripts/Makefile.kasan               |  1 +
- 7 files changed, 43 insertions(+), 3 deletions(-)
+https://bugzilla.kernel.org/show_bug.cgi?id=92271
 
-diff --git a/arch/x86/include/asm/page_64_types.h b/arch/x86/include/asm/page_64_types.h
-index 75450b2..4edd53b 100644
---- a/arch/x86/include/asm/page_64_types.h
-+++ b/arch/x86/include/asm/page_64_types.h
-@@ -1,17 +1,23 @@
- #ifndef _ASM_X86_PAGE_64_DEFS_H
- #define _ASM_X86_PAGE_64_DEFS_H
- 
--#define THREAD_SIZE_ORDER	2
-+#ifdef CONFIG_KASAN
-+#define KASAN_STACK_ORDER 1
-+#else
-+#define KASAN_STACK_ORDER 0
-+#endif
-+
-+#define THREAD_SIZE_ORDER	(2 + KASAN_STACK_ORDER)
- #define THREAD_SIZE  (PAGE_SIZE << THREAD_SIZE_ORDER)
- #define CURRENT_MASK (~(THREAD_SIZE - 1))
- 
--#define EXCEPTION_STACK_ORDER 0
-+#define EXCEPTION_STACK_ORDER (0 + KASAN_STACK_ORDER)
- #define EXCEPTION_STKSZ (PAGE_SIZE << EXCEPTION_STACK_ORDER)
- 
- #define DEBUG_STACK_ORDER (EXCEPTION_STACK_ORDER + 1)
- #define DEBUG_STKSZ (PAGE_SIZE << DEBUG_STACK_ORDER)
- 
--#define IRQ_STACK_ORDER 2
-+#define IRQ_STACK_ORDER (2 + KASAN_STACK_ORDER)
- #define IRQ_STACK_SIZE (PAGE_SIZE << IRQ_STACK_ORDER)
- 
- #define DOUBLEFAULT_STACK 1
-diff --git a/arch/x86/kernel/Makefile b/arch/x86/kernel/Makefile
-index 4fc8ca7..057f6f6 100644
---- a/arch/x86/kernel/Makefile
-+++ b/arch/x86/kernel/Makefile
-@@ -17,6 +17,8 @@ CFLAGS_REMOVE_early_printk.o = -pg
- endif
- 
- KASAN_SANITIZE_head$(BITS).o := n
-+KASAN_SANITIZE_dumpstack.o := n
-+KASAN_SANITIZE_dumpstack_$(BITS).o := n
- 
- CFLAGS_irq.o := -I$(src)/../include/asm/trace
- 
-diff --git a/arch/x86/mm/kasan_init_64.c b/arch/x86/mm/kasan_init_64.c
-index cfb932e..9498ece 100644
---- a/arch/x86/mm/kasan_init_64.c
-+++ b/arch/x86/mm/kasan_init_64.c
-@@ -189,9 +189,17 @@ void __init kasan_init(void)
- 			panic("kasan: unable to allocate shadow!");
- 	}
- 	populate_zero_shadow(kasan_mem_to_shadow(PAGE_OFFSET + MAXMEM),
-+			kasan_mem_to_shadow(__START_KERNEL_map));
-+
-+	vmemmap_populate(kasan_mem_to_shadow((unsigned long)_stext),
-+			kasan_mem_to_shadow((unsigned long)_end),
-+			NUMA_NO_NODE);
-+
-+	populate_zero_shadow(kasan_mem_to_shadow(MODULES_VADDR),
- 			KASAN_SHADOW_END);
- 
- 	memset(kasan_zero_page, 0, PAGE_SIZE);
- 
- 	load_cr3(init_level4_pgt);
-+	init_task.kasan_depth = 0;
- }
-diff --git a/include/linux/init_task.h b/include/linux/init_task.h
-index d3d43ec..696d223 100644
---- a/include/linux/init_task.h
-+++ b/include/linux/init_task.h
-@@ -175,6 +175,13 @@ extern struct task_group root_task_group;
- # define INIT_NUMA_BALANCING(tsk)
- #endif
- 
-+#ifdef CONFIG_KASAN
-+# define INIT_KASAN(tsk)						\
-+	.kasan_depth = 1,
-+#else
-+# define INIT_KASAN(tsk)
-+#endif
-+
- /*
-  *  INIT_TASK is used to set up the first task table, touch at
-  * your own risk!. Base=0, limit=0x1fffff (=2MB)
-@@ -250,6 +257,7 @@ extern struct task_group root_task_group;
- 	INIT_RT_MUTEXES(tsk)						\
- 	INIT_VTIME(tsk)							\
- 	INIT_NUMA_BALANCING(tsk)					\
-+	INIT_KASAN(tsk)							\
- }
- 
- 
-diff --git a/mm/kasan/kasan.h b/mm/kasan/kasan.h
-index f500a8a..9efc523 100644
---- a/mm/kasan/kasan.h
-+++ b/mm/kasan/kasan.h
-@@ -12,6 +12,15 @@
- #define KASAN_KMALLOC_REDZONE   0xFC  /* redzone inside slub object */
- #define KASAN_KMALLOC_FREE      0xFB  /* object was freed (kmem_cache_free/kfree) */
- 
-+/*
-+ * Stack redzone shadow values
-+ * (Those are compiler's ABI, don't change them)
-+ */
-+#define KASAN_STACK_LEFT        0xF1
-+#define KASAN_STACK_MID         0xF2
-+#define KASAN_STACK_RIGHT       0xF3
-+#define KASAN_STACK_PARTIAL     0xF4
-+
- 
- struct access_info {
- 	unsigned long access_addr;
-diff --git a/mm/kasan/report.c b/mm/kasan/report.c
-index edf1638..c83e397 100644
---- a/mm/kasan/report.c
-+++ b/mm/kasan/report.c
-@@ -64,6 +64,12 @@ static void print_error_description(struct access_info *info)
- 	case 0 ... KASAN_SHADOW_SCALE_SIZE - 1:
- 		bug_type = "out of bounds access";
- 		break;
-+	case KASAN_STACK_LEFT:
-+	case KASAN_STACK_MID:
-+	case KASAN_STACK_RIGHT:
-+	case KASAN_STACK_PARTIAL:
-+		bug_type = "out of bounds on stack";
-+		break;
- 	}
- 
- 	pr_err("BUG: AddressSanitizer: %s in %pS at addr %p\n",
-diff --git a/scripts/Makefile.kasan b/scripts/Makefile.kasan
-index 159396a..0ac7d1d 100644
---- a/scripts/Makefile.kasan
-+++ b/scripts/Makefile.kasan
-@@ -9,6 +9,7 @@ CFLAGS_KASAN_MINIMAL := $(call cc-option, -fsanitize=kernel-address)
- 
- CFLAGS_KASAN := $(call cc-option, -fsanitize=kernel-address \
- 		-fasan-shadow-offset=$(CONFIG_KASAN_SHADOW_OFFSET) \
-+		--param asan-stack=1 \
- 		--param asan-instrumentation-with-call-threshold=$(call_threshold))
- 
- ifeq ($(CFLAGS_KASAN_MINIMAL),)
--- 
-2.2.2
+https://bugzilla.kernel.org/show_bug.cgi?id=92261
+
+Regards,
+
+Alexander Holler
 
