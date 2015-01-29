@@ -1,63 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:40036 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:42779 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753828AbbA2Mjr (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 29 Jan 2015 07:39:47 -0500
-Message-ID: <54CA2A10.5050801@suse.cz>
-Date: Thu, 29 Jan 2015 13:39:44 +0100
+	id S1753472AbbA2NPO (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 29 Jan 2015 08:15:14 -0500
+Message-ID: <54CA325F.9070906@suse.cz>
+Date: Thu, 29 Jan 2015 14:15:11 +0100
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH 1/1] kconfig: warn if an unknown symbol is selected
-References: <1412100583.21730.31.camel@x220>		 <1415014691.20372.49.camel@x220> <1422438897.5666.23.camel@x220>	 <54C8FFBA.5040000@suse.cz> <1422480756.3621.52.camel@x220>
-In-Reply-To: <1422480756.3621.52.camel@x220>
-Content-Type: text/plain; charset=utf-8
+Subject: Re: [PATCH v11 23/28] scripts/gdb: Ignore byte-compiled python files
+References: <cover.1422514006.git.jan.kiszka@siemens.com> <fd0c2a6ad6e1d021ce85798f9cd89d9e3381288e.1422514006.git.jan.kiszka@siemens.com>
+In-Reply-To: <fd0c2a6ad6e1d021ce85798f9cd89d9e3381288e.1422514006.git.jan.kiszka@siemens.com>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Paul Bolle <pebolle@tiscali.nl>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Jan Kiszka <jan.kiszka@siemens.com>, Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org
+Cc: Thomas Gleixner <tglx@linutronix.de>, Jason Wessel <jason.wessel@windriver.com>, kgdb-bugreport@lists.sourceforge.net, Andi Kleen <andi@firstfloor.org>, Tom Tromey <tromey@redhat.com>, Ben Widawsky <ben@bwidawsk.net>, Borislav Petkov <bp@suse.de>, Daniel Thompson <daniel.thompson@linaro.org>, linux-kbuild@vger.kernel.org
 
-On 2015-01-28 22:32, Paul Bolle wrote:
-> On Wed, 2015-01-28 at 16:26 +0100, Michal Marek wrote:
->> On 2015-01-28 10:54, Paul Bolle wrote:
->>> Now that we've been told Yann has disappeared, would you consider taking
->>> this patch into one of your trees? It would be nice to have people
->>> actually use it for a while.
->>>
->>> Or should we first clean up (most of) the warnings it generates? There
->>
->> It seems your fixes have been accepted in the meantime, but there is one
->> new:
->> *** Default configuration is based on 'x86_64_defconfig'
->> drivers/misc/cxl/Kconfig:8:warning: 'CXL_BASE' selects unknown symbol
->> 'PPC_COPRO_BASE'
->>
->> PPC_COPRO_BASE is not known on x86, but at the same time, there is no
->> way for CXL_BASE to be selected on x86:
->>
->> config CXL_BASE
->> 	bool
->> 	default n
->> 	select PPC_COPRO_BASE
->>
->> config CXL
->> 	tristate "Support for IBM Coherent Accelerators (CXL)"
->> 	depends on PPC_POWERNV && PCI_MSI
->> 	select CXL_BASE
->> 	default m
->>
->> Shouldn't we only warn about a select when it is triggered? An
->> allyesconfig would still report all bogus selects for given architecture.
-> 
-> Good catch! I think checking only for selects done by Kconfig symbols
-> that are not "n" might do the trick. Expect a v2 one of these days.
-> 
-> The current load of issues (for allyesconfig on all arches except um) is
-> pasted at the bottom of this message (with some comments added). Looking
-> at that load I think it might be preferable to first most of fix those
-> issues before adding this to kconfig.
+On 2015-01-29 07:46, Jan Kiszka wrote:
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -1179,7 +1179,8 @@ MRPROPER_FILES += .config .config.old .version .old_version $(version_h) \
+>  		  Module.symvers tags TAGS cscope* GPATH GTAGS GRTAGS GSYMS \
+>  		  signing_key.priv signing_key.x509 x509.genkey		\
+>  		  extra_certificates signing_key.x509.keyid		\
+> -		  signing_key.x509.signer vmlinux-gdb.py
+> +		  signing_key.x509.signer vmlinux-gdb.py		\
+> +		  scripts/gdb/linux/*.py[co]
 
-Maybe. OTOH, you have no warnings on x86 and powerpc and you already
-have patches for the arm(64) warnings, so I think this can go in.
+In 01/28, you already have
+
++clean-files := *.pyc $(if $(KBUILD_SRC),*.py)
+
+Maybe just add *.pyo there and you don't need to add it to the toplevel
+Makefile.
 
 Michal
