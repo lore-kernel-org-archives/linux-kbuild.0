@@ -1,51 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f182.google.com ([209.85.212.182]:58349 "EHLO
-	mail-wi0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752404AbbA2OeK (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 29 Jan 2015 09:34:10 -0500
-Received: by mail-wi0-f182.google.com with SMTP id n3so25293811wiv.3
-        for <linux-kbuild@vger.kernel.org>; Thu, 29 Jan 2015 06:34:09 -0800 (PST)
-Message-ID: <54CA44E2.904@linaro.org>
-Date: Thu, 29 Jan 2015 14:34:10 +0000
-From: Daniel Thompson <daniel.thompson@linaro.org>
+Received: from david.siemens.de ([192.35.17.14]:46078 "EHLO david.siemens.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752244AbbA2OmT (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 29 Jan 2015 09:42:19 -0500
+Message-ID: <54CA46A6.2030108@siemens.com>
+Date: Thu, 29 Jan 2015 15:41:42 +0100
+From: Jan Kiszka <jan.kiszka@siemens.com>
 MIME-Version: 1.0
 Subject: Re: [PATCH v11 23/28] scripts/gdb: Ignore byte-compiled python files
-References: <cover.1422514006.git.jan.kiszka@siemens.com> <fd0c2a6ad6e1d021ce85798f9cd89d9e3381288e.1422514006.git.jan.kiszka@siemens.com> <54CA325F.9070906@suse.cz> <54CA3736.4090600@siemens.com>
-In-Reply-To: <54CA3736.4090600@siemens.com>
+References: <cover.1422514006.git.jan.kiszka@siemens.com> <fd0c2a6ad6e1d021ce85798f9cd89d9e3381288e.1422514006.git.jan.kiszka@siemens.com> <54CA325F.9070906@suse.cz> <54CA3736.4090600@siemens.com> <54CA44E2.904@linaro.org>
+In-Reply-To: <54CA44E2.904@linaro.org>
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jan Kiszka <jan.kiszka@siemens.com>, Michal Marek <mmarek@suse.cz>, Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org
+To: Daniel Thompson <daniel.thompson@linaro.org>, Michal Marek <mmarek@suse.cz>, Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org
 Cc: Thomas Gleixner <tglx@linutronix.de>, Jason Wessel <jason.wessel@windriver.com>, kgdb-bugreport@lists.sourceforge.net, Andi Kleen <andi@firstfloor.org>, Tom Tromey <tromey@redhat.com>, Ben Widawsky <ben@bwidawsk.net>, Borislav Petkov <bp@suse.de>, linux-kbuild@vger.kernel.org
 
-On 29/01/15 13:35, Jan Kiszka wrote:
-> On 2015-01-29 14:15, Michal Marek wrote:
->> On 2015-01-29 07:46, Jan Kiszka wrote:
->>> --- a/Makefile
->>> +++ b/Makefile
->>> @@ -1179,7 +1179,8 @@ MRPROPER_FILES += .config .config.old .version .old_version $(version_h) \
->>>  		  Module.symvers tags TAGS cscope* GPATH GTAGS GRTAGS GSYMS \
->>>  		  signing_key.priv signing_key.x509 x509.genkey		\
->>>  		  extra_certificates signing_key.x509.keyid		\
->>> -		  signing_key.x509.signer vmlinux-gdb.py
->>> +		  signing_key.x509.signer vmlinux-gdb.py		\
->>> +		  scripts/gdb/linux/*.py[co]
+On 2015-01-29 15:34, Daniel Thompson wrote:
+> On 29/01/15 13:35, Jan Kiszka wrote:
+>> On 2015-01-29 14:15, Michal Marek wrote:
+>>> On 2015-01-29 07:46, Jan Kiszka wrote:
+>>>> --- a/Makefile
+>>>> +++ b/Makefile
+>>>> @@ -1179,7 +1179,8 @@ MRPROPER_FILES += .config .config.old .version .old_version $(version_h) \
+>>>>  		  Module.symvers tags TAGS cscope* GPATH GTAGS GRTAGS GSYMS \
+>>>>  		  signing_key.priv signing_key.x509 x509.genkey		\
+>>>>  		  extra_certificates signing_key.x509.keyid		\
+>>>> -		  signing_key.x509.signer vmlinux-gdb.py
+>>>> +		  signing_key.x509.signer vmlinux-gdb.py		\
+>>>> +		  scripts/gdb/linux/*.py[co]
+>>>
+>>> In 01/28, you already have
+>>>
+>>> +clean-files := *.pyc $(if $(KBUILD_SRC),*.py)
+>>>
+>>> Maybe just add *.pyo there and you don't need to add it to the toplevel
+>>> Makefile.
 >>
->> In 01/28, you already have
->>
->> +clean-files := *.pyc $(if $(KBUILD_SRC),*.py)
->>
->> Maybe just add *.pyo there and you don't need to add it to the toplevel
->> Makefile.
+>> Based on a quick test, you seem right. Daniel, anything we miss?
 > 
-> Based on a quick test, you seem right. Daniel, anything we miss?
+> No. Deleting it with the clean rule makes sense.
+> 
+> Of course the .gitignore parts of my patch will still be needed in some
+> form or other.
 
-No. Deleting it with the clean rule makes sense.
+Sure. Can you provide an updated version, one that augments the
+clean-files rule instead? Then I'll sign-off and include it in a
+potential follow-up round.
 
-Of course the .gitignore parts of my patch will still be needed in some
-form or other.
+Thanks,
+Jan
 
-
-Daniel.
+-- 
+Siemens AG, Corporate Technology, CT RTC ITP SES-DE
+Corporate Competence Center Embedded Linux
