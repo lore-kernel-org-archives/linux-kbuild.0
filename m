@@ -1,146 +1,113 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mailout2.w1.samsung.com ([210.118.77.12]:61033 "EHLO
-	mailout2.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756643AbbA3QEq (ORCPT
+Received: from mailout3.w1.samsung.com ([210.118.77.13]:63087 "EHLO
+	mailout3.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750742AbbA3RrY (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 30 Jan 2015 11:04:46 -0500
-Message-id: <54CBAB92.6090108@samsung.com>
-Date: Fri, 30 Jan 2015 19:04:34 +0300
+	Fri, 30 Jan 2015 12:47:24 -0500
+Message-id: <54CBC3A1.5040505@samsung.com>
+Date: Fri, 30 Jan 2015 20:47:13 +0300
 From: Andrey Ryabinin <a.ryabinin@samsung.com>
 MIME-version: 1.0
-Subject: Re: [PATCH v10 01/17] Add kernel address sanitizer infrastructure.
+Subject: Re: [PATCH v10 17/17] kasan: enable instrumentation of global variables
 References: <1404905415-9046-1-git-send-email-a.ryabinin@samsung.com>
  <1422544321-24232-1-git-send-email-a.ryabinin@samsung.com>
- <1422544321-24232-2-git-send-email-a.ryabinin@samsung.com>
- <20150129151213.09d1f9e0a01490712d0eb071@linux-foundation.org>
-In-reply-to: <20150129151213.09d1f9e0a01490712d0eb071@linux-foundation.org>
+ <1422544321-24232-18-git-send-email-a.ryabinin@samsung.com>
+ <20150129151332.3f87c0b2e335afd88af33e08@linux-foundation.org>
+In-reply-to: <20150129151332.3f87c0b2e335afd88af33e08@linux-foundation.org>
 Content-type: text/plain; charset=windows-1252
 Content-transfer-encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Andrew Morton <akpm@linux-foundation.org>
-Cc: linux-kernel@vger.kernel.org, Dmitry Vyukov <dvyukov@google.com>, Konstantin Serebryany <kcc@google.com>, Dmitry Chernenkov <dmitryc@google.com>, Andrey Konovalov <adech.fo@gmail.com>, Yuri Gribov <tetra2005@gmail.com>, Konstantin Khlebnikov <koct9i@gmail.com>, Sasha Levin <sasha.levin@oracle.com>, Christoph Lameter <cl@linux.com>, Joonsoo Kim <iamjoonsoo.kim@lge.com>, Dave Hansen <dave.hansen@intel.com>, Andi Kleen <andi@firstfloor.org>, x86@kernel.org, linux-mm@kvack.org, Jonathan Corbet <corbet@lwn.net>, Michal Marek <mmarek@suse.cz>, Ingo Molnar <mingo@redhat.com>, Peter Zijlstra <peterz@infradead.org>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, "open list:KERNEL BUILD + fi..." <linux-kbuild@vger.kernel.org>
+Cc: linux-kernel@vger.kernel.org, Dmitry Vyukov <dvyukov@google.com>, Konstantin Serebryany <kcc@google.com>, Dmitry Chernenkov <dmitryc@google.com>, Andrey Konovalov <adech.fo@gmail.com>, Yuri Gribov <tetra2005@gmail.com>, Konstantin Khlebnikov <koct9i@gmail.com>, Sasha Levin <sasha.levin@oracle.com>, Christoph Lameter <cl@linux.com>, Joonsoo Kim <iamjoonsoo.kim@lge.com>, Dave Hansen <dave.hansen@intel.com>, Andi Kleen <andi@firstfloor.org>, x86@kernel.org, linux-mm@kvack.org, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Rusty Russell <rusty@rustcorp.com.au>, Michal Marek <mmarek@suse.cz>, "open list:KERNEL BUILD + fi..." <linux-kbuild@vger.kernel.org>
 
-On 01/30/2015 02:12 AM, Andrew Morton wrote:
-> On Thu, 29 Jan 2015 18:11:45 +0300 Andrey Ryabinin <a.ryabinin@samsung.com> wrote:
+On 01/30/2015 02:13 AM, Andrew Morton wrote:
+> On Thu, 29 Jan 2015 18:12:01 +0300 Andrey Ryabinin <a.ryabinin@samsung.com> wrote:
 > 
->> Kernel Address sanitizer (KASan) is a dynamic memory error detector. It provides
->> fast and comprehensive solution for finding use-after-free and out-of-bounds bugs.
+>> This feature let us to detect accesses out of bounds
+>> of global variables.
+> 
+> global variables *within modules*, I think?  More specificity needed here.
+
+Within modules and within kernel image. Handling modules just the most
+tricky part of this.
+
+> 
+>> The idea of this is simple. Compiler increases each global variable
+>> by redzone size and add constructors invoking __asan_register_globals()
+>> function. Information about global variable (address, size,
+>> size with redzone ...) passed to __asan_register_globals() so we could
+>> poison variable's redzone.
 >>
->> KASAN uses compile-time instrumentation for checking every memory access,
->> therefore GCC >= v4.9.2 required.
+>> This patch also forces module_alloc() to return 8*PAGE_SIZE aligned
+>> address making shadow memory handling ( kasan_module_alloc()/kasan_module_free() )
+>> more simple. Such alignment guarantees that each shadow page backing
+>> modules address space correspond to only one module_alloc() allocation.
 >>
 >> ...
 >>
->> Based on work by Andrey Konovalov <adech.fo@gmail.com>
-> 
-> Can we obtain Andrey's signed-off-by: please?
->  
-
-I'll ask.
-
-...
-
->> +static __always_inline bool memory_is_poisoned_1(unsigned long addr)
-> 
-> What's with all the __always_inline in this file?  When I remove them
-> all, kasan.o .text falls from 8294 bytes down to 4543 bytes.  That's
-> massive, and quite possibly faster.
-> 
-> If there's some magical functional reason for this then can we please
-> get a nice prominent comment into this code apologetically explaining
-> it?
-> 
-
-The main reason is performance. __always_inline especially needed for check_memory_region()
-and memory_is_poisoned() to optimize away switch in memory_is_poisoned():
-
-	if (__builtin_constant_p(size)) {
-		switch (size) {
-		case 1:
-			return memory_is_poisoned_1(addr);
-		case 2:
-			return memory_is_poisoned_2(addr);
-		case 4:
-			return memory_is_poisoned_4(addr);
-		case 8:
-			return memory_is_poisoned_8(addr);
-		case 16:
-			return memory_is_poisoned_16(addr);
-		default:
-			BUILD_BUG();
-		}
-	}
-
-Always inlining memory_is_poisoned_x() gives additionally about 7%-10%.
-
-According to my simple testing __always_inline gives about 20% versus
-not inlined version of kasan.c
-
-
-...
-
->> +
->> +void __asan_loadN(unsigned long addr, size_t size)
+>> +int kasan_module_alloc(void *addr, size_t size)
 >> +{
->> +	check_memory_region(addr, size, false);
+>> +
+>> +	size_t shadow_size = round_up(size >> KASAN_SHADOW_SCALE_SHIFT,
+>> +				PAGE_SIZE);
+>> +	unsigned long shadow_start = kasan_mem_to_shadow((unsigned long)addr);
+>> +	void *ret;
+> 
+> Like this:
+> 
+> 	size_t shadow_size;
+> 	unsigned long shadow_start;
+> 	void *ret;
+> 
+> 	shadow_size = round_up(size >> KASAN_SHADOW_SCALE_SHIFT, PAGE_SIZE);
+> 	shadow_start = kasan_mem_to_shadow((unsigned long)addr);
+> 
+> it's much easier to read and avoids the 80-column trickery.
+> 
+> I do suspect that
+> 
+> 	void *kasan_mem_to_shadow(const void *addr);
+> 
+> would clean up lots and lots of code.
+> 
+
+Agreed.
+
+>> +	if (WARN_ON(!PAGE_ALIGNED(shadow_start)))
+>> +		return -EINVAL;
+>> +
+>> +	ret = __vmalloc_node_range(shadow_size, 1, shadow_start,
+>> +			shadow_start + shadow_size,
+>> +			GFP_KERNEL | __GFP_HIGHMEM | __GFP_ZERO,
+>> +			PAGE_KERNEL, VM_NO_GUARD, NUMA_NO_NODE,
+>> +			__builtin_return_address(0));
+>> +	return ret ? 0 : -ENOMEM;
 >> +}
->> +EXPORT_SYMBOL(__asan_loadN);
 >> +
->> +__attribute__((alias("__asan_loadN")))
-> 
-> Maybe we need a __alias.  Like __packed and various other helpers.
-> 
-
-Ok.
-
-....
-
->> +
->> +static __always_inline void kasan_report(unsigned long addr,
->> +					size_t size,
->> +					bool is_write)
-> 
-> Again, why the inline?  This is presumably not a hotpath and
-> kasan_report has sixish call sites.
-> 
-
-The reason of __always_inline here is to get correct _RET_IP_.
-I could pass it from above and drop always inline here.
-
-> 
->> +{
->> +	struct access_info info;
->> +
->> +	if (likely(!kasan_enabled()))
->> +		return;
->> +
->> +	info.access_addr = addr;
->> +	info.access_size = size;
->> +	info.is_write = is_write;
->> +	info.ip = _RET_IP_;
->> +	kasan_report_error(&info);
->> +}
 >>
-...
-
->> +
->> +static void print_address_description(struct access_info *info)
->> +{
->> +	dump_stack();
->> +}
+>> ...
+>>
+>> +struct kasan_global {
+>> +	const void *beg;		/* Address of the beginning of the global variable. */
+>> +	size_t size;			/* Size of the global variable. */
+>> +	size_t size_with_redzone;	/* Size of the variable + size of the red zone. 32 bytes aligned */
+>> +	const void *name;
+>> +	const void *module_name;	/* Name of the module where the global variable is declared. */
+>> +	unsigned long has_dynamic_init;	/* This needed for C++ */
 > 
-> dump_stack() uses KERN_INFO but the callers or
-> print_address_description() use KERN_ERR.  This means that at some
-> settings of `dmesg -n', the kasan output will have large missing
-> chunks.
-> 
-> Please test this and deide how bad it is.  A proper fix will be
-> somewhat messy (new_dump_stack(KERN_ERR)).
+> This can be removed?
 > 
 
-This new_dump_stack() could be useful in other places.
-E.g. object_err()/slab_err() in SLUB also use pr_err() + dump_stack() combination.
+No, compiler dictates layout of this struct. That probably deserves a comment.
 
-
+>> +#if KASAN_ABI_VERSION >= 4
+>> +	struct kasan_source_location *location;
+>> +#endif
+>> +};
+>>
+>> ...
+>>
+> 
+> 
 
