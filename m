@@ -1,167 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from thoth.sbs.de ([192.35.17.2]:59653 "EHLO thoth.sbs.de"
+Received: from cantor2.suse.de ([195.135.220.15]:53564 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754177AbbA3HZb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 30 Jan 2015 02:25:31 -0500
-From: Jan Kiszka <jan.kiszka@siemens.com>
-Subject: [PATCH v12 01/28] scripts/gdb: Add infrastructure
-Date: Fri, 30 Jan 2015 08:24:30 +0100
-Message-Id: <dac94f3b72cb0de147e679a605eec64528b8bf76.1422602696.git.jan.kiszka@siemens.com>
-In-Reply-To: <cover.1422602696.git.jan.kiszka@siemens.com>
-References: <cover.1422602696.git.jan.kiszka@siemens.com>
-In-Reply-To: <cover.1422602696.git.jan.kiszka@siemens.com>
-References: <cover.1422602696.git.jan.kiszka@siemens.com>
+	id S1759913AbbA3K72 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 30 Jan 2015 05:59:28 -0500
+Message-ID: <54CB640B.4030707@suse.cz>
+Date: Fri, 30 Jan 2015 11:59:23 +0100
+From: Michal Marek <mmarek@suse.cz>
+MIME-Version: 1.0
+Subject: Re: [PATCH v12 01/28] scripts/gdb: Add infrastructure
+References: <cover.1422602696.git.jan.kiszka@siemens.com> <dac94f3b72cb0de147e679a605eec64528b8bf76.1422602696.git.jan.kiszka@siemens.com>
+In-Reply-To: <dac94f3b72cb0de147e679a605eec64528b8bf76.1422602696.git.jan.kiszka@siemens.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org
-Cc: Thomas Gleixner <tglx@linutronix.de>, Jason Wessel <jason.wessel@windriver.com>, kgdb-bugreport@lists.sourceforge.net, Andi Kleen <andi@firstfloor.org>, Ben Widawsky <ben@bwidawsk.net>, Borislav Petkov <bp@suse.de>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+To: Jan Kiszka <jan.kiszka@siemens.com>, Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org
+Cc: Thomas Gleixner <tglx@linutronix.de>, Jason Wessel <jason.wessel@windriver.com>, kgdb-bugreport@lists.sourceforge.net, Andi Kleen <andi@firstfloor.org>, Ben Widawsky <ben@bwidawsk.net>, Borislav Petkov <bp@suse.de>, linux-kbuild@vger.kernel.org
 
-This provides the basic infrastructure to load kernel-specific python
-helper scripts when debugging the kernel in gdb.
+On 2015-01-30 08:24, Jan Kiszka wrote:
+> This provides the basic infrastructure to load kernel-specific python
+> helper scripts when debugging the kernel in gdb.
+> 
+> The loading mechanism is based on gdb loading for <objfile>-gdb.py when
+> opening <objfile>. Therefore, this places a corresponding link to the
+> main helper script into the output directory that contains vmlinux.
+> 
+> The main scripts will pull in submodules containing Linux specific gdb
+> commands and functions. To avoid polluting the source directory with
+> compiled python modules, we link to them from the object directory.
+> 
+> Due to gdb.parse_and_eval and string redirection for gdb.execute, we
+> depend on gdb >= 7.2.
+> 
+> This feature is enabled via CONFIG_GDB_SCRIPTS.
+> 
+> CC: Michal Marek <mmarek@suse.cz>
+> CC: linux-kbuild@vger.kernel.org
+> Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+> ---
+>  Makefile                      |  5 ++++-
+>  lib/Kconfig.debug             | 11 +++++++++++
+>  scripts/Makefile              |  1 +
+>  scripts/gdb/Makefile          |  1 +
+>  scripts/gdb/linux/Makefile    | 11 +++++++++++
 
-The loading mechanism is based on gdb loading for <objfile>-gdb.py when
-opening <objfile>. Therefore, this places a corresponding link to the
-main helper script into the output directory that contains vmlinux.
+For the kbuild stuff:
+Acked-by: Michal Marek <mmarek@suse.cz>
 
-The main scripts will pull in submodules containing Linux specific gdb
-commands and functions. To avoid polluting the source directory with
-compiled python modules, we link to them from the object directory.
-
-Due to gdb.parse_and_eval and string redirection for gdb.execute, we
-depend on gdb >= 7.2.
-
-This feature is enabled via CONFIG_GDB_SCRIPTS.
-
-CC: Michal Marek <mmarek@suse.cz>
-CC: linux-kbuild@vger.kernel.org
-Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
----
- Makefile                      |  5 ++++-
- lib/Kconfig.debug             | 11 +++++++++++
- scripts/Makefile              |  1 +
- scripts/gdb/Makefile          |  1 +
- scripts/gdb/linux/Makefile    | 11 +++++++++++
- scripts/gdb/linux/__init__.py |  0
- scripts/gdb/vmlinux-gdb.py    | 23 +++++++++++++++++++++++
- 7 files changed, 51 insertions(+), 1 deletion(-)
- create mode 100644 scripts/gdb/Makefile
- create mode 100644 scripts/gdb/linux/Makefile
- create mode 100644 scripts/gdb/linux/__init__.py
- create mode 100644 scripts/gdb/vmlinux-gdb.py
-
-diff --git a/Makefile b/Makefile
-index 95a0e82..6881ddf 100644
---- a/Makefile
-+++ b/Makefile
-@@ -922,6 +922,9 @@ endif
- ifdef CONFIG_BUILD_DOCSRC
- 	$(Q)$(MAKE) $(build)=Documentation
- endif
-+ifdef CONFIG_GDB_SCRIPTS
-+	$(Q)ln -fsn `cd $(srctree) && /bin/pwd`/scripts/gdb/vmlinux-gdb.py
-+endif
- 	+$(call if_changed,link-vmlinux)
- 
- # The actual objects are generated when descending,
-@@ -1176,7 +1179,7 @@ MRPROPER_FILES += .config .config.old .version .old_version $(version_h) \
- 		  Module.symvers tags TAGS cscope* GPATH GTAGS GRTAGS GSYMS \
- 		  signing_key.priv signing_key.x509 x509.genkey		\
- 		  extra_certificates signing_key.x509.keyid		\
--		  signing_key.x509.signer
-+		  signing_key.x509.signer vmlinux-gdb.py
- 
- # clean - Delete most, but leave enough to build external modules
- #
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index 5f2ce61..74984af 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -167,6 +167,17 @@ config DEBUG_INFO_DWARF4
- 	  But it significantly improves the success of resolving
- 	  variables in gdb on optimized code.
- 
-+config GDB_SCRIPTS
-+	bool "Provide GDB scripts for kernel debugging"
-+	select DEBUG_INFO
-+	help
-+	  This creates the required links to GDB helper scripts in the
-+	  build directory. If you load vmlinux into gdb, the helper
-+	  scripts will be automatically imported by gdb as well, and
-+	  additional functions are available to analyze a Linux kernel
-+	  instance. See Documentation/gdb-kernel-debugging.txt for further
-+	  details.
-+
- config ENABLE_WARN_DEPRECATED
- 	bool "Enable __deprecated logic"
- 	default y
-diff --git a/scripts/Makefile b/scripts/Makefile
-index 72902b5..2016a64 100644
---- a/scripts/Makefile
-+++ b/scripts/Makefile
-@@ -36,6 +36,7 @@ subdir-$(CONFIG_MODVERSIONS) += genksyms
- subdir-y                     += mod
- subdir-$(CONFIG_SECURITY_SELINUX) += selinux
- subdir-$(CONFIG_DTC)         += dtc
-+subdir-$(CONFIG_GDB_SCRIPTS) += gdb
- 
- # Let clean descend into subdirs
- subdir-	+= basic kconfig package
-diff --git a/scripts/gdb/Makefile b/scripts/gdb/Makefile
-new file mode 100644
-index 0000000..62f5f65
---- /dev/null
-+++ b/scripts/gdb/Makefile
-@@ -0,0 +1 @@
-+subdir-y := linux
-diff --git a/scripts/gdb/linux/Makefile b/scripts/gdb/linux/Makefile
-new file mode 100644
-index 0000000..6cf1ecf
---- /dev/null
-+++ b/scripts/gdb/linux/Makefile
-@@ -0,0 +1,11 @@
-+always := gdb-scripts
-+
-+SRCTREE := $(shell cd $(srctree) && /bin/pwd)
-+
-+$(obj)/gdb-scripts:
-+ifneq ($(KBUILD_SRC),)
-+	$(Q)ln -fsn $(SRCTREE)/$(obj)/*.py $(objtree)/$(obj)
-+endif
-+	@:
-+
-+clean-files := *.pyc *.pyo $(if $(KBUILD_SRC),*.py)
-diff --git a/scripts/gdb/linux/__init__.py b/scripts/gdb/linux/__init__.py
-new file mode 100644
-index 0000000..e69de29
-diff --git a/scripts/gdb/vmlinux-gdb.py b/scripts/gdb/vmlinux-gdb.py
-new file mode 100644
-index 0000000..c1d90ce
---- /dev/null
-+++ b/scripts/gdb/vmlinux-gdb.py
-@@ -0,0 +1,23 @@
-+#
-+# gdb helper commands and functions for Linux kernel debugging
-+#
-+#  loader module
-+#
-+# Copyright (c) Siemens AG, 2012, 2013
-+#
-+# Authors:
-+#  Jan Kiszka <jan.kiszka@siemens.com>
-+#
-+# This work is licensed under the terms of the GNU GPL version 2.
-+#
-+
-+import os
-+
-+sys.path.insert(0, os.path.dirname(__file__) + "/scripts/gdb")
-+
-+try:
-+    gdb.parse_and_eval("0")
-+    gdb.execute("", to_string=True)
-+except:
-+    gdb.write("NOTE: gdb 7.2 or later required for Linux helper scripts to "
-+              "work.\n")
--- 
-2.1.4
-
+Michal
