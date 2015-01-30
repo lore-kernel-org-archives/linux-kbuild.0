@@ -1,124 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from david.siemens.de ([192.35.17.14]:49900 "EHLO david.siemens.de"
+Received: from david.siemens.de ([192.35.17.14]:49836 "EHLO david.siemens.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932466AbbA3HZq (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 30 Jan 2015 02:25:46 -0500
+	id S932132AbbA3HZi (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 30 Jan 2015 02:25:38 -0500
 From: Jan Kiszka <jan.kiszka@siemens.com>
-Subject: [PATCH v12 00/28] Add gdb python scripts as kernel debugging helpers
-Date: Fri, 30 Jan 2015 08:24:29 +0100
-Message-Id: <cover.1422602696.git.jan.kiszka@siemens.com>
+Subject: [PATCH v12 23/28] scripts/gdb: Ignore byte-compiled python files
+Date: Fri, 30 Jan 2015 08:24:52 +0100
+Message-Id: <3cf54d52b07feaac667de437267bb657c7d2974a.1422602696.git.jan.kiszka@siemens.com>
+In-Reply-To: <cover.1422602696.git.jan.kiszka@siemens.com>
+References: <cover.1422602696.git.jan.kiszka@siemens.com>
+In-Reply-To: <cover.1422602696.git.jan.kiszka@siemens.com>
+References: <cover.1422602696.git.jan.kiszka@siemens.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org
-Cc: Thomas Gleixner <tglx@linutronix.de>, Jason Wessel <jason.wessel@windriver.com>, kgdb-bugreport@lists.sourceforge.net, Andi Kleen <andi@firstfloor.org>, Ben Widawsky <ben@bwidawsk.net>, Borislav Petkov <bp@suse.de>, Daniel Thompson <daniel.thompson@linaro.org>, Daniel Wagner <daniel.wagner@bmw-carit.de>, "David S. Miller" <davem@davemloft.net>, Fenghua Yu <fenghua.yu@intel.com>, Kay Sievers <kay@vrfy.org>, linux-doc@vger.kernel.org, linux-ia64@vger.kernel.org, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, Pantelis Koukousoulas <pktoss@gmail.com>, Rob Landley <rob@landley.net>, Rusty Russell <rusty@rustcorp.com.au>, sparclinux@vger.kernel.org, Tony Luck <tony.luck@intel.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Jason Wessel <jason.wessel@windriver.com>, kgdb-bugreport@lists.sourceforge.net, Andi Kleen <andi@firstfloor.org>, Ben Widawsky <ben@bwidawsk.net>, Borislav Petkov <bp@suse.de>, Daniel Thompson <daniel.thompson@linaro.org>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
-Hi Andrew,
+From: Daniel Thompson <daniel.thompson@linaro.org>
 
-this is an update to address the review comments provided by Michal
-Marek on v11.
+Using the gdb scripts leaves byte-compiled python files in the scripts/
+directory. These should be ignored by git.
 
-Changes since v11:
- - drop redundant subdir rule
- - fold *.pyo into existing clean-files rules
-
-See http://lkml.indiana.edu/hypermail/linux/kernel/1210.0/01598.html for
-the original description and
-
-    git://git.kiszka.org/linux.git queues/gdb-scripts
-
-for the latest version.
-
-Jan
-
-CC: Daniel Thompson <daniel.thompson@linaro.org>
-CC: Daniel Wagner <daniel.wagner@bmw-carit.de>
-CC: "David S. Miller" <davem@davemloft.net>
-CC: Fenghua Yu <fenghua.yu@intel.com>
-Cc: Jan Kiszka <jan.kiszka@siemens.com>
-CC: Kay Sievers <kay@vrfy.org>
-CC: linux-doc@vger.kernel.org
-CC: linux-ia64@vger.kernel.org
-Cc: linux-kbuild@vger.kernel.org
-CC: linux-kbuild@vger.kernel.org
+Signed-off-by: Daniel Thompson <daniel.thompson@linaro.org>
 Cc: Michal Marek <mmarek@suse.cz>
-CC: Michal Marek <mmarek@suse.cz>
-CC: Pantelis Koukousoulas <pktoss@gmail.com>
-CC: Rob Landley <rob@landley.net>
-CC: Rusty Russell <rusty@rustcorp.com.au>
-CC: sparclinux@vger.kernel.org
-CC: Tony Luck <tony.luck@intel.com>
-
-Daniel Thompson (1):
-  scripts/gdb: Ignore byte-compiled python files
-
-Daniel Wagner (1):
-  scripts/gdb: Use a generator instead of iterator for task list
-
-Jan Kiszka (25):
-  scripts/gdb: Add infrastructure
-  scripts/gdb: Add cache for type objects
-  scripts/gdb: Add container_of helper and convenience function
-  scripts/gdb: Add module iteration class
-  scripts/gdb: Add lx-symbols command
-  module: Do not inline do_init_module
-  scripts/gdb: Add automatic symbol reloading on module insertion
-  scripts/gdb: Add internal helper and convenience function to look up a
-    module
-  scripts/gdb: Add get_target_endianness helper
-  scripts/gdb: Add read_u16/32/64 helpers
-  scripts/gdb: Add lx-dmesg command
-  scripts/gdb: Add task iteration class
-  scripts/gdb: Add helper and convenience function to look up tasks
-  scripts/gdb: Add is_target_arch helper
-  scripts/gdb: Add internal helper and convenience function to retrieve
-    thread_info
-  scripts/gdb: Add get_gdbserver_type helper
-  scripts/gdb: Add internal helper and convenience function for per-cpu
-    lookup
-  scripts/gdb: Add lx_current convenience function
-  scripts/gdb: Add class to iterate over CPU masks
-  scripts/gdb: Add lx-lsmod command
-  scripts/gdb: Add basic documentation
-  scripts/gdb: Convert ModuleList to generator function
-  scripts/gdb: Convert CpuList to generator function
-  scripts/gdb: Define maintainer
-  scripts/gdb: Disable pagination while printing from breakpoint handler
-
-Pantelis Koukousoulas (1):
-  scripts/gdb: Port to python3 / gdb7.7
-
- .gitignore                             |   1 +
- Documentation/gdb-kernel-debugging.txt | 160 +++++++++++++++++++++++++++++
- MAINTAINERS                            |   5 +
- Makefile                               |   5 +-
- kernel/module.c                        |   9 +-
- lib/Kconfig.debug                      |  11 ++
- scripts/Makefile                       |   1 +
- scripts/gdb/Makefile                   |   1 +
- scripts/gdb/linux/.gitignore           |   2 +
- scripts/gdb/linux/Makefile             |  11 ++
- scripts/gdb/linux/__init__.py          |   0
- scripts/gdb/linux/cpus.py              | 135 +++++++++++++++++++++++++
- scripts/gdb/linux/dmesg.py             |  65 ++++++++++++
- scripts/gdb/linux/modules.py           | 103 +++++++++++++++++++
- scripts/gdb/linux/symbols.py           | 177 +++++++++++++++++++++++++++++++++
- scripts/gdb/linux/tasks.py             | 100 +++++++++++++++++++
- scripts/gdb/linux/utils.py             | 156 +++++++++++++++++++++++++++++
- scripts/gdb/vmlinux-gdb.py             |  30 ++++++
- 18 files changed, 969 insertions(+), 3 deletions(-)
- create mode 100644 Documentation/gdb-kernel-debugging.txt
- create mode 100644 scripts/gdb/Makefile
+Cc: linux-kbuild@vger.kernel.org
+[Jan: drop redundant mrproper rule as suggested by Michal]
+Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+---
+ .gitignore                   | 1 +
+ scripts/gdb/linux/.gitignore | 2 ++
+ 2 files changed, 3 insertions(+)
  create mode 100644 scripts/gdb/linux/.gitignore
- create mode 100644 scripts/gdb/linux/Makefile
- create mode 100644 scripts/gdb/linux/__init__.py
- create mode 100644 scripts/gdb/linux/cpus.py
- create mode 100644 scripts/gdb/linux/dmesg.py
- create mode 100644 scripts/gdb/linux/modules.py
- create mode 100644 scripts/gdb/linux/symbols.py
- create mode 100644 scripts/gdb/linux/tasks.py
- create mode 100644 scripts/gdb/linux/utils.py
- create mode 100644 scripts/gdb/vmlinux-gdb.py
 
+diff --git a/.gitignore b/.gitignore
+index ce57b79..ecb89e3 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -43,6 +43,7 @@ Module.symvers
+ /TAGS
+ /linux
+ /vmlinux
++/vmlinux-gdb.py
+ /vmlinuz
+ /System.map
+ /Module.markers
+diff --git a/scripts/gdb/linux/.gitignore b/scripts/gdb/linux/.gitignore
+new file mode 100644
+index 0000000..52e4e61
+--- /dev/null
++++ b/scripts/gdb/linux/.gitignore
+@@ -0,0 +1,2 @@
++*.pyc
++*.pyo
 -- 
 2.1.4
 
