@@ -1,74 +1,179 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ie0-f179.google.com ([209.85.223.179]:43110 "EHLO
-	mail-ie0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751889AbbBDEAY (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 3 Feb 2015 23:00:24 -0500
+Received: from david.siemens.de ([192.35.17.14]:58585 "EHLO david.siemens.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751183AbbBDGuM (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 4 Feb 2015 01:50:12 -0500
+Message-ID: <54D1C102.4060504@siemens.com>
+Date: Wed, 04 Feb 2015 07:49:38 +0100
+From: Jan Kiszka <jan.kiszka@siemens.com>
 MIME-Version: 1.0
-In-Reply-To: <20150203150408.1913cf209c4552683cca8b35@linux-foundation.org>
-References: <1404905415-9046-1-git-send-email-a.ryabinin@samsung.com>
-	<1422985392-28652-1-git-send-email-a.ryabinin@samsung.com>
-	<1422985392-28652-3-git-send-email-a.ryabinin@samsung.com>
-	<20150203150408.1913cf209c4552683cca8b35@linux-foundation.org>
-Date: Wed, 4 Feb 2015 08:00:18 +0400
-Message-ID: <CADmp3APLy0qg+qubdpPTFKSot6xyfAoEVNP4zXhZnGAfEAWniw@mail.gmail.com>
-Subject: Re: [PATCH v11 02/19] Add kernel address sanitizer infrastructure.
-From: Andrey Konovalov <adech.fo@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Subject: [PATCH v13 01/28] scripts/gdb: Add infrastructure
+References: <cover.1422602696.git.jan.kiszka@siemens.com> <dac94f3b72cb0de147e679a605eec64528b8bf76.1422602696.git.jan.kiszka@siemens.com>
+In-Reply-To: <dac94f3b72cb0de147e679a605eec64528b8bf76.1422602696.git.jan.kiszka@siemens.com>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Andrey Ryabinin <a.ryabinin@samsung.com>, linux-kernel@vger.kernel.org, Dmitry Vyukov <dvyukov@google.com>, Konstantin Serebryany <kcc@google.com>, Dmitry Chernenkov <dmitryc@google.com>, Yuri Gribov <tetra2005@gmail.com>, Konstantin Khlebnikov <koct9i@gmail.com>, Sasha Levin <sasha.levin@oracle.com>, Christoph Lameter <cl@linux.com>, Joonsoo Kim <iamjoonsoo.kim@lge.com>, Dave Hansen <dave.hansen@intel.com>, Andi Kleen <andi@firstfloor.org>, x86@kernel.org, linux-mm@kvack.org, Jonathan Corbet <corbet@lwn.net>, Michal Marek <mmarek@suse.cz>, Ingo Molnar <mingo@redhat.com>, Peter Zijlstra <peterz@infradead.org>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, "open list:KERNEL BUILD + fi..." <linux-kbuild@vger.kernel.org>
+To: Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org
+Cc: Thomas Gleixner <tglx@linutronix.de>, Jason Wessel <jason.wessel@windriver.com>, kgdb-bugreport@lists.sourceforge.net, Andi Kleen <andi@firstfloor.org>, Ben Widawsky <ben@bwidawsk.net>, Borislav Petkov <bp@suse.de>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
-Sorry I didn't reply earlier.
+This provides the basic infrastructure to load kernel-specific python
+helper scripts when debugging the kernel in gdb.
 
-Signed-off-by: Andrey Konovalov <adech.fo@gmail.com>
+The loading mechanism is based on gdb loading for <objfile>-gdb.py when
+opening <objfile>. Therefore, this places a corresponding link to the
+main helper script into the output directory that contains vmlinux.
 
-(Repeating in plain text.)
+The main scripts will pull in submodules containing Linux specific gdb
+commands and functions. To avoid polluting the source directory with
+compiled python modules, we link to them from the object directory.
 
-On Wed, Feb 4, 2015 at 2:04 AM, Andrew Morton <akpm@linux-foundation.org> wrote:
-> On Tue, 03 Feb 2015 20:42:55 +0300 Andrey Ryabinin <a.ryabinin@samsung.com> wrote:
->
->>
->> ...
->>
->> Based on work by Andrey Konovalov <adech.fo@gmail.com>
->>
->
-> We still don't have Andrey Konovalov's signoff?  As it stands we're
-> taking some of his work and putting it into Linux without his
-> permission.
->
->> ...
->>
->> --- /dev/null
->> +++ b/mm/kasan/kasan.c
->> @@ -0,0 +1,302 @@
->> +/*
->> + * This file contains shadow memory manipulation code.
->> + *
->> + * Copyright (c) 2014 Samsung Electronics Co., Ltd.
->> + * Author: Andrey Ryabinin <a.ryabinin@samsung.com>
->> + *
->> + * Some of code borrowed from https://github.com/xairy/linux by
->> + *        Andrey Konovalov <adech.fo@gmail.com>
->> + *
->> + * This program is free software; you can redistribute it and/or modify
->> + * it under the terms of the GNU General Public License version 2 as
->> + * published by the Free Software Foundation.
->> + *
->> + */
->
-> https://code.google.com/p/thread-sanitizer/ is BSD licensed and we're
-> changing it to GPL.
->
-> I don't do the lawyer stuff, but this is all a bit worrisome.  I'd be a
-> lot more comfortable with that signed-off-by, please.
->
->
+Due to gdb.parse_and_eval and string redirection for gdb.execute, we
+depend on gdb >= 7.2.
 
+This feature is enabled via CONFIG_GDB_SCRIPTS.
 
+CC: Michal Marek <mmarek@suse.cz>
+CC: linux-kbuild@vger.kernel.org
+Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
+---
 
+Changes in v13:
+ - Let CONFIG_GDB_SCRIPT depend on CONFIG_DEBUG_INFO, instead of
+   selecting it. This addresses
+ 
+   warning: (GDB_SCRIPTS) selects DEBUG_INFO which has unmet direct
+   dependencies (DEBUG_KERNEL && !COMPILE_TEST)
+
+   as found by the test robot.
+
+This replaces v12 in -mm.
+
+ Makefile                      |  5 ++++-
+ lib/Kconfig.debug             | 11 +++++++++++
+ scripts/Makefile              |  1 +
+ scripts/gdb/Makefile          |  1 +
+ scripts/gdb/linux/Makefile    | 11 +++++++++++
+ scripts/gdb/linux/__init__.py |  0
+ scripts/gdb/vmlinux-gdb.py    | 23 +++++++++++++++++++++++
+ 7 files changed, 51 insertions(+), 1 deletion(-)
+ create mode 100644 scripts/gdb/Makefile
+ create mode 100644 scripts/gdb/linux/Makefile
+ create mode 100644 scripts/gdb/linux/__init__.py
+ create mode 100644 scripts/gdb/vmlinux-gdb.py
+
+diff --git a/Makefile b/Makefile
+index c8e17c0..3f86eea 100644
+--- a/Makefile
++++ b/Makefile
+@@ -922,6 +922,9 @@ endif
+ ifdef CONFIG_BUILD_DOCSRC
+ 	$(Q)$(MAKE) $(build)=Documentation
+ endif
++ifdef CONFIG_GDB_SCRIPTS
++	$(Q)ln -fsn `cd $(srctree) && /bin/pwd`/scripts/gdb/vmlinux-gdb.py
++endif
+ 	+$(call if_changed,link-vmlinux)
+ 
+ # The actual objects are generated when descending,
+@@ -1176,7 +1179,7 @@ MRPROPER_FILES += .config .config.old .version .old_version $(version_h) \
+ 		  Module.symvers tags TAGS cscope* GPATH GTAGS GRTAGS GSYMS \
+ 		  signing_key.priv signing_key.x509 x509.genkey		\
+ 		  extra_certificates signing_key.x509.keyid		\
+-		  signing_key.x509.signer
++		  signing_key.x509.signer vmlinux-gdb.py
+ 
+ # clean - Delete most, but leave enough to build external modules
+ #
+diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+index 5f2ce61..6fd73c1 100644
+--- a/lib/Kconfig.debug
++++ b/lib/Kconfig.debug
+@@ -167,6 +167,17 @@ config DEBUG_INFO_DWARF4
+ 	  But it significantly improves the success of resolving
+ 	  variables in gdb on optimized code.
+ 
++config GDB_SCRIPTS
++	bool "Provide GDB scripts for kernel debugging"
++	depends on DEBUG_INFO
++	help
++	  This creates the required links to GDB helper scripts in the
++	  build directory. If you load vmlinux into gdb, the helper
++	  scripts will be automatically imported by gdb as well, and
++	  additional functions are available to analyze a Linux kernel
++	  instance. See Documentation/gdb-kernel-debugging.txt for further
++	  details.
++
+ config ENABLE_WARN_DEPRECATED
+ 	bool "Enable __deprecated logic"
+ 	default y
+diff --git a/scripts/Makefile b/scripts/Makefile
+index 72902b5..2016a64 100644
+--- a/scripts/Makefile
++++ b/scripts/Makefile
+@@ -36,6 +36,7 @@ subdir-$(CONFIG_MODVERSIONS) += genksyms
+ subdir-y                     += mod
+ subdir-$(CONFIG_SECURITY_SELINUX) += selinux
+ subdir-$(CONFIG_DTC)         += dtc
++subdir-$(CONFIG_GDB_SCRIPTS) += gdb
+ 
+ # Let clean descend into subdirs
+ subdir-	+= basic kconfig package
+diff --git a/scripts/gdb/Makefile b/scripts/gdb/Makefile
+new file mode 100644
+index 0000000..62f5f65
+--- /dev/null
++++ b/scripts/gdb/Makefile
+@@ -0,0 +1 @@
++subdir-y := linux
+diff --git a/scripts/gdb/linux/Makefile b/scripts/gdb/linux/Makefile
+new file mode 100644
+index 0000000..6cf1ecf
+--- /dev/null
++++ b/scripts/gdb/linux/Makefile
+@@ -0,0 +1,11 @@
++always := gdb-scripts
++
++SRCTREE := $(shell cd $(srctree) && /bin/pwd)
++
++$(obj)/gdb-scripts:
++ifneq ($(KBUILD_SRC),)
++	$(Q)ln -fsn $(SRCTREE)/$(obj)/*.py $(objtree)/$(obj)
++endif
++	@:
++
++clean-files := *.pyc *.pyo $(if $(KBUILD_SRC),*.py)
+diff --git a/scripts/gdb/linux/__init__.py b/scripts/gdb/linux/__init__.py
+new file mode 100644
+index 0000000..e69de29
+diff --git a/scripts/gdb/vmlinux-gdb.py b/scripts/gdb/vmlinux-gdb.py
+new file mode 100644
+index 0000000..c1d90ce
+--- /dev/null
++++ b/scripts/gdb/vmlinux-gdb.py
+@@ -0,0 +1,23 @@
++#
++# gdb helper commands and functions for Linux kernel debugging
++#
++#  loader module
++#
++# Copyright (c) Siemens AG, 2012, 2013
++#
++# Authors:
++#  Jan Kiszka <jan.kiszka@siemens.com>
++#
++# This work is licensed under the terms of the GNU GPL version 2.
++#
++
++import os
++
++sys.path.insert(0, os.path.dirname(__file__) + "/scripts/gdb")
++
++try:
++    gdb.parse_and_eval("0")
++    gdb.execute("", to_string=True)
++except:
++    gdb.write("NOTE: gdb 7.2 or later required for Linux helper scripts to "
++              "work.\n")
 -- 
-Sincerely,
-Andrey Konovalov.
+2.1.4
