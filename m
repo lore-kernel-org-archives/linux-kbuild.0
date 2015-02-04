@@ -1,179 +1,120 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from david.siemens.de ([192.35.17.14]:58585 "EHLO david.siemens.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751183AbbBDGuM (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 4 Feb 2015 01:50:12 -0500
-Message-ID: <54D1C102.4060504@siemens.com>
-Date: Wed, 04 Feb 2015 07:49:38 +0100
-From: Jan Kiszka <jan.kiszka@siemens.com>
-MIME-Version: 1.0
-Subject: [PATCH v13 01/28] scripts/gdb: Add infrastructure
-References: <cover.1422602696.git.jan.kiszka@siemens.com> <dac94f3b72cb0de147e679a605eec64528b8bf76.1422602696.git.jan.kiszka@siemens.com>
-In-Reply-To: <dac94f3b72cb0de147e679a605eec64528b8bf76.1422602696.git.jan.kiszka@siemens.com>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Transfer-Encoding: 7bit
+Received: from mailout1.w1.samsung.com ([210.118.77.11]:20642 "EHLO
+	mailout1.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751346AbbBDMFg (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 4 Feb 2015 07:05:36 -0500
+Message-id: <54D20B08.7010508@samsung.com>
+Date: Wed, 04 Feb 2015 15:05:28 +0300
+From: Andrey Ryabinin <a.ryabinin@samsung.com>
+MIME-version: 1.0
+Subject: Re: [PATCH] kasan: fix build warnings
+References: <20150204185328.1ee3ce3c@canb.auug.org.au>
+ <1423050231-1701-1-git-send-email-a.ryabinin@samsung.com>
+In-reply-to: <1423050231-1701-1-git-send-email-a.ryabinin@samsung.com>
+Content-type: text/plain; charset=utf-8
+Content-transfer-encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrew Morton <akpm@linux-foundation.org>, linux-kernel@vger.kernel.org
-Cc: Thomas Gleixner <tglx@linutronix.de>, Jason Wessel <jason.wessel@windriver.com>, kgdb-bugreport@lists.sourceforge.net, Andi Kleen <andi@firstfloor.org>, Ben Widawsky <ben@bwidawsk.net>, Borislav Petkov <bp@suse.de>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+To: Andrew Morton <akpm@linux-foundation.org>, Stephen Rothwell <sfr@canb.auug.org.au>
+Cc: linux-next@vger.kernel.org, open list <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
-This provides the basic infrastructure to load kernel-specific python
-helper scripts when debugging the kernel in gdb.
+On 02/04/2015 02:43 PM, Andrey Ryabinin wrote:
+> Some versions of gcc produce warning instead of error when
+> -fsanitize flag uses unsupported argument:
+> 	https://gcc.gnu.org/bugzilla/show_bug.cgi?id=61065
+> 
+> This breaks our detection of whether -fsanitize=kernel-address
+> is supported by compiler or not. Thus we have tons of build
+> warnings like this:
+> 	x86_64-linux-gcc: warning: unrecognized argument to -fsanitize= option: 'kernel-address'
+> 
+> Passing -Werror into $(call cc-option) will fix this problem
+> as gcc will error out now.
+> 
+> Signed-off-by: Andrey Ryabinin <a.ryabinin@samsung.com>
+> Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
+> ---
+> 
+> Hi Andrew, this patch applies on top kasan patch set.
+> We can't just fix add-kernel-address-sanitizer-infrastructure.patch
+> as patch  kasan-enable-instrumentation-of-global-variables.patch
+> depends on it.
+> 
+> Let me know if your prefer to update all needed patches instead
+> of this fix.
+> 
+>  scripts/Makefile.kasan | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
+> 
+> diff --git a/scripts/Makefile.kasan b/scripts/Makefile.kasan
+> index df302f8..72a40bb 100644
+> --- a/scripts/Makefile.kasan
+> +++ b/scripts/Makefile.kasan
+> @@ -5,15 +5,14 @@ else
+>  	call_threshold := 0
+>  endif
+>  
+> -CFLAGS_KASAN_MINIMAL := $(call cc-option, -fsanitize=kernel-address \
+> -				--param asan-globals=1)
+> +CFLAGS_KASAN_MINIMAL := -fsanitize=kernel-address --param asan-globals=1
+>  
+>  CFLAGS_KASAN := $(call cc-option, -fsanitize=kernel-address \
+>  		-fasan-shadow-offset=$(CONFIG_KASAN_SHADOW_OFFSET) \
+>  		--param asan-stack=1 --param asan-globals=1 \
+>  		--param asan-instrumentation-with-call-threshold=$(call_threshold))
+>  
+> -ifeq ($(CFLAGS_KASAN_MINIMAL),)
+> +ifeq ($(call cc-option, $(CFLAGS_KASAN_MINIMAL) -Werror),)
+>          $(warning Cannot use CONFIG_KASAN: \
+>              -fsanitize=kernel-address is not supported by compiler)
+>  else
+> 
 
-The loading mechanism is based on gdb loading for <objfile>-gdb.py when
-opening <objfile>. Therefore, this places a corresponding link to the
-main helper script into the output directory that contains vmlinux.
 
-The main scripts will pull in submodules containing Linux specific gdb
-commands and functions. To avoid polluting the source directory with
-compiled python modules, we link to them from the object directory.
+Or maybe it would be be better always use -Werror in cc-option?
 
-Due to gdb.parse_and_eval and string redirection for gdb.execute, we
-depend on gdb >= 7.2.
-
-This feature is enabled via CONFIG_GDB_SCRIPTS.
-
-CC: Michal Marek <mmarek@suse.cz>
-CC: linux-kbuild@vger.kernel.org
-Signed-off-by: Jan Kiszka <jan.kiszka@siemens.com>
 ---
+From: Andrey Ryabinin <a.ryabinin@samsung.com>
+Subject: [PATCH] kbuild: always use -Werror in 'call cc-option'
 
-Changes in v13:
- - Let CONFIG_GDB_SCRIPT depend on CONFIG_DEBUG_INFO, instead of
-   selecting it. This addresses
- 
-   warning: (GDB_SCRIPTS) selects DEBUG_INFO which has unmet direct
-   dependencies (DEBUG_KERNEL && !COMPILE_TEST)
+Some versions of gcc produce warning instead of error when
+-fsanitize flag uses unsupported argument:
+	https://gcc.gnu.org/bugzilla/show_bug.cgi?id=61065
 
-   as found by the test robot.
+This breaks our detection of whether -fsanitize=kernel-address
+is supported by compiler or not. Thus we have tons of build
+warnings like this:
+	x86_64-linux-gcc: warning: unrecognized argument to -fsanitize= option: 'kernel-address'
 
-This replaces v12 in -mm.
+To workaround this compiler bug we could always use -Werror
+with 'call cc-option' forcing gcc to produce error instead of
+warnings.
 
- Makefile                      |  5 ++++-
- lib/Kconfig.debug             | 11 +++++++++++
- scripts/Makefile              |  1 +
- scripts/gdb/Makefile          |  1 +
- scripts/gdb/linux/Makefile    | 11 +++++++++++
- scripts/gdb/linux/__init__.py |  0
- scripts/gdb/vmlinux-gdb.py    | 23 +++++++++++++++++++++++
- 7 files changed, 51 insertions(+), 1 deletion(-)
- create mode 100644 scripts/gdb/Makefile
- create mode 100644 scripts/gdb/linux/Makefile
- create mode 100644 scripts/gdb/linux/__init__.py
- create mode 100644 scripts/gdb/vmlinux-gdb.py
+Signed-off-by: Andrey Ryabinin <a.ryabinin@samsung.com>
+Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
+Cc: Michal Marek <mmarek@suse.cz>
+---
+ scripts/Kbuild.include | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index c8e17c0..3f86eea 100644
---- a/Makefile
-+++ b/Makefile
-@@ -922,6 +922,9 @@ endif
- ifdef CONFIG_BUILD_DOCSRC
- 	$(Q)$(MAKE) $(build)=Documentation
- endif
-+ifdef CONFIG_GDB_SCRIPTS
-+	$(Q)ln -fsn `cd $(srctree) && /bin/pwd`/scripts/gdb/vmlinux-gdb.py
-+endif
- 	+$(call if_changed,link-vmlinux)
- 
- # The actual objects are generated when descending,
-@@ -1176,7 +1179,7 @@ MRPROPER_FILES += .config .config.old .version .old_version $(version_h) \
- 		  Module.symvers tags TAGS cscope* GPATH GTAGS GRTAGS GSYMS \
- 		  signing_key.priv signing_key.x509 x509.genkey		\
- 		  extra_certificates signing_key.x509.keyid		\
--		  signing_key.x509.signer
-+		  signing_key.x509.signer vmlinux-gdb.py
- 
- # clean - Delete most, but leave enough to build external modules
- #
-diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
-index 5f2ce61..6fd73c1 100644
---- a/lib/Kconfig.debug
-+++ b/lib/Kconfig.debug
-@@ -167,6 +167,17 @@ config DEBUG_INFO_DWARF4
- 	  But it significantly improves the success of resolving
- 	  variables in gdb on optimized code.
- 
-+config GDB_SCRIPTS
-+	bool "Provide GDB scripts for kernel debugging"
-+	depends on DEBUG_INFO
-+	help
-+	  This creates the required links to GDB helper scripts in the
-+	  build directory. If you load vmlinux into gdb, the helper
-+	  scripts will be automatically imported by gdb as well, and
-+	  additional functions are available to analyze a Linux kernel
-+	  instance. See Documentation/gdb-kernel-debugging.txt for further
-+	  details.
-+
- config ENABLE_WARN_DEPRECATED
- 	bool "Enable __deprecated logic"
- 	default y
-diff --git a/scripts/Makefile b/scripts/Makefile
-index 72902b5..2016a64 100644
---- a/scripts/Makefile
-+++ b/scripts/Makefile
-@@ -36,6 +36,7 @@ subdir-$(CONFIG_MODVERSIONS) += genksyms
- subdir-y                     += mod
- subdir-$(CONFIG_SECURITY_SELINUX) += selinux
- subdir-$(CONFIG_DTC)         += dtc
-+subdir-$(CONFIG_GDB_SCRIPTS) += gdb
- 
- # Let clean descend into subdirs
- subdir-	+= basic kconfig package
-diff --git a/scripts/gdb/Makefile b/scripts/gdb/Makefile
-new file mode 100644
-index 0000000..62f5f65
---- /dev/null
-+++ b/scripts/gdb/Makefile
-@@ -0,0 +1 @@
-+subdir-y := linux
-diff --git a/scripts/gdb/linux/Makefile b/scripts/gdb/linux/Makefile
-new file mode 100644
-index 0000000..6cf1ecf
---- /dev/null
-+++ b/scripts/gdb/linux/Makefile
-@@ -0,0 +1,11 @@
-+always := gdb-scripts
-+
-+SRCTREE := $(shell cd $(srctree) && /bin/pwd)
-+
-+$(obj)/gdb-scripts:
-+ifneq ($(KBUILD_SRC),)
-+	$(Q)ln -fsn $(SRCTREE)/$(obj)/*.py $(objtree)/$(obj)
-+endif
-+	@:
-+
-+clean-files := *.pyc *.pyo $(if $(KBUILD_SRC),*.py)
-diff --git a/scripts/gdb/linux/__init__.py b/scripts/gdb/linux/__init__.py
-new file mode 100644
-index 0000000..e69de29
-diff --git a/scripts/gdb/vmlinux-gdb.py b/scripts/gdb/vmlinux-gdb.py
-new file mode 100644
-index 0000000..c1d90ce
---- /dev/null
-+++ b/scripts/gdb/vmlinux-gdb.py
-@@ -0,0 +1,23 @@
-+#
-+# gdb helper commands and functions for Linux kernel debugging
-+#
-+#  loader module
-+#
-+# Copyright (c) Siemens AG, 2012, 2013
-+#
-+# Authors:
-+#  Jan Kiszka <jan.kiszka@siemens.com>
-+#
-+# This work is licensed under the terms of the GNU GPL version 2.
-+#
-+
-+import os
-+
-+sys.path.insert(0, os.path.dirname(__file__) + "/scripts/gdb")
-+
-+try:
-+    gdb.parse_and_eval("0")
-+    gdb.execute("", to_string=True)
-+except:
-+    gdb.write("NOTE: gdb 7.2 or later required for Linux helper scripts to "
-+              "work.\n")
--- 
-2.1.4
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index d3437b8..6bc4e3e 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -111,12 +111,12 @@ as-instr = $(call try-run,\
+ # Usage: cflags-y += $(call cc-option,-march=winchip-c6,-march=i586)
+
+ cc-option = $(call try-run,\
+-	$(CC) $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS) $(1) -c -x c /dev/null -o "$$TMP",$(1),$(2))
++	$(CC) $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS) $(1) -Werror -c -x c /dev/null -o "$$TMP",$(1),$(2))
+
+ # cc-option-yn
+ # Usage: flag := $(call cc-option-yn,-march=winchip-c6)
+ cc-option-yn = $(call try-run,\
+-	$(CC) $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS) $(1) -c -x c /dev/null -o "$$TMP",y,n)
++	$(CC) $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS) $(1) -Werror -c -x c /dev/null -o "$$TMP",y,n)
+
+ # cc-option-align
+ # Prefix align with either -falign or -malign
+
