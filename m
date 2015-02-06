@@ -1,96 +1,109 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:40895 "EHLO
-	shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S934021AbbBDSHG (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 4 Feb 2015 13:07:06 -0500
-Message-ID: <1423073211.2349.12.camel@decadent.org.uk>
-Subject: Re: [PATCHv4 1/1] deb-pkg: Add device tree blobs to the package
-From: Ben Hutchings <ben@decadent.org.uk>
-Date: Wed, 04 Feb 2015 18:06:51 +0000
-In-Reply-To: <20150203121648.046396044@rtp-net.org>
-References: <20150203121648.046396044@rtp-net.org>
-Content-Type: multipart/signed; micalg="pgp-sha512";
-	protocol="application/pgp-signature"; boundary="=-9ZxzrIerDgFhgGIjUqdc"
-Mime-Version: 1.0
+Received: from cantor2.suse.de ([195.135.220.15]:47967 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755369AbbBFPAq (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 6 Feb 2015 10:00:46 -0500
+Message-ID: <54D4D71B.40901@suse.com>
+Date: Fri, 06 Feb 2015 16:00:43 +0100
+From: Juergen Gross <jgross@suse.com>
+MIME-Version: 1.0
+Subject: Re: [RESEND Patch V2 1/4] xen: build infrastructure for generating
+ hypercall depending symbols
+References: <1421826565-10826-1-git-send-email-jgross@suse.com> <1421826565-10826-2-git-send-email-jgross@suse.com> <54C86F97.1000907@suse.com>
+In-Reply-To: <54C86F97.1000907@suse.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaud Patard <arnaud.patard@rtp-net.org>
-Cc: linux-kbuild@vger.kernel.org, maximilian attems <max@stro.at>, Michal Marek <mmarek@suse.cz>
+To: x86@kernel.org, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
+Cc: linux-kernel@vger.kernel.org, xen-devel@lists.xensource.com, konrad.wilk@oracle.com, david.vrabel@citrix.com, boris.ostrovsky@oracle.com, mmarek@suse.cz, linux-kbuild@vger.kernel.org
+
+Hey, x86 maintainers!
+
+could you please comment?
 
 
---=-9ZxzrIerDgFhgGIjUqdc
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Juergen
 
-On Tue, 2015-02-03 at 13:16 +0100, Arnaud Patard wrote:
-> When building a package with make deb-pkg (say, for arm), the dtb files a=
-re
-> not added to the package. Given that things are still evolving on arm, it
-> make sense to have them along with the kernel and modules.
->=20
-> v4: Use $KCONFIG_CONFIG
-> v3: handle with OF but without dtbs_install.
->     Use $MAKE ... as done everywhere else in the script
-> v2: make use of dtbs_install
->=20
-> Signed-off-by: Arnaud Patard <arnaud.patard@rtp-net.org>
+On 01/28/2015 06:11 AM, Juergen Gross wrote:
+> *Ping*
+>
+> David wants a comment from the x86 maintainers.
+>
+>
+> Juergen
+>
+> On 01/21/2015 08:49 AM, Juergen Gross wrote:
+>> Today there are several places in the kernel which build tables
+>> containing one entry for each possible Xen hypercall. Create an
+>> infrastructure to be able to generate these tables at build time.
+>>
+>> Based-on-patch-by: Jan Beulich <jbeulich@suse.com>
+>> Signed-off-by: Juergen Gross <jgross@suse.com>
+>> Reviewed-by: David Vrabel <david.vrabel@citrix.com>
+>> ---
+>>   arch/x86/syscalls/Makefile |  9 +++++++++
+>>   scripts/xen-hypercalls.sh  | 12 ++++++++++++
+>>   2 files changed, 21 insertions(+)
+>>   create mode 100644 scripts/xen-hypercalls.sh
+>>
+>> diff --git a/arch/x86/syscalls/Makefile b/arch/x86/syscalls/Makefile
+>> index 3323c27..a55abb9 100644
+>> --- a/arch/x86/syscalls/Makefile
+>> +++ b/arch/x86/syscalls/Makefile
+>> @@ -19,6 +19,9 @@ quiet_cmd_syshdr = SYSHDR  $@
+>>   quiet_cmd_systbl = SYSTBL  $@
+>>         cmd_systbl = $(CONFIG_SHELL) '$(systbl)' $< $@
+>>
+>> +quiet_cmd_hypercalls = HYPERCALLS $@
+>> +      cmd_hypercalls = $(CONFIG_SHELL) '$<' $@ $(filter-out $<,$^)
+>> +
+>>   syshdr_abi_unistd_32 := i386
+>>   $(uapi)/unistd_32.h: $(syscall32) $(syshdr)
+>>       $(call if_changed,syshdr)
+>> @@ -47,10 +50,16 @@ $(out)/syscalls_32.h: $(syscall32) $(systbl)
+>>   $(out)/syscalls_64.h: $(syscall64) $(systbl)
+>>       $(call if_changed,systbl)
+>>
+>> +$(out)/xen-hypercalls.h: $(srctree)/scripts/xen-hypercalls.sh
+>> +    $(call if_changed,hypercalls)
+>> +
+>> +$(out)/xen-hypercalls.h: $(srctree)/include/xen/interface/xen*.h
+>> +
+>>   uapisyshdr-y            += unistd_32.h unistd_64.h unistd_x32.h
+>>   syshdr-y            += syscalls_32.h
+>>   syshdr-$(CONFIG_X86_64)        += unistd_32_ia32.h unistd_64_x32.h
+>>   syshdr-$(CONFIG_X86_64)        += syscalls_64.h
+>> +syshdr-$(CONFIG_XEN)        += xen-hypercalls.h
+>>
+>>   targets    += $(uapisyshdr-y) $(syshdr-y)
+>>
+>> diff --git a/scripts/xen-hypercalls.sh b/scripts/xen-hypercalls.sh
+>> new file mode 100644
+>> index 0000000..676d922
+>> --- /dev/null
+>> +++ b/scripts/xen-hypercalls.sh
+>> @@ -0,0 +1,12 @@
+>> +#!/bin/sh
+>> +out="$1"
+>> +shift
+>> +in="$@"
+>> +
+>> +for i in $in; do
+>> +    eval $CPP $LINUXINCLUDE -dD -imacros "$i" -x c /dev/null
+>> +done | \
+>> +awk '$1 == "#define" && $2 ~ /__HYPERVISOR_[a-z][a-z_0-9]*/ { v[$3] =
+>> $2 }
+>> +    END {   print "/* auto-generated by scripts/xen-hypercall.sh */"
+>> +        for (i in v) if (!(v[i] in v))
+>> +            print "HYPERCALL("substr(v[i], 14)")"}' | sort -u >$out
+>>
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Please read the FAQ at  http://www.tux.org/lkml/
+>
+>
 
-Reviewed-by: Ben Hutchings <ben@decadent.org.uk>
-
-> ---
->=20
-> Index: linux-next/scripts/package/builddeb
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> --- linux-next.orig/scripts/package/builddeb    2015-01-14 13:04:45.84592=
-2441 +0100
-> +++ linux-next/scripts/package/builddeb 2015-01-28 09:25:15.298796403 +01=
-00
-> @@ -143,6 +143,13 @@ else
->         cp arch/$ARCH/boot/$KBUILD_IMAGE "$tmpdir/$installed_image_path"
->  fi
-> =20
-> +if grep -q "^CONFIG_OF=3Dy" $KCONFIG_CONFIG ; then
-> +       # Only some architectures with OF support have this target
-> +       if grep -q dtbs_install "${srctree}/arch/$SRCARCH/Makefile"; then
-> +               $MAKE KBUILD_SRC=3D INSTALL_DTBS_PATH=3D"$tmpdir/usr/lib/=
-$packagename" dtbs_install
-> +       fi
-> +fi
-> +
->  if grep -q '^CONFIG_MODULES=3Dy' $KCONFIG_CONFIG ; then
->         INSTALL_MOD_PATH=3D"$tmpdir" $MAKE KBUILD_SRC=3D modules_install
->         rm -f "$tmpdir/lib/modules/$version/build"
->=20
-
---=20
-Ben Hutchings
-Hoare's Law of Large Problems:
-        Inside every large problem is a small problem struggling to get out=
-.
-
---=-9ZxzrIerDgFhgGIjUqdc
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIVAwUAVNJfwue/yOyVhhEJAQrA/Q//bGctHGnDODnmYd5iLSmlupTESmVqDx/W
-lCMgy2kiGHQ5FR+drsLRcThlyaSGHXF/uOr5cW5zvHq7YYCG3b61YDRJHe8R/Rje
-ckcthznUEJeI41ie58/Z4dz707IN4Phi4Lj9fv4HGA5xl+fRwYLceWKt3mJznyOg
-Ht2la/0cuKWKue91wQoUYRID7fsRJpxjxzY+AuWQjHg7ZdHcf8vOCXUBtaFGzV1/
-frL4uokEHpcjVT526g4XLgaeHkcaoJVR2ELNvtcDwEWn0G+XqYXBFZhgnCDkwcI4
-pxf7Dg831mRtNN9oi2FpIRXU8L0yyJMHzG3S9p4AJM5n0iiI7N1KaQ9aV3xrdS0R
-Pf+0AwVB8XpMP5OAbnwsSqB58xLxfY/baRATgUu4kue5T+0BvPZ1l5R+TEVVknKJ
-i0teBIPU1G1hiT6Qwezlt8lU9JgYiJvuGLC6pYF45l7cEAv6M3nSsqhuCJM2E7Cq
-9MpD7tLWOckuh0xrHhAYASw+PzHPrQVEzC6UqeYFRxae/6JCqjCrhglbGV3Hll/N
-i1Ww0pmp305A1xN4Uurogc8rC8bx2n3ld9rCE0MbfLDGIYYQpb2TPfmnXCAdUZG7
-msrdjFJE73wc4oKFZNUtgjD2ol0PbOblOOoEvXmwjz5WVs/qYZd4yfHUgCCkr2mE
-cSeJk5RA648=
-=i02p
------END PGP SIGNATURE-----
-
---=-9ZxzrIerDgFhgGIjUqdc--
