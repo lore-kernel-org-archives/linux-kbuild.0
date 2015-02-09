@@ -1,64 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f178.google.com ([209.85.212.178]:48155 "EHLO
-	mail-wi0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752752AbbBFQWx convert rfc822-to-8bit (ORCPT
+Received: from mail-pd0-f176.google.com ([209.85.192.176]:39784 "EHLO
+	mail-pd0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932339AbbBILBQ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 6 Feb 2015 11:22:53 -0500
-MIME-Version: 1.0
-Reply-To: sedat.dilek@gmail.com
-In-Reply-To: <20150206155009.GA23394@kroah.com>
-References: <CA+icZUWoPxGgzgjiMEJ1PPXjRp_oa8_C0tceTyK4Ao6_Hco+Gw@mail.gmail.com>
-	<20150206155009.GA23394@kroah.com>
-Date: Fri, 6 Feb 2015 17:22:51 +0100
-Message-ID: <CA+icZUUQF4M2=bOTvD8wWzjpWaR=4=LobQpcCQrkKQKMNd8iHg@mail.gmail.com>
-Subject: =?UTF-8?B?UmU6IGxpbnV4LTMuMTgueTogQWRkICJrY29uZmlnOiBGaXggd2FybmluZyAi4oCYanVtcA==?=
-	=?UTF-8?B?4oCZIG1heSBiZSB1c2VkIHVuaW5pdGlhbGl6ZWQiIg==?=
-From: Sedat Dilek <sedat.dilek@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+	Mon, 9 Feb 2015 06:01:16 -0500
+From: Kiran Raparthy <kumarsharma.r@gmail.com>
+Subject: [RFC] kbuild: make it possible to specify the module output dir
+Date: Mon,  9 Feb 2015 16:28:48 +0530
+Message-Id: <1423479528-27027-1-git-send-email-kumarsharma.r@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: =?UTF-8?Q?Peter_K=C3=BCmmel?= <syntheticpp@gmx.net>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
+To: linux-kernel@vger.kernel.org
+Cc: Rom Lemarchand <romlem@android.com>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, Android Kernel Team <kernel-team@android.com>, Kiran Raparthy <kumarsharma.r@gmail.com>
 
-On Fri, Feb 6, 2015 at 4:50 PM, Greg Kroah-Hartman
-<gregkh@linuxfoundation.org> wrote:
-> On Fri, Feb 06, 2015 at 04:40:28PM +0100, Sedat Dilek wrote:
->> Hi,
->>
->> I see the following...
->>
->> $ yes "" | make oldconfig && make silentoldconfig </dev/null
->>   HOSTCC  scripts/basic/fixdep
->>   HOSTCC  scripts/kconfig/conf.o
->>   SHIPPED scripts/kconfig/zconf.tab.c
->>   SHIPPED scripts/kconfig/zconf.lex.c
->>   SHIPPED scripts/kconfig/zconf.hash.c
->>   HOSTCC  scripts/kconfig/zconf.tab.o
->> In file included from scripts/kconfig/zconf.tab.c:2537:0:
->> scripts/kconfig/menu.c: In function ‘get_symbol_str’:
->> scripts/kconfig/menu.c:590:18: warning: ‘jump’ may be used
->> uninitialized in this function [-Wmaybe-uninitialized]
->>      jump->offset = strlen(r->s);
->>                   ^
->> scripts/kconfig/menu.c:551:19: note: ‘jump’ was declared here
->>   struct jump_key *jump;
->>                    ^
->>   HOSTLD  scripts/kconfig/conf
->> scripts/kconfig/conf --oldconfig Kconfig
->> #
->> # configuration written to .config
->> #
->> scripts/kconfig/conf --silentoldconfig Kconfig
->>
->> The fix is "kconfig: Fix warning "‘jump’ may be used uninitialized"" upstream.
->
->
-> Sure, what's the git commit id of the patch in Linus's tree?  That's
-> annoying to me as well, thanks for reminding me about it.
->
+From: Rom Lemarchand <romlem@android.com>
 
-commit 2d560306096739e2251329ab5c16059311a151b0
-kconfig: Fix warning "‘jump’ may be used uninitialized"
+kbuild: make it possible to specify the module output dir
 
-- Sedat -
+Make modinst_dir user-defined on the command line.
+
+This allows to do things like:
+make MODLIB=output/ modinst_dir=. modules_install
+
+to ensure all the .ko are in the output/ directory.
+
+Cc: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: Android Kernel Team <kernel-team@android.com>
+Signed-off-by: Rom Lemarchand <romlem@android.com>
+[Kiran: Added context to commit message]
+Signed-off-by: Kiran Raparthy <kumarsharma.r@gmail.com>
+---
+This is one of the number of patches from the Android AOSP common.git tree,
+which is used on Android devices. I wanted to submit it for review
+to see if it should go upstream.
+
+ scripts/Makefile.modinst | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/Makefile.modinst b/scripts/Makefile.modinst
+index e48a4e9..9b7b280 100644
+--- a/scripts/Makefile.modinst
++++ b/scripts/Makefile.modinst
+@@ -29,7 +29,7 @@ quiet_cmd_modules_install = INSTALL $@
+ INSTALL_MOD_DIR ?= extra
+ ext-mod-dir = $(INSTALL_MOD_DIR)$(subst $(patsubst %/,%,$(KBUILD_EXTMOD)),,$(@D))
+ 
+-modinst_dir = $(if $(KBUILD_EXTMOD),$(ext-mod-dir),kernel/$(@D))
++modinst_dir ?= $(if $(KBUILD_EXTMOD),$(ext-mod-dir),kernel/$(@D))
+ 
+ $(modules):
+ 	$(call cmd,modules_install,$(MODLIB)/$(modinst_dir))
+-- 
+1.8.2.1
+
