@@ -1,57 +1,97 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ig0-f177.google.com ([209.85.213.177]:50223 "EHLO
-	mail-ig0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751696AbbBLSSM (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 12 Feb 2015 13:18:12 -0500
-Received: by mail-ig0-f177.google.com with SMTP id z20so5476881igj.4
-        for <linux-kbuild@vger.kernel.org>; Thu, 12 Feb 2015 10:18:11 -0800 (PST)
+Received: from cantor2.suse.de ([195.135.220.15]:52701 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751477AbbBMFdM (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 13 Feb 2015 00:33:12 -0500
+Message-ID: <54DD8C92.7050201@suse.com>
+Date: Fri, 13 Feb 2015 06:33:06 +0100
+From: Juergen Gross <jgross@suse.com>
 MIME-Version: 1.0
-Date: Thu, 12 Feb 2015 10:18:11 -0800
-Message-ID: <CA+55aFzgR3BaK4ihHmToZrft4=7NktH1nmi3tV0QMR4Y3QU4Kg@mail.gmail.com>
-Subject: Still some race in X509 certificates handling
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [RESEND Patch V2 1/4] xen: build infrastructure for generating
+ hypercall depending symbols
+References: <1421826565-10826-1-git-send-email-jgross@suse.com> <1421826565-10826-2-git-send-email-jgross@suse.com>
+In-Reply-To: <1421826565-10826-2-git-send-email-jgross@suse.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: David Howells <dhowells@redhat.com>, Michal Marek <mmarek@suse.cz>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: x86@kernel.org, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com
+Cc: linux-kernel@vger.kernel.org, xen-devel@lists.xensource.com, konrad.wilk@oracle.com, david.vrabel@citrix.com, boris.ostrovsky@oracle.com, mmarek@suse.cz, linux-kbuild@vger.kernel.org
 
-So this is *really* hard to trigger, but it happened for the second
-time (in a month?) today when I tried to boot into a newly built
-kernel.
+  ######   ###  #     #   #####
+  #     #   #   ##    #  #     #
+  #     #   #   # #   #  #
+  ######    #   #  #  #  #  ####
+  #         #   #   # #  #     #
+  #         #   #    ##  #     #
+  #        ###  #     #   #####
 
-What  happens is that somehow the build gets confused about the
-certificates, and my modules refuse to load with something along the
-line of "Request for unknown module key 'Magrathea: Glacier signing
-key'" (which is obviously the built-in generated key).
+David still wants a comment from the x86 maintainers...
 
-When it happens, I can do a rebuild, and the build will say
+Juergen
 
-   X.509 certificate list changed
+On 01/21/2015 08:49 AM, Juergen Gross wrote:
+> Today there are several places in the kernel which build tables
+> containing one entry for each possible Xen hypercall. Create an
+> infrastructure to be able to generate these tables at build time.
+>
+> Based-on-patch-by: Jan Beulich <jbeulich@suse.com>
+> Signed-off-by: Juergen Gross <jgross@suse.com>
+> Reviewed-by: David Vrabel <david.vrabel@citrix.com>
+> ---
+>   arch/x86/syscalls/Makefile |  9 +++++++++
+>   scripts/xen-hypercalls.sh  | 12 ++++++++++++
+>   2 files changed, 21 insertions(+)
+>   create mode 100644 scripts/xen-hypercalls.sh
+>
+> diff --git a/arch/x86/syscalls/Makefile b/arch/x86/syscalls/Makefile
+> index 3323c27..a55abb9 100644
+> --- a/arch/x86/syscalls/Makefile
+> +++ b/arch/x86/syscalls/Makefile
+> @@ -19,6 +19,9 @@ quiet_cmd_syshdr = SYSHDR  $@
+>   quiet_cmd_systbl = SYSTBL  $@
+>         cmd_systbl = $(CONFIG_SHELL) '$(systbl)' $< $@
+>
+> +quiet_cmd_hypercalls = HYPERCALLS $@
+> +      cmd_hypercalls = $(CONFIG_SHELL) '$<' $@ $(filter-out $<,$^)
+> +
+>   syshdr_abi_unistd_32 := i386
+>   $(uapi)/unistd_32.h: $(syscall32) $(syshdr)
+>   	$(call if_changed,syshdr)
+> @@ -47,10 +50,16 @@ $(out)/syscalls_32.h: $(syscall32) $(systbl)
+>   $(out)/syscalls_64.h: $(syscall64) $(systbl)
+>   	$(call if_changed,systbl)
+>
+> +$(out)/xen-hypercalls.h: $(srctree)/scripts/xen-hypercalls.sh
+> +	$(call if_changed,hypercalls)
+> +
+> +$(out)/xen-hypercalls.h: $(srctree)/include/xen/interface/xen*.h
+> +
+>   uapisyshdr-y			+= unistd_32.h unistd_64.h unistd_x32.h
+>   syshdr-y			+= syscalls_32.h
+>   syshdr-$(CONFIG_X86_64)		+= unistd_32_ia32.h unistd_64_x32.h
+>   syshdr-$(CONFIG_X86_64)		+= syscalls_64.h
+> +syshdr-$(CONFIG_XEN)		+= xen-hypercalls.h
+>
+>   targets	+= $(uapisyshdr-y) $(syshdr-y)
+>
+> diff --git a/scripts/xen-hypercalls.sh b/scripts/xen-hypercalls.sh
+> new file mode 100644
+> index 0000000..676d922
+> --- /dev/null
+> +++ b/scripts/xen-hypercalls.sh
+> @@ -0,0 +1,12 @@
+> +#!/bin/sh
+> +out="$1"
+> +shift
+> +in="$@"
+> +
+> +for i in $in; do
+> +	eval $CPP $LINUXINCLUDE -dD -imacros "$i" -x c /dev/null
+> +done | \
+> +awk '$1 == "#define" && $2 ~ /__HYPERVISOR_[a-z][a-z_0-9]*/ { v[$3] = $2 }
+> +	END {   print "/* auto-generated by scripts/xen-hypercall.sh */"
+> +		for (i in v) if (!(v[i] in v))
+> +			print "HYPERCALL("substr(v[i], 14)")"}' | sort -u >$out
+>
 
-which is kind of odd, since the list should *always* be just that
-single key for me (ie "./signing_key.509").
-
-But even after the rebuild the end result *still* did not work. I
-needed to do a "git clean" and rebuild to make it all come out right.
-So presumably the modules themselves still had the old stale data, or
-something like that. Despite the whole rebuild, and re-installing the
-modules and kernel.
-
-As mentioned, this is very rare. I build and boot quite a lot of
-kernels particularly during the merge window, and it definitely
-doesn't happen every time.
-
-So it really smells like some odd race - I build my kernels with "make
--j16", so there's certainly room for a race or two with any rule that
-doesn't have proper dependencies. I don't see it, though.
-
-Anybody see anything fishy in this area?
-
-(Side note: the HHGTTG references are cute, but I suspect we should
-rename the key so that it just says something boring like "build-time
-autogenerated kernel key" instead. Just so that the error messages are
-a bit more readable to people who aren't kernel engineers)
-
-                         Linus
