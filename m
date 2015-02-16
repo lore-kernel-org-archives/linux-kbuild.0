@@ -1,68 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([103.22.144.67]:49290 "EHLO ozlabs.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752565AbbBPEKs (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 15 Feb 2015 23:10:48 -0500
-From: Rusty Russell <rusty@rustcorp.com.au>
-Subject: Re: [PATCH v11 19/19] kasan: enable instrumentation of global variables
-In-Reply-To: <1422985392-28652-20-git-send-email-a.ryabinin@samsung.com>
-References: <1404905415-9046-1-git-send-email-a.ryabinin@samsung.com> <1422985392-28652-1-git-send-email-a.ryabinin@samsung.com> <1422985392-28652-20-git-send-email-a.ryabinin@samsung.com>
-Date: Mon, 16 Feb 2015 13:28:09 +1030
-Message-ID: <87a90ea7ge.fsf@rustcorp.com.au>
+Received: from mail-wi0-f181.google.com ([209.85.212.181]:43814 "EHLO
+	mail-wi0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751756AbbBPEgT (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 15 Feb 2015 23:36:19 -0500
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <1423479528-27027-1-git-send-email-kumarsharma.r@gmail.com>
+References: <1423479528-27027-1-git-send-email-kumarsharma.r@gmail.com>
+Date: Mon, 16 Feb 2015 10:06:17 +0530
+Message-ID: <CAKXpmjz5bSOV-HHGPnxXF23wOCEbEZpXWVwnUpyk+q6otiSsZw@mail.gmail.com>
+Subject: Re: [RFC] kbuild: make it possible to specify the module output dir
+From: Kiran Kumar <kumarsharma.r@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrey Ryabinin <a.ryabinin@samsung.com>, linux-kernel@vger.kernel.org
-Cc: Dmitry Vyukov <dvyukov@google.com>, Konstantin Serebryany <kcc@google.com>, Dmitry Chernenkov <dmitryc@google.com>, Andrey Konovalov <adech.fo@gmail.com>, Yuri Gribov <tetra2005@gmail.com>, Konstantin Khlebnikov <koct9i@gmail.com>, Sasha Levin <sasha.levin@oracle.com>, Christoph Lameter <cl@linux.com>, Joonsoo Kim <iamjoonsoo.kim@lge.com>, Andrew Morton <akpm@linux-foundation.org>, Dave Hansen <dave.hansen@intel.com>, Andi Kleen <andi@firstfloor.org>, x86@kernel.org, linux-mm@kvack.org, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Michal Marek <mmarek@suse.cz>, "open list:KERNEL BUILD + fi..." <linux-kbuild@vger.kernel.org>
+To: linux-kernel@vger.kernel.org
+Cc: Rom Lemarchand <romlem@android.com>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, Android Kernel Team <kernel-team@android.com>, Kiran Raparthy <kumarsharma.r@gmail.com>
 
-Andrey Ryabinin <a.ryabinin@samsung.com> writes:
-> This feature let us to detect accesses out of bounds of
-> global variables. This will work as for globals in kernel
-> image, so for globals in modules. Currently this won't work
-> for symbols in user-specified sections (e.g. __init, __read_mostly, ...)
+On Mon, Feb 9, 2015 at 4:28 PM, Kiran Raparthy <kumarsharma.r@gmail.com> wrote:
+> From: Rom Lemarchand <romlem@android.com>
 >
-> The idea of this is simple. Compiler increases each global variable
-> by redzone size and add constructors invoking __asan_register_globals()
-> function. Information about global variable (address, size,
-> size with redzone ...) passed to __asan_register_globals() so we could
-> poison variable's redzone.
+> kbuild: make it possible to specify the module output dir
 >
-> This patch also forces module_alloc() to return 8*PAGE_SIZE aligned
-> address making shadow memory handling ( kasan_module_alloc()/kasan_module_free() )
-> more simple. Such alignment guarantees that each shadow page backing
-> modules address space correspond to only one module_alloc() allocation.
-
-Hmm, I understand why you only fixed x86, but it's weird.
-
-I think MODULE_ALIGN belongs in linux/moduleloader.h, and every arch
-should be fixed up to use it (though you could leave that for later).
-
-Might as well fix the default implementation at least.
-
-> @@ -49,8 +49,15 @@ void kasan_krealloc(const void *object, size_t new_size);
->  void kasan_slab_alloc(struct kmem_cache *s, void *object);
->  void kasan_slab_free(struct kmem_cache *s, void *object);
->  
-> +#define MODULE_ALIGN (PAGE_SIZE << KASAN_SHADOW_SCALE_SHIFT)
-> +
-> +int kasan_module_alloc(void *addr, size_t size);
-> +void kasan_module_free(void *addr);
-> +
->  #else /* CONFIG_KASAN */
->  
-> +#define MODULE_ALIGN 1
-
-Hmm, that should be PAGE_SIZE (we assume that in several places).
-
-> @@ -1807,6 +1808,7 @@ static void unset_module_init_ro_nx(struct module *mod) { }
->  void __weak module_memfree(void *module_region)
->  {
->  	vfree(module_region);
-> +	kasan_module_free(module_region);
->  }
-
-This looks racy (memory reuse?).  Perhaps try other order?
-
-Cheers,
-Rusty.
+> Make modinst_dir user-defined on the command line.
+>
+> This allows to do things like:
+> make MODLIB=output/ modinst_dir=. modules_install
+>
+> to ensure all the .ko are in the output/ directory.
+>
+> Cc: Michal Marek <mmarek@suse.cz>
+> Cc: linux-kbuild@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Cc: Andrew Morton <akpm@linux-foundation.org>
+> Cc: Android Kernel Team <kernel-team@android.com>
+> Signed-off-by: Rom Lemarchand <romlem@android.com>
+> [Kiran: Added context to commit message]
+> Signed-off-by: Kiran Raparthy <kumarsharma.r@gmail.com>
+> ---
+> This is one of the number of patches from the Android AOSP common.git tree,
+> which is used on Android devices. I wanted to submit it for review
+> to see if it should go upstream.
+Just a gentle reminder.
+Regards,
+Kiran
+>
+>  scripts/Makefile.modinst | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/scripts/Makefile.modinst b/scripts/Makefile.modinst
+> index e48a4e9..9b7b280 100644
+> --- a/scripts/Makefile.modinst
+> +++ b/scripts/Makefile.modinst
+> @@ -29,7 +29,7 @@ quiet_cmd_modules_install = INSTALL $@
+>  INSTALL_MOD_DIR ?= extra
+>  ext-mod-dir = $(INSTALL_MOD_DIR)$(subst $(patsubst %/,%,$(KBUILD_EXTMOD)),,$(@D))
+>
+> -modinst_dir = $(if $(KBUILD_EXTMOD),$(ext-mod-dir),kernel/$(@D))
+> +modinst_dir ?= $(if $(KBUILD_EXTMOD),$(ext-mod-dir),kernel/$(@D))
+>
+>  $(modules):
+>         $(call cmd,modules_install,$(MODLIB)/$(modinst_dir))
+> --
+> 1.8.2.1
+>
