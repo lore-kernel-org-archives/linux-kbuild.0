@@ -1,66 +1,20 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f181.google.com ([209.85.212.181]:43814 "EHLO
-	mail-wi0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751756AbbBPEgT (ORCPT
+Received: from hpeed03w28.hanze.nl ([145.33.5.181]:54355 "EHLO
+	HPEED03W28.hanze.nl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751673AbbBPFXe convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 15 Feb 2015 23:36:19 -0500
+	Mon, 16 Feb 2015 00:23:34 -0500
+From: "Eijzenga MMEM, Esmee" <m.m.e.m.eijzenga@st.hanze.nl>
+Subject: work with
+Date: Mon, 16 Feb 2015 05:23:29 +0000
+Message-ID: <EE1AE3F2A6E85B4EBB73748C09C6CE6F58456561@HPEMB08W28.hanze.nl>
+Content-Language: nl-NL
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
 MIME-Version: 1.0
-In-Reply-To: <1423479528-27027-1-git-send-email-kumarsharma.r@gmail.com>
-References: <1423479528-27027-1-git-send-email-kumarsharma.r@gmail.com>
-Date: Mon, 16 Feb 2015 10:06:17 +0530
-Message-ID: <CAKXpmjz5bSOV-HHGPnxXF23wOCEbEZpXWVwnUpyk+q6otiSsZw@mail.gmail.com>
-Subject: Re: [RFC] kbuild: make it possible to specify the module output dir
-From: Kiran Kumar <kumarsharma.r@gmail.com>
-Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: Rom Lemarchand <romlem@android.com>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, Android Kernel Team <kernel-team@android.com>, Kiran Raparthy <kumarsharma.r@gmail.com>
 
-On Mon, Feb 9, 2015 at 4:28 PM, Kiran Raparthy <kumarsharma.r@gmail.com> wrote:
-> From: Rom Lemarchand <romlem@android.com>
->
-> kbuild: make it possible to specify the module output dir
->
-> Make modinst_dir user-defined on the command line.
->
-> This allows to do things like:
-> make MODLIB=output/ modinst_dir=. modules_install
->
-> to ensure all the .ko are in the output/ directory.
->
-> Cc: Michal Marek <mmarek@suse.cz>
-> Cc: linux-kbuild@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> Cc: Andrew Morton <akpm@linux-foundation.org>
-> Cc: Android Kernel Team <kernel-team@android.com>
-> Signed-off-by: Rom Lemarchand <romlem@android.com>
-> [Kiran: Added context to commit message]
-> Signed-off-by: Kiran Raparthy <kumarsharma.r@gmail.com>
-> ---
-> This is one of the number of patches from the Android AOSP common.git tree,
-> which is used on Android devices. I wanted to submit it for review
-> to see if it should go upstream.
-Just a gentle reminder.
-Regards,
-Kiran
->
->  scripts/Makefile.modinst | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/scripts/Makefile.modinst b/scripts/Makefile.modinst
-> index e48a4e9..9b7b280 100644
-> --- a/scripts/Makefile.modinst
-> +++ b/scripts/Makefile.modinst
-> @@ -29,7 +29,7 @@ quiet_cmd_modules_install = INSTALL $@
->  INSTALL_MOD_DIR ?= extra
->  ext-mod-dir = $(INSTALL_MOD_DIR)$(subst $(patsubst %/,%,$(KBUILD_EXTMOD)),,$(@D))
->
-> -modinst_dir = $(if $(KBUILD_EXTMOD),$(ext-mod-dir),kernel/$(@D))
-> +modinst_dir ?= $(if $(KBUILD_EXTMOD),$(ext-mod-dir),kernel/$(@D))
->
->  $(modules):
->         $(call cmd,modules_install,$(MODLIB)/$(modinst_dir))
-> --
-> 1.8.2.1
->
+
+
+My name is Gatan Magsino, I work with Mediterranean Bank in Malta. Can i trust you with a business worth 8.3 million USD? Please reply ONLY to my private email: mgatan@rogers.com for more information.
