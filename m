@@ -1,73 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.mei.co.jp ([133.183.100.20]:45240 "EHLO smtp.mei.co.jp"
+Received: from cantor2.suse.de ([195.135.220.15]:37844 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751571AbbBQHSc (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 17 Feb 2015 02:18:32 -0500
-Date: Tue, 17 Feb 2015 16:18:12 +0900
-From: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Subject: Re: [PATCH 01/45] Makefile: propagate verbose options
-In-Reply-To: <1424127948-22484-2-git-send-email-mikko.rapeli@iki.fi>
-References: <1424127948-22484-1-git-send-email-mikko.rapeli@iki.fi> <1424127948-22484-2-git-send-email-mikko.rapeli@iki.fi>
-Message-Id: <20150217161810.A3B9.AA925319@jp.panasonic.com>
+	id S1751674AbbBROEE (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 18 Feb 2015 09:04:04 -0500
+Message-ID: <54E49BD2.1010503@suse.cz>
+Date: Wed, 18 Feb 2015 15:04:02 +0100
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
+Subject: Re: Still some race in X509 certificates handling
+References: <CA+55aFzgR3BaK4ihHmToZrft4=7NktH1nmi3tV0QMR4Y3QU4Kg@mail.gmail.com> <417.1423829747@warthog.procyon.org.uk>
+In-Reply-To: <417.1423829747@warthog.procyon.org.uk>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mikko Rapeli <mikko.rapeli@iki.fi>
-Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+To: David Howells <dhowells@redhat.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-Hi Mikko,
-
-On Tue, 17 Feb 2015 00:05:04 +0100
-Mikko Rapeli <mikko.rapeli@iki.fi> wrote:
-
-> Usefull when debugging the make scripts.
+On 2015-02-13 13:15, David Howells wrote:
+> Linus Torvalds <torvalds@linux-foundation.org> wrote:
 > 
-> Signed-off-by: Mikko Rapeli <mikko.rapeli@iki.fi>
-> ---
->  Makefile | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
+>> When it happens, I can do a rebuild, and the build will say
+>>
+>>    X.509 certificate list changed
+>>
+>> which is kind of odd, since the list should *always* be just that
+>> single key for me (ie "./signing_key.509").
 > 
-> diff --git a/Makefile b/Makefile
-> index 4e93284..c1b515d 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -912,13 +912,13 @@ quiet_cmd_link-vmlinux = LINK    $@
->  # execute if the rest of the kernel build went well.
->  vmlinux: scripts/link-vmlinux.sh $(vmlinux-deps) FORCE
->  ifdef CONFIG_HEADERS_CHECK
-> -	$(Q)$(MAKE) -f $(srctree)/Makefile headers_check
-> +	$(Q)$(MAKE) V=$(KBUILD_VERBOSE) -f $(srctree)/Makefile headers_check
->  endif
->  ifdef CONFIG_SAMPLES
-> -	$(Q)$(MAKE) $(build)=samples
-> +	$(Q)$(MAKE) V=$(KBUILD_VERBOSE) $(build)=samples
->  endif
->  ifdef CONFIG_BUILD_DOCSRC
-> -	$(Q)$(MAKE) $(build)=Documentation
-> +	$(Q)$(MAKE) V=$(KBUILD_VERBOSE) $(build)=Documentation
->  endif
->  	+$(call if_changed,link-vmlinux)
->  
-> @@ -1069,7 +1069,7 @@ headers_check_all: headers_install_all
->  PHONY += headers_check
->  headers_check: headers_install
->  	$(Q)$(MAKE) $(hdr-inst)=include/uapi HDRCHECK=1
-> -	$(Q)$(MAKE) $(hdr-inst)=arch/$(hdr-arch)/include/uapi/asm $(hdr-dst) HDRCHECK=1
-> +	$(Q)$(MAKE) V=$(KBUILD_VERBOSE) $(hdr-inst)=arch/$(hdr-arch)/include/uapi/asm $(hdr-dst) HDRCHECK=1
->  
->  # ---------------------------------------------------------------------------
->  # Kernel selftest
+> Did you by any chance set aside a build tree that went wrong?  If so, could
+> you have a look to see what's in:
+> 
+> 	<builddir>/kernel/.x509.list
+> 	<builddir>/kernel/x509_certificate_list (note this is binary)
+> 	<builddir>/x509.genkey
+> 
+> and make sure that:
+> 
+> 	<builddir>/signing_key.priv
+> 	<builddir>/signing_key.x509
+> 
+> both exist.  I wonder if the problem might perhaps be due to one of
+> signing_key.priv or signing_key.x509 getting removed somehow - but not both.
 
+It could also be due to the usage of realpath when building the
+certificate list:
 
+X509_CERTIFICATES-$(CONFIG_MODULE_SIG) += $(objtree)/signing_key.x509
+X509_CERTIFICATES-raw := $(sort $(foreach CERT,$(X509_CERTIFICATES-y), \
+				$(or $(realpath $(CERT)),$(CERT))))
 
-If you give V=... from the command line, it is automatically propagated
-to its sub-makes.
+If signing_key.x509 hasn't been generated yet, it will be stored as as
+./signing_key.x509. In a later make invocation, realpath will resolve it
+into /home/.../signing_key.x509. But then, it should fail every time,
+because of the := assignment.
 
-I think this patch has no point.
-
-
-Best Regards
-Masahiro Yamada
-
+Michal
