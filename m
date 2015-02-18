@@ -1,86 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:39254 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751787AbbBRVdp (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 18 Feb 2015 16:33:45 -0500
-Date: Wed, 18 Feb 2015 22:33:43 +0100
-From: Michal Marek <mmarek@suse.cz>
-Subject: [GIT PULL] kconfig changes for v3.20-rc1
-Message-ID: <20150218213342.GA28352@pobox.suse.cz>
+Received: from mail-we0-f170.google.com ([74.125.82.170]:43861 "EHLO
+	mail-we0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752358AbbBRX7S (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 18 Feb 2015 18:59:18 -0500
+Date: Thu, 19 Feb 2015 00:59:13 +0100
+From: Ingo Molnar <mingo@kernel.org>
+Subject: Re: [RESEND Patch V2 1/4] xen: build infrastructure for generating
+ hypercall depending symbols
+Message-ID: <20150218235913.GA9843@gmail.com>
+References: <1421826565-10826-1-git-send-email-jgross@suse.com>
+ <1421826565-10826-2-git-send-email-jgross@suse.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <1421826565-10826-2-git-send-email-jgross@suse.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: cj@linux.com, colin.king@canonical.com, olof@lixom.net, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Juergen Gross <jgross@suse.com>
+Cc: linux-kernel@vger.kernel.org, x86@kernel.org, xen-devel@lists.xensource.com, konrad.wilk@oracle.com, david.vrabel@citrix.com, boris.ostrovsky@oracle.com, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com, mmarek@suse.cz, linux-kbuild@vger.kernel.org
 
-Hi Linus,
 
-Yann E. Morin was supposed to take over kconfig maintainership, but this
-hasn't happened. So I'm sending a few kconfig patches that I collected
-for v3.20-rc1:
+* Juergen Gross <jgross@suse.com> wrote:
 
-- Fix for missing va_end in kconfig
-- merge_config.sh displays used if given too few arguments
-- s/boolean/bool/ in Kconfig files for consistency, with the plan to
-  only support bool in the future.
+> Today there are several places in the kernel which build tables
+> containing one entry for each possible Xen hypercall. Create an
+> infrastructure to be able to generate these tables at build time.
+> 
+> Based-on-patch-by: Jan Beulich <jbeulich@suse.com>
+> Signed-off-by: Juergen Gross <jgross@suse.com>
+> Reviewed-by: David Vrabel <david.vrabel@citrix.com>
+> ---
+>  arch/x86/syscalls/Makefile |  9 +++++++++
+>  scripts/xen-hypercalls.sh  | 12 ++++++++++++
+>  2 files changed, 21 insertions(+)
+>  create mode 100644 scripts/xen-hypercalls.sh
+> 
+> diff --git a/arch/x86/syscalls/Makefile b/arch/x86/syscalls/Makefile
+> index 3323c27..a55abb9 100644
+> --- a/arch/x86/syscalls/Makefile
+> +++ b/arch/x86/syscalls/Makefile
+> @@ -19,6 +19,9 @@ quiet_cmd_syshdr = SYSHDR  $@
+>  quiet_cmd_systbl = SYSTBL  $@
+>        cmd_systbl = $(CONFIG_SHELL) '$(systbl)' $< $@
+>  
+> +quiet_cmd_hypercalls = HYPERCALLS $@
+> +      cmd_hypercalls = $(CONFIG_SHELL) '$<' $@ $(filter-out $<,$^)
+> +
+>  syshdr_abi_unistd_32 := i386
+>  $(uapi)/unistd_32.h: $(syscall32) $(syshdr)
+>  	$(call if_changed,syshdr)
+> @@ -47,10 +50,16 @@ $(out)/syscalls_32.h: $(syscall32) $(systbl)
+>  $(out)/syscalls_64.h: $(syscall64) $(systbl)
+>  	$(call if_changed,systbl)
+>  
+> +$(out)/xen-hypercalls.h: $(srctree)/scripts/xen-hypercalls.sh
+> +	$(call if_changed,hypercalls)
+> +
+> +$(out)/xen-hypercalls.h: $(srctree)/include/xen/interface/xen*.h
+> +
+>  uapisyshdr-y			+= unistd_32.h unistd_64.h unistd_x32.h
+>  syshdr-y			+= syscalls_32.h
+>  syshdr-$(CONFIG_X86_64)		+= unistd_32_ia32.h unistd_64_x32.h
+>  syshdr-$(CONFIG_X86_64)		+= syscalls_64.h
+> +syshdr-$(CONFIG_XEN)		+= xen-hypercalls.h
+>  
+>  targets	+= $(uapisyshdr-y) $(syshdr-y)
 
-Michal
+From a core x86 perspective:
 
-The following changes since commit 97bf6af1f928216fd6c5a66e8a57bfa95a659672:
+Acked-by: Ingo Molnar <mingo@kernel.org>
 
-  Linux 3.19-rc1 (2014-12-20 17:08:50 -0800)
+Thanks,
 
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git kconfig
-
-for you to fetch changes up to b6a2ab2cd4739a9573ed41677e53171987b8da34:
-
-  kconfig: use va_end to match corresponding va_start (2015-01-27 16:52:43 +0100)
-
-----------------------------------------------------------------
-Christoph Jaeger (1):
-      kconfig: use bool instead of boolean for type definition attributes
-
-Colin Ian King (1):
-      kconfig: use va_end to match corresponding va_start
-
-Olof Johansson (1):
-      merge_config.sh: Display usage if given too few arguments
-
- arch/mips/pmcs-msp71xx/Kconfig      |  6 +++---
- drivers/connector/Kconfig           |  2 +-
- drivers/hwmon/Kconfig               |  2 +-
- drivers/hwmon/pmbus/Kconfig         |  2 +-
- drivers/i2c/Kconfig                 |  4 ++--
- drivers/iio/Kconfig                 |  4 ++--
- drivers/isdn/hardware/mISDN/Kconfig |  2 +-
- drivers/md/Kconfig                  |  4 ++--
- drivers/md/persistent-data/Kconfig  |  2 +-
- drivers/net/ethernet/ti/Kconfig     |  4 ++--
- drivers/net/usb/Kconfig             | 12 ++++++------
- drivers/net/wireless/rt2x00/Kconfig |  6 +++---
- drivers/pci/pcie/aer/Kconfig        |  2 +-
- drivers/rtc/Kconfig                 |  8 ++++----
- drivers/spi/Kconfig                 |  6 +++---
- drivers/staging/board/Kconfig       |  2 +-
- drivers/staging/emxx_udc/Kconfig    |  2 +-
- drivers/staging/iio/Kconfig         |  4 ++--
- drivers/tty/serial/Kconfig          |  2 +-
- drivers/usb/gadget/Kconfig          | 34 +++++++++++++++++-----------------
- drivers/usb/gadget/legacy/Kconfig   |  2 +-
- drivers/usb/gadget/udc/Kconfig      |  4 ++--
- drivers/usb/phy/Kconfig             |  2 +-
- init/Kconfig                        |  4 ++--
- lib/Kconfig                         | 30 +++++++++++++++---------------
- mm/Kconfig                          | 22 +++++++++++-----------
- net/Kconfig                         | 14 +++++++-------
- net/sched/Kconfig                   |  2 +-
- net/switchdev/Kconfig               |  2 +-
- scripts/kconfig/confdata.c          |  1 +
- scripts/kconfig/merge_config.sh     |  5 +++++
- security/integrity/Kconfig          |  4 ++--
- security/integrity/evm/Kconfig      |  2 +-
- 33 files changed, 105 insertions(+), 99 deletions(-)
+	Ingo
