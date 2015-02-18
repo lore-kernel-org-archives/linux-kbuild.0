@@ -1,27 +1,30 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:39059 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:39254 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752012AbbBRV1r (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 18 Feb 2015 16:27:47 -0500
-Date: Wed, 18 Feb 2015 22:27:45 +0100
+	id S1751787AbbBRVdp (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 18 Feb 2015 16:33:45 -0500
+Date: Wed, 18 Feb 2015 22:33:43 +0100
 From: Michal Marek <mmarek@suse.cz>
-Subject: [GIT PULL] kbuild misc changes for v3.20-rc1
-Message-ID: <20150218212745.GA27680@pobox.suse.cz>
+Subject: [GIT PULL] kconfig changes for v3.20-rc1
+Message-ID: <20150218213342.GA28352@pobox.suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: mmarek@suse.cz, sedat.dilek@gmail.com, yamada.m@jp.panasonic.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: cj@linux.com, colin.king@canonical.com, olof@lixom.net, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hi Linus,
 
-just a few non-critical kbuild changes for v3.20-rc1 (or v4.0-rc1 or
-vYearOfTheGoatKernel-rc1 or whatever it's called):
+Yann E. Morin was supposed to take over kconfig maintainership, but this
+hasn't happened. So I'm sending a few kconfig patches that I collected
+for v3.20-rc1:
 
-- builddeb adds the actual distribution name in the changelog
-- documentation fixes
+- Fix for missing va_end in kconfig
+- merge_config.sh displays used if given too few arguments
+- s/boolean/bool/ in Kconfig files for consistency, with the plan to
+  only support bool in the future.
 
 Michal
 
@@ -31,24 +34,53 @@ The following changes since commit 97bf6af1f928216fd6c5a66e8a57bfa95a659672:
 
 are available in the git repository at:
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git misc
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git kconfig
 
-for you to fetch changes up to 31a4af7f7d3cd3090c1c9201d62d4ede54dc5969:
+for you to fetch changes up to b6a2ab2cd4739a9573ed41677e53171987b8da34:
 
-  kbuild: trivial - fix the help doc of CONFIG_CC_OPTIMIZE_FOR_SIZE (2015-01-08 14:53:50 +0100)
+  kconfig: use va_end to match corresponding va_start (2015-01-27 16:52:43 +0100)
 
 ----------------------------------------------------------------
-Masahiro Yamada (1):
-      kbuild: trivial - fix the help doc of CONFIG_CC_OPTIMIZE_FOR_SIZE
+Christoph Jaeger (1):
+      kconfig: use bool instead of boolean for type definition attributes
 
-Michal Marek (1):
-      kbuild: Update documentation of clean-files and clean-dirs
+Colin Ian King (1):
+      kconfig: use va_end to match corresponding va_start
 
-Sedat Dilek (2):
-      builddeb: Update year and git repository URL in debian/copyright
-      builddeb: Try to determine distribution
+Olof Johansson (1):
+      merge_config.sh: Display usage if given too few arguments
 
- Documentation/kbuild/makefiles.txt | 11 +++++------
- init/Kconfig                       |  4 ++--
- scripts/package/builddeb           | 17 ++++++++++++++---
- 3 files changed, 21 insertions(+), 11 deletions(-)
+ arch/mips/pmcs-msp71xx/Kconfig      |  6 +++---
+ drivers/connector/Kconfig           |  2 +-
+ drivers/hwmon/Kconfig               |  2 +-
+ drivers/hwmon/pmbus/Kconfig         |  2 +-
+ drivers/i2c/Kconfig                 |  4 ++--
+ drivers/iio/Kconfig                 |  4 ++--
+ drivers/isdn/hardware/mISDN/Kconfig |  2 +-
+ drivers/md/Kconfig                  |  4 ++--
+ drivers/md/persistent-data/Kconfig  |  2 +-
+ drivers/net/ethernet/ti/Kconfig     |  4 ++--
+ drivers/net/usb/Kconfig             | 12 ++++++------
+ drivers/net/wireless/rt2x00/Kconfig |  6 +++---
+ drivers/pci/pcie/aer/Kconfig        |  2 +-
+ drivers/rtc/Kconfig                 |  8 ++++----
+ drivers/spi/Kconfig                 |  6 +++---
+ drivers/staging/board/Kconfig       |  2 +-
+ drivers/staging/emxx_udc/Kconfig    |  2 +-
+ drivers/staging/iio/Kconfig         |  4 ++--
+ drivers/tty/serial/Kconfig          |  2 +-
+ drivers/usb/gadget/Kconfig          | 34 +++++++++++++++++-----------------
+ drivers/usb/gadget/legacy/Kconfig   |  2 +-
+ drivers/usb/gadget/udc/Kconfig      |  4 ++--
+ drivers/usb/phy/Kconfig             |  2 +-
+ init/Kconfig                        |  4 ++--
+ lib/Kconfig                         | 30 +++++++++++++++---------------
+ mm/Kconfig                          | 22 +++++++++++-----------
+ net/Kconfig                         | 14 +++++++-------
+ net/sched/Kconfig                   |  2 +-
+ net/switchdev/Kconfig               |  2 +-
+ scripts/kconfig/confdata.c          |  1 +
+ scripts/kconfig/merge_config.sh     |  5 +++++
+ security/integrity/Kconfig          |  4 ++--
+ security/integrity/evm/Kconfig      |  2 +-
+ 33 files changed, 105 insertions(+), 99 deletions(-)
