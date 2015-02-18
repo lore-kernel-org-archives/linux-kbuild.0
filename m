@@ -1,37 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:32901 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:38013 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754432AbbBRTo0 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 18 Feb 2015 14:44:26 -0500
-Message-ID: <54E4EB98.2020407@suse.cz>
-Date: Wed, 18 Feb 2015 20:44:24 +0100
+	id S1751649AbbBRVMR (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 18 Feb 2015 16:12:17 -0500
+Date: Wed, 18 Feb 2015 22:12:13 +0100
 From: Michal Marek <mmarek@suse.cz>
+Subject: [GIT PULL] kbuild changes for v3.20-rc1
+Message-ID: <20150218211213.GA27204@pobox.suse.cz>
 MIME-Version: 1.0
-Subject: Re: Still some race in X509 certificates handling
-References: <CA+55aFzgR3BaK4ihHmToZrft4=7NktH1nmi3tV0QMR4Y3QU4Kg@mail.gmail.com>	<417.1423829747@warthog.procyon.org.uk>	<54E49BD2.1010503@suse.cz>	<54E4A37D.1040202@suse.cz> <CA+55aFy8gj_PaMq31Rkax2-0XyAPALQ3RFrB2dJDGCG4SFUdNA@mail.gmail.com>
-In-Reply-To: <CA+55aFy8gj_PaMq31Rkax2-0XyAPALQ3RFrB2dJDGCG4SFUdNA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: David Howells <dhowells@redhat.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: mmarek@suse.cz, yamada.m@jp.panasonic.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Dne 18.2.2015 v 19:49 Linus Torvalds napsal(a):
-> On Wed, Feb 18, 2015 at 6:36 AM, Michal Marek <mmarek@suse.cz> wrote:
->>
->> Actually, I sent a patch for the "X.509 certificate list changed"
->> message last October: https://lkml.org/lkml/2014/10/8/306, please apply
->> it. However, this is just a spurious rebuild. The cause for the
->> signature verification error must be something else.
-> 
-> So I saw the patch originally and it seemed a reasonable cleanup, but
-> you're the kbuild maintainer, so I always assumed it would come
-> through a standard kbuild pull.
+Hi Linus,
 
-I assumed it would get through David's tree like other modsign patches,
-and I forgot about it later. David, is it OK to merge the patch through
-the kbuild tree?
+please pull the kbuild stuff for v3.20-rc1:
+- several cleanups in kbuild
+- serialize multiple *config targets so that 'make defconfig kvmconfig'
+  works
+- The cc-ifversion macro got support for an else-branch
 
-Thanks,
-Michal
+
+The following changes since commit 97bf6af1f928216fd6c5a66e8a57bfa95a659672:
+
+  Linux 3.19-rc1 (2014-12-20 17:08:50 -0800)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git kbuild
+
+for you to fetch changes up to a75f8b8dab0f73459fa47a1daa10c84c4e8400a8:
+
+  kbuild,gcov: simplify kernel/gcov/Makefile more (2015-01-09 17:25:44 +0100)
+
+----------------------------------------------------------------
+Masahiro Yamada (10):
+      kbuild: merge bounds.h and asm-offsets.h rules
+      kbuild: remove redundant line from bounds.h/asm-offsets.h
+      kbuild: use mixed-targets when two or more config targets are given
+      kbuild: drop $(version_h) from MRPROPER_FILES
+      kbuild: fix cc-ifversion macro
+      kbuild: do not add $(call ...) to invoke cc-version or cc-fullversion
+      kbuild,gcov: remove unnecessary workaround
+      kbuild,gcov: simplify kernel/gcov/Makefile
+      kbuild: allow cc-ifversion to have the argument for false condition
+      kbuild,gcov: simplify kernel/gcov/Makefile more
+
+Michal Marek (1):
+      kbuild: Drop support for clean-rule
+
+ Documentation/kbuild/makefiles.txt |  9 +++---
+ Kbuild                             | 61 +++++++++++++-------------------------
+ Makefile                           |  4 +--
+ arch/parisc/Makefile               |  2 +-
+ arch/powerpc/Makefile              |  6 ++--
+ arch/x86/Makefile.um               |  2 +-
+ kernel/gcov/Makefile               | 36 ++++------------------
+ scripts/Kbuild.include             |  7 ++---
+ scripts/Makefile.clean             |  3 --
+ 9 files changed, 40 insertions(+), 90 deletions(-)
