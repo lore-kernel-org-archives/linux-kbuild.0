@@ -1,50 +1,151 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([103.22.144.67]:59181 "EHLO ozlabs.org"
+Received: from cantor2.suse.de ([195.135.220.15]:36221 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752239AbbBXALZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 23 Feb 2015 19:11:25 -0500
-Message-ID: <1424736683.2318.0.camel@ellerman.id.au>
-Subject: Re: [PATCH] powerpc: Update all configs using savedefconfig
-From: Michael Ellerman <mpe@ellerman.id.au>
-Date: Tue, 24 Feb 2015 11:11:23 +1100
-In-Reply-To: <CAMuHMdXXoqhwEf6P0pbJb_JkEKkK4bOGBVt8jG-gqKYBBDeHQA@mail.gmail.com>
-References: <1421737558-14756-1-git-send-email-mpe@ellerman.id.au>
-	 <CAMuHMdXXoqhwEf6P0pbJb_JkEKkK4bOGBVt8jG-gqKYBBDeHQA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+	id S1752323AbbBXPjM (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 24 Feb 2015 10:39:12 -0500
+From: Michal Marek <mmarek@suse.cz>
+Subject: [PATCH 1/3] kconfig: Get rid of the P() macro in headers
+Date: Tue, 24 Feb 2015 16:39:01 +0100
+Message-Id: <1424792343-25621-1-git-send-email-mmarek@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Linuxppc-dev <linuxppc-dev@ozlabs.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
 
-On Mon, 2015-02-23 at 10:59 +0100, Geert Uytterhoeven wrote:
-> Hi Michael,
-> 
-> On Tue, Jan 20, 2015 at 8:05 AM, Michael Ellerman <mpe@ellerman.id.au> wrote:
-> > It looks like it's ~4 years since we updated some of these, so do a bulk
-> > update.
-> >
-> > Verified that the before and after generated configs are exactly the
-> > same.
-> 
-> Yep, that's guaranteed by the tool (modulo bugs).
-> 
-> > Which begs the question why update them? The answer is that it can be
-> > confusing when the stored defconfig drifts too far from the generated
-> > result.
-> 
-> And it becomes hard to update them, e.g. for enabling or disabling a single
-> option.
-> 
-> Now the big question is: do they still work?
-> Plainly ignoring any bugs introduced in the code, there are probably several
-> "select" statements that have been removed. 4 years ago, they automatically
-> selected some critical options, while now, they're no longer selected, causing
-> breakage.
+This was originally meant for dlopen()ing a potential kconfig shared
+library. The unused dlopen code has already been removed in commit
+5a6f8d2b (kconfig: nuke LKC_DIRECT_LINK cruft), so let's remove the
+rest. The lkc_proto.h change was made with the following sed script:
 
-Yeah true. So far no one has yelled at me, so perhaps we got lucky :)
+  sed -r 's/^P\(([^,]*), *([^,]*), *(.*)\);/\2 \1\3;/'
 
-cheers
+Plus some manual adjustments.
 
+Signed-off-by: Michal Marek <mmarek@suse.cz>
+---
+ scripts/kconfig/lkc.h       |  2 --
+ scripts/kconfig/lkc_proto.h | 88 ++++++++++++++++++++++-----------------------
+ 2 files changed, 43 insertions(+), 47 deletions(-)
+
+diff --git a/scripts/kconfig/lkc.h b/scripts/kconfig/lkc.h
+index d5daa7a..e418a30 100644
+--- a/scripts/kconfig/lkc.h
++++ b/scripts/kconfig/lkc.h
+@@ -21,9 +21,7 @@ static inline char *bind_textdomain_codeset(const char *dn, char *c) { return c;
+ extern "C" {
+ #endif
+ 
+-#define P(name,type,arg)	extern type name arg
+ #include "lkc_proto.h"
+-#undef P
+ 
+ #define SRCTREE "srctree"
+ 
+diff --git a/scripts/kconfig/lkc_proto.h b/scripts/kconfig/lkc_proto.h
+index ecdb965..ceddbcf 100644
+--- a/scripts/kconfig/lkc_proto.h
++++ b/scripts/kconfig/lkc_proto.h
+@@ -1,57 +1,55 @@
+ #include <stdarg.h>
+ 
+ /* confdata.c */
+-P(conf_parse,void,(const char *name));
+-P(conf_read,int,(const char *name));
+-P(conf_read_simple,int,(const char *name, int));
+-P(conf_write_defconfig,int,(const char *name));
+-P(conf_write,int,(const char *name));
+-P(conf_write_autoconf,int,(void));
+-P(conf_get_changed,bool,(void));
+-P(conf_set_changed_callback, void,(void (*fn)(void)));
+-P(conf_set_message_callback, void,(void (*fn)(const char *fmt, va_list ap)));
++void conf_parse(const char *name);
++int conf_read(const char *name);
++int conf_read_simple(const char *name, int);
++int conf_write_defconfig(const char *name);
++int conf_write(const char *name);
++int conf_write_autoconf(void);
++bool conf_get_changed(void);
++void conf_set_changed_callback(void (*fn)(void));
++void conf_set_message_callback(void (*fn)(const char *fmt, va_list ap));
+ 
+ /* menu.c */
+-P(rootmenu,struct menu,);
++extern struct menu rootmenu;
+ 
+-P(menu_is_empty, bool, (struct menu *menu));
+-P(menu_is_visible, bool, (struct menu *menu));
+-P(menu_has_prompt, bool, (struct menu *menu));
+-P(menu_get_prompt,const char *,(struct menu *menu));
+-P(menu_get_root_menu,struct menu *,(struct menu *menu));
+-P(menu_get_parent_menu,struct menu *,(struct menu *menu));
+-P(menu_has_help,bool,(struct menu *menu));
+-P(menu_get_help,const char *,(struct menu *menu));
+-P(get_symbol_str, void, (struct gstr *r, struct symbol *sym, struct list_head
+-			 *head));
+-P(get_relations_str, struct gstr, (struct symbol **sym_arr, struct list_head
+-				   *head));
+-P(menu_get_ext_help,void,(struct menu *menu, struct gstr *help));
++bool menu_is_empty(struct menu *menu);
++bool menu_is_visible(struct menu *menu);
++bool menu_has_prompt(struct menu *menu);
++const char * menu_get_prompt(struct menu *menu);
++struct menu * menu_get_root_menu(struct menu *menu);
++struct menu * menu_get_parent_menu(struct menu *menu);
++bool menu_has_help(struct menu *menu);
++const char * menu_get_help(struct menu *menu);
++void get_symbol_str(struct gstr *r, struct symbol *sym, struct list_head *head);
++struct gstr get_relations_str(struct symbol **sym_arr, struct list_head *head);
++void menu_get_ext_help(struct menu *menu, struct gstr *help);
+ 
+ /* symbol.c */
+-P(symbol_hash,struct symbol *,[SYMBOL_HASHSIZE]);
++extern struct symbol * symbol_hash[SYMBOL_HASHSIZE];
+ 
+-P(sym_lookup,struct symbol *,(const char *name, int flags));
+-P(sym_find,struct symbol *,(const char *name));
+-P(sym_expand_string_value,const char *,(const char *in));
+-P(sym_escape_string_value, const char *,(const char *in));
+-P(sym_re_search,struct symbol **,(const char *pattern));
+-P(sym_type_name,const char *,(enum symbol_type type));
+-P(sym_calc_value,void,(struct symbol *sym));
+-P(sym_get_type,enum symbol_type,(struct symbol *sym));
+-P(sym_tristate_within_range,bool,(struct symbol *sym,tristate tri));
+-P(sym_set_tristate_value,bool,(struct symbol *sym,tristate tri));
+-P(sym_toggle_tristate_value,tristate,(struct symbol *sym));
+-P(sym_string_valid,bool,(struct symbol *sym, const char *newval));
+-P(sym_string_within_range,bool,(struct symbol *sym, const char *str));
+-P(sym_set_string_value,bool,(struct symbol *sym, const char *newval));
+-P(sym_is_changable,bool,(struct symbol *sym));
+-P(sym_get_choice_prop,struct property *,(struct symbol *sym));
+-P(sym_get_default_prop,struct property *,(struct symbol *sym));
+-P(sym_get_string_value,const char *,(struct symbol *sym));
++struct symbol * sym_lookup(const char *name, int flags);
++struct symbol * sym_find(const char *name);
++const char * sym_expand_string_value(const char *in);
++const char * sym_escape_string_value(const char *in);
++struct symbol ** sym_re_search(const char *pattern);
++const char * sym_type_name(enum symbol_type type);
++void sym_calc_value(struct symbol *sym);
++enum symbol_type sym_get_type(struct symbol *sym);
++bool sym_tristate_within_range(struct symbol *sym,tristate tri);
++bool sym_set_tristate_value(struct symbol *sym,tristate tri);
++tristate sym_toggle_tristate_value(struct symbol *sym);
++bool sym_string_valid(struct symbol *sym, const char *newval);
++bool sym_string_within_range(struct symbol *sym, const char *str);
++bool sym_set_string_value(struct symbol *sym, const char *newval);
++bool sym_is_changable(struct symbol *sym);
++struct property * sym_get_choice_prop(struct symbol *sym);
++struct property * sym_get_default_prop(struct symbol *sym);
++const char * sym_get_string_value(struct symbol *sym);
+ 
+-P(prop_get_type_name,const char *,(enum prop_type type));
++const char * prop_get_type_name(enum prop_type type);
+ 
+ /* expr.c */
+-P(expr_compare_type,int,(enum expr_type t1, enum expr_type t2));
+-P(expr_print,void,(struct expr *e, void (*fn)(void *, struct symbol *, const char *), void *data, int prevtoken));
++int expr_compare_type(enum expr_type t1, enum expr_type t2);
++void expr_print(struct expr *e, void (*fn)(void *, struct symbol *, const char *), void *data, int prevtoken);
+-- 
+2.1.2
 
