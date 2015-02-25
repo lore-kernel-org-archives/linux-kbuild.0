@@ -1,30 +1,31 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:36488 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751848AbbBYOAA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 25 Feb 2015 09:00:00 -0500
-Message-ID: <54EDD55E.4010809@suse.cz>
-Date: Wed, 25 Feb 2015 14:59:58 +0100
-From: Michal Marek <mmarek@suse.cz>
+Received: from mail-ob0-f177.google.com ([209.85.214.177]:55777 "EHLO
+	mail-ob0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752809AbbBYTj6 (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 25 Feb 2015 14:39:58 -0500
+Received: by mail-ob0-f177.google.com with SMTP id wp18so5977777obc.8
+        for <linux-kbuild@vger.kernel.org>; Wed, 25 Feb 2015 11:39:58 -0800 (PST)
 MIME-Version: 1.0
-Subject: Re: [PATCH] kconfig: fix a misspelling in scripts/kconfig/merge_config.sh
-References: <1417589750-16011-1-git-send-email-yamada.m@jp.panasonic.com>
-In-Reply-To: <1417589750-16011-1-git-send-email-yamada.m@jp.panasonic.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Date: Wed, 25 Feb 2015 11:39:58 -0800
+Message-ID: <CAHTgTXU1fA9Y3YWoOSRuqZ6iZ5c8DK0+TwBdSKFohytjPAkjhg@mail.gmail.com>
+Subject: SYMTAB_SHNDX has bad sh_link build error
+From: Vinson Lee <vlee@twopensource.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.m@jp.panasonic.com>, linux-kbuild@vger.kernel.org
-Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, linux-kernel@vger.kernel.org
+To: LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
 
-On 2014-12-03 07:55, Masahiro Yamada wrote:
-> Signed-off-by: Masahiro Yamada <yamada.m@jp.panasonic.com>
-> ---
-> 
->  scripts/kconfig/merge_config.sh | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+Hi.
 
-Applied to kbuild.git#kconfig, sorry for the delay.
+With Linux 4.0-rc1, I get this allyesconfig build error on CentOS 5.
+This build error occurs starting with Linux 3.15-rc1.
 
-Michal
++ modpost_link vmlinux.o
++ ld -m elf_x86_64 -r -o vmlinux.o arch/x86/kernel/head_64.o arch/x86/kernel/he$
++ make -f ./scripts/Makefile.modpost vmlinux.o
+  scripts/mod/modpost -m -a -o ./Module.symvers      vmlinux.o
+FATAL: vmlinux.o: SYMTAB_SHNDX has bad sh_link: 71288!=71032
 
+Cheers,
+Vinson
