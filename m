@@ -1,31 +1,28 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ob0-f177.google.com ([209.85.214.177]:55777 "EHLO
-	mail-ob0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752809AbbBYTj6 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 25 Feb 2015 14:39:58 -0500
-Received: by mail-ob0-f177.google.com with SMTP id wp18so5977777obc.8
-        for <linux-kbuild@vger.kernel.org>; Wed, 25 Feb 2015 11:39:58 -0800 (PST)
+Received: from smtp.citrix.com ([66.165.176.89]:21786 "EHLO SMTP.CITRIX.COM"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751077AbbCBLAp (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 2 Mar 2015 06:00:45 -0500
+Message-ID: <54F442B6.1050400@citrix.com>
+Date: Mon, 2 Mar 2015 11:00:06 +0000
+From: David Vrabel <david.vrabel@citrix.com>
 MIME-Version: 1.0
-Date: Wed, 25 Feb 2015 11:39:58 -0800
-Message-ID: <CAHTgTXU1fA9Y3YWoOSRuqZ6iZ5c8DK0+TwBdSKFohytjPAkjhg@mail.gmail.com>
-Subject: SYMTAB_SHNDX has bad sh_link build error
-From: Vinson Lee <vlee@twopensource.com>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [Xen-devel] [RESEND Patch V2 0/4] xen: auto-generate symbols
+ for xen hypercalls
+References: <1421826565-10826-1-git-send-email-jgross@suse.com>
+In-Reply-To: <1421826565-10826-1-git-send-email-jgross@suse.com>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
+To: Juergen Gross <jgross@suse.com>, linux-kernel@vger.kernel.org, x86@kernel.org, xen-devel@lists.xensource.com, konrad.wilk@oracle.com, david.vrabel@citrix.com, boris.ostrovsky@oracle.com, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com, mmarek@suse.cz, linux-kbuild@vger.kernel.org
 
-Hi.
+On 21/01/15 07:49, Juergen Gross wrote:
+> The Xen hypercalls are defined in include/xen/interface/xen.h. There
+> are some places where for each hypercall a table element is created.
+> Instead of manually add each hypercall element to these tables use
+> an auto generated header built during the make process of the kernel.
 
-With Linux 4.0-rc1, I get this allyesconfig build error on CentOS 5.
-This build error occurs starting with Linux 3.15-rc1.
+Applied to devel/for-linus-4.1, thanks.
 
-+ modpost_link vmlinux.o
-+ ld -m elf_x86_64 -r -o vmlinux.o arch/x86/kernel/head_64.o arch/x86/kernel/he$
-+ make -f ./scripts/Makefile.modpost vmlinux.o
-  scripts/mod/modpost -m -a -o ./Module.symvers      vmlinux.o
-FATAL: vmlinux.o: SYMTAB_SHNDX has bad sh_link: 71288!=71032
-
-Cheers,
-Vinson
+David
