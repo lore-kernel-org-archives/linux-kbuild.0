@@ -1,28 +1,111 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.citrix.com ([66.165.176.89]:21786 "EHLO SMTP.CITRIX.COM"
+Received: from comal.ext.ti.com ([198.47.26.152]:60833 "EHLO comal.ext.ti.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751077AbbCBLAp (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 2 Mar 2015 06:00:45 -0500
-Message-ID: <54F442B6.1050400@citrix.com>
-Date: Mon, 2 Mar 2015 11:00:06 +0000
-From: David Vrabel <david.vrabel@citrix.com>
+	id S1750870AbbCBNAZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 2 Mar 2015 08:00:25 -0500
+Message-ID: <54F45EC8.4080202@ti.com>
+Date: Mon, 2 Mar 2015 14:59:52 +0200
+From: Tomi Valkeinen <tomi.valkeinen@ti.com>
 MIME-Version: 1.0
-Subject: Re: [Xen-devel] [RESEND Patch V2 0/4] xen: auto-generate symbols
- for xen hypercalls
-References: <1421826565-10826-1-git-send-email-jgross@suse.com>
-In-Reply-To: <1421826565-10826-1-git-send-email-jgross@suse.com>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH RFC 5/6] drm/tilcdc: Force building of DRM_TILCDC_INIT
+References: <cover.1424961754.git.jsarha@ti.com> <2f0e612a87ad97ff9a0b512456a2fe0880d99d54.1424961754.git.jsarha@ti.com>
+In-Reply-To: <2f0e612a87ad97ff9a0b512456a2fe0880d99d54.1424961754.git.jsarha@ti.com>
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature";
+	boundary="asMBVcd9eN067Re5UPjvI7Kqi5jokOxAM"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Juergen Gross <jgross@suse.com>, linux-kernel@vger.kernel.org, x86@kernel.org, xen-devel@lists.xensource.com, konrad.wilk@oracle.com, david.vrabel@citrix.com, boris.ostrovsky@oracle.com, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com, mmarek@suse.cz, linux-kbuild@vger.kernel.org
+To: Jyri Sarha <jsarha@ti.com>, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>
+Cc: dri-devel@lists.freedesktop.org, airlied@linux.ie, linux-omap@vger.kernel.org, devicetree@vger.kernel.org, bcousson@baylibre.com, tony@atomide.com, detheridge@ti.com, moinejf@free.fr, linux@arm.linux.org.uk
 
-On 21/01/15 07:49, Juergen Gross wrote:
-> The Xen hypercalls are defined in include/xen/interface/xen.h. There
-> are some places where for each hypercall a table element is created.
-> Instead of manually add each hypercall element to these tables use
-> an auto generated header built during the make process of the kernel.
+--asMBVcd9eN067Re5UPjvI7Kqi5jokOxAM
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
 
-Applied to devel/for-linus-4.1, thanks.
+On 26/02/15 16:55, Jyri Sarha wrote:
+> If I read Documentation/kbuild/makefiles.txt section 3.6 right, this
+> patch should not be needed. However, without this patch the objects
+> needed for DRM_TILCDC_INIT are not linked, if DRM_TILCDC is built as
+> module.
 
-David
+I also think there's something funny either with the documentation or
+the kernel build system.
+
+To summarize (Jyri correct me if I'm wrong):
+
+We enter tilcdc directory using "obj-$(CONFIG_DRM_TILCDC)", and
+CONFIG_DRM_TILCDC is either y or m. Inside the directory we have the
+necessary makefile and code to build the driver as module or built-in.
+And this works fine.
+
+But now Jyri added new piece of code to tilcdc directory, which is
+always built-in, even if the tilcdc driver itself is a module. So now if
+we enter the directory with "obj-m", and inside the tilcdc/Makefile we
+do "obj-y +=3D foo.o" line, the result is that foo.o is compiled, but it
+is not linked either to the kernel image nor to the tilcdc.ko.
+
+The doc says:
+
+"Kbuild only uses this information to decide that it needs to visit
+the directory, it is the Makefile in the subdirectory that
+specifies what is modular and what is built-in."
+
+which doesn't seem to work for us.
+
+> Signed-off-by: Jyri Sarha <jsarha@ti.com>
+> ---
+>  drivers/gpu/drm/Makefile | 1 +
+>  1 file changed, 1 insertion(+)
+>=20
+> diff --git a/drivers/gpu/drm/Makefile b/drivers/gpu/drm/Makefile
+> index 2c239b9..62c6158 100644
+> --- a/drivers/gpu/drm/Makefile
+> +++ b/drivers/gpu/drm/Makefile
+> @@ -60,6 +60,7 @@ obj-$(CONFIG_DRM_RCAR_DU) +=3D rcar-du/
+>  obj-$(CONFIG_DRM_SHMOBILE) +=3Dshmobile/
+>  obj-$(CONFIG_DRM_OMAP)	+=3D omapdrm/
+>  obj-$(CONFIG_DRM_TILCDC)	+=3D tilcdc/
+> +obj-$(CONFIG_DRM_TILCDC_INIT)	+=3D tilcdc/
+>  obj-$(CONFIG_DRM_QXL) +=3D qxl/
+>  obj-$(CONFIG_DRM_BOCHS) +=3D bochs/
+>  obj-$(CONFIG_DRM_MSM) +=3D msm/
+
+I don't think the above is right. You add two rules for tilcdc
+directory. I presume you meant to replace the current tilcdc line with
+the new one?
+
+But I don't think the new line makes sense. Using
+obj-$(CONFIG_DRM_TILCDC) above makes sense, and also obj-y makes sense,
+but obj-$(CONFIG_DRM_TILCDC_INIT) doesn't.
+
+So I think it should be just obj-y, if obj-$(CONFIG_DRM_TILCDC) does not
+work.
+
+ Tomi
+
+
+
+--asMBVcd9eN067Re5UPjvI7Kqi5jokOxAM
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJU9F7IAAoJEPo9qoy8lh71NngP/0CsyvlUrIdh+qv04D/Tt/qC
+qssWL32MeJLa+2WD4M7r+R9CmeX+ncyTpMIIqA9gb1RgnOf5Vb+AGuHbKOklcIus
+r2vqYDkEkTp1w/EOg1UofWDcpkBJduZkddkNes1pMWbHp113pl//bM9cOViJzxkS
+zQFTW5YefidFxzHLMkgpjEkKLLbDix3QAqLGyEE5X7IEj9QC3Ikscf8W4vBKe3OB
+H3gpYNQ5dnh/Lhq2qGGz7wKPgzJXlHitmzbSBKP+9ytrOpuZv+1zhjgz0UOlwTTb
+lVOJRZ2w+SskFydMaDrsqH9R7w7+G8EMcCeZjsPEwaw8N7kIuwzV5aWt3179YDle
+20iyyM3uBdoxSl6gyvdQWt1J7LYzdt9W1JZ1TBXf2lx2MnZgzY4L/6jgn9pLXNjx
+65d4ZYcH4k++qz5bGwz71OThvuBOF7HaSzHx4lH+KrxZNs75TNHlQNxdjpku9XS7
+dR73tIiUh380Ga8AhIxWIB2GQbE0QncZ4ADi3nsuw51eoBfXjK9FlKTOBq5SQxEA
+dM5xKySyHYF0SKsHR5gTpdSOKJmz3Or8Dk/pG5cLGLTgPIwmuz9nRjQ3zn0YBppx
+llqSZ4n+XQ5ZLxY7nfjGGZeAGQQXiLiN99ElDT/G4yK6xNDTfAHEsayZfmFxeBV/
+eH6pkRSMo8oB/ANI2j/D
+=4SMJ
+-----END PGP SIGNATURE-----
+
+--asMBVcd9eN067Re5UPjvI7Kqi5jokOxAM--
