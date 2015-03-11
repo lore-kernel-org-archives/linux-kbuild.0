@@ -1,75 +1,72 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kapsi.fi ([217.30.184.167]:38767 "EHLO mail.kapsi.fi"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752631AbbCJWhF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 10 Mar 2015 18:37:05 -0400
-Date: Wed, 11 Mar 2015 00:36:55 +0200
-From: Mikko Rapeli <mikko.rapeli@iki.fi>
-Subject: Re: [PATCH 01/45] Makefile: propagate verbose options
-Message-ID: <20150310223655.GU12550@lakka.kapsi.fi>
-References: <1424127948-22484-1-git-send-email-mikko.rapeli@iki.fi>
- <1424127948-22484-2-git-send-email-mikko.rapeli@iki.fi>
- <20150217161810.A3B9.AA925319@jp.panasonic.com>
+Received: from szxga01-in.huawei.com ([58.251.152.64]:34944 "EHLO
+	szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750783AbbCKEYz (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 11 Mar 2015 00:24:55 -0400
+Message-ID: <54FFC37C.8030505@huawei.com>
+Date: Wed, 11 Mar 2015 12:24:28 +0800
+From: shengyong <shengyong1@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20150217161810.A3B9.AA925319@jp.panasonic.com>
+Subject: Question: "genksyms: Track changes to enum constants" doesn't work
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.m@jp.panasonic.com>
-Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+To: mmarek@suse.cz
+Cc: linux-kbuild@vger.kernel.org, sam@ravnborg.org
 
-On Tue, Feb 17, 2015 at 04:18:12PM +0900, Masahiro Yamada wrote:
-> Hi Mikko,
-> 
-> On Tue, 17 Feb 2015 00:05:04 +0100
-> Mikko Rapeli <mikko.rapeli@iki.fi> wrote:
-> 
-> > Usefull when debugging the make scripts.
-> > 
-> > Signed-off-by: Mikko Rapeli <mikko.rapeli@iki.fi>
-> > ---
-> >  Makefile | 8 ++++----
-> >  1 file changed, 4 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/Makefile b/Makefile
-> > index 4e93284..c1b515d 100644
-> > --- a/Makefile
-> > +++ b/Makefile
-> > @@ -912,13 +912,13 @@ quiet_cmd_link-vmlinux = LINK    $@
-> >  # execute if the rest of the kernel build went well.
-> >  vmlinux: scripts/link-vmlinux.sh $(vmlinux-deps) FORCE
-> >  ifdef CONFIG_HEADERS_CHECK
-> > -	$(Q)$(MAKE) -f $(srctree)/Makefile headers_check
-> > +	$(Q)$(MAKE) V=$(KBUILD_VERBOSE) -f $(srctree)/Makefile headers_check
-> >  endif
-> >  ifdef CONFIG_SAMPLES
-> > -	$(Q)$(MAKE) $(build)=samples
-> > +	$(Q)$(MAKE) V=$(KBUILD_VERBOSE) $(build)=samples
-> >  endif
-> >  ifdef CONFIG_BUILD_DOCSRC
-> > -	$(Q)$(MAKE) $(build)=Documentation
-> > +	$(Q)$(MAKE) V=$(KBUILD_VERBOSE) $(build)=Documentation
-> >  endif
-> >  	+$(call if_changed,link-vmlinux)
-> >  
-> > @@ -1069,7 +1069,7 @@ headers_check_all: headers_install_all
-> >  PHONY += headers_check
-> >  headers_check: headers_install
-> >  	$(Q)$(MAKE) $(hdr-inst)=include/uapi HDRCHECK=1
-> > -	$(Q)$(MAKE) $(hdr-inst)=arch/$(hdr-arch)/include/uapi/asm $(hdr-dst) HDRCHECK=1
-> > +	$(Q)$(MAKE) V=$(KBUILD_VERBOSE) $(hdr-inst)=arch/$(hdr-arch)/include/uapi/asm $(hdr-dst) HDRCHECK=1
-> >  
-> >  # ---------------------------------------------------------------------------
-> >  # Kernel selftest
-> 
-> 
-> 
-> If you give V=... from the command line, it is automatically propagated
-> to its sub-makes.
-> 
-> I think this patch has no point.
+Hi, Michal Marek
 
-You are right, I'll drop this patch.
+The commit e37ddb8250 ("genksyms: Track changes to enum constants") helps to changes the
+checksum of export symbol if an enum is changed. I test this agains linux-next, but it
+seems that it does not work well.
 
--Mikko
+	#include <linux/module.h>
+	#include <linux/kernel.h>
+	#include <linux/init.h>
+
+	enum a {
+		E1,
+		E2,
+		E_MAX
+	};
+
+	struct s {
+		int a[E_MAX];
+	};
+
+	int test(struct s *s)
+	{
+		s->a[E2] = 0;
+		return 0;
+	}
+	EXPORT_SYMBOL(test);
+	
+	static int __init hello_init(void) { return 0; }
+	static void __exit hello_exit(void) { return; }
+	module_init(hello_init);
+	module_exit(hello_exit);
+
+After compiled, I get:
+$ cat Module.symvers
+*0xb6ca7216*	test	/home/test/module/hello	EXPORT_SYMBOL
+
+Then add an "E3" in the enum:
+
+	enum a {
+		E1,
+		E2,
+	+	E3,
+		E_MAX
+	};
+
+After compiled, I still get:
+$ cat Module.symvers
+*0xb6ca7216*	test	/home/test/module/hello	EXPORT_SYMBOL
+
+Anything wrong with my test?
+
+thanks,
+Sheng
+
