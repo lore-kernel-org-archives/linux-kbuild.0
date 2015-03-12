@@ -1,148 +1,97 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.emea.novell.com ([130.57.118.101]:44278 "EHLO
-	mail.emea.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750856AbbCKN72 convert rfc822-to-8bit (ORCPT
-	<rfc822;groupwise-linux-kbuild@vger.kernel.org:4:1>);
-	Wed, 11 Mar 2015 09:59:28 -0400
-Message-Id: <5500584D02000078000688F5@mail.emea.novell.com>
-Date: Wed, 11 Mar 2015 13:59:25 +0000
-From: "Jan Beulich" <JBeulich@suse.com>
-Subject: [PATCH] Kconfig: drop bogus default values
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8BIT
-Content-Disposition: inline
+Received: from mail-pa0-f44.google.com ([209.85.220.44]:42600 "EHLO
+	mail-pa0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750909AbbCLFdl (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 12 Mar 2015 01:33:41 -0400
+Message-ID: <55012531.8040608@gmail.com>
+Date: Wed, 11 Mar 2015 22:33:37 -0700
+From: Frank Rowand <frowand.list@gmail.com>
+Reply-To: frowand.list@gmail.com
+MIME-Version: 1.0
+Subject: [Patch 1/3] dt: OF_UNITTEST make dependency broken, framework fixes
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: yann.morin.1998@free.fr, akpm@linux-foundation.org, Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Grant Likely <grant.likely@linaro.org>, Rob Herring <robh+dt@kernel.org>, Michal Marek <mmarek@suse.cz>, Linux Kernel list <linux-kernel@vger.kernel.org>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, linux-kbuild@vger.kernel.org
 
-Default "no" is pretty pointless for options without (visible) prompts:
-They only clutter .config-s with "# CONFIG_... is not set" and thus
-prevent users of "make oldconfig", when the option obtains a prompt or
-its prompt becomes visible, noticing that these may now be enabled.
+From: Frank Rowand <frank.rowand@sonymobile.com>
 
-Signed-off-by: Jan Beulich <jbeulich@suse.com>
+This 3 patch series is not bisectable.  If CONFIG_OF_UNITTEST=y then the kernel
+will not build with just patch 1 or just patches 1 and 2 applied.
+
+If CONFIG_OF_UNITTEST=y then a kernel image make will always cause .version to
+be incremented, even if there are not source changes.  This is caused by
+a lack of dependency tracking and checking for
+drivers/of/unittest-data/testcases.dtb.o.  Fixing the problem was made more
+complicated by the fact that testcases.dtb.o was linked into ../of_unittest.o.
+
+Patch 1 modifies makefiles to move of_unittest.c into unittest-data/ and
+creates missing dependency tracking for testcases.dtb.o.
+
+Patch 2 will move of_unittest.c into unittest-data/
+
+Patch 3 will fix an of_unittest.c include path to account for the move.
+
+Signed-off-by: Frank Rowand <frank.rowand@sonymobile.com>
+
 ---
- arch/Kconfig   |    7 ++++---
- init/Kconfig   |   10 ++++------
- lib/Kconfig    |    3 +--
- lib/xz/Kconfig |    1 -
- 4 files changed, 9 insertions(+), 12 deletions(-)
+ drivers/of/Makefile               |    4 ++--
+ drivers/of/unittest-data/Makefile |    9 +++++++++
+ scripts/Makefile.lib              |    5 +++--
+ 3 files changed, 14 insertions(+), 4 deletions(-)
 
---- 4.0-rc3/arch/Kconfig
-+++ 4.0-rc3-Kconfig-cleanup/arch/Kconfig
-@@ -86,7 +86,7 @@ config KPROBES_ON_FTRACE
- 	 optimize on top of function tracing.
+Index: b/drivers/of/Makefile
+===================================================================
+--- a/drivers/of/Makefile
++++ b/drivers/of/Makefile
+@@ -6,8 +6,6 @@ obj-$(CONFIG_OF_PROMTREE) += pdt.o
+ obj-$(CONFIG_OF_ADDRESS)  += address.o
+ obj-$(CONFIG_OF_IRQ)    += irq.o
+ obj-$(CONFIG_OF_NET)	+= of_net.o
+-obj-$(CONFIG_OF_UNITTEST) += of_unittest.o
+-of_unittest-objs := unittest.o unittest-data/testcases.dtb.o
+ obj-$(CONFIG_OF_MDIO)	+= of_mdio.o
+ obj-$(CONFIG_OF_PCI)	+= of_pci.o
+ obj-$(CONFIG_OF_PCI_IRQ)  += of_pci_irq.o
+@@ -16,5 +14,7 @@ obj-$(CONFIG_OF_RESERVED_MEM) += of_rese
+ obj-$(CONFIG_OF_RESOLVE)  += resolver.o
+ obj-$(CONFIG_OF_OVERLAY) += overlay.o
  
- config UPROBES
--	def_bool n
-+	bool
- 	select PERCPU_RWSEM
- 	help
- 	  Uprobes is the user-space counterpart to kprobes: they
-@@ -100,7 +100,8 @@ config UPROBES
- 	    application. )
++obj-$(CONFIG_OF_UNITTEST) += unittest-data/
++
+ CFLAGS_fdt.o = -I$(src)/../../scripts/dtc/libfdt
+ CFLAGS_fdt_address.o = -I$(src)/../../scripts/dtc/libfdt
+Index: b/scripts/Makefile.lib
+===================================================================
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -276,10 +276,11 @@ cmd_dt_S_dtb=						\
+ 	echo '__dtb_$(*F)_end:';			\
+ 	echo '.global __dtb_$(*F)_end';			\
+ 	echo '.balign STRUCT_ALIGNMENT'; 		\
+-) > $@
++) > $@ ;                                                \
++	touch $(depfile)
  
- config HAVE_64BIT_ALIGNED_ACCESS
--	def_bool 64BIT && !HAVE_EFFICIENT_UNALIGNED_ACCESS
-+	bool
-+	default y if 64BIT && !HAVE_EFFICIENT_UNALIGNED_ACCESS
- 	help
- 	  Some architectures require 64 bit accesses to be 64 bit
- 	  aligned, which also requires structs containing 64 bit values
-@@ -352,7 +353,7 @@ config HAVE_CC_STACKPROTECTOR
- 	  - it has implemented a stack canary (e.g. __stack_chk_guard)
+ $(obj)/%.dtb.S: $(obj)/%.dtb
+-	$(call cmd,dt_S_dtb)
++	$(call if_changed_dep,dt_S_dtb)
  
- config CC_STACKPROTECTOR
--	def_bool n
-+	bool
- 	help
- 	  Set when a stack-protector mode is enabled, so that the build
- 	  can enable kernel-side support for the GCC feature.
---- 4.0-rc3/init/Kconfig
-+++ 4.0-rc3-Kconfig-cleanup/init/Kconfig
-@@ -518,7 +518,8 @@ config TASKS_RCU
- 	  If unsure, say N.
- 
- config RCU_STALL_COMMON
--	def_bool ( TREE_RCU || PREEMPT_RCU || RCU_TRACE )
-+	def_bool y
-+	depends on TREE_RCU || PREEMPT_RCU || RCU_TRACE
- 	help
- 	  This option enables RCU CPU stall code that is common between
- 	  the TINY and TREE variants of RCU.  The purpose is to allow
-@@ -652,7 +653,8 @@ config RCU_FAST_NO_HZ
- 	  Say N if you are unsure.
- 
- config TREE_RCU_TRACE
--	def_bool RCU_TRACE && ( TREE_RCU || PREEMPT_RCU )
-+	def_bool y
-+	depends on RCU_TRACE && (TREE_RCU || PREEMPT_RCU)
- 	select DEBUG_FS
- 	help
- 	  This option provides tracing for the TREE_RCU and
-@@ -795,7 +797,6 @@ endmenu # "RCU Subsystem"
- 
- config BUILD_BIN2C
- 	bool
--	default n
- 
- config IKCONFIG
- 	tristate "Kernel .config support"
-@@ -1136,7 +1137,6 @@ endif # CGROUPS
- 
- config CHECKPOINT_RESTORE
- 	bool "Checkpoint/restore support" if EXPERT
--	default n
- 	help
- 	  Enables additional kernel features in a sake of checkpoint/restore.
- 	  In particular it adds auxiliary prctl codes to setup process text,
-@@ -1371,7 +1371,6 @@ config SYSFS_SYSCALL
- config SYSCTL_SYSCALL
- 	bool "Sysctl syscall support" if EXPERT
- 	depends on PROC_SYSCTL
--	default n
- 	select SYSCTL
- 	---help---
- 	  sys_sysctl uses binary paths that have been found challenging
-@@ -1753,7 +1752,6 @@ endmenu		# General setup
- 
- config HAVE_GENERIC_DMA_COHERENT
- 	bool
--	default n
- 
- config SLABINFO
- 	bool
---- 4.0-rc3/lib/Kconfig
-+++ 4.0-rc3-Kconfig-cleanup/lib/Kconfig
-@@ -3,7 +3,7 @@
- #
- 
- config BINARY_PRINTF
--	def_bool n
-+	bool
- 
- menu "Library routines"
- 
-@@ -49,7 +49,6 @@ config GENERIC_IOMAP
- 
- config GENERIC_IO
- 	bool
--	default n
- 
- config STMP_DEVICE
- 	bool
---- 4.0-rc3/lib/xz/Kconfig
-+++ 4.0-rc3-Kconfig-cleanup/lib/xz/Kconfig
-@@ -42,7 +42,6 @@ endif
- 
- config XZ_DEC_BCJ
- 	bool
--	default n
- 
- config XZ_DEC_TEST
- 	tristate "XZ decompressor tester"
-
-
-
+ quiet_cmd_dtc = DTC     $@
+ cmd_dtc = $(CPP) $(dtc_cpp_flags) -x assembler-with-cpp -o $(dtc-tmp) $< ; \
+Index: b/drivers/of/unittest-data/Makefile
+===================================================================
+--- /dev/null
++++ b/drivers/of/unittest-data/Makefile
+@@ -0,0 +1,9 @@
++
++obj-$(CONFIG_OF_UNITTEST) += of_unittest.o
++of_unittest-objs := unittest.o testcases.dtb.o
++
++targets += testcases.dtb testcases.dtb.S
++
++.SECONDARY: \
++	$(obj)/testcases.dtb.S \
++	$(obj)/testcases.dtb
