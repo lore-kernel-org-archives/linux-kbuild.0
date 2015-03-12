@@ -1,49 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cpsmtpb-ews05.kpnxchange.com ([213.75.39.8]:59601 "EHLO
-	cpsmtpb-ews05.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1753979AbbCLMlz (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 12 Mar 2015 08:41:55 -0400
-Message-ID: <1426164113.5304.54.camel@x220>
-Subject: Re: [PATCH] Kconfig: drop bogus default values
-From: Paul Bolle <pebolle@tiscali.nl>
-Date: Thu, 12 Mar 2015 13:41:53 +0100
-In-Reply-To: <5501966D0200007800068FFB@mail.emea.novell.com>
-References: <5500584D02000078000688F5@mail.emea.novell.com>
-	 <1426162307.5304.41.camel@x220>
-	 <5501966D0200007800068FFB@mail.emea.novell.com>
-Content-Type: text/plain; charset="UTF-8"
+Received: from mail.emea.novell.com ([130.57.118.101]:39521 "EHLO
+	mail.emea.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753900AbbCLMmV convert rfc822-to-8bit (ORCPT
+	<rfc822;groupwise-linux-kbuild@vger.kernel.org:4:1>);
+	Thu, 12 Mar 2015 08:42:21 -0400
+Message-Id: <550197BB020000780006900F@mail.emea.novell.com>
+Date: Thu, 12 Mar 2015 12:42:19 +0000
+From: "Jan Beulich" <JBeulich@suse.com>
+Subject: Re: [PATCH v3 0/3] kconfig: enhance parsing and operator
+ recognition
+References: <54BE5D52020000780005705C@mail.emea.novell.com>
+ <1426163664.5304.49.camel@x220>
+In-Reply-To: <1426163664.5304.49.camel@x220>
 Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8BIT
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jan Beulich <JBeulich@suse.com>
-Cc: akpm@linux-foundation.org, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Paul Bolle <pebolle@tiscali.nl>
+Cc: akpm@linux-foundation.org, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
-On Thu, 2015-03-12 at 12:36 +0000, Jan Beulich wrote:
-> >>> On 12.03.15 at 13:11, <pebolle@tiscali.nl> wrote:
-> > On Wed, 2015-03-11 at 13:59 +0000, Jan Beulich wrote:
-> >> Default "no" is pretty pointless for options without (visible) prompts:
-> > 
-> > Related: is there ever a situation where using "default n" or "def_bool
-> > n" makes sense (whether or not the entry has a prompt)? I think I once
-> > thought of one but I can't remember it at all, so I guess my memory is
-> > fooling me.
+>>> On 12.03.15 at 13:34, <pebolle@tiscali.nl> wrote:
+> On Tue, 2015-01-20 at 12:51 +0000, Jan Beulich wrote:
+>> 2: kconfig: don't silently ignore unhandled characters
+>> 3: kconfig: allow use of relations other than (in)equality
+>> 
+>> Signed-off-by: Jan Beulich <jbeulich@suse.com>
 > 
-> I can't see any, but since as long as there is a visible prompt this
-> doesn't have any other bad effect than bloating the Kconfig file
-> and making its parsing a tiny bit slower, I don't care that much
-> about those (originally I had started a patch removing those too,
-> but gave up after a while).
+> What's the status on 2: and 3:? Is everyone waiting on someone else to
+> do something? (One thing I remember is that Michal wanted the changes to
+> the _shipped files separately. Is that correct?)
 
-Well, unless someone comes up with a valid reason to add "default
-n" (and, again, I don't think what you ran into is a valid reason) we
-might instead bloat checkpatch.pl a bit by adding a warning for it. That
-should at least stop new instances from being added.
+Since I don't recall any requests for changes mandatory for any
+of this to be accepted, I didn't plan on re-submitting unless other
+changes would require the patches to be refreshed in non-trivial
+ways.
 
-I wonder whether Michal knows of a valid reason to use "default n"? What
-are Jan and I missing here?
+> For my part I still think 2: should go in.
+> 
+> And for 3: I would like to see related changes to Kconfig files
+> submitted too. But, of course, whether that is actually needed is mostly
+> Michal's call.
 
+Not sure what related changes to refer to. As it stands, there is
+at least one use already in the tree that this change fixes, so I
+didn't think there was an immediate further need for actual uses
+thereof. And of course I'm hesitant to invest work in using these
+new capabilities elsewhere when I can't be certain the base
+changes are going to be accepted.
 
-Paul Bolle
+Jan
 
