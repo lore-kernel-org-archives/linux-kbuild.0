@@ -1,49 +1,32 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from sessmg22.ericsson.net ([193.180.251.58]:54448 "EHLO
-	sessmg22.ericsson.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753897AbbCLObU (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 12 Mar 2015 10:31:20 -0400
-Date: Thu, 12 Mar 2015 15:13:01 +0100
-From: Erik Hugne <erik.hugne@ericsson.com>
+Received: from mout.web.de ([212.227.15.3]:59180 "EHLO mout.web.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754294AbbCLPOZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 12 Mar 2015 11:14:25 -0400
+From: Martin Walch <walch.martin@web.de>
 Subject: Re: [PATCH] net:Kconfig: drop no sense dependence entry for BONDING
-Message-ID: <20150312141301.GM306@haze>
+Date: Thu, 12 Mar 2015 16:14:15 +0100
+Message-ID: <5969250.CkvXFhddBO@tacticalops>
+In-Reply-To: <20150312135933.GA3502@udknight>
 References: <20150312135933.GA3502@udknight>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20150312135933.GA3502@udknight>
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Wang YanQing <udknight@gmail.com>, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, j.vosburgh@gmail.com, vfalico@gmail.com, gospo@cumulusnetworks.com
+To: Wang YanQing <udknight@gmail.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, j.vosburgh@gmail.com, vfalico@gmail.com, gospo@cumulusnetworks.com, Erik Hugne <erik.hugne@ericsson.com>
 
-On Thu, Mar 12, 2015 at 09:59:33PM +0800, Wang YanQing wrote:
+On Thursday 12 March 2015 21:59:33 Wang YanQing wrote:
 > "IPV6 || IPV6=n" means no dependence!
 
-Wow, this is all over the place..
-find . -name 'Kconfig' | xargs grep 'depends on' |grep 'IPV6 || IPV6=n'
+IPV6 and BONDING are both tristate symbols and therefore this is not the same
+as no dependency. When setting IPV6 to m, the expression evaluates to
 
-> 
-> Signed-off-by: Wang YanQing <udknight@gmail.com>
-> ---
->  drivers/net/Kconfig | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
-> index df51d60..37b364f 100644
-> --- a/drivers/net/Kconfig
-> +++ b/drivers/net/Kconfig
-> @@ -40,7 +40,6 @@ if NET_CORE
->  config BONDING
->  	tristate "Bonding driver support"
->  	depends on INET
-> -	depends on IPV6 || IPV6=n
->  	---help---
->  	  Say 'Y' or 'M' if you wish to be able to 'bond' multiple Ethernet
->  	  Channels together. This is called 'Etherchannel' by Cisco,
-> -- 
-> 2.2.2.dirty
-> --
-> To unsubscribe from this list: send the line "unsubscribe netdev" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+"IPV6 || IPV6=n" 
+"m || m=n"
+"m || n"
+"m"
+
+So, if IPV6=m, then BONDING can only be n or m, but not y.
+
