@@ -1,39 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pd0-f182.google.com ([209.85.192.182]:45053 "EHLO
-	mail-pd0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753788AbbCLN75 (ORCPT
+Received: from sessmg22.ericsson.net ([193.180.251.58]:54448 "EHLO
+	sessmg22.ericsson.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753897AbbCLObU (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 12 Mar 2015 09:59:57 -0400
-Date: Thu, 12 Mar 2015 21:59:33 +0800
-From: Wang YanQing <udknight@gmail.com>
-Subject: [PATCH] net:Kconfig: drop no sense dependence entry for BONDING
-Message-ID: <20150312135933.GA3502@udknight>
+	Thu, 12 Mar 2015 10:31:20 -0400
+Date: Thu, 12 Mar 2015 15:13:01 +0100
+From: Erik Hugne <erik.hugne@ericsson.com>
+Subject: Re: [PATCH] net:Kconfig: drop no sense dependence entry for BONDING
+Message-ID: <20150312141301.GM306@haze>
+References: <20150312135933.GA3502@udknight>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
+In-Reply-To: <20150312135933.GA3502@udknight>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, j.vosburgh@gmail.com, vfalico@gmail.com, gospo@cumulusnetworks.com
+To: Wang YanQing <udknight@gmail.com>, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, j.vosburgh@gmail.com, vfalico@gmail.com, gospo@cumulusnetworks.com
 
-"IPV6 || IPV6=n" means no dependence!
+On Thu, Mar 12, 2015 at 09:59:33PM +0800, Wang YanQing wrote:
+> "IPV6 || IPV6=n" means no dependence!
 
-Signed-off-by: Wang YanQing <udknight@gmail.com>
----
- drivers/net/Kconfig | 1 -
- 1 file changed, 1 deletion(-)
+Wow, this is all over the place..
+find . -name 'Kconfig' | xargs grep 'depends on' |grep 'IPV6 || IPV6=n'
 
-diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
-index df51d60..37b364f 100644
---- a/drivers/net/Kconfig
-+++ b/drivers/net/Kconfig
-@@ -40,7 +40,6 @@ if NET_CORE
- config BONDING
- 	tristate "Bonding driver support"
- 	depends on INET
--	depends on IPV6 || IPV6=n
- 	---help---
- 	  Say 'Y' or 'M' if you wish to be able to 'bond' multiple Ethernet
- 	  Channels together. This is called 'Etherchannel' by Cisco,
--- 
-2.2.2.dirty
+> 
+> Signed-off-by: Wang YanQing <udknight@gmail.com>
+> ---
+>  drivers/net/Kconfig | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
+> index df51d60..37b364f 100644
+> --- a/drivers/net/Kconfig
+> +++ b/drivers/net/Kconfig
+> @@ -40,7 +40,6 @@ if NET_CORE
+>  config BONDING
+>  	tristate "Bonding driver support"
+>  	depends on INET
+> -	depends on IPV6 || IPV6=n
+>  	---help---
+>  	  Say 'Y' or 'M' if you wish to be able to 'bond' multiple Ethernet
+>  	  Channels together. This is called 'Etherchannel' by Cisco,
+> -- 
+> 2.2.2.dirty
+> --
+> To unsubscribe from this list: send the line "unsubscribe netdev" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
