@@ -1,54 +1,101 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.emea.novell.com ([130.57.118.101]:39521 "EHLO
-	mail.emea.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753900AbbCLMmV convert rfc822-to-8bit (ORCPT
-	<rfc822;groupwise-linux-kbuild@vger.kernel.org:4:1>);
-	Thu, 12 Mar 2015 08:42:21 -0400
-Message-Id: <550197BB020000780006900F@mail.emea.novell.com>
-Date: Thu, 12 Mar 2015 12:42:19 +0000
-From: "Jan Beulich" <JBeulich@suse.com>
-Subject: Re: [PATCH v3 0/3] kconfig: enhance parsing and operator
- recognition
-References: <54BE5D52020000780005705C@mail.emea.novell.com>
- <1426163664.5304.49.camel@x220>
-In-Reply-To: <1426163664.5304.49.camel@x220>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8BIT
-Content-Disposition: inline
+Received: from mail-pa0-f41.google.com ([209.85.220.41]:39001 "EHLO
+	mail-pa0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754113AbbCLNQA (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 12 Mar 2015 09:16:00 -0400
+Message-ID: <5501918D.2020000@gmail.com>
+Date: Thu, 12 Mar 2015 06:15:57 -0700
+From: Frank Rowand <frowand.list@gmail.com>
+Reply-To: frowand.list@gmail.com
+MIME-Version: 1.0
+Subject: [Patch v3 1/3] dt: OF_UNITTEST make dependency broken, framework
+ fixes
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Paul Bolle <pebolle@tiscali.nl>
-Cc: akpm@linux-foundation.org, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+To: Grant Likely <grant.likely@linaro.org>, Rob Herring <robh+dt@kernel.org>, Michal Marek <mmarek@suse.cz>, Linux Kernel list <linux-kernel@vger.kernel.org>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, linux-kbuild@vger.kernel.org
 
->>> On 12.03.15 at 13:34, <pebolle@tiscali.nl> wrote:
-> On Tue, 2015-01-20 at 12:51 +0000, Jan Beulich wrote:
->> 2: kconfig: don't silently ignore unhandled characters
->> 3: kconfig: allow use of relations other than (in)equality
->> 
->> Signed-off-by: Jan Beulich <jbeulich@suse.com>
-> 
-> What's the status on 2: and 3:? Is everyone waiting on someone else to
-> do something? (One thing I remember is that Michal wanted the changes to
-> the _shipped files separately. Is that correct?)
+From: Frank Rowand <frank.rowand@sonymobile.com>
 
-Since I don't recall any requests for changes mandatory for any
-of this to be accepted, I didn't plan on re-submitting unless other
-changes would require the patches to be refreshed in non-trivial
-ways.
+This 3 patch series is not bisectable.  If CONFIG_OF_UNITTEST=y then the kernel
+will not build with just patch 1 or just patches 1 and 2 applied.
 
-> For my part I still think 2: should go in.
-> 
-> And for 3: I would like to see related changes to Kconfig files
-> submitted too. But, of course, whether that is actually needed is mostly
-> Michal's call.
+If CONFIG_OF_UNITTEST=y then a kernel image make will always cause .version to
+be incremented, even if there are not source changes.  This is caused by
+a lack of dependency tracking and checking for
+drivers/of/unittest-data/testcases.dtb.o.  Fixing the problem was made more
+complicated by the fact that testcases.dtb.o was linked into ../of_unittest.o.
 
-Not sure what related changes to refer to. As it stands, there is
-at least one use already in the tree that this change fixes, so I
-didn't think there was an immediate further need for actual uses
-thereof. And of course I'm hesitant to invest work in using these
-new capabilities elsewhere when I can't be certain the base
-changes are going to be accepted.
+Patch 1 modifies makefiles to move of_unittest.c into unittest-data/ and
+creates missing dependency tracking for testcases.dtb.o.
 
-Jan
+Patch 2 will move of_unittest.c into unittest-data/
 
+Patch 3 will fix an of_unittest.c include path to account for the move.
+
+Signed-off-by: Frank Rowand <frank.rowand@sonymobile.com>
+
+---
+
+changes since version 2:
+
+  patch 1:
+  Add .gitignore so that generated files will not get committed.
+
+changes since version 1:
+
+  patch 1:
+  Remove some changes to scripts/Makefile.lib that are not needed.  They
+  were left over from attempts to fix the problem without moving of_unitest.c
+  into unittest-data/.
+
+
+ drivers/of/Makefile                 |    4 ++--
+ drivers/of/unittest-data/.gitignore |    2 ++
+ drivers/of/unittest-data/Makefile   |    9 +++++++++
+ 3 files changed, 13 insertions(+), 2 deletions(-)
+
+Index: b/drivers/of/Makefile
+===================================================================
+--- a/drivers/of/Makefile
++++ b/drivers/of/Makefile
+@@ -6,8 +6,6 @@ obj-$(CONFIG_OF_PROMTREE) += pdt.o
+ obj-$(CONFIG_OF_ADDRESS)  += address.o
+ obj-$(CONFIG_OF_IRQ)    += irq.o
+ obj-$(CONFIG_OF_NET)	+= of_net.o
+-obj-$(CONFIG_OF_UNITTEST) += of_unittest.o
+-of_unittest-objs := unittest.o unittest-data/testcases.dtb.o
+ obj-$(CONFIG_OF_MDIO)	+= of_mdio.o
+ obj-$(CONFIG_OF_PCI)	+= of_pci.o
+ obj-$(CONFIG_OF_PCI_IRQ)  += of_pci_irq.o
+@@ -16,5 +14,7 @@ obj-$(CONFIG_OF_RESERVED_MEM) += of_rese
+ obj-$(CONFIG_OF_RESOLVE)  += resolver.o
+ obj-$(CONFIG_OF_OVERLAY) += overlay.o
+ 
++obj-$(CONFIG_OF_UNITTEST) += unittest-data/
++
+ CFLAGS_fdt.o = -I$(src)/../../scripts/dtc/libfdt
+ CFLAGS_fdt_address.o = -I$(src)/../../scripts/dtc/libfdt
+Index: b/drivers/of/unittest-data/Makefile
+===================================================================
+--- /dev/null
++++ b/drivers/of/unittest-data/Makefile
+@@ -0,0 +1,9 @@
++
++obj-$(CONFIG_OF_UNITTEST) += of_unittest.o
++of_unittest-objs := unittest.o testcases.dtb.o
++
++targets += testcases.dtb testcases.dtb.S
++
++.SECONDARY: \
++	$(obj)/testcases.dtb.S \
++	$(obj)/testcases.dtb
+Index: b/drivers/of/unittest-data/.gitignore
+===================================================================
+--- /dev/null
++++ b/drivers/of/unittest-data/.gitignore
+@@ -0,0 +1,2 @@
++testcases.dtb
++testcases.dtb.S
