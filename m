@@ -1,57 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cpsmtpb-ews09.kpnxchange.com ([213.75.39.14]:60229 "EHLO
-	cpsmtpb-ews09.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1753985AbbCLMe0 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 12 Mar 2015 08:34:26 -0400
-Message-ID: <1426163664.5304.49.camel@x220>
-Subject: Re: [PATCH v3 0/3] kconfig: enhance parsing and operator recognition
-From: Paul Bolle <pebolle@tiscali.nl>
-Date: Thu, 12 Mar 2015 13:34:24 +0100
-In-Reply-To: <54BE5D52020000780005705C@mail.emea.novell.com>
-References: <54BE5D52020000780005705C@mail.emea.novell.com>
-Content-Type: text/plain; charset="UTF-8"
+Received: from mail.emea.novell.com ([130.57.118.101]:59287 "EHLO
+	mail.emea.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754423AbbCLMgr convert rfc822-to-8bit (ORCPT
+	<rfc822;groupwise-linux-kbuild@vger.kernel.org:4:1>);
+	Thu, 12 Mar 2015 08:36:47 -0400
+Message-Id: <5501966D0200007800068FFB@mail.emea.novell.com>
+Date: Thu, 12 Mar 2015 12:36:45 +0000
+From: "Jan Beulich" <JBeulich@suse.com>
+Subject: Re: [PATCH] Kconfig: drop bogus default values
+References: <5500584D02000078000688F5@mail.emea.novell.com>
+ <1426162307.5304.41.camel@x220>
+In-Reply-To: <1426162307.5304.41.camel@x220>
 Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8BIT
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jan Beulich <JBeulich@suse.com>
-Cc: linux-kbuild@vger.kernel.org, akpm@linux-foundation.org, Michal Marek <mmarek@suse.cz>
+To: Paul Bolle <pebolle@tiscali.nl>
+Cc: akpm@linux-foundation.org, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Tue, 2015-01-20 at 12:51 +0000, Jan Beulich wrote:
-> There being at least one case (DEBUG_UART_8250_WORD in
-> arch/arm/Kconfig.debug) where the utility silently behaves other than
-> what the programmer expects tells us that (a) we shouldn't silently
-> ignore unrecognized characters and (b) it's not just me always having
-> wanted to be able to use comparisons other than (in)equality ones.
+>>> On 12.03.15 at 13:11, <pebolle@tiscali.nl> wrote:
+> On Wed, 2015-03-11 at 13:59 +0000, Jan Beulich wrote:
+>> Default "no" is pretty pointless for options without (visible) prompts:
 > 
-> 1: trivial: sound/soc/intel/Kconfig: use single backslash for line continuation
+> Related: is there ever a situation where using "default n" or "def_bool
+> n" makes sense (whether or not the entry has a prompt)? I think I once
+> thought of one but I can't remember it at all, so I guess my memory is
+> fooling me.
 
-This turned out to be already fixed by commit 34084a436703 ("ASoC:
-intel: Remove superfluous backslash in Kconfig"), which was added in
-v4.0-rc1.
+I can't see any, but since as long as there is a visible prompt this
+doesn't have any other bad effect than bloating the Kconfig file
+and making its parsing a tiny bit slower, I don't care that much
+about those (originally I had started a patch removing those too,
+but gave up after a while).
 
-> 2: kconfig: don't silently ignore unhandled characters
-> 3: kconfig: allow use of relations other than (in)equality
-> 
-> Signed-off-by: Jan Beulich <jbeulich@suse.com>
+Jan
 
-What's the status on 2: and 3:? Is everyone waiting on someone else to
-do something? (One thing I remember is that Michal wanted the changes to
-the _shipped files separately. Is that correct?)
-
-For my part I still think 2: should go in.
-
-And for 3: I would like to see related changes to Kconfig files
-submitted too. But, of course, whether that is actually needed is mostly
-Michal's call.
-
-> v3: Split off sound/soc/intel/Kconfig change from patch 1 (now 2).
-> v2: printf() -> fprintf(stderr, ) upon Paul Bolle's request. Replace
->     two instances of double backslash line continuations with single
->     ones in sound/soc/intel/Kconfig. Drop stray debugging printf()s
->     from patch 2.
-
-
-Paul Bolle
 
