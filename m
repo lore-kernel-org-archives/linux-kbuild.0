@@ -1,46 +1,29 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:45370 "EHLO mx2.suse.de"
+Received: from smtp3.ono.com ([62.42.230.163]:11389 "EHLO smtp3.ono.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751857AbbCLIVS (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 12 Mar 2015 04:21:18 -0400
-Message-ID: <55014B9F.3060602@suse.cz>
-Date: Thu, 12 Mar 2015 09:17:35 +0100
-From: Michal Marek <mmarek@suse.cz>
+	id S1751762AbbCLMGE (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 12 Mar 2015 08:06:04 -0400
+Message-ID: <13666170.126121426160977904.JavaMail.defaultUser@defaultHost>
+Date: Thu, 12 Mar 2015 12:49:37 +0100 (CET)
+From: "pepa6.es@ono.com" <pepa6.es@ono.com>
+Reply-To: pepa6.es@ono.com
+Subject: 
 MIME-Version: 1.0
-Subject: Re: Question: "genksyms: Track changes to enum constants" doesn't
- work
-References: <54FFC37C.8030505@huawei.com>
-In-Reply-To: <54FFC37C.8030505@huawei.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain;charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: shengyong <shengyong1@huawei.com>
-Cc: linux-kbuild@vger.kernel.org, sam@ravnborg.org
 
-Dne 11.3.2015 v 05:24 shengyong napsal(a):
-> Hi, Michal Marek
-> 
-> The commit e37ddb8250 ("genksyms: Track changes to enum constants") helps to changes the
-> checksum of export symbol if an enum is changed. I test this agains linux-next, but it
-> seems that it does not work well.
-> 
-> 	#include <linux/module.h>
-> 	#include <linux/kernel.h>
-> 	#include <linux/init.h>
-> 
-> 	enum a {
-> 		E1,
-> 		E2,
-> 		E_MAX
-> 	};
-> 
-> 	struct s {
-> 		int a[E_MAX];
-> 	};
+Proposal,
 
-What you are seeing is the effect of commit 2c5925d ("genksyms: Do not
-expand internal types"). You need to move the type definitions to a
-header for these to be considered by genksyms.
+Respond to my personal email;  mrs.zhangxiao1962@outlook.
+com 
 
-Michal
+
+Yours Sincerely.
+Mrs. Zhang Xiao (Accounts book Keeper)
+Angang 
+Steel Company Limited
+396 Nan Zhong Hua Lu, Tie Dong District Anshan, 
+Liaoning 114021, China.
+
