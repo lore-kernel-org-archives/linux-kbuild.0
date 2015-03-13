@@ -1,64 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg009.nifty.com ([202.248.44.35]:57775 "EHLO
-	conuserg009-v.nifty.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751941AbbCMGW1 (ORCPT
+Received: from relay5-d.mail.gandi.net ([217.70.183.197]:46567 "EHLO
+	relay5-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751124AbbCMI1Z (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 13 Mar 2015 02:22:27 -0400
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 5/6] merge_config.sh: rename MAKE to RUNMAKE
-Date: Fri, 13 Mar 2015 15:21:42 +0900
-Message-Id: <1426227703-31815-6-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1426227703-31815-1-git-send-email-yamada.masahiro@socionext.com>
+	Fri, 13 Mar 2015 04:27:25 -0400
+Date: Fri, 13 Mar 2015 01:27:16 -0700
+From: Josh Triplett <josh@joshtriplett.org>
+Subject: Re: [PATCH 0/6] kbuild: mergeconfig: fix bugs, improve readability,
+ and add generic entry point
+Message-ID: <20150313082716.GA11052@thin>
 References: <1426227703-31815-1-git-send-email-yamada.masahiro@socionext.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1426227703-31815-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Josh Boyer <jwboyer@redhat.com>, Darren Hart <dvhart@linux.intel.com>, john stultz <johnstul@us.ibm.com>, Michal Marek <mmarek@suse.cz>, Josh Triplett <josh@joshtriplett.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org, "Yann E. MORIN" <yann.morin.1998@free.fr>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-kbuild@vger.kernel.org, Josh Boyer <jwboyer@redhat.com>, Darren Hart <dvhart@linux.intel.com>, john stultz <johnstul@us.ibm.com>, Michal Marek <mmarek@suse.cz>, linux-kernel@vger.kernel.org, "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-The variable "MAKE" is used to store the command name that has
-invoked the Makefile.  (Actually, it is already set to "make"
-if you run this script from a Makefile.)
+On Fri, Mar 13, 2015 at 03:21:37PM +0900, Masahiro Yamada wrote:
+> 
+> This series is related to mergeconfig (scripts/kconfig/merge_config.sh):
+> 
+> 1/6 and 2/6 fix bugs related to the parallel build. (-j option).
+> 3/6 thru 5/6 are minor clean-ups.
+> 6/6 is a new feature; add a generic entry point of mergeconfig.
+> 
+> The last one is RFC.
+> 
+> Masahiro Yamada (6):
+>   kbuild: mergeconfig: fix "jobserver unavailable" warning
+>   kbuild: mergeconfig: move an error check to merge_config.sh
+>   kbuild: mergeconfig: remove redundant $(objtree)
+>   merge_config.sh: improve indentation
+>   merge_config.sh: rename MAKE to RUNMAKE
+>   kbuild: add generic mergeconfig target, %.config
 
-In this script, however, it is used to determine if Make should be
-run or not.  It is not what we usually expect.
+For all six:
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
-
- scripts/kconfig/merge_config.sh | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/scripts/kconfig/merge_config.sh b/scripts/kconfig/merge_config.sh
-index 56584b1..ec8e203 100755
---- a/scripts/kconfig/merge_config.sh
-+++ b/scripts/kconfig/merge_config.sh
-@@ -35,7 +35,7 @@ usage() {
- 	echo "  -O    dir to put generated output files"
- }
- 
--MAKE=true
-+RUNMAKE=true
- ALLTARGET=alldefconfig
- WARNREDUN=false
- OUTPUT=.
-@@ -48,7 +48,7 @@ while true; do
- 		continue
- 		;;
- 	"-m")
--		MAKE=false
-+		RUNMAKE=false
- 		shift
- 		continue
- 		;;
-@@ -119,7 +119,7 @@ for MERGE_FILE in $MERGE_LIST ; do
- 	cat $MERGE_FILE >> $TMP_FILE
- done
- 
--if [ "$MAKE" = "false" ]; then
-+if [ "$RUNMAKE" = "false" ]; then
- 	cp $TMP_FILE $OUTPUT/.config
- 	echo "#"
- 	echo "# merged configuration written to $OUTPUT/.config (needs make)"
--- 
-1.9.1
-
+Reviewed-by: Josh Triplett <josh@joshtriplett.org>
