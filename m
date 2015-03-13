@@ -1,152 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from condef005-v.nifty.com ([210.131.4.242]:55096 "EHLO
-	condef005-v.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750853AbbCMFAn (ORCPT
+Received: from conuserg009.nifty.com ([202.248.44.35]:57526 "EHLO
+	conuserg009-v.nifty.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751803AbbCMGWW (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 13 Mar 2015 01:00:43 -0400
-MIME-Version: 1.0
-In-Reply-To: <20150311100101.GA30787@sepie.suse.cz>
-References: <15447.1425431256@turing-police.cc.vt.edu>
-	<CA+55aFx368q6kAuNV_7zskFdyh2yxYfpm77Yak5WQiexin_d9A@mail.gmail.com>
-	<20150311100101.GA30787@sepie.suse.cz>
-Date: Fri, 13 Mar 2015 13:59:48 +0900
-Message-ID: <CAK7LNASH7oTCcNbyt_D+aaNuG+UFb8MXLUHBMWtW+ZcjmFsnjw@mail.gmail.com>
-Subject: Re: [RFC PATCH] Don't reset timestamps in include/generated if not needed
+	Fri, 13 Mar 2015 02:22:22 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Content-Type: text/plain; charset=UTF-8
+Subject: [PATCH 1/6] kbuild: mergeconfig: fix "jobserver unavailable" warning
+Date: Fri, 13 Mar 2015 15:21:38 +0900
+Message-Id: <1426227703-31815-2-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1426227703-31815-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1426227703-31815-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, Valdis Kletnieks <Valdis.Kletnieks@vt.edu>, Andrew Morton <akpm@linux-foundation.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Josh Boyer <jwboyer@redhat.com>, Darren Hart <dvhart@linux.intel.com>, john stultz <johnstul@us.ibm.com>, Michal Marek <mmarek@suse.cz>, Josh Triplett <josh@joshtriplett.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org, "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-Hi.
+If "make kvmconfig" is run with "-j" option, a warning message,
+"jobserver unavailable: using -j1.  Add `+' to parent make rule.",
+is displayed.
 
+  $ make -s defconfig
+  *** Default configuration is based on 'x86_64_defconfig'
+  #
+  # configuration written to .config
+  #
+  $ make -j8 kvmconfig
+  Using ./.config as base
+  Merging ./arch/x86/configs/kvm_guest.config
+    [ snip ]
+  #
+  # merged configuration written to ./.config (needs make)
+  #
+  make[2]: warning: jobserver unavailable: using -j1.  Add `+' to
+  parent make rule.
+  scripts/kconfig/conf --oldconfig Kconfig
+    [ snip ]
+  #
+  # configuration written to .config
+  #
 
-2015-03-11 19:01 GMT+09:00 Michal Marek <mmarek@suse.cz>:
-> On Sun, Mar 08, 2015 at 04:08:06PM -0700, Linus Torvalds wrote:
->> On Tue, Mar 3, 2015 at 5:07 PM, Valdis Kletnieks
->> <Valdis.Kletnieks@vt.edu> wrote:
->> >
->> > Kbuild regenerates bounds.h and asm-offsets.h, resetting the timestamps
->> > and forcing rebuilds even if the contents haven't changed.  Add a bit of
->> > shell magic to only replace the file if the contents have in fact changed,
->> > which should speed up git bisects and similar.
->> > ...
->> > RFC because I can't wrap my head around why this wasn't done ages ago.
->> > If I'm missing something something obvious, please apply a cluestick. :)
->
-> We do not regenerate the files *always*, but only if bounds.c /
-> asm-offsets.c or one of the headers they include change.  So the rule is
-> not any worse than the rule for compiling a regular .c file into an .o
-> file. You can use ccache to avoid repeated rebuilds.
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
-Right.
+ scripts/kconfig/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> However, I can see that especially bounds.h ends up being included in
-> many places, so cutting its dependencies helps in some cases.
-
-Agreed.
-
->
->> > Lightly tested - if I rm one of those two files, it gets rebuilt. If I
->> > insert some whitespace, it gets replaced. If I don't touch it, the datestamp
->> > doesn't change.
->>
->> I don't think this is wrong, but I'd really prefer to do the whole
->> move-if-changed thing as a separate rule, and a separate command.
->>
->> IOW, could we please have something that generates the "build.h" file
->> by separately creating a new temporary file, and then having the
->> traditional kind of move-if-changed definition
->>
->>    define move-if-changed
->>         if ! cmp -s $(1) $(2); then mv -f $(1) $(2); else rm -f $(1); fi
->>    endef
->
-> We already have it and it is called "filechk." Valdis, can you check if
-> the below patch works equally well for you?
-
-
-This looks almost nice, but a few comments below.
-
-
-
-> diff --git a/Kbuild b/Kbuild
-> index ab8ded9..47d0630 100644
-> --- a/Kbuild
-> +++ b/Kbuild
-> @@ -13,8 +13,9 @@ define sed-y
->         s:->::; p;}"
->  endef
->
-> -quiet_cmd_offsets = GEN     $@
-> -define cmd_offsets
-> +# Use filechk to avoid rebuilds when a header changes, but the resulting file
-> +# does not
-> +define filechk_offsets
->         (set -e; \
->          echo "#ifndef $2"; \
->          echo "#define $2"; \
-> @@ -24,9 +25,9 @@ define cmd_offsets
->          echo " * This file was generated by Kbuild"; \
->          echo " */"; \
->          echo ""; \
-> -        sed -ne $(sed-y) $<; \
-> +        sed -ne $(sed-y); \
->          echo ""; \
-> -        echo "#endif" ) > $@
-> +        echo "#endif" )
->  endef
->
->  #####
-> @@ -44,7 +45,7 @@ kernel/bounds.s: kernel/bounds.c FORCE
->
->  $(obj)/$(bounds-file): kernel/bounds.s Kbuild
-
-You are checking the resulting file content,
-so the dependency on "Kbuild" is not necessary.
-
-Instead, you need to add "FORCE" so that this rule is always invoked.
-
-
-
->         $(Q)mkdir -p $(dir $@)
-
-You can drop this line because filechk automatically creates the
-output directory.
-
-
-
-> -       $(call cmd,offsets,__LINUX_BOUNDS_H__)
-> +       $(call filechk,offsets,__LINUX_BOUNDS_H__)
-
-
-
-
-To sum up, I want this part to look like this:
-
-$(obj)/$(offsets-file): arch/$(SRCARCH)/kernel/asm-offsets.s FORCE
-        $(call cmd,filechk,__ASM_OFFSETS_H__)
-
-
-
-
-
->  #####
->  # 2) Generate asm-offsets.h
-> @@ -63,7 +64,7 @@ arch/$(SRCARCH)/kernel/asm-offsets.s: arch/$(SRCARCH)/kernel/asm-offsets.c \
->         $(call if_changed_dep,cc_s_c)
->
->  $(obj)/$(offsets-file): arch/$(SRCARCH)/kernel/asm-offsets.s Kbuild
-> -       $(call cmd,offsets,__ASM_OFFSETS_H__)
-> +       $(call filechk,offsets,__ASM_OFFSETS_H__)
-
-
-Ditto.
-
-
-
-
+diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+index 9645c07..fc34f46 100644
+--- a/scripts/kconfig/Makefile
++++ b/scripts/kconfig/Makefile
+@@ -110,7 +110,7 @@ define mergeconfig
+ $(if $(wildcard $(objtree)/.config),, $(error You need an existing .config for this target))
+ $(if $(call configfiles,$(1)),, $(error No configuration exists for this target on this architecture))
+ $(Q)$(CONFIG_SHELL) $(srctree)/scripts/kconfig/merge_config.sh -m -O $(objtree) $(objtree)/.config $(call configfiles,$(1))
+-$(Q)yes "" | $(MAKE) -f $(srctree)/Makefile oldconfig
+++$(Q)yes "" | $(MAKE) -f $(srctree)/Makefile oldconfig
+ endef
+ 
+ PHONY += kvmconfig
 -- 
-Best Regards
-Masahiro Yamada
+1.9.1
+
