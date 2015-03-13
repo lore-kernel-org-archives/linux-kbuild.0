@@ -1,56 +1,152 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from asavdk3.altibox.net ([109.247.116.14]:47874 "EHLO
-	asavdk3.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753043AbbCLS4u (ORCPT
+Received: from condef005-v.nifty.com ([210.131.4.242]:55096 "EHLO
+	condef005-v.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750853AbbCMFAn (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 12 Mar 2015 14:56:50 -0400
-Date: Thu, 12 Mar 2015 19:51:29 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH] Kconfig: drop bogus default values
-Message-ID: <20150312185128.GB22552@ravnborg.org>
-References: <5500584D02000078000688F5@mail.emea.novell.com>
- <1426162307.5304.41.camel@x220>
- <5501966D0200007800068FFB@mail.emea.novell.com>
- <1426164113.5304.54.camel@x220>
+	Fri, 13 Mar 2015 01:00:43 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1426164113.5304.54.camel@x220>
+In-Reply-To: <20150311100101.GA30787@sepie.suse.cz>
+References: <15447.1425431256@turing-police.cc.vt.edu>
+	<CA+55aFx368q6kAuNV_7zskFdyh2yxYfpm77Yak5WQiexin_d9A@mail.gmail.com>
+	<20150311100101.GA30787@sepie.suse.cz>
+Date: Fri, 13 Mar 2015 13:59:48 +0900
+Message-ID: <CAK7LNASH7oTCcNbyt_D+aaNuG+UFb8MXLUHBMWtW+ZcjmFsnjw@mail.gmail.com>
+Subject: Re: [RFC PATCH] Don't reset timestamps in include/generated if not needed
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Paul Bolle <pebolle@tiscali.nl>
-Cc: Jan Beulich <JBeulich@suse.com>, akpm@linux-foundation.org, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, Valdis Kletnieks <Valdis.Kletnieks@vt.edu>, Andrew Morton <akpm@linux-foundation.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Thu, Mar 12, 2015 at 01:41:53PM +0100, Paul Bolle wrote:
-> On Thu, 2015-03-12 at 12:36 +0000, Jan Beulich wrote:
-> > >>> On 12.03.15 at 13:11, <pebolle@tiscali.nl> wrote:
-> > > On Wed, 2015-03-11 at 13:59 +0000, Jan Beulich wrote:
-> > >> Default "no" is pretty pointless for options without (visible) prompts:
-> > > 
-> > > Related: is there ever a situation where using "default n" or "def_bool
-> > > n" makes sense (whether or not the entry has a prompt)? I think I once
-> > > thought of one but I can't remember it at all, so I guess my memory is
-> > > fooling me.
-> > 
-> > I can't see any, but since as long as there is a visible prompt this
-> > doesn't have any other bad effect than bloating the Kconfig file
-> > and making its parsing a tiny bit slower, I don't care that much
-> > about those (originally I had started a patch removing those too,
-> > but gave up after a while).
-> 
-> Well, unless someone comes up with a valid reason to add "default
-> n" (and, again, I don't think what you ran into is a valid reason) we
-> might instead bloat checkpatch.pl a bit by adding a warning for it. That
-> should at least stop new instances from being added.
-> 
-> I wonder whether Michal knows of a valid reason to use "default n"? What
-> are Jan and I missing here?
-I for one cannot figure out a reason right now.
-And if we want a warning then kconfig could be extended to
-warn on this case - this is better than checkpatch.
-This mandates that all existing uses are fixed first so we do not
-see a tons of warnings in existing code.
-But that should be a boring but trivial thing to do when the warning
-is in place.
+Hi.
 
-	Sam
+
+2015-03-11 19:01 GMT+09:00 Michal Marek <mmarek@suse.cz>:
+> On Sun, Mar 08, 2015 at 04:08:06PM -0700, Linus Torvalds wrote:
+>> On Tue, Mar 3, 2015 at 5:07 PM, Valdis Kletnieks
+>> <Valdis.Kletnieks@vt.edu> wrote:
+>> >
+>> > Kbuild regenerates bounds.h and asm-offsets.h, resetting the timestamps
+>> > and forcing rebuilds even if the contents haven't changed.  Add a bit of
+>> > shell magic to only replace the file if the contents have in fact changed,
+>> > which should speed up git bisects and similar.
+>> > ...
+>> > RFC because I can't wrap my head around why this wasn't done ages ago.
+>> > If I'm missing something something obvious, please apply a cluestick. :)
+>
+> We do not regenerate the files *always*, but only if bounds.c /
+> asm-offsets.c or one of the headers they include change.  So the rule is
+> not any worse than the rule for compiling a regular .c file into an .o
+> file. You can use ccache to avoid repeated rebuilds.
+
+Right.
+
+> However, I can see that especially bounds.h ends up being included in
+> many places, so cutting its dependencies helps in some cases.
+
+Agreed.
+
+>
+>> > Lightly tested - if I rm one of those two files, it gets rebuilt. If I
+>> > insert some whitespace, it gets replaced. If I don't touch it, the datestamp
+>> > doesn't change.
+>>
+>> I don't think this is wrong, but I'd really prefer to do the whole
+>> move-if-changed thing as a separate rule, and a separate command.
+>>
+>> IOW, could we please have something that generates the "build.h" file
+>> by separately creating a new temporary file, and then having the
+>> traditional kind of move-if-changed definition
+>>
+>>    define move-if-changed
+>>         if ! cmp -s $(1) $(2); then mv -f $(1) $(2); else rm -f $(1); fi
+>>    endef
+>
+> We already have it and it is called "filechk." Valdis, can you check if
+> the below patch works equally well for you?
+
+
+This looks almost nice, but a few comments below.
+
+
+
+> diff --git a/Kbuild b/Kbuild
+> index ab8ded9..47d0630 100644
+> --- a/Kbuild
+> +++ b/Kbuild
+> @@ -13,8 +13,9 @@ define sed-y
+>         s:->::; p;}"
+>  endef
+>
+> -quiet_cmd_offsets = GEN     $@
+> -define cmd_offsets
+> +# Use filechk to avoid rebuilds when a header changes, but the resulting file
+> +# does not
+> +define filechk_offsets
+>         (set -e; \
+>          echo "#ifndef $2"; \
+>          echo "#define $2"; \
+> @@ -24,9 +25,9 @@ define cmd_offsets
+>          echo " * This file was generated by Kbuild"; \
+>          echo " */"; \
+>          echo ""; \
+> -        sed -ne $(sed-y) $<; \
+> +        sed -ne $(sed-y); \
+>          echo ""; \
+> -        echo "#endif" ) > $@
+> +        echo "#endif" )
+>  endef
+>
+>  #####
+> @@ -44,7 +45,7 @@ kernel/bounds.s: kernel/bounds.c FORCE
+>
+>  $(obj)/$(bounds-file): kernel/bounds.s Kbuild
+
+You are checking the resulting file content,
+so the dependency on "Kbuild" is not necessary.
+
+Instead, you need to add "FORCE" so that this rule is always invoked.
+
+
+
+>         $(Q)mkdir -p $(dir $@)
+
+You can drop this line because filechk automatically creates the
+output directory.
+
+
+
+> -       $(call cmd,offsets,__LINUX_BOUNDS_H__)
+> +       $(call filechk,offsets,__LINUX_BOUNDS_H__)
+
+
+
+
+To sum up, I want this part to look like this:
+
+$(obj)/$(offsets-file): arch/$(SRCARCH)/kernel/asm-offsets.s FORCE
+        $(call cmd,filechk,__ASM_OFFSETS_H__)
+
+
+
+
+
+>  #####
+>  # 2) Generate asm-offsets.h
+> @@ -63,7 +64,7 @@ arch/$(SRCARCH)/kernel/asm-offsets.s: arch/$(SRCARCH)/kernel/asm-offsets.c \
+>         $(call if_changed_dep,cc_s_c)
+>
+>  $(obj)/$(offsets-file): arch/$(SRCARCH)/kernel/asm-offsets.s Kbuild
+> -       $(call cmd,offsets,__ASM_OFFSETS_H__)
+> +       $(call filechk,offsets,__ASM_OFFSETS_H__)
+
+
+Ditto.
+
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
