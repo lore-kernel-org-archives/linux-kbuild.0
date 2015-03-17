@@ -1,55 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lb0-f174.google.com ([209.85.217.174]:36710 "EHLO
-	mail-lb0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750950AbbCPIVE (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 16 Mar 2015 04:21:04 -0400
-From: Andrey Skvortsov <andrej.skvortzov@gmail.com>
-Subject: [PATCH] builddeb: fix stripped module signatures if CONFIG_DEBUG_INFO and CONFIG_MODULE_SIG_ALL are set
-Date: Mon, 16 Mar 2015 11:20:54 +0300
-Message-Id: <1426494054-32138-1-git-send-email-andrej.skvortzov@gmail.com>
+Received: from foss.arm.com ([217.140.101.70]:58560 "EHLO foss.arm.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753553AbbCQKd4 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 17 Mar 2015 06:33:56 -0400
+Date: Tue, 17 Mar 2015 10:33:51 +0000
+From: Will Deacon <will.deacon@arm.com>
+Subject: Re: [PATCH] kbuild: Create directory for target DTB
+Message-ID: <20150317103351.GC1839@arm.com>
+References: <eeaee5ea1dc1082db84c91567a9fe6260138512e.1425562715.git.michal.simek@xilinx.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <eeaee5ea1dc1082db84c91567a9fe6260138512e.1425562715.git.michal.simek@xilinx.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Ben Hutchings <ben@decadent.org.uk>
-Cc: Andrey Skvortsov <andrej.skvortzov@gmail.com>
+To: Michal Simek <michal.simek@xilinx.com>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "monstr@monstr.eu" <monstr@monstr.eu>, Zach Pfeffer <zachp@xilinx.com>, Nathan Rossi <nrossi@xilinx.com>, Arnd Bergmann <arnd@arndb.de>, Catalin Marinas <Catalin.Marinas@arm.com>, Nathan Rossi <nathan.rossi@xilinx.com>, Michal Marek <mmarek@suse.cz>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
 
-If CONFIG_MODULE_SIG_ALL is set, then user expects that all modules are
-automatically signed in the result package, as it's for rpm-pkg, binrpm-pkg,
-tar, tar-*. For deb-pkg this is correct only if CONFIG_DEBUG_INFO
-is NOT set. In that case deb-package contains signed modules.
+On Thu, Mar 05, 2015 at 01:38:41PM +0000, Michal Simek wrote:
+> From: Nathan Rossi <nathan.rossi@xilinx.com>
+> 
+> When building specific DTBs out of the kernel tree the vendor subdirs
+> (boot/dts/<vendor>) are not created, ensure that they are before
+> building the DTB.
+> 
+> Signed-off-by: Nathan Rossi <nathan.rossi@xilinx.com>
+> Signed-off-by: Michal Simek <michal.simek@xilinx.com>
+> ---
+> 
+> Problem is visible with arm64 for out of tree builds.
+> make O=/tmp/kkk/ defconfig
+> make O=/tmp/kkk/ cavium/thunder-88xx.dtb
+> 
+>   DTC     arch/arm64/boot/dts/cavium/thunder-88xx.dtb
+> cc1: fatal error: opening output file
+> arch/arm64/boot/dts/cavium/.thunder-88xx.dtb.dts.tmp: No such file or
+> directory
+> compilation terminated.
+> make[2]: *** [arch/arm64/boot/dts/cavium/thunder-88xx.dtb] Error 1
+> make[1]: *** [cavium/thunder-88xx.dtb] Error 2
+> 
+> Building specific dtb target on arm32 is working fine
+> make O=/tmp/kkk4/ multi_v7_defconfig
+> make O=/tmp/kkk4/ zynq-zc702.dtb
+> 
+> This is the way how Yocto is building dtb for specific target.
+> ---
+>  scripts/Makefile.lib | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+> index 044eb4f89a91..6e3356005ec4 100644
+> --- a/scripts/Makefile.lib
+> +++ b/scripts/Makefile.lib
+> @@ -282,7 +282,8 @@ $(obj)/%.dtb.S: $(obj)/%.dtb
+>  	$(call cmd,dt_S_dtb)
+>  
+>  quiet_cmd_dtc = DTC     $@
+> -cmd_dtc = $(CPP) $(dtc_cpp_flags) -x assembler-with-cpp -o $(dtc-tmp) $< ; \
+> +cmd_dtc = mkdir -p `dirname ${dtc-tmp}` ; \
 
-But if CONFIG_DEBUG_INFO is set, builddeb creates separate package with
-debug information. To do that, debug information from all modules
-is copied into separate files by objcopy. And loadable kernel modules are
-stripped afterwards. Stripping removes previously (during modules_install)
-added signatures from loadable kernel modules. Therefore final deb-package
-contains unsigned modules despite of set option CONFIG_MODULE_SIG_ALL.
+The backticks are fairly gross here, can you use something like $(dir
+${dtc-tmp}) instead?
 
-This patch resigns all stripped modules if CONFIG_MODULE_SIG_ALL is set
-to solve this problem.
-
-Signed-off-by: Andrey Skvortsov <andrej.skvortzov@gmail.com>
----
- scripts/package/builddeb |    6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index 88dbf23..977c4d7 100755
---- a/scripts/package/builddeb
-+++ b/scripts/package/builddeb
-@@ -162,6 +162,12 @@ if grep -q '^CONFIG_MODULES=y' $KCONFIG_CONFIG ; then
- 			# then add a link to those
- 			$OBJCOPY --add-gnu-debuglink=$dbg_dir/usr/lib/debug/$module $tmpdir/$module
- 		done
-+
-+                # resign stripped modules
-+                MODULE_SIG_ALL="$(grep -s '^CONFIG_MODULE_SIG_ALL=y' $KCONFIG_CONFIG || true)"
-+                if [ -n "$MODULE_SIG_ALL" ]; then
-+	            	INSTALL_MOD_PATH="$tmpdir" $MAKE KBUILD_SRC= modules_sign
-+                fi
- 	fi
- fi
- 
--- 
-1.7.10.4
-
+Will
