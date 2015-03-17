@@ -1,39 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:44244 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750958AbbCQU7Q (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 17 Mar 2015 16:59:16 -0400
-Message-ID: <550895A1.1000901@suse.cz>
-Date: Tue, 17 Mar 2015 21:59:13 +0100
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: [PATCH] scripts: fix link-vmlinux.sh bash-ism
-References: <20141229163456.GB27533@dhcppc1> <54A6BF7E.8070003@suse.cz> <20150303163453.GA21318@localhost.localdomain>
-In-Reply-To: <20150303163453.GA21318@localhost.localdomain>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Received: from mail-pa0-f51.google.com ([209.85.220.51]:33492 "EHLO
+	mail-pa0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752081AbbCQWhv (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 17 Mar 2015 18:37:51 -0400
+Received: by pabxg6 with SMTP id xg6so9459026pab.0
+        for <linux-kbuild@vger.kernel.org>; Tue, 17 Mar 2015 15:37:50 -0700 (PDT)
+From: Jonathan Toppins <jtoppins@cumulusnetworks.com>
+Subject: [PATCH v1 kbuild for-next 1/2] makefiles: add config option to force all cc warnings to errors
+Date: Tue, 17 Mar 2015 15:37:41 -0700
+Message-Id: <1426631862-19563-1-git-send-email-jtoppins@cumulusnetworks.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sylvain BERTRAND <sylvain.bertrand@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org
 
-Dne 3.3.2015 v 17:34 Sylvain BERTRAND napsal(a):
-> On Fri, Jan 02, 2015 at 04:55:42PM +0100, Michal Marek wrote:
->> On 2014-12-29 17:34, Sylvain BERTRAND wrote:
->>> Chocked while compiling linux with dash shell instead of bash shell.
->>> See:
->>> http://pubs.opengroup.org/onlinepubs/000095399/utilities/trap.html
->>
->> Please describe the actual problem in the changelog. I guess it's
->> because of the 'ERR' trap?
-> 
-> Indeed:
->  - ERR is specific to bash
->  - signal names in a trap built-in instruction should be without the SIG prefix
-> 
-> Shall I repost a v2 with the above lines?
+Add a Kconfig option to force cc warnings to errors. Also, to promote
+better code hygiene enable the configuration option by default to force
+authors to take some action. If for some reason a compilation unit
+cannot get rid of the error the author has the option to suppress the
+warning for that compile unit or module, see
+Documentation/kbuild/makefiles.txt for details.
 
-Sorry if I wasn't clear. The changelog should contain the actual error
-message or description of wrong behavior when ran under dash.
+Signed-off-by: Jonathan Toppins <jtoppins@cumulusnetworks.com>
+---
+ Makefile          |    4 ++++
+ lib/Kconfig.debug |   14 ++++++++++++++
+ 2 files changed, 18 insertions(+)
 
-Michal
+diff --git a/Makefile b/Makefile
+index abf7bb1..eb47733 100644
+--- a/Makefile
++++ b/Makefile
+@@ -764,6 +764,10 @@ ifdef CONFIG_DEBUG_SECTION_MISMATCH
+ KBUILD_CFLAGS += $(call cc-option, -fno-inline-functions-called-once)
+ endif
+ 
++ifdef CONFIG_DEBUG_FORCE_CC_WARNINGS_TO_ERRORS
++KBUILD_CFLAGS += $(call cc-option, -Werror)
++endif
++
+ # arch Makefile may override CC so keep this after arch Makefile is included
+ NOSTDINC_FLAGS += -nostdinc -isystem $(shell $(CC) -print-file-name=include)
+ CHECKFLAGS     += $(NOSTDINC_FLAGS)
+diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+index 3e0289e..0b288db 100644
+--- a/lib/Kconfig.debug
++++ b/lib/Kconfig.debug
+@@ -347,6 +347,20 @@ config DEBUG_FORCE_WEAK_PER_CPU
+ 	  To ensure that generic code follows the above rules, this
+ 	  option forces all percpu variables to be defined as weak.
+ 
++config DEBUG_FORCE_CC_WARNINGS_TO_ERRORS
++	bool "Force cc warnings to errors"
++	default y
++	help
++	  Simply enables the gcc compiler option -Werror for the entire
++	  build. If a compilation unit cannot handle -Werror by fixing the
++	  warning then that unit must suppress the cc warning using
++	  cc-disable-warning for that compilation unit in the unit's makefile.
++	  .
++	  This option is intended to be more in the developer's face and
++	  encourage effort of some kind to remove the compilation warning.
++	  .
++	  If unsure say y.
++
+ endmenu # "Compiler options"
+ 
+ config MAGIC_SYSRQ
+-- 
+1.7.10.4
+
