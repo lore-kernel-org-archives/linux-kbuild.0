@@ -1,45 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from aserp1040.oracle.com ([141.146.126.69]:31057 "EHLO
-	aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753351AbbCRJMu (ORCPT
+Received: from cpsmtpb-ews08.kpnxchange.com ([213.75.39.13]:59240 "EHLO
+	cpsmtpb-ews08.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S932930AbbCRKAf (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 18 Mar 2015 05:12:50 -0400
-Date: Wed, 18 Mar 2015 10:14:34 +0100
-From: Quentin Casasnovas <quentin.casasnovas@oracle.com>
-Subject: Re: [PATCH 1/7] modpost: add strict white-listing when referencing
- sections.
-Message-ID: <20150318091433.GM19131@chrystal.uk.oracle.com>
-References: <1426596002-26128-1-git-send-email-quentin.casasnovas@oracle.com>
- <1426596002-26128-2-git-send-email-quentin.casasnovas@oracle.com>
- <CA+55aFzOJMmeXQM0rwnfxvkjRnOXYGKTeY_uXK9p4mp8-fTUUw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CA+55aFzOJMmeXQM0rwnfxvkjRnOXYGKTeY_uXK9p4mp8-fTUUw@mail.gmail.com>
+	Wed, 18 Mar 2015 06:00:35 -0400
+Message-ID: <1426672832.2649.28.camel@tiscali.nl>
+Subject: Re: [PATCH v1 kbuild for-next 1/2] makefiles: add config option to
+ force all cc warnings to errors
+From: Paul Bolle <pebolle@tiscali.nl>
+Date: Wed, 18 Mar 2015 11:00:32 +0100
+In-Reply-To: <5508B574.5030505@cumulusnetworks.com>
+References: <1426631862-19563-1-git-send-email-jtoppins@cumulusnetworks.com>
+	 <1426633120.15575.17.camel@x220> <5508B574.5030505@cumulusnetworks.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Quentin Casasnovas <quentin.casasnovas@oracle.com>, Rusty Russell <rusty@rustcorp.com.au>, Michal Marek <mmarek@suse.cz>, lkml <linux-kernel@vger.kernel.org>, Oleg Nesterov <oleg@redhat.com>, Borislav Petkov <bp@alien8.de>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Jonathan Toppins <jtoppins@cumulusnetworks.com>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
-On Tue, Mar 17, 2015 at 09:25:07AM -0700, Linus Torvalds wrote:
-> On Tue, Mar 17, 2015 at 5:39 AM, Quentin Casasnovas
-> <quentin.casasnovas@oracle.com> wrote:
-> > Prints a warning when a section references a section outside a strict
-> > white-list.  This will be useful to print a warning if __ex_table
-> > references a non-executable section.
-> 
-> So I think all of these patches are ok,
+Jonathan Toppins schreef op di 17-03-2015 om 19:15 [-0400]:
+> So default to "n"?
 
-Cool :)
+"n" is the default anyhow, so I think you never need it.
 
-> but you should probably add a few more people explicitly to the cc.
-> 
-> Probably Rusty (because modpost) and MIchal (because kbuild). The
-> kernel mailing list is so high-volume and untargeted that it's usually
-> better as a "archival cc" than as a way to find people to comment and
-> merge the patches.
-> 
+> Kconfig bases paragraph continuation on indention, 
+> correct?
 
-Done. Thanks for the heads up!
+Yes. It's a syntax I quite dislike, but we're stuck with it.
 
-Quentin
+> Appreciate the review thanks.
+
+My review ended up a bit blunt. But the patch defaults to y for every
+configuration (because, I think, all of them source lib/Kconfig.debug)
+for an option that would stop the build at the first warning it sees.
+That's not really a considerate thing to do.
+
+
+Paul Bolle
+
