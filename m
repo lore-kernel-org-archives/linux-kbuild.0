@@ -1,56 +1,69 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cpsmtpb-ews09.kpnxchange.com ([213.75.39.14]:50121 "EHLO
-	cpsmtpb-ews09.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1755140AbbCRKQc (ORCPT
+Received: from mail-wi0-f173.google.com ([209.85.212.173]:37402 "EHLO
+	mail-wi0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755590AbbCRMjR (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 18 Mar 2015 06:16:32 -0400
-Message-ID: <1426673790.2649.41.camel@tiscali.nl>
-Subject: Re: [PATCH v1 kbuild for-next 1/2] makefiles: add config option to
- force all cc warnings to errors
-From: Paul Bolle <pebolle@tiscali.nl>
-Date: Wed, 18 Mar 2015 11:16:30 +0100
-In-Reply-To: <5508DD81.20006@cumulusnetworks.com>
-References: <1426631862-19563-1-git-send-email-jtoppins@cumulusnetworks.com>
-	 <1426633120.15575.17.camel@x220> <5508DD81.20006@cumulusnetworks.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+	Wed, 18 Mar 2015 08:39:17 -0400
+Received: by wixw10 with SMTP id w10so38625455wix.0
+        for <linux-kbuild@vger.kernel.org>; Wed, 18 Mar 2015 05:39:16 -0700 (PDT)
+From: Michal Simek <michal.simek@xilinx.com>
+Subject: [PATCH v2] kbuild: Create directory for target DTB
+Date: Wed, 18 Mar 2015 13:39:07 +0100
+Message-Id: <c09612262f2758e70dd4d700f2d32692601f8287.1426682342.git.michal.simek@xilinx.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jonathan Toppins <jtoppins@cumulusnetworks.com>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+To: linux-kernel@vger.kernel.org, monstr@monstr.eu
+Cc: Zach Pfeffer <zachp@xilinx.com>, Nathan Rossi <nrossi@xilinx.com>, Arnd Bergmann <arnd@arndb.de>, catalin.marinas@arm.com, will.deacon@arm.com, Nathan Rossi <nathan.rossi@xilinx.com>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
-Jonathan Toppins schreef op di 17-03-2015 om 22:05 [-0400]:
-> Some slight background on these patches, they were born out of the team 
-> here wanting to have a simple way of easily catching warnings during 
-> driver development. This seemed like the least cumbersome way. I 
-> understand if defaulting to yes is not advisable.
-> 
-> Will be happy to submit another patch defaulting to no and clean-up the 
-> Dots in the paragraphs. From the comments provided so far this approach 
-> would seem to address them, unless I am misunderstanding and in fact the 
-> general idea of compiling with -Werror is not wanted.
-> 
-> Appreciate the discussion.
+From: Nathan Rossi <nathan.rossi@xilinx.com>
 
-The builds are rather silent as is. Warnings already tend to stand out.
-But to follow up on Michal's suggestion, every now and then I do
-    grep ":[[:digit:]]\+:" $LOG
+When building specific DTBs out of the kernel tree the vendor subdirs
+(boot/dts/<vendor>) are not created, ensure that they are before
+building the DTB.
 
-to catch all well behaved warnings. (I typed that from memory, so the
-pattern might be wrong.) The occasional
-    make $SOME_TARGET > /dev/null
+Signed-off-by: Nathan Rossi <nathan.rossi@xilinx.com>
+Signed-off-by: Michal Simek <michal.simek@xilinx.com>
+---
 
-does wonders too.
+Changes in v2:
+- Use $(dir ${dtc-tmp}) instead of `dirname ${dtc-tmp}`
+  Reported-by: Will Deacon <will.deacon@arm.com>
 
-And, on a general note, the warnings spotting real issues get fixed
-quite quickly. The warnings that actually do make it into releases are
-almost always false positives. They might only get fixed if someone
-finds a way to redo the code in such a way that the compiler has less
-trouble analyzing it.
+Problem is visible with arm64 for out of tree builds.
+make O=/tmp/kkk/ defconfig
+make O=/tmp/kkk/ cavium/thunder-88xx.dtb
 
-Thanks,
+  DTC     arch/arm64/boot/dts/cavium/thunder-88xx.dtb
+cc1: fatal error: opening output file
+arch/arm64/boot/dts/cavium/.thunder-88xx.dtb.dts.tmp: No such file or
+directory
+compilation terminated.
+make[2]: *** [arch/arm64/boot/dts/cavium/thunder-88xx.dtb] Error 1
+make[1]: *** [cavium/thunder-88xx.dtb] Error 2
 
+Building specific dtb target on arm32 is working fine
+make O=/tmp/kkk4/ multi_v7_defconfig
+make O=/tmp/kkk4/ zynq-zc702.dtb
 
-Paul Bolle
+This is the way how Yocto is building dtb for specific target.
+---
+ scripts/Makefile.lib |    3 ++-
+ 1 files changed, 2 insertions(+), 1 deletions(-)
+
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index 044eb4f..79e8661 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -282,7 +282,8 @@ $(obj)/%.dtb.S: $(obj)/%.dtb
+ 	$(call cmd,dt_S_dtb)
+ 
+ quiet_cmd_dtc = DTC     $@
+-cmd_dtc = $(CPP) $(dtc_cpp_flags) -x assembler-with-cpp -o $(dtc-tmp) $< ; \
++cmd_dtc = mkdir -p $(dir ${dtc-tmp}) ; \
++	$(CPP) $(dtc_cpp_flags) -x assembler-with-cpp -o $(dtc-tmp) $< ; \
+ 	$(objtree)/scripts/dtc/dtc -O dtb -o $@ -b 0 \
+ 		-i $(dir $<) $(DTC_FLAGS) \
+ 		-d $(depfile).dtc.tmp $(dtc-tmp) ; \
+-- 
+1.7.2.3
 
