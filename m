@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qc0-f175.google.com ([209.85.216.175]:33420 "EHLO
-	mail-qc0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751000AbbCQXPC (ORCPT
+Received: from mail-qg0-f49.google.com ([209.85.192.49]:34275 "EHLO
+	mail-qg0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753589AbbCRCFy (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 17 Mar 2015 19:15:02 -0400
-Received: by qcyi15 with SMTP id i15so24222066qcy.0
-        for <linux-kbuild@vger.kernel.org>; Tue, 17 Mar 2015 16:15:01 -0700 (PDT)
-Message-ID: <5508B574.5030505@cumulusnetworks.com>
-Date: Tue, 17 Mar 2015 19:15:00 -0400
+	Tue, 17 Mar 2015 22:05:54 -0400
+Received: by qgh62 with SMTP id 62so25957357qgh.1
+        for <linux-kbuild@vger.kernel.org>; Tue, 17 Mar 2015 19:05:54 -0700 (PDT)
+Message-ID: <5508DD81.20006@cumulusnetworks.com>
+Date: Tue, 17 Mar 2015 22:05:53 -0400
 From: Jonathan Toppins <jtoppins@cumulusnetworks.com>
 MIME-Version: 1.0
 Subject: Re: [PATCH v1 kbuild for-next 1/2] makefiles: add config option to
@@ -30,9 +30,6 @@ On 3/17/15 6:58 PM, Paul Bolle wrote:
 >> +	default y
 >
 > No way.
-
-So default to "n"?
-
 >
 >> +	help
 >> +	  Simply enables the gcc compiler option -Werror for the entire
@@ -42,11 +39,6 @@ So default to "n"?
 >> +	  .
 >
 > (Why the dot?)
-
-I am probably confusing the need for the dot in Debian control files 
-with Kconfig files. Kconfig bases paragraph continuation on indention, 
-correct?
-
 >
 >> +	  This option is intended to be more in the developer's face and
 >> +	  encourage effort of some kind to remove the compilation warning.
@@ -68,13 +60,22 @@ correct?
 > that's nice. And I find -Werror (and littering Makefiles with
 > cc-disable-warning) just to remove the few warnings I still see plain
 > silly. I'm sure the same holds for other people and their builds too.
->
-> (This can be summarized as: NAK.)
->
->
-> Paul Bolle
->
 
-Appreciate the review thanks.
+Please note, I was not trying to imply using cc-disable-warning was a 
+first resort option, sorry if it seemed like that. In fact in my opinion 
+cc-disable-warning should almost never be used. Do you have a suggestion 
+for better wording of this?
+
+Some slight background on these patches, they were born out of the team 
+here wanting to have a simple way of easily catching warnings during 
+driver development. This seemed like the least cumbersome way. I 
+understand if defaulting to yes is not advisable.
+
+Will be happy to submit another patch defaulting to no and clean-up the 
+Dots in the paragraphs. From the comments provided so far this approach 
+would seem to address them, unless I am misunderstanding and in fact the 
+general idea of compiling with -Werror is not wanted.
+
+Appreciate the discussion.
 
 -Jon
