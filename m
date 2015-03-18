@@ -1,17 +1,17 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cpsmtpb-ews08.kpnxchange.com ([213.75.39.13]:59240 "EHLO
-	cpsmtpb-ews08.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S932930AbbCRKAf (ORCPT
+Received: from cpsmtpb-ews09.kpnxchange.com ([213.75.39.14]:50121 "EHLO
+	cpsmtpb-ews09.kpnxchange.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1755140AbbCRKQc (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 18 Mar 2015 06:00:35 -0400
-Message-ID: <1426672832.2649.28.camel@tiscali.nl>
+	Wed, 18 Mar 2015 06:16:32 -0400
+Message-ID: <1426673790.2649.41.camel@tiscali.nl>
 Subject: Re: [PATCH v1 kbuild for-next 1/2] makefiles: add config option to
  force all cc warnings to errors
 From: Paul Bolle <pebolle@tiscali.nl>
-Date: Wed, 18 Mar 2015 11:00:32 +0100
-In-Reply-To: <5508B574.5030505@cumulusnetworks.com>
+Date: Wed, 18 Mar 2015 11:16:30 +0100
+In-Reply-To: <5508DD81.20006@cumulusnetworks.com>
 References: <1426631862-19563-1-git-send-email-jtoppins@cumulusnetworks.com>
-	 <1426633120.15575.17.camel@x220> <5508B574.5030505@cumulusnetworks.com>
+	 <1426633120.15575.17.camel@x220> <5508DD81.20006@cumulusnetworks.com>
 Content-Type: text/plain; charset="UTF-8"
 Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -20,22 +20,36 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Jonathan Toppins <jtoppins@cumulusnetworks.com>
 Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
-Jonathan Toppins schreef op di 17-03-2015 om 19:15 [-0400]:
-> So default to "n"?
+Jonathan Toppins schreef op di 17-03-2015 om 22:05 [-0400]:
+> Some slight background on these patches, they were born out of the team 
+> here wanting to have a simple way of easily catching warnings during 
+> driver development. This seemed like the least cumbersome way. I 
+> understand if defaulting to yes is not advisable.
+> 
+> Will be happy to submit another patch defaulting to no and clean-up the 
+> Dots in the paragraphs. From the comments provided so far this approach 
+> would seem to address them, unless I am misunderstanding and in fact the 
+> general idea of compiling with -Werror is not wanted.
+> 
+> Appreciate the discussion.
 
-"n" is the default anyhow, so I think you never need it.
+The builds are rather silent as is. Warnings already tend to stand out.
+But to follow up on Michal's suggestion, every now and then I do
+    grep ":[[:digit:]]\+:" $LOG
 
-> Kconfig bases paragraph continuation on indention, 
-> correct?
+to catch all well behaved warnings. (I typed that from memory, so the
+pattern might be wrong.) The occasional
+    make $SOME_TARGET > /dev/null
 
-Yes. It's a syntax I quite dislike, but we're stuck with it.
+does wonders too.
 
-> Appreciate the review thanks.
+And, on a general note, the warnings spotting real issues get fixed
+quite quickly. The warnings that actually do make it into releases are
+almost always false positives. They might only get fixed if someone
+finds a way to redo the code in such a way that the compiler has less
+trouble analyzing it.
 
-My review ended up a bit blunt. But the patch defaults to y for every
-configuration (because, I think, all of them source lib/Kconfig.debug)
-for an option that would stop the build at the first warning it sees.
-That's not really a considerate thing to do.
+Thanks,
 
 
 Paul Bolle
