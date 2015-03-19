@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pa0-f54.google.com ([209.85.220.54]:35177 "EHLO
-	mail-pa0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751305AbbCSDjk (ORCPT
+Received: from mail-pd0-f179.google.com ([209.85.192.179]:33907 "EHLO
+	mail-pd0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750756AbbCSDlb (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 18 Mar 2015 23:39:40 -0400
-Message-ID: <550A44F9.9060504@gmail.com>
-Date: Wed, 18 Mar 2015 20:39:37 -0700
+	Wed, 18 Mar 2015 23:41:31 -0400
+Message-ID: <550A4567.5030803@gmail.com>
+Date: Wed, 18 Mar 2015 20:41:27 -0700
 From: Frank Rowand <frowand.list@gmail.com>
 Reply-To: frowand.list@gmail.com
 MIME-Version: 1.0
-Subject: [patch 6/7] dt: dtb version: dtsi files
+Subject: [patch 7/7] dt: dtb version: report dtb info
 References: <550A42AC.8060104@gmail.com>
 In-Reply-To: <550A42AC.8060104@gmail.com>
 Content-Type: text/plain; charset=ISO-8859-1
@@ -21,45 +21,77 @@ Cc: Ian Campbell <ijc+devicetree@hellion.org.uk>, Kumar Gala <galak@codeaurora.o
 
 From: Frank Rowand <frank.rowand@sonymobile.com>
 
-Create a .dtsi file to contain the /chosen/dtb-info node and populate the
-properties in that node.
+Report the /chosen/dtb-info properties on boot.
 
 Signed-off-by: Frank Rowand <frank.rowand@sonymobile.com>
 ---
- arch/arm/boot/dts/skeleton.dtsi              |    2 
- include/dt-bindings/version.dtsi             |   19 +++++
 
-Index: b/include/dt-bindings/version.dtsi
+The beginning of the context for hunk 2 includes a line from
+2fa645cb2703d9b3786d850db815414dfeefa51d, which is in 4.0-rc4.  The
+author of that commit has submitted a request to revert the commit:
+http://lkml.iu.edu/hypermail/linux/kernel/1503.2/02134.html
+
+
+ drivers/of/base.c |   42 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 42 insertions(+)
+
+Index: b/drivers/of/base.c
 ===================================================================
---- /dev/null
-+++ b/include/dt-bindings/version.dtsi
-@@ -0,0 +1,19 @@
+--- a/drivers/of/base.c
++++ b/drivers/of/base.c
+@@ -1880,6 +1880,7 @@ static void of_alias_add(struct alias_pr
+ void of_alias_scan(void * (*dt_alloc)(u64 size, u64 align))
+ {
+ 	struct property *pp;
++	struct device_node *dtb_info = NULL;
+ 
+ 	of_aliases = of_find_node_by_path("/aliases");
+ 	of_chosen = of_find_node_by_path("/chosen");
+@@ -1899,6 +1900,47 @@ void of_alias_scan(void * (*dt_alloc)(u6
+ 		}
+ 	}
+ 
++	dtb_info = of_find_node_by_path("/chosen/dtb-info");
++	if (dtb_info == NULL)
++		dtb_info = of_find_node_by_path("/chosen@0/dtb-info");
 +
-+#include <utsrelease.h>
-+#include <compile.h>
-+#include <compile_dtb.h>
++	if (dtb_info) {
++		const char *string;
++		int len;
 +
-+/ {
-+	chosen {
-+		dtb-info {
-+			version = UTS_RELEASE, " ", DTB_VERSION;
-+			version-linux =
-+				UTS_RELEASE,
-+				" (", LINUX_COMPILE_BY, "@", LINUX_COMPILE_HOST, ") ",
-+				"(", LINUX_COMPILER, ") ",
-+				UTS_VERSION;
-+			dtb-path = ___DTB_DTB_PATH;
-+			dts-path = ___DTB_DTS_PATH;
-+		};
-+	};
-+};
-Index: b/arch/arm/boot/dts/skeleton.dtsi
-===================================================================
---- a/arch/arm/boot/dts/skeleton.dtsi
-+++ b/arch/arm/boot/dts/skeleton.dtsi
-@@ -11,3 +11,5 @@
- 	aliases { };
- 	memory { device_type = "memory"; reg = <0 0>; };
- };
++		string = of_get_property(dtb_info, "version", &len);
++		if (string) {
++			pr_notice("DTB version ");
++			for ( ; len > 0;
++				len -= (strlen(string) + 1),
++				string += (strlen(string) + 1)) {
++				pr_cont("%s", string);
++			}
++			pr_cont("\n");
++		}
 +
-+#include <dt-bindings/version.dtsi>
++		string = of_get_property(dtb_info, "version-linux", &len);
++		if (string) {
++			pr_notice("DTB linux version ");
++			for ( ; len > 0;
++				len -= (strlen(string) + 1),
++				string += (strlen(string) + 1)) {
++				pr_cont("%s", string);
++			}
++			pr_cont("\n");
++		}
++
++		string = of_get_property(dtb_info, "dts-path", &len);
++		if (string)
++			pr_notice("DTB source %s\n", string);
++
++		string = of_get_property(dtb_info, "dtb-path", &len);
++		if (string)
++			pr_notice("DTB blob %s\n", string);
++
++		of_node_put(dtb_info);
++	}
++
+ 	if (!of_aliases)
+ 		return;
+ 
