@@ -1,103 +1,105 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pd0-f172.google.com ([209.85.192.172]:33911 "EHLO
-	mail-pd0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751649AbbCSTBp (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 19 Mar 2015 15:01:45 -0400
-Message-ID: <550B1D16.7000108@gmail.com>
-Date: Thu, 19 Mar 2015 12:01:42 -0700
-From: Frank Rowand <frowand.list@gmail.com>
-Reply-To: frowand.list@gmail.com
+Received: from foss.arm.com ([217.140.101.70]:38337 "EHLO foss.arm.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750830AbbCSTNF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 19 Mar 2015 15:13:05 -0400
+Date: Thu, 19 Mar 2015 19:12:31 +0000
+From: Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [patch 2/7] dt: dtb version: document chosen/dtb-info node
+ binding
+Message-ID: <20150319191231.GC11683@leverpostej>
+References: <550A42AC.8060104@gmail.com>
+ <550A4382.4030209@gmail.com>
+ <20150319134910.GF18473@leverpostej>
+ <550B013B.1060002@gmail.com>
 MIME-Version: 1.0
-Subject: Re: [patch 2/7] dt: dtb version: document chosen/dtb-info node binding
-References: <550A42AC.8060104@gmail.com> <550A4382.4030209@gmail.com> <CAL_Jsq+sPkZtreQ0sp8KXpkUVpFy=Yh9dr249u8uyoa8yksjmg@mail.gmail.com> <20150319184139.GG8656@n2100.arm.linux.org.uk>
-In-Reply-To: <20150319184139.GG8656@n2100.arm.linux.org.uk>
-Content-Type: text/plain; charset=ISO-8859-1
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <550B013B.1060002@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Russell King - ARM Linux <linux@arm.linux.org.uk>
-Cc: Rob Herring <robherring2@gmail.com>, Rob Herring <robh+dt@kernel.org>, Grant Likely <grant.likely@linaro.org>, Michal Marek <mmarek@suse.cz>, Ian Campbell <ijc+devicetree@hellion.org.uk>, Kumar Gala <galak@codeaurora.org>, Leif Lindholm <leif.lindholm@linaro.org>, Mark Rutland <mark.rutland@arm.com>, Pawel Moll <pawel.moll@arm.com>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, linux-kbuild@vger.kernel.org, Linux Kernel list <linux-kernel@vger.kernel.org>
+To: Frank Rowand <frowand.list@gmail.com>
+Cc: Rob Herring <robh+dt@kernel.org>, "grant.likely@linaro.org" <grant.likely@linaro.org>, Russell King <linux@arm.linux.org.uk>, Michal Marek <mmarek@suse.cz>, Ian Campbell <ijc+devicetree@hellion.org.uk>, Kumar Gala <galak@codeaurora.org>, Leif Lindholm <leif.lindholm@linaro.org>, Pawel Moll <Pawel.Moll@arm.com>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, Linux Kernel list <linux-kernel@vger.kernel.org>
 
-On 3/19/2015 11:41 AM, Russell King - ARM Linux wrote:
-> On Thu, Mar 19, 2015 at 08:23:29AM -0500, Rob Herring wrote:
->> On Wed, Mar 18, 2015 at 10:33 PM, Frank Rowand <frowand.list@gmail.com> wrote:
->>> +version
->>> +       The version of the DTB.  This is analagous to the linux kernel version.
->>> +
->>> +       This is a format free field intended for human consumption.  User space
->>> +       programs should not have any expections about this property.
->>> +
->>> +       The DTB number in this property is incremented each time a make that
->>> +       creates one or more DTBs is invoked.  If the make creates multiple
->>> +       DTBs then this number is only incremented once.
->>> +
->>> +       The DTB number is stored in file .version_dtb.
->>> +
->>> +version-linux
->>> +       The version of the linux kernel most recently built in the source
->>> +       control system that contains the source used to build the DTB.
->>> +
->>> +       The linux kernel version number is not incremented for a make that
->>> +       creates a DTB.
->>> +
->>> +dtb-path
->>> +       The build directory relative path of the DTB.
->>> +
->>> +dts-path
->>> +       The absolute path of the .dts file compiled to create the DTB.
->>
->> So these become an ABI and we can never change the directory structure?
->>
->> The problem with informational fields is someone, somewhere will rely
->> on them and then we are stuck with them. Look at /proc/cpuinfo.
+> > I'm not sure I see the point in adding a property which is not
+> > well-defined and not guarnateed to be in any way stable.
 > 
-> There's a bigger problem: including the Linux kernel specific version
-> means that we will _never_ be able to move them out of the kernel.
+> This binding is kind of an odd ball to me.  It is clearly _not_ describing
+> hardware, which is really the central point of the dtb.  But the chosen
+> node is allowed to cover policy things like the boot command line.
 
-As I failed to properly document, but have said will be in the next
-version, the dtb-info node and all of the properties are optional.
+Sure, but this has nothing to do with policy regarding the HW. This is
+entirely to do with the build environment of the DTB, which in general
+you don't need to know.
 
-As I replied to Mark, I will change version-linux to a more generic
-name and meaning in the next version.  The property could be missing,
-it could be about BSD, it could be about uboot.  Whatever.
+> If I want to debug DTB related issues, read the source that was used
+> to create the DTB, or slightly modify the DTB - where is the source
+> and what is the version of it in the source control system.
 
+That's only useful if you have access to the machine that the source is
+on, access to the repo on said machine, and so on.
+
+You can easily slightly modify a DTB by decompiling and recompiling it,
+as bootloaders do to inject /chosen/bootargs. Admittedly this can be
+painful, but at least you know exactly what was changed, because you
+know which DTB you started with.
+
+Consider what modification by other agents means for provenance of the
+DTB. We've already been bitten by bootloaders messing with the DTB [1],
+and simple loaders can change things substantially [2,3], and won't
+update any provenance binding.
+
+> When building and installing a DTB, did the version that I wanted to
+> install on the target actually get on the target.
+
+You can already check the hash if you want to check that you copies the
+correct version; which is better than trusting an arbitrary string,
+because if anything fiddles with the DTB it will change.
+
+[...]
+
+> >> +dtb-path
+> >> +	The build directory relative path of the DTB.
+> >> +
+> >> +dts-path
+> >> +	The absolute path of the .dts file compiled to create the DTB.
+> > 
+> > Why do you need the DTB path?
 > 
-> Moreover, what it means is that people can then write code to test
-> what the dtb version is, and we'll end up with the dtb version being
-> tested to determine various features.
+> Paranoia.  Even if not probable, one could build different DTBs from
+> the same .dts.
 
-What???  Why would we ever accept code that tested the dtb version
-instead of the compatible strings and properties in device nodes?
-The dtb version is a meaningless number just like the kernel version
-number in /proc/version is a meaningless number.  It starts at 1 (and
-can be reset to 1 anytime the person controlling the build environment
-chooses to for any random reason).  The dtb version number only makes
-sense in a local context to check which build of an object actually
-got onto the target.
+One could also build the same DTB from two different dts files, no?
 
-I could be creating some confusion here though.  The dtb version string
-also includes the current commit of the source code repository, in
-exactly the same manner as the kernel version string does.
+You could build the same dtb from the same dts, but with some arbitrary
+things changed, such that the at either end of the process is
+irrelevant. Personally, I end up doing this a fair amount when testing.
 
+> > Why do these differ w.r.t. absolute/relative?
 > 
-> Since the design goal of DTB is to describe the hardware, including
-> the Linux kernel version is totally against that: the Linux kernel
-> version should be totally irrelevant.  What's more relevant would be
-> a _hardware_ version field, but even that's questionable...
+> Those are the forms of the path that are present in the build
+> system.  If there is a good reason to change one of them to the
+> other form, I could add the extra complexity to massage the path.
 > 
-> And yes, you are right - anything like this which we add immediately
-> becames a user ABI which becomes *very* difficult to change later, so
-> in order to accept anything like this, we have to be absolutely sure
-> that this is something we really really really really want to do.  Let
-> me put it another way: once this is accepted, it will probably be
-> impossible to ever change it.
-
-Would it be more palatable if including the dtb-info node was conditional
-on some debug config option?
-
-
+> > 
+> > Why would you _ever_ need an absolute path!?
 > 
-> ... just like Bogomips in /proc/cpuinfo.
-> 
+> The absolute path tells you which source repository contained the source.
 
+Except that the absolute path is realtive to the machine it was built
+on, so doesn't actually help.
+
+On various machines I have folders called /home/mark/src/linux. These
+are not the same folder. If I gave you a DTB that told you it was from
+/home/mark/src/linux/arch/arm64/boot/dts/vendor/foo.dts, you would have
+difficulty acquiring that precise file.
+
+As far as I can tell, this binding just allows you to place a
+meaningless set of strings in the DTB, that don't actually tell you
+anything useful.
+
+Mark.
+
+[1] http://lists.infradead.org/pipermail/linux-arm-kernel/2015-March/329938.html
+[2] https://git.kernel.org/cgit/linux/kernel/git/mark/boot-wrapper-aarch64.git/
+[3] https://git.kernel.org/cgit/linux/kernel/git/mark/boot-wrapper-aarch64.git/commit/?id=e4ae51a1c128ccaac01bdc834692fd15c3a3c8de
