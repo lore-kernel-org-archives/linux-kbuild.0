@@ -1,105 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from foss.arm.com ([217.140.101.70]:38337 "EHLO foss.arm.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750830AbbCSTNF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 19 Mar 2015 15:13:05 -0400
-Date: Thu, 19 Mar 2015 19:12:31 +0000
-From: Mark Rutland <mark.rutland@arm.com>
+Received: from pandora.arm.linux.org.uk ([78.32.30.218]:57743 "EHLO
+	pandora.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750853AbbCSTcn (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 19 Mar 2015 15:32:43 -0400
+Date: Thu, 19 Mar 2015 19:32:25 +0000
+From: Russell King - ARM Linux <linux@arm.linux.org.uk>
 Subject: Re: [patch 2/7] dt: dtb version: document chosen/dtb-info node
  binding
-Message-ID: <20150319191231.GC11683@leverpostej>
+Message-ID: <20150319193225.GH8656@n2100.arm.linux.org.uk>
 References: <550A42AC.8060104@gmail.com>
  <550A4382.4030209@gmail.com>
- <20150319134910.GF18473@leverpostej>
- <550B013B.1060002@gmail.com>
+ <CAL_Jsq+sPkZtreQ0sp8KXpkUVpFy=Yh9dr249u8uyoa8yksjmg@mail.gmail.com>
+ <20150319184139.GG8656@n2100.arm.linux.org.uk>
+ <550B1D16.7000108@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <550B013B.1060002@gmail.com>
+In-Reply-To: <550B1D16.7000108@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Frank Rowand <frowand.list@gmail.com>
-Cc: Rob Herring <robh+dt@kernel.org>, "grant.likely@linaro.org" <grant.likely@linaro.org>, Russell King <linux@arm.linux.org.uk>, Michal Marek <mmarek@suse.cz>, Ian Campbell <ijc+devicetree@hellion.org.uk>, Kumar Gala <galak@codeaurora.org>, Leif Lindholm <leif.lindholm@linaro.org>, Pawel Moll <Pawel.Moll@arm.com>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, Linux Kernel list <linux-kernel@vger.kernel.org>
+Cc: Rob Herring <robherring2@gmail.com>, Rob Herring <robh+dt@kernel.org>, Grant Likely <grant.likely@linaro.org>, Michal Marek <mmarek@suse.cz>, Ian Campbell <ijc+devicetree@hellion.org.uk>, Kumar Gala <galak@codeaurora.org>, Leif Lindholm <leif.lindholm@linaro.org>, Mark Rutland <mark.rutland@arm.com>, Pawel Moll <pawel.moll@arm.com>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, linux-kbuild@vger.kernel.org, Linux Kernel list <linux-kernel@vger.kernel.org>
 
-> > I'm not sure I see the point in adding a property which is not
-> > well-defined and not guarnateed to be in any way stable.
-> 
-> This binding is kind of an odd ball to me.  It is clearly _not_ describing
-> hardware, which is really the central point of the dtb.  But the chosen
-> node is allowed to cover policy things like the boot command line.
+On Thu, Mar 19, 2015 at 12:01:42PM -0700, Frank Rowand wrote:
+> On 3/19/2015 11:41 AM, Russell King - ARM Linux wrote:
+> What???  Why would we ever accept code that tested the dtb version
+> instead of the compatible strings and properties in device nodes?
+> The dtb version is a meaningless number just like the kernel version
+> number in /proc/version is a meaningless number.  It starts at 1 (and
+> can be reset to 1 anytime the person controlling the build environment
+> chooses to for any random reason).  The dtb version number only makes
+> sense in a local context to check which build of an object actually
+> got onto the target.
 
-Sure, but this has nothing to do with policy regarding the HW. This is
-entirely to do with the build environment of the DTB, which in general
-you don't need to know.
+I think you need to learn a lesson here.  I rotfled at your "just like
+the kernel version number" comment, because we already have code in the
+kernel to map 3.x and 4.x kernels to a 2.60.x number because userspace
+breaks with 3.x and 4.x version numbers.
 
-> If I want to debug DTB related issues, read the source that was used
-> to create the DTB, or slightly modify the DTB - where is the source
-> and what is the version of it in the source control system.
+I'm quite sure that someone made the exact same argument about kernel
+version numbers that you're making above about versioning dtb stuff.
 
-That's only useful if you have access to the machine that the source is
-on, access to the repo on said machine, and so on.
+At the end of the day, if userspace starts abusing an API that we've
+provided in good faith, and we change something such as the version
+information which results in userspace breaking - even if userspace is
+doing something that's wrong according to how we've defined it, it's
+still our problem to fix.  No userspace regressions when upgrading.
+That's the rule.
 
-You can easily slightly modify a DTB by decompiling and recompiling it,
-as bootloaders do to inject /chosen/bootargs. Admittedly this can be
-painful, but at least you know exactly what was changed, because you
-know which DTB you started with.
+Don't bother trying to argue against this - you can't.  We will not accept
+any argument (no matter how valid) which will result in userspace breaking
+upon an upgrade.
 
-Consider what modification by other agents means for provenance of the
-DTB. We've already been bitten by bootloaders messing with the DTB [1],
-and simple loaders can change things substantially [2,3], and won't
-update any provenance binding.
+You must be *absolutely* *sure* that you want to export this information,
+and that you are absolutely happy with the consequences which would occur
+should userspace then start using this information in a way which you did
+not intend, which could very well block you from ever being able to change
+the version number from a prescribed "this version number makes userspace
+work" value.
 
-> When building and installing a DTB, did the version that I wanted to
-> install on the target actually get on the target.
-
-You can already check the hash if you want to check that you copies the
-correct version; which is better than trusting an arbitrary string,
-because if anything fiddles with the DTB it will change.
-
-[...]
-
-> >> +dtb-path
-> >> +	The build directory relative path of the DTB.
-> >> +
-> >> +dts-path
-> >> +	The absolute path of the .dts file compiled to create the DTB.
-> > 
-> > Why do you need the DTB path?
-> 
-> Paranoia.  Even if not probable, one could build different DTBs from
-> the same .dts.
-
-One could also build the same DTB from two different dts files, no?
-
-You could build the same dtb from the same dts, but with some arbitrary
-things changed, such that the at either end of the process is
-irrelevant. Personally, I end up doing this a fair amount when testing.
-
-> > Why do these differ w.r.t. absolute/relative?
-> 
-> Those are the forms of the path that are present in the build
-> system.  If there is a good reason to change one of them to the
-> other form, I could add the extra complexity to massage the path.
-> 
-> > 
-> > Why would you _ever_ need an absolute path!?
-> 
-> The absolute path tells you which source repository contained the source.
-
-Except that the absolute path is realtive to the machine it was built
-on, so doesn't actually help.
-
-On various machines I have folders called /home/mark/src/linux. These
-are not the same folder. If I gave you a DTB that told you it was from
-/home/mark/src/linux/arch/arm64/boot/dts/vendor/foo.dts, you would have
-difficulty acquiring that precise file.
-
-As far as I can tell, this binding just allows you to place a
-meaningless set of strings in the DTB, that don't actually tell you
-anything useful.
-
-Mark.
-
-[1] http://lists.infradead.org/pipermail/linux-arm-kernel/2015-March/329938.html
-[2] https://git.kernel.org/cgit/linux/kernel/git/mark/boot-wrapper-aarch64.git/
-[3] https://git.kernel.org/cgit/linux/kernel/git/mark/boot-wrapper-aarch64.git/commit/?id=e4ae51a1c128ccaac01bdc834692fd15c3a3c8de
+-- 
+FTTC broadband for 0.8mile line: currently at 10.5Mbps down 400kbps up
+according to speedtest.net.
