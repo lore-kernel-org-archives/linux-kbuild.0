@@ -1,36 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pd0-f179.google.com ([209.85.192.179]:36464 "EHLO
-	mail-pd0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751202AbbCSQmp (ORCPT
+Received: from mail-pd0-f177.google.com ([209.85.192.177]:34803 "EHLO
+	mail-pd0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755192AbbCSRCz (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 19 Mar 2015 12:42:45 -0400
-Message-ID: <550AFC81.20103@gmail.com>
-Date: Thu, 19 Mar 2015 09:42:41 -0700
+	Thu, 19 Mar 2015 13:02:55 -0400
+Message-ID: <550B013B.1060002@gmail.com>
+Date: Thu, 19 Mar 2015 10:02:51 -0700
 From: Frank Rowand <frowand.list@gmail.com>
 Reply-To: frowand.list@gmail.com
 MIME-Version: 1.0
 Subject: Re: [patch 2/7] dt: dtb version: document chosen/dtb-info node binding
-References: <550A42AC.8060104@gmail.com> <550A4382.4030209@gmail.com> <CAL_Jsq+sPkZtreQ0sp8KXpkUVpFy=Yh9dr249u8uyoa8yksjmg@mail.gmail.com>
-In-Reply-To: <CAL_Jsq+sPkZtreQ0sp8KXpkUVpFy=Yh9dr249u8uyoa8yksjmg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+References: <550A42AC.8060104@gmail.com> <550A4382.4030209@gmail.com> <20150319134910.GF18473@leverpostej>
+In-Reply-To: <20150319134910.GF18473@leverpostej>
+Content-Type: text/plain; charset=ISO-8859-1
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rob Herring <robherring2@gmail.com>
-Cc: Rob Herring <robh+dt@kernel.org>, Grant Likely <grant.likely@linaro.org>, Russell King <linux@arm.linux.org.uk>, Michal Marek <mmarek@suse.cz>, Ian Campbell <ijc+devicetree@hellion.org.uk>, Kumar Gala <galak@codeaurora.org>, Leif Lindholm <leif.lindholm@linaro.org>, Mark Rutland <mark.rutland@arm.com>, Pawel Moll <pawel.moll@arm.com>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, linux-kbuild@vger.kernel.org, Linux Kernel list <linux-kernel@vger.kernel.org>
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: Rob Herring <robh+dt@kernel.org>, "grant.likely@linaro.org" <grant.likely@linaro.org>, Russell King <linux@arm.linux.org.uk>, Michal Marek <mmarek@suse.cz>, Ian Campbell <ijc+devicetree@hellion.org.uk>, Kumar Gala <galak@codeaurora.org>, Leif Lindholm <leif.lindholm@linaro.org>, Pawel Moll <Pawel.Moll@arm.com>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, Linux Kernel list <linux-kernel@vger.kernel.org>
 
-On 3/19/2015 6:23 AM, Rob Herring wrote:
-> On Wed, Mar 18, 2015 at 10:33 PM, Frank Rowand <frowand.list@gmail.com> wrote:
+On 3/19/2015 6:49 AM, Mark Rutland wrote:
+> On Thu, Mar 19, 2015 at 03:33:22AM +0000, Frank Rowand wrote:
 >> From: Frank Rowand <frank.rowand@sonymobile.com>
 >>
 >> Add /chosen/dtb-node binding.
 > 
-> Why? Please write better commit messages.
+> Why? It doesn't matter what the cover says, the commit message should
+> have a rationale.
+> 
+> Who needs this information, and when do they need it?
+> 
+> Why is the existing information insufficient?
 
-Will update.
+Will update and add better information.
 
 > 
->>
 >> Signed-off-by: Frank Rowand <frank.rowand@sonymobile.com>
 >> ---
 >>  Documentation/devicetree/bindings/chosen.txt |   37 +++++++++++
@@ -41,8 +45,8 @@ Will update.
 >> +++ b/Documentation/devicetree/bindings/chosen.txt
 >> @@ -46,6 +46,43 @@ on PowerPC "stdout" if "stdout-path" is
 >>  should only use the "stdout-path" property.
->>
->>
+>>  
+>>  
 >> +dtb-info node
 >> +----------------
 >> +
@@ -55,44 +59,92 @@ Will update.
 >> +Properties:
 >> +
 >> +version
->> +       The version of the DTB.  This is analagous to the linux kernel version.
+>> +	The version of the DTB.  This is analagous to the linux kernel version.
 >> +
->> +       This is a format free field intended for human consumption.  User space
->> +       programs should not have any expections about this property.
+>> +	This is a format free field intended for human consumption.  User space
+>> +	programs should not have any expections about this property.
+> 
+> I doubt that this would stay the case for long were this property added.
+> 
+>> +	The DTB number in this property is incremented each time a make that
+>> +	creates one or more DTBs is invoked.  If the make creates multiple
+>> +	DTBs then this number is only incremented once.
 >> +
->> +       The DTB number in this property is incremented each time a make that
->> +       creates one or more DTBs is invoked.  If the make creates multiple
->> +       DTBs then this number is only incremented once.
->> +
->> +       The DTB number is stored in file .version_dtb.
+>> +	The DTB number is stored in file .version_dtb.
+> 
+> This is irrelevant to the binding, and as you mention above, you can
+> make no expectations about this property.
+
+OK, I'll remove the reference to .version_dtb.
+
+> 
+> I'm not sure I see the point in adding a property which is not
+> well-defined and not guarnateed to be in any way stable.
+
+This binding is kind of an odd ball to me.  It is clearly _not_ describing
+hardware, which is really the central point of the dtb.  But the chosen
+node is allowed to cover policy things like the boot command line.
+
+So I would encourage a slightly unusual mind set when reviewing this
+binding (not that I really know what that mind set is!).
+
+The answer to the specific question of why add a "not well-defined"
+binding is the same answer as to why have a kernel version string.
+There was a proposal to remove the kernel version string and that
+was quickly dropped.
+
+I should have written more about why this is useful.
+
+This binding provides the provenance of the DTB.  What source (and
+version of the source) and version of the compiler (dtc) was used
+to make the DTB.
+
+If I want to debug DTB related issues, read the source that was used
+to create the DTB, or slightly modify the DTB - where is the source
+and what is the version of it in the source control system.
+
+When building and installing a DTB, did the version that I wanted to
+install on the target actually get on the target.
+
+> 
 >> +
 >> +version-linux
->> +       The version of the linux kernel most recently built in the source
->> +       control system that contains the source used to build the DTB.
+>> +	The version of the linux kernel most recently built in the source
+>> +	control system that contains the source used to build the DTB.
 >> +
->> +       The linux kernel version number is not incremented for a make that
->> +       creates a DTB.
->> +
+>> +	The linux kernel version number is not incremented for a make that
+>> +	creates a DTB.
+> 
+> ...so if I build a DTB outside of a linux source tree I don't get to
+> describe that?
+
+I will make the name more generic.
+
+> 
 >> +dtb-path
->> +       The build directory relative path of the DTB.
+>> +	The build directory relative path of the DTB.
 >> +
 >> +dts-path
->> +       The absolute path of the .dts file compiled to create the DTB.
+>> +	The absolute path of the .dts file compiled to create the DTB.
 > 
-> So these become an ABI and we can never change the directory structure?
+> Why do you need the DTB path?
 
-Nope.  This is describing where the dtb and the dts were on the build host
-when the dtb was built.  The computer where the dtb is currently located
-when this information is useful (on the "target") is probably not even the
-same computer the dtb was built on.
-
-Mark Rutland asks a lot more questions about this
-so I'll answer some more in reply to his comments.
+Paranoia.  Even if not probable, one could build different DTBs from
+the same .dts.
 
 > 
-> The problem with informational fields is someone, somewhere will rely
-> on them and then we are stuck with them. Look at /proc/cpuinfo.
+> Why do these differ w.r.t. absolute/relative?
+
+Those are the forms of the path that are present in the build
+system.  If there is a good reason to change one of them to the
+other form, I could add the extra complexity to massage the path.
+
 > 
-> Rob
+> Why would you _ever_ need an absolute path!?
+
+The absolute path tells you which source repository contained the source.
+
+> 
+> Mark.
 > 
 
