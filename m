@@ -1,131 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from foss.arm.com ([217.140.101.70]:40414 "EHLO foss.arm.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751229AbbCTPZx (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 20 Mar 2015 11:25:53 -0400
-Date: Fri, 20 Mar 2015 15:25:19 +0000
-From: Mark Rutland <mark.rutland@arm.com>
-Subject: Re: [patch 2/7] dt: dtb version: document chosen/dtb-info node
- binding
-Message-ID: <20150320152518.GI14766@leverpostej>
+Received: from metis.ext.pengutronix.de ([92.198.50.35]:42370 "EHLO
+	metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750925AbbCTTR1 (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 20 Mar 2015 15:17:27 -0400
+Date: Fri, 20 Mar 2015 20:14:05 +0100
+From: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?=
+	<u.kleine-koenig@pengutronix.de>
+Subject: Re: [patch 0/7] dt: dtb version: add version info to dtb
+Message-ID: <20150320191405.GE5664@pengutronix.de>
 References: <550A42AC.8060104@gmail.com>
- <550A4382.4030209@gmail.com>
- <20150319134910.GF18473@leverpostej>
- <550B013B.1060002@gmail.com>
- <20150319191231.GC11683@leverpostej>
- <550B3F2E.2000303@gmail.com>
+ <CAL_JsqJkrPubmM6m7KsaU9S=7j_qVq-U=dJ-500H2VDbT9CwdQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <550B3F2E.2000303@gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAL_JsqJkrPubmM6m7KsaU9S=7j_qVq-U=dJ-500H2VDbT9CwdQ@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Frank Rowand <frowand.list@gmail.com>
-Cc: Rob Herring <robh+dt@kernel.org>, "grant.likely@linaro.org" <grant.likely@linaro.org>, Russell King <linux@arm.linux.org.uk>, Michal Marek <mmarek@suse.cz>, Ian Campbell <ijc+devicetree@hellion.org.uk>, Kumar Gala <galak@codeaurora.org>, Leif Lindholm <leif.lindholm@linaro.org>, Pawel Moll <Pawel.Moll@arm.com>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, Linux Kernel list <linux-kernel@vger.kernel.org>
+To: Rob Herring <robherring2@gmail.com>
+Cc: Frank Rowand <frowand.list@gmail.com>, Michal Marek <mmarek@suse.cz>, Mark Rutland <mark.rutland@arm.com>, Russell King <linux@arm.linux.org.uk>, Pawel Moll <pawel.moll@arm.com>, Ian Campbell <ijc+devicetree@hellion.org.uk>, linux-kbuild@vger.kernel.org, Linux Kernel list <linux-kernel@vger.kernel.org>, Leif Lindholm <leif.lindholm@linaro.org>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, Rob Herring <robh+dt@kernel.org>, Kumar Gala <galak@codeaurora.org>, Grant Likely <grant.likely@linaro.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 
-> > You can already check the hash if you want to check that you copies the
-> > correct version; which is better than trusting an arbitrary string,
-> > because if anything fiddles with the DTB it will change.
+Hello,
+
+On Fri, Mar 20, 2015 at 08:46:09AM -0500, Rob Herring wrote:
+> On Wed, Mar 18, 2015 at 10:29 PM, Frank Rowand <frowand.list@gmail.com> wrote:
+> > Can this be added to the next trees to get some test exposure before submitting
+> > to Linus?
 > 
-> I'm confused.  If the bootloader fiddles with the DTB then I can not
-> compare a hash of the DTB from the build host to a hash of the DTB
-> on the target.  Of course the bootloader can also fiddle with the
-> dtb-info if it wants to .  Bootloaders do what they want to do.  :-(
+> No. I've yet to see anyone think this is a good idea.
+To push the balance a bit into the IMHO right direction: I think the
+version info is a bad idea and fully agree with Russell's concerns.
 
-This is a fundamental issue with the approach: if bootloaders  mess with
-the DTB, then the provenance information is at best misleading.
+Best regards
+Uwe
 
-If bootloaders don't mess with the DTB, then a hash gives you reliable
-provenance information, provided you have a DB of the hashes of DTBs
-you've shipped. If you're already in the habit of distributing binaries
-that should be fine, and if you're not then it presumably doesn't matter
-anyway.
-
-> >>>> +dtb-path
-> >>>> +	The build directory relative path of the DTB.
-> >>>> +
-> >>>> +dts-path
-> >>>> +	The absolute path of the .dts file compiled to create the DTB.
-> >>>
-> >>> Why do you need the DTB path?
-> >>
-> >> Paranoia.  Even if not probable, one could build different DTBs from
-> >> the same .dts.
-> > 
-> > One could also build the same DTB from two different dts files, no?
-> > 
-> > You could build the same dtb from the same dts, but with some arbitrary
-> > things changed, such that the at either end of the process is
-> > irrelevant. Personally, I end up doing this a fair amount when testing.
-> 
-> Exactly.  And the dtb version number will change when the DTB is
-> recompiled.
-
-Consider having to work around stale object issues in the build system
-with git clean -fdx or similar. While unfortunate, this is sometimes
-necessary. Due to this, I build two different DTBs with exactly the same
-"version".
-
-If you need to tell these apart, you can do that by hash. You don't need
-the "version" to do so.
-
-(and yes, I am aware that the same is true of the kernel).
-
-> >>> Why do these differ w.r.t. absolute/relative?
-> >>
-> >> Those are the forms of the path that are present in the build
-> >> system.  If there is a good reason to change one of them to the
-> >> other form, I could add the extra complexity to massage the path.
-> >>
-> >>>
-> >>> Why would you _ever_ need an absolute path!?
-> >>
-> >> The absolute path tells you which source repository contained the source.
-> > 
-> > Except that the absolute path is realtive to the machine it was built
-> > on, so doesn't actually help.
-> 
-> Different use cases for different people.
-
-Given the reservations that have been expressed so far, it sounds like
-the set of negative use cases is larger than the set of positives.
-
-> In all cases the absolute path includes the relative path, so it is
-> just a case of extra information.  The relative portion of the path
-> is still useful for anyone who wants to know what .dts was used in
-> the build, even if they don't have access to the build machine.
-> (They do have access to the gpl v2 source code, which will have
-> at least the relative portion of the path because that is needed
-> to build the DTB from the .dts.)
-> 
-> The extra information in the absolute path could be useful to a
-> build engineer, a distro engineer, or a support person for a distro.
-> Or could just be useless extra info.
-
-I very much suspect it will end up being the latter. For example I've
-seen various iterations of certain FW ship with all-zero ID numbers, for
-which the use-cases of said ID numbers are exactly those you mention
-above.
-
-As far as I can see, the only consistent and sane way to identify a
-binary object is by its hash, which for obvious reasons cannot be
-encoded within itself (though can be computed consistently).
-
-> > On various machines I have folders called /home/mark/src/linux. These
-> > are not the same folder. If I gave you a DTB that told you it was from
-> > /home/mark/src/linux/arch/arm64/boot/dts/vendor/foo.dts, you would have
-> > difficulty acquiring that precise file.
-> 
-> If you distributed the DTB to me under the gpl v2 then you have also
-> either distributed the source to me or offered to make it available
-> to me.
-
-That being the case you don't care about the fields; we've established
-that they're meaningless to the end user.
-
-Were I to have distributed files to you, I would have archived the
-relevant build (with source, config, and so on). I can look up what I've
-distributed to you and hand you the source without needing additional
-properties in the DTB.
-
-Mark.
+-- 
+Pengutronix e.K.                           | Uwe Kleine-König            |
+Industrial Linux Solutions                 | http://www.pengutronix.de/  |
