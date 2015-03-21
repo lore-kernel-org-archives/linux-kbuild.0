@@ -1,40 +1,89 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from metis.ext.pengutronix.de ([92.198.50.35]:42370 "EHLO
-	metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750925AbbCTTR1 (ORCPT
+Received: from mail-la0-f51.google.com ([209.85.215.51]:36468 "EHLO
+	mail-la0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751251AbbCUBuZ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 20 Mar 2015 15:17:27 -0400
-Date: Fri, 20 Mar 2015 20:14:05 +0100
-From: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?=
-	<u.kleine-koenig@pengutronix.de>
-Subject: Re: [patch 0/7] dt: dtb version: add version info to dtb
-Message-ID: <20150320191405.GE5664@pengutronix.de>
-References: <550A42AC.8060104@gmail.com>
- <CAL_JsqJkrPubmM6m7KsaU9S=7j_qVq-U=dJ-500H2VDbT9CwdQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAL_JsqJkrPubmM6m7KsaU9S=7j_qVq-U=dJ-500H2VDbT9CwdQ@mail.gmail.com>
+	Fri, 20 Mar 2015 21:50:25 -0400
+Received: by labe2 with SMTP id e2so24109659lab.3
+        for <linux-kbuild@vger.kernel.org>; Fri, 20 Mar 2015 18:50:23 -0700 (PDT)
+From: Rasmus Villemoes <linux@rasmusvillemoes.dk>
+Subject: [PATCH] kbuild: include core debug info when DEBUG_INFO_REDUCED
+Date: Sat, 21 Mar 2015 02:50:01 +0100
+Message-Id: <1426902601-13524-1-git-send-email-linux@rasmusvillemoes.dk>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rob Herring <robherring2@gmail.com>
-Cc: Frank Rowand <frowand.list@gmail.com>, Michal Marek <mmarek@suse.cz>, Mark Rutland <mark.rutland@arm.com>, Russell King <linux@arm.linux.org.uk>, Pawel Moll <pawel.moll@arm.com>, Ian Campbell <ijc+devicetree@hellion.org.uk>, linux-kbuild@vger.kernel.org, Linux Kernel list <linux-kernel@vger.kernel.org>, Leif Lindholm <leif.lindholm@linaro.org>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, Rob Herring <robh+dt@kernel.org>, Kumar Gala <galak@codeaurora.org>, Grant Likely <grant.likely@linaro.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+To: Michal Marek <mmarek@suse.cz>, Andrew Morton <akpm@linux-foundation.org>
+Cc: linux-kbuild@vger.kernel.org, Rasmus Villemoes <linux@rasmusvillemoes.dk>, linux-kernel@vger.kernel.org
 
-Hello,
+With CONFIG_DEBUG_INFO_REDUCED, we do get quite a lot of debug info
+(around 22.7 MB for a defconfig+DEBUG_INFO_REDUCED). However, the
+"basenames must match" rule used by -femit-struct-debug-baseonly
+option means that we miss some core data structures, such as struct
+{device, file, inode, mm_struct, page} etc.
 
-On Fri, Mar 20, 2015 at 08:46:09AM -0500, Rob Herring wrote:
-> On Wed, Mar 18, 2015 at 10:29 PM, Frank Rowand <frowand.list@gmail.com> wrote:
-> > Can this be added to the next trees to get some test exposure before submitting
-> > to Linus?
-> 
-> No. I've yet to see anyone think this is a good idea.
-To push the balance a bit into the IMHO right direction: I think the
-version info is a bad idea and fully agree with Russell's concerns.
+We can easily get these included as well, while still getting the
+benefits of CONFIG_DEBUG_INFO_REDUCED (faster build times and smaller
+individual object files): All it takes is a dummy translation unit
+including a few strategic headers and compiled with a flag overriding
+-femit-struct-debug-baseonly.
 
-Best regards
-Uwe
+This increases the size of .debug_info by ~0.3%, but these 90 KB
+contain some rather useful info.
 
+Signed-off-by: Rasmus Villemoes <linux@rasmusvillemoes.dk>
+---
+ lib/Makefile     |  3 +++
+ lib/debug_info.c | 27 +++++++++++++++++++++++++++
+ 2 files changed, 30 insertions(+)
+ create mode 100644 lib/debug_info.c
+
+diff --git a/lib/Makefile b/lib/Makefile
+index 58f74d2dd396..3d788091d60c 100644
+--- a/lib/Makefile
++++ b/lib/Makefile
+@@ -45,6 +45,9 @@ CFLAGS_kobject.o += -DDEBUG
+ CFLAGS_kobject_uevent.o += -DDEBUG
+ endif
+ 
++obj-$(CONFIG_DEBUG_INFO_REDUCED) += debug_info.o
++CFLAGS_debug_info.o += $(call cc-option, -femit-struct-debug-detailed=any)
++
+ obj-$(CONFIG_GENERIC_IOMAP) += iomap.o
+ obj-$(CONFIG_GENERIC_PCI_IOMAP) += pci_iomap.o
+ obj-$(CONFIG_HAS_IOMEM) += iomap_copy.o devres.o
+diff --git a/lib/debug_info.c b/lib/debug_info.c
+new file mode 100644
+index 000000000000..2edbe27517ed
+--- /dev/null
++++ b/lib/debug_info.c
+@@ -0,0 +1,27 @@
++/*
++ * This file exists solely to ensure debug information for some core
++ * data structures is included in the final image even for
++ * CONFIG_DEBUG_INFO_REDUCED. Please do not add actual code. However,
++ * adding appropriate #includes is fine.
++ */
++#include <stdarg.h>
++
++#include <linux/cred.h>
++#include <linux/crypto.h>
++#include <linux/dcache.h>
++#include <linux/device.h>
++#include <linux/fs.h>
++#include <linux/fscache-cache.h>
++#include <linux/io.h>
++#include <linux/kallsyms.h>
++#include <linux/kernel.h>
++#include <linux/kobject.h>
++#include <linux/mm.h>
++#include <linux/module.h>
++#include <linux/net.h>
++#include <linux/sched.h>
++#include <linux/slab.h>
++#include <linux/types.h>
++#include <net/addrconf.h>
++#include <net/sock.h>
++#include <net/tcp.h>
 -- 
-Pengutronix e.K.                           | Uwe Kleine-König            |
-Industrial Linux Solutions                 | http://www.pengutronix.de/  |
+2.1.3
+
