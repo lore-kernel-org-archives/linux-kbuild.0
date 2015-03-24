@@ -1,62 +1,86 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from omr2.cc.vt.edu ([198.82.141.100]:54063 "EHLO omr2.cc.vt.edu"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932114AbbCXQIp (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 24 Mar 2015 12:08:45 -0400
-Subject: Re: [PATCH] kbuild: Don't reset timestamps in include/generated if not needed
-In-Reply-To: Your message of "Tue, 24 Mar 2015 16:36:04 +0100."
-             <1427211364-20352-1-git-send-email-mmarek@suse.cz>
-From: Valdis.Kletnieks@vt.edu
-References: <5502B546.5010806@suse.cz>
-            <1427211364-20352-1-git-send-email-mmarek@suse.cz>
-Mime-Version: 1.0
-Content-Type: multipart/signed; boundary="==_Exmh_1427213311_2001P";
-	 micalg=pgp-sha1; protocol="application/pgp-signature"
-Content-Transfer-Encoding: 7bit
-Date: Tue, 24 Mar 2015 12:08:31 -0400
-Message-ID: <7468.1427213311@turing-police.cc.vt.edu>
+Received: from mail-wi0-f176.google.com ([209.85.212.176]:37772 "EHLO
+	mail-wi0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755207AbbCXRhb (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 24 Mar 2015 13:37:31 -0400
+Message-ID: <5511A0D6.5030606@suse.cz>
+Date: Tue, 24 Mar 2015 18:37:26 +0100
+From: Jiri Slaby <jslaby@suse.cz>
+MIME-Version: 1.0
+Subject: Re: [PATCH 13/14] kdbus: add walk-through user space example
+References: <1425906560-13798-1-git-send-email-gregkh@linuxfoundation.org>	<1425906560-13798-14-git-send-email-gregkh@linuxfoundation.org>	<551194C8.4070707@suse.cz> <CANq1E4QmOg0Xjx9d=fDQmuaAO1aBwQAbdwz_7ucyo6LVvFLzUA@mail.gmail.com>
+In-Reply-To: <CANq1E4QmOg0Xjx9d=fDQmuaAO1aBwQAbdwz_7ucyo6LVvFLzUA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>
+To: David Herrmann <dh.herrmann@gmail.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, "Eric W. Biederman" <ebiederm@xmission.com>, One Thousand Gnomes <gnomes@lxorguk.ukuu.org.uk>, Tom Gundersen <teg@jklm.no>, Jiri Kosina <jkosina@suse.cz>, Andy Lutomirski <luto@amacapital.net>, Linux API <linux-api@vger.kernel.org>, linux-kernel <linux-kernel@vger.kernel.org>, Daniel Mack <daniel@zonque.org>, Djalal Harouni <tixxdz@opendz.org>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
---==_Exmh_1427213311_2001P
-Content-Type: text/plain; charset=us-ascii
+Ccing kbuild fellows (see the very bottom).
 
-On Tue, 24 Mar 2015 16:36:04 +0100, Michal Marek said:
-> Use filechk to generate asm-offsets.h and bounds.h.
->
-> Reported-by: Valdis Kletnieks <Valdis.Kletnieks@vt.edu>
-> Reviewed-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> Signed-off-by: Michal Marek <mmarek@suse.cz>
-> ---
->  Kbuild | 18 +++++++++---------
->  1 file changed, 9 insertions(+), 9 deletions(-)
+On 03/24/2015, 06:15 PM, David Herrmann wrote:
+> Hi
+> 
+> On Tue, Mar 24, 2015 at 5:46 PM, Jiri Slaby <jslaby@suse.cz> wrote:
+>> On 03/09/2015, 02:09 PM, Greg Kroah-Hartman wrote:
+>>> --- /dev/null
+>>> +++ b/samples/kdbus/Makefile
+>>> @@ -0,0 +1,10 @@
+>>> +# kbuild trick to avoid linker error. Can be omitted if a module is built.
+>>> +obj- := dummy.o
+>>> +
+>>> +hostprogs-y += kdbus-workers
+>>> +
+>>> +always := $(hostprogs-y)
+>>
+>> Errr, no. Not only it causes build failures (even with KDBUS=n), it
+>> definitely should not be built for everyone.
+> 
+> It's only built if CONFIG_SAMPLES is set, right?
 
-Different from my patch, but that's OK.  Feel free to stick an Acked-By:
-on there. :)
+Yes, but I build other samples selected with separate CONFIG_ options
+like CONFIG_SAMPLE_LIVEPATCH. So this guy should have its own CONFIG_
+option too, because I (and likely others) don't want to build it. All of
+the samples should be protected at least by their respective kernel
+CONFIG_ option IMO.
 
+> What build-failures does it cause? linux/kdbus.h is not optional based
+> on CONFIG_KDBUS, so the samples should build just fine. Can you tell
+> me what kind of errors you get? The kbuild-robots didn't report
+> anything so far.
 
---==_Exmh_1427213311_2001P
-Content-Type: application/pgp-signature
+The output is this:
+In file included from samples/kdbus/kdbus-workers.c:79:0:
+/home/latest/linux/samples/kdbus/kdbus-api.h:5:25: fatal error:
+linux/kdbus.h: No such file or directory
+ #include <linux/kdbus.h>
+                         ^
+compilation terminated.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-Comment: Exmh version 2.5 07/13/2001
+I now know that I have to install_headers *if* I want to build the
+sample. But I don't want to build it in the first place. (So the config
+option above should be all we need.)
 
-iQIVAwUBVRGL/wdmEQWDXROgAQILdQ//YaMqKzTBV977wzfIAnk1/T4jo7XLZAOH
-rIUP641QrunfJmV9lNRleJXW2LdQRjmSUQBmt31IlajiDUvr+q0GOnxPnWNgSb3G
-UsV0Q5E4I5l/4sNvagrxVF/ElzC2v901Zm4Dja10tzojba0kMFKG7fEaN9gQZvv1
-HQfGjA91932h/crOY2YyebROrjJZGIiavJWgppQ5gVET0lQBQpunIrRb4K+KsEbP
-gFkzuV/fLfbP9NnNuiUBx96OjdrNKrxIUsRl9ZsMJ8e74o6T1rlr8qrl/WmUm4f0
-rtK894XzeLFY2N1a9hnvO1k3/MKQ235dOWjwPwQOu0/GSbDYzPKdaSNaAKBwzhrB
-HFLQjAm8gAU7L6ZGSPZg6AbU43NemMH/poXvxmFD4/fCBo66bxoHLqo0JUZ8RMSk
-hYfj0tPwjl1NEZsL3xEWw+EqpOkTQtEnKKp1kgr73st+rYxdrO2RskDO4HiWXIwV
-32A4+e5S7xEV9ef2gJedd6VhkdCM3E0CY7k6uFy+YmOvlJwsK83ntww+Hgg+33j5
-4foODx1YSAQAov8Rqt1GjQPzPPpikBa8YKgTvZVU6u5Em/c5mqDF/6xYD1XTwCuC
-6D/soY/DBPd8tBRqhUXkXYHbDHYJxsfIh6amEwOadPsyCXgH5oBtVJmhhYsoFVFW
-Strl+Ra+vCo=
-=ZhBM
------END PGP SIGNATURE-----
+>> And why is it a host prog? It's a sample prog for the kernel I am
+>> building, i.e. for the destination arch, like all the other samples.
+> 
+> It's modeled after the other user-space examples in ./samples/, which
+> all use hostprogs (see samples/{bpf,hidraw,seccomp,uhid}/Makefile). I
+> have no idea how to build programs that run on the target
+> architecture. Documentation/kbuild/makefiles.txt doesn't list it,
+> which is, I guess, the reason why everyone used hostprogs so far. And
+> given that autotools calls the target architecture "--host", I
+> actually thought this is what hostprogs does.. apparently that's not
+> the case, sorry.
 
---==_Exmh_1427213311_2001P--
+Oh, it's cut&paste, I see. This does not look correct though. The hack
+inclusive. Host progs are intended to be run on the host where the
+kernel is built. During the compilation or such (like x/menuconfig).
+Quite misleading naming if you are used to the autotools one.
+
+thanks,
+-- 
+js
+suse labs
