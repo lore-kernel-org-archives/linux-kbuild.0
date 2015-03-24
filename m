@@ -1,57 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:35927 "EHLO mx2.suse.de"
+Received: from omr2.cc.vt.edu ([198.82.141.100]:54063 "EHLO omr2.cc.vt.edu"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932423AbbCXPzI (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 24 Mar 2015 11:55:08 -0400
-Message-ID: <551188DA.3090109@suse.cz>
-Date: Tue, 24 Mar 2015 16:55:06 +0100
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: [PATCH 0/6] kbuild: mergeconfig: fix bugs, improve readability,
- and add generic entry point
-References: <1426227703-31815-1-git-send-email-yamada.masahiro@socionext.com> <20150313082716.GA11052@thin> <D128A497.C1D73%dvhart@linux.intel.com>
-In-Reply-To: <D128A497.C1D73%dvhart@linux.intel.com>
-Content-Type: text/plain; charset=windows-1252
+	id S932114AbbCXQIp (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 24 Mar 2015 12:08:45 -0400
+Subject: Re: [PATCH] kbuild: Don't reset timestamps in include/generated if not needed
+In-Reply-To: Your message of "Tue, 24 Mar 2015 16:36:04 +0100."
+             <1427211364-20352-1-git-send-email-mmarek@suse.cz>
+From: Valdis.Kletnieks@vt.edu
+References: <5502B546.5010806@suse.cz>
+            <1427211364-20352-1-git-send-email-mmarek@suse.cz>
+Mime-Version: 1.0
+Content-Type: multipart/signed; boundary="==_Exmh_1427213311_2001P";
+	 micalg=pgp-sha1; protocol="application/pgp-signature"
 Content-Transfer-Encoding: 7bit
+Date: Tue, 24 Mar 2015 12:08:31 -0400
+Message-ID: <7468.1427213311@turing-police.cc.vt.edu>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Darren Hart <dvhart@linux.intel.com>, Josh Triplett <josh@joshtriplett.org>, Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild@vger.kernel.org, Josh Boyer <jwboyer@redhat.com>, john stultz <johnstul@us.ibm.com>, linux-kernel@vger.kernel.org, "Yann E. MORIN" <yann.morin.1998@free.fr>
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>
 
-On 2015-03-13 22:29, Darren Hart wrote:
-> On 3/13/15, 1:27 AM, "Josh Triplett" <josh@joshtriplett.org> wrote:
-> 
->> On Fri, Mar 13, 2015 at 03:21:37PM +0900, Masahiro Yamada wrote:
->>>
->>> This series is related to mergeconfig (scripts/kconfig/merge_config.sh):
->>>
->>> 1/6 and 2/6 fix bugs related to the parallel build. (-j option).
->>> 3/6 thru 5/6 are minor clean-ups.
->>> 6/6 is a new feature; add a generic entry point of mergeconfig.
->>>
->>> The last one is RFC.
->>>
->>> Masahiro Yamada (6):
->>>   kbuild: mergeconfig: fix "jobserver unavailable" warning
->>>   kbuild: mergeconfig: move an error check to merge_config.sh
->>>   kbuild: mergeconfig: remove redundant $(objtree)
->>>   merge_config.sh: improve indentation
->>>   merge_config.sh: rename MAKE to RUNMAKE
->>>   kbuild: add generic mergeconfig target, %.config
-> 
-> Nice improvements, thank you.
-> 
->>
->> For all six:
->>
->> Reviewed-by: Josh Triplett <josh@joshtriplett.org>
->>
-> 
-> Likewise:
-> 
-> Reviewed-by: Darren Hart <dvhart@linux.intel.com>
+--==_Exmh_1427213311_2001P
+Content-Type: text/plain; charset=us-ascii
 
-Added to kbuild.git#kconfig.
+On Tue, 24 Mar 2015 16:36:04 +0100, Michal Marek said:
+> Use filechk to generate asm-offsets.h and bounds.h.
+>
+> Reported-by: Valdis Kletnieks <Valdis.Kletnieks@vt.edu>
+> Reviewed-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> Signed-off-by: Michal Marek <mmarek@suse.cz>
+> ---
+>  Kbuild | 18 +++++++++---------
+>  1 file changed, 9 insertions(+), 9 deletions(-)
 
-Michal
+Different from my patch, but that's OK.  Feel free to stick an Acked-By:
+on there. :)
 
+
+--==_Exmh_1427213311_2001P
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+Comment: Exmh version 2.5 07/13/2001
+
+iQIVAwUBVRGL/wdmEQWDXROgAQILdQ//YaMqKzTBV977wzfIAnk1/T4jo7XLZAOH
+rIUP641QrunfJmV9lNRleJXW2LdQRjmSUQBmt31IlajiDUvr+q0GOnxPnWNgSb3G
+UsV0Q5E4I5l/4sNvagrxVF/ElzC2v901Zm4Dja10tzojba0kMFKG7fEaN9gQZvv1
+HQfGjA91932h/crOY2YyebROrjJZGIiavJWgppQ5gVET0lQBQpunIrRb4K+KsEbP
+gFkzuV/fLfbP9NnNuiUBx96OjdrNKrxIUsRl9ZsMJ8e74o6T1rlr8qrl/WmUm4f0
+rtK894XzeLFY2N1a9hnvO1k3/MKQ235dOWjwPwQOu0/GSbDYzPKdaSNaAKBwzhrB
+HFLQjAm8gAU7L6ZGSPZg6AbU43NemMH/poXvxmFD4/fCBo66bxoHLqo0JUZ8RMSk
+hYfj0tPwjl1NEZsL3xEWw+EqpOkTQtEnKKp1kgr73st+rYxdrO2RskDO4HiWXIwV
+32A4+e5S7xEV9ef2gJedd6VhkdCM3E0CY7k6uFy+YmOvlJwsK83ntww+Hgg+33j5
+4foODx1YSAQAov8Rqt1GjQPzPPpikBa8YKgTvZVU6u5Em/c5mqDF/6xYD1XTwCuC
+6D/soY/DBPd8tBRqhUXkXYHbDHYJxsfIh6amEwOadPsyCXgH5oBtVJmhhYsoFVFW
+Strl+Ra+vCo=
+=ZhBM
+-----END PGP SIGNATURE-----
+
+--==_Exmh_1427213311_2001P--
