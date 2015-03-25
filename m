@@ -1,115 +1,84 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from svenfoo.org ([82.94.215.22]:41170 "EHLO mail.zonque.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752342AbbCXSvq (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 24 Mar 2015 14:51:46 -0400
-Message-ID: <5511B23F.1020407@zonque.org>
-Date: Tue, 24 Mar 2015 19:51:43 +0100
-From: Daniel Mack <daniel@zonque.org>
+Received: from mail-wi0-f173.google.com ([209.85.212.173]:36531 "EHLO
+	mail-wi0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752190AbbCYEoq (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 25 Mar 2015 00:44:46 -0400
 MIME-Version: 1.0
-Subject: Re: [PATCH 13/14] kdbus: add walk-through user space example
-References: <1425906560-13798-1-git-send-email-gregkh@linuxfoundation.org>	<1425906560-13798-14-git-send-email-gregkh@linuxfoundation.org>	<551194C8.4070707@suse.cz> <CANq1E4QmOg0Xjx9d=fDQmuaAO1aBwQAbdwz_7ucyo6LVvFLzUA@mail.gmail.com> <5511A0D6.5030606@suse.cz> <5511AB80.3020102@suse.cz>
-In-Reply-To: <5511AB80.3020102@suse.cz>
-Content-Type: multipart/mixed;
- boundary="------------090207040409010408060200"
+In-Reply-To: <550338CA.50003@gmail.com>
+References: <550338CA.50003@gmail.com>
+From: Rob Herring <robherring2@gmail.com>
+Date: Tue, 24 Mar 2015 23:44:23 -0500
+Message-ID: <CAL_JsqJB15xGBPv71tVHvS4YiHKS1o5XqUgbwkuz6uodnD=ETA@mail.gmail.com>
+Subject: Re: [Patch] dt: OF_UNITTEST make dependency broken
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>, Jiri Slaby <jslaby@suse.cz>, David Herrmann <dh.herrmann@gmail.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, "Eric W. Biederman" <ebiederm@xmission.com>, One Thousand Gnomes <gnomes@lxorguk.ukuu.org.uk>, Tom Gundersen <teg@jklm.no>, Jiri Kosina <jkosina@suse.cz>, Andy Lutomirski <luto@amacapital.net>, Linux API <linux-api@vger.kernel.org>, linux-kernel <linux-kernel@vger.kernel.org>, Djalal Harouni <tixxdz@opendz.org>, linux-kbuild@vger.kernel.org
+To: Frank Rowand <frowand.list@gmail.com>
+Cc: Grant Likely <grant.likely@linaro.org>, Rob Herring <robh+dt@kernel.org>, Michal Marek <mmarek@suse.cz>, Linux Kernel list <linux-kernel@vger.kernel.org>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, linux-kbuild@vger.kernel.org
 
-This is a multi-part message in MIME format.
---------------090207040409010408060200
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+On Fri, Mar 13, 2015 at 2:21 PM, Frank Rowand <frowand.list@gmail.com> wrote:
+> From: Frank Rowand <frank.rowand@sonymobile.com>
+>
+> If CONFIG_OF_UNITTEST=y then a kernel image make will always cause .version to
+> be incremented, even if there are not source changes.  This is caused by
+> a lack of dependency tracking and checking for
+> drivers/of/unittest-data/testcases.dtb.o.
+>
+>
+> Signed-off-by: Frank Rowand <frank.rowand@sonymobile.com>
 
-On 03/24/2015 07:22 PM, Michal Marek wrote:
-> Dne 24.3.2015 v 18:37 Jiri Slaby napsal(a):
+Applied. Thanks.
 
->> Oh, it's cut&paste, I see. This does not look correct though. The hack
->> inclusive. Host progs are intended to be run on the host where the
->> kernel is built. During the compilation or such (like x/menuconfig).
->> Quite misleading naming if you are used to the autotools one.
-> 
-> when cross compiling, we are a bit between a rock and a hard place with
-> the sample userspace programs:
-> - The target toolchain might not have libc support
-> - The host toolchain might be lacking recent kernel headers (therefore
->   the need to do make headers_install)
-> - It's not clean whether the samples are meant to be ran on the build
->   host or target.
+Rob
 
-Exactly. I just checked in a cross-compiled source tree, and none of the
-compiled standalone executables from samples/ or Documentation/ are
-actually built for the target platform. Only the samples which come as
-kernel modules are.
-
-> There has been some work by Sam Ravnborg to introduce uapiprogs-y to for
-> sample userspace programs, but for now, please use hostprogs-y,
-> -Iusr/include and make each sample opt-in.
-
-Alright then. Does the attached patch fix your problem, Jiri?
-
-
-Thanks,
-Daniel
-
-
---------------090207040409010408060200
-Content-Type: text/x-diff;
- name="0001-kdbus-sample-build-kdbus-workers-conditionally.patch"
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: attachment;
- filename*0="0001-kdbus-sample-build-kdbus-workers-conditionally.patch"
-
-=46rom 56309ab0717720fb086ec3209f1b1fa719072f61 Mon Sep 17 00:00:00 2001
-From: Daniel Mack <daniel@zonque.org>
-Date: Tue, 24 Mar 2015 19:41:56 +0100
-Subject: [PATCH] kdbus: sample: build kdbus-workers conditionally
-
-Give the kdbus sample its own config switch and only build it if it's
-explicitly switched on.
-
-Reported-by: Jiri Slaby <jslaby@suse.cz>
-Signed-off-by: Daniel Mack <daniel@zonque.org>
----
- samples/Kconfig        | 7 +++++++
- samples/kdbus/Makefile | 2 +-
- 2 files changed, 8 insertions(+), 1 deletion(-)
-
-diff --git a/samples/Kconfig b/samples/Kconfig
-index 224ebb4..a4c6b2f 100644
---- a/samples/Kconfig
-+++ b/samples/Kconfig
-@@ -55,6 +55,13 @@ config SAMPLE_KDB
- 	  Build an example of how to dynamically add the hello
- 	  command to the kdb shell.
-=20
-+config SAMPLE_KDBUS
-+	bool "Build kdbus API example"
-+	depends on KDBUS
-+	help
-+	  Build an example of how the kdbus API can be used from
-+	  userspace.
-+
- config SAMPLE_RPMSG_CLIENT
- 	tristate "Build rpmsg client sample -- loadable modules only"
- 	depends on RPMSG && m
-diff --git a/samples/kdbus/Makefile b/samples/kdbus/Makefile
-index d009025..9e40c68 100644
---- a/samples/kdbus/Makefile
-+++ b/samples/kdbus/Makefile
-@@ -1,7 +1,7 @@
- # kbuild trick to avoid linker error. Can be omitted if a module is buil=
-t.
- obj- :=3D dummy.o
-=20
--hostprogs-y +=3D kdbus-workers
-+hostprogs-$(CONFIG_SAMPLE_KDBUS) +=3D kdbus-workers
-=20
- always :=3D $(hostprogs-y)
-=20
---=20
-2.3.3
-
-
---------------090207040409010408060200--
+>
+> ---
+>
+>
+>  drivers/of/Makefile                 |    5 +++--
+>  drivers/of/unittest-data/.gitignore |    2 ++
+>  drivers/of/unittest-data/Makefile   |    7 +++++++
+>  3 files changed, 12 insertions(+), 2 deletions(-)
+>
+> Index: b/drivers/of/Makefile
+> ===================================================================
+> --- a/drivers/of/Makefile
+> +++ b/drivers/of/Makefile
+> @@ -6,8 +6,7 @@ obj-$(CONFIG_OF_PROMTREE) += pdt.o
+>  obj-$(CONFIG_OF_ADDRESS)  += address.o
+>  obj-$(CONFIG_OF_IRQ)    += irq.o
+>  obj-$(CONFIG_OF_NET)   += of_net.o
+> -obj-$(CONFIG_OF_UNITTEST) += of_unittest.o
+> -of_unittest-objs := unittest.o unittest-data/testcases.dtb.o
+> +obj-$(CONFIG_OF_UNITTEST) += unittest.o
+>  obj-$(CONFIG_OF_MDIO)  += of_mdio.o
+>  obj-$(CONFIG_OF_PCI)   += of_pci.o
+>  obj-$(CONFIG_OF_PCI_IRQ)  += of_pci_irq.o
+> @@ -16,5 +15,7 @@ obj-$(CONFIG_OF_RESERVED_MEM) += of_rese
+>  obj-$(CONFIG_OF_RESOLVE)  += resolver.o
+>  obj-$(CONFIG_OF_OVERLAY) += overlay.o
+>
+> +obj-$(CONFIG_OF_UNITTEST) += unittest-data/
+> +
+>  CFLAGS_fdt.o = -I$(src)/../../scripts/dtc/libfdt
+>  CFLAGS_fdt_address.o = -I$(src)/../../scripts/dtc/libfdt
+> Index: b/drivers/of/unittest-data/Makefile
+> ===================================================================
+> --- /dev/null
+> +++ b/drivers/of/unittest-data/Makefile
+> @@ -0,0 +1,7 @@
+> +obj-y += testcases.dtb.o
+> +
+> +targets += testcases.dtb testcases.dtb.S
+> +
+> +.SECONDARY: \
+> +       $(obj)/testcases.dtb.S \
+> +       $(obj)/testcases.dtb
+> Index: b/drivers/of/unittest-data/.gitignore
+> ===================================================================
+> --- /dev/null
+> +++ b/drivers/of/unittest-data/.gitignore
+> @@ -0,0 +1,2 @@
+> +testcases.dtb
+> +testcases.dtb.S
