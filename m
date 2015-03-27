@@ -1,35 +1,84 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg010.nifty.com ([202.248.44.36]:33154 "EHLO
+Received: from conuserg010.nifty.com ([202.248.44.36]:30601 "EHLO
 	conuserg010-v.nifty.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752986AbbC0Lqq (ORCPT
+	with ESMTP id S1752908AbbC0Lpf (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 27 Mar 2015 07:46:46 -0400
+	Fri, 27 Mar 2015 07:45:35 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 0/4] kbuild: refactor Makefile inclusion
-Date: Fri, 27 Mar 2015 20:43:34 +0900
-Message-Id: <1427456618-23830-1-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH 1/4] kbuild: use relative path to include Makefile
+Date: Fri, 27 Mar 2015 20:43:35 +0900
+Message-Id: <1427456618-23830-2-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1427456618-23830-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1427456618-23830-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-mips@linux-mips.org, Tony Luck <tony.luck@intel.com>, x86@kernel.org, linux-ia64@vger.kernel.org, user-mode-linux-devel@lists.sourceforge.net, Jeff Dike <jdike@addtoit.com>, "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, Russell King <linux@arm.linux.org.uk>, Richard Weinberger <richard@nod.at>, Michal Marek <mmarek@suse.cz>, user-mode-linux-user@lists.sourceforge.net, Ingo Molnar <mingo@redhat.com>, Fenghua Yu <fenghua.yu@intel.com>, Ralf Baechle <ralf@linux-mips.org>, linux-arm-kernel@lists.infradead.org
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Tony Luck <tony.luck@intel.com>, linux-ia64@vger.kernel.org, linux-kernel@vger.kernel.org, Russell King <linux@arm.linux.org.uk>, Michal Marek <mmarek@suse.cz>, Fenghua Yu <fenghua.yu@intel.com>, linux-arm-kernel@lists.infradead.org
 
-Masahiro Yamada (4):
-  kbuild: use relative path to include Makefile
-  kbuild: use relative path more to include Makefile
-  kbuild: include $(src)/Makefile rather than $(obj)/Makefile
-  kbuild: ia64: use $(src)/Makefile.gate rather than particular path
+The "MAKEFLAGS += --include-dir=$(srctree)" line in the top Makefile
+allows us to do this.
 
- Makefile                  | 22 ++++++++++------------
- arch/arm/boot/Makefile    |  2 +-
- arch/ia64/kernel/Makefile |  2 +-
- arch/mips/Makefile        |  2 +-
- arch/um/Makefile          |  6 +++---
- arch/x86/Makefile         |  2 +-
- arch/x86/Makefile.um      |  2 +-
- scripts/Makefile.dtbinst  |  2 +-
- scripts/Makefile.fwinst   |  2 +-
- 9 files changed, 20 insertions(+), 22 deletions(-)
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
+ arch/arm/boot/Makefile    | 2 +-
+ arch/ia64/kernel/Makefile | 2 +-
+ scripts/Makefile.dtbinst  | 2 +-
+ scripts/Makefile.fwinst   | 2 +-
+ 4 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/arch/arm/boot/Makefile b/arch/arm/boot/Makefile
+index ec2f806..9eca7ae 100644
+--- a/arch/arm/boot/Makefile
++++ b/arch/arm/boot/Makefile
+@@ -12,7 +12,7 @@
+ #
+ 
+ ifneq ($(MACHINE),)
+-include $(srctree)/$(MACHINE)/Makefile.boot
++include $(MACHINE)/Makefile.boot
+ endif
+ 
+ # Note: the following conditions must always be true:
+diff --git a/arch/ia64/kernel/Makefile b/arch/ia64/kernel/Makefile
+index 20678a9..47e8aff 100644
+--- a/arch/ia64/kernel/Makefile
++++ b/arch/ia64/kernel/Makefile
+@@ -51,7 +51,7 @@ obj-$(CONFIG_BINFMT_ELF)	+= elfcore.o
+ CFLAGS_traps.o  += -mfixed-range=f2-f5,f16-f31
+ 
+ # The gate DSO image is built using a special linker script.
+-include $(srctree)/arch/ia64/kernel/Makefile.gate
++include arch/ia64/kernel/Makefile.gate
+ # tell compiled for native
+ CPPFLAGS_gate.lds += -D__IA64_GATE_PARAVIRTUALIZED_NATIVE
+ 
+diff --git a/scripts/Makefile.dtbinst b/scripts/Makefile.dtbinst
+index 909ed7a..7cbff16 100644
+--- a/scripts/Makefile.dtbinst
++++ b/scripts/Makefile.dtbinst
+@@ -18,7 +18,7 @@ export dtbinst-root ?= $(obj)
+ 
+ include include/config/auto.conf
+ include scripts/Kbuild.include
+-include $(srctree)/$(obj)/Makefile
++include $(obj)/Makefile
+ 
+ PHONY += __dtbs_install_prep
+ __dtbs_install_prep:
+diff --git a/scripts/Makefile.fwinst b/scripts/Makefile.fwinst
+index 5b698ad..baf5eae 100644
+--- a/scripts/Makefile.fwinst
++++ b/scripts/Makefile.fwinst
+@@ -13,7 +13,7 @@ src := $(obj)
+ -include $(objtree)/.config
+ 
+ include scripts/Kbuild.include
+-include $(srctree)/$(obj)/Makefile
++include $(obj)/Makefile
+ 
+ include scripts/Makefile.host
+ 
 -- 
 1.9.1
 
