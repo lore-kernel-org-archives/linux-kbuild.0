@@ -1,84 +1,71 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg010.nifty.com ([202.248.44.36]:30601 "EHLO
-	conuserg010-v.nifty.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1752908AbbC0Lpf (ORCPT
+Received: from mail-pa0-f51.google.com ([209.85.220.51]:36455 "EHLO
+	mail-pa0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752739AbbC0Rvc (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 27 Mar 2015 07:45:35 -0400
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 1/4] kbuild: use relative path to include Makefile
-Date: Fri, 27 Mar 2015 20:43:35 +0900
-Message-Id: <1427456618-23830-2-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1427456618-23830-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1427456618-23830-1-git-send-email-yamada.masahiro@socionext.com>
+	Fri, 27 Mar 2015 13:51:32 -0400
+Received: by padcy3 with SMTP id cy3so102028969pad.3
+        for <linux-kbuild@vger.kernel.org>; Fri, 27 Mar 2015 10:51:32 -0700 (PDT)
+From: Jonathan Toppins <jtoppins@cumulusnetworks.com>
+Subject: [PATCH v2 kbuild for-next 1/2] makefiles: add config option to force all cc warnings to errors
+Date: Fri, 27 Mar 2015 10:51:10 -0700
+Message-Id: <1427478671-16379-1-git-send-email-jtoppins@cumulusnetworks.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Tony Luck <tony.luck@intel.com>, linux-ia64@vger.kernel.org, linux-kernel@vger.kernel.org, Russell King <linux@arm.linux.org.uk>, Michal Marek <mmarek@suse.cz>, Fenghua Yu <fenghua.yu@intel.com>, linux-arm-kernel@lists.infradead.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org
 
-The "MAKEFLAGS += --include-dir=$(srctree)" line in the top Makefile
-allows us to do this.
+Add a Kconfig option to force cc warnings to errors. For new
+development it is recommended this setting be enabled as warnings
+in the code will be quite obvious.
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+v2: * remove DOTs from Kconfig entries
+    * reworded Kconfig to not imply suppressing cc warnings was
+      acceptable
+    * default option to 'n'
+
+Signed-off-by: Jonathan Toppins <jtoppins@cumulusnetworks.com>
 ---
+ Makefile          |    4 ++++
+ lib/Kconfig.debug |   10 ++++++++++
+ 2 files changed, 14 insertions(+)
 
- arch/arm/boot/Makefile    | 2 +-
- arch/ia64/kernel/Makefile | 2 +-
- scripts/Makefile.dtbinst  | 2 +-
- scripts/Makefile.fwinst   | 2 +-
- 4 files changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/arch/arm/boot/Makefile b/arch/arm/boot/Makefile
-index ec2f806..9eca7ae 100644
---- a/arch/arm/boot/Makefile
-+++ b/arch/arm/boot/Makefile
-@@ -12,7 +12,7 @@
- #
- 
- ifneq ($(MACHINE),)
--include $(srctree)/$(MACHINE)/Makefile.boot
-+include $(MACHINE)/Makefile.boot
+diff --git a/Makefile b/Makefile
+index dc2d91a..a69562a 100644
+--- a/Makefile
++++ b/Makefile
+@@ -764,6 +764,10 @@ ifdef CONFIG_DEBUG_SECTION_MISMATCH
+ KBUILD_CFLAGS += $(call cc-option, -fno-inline-functions-called-once)
  endif
  
- # Note: the following conditions must always be true:
-diff --git a/arch/ia64/kernel/Makefile b/arch/ia64/kernel/Makefile
-index 20678a9..47e8aff 100644
---- a/arch/ia64/kernel/Makefile
-+++ b/arch/ia64/kernel/Makefile
-@@ -51,7 +51,7 @@ obj-$(CONFIG_BINFMT_ELF)	+= elfcore.o
- CFLAGS_traps.o  += -mfixed-range=f2-f5,f16-f31
++ifdef CONFIG_DEBUG_FORCE_CC_WARNINGS_TO_ERRORS
++KBUILD_CFLAGS += $(call cc-option, -Werror)
++endif
++
+ # arch Makefile may override CC so keep this after arch Makefile is included
+ NOSTDINC_FLAGS += -nostdinc -isystem $(shell $(CC) -print-file-name=include)
+ CHECKFLAGS     += $(NOSTDINC_FLAGS)
+diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+index 3e0289e..bbe2eed 100644
+--- a/lib/Kconfig.debug
++++ b/lib/Kconfig.debug
+@@ -347,6 +347,16 @@ config DEBUG_FORCE_WEAK_PER_CPU
+ 	  To ensure that generic code follows the above rules, this
+ 	  option forces all percpu variables to be defined as weak.
  
- # The gate DSO image is built using a special linker script.
--include $(srctree)/arch/ia64/kernel/Makefile.gate
-+include arch/ia64/kernel/Makefile.gate
- # tell compiled for native
- CPPFLAGS_gate.lds += -D__IA64_GATE_PARAVIRTUALIZED_NATIVE
++config DEBUG_FORCE_CC_WARNINGS_TO_ERRORS
++	bool "Force cc warnings to errors"
++	help
++	  Simply enables the gcc compiler option -Werror for the entire
++	  build. This option is intended to be more in the developer's
++	  face and encourage effort of some kind to remove the
++	  compilation warning.
++
++	  If doing new development recommend setting to y.
++
+ endmenu # "Compiler options"
  
-diff --git a/scripts/Makefile.dtbinst b/scripts/Makefile.dtbinst
-index 909ed7a..7cbff16 100644
---- a/scripts/Makefile.dtbinst
-+++ b/scripts/Makefile.dtbinst
-@@ -18,7 +18,7 @@ export dtbinst-root ?= $(obj)
- 
- include include/config/auto.conf
- include scripts/Kbuild.include
--include $(srctree)/$(obj)/Makefile
-+include $(obj)/Makefile
- 
- PHONY += __dtbs_install_prep
- __dtbs_install_prep:
-diff --git a/scripts/Makefile.fwinst b/scripts/Makefile.fwinst
-index 5b698ad..baf5eae 100644
---- a/scripts/Makefile.fwinst
-+++ b/scripts/Makefile.fwinst
-@@ -13,7 +13,7 @@ src := $(obj)
- -include $(objtree)/.config
- 
- include scripts/Kbuild.include
--include $(srctree)/$(obj)/Makefile
-+include $(obj)/Makefile
- 
- include scripts/Makefile.host
- 
+ config MAGIC_SYSRQ
 -- 
-1.9.1
+1.7.10.4
 
