@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qg0-f45.google.com ([209.85.192.45]:34367 "EHLO
-	mail-qg0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751156AbbC1J2a (ORCPT
+Received: from mail-qc0-f177.google.com ([209.85.216.177]:33638 "EHLO
+	mail-qc0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751272AbbC1KAk (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 28 Mar 2015 05:28:30 -0400
-Received: by qgep97 with SMTP id p97so152941357qge.1
-        for <linux-kbuild@vger.kernel.org>; Sat, 28 Mar 2015 02:28:29 -0700 (PDT)
+	Sat, 28 Mar 2015 06:00:40 -0400
+Received: by qcbjx9 with SMTP id jx9so35936528qcb.0
+        for <linux-kbuild@vger.kernel.org>; Sat, 28 Mar 2015 03:00:39 -0700 (PDT)
 From: Diego Viola <diego.viola@gmail.com>
 Subject: [PATCH] scripts/kconfig/Makefile: fix Qt spelling
-Date: Sat, 28 Mar 2015 06:28:31 -0300
-Message-Id: <1427534911-2914-1-git-send-email-diego.viola@gmail.com>
+Date: Sat, 28 Mar 2015 07:00:41 -0300
+Message-Id: <1427536841-3089-1-git-send-email-diego.viola@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
