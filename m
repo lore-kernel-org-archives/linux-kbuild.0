@@ -1,32 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:59788 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:34011 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752436AbbC3Nfx (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 30 Mar 2015 09:35:53 -0400
-Message-ID: <55195136.3030804@suse.cz>
-Date: Mon, 30 Mar 2015 15:35:50 +0200
+	id S1752648AbbC3ONH (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 30 Mar 2015 10:13:07 -0400
+Message-ID: <551959F1.4030704@suse.cz>
+Date: Mon, 30 Mar 2015 16:13:05 +0200
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 kbuild for-next 1/2] makefiles: add config option to
- force all cc warnings to errors
-References: <1427478671-16379-1-git-send-email-jtoppins@cumulusnetworks.com>
-In-Reply-To: <1427478671-16379-1-git-send-email-jtoppins@cumulusnetworks.com>
-Content-Type: text/plain; charset=windows-1252
+Subject: Re: [RFC PATCH 2/2] Kbuild: avoid partial linking of drivers/built-in.o
+References: <1427716167-25078-1-git-send-email-ard.biesheuvel@linaro.org>	<1427716167-25078-3-git-send-email-ard.biesheuvel@linaro.org>	<551943CB.3010303@suse.cz>	<20150330132617.GI24899@n2100.arm.linux.org.uk> <CAKv+Gu8-4XR5D-0_JnVfS2LNkH_Uvcc5txe4wJhwZogc5hZ-1w@mail.gmail.com>
+In-Reply-To: <CAKv+Gu8-4XR5D-0_JnVfS2LNkH_Uvcc5txe4wJhwZogc5hZ-1w@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jonathan Toppins <jtoppins@cumulusnetworks.com>
-Cc: linux-kbuild@vger.kernel.org
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>, Russell King - ARM Linux <linux@arm.linux.org.uk>
+Cc: linux-kbuild@vger.kernel.org, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Arnd Bergmann <arnd@arndb.de>
 
-On 2015-03-27 18:51, Jonathan Toppins wrote:
-> Add a Kconfig option to force cc warnings to errors. For new
-> development it is recommended this setting be enabled as warnings
-> in the code will be quite obvious.
+On 2015-03-30 15:31, Ard Biesheuvel wrote:
+> On 30 March 2015 at 15:26, Russell King - ARM Linux
+> <linux@arm.linux.org.uk> wrote:
+>> On Mon, Mar 30, 2015 at 02:38:35PM +0200, Michal Marek wrote:
+>>> Is this a limitation of a particular ARM ABI or a limitation of a state
+>>> of the art ARM linker or something else?
+>>
+>> It's a limitation of the ARM ISA.
+>>
+>> Normal PC-relative branches, which are emitted by the C compiler, can
+>> branch +/- 32MB for ARM, or +/- 16MB of Thumb.  Beyond that, the address
+>> offset is not representable in the instruction.
 
-I don't want to add such kconfig option, because it will break
-all{mod,yes}config for little gain. And there are warnings like the
-preprocessor #warning or the use of a function marked as __deprecated --
-these a basically TODOs and there is no point in failing the build. Test
-builds can be done with KCFLAGS=-Werror or you can grep build logs.
+Thank you both for the explanation!
+
+
+>> The question is: how far do we go with allyesconfig... do we want it
+>> to work, or is reaching the final link sufficient?
+
+It certainly is more useful as a test tool if the baseline is a
+successful compile and link. Because you can have genuine link errors
+due to missing symbols.
+
+
+>> If we do tweak
+>> stuff to allow the link to work, are we going to try running it?
+
+Good question. I myself always treated all{yes,mod}config as a build
+test only and never dared to run it. Allyesconfig produces a giant
+kernel image and allmodconfig builds binfmt_script as a module. And if
+people used all*config for boot tests, they would probably be sending
+patches to tweak the Kconfigs for that purpose. And this is not the case
+as far as I can tell.
+
+
+> That is an excellent question, hence the RFC in the subject line.
+> 
+> Note that the other patch, the one against kallsyms, addresses the
+> issue where the distance between the beginning of .text and the end of
+> .init.text  exceeds this limit, which is not as unlikely as the issue
+> that this patch addresses, where just drivers/built-in.o in isolation
+> already exceeds this limit.
+> 
+> So I am quite happy to drop this, especially as we can add
+> -ffunction-sections as well.
+
+What you could do is to add a Kconfig option to arch/arm/Kconfig adding
+-ffunction-sections to the compiler flags. Then allyesconfig would
+select it and work around the problem in a somewhat elegant way.
 
 Michal
