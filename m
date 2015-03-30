@@ -1,49 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pd0-f180.google.com ([209.85.192.180]:33076 "EHLO
-	mail-pd0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752487AbbC2U5e (ORCPT
+Received: from mail-wg0-f42.google.com ([74.125.82.42]:35128 "EHLO
+	mail-wg0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752679AbbC3Lth (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 29 Mar 2015 16:57:34 -0400
-Received: by pdnc3 with SMTP id c3so154414988pdn.0
-        for <linux-kbuild@vger.kernel.org>; Sun, 29 Mar 2015 13:57:33 -0700 (PDT)
-Date: Sun, 29 Mar 2015 13:57:31 -0700
-From: Olof Johansson <olof@lixom.net>
-Subject: Re: [PATCH v2] kbuild: Create directory for target DTB
-Message-ID: <20150329205731.GB13301@localhost>
-References: <c09612262f2758e70dd4d700f2d32692601f8287.1426682342.git.michal.simek@xilinx.com>
- <20150318132004.GC10863@arm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20150318132004.GC10863@arm.com>
+	Mon, 30 Mar 2015 07:49:37 -0400
+Received: by wgdm6 with SMTP id m6so171491949wgd.2
+        for <linux-kbuild@vger.kernel.org>; Mon, 30 Mar 2015 04:49:36 -0700 (PDT)
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [RFC PATCH 0/2] ARM large kernels
+Date: Mon, 30 Mar 2015 13:49:25 +0200
+Message-Id: <1427716167-25078-1-git-send-email-ard.biesheuvel@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Will Deacon <will.deacon@arm.com>
-Cc: Michal Simek <michal.simek@xilinx.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "monstr@monstr.eu" <monstr@monstr.eu>, Zach Pfeffer <zachp@xilinx.com>, Nathan Rossi <nrossi@xilinx.com>, Arnd Bergmann <arnd@arndb.de>, Catalin Marinas <Catalin.Marinas@arm.com>, Nathan Rossi <nathan.rossi@xilinx.com>, Michal Marek <mmarek@suse.cz>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, arm@kernel.org
+To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, arnd@arndb.de, mmarek@suse.cz, linux@arm.linux.org.uk
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-On Wed, Mar 18, 2015 at 01:20:04PM +0000, Will Deacon wrote:
-> On Wed, Mar 18, 2015 at 12:39:07PM +0000, Michal Simek wrote:
-> > From: Nathan Rossi <nathan.rossi@xilinx.com>
-> > 
-> > When building specific DTBs out of the kernel tree the vendor subdirs
-> > (boot/dts/<vendor>) are not created, ensure that they are before
-> > building the DTB.
-> > 
-> > Signed-off-by: Nathan Rossi <nathan.rossi@xilinx.com>
-> > Signed-off-by: Michal Simek <michal.simek@xilinx.com>
-> > ---
-> > 
-> > Changes in v2:
-> > - Use $(dir ${dtc-tmp}) instead of `dirname ${dtc-tmp}`
-> >   Reported-by: Will Deacon <will.deacon@arm.com>
-> 
-> Looks ok to me, but no idea which tree this should go through. Maybe
-> arm-soc?
-> 
->   Acked-by: Will Deacon <will.deacon@arm.com>
+Hello all,
 
-Sure. Please resend with appropriate acks to arm@kernel.org and we can apply it.
+After Russell has pulled most of the large kernel fixes that are
+specific to the ARM tree, these two patches are the remaining ones
+that are required to successfully build 'allyesconfig' on ARM (*)
 
+The first one updates scripts/kallsyms.c to ignore _veneer symbols.
+These are emitted by the linker, and due to the fact that the kallsyms
+region is empty in the first pass, and populated in the second, the
+number of emitted veneers changes, which changes the contents of
+the symbol table etc etc
 
--Olof
+The second patch keeps the contents of drivers/built-in.o into as
+separate inputs into the final link stage. This ensures that the
+linker can emit the veneers against out-of-range functions in a
+location that is not out of range itself.
+
+(*) It produces a ~75 MB zImage; whether it runs is another question
+
+Ard Biesheuvel (2):
+  Kbuild: kallsyms: ignore veneers emitted by the ARM linker
+  Kbuild: avoid partial linking of drivers/built-in.o
+
+ Makefile           | 12 +++++++++++-
+ scripts/kallsyms.c | 17 ++++++++++++++---
+ 2 files changed, 25 insertions(+), 4 deletions(-)
+
+-- 
+1.8.3.2
 
