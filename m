@@ -1,14 +1,14 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from eu-smtp-delivery-143.mimecast.com ([207.82.80.143]:29718 "EHLO
-	eu-smtp-delivery-143.mimecast.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1754098AbbCaQ1g convert rfc822-to-8bit
-	(ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 31 Mar 2015 12:27:36 -0400
-Date: Tue, 31 Mar 2015 17:27:22 +0100
-From: Dave Martin <Dave.Martin@arm.com>
+Received: from pandora.arm.linux.org.uk ([78.32.30.218]:54938 "EHLO
+	pandora.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752407AbbCaQfN (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 31 Mar 2015 12:35:13 -0400
+Date: Tue, 31 Mar 2015 17:34:59 +0100
+From: Russell King - ARM Linux <linux@arm.linux.org.uk>
 Subject: Re: [RFC PATCH 2/2] Kbuild: avoid partial linking of
  drivers/built-in.o
-Message-ID: <20150331161026.GA17480@e103592.cambridge.arm.com>
+Message-ID: <20150331163459.GU24899@n2100.arm.linux.org.uk>
 References: <1427716167-25078-1-git-send-email-ard.biesheuvel@linaro.org>
  <1427716167-25078-3-git-send-email-ard.biesheuvel@linaro.org>
  <551943CB.3010303@suse.cz>
@@ -17,46 +17,55 @@ References: <1427716167-25078-1-git-send-email-ard.biesheuvel@linaro.org>
  <551959F1.4030704@suse.cz>
  <CAKv+Gu-gRuf8L+NKtez4Jm9Mqe1HeeufH9MPqRztLcD+NTo+sA@mail.gmail.com>
  <alpine.LFD.2.11.1503311115300.25806@knanqh.ubzr>
+ <20150331161026.GA17480@e103592.cambridge.arm.com>
 MIME-Version: 1.0
-In-Reply-To: <alpine.LFD.2.11.1503311115300.25806@knanqh.ubzr>
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20150331161026.GA17480@e103592.cambridge.arm.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicolas Pitre <nicolas.pitre@linaro.org>
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>, Michal Marek <mmarek@suse.cz>, Russell King - ARM Linux <linux@arm.linux.org.uk>, Arnd Bergmann <arnd@arndb.de>, linux-kbuild@vger.kernel.org, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+To: Dave Martin <Dave.Martin@arm.com>
+Cc: Nicolas Pitre <nicolas.pitre@linaro.org>, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Michal Marek <mmarek@suse.cz>, Arnd Bergmann <arnd@arndb.de>, linux-kbuild@vger.kernel.org, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 
-On Tue, Mar 31, 2015 at 11:22:29AM -0400, Nicolas Pitre wrote:
-> On Mon, 30 Mar 2015, Ard Biesheuvel wrote:
+On Tue, Mar 31, 2015 at 05:27:22PM +0100, Dave Martin wrote:
+> On Tue, Mar 31, 2015 at 11:22:29AM -0400, Nicolas Pitre wrote:
+> > I'm using -ffunction-sections as well for the kernel size reduction work 
+> > I'm currently doing.  The linker script has to be adapted so .text.* is 
+> > specified along .text otherwise those functions end up appended at the 
+> > end of the binary.
 > 
-> > On 30 March 2015 at 16:13, Michal Marek <mmarek@suse.cz> wrote:
-
-[...]
-
-> > > What you could do is to add a Kconfig option to arch/arm/Kconfig adding
-> > > -ffunction-sections to the compiler flags. Then allyesconfig would
-> > > select it and work around the problem in a somewhat elegant way.
-> > >
-> > 
-> > Excellent idea! Arnd hasn't chimed in yet, but he is the one doing
-> > lots and lots of randconfig builds and other test builds, so I will
-> > wait for him to confirm that this is a useful thing to have.
+> Interesting ... do you also mean using --gc-sections at link time?
+> We'd need to avoid pruning needed code that has no explicit caller,
+> and functions that are part of the kernel/module ABI but not used
+> within vmlinux.
 > 
-> I'm using -ffunction-sections as well for the kernel size reduction work 
-> I'm currently doing.  The linker script has to be adapted so .text.* is 
-> specified along .text otherwise those functions end up appended at the 
-> end of the binary.
+> The GCC docs suggest that -ffunction-sections may impact performance
+> and/or increase code size, but I don't know by how much.  Maybe it
+> interferes with inling.
 
-Interesting ... do you also mean using --gc-sections at link time?
-We'd need to avoid pruning needed code that has no explicit caller,
-and functions that are part of the kernel/module ABI but not used
-within vmlinux.
+I've mentioned these options over the course of the last couple of
+months.  David Woodhouse replied in February, so it's worth reading
+up on that work.
 
-The GCC docs suggest that -ffunction-sections may impact performance
-and/or increase code size, but I don't know by how much.  Maybe it
-interferes with inling.
+David Woodhouse wrote:
+| In many kernel configurations there are actually quite a lot of
+| functions that are never called, and I was quite surprised the first
+| time I played with this stuff.
+| 
+| There are a few ways of dealing with it. One is to use
+| -ffunction-section -fdata-sections --gc-sections as you noted. I once
+| also played with using GCC's --combine during the brief period that it
+| was supported and not *entirely* broken, with similar effects:
+| https://lwn.net/Articles/197097/
+| 
+| These days, the better answer is probably LTO. We could potentially
+| still look at --gc-sections, but I suspect we're better off using LTO
+| and just filing toolchain bugs until everything that --gc-sections
+| *would* have dropped is also dropped from the LTO build :)
+| 
+| Unless --gc-sections actually speeds up the build in a significant way;
+| a full LTO link of the kernel takes insane amounts of memory IIRC.
 
-Cheers
----Dave
-
+-- 
+FTTC broadband for 0.8mile line: currently at 10.5Mbps down 400kbps up
+according to speedtest.net.
