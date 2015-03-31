@@ -1,100 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qc0-f180.google.com ([209.85.216.180]:36142 "EHLO
-	mail-qc0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753373AbbCaPWe (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 31 Mar 2015 11:22:34 -0400
-Received: by qcgx3 with SMTP id x3so16387984qcg.3
-        for <linux-kbuild@vger.kernel.org>; Tue, 31 Mar 2015 08:22:33 -0700 (PDT)
-Date: Tue, 31 Mar 2015 11:22:29 -0400 (EDT)
-From: Nicolas Pitre <nicolas.pitre@linaro.org>
+Received: from eu-smtp-delivery-143.mimecast.com ([207.82.80.143]:29718 "EHLO
+	eu-smtp-delivery-143.mimecast.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1754098AbbCaQ1g convert rfc822-to-8bit
+	(ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 31 Mar 2015 12:27:36 -0400
+Date: Tue, 31 Mar 2015 17:27:22 +0100
+From: Dave Martin <Dave.Martin@arm.com>
 Subject: Re: [RFC PATCH 2/2] Kbuild: avoid partial linking of
  drivers/built-in.o
-In-Reply-To: <CAKv+Gu-gRuf8L+NKtez4Jm9Mqe1HeeufH9MPqRztLcD+NTo+sA@mail.gmail.com>
-Message-ID: <alpine.LFD.2.11.1503311115300.25806@knanqh.ubzr>
-References: <1427716167-25078-1-git-send-email-ard.biesheuvel@linaro.org> <1427716167-25078-3-git-send-email-ard.biesheuvel@linaro.org> <551943CB.3010303@suse.cz> <20150330132617.GI24899@n2100.arm.linux.org.uk> <CAKv+Gu8-4XR5D-0_JnVfS2LNkH_Uvcc5txe4wJhwZogc5hZ-1w@mail.gmail.com>
- <551959F1.4030704@suse.cz> <CAKv+Gu-gRuf8L+NKtez4Jm9Mqe1HeeufH9MPqRztLcD+NTo+sA@mail.gmail.com>
+Message-ID: <20150331161026.GA17480@e103592.cambridge.arm.com>
+References: <1427716167-25078-1-git-send-email-ard.biesheuvel@linaro.org>
+ <1427716167-25078-3-git-send-email-ard.biesheuvel@linaro.org>
+ <551943CB.3010303@suse.cz>
+ <20150330132617.GI24899@n2100.arm.linux.org.uk>
+ <CAKv+Gu8-4XR5D-0_JnVfS2LNkH_Uvcc5txe4wJhwZogc5hZ-1w@mail.gmail.com>
+ <551959F1.4030704@suse.cz>
+ <CAKv+Gu-gRuf8L+NKtez4Jm9Mqe1HeeufH9MPqRztLcD+NTo+sA@mail.gmail.com>
+ <alpine.LFD.2.11.1503311115300.25806@knanqh.ubzr>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+In-Reply-To: <alpine.LFD.2.11.1503311115300.25806@knanqh.ubzr>
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: 8BIT
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: Michal Marek <mmarek@suse.cz>, Russell King - ARM Linux <linux@arm.linux.org.uk>, linux-kbuild@vger.kernel.org, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Arnd Bergmann <arnd@arndb.de>
+To: Nicolas Pitre <nicolas.pitre@linaro.org>
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>, Michal Marek <mmarek@suse.cz>, Russell King - ARM Linux <linux@arm.linux.org.uk>, Arnd Bergmann <arnd@arndb.de>, linux-kbuild@vger.kernel.org, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 
-On Mon, 30 Mar 2015, Ard Biesheuvel wrote:
-
-> On 30 March 2015 at 16:13, Michal Marek <mmarek@suse.cz> wrote:
-> > On 2015-03-30 15:31, Ard Biesheuvel wrote:
-> >> On 30 March 2015 at 15:26, Russell King - ARM Linux
-> >> <linux@arm.linux.org.uk> wrote:
-> >>> On Mon, Mar 30, 2015 at 02:38:35PM +0200, Michal Marek wrote:
-> >>>> Is this a limitation of a particular ARM ABI or a limitation of a state
-> >>>> of the art ARM linker or something else?
-> >>>
-> >>> It's a limitation of the ARM ISA.
-> >>>
-> >>> Normal PC-relative branches, which are emitted by the C compiler, can
-> >>> branch +/- 32MB for ARM, or +/- 16MB of Thumb.  Beyond that, the address
-> >>> offset is not representable in the instruction.
-> >
-> > Thank you both for the explanation!
-> >
-> >
-> >>> The question is: how far do we go with allyesconfig... do we want it
-> >>> to work, or is reaching the final link sufficient?
-> >
-> > It certainly is more useful as a test tool if the baseline is a
-> > successful compile and link. Because you can have genuine link errors
-> > due to missing symbols.
-> >
+On Tue, Mar 31, 2015 at 11:22:29AM -0400, Nicolas Pitre wrote:
+> On Mon, 30 Mar 2015, Ard Biesheuvel wrote:
 > 
-> Agreed
+> > On 30 March 2015 at 16:13, Michal Marek <mmarek@suse.cz> wrote:
+
+[...]
+
+> > > What you could do is to add a Kconfig option to arch/arm/Kconfig adding
+> > > -ffunction-sections to the compiler flags. Then allyesconfig would
+> > > select it and work around the problem in a somewhat elegant way.
+> > >
+> > 
+> > Excellent idea! Arnd hasn't chimed in yet, but he is the one doing
+> > lots and lots of randconfig builds and other test builds, so I will
+> > wait for him to confirm that this is a useful thing to have.
 > 
-> >
-> >>> If we do tweak
-> >>> stuff to allow the link to work, are we going to try running it?
-> >
-> > Good question. I myself always treated all{yes,mod}config as a build
-> > test only and never dared to run it. Allyesconfig produces a giant
-> > kernel image and allmodconfig builds binfmt_script as a module. And if
-> > people used all*config for boot tests, they would probably be sending
-> > patches to tweak the Kconfigs for that purpose. And this is not the case
-> > as far as I can tell.
-> >
-> 
-> Russell should confirm this, but I think running such a large kernel
-> is non-trivial on ARM, since the decompressor should make room for the
-> decompressed image by moving itself upward in memory, and it may
-> overwrite the device tree binary in the process.
+> I'm using -ffunction-sections as well for the kernel size reduction work 
+> I'm currently doing.  The linker script has to be adapted so .text.* is 
+> specified along .text otherwise those functions end up appended at the 
+> end of the binary.
 
-Loading the device tree at a different address should be easy.  You just 
-need to load it at the top of RAM. You may also start by attempting to 
-boot a plain Image (uncompressed) kernel binary.
+Interesting ... do you also mean using --gc-sections at link time?
+We'd need to avoid pruning needed code that has no explicit caller,
+and functions that are part of the kernel/module ABI but not used
+within vmlinux.
 
-> >> That is an excellent question, hence the RFC in the subject line.
-> >>
-> >> Note that the other patch, the one against kallsyms, addresses the
-> >> issue where the distance between the beginning of .text and the end of
-> >> .init.text  exceeds this limit, which is not as unlikely as the issue
-> >> that this patch addresses, where just drivers/built-in.o in isolation
-> >> already exceeds this limit.
-> >>
-> >> So I am quite happy to drop this, especially as we can add
-> >> -ffunction-sections as well.
-> >
-> > What you could do is to add a Kconfig option to arch/arm/Kconfig adding
-> > -ffunction-sections to the compiler flags. Then allyesconfig would
-> > select it and work around the problem in a somewhat elegant way.
-> >
-> 
-> Excellent idea! Arnd hasn't chimed in yet, but he is the one doing
-> lots and lots of randconfig builds and other test builds, so I will
-> wait for him to confirm that this is a useful thing to have.
+The GCC docs suggest that -ffunction-sections may impact performance
+and/or increase code size, but I don't know by how much.  Maybe it
+interferes with inling.
 
-I'm using -ffunction-sections as well for the kernel size reduction work 
-I'm currently doing.  The linker script has to be adapted so .text.* is 
-specified along .text otherwise those functions end up appended at the 
-end of the binary.
+Cheers
+---Dave
 
-
-Nicolas
