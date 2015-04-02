@@ -1,36 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f173.google.com ([209.85.212.173]:35615 "EHLO
-	mail-wi0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752522AbbDBM3D (ORCPT
+Received: from mail-wi0-f170.google.com ([209.85.212.170]:35865 "EHLO
+	mail-wi0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753081AbbDBNOK (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 2 Apr 2015 08:29:03 -0400
-Received: by widdi4 with SMTP id di4so76984456wid.0
-        for <linux-kbuild@vger.kernel.org>; Thu, 02 Apr 2015 05:29:02 -0700 (PDT)
+	Thu, 2 Apr 2015 09:14:10 -0400
+Received: by wizk4 with SMTP id k4so14833967wiz.1
+        for <linux-kbuild@vger.kernel.org>; Thu, 02 Apr 2015 06:14:08 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <87bnj63es2.fsf@lebrac.rtp-net.org>
+In-Reply-To: <87fv8i3fiw.fsf@lebrac.rtp-net.org>
 References: <cover.1427968988.git.riku.voipio@linaro.org>
-	<f5cc7f6394efe3d5404beb5588b67671dca9fb74.1427968988.git.riku.voipio@linaro.org>
-	<87k2xu3frr.fsf@lebrac.rtp-net.org>
-	<87bnj63es2.fsf@lebrac.rtp-net.org>
-Date: Thu, 2 Apr 2015 15:29:02 +0300
-Message-ID: <CAAqcGHnmxF5iYCT3RDL32-A6Xnqt5k8awPn6-iUUQ0a54jwQbQ@mail.gmail.com>
-Subject: Re: [PATCH 2/4] builddeb: install dtbs
+	<834bd55c0de686780eb15f9a06b13f7fb560e9a8.1427968988.git.riku.voipio@linaro.org>
+	<87fv8i3fiw.fsf@lebrac.rtp-net.org>
+Date: Thu, 2 Apr 2015 16:14:08 +0300
+Message-ID: <CAAqcGH=iT4-R=D+WWCZ2ibKHnc8dGgHPyC+5WyOT2WM=LuJwRA@mail.gmail.com>
+Subject: Re: [PATCH 1/4] deb-pkg: Add automatic support for armhf architecture
 From: Riku Voipio <riku.voipio@linaro.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Arnaud Patard <arnaud.patard@rtp-net.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, mmarek <mmarek@suse.cz>, debian-kernel <debian-kernel@lists.debian.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, mmarek <mmarek@suse.cz>, debian-kernel <debian-kernel@lists.debian.org>, Ben Hutchings <ben@decadent.org.uk>, debian-arm@lists.debian.org
 
-On 2 April 2015 at 15:17, Arnaud Patard <arnaud.patard@rtp-net.org> wrote:
-> Arnaud Patard (Rtp) <arnaud.patard@rtp-net.org> writes:
->> Already sent a "better" patch for that (your patch is not handling
->> system with CONFIG_OF and without dtbs_install):
->> http://www.spinics.net/lists/linux-kbuild/msg10794.html
+On 2 April 2015 at 15:01, Arnaud Patard <arnaud.patard@rtp-net.org> wrote:
+> riku.voipio@linaro.org writes:
+>> --- a/scripts/package/builddeb
+>> +++ b/scripts/package/builddeb
+>> @@ -45,7 +45,16 @@ create_package() {
+>>       arm64)
+>>               debarch=arm64 ;;
+>>       arm*)
+>> -             debarch=arm$(grep -q CONFIG_AEABI=y $KCONFIG_CONFIG && echo el || true) ;;
+>> +             if grep -q CONFIG_AEABI=y $KCONFIG_CONFIG; then
+>> +                     if $CC -dM -E - < /dev/null|grep -q __ARM_PCS_VFP; then
+>
+> Actually, I guess there's nothing preventing you building a armhf kernel
+> with a compiler not having __ARM_PCS_VFP defined by default, but I'm not sure
+> we should take care of this case. One can always use KBUILD_DEBARCH=armhf.
 
-> Oops. Wrong version. The right one is v4:
-> http://www.spinics.net/lists/linux-kbuild/msg10832.html
-
-Your version looks good. What needs to happen for it to get merged?
+I think the common use cases would be a) native compilers or b)
+cross-compiler targeting the same debian architecture as the rootfs.
+This patch provides automatic detection for both cases. For corner
+cases, one will have to manually specify KBUILD_DEBARCH - which one
+already had to do if one was targeting armhf.
 
 Riku
