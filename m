@@ -1,30 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:60657 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752597AbbDBP1x (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 2 Apr 2015 11:27:53 -0400
-Message-ID: <551D5FF5.7070503@suse.cz>
-Date: Thu, 02 Apr 2015 17:27:49 +0200
-From: Michal Marek <mmarek@suse.cz>
+Received: from lebrac.rtp-net.org ([195.154.106.105]:34965 "EHLO
+	lebrac.rtp-net.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751751AbbDBRrP (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 2 Apr 2015 13:47:15 -0400
+From: Arnaud Patard (Rtp) <arnaud.patard@rtp-net.org>
+Subject: Re: [PATCH 2/4] builddeb: install dtbs
+References: <cover.1427968988.git.riku.voipio@linaro.org>
+	<f5cc7f6394efe3d5404beb5588b67671dca9fb74.1427968988.git.riku.voipio@linaro.org>
+	<87k2xu3frr.fsf@lebrac.rtp-net.org>
+	<87bnj63es2.fsf@lebrac.rtp-net.org>
+	<CAAqcGHnmxF5iYCT3RDL32-A6Xnqt5k8awPn6-iUUQ0a54jwQbQ@mail.gmail.com>
+Date: Thu, 02 Apr 2015 19:46:11 +0200
+In-Reply-To: <CAAqcGHnmxF5iYCT3RDL32-A6Xnqt5k8awPn6-iUUQ0a54jwQbQ@mail.gmail.com>
+	(Riku Voipio's message of "Thu, 2 Apr 2015 15:29:02 +0300")
+Message-ID: <874moy2zks.fsf@lebrac.rtp-net.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH 0/4] kbuild: refactor Makefile inclusion
-References: <1427456618-23830-1-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1427456618-23830-1-git-send-email-yamada.masahiro@socionext.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
-Cc: linux-mips@linux-mips.org, Tony Luck <tony.luck@intel.com>, x86@kernel.org, linux-ia64@vger.kernel.org, user-mode-linux-devel@lists.sourceforge.net, Jeff Dike <jdike@addtoit.com>, "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, Russell King <linux@arm.linux.org.uk>, Richard Weinberger <richard@nod.at>, user-mode-linux-user@lists.sourceforge.net, Ingo Molnar <mingo@redhat.com>, Fenghua Yu <fenghua.yu@intel.com>, Ralf Baechle <ralf@linux-mips.org>, linux-arm-kernel@lists.infradead.org
+To: Riku Voipio <riku.voipio@linaro.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, mmarek <mmarek@suse.cz>, debian-kernel <debian-kernel@lists.debian.org>
 
-On 2015-03-27 12:43, Masahiro Yamada wrote:
-> Masahiro Yamada (4):
->   kbuild: use relative path to include Makefile
->   kbuild: use relative path more to include Makefile
->   kbuild: include $(src)/Makefile rather than $(obj)/Makefile
->   kbuild: ia64: use $(src)/Makefile.gate rather than particular path
+Riku Voipio <riku.voipio@linaro.org> writes:
 
-Applied to kbuild.git#kbuild.
+> On 2 April 2015 at 15:17, Arnaud Patard <arnaud.patard@rtp-net.org> wrote:
+>> Arnaud Patard (Rtp) <arnaud.patard@rtp-net.org> writes:
+>>> Already sent a "better" patch for that (your patch is not handling
+>>> system with CONFIG_OF and without dtbs_install):
+>>> http://www.spinics.net/lists/linux-kbuild/msg10794.html
+>
+>> Oops. Wrong version. The right one is v4:
+>> http://www.spinics.net/lists/linux-kbuild/msg10832.html
+>
+> Your version looks good. What needs to happen for it to get merged?
 
-Michal
+No idea. I was hoping that someone would take it.
+
+Arnaud
 
