@@ -1,16 +1,16 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qc0-f180.google.com ([209.85.216.180]:36291 "EHLO
-	mail-qc0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750808AbbDEHAU (ORCPT
+Received: from mail-qk0-f170.google.com ([209.85.220.170]:33330 "EHLO
+	mail-qk0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751829AbbDFJ1g (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 5 Apr 2015 03:00:20 -0400
+	Mon, 6 Apr 2015 05:27:36 -0400
 From: Diego Viola <diego.viola@gmail.com>
-Subject: [PATCH] scripts/kconfig/Makefile: fix Qt spelling
-Date: Sun,  5 Apr 2015 04:00:13 -0300
-Message-Id: <1428217213-22225-1-git-send-email-diego.viola@gmail.com>
+Subject: [PATCH] scripts/kconfig/Makefile: Fix spelling of Qt
+Date: Mon,  6 Apr 2015 06:27:45 -0300
+Message-Id: <1428312465-4172-1-git-send-email-diego.viola@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: yann.morin.1998@free.fr
+To: trivial@kernel.org
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Diego Viola <diego.viola@gmail.com>
 
 Signed-off-by: Diego Viola <diego.viola@gmail.com>
