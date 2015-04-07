@@ -1,70 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qk0-f170.google.com ([209.85.220.170]:33330 "EHLO
-	mail-qk0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751829AbbDFJ1g (ORCPT
+Received: from mail-ig0-f173.google.com ([209.85.213.173]:36640 "EHLO
+	mail-ig0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752960AbbDGJCY (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 6 Apr 2015 05:27:36 -0400
-From: Diego Viola <diego.viola@gmail.com>
-Subject: [PATCH] scripts/kconfig/Makefile: Fix spelling of Qt
-Date: Mon,  6 Apr 2015 06:27:45 -0300
-Message-Id: <1428312465-4172-1-git-send-email-diego.viola@gmail.com>
+	Tue, 7 Apr 2015 05:02:24 -0400
+Received: by igblo3 with SMTP id lo3so6312121igb.1
+        for <linux-kbuild@vger.kernel.org>; Tue, 07 Apr 2015 02:02:22 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <1427721632-11665-1-git-send-email-ard.biesheuvel@linaro.org>
+References: <1427721632-11665-1-git-send-email-ard.biesheuvel@linaro.org>
+Date: Tue, 7 Apr 2015 11:02:22 +0200
+Message-ID: <CAKv+Gu-HkK96hz7zKQeJfeh2YiRY+qGaWkQdrSn0=n+P0qeHZQ@mail.gmail.com>
+Subject: Re: [PATCH 0/2] Kbuild: kallsyms: update suffix ignore logic
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: trivial@kernel.org
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Diego Viola <diego.viola@gmail.com>
+To: linux-kbuild@vger.kernel.org, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Arnd Bergmann <arnd@arndb.de>, Michal Marek <mmarek@suse.cz>, Russell King - ARM Linux <linux@arm.linux.org.uk>
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-Signed-off-by: Diego Viola <diego.viola@gmail.com>
----
- scripts/kconfig/Makefile | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+On 30 March 2015 at 15:20, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+> Two patches that update the kallsyms ignore logic.
+>
+> Patch #1 adds logic to introduce symbols whose names end in (or equal)
+> "_veneer". This prevent kallsyms generation errors on large ARM kernels
+> where the emitted veneers will be different between the first and second
+> pass, due to the fact that the size of the kallsyms region itself pushes
+> the .text and .init.text sections further apart during the second pass.
+>
+> Patch #2 removes the handling of the "gcc[0-9]_compiled." symbol. It was
+> only ever emitted by GCC v2.x which we don't support anymore anyway.
+>
+> This series is a followup to ' [RFC PATCH 0/2] ARM large kernels'
+> (http://thread.gmane.org/gmane.linux.kbuild.devel/13065), but the
+> other issue addressed by patch #2 of that series will be deferred
+> for now.
+>
+> Ard Biesheuvel (2):
+>   Kbuild: kallsyms: ignore veneers emitted by the ARM linker
+>   Kbuild: kallsyms: drop special handling of pre-3.0 GCC symbols
+>
+>  scripts/kallsyms.c | 29 ++++++++++++++++++++---------
+>  1 file changed, 20 insertions(+), 9 deletions(-)
+>
 
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index 9645c07..6da13d0 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -126,7 +126,7 @@ help:
- 	@echo  '  config	  - Update current config utilising a line-oriented program'
- 	@echo  '  nconfig         - Update current config utilising a ncurses menu based program'
- 	@echo  '  menuconfig	  - Update current config utilising a menu based program'
--	@echo  '  xconfig	  - Update current config utilising a QT based front-end'
-+	@echo  '  xconfig	  - Update current config utilising a Qt based front-end'
- 	@echo  '  gconfig	  - Update current config utilising a GTK based front-end'
- 	@echo  '  oldconfig	  - Update current config utilising a provided .config as base'
- 	@echo  '  localmodconfig  - Update current config disabling modules not loaded'
-@@ -160,7 +160,7 @@ HOST_EXTRACFLAGS += $(shell $(CONFIG_SHELL) $(check-lxdialog) -ccflags) \
- # mconf:  Used for the menuconfig target
- #         Utilizes the lxdialog package
- # qconf:  Used for the xconfig target
--#         Based on QT which needs to be installed to compile it
-+#         Based on Qt which needs to be installed to compile it
- # gconf:  Used for the gconfig target
- #         Based on GTK which needs to be installed to compile it
- # object files used by all kconfig flavours
-@@ -219,11 +219,11 @@ ifeq ($(MAKECMDGOALS),xconfig)
- $(obj)/.tmp_qtcheck: $(src)/Makefile
- -include $(obj)/.tmp_qtcheck
- 
--# QT needs some extra effort...
-+# Qt needs some extra effort...
- $(obj)/.tmp_qtcheck:
- 	@set -e; echo "  CHECK   qt"; dir=""; pkg=""; \
- 	if ! pkg-config --exists QtCore 2> /dev/null; then \
--	    echo "* Unable to find the QT4 tool qmake. Trying to use QT3"; \
-+	    echo "* Unable to find the Qt4 tool qmake. Trying to use Qt3"; \
- 	    pkg-config --exists qt 2> /dev/null && pkg=qt; \
- 	    pkg-config --exists qt-mt 2> /dev/null && pkg=qt-mt; \
- 	    if [ -n "$$pkg" ]; then \
-@@ -237,8 +237,8 @@ $(obj)/.tmp_qtcheck:
- 	      done; \
- 	      if [ -z "$$dir" ]; then \
- 	        echo >&2 "*"; \
--	        echo >&2 "* Unable to find any QT installation. Please make sure that"; \
--	        echo >&2 "* the QT4 or QT3 development package is correctly installed and"; \
-+	        echo >&2 "* Unable to find any Qt installation. Please make sure that"; \
-+	        echo >&2 "* the Qt4 or Qt3 development package is correctly installed and"; \
- 	        echo >&2 "* either qmake can be found or install pkg-config or set"; \
- 	        echo >&2 "* the QTDIR environment variable to the correct location."; \
- 	        echo >&2 "*"; \
--- 
-2.3.5
-
+Ping?
