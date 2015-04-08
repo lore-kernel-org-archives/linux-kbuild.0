@@ -1,50 +1,78 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:33486 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:54573 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752381AbbDGLUB (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 7 Apr 2015 07:20:01 -0400
-Message-ID: <5523BD5E.8000300@suse.cz>
-Date: Tue, 07 Apr 2015 13:19:58 +0200
+	id S1751300AbbDHLnF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 8 Apr 2015 07:43:05 -0400
+Received: from relay2.suse.de (charybdis-ext.suse.de [195.135.220.254])
+	by mx2.suse.de (Postfix) with ESMTP id 88067AD25
+	for <linux-kbuild@vger.kernel.org>; Wed,  8 Apr 2015 11:43:03 +0000 (UTC)
 From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: [PATCH 0/2] Kbuild: kallsyms: update suffix ignore logic
-References: <1427721632-11665-1-git-send-email-ard.biesheuvel@linaro.org> <CAKv+Gu-HkK96hz7zKQeJfeh2YiRY+qGaWkQdrSn0=n+P0qeHZQ@mail.gmail.com>
-In-Reply-To: <CAKv+Gu-HkK96hz7zKQeJfeh2YiRY+qGaWkQdrSn0=n+P0qeHZQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Subject: [PATCH 1/2] kconfig: Simplify Makefile
+Date: Wed,  8 Apr 2015 13:42:55 +0200
+Message-Id: <1428493376-20197-1-git-send-email-mmarek@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>, linux-kbuild@vger.kernel.org, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Arnd Bergmann <arnd@arndb.de>, Russell King - ARM Linux <linux@arm.linux.org.uk>
+To: linux-kbuild@vger.kernel.org
 
-Dne 7.4.2015 v 11:02 Ard Biesheuvel napsal(a):
-> On 30 March 2015 at 15:20, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
->> Two patches that update the kallsyms ignore logic.
->>
->> Patch #1 adds logic to introduce symbols whose names end in (or equal)
->> "_veneer". This prevent kallsyms generation errors on large ARM kernels
->> where the emitted veneers will be different between the first and second
->> pass, due to the fact that the size of the kallsyms region itself pushes
->> the .text and .init.text sections further apart during the second pass.
->>
->> Patch #2 removes the handling of the "gcc[0-9]_compiled." symbol. It was
->> only ever emitted by GCC v2.x which we don't support anymore anyway.
->>
->> This series is a followup to ' [RFC PATCH 0/2] ARM large kernels'
->> (http://thread.gmane.org/gmane.linux.kbuild.devel/13065), but the
->> other issue addressed by patch #2 of that series will be deferred
->> for now.
->>
->> Ard Biesheuvel (2):
->>   Kbuild: kallsyms: ignore veneers emitted by the ARM linker
->>   Kbuild: kallsyms: drop special handling of pre-3.0 GCC symbols
->>
->>  scripts/kallsyms.c | 29 ++++++++++++++++++++---------
->>  1 file changed, 20 insertions(+), 9 deletions(-)
->>
-> 
-> Ping?
+Use a single rule for targets handled directly by the conf program.
 
-Applied to kbuild.git#kbuild.
+Signed-off-by: Michal Marek <mmarek@suse.cz>
+---
+ scripts/kconfig/Makefile | 20 ++++++++------------
+ 1 file changed, 8 insertions(+), 12 deletions(-)
 
-Michal
+diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+index cb2cf54..1f5e453 100644
+--- a/scripts/kconfig/Makefile
++++ b/scripts/kconfig/Makefile
+@@ -2,7 +2,7 @@
+ # Kernel configuration targets
+ # These targets are used from top-level makefile
+ 
+-PHONY += oldconfig xconfig gconfig menuconfig config silentoldconfig update-po-config \
++PHONY += xconfig gconfig menuconfig config silentoldconfig update-po-config \
+ 	localmodconfig localyesconfig
+ 
+ ifdef KBUILD_KCONFIG
+@@ -29,9 +29,6 @@ config: $(obj)/conf
+ nconfig: $(obj)/nconf
+ 	$< $(Kconfig)
+ 
+-oldconfig: $(obj)/conf
+-	$< --$@ $(Kconfig)
+-
+ silentoldconfig: $(obj)/conf
+ 	$(Q)mkdir -p include/config include/generated
+ 	$< --$@ $(Kconfig)
+@@ -74,21 +71,20 @@ update-po-config: $(obj)/kxgettext $(obj)/gconf.glade.h
+ 	    --output $(obj)/linux.pot
+ 	$(Q)rm -f $(obj)/config.pot
+ 
+-PHONY += allnoconfig allyesconfig allmodconfig alldefconfig randconfig
++# These targets map 1:1 to the commandline options of 'conf'
++simple-targets := oldconfig allnoconfig allyesconfig allmodconfig \
++	alldefconfig randconfig listnewconfig olddefconfig
++PHONY += $(simple-targets)
+ 
+-allnoconfig allyesconfig allmodconfig alldefconfig randconfig: $(obj)/conf
++$(simple-targets): $(obj)/conf
+ 	$< --$@ $(Kconfig)
+ 
+-PHONY += listnewconfig olddefconfig oldnoconfig savedefconfig defconfig
+-
+-listnewconfig olddefconfig: $(obj)/conf
+-	$< --$@ $(Kconfig)
++PHONY += oldnoconfig savedefconfig defconfig
+ 
+ # oldnoconfig is an alias of olddefconfig, because people already are dependent
+ # on its behavior(sets new symbols to their default value but not 'n') with the
+ # counter-intuitive name.
+-oldnoconfig: $(obj)/conf
+-	$< --olddefconfig $(Kconfig)
++oldnoconfig: olddefconfig
+ 
+ savedefconfig: $(obj)/conf
+ 	$< --$@=defconfig $(Kconfig)
+-- 
+2.1.4
 
