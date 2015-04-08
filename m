@@ -1,55 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mailout2.w1.samsung.com ([210.118.77.12]:50235 "EHLO
-	mailout2.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753311AbbDHPih (ORCPT
+Received: from mail.linuxfoundation.org ([140.211.169.12]:60339 "EHLO
+	mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754222AbbDHWbN (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 8 Apr 2015 11:38:37 -0400
-From: Andrey Ryabinin <a.ryabinin@samsung.com>
-Subject: [PATCH] kasan: Makefile: shut up warnings if CONFIG_COMPILE_TEST=y
-Date: Wed, 08 Apr 2015 18:38:25 +0300
-Message-id: <1428507505-4015-1-git-send-email-a.ryabinin@samsung.com>
-In-reply-to: <20150407160213.8f66c90ca812c30f362dd543@linux-foundation.org>
-References: <20150407160213.8f66c90ca812c30f362dd543@linux-foundation.org>
+	Wed, 8 Apr 2015 18:31:13 -0400
+Date: Wed, 8 Apr 2015 15:31:12 -0700
+From: Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH] lto: Add __noreorder and mark initcalls __noreorder
+Message-Id: <20150408153112.bd375a883138f4c9fd319645@linux-foundation.org>
+In-Reply-To: <1428499058-8322-1-git-send-email-andi@firstfloor.org>
+References: <1428499058-8322-1-git-send-email-andi@firstfloor.org>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Andrey Ryabinin <a.ryabinin@samsung.com>
+To: Andi Kleen <andi@firstfloor.org>
+Cc: mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Andi Kleen <ak@linux.intel.com>
 
-It might be annoying to constantly see this:
+On Wed,  8 Apr 2015 06:17:38 -0700 Andi Kleen <andi@firstfloor.org> wrote:
 
-	scripts/Makefile.kasan:16: Cannot use CONFIG_KASAN: -fsanitize=kernel-address is not supported by compiler
+> From: Andi Kleen <ak@linux.intel.com>
+> 
+> gcc 5 has a new no_reorder attribute that prevents top level
+> reordering only for that symbol.
 
-while performing allmodconfig/allyesconfig build tests.
-Disable this warning if CONFIG_COMPILE_TEST=y.
+I'm having trouble locating gcc documentation which explains all this
+stuff.
 
-Signed-off-by: Andrey Ryabinin <a.ryabinin@samsung.com>
----
- scripts/Makefile.kasan | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+> Kernels don't like any reordering of initcalls between files, as several
+> initcalls depend on each other. LTO previously needed to use
+> -fno-toplevel-reordering to prevent boot failures.
 
-diff --git a/scripts/Makefile.kasan b/scripts/Makefile.kasan
-index 631619b..3f874d2 100644
---- a/scripts/Makefile.kasan
-+++ b/scripts/Makefile.kasan
-@@ -13,12 +13,16 @@ CFLAGS_KASAN := $(call cc-option, -fsanitize=kernel-address \
- 		--param asan-instrumentation-with-call-threshold=$(call_threshold))
- 
- ifeq ($(call cc-option, $(CFLAGS_KASAN_MINIMAL) -Werror),)
-+   ifneq ($(CONFIG_COMPILE_TEST),y)
-         $(warning Cannot use CONFIG_KASAN: \
-             -fsanitize=kernel-address is not supported by compiler)
-+   endif
- else
-     ifeq ($(CFLAGS_KASAN),)
--        $(warning CONFIG_KASAN: compiler does not support all options.\
--            Trying minimal configuration)
-+        ifneq ($(CONFIG_COMPILE_TEST),y)
-+            $(warning CONFIG_KASAN: compiler does not support all options.\
-+                Trying minimal configuration)
-+        endif
-         CFLAGS_KASAN := $(CFLAGS_KASAN_MINIMAL)
-     endif
- endif
--- 
-2.3.5
+That's "-fno-toplevel-reorder", I believe?
+
+> Add a __noreorder wrapper for the no_reorder attribute and use
+> it for initcalls.
+
+Head is spinning a bit.  As this all appears to be shiny new
+added-by-andi gcc functionality, it would be useful if we could have a
+few more words describing what it's all about.  Reordering of what with
+respect to what and why and why is it bad.  Why is gcc reordering
+things anyway, and what's the downside of preventing this.  Why is the
+compiler reordering things rather than the linker. etc etc etc.
+
+Please gently educate us ;)
 
