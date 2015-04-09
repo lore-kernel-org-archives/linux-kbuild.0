@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([103.22.144.67]:52140 "EHLO ozlabs.org"
+Received: from ozlabs.org ([103.22.144.67]:51882 "EHLO ozlabs.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754938AbbDIDvn (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 8 Apr 2015 23:51:43 -0400
+	id S1753626AbbDIDvk (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 8 Apr 2015 23:51:40 -0400
 From: Anton Blanchard <anton@samba.org>
-Subject: [PATCH 2/3] jump_label: Allow jump labels to be used in assembly
-Date: Thu,  9 Apr 2015 13:51:31 +1000
-Message-Id: <1428551492-21977-2-git-send-email-anton@samba.org>
+Subject: [PATCH 3/3] powerpc: Include linux/jump_label.h to get HAVE_JUMP_LABEL define
+Date: Thu,  9 Apr 2015 13:51:32 +1000
+Message-Id: <1428551492-21977-3-git-send-email-anton@samba.org>
 In-Reply-To: <1428551492-21977-1-git-send-email-anton@samba.org>
 References: <1428551492-21977-1-git-send-email-anton@samba.org>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -14,85 +14,69 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: benh@kernel.crashing.org, paulus@samba.org, mpe@ellerman.id.au, mmarek@suse.cz, akpm@linux-foundation.org, jbaron@akamai.com, peterz@infradead.org, liuj97@gmail.com, mingo@kernel.org, mgorman@suse.de, linux@arm.linux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, ralf@linux-mips.org, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, davem@davemloft.net, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com, rostedt@goodmis.org
 Cc: linuxppc-dev@lists.ozlabs.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-To use jump labels in assembly we need the HAVE_JUMP_LABEL define,
-so we select a fallback version if the toolchain does not support
-them.
+Commit 1bc9e47aa8e4 ("powerpc/jump_label: Use HAVE_JUMP_LABEL")
+converted uses of CONFIG_JUMP_LABEL to HAVE_JUMP_LABEL in
+some assembly files.
 
-Modify linux/jump_label.h so it can be included by assembly files.
-We also need to add -DCC_HAVE_ASM_GOTO to KBUILD_AFLAGS.
+HAVE_JUMP_LABEL is defined in linux/jump_label.h, so we need to
+include this or we always get the non jump label fallback code.
 
+Fixes: 1bc9e47aa8e4 ("powerpc/jump_label: Use HAVE_JUMP_LABEL")
 Signed-off-by: Anton Blanchard <anton@samba.org>
 ---
- Makefile                   |  1 +
- include/linux/jump_label.h | 21 +++++++++++++++++----
- 2 files changed, 18 insertions(+), 4 deletions(-)
+ arch/powerpc/platforms/powernv/opal-wrappers.S | 2 +-
+ arch/powerpc/platforms/pseries/hvCall.S        | 2 +-
+ arch/powerpc/platforms/pseries/lpar.c          | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index e734965..3624215 100644
---- a/Makefile
-+++ b/Makefile
-@@ -779,6 +779,7 @@ KBUILD_ARFLAGS := $(call ar-option,D)
- # check for 'asm goto'
- ifeq ($(shell $(CONFIG_SHELL) $(srctree)/scripts/gcc-goto.sh $(CC)), y)
- 	KBUILD_CFLAGS += -DCC_HAVE_ASM_GOTO
-+	KBUILD_AFLAGS += -DCC_HAVE_ASM_GOTO
- endif
- 
- include $(srctree)/scripts/Makefile.kasan
-diff --git a/include/linux/jump_label.h b/include/linux/jump_label.h
-index 98f923b6..f4de473 100644
---- a/include/linux/jump_label.h
-+++ b/include/linux/jump_label.h
-@@ -45,6 +45,12 @@
-  * same as using STATIC_KEY_INIT_FALSE.
+diff --git a/arch/powerpc/platforms/powernv/opal-wrappers.S b/arch/powerpc/platforms/powernv/opal-wrappers.S
+index b23fe7c..4c4fe6f 100644
+--- a/arch/powerpc/platforms/powernv/opal-wrappers.S
++++ b/arch/powerpc/platforms/powernv/opal-wrappers.S
+@@ -9,11 +9,11 @@
+  * 2 of the License, or (at your option) any later version.
   */
  
-+#if defined(CC_HAVE_ASM_GOTO) && defined(CONFIG_JUMP_LABEL)
-+# define HAVE_JUMP_LABEL
-+#endif
-+
-+#ifndef __ASSEMBLY__
-+
- #include <linux/types.h>
- #include <linux/compiler.h>
- #include <linux/bug.h>
-@@ -55,7 +61,7 @@ extern bool static_key_initialized;
- 				    "%s used before call to jump_label_init", \
- 				    __func__)
++#include <linux/jump_label.h>
+ #include <asm/ppc_asm.h>
+ #include <asm/hvcall.h>
+ #include <asm/asm-offsets.h>
+ #include <asm/opal.h>
+-#include <asm/jump_label.h>
  
--#if defined(CC_HAVE_ASM_GOTO) && defined(CONFIG_JUMP_LABEL)
-+#ifdef HAVE_JUMP_LABEL
+ 	.section	".text"
  
- struct static_key {
- 	atomic_t enabled;
-@@ -66,13 +72,18 @@ struct static_key {
- #endif
- };
+diff --git a/arch/powerpc/platforms/pseries/hvCall.S b/arch/powerpc/platforms/pseries/hvCall.S
+index ccd53f9..74b5b8e 100644
+--- a/arch/powerpc/platforms/pseries/hvCall.S
++++ b/arch/powerpc/platforms/pseries/hvCall.S
+@@ -7,12 +7,12 @@
+  * as published by the Free Software Foundation; either version
+  * 2 of the License, or (at your option) any later version.
+  */
++#include <linux/jump_label.h>
+ #include <asm/hvcall.h>
+ #include <asm/processor.h>
+ #include <asm/ppc_asm.h>
+ #include <asm/asm-offsets.h>
+ #include <asm/ptrace.h>
+-#include <asm/jump_label.h>
  
--# include <asm/jump_label.h>
--# define HAVE_JUMP_LABEL
- #else
- struct static_key {
- 	atomic_t enabled;
- };
--#endif	/* CC_HAVE_ASM_GOTO && CONFIG_JUMP_LABEL */
-+#endif	/* HAVE_JUMP_LABEL */
-+#endif /* __ASSEMBLY__ */
-+
-+#ifdef HAVE_JUMP_LABEL
-+#include <asm/jump_label.h>
-+#endif
-+
-+#ifndef __ASSEMBLY__
- 
- enum jump_label_type {
- 	JUMP_LABEL_DISABLE = 0,
-@@ -203,3 +214,5 @@ static inline bool static_key_enabled(struct static_key *key)
- }
- 
- #endif	/* _LINUX_JUMP_LABEL_H */
-+
-+#endif /* __ASSEMBLY__ */
+ 	.section	".text"
+ 	
+diff --git a/arch/powerpc/platforms/pseries/lpar.c b/arch/powerpc/platforms/pseries/lpar.c
+index b5682fd..b7a67e3 100644
+--- a/arch/powerpc/platforms/pseries/lpar.c
++++ b/arch/powerpc/platforms/pseries/lpar.c
+@@ -26,7 +26,7 @@
+ #include <linux/dma-mapping.h>
+ #include <linux/console.h>
+ #include <linux/export.h>
+-#include <linux/static_key.h>
++#include <linux/jump_label.h>
+ #include <asm/processor.h>
+ #include <asm/mmu.h>
+ #include <asm/page.h>
 -- 
 2.1.0
 
