@@ -1,350 +1,108 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:58386 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751554AbbDIPqh (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 9 Apr 2015 11:46:37 -0400
-Date: Thu, 9 Apr 2015 17:46:35 +0200
-From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH 2/2] kconfig: Do not print status messages in make -s mode
-Message-ID: <20150409154635.GA7231@sepie.suse.cz>
-References: <1428493376-20197-1-git-send-email-mmarek@suse.cz>
- <1428493376-20197-2-git-send-email-mmarek@suse.cz>
- <1428583676.14000.50.camel@x220>
- <55267775.3080407@suse.cz>
- <1428591484.14000.69.camel@x220>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1428591484.14000.69.camel@x220>
+Received: from lb2-smtp-cloud2.xs4all.net ([194.109.24.25]:47837 "EHLO
+	lb2-smtp-cloud2.xs4all.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1756024AbbDIQBL (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 9 Apr 2015 12:01:11 -0400
+Message-ID: <1428595267.13881.6.camel@x220>
+Subject: Re: [PATCH] kasan: Makefile: shut up warnings if
+ CONFIG_COMPILE_TEST=y
+From: Paul Bolle <pebolle@tiscali.nl>
+Date: Thu, 09 Apr 2015 18:01:07 +0200
+In-Reply-To: <55267431.7030304@samsung.com>
+References: <20150407160213.8f66c90ca812c30f362dd543@linux-foundation.org>
+	 <1428507505-4015-1-git-send-email-a.ryabinin@samsung.com>
+	 <1428577598.14000.31.camel@x220> <55267431.7030304@samsung.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Paul Bolle <pebolle@tiscali.nl>
-Cc: linux-kbuild@vger.kernel.org
+To: Andrey Ryabinin <a.ryabinin@samsung.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Thu, Apr 09, 2015 at 04:58:04PM +0200, Paul Bolle wrote:
-> On Thu, 2015-04-09 at 14:58 +0200, Michal Marek wrote:
-> > On 2015-04-09 14:47, Paul Bolle wrote:
-> > > The patch adds this :
-> > >     conf_set_message_callback(NULL);
-> > > 
-> > > for conf, gconf, and qconf. That won't work for mconf?
+On Thu, 2015-04-09 at 15:44 +0300, Andrey Ryabinin wrote:
+> On 04/09/2015 02:06 PM, Paul Bolle wrote:
+> > On Wed, 2015-04-08 at 18:38 +0300, Andrey Ryabinin wrote:
+> >> It might be annoying to constantly see this:
+> >>
+> >> 	scripts/Makefile.kasan:16: Cannot use CONFIG_KASAN: -fsanitize=kernel-address is not supported by compiler
+> >>
+> >> while performing allmodconfig/allyesconfig build tests.
 > > 
-> > Have you tried looking at the mconf code? It sets a message callback to
-> > display ncurses dialogs.
+> > That warning might be seen - once per build - because allmodconfig and
+> > allyesconfig enable both CONFIG_KASAN and CONFIG_COMPILE_TEST, right?
+> > 
 > 
-> I see.
+> It might be seen once per build because all*config enables CONFIG_KASAN.
+> There was no dependency on CONFIG_COMPILE_TEST before this patch.
+
+Yes, of course.
+
+> >> Disable this warning if CONFIG_COMPILE_TEST=y.
+> > 
+> > Do we expect that some people want to enable both KASAN and COMPILE_TEST
+> > manually (ie, not as a result of allmodconfig or allyesconfig)? If so,
+> > those people might now be in for some head-scratching if their compiler
+> > lacks what's apparently needed to run kasan.
+> > 
 > 
-> mconf sets that callback after it has already done a few things. So
-> "make -s menuconfig" without a .config will do
->     main()
->         conf_read(NULL)
->             conf_read_simple([...])
->                 conf_message(_("using defaults found in %s"), [...])
->                      conf_message_callback()
+> I think this shouldn't be a problem.
+> CONFIG_COMPILE_TEST used for building drivers that cannot be loaded on
+> platform used for compiling these drivers.
+> So it's unlikely that such kernel will be used for runtime testing.
+
+It would be nice if there would at least be a comment explaining what's
+being done here (ie, assuming that if CONFIG_COMPILE_TEST equals 'y'
+we're doing a allmodconfig or an allyesconfig and that people using
+either of those make targets don't care whether their compiler supports
+kasan). Because I'd be surprised if people figure that out by looking at
+this Makefile.
+
+> >> Signed-off-by: Andrey Ryabinin <a.ryabinin@samsung.com>
+> >> ---
+> >>  scripts/Makefile.kasan | 8 ++++++--
+> >>  1 file changed, 6 insertions(+), 2 deletions(-)
+> >>
+> >> diff --git a/scripts/Makefile.kasan b/scripts/Makefile.kasan
+> >> index 631619b..3f874d2 100644
+> >> --- a/scripts/Makefile.kasan
+> >> +++ b/scripts/Makefile.kasan
+> >> @@ -13,12 +13,16 @@ CFLAGS_KASAN := $(call cc-option, -fsanitize=kernel-address \
+> >>  		--param asan-instrumentation-with-call-threshold=$(call_threshold))
+> >>  
+> >>  ifeq ($(call cc-option, $(CFLAGS_KASAN_MINIMAL) -Werror),)
+> >> +   ifneq ($(CONFIG_COMPILE_TEST),y)
+> >>          $(warning Cannot use CONFIG_KASAN: \
+> >>              -fsanitize=kernel-address is not supported by compiler)
+> >> +   endif
+> >>  else
+> >>      ifeq ($(CFLAGS_KASAN),)
+> >> -        $(warning CONFIG_KASAN: compiler does not support all options.\
+> >> -            Trying minimal configuration)
+> >> +        ifneq ($(CONFIG_COMPILE_TEST),y)
+> >> +            $(warning CONFIG_KASAN: compiler does not support all options.\
+> >> +                Trying minimal configuration)
+> > 
+> > (Side note: in this case the compiler supports that minimal
+> > configuration, doesn't it? So shouldn't the second warning end in
+> >                 Running with minimal configuration)
+> > 
+> > or something to that effect?)
+> >
 > 
-> and at that point conf_message_callback() still points to
-> conf_default_message_callback(). This default uses stdout. So I think I
-> stumbled on a cornercase where one message still can be printed to
-> stdout. Shocking!
+> It should and it does.
+> CFLAGS_KASAN reassigned to minimal set of options below.
 
-Heh, you are right and nconf has the same problem. Here is an updated
-version.
+Which makes "Trying" ambiguous, but anyway, it's just a side note.
 
-Michal
+> >> +        endif
+> >>          CFLAGS_KASAN := $(CFLAGS_KASAN_MINIMAL)
+> >>      endif
+> >>  endif
 
-From 0a1f00a1c86421cc07cec87011c7cf4df68ee54b Mon Sep 17 00:00:00 2001
-From: Michal Marek <mmarek@suse.cz>
-Date: Wed, 8 Apr 2015 13:30:42 +0200
-Subject: [PATCH v2 2/2] kconfig: Do not print status messages in make -s mode
+Thanks, 
 
-Add an -s option to the various frontends and pass it when make -s is
-used. Also, use $(kecho) instead of @echo in the Makefile.
 
-Signed-off-by: Michal Marek <mmarek@suse.cz>
----
-
-v2: Silence another message when mconf / nconf start with missing
-configuration.
-
----
- scripts/kconfig/Makefile | 40 ++++++++++++++++++++++------------------
- scripts/kconfig/conf.c   |  8 ++++++--
- scripts/kconfig/gconf.c  |  5 ++++-
- scripts/kconfig/mconf.c  | 31 +++++++++++++++++++++----------
- scripts/kconfig/nconf.c  |  5 +++++
- scripts/kconfig/qconf.cc |  5 ++++-
- 6 files changed, 62 insertions(+), 32 deletions(-)
-
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index 1f5e453..d9b1fef 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -11,27 +11,31 @@ else
- Kconfig := Kconfig
- endif
- 
-+ifeq ($(quiet),silent_)
-+silent := -s
-+endif
-+
- # We need this, in case the user has it in its environment
- unexport CONFIG_
- 
- xconfig: $(obj)/qconf
--	$< $(Kconfig)
-+	$< $(silent) $(Kconfig)
- 
- gconfig: $(obj)/gconf
--	$< $(Kconfig)
-+	$< $(silent) $(Kconfig)
- 
- menuconfig: $(obj)/mconf
--	$< $(Kconfig)
-+	$< $(silent) $(Kconfig)
- 
- config: $(obj)/conf
--	$< --oldaskconfig $(Kconfig)
-+	$< $(silent) --oldaskconfig $(Kconfig)
- 
- nconfig: $(obj)/nconf
--	$< $(Kconfig)
-+	$< $(silent) $(Kconfig)
- 
- silentoldconfig: $(obj)/conf
- 	$(Q)mkdir -p include/config include/generated
--	$< --$@ $(Kconfig)
-+	$< $(silent) --$@ $(Kconfig)
- 
- localyesconfig localmodconfig: $(obj)/streamline_config.pl $(obj)/conf
- 	$(Q)mkdir -p include/config include/generated
-@@ -40,18 +44,18 @@ localyesconfig localmodconfig: $(obj)/streamline_config.pl $(obj)/conf
- 			cmp -s .tmp.config .config ||			\
- 			(mv -f .config .config.old.1;			\
- 			 mv -f .tmp.config .config;			\
--			 $(obj)/conf --silentoldconfig $(Kconfig);	\
-+			 $(obj)/conf $(silent) --silentoldconfig $(Kconfig); \
- 			 mv -f .config.old.1 .config.old)		\
- 	else								\
- 			mv -f .tmp.config .config;			\
--			$(obj)/conf --silentoldconfig $(Kconfig);	\
-+			$(obj)/conf $(silent) --silentoldconfig $(Kconfig); \
- 	fi
- 	$(Q)rm -f .tmp.config
- 
- # Create new linux.pot file
- # Adjust charset to UTF-8 in .po file to accept UTF-8 in Kconfig files
- update-po-config: $(obj)/kxgettext $(obj)/gconf.glade.h
--	$(Q)echo "  GEN     config.pot"
-+	$(Q)$(kecho) "  GEN     config.pot"
- 	$(Q)xgettext --default-domain=linux                         \
- 	    --add-comments --keyword=_ --keyword=N_                 \
- 	    --from-code=UTF-8                                       \
-@@ -62,11 +66,11 @@ update-po-config: $(obj)/kxgettext $(obj)/gconf.glade.h
- 	$(Q)(for i in `ls $(srctree)/arch/*/Kconfig      \
- 	    $(srctree)/arch/*/um/Kconfig`;               \
- 	    do                                           \
--		echo "  GEN     $$i";                    \
-+		$(kecho) "  GEN     $$i";                    \
- 		$(obj)/kxgettext $$i                     \
- 		     >> $(obj)/config.pot;               \
- 	    done )
--	$(Q)echo "  GEN     linux.pot"
-+	$(Q)$(kecho) "  GEN     linux.pot"
- 	$(Q)msguniq --sort-by-file --to-code=UTF-8 $(obj)/config.pot \
- 	    --output $(obj)/linux.pot
- 	$(Q)rm -f $(obj)/config.pot
-@@ -77,7 +81,7 @@ simple-targets := oldconfig allnoconfig allyesconfig allmodconfig \
- PHONY += $(simple-targets)
- 
- $(simple-targets): $(obj)/conf
--	$< --$@ $(Kconfig)
-+	$< $(silent) --$@ $(Kconfig)
- 
- PHONY += oldnoconfig savedefconfig defconfig
- 
-@@ -87,18 +91,18 @@ PHONY += oldnoconfig savedefconfig defconfig
- oldnoconfig: olddefconfig
- 
- savedefconfig: $(obj)/conf
--	$< --$@=defconfig $(Kconfig)
-+	$< $(silent) --$@=defconfig $(Kconfig)
- 
- defconfig: $(obj)/conf
- ifeq ($(KBUILD_DEFCONFIG),)
--	$< --defconfig $(Kconfig)
-+	$< $(silent) --defconfig $(Kconfig)
- else
--	@echo "*** Default configuration is based on '$(KBUILD_DEFCONFIG)'"
--	$(Q)$< --defconfig=arch/$(SRCARCH)/configs/$(KBUILD_DEFCONFIG) $(Kconfig)
-+	@$(kecho) "*** Default configuration is based on '$(KBUILD_DEFCONFIG)'"
-+	$(Q)$< $(silent) --defconfig=arch/$(SRCARCH)/configs/$(KBUILD_DEFCONFIG) $(Kconfig)
- endif
- 
- %_defconfig: $(obj)/conf
--	$(Q)$< --defconfig=arch/$(SRCARCH)/configs/$@ $(Kconfig)
-+	$(Q)$< $(silent) --defconfig=arch/$(SRCARCH)/configs/$@ $(Kconfig)
- 
- configfiles=$(wildcard $(srctree)/kernel/configs/$@ $(srctree)/arch/$(SRCARCH)/configs/$@)
- 
-@@ -215,7 +219,7 @@ $(obj)/.tmp_qtcheck: $(src)/Makefile
- 
- # QT needs some extra effort...
- $(obj)/.tmp_qtcheck:
--	@set -e; echo "  CHECK   qt"; dir=""; pkg=""; \
-+	@set -e; $(kecho) "  CHECK   qt"; dir=""; pkg=""; \
- 	if ! pkg-config --exists QtCore 2> /dev/null; then \
- 	    echo "* Unable to find the QT4 tool qmake. Trying to use QT3"; \
- 	    pkg-config --exists qt 2> /dev/null && pkg=qt; \
-diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
-index fef75fc..6c20431 100644
---- a/scripts/kconfig/conf.c
-+++ b/scripts/kconfig/conf.c
-@@ -471,7 +471,7 @@ static struct option long_opts[] = {
- static void conf_usage(const char *progname)
- {
- 
--	printf("Usage: %s [option] <kconfig-file>\n", progname);
-+	printf("Usage: %s [-s] [option] <kconfig-file>\n", progname);
- 	printf("[option] is _one_ of the following:\n");
- 	printf("  --listnewconfig         List new options\n");
- 	printf("  --oldaskconfig          Start a new configuration using a line-oriented program\n");
-@@ -501,7 +501,11 @@ int main(int ac, char **av)
- 
- 	tty_stdio = isatty(0) && isatty(1) && isatty(2);
- 
--	while ((opt = getopt_long(ac, av, "", long_opts, NULL)) != -1) {
-+	while ((opt = getopt_long(ac, av, "s", long_opts, NULL)) != -1) {
-+		if (opt == 's') {
-+			conf_set_message_callback(NULL);
-+			continue;
-+		}
- 		input_mode = (enum input_mode)opt;
- 		switch (opt) {
- 		case silentoldconfig:
-diff --git a/scripts/kconfig/gconf.c b/scripts/kconfig/gconf.c
-index 344b9e3..26d208b 100644
---- a/scripts/kconfig/gconf.c
-+++ b/scripts/kconfig/gconf.c
-@@ -1474,9 +1474,12 @@ int main(int ac, char *av[])
- 		case 'a':
- 			//showAll = 1;
- 			break;
-+		case 's':
-+			conf_set_message_callback(NULL);
-+			break;
- 		case 'h':
- 		case '?':
--			printf("%s <config>\n", av[0]);
-+			printf("%s [-s] <config>\n", av[0]);
- 			exit(0);
- 		}
- 		name = av[2];
-diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
-index 4dd3755..315ce2c 100644
---- a/scripts/kconfig/mconf.c
-+++ b/scripts/kconfig/mconf.c
-@@ -279,6 +279,7 @@ static int child_count;
- static int single_menu_mode;
- static int show_all_options;
- static int save_and_exit;
-+static int silent;
- 
- static void conf(struct menu *menu, struct menu *active_menu);
- static void conf_choice(struct menu *menu);
-@@ -777,10 +778,12 @@ static void conf_message_callback(const char *fmt, va_list ap)
- 	char buf[PATH_MAX+1];
- 
- 	vsnprintf(buf, sizeof(buf), fmt, ap);
--	if (save_and_exit)
--		printf("%s", buf);
--	else
-+	if (save_and_exit) {
-+		if (!silent)
-+			printf("%s", buf);
-+	} else {
- 		show_textbox(NULL, buf, 6, 60);
-+	}
- }
- 
- static void show_help(struct menu *menu)
-@@ -977,16 +980,18 @@ static int handle_exit(void)
- 		}
- 		/* fall through */
- 	case -1:
--		printf(_("\n\n"
--			 "*** End of the configuration.\n"
--			 "*** Execute 'make' to start the build or try 'make help'."
--			 "\n\n"));
-+		if (!silent)
-+			printf(_("\n\n"
-+				 "*** End of the configuration.\n"
-+				 "*** Execute 'make' to start the build or try 'make help'."
-+				 "\n\n"));
- 		res = 0;
- 		break;
- 	default:
--		fprintf(stderr, _("\n\n"
--				  "Your configuration changes were NOT saved."
--				  "\n\n"));
-+		if (!silent)
-+			fprintf(stderr, _("\n\n"
-+					  "Your configuration changes were NOT saved."
-+					  "\n\n"));
- 		if (res != KEY_ESC)
- 			res = 0;
- 	}
-@@ -1010,6 +1015,12 @@ int main(int ac, char **av)
- 
- 	signal(SIGINT, sig_handler);
- 
-+	if (ac > 1 && strcmp(av[1], "-s") == 0) {
-+		silent = 1;
-+		/* Silence conf_read() until the real callback is set up */
-+		conf_set_message_callback(NULL);
-+		av++;
-+	}
- 	conf_parse(av[1]);
- 	conf_read(NULL);
- 
-diff --git a/scripts/kconfig/nconf.c b/scripts/kconfig/nconf.c
-index 984489e..d42d534 100644
---- a/scripts/kconfig/nconf.c
-+++ b/scripts/kconfig/nconf.c
-@@ -1482,6 +1482,11 @@ int main(int ac, char **av)
- 	bindtextdomain(PACKAGE, LOCALEDIR);
- 	textdomain(PACKAGE);
- 
-+	if (ac > 1 && strcmp(av[1], "-s") == 0) {
-+		/* Silence conf_read() until the real callback is set up */
-+		conf_set_message_callback(NULL);
-+		av++;
-+	}
- 	conf_parse(av[1]);
- 	conf_read(NULL);
- 
-diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
-index 9d3b04b..c3bb7fe 100644
---- a/scripts/kconfig/qconf.cc
-+++ b/scripts/kconfig/qconf.cc
-@@ -1746,7 +1746,7 @@ static const char *progname;
- 
- static void usage(void)
- {
--	printf(_("%s <config>\n"), progname);
-+	printf(_("%s [-s] <config>\n"), progname);
- 	exit(0);
- }
- 
-@@ -1762,6 +1762,9 @@ int main(int ac, char** av)
- 	configApp = new QApplication(ac, av);
- 	if (ac > 1 && av[1][0] == '-') {
- 		switch (av[1][1]) {
-+		case 's':
-+			conf_set_message_callback(NULL);
-+			break;
- 		case 'h':
- 		case '?':
- 			usage();
--- 
-2.1.4
+Paul Bolle
 
