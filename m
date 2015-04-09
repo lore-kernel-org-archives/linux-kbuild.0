@@ -1,41 +1,204 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg002.nifty.com ([202.248.44.40]:25669 "EHLO
-	conssluserg002-v.nifty.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1754148AbbDIBne (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 8 Apr 2015 21:43:34 -0400
-Received: from mail-wi0-f181.google.com (mail-wi0-f181.google.com [209.85.212.181]) (authenticated)
-	by conssluserg002-v.nifty.com with ESMTP id t391hNJx025261
-	for <linux-kbuild@vger.kernel.org>; Thu, 9 Apr 2015 10:43:24 +0900
-Received: by wiaa2 with SMTP id a2so80003007wia.0
-        for <linux-kbuild@vger.kernel.org>; Wed, 08 Apr 2015 18:43:22 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <1428493376-20197-1-git-send-email-mmarek@suse.cz>
-References: <1428493376-20197-1-git-send-email-mmarek@suse.cz>
-Date: Thu, 9 Apr 2015 10:43:22 +0900
-Message-ID: <CAK7LNASDx7uqnT99PcWzfo2V=QTy=g5-VLQEB7aDmS+xSw+zqQ@mail.gmail.com>
-Subject: Re: [PATCH 1/2] kconfig: Simplify Makefile
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Content-Type: text/plain; charset=UTF-8
+Received: from ozlabs.org ([103.22.144.67]:36770 "EHLO ozlabs.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752889AbbDIDvh (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 8 Apr 2015 23:51:37 -0400
+From: Anton Blanchard <anton@samba.org>
+Subject: [PATCH 1/3] jump_label: Allow asm/jump_label.h to be included in assembly
+Date: Thu,  9 Apr 2015 13:51:30 +1000
+Message-Id: <1428551492-21977-1-git-send-email-anton@samba.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: benh@kernel.crashing.org, paulus@samba.org, mpe@ellerman.id.au, mmarek@suse.cz, akpm@linux-foundation.org, jbaron@akamai.com, peterz@infradead.org, liuj97@gmail.com, mingo@kernel.org, mgorman@suse.de, linux@arm.linux.org.uk, catalin.marinas@arm.com, will.deacon@arm.com, ralf@linux-mips.org, schwidefsky@de.ibm.com, heiko.carstens@de.ibm.com, davem@davemloft.net, tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com, rostedt@goodmis.org
+Cc: linuxppc-dev@lists.ozlabs.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hi Michal,
+Wrap asm/jump_label.h for all archs with #ifndef __ASSEMBLY__.
+Since these are kernel only headers, we don't need #ifdef __KERNEL__
+so can simplify things a bit.
 
+If an architecture wants to use jump labels in assembly, it
+will still need to define a macro to create the __jump_table
+entries (see ARCH_STATIC_BRANCH in the powerpc asm/jump_label.h
+for an example).
 
-2015-04-08 20:42 GMT+09:00 Michal Marek <mmarek@suse.cz>:
-> Use a single rule for targets handled directly by the conf program.
->
-> Signed-off-by: Michal Marek <mmarek@suse.cz>
+Signed-off-by: Anton Blanchard <anton@samba.org>
+---
+ arch/arm/include/asm/jump_label.h   | 5 ++---
+ arch/arm64/include/asm/jump_label.h | 8 ++++----
+ arch/mips/include/asm/jump_label.h  | 7 +++----
+ arch/s390/include/asm/jump_label.h  | 3 +++
+ arch/sparc/include/asm/jump_label.h | 5 ++---
+ arch/x86/include/asm/jump_label.h   | 5 ++---
+ 6 files changed, 16 insertions(+), 17 deletions(-)
 
-Nice cleanup!
-
-Reviewed-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-
-
-
+diff --git a/arch/arm/include/asm/jump_label.h b/arch/arm/include/asm/jump_label.h
+index 70f9b9b..5f337dc 100644
+--- a/arch/arm/include/asm/jump_label.h
++++ b/arch/arm/include/asm/jump_label.h
+@@ -1,7 +1,7 @@
+ #ifndef _ASM_ARM_JUMP_LABEL_H
+ #define _ASM_ARM_JUMP_LABEL_H
+ 
+-#ifdef __KERNEL__
++#ifndef __ASSEMBLY__
+ 
+ #include <linux/types.h>
+ 
+@@ -27,8 +27,6 @@ l_yes:
+ 	return true;
+ }
+ 
+-#endif /* __KERNEL__ */
+-
+ typedef u32 jump_label_t;
+ 
+ struct jump_entry {
+@@ -37,4 +35,5 @@ struct jump_entry {
+ 	jump_label_t key;
+ };
+ 
++#endif  /* __ASSEMBLY__ */
+ #endif
+diff --git a/arch/arm64/include/asm/jump_label.h b/arch/arm64/include/asm/jump_label.h
+index 076a1c7..c0e5165 100644
+--- a/arch/arm64/include/asm/jump_label.h
++++ b/arch/arm64/include/asm/jump_label.h
+@@ -18,11 +18,12 @@
+  */
+ #ifndef __ASM_JUMP_LABEL_H
+ #define __ASM_JUMP_LABEL_H
++
++#ifndef __ASSEMBLY__
++
+ #include <linux/types.h>
+ #include <asm/insn.h>
+ 
+-#ifdef __KERNEL__
+-
+ #define JUMP_LABEL_NOP_SIZE		AARCH64_INSN_SIZE
+ 
+ static __always_inline bool arch_static_branch(struct static_key *key)
+@@ -39,8 +40,6 @@ l_yes:
+ 	return true;
+ }
+ 
+-#endif /* __KERNEL__ */
+-
+ typedef u64 jump_label_t;
+ 
+ struct jump_entry {
+@@ -49,4 +48,5 @@ struct jump_entry {
+ 	jump_label_t key;
+ };
+ 
++#endif  /* __ASSEMBLY__ */
+ #endif	/* __ASM_JUMP_LABEL_H */
+diff --git a/arch/mips/include/asm/jump_label.h b/arch/mips/include/asm/jump_label.h
+index fdbff44..608aa57 100644
+--- a/arch/mips/include/asm/jump_label.h
++++ b/arch/mips/include/asm/jump_label.h
+@@ -8,9 +8,9 @@
+ #ifndef _ASM_MIPS_JUMP_LABEL_H
+ #define _ASM_MIPS_JUMP_LABEL_H
+ 
+-#include <linux/types.h>
++#ifndef __ASSEMBLY__
+ 
+-#ifdef __KERNEL__
++#include <linux/types.h>
+ 
+ #define JUMP_LABEL_NOP_SIZE 4
+ 
+@@ -39,8 +39,6 @@ l_yes:
+ 	return true;
+ }
+ 
+-#endif /* __KERNEL__ */
+-
+ #ifdef CONFIG_64BIT
+ typedef u64 jump_label_t;
+ #else
+@@ -53,4 +51,5 @@ struct jump_entry {
+ 	jump_label_t key;
+ };
+ 
++#endif  /* __ASSEMBLY__ */
+ #endif /* _ASM_MIPS_JUMP_LABEL_H */
+diff --git a/arch/s390/include/asm/jump_label.h b/arch/s390/include/asm/jump_label.h
+index 58642fd..2b77e23 100644
+--- a/arch/s390/include/asm/jump_label.h
++++ b/arch/s390/include/asm/jump_label.h
+@@ -1,6 +1,8 @@
+ #ifndef _ASM_S390_JUMP_LABEL_H
+ #define _ASM_S390_JUMP_LABEL_H
+ 
++#ifndef __ASSEMBLY__
++
+ #include <linux/types.h>
+ 
+ #define JUMP_LABEL_NOP_SIZE 6
+@@ -39,4 +41,5 @@ struct jump_entry {
+ 	jump_label_t key;
+ };
+ 
++#endif  /* __ASSEMBLY__ */
+ #endif
+diff --git a/arch/sparc/include/asm/jump_label.h b/arch/sparc/include/asm/jump_label.h
+index ec2e2e2..cc9b04a 100644
+--- a/arch/sparc/include/asm/jump_label.h
++++ b/arch/sparc/include/asm/jump_label.h
+@@ -1,7 +1,7 @@
+ #ifndef _ASM_SPARC_JUMP_LABEL_H
+ #define _ASM_SPARC_JUMP_LABEL_H
+ 
+-#ifdef __KERNEL__
++#ifndef __ASSEMBLY__
+ 
+ #include <linux/types.h>
+ 
+@@ -22,8 +22,6 @@ l_yes:
+ 	return true;
+ }
+ 
+-#endif /* __KERNEL__ */
+-
+ typedef u32 jump_label_t;
+ 
+ struct jump_entry {
+@@ -32,4 +30,5 @@ struct jump_entry {
+ 	jump_label_t key;
+ };
+ 
++#endif  /* __ASSEMBLY__ */
+ #endif
+diff --git a/arch/x86/include/asm/jump_label.h b/arch/x86/include/asm/jump_label.h
+index 6a2cefb..a4c1cf7 100644
+--- a/arch/x86/include/asm/jump_label.h
++++ b/arch/x86/include/asm/jump_label.h
+@@ -1,7 +1,7 @@
+ #ifndef _ASM_X86_JUMP_LABEL_H
+ #define _ASM_X86_JUMP_LABEL_H
+ 
+-#ifdef __KERNEL__
++#ifndef __ASSEMBLY__
+ 
+ #include <linux/stringify.h>
+ #include <linux/types.h>
+@@ -30,8 +30,6 @@ l_yes:
+ 	return true;
+ }
+ 
+-#endif /* __KERNEL__ */
+-
+ #ifdef CONFIG_X86_64
+ typedef u64 jump_label_t;
+ #else
+@@ -44,4 +42,5 @@ struct jump_entry {
+ 	jump_label_t key;
+ };
+ 
++#endif  /* __ASSEMBLY__ */
+ #endif
 -- 
-Best Regards
-Masahiro Yamada
+2.1.0
+
