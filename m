@@ -1,104 +1,125 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-la0-f47.google.com ([209.85.215.47]:34718 "EHLO
-	mail-la0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932434AbbDJNPc (ORCPT
+Received: from lb3-smtp-cloud3.xs4all.net ([194.109.24.30]:36280 "EHLO
+	lb3-smtp-cloud3.xs4all.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753796AbbDJVZr (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 10 Apr 2015 09:15:32 -0400
-Received: by laat2 with SMTP id t2so12989506laa.1
-        for <linux-kbuild@vger.kernel.org>; Fri, 10 Apr 2015 06:15:30 -0700 (PDT)
-From: riku.voipio@linaro.org
-Subject: [PATCH 2/2] deb-pkg: add source package
-Date: Fri, 10 Apr 2015 16:15:14 +0300
-Message-Id: <34017611f8a0056a09d2c38412efd7828efe00fe.1428671643.git.riku.voipio@linaro.org>
-In-Reply-To: <cf573e24baadc04da27c471dafee90344e0cb400.1428671643.git.riku.voipio@linaro.org>
-References: <cf573e24baadc04da27c471dafee90344e0cb400.1428671643.git.riku.voipio@linaro.org>
+	Fri, 10 Apr 2015 17:25:47 -0400
+Message-ID: <1428701143.17822.72.camel@x220>
+Subject: Re: [PATCH 1/2] kconfig: Print full defined and depends for
+ multiply-defined symbols
+From: Paul Bolle <pebolle@tiscali.nl>
+Date: Fri, 10 Apr 2015 23:25:43 +0200
+In-Reply-To: <1428537385-15089-1-git-send-email-gregory.0xf0@gmail.com>
+References: <1428537385-15089-1-git-send-email-gregory.0xf0@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org, mmarek@suse.cz, debian-kernel@lists.debian.org
-Cc: Riku Voipio <riku.voipio@linaro.org>
+To: Gregory Fong <gregory.0xf0@gmail.com>
+Cc: Michal Marek <mmarek@suse.cz>, Valentin Rothberg <valentinrothberg@gmail.com>, Stefan Hengelein <stefan.hengelein@fau.de>, Andreas Ruprecht <rupran@einserver.de>, Martin Walch <walch.martin@web.de>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-From: Riku Voipio <riku.voipio@linaro.org>
+[Removed Yann. Added the people that I hope might actually understand
+what this is all about.] 
 
-By passing BUILD_SOURCE=y variable, make deb-pkg builds a debian source
-package. It will generate a minimal debian/rules file that calls back
-to make deb-pkg. Generated source package will build the same kernel
-.config than what was available for make deb-pkg.
+On Wed, 2015-04-08 at 16:56 -0700, Gregory Fong wrote:
+> get_symbol_str() was assuming that symbols would only have a single
+> property for the purpose of printing define and depends information.
+> This is not true, and one current example is FRAME_POINTER which is
+> both in lib/Kconfig.debug and arch/arm/Kconfig.debug.
+> 
+> In order to print out the correct Defined and Depends info, iterate
+> over all properties associated with the given symbol, similarly to was
+> done for selects.  And for depends, rather than iterating over the
+> property, just use the direct dependency expression.
+> 
+> CONFIG_FRAME_POINTER text, before:
+>   Defined at lib/Kconfig.debug:323
+>   Depends on: DEBUG_KERNEL [=y] && (ARM [=y] || CRIS || M68K || FRV || UML || AVR32 || SUPERH || BLACKFIN || MN10300 || METAG) || ARCH_WANT_FRAME_POINTERS [=n]
+> 
+> After:
+>   Defined at lib/Kconfig.debug:323, arch/arm/Kconfig.debug:35
+>   Depends on: DEBUG_KERNEL [=y] && (ARM [=y] || CRIS || M68K || FRV || UML || AVR32 || SUPERH || BLACKFIN || MN10300 || METAG) || ARCH_WANT_FRAME_POINTERS [=n] || !THUMB2_KERNEL [=n]
 
-The source package is useful for gpl compliance, or for feeding to a
-automated debian package builder.
+Note that there are currently six places where FRAME_POINTER is defined:
+    arch/arm/Kconfig.debug:35:config FRAME_POINTER
+    arch/arm64/Kconfig.debug:5:config FRAME_POINTER
+    arch/hexagon/Kconfig:40:config FRAME_POINTER
+    arch/m32r/Kconfig.debug:13:config FRAME_POINTER
+    arch/sparc/Kconfig.debug:19:config FRAME_POINTER
+    lib/Kconfig.debug:323:config FRAME_POINTER
 
-Patch depends on the "deb-pkg: move setting debarch for a separate function"
-for correct changelog filenames.
+Anyhow, does anyone dare to state that the After: line above describes
+FRAME_POINTER for arm correctly? (Of course, I could dive in the semi
+documented kconfig code myself. But that might mean that Gregory will be
+waiting for feedback for quite some time.)
 
-Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
----
- scripts/package/builddeb | 42 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 42 insertions(+)
+> Removes now-unused function get_symbol_prop().
 
-diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index e397815..3d77fd3 100755
---- a/scripts/package/builddeb
-+++ b/scripts/package/builddeb
-@@ -272,12 +272,23 @@ On Debian GNU/Linux systems, the complete text of the GNU General Public
- License version 2 can be found in \`/usr/share/common-licenses/GPL-2'.
- EOF
- 
-+
-+build_depends="bc, "
-+if [ -n "$BUILD_TOOLS" ]
-+then
-+	build_depends="$build_depends python-dev, libperl-dev, bison, flex, \
-+libaudit-dev, libdw-dev, libelf-dev, libiberty-dev, libnewt-dev, autoconf, \
-+automake, libtool, libglib2.0-dev, libudev-dev, libwrap0-dev, libiberty-dev, \
-+libunwind8-dev [amd64 arm64 i386], libnuma-dev [amd64 arm64 i386 powerpc ppc64 ppc64el] "
-+fi
-+
- # Generate a control file
- cat <<EOF > debian/control
- Source: linux-upstream
- Section: kernel
- Priority: optional
- Maintainer: $maintainer
-+Build-Depends: $build_depends
- Standards-Version: 3.8.4
- Homepage: http://www.kernel.org/
- EOF
-@@ -425,4 +436,35 @@ EOF
- 	create_package "$tools_packagename" "$tools_dir"
- fi
- 
-+if [ -n "$BUILD_SOURCE" ]
-+then
-+    cat <<EOF > debian/rules
-+#!/usr/bin/make -f
-+
-+build:
-+	cp debian/config .config
-+	\$(MAKE) oldconfig
-+
-+binary-arch:
-+	\$(MAKE) KDEB_PKGVERSION=${packageversion} BUILD_TOOLS=$BUILD_TOOLS deb-pkg
-+
-+clean:
-+	\$(MAKE) clean
-+
-+binary: binary-arch
-+EOF
-+
-+	(cd $KBUILD_SRC; git archive --prefix=linux-upstream-${version}/ HEAD)|gzip -9 > ../linux-upstream_${version}.orig.tar.gz
-+	cp $KCONFIG_CONFIG debian/config
-+	tar caf ../linux-upstream_${packageversion}.debian.tar.gz debian/{config,copyright,rules,changelog,control}
-+	dpkg-source -cdebian/control -ldebian/changelog --format="3.0 (custom)" --target-format="3.0 (quilt)" \
-+		-b / ../linux-upstream_${version}.orig.tar.gz  ../linux-upstream_${packageversion}.debian.tar.gz
-+	mv linux-upstream_${packageversion}*dsc ..
-+	dpkg-genchanges > ../linux-upstream_${packageversion}_${debarch}.changes
-+else
-+	dpkg-genchanges -b > ../linux-upstream_${packageversion}_${debarch}.changes
-+fi
-+
-+
-+
- exit 0
--- 
-2.1.4
+It might be better to do that in a separate patch. 
+
+> Signed-off-by: Gregory Fong <gregory.0xf0@gmail.com>
+> ---
+>  scripts/kconfig/menu.c | 35 +++++++++++++++--------------------
+>  1 file changed, 15 insertions(+), 20 deletions(-)
+> 
+> diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+> index 72c9dba..da482ff 100644
+> --- a/scripts/kconfig/menu.c
+> +++ b/scripts/kconfig/menu.c
+> @@ -601,18 +601,6 @@ static void get_prompt_str(struct gstr *r, struct property *prop,
+>  }
+>  
+>  /*
+> - * get property of type P_SYMBOL
+> - */
+> -static struct property *get_symbol_prop(struct symbol *sym)
+> -{
+> -	struct property *prop = NULL;
+> -
+> -	for_all_properties(sym, prop, P_SYMBOL)
+> -		break;
+> -	return prop;
+> -}
+> -
+> -/*
+>   * head is optional and may be NULL
+>   */
+>  void get_symbol_str(struct gstr *r, struct symbol *sym,
+> @@ -637,15 +625,22 @@ void get_symbol_str(struct gstr *r, struct symbol *sym,
+>  	for_all_prompts(sym, prop)
+>  		get_prompt_str(r, prop, head);
+>  
+> -	prop = get_symbol_prop(sym);
+> -	if (prop) {
+> -		str_printf(r, _("  Defined at %s:%d\n"), prop->menu->file->name,
+> +	hit = false;
+> +	for_all_properties(sym, prop, P_SYMBOL) {
+> +		if (!hit) {
+> +			str_append(r, "  Defined at ");
+> +			hit = true;
+> +		} else
+> +			str_append(r, ", ");
+> +		str_printf(r, _("%s:%d"), prop->menu->file->name,
+>  			prop->menu->lineno);
+> -		if (!expr_is_yes(prop->visible.expr)) {
+> -			str_append(r, _("  Depends on: "));
+> -			expr_gstr_print(prop->visible.expr, r);
+> -			str_append(r, "\n");
+> -		}
+> +	}
+> +	if (hit)
+> +		str_append(r, "\n");
+> +	if (!expr_is_yes(sym->dir_dep.expr)) {
+> +		str_append(r, _("  Depends on: "));
+> +		expr_gstr_print(sym->dir_dep.expr, r);
+> +		str_append(r, "\n");
+>  	}
+>  
+>  	hit = false;
+
+Thanks,
+
+
+Paul Bolle
 
