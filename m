@@ -1,55 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f178.google.com ([209.85.212.178]:32948 "EHLO
-	mail-wi0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754721AbbDMUR3 (ORCPT
+Received: from lb3-smtp-cloud6.xs4all.net ([194.109.24.31]:46943 "EHLO
+	lb3-smtp-cloud6.xs4all.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1750833AbbDMUzD (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 13 Apr 2015 16:17:29 -0400
-Received: by wiax7 with SMTP id x7so73296411wia.0
-        for <linux-kbuild@vger.kernel.org>; Mon, 13 Apr 2015 13:17:28 -0700 (PDT)
-MIME-Version: 1.0
-Date: Mon, 13 Apr 2015 15:17:28 -0500
-Message-ID: <CAL3kL1vV-aYF+Hokm+nbivS689cTvO=JmUbpGeSKe19CdH=VPw@mail.gmail.com>
-Subject: difficulties with KCONFIG_ALLCONFIG miniconfigs
-From: Jeff Weber <jwamsc@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+	Mon, 13 Apr 2015 16:55:03 -0400
+Message-ID: <1428958499.3868.31.camel@x220>
+Subject: Re: difficulties with KCONFIG_ALLCONFIG miniconfigs
+From: Paul Bolle <pebolle@tiscali.nl>
+Date: Mon, 13 Apr 2015 22:54:59 +0200
+In-Reply-To: <CAL3kL1vV-aYF+Hokm+nbivS689cTvO=JmUbpGeSKe19CdH=VPw@mail.gmail.com>
+References: <CAL3kL1vV-aYF+Hokm+nbivS689cTvO=JmUbpGeSKe19CdH=VPw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
+To: Jeff Weber <jwamsc@gmail.com>
+Cc: linux-kbuild@vger.kernel.org
 
-I am unable to pass required kernel config items via KCONFIG_ALLCONFIG
-to kbuild.
-I originally encountered issues with the
-scripts/kconfig/merge_config.sh tool, but I've
-isolated some of my issues to the examples below.  Kernel = 3.18.11 .
-Help appreciated.
+On Mon, 2015-04-13 at 15:17 -0500, Jeff Weber wrote:
+> $ cat ext4.cfg
+> CONFIG_EXT4_FS=y
+> 
+> $ KCONFIG_ALLCONFIG=ext4.cfg  make allnoconfig
+> 
+> $ grep CONFIG_EXT4_FS .config || echo not found
+> not found
+> 
+> Why was CONFIG_EXT4_FS not set?
 
-Case 1: Attempt to enable EXT4_FS using allnoconfig target.
-Per ./fs/ext4/Kconfig, config EXT4_FS has no other dependencies.
+A search of EXT4_FS in make menuconfig inspired me to add
+    CONFIG_BLOCK=y
 
-$ cat ext4.cfg
-CONFIG_EXT4_FS=y
+to ext4.cfg.
 
-$ KCONFIG_ALLCONFIG=ext4.cfg  make allnoconfig
+> Case 2: Attempt to disable SLUB_DEBUG using alldefconfig target.
+> Search of Kconfigs shows no other configs select SLUB_DEBUG .
+> 
+> $ cat no-slub-debug.cfg
+> CONFIG_SLUB_DEBUG=n
+> 
+> $ KCONFIG_ALLCONFIG=no-slub-debug.cfg make alldefconfig
+> 
+> $ grep SLUB_DEBUG .config
+> CONFIG_SLUB_DEBUG=y
+> # CONFIG_SLUB_DEBUG_ON is not set
+> 
+> Why was CONFIG_SLUB_DEBUG not disabled?
 
-$ grep CONFIG_EXT4_FS .config || echo not found
-not found
+Seeing that the Kconfig entry for SLUB_DEBUG reads
+    config SLUB_DEBUG
+        default y
+        bool "Enable SLUB debugging support" if EXPERT
+        depends on SLUB && SYSFS
+        help
+          [...]
 
-Why was CONFIG_EXT4_FS not set?
+I guessed that this no-slub-debug.cfg might work:
+    CONFIG_EXPERT=y
+    # CONFIG_SLUB_DEBUG is not set
+
+Please don't ask me to explain why.
 
 
-Case 2: Attempt to disable SLUB_DEBUG using alldefconfig target.
-Search of Kconfigs shows no other configs select SLUB_DEBUG .
+Paul Bolle
 
-$ cat no-slub-debug.cfg
-CONFIG_SLUB_DEBUG=n
-
-$ KCONFIG_ALLCONFIG=no-slub-debug.cfg make alldefconfig
-
-$ grep SLUB_DEBUG .config
-CONFIG_SLUB_DEBUG=y
-# CONFIG_SLUB_DEBUG_ON is not set
-
-Why was CONFIG_SLUB_DEBUG not disabled?
-
-TIA,
-Jeff
