@@ -1,81 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtprelay0059.hostedemail.com ([216.40.44.59]:49504 "EHLO
-	smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1751376AbbDMTcP (ORCPT
+Received: from mail-wi0-f178.google.com ([209.85.212.178]:32948 "EHLO
+	mail-wi0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754721AbbDMUR3 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 13 Apr 2015 15:32:15 -0400
-Date: Mon, 13 Apr 2015 15:32:12 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-Subject: Re: [PATCH] Use -mcount-record for dynamic ftrace
-Message-ID: <20150413153212.131fabc1@gandalf.local.home>
-In-Reply-To: <1428886467-4969-1-git-send-email-andi@firstfloor.org>
-References: <1428886467-4969-1-git-send-email-andi@firstfloor.org>
+	Mon, 13 Apr 2015 16:17:29 -0400
+Received: by wiax7 with SMTP id x7so73296411wia.0
+        for <linux-kbuild@vger.kernel.org>; Mon, 13 Apr 2015 13:17:28 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Date: Mon, 13 Apr 2015 15:17:28 -0500
+Message-ID: <CAL3kL1vV-aYF+Hokm+nbivS689cTvO=JmUbpGeSKe19CdH=VPw@mail.gmail.com>
+Subject: difficulties with KCONFIG_ALLCONFIG miniconfigs
+From: Jeff Weber <jwamsc@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andi Kleen <andi@firstfloor.org>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, mmarek@suse.cz, Andi Kleen <ak@linux.intel.com>
+To: linux-kbuild@vger.kernel.org
 
-On Sun, 12 Apr 2015 17:54:27 -0700
-Andi Kleen <andi@firstfloor.org> wrote:
+I am unable to pass required kernel config items via KCONFIG_ALLCONFIG
+to kbuild.
+I originally encountered issues with the
+scripts/kconfig/merge_config.sh tool, but I've
+isolated some of my issues to the examples below.  Kernel = 3.18.11 .
+Help appreciated.
 
-> From: Andi Kleen <ak@linux.intel.com>
-> 
-> gcc 5 supports a new -mcount-record option to generate ftrace
-> tables directly. This avoids the need to run record_mcount
-> manually.
-> 
-> Use this option when available.
-> 
-> It also has a -mcount-nop option to generate the mcount calls
-> as nops. So far that is not implemented, but it could be used
-> to optimize patching at boot up.
+Case 1: Attempt to enable EXT4_FS using allnoconfig target.
+Per ./fs/ext4/Kconfig, config EXT4_FS has no other dependencies.
 
-Interesting. But I can't accept this until I can test it. I don't have
-the time to build gcc from scratch, and currently none of my boxes have
-a gcc 5 install.
+$ cat ext4.cfg
+CONFIG_EXT4_FS=y
 
-I wonder who's responsible for
-https://www.kernel.org/pub/tools/crosstool/files/bin/x86_64/
+$ KCONFIG_ALLCONFIG=ext4.cfg  make allnoconfig
 
-If they can add a i386/x86_64 build for gcc5 I'll be happy to download
-it and test this patch.
+$ grep CONFIG_EXT4_FS .config || echo not found
+not found
 
-Thanks,
-
--- Steve
+Why was CONFIG_EXT4_FS not set?
 
 
-> 
-> Signed-off-by: Andi Kleen <ak@linux.intel.com>
-> ---
->  scripts/Makefile.build | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-> index 01df30a..f258e9b 100644
-> --- a/scripts/Makefile.build
-> +++ b/scripts/Makefile.build
-> @@ -210,6 +210,11 @@ cmd_modversions =								\
->  	fi;
->  endif
->  
-> +# gcc 5 supports generating the mcount tables directly
-> +ifneq ($(call cc-option,-mrecord-mcount,y),y)
-> +KBUILD_CFLAGS += -mrecord-mcount
-> +else
-> +# else do it all manually
->  ifdef CONFIG_FTRACE_MCOUNT_RECORD
->  ifdef BUILD_C_RECORDMCOUNT
->  ifeq ("$(origin RECORDMCOUNT_WARN)", "command line")
-> @@ -240,6 +245,7 @@ cmd_record_mcount =						\
->  		$(sub_cmd_record_mcount)			\
->  	fi;
->  endif
-> +endif
->  
->  define rule_cc_o_c
->  	$(call echo-cmd,checksrc) $(cmd_checksrc)			  \
+Case 2: Attempt to disable SLUB_DEBUG using alldefconfig target.
+Search of Kconfigs shows no other configs select SLUB_DEBUG .
 
+$ cat no-slub-debug.cfg
+CONFIG_SLUB_DEBUG=n
+
+$ KCONFIG_ALLCONFIG=no-slub-debug.cfg make alldefconfig
+
+$ grep SLUB_DEBUG .config
+CONFIG_SLUB_DEBUG=y
+# CONFIG_SLUB_DEBUG_ON is not set
+
+Why was CONFIG_SLUB_DEBUG not disabled?
+
+TIA,
+Jeff
