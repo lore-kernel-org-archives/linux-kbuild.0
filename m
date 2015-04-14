@@ -1,37 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from purkki.adurom.net ([80.68.90.206]:60488 "EHLO purkki.adurom.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751179AbbDNGw5 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 14 Apr 2015 02:52:57 -0400
-From: Kalle Valo <kvalo@adurom.com>
+Received: from smtprelay0240.hostedemail.com ([216.40.44.240]:42420 "EHLO
+	smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1752843AbbDNNHU (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 14 Apr 2015 09:07:20 -0400
+Date: Tue, 14 Apr 2015 09:07:17 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
 Subject: Re: [PATCH] Use -mcount-record for dynamic ftrace
+Message-ID: <20150414090717.10d54ce6@gandalf.local.home>
+In-Reply-To: <878udv6xkh.fsf@purkki.adurom.net>
 References: <1428886467-4969-1-git-send-email-andi@firstfloor.org>
 	<20150413153212.131fabc1@gandalf.local.home>
-Date: Tue, 14 Apr 2015 09:19:58 +0300
-In-Reply-To: <20150413153212.131fabc1@gandalf.local.home> (Steven Rostedt's
-	message of "Mon, 13 Apr 2015 15:32:12 -0400")
-Message-ID: <878udv6xkh.fsf@purkki.adurom.net>
+	<878udv6xkh.fsf@purkki.adurom.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Steven Rostedt <rostedt@goodmis.org>
+To: Kalle Valo <kvalo@adurom.com>
 Cc: Andi Kleen <andi@firstfloor.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, mmarek@suse.cz, Andi Kleen <ak@linux.intel.com>
 
-Steven Rostedt <rostedt@goodmis.org> writes:
+On Tue, 14 Apr 2015 09:19:58 +0300
+Kalle Valo <kvalo@adurom.com> wrote:
 
-> I wonder who's responsible for
-> https://www.kernel.org/pub/tools/crosstool/files/bin/x86_64/
->
-> If they can add a i386/x86_64 build for gcc5 I'll be happy to download
-> it and test this patch.
+> Steven Rostedt <rostedt@goodmis.org> writes:
+> 
+> > I wonder who's responsible for
+> > https://www.kernel.org/pub/tools/crosstool/files/bin/x86_64/
+> >
+> > If they can add a i386/x86_64 build for gcc5 I'll be happy to download
+> > it and test this patch.
+> 
+> Found this:
+> 
+> "For any questions don't hesitate to contact me at tony (at) bake your
+> noodle . com"
+> 
+> https://www.kernel.org/pub/tools/crosstool/
+> 
 
-Found this:
+Thanks for the pointer.
 
-"For any questions don't hesitate to contact me at tony (at) bake your
-noodle . com"
-
-https://www.kernel.org/pub/tools/crosstool/
-
--- 
-Kalle Valo
+-- Steve
