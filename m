@@ -1,41 +1,68 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.17.10]:65294 "EHLO
-	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751646AbbDOKlg (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 15 Apr 2015 06:41:36 -0400
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH] modpost: add .text.fixup to OTHER_TEXT_SECTIONS
-Date: Wed, 15 Apr 2015 12:40:52 +0200
-Message-ID: <2576764.pLO2LLU9HG@wuerfel>
-In-Reply-To: <5641468.B6ky8Ch4vY@wuerfel>
-References: <5641468.B6ky8Ch4vY@wuerfel>
+Received: from cantor2.suse.de ([195.135.220.15]:46786 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754425AbbDOLlX (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 15 Apr 2015 07:41:23 -0400
+Date: Wed, 15 Apr 2015 13:41:20 +0200
+From: Michal Marek <mmarek@suse.cz>
+Subject: [GIT PULL] kbuild changes for v4.1-rc1
+Message-ID: <20150415114119.GA5171@sepie.suse.cz>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rusty Russell <rusty@rustcorp.com.au>
-Cc: Quentin Casasnovas <quentin.casasnovas@oracle.com>, linux-kbuild@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Nicolas Pitre <nico@linaro.org>, Russell King <rmk+kernel@arm.linux.org.uk>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: ard.biesheuvel@linaro.org, mmarek@suse.cz, yamada.m@jp.panasonic.com, yamada.masahiro@socionext.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Wednesday 15 April 2015 11:48:31 Arnd Bergmann wrote:
-> Two correct patches for the 4.1 release clashed in a way that
-> caused modpost to fail badly, with hundreds warnings like
-> 
-> WARNING: vmlinux.o(__ex_table+0x1014): Section mismatch in reference from the (unknown reference) (unknown) to the (unknown reference) .text.fixup:(unknown)
-> 
-> The fix, as suggested by the warnings, is to add the new .text.fixup
-> section into the OTHER_TEXT_SECTIONS list.
-> 
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> Fixes: 52dc0595d540 ("modpost: handle relocations mismatch in __ex_table")
-> Fixes: c4a84ae39b4a ("ARM: 8322/1: keep .text and .fixup regions closer together")
-> ---
-> The mostpost patch has not made it into 4.1 yet, so it's probably best to
-> add this fix on top of that to avoid breaking when Linus pulls it in.
-> 
+Hi Linus,
 
-Nevermind this patch, I'm way behind the times apparently, and multiple
-improvements of the original code have made it in since it was broken.
+Here is the first round of kbuild changes for v4.1-rc1:
+- kallsyms fix for ARM and cleanup
+- make dep(end) removed (developers have no sense of nostalgia these
+  days...)
+- include Makefiles by relative path
+- stop useless rebuilds of asm-offsets.h and bounds.h
 
-	Arnd
+Michal
+
+The following changes since commit c517d838eb7d07bbe9507871fab3931deccff539:
+
+  Linux 4.0-rc1 (2015-02-22 18:21:14 -0800)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git kbuild
+
+for you to fetch changes up to 41b585b2ed793db6f02ec87d0026d73382e8180a:
+
+  Kbuild: kallsyms: drop special handling of pre-3.0 GCC symbols (2015-04-07 13:04:51 +0200)
+
+----------------------------------------------------------------
+Ard Biesheuvel (2):
+      Kbuild: kallsyms: ignore veneers emitted by the ARM linker
+      Kbuild: kallsyms: drop special handling of pre-3.0 GCC symbols
+
+Masahiro Yamada (6):
+      kbuild: remove warning about "make depend"
+      kbuild: do not add $(bounds-file) and $(offsets-file) to targets
+      kbuild: use relative path to include Makefile
+      kbuild: use relative path more to include Makefile
+      kbuild: include $(src)/Makefile rather than $(obj)/Makefile
+      kbuild: ia64: use $(src)/Makefile.gate rather than particular path
+
+Michal Marek (1):
+      kbuild: Don't reset timestamps in include/generated if not needed
+
+ Kbuild                    | 21 ++++++++++-----------
+ Makefile                  | 28 ++++++++++------------------
+ arch/arm/boot/Makefile    |  2 +-
+ arch/ia64/kernel/Makefile |  2 +-
+ arch/mips/Makefile        |  2 +-
+ arch/um/Makefile          |  6 +++---
+ arch/x86/Makefile         |  2 +-
+ arch/x86/Makefile.um      |  2 +-
+ scripts/Makefile.dtbinst  |  2 +-
+ scripts/Makefile.fwinst   |  2 +-
+ scripts/kallsyms.c        | 29 ++++++++++++++++++++---------
+ 11 files changed, 50 insertions(+), 48 deletions(-)
