@@ -1,65 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lb0-f177.google.com ([209.85.217.177]:34977 "EHLO
-	mail-lb0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932674AbbDOFsX (ORCPT
+Received: from mout.kundenserver.de ([212.227.126.187]:62150 "EHLO
+	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751200AbbDOJtP (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 15 Apr 2015 01:48:23 -0400
+	Wed, 15 Apr 2015 05:49:15 -0400
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH] modpost: add .text.fixup to OTHER_TEXT_SECTIONS
+Date: Wed, 15 Apr 2015 11:48:31 +0200
+Message-ID: <5641468.B6ky8Ch4vY@wuerfel>
 MIME-Version: 1.0
-In-Reply-To: <alpine.LNX.2.00.1504150733480.26287@pobox.suse.cz>
-References: <1428312465-4172-1-git-send-email-diego.viola@gmail.com>
-	<CA+ToGPE-eTeGFLSKP9e=At=COzzak6yiMV4-8nRdMvGQZLAg2w@mail.gmail.com>
-	<CA+ToGPEjNdXoQzdFZTohGyZ5eH0exc+DhB7FhH88tNuixn6riw@mail.gmail.com>
-	<1428912885.11113.57.camel@x220>
-	<CA+ToGPG8LudoV6rjLKgJjueG3HhREd30--863N_vmC2coMfo1w@mail.gmail.com>
-	<alpine.LNX.2.00.1504150733480.26287@pobox.suse.cz>
-Date: Wed, 15 Apr 2015 02:48:21 -0300
-Message-ID: <CA+ToGPGsdwW3jxhd_No9soLy4KLZfwdKaKxUYSCQwoRNv_fqUA@mail.gmail.com>
-Subject: Re: [PATCH] scripts/kconfig/Makefile: Fix spelling of Qt
-From: Diego Viola <diego.viola@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jiri Kosina <jkosina@suse.cz>
-Cc: Paul Bolle <pebolle@tiscali.nl>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, mmarek@suse.cz
+To: Rusty Russell <rusty@rustcorp.com.au>
+Cc: Quentin Casasnovas <quentin.casasnovas@oracle.com>, linux-kbuild@vger.kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>, Nicolas Pitre <nico@linaro.org>, Russell King <rmk+kernel@arm.linux.org.uk>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 
-Thanks, that gives me hope, I'll wait patiently then.
+Two correct patches for the 4.1 release clashed in a way that
+caused modpost to fail badly, with hundreds warnings like
 
-BTW, if you want any reference for how this is written, see this:
+WARNING: vmlinux.o(__ex_table+0x1014): Section mismatch in reference from the (unknown reference) (unknown) to the (unknown reference) .text.fixup:(unknown)
 
-http://en.wikipedia.org/wiki/Qt_%28software%29
+The fix, as suggested by the warnings, is to add the new .text.fixup
+section into the OTHER_TEXT_SECTIONS list.
 
-Thanks,
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Fixes: 52dc0595d540 ("modpost: handle relocations mismatch in __ex_table")
+Fixes: c4a84ae39b4a ("ARM: 8322/1: keep .text and .fixup regions closer together")
+---
+The mostpost patch has not made it into 4.1 yet, so it's probably best to
+add this fix on top of that to avoid breaking when Linus pulls it in.
 
-Diego
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index cbd53e08769d..dd7efba020a1 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -876,7 +876,7 @@ static void check_section(const char *modname, struct elf_info *elf,
+ #define TEXT_SECTIONS ".text", ".text.unlikely", ".sched.text", \
+ 		".kprobes.text"
+ #define OTHER_TEXT_SECTIONS ".ref.text", ".head.text", ".spinlock.text", \
+-		".fixup", ".entry.text"
++		".fixup", ".text.fixup", ".entry.text"
+ 
+ #define INIT_SECTIONS      ".init.*"
+ #define MEM_INIT_SECTIONS  ".meminit.*"
 
-On Wed, Apr 15, 2015 at 2:36 AM, Jiri Kosina <jkosina@suse.cz> wrote:
-> On Wed, 15 Apr 2015, Diego Viola wrote:
->
->> I apologize for being impatient, but I sent my first patch a week ago
->> and then I sent another after a week.
->>
->> I realize the patch is trivial, but I still want to see it merged
->> regardless, and this is my first contribution to the mailing list, so
->> I apologize for any inconvenience.
->>
->> I thought my patch was being ignored and I didn't want to see it lost
->> with all the other emails/patches so I thought about resending it.
->>
->> Should I send it again after a week if this one is ignored?
->
-> It's very trivial patch indeed, and that's exactly why it's not on the top
-> of the TODO list of everybody on CC.
->
-> Plus we are just now in the middle of merge window, which is exactly the
-> time when everyone is focusing on merging with Linus, and postpones even
-> looking at patches which are not urgent bugfixes.
->
-> Don't worry about us not seeing your endless stream of pings about this
-> typo. We are rather good in not losing e-mails, and you are trying really
-> hard not to be overlooked.
->
-> Patience is a virtue.
->
-> --
-> Jiri Kosina
-> SUSE Labs
