@@ -1,67 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:49243 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752332AbbDOMaS (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 15 Apr 2015 08:30:18 -0400
-Message-ID: <552E59D9.7060101@suse.cz>
-Date: Wed, 15 Apr 2015 14:30:17 +0200
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: [PATCH 1/2] deb-pkg: move setting debarch for a separate function
-References: <cf573e24baadc04da27c471dafee90344e0cb400.1428671643.git.riku.voipio@linaro.org>
-In-Reply-To: <cf573e24baadc04da27c471dafee90344e0cb400.1428671643.git.riku.voipio@linaro.org>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Received: from one.firstfloor.org ([193.170.194.197]:57675 "EHLO
+	one.firstfloor.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751607AbbDOTsm (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 15 Apr 2015 15:48:42 -0400
+From: Andi Kleen <andi@firstfloor.org>
+Subject: [PATCH] Support gcc 6 for building
+Date: Wed, 15 Apr 2015 12:45:43 -0700
+Message-Id: <1429127143-31745-1-git-send-email-andi@firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: riku.voipio@linaro.org
-Cc: linux-kbuild@vger.kernel.org, debian-kernel@lists.debian.org
+To: akpm@linux-foundation.org
+Cc: mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Andi Kleen <ak@linux.intel.com>, Segher Boessenkool <segher@kernel.crashing.org>
 
-On 2015-04-10 15:15, riku.voipio@linaro.org wrote:
-> From: Riku Voipio <riku.voipio@linaro.org>
-> 
-> create_package() function tries to resolve used architecture
-> for everry package. Split the setting the architecture to a
-> new function, set_debarch(), called once on startup.
-> 
-> This allows using debarch from other parts of script as
-> needed.
-> ---
->  scripts/package/builddeb | 14 ++++++++++----
->  1 file changed, 10 insertions(+), 4 deletions(-)
-> 
-> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-> index a9858a4..e397815 100755
-> --- a/scripts/package/builddeb
-> +++ b/scripts/package/builddeb
-> @@ -27,8 +27,15 @@ create_package() {
->  	chown -R root:root "$pdir"
->  	chmod -R go-w "$pdir"
->  
-> +	# Create the package
-> +	dpkg-gencontrol $forcearch -Vkernel:debarch="${debarch:-$(dpkg --print-architecture)}" -p$pname -P"$pdir"
-> +	dpkg --build "$pdir" ..
-> +}
-> +
-> +set_debarch() {
->  	# Attempt to find the correct Debian architecture
-> -	local forcearch="" debarch=""
-> +	forcearch=""
-> +	debarch=""
->  	case "$UTS_MACHINE" in
->  	i386|ia64|alpha)
->  		debarch="$UTS_MACHINE" ;;
-> @@ -73,10 +80,8 @@ create_package() {
->  	if [ -n "$debarch" ] ; then
->  		forcearch="-DArchitecture=$debarch"
->  	fi
-> +	export forcearch debarch
+From: Andi Kleen <ak@linux.intel.com>
 
-You do not need to export the variables. But it will improve the
-readability of the script if you initialize the variables in the
-toplevel scope.
+gcc recently switched to a new version number scheme, where every version
+gets a new major version number. The current version is 5.x, the next 6.x, etc.
 
-Also, the fallback for empty $debarch is $(dpkg --print-architecture).
-It makes sense to set it once in the new function.
+The gcc git repository trunk branch just switched to report 6.x for the next
+major release.
 
-Michal
+This breaks the way Linux selects compiler-gccX.h based on the major
+version. Every new version would require adding a new compiler-gccX.h file,
+which wouldn't really scale.
+
+Let's assume that future gccs are fairly compatible (they are unlikely
+to break anything Linux is relying on). So we can just keep using
+compiler-gcc5.h, and select any specific differences with #if.
+
+Cc: Segher Boessenkool <segher@kernel.crashing.org>
+Signed-off-by: Andi Kleen <ak@linux.intel.com>
+---
+ include/linux/compiler-gcc.h | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/include/linux/compiler-gcc.h b/include/linux/compiler-gcc.h
+index cdf13ca..9c9a4e4 100644
+--- a/include/linux/compiler-gcc.h
++++ b/include/linux/compiler-gcc.h
+@@ -104,7 +104,12 @@
+ #define __gcc_header(x) #x
+ #define _gcc_header(x) __gcc_header(linux/compiler-gcc##x.h)
+ #define gcc_header(x) _gcc_header(x)
+-#include gcc_header(__GNUC__)
++#if __GNUC__ < 5
++#define __LINUX_GCC_VERSION __GNUC__
++#else
++#define __LINUX_GCC_VERSION 5
++#endif
++#include gcc_header(__LINUX_GCC_VERSION)
+ 
+ #if !defined(__noclone)
+ #define __noclone	/* not needed */
+-- 
+2.3.3
+
