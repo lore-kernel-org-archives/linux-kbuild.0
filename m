@@ -1,61 +1,30 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from gproxy9-pub.mail.unifiedlayer.com ([69.89.20.122]:52734 "HELO
-	gproxy9-pub.mail.unifiedlayer.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with SMTP id S1751424AbbDPTz1 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 16 Apr 2015 15:55:27 -0400
-Message-ID: <553011F5.6090107@virtuousgeek.org>
-Date: Thu, 16 Apr 2015 12:48:05 -0700
-From: Jesse Barnes <jbarnes@virtuousgeek.org>
+Received: from cantor2.suse.de ([195.135.220.15]:52539 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752255AbbDPUNq (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 16 Apr 2015 16:13:46 -0400
+Message-ID: <553017F6.7080205@suse.cz>
+Date: Thu, 16 Apr 2015 22:13:42 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH] kbuild/tags.sh: use cscope -q option for building symbol
- db
-References: <1429211657-2486-1-git-send-email-jbarnes@virtuousgeek.org> <1429213062.16771.90.camel@x220>
-In-Reply-To: <1429213062.16771.90.camel@x220>
-Content-Type: text/plain; charset=utf-8
+Subject: Re: [PATCH] Support gcc 6 for building
+References: <1429127143-31745-1-git-send-email-andi@firstfloor.org> <552F6B7C.7020406@suse.cz> <20150416155626.GT2366@two.firstfloor.org>
+In-Reply-To: <20150416155626.GT2366@two.firstfloor.org>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Paul Bolle <pebolle@tiscali.nl>
-Cc: linux-kbuild@vger.kernel.org, mmarek@suse.cz
+To: Andi Kleen <andi@firstfloor.org>
+Cc: akpm@linux-foundation.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Andi Kleen <ak@linux.intel.com>, Segher Boessenkool <segher@kernel.crashing.org>
 
-On 04/16/2015 12:37 PM, Paul Bolle wrote:
-> On Thu, 2015-04-16 at 12:14 -0700, Jesse Barnes wrote:
->> This takes up a bit more disk space, but really improves symbol lookup
->> performance.
->>
->> Signed-off-by: Jesse Barnes <jbarnes@virtuousgeek.org>
->> ---
->>  scripts/tags.sh | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/scripts/tags.sh b/scripts/tags.sh
->> index cdb491d..bb35d83 100755
->> --- a/scripts/tags.sh
->> +++ b/scripts/tags.sh
->> @@ -142,7 +142,7 @@ all_defconfigs()
->>  docscope()
->>  {
->>  	(echo \-k; echo \-q; all_target_sources) > cscope.files
+Dne 16.4.2015 v 17:56 Andi Kleen napsal(a):
+> On Thu, Apr 16, 2015 at 09:57:48AM +0200, Michal Marek wrote:
+>> Good idea. With the new scheme, we could also merge back compiler-gcc5.h
+>> and compiler-gcc4.h. The only difference is the KASAN_ABI_VERSION define.
 > 
-> There's an "echo -q" there.
-> 
->> -	cscope -b -f cscope.out
->> +	cscope -q -b -f cscope.out
->>  }
->>  
->>  dogtags()
-> 
-> man cscope tells me:
->     The -I, -c, -k, -p, -q, and -T options can also be in the cscope.files file
-> 
-> Doesn't the above do that correctly?
+> Would be fine too. Are you doing that, or should I send a patch?
 
-I missed that... when I did 'make cscope' after adding the -q option
-things must have just gotten faster due to it all being cached, rather
-than a change in the db.
+I suggest to merge your patch now, so that the kernel can be built with
+gcc 6 snapshots. I can send a follow-up patch.
 
-Sorry for the noise!
-
-Thanks,
-Jesse
+Michal
