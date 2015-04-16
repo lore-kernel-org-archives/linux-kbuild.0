@@ -1,32 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtprelay0232.hostedemail.com ([216.40.44.232]:35221 "EHLO
-	smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1753381AbbDPUof (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 16 Apr 2015 16:44:35 -0400
-Message-ID: <1429217067.2850.55.camel@perches.com>
-Subject: Re: [PATCH 1/2] compiler-gcc.h: Neatening
-From: Joe Perches <joe@perches.com>
-Date: Thu, 16 Apr 2015 13:44:27 -0700
-In-Reply-To: <591534b6927eb1ecc0622f6049947741208f1e11.1429212277.git.joe@perches.com>
-References: <20150416162938.GU2366@two.firstfloor.org>
-	 <591534b6927eb1ecc0622f6049947741208f1e11.1429212277.git.joe@perches.com>
-Content-Type: text/plain; charset="ISO-8859-1"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Received: from mga03.intel.com ([134.134.136.65]:60344 "EHLO mga03.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750753AbbDPVDc (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 16 Apr 2015 17:03:32 -0400
+From: Andi Kleen <andi@firstfloor.org>
+Subject: [PATCH] Kbuild: Add ID files to .gitignore
+Date: Thu, 16 Apr 2015 14:02:41 -0700
+Message-Id: <1429218161-12999-1-git-send-email-andi@firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Andi Kleen <andi@firstfloor.org>, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Andi Kleen <ak@linux.intel.com>, Segher Boessenkool <segher@kernel.crashing.org>, Sasha Levin <levinsasha928@gmail.com>
+To: mmarek@suse.cz
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Andi Kleen <ak@linux.intel.com>
 
-On Thu, 2015-04-16 at 13:31 -0700, Joe Perches wrote:
-> Move the inline and noinline blocks together
-> Comment neatening
-> Alignment of __attribute__ uses
-> Consistent naming of __must_be_array macro argument
-> Multiline macro neatening
+From: Andi Kleen <ak@linux.intel.com>
 
-I must have missed the -s flag on the git commit.
+I use GNU id-utils to find code (essentially a database backed grep),
+which generates an ID file to maintain its data.
 
-Signed-off-by: Joe Perches <joe@perches.com>
+Add ID to the .gitignore file.
+
+Signed-off-by: Andi Kleen <ak@linux.intel.com>
+---
+ .gitignore | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/.gitignore b/.gitignore
+index acb6afe..15766be 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -88,6 +88,9 @@ GRTAGS
+ GSYMS
+ GTAGS
+ 
++# id-utils files
++ID
++
+ *.orig
+ *~
+ \#*#
+-- 
+1.9.3
 
