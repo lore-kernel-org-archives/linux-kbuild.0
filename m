@@ -1,40 +1,92 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:41111 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752251AbbDPH5v (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 16 Apr 2015 03:57:51 -0400
-Message-ID: <552F6B7C.7020406@suse.cz>
-Date: Thu, 16 Apr 2015 09:57:48 +0200
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: [PATCH] Support gcc 6 for building
-References: <1429127143-31745-1-git-send-email-andi@firstfloor.org>
-In-Reply-To: <1429127143-31745-1-git-send-email-andi@firstfloor.org>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Received: from mail-la0-f49.google.com ([209.85.215.49]:35430 "EHLO
+	mail-la0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S964987AbbDPNm7 (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 16 Apr 2015 09:42:59 -0400
+Received: by labbd9 with SMTP id bd9so57030238lab.2
+        for <linux-kbuild@vger.kernel.org>; Thu, 16 Apr 2015 06:42:57 -0700 (PDT)
+From: riku.voipio@linaro.org
+Subject: [PATCH] deb-pkg: v2: move setting debarch for a separate function
+Date: Thu, 16 Apr 2015 16:42:46 +0300
+Message-Id: <1429191766-13385-1-git-send-email-riku.voipio@linaro.org>
+In-Reply-To: <552E59D9.7060101@suse.cz>
+References: <552E59D9.7060101@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andi Kleen <andi@firstfloor.org>
-Cc: akpm@linux-foundation.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Andi Kleen <ak@linux.intel.com>, Segher Boessenkool <segher@kernel.crashing.org>
+To: linux-kbuild@vger.kernel.org, mmarek@suse.cz, debian-kernel@lists.debian.org
+Cc: Riku Voipio <riku.voipio@linaro.org>
 
-On 2015-04-15 21:45, Andi Kleen wrote:
-> From: Andi Kleen <ak@linux.intel.com>
-> 
-> gcc recently switched to a new version number scheme, where every version
-> gets a new major version number. The current version is 5.x, the next 6.x, etc.
-> 
-> The gcc git repository trunk branch just switched to report 6.x for the next
-> major release.
-> 
-> This breaks the way Linux selects compiler-gccX.h based on the major
-> version. Every new version would require adding a new compiler-gccX.h file,
-> which wouldn't really scale.
-> 
-> Let's assume that future gccs are fairly compatible (they are unlikely
-> to break anything Linux is relying on). So we can just keep using
-> compiler-gcc5.h, and select any specific differences with #if.
+From: Riku Voipio <riku.voipio@linaro.org>
 
-Good idea. With the new scheme, we could also merge back compiler-gcc5.h
-and compiler-gcc4.h. The only difference is the KASAN_ABI_VERSION define.
+create_package() function tries to resolve used architecture
+for everry package. Split the setting the architecture to a
+new function, set_debarch(), called once on startup.
 
-Michal
+This allows using debarch from other parts of script as
+needed.
+
+v2: Follow Michals suggestion on setting variables at
+top scope and also setting the fallback $debarch in the
+new function
+
+Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
+---
+ scripts/package/builddeb | 18 +++++++++++-------
+ 1 file changed, 11 insertions(+), 7 deletions(-)
+
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index a9858a4..d9b7694 100755
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -27,8 +27,13 @@ create_package() {
+ 	chown -R root:root "$pdir"
+ 	chmod -R go-w "$pdir"
+ 
++	# Create the package
++	dpkg-gencontrol $forcearch -Vkernel:debarch="${debarch}" -p$pname -P"$pdir"
++	dpkg --build "$pdir" ..
++}
++
++set_debarch() {
+ 	# Attempt to find the correct Debian architecture
+-	local forcearch="" debarch=""
+ 	case "$UTS_MACHINE" in
+ 	i386|ia64|alpha)
+ 		debarch="$UTS_MACHINE" ;;
+@@ -58,6 +63,7 @@ create_package() {
+ 		fi
+ 		;;
+ 	*)
++		debarch=$(dpkg --print-architecture)
+ 		echo "" >&2
+ 		echo "** ** **  WARNING  ** ** **" >&2
+ 		echo "" >&2
+@@ -70,13 +76,8 @@ create_package() {
+ 	if [ -n "$KBUILD_DEBARCH" ] ; then
+ 		debarch="$KBUILD_DEBARCH"
+ 	fi
+-	if [ -n "$debarch" ] ; then
+-		forcearch="-DArchitecture=$debarch"
+-	fi
++	forcearch="-DArchitecture=$debarch"
+ 
+-	# Create the package
+-	dpkg-gencontrol $forcearch -Vkernel:debarch="${debarch:-$(dpkg --print-architecture)}" -p$pname -P"$pdir"
+-	dpkg --build "$pdir" ..
+ }
+ 
+ # Some variables and settings used throughout the script
+@@ -99,6 +100,9 @@ kernel_headers_packagename=linux-headers-$version
+ libc_headers_packagename=linux-libc-dev
+ dbg_packagename=$packagename-dbg
+ tools_packagename=linux-tools-$version
++debarch=
++forcearch=
++set_debarch
+ 
+ if [ "$ARCH" = "um" ] ; then
+ 	packagename=user-mode-linux-$version
+-- 
+2.1.4
+
