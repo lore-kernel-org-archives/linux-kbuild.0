@@ -1,30 +1,33 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:52539 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752255AbbDPUNq (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 16 Apr 2015 16:13:46 -0400
-Message-ID: <553017F6.7080205@suse.cz>
-Date: Thu, 16 Apr 2015 22:13:42 +0200
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: [PATCH] Support gcc 6 for building
-References: <1429127143-31745-1-git-send-email-andi@firstfloor.org> <552F6B7C.7020406@suse.cz> <20150416155626.GT2366@two.firstfloor.org>
-In-Reply-To: <20150416155626.GT2366@two.firstfloor.org>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Received: from smtprelay0225.hostedemail.com ([216.40.44.225]:34038 "EHLO
+	smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1750753AbbDPUbM (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 16 Apr 2015 16:31:12 -0400
+From: Joe Perches <joe@perches.com>
+Subject: [PATCH 0/2] Integrate compiler-gcc[345].h files into compiler-gcc.h
+Date: Thu, 16 Apr 2015 13:31:01 -0700
+Message-Id: <cover.1429212277.git.joe@perches.com>
+In-Reply-To: <20150416162938.GU2366@two.firstfloor.org>
+References: <20150416162938.GU2366@two.firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andi Kleen <andi@firstfloor.org>
-Cc: akpm@linux-foundation.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Andi Kleen <ak@linux.intel.com>, Segher Boessenkool <segher@kernel.crashing.org>
+To: Andrew Morton <akpm@linux-foundation.org>, Andi Kleen <andi@firstfloor.org>, linux-kernel@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Andi Kleen <ak@linux.intel.com>, Segher Boessenkool <segher@kernel.crashing.org>, Sasha Levin <levinsasha928@gmail.com>
 
-Dne 16.4.2015 v 17:56 Andi Kleen napsal(a):
-> On Thu, Apr 16, 2015 at 09:57:48AM +0200, Michal Marek wrote:
->> Good idea. With the new scheme, we could also merge back compiler-gcc5.h
->> and compiler-gcc4.h. The only difference is the KASAN_ABI_VERSION define.
-> 
-> Would be fine too. Are you doing that, or should I send a patch?
+Joe Perches (2):
+  compiler-gcc.h: Neatening
+  compiler-gcc: Integrate the various compiler-gcc[345].h files
 
-I suggest to merge your patch now, so that the kernel can be built with
-gcc 6 snapshots. I can send a follow-up patch.
+ include/linux/compiler-gcc.h  | 207 +++++++++++++++++++++++++++++++++---------
+ include/linux/compiler-gcc3.h |  23 -----
+ include/linux/compiler-gcc4.h |  91 -------------------
+ include/linux/compiler-gcc5.h |  67 --------------
+ 4 files changed, 162 insertions(+), 226 deletions(-)
+ delete mode 100644 include/linux/compiler-gcc3.h
+ delete mode 100644 include/linux/compiler-gcc4.h
+ delete mode 100644 include/linux/compiler-gcc5.h
 
-Michal
+-- 
+2.1.2
+
