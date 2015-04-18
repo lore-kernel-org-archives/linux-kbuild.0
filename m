@@ -1,30 +1,95 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:53999 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:36480 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752034AbbDRUex (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 18 Apr 2015 16:34:53 -0400
+	id S1751105AbbDRUfF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 18 Apr 2015 16:35:05 -0400
 From: Jiri Olsa <jolsa@kernel.org>
-Subject: [PATCH 0/3] tools build: Fix tools Makefile
-Date: Sat, 18 Apr 2015 22:34:37 +0200
-Message-Id: <1429389280-18720-1-git-send-email-jolsa@kernel.org>
+Subject: [PATCH 2/3] tools build: Fix Makefile(s) to properly invoke tools build
+Date: Sat, 18 Apr 2015 22:34:39 +0200
+Message-Id: <1429389280-18720-3-git-send-email-jolsa@kernel.org>
+In-Reply-To: <1429389280-18720-1-git-send-email-jolsa@kernel.org>
+References: <1429389280-18720-1-git-send-email-jolsa@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Arnaldo Carvalho de Melo <acme@kernel.org>
 Cc: Borislav Petkov <bp@suse.de>, Brian Norris <computersforpeace@gmail.com>, David Ahern <dsahern@gmail.com>, David Howells <dhowells@redhat.com>, Ingo Molnar <mingo@kernel.org>, Michal Marek <mmarek@suse.cz>, Namhyung Kim <namhyung@kernel.org>, Paul Mackerras <paulus@samba.org>, Peter Zijlstra <a.p.zijlstra@chello.nl>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>
 
-hi,
-sending tools/Makefile fixes discussed in here:
-  http://marc.info/?t=142250693600001&r=1&w=2
+Several fixes were needed to allow following builds:
+  $ make tools/tmon
+  $ make -C <kernelsrc> tools/perf
+  $ make -C <kernelsrc>/tools perf
 
-thanks,
-jirka
+ - some of the tools (perf) use same make variables as in
+   kernel build, unsetting srctree and objtree
+ - using original $(O) for O variable
+ - perf build does not follow the descend function setup
+   invoking it via it's own make rule
+
+I tried the rest of the tools/Makefile targets and they
+seem to work now.
+
+Reported-by: Brian Norris <computersforpeace@gmail.com>
+Link: http://lkml.kernel.org/n/tip-pvncmskx7tw8vpolkfqmcgrf@git.kernel.org
+Signed-off-by: Jiri Olsa <jolsa@kernel.org>
 ---
-Jiri Olsa (3):
-      tools build: No need to make libapi for perf explicitly
-      tools build: Fix Makefile(s) to properly invoke tools build
-      perf tests: Add build tests for building perf from kernel source root and tools
+ Makefile       |  5 ++---
+ tools/Makefile | 12 +++++++++++-
+ 2 files changed, 13 insertions(+), 4 deletions(-)
 
- Makefile              |  5 ++---
- tools/Makefile        | 20 +++++++++++++++-----
- tools/perf/tests/make | 14 +++++++++++++-
- 3 files changed, 30 insertions(+), 9 deletions(-)
+diff --git a/Makefile b/Makefile
+index da36a3be7969..b1ca0607ed2e 100644
+--- a/Makefile
++++ b/Makefile
+@@ -214,7 +214,6 @@ VPATH		:= $(srctree)$(if $(KBUILD_EXTMOD),:$(KBUILD_EXTMOD))
+ 
+ export srctree objtree VPATH
+ 
+-
+ # SUBARCH tells the usermode build what the underlying arch is.  That is set
+ # first, and if a usermode build is happening, the "ARCH=um" on the command
+ # line overrides the setting of ARCH below.  If a native build is happening,
+@@ -1504,11 +1503,11 @@ image_name:
+ # Clear a bunch of variables before executing the submake
+ tools/: FORCE
+ 	$(Q)mkdir -p $(objtree)/tools
+-	$(Q)$(MAKE) LDFLAGS= MAKEFLAGS="$(filter --j% -j,$(MAKEFLAGS))" O=$(objtree) subdir=tools -C $(src)/tools/
++	$(Q)$(MAKE) LDFLAGS= MAKEFLAGS="$(filter --j% -j,$(MAKEFLAGS))" O=$(O) subdir=tools -C $(src)/tools/
+ 
+ tools/%: FORCE
+ 	$(Q)mkdir -p $(objtree)/tools
+-	$(Q)$(MAKE) LDFLAGS= MAKEFLAGS="$(filter --j% -j,$(MAKEFLAGS))" O=$(objtree) subdir=tools -C $(src)/tools/ $*
++	$(Q)$(MAKE) LDFLAGS= MAKEFLAGS="$(filter --j% -j,$(MAKEFLAGS))" O=$(O) subdir=tools -C $(src)/tools/ $*
+ 
+ # Single targets
+ # ---------------------------------------------------------------------------
+diff --git a/tools/Makefile b/tools/Makefile
+index 01995cc8ac44..b35102721cbb 100644
+--- a/tools/Makefile
++++ b/tools/Makefile
+@@ -1,3 +1,8 @@
++# Some of the tools (perf) use same make variables
++# as in kernel build.
++export srctree=
++export objtree=
++
+ include scripts/Makefile.include
+ 
+ help:
+@@ -50,8 +55,13 @@ liblockdep: FORCE
+ libapi: FORCE
+ 	$(call descend,lib/api)
+ 
++# The perf build does not follow the descend function setup,
++# invoking it via it's own make rule.
++PERF_O   = $(if $(O),$(O)/tools/perf,)
++
+ perf: FORCE
+-	$(call descend,$@)
++	$(Q)mkdir -p $(PERF_O) .
++	$(Q)$(MAKE) --no-print-directory -C perf O=$(PERF_O) subdir=
+ 
+ selftests: FORCE
+ 	$(call descend,testing/$@)
+-- 
+1.9.3
+
