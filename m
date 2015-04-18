@@ -1,60 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:51582 "EHLO mx1.redhat.com"
+Received: from mail.skyhub.de ([78.46.96.112]:50556 "EHLO mail.skyhub.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754539AbbDRUfN (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 18 Apr 2015 16:35:13 -0400
-From: Jiri Olsa <jolsa@kernel.org>
-Subject: [PATCH 1/3] tools build: No need to make libapi for perf explicitly
-Date: Sat, 18 Apr 2015 22:34:38 +0200
-Message-Id: <1429389280-18720-2-git-send-email-jolsa@kernel.org>
-In-Reply-To: <1429389280-18720-1-git-send-email-jolsa@kernel.org>
-References: <1429389280-18720-1-git-send-email-jolsa@kernel.org>
+	id S1750818AbbDRWFR (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 18 Apr 2015 18:05:17 -0400
+From: Borislav Petkov <bp@alien8.de>
+Subject: [PATCH] kbuild/mkspec: Simplify vmlinux.bz2 creation
+Date: Sun, 19 Apr 2015 00:05:14 +0200
+Message-Id: <1429394714-9028-1-git-send-email-bp@alien8.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaldo Carvalho de Melo <acme@kernel.org>
-Cc: Borislav Petkov <bp@suse.de>, Brian Norris <computersforpeace@gmail.com>, David Ahern <dsahern@gmail.com>, David Howells <dhowells@redhat.com>, Ingo Molnar <mingo@kernel.org>, Michal Marek <mmarek@suse.cz>, Namhyung Kim <namhyung@kernel.org>, Paul Mackerras <paulus@samba.org>, Peter Zijlstra <a.p.zijlstra@chello.nl>, Sam Ravnborg <sam@ravnborg.org>, linux-kbuild@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>
+To: LKML <linux-kernel@vger.kernel.org>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
-The perf build handles its dependencies by itself.
+From: Borislav Petkov <bp@suse.de>
 
-Also renaming libapi libapikfs to libapi as it got
-changed just recently.
+No need for the intermediary vmlinux.orig - bzip2 can keep the original
+files used for compression with --keep.
 
-Link: http://lkml.kernel.org/n/tip-f31hq9rl838ovbyj0w1bhgzo@git.kernel.org
-Signed-off-by: Jiri Olsa <jolsa@kernel.org>
+Signed-off-by: Borislav Petkov <bp@suse.de>
+Cc: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org
 ---
- tools/Makefile | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ scripts/package/mkspec | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/tools/Makefile b/tools/Makefile
-index 9a617adc6675..01995cc8ac44 100644
---- a/tools/Makefile
-+++ b/tools/Makefile
-@@ -47,10 +47,10 @@ cgroup firewire hv guest usb virtio vm net: FORCE
- liblockdep: FORCE
- 	$(call descend,lib/lockdep)
+diff --git a/scripts/package/mkspec b/scripts/package/mkspec
+index d9ab94b17de0..89f9669d4f00 100755
+--- a/scripts/package/mkspec
++++ b/scripts/package/mkspec
+@@ -111,10 +111,8 @@ echo 'cp System.map $RPM_BUILD_ROOT'"/boot/System.map-$KERNELRELEASE"
+ echo 'cp .config $RPM_BUILD_ROOT'"/boot/config-$KERNELRELEASE"
  
--libapikfs: FORCE
-+libapi: FORCE
- 	$(call descend,lib/api)
+ echo "%ifnarch ppc64"
+-echo 'cp vmlinux vmlinux.orig'
+-echo 'bzip2 -9 vmlinux'
++echo 'bzip2 -9 --keep vmlinux'
+ echo 'mv vmlinux.bz2 $RPM_BUILD_ROOT'"/boot/vmlinux-$KERNELRELEASE.bz2"
+-echo 'mv vmlinux.orig vmlinux'
+ echo "%endif"
  
--perf: libapikfs FORCE
-+perf: FORCE
- 	$(call descend,$@)
- 
- selftests: FORCE
-@@ -97,10 +97,10 @@ cgroup_clean hv_clean firewire_clean lguest_clean usb_clean virtio_clean vm_clea
- liblockdep_clean:
- 	$(call descend,lib/lockdep,clean)
- 
--libapikfs_clean:
-+libapi_clean:
- 	$(call descend,lib/api,clean)
- 
--perf_clean: libapikfs_clean
-+perf_clean:
- 	$(call descend,$(@:_clean=),clean)
- 
- selftests_clean:
+ if ! $PREBUILT; then
 -- 
-1.9.3
+2.3.5
 
