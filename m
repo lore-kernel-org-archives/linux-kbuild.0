@@ -1,45 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.skyhub.de ([78.46.96.112]:50556 "EHLO mail.skyhub.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750818AbbDRWFR (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 18 Apr 2015 18:05:17 -0400
-From: Borislav Petkov <bp@alien8.de>
-Subject: [PATCH] kbuild/mkspec: Simplify vmlinux.bz2 creation
-Date: Sun, 19 Apr 2015 00:05:14 +0200
-Message-Id: <1429394714-9028-1-git-send-email-bp@alien8.de>
+Received: from services.gouders.net ([141.101.32.176]:34415 "EHLO
+	services.gouders.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754789AbbDTMnD (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 20 Apr 2015 08:43:03 -0400
+From: Dirk Gouders <dirk@gouders.net>
+Subject: [PATCH] tools/lib/api/Makefile: Add feature check for _FORTIFY_SOURCE
+Date: Mon, 20 Apr 2015 14:01:19 +0200
+Message-ID: <ghlhhnf0j2.fsf@lena.gouders.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: LKML <linux-kernel@vger.kernel.org>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
+To: Arnaldo Carvalho de Melo <acme@kernel.org>
+Cc: Peter Zijlstra <a.p.zijlstra@chello.nl>, Paul Mackerras <paulus@samba.org>, Ingo Molnar <mingo@redhat.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-From: Borislav Petkov <bp@suse.de>
+For example on Gentoo systems where _FORTIFY_SOURCE is set by default,
+`make -C tools/perf' fails, because of the macro being redefined.
 
-No need for the intermediary vmlinux.orig - bzip2 can keep the original
-files used for compression with --keep.
+Fix that by a feature-check analogous to tools/perf/config/Makefile.
 
-Signed-off-by: Borislav Petkov <bp@suse.de>
-Cc: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org
+Signed-off-by: Dirk Gouders <dirk@gouders.net>
 ---
- scripts/package/mkspec | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ tools/lib/api/Makefile | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/scripts/package/mkspec b/scripts/package/mkspec
-index d9ab94b17de0..89f9669d4f00 100755
---- a/scripts/package/mkspec
-+++ b/scripts/package/mkspec
-@@ -111,10 +111,8 @@ echo 'cp System.map $RPM_BUILD_ROOT'"/boot/System.map-$KERNELRELEASE"
- echo 'cp .config $RPM_BUILD_ROOT'"/boot/config-$KERNELRELEASE"
+diff --git a/tools/lib/api/Makefile b/tools/lib/api/Makefile
+index d8fe29f..acf9097 100644
+--- a/tools/lib/api/Makefile
++++ b/tools/lib/api/Makefile
+@@ -16,7 +16,14 @@ MAKEFLAGS += --no-print-directory
+ LIBFILE = $(OUTPUT)libapi.a
  
- echo "%ifnarch ppc64"
--echo 'cp vmlinux vmlinux.orig'
--echo 'bzip2 -9 vmlinux'
-+echo 'bzip2 -9 --keep vmlinux'
- echo 'mv vmlinux.bz2 $RPM_BUILD_ROOT'"/boot/vmlinux-$KERNELRELEASE.bz2"
--echo 'mv vmlinux.orig vmlinux'
- echo "%endif"
+ CFLAGS := $(EXTRA_WARNINGS) $(EXTRA_CFLAGS)
+-CFLAGS += -ggdb3 -Wall -Wextra -std=gnu99 -Werror -O6 -D_FORTIFY_SOURCE=2 -fPIC
++CFLAGS += -ggdb3 -Wall -Wextra -std=gnu99 -Werror -O6 -fPIC
++
++ifeq ($(DEBUG),0)
++  ifeq ($(feature-fortify-source), 1)
++    CFLAGS += -D_FORTIFY_SOURCE=2
++  endif
++endif
++
+ CFLAGS += -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64
  
- if ! $PREBUILT; then
+ RM = rm -f
 -- 
 2.3.5
 
