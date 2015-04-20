@@ -1,52 +1,60 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:40050 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752380AbbDTO5R (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 20 Apr 2015 10:57:17 -0400
-Date: Mon, 20 Apr 2015 16:57:14 +0200
-From: Michal Marek <mmarek@suse.cz>
-Subject: [GIT PULL] kbuild misc update for v4.1-rc1
-Message-ID: <20150420145714.GA5703@sepie.suse.cz>
+Received: from mail-wg0-f48.google.com ([74.125.82.48]:34619 "EHLO
+	mail-wg0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755376AbbDTSQg (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 20 Apr 2015 14:16:36 -0400
+Date: Mon, 20 Apr 2015 20:16:31 +0200
+From: Ingo Molnar <mingo@kernel.org>
+Subject: Re: [PATCH] tools/lib/api/Makefile: Add feature check for
+ _FORTIFY_SOURCE
+Message-ID: <20150420181631.GA19378@gmail.com>
+References: <ghlhhnf0j2.fsf@lena.gouders.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <ghlhhnf0j2.fsf@lena.gouders.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: alp+linux@alexpilon.ca, fabf@skynet.be, valentinrothberg@gmail.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Dirk Gouders <dirk@gouders.net>
+Cc: Arnaldo Carvalho de Melo <acme@kernel.org>, Peter Zijlstra <a.p.zijlstra@chello.nl>, Paul Mackerras <paulus@samba.org>, Ingo Molnar <mingo@redhat.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hi Linus,
 
-this is the remaining part of kbuild stuff for v4.1-rc1:
-- One wew coccinelle script and a clarification of the proposed fix
-  in bugon.coccinelle
-- CONFIG_KERNEL_LZ4 support for extract-ikconfig
+* Dirk Gouders <dirk@gouders.net> wrote:
 
-Michal
+> For example on Gentoo systems where _FORTIFY_SOURCE is set by default,
+> `make -C tools/perf' fails, because of the macro being redefined.
+> 
+> Fix that by a feature-check analogous to tools/perf/config/Makefile.
+> 
+> Signed-off-by: Dirk Gouders <dirk@gouders.net>
+> ---
+>  tools/lib/api/Makefile | 9 ++++++++-
+>  1 file changed, 8 insertions(+), 1 deletion(-)
+> 
+> diff --git a/tools/lib/api/Makefile b/tools/lib/api/Makefile
+> index d8fe29f..acf9097 100644
+> --- a/tools/lib/api/Makefile
+> +++ b/tools/lib/api/Makefile
+> @@ -16,7 +16,14 @@ MAKEFLAGS += --no-print-directory
+>  LIBFILE = $(OUTPUT)libapi.a
+>  
+>  CFLAGS := $(EXTRA_WARNINGS) $(EXTRA_CFLAGS)
+> -CFLAGS += -ggdb3 -Wall -Wextra -std=gnu99 -Werror -O6 -D_FORTIFY_SOURCE=2 -fPIC
+> +CFLAGS += -ggdb3 -Wall -Wextra -std=gnu99 -Werror -O6 -fPIC
+> +
+> +ifeq ($(DEBUG),0)
+> +  ifeq ($(feature-fortify-source), 1)
+> +    CFLAGS += -D_FORTIFY_SOURCE=2
+> +  endif
+> +endif
 
-The following changes since commit c517d838eb7d07bbe9507871fab3931deccff539:
+So how about undefining it instead and re-defining it as 
+_FORTIFY_SOURCE=2?
 
-  Linux 4.0-rc1 (2015-02-22 18:21:14 -0800)
+Just in case a distro sets a weaker version - lets not accept that 
+weaker setting. We've always had the stronger version of it.
 
-are available in the git repository at:
+Thanks,
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git misc
-
-for you to fetch changes up to 33236415ece63d5689411f3ddb676eeb93af2698:
-
-  scripts/coccinelle/misc/bugon.cocci: update bug_on conversion warning (2015-04-15 14:21:31 +0200)
-
-----------------------------------------------------------------
-Alex Pilon (1):
-      scripts/extract-ikconfig: Support LZ4-compressed images.
-
-Fabian Frederick (1):
-      scripts/coccinelle/misc/bugon.cocci: update bug_on conversion warning
-
-Valentin Rothberg (1):
-      irqf_oneshot.cocci: add check of devm_request_threaded_irq()
-
- scripts/coccinelle/misc/bugon.cocci        |  2 +-
- scripts/coccinelle/misc/irqf_oneshot.cocci | 24 ++++++++++++++++++++++++
- scripts/extract-ikconfig                   |  1 +
- 3 files changed, 26 insertions(+), 1 deletion(-)
+	Ingo
