@@ -1,48 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from one.firstfloor.org ([193.170.194.197]:42020 "EHLO
-	one.firstfloor.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751850AbbDTVYR (ORCPT
+Received: from services.gouders.net ([141.101.32.176]:43307 "EHLO
+	services.gouders.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752130AbbDUHyN (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 20 Apr 2015 17:24:17 -0400
-Date: Mon, 20 Apr 2015 23:24:14 +0200
-From: Andi Kleen <andi@firstfloor.org>
-Subject: Re: [PATCH 0/2] Integrate compiler-gcc[345].h files into
- compiler-gcc.h
-Message-ID: <20150420212414.GC2366@two.firstfloor.org>
-References: <20150416162938.GU2366@two.firstfloor.org>
- <cover.1429212277.git.joe@perches.com>
- <20150420141713.e8611fcb6336ece7b4e84967@linux-foundation.org>
+	Tue, 21 Apr 2015 03:54:13 -0400
+From: Dirk Gouders <dirk@gouders.net>
+Subject: Re: [PATCH] tools/lib/api/Makefile: Add feature check for _FORTIFY_SOURCE
+In-Reply-To: <CAArOQ2XqxqF8cLmxe5DWwcAEvJbMnqnvaoB5U3+DGqwBYWVqRQ@mail.gmail.com>
+	(Bobby Powers's message of "Mon, 20 Apr 2015 14:55:59 -0400")
+References: <ghlhhnf0j2.fsf@lena.gouders.net>
+	<20150420181631.GA19378@gmail.com> <gh7ft6odi8.fsf@quad.gouders.net>
+	<CAArOQ2XqxqF8cLmxe5DWwcAEvJbMnqnvaoB5U3+DGqwBYWVqRQ@mail.gmail.com>
+Date: Tue, 21 Apr 2015 09:46:17 +0200
+Message-ID: <ghh9s9hqk6.fsf@lena.gouders.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20150420141713.e8611fcb6336ece7b4e84967@linux-foundation.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Joe Perches <joe@perches.com>, Andi Kleen <andi@firstfloor.org>, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Andi Kleen <ak@linux.intel.com>, Segher Boessenkool <segher@kernel.crashing.org>, Sasha Levin <levinsasha928@gmail.com>, Anton Blanchard <anton@samba.org>, Alan Modra <amodra@gmail.com>
+To: Bobby Powers <bobbypowers@gmail.com>
+Cc: Ingo Molnar <mingo@kernel.org>, Arnaldo Carvalho de Melo <acme@kernel.org>, Peter Zijlstra <a.p.zijlstra@chello.nl>, Paul Mackerras <paulus@samba.org>, Ingo Molnar <mingo@redhat.com>, linux-kbuild@vger.kernel.org, Kernel development list <linux-kernel@vger.kernel.org>
 
-On Mon, Apr 20, 2015 at 02:17:13PM -0700, Andrew Morton wrote:
-> On Thu, 16 Apr 2015 13:31:01 -0700 Joe Perches <joe@perches.com> wrote:
-> 
-> > Joe Perches (2):
-> >   compiler-gcc.h: Neatening
-> >   compiler-gcc: Integrate the various compiler-gcc[345].h files
-> > 
-> 
-> We have at least three support-three-gcc-6 patchsets floating about. 
-> Are we all happy with Joe's patchset?
+Bobby Powers <bobbypowers@gmail.com> writes:
 
-It's fine for me.
-> 
-> 
-> I expect Andi's
-> http://ozlabs.org/~akpm/mmots/broken-out/lto-add-__noreorder-and-mark-initcalls-__noreorder.patch
-> will need to be updated in response, which is why I didn't merge it.
+> Hi,
+>
+> Dirk Gouders <dirk@gouders.net> wrote:
+>> Yes, I was suggesting something similar (but without founded reasoning),
+>> some time ago [1].
+>
+> I submitted a patch for this a few days ago, but I didn't realize I
+> should CC linux-kbuild@ (my bad):
+> https://lkml.org/lkml/2015/4/18/71
 
-I'll resend.
+Thanks for the hint, Bobby, I really should have checked recent
+archives.
 
--Andi
-> 
+I could not apply your patch against Linus' current tree, but tested it
+with your change typed in, manually with positive result (as expected).
 
--- 
-ak@linux.intel.com -- Speaking for myself only.
+Dirk
