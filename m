@@ -1,33 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:46298 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:46687 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932349AbbDVO2W (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 22 Apr 2015 10:28:22 -0400
-Date: Wed, 22 Apr 2015 16:28:19 +0200
+	id S933456AbbDVOdV (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 22 Apr 2015 10:33:21 -0400
+Date: Wed, 22 Apr 2015 16:33:20 +0200
 From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] kbuild/mkspec: Simplify vmlinux.bz2 creation
-Message-ID: <20150422142819.GA19277@sepie.suse.cz>
-References: <1429394714-9028-1-git-send-email-bp@alien8.de>
+Subject: Re: [PATCH v2] Makefile: Fix detection of clang when cross-compiling
+Message-ID: <20150422143320.GB19277@sepie.suse.cz>
+References: <1429306504-26122-1-git-send-email-paul@crapouillou.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1429394714-9028-1-git-send-email-bp@alien8.de>
+In-Reply-To: <1429306504-26122-1-git-send-email-paul@crapouillou.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Borislav Petkov <bp@alien8.de>
-Cc: LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
+To: Paul Cercueil <paul@crapouillou.net>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Sun, Apr 19, 2015 at 12:05:14AM +0200, Borislav Petkov wrote:
-> From: Borislav Petkov <bp@suse.de>
+On Fri, Apr 17, 2015 at 11:35:04PM +0200, Paul Cercueil wrote:
+> When the host's C compiler is clang, and when attempting to
+> cross-compile Linux e.g. to MIPS with mipsel-linux-gcc, the Makefile
+> would incorrectly detect the use of clang, which resulted in
+> clang-specific flags being passed to mipsel-linux-gcc.
 > 
-> No need for the intermediary vmlinux.orig - bzip2 can keep the original
-> files used for compression with --keep.
+> This can be verified under Debian by installing the "clang" package,
+> and then using it as the default compiler with:
+> sudo update-alternatives --config cc
 > 
-> Signed-off-by: Borislav Petkov <bp@suse.de>
-> Cc: Michal Marek <mmarek@suse.cz>
-> Cc: linux-kbuild@vger.kernel.org
+> This patch moves the detection of clang after the $(CC) variable is
+> initialized to the name of the cross-compiler, so that the check applies
+> to the cross-compiler and not the host's C compiler.
+> 
+> v2: Move the detection of clang after the inclusion of the
+> arch/*/Makefile (as they might set $(CROSS_COMPILE))
+> 
+> Signed-off-by: Paul Cercueil <paul@crapouillou.net>
 
-Applied to kbuild.git#misc. I will push it after v4.1-rc1 becomes
+Applied to kbuild.git#kbuild. I will push it after v4.1-rc1 becomes
 available, though.
 
 Michal
