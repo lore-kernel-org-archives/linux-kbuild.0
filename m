@@ -1,44 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from baikonur.stro.at ([88.198.36.42]:48461 "EHLO baikonur.stro.at"
+Received: from baikonur.stro.at ([88.198.36.42]:48464 "EHLO baikonur.stro.at"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754619AbbDVQBc (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 22 Apr 2015 12:01:32 -0400
-Date: Wed, 22 Apr 2015 17:52:01 +0200
-From: maximilian attems <maks@stro.at>
-Subject: Re: [PATCH] deb-pkg: v2: move setting debarch for a separate function
-Message-ID: <20150422155201.GB32026@gluino>
-References: <552E59D9.7060101@suse.cz>
- <1429191766-13385-1-git-send-email-riku.voipio@linaro.org>
- <5537B412.1000109@suse.cz>
+	id S1754976AbbDVQGa (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 22 Apr 2015 12:06:30 -0400
+Date: Wed, 22 Apr 2015 17:57:00 +0200
+From: maximilian attems <max@stro.at>
+Subject: Re: [PATCH] builddeb: fix stripped module signatures if
+ CONFIG_DEBUG_INFO and CONFIG_MODULE_SIG_ALL are set
+Message-ID: <20150422155700.GD32026@gluino>
+References: <1426494054-32138-1-git-send-email-andrej.skvortzov@gmail.com>
+ <55365798.4090302@suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5537B412.1000109@suse.cz>
+In-Reply-To: <55365798.4090302@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.cz>
-Cc: riku.voipio@linaro.org, linux-kbuild@vger.kernel.org, debian-kernel@lists.debian.org
+Cc: Andrey Skvortsov <andrej.skvortzov@gmail.com>, Ben Hutchings <ben@decadent.org.uk>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Wed, Apr 22, 2015 at 04:45:38PM +0200, Michal Marek wrote:
-> On 2015-04-16 15:42, riku.voipio@linaro.org wrote:
-> > From: Riku Voipio <riku.voipio@linaro.org>
-> > 
-> > create_package() function tries to resolve used architecture
-> > for everry package. Split the setting the architecture to a
-> > new function, set_debarch(), called once on startup.
-> > 
-> > This allows using debarch from other parts of script as
-> > needed.
-> > 
-> > v2: Follow Michals suggestion on setting variables at
-> > top scope and also setting the fallback $debarch in the
-> > new function
-> > 
-> > Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
+On Tue, Apr 21, 2015 at 03:58:48PM +0200, Michal Marek wrote:
+> (added Max to Cc)
 > 
-> Thanks, applied to kbuild.git#misc. But please base your patches on
-> Linus's or the maintainer's tree next time. Your patch had some
-> conflicts, because it was based on some non-upstream patches.
+> On 2015-03-16 09:20, Andrey Skvortsov wrote:
+> > If CONFIG_MODULE_SIG_ALL is set, then user expects that all modules are
+> > automatically signed in the result package, as it's for rpm-pkg, binrpm-pkg,
+> > tar, tar-*. For deb-pkg this is correct only if CONFIG_DEBUG_INFO
+> > is NOT set. In that case deb-package contains signed modules.
+> > 
+> > But if CONFIG_DEBUG_INFO is set, builddeb creates separate package with
+> > debug information. To do that, debug information from all modules
+> > is copied into separate files by objcopy. And loadable kernel modules are
+> > stripped afterwards. Stripping removes previously (during modules_install)
+> > added signatures from loadable kernel modules. Therefore final deb-package
+> > contains unsigned modules despite of set option CONFIG_MODULE_SIG_ALL.
+> > 
+> > This patch resigns all stripped modules if CONFIG_MODULE_SIG_ALL is set
+> > to solve this problem.
+> > 
+> > Signed-off-by: Andrey Skvortsov <andrej.skvortzov@gmail.com>
+> 
+> Max, Ben, are you fine with this patch? It looks OK to me, the
+> modules_sign target has been added for this very purpose.
+> 
 
-thanks, acked.
+Ben seems busy with the release, so jumping in. The patch looks
+perfect to me.
+
+Acked-by: maximilian attems <max@stro.at>
 
