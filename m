@@ -1,37 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from baikonur.stro.at ([88.198.36.42]:48460 "EHLO baikonur.stro.at"
+Received: from baikonur.stro.at ([88.198.36.42]:48461 "EHLO baikonur.stro.at"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755952AbbDVQBb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 22 Apr 2015 12:01:31 -0400
-Date: Wed, 22 Apr 2015 17:55:36 +0200
-From: maximilian attems <max@stro.at>
-Subject: Re: [PATCHv4 1/1] deb-pkg: Add device tree blobs to the package
-Message-ID: <20150422155535.GC32026@gluino>
-References: <20150203121648.046396044@rtp-net.org>
+	id S1754619AbbDVQBc (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 22 Apr 2015 12:01:32 -0400
+Date: Wed, 22 Apr 2015 17:52:01 +0200
+From: maximilian attems <maks@stro.at>
+Subject: Re: [PATCH] deb-pkg: v2: move setting debarch for a separate function
+Message-ID: <20150422155201.GB32026@gluino>
+References: <552E59D9.7060101@suse.cz>
+ <1429191766-13385-1-git-send-email-riku.voipio@linaro.org>
+ <5537B412.1000109@suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20150203121648.046396044@rtp-net.org>
+In-Reply-To: <5537B412.1000109@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaud Patard <arnaud.patard@rtp-net.org>
-Cc: linux-kbuild@vger.kernel.org, Ben Hutchings <ben@decadent.org.uk>, Michal Marek <mmarek@suse.cz>
+To: Michal Marek <mmarek@suse.cz>
+Cc: riku.voipio@linaro.org, linux-kbuild@vger.kernel.org, debian-kernel@lists.debian.org
 
-On Tue, Feb 03, 2015 at 01:16:33PM +0100, Arnaud Patard wrote:
-> When building a package with make deb-pkg (say, for arm), the dtb files are
-> not added to the package. Given that things are still evolving on arm, it
-> make sense to have them along with the kernel and modules.
+On Wed, Apr 22, 2015 at 04:45:38PM +0200, Michal Marek wrote:
+> On 2015-04-16 15:42, riku.voipio@linaro.org wrote:
+> > From: Riku Voipio <riku.voipio@linaro.org>
+> > 
+> > create_package() function tries to resolve used architecture
+> > for everry package. Split the setting the architecture to a
+> > new function, set_debarch(), called once on startup.
+> > 
+> > This allows using debarch from other parts of script as
+> > needed.
+> > 
+> > v2: Follow Michals suggestion on setting variables at
+> > top scope and also setting the fallback $debarch in the
+> > new function
+> > 
+> > Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
 > 
-> v4: Use $KCONFIG_CONFIG
-> v3: handle with OF but without dtbs_install.
->     Use $MAKE ... as done everywhere else in the script
-> v2: make use of dtbs_install
-> 
-> Signed-off-by: Arnaud Patard <arnaud.patard@rtp-net.org>
-> ---
+> Thanks, applied to kbuild.git#misc. But please base your patches on
+> Linus's or the maintainer's tree next time. Your patch had some
+> conflicts, because it was based on some non-upstream patches.
 
-the patch seems to apply to current linus with 
-Hunk #1 succeeded at 143 with fuzz 1.
-
-acked.
+thanks, acked.
 
