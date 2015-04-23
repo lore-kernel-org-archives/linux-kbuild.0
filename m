@@ -1,81 +1,79 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from baikonur.stro.at ([88.198.36.42]:48840 "EHLO baikonur.stro.at"
+Received: from mail.kernel.org ([198.145.29.136]:59554 "EHLO mail.kernel.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756393AbbDWKoC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 23 Apr 2015 06:44:02 -0400
-Date: Thu, 23 Apr 2015 12:43:58 +0200
-From: maximilian attems <maks@stro.at>
-Subject: Re: [PATCH 2/2] deb-pkg: add source package
-Message-ID: <20150423104358.GR27866@stro.at>
-References: <cf573e24baadc04da27c471dafee90344e0cb400.1428671643.git.riku.voipio@linaro.org>
- <34017611f8a0056a09d2c38412efd7828efe00fe.1428671643.git.riku.voipio@linaro.org>
- <20150422155057.GA32026@gluino>
- <CAAqcGHnRinMmG++0d02-ANYrdhxod5K3G5qcwxbA7tKOqe+Fjw@mail.gmail.com>
+	id S1752238AbbDWWDW (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 23 Apr 2015 18:03:22 -0400
+From: Arnaldo Carvalho de Melo <acme@kernel.org>
+Subject: [GIT PULL 0/4] perf/urgent fixes
+Date: Thu, 23 Apr 2015 19:03:06 -0300
+Message-Id: <1429826590-32193-1-git-send-email-acme@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAAqcGHnRinMmG++0d02-ANYrdhxod5K3G5qcwxbA7tKOqe+Fjw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Riku Voipio <riku.voipio@linaro.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, mmarek <mmarek@suse.cz>, debian-kernel <debian-kernel@lists.debian.org>
+To: Ingo Molnar <mingo@kernel.org>
+Cc: linux-kernel@vger.kernel.org, Arnaldo Carvalho de Melo <acme@kernel.org>, Adrian Hunter <adrian.hunter@intel.com>, Bobby Powers <bobbypowers@gmail.com>, Borislav Petkov <bp@suse.de>, David Ahern <dsahern@gmail.com>, Dirk Gouders <dirk@gouders.net>, Don Zickus <dzickus@redhat.com>, Frederic Weisbecker <fweisbec@gmail.com>, Jiri Olsa <jolsa@redhat.com>, Joonsoo Kim <js1304@gmail.com>, linux-kbuild@vger.kernel.org, Michael Petlan <mpetlan@redhat.com>, Michal Marek <mmarek@suse.cz>, Minchan Kim <minchan@kernel.org>, Namhyung Kim <namhyung@kernel.org>, Paul Mackerras <paulus@samba.org>, Peter Zijlstra <a.p.zijlstra@chello.nl>, Stephane Eranian <eranian@google.com>, Will Deacon <will.deacon@arm.com>, Arnaldo Carvalho de Melo <acme@redhat.com>
 
-On Thu, Apr 23, 2015 at 12:01:10PM +0300, Riku Voipio wrote:
-> On 22 April 2015 at 18:50, maximilian attems <maks@stro.at> wrote:
-> >
-> > great this is a much requested feature for wider adoption of make
-> > deb-pkg. In general acked-by me, just minor comment below.
-> >
-> > I do not like the BUILD_SOURCE=y variable,
-> > I think it should just be like the other scripts and do it by default.
-> >
-> > What we do need is a target that *only* compiles the linux image.
-> 
-> So a bin-debpkg target in scripts/package/Makefile ?
+Hi Ingo,
 
-yes, please.
- 
-> >>  scripts/package/builddeb | 42 ++++++++++++++++++++++++++++++++++++++++++
-> >>  1 file changed, 42 insertions(+)
-> >>
-> >> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-> >> index e397815..3d77fd3 100755
-> >> --- a/scripts/package/builddeb
-> >> +++ b/scripts/package/builddeb
-> >> @@ -272,12 +272,23 @@ On Debian GNU/Linux systems, the complete text of the GNU General Public
-> >>  License version 2 can be found in \`/usr/share/common-licenses/GPL-2'.
-> >>  EOF
-> >>
-> >> +
-> >> +build_depends="bc, "
-> >> +if [ -n "$BUILD_TOOLS" ]
-> 
-> > why this dual stage?
-> 
-> That variable was introduced in "RFC: builddeb: add linux-tools
-> package with perf" [1]. Building perf
-> as part of deb-pkg was kind of the major motivation for these series.
+	Please consider pulling,
 
-With adding the very specific image target, I don't think this variable
-is needed.
- 
-> >> +then
-> >> +     build_depends="$build_depends python-dev, libperl-dev, bison, flex, \
-> >> +libaudit-dev, libdw-dev, libelf-dev, libiberty-dev, libnewt-dev, autoconf, \
-> >> +automake, libtool, libglib2.0-dev, libudev-dev, libwrap0-dev, libiberty-dev, \
-> >> +libunwind8-dev [amd64 arm64 i386], libnuma-dev [amd64 arm64 i386 powerpc ppc64 ppc64el] "
-> 
-> > how did you generate this list, this seems bogus to me?!
-> 
-> > python-dev should probably be python
-> > why would you need automake?
-> 
-> These are build-depends of linux-tools (perf etc).
+- Arnaldo
 
-Hmm, ok.
- 
-> > plus I do seem to miss cpio, kmod.
-> 
-> I'll add kmod and cpio to the non-tools case.
+The following changes since commit 0140e6141e4f1d4b15fb469e6912b0e71b7d1cc2:
 
-good.
+  perf/x86/intel/uncore: Move PCI IDs for IMC to uncore driver (2015-04-22 08:29:19 +0200)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/acme/linux.git tags/perf-urgent-for-mingo
+
+for you to fetch changes up to de28c15daf60e9625bece22f13a091fac8d05f1d:
+
+  tools lib api: Undefine _FORTIFY_SOURCE before setting it (2015-04-23 17:08:23 -0300)
+
+----------------------------------------------------------------
+perf/urgent fixes:
+
+User visible:
+
+- Enable events when doing system wide 'trace' and starting a
+  workload, e.g:
+
+   # trace -a sleep 1
+
+  now it matches the pattern in 'record' and will show envents
+  instead of sitting doing nothing while waiting for the started
+  workload to finish (Arnaldo Carvalho de Melo)
+
+- Disable and drain events when forked 'trace' workload ends
+  making sure we notice the end of the workload instead of
+  trying to keep up with the seemingly neverending flux of
+  system wide events (Arnaldo Carvalho de Melo)
+
+Infrastructure:
+
+- Fix the build on 32-bit ARM by consistently use PRIu64 for printing u64
+  values in 'perf kmem' (Will Deacon)
+
+- Undefine _FORTIFY_SOURCE before setting it in tools/perf/api, fixing the build on
+  Hardened Gentoo systems (Bobby Powers)
+
+Signed-off-by: Arnaldo Carvalho de Melo <acme@redhat.com>
+
+----------------------------------------------------------------
+Arnaldo Carvalho de Melo (2):
+      perf trace: Enable events when doing system wide tracing and starting a workload
+      perf trace: Disable events and drain events when forked workload ends
+
+Bobby Powers (1):
+      tools lib api: Undefine _FORTIFY_SOURCE before setting it
+
+Will Deacon (1):
+      perf kmem: Consistently use PRIu64 for printing u64 values
+
+ tools/lib/api/Makefile     |  2 +-
+ tools/perf/builtin-kmem.c  |  4 ++--
+ tools/perf/builtin-trace.c | 10 ++++++++--
+ 3 files changed, 11 insertions(+), 5 deletions(-)
