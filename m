@@ -1,24 +1,26 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.136]:38315 "EHLO mail.kernel.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753097AbbDXCJf (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 23 Apr 2015 22:09:35 -0400
-Date: Thu, 23 Apr 2015 23:09:28 -0300
-From: Arnaldo Carvalho de Melo <acme@kernel.org>
+Received: from eu-smtp-delivery-143.mimecast.com ([146.101.78.143]:12391 "EHLO
+	eu-smtp-delivery-143.mimecast.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S934428AbbDXI7X convert rfc822-to-8bit
+	(ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 24 Apr 2015 04:59:23 -0400
+Date: Fri, 24 Apr 2015 09:59:18 +0100
+From: Javi Merino <javi.merino@arm.com>
 Subject: Re: [GIT PULL 0/4] perf/urgent fixes
-Message-ID: <20150424020928.GB650@kernel.org>
+Message-ID: <20150424085918.GA3115@e104805>
 References: <1429826590-32193-1-git-send-email-acme@kernel.org>
  <20150424020218.GF1905@sejong>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 In-Reply-To: <20150424020218.GF1905@sejong>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Namhyung Kim <namhyung@kernel.org>
-Cc: Ingo Molnar <mingo@kernel.org>, linux-kernel@vger.kernel.org, Adrian Hunter <adrian.hunter@intel.com>, Bobby Powers <bobbypowers@gmail.com>, Borislav Petkov <bp@suse.de>, David Ahern <dsahern@gmail.com>, Dirk Gouders <dirk@gouders.net>, Don Zickus <dzickus@redhat.com>, Frederic Weisbecker <fweisbec@gmail.com>, Jiri Olsa <jolsa@redhat.com>, Joonsoo Kim <js1304@gmail.com>, linux-kbuild@vger.kernel.org, Michael Petlan <mpetlan@redhat.com>, Michal Marek <mmarek@suse.cz>, Minchan Kim <minchan@kernel.org>, Paul Mackerras <paulus@samba.org>, Peter Zijlstra <a.p.zijlstra@chello.nl>, Stephane Eranian <eranian@google.com>, Will Deacon <will.deacon@arm.com>, Javi Merino <javi.merino@arm.com>, Steven Rostedt <rostedt@goodmis.org>
+Cc: Arnaldo Carvalho de Melo <acme@kernel.org>, Ingo Molnar <mingo@kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Adrian Hunter <adrian.hunter@intel.com>, Bobby Powers <bobbypowers@gmail.com>, Borislav Petkov <bp@suse.de>, David Ahern <dsahern@gmail.com>, Dirk Gouders <dirk@gouders.net>, Don Zickus <dzickus@redhat.com>, Frederic Weisbecker <fweisbec@gmail.com>, Jiri Olsa <jolsa@redhat.com>, Joonsoo Kim <js1304@gmail.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, Michael Petlan <mpetlan@redhat.com>, Michal Marek <mmarek@suse.cz>, Minchan Kim <minchan@kernel.org>, Paul Mackerras <paulus@samba.org>, Peter Zijlstra <a.p.zijlstra@chello.nl>, Stephane Eranian <eranian@google.com>, Will Deacon <Will.Deacon@arm.com>, Arnaldo Carvalho de Melo <acme@redhat.com>, Steven Rostedt <rostedt@goodmis.org>
 
-Em Fri, Apr 24, 2015 at 11:02:18AM +0900, Namhyung Kim escreveu:
+On Fri, Apr 24, 2015 at 03:02:18AM +0100, Namhyung Kim wrote:
 > Hi Arnaldo,
 > 
 > I've set up some docker containers for build test, and found a couple
@@ -27,15 +29,9 @@ Em Fri, Apr 24, 2015 at 11:02:18AM +0900, Namhyung Kim escreveu:
 > to be in perf/urgent.  Sorry about the kmem breakages..
 > 
 > And I also found this..
-
-I can send those tomorrow, in another pull request to Ingo. I noticed a
-few on a RHEL5 machine I tested today, in libtraceevent even, I guess
-you was on the CC list for that bug report.
-
-- Arnaldo
- 
 > 
-> >From 581ae7f48c89377755391c3f95637a1d48eefc73 Mon Sep 17 00:00:00 2001
+> 
+> From 581ae7f48c89377755391c3f95637a1d48eefc73 Mon Sep 17 00:00:00 2001
 > From: Namhyung Kim <namhyung@kernel.org>
 > Date: Fri, 24 Apr 2015 10:45:16 +0900
 > Subject: [PATCH] tools lib traceevent: Fix build failure on 32-bit arch
@@ -63,6 +59,13 @@ you was on the CC list for that bug report.
 >  			} else if (el_size == 8) {
 > -				trace_seq_printf(s, "%lu", *(uint64_t *)num);
 > +				trace_seq_printf(s, "%"PRIu64, *(uint64_t *)num);
+
+Didn't know about PRIu64 and friends.  FWIW,
+
+Acked-by: Javi Merino <javi.merino@arm.com>
+
+While you are at it, you could also fix the previous "%u" to "%"PRIu32
+
 >  			} else {
 >  				trace_seq_printf(s, "BAD SIZE:%d 0x%x",
 >  						 el_size, *(uint8_t *)num);
@@ -142,3 +145,5 @@ you was on the CC list for that bug report.
 > > the body of a message to majordomo@vger.kernel.org
 > > More majordomo info at  http://vger.kernel.org/majordomo-info.html
 > > Please read the FAQ at  http://www.tux.org/lkml/
+> 
+
