@@ -1,58 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from youngberry.canonical.com ([91.189.89.112]:50377 "EHLO
-	youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S965559AbbDXSZ4 (ORCPT
+Received: from 66.63.173.11.static.quadranet.com ([66.63.173.11]:38602 "EHLO
+	q1.ich-9.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1946098AbbDXXEh (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 24 Apr 2015 14:25:56 -0400
-From: Chris J Arges <chris.j.arges@canonical.com>
-Subject: [PATCH 2/2] builddeb: parallelize debug module installation
-Date: Fri, 24 Apr 2015 13:25:40 -0500
-Message-Id: <1429899940-32366-3-git-send-email-chris.j.arges@canonical.com>
-In-Reply-To: <1429899940-32366-1-git-send-email-chris.j.arges@canonical.com>
-References: <1429899940-32366-1-git-send-email-chris.j.arges@canonical.com>
+	Fri, 24 Apr 2015 19:04:37 -0400
+Message-ID: <1429916673.4011.0.camel@memnix.com>
+Subject: Re: [PATCHv2 RFC 1/1] Explicit check for existing X.509 module
+ signing keypair
+From: Abelardo Ricart III <aricart@memnix.com>
+Date: Fri, 24 Apr 2015 19:04:33 -0400
+In-Reply-To: <552BC1A1.7010504@suse.cz>
+References: <1428626238.3789.0.camel@memnix.com> <552BC1A1.7010504@suse.cz>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org, mmarek@suse.cz
-Cc: linux-kernel@vger.kernel.org, Chris J Arges <chris.j.arges@canonical.com>
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, David Howells <dhowells@redhat.com>, keyrings@linux-nfs.org
 
-When building the dbg package, we use a large 'for module in $(find' loop that
-can be easily parallelized by using 'find | xargs'. This patch modifies this
-loop to use the later paradigm.
+What's the word on this?
 
-Signed-off-by: Chris J Arges <chris.j.arges@canonical.com>
----
- scripts/package/builddeb | 15 ++++++++-------
- 1 file changed, 8 insertions(+), 7 deletions(-)
-
-diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index 88dbf23..d12d062 100755
---- a/scripts/package/builddeb
-+++ b/scripts/package/builddeb
-@@ -152,16 +152,17 @@ if grep -q '^CONFIG_MODULES=y' $KCONFIG_CONFIG ; then
- 		rmdir "$tmpdir/lib/modules/$version"
- 	fi
- 	if [ -n "$BUILD_DEBUG" ] ; then
--		for module in $(find $tmpdir/lib/modules/ -name *.ko -printf '%P\n'); do
--			module=lib/modules/$module
--			mkdir -p $(dirname $dbg_dir/usr/lib/debug/$module)
-+		find $tmpdir/lib/modules/ -name *.ko -printf '%P\n' | xargs -I {} sh -c '
-+			mkdir -p $(dirname '"$dbg_dir"'/usr/lib/debug/lib/modules/$1);'"
- 			# only keep debug symbols in the debug file
--			$OBJCOPY --only-keep-debug $tmpdir/$module $dbg_dir/usr/lib/debug/$module
-+			$OBJCOPY --only-keep-debug $tmpdir/lib/modules/{} \
-+				$dbg_dir/usr/lib/debug/lib/modules/{};
- 			# strip original module from debug symbols
--			$OBJCOPY --strip-debug $tmpdir/$module
-+			$OBJCOPY --strip-debug $tmpdir/lib/modules/{};
- 			# then add a link to those
--			$OBJCOPY --add-gnu-debuglink=$dbg_dir/usr/lib/debug/$module $tmpdir/$module
--		done
-+			$OBJCOPY --add-gnu-debuglink=$dbg_dir/usr/lib/debug/lib/modules/{} \
-+				$tmpdir/lib/modules/{};
-+		" -- {}
- 	fi
- fi
- 
--- 
-1.9.1
-
+On Mon, 2015-04-13 at 15:16 +0200, Michal Marek wrote:
+> Added David Howels and keyrings@linux-nfs.org to Cc
+> 
+> Michal
+> 
+> On 2015-04-10 02:37, Abelardo Ricart III wrote:
+> > 
+> > The module-signing.txt documentation states that the kernel will use an 
+> > existing
+> > x.509 key pair for module signing should they exist in the root of the 
+> > source tree.
+> > However, user provided signing keys are unexpectedly overwritten during 
+> > build if the 
+> > last-modified times on the key pair are older than the "x509.genkey" target 
+> > dependency.
+> > This fix stops this unexpected behavior, and warns if the key pair was not 
+> > found.
+> > 
+> > Signed-off-by: Abelardo Ricart III <aricart@memnix.com>
+> > ---
+> > 
+> > diff --git a/kernel/Makefile b/kernel/Makefile
+> > index 1408b33..10c8df0 100644
+> > --- a/kernel/Makefile
+> > +++ b/kernel/Makefile
+> > @@ -168,7 +168,8 @@ ifndef CONFIG_MODULE_SIG_HASH
+> >  $(error Could not determine digest type to use from kernel config)
+> >  endif
+> >  
+> > -signing_key.priv signing_key.x509: x509.genkey
+> > +signing_key.priv signing_key.x509: | x509.genkey
+> > +       $(warning *** X.509 module signing key pair not found in root of 
+> > source tree ***)
+> >         @echo "###"
+> >         @echo "### Now generating an X.509 key pair to be used for signing 
+> > modules."
+> >         @echo "###"
+> > 
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
