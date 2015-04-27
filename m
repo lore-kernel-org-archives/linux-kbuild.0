@@ -1,65 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lb1-smtp-cloud2.xs4all.net ([194.109.24.21]:41635 "EHLO
-	lb1-smtp-cloud2.xs4all.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1750761AbbDZVTM (ORCPT
+Received: from mail-wg0-f41.google.com ([74.125.82.41]:35774 "EHLO
+	mail-wg0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932508AbbD0MAX (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 26 Apr 2015 17:19:12 -0400
-Message-ID: <1430083148.2411.15.camel@x220>
+	Mon, 27 Apr 2015 08:00:23 -0400
+Date: Mon, 27 Apr 2015 12:00:19 +0000
+From: sylvain.bertrand@gmail.com
 Subject: Re: [PATCH] kconfig: add tinfo library if it exists to lxdialog
  linking flags
-From: Paul Bolle <pebolle@tiscali.nl>
-Date: Sun, 26 Apr 2015 23:19:08 +0200
-In-Reply-To: <20150425160546.GA4002@freedom>
+Message-ID: <20150427120019.GA567@freedom>
 References: <20150425160546.GA4002@freedom>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+ <1430083148.2411.15.camel@x220>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1430083148.2411.15.camel@x220>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: sylvain.bertrand@gmail.com
+To: Paul Bolle <pebolle@tiscali.nl>
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Sat, 2015-04-25 at 16:05 +0000, sylvain.bertrand@gmail.com wrote:
-> HOSTLD  scripts/kconfig/mconf
-> /bin/ld: scripts/kconfig/lxdialog/checklist.o: undefined reference to symbol 'acs_map'
-> 
-> Add tinfo library to lxdiablog linking flags, if it exists.
-> 
-> Signed-off-by: Sylvain BERTRAND <sylvain.bertrand@gmail.com>
-> ---
-> --- a/scripts/kconfig/lxdialog/check-lxdialog.sh
-> +++ b/scripts/kconfig/lxdialog/check-lxdialog.sh
-> @@ -4,6 +4,9 @@
->  # What library to link
->  ldflags()
->  {
-> +	# Some ncurses symbols are in tinfo library, if it exists
-> +	pkg-config --libs tinfow 2>/dev/null
-> +	pkg-config --libs tinfo 2>/dev/null
->  	pkg-config --libs ncursesw 2>/dev/null && exit
->  	pkg-config --libs ncurses 2>/dev/null && exit
->  	for ext in so a dll.a dylib ; do
+On Sun, Apr 26, 2015 at 11:19:08PM +0200, Paul Bolle wrote:
+> Is that how pkg-config should work? If so, I wonder why it fails for
+> you.
 
-It looks like commit fc9c6e000f62 ("menuconfig: optionally use
-pkg-config to detect ncurses libs") claims to already fix this. And your
-patch is obviously done on top of that commit.
+The pkg-config file I use is straight from the ncurses distribution with the
+lastest "rollup" patch.
 
-So I did some further, well, research. That is: I skimmed man pkg-config
-and stared a bit at the pkg-config related files shipped with
-ncurses-devel (for Fedora 20). And to me it seems
-	pkg-config --libs ncursesw
+Either it's a fedora specific modification, either a genuine ncurses patch
+released after the lastest "rollup" patch.
 
-or
-	pkg-config --libs ncurses
+As far I understand it, from an application point of view, "standard" ncurses
+programming, in the case where tinfo lib is outside of ncurses lib, involves
+linking to libncurses library only. libtinfo linking would be required only in
+some special features are used, which seems to be the case with lxdialog.
 
-should already add -ltinfow or -ltinfo if those flags would be needed,
-just like that commit implies.
+Please correct me if I'm wrong.
 
-Is that how pkg-config should work? If so, I wonder why it fails for
-you.
+regards,
 
-Thanks,
-
-
-Paul Bolle
-
+-- 
+Sylvain BERTRAND
