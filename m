@@ -1,43 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f41.google.com ([74.125.82.41]:35774 "EHLO
-	mail-wg0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932508AbbD0MAX (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 27 Apr 2015 08:00:23 -0400
-Date: Mon, 27 Apr 2015 12:00:19 +0000
-From: sylvain.bertrand@gmail.com
-Subject: Re: [PATCH] kconfig: add tinfo library if it exists to lxdialog
- linking flags
-Message-ID: <20150427120019.GA567@freedom>
-References: <20150425160546.GA4002@freedom>
- <1430083148.2411.15.camel@x220>
+Received: from cantor2.suse.de ([195.135.220.15]:33739 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S932661AbbD0OWp (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 27 Apr 2015 10:22:45 -0400
+Message-ID: <553E4633.8080606@suse.cz>
+Date: Mon, 27 Apr 2015 16:22:43 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1430083148.2411.15.camel@x220>
+Subject: Re: [PATCH 2/2] builddeb: parallelize debug module installation
+References: <1429899940-32366-1-git-send-email-chris.j.arges@canonical.com> <1429899940-32366-3-git-send-email-chris.j.arges@canonical.com>
+In-Reply-To: <1429899940-32366-3-git-send-email-chris.j.arges@canonical.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Paul Bolle <pebolle@tiscali.nl>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Chris J Arges <chris.j.arges@canonical.com>, linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
 
-On Sun, Apr 26, 2015 at 11:19:08PM +0200, Paul Bolle wrote:
-> Is that how pkg-config should work? If so, I wonder why it fails for
-> you.
+On 2015-04-24 20:25, Chris J Arges wrote:
+> When building the dbg package, we use a large 'for module in $(find' loop that
+> can be easily parallelized by using 'find | xargs'. This patch modifies this
+> loop to use the later paradigm.
+> 
+> Signed-off-by: Chris J Arges <chris.j.arges@canonical.com>
+> ---
+>  scripts/package/builddeb | 15 ++++++++-------
+>  1 file changed, 8 insertions(+), 7 deletions(-)
+> 
+> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+> index 88dbf23..d12d062 100755
+> --- a/scripts/package/builddeb
+> +++ b/scripts/package/builddeb
+> @@ -152,16 +152,17 @@ if grep -q '^CONFIG_MODULES=y' $KCONFIG_CONFIG ; then
+>  		rmdir "$tmpdir/lib/modules/$version"
+>  	fi
+>  	if [ -n "$BUILD_DEBUG" ] ; then
+> -		for module in $(find $tmpdir/lib/modules/ -name *.ko -printf '%P\n'); do
+> -			module=lib/modules/$module
+> -			mkdir -p $(dirname $dbg_dir/usr/lib/debug/$module)
+> +		find $tmpdir/lib/modules/ -name *.ko -printf '%P\n' | xargs -I {} sh -c '
 
-The pkg-config file I use is straight from the ncurses distribution with the
-lastest "rollup" patch.
+I guess you want to use the -P option here.
 
-Either it's a fedora specific modification, either a genuine ncurses patch
-released after the lastest "rollup" patch.
-
-As far I understand it, from an application point of view, "standard" ncurses
-programming, in the case where tinfo lib is outside of ncurses lib, involves
-linking to libncurses library only. libtinfo linking would be required only in
-some special features are used, which seems to be the case with lxdialog.
-
-Please correct me if I'm wrong.
-
-regards,
-
--- 
-Sylvain BERTRAND
+Michal
