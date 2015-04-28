@@ -1,61 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from youngberry.canonical.com ([91.189.89.112]:39989 "EHLO
-	youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932506AbbD0Qny (ORCPT
+Received: from lb3-smtp-cloud2.xs4all.net ([194.109.24.29]:54005 "EHLO
+	lb3-smtp-cloud2.xs4all.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S932150AbbD1ITb (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 27 Apr 2015 12:43:54 -0400
-From: Chris J Arges <chris.j.arges@canonical.com>
-Subject: [PATCH v2] builddeb: parallelize debug module installation
-Date: Mon, 27 Apr 2015 11:43:39 -0500
-Message-Id: <1430153019-31596-1-git-send-email-chris.j.arges@canonical.com>
-In-Reply-To: <553E4633.8080606@suse.cz>
-References: <553E4633.8080606@suse.cz>
+	Tue, 28 Apr 2015 04:19:31 -0400
+Message-ID: <1430209167.2411.41.camel@x220>
+Subject: Re: [PATCH] kconfig: add tinfo library if it exists to lxdialog
+ linking flags
+From: Paul Bolle <pebolle@tiscali.nl>
+Date: Tue, 28 Apr 2015 10:19:27 +0200
+In-Reply-To: <20150427120019.GA567@freedom>
+References: <20150425160546.GA4002@freedom> <1430083148.2411.15.camel@x220>
+	 <20150427120019.GA567@freedom>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org, mmarek@suse.cz
-Cc: linux-kernel@vger.kernel.org, Chris J Arges <chris.j.arges@canonical.com>
+To: sylvain.bertrand@gmail.com
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-When building the dbg package, we use a large 'for module in $(find' loop that
-can be easily parallelized by using 'find | xargs'. This patch modifies this
-loop to use the later paradigm.
+On Mon, 2015-04-27 at 12:00 +0000, sylvain.bertrand@gmail.com wrote:
+> The pkg-config file I use is straight from the ncurses distribution with the
+> lastest "rollup" patch.
+> 
+> Either it's a fedora specific modification, either a genuine ncurses patch
+> released after the lastest "rollup" patch.
 
-In addition, ensure we add '-n1 -P0' to xargs to run as many processes as
-possible.
+(If I read ftp://invisible-island.net/ncurses/5.9/README correctly, a
+rollup is the patch that should be applied on top of the latest ncurses
+release in order to get a development snapshot.)
 
-Signed-off-by: Chris J Arges <chris.j.arges@canonical.com>
----
- scripts/package/builddeb | 15 ++++++++-------
- 1 file changed, 8 insertions(+), 7 deletions(-)
+What version of ncurses are you actually using?
 
-diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index 88dbf23..538f829 100755
---- a/scripts/package/builddeb
-+++ b/scripts/package/builddeb
-@@ -152,16 +152,17 @@ if grep -q '^CONFIG_MODULES=y' $KCONFIG_CONFIG ; then
- 		rmdir "$tmpdir/lib/modules/$version"
- 	fi
- 	if [ -n "$BUILD_DEBUG" ] ; then
--		for module in $(find $tmpdir/lib/modules/ -name *.ko -printf '%P\n'); do
--			module=lib/modules/$module
--			mkdir -p $(dirname $dbg_dir/usr/lib/debug/$module)
-+		find $tmpdir/lib/modules/ -name *.ko -printf '%P\n' | xargs -n1 -P0 -I {} sh -c '
-+			mkdir -p $(dirname '"$dbg_dir"'/usr/lib/debug/lib/modules/$1);'"
- 			# only keep debug symbols in the debug file
--			$OBJCOPY --only-keep-debug $tmpdir/$module $dbg_dir/usr/lib/debug/$module
-+			$OBJCOPY --only-keep-debug $tmpdir/lib/modules/{} \
-+				$dbg_dir/usr/lib/debug/lib/modules/{};
- 			# strip original module from debug symbols
--			$OBJCOPY --strip-debug $tmpdir/$module
-+			$OBJCOPY --strip-debug $tmpdir/lib/modules/{};
- 			# then add a link to those
--			$OBJCOPY --add-gnu-debuglink=$dbg_dir/usr/lib/debug/$module $tmpdir/$module
--		done
-+			$OBJCOPY --add-gnu-debuglink=$dbg_dir/usr/lib/debug/lib/modules/{} \
-+				$tmpdir/lib/modules/{};
-+		" -- {}
- 	fi
- fi
- 
--- 
-1.9.1
+> As far I understand it, from an application point of view, "standard" ncurses
+> programming, in the case where tinfo lib is outside of ncurses lib, involves
+> linking to libncurses library only. libtinfo linking would be required only in
+> some special features are used, which seems to be the case with lxdialog.
+
+On my Fedora 20 box linking to libtinfo is only necessary if you're
+linking an application that's using libncurses statically.
+
+> Please correct me if I'm wrong.
+
+I have no idea.
+
+Perhaps - and I'm speculating here - some features got moved from
+ncurses(w) to tinfo. Anyhow, over here linking to tinfo is unneeded but
+doesn't break mconf as far as I noticed. But, personally, I'd like to
+know what triggered the issue you ran into before considering this
+patch.
+
+
+Paul Bolle
 
