@@ -1,164 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mo4-p04-ob.smtp.rzone.de ([81.169.146.176]:22543 "EHLO
-	mo4-p04-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751078AbbEGNM1 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 7 May 2015 09:12:27 -0400
-From: Stefan Roese <sr@denx.de>
-Subject: [PATCH] Kconfig: Enable usage of escape char '\' in string values
-Date: Thu,  7 May 2015 15:06:22 +0200
-Message-Id: <1431003982-992-1-git-send-email-sr@denx.de>
+Received: from numascale.com ([213.162.240.84]:43765 "EHLO numascale.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750842AbbEHHmk (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 8 May 2015 03:42:40 -0400
+From: Espen Carlsen <ec@numascale.com>
+Subject: [PATCH] build: fix broken kernel RPM source symlink
+Date: Fri,  8 May 2015 09:42:17 +0200
+Message-Id: <1431070937-3884-1-git-send-email-ec@numascale.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.cz>, "Yann E. MORIN" <yann.morin.1998@free.fr>
+To: Michal Marek <mmarek@suse.cz>
+Cc: Espen Carlsen <ec@numascale.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Daniel J Blueman <daniel@numascale.com>, Steffen Persvold <sp@numascale.com>
 
-I might have missed something, but I failed to use the escape char '\'
-in strings. To pass a printf format string like "foo %d bar\n" via
-Kconfig to the code.
+Fix the 'rpm-pkg' makefile target to always generate the correct
+/usr/src/kernel/<ver> symlink; this fails on non-RPM-native systems
+eg Ubuntu.
 
-Right now its not possible to use the escape character '\' in Kconfig
-string values correctly to e.g. set this string value "test output\n".
-The '\n' will be converted to 'n'.
+On a non-RPM-native system, the symlink created by rpmbuild points to
+the source tree, so the ln -sf commands to overwrite build and source will
+create a new link inside the directory pointed to by the build and source
+symlinks. This will break the -devel.rpm, as the build and source symlinks
+will point to non existing directories after installing them.
 
-The current implementation removes some of the '\' chars from the input
-string in conf_set_sym_val(). Examples:
+Candidate for stable.
 
-'\'	-> ''
-'\\'	-> '\'
-'\\\'	-> '\'
-'\\\\'	-> '\\'
-...
-
-And then doubles the backslash chars in the output string in
-sym_escape_string_value(). Example:
-
-'\'	-> ''	-> ''
-'\\'	-> '\'	-> '\\'
-'\\\'	-> '\'	-> '\\'
-'\\\\'	-> '\\'	-> '\\\\'
-...
-
-As you see in these examples, its impossible to generate a single '\'
-charater in the output string as its needed for something like '\n'.
-
-This patch now changes this behavior to not drop some backslashes in
-conf_set_sym_val() and to not add new backslashes in the resulting
-output string. Removing the function sym_escape_string_value()
-completely as its not needed anymore.
-
-Signed-off-by: Stefan Roese <sr@denx.de>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Michal Marek <mmarek@suse.cz>
-Cc: Yann E. MORIN <yann.morin.1998@free.fr>
+Signed-off-by: Espen Carlsen <ec@numascale.com>
 ---
- scripts/kconfig/confdata.c | 20 +++++++++-----------
- scripts/kconfig/symbol.c   | 43 -------------------------------------------
- 2 files changed, 9 insertions(+), 54 deletions(-)
+ scripts/package/mkspec | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-index c814f57..0c4200a 100644
---- a/scripts/kconfig/confdata.c
-+++ b/scripts/kconfig/confdata.c
-@@ -161,18 +161,14 @@ static int conf_set_sym_val(struct symbol *sym, int def, int def_flags, char *p)
- 	case S_STRING:
- 		if (*p++ != '"')
- 			break;
--		for (p2 = p; (p2 = strpbrk(p2, "\"\\")); p2++) {
--			if (*p2 == '"') {
--				*p2 = 0;
--				break;
--			}
--			memmove(p2, p2 + 1, strlen(p2));
--		}
--		if (!p2) {
-+		/* Last char has to be a '"' */
-+		if (p[strlen(p) - 1] != '"') {
- 			if (def != S_DEF_AUTO)
- 				conf_warning("invalid string found");
- 			return 1;
- 		}
-+		/* Overwrite '"' with \0 for string termination */
-+		p[strlen(p) - 1] = 0;
- 		/* fall through */
- 	case S_INT:
- 	case S_HEX:
-@@ -630,6 +626,7 @@ static void conf_write_symbol(FILE *fp, struct symbol *sym,
- 			      struct conf_printer *printer, void *printer_arg)
- {
- 	const char *str;
-+	char *str2;
+diff --git a/scripts/package/mkspec b/scripts/package/mkspec
+index d9ab94b..2d28d48 100755
+--- a/scripts/package/mkspec
++++ b/scripts/package/mkspec
+@@ -123,8 +123,8 @@ echo "mkdir -p "'$RPM_BUILD_ROOT'"/usr/src/kernels/$KERNELRELEASE"
+ echo "EXCLUDES=\"$RCS_TAR_IGNORE --exclude .tmp_versions --exclude=*vmlinux* --exclude=*.o --exclude=*.ko --exclude=*.cmd --exclude=Documentation --exclude=firmware --exclude .config.old --exclude .missing-syscalls.d\""
+ echo "tar "'$EXCLUDES'" -cf- . | (cd "'$RPM_BUILD_ROOT'"/usr/src/kernels/$KERNELRELEASE;tar xvf -)"
+ echo 'cd $RPM_BUILD_ROOT'"/lib/modules/$KERNELRELEASE"
+-echo "ln -sf /usr/src/kernels/$KERNELRELEASE build"
+-echo "ln -sf /usr/src/kernels/$KERNELRELEASE source"
++echo "ln -sfT /usr/src/kernels/$KERNELRELEASE build"
++echo "ln -sfT /usr/src/kernels/$KERNELRELEASE source"
+ fi
  
- 	switch (sym->type) {
- 	case S_OTHER:
-@@ -637,9 +634,10 @@ static void conf_write_symbol(FILE *fp, struct symbol *sym,
- 		break;
- 	case S_STRING:
- 		str = sym_get_string_value(sym);
--		str = sym_escape_string_value(str);
--		printer->print_symbol(fp, sym, str, printer_arg);
--		free((void *)str);
-+		str2 = xmalloc(strlen(str) + 2);
-+		sprintf(str2, "\"%s\"", str);
-+		printer->print_symbol(fp, sym, str2, printer_arg);
-+		free((void *)str2);
- 		break;
- 	default:
- 		str = sym_get_string_value(sym);
-diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
-index 6731377..550e1d7 100644
---- a/scripts/kconfig/symbol.c
-+++ b/scripts/kconfig/symbol.c
-@@ -912,49 +912,6 @@ const char *sym_expand_string_value(const char *in)
- 	return res;
- }
- 
--const char *sym_escape_string_value(const char *in)
--{
--	const char *p;
--	size_t reslen;
--	char *res;
--	size_t l;
--
--	reslen = strlen(in) + strlen("\"\"") + 1;
--
--	p = in;
--	for (;;) {
--		l = strcspn(p, "\"\\");
--		p += l;
--
--		if (p[0] == '\0')
--			break;
--
--		reslen++;
--		p++;
--	}
--
--	res = xmalloc(reslen);
--	res[0] = '\0';
--
--	strcat(res, "\"");
--
--	p = in;
--	for (;;) {
--		l = strcspn(p, "\"\\");
--		strncat(res, p, l);
--		p += l;
--
--		if (p[0] == '\0')
--			break;
--
--		strcat(res, "\\");
--		strncat(res, p++, 1);
--	}
--
--	strcat(res, "\"");
--	return res;
--}
--
- struct sym_match {
- 	struct symbol	*sym;
- 	off_t		so, eo;
+ echo ""
 -- 
-2.4.0
+1.9.1
 
