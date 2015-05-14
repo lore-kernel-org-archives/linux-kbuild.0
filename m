@@ -1,66 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wg0-f49.google.com ([74.125.82.49]:33305 "EHLO
-	mail-wg0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932790AbbELOdf convert rfc822-to-8bit (ORCPT
+Received: from lb2-smtp-cloud6.xs4all.net ([194.109.24.28]:35275 "EHLO
+	lb2-smtp-cloud6.xs4all.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752786AbbENLES (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 12 May 2015 10:33:35 -0400
-Subject: Re: [PATCH/RFC] kbuild: Create a rule for building device tree overlay objects
-Mime-Version: 1.0 (Mac OS X Mail 8.2 \(2098\))
-Content-Type: text/plain; charset=utf-8
-From: Pantelis Antoniou <pantelis.antoniou@gmail.com>
-In-Reply-To: <1431431816-24612-1-git-send-email-geert+renesas@glider.be>
-Date: Tue, 12 May 2015 17:33:29 +0300
-Content-Transfer-Encoding: 8BIT
-Message-Id: <D4386733-8722-478F-8BB6-FB86597D9E37@gmail.com>
-References: <1431431816-24612-1-git-send-email-geert+renesas@glider.be>
+	Thu, 14 May 2015 07:04:18 -0400
+Message-ID: <1431601446.2650.76.camel@x220>
+Subject: Re: [PATCH 1/4] init/Kconfig: Fix break in middle of EXPERT menu
+From: Paul Bolle <pebolle@tiscali.nl>
+Date: Thu, 14 May 2015 13:04:06 +0200
+In-Reply-To: <e71aeef65671f2b60ce10b0b871585fd2baf850a.1431531573.git.josh@joshtriplett.org>
+References: <e71aeef65671f2b60ce10b0b871585fd2baf850a.1431531573.git.josh@joshtriplett.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Geert Uytterhoeven <geert+renesas@glider.be>
-Cc: linux-kbuild@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Josh Triplett <josh@joshtriplett.org>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Ingo Molnar <mingo@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Michal Hocko <mhocko@suse.cz>, Vladimir Davydov <vdavydov@parallels.com>, Johannes Weiner <hannes@cmpxchg.org>, Geert Uytterhoeven <geert@linux-m68k.org>, Andy Lutomirski <luto@amacapital.net>, Bertrand Jacquin <beber@meleeweb.net>, "Luis R. Rodriguez" <mcgrof@suse.com>, Iulia Manda <iulia.manda21@gmail.com>, Pranith Kumar <bobby.prani@gmail.com>, Clark Williams <clark.williams@gmail.com>, Mel Gorman <mgorman@suse.de>, Randy Dunlap <rdunlap@infradead.org>, linux-kernel@vger.kernel.org
 
-Hi Geert,
+[Adding Michal and linux-kbuild.]
 
-> On May 12, 2015, at 14:56 , Geert Uytterhoeven <geert+renesas@glider.be> wrote:
-> 
-> This allows to handle device tree overlays like plain device trees.
-> 
-> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-> ---
-> Questions:
->  - Do we want dtso files under arch/<arch>/boot/dts/, too?
->  - Do we want to move the dts files outside the kernel repository
->    first?
-> 
+Hi Josh,
 
-Oh that’s a nice hornet’s nest you’ve kicked here.
+Could you please resend this series to include Michal and linux-kbuild?
+Don't bother to include Yann. (I almost forwarded the entire series but
+that looked impractical for patches.)
 
-arch/<arch>/boot/dts should not be the place, cause overlays are not related with boot per se.
-As they are right now are board (family) specific.
+Please split 4/4 into two patches, while you're at it. Ie, 5/5 for
+init/Kconfig.expert only, and 4/5 for the changes to scripts/kconfig/.
 
-I think we should try to keep an external kernel repo with them for now until we
-figure out where to put them.
+Thanks,
 
-> scripts/Makefile.lib | 3 +++
-> 1 file changed, 3 insertions(+)
-> 
-> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-> index 79e86613712f2230..4b14eef1d4b2ce8f 100644
-> --- a/scripts/Makefile.lib
-> +++ b/scripts/Makefile.lib
-> @@ -292,6 +292,9 @@ cmd_dtc = mkdir -p $(dir ${dtc-tmp}) ; \
-> $(obj)/%.dtb: $(src)/%.dts FORCE
-> 	$(call if_changed_dep,dtc)
-> 
-> +$(obj)/%.dtbo: $(src)/%.dtso FORCE
-> +	$(call if_changed_dep,dtc)
-> +
-> dtc-tmp = $(subst $(comma),_,$(dot-target).dts.tmp)
-> 
-> # Bzip2
-> -- 
-> 1.9.1
 
-Regards
-
-— Pantelis
+Paul Bolle
 
