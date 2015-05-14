@@ -1,40 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp2-g21.free.fr ([212.27.42.2]:53033 "EHLO smtp2-g21.free.fr"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932480AbbENMgJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 14 May 2015 08:36:09 -0400
-From: Yves-Alexis Perez <corsac@debian.org>
-Subject: [PATCH] builddeb: generate a changes file from the build
-Date: Thu, 14 May 2015 14:35:08 +0200
-Message-Id: <1431606908-20880-1-git-send-email-corsac@debian.org>
+Received: from relay3-d.mail.gandi.net ([217.70.183.195]:35812 "EHLO
+	relay3-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933494AbbENPfh (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 14 May 2015 11:35:37 -0400
+Date: Thu, 14 May 2015 08:35:23 -0700
+From: Josh Triplett <josh@joshtriplett.org>
+Subject: [PATCH 1/5] init/Kconfig: Fix break in middle of EXPERT menu
+Message-ID: <e71aeef65671f2b60ce10b0b871585fd2baf850a.1431589089.git.josh@joshtriplett.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Yves-Alexis Perez <corsac@debian.org>
+To: Ingo Molnar <mingo@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Michal Hocko <mhocko@suse.cz>, Josh Triplett <josh@joshtriplett.org>, Vladimir Davydov <vdavydov@parallels.com>, Johannes Weiner <hannes@cmpxchg.org>, Geert Uytterhoeven <geert@linux-m68k.org>, Andy Lutomirski <luto@amacapital.net>, Bertrand Jacquin <beber@meleeweb.net>, "Luis R. Rodriguez" <mcgrof@suse.com>, Iulia Manda <iulia.manda21@gmail.com>, Pranith Kumar <bobby.prani@gmail.com>, Clark Williams <clark.williams@gmail.com>, Mel Gorman <mgorman@suse.de>, Randy Dunlap <rdunlap@infradead.org>, Paul Bolle <pebolle@tiscali.nl>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-A changes file (also called Debian upload control file) contains
-information about binary packages, including the changelog entry, the
-maintainer, the package list and the checksums.
+Commit e1abf2cc8d5 ("bpf: Fix the build on BPF_SYSCALL=y &&
+!CONFIG_TRACING kernels, make it more configurable") made BPF_SYSCALL no
+longer hidden with !EXPERT, but left it in the middle of the EXPERT
+menu.  menuconfig stops putting config items under a submenu once it
+encounters an item that doesn't depend on the menu's config item, so
+this caused the remainder of the EXPERT menu to spill out into the
+containing menu around it.  Fix by moving BPF_SYSCALL before the EXPERT
+menu, next to BPF.
 
-It can be used by various Debian tools like dput and dcmd to execute
-action on all the build packages at once, for example uploading the
-packages to an dedicated Debian repository.
+Fixes: e1abf2cc8d5 ("bpf: Fix the build on BPF_SYSCALL=y && !CONFIG_TRACING kernels, make it more configurable")
+Signed-off-by: Josh Triplett <josh@joshtriplett.org>
 ---
- scripts/package/builddeb | 3 +++
- 1 file changed, 3 insertions(+)
+ init/Kconfig | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index 88dbf23..46c2838 100755
---- a/scripts/package/builddeb
-+++ b/scripts/package/builddeb
-@@ -383,4 +383,7 @@ EOF
- 	create_package "$dbg_packagename" "$dbg_dir"
- fi
+diff --git a/init/Kconfig b/init/Kconfig
+index dc24dec..e2f16f1 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -1341,6 +1341,16 @@ config HAVE_PCSPKR_PLATFORM
+ config BPF
+ 	bool
  
-+# Generate a change file
-+(cd $KBUILD_OUTPUT; dpkg-genchanges -b > ../linux_${packageversion}_${debarch}.changes)
++# syscall, maps, verifier
++config BPF_SYSCALL
++	bool "Enable bpf() system call"
++	select ANON_INODES
++	select BPF
++	default n
++	help
++	  Enable the bpf() system call that allows to manipulate eBPF
++	  programs and maps via file descriptors.
 +
- exit 0
+ menuconfig EXPERT
+ 	bool "Configure standard kernel features (expert users)"
+ 	# Unhide debug options, to make the on-by-default options visible
+@@ -1535,16 +1545,6 @@ config EVENTFD
+ 
+ 	  If unsure, say Y.
+ 
+-# syscall, maps, verifier
+-config BPF_SYSCALL
+-	bool "Enable bpf() system call"
+-	select ANON_INODES
+-	select BPF
+-	default n
+-	help
+-	  Enable the bpf() system call that allows to manipulate eBPF
+-	  programs and maps via file descriptors.
+-
+ config SHMEM
+ 	bool "Use full shmem filesystem" if EXPERT
+ 	default y
 -- 
 2.1.4
 
