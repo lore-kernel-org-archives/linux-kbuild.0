@@ -1,34 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f175.google.com ([209.85.212.175]:37404 "EHLO
-	mail-wi0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750728AbbESEGO (ORCPT
+Received: from mout.kundenserver.de ([212.227.17.24]:54364 "EHLO
+	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754539AbbESMri (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 19 May 2015 00:06:14 -0400
-Received: by wibt6 with SMTP id t6so6178016wib.0
-        for <linux-kbuild@vger.kernel.org>; Mon, 18 May 2015 21:06:13 -0700 (PDT)
-Date: Tue, 19 May 2015 06:06:08 +0200
-From: Petr Vorel <petr.vorel@gmail.com>
-Subject: Re: [PATCH] [RFC] kconfig: menuconfig make "Selected by:" readable
-Message-ID: <20150519040606.GA18127@t61>
-Reply-To: Petr Vorel <petr.vorel@gmail.com>
-References: <20150518211925.GD11015@t61>
- <1431984486.9091.34.camel@x220>
+	Tue, 19 May 2015 08:47:38 -0400
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH] ASoC: omap: fix up SND_OMAP_SOC_OMAP_ABE_TWL6040 dependency, again
+Date: Tue, 19 May 2015 14:47:32 +0200
+Message-ID: <3413182.qcoNiOhonF@wuerfel>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1431984486.9091.34.camel@x220>
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Paul Bolle <pebolle@tiscali.nl>
-Cc: linux-kbuild@vger.kernel.org, mmarek@suse.cz
+To: alsa-devel@alsa-project.org
+Cc: broonie@kernel.org, lgirdwood@gmail.com, peter.ujfalusi@ti.com, linux-omap@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 
-Hi Paul,
+I tried to fix this before and submitted a working patch, but after
+some discussion we came up with what seemed to be a nicer solution,
+resulting in commit 3d4cf65e2d ("ASoC: omap: fix up
+SND_OMAP_SOC_OMAP_ABE_TWL6040 dependency"). Unfortunately, that
+version was incomplete, and we still get this build error:
 
-> There are quite a few Kconfig related things that I should put more
-> effort into. Let's call the sum of those my "social debt". I'm not sure
-> how I'll handle that debt, but feel free to prod me in a few weeks about
-> the status of this idea. Perhaps that will help me at least handle this
-> part.
-Sure, I will :-). Thanks for your effort.
+drivers/clk/clk-palmas.c:46:16: error: field 'hw' has incomplete type
+drivers/clk/clk-palmas.c: In function 'to_palmas_clks_info':
+drivers/clk/clk-palmas.c:54:74: warning: initialization from incompatible pointer type [-Winc
 
-Petr
+This happens only in randconfig builds that turn on MFD_PALMAS
+on a platform other than OMAP2+ when COMPILE_TEST is set
+but COMMON_CLK is not.
+
+The new approach is only 'select COMMON_CLK_PALMAS' if we know
+that we are on an OMAP5 platform and MFD_PALMAS is already set.
+This patch has survived thousands of randconfig builds and I
+don't see a remaining hole in the logic.
+
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Fixes: 3d4cf65e2d ("ASoC: omap: fix up SND_OMAP_SOC_OMAP_ABE_TWL6040 dependency")
+
+diff --git a/sound/soc/omap/Kconfig b/sound/soc/omap/Kconfig
+index 6768e4f7d7d0..30d0109703a9 100644
+--- a/sound/soc/omap/Kconfig
++++ b/sound/soc/omap/Kconfig
+@@ -100,12 +100,13 @@ config SND_OMAP_SOC_OMAP_TWL4030
+ 
+ config SND_OMAP_SOC_OMAP_ABE_TWL6040
+ 	tristate "SoC Audio support for OMAP boards using ABE and twl6040 codec"
+-	depends on TWL6040_CORE && SND_OMAP_SOC && (ARCH_OMAP4 || SOC_OMAP5 || COMPILE_TEST)
++	depends on TWL6040_CORE && SND_OMAP_SOC
++	depends on ARCH_OMAP4 || (SOC_OMAP5 && MFD_PALMAS) || COMPILE_TEST
+ 	select SND_OMAP_SOC_DMIC
+ 	select SND_OMAP_SOC_MCPDM
+ 	select SND_SOC_TWL6040
+ 	select SND_SOC_DMIC
+-	select COMMON_CLK_PALMAS if MFD_PALMAS
++	select COMMON_CLK_PALMAS if (SOC_OMAP5 && MFD_PALMAS)
+ 	help
+ 	  Say Y if you want to add support for SoC audio on OMAP boards using
+ 	  ABE and twl6040 codec. This driver currently supports:
+
