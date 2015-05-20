@@ -1,61 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.17.24]:54364 "EHLO
-	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754539AbbESMri (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 19 May 2015 08:47:38 -0400
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH] ASoC: omap: fix up SND_OMAP_SOC_OMAP_ABE_TWL6040 dependency, again
-Date: Tue, 19 May 2015 14:47:32 +0200
-Message-ID: <3413182.qcoNiOhonF@wuerfel>
+Received: from cantor2.suse.de ([195.135.220.15]:39689 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751305AbbETFKR (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 20 May 2015 01:10:17 -0400
+Message-ID: <555C172F.3020708@suse.cz>
+Date: Wed, 20 May 2015 13:10:07 +0800
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Subject: Re: [PATCHv4 1/1] deb-pkg: Add device tree blobs to the package
+References: <20150203121648.046396044@rtp-net.org> <20150422155535.GC32026@gluino>
+In-Reply-To: <20150422155535.GC32026@gluino>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: alsa-devel@alsa-project.org
-Cc: broonie@kernel.org, lgirdwood@gmail.com, peter.ujfalusi@ti.com, linux-omap@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: maximilian attems <max@stro.at>, Arnaud Patard <arnaud.patard@rtp-net.org>
+Cc: linux-kbuild@vger.kernel.org, Ben Hutchings <ben@decadent.org.uk>
 
-I tried to fix this before and submitted a working patch, but after
-some discussion we came up with what seemed to be a nicer solution,
-resulting in commit 3d4cf65e2d ("ASoC: omap: fix up
-SND_OMAP_SOC_OMAP_ABE_TWL6040 dependency"). Unfortunately, that
-version was incomplete, and we still get this build error:
+Dne 22.4.2015 v 23:55 maximilian attems napsal(a):
+> On Tue, Feb 03, 2015 at 01:16:33PM +0100, Arnaud Patard wrote:
+>> When building a package with make deb-pkg (say, for arm), the dtb files are
+>> not added to the package. Given that things are still evolving on arm, it
+>> make sense to have them along with the kernel and modules.
+>>
+>> v4: Use $KCONFIG_CONFIG
+>> v3: handle with OF but without dtbs_install.
+>>     Use $MAKE ... as done everywhere else in the script
+>> v2: make use of dtbs_install
+>>
+>> Signed-off-by: Arnaud Patard <arnaud.patard@rtp-net.org>
+>> ---
+> 
+> the patch seems to apply to current linus with 
+> Hunk #1 succeeded at 143 with fuzz 1.
+> 
+> acked.
 
-drivers/clk/clk-palmas.c:46:16: error: field 'hw' has incomplete type
-drivers/clk/clk-palmas.c: In function 'to_palmas_clks_info':
-drivers/clk/clk-palmas.c:54:74: warning: initialization from incompatible pointer type [-Winc
+Applied to kbuild.git#misc now, sorry for the delay.
 
-This happens only in randconfig builds that turn on MFD_PALMAS
-on a platform other than OMAP2+ when COMPILE_TEST is set
-but COMMON_CLK is not.
-
-The new approach is only 'select COMMON_CLK_PALMAS' if we know
-that we are on an OMAP5 platform and MFD_PALMAS is already set.
-This patch has survived thousands of randconfig builds and I
-don't see a remaining hole in the logic.
-
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-Fixes: 3d4cf65e2d ("ASoC: omap: fix up SND_OMAP_SOC_OMAP_ABE_TWL6040 dependency")
-
-diff --git a/sound/soc/omap/Kconfig b/sound/soc/omap/Kconfig
-index 6768e4f7d7d0..30d0109703a9 100644
---- a/sound/soc/omap/Kconfig
-+++ b/sound/soc/omap/Kconfig
-@@ -100,12 +100,13 @@ config SND_OMAP_SOC_OMAP_TWL4030
- 
- config SND_OMAP_SOC_OMAP_ABE_TWL6040
- 	tristate "SoC Audio support for OMAP boards using ABE and twl6040 codec"
--	depends on TWL6040_CORE && SND_OMAP_SOC && (ARCH_OMAP4 || SOC_OMAP5 || COMPILE_TEST)
-+	depends on TWL6040_CORE && SND_OMAP_SOC
-+	depends on ARCH_OMAP4 || (SOC_OMAP5 && MFD_PALMAS) || COMPILE_TEST
- 	select SND_OMAP_SOC_DMIC
- 	select SND_OMAP_SOC_MCPDM
- 	select SND_SOC_TWL6040
- 	select SND_SOC_DMIC
--	select COMMON_CLK_PALMAS if MFD_PALMAS
-+	select COMMON_CLK_PALMAS if (SOC_OMAP5 && MFD_PALMAS)
- 	help
- 	  Say Y if you want to add support for SoC audio on OMAP boards using
- 	  ABE and twl6040 codec. This driver currently supports:
+Michal
 
