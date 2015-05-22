@@ -1,164 +1,255 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.skyhub.de ([78.46.96.112]:37379 "EHLO mail.skyhub.de"
+Received: from mout.web.de ([212.227.15.14]:49291 "EHLO mout.web.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756038AbbEVKzy (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 22 May 2015 06:55:54 -0400
-Date: Fri, 22 May 2015 12:55:49 +0200
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [RFC][PATCH 2/2] kallsyms: Do not display SyS_foo() syscall
- aliases in kallsyms
-Message-ID: <20150522105549.GG23022@pd.tnic>
-References: <20150506181831.145849116@goodmis.org>
- <20150506182359.216601202@goodmis.org>
+	id S1752617AbbEVLl6 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 22 May 2015 07:41:58 -0400
+From: Martin Walch <walch.martin@web.de>
+Subject: [PATCH v4] Kconfig: Remove bad inference rules expr_eliminate_dups2()
+Date: Fri, 22 May 2015 13:41:52 +0200
+Message-ID: <47745287.pcmKhRVW0u@tacticalops>
+In-Reply-To: <555D7D9C.7010701@suse.cz>
+References: <6333557.fobqH0bixi@tacticalops> <5729946.JOCDOEaf0S@tacticalops> <555D7D9C.7010701@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20150506182359.216601202@goodmis.org>
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>, Andrew Morton <akpm@linux-foundation.org>, Al Viro <viro@zeniv.linux.org.uk>
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org
 
-On Wed, May 06, 2015 at 02:18:33PM -0400, Steven Rostedt wrote:
-> From: "Steven Rostedt (Red Hat)" <rostedt@goodmis.org>
-> 
-> The SyS_foo() alias wrapper was added to make sure that system call
-> arguments were signed extended. The call itself is to never be used
-> by anything, only the sys_foo() version is. But this symbol is stored
-> in /proc/kallsyms, and is returned sometimes as the name of system
-> call functions when a ksym lookup is made, it confuses the function
-> tracer interface (see available_filter_functions in the tracefs
-> directory).
-> 
-> Al Viro even suggested that this should be removed from kallsyms
-> as well:
-> 
-> Link: http://lkml.kernel.org/r/20130510211716.GN25399@ZenIV.linux.org.uk
-> 
-> Modify the compile time kallsyms.c to check if the function name
-> begins with SyS_ and is before or after the same name that starts
-> with sys_ and if so, do not record it. This saves some space and
-> more importantly removes the confusing variations of the system
-> call name.
-> 
->  wc kallsyms.*
->   90151  284644 3819255 kallsyms.orig
->   89826  283669 3808628 kallsyms.patched
-> 
->  size vmlinux*
->    text    data     bss     dec     hex filename
-> 9990933 2368592 1249280 13608805         cfa765 vmlinux.orig
-> 9986837 2368592 1249280 13604709         cf9765 vmlinux.patched
-> 
-> This patch only removes SyS_*, it does not do anything with
-> compat_SyS_*.
-> 
-> Cc: Al Viro <viro@zeniv.linux.org.uk>
-> Signed-off-by: Steven Rostedt <rostedt@goodmis.org>
-> ---
->  scripts/kallsyms.c | 43 ++++++++++++++++++++++++++++++++++++++-----
->  1 file changed, 38 insertions(+), 5 deletions(-)
-> 
-> diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
-> index 8fa81e84e295..a64d89c6641c 100644
-> --- a/scripts/kallsyms.c
-> +++ b/scripts/kallsyms.c
-> @@ -193,8 +193,22 @@ static int symbol_in_range(struct sym_entry *s, struct addr_range *ranges,
->  	return 0;
->  }
->  
-> -static int symbol_valid(struct sym_entry *s)
-> +static const char *skip_prefix(const char *sym)
->  {
-> +	if (symbol_prefix_char && *sym == symbol_prefix_char)
-> +		return sym + 1;
-> +	return sym;
-> +}
+From: Martin Walch <walch.martin@web.de>
 
-scripts/kallsyms.c: In function ‘symbol_valid’:
-scripts/kallsyms.c:241:11: warning: assignment discards ‘const’ qualifier from pointer target type
-  sym_name = skip_prefix(sym_name);
-           ^
-scripts/kallsyms.c:277:20: warning: assignment discards ‘const’ qualifier from pointer target type
-    sym_name_before = skip_prefix(sym_name_before);
-                    ^
-scripts/kallsyms.c:282:19: warning: assignment discards ‘const’ qualifier from pointer target type
-    sym_name_after = skip_prefix(sym_name_after);
-                   ^
+expr_eliminate_dups2() in scripts/kconfig/expr.c applies two invalid
+inference rules:
 
-That sym_name should be const?
+(FOO || BAR) && (!FOO && !BAR) -> n
+(FOO && BAR) || (!FOO || !BAR) -> y
 
-> +
-> +static int match_sys(const char *sym, const char *sys)
-> +{
-> +	return !strncmp(sys, "sys_", 4) && !strcmp(sym + 4, sys + 4);
-> +}
-> +
-> +static int symbol_valid(int idx)
-> +{
-> +	struct sym_entry *s = &table[idx];
-> +
->  	/* Symbols which vary between passes.  Passes 1 and 2 must have
->  	 * identical symbol lists.  The kallsyms_* symbols below are only added
->  	 * after pass 1, they would be included in pass 2 when --all-symbols is
-> @@ -224,9 +238,7 @@ static int symbol_valid(struct sym_entry *s)
->  	if (s->addr < kernel_start_addr)
->  		return 0;
->  
-> -	/* skip prefix char */
-> -	if (symbol_prefix_char && *sym_name == symbol_prefix_char)
-> -		sym_name++;
-> +	sym_name = skip_prefix(sym_name);
->  
->  
->  	/* if --all-symbols is not specified, then symbols outside the text
-> @@ -255,6 +267,27 @@ static int symbol_valid(struct sym_entry *s)
->  		if (strcmp(sym_name, special_symbols[i]) == 0)
->  			return 0;
->  
-> +	/* Ignore SyS_* alias system calls */
-> +	if (!strncmp(sym_name, "SyS_", 4)) {
+They would be correct in propositional logic, but this is a three-valued
+logic, and here it is wrong in that it changes semantics. It becomes
+immediately visible when assigning the value 1 to both, FOO and BAR:
 
-I guess we won't have to hide more symbols from kallsyms. If we do, then
-probably will have to generalize this... Oh well.
+(FOO || BAR) && (!FOO && !BAR)
+-> min(max(1, 1), min(2-1, 2-1)) = min(1, 1) = 1
 
-Other than that, I think this a step in the right direction as the first
-patch makes the SyS_ symbols local and that's a good way for tools
-parsing the symbol table to know which symbol to show:
+while n evaluates to 0 and
 
-readelf -a vmlinux | grep -iE "\Wsys_" | sort -k8 | head -50
- 77462: ffffffff815928f0    18 FUNC    GLOBAL DEFAULT    1 sys_accept
- 43024: ffffffff815928f0    18 FUNC    LOCAL  DEFAULT    1 SyS_accept
- 71564: ffffffff815926e0   526 FUNC    GLOBAL DEFAULT    1 sys_accept4
- 43023: ffffffff815926e0   526 FUNC    LOCAL  DEFAULT    1 SyS_accept4
- 50484: ffffffff81181170    26 FUNC    GLOBAL DEFAULT    1 sys_access
- 12656: ffffffff81181170    26 FUNC    LOCAL  DEFAULT    1 SyS_access
- ...
+(FOO && BAR) || (!FOO || !BAR)
+-> max(min(1, 1), max(2-1, 2-1)) = max(1, 1) = 1
 
-i.e., the global one, provided all the other attributes are the same.
+with y evaluating to 2.
 
-Before that we had them all identical:
+Fix it by removing expr_eliminate_dups2() and the functions that have no
+use anywhere else: expr_extract_eq_and(), expr_extract_eq_or(),
+and expr_extract_eq() from scripts/kconfig/expr.c
 
-readelf -a vmlinux | grep -iE "\Wsys_" | sort -k8 | head -50
- 77446: ffffffff815928f0    18 FUNC    GLOBAL DEFAULT    1 sys_accept
- 69532: ffffffff815928f0    18 FUNC    GLOBAL DEFAULT    1 SyS_accept
- 71484: ffffffff815926e0   526 FUNC    GLOBAL DEFAULT    1 sys_accept4
- 50916: ffffffff815926e0   526 FUNC    GLOBAL DEFAULT    1 SyS_accept4
- 50192: ffffffff81181170    26 FUNC    GLOBAL DEFAULT    1 sys_access
- 59364: ffffffff81181170    26 FUNC    GLOBAL DEFAULT    1 SyS_access
- 52487: ffffffff81078920    18 FUNC    WEAK   DEFAULT    1 sys_acct
- 57730: ffffffff812b7d20   629 FUNC    GLOBAL DEFAULT    1 sys_add_key
- 64564: ffffffff812b7d20   629 FUNC    GLOBAL DEFAULT    1 SyS_add_key
- 74229: ffffffff810c7b00   154 FUNC    GLOBAL DEFAULT    1 sys_adjtimex
- 50534: ffffffff810c7b00   154 FUNC    GLOBAL DEFAULT    1 SyS_adjtimex
- 58974: ffffffff810cbab0    18 FUNC    GLOBAL DEFAULT    1 sys_alarm
- 54082: ffffffff810cbab0    18 FUNC    GLOBAL DEFAULT    1 SyS_alarm
- ...
+Currently the bug is not triggered in mainline, so this patch does not
+modify the configuration space there. To observe the bug consider this
+example:
 
+config MODULES
+        def_bool y
+        option modules
+
+config FOO
+        def_tristate m
+
+config BAR
+        def_tristate m
+
+config TEST1
+        def_tristate y
+        depends on (FOO || BAR) && (!FOO && !BAR)
+
+if TEST1 = n
+comment "TEST1 broken"
+endif
+
+config TEST2
+        def_tristate y
+        depends on (FOO && BAR) || (!FOO || !BAR)
+
+if TEST2 = y
+comment "TEST2 broken"
+endif
+
+config TEST3
+        def_tristate y
+        depends on m && !m
+
+if TEST3 = n
+comment "TEST3 broken"
+endif
+
+TEST1, TEST2 and TEST3 should all evaluate to m, but without the patch,
+none of them does. It is probably not obvious that TEST3 is the same bug,
+but it becomes clear when considering what happens internally to the
+expression
+m && !m": 
+First it expands to
+(m && MODULES) && !(m && MODULES),
+then it is transformed into
+(m && MODULES) && (!m || !MODULES),
+and finally due to the bug it is replaced with n.
+
+As a side effect, this patch reduces code size in expr.c by roughly 10%
+and slightly improves startup time for all configuration frontends.
+
+Signed-off-by: Martin Walch <walch.martin@web.de>
+---
+Version 3:
+Earlier versions fixed some comments, too. Remove those bits and focus
+on the logical problem.
+
+Version 4:
+Add test case to commit description.
+
+ scripts/kconfig/expr.c | 111 -------------------------------------------------
+ 1 file changed, 111 deletions(-)
+
+diff --git a/scripts/kconfig/expr.c b/scripts/kconfig/expr.c
+index fb0a2a2..0d7364c 100644
+--- a/scripts/kconfig/expr.c
++++ b/scripts/kconfig/expr.c
+@@ -13,9 +13,6 @@
+ 
+ static int expr_eq(struct expr *e1, struct expr *e2);
+ static struct expr *expr_eliminate_yn(struct expr *e);
+-static struct expr *expr_extract_eq_and(struct expr **ep1, struct expr **ep2);
+-static struct expr *expr_extract_eq_or(struct expr **ep1, struct expr **ep2);
+-static void expr_extract_eq(enum expr_type type, struct expr **ep, struct expr **ep1, struct expr **ep2);
+ 
+ struct expr *expr_alloc_symbol(struct symbol *sym)
+ {
+@@ -559,62 +556,6 @@ static void expr_eliminate_dups1(enum expr_type type, struct expr **ep1, struct
+ #undef e2
+ }
+ 
+-static void expr_eliminate_dups2(enum expr_type type, struct expr **ep1, struct expr **ep2)
+-{
+-#define e1 (*ep1)
+-#define e2 (*ep2)
+-	struct expr *tmp, *tmp1, *tmp2;
+-
+-	if (e1->type == type) {
+-		expr_eliminate_dups2(type, &e1->left.expr, &e2);
+-		expr_eliminate_dups2(type, &e1->right.expr, &e2);
+-		return;
+-	}
+-	if (e2->type == type) {
+-		expr_eliminate_dups2(type, &e1, &e2->left.expr);
+-		expr_eliminate_dups2(type, &e1, &e2->right.expr);
+-	}
+-	if (e1 == e2)
+-		return;
+-
+-	switch (e1->type) {
+-	case E_OR:
+-		expr_eliminate_dups2(e1->type, &e1, &e1);
+-		// (FOO || BAR) && (!FOO && !BAR) -> n
+-		tmp1 = expr_transform(expr_alloc_one(E_NOT, expr_copy(e1)));
+-		tmp2 = expr_copy(e2);
+-		tmp = expr_extract_eq_and(&tmp1, &tmp2);
+-		if (expr_is_yes(tmp1)) {
+-			expr_free(e1);
+-			e1 = expr_alloc_symbol(&symbol_no);
+-			trans_count++;
+-		}
+-		expr_free(tmp2);
+-		expr_free(tmp1);
+-		expr_free(tmp);
+-		break;
+-	case E_AND:
+-		expr_eliminate_dups2(e1->type, &e1, &e1);
+-		// (FOO && BAR) || (!FOO || !BAR) -> y
+-		tmp1 = expr_transform(expr_alloc_one(E_NOT, expr_copy(e1)));
+-		tmp2 = expr_copy(e2);
+-		tmp = expr_extract_eq_or(&tmp1, &tmp2);
+-		if (expr_is_no(tmp1)) {
+-			expr_free(e1);
+-			e1 = expr_alloc_symbol(&symbol_yes);
+-			trans_count++;
+-		}
+-		expr_free(tmp2);
+-		expr_free(tmp1);
+-		expr_free(tmp);
+-		break;
+-	default:
+-		;
+-	}
+-#undef e1
+-#undef e2
+-}
+-
+ struct expr *expr_eliminate_dups(struct expr *e)
+ {
+ 	int oldcount;
+@@ -627,7 +568,6 @@ struct expr *expr_eliminate_dups(struct expr *e)
+ 		switch (e->type) {
+ 		case E_OR: case E_AND:
+ 			expr_eliminate_dups1(e->type, &e, &e);
+-			expr_eliminate_dups2(e->type, &e, &e);
+ 		default:
+ 			;
+ 		}
+@@ -829,57 +769,6 @@ bool expr_depends_symbol(struct expr *dep, struct symbol *sym)
+  	return false;
+ }
+ 
+-static struct expr *expr_extract_eq_and(struct expr **ep1, struct expr **ep2)
+-{
+-	struct expr *tmp = NULL;
+-	expr_extract_eq(E_AND, &tmp, ep1, ep2);
+-	if (tmp) {
+-		*ep1 = expr_eliminate_yn(*ep1);
+-		*ep2 = expr_eliminate_yn(*ep2);
+-	}
+-	return tmp;
+-}
+-
+-static struct expr *expr_extract_eq_or(struct expr **ep1, struct expr **ep2)
+-{
+-	struct expr *tmp = NULL;
+-	expr_extract_eq(E_OR, &tmp, ep1, ep2);
+-	if (tmp) {
+-		*ep1 = expr_eliminate_yn(*ep1);
+-		*ep2 = expr_eliminate_yn(*ep2);
+-	}
+-	return tmp;
+-}
+-
+-static void expr_extract_eq(enum expr_type type, struct expr **ep, struct expr **ep1, struct expr **ep2)
+-{
+-#define e1 (*ep1)
+-#define e2 (*ep2)
+-	if (e1->type == type) {
+-		expr_extract_eq(type, ep, &e1->left.expr, &e2);
+-		expr_extract_eq(type, ep, &e1->right.expr, &e2);
+-		return;
+-	}
+-	if (e2->type == type) {
+-		expr_extract_eq(type, ep, ep1, &e2->left.expr);
+-		expr_extract_eq(type, ep, ep1, &e2->right.expr);
+-		return;
+-	}
+-	if (expr_eq(e1, e2)) {
+-		*ep = *ep ? expr_alloc_two(type, *ep, e1) : e1;
+-		expr_free(e2);
+-		if (type == E_AND) {
+-			e1 = expr_alloc_symbol(&symbol_yes);
+-			e2 = expr_alloc_symbol(&symbol_yes);
+-		} else if (type == E_OR) {
+-			e1 = expr_alloc_symbol(&symbol_no);
+-			e2 = expr_alloc_symbol(&symbol_no);
+-		}
+-	}
+-#undef e1
+-#undef e2
+-}
+-
+ struct expr *expr_trans_compare(struct expr *e, enum expr_type type, struct symbol *sym)
+ {
+ 	struct expr *e1, *e2;
 -- 
-Regards/Gruss,
-    Boris.
+2.0.5
 
-ECO tip #101: Trim your mails when you reply.
---
