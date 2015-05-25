@@ -1,141 +1,110 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtprelay0127.hostedemail.com ([216.40.44.127]:53077 "EHLO
-	smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1756587AbbEVMvm convert rfc822-to-8bit
-	(ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 22 May 2015 08:51:42 -0400
-Received: from smtprelay.hostedemail.com (10.5.19.251.rfc1918.com [10.5.19.251])
-	by smtpgrave02.hostedemail.com (Postfix) with ESMTP id 08C303F7A
-	for <linux-kbuild@vger.kernel.org>; Fri, 22 May 2015 12:42:56 +0000 (UTC)
-Date: Fri, 22 May 2015 08:42:50 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-Subject: Re: [RFC][PATCH 2/2] kallsyms: Do not display SyS_foo() syscall
- aliases in kallsyms
-Message-ID: <20150522084250.09abe08e@gandalf.local.home>
-In-Reply-To: <20150522105549.GG23022@pd.tnic>
-References: <20150506181831.145849116@goodmis.org>
-	<20150506182359.216601202@goodmis.org>
-	<20150522105549.GG23022@pd.tnic>
+Received: from cantor2.suse.de ([195.135.220.15]:41263 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751784AbbEYIFY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 25 May 2015 04:05:24 -0400
+Message-ID: <5562D7BC.3050604@suse.cz>
+Date: Mon, 25 May 2015 16:05:16 +0800
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Subject: Re: [PATCH v4] Kconfig: Remove bad inference rules expr_eliminate_dups2()
+References: <6333557.fobqH0bixi@tacticalops> <5729946.JOCDOEaf0S@tacticalops> <555D7D9C.7010701@suse.cz> <47745287.pcmKhRVW0u@tacticalops>
+In-Reply-To: <47745287.pcmKhRVW0u@tacticalops>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Borislav Petkov <bp@alien8.de>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>, Andrew Morton <akpm@linux-foundation.org>, Al Viro <viro@zeniv.linux.org.uk>
+To: Martin Walch <walch.martin@web.de>
+Cc: linux-kbuild@vger.kernel.org
 
-On Fri, 22 May 2015 12:55:49 +0200
-Borislav Petkov <bp@alien8.de> wrote:
-
-> > diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
-> > index 8fa81e84e295..a64d89c6641c 100644
-> > --- a/scripts/kallsyms.c
-> > +++ b/scripts/kallsyms.c
-> > @@ -193,8 +193,22 @@ static int symbol_in_range(struct sym_entry *s, struct addr_range *ranges,
-> >  	return 0;
-> >  }
-> >  
-> > -static int symbol_valid(struct sym_entry *s)
-> > +static const char *skip_prefix(const char *sym)
-> >  {
-> > +	if (symbol_prefix_char && *sym == symbol_prefix_char)
-> > +		return sym + 1;
-> > +	return sym;
-> > +}
+Dne 22.5.2015 v 19:41 Martin Walch napsal(a):
+> From: Martin Walch <walch.martin@web.de>
 > 
-> scripts/kallsyms.c: In function ‘symbol_valid’:
-> scripts/kallsyms.c:241:11: warning: assignment discards ‘const’ qualifier from pointer target type
->   sym_name = skip_prefix(sym_name);
->            ^
-> scripts/kallsyms.c:277:20: warning: assignment discards ‘const’ qualifier from pointer target type
->     sym_name_before = skip_prefix(sym_name_before);
->                     ^
-> scripts/kallsyms.c:282:19: warning: assignment discards ‘const’ qualifier from pointer target type
->     sym_name_after = skip_prefix(sym_name_after);
->                    ^
+> expr_eliminate_dups2() in scripts/kconfig/expr.c applies two invalid
+> inference rules:
 > 
-> That sym_name should be const?
-
-Hmm, thanks. I'll take a look at this.
-
+> (FOO || BAR) && (!FOO && !BAR) -> n
+> (FOO && BAR) || (!FOO || !BAR) -> y
 > 
-> > +
-> > +static int match_sys(const char *sym, const char *sys)
-> > +{
-> > +	return !strncmp(sys, "sys_", 4) && !strcmp(sym + 4, sys + 4);
-> > +}
-> > +
-> > +static int symbol_valid(int idx)
-> > +{
-> > +	struct sym_entry *s = &table[idx];
-> > +
-> >  	/* Symbols which vary between passes.  Passes 1 and 2 must have
-> >  	 * identical symbol lists.  The kallsyms_* symbols below are only added
-> >  	 * after pass 1, they would be included in pass 2 when --all-symbols is
-> > @@ -224,9 +238,7 @@ static int symbol_valid(struct sym_entry *s)
-> >  	if (s->addr < kernel_start_addr)
-> >  		return 0;
-> >  
-> > -	/* skip prefix char */
-> > -	if (symbol_prefix_char && *sym_name == symbol_prefix_char)
-> > -		sym_name++;
-> > +	sym_name = skip_prefix(sym_name);
-> >  
-> >  
-> >  	/* if --all-symbols is not specified, then symbols outside the text
-> > @@ -255,6 +267,27 @@ static int symbol_valid(struct sym_entry *s)
-> >  		if (strcmp(sym_name, special_symbols[i]) == 0)
-> >  			return 0;
-> >  
-> > +	/* Ignore SyS_* alias system calls */
-> > +	if (!strncmp(sym_name, "SyS_", 4)) {
+> They would be correct in propositional logic, but this is a three-valued
+> logic, and here it is wrong in that it changes semantics. It becomes
+> immediately visible when assigning the value 1 to both, FOO and BAR:
 > 
-> I guess we won't have to hide more symbols from kallsyms. If we do, then
-> probably will have to generalize this... Oh well.
-
-I started writing a more generalize version to begin with, then
-realized, "why? this isn't something we do every day". Yeah, if we add
-another one then we should take the time to do so.
-
+> (FOO || BAR) && (!FOO && !BAR)
+> -> min(max(1, 1), min(2-1, 2-1)) = min(1, 1) = 1
 > 
-> Other than that, I think this a step in the right direction as the first
-> patch makes the SyS_ symbols local and that's a good way for tools
-> parsing the symbol table to know which symbol to show:
+> while n evaluates to 0 and
 > 
-> readelf -a vmlinux | grep -iE "\Wsys_" | sort -k8 | head -50
->  77462: ffffffff815928f0    18 FUNC    GLOBAL DEFAULT    1 sys_accept
->  43024: ffffffff815928f0    18 FUNC    LOCAL  DEFAULT    1 SyS_accept
->  71564: ffffffff815926e0   526 FUNC    GLOBAL DEFAULT    1 sys_accept4
->  43023: ffffffff815926e0   526 FUNC    LOCAL  DEFAULT    1 SyS_accept4
->  50484: ffffffff81181170    26 FUNC    GLOBAL DEFAULT    1 sys_access
->  12656: ffffffff81181170    26 FUNC    LOCAL  DEFAULT    1 SyS_access
->  ...
+> (FOO && BAR) || (!FOO || !BAR)
+> -> max(min(1, 1), max(2-1, 2-1)) = max(1, 1) = 1
 > 
-> i.e., the global one, provided all the other attributes are the same.
+> with y evaluating to 2.
 > 
-> Before that we had them all identical:
-
-Yep!
-
-Thanks, I'll update this patch.
-
--- Steve
-
+> Fix it by removing expr_eliminate_dups2() and the functions that have no
+> use anywhere else: expr_extract_eq_and(), expr_extract_eq_or(),
+> and expr_extract_eq() from scripts/kconfig/expr.c
 > 
-> readelf -a vmlinux | grep -iE "\Wsys_" | sort -k8 | head -50
->  77446: ffffffff815928f0    18 FUNC    GLOBAL DEFAULT    1 sys_accept
->  69532: ffffffff815928f0    18 FUNC    GLOBAL DEFAULT    1 SyS_accept
->  71484: ffffffff815926e0   526 FUNC    GLOBAL DEFAULT    1 sys_accept4
->  50916: ffffffff815926e0   526 FUNC    GLOBAL DEFAULT    1 SyS_accept4
->  50192: ffffffff81181170    26 FUNC    GLOBAL DEFAULT    1 sys_access
->  59364: ffffffff81181170    26 FUNC    GLOBAL DEFAULT    1 SyS_access
->  52487: ffffffff81078920    18 FUNC    WEAK   DEFAULT    1 sys_acct
->  57730: ffffffff812b7d20   629 FUNC    GLOBAL DEFAULT    1 sys_add_key
->  64564: ffffffff812b7d20   629 FUNC    GLOBAL DEFAULT    1 SyS_add_key
->  74229: ffffffff810c7b00   154 FUNC    GLOBAL DEFAULT    1 sys_adjtimex
->  50534: ffffffff810c7b00   154 FUNC    GLOBAL DEFAULT    1 SyS_adjtimex
->  58974: ffffffff810cbab0    18 FUNC    GLOBAL DEFAULT    1 sys_alarm
->  54082: ffffffff810cbab0    18 FUNC    GLOBAL DEFAULT    1 SyS_alarm
->  ...
+> Currently the bug is not triggered in mainline, so this patch does not
+> modify the configuration space there. To observe the bug consider this
+> example:
 > 
+> config MODULES
+>         def_bool y
+>         option modules
+> 
+> config FOO
+>         def_tristate m
+> 
+> config BAR
+>         def_tristate m
+> 
+> config TEST1
+>         def_tristate y
+>         depends on (FOO || BAR) && (!FOO && !BAR)
+> 
+> if TEST1 = n
+> comment "TEST1 broken"
+> endif
+> 
+> config TEST2
+>         def_tristate y
+>         depends on (FOO && BAR) || (!FOO || !BAR)
+> 
+> if TEST2 = y
+> comment "TEST2 broken"
+> endif
+> 
+> config TEST3
+>         def_tristate y
+>         depends on m && !m
+> 
+> if TEST3 = n
+> comment "TEST3 broken"
+> endif
+> 
+> TEST1, TEST2 and TEST3 should all evaluate to m, but without the patch,
+> none of them does. It is probably not obvious that TEST3 is the same bug,
+> but it becomes clear when considering what happens internally to the
+> expression
+> m && !m": 
+> First it expands to
+> (m && MODULES) && !(m && MODULES),
+> then it is transformed into
+> (m && MODULES) && (!m || !MODULES),
+> and finally due to the bug it is replaced with n.
+> 
+> As a side effect, this patch reduces code size in expr.c by roughly 10%
+> and slightly improves startup time for all configuration frontends.
+> 
+> Signed-off-by: Martin Walch <walch.martin@web.de>
+> ---
+> Version 3:
+> Earlier versions fixed some comments, too. Remove those bits and focus
+> on the logical problem.
+> 
+> Version 4:
+> Add test case to commit description.
 
+Thanks, applied now!
+
+Michal
