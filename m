@@ -1,51 +1,60 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cassarossa.samfundet.no ([193.35.52.29]:60566 "EHLO
-	cassarossa.samfundet.no" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753521AbbEZNJG (ORCPT
+Received: from wilson.telenet-ops.be ([195.130.132.42]:50255 "EHLO
+	wilson.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932270AbbEZNg0 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 26 May 2015 09:09:06 -0400
-Date: Tue, 26 May 2015 13:52:11 +0200
-From: Hans-Christian Egtvedt <egtvedt@samfundet.no>
-Subject: Re: [PATCH 3/3] kconfig: Extend defconfig field size from 24 to 32
-Message-ID: <20150526115211.GA18353@samfundet.no>
-References: <1432640395-17310-1-git-send-email-geert+renesas@glider.be>
- <1432640395-17310-3-git-send-email-geert+renesas@glider.be>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1432640395-17310-3-git-send-email-geert+renesas@glider.be>
+	Tue, 26 May 2015 09:36:26 -0400
+Received: from laurent.telenet-ops.be (laurent.telenet-ops.be [195.130.137.89])
+	by wilson.telenet-ops.be (Postfix) with ESMTP id C6EA835949
+	for <linux-kbuild@vger.kernel.org>; Tue, 26 May 2015 13:40:14 +0200 (CEST)
+From: Geert Uytterhoeven <geert+renesas@glider.be>
+Subject: [PATCH 1/3] Blackfin: Wrap long "make help" text lines
+Date: Tue, 26 May 2015 13:39:53 +0200
+Message-Id: <1432640395-17310-1-git-send-email-geert+renesas@glider.be>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Geert Uytterhoeven <geert+renesas@glider.be>
-Cc: Michal Marek <mmarek@suse.cz>, "Yann E. MORIN" <yann.morin.1998@free.fr>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Haavard Skinnemoen <hskinnemoen@gmail.com>
+To: Michal Marek <mmarek@suse.cz>, "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Geert Uytterhoeven <geert+renesas@glider.be>, Steven Miao <realmz6@gmail.com>, adi-buildroot-devel@lists.sourceforge.net
 
-Around Tue 26 May 2015 13:39:55 +0200 or thereabout, Geert Uytterhoeven wrote:
-> next-20150526 has 12 defconfigs with names longer than 24 characters,
-> breaking alignment in "make help".
-> 
-> The "winners" are "atngw100mkii_evklcd100_defconfig" and
-> "atngw100mkii_evklcd101_defconfig", counting in at 32 characters.
-> 
-> Extend the defconfig field size to 32 to restore alignment.
-> Don't use a larger value, to not encourage people to create even longer
-> defconfig names.
+Some "make help" text lines extend beyond 80 characters. Wrap them at 79
+characters.
 
-(-:
+Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+Cc: Steven Miao <realmz6@gmail.com>
+Cc: adi-buildroot-devel@lists.sourceforge.net
+---
+ arch/blackfin/Makefile | 18 ++++++++++++------
+ 1 file changed, 12 insertions(+), 6 deletions(-)
 
-They were very explicit to the ordering code.
-
-> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-> Cc: Haavard Skinnemoen <hskinnemoen@gmail.com>
-> Cc: Hans-Christian Egtvedt <egtvedt@samfundet.no>
-
-Acked-by: Hans-Christian Egtvedt <egtvedt@samfundet.no>
-
-> ---
->  Makefile | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-
-<snipp diff>
-
+diff --git a/arch/blackfin/Makefile b/arch/blackfin/Makefile
+index 1fce08632ad763ab..a6ce3ba90b6706a5 100644
+--- a/arch/blackfin/Makefile
++++ b/arch/blackfin/Makefile
+@@ -155,12 +155,18 @@ install:
+ 
+ define archhelp
+   echo  '* vmImage         - Alias to selected kernel format (vmImage.gz by default)'
+-  echo  '  vmImage.bin     - Uncompressed Kernel-only image for U-Boot (arch/$(ARCH)/boot/vmImage.bin)'
+-  echo  '  vmImage.bz2     - Kernel-only image for U-Boot (arch/$(ARCH)/boot/vmImage.bz2)'
+-  echo  '* vmImage.gz      - Kernel-only image for U-Boot (arch/$(ARCH)/boot/vmImage.gz)'
+-  echo  '  vmImage.lzma    - Kernel-only image for U-Boot (arch/$(ARCH)/boot/vmImage.lzma)'
+-  echo  '  vmImage.lzo     - Kernel-only image for U-Boot (arch/$(ARCH)/boot/vmImage.lzo)'
+-  echo  '  vmImage.xip     - XIP Kernel-only image for U-Boot (arch/$(ARCH)/boot/vmImage.xip)'
++  echo  '  vmImage.bin     - Uncompressed Kernel-only image for U-Boot'
++  echo  '                     (arch/$(ARCH)/boot/vmImage.bin)'
++  echo  '  vmImage.bz2     - Kernel-only image for U-Boot'
++  echo  '                     (arch/$(ARCH)/boot/vmImage.bz2)'
++  echo  '* vmImage.gz      - Kernel-only image for U-Boot'
++  echo  '                     (arch/$(ARCH)/boot/vmImage.gz)'
++  echo  '  vmImage.lzma    - Kernel-only image for U-Boot'
++  echo  '                     (arch/$(ARCH)/boot/vmImage.lzma)'
++  echo  '  vmImage.lzo     - Kernel-only image for U-Boot'
++  echo  '                     (arch/$(ARCH)/boot/vmImage.lzo)'
++  echo  '  vmImage.xip     - XIP Kernel-only image for U-Boot'
++  echo  '                     (arch/$(ARCH)/boot/vmImage.xip)'
+   echo  '  install         - Install kernel using'
+   echo  '                     (your) ~/bin/$(INSTALLKERNEL) or'
+   echo  '                     (distribution) PATH: $(INSTALLKERNEL) or'
 -- 
-mvh
-Hans-Christian Egtvedt
+1.9.1
+
