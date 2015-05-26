@@ -1,110 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:41263 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751784AbbEYIFY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 25 May 2015 04:05:24 -0400
-Message-ID: <5562D7BC.3050604@suse.cz>
-Date: Mon, 25 May 2015 16:05:16 +0800
-From: Michal Marek <mmarek@suse.cz>
+Received: from cassarossa.samfundet.no ([193.35.52.29]:60566 "EHLO
+	cassarossa.samfundet.no" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753521AbbEZNJG (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 26 May 2015 09:09:06 -0400
+Date: Tue, 26 May 2015 13:52:11 +0200
+From: Hans-Christian Egtvedt <egtvedt@samfundet.no>
+Subject: Re: [PATCH 3/3] kconfig: Extend defconfig field size from 24 to 32
+Message-ID: <20150526115211.GA18353@samfundet.no>
+References: <1432640395-17310-1-git-send-email-geert+renesas@glider.be>
+ <1432640395-17310-3-git-send-email-geert+renesas@glider.be>
 MIME-Version: 1.0
-Subject: Re: [PATCH v4] Kconfig: Remove bad inference rules expr_eliminate_dups2()
-References: <6333557.fobqH0bixi@tacticalops> <5729946.JOCDOEaf0S@tacticalops> <555D7D9C.7010701@suse.cz> <47745287.pcmKhRVW0u@tacticalops>
-In-Reply-To: <47745287.pcmKhRVW0u@tacticalops>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1432640395-17310-3-git-send-email-geert+renesas@glider.be>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Martin Walch <walch.martin@web.de>
-Cc: linux-kbuild@vger.kernel.org
+To: Geert Uytterhoeven <geert+renesas@glider.be>
+Cc: Michal Marek <mmarek@suse.cz>, "Yann E. MORIN" <yann.morin.1998@free.fr>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Haavard Skinnemoen <hskinnemoen@gmail.com>
 
-Dne 22.5.2015 v 19:41 Martin Walch napsal(a):
-> From: Martin Walch <walch.martin@web.de>
+Around Tue 26 May 2015 13:39:55 +0200 or thereabout, Geert Uytterhoeven wrote:
+> next-20150526 has 12 defconfigs with names longer than 24 characters,
+> breaking alignment in "make help".
 > 
-> expr_eliminate_dups2() in scripts/kconfig/expr.c applies two invalid
-> inference rules:
+> The "winners" are "atngw100mkii_evklcd100_defconfig" and
+> "atngw100mkii_evklcd101_defconfig", counting in at 32 characters.
 > 
-> (FOO || BAR) && (!FOO && !BAR) -> n
-> (FOO && BAR) || (!FOO || !BAR) -> y
-> 
-> They would be correct in propositional logic, but this is a three-valued
-> logic, and here it is wrong in that it changes semantics. It becomes
-> immediately visible when assigning the value 1 to both, FOO and BAR:
-> 
-> (FOO || BAR) && (!FOO && !BAR)
-> -> min(max(1, 1), min(2-1, 2-1)) = min(1, 1) = 1
-> 
-> while n evaluates to 0 and
-> 
-> (FOO && BAR) || (!FOO || !BAR)
-> -> max(min(1, 1), max(2-1, 2-1)) = max(1, 1) = 1
-> 
-> with y evaluating to 2.
-> 
-> Fix it by removing expr_eliminate_dups2() and the functions that have no
-> use anywhere else: expr_extract_eq_and(), expr_extract_eq_or(),
-> and expr_extract_eq() from scripts/kconfig/expr.c
-> 
-> Currently the bug is not triggered in mainline, so this patch does not
-> modify the configuration space there. To observe the bug consider this
-> example:
-> 
-> config MODULES
->         def_bool y
->         option modules
-> 
-> config FOO
->         def_tristate m
-> 
-> config BAR
->         def_tristate m
-> 
-> config TEST1
->         def_tristate y
->         depends on (FOO || BAR) && (!FOO && !BAR)
-> 
-> if TEST1 = n
-> comment "TEST1 broken"
-> endif
-> 
-> config TEST2
->         def_tristate y
->         depends on (FOO && BAR) || (!FOO || !BAR)
-> 
-> if TEST2 = y
-> comment "TEST2 broken"
-> endif
-> 
-> config TEST3
->         def_tristate y
->         depends on m && !m
-> 
-> if TEST3 = n
-> comment "TEST3 broken"
-> endif
-> 
-> TEST1, TEST2 and TEST3 should all evaluate to m, but without the patch,
-> none of them does. It is probably not obvious that TEST3 is the same bug,
-> but it becomes clear when considering what happens internally to the
-> expression
-> m && !m": 
-> First it expands to
-> (m && MODULES) && !(m && MODULES),
-> then it is transformed into
-> (m && MODULES) && (!m || !MODULES),
-> and finally due to the bug it is replaced with n.
-> 
-> As a side effect, this patch reduces code size in expr.c by roughly 10%
-> and slightly improves startup time for all configuration frontends.
-> 
-> Signed-off-by: Martin Walch <walch.martin@web.de>
+> Extend the defconfig field size to 32 to restore alignment.
+> Don't use a larger value, to not encourage people to create even longer
+> defconfig names.
+
+(-:
+
+They were very explicit to the ordering code.
+
+> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+> Cc: Haavard Skinnemoen <hskinnemoen@gmail.com>
+> Cc: Hans-Christian Egtvedt <egtvedt@samfundet.no>
+
+Acked-by: Hans-Christian Egtvedt <egtvedt@samfundet.no>
+
 > ---
-> Version 3:
-> Earlier versions fixed some comments, too. Remove those bits and focus
-> on the logical problem.
-> 
-> Version 4:
-> Add test case to commit description.
+>  Makefile | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thanks, applied now!
+<snipp diff>
 
-Michal
+-- 
+mvh
+Hans-Christian Egtvedt
