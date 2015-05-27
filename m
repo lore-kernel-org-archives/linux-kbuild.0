@@ -1,72 +1,69 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lb1-smtp-cloud6.xs4all.net ([194.109.24.24]:44461 "EHLO
-	lb1-smtp-cloud6.xs4all.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752590AbbE0IUo (ORCPT
+Received: from mail-lb0-f180.google.com ([209.85.217.180]:33417 "EHLO
+	mail-lb0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751952AbbE0Tno (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 27 May 2015 04:20:44 -0400
-Message-ID: <1432714841.27695.250.camel@x220>
-Subject: Re: [PATCH] gconf: Unify exit dialog with the one from qconf
-From: Paul Bolle <pebolle@tiscali.nl>
-Date: Wed, 27 May 2015 10:20:41 +0200
-In-Reply-To: <1432237998-30330-1-git-send-email-leonidsbox@gmail.com>
-References: <1432237998-30330-1-git-send-email-leonidsbox@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+	Wed, 27 May 2015 15:43:44 -0400
+MIME-Version: 1.0
+In-Reply-To: <CA+ToGPGsdwW3jxhd_No9soLy4KLZfwdKaKxUYSCQwoRNv_fqUA@mail.gmail.com>
+References: <1428312465-4172-1-git-send-email-diego.viola@gmail.com>
+	<CA+ToGPE-eTeGFLSKP9e=At=COzzak6yiMV4-8nRdMvGQZLAg2w@mail.gmail.com>
+	<CA+ToGPEjNdXoQzdFZTohGyZ5eH0exc+DhB7FhH88tNuixn6riw@mail.gmail.com>
+	<1428912885.11113.57.camel@x220>
+	<CA+ToGPG8LudoV6rjLKgJjueG3HhREd30--863N_vmC2coMfo1w@mail.gmail.com>
+	<alpine.LNX.2.00.1504150733480.26287@pobox.suse.cz>
+	<CA+ToGPGsdwW3jxhd_No9soLy4KLZfwdKaKxUYSCQwoRNv_fqUA@mail.gmail.com>
+Date: Wed, 27 May 2015 16:43:42 -0300
+Message-ID: <CA+ToGPHft9FSk-DcrXYZ579vB_uG079yDNkmDa-3krq5kHPsUA@mail.gmail.com>
+Subject: Re: [PATCH] scripts/kconfig/Makefile: Fix spelling of Qt
+From: Diego Viola <diego.viola@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Leonid V. Fedorenchik" <leonidsbox@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Jiri Kosina <jkosina@suse.cz>
+Cc: Paul Bolle <pebolle@tiscali.nl>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, mmarek@suse.cz
 
-[Yann disappeared, but you couldn't know that.]
+Ping?
 
-On Thu, 2015-05-21 at 22:53 +0300, Leonid V. Fedorenchik wrote:
-> Make exit dialog more user-friendly and, at the same time, make it
-> similar to the one from qconf.
-
-Could you please describe, in the commit explanation, the dialog before
-and after this change. Now we have to fire up gconf and qconf to get an
-idea of this proposal. (I use neither. I don't know whether these
-front-ends are used much.)
-
-> Signed-off-by: Leonid V. Fedorenchik <leonidsbox@gmail.com>
-> ---
->  scripts/kconfig/gconf.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
-> 
-> diff --git a/scripts/kconfig/gconf.c b/scripts/kconfig/gconf.c
-> index 26d208b..9348c9f 100644
-> --- a/scripts/kconfig/gconf.c
-> +++ b/scripts/kconfig/gconf.c
-> @@ -422,21 +422,21 @@ gboolean on_window1_delete_event(GtkWidget * widget, GdkEvent * event,
->  	if (!conf_get_changed())
->  		return FALSE;
->  
-> -	dialog = gtk_dialog_new_with_buttons(_("Warning !"),
-> +	dialog = gtk_dialog_new_with_buttons(_("gconf"),
->  					     GTK_WINDOW(main_wnd),
->  					     (GtkDialogFlags)
->  					     (GTK_DIALOG_MODAL |
->  					      GTK_DIALOG_DESTROY_WITH_PARENT),
-> -					     GTK_STOCK_OK,
-> +					     _("Save Changes"),
->  					     GTK_RESPONSE_YES,
-> -					     GTK_STOCK_NO,
-> +					     _("Discard Changes"),
->  					     GTK_RESPONSE_NO,
-> -					     GTK_STOCK_CANCEL,
-> +					     _("Cancel Exit"),
->  					     GTK_RESPONSE_CANCEL, NULL);
->  	gtk_dialog_set_default_response(GTK_DIALOG(dialog),
->  					GTK_RESPONSE_CANCEL);
->  
-> -	label = gtk_label_new(_("\nSave configuration ?\n"));
-> +	label = gtk_label_new(_("\nSave configuration?\n"));
->  	gtk_container_add(GTK_CONTAINER(GTK_DIALOG(dialog)->vbox), label);
->  	gtk_widget_show(label);
-
-Thanks,
-
-
-Paul Bolle
-
+On Wed, Apr 15, 2015 at 2:48 AM, Diego Viola <diego.viola@gmail.com> wrote:
+> Thanks, that gives me hope, I'll wait patiently then.
+>
+> BTW, if you want any reference for how this is written, see this:
+>
+> http://en.wikipedia.org/wiki/Qt_%28software%29
+>
+> Thanks,
+>
+> Diego
+>
+> On Wed, Apr 15, 2015 at 2:36 AM, Jiri Kosina <jkosina@suse.cz> wrote:
+>> On Wed, 15 Apr 2015, Diego Viola wrote:
+>>
+>>> I apologize for being impatient, but I sent my first patch a week ago
+>>> and then I sent another after a week.
+>>>
+>>> I realize the patch is trivial, but I still want to see it merged
+>>> regardless, and this is my first contribution to the mailing list, so
+>>> I apologize for any inconvenience.
+>>>
+>>> I thought my patch was being ignored and I didn't want to see it lost
+>>> with all the other emails/patches so I thought about resending it.
+>>>
+>>> Should I send it again after a week if this one is ignored?
+>>
+>> It's very trivial patch indeed, and that's exactly why it's not on the top
+>> of the TODO list of everybody on CC.
+>>
+>> Plus we are just now in the middle of merge window, which is exactly the
+>> time when everyone is focusing on merging with Linus, and postpones even
+>> looking at patches which are not urgent bugfixes.
+>>
+>> Don't worry about us not seeing your endless stream of pings about this
+>> typo. We are rather good in not losing e-mails, and you are trying really
+>> hard not to be overlooked.
+>>
+>> Patience is a virtue.
+>>
+>> --
+>> Jiri Kosina
+>> SUSE Labs
