@@ -1,25 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:56406 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751381AbbE1IwB (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 28 May 2015 04:52:01 -0400
-Message-ID: <5566D727.4070802@suse.cz>
-Date: Thu, 28 May 2015 16:51:51 +0800
-From: Michal Marek <mmarek@suse.cz>
-MIME-Version: 1.0
-Subject: Re: [PATCH] scripts/kconfig/Makefile: Fix spelling of Qt
-References: <1428312465-4172-1-git-send-email-diego.viola@gmail.com>	<CA+ToGPE-eTeGFLSKP9e=At=COzzak6yiMV4-8nRdMvGQZLAg2w@mail.gmail.com>	<CA+ToGPEjNdXoQzdFZTohGyZ5eH0exc+DhB7FhH88tNuixn6riw@mail.gmail.com>	<1428912885.11113.57.camel@x220>	<CA+ToGPG8LudoV6rjLKgJjueG3HhREd30--863N_vmC2coMfo1w@mail.gmail.com>	<alpine.LNX.2.00.1504150733480.26287@pobox.suse.cz>	<CA+ToGPGsdwW3jxhd_No9soLy4KLZfwdKaKxUYSCQwoRNv_fqUA@mail.gmail.com> <CA+ToGPHft9FSk-DcrXYZ579vB_uG079yDNkmDa-3krq5kHPsUA@mail.gmail.com>
-In-Reply-To: <CA+ToGPHft9FSk-DcrXYZ579vB_uG079yDNkmDa-3krq5kHPsUA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Received: from mail-lb0-f170.google.com ([209.85.217.170]:34101 "EHLO
+	mail-lb0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753626AbbE1JLU (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 28 May 2015 05:11:20 -0400
+Received: by lbcmx3 with SMTP id mx3so23950213lbc.1
+        for <linux-kbuild@vger.kernel.org>; Thu, 28 May 2015 02:11:18 -0700 (PDT)
+From: riku.voipio@linaro.org
+Subject: [PATCH 0/2] deb-pkg: add source package
+Date: Thu, 28 May 2015 12:11:13 +0300
+Message-Id: <1432804275-13187-1-git-send-email-riku.voipio@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Diego Viola <diego.viola@gmail.com>, Jiri Kosina <jkosina@suse.cz>
-Cc: Paul Bolle <pebolle@tiscali.nl>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-kbuild@vger.kernel.org, mmarek@suse.cz, debian-kernel@lists.debian.org
+Cc: Riku Voipio <riku.voipio@linaro.org>
 
-Dne 28.5.2015 v 03:43 Diego Viola napsal(a):
-> Ping?
+From: Riku Voipio <riku.voipio@linaro.org>
 
-I applied the patch to kbuild.git#kconfig, sorry for the delay.
+A bit delayed v2 of debian source package addition. This is against
+linux-next which already has needed set_debarch function. Resubmitting
+the slipped directory simplification patch.
 
-Michal
+Riku Voipio (2):
+  deb-pkg: simplify directory creation
+  deb-pkg: add source package
+
+ scripts/package/Makefile | 11 +++++++---
+ scripts/package/builddeb | 52 +++++++++++++++++++++++++++++++++++-------------
+ 2 files changed, 46 insertions(+), 17 deletions(-)
+
+-- 
+2.1.4
+
