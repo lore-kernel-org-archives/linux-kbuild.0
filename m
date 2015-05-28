@@ -1,39 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lb3-smtp-cloud3.xs4all.net ([194.109.24.30]:45424 "EHLO
-	lb3-smtp-cloud3.xs4all.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1754159AbbE1O5u (ORCPT
+Received: from mail-lb0-f180.google.com ([209.85.217.180]:32926 "EHLO
+	mail-lb0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754287AbbE1QmZ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 28 May 2015 10:57:50 -0400
-Message-ID: <1432825060.8508.57.camel@x220>
-Subject: Re: [PATCH 4/5] kconfig: Introduce "showif" to factor out
- conditions on visibility
-From: Paul Bolle <pebolle@tiscali.nl>
-Date: Thu, 28 May 2015 16:57:40 +0200
-In-Reply-To: <20150520183042.GA5720@cloud>
-References: <e71aeef65671f2b60ce10b0b871585fd2baf850a.1431589089.git.josh@joshtriplett.org>
-	 <760264ebf529ba3b0aa007144e2862bc73807dad.1431589089.git.josh@joshtriplett.org>
-	 <1432116013.21715.82.camel@x220> <20150520183042.GA5720@cloud>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+	Thu, 28 May 2015 12:42:25 -0400
+MIME-Version: 1.0
+In-Reply-To: <5566D727.4070802@suse.cz>
+References: <1428312465-4172-1-git-send-email-diego.viola@gmail.com>
+	<CA+ToGPE-eTeGFLSKP9e=At=COzzak6yiMV4-8nRdMvGQZLAg2w@mail.gmail.com>
+	<CA+ToGPEjNdXoQzdFZTohGyZ5eH0exc+DhB7FhH88tNuixn6riw@mail.gmail.com>
+	<1428912885.11113.57.camel@x220>
+	<CA+ToGPG8LudoV6rjLKgJjueG3HhREd30--863N_vmC2coMfo1w@mail.gmail.com>
+	<alpine.LNX.2.00.1504150733480.26287@pobox.suse.cz>
+	<CA+ToGPGsdwW3jxhd_No9soLy4KLZfwdKaKxUYSCQwoRNv_fqUA@mail.gmail.com>
+	<CA+ToGPHft9FSk-DcrXYZ579vB_uG079yDNkmDa-3krq5kHPsUA@mail.gmail.com>
+	<5566D727.4070802@suse.cz>
+Date: Thu, 28 May 2015 13:42:23 -0300
+Message-ID: <CA+ToGPHY1uxq0EDjhp256+Jm6nWh5d0SbCqSrrjhg83cYreo4w@mail.gmail.com>
+Subject: Re: [PATCH] scripts/kconfig/Makefile: Fix spelling of Qt
+From: Diego Viola <diego.viola@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: josh@joshtriplett.org
-Cc: Ingo Molnar <mingo@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Michal Hocko <mhocko@suse.cz>, Vladimir Davydov <vdavydov@parallels.com>, Johannes Weiner <hannes@cmpxchg.org>, Geert Uytterhoeven <geert@linux-m68k.org>, Andy Lutomirski <luto@amacapital.net>, Bertrand Jacquin <beber@meleeweb.net>, "Luis R. Rodriguez" <mcgrof@suse.com>, Iulia Manda <iulia.manda21@gmail.com>, Pranith Kumar <bobby.prani@gmail.com>, Clark Williams <clark.williams@gmail.com>, Mel Gorman <mgorman@suse.de>, Randy Dunlap <rdunlap@infradead.org>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: Jiri Kosina <jkosina@suse.cz>, Paul Bolle <pebolle@tiscali.nl>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Wed, 2015-05-20 at 11:30 -0700, josh@joshtriplett.org wrote:
-> In net/rfkill/Kconfig, RFKILL_REGULATOR oddly has
-> "depends on RFKILL || !RFKILL".  WIMAX does the same thing.
+Thank you, this means a lot to me.
 
-That's only tristate logic. It's a common idiom, but it looks very odd
-compared to boolean logic. It ensures RFKILL_REGULATOR will not be 'y'
-if RFKILL is 'm'. Because:
-    RFKILL = 'n' => RFKILL_REGULATOR = 'n' || 'm' || 'y'
-    RFKILL = 'm' => RFKILL_REGULATOR = 'n' || 'm'
-    RFKILL = 'y' => RFKILL_REGULATOR = 'n' || 'm' || 'y'
+Diego
 
-Hope this helps,
-
-
-Paul Bolle
-
+On Thu, May 28, 2015 at 5:51 AM, Michal Marek <mmarek@suse.cz> wrote:
+> Dne 28.5.2015 v 03:43 Diego Viola napsal(a):
+>> Ping?
+>
+> I applied the patch to kbuild.git#kconfig, sorry for the delay.
+>
+> Michal
