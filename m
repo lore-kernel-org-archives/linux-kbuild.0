@@ -1,59 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f181.google.com ([209.85.212.181]:33886 "EHLO
-	mail-wi0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751673AbbE1JuE (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 28 May 2015 05:50:04 -0400
-Received: by wicmc15 with SMTP id mc15so118149949wic.1
-        for <linux-kbuild@vger.kernel.org>; Thu, 28 May 2015 02:50:03 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <1431606908-20880-1-git-send-email-corsac@debian.org>
-References: <1431606908-20880-1-git-send-email-corsac@debian.org>
-Date: Thu, 28 May 2015 12:50:03 +0300
-Message-ID: <CAAqcGHkhVG9YKtda0y97gsrz26RKpnAibOfNE2Y1xUEXfKr+=w@mail.gmail.com>
+Received: from smtp2-g21.free.fr ([212.27.42.2]:54162 "EHLO smtp2-g21.free.fr"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753824AbbE1L0u (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 28 May 2015 07:26:50 -0400
+Received: from molly.corsac.net (unknown [78.194.244.226])
+	by smtp2-g21.free.fr (Postfix) with ESMTPS id 97D304B0150
+	for <linux-kbuild@vger.kernel.org>; Thu, 28 May 2015 13:25:07 +0200 (CEST)
+Message-ID: <1432812367.9041.105.camel@debian.org>
 Subject: Re: [PATCH] builddeb: generate a changes file from the build
-From: Riku Voipio <riku.voipio@linaro.org>
-Content-Type: text/plain; charset=UTF-8
+From: Yves-Alexis Perez <corsac@debian.org>
+Date: Thu, 28 May 2015 13:26:07 +0200
+In-Reply-To: <CAAqcGHkhVG9YKtda0y97gsrz26RKpnAibOfNE2Y1xUEXfKr+=w@mail.gmail.com>
+References: <1431606908-20880-1-git-send-email-corsac@debian.org>
+	 <CAAqcGHkhVG9YKtda0y97gsrz26RKpnAibOfNE2Y1xUEXfKr+=w@mail.gmail.com>
+Content-Type: multipart/signed; micalg="pgp-sha256";
+	protocol="application/pgp-signature"; boundary="=-ndN0llpXcnqtJgtqVa8c"
+Mime-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Yves-Alexis Perez <corsac@debian.org>
+To: Riku Voipio <riku.voipio@linaro.org>
 Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-Hi,
 
-On 14 May 2015 at 15:35, Yves-Alexis Perez <corsac@debian.org> wrote:
-> A changes file (also called Debian upload control file) contains
-> information about binary packages, including the changelog entry, the
-> maintainer, the package list and the checksums.
->
-> It can be used by various Debian tools like dput and dcmd to execute
-> action on all the build packages at once, for example uploading the
-> packages to an dedicated Debian repository.
+--=-ndN0llpXcnqtJgtqVa8c
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This change is also part for my "add source package" patch:
+On jeu., 2015-05-28 at 12:50 +0300, Riku Voipio wrote:
+> This change is also part for my "add source package" patch:
+>=20
+> http://article.gmane.org/gmane.linux.kbuild.devel/13336
 
-http://article.gmane.org/gmane.linux.kbuild.devel/13336
+I wasn't aware of that patchset, thanks! Will try it.
 
-> ---
->  scripts/package/builddeb | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-> index 88dbf23..46c2838 100755
-> --- a/scripts/package/builddeb
-> +++ b/scripts/package/builddeb
-> @@ -383,4 +383,7 @@ EOF
->         create_package "$dbg_packagename" "$dbg_dir"
->  fi
->
-> +# Generate a change file
-> +(cd $KBUILD_OUTPUT; dpkg-genchanges -b > ../linux_${packageversion}_${debarch}.changes)
-> +
->  exit 0
-> --
-> 2.1.4
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Regards,
+--=20
+Yves-Alexis
+
+--=-ndN0llpXcnqtJgtqVa8c
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQEcBAABCAAGBQJVZvtPAAoJEG3bU/KmdcCl2J4H/iOucEKkBpeUZXl0F69U6mRS
+sPS0n9jYTozepFPb5D0DfcWDjVjHoLJfcqkEzavw8wv6F4KEn6CPDrypWYvlGApa
+wBVimHojlG5NlY79dKqgVYd2pED0wVTRRc+Y1KXWkZfLCyyBNq3ojO3HdK/QaeW3
+6wsO9JBtxLM6WnZgm8Z6RJpMo8n4SII1SQtfW7mmwPI29MmL3jhl/BF2iMHdLCpK
+JNEOYpkF0ZwEFwRWNMC9hGITQUyz1mvlzUwkkF1kCxyni1XH9DqAl/6tEWPOwt3D
+YC3A1bq4gdhueVpfSmdPchr74jvLIpXahCL0tjSF2epFFZBTvVzZEbEZ/HDnEqg=
+=53w3
+-----END PGP SIGNATURE-----
+
+--=-ndN0llpXcnqtJgtqVa8c--
