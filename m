@@ -1,38 +1,60 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lb1-smtp-cloud3.xs4all.net ([194.109.24.22]:34071 "EHLO
-	lb1-smtp-cloud3.xs4all.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1753815AbbE1S2x (ORCPT
+Received: from mail-wi0-f182.google.com ([209.85.212.182]:35436 "EHLO
+	mail-wi0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750740AbbE2E4G (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 28 May 2015 14:28:53 -0400
-Message-ID: <1432837730.1354.33.camel@x220>
-Subject: Re: [PATCH 4/5] kconfig: Introduce "showif" to factor out
- conditions on visibility
-From: Paul Bolle <pebolle@tiscali.nl>
-Date: Thu, 28 May 2015 20:28:50 +0200
-In-Reply-To: <20150520183042.GA5720@cloud>
-References: <e71aeef65671f2b60ce10b0b871585fd2baf850a.1431589089.git.josh@joshtriplett.org>
-	 <760264ebf529ba3b0aa007144e2862bc73807dad.1431589089.git.josh@joshtriplett.org>
-	 <1432116013.21715.82.camel@x220> <20150520183042.GA5720@cloud>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+	Fri, 29 May 2015 00:56:06 -0400
+Received: by wicmx19 with SMTP id mx19so6131072wic.0
+        for <linux-kbuild@vger.kernel.org>; Thu, 28 May 2015 21:56:05 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <1431352946-6691-2-git-send-email-chris.j.arges@canonical.com>
+References: <1431352946-6691-1-git-send-email-chris.j.arges@canonical.com>
+	<1431352946-6691-2-git-send-email-chris.j.arges@canonical.com>
+Date: Fri, 29 May 2015 07:56:05 +0300
+Message-ID: <CAAqcGHkuDe9+mTuLeMq-BV4+zJBoqFWQ4nawfEMRTm=0oKYSgA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] package: Makefile: ensure $MAKE can use jobserver
+From: Riku Voipio <riku.voipio@linaro.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: josh@joshtriplett.org
-Cc: Ingo Molnar <mingo@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Michal Hocko <mhocko@suse.cz>, Vladimir Davydov <vdavydov@parallels.com>, Johannes Weiner <hannes@cmpxchg.org>, Geert Uytterhoeven <geert@linux-m68k.org>, Andy Lutomirski <luto@amacapital.net>, Bertrand Jacquin <beber@meleeweb.net>, "Luis R. Rodriguez" <mcgrof@suse.com>, Iulia Manda <iulia.manda21@gmail.com>, Pranith Kumar <bobby.prani@gmail.com>, Clark Williams <clark.williams@gmail.com>, Mel Gorman <mgorman@suse.de>, Randy Dunlap <rdunlap@infradead.org>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Chris J Arges <chris.j.arges@canonical.com>
+Cc: mmarek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>, linux-kernel@vger.kernel.org
 
-On Wed, 2015-05-20 at 11:30 -0700, josh@joshtriplett.org wrote:
-> So, that's several cases that should use "if", at least one more that
-> should use "showif" (PROCESSOR_SELECT), and several broken menus.
+Hi,
 
-Would it be terribly rude to ask if you could send in a quick patch (of
-the Not-signed-off-by variety) that uses both "if" and your "showif" (or
-my "visible if" suggestion) to fix one or two of these problems?
+On 11 May 2015 at 17:02, Chris J Arges <chris.j.arges@canonical.com> wrote:
+> When using make deb-pkg, builddeb is called without proper MAKEFLAGS due to the
+> script being invoked without '+'. This results in the following message when
+> building:
+> warning: jobserver unavailable: using -j1. Add `+' to parent make rule
+>
+> Add the '+' so the make operations can be parallelized.
+>
+> Signed-off-by: Chris J Arges <chris.j.arges@canonical.com>
 
-Either way, I hope to give my final opinion some time next week.
+Conflicts with my "add source package" patch now that it adds the
+bindeb-pkg target. This patch is still correct, and manually updating
+either your or my patch to apply after the other is quite trivial.
 
-Thanks,
+Reviewed-by: Riku Voipio <riku.voipio@linaro.org>
 
-
-Paul Bolle
-
+> ---
+>  scripts/package/Makefile | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/scripts/package/Makefile b/scripts/package/Makefile
+> index 99ca6e7..0dbfae7 100644
+> --- a/scripts/package/Makefile
+> +++ b/scripts/package/Makefile
+> @@ -88,7 +88,7 @@ quiet_cmd_builddeb = BUILDDEB
+>
+>  deb-pkg: FORCE
+>         $(MAKE) KBUILD_SRC=
+> -       $(call cmd,builddeb)
+> +       +$(call cmd,builddeb)
+>
+>  clean-dirs += $(objtree)/debian/
+>
+> --
+> 1.9.1
+>
