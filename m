@@ -1,59 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-yk0-f174.google.com ([209.85.160.174]:35919 "EHLO
-	mail-yk0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758472AbbEaSOe (ORCPT
+Received: from lb3-smtp-cloud6.xs4all.net ([194.109.24.31]:40472 "EHLO
+	lb3-smtp-cloud6.xs4all.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751158AbbFAH4x (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 31 May 2015 14:14:34 -0400
-MIME-Version: 1.0
-In-Reply-To: <CA+ToGPFkqQjpu6UW7LyneOV-jtVFygq2QpprBY5=DNi=du+FoA@mail.gmail.com>
-References: <1432640395-17310-1-git-send-email-geert+renesas@glider.be>
-	<1432640395-17310-2-git-send-email-geert+renesas@glider.be>
-	<CA+ToGPGAhmKm3RT=GB6Bxi2TBEMsWpjMTTm0WeqgQNATnM6b6g@mail.gmail.com>
-	<CAMuHMdWohSUg_uxg5VaFtT0Po_pwaht3+G7A+hAPS7B2hEXJcg@mail.gmail.com>
-	<CA+ToGPFkqQjpu6UW7LyneOV-jtVFygq2QpprBY5=DNi=du+FoA@mail.gmail.com>
-Date: Sun, 31 May 2015 15:14:33 -0300
-Message-ID: <CA+ToGPH2LQ3kCm6vms8hEP+d4AO5cfU-TCdLys3q0326gDFxLA@mail.gmail.com>
-Subject: Re: [PATCH 2/3] kconfig: Wrap long "make help" text lines
-From: Diego Viola <diego.viola@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+	Mon, 1 Jun 2015 03:56:53 -0400
+Message-ID: <1433145409.2361.14.camel@x220>
+Subject: Re: make binrpm-pkg problem with Fedora 22
+From: Paul Bolle <pebolle@tiscali.nl>
+Date: Mon, 01 Jun 2015 09:56:49 +0200
+In-Reply-To: <CA+r1ZhieLs6vb6RUZGeVp_crCu-LyYT9DOoAuynBT2xDEh=UCg@mail.gmail.com>
+References: <CA+r1ZhieLs6vb6RUZGeVp_crCu-LyYT9DOoAuynBT2xDEh=UCg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Geert Uytterhoeven <geert+renesas@glider.be>, Michal Marek <mmarek@suse.cz>, "Yann E. MORIN" <yann.morin.1998@free.fr>, linux-kbuild <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: Jim Davis <jim.epost@gmail.com>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org
 
-Done.
+On Fri, 2015-05-29 at 10:16 -0700, Jim Davis wrote:
+> On a new Fedora 22 install,  running 'make binrpm-pkg' in the v4.1-rc5
+> kernel source tree fails with
+> 
+> rpm --define "_builddir ." --target \
+>     x86_64 -bb ./binkernel.spec
+> rpm --target: unknown option
+> scripts/package/Makefile:60: recipe for target 'binrpm-pkg' failed
 
-On Sun, May 31, 2015 at 9:53 AM, Diego Viola <diego.viola@gmail.com> wrote:
-> Okay, will do.
->
-> Diego
->
-> On Sun, May 31, 2015 at 5:26 AM, Geert Uytterhoeven
-> <geert@linux-m68k.org> wrote:
->> On Sun, May 31, 2015 at 3:10 AM, Diego Viola <diego.viola@gmail.com> wrote:
->>> Can you please include a minor change in your patch?
->>>
->>> At line 89, there's this:
->>>
->>> # on its behavior(sets new symbols to their default value but not 'n') with the
->>>
->>> Please change this line to this:
->>>
->>> # on its behavior (sets new symbols to their default value but not 'n') with the
->>>
->>> There should be a space between "behavior" and the parentheses/bracket.
->>
->> That's an unrelated change in an unrelated part of my patch.
->>
->> Please send a separate patch to fix that.
->>
->> Gr{oetje,eeting}s,
->>
->>                         Geert
->>
->> --
->> Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
->>
->> In personal conversations with technical people, I call myself a hacker. But
->> when I'm talking to journalists I just say "programmer" or something like that.
->>                                 -- Linus Torvalds
+This looks like the issue I ran into a few times after installing
+Fedora: the need to install the rpm-build package separately, because it
+isn't included in the default install. At least, the installs I do tend
+to have it excluded. (The gotcha that I trip over _every_ time is that
+rpmbuild is packaged in rpm-build. Note the hyphen.)
+
+> From that makefile,
+> 
+> # Do we have rpmbuild, otherwise fall back to the older rpm
+> RPM := $(shell if [ -x "/usr/bin/rpmbuild" ]; then echo rpmbuild; \
+>                    else echo rpm; fi)
+> 
+> but it looks like the rpmbuild functionality has been taken out of
+> (plain) rpm now.
+
+This made me grep rpm's history a bit. I found a change from 2008 that
+reads:
+    Update rpm manpage wrt build modes
+    - the build modes have been removed ages ago, just point to rpmbuild manual
+
+And there's a change from 2000 that already reads:
+    Remove build modes from rpm, use rpmb and/or popt glue instead.
+
+We could consult people actually familiar with rpm's history, but it
+appears plain rpm hasn't been able to build rpms for quite some time. So
+I think scripts/package/Makefile should only (try to) use rpmbuild.
+
+Hope this helps,
+
+
+Paul Bolle
+
