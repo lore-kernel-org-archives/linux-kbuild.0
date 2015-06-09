@@ -1,74 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi0-f44.google.com ([209.85.218.44]:35149 "EHLO
-	mail-oi0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753322AbbFHUTd (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 8 Jun 2015 16:19:33 -0400
-From: Jim Davis <jim.epost@gmail.com>
-Subject: [PATCH] scripts/package/Makefile: rpmbuild is needed for rpm targets
-Date: Mon,  8 Jun 2015 13:19:08 -0700
-Message-Id: <1433794748-6570-1-git-send-email-jim.epost@gmail.com>
-In-Reply-To: <CA+r1ZhiyQbakrxr4saPE_mFjwjGG4aJxLHm3oCvqD=4=ByBA_w@mail.gmail.com>
-References: <CA+r1ZhiyQbakrxr4saPE_mFjwjGG4aJxLHm3oCvqD=4=ByBA_w@mail.gmail.com>
+Received: from smtp2-g21.free.fr ([212.27.42.2]:14451 "EHLO smtp2-g21.free.fr"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752106AbbFIH06 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 9 Jun 2015 03:26:58 -0400
+Received: from molly.corsac.net (unknown [78.194.244.226])
+	by smtp2-g21.free.fr (Postfix) with ESMTPS id 1C9614B021B
+	for <linux-kbuild@vger.kernel.org>; Tue,  9 Jun 2015 09:24:42 +0200 (CEST)
+Message-ID: <1433834784.3041.1.camel@debian.org>
+Subject: Re: [2/2] deb-pkg: add source package
+From: Yves-Alexis Perez <corsac@debian.org>
+Date: Tue, 09 Jun 2015 09:26:24 +0200
+In-Reply-To: <1432804275-13187-3-git-send-email-riku.voipio@linaro.org>
+References: <1432804275-13187-3-git-send-email-riku.voipio@linaro.org>
+Content-Type: multipart/signed; micalg="pgp-sha256";
+	protocol="application/pgp-signature"; boundary="=-I92HHozgJm64FYUKPGtY"
+Mime-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mmarek@suse.cz, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Jim Davis <jim.epost@gmail.com>
+To: Riku Voipio <riku.voipio@linaro.org>
+Cc: linux-kbuild@vger.kernel.org, mmarek@suse.cz, debian-kernel@lists.debian.org, maximilian attems <maks@stro.at>
 
-Before rpm release 4.1, in 2002, either the rpm command or the
-rpmbuild command could be used in the rpm-pkg or binrpm-pkg targets,
-and the Makefile chose the rpm command if the rpmbuild command wasn't
-found.
 
-After release 4.1, however, the rpm command could no longer be used in
-place of the rpmbuild command.  As the rpmbuild command is not
-installed by default, this can lead to failures with the rpm-pkg and
-binrpm-pkg targets:
+--=-I92HHozgJm64FYUKPGtY
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-rpm --define "_builddir ." --target \
-    x86_64 -bb ./binkernel.spec
-    rpm --target: unknown option
-    scripts/package/Makefile:60: recipe for target 'binrpm-pkg' failed
+On jeu., 2015-05-28 at 12:11 +0300, Riku Voipio wrote:
+> +       dpkg-genchanges > ../linux-upstream_${packageversion}_
+> ${debarch}.changes
+> +else
+> +       dpkg-genchanges -b > ../linux-upstream_${packageversion}_
+> ${debarch}.changes
 
-Change the Makefile to use rpmbuild unconditionally to avoid this.
+${debarch} seems empty here when using make deb-pkg, not too sure why
+(I'm building using KBUILD_OUTPUT, not sure if it's related).
 
-Signed-off-by: Jim Davis <jim.epost@gmail.com>
----
- scripts/package/Makefile | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+Regards,
+--=20
+Yves-Alexis
 
-diff --git a/scripts/package/Makefile b/scripts/package/Makefile
-index 99ca6e7..8b11d5a 100644
---- a/scripts/package/Makefile
-+++ b/scripts/package/Makefile
-@@ -21,10 +21,6 @@
- # Note that the rpm-pkg target cannot be used with KBUILD_OUTPUT,
- # but the binrpm-pkg target can; for some reason O= gets ignored.
+--=-I92HHozgJm64FYUKPGtY
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
 
--# Do we have rpmbuild, otherwise fall back to the older rpm
--RPM := $(shell if [ -x "/usr/bin/rpmbuild" ]; then echo rpmbuild; \
--	           else echo rpm; fi)
--
- # Remove hyphens since they have special meaning in RPM filenames
- KERNELPATH := kernel-$(subst -,_,$(KERNELRELEASE))
- # Include only those top-level files that are needed by make, plus the GPL copy
-@@ -51,7 +47,7 @@ rpm-pkg rpm: FORCE
- 	rm -f $(objtree)/.scmversion
- 	$(CONFIG_SHELL) $(srctree)/scripts/mkversion > $(objtree)/.tmp_version
- 	mv -f $(objtree)/.tmp_version $(objtree)/.version
--	$(RPM) $(RPMOPTS) --target $(UTS_MACHINE) -ta $(KERNELPATH).tar.gz
-+	rpmbuild --target $(UTS_MACHINE) -ta $(KERNELPATH).tar.gz
- 	rm $(KERNELPATH).tar.gz kernel.spec
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
- # binrpm-pkg
-@@ -62,7 +58,7 @@ binrpm-pkg: FORCE
- 	$(CONFIG_SHELL) $(srctree)/scripts/mkversion > $(objtree)/.tmp_version
- 	mv -f $(objtree)/.tmp_version $(objtree)/.version
+iQEcBAABCAAGBQJVdpUgAAoJEG3bU/KmdcClth8H/3uJfOMQ8pVszluSPbhEO7f8
++/NAllYGs+vsHfjUE2rP6ExU8/hNhZ11DeMdKs6+4emM3bQxSfWid2efIqu8+0dE
+tpUf7Kv6xP60n+JcGx0vxqQh9YHYcXFVPCtVnbaI9nMFMBfYaBDTsMOugIz0uAAO
+YJoRmGmN9v+DMg2FAF2Di0xqG0H2QrALRBU3rZtGRYJqCRCdpL47uHjXKTtYWoNv
+Zaz/EBdSas/7XZcFkgkPFayB6chalhJOzBEduG1ZnYHr2vrb9dLXZyN57tzO+vte
+ECVhMIblzGhIK7+cRd5er3plQVYYKmdlYWo+IcHtjujKoS/FfDQIgsEJgc3lDR4=
+=rFGi
+-----END PGP SIGNATURE-----
 
--	$(RPM) $(RPMOPTS) --define "_builddir $(objtree)" --target \
-+	rpmbuild --define "_builddir $(objtree)" --target \
- 		$(UTS_MACHINE) -bb $(objtree)/binkernel.spec
- 	rm binkernel.spec
-
---
-2.4.2
+--=-I92HHozgJm64FYUKPGtY--
