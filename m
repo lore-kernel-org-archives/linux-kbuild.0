@@ -1,43 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:50446 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:55483 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754051AbbFOMzt (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 15 Jun 2015 08:55:49 -0400
-Message-ID: <557ECB52.2060402@suse.cz>
-Date: Mon, 15 Jun 2015 14:55:46 +0200
+	id S1750734AbbFOOMp (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 15 Jun 2015 10:12:45 -0400
+Message-ID: <557EDD5B.5050703@suse.cz>
+Date: Mon, 15 Jun 2015 16:12:43 +0200
 From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [RFC] kconfig: a new command line tool to set configs
-References: <20150512103128.GA25706@mwanda>
-In-Reply-To: <20150512103128.GA25706@mwanda>
+Subject: Re: [PATCH] scripts/package/Makefile: rpmbuild is needed for rpm
+ targets
+References: <CA+r1ZhiyQbakrxr4saPE_mFjwjGG4aJxLHm3oCvqD=4=ByBA_w@mail.gmail.com> <1433794748-6570-1-git-send-email-jim.epost@gmail.com>
+In-Reply-To: <1433794748-6570-1-git-send-email-jim.epost@gmail.com>
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dan Carpenter <dan.carpenter@oracle.com>, linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
+To: Jim Davis <jim.epost@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 2015-05-12 12:31, Dan Carpenter wrote:
-> This is an ugly hack job I made last night and it barely works.  It
-> does two things:
+On 2015-06-08 22:19, Jim Davis wrote:
+> Before rpm release 4.1, in 2002, either the rpm command or the
+> rpmbuild command could be used in the rpm-pkg or binrpm-pkg targets,
+> and the Makefile chose the rpm command if the rpmbuild command wasn't
+> found.
 > 
-> 1)  Sometimes I want to search for a config so I have to load
->     menuconfig, then search for the config entry, then exit.  With
->     this script I simply run:
+> After release 4.1, however, the rpm command could no longer be used in
+> place of the rpmbuild command.  As the rpmbuild command is not
+> installed by default, this can lead to failures with the rpm-pkg and
+> binrpm-pkg targets:
 > 
-> 	./scripts/kconfig/kconfig search COMEDI
+> rpm --define "_builddir ." --target \
+>     x86_64 -bb ./binkernel.spec
+>     rpm --target: unknown option
+>     scripts/package/Makefile:60: recipe for target 'binrpm-pkg' failed
 > 
-> 2)  I quite often try to enable something by doing:
+> Change the Makefile to use rpmbuild unconditionally to avoid this.
 > 
-> 	echo CONFIG_FOO=y >> .config
-> 	make oldconfig
-> 	grep CONFIG_FOO .config
-> 
->     The grep is to see if the setting worked.  Now I can do:
-> 
-> 	./scripts/kconfig/kconfig set CONFIG_FOO=y
+> Signed-off-by: Jim Davis <jim.epost@gmail.com>
 
-The second use-case is provided by scripts/config already. It's is a lot
-simpler shell script, but it's maybe good enough for such task.
+I agree that compatibility with rpm < 4.1 is not an issue nowadays and
+"rpmbuild: command not found" is a lot more informative error message. I
+applied the patch to kbuild.git#misc.
 
+thanks,
 Michal
+
