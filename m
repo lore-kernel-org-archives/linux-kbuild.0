@@ -1,45 +1,29 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:51203 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751101AbbFKNfE (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 11 Jun 2015 09:35:04 -0400
-Date: Thu, 11 Jun 2015 15:35:01 +0200
-From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] kbuild: include core debug info when DEBUG_INFO_REDUCED
-Message-ID: <20150611133501.GA23573@sepie.suse.cz>
-References: <1426902601-13524-1-git-send-email-linux@rasmusvillemoes.dk>
- <87eglie87j.fsf@rasmusvillemoes.dk>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Received: from mail.emea.novell.com ([130.57.118.101]:38497 "EHLO
+	mail.emea.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753243AbbFOL7R convert rfc822-to-8bit (ORCPT
+	<rfc822;groupwise-linux-kbuild@vger.kernel.org:3:1>);
+	Mon, 15 Jun 2015 07:59:17 -0400
+Message-Id: <557EDA310200007800084C43@mail.emea.novell.com>
+Date: Mon, 15 Jun 2015 12:59:13 +0100
+From: "Jan Beulich" <JBeulich@suse.com>
+Subject: [PATCH 0/2] kconfig: allow use of relations other than
+ (in)equality
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8BIT
 Content-Disposition: inline
-In-Reply-To: <87eglie87j.fsf@rasmusvillemoes.dk>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rasmus Villemoes <linux@rasmusvillemoes.dk>
-Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: pebolle@tiscali.nl, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Thu, Jun 11, 2015 at 02:32:48PM +0200, Rasmus Villemoes wrote:
-> On Sat, Mar 21 2015, Rasmus Villemoes <linux@rasmusvillemoes.dk> wrote:
-> 
-> > With CONFIG_DEBUG_INFO_REDUCED, we do get quite a lot of debug info
-> > (around 22.7 MB for a defconfig+DEBUG_INFO_REDUCED). However, the
-> > "basenames must match" rule used by -femit-struct-debug-baseonly
-> > option means that we miss some core data structures, such as struct
-> > {device, file, inode, mm_struct, page} etc.
-> >
-> > We can easily get these included as well, while still getting the
-> > benefits of CONFIG_DEBUG_INFO_REDUCED (faster build times and smaller
-> > individual object files): All it takes is a dummy translation unit
-> > including a few strategic headers and compiled with a flag overriding
-> > -femit-struct-debug-baseonly.
-> >
-> > This increases the size of .debug_info by ~0.3%, but these 90 KB
-> > contain some rather useful info.
-> >
-> 
-> Any comments on this patch? I know it's a little hacky, but I do find it
-> rather useful. For example, I just noticed that pahole shows this
+1: allow use of relations other than (in)equality
+2: re-generate *.c_shipped files after previous change
 
-I applied it to kbuild.git#kbuild now. It indeed can be quite useful.
+Signed-off-by: Jan Beulich <jbeulich@suse.com>
+---
+Note that while benign for the first patch, the second patch can only
+be applied cleanly on top of "kconfig: don't silently ignore unhandled
+characters" (commit 2e0d737fc7 in kbuild.git).
 
-Michal
