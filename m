@@ -1,58 +1,88 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f173.google.com ([209.85.212.173]:37309 "EHLO
-	mail-wi0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757556AbbFQGef (ORCPT
+Received: from mail-la0-f48.google.com ([209.85.215.48]:35659 "EHLO
+	mail-la0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752878AbbFQMeE (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 17 Jun 2015 02:34:35 -0400
-Received: by wifx6 with SMTP id x6so41252495wif.0
-        for <linux-kbuild@vger.kernel.org>; Tue, 16 Jun 2015 23:34:34 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <1434421046-4020-1-git-send-email-tytso@mit.edu>
-References: <1434421046-4020-1-git-send-email-tytso@mit.edu>
-Date: Wed, 17 Jun 2015 09:34:34 +0300
-Message-ID: <CAAqcGHkcmFxPtCxnNgdoKyPerZXQSVpQ-FVWz7PU01TF=rzMbA@mail.gmail.com>
-Subject: Re: [PATCH] builddeb: sign the modules after splitting out the
- debuginfo files
-From: Riku Voipio <riku.voipio@linaro.org>
-Content-Type: text/plain; charset=UTF-8
+	Wed, 17 Jun 2015 08:34:04 -0400
+Received: by labko7 with SMTP id ko7so32004820lab.2
+        for <linux-kbuild@vger.kernel.org>; Wed, 17 Jun 2015 05:34:03 -0700 (PDT)
+From: riku.voipio@linaro.org
+Subject: [PATCH] package Makefile: fix perf-tar targets when outdir is set
+Date: Wed, 17 Jun 2015 15:34:01 +0300
+Message-Id: <1434544441-2973-1-git-send-email-riku.voipio@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Theodore Ts'o <tytso@mit.edu>
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org, mmarek@suse.cz
+Cc: Riku Voipio <riku.voipio@linaro.org>
 
-Hi,
+From: Riku Voipio <riku.voipio@linaro.org>
 
-On 16 June 2015 at 05:17, Theodore Ts'o <tytso@mit.edu> wrote:
-> Signed-off-by: Theodore Ts'o <tytso@mit.edu>
+When building with $srctree != $objtree, perf-tar-* targets fail
+to read the MANIFEST file and add the PERF-VERSION-FILE needed
+by out-of-tree builds. The build errors and an incorrect tar is created:
 
-A similar patch is already in Michals tree:
+$ make O=build-x86 perf-targz-src-pkg
+  TAR
+cat: ../tools/perf/MANIFEST: No such file or directory
+tar: perf-4.1.0-rc8/PERF-VERSION-FILE: Cannot stat: No such file or dir..
+tar: Exiting with failure status due to previous errors
 
-https://git.kernel.org/cgit/linux/kernel/git/mmarek/kbuild.git/commit/?h=misc&id=64178cb62c329350fe06622cd215264d849b27b1
+Kbuild sets objtree to "." and srctree to ".." The command to output
+MANIFEST becomes:
 
-Riku
+   $(cd ..; echo $(cat ../tools/perf/MANIFEST))
 
-> ---
->  scripts/package/builddeb | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-> index 88dbf23..159ec7c 100755
-> --- a/scripts/package/builddeb
-> +++ b/scripts/package/builddeb
-> @@ -163,6 +163,9 @@ if grep -q '^CONFIG_MODULES=y' $KCONFIG_CONFIG ; then
->                         $OBJCOPY --add-gnu-debuglink=$dbg_dir/usr/lib/debug/$module $tmpdir/$module
->                 done
->         fi
-> +       if grep -q '^CONFIG_MODULE_SIG=y' $KCONFIG_CONFIG ; then
-> +               INSTALL_MOD_PATH="$tmpdir" $MAKE KBUILD_SRC= modules_sign
-> +       fi
->  fi
->
->  if [ "$ARCH" != "um" ]; then
-> --
-> 2.3.0
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Without MANIFEST, the entire kernel source tree is added to the perf
+source tarball. The easy fix is removing the unneccesary cd $objtree bit.
+
+Second, PERF-VERSION-FILE gets not added, because in-tree build path is
+hardcoded to Makefile:
+
+   util/PERF-VERSION-GEN ../../$(perf-tar)/ 2>/dev/null)
+
+The PERF-VERSION-GEN needs to be run from tools/perf directory, so
+we can't just replace the hardcoded "../../" bit the relative $objtree
+contents - we need a fully expanded $objtree_full variable to place
+PERF-VERSION-FILE to the right place. Also remove the error redirect
+to /dev/null which hid the error.
+
+Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
+---
+ scripts/package/Makefile | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/scripts/package/Makefile b/scripts/package/Makefile
+index 99ca6e7..98f934c 100644
+--- a/scripts/package/Makefile
++++ b/scripts/package/Makefile
+@@ -33,6 +33,11 @@ TAR_CONTENT := $(KBUILD_ALLDIRS) kernel.spec .config .scmversion Makefile \
+ TAR_CONTENT := $(addprefix $(KERNELPATH)/,$(TAR_CONTENT))
+ MKSPEC     := $(srctree)/scripts/package/mkspec
+ 
++# objtree is relative path, which doesn't work if we cd around
++ifneq ($(objtree),)
++  objtree_full := $(shell readlink -f $(objtree) || echo $(objtree))
++endif
++
+ # rpm-pkg
+ # ---------------------------------------------------------------------------
+ rpm-pkg rpm: FORCE
+@@ -110,13 +115,12 @@ perf-tar=perf-$(KERNELVERSION)
+ quiet_cmd_perf_tar = TAR
+       cmd_perf_tar = \
+ git --git-dir=$(srctree)/.git archive --prefix=$(perf-tar)/         \
+-	HEAD^{tree} $$(cd $(srctree);                               \
+-		       echo $$(cat $(srctree)/tools/perf/MANIFEST)) \
++	HEAD^{tree} $$(echo $$(cat $(srctree)/tools/perf/MANIFEST)) \
+ 	-o $(perf-tar).tar;                                         \
+ mkdir -p $(perf-tar);                                               \
+ git --git-dir=$(srctree)/.git rev-parse HEAD > $(perf-tar)/HEAD;    \
+ (cd $(srctree)/tools/perf;                                          \
+-util/PERF-VERSION-GEN ../../$(perf-tar)/ 2>/dev/null);              \
++util/PERF-VERSION-GEN $(objtree_full)/$(perf-tar)/);                \
+ tar rf $(perf-tar).tar $(perf-tar)/HEAD $(perf-tar)/PERF-VERSION-FILE; \
+ rm -r $(perf-tar);                                                  \
+ $(if $(findstring tar-src,$@),,                                     \
+-- 
+2.1.4
+
