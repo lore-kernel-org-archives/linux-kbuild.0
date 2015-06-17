@@ -1,88 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-la0-f48.google.com ([209.85.215.48]:35659 "EHLO
-	mail-la0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752878AbbFQMeE (ORCPT
+Received: from mx4.itb.ac.id ([167.205.1.69]:26589 "EHLO mx4.ITB.ac.id"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756504AbbFQPNo convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 17 Jun 2015 08:34:04 -0400
-Received: by labko7 with SMTP id ko7so32004820lab.2
-        for <linux-kbuild@vger.kernel.org>; Wed, 17 Jun 2015 05:34:03 -0700 (PDT)
-From: riku.voipio@linaro.org
-Subject: [PATCH] package Makefile: fix perf-tar targets when outdir is set
-Date: Wed, 17 Jun 2015 15:34:01 +0300
-Message-Id: <1434544441-2973-1-git-send-email-riku.voipio@linaro.org>
+	Wed, 17 Jun 2015 11:13:44 -0400
+Received: from av2.itb.ac.id (av2.itb.ac.id [167.205.1.68])
+	by mx4.ITB.ac.id (Postfix) with ESMTP id 3mBV5q0148z2bj4M
+	for <linux-kbuild@vger.kernel.org>; Wed, 17 Jun 2015 22:03:43 +0700 (WIB)
+Received: from mx4.ITB.ac.id ([167.205.1.69])
+	by av2.itb.ac.id (av2.itb.ac.id [167.205.1.73]) (amavisd-new, port 10004)
+	with ESMTP id VdFt32KIDR27 for <linux-kbuild@vger.kernel.org>;
+	Wed, 17 Jun 2015 22:03:35 +0700 (WIB)
+Received: from mail.gc.itb.ac.id (GC.ITB.ac.id [167.205.16.13])
+	by mx4.ITB.ac.id (Postfix) with ESMTP id 3mBV5M0wC1z2bhtG
+	for <linux-kbuild@vger.kernel.org>; Wed, 17 Jun 2015 22:03:19 +0700 (WIB)
+Date: Wed, 17 Jun 2015 17:26:42 +0700 (WIB)
+From: Q Foundation <yan@gc.itb.ac.id>
+Reply-To: Q Foundation <qforgqa@gmail.com>
+Message-ID: <905203993.49930.1434536802972.JavaMail.zimbra@gc.itb.ac.id>
+Subject: Geld
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org, mmarek@suse.cz
-Cc: Riku Voipio <riku.voipio@linaro.org>
 
-From: Riku Voipio <riku.voipio@linaro.org>
 
-When building with $srctree != $objtree, perf-tar-* targets fail
-to read the MANIFEST file and add the PERF-VERSION-FILE needed
-by out-of-tree builds. The build errors and an incorrect tar is created:
 
-$ make O=build-x86 perf-targz-src-pkg
-  TAR
-cat: ../tools/perf/MANIFEST: No such file or directory
-tar: perf-4.1.0-rc8/PERF-VERSION-FILE: Cannot stat: No such file or dir..
-tar: Exiting with failure status due to previous errors
+Lieber Begünstigte,
 
-Kbuild sets objtree to "." and srctree to ".." The command to output
-MANIFEST becomes:
+Sie wurden ausgewählt, um (€ 950,000.00 EURO) als Charity-Spenden / Hilfe der Qatar Foundation erhalten. Kindy Antwort per E-Mail für weitere Informationen: qforgqa@gmail.com
 
-   $(cd ..; echo $(cat ../tools/perf/MANIFEST))
+Mit freundlichen Grüßen,
+Ingenieur Saad Al Muhannadi.
+Kontakt e - mail: qforgqa@gmail.com
 
-Without MANIFEST, the entire kernel source tree is added to the perf
-source tarball. The easy fix is removing the unneccesary cd $objtree bit.
+Präsident der Qatar Foundation.
 
-Second, PERF-VERSION-FILE gets not added, because in-tree build path is
-hardcoded to Makefile:
+WICHTIG: Wenn Sie diese Nachricht in Ihrem Spam- oder Junk-Ordner zu erhalten, ist es aufgrund von Ihrem Netzanbieter, bitte für Ansprüche zurück zu beantworten.
+__________________________________________________________________________
 
-   util/PERF-VERSION-GEN ../../$(perf-tar)/ 2>/dev/null)
+Cher bénéficiaire,
 
-The PERF-VERSION-GEN needs to be run from tools/perf directory, so
-we can't just replace the hardcoded "../../" bit the relative $objtree
-contents - we need a fully expanded $objtree_full variable to place
-PERF-VERSION-FILE to the right place. Also remove the error redirect
-to /dev/null which hid the error.
+Vous avez été sélectionné pour recevoir (€ 950,000.00 EURO) que les dons de charité / aide de la Fondation du Qatar. Kindy réponse par e-mail pour plus d'informations: qforgqa@gmail.com
 
-Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
----
- scripts/package/Makefile | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+Avec mes meilleures salutations,
+Ingénieur Saad Al Muhannadi.
+Contact e - mail: qforgqa@gmail.com
 
-diff --git a/scripts/package/Makefile b/scripts/package/Makefile
-index 99ca6e7..98f934c 100644
---- a/scripts/package/Makefile
-+++ b/scripts/package/Makefile
-@@ -33,6 +33,11 @@ TAR_CONTENT := $(KBUILD_ALLDIRS) kernel.spec .config .scmversion Makefile \
- TAR_CONTENT := $(addprefix $(KERNELPATH)/,$(TAR_CONTENT))
- MKSPEC     := $(srctree)/scripts/package/mkspec
- 
-+# objtree is relative path, which doesn't work if we cd around
-+ifneq ($(objtree),)
-+  objtree_full := $(shell readlink -f $(objtree) || echo $(objtree))
-+endif
-+
- # rpm-pkg
- # ---------------------------------------------------------------------------
- rpm-pkg rpm: FORCE
-@@ -110,13 +115,12 @@ perf-tar=perf-$(KERNELVERSION)
- quiet_cmd_perf_tar = TAR
-       cmd_perf_tar = \
- git --git-dir=$(srctree)/.git archive --prefix=$(perf-tar)/         \
--	HEAD^{tree} $$(cd $(srctree);                               \
--		       echo $$(cat $(srctree)/tools/perf/MANIFEST)) \
-+	HEAD^{tree} $$(echo $$(cat $(srctree)/tools/perf/MANIFEST)) \
- 	-o $(perf-tar).tar;                                         \
- mkdir -p $(perf-tar);                                               \
- git --git-dir=$(srctree)/.git rev-parse HEAD > $(perf-tar)/HEAD;    \
- (cd $(srctree)/tools/perf;                                          \
--util/PERF-VERSION-GEN ../../$(perf-tar)/ 2>/dev/null);              \
-+util/PERF-VERSION-GEN $(objtree_full)/$(perf-tar)/);                \
- tar rf $(perf-tar).tar $(perf-tar)/HEAD $(perf-tar)/PERF-VERSION-FILE; \
- rm -r $(perf-tar);                                                  \
- $(if $(findstring tar-src,$@),,                                     \
--- 
-2.1.4
+Président de la Fondation du Qatar.
 
+IMPORTANT: Si vous recevez ce message dans votre dossier spam ou pourriels, cela est dû à votre fournisseur de réseau, s'il vous plaît répondre retour pour les réclamations.
