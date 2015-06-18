@@ -1,92 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-la0-f45.google.com ([209.85.215.45]:35829 "EHLO
-	mail-la0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751001AbbFRMiE (ORCPT
+Received: from mail-la0-f47.google.com ([209.85.215.47]:35301 "EHLO
+	mail-la0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751001AbbFRMv6 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 18 Jun 2015 08:38:04 -0400
-Received: by labko7 with SMTP id ko7so53551698lab.2
-        for <linux-kbuild@vger.kernel.org>; Thu, 18 Jun 2015 05:38:03 -0700 (PDT)
+	Thu, 18 Jun 2015 08:51:58 -0400
+Received: by labko7 with SMTP id ko7so53798903lab.2
+        for <linux-kbuild@vger.kernel.org>; Thu, 18 Jun 2015 05:51:57 -0700 (PDT)
 From: riku.voipio@linaro.org
-Subject: [PATCH] package Makefile: fix perf-tar targets when outdir is set
-Date: Thu, 18 Jun 2015 15:37:58 +0300
-Message-Id: <1434631078-12035-1-git-send-email-riku.voipio@linaro.org>
+Subject: [PATCH] Makefile.perf: make python module depend on traceevent
+Date: Thu, 18 Jun 2015 15:51:49 +0300
+Message-Id: <1434631909-12636-1-git-send-email-riku.voipio@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org, mmarek@suse.cz
-Cc: Riku Voipio <riku.voipio@linaro.org>
+To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: acme@kernel.org, mingo@redhat.com, a.p.zijlstra@chello.nl, hekuang@huawei.com, Riku Voipio <riku.voipio@linaro.org>
 
 From: Riku Voipio <riku.voipio@linaro.org>
 
-When building with $srctree != $objtree, perf-tar-* targets fail
-to read the MANIFEST file and add the PERF-VERSION-FILE needed
-by out-of-tree builds. The build errors and an incorrect tar is created:
+Building python module might fail if libtraceevent-dynamic-list
+hasn't been built before:
 
-$ make O=build-x86 perf-targz-src-pkg
-  TAR
-cat: ../tools/perf/MANIFEST: No such file or directory
-tar: perf-4.1.0-rc8/PERF-VERSION-FILE: Cannot stat: No such file or
-dir..
-tar: Exiting with failure status due to previous errors
+to LDFLAGS:
 
-Kbuild sets objtree to "." and srctree to ".." The command to output
-MANIFEST becomes:
+  GEN      python/perf.so
+/usr/bin/ld: cannot open linker script file /x/tools/lib/traceevent/libtraceevent-dynamic-list: No such file or directory
+collect2: error: ld returned 1 exit status
+error: command 'x86_64-linux-gnu-gcc' failed with exit status 1
+cp: cannot stat ?python_ext_build/lib/perf.so?: No such file or directory
 
-   $(cd ..; echo $(cat ../tools/perf/MANIFEST))
-
-Without MANIFEST, the entire kernel source tree is added to the perf
-source tarball. The *correct* fix is to keep the cd and remove srctree
-from cat command line since MANIFEST has wildcards that fail to expand
-working directory isn't srctree.
-
-Second, PERF-VERSION-FILE gets not added, because in-tree build path is
-hardcoded to Makefile:
-
-   util/PERF-VERSION-GEN ../../$(perf-tar)/ 2>/dev/null)
-
-The PERF-VERSION-GEN needs to be run from tools/perf directory, so
-we can't just replace the hardcoded "../../" bit the relative $objtree
-contents - we need a fully expanded $objtree_full variable to place
-PERF-VERSION-FILE to the right place. Also remove the error redirect
-to /dev/null which hid the error.
-
-Patch v2: switch from easy fix to correct fix
+Add explicit Makefile dependency to make sure libtraceevent-dynamic-list
+is built before.
 
 Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
 ---
- scripts/package/Makefile | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ tools/perf/Makefile.perf | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/scripts/package/Makefile b/scripts/package/Makefile
-index 99ca6e7..cd5a321 100644
---- a/scripts/package/Makefile
-+++ b/scripts/package/Makefile
-@@ -33,6 +33,11 @@ TAR_CONTENT := $(KBUILD_ALLDIRS) kernel.spec .config .scmversion Makefile \
- TAR_CONTENT := $(addprefix $(KERNELPATH)/,$(TAR_CONTENT))
- MKSPEC     := $(srctree)/scripts/package/mkspec
+diff --git a/tools/perf/Makefile.perf b/tools/perf/Makefile.perf
+index b1dfcd8..66045d0 100644
+--- a/tools/perf/Makefile.perf
++++ b/tools/perf/Makefile.perf
+@@ -188,7 +188,7 @@ export PYTHON_EXTBUILD_LIB PYTHON_EXTBUILD_TMP
+ python-clean := $(call QUIET_CLEAN, python) $(RM) -r $(PYTHON_EXTBUILD) $(OUTPUT)python/perf.so
  
-+# objtree is relative path, which doesn't work if we cd around
-+ifneq ($(objtree),)
-+  objtree_full := $(shell readlink -f $(objtree) || echo $(objtree))
-+endif
-+
- # rpm-pkg
- # ---------------------------------------------------------------------------
- rpm-pkg rpm: FORCE
-@@ -111,12 +116,12 @@ quiet_cmd_perf_tar = TAR
-       cmd_perf_tar = \
- git --git-dir=$(srctree)/.git archive --prefix=$(perf-tar)/         \
- 	HEAD^{tree} $$(cd $(srctree);                               \
--		       echo $$(cat $(srctree)/tools/perf/MANIFEST)) \
-+	               echo $$(cat tools/perf/MANIFEST))            \
- 	-o $(perf-tar).tar;                                         \
- mkdir -p $(perf-tar);                                               \
- git --git-dir=$(srctree)/.git rev-parse HEAD > $(perf-tar)/HEAD;    \
- (cd $(srctree)/tools/perf;                                          \
--util/PERF-VERSION-GEN ../../$(perf-tar)/ 2>/dev/null);              \
-+util/PERF-VERSION-GEN $(objtree_full)/$(perf-tar)/);                \
- tar rf $(perf-tar).tar $(perf-tar)/HEAD $(perf-tar)/PERF-VERSION-FILE; \
- rm -r $(perf-tar);                                                  \
- $(if $(findstring tar-src,$@),,                                     \
+ PYTHON_EXT_SRCS := $(shell grep -v ^\# util/python-ext-sources)
+-PYTHON_EXT_DEPS := util/python-ext-sources util/setup.py $(LIBTRACEEVENT) $(LIBAPI)
++PYTHON_EXT_DEPS := util/python-ext-sources util/setup.py $(LIBTRACEEVENT) $(LIBTRACEEVENT_DYNAMIC_LIST) $(LIBAPI)
+ 
+ $(OUTPUT)python/perf.so: $(PYTHON_EXT_SRCS) $(PYTHON_EXT_DEPS)
+ 	$(QUIET_GEN)CFLAGS='$(CFLAGS)' $(PYTHON_WORD) util/setup.py \
 -- 
 2.1.4
 
