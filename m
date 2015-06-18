@@ -1,53 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx4.itb.ac.id ([167.205.1.69]:26589 "EHLO mx4.ITB.ac.id"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756504AbbFQPNo convert rfc822-to-8bit (ORCPT
+Received: from mail-oi0-f50.google.com ([209.85.218.50]:34986 "EHLO
+	mail-oi0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752592AbbFRAWz (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 17 Jun 2015 11:13:44 -0400
-Received: from av2.itb.ac.id (av2.itb.ac.id [167.205.1.68])
-	by mx4.ITB.ac.id (Postfix) with ESMTP id 3mBV5q0148z2bj4M
-	for <linux-kbuild@vger.kernel.org>; Wed, 17 Jun 2015 22:03:43 +0700 (WIB)
-Received: from mx4.ITB.ac.id ([167.205.1.69])
-	by av2.itb.ac.id (av2.itb.ac.id [167.205.1.73]) (amavisd-new, port 10004)
-	with ESMTP id VdFt32KIDR27 for <linux-kbuild@vger.kernel.org>;
-	Wed, 17 Jun 2015 22:03:35 +0700 (WIB)
-Received: from mail.gc.itb.ac.id (GC.ITB.ac.id [167.205.16.13])
-	by mx4.ITB.ac.id (Postfix) with ESMTP id 3mBV5M0wC1z2bhtG
-	for <linux-kbuild@vger.kernel.org>; Wed, 17 Jun 2015 22:03:19 +0700 (WIB)
-Date: Wed, 17 Jun 2015 17:26:42 +0700 (WIB)
-From: Q Foundation <yan@gc.itb.ac.id>
-Reply-To: Q Foundation <qforgqa@gmail.com>
-Message-ID: <905203993.49930.1434536802972.JavaMail.zimbra@gc.itb.ac.id>
-Subject: Geld
+	Wed, 17 Jun 2015 20:22:55 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
+In-Reply-To: <557EEF42.20504@infradead.org>
+References: <557EDA750200007800084C46@mail.emea.novell.com>
+	<557EEF42.20504@infradead.org>
+Date: Thu, 18 Jun 2015 02:22:54 +0200
+Message-ID: <CAEMqcmppqr+cT6g-b_JwUZJA3h2RGe_Fi79VANXBe8Td6cO5Jw@mail.gmail.com>
+Subject: Re: [PATCH v3 1/2] kconfig: allow use of relations other than (in)equality
+From: Ulf Magnusson <ulfalizer.lkml@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: Jan Beulich <JBeulich@suse.com>, Michal Marek <mmarek@suse.cz>, pebolle@tiscali.nl, linux-kbuild@vger.kernel.org, Kernel Mailing List <linux-kernel@vger.kernel.org>
 
+On Mon, Jun 15, 2015 at 5:29 PM, Randy Dunlap <rdunlap@infradead.org> wrote:
+>
+> Hi,
+>
+> Please update Documentation/kbuild/kconfig-language.txt where <expr>
+> syntax is defined.
+>
+>
+> --
+> ~Randy
 
+Is this likely to be the final version? Approx. when will it go in?
 
-Lieber Begünstigte,
-
-Sie wurden ausgewählt, um (€ 950,000.00 EURO) als Charity-Spenden / Hilfe der Qatar Foundation erhalten. Kindy Antwort per E-Mail für weitere Informationen: qforgqa@gmail.com
-
-Mit freundlichen Grüßen,
-Ingenieur Saad Al Muhannadi.
-Kontakt e - mail: qforgqa@gmail.com
-
-Präsident der Qatar Foundation.
-
-WICHTIG: Wenn Sie diese Nachricht in Ihrem Spam- oder Junk-Ordner zu erhalten, ist es aufgrund von Ihrem Netzanbieter, bitte für Ansprüche zurück zu beantworten.
-__________________________________________________________________________
-
-Cher bénéficiaire,
-
-Vous avez été sélectionné pour recevoir (€ 950,000.00 EURO) que les dons de charité / aide de la Fondation du Qatar. Kindy réponse par e-mail pour plus d'informations: qforgqa@gmail.com
-
-Avec mes meilleures salutations,
-Ingénieur Saad Al Muhannadi.
-Contact e - mail: qforgqa@gmail.com
-
-Président de la Fondation du Qatar.
-
-IMPORTANT: Si vous recevez ce message dans votre dossier spam ou pourriels, cela est dû à votre fournisseur de réseau, s'il vous plaît répondre retour pour les réclamations.
+/Ulf
