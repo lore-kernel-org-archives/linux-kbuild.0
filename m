@@ -1,54 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-la0-f47.google.com ([209.85.215.47]:35301 "EHLO
-	mail-la0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751001AbbFRMv6 (ORCPT
+Received: from mail-lb0-f172.google.com ([209.85.217.172]:33366 "EHLO
+	mail-lb0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755153AbbFRMwY (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 18 Jun 2015 08:51:58 -0400
-Received: by labko7 with SMTP id ko7so53798903lab.2
-        for <linux-kbuild@vger.kernel.org>; Thu, 18 Jun 2015 05:51:57 -0700 (PDT)
+	Thu, 18 Jun 2015 08:52:24 -0400
+Received: by lbbvz5 with SMTP id vz5so3492405lbb.0
+        for <linux-kbuild@vger.kernel.org>; Thu, 18 Jun 2015 05:52:22 -0700 (PDT)
 From: riku.voipio@linaro.org
-Subject: [PATCH] Makefile.perf: make python module depend on traceevent
-Date: Thu, 18 Jun 2015 15:51:49 +0300
-Message-Id: <1434631909-12636-1-git-send-email-riku.voipio@linaro.org>
+Subject: [PATCH] tools/lib: improve clean target
+Date: Thu, 18 Jun 2015 15:52:18 +0300
+Message-Id: <1434631938-12681-1-git-send-email-riku.voipio@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: acme@kernel.org, mingo@redhat.com, a.p.zijlstra@chello.nl, hekuang@huawei.com, Riku Voipio <riku.voipio@linaro.org>
+Cc: acme@kernel.org, mingo@redhat.com, a.p.zijlstra@chello.nl, Riku Voipio <riku.voipio@linaro.org>
 
 From: Riku Voipio <riku.voipio@linaro.org>
 
-Building python module might fail if libtraceevent-dynamic-list
-hasn't been built before:
-
-to LDFLAGS:
-
-  GEN      python/perf.so
-/usr/bin/ld: cannot open linker script file /x/tools/lib/traceevent/libtraceevent-dynamic-list: No such file or directory
-collect2: error: ld returned 1 exit status
-error: command 'x86_64-linux-gnu-gcc' failed with exit status 1
-cp: cannot stat ?python_ext_build/lib/perf.so?: No such file or directory
-
-Add explicit Makefile dependency to make sure libtraceevent-dynamic-list
-is built before.
+The clean targets miss some .cmd and .d files.
 
 Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
 ---
- tools/perf/Makefile.perf | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tools/lib/api/Makefile        | 2 +-
+ tools/lib/traceevent/Makefile | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/tools/perf/Makefile.perf b/tools/perf/Makefile.perf
-index b1dfcd8..66045d0 100644
---- a/tools/perf/Makefile.perf
-+++ b/tools/perf/Makefile.perf
-@@ -188,7 +188,7 @@ export PYTHON_EXTBUILD_LIB PYTHON_EXTBUILD_TMP
- python-clean := $(call QUIET_CLEAN, python) $(RM) -r $(PYTHON_EXTBUILD) $(OUTPUT)python/perf.so
+diff --git a/tools/lib/api/Makefile b/tools/lib/api/Makefile
+index 8bd9606..fe1b02c 100644
+--- a/tools/lib/api/Makefile
++++ b/tools/lib/api/Makefile
+@@ -36,7 +36,7 @@ $(LIBFILE): $(API_IN)
  
- PYTHON_EXT_SRCS := $(shell grep -v ^\# util/python-ext-sources)
--PYTHON_EXT_DEPS := util/python-ext-sources util/setup.py $(LIBTRACEEVENT) $(LIBAPI)
-+PYTHON_EXT_DEPS := util/python-ext-sources util/setup.py $(LIBTRACEEVENT) $(LIBTRACEEVENT_DYNAMIC_LIST) $(LIBAPI)
+ clean:
+ 	$(call QUIET_CLEAN, libapi) $(RM) $(LIBFILE); \
+-	find $(if $(OUTPUT),$(OUTPUT),.) -name \*.o | xargs $(RM)
++	find $(if $(OUTPUT),$(OUTPUT),.) -name \*.o -or -name \*.o.cmd -or -name \*.o.d | xargs $(RM)
  
- $(OUTPUT)python/perf.so: $(PYTHON_EXT_SRCS) $(PYTHON_EXT_DEPS)
- 	$(QUIET_GEN)CFLAGS='$(CFLAGS)' $(PYTHON_WORD) util/setup.py \
+ FORCE:
+ 
+diff --git a/tools/lib/traceevent/Makefile b/tools/lib/traceevent/Makefile
+index 6daaff6..7851df1 100644
+--- a/tools/lib/traceevent/Makefile
++++ b/tools/lib/traceevent/Makefile
+@@ -268,7 +268,7 @@ install: install_lib
+ 
+ clean:
+ 	$(call QUIET_CLEAN, libtraceevent) \
+-		$(RM) *.o *~ $(TARGETS) *.a *.so $(VERSION_FILES) .*.d \
++		$(RM) *.o *~ $(TARGETS) *.a *.so $(VERSION_FILES) .*.d .*.cmd \
+ 		$(RM) TRACEEVENT-CFLAGS tags TAGS
+ 
+ PHONY += force plugins
 -- 
 2.1.4
 
