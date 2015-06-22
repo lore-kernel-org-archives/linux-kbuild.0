@@ -1,37 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lb0-f171.google.com ([209.85.217.171]:34021 "EHLO
-	mail-lb0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933047AbbFVHjl (ORCPT
+Received: from mout.kundenserver.de ([212.227.17.13]:58799 "EHLO
+	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751604AbbFVRDR (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 22 Jun 2015 03:39:41 -0400
-Received: by lbbti3 with SMTP id ti3so103261122lbb.1
-        for <linux-kbuild@vger.kernel.org>; Mon, 22 Jun 2015 00:39:40 -0700 (PDT)
-From: Rasmus Villemoes <linux@rasmusvillemoes.dk>
-Subject: Re: [RFC 4/4] scripts: add stackdelta script
-References: <1434849046-19920-1-git-send-email-linux@rasmusvillemoes.dk>
-	<1434849046-19920-5-git-send-email-linux@rasmusvillemoes.dk>
-Date: Mon, 22 Jun 2015 09:39:37 +0200
-In-Reply-To: <1434849046-19920-5-git-send-email-linux@rasmusvillemoes.dk>
-	(Rasmus Villemoes's message of "Sun, 21 Jun 2015 03:10:46 +0200")
-Message-ID: <87mvzsp4xy.fsf@rasmusvillemoes.dk>
+	Mon, 22 Jun 2015 13:03:17 -0400
+Date: Mon, 22 Jun 2015 19:03:01 +0200
+From: Karsten Merker <merker@debian.org>
+Subject: Re: [PATCH] kbuild: builddeb: Include dtbs in the Debian package
+ built by "make deb-pkg"
+Message-ID: <20150622170301.GA1773@excalibur.cnev.de>
+References: <1434811689-6923-1-git-send-email-merker@debian.org>
+ <CAAqcGH=+NFPLifxXy58QytE2ndpQC2sj3_xkHe8405oZLkk3WQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAAqcGH=+NFPLifxXy58QytE2ndpQC2sj3_xkHe8405oZLkk3WQ@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Riku Voipio <riku.voipio@linaro.org>
+Cc: Karsten Merker <merker@debian.org>, Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On Sun, Jun 21 2015, Rasmus Villemoes <linux@rasmusvillemoes.dk> wrote:
+On Mon, Jun 22, 2015 at 09:04:43AM +0300, Riku Voipio wrote:
+> On 20 June 2015 at 17:48, Karsten Merker <merker@debian.org> wrote:
+> > Native Debian kernel packages include any dtbs that were generated
+> > during the kernel build process in /usr/lib/${packagename}.
+> > Do the same for Debian packages built by scripts/package/builddeb
+> > (executed by the "deb-pkg" target).
+> 
+> This change has already been submitted in a few variations and is now
+> headed to next kernel version:
+> 
+> https://git.kernel.org/cgit/linux/kernel/git/mmarek/kbuild.git/commit/?h=misc&id=ca2a9d2cf6cf3dd852c3926ac7e30ee774da4638
 
-> +
-> +my $old = read_stack_usage_file($ARGV[0]);
-> +my $new = read_stack_usage_file($ARGV[1]);
-> +my @common = grep {exists $new->{$_}} keys %$old;
-> +print join(",", keys %old) . "\n";
+Ooops - sorry for the noise...
 
-Bah, that print is leftover from debugging. Please pretend it's not
-there.
-
-Rasmus
+Regards,
+Karsten
+-- 
+Gem. Par. 28 Abs. 4 Bundesdatenschutzgesetz widerspreche ich der Nutzung
+sowie der Weitergabe meiner personenbezogenen Daten für Zwecke der
+Werbung sowie der Markt- oder Meinungsforschung.
 --
 To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
