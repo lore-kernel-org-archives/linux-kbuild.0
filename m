@@ -1,45 +1,69 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.17.13]:58799 "EHLO
-	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751604AbbFVRDR (ORCPT
+Received: from jessie.kos.to ([212.47.231.226]:46285 "EHLO pilvi.kos.to"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750973AbbFWFk4 convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 22 Jun 2015 13:03:17 -0400
-Date: Mon, 22 Jun 2015 19:03:01 +0200
-From: Karsten Merker <merker@debian.org>
-Subject: Re: [PATCH] kbuild: builddeb: Include dtbs in the Debian package
- built by "make deb-pkg"
-Message-ID: <20150622170301.GA1773@excalibur.cnev.de>
-References: <1434811689-6923-1-git-send-email-merker@debian.org>
- <CAAqcGH=+NFPLifxXy58QytE2ndpQC2sj3_xkHe8405oZLkk3WQ@mail.gmail.com>
+	Tue, 23 Jun 2015 01:40:56 -0400
+Received: from localhost (91-157-196-38.elisa-laajakaista.fi [91.157.196.38])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by pilvi.kos.to (Postfix) with ESMTPSA id 88F7D2C0022
+	for <linux-kbuild@vger.kernel.org>; Tue, 23 Jun 2015 05:33:31 +0000 (UTC)
+From: Riku Voipio <riku.voipio@iki.fi>
+Subject: collection of make deb-pkg improvements
+Date: Tue, 23 Jun 2015 08:33:30 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAAqcGH=+NFPLifxXy58QytE2ndpQC2sj3_xkHe8405oZLkk3WQ@mail.gmail.com>
+Message-ID: <a3a3c255-c1ac-400b-bf7d-233a90446f2c@iki.fi>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Riku Voipio <riku.voipio@linaro.org>
-Cc: Karsten Merker <merker@debian.org>, Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
 
-On Mon, Jun 22, 2015 at 09:04:43AM +0300, Riku Voipio wrote:
-> On 20 June 2015 at 17:48, Karsten Merker <merker@debian.org> wrote:
-> > Native Debian kernel packages include any dtbs that were generated
-> > during the kernel build process in /usr/lib/${packagename}.
-> > Do the same for Debian packages built by scripts/package/builddeb
-> > (executed by the "deb-pkg" target).
-> 
-> This change has already been submitted in a few variations and is now
-> headed to next kernel version:
-> 
-> https://git.kernel.org/cgit/linux/kernel/git/mmarek/kbuild.git/commit/?h=misc&id=ca2a9d2cf6cf3dd852c3926ac7e30ee774da4638
+Hi,
 
-Ooops - sorry for the noise...
+Since a lot of patches for deb-pkg seem to be floating around, I've decided 
+to gather all the ones I use for general availability[1].
 
-Regards,
-Karsten
--- 
-Gem. Par. 28 Abs. 4 Bundesdatenschutzgesetz widerspreche ich der Nutzung
-sowie der Weitergabe meiner personenbezogenen Daten für Zwecke der
-Werbung sowie der Markt- oder Meinungsforschung.
+The branch deb-pkg-4.1 is all the deb-pkg patches on top of 4.1. It 
+includes the patches already in kbuild#misc + a bunch of patches needed for 
+source package generation.
+
+The branch perf-pkg-4.1 adds on top of that patches to create a perf source 
+package. This is still more WiP, and I'm not sure if it's really useful for 
+anyone but me. At least the previous patch got no comments...
+
+[1] https://github.com/suihkulokki/linux/commits/perf-pkg-4.1
+
+And the list of changes included:
+
+----------------------------------------------------------------
+Andrey Skvortsov (1):
+      builddeb: fix stripped module signatures if CONFIG_DEBUG_INFO and 
+CONFIG_MODULE_SIG_ALL are set
+
+Arnaud Patard (1):
+      deb-pkg: Add device tree blobs to the package
+
+Ben Hutchings (1):
+      deb-pkg: Add automatic support for armhf architecture
+
+Riku Voipio (6):
+      deb-pkg: move setting debarch for a separate function
+      deb-pkg: simplify directory creation
+      deb-pkg: add source package
+      package Makefile: fix perf-tar targets when outdir is set
+      tools/lib: improve clean target
+      make: add perf-deb-src-pkg target to build perf debian source package
+
+ scripts/package/Makefile      |  32 +++++++++++++++++++-----
+ scripts/package/builddeb      | 103 
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++------------------
+ scripts/package/buildperfdsc  | 128 
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ tools/lib/api/Makefile        |   2 +-
+ tools/lib/traceevent/Makefile |   2 +-
+ 5 files changed, 235 insertions(+), 32 deletions(-)
+ create mode 100755 scripts/package/buildperfdsc
 --
 To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
