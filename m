@@ -1,39 +1,97 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from [115.29.104.60] ([115.29.104.60]:49258 "HELO fumeilaistone.cn"
-	rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with SMTP
-	id S1754578AbbFWKtj convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 23 Jun 2015 06:49:39 -0400
-Message-ID: <CA2C27E7-11B9-4C7B-8B69-CD876ABFFA05@fumeilaistone.cn>
-Reply-To: <martinsdweber@aim.com>
-From: "Herr Martins D Weber" <test@fumeilaistone.cn>
-Subject: Lieber Freund!!!
-Date: Sat, 13 Jun 2015 05:14:03 -0700
+Received: from cantor2.suse.de ([195.135.220.15]:57500 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S933365AbbFWNxw (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 23 Jun 2015 09:53:52 -0400
+Message-ID: <558964EE.7090009@suse.cz>
+Date: Tue, 23 Jun 2015 15:53:50 +0200
+From: Michal Marek <mmarek@suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="Windows-1251"
-Content-Transfer-Encoding: 8BIT
+Subject: Re: [RFC 1/4] scripts: add stackusage script
+References: <1434849046-19920-1-git-send-email-linux@rasmusvillemoes.dk> <1434849046-19920-2-git-send-email-linux@rasmusvillemoes.dk>
+In-Reply-To: <1434849046-19920-2-git-send-email-linux@rasmusvillemoes.dk>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: Rasmus Villemoes <linux@rasmusvillemoes.dk>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Lieber Freund!!!
+On 2015-06-21 03:10, Rasmus Villemoes wrote:
+> The current checkstack.pl script has a few problems, stemming from the
+> overly simplistic attempt at parsing objdump output with regular
+> expresions: For example, on x86_64 it doesn't take the push
+> instruction into account, making it consistently underestimate the
+> real stack use, and it also doesn't capture stack pointer adjustments
+> of exactly 128 bytes [1].
+> 
+> Since newer gcc (>= 4.6) knows about -fstack-usage, we might as well
+> take the information straight from the horse's mouth. This patch
+> introduces scripts/stackusage, which is a simple wrapper for running
+> make with EXTRA_CFLAGS set to -fstack-usage. Example use is
+> 
+> scripts/stackusage -o out.su -- -j8 fs/ext4/
+> 
+> Arguments after -- are passed to make. Afterwards, we find all newly
+> created .su files, massage them a little, sort by stack use and
+> concatenate the result to a single output file.
+> 
+> [1] Since gcc encodes that by
+> 
+> 48 83 c4 80             add    $0xffffffffffffff80,%rsp
+> 
+> and not
+> 
+> 48 81 ec 80 00 00 00    sub    $0x80,%rsp
+> 
+> since -128 fits in an imm8.
+> 
+> Signed-off-by: Rasmus Villemoes <linux@rasmusvillemoes.dk>
+> ---
+>  scripts/stackusage | 40 ++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 40 insertions(+)
+>  create mode 100755 scripts/stackusage
+> 
+> diff --git a/scripts/stackusage b/scripts/stackusage
+> new file mode 100755
+> index 000000000000..d631af648ae7
+> --- /dev/null
+> +++ b/scripts/stackusage
+> @@ -0,0 +1,40 @@
+> +#!/bin/sh
+> +
+> +outfile=""
+> +now=`date +%s`
+> +
+> +while [ $# -gt 0 ]
+> +do
+> +    case "$1" in
+> +        -o)
+> +	    outfile="$2"
+> +	    echo "$outfile"
+> +	    shift 2;;
+> +	-h)
+> +	    echo "usage: $0 [-o outfile] -- <make options/args>"
+> +	    exit 0;;
+> +	--)
+> +	    shift
+> +	    break;;
+> +	-*)
+> +            echo >&2 "usage: $0 [-o outfile] -- <make options/args>"
+> +	    exit 1;;
+> +	*)  break;;
+> +    esac
+> +done
+> +
+> +if [ -z "$outfile" ]
+> +then
+> +    outfile=`mktemp --tmpdir stackusage.$$.XXXX`
+> +fi
+> +
+> +make EXTRA_CFLAGS="-fstack-usage" "$@"
 
-Ich vermute das diese E-Mail eine ?berraschung f?r Sie sein wird, aber es ist wahr.Ich bin bei einer routinen ?berpr?fung in meiner Bank (StandardBank PLC von S?d Afrika) wo ich arbeite, auf einem Konto gesto?en, was nicht in anspruch genommen worden ist, wo derzeit USD$18.5M (Achtzehn Million, F?nf Hundert Tausend, US Dollar)  gutgeschrieben sind.Dieses Konto geh?rte Herrn Manfred Becker, der ein Kunde in unsere Bank war, der leider verstorben ist. Herrn Manfred Becker war ein geb?rtiger Deutscher.
+EXTRA_CFLAGS is reserved for use by Makefiles, please use KCFLAGS
+instead. I wonder whether it worked at all, because EXTRA_CFLAGS is
+reset by scripts/Makefile.build.
 
-Damit es mir m?glich ist dieses Geld $18,500,000 inanspruch zunehmen,ben?tige ich die zusammenarbeit eines Ausl?ndischen Partners wie Sie,den ich als Verwandter und Erbe des verstorbenen Herrn Manfred Becker vorstellen kann,damit wir das Geld inanspruch nehmen k?nnen. F?r diese Unterst?tzung erhalten Sie 30% der Erbschaftsumme und die restlichen 70% teile ich mirmit meinen zwei Arbeitskollegen, die mich bei dieser Transaktion ebenfalls unterst?tzen.
-
-
-Wenn Sie interessiert sind, k?nnen Sie mir bitte eine E-Mail schicken, damit ich Ihnen mehr Details zukommen lassen kann. N.B.BITTE SENDEN SIE MIR Martins D Weber ANTWORT ZU durch mein E-mail: ( martinsdweber@aim.com ) f?R VERTRAULICHEN GRUND. Schicken Sie keine POST ZU MEINEM B?RO-E-MAIL.(martinsdweber@aim.com )
-
-
-If you understand english,please  kindly reply with english ( martinsdweber@aim.com )
-
-Mit freundlichen Grüßen
-
-Herr Martins D Weber
-
----
-This email has been checked for viruses by Avast antivirus software.
-https://www.avast.com/antivirus
-
-
+Michal
