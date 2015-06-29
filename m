@@ -1,66 +1,136 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f173.google.com ([209.85.212.173]:35728 "EHLO
-	mail-wi0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751801AbbFZLRH (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 26 Jun 2015 07:17:07 -0400
-Received: by wiga1 with SMTP id a1so14679673wig.0
-        for <linux-kbuild@vger.kernel.org>; Fri, 26 Jun 2015 04:17:06 -0700 (PDT)
+Received: from mga09.intel.com ([134.134.136.24]:16246 "EHLO mga09.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752503AbbF2ChR (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 28 Jun 2015 22:37:17 -0400
+From: Thiago Macieira <thiago.macieira@intel.com>
+Subject: kconfig xconfig port to Qt 5
+Date: Sun, 28 Jun 2015 18:44:52 -0700
+Message-ID: <1462835.V8cvkXcCv0@tjmaciei-mobl4>
 MIME-Version: 1.0
-In-Reply-To: <1434631909-12636-1-git-send-email-riku.voipio@linaro.org>
-References: <1434631909-12636-1-git-send-email-riku.voipio@linaro.org>
-Date: Fri, 26 Jun 2015 14:17:06 +0300
-Message-ID: <CAAqcGHn2cNaVNL594ta3xRZqJ8EU-AfC=rEQYHOmp7_RxtpdaA@mail.gmail.com>
-Subject: Re: [PATCH] Makefile.perf: make python module depend on traceevent
-From: Riku Voipio <riku.voipio@linaro.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: multipart/signed; boundary="nextPart6382654.cZEpz6jAod"; micalg="sha1"; protocol="application/pkcs7-signature"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild <linux-kbuild@vger.kernel.org>
-Cc: acme@kernel.org, hekuang@huawei.com, wangnan0@huawei.com
+To: yann.morin.1998@free.fr
+Cc: Boris Barbulovski <bbarbulovski@gmail.com>, linux-kbuild@vger.kernel.org
 
-On 18 June 2015 at 15:51,  <riku.voipio@linaro.org> wrote:
-> From: Riku Voipio <riku.voipio@linaro.org>
->
-> Building python module might fail if libtraceevent-dynamic-list
-> hasn't been built before:
->
-> to LDFLAGS:
->
->   GEN      python/perf.so
-> /usr/bin/ld: cannot open linker script file /x/tools/lib/traceevent/libtraceevent-dynamic-list: No such file or directory
-> collect2: error: ld returned 1 exit status
-> error: command 'x86_64-linux-gnu-gcc' failed with exit status 1
-> cp: cannot stat ?python_ext_build/lib/perf.so?: No such file or directory
->
-> Add explicit Makefile dependency to make sure libtraceevent-dynamic-list
-> is built before.
+--nextPart6382654.cZEpz6jAod
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
 
-Forget this broken patch, the correct patch has already been applied:
+Hello Yann & others
 
-https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/tools/perf/Makefile.perf?id=5d618324dd4442d20dbdb039176787199ba2f12b
+I asked on Google+ a few weeks ago about some help to port qconf to Qt =
+5 and=20
+Boris volunteered. He's finished porting and I've tested his changes, p=
+lus made=20
+an update to the buildsystem to find and use Qt 5. In order to do that,=
+ we=20
+dropped Qt 2 and Qt 3 support.
 
-perf tools: Move libtraceevent dynamic list to separated LDFLAGS variable
+First things first: the MAINTAINERS file lists=20
+git://gitorious.org/linux-kconfig/linux-kconfig as the repository for u=
+pstream=20
+sources, but Gitorious is no longer working and that is unavailable. Do=
+ you=20
+have an updated URL?
 
-Riku
+Second: how do you prefer these changes? Boris made 37 commits, each ma=
+king a=20
+small part of the port. Do you want each change individually, or would =
+you=20
+like me to squash them?
 
-> ---
->  tools/perf/Makefile.perf | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/tools/perf/Makefile.perf b/tools/perf/Makefile.perf
-> index b1dfcd8..66045d0 100644
-> --- a/tools/perf/Makefile.perf
-> +++ b/tools/perf/Makefile.perf
-> @@ -188,7 +188,7 @@ export PYTHON_EXTBUILD_LIB PYTHON_EXTBUILD_TMP
->  python-clean := $(call QUIET_CLEAN, python) $(RM) -r $(PYTHON_EXTBUILD) $(OUTPUT)python/perf.so
->
->  PYTHON_EXT_SRCS := $(shell grep -v ^\# util/python-ext-sources)
-> -PYTHON_EXT_DEPS := util/python-ext-sources util/setup.py $(LIBTRACEEVENT) $(LIBAPI)
-> +PYTHON_EXT_DEPS := util/python-ext-sources util/setup.py $(LIBTRACEEVENT) $(LIBTRACEEVENT_DYNAMIC_LIST) $(LIBAPI)
->
->  $(OUTPUT)python/perf.so: $(PYTHON_EXT_SRCS) $(PYTHON_EXT_DEPS)
->         $(QUIET_GEN)CFLAGS='$(CFLAGS)' $(PYTHON_WORD) util/setup.py \
-> --
-> 2.1.4
->
+=2D-=20
+Thiago Macieira - thiago (AT) macieira.info - thiago (AT) kde.org
+   Software Architect - Intel Open Source Technology Center
+      PGP/GPG: 0x6EF45358; fingerprint:
+      E067 918B B660 DBD1 105C  966C 33F5 F005 6EF4 5358
+
+--nextPart6382654.cZEpz6jAod
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExCzAJBgUrDgMCGgUAMIAGCSqGSIb3DQEHAQAAoIIO3zCCBGYw
+ggNOoAMCAQICEFEmCpMc4n+cw6VfeeByroIwDQYJKoZIhvcNAQEFBQAwgZMxCzAJBgNVBAYTAlVT
+MQswCQYDVQQIEwJVVDEXMBUGA1UEBxMOU2FsdCBMYWtlIENpdHkxHjAcBgNVBAoTFVRoZSBVU0VS
+VFJVU1QgTmV0d29yazEhMB8GA1UECxMYaHR0cDovL3d3dy51c2VydHJ1c3QuY29tMRswGQYDVQQD
+ExJVVE4gLSBEQVRBQ29ycCBTR0MwHhcNMDUwNjA3MDgwOTEwWhcNMTkwNjI0MTkwNjMwWjBvMQsw
+CQYDVQQGEwJTRTEUMBIGA1UEChMLQWRkVHJ1c3QgQUIxJjAkBgNVBAsTHUFkZFRydXN0IEV4dGVy
+bmFsIFRUUCBOZXR3b3JrMSIwIAYDVQQDExlBZGRUcnVzdCBFeHRlcm5hbCBDQSBSb290MIIBIjAN
+BgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAt/caM+byAAQtOeBOW+0fvGwPzbX6I7bO3psRM5ek
+KUx9k5+9SryT7QMa44/P5W1QWtaXKZRagLBJetsulf24yr83OC0ePpFBrXBWx/BPP+gynnTKyJBU
+6cZfD3idmkA8Dqxhql4Uj56HoWpQ3NeaTq8Fs6ZxlJxxs1BgCscTnTgHhgKo6ahpJhiQq0ywTyOr
+Ok+E2N/On+Fpb7vXQtdrROTHre5tQV9yWnEIN7N5ZaRZoJQ39wAvDcKSctrQOHLbFKhFxF0qfbe0
+1sTurM0TRLfJK91DACX6YblpalgjEbenM49WdVn1zSnXRrcKK2W200JvFbK4e/vv6V1T1TRaJwID
+AQABo4HYMIHVMB8GA1UdIwQYMBaAFFMy0bPPf/rg8aBdhU6S0p5FHbRPMB0GA1UdDgQWBBStvZh6
+NLQm9/rEJlTvA73gJMtUGjAOBgNVHQ8BAf8EBAMCAQYwDwYDVR0TAQH/BAUwAwEB/zARBglghkgB
+hvhCAQEEBAMCAQIwIAYDVR0lBBkwFwYKKwYBBAGCNwoDAwYJYIZIAYb4QgQBMD0GA1UdHwQ2MDQw
+MqAwoC6GLGh0dHA6Ly9jcmwudXNlcnRydXN0LmNvbS9VVE4tREFUQUNvcnBTR0MuY3JsMA0GCSqG
+SIb3DQEBBQUAA4IBAQDG7lMXaBSyUSIekFgNlP298XDlhi3DNjGPVEhG5y0IN7xsCmDhDq1RNOAS
+k+m+uKu4JrTplj0oj65kB/7gAezF45HrGKDxdX7bCuafkduvrnXfI5Fo3RcAWkv/ZGxw6wEa0JDZ
+x6bWbfYT5P+1ydIeKsuxJUMmeNkwm04NHr5p79/q/i2zzPmw3bUUypHUsrWl+wEZo0d5n52MlYc0
++B84kto2phH6a+tr6dxFeBU5BtdNQeQhyNwvh9G3v0hgdaViyyTeO2GgKSCmvsVsnMTpCmki75E6
++iav0VtBpzri+DgHQqvBW/jObboPBD8yNKzcBCjXcDAUJgbE5JuY1c94MIIE6zCCA9OgAwIBAgIQ
+NpvEAujBQFL7bUoLQkjx9zANBgkqhkiG9w0BAQUFADBvMQswCQYDVQQGEwJTRTEUMBIGA1UEChML
+QWRkVHJ1c3QgQUIxJjAkBgNVBAsTHUFkZFRydXN0IEV4dGVybmFsIFRUUCBOZXR3b3JrMSIwIAYD
+VQQDExlBZGRUcnVzdCBFeHRlcm5hbCBDQSBSb290MB4XDTEzMTIxMTAwMDAwMFoXDTIwMDUzMDEw
+NDgzOFoweTELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAkNBMRQwEgYDVQQHEwtTYW50YSBDbGFyYTEa
+MBgGA1UEChMRSW50ZWwgQ29ycG9yYXRpb24xKzApBgNVBAMTIkludGVsIEV4dGVybmFsIEJhc2lj
+IElzc3VpbmcgQ0EgNEIwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDLO5b/L+DRvOfP
+wEPjwz3iW4XOodqpj3IY30f9bQnuE5UGmXStNAnqRnvPuHINv2R/ZRbhlTblqUKL6rmbo3AeD7P2
+lw3ttDzhJIG55pgXtxeUCDvPdfJlvNIRg/utp65ZF/l9i9jOrz+4jtU1Hyj/jfA+0M/XRgN07/Qn
+nGsfGcL/39pT7BMVJWw+rGx3sLnyae7sbhVEnSf08bhJ+Zg0LSH/l8ta45aHEC/oy6Irsya9M8cs
+xyVQuAmpVKobUxsGzQVvOhEed7gLHTDqu3M9OvOj5tNGqGu5pTXyVCTMGTo6fIlS2G1oNAiV/IbL
+YiVnkXpATKMi1t0pwcd2MFfzAgMBAAGjggF3MIIBczAfBgNVHSMEGDAWgBStvZh6NLQm9/rEJlTv
+A73gJMtUGjAdBgNVHQ4EFgQU2kEjnFqPca9Xgz4g0+Nl2wzLC9swDgYDVR0PAQH/BAQDAgGGMBIG
+A1UdEwEB/wQIMAYBAf8CAQAwNgYDVR0lBC8wLQYIKwYBBQUHAwQGCisGAQQBgjcKAwQGCisGAQQB
+gjcKAwwGCSsGAQQBgjcVBTAXBgNVHSAEEDAOMAwGCiqGSIb4TQEFAWkwSQYDVR0fBEIwQDA+oDyg
+OoY4aHR0cDovL2NybC50cnVzdC1wcm92aWRlci5jb20vQWRkVHJ1c3RFeHRlcm5hbENBUm9vdC5j
+cmwwOgYIKwYBBQUHAQEELjAsMCoGCCsGAQUFBzABhh5odHRwOi8vb2NzcC50cnVzdC1wcm92aWRl
+ci5jb20wNQYDVR0eBC4wLKAqMAuBCWludGVsLmNvbTAboBkGCisGAQQBgjcUAgOgCwwJaW50ZWwu
+Y29tMA0GCSqGSIb3DQEBBQUAA4IBAQCn1caAfzmGT/ci43wXiesV3bgwChq7tSoz+h/T1e3JiDZ1
+XRMg+q3E9nDjzXevvxbCwYhu+07xVDXx02S0jFqrr7KbbN5uoOHTPoG+jreMoT8cyPyg1Xei+e6j
+7usakKmlx1riJUEbYJ60HdZdtRWvzYTMQI37DGYLgf1G6n6Cf636p4FNpe6VB9VNg69nR5k874PI
+LalW/mrn7EeWPJSxWqnOzDz26247xlhoyxAYFG4UY6dxEsQ6EK16HLkHloIjnvWLh0MC/0s84OsT
+Obc8F+s2GWnwLSyRqTXlVdYXM24d3TQCzFfFZJRPhMbxGIAfrVRrkZew/UEhnCXhaMrwMIIFgjCC
+BGqgAwIBAgITMwAAEkAo/OoNMKIkngAAAAASQDANBgkqhkiG9w0BAQUFADB5MQswCQYDVQQGEwJV
+UzELMAkGA1UECBMCQ0ExFDASBgNVBAcTC1NhbnRhIENsYXJhMRowGAYDVQQKExFJbnRlbCBDb3Jw
+b3JhdGlvbjErMCkGA1UEAxMiSW50ZWwgRXh0ZXJuYWwgQmFzaWMgSXNzdWluZyBDQSA0QjAeFw0x
+NTA0MTAxODMzMjdaFw0xODAzMjUxODMzMjdaMEUxGTAXBgNVBAMTEE1hY2llaXJhLCBUaGlhZ28x
+KDAmBgkqhkiG9w0BCQEWGXRoaWFnby5tYWNpZWlyYUBpbnRlbC5jb20wggEiMA0GCSqGSIb3DQEB
+AQUAA4IBDwAwggEKAoIBAQCXu9t+rEaOYiJmldjVa8NHp22iEBHaGu9RdkV8nOU0lMWWHs+USAFA
+jq165LYL4FY4UU7+1lSG4FIz+LkkR7X2+6mxMf7NBQ1vNnejTz/NygpYZaqtlZYnsBFj6Wq2m79V
+q6jpXdyaeT2PImeKz1IxzRfwgBjPaN2cDJcKzyBKT8oUVgGbkDl21xWhBLWHBiHNQirJDyMtvl6x
++pmnxhIbNlktaUpb2XqyhIv1soJxamm2GNxh3mRBA99bWGXbljC7FpIJwMkCV1V3PDD51ZbYgOfu
+WvO2zTzZCtrBPR8Ai/6JY5avC4r26HRGSZ86S0NSUPmnA/Z7I4M8QTmozMr9AgMBAAGjggI1MIIC
+MTALBgNVHQ8EBAMCB4AwPAYJKwYBBAGCNxUHBC8wLQYlKwYBBAGCNxUIhsOMdYSZ5VGD/YEohY6f
+U4KRwAlngd69OZXwQwIBZAIBCDAdBgNVHQ4EFgQUJRkV/QlBumXFZkOIDUizdeNJ00wwHwYDVR0j
+BBgwFoAU2kEjnFqPca9Xgz4g0+Nl2wzLC9swZQYDVR0fBF4wXDBaoFigVoZUaHR0cDovL3d3dy5p
+bnRlbC5jb20vcmVwb3NpdG9yeS9DUkwvSW50ZWwlMjBFeHRlcm5hbCUyMEJhc2ljJTIwSXNzdWlu
+ZyUyMENBJTIwNEIuY3JsMIGfBggrBgEFBQcBAQSBkjCBjzAiBggrBgEFBQcwAYYWaHR0cDovL29j
+c3AuaW50ZWwuY29tLzBpBggrBgEFBQcwAoZdaHR0cDovL3d3dy5pbnRlbC5jb20vcmVwb3NpdG9y
+eS9jZXJ0aWZpY2F0ZXMvSW50ZWwlMjBFeHRlcm5hbCUyMEJhc2ljJTIwSXNzdWluZyUyMENBJTIw
+NEIuY3J0MB8GA1UdJQQYMBYGCCsGAQUFBwMEBgorBgEEAYI3CgMMMCkGCSsGAQQBgjcVCgQcMBow
+CgYIKwYBBQUHAwQwDAYKKwYBBAGCNwoDDDBPBgNVHREESDBGoCkGCisGAQQBgjcUAgOgGwwZdGhp
+YWdvLm1hY2llaXJhQGludGVsLmNvbYEZdGhpYWdvLm1hY2llaXJhQGludGVsLmNvbTANBgkqhkiG
+9w0BAQUFAAOCAQEAdQTQjmc7BSxcs6lwy0UCbt08asgnUMKty+7pu4CQksOS/3DiERvum7OgJJRG
+vGY0IimBPzpzkY//KW6buUTvRZhCN0RvqVvSqQ46+AHRgLfw7oAd/9I5uuxZsfV8H3KjvmbTTERm
+vGvICJ+tUw3LMYILk9gOxHq5RXOvFQvYxTHU+hVQG6SlTRfnCTqOrxOVywOzVI88NTXANsBUnda5
+eVJDwYWdYkD3RWH0m/DfTBcHvMUljynpwIl75lRit1W0i+aOekGG/PULfN5GgVOfuR2YrHmu03j/
+WEEhx8+Mf9xAJVow7H61pR5A7GrQtad8lOcHPn9QAsRGMVpBWawmjTGCAkIwggI+AgEBMIGQMHkx
+CzAJBgNVBAYTAlVTMQswCQYDVQQIEwJDQTEUMBIGA1UEBxMLU2FudGEgQ2xhcmExGjAYBgNVBAoT
+EUludGVsIENvcnBvcmF0aW9uMSswKQYDVQQDEyJJbnRlbCBFeHRlcm5hbCBCYXNpYyBJc3N1aW5n
+IENBIDRCAhMzAAASQCj86g0woiSeAAAAABJAMAkGBSsOAwIaBQCggYcwGAYJKoZIhvcNAQkDMQsG
+CSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMTUwNjI5MDE0NDUyWjAjBgkqhkiG9w0BCQQxFgQU
+ZS4w8Gj86Dzqp8R0BE8+2rNxfOUwKAYJKoZIhvcNAQkPMRswGTALBglghkgBZQMEAQIwCgYIKoZI
+hvcNAwcwDQYJKoZIhvcNAQEBBQAEggEAKyGKA9gGW0zSDd/PNelQoMJ/f2yCgJQNbmdZ4xvVohkt
+GLaW/ezcvQmF1rHyhOiRWBWKxnFEtPIojSsikYTvpEgBY1RGz2Y1+dTA+2jYPCoZsTZshRxCLR0L
+Rr6OHPE/UzrvPSFbyAI+9/JwcQ4ITuQ+gwye25AdfSW8CecUnE3u6xfXlY9e89xBWQAKL0L0jAAN
+DgRUfQls6eyummZOHx30nWkNDDG5ScxdwzJilr14zZCVobAdaavTHYh7Q70JGKGvViHXwuTy1jOH
+WrWy/DtjzoekainSsWN76pwOZJDek7L6w9FtjMA/gvMTzLLxdc4LfYdbXoTVngkLA2h19gAAAAAA
+AA==
+
+--nextPart6382654.cZEpz6jAod--
+
