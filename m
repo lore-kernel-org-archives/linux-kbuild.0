@@ -1,41 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:36659 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:37476 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753674AbbGBUG3 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 2 Jul 2015 16:06:29 -0400
-Message-ID: <559599C2.6090505@suse.cz>
-Date: Thu, 02 Jul 2015 22:06:26 +0200
+	id S1754303AbbGBU23 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 2 Jul 2015 16:28:29 -0400
+Date: Thu, 2 Jul 2015 22:28:28 +0200
 From: Michal Marek <mmarek@suse.cz>
+Subject: [GIT PULL] kconfig changes for v4.2-rc1
+Message-ID: <20150702202828.GA19987@pobox.suse.cz>
 MIME-Version: 1.0
-Subject: Re: [PATCH 0/2] kconfig: allow use of relations other than (in)equality
-References: <557EDA310200007800084C43@mail.emea.novell.com> <6743206.QpmKW5snMP@tacticalops>
-In-Reply-To: <6743206.QpmKW5snMP@tacticalops>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Martin Walch <walch.martin@web.de>
-Cc: Jan Beulich <JBeulich@suse.com>, pebolle@tiscali.nl, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: JBeulich@suse.com, diego.viola@gmail.com, geert+renesas@glider.be, walch.martin@web.de, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Dne 2.7.2015 v 15:04 Martin Walch napsal(a):
-> Hi,
-> 
->> 1: allow use of relations other than (in)equality
-> 
-> I know it is a bit late for objections. Still, I want to point out that
-> this looks to me like a major extension to the language.
-> 
-> Kconfig is a configuration language, and as far as I can tell it is
-> (intentionally) not Turing complete to keep the configuration simple and
-> controllable. All relations that have been defined so far check for equality
-> (or for being not equal). The new relations "<=", ">=", "<", and ">" add more
-> expressiveness, potentially making the language actually more complex and
-> reasoning harder.
+Hi Linus,
 
-The patch just adds four new binary operations of the same order as the
-existing == and !=, with a the semantics that everybody expects. And the
-grammar for kconfig expressions is so simplistic that you cannot even
-write things like (A && B) == (C && D). So turing completeness is not a
-topic here, neither before nor after this patch.
+please pull this for v4.2-rc1:
+- kconfig conditions can use usual less/greater than comparisons
+- kconfig warns about stray characters in Kconfig files
+- Bogus expression simplification removed
+- some minor fixes
 
-Michal
+
+The following changes since commit b787f68c36d49bb1d9236f403813641efa74a031:
+
+  Linux 4.1-rc1 (2015-04-26 17:59:10 -0700)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git kconfig
+
+for you to fetch changes up to 4a47f1eb35c5933ef32b2b99ef20f8fe4a251429:
+
+  kconfig: re-generate *.c_shipped files after previous change (2015-06-15 14:05:58 +0200)
+
+----------------------------------------------------------------
+Diego Viola (2):
+      scripts/kconfig/Makefile: Fix spelling of Qt
+      scripts/kconfig/Makefile: Cosmetic fixes
+
+Geert Uytterhoeven (1):
+      kconfig: Wrap long "make help" text lines
+
+Jan Beulich (3):
+      kconfig: don't silently ignore unhandled characters
+      kconfig: allow use of relations other than (in)equality
+      kconfig: re-generate *.c_shipped files after previous change
+
+Martin Walch (1):
+      Kconfig: Remove bad inference rules expr_eliminate_dups2()
+
+ scripts/kconfig/Makefile            |  28 +-
+ scripts/kconfig/expr.c              | 278 ++++++++++---------
+ scripts/kconfig/expr.h              |   4 +-
+ scripts/kconfig/symbol.c            |   4 +
+ scripts/kconfig/zconf.l             |  11 +-
+ scripts/kconfig/zconf.lex.c_shipped | 314 ++++++++++++---------
+ scripts/kconfig/zconf.tab.c_shipped | 524 +++++++++++++++++++-----------------
+ scripts/kconfig/zconf.y             |   9 +
+ 8 files changed, 666 insertions(+), 506 deletions(-)
