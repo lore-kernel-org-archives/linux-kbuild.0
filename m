@@ -1,89 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lb2-smtp-cloud3.xs4all.net ([194.109.24.26]:52911 "EHLO
-	lb2-smtp-cloud3.xs4all.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751409AbbGBJBL (ORCPT
+Received: from andre.telenet-ops.be ([195.130.132.53]:59748 "EHLO
+	andre.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750893AbbGBJRr (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 2 Jul 2015 05:01:11 -0400
-Message-ID: <1435827662.2423.4.camel@tiscali.nl>
-Subject: Re: Kconfig: '+config' valid syntax?
-From: Paul Bolle <pebolle@tiscali.nl>
-Date: Thu, 02 Jul 2015 11:01:02 +0200
-In-Reply-To: <CAD3Xx4Kh9ASyVYo7ZyRyr2maJbXwbqauQ7tUsLBUHof_hsaP2w@mail.gmail.com>
-References: <CAD3Xx4Kh9ASyVYo7ZyRyr2maJbXwbqauQ7tUsLBUHof_hsaP2w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+	Thu, 2 Jul 2015 05:17:47 -0400
+From: Geert Uytterhoeven <geert+renesas@glider.be>
+Subject: [PATCH] kconfig: Wrap long "make help" text lines
+Date: Thu,  2 Jul 2015 11:17:47 +0200
+Message-Id: <1435828667-20400-1-git-send-email-geert+renesas@glider.be>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Valentin Rothberg <valentinrothberg@gmail.com>
-Cc: rafael.j.wysocki@intel.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Andreas Ruprecht <andreas.ruprecht@fau.de>, hengelein Stefan <stefan.hengelein@fau.de>, linux@dominikbrodowski.net
+To: Michal Marek <mmarek@suse.cz>, "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>, "Luis R. Rodriguez" <mcgrof@suse.com>, David Vrabel <david.vrabel@citrix.com>, linux-kbuild@vger.kernel.org, linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, Geert Uytterhoeven <geert+renesas@glider.be>
 
-[Dropped Yann. You already know Yann disappeared.]
+Some "make help" text lines extend beyond 80 characters. Wrap them at 79
+characters.
 
-On Thu, 2015-07-02 at 10:08 +0200, Valentin Rothberg wrote:
-> commit ed013214afa7 ("ACPI / init: Make it possible to override _REV")
-> is in today's linux-next tree (i.e., next-20150702) adding the
-> following hunk to drivers/acpi/Kconfig:
-> 
-> --- a/drivers/acpi/Kconfig
-> +++ b/drivers/acpi/Kconfig
-> @@ -428,6 +428,26 @@ config XPOWER_PMIC_OPREGION
->         help
->           This config adds ACPI operation region support for XPower 
-> AXP288 PMIC.
-> 
-> ++config ACPI_REV_OVERRIDE_POSSIBLE
+Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+---
+v2:
+  - Rebased against Linus' tree,
+  - Wrap new "xenconfig" line.
+---
+ scripts/kconfig/Makefile | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-(Odd. Botched conflict resolution?)
+diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+index f52abae0ec5fe84f..2d9379b9732cf349 100644
+--- a/scripts/kconfig/Makefile
++++ b/scripts/kconfig/Makefile
+@@ -126,7 +126,8 @@ tinyconfig:
+ # Help text used by make help
+ help:
+ 	@echo  '  config	  - Update current config utilising a line-oriented program'
+-	@echo  '  nconfig         - Update current config utilising a ncurses menu based program'
++	@echo  '  nconfig         - Update current config utilising a ncurses menu based'
++	@echo  '                    program'
+ 	@echo  '  menuconfig	  - Update current config utilising a menu based program'
+ 	@echo  '  xconfig	  - Update current config utilising a QT based front-end'
+ 	@echo  '  gconfig	  - Update current config utilising a GTK based front-end'
+@@ -142,9 +143,11 @@ help:
+ 	@echo  '  alldefconfig    - New config with all symbols set to default'
+ 	@echo  '  randconfig	  - New config with random answer to all options'
+ 	@echo  '  listnewconfig   - List new options'
+-	@echo  '  olddefconfig	  - Same as silentoldconfig but sets new symbols to their default value'
++	@echo  '  olddefconfig	  - Same as silentoldconfig but sets new symbols to their'
++	@echo  '                    default value'
+ 	@echo  '  kvmconfig	  - Enable additional options for kvm guest kernel support'
+-	@echo  '  xenconfig       - Enable additional options for xen dom0 and guest kernel support'
++	@echo  '  xenconfig       - Enable additional options for xen dom0 and guest kernel'
++	@echo  '                    support'
+ 	@echo  '  tinyconfig	  - Configure the tiniest possible kernel'
+ 
+ # lxdialog stuff
+-- 
+1.9.1
 
-> +       bool "Allow supported ACPI revision to be overriden"
-> +       depends on X86
-> +       default y
-> [...]
-> 
-> By having a close look at the first added line, we can see that
-> '+config ACPI_...' is added.  To my great surprise, it's valid Kconfig
-> syntax.
-
-I played a bit with this. It seems you can basically add a '+' anywhere
-you like and kconfig will just ignore it.
-
-> How is that possible?  IMHO it's an invalid token, such that
-> Kconfig should complain about it.  Or do I miss something?
-
-Welcome to the wonders of lex and yacc!
-
-I try to spend as little time as possible looking at the lex rules, so
-I'm just guessing here. Anyhow, you might start by looking at this
-snippet in zconf.l:
-    .       {
-            unput(yytext[0]);
-            BEGIN(COMMAND);
-    }
-
-
-    <COMMAND>{
-            {n}+    {
-                    [...]
-            }
-            .
-            \n      {
-                    BEGIN(INITIAL);
-                    current_file->lineno++;
-                    return T_EOL;
-            }
-    }
-
-Which perhaps translates to:
-- ignore unknown stuff for now and go in COMMAND state;
-- do something if we encounter some text ({n} = [A-Za-z0-9_]);
-- go in INITIAL state if we encounter newlines or unknown stuff.
-
-At the end of which we're back where we started before encountering
-the'+'. But there are more references to '.' in the lex rules so it's
-probably more complicated.
-
-Hope this helps,
-
-
-Paul Bolle
