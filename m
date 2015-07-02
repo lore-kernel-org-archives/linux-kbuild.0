@@ -1,28 +1,30 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:37476 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:38078 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754303AbbGBU23 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 2 Jul 2015 16:28:29 -0400
-Date: Thu, 2 Jul 2015 22:28:28 +0200
+	id S1754232AbbGBUfU (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 2 Jul 2015 16:35:20 -0400
+Date: Thu, 2 Jul 2015 22:35:19 +0200
 From: Michal Marek <mmarek@suse.cz>
-Subject: [GIT PULL] kconfig changes for v4.2-rc1
-Message-ID: <20150702202828.GA19987@pobox.suse.cz>
+Subject: [GIT PULL] kbuild changes for v4.2-rc1
+Message-ID: <20150702203519.GA21330@pobox.suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: JBeulich@suse.com, diego.viola@gmail.com, geert+renesas@glider.be, walch.martin@web.de, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: linux@rasmusvillemoes.dk, mcoquelin.stm32@gmail.com, paul@crapouillou.net, sylvain.bertrand@gmail.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hi Linus,
 
-please pull this for v4.2-rc1:
-- kconfig conditions can use usual less/greater than comparisons
-- kconfig warns about stray characters in Kconfig files
-- Bogus expression simplification removed
-- some minor fixes
+just a few kbuild core commits this time:
+- kallsyms fix for CONFIG_XIP_KERNEL
+- bashisms in scripts/link-vmlinux.sh fixed
+- Workaround to make DEBUG_INFO_REDUCED more useful yet still space
+  efficient
+- clang is not wrongly detected when cross-compiling
 
+Michal
 
 The following changes since commit b787f68c36d49bb1d9236f403813641efa74a031:
 
@@ -30,34 +32,28 @@ The following changes since commit b787f68c36d49bb1d9236f403813641efa74a031:
 
 are available in the git repository at:
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git kconfig
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git kbuild
 
-for you to fetch changes up to 4a47f1eb35c5933ef32b2b99ef20f8fe4a251429:
+for you to fetch changes up to 50ab9a69275dca588cb5ad5038657f069bbdeb56:
 
-  kconfig: re-generate *.c_shipped files after previous change (2015-06-15 14:05:58 +0200)
+  kbuild: include core debug info when DEBUG_INFO_REDUCED (2015-06-11 15:08:32 +0200)
 
 ----------------------------------------------------------------
-Diego Viola (2):
-      scripts/kconfig/Makefile: Fix spelling of Qt
-      scripts/kconfig/Makefile: Cosmetic fixes
+Maxime Coquelin (1):
+      scripts: link-vmlinux: Don't pass page offset to kallsyms if XIP Kernel
 
-Geert Uytterhoeven (1):
-      kconfig: Wrap long "make help" text lines
+Paul Cercueil (1):
+      Makefile: Fix detection of clang when cross-compiling
 
-Jan Beulich (3):
-      kconfig: don't silently ignore unhandled characters
-      kconfig: allow use of relations other than (in)equality
-      kconfig: re-generate *.c_shipped files after previous change
+Rasmus Villemoes (1):
+      kbuild: include core debug info when DEBUG_INFO_REDUCED
 
-Martin Walch (1):
-      Kconfig: Remove bad inference rules expr_eliminate_dups2()
+Sylvain BERTRAND (1):
+      scripts: fix link-vmlinux.sh bash-ism
 
- scripts/kconfig/Makefile            |  28 +-
- scripts/kconfig/expr.c              | 278 ++++++++++---------
- scripts/kconfig/expr.h              |   4 +-
- scripts/kconfig/symbol.c            |   4 +
- scripts/kconfig/zconf.l             |  11 +-
- scripts/kconfig/zconf.lex.c_shipped | 314 ++++++++++++---------
- scripts/kconfig/zconf.tab.c_shipped | 524 +++++++++++++++++++-----------------
- scripts/kconfig/zconf.y             |   9 +
- 8 files changed, 666 insertions(+), 506 deletions(-)
+ Makefile                | 16 +++++++---------
+ lib/Makefile            |  3 +++
+ lib/debug_info.c        | 27 +++++++++++++++++++++++++++
+ scripts/link-vmlinux.sh | 18 +++++++++++++++---
+ 4 files changed, 52 insertions(+), 12 deletions(-)
+ create mode 100644 lib/debug_info.c
