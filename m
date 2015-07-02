@@ -1,29 +1,27 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cantor2.suse.de ([195.135.220.15]:38078 "EHLO mx2.suse.de"
+Received: from cantor2.suse.de ([195.135.220.15]:38161 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754232AbbGBUfU (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 2 Jul 2015 16:35:20 -0400
-Date: Thu, 2 Jul 2015 22:35:19 +0200
+	id S1753647AbbGBUhh (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 2 Jul 2015 16:37:37 -0400
+Date: Thu, 2 Jul 2015 22:37:36 +0200
 From: Michal Marek <mmarek@suse.cz>
-Subject: [GIT PULL] kbuild changes for v4.2-rc1
-Message-ID: <20150702203519.GA21330@pobox.suse.cz>
+Subject: [GIT PULL] kbuild misc fixes for v4.2-rc1
+Message-ID: <20150702203736.GA23499@pobox.suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: linux@rasmusvillemoes.dk, mcoquelin.stm32@gmail.com, paul@crapouillou.net, sylvain.bertrand@gmail.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: ak@linux.intel.com, andrej.skvortzov@gmail.com, arnaud.patard@rtp-net.org, bp@suse.de, dmitry.kalinkin@gmail.com, f.fainelli@gmail.com, fabio.estevam@freescale.com, jim.epost@gmail.com, riku.voipio@linaro.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hi Linus,
 
-just a few kbuild core commits this time:
-- kallsyms fix for CONFIG_XIP_KERNEL
-- bashisms in scripts/link-vmlinux.sh fixed
-- Workaround to make DEBUG_INFO_REDUCED more useful yet still space
-  efficient
-- clang is not wrongly detected when cross-compiling
-
+this is the non-critical part of kbuild:
+- usual make deb-pkg/rpm improvements
+- .gitignore additions
+- grammar cleansing in scripts/coccinelle
+- new coccinelle semantic patch
 Michal
 
 The following changes since commit b787f68c36d49bb1d9236f403813641efa74a031:
@@ -32,28 +30,58 @@ The following changes since commit b787f68c36d49bb1d9236f403813641efa74a031:
 
 are available in the git repository at:
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git kbuild
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git misc
 
-for you to fetch changes up to 50ab9a69275dca588cb5ad5038657f069bbdeb56:
+for you to fetch changes up to 21a59991ce0cd9a0b54b135305e3fcf880f2aaf1:
 
-  kbuild: include core debug info when DEBUG_INFO_REDUCED (2015-06-11 15:08:32 +0200)
+  scripts/package/Makefile: rpmbuild is needed for rpm targets (2015-06-15 16:08:05 +0200)
 
 ----------------------------------------------------------------
-Maxime Coquelin (1):
-      scripts: link-vmlinux: Don't pass page offset to kallsyms if XIP Kernel
+Andi Kleen (1):
+      Kbuild: Add ID files to .gitignore
 
-Paul Cercueil (1):
-      Makefile: Fix detection of clang when cross-compiling
+Andrey Skvortsov (1):
+      builddeb: fix stripped module signatures if CONFIG_DEBUG_INFO and CONFIG_MODULE_SIG_ALL are set
 
-Rasmus Villemoes (1):
-      kbuild: include core debug info when DEBUG_INFO_REDUCED
+Arnaud Patard (1):
+      deb-pkg: Add device tree blobs to the package
 
-Sylvain BERTRAND (1):
-      scripts: fix link-vmlinux.sh bash-ism
+Borislav Petkov (1):
+      kbuild/mkspec: Simplify vmlinux.bz2 creation
 
- Makefile                | 16 +++++++---------
- lib/Makefile            |  3 +++
- lib/debug_info.c        | 27 +++++++++++++++++++++++++++
- scripts/link-vmlinux.sh | 18 +++++++++++++++---
- 4 files changed, 52 insertions(+), 12 deletions(-)
- create mode 100644 lib/debug_info.c
+Dmitry Kalinkin (1):
+      coccinelle: api: add vma_pages.cocci
+
+Fabio Estevam (8):
+      coccinelle: pm_runtime: Insert blank line
+      coccinelle: returnvar: Use imperative mood
+      coccinelle: ifaddr: Fix the sentence
+      coccinelle: simple_open: Use imperative mood
+      scripts/coccinelle/misc/semicolon.cocci: Use imperative mood
+      scripts/coccinelle/misc/irqf_oneshot.cocci: Fix grammar
+      coccinelle: irqf_oneshot.cocci: Improve the generated commit log
+      coccinelle: simple_return: Add a blank line
+
+Florian Fainelli (1):
+      gitignore: Add MIPS vmlinux.32 to the list
+
+Jim Davis (1):
+      scripts/package/Makefile: rpmbuild is needed for rpm targets
+
+Riku Voipio (1):
+      deb-pkg: move setting debarch for a separate function
+
+ .gitignore                                  |  4 ++
+ scripts/coccinelle/api/pm_runtime.cocci     |  2 +-
+ scripts/coccinelle/api/simple_open.cocci    |  4 +-
+ scripts/coccinelle/api/vma_pages.cocci      | 60 +++++++++++++++++++++++++++++
+ scripts/coccinelle/misc/ifaddr.cocci        |  3 +-
+ scripts/coccinelle/misc/irqf_oneshot.cocci  |  7 +++-
+ scripts/coccinelle/misc/returnvar.cocci     |  2 +-
+ scripts/coccinelle/misc/semicolon.cocci     |  2 +-
+ scripts/coccinelle/misc/simple_return.cocci |  2 +-
+ scripts/package/Makefile                    |  8 +---
+ scripts/package/builddeb                    | 31 +++++++++++----
+ scripts/package/mkspec                      |  4 +-
+ 12 files changed, 103 insertions(+), 26 deletions(-)
+ create mode 100644 scripts/coccinelle/api/vma_pages.cocci
