@@ -1,58 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from andre.telenet-ops.be ([195.130.132.53]:59748 "EHLO
-	andre.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750893AbbGBJRr (ORCPT
+Received: from lb1-smtp-cloud3.xs4all.net ([194.109.24.22]:46676 "EHLO
+	lb1-smtp-cloud3.xs4all.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752343AbbGBJZh (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 2 Jul 2015 05:17:47 -0400
-From: Geert Uytterhoeven <geert+renesas@glider.be>
-Subject: [PATCH] kconfig: Wrap long "make help" text lines
-Date: Thu,  2 Jul 2015 11:17:47 +0200
-Message-Id: <1435828667-20400-1-git-send-email-geert+renesas@glider.be>
+	Thu, 2 Jul 2015 05:25:37 -0400
+Message-ID: <1435829132.2423.10.camel@tiscali.nl>
+Subject: Re: Kconfig: '+config' valid syntax?
+From: Paul Bolle <pebolle@tiscali.nl>
+Date: Thu, 02 Jul 2015 11:25:32 +0200
+In-Reply-To: <1435827662.2423.4.camel@tiscali.nl>
+References: <CAD3Xx4Kh9ASyVYo7ZyRyr2maJbXwbqauQ7tUsLBUHof_hsaP2w@mail.gmail.com>
+	 <1435827662.2423.4.camel@tiscali.nl>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>, "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>, "Luis R. Rodriguez" <mcgrof@suse.com>, David Vrabel <david.vrabel@citrix.com>, linux-kbuild@vger.kernel.org, linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, Geert Uytterhoeven <geert+renesas@glider.be>
+To: Valentin Rothberg <valentinrothberg@gmail.com>
+Cc: rafael.j.wysocki@intel.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Andreas Ruprecht <andreas.ruprecht@fau.de>, hengelein Stefan <stefan.hengelein@fau.de>, linux@dominikbrodowski.net
 
-Some "make help" text lines extend beyond 80 characters. Wrap them at 79
-characters.
+On do, 2015-07-02 at 11:01 +0200, Paul Bolle wrote:
+> I'm just guessing here. Anyhow, you might start by looking at this
+> snippet in zconf.l:
+>     .       {
+>             unput(yytext[0]);
+>             BEGIN(COMMAND);
+>     }
+> 
+> 
+>     <COMMAND>{
+>             {n}+    {
+>                     [...]
+>             }
+>             .
+>             \n      {
+>                     BEGIN(INITIAL);
+>                     current_file->lineno++;
+>                     return T_EOL;
+>             }
+>     }
+> 
+> Which perhaps translates to:
+> - ignore unknown stuff for now and go in COMMAND state;
+> - do something if we encounter some text ({n} = [A-Za-z0-9_]);
+> - go in INITIAL state if we encounter newlines or unknown stuff.
+> 
+> At the end of which we're back where we started before encountering
+> the'+'. But there are more references to '.' in the lex rules so it's
+> probably more complicated.
 
-Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
----
-v2:
-  - Rebased against Linus' tree,
-  - Wrap new "xenconfig" line.
----
- scripts/kconfig/Makefile | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+All of which is moot after commit 2e0d737fc76f ("kconfig: don't silently
+ignore unhandled characters"). That's in linux-next but not (yet) in
+v4.1+. It even has my Ack! My memory really must be degrading now...
 
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index f52abae0ec5fe84f..2d9379b9732cf349 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -126,7 +126,8 @@ tinyconfig:
- # Help text used by make help
- help:
- 	@echo  '  config	  - Update current config utilising a line-oriented program'
--	@echo  '  nconfig         - Update current config utilising a ncurses menu based program'
-+	@echo  '  nconfig         - Update current config utilising a ncurses menu based'
-+	@echo  '                    program'
- 	@echo  '  menuconfig	  - Update current config utilising a menu based program'
- 	@echo  '  xconfig	  - Update current config utilising a QT based front-end'
- 	@echo  '  gconfig	  - Update current config utilising a GTK based front-end'
-@@ -142,9 +143,11 @@ help:
- 	@echo  '  alldefconfig    - New config with all symbols set to default'
- 	@echo  '  randconfig	  - New config with random answer to all options'
- 	@echo  '  listnewconfig   - List new options'
--	@echo  '  olddefconfig	  - Same as silentoldconfig but sets new symbols to their default value'
-+	@echo  '  olddefconfig	  - Same as silentoldconfig but sets new symbols to their'
-+	@echo  '                    default value'
- 	@echo  '  kvmconfig	  - Enable additional options for kvm guest kernel support'
--	@echo  '  xenconfig       - Enable additional options for xen dom0 and guest kernel support'
-+	@echo  '  xenconfig       - Enable additional options for xen dom0 and guest kernel'
-+	@echo  '                    support'
- 	@echo  '  tinyconfig	  - Configure the tiniest possible kernel'
- 
- # lxdialog stuff
--- 
-1.9.1
 
+Paul Bolle
