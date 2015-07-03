@@ -1,79 +1,93 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f169.google.com ([209.85.212.169]:34410 "EHLO
-	mail-wi0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754894AbbGCLLV (ORCPT
+Received: from mx-rz-3.rrze.uni-erlangen.de ([131.188.11.22]:54804 "EHLO
+	mx-rz-3.rrze.uni-erlangen.de" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1755113AbbGCLdy (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 3 Jul 2015 07:11:21 -0400
+	Fri, 3 Jul 2015 07:33:54 -0400
+Message-ID: <5596731F.20309@fau.de>
+Date: Fri, 03 Jul 2015 13:33:51 +0200
+From: Andreas Ruprecht <andreas.ruprecht@fau.de>
 MIME-Version: 1.0
-In-Reply-To: <CABv5NL_-1zeOR+=9KHLmzZKMd7DXCLtQB+wVW79u8YaJQbN5Rw@mail.gmail.com>
-References: <CAD3Xx4Kh9ASyVYo7ZyRyr2maJbXwbqauQ7tUsLBUHof_hsaP2w@mail.gmail.com>
-	<1435827662.2423.4.camel@tiscali.nl>
-	<55952723.80801@fau.de>
-	<1435839005.2423.28.camel@tiscali.nl>
-	<55963AD7.3040905@fau.de>
-	<1435913987.2423.38.camel@tiscali.nl>
-	<559655E3.6010400@fau.de>
-	<CAEMqcmoTHxOGRdRFMrY=kkG4HzD7vNUHVwZCsGDabGUOxhsvOQ@mail.gmail.com>
-	<CAD3Xx4LSYWfeeSyEnFNgOHera9wnt2ZxBrRutzMdw2tbaC1DNw@mail.gmail.com>
-	<CABv5NL_-1zeOR+=9KHLmzZKMd7DXCLtQB+wVW79u8YaJQbN5Rw@mail.gmail.com>
-Date: Fri, 3 Jul 2015 13:11:19 +0200
-Message-ID: <CABv5NL_xyB2U6khOudBok_v_H0cw1E7m7uJ0iSPVn0DYW-w9Pg@mail.gmail.com>
 Subject: Re: Kconfig: '+config' valid syntax?
-From: Stefan Hengelein <stefan.hengelein@fau.de>
-Content-Type: text/plain; charset=UTF-8
+References: <CAD3Xx4Kh9ASyVYo7ZyRyr2maJbXwbqauQ7tUsLBUHof_hsaP2w@mail.gmail.com>	<1435827662.2423.4.camel@tiscali.nl>	<55952723.80801@fau.de>	<1435839005.2423.28.camel@tiscali.nl>	<55963AD7.3040905@fau.de>	<1435913987.2423.38.camel@tiscali.nl>	<559655E3.6010400@fau.de> <CAEMqcmoTHxOGRdRFMrY=kkG4HzD7vNUHVwZCsGDabGUOxhsvOQ@mail.gmail.com>
+In-Reply-To: <CAEMqcmoTHxOGRdRFMrY=kkG4HzD7vNUHVwZCsGDabGUOxhsvOQ@mail.gmail.com>
+Content-Type: multipart/mixed;
+ boundary="------------080502000700010808080008"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Valentin Rothberg <valentinrothberg@gmail.com>
-Cc: Ulf Magnusson <ulfalizer.lkml@gmail.com>, Andreas Ruprecht <andreas.ruprecht@fau.de>, Paul Bolle <pebolle@tiscali.nl>, rafael.j.wysocki@intel.com, "open list:KCONFIG" <linux-kbuild@vger.kernel.org>, Kernel Mailing List <linux-kernel@vger.kernel.org>, linux@dominikbrodowski.net
+To: Ulf Magnusson <ulfalizer.lkml@gmail.com>
+Cc: Paul Bolle <pebolle@tiscali.nl>, Valentin Rothberg <valentinrothberg@gmail.com>, rafael.j.wysocki@intel.com, linux-kbuild@vger.kernel.org, Kernel Mailing List <linux-kernel@vger.kernel.org>, hengelein Stefan <stefan.hengelein@fau.de>, linux@dominikbrodowski.net
 
-2015-07-03 12:56 GMT+02:00 Stefan Hengelein <stefan.hengelein@fau.de>:
-> 2015-07-03 12:51 GMT+02:00 Valentin Rothberg <valentinrothberg@gmail.com>:
->>>>
->>>> The output looks like this:
->>>> scripts/kconfig/conf  --allyesconfig Kconfig
->>>> arch/x86/Kconfig:4:warning: ignoring unsupported character '-'
->>>> arch/x86/Kconfig:4:warning: ignoring unsupported character '-'
->>>> arch/x86/Kconfig:4:warning: ignoring unsupported character '-'
->>>> init/Kconfig:222:warning: ignoring unsupported character '-'
->>>> init/Kconfig:222:warning: ignoring unsupported character '-'
->>>> init/Kconfig:222:warning: ignoring unsupported character '-'
->>>> init/Kconfig:244:warning: ignoring unsupported character '-'
->>>> init/Kconfig:244:warning: ignoring unsupported character '-'
->>>> init/Kconfig:244:warning: ignoring unsupported character '-'
->>>> [...]
->>>>
->>>> So we would need to add special treatment for '-' also in the command
->>>> case, right? But that doesn't look appealing to me, more like a dirty,
->>>> dirty hack around the actual problem...
->>>>
->>>> Regards,
->>>>
->>>> Andreas
->>>>
->>>
->>> Except for scattered accidents like in the original message, which are
->>> hopefully pretty rare and easy to fix, the only documented thing that depends
->>> on that lexer sloppiness is the ---help--- "token".
->>>
->>> I'd just add "---help---" as another T_HELP alias (or get rid of it altogether,
->>> but that's probably more work than it's worth). Tightening things up should be
->>> safe after that.
->>
->> This idea has a big ACK from me.  It seems to me the cleanest way to
->> solve the issue.
->>
->
-> Agreed! I also wanted to suggest this solution, but Ulf was faster :)
->
-> Kind Regards,
-> Stefan
+This is a multi-part message in MIME format.
+--------------080502000700010808080008
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 
-However, thinking about this solution a little more....
-This change might lead to parser conflicts....shift-reduce conflicts maybe.
+On 07/03/2015 12:46, Ulf Magnusson wrote:
+> 
+> Except for scattered accidents like in the original message, which are
+> hopefully pretty rare and easy to fix, the only documented thing that depends
+> on that lexer sloppiness is the ---help--- "token".
+> 
+> I'd just add "---help---" as another T_HELP alias (or get rid of it altogether,
+> but that's probably more work than it's worth). Tightening things up should be
+> safe after that.
+> 
+> /Ulf
+> 
 
-Is the '-' used somewhere else and has a distinct token or is it just
-ignored and thrown away?
+So we might want to do something like the attached patch, right?
 
+Unfortunately, when I generate the zconf.{hash,lex,tab}.c files on my
+machine, they have some notable differences to the _shipped versions:
 
-Kind Regards,
-Stefan
+ruprecht@box:linux-next$ diff -u zconf.tab.c zconf.tab.c_shipped
+-  return yyresult;
++  /* Make sure YYID is used.  */
++  return YYID (yyresult);
+
+and I can't find any Documentation on how to properly rebuild the
+_shipped files... Does anybody have a hint on that?
+
+Regards,
+
+Andreas
+
+--------------080502000700010808080008
+Content-Type: text/x-patch;
+ name="zconf.l.patch"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: attachment;
+ filename="zconf.l.patch"
+
+diff --git a/scripts/kconfig/zconf.l b/scripts/kconfig/zconf.l
+index 200a3fe..84a5d05 100644
+--- a/scripts/kconfig/zconf.l
++++ b/scripts/kconfig/zconf.l
+@@ -106,7 +106,15 @@ n	[A-Za-z0-9_]
+ 		zconflval.string =3D text;
+ 		return T_WORD;
+ 	}
+-	.
++	"---help---"	{
++		/* Support old syntax for help statement */
++		return T_HELP;
++	}
++	.	{
++		fprintf(stderr,
++		        "%s:%d:warning: ignoring unsupported character '%c'\n",
++		        zconf_curname(), zconf_lineno(), *yytext);
++	}
+ 	\n	{
+ 		BEGIN(INITIAL);
+ 		current_file->lineno++;
+@@ -132,7 +140,6 @@ n	[A-Za-z0-9_]
+ 		BEGIN(STRING);
+ 	}
+ 	\n	BEGIN(INITIAL); current_file->lineno++; return T_EOL;
+-	---	/* ignore */
+ 	({n}|[-/.])+	{
+ 		const struct kconf_id *id =3D kconf_id_lookup(yytext, yyleng);
+ 		if (id && id->flags & TF_PARAM) {
+
+--------------080502000700010808080008--
