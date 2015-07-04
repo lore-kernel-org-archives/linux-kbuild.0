@@ -1,90 +1,97 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.web.de ([212.227.17.11]:56614 "EHLO mout.web.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750799AbbGEJYd (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 5 Jul 2015 05:24:33 -0400
-From: Martin Walch <walch.martin@web.de>
-Subject: Re: [PATCH 0/2] kconfig: allow use of relations other than (in)equality
-Date: Sat, 04 Jul 2015 17:47:23 +0200
-Message-ID: <3429435.blxdgi52Pe@tacticalops>
-In-Reply-To: <559599C2.6090505@suse.cz>
-References: <557EDA310200007800084C43@mail.emea.novell.com> <6743206.QpmKW5snMP@tacticalops> <559599C2.6090505@suse.cz>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
+Received: from lb3-smtp-cloud3.xs4all.net ([194.109.24.30]:53792 "EHLO
+	lb3-smtp-cloud3.xs4all.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751905AbbGEKAs (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 5 Jul 2015 06:00:48 -0400
+Message-ID: <1436002433.20057.49.camel@tiscali.nl>
+Subject: Re: [PATCH 1/2] kconfig: also warn of unhandled characters in
+ statements
+From: Paul Bolle <pebolle@tiscali.nl>
+Date: Sat, 04 Jul 2015 11:33:53 +0200
+In-Reply-To: <a2424e6c57a4d6c38369c393ba58e0d050b7c130.1435927467.git.andreas.ruprecht@fau.de>
+References: <cover.1435927467.git.andreas.ruprecht@fau.de>
+	 <a2424e6c57a4d6c38369c393ba58e0d050b7c130.1435927467.git.andreas.ruprecht@fau.de>
 Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Jan Beulich <JBeulich@suse.com>, pebolle@tiscali.nl, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Andreas Ruprecht <andreas.ruprecht@fau.de>, Ulf Magnusson <ulfalizer.lkml@gmail.com>
+Cc: Valentin Rothberg <valentinrothberg@gmail.com>, rafael.j.wysocki@intel.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, hengelein Stefan <stefan.hengelein@fau.de>, linux@dominikbrodowski.net, Michal Marek <mmarek@suse.cz>
 
-On Thursday 02 July 2015 22:06:26 Michal Marek wrote:
-> The patch just adds four new binary operations of the same order as the
-> existing == and !=, with a the semantics that everybody expects. And the
-> grammar for kconfig expressions is so simplistic that you cannot even
-> write things like (A && B) == (C && D). So turing completeness is not a
-> topic here, neither before nor after this patch.
+On vr, 2015-07-03 at 14:46 +0200, Andreas Ruprecht wrote:
+> While commit 2e0d737fc76f ("kconfig: don't silently ignore unhandled
+> characters") introduced a warning for unsupported characters inside
+> parameters,
 
-I am not trying to say that the patch results in Turing completeness. The
-point of mentioning that the language is *not* Turing complete is that the
-language is simple enough to encode the configuration with formal methods,
-i.e. in particular with the means of propositional logic and SAT solving.
-This is also done by the VAMOS project [1] and has uncovered hundreds of
-bugs leading to more than 100 applied patches.
+What are "parameters"? The term doesn't show up in Documentation/kbuild.
 
-Encoding equality in propositional logic is viable, while the new relations
-are predicates that are quite hard to capture in propositional logic. I do
-not say that there is no way at all to get this done, but "less than" and
-"greater than" are much more difficult in propositional logic than "equal to"
-and "not equal to".
+There's TF_PARAM in zconf.gperf, but that's some odd category that
+apparently only includes "on" and "if". zconf.l only has the
+undocumented PARAM state.
 
-On Friday 03 July 2015 11:18:23 Paul Bolle wrote:
-> Actually, since
-> DEBUG_UART_8250_WORD already uses ">=", and that's now become legal,
-> perhaps the downsides can already be demonstrated.
+> it does not cover situations where a statement
+> has additional characters around it.
+> 
+> This change introduces a warning if superfluous characters are found
+> around statements. As the 'help' statement sometimes is written as
+> '---help---', the '-' character would now also be regarded as
+> unhandled, this change also adds a special rule for this case.
 
-Thanks for the hint. That particular case is actually not that bad:
->	depends on DEBUG_UART_8250_SHIFT >= 2
-The 2 is treated as the integer 2 (as long as there is no "config 2"
-floating around somewhere). So it is a relation between a symbol of type int
-and a constant integer. Getting this right in general in propositional
-logic will require some work, but it is feasible: From a propositional point
-of view, DEBUG_UART_8250_SHIFT >= 2 is either true or false, and if somewhere
-else it says DEBUG_UART_8250_SHIFT <= 1 then the two propositions exclude
-each other. Both are simple propositions that can be added to a formula and
-their exclusiveness is easy to encode. No matter how many "less than" or
-"greater than" relations there are with DEBUG_UART_8250_SHIFT and constant
-integer values: is it not too hard to add implications accordingly.
+         [...], but '-' characters will now also generate a warning,
+  add a special rule for that case.
 
-However, if the relation is used with two (not constant) symbols of type int,
-things become hard due to the transitivity. Imagine something like this
+or something along those lines.
 
-> ...
-> depends on A >= B
-> ...
-> depends on B >= C
-> ...
-> depends on C > A
-> ...
-> depends on B = 1
-> ...
-> depends on C = 1
-> ...
+Should we elaborate here that currently "---help---" only is an alias
+for "help" because we simply skip "---" when parsing Kconfig files? Or
+is that trick so obscure that nobody else will care about it?
 
-It is possible to define a propositional variable for each of these
-propositions. But now if B = 1 and C = 1 hold true, then B >= C is also true
-and A >= B may be true. But if A >= B is true, then C > A is not. If vice
-versa A >= B is false then C > A must be true. (Of course still provided that
-B = 1 and C = 1.) Next, there is the case that B = 1 is true and C = 1 is
-false and the resulting implications and the same with B = 1 false and C = 1
-true and with both of them false. And it probably needs even more constraints
-to get the first three propositions consistent in general.
+> Reported-by: Valentin Rothberg <valentinrothberg@gmail.com>
+> Signed-off-by: Andreas Ruprecht <andreas.ruprecht@fau.de>
+> ---
+>  scripts/kconfig/zconf.l | 11 +++++++++--
+>  1 file changed, 9 insertions(+), 2 deletions(-)
+> 
+> diff --git a/scripts/kconfig/zconf.l b/scripts/kconfig/zconf.l
+> index 200a3fe..84a5d05 100644
+> --- a/scripts/kconfig/zconf.l
+> +++ b/scripts/kconfig/zconf.l
+> @@ -106,7 +106,15 @@ n	[A-Za-z0-9_]
+>  		zconflval.string = text;
+>  		return T_WORD;
+>  	}
+> -	.
+> +	"---help---"	{
+> +		/* Support old syntax for help statement */
 
-Yes, it is possible to get this right in propositional logic, but it is really
-cumbersome and lots of new code will be necessary.
+s/old/alternative/?
 
-Regards,
-Martin Walch
+> +		return T_HELP;
+> +	}
+> +	.	{
+> +		fprintf(stderr,
+> +		        "%s:%d:warning: ignoring unsupported character '%c'\n",
+> +		        zconf_curname(), zconf_lineno(), *yytext);
+> +	}
 
-[1] https://www4.cs.fau.de/Research/VAMOS/
--- 
+Could you add and use a small helper function for this warning and the
+identical warning that was added in commit 2e0d737fc76f?
 
+>  	\n	{
+>  		BEGIN(INITIAL);
+>  		current_file->lineno++;
+> @@ -132,7 +140,6 @@ n	[A-Za-z0-9_]
+>  		BEGIN(STRING);
+>  	}
+>  	\n	BEGIN(INITIAL); current_file->lineno++; return T_EOL;
+> -	---	/* ignore */
+>  	({n}|[-/.])+	{
+>  		const struct kconf_id *id = kconf_id_lookup(yytext, yyleng);
+>  		if (id && id->flags & TF_PARAM) {
+
+Thanks,
+
+
+Paul Bolle
