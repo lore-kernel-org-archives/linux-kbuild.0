@@ -1,99 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi0-f50.google.com ([209.85.218.50]:35472 "EHLO
-	mail-oi0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750978AbbGEIpB (ORCPT
+Received: from lb1-smtp-cloud3.xs4all.net ([194.109.24.22]:47159 "EHLO
+	lb1-smtp-cloud3.xs4all.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753606AbbGEIqR (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 5 Jul 2015 04:45:01 -0400
-MIME-Version: 1.0
-In-Reply-To: <a2424e6c57a4d6c38369c393ba58e0d050b7c130.1435927467.git.andreas.ruprecht@fau.de>
-References: <cover.1435927467.git.andreas.ruprecht@fau.de>
-	<a2424e6c57a4d6c38369c393ba58e0d050b7c130.1435927467.git.andreas.ruprecht@fau.de>
-Date: Sun, 5 Jul 2015 08:06:33 +0200
-Message-ID: <CAEMqcmrBWGFGTZXvASDXRtTUtb=5=q-b_9a3A_hQ8RC47zNhUg@mail.gmail.com>
-Subject: Re: [PATCH 1/2] kconfig: also warn of unhandled characters in statements
-From: Ulf Magnusson <ulfalizer.lkml@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+	Sun, 5 Jul 2015 04:46:17 -0400
+Message-ID: <1436005169.20057.60.camel@tiscali.nl>
+Subject: Re: [PATCH, resend] build: fix broken kernel RPM source symlink
+From: Paul Bolle <pebolle@tiscali.nl>
+Date: Sat, 04 Jul 2015 12:19:29 +0200
+In-Reply-To: <1435664842-17908-1-git-send-email-ec@numascale.com>
+References: <1435664842-17908-1-git-send-email-ec@numascale.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andreas Ruprecht <andreas.ruprecht@fau.de>
-Cc: Paul Bolle <pebolle@tiscali.nl>, Valentin Rothberg <valentinrothberg@gmail.com>, rafael.j.wysocki@intel.com, "open list:KCONFIG" <linux-kbuild@vger.kernel.org>, Kernel Mailing List <linux-kernel@vger.kernel.org>, hengelein Stefan <stefan.hengelein@fau.de>, linux@dominikbrodowski.net, Michal Marek <mmarek@suse.cz>
+To: Espen Carlsen <ec@numascale.com>, Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Daniel J Blueman <daniel@numascale.com>, Steffen Persvold <sp@numascale.com>
 
-A more exact commit title would be something like "warn for unhandled
-characters before the initial token on a line".
+On di, 2015-06-30 at 13:47 +0200, Espen Carlsen wrote:
+> Fix the 'rpm-pkg' makefile target to always generate the correct
+> /usr/src/kernel/<ver> symlink; this fails on non-RPM-native systems
 
-On Fri, Jul 3, 2015 at 2:46 PM, Andreas Ruprecht
-<andreas.ruprecht@fau.de> wrote:
-> While commit 2e0d737fc76f ("kconfig: don't silently ignore unhandled
-> characters") introduced a warning for unsupported characters inside
-> parameters, it does not cover situations where a statement
-> has additional characters around it.
+          /kernels/
 
-This could say something like "...introduces a warning for unhandled characters
-after the initial token on a line, but does not cover unhandled characters
-before the initial token, which are ignored using a different mechanism."
+> eg Ubuntu.
+> 
+> On a non-RPM-native system, the symlink created by rpmbuild points to
+> the source tree, so the ln -sf commands to overwrite build and source 
+> will
+> create a new link inside the directory pointed to by the build and 
+> source
+> symlinks. This will break the -devel.rpm, as the build and source 
+> symlinks
+> will point to non existing directories after installing them.
 
->
-> This change introduces a warning if superfluous characters are found
-> around statements. As the 'help' statement sometimes is written as
-> '---help---', the '-' character would now also be regarded as
-> unhandled, this change also adds a special rule for this case.
+Perhaps this is all obvious but what exactly happens currently and what
+happens after this change? (An example might help readers that are just
+as easily confused as I am. Perhaps that might also explain why this is
+only an issue on non-RPM-native systems.)
 
-Similarly above.
+It doesn't help that the description of -T in "man ln" is rather
+unhelpful. "info ln" was better, after following some references, but
+I'm still not sure what it buys you for this issue.
+ 
+> --- a/scripts/package/mkspec
+> +++ b/scripts/package/mkspec
 
->
-> Reported-by: Valentin Rothberg <valentinrothberg@gmail.com>
-> Signed-off-by: Andreas Ruprecht <andreas.ruprecht@fau.de>
-> ---
->  scripts/kconfig/zconf.l | 11 +++++++++--
->  1 file changed, 9 insertions(+), 2 deletions(-)
->
-> diff --git a/scripts/kconfig/zconf.l b/scripts/kconfig/zconf.l
-> index 200a3fe..84a5d05 100644
-> --- a/scripts/kconfig/zconf.l
-> +++ b/scripts/kconfig/zconf.l
-> @@ -106,7 +106,15 @@ n  [A-Za-z0-9_]
->                 zconflval.string = text;
->                 return T_WORD;
->         }
-> -       .
-> +       "---help---"    {
-> +               /* Support old syntax for help statement */
-> +               return T_HELP;
-> +       }
+> -echo "ln -sf /usr/src/kernels/$KERNELRELEASE build"
+> -echo "ln -sf /usr/src/kernels/$KERNELRELEASE source"
+> +echo "ln -sfT /usr/src/kernels/$KERNELRELEASE build"
+> +echo "ln -sfT /usr/src/kernels/$KERNELRELEASE source"
 
-I haven't tried it out to see if there would be problems, but adding '-' to the
+Thanks,
 
-n    [A-Za-z0-9_]
 
-definition in zconf.l and adding '---help---' to zconf.gperf seems cleaner than
-special-casing it in zconf.l. If '---help---' is treated as a token, then it
-makes sense to include '-' among the token characters.
-
-(I also rambled a bit in
-http://www.spinics.net/lists/linux-kbuild/msg11393.html.)
-
-With that change, '-' could be removed from the parameter regex ({n}|[-/.])+ in
-zconf.l too.
-
-> +       .       {
-> +               fprintf(stderr,
-> +                       "%s:%d:warning: ignoring unsupported character '%c'\n",
-> +                       zconf_curname(), zconf_lineno(), *yytext);
-> +       }
->         \n      {
->                 BEGIN(INITIAL);
->                 current_file->lineno++;
-> @@ -132,7 +140,6 @@ n   [A-Za-z0-9_]
->                 BEGIN(STRING);
->         }
->         \n      BEGIN(INITIAL); current_file->lineno++; return T_EOL;
-> -       ---     /* ignore */
->         ({n}|[-/.])+    {
->                 const struct kconf_id *id = kconf_id_lookup(yytext, yyleng);
->                 if (id && id->flags & TF_PARAM) {
-> --
-> 1.9.1
->
-
-Cheers,
-Ulf
+Paul Bolle
