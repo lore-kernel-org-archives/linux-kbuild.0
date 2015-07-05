@@ -1,38 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from faui40.informatik.uni-erlangen.de ([131.188.34.40]:51855 "EHLO
-	faui40.informatik.uni-erlangen.de" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1755256AbbGCMzp (ORCPT
+Received: from mail-oi0-f52.google.com ([209.85.218.52]:35800 "EHLO
+	mail-oi0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751286AbbGEImJ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 3 Jul 2015 08:55:45 -0400
-From: Andreas Ruprecht <andreas.ruprecht@fau.de>
-Subject: [PATCH 0/2] kconfig: warn of unhandled characters in statements
-Date: Fri,  3 Jul 2015 14:46:37 +0200
-Message-Id: <cover.1435927467.git.andreas.ruprecht@fau.de>
+	Sun, 5 Jul 2015 04:42:09 -0400
+MIME-Version: 1.0
+In-Reply-To: <1436002433.20057.49.camel@tiscali.nl>
+References: <cover.1435927467.git.andreas.ruprecht@fau.de>
+	<a2424e6c57a4d6c38369c393ba58e0d050b7c130.1435927467.git.andreas.ruprecht@fau.de>
+	<1436002433.20057.49.camel@tiscali.nl>
+Date: Sun, 5 Jul 2015 08:44:41 +0200
+Message-ID: <CAEMqcmpnL58MpscBgs6YmrhTeVUKeHDhox2hWJ6wyX9ks=PHYA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] kconfig: also warn of unhandled characters in statements
+From: Ulf Magnusson <ulfalizer.lkml@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ulf Magnusson <ulfalizer.lkml@gmail.com>
-Cc: Paul Bolle <pebolle@tiscali.nl>, Valentin Rothberg <valentinrothberg@gmail.com>, rafael.j.wysocki@intel.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, hengelein Stefan <stefan.hengelein@fau.de>, linux@dominikbrodowski.net, Michal Marek <mmarek@suse.cz>, Andreas Ruprecht <andreas.ruprecht@fau.de>
+To: Paul Bolle <pebolle@tiscali.nl>
+Cc: Andreas Ruprecht <andreas.ruprecht@fau.de>, Valentin Rothberg <valentinrothberg@gmail.com>, rafael.j.wysocki@intel.com, "open list:KCONFIG" <linux-kbuild@vger.kernel.org>, Kernel Mailing List <linux-kernel@vger.kernel.org>, hengelein Stefan <stefan.hengelein@fau.de>, linux@dominikbrodowski.net, Michal Marek <mmarek@suse.cz>
 
-This patchset changes the lexer file to emit a warning if any unhandled
-characters are found in the input. So far, Kconfig options like
+On Sat, Jul 4, 2015 at 11:33 AM, Paul Bolle <pebolle@tiscali.nl> wrote:
+> On vr, 2015-07-03 at 14:46 +0200, Andreas Ruprecht wrote:
+>> While commit 2e0d737fc76f ("kconfig: don't silently ignore unhandled
+>> characters") introduced a warning for unsupported characters inside
+>> parameters,
+>
+> What are "parameters"? The term doesn't show up in Documentation/kbuild.
+>
 
- +config FOO
-    bool
-    [...]
+zconf.l parses each line like "<COMMAND> <PARAM> <PARAM> ...", with a slightly
+different set of characters allowed for <COMMAND> and <PARAM> (for whatever
+reason). I agree that that's not clear from the commit message alone though.
 
-(note the wrong '+'!) were parsed without a warning. As simply adding a
-warning for '.' produces lots of warnings as occasionally '---help---'
-is used instead of 'help' (and thus '-' is recognized as an unhandled
-character), we need to handle the former separately.
+(As a side note, that Flex/gperf split seems kinda odd to me. Does anyone know
+of a good reason why more lexing wasn't done in zconf.l? Is it an optimization
+attempt?)
 
-Andreas Ruprecht (2):
-  kconfig: also warn of unhandled characters in statements
-  kconfig: Regenerate shipped zconf.lex.c file
-
- scripts/kconfig/zconf.l             |  11 +-
- scripts/kconfig/zconf.lex.c_shipped | 453 +++++++++++++++++++++++++-----------
- 2 files changed, 322 insertions(+), 142 deletions(-)
-
--- 
-1.9.1
-
+Cheers,
+Ulf
