@@ -1,49 +1,93 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from frisell.zx2c4.com ([192.95.5.64]:42097 "EHLO frisell.zx2c4.com"
+Received: from mout.web.de ([212.227.15.3]:58794 "EHLO mout.web.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932581AbbGGScx (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 7 Jul 2015 14:32:53 -0400
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH] Makefile: Force gzip and xz on module install
-Date: Tue,  7 Jul 2015 20:26:07 +0200
-Message-Id: <1436293567-20226-1-git-send-email-Jason@zx2c4.com>
+	id S933461AbbGGTyr (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 7 Jul 2015 15:54:47 -0400
+Subject: [PATCH v3] kconfig: Delete unnecessary checks before the function
+ call "sym_calc_value"
+References: <5307CAA2.8060406@users.sourceforge.net>
+ <alpine.DEB.2.02.1402212321410.2043@localhost6.localdomain6>
+ <530A086E.8010901@users.sourceforge.net>
+ <alpine.DEB.2.02.1402231635510.1985@localhost6.localdomain6>
+ <530A72AA.3000601@users.sourceforge.net>
+ <alpine.DEB.2.02.1402240658210.2090@localhost6.localdomain6>
+ <530B5FB6.6010207@users.sourceforge.net>
+ <alpine.DEB.2.10.1402241710370.2074@hadrien>
+ <530C5E18.1020800@users.sourceforge.net>
+ <alpine.DEB.2.10.1402251014170.2080@hadrien>
+ <530CD2C4.4050903@users.sourceforge.net>
+ <alpine.DEB.2.10.1402251840450.7035@hadrien>
+ <530CF8FF.8080600@users.sourceforge.net>
+ <alpine.DEB.2.02.1402252117150.2047@localhost6.localdomain6>
+ <530DD06F.4090703@users.sourceforge.net>
+ <alpine.DEB.2.02.1402262129250.2221@localhost6.localdomain6>
+ <5317A59D.4@users.sourceforge.net> <54568924.5010008@users.sourceforge.net>
+ <5457CC33.4050906@users.sourceforge.net>
+From: SF Markus Elfring <elfring@users.sourceforge.net>
+Message-ID: <559C2E7A.1090408@users.sourceforge.net>
+Date: Tue, 7 Jul 2015 21:54:34 +0200
+MIME-Version: 1.0
+In-Reply-To: <5457CC33.4050906@users.sourceforge.net>
+Content-Type: text/plain; charset=iso-8859-15
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>, linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org, Julia Lawall <julia.lawall@lip6.fr>, Paul Bolle <pebolle@tiscali.nl>
 
-Running `make modules_install` ordinarily will overwrite existing
-modules. This is the desired behavior, and is how pretty much every
-other `make install` target works.
+From: Markus Elfring <elfring@users.sourceforge.net>
+Date: Tue, 7 Jul 2015 21:48:23 +0200
 
-However, if CONFIG_MODULE_COMPRESS is enabled, modules are passed
-through gzip and xz which then do the file writing. Both gzip and xz
-will error out if the file already exists, unless -f is passed.
+The sym_calc_value() function tests whether its argument is NULL and then
+returns immediately. Thus the test around the call is not needed.
 
-This patch adds -f so that the behavior is uniform.
+This issue was detected by using the Coccinelle software.
 
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
 ---
- Makefile | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ scripts/kconfig/confdata.c | 7 ++-----
+ scripts/kconfig/symbol.c   | 3 +--
+ 2 files changed, 3 insertions(+), 7 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 6c6f146..5d2ec1c 100644
---- a/Makefile
-+++ b/Makefile
-@@ -849,10 +849,10 @@ export mod_strip_cmd
- mod_compress_cmd = true
- ifdef CONFIG_MODULE_COMPRESS
-   ifdef CONFIG_MODULE_COMPRESS_GZIP
--    mod_compress_cmd = gzip -n
-+    mod_compress_cmd = gzip -n -f
-   endif # CONFIG_MODULE_COMPRESS_GZIP
-   ifdef CONFIG_MODULE_COMPRESS_XZ
--    mod_compress_cmd = xz
-+    mod_compress_cmd = xz -f
-   endif # CONFIG_MODULE_COMPRESS_XZ
- endif # CONFIG_MODULE_COMPRESS
- export mod_compress_cmd
+diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+index c814f57..0b7dc2f 100644
+--- a/scripts/kconfig/confdata.c
++++ b/scripts/kconfig/confdata.c
+@@ -268,8 +268,7 @@ int conf_read_simple(const char *name, int def)
+ 			goto load;
+ 		sym_add_change_count(1);
+ 		if (!sym_defconfig_list) {
+-			if (modules_sym)
+-				sym_calc_value(modules_sym);
++			sym_calc_value(modules_sym);
+ 			return 1;
+ 		}
+ 
+@@ -404,9 +403,7 @@ setsym:
+ 	}
+ 	free(line);
+ 	fclose(in);
+-
+-	if (modules_sym)
+-		sym_calc_value(modules_sym);
++	sym_calc_value(modules_sym);
+ 	return 0;
+ }
+ 
+diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
+index 70c5ee1..50878dc 100644
+--- a/scripts/kconfig/symbol.c
++++ b/scripts/kconfig/symbol.c
+@@ -467,8 +467,7 @@ void sym_clear_all_valid(void)
+ 	for_all_symbols(i, sym)
+ 		sym->flags &= ~SYMBOL_VALID;
+ 	sym_add_change_count(1);
+-	if (modules_sym)
+-		sym_calc_value(modules_sym);
++	sym_calc_value(modules_sym);
+ }
+ 
+ bool sym_tristate_within_range(struct symbol *sym, tristate val)
 -- 
-2.4.2
+2.4.5
 
