@@ -1,63 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f169.google.com ([209.85.212.169]:34810 "EHLO
-	mail-wi0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752219AbbGHSWZ (ORCPT
+Received: from numascale.com ([213.162.240.84]:42220 "EHLO numascale.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753656AbbGHSrS convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 8 Jul 2015 14:22:25 -0400
-Received: by wifm2 with SMTP id m2so97541529wif.1
-        for <linux-kbuild@vger.kernel.org>; Wed, 08 Jul 2015 11:22:23 -0700 (PDT)
+	Wed, 8 Jul 2015 14:47:18 -0400
+From: "Espen Carlsen" <ec@numascale.com>
+References: <1435664842-17908-1-git-send-email-ec@numascale.com>		 <1436005169.20057.60.camel@tiscali.nl>		 <006601d0b823$2b144820$813cd860$@numascale.com>	 <1436365587.20619.19.camel@tiscali.nl>	 <00fe01d0b994$af584380$0e08ca80$@numascale.com> <1436372280.20619.24.camel@tiscali.nl>
+In-Reply-To: <1436372280.20619.24.camel@tiscali.nl>
+Subject: RE: [PATCH, resend] build: fix broken kernel RPM source symlink
+Date: Wed, 8 Jul 2015 20:47:12 +0200
+Message-ID: <010a01d0b9ae$809dd5e0$81d981a0$@numascale.com>
 MIME-Version: 1.0
-In-Reply-To: <1434631938-12681-1-git-send-email-riku.voipio@linaro.org>
-References: <1434631938-12681-1-git-send-email-riku.voipio@linaro.org>
-Date: Wed, 8 Jul 2015 21:22:23 +0300
-Message-ID: <CAAqcGHnT5kCapivn+mTZws2gJX0gwnLA2owzdguZsefsAdQ1fg@mail.gmail.com>
-Subject: Re: [PATCH] tools/lib: improve clean target
-From: Riku Voipio <riku.voipio@linaro.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
+Content-Language: no
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild <linux-kbuild@vger.kernel.org>, linux-kernel@vger.kernel.org
-Cc: mingo@redhat.com, a.p.zijlstra@chello.nl, Riku Voipio <riku.voipio@linaro.org>, acme@redhat.com
+To: 'Paul Bolle' <pebolle@tiscali.nl>
+Cc: 'Michal Marek' <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, 'Daniel J Blueman' <daniel@numascale.com>, 'Steffen Persvold' <sp@numascale.com>
 
-On 18 June 2015 at 15:52,  <riku.voipio@linaro.org> wrote:
-> From: Riku Voipio <riku.voipio@linaro.org>
->
-> The clean targets miss some .cmd and .d files.
+> From: Paul Bolle [mailto:pebolle@tiscali.nl]
+> On wo, 2015-07-08 at 17:42 +0200, Espen Carlsen wrote:
+> Wild guess: do the Ubuntu systems already have
+>     /lib/modules/4.1.0/build
+>     /lib/modules/4.1.0/source
+> as symlinks to /usr/src/kernels/4.1.0 when you're building the rpms?
+> (That is, not in rpm's buildroot, but in the actual filesystem.)
 
-Is this patch slipping through cracks?
+No, I don't have any 4.x kernels installed on that system, just 3.16 Ubuntu kernel.
+I assume your wild guess was that if I had /lib/modules/4.1.0/build & source as that was the kernel I was building?
 
-> Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
-> ---
->  tools/lib/api/Makefile        | 2 +-
->  tools/lib/traceevent/Makefile | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/tools/lib/api/Makefile b/tools/lib/api/Makefile
-> index 8bd9606..fe1b02c 100644
-> --- a/tools/lib/api/Makefile
-> +++ b/tools/lib/api/Makefile
-> @@ -36,7 +36,7 @@ $(LIBFILE): $(API_IN)
->
->  clean:
->         $(call QUIET_CLEAN, libapi) $(RM) $(LIBFILE); \
-> -       find $(if $(OUTPUT),$(OUTPUT),.) -name \*.o | xargs $(RM)
-> +       find $(if $(OUTPUT),$(OUTPUT),.) -name \*.o -or -name \*.o.cmd -or -name \*.o.d | xargs $(RM)
->
->  FORCE:
->
-> diff --git a/tools/lib/traceevent/Makefile b/tools/lib/traceevent/Makefile
-> index 6daaff6..7851df1 100644
-> --- a/tools/lib/traceevent/Makefile
-> +++ b/tools/lib/traceevent/Makefile
-> @@ -268,7 +268,7 @@ install: install_lib
->
->  clean:
->         $(call QUIET_CLEAN, libtraceevent) \
-> -               $(RM) *.o *~ $(TARGETS) *.a *.so $(VERSION_FILES) .*.d \
-> +               $(RM) *.o *~ $(TARGETS) *.a *.so $(VERSION_FILES) .*.d .*.cmd \
->                 $(RM) TRACEEVENT-CFLAGS tags TAGS
->
->  PHONY += force plugins
-> --
-> 2.1.4
->
+Also, so you know, the issue isn't related to the 4.1.0 kernel, I can reproduce this on 4.0.x, 3.19.x and 3.18.x.
+Probably others also, but those are the ones I've tried.
+On all of them when I compile on Ubuntu, there will be a build and source softlink in the lib/modules/version/ directory
+of BUILDROOT.
+
+Espen
+
