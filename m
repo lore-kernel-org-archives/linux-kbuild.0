@@ -1,93 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.web.de ([212.227.15.3]:58794 "EHLO mout.web.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S933461AbbGGTyr (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 7 Jul 2015 15:54:47 -0400
-Subject: [PATCH v3] kconfig: Delete unnecessary checks before the function
- call "sym_calc_value"
-References: <5307CAA2.8060406@users.sourceforge.net>
- <alpine.DEB.2.02.1402212321410.2043@localhost6.localdomain6>
- <530A086E.8010901@users.sourceforge.net>
- <alpine.DEB.2.02.1402231635510.1985@localhost6.localdomain6>
- <530A72AA.3000601@users.sourceforge.net>
- <alpine.DEB.2.02.1402240658210.2090@localhost6.localdomain6>
- <530B5FB6.6010207@users.sourceforge.net>
- <alpine.DEB.2.10.1402241710370.2074@hadrien>
- <530C5E18.1020800@users.sourceforge.net>
- <alpine.DEB.2.10.1402251014170.2080@hadrien>
- <530CD2C4.4050903@users.sourceforge.net>
- <alpine.DEB.2.10.1402251840450.7035@hadrien>
- <530CF8FF.8080600@users.sourceforge.net>
- <alpine.DEB.2.02.1402252117150.2047@localhost6.localdomain6>
- <530DD06F.4090703@users.sourceforge.net>
- <alpine.DEB.2.02.1402262129250.2221@localhost6.localdomain6>
- <5317A59D.4@users.sourceforge.net> <54568924.5010008@users.sourceforge.net>
- <5457CC33.4050906@users.sourceforge.net>
-From: SF Markus Elfring <elfring@users.sourceforge.net>
-Message-ID: <559C2E7A.1090408@users.sourceforge.net>
-Date: Tue, 7 Jul 2015 21:54:34 +0200
+Received: from mx-rz-1.rrze.uni-erlangen.de ([131.188.11.20]:39054 "EHLO
+	mx-rz-1.rrze.uni-erlangen.de" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S932996AbbGHKRd (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 8 Jul 2015 06:17:33 -0400
+Message-ID: <559CF8BA.90803@fau.de>
+Date: Wed, 08 Jul 2015 12:17:30 +0200
+From: Andreas Ruprecht <andreas.ruprecht@fau.de>
 MIME-Version: 1.0
-In-Reply-To: <5457CC33.4050906@users.sourceforge.net>
-Content-Type: text/plain; charset=iso-8859-15
-Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH 1/2] kconfig: also warn of unhandled characters in statements
+References: <cover.1435927467.git.andreas.ruprecht@fau.de> <a2424e6c57a4d6c38369c393ba58e0d050b7c130.1435927467.git.andreas.ruprecht@fau.de> <CAEMqcmrBWGFGTZXvASDXRtTUtb=5=q-b_9a3A_hQ8RC47zNhUg@mail.gmail.com> <559BA09A.2030603@fau.de> <20150707144559.GA12760@huvuddator>
+In-Reply-To: <20150707144559.GA12760@huvuddator>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>, linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org, Julia Lawall <julia.lawall@lip6.fr>, Paul Bolle <pebolle@tiscali.nl>
+To: Ulf Magnusson <ulfalizer.lkml@gmail.com>
+Cc: Paul Bolle <pebolle@tiscali.nl>, Valentin Rothberg <valentinrothberg@gmail.com>, rafael.j.wysocki@intel.com, KCONFIG <linux-kbuild@vger.kernel.org>, Kernel Mailing List <linux-kernel@vger.kernel.org>, hengelein Stefan <stefan.hengelein@fau.de>, linux@dominikbrodowski.net, Michal Marek <mmarek@suse.cz>
 
-From: Markus Elfring <elfring@users.sourceforge.net>
-Date: Tue, 7 Jul 2015 21:48:23 +0200
+Hi,
 
-The sym_calc_value() function tests whether its argument is NULL and then
-returns immediately. Thus the test around the call is not needed.
+On 07/07/2015 16:45, Ulf Magnusson wrote:
+> 
+> Did you use the (undocumented, obviously :) REGENERATE_PARSERS option,
+> like 'make menuconfig REGENERATE_PARSERS=1'? It's from
+> scripts/Makefile.lib.
+> 
+> The following patch works fine for me from some quick experimentation.
+> It's against the mainline kernel, as for some reason I can't clone
+> git://gitorious.org/linux-kconfig/linux-kconfig at the moment.
 
-This issue was detected by using the Coccinelle software.
+yep, I used that. After some playing around with it, I also submitted a
+v2 of the patch (although with the '-' still included in the regex for
+PARAMs), didn't you receive that? (Message-Id:
+<cover.1436264921.git.andreas.ruprecht@fau.de>) and the two patches as
+replies to the cover letter. They are against yesterday's linux-next.
 
-Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
----
- scripts/kconfig/confdata.c | 7 ++-----
- scripts/kconfig/symbol.c   | 3 +--
- 2 files changed, 3 insertions(+), 7 deletions(-)
+Regards,
 
-diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-index c814f57..0b7dc2f 100644
---- a/scripts/kconfig/confdata.c
-+++ b/scripts/kconfig/confdata.c
-@@ -268,8 +268,7 @@ int conf_read_simple(const char *name, int def)
- 			goto load;
- 		sym_add_change_count(1);
- 		if (!sym_defconfig_list) {
--			if (modules_sym)
--				sym_calc_value(modules_sym);
-+			sym_calc_value(modules_sym);
- 			return 1;
- 		}
- 
-@@ -404,9 +403,7 @@ setsym:
- 	}
- 	free(line);
- 	fclose(in);
--
--	if (modules_sym)
--		sym_calc_value(modules_sym);
-+	sym_calc_value(modules_sym);
- 	return 0;
- }
- 
-diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
-index 70c5ee1..50878dc 100644
---- a/scripts/kconfig/symbol.c
-+++ b/scripts/kconfig/symbol.c
-@@ -467,8 +467,7 @@ void sym_clear_all_valid(void)
- 	for_all_symbols(i, sym)
- 		sym->flags &= ~SYMBOL_VALID;
- 	sym_add_change_count(1);
--	if (modules_sym)
--		sym_calc_value(modules_sym);
-+	sym_calc_value(modules_sym);
- }
- 
- bool sym_tristate_within_range(struct symbol *sym, tristate val)
--- 
-2.4.5
-
+Andreas
