@@ -1,128 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-la0-f45.google.com ([209.85.215.45]:32868 "EHLO
-	mail-la0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753046AbbGIRww (ORCPT
+Received: from mail-pa0-f43.google.com ([209.85.220.43]:35200 "EHLO
+	mail-pa0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751264AbbGIXJl (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 9 Jul 2015 13:52:52 -0400
-Date: Thu, 9 Jul 2015 19:52:42 +0200
-From: Ulf Magnusson <ulfalizer.lkml@gmail.com>
-Subject: Re: [PATCH v2 1/2] kconfig: warn of unhandled characters in Kconfig
- commands
-Message-ID: <20150709175242.GA8271@huvuddator>
-References: <cover.1436264921.git.andreas.ruprecht@fau.de>
- <5a5844d23d18500aacbed671fd0c77019f5e32bd.1436264921.git.andreas.ruprecht@fau.de>
+	Thu, 9 Jul 2015 19:09:41 -0400
+Received: by pactm7 with SMTP id tm7so157696361pac.2
+        for <linux-kbuild@vger.kernel.org>; Thu, 09 Jul 2015 16:09:41 -0700 (PDT)
+From: Behan Webster <behanw@converseincode.com>
+Subject: Re: [PATCH v2] Makefile: Fix detection of clang when cross-compiling
+References: <1429306504-26122-1-git-send-email-paul@crapouillou.net>
+ <20150422143320.GB19277@sepie.suse.cz>
+Message-ID: <559EFF2F.1070301@converseincode.com>
+Date: Thu, 9 Jul 2015 16:09:35 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <5a5844d23d18500aacbed671fd0c77019f5e32bd.1436264921.git.andreas.ruprecht@fau.de>
+In-Reply-To: <20150422143320.GB19277@sepie.suse.cz>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andreas Ruprecht <andreas.ruprecht@fau.de>
-Cc: Paul Bolle <pebolle@tiscali.nl>, Valentin Rothberg <valentinrothberg@gmail.com>, rafael.j.wysocki@intel.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, hengelein Stefan <stefan.hengelein@fau.de>, linux@dominikbrodowski.net, Michal Marek <mmarek@suse.cz>
+To: Michal Marek <mmarek@suse.cz>
+Cc: Paul Cercueil <paul@crapouillou.net>, linux-kbuild@vger.kernel.org, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 
-One more nitpick:
+Resent since gmail HTML-ified my previous email...
 
-On Tue, Jul 07, 2015 at 12:31:16PM +0200, Andreas Ruprecht wrote:
-> In Kconfig, definitions of options take the following form:
-> "<COMMAND> <PARAM> <PARAM> ...". COMMANDs and PARAMs are treated
-> slightly different by the underlying parser.
-> 
-> While commit 2e0d737fc76f ("kconfig: don't silently ignore unhandled
-> characters") introduced a warning for unsupported characters around
-> PARAMs, it does not cover situations where a COMMAND has additional
-> characters around it.
-> 
-> This change makes Kconfig emit a warning if superfluous characters
-> are found around COMMANDs. As the 'help' statement sometimes is
-> written as '---help---', the '-' character would now also be regarded
-> as unhandled and generate a warning. To avoid that, '-' is added to
-> the list of allowed characters, and the token '---help---' is included
-> in the zconf.gperf file.
-> 
-> Reported-by: Valentin Rothberg <valentinrothberg@gmail.com>
-> Signed-off-by: Andreas Ruprecht <andreas.ruprecht@fau.de>
-> ---
->  scripts/kconfig/zconf.gperf |  1 +
->  scripts/kconfig/zconf.l     | 18 ++++++++++++------
->  2 files changed, 13 insertions(+), 6 deletions(-)
-> 
-> diff --git a/scripts/kconfig/zconf.gperf b/scripts/kconfig/zconf.gperf
-> index b6ac02d..7aceb7b 100644
-> --- a/scripts/kconfig/zconf.gperf
-> +++ b/scripts/kconfig/zconf.gperf
-> @@ -22,6 +22,7 @@ comment,	T_COMMENT,	TF_COMMAND
->  config,		T_CONFIG,	TF_COMMAND
->  menuconfig,	T_MENUCONFIG,	TF_COMMAND
->  help,		T_HELP,		TF_COMMAND
-> +"---help---",   T_HELP,     TF_COMMAND
->  if,		T_IF,		TF_COMMAND|TF_PARAM
->  endif,		T_ENDIF,	TF_COMMAND
->  depends,	T_DEPENDS,	TF_COMMAND
-> diff --git a/scripts/kconfig/zconf.l b/scripts/kconfig/zconf.l
-> index 200a3fe..3078244 100644
-> --- a/scripts/kconfig/zconf.l
-> +++ b/scripts/kconfig/zconf.l
-> @@ -66,9 +66,16 @@ static void alloc_string(const char *str, int size)
->  	memcpy(text, str, size);
->  	text[size] = 0;
->  }
-> +
-> +static void warn_ignored_character(const char chr)
-> +{
-> +	fprintf(stderr,
-> +	        "%s:%d:warning: ignoring unsupported character '%c'\n",
-> +	        zconf_curname(), zconf_lineno(), chr);
-> +}
->  %}
->  
-> -n	[A-Za-z0-9_]
-> +n	[A-Za-z0-9_-]
->  
->  %%
->  	int str = 0;
-> @@ -106,7 +113,9 @@ n	[A-Za-z0-9_]
->  		zconflval.string = text;
->  		return T_WORD;
->  	}
-> -	.
-> +	.	{
-> +		warn_ignored_character(*yytext);
-> +	}
+On Wed, Apr 22, 2015 at 7:33 AM, Michal Marek <mmarek@suse.cz 
+<mailto:mmarek@suse.cz>> wrote:
 
-I'd shorten this to just
+    On Fri, Apr 17, 2015 at 11:35:04PM +0200, Paul Cercueil wrote:
+     > When the host's C compiler is clang, and when attempting to
+     > cross-compile Linux e.g. to MIPS with mipsel-linux-gcc, the Makefile
+     > would incorrectly detect the use of clang, which resulted in
+     > clang-specific flags being passed to mipsel-linux-gcc.
+     >
+     > This can be verified under Debian by installing the "clang" package,
+     > and then using it as the default compiler with:
+     > sudo update-alternatives --config cc
+     >
+     > This patch moves the detection of clang after the $(CC) variable is
+     > initialized to the name of the cross-compiler, so that the check
+    applies
+     > to the cross-compiler and not the host's C compiler.
+     >
+     > v2: Move the detection of clang after the inclusion of the
+     > arch/*/Makefile (as they might set $(CROSS_COMPILE))
+     >
+     > Signed-off-by: Paul Cercueil <paul@crapouillou.net
+    <mailto:paul@crapouillou.net>>
 
-	.	warn_ignored_character(*yytext);
+    Applied to kbuild.git#kbuild. I will push it after v4.1-rc1 becomes
+    available, though.
 
-Not that the rest of zonf.l is very consistent.
 
->  	\n	{
->  		BEGIN(INITIAL);
->  		current_file->lineno++;
-> @@ -132,7 +141,6 @@ n	[A-Za-z0-9_]
->  		BEGIN(STRING);
->  	}
->  	\n	BEGIN(INITIAL); current_file->lineno++; return T_EOL;
-> -	---	/* ignore */
->  	({n}|[-/.])+	{
->  		const struct kconf_id *id = kconf_id_lookup(yytext, yyleng);
->  		if (id && id->flags & TF_PARAM) {
-> @@ -147,9 +155,7 @@ n	[A-Za-z0-9_]
->  	\\\n	current_file->lineno++;
->  	[[:blank:]]+
->  	.	{
-> -		fprintf(stderr,
-> -		        "%s:%d:warning: ignoring unsupported character '%c'\n",
-> -		        zconf_curname(), zconf_lineno(), *yytext);
-> +		warn_ignored_character(*yytext);
->  	}
+Drat. I wish I saw this earlier.
 
-Ditto.
+This breaks patches which check for the value of COMPILER in 
+arch/*/Makefile. This detection must be performed before the inclusion 
+of the arch Makefile.
 
->  	<<EOF>> {
->  		BEGIN(INITIAL);
-> -- 
-> 1.9.1
-> 
+Can I move this to after the initialization of CC but before the include?
 
-Cheers,
-Ulf
+I'm not sure that being able to define the default compiler per arch is 
+necessary. But I know I need to be able to add arch specific flags for 
+clang.
+
+Behan
+
+-- 
+Behan Webster
+behanw@converseincode.com <mailto:behanw@converseincode.com>
