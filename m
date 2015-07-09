@@ -1,60 +1,128 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from casper.infradead.org ([85.118.1.10]:34858 "EHLO
-	casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752950AbbGIPq3 (ORCPT
+Received: from mail-la0-f45.google.com ([209.85.215.45]:32868 "EHLO
+	mail-la0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753046AbbGIRww (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 9 Jul 2015 11:46:29 -0400
-From: Arnaldo Carvalho de Melo <acme@kernel.org>
-Subject: [PATCH 3/4] tools lib: Improve clean target
-Date: Thu,  9 Jul 2015 12:45:20 -0300
-Message-Id: <1436456721-9048-4-git-send-email-acme@kernel.org>
-In-Reply-To: <1436456721-9048-1-git-send-email-acme@kernel.org>
-References: <1436456721-9048-1-git-send-email-acme@kernel.org>
+	Thu, 9 Jul 2015 13:52:52 -0400
+Date: Thu, 9 Jul 2015 19:52:42 +0200
+From: Ulf Magnusson <ulfalizer.lkml@gmail.com>
+Subject: Re: [PATCH v2 1/2] kconfig: warn of unhandled characters in Kconfig
+ commands
+Message-ID: <20150709175242.GA8271@huvuddator>
+References: <cover.1436264921.git.andreas.ruprecht@fau.de>
+ <5a5844d23d18500aacbed671fd0c77019f5e32bd.1436264921.git.andreas.ruprecht@fau.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <5a5844d23d18500aacbed671fd0c77019f5e32bd.1436264921.git.andreas.ruprecht@fau.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ingo Molnar <mingo@kernel.org>
-Cc: linux-kernel@vger.kernel.org, Riku Voipio <riku.voipio@linaro.org>, Peter Zijlstra <a.p.zijlstra@chello.nl>, linux-kbuild@vger.kernel.org, Arnaldo Carvalho de Melo <acme@redhat.com>
+To: Andreas Ruprecht <andreas.ruprecht@fau.de>
+Cc: Paul Bolle <pebolle@tiscali.nl>, Valentin Rothberg <valentinrothberg@gmail.com>, rafael.j.wysocki@intel.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, hengelein Stefan <stefan.hengelein@fau.de>, linux@dominikbrodowski.net, Michal Marek <mmarek@suse.cz>
 
-From: Riku Voipio <riku.voipio@linaro.org>
+One more nitpick:
 
-The clean targets miss some .cmd and .d files.
+On Tue, Jul 07, 2015 at 12:31:16PM +0200, Andreas Ruprecht wrote:
+> In Kconfig, definitions of options take the following form:
+> "<COMMAND> <PARAM> <PARAM> ...". COMMANDs and PARAMs are treated
+> slightly different by the underlying parser.
+> 
+> While commit 2e0d737fc76f ("kconfig: don't silently ignore unhandled
+> characters") introduced a warning for unsupported characters around
+> PARAMs, it does not cover situations where a COMMAND has additional
+> characters around it.
+> 
+> This change makes Kconfig emit a warning if superfluous characters
+> are found around COMMANDs. As the 'help' statement sometimes is
+> written as '---help---', the '-' character would now also be regarded
+> as unhandled and generate a warning. To avoid that, '-' is added to
+> the list of allowed characters, and the token '---help---' is included
+> in the zconf.gperf file.
+> 
+> Reported-by: Valentin Rothberg <valentinrothberg@gmail.com>
+> Signed-off-by: Andreas Ruprecht <andreas.ruprecht@fau.de>
+> ---
+>  scripts/kconfig/zconf.gperf |  1 +
+>  scripts/kconfig/zconf.l     | 18 ++++++++++++------
+>  2 files changed, 13 insertions(+), 6 deletions(-)
+> 
+> diff --git a/scripts/kconfig/zconf.gperf b/scripts/kconfig/zconf.gperf
+> index b6ac02d..7aceb7b 100644
+> --- a/scripts/kconfig/zconf.gperf
+> +++ b/scripts/kconfig/zconf.gperf
+> @@ -22,6 +22,7 @@ comment,	T_COMMENT,	TF_COMMAND
+>  config,		T_CONFIG,	TF_COMMAND
+>  menuconfig,	T_MENUCONFIG,	TF_COMMAND
+>  help,		T_HELP,		TF_COMMAND
+> +"---help---",   T_HELP,     TF_COMMAND
+>  if,		T_IF,		TF_COMMAND|TF_PARAM
+>  endif,		T_ENDIF,	TF_COMMAND
+>  depends,	T_DEPENDS,	TF_COMMAND
+> diff --git a/scripts/kconfig/zconf.l b/scripts/kconfig/zconf.l
+> index 200a3fe..3078244 100644
+> --- a/scripts/kconfig/zconf.l
+> +++ b/scripts/kconfig/zconf.l
+> @@ -66,9 +66,16 @@ static void alloc_string(const char *str, int size)
+>  	memcpy(text, str, size);
+>  	text[size] = 0;
+>  }
+> +
+> +static void warn_ignored_character(const char chr)
+> +{
+> +	fprintf(stderr,
+> +	        "%s:%d:warning: ignoring unsupported character '%c'\n",
+> +	        zconf_curname(), zconf_lineno(), chr);
+> +}
+>  %}
+>  
+> -n	[A-Za-z0-9_]
+> +n	[A-Za-z0-9_-]
+>  
+>  %%
+>  	int str = 0;
+> @@ -106,7 +113,9 @@ n	[A-Za-z0-9_]
+>  		zconflval.string = text;
+>  		return T_WORD;
+>  	}
+> -	.
+> +	.	{
+> +		warn_ignored_character(*yytext);
+> +	}
 
-Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
-Cc: Peter Zijlstra <a.p.zijlstra@chello.nl>
-Cc: linux-kbuild@vger.kernel.org
-Link: http://lkml.kernel.org/r/1434631938-12681-1-git-send-email-riku.voipio@linaro.org
-Signed-off-by: Arnaldo Carvalho de Melo <acme@redhat.com>
----
- tools/lib/api/Makefile        | 2 +-
- tools/lib/traceevent/Makefile | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+I'd shorten this to just
 
-diff --git a/tools/lib/api/Makefile b/tools/lib/api/Makefile
-index 8bd960658463..fe1b02c2c95b 100644
---- a/tools/lib/api/Makefile
-+++ b/tools/lib/api/Makefile
-@@ -36,7 +36,7 @@ $(LIBFILE): $(API_IN)
- 
- clean:
- 	$(call QUIET_CLEAN, libapi) $(RM) $(LIBFILE); \
--	find $(if $(OUTPUT),$(OUTPUT),.) -name \*.o | xargs $(RM)
-+	find $(if $(OUTPUT),$(OUTPUT),.) -name \*.o -or -name \*.o.cmd -or -name \*.o.d | xargs $(RM)
- 
- FORCE:
- 
-diff --git a/tools/lib/traceevent/Makefile b/tools/lib/traceevent/Makefile
-index 6daaff652aff..7851df1490e0 100644
---- a/tools/lib/traceevent/Makefile
-+++ b/tools/lib/traceevent/Makefile
-@@ -268,7 +268,7 @@ install: install_lib
- 
- clean:
- 	$(call QUIET_CLEAN, libtraceevent) \
--		$(RM) *.o *~ $(TARGETS) *.a *.so $(VERSION_FILES) .*.d \
-+		$(RM) *.o *~ $(TARGETS) *.a *.so $(VERSION_FILES) .*.d .*.cmd \
- 		$(RM) TRACEEVENT-CFLAGS tags TAGS
- 
- PHONY += force plugins
--- 
-2.1.0
+	.	warn_ignored_character(*yytext);
 
+Not that the rest of zonf.l is very consistent.
+
+>  	\n	{
+>  		BEGIN(INITIAL);
+>  		current_file->lineno++;
+> @@ -132,7 +141,6 @@ n	[A-Za-z0-9_]
+>  		BEGIN(STRING);
+>  	}
+>  	\n	BEGIN(INITIAL); current_file->lineno++; return T_EOL;
+> -	---	/* ignore */
+>  	({n}|[-/.])+	{
+>  		const struct kconf_id *id = kconf_id_lookup(yytext, yyleng);
+>  		if (id && id->flags & TF_PARAM) {
+> @@ -147,9 +155,7 @@ n	[A-Za-z0-9_]
+>  	\\\n	current_file->lineno++;
+>  	[[:blank:]]+
+>  	.	{
+> -		fprintf(stderr,
+> -		        "%s:%d:warning: ignoring unsupported character '%c'\n",
+> -		        zconf_curname(), zconf_lineno(), *yytext);
+> +		warn_ignored_character(*yytext);
+>  	}
+
+Ditto.
+
+>  	<<EOF>> {
+>  		BEGIN(INITIAL);
+> -- 
+> 1.9.1
+> 
+
+Cheers,
+Ulf
