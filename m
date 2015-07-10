@@ -1,84 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f175.google.com ([209.85.212.175]:35143 "EHLO
-	mail-wi0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752995AbbGJIEc (ORCPT
+Received: from faui40.informatik.uni-erlangen.de ([131.188.34.40]:43031 "EHLO
+	faui40.informatik.uni-erlangen.de" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751002AbbGJIZo (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 10 Jul 2015 04:04:32 -0400
-Date: Fri, 10 Jul 2015 10:04:27 +0200
-From: Ingo Molnar <mingo@kernel.org>
-Subject: Re: [GIT PULL 0/4] perf/urgent fixes
-Message-ID: <20150710080426.GA9635@gmail.com>
-References: <1436456721-9048-1-git-send-email-acme@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1436456721-9048-1-git-send-email-acme@kernel.org>
+	Fri, 10 Jul 2015 04:25:44 -0400
+From: Andreas Ruprecht <andreas.ruprecht@fau.de>
+Subject: [PATCH v3 0/2] kconfig: warn of unhandled characters in Kconfig commands
+Date: Fri, 10 Jul 2015 10:25:31 +0200
+Message-Id: <cover.1436516211.git.andreas.ruprecht@fau.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaldo Carvalho de Melo <acme@kernel.org>
-Cc: linux-kernel@vger.kernel.org, Adrian Hunter <adrian.hunter@intel.com>, Borislav Petkov <bp@suse.de>, David Ahern <dsahern@gmail.com>, Frederic Weisbecker <fweisbec@gmail.com>, Jiri Olsa <jolsa@redhat.com>, linux-kbuild@vger.kernel.org, Namhyung Kim <namhyung@kernel.org>, Peter Zijlstra <a.p.zijlstra@chello.nl>, Riku Voipio <riku.voipio@linaro.org>, Stephane Eranian <eranian@google.com>, Vinson Lee <vlee@twopensource.com>, Arnaldo Carvalho de Melo <acme@redhat.com>
+To: Ulf Magnusson <ulfalizer.lkml@gmail.com>
+Cc: Paul Bolle <pebolle@tiscali.nl>, Valentin Rothberg <valentinrothberg@gmail.com>, rafael.j.wysocki@intel.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, hengelein Stefan <stefan.hengelein@fau.de>, linux@dominikbrodowski.net, Michal Marek <mmarek@suse.cz>, Andreas Ruprecht <andreas.ruprecht@fau.de>
 
+This patchset changes the lexer file to emit a warning if any unhandled
+characters are found in the input. So far, Kconfig options like
 
-* Arnaldo Carvalho de Melo <acme@kernel.org> wrote:
+ +config FOO
+    bool
+    [...]
 
-> Hi Ingo,
-> 
-> 	Please consider pulling,
-> 
-> - Arnaldo
-> 
-> The following changes since commit ebf2d2689de551d90965090bb991fc640a0c0d41:
-> 
->   perf/x86: Fix copy_from_user_nmi() return if range is not ok (2015-07-06 14:09:27 +0200)
-> 
-> are available in the git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/acme/linux.git tags/perf-urgent-for-mingo
-> 
-> for you to fetch changes up to 08ae217b8d44986062fe3648c5bb83816d5bc00f:
-> 
->   perf thread_map: Fix the sizeof() calculation for map entries (2015-07-09 12:28:53 -0300)
-> 
-> ----------------------------------------------------------------
-> perf/urgent fixes:
-> 
-> User visible:
-> 
-> - Fix 'perf top -u username', where not enough memory per thread_map
->   entry was being allocated nor was being initialized, causing a
->   segfault (Arnaldo Carvalho de Melo)
-> 
-> - Fix locking lockup using 32-bit compat vdso (Adrian Hunter)
-> 
-> Developer stuff:
-> 
-> - Fix shadow declaration of close with older build environments (Jiri Olsa)
-> 
-> - Make the 'clean' target do a better job, removing some more
->   temp files (Riku Voipio)
-> 
-> Signed-off-by: Arnaldo Carvalho de Melo <acme@redhat.com>
-> 
-> ----------------------------------------------------------------
-> Adrian Hunter (1):
->       perf tools: Fix lockup using 32-bit compat vdso
-> 
-> Arnaldo Carvalho de Melo (1):
->       perf thread_map: Fix the sizeof() calculation for map entries
-> 
-> Jiri Olsa (1):
->       perf stat: Fix shadow declaration of close
-> 
-> Riku Voipio (1):
->       tools lib: Improve clean target
-> 
->  tools/lib/api/Makefile        | 2 +-
->  tools/lib/traceevent/Makefile | 2 +-
->  tools/perf/builtin-stat.c     | 4 ++--
->  tools/perf/util/thread_map.c  | 3 +--
->  tools/perf/util/vdso.c        | 8 +++-----
->  5 files changed, 8 insertions(+), 11 deletions(-)
+(note the wrong '+'!) were parsed without a warning. As simply adding a
+warning for '.' produces lots of warnings as occasionally '---help---'
+is used instead of 'help' (and thus '-' is recognized as an unhandled
+character), we need to handle '---help---' separately.
 
-Pulled this and the second round of fixes, thanks a lot Arnaldo!
+Changes to v1:
+	- add '---help---' in zconf.gperf instead of special casing
+	  it in zconf.l
 
-	Ingo
+Changes to v2:
+	- Do no constify char parameter to warn_ignored_character
+	- Shorten rule definitions for '.'
+
+Andreas Ruprecht (2):
+  kconfig: warn of unhandled characters in Kconfig commands
+  kconfig: Regenerate shipped zconf.{hash,lex}.c files
+
+ scripts/kconfig/zconf.gperf          |   1 +
+ scripts/kconfig/zconf.hash.c_shipped |  58 ++++---
+ scripts/kconfig/zconf.l              |  20 ++-
+ scripts/kconfig/zconf.lex.c_shipped  | 325 +++++++++++++++++------------------
+ 4 files changed, 204 insertions(+), 200 deletions(-)
+
+-- 
+1.9.1
+
