@@ -1,70 +1,84 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pa0-f43.google.com ([209.85.220.43]:35200 "EHLO
-	mail-pa0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751264AbbGIXJl (ORCPT
+Received: from mail-wi0-f175.google.com ([209.85.212.175]:35143 "EHLO
+	mail-wi0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752995AbbGJIEc (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 9 Jul 2015 19:09:41 -0400
-Received: by pactm7 with SMTP id tm7so157696361pac.2
-        for <linux-kbuild@vger.kernel.org>; Thu, 09 Jul 2015 16:09:41 -0700 (PDT)
-From: Behan Webster <behanw@converseincode.com>
-Subject: Re: [PATCH v2] Makefile: Fix detection of clang when cross-compiling
-References: <1429306504-26122-1-git-send-email-paul@crapouillou.net>
- <20150422143320.GB19277@sepie.suse.cz>
-Message-ID: <559EFF2F.1070301@converseincode.com>
-Date: Thu, 9 Jul 2015 16:09:35 -0700
+	Fri, 10 Jul 2015 04:04:32 -0400
+Date: Fri, 10 Jul 2015 10:04:27 +0200
+From: Ingo Molnar <mingo@kernel.org>
+Subject: Re: [GIT PULL 0/4] perf/urgent fixes
+Message-ID: <20150710080426.GA9635@gmail.com>
+References: <1436456721-9048-1-git-send-email-acme@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20150422143320.GB19277@sepie.suse.cz>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1436456721-9048-1-git-send-email-acme@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Paul Cercueil <paul@crapouillou.net>, linux-kbuild@vger.kernel.org, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-
-Resent since gmail HTML-ified my previous email...
-
-On Wed, Apr 22, 2015 at 7:33 AM, Michal Marek <mmarek@suse.cz 
-<mailto:mmarek@suse.cz>> wrote:
-
-    On Fri, Apr 17, 2015 at 11:35:04PM +0200, Paul Cercueil wrote:
-     > When the host's C compiler is clang, and when attempting to
-     > cross-compile Linux e.g. to MIPS with mipsel-linux-gcc, the Makefile
-     > would incorrectly detect the use of clang, which resulted in
-     > clang-specific flags being passed to mipsel-linux-gcc.
-     >
-     > This can be verified under Debian by installing the "clang" package,
-     > and then using it as the default compiler with:
-     > sudo update-alternatives --config cc
-     >
-     > This patch moves the detection of clang after the $(CC) variable is
-     > initialized to the name of the cross-compiler, so that the check
-    applies
-     > to the cross-compiler and not the host's C compiler.
-     >
-     > v2: Move the detection of clang after the inclusion of the
-     > arch/*/Makefile (as they might set $(CROSS_COMPILE))
-     >
-     > Signed-off-by: Paul Cercueil <paul@crapouillou.net
-    <mailto:paul@crapouillou.net>>
-
-    Applied to kbuild.git#kbuild. I will push it after v4.1-rc1 becomes
-    available, though.
+To: Arnaldo Carvalho de Melo <acme@kernel.org>
+Cc: linux-kernel@vger.kernel.org, Adrian Hunter <adrian.hunter@intel.com>, Borislav Petkov <bp@suse.de>, David Ahern <dsahern@gmail.com>, Frederic Weisbecker <fweisbec@gmail.com>, Jiri Olsa <jolsa@redhat.com>, linux-kbuild@vger.kernel.org, Namhyung Kim <namhyung@kernel.org>, Peter Zijlstra <a.p.zijlstra@chello.nl>, Riku Voipio <riku.voipio@linaro.org>, Stephane Eranian <eranian@google.com>, Vinson Lee <vlee@twopensource.com>, Arnaldo Carvalho de Melo <acme@redhat.com>
 
 
-Drat. I wish I saw this earlier.
+* Arnaldo Carvalho de Melo <acme@kernel.org> wrote:
 
-This breaks patches which check for the value of COMPILER in 
-arch/*/Makefile. This detection must be performed before the inclusion 
-of the arch Makefile.
+> Hi Ingo,
+> 
+> 	Please consider pulling,
+> 
+> - Arnaldo
+> 
+> The following changes since commit ebf2d2689de551d90965090bb991fc640a0c0d41:
+> 
+>   perf/x86: Fix copy_from_user_nmi() return if range is not ok (2015-07-06 14:09:27 +0200)
+> 
+> are available in the git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/acme/linux.git tags/perf-urgent-for-mingo
+> 
+> for you to fetch changes up to 08ae217b8d44986062fe3648c5bb83816d5bc00f:
+> 
+>   perf thread_map: Fix the sizeof() calculation for map entries (2015-07-09 12:28:53 -0300)
+> 
+> ----------------------------------------------------------------
+> perf/urgent fixes:
+> 
+> User visible:
+> 
+> - Fix 'perf top -u username', where not enough memory per thread_map
+>   entry was being allocated nor was being initialized, causing a
+>   segfault (Arnaldo Carvalho de Melo)
+> 
+> - Fix locking lockup using 32-bit compat vdso (Adrian Hunter)
+> 
+> Developer stuff:
+> 
+> - Fix shadow declaration of close with older build environments (Jiri Olsa)
+> 
+> - Make the 'clean' target do a better job, removing some more
+>   temp files (Riku Voipio)
+> 
+> Signed-off-by: Arnaldo Carvalho de Melo <acme@redhat.com>
+> 
+> ----------------------------------------------------------------
+> Adrian Hunter (1):
+>       perf tools: Fix lockup using 32-bit compat vdso
+> 
+> Arnaldo Carvalho de Melo (1):
+>       perf thread_map: Fix the sizeof() calculation for map entries
+> 
+> Jiri Olsa (1):
+>       perf stat: Fix shadow declaration of close
+> 
+> Riku Voipio (1):
+>       tools lib: Improve clean target
+> 
+>  tools/lib/api/Makefile        | 2 +-
+>  tools/lib/traceevent/Makefile | 2 +-
+>  tools/perf/builtin-stat.c     | 4 ++--
+>  tools/perf/util/thread_map.c  | 3 +--
+>  tools/perf/util/vdso.c        | 8 +++-----
+>  5 files changed, 8 insertions(+), 11 deletions(-)
 
-Can I move this to after the initialization of CC but before the include?
+Pulled this and the second round of fixes, thanks a lot Arnaldo!
 
-I'm not sure that being able to define the default compiler per arch is 
-necessary. But I know I need to be able to add arch specific flags for 
-clang.
-
-Behan
-
--- 
-Behan Webster
-behanw@converseincode.com <mailto:behanw@converseincode.com>
+	Ingo
