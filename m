@@ -1,174 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from condef002-v.nifty.com ([210.131.4.239]:48440 "EHLO
-	condef002-v.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932477AbbGJQmp (ORCPT
+Received: from mail-la0-f52.google.com ([209.85.215.52]:35845 "EHLO
+	mail-la0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750851AbbGKP4r (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 10 Jul 2015 12:42:45 -0400
-Received: from conssluserg001-v.nifty.com ([10.16.229.200])by condef002-v.nifty.com with ESMTP id t6AGfdXJ013198
-	for <linux-kbuild@vger.kernel.org>; Sat, 11 Jul 2015 01:41:39 +0900
+	Sat, 11 Jul 2015 11:56:47 -0400
+Date: Sat, 11 Jul 2015 17:56:37 +0200
+From: Ulf Magnusson <ulfalizer.lkml@gmail.com>
+Subject: Re: [PATCH v3 0/2] kconfig: warn of unhandled characters in Kconfig
+ commands
+Message-ID: <20150711155637.GA25144@huvuddator>
+References: <cover.1436516211.git.andreas.ruprecht@fau.de>
 MIME-Version: 1.0
-In-Reply-To: <20150710102222.GP7557@n2100.arm.linux.org.uk>
-References: <1436186224-6673-1-git-send-email-yamada.masahiro@socionext.com>
-	<20150710102222.GP7557@n2100.arm.linux.org.uk>
-Date: Sat, 11 Jul 2015 01:41:27 +0900
-Message-ID: <CAK7LNAS9L1GEpCfrA7YNzifFfwNbhHFy5ia=wy=Wyuho11BOnw@mail.gmail.com>
-Subject: Re: [PATCH] ARM: add boot image dependencies not to generate invalid images
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <cover.1436516211.git.andreas.ruprecht@fau.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Russell King - ARM Linux <linux@arm.linux.org.uk>
-Cc: linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Michal Marek <mmarek@suse.cz>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Andreas Ruprecht <andreas.ruprecht@fau.de>
+Cc: Paul Bolle <pebolle@tiscali.nl>, Valentin Rothberg <valentinrothberg@gmail.com>, rafael.j.wysocki@intel.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, hengelein Stefan <stefan.hengelein@fau.de>, linux@dominikbrodowski.net, Michal Marek <mmarek@suse.cz>
 
-Hi Russel,
+On Fri, Jul 10, 2015 at 10:25:31AM +0200, Andreas Ruprecht wrote:
+> This patchset changes the lexer file to emit a warning if any unhandled
+> characters are found in the input. So far, Kconfig options like
+> 
+>  +config FOO
+>     bool
+>     [...]
+> 
+> (note the wrong '+'!) were parsed without a warning. As simply adding a
+> warning for '.' produces lots of warnings as occasionally '---help---'
+> is used instead of 'help' (and thus '-' is recognized as an unhandled
+> character), we need to handle '---help---' separately.
+> 
+> Changes to v1:
+> 	- add '---help---' in zconf.gperf instead of special casing
+> 	  it in zconf.l
+> 
+> Changes to v2:
+> 	- Do no constify char parameter to warn_ignored_character
+> 	- Shorten rule definitions for '.'
+> 
+> Andreas Ruprecht (2):
+>   kconfig: warn of unhandled characters in Kconfig commands
+>   kconfig: Regenerate shipped zconf.{hash,lex}.c files
+> 
+>  scripts/kconfig/zconf.gperf          |   1 +
+>  scripts/kconfig/zconf.hash.c_shipped |  58 ++++---
+>  scripts/kconfig/zconf.l              |  20 ++-
+>  scripts/kconfig/zconf.lex.c_shipped  | 325 +++++++++++++++++------------------
+>  4 files changed, 204 insertions(+), 200 deletions(-)
+> 
+> -- 
+> 1.9.1
+> 
 
+Looks good to me.
 
-2015-07-10 19:22 GMT+09:00 Russell King - ARM Linux <linux@arm.linux.org.uk>:
-> On Mon, Jul 06, 2015 at 09:37:04PM +0900, Masahiro Yamada wrote:
->> [3] Then, re-build "all" and "uImage" simultaneously.
->>     You will get an invalid uImage at random.
->>   $ make -s -j8 ARCH=arm UIMAGE_LOADADDR=0x80208000 all uImage
->>   Image Name:   Linux-4.2.0-rc1-00008-g1c4c715-d
->>   Created:      Mon Jul  6 17:52:22 2015
->>   Image Type:   ARM Linux Kernel Image (uncompressed)
->>   Data Size:    26768 Bytes = 26.14 kB = 0.03 MB
->>   Load Address: 80208000
->>   Entry Point:  80208000
->
-> At no point in the above do I see an attempt to rebuild init/main.o,
-> which there should be as you touched the corresponding .c file -
-> because you're hiding that output with -s.  Please show what's going
-> on without using -s.
+I ran the Kconfiglib test suite on it too. Since it simply compares the
+output of Kconfiglib and the C implementation, it doubles as a good
+regression test for the C implementation.
 
-Please see the log attached at the end of this message.
-
-
->> "make uImage" could descend into arch/arm/boot/Makefile before
->> "make zImage" is completed because arch/arm/Makefile describes no
->> dependency among boot targets.
->
-> The uImage target should depend on vmlinux, which should force the
-> rebuild of init/main.o, and relink of the top-level vmlinux file
-> before decending into arch/arm/boot/Makefile for the
-> arch/arm/boot/uImage target.
->
-> That makefile contains the dependencies required to order things
-> correctly - the arch/arm/boot/uImage target depends on
-> arch/arm/boot/zImage, which in turn depends on
-> arch/arm/boot/compressed/vmlinux, and then arch/arm/boot/Image.
->
-> In other words, arch/arm/boot/Makefile deals with the dependencies
-> between the targets it's responsible for building itself.
-
-No, you do not understand what is happening in here.
-
-
-The dependencies among targets such as Image, zImage, uImage,
-are fully described in arch/arm/boot/Makefile, but it is not enough.
-
-Because arch/arm/boot/Makefile is _not_ included from the top-level Makefile,
-the top-level build cannot know the dependency between zImage and uImage.
-
-arch/arm/Makefile, which is included from the top Makefile,
-only describes that zImage depends on vmlinux,
-and uImage depends on vmlinux as well.
-But, no dependency between zImage and uImage is written in arch/arm/Makefile.
-
-Consequently, we run make with the parallel option, first Kbuild
-updates vmlinux,
-and then two different threads descends into arch/arm/boot/Makefile
-almost at the same time, one for updating zImage and the other for uImage.
-
-The is a race between the two threads.
-
-While one thread is re-generating zImage and also uImage on top of that,
-the other thread tries to re-generate zImage independently.
-
-zImage is overwritten by the slower thread, and then uImage is
-re-generated based on the broken zImage.
-
-See my detailed build log below:
-
-Please note:
-"Kernel: arch/arm/boot/zImage is ready"
-is displayed twice,
-the first one is shown before the uImage log, and the second one is
-after uImage.
-
-zImage is correct, but uImage is extremely small when this problem happens.
-
-
-
-$ git describe
-v4.2-rc1-62-gc4b5fd3
-
-
-$ touch init/main.c
-$ make -j8 ARCH=arm UIMAGE_LOADADDR=0x80208000 all uImage
-  CHK     include/config/kernel.release
-  CHK     include/generated/uapi/linux/version.h
-  CHK     include/generated/utsrelease.h
-make[1]: `include/generated/mach-types.h' is up to date.
-  CHK     include/generated/timeconst.h
-  CHK     include/generated/bounds.h
-  CHK     include/generated/asm-offsets.h
-  CALL    scripts/checksyscalls.sh
-  CC      init/main.o
-  CHK     include/generated/compile.h
-  LD      init/built-in.o
-  LINK    vmlinux
-  LD      vmlinux.o
-  MODPOST vmlinux.o
-  GEN     .version
-  CHK     include/generated/compile.h
-  UPD     include/generated/compile.h
-  CC      init/version.o
-  LD      init/built-in.o
-  KSYM    .tmp_kallsyms1.o
-  KSYM    .tmp_kallsyms2.o
-  LD      vmlinux
-  SORTEX  vmlinux
-  SYSMAP  System.map
-  OBJCOPY arch/arm/boot/Image
-  Building modules, stage 2.
-  Kernel: arch/arm/boot/Image is ready
-  GZIP    arch/arm/boot/compressed/piggy.gzip
-  AS      arch/arm/boot/compressed/piggy.gzip.o
-  Kernel: arch/arm/boot/Image is ready
-  GZIP    arch/arm/boot/compressed/piggy.gzip
-  LD      arch/arm/boot/compressed/vmlinux
-  OBJCOPY arch/arm/boot/zImage
-  Kernel: arch/arm/boot/zImage is ready
-  UIMAGE  arch/arm/boot/uImage
-Image Name:   Linux-4.2.0-rc1-00062-gc4b5fd3-d
-Created:      Sat Jul 11 01:22:22 2015
-Image Type:   ARM Linux Kernel Image (uncompressed)
-Data Size:    26472 Bytes = 25.85 kB = 0.03 MB
-Load Address: 80208000
-Entry Point:  80208000
-  Image arch/arm/boot/uImage is ready
-  MODPOST 192 modules
-  AS      arch/arm/boot/compressed/piggy.gzip.o
-  LD      arch/arm/boot/compressed/vmlinux
-  OBJCOPY arch/arm/boot/zImage
-  Kernel: arch/arm/boot/zImage is ready
-$ LANG=C ls -l arch/arm/boot/
-total 19636
--rwxrwxr-x 1 masahiro masahiro 13766656 Jul 11 01:22 Image
--rw-rw-r-- 1 masahiro masahiro     3137 Jul  3 01:17 Makefile
-drwxrwxr-x 2 masahiro masahiro     4096 Jul  3 01:17 bootp
-drwxrwxr-x 2 masahiro masahiro     4096 Jul 11 01:22 compressed
-drwxrwxr-x 3 masahiro masahiro   155648 Jul 11 00:58 dts
--rw-rw-r-- 1 masahiro masahiro     1648 Jul  3 01:17 install.sh
--rw-rw-r-- 1 masahiro masahiro    26536 Jul 11 01:22 uImage
--rwxrwxr-x 1 masahiro masahiro  6135048 Jul 11 01:22 zImage
-
-
-
-
-
-
-
--- 
-Best Regards
-Masahiro Yamada
+Cheers,
+Ulf
