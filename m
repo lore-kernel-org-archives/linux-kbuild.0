@@ -1,50 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pd0-f171.google.com ([209.85.192.171]:32773 "EHLO
-	mail-pd0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751627AbbGNToM (ORCPT
+Received: from mailout4.w1.samsung.com ([210.118.77.14]:54244 "EHLO
+	mailout4.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751583AbbGOIlq (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 14 Jul 2015 15:44:12 -0400
-Message-ID: <55A5661F.90909@gmail.com>
-Date: Tue, 14 Jul 2015 12:42:23 -0700
-From: Florian Fainelli <f.fainelli@gmail.com>
-MIME-Version: 1.0
-Subject: Re: [GIT PULL] kbuild misc fixes for v4.2-rc1
-References: <20150702203736.GA23499@pobox.suse.cz> <CA+55aFx2NScXTnv_0gx=WBe1RGdzHp=QKkaoh1cpcTZ1HKaSxg@mail.gmail.com> <5596690A.9090004@suse.cz>
-In-Reply-To: <5596690A.9090004@suse.cz>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+	Wed, 15 Jul 2015 04:41:46 -0400
+Received: from eucpsbgm1.samsung.com (unknown [203.254.199.244])
+ by mailout4.w1.samsung.com
+ (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May  5 2014))
+ with ESMTP id <0NRI00C4XTHJIFA0@mailout4.w1.samsung.com> for
+ linux-kbuild@vger.kernel.org; Wed, 15 Jul 2015 09:41:43 +0100 (BST)
+From: Pavel Fedin <p.fedin@samsung.com>
+Subject: [RESEND-3 PATCH trivial] Avoid conflict with host definitions when
+ cross-compiling
+Date: Wed, 15 Jul 2015 11:41:42 +0300
+Message-id: <00e101d0beda$13637ee0$3a2a7ca0$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
+Content-transfer-encoding: 7bit
+Content-language: ru
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>, Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Andi Kleen <ak@linux.intel.com>, andrej.skvortzov@gmail.com, arnaud.patard@rtp-net.org, Borislav Petkov <bp@suse.de>, dmitry.kalinkin@gmail.com, fabio.estevam@freescale.com, Jim Davis <jim.epost@gmail.com>, riku.voipio@linaro.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, David Howells <dhowells@redhat.com>
+To: linux-kbuild@vger.kernel.org
+Cc: 'Jiri Kosina' <jkosina@suse.cz>, trivial@kernel.org
 
-On 03/07/15 03:50, Michal Marek wrote:
-> On 2015-07-03 00:25, Linus Torvalds wrote:
->> So with all these changes to the build system fro 4.2, I'm *still*
->> getting that annoying
->>
->>    X.509 certificate list changed
->>
->> issue. Which apparently people don't normally see, because it does to
->> stdout rather than to stderr, so it's hidden by all the other random
->> build output.
-> 
-> There is a fix for that in in David Howels's tree, the topmost commit being
-> 
-> commit 9c71c950793b1b8c23c6d945b31f6545f82adced
-> Author: David Woodhouse <David.Woodhouse@intel.com>
-> Date:   Thu May 21 12:23:55 2015 +0100
-> 
->     modsign: Add explicit CONFIG_SYSTEM_TRUSTED_KEYS option
-> 
-> I though it was meant for 4.2, but I do not even see it in linux-next.
-> David, what's your plan with the patches by David W?
-> 
-> Anyway, none of the kbuild branches was *meant* to fix the issue.
+ Certain platforms (e. g. BSD-based ones) define some ELF constants according to host.
+This patch fixes problems with cross-building Linux kernel on these platforms (e. g. building ARM
+32-bit version on x86-64 host).
 
-I cannot seem to find any of these changes in 4.2-rc2, was there
-anything else that needed to be fixed in Michal's pull request?
+Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
+---
+If you are not fond of mentioning Cygwin in the comment, feel free to change it to "BSD-based" or
+whatever else you feel appropriate
+---
+ scripts/mod/modpost.h | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-Thanks
+diff --git a/scripts/mod/modpost.h b/scripts/mod/modpost.h
+index 168b43d..9f51365 100644
+--- a/scripts/mod/modpost.h
++++ b/scripts/mod/modpost.h
+@@ -11,6 +11,12 @@
+ 
+ #include "elfconfig.h"
+ 
++/* Cygwin's elf.h defines these according to host's word size */
++#undef ELF_ST_BIND
++#undef ELF_ST_TYPE
++#undef ELF_R_SYM
++#undef ELF_R_TYPE
++
+ #if KERNEL_ELFCLASS == ELFCLASS32
+ 
+ #define Elf_Ehdr    Elf32_Ehdr
 -- 
-Florian
+1.9.5.msysgit.0
+
+
+--
+To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Please read the FAQ at  http://www.tux.org/lkml/
+
+--
+To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
+the body of a message to majordomo@vger.kernel.org
+More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Please read the FAQ at  http://www.tux.org/lkml/
+
