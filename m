@@ -1,87 +1,139 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from e23smtp06.au.ibm.com ([202.81.31.148]:52579 "EHLO
-	e23smtp06.au.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932120AbbGTFNW (ORCPT
+Received: from gondolin.macieira.info ([78.47.120.188]:34073 "EHLO
+	gondolin.macieira.info" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753524AbbGTHBk (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 20 Jul 2015 01:13:22 -0400
-Received: from /spool/local
-	by e23smtp06.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-kbuild@vger.kernel.org> from <sam.bobroff@au1.ibm.com>;
-	Mon, 20 Jul 2015 15:13:19 +1000
-From: Sam Bobroff <sam.bobroff@au1.ibm.com>
-Subject: [PATCH v2 1/1] merge_config.sh: exit on missing input files
-Date: Mon, 20 Jul 2015 15:12:19 +1000
-Message-Id: <400239d8e6d962b6bb752136ac9eef704f1eb31f.1437369135.git.sam.bobroff@au1.ibm.com>
+	Mon, 20 Jul 2015 03:01:40 -0400
+From: Thiago Macieira <thiago.macieira@intel.com>
+Subject: Re: kconfig xconfig port to Qt 5
+Date: Sun, 19 Jul 2015 21:17:12 -0700
+Message-ID: <3589908.f58nmp8ZFr@tjmaciei-mobl4>
+In-Reply-To: <1462835.V8cvkXcCv0@tjmaciei-mobl4>
+References: <1462835.V8cvkXcCv0@tjmaciei-mobl4>
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="nextPart2719990.MFtfRCGauv"; micalg="sha1"; protocol="application/pkcs7-signature"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: linux-kbuild@vger.kernel.org
+To: yann.morin.1998@free.fr
+Cc: Boris Barbulovski <bbarbulovski@gmail.com>, linux-kbuild@vger.kernel.org
 
-Add a check for the existence of input files and exit (with failure)
-if they are missing.
+--nextPart2719990.MFtfRCGauv
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
 
-Without this additional check, missing files produce error messages
-but still result in an output file being generated and a successful
-exit code.
+ping
 
-Signed-off-by: Sam Bobroff <sam.bobroff@au1.ibm.com>
----
-The current behaviour (of continuing to run with missing files) seems
-like a bug to me, and I've prepared the patch with what seems to be
-the safest fix: adding a test to explicitly check for file existence.
+On Sunday 28 June 2015 18:44:52 Thiago Macieira wrote:
+> Hello Yann & others
+>=20
+> I asked on Google+ a few weeks ago about some help to port qconf to Q=
+t 5 and
+> Boris volunteered. He's finished porting and I've tested his changes,=
+ plus
+> made an update to the buildsystem to find and use Qt 5. In order to d=
+o
+> that, we dropped Qt 2 and Qt 3 support.
+>=20
+> First things first: the MAINTAINERS file lists
+> git://gitorious.org/linux-kconfig/linux-kconfig as the repository for=
 
-Additionally, it seems like it might be a good idea (either with or
-without this patch) to add "set -e" to the script because this patch
-only handles missing files, not other errors (which will currently be
-ignored and return a successful exit code). Should I add this to the
-patch?
+> upstream sources, but Gitorious is no longer working and that is
+> unavailable. Do you have an updated URL?
+>=20
+> Second: how do you prefer these changes? Boris made 37 commits, each =
+making
+> a small part of the port. Do you want each change individually, or wo=
+uld
+> you like me to squash them?
 
-This can be tested using the top level pseries_le_defconfig target and
-removing arch/powerpc/configs/le.config:
+=2D-=20
+Thiago Macieira - thiago.macieira (AT) intel.com
+  Software Architect - Intel Open Source Technology Center
 
-$ rm arch/powerpc/configs/le.config
-$ make pseries_le_defconfig
+--nextPart2719990.MFtfRCGauv
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
 
-Unpatched behaviour:
+MIAGCSqGSIb3DQEHAqCAMIACAQExCzAJBgUrDgMCGgUAMIAGCSqGSIb3DQEHAQAAoIIO3zCCBGYw
+ggNOoAMCAQICEFEmCpMc4n+cw6VfeeByroIwDQYJKoZIhvcNAQEFBQAwgZMxCzAJBgNVBAYTAlVT
+MQswCQYDVQQIEwJVVDEXMBUGA1UEBxMOU2FsdCBMYWtlIENpdHkxHjAcBgNVBAoTFVRoZSBVU0VS
+VFJVU1QgTmV0d29yazEhMB8GA1UECxMYaHR0cDovL3d3dy51c2VydHJ1c3QuY29tMRswGQYDVQQD
+ExJVVE4gLSBEQVRBQ29ycCBTR0MwHhcNMDUwNjA3MDgwOTEwWhcNMTkwNjI0MTkwNjMwWjBvMQsw
+CQYDVQQGEwJTRTEUMBIGA1UEChMLQWRkVHJ1c3QgQUIxJjAkBgNVBAsTHUFkZFRydXN0IEV4dGVy
+bmFsIFRUUCBOZXR3b3JrMSIwIAYDVQQDExlBZGRUcnVzdCBFeHRlcm5hbCBDQSBSb290MIIBIjAN
+BgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAt/caM+byAAQtOeBOW+0fvGwPzbX6I7bO3psRM5ek
+KUx9k5+9SryT7QMa44/P5W1QWtaXKZRagLBJetsulf24yr83OC0ePpFBrXBWx/BPP+gynnTKyJBU
+6cZfD3idmkA8Dqxhql4Uj56HoWpQ3NeaTq8Fs6ZxlJxxs1BgCscTnTgHhgKo6ahpJhiQq0ywTyOr
+Ok+E2N/On+Fpb7vXQtdrROTHre5tQV9yWnEIN7N5ZaRZoJQ39wAvDcKSctrQOHLbFKhFxF0qfbe0
+1sTurM0TRLfJK91DACX6YblpalgjEbenM49WdVn1zSnXRrcKK2W200JvFbK4e/vv6V1T1TRaJwID
+AQABo4HYMIHVMB8GA1UdIwQYMBaAFFMy0bPPf/rg8aBdhU6S0p5FHbRPMB0GA1UdDgQWBBStvZh6
+NLQm9/rEJlTvA73gJMtUGjAOBgNVHQ8BAf8EBAMCAQYwDwYDVR0TAQH/BAUwAwEB/zARBglghkgB
+hvhCAQEEBAMCAQIwIAYDVR0lBBkwFwYKKwYBBAGCNwoDAwYJYIZIAYb4QgQBMD0GA1UdHwQ2MDQw
+MqAwoC6GLGh0dHA6Ly9jcmwudXNlcnRydXN0LmNvbS9VVE4tREFUQUNvcnBTR0MuY3JsMA0GCSqG
+SIb3DQEBBQUAA4IBAQDG7lMXaBSyUSIekFgNlP298XDlhi3DNjGPVEhG5y0IN7xsCmDhDq1RNOAS
+k+m+uKu4JrTplj0oj65kB/7gAezF45HrGKDxdX7bCuafkduvrnXfI5Fo3RcAWkv/ZGxw6wEa0JDZ
+x6bWbfYT5P+1ydIeKsuxJUMmeNkwm04NHr5p79/q/i2zzPmw3bUUypHUsrWl+wEZo0d5n52MlYc0
++B84kto2phH6a+tr6dxFeBU5BtdNQeQhyNwvh9G3v0hgdaViyyTeO2GgKSCmvsVsnMTpCmki75E6
++iav0VtBpzri+DgHQqvBW/jObboPBD8yNKzcBCjXcDAUJgbE5JuY1c94MIIE6zCCA9OgAwIBAgIQ
+NpvEAujBQFL7bUoLQkjx9zANBgkqhkiG9w0BAQUFADBvMQswCQYDVQQGEwJTRTEUMBIGA1UEChML
+QWRkVHJ1c3QgQUIxJjAkBgNVBAsTHUFkZFRydXN0IEV4dGVybmFsIFRUUCBOZXR3b3JrMSIwIAYD
+VQQDExlBZGRUcnVzdCBFeHRlcm5hbCBDQSBSb290MB4XDTEzMTIxMTAwMDAwMFoXDTIwMDUzMDEw
+NDgzOFoweTELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAkNBMRQwEgYDVQQHEwtTYW50YSBDbGFyYTEa
+MBgGA1UEChMRSW50ZWwgQ29ycG9yYXRpb24xKzApBgNVBAMTIkludGVsIEV4dGVybmFsIEJhc2lj
+IElzc3VpbmcgQ0EgNEIwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDLO5b/L+DRvOfP
+wEPjwz3iW4XOodqpj3IY30f9bQnuE5UGmXStNAnqRnvPuHINv2R/ZRbhlTblqUKL6rmbo3AeD7P2
+lw3ttDzhJIG55pgXtxeUCDvPdfJlvNIRg/utp65ZF/l9i9jOrz+4jtU1Hyj/jfA+0M/XRgN07/Qn
+nGsfGcL/39pT7BMVJWw+rGx3sLnyae7sbhVEnSf08bhJ+Zg0LSH/l8ta45aHEC/oy6Irsya9M8cs
+xyVQuAmpVKobUxsGzQVvOhEed7gLHTDqu3M9OvOj5tNGqGu5pTXyVCTMGTo6fIlS2G1oNAiV/IbL
+YiVnkXpATKMi1t0pwcd2MFfzAgMBAAGjggF3MIIBczAfBgNVHSMEGDAWgBStvZh6NLQm9/rEJlTv
+A73gJMtUGjAdBgNVHQ4EFgQU2kEjnFqPca9Xgz4g0+Nl2wzLC9swDgYDVR0PAQH/BAQDAgGGMBIG
+A1UdEwEB/wQIMAYBAf8CAQAwNgYDVR0lBC8wLQYIKwYBBQUHAwQGCisGAQQBgjcKAwQGCisGAQQB
+gjcKAwwGCSsGAQQBgjcVBTAXBgNVHSAEEDAOMAwGCiqGSIb4TQEFAWkwSQYDVR0fBEIwQDA+oDyg
+OoY4aHR0cDovL2NybC50cnVzdC1wcm92aWRlci5jb20vQWRkVHJ1c3RFeHRlcm5hbENBUm9vdC5j
+cmwwOgYIKwYBBQUHAQEELjAsMCoGCCsGAQUFBzABhh5odHRwOi8vb2NzcC50cnVzdC1wcm92aWRl
+ci5jb20wNQYDVR0eBC4wLKAqMAuBCWludGVsLmNvbTAboBkGCisGAQQBgjcUAgOgCwwJaW50ZWwu
+Y29tMA0GCSqGSIb3DQEBBQUAA4IBAQCn1caAfzmGT/ci43wXiesV3bgwChq7tSoz+h/T1e3JiDZ1
+XRMg+q3E9nDjzXevvxbCwYhu+07xVDXx02S0jFqrr7KbbN5uoOHTPoG+jreMoT8cyPyg1Xei+e6j
+7usakKmlx1riJUEbYJ60HdZdtRWvzYTMQI37DGYLgf1G6n6Cf636p4FNpe6VB9VNg69nR5k874PI
+LalW/mrn7EeWPJSxWqnOzDz26247xlhoyxAYFG4UY6dxEsQ6EK16HLkHloIjnvWLh0MC/0s84OsT
+Obc8F+s2GWnwLSyRqTXlVdYXM24d3TQCzFfFZJRPhMbxGIAfrVRrkZew/UEhnCXhaMrwMIIFgjCC
+BGqgAwIBAgITMwAAEkAo/OoNMKIkngAAAAASQDANBgkqhkiG9w0BAQUFADB5MQswCQYDVQQGEwJV
+UzELMAkGA1UECBMCQ0ExFDASBgNVBAcTC1NhbnRhIENsYXJhMRowGAYDVQQKExFJbnRlbCBDb3Jw
+b3JhdGlvbjErMCkGA1UEAxMiSW50ZWwgRXh0ZXJuYWwgQmFzaWMgSXNzdWluZyBDQSA0QjAeFw0x
+NTA0MTAxODMzMjdaFw0xODAzMjUxODMzMjdaMEUxGTAXBgNVBAMTEE1hY2llaXJhLCBUaGlhZ28x
+KDAmBgkqhkiG9w0BCQEWGXRoaWFnby5tYWNpZWlyYUBpbnRlbC5jb20wggEiMA0GCSqGSIb3DQEB
+AQUAA4IBDwAwggEKAoIBAQCXu9t+rEaOYiJmldjVa8NHp22iEBHaGu9RdkV8nOU0lMWWHs+USAFA
+jq165LYL4FY4UU7+1lSG4FIz+LkkR7X2+6mxMf7NBQ1vNnejTz/NygpYZaqtlZYnsBFj6Wq2m79V
+q6jpXdyaeT2PImeKz1IxzRfwgBjPaN2cDJcKzyBKT8oUVgGbkDl21xWhBLWHBiHNQirJDyMtvl6x
++pmnxhIbNlktaUpb2XqyhIv1soJxamm2GNxh3mRBA99bWGXbljC7FpIJwMkCV1V3PDD51ZbYgOfu
+WvO2zTzZCtrBPR8Ai/6JY5avC4r26HRGSZ86S0NSUPmnA/Z7I4M8QTmozMr9AgMBAAGjggI1MIIC
+MTALBgNVHQ8EBAMCB4AwPAYJKwYBBAGCNxUHBC8wLQYlKwYBBAGCNxUIhsOMdYSZ5VGD/YEohY6f
+U4KRwAlngd69OZXwQwIBZAIBCDAdBgNVHQ4EFgQUJRkV/QlBumXFZkOIDUizdeNJ00wwHwYDVR0j
+BBgwFoAU2kEjnFqPca9Xgz4g0+Nl2wzLC9swZQYDVR0fBF4wXDBaoFigVoZUaHR0cDovL3d3dy5p
+bnRlbC5jb20vcmVwb3NpdG9yeS9DUkwvSW50ZWwlMjBFeHRlcm5hbCUyMEJhc2ljJTIwSXNzdWlu
+ZyUyMENBJTIwNEIuY3JsMIGfBggrBgEFBQcBAQSBkjCBjzAiBggrBgEFBQcwAYYWaHR0cDovL29j
+c3AuaW50ZWwuY29tLzBpBggrBgEFBQcwAoZdaHR0cDovL3d3dy5pbnRlbC5jb20vcmVwb3NpdG9y
+eS9jZXJ0aWZpY2F0ZXMvSW50ZWwlMjBFeHRlcm5hbCUyMEJhc2ljJTIwSXNzdWluZyUyMENBJTIw
+NEIuY3J0MB8GA1UdJQQYMBYGCCsGAQUFBwMEBgorBgEEAYI3CgMMMCkGCSsGAQQBgjcVCgQcMBow
+CgYIKwYBBQUHAwQwDAYKKwYBBAGCNwoDDDBPBgNVHREESDBGoCkGCisGAQQBgjcUAgOgGwwZdGhp
+YWdvLm1hY2llaXJhQGludGVsLmNvbYEZdGhpYWdvLm1hY2llaXJhQGludGVsLmNvbTANBgkqhkiG
+9w0BAQUFAAOCAQEAdQTQjmc7BSxcs6lwy0UCbt08asgnUMKty+7pu4CQksOS/3DiERvum7OgJJRG
+vGY0IimBPzpzkY//KW6buUTvRZhCN0RvqVvSqQ46+AHRgLfw7oAd/9I5uuxZsfV8H3KjvmbTTERm
+vGvICJ+tUw3LMYILk9gOxHq5RXOvFQvYxTHU+hVQG6SlTRfnCTqOrxOVywOzVI88NTXANsBUnda5
+eVJDwYWdYkD3RWH0m/DfTBcHvMUljynpwIl75lRit1W0i+aOekGG/PULfN5GgVOfuR2YrHmu03j/
+WEEhx8+Mf9xAJVow7H61pR5A7GrQtad8lOcHPn9QAsRGMVpBWawmjTGCAkIwggI+AgEBMIGQMHkx
+CzAJBgNVBAYTAlVTMQswCQYDVQQIEwJDQTEUMBIGA1UEBxMLU2FudGEgQ2xhcmExGjAYBgNVBAoT
+EUludGVsIENvcnBvcmF0aW9uMSswKQYDVQQDEyJJbnRlbCBFeHRlcm5hbCBCYXNpYyBJc3N1aW5n
+IENBIDRCAhMzAAASQCj86g0woiSeAAAAABJAMAkGBSsOAwIaBQCggYcwGAYJKoZIhvcNAQkDMQsG
+CSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMTUwNzIwMDQxNzEyWjAjBgkqhkiG9w0BCQQxFgQU
+QH6agiHiDEWvJuCjzKilKsFTKbYwKAYJKoZIhvcNAQkPMRswGTALBglghkgBZQMEAQIwCgYIKoZI
+hvcNAwcwDQYJKoZIhvcNAQEBBQAEggEAHUISUB6iqiHsc/nimY8Tu9GqRXRY6SCiAjJU/P4IUHfi
+xWjhB8s3uBffRkQq2/Bwn3QeZ1hwJa0Mxd4oC1jUwNtjNx5VwH549MDPTkL88Fyez+1ryFJUvIlt
+FaUBR06d05QQw6tLikbsGEDKU6U2+zC0wGZIK0Is59f+Oiz2MXJk24QFOz5QA+hoC4G0Jf7rTsw9
+RlRUmLrMdSvV4IM2dsFvC2LbJym5ithE4TsFQ1pdY4USZDeKkVqF+W/Se1uu3j86CUNJKyuSl7Ht
+uw0IvK7/ZQ921uuH3kfOF0ii5aiNQmyGjNjOfUS1FUQOTOWCwrFDTpaPjLAVADVAPWQinwAAAAAA
+AA==
 
-	Using ../arch/powerpc/configs/pseries_defconfig as base
-	Merging ../arch/powerpc/configs/le.config
-	sed: can't read ../arch/powerpc/configs/le.config: No such file or directory
-	cat: ../arch/powerpc/configs/le.config: No such file or directory
-	#
-	# merged configuration written to ./.config (needs make)
-	#
-	  GEN     ./Makefile
-	scripts/kconfig/conf  --olddefconfig Kconfig
-	#
-	# configuration written to .config
-	#
-
-Patched behaviour:
-
-	Using ../arch/powerpc/configs/pseries_defconfig as base
-	Merging ../arch/powerpc/configs/le.config
-	The merge file '../arch/powerpc/configs/le.config' does not exist.  Exit.
-	arch/powerpc/Makefile:289: recipe for target 'pseries_le_defconfig' failed
-
- scripts/kconfig/merge_config.sh | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/scripts/kconfig/merge_config.sh b/scripts/kconfig/merge_config.sh
-index ec8e203..0d883b3 100755
---- a/scripts/kconfig/merge_config.sh
-+++ b/scripts/kconfig/merge_config.sh
-@@ -100,6 +100,10 @@ cat $INITFILE > $TMP_FILE
- # Merge files, printing warnings on overridden values
- for MERGE_FILE in $MERGE_LIST ; do
- 	echo "Merging $MERGE_FILE"
-+	if [ ! -r "$MERGE_FILE" ]; then
-+		echo "The merge file '$MERGE_FILE' does not exist.  Exit." >&2
-+		exit 1
-+	fi
- 	CFG_LIST=$(sed -n "$SED_CONFIG_EXP" $MERGE_FILE)
- 
- 	for CFG in $CFG_LIST ; do
--- 
-2.1.4
+--nextPart2719990.MFtfRCGauv--
 
