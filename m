@@ -1,86 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f176.google.com ([209.85.212.176]:34009 "EHLO
-	mail-wi0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753119AbbGXKMt (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 24 Jul 2015 06:12:49 -0400
-Received: by wibud3 with SMTP id ud3so59032229wib.1
-        for <linux-kbuild@vger.kernel.org>; Fri, 24 Jul 2015 03:12:48 -0700 (PDT)
-Message-ID: <55B20F9C.4020607@linaro.org>
-Date: Fri, 24 Jul 2015 11:12:44 +0100
-From: Srinivas Kandagatla <srinivas.kandagatla@linaro.org>
+Received: from foss.arm.com ([217.140.101.70]:44581 "EHLO foss.arm.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751904AbbGXLcR (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 24 Jul 2015 07:32:17 -0400
+Date: Fri, 24 Jul 2015 12:31:49 +0100
+From: Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [PATCH] dtb: Create a common home for cross-architecture dtsi
+ files.
+Message-ID: <20150724113149.GE4348@leverpostej>
+References: <1437496204-5438-1-git-send-email-ian.campbell@citrix.com>
+ <20150722084753.GC14923@e106497-lin.cambridge.arm.com>
+ <1437558438.8383.72.camel@citrix.com>
 MIME-Version: 1.0
-Subject: Re: [PATCH RFC] merge_config.sh: Add support to pass arguments to
- make
-References: <1437484956-23985-1-git-send-email-srinivas.kandagatla@linaro.org> <CAK7LNAQKJXRkuWnSpyMtp95uOrGYmQkKYGoYwqw-5wUJLF9bFw@mail.gmail.com>
-In-Reply-To: <CAK7LNAQKJXRkuWnSpyMtp95uOrGYmQkKYGoYwqw-5wUJLF9bFw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1437558438.8383.72.camel@citrix.com>
+Content-Language: en-US
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Michal Marek <mmarek@suse.cz>, yann.morin.1998@free.fr, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: "Ian.Campbell@citrix.com" <Ian.Campbell@citrix.com>
+Cc: Liviu Dudau <Liviu.Dudau@arm.com>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, Rob Herring <robh+dt@kernel.org>, Pawel Moll <Pawel.Moll@arm.com>, Kumar Gala <galak@codeaurora.org>, Sudeep Holla <Sudeep.Holla@arm.com>, Lorenzo Pieralisi <Lorenzo.Pieralisi@arm.com>, Russell King <linux@arm.linux.org.uk>, Catalin Marinas <Catalin.Marinas@arm.com>, Will Deacon <Will.Deacon@arm.com>, Kristina Martsenko <Kristina.Martsenko@arm.com>, Kevin Hilman <khilman@linaro.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
 
+On Wed, Jul 22, 2015 at 10:47:18AM +0100, Ian Campbell wrote:
+> On Wed, 2015-07-22 at 09:47 +0100, Liviu Dudau wrote:
+> > 
+> > Acked-by: Liviu Dudau <Liviu.Dudau@arm.com>
+> 
+> Thanks.
+> 
+> > Picking your brains here: would it be worth to have some vendor directories in
+> > this shared area or we can hope that there will be very few files living here?
+> 
+> I'm honestly not sure.
+> 
+> I don't expect there will be very many files under here, and I would
+> expect the norm would be that common .dtsi files used by multiple
+> arches would be things from the same vendor, but I don't think we can
+> guarantee that.
 
-Hi Mashahiro,
+I'm not so sure that this area will remain small. I suspect we'll see
+a reasonable amount of sharing for arm/arm64 where two SoCs differ sith
+s/Cortex-A7/Cortex-A53/, for example.
 
-Thanks for the comments.
-On 24/07/15 07:10, Masahiro Yamada wrote:
-> Hi Srinivas,
->
->
-> 2015-07-21 22:22 GMT+09:00 Srinivas Kandagatla <srinivas.kandagatla@linaro.org>:
->> The issue is flags like ARCH can be passed to make via environment variable
->> or at command line by passing "ARCH=" argument to make file. The former case
->> works fine if used with merge_config but the later case would not work and
->> resulting config file from merge_config is useless.
->>
->> I hit this issue when I started using config fragments on arm64 bit platform
->> and I usually pass ARCH at the make command line.
->
-> Me too.  I always pass ARCH from the make command line.
->
-> I did a simple test, but I did not hit this issue.
->
-> I think both environment variables and make command line variables
-> are inherited to sub-processes.
->
-> I guess this patch is useful only when we directly invoke this shell script,
-> not via the top-level Makefile.  But, from your statement, I thought
-> you invoke merge_config.sh from the Makefile.  So, I cannot understand
-> what you mean.
+Perhaps we could wait until the that starts to happen; we managed to
+survive for a while before moving arm64's dts into subdirs.
 
-Actually Am invoking the script directly, Is this a valid usage?
-If this usage is not valid we can ignore this patch I guess :-)
-
-Sorry I should have put my command line in the log to make it clear.
-
-I use below command:
-  ./scripts/kconfig/merge_config.sh  -O /objs/ 
-arch/arm64/configs/defconfig distro.conf
-
->
-> Moreover, the top-level Makefile exports ARCH, so it is always an
-> environment variable.
->
-> See the line 408:
-> export ARCH SRCARCH CONFIG_SHELL HOSTCC HOSTCFLAGS CROSS_COMPILE AS LD CC
->
-Yes, It works if invoked with make with your patch "kbuild: add generic 
-mergeconfig target, %.config"
-
->
->
->
->> As it is common for users like me to pass ARCH variable in command line,
->> providing such flexiblity in merge_config makes more sense.
->>
->> This patch adds support to pass arguments to make file, without this patch the
->> user has to set the enviroment variables which is not explicit.
->>
->> Signed-off-by: Srinivas Kandagatla <srinivas.kandagatla@linaro.org>
->
->
->
->
---srini
+Mark.
