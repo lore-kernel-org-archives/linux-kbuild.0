@@ -1,95 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from arroyo.ext.ti.com ([192.94.94.40]:46960 "EHLO arroyo.ext.ti.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754172AbbGWUvY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 23 Jul 2015 16:51:24 -0400
-From: Dan Murphy <dmurphy@ti.com>
-Subject: [PATCH] merge_config.sh: Add the ability to perform make with an ARCH
-Date: Thu, 23 Jul 2015 15:51:21 -0500
-Message-ID: <1437684681-29452-1-git-send-email-dmurphy@ti.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Received: from condef001-v.nifty.com ([210.131.4.238]:55730 "EHLO
+	condef001-v.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753365AbbGXFUX (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 24 Jul 2015 01:20:23 -0400
+Received: from conuserg010-v.nifty.com ([10.16.229.197])by condef001-v.nifty.com with ESMTP id t6O5JNHf003884
+	for <linux-kbuild@vger.kernel.org>; Fri, 24 Jul 2015 14:19:23 +0900
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH 1/2] kbuild: fixdep: optimize code slightly
+Date: Fri, 24 Jul 2015 14:18:45 +0900
+Message-Id: <1437715126-6421-2-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1437715126-6421-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1437715126-6421-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: yann.morin.1998@free.fr
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Dan Murphy <dmurphy@ti.com>
+To: linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, linux-kernel@vger.kernel.org
 
-The script does not allow building for different architectures.
-It may assume that the developer has set the ARCH as a global
-variable.
+If the target string matches "CONFIG_", move the pointer p
+forward.  This saves several 7-chars adjustments.
 
-Add a switch argument to pass in the desired architecture.
-Then verify that that architecture is supported in the arch
-directory.
-
-If not exit if it is supported then set it.
-
-Signed-off-by: Dan Murphy <dmurphy@ti.com>
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
- scripts/kconfig/merge_config.sh | 29 +++++++++++++++++++++++++++--
- 1 file changed, 27 insertions(+), 2 deletions(-)
 
-diff --git a/scripts/kconfig/merge_config.sh b/scripts/kconfig/merge_config.sh
-index ec8e203..bdbff4b 100755
---- a/scripts/kconfig/merge_config.sh
-+++ b/scripts/kconfig/merge_config.sh
-@@ -19,7 +19,16 @@
- #  but WITHOUT ANY WARRANTY; without even the implied warranty of
- #  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- #  See the GNU General Public License for more details.
--
-+verify_arch() {
-+	cd arch
-+	for d in * ; do
-+		if [ "$d" = "$_TEST_ARCH" ]; then
-+			BUILD_ARCH="ARCH="$d
-+			break
-+		fi
-+	done
-+	cd ..
-+}
- clean_up() {
- 	rm -f $TMP_FILE
- 	exit
-@@ -33,6 +42,7 @@ usage() {
- 	echo "  -n    use allnoconfig instead of alldefconfig"
- 	echo "  -r    list redundant entries when merging fragments"
- 	echo "  -O    dir to put generated output files"
-+	echo "  -A    architecture to support for make"
+ scripts/basic/fixdep.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
+index b304068..46cc1b3 100644
+--- a/scripts/basic/fixdep.c
++++ b/scripts/basic/fixdep.c
+@@ -251,7 +251,8 @@ static void parse_config_file(const char *map, size_t len)
+ 			continue;
+ 		if (memcmp(p, "CONFIG_", 7))
+ 			continue;
+-		for (q = p + 7; q < map + len; q++) {
++		p += 7;
++		for (q = p; q < map + len; q++) {
+ 			if (!(isalnum(*q) || *q == '_'))
+ 				goto found;
+ 		}
+@@ -260,9 +261,9 @@ static void parse_config_file(const char *map, size_t len)
+ 	found:
+ 		if (!memcmp(q - 7, "_MODULE", 7))
+ 			q -= 7;
+-		if( (q-p-7) < 0 )
++		if (q - p < 0)
+ 			continue;
+-		use_config(p+7, q-p-7);
++		use_config(p, q - p);
+ 	}
  }
  
- RUNMAKE=true
-@@ -71,6 +81,21 @@ while true; do
- 		shift 2
- 		continue
- 		;;
-+	"-A")
-+		if [ "$2" != "" ]; then
-+			_TEST_ARCH=$2
-+			verify_arch
-+			if [ "$BUILD_ARCH" = "" ]; then
-+				echo "ARCH $_TEST_ARCH is not valid" 1>&2
-+				exit 1
-+			fi
-+		else
-+			echo "ARCH $_TEST_ARCH is not valid" 1>&2
-+			exit 1
-+		fi
-+		shift 2
-+		continue
-+		;;
- 	*)
- 		break
- 		;;
-@@ -139,7 +164,7 @@ fi
- # Use the merged file as the starting point for:
- # alldefconfig: Fills in any missing symbols with Kconfig default
- # allnoconfig: Fills in any missing symbols with # CONFIG_* is not set
--make KCONFIG_ALLCONFIG=$TMP_FILE $OUTPUT_ARG $ALLTARGET
-+make $BUILD_ARCH KCONFIG_ALLCONFIG=$TMP_FILE $OUTPUT_ARG $ALLTARGET
- 
- 
- # Check all specified config values took (might have missed-dependency issues)
 -- 
 1.9.1
 
