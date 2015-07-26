@@ -1,129 +1,87 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mailout2.w1.samsung.com ([210.118.77.12]:50180 "EHLO
-	mailout2.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753030AbbGXQm3 (ORCPT
+Received: from mail-wi0-f170.google.com ([209.85.212.170]:36197 "EHLO
+	mail-wi0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755214AbbGZVln (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 24 Jul 2015 12:42:29 -0400
-From: Andrey Ryabinin <a.ryabinin@samsung.com>
-Subject: [PATCH v4 1/7] x86/kasan: generate KASAN_SHADOW_OFFSET in Makefile
-Date: Fri, 24 Jul 2015 19:41:53 +0300
-Message-id: <1437756119-12817-2-git-send-email-a.ryabinin@samsung.com>
-In-reply-to: <1437756119-12817-1-git-send-email-a.ryabinin@samsung.com>
-References: <1437756119-12817-1-git-send-email-a.ryabinin@samsung.com>
+	Sun, 26 Jul 2015 17:41:43 -0400
+Received: by wicgb10 with SMTP id gb10so87858977wic.1
+        for <linux-kbuild@vger.kernel.org>; Sun, 26 Jul 2015 14:41:42 -0700 (PDT)
+Date: Sun, 26 Jul 2015 22:41:40 +0100
+From: Ciprian Manea <ciprian.manea.cm@gmail.com>
+Subject: [PATCH] Makefile: 8c2d815587fd: Change EXTRAVERSION from '-rc3' to
+ 'eudyptula'
+Message-ID: <20150726214140.GA3396@ciphp>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="HlL+5n6rz5pIUxbD"
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org
-Cc: Arnd Bergmann <arnd@arndb.de>, Linus Walleij <linus.walleij@linaro.org>, David Keitel <dkeitel@codeaurora.org>, Alexander Potapenko <glider@google.com>, Andrew Morton <akpm@linux-foundation.org>, Dmitry Vyukov <dvyukov@google.com>, linux-mm@kvack.org, linux-kernel@vger.kernel.org, Alexey Klimov <klimov.linux@gmail.com>, Andrey Ryabinin <a.ryabinin@samsung.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org, Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org
+To: Little Penguin <little@eudyptula-challenge.org>
+Cc: linux-kbuild@vger.kernel.org
 
-ARM64 has several different address space layouts and its
-going to have one more at least. Different address space layouts
-have different shadow offsets, so every new layout require adding
-new default value for CONFIG_KASAN_SHADOW_OFFSET.
-It's possible to generate KASAN_SHADOW_OFFSET in Makefile, so
-the shadow address for every possible layout will be auto-generated.
 
-However, we should do this in x86 too, because generic code
-depend on having CONFIG_KASAN_SHADOW_OFFSET.
-There is no functional changes here.
+--HlL+5n6rz5pIUxbD
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Signed-off-by: Andrey Ryabinin <a.ryabinin@samsung.com>
+According to Task 03 of Eudyptula Challenge, when running the newly
+compiled kernel, 'eudyptula' string should be visible in the kernel
+version, when running 'uname -r' command.
+
+Signed-off-by: Ciprian Manea <ciprian.manea.cm@gmail.com>
 ---
- arch/x86/Kconfig             |  5 -----
- arch/x86/Makefile            |  2 ++
- arch/x86/include/asm/kasan.h | 21 +++++++++++++--------
- include/linux/kasan.h        |  1 -
- scripts/Makefile.kasan       |  2 +-
- 5 files changed, 16 insertions(+), 15 deletions(-)
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-index b3a1a5d..6d6dd6f 100644
---- a/arch/x86/Kconfig
-+++ b/arch/x86/Kconfig
-@@ -255,11 +255,6 @@ config ARCH_SUPPORTS_OPTIMIZED_INLINING
- config ARCH_SUPPORTS_DEBUG_PAGEALLOC
- 	def_bool y
+diff --git a/Makefile b/Makefile
+index a9ad490..c9580d8 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,7 +1,7 @@
+ VERSION = 4
+ PATCHLEVEL = 2
+ SUBLEVEL = 0
+-EXTRAVERSION = -rc3
++EXTRAVERSION = -eudyptula
+ NAME = Hurr durr I'ma sheep
  
--config KASAN_SHADOW_OFFSET
--	hex
--	depends on KASAN
--	default 0xdffffc0000000000
--
- config HAVE_INTEL_TXT
- 	def_bool y
- 	depends on INTEL_IOMMU && ACPI
-diff --git a/arch/x86/Makefile b/arch/x86/Makefile
-index 118e6de..c666989 100644
---- a/arch/x86/Makefile
-+++ b/arch/x86/Makefile
-@@ -39,6 +39,8 @@ ifdef CONFIG_X86_NEED_RELOCS
-         LDFLAGS_vmlinux := --emit-relocs
- endif
- 
-+KASAN_SHADOW_OFFSET := 0xdffffc0000000000
-+
- ifeq ($(CONFIG_X86_32),y)
-         BITS := 32
-         UTS_MACHINE := i386
-diff --git a/arch/x86/include/asm/kasan.h b/arch/x86/include/asm/kasan.h
-index 74a2a8d..88881f6 100644
---- a/arch/x86/include/asm/kasan.h
-+++ b/arch/x86/include/asm/kasan.h
-@@ -1,17 +1,22 @@
- #ifndef _ASM_X86_KASAN_H
- #define _ASM_X86_KASAN_H
- 
--/*
-- * Compiler uses shadow offset assuming that addresses start
-- * from 0. Kernel addresses don't start from 0, so shadow
-- * for kernel really starts from compiler's shadow offset +
-- * 'kernel address space start' >> KASAN_SHADOW_SCALE_SHIFT
-- */
--#define KASAN_SHADOW_START      (KASAN_SHADOW_OFFSET + \
--					(0xffff800000000000ULL >> 3))
-+#define KASAN_SHADOW_START      (0xffffec0000000000ULL)
- /* 47 bits for kernel address -> (47 - 3) bits for shadow */
- #define KASAN_SHADOW_END        (KASAN_SHADOW_START + (1ULL << (47 - 3)))
- 
-+/*
-+ * This value is used to map an address to the corresponding shadow
-+ * address by the following formula:
-+ *	shadow_addr = (address >> 3) + KASAN_SHADOW_OFFSET;
-+ *
-+ * (1 << 61) shadow addresses - [KASAN_SHADOW_OFFSET,KASAN_SHADOW_END]
-+ * cover all 64-bits of virtual addresses. So KASAN_SHADOW_OFFSET
-+ * should satisfy the following equation:
-+ *      KASAN_SHADOW_OFFSET = KASAN_SHADOW_END - (1ULL << 61)
-+ */
-+#define KASAN_SHADOW_OFFSET (KASAN_SHADOW_END - (1UL << (64 - 3)))
-+
- #ifndef __ASSEMBLY__
- 
- #ifdef CONFIG_KASAN
-diff --git a/include/linux/kasan.h b/include/linux/kasan.h
-index 5486d77..6fb1c7d 100644
---- a/include/linux/kasan.h
-+++ b/include/linux/kasan.h
-@@ -10,7 +10,6 @@ struct vm_struct;
- #ifdef CONFIG_KASAN
- 
- #define KASAN_SHADOW_SCALE_SHIFT 3
--#define KASAN_SHADOW_OFFSET _AC(CONFIG_KASAN_SHADOW_OFFSET, UL)
- 
- #include <asm/kasan.h>
- #include <linux/sched.h>
-diff --git a/scripts/Makefile.kasan b/scripts/Makefile.kasan
-index 3f874d2..19d9a61 100644
---- a/scripts/Makefile.kasan
-+++ b/scripts/Makefile.kasan
-@@ -8,7 +8,7 @@ endif
- CFLAGS_KASAN_MINIMAL := -fsanitize=kernel-address
- 
- CFLAGS_KASAN := $(call cc-option, -fsanitize=kernel-address \
--		-fasan-shadow-offset=$(CONFIG_KASAN_SHADOW_OFFSET) \
-+		-fasan-shadow-offset=$(KASAN_SHADOW_OFFSET) \
- 		--param asan-stack=1 --param asan-globals=1 \
- 		--param asan-instrumentation-with-call-threshold=$(call_threshold))
- 
+ # *DOCUMENTATION*
 -- 
-2.4.5
+1.9.1
 
+
+--HlL+5n6rz5pIUxbD
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: attachment; filename="proof-of-running.txt"
+
+1. Modifie the EXTRAVERSION field
+
+ciphp@ciphp:~/Workspace/Eudyptula/linusTree/linux$ git status 
+On branch edyptulaTask2
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+	modified:   Makefile
+
+no changes added to commit (use "git add" and/or "git commit -a")
+ciphp@ciphp:~/Workspace/Eudyptula/linusTree/linux$ git diff Makefile
+diff --git a/Makefile b/Makefile
+index a9ad490..c9580d8 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,7 +1,7 @@
+ VERSION = 4
+ PATCHLEVEL = 2
+ SUBLEVEL = 0
+-EXTRAVERSION = -rc3
++EXTRAVERSION = -eudyptula
+ NAME = Hurr durr I'ma sheep
+ 
+ # *DOCUMENTATION*
+
+2. Booting with the new compiled kernel
+ciphp@ciphp:~/Workspace/Eudyptula$ uname -a
+Linux ciphp 4.2.0-eudyptula-00021-g345647c #3 SMP Sun Jul 26 00:35:28 IST 2015 x86_64 x86_64 x86_64 GNU/Linux
+
+--HlL+5n6rz5pIUxbD--
