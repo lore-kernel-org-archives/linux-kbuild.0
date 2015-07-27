@@ -1,42 +1,24 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.sigma-star.at ([95.130.255.111]:14385 "EHLO
-	mail.sigma-star.at" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753074AbbGZWHk (ORCPT
+Received: from li684-192.members.linode.com ([23.239.3.192]:33245 "EHLO
+	www.eudyptula-challenge.org" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1755058AbbG0Cyx (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 26 Jul 2015 18:07:40 -0400
-From: Richard Weinberger <richard@nod.at>
-Subject: [PATCH] localmodconfig: Use Kbuild files too
-Date: Mon, 27 Jul 2015 00:06:55 +0200
-Message-Id: <1437948415-16290-1-git-send-email-richard@nod.at>
+	Sun, 26 Jul 2015 22:54:53 -0400
+Date: Mon, 27 Jul 2015 02:48:51 +0000
+From: Little Penguin <little@eudyptula-challenge.org>
+Subject: Re: [PATCH] Makefile: 8c2d815587fd: Change EXTRAVERSION from '-rc3'
+ to 'eudyptula'
+Message-ID: <20150727024851.GA22319@eudyptula-challenge.org>
+References: <20150726214140.GA3396@ciphp>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20150726214140.GA3396@ciphp>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: yann.morin.1998@free.fr
-Cc: rostedt@goodmis.org, artafinde@gmail.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Richard Weinberger <richard@nod.at>
+To: Ciprian Manea <ciprian.manea.cm@gmail.com>
+Cc: linux-kbuild@vger.kernel.org
 
-In kbuild it is allowed to define objects in files named "Makefile"
-and "Kbuild".
-Currently localmodconfig reads objects only from "Makefile"s and misses
-modules like nouveau.
-
-Reported-and-tested-by: Leonidas Spyropoulos <artafinde@gmail.com>
-Signed-off-by: Richard Weinberger <richard@nod.at>
----
- scripts/kconfig/streamline_config.pl | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
-index 9cb8522..f3d3fb4 100755
---- a/scripts/kconfig/streamline_config.pl
-+++ b/scripts/kconfig/streamline_config.pl
-@@ -137,7 +137,7 @@ my $ksource = ($ARGV[0] ? $ARGV[0] : '.');
- my $kconfig = $ARGV[1];
- my $lsmod_file = $ENV{'LSMOD'};
- 
--my @makefiles = `find $ksource -name Makefile 2>/dev/null`;
-+my @makefiles = `find $ksource -name Makefile -or -name Kbuild 2>/dev/null`;
- chomp @makefiles;
- 
- my %depends;
--- 
-2.4.6
-
+I can not understand your Subject: line, please read the introductory
+email and fix the subject to match exactly as it says in order for me to
+be able to parse it properly.
