@@ -1,62 +1,35 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mailout4.w1.samsung.com ([210.118.77.14]:9315 "EHLO
-	mailout4.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753421AbbG0RwY (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 27 Jul 2015 13:52:24 -0400
-Message-id: <55B66FD3.6090201@samsung.com>
-Date: Mon, 27 Jul 2015 20:52:19 +0300
-From: Andrey Ryabinin <a.ryabinin@samsung.com>
-MIME-version: 1.0
-Subject: Re: [PATCH v4 1/7] x86/kasan: generate KASAN_SHADOW_OFFSET in Makefile
-References: <1437756119-12817-1-git-send-email-a.ryabinin@samsung.com>
- <1437756119-12817-2-git-send-email-a.ryabinin@samsung.com>
- <20150727164034.GC350@e104818-lin.cambridge.arm.com>
-In-reply-to: <20150727164034.GC350@e104818-lin.cambridge.arm.com>
-Content-type: text/plain; charset=windows-1252
-Content-transfer-encoding: 7bit
+Received: from imap.thunk.org ([74.207.234.97]:36690 "EHLO imap.thunk.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752485AbbG1T1L (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 28 Jul 2015 15:27:11 -0400
+Date: Tue, 28 Jul 2015 15:27:06 -0400
+From: Theodore Ts'o <tytso@mit.edu>
+Subject: Re: [PATCH] builddeb: sign the modules after splitting out the
+ debuginfo files
+Message-ID: <20150728192706.GP2851@thunk.org>
+References: <1434421046-4020-1-git-send-email-tytso@mit.edu>
+ <CAAqcGHkcmFxPtCxnNgdoKyPerZXQSVpQ-FVWz7PU01TF=rzMbA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAAqcGHkcmFxPtCxnNgdoKyPerZXQSVpQ-FVWz7PU01TF=rzMbA@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org, Alexey Klimov <klimov.linux@gmail.com>, Arnd Bergmann <arnd@arndb.de>, linux-mm@kvack.org, Linus Walleij <linus.walleij@linaro.org>, x86@kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, David Keitel <dkeitel@codeaurora.org>, Ingo Molnar <mingo@redhat.com>, Alexander Potapenko <glider@google.com>, Michal Marek <mmarek@suse.com>, "H. Peter Anvin" <hpa@zytor.com>, Andrew Morton <akpm@linux-foundation.org>, Thomas Gleixner <tglx@linutronix.de>, Dmitry Vyukov <dvyukov@google.com>
+To: Riku Voipio <riku.voipio@linaro.org>
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On 07/27/2015 07:40 PM, Catalin Marinas wrote:
-> On Fri, Jul 24, 2015 at 07:41:53PM +0300, Andrey Ryabinin wrote:
->> diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
->> index b3a1a5d..6d6dd6f 100644
->> --- a/arch/x86/Kconfig
->> +++ b/arch/x86/Kconfig
->> @@ -255,11 +255,6 @@ config ARCH_SUPPORTS_OPTIMIZED_INLINING
->>  config ARCH_SUPPORTS_DEBUG_PAGEALLOC
->>  	def_bool y
->>  
->> -config KASAN_SHADOW_OFFSET
->> -	hex
->> -	depends on KASAN
->> -	default 0xdffffc0000000000
->> -
->>  config HAVE_INTEL_TXT
->>  	def_bool y
->>  	depends on INTEL_IOMMU && ACPI
->> diff --git a/arch/x86/Makefile b/arch/x86/Makefile
->> index 118e6de..c666989 100644
->> --- a/arch/x86/Makefile
->> +++ b/arch/x86/Makefile
->> @@ -39,6 +39,8 @@ ifdef CONFIG_X86_NEED_RELOCS
->>          LDFLAGS_vmlinux := --emit-relocs
->>  endif
->>  
->> +KASAN_SHADOW_OFFSET := 0xdffffc0000000000
+On Wed, Jun 17, 2015 at 09:34:34AM +0300, Riku Voipio wrote:
+> Hi,
 > 
-> To keep things simple for x86, can you not just define:
+> On 16 June 2015 at 05:17, Theodore Ts'o <tytso@mit.edu> wrote:
+> > Signed-off-by: Theodore Ts'o <tytso@mit.edu>
 > 
-> KASAN_SHADOW_OFFSET := $(CONFIG_KASAN_SHADOW_OFFSET)
+> A similar patch is already in Michals tree:
 > 
-> or, even better, in scripts/Makefile.kasan:
-> 
-> KASAN_SHADOW_OFFSET ?= $(CONFIG_KASAN_SHADOW_OFFSET)
-> 
-> and set it under arch/arm64/Makefile only.
-> 
+> https://git.kernel.org/cgit/linux/kernel/git/mmarek/kbuild.git/commit/?h=misc&id=64178cb62c329350fe06622cd215264d849b27b1
+>
 
-Yes, this much better.
+It looks like kbuild.git didn't get merged for the 4.2 merge cycle?
+
+   	      		 	    - Ted
