@@ -1,24 +1,25 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:56720 "EHLO
-	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751246AbbG2UfC (ORCPT
+Received: from relay3-d.mail.gandi.net ([217.70.183.195]:45176 "EHLO
+	relay3-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752477AbbG2UyQ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 29 Jul 2015 16:35:02 -0400
-Message-ID: <55B938EA.2080402@infradead.org>
-Date: Wed, 29 Jul 2015 13:34:50 -0700
-From: Randy Dunlap <rdunlap@infradead.org>
-MIME-Version: 1.0
-Subject: Re: [PATCH] kbuild: document recursive dependency limitation / resolution
+	Wed, 29 Jul 2015 16:54:16 -0400
+Date: Wed, 29 Jul 2015 13:54:07 -0700
+From: josh@joshtriplett.org
+Subject: Re: [PATCH] kbuild: document recursive dependency limitation /
+ resolution
+Message-ID: <20150729205407.GC15480@cloud>
 References: <1438200556-13842-1-git-send-email-mcgrof@do-not-panic.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 In-Reply-To: <1438200556-13842-1-git-send-email-mcgrof@do-not-panic.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Luis R. Rodriguez" <mcgrof@do-not-panic.com>, mmarek@suse.com
-Cc: josh@joshtriplett.org, jbottomley@odin.com, geert@linux-m68k.org, pebolle@tiscali.nl, herbert@gondor.apana.org.au, tiwai@suse.de, yann.morin.1998@free.fr, corbet@lwn.net, linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, roberto@dicosmo.org, zack@upsilon.cc, "Luis R. Rodriguez" <mcgrof@suse.com>
+To: "Luis R. Rodriguez" <mcgrof@do-not-panic.com>
+Cc: mmarek@suse.com, jbottomley@odin.com, geert@linux-m68k.org, pebolle@tiscali.nl, herbert@gondor.apana.org.au, tiwai@suse.de, yann.morin.1998@free.fr, corbet@lwn.net, linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, roberto@dicosmo.org, zack@upsilon.cc, "Luis R. Rodriguez" <mcgrof@suse.com>
 
-On 07/29/15 13:09, Luis R. Rodriguez wrote:
+On Wed, Jul 29, 2015 at 01:09:16PM -0700, Luis R. Rodriguez wrote:
 > From: "Luis R. Rodriguez" <mcgrof@suse.com>
 > 
 > Recursive dependency issues with kconfig are unavoidable due to
@@ -39,8 +40,17 @@ On 07/29/15 13:09, Luis R. Rodriguez wrote:
 > Cc: linux-doc@vger.kernel.org
 > Cc: linux-kernel@vger.kernel.org
 > Signed-off-by: Luis R. Rodriguez <mcgrof@suse.com>
-> ---
-> 
+
+As a minor nit, I would suggest saying that making Kbuild handle this
+might require a full SAT solver, rather than the current phrasing that
+suggests that a SAT solver is the right solution to this problem.  Let's
+wait to make that conclusion until a kbuild patch shows up.
+
+Otherwise, this seems quite sensible; thanks for documenting this bit of
+tribal knowledge.
+
+- Josh Triplett
+
 > I've cc'd Roberto and Stefano as I think we might be able to in the
 > long term use some of their work on package dependency and solvers for
 > this problem [0] [1] [2]. This last part -- just consider it long term
@@ -69,9 +79,6 @@ On 07/29/15 13:09, Luis R. Rodriguez wrote:
 > +If you've hit the Kconfig error: "recursive dependency detected" you've run
 > +into a recursive dependency issue with Kconfig. Kconfig does not do recursive
 > +dependency resolution, this has a few implications for Kconfig file writers. In
-
-maybe                 s/,/;/
-
 > +practice it means that for instance if a driver A selects a few kconfig symbols
 > +another driver B which selects any of these symbols cannot negate any of the
 > +symbols the driver A selected.  Because of this current limitation developers
@@ -83,14 +90,23 @@ maybe                 s/,/;/
 > +
 > +Kconfig's limitations can be addressed by implementing a SAT solver for it,
 > +but until then, Kconfig is limitted to require developers to use one of
-
-                              limited
-
 > +the above two mechanisms to address recursive dependency issues. For more
 > +details you can refer to this thread and discussion:
 > +
 > +http://lkml.kernel.org/r/1432241149-8762-1-git-send-email-mcgrof@do-not-panic.com
-
-
--- 
-~Randy
+> diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
+> index 70c5ee189dce..4d61b7490dad 100644
+> --- a/scripts/kconfig/symbol.c
+> +++ b/scripts/kconfig/symbol.c
+> @@ -1117,6 +1117,8 @@ static void sym_check_print_recursive(struct symbol *last_sym)
+>  		if (stack->sym == last_sym)
+>  			fprintf(stderr, "%s:%d:error: recursive dependency detected!\n",
+>  				prop->file->name, prop->lineno);
+> +			fprintf(stderr, "For a resolution refer to Documentation/kbuild/kconfig-language.txt\n");
+> +			fprintf(stderr, "section \"Kconfig recursive dependency limitations\"\n");
+>  		if (stack->expr) {
+>  			fprintf(stderr, "%s:%d:\tsymbol %s %s value contains %s\n",
+>  				prop->file->name, prop->lineno,
+> -- 
+> 2.3.2.209.gd67f9d5.dirty
+> 
