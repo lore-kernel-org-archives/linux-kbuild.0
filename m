@@ -1,112 +1,90 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from relay3-d.mail.gandi.net ([217.70.183.195]:45176 "EHLO
-	relay3-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752477AbbG2UyQ (ORCPT
+Received: from conssluserg001.nifty.com ([202.248.44.39]:60664 "EHLO
+	conssluserg001-v.nifty.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1754295AbbG3Ban (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 29 Jul 2015 16:54:16 -0400
-Date: Wed, 29 Jul 2015 13:54:07 -0700
-From: josh@joshtriplett.org
-Subject: Re: [PATCH] kbuild: document recursive dependency limitation /
- resolution
-Message-ID: <20150729205407.GC15480@cloud>
-References: <1438200556-13842-1-git-send-email-mcgrof@do-not-panic.com>
+	Wed, 29 Jul 2015 21:30:43 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1438200556-13842-1-git-send-email-mcgrof@do-not-panic.com>
+In-Reply-To: <CAL_JsqL7KRcSv5jSneWYj1PJOYbvMQ8HOAGK+w-+MDBMpMatow@mail.gmail.com>
+References: <1437993343-9542-1-git-send-email-ian.campbell@citrix.com>
+	<CAK7LNAQKswPzeFYdSVq3JDk2qawZ8e5ogBFMWdor-CibMovU3g@mail.gmail.com>
+	<1438176174.11600.198.camel@citrix.com>
+	<CAL_JsqL7KRcSv5jSneWYj1PJOYbvMQ8HOAGK+w-+MDBMpMatow@mail.gmail.com>
+Date: Thu, 30 Jul 2015 10:30:27 +0900
+Message-ID: <CAK7LNAS_P65k3T_J_vXZ9dxBB-uVbrTW-qFE_fJEOSLcOW4JsA@mail.gmail.com>
+Subject: Re: [PATCH v2] dtb: Create a common home for cross-architecture dtsi files.
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Luis R. Rodriguez" <mcgrof@do-not-panic.com>
-Cc: mmarek@suse.com, jbottomley@odin.com, geert@linux-m68k.org, pebolle@tiscali.nl, herbert@gondor.apana.org.au, tiwai@suse.de, yann.morin.1998@free.fr, corbet@lwn.net, linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, roberto@dicosmo.org, zack@upsilon.cc, "Luis R. Rodriguez" <mcgrof@suse.com>
+To: Rob Herring <robherring2@gmail.com>
+Cc: Ian Campbell <ian.campbell@citrix.com>, Mark Rutland <mark.rutland@arm.com>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Russell King <linux@arm.linux.org.uk>, Pawel Moll <pawel.moll@arm.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, Kumar Gala <galak@codeaurora.org>, Liviu Dudau <liviu.dudau@arm.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Will Deacon <will.deacon@arm.com>, Rob Herring <robh+dt@kernel.org>, Kristina Martsenko <kristina.martsenko@arm.com>, Sudeep Holla <sudeep.holla@arm.com>, Kevin Hilman <khilman@linaro.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
 
-On Wed, Jul 29, 2015 at 01:09:16PM -0700, Luis R. Rodriguez wrote:
-> From: "Luis R. Rodriguez" <mcgrof@suse.com>
-> 
-> Recursive dependency issues with kconfig are unavoidable due to
-> some limitations with kconfig, since these issues are recurring
-> provide a hint to the user how they can resolve these dependency
-> issues and also document why such limitation exists.
-> 
-> Cc: Geert Uytterhoeven <geert@linux-m68k.org>
-> Cc: James Bottomley <jbottomley@odin.com>
-> Cc: Josh Triplett <josh@joshtriplett.org>
-> Cc: Paul Bolle <pebolle@tiscali.nl>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: Takashi Iwai <tiwai@suse.de>
-> Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>
-> Cc: Michal Marek <mmarek@suse.com>
-> Cc: Jonathan Corbet <corbet@lwn.net>
-> Cc: linux-kbuild@vger.kernel.org
-> Cc: linux-doc@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> Signed-off-by: Luis R. Rodriguez <mcgrof@suse.com>
+Hi,
 
-As a minor nit, I would suggest saying that making Kbuild handle this
-might require a full SAT solver, rather than the current phrasing that
-suggests that a SAT solver is the right solution to this problem.  Let's
-wait to make that conclusion until a kbuild patch shows up.
 
-Otherwise, this seems quite sensible; thanks for documenting this bit of
-tribal knowledge.
+2015-07-30 0:23 GMT+09:00 Rob Herring <robherring2@gmail.com>:
+> On Wed, Jul 29, 2015 at 8:22 AM, Ian Campbell <ian.campbell@citrix.com> wrote:
+>> On Wed, 2015-07-29 at 20:07 +0900, Masahiro Yamada wrote:
+>>> Hi Ian,
+>>>
+>>>
+>>> 2015-07-27 19:35 GMT+09:00 Ian Campbell <ian.campbell@citrix.com>:
+>>> > Commit 9ccd608070b6 "arm64: dts: add device tree for ARM SMM-A53x2 on
+>>> > LogicTile Express 20MG" added a new dts file to arch/arm64 which
+>>> > included "../../../../arm/boot/dts/vexpress-v2m-rs1.dtsi", i.e. a
+>>> > .dtsi supplied by arch/arm.
+>>> >
+>>> > Unfortunately this causes some issues for the split device tree
+>>> > repository[0], since things get moved around there. In that context
+>>> > the new .dts ends up at src/arm64/arm/vexpress-v2f-1xv7-ca53x2.dts
+>>> > while the include is at src/arm/vexpress-v2m-rs1.dtsi.
+>>> >
+>>> > The sharing of the .dtsi is legitimate since the baseboard is the same
+>>> > for various vexpress systems whatever processor they use.
+>>> >
+>>> > Rather than using ../../ tricks to pickup .dtsi files from another
+>>> > arch this patch creates a new directory include/dt-dtsi as a
+>>> > home for such cross-arch .dtsi files, arranges for it to be in the
+>>> > include path when the .dts files are processed by cpp and switches the
+>>>
+>>>
+>>> "include/dt-dtsi/"  can be referenced from normal C sources.
+>>>
+>>> I think another possible home for cross-arch DTSI is "kernel/dts/".
+>>> This directory can be hidden from C sources.
+>>
+>> I suppose, I don't really mind and will follow the direction of the other
+>> DTB maintainers. It doesn't seem like a big deal to me.
+>
+> Seems fine to me. We might think of other things to put here that are
+> not includes. Overlays perhaps?
 
-- Josh Triplett
 
-> I've cc'd Roberto and Stefano as I think we might be able to in the
-> long term use some of their work on package dependency and solvers for
-> this problem [0] [1] [2]. This last part -- just consider it long term
-> focused.
-> 
-> [0] https://upsilon.cc/~zack/research/publications/splc2010-fd-deps.pdf
-> [1] https://ocaml.org/meetings/ocaml/2014/preferences-2014-09-05-slides.pdf
-> [2] https://www.youtube.com/watch?v=GSOcRQvZg8w
-> 
->  Documentation/kbuild/kconfig-language.txt | 22 ++++++++++++++++++++++
->  scripts/kconfig/symbol.c                  |  2 ++
->  2 files changed, 24 insertions(+)
-> 
-> diff --git a/Documentation/kbuild/kconfig-language.txt b/Documentation/kbuild/kconfig-language.txt
-> index 350f733bf2c7..7e0510d1cef7 100644
-> --- a/Documentation/kbuild/kconfig-language.txt
-> +++ b/Documentation/kbuild/kconfig-language.txt
-> @@ -393,3 +393,25 @@ config FOO
->  	depends on BAR && m
->  
->  limits FOO to module (=m) or disabled (=n).
-> +
-> +Kconfig recursive dependency limitations
-> +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> +
-> +If you've hit the Kconfig error: "recursive dependency detected" you've run
-> +into a recursive dependency issue with Kconfig. Kconfig does not do recursive
-> +dependency resolution, this has a few implications for Kconfig file writers. In
-> +practice it means that for instance if a driver A selects a few kconfig symbols
-> +another driver B which selects any of these symbols cannot negate any of the
-> +symbols the driver A selected.  Because of this current limitation developers
-> +who run into this type of recursive dependency issue have two diverging
-> +options:
-> +
-> +  a) Either swap all "select FOO" to "depends on FOO" or,
-> +  b) Change the offending "depends on FOO" to "select FOO"
-> +
-> +Kconfig's limitations can be addressed by implementing a SAT solver for it,
-> +but until then, Kconfig is limitted to require developers to use one of
-> +the above two mechanisms to address recursive dependency issues. For more
-> +details you can refer to this thread and discussion:
-> +
-> +http://lkml.kernel.org/r/1432241149-8762-1-git-send-email-mcgrof@do-not-panic.com
-> diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
-> index 70c5ee189dce..4d61b7490dad 100644
-> --- a/scripts/kconfig/symbol.c
-> +++ b/scripts/kconfig/symbol.c
-> @@ -1117,6 +1117,8 @@ static void sym_check_print_recursive(struct symbol *last_sym)
->  		if (stack->sym == last_sym)
->  			fprintf(stderr, "%s:%d:error: recursive dependency detected!\n",
->  				prop->file->name, prop->lineno);
-> +			fprintf(stderr, "For a resolution refer to Documentation/kbuild/kconfig-language.txt\n");
-> +			fprintf(stderr, "section \"Kconfig recursive dependency limitations\"\n");
->  		if (stack->expr) {
->  			fprintf(stderr, "%s:%d:\tsymbol %s %s value contains %s\n",
->  				prop->file->name, prop->lineno,
-> -- 
-> 2.3.2.209.gd67f9d5.dirty
-> 
+Putting device trees below "include/" seems weird to me.
+
+
+I thought, kernel/  is a place where we put something common among
+architectures.
+
+
+"kernel/configs/" was created as a home for cross-arch config fragments.
+
+
+arch/${ARCH}/configs/  -  arch-specific *_defconfig and *.config
+kernel/configs/        -  arch-common  *.config
+
+
+Likewise,
+
+arch/${ARCH}/boot/dts  -  arch-specific *.dts and *.dtsi
+kernel/dts             -  arch-common  *.dtsi
+
+
+This is just a matter of preference, though.
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
