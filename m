@@ -1,13 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp02.citrix.com ([66.165.176.63]:15955 "EHLO
-	SMTP02.CITRIX.COM" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753480AbbHCQGi (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 3 Aug 2015 12:06:38 -0400
+Received: from smtp.citrix.com ([66.165.176.89]:5414 "EHLO SMTP.CITRIX.COM"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753300AbbHCQHL (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 3 Aug 2015 12:07:11 -0400
 From: Ian Campbell <ian.campbell@citrix.com>
-Subject: [PATCH v4] dtb: Create a common home for cross-architecture dtsi files.
-Date: Mon, 3 Aug 2015 17:06:33 +0100
-Message-ID: <1438617993-1012-1-git-send-email-ian.campbell@citrix.com>
+Subject: [PATCH v5] dtb: Create a common home for cross-architecture dtsi files.
+Date: Mon, 3 Aug 2015 17:06:40 +0100
+Message-ID: <1438618000-1091-1-git-send-email-ian.campbell@citrix.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
