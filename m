@@ -1,36 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lb1-smtp-cloud6.xs4all.net ([194.109.24.24]:35595 "EHLO
-	lb1-smtp-cloud6.xs4all.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S933643AbbHDMFX (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 4 Aug 2015 08:05:23 -0400
-Message-ID: <1438689914.8734.68.camel@tiscali.nl>
-Subject: Re: [PATCH] kbuild: document recursive dependency limitation /
- resolution
-From: Paul Bolle <pebolle@tiscali.nl>
-Date: Tue, 04 Aug 2015 14:05:14 +0200
-In-Reply-To: <55C0A8A1.2030706@suse.com>
-References: <1438200556-13842-1-git-send-email-mcgrof@do-not-panic.com>
-	 <55B938EA.2080402@infradead.org> <55C0A8A1.2030706@suse.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Received: from mx2.suse.de ([195.135.220.15]:44157 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755974AbbHDM00 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 4 Aug 2015 08:26:26 -0400
+Date: Tue, 4 Aug 2015 14:26:26 +0200
+From: Michal Marek <mmarek@suse.cz>
+Subject: [GIT PULL] kbuild fixes for v4.2-rc6
+Message-ID: <20150804122626.GA26806@pobox.suse.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>, "Luis R. Rodriguez" <mcgrof@do-not-panic.com>
-Cc: Randy Dunlap <rdunlap@infradead.org>, josh@joshtriplett.org, jbottomley@odin.com, geert@linux-m68k.org, herbert@gondor.apana.org.au, tiwai@suse.de, yann.morin.1998@free.fr, corbet@lwn.net, linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, roberto@dicosmo.org, zack@upsilon.cc, "Luis R. Rodriguez" <mcgrof@suse.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Jason@zx2c4.com, mmarek@suse.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On di, 2015-08-04 at 13:57 +0200, Michal Marek wrote:
-> should I apply the patch with the typo fixed or are you going to send 
-> a v2?
+Hi Linus,
 
-I'm afraid I have been thinking about some comments for quite a few days
-now. So a v2 would be appreciated.
+please pull these two fixes for kbuild:
+- The new ARCH_{CPP,A,C}FLAGS variables are reset before including the
+  arch Makefile
+- Fix calling make modules_install twice when module compression is
+  enabled
 
-Or, alternatively, Michal could perhaps wait another day and I promise
-to actually make those comments. Is that OK?
-
-Thanks either way,
+Thanks,
+Michal
 
 
-Paul Bolle
+The following changes since commit d770e558e21961ad6cfdf0ff7df0eb5d7d4f0754:
+
+  Linux 4.2-rc1 (2015-07-05 11:01:52 -0700)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git rc-fixes
+
+for you to fetch changes up to 3d1450d54a4fc277fc4598acf2335f74b66b08fc:
+
+  Makefile: Force gzip and xz on module install (2015-07-22 17:47:12 +0200)
+
+----------------------------------------------------------------
+Jason A. Donenfeld (1):
+      Makefile: Force gzip and xz on module install
+
+Michal Marek (1):
+      kbuild: Do not pick up ARCH_{CPP,A,C}FLAGS from the environment
+
+ Makefile | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
