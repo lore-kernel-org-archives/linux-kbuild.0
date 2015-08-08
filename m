@@ -1,51 +1,169 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi0-f47.google.com ([209.85.218.47]:36699 "EHLO
-	mail-oi0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932633AbbHHMre (ORCPT
+Received: from conuserg011.nifty.com ([202.248.44.37]:58616 "EHLO
+	conuserg011-v.nifty.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S964799AbbHHPzV (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 8 Aug 2015 08:47:34 -0400
-MIME-Version: 1.0
-In-Reply-To: <1437948415-16290-1-git-send-email-richard@nod.at>
-References: <1437948415-16290-1-git-send-email-richard@nod.at>
-Date: Sat, 8 Aug 2015 14:47:32 +0200
-Message-ID: <CAFLxGvzT11zSu2YDO5Hqr4se0icp=K1MGKhhGZgubVQbu55=mw@mail.gmail.com>
-Subject: Re: [PATCH] localmodconfig: Use Kbuild files too
-From: Richard Weinberger <richard.weinberger@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+	Sat, 8 Aug 2015 11:55:21 -0400
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH v2] ARM: add boot image dependencies to not generate invalid images
+Date: Sun,  9 Aug 2015 00:53:31 +0900
+Message-Id: <1439049211-4181-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Richard Weinberger <richard@nod.at>
-Cc: yann.morin.1998@free.fr, Steven Rostedt <rostedt@goodmis.org>, artafinde@gmail.com, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+To: linux-arm-kernel@lists.infradead.org
+Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Russell King <linux@arm.linux.org.uk>, linux-kernel@vger.kernel.org
 
-On Mon, Jul 27, 2015 at 12:06 AM, Richard Weinberger <richard@nod.at> wrote:
-> In kbuild it is allowed to define objects in files named "Makefile"
-> and "Kbuild".
-> Currently localmodconfig reads objects only from "Makefile"s and misses
-> modules like nouveau.
->
-> Reported-and-tested-by: Leonidas Spyropoulos <artafinde@gmail.com>
-> Signed-off-by: Richard Weinberger <richard@nod.at>
-> ---
->  scripts/kconfig/streamline_config.pl | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
-> index 9cb8522..f3d3fb4 100755
-> --- a/scripts/kconfig/streamline_config.pl
-> +++ b/scripts/kconfig/streamline_config.pl
-> @@ -137,7 +137,7 @@ my $ksource = ($ARGV[0] ? $ARGV[0] : '.');
->  my $kconfig = $ARGV[1];
->  my $lsmod_file = $ENV{'LSMOD'};
->
-> -my @makefiles = `find $ksource -name Makefile 2>/dev/null`;
-> +my @makefiles = `find $ksource -name Makefile -or -name Kbuild 2>/dev/null`;
->  chomp @makefiles;
->
->  my %depends;
-> --
+U-Boot is often used to boot the kernel on ARM boards, but uImage
+is not built by "make all", so we are often inclined to do
+"make all uImage" to generate DTBs, modules and uImage in a single
+command, but we should notice a pitfall behind it.  In fact,
+"make all uImage" could generate an invalid uImage if it is run with
+the parallel option (-j).
 
-Ping?
+You can reproduce this problem with the following procedure:
 
+[1] First, build "all" and "uImage" separately.
+    You will get a valid uImage
+
+  $ git clean -f -x -d
+  $ export CROSS_COMPILE=<your-tools-prefix>
+  $ make -s -j8 ARCH=arm multi_v7_defconfig
+  $ make -s -j8 ARCH=arm all
+  $ make -j8 ARCH=arm UIMAGE_LOADADDR=0x80208000 uImage
+    CHK     include/config/kernel.release
+    CHK     include/generated/uapi/linux/version.h
+    CHK     include/generated/utsrelease.h
+  make[1]: `include/generated/mach-types.h' is up to date.
+    CHK     include/generated/timeconst.h
+    CHK     include/generated/bounds.h
+    CHK     include/generated/asm-offsets.h
+    CALL    scripts/checksyscalls.sh
+    CHK     include/generated/compile.h
+    Kernel: arch/arm/boot/Image is ready
+    Kernel: arch/arm/boot/zImage is ready
+    UIMAGE  arch/arm/boot/uImage
+  Image Name:   Linux-4.2.0-rc5-00156-gdd2384a-d
+  Created:      Sat Aug  8 23:21:35 2015
+  Image Type:   ARM Linux Kernel Image (uncompressed)
+  Data Size:    6138648 Bytes = 5994.77 kB = 5.85 MB
+  Load Address: 80208000
+  Entry Point:  80208000
+    Image arch/arm/boot/uImage is ready
+  $ ls -l arch/arm/boot/*Image
+  -rwxrwxr-x 1 masahiro masahiro 13766656 Aug  8 23:20 arch/arm/boot/Image
+  -rw-rw-r-- 1 masahiro masahiro  6138712 Aug  8 23:21 arch/arm/boot/uImage
+  -rwxrwxr-x 1 masahiro masahiro  6138648 Aug  8 23:20 arch/arm/boot/zImage
+
+[2] Update some source file(s)
+
+  $ touch init/main.c
+
+[3] Then, re-build "all" and "uImage" simultaneously.
+    You will get an invalid uImage at random.
+
+  $ make -j8 ARCH=arm UIMAGE_LOADADDR=0x80208000 all uImage
+    CHK     include/config/kernel.release
+    CHK     include/generated/uapi/linux/version.h
+    CHK     include/generated/utsrelease.h
+  make[1]: `include/generated/mach-types.h' is up to date.
+    CHK     include/generated/timeconst.h
+    CHK     include/generated/bounds.h
+    CHK     include/generated/asm-offsets.h
+    CALL    scripts/checksyscalls.sh
+    CC      init/main.o
+    CHK     include/generated/compile.h
+    LD      init/built-in.o
+    LINK    vmlinux
+    LD      vmlinux.o
+    MODPOST vmlinux.o
+    GEN     .version
+    CHK     include/generated/compile.h
+    UPD     include/generated/compile.h
+    CC      init/version.o
+    LD      init/built-in.o
+    KSYM    .tmp_kallsyms1.o
+    KSYM    .tmp_kallsyms2.o
+    LD      vmlinux
+    SORTEX  vmlinux
+    SYSMAP  System.map
+    OBJCOPY arch/arm/boot/Image
+    Building modules, stage 2.
+    Kernel: arch/arm/boot/Image is ready
+    GZIP    arch/arm/boot/compressed/piggy.gzip
+    AS      arch/arm/boot/compressed/piggy.gzip.o
+    Kernel: arch/arm/boot/Image is ready
+    LD      arch/arm/boot/compressed/vmlinux
+    GZIP    arch/arm/boot/compressed/piggy.gzip
+    OBJCOPY arch/arm/boot/zImage
+    Kernel: arch/arm/boot/zImage is ready
+    UIMAGE  arch/arm/boot/uImage
+  Image Name:   Linux-4.2.0-rc5-00156-gdd2384a-d
+  Created:      Sat Aug  8 23:23:14 2015
+  Image Type:   ARM Linux Kernel Image (uncompressed)
+  Data Size:    26472 Bytes = 25.85 kB = 0.03 MB
+  Load Address: 80208000
+  Entry Point:  80208000
+    Image arch/arm/boot/uImage is ready
+    MODPOST 192 modules
+    AS      arch/arm/boot/compressed/piggy.gzip.o
+    LD      arch/arm/boot/compressed/vmlinux
+    OBJCOPY arch/arm/boot/zImage
+    Kernel: arch/arm/boot/zImage is ready
+  $ ls -l arch/arm/boot/*Image
+  -rwxrwxr-x 1 masahiro masahiro 13766656 Aug  8 23:23 arch/arm/boot/Image
+  -rw-rw-r-- 1 masahiro masahiro    26536 Aug  8 23:23 arch/arm/boot/uImage
+  -rwxrwxr-x 1 masahiro masahiro  6138648 Aug  8 23:23 arch/arm/boot/zImage
+
+Please notice the uImage is extremely small when this issue is
+encountered.  Besides, "Kernel: arch/arm/boot/zImage is ready" is
+displayed twice, before and after the uImage log.
+
+The root cause of this is the race condition between zImage and
+uImage.  Actually, uImage depends on zImage, but the dependency
+between the two is only described in arch/arm/boot/Makefile.
+Because arch/arm/boot/Makefile is not included from the top-level
+Makefile, it cannot know the dependency between zImage and uImage.
+
+Consequently, when we run make with the parallel option, Kbuild
+updates vmlinux first, and then two different threads descends into
+the arch/arm/boot/Makefile almost at the same time, one for updating
+zImage and the other for uImage.  While one thread is re-generating
+zImage, the other also tries to update zImage before creating uImage
+on top of that.  zImage is overwritten by the slower thread and then
+uImage is created based on the half-written zImage.
+
+This is the reason why "Kernel: arch/arm/boot/zImage is ready" is
+displayed twice, and a broken uImage is created.
+
+The same problem could happen on bootpImage.
+
+This commit adds dependencies among Image, zImage, uImage, and
+bootpImage to arch/arm/Makefile, which is included from the
+top-level Makefile.
+
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
+
+Changes in v2:
+  - Add more detailed build log and explanation.
+
+ arch/arm/Makefile | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/arch/arm/Makefile b/arch/arm/Makefile
+index 07ab3d2..7451b44 100644
+--- a/arch/arm/Makefile
++++ b/arch/arm/Makefile
+@@ -312,6 +312,9 @@ INSTALL_TARGETS	= zinstall uinstall install
+ 
+ PHONY += bzImage $(BOOT_TARGETS) $(INSTALL_TARGETS)
+ 
++bootpImage uImage: zImage
++zImage: Image
++
+ $(BOOT_TARGETS): vmlinux
+ 	$(Q)$(MAKE) $(build)=$(boot) MACHINE=$(MACHINE) $(boot)/$@
+ 
 -- 
-Thanks,
-//richard
+1.9.1
+
