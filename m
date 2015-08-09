@@ -1,169 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg011.nifty.com ([202.248.44.37]:58616 "EHLO
-	conuserg011-v.nifty.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S964799AbbHHPzV (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 8 Aug 2015 11:55:21 -0400
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v2] ARM: add boot image dependencies to not generate invalid images
-Date: Sun,  9 Aug 2015 00:53:31 +0900
-Message-Id: <1439049211-4181-1-git-send-email-yamada.masahiro@socionext.com>
+Received: from a.ns.miles-group.at ([95.130.255.143]:65277 "EHLO radon.swed.at"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754463AbbHIJkJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 9 Aug 2015 05:40:09 -0400
+From: Richard Weinberger <richard@nod.at>
+Subject: unmet direct dependencies in -next
+Message-ID: <55C71FF5.1020902@nod.at>
+Date: Sun, 9 Aug 2015 11:40:05 +0200
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-arm-kernel@lists.infradead.org
-Cc: Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Russell King <linux@arm.linux.org.uk>, linux-kernel@vger.kernel.org
+To: linux-next@vger.kernel.org
+Cc: sameo@linux.intel.com, lee.jones@linaro.org, Arnd Bergmann <arnd@arndb.de>, yann.morin.1998@free.fr, linux-kbuild <linux-kbuild@vger.kernel.org>, Wolfram Sang <wsa@the-dreams.de>, "open list:I2C SUBSYSTEM" <linux-i2c@vger.kernel.org>, user-mode-linux-devel <user-mode-linux-devel@lists.sourceforge.net>
 
-U-Boot is often used to boot the kernel on ARM boards, but uImage
-is not built by "make all", so we are often inclined to do
-"make all uImage" to generate DTBs, modules and uImage in a single
-command, but we should notice a pitfall behind it.  In fact,
-"make all uImage" could generate an invalid uImage if it is run with
-the parallel option (-j).
+Hi!
 
-You can reproduce this problem with the following procedure:
+-next faces some build issues on UML because of unmet direct dependencies.
+Mostly due to HAS_IOMEM and I2C.
 
-[1] First, build "all" and "uImage" separately.
-    You will get a valid uImage
+warning: (MEDIA_SUBDRV_AUTOSELECT && VIDEO_CX231XX && INV_MPU6050_IIO) selects I2C_MUX which has unmet direct dependencies (I2C && HAS_IOMEM)
+warning: (ST_IRQCHIP && HIP04_ETH && STMMAC_PLATFORM && DWMAC_IPQ806X && DWMAC_LPC18XX && DWMAC_ROCKCHIP && DWMAC_SOCFPGA && DWMAC_STI && TI_CPSW && PINCTRL_ROCKCHIP &&
+PINCTRL_DOVE && POWER_RESET_KEYSTONE && POWER_RESET_SYSCON && POWER_RESET_SYSCON_POWEROFF && S3C2410_WATCHDOG && VIDEO_OMAP3 && VIDEO_S5P_FIMC && RTC_DRV_AT91SAM9 && VIDEO_OMAP4 &&
+HWSPINLOCK_QCOM && ATMEL_ST && QCOM_GSBI) selects MFD_SYSCON which has unmet direct dependencies (HAS_IOMEM)
+warning: (MEDIA_SUBDRV_AUTOSELECT && VIDEO_CX231XX && INV_MPU6050_IIO) selects I2C_MUX which has unmet direct dependencies (I2C && HAS_IOMEM)
+warning: (ST_IRQCHIP && HIP04_ETH && STMMAC_PLATFORM && DWMAC_IPQ806X && DWMAC_LPC18XX && DWMAC_ROCKCHIP && DWMAC_SOCFPGA && DWMAC_STI && TI_CPSW && PINCTRL_ROCKCHIP &&
+PINCTRL_DOVE && POWER_RESET_KEYSTONE && POWER_RESET_SYSCON && POWER_RESET_SYSCON_POWEROFF && S3C2410_WATCHDOG && VIDEO_OMAP3 && VIDEO_S5P_FIMC && RTC_DRV_AT91SAM9 && VIDEO_OMAP4 &&
+HWSPINLOCK_QCOM && ATMEL_ST && QCOM_GSBI) selects MFD_SYSCON which has unmet direct dependencies (HAS_IOMEM)
 
-  $ git clean -f -x -d
-  $ export CROSS_COMPILE=<your-tools-prefix>
-  $ make -s -j8 ARCH=arm multi_v7_defconfig
-  $ make -s -j8 ARCH=arm all
-  $ make -j8 ARCH=arm UIMAGE_LOADADDR=0x80208000 uImage
-    CHK     include/config/kernel.release
-    CHK     include/generated/uapi/linux/version.h
-    CHK     include/generated/utsrelease.h
-  make[1]: `include/generated/mach-types.h' is up to date.
-    CHK     include/generated/timeconst.h
-    CHK     include/generated/bounds.h
-    CHK     include/generated/asm-offsets.h
-    CALL    scripts/checksyscalls.sh
-    CHK     include/generated/compile.h
-    Kernel: arch/arm/boot/Image is ready
-    Kernel: arch/arm/boot/zImage is ready
-    UIMAGE  arch/arm/boot/uImage
-  Image Name:   Linux-4.2.0-rc5-00156-gdd2384a-d
-  Created:      Sat Aug  8 23:21:35 2015
-  Image Type:   ARM Linux Kernel Image (uncompressed)
-  Data Size:    6138648 Bytes = 5994.77 kB = 5.85 MB
-  Load Address: 80208000
-  Entry Point:  80208000
-    Image arch/arm/boot/uImage is ready
-  $ ls -l arch/arm/boot/*Image
-  -rwxrwxr-x 1 masahiro masahiro 13766656 Aug  8 23:20 arch/arm/boot/Image
-  -rw-rw-r-- 1 masahiro masahiro  6138712 Aug  8 23:21 arch/arm/boot/uImage
-  -rwxrwxr-x 1 masahiro masahiro  6138648 Aug  8 23:20 arch/arm/boot/zImage
+For example MFD_SYSCON cannot build on UML as it depends on HAS_IOMEM.
+While the symbol MFD_SYSCON has correct dependencies some users of MFD_SYSCON
+just issue a "select MFD_SYSCON" and bypass the HAS_IOMEM dependency and causing the build to fail.
 
-[2] Update some source file(s)
+This brings me to a question on kconfig itself, wouldn't it be better to just disable a symbol if it has
+unmet direct dependencies?
 
-  $ touch init/main.c
-
-[3] Then, re-build "all" and "uImage" simultaneously.
-    You will get an invalid uImage at random.
-
-  $ make -j8 ARCH=arm UIMAGE_LOADADDR=0x80208000 all uImage
-    CHK     include/config/kernel.release
-    CHK     include/generated/uapi/linux/version.h
-    CHK     include/generated/utsrelease.h
-  make[1]: `include/generated/mach-types.h' is up to date.
-    CHK     include/generated/timeconst.h
-    CHK     include/generated/bounds.h
-    CHK     include/generated/asm-offsets.h
-    CALL    scripts/checksyscalls.sh
-    CC      init/main.o
-    CHK     include/generated/compile.h
-    LD      init/built-in.o
-    LINK    vmlinux
-    LD      vmlinux.o
-    MODPOST vmlinux.o
-    GEN     .version
-    CHK     include/generated/compile.h
-    UPD     include/generated/compile.h
-    CC      init/version.o
-    LD      init/built-in.o
-    KSYM    .tmp_kallsyms1.o
-    KSYM    .tmp_kallsyms2.o
-    LD      vmlinux
-    SORTEX  vmlinux
-    SYSMAP  System.map
-    OBJCOPY arch/arm/boot/Image
-    Building modules, stage 2.
-    Kernel: arch/arm/boot/Image is ready
-    GZIP    arch/arm/boot/compressed/piggy.gzip
-    AS      arch/arm/boot/compressed/piggy.gzip.o
-    Kernel: arch/arm/boot/Image is ready
-    LD      arch/arm/boot/compressed/vmlinux
-    GZIP    arch/arm/boot/compressed/piggy.gzip
-    OBJCOPY arch/arm/boot/zImage
-    Kernel: arch/arm/boot/zImage is ready
-    UIMAGE  arch/arm/boot/uImage
-  Image Name:   Linux-4.2.0-rc5-00156-gdd2384a-d
-  Created:      Sat Aug  8 23:23:14 2015
-  Image Type:   ARM Linux Kernel Image (uncompressed)
-  Data Size:    26472 Bytes = 25.85 kB = 0.03 MB
-  Load Address: 80208000
-  Entry Point:  80208000
-    Image arch/arm/boot/uImage is ready
-    MODPOST 192 modules
-    AS      arch/arm/boot/compressed/piggy.gzip.o
-    LD      arch/arm/boot/compressed/vmlinux
-    OBJCOPY arch/arm/boot/zImage
-    Kernel: arch/arm/boot/zImage is ready
-  $ ls -l arch/arm/boot/*Image
-  -rwxrwxr-x 1 masahiro masahiro 13766656 Aug  8 23:23 arch/arm/boot/Image
-  -rw-rw-r-- 1 masahiro masahiro    26536 Aug  8 23:23 arch/arm/boot/uImage
-  -rwxrwxr-x 1 masahiro masahiro  6138648 Aug  8 23:23 arch/arm/boot/zImage
-
-Please notice the uImage is extremely small when this issue is
-encountered.  Besides, "Kernel: arch/arm/boot/zImage is ready" is
-displayed twice, before and after the uImage log.
-
-The root cause of this is the race condition between zImage and
-uImage.  Actually, uImage depends on zImage, but the dependency
-between the two is only described in arch/arm/boot/Makefile.
-Because arch/arm/boot/Makefile is not included from the top-level
-Makefile, it cannot know the dependency between zImage and uImage.
-
-Consequently, when we run make with the parallel option, Kbuild
-updates vmlinux first, and then two different threads descends into
-the arch/arm/boot/Makefile almost at the same time, one for updating
-zImage and the other for uImage.  While one thread is re-generating
-zImage, the other also tries to update zImage before creating uImage
-on top of that.  zImage is overwritten by the slower thread and then
-uImage is created based on the half-written zImage.
-
-This is the reason why "Kernel: arch/arm/boot/zImage is ready" is
-displayed twice, and a broken uImage is created.
-
-The same problem could happen on bootpImage.
-
-This commit adds dependencies among Image, zImage, uImage, and
-bootpImage to arch/arm/Makefile, which is included from the
-top-level Makefile.
-
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
-
-Changes in v2:
-  - Add more detailed build log and explanation.
-
- arch/arm/Makefile | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/arch/arm/Makefile b/arch/arm/Makefile
-index 07ab3d2..7451b44 100644
---- a/arch/arm/Makefile
-+++ b/arch/arm/Makefile
-@@ -312,6 +312,9 @@ INSTALL_TARGETS	= zinstall uinstall install
- 
- PHONY += bzImage $(BOOT_TARGETS) $(INSTALL_TARGETS)
- 
-+bootpImage uImage: zImage
-+zImage: Image
-+
- $(BOOT_TARGETS): vmlinux
- 	$(Q)$(MAKE) $(build)=$(boot) MACHINE=$(MACHINE) $(boot)/$@
- 
--- 
-1.9.1
-
+Thanks,
+//richard
