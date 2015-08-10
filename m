@@ -1,58 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from a.ns.miles-group.at ([95.130.255.143]:65276 "EHLO radon.swed.at"
+Received: from mx2.suse.de ([195.135.220.15]:39017 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751523AbbHJJO1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 10 Aug 2015 05:14:27 -0400
+	id S932636AbbHJLM7 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 10 Aug 2015 07:12:59 -0400
 Subject: Re: unmet direct dependencies in -next
 References: <55C71FF5.1020902@nod.at> <20150810091004.GC3249@x1>
-From: Richard Weinberger <richard@nod.at>
-Message-ID: <55C86B66.3020601@nod.at>
-Date: Mon, 10 Aug 2015 11:14:14 +0200
+ <55C86B66.3020601@nod.at>
+From: Michal Marek <mmarek@suse.cz>
+Message-ID: <55C88738.80400@suse.cz>
+Date: Mon, 10 Aug 2015 13:12:56 +0200
 MIME-Version: 1.0
-In-Reply-To: <20150810091004.GC3249@x1>
+In-Reply-To: <55C86B66.3020601@nod.at>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Lee Jones <lee.jones@linaro.org>
-Cc: linux-next@vger.kernel.org, sameo@linux.intel.com, Arnd Bergmann <arnd@arndb.de>, yann.morin.1998@free.fr, linux-kbuild <linux-kbuild@vger.kernel.org>, Wolfram Sang <wsa@the-dreams.de>, "open list:I2C SUBSYSTEM" <linux-i2c@vger.kernel.org>, user-mode-linux-devel <user-mode-linux-devel@lists.sourceforge.net>, mmarek@suse.cz
+To: Richard Weinberger <richard@nod.at>, Lee Jones <lee.jones@linaro.org>
+Cc: linux-next@vger.kernel.org, sameo@linux.intel.com, Arnd Bergmann <arnd@arndb.de>, yann.morin.1998@free.fr, linux-kbuild <linux-kbuild@vger.kernel.org>, Wolfram Sang <wsa@the-dreams.de>, "open list:I2C SUBSYSTEM" <linux-i2c@vger.kernel.org>, user-mode-linux-devel <user-mode-linux-devel@lists.sourceforge.net>
 
-Am 10.08.2015 um 11:10 schrieb Lee Jones:
-> On Sun, 09 Aug 2015, Richard Weinberger wrote:
-> 
->> Hi!
+On 2015-08-10 11:14, Richard Weinberger wrote:
+> Am 10.08.2015 um 11:10 schrieb Lee Jones:
+>> On Sun, 09 Aug 2015, Richard Weinberger wrote:
 >>
->> -next faces some build issues on UML because of unmet direct dependencies.
->> Mostly due to HAS_IOMEM and I2C.
->>
->> warning: (MEDIA_SUBDRV_AUTOSELECT && VIDEO_CX231XX && INV_MPU6050_IIO) selects I2C_MUX which has unmet direct dependencies (I2C && HAS_IOMEM)
->> warning: (ST_IRQCHIP && HIP04_ETH && STMMAC_PLATFORM && DWMAC_IPQ806X && DWMAC_LPC18XX && DWMAC_ROCKCHIP && DWMAC_SOCFPGA && DWMAC_STI && TI_CPSW && PINCTRL_ROCKCHIP &&
->> PINCTRL_DOVE && POWER_RESET_KEYSTONE && POWER_RESET_SYSCON && POWER_RESET_SYSCON_POWEROFF && S3C2410_WATCHDOG && VIDEO_OMAP3 && VIDEO_S5P_FIMC && RTC_DRV_AT91SAM9 && VIDEO_OMAP4 &&
->> HWSPINLOCK_QCOM && ATMEL_ST && QCOM_GSBI) selects MFD_SYSCON which has unmet direct dependencies (HAS_IOMEM)
->> warning: (MEDIA_SUBDRV_AUTOSELECT && VIDEO_CX231XX && INV_MPU6050_IIO) selects I2C_MUX which has unmet direct dependencies (I2C && HAS_IOMEM)
->> warning: (ST_IRQCHIP && HIP04_ETH && STMMAC_PLATFORM && DWMAC_IPQ806X && DWMAC_LPC18XX && DWMAC_ROCKCHIP && DWMAC_SOCFPGA && DWMAC_STI && TI_CPSW && PINCTRL_ROCKCHIP &&
->> PINCTRL_DOVE && POWER_RESET_KEYSTONE && POWER_RESET_SYSCON && POWER_RESET_SYSCON_POWEROFF && S3C2410_WATCHDOG && VIDEO_OMAP3 && VIDEO_S5P_FIMC && RTC_DRV_AT91SAM9 && VIDEO_OMAP4 &&
->> HWSPINLOCK_QCOM && ATMEL_ST && QCOM_GSBI) selects MFD_SYSCON which has unmet direct dependencies (HAS_IOMEM)
->>
->> For example MFD_SYSCON cannot build on UML as it depends on HAS_IOMEM.
->> While the symbol MFD_SYSCON has correct dependencies some users of MFD_SYSCON
->> just issue a "select MFD_SYSCON" and bypass the HAS_IOMEM dependency and causing the build to fail.
->>
->> This brings me to a question on kconfig itself, wouldn't it be better to just disable a symbol if it has
->> unmet direct dependencies?
-> 
-> If this is a question about "kconfig itself", you should probably have
-> included the correct ML and Maintainer:
-> 
-> KCONFIG
-> M:      Michal Marek <mmarek@suse.cz>
-> L:      linux-kbuild@vger.kernel.org
-> S:      Odd Fixes
-> F:      Documentation/kbuild/kconfig-language.txt
-> F:      scripts/kconfig/
+>>> Hi!
+>>>
+>>> -next faces some build issues on UML because of unmet direct dependencies.
+>>> Mostly due to HAS_IOMEM and I2C.
+>>>
+>>> warning: (MEDIA_SUBDRV_AUTOSELECT && VIDEO_CX231XX && INV_MPU6050_IIO) selects I2C_MUX which has unmet direct dependencies (I2C && HAS_IOMEM)
+>>> warning: (ST_IRQCHIP && HIP04_ETH && STMMAC_PLATFORM && DWMAC_IPQ806X && DWMAC_LPC18XX && DWMAC_ROCKCHIP && DWMAC_SOCFPGA && DWMAC_STI && TI_CPSW && PINCTRL_ROCKCHIP &&
+>>> PINCTRL_DOVE && POWER_RESET_KEYSTONE && POWER_RESET_SYSCON && POWER_RESET_SYSCON_POWEROFF && S3C2410_WATCHDOG && VIDEO_OMAP3 && VIDEO_S5P_FIMC && RTC_DRV_AT91SAM9 && VIDEO_OMAP4 &&
+>>> HWSPINLOCK_QCOM && ATMEL_ST && QCOM_GSBI) selects MFD_SYSCON which has unmet direct dependencies (HAS_IOMEM)
+>>> warning: (MEDIA_SUBDRV_AUTOSELECT && VIDEO_CX231XX && INV_MPU6050_IIO) selects I2C_MUX which has unmet direct dependencies (I2C && HAS_IOMEM)
+>>> warning: (ST_IRQCHIP && HIP04_ETH && STMMAC_PLATFORM && DWMAC_IPQ806X && DWMAC_LPC18XX && DWMAC_ROCKCHIP && DWMAC_SOCFPGA && DWMAC_STI && TI_CPSW && PINCTRL_ROCKCHIP &&
+>>> PINCTRL_DOVE && POWER_RESET_KEYSTONE && POWER_RESET_SYSCON && POWER_RESET_SYSCON_POWEROFF && S3C2410_WATCHDOG && VIDEO_OMAP3 && VIDEO_S5P_FIMC && RTC_DRV_AT91SAM9 && VIDEO_OMAP4 &&
+>>> HWSPINLOCK_QCOM && ATMEL_ST && QCOM_GSBI) selects MFD_SYSCON which has unmet direct dependencies (HAS_IOMEM)
+>>>
+>>> For example MFD_SYSCON cannot build on UML as it depends on HAS_IOMEM.
+>>> While the symbol MFD_SYSCON has correct dependencies some users of MFD_SYSCON
+>>> just issue a "select MFD_SYSCON" and bypass the HAS_IOMEM dependency and causing the build to fail.
+>>>
+>>> This brings me to a question on kconfig itself, wouldn't it be better to just disable a symbol if it has
+>>> unmet direct dependencies?
 
-Isn't this kbuild related? I've added kbuild folks...
-But adding Michal now too...
+The result of the given .config does not matter as much. The point of
+the warnings is that there are missing select statements in the Kconfig
+files.
 
-Thanks,
-//richard
+Michal
