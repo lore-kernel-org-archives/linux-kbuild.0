@@ -1,35 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:43058 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753550AbbHJL5c (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 10 Aug 2015 07:57:32 -0400
-Subject: Re: unmet direct dependencies in -next
-References: <55C71FF5.1020902@nod.at> <20150810091004.GC3249@x1>
- <55C86B66.3020601@nod.at> <55C88738.80400@suse.cz>
- <20150810115541.GA6479@katana>
-From: Michal Marek <mmarek@suse.cz>
-Message-ID: <55C891A9.2080607@suse.cz>
-Date: Mon, 10 Aug 2015 13:57:29 +0200
+Received: from smtprelay0248.hostedemail.com ([216.40.44.248]:54089 "EHLO
+	smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1753037AbbHJPGk (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 10 Aug 2015 11:06:40 -0400
+Received: from smtprelay.hostedemail.com (10.5.19.251.rfc1918.com [10.5.19.251])
+	by smtpgrave06.hostedemail.com (Postfix) with ESMTP id 4EFB61743BC
+	for <linux-kbuild@vger.kernel.org>; Mon, 10 Aug 2015 14:58:13 +0000 (UTC)
+Date: Mon, 10 Aug 2015 10:58:08 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+Subject: Re: [PATCH] localmodconfig: Use Kbuild files too
+Message-ID: <20150810105808.6571df03@gandalf.local.home>
+In-Reply-To: <CAFLxGvzT11zSu2YDO5Hqr4se0icp=K1MGKhhGZgubVQbu55=mw@mail.gmail.com>
+References: <1437948415-16290-1-git-send-email-richard@nod.at>
+	<CAFLxGvzT11zSu2YDO5Hqr4se0icp=K1MGKhhGZgubVQbu55=mw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20150810115541.GA6479@katana>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Wolfram Sang <wsa@the-dreams.de>
-Cc: Richard Weinberger <richard@nod.at>, Lee Jones <lee.jones@linaro.org>, linux-next@vger.kernel.org, sameo@linux.intel.com, Arnd Bergmann <arnd@arndb.de>, yann.morin.1998@free.fr, linux-kbuild <linux-kbuild@vger.kernel.org>, "open list:I2C SUBSYSTEM" <linux-i2c@vger.kernel.org>, user-mode-linux-devel <user-mode-linux-devel@lists.sourceforge.net>
+To: Richard Weinberger <richard.weinberger@gmail.com>
+Cc: Richard Weinberger <richard@nod.at>, yann.morin.1998@free.fr, artafinde@gmail.com, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
 
-On 2015-08-10 13:55, Wolfram Sang wrote:
+On Sat, 8 Aug 2015 14:47:32 +0200
+Richard Weinberger <richard.weinberger@gmail.com> wrote:
+
+> On Mon, Jul 27, 2015 at 12:06 AM, Richard Weinberger <richard@nod.at> wrote:
+> > In kbuild it is allowed to define objects in files named "Makefile"
+> > and "Kbuild".
+> > Currently localmodconfig reads objects only from "Makefile"s and misses
+> > modules like nouveau.
+> >
+> > Reported-and-tested-by: Leonidas Spyropoulos <artafinde@gmail.com>
+> > Signed-off-by: Richard Weinberger <richard@nod.at>
+> > ---
+> >  scripts/kconfig/streamline_config.pl | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
+> > index 9cb8522..f3d3fb4 100755
+> > --- a/scripts/kconfig/streamline_config.pl
+> > +++ b/scripts/kconfig/streamline_config.pl
+> > @@ -137,7 +137,7 @@ my $ksource = ($ARGV[0] ? $ARGV[0] : '.');
+> >  my $kconfig = $ARGV[1];
+> >  my $lsmod_file = $ENV{'LSMOD'};
+> >
+> > -my @makefiles = `find $ksource -name Makefile 2>/dev/null`;
+> > +my @makefiles = `find $ksource -name Makefile -or -name Kbuild 2>/dev/null`;
+> >  chomp @makefiles;
+> >
+> >  my %depends;
+> > --
 > 
->> The result of the given .config does not matter as much. The point of
->> the warnings is that there are missing select statements in the Kconfig
->> files.
+> Ping?
 > 
-> For the I2C part, I think they should rather depend on I2C_MUX.
-> Selecting I2C should be rare, like when you really need that PMIC to
-> boot.
 
-Right, that's another way to fix it.
+Thanks, I'll take a look at this today.
 
-Michal
+-- Steve
 
