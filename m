@@ -1,211 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.citrix.com ([66.165.176.89]:61460 "EHLO SMTP.CITRIX.COM"
+Received: from foss.arm.com ([217.140.101.70]:54285 "EHLO foss.arm.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S934325AbbHKKH3 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 11 Aug 2015 06:07:29 -0400
-Message-ID: <1439287646.9747.212.camel@citrix.com>
-Subject: Re: [PATCH v5] dtb: Create a common home for cross-architecture
- dtsi files.
-From: Ian Campbell <ian.campbell@citrix.com>
-Date: Tue, 11 Aug 2015 11:07:26 +0100
-In-Reply-To: <1438618000-1091-1-git-send-email-ian.campbell@citrix.com>
-References: <1438618000-1091-1-git-send-email-ian.campbell@citrix.com>
-Content-Type: text/plain; charset="UTF-8"
+	id S965400AbbHKQhP (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 11 Aug 2015 12:37:15 -0400
+Date: Tue, 11 Aug 2015 17:37:10 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+Subject: Re: [PATCH v5 5/6] arm64: add KASAN support
+Message-ID: <20150811163709.GI23307@e104818-lin.cambridge.arm.com>
+References: <1439259499-13913-1-git-send-email-ryabinin.a.a@gmail.com>
+ <1439259499-13913-6-git-send-email-ryabinin.a.a@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1439259499-13913-6-git-send-email-ryabinin.a.a@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: Rob Herring <robh+dt@kernel.org>, Pawel Moll <pawel.moll@arm.com>, Mark Rutland <mark.rutland@arm.com>, Kumar Gala <galak@codeaurora.org>, Liviu Dudau <liviu.dudau@arm.com>, Sudeep Holla <sudeep.holla@arm.com>, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Russell King <linux@arm.linux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, Kevin Hilman <khilman@linaro.org>, devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org
+To: Andrey Ryabinin <ryabinin.a.a@gmail.com>
+Cc: Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org, Yury <yury.norov@gmail.com>, Alexey Klimov <klimov.linux@gmail.com>, Arnd Bergmann <arnd@arndb.de>, linux-mm@kvack.org, Linus Walleij <linus.walleij@linaro.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, David Keitel <dkeitel@codeaurora.org>, Alexander Potapenko <glider@google.com>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Michal Marek <mmarek@suse.com>, Andrew Morton <akpm@linux-foundation.org>, Dmitry Vyukov <dvyukov@google.com>
 
-On Mon, 2015-08-03 at 17:06 +0100, Ian Campbell wrote:
-> Commit 9ccd608070b6 ("arm64: dts: add device tree for ARM SMM-A53x2 on
-> LogicTile Express 20MG") added a new dts file to arch/arm64 which
-> included "../../../../arm/boot/dts/vexpress-v2m-rs1.dtsi", i.e. a
-> .dtsi supplied by arch/arm.
+On Tue, Aug 11, 2015 at 05:18:18AM +0300, Andrey Ryabinin wrote:
+> This patch adds arch specific code for kernel address sanitizer
+> (see Documentation/kasan.txt).
 > 
-> Unfortunately this causes some issues for the split device tree
-> repository[0], since things get moved around there. In that context
-> the new .dts ends up at src/arm64/arm/vexpress-v2f-1xv7-ca53x2.dts
-> while the include is at src/arm/vexpress-v2m-rs1.dtsi.
+> 1/8 of kernel addresses reserved for shadow memory. There was no
+> big enough hole for this, so virtual addresses for shadow were
+> stolen from vmalloc area.
+> 
+> At early boot stage the whole shadow region populated with just
+> one physical page (kasan_zero_page). Later, this page reused
+> as readonly zero shadow for some memory that KASan currently
+> don't track (vmalloc).
+> After mapping the physical memory, pages for shadow memory are
+> allocated and mapped.
+> 
+> Functions like memset/memmove/memcpy do a lot of memory accesses.
+> If bad pointer passed to one of these function it is important
+> to catch this. Compiler's instrumentation cannot do this since
+> these functions are written in assembly.
+> KASan replaces memory functions with manually instrumented variants.
+> Original functions declared as weak symbols so strong definitions
+> in mm/kasan/kasan.c could replace them. Original functions have aliases
+> with '__' prefix in name, so we could call non-instrumented variant
+> if needed.
+> Some files built without kasan instrumentation (e.g. mm/slub.c).
+> Original mem* function replaced (via #define) with prefixed variants
+> to disable memory access checks for such files.
+> 
+> Signed-off-by: Andrey Ryabinin <ryabinin.a.a@gmail.com>
+> Tested-by: Linus Walleij <linus.walleij@linaro.org>
 
-Hi Grant,
-
-Do you think there is any chance of getting this into 4.2-rc$NEXT or shall
-we wait until 4.3? I'm assuming this should go via the DT tree, but maybe
-it should go via an ARM tree?
-
-Ian.
-
-> 
-> The sharing of the .dtsi is legitimate since the baseboard is the same
-> for various vexpress systems whatever processor they use.
-> 
-> Rather than using ../../ tricks to pickup .dtsi files from another
-> arch this patch creates a new directory kernel/dts as a home for such
-> cross-arch .dtsi files and arranges for it to be in the include path
-> for both dtc and cpp. The dtsi file itself is moved into a vendor
-> subdir in this case "arm" (the vendor, not the ARCH=).
-> 
-> [0] https://git.kernel.org/cgit/linux/kernel/git/devicetree/devicetree
-> -rebasing.git/
-> 
-> Signed-off-by: Ian Campbell <ian.campbell@citrix.com>
-> Cc: Rob Herring <robh+dt@kernel.org>
-> Cc: Pawel Moll <pawel.moll@arm.com>
-> Cc: Mark Rutland <mark.rutland@arm.com>
-> Cc: Kumar Gala <galak@codeaurora.org>
-> Cc: Liviu Dudau <liviu.dudau@arm.com>
-> Cc: Sudeep Holla <sudeep.holla@arm.com>
-> Cc: Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>
-> Cc: Russell King <linux@arm.linux.org.uk>
-> Cc: Catalin Marinas <catalin.marinas@arm.com>
-> Cc: Will Deacon <will.deacon@arm.com>
-> Cc: Kristina Martsenko <kristina.martsenko@arm.com>
-> Cc: Kevin Hilman <khilman@linaro.org>
-> Cc: devicetree@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> Cc: linux-arm-kernel@lists.infradead.org
-> Cc: linux-kbuild@vger.kernel.org
-> Acked-by: Mark Rutland <mark.rutland@arm.com>
-> Acked-by: Rob Herring <robh@kernel.org>
-> Acked-by: Liviu Dudau <Liviu.Dudau@arm.com>
-> Reviewed-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> ---
-> v2: Move to include/dt-dtsi and introduce a per-vendor subdirectory.
-> 
-> v3: Move to kernel/dts.
->     Include new directory in DTC include path as well as cpp path, and
->     therefore switch back to /include/.
->     Update MAINTAINERS
-> 
-> v4: Change path in changelog too.
->     Add ()s to title of 9ccd608070b6.
-> 
-> v5: Remove stale reference to switching from /include/ to #include.
-> ---
->  Documentation/devicetree/bindings/arm/vexpress.txt          | 2 +-
->  MAINTAINERS                                                 | 1 +
->  arch/arm/boot/dts/vexpress-v2p-ca15-tc1.dts                 | 2 +-
->  arch/arm/boot/dts/vexpress-v2p-ca15_a7.dts                  | 2 +-
->  arch/arm/boot/dts/vexpress-v2p-ca5s.dts                     | 2 +-
->  arch/arm64/boot/dts/arm/vexpress-v2f-1xv7-ca53x2.dts        | 2 +-
->  {arch/arm/boot/dts => kernel/dts/arm}/vexpress-v2m-rs1.dtsi | 0
->  scripts/Makefile.lib                                        | 3 ++-
->  8 files changed, 8 insertions(+), 6 deletions(-)
->  rename {arch/arm/boot/dts => kernel/dts/arm}/vexpress-v2m-rs1.dtsi 
-> (100%)
-> 
-> diff --git a/Documentation/devicetree/bindings/arm/vexpress.txt 
-> b/Documentation/devicetree/bindings/arm/vexpress.txt
-> index 39844cd..b6031d9 100644
-> --- a/Documentation/devicetree/bindings/arm/vexpress.txt
-> +++ b/Documentation/devicetree/bindings/arm/vexpress.txt
-> @@ -223,7 +223,7 @@ Example of a VE tile description (simplified)
->  		/* Active high IRQ 0 is connected to GIC's SPI0 */
->  		interrupt-map = <0 0 0 &gic 0 0 4>;
->  
-> -		/include/ "vexpress-v2m-rs1.dtsi"
-> +		/include/ "arm/vexpress-v2m-rs1.dtsi"
->  	};
->  };
->  
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index a226416..1941078 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -7537,6 +7537,7 @@ S:	Maintained
->  F:	Documentation/devicetree/
->  F:	arch/*/boot/dts/
->  F:	include/dt-bindings/
-> +F:	kernel/dts/
->  
->  OPEN FIRMWARE AND DEVICE TREE OVERLAYS
->  M:	Pantelis Antoniou <pantelis.antoniou@konsulko.com>
-> diff --git a/arch/arm/boot/dts/vexpress-v2p-ca15-tc1.dts 
-> b/arch/arm/boot/dts/vexpress-v2p-ca15-tc1.dts
-> index 9420053..b144092 100644
-> --- a/arch/arm/boot/dts/vexpress-v2p-ca15-tc1.dts
-> +++ b/arch/arm/boot/dts/vexpress-v2p-ca15-tc1.dts
-> @@ -278,6 +278,6 @@
->  				<0 0 41 &gic 0 41 4>,
->  				<0 0 42 &gic 0 42 4>;
->  
-> -		/include/ "vexpress-v2m-rs1.dtsi"
-> +		/include/ "arm/vexpress-v2m-rs1.dtsi"
->  	};
->  };
-> diff --git a/arch/arm/boot/dts/vexpress-v2p-ca15_a7.dts 
-> b/arch/arm/boot/dts/vexpress-v2p-ca15_a7.dts
-> index 17f63f7..350f402 100644
-> --- a/arch/arm/boot/dts/vexpress-v2p-ca15_a7.dts
-> +++ b/arch/arm/boot/dts/vexpress-v2p-ca15_a7.dts
-> @@ -636,6 +636,6 @@
->  				<0 0 41 &gic 0 41 4>,
->  				<0 0 42 &gic 0 42 4>;
->  
-> -		/include/ "vexpress-v2m-rs1.dtsi"
-> +		/include/ "arm/vexpress-v2m-rs1.dtsi"
->  	};
->  };
-> diff --git a/arch/arm/boot/dts/vexpress-v2p-ca5s.dts 
-> b/arch/arm/boot/dts/vexpress-v2p-ca5s.dts
-> index d2709b7..585ced0 100644
-> --- a/arch/arm/boot/dts/vexpress-v2p-ca5s.dts
-> +++ b/arch/arm/boot/dts/vexpress-v2p-ca5s.dts
-> @@ -248,6 +248,6 @@
->  				<0 0 41 &gic 0 41 4>,
->  				<0 0 42 &gic 0 42 4>;
->  
-> -		/include/ "vexpress-v2m-rs1.dtsi"
-> +		/include/ "arm/vexpress-v2m-rs1.dtsi"
->  	};
->  };
-> diff --git a/arch/arm64/boot/dts/arm/vexpress-v2f-1xv7-ca53x2.dts 
-> b/arch/arm64/boot/dts/arm/vexpress-v2f-1xv7-ca53x2.dts
-> index 5b1d018..c044804 100644
-> --- a/arch/arm64/boot/dts/arm/vexpress-v2f-1xv7-ca53x2.dts
-> +++ b/arch/arm64/boot/dts/arm/vexpress-v2f-1xv7-ca53x2.dts
-> @@ -186,6 +186,6 @@
->  				<0 0 41 &gic GIC_SPI 41 
-> IRQ_TYPE_LEVEL_HIGH>,
->  				<0 0 42 &gic GIC_SPI 42 
-> IRQ_TYPE_LEVEL_HIGH>;
->  
-> -		/include/ "../../../../arm/boot/dts/vexpress-v2m
-> -rs1.dtsi"
-> +		/include/ "arm/vexpress-v2m-rs1.dtsi"
->  	};
->  };
-> diff --git a/arch/arm/boot/dts/vexpress-v2m-rs1.dtsi 
-> b/kernel/dts/arm/vexpress-v2m-rs1.dtsi
-> similarity index 100%
-> rename from arch/arm/boot/dts/vexpress-v2m-rs1.dtsi
-> rename to kernel/dts/arm/vexpress-v2m-rs1.dtsi
-> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-> index 79e8661..b4d9fb6 100644
-> --- a/scripts/Makefile.lib
-> +++ b/scripts/Makefile.lib
-> @@ -163,6 +163,7 @@ dtc_cpp_flags  = -Wp,-MD,$(depfile).pre.tmp -nostdinc
->                     \
->  		 -I$(srctree)/arch/$(SRCARCH)/boot/dts                  
->  \
->  		 -I$(srctree)/arch/$(SRCARCH)/boot/dts/include          
->  \
->  		 -I$(srctree)/drivers/of/testcase-data                  
->  \
-> +		 -I$(srctree)/kernel/dts                                
->  \
->  		 -undef -D__DTS__
->  
->  # Finds the multi-part object the current object will be linked into
-> @@ -285,7 +286,7 @@ quiet_cmd_dtc = DTC     $@
->  cmd_dtc = mkdir -p $(dir ${dtc-tmp}) ; \
->  	$(CPP) $(dtc_cpp_flags) -x assembler-with-cpp -o $(dtc-tmp) $< ; 
-> \
->  	$(objtree)/scripts/dtc/dtc -O dtb -o $@ -b 0 \
-> -		-i $(dir $<) $(DTC_FLAGS) \
-> +		-i $(dir $<) -i $(srctree)/kernel/dts $(DTC_FLAGS) \
->  		-d $(depfile).dtc.tmp $(dtc-tmp) ; \
->  	cat $(depfile).pre.tmp $(depfile).dtc.tmp > $(depfile)
->  
+Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
