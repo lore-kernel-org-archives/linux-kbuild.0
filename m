@@ -1,224 +1,542 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:58779 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932162AbbHJS5K (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 10 Aug 2015 14:57:10 -0400
-Date: Mon, 10 Aug 2015 20:57:05 +0200
-From: "Luis R. Rodriguez" <mcgrof@suse.com>
-Subject: Re: [PATCH] kbuild: document recursive dependency limitation /
- resolution
-Message-ID: <20150810185705.GX30479@wotan.suse.de>
-References: <1438200556-13842-1-git-send-email-mcgrof@do-not-panic.com>
- <1438775840.30717.46.camel@tiscali.nl>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1438775840.30717.46.camel@tiscali.nl>
+Received: from mail-lb0-f193.google.com ([209.85.217.193]:36153 "EHLO
+	mail-lb0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933309AbbHJWXJ (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 10 Aug 2015 18:23:09 -0400
+From: Andrey Ryabinin <ryabinin.a.a@gmail.com>
+Subject: [PATCH v5 5/6] arm64: add KASAN support
+Date: Tue, 11 Aug 2015 05:18:18 +0300
+Message-Id: <1439259499-13913-6-git-send-email-ryabinin.a.a@gmail.com>
+In-Reply-To: <1439259499-13913-1-git-send-email-ryabinin.a.a@gmail.com>
+References: <1439259499-13913-1-git-send-email-ryabinin.a.a@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Paul Bolle <pebolle@tiscali.nl>
-Cc: "Luis R. Rodriguez" <mcgrof@do-not-panic.com>, mmarek@suse.com, josh@joshtriplett.org, jbottomley@odin.com, geert@linux-m68k.org, herbert@gondor.apana.org.au, tiwai@suse.de, corbet@lwn.net, linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, roberto@dicosmo.org, zack@upsilon.cc
+To: Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org
+Cc: Andrey Ryabinin <ryabinin.a.a@gmail.com>, Arnd Bergmann <arnd@arndb.de>, Linus Walleij <linus.walleij@linaro.org>, David Keitel <dkeitel@codeaurora.org>, Alexander Potapenko <glider@google.com>, Andrew Morton <akpm@linux-foundation.org>, Dmitry Vyukov <dvyukov@google.com>, linux-mm@kvack.org, linux-kernel@vger.kernel.org, Alexey Klimov <klimov.linux@gmail.com>, Yury <yury.norov@gmail.com>, "Aneesh Kumar K.V" <aneesh.kumar@linux.vnet.ibm.com>, Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org
 
-On Wed, Aug 05, 2015 at 01:57:20PM +0200, Paul Bolle wrote:
-> > --- a/Documentation/kbuild/kconfig-language.txt
-> > +++ b/Documentation/kbuild/kconfig-language.txt
-> > @@ -393,3 +393,25 @@ config FOO
-> >  	depends on BAR && m
-> >  
-> >  limits FOO to module (=m) or disabled (=n).
-> > +
-> > +Kconfig recursive dependency limitations
-> > +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> > +
-> > +If you've hit the Kconfig error: "recursive dependency detected" you've run
-> > +into a recursive dependency issue with Kconfig. Kconfig does not do recursive
-> > +dependency resolution,
-> 
-> (True. But what could Kconfig do other than note that a chain of
-> select's and depend on's makes it run in circles? See below.)
+This patch adds arch specific code for kernel address sanitizer
+(see Documentation/kasan.txt).
 
-That's the purpose of the documentation. To annotate as TODO to
-hopefuly enthusiastic kconfig developers what would need to be
-looked into, some small reference material, and obviously something
-for the lazy driver developer who just wants to fix the problem within
-what has been discussed and accepted.
+1/8 of kernel addresses reserved for shadow memory. There was no
+big enough hole for this, so virtual addresses for shadow were
+stolen from vmalloc area.
 
-> >  this has a few implications for Kconfig file writers. In
-> > +practice it means that for instance if a driver A selects a few kconfig symbols
-> > +another driver B which selects any of these symbols cannot negate any of the
-> > +symbols the driver A selected.
-> 
-> I'm afraid I don't follow this.
+At early boot stage the whole shadow region populated with just
+one physical page (kasan_zero_page). Later, this page reused
+as readonly zero shadow for some memory that KASan currently
+don't track (vmalloc).
+After mapping the physical memory, pages for shadow memory are
+allocated and mapped.
 
-You're right this could use a bit more lengthy description. Can you help?
-How about:
+Functions like memset/memmove/memcpy do a lot of memory accesses.
+If bad pointer passed to one of these function it is important
+to catch this. Compiler's instrumentation cannot do this since
+these functions are written in assembly.
+KASan replaces memory functions with manually instrumented variants.
+Original functions declared as weak symbols so strong definitions
+in mm/kasan/kasan.c could replace them. Original functions have aliases
+with '__' prefix in name, so we could call non-instrumented variant
+if needed.
+Some files built without kasan instrumentation (e.g. mm/slub.c).
+Original mem* function replaced (via #define) with prefixed variants
+to disable memory access checks for such files.
 
-If a driver A selects a series of features, and driver B selects its own set of
-features, if both have a common selected feature, they then cannot negate each
-other's features. This means that we have an ongoing lump sum of intersection
-of features and this is always the largest collection of features.
+Signed-off-by: Andrey Ryabinin <ryabinin.a.a@gmail.com>
+Tested-by: Linus Walleij <linus.walleij@linaro.org>
+---
+ arch/arm64/Kconfig               |   1 +
+ arch/arm64/Makefile              |   7 ++
+ arch/arm64/include/asm/kasan.h   |  36 +++++++++
+ arch/arm64/include/asm/pgtable.h |   7 ++
+ arch/arm64/include/asm/string.h  |  16 ++++
+ arch/arm64/kernel/arm64ksyms.c   |   3 +
+ arch/arm64/kernel/head.S         |   3 +
+ arch/arm64/kernel/module.c       |  16 +++-
+ arch/arm64/kernel/setup.c        |   2 +
+ arch/arm64/lib/memcpy.S          |   3 +
+ arch/arm64/lib/memmove.S         |   7 +-
+ arch/arm64/lib/memset.S          |   3 +
+ arch/arm64/mm/Makefile           |   3 +
+ arch/arm64/mm/kasan_init.c       | 165 +++++++++++++++++++++++++++++++++++++++
+ scripts/Makefile.kasan           |   4 +-
+ 15 files changed, 270 insertions(+), 6 deletions(-)
+ create mode 100644 arch/arm64/include/asm/kasan.h
+ create mode 100644 arch/arm64/mm/kasan_init.c
 
-I gave an example for you a while ago, below I provide it again to explain.
-I will note you provided your own other example, I still like and prefer mine.
-They're both similar, thought. We could perhaps combine? The shorter the
-better.
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index 318175f..b4a379e 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -46,6 +46,7 @@ config ARM64
+ 	select HAVE_ARCH_AUDITSYSCALL
+ 	select HAVE_ARCH_BITREVERSE
+ 	select HAVE_ARCH_JUMP_LABEL
++	select HAVE_ARCH_KASAN if SPARSEMEM_VMEMMAP
+ 	select HAVE_ARCH_KGDB
+ 	select HAVE_ARCH_SECCOMP_FILTER
+ 	select HAVE_ARCH_TRACEHOOK
+diff --git a/arch/arm64/Makefile b/arch/arm64/Makefile
+index 4d2a925..4cd8ea7 100644
+--- a/arch/arm64/Makefile
++++ b/arch/arm64/Makefile
+@@ -40,6 +40,13 @@ else
+ TEXT_OFFSET := 0x00080000
+ endif
+ 
++# KASAN_SHADOW_OFFSET = VA_START + (1 << (VA_BITS - 3)) - (1 << 61)
++# in 32-bit arithmetic
++KASAN_SHADOW_OFFSET := $(shell printf "0x%08x00000000\n" $$(( \
++			(0xffffffff & (-1 << ($(CONFIG_ARM64_VA_BITS) - 32))) \
++			+ (1 << ($(CONFIG_ARM64_VA_BITS) - 32 - 3)) \
++			- (1 << (64 - 32 - 3)) )) )
++
+ export	TEXT_OFFSET GZFLAGS
+ 
+ core-y		+= arch/arm64/kernel/ arch/arm64/mm/
+diff --git a/arch/arm64/include/asm/kasan.h b/arch/arm64/include/asm/kasan.h
+new file mode 100644
+index 0000000..71dfe14
+--- /dev/null
++++ b/arch/arm64/include/asm/kasan.h
+@@ -0,0 +1,36 @@
++#ifndef __ASM_KASAN_H
++#define __ASM_KASAN_H
++
++#ifndef __ASSEMBLY__
++
++#ifdef CONFIG_KASAN
++
++#include <asm/memory.h>
++
++/*
++ * KASAN_SHADOW_START: beginning of the kernel virtual addresses.
++ * KASAN_SHADOW_END: KASAN_SHADOW_START + 1/8 of kernel virtual addresses.
++ */
++#define KASAN_SHADOW_START      (VA_START)
++#define KASAN_SHADOW_END        (KASAN_SHADOW_START + (1UL << (VA_BITS - 3)))
++
++/*
++ * This value is used to map an address to the corresponding shadow
++ * address by the following formula:
++ *     shadow_addr = (address >> 3) + KASAN_SHADOW_OFFSET;
++ *
++ * (1 << 61) shadow addresses - [KASAN_SHADOW_OFFSET,KASAN_SHADOW_END]
++ * cover all 64-bits of virtual addresses. So KASAN_SHADOW_OFFSET
++ * should satisfy the following equation:
++ *      KASAN_SHADOW_OFFSET = KASAN_SHADOW_END - (1ULL << 61)
++ */
++#define KASAN_SHADOW_OFFSET     (KASAN_SHADOW_END - (1ULL << (64 - 3)))
++
++void kasan_init(void);
++
++#else
++static inline void kasan_init(void) { }
++#endif
++
++#endif
++#endif
+diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
+index a1f9f61..a071da4 100644
+--- a/arch/arm64/include/asm/pgtable.h
++++ b/arch/arm64/include/asm/pgtable.h
+@@ -40,7 +40,14 @@
+  *	fixed mappings and modules
+  */
+ #define VMEMMAP_SIZE		ALIGN((1UL << (VA_BITS - PAGE_SHIFT)) * sizeof(struct page), PUD_SIZE)
++
++#ifndef CONFIG_KASAN
+ #define VMALLOC_START		(VA_START)
++#else
++#include <asm/kasan.h>
++#define VMALLOC_START		(KASAN_SHADOW_END + SZ_64K)
++#endif
++
+ #define VMALLOC_END		(PAGE_OFFSET - PUD_SIZE - VMEMMAP_SIZE - SZ_64K)
+ 
+ #define vmemmap			((struct page *)(VMALLOC_END + SZ_64K))
+diff --git a/arch/arm64/include/asm/string.h b/arch/arm64/include/asm/string.h
+index 64d2d48..2eb714c 100644
+--- a/arch/arm64/include/asm/string.h
++++ b/arch/arm64/include/asm/string.h
+@@ -36,17 +36,33 @@ extern __kernel_size_t strnlen(const char *, __kernel_size_t);
+ 
+ #define __HAVE_ARCH_MEMCPY
+ extern void *memcpy(void *, const void *, __kernel_size_t);
++extern void *__memcpy(void *, const void *, __kernel_size_t);
+ 
+ #define __HAVE_ARCH_MEMMOVE
+ extern void *memmove(void *, const void *, __kernel_size_t);
++extern void *__memmove(void *, const void *, __kernel_size_t);
+ 
+ #define __HAVE_ARCH_MEMCHR
+ extern void *memchr(const void *, int, __kernel_size_t);
+ 
+ #define __HAVE_ARCH_MEMSET
+ extern void *memset(void *, int, __kernel_size_t);
++extern void *__memset(void *, int, __kernel_size_t);
+ 
+ #define __HAVE_ARCH_MEMCMP
+ extern int memcmp(const void *, const void *, size_t);
+ 
++
++#if defined(CONFIG_KASAN) && !defined(__SANITIZE_ADDRESS__)
++
++/*
++ * For files that are not instrumented (e.g. mm/slub.c) we
++ * should use not instrumented version of mem* functions.
++ */
++
++#define memcpy(dst, src, len) __memcpy(dst, src, len)
++#define memmove(dst, src, len) __memmove(dst, src, len)
++#define memset(s, c, n) __memset(s, c, n)
++#endif
++
+ #endif
+diff --git a/arch/arm64/kernel/arm64ksyms.c b/arch/arm64/kernel/arm64ksyms.c
+index a85843d..3b6d8cc 100644
+--- a/arch/arm64/kernel/arm64ksyms.c
++++ b/arch/arm64/kernel/arm64ksyms.c
+@@ -51,6 +51,9 @@ EXPORT_SYMBOL(strnlen);
+ EXPORT_SYMBOL(memset);
+ EXPORT_SYMBOL(memcpy);
+ EXPORT_SYMBOL(memmove);
++EXPORT_SYMBOL(__memset);
++EXPORT_SYMBOL(__memcpy);
++EXPORT_SYMBOL(__memmove);
+ EXPORT_SYMBOL(memchr);
+ EXPORT_SYMBOL(memcmp);
+ 
+diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
+index c0ff3ce..945bd6d 100644
+--- a/arch/arm64/kernel/head.S
++++ b/arch/arm64/kernel/head.S
+@@ -449,6 +449,9 @@ __mmap_switched:
+ 	str_l	x21, __fdt_pointer, x5		// Save FDT pointer
+ 	str_l	x24, memstart_addr, x6		// Save PHYS_OFFSET
+ 	mov	x29, #0
++#ifdef CONFIG_KASAN
++	bl	kasan_early_init
++#endif
+ 	b	start_kernel
+ ENDPROC(__mmap_switched)
+ 
+diff --git a/arch/arm64/kernel/module.c b/arch/arm64/kernel/module.c
+index 67bf410..7d90c0f 100644
+--- a/arch/arm64/kernel/module.c
++++ b/arch/arm64/kernel/module.c
+@@ -21,6 +21,7 @@
+ #include <linux/bitops.h>
+ #include <linux/elf.h>
+ #include <linux/gfp.h>
++#include <linux/kasan.h>
+ #include <linux/kernel.h>
+ #include <linux/mm.h>
+ #include <linux/moduleloader.h>
+@@ -34,9 +35,18 @@
+ 
+ void *module_alloc(unsigned long size)
+ {
+-	return __vmalloc_node_range(size, 1, MODULES_VADDR, MODULES_END,
+-				    GFP_KERNEL, PAGE_KERNEL_EXEC, 0,
+-				    NUMA_NO_NODE, __builtin_return_address(0));
++	void *p;
++
++	p = __vmalloc_node_range(size, MODULE_ALIGN, MODULES_VADDR, MODULES_END,
++				GFP_KERNEL, PAGE_KERNEL_EXEC, 0,
++				NUMA_NO_NODE, __builtin_return_address(0));
++
++	if (p && (kasan_module_alloc(p, size) < 0)) {
++		vfree(p);
++		return NULL;
++	}
++
++	return p;
+ }
+ 
+ enum aarch64_reloc_op {
+diff --git a/arch/arm64/kernel/setup.c b/arch/arm64/kernel/setup.c
+index f3067d4..bf82ab8 100644
+--- a/arch/arm64/kernel/setup.c
++++ b/arch/arm64/kernel/setup.c
+@@ -54,6 +54,7 @@
+ #include <asm/elf.h>
+ #include <asm/cpufeature.h>
+ #include <asm/cpu_ops.h>
++#include <asm/kasan.h>
+ #include <asm/sections.h>
+ #include <asm/setup.h>
+ #include <asm/smp_plat.h>
+@@ -392,6 +393,7 @@ void __init setup_arch(char **cmdline_p)
+ 	acpi_boot_table_init();
+ 
+ 	paging_init();
++	kasan_init();
+ 	request_standard_resources();
+ 
+ 	early_ioremap_reset();
+diff --git a/arch/arm64/lib/memcpy.S b/arch/arm64/lib/memcpy.S
+index 8a9a96d..42cc4b7 100644
+--- a/arch/arm64/lib/memcpy.S
++++ b/arch/arm64/lib/memcpy.S
+@@ -56,6 +56,8 @@ C_h	.req	x12
+ D_l	.req	x13
+ D_h	.req	x14
+ 
++	.weak memcpy
++ENTRY(__memcpy)
+ ENTRY(memcpy)
+ 	mov	dst, dstin
+ 	cmp	count, #16
+@@ -199,3 +201,4 @@ ENTRY(memcpy)
+ 	b.ne	.Ltail63
+ 	ret
+ ENDPROC(memcpy)
++ENDPROC(__memcpy)
+diff --git a/arch/arm64/lib/memmove.S b/arch/arm64/lib/memmove.S
+index 57b19ea..8819433 100644
+--- a/arch/arm64/lib/memmove.S
++++ b/arch/arm64/lib/memmove.S
+@@ -57,12 +57,14 @@ C_h	.req	x12
+ D_l	.req	x13
+ D_h	.req	x14
+ 
++	.weak memmove
++ENTRY(__memmove)
+ ENTRY(memmove)
+ 	cmp	dstin, src
+-	b.lo	memcpy
++	b.lo	__memcpy
+ 	add	tmp1, src, count
+ 	cmp	dstin, tmp1
+-	b.hs	memcpy		/* No overlap.  */
++	b.hs	__memcpy		/* No overlap.  */
+ 
+ 	add	dst, dstin, count
+ 	add	src, src, count
+@@ -195,3 +197,4 @@ ENTRY(memmove)
+ 	b.ne	.Ltail63
+ 	ret
+ ENDPROC(memmove)
++ENDPROC(__memmove)
+diff --git a/arch/arm64/lib/memset.S b/arch/arm64/lib/memset.S
+index 7c72dfd..edc0e7d 100644
+--- a/arch/arm64/lib/memset.S
++++ b/arch/arm64/lib/memset.S
+@@ -54,6 +54,8 @@ dst		.req	x8
+ tmp3w		.req	w9
+ tmp3		.req	x9
+ 
++	.weak memset
++ENTRY(__memset)
+ ENTRY(memset)
+ 	mov	dst, dstin	/* Preserve return value.  */
+ 	and	A_lw, val, #255
+@@ -214,3 +216,4 @@ ENTRY(memset)
+ 	b.ne	.Ltail_maybe_long
+ 	ret
+ ENDPROC(memset)
++ENDPROC(__memset)
+diff --git a/arch/arm64/mm/Makefile b/arch/arm64/mm/Makefile
+index 773d37a..57f57fd 100644
+--- a/arch/arm64/mm/Makefile
++++ b/arch/arm64/mm/Makefile
+@@ -4,3 +4,6 @@ obj-y				:= dma-mapping.o extable.o fault.o init.o \
+ 				   context.o proc.o pageattr.o
+ obj-$(CONFIG_HUGETLB_PAGE)	+= hugetlbpage.o
+ obj-$(CONFIG_ARM64_PTDUMP)	+= dump.o
++
++obj-$(CONFIG_KASAN)		+= kasan_init.o
++KASAN_SANITIZE_kasan_init.o	:= n
+diff --git a/arch/arm64/mm/kasan_init.c b/arch/arm64/mm/kasan_init.c
+new file mode 100644
+index 0000000..3cf1d89
+--- /dev/null
++++ b/arch/arm64/mm/kasan_init.c
+@@ -0,0 +1,165 @@
++/*
++ * This file contains kasan initialization code for ARM64.
++ *
++ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
++ * Author: Andrey Ryabinin <ryabinin.a.a@gmail.com>
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ *
++ */
++
++#define pr_fmt(fmt) "kasan: " fmt
++#include <linux/kasan.h>
++#include <linux/kernel.h>
++#include <linux/memblock.h>
++#include <linux/start_kernel.h>
++
++#include <asm/page.h>
++#include <asm/pgalloc.h>
++#include <asm/pgtable.h>
++#include <asm/tlbflush.h>
++
++static pgd_t tmp_pg_dir[PTRS_PER_PGD] __initdata __aligned(PGD_SIZE);
++
++static void __init kasan_early_pte_populate(pmd_t *pmd, unsigned long addr,
++					unsigned long end)
++{
++	pte_t *pte;
++	unsigned long next;
++
++	if (pmd_none(*pmd))
++		pmd_populate_kernel(&init_mm, pmd, kasan_zero_pte);
++
++	pte = pte_offset_kernel(pmd, addr);
++	do {
++		next = addr + PAGE_SIZE;
++		set_pte(pte, pfn_pte(virt_to_pfn(kasan_zero_page),
++					PAGE_KERNEL));
++	} while (pte++, addr = next, addr != end && pte_none(*pte));
++}
++
++static void __init kasan_early_pmd_populate(pud_t *pud,
++					unsigned long addr,
++					unsigned long end)
++{
++	pmd_t *pmd;
++	unsigned long next;
++
++	if (pud_none(*pud))
++		pud_populate(&init_mm, pud, kasan_zero_pmd);
++
++	pmd = pmd_offset(pud, addr);
++	do {
++		next = pmd_addr_end(addr, end);
++		kasan_early_pte_populate(pmd, addr, next);
++	} while (pmd++, addr = next, addr != end && pmd_none(*pmd));
++}
++
++static void __init kasan_early_pud_populate(pgd_t *pgd,
++					unsigned long addr,
++					unsigned long end)
++{
++	pud_t *pud;
++	unsigned long next;
++
++	if (pgd_none(*pgd))
++		pgd_populate(&init_mm, pgd, kasan_zero_pud);
++
++	pud = pud_offset(pgd, addr);
++	do {
++		next = pud_addr_end(addr, end);
++		kasan_early_pmd_populate(pud, addr, next);
++	} while (pud++, addr = next, addr != end && pud_none(*pud));
++}
++
++static void __init kasan_map_early_shadow(void)
++{
++	unsigned long addr = KASAN_SHADOW_START;
++	unsigned long end = KASAN_SHADOW_END;
++	unsigned long next;
++	pgd_t *pgd;
++
++	pgd = pgd_offset_k(addr);
++	do {
++		next = pgd_addr_end(addr, end);
++		kasan_early_pud_populate(pgd, addr, next);
++	} while (pgd++, addr = next, addr != end);
++}
++
++void __init kasan_early_init(void)
++{
++	BUILD_BUG_ON(KASAN_SHADOW_OFFSET != KASAN_SHADOW_END - (1UL << 61));
++	BUILD_BUG_ON(!IS_ALIGNED(KASAN_SHADOW_START, PGDIR_SIZE));
++	BUILD_BUG_ON(!IS_ALIGNED(KASAN_SHADOW_END, PGDIR_SIZE));
++	kasan_map_early_shadow();
++}
++
++static void __init clear_pgds(unsigned long start,
++			unsigned long end)
++{
++	/*
++	 * Remove references to kasan page tables from
++	 * swapper_pg_dir. pgd_clear() can't be used
++	 * here because it's nop on 2,3-level pagetable setups
++	 */
++	for (; start < end; start += PGDIR_SIZE)
++		set_pgd(pgd_offset_k(start), __pgd(0));
++}
++
++static void __init cpu_set_ttbr1(unsigned long ttbr1)
++{
++	asm(
++	"	msr	ttbr1_el1, %0\n"
++	"	isb"
++	:
++	: "r" (ttbr1));
++}
++
++void __init kasan_init(void)
++{
++	struct memblock_region *reg;
++
++	/*
++	 * We are going to perform proper setup of shadow memory.
++	 * At first we should unmap early shadow (clear_pgds() call bellow).
++	 * However, instrumented code couldn't execute without shadow memory.
++	 * tmp_pg_dir used to keep early shadow mapped until full shadow
++	 * setup will be finished.
++	 */
++	memcpy(tmp_pg_dir, swapper_pg_dir, sizeof(tmp_pg_dir));
++	cpu_set_ttbr1(__pa(tmp_pg_dir));
++	flush_tlb_all();
++
++	clear_pgds(KASAN_SHADOW_START, KASAN_SHADOW_END);
++
++	kasan_populate_zero_shadow((void *)KASAN_SHADOW_START,
++			kasan_mem_to_shadow((void *)MODULES_VADDR));
++
++	for_each_memblock(memory, reg) {
++		void *start = (void *)__phys_to_virt(reg->base);
++		void *end = (void *)__phys_to_virt(reg->base + reg->size);
++
++		if (start >= end)
++			break;
++
++		/*
++		 * end + 1 here is intentional. We check several shadow bytes in
++		 * advance to slightly speed up fastpath. In some rare cases
++		 * we could cross boundary of mapped shadow, so we just map
++		 * some more here.
++		 */
++		vmemmap_populate((unsigned long)kasan_mem_to_shadow(start),
++				(unsigned long)kasan_mem_to_shadow(end) + 1,
++				pfn_to_nid(virt_to_pfn(start)));
++	}
++
++	memset(kasan_zero_page, 0, PAGE_SIZE);
++	cpu_set_ttbr1(__pa(swapper_pg_dir));
++	flush_tlb_all();
++
++	/* At this point kasan is fully initialized. Enable error messages */
++	init_task.kasan_depth = 0;
++	pr_info("Kernel address sanitizer initialized\n");
++}
+diff --git a/scripts/Makefile.kasan b/scripts/Makefile.kasan
+index 3f874d2..37323b0 100644
+--- a/scripts/Makefile.kasan
++++ b/scripts/Makefile.kasan
+@@ -5,10 +5,12 @@ else
+ 	call_threshold := 0
+ endif
+ 
++KASAN_SHADOW_OFFSET ?= $(CONFIG_KASAN_SHADOW_OFFSET)
++
+ CFLAGS_KASAN_MINIMAL := -fsanitize=kernel-address
+ 
+ CFLAGS_KASAN := $(call cc-option, -fsanitize=kernel-address \
+-		-fasan-shadow-offset=$(CONFIG_KASAN_SHADOW_OFFSET) \
++		-fasan-shadow-offset=$(KASAN_SHADOW_OFFSET) \
+ 		--param asan-stack=1 --param asan-globals=1 \
+ 		--param asan-instrumentation-with-call-threshold=$(call_threshold))
+ 
+-- 
+2.4.6
 
-Example extracted from: http://lkml.kernel.org/r/20150507182838.GA20018@wotan.suse.de
--------------------------------------------------------------------------------
-Let's say rock climbers hate locker rooms, but swimmer need them. We can
-then have:
-
-config GYM
-        tristate
-        default n
-
-config LOCKER
-        tristate
-        default n
-        depends on GYM
-
-config SWIMMING
-        tristate
-        default n
-        select GYM
-        select LOCKER
-
-config ROCK_CLIMBING
-        tristate
-        default n
-        depends on !LOCKER
-        select GYM
-
-Kbuild seems to believe that because swimmers need lockers that rock climbers
-need them too. That is obviously not true.
-
-mcgrof@ergon ~/linux-next (git::your-swimming-dad)$ make allnoconfig
-scripts/kconfig/conf --allnoconfig Kconfig
-drivers/crypto/qat/Kconfig:25:error: recursive dependency detected!
-drivers/crypto/qat/Kconfig:25:  symbol GYM is selected by ROCK_CLIMBING
-drivers/crypto/qat/Kconfig:40:  symbol ROCK_CLIMBING depends on LOCKER
-drivers/crypto/qat/Kconfig:29:  symbol LOCKER depends on GYM
-#
-# configuration written to .config
--------------------------------------------------------------------------------
-
-> > +who run into this type of recursive dependency issue have two diverging
-> > +options:
-> > +
-> > +  a) Either swap all "select FOO" to "depends on FOO" or,
-> 
-> all? "one or more" perhaps.
-
-No I mean all, so in the above example the solution would be to switch
-all select GYM to depends on GYM. One concrete example here was the
-firmware issue with crypto stuff I was trying to add, ie firmware signing,
-and a conflict with a driver I had. One option was to change all "select FW_LOADER"
-to "depends on FW_LOADER" but since that was redundant given FW_LOADER is prevalent
-my original proposed patch was to just remove all FW_LOADER selects [0]. Since
-this was a lot of churn, I decided to go with option documented b) below.
-
-[0] http://lkml.kernel.org/r/1432241149-8762-1-git-send-email-mcgrof@do-not-panic.com
-
-> > +  b) Change the offending "depends on FOO" to "select FOO"
-> 
-> "the offending"? We're looking at a circle. So maybe:
->     Change one or more "depends on BAR" to "select BAR"   
-
-The conflict would come up with *new* code so what I mean by
-offending is to change the incoming code's use of "depends on"
-to "select BAR".
-
-> Which are both variations on a theme: stop running in circles. See below
-> for a (too?) small sample of 22 solutions I could easily find in git's
-> log. Swapping one or more select's with depend on's was done in two
-> thirds of these solutions.
-
-It may help to document this is the preferrred solution. This was the same
-option I went with as well.
-
-> > +Kconfig's limitations can be addressed by implementing a SAT solver for it,
-> 
-> Unlike Josh, I'm not familiar with SAT solvers, so it's hard to comment
-> on this.
-> 
-> But given the two building blocks involved:
->     depends on
->     select
-> 
-> it's clear you can make Kconfig run in circles. (Using only blocks of
-> one of those types could do that too. Kconfig uses both building blocks.
-> And in practice we always see blocks of both types involved when we make
-> Kconfig run in circles.)
-> 
-> What would a SAT solver do once it makes the obvious observation that
-> certain combinations of these two building blocks are circular?
-
-I think that's outside of the scope of the required documentation but
-leave it to Josh or James to chime in if they wish.
-
-> > +but until then, Kconfig is limitted to require developers to use one of
-> > +the above two mechanisms to address recursive dependency issues. For more
-> > +details you can refer to this thread and discussion:
-> > +
-> > +http://lkml.kernel.org/r/1432241149-8762-1-git-send-email-mcgrof@do-not-panic.com
-> 
-> > --- a/scripts/kconfig/symbol.c
-> > +++ b/scripts/kconfig/symbol.c
-> > @@ -1117,6 +1117,8 @@ static void sym_check_print_recursive(struct
-> 
-> > +			fprintf(stderr, "For a resolution refer to Documentation/kbuild/kconfig-language.txt\n");
-> > +			fprintf(stderr, "section \"Kconfig recursive dependency limitations\"\n");
-> 
-> Nit: subsection.
-
-Will change thanks.
-
-> Sorry for being so verbose. And thanks for doing this!
-> 
-> 
-> Paul Bolle
-> 
-> 
-> sample of solutions for recursive dependency errors
-> ===================================================
-> 
-> 21 commits contain the quote "recursive dependency detected". They
-> contain 22 fixes for 21 errors. (One error was solved twice. One commit
-> contained two fixes.)
-> 
-> All errors appear to involve one or more select's and one or more depend
-> on's.
-> 
-> commit		fix
-> ======  	===
-> 06b718c01208	select A -> depends on A
-> c22eacfe82f9	depends on A -> depends on B
-> 6a91e854442c	select A -> depends on A
-> 118c565a8f2e	select A -> select B
-> f004e5594705	select A -> depends on A
-> c7861f37b4c6	depends on A -> (null)
-> 80c69915e5fb	select A -> (null)		(1)
-> c2218e26c0d0	select A -> depends on A	(1)
-> d6ae99d04e1c	select A -> depends on A
-> 95ca19cf8cbf	select A -> depends on A
-> 8f057d7bca54	depends on A -> (null)
-> 8f057d7bca54	depends on A -> select A
-> a0701f04846e	select A -> depends on A
-> 0c8b92f7f259	depends on A -> (null)
-> e4e9e0540928	select A -> depends on A	(2)
-> 7453ea886e87	depends on A > (null)		(1)
-> 7b1fff7e4fdf	select A -> depends on A
-> 86c747d2a4f0	select A -> depends on A
-> d9f9ab51e55e	select A -> depends on A
-> 0c51a4d8abd6	depends on A -> select A	(3)
-> e98062ed6dc4	select A -> depends on A	(3)
-> 91e5d284a7f1	select A -> (null)     
-> 
-> 
-> (1) Partial (or no) quote of error.
-> (2) That seems to be the gist of that fix.
-> (3) Same error.
-
-Maybe I'll tack this on.
-
-  Luis
