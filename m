@@ -1,54 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mailout2.w1.samsung.com ([210.118.77.12]:16471 "EHLO
-	mailout2.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753903AbbHNKwV (ORCPT
+Received: from mail-yk0-f180.google.com ([209.85.160.180]:34725 "EHLO
+	mail-yk0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751936AbbHNVWL (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 14 Aug 2015 06:52:21 -0400
-Received: from eucpsbgm1.samsung.com (unknown [203.254.199.244])
- by mailout2.w1.samsung.com
- (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May  5 2014))
- with ESMTP id <0NT200275JJ64S80@mailout2.w1.samsung.com> for
- linux-kbuild@vger.kernel.org; Fri, 14 Aug 2015 11:52:18 +0100 (BST)
-From: Pavel Fedin <p.fedin@samsung.com>
-Subject: [PATCH TRIVIAL v2] Avoid conflict with host definitions when
- cross-compiling
-Date: Fri, 14 Aug 2015 13:52:13 +0300
-Message-id: <1439549533-8716-1-git-send-email-p.fedin@samsung.com>
+	Fri, 14 Aug 2015 17:22:11 -0400
+MIME-Version: 1.0
+In-Reply-To: <1439287646.9747.212.camel@citrix.com>
+References: <1438618000-1091-1-git-send-email-ian.campbell@citrix.com> <1439287646.9747.212.camel@citrix.com>
+From: Rob Herring <robherring2@gmail.com>
+Date: Fri, 14 Aug 2015 16:21:51 -0500
+Message-ID: <CAL_JsqKv2aOEM-U7JNZnaHomA6HFBSFhSLZ-zhp7c20s6gQBaQ@mail.gmail.com>
+Subject: Re: [PATCH v5] dtb: Create a common home for cross-architecture dtsi files.
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: trivial@kernel.org, mmarek@suse.com
+To: Ian Campbell <ian.campbell@citrix.com>, "arm@kernel.org" <arm@kernel.org>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Rob Herring <robh+dt@kernel.org>, Pawel Moll <pawel.moll@arm.com>, Mark Rutland <mark.rutland@arm.com>, Kumar Gala <galak@codeaurora.org>, Liviu Dudau <liviu.dudau@arm.com>, Sudeep Holla <sudeep.holla@arm.com>, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Russell King <linux@arm.linux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, Kevin Hilman <khilman@linaro.org>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-Certain platforms (e. g. BSD-based ones) define some ELF constants
-according to host. This patch fixes problems with cross-building
-Linux kernel on these platforms (e. g. building ARM 32-bit version
-on x86-64 host).
++arm-soc
 
-Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
----
-v1 => v2
-- Replaced "Cygwin" with "BSD-alike OS-es"
----
- scripts/mod/modpost.h | 6 ++++++
- 1 file changed, 6 insertions(+)
+On Tue, Aug 11, 2015 at 5:07 AM, Ian Campbell <ian.campbell@citrix.com> wrote:
+> On Mon, 2015-08-03 at 17:06 +0100, Ian Campbell wrote:
+>> Commit 9ccd608070b6 ("arm64: dts: add device tree for ARM SMM-A53x2 on
+>> LogicTile Express 20MG") added a new dts file to arch/arm64 which
+>> included "../../../../arm/boot/dts/vexpress-v2m-rs1.dtsi", i.e. a
+>> .dtsi supplied by arch/arm.
+>>
+>> Unfortunately this causes some issues for the split device tree
+>> repository[0], since things get moved around there. In that context
+>> the new .dts ends up at src/arm64/arm/vexpress-v2f-1xv7-ca53x2.dts
+>> while the include is at src/arm/vexpress-v2m-rs1.dtsi.
+>
+> Hi Grant,
+>
+> Do you think there is any chance of getting this into 4.2-rc$NEXT or shall
+> we wait until 4.3? I'm assuming this should go via the DT tree, but maybe
+> it should go via an ARM tree?
 
-diff --git a/scripts/mod/modpost.h b/scripts/mod/modpost.h
-index 168b43d..6a5e151 100644
---- a/scripts/mod/modpost.h
-+++ b/scripts/mod/modpost.h
-@@ -11,6 +11,12 @@
- 
- #include "elfconfig.h"
- 
-+/* On BSD-alike OSes elf.h defines these according to host's word size */
-+#undef ELF_ST_BIND
-+#undef ELF_ST_TYPE
-+#undef ELF_R_SYM
-+#undef ELF_R_TYPE
-+
- #if KERNEL_ELFCLASS == ELFCLASS32
- 
- #define Elf_Ehdr    Elf32_Ehdr
--- 
-2.4.4
+I was assuming this would go thru the arm-soc tree which is why I
+acked it. It is getting a bit late for 4.2 at this point, but I guess
+the standalone tree remains broken for these platforms until this is
+done. Probably not such a big deal in grand scheme of things.
 
+Rob
