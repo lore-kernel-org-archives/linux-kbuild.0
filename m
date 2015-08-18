@@ -1,68 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp02.citrix.com ([66.165.176.63]:26686 "EHLO
-	SMTP02.CITRIX.COM" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751040AbbHPJBT (ORCPT
+Received: from pandora.arm.linux.org.uk ([78.32.30.218]:38986 "EHLO
+	pandora.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751344AbbHRKpM (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 16 Aug 2015 05:01:19 -0400
-Message-ID: <1439715671.3480.21.camel@citrix.com>
-Subject: Re: [PATCH v5] dtb: Create a common home for cross-architecture
- dtsi files.
-From: Ian Campbell <ian.campbell@citrix.com>
-Date: Sun, 16 Aug 2015 10:01:11 +0100
-In-Reply-To: <CAL_JsqKv2aOEM-U7JNZnaHomA6HFBSFhSLZ-zhp7c20s6gQBaQ@mail.gmail.com>
-References: <1438618000-1091-1-git-send-email-ian.campbell@citrix.com>
-	 <1439287646.9747.212.camel@citrix.com>
-	 <CAL_JsqKv2aOEM-U7JNZnaHomA6HFBSFhSLZ-zhp7c20s6gQBaQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+	Tue, 18 Aug 2015 06:45:12 -0400
+Date: Tue, 18 Aug 2015 11:44:58 +0100
+From: Russell King - ARM Linux <linux@arm.linux.org.uk>
+Subject: Re: [PATCH v2] ARM: add boot image dependencies to not generate
+ invalid images
+Message-ID: <20150818104458.GO7557@n2100.arm.linux.org.uk>
+References: <1439049211-4181-1-git-send-email-yamada.masahiro@socionext.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1439049211-4181-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rob Herring <robherring2@gmail.com>, "arm@kernel.org" <arm@kernel.org>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Rob Herring <robh+dt@kernel.org>, Pawel Moll <pawel.moll@arm.com>, Mark Rutland <mark.rutland@arm.com>, Kumar Gala <galak@codeaurora.org>, Liviu Dudau <liviu.dudau@arm.com>, Sudeep Holla <sudeep.holla@arm.com>, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Russell King <linux@arm.linux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, Kevin Hilman <khilman@linaro.org>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-arm-kernel@lists.infradead.org, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Fri, 2015-08-14 at 16:21 -0500, Rob Herring wrote:
-> +arm-soc
+On Sun, Aug 09, 2015 at 12:53:31AM +0900, Masahiro Yamada wrote:
+> U-Boot is often used to boot the kernel on ARM boards, but uImage
+> is not built by "make all", so we are often inclined to do
+> "make all uImage" to generate DTBs, modules and uImage in a single
+> command, but we should notice a pitfall behind it.  In fact,
+> "make all uImage" could generate an invalid uImage if it is run with
+> the parallel option (-j).
 
-I could've sworn I did the same at one point. Obviously not.
+Please put this patch in the patch system.  Thanks.
 
-> 
-> On Tue, Aug 11, 2015 at 5:07 AM, Ian Campbell <
-> ian.campbell@citrix.com> wrote:
-> > On Mon, 2015-08-03 at 17:06 +0100, Ian Campbell wrote:
-> > > Commit 9ccd608070b6 ("arm64: dts: add device tree for ARM SMM
-> > > -A53x2 on
-> > > LogicTile Express 20MG") added a new dts file to arch/arm64 which
-> > > included "../../../../arm/boot/dts/vexpress-v2m-rs1.dtsi", i.e. a
-> > > .dtsi supplied by arch/arm.
-> > > 
-> > > Unfortunately this causes some issues for the split device tree
-> > > repository[0], since things get moved around there. In that 
-> > > context
-> > > the new .dts ends up at src/arm64/arm/vexpress-v2f-1xv7
-> > > -ca53x2.dts
-> > > while the include is at src/arm/vexpress-v2m-rs1.dtsi.
-> > 
-> > Hi Grant,
-> > 
-> > Do you think there is any chance of getting this into 4.2-rc$NEXT 
-> > or shall
-> > we wait until 4.3? I'm assuming this should go via the DT tree, but 
-> > maybe
-> > it should go via an ARM tree?
-> 
-> I was assuming this would go thru the arm-soc tree which is why I
-> acked it. It is getting a bit late for 4.2 at this point, but I guess
-> the standalone tree remains broken for these platforms until this is
-> done.
-
-Correct.
-
->  Probably not such a big deal in grand scheme of things.
-
-I guess not. FWIW I've not pushed since the breakage started happening,
-so the split tree isn't broken, but it's also now however many weeks
-behind. Once 4.3-rc1 arrives with this fixed I'll push all the 4.2-rcN
-and 4.2 as well.
-
-Ian.
+-- 
+FTTC broadband for 0.8mile line: currently at 10.5Mbps down 400kbps up
+according to speedtest.net.
