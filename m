@@ -1,94 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:42534 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:43593 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754152AbbHSOID (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 19 Aug 2015 10:08:03 -0400
-Subject: Re: [PATCH] package Makefile: fix perf-tar targets when outdir is set
-References: <1434631078-12035-1-git-send-email-riku.voipio@linaro.org>
+	id S1751728AbbHSOQ1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 19 Aug 2015 10:16:27 -0400
+Subject: Re: [RFC v2 0/4] scripts: add stack{usage,delta} scripts
+References: <1434849046-19920-1-git-send-email-linux@rasmusvillemoes.dk>
+ <1435220492-15868-1-git-send-email-linux@rasmusvillemoes.dk>
 From: Michal Marek <mmarek@suse.cz>
-Message-ID: <55D48DC1.6050802@suse.cz>
-Date: Wed, 19 Aug 2015 16:08:01 +0200
+Message-ID: <55D48FB9.50605@suse.cz>
+Date: Wed, 19 Aug 2015 16:16:25 +0200
 MIME-Version: 1.0
-In-Reply-To: <1434631078-12035-1-git-send-email-riku.voipio@linaro.org>
+In-Reply-To: <1435220492-15868-1-git-send-email-linux@rasmusvillemoes.dk>
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: riku.voipio@linaro.org
+To: Rasmus Villemoes <linux@rasmusvillemoes.dk>
 Cc: linux-kbuild@vger.kernel.org
 
-On 2015-06-18 14:37, riku.voipio@linaro.org wrote:
-> From: Riku Voipio <riku.voipio@linaro.org>
+On 2015-06-25 10:21, Rasmus Villemoes wrote:
+> The current checkstack.pl script has a few problems, stemming from the
+> overly simplistic attempt at parsing objdump output with regular
+> expresions. Since gcc 4.6 introduced the -fstack-usage option, we can
+> now get the exact stack use instead of resorting to ad hoc methods.
 > 
-> When building with $srctree != $objtree, perf-tar-* targets fail
-> to read the MANIFEST file and add the PERF-VERSION-FILE needed
-> by out-of-tree builds. The build errors and an incorrect tar is created:
+> This introduces two small scripts. One for running make with KCFLAGS
+> set to -fstack-usage, followed by collecting the generated .su files
+> in a single output file. Another for taking two such output files and
+> computing the changes in stack use.
 > 
-> $ make O=build-x86 perf-targz-src-pkg
->   TAR
-> cat: ../tools/perf/MANIFEST: No such file or directory
-> tar: perf-4.1.0-rc8/PERF-VERSION-FILE: Cannot stat: No such file or
-> dir..
-> tar: Exiting with failure status due to previous errors
+> 2/4 and 3/4 may be too small by themselves; they can easily be
+> squashed into 1/4.
 > 
-> Kbuild sets objtree to "." and srctree to ".." The command to output
-> MANIFEST becomes:
-> 
->    $(cd ..; echo $(cat ../tools/perf/MANIFEST))
-> 
-> Without MANIFEST, the entire kernel source tree is added to the perf
-> source tarball. The *correct* fix is to keep the cd and remove srctree
-> from cat command line since MANIFEST has wildcards that fail to expand
-> working directory isn't srctree.
-> 
-> Second, PERF-VERSION-FILE gets not added, because in-tree build path is
-> hardcoded to Makefile:
-> 
->    util/PERF-VERSION-GEN ../../$(perf-tar)/ 2>/dev/null)
-> 
-> The PERF-VERSION-GEN needs to be run from tools/perf directory, so
-> we can't just replace the hardcoded "../../" bit the relative $objtree
-> contents - we need a fully expanded $objtree_full variable to place
-> PERF-VERSION-FILE to the right place. Also remove the error redirect
-> to /dev/null which hid the error.
-> 
-> Patch v2: switch from easy fix to correct fix
-> 
-> Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
-> ---
->  scripts/package/Makefile | 9 +++++++--
->  1 file changed, 7 insertions(+), 2 deletions(-)
-> 
-> diff --git a/scripts/package/Makefile b/scripts/package/Makefile
-> index 99ca6e7..cd5a321 100644
-> --- a/scripts/package/Makefile
-> +++ b/scripts/package/Makefile
-> @@ -33,6 +33,11 @@ TAR_CONTENT := $(KBUILD_ALLDIRS) kernel.spec .config .scmversion Makefile \
->  TAR_CONTENT := $(addprefix $(KERNELPATH)/,$(TAR_CONTENT))
->  MKSPEC     := $(srctree)/scripts/package/mkspec
->  
-> +# objtree is relative path, which doesn't work if we cd around
-> +ifneq ($(objtree),)
-> +  objtree_full := $(shell readlink -f $(objtree) || echo $(objtree))
-> +endif
-> +
->  # rpm-pkg
->  # ---------------------------------------------------------------------------
->  rpm-pkg rpm: FORCE
-> @@ -111,12 +116,12 @@ quiet_cmd_perf_tar = TAR
->        cmd_perf_tar = \
->  git --git-dir=$(srctree)/.git archive --prefix=$(perf-tar)/         \
->  	HEAD^{tree} $$(cd $(srctree);                               \
-> -		       echo $$(cat $(srctree)/tools/perf/MANIFEST)) \
-> +	               echo $$(cat tools/perf/MANIFEST))            \
->  	-o $(perf-tar).tar;                                         \
->  mkdir -p $(perf-tar);                                               \
->  git --git-dir=$(srctree)/.git rev-parse HEAD > $(perf-tar)/HEAD;    \
->  (cd $(srctree)/tools/perf;                                          \
-> -util/PERF-VERSION-GEN ../../$(perf-tar)/ 2>/dev/null);              \
-> +util/PERF-VERSION-GEN $(objtree_full)/$(perf-tar)/);                \
+> v2: Use KCFLAGS instead of EXTRA_CFLAGS. A few more details in commit
+> messages. Simpler option handling in stackusage. Removed accidental
+> leftover debug prints.
 
-Make defines a $(CURDIR) variable, which you can use instead of defining
-your own.
+Do you plan any new iterations, or is this final despite the [RFC]? If
+it's final, I will apply it.
 
 Michal
