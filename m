@@ -1,49 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:47065 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:49703 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751658AbbHSOqO (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 19 Aug 2015 10:46:14 -0400
-Subject: Re: [PATCH v3] kconfig: Delete unnecessary checks before the function
- call "sym_calc_value"
-References: <5307CAA2.8060406@users.sourceforge.net>
- <alpine.DEB.2.02.1402212321410.2043@localhost6.localdomain6>
- <530A086E.8010901@users.sourceforge.net>
- <alpine.DEB.2.02.1402231635510.1985@localhost6.localdomain6>
- <530A72AA.3000601@users.sourceforge.net>
- <alpine.DEB.2.02.1402240658210.2090@localhost6.localdomain6>
- <530B5FB6.6010207@users.sourceforge.net>
- <alpine.DEB.2.10.1402241710370.2074@hadrien>
- <530C5E18.1020800@users.sourceforge.net>
- <alpine.DEB.2.10.1402251014170.2080@hadrien>
- <530CD2C4.4050903@users.sourceforge.net>
- <alpine.DEB.2.10.1402251840450.7035@hadrien>
- <530CF8FF.8080600@users.sourceforge.net>
- <alpine.DEB.2.02.1402252117150.2047@localhost6.localdomain6>
- <530DD06F.4090703@users.sourceforge.net>
- <alpine.DEB.2.02.1402262129250.2221@localhost6.localdomain6>
- <5317A59D.4@users.sourceforge.net> <54568924.5010008@users.sourceforge.net>
- <5457CC33.4050906@users.sourceforge.net>
- <559C2E7A.1090408@users.sourceforge.net>
+	id S1754256AbbHSPG7 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 19 Aug 2015 11:06:59 -0400
+Subject: Re: [PATCH v4 0/2] kconfig: warn of unhandled characters in Kconfig
+ commands
+References: <cover.1436686646.git.andreas.ruprecht@fau.de>
+ <20150720085414.GA32583@huvuddator>
 From: Michal Marek <mmarek@suse.cz>
-Message-ID: <55D496B4.5070004@suse.cz>
-Date: Wed, 19 Aug 2015 16:46:12 +0200
+Message-ID: <55D49B90.4060906@suse.cz>
+Date: Wed, 19 Aug 2015 17:06:56 +0200
 MIME-Version: 1.0
-In-Reply-To: <559C2E7A.1090408@users.sourceforge.net>
-Content-Type: text/plain; charset=iso-8859-15
+In-Reply-To: <20150720085414.GA32583@huvuddator>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: SF Markus Elfring <elfring@users.sourceforge.net>, "Yann E. MORIN" <yann.morin.1998@free.fr>, linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org, Julia Lawall <julia.lawall@lip6.fr>, Paul Bolle <pebolle@tiscali.nl>
+To: Ulf Magnusson <ulfalizer.lkml@gmail.com>, Andreas Ruprecht <andreas.ruprecht@fau.de>
+Cc: Paul Bolle <pebolle@tiscali.nl>, Valentin Rothberg <valentinrothberg@gmail.com>, rafael.j.wysocki@intel.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, hengelein Stefan <stefan.hengelein@fau.de>, linux@dominikbrodowski.net
 
-On 2015-07-07 21:54, SF Markus Elfring wrote:
-> From: Markus Elfring <elfring@users.sourceforge.net>
-> Date: Tue, 7 Jul 2015 21:48:23 +0200
+On 2015-07-20 10:54, Ulf Magnusson wrote:
+> On Sun, Jul 12, 2015 at 09:41:49AM +0200, Andreas Ruprecht wrote:
+>> This patchset changes the lexer file to emit a warning if any unhandled
+>> characters are found in the input. So far, Kconfig options like
+>>
+>>  +config FOO
+>>     bool
+>>     [...]
+>>
+>> (note the wrong '+'!) were parsed without a warning. As simply adding a
+>> warning for '.' produces lots of warnings as occasionally '---help---'
+>> is used instead of 'help' (and thus '-' is recognized as an unhandled
+>> character), we need to handle '---help---' separately.
+>>
+>> Changes to v1:
+>> 	- add '---help---' in zconf.gperf instead of special casing
+>> 	  it in zconf.l
+>>
+>> Changes to v2:
+>> 	- Do no constify char parameter to warn_ignored_character
+>> 	- Shorten rule definitions for '.'
+>>
+>> Changes to v3:
+>> 	- spaces -> tabs in zconf.gperf
+>>
+>> Andreas Ruprecht (2):
+>>   kconfig: warn of unhandled characters in Kconfig commands
+>>   kconfig: Regenerate shipped zconf.{hash,lex}.c files
+>>
+>>  scripts/kconfig/zconf.gperf          |   1 +
+>>  scripts/kconfig/zconf.hash.c_shipped |  58 ++++---
+>>  scripts/kconfig/zconf.l              |  20 ++-
+>>  scripts/kconfig/zconf.lex.c_shipped  | 325 +++++++++++++++++------------------
+>>  4 files changed, 204 insertions(+), 200 deletions(-)
+>>
+>> -- 
+>> 1.9.1
+>>
 > 
-> The sym_calc_value() function tests whether its argument is NULL and then
-> returns immediately. Thus the test around the call is not needed.
+> For what it's worth:
 > 
-> This issue was detected by using the Coccinelle software.
+> Reviewed-by: Ulf Magnusson <ulfalizer@gmail.com>
+> Tested-by: Ulf Magnusson <ulfalizer@gmail.com>
 
 Applied to kbuild.git#kconfig.
 
