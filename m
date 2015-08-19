@@ -1,31 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:60591 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:38945 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753093AbbHSMuq (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 19 Aug 2015 08:50:46 -0400
-Subject: Re: [PATCH] scripts: Extract kernel headers for out of tree modules
- build
-References: <1439967036-18297-1-git-send-email-daniel.baluta@intel.com>
-From: Michal Marek <mmarek@suse.com>
-Message-ID: <55D47BA4.4040601@suse.com>
-Date: Wed, 19 Aug 2015 14:50:44 +0200
+	id S1751512AbbHSNhC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 19 Aug 2015 09:37:02 -0400
+Subject: Re: [PATCH v3] deb-pkg: add source package
+References: <1434010298-21445-1-git-send-email-riku.voipio@linaro.org>
+From: Michal Marek <mmarek@suse.cz>
+Message-ID: <55D4867B.40802@suse.cz>
+Date: Wed, 19 Aug 2015 15:36:59 +0200
 MIME-Version: 1.0
-In-Reply-To: <1439967036-18297-1-git-send-email-daniel.baluta@intel.com>
+In-Reply-To: <1434010298-21445-1-git-send-email-riku.voipio@linaro.org>
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Daniel Baluta <daniel.baluta@intel.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, octavian.purdila@intel.com, bogdan.m.davidoaia@intel.com
+To: Ben Hutchings <ben@decadent.org.uk>
+Cc: riku.voipio@linaro.org, linux-kbuild@vger.kernel.org, debian-kernel@lists.debian.org, Chris J Arges <chris.j.arges@canonical.com>, maximilian attems <maks@stro.at>
 
-On 2015-08-19 08:50, Daniel Baluta wrote:
-> scripts/package/builddeb already creates a linux-keader .deb
-> package, but we need this feature also for non-Debian distros
-> (e.g. Android or LFS).
+On 2015-06-11 10:11, riku.voipio@linaro.org wrote:
+> From: Riku Voipio <riku.voipio@linaro.org>
+> 
+> Make deb-pkg build both source and binary package like make rpm-pkg does.
+> For people who only need binary kernel package, there is now bindeb-pkg
+> target, same target also used to build the .deb files if built from the
+> source package using dpkg-buildpackage.
+> 
+> Generated source package will build the same kernel .config than what
+> was available for make deb-pkg. The name of the source package can
+> be set with KDEB_SOURCENAME enviroment variable.
+> 
+> The source package is useful for gpl compliance, or for feeding to a
+> automated debian package builder.
+> 
+> Cc: Chris J Arges <chris.j.arges@canonical.com>
+> Cc: maximilian attems <maks@stro.at>
+> Cc: Ben Hutchings <ben@decadent.org.uk>
+> Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
+> ---
+> v3,
+>  * Allow setting source package name with KDEB_SOURCENAME
+>  * Fix issues noted by Ben: drop python and fix target in debian/rules
+>  * Merge "ensure $MAKE can use jobserver" oneliner from Chris J Arges
 
-Kbuild supports building out-of-tree modules by providing the
-/lib/modules/*/build and /lib/modules/*/source symlinks, pointing to the
-whole build/source trees. IMO, an optimization like your script should
-remain part of the distro packaging, which also takes care of the symlinks.
+Ben,
 
+are you OK with the v3 of this patch?
+
+Thanks,
 Michal
