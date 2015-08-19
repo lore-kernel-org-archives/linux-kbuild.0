@@ -1,45 +1,109 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg003.nifty.com ([202.248.44.41]:62099 "EHLO
-	conssluserg003-v.nifty.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1750903AbbHRKyi (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 18 Aug 2015 06:54:38 -0400
-MIME-Version: 1.0
-In-Reply-To: <20150818104458.GO7557@n2100.arm.linux.org.uk>
-References: <1439049211-4181-1-git-send-email-yamada.masahiro@socionext.com>
-	<20150818104458.GO7557@n2100.arm.linux.org.uk>
-Date: Tue, 18 Aug 2015 19:54:31 +0900
-Message-ID: <CAK7LNAQ6kqoV_6zYA_6C-Gop8vbs66gsWDVZGrTong290Z_KWw@mail.gmail.com>
-Subject: Re: [PATCH v2] ARM: add boot image dependencies to not generate
- invalid images
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Content-Type: text/plain; charset=UTF-8
+Received: from mga03.intel.com ([134.134.136.65]:23081 "EHLO mga03.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753065AbbHSGsD (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 19 Aug 2015 02:48:03 -0400
+From: Daniel Baluta <daniel.baluta@intel.com>
+Subject: [PATCH] scripts: Extract kernel headers for out of tree modules build
+Date: Wed, 19 Aug 2015 09:50:36 +0300
+Message-Id: <1439967036-18297-1-git-send-email-daniel.baluta@intel.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Russell King - ARM Linux <linux@arm.linux.org.uk>
-Cc: Michal Marek <mmarek@suse.cz>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: mmarek@suse.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: daniel.baluta@intel.com, octavian.purdila@intel.com, bogdan.m.davidoaia@intel.com
 
-Hi Russell,
+scripts/package/builddeb already creates a linux-keader .deb
+package, but we need this feature also for non-Debian distros
+(e.g. Android or LFS).
 
+Signed-off-by: Daniel Baluta <daniel.baluta@intel.com>
+---
+ Makefile                           | 10 +++++++++-
+ scripts/modules_headers_install.sh | 40 ++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 49 insertions(+), 1 deletion(-)
+ create mode 100755 scripts/modules_headers_install.sh
 
-2015-08-18 19:44 GMT+09:00 Russell King - ARM Linux <linux@arm.linux.org.uk>:
-> On Sun, Aug 09, 2015 at 12:53:31AM +0900, Masahiro Yamada wrote:
->> U-Boot is often used to boot the kernel on ARM boards, but uImage
->> is not built by "make all", so we are often inclined to do
->> "make all uImage" to generate DTBs, modules and uImage in a single
->> command, but we should notice a pitfall behind it.  In fact,
->> "make all uImage" could generate an invalid uImage if it is run with
->> the parallel option (-j).
->
-> Please put this patch in the patch system.  Thanks.
-
-
-I posted it yesterday.
-
-ID: 8418/1
-
-
-
+diff --git a/Makefile b/Makefile
+index 35b4c19..839416d 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1042,6 +1042,7 @@ firmware_install: FORCE
+ 
+ #Default location for installed headers
+ export INSTALL_HDR_PATH = $(objtree)/usr
++export INSTALL_MODULES_HDR_PATH = $(objtree)/usr/src
+ 
+ # If we do an all arch process set dst to asm-$(hdr-arch)
+ hdr-dst = $(if $(KBUILD_HEADERS), dst=include/asm-$(hdr-arch), dst=include/asm)
+@@ -1076,6 +1077,10 @@ headers_check: headers_install
+ 	$(Q)$(MAKE) $(hdr-inst)=include/uapi HDRCHECK=1
+ 	$(Q)$(MAKE) $(hdr-inst)=arch/$(hdr-arch)/include/uapi/asm $(hdr-dst) HDRCHECK=1
+ 
++PHONY += modules_headers_install
++modules_headers_install:
++	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/modules_headers_install.sh
++
+ # ---------------------------------------------------------------------------
+ # Kernel selftest
+ 
+@@ -1274,7 +1279,10 @@ help:
+ 	@echo  '  kernelversion	  - Output the version stored in Makefile (use with make -s)'
+ 	@echo  '  image_name	  - Output the image name (use with make -s)'
+ 	@echo  '  headers_install - Install sanitised kernel headers to INSTALL_HDR_PATH'; \
+-	 echo  '                    (default: $(INSTALL_HDR_PATH))'; \
++	 echo  '                    (default: $(INSTALL_HDR_PATH))';
++	@echo  '  modules_headers_install - Install kernel headers to INSTALL_MODULES_HDR_PATH'; \
++	 echo  '                            to be used for out of tree modules build'; \
++	 echo  '                            (default: $(INSTALL_MODULES_HDR_PATH))'; \
+ 	 echo  ''
+ 	@echo  'Static analysers'
+ 	@echo  '  checkstack      - Generate a list of stack hogs'
+diff --git a/scripts/modules_headers_install.sh b/scripts/modules_headers_install.sh
+new file mode 100755
+index 0000000..ebced17
+--- /dev/null
++++ b/scripts/modules_headers_install.sh
+@@ -0,0 +1,40 @@
++#!/bin/sh
++
++# modules_headers_install.sh
++#
++# Simple script to extract linux headers and friends needed to build
++# out of tree modules without having the all source tree around.
++#
++# Inspired from scripts/package/builddeb
++
++HDR_SRC_FILES=$objtree/hdrsrcfiles
++HDR_OBJ_FILES=$objtree/hdrobjfiles
++DEST_DIR=linux-modules-headers
++
++if [ -n "$INSTALL_MODULES_HDR_PATH" ]; then
++	DEST_DIR="$INSTALL_MODULES_HDR_PATH"
++fi
++
++#fresh start
++rm -f $HDR_SRC_FILES
++rm -f $HDR_OBJ_FILES
++
++#build list of headers and friends
++(cd $srctree; find . -name Makefile\* -o -name Kconfig\* -o -name \*.pl) \
++	> "$HDR_SRC_FILES"
++(cd $srctree; find arch/$SRCARCH/include include scripts -type f) \
++	>> "$HDR_SRC_FILES"
++(cd $srctree; find arch/$SRCARCH -name module.lds -o -name Kbuild.platforms \
++	-o -name Platform) >> "$HDR_SRC_FILES"
++(cd $srctree; find $(find arch/$SRCARCH -name include -o -name scripts \
++	-type d) -type f) >> "$HDR_SRC_FILES"
++(cd $objtree; find arch/$SRCARCH/include Module.symvers include scripts \
++	-type f) >> "$HDR_OBJ_FILES"
++
++mkdir -p "$DEST_DIR"
++
++(cd $srctree; tar -c -f - -T -) < "$HDR_SRC_FILES" | (cd $DEST_DIR; tar -xf -)
++(cd $objtree; tar -c -f - -T -) < "$HDR_OBJ_FILES" | (cd $DEST_DIR; tar -xf -)
++
++# copy .config manually to be where it's expected to be
++(cd $objtree; cp $KCONFIG_CONFIG $DEST_DIR/.config)
 -- 
-Best Regards
-Masahiro Yamada
+1.9.1
+
