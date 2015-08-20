@@ -1,81 +1,29 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([103.22.144.67]:38222 "EHLO ozlabs.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751896AbbHTGSv convert rfc822-to-8bit (ORCPT
+Received: from mail.napavalley.edu ([209.129.252.13]:17286 "EHLO
+	mail.napavalley.edu" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751161AbbHTHSU convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 20 Aug 2015 02:18:51 -0400
-Date: Thu, 20 Aug 2015 16:18:49 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-Subject: Re: linux-next: Tree for Aug 12 (include/linux/pci.h)
-Message-ID: <20150820161849.79552437@canb.auug.org.au>
-In-Reply-To: <CAErSpo4+H6AJs9shVGN8fm9=GwPL9EzNcyMNt5FW81JGEA1sDA@mail.gmail.com>
-References: <20150812233914.451d1fcf@canb.auug.org.au>
-	<55CB8AF0.4060905@infradead.org>
-	<20150813075322.064035f8@canb.auug.org.au>
-	<55CBCF96.7060102@intel.com>
-	<CAErSpo4+H6AJs9shVGN8fm9=GwPL9EzNcyMNt5FW81JGEA1sDA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+	Thu, 20 Aug 2015 03:18:20 -0400
+From: Mark Singer <MSinger@napavalley.edu>
+Date: Thu, 20 Aug 2015 00:12:49 -0700
+Subject: 
+Message-ID: <66EA9C2C53B30B46B1D28150E6EB8FB5015BB1A6902C@mail.napavalley.edu>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: 8BIT
+MIME-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Bjorn Helgaas <bhelgaas@google.com>
-Cc: Tadeusz Struk <tadeusz.struk@intel.com>, Randy Dunlap <rdunlap@infradead.org>, linux-next list <linux-next@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, linux-pci <linux-pci@vger.kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, Michal Marek <mmarek@suse.cz>, "Yann E. MORIN" <yann.morin.1998@free.fr>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-Hi Bjorn,
 
-On Wed, 19 Aug 2015 23:16:06 -0700 Bjorn Helgaas <bhelgaas@google.com> wrote:
->
-> [+cc Yann, linux-kbuild]
-> 
-> On Wed, Aug 12, 2015 at 3:58 PM, Tadeusz Struk <tadeusz.struk@intel.com> wrote:
-> > On 08/12/2015 02:53 PM, Stephen Rothwell wrote:
-> >> On Wed, 12 Aug 2015 11:05:36 -0700 Randy Dunlap <rdunlap@infradead.org> wrote:
-> >>> >
-> >>> > on i386 or x86_64:
-> >>> >
-> >>> > Many (repeated) errors like this one:
-> >>> >
-> >>> > ../include/linux/pci.h:390:12: error: â€˜struct pci_devâ€™ has no member named â€˜physfnâ€™
-> >>> >
-> >>> > when CONFIG_PCI_ATS is not enabled.
-> >> Maybe caused by commit
-> >>
-> >>   dd0f368398ea ("crypto: qat - Add qat dh895xcc VF driver")
-> >>
-> >> from the crypto tree Which adds a
-> >>
-> >>   select PCI_IOV
-> >>
-> >> to drivers/crypto/qat/Kconfig without the necessary
-> >>
-> >>   select PCI
-> >>
-> >> but PCI_IOV selects PCI_ATS, so I am not sure what happened here.  I am
-> >> assuming that your config has PCI_IOV enabled?  What about PCI?
-> >
-> > There is a patch submitted, but not yet applied
-> > https://patchwork.kernel.org/patch/6994171/
-> > maybe it will help?
-> 
-> I don't understand this.  In drivers/pci/Kconfig, we have:
-> 
->   config PCI_IOV
->     depends on PCI
-> 
-> and in drivers/crypto/qat/Kconfig, dd0f368398ea adds:
-> 
->   config CRYPTO_DEV_QAT_DH895xCCVF
->     select PCI_IOV
-> 
-> And apparently it's possible to end up with a .config with
-> CONFIG_PCI_IOV=y but CONFIG_PCI is not set?  That seems wrong, since
-> we declared that PCI_IOV depends on PCI.  Does select ignore that
-> dependency somehow?
 
-Yeah, unfortunately that is how select works.  If a symbol you select
-depends on anything, then you need to also select all the dependencies.
 
--- 
-Cheers,
-Stephen Rothwell                    sfr@canb.auug.org.au
+Do you need an investor?
+Our investors fund project and business. We also give out loan/credit to any individual and company at 3% interest rate yearly. For more information, Contact us via Email: devonfps@gmail.com 
+
+If you need an investor or quick funding, forward your response ONLY to this E-mail: devonfps@gmail.com 
+....
+Haben Sie einen Investor brauchen?
+Unsere Investoren Fonds Projekt- und Gesch�fts. Wir geben auch Darlehen / Kredite an jeden einzelnen und Unternehmen bei 3% Zinsen j�hrlich. F�r weitere Informationen, kontaktieren Sie uns per E-Mail: devonfps@gmail.com 
+
+Wenn Sie ein Investor oder schnelle Finanzierung ben�tigen, senden Sie Ihre Antwort nur auf diese E-mail: devonfps@gmail.com 
