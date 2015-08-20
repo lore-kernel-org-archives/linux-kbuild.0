@@ -1,51 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mailout3.w1.samsung.com ([210.118.77.13]:38530 "EHLO
-	mailout3.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752049AbbHTNSH (ORCPT
+Received: from mail-wi0-f175.google.com ([209.85.212.175]:35353 "EHLO
+	mail-wi0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751759AbbHTNyg (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 20 Aug 2015 09:18:07 -0400
-Received: from eucpsbgm1.samsung.com (unknown [203.254.199.244])
- by mailout3.w1.samsung.com
- (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May  5 2014))
- with ESMTP id <0NTD00G5GUA59170@mailout3.w1.samsung.com> for
- linux-kbuild@vger.kernel.org; Thu, 20 Aug 2015 14:18:05 +0100 (BST)
-From: Pavel Fedin <p.fedin@samsung.com>
-References: <1439549533-8716-1-git-send-email-p.fedin@samsung.com>
- <55D5BAA4.5050003@suse.com> <018a01d0db44$35ed5630$a1c80290$@samsung.com>
- <55D5CA31.8090401@suse.com>
-In-reply-to: <55D5CA31.8090401@suse.com>
-Subject: RE: [PATCH TRIVIAL v2] Avoid conflict with host definitions when
- cross-compiling
-Date: Thu, 20 Aug 2015 16:18:04 +0300
-Message-id: <019301d0db4a$a60a7370$f21f5a50$@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
-Content-transfer-encoding: 7bit
-Content-language: ru
+	Thu, 20 Aug 2015 09:54:36 -0400
+From: Gabriel de Perthuis <g2p.code@gmail.com>
+Subject: [PATCH] kconfig/merge_config.sh: Support KCONFIG_CONFIG
+Date: Thu, 20 Aug 2015 15:54:04 +0200
+Message-Id: <fa926d9048b2f21727b863c60137fb9bb03cb8cf.1440078146.git.g2p.code@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: 'Michal Marek' <mmarek@suse.com>
-Cc: linux-kbuild@vger.kernel.org
+To: "Yann E . MORIN" <yann.morin.1998@free.fr>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Gabriel de Perthuis <g2p.code@gmail.com>
 
- Hi!
+All make targets support $KCONFIG_CONFIG because they
+run scripts/kconf.  Make sure this script accesses the
+right file in all cases.
 
-> If you already have the patches, it won't hurt to send them.
+Previously this script broke in two different code paths,
+one for targets like kvmconfig (which use -m then call
+a target that respects KCONFIG_CONFIG) and one for
+direct use of the script without -m, which called make
+rules that edit KCONFIG_CONFIG but verified a different file.
 
- I have one of them, need to make more.
+Signed-off-by: Gabriel de Perthuis <g2p.code@gmail.com>
+---
+ scripts/kconfig/merge_config.sh | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-> Although I
-> was under the impression that the .exe suffix is somehow automagically
-> handled by Cygwin..?
-
- In 99% of cases - yes. But at least there is a problem with implicit rules in GNU Make.
- Actually, here i am talking about patch 0002 from this set:
-https://www.cygwin.com/ml/cygwin/2012-06/msg00221.html. This HOWTO was created when the kernel was
-really old, and now some more tools face a similar problem, like certificate generator for security
-subsystem. I will check this.
-
-Kind regards,
-Pavel Fedin
-Expert Engineer
-Samsung Electronics Research center Russia
-
+diff --git a/scripts/kconfig/merge_config.sh b/scripts/kconfig/merge_config.sh
+index ec8e203..7b53f02 100755
+--- a/scripts/kconfig/merge_config.sh
++++ b/scripts/kconfig/merge_config.sh
+@@ -118,13 +118,13 @@ for MERGE_FILE in $MERGE_LIST ; do
+ 	done
+ 	cat $MERGE_FILE >> $TMP_FILE
+ done
+ 
+ if [ "$RUNMAKE" = "false" ]; then
+-	cp $TMP_FILE $OUTPUT/.config
++	cp $TMP_FILE ${KCONFIG_CONFIG:=$OUTPUT/.config}
+ 	echo "#"
+-	echo "# merged configuration written to $OUTPUT/.config (needs make)"
++	echo "# merged configuration written to $KCONFIG_CONFIG (needs make)"
+ 	echo "#"
+ 	clean_up
+ 	exit
+ fi
+ 
+@@ -144,11 +144,11 @@ make KCONFIG_ALLCONFIG=$TMP_FILE $OUTPUT_ARG $ALLTARGET
+ 
+ # Check all specified config values took (might have missed-dependency issues)
+ for CFG in $(sed -n "$SED_CONFIG_EXP" $TMP_FILE); do
+ 
+ 	REQUESTED_VAL=$(grep -w -e "$CFG" $TMP_FILE)
+-	ACTUAL_VAL=$(grep -w -e "$CFG" $OUTPUT/.config)
++	ACTUAL_VAL=$(grep -w -e "$CFG" ${KCONFIG_CONFIG:=$OUTPUT/.config})
+ 	if [ "x$REQUESTED_VAL" != "x$ACTUAL_VAL" ] ; then
+ 		echo "Value requested for $CFG not in final .config"
+ 		echo "Requested value:  $REQUESTED_VAL"
+ 		echo "Actual value:     $ACTUAL_VAL"
+ 		echo ""
+-- 
+2.5.0.347.g10df1da
 
