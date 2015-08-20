@@ -1,32 +1,35 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:59132 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:59300 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752137AbbHTLbv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 20 Aug 2015 07:31:51 -0400
-Subject: Re: [PATCH TRIVIAL v2] Avoid conflict with host definitions when
- cross-compiling
-References: <1439549533-8716-1-git-send-email-p.fedin@samsung.com>
+	id S1751506AbbHTLe5 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 20 Aug 2015 07:34:57 -0400
+Subject: Re: how to echo $(KBUILD_CFLAGS)
+References: <848BD1798F19584EADB3CD55379CFD64665E5A2C@SHMX01.s3graphics.com>
 From: Michal Marek <mmarek@suse.com>
-Message-ID: <55D5BAA4.5050003@suse.com>
-Date: Thu, 20 Aug 2015 13:31:48 +0200
+Message-ID: <55D5BB5F.6020809@suse.com>
+Date: Thu, 20 Aug 2015 13:34:55 +0200
 MIME-Version: 1.0
-In-Reply-To: <1439549533-8716-1-git-send-email-p.fedin@samsung.com>
+In-Reply-To: <848BD1798F19584EADB3CD55379CFD64665E5A2C@SHMX01.s3graphics.com>
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Pavel Fedin <p.fedin@samsung.com>
-Cc: linux-kbuild@vger.kernel.org, trivial@kernel.org
+To: RaphaelWu@viatech.com.cn
+Cc: linux-kbuild@vger.kernel.org
 
-On 2015-08-14 12:52, Pavel Fedin wrote:
-> Certain platforms (e. g. BSD-based ones) define some ELF constants
-> according to host. This patch fixes problems with cross-building
-> Linux kernel on these platforms (e. g. building ARM 32-bit version
-> on x86-64 host).
+On 2015-08-20 13:03, RaphaelWu@viatech.com.cn wrote:
+> Let me show the simplified piece.
 > 
-> Signed-off-by: Pavel Fedin <p.fedin@samsung.com>
+> obj-m += test.o
+> KBUILD_CFLAGS := $(subst -pg,,$(KBUILD_CFLAGS))
+> 
+> all:
+>         @echo $(KBUILD_CFLAGS)
+>         $(MAKE) -C /lib/modules/`uname`/build M=$(PWD) modules
+> 
+> So if it's not a kbuild makefile, why the -pg flag can be successful removed through KBUILD_CFLAGS.
 
-Thanks, applied to kbuild.git#kbuild. But it seems that
-arch/x86/tools/relocs needs the same fix.
+There are no all: rules in kbuild files.
 
 Michal
+
