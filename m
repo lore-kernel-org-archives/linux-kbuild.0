@@ -1,43 +1,33 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f170.google.com ([209.85.212.170]:34662 "EHLO
-	mail-wi0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751320AbbHTOGQ (ORCPT
+Received: from asavdk3.altibox.net ([109.247.116.14]:33848 "EHLO
+	asavdk3.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751239AbbHTR0o (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 20 Aug 2015 10:06:16 -0400
-From: Gabriel de Perthuis <g2p.code@gmail.com>
-Subject: [PATCH] kconfig/merge_config.sh: Accept a single file
-Date: Thu, 20 Aug 2015 16:06:10 +0200
-Message-Id: <d0d3192eeda637ceed8cb82db0b092fa44afc603.1440079557.git.g2p.code@gmail.com>
+	Thu, 20 Aug 2015 13:26:44 -0400
+Date: Thu, 20 Aug 2015 19:19:24 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: how to echo $(KBUILD_CFLAGS)
+Message-ID: <20150820171924.GA2620@ravnborg.org>
+References: <848BD1798F19584EADB3CD55379CFD64665E5A2C@SHMX01.s3graphics.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <848BD1798F19584EADB3CD55379CFD64665E5A2C@SHMX01.s3graphics.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E . MORIN" <yann.morin.1998@free.fr>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Gabriel de Perthuis <g2p.code@gmail.com>
+To: RaphaelWu@viatech.com.cn
+Cc: mmarek@suse.com, linux-kbuild@vger.kernel.org
 
-merge_config.sh can usefully be applied to a single file.
-It does an implicit merge with the default configuration.
+Hi RaphaelWu
 
-Signed-off-by: Gabriel de Perthuis <g2p.code@gmail.com>
----
- scripts/kconfig/merge_config.sh | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/scripts/kconfig/merge_config.sh b/scripts/kconfig/merge_config.sh
-index 7b53f02..e914c5a 100755
---- a/scripts/kconfig/merge_config.sh
-+++ b/scripts/kconfig/merge_config.sh
-@@ -75,11 +75,11 @@ while true; do
- 		break
- 		;;
- 	esac
- done
+Try this:
  
--if [ "$#" -lt 2 ] ; then
-+if [ "$#" -lt 1 ] ; then
- 	usage
- 	exit
- fi
- 
- INITFILE=$1
--- 
-2.5.0.347.g10df1da
+obj-m += test.o
 
+$(warning Before-KBUILD_CFLAGS=$(KBUILD_CFLAGS))
+
+KBUILD_CFLAGS := $(subst -pg,,$(KBUILD_CFLAGS))
+
+$(warning After-KBUILD_CFLAGS=$(KBUILD_CFLAGS))
+
+	Sam
