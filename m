@@ -1,35 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:59300 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:60920 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751506AbbHTLe5 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 20 Aug 2015 07:34:57 -0400
-Subject: Re: how to echo $(KBUILD_CFLAGS)
-References: <848BD1798F19584EADB3CD55379CFD64665E5A2C@SHMX01.s3graphics.com>
-From: Michal Marek <mmarek@suse.com>
-Message-ID: <55D5BB5F.6020809@suse.com>
-Date: Thu, 20 Aug 2015 13:34:55 +0200
+	id S1751114AbbHTLz1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 20 Aug 2015 07:55:27 -0400
+Subject: Re: [PATCH] kbuild: Fix .text.unlikely placement
+References: <1437354079-18609-1-git-send-email-andi@firstfloor.org>
+From: Michal Marek <mmarek@suse.cz>
+Message-ID: <55D5C02D.5060707@suse.cz>
+Date: Thu, 20 Aug 2015 13:55:25 +0200
 MIME-Version: 1.0
-In-Reply-To: <848BD1798F19584EADB3CD55379CFD64665E5A2C@SHMX01.s3graphics.com>
+In-Reply-To: <1437354079-18609-1-git-send-email-andi@firstfloor.org>
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: RaphaelWu@viatech.com.cn
-Cc: linux-kbuild@vger.kernel.org
+To: Andi Kleen <andi@firstfloor.org>, linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Andi Kleen <ak@linux.intel.com>
 
-On 2015-08-20 13:03, RaphaelWu@viatech.com.cn wrote:
-> Let me show the simplified piece.
+On 2015-07-20 03:01, Andi Kleen wrote:
+> From: Andi Kleen <ak@linux.intel.com>
 > 
-> obj-m += test.o
-> KBUILD_CFLAGS := $(subst -pg,,$(KBUILD_CFLAGS))
+> When building a kernel with .text.unlikely text the unlikely text for
+> each translation unit was put next to the main .text code in the
+> final vmlinux.
 > 
-> all:
->         @echo $(KBUILD_CFLAGS)
->         $(MAKE) -C /lib/modules/`uname`/build M=$(PWD) modules
+> The problem is that the linker doesn't allow more specific submatches
+> of a section name in a different linker script statement after the
+> main match.
 > 
-> So if it's not a kbuild makefile, why the -pg flag can be successful removed through KBUILD_CFLAGS.
+> So we need to move them all into one line. With that change
+> .text.unlikely is at the end of everything again.
+> 
+> I also moved .text.hot into the same statement though, even though
+> that's not strictly needed.
+> 
+> Signed-off-by: Andi Kleen <ak@linux.intel.com>
 
-There are no all: rules in kbuild files.
+Applied to kbuild.git#kbuild.
 
 Michal
 
