@@ -1,43 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:46265 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:48191 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752473AbbHUMiZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 21 Aug 2015 08:38:25 -0400
-Date: Fri, 21 Aug 2015 14:38:23 +0200
-From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH v3] deb-pkg: add source package
-Message-ID: <20150821123823.GA24978@sepie.suse.cz>
-References: <1434010298-21445-1-git-send-email-riku.voipio@linaro.org>
- <55D4867B.40802@suse.cz>
- <1440148124.2632.39.camel@decadent.org.uk>
+	id S1751275AbbHUMtf (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 21 Aug 2015 08:49:35 -0400
+Subject: Re: [PATCH TRIVIAL v2] Avoid conflict with host definitions when
+ cross-compiling
+References: <1439549533-8716-1-git-send-email-p.fedin@samsung.com>
+ <55D5BAA4.5050003@suse.com> <018a01d0db44$35ed5630$a1c80290$@samsung.com>
+ <55D5CA31.8090401@suse.com> <019301d0db4a$a60a7370$f21f5a50$@samsung.com>
+From: Michal Marek <mmarek@suse.com>
+Message-ID: <55D71E5C.2080807@suse.com>
+Date: Fri, 21 Aug 2015 14:49:32 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1440148124.2632.39.camel@decadent.org.uk>
+In-Reply-To: <019301d0db4a$a60a7370$f21f5a50$@samsung.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ben Hutchings <ben@decadent.org.uk>
-Cc: riku.voipio@linaro.org, linux-kbuild@vger.kernel.org, debian-kernel@lists.debian.org, Chris J Arges <chris.j.arges@canonical.com>, maximilian attems <maks@stro.at>
+To: Pavel Fedin <p.fedin@samsung.com>
+Cc: linux-kbuild@vger.kernel.org
 
-On Fri, Aug 21, 2015 at 11:08:44AM +0200, Ben Hutchings wrote:
-> I've gone through this with Riku and found a couple of problems:
+On 2015-08-20 15:18, Pavel Fedin wrote:
+>  Hi!
 > 
-> - The 'clean' rule in the generated debian/rules calls 'make clean',
->   but scripts/package/Makefile includes debian/ in clean-dirs.
->   Currently that directory does not get removed for some reason, but I
->   think that's a bug and the clean rule in debian/rules should guard
->   against removal.
+>> If you already have the patches, it won't hurt to send them.
+> 
+>  I have one of them, need to make more.
+> 
+>> Although I
+>> was under the impression that the .exe suffix is somehow automagically
+>> handled by Cygwin..?
+> 
+>  In 99% of cases - yes. But at least there is a problem with implicit rules in GNU Make.
 
-Good catch. make clean is indeed supposed to delete the debian/
-directory.
+That sounds good. I feared we would have to write scripts/foo$(EXE)
+everywhere.
+
+>  Actually, here i am talking about patch 0002 from this set:
+> https://www.cygwin.com/ml/cygwin/2012-06/msg00221.html.
+
+Patch 0002 has been merged in the meantime.
 
 
-> - Building of the 'orig' tarball uses git, i.e. it depends on the
->   kernel source being in a git repository and not simply unpacked from
->   a tarball (or from other VCS).  The rpmpkg target doesn't have this 
->   same restriction.
+> This HOWTO was created when the kernel was
+> really old, and now some more tools face a similar problem, like certificate generator for security
+> subsystem. I will check this.
 
-Right. make rpm uses the KBUILD_ALLDIRS to generate the tarball. It's
-not perfect, but it behaves consistently.
+OK.
 
 Michal
