@@ -1,58 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f170.google.com ([209.85.212.170]:35013 "EHLO
-	mail-wi0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753881AbbHUOkJ (ORCPT
+Received: from mail-oi0-f42.google.com ([209.85.218.42]:36284 "EHLO
+	mail-oi0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753356AbbHWXNz (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 21 Aug 2015 10:40:09 -0400
-Received: by wicne3 with SMTP id ne3so17800268wic.0
-        for <linux-kbuild@vger.kernel.org>; Fri, 21 Aug 2015 07:40:07 -0700 (PDT)
+	Sun, 23 Aug 2015 19:13:55 -0400
+Received: by oiev193 with SMTP id v193so70238881oie.3
+        for <linux-kbuild@vger.kernel.org>; Sun, 23 Aug 2015 16:13:54 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20150821123823.GA24978@sepie.suse.cz>
-References: <1434010298-21445-1-git-send-email-riku.voipio@linaro.org>
-	<55D4867B.40802@suse.cz>
-	<1440148124.2632.39.camel@decadent.org.uk>
-	<20150821123823.GA24978@sepie.suse.cz>
-Date: Fri, 21 Aug 2015 17:40:07 +0300
-Message-ID: <CAAqcGHkg7GBd5c=uaD+ivZpSf3h5EtrYDG7_GoHQpC0qJonNJQ@mail.gmail.com>
-Subject: Re: [PATCH v3] deb-pkg: add source package
-From: Riku Voipio <riku.voipio@linaro.org>
+In-Reply-To: <CAL_JsqKv2aOEM-U7JNZnaHomA6HFBSFhSLZ-zhp7c20s6gQBaQ@mail.gmail.com>
+References: <1438618000-1091-1-git-send-email-ian.campbell@citrix.com>
+	<1439287646.9747.212.camel@citrix.com>
+	<CAL_JsqKv2aOEM-U7JNZnaHomA6HFBSFhSLZ-zhp7c20s6gQBaQ@mail.gmail.com>
+Date: Sun, 23 Aug 2015 16:13:54 -0700
+Message-ID: <CAOesGMj46mvbdya1OQnZzL8VrxVwxAV3KoZZRtk3c0CTVx7d5w@mail.gmail.com>
+Subject: Re: [PATCH v5] dtb: Create a common home for cross-architecture dtsi files.
+From: Olof Johansson <olof@lixom.net>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Ben Hutchings <ben@decadent.org.uk>, linux-kbuild <linux-kbuild@vger.kernel.org>, debian-kernel <debian-kernel@lists.debian.org>, Chris J Arges <chris.j.arges@canonical.com>, maximilian attems <maks@stro.at>
+To: Rob Herring <robherring2@gmail.com>
+Cc: Ian Campbell <ian.campbell@citrix.com>, "arm@kernel.org" <arm@kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Rob Herring <robh+dt@kernel.org>, Pawel Moll <pawel.moll@arm.com>, Mark Rutland <mark.rutland@arm.com>, Kumar Gala <galak@codeaurora.org>, Liviu Dudau <liviu.dudau@arm.com>, Sudeep Holla <sudeep.holla@arm.com>, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Russell King <linux@arm.linux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, Kevin Hilman <khilman@linaro.org>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On 21 August 2015 at 15:38, Michal Marek <mmarek@suse.cz> wrote:
+On Fri, Aug 14, 2015 at 2:21 PM, Rob Herring <robherring2@gmail.com> wrote:
+> +arm-soc
 >
-> On Fri, Aug 21, 2015 at 11:08:44AM +0200, Ben Hutchings wrote:
-> > I've gone through this with Riku and found a couple of problems:
-> >
-> > - The 'clean' rule in the generated debian/rules calls 'make clean',
-> >   but scripts/package/Makefile includes debian/ in clean-dirs.
-> >   Currently that directory does not get removed for some reason, but I
-> >   think that's a bug and the clean rule in debian/rules should guard
-> >   against removal.
+> On Tue, Aug 11, 2015 at 5:07 AM, Ian Campbell <ian.campbell@citrix.com> wrote:
+>> On Mon, 2015-08-03 at 17:06 +0100, Ian Campbell wrote:
+>>> Commit 9ccd608070b6 ("arm64: dts: add device tree for ARM SMM-A53x2 on
+>>> LogicTile Express 20MG") added a new dts file to arch/arm64 which
+>>> included "../../../../arm/boot/dts/vexpress-v2m-rs1.dtsi", i.e. a
+>>> .dtsi supplied by arch/arm.
+>>>
+>>> Unfortunately this causes some issues for the split device tree
+>>> repository[0], since things get moved around there. In that context
+>>> the new .dts ends up at src/arm64/arm/vexpress-v2f-1xv7-ca53x2.dts
+>>> while the include is at src/arm/vexpress-v2m-rs1.dtsi.
+>>
+>> Hi Grant,
+>>
+>> Do you think there is any chance of getting this into 4.2-rc$NEXT or shall
+>> we wait until 4.3? I'm assuming this should go via the DT tree, but maybe
+>> it should go via an ARM tree?
 >
-> Good catch. make clean is indeed supposed to delete the debian/
-> directory.
+> I was assuming this would go thru the arm-soc tree which is why I
+> acked it. It is getting a bit late for 4.2 at this point, but I guess
+> the standalone tree remains broken for these platforms until this is
+> done. Probably not such a big deal in grand scheme of things.
 
-It looks like debian/ directory isn't cleaned because "scripts" is
-missing from "clean-dirs" in
-the kernel top-level Makefile - it is in mroper-dirs, and thus debian/
-vanishes when "make mrproper"
-is run. I'm quite surprised that "clean-dirs" in toplevel makefile
-means "recurse" but deeper in directory
-tree it starts meaning "rm -rf this"..
+I'm cc:d in the far tail of a thread, so I'll just comment here
+instead of further up:
 
-If clean-dirs is fixed to remove debian/, this will be annoying to fix
-in this patch.
+I'm not a fan at all of creating kernel/dts/<arch>/*, at least if
+there's expected to be contents in there.
 
-> > - Building of the 'orig' tarball uses git, i.e. it depends on the
-> >   kernel source being in a git repository and not simply unpacked from
-> >   a tarball (or from other VCS).  The rpmpkg target doesn't have this
-> >   same restriction.
->
-> Right. make rpm uses the KBUILD_ALLDIRS to generate the tarball. It's
-> not perfect, but it behaves consistently.
+We don't have include/linux/asm-<arch>/ in the common tree either.
+Let's not create that for dts.
 
-Changing this to match rpmpkg behaviour makes sense.
+So, while I'm all for a prefix-based sharing of DTSI files, I don't
+want them to go in a common kernel/dts directory.
+
+Besides sharing some snippets between arm and arm64, what else is
+expected to need to go into such a shared location today?
+
+
+-Olof
