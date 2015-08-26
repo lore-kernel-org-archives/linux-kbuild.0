@@ -1,27 +1,31 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-bn1bhn0249.outbound.protection.outlook.com ([157.56.111.249]:41915
-	"EHLO na01-bn1-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1754619AbbHYLjh convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 25 Aug 2015 07:39:37 -0400
-Content-Type: text/plain; charset=US-ASCII
+Received: from mx2.suse.de ([195.135.220.15]:54979 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751995AbbHZJ1t (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 26 Aug 2015 05:27:49 -0400
+Date: Wed, 26 Aug 2015 11:27:47 +0200
+From: Michal Marek <mmarek@suse.cz>
+Subject: Re: [PATCH] kbuild: avoid listing /lib/modules in kernel spec file
+Message-ID: <20150826092747.GA27121@sepie.suse.cz>
+References: <20150813211610.11760.6911.stgit@phlsvslse11.ph.intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Description: Mail message body
-Subject: Good News !! Please Respond Swiftly
-From: Prince@vger.kernel.org, Alwaleed@vger.kernel.org,
-	Bin@vger.kernel.org
-Date: Tue, 25 Aug 2015 14:36:29 +0300
-Reply-To: <ahmadsadiqafn@gmail.com>
-Message-ID: <d434009c-2e4d-49fb-88a9-0088cb5ae8b9@FSU-EXCH-NWR04.fsu.edu>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20150813211610.11760.6911.stgit@phlsvslse11.ph.intel.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Recipients@vger.kernel.org
+To: Mike Marciniszyn <mike.marciniszyn@intel.com>
+Cc: dledford@redhat.com, linux-kbuild@vger.kernel.org
 
-SAUDI ARABIA PRINCE ALWALEED BIN TALAL FINANCIAL DONATION OF $25,000,000 USD TO YOU
+On Thu, Aug 13, 2015 at 05:16:10PM -0400, Mike Marciniszyn wrote:
+> This causes conflicts when using multiple kernels built
+> with this mechanism.
+> 
+> Reviewed-by: Dennis Dalessandro <dennis.dalessandro@intel.com>
+> Signed-off-by: Mike Marciniszyn <mike.marciniszyn@intel.com>
 
----
-This email has been checked for viruses by Avast antivirus software.
-https://www.avast.com/antivirus
+It's not obvious to me which file conflict you are getting, but you are
+right that the directory does not have to be in the package. Applied to
+kbuild.git#misc.
 
+Michal
