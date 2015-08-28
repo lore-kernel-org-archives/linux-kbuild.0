@@ -1,54 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:46374 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751717AbbH1IDu (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 28 Aug 2015 04:03:50 -0400
-Subject: Re: [GIT PULL] kbuild misc fixes for v4.2-rc1
-References: <20150702203736.GA23499@pobox.suse.cz>
- <CA+55aFx2NScXTnv_0gx=WBe1RGdzHp=QKkaoh1cpcTZ1HKaSxg@mail.gmail.com>
- <5596690A.9090004@suse.cz> <55DF8C2F.9010407@gmail.com>
-From: Michal Marek <mmarek@suse.cz>
-Message-ID: <55E015E2.10700@suse.cz>
-Date: Fri, 28 Aug 2015 10:03:46 +0200
+Received: from mailrelay.lanline.com ([216.187.10.16]:14332 "EHLO
+	mailrelay.lanline.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752124AbbH1NKJ (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 28 Aug 2015 09:10:09 -0400
 MIME-Version: 1.0
-In-Reply-To: <55DF8C2F.9010407@gmail.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
+Message-ID: <21984.23085.125231.147499@quad.stoffel.home>
+Date: Fri, 28 Aug 2015 08:55:09 -0400
+From: "John Stoffel" <john@stoffel.org>
+Subject: Re: [RFC/PATCH 0/2] A simpler way to maintain custom defconfigs
+In-Reply-To: <1440680925-2879-1-git-send-email-felipe.contreras@gmail.com>
+References: <1440680925-2879-1-git-send-email-felipe.contreras@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Florian Fainelli <f.fainelli@gmail.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, Andi Kleen <ak@linux.intel.com>, andrej.skvortzov@gmail.com, arnaud.patard@rtp-net.org, Borislav Petkov <bp@suse.de>, dmitry.kalinkin@gmail.com, fabio.estevam@freescale.com, Jim Davis <jim.epost@gmail.com>, riku.voipio@linaro.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, David Howells <dhowells@redhat.com>
+To: Felipe Contreras <felipe.contreras@gmail.com>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, "Yann E. MORIN" <yann.morin.1998@free.fr>, Linus Torvalds <torvalds@linux-foundation.org>
 
-On 2015-08-28 00:16, Florian Fainelli wrote:
-> On 03/07/15 03:50, Michal Marek wrote:
->> On 2015-07-03 00:25, Linus Torvalds wrote:
->>> So with all these changes to the build system fro 4.2, I'm *still*
->>> getting that annoying
->>>
->>>    X.509 certificate list changed
->>>
->>> issue. Which apparently people don't normally see, because it does to
->>> stdout rather than to stderr, so it's hidden by all the other random
->>> build output.
->>
->> There is a fix for that in in David Howels's tree, the topmost commit being
->>
->> commit 9c71c950793b1b8c23c6d945b31f6545f82adced
->> Author: David Woodhouse <David.Woodhouse@intel.com>
->> Date:   Thu May 21 12:23:55 2015 +0100
->>
->>     modsign: Add explicit CONFIG_SYSTEM_TRUSTED_KEYS option
->>
->> I though it was meant for 4.2, but I do not even see it in linux-next.
->> David, what's your plan with the patches by David W?
->>
->> Anyway, none of the kbuild branches was *meant* to fix the issue.
-> 
-> Michal, it does not look like this pull request has been merged into any
-> 4.2-rc release, but I have not seen a resent either, what do we do with
-> these changes now?
 
-It will be part of the 4.3-rc1 pull request.
+Felipe> For several years I've used a trick to be able to maintain a simple defconfig
+Felipe> that works across many versions, and requires little maintenance from my
+Felipe> part:
 
-Michal
+Felipe> % cat arch/x86/configs/x86_64_defconfig ~/my-config > .config && make olddefconfig
+
+Felipe> I'm sending a proposal to integrate it on the build system so that many people
+Felipe> can do the same in a simple manner.
+
+Felipe> The interesting part is how to generate this simplified defconfig. In a
+Felipe> nutshell; you want to take your .config, remove everything that is the default
+Felipe> in the Kconfig files (what savedefconfig does), but also removes anything that
+Felipe> is in the default defconfig (e.g. x86_64_defconfig)
+
+Felipe> I've been doing this by hand, but today I gave it a shot to automate this. The
+Felipe> result is a bit crude, but it works.
+
+Felipe> Thoughts?
+
+I like this idea, it makes alot of sense to me, and looks like it will
+simplify things for people.  
 
