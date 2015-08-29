@@ -1,33 +1,21 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:53607 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751857AbbH1PFY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 28 Aug 2015 11:05:24 -0400
-Subject: Re: [PATCH v3 0/4] scripts: add stack{usage,delta} scripts
-References: <55D48FB9.50605@suse.cz>
- <1440064410-13515-1-git-send-email-linux@rasmusvillemoes.dk>
-From: Michal Marek <mmarek@suse.cz>
-Message-ID: <55E078B2.2070003@suse.cz>
-Date: Fri, 28 Aug 2015 17:05:22 +0200
+Received: from mail-hk2apc01hn0233.outbound.protection.outlook.com ([104.47.124.233]:32691
+	"EHLO APC01-HK2-obe.outbound.protection.outlook.com"
+	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+	id S1751819AbbH2SXZ convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 29 Aug 2015 14:23:25 -0400
+Content-Type: text/plain; charset=US-ASCII
 MIME-Version: 1.0
-In-Reply-To: <1440064410-13515-1-git-send-email-linux@rasmusvillemoes.dk>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 7BIT
+Content-Description: Mail message body
+Subject: 
+From: <jerryfunds19@unitedfunds.onmicrosoft.com>
+Date: Sat, 29 Aug 2015 23:52:34 +0530
+Reply-To: <j.funds2000000@inbox.lv>
+Message-ID: <SIXPR0201MB09855DE0E3E37B0632C455DDB86D0@SIXPR0201MB0985.apcprd02.prod.outlook.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rasmus Villemoes <linux@rasmusvillemoes.dk>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Recipients@vger.kernel.org
 
-On 2015-08-20 11:53, Rasmus Villemoes wrote:
-> On Wed, Aug 19 2015, Michal Marek <mmarek@suse.cz> wrote:
-> 
->> Do you plan any new iterations, or is this final despite the [RFC]?
->> If it's final, I will apply it.
-> 
-> It's final, modulo a few typos I spotted. I took the opportunity to
-> fix those and send with a PATCH prefix.
-
-Thanks. I applied the series to kbuild.git#misc now.
-
-Michal
-
+We Give Out Loans For 3% Interest Rate And We Offer Loans From $5,000 To $50,000,000.00, Are You Looking To Buy A House Car Or Company Or Start Up A Truck Company or Buy A Truck Or Personal Loans, Email Us At j.funds2000000@inbox.lv  With Amount Needed And Phone Number.
