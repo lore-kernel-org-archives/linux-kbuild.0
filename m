@@ -1,59 +1,127 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:47259 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:48386 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754573AbbIHP05 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 8 Sep 2015 11:26:57 -0400
-Date: Tue, 8 Sep 2015 17:26:57 +0200
+	id S1754861AbbIHPiU (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 8 Sep 2015 11:38:20 -0400
+Date: Tue, 8 Sep 2015 17:38:17 +0200
 From: Michal Marek <mmarek@suse.cz>
-Subject: [GIT PULL] kconfig changes for v4.3-rc1
-Message-ID: <20150908152657.GA16438@pobox.suse.cz>
+Subject: [GIT PULL] kbuild misc changes for v4.3-rc1
+Message-ID: <20150908153817.GA17143@pobox.suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: andreas.ruprecht@fau.de, elfring@users.sourceforge.net, sam.bobroff@au1.ibm.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: ak@linux.intel.com, andrej.skvortzov@gmail.com, arnaud.patard@rtp-net.org, bp@suse.de, dmitry.kalinkin@gmail.com, f.fainelli@gmail.com, fabio.estevam@freescale.com, jim.epost@gmail.com, k.kozlowski@samsung.com, linux@rasmusvillemoes.dk, lists@nerdbynature.de, mike.marciniszyn@intel.com, riku.voipio@linaro.org, sboyd@codeaurora.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hi Linux,
+Hi Linus,
 
-please pull these kconfig changes for v4.3-rc1:
-- kconfig warns about junk characters in Kconfig files
-- merge_config.sh error handling
-- small cleanup
+these are the non-core kbuild changes for 4.3-rc1:
+- deb-pkg:
+  + module signing fix
+  + dtb files are added to the package
+  + do not require `hostname -f` to work during build
+  + make deb-pkg generates a source package, bindeb-pkg has been added 
+    to only generate the binary package
+- rpm-pkg packages /lib/modules as well
+- new coccinelle patch and updates to existing ones
+- new stackusage & stackdelta script to collect and compare stack usage
+  info (using gcc's -fstack-usage)
+- make tags understands trace_*_rcuidle() macros
+- .gitignore updates, misc cleanups
 
 Thanks,
 Michal
+  
 
 
-The following changes since commit d770e558e21961ad6cfdf0ff7df0eb5d7d4f0754:
+The following changes since commit b787f68c36d49bb1d9236f403813641efa74a031:
 
-  Linux 4.2-rc1 (2015-07-05 11:01:52 -0700)
+  Linux 4.1-rc1 (2015-04-26 17:59:10 -0700)
 
 are available in the git repository at:
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git kconfig
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git misc
 
-for you to fetch changes up to 78a6854e219ba266b6cc12f840b571c5f1168b5e:
+for you to fetch changes up to 3716001bcb7f5822382ac1f2f54226b87312cc6b:
 
-  merge_config.sh: exit on missing input files (2015-08-20 13:56:55 +0200)
+  deb-pkg: add source package (2015-09-04 11:25:03 +0200)
 
 ----------------------------------------------------------------
-Andreas Ruprecht (2):
-      kconfig: warn of unhandled characters in Kconfig commands
-      kconfig: Regenerate shipped zconf.{hash,lex}.c files
+Andi Kleen (1):
+      Kbuild: Add ID files to .gitignore
 
-Markus Elfring (1):
-      kconfig: Delete unnecessary checks before the function call "sym_calc_value"
+Andrey Skvortsov (1):
+      builddeb: fix stripped module signatures if CONFIG_DEBUG_INFO and CONFIG_MODULE_SIG_ALL are set
 
-Sam Bobroff (1):
-      merge_config.sh: exit on missing input files
+Arnaud Patard (1):
+      deb-pkg: Add device tree blobs to the package
 
- scripts/kconfig/confdata.c           |   7 +-
- scripts/kconfig/merge_config.sh      |   4 +
- scripts/kconfig/symbol.c             |   3 +-
- scripts/kconfig/zconf.gperf          |   1 +
- scripts/kconfig/zconf.hash.c_shipped |  58 ++++---
- scripts/kconfig/zconf.l              |  20 ++-
- scripts/kconfig/zconf.lex.c_shipped  | 325 +++++++++++++++++------------------
- 7 files changed, 211 insertions(+), 207 deletions(-)
+Borislav Petkov (1):
+      kbuild/mkspec: Simplify vmlinux.bz2 creation
+
+Christian Kujau (1):
+      fallback to hostname in scripts/package/builddeb
+
+Dmitry Kalinkin (1):
+      coccinelle: api: add vma_pages.cocci
+
+Fabio Estevam (8):
+      coccinelle: pm_runtime: Insert blank line
+      coccinelle: returnvar: Use imperative mood
+      coccinelle: ifaddr: Fix the sentence
+      coccinelle: simple_open: Use imperative mood
+      scripts/coccinelle/misc/semicolon.cocci: Use imperative mood
+      scripts/coccinelle/misc/irqf_oneshot.cocci: Fix grammar
+      coccinelle: irqf_oneshot.cocci: Improve the generated commit log
+      coccinelle: simple_return: Add a blank line
+
+Florian Fainelli (1):
+      gitignore: Add MIPS vmlinux.32 to the list
+
+Jim Davis (1):
+      scripts/package/Makefile: rpmbuild is needed for rpm targets
+
+Krzysztof Kozlowski (1):
+      coccinelle: api: extend spatch for dropping unnecessary owner
+
+Mike Marciniszyn (1):
+      kbuild: avoid listing /lib/modules in kernel spec file
+
+Rasmus Villemoes (4):
+      scripts: add stackusage script
+      .gitignore: add *.su pattern
+      kbuild: remove *.su files generated by -fstack-usage
+      scripts: add stackdelta script
+
+Riku Voipio (4):
+      deb-pkg: move setting debarch for a separate function
+      deb-pkg: simplify directory creation
+      package/Makefile: move source tar creation to a function
+      deb-pkg: add source package
+
+Stephen Boyd (1):
+      scripts/tags.sh: Include trace_*_rcuidle() in tags
+
+ .gitignore                                         |  5 ++
+ Makefile                                           |  1 +
+ scripts/coccinelle/api/platform_no_drv_owner.cocci | 73 ++++++++++++++++++
+ scripts/coccinelle/api/pm_runtime.cocci            |  2 +-
+ scripts/coccinelle/api/simple_open.cocci           |  4 +-
+ scripts/coccinelle/api/vma_pages.cocci             | 60 +++++++++++++++
+ scripts/coccinelle/misc/ifaddr.cocci               |  3 +-
+ scripts/coccinelle/misc/irqf_oneshot.cocci         |  7 +-
+ scripts/coccinelle/misc/returnvar.cocci            |  2 +-
+ scripts/coccinelle/misc/semicolon.cocci            |  2 +-
+ scripts/coccinelle/misc/simple_return.cocci        |  2 +-
+ scripts/package/Makefile                           | 54 +++++++------
+ scripts/package/builddeb                           | 90 ++++++++++++++++------
+ scripts/package/mkspec                             |  5 +-
+ scripts/stackdelta                                 | 59 ++++++++++++++
+ scripts/stackusage                                 | 33 ++++++++
+ scripts/tags.sh                                    |  4 +
+ 17 files changed, 345 insertions(+), 61 deletions(-)
+ create mode 100644 scripts/coccinelle/api/vma_pages.cocci
+ create mode 100755 scripts/stackdelta
+ create mode 100755 scripts/stackusage
