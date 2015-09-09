@@ -1,127 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:48386 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754861AbbIHPiU (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 8 Sep 2015 11:38:20 -0400
-Date: Tue, 8 Sep 2015 17:38:17 +0200
-From: Michal Marek <mmarek@suse.cz>
-Subject: [GIT PULL] kbuild misc changes for v4.3-rc1
-Message-ID: <20150908153817.GA17143@pobox.suse.cz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Received: from mailout2.w1.samsung.com ([210.118.77.12]:36221 "EHLO
+	mailout2.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753132AbbIIIeR convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 9 Sep 2015 04:34:17 -0400
+Received: from eucpsbgm1.samsung.com (unknown [203.254.199.244])
+ by mailout2.w1.samsung.com
+ (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May  5 2014))
+ with ESMTP id <0NUE006MNIH27J80@mailout2.w1.samsung.com> for
+ linux-kbuild@vger.kernel.org; Wed, 09 Sep 2015 09:34:14 +0100 (BST)
+From: Pavel Fedin <p.fedin@samsung.com>
+References: <01e001d0e716$34a48b80$9deda280$@samsung.com>
+ <CAK7LNAS3UFq17rHobEUpS=fbyefscPunyHu9DMTAJESzcSfLxw@mail.gmail.com>
+ <014501d0e93a$4ee5ea90$ecb1bfb0$@samsung.com>
+ <CAK7LNAQHHKUO=EWQrgHLLu0rZM5sfH=xZ+XW9t9-ehBNmf7qxQ@mail.gmail.com>
+In-reply-to: <CAK7LNAQHHKUO=EWQrgHLLu0rZM5sfH=xZ+XW9t9-ehBNmf7qxQ@mail.gmail.com>
+Subject: RE: PING: [PATCH] make build tool dependencies portable
+Date: Wed, 09 Sep 2015 11:34:13 +0300
+Message-id: <017b01d0eada$4f0f0960$ed2d1c20$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=utf-8
+Content-transfer-encoding: 8BIT
+Content-language: ru
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: ak@linux.intel.com, andrej.skvortzov@gmail.com, arnaud.patard@rtp-net.org, bp@suse.de, dmitry.kalinkin@gmail.com, f.fainelli@gmail.com, fabio.estevam@freescale.com, jim.epost@gmail.com, k.kozlowski@samsung.com, linux@rasmusvillemoes.dk, lists@nerdbynature.de, mike.marciniszyn@intel.com, riku.voipio@linaro.org, sboyd@codeaurora.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: 'Masahiro Yamada' <yamada.masahiro@socionext.com>
+Cc: 'Linux Kbuild mailing list' <linux-kbuild@vger.kernel.org>, 'Michal Marek' <mmarek@suse.com>
 
-Hi Linus,
+ Hello!
 
-these are the non-core kbuild changes for 4.3-rc1:
-- deb-pkg:
-  + module signing fix
-  + dtb files are added to the package
-  + do not require `hostname -f` to work during build
-  + make deb-pkg generates a source package, bindeb-pkg has been added 
-    to only generate the binary package
-- rpm-pkg packages /lib/modules as well
-- new coccinelle patch and updates to existing ones
-- new stackusage & stackdelta script to collect and compare stack usage
-  info (using gcc's -fstack-usage)
-- make tags understands trace_*_rcuidle() macros
-- .gitignore updates, misc cleanups
+> You are adding the dependency of pnmtolog and asn1_compiler.
+> 
+> 
+> We have more host tools.  See scripts/Makefile
 
-Thanks,
-Michal
-  
+ Looks like the problem only happens when we have an explicit dependency of something on this binary. This appears to be the case only for these two tools.
+ Ok, i see your point and i agree that this might be an ad-hoc fix. We can consider it to be GNU make's bug. Let's try that side then. :)
+
+Kind regards,
+Pavel Fedin
+Expert Engineer
+Samsung Electronics Research center Russia
 
 
-The following changes since commit b787f68c36d49bb1d9236f403813641efa74a031:
-
-  Linux 4.1-rc1 (2015-04-26 17:59:10 -0700)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git misc
-
-for you to fetch changes up to 3716001bcb7f5822382ac1f2f54226b87312cc6b:
-
-  deb-pkg: add source package (2015-09-04 11:25:03 +0200)
-
-----------------------------------------------------------------
-Andi Kleen (1):
-      Kbuild: Add ID files to .gitignore
-
-Andrey Skvortsov (1):
-      builddeb: fix stripped module signatures if CONFIG_DEBUG_INFO and CONFIG_MODULE_SIG_ALL are set
-
-Arnaud Patard (1):
-      deb-pkg: Add device tree blobs to the package
-
-Borislav Petkov (1):
-      kbuild/mkspec: Simplify vmlinux.bz2 creation
-
-Christian Kujau (1):
-      fallback to hostname in scripts/package/builddeb
-
-Dmitry Kalinkin (1):
-      coccinelle: api: add vma_pages.cocci
-
-Fabio Estevam (8):
-      coccinelle: pm_runtime: Insert blank line
-      coccinelle: returnvar: Use imperative mood
-      coccinelle: ifaddr: Fix the sentence
-      coccinelle: simple_open: Use imperative mood
-      scripts/coccinelle/misc/semicolon.cocci: Use imperative mood
-      scripts/coccinelle/misc/irqf_oneshot.cocci: Fix grammar
-      coccinelle: irqf_oneshot.cocci: Improve the generated commit log
-      coccinelle: simple_return: Add a blank line
-
-Florian Fainelli (1):
-      gitignore: Add MIPS vmlinux.32 to the list
-
-Jim Davis (1):
-      scripts/package/Makefile: rpmbuild is needed for rpm targets
-
-Krzysztof Kozlowski (1):
-      coccinelle: api: extend spatch for dropping unnecessary owner
-
-Mike Marciniszyn (1):
-      kbuild: avoid listing /lib/modules in kernel spec file
-
-Rasmus Villemoes (4):
-      scripts: add stackusage script
-      .gitignore: add *.su pattern
-      kbuild: remove *.su files generated by -fstack-usage
-      scripts: add stackdelta script
-
-Riku Voipio (4):
-      deb-pkg: move setting debarch for a separate function
-      deb-pkg: simplify directory creation
-      package/Makefile: move source tar creation to a function
-      deb-pkg: add source package
-
-Stephen Boyd (1):
-      scripts/tags.sh: Include trace_*_rcuidle() in tags
-
- .gitignore                                         |  5 ++
- Makefile                                           |  1 +
- scripts/coccinelle/api/platform_no_drv_owner.cocci | 73 ++++++++++++++++++
- scripts/coccinelle/api/pm_runtime.cocci            |  2 +-
- scripts/coccinelle/api/simple_open.cocci           |  4 +-
- scripts/coccinelle/api/vma_pages.cocci             | 60 +++++++++++++++
- scripts/coccinelle/misc/ifaddr.cocci               |  3 +-
- scripts/coccinelle/misc/irqf_oneshot.cocci         |  7 +-
- scripts/coccinelle/misc/returnvar.cocci            |  2 +-
- scripts/coccinelle/misc/semicolon.cocci            |  2 +-
- scripts/coccinelle/misc/simple_return.cocci        |  2 +-
- scripts/package/Makefile                           | 54 +++++++------
- scripts/package/builddeb                           | 90 ++++++++++++++++------
- scripts/package/mkspec                             |  5 +-
- scripts/stackdelta                                 | 59 ++++++++++++++
- scripts/stackusage                                 | 33 ++++++++
- scripts/tags.sh                                    |  4 +
- 17 files changed, 345 insertions(+), 61 deletions(-)
- create mode 100644 scripts/coccinelle/api/vma_pages.cocci
- create mode 100755 scripts/stackdelta
- create mode 100755 scripts/stackusage
