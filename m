@@ -1,64 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cmta7.telus.net ([209.171.16.80]:56625 "EHLO cmta7.telus.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753392AbbINDRF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 13 Sep 2015 23:17:05 -0400
-From: "Doug Smythies" <dsmythies@telus.net>
-Subject: Re: [PATCH v5] deb-pkg: add source package
-Date: Sun, 13 Sep 2015 20:08:48 -0700
-Message-ID: <000701d0ee9a$ae397600$0aac6200$@net>
+Received: from mail-yk0-f181.google.com ([209.85.160.181]:34568 "EHLO
+	mail-yk0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750832AbbINERV (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 14 Sep 2015 00:17:21 -0400
+Received: by ykdg206 with SMTP id g206so141793875ykd.1
+        for <linux-kbuild@vger.kernel.org>; Sun, 13 Sep 2015 21:17:20 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-Content-Language: en-ca
+Date: Mon, 14 Sep 2015 01:17:20 -0300
+Message-ID: <CA+ToGPHBHz1k1CTEoA0TsK_g+TPw6yhJJYgRVTOJS2vc-CAKbQ@mail.gmail.com>
+Subject: What would it take to port xconfig to Qt5 and gconfig to GTK+ 3?
+From: Diego Viola <diego.viola@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: 'Riku Voipio' <riku.voipio@linaro.org>, 'Michal Marek' <mmarek@suse.com>
-Cc: 'maximilian attems' <maks@stro.at>, 'Ben Hutchings' <ben@decadent.org.uk>, linux-kbuild@vger.kernel.org, 'Doug Smythies' <dsmythies@telus.net>, 'Chris J Arges' <chris.j.arges@canonical.com>
+To: linux-kbuild@vger.kernel.org
 
-Kernel 4.3-rc1 introduces 
-Commit 3716001bcb7f5822382ac1f2f54226b87312cc6b 
-which was from an e-mail thread of this subject name.
-I am not on the linux-kbuild e-mail list, but have
-found and reviewed the approximately 45 e-mails
-of this thread, back to v1.
+Hi,
 
-I understand that I now need to use bindeb-pkg
-where I used to use deb-pkg to compile the kernel.
+I would like to help with this and try to port one or the other to the
+latest toolkits so that we can remove "X windows" from the README.
 
-However, I do not understand why I now get a .change
-file that I do not want.
+I.e.,
 
-Nor do I want the 532 lines of "dpkg-genchanges"
-and ""Use of uninitialized value" warnings at the end
-of the compile.
- 
-I am asking why is this stuff here (in
-scripts/package/builddeb):
+I want to replace this:
 
->+EOF
->+	mv ${sourcename}.tar.gz ../${sourcename}_${version}.orig.tar.gz
->+	tar caf ../${sourcename}_${packageversion}.debian.tar.gz debian/{copyright,rules,changelog,control}
->+	dpkg-source -cdebian/control -ldebian/changelog --format="3.0 (custom)" --target-format="3.0 (quilt)" \
->+		-b / ../${sourcename}_${version}.orig.tar.gz  ../${sourcename}_${packageversion}.debian.tar.gz
->+	mv ${sourcename}_${packageversion}*dsc ..
->+	dpkg-genchanges > ../${sourcename}_${packageversion}_${debarch}.changes
->+else
->+	dpkg-genchanges -b > ../${sourcename}_${packageversion}_${debarch}.changes
->+fi
->+
+"make xconfig"     X windows (Qt) based configuration tool.
 
-and suggest that (at least for people that just want things
-to be the way they were) it should be:
+"make gconfig"     X windows (GTK+) based configuration tool.
 
-+EOF
-+	mv ${sourcename}.tar.gz ../${sourcename}_${version}.orig.tar.gz
-+	tar caf ../${sourcename}_${packageversion}.debian.tar.gz debian/{copyright,rules,changelog,control}
-+	dpkg-source -cdebian/control -ldebian/changelog --format="3.0 (custom)" --target-format="3.0 (quilt)" \
-+		-b / ../${sourcename}_${version}.orig.tar.gz  ../${sourcename}_${packageversion}.debian.tar.gz
-+	mv ${sourcename}_${packageversion}*dsc ..
-+	dpkg-genchanges > ../${sourcename}_${packageversion}_${debarch}.changes
-+fi
+With this:
 
+"make qconfig"     Qt based configuration tool.
 
+"make gconfig"     GTK+ based configuration tool.
+
+And perhaps keep an alias xconfig to qconfig for backwards
+compatibility. Does it makes sense?
+
+The reason I want to remove "X windows" from the README is that those
+toolkits are no longer dependent on X, there's also Wayland now.
+
+Do any of those work with Qt5/GTK+3 at the moment?
+
+Thanks,
+
+Diego
