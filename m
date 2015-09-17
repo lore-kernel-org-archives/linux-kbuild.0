@@ -1,59 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f177.google.com ([209.85.212.177]:33610 "EHLO
-	mail-wi0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751739AbbIPGzG (ORCPT
+Received: from smtp02.citrix.com ([66.165.176.63]:21277 "EHLO
+	SMTP02.CITRIX.COM" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751811AbbIQLHF (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 16 Sep 2015 02:55:06 -0400
-Received: by wiclk2 with SMTP id lk2so58379644wic.0
-        for <linux-kbuild@vger.kernel.org>; Tue, 15 Sep 2015 23:55:05 -0700 (PDT)
+	Thu, 17 Sep 2015 07:07:05 -0400
+Message-ID: <1442488021.18856.179.camel@citrix.com>
+Subject: Re: [PATCH v5] dtb: Create a common home for cross-architecture
+ dtsi files.
+From: Ian Campbell <ian.campbell@citrix.com>
+Date: Thu, 17 Sep 2015 12:07:01 +0100
+In-Reply-To: <CAOesGMhj50wg5WyByC7kHp3joo-ahfYWWDLLudp=kyKMpxauhg@mail.gmail.com>
+References: <1438618000-1091-1-git-send-email-ian.campbell@citrix.com>
+	 <1439287646.9747.212.camel@citrix.com>
+	 <CAL_JsqKv2aOEM-U7JNZnaHomA6HFBSFhSLZ-zhp7c20s6gQBaQ@mail.gmail.com>
+	 <CAOesGMj46mvbdya1OQnZzL8VrxVwxAV3KoZZRtk3c0CTVx7d5w@mail.gmail.com>
+	 <CAL_Jsq+tUmRfvKE6vf+za6TsG_fhMWn5M2DDDLcCfkDt=KJGVg@mail.gmail.com>
+	 <CAOesGMigmaEviCDBAncomkq+uowr18B5FTOmOyBHsNz4p6F6Dw@mail.gmail.com>
+	 <CAL_JsqKu6B1Q1q38GFSkdAT+Gxg3=87uk8ZOGPH96Eni0cer_g@mail.gmail.com>
+	 <CAOesGMhj50wg5WyByC7kHp3joo-ahfYWWDLLudp=kyKMpxauhg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 MIME-Version: 1.0
-In-Reply-To: <001f01d0efea$56135e40$023a1ac0$@net>
-References: <1442340712-8991-1-git-send-email-riku.voipio@linaro.org>
-	<8737yfy24g.fsf@kamboji.qca.qualcomm.com>
-	<001f01d0efea$56135e40$023a1ac0$@net>
-Date: Wed, 16 Sep 2015 09:55:05 +0300
-Message-ID: <CAAqcGHm+BNX4NHazXozmUdCW5yNjd4nQ0BV1oU71eQLDVtQTXw@mail.gmail.com>
-Subject: Re: [PATCH v2] builddeb: remove debian/files before build
-From: Riku Voipio <riku.voipio@linaro.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Doug Smythies <dsmythies@telus.net>
-Cc: Kalle Valo <kvalo@codeaurora.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, mmarek <mmarek@suse.cz>, Ben Hutchings <ben@decadent.org.uk>
+To: Olof Johansson <olof@lixom.net>, Rob Herring <robherring2@gmail.com>
+Cc: "arm@kernel.org" <arm@kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Rob Herring <robh+dt@kernel.org>, Pawel Moll <pawel.moll@arm.com>, Mark Rutland <mark.rutland@arm.com>, Kumar Gala <galak@codeaurora.org>, Liviu Dudau <liviu.dudau@arm.com>, Sudeep Holla <sudeep.holla@arm.com>, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Russell King <linux@arm.linux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Kristina Martsenko <kristina.martsenko@arm.com>, Kevin Hilman <khilman@linaro.org>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On 15 September 2015 at 22:11, Doug Smythies <dsmythies@telus.net> wrote:
-> On 2015.09.15 11:22 Kalle Valo wrote:
->> <riku.voipio@linaro.org> writes:
->>> From: Riku Voipio <riku.voipio@linaro.org>
->>>
->>> As debian/files keeps accumulating entries, the changes file
->>> will end up growing indefinelty. Remove the file in clean
->>> rule and before build starts.
->>>
->>> Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
->>> Reported-by: Doug Smythies <dsmythies@telus.net>
+Hi Olof,
 
->> Thanks, I had the same problem and this fixed it.
->> Tested-by: Kalle Valo <kvalo@codeaurora.org>
+On Mon, 2015-08-24 at 15:22 -0700, Olof Johansson wrote:
 
-> I tested also. Thanks.
+A little while ago you were trying to explain the scheme you would like to
+see on IRC but my thick skull was getting in the way :-/ Then you had to
+run...
 
-Michal, can you get this as fix for 4.3, since this is a regression?
+So, ping?
 
-Riku
-
-> For an incremental compile, where only one source file
-> has changed, the time went from 7 minutes and 47 seconds
-> to 4 minutes and 33 seconds on my test server.
-> And the spew of warnings and such are gone.
->
-> For reference a clean compile typically takes about
-> 23 minutes.
->
-> The overhead for making the .changes file is now on the
-> order of 2 to 4 seconds.
->
-> Obviously, results will vary widely for others, depending
-> on their hardware.
->
->
+Ian.
