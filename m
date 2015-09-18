@@ -1,59 +1,102 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from tex.lwn.net ([70.33.254.29]:32839 "EHLO vena.lwn.net"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751874AbbIRQa0 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 18 Sep 2015 12:30:26 -0400
-Date: Fri, 18 Sep 2015 10:30:24 -0600
-From: Jonathan Corbet <corbet@lwn.net>
-Subject: Re: [PATCH 2/2] DocBook: Use a fixed encoding for output
-Message-ID: <20150918103024.7ebbb8c9@xps.lwn.net>
-In-Reply-To: <1442190770.2298.31.camel@decadent.org.uk>
-References: <1441147632.9215.42.camel@decadent.org.uk>
-	<1441147759.9215.44.camel@decadent.org.uk>
-	<20150911133059.77455c16@lwn.net>
-	<1442190770.2298.31.camel@decadent.org.uk>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
+Received: from lb2-smtp-cloud2.xs4all.net ([194.109.24.25]:39520 "EHLO
+	lb2-smtp-cloud2.xs4all.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1753359AbbIRUcx (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 18 Sep 2015 16:32:53 -0400
+Message-ID: <1442608364.9205.31.camel@tiscali.nl>
+Subject: Re: [PATCH 1/1] [RFC] kconfig: menuconfig make "Selected by:"
+ readable
+From: Paul Bolle <pebolle@tiscali.nl>
+Date: Fri, 18 Sep 2015 22:32:44 +0200
+In-Reply-To: <1442257543-6194-2-git-send-email-petr.vorel@gmail.com>
+References: <1442257543-6194-1-git-send-email-petr.vorel@gmail.com>
+	 <1442257543-6194-2-git-send-email-petr.vorel@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ben Hutchings <ben@decadent.org.uk>
-Cc: =?UTF-8?B?SsOpcsOpbXk=?= Bobbio <lunar@debian.org>, reproducible-builds@lists.alioth.debian.org, linux-doc@vger.kernel.org, Randy Dunlap <rdunlap@infradead.org>, Michal Marek <mmarek@suse.com>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Petr Vorel <petr.vorel@gmail.com>, linux-kbuild@vger.kernel.org
+Cc: Randy Dunlap <rdunlap@infradead.org>
 
-On Mon, 14 Sep 2015 01:32:50 +0100
-Ben Hutchings <ben@decadent.org.uk> wrote:
+On ma, 2015-09-14 at 21:05 +0200, Petr Vorel wrote:
+> From: Paul Bolle <pebolle@tiscali.nl>
 
-> > I guess I have to ask, though: doesn't it seem that having the docs
-> > produced according to the current locale is the Right Thing to do?  Users
-> > have their locale set as it is for a reason, it seems like the production
-> > of textual documents should respect their choice.
-> > 
-> > Am I missing something here?  
-> 
-> Yes - the locale's character encoding applies to plain text, but rich
-> text formats can have a locale-independent encoding which the viewer
-> will automatically to the current locale's encoding.
-> 
-> For HTML, the document encoding can be explicit in the document header
-> (and is, in this case).
-> 
-> Manual pages were already consistently encoded in UTF-8, as this is the
-> default behaviour of DocBook-XSL (and is what man-db prefers as input).
-> 
-> PDF and Postscript documents have arbitrary and explicit mappings from
-> character numbers (or names) to glyphs, and PDF documents normally have
-> a mapping from glyphs back to Unicode code points to support searching
-> and copying text.
+(Petr and I have been in contact about this patch. The way it's been
+resubmitted is a bit odd. That's probably because I didn't give Petr's
+queries about my patch the attention they deserved.)
 
-OK, I guess you've talked me into it.  Can I ask you for one last favor,
-though: please resubmit this patch with a couple of tweaks:
+> This is a _hack_ to show what might be a better way to do this.
 
- - Based off current mainline, please (or docs-next, but that shouldn't
-   be necessary).  The patch as sent doesn't apply.
+That's the reason I submitted this as an RFC.
 
- - Could you add a comment to the check-lc_ctype proglet so that somebody
-   stumbling across it in the scripts directory knows why it's there?
+(By now I doubt whether RFC patches are worth the effort. I'm inclined
+to think that one might as well send in actual patches. Reviewing RFCs
+seems to be about as much work as reviewing real patches. So why bother
+reviewing them when the submitter might claim "It's only an RFC!" once
+things get serious?)  
+
+> Not-yet-signed-off-by: Paul Bolle <pebolle@tiscali.nl>
+
+I did this for a reason!	
+
+> Tested-by: Petr Vorel <petr.vorel@gmail.com>
+
+(Resubmitting someone else's patch can be the right thing to do. The
+patch should be correctly signed off in that case - this patch wasn't! -
+and the person resubmitting should sign off too. Petr didn't sign off on
+this patch.)
+
+> +static void rev_dep_gstr_print(struct expr *e, struct gstr *gs)
+> +{
+> +	struct gstr tmp = str_new();
+> +	const char *prev, *start;
+> +	char *beam;
+> +
+> +	expr_gstr_print(e, &tmp);
+
+This is the main problem with my RFC. I feel that the right thing for
+ rev_dep_gstr_print() would be to work on a struct expr directly,
+instead of cheating by using expr_gstr_print()'s output.
+
+Would you mind working on a v2 that tries to do that?
+
+> +	prev = start = str_get(&tmp);
+> +
+> +	str_append(gs, "\n  - ");
+> +
+> +	while ((beam = index(start, '|'))) {
+> +		char *lparen = index(start, '(');
+> +
+> +		/* don't split "(I || J)" */
+> +		if (lparen && (lparen < beam)) {
+> +			const char *rparen = matching_paren(++lparen);
+> +
+> +			/* skip the expression inside parentheses */
+> +			start = ++rparen;
+> +			continue;
+> +		}
+> +
+> +		/* we can assume we're fed a sane string, so the space before
+> +		 * the beam gets turned into a NUL */
+> +		*(beam - 1) = '\0';
+> +		str_append(gs, prev);
+> +		str_append(gs, "\n  - ");
+> +		/* assume sane string, so skip the second beam */
+> +		beam++;
+> +		/* trim */
+> +		while (*++beam == ' ')
+> +			;
+> +		prev = start = beam;
+> +	}
+> +
+> +	str_append(gs, prev);
+> +
+> +	str_free(&tmp);
+> +}
 
 Thanks,
 
-jon
+
+Paul Bolle
