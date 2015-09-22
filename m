@@ -1,40 +1,117 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:62639 "EHLO mga11.intel.com"
+Received: from mga11.intel.com ([192.55.52.93]:59967 "EHLO mga11.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S933339AbbIVSgx (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	id S933399AbbIVSgx (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
 	Tue, 22 Sep 2015 14:36:53 -0400
 From: Thiago Macieira <thiago.macieira@intel.com>
-Subject: [PATCH 37/39] Port xconfig to Qt5 - Fix goParent issue.
-Date: Tue, 22 Sep 2015 11:36:37 -0700
-Message-Id: <1442946999-37018-38-git-send-email-thiago.macieira@intel.com>
+Subject: [PATCH 39/39] Update the buildsystem for KConfig finding Qt
+Date: Tue, 22 Sep 2015 11:36:39 -0700
+Message-Id: <1442946999-37018-40-git-send-email-thiago.macieira@intel.com>
 In-Reply-To: <1442946999-37018-1-git-send-email-thiago.macieira@intel.com>
 References: <1442946999-37018-1-git-send-email-thiago.macieira@intel.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.com>, Boris Barbulovski <bbarbulovski@gmail.com>
+Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.com>
 
-From: Boris Barbulovski <bbarbulovski@gmail.com>
+The buildsystem will now only search for Qt 4 and Qt 5. Support for Qt 2
+and 3 was dropped in the previous commits (Qt 3 was EOL'ed in 2010 or
+so...).
 
-Signed-off-by: Boris Barbulovski <bbarbulovski@gmail.com>
+For Qt 5, to be future-proof with the future direction notice appearing
+in the 5.5 release, C++11 support is automatically enabled.
+
 Signed-off-by: Thiago Macieira <thiago.macieira@intel.com>
 ---
- scripts/kconfig/qconf.cc | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ scripts/kconfig/Makefile | 73 +++++++++++++++++++-----------------------------
+ 1 file changed, 28 insertions(+), 45 deletions(-)
 
-diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
-index d4e9cd5..1f31651 100644
---- a/scripts/kconfig/qconf.cc
-+++ b/scripts/kconfig/qconf.cc
-@@ -438,7 +438,7 @@ void ConfigList::updateList(ConfigItem* item)
+diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+index 9b5b8c6..33c4994 100644
+--- a/scripts/kconfig/Makefile
++++ b/scripts/kconfig/Makefile
+@@ -226,53 +226,36 @@ $(obj)/.tmp_qtcheck: $(src)/Makefile
  
- 	if (rootEntry != &rootmenu && (mode == singleMode ||
- 	    (mode == symbolMode && rootEntry->parent != &rootmenu))) {
--		item = firstChild();
-+		item = (ConfigItem *)topLevelItem(0);
- 		if (!item)
- 			item = new ConfigItem(this, 0, true);
- 		last = item;
+ # Qt needs some extra effort...
+ $(obj)/.tmp_qtcheck:
+-	@set -e; $(kecho) "  CHECK   qt"; dir=""; pkg=""; \
+-	if ! pkg-config --exists QtCore 2> /dev/null; then \
+-	    echo "* Unable to find the Qt4 tool qmake. Trying to use Qt3"; \
+-	    pkg-config --exists qt 2> /dev/null && pkg=qt; \
+-	    pkg-config --exists qt-mt 2> /dev/null && pkg=qt-mt; \
+-	    if [ -n "$$pkg" ]; then \
+-	      cflags="\$$(shell pkg-config $$pkg --cflags)"; \
+-	      libs="\$$(shell pkg-config $$pkg --libs)"; \
+-	      moc="\$$(shell pkg-config $$pkg --variable=prefix)/bin/moc"; \
+-	      dir="$$(pkg-config $$pkg --variable=prefix)"; \
+-	    else \
+-	      for d in $$QTDIR /usr/share/qt* /usr/lib/qt*; do \
+-	        if [ -f $$d/include/qconfig.h ]; then dir=$$d; break; fi; \
+-	      done; \
+-	      if [ -z "$$dir" ]; then \
+-	        echo >&2 "*"; \
+-	        echo >&2 "* Unable to find any Qt installation. Please make sure that"; \
+-	        echo >&2 "* the Qt4 or Qt3 development package is correctly installed and"; \
+-	        echo >&2 "* either qmake can be found or install pkg-config or set"; \
+-	        echo >&2 "* the QTDIR environment variable to the correct location."; \
+-	        echo >&2 "*"; \
+-	        false; \
+-	      fi; \
+-	      libpath=$$dir/lib; lib=qt; osdir=""; \
+-	      $(HOSTCXX) -print-multi-os-directory > /dev/null 2>&1 && \
+-	        osdir=x$$($(HOSTCXX) -print-multi-os-directory); \
+-	      test -d $$libpath/$$osdir && libpath=$$libpath/$$osdir; \
+-	      test -f $$libpath/libqt-mt.so && lib=qt-mt; \
+-	      cflags="-I$$dir/include"; \
+-	      libs="-L$$libpath -Wl,-rpath,$$libpath -l$$lib"; \
+-	      moc="$$dir/bin/moc"; \
+-	    fi; \
+-	    if [ ! -x $$dir/bin/moc -a -x /usr/bin/moc ]; then \
+-	      echo "*"; \
+-	      echo "* Unable to find $$dir/bin/moc, using /usr/bin/moc instead."; \
+-	      echo "*"; \
+-	      moc="/usr/bin/moc"; \
+-	    fi; \
+-	else \
+-	  cflags="\$$(shell pkg-config QtCore QtGui --cflags)"; \
+-	  libs="\$$(shell pkg-config QtCore QtGui --libs)"; \
+-	  moc="\$$(shell pkg-config QtCore --variable=moc_location)"; \
+-	  [ -n "$$moc" ] || moc="\$$(shell pkg-config QtCore --variable=prefix)/bin/moc"; \
+-	fi; \
++	@set -e; $(kecho) "  CHECK   qt"; \
++	qtver=`qmake -query QT_VERSION` || { \
++	    echo >&2 "*"; \
++	    echo >&2 "* qmake failed."; \
++	    echo >&2 "*"; \
++	    exit 1; \
++	}; \
++	qtlibdir=`qmake -query QT_INSTALL_LIBS`; \
++	qthdrdir=`qmake -query QT_INSTALL_HEADERS`; \
++	qtbindir=`qmake -query QT_INSTALL_BINS`; \
++	cflags="-I$$qthdrdir -I$$qthdrdir/QtCore -I$$qthdrdir/QtGui"; \
++	case "$$qtver" in \
++	5.*) \
++	    cflags="$$cflags -I$$qthdrdir/QtWidgets -std=c++11 -fPIC"; \
++	    libs="-L$$qtlibdir -lQt5Widgets -lQt5Gui -lQt5Core "; \
++	    ;; \
++	4.*) \
++	    libs="-L$$qtlibdir -lQtGui -lQtCore"; \
++	    ;; \
++	*) \
++	    echo >&2 "*"; \
++	    echo >&2 "* Found qmake but it is for Qt version $$qtver, which is not supported."; \
++	    echo >&2 "* Please install either Qt 4.8 or 5.x."; \
++	    echo >&2 "*"; \
++	    exit 1; \
++	    ;; \
++	esac; \
+ 	echo "KC_QT_CFLAGS=$$cflags" > $@; \
+ 	echo "KC_QT_LIBS=$$libs" >> $@; \
+-	echo "KC_QT_MOC=$$moc" >> $@
++	echo "KC_QT_MOC=$$qtbindir/moc" >> $@
+ endif
+ 
+ $(obj)/gconf.o: $(obj)/.tmp_gtkcheck
 -- 
 2.1.4
 
