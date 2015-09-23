@@ -1,41 +1,60 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([103.22.144.67]:58506 "EHLO ozlabs.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751654AbbIWFkj (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 23 Sep 2015 01:40:39 -0400
-From: Michael Ellerman <mpe@ellerman.id.au>
-Subject: [RFC PATCH 2/2] powerpc: Add ppc64le_defconfig
-Date: Wed, 23 Sep 2015 15:40:35 +1000
-Message-Id: <1442986835-13985-2-git-send-email-mpe@ellerman.id.au>
-In-Reply-To: <1442986835-13985-1-git-send-email-mpe@ellerman.id.au>
-References: <1442986835-13985-1-git-send-email-mpe@ellerman.id.au>
+Received: from szxga03-in.huawei.com ([119.145.14.66]:35888 "EHLO
+	szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753280AbbIWJeK (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 23 Sep 2015 05:34:10 -0400
+From: Wang Long <long.wanglong@huawei.com>
+Subject: [PATCH] kselftest: add cleankselftest rule
+Date: Wed, 23 Sep 2015 09:33:38 +0000
+Message-ID: <1443000818-118964-1-git-send-email-long.wanglong@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linuxppc-dev@ozlabs.org
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, yann.morin.1998@free.fr, mmarek@suse.com
+To: shuahkh@osg.samsung.com, mmarek@suse.com
+Cc: long.wanglong@huawei.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, wanglong@laoqinren.net, peifeiyue@huawei.com
 
-Based directly on ppc64_defconfig using merge_config.
+We use
 
-Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
+    $make TARGETS="size timers" kselftest
+
+to build and run selftests. but there is no rule
+for us to clean the kselftest generated files.
+
+This patch add the rules, for example:
+
+	$ make TARGETS="size timers" cleankselftest
+
+can clean all kselftst generated files.
+
+Signed-off-by: Wang Long <long.wanglong@huawei.com>
 ---
- arch/powerpc/Makefile | 4 ++++
+ Makefile | 4 ++++
  1 file changed, 4 insertions(+)
 
-diff --git a/arch/powerpc/Makefile b/arch/powerpc/Makefile
-index b9b4af2af9a5..3704db45a832 100644
---- a/arch/powerpc/Makefile
-+++ b/arch/powerpc/Makefile
-@@ -288,6 +288,10 @@ PHONY += pseries_le_defconfig
- pseries_le_defconfig:
- 	$(call merge_into_defconfig,pseries_defconfig,le)
+diff --git a/Makefile b/Makefile
+index 84f4b31..c25d139 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1075,6 +1075,9 @@ PHONY += kselftest
+ kselftest:
+ 	$(Q)$(MAKE) -C tools/testing/selftests run_tests
  
-+PHONY += ppc64le_defconfig
-+ppc64le_defconfig:
-+	$(call merge_into_defconfig,ppc64_defconfig,le)
++cleankselftest:
++	$(Q)$(MAKE) -C tools/testing/selftests clean
 +
- PHONY += mpc85xx_defconfig
- mpc85xx_defconfig:
- 	$(call merge_into_defconfig,mpc85xx_basic_defconfig,\
+ # ---------------------------------------------------------------------------
+ # Modules
+ 
+@@ -1282,6 +1285,7 @@ help:
+ 	@echo  '  kselftest       - Build and run kernel selftest (run as root)'
+ 	@echo  '                    Build, install, and boot kernel before'
+ 	@echo  '                    running kselftest on it'
++	@echo  '  cleankselftest  - Remove all generated kselftest files'
+ 	@echo  ''
+ 	@echo  'Kernel packaging:'
+ 	@$(MAKE) $(build)=$(package-dir) help
 -- 
-2.1.4
+1.8.3.4
 
