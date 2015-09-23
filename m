@@ -1,60 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from szxga03-in.huawei.com ([119.145.14.66]:35888 "EHLO
-	szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753280AbbIWJeK (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 23 Sep 2015 05:34:10 -0400
-From: Wang Long <long.wanglong@huawei.com>
-Subject: [PATCH] kselftest: add cleankselftest rule
-Date: Wed, 23 Sep 2015 09:33:38 +0000
-Message-ID: <1443000818-118964-1-git-send-email-long.wanglong@huawei.com>
+Received: from mx2.suse.de ([195.135.220.15]:37655 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753151AbbIWJuy (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 23 Sep 2015 05:50:54 -0400
+Subject: Re: [RFC PATCH 1/2] scripts/kconfig/Makefile: Allow KBUILD_DEFCONFIG
+ to be a target
+References: <1442986835-13985-1-git-send-email-mpe@ellerman.id.au>
+From: Michal Marek <mmarek@suse.com>
+Message-ID: <560275FC.60104@suse.com>
+Date: Wed, 23 Sep 2015 11:50:52 +0200
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <1442986835-13985-1-git-send-email-mpe@ellerman.id.au>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: shuahkh@osg.samsung.com, mmarek@suse.com
-Cc: long.wanglong@huawei.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, wanglong@laoqinren.net, peifeiyue@huawei.com
+To: Michael Ellerman <mpe@ellerman.id.au>, linuxppc-dev@ozlabs.org
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, yann.morin.1998@free.fr
 
-We use
+On 2015-09-23 07:40, Michael Ellerman wrote:
+> +else ifneq ($(wildcard arch/$(SRCARCH)/configs/$(KBUILD_DEFCONFIG)),)
+>  	@$(kecho) "*** Default configuration is based on '$(KBUILD_DEFCONFIG)'"
+>  	$(Q)$< $(silent) --defconfig=arch/$(SRCARCH)/configs/$(KBUILD_DEFCONFIG) $(Kconfig)
+> +else
+> +	@$(kecho) "*** Default configuration is based on target '$(KBUILD_DEFCONFIG)'"
+> +	$(Q)$(MAKE) -f $(srctree)/Makefile $(KBUILD_DEFCONFIG)
+>  endif
 
-    $make TARGETS="size timers" kselftest
+What is the anticipated usage of this? The patch is not needed to make
 
-to build and run selftests. but there is no rule
-for us to clean the kselftest generated files.
+  make ppc64le_defconfig
 
-This patch add the rules, for example:
+work with the second patch. If it was, this would create a loop anyway.
 
-	$ make TARGETS="size timers" cleankselftest
-
-can clean all kselftst generated files.
-
-Signed-off-by: Wang Long <long.wanglong@huawei.com>
----
- Makefile | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/Makefile b/Makefile
-index 84f4b31..c25d139 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1075,6 +1075,9 @@ PHONY += kselftest
- kselftest:
- 	$(Q)$(MAKE) -C tools/testing/selftests run_tests
- 
-+cleankselftest:
-+	$(Q)$(MAKE) -C tools/testing/selftests clean
-+
- # ---------------------------------------------------------------------------
- # Modules
- 
-@@ -1282,6 +1285,7 @@ help:
- 	@echo  '  kselftest       - Build and run kernel selftest (run as root)'
- 	@echo  '                    Build, install, and boot kernel before'
- 	@echo  '                    running kselftest on it'
-+	@echo  '  cleankselftest  - Remove all generated kselftest files'
- 	@echo  ''
- 	@echo  'Kernel packaging:'
- 	@$(MAKE) $(build)=$(package-dir) help
--- 
-1.8.3.4
-
+Michal
