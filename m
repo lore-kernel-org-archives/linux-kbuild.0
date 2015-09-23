@@ -1,119 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga14.intel.com ([192.55.52.115]:35856 "EHLO mga14.intel.com"
+Received: from ozlabs.org ([103.22.144.67]:40152 "EHLO ozlabs.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1759235AbbIVSgo (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 22 Sep 2015 14:36:44 -0400
-From: Thiago Macieira <thiago.macieira@intel.com>
-Subject: [PATCH 01/39] Remove support for QT3 and older.
-Date: Tue, 22 Sep 2015 11:36:01 -0700
-Message-Id: <1442946999-37018-2-git-send-email-thiago.macieira@intel.com>
-In-Reply-To: <1442946999-37018-1-git-send-email-thiago.macieira@intel.com>
-References: <1442946999-37018-1-git-send-email-thiago.macieira@intel.com>
+	id S1751604AbbIWFkj (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 23 Sep 2015 01:40:39 -0400
+From: Michael Ellerman <mpe@ellerman.id.au>
+Subject: [RFC PATCH 1/2] scripts/kconfig/Makefile: Allow KBUILD_DEFCONFIG to be a target
+Date: Wed, 23 Sep 2015 15:40:34 +1000
+Message-Id: <1442986835-13985-1-git-send-email-mpe@ellerman.id.au>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.com>, Boris Barbulovski <bbarbulovski@gmail.com>
+To: linuxppc-dev@ozlabs.org
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, yann.morin.1998@free.fr, mmarek@suse.com
 
-From: Boris Barbulovski <bbarbulovski@gmail.com>
+Arch Makefiles can set KBUILD_DEFCONFIG to tell kbuild the name of the
+defconfig that should be built by default.
 
-Signed-off-by: Boris Barbulovski <bbarbulovski@gmail.com>
-Signed-off-by: Thiago Macieira <thiago.macieira@intel.com>
+However currently there is an assumption that KBUILD_DEFCONFIG points to
+a file at arch/$(SRCARCH)/configs/$(KBUILD_DEFCONFIG).
+
+We would like to use a target, using merge_config, as our defconfig, so
+adapt the logic in scripts/kconfig/Makefile to allow that.
+
+To minimise the chance of breaking anything, we first check if
+KBUILD_DEFCONFIG is a file, and if so we do the old logic. If it's not a
+file, then we call the top-level Makefile with KBUILD_DEFCONFIG as the
+target.
+
+Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
 ---
- scripts/kconfig/qconf.h  | 18 ------------------
- scripts/kconfig/qconf.cc | 23 -----------------------
- 2 files changed, 41 deletions(-)
+ scripts/kconfig/Makefile | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/scripts/kconfig/qconf.h b/scripts/kconfig/qconf.h
-index bde0c6b..703285d 100644
---- a/scripts/kconfig/qconf.h
-+++ b/scripts/kconfig/qconf.h
-@@ -3,27 +3,9 @@
-  * Released under the terms of the GNU GPL v2.0.
-  */
+diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+index aceaaed09811..b2b9c87cec50 100644
+--- a/scripts/kconfig/Makefile
++++ b/scripts/kconfig/Makefile
+@@ -96,9 +96,12 @@ savedefconfig: $(obj)/conf
+ defconfig: $(obj)/conf
+ ifeq ($(KBUILD_DEFCONFIG),)
+ 	$< $(silent) --defconfig $(Kconfig)
+-else
++else ifneq ($(wildcard arch/$(SRCARCH)/configs/$(KBUILD_DEFCONFIG)),)
+ 	@$(kecho) "*** Default configuration is based on '$(KBUILD_DEFCONFIG)'"
+ 	$(Q)$< $(silent) --defconfig=arch/$(SRCARCH)/configs/$(KBUILD_DEFCONFIG) $(Kconfig)
++else
++	@$(kecho) "*** Default configuration is based on target '$(KBUILD_DEFCONFIG)'"
++	$(Q)$(MAKE) -f $(srctree)/Makefile $(KBUILD_DEFCONFIG)
+ endif
  
--#if QT_VERSION < 0x040000
--#include <qlistview.h>
--#else
- #include <q3listview.h>
--#endif
- #include <qsettings.h>
- 
--#if QT_VERSION < 0x040000
--#define Q3ValueList             QValueList
--#define Q3PopupMenu             QPopupMenu
--#define Q3ListView              QListView
--#define Q3ListViewItem          QListViewItem
--#define Q3VBox                  QVBox
--#define Q3TextBrowser           QTextBrowser
--#define Q3MainWindow            QMainWindow
--#define Q3Action                QAction
--#define Q3ToolBar               QToolBar
--#define Q3ListViewItemIterator  QListViewItemIterator
--#define Q3FileDialog            QFileDialog
--#endif
--
- class ConfigView;
- class ConfigList;
- class ConfigItem;
-diff --git a/scripts/kconfig/qconf.cc b/scripts/kconfig/qconf.cc
-index c3bb7fe..0e18a9c 100644
---- a/scripts/kconfig/qconf.cc
-+++ b/scripts/kconfig/qconf.cc
-@@ -5,18 +5,6 @@
- 
- #include <qglobal.h>
- 
--#if QT_VERSION < 0x040000
--#include <stddef.h>
--#include <qmainwindow.h>
--#include <qvbox.h>
--#include <qvaluelist.h>
--#include <qtextbrowser.h>
--#include <qaction.h>
--#include <qheader.h>
--#include <qfiledialog.h>
--#include <qdragobject.h>
--#include <qpopupmenu.h>
--#else
- #include <q3mainwindow.h>
- #include <q3vbox.h>
- #include <q3valuelist.h>
-@@ -26,7 +14,6 @@
- #include <q3filedialog.h>
- #include <q3dragobject.h>
- #include <q3popupmenu.h>
--#endif
- 
- #include <qapplication.h>
- #include <qdesktopwidget.h>
-@@ -1282,11 +1269,7 @@ ConfigMainWindow::ConfigMainWindow(void)
- 	QDesktopWidget *d = configApp->desktop();
- 	snprintf(title, sizeof(title), "%s%s",
- 		rootmenu.prompt->text,
--#if QT_VERSION < 0x040000
--		" (Qt3)"
--#else
- 		""
--#endif
- 		);
- 	setCaption(title);
- 
-@@ -1368,15 +1351,9 @@ ConfigMainWindow::ConfigMainWindow(void)
- 	connect(optGroup, SIGNAL(selected(QAction *)), menuView,
- 		SLOT(setOptionMode(QAction *)));
- 
--#if QT_VERSION >= 0x040000
- 	configView->showNormalAction = new QAction(_("Show Normal Options"), optGroup);
- 	configView->showAllAction = new QAction(_("Show All Options"), optGroup);
- 	configView->showPromptAction = new QAction(_("Show Prompt Options"), optGroup);
--#else
--	configView->showNormalAction = new QAction(_("Show Normal Options"), 0, optGroup);
--	configView->showAllAction = new QAction(_("Show All Options"), 0, optGroup);
--	configView->showPromptAction = new QAction(_("Show Prompt Options"), 0, optGroup);
--#endif
- 	configView->showNormalAction->setToggleAction(TRUE);
- 	configView->showNormalAction->setOn(configList->optMode == normalOpt);
- 	configView->showAllAction->setToggleAction(TRUE);
+ %_defconfig: $(obj)/conf
 -- 
 2.1.4
 
