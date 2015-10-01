@@ -1,39 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:59179 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751590AbbJAJ6g (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 1 Oct 2015 05:58:36 -0400
+Received: from mail-wi0-f169.google.com ([209.85.212.169]:34482 "EHLO
+	mail-wi0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752115AbbJAKPF (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 1 Oct 2015 06:15:05 -0400
+Received: by wicfx3 with SMTP id fx3so25464319wic.1
+        for <linux-kbuild@vger.kernel.org>; Thu, 01 Oct 2015 03:15:03 -0700 (PDT)
+Date: Thu, 1 Oct 2015 12:17:58 +0200
+From: Daniel Vetter <daniel@ffwll.ch>
 Subject: Re: [PATCH] drm: Hack around CONFIG_AGP=m build failures
+Message-ID: <20151001101757.GV3383@phenom.ffwll.local>
 References: <1443682119-17011-1-git-send-email-daniel.vetter@ffwll.ch>
  <8737xvc87a.fsf@intel.com>
-From: Michal Marek <mmarek@suse.com>
-Message-ID: <560D03C8.70309@suse.com>
-Date: Thu, 1 Oct 2015 11:58:32 +0200
+ <560D03C8.70309@suse.com>
 MIME-Version: 1.0
-In-Reply-To: <8737xvc87a.fsf@intel.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <560D03C8.70309@suse.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jani Nikula <jani.nikula@linux.intel.com>, Daniel Vetter <daniel.vetter@ffwll.ch>, DRI Development <dri-devel@lists.freedesktop.org>
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>, linux-kbuild@vger.kernel.org, Daniel Vetter <daniel.vetter@intel.com>
+To: Michal Marek <mmarek@suse.com>
+Cc: Jani Nikula <jani.nikula@linux.intel.com>, Daniel Vetter <daniel.vetter@ffwll.ch>, DRI Development <dri-devel@lists.freedesktop.org>, Stephen Rothwell <sfr@canb.auug.org.au>, linux-kbuild@vger.kernel.org, Daniel Vetter <daniel.vetter@intel.com>
 
-On 2015-10-01 10:19, Jani Nikula wrote:
-> On Thu, 01 Oct 2015, Daniel Vetter <daniel.vetter@ffwll.ch> wrote:
->> Surprisingly kbuild can't cope with tristates in the
->> <module>-$(CONFIG_FOO) pattern. This patch hacks up a solution.
+On Thu, Oct 01, 2015 at 11:58:32AM +0200, Michal Marek wrote:
+> On 2015-10-01 10:19, Jani Nikula wrote:
+> > On Thu, 01 Oct 2015, Daniel Vetter <daniel.vetter@ffwll.ch> wrote:
+> >> Surprisingly kbuild can't cope with tristates in the
+> >> <module>-$(CONFIG_FOO) pattern. This patch hacks up a solution.
+> > 
+> > Given that it's two distinct Makefile variables (foo-y and foo-m) being
+> > assigned to, I don't really find this surprising. Maybe this could be
+> > made to work as a convenience, but there might be other, more surpising
+> > consequences.
 > 
-> Given that it's two distinct Makefile variables (foo-y and foo-m) being
-> assigned to, I don't really find this surprising. Maybe this could be
-> made to work as a convenience, but there might be other, more surpising
-> consequences.
+> I actually think that kbuild should be able to handle this. The likely
+> reason why it is not doing it right now is that in an ideal world,
+> modules are modules can be built out of tree against just the kernel and
+> their static dependencies. In real world, we sometimes have features in
+> modules that are enabled if other modules are enabled. I'll post a patch
+> later. We also have lots of tests fo CONFIG_FOO || CONFIG_FOO_MODULE in
+> built-in code, which is a similar case.
 
-I actually think that kbuild should be able to handle this. The likely
-reason why it is not doing it right now is that in an ideal world,
-modules are modules can be built out of tree against just the kernel and
-their static dependencies. In real world, we sometimes have features in
-modules that are enabled if other modules are enabled. I'll post a patch
-later. We also have lots of tests fo CONFIG_FOO || CONFIG_FOO_MODULE in
-built-in code, which is a similar case.
-
-Michal
+Cool. I'll keep this hack in drm-misc then. Please cc me on the proper
+solution so I know when I can revert it again.
+-Daniel
+-- 
+Daniel Vetter
+Software Engineer, Intel Corporation
+http://blog.ffwll.ch
