@@ -1,23 +1,23 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lists.s-osg.org ([54.187.51.154]:40106 "EHLO lists.s-osg.org"
+Received: from ozlabs.org ([103.22.144.67]:39210 "EHLO ozlabs.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1756169AbbI3Nge (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 30 Sep 2015 09:36:34 -0400
+	id S1753013AbbJABR0 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 30 Sep 2015 21:17:26 -0400
+Message-ID: <1443662245.30258.4.camel@ellerman.id.au>
 Subject: Re: [PATCH] kselftest: add cleankselftest rule
-References: <1443000818-118964-1-git-send-email-long.wanglong@huawei.com>
-From: Shuah Khan <shuahkh@osg.samsung.com>
-Message-ID: <560BE55F.6050507@osg.samsung.com>
-Date: Wed, 30 Sep 2015 07:36:31 -0600
-MIME-Version: 1.0
+From: Michael Ellerman <mpe@ellerman.id.au>
+Date: Thu, 01 Oct 2015 11:17:25 +1000
 In-Reply-To: <1443000818-118964-1-git-send-email-long.wanglong@huawei.com>
-Content-Type: text/plain; charset=windows-1252
+References: <1443000818-118964-1-git-send-email-long.wanglong@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Wang Long <long.wanglong@huawei.com>, mmarek@suse.com
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, wanglong@laoqinren.net, peifeiyue@huawei.com
+To: Wang Long <long.wanglong@huawei.com>
+Cc: shuahkh@osg.samsung.com, mmarek@suse.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, wanglong@laoqinren.net, peifeiyue@huawei.com
 
-On 09/23/2015 03:33 AM, Wang Long wrote:
+On Wed, 2015-09-23 at 09:33 +0000, Wang Long wrote:
 > We use
 > 
 >     $make TARGETS="size timers" kselftest
@@ -28,19 +28,11 @@ On 09/23/2015 03:33 AM, Wang Long wrote:
 > This patch add the rules, for example:
 > 
 > 	$ make TARGETS="size timers" cleankselftest
-> 
-> can clean all kselftst generated files.
-> 
-> Signed-off-by: Wang Long <long.wanglong@huawei.com>
 
-Thanks. Applied to linux-kselftest next for 4.4
+I think 'kselftest-clean' would be neater.
 
--- Shuah
+That way all the kselftests targets start with 'kselftest'.
+
+cheers
 
 
--- 
-Shuah Khan
-Sr. Linux Kernel Developer
-Open Source Innovation Group
-Samsung Research America (Silicon Valley)
-shuahkh@osg.samsung.com | (970) 217-8978
