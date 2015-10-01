@@ -1,72 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([103.22.144.67]:32800 "EHLO ozlabs.org"
+Received: from mga11.intel.com ([192.55.52.93]:59143 "EHLO mga11.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751974AbbJAHFw (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 1 Oct 2015 03:05:52 -0400
-Message-ID: <1443683150.16900.1.camel@ellerman.id.au>
-Subject: Re: [RFC PATCH 1/2] scripts/kconfig/Makefile: Allow
- KBUILD_DEFCONFIG to be a target
-From: Michael Ellerman <mpe@ellerman.id.au>
-Date: Thu, 01 Oct 2015 17:05:50 +1000
-In-Reply-To: <560CD7A6.2040905@suse.com>
-References: <1442986835-13985-1-git-send-email-mpe@ellerman.id.au>
-	 <560275FC.60104@suse.com>
-	 <FE248B88-D584-4E66-A59F-B2A2C254000C@ellerman.id.au>
-	 <5605B2AE.1080409@suse.com> <1443680055.16900.0.camel@ellerman.id.au>
-	 <560CD7A6.2040905@suse.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+	id S1754815AbbJAHTK (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 1 Oct 2015 03:19:10 -0400
+Date: Thu, 1 Oct 2015 10:19:05 +0300
+From: Ville =?iso-8859-1?Q?Syrj=E4l=E4?= <ville.syrjala@linux.intel.com>
+Subject: Re: [PATCH] drm: Hack around CONFIG_AGP=m build failures
+Message-ID: <20151001071905.GX26517@intel.com>
+References: <1443682119-17011-1-git-send-email-daniel.vetter@ffwll.ch>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1443682119-17011-1-git-send-email-daniel.vetter@ffwll.ch>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>
-Cc: linuxppc-dev@ozlabs.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, yann.morin.1998@free.fr
+To: Daniel Vetter <daniel.vetter@ffwll.ch>
+Cc: DRI Development <dri-devel@lists.freedesktop.org>, Stephen Rothwell <sfr@canb.auug.org.au>, Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, Daniel Vetter <daniel.vetter@intel.com>
 
-On Thu, 2015-10-01 at 08:50 +0200, Michal Marek wrote:
-> On 2015-10-01 08:14, Michael Ellerman wrote:
-> > On Fri, 2015-09-25 at 22:46 +0200, Michal Marek wrote:
-> >> Dne 24.9.2015 v 00:16 Michael Ellerman napsal(a):
-> >>> On 23 September 2015 19:50:52 GMT+10:00, Michal Marek
-> >>> <mmarek@suse.com> wrote:
-> >>>> On 2015-09-23 07:40, Michael Ellerman wrote:
-> >>>>> +else ifneq ($(wildcard
-> >>>> arch/$(SRCARCH)/configs/$(KBUILD_DEFCONFIG)),)
-> >>>>> @$(kecho) "*** Default configuration is based on
-> >>>> '$(KBUILD_DEFCONFIG)'"
-> >>>>> $(Q)$< $(silent)
-> >>>> --defconfig=arch/$(SRCARCH)/configs/$(KBUILD_DEFCONFIG) $(Kconfig)
-> >>>>> +else +	@$(kecho) "*** Default configuration is based on target
-> >>>> '$(KBUILD_DEFCONFIG)'"
-> >>>>> +	$(Q)$(MAKE) -f $(srctree)/Makefile $(KBUILD_DEFCONFIG) endif
-> >>>>
-> >>>> What is the anticipated usage of this? The patch is not needed to
-> >>>> make
-> >>>>
-> >>>> make ppc64le_defconfig
-> >>>>
-> >>>> work with the second patch. If it was, this would create a loop
-> >>>> anyway.
-> >>>
-> >>> The idea is to make 'make defconfig' work when KBUILD_DEFCONFIG is
-> >>> ppc64le_defconfig (which happens for us when uname returns ppc64le)
-> >>> and additionally when ppc64le_defconfig is not a real file.
-> >>
-> >> Ah, that makes sense. You can add
-> >>
-> >> Acked-by: Michal Marek <mmarek@suse.com>
-> >>
-> >> if you want.
-> > 
-> > Thanks. I'll assume by that you mean you're happy if I take both patches
-> > through the powerpc tree.
+On Thu, Oct 01, 2015 at 08:48:39AM +0200, Daniel Vetter wrote:
+> Surprisingly kbuild can't cope with tristates in the
+> <module>-$(CONFIG_FOO) pattern. This patch hacks up a solution.
 > 
-> Yes, I assumed that this was your plan.
+> Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
+> Reported-by: Ville Syrjälä <ville.syrjala@linux.intel.com>
+> Cc: Stephen Rothwell <sfr@canb.auug.org.au>
+> Cc: Ville Syrjälä <ville.syrjala@linux.intel.com>
+> Cc: Michal Marek <mmarek@suse.com>
+> Cc: linux-kbuild@vger.kernel.org
+> Signed-off-by: Daniel Vetter <daniel.vetter@intel.com>
 
-I didn't really have a plan :)
+Tested-by: Ville Syrjälä <ville.syrjala@linux.intel.com>
 
-It's certainly easiest if I take it in my tree along with the new
-ppc64le_defconfig, so I'll do that. Thanks.
+> ---
+>  drivers/gpu/drm/Makefile | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/drivers/gpu/drm/Makefile b/drivers/gpu/drm/Makefile
+> index f458d6e33655..e814517513ce 100644
+> --- a/drivers/gpu/drm/Makefile
+> +++ b/drivers/gpu/drm/Makefile
+> @@ -21,6 +21,8 @@ drm-$(CONFIG_DRM_PANEL) += drm_panel.o
+>  drm-$(CONFIG_OF) += drm_of.o
+>  drm-$(CONFIG_AGP) += drm_agpsupport.o
+>  
+> +drm-y += $(drm-m)
+> +
+>  drm_kms_helper-y := drm_crtc_helper.o drm_dp_helper.o drm_probe_helper.o \
+>  		drm_plane_helper.o drm_dp_mst_topology.o drm_atomic_helper.o
+>  drm_kms_helper-$(CONFIG_DRM_LOAD_EDID_FIRMWARE) += drm_edid_load.o
+> -- 
+> 2.5.1
 
-cheers
-
-
+-- 
+Ville Syrjälä
+Intel OTC
