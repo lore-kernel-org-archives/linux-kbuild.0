@@ -1,114 +1,153 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:56091 "EHLO
-	shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1750788AbbJAXPo (ORCPT
+Received: from mail-pa0-f42.google.com ([209.85.220.42]:33298 "EHLO
+	mail-pa0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751043AbbJBAfJ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 1 Oct 2015 19:15:44 -0400
-Message-ID: <1443741332.2730.75.camel@decadent.org.uk>
-Subject: [PATCH] kbuild: Add support for SOURCE_DATE_EPOCH environment
- variable
-From: Ben Hutchings <ben@decadent.org.uk>
-Date: Fri, 02 Oct 2015 00:15:32 +0100
-Content-Type: multipart/signed; micalg="pgp-sha512";
-	protocol="application/pgp-signature"; boundary="=-XBUWhZocGLBSbCLzAhs2"
-Mime-Version: 1.0
+	Thu, 1 Oct 2015 20:35:09 -0400
+Received: by pacex6 with SMTP id ex6so89893858pac.0
+        for <linux-kbuild@vger.kernel.org>; Thu, 01 Oct 2015 17:35:08 -0700 (PDT)
+From: Nicolas Boichat <drinkcat@chromium.org>
+Subject: [PATCH] modpost: Add flag -f for making section mismatches fatal
+Date: Fri,  2 Oct 2015 08:34:28 +0800
+Message-Id: <1443746068-33050-1-git-send-email-drinkcat@chromium.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, reproducible-builds@lists.alioth.debian.org
+To: linux-kbuild@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.com>, "Paul E . McKenney" <paulmck@linux.vnet.ibm.com>, Andrew Morton <akpm@linux-foundation.org>, Ingo Molnar <mingo@kernel.org>, Pranith Kumar <bobby.prani@gmail.com>, Peter Zijlstra <peterz@infradead.org>, Vladimir Murzin <vladimir.murzin@arm.com>, Davidlohr Bueso <dave@stgolabs.net>, Joonsoo Kim <iamjoonsoo.kim@lge.com>, John Stultz <john.stultz@linaro.org>, Jan Kiszka <jan.kiszka@siemens.com>, Rusty Russell <rusty@rustcorp.com.au>, Quentin Casasnovas <quentin.casasnovas@oracle.com>, Paul Gortmaker <paul.gortmaker@windriver.com>, Chris Metcalf <cmetcalf@ezchip.com>, Takashi Iwai <tiwai@suse.de>, Nicolas Boichat <drinkcat@chromium.org>, Kyle McMartin <kyle@redhat.com>, linux-kernel@vger.kernel.org, Jonathan Kliegman <kliegs@chromium.org>, olofj@chromium.org, Sam Ravnborg <sam@ravnborg.org>
 
+The section mismatch warning can be easy to miss during the kernel build
+process. Allow it to be marked as fatal to be easily caught and prevent
+bugs from slipping in.
 
---=-XBUWhZocGLBSbCLzAhs2
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Setting CONFIG_SECTION_MISMATCH_WARNING=y causes these warnings to be
+non-fatal, since there are a number of section mismatches when using
+allmodconfig on some architectures, and we do not want to break these
+builds by default.
 
-As part of the reproducible builds project, the SOURCE_DATE_EPOCH
-environment variable has been specified as a project- and
-distribution-independent means to specify a timestamp at build
-time: https://reproducible-builds.org/specs/source-date-epoch/
+Signed-off-by: Nicolas Boichat <drinkcat@chromium.org>
 
-Add support for this by converting it to KBUILD_BUILD_TIMESTAMP
-if they aren't both set.
-
-Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+Change-Id: Ic346706e3297c9f0d790e3552aa94e5cff9897a6
 ---
- Documentation/kbuild/kbuild.txt | 15 +++++++++------
- Makefile                        | 10 ++++++++++
- 2 files changed, 19 insertions(+), 6 deletions(-)
 
-diff --git a/Documentation/kbuild/kbuild.txt b/Documentation/kbuild/kbuild.=
-txt
-index 0ff6a46..9f95228 100644
---- a/Documentation/kbuild/kbuild.txt
-+++ b/Documentation/kbuild/kbuild.txt
-@@ -211,12 +211,15 @@ KBUILD_ENABLE_EXTRA_GCC_CHECKS
- If enabled over the make command line with "W=3D1", it turns on additional
- gcc -W... options for more extensive build-time checking.
-=20
--KBUILD_BUILD_TIMESTAMP
----------------------------------------------------
--Setting this to a date string overrides the timestamp used in the
--UTS_VERSION definition (uname -v in the running kernel). The value has to
--be a string that can be passed to date -d. The default value
--is the output of the date command at one point during build.
-+KBUILD_BUILD_TIMESTAMP, SOURCE_DATE_EPOCH
-+--------------------------------------------------
-+Setting KBUILD_BUILD_TIMESTAMP to a date string overrides the
-+timestamp used in the UTS_VERSION definition (uname -v in the running
-+kernel). The value has to be a string that can be passed to date -d.
-+The default value is the output of the date command at one point
-+during build. Alternately, the timestamp may be specified in
-+SOURCE_DATE_EPOCH as the number of whole non-leap seconds since the
-+epoch.
-=20
- KBUILD_BUILD_USER, KBUILD_BUILD_HOST
- --------------------------------------------------
-diff --git a/Makefile b/Makefile
-index 1d341eb..bfb0243 100644
---- a/Makefile
-+++ b/Makefile
-@@ -417,6 +417,16 @@ export KBUILD_AFLAGS_MODULE KBUILD_CFLAGS_MODULE KBUIL=
-D_LDFLAGS_MODULE
- export KBUILD_AFLAGS_KERNEL KBUILD_CFLAGS_KERNEL
- export KBUILD_ARFLAGS
-=20
-+ifndef KBUILD_BUILD_TIMESTAMP
-+  # If SOURCE_DATE_EPOCH is set in the environment (only), then
-+  # generate a timestamp string based on that, independent of the
-+  # current time zone and locale.
-+  ifeq ("$(origin SOURCE_DATE_EPOCH)", "environment")
-+    KBUILD_BUILD_TIMESTAMP :=3D $(shell LC_TIME=3DC date -u -d@$(SOURCE_DA=
-TE_EPOCH))
-+    export KBUILD_BUILD_TIMESTAMP
-+  endif
-+endif
+I'm trying to revive this old patch. When it was first submitted [1],
+Jonathan got the following feedback:
+ - The logic of the option should be inverted (i.e. SECTION_MISMATCH_WARNING),
+   so that is not not enabled in allmodconfig for some architectures that do
+   have section mismatches. I've seen some failures (namely, on arm64), so I
+   did that.
+ - CONFIG_DEBUG_SECTION_MISMATCH should be removed and warnings should always
+   be shown verbosely. This option does 3 things:
+     1. Enable -fno-inline-functions-called-onc
+     2. Run the section mismatch analysis for each module/built-in.o
+     3. Enable verbose reporting from modpost
+   We definitely do not want 1 by default, so I think we should keep the option.
+   If we enable 2 & 3 by default, which I think would be reasonable, then the
+   option name does not make much sense anymore, and I'm not sure what to do
+   with the documentation that is currently provided in the Kconfig description.
+
+Tested on x86-64 allmodconfig, setting the option to =n, and creating a
+section mismatch by running:
+sed -i -e 's/\(ssize_t soc_codec_reg_show\)/__init \1/' sound/soc/soc-core.c
+
+Applies on linux-next/20151001
+
+[1] http://thread.gmane.org/gmane.linux.kbuild.devel/9044
+
+ lib/Kconfig.debug        |  9 +++++++++
+ scripts/Makefile.modpost |  1 +
+ scripts/mod/modpost.c    | 24 +++++++++++++++++-------
+ 3 files changed, 27 insertions(+), 7 deletions(-)
+
+diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+index d190d44..74314bb 100644
+--- a/lib/Kconfig.debug
++++ b/lib/Kconfig.debug
+@@ -311,6 +311,15 @@ config DEBUG_SECTION_MISMATCH
+ 	  - Enable verbose reporting from modpost in order to help resolve
+ 	    the section mismatches that are reported.
+ 
++config SECTION_MISMATCH_WARNING
++	bool "Make section mismatch errors non-fatal"
++	default y
++	help
++	  If you say N here, the build process will fail if there are any
++	  section mismatch, instead of just throwing warnings.
 +
- # When compiling out-of-tree modules, put MODVERDIR in the module
- # tree rather than in the kernel tree. The kernel tree might
- # even be read-only.
---=20
-Ben Hutchings
-When in doubt, use brute force. - Ken Thompson
---=-XBUWhZocGLBSbCLzAhs2
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
++	  If unsure, say Y.
++
+ #
+ # Select this config option from the architecture Kconfig, if it
+ # is preferred to always offer frame pointers as a config
+diff --git a/scripts/Makefile.modpost b/scripts/Makefile.modpost
+index 9c40dae..d2cbd83 100644
+--- a/scripts/Makefile.modpost
++++ b/scripts/Makefile.modpost
+@@ -77,6 +77,7 @@ modpost = scripts/mod/modpost                    \
+  $(if $(KBUILD_EXTRA_SYMBOLS), $(patsubst %, -e %,$(KBUILD_EXTRA_SYMBOLS))) \
+  $(if $(KBUILD_EXTMOD),-o $(modulesymfile))      \
+  $(if $(CONFIG_DEBUG_SECTION_MISMATCH),,-S)      \
++ $(if $(CONFIG_SECTION_MISMATCH_WARNING),,-f)    \
+  $(if $(KBUILD_EXTMOD)$(KBUILD_MODPOST_WARN),-w) \
+  $(if $(CONFIG_LTO),-w)
+ 
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index d583c98..bc729b8 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -38,6 +38,7 @@ static int warn_unresolved = 0;
+ /* How a symbol is exported */
+ static int sec_mismatch_count = 0;
+ static int sec_mismatch_verbose = 1;
++static int sec_mismatch_fatal = 0;
+ /* ignore missing files */
+ static int ignore_missing_files;
+ 
+@@ -2385,7 +2386,7 @@ int main(int argc, char **argv)
+ 	struct ext_sym_list *extsym_iter;
+ 	struct ext_sym_list *extsym_start = NULL;
+ 
+-	while ((opt = getopt(argc, argv, "i:I:e:mnsST:o:awM:K:")) != -1) {
++	while ((opt = getopt(argc, argv, "i:I:e:mnsST:o:awM:K:f")) != -1) {
+ 		switch (opt) {
+ 		case 'i':
+ 			kernel_read = optarg;
+@@ -2426,6 +2427,9 @@ int main(int argc, char **argv)
+ 		case 'w':
+ 			warn_unresolved = 1;
+ 			break;
++		case 'f':
++			sec_mismatch_fatal = 1;
++			break;
+ 		default:
+ 			exit(1);
+ 		}
+@@ -2475,14 +2479,20 @@ int main(int argc, char **argv)
+ 		sprintf(fname, "%s.mod.c", mod->name);
+ 		write_if_changed(&buf, fname);
+ 	}
+-
+ 	if (dump_write)
+ 		write_dump(dump_write);
+-	if (sec_mismatch_count && !sec_mismatch_verbose)
+-		warn("modpost: Found %d section mismatch(es).\n"
+-		     "To see full details build your kernel with:\n"
+-		     "'make CONFIG_DEBUG_SECTION_MISMATCH=y'\n",
+-		     sec_mismatch_count);
++	if (sec_mismatch_count) {
++		if (!sec_mismatch_verbose) {
++			warn("modpost: Found %d section mismatch(es).\n"
++			     "To see full details build your kernel with:\n"
++			     "'make CONFIG_DEBUG_SECTION_MISMATCH=y'\n",
++			     sec_mismatch_count);
++		}
++		if (sec_mismatch_fatal) {
++			fatal("modpost: Section mismatches detected.\n"
++			      "Set CONFIG_SECTION_MISMATCH_WARNING=y to allow them.\n");
++		}
++	}
+ 
+ 	return err;
+ }
+-- 
+2.6.0.rc2.230.g3dd15c0
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iQIVAwUAVg2+lOe/yOyVhhEJAQrOQhAAqIMyj2wHQ8KLcWi6BoSSWF91duE+v5ie
-pmDZpd6c5O0KfNS77ajlqz6pLS7CMEx22cNuXQfJsTqNDTENHQ05TosJc/EkqDaf
-JbnoAwqnenP5vKck8K1WpNA3CQvhddlzQ3z1dQo2gtFC+t6WPnB35GiL1BF87ToY
-zeI+bbpZuraX5mt4BiHK0ewCyxu+lXUP73kyKY5VUNl6al1F4yUFkLim0QvWIx3G
-mmKhrN3wMUbEL1UI1186W/j8FHO/fSDKIVP97UOU9Wvama26Jj2F/yIxbHWgPEVh
-e7vuw9nAHzBoWrUc48KWvI2iZLCOR4kH9EGfT5c0KLjj0FOaDxo2QQyPIvdVwPaA
-NhnJOCls0EtJs4pe7lLjtnuhgMm9WPIRU6fAFjmM/2v/F0X7TGqmjKrPWi5ecsqP
-e+3M4I3P2KZgbKw8HEnsb6CSS5qAHNrcTp0b2oJPSBPlk+DU9Vi1kslo0KuAprE7
-nkTquXD6wIA8gYu/mWXtfTq2xB3qHm33kyctY6dz1l8We8CXSY97N+q+0ys6g1Uc
-ZWz9TAfpaHPY3uByVb7qBexpOXc+RtizJW+PWTRzwauipOfhN2aAx6wUO3EYYzxa
-oAqcwsmsF62NUuDkXXCfprrNBXLVw1lbNwjqOGwuUEfigdYtlGqnN3QbZytldGox
-fjQENL/2sGc=
-=KpYG
------END PGP SIGNATURE-----
-
---=-XBUWhZocGLBSbCLzAhs2--
