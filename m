@@ -1,25 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([103.22.144.67]:38037 "EHLO ozlabs.org"
+Received: from lists.s-osg.org ([54.187.51.154]:47031 "EHLO lists.s-osg.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751473AbbJBHrK (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 2 Oct 2015 03:47:10 -0400
-In-Reply-To: <1442986835-13985-2-git-send-email-mpe@ellerman.id.au>
-From: Michael Ellerman <mpe@ellerman.id.au>
-Subject: Re: [RFC,2/2] powerpc: Add ppc64le_defconfig
-Message-Id: <20151002074709.65F24140785@ozlabs.org>
-Date: Fri,  2 Oct 2015 17:47:09 +1000 (AEST)
+	id S1751841AbbJBOSv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 2 Oct 2015 10:18:51 -0400
+Subject: Re: [PATCH] kselftest: add cleankselftest rule
+References: <1443000818-118964-1-git-send-email-long.wanglong@huawei.com>
+ <1443662245.30258.4.camel@ellerman.id.au>
+From: Shuah Khan <shuahkh@osg.samsung.com>
+Message-ID: <560E9242.9000402@osg.samsung.com>
+Date: Fri, 2 Oct 2015 08:18:42 -0600
+MIME-Version: 1.0
+In-Reply-To: <1443662245.30258.4.camel@ellerman.id.au>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michael Ellerman <mpe@ellerman.id.au>, linuxppc-dev@ozlabs.org
-Cc: mmarek@suse.com, linux-kernel@vger.kernel.org, yann.morin.1998@free.fr, linux-kbuild@vger.kernel.org
+To: Michael Ellerman <mpe@ellerman.id.au>, Wang Long <long.wanglong@huawei.com>
+Cc: mmarek@suse.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, wanglong@laoqinren.net, peifeiyue@huawei.com, Shuah Khan <shuahkh@osg.samsung.com>
 
-On Wed, 2015-23-09 at 05:40:35 UTC, Michael Ellerman wrote:
-> Based directly on ppc64_defconfig using merge_config.
+On 09/30/2015 07:17 PM, Michael Ellerman wrote:
+> On Wed, 2015-09-23 at 09:33 +0000, Wang Long wrote:
+>> We use
+>>
+>>     $make TARGETS="size timers" kselftest
+>>
+>> to build and run selftests. but there is no rule
+>> for us to clean the kselftest generated files.
+>>
+>> This patch add the rules, for example:
+>>
+>> 	$ make TARGETS="size timers" cleankselftest
 > 
-> Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
+> I think 'kselftest-clean' would be neater.
+> 
+> That way all the kselftests targets start with 'kselftest'.
+> 
 
-Applied to powerpc next.
+Good suggestion. Wang! Could you please send me updated patch
+with this suggested change.
 
-https://git.kernel.org/powerpc/c/2adc48a691866fbb3134dd3a
+thanks,
+-- Shuah
 
-cheers
+
+-- 
+Shuah Khan
+Sr. Linux Kernel Developer
+Open Source Innovation Group
+Samsung Research America (Silicon Valley)
+shuahkh@osg.samsung.com | (970) 217-8978
