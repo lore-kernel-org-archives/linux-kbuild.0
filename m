@@ -1,60 +1,94 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lb3-smtp-cloud2.xs4all.net ([194.109.24.29]:46466 "EHLO
-	lb3-smtp-cloud2.xs4all.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751432AbbJFJRD (ORCPT
+Received: from mail-wi0-f193.google.com ([209.85.212.193]:34237 "EHLO
+	mail-wi0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752759AbbJFJWe (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 6 Oct 2015 05:17:03 -0400
-Message-ID: <1444123019.2417.39.camel@tiscali.nl>
+	Tue, 6 Oct 2015 05:22:34 -0400
+Date: Tue, 6 Oct 2015 11:22:31 +0200
+From: Valentin Rothberg <valentinrothberg@gmail.com>
 Subject: Re: [PATCH v3] kbuild: document recursive dependency limitation /
  resolution
-From: Paul Bolle <pebolle@tiscali.nl>
-Date: Tue, 06 Oct 2015 11:16:59 +0200
-In-Reply-To: <20151005230317.GQ14464@wotan.suse.de>
+Message-ID: <20151006092231.GC2681@nebuchadnezzar.informatik.uni-erlangen.de>
 References: <1438200556-13842-1-git-send-email-mcgrof@do-not-panic.com>
-	 <1443026498-15081-1-git-send-email-mcgrof@do-not-panic.com>
-	 <20151004134247.GA7528@nebuchadnezzar>
-	 <20151005230317.GQ14464@wotan.suse.de>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+ <1443026498-15081-1-git-send-email-mcgrof@do-not-panic.com>
+ <20151004134247.GA7528@nebuchadnezzar>
+ <20151005230317.GQ14464@wotan.suse.de>
+ <20151006081912.GA2681@nebuchadnezzar.informatik.uni-erlangen.de>
+ <1444120375.2417.10.camel@tiscali.nl>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="BXVAT5kNtrzKuDFl"
+Content-Disposition: inline
+In-Reply-To: <1444120375.2417.10.camel@tiscali.nl>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Luis R. Rodriguez" <mcgrof@suse.com>, Valentin Rothberg <valentinrothberg@gmail.com>
-Cc: "Luis R. Rodriguez" <mcgrof@do-not-panic.com>, mmarek@suse.com, josh@joshtriplett.org, jbottomley@odin.com, geert@linux-m68k.org, herbert@gondor.apana.org.au, tiwai@suse.de, corbet@lwn.net, linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, roberto@dicosmo.org, zack@upsilon.cc, soos.mate@gmail.com, skl@det.ua.pt, iouliia@det.ua.pt, Armin Biere <biere@jku.at>, Julia Lawall <julia.lawall@lip6.fr>
+To: Paul Bolle <pebolle@tiscali.nl>
+Cc: "Luis R. Rodriguez" <mcgrof@suse.com>, "Luis R. Rodriguez" <mcgrof@do-not-panic.com>, mmarek@suse.com, josh@joshtriplett.org, jbottomley@odin.com, geert@linux-m68k.org, herbert@gondor.apana.org.au, tiwai@suse.de, corbet@lwn.net, linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, roberto@dicosmo.org, zack@upsilon.cc, soos.mate@gmail.com, skl@det.ua.pt, iouliia@det.ua.pt, Armin Biere <biere@jku.at>, Julia Lawall <julia.lawall@lip6.fr>, ziegler@cs.fau.de
 
-On di, 2015-10-06 at 01:03 +0200, Luis R. Rodriguez wrote:
-> On Sun, Oct 04, 2015 at 03:42:47PM +0200, Valentin Rothberg wrote:
 
-> > In contrast to a select, a symbol using a dependency is only
-> > visible to the user when its dependency are satisfied.  I see it as a
-> > decision between being semantically correct (depends) and being easy to
-> > configure/user friendly (select).
+--BXVAT5kNtrzKuDFl
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+
+Hi Paul,
+
+On Oct 06 '15 10:32, Paul Bolle wrote:
+> Hi Valentin,
 > 
-> Good point, something easy to configure should however still likely only
-> be visible to the user if and only if it would not break existing user
-> config. If we are not ensuring that now its perhaps good to annotate that
-> as a desirable future feature.
+> On di, 2015-10-06 at 10:19 +0200, Valentin Rothberg wrote:
+> > I think that a general remark that using selects should be discouraged
+> > as, besides causing the recursive issue, selects can also break
+> > dependencies.
+> 
+> How do selects break dependencies?
 
-(This might be going off on a tangent a bit.)
+Consider the following example (I also attached it as a path):
 
-Perhaps the issue that people run into, and that Luis is trying to
-solve, here and in other threads, is that these two approaches currently
-are used at the same level. In other words, maybe the configuration
-requirements should only be described using dependency relations while a
-(new) tool should provide what now is provided, sort of, by selects.
+config A
+    bool "CONFIG A"
 
-Isn't that how package managers work? The packages themselves state
-things like: "I need Foo", "I conflict with Bar". Package managers use
-that information to handle what people actually care about, like "Please
-install Baz", without requiring those people to do the busy work of
-figuring out the dependencies of all packages.
+config B
+    bool "CONFIG B"
+    depends on !A
 
-So, would a future SAT solver for Kconfig use a two level approach too:
-given the set of dependencies of the various features (first level) try
-to figure out if and how the features a user picks can actually be
-enabled (second level)?
+config C
+    bool "CONFIG C"
+    depends on A
+    select B
 
-Thanks,
+The option B and C are clearly contradicting with respect to A.
+However, when A is set, C can be set as well because Kconfig does not
+visit the dependencies of the select target (in this case B).  And since
+Kconfig does not visit the dependencies, it breaks the dependencies of B
+(!A).
 
+You can test the example after applying the patch via:
+   $ make KBUILD_KCONFIG=bad_selects.Kconfig menuconfig
 
-Paul Bolle
+Set A, then set C and you'll see that B is set to 'y' as well.
+
+Kind regards,
+  Valentin
+
+--BXVAT5kNtrzKuDFl
+Content-Type: text/x-diff; charset=utf-8
+Content-Disposition: attachment; filename="bad_selects.patch"
+
+diff --git a/bad_selects.Kconfig b/bad_selects.Kconfig
+new file mode 100644
+index 000000000000..989fc4e1fc17
+--- /dev/null
++++ b/bad_selects.Kconfig
+@@ -0,0 +1,11 @@
++config A
++    bool "CONFIG A"
++
++config B
++    bool "CONFIG B"
++    depends on !A
++
++config C
++    bool "CONFIG C"
++    depends on A
++    select B
+
+--BXVAT5kNtrzKuDFl--
