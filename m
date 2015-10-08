@@ -1,62 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lists.s-osg.org ([54.187.51.154]:47857 "EHLO lists.s-osg.org"
+Received: from mx2.suse.de ([195.135.220.15]:39637 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754583AbbJHN0d (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 8 Oct 2015 09:26:33 -0400
-Subject: Re: [PATCH v2] kselftest: add kselftest-clean rule
-References: <560E9242.9000402@osg.samsung.com>
- <1444272078-7087-1-git-send-email-long.wanglong@huawei.com>
- <1444276324.9940.6.camel@ellerman.id.au>
- <20151008122150.GA12217@sepie.suse.cz>
-From: Shuah Khan <shuahkh@osg.samsung.com>
-Message-ID: <56166EFB.7080708@osg.samsung.com>
-Date: Thu, 8 Oct 2015 07:26:19 -0600
+	id S1757617AbbJHNhq (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 8 Oct 2015 09:37:46 -0400
+Date: Thu, 8 Oct 2015 15:37:41 +0200
+From: Michal Marek <mmarek@suse.com>
+Subject: Re: [PATCH v4] kbuild: document recursive dependency limitation /
+ resolution
+Message-ID: <20151008133741.GA14213@sepie.suse.cz>
+References: <1438200556-13842-1-git-send-email-mcgrof@do-not-panic.com>
+ <1444259793-32486-1-git-send-email-mcgrof@do-not-panic.com>
 MIME-Version: 1.0
-In-Reply-To: <20151008122150.GA12217@sepie.suse.cz>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1444259793-32486-1-git-send-email-mcgrof@do-not-panic.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>, Michael Ellerman <mpe@ellerman.id.au>
-Cc: Wang Long <long.wanglong@huawei.com>, mmarek@suse.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, peifeiyue@huawei.com
+To: "Luis R. Rodriguez" <mcgrof@do-not-panic.com>
+Cc: josh@joshtriplett.org, jbottomley@odin.com, geert@linux-m68k.org, pebolle@tiscali.nl, herbert@gondor.apana.org.au, tiwai@suse.de, yann.morin.1998@free.fr, corbet@lwn.net, linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, roberto@dicosmo.org, zack@upsilon.cc, mcgrof@suse.com, soos.mate@gmail.com, skl@det.ua.pt, iouliia@det.ua.pt, biere@jku.at, julia.lawall@lip6.fr, chidaph@gmail.com, wasowski@itu.dk, bergert@chalmers.se, mgorman@suse.de, vegard.nossum@gmail.com, kconfig-sat@googlegroups.com
 
-On 10/08/2015 06:21 AM, Michal Marek wrote:
-> On Thu, Oct 08, 2015 at 02:52:04PM +1100, Michael Ellerman wrote:
->> On Thu, 2015-10-08 at 02:41 +0000, Wang Long wrote:
->>> We use
->>>
->>>     $make TARGETS="size timers" kselftest
->>>
->>> to build and run selftests. but there is no rule
->>> for us to clean the kselftest generated files.
->>>
->>> This patch add the rules, for example:
->>>
->>> 	$ make TARGETS="size timers" kselftest-clean
->>>
->>> can clean all kselftest generated files.
->>>
->>> Signed-off-by: Wang Long <long.wanglong@huawei.com>
->>> ---
->>>  Makefile | 4 ++++
->>>  1 file changed, 4 insertions(+)
->>
->> Thanks that's much neater.
->>
->> Acked-by: Michael Ellerman <mpe@ellerman.id.au>
+On Wed, Oct 07, 2015 at 04:16:33PM -0700, Luis R. Rodriguez wrote:
+> From: "Luis R. Rodriguez" <mcgrof@suse.com>
 > 
-> Applied to kbuild.git#kbuild.
+> Recursive dependency issues with kconfig are unavoidable due to
+> some limitations with kconfig, since these issues are recurring
+> provide a hint to the user how they can resolve these dependency
+> issues and also document why such limitation exists.
 > 
+> While at it also document a bit of future prospects of ways to
+> enhance Kconfig, including providing formal semantics and evaluation
+> of use of a SAT solver. If you're interested in this work or prospects
+> of it check out the kconfig-sat project wiki [0] and mailing list [1].
+> 
+> [0] http://kernelnewbies.org/KernelProjects/kconfig-sat
+> [1] https://groups.google.com/d/forum/kconfig-sat
+> 
+> Cc: Geert Uytterhoeven <geert@linux-m68k.org>
+> Cc: James Bottomley <jbottomley@odin.com>
+> Cc: Josh Triplett <josh@joshtriplett.org>
+> Cc: Paul Bolle <pebolle@tiscali.nl>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: Takashi Iwai <tiwai@suse.de>
+> Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>
+> Cc: Michal Marek <mmarek@suse.com>
+> Cc: Jonathan Corbet <corbet@lwn.net>
+> Cc: Mate Soos <soos.mate@gmail.com>
+> Cc: linux-kbuild@vger.kernel.org
+> Cc: linux-doc@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Signed-off-by: Luis R. Rodriguez <mcgrof@suse.com>
 
+Applied to kbuild.git#kconfig, thanks.
 
-Thanks for getting this in.
-
--- Shuah
-
-
--- 
-Shuah Khan
-Sr. Linux Kernel Developer
-Open Source Innovation Group
-Samsung Research America (Silicon Valley)
-shuahkh@osg.samsung.com | (970) 217-8978
+Michal
