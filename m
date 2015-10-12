@@ -1,77 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-yk0-f196.google.com ([209.85.160.196]:35568 "EHLO
-	mail-yk0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752809AbbJLC7Q (ORCPT
+Received: from mail-vk0-f67.google.com ([209.85.213.67]:34995 "EHLO
+	mail-vk0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750710AbbJLFEe (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 11 Oct 2015 22:59:16 -0400
+	Mon, 12 Oct 2015 01:04:34 -0400
 MIME-Version: 1.0
-From: Pranith Kumar <bobby.prani+lkml@gmail.com>
-Date: Sun, 11 Oct 2015 22:58:44 -0400
-Message-ID: <CAJhHMCA=CGdBdnGKzG05HDPOESgGZvZ=VwDTMUnpgT==mKSe3w@mail.gmail.com>
-Subject: bindeb-pkg error (was Re: kbuild misc changes for v4.3-rc1 )
+In-Reply-To: <CAJhHMCA=CGdBdnGKzG05HDPOESgGZvZ=VwDTMUnpgT==mKSe3w@mail.gmail.com>
+References: <CAJhHMCA=CGdBdnGKzG05HDPOESgGZvZ=VwDTMUnpgT==mKSe3w@mail.gmail.com>
+Date: Sun, 11 Oct 2015 22:04:31 -0700
+Message-ID: <CA+r1Zhhs5Ef1sqC8iV11vwAwVkezxRjmM6-cuA63T3ya0Ne4EQ@mail.gmail.com>
+Subject: Re: bindeb-pkg error (was Re: kbuild misc changes for v4.3-rc1 )
+From: Jim Davis <jim.epost@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, Andi Kleen <ak@linux.intel.com>, andrej.skvortzov@gmail.com, arnaud.patard@rtp-net.org, Borislav Petkov <bp@suse.de>, dmitry.kalinkin@gmail.com, f.fainelli@gmail.com, fabio.estevam@freescale.com, jim.epost@gmail.com, k.kozlowski@samsung.com, linux@rasmusvillemoes.dk, lists@nerdbynature.de, mike.marciniszyn@intel.com, riku.voipio@linaro.org, sboyd@codeaurora.org, linux-kbuild@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
+To: Pranith Kumar <bobby.prani+lkml@gmail.com>
+Cc: Michal Marek <mmarek@suse.cz>, Linus Torvalds <torvalds@linux-foundation.org>, Andi Kleen <ak@linux.intel.com>, andrej.skvortzov@gmail.com, arnaud.patard@rtp-net.org, Borislav Petkov <bp@suse.de>, dmitry.kalinkin@gmail.com, Florian Fainelli <f.fainelli@gmail.com>, fabio.estevam@freescale.com, k.kozlowski@samsung.com, linux@rasmusvillemoes.dk, lists@nerdbynature.de, mike.marciniszyn@intel.com, Riku Voipio <riku.voipio@linaro.org>, sboyd@codeaurora.org, linux-kbuild@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
 
-Hi Michal,
-
-On Tue, Sep 8, 2015 at 11:38 AM, Michal Marek <mmarek@suse.cz> wrote:
-> Hi Linus,
+On Sun, Oct 11, 2015 at 7:58 PM, Pranith Kumar
+<bobby.prani+lkml@gmail.com> wrote:
 >
-> these are the non-core kbuild changes for 4.3-rc1:
-> - deb-pkg:
->   + module signing fix
->   + dtb files are added to the package
->   + do not require `hostname -f` to work during build
->   + make deb-pkg generates a source package, bindeb-pkg has been added
->     to only generate the binary package
+>
+> ../linux-firmware-image-4.3.0-rc4_4.3.0-rc4-7_powerpc.deb: No such
+> file or directory
+> scripts/package/Makefile:97: recipe for target 'bindeb-pkg' failed
+> make[1]: *** [bindeb-pkg] Error 2
+> Makefile:1226: recipe for target 'bindeb-pkg' failed
+> make: *** [bindeb-pkg] Error 2
 
-It would have been great to not change the functionality of the
-target. Instead you could have added srcdeb-pkg to generate both the
-source and binary.
+So this is a build on a ppc system?  What's the distro?  I've checked
+that bindeb-pkg works fine with 4.3-rc4 on Ubuntu 15.04 with the amd64
+architecture, but that's probably not much consolation.
 
-Other than that, I keep seeing these errors now:
-
-dpkg-gencontrol: warning: File::FcntlLock not available; using flock
-which is not NFS-safe
-dpkg-deb: building package `linux-firmware-image-4.3.0-rc4+' in
-`../linux-firmware-image-4.3.0-rc4+_4.3.0-rc4+-8_powerpc.deb'.
-dpkg-gencontrol: warning: File::FcntlLock not available; using flock
-which is not NFS-safe
-dpkg-deb: building package `linux-headers-4.3.0-rc4+' in
-`../linux-headers-4.3.0-rc4+_4.3.0-rc4+-8_powerpc.deb'.
-dpkg-gencontrol: warning: File::FcntlLock not available; using flock
-which is not NFS-safe
-dpkg-deb: building package `linux-libc-dev' in
-`../linux-libc-dev_4.3.0-rc4+-8_powerpc.deb'.
-dpkg-gencontrol: warning: File::FcntlLock not available; using flock
-which is not NFS-safe
-dpkg-deb: building package `linux-image-4.3.0-rc4+' in
-`../linux-image-4.3.0-rc4+_4.3.0-rc4+-8_powerpc.deb'.
-dpkg-genchanges: warning: package linux-image-4.3.0-rc4 listed in
-files list but not in control info
-dpkg-genchanges: warning: package linux-firmware-image-4.3.0-rc4
-listed in files list but not in control info
-dpkg-genchanges: warning: package linux-headers-4.3.0-rc4 listed in
-files list but not in control info
-dpkg-genchanges: binary-only upload (no source code included)
-Use of uninitialized value $b in string eq at
-/usr/share/perl5/Dpkg/Arch.pm line 399.
-Use of uninitialized value $arch in pattern match (m//) at
-/usr/share/perl5/Dpkg/Arch.pm line 335.
-Use of uninitialized value $arch in hash element at
-/usr/share/perl5/Dpkg/Arch.pm line 340.
-dpkg-genchanges: error: cannot fstat file
-../linux-firmware-image-4.3.0-rc4_4.3.0-rc4-7_powerpc.deb: No such
-file or directory
-scripts/package/Makefile:97: recipe for target 'bindeb-pkg' failed
-make[1]: *** [bindeb-pkg] Error 2
-Makefile:1226: recipe for target 'bindeb-pkg' failed
-make: *** [bindeb-pkg] Error 2
-
-Any idea on how to fix this?
-
-Thanks,
-Pranith
+-- 
+Jim
