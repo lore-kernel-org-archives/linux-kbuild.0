@@ -1,59 +1,84 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.17.13]:62672 "EHLO
-	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S964785AbbJNP5L (ORCPT
+Received: from mail-yk0-f179.google.com ([209.85.160.179]:35902 "EHLO
+	mail-yk0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753703AbbJNQyz (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 14 Oct 2015 11:57:11 -0400
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH] ARM64: dts: vexpress: Use a symlink to vexpress-v2m-rs1.dtsi from arch=arm
-Date: Wed, 14 Oct 2015 17:56:27 +0200
-Message-ID: <19050561.IRVkypnnKH@wuerfel>
-In-Reply-To: <20151012153750.GE7452@leverpostej>
-References: <1444046032-31310-1-git-send-email-ian.campbell@citrix.com> <20151012153750.GE7452@leverpostej>
+	Wed, 14 Oct 2015 12:54:55 -0400
+Received: by ykey125 with SMTP id y125so53159055yke.3
+        for <linux-kbuild@vger.kernel.org>; Wed, 14 Oct 2015 09:54:55 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <1444779780.12197.3.camel@ellerman.id.au>
+References: <1442986835-13985-1-git-send-email-mpe@ellerman.id.au>
+	<20151002074708.CF4DC14076A@ozlabs.org>
+	<CAOesGMjDC99RFEenyUqc2uhpT9EhqhevrqxiO5Gd7AN_GWmrkg@mail.gmail.com>
+	<1444779780.12197.3.camel@ellerman.id.au>
+Date: Wed, 14 Oct 2015 09:54:55 -0700
+Message-ID: <CAOesGMgd2rnAs9hmi1B9PWN2=fr6HUDn+krxdDdGPUKBrZOQGw@mail.gmail.com>
+Subject: Re: [RFC, 1/2] scripts/kconfig/Makefile: Allow KBUILD_DEFCONFIG to be
+ a target
+From: Olof Johansson <olof@lixom.net>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-arm-kernel@lists.infradead.org
-Cc: Mark Rutland <mark.rutland@arm.com>, Ian Campbell <ian.campbell@citrix.com>, devicetree@vger.kernel.org, Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>, Russell King <linux@arm.linux.org.uk>, arm@kernel.org, Pawel Moll <pawel.moll@arm.com>, linux-kbuild@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Kumar Gala <galak@codeaurora.org>, Liviu Dudau <liviu.dudau@arm.com>, linux-kernel@vger.kernel.org, Will Deacon <will.deacon@arm.com>, Rob Herring <robh+dt@kernel.org>, Kristina Martsenko <kristina.martsenko@arm.com>, Frank Rowand <frank.rowand@sonymobile.com>, Sudeep Holla <sudeep.holla@arm.com>, Olof Johansson <olof@lixom.net>, Kevin Hilman <khilman@linaro.org>
+To: Michael Ellerman <mpe@ellerman.id.au>
+Cc: linuxppc-dev@ozlabs.org, mmarek@suse.com, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, yann.morin.1998@free.fr, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
 
-On Monday 12 October 2015 16:37:50 Mark Rutland wrote:
-> On Mon, Oct 05, 2015 at 12:53:52PM +0100, Ian Campbell wrote:
-> > Commit 9ccd608070b6 "arm64: dts: add device tree for ARM SMM-A53x2 on
-> > LogicTile Express 20MG" added a new dts file to arch/arm64 which
-> > included "../../../../arm/boot/dts/vexpress-v2m-rs1.dtsi", i.e. a
-> > .dtsi supplied by arch/arm.
-> > 
-> > Unfortunately this causes some issues for the split device tree
-> > repository[0], since things get moved around there. In that context
-> > the new .dts ends up at src/arm64/arm/vexpress-v2f-1xv7-ca53x2.dts
-> > while the include is at src/arm/vexpress-v2m-rs1.dtsi.
-> > 
-> > The sharing of the .dtsi is legitimate since the baseboard is the same
-> > for various vexpress systems whatever processor they use.
-> > 
-> > Previously I attempted to resolve this by creating a shared location
-> > for such things but we have been unable to come to a consensus on
-> > where that should be.
-> > 
-> > Instead this patch simply replaces the use of ../../ in the dts
-> > /include/ with a symlink in arch/arm64/boot/dts/arm pointing to the
-> > file arch/arm/boot/dts.
-> > 
-> > Since the split device tree repo will shortly be required to flatten
-> > symlinks for other reasons this will cause the dtsi file to appear in
-> > both src/arm and src/arm64 in the split repo, which is an improvement
-> > on not building for arm64 now.
-> > 
-> > [0] https://git.kernel.org/cgit/linux/kernel/git/devicetree/devicetree-rebasing.git/
-> > 
-> > Signed-off-by: Ian Campbell <ian.campbell@citrix.com>
+On Tue, Oct 13, 2015 at 4:43 PM, Michael Ellerman <mpe@ellerman.id.au> wrote:
+> On Tue, 2015-10-13 at 14:02 -0700, Olof Johansson wrote:
+>> On Fri, Oct 2, 2015 at 12:47 AM, Michael Ellerman <mpe@ellerman.id.au> wrote:
+>> > On Wed, 2015-23-09 at 05:40:34 UTC, Michael Ellerman wrote:
+>> >> Arch Makefiles can set KBUILD_DEFCONFIG to tell kbuild the name of the
+>> >> defconfig that should be built by default.
+>> >>
+>> >> However currently there is an assumption that KBUILD_DEFCONFIG points to
+>> >> a file at arch/$(SRCARCH)/configs/$(KBUILD_DEFCONFIG).
+>> >>
+>> >> We would like to use a target, using merge_config, as our defconfig, so
+>> >> adapt the logic in scripts/kconfig/Makefile to allow that.
+>> >>
+>> >> To minimise the chance of breaking anything, we first check if
+>> >> KBUILD_DEFCONFIG is a file, and if so we do the old logic. If it's not a
+>> >> file, then we call the top-level Makefile with KBUILD_DEFCONFIG as the
+>> >> target.
+>> >>
+>> >> Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
+>> >> Acked-by: Michal Marek <mmarek@suse.com>
+>> >
+>> > Applied to powerpc next.
+>> >
+>> > https://git.kernel.org/powerpc/c/d2036f30cfe1daa19e63ce75
+>>
+>> This breaks arm64 defconfig for me:
+>>
+>> mkdir obj-tmp
+>> make -f Makefile O=obj-tmp ARCH=arm64 defconfig
+>> ... watch loop of:
+>> *** Default configuration is based on target 'defconfig'
+>>   GEN     ./Makefile
+>
+> Crap, sorry. I knew I shouldn't have touched that code!
+>
+> Does this fix it for you?
+
+Yes, it does, however:
+
+>
+> diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+> index b2b9c87..3043d6b 100644
+> --- a/scripts/kconfig/Makefile
+> +++ b/scripts/kconfig/Makefile
+> @@ -96,7 +96,7 @@ savedefconfig: $(obj)/conf
+>  defconfig: $(obj)/conf
+>  ifeq ($(KBUILD_DEFCONFIG),)
+>         $< $(silent) --defconfig $(Kconfig)
+> -else ifneq ($(wildcard arch/$(SRCARCH)/configs/$(KBUILD_DEFCONFIG)),)
+> +else ifneq ($(wildcard $(srctree)/arch/$(SRCARCH)/configs/$(KBUILD_DEFCONFIG)),)
+>         @$(kecho) "*** Default configuration is based on '$(KBUILD_DEFCONFIG)'"
+>         $(Q)$< $(silent) --defconfig=arch/$(SRCARCH)/configs/$(KBUILD_DEFCONFIG) $(Kconfig)
+
+Do you need a $(srctree) prefix here too? I'm not entirely sure what I
+would do to reproduce a run that goes down this path so I can't
+confirm.
 
 
-> Acked-by: Mark Rutland <mark.rutland@arm.com>
-> 
-
-Applied to next/dt, thanks!
-
-	Arnd
+-Olof
