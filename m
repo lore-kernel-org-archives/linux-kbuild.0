@@ -1,47 +1,115 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:55007 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:54994 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753057AbbJOURZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	id S1753043AbbJOURZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
 	Thu, 15 Oct 2015 16:17:25 -0400
 From: Michal Marek <mmarek@suse.com>
-Subject: [PATCH 7/9] tags: Drop the _PE rule
-Date: Thu, 15 Oct 2015 22:16:33 +0200
-Message-Id: <1444940195-28272-8-git-send-email-mmarek@suse.com>
+Subject: [PATCH 3/9] aic7xxx: Avoid name collision with <linux/list.h>
+Date: Thu, 15 Oct 2015 22:16:29 +0200
+Message-Id: <1444940195-28272-4-git-send-email-mmarek@suse.com>
 In-Reply-To: <1444940195-28272-1-git-send-email-mmarek@suse.com>
 References: <1444940195-28272-1-git-send-email-mmarek@suse.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org
 
-We are not indexing the userspace tools, so the rules only match some
-false positives in the kernel code.
+Rename the local definition of LIST_HEAD to BSD_LIST_HEAD. This fixes a
+ctags error if we apply the C rules to header files  as well:
 
+ctags: Warning: drivers/scsi/aic7xxx/aic79xx.h:1072: null expansion of name pattern "\3"
+ctags: Warning: drivers/scsi/aic7xxx/aic7xxx.h:919: null expansion of name pattern "\3"
+
+Cc: linux-scsi@vger.kernel.org
 Signed-off-by: Michal Marek <mmarek@suse.com>
 ---
- scripts/tags.sh | 2 --
- 1 file changed, 2 deletions(-)
+ drivers/scsi/aic7xxx/aic79xx.h     | 4 ++--
+ drivers/scsi/aic7xxx/aic79xx_osm.h | 5 -----
+ drivers/scsi/aic7xxx/aic7xxx.h     | 2 +-
+ drivers/scsi/aic7xxx/aic7xxx_osm.h | 5 -----
+ drivers/scsi/aic7xxx/queue.h       | 2 +-
+ 5 files changed, 4 insertions(+), 14 deletions(-)
 
-diff --git a/scripts/tags.sh b/scripts/tags.sh
-index 8a03c335d107..06246b64c0a1 100755
---- a/scripts/tags.sh
-+++ b/scripts/tags.sh
-@@ -189,7 +189,6 @@ exuberant()
- 	--regex-c='/__CLEARPAGEFLAG_NOOP\(([^,)]*).*/__ClearPage\1/'	\
- 	--regex-c='/TESTCLEARFLAG_FALSE\(([^,)]*).*/TestClearPage\1/' \
- 	--regex-c='/__TESTCLEARFLAG_FALSE\(([^,)]*).*/__TestClearPage\1/' \
--	--regex-c='/_PE\(([^,)]*).*/PEVENT_ERRNO__\1/'		\
- 	--regex-c='/TASK_PFA_TEST\([^,]*,\s*([^)]*)\)/task_\1/'	\
- 	--regex-c='/TASK_PFA_SET\([^,]*,\s*([^)]*)\)/task_set_\1/'	\
- 	--regex-c='/TASK_PFA_CLEAR\([^,]*,\s*([^)]*)\)/task_clear_\1/'\
-@@ -252,7 +251,6 @@ emacs()
- 	--regex='/TASK_PFA_TEST\([^,]*,\s*([^)]*)\)/task_\1/'		\
- 	--regex='/TASK_PFA_SET\([^,]*,\s*([^)]*)\)/task_set_\1/'	\
- 	--regex='/TASK_PFA_CLEAR\([^,]*,\s*([^)]*)\)/task_clear_\1/'	\
--	--regex='/_PE(\([^,)]*\).*/PEVENT_ERRNO__\1/'		\
- 	--regex='/PCI_OP_READ(\([a-z]*[a-z]\).*[1-4])/pci_bus_read_config_\1/' \
- 	--regex='/PCI_OP_WRITE(\([a-z]*[a-z]\).*[1-4])/pci_bus_write_config_\1/'\
- 	--regex='/[^#]*DEFINE_HASHTABLE(\([^,)]*\)/\1/'
+diff --git a/drivers/scsi/aic7xxx/aic79xx.h b/drivers/scsi/aic7xxx/aic79xx.h
+index df2e0e5367d2..d47b527b25dd 100644
+--- a/drivers/scsi/aic7xxx/aic79xx.h
++++ b/drivers/scsi/aic7xxx/aic79xx.h
+@@ -624,7 +624,7 @@ struct scb {
+ };
+ 
+ TAILQ_HEAD(scb_tailq, scb);
+-LIST_HEAD(scb_list, scb);
++BSD_LIST_HEAD(scb_list, scb);
+ 
+ struct scb_data {
+ 	/*
+@@ -1069,7 +1069,7 @@ struct ahd_softc {
+ 	/*
+ 	 * SCBs that have been sent to the controller
+ 	 */
+-	LIST_HEAD(, scb)	  pending_scbs;
++	BSD_LIST_HEAD(, scb)	  pending_scbs;
+ 
+ 	/*
+ 	 * Current register window mode information.
+diff --git a/drivers/scsi/aic7xxx/aic79xx_osm.h b/drivers/scsi/aic7xxx/aic79xx_osm.h
+index c58fa33c6592..728193a42e6e 100644
+--- a/drivers/scsi/aic7xxx/aic79xx_osm.h
++++ b/drivers/scsi/aic7xxx/aic79xx_osm.h
+@@ -65,11 +65,6 @@
+ /* Core SCSI definitions */
+ #define AIC_LIB_PREFIX ahd
+ 
+-/* Name space conflict with BSD queue macros */
+-#ifdef LIST_HEAD
+-#undef LIST_HEAD
+-#endif
+-
+ #include "cam.h"
+ #include "queue.h"
+ #include "scsi_message.h"
+diff --git a/drivers/scsi/aic7xxx/aic7xxx.h b/drivers/scsi/aic7xxx/aic7xxx.h
+index f695774645c1..4ce4e903a759 100644
+--- a/drivers/scsi/aic7xxx/aic7xxx.h
++++ b/drivers/scsi/aic7xxx/aic7xxx.h
+@@ -916,7 +916,7 @@ struct ahc_softc {
+ 	/*
+ 	 * SCBs that have been sent to the controller
+ 	 */
+-	LIST_HEAD(, scb)	  pending_scbs;
++	BSD_LIST_HEAD(, scb)	  pending_scbs;
+ 
+ 	/*
+ 	 * Counting lock for deferring the release of additional
+diff --git a/drivers/scsi/aic7xxx/aic7xxx_osm.h b/drivers/scsi/aic7xxx/aic7xxx_osm.h
+index bc4cca92ff04..54c702864103 100644
+--- a/drivers/scsi/aic7xxx/aic7xxx_osm.h
++++ b/drivers/scsi/aic7xxx/aic7xxx_osm.h
+@@ -82,11 +82,6 @@
+ /* Core SCSI definitions */
+ #define AIC_LIB_PREFIX ahc
+ 
+-/* Name space conflict with BSD queue macros */
+-#ifdef LIST_HEAD
+-#undef LIST_HEAD
+-#endif
+-
+ #include "cam.h"
+ #include "queue.h"
+ #include "scsi_message.h"
+diff --git a/drivers/scsi/aic7xxx/queue.h b/drivers/scsi/aic7xxx/queue.h
+index 8adf8003a164..ba602981f193 100644
+--- a/drivers/scsi/aic7xxx/queue.h
++++ b/drivers/scsi/aic7xxx/queue.h
+@@ -246,7 +246,7 @@ struct {								\
+ /*
+  * List declarations.
+  */
+-#define	LIST_HEAD(name, type)						\
++#define	BSD_LIST_HEAD(name, type)					\
+ struct name {								\
+ 	struct type *lh_first;	/* first element */			\
+ }
 -- 
 2.1.4
 
