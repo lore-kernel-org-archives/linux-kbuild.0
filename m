@@ -1,96 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([103.22.144.67]:42316 "EHLO ozlabs.org"
+Received: from ozlabs.org ([103.22.144.67]:37357 "EHLO ozlabs.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751478AbbJOD1R (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 14 Oct 2015 23:27:17 -0400
-Message-ID: <1444879634.5970.3.camel@ellerman.id.au>
-Subject: Re: [RFC, 1/2] scripts/kconfig/Makefile: Allow KBUILD_DEFCONFIG to
- be a target
+	id S1755142AbbJOGFy (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 15 Oct 2015 02:05:54 -0400
 From: Michael Ellerman <mpe@ellerman.id.au>
-Date: Thu, 15 Oct 2015 14:27:14 +1100
-In-Reply-To: <CAOesGMgd2rnAs9hmi1B9PWN2=fr6HUDn+krxdDdGPUKBrZOQGw@mail.gmail.com>
-References: <1442986835-13985-1-git-send-email-mpe@ellerman.id.au>
-	 <20151002074708.CF4DC14076A@ozlabs.org>
-	 <CAOesGMjDC99RFEenyUqc2uhpT9EhqhevrqxiO5Gd7AN_GWmrkg@mail.gmail.com>
-	 <1444779780.12197.3.camel@ellerman.id.au>
-	 <CAOesGMgd2rnAs9hmi1B9PWN2=fr6HUDn+krxdDdGPUKBrZOQGw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Subject: [PATCH] scripts/kconfig/Makefile: Fix KBUILD_DEFCONFIG check when building with O=
+Date: Thu, 15 Oct 2015 17:05:50 +1100
+Message-Id: <1444889150-23609-1-git-send-email-mpe@ellerman.id.au>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Olof Johansson <olof@lixom.net>
-Cc: linuxppc-dev@ozlabs.org, mmarek@suse.com, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, yann.morin.1998@free.fr, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
+To: linuxppc-dev@ozlabs.org
+Cc: Olof Johannsson <olof@lixom.net>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, yann.morin.1998@free.fr, mmarek@suse.com
 
-On Wed, 2015-10-14 at 09:54 -0700, Olof Johansson wrote:
-> On Tue, Oct 13, 2015 at 4:43 PM, Michael Ellerman <mpe@ellerman.id.au> wrote:
-> > On Tue, 2015-10-13 at 14:02 -0700, Olof Johansson wrote:
-> >> On Fri, Oct 2, 2015 at 12:47 AM, Michael Ellerman <mpe@ellerman.id.au> wrote:
-> >> > On Wed, 2015-23-09 at 05:40:34 UTC, Michael Ellerman wrote:
-> >> >> Arch Makefiles can set KBUILD_DEFCONFIG to tell kbuild the name of the
-> >> >> defconfig that should be built by default.
-> >> >>
-> >> >> However currently there is an assumption that KBUILD_DEFCONFIG points to
-> >> >> a file at arch/$(SRCARCH)/configs/$(KBUILD_DEFCONFIG).
-> >> >>
-> >> >> We would like to use a target, using merge_config, as our defconfig, so
-> >> >> adapt the logic in scripts/kconfig/Makefile to allow that.
-> >> >>
-> >> >> To minimise the chance of breaking anything, we first check if
-> >> >> KBUILD_DEFCONFIG is a file, and if so we do the old logic. If it's not a
-> >> >> file, then we call the top-level Makefile with KBUILD_DEFCONFIG as the
-> >> >> target.
-> >> >>
-> >> >> Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
-> >> >> Acked-by: Michal Marek <mmarek@suse.com>
-> >> >
-> >> > Applied to powerpc next.
-> >> >
-> >> > https://git.kernel.org/powerpc/c/d2036f30cfe1daa19e63ce75
-> >>
-> >> This breaks arm64 defconfig for me:
-> >>
-> >> mkdir obj-tmp
-> >> make -f Makefile O=obj-tmp ARCH=arm64 defconfig
-> >> ... watch loop of:
-> >> *** Default configuration is based on target 'defconfig'
-> >>   GEN     ./Makefile
-> >
-> > Crap, sorry. I knew I shouldn't have touched that code!
-> >
-> > Does this fix it for you?
-> 
-> Yes, it does, however:
-> 
-> > diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-> > index b2b9c87..3043d6b 100644
-> > --- a/scripts/kconfig/Makefile
-> > +++ b/scripts/kconfig/Makefile
-> > @@ -96,7 +96,7 @@ savedefconfig: $(obj)/conf
-> >  defconfig: $(obj)/conf
-> >  ifeq ($(KBUILD_DEFCONFIG),)
-> >         $< $(silent) --defconfig $(Kconfig)
-> > -else ifneq ($(wildcard arch/$(SRCARCH)/configs/$(KBUILD_DEFCONFIG)),)
-> > +else ifneq ($(wildcard $(srctree)/arch/$(SRCARCH)/configs/$(KBUILD_DEFCONFIG)),)
-> >         @$(kecho) "*** Default configuration is based on '$(KBUILD_DEFCONFIG)'"
-> >         $(Q)$< $(silent) --defconfig=arch/$(SRCARCH)/configs/$(KBUILD_DEFCONFIG) $(Kconfig)
-> 
-> Do you need a $(srctree) prefix here too? I'm not entirely sure what I
-> would do to reproduce a run that goes down this path so I can't
-> confirm.
+My recent commit d2036f30cfe1 ("scripts/kconfig/Makefile: Allow
+KBUILD_DEFCONFIG to be a target"), contained a bug in that when it
+checks if KBUILD_DEFCONFIG is a file it forgets to prepend $(srctree) to
+the path.
 
-That is the path you're going down, now that it's fixed. That's the path where
-KBUILD_DEFCONFIG is a real file, ie. the old behaviour.
+This causes the build to fail when building out of tree (with O=), and
+when the value of KBUILD_DEFCONFIG is 'defconfig'. In that case we will
+fail to find the 'defconfig' file, because we look in the build
+directory not $(srctree), and so we will call Make again with
+'defconfig' as the target. From there we loop infinitely calling 'make
+defconfig' again and again.
 
-I'm not sure why it doesn't have a $(srctree) there, but it's never had one.
+The fix is simple, we need to look for the file under $(srctree).
 
-It looks like it eventually boils down to zconf_fopen() which looks for the
-file in both .  and $(srctree).
+Fixes: d2036f30cfe1 ("scripts/kconfig/Makefile: Allow KBUILD_DEFCONFIG to be a target")
+Reported-by: Olof Johansson <olof@lixom.net>
+Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
+---
+ scripts/kconfig/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-So I think we could add a $(srctree) there, it would be more obvious and not
-rely on the zconf_fopen() behaviour, but I'd rather leave it as is and let
-Michal do that as a cleanup later.
 
-cheers
+This works for me and is a minimal fix. I'll merge this into the powerpc#next
+branch unless anyone yells.
 
+diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+index b2b9c87cec50..3043d6b0b51d 100644
+--- a/scripts/kconfig/Makefile
++++ b/scripts/kconfig/Makefile
+@@ -96,7 +96,7 @@ savedefconfig: $(obj)/conf
+ defconfig: $(obj)/conf
+ ifeq ($(KBUILD_DEFCONFIG),)
+ 	$< $(silent) --defconfig $(Kconfig)
+-else ifneq ($(wildcard arch/$(SRCARCH)/configs/$(KBUILD_DEFCONFIG)),)
++else ifneq ($(wildcard $(srctree)/arch/$(SRCARCH)/configs/$(KBUILD_DEFCONFIG)),)
+ 	@$(kecho) "*** Default configuration is based on '$(KBUILD_DEFCONFIG)'"
+ 	$(Q)$< $(silent) --defconfig=arch/$(SRCARCH)/configs/$(KBUILD_DEFCONFIG) $(Kconfig)
+ else
+-- 
+2.1.4
 
