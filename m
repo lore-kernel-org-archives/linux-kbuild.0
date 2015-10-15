@@ -1,58 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:55014 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:55002 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753120AbbJOUR1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 15 Oct 2015 16:17:27 -0400
+	id S1753048AbbJOURZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 15 Oct 2015 16:17:25 -0400
 From: Michal Marek <mmarek@suse.com>
-Subject: [PATCH 2/9] KVM: arm: Do not indent the arguments of DECLARE_BITMAP
-Date: Thu, 15 Oct 2015 22:16:28 +0200
-Message-Id: <1444940195-28272-3-git-send-email-mmarek@suse.com>
+Subject: [PATCH 6/9] tags: Do not try to index defconfigs
+Date: Thu, 15 Oct 2015 22:16:32 +0200
+Message-Id: <1444940195-28272-7-git-send-email-mmarek@suse.com>
 In-Reply-To: <1444940195-28272-1-git-send-email-mmarek@suse.com>
 References: <1444940195-28272-1-git-send-email-mmarek@suse.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
+Cc: linux-kernel@vger.kernel.org
 
-Besides being a coding style issue, it confuses make tags:
+The defconfig files are in predictable locations, so there is no need to
+index them. Plus, the script was only looking for files named
+'defconfig', which only works on a few architectures nowadays.
 
-ctags: Warning: include/kvm/arm_vgic.h:307: null expansion of name pattern "\1"
-ctags: Warning: include/kvm/arm_vgic.h:308: null expansion of name pattern "\1"
-ctags: Warning: include/kvm/arm_vgic.h:309: null expansion of name pattern "\1"
-ctags: Warning: include/kvm/arm_vgic.h:317: null expansion of name pattern "\1"
-
-Cc: kvmarm@lists.cs.columbia.edu
 Signed-off-by: Michal Marek <mmarek@suse.com>
 ---
- include/kvm/arm_vgic.h | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ scripts/tags.sh | 12 ------------
+ 1 file changed, 12 deletions(-)
 
-diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
-index d901f1a47be6..58c5c0eb8d2d 100644
---- a/include/kvm/arm_vgic.h
-+++ b/include/kvm/arm_vgic.h
-@@ -304,9 +304,9 @@ struct vgic_cpu {
- 	u8		*vgic_irq_lr_map;
+diff --git a/scripts/tags.sh b/scripts/tags.sh
+index 7d496f602c4b..8a03c335d107 100755
+--- a/scripts/tags.sh
++++ b/scripts/tags.sh
+@@ -134,11 +134,6 @@ all_kconfigs()
+ 	find_other_sources 'Kconfig*'
+ }
  
- 	/* Pending/active/both interrupts on this VCPU */
--	DECLARE_BITMAP(	pending_percpu, VGIC_NR_PRIVATE_IRQS);
--	DECLARE_BITMAP(	active_percpu, VGIC_NR_PRIVATE_IRQS);
--	DECLARE_BITMAP(	pend_act_percpu, VGIC_NR_PRIVATE_IRQS);
-+	DECLARE_BITMAP(pending_percpu, VGIC_NR_PRIVATE_IRQS);
-+	DECLARE_BITMAP(active_percpu, VGIC_NR_PRIVATE_IRQS);
-+	DECLARE_BITMAP(pend_act_percpu, VGIC_NR_PRIVATE_IRQS);
+-all_defconfigs()
+-{
+-	find_sources $ALLSOURCE_ARCHS "defconfig"
+-}
+-
+ docscope()
+ {
+ 	(echo \-k; echo \-q; all_target_sources) > cscope.files
+@@ -221,10 +216,6 @@ exuberant()
+ 	--langdef=kconfig --language-force=kconfig              \
+ 	--regex-kconfig='/^[[:blank:]]*(menu|)config[[:blank:]]+([[:alnum:]_]+)/\2/' \
+ 	--regex-kconfig='/^[[:blank:]]*(menu|)config[[:blank:]]+([[:alnum:]_]+)/CONFIG_\2/'
+-
+-	all_defconfigs | xargs -r $1 -a                         \
+-	--langdef=dotconfig --language-force=dotconfig          \
+-	--regex-dotconfig='/^#?[[:blank:]]*(CONFIG_[[:alnum:]_]+)/\1/'
+ }
  
- 	/* Pending/active/both shared interrupts, dynamically sized */
- 	unsigned long	*pending_shared;
-@@ -314,7 +314,7 @@ struct vgic_cpu {
- 	unsigned long   *pend_act_shared;
+ emacs()
+@@ -269,9 +260,6 @@ emacs()
+ 	all_kconfigs | xargs $1 -a                              \
+ 	--regex='/^[ \t]*\(\(menu\)*config\)[ \t]+\([a-zA-Z0-9_]+\)/\3/' \
+ 	--regex='/^[ \t]*\(\(menu\)*config\)[ \t]+\([a-zA-Z0-9_]+\)/CONFIG_\3/'
+-
+-	all_defconfigs | xargs -r $1 -a                         \
+-	--regex='/^#?[ \t]?\(CONFIG_[a-zA-Z0-9_]+\)/\1/'
+ }
  
- 	/* Bitmap of used/free list registers */
--	DECLARE_BITMAP(	lr_used, VGIC_V2_MAX_LRS);
-+	DECLARE_BITMAP(lr_used, VGIC_V2_MAX_LRS);
- 
- 	/* Number of list registers on this CPU */
- 	int		nr_lr;
+ xtags()
 -- 
 2.1.4
 
