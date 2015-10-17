@@ -1,44 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:58196 "EHLO mga09.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932378AbbJPP2q (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 16 Oct 2015 11:28:46 -0400
-From: Thiago Macieira <thiago.macieira@intel.com>
-Subject: Re: [PATCH 39/39] Update the buildsystem for KConfig finding Qt
-Date: Fri, 16 Oct 2015 08:28:44 -0700
-Message-ID: <4227965.esWC4RuHGt@tjmaciei-mobl4>
-In-Reply-To: <20151016061241.45c51b63@mir>
-References: <1442946999-37018-1-git-send-email-thiago.macieira@intel.com> <1442946999-37018-40-git-send-email-thiago.macieira@intel.com> <20151016061241.45c51b63@mir>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Received: from mail-ob0-f176.google.com ([209.85.214.176]:34862 "EHLO
+	mail-ob0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751201AbbJQAJ2 (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 16 Oct 2015 20:09:28 -0400
+From: Jim Davis <jim.epost@gmail.com>
+Subject: [PATCH] scripts/package/Makefile: Restore the RPMOPTS variable
+Date: Fri, 16 Oct 2015 17:09:09 -0700
+Message-Id: <1445040549-31011-1-git-send-email-jim.epost@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Stefan Lippers-Hollmann <s.l-h@gmx.de>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.com>
+To: mmarek@suse.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: alaa.hl2@gmail.com
 
-On Friday 16 October 2015 06:12:41 Stefan Lippers-Hollmann wrote:
-> > +     @set -e; $(kecho) "  CHECK   qt"; \
-> > +     qtver=`qmake -query QT_VERSION` || { \
-> > +         echo >&2 "*"; \
-> > +         echo >&2 "* qmake failed."; \
-> > +         echo >&2 "*"; \
-> > +         exit 1; \
-> > +     }; \
-> 
-> [...]
-> 
-> "qmake -query QT_VERSION" appears to be a little fragile on Debian 
-> with both qt4-qmake and qt5-qmake installed, as it reports back 
-> "4.8.7" by default. The actual qmake is hiding behind qtchooser
-> (/usr/bin/qmake -> qtchooser) and will report different environments
-> based on the chosen personality:
+Restore the RPMOPTS variable to the rpm-pkg and binrpm-pkg targets
+that commit 21a59991ce0c ("scripts/package/Makefile: rpmbuild is
+needed for rpm targets") removed.
 
-Since xconfig still builds with Qt 4, I didn't feel the need to force the 
-choice for Qt 5. If your environment is qtchooser, then you can just set 
-QT_SELECT=5 before running "make xconfig".
+Reported-by: Alaa Hleihel <alaa.hl2@gmail.com>
+Signed-off-by: Jim Davis <jim.epost@gmail.com>
+---
+ scripts/package/Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
+diff --git a/scripts/package/Makefile b/scripts/package/Makefile
+index 1aca224e8597..493e226356ca 100644
+--- a/scripts/package/Makefile
++++ b/scripts/package/Makefile
+@@ -52,7 +52,7 @@ rpm-pkg rpm: FORCE
+ 	$(call cmd,src_tar,$(KERNELPATH),kernel.spec)
+ 	$(CONFIG_SHELL) $(srctree)/scripts/mkversion > $(objtree)/.tmp_version
+ 	mv -f $(objtree)/.tmp_version $(objtree)/.version
+-	rpmbuild --target $(UTS_MACHINE) -ta $(KERNELPATH).tar.gz
++	rpmbuild $(RPMOPTS) --target $(UTS_MACHINE) -ta $(KERNELPATH).tar.gz
+ 	rm $(KERNELPATH).tar.gz kernel.spec
+ 
+ # binrpm-pkg
+@@ -63,7 +63,7 @@ binrpm-pkg: FORCE
+ 	$(CONFIG_SHELL) $(srctree)/scripts/mkversion > $(objtree)/.tmp_version
+ 	mv -f $(objtree)/.tmp_version $(objtree)/.version
+ 
+-	rpmbuild --define "_builddir $(objtree)" --target \
++	rpmbuild $(RPMOPTS) --define "_builddir $(objtree)" --target \
+ 		$(UTS_MACHINE) -bb $(objtree)/binkernel.spec
+ 	rm binkernel.spec
+ 
 -- 
-Thiago Macieira - thiago.macieira (AT) intel.com
-  Software Architect - Intel Open Source Technology Center
+2.1.4
 
