@@ -1,64 +1,30 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lb0-f172.google.com ([209.85.217.172]:36170 "EHLO
-	mail-lb0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750839AbbJSMF1 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 19 Oct 2015 08:05:27 -0400
-Received: by lbcao8 with SMTP id ao8so141694926lbc.3
-        for <linux-kbuild@vger.kernel.org>; Mon, 19 Oct 2015 05:05:25 -0700 (PDT)
-Date: Mon, 19 Oct 2015 14:05:56 +0200
-From: Christoffer Dall <christoffer.dall@linaro.org>
+Received: from mx2.suse.de ([195.135.220.15]:46795 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751037AbbJSMHV (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 19 Oct 2015 08:07:21 -0400
 Subject: Re: [PATCH 2/9] KVM: arm: Do not indent the arguments of
  DECLARE_BITMAP
-Message-ID: <20151019120556.GC24104@cbox>
 References: <1444940195-28272-1-git-send-email-mmarek@suse.com>
  <1444940195-28272-3-git-send-email-mmarek@suse.com>
- <20151018203458.GE7531@cbox>
- <5624DA2C.1000100@suse.com>
+ <20151018203458.GE7531@cbox> <5624DA2C.1000100@suse.com>
+ <20151019120556.GC24104@cbox>
+From: Michal Marek <mmarek@suse.com>
+Message-ID: <5624DCF7.7000001@suse.com>
+Date: Mon, 19 Oct 2015 14:07:19 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5624DA2C.1000100@suse.com>
+In-Reply-To: <20151019120556.GC24104@cbox>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>
+To: Christoffer Dall <christoffer.dall@linaro.org>
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, kvmarm@lists.cs.columbia.edu
 
-On Mon, Oct 19, 2015 at 01:55:24PM +0200, Michal Marek wrote:
-> On 2015-10-18 22:34, Christoffer Dall wrote:
-> > On Thu, Oct 15, 2015 at 10:16:28PM +0200, Michal Marek wrote:
-> >> Besides being a coding style issue, it confuses make tags:
-> >>
-> >> ctags: Warning: include/kvm/arm_vgic.h:307: null expansion of name pattern "\1"
-> >> ctags: Warning: include/kvm/arm_vgic.h:308: null expansion of name pattern "\1"
-> >> ctags: Warning: include/kvm/arm_vgic.h:309: null expansion of name pattern "\1"
-> >> ctags: Warning: include/kvm/arm_vgic.h:317: null expansion of name pattern "\1"
-> >>
-> >> Cc: kvmarm@lists.cs.columbia.edu
-> >> Signed-off-by: Michal Marek <mmarek@suse.com>
-> >> ---
-> > 
-> > Is not being able to deal with a whitespace not a make tags problem?
-> 
-> Yes, but the regular expressions are hardly readable already :-(.
-> 
-> 
-> > As for coding style, do we really entertain these kinds of changes just
-> > to adhere to a coding style?  It feels unnecessary taints the log etc.
-> 
-> I wouldn't have submitted this just for the sake of coding style, it was
-> the ctags warning prompted me to do so.
-> 
-> 
-> > However, I'm curious what the general concesus and previous practice for
-> > this sort of thing is?
-> 
-> This KVM header was the only instance where whitespace confused the
-> patterns, so I'd say it's established practice not to do this. The other
-> ctags warnings were about multi-line macro invocations, where the
-> line-oriented regular expression rules cannot work.
-> 
+On 2015-10-19 14:05, Christoffer Dall wrote:
+> ok, I've taken the patch.
 
-ok, I've taken the patch.
+Thank you! I will remove it from my series.
 
--Christoffer
+Michal
+
