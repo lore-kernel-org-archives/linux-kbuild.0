@@ -1,48 +1,113 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:41625 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:42442 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750859AbbJZUBs (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 26 Oct 2015 16:01:48 -0400
-Subject: Re: [PATCH] kbuild: llvmlinux: Fix -fno-delete-null-pointer-checks
- compiler-flag
-References: <1442286180-11050-1-git-send-email-sedat.dilek@gmail.com>
-From: Michal Marek <mmarek@suse.com>
-Message-ID: <562E86AA.6080405@suse.com>
-Date: Mon, 26 Oct 2015 21:01:46 +0100
+	id S1752408AbbJZUVp (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 26 Oct 2015 16:21:45 -0400
+Subject: Re: [PATCH 1/1] [RFC] kconfig: menuconfig make "Selected by:"
+ readable
+References: <1442257543-6194-1-git-send-email-petr.vorel@gmail.com>
+ <1442257543-6194-2-git-send-email-petr.vorel@gmail.com>
+From: Michal Marek <mmarek@suse.cz>
+Message-ID: <562E8B55.1030607@suse.cz>
+Date: Mon, 26 Oct 2015 21:21:41 +0100
 MIME-Version: 1.0
-In-Reply-To: <1442286180-11050-1-git-send-email-sedat.dilek@gmail.com>
+In-Reply-To: <1442257543-6194-2-git-send-email-petr.vorel@gmail.com>
 Content-Type: text/plain; charset=iso-8859-2
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sedat Dilek <sedat.dilek@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Petr Vorel <petr.vorel@gmail.com>, Paul Bolle <pebolle@tiscali.nl>
+Cc: linux-kbuild@vger.kernel.org, Randy Dunlap <rdunlap@infradead.org>
 
-Dne 15.9.2015 v 05:03 Sedat Dilek napsal(a):
-> CLANG (here: v3.7) does not support '-fno-delete-null-pointer-checks'
-> as a compiler-flag.
+Dne 14.9.2015 v 21:05 Petr Vorel napsal(a):
+> From: Paul Bolle <pebolle@tiscali.nl>
 > 
-> Fix the HOSTCFLAGS and KBUILD_CFLAGS settings accordingly.
-> Furthermore, move and correct the $HOSTCC check.
+> rev_dep expressions can get rather unwieldy, especially if a symbol is
+> selected by more than a handful of other symbols. Ie, it's possible to
+> have near endless expressions like:
+>    A && B && !C || D || F && (G || H) || [...]
 > 
-> Tested against Linux v4.3-rc1 and a refreshed llvmlinux patchset.
+> Chop these expressions into actually readable chunks:
+>    - A && B && !C
+>    - D
+>    - F && (G || H)
+>    - [...]
+> 
+> Ie, transform the top level "||" tokens into newlines and prepend each
+> line with a minus. This makes the "Selected by:" blurb much easier to
+> read.
 > ---
->  Makefile | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
+> Today I found myself wondering why a certain Kconfig was selected.
+> Currently menuconfig's help is of no use in complicated cases. Please
+> look at the help of USB or CRYPTO to see what I mean.
 > 
-> diff --git a/Makefile b/Makefile
-> index aaf1d52bc646..4249441e535d 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -300,9 +300,9 @@ HOSTCXX      = g++
->  HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89
->  HOSTCXXFLAGS = -O2
+> This is a _hack_ to show what might be a better way to do this. It
+> parses a stringified version of the reverse dependency, and not the
+> actual reverse dependecy expression. But that was easier to cobble
+> together.
+> 
+> One cool improvement would be to change to minus in front of the
+> subexpressions to Y or M for those that actually set the symbol. Anyhow,
+> other suggestions and feedback is welcome.
+> 
+> Not-yet-signed-off-by: Paul Bolle <pebolle@tiscali.nl>
+> Tested-by: Petr Vorel <petr.vorel@gmail.com>
+> Cc: Paul Bolle <pebolle@tiscali.nl>
+> Cc: Randy Dunlap <rdunlap@infradead.org>
+> Cc: Petr Vorel <petr.vorel@gmail.com>
+> ---
+>  scripts/kconfig/menu.c | 83 ++++++++++++++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 81 insertions(+), 2 deletions(-)
+> 
+> diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+> index b05cc3d..a8b37a2 100644
+> --- a/scripts/kconfig/menu.c
+> +++ b/scripts/kconfig/menu.c
+> @@ -613,6 +613,86 @@ static struct property *get_symbol_prop(struct symbol *sym)
+>  }
 >  
-> -ifeq ($(shell $(HOSTCC) -v 2>&1 | grep -c "clang version"), 1)
-> -HOSTCFLAGS  += -Wno-unused-value -Wno-unused-parameter \
-> -		-Wno-missing-field-initializers -fno-delete-null-pointer-checks
-> +HOSTCFLAGS  += -Wno-unused-value -Wno-unused-parameter -Wno-missing-field-initializers
+>  /*
+> + * Assuming we're just past an opening parenthesis in a NUL terminated string,
+> + * find it's closing parenthesis and return its postion. Die otherwise.
+> + */
+> +static const char *matching_paren(const char *s)
+> +{
+> +	int lvl = 1;
+> +
+> +	while (1) {
+> +		if (*s == '(')
+> +			lvl++;
+> +		else if (*s == ')')
+> +			lvl--;
+> +		if (lvl == 0)
+> +			break;
+> +		if (*s == '\0')
+> +			/* huh? */
+> +			exit(1);
 
-You are enabling the -Wno-* options for gcc with this.
+assert/abort?
+
+BTW, the whole splitting can be done in a singe loop a-la
+
+while (c = s++) {
+	if (c == '(')
+		lvl++;
+	else if (c == ')')
+		lvl--;
+	else if (c == '|' && lvl == 0)
+		/* insert newline and indent */
+	/* output c */
+}
+
+No need to seek back and forth in the string.
+
+
+> -		expr_gstr_print(sym->rev_dep.expr, r);
+> -		str_append(r, "\n");
+> +		rev_dep_gstr_print(sym->rev_dep.expr, r);
+
+... and a cleaner fix would be to patch the printer, instead of
+generating a string representation and converting it.
 
 Michal
+
