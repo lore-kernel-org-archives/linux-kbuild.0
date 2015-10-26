@@ -1,35 +1,33 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:45232 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:46494 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752101AbbJZVDM (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 26 Oct 2015 17:03:12 -0400
-Subject: Re: [PATCH] kbuild: Add support for SOURCE_DATE_EPOCH environment
- variable
-References: <1443741332.2730.75.camel@decadent.org.uk>
+	id S1750990AbbJZVVQ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 26 Oct 2015 17:21:16 -0400
+Subject: Re: [PATCH] scripts/package/Makefile: Restore the RPMOPTS variable
+References: <1445040549-31011-1-git-send-email-jim.epost@gmail.com>
 From: Michal Marek <mmarek@suse.com>
-Message-ID: <562E950D.2030609@suse.com>
-Date: Mon, 26 Oct 2015 22:03:09 +0100
+Message-ID: <562E994A.2000104@suse.com>
+Date: Mon, 26 Oct 2015 22:21:14 +0100
 MIME-Version: 1.0
-In-Reply-To: <1443741332.2730.75.camel@decadent.org.uk>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1445040549-31011-1-git-send-email-jim.epost@gmail.com>
+Content-Type: text/plain; charset=iso-8859-2
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ben Hutchings <ben@decadent.org.uk>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, reproducible-builds@lists.alioth.debian.org
+To: Jim Davis <jim.epost@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, alaa.hl2@gmail.com
 
-Dne 2.10.2015 v 01:15 Ben Hutchings napsal(a):
-> As part of the reproducible builds project, the SOURCE_DATE_EPOCH
-> environment variable has been specified as a project- and
-> distribution-independent means to specify a timestamp at build
-> time: https://reproducible-builds.org/specs/source-date-epoch/
+Dne 17.10.2015 v 02:09 Jim Davis napsal(a):
+> Restore the RPMOPTS variable to the rpm-pkg and binrpm-pkg targets
+> that commit 21a59991ce0c ("scripts/package/Makefile: rpmbuild is
+> needed for rpm targets") removed.
 > 
-> Add support for this by converting it to KBUILD_BUILD_TIMESTAMP
-> if they aren't both set.
+> Reported-by: Alaa Hleihel <alaa.hl2@gmail.com>
+> Signed-off-by: Jim Davis <jim.epost@gmail.com>
 
-At which projects besides the kernel is this aimed? If there are
-multiple projects willing to support this, I'll happily apply it. But if
-it's just a synonym for KBUILD_BUILD_TIMESTAMP that nobody else is going
-to support, then it looks a bit redundant.
+If this is a regression fix, please add a Fixes: hash ("commit message")
+line to the signoff area.
+
+Out of curiosity, what options do you need to pass to rpmbuild?
 
 Michal
