@@ -1,144 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wi0-f180.google.com ([209.85.212.180]:33590 "EHLO
-	mail-wi0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755171AbbJ1Cuq (ORCPT
+Received: from bombadil.infradead.org ([198.137.202.9]:47462 "EHLO
+	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751093AbbJ1FCs (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 27 Oct 2015 22:50:46 -0400
-Received: by wijp11 with SMTP id p11so239079798wij.0
-        for <linux-kbuild@vger.kernel.org>; Tue, 27 Oct 2015 19:50:45 -0700 (PDT)
-From: Petr Vorel <petr.vorel@gmail.com>
-Subject: [PATCH v3] kconfig: menuconfig make "selected by:" readable
-Date: Wed, 28 Oct 2015 03:50:30 +0100
-Message-Id: <1446000630-30233-1-git-send-email-petr.vorel@gmail.com>
+	Wed, 28 Oct 2015 01:02:48 -0400
+Date: Wed, 28 Oct 2015 14:02:24 +0900
+From: Darren Hart <dvhart@infradead.org>
+Subject: Re: [PATCH 00/10] merge_config misc reworks and testcases
+Message-ID: <20151028050224.GB1854@malice.jf.intel.com>
+References: <1445992931-28107-1-git-send-email-olof@lixom.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1445992931-28107-1-git-send-email-olof@lixom.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Petr Vorel <petr.vorel@gmail.com>, Paul Bolle <pebolle@tiscali.nl>
+To: Olof Johansson <olof@lixom.net>, Bruce Ashfield <bruce.ashfield@windriver.com>
+Cc: Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, dvhart@linux.intel.com
 
-rev_dep expressions can get rather unwieldy, especially if a symbol is
-selected by more than a handful of other symbols. Ie, it's possible to
-have near endless expressions like:
-   A && B && !C || D || F && (G || H) || [...]
+On Wed, Oct 28, 2015 at 09:42:01AM +0900, Olof Johansson wrote:
+> Hi,
+> 
+> Somewhat wide distribution list here, since I've added everyone who's
+> touched the script, with the presumption that those have been the major
+> users of it. Please make sure none of these changes break your use cases.
 
-Chop these expressions into actually readable chunks:
-   - A && B && !C
-   - D
-   - F && (G || H)
-   - [...]
++Bruce. I think you were going to test these with the linux-yocto tooling. Did
+you get a chance to run that test? I'd like your thoughts on the two comments
+below:
 
-Ie, transform the top level "||" tokens into newlines and prepend each
-line with a minus. This makes the "Selected by:" blurb much easier to
-read.
+> 
+> I've done some reworks of merge_config.sh. I was quite hesitant to start
+> this since there are no good ways to see if your changes break others
+> or not, so the first thing I did was to add some tests. I know this is
+> highly unorthodox so try not to panic. :-)
+> 
+> As far as what this series does is:
+> 
+> - Adds a way to pass in CONFIG_FOO=<value> on the command line, it gets
+>   treated as a single-entry fragment file
+> 
+> - The script now prints the warnings on stderr, and returns non-0 when
+>   something is encountered
 
-Cc: Paul Bolle <pebolle@tiscali.nl>
-Signed-off-by: Petr Vorel <petr.vorel@gmail.com>
----
-Changes v2->v3:
-* Actually Signed-off-by:
-* Cleanup commit message.
-Changes v1->v2:
-* Rewrote Paul Bolle's original implementation: removed use of
-expr_gstr_print()'s output from rev_dep_gstr_print(). I admit that
-adding revdep variable and wrapper function isn't a nice solution, but
-it works directly with struct expr :-).
----
- scripts/kconfig/expr.c | 36 ++++++++++++++++++++++++++++++++----
- scripts/kconfig/expr.h |  1 +
- scripts/kconfig/menu.c |  4 ++--
- 3 files changed, 35 insertions(+), 6 deletions(-)
+This one might impact linux-yocto usage, Bruce? That said, it seems like the
+right thing to do. So I'd still like to see it go in, but we may need to plan to
+update the dependent tooling to use it.
 
-diff --git a/scripts/kconfig/expr.c b/scripts/kconfig/expr.c
-index cbf4996..caf89af 100644
---- a/scripts/kconfig/expr.c
-+++ b/scripts/kconfig/expr.c
-@@ -1070,7 +1070,7 @@ struct expr *expr_simplify_unmet_dep(struct expr *e1, struct expr *e2)
- 	return expr_get_leftmost_symbol(ret);
- }
- 
--void expr_print(struct expr *e, void (*fn)(void *, struct symbol *, const char *), void *data, int prevtoken)
-+static void expr_print_impl(struct expr *e, void (*fn)(void *, struct symbol *, const char *), void *data, int prevtoken, bool revdep)
- {
- 	if (!e) {
- 		fn(data, NULL, "y");
-@@ -1125,9 +1125,12 @@ void expr_print(struct expr *e, void (*fn)(void *, struct symbol *, const char *
- 		fn(data, e->right.sym, e->right.sym->name);
- 		break;
- 	case E_OR:
--		expr_print(e->left.expr, fn, data, E_OR);
--		fn(data, NULL, " || ");
--		expr_print(e->right.expr, fn, data, E_OR);
-+		expr_print_impl(e->left.expr, fn, data, E_OR, revdep);
-+		if (revdep)
-+			fn(data, NULL, "\n  - ");
-+		else
-+			fn(data, NULL, " || ");
-+		expr_print_impl(e->right.expr, fn, data, E_OR, revdep);
- 		break;
- 	case E_AND:
- 		expr_print(e->left.expr, fn, data, E_AND);
-@@ -1160,6 +1163,11 @@ void expr_print(struct expr *e, void (*fn)(void *, struct symbol *, const char *
- 		fn(data, NULL, ")");
- }
- 
-+void expr_print(struct expr *e, void (*fn)(void *, struct symbol *, const char *), void *data, int prevtoken)
-+{
-+	expr_print_impl(e, fn, data, prevtoken, false);
-+}
-+
- static void expr_print_file_helper(void *data, struct symbol *sym, const char *str)
- {
- 	xfwrite(str, strlen(str), 1, data);
-@@ -1204,3 +1212,23 @@ void expr_gstr_print(struct expr *e, struct gstr *gs)
- {
- 	expr_print(e, expr_print_gstr_helper, gs, E_NONE);
- }
-+
-+/*
-+ * rev_dep expressions can get rather unwieldy, especially if a symbol is
-+ * selected by more than a handful of other symbols. Ie, it's possible to
-+ * have near endless expressions like:
-+ *    A && B && !C || D || F && (G || H) || [...]
-+ *
-+ * Chop these expressions into actually readable chunks:
-+ *    - A && B && !C
-+ *    - D
-+ *    - F && (G || H)
-+ *    - [...]
-+ *
-+ * Ie, transform the top level "||" tokens into newlines and prepend each line
-+ * with a minus. This makes the "Selected by:" blurb much easier to read.
-+ */
-+void rev_dep_gstr_print(struct expr *e, struct gstr *gs)
-+{
-+	expr_print_impl(e, expr_print_gstr_helper, gs, E_NONE, true);
-+}
-diff --git a/scripts/kconfig/expr.h b/scripts/kconfig/expr.h
-index 973b6f7..f3bf88d 100644
---- a/scripts/kconfig/expr.h
-+++ b/scripts/kconfig/expr.h
-@@ -220,6 +220,7 @@ struct expr *expr_simplify_unmet_dep(struct expr *e1, struct expr *e2);
- void expr_fprint(struct expr *e, FILE *out);
- struct gstr; /* forward */
- void expr_gstr_print(struct expr *e, struct gstr *gs);
-+void rev_dep_gstr_print(struct expr *e, struct gstr *gs);
- 
- static inline int expr_is_yes(struct expr *e)
- {
-diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
-index b05cc3d..b6b383e 100644
---- a/scripts/kconfig/menu.c
-+++ b/scripts/kconfig/menu.c
-@@ -661,8 +661,8 @@ static void get_symbol_str(struct gstr *r, struct symbol *sym,
- 		str_append(r, "\n");
- 	if (sym->rev_dep.expr) {
- 		str_append(r, _("  Selected by: "));
--		expr_gstr_print(sym->rev_dep.expr, r);
--		str_append(r, "\n");
-+		str_append(r, "\n  - ");
-+		rev_dep_gstr_print(sym->rev_dep.expr, r);
- 	}
- 	str_append(r, "\n\n");
- }
+> 
+> - Optionally, it'll also return non-0 when a redundant entry is found. I
+>   presumed people rely on -r not being a failure so I did this separately
+> 
+> - CONFIG_FOO=n and "# CONFIG_FOO is not set" is now treated the same,
+>   and using the former doesn't cause an invalid warning when the results
+>   are checked at the end
+> 
+> - Slightly odd things happened if a fragment contains the same option
+>   twice: It'd produce a warning that was malformed. Now just ignore that
+>   and use only the latest value of said option.
+
+This one will likely impact usage as well. linux-yocto does want to report when
+there is an override, not as an error, but for informational purposes - "Where
+does my option get clobbered?"
+
+
+
 -- 
-1.8.0
-
+Darren Hart
+Intel Open Source Technology Center
