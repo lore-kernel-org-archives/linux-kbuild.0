@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pa0-f47.google.com ([209.85.220.47]:33150 "EHLO
-	mail-pa0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752677AbbJ1Amj (ORCPT
+Received: from mail-pa0-f49.google.com ([209.85.220.49]:34704 "EHLO
+	mail-pa0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754735AbbJ1Amh (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 27 Oct 2015 20:42:39 -0400
-Received: by pabla5 with SMTP id la5so44894594pab.0
-        for <linux-kbuild@vger.kernel.org>; Tue, 27 Oct 2015 17:42:39 -0700 (PDT)
+	Tue, 27 Oct 2015 20:42:37 -0400
+Received: by padhk11 with SMTP id hk11so238186878pad.1
+        for <linux-kbuild@vger.kernel.org>; Tue, 27 Oct 2015 17:42:36 -0700 (PDT)
 From: Olof Johansson <olof@lixom.net>
-Subject: [PATCH 03/10] merge_config.sh: minor argument parsing refactoring
-Date: Wed, 28 Oct 2015 09:42:04 +0900
-Message-Id: <1445992931-28107-4-git-send-email-olof@lixom.net>
+Subject: [PATCH 02/10] merge_config.sh: print warnings on stderr
+Date: Wed, 28 Oct 2015 09:42:03 +0900
+Message-Id: <1445992931-28107-3-git-send-email-olof@lixom.net>
 In-Reply-To: <1445992931-28107-1-git-send-email-olof@lixom.net>
 References: <1445992931-28107-1-git-send-email-olof@lixom.net>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -17,58 +17,35 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.com>
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, dvhart@linux.intel.com, Olof Johansson <olof@lixom.net>
 
-Every case that continues iterating needs a shift, so move it to common location.
-Also, the continues are redundant.
+Makes it easier to grab just errors/warnings in a build log.
 
 Signed-off-by: Olof Johansson <olof@lixom.net>
 ---
- scripts/kconfig/merge_config.sh | 11 +++--------
- 1 file changed, 3 insertions(+), 8 deletions(-)
+ scripts/kconfig/merge_config.sh | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/scripts/kconfig/merge_config.sh b/scripts/kconfig/merge_config.sh
-index 0e98619..fd0d537 100755
+index d8cd913..0e98619 100755
 --- a/scripts/kconfig/merge_config.sh
 +++ b/scripts/kconfig/merge_config.sh
-@@ -48,13 +48,9 @@ while true; do
- 	case $1 in
- 	"-n")
- 		ALLTARGET=allnoconfig
--		shift
--		continue
- 		;;
- 	"-m")
- 		RUNMAKE=false
--		shift
--		continue
- 		;;
- 	"-h")
- 		usage
-@@ -62,8 +58,6 @@ while true; do
- 		;;
- 	"-r")
- 		WARNREDUN=true
--		shift
--		continue
- 		;;
- 	"-O")
- 		if [ -d $2 ];then
-@@ -72,13 +66,14 @@ while true; do
- 			echo "output directory $2 does not exist" 1>&2
- 			exit 1
+@@ -131,7 +131,7 @@ for MERGE_FILE in $MERGE_LIST ; do
+ 			echo Value of $CFG is redundant by fragment $MERGE_FILE:
  		fi
--		shift 2
--		continue
-+		shift
- 		;;
- 	*)
- 		break
- 		;;
- 	esac
-+
-+	shift
+ 		sed -i "/$CFG[ =]/d" $TMP_FILE
+-	done
++	done >&2
+ 	cat $MERGE_FILE >> $TMP_FILE
  done
  
- if [ "$#" -lt 1 ] ; then
+@@ -168,7 +168,7 @@ for CFG in $(sed -n "$SED_CONFIG_EXP" $TMP_FILE); do
+ 		echo "Requested value:  $REQUESTED_VAL"
+ 		echo "Actual value:     $ACTUAL_VAL"
+ 		echo ""
+-	fi
++	fi >&2
+ done
+ 
+ clean_up
 -- 
 2.1.4
 
