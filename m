@@ -1,78 +1,60 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:49676 "EHLO
+Received: from bombadil.infradead.org ([198.137.202.9]:50982 "EHLO
 	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752945AbbJ1FYs (ORCPT
+	with ESMTP id S1751509AbbJ1F40 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 28 Oct 2015 01:24:48 -0400
-Date: Wed, 28 Oct 2015 14:24:34 +0900
+	Wed, 28 Oct 2015 01:56:26 -0400
+Date: Wed, 28 Oct 2015 14:56:16 +0900
 From: Darren Hart <dvhart@infradead.org>
-Subject: Re: [PATCH 01/10] merge_config.sh: factor out value parsing
-Message-ID: <20151028052434.GC1854@malice.jf.intel.com>
+Subject: Re: [PATCH 02/10] merge_config.sh: print warnings on stderr
+Message-ID: <20151028055616.GD1854@malice.jf.intel.com>
 References: <1445992931-28107-1-git-send-email-olof@lixom.net>
- <1445992931-28107-2-git-send-email-olof@lixom.net>
+ <1445992931-28107-3-git-send-email-olof@lixom.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1445992931-28107-2-git-send-email-olof@lixom.net>
+In-Reply-To: <1445992931-28107-3-git-send-email-olof@lixom.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Olof Johansson <olof@lixom.net>
+To: Olof Johansson <olof@lixom.net>, Bruce Ashfield <bruce.ashfield@windriver.com>
 Cc: Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, dvhart@linux.intel.com
 
-On Wed, Oct 28, 2015 at 09:42:02AM +0900, Olof Johansson wrote:
-> Since we want to adjust the line later on to deal with CONFIG_FOO=n,
-> let's make a function for it so we have only one place to change it in.
+On Wed, Oct 28, 2015 at 09:42:03AM +0900, Olof Johansson wrote:
+> Makes it easier to grab just errors/warnings in a build log.
 > 
 > Signed-off-by: Olof Johansson <olof@lixom.net>
-> ---
->  scripts/kconfig/merge_config.sh | 12 ++++++++----
->  1 file changed, 8 insertions(+), 4 deletions(-)
-> 
-> diff --git a/scripts/kconfig/merge_config.sh b/scripts/kconfig/merge_config.sh
-> index 67d1314..d8cd913 100755
-> --- a/scripts/kconfig/merge_config.sh
-> +++ b/scripts/kconfig/merge_config.sh
-> @@ -35,6 +35,10 @@ usage() {
->  	echo "  -O    dir to put generated output files.  Consider setting \$KCONFIG_CONFIG instead."
->  }
->  
-> +getval() {
-> +	grep -w -e "$1" "$2"
 
-So the inclusion of -e makes sense from a common-denominator perspective... but
-is it necessary at all? It's not a big deal either way though. I believe we are
-searching only for whole CONFIG_FEATURE options, not a pattern. However, this is
-minimal change and is correct.
+I think this is the right change, I just want to make sure Bruce (Cc'd) sees it
+for linux-yocto.
 
 Reviewed-by: Darren Hart <dvhart@linux.intel.com>
 
-> +}
-> +
->  RUNMAKE=true
->  ALLTARGET=alldefconfig
->  WARNREDUN=false
-> @@ -116,8 +120,8 @@ for MERGE_FILE in $MERGE_LIST ; do
+> ---
+>  scripts/kconfig/merge_config.sh | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/scripts/kconfig/merge_config.sh b/scripts/kconfig/merge_config.sh
+> index d8cd913..0e98619 100755
+> --- a/scripts/kconfig/merge_config.sh
+> +++ b/scripts/kconfig/merge_config.sh
+> @@ -131,7 +131,7 @@ for MERGE_FILE in $MERGE_LIST ; do
+>  			echo Value of $CFG is redundant by fragment $MERGE_FILE:
+>  		fi
+>  		sed -i "/$CFG[ =]/d" $TMP_FILE
+> -	done
+> +	done >&2
+>  	cat $MERGE_FILE >> $TMP_FILE
+>  done
 >  
->  	for CFG in $CFG_LIST ; do
->  		grep -q -w $CFG $TMP_FILE || continue
-> -		PREV_VAL=$(grep -w $CFG $TMP_FILE)
-> -		NEW_VAL=$(grep -w $CFG $MERGE_FILE)
-> +		PREV_VAL=$(getval "$CFG" "$TMP_FILE")
-> +		NEW_VAL=$(getval "$CFG" "$MERGE_FILE")
->  		if [ "x$PREV_VAL" != "x$NEW_VAL" ] ; then
->  			echo Value of $CFG is redefined by fragment $MERGE_FILE:
->  			echo Previous  value: $PREV_VAL
-> @@ -157,8 +161,8 @@ make KCONFIG_ALLCONFIG=$TMP_FILE $OUTPUT_ARG $ALLTARGET
->  # Check all specified config values took (might have missed-dependency issues)
->  for CFG in $(sed -n "$SED_CONFIG_EXP" $TMP_FILE); do
->  
-> -	REQUESTED_VAL=$(grep -w -e "$CFG" $TMP_FILE)
-> -	ACTUAL_VAL=$(grep -w -e "$CFG" "$KCONFIG_CONFIG")
-> +	REQUESTED_VAL=$(getval "$CFG" "$TMP_FILE")
-> +	ACTUAL_VAL=$(getval "$CFG" "$KCONFIG_CONFIG")
->  	if [ "x$REQUESTED_VAL" != "x$ACTUAL_VAL" ] ; then
->  		echo "Value requested for $CFG not in final .config"
+> @@ -168,7 +168,7 @@ for CFG in $(sed -n "$SED_CONFIG_EXP" $TMP_FILE); do
 >  		echo "Requested value:  $REQUESTED_VAL"
+>  		echo "Actual value:     $ACTUAL_VAL"
+>  		echo ""
+> -	fi
+> +	fi >&2
+>  done
+>  
+>  clean_up
 > -- 
 > 2.1.4
 > 
