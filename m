@@ -1,42 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from [64.129.254.146] ([64.129.254.146]:13898 "EHLO mail5.wrs.com"
-	rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1753192AbbJ1GbV (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 28 Oct 2015 02:31:21 -0400
-Message-ID: <56306B9D.9040109@windriver.com>
-Date: Wed, 28 Oct 2015 02:30:53 -0400
-From: Bruce Ashfield <bruce.ashfield@windriver.com>
+Received: from bombadil.infradead.org ([198.137.202.9]:58363 "EHLO
+	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754777AbbJ1Ggo (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 28 Oct 2015 02:36:44 -0400
+Date: Wed, 28 Oct 2015 15:36:33 +0900
+From: Darren Hart <dvhart@infradead.org>
+Subject: Re: [PATCH 06/10] merge_config.sh: only consider last value of
+ symbols
+Message-ID: <20151028063633.GH1854@malice.jf.intel.com>
+References: <1445992931-28107-1-git-send-email-olof@lixom.net>
+ <1445992931-28107-7-git-send-email-olof@lixom.net>
 MIME-Version: 1.0
-Subject: Re: [PATCH 05/10] merge_config.sh: Better handling of CONFIG_FOO=n
-References: <1445992931-28107-1-git-send-email-olof@lixom.net> <1445992931-28107-6-git-send-email-olof@lixom.net> <20151028062654.GG1854@malice.jf.intel.com>
-In-Reply-To: <20151028062654.GG1854@malice.jf.intel.com>
-Content-Type: text/plain; charset="windows-1252"; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1445992931-28107-7-git-send-email-olof@lixom.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Darren Hart <dvhart@infradead.org>, Olof Johansson <olof@lixom.net>
+To: Olof Johansson <olof@lixom.net>
 Cc: Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, dvhart@linux.intel.com
 
-On 10/28/2015 02:26 AM, Darren Hart wrote:
-> On Wed, Oct 28, 2015 at 09:42:06AM +0900, Olof Johansson wrote:
->> Kconfig knows how to handle CONFIG_FOO=n just fine, but it'll always
->> use "# CONFIG FOO is not set" in the resulting config. Mangle the input
->> accordingly so we don't report this as a failure when it isn't.
->>
->> Signed-off-by: Olof Johansson <olof@lixom.net>
->
-> Matching Kconfig behavior is the logical approach, no point in complaining if
-> Kconfig will accpet the result.
->
-> Bruce, I think we'll just need to update the linux-yocto tool documentation not
-> to mark =n as wrong.
+On Wed, Oct 28, 2015 at 09:42:07AM +0900, Olof Johansson wrote:
 
-purists still think it is wrong :) The tools don't report this as
-an error anymore, so there's no change here.
+Needs a commit message here that says (I think): Avoid mangled error output by
+collecting only the last value. Warnings are still issued when overrides occur.
 
-Bruce
+Agreed on the change though.
 
->
-> Reviewed-by: Darren Hart <dvhart@linux.intel.com>
->
+Reviewed-by: Darren Hart <dvhart@linux.intel.com>
 
+> Signed-off-by: Olof Johansson <olof@lixom.net>
+> ---
+>  scripts/kconfig/merge_config.sh | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/scripts/kconfig/merge_config.sh b/scripts/kconfig/merge_config.sh
+> index 933f2d6..1945b2c 100755
+> --- a/scripts/kconfig/merge_config.sh
+> +++ b/scripts/kconfig/merge_config.sh
+> @@ -39,7 +39,7 @@ usage() {
+>  }
+>  
+>  getval() {
+> -	grep -w -e "$1" "$2" | sed 's/^CONFIG_\(.*\)=n$/# CONFIG_\1 is not set/g'
+> +	grep -w -e "$1" "$2" | tail -1 | sed 's/^CONFIG_\(.*\)=n/# CONFIG_\1 is not set/g'
+>  }
+>  
+>  CONF_IS_ERR=false
+> -- 
+> 2.1.4
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Please read the FAQ at  http://www.tux.org/lkml/
+> 
+
+-- 
+Darren Hart
+Intel Open Source Technology Center
