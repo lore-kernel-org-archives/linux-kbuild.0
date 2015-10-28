@@ -1,65 +1,72 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:39278 "EHLO
+Received: from bombadil.infradead.org ([198.137.202.9]:42522 "EHLO
 	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932492AbbJ1HW4 (ORCPT
+	with ESMTP id S1752330AbbJ1H2T (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 28 Oct 2015 03:22:56 -0400
-Date: Wed, 28 Oct 2015 16:22:45 +0900
+	Wed, 28 Oct 2015 03:28:19 -0400
+Date: Wed, 28 Oct 2015 16:28:08 +0900
 From: Darren Hart <dvhart@infradead.org>
-Subject: Re: [PATCH 09/10] merge_config.sh: allow single configs to be passed
- in on cmdline
-Message-ID: <20151028072245.GL1854@malice.jf.intel.com>
+Subject: Re: [PATCH 08/10] merge_config.sh: use trap for cleanup
+Message-ID: <20151028072808.GM1854@malice.jf.intel.com>
 References: <1445992931-28107-1-git-send-email-olof@lixom.net>
- <1445992931-28107-10-git-send-email-olof@lixom.net>
+ <1445992931-28107-9-git-send-email-olof@lixom.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1445992931-28107-10-git-send-email-olof@lixom.net>
+In-Reply-To: <1445992931-28107-9-git-send-email-olof@lixom.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Olof Johansson <olof@lixom.net>
 Cc: Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, dvhart@linux.intel.com
 
-On Wed, Oct 28, 2015 at 09:42:10AM +0900, Olof Johansson wrote:
-> Treat CONFIG_FOO=..  on the command line the same way as a single-entry file would.
+On Wed, Oct 28, 2015 at 09:42:09AM +0900, Olof Johansson wrote:
+> Use the trap to cleanup even on regular exit.
 > 
 > Signed-off-by: Olof Johansson <olof@lixom.net>
+
+Looks like this should trade spots in the series with 9 where CLEAN_FILES is
+defined. Otherwise:
+
+Reviewed-by: Darren Hart <dvhart@linux.intel.com>
+
 > ---
->  scripts/kconfig/merge_config.sh | 29 ++++++++++++++++++++++++-----
->  1 file changed, 24 insertions(+), 5 deletions(-)
+>  scripts/kconfig/merge_config.sh | 8 +++++---
+>  1 file changed, 5 insertions(+), 3 deletions(-)
 > 
 > diff --git a/scripts/kconfig/merge_config.sh b/scripts/kconfig/merge_config.sh
-> index b26c0ef..69463dd 100755
+> index 1945b2c..b26c0ef 100755
 > --- a/scripts/kconfig/merge_config.sh
 > +++ b/scripts/kconfig/merge_config.sh
-> @@ -1,8 +1,8 @@
->  #!/bin/sh
-> -#  merge_config.sh - Takes a list of config fragment values, and merges
-> -#  them one by one. Provides warnings on overridden values, and specified
-> -#  values that did not make it to the resulting .config file (due to missed
-> -#  dependencies or config symbol removal).
-> +#  merge_config.sh - Takes a list of config fragment filenames or configuration
-> +#  value, and merges them one by one. Provides warnings on overridden values,
-> +#  and specified values that did not make it to the resulting .config file
-> +#  (due to missed dependencies or config symbol removal).
->  #
->  #  Portions reused from kconf_check and generate_cfg:
->  #  http://git.yoctoproject.org/cgit/cgit.cgi/yocto-kernel-tools/tree/tools/kconf_check
-> @@ -108,7 +108,26 @@ fi
+> @@ -23,10 +23,12 @@
+>  EXITVAL=0
 >  
->  MERGE_LIST=$*
->  SED_CONFIG_EXP="s/^\(# \)\{0,1\}\(CONFIG_[a-zA-Z0-9_]*\)[= ].*/\2/p"
-> -TMP_FILE=$(mktemp ./.tmp.config.XXXXXXXXXX)
-> +TMP_FILE=$(mktemp $OUTPUT/.tmp.config.XXXXXXXXXX)
-> +
-> +CLEAN_FILES=$TMP_FILE
-
-Oh, here it is :-) Looks like this should come before 8/10 ?
-
-But, content is good. Multiple files are needed in case CONFIG_* options are
-intermixed with file fragments.
-
-Signed-off-by: Darren Hart <dvhart@linux.intel.com>
+>  clean_up() {
+> -	rm -f $TMP_FILE
+> +	if [ -n "$CLEAN_FILES" ] ; then
+> +		rm -f $CLEAN_FILES
+> +	fi
+>  	exit $EXITVAL
+>  }
+> -trap clean_up HUP INT TERM
+> +trap clean_up HUP INT TERM EXIT
+>  
+>  usage() {
+>  	echo "Usage: $0 [OPTIONS] [CONFIG [...]]"
+> @@ -178,4 +180,4 @@ for CFG in $(sed -n "$SED_CONFIG_EXP" $TMP_FILE); do
+>  	fi >&2
+>  done
+>  
+> -clean_up
+> +# Note: clean_up will run here due to EXIT being trapped
+> -- 
+> 2.1.4
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kernel" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Please read the FAQ at  http://www.tux.org/lkml/
+> 
 
 -- 
 Darren Hart
