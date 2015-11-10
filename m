@@ -1,38 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:42003 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:55777 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757240AbbKFQH1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 6 Nov 2015 11:07:27 -0500
-Subject: Re: [PATCH 00/10] merge_config misc reworks and testcases
-References: <1445992931-28107-1-git-send-email-olof@lixom.net>
- <CAOesGMhiOu5Pkf_-tot-4rvGOGOMmKiGgWQheGhQKTXptu977Q@mail.gmail.com>
-From: Michal Marek <mmarek@suse.com>
-Message-ID: <563CD03C.7090709@suse.com>
-Date: Fri, 6 Nov 2015 17:07:24 +0100
+	id S1751351AbbKJUfW (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 10 Nov 2015 15:35:22 -0500
+Date: Tue, 10 Nov 2015 21:35:21 +0100
+From: Michal Marek <mmarek@suse.cz>
+Subject: [GIT PULL] kbuild patch for v4.4-rc1
+Message-ID: <20151110203521.GA3614@pobox.suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <CAOesGMhiOu5Pkf_-tot-4rvGOGOMmKiGgWQheGhQKTXptu977Q@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Olof Johansson <olof@lixom.net>
-Cc: "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Darren Hart <dvhart@linux.intel.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: long.wanglong@huawei.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 2015-10-28 01:46, Olof Johansson wrote:
-> On Wed, Oct 28, 2015 at 9:42 AM, Olof Johansson <olof@lixom.net> wrote:
->> Hi,
->>
->> Somewhat wide distribution list here, since I've added everyone who's
->> touched the script, with the presumption that those have been the major
->> users of it. Please make sure none of these changes break your use cases.
-> 
-> Actually, I dropped a handful of cc:s on this repost, so this isn't
-> necessarily true. Also, since Yann didn't respond on the last posting
-> I'm sending these to you now, Michal. :)
+Hi Linus,
 
-Thanks. Can you please resend with the ACKs collected and with 08/10 and
-09/10 swapped?
+the kbuild branch for v4.4-rc1 only has one commit: A new make kselftest-clean
+target cleans tools/testing/selftests.
 
-Thanks,
 Michal
 
+The following changes since commit 6ff33f3902c3b1c5d0db6b1e2c70b6d76fba357f:
+
+  Linux 4.3-rc1 (2015-09-12 16:35:56 -0700)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git kbuild
+
+for you to fetch changes up to dcb825a9fd865638f82c557fe42ce8eed35f751d:
+
+  kselftest: add kselftest-clean rule (2015-10-08 14:20:38 +0200)
+
+----------------------------------------------------------------
+Wang Long (1):
+      kselftest: add kselftest-clean rule
+
+ Makefile | 4 ++++
+ 1 file changed, 4 insertions(+)
