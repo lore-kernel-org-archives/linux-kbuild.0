@@ -1,88 +1,78 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f53.google.com ([74.125.82.53]:35154 "EHLO
-	mail-wm0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751238AbbKPKJ3 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 16 Nov 2015 05:09:29 -0500
-Received: by wmdw130 with SMTP id w130so103679796wmd.0
-        for <linux-kbuild@vger.kernel.org>; Mon, 16 Nov 2015 02:09:28 -0800 (PST)
+Received: from mx.socionext.com ([202.248.49.38]:6120 "EHLO mx.socionext.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751823AbbKPKmy (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 16 Nov 2015 05:42:54 -0500
+From: <yamada.masahiro@socionext.com>
+Subject: RE: [PATCH] ARM: use "depends on" for SoC configs instead of "if"
+ after prompt
+Date: Mon, 16 Nov 2015 10:32:51 +0000
+Message-ID: <d5271606263b496c841abd62647f9db0@SOC-EX02V.e01.socionext.com>
+References: <1447643170-23773-1-git-send-email-yamada.masahiro@socionext.com>
+ <4171977.M1BLuS2ZzP@wuerfel>
+In-Reply-To: <4171977.M1BLuS2ZzP@wuerfel>
+Content-Language: ja-JP
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <1441116861-28604-1-git-send-email-riku.voipio@linaro.org>
-References: <1441116861-28604-1-git-send-email-riku.voipio@linaro.org>
-Date: Mon, 16 Nov 2015 12:09:27 +0200
-Message-ID: <CAAqcGH=s3VL8y4QzycZR0ueMHmwJ4UcyUZMP4sjxSteb-X_itA@mail.gmail.com>
-Subject: Re: [PATCH v3] package Makefile: fix perf-tar targets when outdir is set
-From: Riku Voipio <riku.voipio@linaro.org>
-Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild <linux-kbuild@vger.kernel.org>, mmarek <mmarek@suse.cz>
-Cc: Riku Voipio <riku.voipio@linaro.org>
+To: arnd@arndb.de
+Cc: linux-arm-kernel@lists.infradead.org, arm@kernel.org, mmarek@suse.com, olof@lixom.net, linux-kbuild@vger.kernel.org, jamie@jamieiles.com, agross@codeaurora.org, kernel@pengutronix.de, gregory.clement@free-electrons.com, linux-sh@vger.kernel.org, tsahee@annapurnalabs.com, linux-arm-msm@vger.kernel.org, linus.walleij@linaro.org, galak@codeaurora.org, plagnioj@jcrosoft.com, dinguyen@opensource.altera.com, baohua@kernel.org, shiraz.linux.kernel@gmail.com, rjui@broadcom.com, patrice.chotard@st.com, kernel@stlinux.com, soren.brinkmann@xilinx.com, horms@verge.net.au, michal.simek@xilinx.com, heiko@sntech.de, linux-rockchip@lists.infradead.org, linux-soc@vger.kernel.org, davidb@codeaurora.org, sbranden@broadcom.com, vireshk@kernel.org, alexandre.belloni@free-electrons.com, kyungmin.park@samsung.com, mappyland78@gmail.com, k.kozlowski@samsung.com, bcm-kernel-feedback-list@broadcom.com, f.fainelli@gmail.com, gnurou@gmail.com, matthias.bgg@gmail.com, kgene@kernel.org, thierry.reding@gmail.com, robh@kernel.org, linux-kernel@vger.kernel.org, spear-devel@list.st.com, sebastian.hesselbarth@gmail.com, sudeep.holla@arm.com, andrew@lunn.ch, linux@arm.linux.org.uk, linux-samsung-soc@vger.kernel.org, linux-mediatek@lists.infradead.org, linux-tegra@vger.kernel.org, maxime.coquelin@st.com, srinivas.kandagatla@gmail.com, shawnguo@kernel.org, liviu.dudau@arm.com, jun.nie@linaro.org, lorenzo.pieralisi@arm.com, nicolas.ferre@atmel.com, jason@lakedaemon.net, swarren@wwwdotorg.org, khalasa@piap.pl, xuwei5@hisilicon.com, magnus.damm@gmail.com, wens@csie.org, maxime.ripard@free-electrons.com
 
-On 1 September 2015 at 17:14,  <riku.voipio@linaro.org> wrote:
-> From: Riku Voipio <riku.voipio@linaro.org>
->
-> building with $srctree != $objtree, perf-tar-* targets fail
-> to read the MANIFEST file and add the PERF-VERSION-FILE needed
-> by out-of-tree builds. The build errors and an incorrect tar is created:
->
-> $ make O=build-x86 perf-targz-src-pkg
->   TAR
-> cat: ../tools/perf/MANIFEST: No such file or directory
-> tar: perf-4.1.0-rc8/PERF-VERSION-FILE: Cannot stat: No such file or
-> dir..
-> tar: Exiting with failure status due to previous errors
->
-> Kbuild sets objtree to "." and srctree to ".." The command to output
-> MANIFEST becomes:
->
->    $(cd ..; echo $(cat ../tools/perf/MANIFEST))
->
-> Without MANIFEST, the entire kernel source tree is added to the perf
-> source tarball. The *correct* fix is to keep the cd and remove srctree
-> from cat command line since MANIFEST has wildcards that fail to expand
-> working directory isn't srctree.
->
-> Second, PERF-VERSION-FILE gets not added, because in-tree build path is
-> hardcoded to Makefile:
->
->    util/PERF-VERSION-GEN ../../$(perf-tar)/ 2>/dev/null)
->
-> The PERF-VERSION-GEN needs to be run from tools/perf directory,
-> and the output directory needs to be changed from relative to
-> to absolute. This can be achieved using the $(CURDIR) variable.
->
-> Also remove the error redirect to /dev/null which hid the error.
->
-> Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
-
-Ping?
-
-> ---
-> v3: use $(CURDIR)
-> v2: switch from easy fix to correct fix
->  scripts/package/Makefile | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/scripts/package/Makefile b/scripts/package/Makefile
-> index 562aa15..f127f7e 100644
-> --- a/scripts/package/Makefile
-> +++ b/scripts/package/Makefile
-> @@ -117,12 +117,12 @@ quiet_cmd_perf_tar = TAR
->        cmd_perf_tar = \
->  git --git-dir=$(srctree)/.git archive --prefix=$(perf-tar)/         \
->         HEAD^{tree} $$(cd $(srctree);                               \
-> -                      echo $$(cat $(srctree)/tools/perf/MANIFEST)) \
-> +                      echo $$(cat tools/perf/MANIFEST)) \
->         -o $(perf-tar).tar;                                         \
->  mkdir -p $(perf-tar);                                               \
->  git --git-dir=$(srctree)/.git rev-parse HEAD > $(perf-tar)/HEAD;    \
->  (cd $(srctree)/tools/perf;                                          \
-> -util/PERF-VERSION-GEN ../../$(perf-tar)/ 2>/dev/null);              \
-> +util/PERF-VERSION-GEN $(CURDIR)/$(perf-tar)/);              \
->  tar rf $(perf-tar).tar $(perf-tar)/HEAD $(perf-tar)/PERF-VERSION-FILE; \
->  rm -r $(perf-tar);                                                  \
->  $(if $(findstring tar-src,$@),,                                     \
-> --
-> 2.4.6
->
+SGkgQXJuZCwNCg0KIA0KPiBPbiBNb25kYXkgMTYgTm92ZW1iZXIgMjAxNSAxMjowNjoxMCBNYXNh
+aGlybyBZYW1hZGEgd3JvdGU6DQo+ID4gTWFueSBBUk0gc3ViLWFyY2hpdGVjdHVyZXMgdXNlIHBy
+b21wdHMgZm9sbG93ZWQgYnkgImlmIiBjb25kaXRpb25hbCwNCj4gPiBidXQgaXQgaXMgd3Jvbmcu
+DQo+ID4NCj4gPiBQbGVhc2Ugbm90aWNlIHRoZSBkaWZmZXJlbmNlIGJldHdlZW4NCj4gPg0KPiA+
+ICAgICBjb25maWcgQVJDSF9GT08NCj4gPiAgICAgICAgICAgICBib29sICJGb28gU29DcyIgaWYg
+QVJDSF9NVUxUSV9WNw0KPiA+DQo+ID4gYW5kDQo+ID4NCj4gPiAgICAgY29uZmlnIEFSQ0hfRk9P
+DQo+ID4gICAgICAgICAgICAgYm9vbCAiRm9vIFNvQ3MiDQo+ID4gICAgICAgICAgICAgZGVwZW5k
+cyBvbiBBUkNIX01VTFRJX1Y3DQo+ID4NCj4gPiBUaGVzZSB0d28gYXJlICpub3QqIGVxdWl2YWxl
+bnQhDQo+ID4NCj4gPiBJbiB0aGUgZm9ybWVyIHN0YXRlbWVudCwgaXQgaXMgbm90IEFSQ0hfRk9P
+LCBidXQgaXRzIHByb21wdCB0aGF0DQo+ID4gZGVwZW5kcyBvbiBBUkNIX01VTFRJX1Y3LiAgU28s
+IGl0IGlzIGNvbXBsZXRlbHkgdmFsaWQgdGhhdCBBUkNIX0ZPTyBpcw0KPiA+IHNlbGVjdGVkIGJ5
+IGFub3RoZXIsIGJ1dCBBUkNIX01VTFRJX1Y3IGlzIHN0aWxsIGRpc2FibGVkLiBBcyBpdCBpcyBu
+b3QNCj4gPiB1bm1ldCBkZXBlbmRlbmN5LCBLY29uZmlnIG5ldmVyIHdhcm5zLiAgVGhpcyBpcyBw
+cm9iYWJseSBub3Qgd2hhdCB5b3UNCj4gPiB3YW50Lg0KPiANCj4gRGlkIHlvdSBlbmNvdW50ZXIg
+YSBjYXNlIHdoZXJlIHNvbWVvbmUgYWN0dWFsbHkgZGlkIGEgJ3NlbGVjdCcgb24gb25lIG9mDQo+
+IHRob3NlIHN5bWJvbHM/IEkgcHJvYmFibHkgaW50cm9kdWNlZCBhIGxvdCBvZiB0aGVtIGFuZCBk
+aWQgbm90IGV4cGVjdCB0aGF0DQo+IHRvIGhhcHBlbi4NCg0KTm8sIGZvciBBUk0gc3ViLWFyY2hp
+dGVjdHVyZXMuDQpCdXQsIHllcyBmb3IgdGhlIEFSTSBjb3JlIHBhcnQuDQoNCg0KRm9yIGV4YW1w
+bGUsIHRoZSBmb2xsb3dpbmcgZW50cnkgaW4gYXJjaC9hcm0vS2NvbmZpZyBpcyBzdXNwaWNvdXMu
+DQoNCmNvbmZpZyBQQ0kNCiAgICAgICAgYm9vbCAiUENJIHN1cHBvcnQiIGlmIE1JR0hUX0hBVkVf
+UENJDQogICAgICAgIGhlbHANCiAgICAgICAgICBGaW5kIG91dCB3aGV0aGVyIHlvdSBoYXZlIGEg
+UENJIG1vdGhlcmJvYXJkLiBQQ0kgaXMgdGhlIG5hbWUgb2YgYQ0KICAgICAgICAgIGJ1cyBzeXN0
+ZW0sIGkuZS4gdGhlIHdheSB0aGUgQ1BVIHRhbGtzIHRvIHRoZSBvdGhlciBzdHVmZiBpbnNpZGUN
+CiAgICAgICAgICB5b3VyIGJveC4gT3RoZXIgYnVzIHN5c3RlbXMgYXJlIElTQSwgRUlTQSwgTWlj
+cm9DaGFubmVsIChNQ0EpIG9yDQogICAgICAgICAgVkVTQS4gSWYgeW91IGhhdmUgUENJLCBzYXkg
+WSwgb3RoZXJ3aXNlIE4uDQoNCg0KDQoNClRyeSAibWFrZSBBUkNIPWFybSBmb290YnJpZGdlX2Rl
+ZmNvbmZpZyIgYW5kIGNoZWNrIHRoZSAuY29uZmlnIGZpbGUuDQoNCkl0IGRlZmluZXMgQ09ORklH
+X1BDST15LCBidXQgbm90IENPTkZJR19NSUdIVF9IQVZFX1BDSS4NCkkgYW0gbm90IHN1cmUgdGhp
+cyBpcyBhIHNhbmUgLmNvbmZpZyBvciBub3QuDQoNCkJ1dCwgYW55d2F5LCBLY29uZmlnIGRvZXMg
+bm90IGNvbXBsYWluIGFib3V0IGl0Lg0KDQoNCldlIGhhdmUgc2ltaWxhciBpc3N1ZXMgZm9yIENQ
+VV9WNiwgQ1BVX1Y2SywgQ1BVX1Y3LCBldGMuDQpUaGUgY29uZmlnIGlzIHNlbGVjdGVkLCBidXQg
+dGhlICJpZiIgY29uZGl0aW9uYWwgaXMgdW5tZXQuDQooSSBkZWNpZGVkIHRvIHBvc3Rwb25lIHRo
+aXMgcHJvYmxlbSBiZWNhdXNlIGl0IHdvdWxkIHRha2Ugc29tZSB0aW1lIHRvIHVuZGVyc3RhbmQN
+CmNvbXBsaWNhdGVkIGRlcGVuZGVuY3kuKQ0KDQpUaGUgdXNlIG9mIGEgcHJvbXB0IGZvbGxvd2Vk
+IGJ5ICJpZiIgd2l0aG91dCBjb3JyZWN0IHVuZGVyc3RhbmRpbmcgaXMgZGFuZ2Vyb3VzDQpiZWNh
+dXNlIGl0IGNvdWxkIGhpZGUgdGhlIHVubWV0IGRlcGVuZGVuY3kgcHJvYmxlbS4NCg0KSSB3YW50
+IHRvIGVsaW1pbmF0ZSB0aGUgcG90ZW50aWFsIHByb2JsZW0gYnkgdGhpcyBwYXRjaA0KYmVmb3Jl
+IHNvbWVib2R5IGludHJvZHVjZSBpbnNhbmUgZGVwZW5kZW5jeS4NCg0KDQo+IA0KPiA+IGRpZmYg
+LS1naXQgYS9hcmNoL2FybS9tYWNoLWludGVncmF0b3IvS2NvbmZpZw0KPiA+IGIvYXJjaC9hcm0v
+bWFjaC1pbnRlZ3JhdG9yL0tjb25maWcNCj4gPiBpbmRleCAwMmQwODM0Li4yZmE5ZDExIDEwMDY0
+NA0KPiA+IC0tLSBhL2FyY2gvYXJtL21hY2gtaW50ZWdyYXRvci9LY29uZmlnDQo+ID4gKysrIGIv
+YXJjaC9hcm0vbWFjaC1pbnRlZ3JhdG9yL0tjb25maWcNCj4gPiBAQCAtMSw1ICsxLDYgQEANCj4g
+PiAgY29uZmlnIEFSQ0hfSU5URUdSQVRPUg0KPiA+IC0JYm9vbCAiQVJNIEx0ZC4gSW50ZWdyYXRv
+ciBmYW1pbHkiIGlmIChBUkNIX01VTFRJX1Y0VCB8fA0KPiBBUkNIX01VTFRJX1Y1IHx8IEFSQ0hf
+TVVMVElfVjYpDQo+ID4gKwlib29sICJBUk0gTHRkLiBJbnRlZ3JhdG9yIGZhbWlseSINCj4gPiAr
+CWRlcGVuZHMgb24gQVJDSF9NVUxUSV9WNFQgfHwgQVJDSF9NVUxUSV9WNSB8fCBBUkNIX01VTFRJ
+X1Y2DQo+ID4gIAlzZWxlY3QgQVJNX0FNQkENCj4gPiAgCXNlbGVjdCBBUk1fUEFUQ0hfUEhZU19W
+SVJUIGlmIE1NVQ0KPiA+ICAJc2VsZWN0IEFVVE9fWlJFTEFERFINCj4gDQo+IFRoZXJlIGlzIG9u
+ZSByZWxhdGVkIGNoYW5nZSB0aGF0IEkgd291bGQgbGlrZSB0byBzZWUsIGFuZCB0aGF0IGlzIHRv
+IGNvbnZlcnQNCj4gYWxsIHRvcC1sZXZlbCAnY29uZmlnJyBzdGF0ZW1lbnRzIHRoYXQgaGF2ZSBz
+dWItb3B0aW9ucyBpbnRvICdtZW51Y29uZmlnJw0KPiBzdGF0ZW1lbnRzIGZvciBjb25zaXN0ZW5j
+eS4gQXQgdGhlIG1vbWVudCwgdGhlIHBsYXRmb3JtIG1lbnUgaGFzIGEgbWl4IG9mDQo+IHBsYXRm
+b3JtLXNlbGVjdGlvbiBhbmQgcGxhdGZvcm0tc3BlY2lmaWMgb3B0aW9ucywgYW5kIEknZCBsaWtl
+IHRvIG1ha2UgdGhhdA0KPiBtb3JlIGNvbnNpc3RlbnQuDQoNCkkgYWdyZWUsIGJ1dCBpbiBhbm90
+aGVyIHBhdGNoIChvciBzZXJpZXMpPw0KDQoNCg0KQmVzdCBSZWdhcmRzDQpNYXNoYWlybyBZYW1h
+ZGENCg0K
