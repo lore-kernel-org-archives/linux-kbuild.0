@@ -1,32 +1,33 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail2.lawo.de ([80.149.95.33]:52957 "EHLO mail2.lawo.de"
+Received: from mx2.suse.de ([195.135.220.15]:56660 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S933064AbbKROu1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 18 Nov 2015 09:50:27 -0500
-Message-ID: <1447858006.4104.38.camel@alcnetworx.de>
-Subject: out-of-tree build with external module
-From: Tino Mettler <tino.mettler@alcnetworx.de>
-Date: Wed, 18 Nov 2015 15:46:46 +0100
-Content-Type: text/plain; charset="UTF-8"
+	id S1755732AbbKRRpO (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 18 Nov 2015 12:45:14 -0500
+Subject: Re: [PATCH] staging: drop kbuild workaround dummy module from top dir
+References: <1447721929-45813-1-git-send-email-paul.gortmaker@windriver.com>
+From: Michal Marek <mmarek@suse.com>
+Message-ID: <564CB927.5020105@suse.com>
+Date: Wed, 18 Nov 2015 18:45:11 +0100
 MIME-Version: 1.0
+In-Reply-To: <1447721929-45813-1-git-send-email-paul.gortmaker@windriver.com>
+Content-Type: text/plain; charset=iso-8859-2
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
+To: Paul Gortmaker <paul.gortmaker@windriver.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-Hi,
+Dne 17.11.2015 v 01:58 Paul Gortmaker napsal(a):
+> This is essentially a revert of 86f69fe9c069dd8608d238581eea259caa1dfc99
+> ("Staging: workaround build system bug"), but to call it a revert would
+> imply it was wrong -- rather it seems more like it is just no longer
+> required anymore.
 
-I want to build an external module out-of-tree. I tried this:
+Acked-by: Michal Marek <mmarek@suse.com>
 
-make -C <kernel-source> KBUILD_OUTPUT=<out-of-tree-path> M=<external-module> modules
+In fact, I can't even reproduce the original bug with 2.6.27 + the
+initial staging series. I also do not remember any fix for such bug in
+the recent years. 4b024242e8a4 ("kbuild: Fix linking error built-in.o no
+such file or directory") is related, but fixing a different problem.
 
-However, the result is put to the source path specified by M=, whereas a
-normal kernel build (without M=) but otherwise same parameters puts the
-result to <out-of-tree-path>.
-
-Any hints what I'm doing wrong?
-
-Regards,
-Tino
-
-
+Michal
