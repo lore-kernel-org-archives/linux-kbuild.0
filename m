@@ -1,55 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:38907 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754994AbbKSQVJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 19 Nov 2015 11:21:09 -0500
-Subject: Re: [PATCH] ARM: xip: Move XIP linking to a separate file
+Received: from relmlor2.renesas.com ([210.160.252.172]:12520 "EHLO
+	relmlie1.idc.renesas.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S933201AbbKSQ0P convert rfc822-to-8bit
+	(ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 19 Nov 2015 11:26:15 -0500
+From: Chris Brandt <Chris.Brandt@renesas.com>
+Subject: RE: [PATCH] ARM: xip: Move XIP linking to a separate file
+Date: Thu, 19 Nov 2015 16:26:11 +0000
+Message-ID: <HK2PR06MB0561EC19AE06D509A4E408B98A1B0@HK2PR06MB0561.apcprd06.prod.outlook.com>
 References: <1447943047-22427-1-git-send-email-chris.brandt@renesas.com>
  <alpine.LFD.2.20.1511191050080.22569@knanqh.ubzr>
  <HK2PR06MB0561F1A746E04D0A205B2DBB8A1B0@HK2PR06MB0561.apcprd06.prod.outlook.com>
-From: Michal Marek <mmarek@suse.com>
-Message-ID: <564DF6F2.5090808@suse.com>
-Date: Thu, 19 Nov 2015 17:21:06 +0100
+ <564DF6F2.5090808@suse.com>
+In-Reply-To: <564DF6F2.5090808@suse.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-In-Reply-To: <HK2PR06MB0561F1A746E04D0A205B2DBB8A1B0@HK2PR06MB0561.apcprd06.prod.outlook.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Chris Brandt <Chris.Brandt@renesas.com>
+To: Michal Marek <mmarek@suse.com>
 Cc: Nicolas Pitre <nico@fluxnic.net>, "linux@arm.linux.org.uk" <linux@arm.linux.org.uk>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "mcoquelin.stm32@gmail.com" <mcoquelin.stm32@gmail.com>, "kernel@pengutronix.de" <kernel@pengutronix.de>
 
-On 2015-11-19 17:04, Chris Brandt wrote:
-> On Thu, 19 Nov 2015, Michal Marek wrote:
->> Why not have a vmlinux.lds.S and #include a vmlinux-xip.lds.S / 
->> vmlinux-nonxip.lds.S from there? That way, you do not clutter the
->> main Makefile and you can reuse the boilerplate of the linker script.
->>
->> Michal
+On Thu, 19 Nov 2015, Michal Marek wrote:
+> UM even uses it in its linker script:
 > 
-> On Thu, 19 Nov 2015, Nicolas Pitre wrote:
->> I agree with Michal's suggestion to do the selection locally with an
->> include.
-> 
-> 
-> That's actually how I started out locally, but I thought if I tried submitting that, I'd get a bunch of "Eww, that's ugly".
+> arch/um/kernel/vmlinux.lds.S:#include "uml.lds.S"
+> arch/um/kernel/vmlinux.lds.S:#include "dyn.lds.S"
 
-:-). It arguably is not the most beautiful pattern, but it is still easy
-to understand and there is some prior art in the kernel already, where
-we include variants of C / asm files from other source files:
 
-arch/arm/mm/fault.c:#include "fsr-3level.c"
-arch/arm/mm/fault.c:#include "fsr-2level.c"
-arch/m68k/kernel/setup.c:#include "setup_mm.c"
-arch/m68k/kernel/setup.c:#include "setup_no.c"
-arch/powerpc/kvm/book3s_segment.S:#include "book3s_64_slb.S"
-arch/powerpc/kvm/book3s_segment.S:#include "book3s_32_sr.S"
-mm/percpu.c:#include "percpu-km.c"
-mm/percpu.c:#include "percpu-vm.c"
+"When in Rome, ..."
 
-UM even uses it in its linker script:
 
-arch/um/kernel/vmlinux.lds.S:#include "uml.lds.S"
-arch/um/kernel/vmlinux.lds.S:#include "dyn.lds.S"
-
-Michal
