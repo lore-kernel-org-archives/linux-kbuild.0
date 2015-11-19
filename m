@@ -1,41 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:60813 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750857AbbKSPHG (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 19 Nov 2015 10:07:06 -0500
-Subject: Re: [PATCH] ARM: xip: Move XIP linking to a separate file
+Received: from relmlor2.renesas.com ([210.160.252.172]:50492 "EHLO
+	relmlie1.idc.renesas.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1751221AbbKSQEL convert rfc822-to-8bit
+	(ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 19 Nov 2015 11:04:11 -0500
+From: Chris Brandt <Chris.Brandt@renesas.com>
+Subject: RE: [PATCH] ARM: xip: Move XIP linking to a separate file
+Date: Thu, 19 Nov 2015 16:04:03 +0000
+Message-ID: <HK2PR06MB0561F1A746E04D0A205B2DBB8A1B0@HK2PR06MB0561.apcprd06.prod.outlook.com>
 References: <1447943047-22427-1-git-send-email-chris.brandt@renesas.com>
-From: Michal Marek <mmarek@suse.com>
-Message-ID: <564DE598.7060404@suse.com>
-Date: Thu, 19 Nov 2015 16:07:04 +0100
+ <alpine.LFD.2.20.1511191050080.22569@knanqh.ubzr>
+In-Reply-To: <alpine.LFD.2.20.1511191050080.22569@knanqh.ubzr>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-In-Reply-To: <1447943047-22427-1-git-send-email-chris.brandt@renesas.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Chris Brandt <chris.brandt@renesas.com>
-Cc: linux@arm.linux.org.uk, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org, nico@fluxnic.net, mcoquelin.stm32@gmail.com, kernel@pengutronix.de
+To: Nicolas Pitre <nico@fluxnic.net>, "mmarek@suse.com" <mmarek@suse.com>
+Cc: "linux@arm.linux.org.uk" <linux@arm.linux.org.uk>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "mcoquelin.stm32@gmail.com" <mcoquelin.stm32@gmail.com>, "kernel@pengutronix.de" <kernel@pengutronix.de>
 
-On 2015-11-19 15:24, Chris Brandt wrote:
-> When building an XIP kernel, the linker script needs to be much different
-> than a conventional kernel's script. Over time, it's been difficult to
-> maintain both XIP and non-XIP layouts in one linker script. Therefore,
-> this patch separates the two procedures into two completely different
-> files.
+On Thu, 19 Nov 2015, Michal Marek wrote:
+> Why not have a vmlinux.lds.S and #include a vmlinux-xip.lds.S / 
+> vmlinux-nonxip.lds.S from there? That way, you do not clutter the
+> main Makefile and you can reuse the boilerplate of the linker script.
 > 
-> The new linker script is essentially a straight copy of the current script
-> with all the non-CONFIG_XIP_KERNEL portions removed.
-> 
-> Additionally, all CONFIG_XIP_KERNEL portions have been removed from the
-> existing linker script...never to return again.
-> 
-> From now on, for any architecture, when CONFIG_XIP_KERNEL is enabled, you
-> must provide a vmlinux-xip.lds.S for the build process.
+> Michal
 
-Why not have a vmlinux.lds.S and #include a vmlinux-xip.lds.S /
-vmlinux-nonxip.lds.S from there? That way, you do not clutter the main
-Makefile and you can reuse the boilerplate of the linker script.
+On Thu, 19 Nov 2015, Nicolas Pitre wrote:
+> I agree with Michal's suggestion to do the selection locally with an
+> include.
 
-Michal
+
+That's actually how I started out locally, but I thought if I tried submitting that, I'd get a bunch of "Eww, that's ugly".
+I'm happy to redo the patch and contain the dysfunctionalism of XIP to the ARM tree.
+
+Chris
 
