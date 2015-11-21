@@ -1,43 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ob0-f172.google.com ([209.85.214.172]:34852 "EHLO
-	mail-ob0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1761238AbbKTXvH (ORCPT
+Received: from e06smtp10.uk.ibm.com ([195.75.94.106]:37141 "EHLO
+	e06smtp10.uk.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751715AbbKULAG (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 20 Nov 2015 18:51:07 -0500
-From: Jim Davis <jim.epost@gmail.com>
-Subject: [PATCH] scripts/package/buildtar: don't complain if lib/ is missing
-Date: Fri, 20 Nov 2015 16:50:36 -0700
-Message-Id: <1448063436-32486-1-git-send-email-jim.epost@gmail.com>
+	Sat, 21 Nov 2015 06:00:06 -0500
+Received: from localhost
+	by e06smtp10.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-kbuild@vger.kernel.org> from <heiko.carstens@de.ibm.com>;
+	Sat, 21 Nov 2015 11:00:04 -0000
+From: Heiko Carstens <heiko.carstens@de.ibm.com>
+Subject: [PATCH 0/2] kbuild: add AFLAGS_REMOVE
+Date: Sat, 21 Nov 2015 11:59:57 +0100
+Message-Id: <1448103599-6660-1-git-send-email-heiko.carstens@de.ibm.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mmarek@suse.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Michal Marek <mmarek@suse.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Martin Schwidefsky <schwidefsky@de.ibm.com>, Heiko Carstens <heiko.carstens@de.ibm.com>
 
-Building a tinyconfig kernel or similar stripped-down configurations
-may not have a lib directory to tar up.  Test for a lib directory to
-avoid an unnecessary error message.
+Hi Michal,
 
-Signed-off-by: Jim Davis <jim.epost@gmail.com>
----
- scripts/package/buildtar | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+these are just two simple patches which add
+1) an AFLAGS_REMOVE option which works just like CFLAGS_REMOVE and
+2) one user of it in s390 code.
 
-diff --git a/scripts/package/buildtar b/scripts/package/buildtar
-index e046bff33589..b52475d2be3b 100755
---- a/scripts/package/buildtar
-+++ b/scripts/package/buildtar
-@@ -129,7 +129,11 @@ esac
- 	if tar --owner=root --group=root --help >/dev/null 2>&1; then
- 		opts="--owner=root --group=root"
- 	fi
--	tar cf - -C "$tmpdir" boot/ lib/ $opts | ${compress} > "${tarball}${file_ext}"
-+	lib=
-+	if test -d "$tmpdir/lib"; then
-+		lib="lib/"
-+	fi
-+	tar cf - -C "$tmpdir" boot/ $lib $opts | ${compress} > "${tarball}${file_ext}"
- )
- 
- echo "Tarball successfully created in ${tarball}${file_ext}"
+If you agree this is ok, then these two patches could go upstream either
+via your tree or the s390 tree.
+
+Thanks,
+Heiko
+
+Heiko Carstens (2):
+  kbuild: add AFLAGS_REMOVE_(basename).o option
+  s390: compile head.s always with -march=z900
+
+ arch/s390/kernel/Makefile | 6 ++++--
+ scripts/Makefile.lib      | 3 ++-
+ 2 files changed, 6 insertions(+), 3 deletions(-)
+
 -- 
-2.6.2.195.g0c4dd78
+2.3.9
 
