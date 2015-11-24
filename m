@@ -1,49 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:45690 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:46463 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753114AbbKXMHY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 24 Nov 2015 07:07:24 -0500
-Subject: Re: [PATCH] Kbuild: disable 'maybe-uninitialized' warning for
- CONFIG_PROFILE_ALL_BRANCHES
-References: <3799453.oCg1CdOrtm@wuerfel> <565439FB.6050800@suse.com>
- <20825812.L9y0yMCgts@wuerfel>
-From: Michal Marek <mmarek@suse.com>
-Message-ID: <565452FA.6010603@suse.com>
-Date: Tue, 24 Nov 2015 13:07:22 +0100
+	id S1753961AbbKXQuP (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 24 Nov 2015 11:50:15 -0500
+Subject: Re: [PATCH v3] package Makefile: fix perf-tar targets when outdir is
+ set
+References: <1441116861-28604-1-git-send-email-riku.voipio@linaro.org>
+ <CAAqcGH=s3VL8y4QzycZR0ueMHmwJ4UcyUZMP4sjxSteb-X_itA@mail.gmail.com>
+From: Michal Marek <mmarek@suse.cz>
+Message-ID: <56549545.5060908@suse.cz>
+Date: Tue, 24 Nov 2015 17:50:13 +0100
 MIME-Version: 1.0
-In-Reply-To: <20825812.L9y0yMCgts@wuerfel>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <CAAqcGH=s3VL8y4QzycZR0ueMHmwJ4UcyUZMP4sjxSteb-X_itA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: Riku Voipio <riku.voipio@linaro.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On 2015-11-24 11:42, Arnd Bergmann wrote:
-> On Tuesday 24 November 2015 11:20:43 Michal Marek wrote:
->>> diff --git a/Makefile b/Makefile
->>> index 5e01a416c6e4..f8b921658f29 100644
->>> --- a/Makefile
->>> +++ b/Makefile
->>> @@ -626,7 +626,11 @@ KBUILD_CFLAGS    += $(call cc-option,-fno-delete-null-pointer-checks,)
->>>  ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
->>>  KBUILD_CFLAGS        += -Os $(call cc-disable-warning,maybe-uninitialized,)
->>>  else
->>> -KBUILD_CFLAGS        += -O2
->>> +ifdef CONFIG_PROFILE_ALL_BRANCHES
->>> +KBUILD_CFLAGS        += -O2 $(call cc-disable-warning,maybe-uninitialized,)
->>> +else
->>> +KBUILD_CFLAGS   += -O2
->>> +endif
+On 2015-11-16 11:09, Riku Voipio wrote:
+> On 1 September 2015 at 17:14,  <riku.voipio@linaro.org> wrote:
+>> From: Riku Voipio <riku.voipio@linaro.org>
 >>
->> Does it only happen with -O2? Normally, we would add it outside the
->> ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE.
+>> building with $srctree != $objtree, perf-tar-* targets fail
+>> to read the MANIFEST file and add the PERF-VERSION-FILE needed
+>> by out-of-tree builds. The build errors and an incorrect tar is created:
 >>
+>> $ make O=build-x86 perf-targz-src-pkg
+>>   TAR
+>> cat: ../tools/perf/MANIFEST: No such file or directory
+>> tar: perf-4.1.0-rc8/PERF-VERSION-FILE: Cannot stat: No such file or
+>> dir..
+>> tar: Exiting with failure status due to previous errors
+>>
+>> Kbuild sets objtree to "." and srctree to ".." The command to output
+>> MANIFEST becomes:
+>>
+>>    $(cd ..; echo $(cat ../tools/perf/MANIFEST))
+>>
+>> Without MANIFEST, the entire kernel source tree is added to the perf
+>> source tarball. The *correct* fix is to keep the cd and remove srctree
+>> from cat command line since MANIFEST has wildcards that fail to expand
+>> working directory isn't srctree.
+>>
+>> Second, PERF-VERSION-FILE gets not added, because in-tree build path is
+>> hardcoded to Makefile:
+>>
+>>    util/PERF-VERSION-GEN ../../$(perf-tar)/ 2>/dev/null)
+>>
+>> The PERF-VERSION-GEN needs to be run from tools/perf directory,
+>> and the output directory needs to be changed from relative to
+>> to absolute. This can be achieved using the $(CURDIR) variable.
+>>
+>> Also remove the error redirect to /dev/null which hid the error.
+>>
+>> Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
 > 
-> We already disable the warning for -Os builds based on a patch we merged
-> a while ago. It seems easier to add it to the block we already have.
+> Ping?
 
-I'm blind, sorry.
+Added to kbuild.git#misc now, sorry for the delay.
 
 Michal
 
