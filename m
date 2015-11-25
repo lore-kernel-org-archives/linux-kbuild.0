@@ -1,64 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:46463 "EHLO mx2.suse.de"
+Received: from mx.socionext.com ([202.248.49.38]:48093 "EHLO mx.socionext.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753961AbbKXQuP (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 24 Nov 2015 11:50:15 -0500
-Subject: Re: [PATCH v3] package Makefile: fix perf-tar targets when outdir is
- set
-References: <1441116861-28604-1-git-send-email-riku.voipio@linaro.org>
- <CAAqcGH=s3VL8y4QzycZR0ueMHmwJ4UcyUZMP4sjxSteb-X_itA@mail.gmail.com>
-From: Michal Marek <mmarek@suse.cz>
-Message-ID: <56549545.5060908@suse.cz>
-Date: Tue, 24 Nov 2015 17:50:13 +0100
+	id S1753794AbbKYCJu (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 24 Nov 2015 21:09:50 -0500
+From: <yamada.masahiro@socionext.com>
+Subject: RE: [PATCH] ARM: use "depends on" for SoC configs instead of "if"
+ after prompt
+Date: Wed, 25 Nov 2015 02:09:46 +0000
+Message-ID: <4da749fb0cb34349babe18dc3c0d585a@SOC-EX02V.e01.socionext.com>
+References: <1447643170-23773-1-git-send-email-yamada.masahiro@socionext.com>
+ <20151124155857.GB32623@ulmo.nvidia.com>
+In-Reply-To: <20151124155857.GB32623@ulmo.nvidia.com>
+Content-Language: ja-JP
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <CAAqcGH=s3VL8y4QzycZR0ueMHmwJ4UcyUZMP4sjxSteb-X_itA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Riku Voipio <riku.voipio@linaro.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: thierry.reding@gmail.com, arnd@arndb.de, arm@kernel.org
+Cc: linux-arm-kernel@lists.infradead.org, mmarek@suse.com, olof@lixom.net, linux-kbuild@vger.kernel.org, jamie@jamieiles.com, agross@codeaurora.org, kernel@pengutronix.de, gregory.clement@free-electrons.com, linux-sh@vger.kernel.org, tsahee@annapurnalabs.com, linux-arm-msm@vger.kernel.org, linus.walleij@linaro.org, galak@codeaurora.org, plagnioj@jcrosoft.com, dinguyen@opensource.altera.com, baohua@kernel.org, shiraz.linux.kernel@gmail.com, rjui@broadcom.com, patrice.chotard@st.com, kernel@stlinux.com, soren.brinkmann@xilinx.com, horms@verge.net.au, michal.simek@xilinx.com, heiko@sntech.de, linux-rockchip@lists.infradead.org, linux-soc@vger.kernel.org, davidb@codeaurora.org, sbranden@broadcom.com, vireshk@kernel.org, alexandre.belloni@free-electrons.com, kyungmin.park@samsung.com, k.kozlowski@samsung.com, bcm-kernel-feedback-list@broadcom.com, f.fainelli@gmail.com, gnurou@gmail.com, matthias.bgg@gmail.com, kgene@kernel.org, robh@kernel.org, linux-kernel@vger.kernel.org, spear-devel@list.st.com, sebastian.hesselbarth@gmail.com, sudeep.holla@arm.com, andrew@lunn.ch, linux@arm.linux.org.uk, linux-samsung-soc@vger.kernel.org, linux-mediatek@lists.infradead.org, linux-tegra@vger.kernel.org, maxime.coquelin@st.com, srinivas.kandagatla@gmail.com, shawnguo@kernel.org, liviu.dudau@arm.com, jun.nie@linaro.org, lorenzo.pieralisi@arm.com, nicolas.ferre@atmel.com, jason@lakedaemon.net, swarren@wwwdotorg.org, khalasa@piap.pl, xuwei5@hisilicon.com, magnus.damm@gmail.com, wens@csie.org, maxime.ripard@free-electrons.com
 
-On 2015-11-16 11:09, Riku Voipio wrote:
-> On 1 September 2015 at 17:14,  <riku.voipio@linaro.org> wrote:
->> From: Riku Voipio <riku.voipio@linaro.org>
->>
->> building with $srctree != $objtree, perf-tar-* targets fail
->> to read the MANIFEST file and add the PERF-VERSION-FILE needed
->> by out-of-tree builds. The build errors and an incorrect tar is created:
->>
->> $ make O=build-x86 perf-targz-src-pkg
->>   TAR
->> cat: ../tools/perf/MANIFEST: No such file or directory
->> tar: perf-4.1.0-rc8/PERF-VERSION-FILE: Cannot stat: No such file or
->> dir..
->> tar: Exiting with failure status due to previous errors
->>
->> Kbuild sets objtree to "." and srctree to ".." The command to output
->> MANIFEST becomes:
->>
->>    $(cd ..; echo $(cat ../tools/perf/MANIFEST))
->>
->> Without MANIFEST, the entire kernel source tree is added to the perf
->> source tarball. The *correct* fix is to keep the cd and remove srctree
->> from cat command line since MANIFEST has wildcards that fail to expand
->> working directory isn't srctree.
->>
->> Second, PERF-VERSION-FILE gets not added, because in-tree build path is
->> hardcoded to Makefile:
->>
->>    util/PERF-VERSION-GEN ../../$(perf-tar)/ 2>/dev/null)
->>
->> The PERF-VERSION-GEN needs to be run from tools/perf directory,
->> and the output directory needs to be changed from relative to
->> to absolute. This can be achieved using the $(CURDIR) variable.
->>
->> Also remove the error redirect to /dev/null which hid the error.
->>
->> Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
-> 
-> Ping?
-
-Added to kbuild.git#misc now, sorry for the delay.
-
-Michal
-
+SGkgQXJuZCwNCg0KQ291bGQgeW91IGFwcGx5IHRoaXMgcGF0Y2ggd2l0aCBBY2tlZC1ieSBzdG9y
+bQ0Kc28gdGhhdCBvdGhlciBzdWJhcmNodGVjdHVyZXMgY2FuIGJhc2Ugb24gaXQ/DQoNCkFsc28s
+IHRoZSBmb2xsb3dpbmcgc2VyaWVzOg0KDQoxLzI6IEFSTTogaGlzaTogZG8gbm90IGV4cG9ydCBz
+bXBfb3BlcmF0aW9ucyBzdHJ1Y3R1cmVzDQoyLzI6IEFSTTogdXNlIGNvbnN0IGFuZCBfX2luaXRj
+b25zdCBmb3Igc21wX29wZXJhdGlvbnMNCg0KDQoNCg0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2Fn
+ZS0tLS0tDQo+IEZyb206IFRoaWVycnkgUmVkaW5nIFttYWlsdG86dGhpZXJyeS5yZWRpbmdAZ21h
+aWwuY29tXQ0KPiBTZW50OiBXZWRuZXNkYXksIE5vdmVtYmVyIDI1LCAyMDE1IDEyOjU5IEFNDQo+
+IFRvOiBZYW1hZGEsIE1hc2FoaXJvDQo+IENjOiBsaW51eC1hcm0ta2VybmVsQGxpc3RzLmluZnJh
+ZGVhZC5vcmc7IGFybUBrZXJuZWwub3JnOyBNaWNoYWwgTWFyZWs7DQo+IEFybmQgQmVyZ21hbm47
+IE9sb2YgSm9oYW5zc29uOyBsaW51eC1rYnVpbGRAdmdlci5rZXJuZWwub3JnOyBKYW1pZSBJbGVz
+Ow0KPiBBbmR5IEdyb3NzOyBTYXNjaGEgSGF1ZXI7IEdyZWdvcnkgQ2xlbWVudDsgbGludXgtc2hA
+dmdlci5rZXJuZWwub3JnOw0KPiBUc2FoZWUgWmlkZW5iZXJnOyBsaW51eC1hcm0tbXNtQHZnZXIu
+a2VybmVsLm9yZzsgTGludXMgV2FsbGVpajsgS3VtYXINCj4gR2FsYTsgSmVhbi1DaHJpc3RvcGhl
+IFBsYWduaW9sLVZpbGxhcmQ7IERpbmggTmd1eWVuOyBCYXJyeSBTb25nOyBTaGlyYXoNCj4gSGFz
+aGltOyBSYXkgSnVpOyBQYXRyaWNlIENob3RhcmQ7IGtlcm5lbEBzdGxpbnV4LmNvbTsgU8O2cmVu
+IEJyaW5rbWFubjsNCj4gU2ltb24gSG9ybWFuOyBNaWNoYWwgU2ltZWs7IEhlaWtvIFN0dWVibmVy
+Ow0KPiBsaW51eC1yb2NrY2hpcEBsaXN0cy5pbmZyYWRlYWQub3JnOyBsaW51eC1zb2NAdmdlci5r
+ZXJuZWwub3JnOyBEYXZpZA0KPiBCcm93bjsgU2NvdHQgQnJhbmRlbjsgVmlyZXNoIEt1bWFyOyBB
+bGV4YW5kcmUgQmVsbG9uaTsgS3l1bmdtaW4gUGFyazsNCj4gS3J6eXN6dG9mIEtvemxvd3NraTsg
+YmNtLWtlcm5lbC1mZWVkYmFjay1saXN0QGJyb2FkY29tLmNvbTsgRmxvcmlhbg0KPiBGYWluZWxs
+aTsgQWxleGFuZHJlIENvdXJib3Q7IE1hdHRoaWFzIEJydWdnZXI7IEt1a2ppbiBLaW07IFJvYiBI
+ZXJyaW5nOw0KPiBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnOyBzcGVhci1kZXZlbEBsaXN0
+LnN0LmNvbTsgU2ViYXN0aWFuDQo+IEhlc3NlbGJhcnRoOyBTdWRlZXAgSG9sbGE7IEFuZHJldyBM
+dW5uOyBSdXNzZWxsIEtpbmc7DQo+IGxpbnV4LXNhbXN1bmctc29jQHZnZXIua2VybmVsLm9yZzsg
+bGludXgtbWVkaWF0ZWtAbGlzdHMuaW5mcmFkZWFkLm9yZzsNCj4gbGludXgtdGVncmFAdmdlci5r
+ZXJuZWwub3JnOyBNYXhpbWUgQ29xdWVsaW47IFNyaW5pdmFzIEthbmRhZ2F0bGE7IFNoYXduDQo+
+IEd1bzsgTGl2aXUgRHVkYXU7IEp1biBOaWU7IExvcmVuem8gUGllcmFsaXNpOyBOaWNvbGFzIEZl
+cnJlOyBKYXNvbiBDb29wZXI7DQo+IFN0ZXBoZW4gV2FycmVuOyBLcnp5c3p0b2YgSGFsYXNhOyBX
+ZWkgWHU7IE1hZ251cyBEYW1tOyBDaGVuLVl1IFRzYWk7IE1heGltZQ0KPiBSaXBhcmQNCj4gU3Vi
+amVjdDogUmU6IFtQQVRDSF0gQVJNOiB1c2UgImRlcGVuZHMgb24iIGZvciBTb0MgY29uZmlncyBp
+bnN0ZWFkIG9mICJpZiINCj4gYWZ0ZXIgcHJvbXB0DQo+IA0KPiBPbiBNb24sIE5vdiAxNiwgMjAx
+NSBhdCAxMjowNjoxMFBNICswOTAwLCBNYXNhaGlybyBZYW1hZGEgd3JvdGU6DQo+IFsuLi5dDQo+
+ID4gIGFyY2gvYXJtL21hY2gtdGVncmEvS2NvbmZpZyAgICAgIHwgIDMgKystDQo+IA0KPiBUaGVy
+ZSB3aWxsIGJlIGEgc2xpZ2h0IGNvbmZsaWN0IGJldHdlZW4gdGhpcyBhbmQgYSBwYXRjaCBpbiB0
+aGUgdGVncmEgdHJlZSwNCj4gYnV0IG5vdGhpbmcgdGhhdCB0aGUgQVJNIFNvQyBtYWludGFpbmVy
+cyBjYW4ndCBoYW5kbGUsIHNvOg0KPiANCj4gQWNrZWQtYnk6IFRoaWVycnkgUmVkaW5nIDx0cmVk
+aW5nQG52aWRpYS5jb20+DQo=
