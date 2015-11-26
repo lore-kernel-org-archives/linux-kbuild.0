@@ -1,28 +1,33 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:51981 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751065AbbKZPxd (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 26 Nov 2015 10:53:33 -0500
+Received: from wolverine02.qualcomm.com ([199.106.114.251]:18230 "EHLO
+	wolverine02.qualcomm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751570AbbKZRCA convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 26 Nov 2015 12:02:00 -0500
+From: Kalle Valo <kvalo@qca.qualcomm.com>
 Subject: Re: [PATCH] ath10: Fix build with CONFIG_THERMAL=m
 References: <201511260039.iQbaOe1h%fengguang.wu@intel.com>
- <1448552198-26911-1-git-send-email-mmarek@suse.com>
-From: Michal Marek <mmarek@suse.cz>
-Message-ID: <56572AFB.20309@suse.cz>
-Date: Thu, 26 Nov 2015 16:53:31 +0100
+	<1448552198-26911-1-git-send-email-mmarek@suse.com>
+Date: Thu, 26 Nov 2015 19:01:42 +0200
+In-Reply-To: <1448552198-26911-1-git-send-email-mmarek@suse.com> (Michal
+	Marek's message of "Thu, 26 Nov 2015 16:36:38 +0100")
+Message-ID: <87h9k8n18p.fsf@kamboji.qca.qualcomm.com>
 MIME-Version: 1.0
-In-Reply-To: <1448552198-26911-1-git-send-email-mmarek@suse.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kalle Valo <kvalo@qca.qualcomm.com>
-Cc: linux-kbuild@vger.kernel.org, kbuild-all@01.org, fengguang.wu@intel.com, ath10k@lists.infradead.org
+To: Michal Marek <mmarek@suse.com>
+Cc: linux-kbuild@vger.kernel.org, fengguang.wu@intel.com, kbuild-all@01.org, ath10k@lists.infradead.org, linux-wireless@vger.kernel.org
 
-On 2015-11-26 16:36, Michal Marek wrote:
++ linux-wireless
+
+Michal Marek <mmarek@suse.com> writes:
+
 > After commit cf4f21938e13 ("kbuild: Allow to specify composite modules
 > with modname-m"), thermal.c gets included in the driver and the build
 > fails with
-> 
+>
 > drivers/net/wireless/ath/ath10k/thermal.c:119:6: error: redefinition of ‘ath10k_thermal_event_temperature’
 > drivers/net/wireless/ath/ath10k/thermal.h:54:20: note: previous definition of ‘ath10k_thermal_event_temperature’ was here
 > drivers/net/wireless/ath/ath10k/thermal.c:136:6: error: redefinition of ‘ath10k_thermal_set_throttling’
@@ -31,11 +36,16 @@ On 2015-11-26 16:36, Michal Marek wrote:
 > drivers/net/wireless/ath/ath10k/thermal.h:45:19: note: previous definition of ‘ath10k_thermal_register’ was here
 > drivers/net/wireless/ath/ath10k/thermal.c:216:6: error: redefinition of ‘ath10k_thermal_unregister’
 > drivers/net/wireless/ath/ath10k/thermal.h:50:20: note: previous definition of ‘ath10k_thermal_unregister’ was here
-> 
+>
 > Change the #ifdef to reflect the new kbuild behavior.
+>
+> Reported-by: kbuild test robot <fengguang.wu@intel.com>
+> Signed-off-by: Michal Marek <mmarek@suse.com>
 
-Forgot to mention: The above commit only exists in the kbuild tree, so I
-will apply this there as well, unless anybody objects. Applying the
-patch to the ath tree would break the other way around.
+Please fix the subject prefix to "ath10k: ", otherwise looks good. Feel
+free to apply this to the kbuild tree.
 
-Michal
+Acked-by: Kalle Valo <kvalo@qca.qualcomm.com>
+
+-- 
+Kalle Valo
