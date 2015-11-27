@@ -1,51 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from wolverine02.qualcomm.com ([199.106.114.251]:18230 "EHLO
-	wolverine02.qualcomm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751570AbbKZRCA convert rfc822-to-8bit (ORCPT
+Received: from mout.kundenserver.de ([212.227.17.10]:52645 "EHLO
+	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750978AbbK0Nz0 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 26 Nov 2015 12:02:00 -0500
-From: Kalle Valo <kvalo@qca.qualcomm.com>
-Subject: Re: [PATCH] ath10: Fix build with CONFIG_THERMAL=m
-References: <201511260039.iQbaOe1h%fengguang.wu@intel.com>
-	<1448552198-26911-1-git-send-email-mmarek@suse.com>
-Date: Thu, 26 Nov 2015 19:01:42 +0200
-In-Reply-To: <1448552198-26911-1-git-send-email-mmarek@suse.com> (Michal
-	Marek's message of "Thu, 26 Nov 2015 16:36:38 +0100")
-Message-ID: <87h9k8n18p.fsf@kamboji.qca.qualcomm.com>
+	Fri, 27 Nov 2015 08:55:26 -0500
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH] logfs: clarify MTD dependency
+Date: Fri, 27 Nov 2015 14:54:53 +0100
+Message-ID: <9365895.IkncCfXjo6@wuerfel>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8BIT
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>
-Cc: linux-kbuild@vger.kernel.org, fengguang.wu@intel.com, kbuild-all@01.org, ath10k@lists.infradead.org, linux-wireless@vger.kernel.org
+To: Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org
+Cc: =?ISO-8859-1?Q?J=F6rn?= Engel <joern@logfs.org>, Prasad Joshi <prasadjoshi.linux@gmail.com>, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 
-+ linux-wireless
+After a change to the way that composite modules work, we get
+a logfs build error:
 
-Michal Marek <mmarek@suse.com> writes:
+fs/built-in.o: In function `logfs_mount':
+:(.text+0x139d34): undefined reference to `logfs_get_sb_mtd'
+fs/built-in.o: In function `logfs_get_sb_bdev':
+:(.text+0x13aa08): undefined reference to `logfs_get_sb_mtd'
 
-> After commit cf4f21938e13 ("kbuild: Allow to specify composite modules
-> with modname-m"), thermal.c gets included in the driver and the build
-> fails with
->
-> drivers/net/wireless/ath/ath10k/thermal.c:119:6: error: redefinition of ‘ath10k_thermal_event_temperature’
-> drivers/net/wireless/ath/ath10k/thermal.h:54:20: note: previous definition of ‘ath10k_thermal_event_temperature’ was here
-> drivers/net/wireless/ath/ath10k/thermal.c:136:6: error: redefinition of ‘ath10k_thermal_set_throttling’
-> drivers/net/wireless/ath/ath10k/thermal.h:59:20: note: previous definition of ‘ath10k_thermal_set_throttling’ was here
-> drivers/net/wireless/ath/ath10k/thermal.c:162:5: error: redefinition of ‘ath10k_thermal_register’
-> drivers/net/wireless/ath/ath10k/thermal.h:45:19: note: previous definition of ‘ath10k_thermal_register’ was here
-> drivers/net/wireless/ath/ath10k/thermal.c:216:6: error: redefinition of ‘ath10k_thermal_unregister’
-> drivers/net/wireless/ath/ath10k/thermal.h:50:20: note: previous definition of ‘ath10k_thermal_unregister’ was here
->
-> Change the #ifdef to reflect the new kbuild behavior.
->
-> Reported-by: kbuild test robot <fengguang.wu@intel.com>
-> Signed-off-by: Michal Marek <mmarek@suse.com>
+This patch avoids the error by changing the dependencies of
+logfs in a way that we can no longer configure logfs as built-in
+when the MTD core is a loadable module, while leaving the
+dependency to require at least one of MTD or BLOCK to be
+enabled.
 
-Please fix the subject prefix to "ath10k: ", otherwise looks good. Feel
-free to apply this to the kbuild tree.
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Fixes: cf4f21938e13 ("kbuild: Allow to specify composite modules with modname-m")
+---
+Found on today's linux-next. The commit that broke it is currently
+in the kbuild for-next tree, so please apply my fix on top, or fold
+it into the original patch.
 
-Acked-by: Kalle Valo <kvalo@qca.qualcomm.com>
+diff --git a/fs/logfs/Kconfig b/fs/logfs/Kconfig
+index 09ed066c0221..2b4503163930 100644
+--- a/fs/logfs/Kconfig
++++ b/fs/logfs/Kconfig
+@@ -1,6 +1,6 @@
+ config LOGFS
+ 	tristate "LogFS file system"
+-	depends on (MTD || BLOCK)
++	depends on MTD || (!MTD && BLOCK)
+ 	select ZLIB_INFLATE
+ 	select ZLIB_DEFLATE
+ 	select CRC32
 
--- 
-Kalle Valo
