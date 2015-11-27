@@ -1,100 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:33016 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754284AbbK0OOH (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 27 Nov 2015 09:14:07 -0500
-Date: Fri, 27 Nov 2015 15:14:06 +0100
-From: Michal Marek <mmarek@suse.com>
+Received: from mout.kundenserver.de ([217.72.192.73]:62798 "EHLO
+	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754013AbbK0Oar (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 27 Nov 2015 09:30:47 -0500
+From: Arnd Bergmann <arnd@arndb.de>
 Subject: Re: [PATCH] logfs: clarify MTD dependency
-Message-ID: <20151127141406.GA29886@sepie.suse.cz>
-References: <9365895.IkncCfXjo6@wuerfel>
+Date: Fri, 27 Nov 2015 15:30:12 +0100
+Message-ID: <3269089.8XYbbcUOLH@wuerfel>
+In-Reply-To: <20151127141406.GA29886@sepie.suse.cz>
+References: <9365895.IkncCfXjo6@wuerfel> <20151127141406.GA29886@sepie.suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9365895.IkncCfXjo6@wuerfel>
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: linux-kbuild@vger.kernel.org, =?iso-8859-1?Q?J=F6rn?= Engel <joern@logfs.org>, Prasad Joshi <prasadjoshi.linux@gmail.com>, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: Michal Marek <mmarek@suse.com>
+Cc: linux-kbuild@vger.kernel.org, =?ISO-8859-1?Q?J=F6rn?= Engel <joern@logfs.org>, Prasad Joshi <prasadjoshi.linux@gmail.com>, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 
-On Fri, Nov 27, 2015 at 02:54:53PM +0100, Arnd Bergmann wrote:
-> After a change to the way that composite modules work, we get
-> a logfs build error:
+On Friday 27 November 2015 15:14:06 Michal Marek wrote:
 > 
-> fs/built-in.o: In function `logfs_mount':
-> :(.text+0x139d34): undefined reference to `logfs_get_sb_mtd'
-> fs/built-in.o: In function `logfs_get_sb_bdev':
-> :(.text+0x13aa08): undefined reference to `logfs_get_sb_mtd'
+> Hi Arnd,
 > 
-> This patch avoids the error by changing the dependencies of
-> logfs in a way that we can no longer configure logfs as built-in
-> when the MTD core is a loadable module, while leaving the
-> dependency to require at least one of MTD or BLOCK to be
-> enabled.
+> I hit this as well and was about to submit a slightly different fix. Can
+> you try the logfs portion of the below patch? Proper changelog is to be
+> done, but the gist of the patch is that IS_REACHABLE(CONFIG_FOO) 
+> evaluates to 1 if CONFIG_FOO=y or we are building a module and
+> CONFIG_FOO=m.
+> 
 
-Hi Arnd,
+I thought about doing it that way, and I'm sure that also worked.
+The possible behaviors are basically:
 
-I hit this as well and was about to submit a slightly different fix. Can
-you try the logfs portion of the below patch? Proper changelog is to be
-done, but the gist of the patch is that IS_REACHABLE(CONFIG_FOO) 
-evaluates to 1 if CONFIG_FOO=y or we are building a module and
-CONFIG_FOO=m.
+a) before your original patch, building logfs with CONFIG_MTD=m would
+   silently leave out MTD support, which was rather confusing.
 
-Michal
+b) with my patch, it becomes impossible to have logfs as the built-in
+   root file system on a block device while also using CONFIG_MTD=m,
+   and that may be slightly annoying
 
-From 63e7ab41e3958e753277728acbe15faf35a5374e Mon Sep 17 00:00:00 2001
-From: Michal Marek <mmarek@suse.com>
-Date: Fri, 27 Nov 2015 15:08:29 +0100
-Subject: [PATCH] kbuild: Use IS_REACHABLE to handle objname-m composite
- objects
+c) your patch restores a), but makes it work in the case where both
+   logfs and mtd are loadable modules, which is an improvement but
+   may still confuse users.
 
-Fixes: cf4f21938e13 ("kbuild: Allow to specify composite modules with modname-m")
-Signed-off-by: Michal Marek <mmarek@suse.com>
----
- drivers/misc/ibmasm/ibmasm.h   | 2 +-
- drivers/usb/chipidea/otg_fsm.h | 2 +-
- fs/logfs/logfs.h               | 2 +-
- 3 files changed, 3 insertions(+), 3 deletions(-)
+My preference is still version b) as I sent, but I don't really mind
+your version either.
 
-diff --git a/drivers/misc/ibmasm/ibmasm.h b/drivers/misc/ibmasm/ibmasm.h
-index 5bd127727d8e..0f4c43a8543e 100644
---- a/drivers/misc/ibmasm/ibmasm.h
-+++ b/drivers/misc/ibmasm/ibmasm.h
-@@ -211,7 +211,7 @@ void ibmasmfs_unregister(void);
- void ibmasmfs_add_sp(struct service_processor *sp);
- 
- /* uart */
--#if IS_ENABLED(CONFIG_SERIAL_8250)
-+#if IS_REACHABLE(CONFIG_SERIAL_8250)
- void ibmasm_register_uart(struct service_processor *sp);
- void ibmasm_unregister_uart(struct service_processor *sp);
- #else
-diff --git a/drivers/usb/chipidea/otg_fsm.h b/drivers/usb/chipidea/otg_fsm.h
-index 262d6ef8df7c..44506e4aa11f 100644
---- a/drivers/usb/chipidea/otg_fsm.h
-+++ b/drivers/usb/chipidea/otg_fsm.h
-@@ -62,7 +62,7 @@
- /* SSEND time before SRP */
- #define TB_SSEND_SRP         (1500)	/* minimum 1.5 sec, section:5.1.2 */
- 
--#if IS_ENABLED(CONFIG_USB_OTG_FSM)
-+#if IS_REACHABLE(CONFIG_USB_OTG_FSM)
- 
- int ci_hdrc_otg_fsm_init(struct ci_hdrc *ci);
- int ci_otg_fsm_work(struct ci_hdrc *ci);
-diff --git a/fs/logfs/logfs.h b/fs/logfs/logfs.h
-index 23f961a8fb92..2fcd487a4ab2 100644
---- a/fs/logfs/logfs.h
-+++ b/fs/logfs/logfs.h
-@@ -485,7 +485,7 @@ static inline int logfs_get_sb_bdev(struct logfs_super *s,
- #endif
- 
- /* dev_mtd.c */
--#if IS_ENABLED(CONFIG_MTD)
-+#if IS_REACHABLE(CONFIG_MTD)
- int logfs_get_sb_mtd(struct logfs_super *s, int mtdnr);
- #else
- static inline int logfs_get_sb_mtd(struct logfs_super *s, int mtdnr)
--- 
-2.1.4
-
+	Arnd
