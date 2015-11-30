@@ -1,69 +1,95 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:44683 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752297AbbK3Pk2 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 30 Nov 2015 10:40:28 -0500
-Subject: Re: [PATCH v2 1/2] scripts: Add a recorduidiv program
-References: <1448488264-23400-1-git-send-email-sboyd@codeaurora.org>
- <1448488264-23400-2-git-send-email-sboyd@codeaurora.org>
- <20151125234711.GT8644@n2100.arm.linux.org.uk> <565C6714.802@suse.com>
- <20151130153208.GR8644@n2100.arm.linux.org.uk>
-From: Michal Marek <mmarek@suse.com>
-Message-ID: <565C6DE9.2020302@suse.com>
-Date: Mon, 30 Nov 2015 16:40:25 +0100
+Received: from relay.parallels.com ([195.214.232.42]:39451 "EHLO
+	relay.parallels.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751524AbbK3QAB (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 30 Nov 2015 11:00:01 -0500
+From: Andrey Ryabinin <aryabinin@virtuozzo.com>
+Subject: [PATCH v3 0/2] UBSAN: run-time undefined behavior sanity checker
+Date: Mon, 30 Nov 2015 18:59:41 +0300
+Message-ID: <1448899183-8677-1-git-send-email-aryabinin@virtuozzo.com>
 MIME-Version: 1.0
-In-Reply-To: <20151130153208.GR8644@n2100.arm.linux.org.uk>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Russell King - ARM Linux <linux@arm.linux.org.uk>
-Cc: Stephen Boyd <sboyd@codeaurora.org>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, Thomas Petazzoni <thomas.petazzoni@free-electrons.com>, linux-kbuild@vger.kernel.org, Nicolas Pitre <nico@fluxnic.net>, Arnd Bergmann <arnd@arndb.de>, Steven Rostedt <rostedt@goodmis.org>, =?UTF-8?B?TcOlbnMgUnVsbGfDpXJk?= <mans@mansr.com>
+To: linux-kernel@vger.kernel.org
+Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Andrew Morton <akpm@linux-foundation.org>, Peter Zijlstra <peterz@infradead.org>, Sasha Levin <sasha.levin@oracle.com>, Randy Dunlap <rdunlap@infradead.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Jonathan Corbet <corbet@lwn.net>, Michal Marek <mmarek@suse.cz>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Yury Gribov <y.gribov@samsung.com>, Dmitry Vyukov <dvyukov@google.com>, Konstantin Khlebnikov <koct9i@gmail.com>, Kostya Serebryany <kcc@google.com>, x86@kernel.org, linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On 2015-11-30 16:32, Russell King - ARM Linux wrote:
-> On Mon, Nov 30, 2015 at 04:11:16PM +0100, Michal Marek wrote:
->> On 2015-11-26 00:47, Russell King - ARM Linux wrote:
->>> On Wed, Nov 25, 2015 at 01:51:03PM -0800, Stephen Boyd wrote:
->>>> The ARM compiler inserts calls to __aeabi_uidiv() and
->>>> __aeabi_idiv() when it needs to perform division on signed and
->>>> unsigned integers. If a processor has support for the udiv and
->>>> sdiv division instructions the calls to these support routines
->>>> can be replaced with those instructions. Therefore, record the
->>>> location of calls to these library functions into two sections
->>>> (one for udiv and one for sdiv) similar to how we trace calls to
->>>> mcount. When the kernel boots up it will check to see if the
->>>> processor supports the instructions and then patch the call sites
->>>> with the instruction.
->>>
->>> Do we have any resolution on these programs which modify the object
->>> files in-place, rather than breaking any hard-links which may be
->>> present (eg, as a result of using ccache in hard-link mode) ?
->>
->> Good point, but I do not think anybody is using CCACHE_HARDLINK with the
->> kernel.
-> 
-> That's wrong then, because I've been using it for a very long time with
-> my nightly builds. :)  Therefore, there is somebody!
-
-OK.
+UBSAN is run-time undefined behaviour checker. It uses compile-time
+instrumentation to catch undefined behavior (UB). Compiler inserts code
+that perform certain kinds of checks before operations that could cause UB.
+If check fails (i.e. UB detected) __ubsan_handle_* function called to print error message.
 
 
->> As the manpage says, it is going to confuse make, so the time
->> saved by ccache would be offset by make trying to recompile all *.c
->> files each time.
-> 
-> From what I've noticed, it makes a big difference when running nightly
-> builds.  My nightly builds use O= and always build into an empty target
-> tree, so there are no old objects back-dated to confuse make.
-> 
-> Even if there were, make would spot that the object is older than the
-> source, and try to re-make the target again, at which point ccache
-> would re-hardlink the object after looking up the hashed preprocessed
-> source.
+Changes since V2:
+   - Dropped -fsanitize=nonnull-attribute. It checks whether null values
+     are not passed to arguments marked as requiring a non-null value by
+     the "nonnull" function attribute.
 
-That's what I meant. If you do a second make in a freshly built tree, it
-will recompile all the files again. It will all be cache hits, but each
-of the will be lot slower than comparing two timestamps. But in
-throwaway build trees you do not care, I haven't considered that...
+     We don't have much functions with such attribute (early_shadow_write() in arch/blackfin
+     and GCC builtin functions: memcpy, memset, memmove, etc). Some kernel code deliberately
+     passes NULL-ptr with 0-length to mem*(). This should be fine since we compile kernel
+     with -fno-delete-null-pointer-checks. And NULL-ptr with != 0 length will just crash.
+     So this options is useless in kernel since it produces only false positives.
+     See also: http://thread.gmane.org/gmane.linux.kernel/1810656
+       
 
-Michal
+   - Also dropped enabling/disabling various checkers via boot cmdline.
+     Boot time flag only disable reports, it can't disable compile-time code instrumentation.
+     Thus, if we ever will need to disable some checker it would be better to
+     do it in compile time via Kconfig option.
+
+   - Alignment checks produce too much noise if CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS is set.
+      Since there is no boottime option to disable alignment checks, CONFIG_UBSAN_ALIGNMENT
+      was added. It's off by default if CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS is set.
+   
+   - Couple other small misc changes/fixes.
+
+
+
+Changes since v1:
+   - Refactoring and cleanups in lib/ubsan.c including Sasha's complains.
+   - Some spelling fixes from Randy
+   - Fixed possible memory corruption on 64 big endian machines, spotted by Rasmus.
+   - Links to the relevant GCC documentation added into changelog (Peter).
+   - Added documentation.
+   - Fix deadlock caused by kernel/printk/printk.c instrumentation
+        (patch "kernel: printk: specify alignment for struct printk_log").
+   - Dropped useless 'Indirect call of a function through a function pointer of the wrong type'
+     checker. GCC doesn't support this, and as clang manual says it's for C++ only.
+   - Added checker for __builtin_unreachable() calls.
+   - Removed redundant -fno-sanitize=float-cast-overflow from CFLAGS.
+   - Added lock to prevent mixing reports.
+
+Andrey Ryabinin (2):
+  kernel: printk: specify alignment for struct printk_log
+  UBSAN: run-time undefined behavior sanity checker
+
+ Documentation/ubsan.txt               |  84 +++++++
+ Makefile                              |   3 +-
+ arch/x86/Kconfig                      |   1 +
+ arch/x86/boot/Makefile                |   1 +
+ arch/x86/boot/compressed/Makefile     |   1 +
+ arch/x86/entry/vdso/Makefile          |   1 +
+ arch/x86/realmode/rm/Makefile         |   1 +
+ drivers/firmware/efi/libstub/Makefile |   1 +
+ include/linux/sched.h                 |   3 +
+ kernel/printk/printk.c                |  10 +-
+ lib/Kconfig.debug                     |   1 +
+ lib/Kconfig.ubsan                     |  29 +++
+ lib/Makefile                          |   3 +
+ lib/ubsan.c                           | 452 ++++++++++++++++++++++++++++++++++
+ lib/ubsan.h                           |  84 +++++++
+ mm/kasan/Makefile                     |   1 +
+ scripts/Makefile.lib                  |   6 +
+ scripts/Makefile.ubsan                |  18 ++
+ 18 files changed, 694 insertions(+), 6 deletions(-)
+ create mode 100644 Documentation/ubsan.txt
+ create mode 100644 lib/Kconfig.ubsan
+ create mode 100644 lib/ubsan.c
+ create mode 100644 lib/ubsan.h
+ create mode 100644 scripts/Makefile.ubsan
+
+-- 
+2.4.10
+
