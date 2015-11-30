@@ -1,55 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:35672 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751484AbbK0OuI (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 27 Nov 2015 09:50:08 -0500
-Subject: Re: [PATCH] logfs: clarify MTD dependency
-References: <9365895.IkncCfXjo6@wuerfel>
- <20151127141406.GA29886@sepie.suse.cz> <3269089.8XYbbcUOLH@wuerfel>
-From: Michal Marek <mmarek@suse.com>
-Message-ID: <56586D9D.1000603@suse.com>
-Date: Fri, 27 Nov 2015 15:50:05 +0100
+Received: from e06smtp11.uk.ibm.com ([195.75.94.107]:37222 "EHLO
+	e06smtp11.uk.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753085AbbK3IRP (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 30 Nov 2015 03:17:15 -0500
+Received: from localhost
+	by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-kbuild@vger.kernel.org> from <heiko.carstens@de.ibm.com>;
+	Mon, 30 Nov 2015 08:17:13 -0000
+Date: Mon, 30 Nov 2015 09:17:08 +0100
+From: Heiko Carstens <heiko.carstens@de.ibm.com>
+Subject: Re: [PATCH 1/2] kbuild: add AFLAGS_REMOVE_(basename).o option
+Message-ID: <20151130081708.GA4045@osiris>
+References: <1448103599-6660-1-git-send-email-heiko.carstens@de.ibm.com>
+ <1448103599-6660-2-git-send-email-heiko.carstens@de.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <3269089.8XYbbcUOLH@wuerfel>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1448103599-6660-2-git-send-email-heiko.carstens@de.ibm.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: linux-kbuild@vger.kernel.org, =?UTF-8?Q?J=c3=b6rn_Engel?= <joern@logfs.org>, Prasad Joshi <prasadjoshi.linux@gmail.com>, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Martin Schwidefsky <schwidefsky@de.ibm.com>
 
-On 2015-11-27 15:30, Arnd Bergmann wrote:
-> On Friday 27 November 2015 15:14:06 Michal Marek wrote:
->>
->> Hi Arnd,
->>
->> I hit this as well and was about to submit a slightly different fix. Can
->> you try the logfs portion of the below patch? Proper changelog is to be
->> done, but the gist of the patch is that IS_REACHABLE(CONFIG_FOO) 
->> evaluates to 1 if CONFIG_FOO=y or we are building a module and
->> CONFIG_FOO=m.
->>
+On Sat, Nov 21, 2015 at 11:59:58AM +0100, Heiko Carstens wrote:
+> It is already possible to remove CFLAGS with the CFLAGS_REMOVE option
+> that was introduced with commit 656ee82cc855 ("kbuild: create new
+> CFLAGS_REMOVE_(basename).o option").  However it is not possible to
+> remove AFLAGS for assembler files.
 > 
-> I thought about doing it that way, and I'm sure that also worked.
-> The possible behaviors are basically:
+> So this patch just adds the AFLAGS_REMOVE option which works the same
+> like CFLAGS_REMOVE.
 > 
-> a) before your original patch, building logfs with CONFIG_MTD=m would
->    silently leave out MTD support, which was rather confusing.
+> Signed-off-by: Heiko Carstens <heiko.carstens@de.ibm.com>
+> ---
+>  scripts/Makefile.lib | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 > 
-> b) with my patch, it becomes impossible to have logfs as the built-in
->    root file system on a block device while also using CONFIG_MTD=m,
->    and that may be slightly annoying
-> 
-> c) your patch restores a), but makes it work in the case where both
->    logfs and mtd are loadable modules, which is an improvement but
->    may still confuse users.
-> 
-> My preference is still version b) as I sent, but I don't really mind
-> your version either.
+> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+> index 79e86613712f..26a48d76eb9d 100644
+> --- a/scripts/Makefile.lib
+> +++ b/scripts/Makefile.lib
+> @@ -104,8 +104,9 @@ modname_flags  = $(if $(filter 1,$(words $(modname))),\
+>  orig_c_flags   = $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS) $(KBUILD_SUBDIR_CCFLAGS) \
+>                   $(ccflags-y) $(CFLAGS_$(basetarget).o)
+>  _c_flags       = $(filter-out $(CFLAGS_REMOVE_$(basetarget).o), $(orig_c_flags))
+> -_a_flags       = $(KBUILD_CPPFLAGS) $(KBUILD_AFLAGS) $(KBUILD_SUBDIR_ASFLAGS) \
+> +orig_a_flags   = $(KBUILD_CPPFLAGS) $(KBUILD_AFLAGS) $(KBUILD_SUBDIR_ASFLAGS) \
+>                   $(asflags-y) $(AFLAGS_$(basetarget).o)
+> +_a_flags       = $(filter-out $(AFLAGS_REMOVE_$(basetarget).o), $(orig_a_flags))
+>  _cpp_flags     = $(KBUILD_CPPFLAGS) $(cppflags-y) $(CPPFLAGS_$(@F))
+>  
+>  #
 
-I used the IS_REACHABLE macro because it hides the boolean expressions
-nicely :). But I also do not insist on a particular solution. Jörn, what
-would be your preference?
+Hello Michal,
+
+since I didn't hear anything from you, I'll simply add this to the s390 tree.
+The patch should be trivial enough and is certainly not controversial.
 
 Thanks,
-Michal
+Heiko
+
