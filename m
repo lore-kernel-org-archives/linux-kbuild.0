@@ -1,103 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pandora.arm.linux.org.uk ([78.32.30.218]:45243 "EHLO
-	pandora.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755823AbbLARK0 (ORCPT
+Received: from smtprelay0210.hostedemail.com ([216.40.44.210]:35279 "EHLO
+	smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1756569AbbLARWQ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 1 Dec 2015 12:10:26 -0500
-Date: Tue, 1 Dec 2015 17:10:14 +0000
-From: Russell King - ARM Linux <linux@arm.linux.org.uk>
+	Tue, 1 Dec 2015 12:22:16 -0500
+Date: Tue, 1 Dec 2015 12:22:12 -0500
+From: Steven Rostedt <rostedt@goodmis.org>
 Subject: Re: [PATCH v2 1/2] scripts: Add a recorduidiv program
-Message-ID: <20151201171014.GY8644@n2100.arm.linux.org.uk>
+Message-ID: <20151201122212.474afce5@gandalf.local.home>
+In-Reply-To: <20151201171014.GY8644@n2100.arm.linux.org.uk>
 References: <1448488264-23400-1-git-send-email-sboyd@codeaurora.org>
- <1448488264-23400-2-git-send-email-sboyd@codeaurora.org>
- <20151125234711.GT8644@n2100.arm.linux.org.uk>
- <565C6714.802@suse.com>
- <20151130153208.GR8644@n2100.arm.linux.org.uk>
- <565C6DE9.2020302@suse.com>
- <565DC5A9.2010305@suse.cz>
- <20151201161944.GX8644@n2100.arm.linux.org.uk>
- <20151201114929.655433a2@gandalf.local.home>
+	<1448488264-23400-2-git-send-email-sboyd@codeaurora.org>
+	<20151125234711.GT8644@n2100.arm.linux.org.uk>
+	<565C6714.802@suse.com>
+	<20151130153208.GR8644@n2100.arm.linux.org.uk>
+	<565C6DE9.2020302@suse.com>
+	<565DC5A9.2010305@suse.cz>
+	<20151201161944.GX8644@n2100.arm.linux.org.uk>
+	<20151201114929.655433a2@gandalf.local.home>
+	<20151201171014.GY8644@n2100.arm.linux.org.uk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20151201114929.655433a2@gandalf.local.home>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: Michal Marek <mmarek@suse.cz>, Stephen Boyd <sboyd@codeaurora.org>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, Thomas Petazzoni <thomas.petazzoni@free-electrons.com>, linux-kbuild@vger.kernel.org, Nicolas Pitre <nico@fluxnic.net>, Arnd Bergmann <arnd@arndb.de>, =?iso-8859-1?Q?M=E5ns_Rullg=E5rd?= <mans@mansr.com>
+To: Russell King - ARM Linux <linux@arm.linux.org.uk>
+Cc: Michal Marek <mmarek@suse.cz>, Stephen Boyd <sboyd@codeaurora.org>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, Thomas Petazzoni <thomas.petazzoni@free-electrons.com>, linux-kbuild@vger.kernel.org, Nicolas Pitre <nico@fluxnic.net>, Arnd Bergmann <arnd@arndb.de>, =?UTF-8?B?TcOlbnMgUnVsbGfDpXJk?= <mans@mansr.com>
 
-On Tue, Dec 01, 2015 at 11:49:29AM -0500, Steven Rostedt wrote:
-> On Tue, 1 Dec 2015 16:19:44 +0000
-> Russell King - ARM Linux <linux@arm.linux.org.uk> wrote:
->  
-> > They hardly "do nothing", as the (eg) recordmcount plasters the build
-> > log with warnings.  A solution to that would be to make recordmcount
-> > silent if the section is already present.
+On Tue, 1 Dec 2015 17:10:14 +0000
+Russell King - ARM Linux <linux@arm.linux.org.uk> wrote:
+
+> Another suggestion - maybe recordmcount, which fstat()s the file,
+> should check the st_nlink before modifying the file, and error out
+> with a helpful error message telling people not to use hardlinks,
+> which would stop nasty surprises (and make it a rule that this should
+> be implemented as a general principle for good build behaviour) - iow,
+
+Actually I like this solution the best.
+
+> something like this (untested):
+
+Can you test it to see if it gives you the error, otherwise I need to
+set up a CCACHE_HARDLINK environment :-)
+
+I guess another solution is to do a copy instead of modifying in place
+if it detects the multiple hard link?
+
+-- Steve
+
+
 > 
-> Note, that warning found plenty of bugs when modifications of the build
-> system was being done and broke recordmcount.c. I really don't want to
-> silent it.
+>  scripts/recordmcount.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 > 
-> But for some reason, your build is causing lots of warnings and not for
-> others. Perhaps we can add a "SILENT_RECORDMCOUNT" environment variable
-> and have it set when something like CCACHE_HARDLINK or whatever is
-> causing it to trigger when we don't care.
+> diff --git a/scripts/recordmcount.c b/scripts/recordmcount.c
+> index 698768bdc581..bb7589fd7392 100644
+> --- a/scripts/recordmcount.c
+> +++ b/scripts/recordmcount.c
+> @@ -203,6 +203,10 @@ static void *mmap_file(char const *fname)
+>  		fprintf(stderr, "not a regular file: %s\n", fname);
+>  		fail_file();
+>  	}
+> +	if (sb.st_nlink != 1) {
+> +		fprintf(stderr, "file is hard linked: %s\n", fname);
+> +		fail_file();
+> +	}
+>  	addr = mmap(0, sb.st_size, PROT_READ|PROT_WRITE, MAP_PRIVATE,
+>  		    fd_map, 0);
+>  	mmap_failed = 0;
+> 
+> 
 
-The case is:
-
-Build 1 runs with CCACHE_HARDLINK enabled.
-- Each object ccache creates will be stored in ccache, and hard linked
-  into the throw-away object tree.
-- recordmcount modifies in-place the object in the object tree, which
-  also modifies the object in the ccache repository.
-
-The throw-away object tree is thrown away, and a new tree is created,
-and the build re-run.  It doesn't matter what CCACHE options are used,
-the effect will now be the same:
-- Each "hit" ccache object from the previous build will be linked or
-  copied to the new throw-away object tree.
-- recordmcount will be re-run on the object, which now contains the
-  results of the previous recordmcount in-place modification.  This
-  causes recordmcount to issue a warning.
-
-There's two solutions to this: one is to disable CCACHE_HARDLINK for
-all kernel builds which use in-place object modification.  The other
-solution is to avoid in-place object modification, instead doing a
-read-write-rename.
-
-I think I ought to ask another question though, before we decide what
-to do.  With recordmcount doing in-place object modification, what
-happens if a SIGINT or similar is received half way through the
-modification of an object?  I would hope that make would delete the
-object and not leave it around.
-
-Another suggestion - maybe recordmcount, which fstat()s the file,
-should check the st_nlink before modifying the file, and error out
-with a helpful error message telling people not to use hardlinks,
-which would stop nasty surprises (and make it a rule that this should
-be implemented as a general principle for good build behaviour) - iow,
-something like this (untested):
-
- scripts/recordmcount.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/scripts/recordmcount.c b/scripts/recordmcount.c
-index 698768bdc581..bb7589fd7392 100644
---- a/scripts/recordmcount.c
-+++ b/scripts/recordmcount.c
-@@ -203,6 +203,10 @@ static void *mmap_file(char const *fname)
- 		fprintf(stderr, "not a regular file: %s\n", fname);
- 		fail_file();
- 	}
-+	if (sb.st_nlink != 1) {
-+		fprintf(stderr, "file is hard linked: %s\n", fname);
-+		fail_file();
-+	}
- 	addr = mmap(0, sb.st_size, PROT_READ|PROT_WRITE, MAP_PRIVATE,
- 		    fd_map, 0);
- 	mmap_failed = 0;
-
-
--- 
-FTTC broadband for 0.8mile line: currently at 9.6Mbps down 400kbps up
-according to speedtest.net.
