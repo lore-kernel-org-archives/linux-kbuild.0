@@ -1,61 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from hotel311.server4you.de ([85.25.146.15]:59224 "EHLO
-	hotel311.server4you.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754435AbbK3S6M (ORCPT
+Received: from one.firstfloor.org ([193.170.194.197]:41253 "EHLO
+	one.firstfloor.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750741AbbLAGDk (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 30 Nov 2015 13:58:12 -0500
-Subject: Re: [PATCH tip v5 2/5] kbuild: Add option to turn incompatible
- pointer check into error
-References: <1448890711-5812-1-git-send-email-daniel.wagner@bmw-carit.de>
- <1448890711-5812-3-git-send-email-daniel.wagner@bmw-carit.de>
- <565C6A8B.8080103@bmw-carit.de> <20151130173842.GV26643@linux.vnet.ibm.com>
-From: Daniel Wagner <wagi@monom.org>
-Message-ID: <565C9AE2.7040408@monom.org>
-Date: Mon, 30 Nov 2015 19:52:18 +0100
-MIME-Version: 1.0
-In-Reply-To: <20151130173842.GV26643@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
+	Tue, 1 Dec 2015 01:03:40 -0500
+From: Andi Kleen <andi@firstfloor.org>
+Subject: [PATCH] Kbuild: Enable interprocedural register allocation for gcc 5
+Date: Mon, 30 Nov 2015 22:00:43 -0800
+Message-Id: <1448949643-6059-1-git-send-email-andi@firstfloor.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: paulmck@linux.vnet.ibm.com, Daniel Wagner <daniel.wagner@bmw-carit.de>
-Cc: linux-kernel@vger.kernel.org, linux-rt-users@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, Peter Zijlstra <peterz@infradead.org>, linux-kbuild@vger.kernel.org, Marcelo Tosatti <mtosatti@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, Paul Gortmaker <paul.gortmaker@windriver.com>, Steven Rostedt <rostedt@goodmis.org>, Boqun Feng <boqun.feng@gmail.com>
+To: mmarek@suse.com
+Cc: torvalds@linux-foundation.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, Andi Kleen <ak@linux.intel.com>
 
-Hi Paul,
+From: Andi Kleen <ak@linux.intel.com>
 
-On 11/30/2015 06:38 PM, Paul E. McKenney wrote:
-> On Mon, Nov 30, 2015 at 04:26:03PM +0100, Daniel Wagner wrote:
->> On 11/30/2015 02:38 PM, Daniel Wagner wrote:
->>> With the introduction of the simple wait API we have two very
->>> similar APIs in the kernel. For example wake_up() and swake_up()
->>> is only one character away. Although the compiler will warn
->>> happily the wrong usage it keeps on going an even links the kernel.
->>> Thomas and Peter would rather like to see early missuses reported
->>> as error early on.
->>>
->>> In a first attempt we tried to wrap all swait and wait calls
->>> into a macro which has an compile time type assertion. The result
->>> was pretty ugly and wasn't able to catch all wrong usages.
->>> woken_wake_function(), autoremove_wake_function() and wake_bit_function()
->>> are assigned as function pointers. Wrapping them with a macro around is
->>> not possible. Prefixing them with '_' was also not a real option
->>> because there some users in the kernel which do use them as well.
->>> All in all this attempt looked to intrusive and too ugly.
->>>
->>> An alternative is to turn the pointer type check into an error which
->>> catches wrong type uses. Obviously not only the swait/wait ones. That
->>> isn't a bad thing either. Though for the beginning let's introduce it
->>> as options in the kernel hacking section.
->>
->> The kbuild bot found one problem for allmodconfig. I just send a fix for
->> it ("regmap: Fix leftover from struct reg_default to struct reg_sequence
->> change").
->
-> This will result in an updated series, correct?
+gcc 5 has a new -fipa-ra option that enables limited interprocedural
+register allocation. When it generates a function it remembers
+what registers it clobbered. Later when the function is called
+it only saves registers that are actually clobbered by the function.
 
-Not necessarily. This patch just points very verbose the incorrect 
-pointer usage in regmap_register_path() users with allmodconfig. This 
-series itself should be okay (unless I missed something).
+This only really works when caller and callee are in the same compilation unit
+(except with LTO)
 
-cheers,
-daniel
+In principle this violates the ABI which specifies which registers
+are saved and which are clobbered on a call. However there shouldn't
+be anything else relying on this: while we have multiple subsystems
+that patch binaries (like ftrace, kprobes) they all cannot know
+which registers are used as arguments, so always need to save/restore
+all registers.
+
+Similarly gdb and other debuggers cannot rely on the ABI either.
+
+It has some risk that it breaks something obscure, but so far I haven't
+seen or found anything.
+
+On my system with gcc 5.2 it saves about 40k in binary size
+
+   text    data     bss     dec     hex filename
+9583446 2178288 1675264 13436998         cd0846 vmlinux-base
+9542180 2178096 1675264 13395540         cc6654 vmlinux-ipara   -0.4%
+
+pretty much all in missing spill code. So it's not a dramatic win,
+but still a nice improvement.
+
+Open: for now I enabled it for all architectures, although it's
+only tested on x86-64. It may be safer to move it to be x86
+specific or guard with an CONFIG option, until more testing can be done.
+
+Signed-off-by: Andi Kleen <ak@linux.intel.com>
+---
+ Makefile | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/Makefile b/Makefile
+index 2ffdf9d..c95320f 100644
+--- a/Makefile
++++ b/Makefile
+@@ -626,6 +626,12 @@ KBUILD_CFLAGS += $(call cc-option,-fno-reorder-blocks,) \
+                  $(call cc-option,-fno-partial-inlining)
+ endif
+ 
++# Ask gcc to use interprocedural register allocation when possible.
++# This allows it to violate the callee-saved register ABI and avoid
++# generating register spills in the caller when it knows the function does
++# not clobber these registers
++KBUILD_CFLAGS += $(call cc-option,-fipa-ra,)
++
+ ifneq ($(CONFIG_FRAME_WARN),0)
+ KBUILD_CFLAGS += $(call cc-option,-Wframe-larger-than=${CONFIG_FRAME_WARN})
+ endif
+-- 
+2.6.3
+
