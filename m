@@ -1,75 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from one.firstfloor.org ([193.170.194.197]:41253 "EHLO
-	one.firstfloor.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750741AbbLAGDk (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 1 Dec 2015 01:03:40 -0500
-From: Andi Kleen <andi@firstfloor.org>
-Subject: [PATCH] Kbuild: Enable interprocedural register allocation for gcc 5
-Date: Mon, 30 Nov 2015 22:00:43 -0800
-Message-Id: <1448949643-6059-1-git-send-email-andi@firstfloor.org>
+Received: from mx2.suse.de ([195.135.220.15]:49309 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754883AbbLAQHK (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 1 Dec 2015 11:07:10 -0500
+Subject: Re: [PATCH v2 1/2] scripts: Add a recorduidiv program
+References: <1448488264-23400-1-git-send-email-sboyd@codeaurora.org>
+ <1448488264-23400-2-git-send-email-sboyd@codeaurora.org>
+ <20151125234711.GT8644@n2100.arm.linux.org.uk> <565C6714.802@suse.com>
+ <20151130153208.GR8644@n2100.arm.linux.org.uk> <565C6DE9.2020302@suse.com>
+From: Michal Marek <mmarek@suse.cz>
+Message-ID: <565DC5A9.2010305@suse.cz>
+Date: Tue, 1 Dec 2015 17:07:05 +0100
+MIME-Version: 1.0
+In-Reply-To: <565C6DE9.2020302@suse.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mmarek@suse.com
-Cc: torvalds@linux-foundation.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, Andi Kleen <ak@linux.intel.com>
+To: Russell King - ARM Linux <linux@arm.linux.org.uk>
+Cc: Stephen Boyd <sboyd@codeaurora.org>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org, Thomas Petazzoni <thomas.petazzoni@free-electrons.com>, linux-kbuild@vger.kernel.org, Nicolas Pitre <nico@fluxnic.net>, Arnd Bergmann <arnd@arndb.de>, Steven Rostedt <rostedt@goodmis.org>, =?UTF-8?B?TcOlbnMgUnVsbGfDpXJk?= <mans@mansr.com>
 
-From: Andi Kleen <ak@linux.intel.com>
+On 2015-11-30 16:40, Michal Marek wrote:
+> On 2015-11-30 16:32, Russell King - ARM Linux wrote:
+>> On Mon, Nov 30, 2015 at 04:11:16PM +0100, Michal Marek wrote:
+>>> On 2015-11-26 00:47, Russell King - ARM Linux wrote:
+>>>> Do we have any resolution on these programs which modify the object
+>>>> files in-place, rather than breaking any hard-links which may be
+>>>> present (eg, as a result of using ccache in hard-link mode) ?
+>>>
+>>> Good point, but I do not think anybody is using CCACHE_HARDLINK with the
+>>> kernel.
+>>
+>> That's wrong then, because I've been using it for a very long time with
+>> my nightly builds. :)  Therefore, there is somebody!
+> 
+> OK.
 
-gcc 5 has a new -fipa-ra option that enables limited interprocedural
-register allocation. When it generates a function it remembers
-what registers it clobbered. Later when the function is called
-it only saves registers that are actually clobbered by the function.
+So, both recordmcount and the new recordudiv program are idempotent.
+They check if the to-be-added section is already present and do nothing.
+So the result is correct even with CCACHE_HARDLINK, just the
+intermediate file might be incorrect. If this still is considered an
+issue, I suggest clearing CCACHE_HARDLINK when using any of these
+postprocessors, so as not to penalize other use cases.
 
-This only really works when caller and callee are in the same compilation unit
-(except with LTO)
+The perl recordmcount does not modify the file in place.
 
-In principle this violates the ABI which specifies which registers
-are saved and which are clobbered on a call. However there shouldn't
-be anything else relying on this: while we have multiple subsystems
-that patch binaries (like ftrace, kprobes) they all cannot know
-which registers are used as arguments, so always need to save/restore
-all registers.
-
-Similarly gdb and other debuggers cannot rely on the ABI either.
-
-It has some risk that it breaks something obscure, but so far I haven't
-seen or found anything.
-
-On my system with gcc 5.2 it saves about 40k in binary size
-
-   text    data     bss     dec     hex filename
-9583446 2178288 1675264 13436998         cd0846 vmlinux-base
-9542180 2178096 1675264 13395540         cc6654 vmlinux-ipara   -0.4%
-
-pretty much all in missing spill code. So it's not a dramatic win,
-but still a nice improvement.
-
-Open: for now I enabled it for all architectures, although it's
-only tested on x86-64. It may be safer to move it to be x86
-specific or guard with an CONFIG option, until more testing can be done.
-
-Signed-off-by: Andi Kleen <ak@linux.intel.com>
----
- Makefile | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/Makefile b/Makefile
-index 2ffdf9d..c95320f 100644
---- a/Makefile
-+++ b/Makefile
-@@ -626,6 +626,12 @@ KBUILD_CFLAGS += $(call cc-option,-fno-reorder-blocks,) \
-                  $(call cc-option,-fno-partial-inlining)
- endif
- 
-+# Ask gcc to use interprocedural register allocation when possible.
-+# This allows it to violate the callee-saved register ABI and avoid
-+# generating register spills in the caller when it knows the function does
-+# not clobber these registers
-+KBUILD_CFLAGS += $(call cc-option,-fipa-ra,)
-+
- ifneq ($(CONFIG_FRAME_WARN),0)
- KBUILD_CFLAGS += $(call cc-option,-Wframe-larger-than=${CONFIG_FRAME_WARN})
- endif
--- 
-2.6.3
-
+Michal
