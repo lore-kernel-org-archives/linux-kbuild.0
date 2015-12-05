@@ -1,58 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.linuxfoundation.org ([140.211.169.12]:48765 "EHLO
-	mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754700AbbLEAkY (ORCPT
+Received: from mail-wm0-f50.google.com ([74.125.82.50]:33301 "EHLO
+	mail-wm0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753016AbbLEJng (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 4 Dec 2015 19:40:24 -0500
-Date: Fri, 4 Dec 2015 16:40:22 -0800
-From: Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH v4 3/3] UBSAN: run-time undefined behavior sanity
- checker
-Message-Id: <20151204164022.ae404aa5a78dd87d979ed60f@linux-foundation.org>
-In-Reply-To: <201512042231.PdGxWJsA%fengguang.wu@intel.com>
-References: <1449157807-20298-4-git-send-email-aryabinin@virtuozzo.com>
-	<201512042231.PdGxWJsA%fengguang.wu@intel.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+	Sat, 5 Dec 2015 04:43:36 -0500
+Subject: Re: [PATCH] fixdep: constify strrcmp arguments
+References: <1447870035-14677-1-git-send-email-nicolas.iooss_linux@m4x.org>
+From: Nicolas Iooss <nicolas.iooss_linux@m4x.org>
+Message-ID: <5662B1C4.5050104@m4x.org>
+Date: Sat, 5 Dec 2015 10:43:32 +0100
+MIME-Version: 1.0
+In-Reply-To: <1447870035-14677-1-git-send-email-nicolas.iooss_linux@m4x.org>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: kbuild test robot <lkp@intel.com>
-Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, kbuild-all@01.org, linux-kernel@vger.kernel.org, Peter Zijlstra <peterz@infradead.org>, Sasha Levin <sasha.levin@oracle.com>, Randy Dunlap <rdunlap@infradead.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Jonathan Corbet <corbet@lwn.net>, Michal Marek <mmarek@suse.cz>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Yury Gribov <y.gribov@samsung.com>, Dmitry Vyukov <dvyukov@google.com>, Konstantin Khlebnikov <koct9i@gmail.com>, Kostya Serebryany <kcc@google.com>, x86@kernel.org, linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
 
-On Fri, 4 Dec 2015 22:27:36 +0800 kbuild test robot <lkp@intel.com> wrote:
+Hello,
+I sent the path below a few weeks ago and did not have any feedback.
+Could you please review it?
 
-> [auto build test WARNING on next-20151203]
-> [cannot apply to tip/x86/core kbuild/rc-fixes v4.4-rc3 v4.4-rc2 v4.4-rc1 v4.4-rc3]
+Thanks,
+Nicolas
+
+On 11/18/2015 07:07 PM, Nicolas Iooss wrote:
+> strrcmp only performs read access to the memory addressed by its
+> arguments so make them const pointers.
 > 
-> url:    https://github.com/0day-ci/linux/commits/Andrey-Ryabinin/UBSAN-run-time-undefined-behavior-sanity-checker/20151204-202547
-> config: i386-allmodconfig (attached as .config)
-> reproduce:
->         # save the attached .config to linux build tree
->         make ARCH=i386 
+> Signed-off-by: Nicolas Iooss <nicolas.iooss_linux@m4x.org>
+> ---
+>  scripts/basic/fixdep.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> All warnings (new ones prefixed by >>):
+> diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
+> index c68fd61fdc42..5b327c67a828 100644
+> --- a/scripts/basic/fixdep.c
+> +++ b/scripts/basic/fixdep.c
+> @@ -251,7 +251,7 @@ static void parse_config_file(const char *map, size_t len)
+>  }
+>  
+>  /* test is s ends in sub */
+> -static int strrcmp(char *s, char *sub)
+> +static int strrcmp(const char *s, const char *sub)
+>  {
+>  	int slen = strlen(s);
+>  	int sublen = strlen(sub);
 > 
->    lib/ubsan.c: In function 'val_to_string':
-> >> lib/ubsan.c:121:8: warning: unused variable 'val' [-Wunused-variable]
->      u_max val = get_unsigned_val(type, value);
-
-I did this.
-
---- a/lib/ubsan.c~ubsan-run-time-undefined-behavior-sanity-checker-fix
-+++ a/lib/ubsan.c
-@@ -118,11 +118,11 @@ static u_max get_unsigned_val(struct typ
- static void val_to_string(char *str, size_t size, struct type_descriptor *type,
- 	unsigned long value)
- {
--	u_max val = get_unsigned_val(type, value);
--
- 	if (type_is_int(type)) {
- 		if (type_bit_width(type) == 128) {
- #ifdef CONFIG_ARCH_SUPPORTS_INT128
-+			u_max val = get_unsigned_val(type, value);
-+
- 			scnprintf(str, size, "0x%08x%08x%08x%08x",
- 				(u32)(val >> 96),
- 				(u32)(val >> 64),
 
