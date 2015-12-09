@@ -1,62 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from asavdk4.altibox.net ([109.247.116.15]:52869 "EHLO
-	asavdk4.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753203AbbLIVjH (ORCPT
+Received: from mail-gw2-out.broadcom.com ([216.31.210.63]:26264 "EHLO
+	mail-gw2-out.broadcom.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753901AbbLIW4Z (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 9 Dec 2015 16:39:07 -0500
-Date: Wed, 9 Dec 2015 22:32:56 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: Behaviour of kernel makefiles when entering a subdir using a
- config symbol = m
-Message-ID: <20151209213255.GA11031@ravnborg.org>
-References: <56687204.4080404@ti.com>
+	Wed, 9 Dec 2015 17:56:25 -0500
+From: Markus Mayer <mmayer@broadcom.com>
+Subject: [RESEND PATCH] kconfig: allow kconfig to handle longer path names
+Date: Wed, 9 Dec 2015 14:56:12 -0800
+Message-ID: <1449701772-25095-1-git-send-email-mmayer@broadcom.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <56687204.4080404@ti.com>
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Tomi Valkeinen <tomi.valkeinen@ti.com>
-Cc: Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org
+To: "Yann E. Morin" <yann.morin.1998@free.fr>
+Cc: Michal Marek <mmarek@suse.com>, Sam Ravnborg <sam@ravnborg.org>, Linux Kbuild <linux-kbuild@vger.kernel.org>, Linux Kernel <linux-kernel@vger.kernel.org>, Broadcom Kernel List <bcm-kernel-feedback-list@broadcom.com>, Markus Mayer <mmayer@broadcom.com>
 
-On Wed, Dec 09, 2015 at 08:25:08PM +0200, Tomi Valkeinen wrote:
-> Hi,
-> 
-> I wonder if this is as designed, or a bug:
-> 
-> I have a makefile which has
-> 
-> obj-$(CONFIG_FOO) += foo/
-> 
-> In the foo directory, I have a makefile which has
-> 
-> obj-$(CONFIG_FOO_BAR) += bar.o
-> 
-> The values of the variables are
-> 
-> CONFIG_FOO=m
-> CONFIG_FOO_BAR=y
-> 
-> When building the kernel with the above setup, I would expect make to
-> enter the foo/ directory, and build 'bar.o' into the kernel image.
-> 
-> And make does enter the directory, and does compile 'bar.o', but I think
-> 'bar.o' doesn't end up anywhere. At least it's not compiled into the
-> kernel image.
-kbuild may enter a sub directory for two purposes:
-1) to build object files to be part of the final image
-   Only subdirs specified using obj-y is visited.
+The current (arbitrary) limit of 128 characters for path names has
+proven too short for Android builds, as longer path names are used
+there.
 
-2) to build object files that will be included in a module
-   Subdirs specified with obj-y and obj-m is visited
+Change conf.c, so it can handle path lengths up to PATH_MAX characters.
 
-Since you have the following code in your Makefile:
+Signed-off-by: Markus Mayer <mmayer@broadcom.com>
+---
+ scripts/kconfig/conf.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-    obj-m += foo/
+diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
+index 6c20431..866369f 100644
+--- a/scripts/kconfig/conf.c
++++ b/scripts/kconfig/conf.c
+@@ -5,6 +5,7 @@
+ 
+ #include <locale.h>
+ #include <ctype.h>
++#include <limits.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+@@ -41,7 +42,7 @@ static int tty_stdio;
+ static int valid_stdin = 1;
+ static int sync_kconfig;
+ static int conf_cnt;
+-static char line[128];
++static char line[PATH_MAX];
+ static struct menu *rootEntry;
+ 
+ static void print_help(struct menu *menu)
+@@ -109,7 +110,7 @@ static int conf_askvalue(struct symbol *sym, const char *def)
+ 		/* fall through */
+ 	case oldaskconfig:
+ 		fflush(stdout);
+-		xfgets(line, 128, stdin);
++		xfgets(line, sizeof(line), stdin);
+ 		if (!tty_stdio)
+ 			printf("\n");
+ 		return 1;
+@@ -311,7 +312,7 @@ static int conf_choice(struct menu *menu)
+ 			/* fall through */
+ 		case oldaskconfig:
+ 			fflush(stdout);
+-			xfgets(line, 128, stdin);
++			xfgets(line, sizeof(line), stdin);
+ 			strip(line);
+ 			if (line[0] == '?') {
+ 				print_help(menu);
+-- 
+1.9.1
 
-then foo/ is only visited to build modules.
-
-So bar.o is built but is NOT included in the final image.
-This is also the behaviour you see.
-
-	Sam
