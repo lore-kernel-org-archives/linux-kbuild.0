@@ -1,77 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bear.ext.ti.com ([192.94.94.41]:59656 "EHLO bear.ext.ti.com"
+Received: from mail5.windriver.com ([192.103.53.11]:55494 "EHLO mail5.wrs.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753147AbbLISZO (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 9 Dec 2015 13:25:14 -0500
-From: Tomi Valkeinen <tomi.valkeinen@ti.com>
-Subject: Behaviour of kernel makefiles when entering a subdir using a config
- symbol = m
-Message-ID: <56687204.4080404@ti.com>
-Date: Wed, 9 Dec 2015 20:25:08 +0200
+	id S1752274AbbLIVIP (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 9 Dec 2015 16:08:15 -0500
+Date: Wed, 9 Dec 2015 16:06:10 -0500
+From: Paul Gortmaker <paul.gortmaker@windriver.com>
+Subject: Re: [PATCH] staging: drop kbuild workaround dummy module from top dir
+Message-ID: <20151209210609.GR22885@windriver.com>
+References: <1447721929-45813-1-git-send-email-paul.gortmaker@windriver.com>
+ <564CB927.5020105@suse.com>
+ <20151118175330.GA5988@kroah.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature";
-	boundary="9EAtk5nwsVl3MtDnSMNlD117wfc3B8Tsg"
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20151118175330.GA5988@kroah.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Michal Marek <mmarek@suse.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
---9EAtk5nwsVl3MtDnSMNlD117wfc3B8Tsg
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+[Re: [PATCH] staging: drop kbuild workaround dummy module from top dir] On 18/11/2015 (Wed 09:53) Greg Kroah-Hartman wrote:
 
-Hi,
+> On Wed, Nov 18, 2015 at 06:45:11PM +0100, Michal Marek wrote:
+> > Dne 17.11.2015 v 01:58 Paul Gortmaker napsal(a):
+> > > This is essentially a revert of 86f69fe9c069dd8608d238581eea259caa1dfc99
+> > > ("Staging: workaround build system bug"), but to call it a revert would
+> > > imply it was wrong -- rather it seems more like it is just no longer
+> > > required anymore.
+> > 
+> > Acked-by: Michal Marek <mmarek@suse.com>
+> > 
+> > In fact, I can't even reproduce the original bug with 2.6.27 + the
+> > initial staging series. I also do not remember any fix for such bug in
+> > the recent years. 4b024242e8a4 ("kbuild: Fix linking error built-in.o no
+> > such file or directory") is related, but fixing a different problem.
+> 
+> I can't remember the issue at the moment either, but it was a problem
+> with some sort of config, I'll queue this up and see if anything breaks
+> :)
 
-I wonder if this is as designed, or a bug:
+Did you detect any fallout?  Just wondering since I didn't see it loop
+around in linux-next via staging #staging-next yet...
 
-I have a makefile which has
+Thanks,
+Paul.
+--
 
-obj-$(CONFIG_FOO) +=3D foo/
-
-In the foo directory, I have a makefile which has
-
-obj-$(CONFIG_FOO_BAR) +=3D bar.o
-
-The values of the variables are
-
-CONFIG_FOO=3Dm
-CONFIG_FOO_BAR=3Dy
-
-When building the kernel with the above setup, I would expect make to
-enter the foo/ directory, and build 'bar.o' into the kernel image.
-
-And make does enter the directory, and does compile 'bar.o', but I think
-'bar.o' doesn't end up anywhere. At least it's not compiled into the
-kernel image.
-
-If CONFIG_FOO=3Dy, then 'bar.o' will be built in to the kernel image.
-
-Am I doing something wrong here?
-
- Tomi
-
-
---9EAtk5nwsVl3MtDnSMNlD117wfc3B8Tsg
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJWaHIFAAoJEPo9qoy8lh71+xMP/1M7UO/8UfHKtC5KJPVjeylT
-lqCK35t+tyHZ9bUTdRJDzcogbmlofM4JMQiVvOcrWH/Oq/n4mb6FTZr3bUjlDU0l
-dE6bofKoa3VHec7QTn8fzY6+eImh7pMM8NYsv3GWyG4/OnjQLcopCCkzGc0mBlGb
-kgNyJsiayXFJeW/FCxDzVzVENLArHCI2M7uIz+ALvEtW896YkMIatIRPDjQd0bPO
-GayVVwkVhvT9lR6kgxStB/UzS65hK0nmxje0H1zjoNWjVg/1ZdYJ/iGqwbv65vnZ
-pf+U1R9RPj8wNb6E/rYGPvLt+YOvLgire9Ba9K2AO5zXr2YoeQ2DmbqnRSQYdkLy
-ntpPy9GLk4ZPPv9E5hzLZcGcwq1LgxvnJiSLh/EthZPyYj97/BPJdi/oJVjqz8Im
-FzwXt02wEpZ2vG9wBw3wQyZO5wrNiGx+fgnQ3DkTjCPN7JpHbBuk2MKIXFjBuv22
-h9rBdLwttTycitzfODA0Ddz9FmY8d/+4tWAFQVuWqjtt4IG4IuHp8e2OrNPlf+WN
-mXDaHFMR+2JDEHeRB0yaYNKQyRzTgR1eFnTeJR1K9ASyn0Ur+04ZTRklif+GuLXg
-IJm7ZVi5pj8ROZk2Tn25So+ELVdlBIhvA1GS2flK0Gk6ynu/3Sli4vccLFfX0x3G
-5iRv827n3sYW8XGMiFDX
-=CUP4
------END PGP SIGNATURE-----
-
---9EAtk5nwsVl3MtDnSMNlD117wfc3B8Tsg--
+> 
+> thanks,
+> 
+> greg k-h
