@@ -1,58 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi0-f46.google.com ([209.85.218.46]:34923 "EHLO
-	mail-oi0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752048AbbLIVec (ORCPT
+Received: from asavdk4.altibox.net ([109.247.116.15]:52869 "EHLO
+	asavdk4.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753203AbbLIVjH (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 9 Dec 2015 16:34:32 -0500
-Received: by oige206 with SMTP id e206so34211189oig.2
-        for <linux-kbuild@vger.kernel.org>; Wed, 09 Dec 2015 13:34:32 -0800 (PST)
+	Wed, 9 Dec 2015 16:39:07 -0500
+Date: Wed, 9 Dec 2015 22:32:56 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: Behaviour of kernel makefiles when entering a subdir using a
+ config symbol = m
+Message-ID: <20151209213255.GA11031@ravnborg.org>
+References: <56687204.4080404@ti.com>
 MIME-Version: 1.0
-In-Reply-To: <1402652395-28779-1-git-send-email-mmarek@suse.cz>
-References: <CALCETrWSX1nVqyfe0Ee2rUvpHosTRyW8GSJfr52UCpT566-eWA@mail.gmail.com>
- <1402652395-28779-1-git-send-email-mmarek@suse.cz>
-From: Andy Lutomirski <luto@amacapital.net>
-Date: Wed, 9 Dec 2015 13:34:12 -0800
-Message-ID: <CALCETrWToro=6RvnDm023eOooqCmkRixRpLYAcFnPvJES8jAjA@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: Do not run modules_install and install in paralel
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <56687204.4080404@ti.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: "H. Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: Tomi Valkeinen <tomi.valkeinen@ti.com>
+Cc: Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org
 
-On Fri, Jun 13, 2014 at 2:39 AM, Michal Marek <mmarek@suse.cz> wrote:
-> Based on a x86-only patch by Andy Lutomirski <luto@amacapital.net>
->
-> With modular kernels, 'make install' is going to need the installed
-> modules at some point to generate the initramfs.
->
-> Signed-off-by: Michal Marek <mmarek@suse.cz>
-> ---
->  Makefile | 6 ++++++
->  1 file changed, 6 insertions(+)
->
-> diff --git a/Makefile b/Makefile
-> index 7680d7c..7e5e483 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -503,6 +503,12 @@ ifeq ($(KBUILD_EXTMOD),)
->                  endif
->          endif
->  endif
-> +# install and module_install need also be processed one by one
-> +ifneq ($(filter install,$(MAKECMDGOALS)),)
-> +        ifneq ($(filter modules_install,$(MAKECMDGOALS)),)
-> +               mixed-targets := 1
-> +        endif
-> +endif
->
->  ifeq ($(mixed-targets),1)
->  # ===========================================================================
-> --
-> 1.9.2
->
+On Wed, Dec 09, 2015 at 08:25:08PM +0200, Tomi Valkeinen wrote:
+> Hi,
+> 
+> I wonder if this is as designed, or a bug:
+> 
+> I have a makefile which has
+> 
+> obj-$(CONFIG_FOO) += foo/
+> 
+> In the foo directory, I have a makefile which has
+> 
+> obj-$(CONFIG_FOO_BAR) += bar.o
+> 
+> The values of the variables are
+> 
+> CONFIG_FOO=m
+> CONFIG_FOO_BAR=y
+> 
+> When building the kernel with the above setup, I would expect make to
+> enter the foo/ directory, and build 'bar.o' into the kernel image.
+> 
+> And make does enter the directory, and does compile 'bar.o', but I think
+> 'bar.o' doesn't end up anywhere. At least it's not compiled into the
+> kernel image.
+kbuild may enter a sub directory for two purposes:
+1) to build object files to be part of the final image
+   Only subdirs specified using obj-y is visited.
 
-This patch seems to have gotten lost.  Do you still like it?  If so,
-can someone apply it, please?
+2) to build object files that will be included in a module
+   Subdirs specified with obj-y and obj-m is visited
 
---Andy
+Since you have the following code in your Makefile:
+
+    obj-m += foo/
+
+then foo/ is only visited to build modules.
+
+So bar.o is built but is NOT included in the final image.
+This is also the behaviour you see.
+
+	Sam
