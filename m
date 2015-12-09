@@ -1,52 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail5.windriver.com ([192.103.53.11]:55494 "EHLO mail5.wrs.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752274AbbLIVIP (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 9 Dec 2015 16:08:15 -0500
-Date: Wed, 9 Dec 2015 16:06:10 -0500
-From: Paul Gortmaker <paul.gortmaker@windriver.com>
-Subject: Re: [PATCH] staging: drop kbuild workaround dummy module from top dir
-Message-ID: <20151209210609.GR22885@windriver.com>
-References: <1447721929-45813-1-git-send-email-paul.gortmaker@windriver.com>
- <564CB927.5020105@suse.com>
- <20151118175330.GA5988@kroah.com>
+Received: from mail-oi0-f46.google.com ([209.85.218.46]:34923 "EHLO
+	mail-oi0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752048AbbLIVec (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 9 Dec 2015 16:34:32 -0500
+Received: by oige206 with SMTP id e206so34211189oig.2
+        for <linux-kbuild@vger.kernel.org>; Wed, 09 Dec 2015 13:34:32 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20151118175330.GA5988@kroah.com>
+In-Reply-To: <1402652395-28779-1-git-send-email-mmarek@suse.cz>
+References: <CALCETrWSX1nVqyfe0Ee2rUvpHosTRyW8GSJfr52UCpT566-eWA@mail.gmail.com>
+ <1402652395-28779-1-git-send-email-mmarek@suse.cz>
+From: Andy Lutomirski <luto@amacapital.net>
+Date: Wed, 9 Dec 2015 13:34:12 -0800
+Message-ID: <CALCETrWToro=6RvnDm023eOooqCmkRixRpLYAcFnPvJES8jAjA@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: Do not run modules_install and install in paralel
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Michal Marek <mmarek@suse.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: "H. Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 
-[Re: [PATCH] staging: drop kbuild workaround dummy module from top dir] On 18/11/2015 (Wed 09:53) Greg Kroah-Hartman wrote:
+On Fri, Jun 13, 2014 at 2:39 AM, Michal Marek <mmarek@suse.cz> wrote:
+> Based on a x86-only patch by Andy Lutomirski <luto@amacapital.net>
+>
+> With modular kernels, 'make install' is going to need the installed
+> modules at some point to generate the initramfs.
+>
+> Signed-off-by: Michal Marek <mmarek@suse.cz>
+> ---
+>  Makefile | 6 ++++++
+>  1 file changed, 6 insertions(+)
+>
+> diff --git a/Makefile b/Makefile
+> index 7680d7c..7e5e483 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -503,6 +503,12 @@ ifeq ($(KBUILD_EXTMOD),)
+>                  endif
+>          endif
+>  endif
+> +# install and module_install need also be processed one by one
+> +ifneq ($(filter install,$(MAKECMDGOALS)),)
+> +        ifneq ($(filter modules_install,$(MAKECMDGOALS)),)
+> +               mixed-targets := 1
+> +        endif
+> +endif
+>
+>  ifeq ($(mixed-targets),1)
+>  # ===========================================================================
+> --
+> 1.9.2
+>
 
-> On Wed, Nov 18, 2015 at 06:45:11PM +0100, Michal Marek wrote:
-> > Dne 17.11.2015 v 01:58 Paul Gortmaker napsal(a):
-> > > This is essentially a revert of 86f69fe9c069dd8608d238581eea259caa1dfc99
-> > > ("Staging: workaround build system bug"), but to call it a revert would
-> > > imply it was wrong -- rather it seems more like it is just no longer
-> > > required anymore.
-> > 
-> > Acked-by: Michal Marek <mmarek@suse.com>
-> > 
-> > In fact, I can't even reproduce the original bug with 2.6.27 + the
-> > initial staging series. I also do not remember any fix for such bug in
-> > the recent years. 4b024242e8a4 ("kbuild: Fix linking error built-in.o no
-> > such file or directory") is related, but fixing a different problem.
-> 
-> I can't remember the issue at the moment either, but it was a problem
-> with some sort of config, I'll queue this up and see if anything breaks
-> :)
+This patch seems to have gotten lost.  Do you still like it?  If so,
+can someone apply it, please?
 
-Did you detect any fallout?  Just wondering since I didn't see it loop
-around in linux-next via staging #staging-next yet...
-
-Thanks,
-Paul.
---
-
-> 
-> thanks,
-> 
-> greg k-h
+--Andy
