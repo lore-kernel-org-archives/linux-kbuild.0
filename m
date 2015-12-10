@@ -1,43 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pa0-f49.google.com ([209.85.220.49]:33255 "EHLO
-	mail-pa0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750933AbbLJQqk (ORCPT
+Received: from asavdk3.altibox.net ([109.247.116.14]:49087 "EHLO
+	asavdk3.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750783AbbLJUqz (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 10 Dec 2015 11:46:40 -0500
-Date: Fri, 11 Dec 2015 00:35:19 +0800
-From: Wang YanQing <udknight@gmail.com>
-Subject: [PATCH] Makefile: revert "Makefile: Document ability to make
- file.lst and file.S" partially
-Message-ID: <20151210163518.GB18947@udknight>
+	Thu, 10 Dec 2015 15:46:55 -0500
+Date: Thu, 10 Dec 2015 21:46:38 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: Behaviour of kernel makefiles when entering a subdir using a
+ config symbol = m
+Message-ID: <20151210204638.GA32218@ravnborg.org>
+References: <56687204.4080404@ti.com>
+ <20151209213255.GA11031@ravnborg.org>
+ <56692D6D.6060607@ti.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <56692D6D.6060607@ti.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mmarek@suse.com
-Cc: joe@perches.com, xiyou.wangcong@gmail.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Tomi Valkeinen <tomi.valkeinen@ti.com>
+Cc: Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org
 
-Commit 627189797807 ("Makefile: Document ability to make file.lst
-and file.S") document ability to make file.S, but there isn't such
-ability in kbuild, so revert it.
+On Thu, Dec 10, 2015 at 09:44:45AM +0200, Tomi Valkeinen wrote:
+> Hi Sam,
+> 
+> On 09/12/15 23:32, Sam Ravnborg wrote:
+> 
+> > kbuild may enter a sub directory for two purposes:
+> > 1) to build object files to be part of the final image
+> >    Only subdirs specified using obj-y is visited.
+> > 
+> > 2) to build object files that will be included in a module
+> >    Subdirs specified with obj-y and obj-m is visited
+> > 
+> > Since you have the following code in your Makefile:
+> > 
+> >     obj-m += foo/
+> > 
+> > then foo/ is only visited to build modules.
+> > 
+> > So bar.o is built but is NOT included in the final image.
+> > This is also the behaviour you see.
+> 
+> Right.
+> 
+> We have three drivers (one fbdev, two drm), each of which can be built
+> as a module. But each of them also may require small boot-time setup,
+> which needs to be built-in.
+> 
+> I can get around the problem by entering the dir with obj-y, or by
+> creating a new extra config define which is y/n, and using that in the
+> makefile. The former makes make enter the dir even if the driver is not
+> enabled, and latter creates a config symbol only to solve this problem.
+The extra config symbol is the most elegant solution here IMO.
+Make sure to document that this config symbol enables the boot-time
+setup stuff.
 
-Signed-off-by: Wang YanQing <udknight@gmail.com>
----
- Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/Makefile b/Makefile
-index d7e2060..e2d056b 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1277,7 +1277,7 @@ help:
- 	@echo  '  firmware_install- Install all firmware to INSTALL_FW_PATH'
- 	@echo  '                    (default: $$(INSTALL_MOD_PATH)/lib/firmware)'
- 	@echo  '  dir/            - Build all files in dir and below'
--	@echo  '  dir/file.[oisS] - Build specified target only'
-+	@echo  '  dir/file.[ois]  - Build specified target only'
- 	@echo  '  dir/file.lst    - Build specified mixed source/assembly target only'
- 	@echo  '                    (requires a recent binutils and recent build (System.map))'
- 	@echo  '  dir/file.ko     - Build module including final link'
--- 
-1.8.5.6.2.g3d8a54e.dirty
+	Sam
