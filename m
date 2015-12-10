@@ -1,70 +1,30 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-gw2-out.broadcom.com ([216.31.210.63]:26264 "EHLO
-	mail-gw2-out.broadcom.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753901AbbLIW4Z (ORCPT
+Received: from mail-pa0-f68.google.com ([209.85.220.68]:34637 "EHLO
+	mail-pa0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753600AbbLJBQW (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 9 Dec 2015 17:56:25 -0500
-From: Markus Mayer <mmayer@broadcom.com>
-Subject: [RESEND PATCH] kconfig: allow kconfig to handle longer path names
-Date: Wed, 9 Dec 2015 14:56:12 -0800
-Message-ID: <1449701772-25095-1-git-send-email-mmayer@broadcom.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+	Wed, 9 Dec 2015 20:16:22 -0500
+Received: by pacfl14 with SMTP id fl14so3936075pac.1
+        for <linux-kbuild@vger.kernel.org>; Wed, 09 Dec 2015 17:16:21 -0800 (PST)
+From: Daniel Axtens <dja@axtens.net>
+Subject: Re: [PATCH v4 3/3] UBSAN: run-time undefined behavior sanity checker
+Date: Thu, 10 Dec 2015 12:15:51 +1100
+Message-Id: <1449710151-18902-1-git-send-email-dja@axtens.net>
+In-Reply-To: <1449157807-20298-4-git-send-email-aryabinin@virtuozzo.com>
+References: <1449157807-20298-4-git-send-email-aryabinin@virtuozzo.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. Morin" <yann.morin.1998@free.fr>
-Cc: Michal Marek <mmarek@suse.com>, Sam Ravnborg <sam@ravnborg.org>, Linux Kbuild <linux-kbuild@vger.kernel.org>, Linux Kernel <linux-kernel@vger.kernel.org>, Broadcom Kernel List <bcm-kernel-feedback-list@broadcom.com>, Markus Mayer <mmayer@broadcom.com>
+To: linux-kernel@vger.kernel.org
+Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Andrew Morton <akpm@linux-foundation.org>, Peter Zijlstra <peterz@infradead.org>, Sasha Levin <sasha.levin@oracle.com>, Randy Dunlap <rdunlap@infradead.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Jonathan Corbet <corbet@lwn.net>, Michal Marek <mmarek@suse.cz>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, hpa@zytor.com, Yury Gribov <y.gribov@samsung.com>, Dmitry Vyukov <dvyukov@google.com>, Konstantin Khlebnikov <koct9i@gmail.com>, Kostya Serebryany <kcc@google.com>, x86@kernel.org, linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org, Daniel Axtens <dja@axtens.net>
 
-The current (arbitrary) limit of 128 characters for path names has
-proven too short for Android builds, as longer path names are used
-there.
+Hi Andrey,
 
-Change conf.c, so it can handle path lengths up to PATH_MAX characters.
+>+	select ARCH_HAS_UBSAN_SANTIZE_ALL
 
-Signed-off-by: Markus Mayer <mmayer@broadcom.com>
----
- scripts/kconfig/conf.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+I think you've missed an I in SAN*I*TIZE here.
 
-diff --git a/scripts/kconfig/conf.c b/scripts/kconfig/conf.c
-index 6c20431..866369f 100644
---- a/scripts/kconfig/conf.c
-+++ b/scripts/kconfig/conf.c
-@@ -5,6 +5,7 @@
- 
- #include <locale.h>
- #include <ctype.h>
-+#include <limits.h>
- #include <stdio.h>
- #include <stdlib.h>
- #include <string.h>
-@@ -41,7 +42,7 @@ static int tty_stdio;
- static int valid_stdin = 1;
- static int sync_kconfig;
- static int conf_cnt;
--static char line[128];
-+static char line[PATH_MAX];
- static struct menu *rootEntry;
- 
- static void print_help(struct menu *menu)
-@@ -109,7 +110,7 @@ static int conf_askvalue(struct symbol *sym, const char *def)
- 		/* fall through */
- 	case oldaskconfig:
- 		fflush(stdout);
--		xfgets(line, 128, stdin);
-+		xfgets(line, sizeof(line), stdin);
- 		if (!tty_stdio)
- 			printf("\n");
- 		return 1;
-@@ -311,7 +312,7 @@ static int conf_choice(struct menu *menu)
- 			/* fall through */
- 		case oldaskconfig:
- 			fflush(stdout);
--			xfgets(line, 128, stdin);
-+			xfgets(line, sizeof(line), stdin);
- 			strip(line);
- 			if (line[0] == '?') {
- 				print_help(menu);
--- 
-1.9.1
+Apart from that, I've tested that this works on PowerPC, so:
+Tested-by: Daniel Axtens <dja@axtens.net> # on PowerPC only
 
+Regards,
+Daniel
