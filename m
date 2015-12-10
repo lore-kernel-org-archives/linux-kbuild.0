@@ -1,35 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:58116 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:58182 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753013AbbLJKHe (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 10 Dec 2015 05:07:34 -0500
-Subject: Re: [RESEND PATCH] kconfig: allow kconfig to handle longer path names
-References: <1449701772-25095-1-git-send-email-mmayer@broadcom.com>
-From: Michal Marek <mmarek@suse.com>
-Message-ID: <56694EE4.2040108@suse.com>
-Date: Thu, 10 Dec 2015 11:07:32 +0100
+	id S1753340AbbLJKID (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 10 Dec 2015 05:08:03 -0500
+Subject: Re: [PATCH] genksyms: Handle string literals with spaces in reference
+ files
+References: <1449673575-328-1-git-send-email-mmarek@suse.com>
+From: Michal Marek <mmarek@suse.cz>
+Message-ID: <56694F00.9040100@suse.cz>
+Date: Thu, 10 Dec 2015 11:08:00 +0100
 MIME-Version: 1.0
-In-Reply-To: <1449701772-25095-1-git-send-email-mmayer@broadcom.com>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <1449673575-328-1-git-send-email-mmarek@suse.com>
+Content-Type: text/plain; charset=iso-8859-2
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Markus Mayer <mmayer@broadcom.com>
-Cc: "Yann E. Morin" <yann.morin.1998@free.fr>, Sam Ravnborg <sam@ravnborg.org>, Linux Kbuild <linux-kbuild@vger.kernel.org>, Linux Kernel <linux-kernel@vger.kernel.org>, Broadcom Kernel List <bcm-kernel-feedback-list@broadcom.com>
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
 
-On 2015-12-09 23:56, Markus Mayer wrote:
-> The current (arbitrary) limit of 128 characters for path names has
-> proven too short for Android builds, as longer path names are used
-> there.
+Dne 9.12.2015 v 16:06 Michal Marek napsal(a):
+> The reference files use spaces to separate tokens, however, we must
+> preserve spaces inside string literals. Currently the only case in the
+> tree is struct edac_raw_error_desc in <linux/edac.h>:
 > 
-> Change conf.c, so it can handle path lengths up to PATH_MAX characters.
+> $ KBUILD_SYMTYPES=1 make -s drivers/edac/amd64_edac.symtypes
+> $ mv drivers/edac/amd64_edac.{symtypes,symref}
+> $ KBUILD_SYMTYPES=1 make -s drivers/edac/amd64_edac.symtypes
+> drivers/edac/amd64_edac.c:527: warning: amd64_get_dram_hole_info: modversion changed because of changes in struct edac_raw_error_desc
 > 
-> Signed-off-by: Markus Mayer <mmayer@broadcom.com>
-> ---
->  scripts/kconfig/conf.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
+> Signed-off-by: Michal Marek <mmarek@suse.com>
 
-Thanks, applied to kbuild.git#kconfig.
+Applied to kbuild.git#kbuild.
 
 Michal
 
