@@ -1,31 +1,60 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:40774 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752488AbbLKQc1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 11 Dec 2015 11:32:27 -0500
-Subject: Re: [PATCH] Makefile: revert "Makefile: Document ability to make
- file.lst and file.S" partially
-References: <20151210163518.GB18947@udknight>
-From: Michal Marek <mmarek@suse.com>
-Message-ID: <566AFA99.5050503@suse.com>
-Date: Fri, 11 Dec 2015 17:32:25 +0100
+Received: from smtprelay0149.hostedemail.com ([216.40.44.149]:44382 "EHLO
+	smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1751972AbbLKSKe (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 11 Dec 2015 13:10:34 -0500
+Date: Fri, 11 Dec 2015 13:10:29 -0500
+From: Steven Rostedt <rostedt@goodmis.org>
+Subject: Re: [PATCH] scripts: recordmcount: break hardlinks
+Message-ID: <20151211131029.5bb23411@gandalf.local.home>
+In-Reply-To: <20151211144541.GT8644@n2100.arm.linux.org.uk>
+References: <20151202090517.432556a4@gandalf.local.home>
+	<E1a7MVT-0000et-62@rmk-PC.arm.linux.org.uk>
+	<20151211093125.50b72639@gandalf.local.home>
+	<20151211144541.GT8644@n2100.arm.linux.org.uk>
 MIME-Version: 1.0
-In-Reply-To: <20151210163518.GB18947@udknight>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Wang YanQing <udknight@gmail.com>
-Cc: joe@perches.com, xiyou.wangcong@gmail.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Russell King - ARM Linux <linux@arm.linux.org.uk>
+Cc: Michal Marek <mmarek@suse.cz>, Thomas Petazzoni <thomas.petazzoni@free-electrons.com>, =?UTF-8?B?TcOlbnMgUnVsbGfDpXJk?= <mans@mansr.com>, Arnd Bergmann <arnd@arndb.de>, linux-kbuild@vger.kernel.org, linux-arm-msm@vger.kernel.org, Nicolas Pitre <nico@fluxnic.net>, Stephen Boyd <sboyd@codeaurora.org>, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 
-Dne 10.12.2015 v 17:35 Wang YanQing napsal(a):
-> Commit 627189797807 ("Makefile: Document ability to make file.lst
-> and file.S") document ability to make file.S, but there isn't such
-> ability in kbuild, so revert it.
+On Fri, 11 Dec 2015 14:45:41 +0000
+Russell King - ARM Linux <linux@arm.linux.org.uk> wrote:
+
+> On Fri, Dec 11, 2015 at 09:31:25AM -0500, Steven Rostedt wrote:
+> > On Fri, 11 Dec 2015 12:09:03 +0000
+> > Russell King <rmk+kernel@arm.linux.org.uk> wrote:
+> >   
+> > > recordmcount edits the file in-place, which can cause problems when
+> > > using ccache in hardlink mode.  Arrange for recordmcount to break a
+> > > hardlinked object.
+> > > 
+> > > Signed-off-by: Russell King <rmk+kernel@arm.linux.org.uk>
+> > > ---
+> > > Steven, sorry it took a while to get this out...  
+> > 
+> > Should this be for stable, or is it fine to just add this to my 4.5
+> > queue?  
 > 
-> Signed-off-by: Wang YanQing <udknight@gmail.com>
+> I thought you wanted to test it first - although I've been running with
+> this for a while now, my nightly builds have masked out the mcount
+> warning, and I suspect it'll take a while for ccache to purge itself
+> of the modified objects.
+> 
+> If you're happy to add a stable tag to it, then please do so.
+> 
 
-Thanks, applied to kbuild.git#kbuild.
+I ran it through most my tests (it's still running and is at 20 of 33
+tests). If there was anything wrong with this patch, I'm sure one of my
+tests would have crashed by now.
 
-Michal
+Do you want to take it, or shall I?
 
+If you want to take it, you can add my:
+
+Reviewed-by: Steven Rostedt <rostedt@goodmis.org>
+
+-- Steve
