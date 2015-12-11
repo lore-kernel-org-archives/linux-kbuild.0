@@ -1,42 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:46390 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752579AbbLKJbv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 11 Dec 2015 04:31:51 -0500
-Subject: Re: Behaviour of kernel makefiles when entering a subdir using a
- config symbol = m
-References: <56687204.4080404@ti.com> <20151209213255.GA11031@ravnborg.org>
- <56692D6D.6060607@ti.com> <20151210204638.GA32218@ravnborg.org>
-From: Michal Marek <mmarek@suse.com>
-Message-ID: <566A9804.6060305@suse.com>
-Date: Fri, 11 Dec 2015 10:31:48 +0100
+Received: from smtprelay0067.hostedemail.com ([216.40.44.67]:44703 "EHLO
+	smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1751940AbbLKOb3 (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 11 Dec 2015 09:31:29 -0500
+Date: Fri, 11 Dec 2015 09:31:25 -0500
+From: Steven Rostedt <rostedt@goodmis.org>
+Subject: Re: [PATCH] scripts: recordmcount: break hardlinks
+Message-ID: <20151211093125.50b72639@gandalf.local.home>
+In-Reply-To: <E1a7MVT-0000et-62@rmk-PC.arm.linux.org.uk>
+References: <20151202090517.432556a4@gandalf.local.home>
+	<E1a7MVT-0000et-62@rmk-PC.arm.linux.org.uk>
 MIME-Version: 1.0
-In-Reply-To: <20151210204638.GA32218@ravnborg.org>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>, Tomi Valkeinen <tomi.valkeinen@ti.com>
-Cc: linux-kbuild@vger.kernel.org
+To: Russell King <rmk+kernel@arm.linux.org.uk>
+Cc: Michal Marek <mmarek@suse.cz>, Thomas Petazzoni <thomas.petazzoni@free-electrons.com>, =?UTF-8?B?TcOlbnMgUnVsbGfDpXJk?= <mans@mansr.com>, Arnd Bergmann <arnd@arndb.de>, linux-kbuild@vger.kernel.org, linux-arm-msm@vger.kernel.org, Nicolas Pitre <nico@fluxnic.net>, Stephen Boyd <sboyd@codeaurora.org>, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 
-Dne 10.12.2015 v 21:46 Sam Ravnborg napsal(a):
-> On Thu, Dec 10, 2015 at 09:44:45AM +0200, Tomi Valkeinen wrote:
->> We have three drivers (one fbdev, two drm), each of which can be built
->> as a module. But each of them also may require small boot-time setup,
->> which needs to be built-in.
->>
->> I can get around the problem by entering the dir with obj-y, or by
->> creating a new extra config define which is y/n, and using that in the
->> makefile. The former makes make enter the dir even if the driver is not
->> enabled, and latter creates a config symbol only to solve this problem.
-> The extra config symbol is the most elegant solution here IMO.
-> Make sure to document that this config symbol enables the boot-time
-> setup stuff.
+On Fri, 11 Dec 2015 12:09:03 +0000
+Russell King <rmk+kernel@arm.linux.org.uk> wrote:
 
-Agreed. We could tech kbuild to look for built-in.o also in obj-m
-subdirs, but I'm quite sure it would break a Makefile or two. We had
-this case when adding support for modname-m recently, a couple of
-Makefiles did not expect this and broke.
+> recordmcount edits the file in-place, which can cause problems when
+> using ccache in hardlink mode.  Arrange for recordmcount to break a
+> hardlinked object.
+> 
+> Signed-off-by: Russell King <rmk+kernel@arm.linux.org.uk>
+> ---
+> Steven, sorry it took a while to get this out...
 
-Michal
+Should this be for stable, or is it fine to just add this to my 4.5
+queue?
+
+-- Steve
+
+> 
+>  scripts/recordmcount.c | 14 ++++++++++++++
+>  1 file changed, 14 insertions(+)
+> 
+> diff --git a/scripts/recordmcount.c b/scripts/recordmcount.c
+> index 698768bdc581..91705ef30402 100644
+> --- a/scripts/recordmcount.c
+> +++ b/scripts/recordmcount.c
+> @@ -211,6 +211,20 @@ static void *mmap_file(char const *fname)
+>  		addr = umalloc(sb.st_size);
+>  		uread(fd_map, addr, sb.st_size);
+>  	}
+> +	if (sb.st_nlink != 1) {
+> +		/* file is hard-linked, break the hard link */
+> +		close(fd_map);
+> +		if (unlink(fname) < 0) {
+> +			perror(fname);
+> +			fail_file();
+> +		}
+> +		fd_map = open(fname, O_RDWR | O_CREAT, sb.st_mode);
+> +		if (fd_map < 0) {
+> +			perror(fname);
+> +			fail_file();
+> +		}
+> +		uwrite(fd_map, addr, sb.st_size);
+> +	}
+>  	return addr;
+>  }
+>  
 
