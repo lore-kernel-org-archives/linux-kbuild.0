@@ -1,17 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pa0-f42.google.com ([209.85.220.42]:33712 "EHLO
-	mail-pa0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755854AbbLQJ6L (ORCPT
+Received: from mail-pf0-f177.google.com ([209.85.192.177]:33006 "EHLO
+	mail-pf0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755206AbbLQJ6G (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 17 Dec 2015 04:58:11 -0500
-Received: by mail-pa0-f42.google.com with SMTP id ur14so39775606pab.0
-        for <linux-kbuild@vger.kernel.org>; Thu, 17 Dec 2015 01:58:10 -0800 (PST)
+	Thu, 17 Dec 2015 04:58:06 -0500
+Received: by mail-pf0-f177.google.com with SMTP id n128so9940113pfn.0
+        for <linux-kbuild@vger.kernel.org>; Thu, 17 Dec 2015 01:58:06 -0800 (PST)
 From: Bamvor Jian Zhang <bamvor.zhangjian@linaro.org>
 Subject: [PATCH v3 0/2] Create specific kconfig for kselftest
-Date: Thu, 17 Dec 2015 17:57:51 +0800
-Message-Id: <1450346273-31633-2-git-send-email-bamvor.zhangjian@linaro.org>
-In-Reply-To: <1450346273-31633-1-git-send-email-bamvor.zhangjian@linaro.org>
-References: <1450346273-31633-1-git-send-email-bamvor.zhangjian@linaro.org>
+Date: Thu, 17 Dec 2015 17:57:50 +0800
+Message-Id: <1450346273-31633-1-git-send-email-bamvor.zhangjian@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-api@vger.kernel.org
