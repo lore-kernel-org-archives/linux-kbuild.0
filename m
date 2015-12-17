@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pa0-f44.google.com ([209.85.220.44]:34423 "EHLO
-	mail-pa0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933043AbbLQJ6T (ORCPT
+Received: from mail-pa0-f42.google.com ([209.85.220.42]:33712 "EHLO
+	mail-pa0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755854AbbLQJ6L (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 17 Dec 2015 04:58:19 -0500
-Received: by mail-pa0-f44.google.com with SMTP id wq6so39897274pac.1
-        for <linux-kbuild@vger.kernel.org>; Thu, 17 Dec 2015 01:58:19 -0800 (PST)
+	Thu, 17 Dec 2015 04:58:11 -0500
+Received: by mail-pa0-f42.google.com with SMTP id ur14so39775606pab.0
+        for <linux-kbuild@vger.kernel.org>; Thu, 17 Dec 2015 01:58:10 -0800 (PST)
 From: Bamvor Jian Zhang <bamvor.zhangjian@linaro.org>
-Subject: [PATCH v3 2/2] scripts/kconfig/Makefile: add kselftest-mergeconfig
-Date: Thu, 17 Dec 2015 17:57:53 +0800
-Message-Id: <1450346273-31633-4-git-send-email-bamvor.zhangjian@linaro.org>
+Subject: [PATCH v3 0/2] Create specific kconfig for kselftest
+Date: Thu, 17 Dec 2015 17:57:51 +0800
+Message-Id: <1450346273-31633-2-git-send-email-bamvor.zhangjian@linaro.org>
 In-Reply-To: <1450346273-31633-1-git-send-email-bamvor.zhangjian@linaro.org>
 References: <1450346273-31633-1-git-send-email-bamvor.zhangjian@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -17,44 +17,60 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-api@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, shuahkh@osg.samsung.com, yann.morin.1998@free.fr, khilman@linaro.org, tyler.baker@linaro.org, broonie@kernel.org, mpe@ellerman.id.au, dvhart@infradead.org, Bamvor Jian Zhang <bamvor.zhangjian@linaro.org>
 
-Add kselftest-mergeconfig to enable the dependencies of kernel
-config for all the kselftest testcases. User could call it after
-create the kernel configuration(.config), eg:
+There is a discussion about improving the usability of kselftest by
+creating test-specific kconfig in recent kernel Summit.
 
-$ make kselftest-mergeconfig
+Patch 1 keep test-specific kconfig fragments inside each selftest so
+that merge_configs.sh could build up a kernel that can test the
+specific or all feature(s).
 
-Signed-off-by: Bamvor Jian Zhang <bamvor.zhangjian@linaro.org>
----
- scripts/kconfig/Makefile | 9 +++++++++
- 1 file changed, 9 insertions(+)
+Patch 2 add config option(kselftest-mergeconfig) in make file as a
+helper to merge all the test config dependecies to .config.
 
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index d79cba4..2694638 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -126,6 +126,14 @@ PHONY += tinyconfig
- tinyconfig:
- 	$(Q)$(MAKE) -f $(srctree)/Makefile allnoconfig tiny.config
- 
-+PHONY += kselftest-mergeconfig
-+kselftest-mergeconfig: $(obj)/conf
-+	$(if $(wildcard $(objtree)/.config),, $(error No .config exists, config your kernel first!))
-+	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/kconfig/merge_config.sh \
-+		-m $(objtree)/.config \
-+		$(srctree)/tools/testing/selftests/*/config
-+	+$(Q)$(MAKE) -f $(srctree)/Makefile olddefconfig
-+
- # Help text used by make help
- help:
- 	@echo  '  config	  - Update current config utilising a line-oriented program'
-@@ -151,6 +159,7 @@ help:
- 	@echo  '  kvmconfig	  - Enable additional options for kvm guest kernel support'
- 	@echo  '  xenconfig       - Enable additional options for xen dom0 and guest kernel support'
- 	@echo  '  tinyconfig	  - Configure the tiniest possible kernel'
-+	@echo  '  kselftest-mergeconfig - Merge all the config dependencies of kselftest to .config'
- 
- # lxdialog stuff
- check-lxdialog  := $(srctree)/$(src)/lxdialog/check-lxdialog.sh
+Changes since v2:
+1.  Fix the misuse of objtree and srctree in the
+    kselftest-mergeconfig target.
+
+Changes since v1:
+1.  Add kselftest-mergeconfig in scripts/kconfig/Makefile according
+    to the suggestion from Michael.
+
+[1] http://www.spinics.net/lists/linux-api/msg15533.html
+[2] http://www.spinics.net/lists/linux-api/msg15593.html
+
+Bamvor Jian Zhang (2):
+  selftests: create test-specific kconfig fragments
+  scripts/kconfig/Makefile: add kselftest-mergeconfig
+
+ scripts/kconfig/Makefile                      | 9 +++++++++
+ tools/testing/selftests/cpu-hotplug/config    | 2 ++
+ tools/testing/selftests/firmware/config       | 1 +
+ tools/testing/selftests/ftrace/config         | 1 +
+ tools/testing/selftests/ipc/config            | 2 ++
+ tools/testing/selftests/memory-hotplug/config | 4 ++++
+ tools/testing/selftests/mount/config          | 2 ++
+ tools/testing/selftests/net/config            | 3 +++
+ tools/testing/selftests/pstore/config         | 4 ++++
+ tools/testing/selftests/seccomp/config        | 2 ++
+ tools/testing/selftests/static_keys/config    | 1 +
+ tools/testing/selftests/user/config           | 1 +
+ tools/testing/selftests/vm/config             | 1 +
+ tools/testing/selftests/zram/config           | 2 ++
+ 14 files changed, 35 insertions(+)
+ create mode 100644 tools/testing/selftests/cpu-hotplug/config
+ create mode 100644 tools/testing/selftests/firmware/config
+ create mode 100644 tools/testing/selftests/ftrace/config
+ create mode 100644 tools/testing/selftests/ipc/config
+ create mode 100644 tools/testing/selftests/memory-hotplug/config
+ create mode 100644 tools/testing/selftests/mount/config
+ create mode 100644 tools/testing/selftests/net/config
+ create mode 100644 tools/testing/selftests/pstore/config
+ create mode 100644 tools/testing/selftests/seccomp/config
+ create mode 100644 tools/testing/selftests/static_keys/config
+ create mode 100644 tools/testing/selftests/user/config
+ create mode 100644 tools/testing/selftests/vm/config
+ create mode 100644 tools/testing/selftests/zram/config
+
 -- 
 2.1.4
 
