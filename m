@@ -1,44 +1,82 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([103.22.144.67]:53441 "EHLO ozlabs.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751885AbbLQXo6 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 17 Dec 2015 18:44:58 -0500
-Message-ID: <1450395897.19696.0.camel@ellerman.id.au>
-Subject: Re: [PATCH v3 0/2] Create specific kconfig for kselftest
-From: Michael Ellerman <mpe@ellerman.id.au>
-Date: Fri, 18 Dec 2015 10:44:57 +1100
-In-Reply-To: <1450346273-31633-1-git-send-email-bamvor.zhangjian@linaro.org>
-References: <1450346273-31633-1-git-send-email-bamvor.zhangjian@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Received: from smtp01.smtpout.orange.fr ([80.12.242.123]:47873 "EHLO
+	smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750802AbbLUUtp (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 21 Dec 2015 15:49:45 -0500
+From: Robert Jarzmik <robert.jarzmik@free.fr>
+Subject: kbuild: global makefile and spaces in path
+Date: Mon, 21 Dec 2015 21:49:39 +0100
+Message-ID: <87lh8nfrx8.fsf@belgarion.home>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Bamvor Jian Zhang <bamvor.zhangjian@linaro.org>, linux-api@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, shuahkh@osg.samsung.com, yann.morin.1998@free.fr, khilman@linaro.org, tyler.baker@linaro.org, broonie@kernel.org, dvhart@infradead.org
+To: Michal Marek <mmarek@suse.com>
+Cc: linux-kbuild@vger.kernel.org
 
-On Thu, 2015-12-17 at 17:57 +0800, Bamvor Jian Zhang wrote:
+Hi Michal,
 
-> There is a discussion about improving the usability of kselftest by
-> creating test-specific kconfig in recent kernel Summit.
-> 
-> Patch 1 keep test-specific kconfig fragments inside each selftest so
-> that merge_configs.sh could build up a kernel that can test the
-> specific or all feature(s).
-> 
-> Patch 2 add config option(kselftest-mergeconfig) in make file as a
-> helper to merge all the test config dependecies to .config.
-> 
-> Changes since v2:
-> 1.  Fix the misuse of objtree and srctree in the
->     kselftest-mergeconfig target.
-> 
-> Changes since v1:
-> 1.  Add kselftest-mergeconfig in scripts/kconfig/Makefile according
->     to the suggestion from Michael.
+I compiled my kernel in a directory /home/robert jarzmik/kernel, and that's the
+first time I encountered a space in the path containing my kernel in years.
 
-Sorry I only just noticed you put it in scripts/kconfig/Makefile. I meant for
-it to go in Makefile, alongside the other kselftest targets.
+I was wondering if there is a known constraint that the linux kernel source
+should be contained within a path without any space ?
 
-cheers
+If no such constraint is known, maybe you could consider the patch in [1].
+
+Cheers.
+
+-- 
+Robert
+
+---8>---
+From a8af33224ad536cc3137297e4a7617ee1031efb7 Mon Sep 17 00:00:00 2001
+From: Robert Jarzmik <robert.jarzmik@free.fr>
+Date: Mon, 21 Dec 2015 21:42:42 +0100
+Subject: [PATCH] kbuild: fix modules_install with spaces in kernel path
+
+When the kernel path contains a space somewhere in the path name, the
+modules_install target doesn't work anymore, as the path names are not
+enclosed in double quotes.
+
+This patch fixes the modules_install target.
+
+Signed-off-by: Robert Jarzmik <robert.jarzmik@free.fr>
+---
+ Makefile | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 7ce5c5a76c0b..45ec34644b4f 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1119,16 +1119,16 @@ modules_install: _modinst_ _modinst_post
+ 
+ PHONY += _modinst_
+ _modinst_:
+-	@rm -rf $(MODLIB)/kernel
+-	@rm -f $(MODLIB)/source
+-	@mkdir -p $(MODLIB)/kernel
+-	@ln -s `cd $(srctree) && /bin/pwd` $(MODLIB)/source
+-	@if [ ! $(objtree) -ef  $(MODLIB)/build ]; then \
+-		rm -f $(MODLIB)/build ; \
+-		ln -s $(CURDIR) $(MODLIB)/build ; \
++	@rm -rf "$(MODLIB)"/kernel
++	@rm -f "$(MODLIB)"/source
++	@mkdir -p "$(MODLIB)"/kernel
++	@ln -s "`cd $(srctree) && /bin/pwd`" "$(MODLIB)"/source
++	@if [ ! "$(objtree)" -ef  "$(MODLIB)"/build ]; then \
++		rm -f "$(MODLIB)"/build ; \
++		ln -s "$(CURDIR)" "$(MODLIB)"/build ; \
+ 	fi
+-	@cp -f $(objtree)/modules.order $(MODLIB)/
+-	@cp -f $(objtree)/modules.builtin $(MODLIB)/
++	@cp -f $(objtree)/modules.order "$(MODLIB)"/
++	@cp -f $(objtree)/modules.builtin "$(MODLIB)"/
+ 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.modinst
+ 
+ # This depmod is only for convenience to give the initial
+-- 
+2.1.4
 
