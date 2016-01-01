@@ -1,26 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx3.its.uni-kassel.de ([141.51.12.64]:41198 "EHLO
-	mx3.its.uni-kassel.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753167AbbL2EYA convert rfc822-to-8bit (ORCPT
+Received: from aserp1040.oracle.com ([141.146.126.69]:17724 "EHLO
+	aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751718AbcAAQeQ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 28 Dec 2015 23:24:00 -0500
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8BIT
-Content-Description: Mail message body
-Subject: Donation/Charity
-From: "Jeff Skoll" <verna.viajar@icdd.uni-kassel.de>
-Date: Mon, 28 Dec 2015 22:01:01 -0500
-Reply-To: jeff.skoll@skollcharity.org
-Message-ID: <auto-000005547794@mailadmin.uni-kassel.de>
+	Fri, 1 Jan 2016 11:34:16 -0500
+From: Vegard Nossum <vegard.nossum@oracle.com>
+Subject: [PATCH] kconfig: return 'false' instead of 'no' in bool function
+Date: Fri,  1 Jan 2016 17:34:05 +0100
+Message-Id: <1451666045-12198-1-git-send-email-vegard.nossum@oracle.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Me <verna.viajar@icdd.uni-kassel.de>
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>, Michal Marek <mmarek@suse.com>
+Cc: linux-kbuild@vger.kernel.org, Vegard Nossum <vegard.nossum@oracle.com>, Arnaud Lacombe <lacombar@gmail.com>, Mauro Carvalho Chehab <mchehab@redhat.com>
 
-Hi,
-My name is Jeffrey Skoll, a philanthropist and the founder of one of the largest private foundations in the world. I believe strongly in ‘giving while living.’ I had one idea that never changed in my mind — that you should use your wealth to help people and I have decided to secretly give USD2.498 Million to a randomly selected individual. On receipt of this email, you should count yourself as the individual. Kindly get back to me at your earliest convenience, so I know your email address is valid.
+menu_is_visible() is a bool function and should use boolean return
+values. "no" is a tristate value which happens to also have a value
+of 0, but we should nevertheless use the right symbol for it.
 
-Visit the web page to know more about me: http://www.theglobeandmail.com/news/national/meet-the-canadian-billionaire-whos-giving-it-all-away/article4209888/ or you can read an article of me on Wikipedia.
+This is a very minor cleanup with no semantic change.
 
-Regards,
-Jeffrey Skoll.
+Fixes: 86e187ff9 ("kconfig: add an option to determine a menu's visibility")
+Cc: Arnaud Lacombe <lacombar@gmail.com>
+Cc: Mauro Carvalho Chehab <mchehab@redhat.com>
+Signed-off-by: Vegard Nossum <vegard.nossum@oracle.com>
+---
+ scripts/kconfig/menu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+index b05cc3d..aed678e 100644
+--- a/scripts/kconfig/menu.c
++++ b/scripts/kconfig/menu.c
+@@ -477,7 +477,7 @@ bool menu_is_visible(struct menu *menu)
+ 
+ 	if (menu->visibility) {
+ 		if (expr_calc_value(menu->visibility) == no)
+-			return no;
++			return false;
+ 	}
+ 
+ 	sym = menu->sym;
+-- 
+1.9.1
+
