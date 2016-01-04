@@ -1,56 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([103.22.144.67]:40930 "EHLO ozlabs.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752185AbcADE5H (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 3 Jan 2016 23:57:07 -0500
-Message-ID: <1451883424.14373.1.camel@ellerman.id.au>
+Received: from mail-pa0-f44.google.com ([209.85.220.44]:35505 "EHLO
+	mail-pa0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751941AbcADKeu (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 4 Jan 2016 05:34:50 -0500
+Received: by mail-pa0-f44.google.com with SMTP id do7so3571861pab.2
+        for <linux-kbuild@vger.kernel.org>; Mon, 04 Jan 2016 02:34:50 -0800 (PST)
 Subject: Re: [PATCH v3 0/2] Create specific kconfig for kselftest
-From: Michael Ellerman <mpe@ellerman.id.au>
-Date: Mon, 04 Jan 2016 15:57:04 +1100
-In-Reply-To: <CAFy1USTM1B_pWuPUun+yrhcHspNUOm9_2giWwJgOaJvgWDsiEA@mail.gmail.com>
 References: <1450346273-31633-1-git-send-email-bamvor.zhangjian@linaro.org>
-	 <1450395897.19696.0.camel@ellerman.id.au>
-	 <CAFy1USTM1B_pWuPUun+yrhcHspNUOm9_2giWwJgOaJvgWDsiEA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+ <1450395897.19696.0.camel@ellerman.id.au>
+ <CAFy1USTM1B_pWuPUun+yrhcHspNUOm9_2giWwJgOaJvgWDsiEA@mail.gmail.com>
+ <1451883424.14373.1.camel@ellerman.id.au>
+From: Bamvor Jian Zhang <bamvor.zhangjian@linaro.org>
+Message-ID: <568A4AC5.1050703@linaro.org>
+Date: Mon, 4 Jan 2016 18:34:45 +0800
+MIME-Version: 1.0
+In-Reply-To: <1451883424.14373.1.camel@ellerman.id.au>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Bamvor Zhang Jian <bamvor.zhangjian@linaro.org>, linux-api <linux-api@vger.kernel.org>
-Cc: lkml <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, Shuah Khan <shuahkh@osg.samsung.com>, yann.morin.1998@free.fr, Kevin Hilman <khilman@linaro.org>, Tyler Baker <tyler.baker@linaro.org>, Mark Brown <broonie@kernel.org>, dvhart@infradead.org
+To: Michael Ellerman <mpe@ellerman.id.au>, linux-api <linux-api@vger.kernel.org>
+Cc: lkml <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, Shuah Khan <shuahkh@osg.samsung.com>, yann.morin.1998@free.fr, Kevin Hilman <khilman@linaro.org>, Tyler Baker <tyler.baker@linaro.org>, Mark Brown <broonie@kernel.org>, dvhart@infradead.org, Bamvor Zhang Jian <bamvor.zhangjian@linaro.org>
 
-On Thu, 2015-12-24 at 18:17 +0800, Bamvor Zhang Jian wrote:
-> On 12/18/2015 07:44 AM, Michael Ellerman wrote:
-> > On Thu, 2015-12-17 at 17:57 +0800, Bamvor Jian Zhang wrote:
-> > > There is a discussion about improving the usability of kselftest by
-> > > creating test-specific kconfig in recent kernel Summit.
-> > > 
-> > > Patch 1 keep test-specific kconfig fragments inside each selftest so
-> > > that merge_configs.sh could build up a kernel that can test the
-> > > specific or all feature(s).
-> > > 
-> > > Patch 2 add config option(kselftest-mergeconfig) in make file as a
-> > > helper to merge all the test config dependecies to .config.
-> > > 
-> > > Changes since v2:
-> > > 1.  Fix the misuse of objtree and srctree in the
-> > >     kselftest-mergeconfig target.
-> > > 
-> > > Changes since v1:
-> > > 1.  Add kselftest-mergeconfig in scripts/kconfig/Makefile according
-> > >     to the suggestion from Michael.
-> > 
-> > Sorry I only just noticed you put it in scripts/kconfig/Makefile. I meant for
-> > it to go in Makefile, alongside the other kselftest targets.
+Hi, Michael
+
+On 01/04/2016 12:57 PM, Michael Ellerman wrote:
+[...]
+>> Do you mean "tools/testing/selftest/Makefile"? I try to do it but I could not
+>> get the objtree and srctree if it is called directly(objtree and srctree is
+>> defined in toplevel Makefile)
 > 
-> Do you mean "tools/testing/selftest/Makefile"? I try to do it but I could not
-> get the objtree and srctree if it is called directly(objtree and srctree is
-> defined in toplevel Makefile)
+> No I meant Makefile, the very top level Makefile.
+> 
+> There is already a kselftest target in there (line 1077), I meant we would add
+> a kselftest-mergeconfig target in there.
+I am trying to add it in top level Makefile, it says:
+> make kselftest-mergeconfig
+make[1]: *** No rule to make target 'kselftest-mergeconfig'.  Stop.
+Makefile:553: recipe for target 'kselftest-mergeconfig' failed
+make: *** [kselftest-mergeconfig] Error 2
 
-No I meant Makefile, the very top level Makefile.
+01234567890123456789012345678901234567890123456789012345678901234567890123456789
+It works when I get rid of the config at the end of this target. So, I guess
+that this is because the "%config" in this Makefile. How should I overwrite
+this wildcard?
 
-There is already a kselftest target in there (line 1077), I meant we would add
-a kselftest-mergeconfig target in there.
+Thanks
 
-cheers
+Bamvor
 
+> 
+> cheers
+> 
+
+-- 
+-----------------------------------------
+   arm64, kernel. opensuse
+   blog: http://bjzhang.github.io
+-----------------------------------------
