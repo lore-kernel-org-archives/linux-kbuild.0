@@ -1,35 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:51757 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:36701 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751603AbcAEKUP (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 5 Jan 2016 05:20:15 -0500
-Subject: Re: [PATCH] kconfig: return 'false' instead of 'no' in bool function
-References: <1451666045-12198-1-git-send-email-vegard.nossum@oracle.com>
-From: Michal Marek <mmarek@suse.com>
-Message-ID: <568B98DC.9000806@suse.com>
-Date: Tue, 5 Jan 2016 11:20:12 +0100
+	id S1751768AbcAEVvn (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 5 Jan 2016 16:51:43 -0500
+Subject: Re: [PATCH v2 7/8] tags: Unify emacs and exuberant rules
+References: <1449242787-16598-1-git-send-email-mmarek@suse.com>
+ <1449242787-16598-8-git-send-email-mmarek@suse.com>
+From: Michal Marek <mmarek@suse.cz>
+Message-ID: <568C3AEC.70000@suse.cz>
+Date: Tue, 5 Jan 2016 22:51:40 +0100
 MIME-Version: 1.0
-In-Reply-To: <1451666045-12198-1-git-send-email-vegard.nossum@oracle.com>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <1449242787-16598-8-git-send-email-mmarek@suse.com>
+Content-Type: text/plain; charset=iso-8859-2
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Vegard Nossum <vegard.nossum@oracle.com>, "Yann E. MORIN" <yann.morin.1998@free.fr>
-Cc: linux-kbuild@vger.kernel.org, Arnaud Lacombe <lacombar@gmail.com>, Mauro Carvalho Chehab <mchehab@redhat.com>
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
 
-On 2016-01-01 17:34, Vegard Nossum wrote:
-> menu_is_visible() is a bool function and should use boolean return
-> values. "no" is a tristate value which happens to also have a value
-> of 0, but we should nevertheless use the right symbol for it.
+Dne 4.12.2015 v 16:26 Michal Marek napsal(a):
+> The emacs rules were constantly lagging behind the exuberant ones. Use a
+> single set of rules for both, to make the script easier to maintain.
+> The language understood by both tools is basic regular expression with
+> some limitations, which are documented in a comment. To be able to store
+> the rules in an array and easily iterate over it, the script requires
+> bash now. In the exuberant case, the change fixes some false matches in
+> <linux/page-flags.h> and also some too greedy matches in the arguments
+> of the DECLARE_*/DEFINE_* macros. In the emacs case, several previously
+> not working rules are matching now. Tested with these versions of the
+> tools:
 > 
-> This is a very minor cleanup with no semantic change.
+>   Exuberant Ctags 5.8, Copyright (C) 1996-2009 Darren Hiebert
+>   etags (GNU Emacs 24.5)
 > 
-> Fixes: 86e187ff9 ("kconfig: add an option to determine a menu's visibility")
-> Cc: Arnaud Lacombe <lacombar@gmail.com>
-> Cc: Mauro Carvalho Chehab <mchehab@redhat.com>
-> Signed-off-by: Vegard Nossum <vegard.nossum@oracle.com>
+> Signed-off-by: Michal Marek <mmarek@suse.com>
+> ---
+> v2: Rebased onto current linux-next
 
-Thanks, applied to kbuild.git#kconfig.
+I applied the series up to 7/8 to kbuild.git#misc. I will repost 8/8
+with a more convincing changelog.
 
 Michal
-
