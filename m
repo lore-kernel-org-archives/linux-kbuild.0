@@ -1,26 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx4.rus.uni-stuttgart.de ([129.69.192.4]:56139 "EHLO
-	mx4.rus.uni-stuttgart.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750846AbcAFCZI convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 5 Jan 2016 21:25:08 -0500
-Content-Type: text/plain; charset="utf-8"
+Received: from mx2.suse.de ([195.135.220.15]:53668 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751777AbcAFOsJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 6 Jan 2016 09:48:09 -0500
+Subject: Re: kbuild: global makefile and spaces in path
+References: <87lh8nfrx8.fsf@belgarion.home>
+From: Michal Marek <mmarek@suse.com>
+Message-ID: <568D2927.2010106@suse.com>
+Date: Wed, 6 Jan 2016 15:48:07 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8BIT
-Content-Description: Mail message body
-Subject: Charity/Donation
-From: "Skoll, Jeff" <teb43595@stud.uni-stuttgart.de>
-Date: Tue, 05 Jan 2016 19:39:27 -0500
-Reply-To: jeff.skoll@skollcharity.org
-Message-ID: <auto-000204358864@uni-stuttgart.de>
+In-Reply-To: <87lh8nfrx8.fsf@belgarion.home>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Me <teb43595@stud.uni-stuttgart.de>
+To: Robert Jarzmik <robert.jarzmik@free.fr>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>
 
-Hi,
-My name is Jeffrey Skoll, a philanthropist and the founder of one of the largest private foundations in the world. I believe strongly in ‘giving while living.’ I had one idea that never changed in my mind — that you should use your wealth to help people and I have decided to secretly give USD2.498 Million to a randomly selected individual. On receipt of this email, you should count yourself as the individual. Kindly get back to me at your earliest convenience, so I know your email address is valid.
+On 2015-12-21 21:49, Robert Jarzmik wrote:
+> Hi Michal,
+> 
+> I compiled my kernel in a directory /home/robert jarzmik/kernel, and that's the
+> first time I encountered a space in the path containing my kernel in years.
+> 
+> I was wondering if there is a known constraint that the linux kernel source
+> should be contained within a path without any space ?
 
-Visit the web page to know more about me: http://www.theglobeandmail.com/news/national/meet-the-canadian-billionaire-whos-giving-it-all-away/article4209888/ or you can read an article of me on Wikipedia.
+Whitespace and colons are problematic.
 
-Regards,
-Jeffrey Skoll.
+
+> If no such constraint is known, maybe you could consider the patch in [1].
+
+I expect it is going to break in lot more places, especially if you do
+an O= build. I think it's better to just check for this and error out early.
+
+Michal
