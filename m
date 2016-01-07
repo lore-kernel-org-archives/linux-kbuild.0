@@ -1,37 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:53668 "EHLO mx2.suse.de"
+Received: from mx1.redhat.com ([209.132.183.28]:34838 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751777AbcAFOsJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 6 Jan 2016 09:48:09 -0500
-Subject: Re: kbuild: global makefile and spaces in path
-References: <87lh8nfrx8.fsf@belgarion.home>
-From: Michal Marek <mmarek@suse.com>
-Message-ID: <568D2927.2010106@suse.com>
-Date: Wed, 6 Jan 2016 15:48:07 +0100
+	id S1751920AbcAGRz1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 7 Jan 2016 12:55:27 -0500
+Date: Thu, 7 Jan 2016 19:55:24 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: [PATCH] ld-version: fix it on Fedora
+Message-ID: <1452189189-31188-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <87lh8nfrx8.fsf@belgarion.home>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Robert Jarzmik <robert.jarzmik@free.fr>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>
+To: linux-kernel@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, linux-mips@linux-mips.org, ralf@linux-mips.org
 
-On 2015-12-21 21:49, Robert Jarzmik wrote:
-> Hi Michal,
-> 
-> I compiled my kernel in a directory /home/robert jarzmik/kernel, and that's the
-> first time I encountered a space in the path containing my kernel in years.
-> 
-> I was wondering if there is a known constraint that the linux kernel source
-> should be contained within a path without any space ?
+On Fedora 23, ld --version outputs:
+GNU ld version 2.25-15.fc23
 
-Whitespace and colons are problematic.
+But ld-version.sh fails to parse this, so e.g.  mips build fails to
+enable VDSO, printing a warning that binutils >= 2.24 is required.
 
+To fix, teach ld-version to parse this format.
 
-> If no such constraint is known, maybe you could consider the patch in [1].
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
 
-I expect it is going to break in lot more places, especially if you do
-an O= build. I think it's better to just check for this and error out early.
+Which tree should this be merged through? Mine? MIPS?
 
-Michal
+ scripts/ld-version.sh | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/scripts/ld-version.sh b/scripts/ld-version.sh
+index 198580d..25d23c8 100755
+--- a/scripts/ld-version.sh
++++ b/scripts/ld-version.sh
+@@ -2,6 +2,8 @@
+ # extract linker version number from stdin and turn into single number
+ 	{
+ 	gsub(".*)", "");
++	gsub(".*version ", "");
++	gsub("-.*", "");
+ 	split($1,a, ".");
+ 	print a[1]*10000000 + a[2]*100000 + a[3]*10000 + a[4]*100 + a[5];
+ 	exit
+-- 
+MST
