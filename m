@@ -1,82 +1,81 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp02.smtpout.orange.fr ([80.12.242.124]:33213 "EHLO
-	smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753194AbcAGWBa (ORCPT
+Received: from mail-pa0-f51.google.com ([209.85.220.51]:34846 "EHLO
+	mail-pa0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751690AbcAHH17 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 7 Jan 2016 17:01:30 -0500
-From: Robert Jarzmik <robert.jarzmik@free.fr>
-Subject: Re: kbuild: global makefile and spaces in path
-References: <87lh8nfrx8.fsf@belgarion.home> <568D2927.2010106@suse.com>
-Date: Thu, 07 Jan 2016 22:53:54 +0100
-In-Reply-To: <568D2927.2010106@suse.com> (Michal Marek's message of "Wed, 6
-	Jan 2016 15:48:07 +0100")
-Message-ID: <87mvshdpjh.fsf@belgarion.home>
-MIME-Version: 1.0
-Content-Type: text/plain
+	Fri, 8 Jan 2016 02:27:59 -0500
+Received: by mail-pa0-f51.google.com with SMTP id ho8so17032743pac.2
+        for <linux-kbuild@vger.kernel.org>; Thu, 07 Jan 2016 23:27:58 -0800 (PST)
+From: Bamvor Jian Zhang <bamvor.zhangjian@linaro.org>
+Subject: [PATCH v4 0/2] Create specific kconfig for kselftest
+Date: Fri,  8 Jan 2016 15:27:32 +0800
+Message-Id: <1452238054-15482-1-git-send-email-bamvor.zhangjian@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>
+To: linux-api@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, shuahkh@osg.samsung.com, yann.morin.1998@free.fr, khilman@linaro.org, tyler.baker@linaro.org, broonie@kernel.org, mpe@ellerman.id.au, dvhart@infradead.org, mmarek@suse.com, Bamvor Jian Zhang <bamvor.zhangjian@linaro.org>
 
-Michal Marek <mmarek@suse.com> writes:
+There is a discussion about improving the usability of kselftest by
+creating test-specific kconfig in recent kernel Summit. The first
+three versions could be found at [1], [2], [3].
 
-> On 2015-12-21 21:49, Robert Jarzmik wrote:
->> Hi Michal,
->> 
->> I compiled my kernel in a directory /home/robert jarzmik/kernel, and that's the
->> first time I encountered a space in the path containing my kernel in years.
->> 
->> I was wondering if there is a known constraint that the linux kernel source
->> should be contained within a path without any space ?
-> Whitespace and colons are problematic.
-Ok.
+Patch 1 keep test-specific kconfig fragments inside each selftest so
+that merge_configs.sh could build up a kernel configuration that can
+test the specific or all feature(s).
 
->> If no such constraint is known, maybe you could consider the patch in [1].
-> I expect it is going to break in lot more places, especially if you do
-> an O= build. I think it's better to just check for this and error out early.
-Ok, I'll try to do that. Let's see if the patch at the end of this mail is what
-you're expecting.
+Patch 2 add config option(kselftest-merge) in make file as a
+helper to merge all the test config dependecies to .config.
 
-Cheers.
+Changes since v3:
+1.  move the target kselftest-mergeconfig from scripts/kconfig/Makfile
+    to toplevel Makefile. And rename to kselftest-merge to avoid the
+    conflict with "%config" target.
 
--- 
-Robert
+Changes since v2:
+1.  Fix the misuse of objtree and srctree in the
+    kselftest-mergeconfig target.
 
----8<---
-From 68bcedba135cc50254a234a949ed5cd3b4e92b7a Mon Sep 17 00:00:00 2001
-From: Robert Jarzmik <robert.jarzmik@free.fr>
-Date: Thu, 7 Jan 2016 22:39:51 +0100
-Subject: [PATCH] kbuild: forbid kernel directory to contain spaces
+Changes since v1:
+1.  Add kselftest-mergeconfig in scripts/kconfig/Makefile according
+    to the suggestion from Michael.
 
-When the kernel path contains a space somewhere in the path name, the
-modules_install target doesn't work anymore, as the path names are not
-enclosed in double quotes. It is also supposed that and O= build will
-suffer from the same weakness as modules_install.
+[1] http://www.spinics.net/lists/linux-api/msg15533.html
+[2] http://www.spinics.net/lists/linux-api/msg15593.html
+[3] http://comments.gmane.org/gmane.linux.kernel/2110565
 
-Instead of checking and improving kbuild to resist to directories
-including spaces, error out early to prevent any build if the kernel's
-main directory contains a space.
+Bamvor Jian Zhang (2):
+  selftests: create test-specific kconfig fragments
+  Makefile: add kselftest-merge
 
-Signed-off-by: Robert Jarzmik <robert.jarzmik@free.fr>
----
- Makefile | 4 ++++
- 1 file changed, 4 insertions(+)
+ Makefile                                      | 11 +++++++++++
+ tools/testing/selftests/cpu-hotplug/config    |  2 ++
+ tools/testing/selftests/firmware/config       |  1 +
+ tools/testing/selftests/ftrace/config         |  1 +
+ tools/testing/selftests/ipc/config            |  2 ++
+ tools/testing/selftests/memory-hotplug/config |  4 ++++
+ tools/testing/selftests/mount/config          |  2 ++
+ tools/testing/selftests/net/config            |  3 +++
+ tools/testing/selftests/pstore/config         |  4 ++++
+ tools/testing/selftests/seccomp/config        |  2 ++
+ tools/testing/selftests/static_keys/config    |  1 +
+ tools/testing/selftests/user/config           |  1 +
+ tools/testing/selftests/vm/config             |  1 +
+ tools/testing/selftests/zram/config           |  2 ++
+ 14 files changed, 37 insertions(+)
+ create mode 100644 tools/testing/selftests/cpu-hotplug/config
+ create mode 100644 tools/testing/selftests/firmware/config
+ create mode 100644 tools/testing/selftests/ftrace/config
+ create mode 100644 tools/testing/selftests/ipc/config
+ create mode 100644 tools/testing/selftests/memory-hotplug/config
+ create mode 100644 tools/testing/selftests/mount/config
+ create mode 100644 tools/testing/selftests/net/config
+ create mode 100644 tools/testing/selftests/pstore/config
+ create mode 100644 tools/testing/selftests/seccomp/config
+ create mode 100644 tools/testing/selftests/static_keys/config
+ create mode 100644 tools/testing/selftests/user/config
+ create mode 100644 tools/testing/selftests/vm/config
+ create mode 100644 tools/testing/selftests/zram/config
 
-diff --git a/Makefile b/Makefile
-index 45ec34644b4f..72e9b7371b0d 100644
---- a/Makefile
-+++ b/Makefile
-@@ -128,6 +128,10 @@ _all:
- # Cancel implicit rules on top Makefile
- $(CURDIR)/Makefile Makefile: ;
- 
-+ifneq ($(words $(CURDIR)),1)
-+  $(error main directory cannot contain spaces)
-+endif
-+
- ifneq ($(KBUILD_OUTPUT),)
- # Invoke a second make in the output directory, passing relevant variables
- # check that the output directory actually exists
 -- 
 2.1.4
 
