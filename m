@@ -1,161 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vk0-f51.google.com ([209.85.213.51]:35341 "EHLO
-	mail-vk0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750785AbcAHNZp (ORCPT
+Received: from server.mytravel.pl ([193.108.35.103]:33255 "EHLO
+	smtp.mytravel.pl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754885AbcAJK6f convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 8 Jan 2016 08:25:45 -0500
+	Sun, 10 Jan 2016 05:58:35 -0500
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-Reply-To: sedat.dilek@gmail.com
-In-Reply-To: <568FABDE.4010004@suse.cz>
-References: <CA+icZUVEs_+XiWeqtJ+34HBSx5LJYyEgoo2DLFzVr6yc9oxx2Q@mail.gmail.com>
-	<20160104113318.700a9ed0@lxorguk.ukuu.org.uk>
-	<CA+icZUUAoG0VeY06r_=c7aNGbuSkHp5VRHNSB=bQGTiTHShGtQ@mail.gmail.com>
-	<568AF421.7050305@suse.cz>
-	<CA+icZUWxfbPN4URoVdBAwm22sdKqGmTtiNBEg-KoHi-vgGqzqg@mail.gmail.com>
-	<568F9E1E.7030406@suse.cz>
-	<CA+icZUWMX_C2ME7BT0gkdbPPao_59=ddg6+2E9T3OMfZ0++OQA@mail.gmail.com>
-	<568FABDE.4010004@suse.cz>
-Date: Fri, 8 Jan 2016 14:25:44 +0100
-Message-ID: <CA+icZUVMjyivwB2Sm8+mOygb5fgpe1MY2XBPLLNv0cqDE74ZUw@mail.gmail.com>
-Subject: Re: Thoughts about introducing OPTIMIZATION_CFLAG
-From: Sedat Dilek <sedat.dilek@gmail.com>
-Content-Type: multipart/mixed; boundary=001a114360f2481ec80528d28696
+Content-Transfer-Encoding: 8BIT
+Content-Description: Mail message body
+Subject: Kann ich dir vertrauen mit diesem Vorschlag?
+From: "Mr. Zhao Burn" <info@commonwealthbank.com>
+Date: Sun, 10 Jan 2016 21:22:44 +1030
+Reply-To: zhaoburn@razbk.com
+Message-Id: <20160110104258.80A80202D09@smtp.mytravel.pl>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: One Thousand Gnomes <gnomes@lxorguk.ukuu.org.uk>, Linus Torvalds <torvalds@linux-foundation.org>, Andrew Morton <akpm@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>, Arnd Bergmann <arnd@arndb.de>, Ingo Molnar <mingo@redhat.com>, linux-kbuild@vger.kernel.org, Linux ACPI <linux-acpi@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, the arch/x86 maintainers <x86@kernel.org>
+To: Recipients <info@commonwealthbank.com>
 
---001a114360f2481ec80528d28696
-Content-Type: text/plain; charset=UTF-8
+Achtung: Begünstigter,
 
-On Fri, Jan 8, 2016 at 1:30 PM, Michal Marek <mmarek@suse.cz> wrote:
-> On 2016-01-08 12:49, Sedat Dilek wrote:
->> On Fri, Jan 8, 2016 at 12:31 PM, Michal Marek <mmarek@suse.cz> wrote:
->>> On 2016-01-08 11:03, Sedat Dilek wrote:
->>>> On Mon, Jan 4, 2016 at 11:37 PM, Michal Marek <mmarek@suse.cz> wrote:
->>>>> Dne 4.1.2016 v 12:47 Sedat Dilek napsal(a):
->>>> gcc-4.9 "$@"
->>>> - EOF -
->>>>
->>>> According to your statement passing an optlevel here in this script
->>>> will never-ever be recognized - as it is at the begin-of-(make)-line.
->>>
->>> Pass it as the last argument.
->>>
->>
->> How do I do that?
->
-> gcc-4.9 "$@" -O3
->
+Ich bin Herr Zhao Brennen, die Arbeit mit der Commonwealth Bank of Australia. Ich wünschte, Ihren Namen als Begünstigte auf 15,3 Mio. Euro nur wegen des Todes des Hinterlegers, der vor Jahren zusammen mit ihrer Familie starb zu platzieren.
+Ich versichere Ihnen jedoch, dass diese Transaktion unter einer legitimen Anordnung, die Sie aus der Verletzung des Rechts sowohl in Ihrem Land und hier in Australien zu schützen wird ausgeführt, sobald der Fonds wird auf Ihr Bank Konto.Die Fonds Ich beziehe mich auf es übertragen werden hier in dieser Bank schwebend in Zwischenkonto, also bin zu erbitten für Ihre Kooperation, um in Zusammenarbeit mit mir, um dies getan haben, wird es auf ein Konto übertragen werden, werden Sie überall auf der world.I bieten wird müssen Sie die zur Verfügung Folgende Informationen dringend ermöglichen der Anwalt startet die Verarbeitung der alle relevanten rechtlichen Dokumenten
+für den Fonds Weisung.
 
-Hmm, with that modification and my attached build-script I don't see
-any -O3 passed to my generated make-lines.
+1) Name:
+2) Adresse:
+3) Tel:
+4) Alter:
+5) Geschlecht:
+6) Beruf Status:
 
-[ /usr/bin/mycompiler ]
-#!/bin/bash
+Warten auf Ihre Antwort bald.
 
-clang "$@" -O3
-- EOF -
-
-What's wrong?
-
-- Sedat -
-
---001a114360f2481ec80528d28696
-Content-Type: application/x-sh; name="build_llvmlinux.sh"
-Content-Disposition: attachment; filename="build_llvmlinux.sh"
-Content-Transfer-Encoding: base64
-X-Attachment-Id: f_ij5puhng0
-
-IyEvYmluL3NoCgojIyMgTEFTVCBNT0RJRklFRDogMDctSkFOLTIwMTUgKFNlZGF0IERpbGVrIDxz
-ZWRhdC5kaWxla0BnbWFpbC5jb20+KQoKIyMjIEhFTFAKIyAxLiBtYWtlIGRlYi1wa2cgKG9wdGlv
-bnMpOiAgPGZpbGU6IHNjcmlwdHMvcGFja2FnZS9idWlsZGRlYj4KIyAyLiBsb2NhbHZlcnNpb24g
-aGFuZGxpbmc6ICAgPGZpbGU6IHNjcmlwdHMvc2V0bG9jYWx2ZXJzaW9uPgojIDMuIEtCVUlMRF9V
-U0VSXyogdmFyaWFibGVzOiA8ZmlsZTogc2NyaXB0cy9ta2NvbXBpbGVfaD4KIyA0LiBQcmVyZXFz
-L1ByZXBhcmF0aW9uOiAgICAgPGh0dHA6Ly9rZXJuZWwtaGFuZGJvb2suYWxpb3RoLmRlYmlhbi5v
-cmcvY2gtY29tbW9uLXRhc2tzLmh0bWwjczQuMi4xPgoKIyMjIFBSRVJFUVM6IEluc3RhbGwgYnVp
-bGQtZXNzZW50aWFsLCBmYWtlcm9vdCwgZHBrZy1kZXYgYW5kIGdpdCBwYWNrYWdlcwojYXB0LWdl
-dCB1cGRhdGUKI2FwdC1nZXQgaW5zdGFsbCBidWlsZC1lc3NlbnRpYWwgZmFrZXJvb3QgZHBrZy1k
-ZXYgZ2l0CgojIyMgTGFuZ3VhZ2Ugc2V0dGluZ3MKZXhwb3J0IExBTkc9QwpleHBvcnQgTENfQUxM
-PUMKCiMjIyBCYXNlIGlzIExpbnV4LXVwc3RyZWFtIHNvdXJjZSBkaXJlY3RvcnkKQkFTRV9ESVI9
-JChwd2QpClNSQ19ESVI9IiR7QkFTRV9ESVJ9L2xpbnV4IgoKIyMjIENsb25lIExpbnV4LXVwc3Ry
-ZWFtIHJlbW90ZSBHSVQgdHJlZQojR0lUX1VSTD0iZ2l0Oi8vZ2l0Lmtlcm5lbC5vcmcvcHViL3Nj
-bS9saW51eC9rZXJuZWwvZ2l0L3RvcnZhbGRzL2xpbnV4LmdpdCIKI2dpdCBjbG9uZSAke0dJVF9V
-Ukx9CgojIyMgQ2hhbmdlIHRvIGJ1aWxkIGRpcmVjdG9yeQpjZCAke1NSQ19ESVJ9CgojIyMgTWFr
-ZSBhbmQgY29tcGlsZXIgc2V0dGluZ3MgKGhlcmU6IFVzZSBteWNvbXBpbGVyIHdyYXBwZXItc2Ny
-aXB0IHN1Z2dlc3RlZCBieSBMaW51cyBUb3J2YWxkcykKIyMgWFhYOiBERUJVRzogTUFLRT0ibWFr
-ZSBWPTEiICh2ZXJib3NlIG91dHB1dCB0byBnZXQgJG15Y29tcGlsZXIgbGluZXMpCiMjIFhYWDog
-REVCVUc6IE1BS0VfSk9CUz0iMSIKIyMgTk9URTogRm9yIGZhc3QgYnVpbGRzIHVzZSBNQUtFX0pP
-QlM9JCgoJChnZXRjb25mIF9OUFJPQ0VTU09SU19PTkxOKSsxKSkKTUFLRT0ibWFrZSBWPTEiCk1B
-S0VfSk9CUz0iMSIKQ0NfRk9SX0JVSUxEPSJteWNvbXBpbGVyIgpIT1NUQ0NfRk9SX0JVSUxEPSIk
-Q0NfRk9SX0JVSUxEIgoKIyMjIEV4dHJhY3QgdmVyc2lvbi10YWcgZnJvbSBsb2NhbCBHSVQgdHJl
-ZQpMQVRFU1RfVVBTVFJFQU1fVkVSX1RBRz0kKGdpdCBmb3ItZWFjaC1yZWYgLS1zb3J0PXRhZ2dl
-cmRhdGUgLS1mb3JtYXQ9IiUocmVmbmFtZTpzaG9ydCkiIHJlZnMvdGFncyB8IGdyZXAgXid2WzAt
-OV0uWzAtOV0qJyB8IHRhaWwgLTEpCgojIyMgRGlzdHJpYnV0aW9uIHNldHRpbmdzCiMgTk9URTog
-JGRpc3RyaWJ1dGlvbiBpcyB1c2VkIGluICRkZWJpYW5fcmV2aXNpb24KZGlzdHJpYnV0aW9uPSQo
-bHNiX3JlbGVhc2UgLS1jb2RlbmFtZSAtLXNob3J0KQoKIyMjIFVwbG9hZGVyIHNldHRpbmdzCiMg
-Tk9URTogJHVwbG9hZGVyIGlzIHVzZWQgaW4gJGRlYmlhbl9yZXZpc2lvbgpleHBvcnQgREVCRlVM
-TE5BTUU9IlNlZGF0IERpbGVrIgpleHBvcnQgREVCRU1BSUw9InNlZGF0LmRpbGVrQGdtYWlsLmNv
-bSIKdXBsb2FkZXI9ImRpbGVrcyIKCiMjIyBEZWJpYW4gdXBzdHJlYW0gdmVyc2lvbiBzZXR0aW5n
-cyAKIyBOT1RFLTE6ICR1cHN0cmVhbV92ZXJzaW9uIGlzIGV4dHJhY3RlZCBmcm9tIE1ha2VmaWxl
-CiMgTk9URS0yOiAkZGViaWFuX3Vwc3RyZWFtX3ZlcnNpb24gaXMgdXNlZCBpbiBidWlsZGRlYiBv
-cHRpb25zCiMgTk9URS0zOiBDb252ZXJ0ICctcmNYJyBpbiAkdXBzdHJlYW1fdmVyc2lvbiB0byAn
-fnJjWCcgKHNlZSAkZXh0cmF2ZXJzaW9uKQojIEVYQU1QTEU6IGRlYmlhbl91cHN0cmVhbV92ZXJz
-aW9uPSIzLjE5LjB+cmMyIgp2ZXJzaW9uPSQoYXdrICcvXlZFUlNJT04gPSAvIHtwcmludCAkM30n
-IE1ha2VmaWxlKQpwYXRjaGxldmVsPSQoYXdrICcvXlBBVENITEVWRUwgPSAvIHtwcmludCAkM30n
-IE1ha2VmaWxlKQpzdWJsZXZlbD0kKGF3ayAnL15TVUJMRVZFTCA9IC8ge3ByaW50ICQzfScgTWFr
-ZWZpbGUpCmV4dHJhdmVyc2lvbj0kKGF3ayAnL15FWFRSQVZFUlNJT04gPSAvIHtwcmludCAkM30n
-IE1ha2VmaWxlKQp1cHN0cmVhbV92ZXJzaW9uPSIke3ZlcnNpb259LiR7cGF0Y2hsZXZlbH0uJHtz
-dWJsZXZlbH0ke2V4dHJhdmVyc2lvbn0iCmRlYmlhbl91cHN0cmVhbV92ZXJzaW9uPSQoZWNobyAk
-dXBzdHJlYW1fdmVyc2lvbiB8IHRyICctJyAnficpCgojIyMgRGViaWFuIHJldmlzaW9uIHNldHRp
-bmdzCiMgTk9URS0xOiAkZGViaWFuX3JldmlzaW9uIGlzIHVzZWQgaW4gYnVpbGRkZWIgb3B0aW9u
-cwojIE5PVEUtMjogJHJldmlzaW9uIGlzIHVzZWQgaW4gJGRlYmlhbl9yZXZpc2lvbiBhbmQgJG15
-bG9jYWx2ZXJzaW9uCiMgRVhBTVBMRTogZGViaWFuX3JldmlzaW9uPSIxfnByZWNpc2UrZGlsZWtz
-MSIKcmV2aXNpb249IjQiCnVwbG9hZGVyX3JldmlzaW9uPSIxIgpkZWJpYW5fcmV2aXNpb249IiR7
-cmV2aXNpb259fiR7ZGlzdHJpYnV0aW9ufSske3VwbG9hZGVyfSR7dXBsb2FkZXJfcmV2aXNpb259
-IgoKIyMjIE15IGtlcm5lbC1mZWF0dXJlc2V0IHNldHRpbmdzCiMgRVhBTVBMRS0xOiBVc2Ugb3du
-ICJpbml6YSIgZmVhdHVyZXNldCAoZGVmYXVsdCkKIyBFWEFNUExFLTI6IFRyeSAibGx2bWxpbnV4
-IiBmZWF0dXJlc2V0IChFWFBFUklNRU5UQUwpCm15ZmVhdHVyZXNldD0ibGx2bWxpbnV4IgoKIyMj
-IE15IGtlcm5lbC1mbGF2b3VyIHNldHRpbmdzCiMgRVhBTVBMRS0xOiBVc2Ugb3duICJzbWFsbCIg
-a2VybmVsLWZsYXZvdXIgKGxvY2FsbW9kY29uZmlnLWVkIHBsdXMgc29tZSBkZWJ1Zy1vcHRpb25z
-IGVuYWJsZWQpIAojIEVYQU1QTEUtMjogVXNlIG93biAiZGVidWciIGtlcm5lbC1mbGF2b3VyIChD
-T05GSUdfREVCVUdfSU5GTz15LCBXQVJOSU5HOiBFbm91Z2ggZGlzYy1zcGFjZT8pCm15a2VybmVs
-Zmxhdm91cj0iYW1kNjQiCgojIyMgQ3VzdG9taXplZCBMT0NBTFZFUlNJT04gc2V0dGluZ3MKIyBO
-T1RFLTE6ICRteWxvY2FsdmVyc2lvbiBpcyBhdHRhY2hlZCBhcyBzdWZmaXggdG8gImluY2x1ZGUv
-Z2VuZXJhdGVkL3V0c3JlbGVhc2UuaCIgZmlsZQojIE5PVEUtMjogVXNhZ2Ugb2YgTE9DQUxWRVJT
-SU9OPSRteWxvY2FsdmVyc2lvbiBzdXBwcmVzc2VzICIrIiBzdWZmaXgKIyBOT1RFLTM6IFNlZSBh
-bHNvICIjZGVmaW5lIFVUU19SRUxFQVNFIiBpbiB1dHNyZWxlYXNlLmggZmlsZS4KIyBXQVJOSU5H
-OiBEbyBOT1QgdXNlIHVuZGVyc2NvcmUgKCJfIikgaW4gJG15bG9jYWx2ZXJzaW9uIChzZWUgPGh0
-dHA6Ly9idWdzLmRlYmlhbi5vcmcvMjIyNDY3PikuCiMgRVJSLU1TRzogZHBrZy1nZW5jb250cm9s
-OiBlcnJvcjogSWxsZWdhbCBwYWNrYWdlIG5hbWUgLi4uCiMgRVhBTVBMRS0xOiBteWxvY2FsdmVy
-c2lvbj0iMS1pbml6YS1zbWFsbCIKIyBFWEFNUExFLTI6IG15bG9jYWx2ZXJzaW9uPSIxLWluaXph
-LXg4Nl82NCIgKCJ4ODZfNjQiIG5vdCBhbGxvd2VkLCB1c2UgImFtZDY0IiBpbnN0ZWFkKQpteWxv
-Y2FsdmVyc2lvbj0iJHtyZXZpc2lvbn0tJHtteWZlYXR1cmVzZXR9LSR7bXlrZXJuZWxmbGF2b3Vy
-fSIKCiMjIyBCdWlsZC1sb2cgZmlsZQpLVkVSPSIke3Vwc3RyZWFtX3ZlcnNpb259LSR7bXlsb2Nh
-bHZlcnNpb259IgpCVUlMRF9MT0dfRklMRT0iYnVpbGQtbG9nXyR7S1ZFUn0udHh0IgoKIyMjIG1h
-a2Ugb3B0aW9ucwpNQUtFX09QVFM9IkNDPSR7Q0NfRk9SX0JVSUxEfSBIT1NUQ0M9JEhPU1RDQ19G
-T1JfQlVJTEQgLWoke01BS0VfSk9CU30gS0JVSUxEX0JVSUxEX1VTRVI9JHtERUJFTUFJTH0gTE9D
-QUxWRVJTSU9OPS0ke215bG9jYWx2ZXJzaW9ufSIKCiMjIyBidWlsZGRlYiAoZGViLXBrZykgb3B0
-aW9ucwojIEVYQU1QTEUtMTogQlVJTERERUJfVEFSR0VUPSJkZWItZHBrZyIgICAgKHNlZSBzY3Jp
-cHRzL3BhY2thZ2UvYnVpbGRkZWIpCiMgRVhBTVBMRS0yOiBCVUlMRERFQl9UQVJHRVQ9ImJpbmRl
-Yi1wa2ciICAoZ2VuZXJhdGUgYmluYXJ5IGtlcm5lbCBwYWNrYWdlIG9ubHksIExpbnV4ID49IHY0
-LjMtcmMxKQojIEVYQU1QTEUtMzogS0RFQl9QS0dWRVJTSU9OPSIzLjE5LjB+cmMyLTF+cHJlY2lz
-ZStkaWxla3MxIgojIEVYQU1QTEUtNDogS0RFQl9DSEFOR0VMT0dfRElTVD0icHJlY2lzZSIgKHNl
-dCBkaXN0cmlidXRpb24gbmFtZSBleHBsaWNpdGx5KQpCVUlMRERFQl9UQVJHRVQ9ImJpbmRlYi1w
-a2ciCkJVSUxEREVCX09QVFM9IktERUJfUEtHVkVSU0lPTj0ke2RlYmlhbl91cHN0cmVhbV92ZXJz
-aW9ufS0ke2RlYmlhbl9yZXZpc2lvbn0iCiMjQlVJTERERUJfT1BUUz0iJEJVSUxEREVCX09QVFMg
-S0RFQl9DSEFOR0VMT0dfRElTVD0kZGlzdHJpYnV0aW9uIgoKIyMjIExpc3Qgc29tZSB2ZXJzaW9u
-IGFuZCBvcHRpb24gc2V0dGluZ3MKZWNobyAiTGludXggdXBzdHJlYW0gdmVyc2lvbiAuLi4uICR7
-TEFURVNUX1VQU1RSRUFNX1ZFUl9UQUd9IgplY2hvICJEZWJpYW4gdXBzdHJlYW0gdmVyc2lvbiAu
-Li4gJHtkZWJpYW5fdXBzdHJlYW1fdmVyc2lvbn0iCmVjaG8gIkRlYmlhbiByZXZpc2lvbiAuLi4u
-Li4uLi4uLiAke2RlYmlhbl9yZXZpc2lvbn0iCmVjaG8gIm1ha2Ugb3B0aW9ucyAuLi4uLi4uLi4u
-Li4uLiAke01BS0VfT1BUU30iCmVjaG8gImJ1aWxkZGViIHRhcmdldCAuLi4uLi4uLi4uLiAke0JV
-SUxEREVCX1RBUkdFVH0iCmVjaG8gImJ1aWxkZGViIG9wdGlvbnMgLi4uLi4uLi4uLiAke0JVSUxE
-REVCX09QVFN9IgplY2hvICIiCgojIyMgUmVtb3ZlIGFueSBleGlzdGluZyBsb2NhbHZlcnNpb24q
-IGZpbGUocykgYXMgY3VzdG9taXplZCBMT0NBTFZFUlNJT04gaXMgdXNlZAojIEVYQU1QTEU6IExp
-bnV4LW5leHQgc2hpcHMgYSAibG9jYWx2ZXJzaW9uLW5leHQiIGZpbGUuCnJtIC1mIGxvY2FsdmVy
-c2lvbioKCiMjIyBTdGFydCBidWlsZAplY2hvICIjIyMjIyBTdGFydGluZyBMaW51eC1rZXJuZWwg
-YnVpbGQgLi4uIgpmYWtlcm9vdCAke01BS0V9ICR7TUFLRV9PUFRTfSAke0JVSUxEREVCX1RBUkdF
-VH0gJHtCVUlMRERFQl9PUFRTfSAyPiYxIHwgdGVlIC4uLyR7QlVJTERfTE9HX0ZJTEV9CmVjaG8g
-IiMjIyMjIEZpbmlzaGVkISIK
---001a114360f2481ec80528d28696--
+Hochachtungsvoll,
+Herr Zhao brennen.
