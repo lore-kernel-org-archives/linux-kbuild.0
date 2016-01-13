@@ -1,56 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-yk0-f177.google.com ([209.85.160.177]:35160 "EHLO
-	mail-yk0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752162AbcAMRFq (ORCPT
+Received: from mailapp01.imgtec.com ([195.59.15.196]:30745 "EHLO
+	mailapp01.imgtec.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755545AbcAMRaV (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 13 Jan 2016 12:05:46 -0500
-Received: by mail-yk0-f177.google.com with SMTP id x67so496816316ykd.2
-        for <linux-kbuild@vger.kernel.org>; Wed, 13 Jan 2016 09:05:46 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <1452189189-31188-1-git-send-email-mst@redhat.com>
+	Wed, 13 Jan 2016 12:30:21 -0500
+From: Daniel Sanders <Daniel.Sanders@imgtec.com>
+Subject: RE: [PATCH] ld-version: fix it on Fedora
+Date: Wed, 13 Jan 2016 17:30:18 +0000
+Message-ID: <E484D272A3A61B4880CDF2E712E9279F45D04AA7@HHMAIL01.hh.imgtec.org>
 References: <1452189189-31188-1-git-send-email-mst@redhat.com>
-Date: Wed, 13 Jan 2016 17:05:45 +0000
-Message-ID: <CAAG0J995iCNwdN6PpuJfzo+TVWNXR3UVqS9v-4HXbryyvMn+=w@mail.gmail.com>
-Subject: Re: [PATCH] ld-version: fix it on Fedora
-From: James Hogan <james.hogan@imgtec.com>
-Content-Type: text/plain; charset=UTF-8
+ <CAAG0J995iCNwdN6PpuJfzo+TVWNXR3UVqS9v-4HXbryyvMn+=w@mail.gmail.com>
+In-Reply-To: <CAAG0J995iCNwdN6PpuJfzo+TVWNXR3UVqS9v-4HXbryyvMn+=w@mail.gmail.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: LKML <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, Linux MIPS Mailing List <linux-mips@linux-mips.org>, Ralf Baechle <ralf@linux-mips.org>, Daniel Sanders <Daniel.Sanders@imgtec.com>
+To: James Hogan <James.Hogan@imgtec.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, Linux MIPS Mailing List <linux-mips@linux-mips.org>, Ralf Baechle <ralf@linux-mips.org>
 
-Cc'ing Daniel, who has hit further breakage due to unusual version numbers.
-
-On 7 January 2016 at 17:55, Michael S. Tsirkin <mst@redhat.com> wrote:
-> On Fedora 23, ld --version outputs:
-> GNU ld version 2.25-15.fc23
->
-> But ld-version.sh fails to parse this, so e.g.  mips build fails to
-> enable VDSO, printing a warning that binutils >= 2.24 is required.
->
-> To fix, teach ld-version to parse this format.
->
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> ---
->
-> Which tree should this be merged through? Mine? MIPS?
->
->  scripts/ld-version.sh | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/scripts/ld-version.sh b/scripts/ld-version.sh
-> index 198580d..25d23c8 100755
-> --- a/scripts/ld-version.sh
-> +++ b/scripts/ld-version.sh
-> @@ -2,6 +2,8 @@
->  # extract linker version number from stdin and turn into single number
->         {
->         gsub(".*)", "");
-> +       gsub(".*version ", "");
-> +       gsub("-.*", "");
->         split($1,a, ".");
->         print a[1]*10000000 + a[2]*100000 + a[3]*10000 + a[4]*100 + a[5];
->         exit
-> --
-> MST
->
+SGksDQoNClRoZSB2ZXJzaW9uIG51bWJlciB0aGF0J3MgZ2l2aW5nIG1lIHByb2JsZW1zIGlzIDIu
+MjQuNTEuMjAxNDAyMTcgd2hpY2ggbGQtdmVyc2lvbi5zaCBjb252ZXJ0cyB0byAyMDM2OTMxNzAw
+ICgyMDAwMDAwMCsyNDAwMDAwKzUxMDAwMCsyMDE0MDIxNzAwKS4NCg0KQXQgdGhlIG1vbWVudCwg
+SSdtIHdvbmRlcmluZyB3aGV0aGVyIHdlIHJlYWxseSBuZWVkIHRvIGhhbmRsZSBtb3JlIHRoYW4g
+dGhyZWUgdmVyc2lvbiBudW1iZXIgY29tcG9uZW50cy4gQW5vdGhlciB0aG91Z2h0IGlzIHRoYXQg
+dGhlIGNvbXBhcmlzb24gY291bGQgYmUgaW5zaWRlIGxkLXZlcnNpb24uc2ggKG9yIGEgcmVwbGFj
+ZW1lbnQpIHNvIHRoYXQgaXQgY2FuIGNvbXBhcmUgdGhlIGFycmF5IG9mIHZlcnNpb24gY29tcG9u
+ZW50cyBkaXJlY3RseSBpbnN0ZWFkIG9mIHVzaW5nIGEgY29uc3RydWN0ZWQgaW50ZWdlciBhcyBh
+IHByb3h5Lg0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IGphbWVzQGFs
+YmFuYXJ0cy5jb20gW21haWx0bzpqYW1lc0BhbGJhbmFydHMuY29tXSBPbiBCZWhhbGYgT2YNCj4g
+SmFtZXMgSG9nYW4NCj4gU2VudDogMTMgSmFudWFyeSAyMDE2IDE3OjA2DQo+IFRvOiBNaWNoYWVs
+IFMuIFRzaXJraW4NCj4gQ2M6IExLTUw7IE1pY2hhbCBNYXJlazsgbGludXgta2J1aWxkQHZnZXIu
+a2VybmVsLm9yZzsgTGludXggTUlQUyBNYWlsaW5nDQo+IExpc3Q7IFJhbGYgQmFlY2hsZTsgRGFu
+aWVsIFNhbmRlcnMNCj4gU3ViamVjdDogUmU6IFtQQVRDSF0gbGQtdmVyc2lvbjogZml4IGl0IG9u
+IEZlZG9yYQ0KPiANCj4gQ2MnaW5nIERhbmllbCwgd2hvIGhhcyBoaXQgZnVydGhlciBicmVha2Fn
+ZSBkdWUgdG8gdW51c3VhbCB2ZXJzaW9uIG51bWJlcnMuDQo+IA0KPiBPbiA3IEphbnVhcnkgMjAx
+NiBhdCAxNzo1NSwgTWljaGFlbCBTLiBUc2lya2luIDxtc3RAcmVkaGF0LmNvbT4gd3JvdGU6DQo+
+ID4gT24gRmVkb3JhIDIzLCBsZCAtLXZlcnNpb24gb3V0cHV0czoNCj4gPiBHTlUgbGQgdmVyc2lv
+biAyLjI1LTE1LmZjMjMNCj4gPg0KPiA+IEJ1dCBsZC12ZXJzaW9uLnNoIGZhaWxzIHRvIHBhcnNl
+IHRoaXMsIHNvIGUuZy4gIG1pcHMgYnVpbGQgZmFpbHMgdG8NCj4gPiBlbmFibGUgVkRTTywgcHJp
+bnRpbmcgYSB3YXJuaW5nIHRoYXQgYmludXRpbHMgPj0gMi4yNCBpcyByZXF1aXJlZC4NCj4gPg0K
+PiA+IFRvIGZpeCwgdGVhY2ggbGQtdmVyc2lvbiB0byBwYXJzZSB0aGlzIGZvcm1hdC4NCj4gPg0K
+PiA+IFNpZ25lZC1vZmYtYnk6IE1pY2hhZWwgUy4gVHNpcmtpbiA8bXN0QHJlZGhhdC5jb20+DQo+
+ID4gLS0tDQo+ID4NCj4gPiBXaGljaCB0cmVlIHNob3VsZCB0aGlzIGJlIG1lcmdlZCB0aHJvdWdo
+PyBNaW5lPyBNSVBTPw0KPiA+DQo+ID4gIHNjcmlwdHMvbGQtdmVyc2lvbi5zaCB8IDIgKysNCj4g
+PiAgMSBmaWxlIGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygrKQ0KPiA+DQo+ID4gZGlmZiAtLWdpdCBh
+L3NjcmlwdHMvbGQtdmVyc2lvbi5zaCBiL3NjcmlwdHMvbGQtdmVyc2lvbi5zaA0KPiA+IGluZGV4
+IDE5ODU4MGQuLjI1ZDIzYzggMTAwNzU1DQo+ID4gLS0tIGEvc2NyaXB0cy9sZC12ZXJzaW9uLnNo
+DQo+ID4gKysrIGIvc2NyaXB0cy9sZC12ZXJzaW9uLnNoDQo+ID4gQEAgLTIsNiArMiw4IEBADQo+
+ID4gICMgZXh0cmFjdCBsaW5rZXIgdmVyc2lvbiBudW1iZXIgZnJvbSBzdGRpbiBhbmQgdHVybiBp
+bnRvIHNpbmdsZSBudW1iZXINCj4gPiAgICAgICAgIHsNCj4gPiAgICAgICAgIGdzdWIoIi4qKSIs
+ICIiKTsNCj4gPiArICAgICAgIGdzdWIoIi4qdmVyc2lvbiAiLCAiIik7DQo+ID4gKyAgICAgICBn
+c3ViKCItLioiLCAiIik7DQo+ID4gICAgICAgICBzcGxpdCgkMSxhLCAiLiIpOw0KPiA+ICAgICAg
+ICAgcHJpbnQgYVsxXSoxMDAwMDAwMCArIGFbMl0qMTAwMDAwICsgYVszXSoxMDAwMCArIGFbNF0q
+MTAwICsgYVs1XTsNCj4gPiAgICAgICAgIGV4aXQNCj4gPiAtLQ0KPiA+IE1TVA0KPiA+DQo=
