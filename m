@@ -1,58 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.17.24]:59684 "EHLO
-	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751233AbcAMUqJ (ORCPT
+Received: from bombadil.infradead.org ([198.137.202.9]:39356 "EHLO
+	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752853AbcAMVbe (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 13 Jan 2016 15:46:09 -0500
-From: Arnd Bergmann <arnd@arndb.de>
+	Wed, 13 Jan 2016 16:31:34 -0500
 Subject: Re: [PATCH] logfs: clarify MTD dependency
-Date: Wed, 13 Jan 2016 21:45:05 +0100
-Message-ID: <6116283.ubGS0D0e49@wuerfel>
-In-Reply-To: <20160113123918.544497b48bf4c03591c75747@linux-foundation.org>
-References: <5776957.XLg438VUOx@wuerfel> <20160113123918.544497b48bf4c03591c75747@linux-foundation.org>
+References: <5776957.XLg438VUOx@wuerfel>
+ <20160113123918.544497b48bf4c03591c75747@linux-foundation.org>
+ <6116283.ubGS0D0e49@wuerfel>
+From: Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <5696C234.1020500@infradead.org>
+Date: Wed, 13 Jan 2016 13:31:32 -0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <6116283.ubGS0D0e49@wuerfel>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: mmarek@suse.com, Peter Chen <peter.chen@freescale.com>, Randy Dunlap <rdunlap@infradead.org>, Joern Engel <joern@logfs.org>, Prasad Joshi <prasadjoshi.linux@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: Arnd Bergmann <arnd@arndb.de>, Andrew Morton <akpm@linux-foundation.org>
+Cc: mmarek@suse.com, Peter Chen <peter.chen@freescale.com>, Joern Engel <joern@logfs.org>, Prasad Joshi <prasadjoshi.linux@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 
-On Wednesday 13 January 2016 12:39:18 Andrew Morton wrote:
+On 01/13/16 12:45, Arnd Bergmann wrote:
+> On Wednesday 13 January 2016 12:39:18 Andrew Morton wrote:
+>>
+>> Randy's "logfs: fix logfs build errors and dependencies" is an
+>> only-in-mm thing.  So it would make sense to combine the two patches
+>> into a single one and to give that an appropriate changelog.
+>>
+>> How does this look? (Primary author was chosen randomly)
+>>
+>>
+>> From: Arnd Bergmann <arnd@arndb.de>
+>> Subject: logfs: fix logfs build errors and dependencies
+>>
+>> Fix build errors that happen when CONFIG_LOGFS=y and CONFIG_MTD=m:
+>>
+>> fs/built-in.o: In function `logfs_mount':
+>> super.c:(.text+0x92a6f): undefined reference to `logfs_get_sb_mtd'
+>> fs/built-in.o: In function `logfs_get_sb_bdev':
+>> (.text+0x93530): undefined reference to `logfs_get_sb_mtd'
+>>
+>> This patch avoids the error by changing the dependencies of
+>> logfs in a way that we can no longer configure logfs as built-in
+>> when the MTD core is a loadable module, while leaving the
+>> dependency to require at least one of MTD or BLOCK to be
+>> enabled.
+>>
+>> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+>> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+>> Cc: Michal Marek <mmarek@suse.cz>
+>> Cc: Peter Chen <peter.chen@freescale.com>
+>> Cc: Randy Dunlap <rdunlap@infradead.org>
+>> Cc: Joern Engel <joern@logfs.org>
+>> Cc: Prasad Joshi <prasadjoshi.linux@gmail.com>
+>> Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+>>
 > 
-> Randy's "logfs: fix logfs build errors and dependencies" is an
-> only-in-mm thing.  So it would make sense to combine the two patches
-> into a single one and to give that an appropriate changelog.
+> Looks good, thanks!
 > 
-> How does this look? (Primary author was chosen randomly)
-> 
-> 
-> From: Arnd Bergmann <arnd@arndb.de>
-> Subject: logfs: fix logfs build errors and dependencies
-> 
-> Fix build errors that happen when CONFIG_LOGFS=y and CONFIG_MTD=m:
-> 
-> fs/built-in.o: In function `logfs_mount':
-> super.c:(.text+0x92a6f): undefined reference to `logfs_get_sb_mtd'
-> fs/built-in.o: In function `logfs_get_sb_bdev':
-> (.text+0x93530): undefined reference to `logfs_get_sb_mtd'
-> 
-> This patch avoids the error by changing the dependencies of
-> logfs in a way that we can no longer configure logfs as built-in
-> when the MTD core is a loadable module, while leaving the
-> dependency to require at least one of MTD or BLOCK to be
-> enabled.
-> 
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-> Cc: Michal Marek <mmarek@suse.cz>
-> Cc: Peter Chen <peter.chen@freescale.com>
-> Cc: Randy Dunlap <rdunlap@infradead.org>
-> Cc: Joern Engel <joern@logfs.org>
-> Cc: Prasad Joshi <prasadjoshi.linux@gmail.com>
-> Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+> 	Arnd
 > 
 
-Looks good, thanks!
+Thanks also.
 
-	Arnd
+-- 
+~Randy
