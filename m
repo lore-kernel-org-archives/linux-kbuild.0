@@ -1,60 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from walmailout04.yourhostingaccount.com ([65.254.253.36]:45217 "EHLO
-	walmailout04.yourhostingaccount.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752483AbcAMIV7 (ORCPT
+Received: from mout.kundenserver.de ([212.227.126.131]:61699 "EHLO
+	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757242AbcAMN1z (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 13 Jan 2016 03:21:59 -0500
-Received: from mailscan11.yourhostingaccount.com ([10.1.15.11] helo=walmailscan11.yourhostingaccount.com)
-	by walmailout04.yourhostingaccount.com with esmtp (Exim)
-	id 1aJGBK-0000X1-VP
-	for linux-kbuild@vger.kernel.org; Wed, 13 Jan 2016 02:49:26 -0500
-Received: from [10.114.3.33] (helo=walimpout13)
-	by walmailscan11.yourhostingaccount.com with esmtp (Exim)
-	id 1aJGBK-0002GZ-Qu
-	for linux-kbuild@vger.kernel.org; Wed, 13 Jan 2016 02:49:26 -0500
-Received: from [127.0.0.1] (helo=email.powweb.com)
-	by walwebmail02.yourhostingaccount.com with esmtp (Exim)
-	id 1aJGBF-0007IZ-RI
-	for linux-kbuild@vger.kernel.org; Wed, 13 Jan 2016 02:49:21 -0500
-Message-ID: <9c3047e63bc6451f171bb677b8605e04.squirrel@email.powweb.com>
-Date: Wed, 13 Jan 2016 02:49:21 -0500
-Subject: [PATCH] [linux-next] scripts/sign-file.c Fix LibreSSL support]
-From: codarren@hackers.mu
+	Wed, 13 Jan 2016 08:27:55 -0500
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH] logfs: clarify MTD dependency
+Date: Wed, 13 Jan 2016 14:25:55 +0100
+Message-ID: <5776957.XLg438VUOx@wuerfel>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
+To: akpm@linux-foundation.org
+Cc: mmarek@suse.com, Peter Chen <peter.chen@freescale.com>, Randy Dunlap <rdunlap@infradead.org>, Joern Engel <joern@logfs.org>, Prasad Joshi <prasadjoshi.linux@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 
-HOSTCC  scripts/sign-file In file included from
-scripts/sign-file.c:46:0: /usr/include/openssl/cms.h:62:2: error: #error CMS
-is disabled.  #error CMS is disabled.   ^ scripts/Makefile.host:91: recipe
-for target 'scripts/sign-file' failed make[1]: *** [scripts/sign-file] Error
-1 Makefile:567: recipe for target 'scripts' failed make: *** [scripts] Error
-2
+After a change to the way that composite modules work, we get
+a logfs build error:
 
-Fix SSL headers so that the kernel can build with LibreSSL
+fs/built-in.o: In function `logfs_mount':
+:(.text+0x139d34): undefined reference to `logfs_get_sb_mtd'
+fs/built-in.o: In function `logfs_get_sb_bdev':
+:(.text+0x13aa08): undefined reference to `logfs_get_sb_mtd'
+
+This patch avoids the error by changing the dependencies of
+logfs in a way that we can no longer configure logfs as built-in
+when the MTD core is a loadable module, while leaving the
+dependency to require at least one of MTD or BLOCK to be
+enabled.
+
+Another patch tried to work around the problem, but accidentally
+dropped the dependency on 'BLOCK || MTD', allowing the file
+system to be built if neither is selected.
+
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Fixes: cf4f21938e13 ("kbuild: Allow to specify composite modules with modname-m")
+Fixes: e6be296f680c ("logfs: fix logfs build errors and dependencies")
 ---
- scripts/sign-file.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I originally sent the patch November 27, but the discussion did not
+conclude, see https://lkml.org/lkml/2015/11/27/299
 
-diff --git a/scripts/sign-file.c b/scripts/sign-file.c
-index 250a7a6..a0b806d 100755
---- a/scripts/sign-file.c
-+++ b/scripts/sign-file.c
-@@ -39,7 +39,7 @@
-  * signing with anything other than SHA1 - so we're stuck with that if
-such is
-  * the case.
-  */
--#if OPENSSL_VERSION_NUMBER < 0x10000000L
-+#if (OPENSSL_VERSION_NUMBER < 0x10000000L || LIBRESSL_VERSION_NUMBER)
- #define USE_PKCS7
- #endif
- #ifndef USE_PKCS7
---
-2.7.0
+This version is rebased on the patch that got applied yesterday.
 
-
+diff --git a/fs/logfs/Kconfig b/fs/logfs/Kconfig
+index 2b1485a5c086..2b4503163930 100644
+--- a/fs/logfs/Kconfig
++++ b/fs/logfs/Kconfig
+@@ -1,7 +1,6 @@
+ config LOGFS
+ 	tristate "LogFS file system"
+-	depends on BLOCK || BLOCK=n
+-	depends on MTD || MTD=n
++	depends on MTD || (!MTD && BLOCK)
+ 	select ZLIB_INFLATE
+ 	select ZLIB_DEFLATE
+ 	select CRC32
 
