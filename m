@@ -1,64 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from walmailout10.yourhostingaccount.com ([65.254.253.83]:43490 "EHLO
-	walmailout10.yourhostingaccount.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751091AbcAMPjh (ORCPT
+Received: from mail-yk0-f177.google.com ([209.85.160.177]:35160 "EHLO
+	mail-yk0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752162AbcAMRFq (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 13 Jan 2016 10:39:37 -0500
-Received: from walmailscan15.yourhostingaccount.com ([10.1.15.15] helo=walmailscan15.yourhostingaccount.com)
-	by walmailout10.yourhostingaccount.com with esmtp (Exim)
-	id 1aJNWJ-0006i9-2O
-	for linux-kbuild@vger.kernel.org; Wed, 13 Jan 2016 10:39:35 -0500
-Received: from [10.114.3.32] (helo=walimpout12)
-	by walmailscan15.yourhostingaccount.com with esmtp (Exim)
-	id 1aJNWI-0006PI-TA
-	for linux-kbuild@vger.kernel.org; Wed, 13 Jan 2016 10:39:34 -0500
-Message-ID: <92dc47c01a2dd7bd13c71b9febae317a.squirrel@email.powweb.com>
-In-Reply-To: <9c3047e63bc6451f171bb677b8605e04.squirrel@email.powweb.com>
-References: <9c3047e63bc6451f171bb677b8605e04.squirrel@email.powweb.com>
-Date: Wed, 13 Jan 2016 19:39:07 +0400
-Subject: [PATCH] v2 linux-next scripts/sign-file.c Fix LibreSSL support
-From: "Codarren Velvindron" <codarren@hackers.mu>
+	Wed, 13 Jan 2016 12:05:46 -0500
+Received: by mail-yk0-f177.google.com with SMTP id x67so496816316ykd.2
+        for <linux-kbuild@vger.kernel.org>; Wed, 13 Jan 2016 09:05:46 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
+In-Reply-To: <1452189189-31188-1-git-send-email-mst@redhat.com>
+References: <1452189189-31188-1-git-send-email-mst@redhat.com>
+Date: Wed, 13 Jan 2016 17:05:45 +0000
+Message-ID: <CAAG0J995iCNwdN6PpuJfzo+TVWNXR3UVqS9v-4HXbryyvMn+=w@mail.gmail.com>
+Subject: Re: [PATCH] ld-version: fix it on Fedora
+From: James Hogan <james.hogan@imgtec.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: codarren@hackers.mu
-Cc: linux-kbuild@vger.kernel.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, Linux MIPS Mailing List <linux-mips@linux-mips.org>, Ralf Baechle <ralf@linux-mips.org>, Daniel Sanders <Daniel.Sanders@imgtec.com>
 
+Cc'ing Daniel, who has hit further breakage due to unusual version numbers.
 
--Fix SSL headers so that the kernel can build with LibreSSL
-
-In file included from scripts/sign-file.c:47:0:
-/usr/include/openssl/cms.h:62:2: error: #error CMS is disabled.
- #error CMS is disabled.
-  ^
-scripts/Makefile.host:91: recipe for target 'scripts/sign-file' failed
-make[1]: *** [scripts/sign-file] Error 1
-Makefile:567: recipe for target 'scripts' failed
-make: *** [scripts] Error 2
-
-
-Signed-off-by: Codarren Velvindron <codarren@hackers.mu>
----
- scripts/sign-file.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/scripts/sign-file.c b/scripts/sign-file.c
-index 250a7a6..a0b806d 100755
---- a/scripts/sign-file.c
-+++ b/scripts/sign-file.c
-@@ -39,7 +39,7 @@
-  * signing with anything other than SHA1 - so we're stuck with that if
-such is
-  * the case.
-  */
--#if OPENSSL_VERSION_NUMBER < 0x10000000L
-+#if (OPENSSL_VERSION_NUMBER < 0x10000000L || LIBRESSL_VERSION_NUMBER)
- #define USE_PKCS7
- #endif
- #ifndef USE_PKCS7
---
-2.7.0
-
-
+On 7 January 2016 at 17:55, Michael S. Tsirkin <mst@redhat.com> wrote:
+> On Fedora 23, ld --version outputs:
+> GNU ld version 2.25-15.fc23
+>
+> But ld-version.sh fails to parse this, so e.g.  mips build fails to
+> enable VDSO, printing a warning that binutils >= 2.24 is required.
+>
+> To fix, teach ld-version to parse this format.
+>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
+>
+> Which tree should this be merged through? Mine? MIPS?
+>
+>  scripts/ld-version.sh | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/scripts/ld-version.sh b/scripts/ld-version.sh
+> index 198580d..25d23c8 100755
+> --- a/scripts/ld-version.sh
+> +++ b/scripts/ld-version.sh
+> @@ -2,6 +2,8 @@
+>  # extract linker version number from stdin and turn into single number
+>         {
+>         gsub(".*)", "");
+> +       gsub(".*version ", "");
+> +       gsub("-.*", "");
+>         split($1,a, ".");
+>         print a[1]*10000000 + a[2]*100000 + a[3]*10000 + a[4]*100 + a[5];
+>         exit
+> --
+> MST
+>
