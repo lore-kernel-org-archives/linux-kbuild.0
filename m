@@ -1,67 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:39356 "EHLO
-	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752853AbcAMVbe (ORCPT
+Received: from zeniv.linux.org.uk ([195.92.253.2]:54221 "EHLO
+	ZenIV.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751402AbcANEdU (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 13 Jan 2016 16:31:34 -0500
-Subject: Re: [PATCH] logfs: clarify MTD dependency
-References: <5776957.XLg438VUOx@wuerfel>
- <20160113123918.544497b48bf4c03591c75747@linux-foundation.org>
- <6116283.ubGS0D0e49@wuerfel>
-From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <5696C234.1020500@infradead.org>
-Date: Wed, 13 Jan 2016 13:31:32 -0800
+	Wed, 13 Jan 2016 23:33:20 -0500
+Date: Thu, 14 Jan 2016 04:33:14 +0000
+From: Al Viro <viro@ZenIV.linux.org.uk>
+Subject: Re: [vfs:asm-exports 6/6] ERROR: "__raw_readsb"
+ [drivers/ata/pata_pcmcia.ko] undefined!
+Message-ID: <20160114043314.GV17997@ZenIV.linux.org.uk>
+References: <201601141009.4c7T6SyL%fengguang.wu@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <6116283.ubGS0D0e49@wuerfel>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <201601141009.4c7T6SyL%fengguang.wu@intel.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>, Andrew Morton <akpm@linux-foundation.org>
-Cc: mmarek@suse.com, Peter Chen <peter.chen@freescale.com>, Joern Engel <joern@logfs.org>, Prasad Joshi <prasadjoshi.linux@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+To: kbuild test robot <fengguang.wu@intel.com>
+Cc: kbuild-all@01.org, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.com>
 
-On 01/13/16 12:45, Arnd Bergmann wrote:
-> On Wednesday 13 January 2016 12:39:18 Andrew Morton wrote:
->>
->> Randy's "logfs: fix logfs build errors and dependencies" is an
->> only-in-mm thing.  So it would make sense to combine the two patches
->> into a single one and to give that an appropriate changelog.
->>
->> How does this look? (Primary author was chosen randomly)
->>
->>
->> From: Arnd Bergmann <arnd@arndb.de>
->> Subject: logfs: fix logfs build errors and dependencies
->>
->> Fix build errors that happen when CONFIG_LOGFS=y and CONFIG_MTD=m:
->>
->> fs/built-in.o: In function `logfs_mount':
->> super.c:(.text+0x92a6f): undefined reference to `logfs_get_sb_mtd'
->> fs/built-in.o: In function `logfs_get_sb_bdev':
->> (.text+0x93530): undefined reference to `logfs_get_sb_mtd'
->>
->> This patch avoids the error by changing the dependencies of
->> logfs in a way that we can no longer configure logfs as built-in
->> when the MTD core is a loadable module, while leaving the
->> dependency to require at least one of MTD or BLOCK to be
->> enabled.
->>
->> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
->> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
->> Cc: Michal Marek <mmarek@suse.cz>
->> Cc: Peter Chen <peter.chen@freescale.com>
->> Cc: Randy Dunlap <rdunlap@infradead.org>
->> Cc: Joern Engel <joern@logfs.org>
->> Cc: Prasad Joshi <prasadjoshi.linux@gmail.com>
->> Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
->>
+On Thu, Jan 14, 2016 at 10:50:12AM +0800, kbuild test robot wrote:
+> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/viro/vfs.git asm-exports
+> head:   5719a6be97e89c65e2b432b45850100c96c7419a
+> commit: 5719a6be97e89c65e2b432b45850100c96c7419a [6/6] arm: move exports to definitions
+> config: arm-viper_defconfig (attached as .config)
+> reproduce:
+>         wget https://git.kernel.org/cgit/linux/kernel/git/wfg/lkp-tests.git/plain/sbin/make.cross -O ~/bin/make.cross
+>         chmod +x ~/bin/make.cross
+>         git checkout 5719a6be97e89c65e2b432b45850100c96c7419a
+>         # save the attached .config to linux build tree
+>         make.cross ARCH=arm 
 > 
-> Looks good, thanks!
+> All errors (new ones prefixed by >>):
 > 
-> 	Arnd
-> 
+> >> ERROR: "__raw_readsb" [drivers/ata/pata_pcmcia.ko] undefined!
+> >> ERROR: "__raw_writesb" [drivers/ata/pata_pcmcia.ko] undefined!
 
-Thanks also.
+Arrgh...  OK, I see what's going on - export in a lib-y object.  For lib/*.c
+we deal with that by putting such objects into obj-y; the same certainly
+can be done for *.S, but I wonder if a better solution would be to have
+lib-y objects scanned for __ksymtab_strings section (grepping in objdump -h
+output) and treat the ones that have such as obj-y.
 
--- 
-~Randy
+Comments?
