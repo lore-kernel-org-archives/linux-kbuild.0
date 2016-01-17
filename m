@@ -1,138 +1,137 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg003.nifty.com ([202.248.44.41]:45064 "EHLO
-	conssluserg003-v.nifty.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1752547AbcAQUk2 (ORCPT
+Received: from mail-lb0-f178.google.com ([209.85.217.178]:36187 "EHLO
+	mail-lb0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752554AbcAQVOj (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 17 Jan 2016 15:40:28 -0500
-Received: from mail-yk0-f170.google.com (mail-yk0-f170.google.com [209.85.160.170]) (authenticated)
-	by conssluserg003-v.nifty.com with ESMTP id u0HKeDLf024341
-	for <linux-kbuild@vger.kernel.org>; Mon, 18 Jan 2016 05:40:14 +0900
-Received: by mail-yk0-f170.google.com with SMTP id x67so596026400ykd.2
-        for <linux-kbuild@vger.kernel.org>; Sun, 17 Jan 2016 12:40:14 -0800 (PST)
+	Sun, 17 Jan 2016 16:14:39 -0500
+Received: by mail-lb0-f178.google.com with SMTP id oh2so338291784lbb.3
+        for <linux-kbuild@vger.kernel.org>; Sun, 17 Jan 2016 13:14:38 -0800 (PST)
+Subject: Re: [U-Boot] Kconfig bug (optional choice deselected by following
+ option)
+References: <569B7D5D.1030904@gmail.com>
+ <CAK7LNAT9oiuQ81Ms-Piw2=OwX3mr+VzCQk2buy1T7yqRLKU40Q@mail.gmail.com>
+From: Mateusz Kulikowski <mateusz.kulikowski@gmail.com>
+Message-ID: <569C043B.7030301@gmail.com>
+Date: Sun, 17 Jan 2016 22:14:35 +0100
 MIME-Version: 1.0
 In-Reply-To: <CAK7LNAT9oiuQ81Ms-Piw2=OwX3mr+VzCQk2buy1T7yqRLKU40Q@mail.gmail.com>
-References: <569B7D5D.1030904@gmail.com>
-	<CAK7LNAT9oiuQ81Ms-Piw2=OwX3mr+VzCQk2buy1T7yqRLKU40Q@mail.gmail.com>
-Date: Mon, 18 Jan 2016 05:40:12 +0900
-Message-ID: <CAK7LNARHXPaS7hQ=_YJxHAhDvfGZWJqHopzevG2-DJ+tsngRyQ@mail.gmail.com>
-Subject: Re: [U-Boot] Kconfig bug (optional choice deselected by following option)
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mateusz Kulikowski <mateusz.kulikowski@gmail.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
 Cc: "u-boot@lists.denx.de" <u-boot@lists.denx.de>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-I retract my previous replay.
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
 
-With/without the "default n" in the choice menu,
-I confirmed the problem happened (in the latest Linux as well as U-Boot).
+Hi All,
 
-I hope somebody follows up...
+Just a small update from my side;
+
+I used bisect-foo and offending commit (@Linux) seems to be:
+
+commit 5d09598d488f081e3be23f885ed65cbbe2d073b5
+Author: Arnaud Lacombe <lacombar@gmail.com>
+Date:   Mon Jan 23 17:29:05 2012 -0500
+
+    kconfig: fix new choices being skipped upon config update
 
 
 
-2016-01-18 5:29 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
+Best Regards,
+Mateusz
+
+On 17.01.2016 21:29, Masahiro Yamada wrote:
 > Hi Mateusz,
 > (CCing linux-kbuild, which I think the best place to discuss this topic)
->
->
+> 
+> 
 > I think "default n" in the choice entry is weird
 > because the choice is not boolean.
->
+> 
 > Without it, the weird thing you saw did not happen on my box.
->
->
+> 
+> 
 > Anyway, I'd like Kconfig to say something if it is really a syntax error.
->
->
+> 
+> 
 > I hope comments from Kconfig experts.
->
->
->
->
+> 
+> 
+> 
+> 
 > 2016-01-17 20:39 GMT+09:00 Mateusz Kulikowski <mateusz.kulikowski@gmail.com>:
->> -----BEGIN PGP SIGNED MESSAGE-----
->> Hash: SHA256
->>
->> Hi all,
->>
->> I have found weird feature of Kconfig.
->> If I misused something, please let me know - I found at least one place
->> where the same error occurs.
->>
->> Let's consider the following Kconfig (you can put it anywhere in the source tree):
->> <-------------- copy ----------------->
->> menu "Testmenu"
->> choice
->>         prompt "Problem to solve"
->>         optional
->>         default n
->>         help
->>           Solve one of great world problems
->>
->> config SOLVE_HUNGER
->>         bool "Hunger"
->>
->> config SOLVE_WARS
->>         bool "Wars"
->>
->> config CURE_CANCER
->>         bool "Cancer"
->>
->> endchoice
->>
->> config TREES
->>         default n
->>         bool "Plant trees in garden"
->> endmenu
->>
->> config BLAH
->>         default n
->>         bool "Totally unrelated option"
->>
->> <------------- paste ------------------->
->>
->> Now, select HUNGER important problem to solve; Warning - select it with space, _not_ enter + selection from list;
->> Then select either TREES or BLAH.
->>
->> Weird thing is - SOLVE_HUNGER is unselected.
->>
->> It doesn't happen when you select (anything) by entering selection menu (i.e. enter).
->> Even if you deselect option and then select it with space.
->>
->> It happens both in menuconfig and nconfig.
->>
->> It happens both in recent U-Boot b57843e6 and Linux kernel ece62678.
->>
->> Unfortunately my knowledge of Kconfig is very limited so your help would be appreciated.
->>
->> Best Regards,
->> Mateusz
->> -----BEGIN PGP SIGNATURE-----
->> Version: GnuPG v2
->>
->> iQEcBAEBCAAGBQJWm31YAAoJELvtohmVtQzB7dEH/0/9BMe6+Oq38UVSUcjmNzaH
->> GqUdkK9MN9tYD6euHTcynlT0HZRkDTYCOFmQjG68Lj1Ejx0/Si2KYe6NKexvkysB
->> HAshC0+rGkbOgW0fkBByL2HY8PGAxtNbSbcwzC7xnhRMCkiPp2xiMy1pwRSOI7tN
->> dDzXEuuTvGxsGHUm8dSuxGE9Wd96MY71BDzO+vQrP+CiCV7IeKYMfiYhngN6FEBz
->> Sq5YCljVsSIvsZuBIaJlPuU7vnS64x2RnxkPskln9k4M9gv6GQOAcRb+YZ0PKLOs
->> qSdzBTvQsEMBdsJBk2nGgBIXUcFSPbAAQwl1FyepFlgm4d6152Wf9BQxFJBNij4=
->> =zry6
->> -----END PGP SIGNATURE-----
+> Hi all,
+> 
+> I have found weird feature of Kconfig.
+> If I misused something, please let me know - I found at least one place
+> where the same error occurs.
+> 
+> Let's consider the following Kconfig (you can put it anywhere in the source tree):
+> <-------------- copy ----------------->
+> menu "Testmenu"
+> choice
+>         prompt "Problem to solve"
+>         optional
+>         default n
+>         help
+>           Solve one of great world problems
+> 
+> config SOLVE_HUNGER
+>         bool "Hunger"
+> 
+> config SOLVE_WARS
+>         bool "Wars"
+> 
+> config CURE_CANCER
+>         bool "Cancer"
+> 
+> endchoice
+> 
+> config TREES
+>         default n
+>         bool "Plant trees in garden"
+> endmenu
+> 
+> config BLAH
+>         default n
+>         bool "Totally unrelated option"
+> 
+> <------------- paste ------------------->
+> 
+> Now, select HUNGER important problem to solve; Warning - select it with space, _not_ enter + selection from list;
+> Then select either TREES or BLAH.
+> 
+> Weird thing is - SOLVE_HUNGER is unselected.
+> 
+> It doesn't happen when you select (anything) by entering selection menu (i.e. enter).
+> Even if you deselect option and then select it with space.
+> 
+> It happens both in menuconfig and nconfig.
+> 
+> It happens both in recent U-Boot b57843e6 and Linux kernel ece62678.
+> 
+> Unfortunately my knowledge of Kconfig is very limited so your help would be appreciated.
+> 
+> Best Regards,
+> Mateusz
 >> _______________________________________________
 >> U-Boot mailing list
 >> U-Boot@lists.denx.de
 >> http://lists.denx.de/mailman/listinfo/u-boot
->
->
->
-> --
-> Best Regards
-> Masahiro Yamada
+> 
+> 
+> 
 
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
-
--- 
-Best Regards
-Masahiro Yamada
+iQEcBAEBCAAGBQJWnAQpAAoJELvtohmVtQzBqrwH/1joRyZ2wuuTEtaJG9due3IM
+Wf0sHphYkTWdfi4kxRPZRwH57bvdLjtb3BWxDKtze+luoYB6M5dFUFk5SUzcDREI
+/+bddYKcLwkSDc73t/HiA/4U3hqma9jXIo1bLoP9vtlvcIQpaITcqnOxB4tS2kBm
+7qOOuLOoa3qQhh5ZhBH3eE4sx+C2sFnYnHKzkTrMO0CkE3YfEt0ZQXJYrIPyaWea
+UDtK6W7rRoq/7RXGw2Xw8gblk2P60wGK1lBOrEWGY46zufHfyUP4MUzYe2vbwW2i
+mThLtcySF5+ty6NGBs/gIatrSGfgdomBgm6MzJlgQ4EabaGj4ugsY8yFtNJKFPI=
+=idim
+-----END PGP SIGNATURE-----
