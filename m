@@ -1,62 +1,121 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-yk0-f177.google.com ([209.85.160.177]:33367 "EHLO
-	mail-yk0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752469AbcAPTOI (ORCPT
+Received: from conssluserg002.nifty.com ([202.248.44.40]:31922 "EHLO
+	conssluserg002-v.nifty.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1752347AbcAQUaH (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 16 Jan 2016 14:14:08 -0500
-Received: by mail-yk0-f177.google.com with SMTP id k129so553976931yke.0
-        for <linux-kbuild@vger.kernel.org>; Sat, 16 Jan 2016 11:14:08 -0800 (PST)
-Date: Sat, 16 Jan 2016 14:14:27 -0500
-From: Tom Rini <trini@konsulko.com>
-Subject: Re: [PATCH] kbuild: fixdep: Check fstat(2) return value
-Message-ID: <20160116191427.GU3359@bill-the-cat>
-References: <1449523568-31084-1-git-send-email-trini@konsulko.com>
+	Sun, 17 Jan 2016 15:30:07 -0500
+Received: from mail-yk0-f181.google.com (mail-yk0-f181.google.com [209.85.160.181]) (authenticated)
+	by conssluserg002-v.nifty.com with ESMTP id u0HKTuVf022583
+	for <linux-kbuild@vger.kernel.org>; Mon, 18 Jan 2016 05:29:57 +0900
+Received: by mail-yk0-f181.google.com with SMTP id x67so595889512ykd.2
+        for <linux-kbuild@vger.kernel.org>; Sun, 17 Jan 2016 12:29:57 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1449523568-31084-1-git-send-email-trini@konsulko.com>
+In-Reply-To: <569B7D5D.1030904@gmail.com>
+References: <569B7D5D.1030904@gmail.com>
+Date: Mon, 18 Jan 2016 05:29:55 +0900
+Message-ID: <CAK7LNAT9oiuQ81Ms-Piw2=OwX3mr+VzCQk2buy1T7yqRLKU40Q@mail.gmail.com>
+Subject: Re: [U-Boot] Kconfig bug (optional choice deselected by following option)
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Michal Marek <mmarek@suse.com>, lk <linux-kernel@vger.kernel.org>, stable@vger.kernel.org
+To: Mateusz Kulikowski <mateusz.kulikowski@gmail.com>
+Cc: "u-boot@lists.denx.de" <u-boot@lists.denx.de>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Mon, Dec 7, 2015 at 4:26 PM, Tom Rini <trini@konsulko.com> wrote:
+Hi Mateusz,
+(CCing linux-kbuild, which I think the best place to discuss this topic)
 
-> Coverity has recently added a check that will find when we don't check
-> the return code from fstat(2).  Copy/paste the checking logic that
-> print_deps() has with an appropriate re-wording of the perror() message.
->
-> Cc: Michal Marek <mmarek@suse.com>
-> Cc: linux-kbuild@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> Signed-off-by: Tom Rini <trini@konsulko.com>
->
-> ---
-> Note that I don't have a CID here was I found this in U-Boot and the
-> kernel hasn't yet done a build with this test being enabled.
-> ---
->  scripts/basic/fixdep.c |    6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
->
-> diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
-> index c68fd61..e3d9678 100644
-> --- a/scripts/basic/fixdep.c
-> +++ b/scripts/basic/fixdep.c
-> @@ -274,7 +274,11 @@ static void do_config_file(const char *filename)
->                 perror(filename);
->                 exit(2);
->         }
-> -       fstat(fd, &st);
-> +       if (fstat(fd, &st) < 0) {
-> +               fprintf(stderr, "fixdep: error fstat'ing config file: ");
-> +               perror(filename);
-> +               exit(2);
-> +       }
->         if (st.st_size == 0) {
->                 close(fd);
->                 return;
 
-Adding stable@ since this applies to 4.4.  Any comments?  Thanks!
+I think "default n" in the choice entry is weird
+because the choice is not boolean.
+
+Without it, the weird thing you saw did not happen on my box.
+
+
+Anyway, I'd like Kconfig to say something if it is really a syntax error.
+
+
+I hope comments from Kconfig experts.
+
+
+
+
+2016-01-17 20:39 GMT+09:00 Mateusz Kulikowski <mateusz.kulikowski@gmail.com>:
+> -----BEGIN PGP SIGNED MESSAGE-----
+> Hash: SHA256
+>
+> Hi all,
+>
+> I have found weird feature of Kconfig.
+> If I misused something, please let me know - I found at least one place
+> where the same error occurs.
+>
+> Let's consider the following Kconfig (you can put it anywhere in the source tree):
+> <-------------- copy ----------------->
+> menu "Testmenu"
+> choice
+>         prompt "Problem to solve"
+>         optional
+>         default n
+>         help
+>           Solve one of great world problems
+>
+> config SOLVE_HUNGER
+>         bool "Hunger"
+>
+> config SOLVE_WARS
+>         bool "Wars"
+>
+> config CURE_CANCER
+>         bool "Cancer"
+>
+> endchoice
+>
+> config TREES
+>         default n
+>         bool "Plant trees in garden"
+> endmenu
+>
+> config BLAH
+>         default n
+>         bool "Totally unrelated option"
+>
+> <------------- paste ------------------->
+>
+> Now, select HUNGER important problem to solve; Warning - select it with space, _not_ enter + selection from list;
+> Then select either TREES or BLAH.
+>
+> Weird thing is - SOLVE_HUNGER is unselected.
+>
+> It doesn't happen when you select (anything) by entering selection menu (i.e. enter).
+> Even if you deselect option and then select it with space.
+>
+> It happens both in menuconfig and nconfig.
+>
+> It happens both in recent U-Boot b57843e6 and Linux kernel ece62678.
+>
+> Unfortunately my knowledge of Kconfig is very limited so your help would be appreciated.
+>
+> Best Regards,
+> Mateusz
+> -----BEGIN PGP SIGNATURE-----
+> Version: GnuPG v2
+>
+> iQEcBAEBCAAGBQJWm31YAAoJELvtohmVtQzB7dEH/0/9BMe6+Oq38UVSUcjmNzaH
+> GqUdkK9MN9tYD6euHTcynlT0HZRkDTYCOFmQjG68Lj1Ejx0/Si2KYe6NKexvkysB
+> HAshC0+rGkbOgW0fkBByL2HY8PGAxtNbSbcwzC7xnhRMCkiPp2xiMy1pwRSOI7tN
+> dDzXEuuTvGxsGHUm8dSuxGE9Wd96MY71BDzO+vQrP+CiCV7IeKYMfiYhngN6FEBz
+> Sq5YCljVsSIvsZuBIaJlPuU7vnS64x2RnxkPskln9k4M9gv6GQOAcRb+YZ0PKLOs
+> qSdzBTvQsEMBdsJBk2nGgBIXUcFSPbAAQwl1FyepFlgm4d6152Wf9BQxFJBNij4=
+> =zry6
+> -----END PGP SIGNATURE-----
+> _______________________________________________
+> U-Boot mailing list
+> U-Boot@lists.denx.de
+> http://lists.denx.de/mailman/listinfo/u-boot
+
+
 
 -- 
-Tom
+Best Regards
+Masahiro Yamada
