@@ -1,180 +1,95 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:10187 "EHLO mga01.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751017AbcASL2X (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 19 Jan 2016 06:28:23 -0500
-Date: Tue, 19 Jan 2016 19:27:55 +0800
-From: kbuild test robot <fengguang.wu@intel.com>
-Subject: [linux-review:James-Hogan/kbuild-Remove-stale-asm-generic-wrappers/20160119-183642] d979f99e9cc14e2667e9b6e268db695977e4197a BUILD DONE
-Message-ID: <569e1dbb.MgLv8OaZwklOxxtU%fengguang.wu@intel.com>
+Received: from [195.59.15.196] ([195.59.15.196]:40076 "EHLO
+	mailapp01.imgtec.com" rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org
+	with ESMTP id S1755308AbcASNiU (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 19 Jan 2016 08:38:20 -0500
+From: James Hogan <james.hogan@imgtec.com>
+Subject: [PATCH v2 2/2] kbuild: Remove stale asm-generic wrappers
+Date: Tue, 19 Jan 2016 13:37:50 +0000
+Message-ID: <1453210670-12596-3-git-send-email-james.hogan@imgtec.com>
+In-Reply-To: <1453210670-12596-1-git-send-email-james.hogan@imgtec.com>
+References: <1453210670-12596-1-git-send-email-james.hogan@imgtec.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: James Hogan <james.hogan@imgtec.com>
-Cc: linux-mips@linux-mips.org, linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, Florian Fainelli <f.fainelli@gmail.com>, Paul Burton <paul.burton@imgtec.com>, Ralf Baechle <ralf@linux-mips.org>, Arnd Bergmann <arnd@arndb.de>, Heinrich Schuchardt <xypron.glpk@gmx.de>, linux-kernel@vger.kernel.orglinux-mips@linux-mips.orglinux-arch@vger.kernel.orglinux-kbuild@vger.kernel.orgFlorian Fainelli <f.fainelli@gmail.com>Paul Burton <paul.burton@imgtec.com>Ralf Baechle <ralf@linux-mips.org>Arnd Bergmann <arnd@arndb.de>Heinrich Schuchardt <xypron.glpk@gmx.de>linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.com>
+To: Michal Marek <mmarek@suse.com>
+Cc: linux-kernel@vger.kernel.org, Heinrich Schuchardt <xypron.glpk@gmx.de>, James Hogan <james.hogan@imgtec.com>, Arnd Bergmann <arnd@arndb.de>, Ralf Baechle <ralf@linux-mips.org>, Paul Burton <paul.burton@imgtec.com>, Florian Fainelli <f.fainelli@gmail.com>, linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org, linux-mips@linux-mips.org
 
-https://github.com/0day-ci/linux  James-Hogan/kbuild-Remove-stale-asm-generic-wrappers/20160119-183642
-d979f99e9cc14e2667e9b6e268db695977e4197a  kbuild: Remove stale asm-generic wrappers
+When a header file is removed from generic-y (often accompanied by the
+addition of an arch specific header), the generated wrapper file will
+persist, and in some cases may still take precedence over the new arch
+header.
 
-arch/x86/include/asm/unistd.h:15:29: fatal error: asm/unistd_32.h: No such file or directory
-arch/x86/kernel/asm-offsets_32.c:12:29: fatal error: asm/syscalls_32.h: No such file or directory
-arch/x86/kernel/asm-offsets_64.c:15:29: fatal error: asm/syscalls_64.h: No such file or directory
-/bin/sh: line 0: [: -ge: unary operator expected
+For example commit f1fe2d21f4e1 ("MIPS: Add definitions for extended
+context") removed ucontext.h from generic-y in arch/mips/include/asm/,
+and added an arch/mips/include/uapi/asm/ucontext.h. The continued use of
+the wrapper when reusing a dirty build tree resulted in build failures
+in arch/mips/kernel/signal.c:
 
-Error ids grouped by kconfigs:
+arch/mips/kernel/signal.c: In function ‘sc_to_extcontext’:
+arch/mips/kernel/signal.c:142:12: error: ‘struct ucontext’ has no member named ‘uc_extcontext’
+  return &uc->uc_extcontext;
+            ^
 
-recent_errors
-├── i386-alldefconfig
-│   └── arch-x86-include-asm-unistd.h:fatal-error:asm-unistd_32.h:No-such-file-or-directory
-├── i386-allmodconfig
-│   └── arch-x86-include-asm-unistd.h:fatal-error:asm-unistd_32.h:No-such-file-or-directory
-├── i386-allyesconfig
-│   └── arch-x86-include-asm-unistd.h:fatal-error:asm-unistd_32.h:No-such-file-or-directory
-├── i386-defconfig
-│   └── arch-x86-include-asm-unistd.h:fatal-error:asm-unistd_32.h:No-such-file-or-directory
-├── i386-randconfig-a0-201603
-│   └── arch-x86-kernel-asm-offsets_32.c:fatal-error:asm-syscalls_32.h:No-such-file-or-directory
-├── i386-randconfig-b0-01191831
-│   └── arch-x86-kernel-asm-offsets_32.c:fatal-error:asm-syscalls_32.h:No-such-file-or-directory
-├── i386-randconfig-i0-201603
-│   └── arch-x86-include-asm-unistd.h:fatal-error:asm-unistd_32.h:No-such-file-or-directory
-├── i386-randconfig-i1-201603
-│   └── arch-x86-include-asm-unistd.h:fatal-error:asm-unistd_32.h:No-such-file-or-directory
-├── i386-randconfig-r0-201603
-│   └── arch-x86-kernel-asm-offsets_32.c:fatal-error:asm-syscalls_32.h:No-such-file-or-directory
-├── i386-randconfig-s1-201603
-│   └── arch-x86-kernel-asm-offsets_32.c:fatal-error:asm-syscalls_32.h:No-such-file-or-directory
-├── i386-randconfig-x002-01181631
-│   └── bin-sh:line::ge:unary-operator-expected
-├── i386-tinyconfig
-│   └── arch-x86-kernel-asm-offsets_32.c:fatal-error:asm-syscalls_32.h:No-such-file-or-directory
-└── x86_64-randconfig-s3-01191831
-    └── arch-x86-kernel-asm-offsets_64.c:fatal-error:asm-syscalls_64.h:No-such-file-or-directory
+Fix by detecting and removing wrapper headers in generated header
+directories that do not correspond to a filename in generic-y, genhdr-y,
+or the newly introduced generated-y.
 
-elapsed time: 50m
+Reported-by: Jacek Anaszewski <j.anaszewski@samsung.com>
+Reported-by: Hauke Mehrtens <hauke@hauke-m.de>
+Reported-by: Heinrich Schuchardt <xypron.glpk@gmx.de>
+Signed-off-by: James Hogan <james.hogan@imgtec.com>
+Cc: Michal Marek <mmarek@suse.com>
+Cc: Arnd Bergmann <arnd@arndb.de>
+Cc: Ralf Baechle <ralf@linux-mips.org>
+Cc: Paul Burton <paul.burton@imgtec.com>
+Cc: Florian Fainelli <f.fainelli@gmail.com>
+Cc: linux-kbuild@vger.kernel.org
+Cc: linux-arch@vger.kernel.org
+Cc: linux-mips@linux-mips.org
+---
+Changes in v2:
+- Rewrite a bit, drawing inspiration from Makefile.headersinst.
+- Exclude genhdr-y and generated-y (thanks to kbuild test robot).
+---
+ scripts/Makefile.asm-generic | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
 
-configs tested: 118
+diff --git a/scripts/Makefile.asm-generic b/scripts/Makefile.asm-generic
+index 045e0098e962..24c29f16f029 100644
+--- a/scripts/Makefile.asm-generic
++++ b/scripts/Makefile.asm-generic
+@@ -13,11 +13,26 @@ include scripts/Kbuild.include
+ # Create output directory if not already present
+ _dummy := $(shell [ -d $(obj) ] || mkdir -p $(obj))
+ 
++# Stale wrappers when the corresponding files are removed from generic-y
++# need removing.
++generated-y   := $(generic-y) $(genhdr-y) $(generated-y)
++all-files     := $(patsubst %, $(obj)/%, $(generated-y))
++old-headers   := $(wildcard $(obj)/*.h)
++unwanted      := $(filter-out $(all-files),$(old-headers))
++
+ quiet_cmd_wrap = WRAP    $@
+ cmd_wrap = echo "\#include <asm-generic/$*.h>" >$@
+ 
+-all: $(patsubst %, $(obj)/%, $(generic-y))
++quiet_cmd_remove = REMOVE  $(unwanted)
++cmd_remove = rm -f $(unwanted)
++
++all: $(patsubst %, $(obj)/%, $(generic-y)) FORCE
++	$(if $(unwanted),$(call cmd,remove),)
+ 	@:
+ 
+ $(obj)/%.h:
+ 	$(call cmd,wrap)
++
++.PHONY: $(PHONY)
++PHONY += FORCE
++FORCE: ;
+-- 
+2.4.10
 
-i386                     randconfig-a0-201603
-x86_64                             acpi-redef
-x86_64                           allyesdebian
-x86_64                                nfsroot
-blackfin                BF526-EZBRD_defconfig
-blackfin                BF533-EZKIT_defconfig
-blackfin            BF561-EZKIT-SMP_defconfig
-blackfin                  TCM-BF537_defconfig
-cris                 etrax-100lx_v2_defconfig
-sh                                allnoconfig
-sh                          rsk7269_defconfig
-sh                  sh7785lcr_32bit_defconfig
-sh                            titan_defconfig
-arm                               allnoconfig
-arm                         at91_dt_defconfig
-arm                                  at_hdmac
-arm                                    ep93xx
-arm                       imx_v6_v7_defconfig
-arm                                  iop-adma
-arm                          marzen_defconfig
-arm                          prima2_defconfig
-arm                                    sa1100
-arm                                   samsung
-arm                                        sh
-arm                       spear13xx_defconfig
-powerpc                           allnoconfig
-powerpc                             defconfig
-powerpc                       ppc64_defconfig
-m32r                       m32104ut_defconfig
-m32r                     mappi3.smp_defconfig
-m32r                         opsput_defconfig
-m32r                           usrv_defconfig
-xtensa                       common_defconfig
-xtensa                          iss_defconfig
-alpha                               defconfig
-parisc                            allnoconfig
-parisc                         b180_defconfig
-parisc                        c3000_defconfig
-parisc                              defconfig
-avr32                    hammerhead_defconfig
-m32r                    m32700ut.up_defconfig
-mips                        bcm47xx_defconfig
-mips                       capcella_defconfig
-powerpc                   bluestone_defconfig
-i386                             alldefconfig
-i386                              allnoconfig
-i386                                defconfig
-m68k                       m5475evb_defconfig
-m68k                          multi_defconfig
-m68k                           sun3_defconfig
-i386                     randconfig-s0-201603
-i386                     randconfig-s1-201603
-x86_64                 randconfig-s0-01191831
-x86_64                 randconfig-s1-01191831
-x86_64                 randconfig-s2-01191831
-x86_64                           allmodconfig
-x86_64                 randconfig-s3-01191831
-x86_64                 randconfig-s4-01191831
-x86_64                 randconfig-s5-01191831
-avr32                      atngw100_defconfig
-avr32                     atstk1006_defconfig
-frv                                 defconfig
-mn10300                     asb2364_defconfig
-openrisc                    or1ksim_defconfig
-tile                         tilegx_defconfig
-um                             i386_defconfig
-um                           x86_64_defconfig
-m68k                             alldefconfig
-mips                         db1xxx_defconfig
-mips                malta_qemu_32r6_defconfig
-sh                          landisk_defconfig
-mips                              allnoconfig
-mips                      fuloong2e_defconfig
-mips                                   jz4740
-mips                                     txx9
-x86_64                   randconfig-i0-201603
-i386                   randconfig-b0-01191831
-sparc                               defconfig
-sparc64                           allnoconfig
-sparc64                             defconfig
-microblaze                      mmu_defconfig
-microblaze                    nommu_defconfig
-i386                     randconfig-i0-201603
-i386                     randconfig-i1-201603
-i386                             allyesconfig
-x86_64                 randconfig-b0-01191744
-i386                               tinyconfig
-i386                     randconfig-n0-201603
-ia64                             alldefconfig
-ia64                              allnoconfig
-ia64                                defconfig
-x86_64                                   rhel
-ia64                          tiger_defconfig
-x86_64                 randconfig-x000-201603
-x86_64                 randconfig-x001-201603
-x86_64                 randconfig-x002-201603
-x86_64                 randconfig-x003-201603
-x86_64                 randconfig-x004-201603
-x86_64                 randconfig-x005-201603
-x86_64                 randconfig-x006-201603
-x86_64                 randconfig-x007-201603
-x86_64                 randconfig-x008-201603
-x86_64                 randconfig-x009-201603
-i386                     randconfig-r0-201603
-i386                             allmodconfig
-m68k                          sun3x_defconfig
-mips                  mips_paravirt_defconfig
-powerpc                     ppa8548_defconfig
-i386                 randconfig-x000-01181631
-i386                 randconfig-x001-01181631
-i386                 randconfig-x002-01181631
-i386                 randconfig-x003-01181631
-i386                 randconfig-x004-01181631
-i386                 randconfig-x005-01181631
-i386                 randconfig-x006-01181631
-i386                 randconfig-x007-01181631
-i386                 randconfig-x008-01181631
-i386                 randconfig-x009-01181631
-
-Thanks,
-Fengguang
