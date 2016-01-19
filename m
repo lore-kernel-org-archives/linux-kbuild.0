@@ -1,137 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lb0-f178.google.com ([209.85.217.178]:36187 "EHLO
-	mail-lb0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752554AbcAQVOj (ORCPT
+Received: from mail-ob0-f176.google.com ([209.85.214.176]:32948 "EHLO
+	mail-ob0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756738AbcASCWY (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 17 Jan 2016 16:14:39 -0500
-Received: by mail-lb0-f178.google.com with SMTP id oh2so338291784lbb.3
-        for <linux-kbuild@vger.kernel.org>; Sun, 17 Jan 2016 13:14:38 -0800 (PST)
-Subject: Re: [U-Boot] Kconfig bug (optional choice deselected by following
- option)
-References: <569B7D5D.1030904@gmail.com>
- <CAK7LNAT9oiuQ81Ms-Piw2=OwX3mr+VzCQk2buy1T7yqRLKU40Q@mail.gmail.com>
-From: Mateusz Kulikowski <mateusz.kulikowski@gmail.com>
-Message-ID: <569C043B.7030301@gmail.com>
-Date: Sun, 17 Jan 2016 22:14:35 +0100
+	Mon, 18 Jan 2016 21:22:24 -0500
+From: Florian Fainelli <f.fainelli@gmail.com>
+Subject: =?UTF-8?Q?Re:_cannot_build_Linux_4.4:_arch/mips/kernel/signal.c:142?=
+ =?UTF-8?Q?:12:_error:_=e2=80=98struct_ucontext=e2=80=99_has_no_member_named?=
+ =?UTF-8?B?IOKAmHVjX2V4dGNvbnRleHTigJk=?=
+References: <569B9CFE.1090007@gmx.de> <569BA9BB.3080508@gmx.de>
+Message-ID: <569D9DDD.7080909@gmail.com>
+Date: Mon, 18 Jan 2016 18:22:21 -0800
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNAT9oiuQ81Ms-Piw2=OwX3mr+VzCQk2buy1T7yqRLKU40Q@mail.gmail.com>
+In-Reply-To: <569BA9BB.3080508@gmx.de>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: "u-boot@lists.denx.de" <u-boot@lists.denx.de>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Heinrich Schuchardt <xypron.glpk@gmx.de>, lkml <linux-kernel@vger.kernel.org>, linux-mips@linux-mips.org
+Cc: Ralf Baechle <ralf@linux-mips.org>, Paul Burton <paul.burton@imgtec.com>, James Hogan <james.hogan@imgtec.com>, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.com>
 
------BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA256
+Le 17/01/2016 06:48, Heinrich Schuchardt a écrit :
+> On 01/17/2016 02:54 PM, Heinrich Schuchardt wrote:
+>>
+>> HEAD is now at afd2ff9... Linux 4.4
+>> arch/mips/kernel/signal.c: In function ‘sc_to_extcontext’:
+>> arch/mips/kernel/signal.c:142:12: error: ‘struct ucontext’ has no member
+>> named ‘uc_extcontext’
+>>   return &uc->uc_extcontext;
+>>             ^
+>> In file included from include/linux/poll.h:11:0,
+>>                  from include/linux/ring_buffer.h:7,
+>>                  from include/linux/trace_events.h:5,
+>>                  from include/trace/syscall.h:6,
+>>                  from include/linux/syscalls.h:81,
+>>                  from arch/mips/kernel/signal.c:26:
+>> arch/mips/kernel/signal.c: In function ‘save_msa_extcontext’:
+>> arch/mips/kernel/signal.c:170:40: error: dereferencing pointer to
+>> incomplete type
+>>
+> 
+> The problem stemmed from make not recognizing that this file was outdated:
+> 
+> Oct 16  2014 arch/mips/include/generated/asm/ucontext.h
+> 
+> Shouldn't make automatically regenerate outdated files?
 
-Hi All,
+The reduced test case can be simplified to these steps:
 
-Just a small update from my side;
+git co f1fe2d21f4e1aca8644cea888dc618f0183ad671\^1
+configure your kernel
+ARCH=mips make arch/mips/kernel/signal.o
+git co f1fe2d21f4e1aca8644cea888dc618f0183ad671
+ARCH=mips make arch/mips/kernel/signal.o
 
-I used bisect-foo and offending commit (@Linux) seems to be:
+The problem seems to be that if there was a previous build which
+resulted in creating an asm-generic wrapper for a file
+(arch/mips/include/generated/asm/ucontext.h in that case), but this file
+was later moved into an arch-specific, non asm-generic header file, then
+we are just not going to automatically remove this auto-generated
+wrapper, and generate the new one.
 
-commit 5d09598d488f081e3be23f885ed65cbbe2d073b5
-Author: Arnaud Lacombe <lacombar@gmail.com>
-Date:   Mon Jan 23 17:29:05 2012 -0500
+This seems to be aggravated by the fact that commit
+f1fe2d21f4e1aca8644cea888dc618f0183ad671 does not add ucontext.h to
+arch/mips/include/uapi/Kbuild, Paul, James is that intentional?
 
-    kconfig: fix new choices being skipped upon config update
+After trying to mess a bit with a clean solution, I just gave up and
+decided that this was not worth fixing since it is a very infrequent
+problem.
+-- 
+Florian
 
-
-
-Best Regards,
-Mateusz
-
-On 17.01.2016 21:29, Masahiro Yamada wrote:
-> Hi Mateusz,
-> (CCing linux-kbuild, which I think the best place to discuss this topic)
-> 
-> 
-> I think "default n" in the choice entry is weird
-> because the choice is not boolean.
-> 
-> Without it, the weird thing you saw did not happen on my box.
-> 
-> 
-> Anyway, I'd like Kconfig to say something if it is really a syntax error.
-> 
-> 
-> I hope comments from Kconfig experts.
-> 
-> 
-> 
-> 
-> 2016-01-17 20:39 GMT+09:00 Mateusz Kulikowski <mateusz.kulikowski@gmail.com>:
-> Hi all,
-> 
-> I have found weird feature of Kconfig.
-> If I misused something, please let me know - I found at least one place
-> where the same error occurs.
-> 
-> Let's consider the following Kconfig (you can put it anywhere in the source tree):
-> <-------------- copy ----------------->
-> menu "Testmenu"
-> choice
->         prompt "Problem to solve"
->         optional
->         default n
->         help
->           Solve one of great world problems
-> 
-> config SOLVE_HUNGER
->         bool "Hunger"
-> 
-> config SOLVE_WARS
->         bool "Wars"
-> 
-> config CURE_CANCER
->         bool "Cancer"
-> 
-> endchoice
-> 
-> config TREES
->         default n
->         bool "Plant trees in garden"
-> endmenu
-> 
-> config BLAH
->         default n
->         bool "Totally unrelated option"
-> 
-> <------------- paste ------------------->
-> 
-> Now, select HUNGER important problem to solve; Warning - select it with space, _not_ enter + selection from list;
-> Then select either TREES or BLAH.
-> 
-> Weird thing is - SOLVE_HUNGER is unselected.
-> 
-> It doesn't happen when you select (anything) by entering selection menu (i.e. enter).
-> Even if you deselect option and then select it with space.
-> 
-> It happens both in menuconfig and nconfig.
-> 
-> It happens both in recent U-Boot b57843e6 and Linux kernel ece62678.
-> 
-> Unfortunately my knowledge of Kconfig is very limited so your help would be appreciated.
-> 
-> Best Regards,
-> Mateusz
->> _______________________________________________
->> U-Boot mailing list
->> U-Boot@lists.denx.de
->> http://lists.denx.de/mailman/listinfo/u-boot
-> 
-> 
-> 
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQEcBAEBCAAGBQJWnAQpAAoJELvtohmVtQzBqrwH/1joRyZ2wuuTEtaJG9due3IM
-Wf0sHphYkTWdfi4kxRPZRwH57bvdLjtb3BWxDKtze+luoYB6M5dFUFk5SUzcDREI
-/+bddYKcLwkSDc73t/HiA/4U3hqma9jXIo1bLoP9vtlvcIQpaITcqnOxB4tS2kBm
-7qOOuLOoa3qQhh5ZhBH3eE4sx+C2sFnYnHKzkTrMO0CkE3YfEt0ZQXJYrIPyaWea
-UDtK6W7rRoq/7RXGw2Xw8gblk2P60wGK1lBOrEWGY46zufHfyUP4MUzYe2vbwW2i
-mThLtcySF5+ty6NGBs/gIatrSGfgdomBgm6MzJlgQ4EabaGj4ugsY8yFtNJKFPI=
-=idim
------END PGP SIGNATURE-----
