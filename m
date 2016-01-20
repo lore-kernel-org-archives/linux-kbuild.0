@@ -1,69 +1,104 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:35786 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751218AbcATJ20 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 20 Jan 2016 04:28:26 -0500
-Date: Wed, 20 Jan 2016 10:28:23 +0100
-From: Michal Marek <mmarek@suse.com>
-Subject: [GIT PULL] kbuild misc changes for v4.5-rc1
-Message-ID: <20160120092823.GA8011@sepie.suse.cz>
+Received: from mail-oi0-f66.google.com ([209.85.218.66]:35169 "EHLO
+	mail-oi0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752687AbcATSzP (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 20 Jan 2016 13:55:15 -0500
+Subject: Re: [PATCH v2 2/2] kbuild: Remove stale asm-generic wrappers
+References: <1453210670-12596-1-git-send-email-james.hogan@imgtec.com>
+ <1453210670-12596-3-git-send-email-james.hogan@imgtec.com>
+From: Florian Fainelli <f.fainelli@gmail.com>
+Message-ID: <569FD80F.2000109@gmail.com>
+Date: Wed, 20 Jan 2016 10:55:11 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+In-Reply-To: <1453210670-12596-3-git-send-email-james.hogan@imgtec.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: a.hajda@samsung.com, mmarek@suse.com, mpe@ellerman.id.au, riku.voipio@linaro.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: James Hogan <james.hogan@imgtec.com>, Michal Marek <mmarek@suse.com>
+Cc: linux-kernel@vger.kernel.org, Heinrich Schuchardt <xypron.glpk@gmx.de>, Arnd Bergmann <arnd@arndb.de>, Ralf Baechle <ralf@linux-mips.org>, Paul Burton <paul.burton@imgtec.com>, linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org, linux-mips@linux-mips.org
 
-Hi Linus,
+Le 19/01/2016 05:37, James Hogan a écrit :
+> When a header file is removed from generic-y (often accompanied by the
+> addition of an arch specific header), the generated wrapper file will
+> persist, and in some cases may still take precedence over the new arch
+> header.
+> 
+> For example commit f1fe2d21f4e1 ("MIPS: Add definitions for extended
+> context") removed ucontext.h from generic-y in arch/mips/include/asm/,
+> and added an arch/mips/include/uapi/asm/ucontext.h. The continued use of
+> the wrapper when reusing a dirty build tree resulted in build failures
+> in arch/mips/kernel/signal.c:
+> 
+> arch/mips/kernel/signal.c: In function ‘sc_to_extcontext’:
+> arch/mips/kernel/signal.c:142:12: error: ‘struct ucontext’ has no member named ‘uc_extcontext’
+>   return &uc->uc_extcontext;
+>             ^
+> 
+> Fix by detecting and removing wrapper headers in generated header
+> directories that do not correspond to a filename in generic-y, genhdr-y,
+> or the newly introduced generated-y.
+> 
+> Reported-by: Jacek Anaszewski <j.anaszewski@samsung.com>
+> Reported-by: Hauke Mehrtens <hauke@hauke-m.de>
+> Reported-by: Heinrich Schuchardt <xypron.glpk@gmx.de>
+> Signed-off-by: James Hogan <james.hogan@imgtec.com>
 
-please pull this non-critical part of kbuild for v4.5-rc1:
-- Fix for make O=... perf-tar*
-- make tags revamp and fix for the fallout. Patch for warnings about
-  line breaks inside DEFINE_PER_CPU macros is pending
-- New coccinelle test
+Acked-by: Florian Fainelli <f.fainelli@gmail.com>
 
-Thanks,
-Michal
+Thanks for looking into this James.
 
-The following changes since commit 8005c49d9aea74d382f474ce11afbbc7d7130bec:
+> Cc: Michal Marek <mmarek@suse.com>
+> Cc: Arnd Bergmann <arnd@arndb.de>
+> Cc: Ralf Baechle <ralf@linux-mips.org>
+> Cc: Paul Burton <paul.burton@imgtec.com>
+> Cc: Florian Fainelli <f.fainelli@gmail.com>
+> Cc: linux-kbuild@vger.kernel.org
+> Cc: linux-arch@vger.kernel.org
+> Cc: linux-mips@linux-mips.org
+> ---
+> Changes in v2:
+> - Rewrite a bit, drawing inspiration from Makefile.headersinst.
+> - Exclude genhdr-y and generated-y (thanks to kbuild test robot).
+> ---
+>  scripts/Makefile.asm-generic | 17 ++++++++++++++++-
+>  1 file changed, 16 insertions(+), 1 deletion(-)
+> 
+> diff --git a/scripts/Makefile.asm-generic b/scripts/Makefile.asm-generic
+> index 045e0098e962..24c29f16f029 100644
+> --- a/scripts/Makefile.asm-generic
+> +++ b/scripts/Makefile.asm-generic
+> @@ -13,11 +13,26 @@ include scripts/Kbuild.include
+>  # Create output directory if not already present
+>  _dummy := $(shell [ -d $(obj) ] || mkdir -p $(obj))
+>  
+> +# Stale wrappers when the corresponding files are removed from generic-y
+> +# need removing.
+> +generated-y   := $(generic-y) $(genhdr-y) $(generated-y)
+> +all-files     := $(patsubst %, $(obj)/%, $(generated-y))
+> +old-headers   := $(wildcard $(obj)/*.h)
+> +unwanted      := $(filter-out $(all-files),$(old-headers))
+> +
+>  quiet_cmd_wrap = WRAP    $@
+>  cmd_wrap = echo "\#include <asm-generic/$*.h>" >$@
+>  
+> -all: $(patsubst %, $(obj)/%, $(generic-y))
+> +quiet_cmd_remove = REMOVE  $(unwanted)
+> +cmd_remove = rm -f $(unwanted)
+> +
+> +all: $(patsubst %, $(obj)/%, $(generic-y)) FORCE
+> +	$(if $(unwanted),$(call cmd,remove),)
+>  	@:
+>  
+>  $(obj)/%.h:
+>  	$(call cmd,wrap)
+> +
+> +.PHONY: $(PHONY)
+> +PHONY += FORCE
+> +FORCE: ;
+> 
 
-  Linux 4.4-rc1 (2015-11-15 17:00:27 -0800)
 
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git misc
-
-for you to fetch changes up to 3f984cb39907f87515d83657ecd471ae396a6c4a:
-
-  coccinelle: tests: unsigned value cannot be lesser than zero (2016-01-12 17:47:47 +0100)
-
-----------------------------------------------------------------
-Andrzej Hajda (1):
-      coccinelle: tests: unsigned value cannot be lesser than zero
-
-Michael Ellerman (1):
-      scripts/tags.sh: Teach tags about more powerpc macros
-
-Michal Marek (7):
-      tags: Treat header files as C code
-      aic7xxx: Avoid name collision with <linux/list.h>
-      tags: Fix erroneous pattern match in a comment
-      tags: Process Kconfig files in a single pass
-      tags: Do not try to index defconfigs
-      tags: Drop the _PE rule
-      tags: Unify emacs and exuberant rules
-
-Riku Voipio (1):
-      package Makefile: fix perf-tar targets when outdir is set
-
- drivers/scsi/aic7xxx/aic79xx.h                     |   4 +-
- drivers/scsi/aic7xxx/aic79xx_osm.h                 |   5 -
- drivers/scsi/aic7xxx/aic7xxx.h                     |   2 +-
- drivers/scsi/aic7xxx/aic7xxx_osm.h                 |   5 -
- drivers/scsi/aic7xxx/queue.h                       |   2 +-
- .../tests/unsigned_lesser_than_zero.cocci          |  75 +++++++
- scripts/package/Makefile                           |   4 +-
- scripts/tags.sh                                    | 218 ++++++++++-----------
- 8 files changed, 189 insertions(+), 126 deletions(-)
- create mode 100644 scripts/coccinelle/tests/unsigned_lesser_than_zero.cocci
+-- 
+Florian
