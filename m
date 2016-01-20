@@ -1,61 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.126.134]:57930 "EHLO
-	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756094AbcASO1f convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 19 Jan 2016 09:27:35 -0500
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH v2 2/2] kbuild: Remove stale asm-generic wrappers
-Date: Tue, 19 Jan 2016 15:27:24 +0100
-Message-ID: <4206493.gjdgtfndZ8@wuerfel>
-In-Reply-To: <20160119142213.GA12679@jhogan-linux.le.imgtec.org>
-References: <1453210670-12596-1-git-send-email-james.hogan@imgtec.com> <1667268.iM977TQnEK@wuerfel> <20160119142213.GA12679@jhogan-linux.le.imgtec.org>
+Received: from mx2.suse.de ([195.135.220.15]:33613 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S934308AbcATJJX (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 20 Jan 2016 04:09:23 -0500
+Date: Wed, 20 Jan 2016 10:09:20 +0100
+From: Michal Marek <mmarek@suse.com>
+Subject: [GIT PULL] kbuild changes for v4.5-rc1
+Message-ID: <20160120090920.GA7478@sepie.suse.cz>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8BIT
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: James Hogan <james.hogan@imgtec.com>
-Cc: Michal Marek <mmarek@suse.com>, linux-kernel@vger.kernel.org, Heinrich Schuchardt <xypron.glpk@gmx.de>, Ralf Baechle <ralf@linux-mips.org>, Paul Burton <paul.burton@imgtec.com>, Florian Fainelli <f.fainelli@gmail.com>, linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org, linux-mips@linux-mips.org
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: lee.jones@linaro.org, mmarek@suse.com, mmarek@suse.cz, nicolas.iooss_linux@m4x.org, udknight@gmail.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Tuesday 19 January 2016 14:22:13 James Hogan wrote:
-> On Tue, Jan 19, 2016 at 03:09:14PM +0100, Arnd Bergmann wrote:
-> > On Tuesday 19 January 2016 13:37:50 James Hogan wrote:
-> > > When a header file is removed from generic-y (often accompanied by the
-> > > addition of an arch specific header), the generated wrapper file will
-> > > persist, and in some cases may still take precedence over the new arch
-> > > header.
-> > > 
-> > > For example commit f1fe2d21f4e1 ("MIPS: Add definitions for extended
-> > > context") removed ucontext.h from generic-y in arch/mips/include/asm/,
-> > > and added an arch/mips/include/uapi/asm/ucontext.h. The continued use of
-> > > the wrapper when reusing a dirty build tree resulted in build failures
-> > > in arch/mips/kernel/signal.c:
-> > > 
-> > > arch/mips/kernel/signal.c: In function ‘sc_to_extcontext’:
-> > > arch/mips/kernel/signal.c:142:12: error: ‘struct ucontext’ has no member named ‘uc_extcontext’
-> > >   return &uc->uc_extcontext;
-> > >             ^
-> > > 
-> > > Fix by detecting and removing wrapper headers in generated header
-> > > directories that do not correspond to a filename in generic-y, genhdr-y,
-> > > or the newly introduced generated-y.
-> > 
-> > Good idea.
-> > 
-> > Acked-by: Arnd Bergmann <arnd@arndb.de>
-> 
-> Thanks Arnd
-> 
-> > Can you merge this through the mips tree, or do you need me to pick it
-> > up through asm-generic?
-> 
-> I was envisaging the kbuild tree tbh, but I don't really mind how it
-> gets merged. This patch depends on patch 1, which adds generated-y to
-> x86 so we don't delete their other generated headers, but other than
-> that it doesn't really have any dependencies.
+Hi Linus,
 
-Ok, the kbuild tree works fine too, and I guess the x86 tree would
-also be fine if that helps avoid the dependency.
+please pull these kbuild changes for v4.5-rc1:
+- Make <modname>-m in makefiles work like <modname>-y and fix the
+  fallout
+- Minor genksyms fix
+- Fix race with make -j install modules_install
+- Move -Wsign-compare from make W=1 to W=2
+- Other minor fixes
 
-	Arnd
+Thanks,
+Michal
+
+The following changes since commit 8005c49d9aea74d382f474ce11afbbc7d7130bec:
+
+  Linux 4.4-rc1 (2015-11-15 17:00:27 -0800)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git kbuild
+
+for you to fetch changes up to 7599ea8b4e25fd8dea26cb64f100cf265d1e6bf3:
+
+  kbuild: Demote 'sign-compare' warning to W=2 (2016-01-12 16:07:03 +0100)
+
+----------------------------------------------------------------
+Lee Jones (1):
+      kbuild: Demote 'sign-compare' warning to W=2
+
+Michal Marek (6):
+      staging/ad7606: Actually build the interface modules
+      kbuild: Allow to specify composite modules with modname-m
+      Revert "drm: Hack around CONFIG_AGP=m build failures"
+      ath10k: Fix build with CONFIG_THERMAL=m
+      genksyms: Handle string literals with spaces in reference files
+      kbuild: Do not run modules_install and install in paralel
+
+Nicolas Iooss (1):
+      fixdep: constify strrcmp arguments
+
+Wang YanQing (1):
+      Makefile: revert "Makefile: Document ability to make file.lst and file.S" partially
+
+ Makefile                                  | 8 +++++++-
+ drivers/gpu/drm/Makefile                  | 2 --
+ drivers/misc/ibmasm/ibmasm.h              | 2 +-
+ drivers/net/wireless/ath/ath10k/thermal.h | 2 +-
+ drivers/staging/iio/adc/Kconfig           | 4 ++--
+ drivers/staging/iio/adc/Makefile          | 7 +++----
+ drivers/staging/iio/adc/ad7606_core.c     | 4 ++++
+ drivers/usb/chipidea/otg_fsm.h            | 2 +-
+ fs/logfs/logfs.h                          | 2 +-
+ scripts/Makefile.build                    | 8 ++++++--
+ scripts/Makefile.extrawarn                | 2 ++
+ scripts/Makefile.lib                      | 4 ++--
+ scripts/basic/fixdep.c                    | 2 +-
+ scripts/genksyms/genksyms.c               | 6 ++++--
+ 14 files changed, 35 insertions(+), 20 deletions(-)
