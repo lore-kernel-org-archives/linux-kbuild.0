@@ -1,25 +1,26 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi0-f66.google.com ([209.85.218.66]:35169 "EHLO
-	mail-oi0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752687AbcATSzP (ORCPT
+Received: from mailapp01.imgtec.com ([195.59.15.196]:42719 "EHLO
+	mailapp01.imgtec.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752388AbcAUADq (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 20 Jan 2016 13:55:15 -0500
+	Wed, 20 Jan 2016 19:03:46 -0500
+Date: Thu, 21 Jan 2016 00:03:42 +0000
+From: Paul Burton <paul.burton@imgtec.com>
 Subject: Re: [PATCH v2 2/2] kbuild: Remove stale asm-generic wrappers
+Message-ID: <20160121000342.GA7538@NP-P-BURTON>
 References: <1453210670-12596-1-git-send-email-james.hogan@imgtec.com>
  <1453210670-12596-3-git-send-email-james.hogan@imgtec.com>
-From: Florian Fainelli <f.fainelli@gmail.com>
-Message-ID: <569FD80F.2000109@gmail.com>
-Date: Wed, 20 Jan 2016 10:55:11 -0800
 MIME-Version: 1.0
-In-Reply-To: <1453210670-12596-3-git-send-email-james.hogan@imgtec.com>
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <1453210670-12596-3-git-send-email-james.hogan@imgtec.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: James Hogan <james.hogan@imgtec.com>, Michal Marek <mmarek@suse.com>
-Cc: linux-kernel@vger.kernel.org, Heinrich Schuchardt <xypron.glpk@gmx.de>, Arnd Bergmann <arnd@arndb.de>, Ralf Baechle <ralf@linux-mips.org>, Paul Burton <paul.burton@imgtec.com>, linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org, linux-mips@linux-mips.org
+To: James Hogan <james.hogan@imgtec.com>
+Cc: Michal Marek <mmarek@suse.com>, linux-kernel@vger.kernel.org, Heinrich Schuchardt <xypron.glpk@gmx.de>, Arnd Bergmann <arnd@arndb.de>, Ralf Baechle <ralf@linux-mips.org>, Florian Fainelli <f.fainelli@gmail.com>, linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org, linux-mips@linux-mips.org
 
-Le 19/01/2016 05:37, James Hogan a écrit :
+On Tue, Jan 19, 2016 at 01:37:50PM +0000, James Hogan wrote:
 > When a header file is removed from generic-y (often accompanied by the
 > addition of an arch specific header), the generated wrapper file will
 > persist, and in some cases may still take precedence over the new arch
@@ -44,11 +45,6 @@ Le 19/01/2016 05:37, James Hogan a écrit :
 > Reported-by: Hauke Mehrtens <hauke@hauke-m.de>
 > Reported-by: Heinrich Schuchardt <xypron.glpk@gmx.de>
 > Signed-off-by: James Hogan <james.hogan@imgtec.com>
-
-Acked-by: Florian Fainelli <f.fainelli@gmail.com>
-
-Thanks for looking into this James.
-
 > Cc: Michal Marek <mmarek@suse.com>
 > Cc: Arnd Bergmann <arnd@arndb.de>
 > Cc: Ralf Baechle <ralf@linux-mips.org>
@@ -79,6 +75,18 @@ Thanks for looking into this James.
 > +all-files     := $(patsubst %, $(obj)/%, $(generated-y))
 > +old-headers   := $(wildcard $(obj)/*.h)
 > +unwanted      := $(filter-out $(all-files),$(old-headers))
+
+Hi James,
+
+Thanks a bunch for fixing this!
+
+Though is it my sleepy self or are all-files & old-headers misnomers?
+That is, isn't all-files actually a list of headers to be kept, and
+old-headers actually the list of all (header) files?
+
+Thanks,
+    Paul
+
 > +
 >  quiet_cmd_wrap = WRAP    $@
 >  cmd_wrap = echo "\#include <asm-generic/$*.h>" >$@
@@ -97,8 +105,6 @@ Thanks for looking into this James.
 > +.PHONY: $(PHONY)
 > +PHONY += FORCE
 > +FORCE: ;
+> -- 
+> 2.4.10
 > 
-
-
--- 
-Florian
