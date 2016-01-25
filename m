@@ -1,29 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:39674 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757374AbcAYQZP (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 25 Jan 2016 11:25:15 -0500
-Subject: Re: Dependency issue through subdir's
-References: <56A6080C.2070006@kbingham.co.uk> <56A62187.3070805@suse.com>
- <56A64BE2.9030105@kbingham.co.uk>
-From: Michal Marek <mmarek@suse.com>
-Message-ID: <56A64C69.7090000@suse.com>
-Date: Mon, 25 Jan 2016 17:25:13 +0100
-MIME-Version: 1.0
-In-Reply-To: <56A64BE2.9030105@kbingham.co.uk>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Received: from prv-mh.provo.novell.com ([137.65.248.74]:54245 "EHLO
+	prv-mh.provo.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933186AbcAYQpv convert rfc822-to-8bit (ORCPT
+	<rfc822;groupwise-linux-kbuild@vger.kernel.org:3:1>);
+	Mon, 25 Jan 2016 11:45:51 -0500
+Message-Id: <56A65F4B02000078000CAC75@prv-mh.provo.novell.com>
+Date: Mon, 25 Jan 2016 09:45:47 -0700
+From: "Jan Beulich" <JBeulich@suse.com>
+Subject: scripts/kconfig: allow building with make 3.80 again
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8BIT
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kieran Bingham <kieran@kbingham.co.uk>
-Cc: linux-kbuild@vger.kernel.org, Jan Kiszka <jan.kiszka@siemens.com>, Lee Jones <lee.jones@linaro.org>, Peter Griffin <peter.griffin@linaro.org>, Linux Kernel <linux-kernel@vger.kernel.org>
+To: Michal Marek <mmarek@suse.de>
+Cc: mpe@ellerman.id.au, linux-kbuild@vger.kernel.org
 
-On 2016-01-25 17:22, Kieran Bingham wrote:
-> I've got a working patch now for the $(MAKE) version,
-> however I've had to use $(build)=scripts/gdb/linux build_constants to
-> make it work.
+Documentation/Changes still lists this as the minimal required version,
+so it ought to remain usable for the time being.
 
-$(build)= is the correct syntax, sorry for the confusion.
+Fixes: d2036f30cf ("scripts/kconfig/Makefile: Allow KBUILD_DEFCONFIG to be a target")
+Signed-off-by: Jan Beulich <jbeulich@suse.com>
+Cc: Michael Ellerman <mpe@ellerman.id.au>
+---
+ scripts/kconfig/Makefile |    4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Michal
+--- 4.5-rc1/scripts/kconfig/Makefile
++++ 4.5-rc1-kconfig-make-3-80/scripts/kconfig/Makefile
+@@ -96,13 +96,15 @@ savedefconfig: $(obj)/conf
+ defconfig: $(obj)/conf
+ ifeq ($(KBUILD_DEFCONFIG),)
+ 	$< $(silent) --defconfig $(Kconfig)
+-else ifneq ($(wildcard $(srctree)/arch/$(SRCARCH)/configs/$(KBUILD_DEFCONFIG)),)
++else
++ifneq ($(wildcard $(srctree)/arch/$(SRCARCH)/configs/$(KBUILD_DEFCONFIG)),)
+ 	@$(kecho) "*** Default configuration is based on '$(KBUILD_DEFCONFIG)'"
+ 	$(Q)$< $(silent) --defconfig=arch/$(SRCARCH)/configs/$(KBUILD_DEFCONFIG) $(Kconfig)
+ else
+ 	@$(kecho) "*** Default configuration is based on target '$(KBUILD_DEFCONFIG)'"
+ 	$(Q)$(MAKE) -f $(srctree)/Makefile $(KBUILD_DEFCONFIG)
+ endif
++endif
+ 
+ %_defconfig: $(obj)/conf
+ 	$(Q)$< $(silent) --defconfig=arch/$(SRCARCH)/configs/$@ $(Kconfig)
+
+
 
