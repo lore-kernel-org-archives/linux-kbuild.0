@@ -1,51 +1,157 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from prv-mh.provo.novell.com ([137.65.248.74]:54245 "EHLO
-	prv-mh.provo.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933186AbcAYQpv convert rfc822-to-8bit (ORCPT
-	<rfc822;groupwise-linux-kbuild@vger.kernel.org:3:1>);
-	Mon, 25 Jan 2016 11:45:51 -0500
-Message-Id: <56A65F4B02000078000CAC75@prv-mh.provo.novell.com>
-Date: Mon, 25 Jan 2016 09:45:47 -0700
-From: "Jan Beulich" <JBeulich@suse.com>
-Subject: scripts/kconfig: allow building with make 3.80 again
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Received: from mail-wm0-f49.google.com ([74.125.82.49]:38875 "EHLO
+	mail-wm0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932843AbcAYRa6 convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 25 Jan 2016 12:30:58 -0500
+MIME-Version: 1.0
+In-Reply-To: <E484D272A3A61B4880CDF2E712E9279F45D179FA@HHMAIL01.hh.imgtec.org>
+References: <1452189189-31188-1-git-send-email-mst@redhat.com>
+ <CAAG0J995iCNwdN6PpuJfzo+TVWNXR3UVqS9v-4HXbryyvMn+=w@mail.gmail.com>
+ <E484D272A3A61B4880CDF2E712E9279F45D04AA7@HHMAIL01.hh.imgtec.org>
+ <CAJ1xhMWth4kNuEkuVEUiUEz=d_9dmKxh0+Z_GrRcKB+F72W91w@mail.gmail.com> <E484D272A3A61B4880CDF2E712E9279F45D179FA@HHMAIL01.hh.imgtec.org>
+From: Alexander Kapshuk <alexander.kapshuk@gmail.com>
+Date: Mon, 25 Jan 2016 19:30:17 +0200
+Message-ID: <CAJ1xhMVbxoag7psNg+5L6AmL4WYXKyBYNuVGjJcfqe6Km_10SQ@mail.gmail.com>
+Subject: Re: [PATCH] ld-version: fix it on Fedora
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8BIT
-Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.de>
-Cc: mpe@ellerman.id.au, linux-kbuild@vger.kernel.org
+To: Daniel Sanders <Daniel.Sanders@imgtec.com>
+Cc: James Hogan <James.Hogan@imgtec.com>, "Michael S. Tsirkin" <mst@redhat.com>, LKML <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, Linux MIPS Mailing List <linux-mips@linux-mips.org>, Ralf Baechle <ralf@linux-mips.org>
 
-Documentation/Changes still lists this as the minimal required version,
-so it ought to remain usable for the time being.
+On Mon, Jan 25, 2016 at 12:49 PM, Daniel Sanders
+<Daniel.Sanders@imgtec.com> wrote:
+>
+> > From: Alexander Kapshuk [alexander.kapshuk@gmail.com]
+> > Sent: 23 January 2016 14:41
+> > To: Daniel Sanders
+> > Cc: James Hogan; Michael S. Tsirkin; LKML; Michal Marek; linux-kbuild@vger.kernel.org; Linux MIPS Mailing List; Ralf Baechle
+> > Subject: Re: [PATCH] ld-version: fix it on Fedora
+> >
+> > On Wed, Jan 13, 2016 at 7:30 PM, Daniel Sanders <Daniel.Sanders@imgtec.com<mailto:Daniel.Sanders@imgtec.com>> wrote:
+> > Hi,
+> >
+> > The version number that's giving me problems is 2.24.51.20140217 which ld-version.sh converts to 2036931700 (20000000+2400000+510000+2014021700).
+> >
+> > At the moment, I'm wondering whether we really need to handle more than three version number components. Another thought is that the comparison could be inside ld-version.sh (or a replacement) so that it can compare the array of version components directly instead of using a constructed integer as a proxy.
+> >
+> > > -----Original Message-----
+> > > From: james@albanarts.com<mailto:james@albanarts.com> [mailto:james@albanarts.com<mailto:james@albanarts.com>] On Behalf Of
+> > > James Hogan
+> > > Sent: 13 January 2016 17:06
+> > > To: Michael S. Tsirkin
+> > > Cc: LKML; Michal Marek; linux-kbuild@vger.kernel.org<mailto:linux-kbuild@vger.kernel.org>; Linux MIPS Mailing
+> > > List; Ralf Baechle; Daniel Sanders
+> > > Subject: Re: [PATCH] ld-version: fix it on Fedora
+> > >
+> > > Cc'ing Daniel, who has hit further breakage due to unusual version numbers.
+> > >
+> > > On 7 January 2016 at 17:55, Michael S. Tsirkin <mst@redhat.com<mailto:mst@redhat.com>> wrote:
+> > > > On Fedora 23, ld --version outputs:
+> > > > GNU ld version 2.25-15.fc23
+> > > >
+> > > > But ld-version.sh fails to parse this, so e.g.  mips build fails to
+> > > > enable VDSO, printing a warning that binutils >= 2.24 is required.
+> > > >
+> > > > To fix, teach ld-version to parse this format.
+> > > >
+> > > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com<mailto:mst@redhat.com>>
+> > > > ---
+> > > >
+> > > > Which tree should this be merged through? Mine? MIPS?
+> > > >
+> > > >  scripts/ld-version.sh | 2 ++
+> > > >  1 file changed, 2 insertions(+)
+> > > >
+> > > > diff --git a/scripts/ld-version.sh b/scripts/ld-version.sh
+> > > > index 198580d..25d23c8 100755
+> > > > --- a/scripts/ld-version.sh
+> > > > +++ b/scripts/ld-version.sh
+> > > > @@ -2,6 +2,8 @@
+> > > >  # extract linker version number from stdin and turn into single number
+> > > >         {
+> > > >         gsub(".*)", "");
+> > > > +       gsub(".*version ", "");
+> > > > +       gsub("-.*", "");
+> > > >         split($1,a, ".");
+> > > >         print a[1]*10000000 + a[2]*100000 + a[3]*10000 + a[4]*100 + a[5];
+> > > >         exit
+> > > > --
+> > > > MST
+> > > >
+> >
+> > Is this the output you're looking for?
+> >
+> > % echo 'GNU ld version 2.25-15.fc23' |
+> > > awk '/[0-9]+([.]?[0-9]+)+/ && !/not found$/{
+> > > match($0, /[0-9]+([.]?[0-9]+)+/)
+> > > bin=substr($0,RSTART,RLENGTH)
+> > > split(bin, a, ".")
+> > > print a[1]*10000000 + a[2]*100000 + a[3]*10000}'
+> > 22500000
+> >
+> > % echo 2.25.1.20140217 |
+> > > awk '/[0-9]+([.]?[0-9]+)+/ && !/not found$/{
+> > > match($0, /[0-9]+([.]?[0-9]+)+/)
+> > > bin=substr($0,RSTART,RLENGTH)
+> > > split(bin, a, ".")
+> > > print a[1]*10000000 + a[2]*100000 + a[3]*10000}'
+> > 22510000
+> >
+> > awk parsing code taken from ver_linux:
+> > /usr/src/linux/scripts/ver_linux:28,33
+> > ld -v 2>&1 |
+> > awk '/[0-9]+([.]?[0-9]+)+/ && !/not found$/{
+> >     match($0, /[0-9]+([.]?[0-9]+)+/)
+> >     printf("Binutils\t\t%s\n",
+> >     substr($0,RSTART,RLENGTH))
+> > }'
+> >
+>
+> It's close. That code doesn't quite work for my version number because the third component has two
+> digits and overflows into the second component in the proxy integer:
+> $ echo 2.24.51.20140217 |
+> > awk '/[0-9]+([.]?[0-9]+)+/ && !/not found$/{
+> > match($0, /[0-9]+([.]?[0-9]+)+/)
+> > bin=substr($0,RSTART,RLENGTH)
+> > split(bin, a, ".")
+> > print a[1]*10000000 + a[2]*100000 + a[3]*10000}'
+> 22910000
+>
+> but adding a zero to the first two scale factors, or removing one from the third works for me.
+> $ echo 2.24.51.20140217 | awk '/[0-9]+([.]?[0-9]+)+/ && !/not found$/{
+> > match($0, /[0-9]+([.]?[0-9]+)+/)
+> > bin=substr($0,RSTART,RLENGTH)
+> > split(bin, a, ".")
+> > print a[1]*100000000 + a[2]*1000000 + a[3]*10000}'
+> 224510000
+> $ echo 2.24.51.20140217 | awk '/[0-9]+([.]?[0-9]+)+/ && !/not found$/{
+> > match($0, /[0-9]+([.]?[0-9]+)+/)
+> > bin=substr($0,RSTART,RLENGTH)
+> > split(bin, a, ".")
+> > print a[1]*10000000 + a[2]*100000 + a[3]*1000}'
+> 22451000
 
-Fixes: d2036f30cf ("scripts/kconfig/Makefile: Allow KBUILD_DEFCONFIG to be a target")
-Signed-off-by: Jan Beulich <jbeulich@suse.com>
-Cc: Michael Ellerman <mpe@ellerman.id.au>
----
- scripts/kconfig/Makefile |    4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
 
---- 4.5-rc1/scripts/kconfig/Makefile
-+++ 4.5-rc1-kconfig-make-3-80/scripts/kconfig/Makefile
-@@ -96,13 +96,15 @@ savedefconfig: $(obj)/conf
- defconfig: $(obj)/conf
- ifeq ($(KBUILD_DEFCONFIG),)
- 	$< $(silent) --defconfig $(Kconfig)
--else ifneq ($(wildcard $(srctree)/arch/$(SRCARCH)/configs/$(KBUILD_DEFCONFIG)),)
-+else
-+ifneq ($(wildcard $(srctree)/arch/$(SRCARCH)/configs/$(KBUILD_DEFCONFIG)),)
- 	@$(kecho) "*** Default configuration is based on '$(KBUILD_DEFCONFIG)'"
- 	$(Q)$< $(silent) --defconfig=arch/$(SRCARCH)/configs/$(KBUILD_DEFCONFIG) $(Kconfig)
- else
- 	@$(kecho) "*** Default configuration is based on target '$(KBUILD_DEFCONFIG)'"
- 	$(Q)$(MAKE) -f $(srctree)/Makefile $(KBUILD_DEFCONFIG)
- endif
-+endif
- 
- %_defconfig: $(obj)/conf
- 	$(Q)$< $(silent) --defconfig=arch/$(SRCARCH)/configs/$@ $(Kconfig)
+I put the latter of the two methods that worked for you it into a
+script, shown below:
 
+#!/usr/bin/awk -f
+# extract linker version number from stdin and turn into single number
 
+/[0-9]+([.]?[0-9]+)+/ && !/not found$/{
+    match($0, /[0-9]+([.]?[0-9]+)+/)
+    ver=substr($0,RSTART,RLENGTH)
+    split(ver, a, ".")
+    print a[1]*10000000 + a[2]*100000 + a[3]*1000
+    exit
+}
 
+And tried it out on the following input:
+
+% echo 2.24.51.20140217 | ld-version.sh
+22451000
+% echo 'GNU ld version 2.25-15.fc23' | ld-version.sh
+22500000
