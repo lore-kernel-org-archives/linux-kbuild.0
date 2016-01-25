@@ -1,174 +1,132 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mailapp01.imgtec.com ([195.59.15.196]:26904 "EHLO
-	imgpgp01.kl.imgtec.org" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1759251AbcAUKTY (ORCPT
+Received: from mailapp01.imgtec.com ([195.59.15.196]:38292 "EHLO
+	mailapp01.imgtec.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754822AbcAYKto convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 21 Jan 2016 05:19:24 -0500
-Date: Thu, 21 Jan 2016 10:19:21 +0000
-From: James Hogan <james.hogan@imgtec.com>
-Subject: Re: [PATCH v2 2/2] kbuild: Remove stale asm-generic wrappers
-Message-ID: <20160121101921.GC24198@jhogan-linux.le.imgtec.org>
-References: <1453210670-12596-1-git-send-email-james.hogan@imgtec.com>
- <1453210670-12596-3-git-send-email-james.hogan@imgtec.com>
- <20160121000342.GA7538@NP-P-BURTON>
+	Mon, 25 Jan 2016 05:49:44 -0500
+From: Daniel Sanders <Daniel.Sanders@imgtec.com>
+Subject: RE: [PATCH] ld-version: fix it on Fedora
+Date: Mon, 25 Jan 2016 10:49:39 +0000
+Message-ID: <E484D272A3A61B4880CDF2E712E9279F45D179FA@HHMAIL01.hh.imgtec.org>
+References: <1452189189-31188-1-git-send-email-mst@redhat.com>
+ <CAAG0J995iCNwdN6PpuJfzo+TVWNXR3UVqS9v-4HXbryyvMn+=w@mail.gmail.com>
+ <E484D272A3A61B4880CDF2E712E9279F45D04AA7@HHMAIL01.hh.imgtec.org>,<CAJ1xhMWth4kNuEkuVEUiUEz=d_9dmKxh0+Z_GrRcKB+F72W91w@mail.gmail.com>
+In-Reply-To: <CAJ1xhMWth4kNuEkuVEUiUEz=d_9dmKxh0+Z_GrRcKB+F72W91w@mail.gmail.com>
+Content-Language: en-GB
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="bAmEntskrkuBymla"
-Content-Disposition: inline
-In-Reply-To: <20160121000342.GA7538@NP-P-BURTON>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Paul Burton <paul.burton@imgtec.com>
-Cc: Michal Marek <mmarek@suse.com>, linux-kernel@vger.kernel.org, Heinrich Schuchardt <xypron.glpk@gmx.de>, Arnd Bergmann <arnd@arndb.de>, Ralf Baechle <ralf@linux-mips.org>, Florian Fainelli <f.fainelli@gmail.com>, linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org, linux-mips@linux-mips.org
+To: Alexander Kapshuk <alexander.kapshuk@gmail.com>
+Cc: James Hogan <James.Hogan@imgtec.com>, "Michael S. Tsirkin" <mst@redhat.com>, LKML <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, Linux MIPS Mailing List <linux-mips@linux-mips.org>, Ralf Baechle <ralf@linux-mips.org>
 
---bAmEntskrkuBymla
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> From: Alexander Kapshuk [alexander.kapshuk@gmail.com]
+> Sent: 23 January 2016 14:41
+> To: Daniel Sanders
+> Cc: James Hogan; Michael S. Tsirkin; LKML; Michal Marek; linux-kbuild@vger.kernel.org; Linux MIPS Mailing List; Ralf Baechle
+> Subject: Re: [PATCH] ld-version: fix it on Fedora
+> 
+> On Wed, Jan 13, 2016 at 7:30 PM, Daniel Sanders <Daniel.Sanders@imgtec.com<mailto:Daniel.Sanders@imgtec.com>> wrote:
+> Hi,
+> 
+> The version number that's giving me problems is 2.24.51.20140217 which ld-version.sh converts to 2036931700 (20000000+2400000+510000+2014021700).
+> 
+> At the moment, I'm wondering whether we really need to handle more than three version number components. Another thought is that the comparison could be inside ld-version.sh (or a replacement) so that it can compare the array of version components directly instead of using a constructed integer as a proxy.
+> 
+> > -----Original Message-----
+> > From: james@albanarts.com<mailto:james@albanarts.com> [mailto:james@albanarts.com<mailto:james@albanarts.com>] On Behalf Of
+> > James Hogan
+> > Sent: 13 January 2016 17:06
+> > To: Michael S. Tsirkin
+> > Cc: LKML; Michal Marek; linux-kbuild@vger.kernel.org<mailto:linux-kbuild@vger.kernel.org>; Linux MIPS Mailing
+> > List; Ralf Baechle; Daniel Sanders
+> > Subject: Re: [PATCH] ld-version: fix it on Fedora
+> >
+> > Cc'ing Daniel, who has hit further breakage due to unusual version numbers.
+> >
+> > On 7 January 2016 at 17:55, Michael S. Tsirkin <mst@redhat.com<mailto:mst@redhat.com>> wrote:
+> > > On Fedora 23, ld --version outputs:
+> > > GNU ld version 2.25-15.fc23
+> > >
+> > > But ld-version.sh fails to parse this, so e.g.  mips build fails to
+> > > enable VDSO, printing a warning that binutils >= 2.24 is required.
+> > >
+> > > To fix, teach ld-version to parse this format.
+> > >
+> > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com<mailto:mst@redhat.com>>
+> > > ---
+> > >
+> > > Which tree should this be merged through? Mine? MIPS?
+> > >
+> > >  scripts/ld-version.sh | 2 ++
+> > >  1 file changed, 2 insertions(+)
+> > >
+> > > diff --git a/scripts/ld-version.sh b/scripts/ld-version.sh
+> > > index 198580d..25d23c8 100755
+> > > --- a/scripts/ld-version.sh
+> > > +++ b/scripts/ld-version.sh
+> > > @@ -2,6 +2,8 @@
+> > >  # extract linker version number from stdin and turn into single number
+> > >         {
+> > >         gsub(".*)", "");
+> > > +       gsub(".*version ", "");
+> > > +       gsub("-.*", "");
+> > >         split($1,a, ".");
+> > >         print a[1]*10000000 + a[2]*100000 + a[3]*10000 + a[4]*100 + a[5];
+> > >         exit
+> > > --
+> > > MST
+> > >
+> 
+> Is this the output you're looking for?
+> 
+> % echo 'GNU ld version 2.25-15.fc23' |
+> > awk '/[0-9]+([.]?[0-9]+)+/ && !/not found$/{
+> > match($0, /[0-9]+([.]?[0-9]+)+/)
+> > bin=substr($0,RSTART,RLENGTH)
+> > split(bin, a, ".")
+> > print a[1]*10000000 + a[2]*100000 + a[3]*10000}'
+> 22500000
+> 
+> % echo 2.25.1.20140217 |
+> > awk '/[0-9]+([.]?[0-9]+)+/ && !/not found$/{
+> > match($0, /[0-9]+([.]?[0-9]+)+/)
+> > bin=substr($0,RSTART,RLENGTH)
+> > split(bin, a, ".")
+> > print a[1]*10000000 + a[2]*100000 + a[3]*10000}'
+> 22510000
+> 
+> awk parsing code taken from ver_linux:
+> /usr/src/linux/scripts/ver_linux:28,33
+> ld -v 2>&1 |
+> awk '/[0-9]+([.]?[0-9]+)+/ && !/not found$/{
+>     match($0, /[0-9]+([.]?[0-9]+)+/)
+>     printf("Binutils\t\t%s\n",
+>     substr($0,RSTART,RLENGTH))
+> }'
+> 
 
-On Thu, Jan 21, 2016 at 12:03:42AM +0000, Paul Burton wrote:
-> On Tue, Jan 19, 2016 at 01:37:50PM +0000, James Hogan wrote:
-> > When a header file is removed from generic-y (often accompanied by the
-> > addition of an arch specific header), the generated wrapper file will
-> > persist, and in some cases may still take precedence over the new arch
-> > header.
-> >=20
-> > For example commit f1fe2d21f4e1 ("MIPS: Add definitions for extended
-> > context") removed ucontext.h from generic-y in arch/mips/include/asm/,
-> > and added an arch/mips/include/uapi/asm/ucontext.h. The continued use of
-> > the wrapper when reusing a dirty build tree resulted in build failures
-> > in arch/mips/kernel/signal.c:
-> >=20
-> > arch/mips/kernel/signal.c: In function =E2=80=98sc_to_extcontext=E2=80=
-=99:
-> > arch/mips/kernel/signal.c:142:12: error: =E2=80=98struct ucontext=E2=80=
-=99 has no member named =E2=80=98uc_extcontext=E2=80=99
-> >   return &uc->uc_extcontext;
-> >             ^
-> >=20
-> > Fix by detecting and removing wrapper headers in generated header
-> > directories that do not correspond to a filename in generic-y, genhdr-y,
-> > or the newly introduced generated-y.
-> >=20
-> > Reported-by: Jacek Anaszewski <j.anaszewski@samsung.com>
-> > Reported-by: Hauke Mehrtens <hauke@hauke-m.de>
-> > Reported-by: Heinrich Schuchardt <xypron.glpk@gmx.de>
-> > Signed-off-by: James Hogan <james.hogan@imgtec.com>
-> > Cc: Michal Marek <mmarek@suse.com>
-> > Cc: Arnd Bergmann <arnd@arndb.de>
-> > Cc: Ralf Baechle <ralf@linux-mips.org>
-> > Cc: Paul Burton <paul.burton@imgtec.com>
-> > Cc: Florian Fainelli <f.fainelli@gmail.com>
-> > Cc: linux-kbuild@vger.kernel.org
-> > Cc: linux-arch@vger.kernel.org
-> > Cc: linux-mips@linux-mips.org
-> > ---
-> > Changes in v2:
-> > - Rewrite a bit, drawing inspiration from Makefile.headersinst.
-> > - Exclude genhdr-y and generated-y (thanks to kbuild test robot).
-> > ---
-> >  scripts/Makefile.asm-generic | 17 ++++++++++++++++-
-> >  1 file changed, 16 insertions(+), 1 deletion(-)
-> >=20
-> > diff --git a/scripts/Makefile.asm-generic b/scripts/Makefile.asm-generic
-> > index 045e0098e962..24c29f16f029 100644
-> > --- a/scripts/Makefile.asm-generic
-> > +++ b/scripts/Makefile.asm-generic
-> > @@ -13,11 +13,26 @@ include scripts/Kbuild.include
-> >  # Create output directory if not already present
-> >  _dummy :=3D $(shell [ -d $(obj) ] || mkdir -p $(obj))
-> > =20
-> > +# Stale wrappers when the corresponding files are removed from generic=
--y
-> > +# need removing.
-> > +generated-y   :=3D $(generic-y) $(genhdr-y) $(generated-y)
-> > +all-files     :=3D $(patsubst %, $(obj)/%, $(generated-y))
-> > +old-headers   :=3D $(wildcard $(obj)/*.h)
-> > +unwanted      :=3D $(filter-out $(all-files),$(old-headers))
->=20
-> Hi James,
->=20
-> Thanks a bunch for fixing this!
+It's close. That code doesn't quite work for my version number because the third component has two
+digits and overflows into the second component in the proxy integer:
+$ echo 2.24.51.20140217 |
+> awk '/[0-9]+([.]?[0-9]+)+/ && !/not found$/{
+> match($0, /[0-9]+([.]?[0-9]+)+/)
+> bin=substr($0,RSTART,RLENGTH)
+> split(bin, a, ".")
+> print a[1]*10000000 + a[2]*100000 + a[3]*10000}'
+22910000
 
-FTR, I noticed yesterday it fixes a similar case when switching v4.3 to
-v4.4 too:
-
-arch/mips/kernel/../../../fs/binfmt_elf.c In function =E2=80=98create_elf_t=
-ables=E2=80=99:
-=2E/arch/mips/include/asm/elf.h +425 :14: error: =E2=80=98AT_SYSINFO_EHDR=
-=E2=80=99 undeclared (first use in this function)
-  NEW_AUX_ENT(AT_SYSINFO_EHDR,     \
-              ^
-
-Due to commit ebb5e78cc634 ("MIPS: Initial implementation of a VDSO")
-adding uapi/asm/auxvec.h and changing generic-y to header-y. Should
-ucontext.h be exported via header-y too?
-
-With these patches, it removes the stale file:
-  REMOVE  arch/mips/include/generated/uapi/asm/auxvec.h
-
->=20
-> Though is it my sleepy self or are all-files & old-headers misnomers?
-> That is, isn't all-files actually a list of headers to be kept, and
-> old-headers actually the list of all (header) files?
-
-I've followed the naming in Makefile.headersinst. I read all-files as
-"all the files we care about" (i.e. its a combination of several sets of
-generated files, hence "all") and old-headers as in "existing headers"
-(since it won't include files which haven't been generated yet).
-
-all-files could perhaps be renamed new-headers, but that could be
-misleading too.
-
-Cheers
-James
-
->=20
-> Thanks,
->     Paul
->=20
-> > +
-> >  quiet_cmd_wrap =3D WRAP    $@
-> >  cmd_wrap =3D echo "\#include <asm-generic/$*.h>" >$@
-> > =20
-> > -all: $(patsubst %, $(obj)/%, $(generic-y))
-> > +quiet_cmd_remove =3D REMOVE  $(unwanted)
-> > +cmd_remove =3D rm -f $(unwanted)
-> > +
-> > +all: $(patsubst %, $(obj)/%, $(generic-y)) FORCE
-> > +	$(if $(unwanted),$(call cmd,remove),)
-> >  	@:
-> > =20
-> >  $(obj)/%.h:
-> >  	$(call cmd,wrap)
-> > +
-> > +.PHONY: $(PHONY)
-> > +PHONY +=3D FORCE
-> > +FORCE: ;
-> > --=20
-> > 2.4.10
-> >=20
-
---bAmEntskrkuBymla
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJWoLCpAAoJEGwLaZPeOHZ6TaYP/iZf6/2NywLVhS2CqOESHACj
-QCJ192fD3M6pC8KZ0oMw0mqNGupk4G3y7Q1S5uLhm1mI5Ggu3kmvM4x062jFYAZ5
-TQJmpqOqrRAhCWCcEr3MPY3YoPk/ReCs6Z3CtvZ2h+NzG/69GWGZ9gvYfvcVYs9G
-FbzOfPvQq4vUTV3wYdZfkep4bVDFIgUJoCLJuPpTvzcIwDNXu+J8YNYwhphOkFJO
-bsLFpfqd0s/fWhv/hrCf0q1ZM4M899D2wJjOumCeM2rTmzw/CQLbtxOEoyp4aZq9
-lIl2hMgN/cGuBv86dRLwdlOI3hg5sDu74HNQQpXgm9dOFe+TMUoLekeekWs7CEqe
-3lN4zy7HSn6tKjk/OjK5o4vkBUKFIrRh1rV7aSQ85CxuClvaPeSZ5aWS6pVrGXJg
-VaTXeqMF49ref03vs28iQ3ZvwiyLlow5v9JM4z8hSJoXil5SIfU3YxCa57pcqlTB
-92pNm5zipZK8pvMdGIPkkp3V1I07nnUH/ziUIWIPgnVNbJe5GjHDVUIYChVtJJoQ
-0P7ScIJZ2D0ggdOL2+EBZ+bAYzIuP4y5x0K2G9SXp7pfy/VJhVH7Xtpzy/cSpDgS
-Fe0+BuS6P8EUacScrN99EdoNCs0HaQIEXJKvPRcj5qFPWe8oCwWv40PpesdUxZ8c
-N1/7yI/91ymf1KdLbHIs
-=aDXE
------END PGP SIGNATURE-----
-
---bAmEntskrkuBymla--
+but adding a zero to the first two scale factors, or removing one from the third works for me.
+$ echo 2.24.51.20140217 | awk '/[0-9]+([.]?[0-9]+)+/ && !/not found$/{
+> match($0, /[0-9]+([.]?[0-9]+)+/)
+> bin=substr($0,RSTART,RLENGTH)
+> split(bin, a, ".")
+> print a[1]*100000000 + a[2]*1000000 + a[3]*10000}'
+224510000
+$ echo 2.24.51.20140217 | awk '/[0-9]+([.]?[0-9]+)+/ && !/not found$/{
+> match($0, /[0-9]+([.]?[0-9]+)+/)
+> bin=substr($0,RSTART,RLENGTH)
+> split(bin, a, ".")
+> print a[1]*10000000 + a[2]*100000 + a[3]*1000}'
+22451000
