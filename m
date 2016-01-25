@@ -1,76 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.126.133]:50251 "EHLO
-	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S966230AbcAZQ17 (ORCPT
+Received: from userp1050.oracle.com ([156.151.31.82]:24188 "EHLO
+	userp1050.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932586AbcAZSHe (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 26 Jan 2016 11:27:59 -0500
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [linux-review:James-Hogan/kbuild-Remove-stale-asm-generic-wrappers/20160119-183642] d979f99e9cc14e2667e9b6e268db695977e4197a BUILD DONE
-Date: Tue, 26 Jan 2016 17:27:46 +0100
-Message-ID: <3724678.Yr2Z2lv3F9@wuerfel>
-In-Reply-To: <20160126053504.GA22301@wfg-t540p.sh.intel.com>
-References: <569e1dbb.MgLv8OaZwklOxxtU%fengguang.wu@intel.com> <20160126053050.GB20385@wfg-t540p.sh.intel.com> <20160126053504.GA22301@wfg-t540p.sh.intel.com>
+	Tue, 26 Jan 2016 13:07:34 -0500
+Date: Mon, 25 Jan 2016 11:57:20 +0300
+From: Dan Carpenter <dan.carpenter@oracle.com>
+Subject: Re: [RFC] kconfig: a new command line tool to set configs
+Message-ID: <20160125085720.GB5273@mwanda>
+References: <20150512103128.GA25706@mwanda>
+ <557ECB52.2060402@suse.cz>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <557ECB52.2060402@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Fengguang Wu <fengguang.wu@intel.com>
-Cc: James Hogan <james.hogan@imgtec.com>, linux-mips@linux-mips.org, linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, Florian Fainelli <f.fainelli@gmail.com>, Paul Burton <paul.burton@imgtec.com>, Ralf Baechle <ralf@linux-mips.org>, Heinrich Schuchardt <xypron.glpk@gmx.de>, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.com>
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Tuesday 26 January 2016 13:35:04 Fengguang Wu wrote:
-> > There are a fixed set of config files for fast build tests (which I
-> > selected randomly, feel free to ask me to change the list to more
-> > reasonable ones):
+On Mon, Jun 15, 2015 at 02:55:46PM +0200, Michal Marek wrote:
+> On 2015-05-12 12:31, Dan Carpenter wrote:
+> > This is an ugly hack job I made last night and it barely works.  It
+> > does two things:
 > > 
-> >       arm-allnoconfig
-> >       arm-at91_dt_defconfig
-> >       arm-at_hdmac
-> >       arm-ep93xx
-> >       arm-imx_v6_v7_defconfig
-> >       arm-iop-adma
-> >       arm-marzen_defconfig
-> >       arm-prima2_defconfig
-> >       arm-sa1100
-> >       arm-samsung
-> >       arm-sh
-> >       arm-spear13xx_defconfig
+> > 1)  Sometimes I want to search for a config so I have to load
+> >     menuconfig, then search for the config entry, then exit.  With
+> >     this script I simply run:
+> > 
+> > 	./scripts/kconfig/kconfig search COMEDI
+> > 
+> > 2)  I quite often try to enable something by doing:
+> > 
+> > 	echo CONFIG_FOO=y >> .config
+> > 	make oldconfig
+> > 	grep CONFIG_FOO .config
+> > 
+> >     The grep is to see if the setting worked.  Now I can do:
+> > 
+> > 	./scripts/kconfig/kconfig set CONFIG_FOO=y
 > 
-> And there is another set of best effort configs whose priority is
-> in-between the above list and the arch/*/configs/* ones.
-> 
->         arm-arm5
->         arm-arm67
->         arm-mmp
->         arm-omap2plus_defconfig
->         arm-s3c2410_defconfig
->         arm-tegra_defconfig
-> 
+> The second use-case is provided by scripts/config already. It's is a lot
+> simpler shell script, but it's maybe good enough for such task.
 
-I think we want at least one ARMv7-M NOMMU target in the list,
-I'd pick efm32_defconfig as it has the least overlap with the
-drivers in the other configs.
+The scripts/config file doesn't check that the config is valid.  It's
+the same as doing "echo CONFIG_FOO=y >> .config" which I was trying to
+fix.
 
-I don't know what arm-sh is, but I assume it's a superset of
-marzen, so you can probably drop marzen or move it down to the
-low-prio set. Similarly, the at_hdmac is likely a subset of
-at91_dt_defconfig and could be dropped.
+regards,
+dan carpenter
 
-prima2, ep93xx and spear13xx, mmp and s3c2410 are all
-slow-moving platforms, I would not expect to see much
-results from running those compared to the more active
-platforms.
-
-The platforms with the most changes these days are omap2plus,
-sunxi, shmobile, and exynos (samsung), followed by some
-that are widely used but not changed as much including
-tegra, imx_v6_v7, mvebu_v7, and qcom (previously msm).
-
-iop and sa1100 are rather old and won't change much, but it
-can be good to keep them in there because they are for older
-CPU architectures and behave a little different from the
-modern ones. It might be better to replace iop with ixp4xx,
-as this one is the only big-endian defconfig build we have,
-and that sometimes catches build-time bugs.
-
-	Arnd
