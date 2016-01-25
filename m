@@ -1,132 +1,86 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mailapp01.imgtec.com ([195.59.15.196]:38292 "EHLO
-	mailapp01.imgtec.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754822AbcAYKto convert rfc822-to-8bit (ORCPT
+Received: from mail-wm0-f52.google.com ([74.125.82.52]:33162 "EHLO
+	mail-wm0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756965AbcAYLde (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 25 Jan 2016 05:49:44 -0500
-From: Daniel Sanders <Daniel.Sanders@imgtec.com>
-Subject: RE: [PATCH] ld-version: fix it on Fedora
-Date: Mon, 25 Jan 2016 10:49:39 +0000
-Message-ID: <E484D272A3A61B4880CDF2E712E9279F45D179FA@HHMAIL01.hh.imgtec.org>
-References: <1452189189-31188-1-git-send-email-mst@redhat.com>
- <CAAG0J995iCNwdN6PpuJfzo+TVWNXR3UVqS9v-4HXbryyvMn+=w@mail.gmail.com>
- <E484D272A3A61B4880CDF2E712E9279F45D04AA7@HHMAIL01.hh.imgtec.org>,<CAJ1xhMWth4kNuEkuVEUiUEz=d_9dmKxh0+Z_GrRcKB+F72W91w@mail.gmail.com>
-In-Reply-To: <CAJ1xhMWth4kNuEkuVEUiUEz=d_9dmKxh0+Z_GrRcKB+F72W91w@mail.gmail.com>
-Content-Language: en-GB
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+	Mon, 25 Jan 2016 06:33:34 -0500
+Received: by mail-wm0-f52.google.com with SMTP id 123so61632850wmz.0
+        for <linux-kbuild@vger.kernel.org>; Mon, 25 Jan 2016 03:33:34 -0800 (PST)
+From: Kieran Bingham <kieran@kbingham.co.uk>
+Subject: Dependency issue through subdir's
+Message-ID: <56A6080C.2070006@kbingham.co.uk>
+Date: Mon, 25 Jan 2016 11:33:32 +0000
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Alexander Kapshuk <alexander.kapshuk@gmail.com>
-Cc: James Hogan <James.Hogan@imgtec.com>, "Michael S. Tsirkin" <mst@redhat.com>, LKML <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, Linux MIPS Mailing List <linux-mips@linux-mips.org>, Ralf Baechle <ralf@linux-mips.org>
+To: linux-kbuild@vger.kernel.org, mmarek@suse.com
+Cc: Jan Kiszka <jan.kiszka@siemens.com>, Lee Jones <lee.jones@linaro.org>, Peter Griffin <peter.griffin@linaro.org>, Linux Kernel <linux-kernel@vger.kernel.org>
 
-> From: Alexander Kapshuk [alexander.kapshuk@gmail.com]
-> Sent: 23 January 2016 14:41
-> To: Daniel Sanders
-> Cc: James Hogan; Michael S. Tsirkin; LKML; Michal Marek; linux-kbuild@vger.kernel.org; Linux MIPS Mailing List; Ralf Baechle
-> Subject: Re: [PATCH] ld-version: fix it on Fedora
-> 
-> On Wed, Jan 13, 2016 at 7:30 PM, Daniel Sanders <Daniel.Sanders@imgtec.com<mailto:Daniel.Sanders@imgtec.com>> wrote:
-> Hi,
-> 
-> The version number that's giving me problems is 2.24.51.20140217 which ld-version.sh converts to 2036931700 (20000000+2400000+510000+2014021700).
-> 
-> At the moment, I'm wondering whether we really need to handle more than three version number components. Another thought is that the comparison could be inside ld-version.sh (or a replacement) so that it can compare the array of version components directly instead of using a constructed integer as a proxy.
-> 
-> > -----Original Message-----
-> > From: james@albanarts.com<mailto:james@albanarts.com> [mailto:james@albanarts.com<mailto:james@albanarts.com>] On Behalf Of
-> > James Hogan
-> > Sent: 13 January 2016 17:06
-> > To: Michael S. Tsirkin
-> > Cc: LKML; Michal Marek; linux-kbuild@vger.kernel.org<mailto:linux-kbuild@vger.kernel.org>; Linux MIPS Mailing
-> > List; Ralf Baechle; Daniel Sanders
-> > Subject: Re: [PATCH] ld-version: fix it on Fedora
-> >
-> > Cc'ing Daniel, who has hit further breakage due to unusual version numbers.
-> >
-> > On 7 January 2016 at 17:55, Michael S. Tsirkin <mst@redhat.com<mailto:mst@redhat.com>> wrote:
-> > > On Fedora 23, ld --version outputs:
-> > > GNU ld version 2.25-15.fc23
-> > >
-> > > But ld-version.sh fails to parse this, so e.g.  mips build fails to
-> > > enable VDSO, printing a warning that binutils >= 2.24 is required.
-> > >
-> > > To fix, teach ld-version to parse this format.
-> > >
-> > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com<mailto:mst@redhat.com>>
-> > > ---
-> > >
-> > > Which tree should this be merged through? Mine? MIPS?
-> > >
-> > >  scripts/ld-version.sh | 2 ++
-> > >  1 file changed, 2 insertions(+)
-> > >
-> > > diff --git a/scripts/ld-version.sh b/scripts/ld-version.sh
-> > > index 198580d..25d23c8 100755
-> > > --- a/scripts/ld-version.sh
-> > > +++ b/scripts/ld-version.sh
-> > > @@ -2,6 +2,8 @@
-> > >  # extract linker version number from stdin and turn into single number
-> > >         {
-> > >         gsub(".*)", "");
-> > > +       gsub(".*version ", "");
-> > > +       gsub("-.*", "");
-> > >         split($1,a, ".");
-> > >         print a[1]*10000000 + a[2]*100000 + a[3]*10000 + a[4]*100 + a[5];
-> > >         exit
-> > > --
-> > > MST
-> > >
-> 
-> Is this the output you're looking for?
-> 
-> % echo 'GNU ld version 2.25-15.fc23' |
-> > awk '/[0-9]+([.]?[0-9]+)+/ && !/not found$/{
-> > match($0, /[0-9]+([.]?[0-9]+)+/)
-> > bin=substr($0,RSTART,RLENGTH)
-> > split(bin, a, ".")
-> > print a[1]*10000000 + a[2]*100000 + a[3]*10000}'
-> 22500000
-> 
-> % echo 2.25.1.20140217 |
-> > awk '/[0-9]+([.]?[0-9]+)+/ && !/not found$/{
-> > match($0, /[0-9]+([.]?[0-9]+)+/)
-> > bin=substr($0,RSTART,RLENGTH)
-> > split(bin, a, ".")
-> > print a[1]*10000000 + a[2]*100000 + a[3]*10000}'
-> 22510000
-> 
-> awk parsing code taken from ver_linux:
-> /usr/src/linux/scripts/ver_linux:28,33
-> ld -v 2>&1 |
-> awk '/[0-9]+([.]?[0-9]+)+/ && !/not found$/{
->     match($0, /[0-9]+([.]?[0-9]+)+/)
->     printf("Binutils\t\t%s\n",
->     substr($0,RSTART,RLENGTH))
-> }'
-> 
 
-It's close. That code doesn't quite work for my version number because the third component has two
-digits and overflows into the second component in the proxy integer:
-$ echo 2.24.51.20140217 |
-> awk '/[0-9]+([.]?[0-9]+)+/ && !/not found$/{
-> match($0, /[0-9]+([.]?[0-9]+)+/)
-> bin=substr($0,RSTART,RLENGTH)
-> split(bin, a, ".")
-> print a[1]*10000000 + a[2]*100000 + a[3]*10000}'
-22910000
+I am having difficulty with dependencies while trying to create an
+automatically generated file in linux/scripts/gdb/
 
-but adding a zero to the first two scale factors, or removing one from the third works for me.
-$ echo 2.24.51.20140217 | awk '/[0-9]+([.]?[0-9]+)+/ && !/not found$/{
-> match($0, /[0-9]+([.]?[0-9]+)+/)
-> bin=substr($0,RSTART,RLENGTH)
-> split(bin, a, ".")
-> print a[1]*100000000 + a[2]*1000000 + a[3]*10000}'
-224510000
-$ echo 2.24.51.20140217 | awk '/[0-9]+([.]?[0-9]+)+/ && !/not found$/{
-> match($0, /[0-9]+([.]?[0-9]+)+/)
-> bin=substr($0,RSTART,RLENGTH)
-> split(bin, a, ".")
-> print a[1]*10000000 + a[2]*100000 + a[3]*1000}'
-22451000
+This autogenerated file, includes the kernel headers, so that we can
+access kernel constants from GDB. As such, I need to parse C-headers
+into a python-compatible file.
+
+The commit-diff at :
+https://git.linaro.org/people/kieran.bingham/linux.git/commitdiff/26194ca0579ec94b3630f1aac0e985242831aa1c
+shows the current implementation.
+
+This is functional on a make -j1 build, however at -j2 and above (from a
+clean build), kbuild attempts to generate my file before
+include/generated/timeconst.h resulting in the following error:
+
+--- 8< ---
+  GEN     scripts/gdb/linux/constants.py
+In file included from sources/linux/include/linux/ktime.h:25:0,
+                 from /linux/include/linux/rcupdate.h:47,
+                 from /linux/include/linux/rbtree.h:34,
+                 from /linux/include/linux/mm_types.h:9,
+                 from /linux/arch/x86/include/asm/pgtable.h:448,
+                 from /linux/scripts/gdb/linux/constants.py.in:16:
+sources/linux/include/linux/jiffies.h:10:33: fatal error:
+generated/timeconst.h: No such file or directory
+--- >8 ---
+
+
+I have tried to provide a dependency on include/generated/timeconst.h,
+however, because scripts/gdb/ is a subdir-y target, it is run through a
+submake, and the parent directory targets are not available.
+
+
+I have also tried to look at how to delay the execution of the
+scripts/gdb subdir - but subdir-ym is simply a sorted list, (and using
+subdir-m += scripts/gdb didn't help)
+
+
+
+I feel like I have the following possible approaches to solving this:
+
+
+1) Create a 'subdir-late-' target group which builds specifically as
+late in the build process as possible
+
+
+2) Move the code that generates this file to /Kbuild. However I don't
+like the idea of putting non-essential generator at the top level build
+
+
+3) Add #ifndef __GENERATE_CONSTANTS_PY__ across any reference to
+generated header files, such as in ktime.h, and define that with my
+Preprocessor statement.
+
+
+
+Are there any other solutions? I dislike all 3 of the options above ...
+
+I'd appreciate any thoughts here.
+
+--
+Regards
+
+Kieran Bingham
+
