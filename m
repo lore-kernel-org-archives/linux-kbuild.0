@@ -1,48 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pandora.arm.linux.org.uk ([78.32.30.218]:36917 "EHLO
-	pandora.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S965930AbcAZNmX (ORCPT
+Received: from mout.kundenserver.de ([212.227.126.133]:50251 "EHLO
+	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S966230AbcAZQ17 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 26 Jan 2016 08:42:23 -0500
-Date: Tue, 26 Jan 2016 13:42:14 +0000
-From: Russell King - ARM Linux <linux@arm.linux.org.uk>
-Subject: Re: [RFC] scripts: make extract-vmlinux support ARM vmlinuz
-Message-ID: <20160126134214.GN10826@n2100.arm.linux.org.uk>
-References: <1453810236-2082-1-git-send-email-rogershimizu@gmail.com>
+	Tue, 26 Jan 2016 11:27:59 -0500
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [linux-review:James-Hogan/kbuild-Remove-stale-asm-generic-wrappers/20160119-183642] d979f99e9cc14e2667e9b6e268db695977e4197a BUILD DONE
+Date: Tue, 26 Jan 2016 17:27:46 +0100
+Message-ID: <3724678.Yr2Z2lv3F9@wuerfel>
+In-Reply-To: <20160126053504.GA22301@wfg-t540p.sh.intel.com>
+References: <569e1dbb.MgLv8OaZwklOxxtU%fengguang.wu@intel.com> <20160126053050.GB20385@wfg-t540p.sh.intel.com> <20160126053504.GA22301@wfg-t540p.sh.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1453810236-2082-1-git-send-email-rogershimizu@gmail.com>
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Roger Shimizu <rogershimizu@gmail.com>
-Cc: Michal Marek <mmarek@suse.com>, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org
+To: Fengguang Wu <fengguang.wu@intel.com>
+Cc: James Hogan <james.hogan@imgtec.com>, linux-mips@linux-mips.org, linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, Florian Fainelli <f.fainelli@gmail.com>, Paul Burton <paul.burton@imgtec.com>, Ralf Baechle <ralf@linux-mips.org>, Heinrich Schuchardt <xypron.glpk@gmx.de>, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.com>
 
-On Tue, Jan 26, 2016 at 09:10:36PM +0900, Roger Shimizu wrote:
-> vmlinuz on ARM seems is not an ELF, so scripts/extract-vmlinux
-> diff --git a/scripts/extract-vmlinux b/scripts/extract-vmlinux
-> index 5061abcc2540..d569eb8c8efe 100755
-> --- a/scripts/extract-vmlinux
-> +++ b/scripts/extract-vmlinux
-> @@ -15,7 +15,15 @@ check_vmlinux()
->  	# Use readelf to check if it's a valid ELF
->  	# TODO: find a better to way to check that it's really vmlinux
->  	#       and not just an elf
-> -	readelf -h $1 > /dev/null 2>&1 || return 1
-> +	case "$2" in
-> +	0|"")
-> +		readelf -h $1 > /dev/null 2>&1 || return 1
-> +		;;
-> +	1|*)
-> +	# For ARCH like ARM, vmlinux is not ELF, so we only do the check
-> +	# when $2 is 0 or NULL
+On Tuesday 26 January 2016 13:35:04 Fengguang Wu wrote:
+> > There are a fixed set of config files for fast build tests (which I
+> > selected randomly, feel free to ask me to change the list to more
+> > reasonable ones):
+> > 
+> >       arm-allnoconfig
+> >       arm-at91_dt_defconfig
+> >       arm-at_hdmac
+> >       arm-ep93xx
+> >       arm-imx_v6_v7_defconfig
+> >       arm-iop-adma
+> >       arm-marzen_defconfig
+> >       arm-prima2_defconfig
+> >       arm-sa1100
+> >       arm-samsung
+> >       arm-sh
+> >       arm-spear13xx_defconfig
+> 
+> And there is another set of best effort configs whose priority is
+> in-between the above list and the arch/*/configs/* ones.
+> 
+>         arm-arm5
+>         arm-arm67
+>         arm-mmp
+>         arm-omap2plus_defconfig
+>         arm-s3c2410_defconfig
+>         arm-tegra_defconfig
+> 
 
-This comment seems to be misleading - I think you mean "vmlinuz" there,
-or maybe "zImage" as the file is named in the kernel build tree to make
-it clear what you're referring to.  "vmlinuz" is the name chosen by
-distro installers.
+I think we want at least one ARMv7-M NOMMU target in the list,
+I'd pick efm32_defconfig as it has the least overlap with the
+drivers in the other configs.
 
--- 
-RMK's Patch system: http://www.arm.linux.org.uk/developer/patches/
-FTTC broadband for 0.8mile line: currently at 9.6Mbps down 400kbps up
-according to speedtest.net.
+I don't know what arm-sh is, but I assume it's a superset of
+marzen, so you can probably drop marzen or move it down to the
+low-prio set. Similarly, the at_hdmac is likely a subset of
+at91_dt_defconfig and could be dropped.
+
+prima2, ep93xx and spear13xx, mmp and s3c2410 are all
+slow-moving platforms, I would not expect to see much
+results from running those compared to the more active
+platforms.
+
+The platforms with the most changes these days are omap2plus,
+sunxi, shmobile, and exynos (samsung), followed by some
+that are widely used but not changed as much including
+tegra, imx_v6_v7, mvebu_v7, and qcom (previously msm).
+
+iop and sa1100 are rather old and won't change much, but it
+can be good to keep them in there because they are for older
+CPU architectures and behave a little different from the
+modern ones. It might be better to replace iop with ixp4xx,
+as this one is the only big-endian defconfig build we have,
+and that sometimes catches build-time bugs.
+
+	Arnd
