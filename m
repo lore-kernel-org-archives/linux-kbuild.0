@@ -1,96 +1,86 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:22433 "EHLO mga01.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751019AbcAZFf6 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 26 Jan 2016 00:35:58 -0500
-Date: Tue, 26 Jan 2016 13:35:04 +0800
-From: Fengguang Wu <fengguang.wu@intel.com>
-Subject: Re:
- [linux-review:James-Hogan/kbuild-Remove-stale-asm-generic-wrappers/20160119-183642]
- d979f99e9cc14e2667e9b6e268db695977e4197a BUILD DONE
-Message-ID: <20160126053504.GA22301@wfg-t540p.sh.intel.com>
-References: <569e1dbb.MgLv8OaZwklOxxtU%fengguang.wu@intel.com>
- <1534543.eobSKFEFfp@wuerfel>
- <20160126053050.GB20385@wfg-t540p.sh.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20160126053050.GB20385@wfg-t540p.sh.intel.com>
+Received: from mail-pf0-f171.google.com ([209.85.192.171]:36829 "EHLO
+	mail-pf0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S965188AbcAZMLI (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 26 Jan 2016 07:11:08 -0500
+Received: by mail-pf0-f171.google.com with SMTP id n128so98299803pfn.3
+        for <linux-kbuild@vger.kernel.org>; Tue, 26 Jan 2016 04:11:08 -0800 (PST)
+From: Roger Shimizu <rogershimizu@gmail.com>
+Subject: [RFC] scripts: make extract-vmlinux support ARM vmlinuz
+Date: Tue, 26 Jan 2016 21:10:36 +0900
+Message-Id: <1453810236-2082-1-git-send-email-rogershimizu@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: James Hogan <james.hogan@imgtec.com>, linux-mips@linux-mips.org, linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, Florian Fainelli <f.fainelli@gmail.com>, Paul Burton <paul.burton@imgtec.com>, Ralf Baechle <ralf@linux-mips.org>, Heinrich Schuchardt <xypron.glpk@gmx.de>, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.com>
+To: Michal Marek <mmarek@suse.com>, Russell King <linux@arm.linux.org.uk>
+Cc: Roger Shimizu <rogershimizu@gmail.com>, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org
 
-On Tue, Jan 26, 2016 at 01:30:50PM +0800, Fengguang Wu wrote:
-> Hi Arnd,
-> 
-> Sorry for the delay! I lost access to my email account for some week.
-> 
-> On Tue, Jan 19, 2016 at 03:26:16PM +0100, Arnd Bergmann wrote:
-> > On Tuesday 19 January 2016 19:27:55 kbuild test robot wrote:
-> > > arm                               allnoconfig
-> > > arm                         at91_dt_defconfig
-> > > arm                                  at_hdmac
-> > > arm                                    ep93xx
-> > > arm                       imx_v6_v7_defconfig
-> > > arm                                  iop-adma
-> > > arm                          marzen_defconfig
-> > > arm                          prima2_defconfig
-> > > arm                                    sa1100
-> > > arm                                   samsung
-> > > arm                                        sh
-> > > arm                       spear13xx_defconfig
-> > > 
-> > 
-> > Hi Fengguang,
-> > 
-> > Sorry for hijacking this thread. I have never seen the list of arm defconfigs
-> > you are building before, and it seems to be a surprising selection, as a number
-> > of platforms (ep93xx, iop, sa1100, spear13xx) are rather obscure, but the
-> > configurations that I tend to use most (multi_v7_defconfig, multi_v5_defconfig,
-> > allmodconfig) are not included.
-> > 
-> > Do you always build the same set of configurations, or is this a different
-> > each time?
-> 
-> There are a fixed set of config files for fast build tests (which I
-> selected randomly, feel free to ask me to change the list to more
-> reasonable ones):
-> 
-> 	arm-allnoconfig
-> 	arm-at91_dt_defconfig
-> 	arm-at_hdmac
-> 	arm-ep93xx
-> 	arm-imx_v6_v7_defconfig
-> 	arm-iop-adma
-> 	arm-marzen_defconfig
-> 	arm-prima2_defconfig
-> 	arm-sa1100
-> 	arm-samsung
-> 	arm-sh
-> 	arm-spear13xx_defconfig
+vmlinuz on ARM seems is not an ELF, so scripts/extract-vmlinux
+need to support such case.
 
-And there is another set of best effort configs whose priority is
-in-between the above list and the arch/*/configs/* ones.
+This fix is tested on amd64 and armel platform.
 
-	arm-arm5
-	arm-arm67
-	arm-mmp
-	arm-omap2plus_defconfig
-	arm-s3c2410_defconfig
-	arm-tegra_defconfig
+Signed-off-by: Roger Shimizu <rogershimizu@gmail.com>
+---
 
-Thanks,
-Fengguang
+Dear Michal and Russell,
 
-> The more configs included in arch/*/configs will be tested in a more
-> slow pace. So not included in this email does not mean they are not
-> tested -- they are likely not quick enough to catch this notification
-> email.
-> 
-> > Can you always include the three I mentioned?
-> 
-> Sure.
-> 
-> Thanks,
-> Fengguang
+I'm studying ARM booting process, and happened to find scripts/extract-vmlinux
+in kernel tree is broken on ARM for long time. [0][1]
+
+[0]: https://bugs.launchpad.net/linaro-ubuntu/+bug/1050453
+[1]: https://bugs.linaro.org/show_bug.cgi?id=461
+
+The patch I created looks like dirty hack, and I don't know the status of 
+whether vmlinuz is ELF or not on other platforms, so I make this as "RFC".
+
+Please comment. Thank you!
+
+Cheers,
+Roger
+
+ scripts/extract-vmlinux | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
+
+diff --git a/scripts/extract-vmlinux b/scripts/extract-vmlinux
+index 5061abcc2540..d569eb8c8efe 100755
+--- a/scripts/extract-vmlinux
++++ b/scripts/extract-vmlinux
+@@ -15,7 +15,15 @@ check_vmlinux()
+ 	# Use readelf to check if it's a valid ELF
+ 	# TODO: find a better to way to check that it's really vmlinux
+ 	#       and not just an elf
+-	readelf -h $1 > /dev/null 2>&1 || return 1
++	case "$2" in
++	0|"")
++		readelf -h $1 > /dev/null 2>&1 || return 1
++		;;
++	1|*)
++	# For ARCH like ARM, vmlinux is not ELF, so we only do the check
++	# when $2 is 0 or NULL
++		;;
++	esac
+ 
+ 	cat $1
+ 	exit 0
+@@ -31,7 +39,7 @@ try_decompress()
+ 	do
+ 		pos=${pos%%:*}
+ 		tail -c+$pos "$img" | $3 > $tmp 2> /dev/null
+-		check_vmlinux $tmp
++		test $? -eq 0 && check_vmlinux $tmp 1
+ 	done
+ }
+ 
+@@ -53,7 +61,7 @@ check_vmlinux $img
+ 
+ # That didn't work, so retry after decompression.
+ try_decompress '\037\213\010' xy    gunzip
+-try_decompress '\3757zXZ\000' abcde unxz
++try_decompress '\3757zXZ\000' abcde "unxz --single-stream"
+ try_decompress 'BZh'          xy    bunzip2
+ try_decompress '\135\0\0\0'   xxx   unlzma
+ try_decompress '\211\114\132' xy    'lzop -d'
+-- 
+2.1.4
+
