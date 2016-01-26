@@ -1,157 +1,81 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f49.google.com ([74.125.82.49]:38875 "EHLO
-	mail-wm0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932843AbcAYRa6 convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 25 Jan 2016 12:30:58 -0500
+Received: from mga01.intel.com ([192.55.52.88]:40500 "EHLO mga01.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750740AbcAZFbn (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 26 Jan 2016 00:31:43 -0500
+Date: Tue, 26 Jan 2016 13:30:50 +0800
+From: Fengguang Wu <fengguang.wu@intel.com>
+Subject: Re:
+ [linux-review:James-Hogan/kbuild-Remove-stale-asm-generic-wrappers/20160119-183642]
+ d979f99e9cc14e2667e9b6e268db695977e4197a BUILD DONE
+Message-ID: <20160126053050.GB20385@wfg-t540p.sh.intel.com>
+References: <569e1dbb.MgLv8OaZwklOxxtU%fengguang.wu@intel.com>
+ <1534543.eobSKFEFfp@wuerfel>
 MIME-Version: 1.0
-In-Reply-To: <E484D272A3A61B4880CDF2E712E9279F45D179FA@HHMAIL01.hh.imgtec.org>
-References: <1452189189-31188-1-git-send-email-mst@redhat.com>
- <CAAG0J995iCNwdN6PpuJfzo+TVWNXR3UVqS9v-4HXbryyvMn+=w@mail.gmail.com>
- <E484D272A3A61B4880CDF2E712E9279F45D04AA7@HHMAIL01.hh.imgtec.org>
- <CAJ1xhMWth4kNuEkuVEUiUEz=d_9dmKxh0+Z_GrRcKB+F72W91w@mail.gmail.com> <E484D272A3A61B4880CDF2E712E9279F45D179FA@HHMAIL01.hh.imgtec.org>
-From: Alexander Kapshuk <alexander.kapshuk@gmail.com>
-Date: Mon, 25 Jan 2016 19:30:17 +0200
-Message-ID: <CAJ1xhMVbxoag7psNg+5L6AmL4WYXKyBYNuVGjJcfqe6Km_10SQ@mail.gmail.com>
-Subject: Re: [PATCH] ld-version: fix it on Fedora
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1534543.eobSKFEFfp@wuerfel>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Daniel Sanders <Daniel.Sanders@imgtec.com>
-Cc: James Hogan <James.Hogan@imgtec.com>, "Michael S. Tsirkin" <mst@redhat.com>, LKML <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, Linux MIPS Mailing List <linux-mips@linux-mips.org>, Ralf Baechle <ralf@linux-mips.org>
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: James Hogan <james.hogan@imgtec.com>, linux-mips@linux-mips.org, linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, Florian Fainelli <f.fainelli@gmail.com>, Paul Burton <paul.burton@imgtec.com>, Ralf Baechle <ralf@linux-mips.org>, Heinrich Schuchardt <xypron.glpk@gmx.de>, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.com>
 
-On Mon, Jan 25, 2016 at 12:49 PM, Daniel Sanders
-<Daniel.Sanders@imgtec.com> wrote:
->
-> > From: Alexander Kapshuk [alexander.kapshuk@gmail.com]
-> > Sent: 23 January 2016 14:41
-> > To: Daniel Sanders
-> > Cc: James Hogan; Michael S. Tsirkin; LKML; Michal Marek; linux-kbuild@vger.kernel.org; Linux MIPS Mailing List; Ralf Baechle
-> > Subject: Re: [PATCH] ld-version: fix it on Fedora
-> >
-> > On Wed, Jan 13, 2016 at 7:30 PM, Daniel Sanders <Daniel.Sanders@imgtec.com<mailto:Daniel.Sanders@imgtec.com>> wrote:
-> > Hi,
-> >
-> > The version number that's giving me problems is 2.24.51.20140217 which ld-version.sh converts to 2036931700 (20000000+2400000+510000+2014021700).
-> >
-> > At the moment, I'm wondering whether we really need to handle more than three version number components. Another thought is that the comparison could be inside ld-version.sh (or a replacement) so that it can compare the array of version components directly instead of using a constructed integer as a proxy.
-> >
-> > > -----Original Message-----
-> > > From: james@albanarts.com<mailto:james@albanarts.com> [mailto:james@albanarts.com<mailto:james@albanarts.com>] On Behalf Of
-> > > James Hogan
-> > > Sent: 13 January 2016 17:06
-> > > To: Michael S. Tsirkin
-> > > Cc: LKML; Michal Marek; linux-kbuild@vger.kernel.org<mailto:linux-kbuild@vger.kernel.org>; Linux MIPS Mailing
-> > > List; Ralf Baechle; Daniel Sanders
-> > > Subject: Re: [PATCH] ld-version: fix it on Fedora
-> > >
-> > > Cc'ing Daniel, who has hit further breakage due to unusual version numbers.
-> > >
-> > > On 7 January 2016 at 17:55, Michael S. Tsirkin <mst@redhat.com<mailto:mst@redhat.com>> wrote:
-> > > > On Fedora 23, ld --version outputs:
-> > > > GNU ld version 2.25-15.fc23
-> > > >
-> > > > But ld-version.sh fails to parse this, so e.g.  mips build fails to
-> > > > enable VDSO, printing a warning that binutils >= 2.24 is required.
-> > > >
-> > > > To fix, teach ld-version to parse this format.
-> > > >
-> > > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com<mailto:mst@redhat.com>>
-> > > > ---
-> > > >
-> > > > Which tree should this be merged through? Mine? MIPS?
-> > > >
-> > > >  scripts/ld-version.sh | 2 ++
-> > > >  1 file changed, 2 insertions(+)
-> > > >
-> > > > diff --git a/scripts/ld-version.sh b/scripts/ld-version.sh
-> > > > index 198580d..25d23c8 100755
-> > > > --- a/scripts/ld-version.sh
-> > > > +++ b/scripts/ld-version.sh
-> > > > @@ -2,6 +2,8 @@
-> > > >  # extract linker version number from stdin and turn into single number
-> > > >         {
-> > > >         gsub(".*)", "");
-> > > > +       gsub(".*version ", "");
-> > > > +       gsub("-.*", "");
-> > > >         split($1,a, ".");
-> > > >         print a[1]*10000000 + a[2]*100000 + a[3]*10000 + a[4]*100 + a[5];
-> > > >         exit
-> > > > --
-> > > > MST
-> > > >
-> >
-> > Is this the output you're looking for?
-> >
-> > % echo 'GNU ld version 2.25-15.fc23' |
-> > > awk '/[0-9]+([.]?[0-9]+)+/ && !/not found$/{
-> > > match($0, /[0-9]+([.]?[0-9]+)+/)
-> > > bin=substr($0,RSTART,RLENGTH)
-> > > split(bin, a, ".")
-> > > print a[1]*10000000 + a[2]*100000 + a[3]*10000}'
-> > 22500000
-> >
-> > % echo 2.25.1.20140217 |
-> > > awk '/[0-9]+([.]?[0-9]+)+/ && !/not found$/{
-> > > match($0, /[0-9]+([.]?[0-9]+)+/)
-> > > bin=substr($0,RSTART,RLENGTH)
-> > > split(bin, a, ".")
-> > > print a[1]*10000000 + a[2]*100000 + a[3]*10000}'
-> > 22510000
-> >
-> > awk parsing code taken from ver_linux:
-> > /usr/src/linux/scripts/ver_linux:28,33
-> > ld -v 2>&1 |
-> > awk '/[0-9]+([.]?[0-9]+)+/ && !/not found$/{
-> >     match($0, /[0-9]+([.]?[0-9]+)+/)
-> >     printf("Binutils\t\t%s\n",
-> >     substr($0,RSTART,RLENGTH))
-> > }'
-> >
->
-> It's close. That code doesn't quite work for my version number because the third component has two
-> digits and overflows into the second component in the proxy integer:
-> $ echo 2.24.51.20140217 |
-> > awk '/[0-9]+([.]?[0-9]+)+/ && !/not found$/{
-> > match($0, /[0-9]+([.]?[0-9]+)+/)
-> > bin=substr($0,RSTART,RLENGTH)
-> > split(bin, a, ".")
-> > print a[1]*10000000 + a[2]*100000 + a[3]*10000}'
-> 22910000
->
-> but adding a zero to the first two scale factors, or removing one from the third works for me.
-> $ echo 2.24.51.20140217 | awk '/[0-9]+([.]?[0-9]+)+/ && !/not found$/{
-> > match($0, /[0-9]+([.]?[0-9]+)+/)
-> > bin=substr($0,RSTART,RLENGTH)
-> > split(bin, a, ".")
-> > print a[1]*100000000 + a[2]*1000000 + a[3]*10000}'
-> 224510000
-> $ echo 2.24.51.20140217 | awk '/[0-9]+([.]?[0-9]+)+/ && !/not found$/{
-> > match($0, /[0-9]+([.]?[0-9]+)+/)
-> > bin=substr($0,RSTART,RLENGTH)
-> > split(bin, a, ".")
-> > print a[1]*10000000 + a[2]*100000 + a[3]*1000}'
-> 22451000
+Hi Arnd,
 
+Sorry for the delay! I lost access to my email account for some week.
 
-I put the latter of the two methods that worked for you it into a
-script, shown below:
+On Tue, Jan 19, 2016 at 03:26:16PM +0100, Arnd Bergmann wrote:
+> On Tuesday 19 January 2016 19:27:55 kbuild test robot wrote:
+> > arm                               allnoconfig
+> > arm                         at91_dt_defconfig
+> > arm                                  at_hdmac
+> > arm                                    ep93xx
+> > arm                       imx_v6_v7_defconfig
+> > arm                                  iop-adma
+> > arm                          marzen_defconfig
+> > arm                          prima2_defconfig
+> > arm                                    sa1100
+> > arm                                   samsung
+> > arm                                        sh
+> > arm                       spear13xx_defconfig
+> > 
+> 
+> Hi Fengguang,
+> 
+> Sorry for hijacking this thread. I have never seen the list of arm defconfigs
+> you are building before, and it seems to be a surprising selection, as a number
+> of platforms (ep93xx, iop, sa1100, spear13xx) are rather obscure, but the
+> configurations that I tend to use most (multi_v7_defconfig, multi_v5_defconfig,
+> allmodconfig) are not included.
+> 
+> Do you always build the same set of configurations, or is this a different
+> each time?
 
-#!/usr/bin/awk -f
-# extract linker version number from stdin and turn into single number
+There are a fixed set of config files for fast build tests (which I
+selected randomly, feel free to ask me to change the list to more
+reasonable ones):
 
-/[0-9]+([.]?[0-9]+)+/ && !/not found$/{
-    match($0, /[0-9]+([.]?[0-9]+)+/)
-    ver=substr($0,RSTART,RLENGTH)
-    split(ver, a, ".")
-    print a[1]*10000000 + a[2]*100000 + a[3]*1000
-    exit
-}
+	arm-allnoconfig
+	arm-at91_dt_defconfig
+	arm-at_hdmac
+	arm-ep93xx
+	arm-imx_v6_v7_defconfig
+	arm-iop-adma
+	arm-marzen_defconfig
+	arm-prima2_defconfig
+	arm-sa1100
+	arm-samsung
+	arm-sh
+	arm-spear13xx_defconfig
 
-And tried it out on the following input:
+The more configs included in arch/*/configs will be tested in a more
+slow pace. So not included in this email does not mean they are not
+tested -- they are likely not quick enough to catch this notification
+email.
 
-% echo 2.24.51.20140217 | ld-version.sh
-22451000
-% echo 'GNU ld version 2.25-15.fc23' | ld-version.sh
-22500000
+> Can you always include the three I mentioned?
+
+Sure.
+
+Thanks,
+Fengguang
