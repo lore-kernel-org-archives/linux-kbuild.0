@@ -1,52 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from userp1050.oracle.com ([156.151.31.82]:24188 "EHLO
-	userp1050.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932586AbcAZSHe (ORCPT
+Received: from mail-vk0-f41.google.com ([209.85.213.41]:36329 "EHLO
+	mail-vk0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751149AbcAZX3Q (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 26 Jan 2016 13:07:34 -0500
-Date: Mon, 25 Jan 2016 11:57:20 +0300
-From: Dan Carpenter <dan.carpenter@oracle.com>
-Subject: Re: [RFC] kconfig: a new command line tool to set configs
-Message-ID: <20160125085720.GB5273@mwanda>
-References: <20150512103128.GA25706@mwanda>
- <557ECB52.2060402@suse.cz>
+	Tue, 26 Jan 2016 18:29:16 -0500
+Received: by mail-vk0-f41.google.com with SMTP id n1so101400411vkb.3
+        for <linux-kbuild@vger.kernel.org>; Tue, 26 Jan 2016 15:29:16 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <557ECB52.2060402@suse.cz>
+In-Reply-To: <20160126134214.GN10826@n2100.arm.linux.org.uk>
+References: <1453810236-2082-1-git-send-email-rogershimizu@gmail.com> <20160126134214.GN10826@n2100.arm.linux.org.uk>
+From: Roger Shimizu <rogershimizu@gmail.com>
+Date: Wed, 27 Jan 2016 08:28:36 +0900
+Message-ID: <CAEQ9gEmKO9wvp8DMBO8f4dLtxz2DQU-K-am5o0kcYn6uTKF0qw@mail.gmail.com>
+Subject: Re: [RFC] scripts: make extract-vmlinux support ARM vmlinuz
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Russell King - ARM Linux <linux@arm.linux.org.uk>
+Cc: Michal Marek <mmarek@suse.com>, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org
 
-On Mon, Jun 15, 2015 at 02:55:46PM +0200, Michal Marek wrote:
-> On 2015-05-12 12:31, Dan Carpenter wrote:
-> > This is an ugly hack job I made last night and it barely works.  It
-> > does two things:
-> > 
-> > 1)  Sometimes I want to search for a config so I have to load
-> >     menuconfig, then search for the config entry, then exit.  With
-> >     this script I simply run:
-> > 
-> > 	./scripts/kconfig/kconfig search COMEDI
-> > 
-> > 2)  I quite often try to enable something by doing:
-> > 
-> > 	echo CONFIG_FOO=y >> .config
-> > 	make oldconfig
-> > 	grep CONFIG_FOO .config
-> > 
-> >     The grep is to see if the setting worked.  Now I can do:
-> > 
-> > 	./scripts/kconfig/kconfig set CONFIG_FOO=y
-> 
-> The second use-case is provided by scripts/config already. It's is a lot
-> simpler shell script, but it's maybe good enough for such task.
+On Tue, Jan 26, 2016 at 10:42 PM, Russell King - ARM Linux
+<linux@arm.linux.org.uk> wrote:
+> On Tue, Jan 26, 2016 at 09:10:36PM +0900, Roger Shimizu wrote:
+>> vmlinuz on ARM seems is not an ELF, so scripts/extract-vmlinux
+>> diff --git a/scripts/extract-vmlinux b/scripts/extract-vmlinux
+>> index 5061abcc2540..d569eb8c8efe 100755
+>> --- a/scripts/extract-vmlinux
+>> +++ b/scripts/extract-vmlinux
+>> @@ -15,7 +15,15 @@ check_vmlinux()
+>>       # Use readelf to check if it's a valid ELF
+>>       # TODO: find a better to way to check that it's really vmlinux
+>>       #       and not just an elf
+>> -     readelf -h $1 > /dev/null 2>&1 || return 1
+>> +     case "$2" in
+>> +     0|"")
+>> +             readelf -h $1 > /dev/null 2>&1 || return 1
+>> +             ;;
+>> +     1|*)
+>> +     # For ARCH like ARM, vmlinux is not ELF, so we only do the check
+>> +     # when $2 is 0 or NULL
+>
+> This comment seems to be misleading - I think you mean "vmlinuz" there,
+> or maybe "zImage" as the file is named in the kernel build tree to make
+> it clear what you're referring to.  "vmlinuz" is the name chosen by
+> distro installers.
 
-The scripts/config file doesn't check that the config is valid.  It's
-the same as doing "echo CONFIG_FOO=y >> .config" which I was trying to
-fix.
+I just add these comment following original comment above.
+And even the script name is "extract-vmlinux".
 
-regards,
-dan carpenter
+In the check_vmlinux() routine, the target of the check is
+decompressed result of
+parsed part zImage file.
+I guess the original comment is true, it's called vmlinux in kernel build tree.
 
+I hope you can comment:
+- whether my hack work for all ARMs (armel/armhf/arm64 etc). I only
+tested armel.
+- whether there's better way to check ARM's vmlinux
+
+Thank you!
+
+Cheers,
+Roger
+-- 
+Roger Shimizu, GMT +9 Tokyo
+PGP/GPG: 17B3ACB1
