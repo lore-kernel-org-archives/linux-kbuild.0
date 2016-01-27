@@ -1,58 +1,32 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.17.10]:63750 "EHLO
-	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751233AbcA0Jov (ORCPT
+Received: from www.linutronix.de ([62.245.132.108]:42847 "EHLO
+	Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752913AbcA0MFF (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 27 Jan 2016 04:44:51 -0500
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [linux-review:James-Hogan/kbuild-Remove-stale-asm-generic-wrappers/20160119-183642] d979f99e9cc14e2667e9b6e268db695977e4197a BUILD DONE
-Date: Wed, 27 Jan 2016 10:44:01 +0100
-Message-ID: <3596300.IYfzmako0c@wuerfel>
-In-Reply-To: <20160127093018.GA21190@wfg-t540p.sh.intel.com>
-References: <569e1dbb.MgLv8OaZwklOxxtU%fengguang.wu@intel.com> <1947556.38OyJnvGS5@wuerfel> <20160127093018.GA21190@wfg-t540p.sh.intel.com>
+	Wed, 27 Jan 2016 07:05:05 -0500
+Date: Wed, 27 Jan 2016 13:03:57 +0100 (CET)
+From: Thomas Gleixner <tglx@linutronix.de>
+Subject: Re: [PATCH tip v5 2/5] kbuild: Add option to turn incompatible
+ pointer check into error
+In-Reply-To: <1448890711-5812-3-git-send-email-daniel.wagner@bmw-carit.de>
+Message-ID: <alpine.DEB.2.11.1601271300490.3886@nanos>
+References: <1448890711-5812-1-git-send-email-daniel.wagner@bmw-carit.de> <1448890711-5812-3-git-send-email-daniel.wagner@bmw-carit.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Fengguang Wu <fengguang.wu@intel.com>
-Cc: James Hogan <james.hogan@imgtec.com>, linux-mips@linux-mips.org, linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, Florian Fainelli <f.fainelli@gmail.com>, Paul Burton <paul.burton@imgtec.com>, Ralf Baechle <ralf@linux-mips.org>, Heinrich Schuchardt <xypron.glpk@gmx.de>, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.com>, linux-arm-kernel@lists.infradead.org
+To: Daniel Wagner <daniel.wagner@bmw-carit.de>
+Cc: linux-kernel@vger.kernel.org, linux-rt-users@vger.kernel.org, Peter Zijlstra <peterz@infradead.org>, linux-kbuild@vger.kernel.org, Marcelo Tosatti <mtosatti@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Paul Gortmaker <paul.gortmaker@windriver.com>, Steven Rostedt <rostedt@goodmis.org>, Boqun Feng <boqun.feng@gmail.com>
 
-On Wednesday 27 January 2016 17:30:18 Fengguang Wu wrote:
+On Mon, 30 Nov 2015, Daniel Wagner wrote:
+>  
+> +ifdef CONFIG_ENABLE_ERR_TYPE_CHECK
+> +KBUILD_CFLAGS += $(call cc-option,-Werror=incompatible-pointer-types)
+> +endif
 
-> > Looks good, I'm just unsure about "multi_v8_defconfig", this does not
-> > exist. Do you mean multi_v5_defconfig?
+I don't see a value for making this configurable. If the compiler supports it,
+we should use it. It already found a bug, so why would we make that optional?
 
-> Ah yes, multi_v8_defconfig does not exist actually.
+Thanks,
 
-Ok, can you include multi_v5_defconfig than?
-
-I see you have one named "arm-arm5", which may be the same.
-
-> > I also wonder if you include 'randconfig' builds for some architectures.
-> > I have patches for all remaining errors and warnings that I see with
-> > ARM randconfig builds today. Not all of them are merged yet, but I could
-> > probably come up with a file to be used as input to KCONFIG_ALLCONFIG
-> > to eliminate the known-broken configurations, if you are interested.
-> 
-> If the are mostly ready for upstream, it may be easier to wait until
-> upstream randconfig works just fine for ARM.
-
-I have around 130 patches for warnings that I'm submitting at the moment, but
-there are a couple of really tricky ones that I don't currently have
-a good plan for:
-
-- in some configurations, you end up without any boards selected, hitting
-  an #error in the final link
-- ARMv3 support in gcc is rather broken and causes internal compiler errors
-  among other things
-- the old ELF format (OABI) doesn't work in some cases
-- GCOV_PROFILE_ALL causes problems that need to be debugged
-- XIP_KERNEL sometimes causes kallsyms to fail
-- not all platforms implement the complete clk API, if they don't
-  use CONFIG_COMMON_CLK (I have patch for that we can probably merge)
-- CONFIG_PHYS_OFFSET needs to be entered manually to be a number
-  in 'make config'
-- same for DEBUG_LL
-
-	Arnd
+	tglx
