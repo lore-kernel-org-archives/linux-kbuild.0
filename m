@@ -1,41 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.136]:53739 "EHLO mail.kernel.org"
+Received: from mga02.intel.com ([134.134.136.20]:38735 "EHLO mga02.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S965366AbcA1BOA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 27 Jan 2016 20:14:00 -0500
-Received: from mail.kernel.org (localhost [127.0.0.1])
-	by mail.kernel.org (Postfix) with ESMTP id BC11020265
-	for <linux-kbuild@vger.kernel.org>; Thu, 28 Jan 2016 01:13:59 +0000 (UTC)
-Received: from mail-yk0-f181.google.com (mail-yk0-f181.google.com [209.85.160.181])
-	(using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPSA id 74F3D2022D
-	for <linux-kbuild@vger.kernel.org>; Thu, 28 Jan 2016 01:13:58 +0000 (UTC)
-Received: by mail-yk0-f181.google.com with SMTP id a85so13807419ykb.1
-        for <linux-kbuild@vger.kernel.org>; Wed, 27 Jan 2016 17:13:58 -0800 (PST)
+	id S932985AbcA1DOr (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 27 Jan 2016 22:14:47 -0500
+Date: Thu, 28 Jan 2016 11:14:35 +0800
+From: Fengguang Wu <fengguang.wu@intel.com>
+Subject: Re:
+ [linux-review:James-Hogan/kbuild-Remove-stale-asm-generic-wrappers/20160119-183642]
+ d979f99e9cc14e2667e9b6e268db695977e4197a BUILD DONE
+Message-ID: <20160128031435.GA25625@wfg-t540p.sh.intel.com>
+References: <569e1dbb.MgLv8OaZwklOxxtU%fengguang.wu@intel.com>
+ <1947556.38OyJnvGS5@wuerfel>
+ <20160127093018.GA21190@wfg-t540p.sh.intel.com>
+ <3596300.IYfzmako0c@wuerfel>
 MIME-Version: 1.0
-In-Reply-To: <56A9377E.1090404@suse.com>
-References: <E1ZoWXk-0007DX-SY@rmk-PC.arm.linux.org.uk> <20151020132002.GD3953@io.lakedaemon.net>
- <20160127201845.GI10826@n2100.arm.linux.org.uk> <56A9377E.1090404@suse.com>
-From: Rob Herring <robh+dt@kernel.org>
-Date: Wed, 27 Jan 2016 19:13:38 -0600
-Message-ID: <CAL_JsqLYvQS1M-3dn3kd4qpmqCxSLZ-25cBhyeCpq5Z+SCog_w@mail.gmail.com>
-Subject: Re: [PATCH RESEND] dtbsinstall: don't move target directory out of
- the way
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3596300.IYfzmako0c@wuerfel>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>
-Cc: Russell King - ARM Linux <linux@arm.linux.org.uk>, Grant Likely <grant.likely@linaro.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Jason Cooper <jason@lakedaemon.net>
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: James Hogan <james.hogan@imgtec.com>, linux-mips@linux-mips.org, linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, Florian Fainelli <f.fainelli@gmail.com>, Paul Burton <paul.burton@imgtec.com>, Ralf Baechle <ralf@linux-mips.org>, Heinrich Schuchardt <xypron.glpk@gmx.de>, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.com>, linux-arm-kernel@lists.infradead.org
 
-On Wed, Jan 27, 2016 at 3:32 PM, Michal Marek <mmarek@suse.com> wrote:
-> Dne 27.1.2016 v 21:18 Russell King - ARM Linux napsal(a):
->> So what needs to happen to get this change merged?
->
-> Rob, Grant, shall I merged it to the kbuild tree or do you want to take it?
+On Wed, Jan 27, 2016 at 10:44:01AM +0100, Arnd Bergmann wrote:
+> On Wednesday 27 January 2016 17:30:18 Fengguang Wu wrote:
+> 
+> > > Looks good, I'm just unsure about "multi_v8_defconfig", this does not
+> > > exist. Do you mean multi_v5_defconfig?
+> 
+> > Ah yes, multi_v8_defconfig does not exist actually.
+> 
+> Ok, can you include multi_v5_defconfig than?
+ 
+OK, done.
 
-Yes, please take it.
+> I see you have one named "arm-arm5", which may be the same.
 
-Acked-by: Rob Herring <robh@kernel.org>
+Yes, looks so -- it's provided by someone else long time ago.
 
-Rob
+> > > I also wonder if you include 'randconfig' builds for some architectures.
+> > > I have patches for all remaining errors and warnings that I see with
+> > > ARM randconfig builds today. Not all of them are merged yet, but I could
+> > > probably come up with a file to be used as input to KCONFIG_ALLCONFIG
+> > > to eliminate the known-broken configurations, if you are interested.
+> > 
+> > If the are mostly ready for upstream, it may be easier to wait until
+> > upstream randconfig works just fine for ARM.
+> 
+> I have around 130 patches for warnings that I'm submitting at the moment, but
+> there are a couple of really tricky ones that I don't currently have
+> a good plan for:
+> 
+> - in some configurations, you end up without any boards selected, hitting
+>   an #error in the final link
+> - ARMv3 support in gcc is rather broken and causes internal compiler errors
+>   among other things
+> - the old ELF format (OABI) doesn't work in some cases
+> - GCOV_PROFILE_ALL causes problems that need to be debugged
+> - XIP_KERNEL sometimes causes kallsyms to fail
+> - not all platforms implement the complete clk API, if they don't
+>   use CONFIG_COMMON_CLK (I have patch for that we can probably merge)
+
+The robot may explicitly enable/disable some CONFIG_* after randconfig
+to workaround known problems.
+
+> - CONFIG_PHYS_OFFSET needs to be entered manually to be a number
+>   in 'make config'
+
+That's a problem for auto tests.
+
+> - same for DEBUG_LL
+
+Thanks,
+Fengguang
