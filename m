@@ -1,32 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.126.187]:50925 "EHLO
-	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754860AbcA1MH4 (ORCPT
+Received: from mail.bmw-carit.de ([62.245.222.98]:46554 "EHLO
+	linuxmail.bmw-carit.de" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S934877AbcA1OvG (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 28 Jan 2016 07:07:56 -0500
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [linux-review:James-Hogan/kbuild-Remove-stale-asm-generic-wrappers/20160119-183642] d979f99e9cc14e2667e9b6e268db695977e4197a BUILD DONE
-Date: Thu, 28 Jan 2016 13:07:10 +0100
-Message-ID: <1889851.3PhZkL3YD7@wuerfel>
-In-Reply-To: <20160128031435.GA25625@wfg-t540p.sh.intel.com>
-References: <569e1dbb.MgLv8OaZwklOxxtU%fengguang.wu@intel.com> <3596300.IYfzmako0c@wuerfel> <20160128031435.GA25625@wfg-t540p.sh.intel.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+	Thu, 28 Jan 2016 09:51:06 -0500
+From: Daniel Wagner <daniel.wagner@bmw-carit.de>
+Subject: [PATCH tip v6 2/5] kbuild: Add option to turn incompatible pointer check into error
+Date: Thu, 28 Jan 2016 15:44:27 +0100
+Message-Id: <1453992270-4688-3-git-send-email-daniel.wagner@bmw-carit.de>
+In-Reply-To: <1453992270-4688-1-git-send-email-daniel.wagner@bmw-carit.de>
+References: <1453992270-4688-1-git-send-email-daniel.wagner@bmw-carit.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Fengguang Wu <fengguang.wu@intel.com>
-Cc: James Hogan <james.hogan@imgtec.com>, linux-mips@linux-mips.org, linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, Florian Fainelli <f.fainelli@gmail.com>, Paul Burton <paul.burton@imgtec.com>, Ralf Baechle <ralf@linux-mips.org>, Heinrich Schuchardt <xypron.glpk@gmx.de>, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.com>, linux-arm-kernel@lists.infradead.org, rmk@arm.linux.org.uk
+To: linux-kernel@vger.kernel.org, linux-rt-users@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org, Marcelo Tosatti <mtosatti@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Paul E . McKenney" <paulmck@linux.vnet.ibm.com>, Paul Gortmaker <paul.gortmaker@windriver.com>, Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, Steven Rostedt <rostedt@goodmis.org>, Boqun Feng <boqun.feng@gmail.com>, Daniel Wagner <daniel.wagner@bmw-carit.de>
 
-On Thursday 28 January 2016 11:14:35 Fengguang Wu wrote:
+With the introduction of the simple wait API we have two very
+similar APIs in the kernel. For example wake_up() and swake_up()
+is only one character away. Although the compiler will warn
+happily the wrong usage it keeps on going an even links the kernel.
+Thomas and Peter would rather like to see early missuses reported
+as error early on.
 
-> > - CONFIG_PHYS_OFFSET needs to be entered manually to be a number
-> >   in 'make config'
-> 
-> That's a problem for auto tests.
+In a first attempt we tried to wrap all swait and wait calls
+into a macro which has an compile time type assertion. The result
+was pretty ugly and wasn't able to catch all wrong usages.
+woken_wake_function(), autoremove_wake_function() and wake_bit_function()
+are assigned as function pointers. Wrapping them with a macro around is
+not possible. Prefixing them with '_' was also not a real option
+because there some users in the kernel which do use them as well.
+All in all this attempt looked to intrusive and too ugly.
 
-Ok, I'll try to revisit this one. Maybe I can turn it into a
-'default 0xffffffff' with a compile-time warning, or make
-'default 0' the fallback when it's not specified otherwise.
+An alternative is to turn the pointer type check into an error which
+catches wrong type uses. Obviously not only the swait/wait ones. That
+isn't a bad thing either.
 
-	Arnd
+Signed-off-by: Daniel Wagner <daniel.wagner@bmw-carit.de>
+Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+---
+ Makefile | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/Makefile b/Makefile
+index 9d94ade..653fd08 100644
+--- a/Makefile
++++ b/Makefile
+@@ -767,6 +767,9 @@ KBUILD_CFLAGS   += $(call cc-option,-Werror=strict-prototypes)
+ # Prohibit date/time macros, which would make the build non-deterministic
+ KBUILD_CFLAGS   += $(call cc-option,-Werror=date-time)
+ 
++# enforce correct pointer usage
++KBUILD_CFLAGS += $(call cc-option,-Werror=incompatible-pointer-types)
++
+ # use the deterministic mode of AR if available
+ KBUILD_ARFLAGS := $(call ar-option,D)
+ 
+-- 
+2.5.0
+
