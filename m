@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from zeniv.linux.org.uk ([195.92.253.2]:49618 "EHLO
+Received: from zeniv.linux.org.uk ([195.92.253.2]:49617 "EHLO
 	ZenIV.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756682AbcA2TSh (ORCPT
+	with ESMTP id S1756624AbcA2TSh (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Fri, 29 Jan 2016 14:18:37 -0500
 From: Al Viro <viro@ZenIV.linux.org.uk>
-Subject: [PATCH 09/12] sparc: move exports to definitions
-Date: Fri, 29 Jan 2016 19:18:31 +0000
-Message-Id: <1454095114-4128-9-git-send-email-viro@ZenIV.linux.org.uk>
+Subject: [PATCH 08/12] ppc: move exports to definitions
+Date: Fri, 29 Jan 2016 19:18:30 +0000
+Message-Id: <1454095114-4128-8-git-send-email-viro@ZenIV.linux.org.uk>
 In-Reply-To: <20160129191744.GB17997@ZenIV.linux.org.uk>
 References: <20160129191744.GB17997@ZenIV.linux.org.uk>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -19,1347 +19,1117 @@ From: Al Viro <viro@zeniv.linux.org.uk>
 
 Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
 ---
- arch/sparc/include/asm/Kbuild      |   1 +
- arch/sparc/kernel/Makefile         |   2 +-
- arch/sparc/kernel/entry.S          |   3 +
- arch/sparc/kernel/head_32.S        |   3 +
- arch/sparc/kernel/head_64.S        |   7 +-
- arch/sparc/kernel/helpers.S        |   2 +
- arch/sparc/kernel/hvcalls.S        |   4 +
- arch/sparc/kernel/sparc_ksyms.c    |  12 +++
- arch/sparc/kernel/sparc_ksyms_32.c |  31 -------
- arch/sparc/kernel/sparc_ksyms_64.c |  52 ------------
- arch/sparc/lib/Makefile            |   1 -
- arch/sparc/lib/U1memcpy.S          |   2 +
- arch/sparc/lib/VISsave.S           |   2 +
- arch/sparc/lib/ashldi3.S           |   2 +
- arch/sparc/lib/ashrdi3.S           |   2 +
- arch/sparc/lib/atomic_64.S         |  10 ++-
- arch/sparc/lib/bitops.S            |   7 ++
- arch/sparc/lib/blockops.S          |   3 +
- arch/sparc/lib/bzero.S             |   4 +
- arch/sparc/lib/checksum_32.S       |   3 +
- arch/sparc/lib/checksum_64.S       |   2 +
- arch/sparc/lib/clear_page.S        |   3 +
- arch/sparc/lib/copy_in_user.S      |   2 +
- arch/sparc/lib/copy_page.S         |   2 +
- arch/sparc/lib/copy_user.S         |   2 +
- arch/sparc/lib/csum_copy.S         |   3 +
- arch/sparc/lib/divdi3.S            |   2 +
- arch/sparc/lib/ffs.S               |   3 +
- arch/sparc/lib/hweight.S           |   5 ++
- arch/sparc/lib/ipcsum.S            |   2 +
- arch/sparc/lib/ksyms.c             | 165 -------------------------------------
- arch/sparc/lib/locks.S             |   5 ++
- arch/sparc/lib/lshrdi3.S           |   2 +
- arch/sparc/lib/mcount.S            |   2 +
- arch/sparc/lib/memcmp.S            |   2 +
- arch/sparc/lib/memcpy.S            |   4 +
- arch/sparc/lib/memmove.S           |   2 +
- arch/sparc/lib/memscan_32.S        |   4 +
- arch/sparc/lib/memscan_64.S        |   4 +
- arch/sparc/lib/memset.S            |   3 +
- arch/sparc/lib/muldi3.S            |   2 +
- arch/sparc/lib/strlen.S            |   2 +
- arch/sparc/lib/strncmp_32.S        |   2 +
- arch/sparc/lib/strncmp_64.S        |   2 +
- arch/sparc/lib/xor.S               |   9 ++
- 45 files changed, 136 insertions(+), 253 deletions(-)
- create mode 100644 arch/sparc/kernel/sparc_ksyms.c
- delete mode 100644 arch/sparc/kernel/sparc_ksyms_32.c
- delete mode 100644 arch/sparc/kernel/sparc_ksyms_64.c
- delete mode 100644 arch/sparc/lib/ksyms.c
+ arch/powerpc/include/asm/Kbuild      |  1 +
+ arch/powerpc/kernel/Makefile         |  4 ---
+ arch/powerpc/kernel/entry_32.S       |  2 ++
+ arch/powerpc/kernel/entry_64.S       |  3 ++
+ arch/powerpc/kernel/epapr_hcalls.S   |  2 ++
+ arch/powerpc/kernel/fpu.S            |  3 ++
+ arch/powerpc/kernel/head_32.S        |  5 +++
+ arch/powerpc/kernel/head_40x.S       |  2 ++
+ arch/powerpc/kernel/head_44x.S       |  2 ++
+ arch/powerpc/kernel/head_64.S        |  2 ++
+ arch/powerpc/kernel/head_8xx.S       |  2 ++
+ arch/powerpc/kernel/head_fsl_booke.S |  2 ++
+ arch/powerpc/kernel/misc.S           |  2 ++
+ arch/powerpc/kernel/misc_32.S        | 12 +++++++
+ arch/powerpc/kernel/misc_64.S        |  4 +++
+ arch/powerpc/kernel/pci-common.c     |  1 +
+ arch/powerpc/kernel/pci_32.c         |  2 ++
+ arch/powerpc/kernel/ppc_ksyms.c      | 39 -----------------------
+ arch/powerpc/kernel/ppc_ksyms_32.c   | 61 ------------------------------------
+ arch/powerpc/kernel/setup_32.c       |  6 ++++
+ arch/powerpc/kernel/time.c           |  1 +
+ arch/powerpc/kernel/vector.S         |  4 +++
+ arch/powerpc/lib/Makefile            |  2 +-
+ arch/powerpc/lib/checksum_32.S       |  4 +++
+ arch/powerpc/lib/checksum_64.S       |  4 +++
+ arch/powerpc/lib/copy_32.S           |  5 +++
+ arch/powerpc/lib/copypage_64.S       |  2 ++
+ arch/powerpc/lib/copyuser_64.S       |  2 ++
+ arch/powerpc/lib/hweight_64.S        |  5 +++
+ arch/powerpc/lib/mem_64.S            |  3 ++
+ arch/powerpc/lib/memcmp_64.S         |  2 ++
+ arch/powerpc/lib/memcpy_64.S         |  2 ++
+ arch/powerpc/lib/ppc_ksyms.c         | 35 ---------------------
+ arch/powerpc/lib/string.S            | 10 ++++++
+ arch/powerpc/lib/string_64.S         |  2 ++
+ arch/powerpc/mm/hash_low_32.S        |  3 ++
+ arch/powerpc/sysdev/dcr-low.S        |  3 ++
+ 37 files changed, 106 insertions(+), 140 deletions(-)
+ delete mode 100644 arch/powerpc/kernel/ppc_ksyms.c
+ delete mode 100644 arch/powerpc/kernel/ppc_ksyms_32.c
+ delete mode 100644 arch/powerpc/lib/ppc_ksyms.c
 
-diff --git a/arch/sparc/include/asm/Kbuild b/arch/sparc/include/asm/Kbuild
-index e9286188..17aa6b5 100644
---- a/arch/sparc/include/asm/Kbuild
-+++ b/arch/sparc/include/asm/Kbuild
-@@ -6,6 +6,7 @@ generic-y += cputime.h
+diff --git a/arch/powerpc/include/asm/Kbuild b/arch/powerpc/include/asm/Kbuild
+index ab9f4e0..5c4fbc8 100644
+--- a/arch/powerpc/include/asm/Kbuild
++++ b/arch/powerpc/include/asm/Kbuild
+@@ -1,5 +1,6 @@
+ generic-y += clkdev.h
  generic-y += div64.h
- generic-y += emergency-restart.h
- generic-y += exec.h
 +generic-y += export.h
  generic-y += irq_regs.h
  generic-y += irq_work.h
- generic-y += linkage.h
-diff --git a/arch/sparc/kernel/Makefile b/arch/sparc/kernel/Makefile
-index 7cf9c6e..2430127 100644
---- a/arch/sparc/kernel/Makefile
-+++ b/arch/sparc/kernel/Makefile
-@@ -85,7 +85,7 @@ obj-y                     += auxio_$(BITS).o
- obj-$(CONFIG_SUN_PM)      += apc.o pmc.o
- 
- obj-$(CONFIG_MODULES)     += module.o
--obj-$(CONFIG_MODULES)     += sparc_ksyms_$(BITS).o
-+obj-$(CONFIG_MODULES)     += sparc_ksyms.o
- obj-$(CONFIG_SPARC_LED)   += led.o
- obj-$(CONFIG_KGDB)        += kgdb_$(BITS).o
- 
-diff --git a/arch/sparc/kernel/entry.S b/arch/sparc/kernel/entry.S
-index 33c02b1..c201b2b 100644
---- a/arch/sparc/kernel/entry.S
-+++ b/arch/sparc/kernel/entry.S
-@@ -29,6 +29,7 @@
+ generic-y += local64.h
+diff --git a/arch/powerpc/kernel/Makefile b/arch/powerpc/kernel/Makefile
+index 794f22a..5550eac 100644
+--- a/arch/powerpc/kernel/Makefile
++++ b/arch/powerpc/kernel/Makefile
+@@ -92,10 +92,6 @@ obj-$(CONFIG_RELOCATABLE_PPC32)	+= reloc_32.o
+ obj-$(CONFIG_PPC32)		+= entry_32.o setup_32.o
+ obj-$(CONFIG_PPC64)		+= dma-iommu.o iommu.o
+ obj-$(CONFIG_KGDB)		+= kgdb.o
+-obj-$(CONFIG_MODULES)		+= ppc_ksyms.o
+-ifeq ($(CONFIG_PPC32),y)
+-obj-$(CONFIG_MODULES)		+= ppc_ksyms_32.o
+-endif
+ obj-$(CONFIG_BOOTX_TEXT)	+= btext.o
+ obj-$(CONFIG_SMP)		+= smp.o
+ obj-$(CONFIG_KPROBES)		+= kprobes.o
+diff --git a/arch/powerpc/kernel/entry_32.S b/arch/powerpc/kernel/entry_32.S
+index 2405631..c9d487e 100644
+--- a/arch/powerpc/kernel/entry_32.S
++++ b/arch/powerpc/kernel/entry_32.S
+@@ -33,6 +33,7 @@
  #include <asm/unistd.h>
- 
- #include <asm/asmmacro.h>
+ #include <asm/ftrace.h>
+ #include <asm/ptrace.h>
 +#include <asm/export.h>
  
- #define curptr      g6
+ /*
+  * MSR_KERNEL is > 0x10000 on 4xx/Book-E since it include MSR_CE.
+@@ -1342,6 +1343,7 @@ _GLOBAL(_mcount)
+ 	MCOUNT_RESTORE_FRAME
+ 	bctr
+ #endif
++EXPORT_SYMBOL(_mcount)
  
-@@ -1190,6 +1191,8 @@ delay_continue:
- 	
- 	ret
- 	restore
-+EXPORT_SYMBOL(__udelay)
-+EXPORT_SYMBOL(__ndelay)
+ _GLOBAL(ftrace_stub)
+ 	blr
+diff --git a/arch/powerpc/kernel/entry_64.S b/arch/powerpc/kernel/entry_64.S
+index 0d525ce..e980bf1 100644
+--- a/arch/powerpc/kernel/entry_64.S
++++ b/arch/powerpc/kernel/entry_64.S
+@@ -36,6 +36,7 @@
+ #include <asm/hw_irq.h>
+ #include <asm/context_tracking.h>
+ #include <asm/tm.h>
++#include <asm/export.h>
  
- 	/* Handle a software breakpoint */
- 	/* We have to inform parent that child has stopped */
-diff --git a/arch/sparc/kernel/head_32.S b/arch/sparc/kernel/head_32.S
-index 3d92c0a..7bb317b 100644
---- a/arch/sparc/kernel/head_32.S
-+++ b/arch/sparc/kernel/head_32.S
+ /*
+  * System calls.
+@@ -1143,6 +1144,7 @@ _GLOBAL(enter_prom)
+ #ifdef CONFIG_DYNAMIC_FTRACE
+ _GLOBAL(mcount)
+ _GLOBAL(_mcount)
++EXPORT_SYMBOL(_mcount)
+ 	blr
+ 
+ _GLOBAL_TOC(ftrace_caller)
+@@ -1170,6 +1172,7 @@ _GLOBAL(ftrace_stub)
+ 	blr
+ #else
+ _GLOBAL_TOC(_mcount)
++EXPORT_SYMBOL(_mcount)
+ 	/* Taken from output of objdump from lib64/glibc */
+ 	mflr	r3
+ 	ld	r11, 0(r1)
+diff --git a/arch/powerpc/kernel/epapr_hcalls.S b/arch/powerpc/kernel/epapr_hcalls.S
+index 9f1ebf7..52ca247 100644
+--- a/arch/powerpc/kernel/epapr_hcalls.S
++++ b/arch/powerpc/kernel/epapr_hcalls.S
+@@ -16,6 +16,7 @@
+ #include <asm/ppc_asm.h>
+ #include <asm/asm-compat.h>
+ #include <asm/asm-offsets.h>
++#include <asm/export.h>
+ 
+ #ifndef CONFIG_PPC64
+ /* epapr_ev_idle() was derived from e500_idle() */
+@@ -53,3 +54,4 @@ epapr_hypercall_start:
+ 	nop
+ 	nop
+ 	blr
++EXPORT_SYMBOL(epapr_hypercall_start)
+diff --git a/arch/powerpc/kernel/fpu.S b/arch/powerpc/kernel/fpu.S
+index 2117eac..1e70bb7 100644
+--- a/arch/powerpc/kernel/fpu.S
++++ b/arch/powerpc/kernel/fpu.S
 @@ -24,6 +24,7 @@
- #include <asm/thread_info.h>	/* TI_UWINMASK */
- #include <asm/errno.h>
- #include <asm/pgtsrmmu.h>	/* SRMMU_PGDIR_SHIFT */
+ #include <asm/ppc_asm.h>
+ #include <asm/asm-offsets.h>
+ #include <asm/ptrace.h>
 +#include <asm/export.h>
  
- 	.data
- /* The following are used with the prom_vector node-ops to figure out
-@@ -60,6 +61,7 @@ sun4e_notsup:
-  */
- 	.globl empty_zero_page
- empty_zero_page:	.skip PAGE_SIZE
+ #ifdef CONFIG_VSX
+ #define __REST_32FPVSRS(n,c,base)					\
+@@ -85,6 +86,7 @@ _GLOBAL(load_fp_state)
+ 	MTFSF_L(fr0)
+ 	REST_32FPVSRS(0, R4, R3)
+ 	blr
++EXPORT_SYMBOL(load_fp_state)
+ 
+ /*
+  * Store FP state into memory, including FPSCR
+@@ -95,6 +97,7 @@ _GLOBAL(store_fp_state)
+ 	mffs	fr0
+ 	stfd	fr0,FPSTATE_FPSCR(r3)
+ 	blr
++EXPORT_SYMBOL(store_fp_state)
+ 
+ /*
+  * This task wants to use the FPU now.
+diff --git a/arch/powerpc/kernel/head_32.S b/arch/powerpc/kernel/head_32.S
+index dc0488b..590fe4a 100644
+--- a/arch/powerpc/kernel/head_32.S
++++ b/arch/powerpc/kernel/head_32.S
+@@ -34,6 +34,7 @@
+ #include <asm/ptrace.h>
+ #include <asm/bug.h>
+ #include <asm/kvm_book3s_asm.h>
++#include <asm/export.h>
+ 
+ /* 601 only have IBAT; cr0.eq is set on 601 when using this macro */
+ #define LOAD_BAT(n, reg, RA, RB)	\
+@@ -739,6 +740,7 @@ END_MMU_FTR_SECTION_IFSET(MMU_FTR_NEED_DTLB_SW_LRU)
+ 
+ 	.globl mol_trampoline
+ 	.set mol_trampoline, i0x2f00
++	EXPORT_SYMBOL(mol_trampoline)
+ 
+ 	. = 0x3000
+ 
+@@ -1048,6 +1050,7 @@ _ENTRY(switch_mmu_context)
+ 4:	trap
+ 	EMIT_BUG_ENTRY 4b,__FILE__,__LINE__,0
+ 	blr
++EXPORT_SYMBOL(switch_mmu_context)
+ 
+ /*
+  * An undocumented "feature" of 604e requires that the v bit
+@@ -1275,6 +1278,7 @@ sdata:
+ 	.globl	empty_zero_page
+ empty_zero_page:
+ 	.space	4096
 +EXPORT_SYMBOL(empty_zero_page)
  
- 	.global root_flags
- 	.global ram_flags
-@@ -813,3 +815,4 @@ lvl14_save:
- __ret_efault:
-         ret
-          restore %g0, -EFAULT, %o0
-+EXPORT_SYMBOL(__ret_efault)
-diff --git a/arch/sparc/kernel/head_64.S b/arch/sparc/kernel/head_64.S
-index f2d30ca..aae4ae0 100644
---- a/arch/sparc/kernel/head_64.S
-+++ b/arch/sparc/kernel/head_64.S
-@@ -32,7 +32,8 @@
- #include <asm/estate.h>
- #include <asm/sfafsr.h>
- #include <asm/unistd.h>
--	
+ 	.globl	swapper_pg_dir
+ swapper_pg_dir:
+@@ -1288,6 +1292,7 @@ intercept_table:
+ 	.long 0, 0, 0, 0, 0, 0, 0, 0
+ 	.long 0, 0, 0, 0, 0, 0, 0, 0
+ 	.long 0, 0, 0, 0, 0, 0, 0, 0
++EXPORT_SYMBOL(intercept_table)
+ 
+ /* Room for two PTE pointers, usually the kernel and current user pointers
+  * to their respective root page table.
+diff --git a/arch/powerpc/kernel/head_40x.S b/arch/powerpc/kernel/head_40x.S
+index 7d7d863..41374a4 100644
+--- a/arch/powerpc/kernel/head_40x.S
++++ b/arch/powerpc/kernel/head_40x.S
+@@ -41,6 +41,7 @@
+ #include <asm/ppc_asm.h>
+ #include <asm/asm-offsets.h>
+ #include <asm/ptrace.h>
 +#include <asm/export.h>
-+
- /* This section from from _start to sparc64_boot_end should fit into
-  * 0x0000000000404000 to 0x0000000000408000.
-  */
-@@ -143,6 +144,7 @@ prom_cpu_compatible:
- 	.skip	64
- prom_root_node:
- 	.word	0
-+EXPORT_SYMBOL(prom_root_node)
- prom_mmu_ihandle_cache:
- 	.word	0
- prom_boot_mapped_pc:
-@@ -158,6 +160,7 @@ is_sun4v:
- 	.word	0
- sun4v_chip_type:
- 	.word	SUN4V_CHIP_INVALID
-+EXPORT_SYMBOL(sun4v_chip_type)
- 1:
- 	rd	%pc, %l0
  
-@@ -928,6 +931,7 @@ swapper_4m_tsb:
- 	.globl	prom_tba, tlb_type
- prom_tba:	.xword	0
- tlb_type:	.word	0	/* Must NOT end up in BSS */
-+EXPORT_SYMBOL(tlb_type)
- 	.section	".fixup",#alloc,#execinstr
+ /* As with the other PowerPC ports, it is expected that when code
+  * execution begins here, the following registers contain valid, yet
+@@ -971,6 +972,7 @@ sdata:
+ 	.globl	empty_zero_page
+ empty_zero_page:
+ 	.space	4096
++EXPORT_SYMBOL(empty_zero_page)
+ 	.globl	swapper_pg_dir
+ swapper_pg_dir:
+ 	.space	PGD_TABLE_SIZE
+diff --git a/arch/powerpc/kernel/head_44x.S b/arch/powerpc/kernel/head_44x.S
+index b5061ab..58b8616 100644
+--- a/arch/powerpc/kernel/head_44x.S
++++ b/arch/powerpc/kernel/head_44x.S
+@@ -39,6 +39,7 @@
+ #include <asm/asm-offsets.h>
+ #include <asm/ptrace.h>
+ #include <asm/synch.h>
++#include <asm/export.h>
+ #include "head_booke.h"
  
- 	.globl	__ret_efault, __retl_efault, __ret_one, __retl_one
-@@ -935,6 +939,7 @@ ENTRY(__ret_efault)
- 	ret
- 	 restore %g0, -EFAULT, %o0
- ENDPROC(__ret_efault)
-+EXPORT_SYMBOL(__ret_efault)
  
- ENTRY(__retl_efault)
- 	retl
-diff --git a/arch/sparc/kernel/helpers.S b/arch/sparc/kernel/helpers.S
-index 314dd0c..e4e5b83 100644
---- a/arch/sparc/kernel/helpers.S
-+++ b/arch/sparc/kernel/helpers.S
-@@ -15,6 +15,7 @@ __flushw_user:
- 2:	retl
- 	 nop
- 	.size	__flushw_user,.-__flushw_user
-+EXPORT_SYMBOL(__flushw_user)
+@@ -1254,6 +1255,7 @@ sdata:
+ 	.globl	empty_zero_page
+ empty_zero_page:
+ 	.space	PAGE_SIZE
++EXPORT_SYMBOL(empty_zero_page)
  
- 	/* Flush %fp and %i7 to the stack for all register
- 	 * windows active inside of the cpu.  This allows
-@@ -61,3 +62,4 @@ real_hard_smp_processor_id:
- 	.size		hard_smp_processor_id,.-hard_smp_processor_id
- #endif
- 	.size		real_hard_smp_processor_id,.-real_hard_smp_processor_id
-+EXPORT_SYMBOL_GPL(real_hard_smp_processor_id)
-diff --git a/arch/sparc/kernel/hvcalls.S b/arch/sparc/kernel/hvcalls.S
-index afbaba5..64b1c2f 100644
---- a/arch/sparc/kernel/hvcalls.S
-+++ b/arch/sparc/kernel/hvcalls.S
-@@ -775,6 +775,7 @@ ENTRY(sun4v_niagara_getperf)
- 	retl
- 	 nop
- ENDPROC(sun4v_niagara_getperf)
-+EXPORT_SYMBOL(sun4v_niagara_getperf)
+ /*
+  * To support >32-bit physical addresses, we use an 8KB pgdir.
+diff --git a/arch/powerpc/kernel/head_64.S b/arch/powerpc/kernel/head_64.S
+index 1b77956..4a37166 100644
+--- a/arch/powerpc/kernel/head_64.S
++++ b/arch/powerpc/kernel/head_64.S
+@@ -40,6 +40,7 @@
+ #include <asm/kvm_book3s_asm.h>
+ #include <asm/ptrace.h>
+ #include <asm/hw_irq.h>
++#include <asm/export.h>
  
- ENTRY(sun4v_niagara_setperf)
- 	mov	HV_FAST_SET_PERFREG, %o5
-@@ -782,6 +783,7 @@ ENTRY(sun4v_niagara_setperf)
- 	retl
- 	 nop
- ENDPROC(sun4v_niagara_setperf)
-+EXPORT_SYMBOL(sun4v_niagara_setperf)
+ /* The physical memory is laid out such that the secondary processor
+  * spin code sits at 0x0000...0x00ff. On server, the vectors follow
+@@ -881,6 +882,7 @@ start_here_common:
+ 	.globl	empty_zero_page
+ empty_zero_page:
+ 	.space	PAGE_SIZE
++EXPORT_SYMBOL(empty_zero_page)
  
- ENTRY(sun4v_niagara2_getperf)
- 	mov	%o0, %o4
-@@ -791,6 +793,7 @@ ENTRY(sun4v_niagara2_getperf)
- 	retl
- 	 nop
- ENDPROC(sun4v_niagara2_getperf)
-+EXPORT_SYMBOL(sun4v_niagara2_getperf)
+ 	.globl	swapper_pg_dir
+ swapper_pg_dir:
+diff --git a/arch/powerpc/kernel/head_8xx.S b/arch/powerpc/kernel/head_8xx.S
+index 78c1eba..27a6cb0 100644
+--- a/arch/powerpc/kernel/head_8xx.S
++++ b/arch/powerpc/kernel/head_8xx.S
+@@ -30,6 +30,7 @@
+ #include <asm/ppc_asm.h>
+ #include <asm/asm-offsets.h>
+ #include <asm/ptrace.h>
++#include <asm/export.h>
  
- ENTRY(sun4v_niagara2_setperf)
- 	mov	HV_FAST_N2_SET_PERFREG, %o5
-@@ -798,6 +801,7 @@ ENTRY(sun4v_niagara2_setperf)
- 	retl
- 	 nop
- ENDPROC(sun4v_niagara2_setperf)
-+EXPORT_SYMBOL(sun4v_niagara2_setperf)
+ /* Macro to make the code more readable. */
+ #ifdef CONFIG_8xx_CPU6
+@@ -930,6 +931,7 @@ sdata:
+ 	.align	PAGE_SHIFT
+ empty_zero_page:
+ 	.space	PAGE_SIZE
++EXPORT_SYMBOL(empty_zero_page)
  
- ENTRY(sun4v_reboot_data_set)
- 	mov	HV_FAST_REBOOT_DATA_SET, %o5
-diff --git a/arch/sparc/kernel/sparc_ksyms.c b/arch/sparc/kernel/sparc_ksyms.c
-new file mode 100644
-index 0000000..09aa69e
---- /dev/null
-+++ b/arch/sparc/kernel/sparc_ksyms.c
-@@ -0,0 +1,12 @@
-+/*
-+ * arch/sparc/kernel/ksyms.c: Sparc specific ksyms support.
-+ *
-+ * Copyright (C) 1996 David S. Miller (davem@caip.rutgers.edu)
-+ * Copyright (C) 1996 Eddie C. Dost (ecd@skynet.be)
-+ */
-+
-+#include <linux/init.h>
-+#include <linux/export.h>
-+
-+/* This is needed only for drivers/sbus/char/openprom.c */
-+EXPORT_SYMBOL(saved_command_line);
-diff --git a/arch/sparc/kernel/sparc_ksyms_32.c b/arch/sparc/kernel/sparc_ksyms_32.c
+ 	.globl	swapper_pg_dir
+ swapper_pg_dir:
+diff --git a/arch/powerpc/kernel/head_fsl_booke.S b/arch/powerpc/kernel/head_fsl_booke.S
+index f705171..4b3d564 100644
+--- a/arch/powerpc/kernel/head_fsl_booke.S
++++ b/arch/powerpc/kernel/head_fsl_booke.S
+@@ -42,6 +42,7 @@
+ #include <asm/asm-offsets.h>
+ #include <asm/cache.h>
+ #include <asm/ptrace.h>
++#include <asm/export.h>
+ #include "head_booke.h"
+ 
+ /* As with the other PowerPC ports, it is expected that when code
+@@ -1297,6 +1298,7 @@ sdata:
+ 	.globl	empty_zero_page
+ empty_zero_page:
+ 	.space	4096
++EXPORT_SYMBOL(empty_zero_page)
+ 	.globl	swapper_pg_dir
+ swapper_pg_dir:
+ 	.space	PGD_TABLE_SIZE
+diff --git a/arch/powerpc/kernel/misc.S b/arch/powerpc/kernel/misc.S
+index 0d43219..384357c 100644
+--- a/arch/powerpc/kernel/misc.S
++++ b/arch/powerpc/kernel/misc.S
+@@ -18,6 +18,7 @@
+ #include <asm/unistd.h>
+ #include <asm/asm-compat.h>
+ #include <asm/asm-offsets.h>
++#include <asm/export.h>
+ 
+ 	.text
+ 
+@@ -118,3 +119,4 @@ _GLOBAL(longjmp)
+ _GLOBAL(current_stack_pointer)
+ 	PPC_LL	r3,0(r1)
+ 	blr
++EXPORT_SYMBOL(current_stack_pointer)
+diff --git a/arch/powerpc/kernel/misc_32.S b/arch/powerpc/kernel/misc_32.S
+index be8edd6..b1519c5 100644
+--- a/arch/powerpc/kernel/misc_32.S
++++ b/arch/powerpc/kernel/misc_32.S
+@@ -33,6 +33,7 @@
+ #include <asm/kexec.h>
+ #include <asm/bug.h>
+ #include <asm/ptrace.h>
++#include <asm/export.h>
+ 
+ 	.text
+ 
+@@ -337,6 +338,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_UNIFIED_ID_CACHE)
+ #endif /* CONFIG_8xx/4xx */
+ 	isync
+ 	blr
++EXPORT_SYMBOL(flush_instruction_cache)
+ 
+ /*
+  * Write any modified data cache blocks out to memory
+@@ -376,6 +378,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_COHERENT_ICACHE)
+ 	sync				/* additional sync needed on g4 */
+ 	isync
+ 	blr
++EXPORT_SYMBOL(flush_icache_range)
+ /*
+  * Write any modified data cache blocks out to memory.
+  * Does not invalidate the corresponding cache lines (especially for
+@@ -418,6 +421,7 @@ _GLOBAL(flush_dcache_range)
+ 	bdnz	1b
+ 	sync				/* wait for dcbst's to get to ram */
+ 	blr
++EXPORT_SYMBOL(flush_dcache_range)
+ 
+ /*
+  * Like above, but invalidate the D-cache.  This is used by the 8xx
+@@ -549,6 +553,7 @@ _GLOBAL(clear_pages)
+ 	stw	r7,8(r3);	\
+ 	stw	r8,12(r3);	\
+ 	stwu	r9,16(r3)
++EXPORT_SYMBOL(clear_pages)
+ 
+ _GLOBAL(copy_page)
+ 	addi	r3,r3,-4
+@@ -594,6 +599,7 @@ _GLOBAL(copy_page)
+ 	li	r0,MAX_COPY_PREFETCH
+ 	li	r11,4
+ 	b	2b
++EXPORT_SYMBOL(copy_page)
+ 
+ /*
+  * Extended precision shifts.
+@@ -621,6 +627,7 @@ _GLOBAL(__ashrdi3)
+ 	sraw	r3,r3,r5	# MSW = MSW >> count
+ 	or	r4,r4,r7	# LSW |= t2
+ 	blr
++EXPORT_SYMBOL(__ashrdi3)
+ 
+ _GLOBAL(__ashldi3)
+ 	subfic	r6,r5,32
+@@ -632,6 +639,7 @@ _GLOBAL(__ashldi3)
+ 	slw	r4,r4,r5	# LSW = LSW << count
+ 	or	r3,r3,r7	# MSW |= t2
+ 	blr
++EXPORT_SYMBOL(__ashldi3)
+ 
+ _GLOBAL(__lshrdi3)
+ 	subfic	r6,r5,32
+@@ -643,6 +651,7 @@ _GLOBAL(__lshrdi3)
+ 	srw	r3,r3,r5	# MSW = MSW >> count
+ 	or	r4,r4,r7	# LSW |= t2
+ 	blr
++EXPORT_SYMBOL(__lshrdi3)
+ 
+ /*
+  * 64-bit comparison: __cmpdi2(s64 a, s64 b)
+@@ -658,6 +667,7 @@ _GLOBAL(__cmpdi2)
+ 	bltlr
+ 	li	r3,2
+ 	blr
++EXPORT_SYMBOL(__cmpdi2)
+ /*
+  * 64-bit comparison: __ucmpdi2(u64 a, u64 b)
+  * Returns 0 if a < b, 1 if a == b, 2 if a > b.
+@@ -672,6 +682,7 @@ _GLOBAL(__ucmpdi2)
+ 	bltlr
+ 	li	r3,2
+ 	blr
++EXPORT_SYMBOL(__ucmpdi2)
+ 
+ _GLOBAL(__bswapdi2)
+ 	rotlwi  r9,r4,8
+@@ -683,6 +694,7 @@ _GLOBAL(__bswapdi2)
+ 	mr      r3,r9
+ 	mr      r4,r10
+ 	blr
++EXPORT_SYMBOL(__bswapdi2)
+ 
+ _GLOBAL(abs)
+ 	srawi	r4,r3,31
+diff --git a/arch/powerpc/kernel/misc_64.S b/arch/powerpc/kernel/misc_64.S
+index db475d4..f485c94 100644
+--- a/arch/powerpc/kernel/misc_64.S
++++ b/arch/powerpc/kernel/misc_64.S
+@@ -27,6 +27,7 @@
+ #include <asm/kexec.h>
+ #include <asm/ptrace.h>
+ #include <asm/mmu.h>
++#include <asm/export.h>
+ 
+ 	.text
+ 
+@@ -110,6 +111,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_COHERENT_ICACHE)
+ 	isync
+ 	blr
+ 	.previous .text
++EXPORT_SYMBOL(flush_icache_range)
+ /*
+  * Like above, but only do the D-cache.
+  *
+@@ -139,6 +141,7 @@ _GLOBAL(flush_dcache_range)
+ 	bdnz	0b
+ 	sync
+ 	blr
++EXPORT_SYMBOL(flush_dcache_range)
+ 
+ /*
+  * Like above, but works on non-mapped physical addresses.
+@@ -242,6 +245,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_COHERENT_ICACHE)
+ 	blr
+ 
+ _GLOBAL(__bswapdi2)
++EXPORT_SYMBOL(__bswapdi2)
+ 	srdi	r8,r3,32
+ 	rlwinm	r7,r3,8,0xffffffff
+ 	rlwimi	r7,r3,24,0,7
+diff --git a/arch/powerpc/kernel/pci-common.c b/arch/powerpc/kernel/pci-common.c
+index 0f7a60f..fe276cb 100644
+--- a/arch/powerpc/kernel/pci-common.c
++++ b/arch/powerpc/kernel/pci-common.c
+@@ -49,6 +49,7 @@ static int global_phb_number;		/* Global phb counter */
+ 
+ /* ISA Memory physical address */
+ resource_size_t isa_mem_base;
++EXPORT_SYMBOL(isa_mem_base);
+ 
+ 
+ static struct dma_map_ops *pci_dma_ops = &dma_direct_ops;
+diff --git a/arch/powerpc/kernel/pci_32.c b/arch/powerpc/kernel/pci_32.c
+index 1f793003..678f87a 100644
+--- a/arch/powerpc/kernel/pci_32.c
++++ b/arch/powerpc/kernel/pci_32.c
+@@ -32,6 +32,8 @@
+ unsigned long isa_io_base     = 0;
+ unsigned long pci_dram_offset = 0;
+ int pcibios_assign_bus_offset = 1;
++EXPORT_SYMBOL(isa_io_base);
++EXPORT_SYMBOL(pci_dram_offset);
+ 
+ void pcibios_make_OF_bus_map(void);
+ 
+diff --git a/arch/powerpc/kernel/ppc_ksyms.c b/arch/powerpc/kernel/ppc_ksyms.c
 deleted file mode 100644
-index bf4ccb1..0000000
---- a/arch/sparc/kernel/sparc_ksyms_32.c
+index 41e1607..0000000
+--- a/arch/powerpc/kernel/ppc_ksyms.c
 +++ /dev/null
-@@ -1,31 +0,0 @@
--/*
-- * arch/sparc/kernel/ksyms.c: Sparc specific ksyms support.
-- *
-- * Copyright (C) 1996 David S. Miller (davem@caip.rutgers.edu)
-- * Copyright (C) 1996 Eddie C. Dost (ecd@skynet.be)
-- */
+@@ -1,39 +0,0 @@
+-#include <linux/ftrace.h>
+-#include <linux/mm.h>
 -
--#include <linux/module.h>
+-#include <asm/processor.h>
+-#include <asm/switch_to.h>
+-#include <asm/cacheflush.h>
+-#include <asm/epapr_hcalls.h>
 -
--#include <asm/pgtable.h>
--#include <asm/uaccess.h>
--#include <asm/delay.h>
--#include <asm/head.h>
--#include <asm/dma.h>
+-EXPORT_SYMBOL(flush_dcache_range);
+-EXPORT_SYMBOL(flush_icache_range);
 -
--struct poll {
--	int fd;
--	short events;
--	short revents;
--};
--
--/* from entry.S */
--EXPORT_SYMBOL(__udelay);
--EXPORT_SYMBOL(__ndelay);
--
--/* from head_32.S */
--EXPORT_SYMBOL(__ret_efault);
 -EXPORT_SYMBOL(empty_zero_page);
 -
--/* Exporting a symbol from /init/main.c */
--EXPORT_SYMBOL(saved_command_line);
-diff --git a/arch/sparc/kernel/sparc_ksyms_64.c b/arch/sparc/kernel/sparc_ksyms_64.c
+-long long __bswapdi2(long long);
+-EXPORT_SYMBOL(__bswapdi2);
+-
+-#ifdef CONFIG_FUNCTION_TRACER
+-EXPORT_SYMBOL(_mcount);
+-#endif
+-
+-#ifdef CONFIG_PPC_FPU
+-EXPORT_SYMBOL(load_fp_state);
+-EXPORT_SYMBOL(store_fp_state);
+-#endif
+-
+-#ifdef CONFIG_ALTIVEC
+-EXPORT_SYMBOL(load_vr_state);
+-EXPORT_SYMBOL(store_vr_state);
+-#endif
+-
+-#ifdef CONFIG_VSX
+-EXPORT_SYMBOL_GPL(__giveup_vsx);
+-#endif
+-
+-#ifdef CONFIG_EPAPR_PARAVIRT
+-EXPORT_SYMBOL(epapr_hypercall_start);
+-#endif
+-
+-EXPORT_SYMBOL(current_stack_pointer);
+diff --git a/arch/powerpc/kernel/ppc_ksyms_32.c b/arch/powerpc/kernel/ppc_ksyms_32.c
 deleted file mode 100644
-index a92d5d2..0000000
---- a/arch/sparc/kernel/sparc_ksyms_64.c
+index 30ddd8a..0000000
+--- a/arch/powerpc/kernel/ppc_ksyms_32.c
 +++ /dev/null
-@@ -1,52 +0,0 @@
--/* arch/sparc64/kernel/sparc64_ksyms.c: Sparc64 specific ksyms support.
-- *
-- * Copyright (C) 1996, 2007 David S. Miller (davem@davemloft.net)
-- * Copyright (C) 1996 Eddie C. Dost (ecd@skynet.be)
-- * Copyright (C) 1999 Jakub Jelinek (jj@ultra.linux.cz)
-- */
--
+@@ -1,61 +0,0 @@
 -#include <linux/export.h>
--#include <linux/pci.h>
+-#include <linux/smp.h>
+-
+-#include <asm/page.h>
+-#include <asm/dma.h>
+-#include <asm/io.h>
+-#include <asm/hw_irq.h>
+-#include <asm/time.h>
+-#include <asm/mmu_context.h>
+-#include <asm/pgtable.h>
+-#include <asm/dcr.h>
+-
+-EXPORT_SYMBOL(clear_pages);
+-EXPORT_SYMBOL(ISA_DMA_THRESHOLD);
+-EXPORT_SYMBOL(DMA_MODE_READ);
+-EXPORT_SYMBOL(DMA_MODE_WRITE);
+-
+-#if defined(CONFIG_PCI)
+-EXPORT_SYMBOL(isa_io_base);
+-EXPORT_SYMBOL(isa_mem_base);
+-EXPORT_SYMBOL(pci_dram_offset);
+-#endif
+-
+-#ifdef CONFIG_SMP
+-EXPORT_SYMBOL(smp_hw_index);
+-#endif
+-
+-long long __ashrdi3(long long, int);
+-long long __ashldi3(long long, int);
+-long long __lshrdi3(long long, int);
+-int __ucmpdi2(unsigned long long, unsigned long long);
+-int __cmpdi2(long long, long long);
+-EXPORT_SYMBOL(__ashrdi3);
+-EXPORT_SYMBOL(__ashldi3);
+-EXPORT_SYMBOL(__lshrdi3);
+-EXPORT_SYMBOL(__ucmpdi2);
+-EXPORT_SYMBOL(__cmpdi2);
+-
+-EXPORT_SYMBOL(timer_interrupt);
+-EXPORT_SYMBOL(tb_ticks_per_jiffy);
+-
+-EXPORT_SYMBOL(switch_mmu_context);
+-
+-#ifdef CONFIG_PPC_STD_MMU_32
+-extern long mol_trampoline;
+-EXPORT_SYMBOL(mol_trampoline); /* For MOL */
+-EXPORT_SYMBOL(flush_hash_pages); /* For MOL */
+-#ifdef CONFIG_SMP
+-extern int mmu_hash_lock;
+-EXPORT_SYMBOL(mmu_hash_lock); /* For MOL */
+-#endif /* CONFIG_SMP */
+-extern long *intercept_table;
+-EXPORT_SYMBOL(intercept_table);
+-#endif /* CONFIG_PPC_STD_MMU_32 */
+-
+-#ifdef CONFIG_PPC_DCR_NATIVE
+-EXPORT_SYMBOL(__mtdcr);
+-EXPORT_SYMBOL(__mfdcr);
+-#endif
+-
+-EXPORT_SYMBOL(flush_instruction_cache);
+diff --git a/arch/powerpc/kernel/setup_32.c b/arch/powerpc/kernel/setup_32.c
+index ad8c9db..a9d63f5 100644
+--- a/arch/powerpc/kernel/setup_32.c
++++ b/arch/powerpc/kernel/setup_32.c
+@@ -16,6 +16,7 @@
+ #include <linux/cpu.h>
+ #include <linux/console.h>
+ #include <linux/memblock.h>
++#include <linux/export.h>
+ 
+ #include <asm/io.h>
+ #include <asm/prom.h>
+@@ -48,11 +49,16 @@ int boot_cpuid_phys;
+ EXPORT_SYMBOL_GPL(boot_cpuid_phys);
+ 
+ int smp_hw_index[NR_CPUS];
++EXPORT_SYMBOL(smp_hw_index);
+ 
+ unsigned long ISA_DMA_THRESHOLD;
+ unsigned int DMA_MODE_READ;
+ unsigned int DMA_MODE_WRITE;
+ 
++EXPORT_SYMBOL(ISA_DMA_THRESHOLD);
++EXPORT_SYMBOL(DMA_MODE_READ);
++EXPORT_SYMBOL(DMA_MODE_WRITE);
++
+ /*
+  * These are used in binfmt_elf.c to put aux entries on the stack
+  * for each elf executable being started.
+diff --git a/arch/powerpc/kernel/time.c b/arch/powerpc/kernel/time.c
+index 81b0900..78743ce 100644
+--- a/arch/powerpc/kernel/time.c
++++ b/arch/powerpc/kernel/time.c
+@@ -565,6 +565,7 @@ void timer_interrupt(struct pt_regs * regs)
+ 	irq_exit();
+ 	set_irq_regs(old_regs);
+ }
++EXPORT_SYMBOL(timer_interrupt);
+ 
+ /*
+  * Hypervisor decrementer interrupts shouldn't occur but are sometimes
+diff --git a/arch/powerpc/kernel/vector.S b/arch/powerpc/kernel/vector.S
+index 162d0f7..3bcfda8 100644
+--- a/arch/powerpc/kernel/vector.S
++++ b/arch/powerpc/kernel/vector.S
+@@ -6,6 +6,7 @@
+ #include <asm/thread_info.h>
+ #include <asm/page.h>
+ #include <asm/ptrace.h>
++#include <asm/export.h>
+ 
+ #ifdef CONFIG_PPC_TRANSACTIONAL_MEM
+ /* void do_load_up_transact_altivec(struct thread_struct *thread)
+@@ -42,6 +43,7 @@ _GLOBAL(load_vr_state)
+ 	mtvscr	v0
+ 	REST_32VRS(0,r4,r3)
+ 	blr
++EXPORT_SYMBOL(load_vr_state)
+ 
+ /*
+  * Store VMX state into memory, including VSCR.
+@@ -53,6 +55,7 @@ _GLOBAL(store_vr_state)
+ 	li	r4, VRSTATE_VSCR
+ 	stvx	v0, r4, r3
+ 	blr
++EXPORT_SYMBOL(store_vr_state)
+ 
+ /*
+  * Disable VMX for the task which had it previously,
+@@ -179,6 +182,7 @@ _GLOBAL(__giveup_vsx)
+ 	std	r4,_MSR-STACK_FRAME_OVERHEAD(r5)
+ 1:
+ 	blr
++EXPORT_SYMBOL_GPL(__giveup_vsx)
+ 
+ #endif /* CONFIG_VSX */
+ 
+diff --git a/arch/powerpc/lib/Makefile b/arch/powerpc/lib/Makefile
+index a47e142..23a5cb0 100644
+--- a/arch/powerpc/lib/Makefile
++++ b/arch/powerpc/lib/Makefile
+@@ -9,7 +9,7 @@ ccflags-$(CONFIG_PPC64)	:= $(NO_MINIMAL_TOC)
+ CFLAGS_REMOVE_code-patching.o = -pg
+ CFLAGS_REMOVE_feature-fixups.o = -pg
+ 
+-obj-y += string.o alloc.o crtsavres.o ppc_ksyms.o code-patching.o \
++obj-y += string.o alloc.o crtsavres.o code-patching.o \
+ 	 feature-fixups.o
+ 
+ obj-$(CONFIG_PPC32)	+= div64.o copy_32.o
+diff --git a/arch/powerpc/lib/checksum_32.S b/arch/powerpc/lib/checksum_32.S
+index 6d67e05..cb90cd4 100644
+--- a/arch/powerpc/lib/checksum_32.S
++++ b/arch/powerpc/lib/checksum_32.S
+@@ -16,6 +16,7 @@
+ #include <asm/processor.h>
+ #include <asm/errno.h>
+ #include <asm/ppc_asm.h>
++#include <asm/export.h>
+ 
+ 	.text
+ 
+@@ -39,6 +40,7 @@ _GLOBAL(ip_fast_csum)
+ 	not	r3,r3
+ 	srwi	r3,r3,16
+ 	blr
++EXPORT_SYMBOL(ip_fast_csum)
+ 
+ /*
+  * computes the checksum of a memory block at buff, length len,
+@@ -77,6 +79,7 @@ _GLOBAL(csum_partial)
+ 	adde	r0,r0,r5
+ 5:	addze	r3,r0		/* add in final carry */
+ 	blr
++EXPORT_SYMBOL(csum_partial)
+ 
+ /*
+  * Computes the checksum of a memory block at src, length len,
+@@ -207,3 +210,4 @@ dst_error:
+ 	.long	95b,dst_error
+ 	.long	96b,dst_error
+ 	.long	97b,dst_error
++EXPORT_SYMBOL(csum_partial_copy_generic)
+diff --git a/arch/powerpc/lib/checksum_64.S b/arch/powerpc/lib/checksum_64.S
+index f3ef354..fa06a9d 100644
+--- a/arch/powerpc/lib/checksum_64.S
++++ b/arch/powerpc/lib/checksum_64.S
+@@ -16,6 +16,7 @@
+ #include <asm/processor.h>
+ #include <asm/errno.h>
+ #include <asm/ppc_asm.h>
++#include <asm/export.h>
+ 
+ /*
+  * ip_fast_csum(r3=buf, r4=len) -- Optimized for IP header
+@@ -43,6 +44,7 @@ _GLOBAL(ip_fast_csum)
+ 	not	r3,r3
+ 	srwi	r3,r3,16
+ 	blr
++EXPORT_SYMBOL(ip_fast_csum)
+ 
+ /*
+  * Computes the checksum of a memory block at buff, length len,
+@@ -203,6 +205,7 @@ _GLOBAL(csum_partial)
+ 	add	r3,r4,r0
+ 	srdi	r3,r3,32
+ 	blr
++EXPORT_SYMBOL(csum_partial)
+ 
+ 
+ 	.macro srcnr
+@@ -457,3 +460,4 @@ dstnr;	stb	r6,0(r4)
+ 	li	r6,-EFAULT
+ 	stw	r6,0(r8)
+ 	blr
++EXPORT_SYMBOL(csum_partial_copy_generic)
+diff --git a/arch/powerpc/lib/copy_32.S b/arch/powerpc/lib/copy_32.S
+index c44df2d..e43cc62 100644
+--- a/arch/powerpc/lib/copy_32.S
++++ b/arch/powerpc/lib/copy_32.S
+@@ -12,6 +12,7 @@
+ #include <asm/cache.h>
+ #include <asm/errno.h>
+ #include <asm/ppc_asm.h>
++#include <asm/export.h>
+ 
+ #define COPY_16_BYTES		\
+ 	lwz	r7,4(r4);	\
+@@ -92,6 +93,7 @@ _GLOBAL(memset)
+ 	subf	r6,r0,r6
+ 	cmplwi	0,r4,0
+ 	bne	2f	/* Use normal procedure if r4 is not zero */
++EXPORT_SYMBOL(memset)
+ _GLOBAL(memset_nocache_branch)
+ 	b	2f	/* Skip optimised bloc until cache is enabled */
+ 
+@@ -216,6 +218,8 @@ _GLOBAL(memcpy)
+ 	stbu	r0,1(r6)
+ 	bdnz	40b
+ 65:	blr
++EXPORT_SYMBOL(memcpy)
++EXPORT_SYMBOL(memmove)
+ 
+ _GLOBAL(generic_memcpy)
+ 	srwi.	r7,r5,3
+@@ -507,3 +511,4 @@ _GLOBAL(__copy_tofrom_user)
+ 	.long	112b,120b
+ 	.long	114b,120b
+ 	.text
++EXPORT_SYMBOL(__copy_tofrom_user)
+diff --git a/arch/powerpc/lib/copypage_64.S b/arch/powerpc/lib/copypage_64.S
+index a3c4dc4..21367b3 100644
+--- a/arch/powerpc/lib/copypage_64.S
++++ b/arch/powerpc/lib/copypage_64.S
+@@ -10,6 +10,7 @@
+ #include <asm/processor.h>
+ #include <asm/ppc_asm.h>
+ #include <asm/asm-offsets.h>
++#include <asm/export.h>
+ 
+         .section        ".toc","aw"
+ PPC64_CACHES:
+@@ -110,3 +111,4 @@ END_FTR_SECTION_IFSET(CPU_FTR_CP_USE_DCBTZ)
+ 	std	r11,120(r3)
+ 	std	r12,128(r3)
+ 	blr
++EXPORT_SYMBOL(copy_page)
+diff --git a/arch/powerpc/lib/copyuser_64.S b/arch/powerpc/lib/copyuser_64.S
+index f09899e..f19a15b 100644
+--- a/arch/powerpc/lib/copyuser_64.S
++++ b/arch/powerpc/lib/copyuser_64.S
+@@ -8,6 +8,7 @@
+  */
+ #include <asm/processor.h>
+ #include <asm/ppc_asm.h>
++#include <asm/export.h>
+ 
+ #ifdef __BIG_ENDIAN__
+ #define sLd sld		/* Shift towards low-numbered address. */
+@@ -671,3 +672,4 @@ END_FTR_SECTION_IFCLR(CPU_FTR_UNALIGNED_LD_STD)
+ 	.llong	89b,100b
+ 	.llong	90b,100b
+ 	.llong	91b,100b
++EXPORT_SYMBOL(__copy_tofrom_user)
+diff --git a/arch/powerpc/lib/hweight_64.S b/arch/powerpc/lib/hweight_64.S
+index 19e6600..3de7ac1 100644
+--- a/arch/powerpc/lib/hweight_64.S
++++ b/arch/powerpc/lib/hweight_64.S
+@@ -19,6 +19,7 @@
+  */
+ #include <asm/processor.h>
+ #include <asm/ppc_asm.h>
++#include <asm/export.h>
+ 
+ /* Note: This code relies on -mminimal-toc */
+ 
+@@ -32,6 +33,7 @@ FTR_SECTION_ELSE
+ 	clrldi	r3,r3,64-8
+ 	blr
+ ALT_FTR_SECTION_END_IFCLR(CPU_FTR_POPCNTB)
++EXPORT_SYMBOL(__arch_hweight8)
+ 
+ _GLOBAL(__arch_hweight16)
+ BEGIN_FTR_SECTION
+@@ -54,6 +56,7 @@ FTR_SECTION_ELSE
+ 	blr
+   ALT_FTR_SECTION_END_NESTED_IFCLR(CPU_FTR_POPCNTD, 50)
+ ALT_FTR_SECTION_END_IFCLR(CPU_FTR_POPCNTB)
++EXPORT_SYMBOL(__arch_hweight16)
+ 
+ _GLOBAL(__arch_hweight32)
+ BEGIN_FTR_SECTION
+@@ -79,6 +82,7 @@ FTR_SECTION_ELSE
+ 	blr
+   ALT_FTR_SECTION_END_NESTED_IFCLR(CPU_FTR_POPCNTD, 51)
+ ALT_FTR_SECTION_END_IFCLR(CPU_FTR_POPCNTB)
++EXPORT_SYMBOL(__arch_hweight32)
+ 
+ _GLOBAL(__arch_hweight64)
+ BEGIN_FTR_SECTION
+@@ -108,3 +112,4 @@ FTR_SECTION_ELSE
+ 	blr
+   ALT_FTR_SECTION_END_NESTED_IFCLR(CPU_FTR_POPCNTD, 52)
+ ALT_FTR_SECTION_END_IFCLR(CPU_FTR_POPCNTB)
++EXPORT_SYMBOL(__arch_hweight64)
+diff --git a/arch/powerpc/lib/mem_64.S b/arch/powerpc/lib/mem_64.S
+index 43435c6..2d128df 100644
+--- a/arch/powerpc/lib/mem_64.S
++++ b/arch/powerpc/lib/mem_64.S
+@@ -11,6 +11,7 @@
+ #include <asm/processor.h>
+ #include <asm/errno.h>
+ #include <asm/ppc_asm.h>
++#include <asm/export.h>
+ 
+ _GLOBAL(memset)
+ 	neg	r0,r3
+@@ -76,6 +77,7 @@ _GLOBAL(memset)
+ 10:	bflr	31
+ 	stb	r4,0(r6)
+ 	blr
++EXPORT_SYMBOL(memset)
+ 
+ _GLOBAL_TOC(memmove)
+ 	cmplw	0,r3,r4
+@@ -117,3 +119,4 @@ _GLOBAL(backwards_memcpy)
+ 	beq	2b
+ 	mtctr	r7
+ 	b	1b
++EXPORT_SYMBOL(memmove)
+diff --git a/arch/powerpc/lib/memcmp_64.S b/arch/powerpc/lib/memcmp_64.S
+index 8953d23..d75d18b 100644
+--- a/arch/powerpc/lib/memcmp_64.S
++++ b/arch/powerpc/lib/memcmp_64.S
+@@ -8,6 +8,7 @@
+  * 2 of the License, or (at your option) any later version.
+  */
+ #include <asm/ppc_asm.h>
++#include <asm/export.h>
+ 
+ #define off8	r6
+ #define off16	r7
+@@ -231,3 +232,4 @@ _GLOBAL(memcmp)
+ 	ld	r28,-32(r1)
+ 	ld	r27,-40(r1)
+ 	blr
++EXPORT_SYMBOL(memcmp)
+diff --git a/arch/powerpc/lib/memcpy_64.S b/arch/powerpc/lib/memcpy_64.S
+index 32a06ec..f4d6088 100644
+--- a/arch/powerpc/lib/memcpy_64.S
++++ b/arch/powerpc/lib/memcpy_64.S
+@@ -8,6 +8,7 @@
+  */
+ #include <asm/processor.h>
+ #include <asm/ppc_asm.h>
++#include <asm/export.h>
+ 
+ 	.align	7
+ _GLOBAL_TOC(memcpy)
+@@ -219,3 +220,4 @@ END_FTR_SECTION_IFCLR(CPU_FTR_UNALIGNED_LD_STD)
+ 4:	ld	r3,-STACKFRAMESIZE+STK_REG(R31)(r1)	/* return dest pointer */
+ 	blr
+ #endif
++EXPORT_SYMBOL(memcpy)
+diff --git a/arch/powerpc/lib/ppc_ksyms.c b/arch/powerpc/lib/ppc_ksyms.c
+deleted file mode 100644
+index c7f8e95..0000000
+--- a/arch/powerpc/lib/ppc_ksyms.c
++++ /dev/null
+@@ -1,35 +0,0 @@
+-#include <linux/string.h>
+-#include <linux/uaccess.h>
 -#include <linux/bitops.h>
+-#include <net/checksum.h>
 -
--#include <asm/cpudata.h>
--#include <asm/uaccess.h>
--#include <asm/spitfire.h>
--#include <asm/oplib.h>
--#include <asm/hypervisor.h>
--#include <asm/cacheflush.h>
+-EXPORT_SYMBOL(memcpy);
+-EXPORT_SYMBOL(memset);
+-EXPORT_SYMBOL(memmove);
+-EXPORT_SYMBOL(memcmp);
+-EXPORT_SYMBOL(memchr);
 -
--struct poll {
--	int fd;
--	short events;
--	short revents;
--};
+-EXPORT_SYMBOL(strcpy);
+-EXPORT_SYMBOL(strncpy);
+-EXPORT_SYMBOL(strcat);
+-EXPORT_SYMBOL(strlen);
+-EXPORT_SYMBOL(strcmp);
+-EXPORT_SYMBOL(strncmp);
 -
--/* from helpers.S */
--EXPORT_SYMBOL(__flushw_user);
--EXPORT_SYMBOL_GPL(real_hard_smp_processor_id);
+-#ifndef CONFIG_GENERIC_CSUM
+-EXPORT_SYMBOL(csum_partial);
+-EXPORT_SYMBOL(csum_partial_copy_generic);
+-EXPORT_SYMBOL(ip_fast_csum);
+-EXPORT_SYMBOL(csum_tcpudp_magic);
+-#endif
 -
--/* from head_64.S */
--EXPORT_SYMBOL(__ret_efault);
--EXPORT_SYMBOL(tlb_type);
--EXPORT_SYMBOL(sun4v_chip_type);
--EXPORT_SYMBOL(prom_root_node);
+-EXPORT_SYMBOL(__copy_tofrom_user);
+-EXPORT_SYMBOL(__clear_user);
+-EXPORT_SYMBOL(copy_page);
 -
--/* from hvcalls.S */
--EXPORT_SYMBOL(sun4v_niagara_getperf);
--EXPORT_SYMBOL(sun4v_niagara_setperf);
--EXPORT_SYMBOL(sun4v_niagara2_getperf);
--EXPORT_SYMBOL(sun4v_niagara2_setperf);
--
--/* from hweight.S */
+-#ifdef CONFIG_PPC64
 -EXPORT_SYMBOL(__arch_hweight8);
 -EXPORT_SYMBOL(__arch_hweight16);
 -EXPORT_SYMBOL(__arch_hweight32);
 -EXPORT_SYMBOL(__arch_hweight64);
--
--/* from ffs_ffz.S */
--EXPORT_SYMBOL(ffs);
--EXPORT_SYMBOL(__ffs);
--
--/* Exporting a symbol from /init/main.c */
--EXPORT_SYMBOL(saved_command_line);
-diff --git a/arch/sparc/lib/Makefile b/arch/sparc/lib/Makefile
-index 3269b02..885f00e 100644
---- a/arch/sparc/lib/Makefile
-+++ b/arch/sparc/lib/Makefile
-@@ -43,5 +43,4 @@ lib-$(CONFIG_SPARC64) += mcount.o ipcsum.o xor.o hweight.o ffs.o
- 
- obj-$(CONFIG_SPARC64) += iomap.o
- obj-$(CONFIG_SPARC32) += atomic32.o ucmpdi2.o
--obj-y                 += ksyms.o
- obj-$(CONFIG_SPARC64) += PeeCeeI.o
-diff --git a/arch/sparc/lib/U1memcpy.S b/arch/sparc/lib/U1memcpy.S
-index 3e6209e..97e1b21 100644
---- a/arch/sparc/lib/U1memcpy.S
-+++ b/arch/sparc/lib/U1memcpy.S
-@@ -7,6 +7,7 @@
- #ifdef __KERNEL__
- #include <asm/visasm.h>
- #include <asm/asi.h>
-+#include <asm/export.h>
- #define GLOBAL_SPARE	g7
- #else
- #define GLOBAL_SPARE	g5
-@@ -567,3 +568,4 @@ FUNC_NAME:		/* %o0=dst, %o1=src, %o2=len */
- 	 mov		EX_RETVAL(%o4), %o0
- 
- 	.size		FUNC_NAME, .-FUNC_NAME
-+EXPORT_SYMBOL(FUNC_NAME)
-diff --git a/arch/sparc/lib/VISsave.S b/arch/sparc/lib/VISsave.S
-index 62c2647b..1c7b6a3 100644
---- a/arch/sparc/lib/VISsave.S
-+++ b/arch/sparc/lib/VISsave.S
-@@ -13,6 +13,7 @@
- #include <asm/ptrace.h>
- #include <asm/visasm.h>
- #include <asm/thread_info.h>
-+#include <asm/export.h>
- 
- 	/* On entry: %o5=current FPRS value, %g7 is callers address */
- 	/* May clobber %o5, %g1, %g2, %g3, %g7, %icc, %xcc */
-@@ -79,3 +80,4 @@ vis1:	ldub		[%g6 + TI_FPSAVED], %g3
- 80:	jmpl		%g7 + %g0, %g0
- 	 nop
- ENDPROC(VISenter)
-+EXPORT_SYMBOL(VISenter)
-diff --git a/arch/sparc/lib/ashldi3.S b/arch/sparc/lib/ashldi3.S
-index 86f60de..c8b1cf7 100644
---- a/arch/sparc/lib/ashldi3.S
-+++ b/arch/sparc/lib/ashldi3.S
-@@ -6,6 +6,7 @@
-  */
- 
- #include <linux/linkage.h>
-+#include <asm/export.h>
- 
- 	.text
- ENTRY(__ashldi3)
-@@ -33,3 +34,4 @@ ENTRY(__ashldi3)
- 	retl
- 	 nop
- ENDPROC(__ashldi3)
-+EXPORT_SYMBOL(__ashldi3)
-diff --git a/arch/sparc/lib/ashrdi3.S b/arch/sparc/lib/ashrdi3.S
-index 6eb8ba2..4310256 100644
---- a/arch/sparc/lib/ashrdi3.S
-+++ b/arch/sparc/lib/ashrdi3.S
-@@ -6,6 +6,7 @@
-  */
- 
- #include <linux/linkage.h>
-+#include <asm/export.h>
- 
- 	.text
- ENTRY(__ashrdi3)
-@@ -35,3 +36,4 @@ ENTRY(__ashrdi3)
- 	jmpl	%o7 + 8, %g0
- 	 nop
- ENDPROC(__ashrdi3)
-+EXPORT_SYMBOL(__ashrdi3)
-diff --git a/arch/sparc/lib/atomic_64.S b/arch/sparc/lib/atomic_64.S
-index d6b0363..52c927c 100644
---- a/arch/sparc/lib/atomic_64.S
-+++ b/arch/sparc/lib/atomic_64.S
-@@ -6,6 +6,7 @@
- #include <linux/linkage.h>
- #include <asm/asi.h>
- #include <asm/backoff.h>
-+#include <asm/export.h>
- 
- 	.text
- 
-@@ -28,6 +29,7 @@ ENTRY(atomic_##op) /* %o0 = increment, %o1 = atomic_ptr */		\
- 	 nop;								\
- 2:	BACKOFF_SPIN(%o2, %o3, 1b);					\
- ENDPROC(atomic_##op);							\
-+EXPORT_SYMBOL(atomic_##op);						\
- 
- #define ATOMIC_OP_RETURN(op)						\
- ENTRY(atomic_##op##_return) /* %o0 = increment, %o1 = atomic_ptr */	\
-@@ -41,7 +43,8 @@ ENTRY(atomic_##op##_return) /* %o0 = increment, %o1 = atomic_ptr */	\
- 	retl;								\
- 	 sra	%g1, 0, %o0;						\
- 2:	BACKOFF_SPIN(%o2, %o3, 1b);					\
--ENDPROC(atomic_##op##_return);
-+ENDPROC(atomic_##op##_return);						\
-+EXPORT_SYMBOL(atomic_##op##_return);					\
- 
- #define ATOMIC_OPS(op) ATOMIC_OP(op) ATOMIC_OP_RETURN(op)
- 
-@@ -68,6 +71,7 @@ ENTRY(atomic64_##op) /* %o0 = increment, %o1 = atomic_ptr */		\
- 	 nop;								\
- 2:	BACKOFF_SPIN(%o2, %o3, 1b);					\
- ENDPROC(atomic64_##op);							\
-+EXPORT_SYMBOL(atomic64_##op);						\
- 
- #define ATOMIC64_OP_RETURN(op)						\
- ENTRY(atomic64_##op##_return) /* %o0 = increment, %o1 = atomic_ptr */	\
-@@ -81,7 +85,8 @@ ENTRY(atomic64_##op##_return) /* %o0 = increment, %o1 = atomic_ptr */	\
- 	retl;								\
- 	 op	%g1, %o0, %o0;						\
- 2:	BACKOFF_SPIN(%o2, %o3, 1b);					\
--ENDPROC(atomic64_##op##_return);
-+ENDPROC(atomic64_##op##_return);					\
-+EXPORT_SYMBOL(atomic64_##op##_return);
- 
- #define ATOMIC64_OPS(op) ATOMIC64_OP(op) ATOMIC64_OP_RETURN(op)
- 
-@@ -108,3 +113,4 @@ ENTRY(atomic64_dec_if_positive) /* %o0 = atomic_ptr */
- 	 sub	%g1, 1, %o0
- 2:	BACKOFF_SPIN(%o2, %o3, 1b)
- ENDPROC(atomic64_dec_if_positive)
-+EXPORT_SYMBOL(atomic64_dec_if_positive)
-diff --git a/arch/sparc/lib/bitops.S b/arch/sparc/lib/bitops.S
-index 36f72cc..7031bf1 100644
---- a/arch/sparc/lib/bitops.S
-+++ b/arch/sparc/lib/bitops.S
-@@ -6,6 +6,7 @@
- #include <linux/linkage.h>
- #include <asm/asi.h>
- #include <asm/backoff.h>
-+#include <asm/export.h>
- 
- 	.text
- 
-@@ -29,6 +30,7 @@ ENTRY(test_and_set_bit)	/* %o0=nr, %o1=addr */
- 	 nop
- 2:	BACKOFF_SPIN(%o3, %o4, 1b)
- ENDPROC(test_and_set_bit)
-+EXPORT_SYMBOL(test_and_set_bit)
- 
- ENTRY(test_and_clear_bit) /* %o0=nr, %o1=addr */
- 	BACKOFF_SETUP(%o3)
-@@ -50,6 +52,7 @@ ENTRY(test_and_clear_bit) /* %o0=nr, %o1=addr */
- 	 nop
- 2:	BACKOFF_SPIN(%o3, %o4, 1b)
- ENDPROC(test_and_clear_bit)
-+EXPORT_SYMBOL(test_and_clear_bit)
- 
- ENTRY(test_and_change_bit) /* %o0=nr, %o1=addr */
- 	BACKOFF_SETUP(%o3)
-@@ -71,6 +74,7 @@ ENTRY(test_and_change_bit) /* %o0=nr, %o1=addr */
- 	 nop
- 2:	BACKOFF_SPIN(%o3, %o4, 1b)
- ENDPROC(test_and_change_bit)
-+EXPORT_SYMBOL(test_and_change_bit)
- 
- ENTRY(set_bit) /* %o0=nr, %o1=addr */
- 	BACKOFF_SETUP(%o3)
-@@ -90,6 +94,7 @@ ENTRY(set_bit) /* %o0=nr, %o1=addr */
- 	 nop
- 2:	BACKOFF_SPIN(%o3, %o4, 1b)
- ENDPROC(set_bit)
-+EXPORT_SYMBOL(set_bit)
- 
- ENTRY(clear_bit) /* %o0=nr, %o1=addr */
- 	BACKOFF_SETUP(%o3)
-@@ -109,6 +114,7 @@ ENTRY(clear_bit) /* %o0=nr, %o1=addr */
- 	 nop
- 2:	BACKOFF_SPIN(%o3, %o4, 1b)
- ENDPROC(clear_bit)
-+EXPORT_SYMBOL(clear_bit)
- 
- ENTRY(change_bit) /* %o0=nr, %o1=addr */
- 	BACKOFF_SETUP(%o3)
-@@ -128,3 +134,4 @@ ENTRY(change_bit) /* %o0=nr, %o1=addr */
- 	 nop
- 2:	BACKOFF_SPIN(%o3, %o4, 1b)
- ENDPROC(change_bit)
-+EXPORT_SYMBOL(change_bit)
-diff --git a/arch/sparc/lib/blockops.S b/arch/sparc/lib/blockops.S
-index 3c77101..1f2692d5 100644
---- a/arch/sparc/lib/blockops.S
-+++ b/arch/sparc/lib/blockops.S
-@@ -6,6 +6,7 @@
- 
- #include <linux/linkage.h>
- #include <asm/page.h>
-+#include <asm/export.h>
- 
- 	/* Zero out 64 bytes of memory at (buf + offset).
- 	 * Assumes %g1 contains zero.
-@@ -64,6 +65,7 @@ ENTRY(bzero_1page)
- 	retl
- 	 nop
- ENDPROC(bzero_1page)
-+EXPORT_SYMBOL(bzero_1page)
- 
- ENTRY(__copy_1page)
- /* NOTE: If you change the number of insns of this routine, please check
-@@ -87,3 +89,4 @@ ENTRY(__copy_1page)
- 	retl
- 	 nop
- ENDPROC(__copy_1page)
-+EXPORT_SYMBOL(__copy_1page)
-diff --git a/arch/sparc/lib/bzero.S b/arch/sparc/lib/bzero.S
-index 8c05811..3bb1914 100644
---- a/arch/sparc/lib/bzero.S
-+++ b/arch/sparc/lib/bzero.S
-@@ -5,6 +5,7 @@
-  */
- 
- #include <linux/linkage.h>
-+#include <asm/export.h>
- 
- 	.text
- 
-@@ -78,6 +79,8 @@ __bzero_done:
- 	 mov		%o3, %o0
- ENDPROC(__bzero)
- ENDPROC(memset)
-+EXPORT_SYMBOL(__bzero)
-+EXPORT_SYMBOL(memset)
- 
- #define EX_ST(x,y)		\
- 98:	x,y;			\
-@@ -143,3 +146,4 @@ __clear_user_done:
- 	retl
- 	 clr		%o0
- ENDPROC(__clear_user)
-+EXPORT_SYMBOL(__clear_user)
-diff --git a/arch/sparc/lib/checksum_32.S b/arch/sparc/lib/checksum_32.S
-index 0084c33..c9d8b62 100644
---- a/arch/sparc/lib/checksum_32.S
-+++ b/arch/sparc/lib/checksum_32.S
-@@ -14,6 +14,7 @@
-  */
- 
+-#endif
+diff --git a/arch/powerpc/lib/string.S b/arch/powerpc/lib/string.S
+index c80fb49..2d6cb94 100644
+--- a/arch/powerpc/lib/string.S
++++ b/arch/powerpc/lib/string.S
+@@ -11,6 +11,7 @@
+ #include <asm/processor.h>
  #include <asm/errno.h>
+ #include <asm/ppc_asm.h>
 +#include <asm/export.h>
  
- #define CSUM_BIGCHUNK(buf, offset, sum, t0, t1, t2, t3, t4, t5)	\
- 	ldd	[buf + offset + 0x00], t0;			\
-@@ -104,6 +105,7 @@ csum_partial_fix_alignment:
- 	 * buffer of size 0x20.  Follow the code path for that case.
- 	 */
- 	.globl	csum_partial
-+	EXPORT_SYMBOL(csum_partial)
- csum_partial:			/* %o0=buf, %o1=len, %o2=sum */
- 	andcc	%o0, 0x7, %g0				! alignment problems?
- 	bne	csum_partial_fix_alignment		! yep, handle it
-@@ -335,6 +337,7 @@ cc_dword_align:
- 	 */
- 	.align	8
- 	.globl	__csum_partial_copy_sparc_generic
-+	EXPORT_SYMBOL(__csum_partial_copy_sparc_generic)
- __csum_partial_copy_sparc_generic:
- 					/* %o0=src, %o1=dest, %g1=len, %g7=sum */
- 	xor	%o0, %o1, %o4		! get changing bits
-diff --git a/arch/sparc/lib/checksum_64.S b/arch/sparc/lib/checksum_64.S
-index 1d230f6..f673217 100644
---- a/arch/sparc/lib/checksum_64.S
-+++ b/arch/sparc/lib/checksum_64.S
-@@ -13,6 +13,7 @@
-  *	BSD4.4 portable checksum routine
-  */
+ 	.section __ex_table,"a"
+ 	PPC_LONG_ALIGN
+@@ -24,6 +25,7 @@ _GLOBAL(strcpy)
+ 	stbu	r0,1(r5)
+ 	bne	1b
+ 	blr
++EXPORT_SYMBOL(strcpy)
  
-+#include <asm/export.h>
- 	.text
+ /* This clears out any unused part of the destination buffer,
+    just as the libc version does.  -- paulus */
+@@ -44,6 +46,7 @@ _GLOBAL(strncpy)
+ 2:	stbu	r0,1(r6)	/* clear it out if so */
+ 	bdnz	2b
+ 	blr
++EXPORT_SYMBOL(strncpy)
  
- csum_partial_fix_alignment:
-@@ -37,6 +38,7 @@ csum_partial_fix_alignment:
+ _GLOBAL(strcat)
+ 	addi	r5,r3,-1
+@@ -57,6 +60,7 @@ _GLOBAL(strcat)
+ 	stbu	r0,1(r5)
+ 	bne	1b
+ 	blr
++EXPORT_SYMBOL(strcat)
  
- 	.align		32
- 	.globl		csum_partial
-+	EXPORT_SYMBOL(csum_partial)
- csum_partial:		/* %o0=buff, %o1=len, %o2=sum */
- 	prefetch	[%o0 + 0x000], #n_reads
- 	clr		%o4
-diff --git a/arch/sparc/lib/clear_page.S b/arch/sparc/lib/clear_page.S
-index 46272df..f30d6b7 100644
---- a/arch/sparc/lib/clear_page.S
-+++ b/arch/sparc/lib/clear_page.S
-@@ -10,6 +10,7 @@
- #include <asm/pgtable.h>
- #include <asm/spitfire.h>
- #include <asm/head.h>
-+#include <asm/export.h>
+ _GLOBAL(strcmp)
+ 	addi	r5,r3,-1
+@@ -68,6 +72,7 @@ _GLOBAL(strcmp)
+ 	beqlr	1
+ 	beq	1b
+ 	blr
++EXPORT_SYMBOL(strcmp)
  
- 	/* What we used to do was lock a TLB entry into a specific
- 	 * TLB slot, clear the page with interrupts disabled, then
-@@ -26,6 +27,7 @@
- 	.text
+ _GLOBAL(strncmp)
+ 	PPC_LCMPI 0,r5,0
+@@ -84,6 +89,7 @@ _GLOBAL(strncmp)
+ 	blr
+ 2:	li	r3,0
+ 	blr
++EXPORT_SYMBOL(strncmp)
  
- 	.globl		_clear_page
-+	EXPORT_SYMBOL(_clear_page)
- _clear_page:		/* %o0=dest */
- 	ba,pt		%xcc, clear_page_common
- 	 clr		%o4
-@@ -35,6 +37,7 @@ _clear_page:		/* %o0=dest */
- 	 */
- 	.align		32
- 	.globl		clear_user_page
-+	EXPORT_SYMBOL(clear_user_page)
- clear_user_page:	/* %o0=dest, %o1=vaddr */
- 	lduw		[%g6 + TI_PRE_COUNT], %o2
- 	sethi		%hi(PAGE_OFFSET), %g2
-diff --git a/arch/sparc/lib/copy_in_user.S b/arch/sparc/lib/copy_in_user.S
-index 302c0e6..482de09 100644
---- a/arch/sparc/lib/copy_in_user.S
-+++ b/arch/sparc/lib/copy_in_user.S
-@@ -5,6 +5,7 @@
- 
- #include <linux/linkage.h>
- #include <asm/asi.h>
-+#include <asm/export.h>
- 
- #define XCC xcc
- 
-@@ -90,3 +91,4 @@ ENTRY(___copy_in_user)	/* %o0=dst, %o1=src, %o2=len */
- 	retl
- 	 clr		%o0
- ENDPROC(___copy_in_user)
-+EXPORT_SYMBOL(___copy_in_user)
-diff --git a/arch/sparc/lib/copy_page.S b/arch/sparc/lib/copy_page.S
-index dd16c61..7197b72 100644
---- a/arch/sparc/lib/copy_page.S
-+++ b/arch/sparc/lib/copy_page.S
-@@ -10,6 +10,7 @@
- #include <asm/pgtable.h>
- #include <asm/spitfire.h>
- #include <asm/head.h>
-+#include <asm/export.h>
- 
- 	/* What we used to do was lock a TLB entry into a specific
- 	 * TLB slot, clear the page with interrupts disabled, then
-@@ -44,6 +45,7 @@
- 	.align		32
- 	.globl		copy_user_page
- 	.type		copy_user_page,#function
-+	EXPORT_SYMBOL(copy_user_page)
- copy_user_page:		/* %o0=dest, %o1=src, %o2=vaddr */
- 	lduw		[%g6 + TI_PRE_COUNT], %o4
- 	sethi		%hi(PAGE_OFFSET), %g2
-diff --git a/arch/sparc/lib/copy_user.S b/arch/sparc/lib/copy_user.S
-index ef095b6..cea644d 100644
---- a/arch/sparc/lib/copy_user.S
-+++ b/arch/sparc/lib/copy_user.S
-@@ -15,6 +15,7 @@
- #include <asm/asmmacro.h>
- #include <asm/page.h>
- #include <asm/thread_info.h>
-+#include <asm/export.h>
- 
- /* Work around cpp -rob */
- #define ALLOC #alloc
-@@ -119,6 +120,7 @@
- __copy_user_begin:
- 
- 	.globl	__copy_user
-+	EXPORT_SYMBOL(__copy_user)
- dword_align:
- 	andcc	%o1, 1, %g0
- 	be	4f
-diff --git a/arch/sparc/lib/csum_copy.S b/arch/sparc/lib/csum_copy.S
-index e566c77..0ecbafc 100644
---- a/arch/sparc/lib/csum_copy.S
-+++ b/arch/sparc/lib/csum_copy.S
-@@ -3,6 +3,8 @@
-  * Copyright (C) 2005 David S. Miller <davem@davemloft.net>
-  */
- 
-+#include <asm/export.h>
-+
- #ifdef __KERNEL__
- #define GLOBAL_SPARE	%g7
- #else
-@@ -63,6 +65,7 @@
- 	 add		%o5, %o4, %o4
- 
- 	.globl		FUNC_NAME
-+	EXPORT_SYMBOL(FUNC_NAME)
- FUNC_NAME:		/* %o0=src, %o1=dst, %o2=len, %o3=sum */
- 	LOAD(prefetch, %o0 + 0x000, #n_reads)
- 	xor		%o0, %o1, %g1
-diff --git a/arch/sparc/lib/divdi3.S b/arch/sparc/lib/divdi3.S
-index 9614b48..a2b5a97 100644
---- a/arch/sparc/lib/divdi3.S
-+++ b/arch/sparc/lib/divdi3.S
-@@ -17,6 +17,7 @@ along with GNU CC; see the file COPYING.  If not, write to
- the Free Software Foundation, 59 Temple Place - Suite 330,
- Boston, MA 02111-1307, USA.  */
- 
-+#include <asm/export.h>
- 	.text
- 	.align 4
- 	.globl __divdi3
-@@ -279,3 +280,4 @@ __divdi3:
- .LL81:
- 	ret
- 	restore
-+EXPORT_SYMBOL(__divdi3)
-diff --git a/arch/sparc/lib/ffs.S b/arch/sparc/lib/ffs.S
-index b39389f..23aab14 100644
---- a/arch/sparc/lib/ffs.S
-+++ b/arch/sparc/lib/ffs.S
-@@ -1,4 +1,5 @@
- #include <linux/linkage.h>
-+#include <asm/export.h>
- 
- 	.register	%g2,#scratch
- 
-@@ -65,6 +66,8 @@ ENTRY(__ffs)
- 	 add	%o2, %g1, %o0
- ENDPROC(ffs)
- ENDPROC(__ffs)
-+EXPORT_SYMBOL(__ffs)
-+EXPORT_SYMBOL(ffs)
- 
- 	.section	.popc_6insn_patch, "ax"
- 	.word		ffs
-diff --git a/arch/sparc/lib/hweight.S b/arch/sparc/lib/hweight.S
-index 95414e0..f9985f1 100644
---- a/arch/sparc/lib/hweight.S
-+++ b/arch/sparc/lib/hweight.S
-@@ -1,4 +1,5 @@
- #include <linux/linkage.h>
-+#include <asm/export.h>
- 
- 	.text
- 	.align	32
-@@ -7,6 +8,7 @@ ENTRY(__arch_hweight8)
- 	 nop
- 	nop
- ENDPROC(__arch_hweight8)
-+EXPORT_SYMBOL(__arch_hweight8)
- 	.section	.popc_3insn_patch, "ax"
- 	.word		__arch_hweight8
- 	sllx		%o0, 64-8, %g1
-@@ -19,6 +21,7 @@ ENTRY(__arch_hweight16)
- 	 nop
- 	nop
- ENDPROC(__arch_hweight16)
-+EXPORT_SYMBOL(__arch_hweight16)
- 	.section	.popc_3insn_patch, "ax"
- 	.word		__arch_hweight16
- 	sllx		%o0, 64-16, %g1
-@@ -31,6 +34,7 @@ ENTRY(__arch_hweight32)
- 	 nop
- 	nop
- ENDPROC(__arch_hweight32)
-+EXPORT_SYMBOL(__arch_hweight32)
- 	.section	.popc_3insn_patch, "ax"
- 	.word		__arch_hweight32
- 	sllx		%o0, 64-32, %g1
-@@ -43,6 +47,7 @@ ENTRY(__arch_hweight64)
- 	 nop
- 	nop
- ENDPROC(__arch_hweight64)
-+EXPORT_SYMBOL(__arch_hweight64)
- 	.section	.popc_3insn_patch, "ax"
- 	.word		__arch_hweight64
- 	retl
-diff --git a/arch/sparc/lib/ipcsum.S b/arch/sparc/lib/ipcsum.S
-index 4742d59..5d61648 100644
---- a/arch/sparc/lib/ipcsum.S
-+++ b/arch/sparc/lib/ipcsum.S
-@@ -1,4 +1,5 @@
- #include <linux/linkage.h>
-+#include <asm/export.h>
- 
- 	.text
- ENTRY(ip_fast_csum) /* %o0 = iph, %o1 = ihl */
-@@ -31,3 +32,4 @@ ENTRY(ip_fast_csum) /* %o0 = iph, %o1 = ihl */
- 	retl
- 	 and	%o2, %o1, %o0
- ENDPROC(ip_fast_csum)
-+EXPORT_SYMBOL(ip_fast_csum)
-diff --git a/arch/sparc/lib/ksyms.c b/arch/sparc/lib/ksyms.c
-deleted file mode 100644
-index 8eb454c..0000000
---- a/arch/sparc/lib/ksyms.c
-+++ /dev/null
-@@ -1,165 +0,0 @@
--/*
-- * Export of symbols defined in assembler
-- */
--
--/* Tell string.h we don't want memcpy etc. as cpp defines */
--#define EXPORT_SYMTAB_STROPS
--
--#include <linux/module.h>
--#include <linux/string.h>
--#include <linux/types.h>
--
--#include <asm/checksum.h>
--#include <asm/uaccess.h>
--#include <asm/ftrace.h>
--
--/* string functions */
--EXPORT_SYMBOL(strlen);
--EXPORT_SYMBOL(strncmp);
--
--/* mem* functions */
--extern void *__memscan_zero(void *, size_t);
--extern void *__memscan_generic(void *, int, size_t);
--extern void *__bzero(void *, size_t);
--
--EXPORT_SYMBOL(memscan);
--EXPORT_SYMBOL(__memscan_zero);
--EXPORT_SYMBOL(__memscan_generic);
--EXPORT_SYMBOL(memcmp);
--EXPORT_SYMBOL(memcpy);
--EXPORT_SYMBOL(memset);
--EXPORT_SYMBOL(memmove);
--EXPORT_SYMBOL(__bzero);
--
--/* Networking helper routines. */
--EXPORT_SYMBOL(csum_partial);
--
--#ifdef CONFIG_MCOUNT
--EXPORT_SYMBOL(_mcount);
--#endif
--
--/*
-- * sparc
-- */
--#ifdef CONFIG_SPARC32
--extern int __ashrdi3(int, int);
--extern int __ashldi3(int, int);
--extern int __lshrdi3(int, int);
--extern int __muldi3(int, int);
--extern int __divdi3(int, int);
--
--extern void (*__copy_1page)(void *, const void *);
--extern void (*bzero_1page)(void *);
--
--extern void ___rw_read_enter(void);
--extern void ___rw_read_try(void);
--extern void ___rw_read_exit(void);
--extern void ___rw_write_enter(void);
--
--/* Networking helper routines. */
--EXPORT_SYMBOL(__csum_partial_copy_sparc_generic);
--
--/* Special internal versions of library functions. */
--EXPORT_SYMBOL(__copy_1page);
--EXPORT_SYMBOL(__memmove);
--EXPORT_SYMBOL(bzero_1page);
--
--/* Moving data to/from/in userspace. */
--EXPORT_SYMBOL(__copy_user);
--
--/* Used by asm/spinlock.h */
--#ifdef CONFIG_SMP
--EXPORT_SYMBOL(___rw_read_enter);
--EXPORT_SYMBOL(___rw_read_try);
--EXPORT_SYMBOL(___rw_read_exit);
--EXPORT_SYMBOL(___rw_write_enter);
--#endif
--
--EXPORT_SYMBOL(__ashrdi3);
--EXPORT_SYMBOL(__ashldi3);
--EXPORT_SYMBOL(__lshrdi3);
--EXPORT_SYMBOL(__muldi3);
--EXPORT_SYMBOL(__divdi3);
--#endif
--
--/*
-- * sparc64
-- */
--#ifdef CONFIG_SPARC64
--/* Networking helper routines. */
--EXPORT_SYMBOL(csum_partial_copy_nocheck);
--EXPORT_SYMBOL(__csum_partial_copy_from_user);
--EXPORT_SYMBOL(__csum_partial_copy_to_user);
--EXPORT_SYMBOL(ip_fast_csum);
--
--/* Moving data to/from/in userspace. */
--EXPORT_SYMBOL(___copy_to_user);
--EXPORT_SYMBOL(___copy_from_user);
--EXPORT_SYMBOL(___copy_in_user);
--EXPORT_SYMBOL(__clear_user);
--
--/* Atomic counter implementation. */
--#define ATOMIC_OP(op)							\
--EXPORT_SYMBOL(atomic_##op);						\
--EXPORT_SYMBOL(atomic64_##op);
--
--#define ATOMIC_OP_RETURN(op)						\
--EXPORT_SYMBOL(atomic_##op##_return);					\
--EXPORT_SYMBOL(atomic64_##op##_return);
--
--#define ATOMIC_OPS(op) ATOMIC_OP(op) ATOMIC_OP_RETURN(op)
--
--ATOMIC_OPS(add)
--ATOMIC_OPS(sub)
--ATOMIC_OP(and)
--ATOMIC_OP(or)
--ATOMIC_OP(xor)
--
--#undef ATOMIC_OPS
--#undef ATOMIC_OP_RETURN
--#undef ATOMIC_OP
--
--EXPORT_SYMBOL(atomic64_dec_if_positive);
--
--/* Atomic bit operations. */
--EXPORT_SYMBOL(test_and_set_bit);
--EXPORT_SYMBOL(test_and_clear_bit);
--EXPORT_SYMBOL(test_and_change_bit);
--EXPORT_SYMBOL(set_bit);
--EXPORT_SYMBOL(clear_bit);
--EXPORT_SYMBOL(change_bit);
--
--/* Special internal versions of library functions. */
--EXPORT_SYMBOL(_clear_page);
--EXPORT_SYMBOL(clear_user_page);
--EXPORT_SYMBOL(copy_user_page);
--
--/* RAID code needs this */
--void VISenter(void);
--EXPORT_SYMBOL(VISenter);
--
--extern void xor_vis_2(unsigned long, unsigned long *, unsigned long *);
--extern void xor_vis_3(unsigned long, unsigned long *, unsigned long *,
--		unsigned long *);
--extern void xor_vis_4(unsigned long, unsigned long *, unsigned long *,
--		unsigned long *, unsigned long *);
--extern void xor_vis_5(unsigned long, unsigned long *, unsigned long *,
--		unsigned long *, unsigned long *, unsigned long *);
--EXPORT_SYMBOL(xor_vis_2);
--EXPORT_SYMBOL(xor_vis_3);
--EXPORT_SYMBOL(xor_vis_4);
--EXPORT_SYMBOL(xor_vis_5);
--
--extern void xor_niagara_2(unsigned long, unsigned long *, unsigned long *);
--extern void xor_niagara_3(unsigned long, unsigned long *, unsigned long *,
--		unsigned long *);
--extern void xor_niagara_4(unsigned long, unsigned long *, unsigned long *,
--		unsigned long *, unsigned long *);
--extern void xor_niagara_5(unsigned long, unsigned long *, unsigned long *,
--		unsigned long *, unsigned long *, unsigned long *);
--
--EXPORT_SYMBOL(xor_niagara_2);
--EXPORT_SYMBOL(xor_niagara_3);
--EXPORT_SYMBOL(xor_niagara_4);
--EXPORT_SYMBOL(xor_niagara_5);
--#endif
-diff --git a/arch/sparc/lib/locks.S b/arch/sparc/lib/locks.S
-index 64f53f2..f38c4e5 100644
---- a/arch/sparc/lib/locks.S
-+++ b/arch/sparc/lib/locks.S
-@@ -10,6 +10,7 @@
- #include <asm/psr.h>
- #include <asm/smp.h>
- #include <asm/spinlock.h>
-+#include <asm/export.h>
- 
- 	.text
- 	.align	4
-@@ -48,6 +49,7 @@ ___rw_write_enter_spin_on_wlock:
- 	 ld	[%g1], %g2
- 
- 	.globl	___rw_read_enter
-+EXPORT_SYMBOL(___rw_read_enter)
- ___rw_read_enter:
- 	orcc	%g2, 0x0, %g0
- 	bne,a	___rw_read_enter_spin_on_wlock
-@@ -59,6 +61,7 @@ ___rw_read_enter:
- 	 mov	%g4, %o7
- 
- 	.globl	___rw_read_exit
-+EXPORT_SYMBOL(___rw_read_exit)
- ___rw_read_exit:
- 	orcc	%g2, 0x0, %g0
- 	bne,a	___rw_read_exit_spin_on_wlock
-@@ -70,6 +73,7 @@ ___rw_read_exit:
- 	 mov	%g4, %o7
- 
- 	.globl	___rw_read_try
-+EXPORT_SYMBOL(___rw_read_try)
- ___rw_read_try:
- 	orcc	%g2, 0x0, %g0
- 	bne	___rw_read_try_spin_on_wlock
-@@ -81,6 +85,7 @@ ___rw_read_try:
- 	 mov	%g4, %o7
- 
- 	.globl	___rw_write_enter
-+EXPORT_SYMBOL(___rw_write_enter)
- ___rw_write_enter:
- 	orcc	%g2, 0x0, %g0
- 	bne	___rw_write_enter_spin_on_wlock
-diff --git a/arch/sparc/lib/lshrdi3.S b/arch/sparc/lib/lshrdi3.S
-index 60ebc7c..c9b9373 100644
---- a/arch/sparc/lib/lshrdi3.S
-+++ b/arch/sparc/lib/lshrdi3.S
-@@ -1,4 +1,5 @@
- #include <linux/linkage.h>
-+#include <asm/export.h>
- 
- ENTRY(__lshrdi3)
- 	cmp	%o2, 0
-@@ -25,3 +26,4 @@ ENTRY(__lshrdi3)
- 	retl 
- 	 nop 
- ENDPROC(__lshrdi3)
-+EXPORT_SYMBOL(__lshrdi3)
-diff --git a/arch/sparc/lib/mcount.S b/arch/sparc/lib/mcount.S
-index 0b0ed4d..194f383 100644
---- a/arch/sparc/lib/mcount.S
-+++ b/arch/sparc/lib/mcount.S
-@@ -6,6 +6,7 @@
-  */
- 
- #include <linux/linkage.h>
-+#include <asm/export.h>
- 
- /*
-  * This is the main variant and is called by C code.  GCC's -pg option
-@@ -16,6 +17,7 @@
- 	.align		32
- 	.globl		_mcount
- 	.type		_mcount,#function
-+	EXPORT_SYMBOL(_mcount)
- 	.globl		mcount
- 	.type		mcount,#function
- _mcount:
-diff --git a/arch/sparc/lib/memcmp.S b/arch/sparc/lib/memcmp.S
-index efa106c..cee7f30 100644
---- a/arch/sparc/lib/memcmp.S
-+++ b/arch/sparc/lib/memcmp.S
-@@ -6,6 +6,7 @@
- 
- #include <linux/linkage.h>
- #include <asm/asm.h>
-+#include <asm/export.h>
- 
- 	.text
- ENTRY(memcmp)
-@@ -25,3 +26,4 @@ ENTRY(memcmp)
- 2:	retl
- 	 mov	0, %o0
- ENDPROC(memcmp)
-+EXPORT_SYMBOL(memcmp)
-diff --git a/arch/sparc/lib/memcpy.S b/arch/sparc/lib/memcpy.S
-index 4d8c497..1dc8ec5 100644
---- a/arch/sparc/lib/memcpy.S
-+++ b/arch/sparc/lib/memcpy.S
-@@ -7,6 +7,7 @@
-  * Copyright (C) 1996 Jakub Jelinek (jj@sunsite.mff.cuni.cz)
-  */
- 
-+#include <asm/export.h>
- #define FUNC(x) 		\
- 	.globl	x;		\
- 	.type	x,@function;	\
-@@ -143,8 +144,10 @@ x:
- #ifdef __KERNEL__
- FUNC(amemmove)
- FUNC(__memmove)
-+EXPORT_SYMBOL(__memmove)
- #endif
- FUNC(memmove)
-+EXPORT_SYMBOL(memmove)
- 	cmp		%o0, %o1
- 	mov		%o0, %g7
- 	bleu		9f
-@@ -202,6 +205,7 @@ FUNC(memmove)
- 	 add		%o0, 2, %o0
- 
- FUNC(memcpy)	/* %o0=dst %o1=src %o2=len */
-+EXPORT_SYMBOL(memcpy)
- 
- 	sub		%o0, %o1, %o4
- 	mov		%o0, %g7
-diff --git a/arch/sparc/lib/memmove.S b/arch/sparc/lib/memmove.S
-index 857ad4f..012cdb6 100644
---- a/arch/sparc/lib/memmove.S
-+++ b/arch/sparc/lib/memmove.S
-@@ -5,6 +5,7 @@
-  */
- 
- #include <linux/linkage.h>
-+#include <asm/export.h>
- 
- 	.text
- ENTRY(memmove) /* o0=dst o1=src o2=len */
-@@ -57,3 +58,4 @@ ENTRY(memmove) /* o0=dst o1=src o2=len */
- 	 stb		%g7, [%o0 - 0x1]
- 	ba,a,pt		%xcc, 99b
- ENDPROC(memmove)
-+EXPORT_SYMBOL(memmove)
-diff --git a/arch/sparc/lib/memscan_32.S b/arch/sparc/lib/memscan_32.S
-index 4ff1657..51ce690 100644
---- a/arch/sparc/lib/memscan_32.S
-+++ b/arch/sparc/lib/memscan_32.S
-@@ -4,6 +4,8 @@
-  * Copyright (C) 1996 David S. Miller (davem@caip.rutgers.edu)
-  */
- 
-+#include <asm/export.h>
-+
- /* In essence, this is just a fancy strlen. */
- 
- #define LO_MAGIC 0x01010101
-@@ -13,6 +15,8 @@
- 	.align	4
- 	.globl	__memscan_zero, __memscan_generic
- 	.globl	memscan
-+EXPORT_SYMBOL(__memscan_zero)
-+EXPORT_SYMBOL(__memscan_generic)
- __memscan_zero:
- 	/* %o0 = addr, %o1 = size */
- 	cmp	%o1, 0
-diff --git a/arch/sparc/lib/memscan_64.S b/arch/sparc/lib/memscan_64.S
-index 5686dfa..daa96f4 100644
---- a/arch/sparc/lib/memscan_64.S
-+++ b/arch/sparc/lib/memscan_64.S
-@@ -5,6 +5,8 @@
-  * Copyright (C) 1998 David S. Miller (davem@redhat.com)
-  */
- 
-+	#include <asm/export.h>
-+
- #define HI_MAGIC	0x8080808080808080
- #define LO_MAGIC	0x0101010101010101
- #define ASI_PL		0x88
-@@ -13,6 +15,8 @@
- 	.align	32
- 	.globl		__memscan_zero, __memscan_generic
- 	.globl		memscan
-+	EXPORT_SYMBOL(__memscan_zero)
-+	EXPORT_SYMBOL(__memscan_generic)
- 
- __memscan_zero:
- 	/* %o0 = bufp, %o1 = size */
-diff --git a/arch/sparc/lib/memset.S b/arch/sparc/lib/memset.S
-index f75e690..bb539b4 100644
---- a/arch/sparc/lib/memset.S
-+++ b/arch/sparc/lib/memset.S
-@@ -9,6 +9,7 @@
-  */
- 
- #include <asm/ptrace.h>
-+#include <asm/export.h>
- 
- /* Work around cpp -rob */
- #define ALLOC #alloc
-@@ -63,6 +64,8 @@ __bzero_begin:
- 
- 	.globl	__bzero
- 	.globl	memset
-+	EXPORT_SYMBOL(__bzero)
-+	EXPORT_SYMBOL(memset)
- 	.globl	__memset_start, __memset_end
- __memset_start:
- memset:
-diff --git a/arch/sparc/lib/muldi3.S b/arch/sparc/lib/muldi3.S
-index 9794939..17a0f49 100644
---- a/arch/sparc/lib/muldi3.S
-+++ b/arch/sparc/lib/muldi3.S
-@@ -17,6 +17,7 @@ along with GNU CC; see the file COPYING.  If not, write to
- the Free Software Foundation, 59 Temple Place - Suite 330,
- Boston, MA 02111-1307, USA.  */
- 
-+#include <asm/export.h>
- 	.text
- 	.align 4
- 	.globl __muldi3
-@@ -74,3 +75,4 @@ __muldi3:
- 	add  %l2, %l0, %i0
- 	ret 
- 	restore  %g0, %l3, %o1
-+EXPORT_SYMBOL(__muldi3)
-diff --git a/arch/sparc/lib/strlen.S b/arch/sparc/lib/strlen.S
-index 536f835..ca0e7077e 100644
---- a/arch/sparc/lib/strlen.S
-+++ b/arch/sparc/lib/strlen.S
-@@ -7,6 +7,7 @@
- 
- #include <linux/linkage.h>
- #include <asm/asm.h>
-+#include <asm/export.h>
- 
- #define LO_MAGIC 0x01010101
- #define HI_MAGIC 0x80808080
-@@ -78,3 +79,4 @@ ENTRY(strlen)
- 	retl
- 	 mov	2, %o0
- ENDPROC(strlen)
+ _GLOBAL(strlen)
+ 	addi	r4,r3,-1
+@@ -92,6 +98,7 @@ _GLOBAL(strlen)
+ 	bne	1b
+ 	subf	r3,r3,r4
+ 	blr
 +EXPORT_SYMBOL(strlen)
-diff --git a/arch/sparc/lib/strncmp_32.S b/arch/sparc/lib/strncmp_32.S
-index c0d1b56..e3fe014 100644
---- a/arch/sparc/lib/strncmp_32.S
-+++ b/arch/sparc/lib/strncmp_32.S
-@@ -4,6 +4,7 @@
-  */
  
- #include <linux/linkage.h>
-+#include <asm/export.h>
+ #ifdef CONFIG_PPC32
+ _GLOBAL(memcmp)
+@@ -107,6 +114,7 @@ _GLOBAL(memcmp)
+ 	blr
+ 2:	li	r3,0
+ 	blr
++EXPORT_SYMBOL(memcmp)
+ #endif
  
+ _GLOBAL(memchr)
+@@ -120,6 +128,7 @@ _GLOBAL(memchr)
+ 	beqlr
+ 2:	li	r3,0
+ 	blr
++EXPORT_SYMBOL(memchr)
+ 
+ #ifdef CONFIG_PPC32
+ _GLOBAL(__clear_user)
+@@ -163,4 +172,5 @@ _GLOBAL(__clear_user)
+ 	PPC_LONG	1b,91b
+ 	PPC_LONG	8b,92b
  	.text
- ENTRY(strncmp)
-@@ -116,3 +117,4 @@ ENTRY(strncmp)
- 	retl
- 	 sub	%o3, %o0, %o0
- ENDPROC(strncmp)
-+EXPORT_SYMBOL(strncmp)
-diff --git a/arch/sparc/lib/strncmp_64.S b/arch/sparc/lib/strncmp_64.S
-index 0656627..efb5f88 100644
---- a/arch/sparc/lib/strncmp_64.S
-+++ b/arch/sparc/lib/strncmp_64.S
-@@ -6,6 +6,7 @@
++EXPORT_SYMBOL(__clear_user)
+ #endif
+diff --git a/arch/powerpc/lib/string_64.S b/arch/powerpc/lib/string_64.S
+index 7bd9549..57ace35 100644
+--- a/arch/powerpc/lib/string_64.S
++++ b/arch/powerpc/lib/string_64.S
+@@ -20,6 +20,7 @@
  
- #include <linux/linkage.h>
- #include <asm/asi.h>
+ #include <asm/ppc_asm.h>
+ #include <asm/asm-offsets.h>
 +#include <asm/export.h>
  
- 	.text
- ENTRY(strncmp)
-@@ -28,3 +29,4 @@ ENTRY(strncmp)
- 	retl
- 	 clr	%o0
- ENDPROC(strncmp)
-+EXPORT_SYMBOL(strncmp)
-diff --git a/arch/sparc/lib/xor.S b/arch/sparc/lib/xor.S
-index 2c05641..45a49cb 100644
---- a/arch/sparc/lib/xor.S
-+++ b/arch/sparc/lib/xor.S
-@@ -13,6 +13,7 @@
- #include <asm/asi.h>
- #include <asm/dcu.h>
- #include <asm/spitfire.h>
+ 	.section	".toc","aw"
+ PPC64_CACHES:
+@@ -200,3 +201,4 @@ err1;	dcbz	r0,r3
+ 	cmpdi	r4,32
+ 	blt	.Lshort_clear
+ 	b	.Lmedium_clear
++EXPORT_SYMBOL(__clear_user)
+diff --git a/arch/powerpc/mm/hash_low_32.S b/arch/powerpc/mm/hash_low_32.S
+index 115347f..09cc50c 100644
+--- a/arch/powerpc/mm/hash_low_32.S
++++ b/arch/powerpc/mm/hash_low_32.S
+@@ -26,6 +26,7 @@
+ #include <asm/ppc_asm.h>
+ #include <asm/thread_info.h>
+ #include <asm/asm-offsets.h>
 +#include <asm/export.h>
+ 
+ #ifdef CONFIG_SMP
+ 	.section .bss
+@@ -33,6 +34,7 @@
+ 	.globl mmu_hash_lock
+ mmu_hash_lock:
+ 	.space	4
++EXPORT_SYMBOL(mmu_hash_lock)
+ #endif /* CONFIG_SMP */
  
  /*
-  *	Requirements:
-@@ -90,6 +91,7 @@ ENTRY(xor_vis_2)
- 	retl
- 	  wr	%g0, 0, %fprs
- ENDPROC(xor_vis_2)
-+EXPORT_SYMBOL(xor_vis_2)
+@@ -575,6 +577,7 @@ _GLOBAL(flush_hash_pages)
+ 	rlwinm	r8,r8,0,31,29		/* clear HASHPTE bit */
+ 	stwcx.	r8,0,r5			/* update the pte */
+ 	bne-	33b
++EXPORT_SYMBOL(flush_hash_pages)
  
- ENTRY(xor_vis_3)
- 	rd	%fprs, %o5
-@@ -156,6 +158,7 @@ ENTRY(xor_vis_3)
- 	retl
- 	 wr	%g0, 0, %fprs
- ENDPROC(xor_vis_3)
-+EXPORT_SYMBOL(xor_vis_3)
+ 	/* Get the address of the primary PTE group in the hash table (r3) */
+ _GLOBAL(flush_hash_patch_A)
+diff --git a/arch/powerpc/sysdev/dcr-low.S b/arch/powerpc/sysdev/dcr-low.S
+index d3098ef..e687bb2 100644
+--- a/arch/powerpc/sysdev/dcr-low.S
++++ b/arch/powerpc/sysdev/dcr-low.S
+@@ -12,6 +12,7 @@
+ #include <asm/ppc_asm.h>
+ #include <asm/processor.h>
+ #include <asm/bug.h>
++#include <asm/export.h>
  
- ENTRY(xor_vis_4)
- 	rd	%fprs, %o5
-@@ -241,6 +244,7 @@ ENTRY(xor_vis_4)
- 	retl
- 	 wr	%g0, 0, %fprs
- ENDPROC(xor_vis_4)
-+EXPORT_SYMBOL(xor_vis_4)
+ #define DCR_ACCESS_PROLOG(table) \
+ 	cmpli	cr0,r3,1024;	 \
+@@ -28,9 +29,11 @@
  
- ENTRY(xor_vis_5)
- 	save	%sp, -192, %sp
-@@ -347,6 +351,7 @@ ENTRY(xor_vis_5)
- 	ret
- 	 restore
- ENDPROC(xor_vis_5)
-+EXPORT_SYMBOL(xor_vis_5)
+ _GLOBAL(__mfdcr)
+ 	DCR_ACCESS_PROLOG(__mfdcr_table)
++EXPORT_SYMBOL(__mfdcr)
  
- 	/* Niagara versions. */
- ENTRY(xor_niagara_2) /* %o0=bytes, %o1=dest, %o2=src */
-@@ -393,6 +398,7 @@ ENTRY(xor_niagara_2) /* %o0=bytes, %o1=dest, %o2=src */
- 	ret
- 	 restore
- ENDPROC(xor_niagara_2)
-+EXPORT_SYMBOL(xor_niagara_2)
+ _GLOBAL(__mtdcr)
+ 	DCR_ACCESS_PROLOG(__mtdcr_table)
++EXPORT_SYMBOL(__mtdcr)
  
- ENTRY(xor_niagara_3) /* %o0=bytes, %o1=dest, %o2=src1, %o3=src2 */
- 	save		%sp, -192, %sp
-@@ -454,6 +460,7 @@ ENTRY(xor_niagara_3) /* %o0=bytes, %o1=dest, %o2=src1, %o3=src2 */
- 	ret
- 	 restore
- ENDPROC(xor_niagara_3)
-+EXPORT_SYMBOL(xor_niagara_3)
- 
- ENTRY(xor_niagara_4) /* %o0=bytes, %o1=dest, %o2=src1, %o3=src2, %o4=src3 */
- 	save		%sp, -192, %sp
-@@ -536,6 +543,7 @@ ENTRY(xor_niagara_4) /* %o0=bytes, %o1=dest, %o2=src1, %o3=src2, %o4=src3 */
- 	ret
- 	 restore
- ENDPROC(xor_niagara_4)
-+EXPORT_SYMBOL(xor_niagara_4)
- 
- ENTRY(xor_niagara_5) /* %o0=bytes, %o1=dest, %o2=src1, %o3=src2, %o4=src3, %o5=src4 */
- 	save		%sp, -192, %sp
-@@ -634,3 +642,4 @@ ENTRY(xor_niagara_5) /* %o0=bytes, %o1=dest, %o2=src1, %o3=src2, %o4=src3, %o5=s
- 	ret
- 	 restore
- ENDPROC(xor_niagara_5)
-+EXPORT_SYMBOL(xor_niagara_5)
+ __mfdcr_table:
+ 	mfdcr  r3,0; blr
 -- 
 2.1.4
 
