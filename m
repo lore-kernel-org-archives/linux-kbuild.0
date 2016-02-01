@@ -1,50 +1,26 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.bmw-carit.de ([62.245.222.98]:43214 "EHLO
-	mail.bmw-carit.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752731AbcBAGtc (ORCPT
+Received: from www.linutronix.de ([62.245.132.108]:36859 "EHLO
+	Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750921AbcBAINN (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 1 Feb 2016 01:49:32 -0500
-Subject: Re: [PATCH tip v6 2/5] kbuild: Add option to turn incompatible
- pointer check into error
-References: <1453992270-4688-1-git-send-email-daniel.wagner@bmw-carit.de>
- <1453992270-4688-3-git-send-email-daniel.wagner@bmw-carit.de>
- <56AB5867.6020405@bmw-carit.de> <20160129185523.GZ8889@windriver.com>
-From: Daniel Wagner <daniel.wagner@bmw-carit.de>
-Message-ID: <56AEFFF1.1010404@bmw-carit.de>
-Date: Mon, 1 Feb 2016 07:49:21 +0100
+	Mon, 1 Feb 2016 03:13:13 -0500
+Date: Mon, 1 Feb 2016 09:12:06 +0100 (CET)
+From: Thomas Gleixner <tglx@linutronix.de>
+Subject: Re: [PATCH 03/12] x86: move exports to actual definitions
+In-Reply-To: <1454095114-4128-3-git-send-email-viro@ZenIV.linux.org.uk>
+Message-ID: <alpine.DEB.2.11.1602010911450.25254@nanos>
+References: <20160129191744.GB17997@ZenIV.linux.org.uk> <1454095114-4128-3-git-send-email-viro@ZenIV.linux.org.uk>
 MIME-Version: 1.0
-In-Reply-To: <20160129185523.GZ8889@windriver.com>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Paul Gortmaker <paul.gortmaker@windriver.com>
-Cc: linux-kernel@vger.kernel.org, linux-rt-users@vger.kernel.org, linux-kbuild@vger.kernel.org, Marcelo Tosatti <mtosatti@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Paul E . McKenney" <paulmck@linux.vnet.ibm.com>, Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, Steven Rostedt <rostedt@goodmis.org>, Boqun Feng <boqun.feng@gmail.com>
+To: Al Viro <viro@ZenIV.linux.org.uk>
+Cc: linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 01/29/2016 07:55 PM, Paul Gortmaker wrote:
-> [Re: [PATCH tip v6 2/5] kbuild: Add option to turn incompatible pointer check into error] On 29/01/2016 (Fri 13:17) Daniel Wagner wrote:
+On Fri, 29 Jan 2016, Al Viro wrote:
+
+> From: Al Viro <viro@zeniv.linux.org.uk>
 > 
->> On 01/28/2016 03:44 PM, Daniel Wagner wrote:
->>> +# enforce correct pointer usage
->>> +KBUILD_CFLAGS += $(call cc-option,-Werror=incompatible-pointer-types)
->>> +
->>
->> As it turns out there are a few fallouts by that one. I'll send fixes
->> for it.
-> 
-> Did you try non-x86 builds with this applied?   I'd be really surprised
-> if there were just a few, once you did allyesconfig/allmodconfig for
-> ARM, MIPS, PPC, etc.
+> Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
 
-I have tried this with non-x86 builds and apart of a few problems all
-looked fine. As it turns out I was using too old cross tools from
-kernel.org [1]. Luckily Fengguang's kbuild robot did catch a bunch of
-them (see the patches in this series).
-
-Since Thomas was also surprised that only a bunch of them showed up,
-I'll better give it another go with more recent compilers.
-
-cheers,
-daniel
-
-[1] https://www.kernel.org/pub/tools/crosstool
+Acked-by: Thomas Gleixner <tglx@linutronix.de>
