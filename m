@@ -1,52 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ig0-f196.google.com ([209.85.213.196]:35105 "EHLO
-	mail-ig0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752956AbcBAKw2 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 1 Feb 2016 05:52:28 -0500
+Received: from mx2.suse.de ([195.135.220.15]:49058 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753672AbcBALQY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 1 Feb 2016 06:16:24 -0500
+Subject: Re: scripts/kconfig: allow building with make 3.80 again
+References: <56A65F4B02000078000CAC75@prv-mh.provo.novell.com>
+From: Michal Marek <mmarek@suse.de>
+Message-ID: <56AF3E85.9050903@suse.de>
+Date: Mon, 1 Feb 2016 12:16:21 +0100
 MIME-Version: 1.0
-In-Reply-To: <1454095114-4128-5-git-send-email-viro@ZenIV.linux.org.uk>
-References: <20160129191744.GB17997@ZenIV.linux.org.uk>
-	<1454095114-4128-5-git-send-email-viro@ZenIV.linux.org.uk>
-Date: Mon, 1 Feb 2016 11:52:27 +0100
-Message-ID: <CAMuHMdXTu9t9Jnd4F2X=U16X9psF-_oxj5Oxd6tz9wnK+BY2sQ@mail.gmail.com>
-Subject: Re: [PATCH 05/12] m68k: move exports to definitions
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <56A65F4B02000078000CAC75@prv-mh.provo.novell.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Al Viro <viro@zeniv.linux.org.uk>
-Cc: Linux-Arch <linux-arch@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: Jan Beulich <JBeulich@suse.com>
+Cc: mpe@ellerman.id.au, linux-kbuild@vger.kernel.org
 
-Hi Al,
+Dne 25.1.2016 v 17:45 Jan Beulich napsal(a):
+> Documentation/Changes still lists this as the minimal required version,
+> so it ought to remain usable for the time being.
+> 
+> Fixes: d2036f30cf ("scripts/kconfig/Makefile: Allow KBUILD_DEFCONFIG to be a target")
+> Signed-off-by: Jan Beulich <jbeulich@suse.com>
+> Cc: Michael Ellerman <mpe@ellerman.id.au>
+> ---
+>  scripts/kconfig/Makefile |    4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 
-On Fri, Jan 29, 2016 at 8:18 PM, Al Viro <viro@zeniv.linux.org.uk> wrote:
-> From: Al Viro <viro@zeniv.linux.org.uk>
->
-> the rest of architectures should just use generic-y += export.h in
-> asm/Kbuild
->
-> Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
+Sorry for the delay, applied to kbuild.git#kconfig now.
 
-Looks good, and (some of, not all) the symbols end up in kstrtab, so
+Michal
 
-Acked-by: Geert Uytterhoeven <geert@linux-m68k.org>
-
-Note that none of the m68k defconfigs build modules that refer to these
-symbols. This changes completely with allmodconfig, which adds lots of
-references in many of the same modules.
-CONFIG_LBDAF=y is set in the defconfigs.
-
-Unfortunately I haven't managed to boot a kernel that uses these symbols
-in modules...
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
