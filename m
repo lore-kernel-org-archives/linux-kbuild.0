@@ -1,83 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mailapp01.imgtec.com ([195.59.15.196]:28943 "EHLO
-	mailapp01.imgtec.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757218AbcAaPG5 (ORCPT
+Received: from mail.bmw-carit.de ([62.245.222.98]:43214 "EHLO
+	mail.bmw-carit.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752731AbcBAGtc (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 31 Jan 2016 10:06:57 -0500
-Date: Sun, 31 Jan 2016 15:05:49 +0000
-From: "Maciej W. Rozycki" <macro@imgtec.com>
-Subject: Re: [PATCH] ld-version: fix it on Fedora
-In-Reply-To: <alpine.DEB.2.00.1601301311170.5958@tp.orcam.me.uk>
-Message-ID: <alpine.DEB.2.00.1601311445300.5958@tp.orcam.me.uk>
-References: <1452189189-31188-1-git-send-email-mst@redhat.com> <CAAG0J995iCNwdN6PpuJfzo+TVWNXR3UVqS9v-4HXbryyvMn+=w@mail.gmail.com> <E484D272A3A61B4880CDF2E712E9279F45D04AA7@HHMAIL01.hh.imgtec.org> <CAJ1xhMWth4kNuEkuVEUiUEz=d_9dmKxh0+Z_GrRcKB+F72W91w@mail.gmail.com>
- <E484D272A3A61B4880CDF2E712E9279F45D179FA@HHMAIL01.hh.imgtec.org> <CAJ1xhMVbxoag7psNg+5L6AmL4WYXKyBYNuVGjJcfqe6Km_10SQ@mail.gmail.com> <alpine.DEB.2.00.1601301311170.5958@tp.orcam.me.uk>
+	Mon, 1 Feb 2016 01:49:32 -0500
+Subject: Re: [PATCH tip v6 2/5] kbuild: Add option to turn incompatible
+ pointer check into error
+References: <1453992270-4688-1-git-send-email-daniel.wagner@bmw-carit.de>
+ <1453992270-4688-3-git-send-email-daniel.wagner@bmw-carit.de>
+ <56AB5867.6020405@bmw-carit.de> <20160129185523.GZ8889@windriver.com>
+From: Daniel Wagner <daniel.wagner@bmw-carit.de>
+Message-ID: <56AEFFF1.1010404@bmw-carit.de>
+Date: Mon, 1 Feb 2016 07:49:21 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
+In-Reply-To: <20160129185523.GZ8889@windriver.com>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Alexander Kapshuk <alexander.kapshuk@gmail.com>
-Cc: Daniel Sanders <Daniel.Sanders@imgtec.com>, James Hogan <James.Hogan@imgtec.com>, "Michael S. Tsirkin" <mst@redhat.com>, LKML <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, Linux MIPS Mailing List <linux-mips@linux-mips.org>, Ralf Baechle <ralf@linux-mips.org>
+To: Paul Gortmaker <paul.gortmaker@windriver.com>
+Cc: linux-kernel@vger.kernel.org, linux-rt-users@vger.kernel.org, linux-kbuild@vger.kernel.org, Marcelo Tosatti <mtosatti@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Paul E . McKenney" <paulmck@linux.vnet.ibm.com>, Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, Steven Rostedt <rostedt@goodmis.org>, Boqun Feng <boqun.feng@gmail.com>
 
-On Sat, 30 Jan 2016, Maciej W. Rozycki wrote:
-
-> > % echo 2.24.51.20140217 | ld-version.sh
-> > 22451000
+On 01/29/2016 07:55 PM, Paul Gortmaker wrote:
+> [Re: [PATCH tip v6 2/5] kbuild: Add option to turn incompatible pointer check into error] On 29/01/2016 (Fri 13:17) Daniel Wagner wrote:
 > 
->  So the above version is a non-release snapshot from the development tree 
-> as the repository trunk is switched to x.y+1.51 once a release branch for 
-> x.y has been made.  Then the release branch is switched to x.y-1.90 for 
-> prereleases, before settling on x.y or x.y.0 (this hasn't been consistent) 
-> for the actual base release.  Any subsequent maintenance releases will 
-> then have their version set to x.y.1, x.y.2, and so on.  We shouldn't ever 
-> rely on versions that are not proper releases.
+>> On 01/28/2016 03:44 PM, Daniel Wagner wrote:
+>>> +# enforce correct pointer usage
+>>> +KBUILD_CFLAGS += $(call cc-option,-Werror=incompatible-pointer-types)
+>>> +
+>>
+>> As it turns out there are a few fallouts by that one. I'll send fixes
+>> for it.
+> 
+> Did you try non-x86 builds with this applied?   I'd be really surprised
+> if there were just a few, once you did allyesconfig/allmodconfig for
+> ARM, MIPS, PPC, etc.
 
- I need to correct myself here for unclear notation or off-by-one errors, 
-the flow is of course as follows:
+I have tried this with non-x86 builds and apart of a few problems all
+looked fine. As it turns out I was using too old cross tools from
+kernel.org [1]. Luckily Fengguang's kbuild robot did catch a bunch of
+them (see the patches in this series).
 
-    trunk
-   x.y-1.51
-      |
-      |
-      |
-release branchpoint
-      |      \
-    x.y.51 x.y-1.90
-      |   prerelease
-      |       |
-      |       |
-      v    x.y-1.91
-      .   prerelease
-      .       |
-      .       |
-              |
-           x.y-1.92
-          prerelease
-              .
-              .
-              .
-            x.y.0
-         base release
-              |
-              |
-              |
-            x.y.1
-      maintenance release
-              |
-              |
-              |
-            x.y.2
-      maintenance release
-              |
-              v
-              .
-              .
-              .
+Since Thomas was also surprised that only a bunch of them showed up,
+I'll better give it another go with more recent compilers.
 
- The revision number is sometimes bumped up on trunk as well, to 52, 53, 
-etc., though the criteria are not completely clear to me; perhaps to make 
-a trunk snapshot "release".
+cheers,
+daniel
 
- And last but not least for non-release builds the snapshot date is 
-automatically appended to the version number reported, as seen above.
-
-  Maciej
+[1] https://www.kernel.org/pub/tools/crosstool
