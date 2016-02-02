@@ -1,92 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ig0-f194.google.com ([209.85.213.194]:35283 "EHLO
-	mail-ig0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751538AbcBAPcD (ORCPT
+Received: from e06smtp07.uk.ibm.com ([195.75.94.103]:38661 "EHLO
+	e06smtp07.uk.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754588AbcBBL3h (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 1 Feb 2016 10:32:03 -0500
-MIME-Version: 1.0
-In-Reply-To: <20160201145355.GK17997@ZenIV.linux.org.uk>
+	Tue, 2 Feb 2016 06:29:37 -0500
+Received: from localhost
+	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-kbuild@vger.kernel.org> from <heiko.carstens@de.ibm.com>;
+	Tue, 2 Feb 2016 11:29:36 -0000
+Date: Tue, 2 Feb 2016 12:29:31 +0100
+From: Heiko Carstens <heiko.carstens@de.ibm.com>
+Subject: Re: [PATCH 06/12] s390: move exports to definitions
+Message-ID: <20160202112931.GD3990@osiris>
 References: <20160129191744.GB17997@ZenIV.linux.org.uk>
-	<1454095114-4128-5-git-send-email-viro@ZenIV.linux.org.uk>
-	<CAMuHMdXTu9t9Jnd4F2X=U16X9psF-_oxj5Oxd6tz9wnK+BY2sQ@mail.gmail.com>
-	<20160201121834.GJ17997@ZenIV.linux.org.uk>
-	<CAMuHMdUUecCdGcK5FxL6e2FeD6-gyoWkbC_+RZzzb_mzHrcGyg@mail.gmail.com>
-	<20160201145355.GK17997@ZenIV.linux.org.uk>
-Date: Mon, 1 Feb 2016 16:32:02 +0100
-Message-ID: <CAMuHMdUsi3DuBTMjocYGd_nDcxR6ueCZ9s880kZYapG6XdGScg@mail.gmail.com>
-Subject: Re: [PATCH 05/12] m68k: move exports to definitions
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Content-Type: text/plain; charset=UTF-8
+ <1454095114-4128-6-git-send-email-viro@ZenIV.linux.org.uk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1454095114-4128-6-git-send-email-viro@ZenIV.linux.org.uk>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Al Viro <viro@zeniv.linux.org.uk>
-Cc: Linux-Arch <linux-arch@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: Al Viro <viro@ZenIV.linux.org.uk>
+Cc: linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hi Al,
+On Fri, Jan 29, 2016 at 07:18:28PM +0000, Al Viro wrote:
+> From: Al Viro <viro@zeniv.linux.org.uk>
+> 
+> Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
+> ---
+>  arch/s390/include/asm/Kbuild  |  1 +
+>  arch/s390/kernel/Makefile     |  2 +-
+>  arch/s390/kernel/entry.S      |  6 ++++++
+>  arch/s390/kernel/mcount.S     |  3 +++
+>  arch/s390/kernel/s390_ksyms.c | 15 ---------------
+>  arch/s390/lib/mem.S           |  3 +++
+>  6 files changed, 14 insertions(+), 16 deletions(-)
+>  delete mode 100644 arch/s390/kernel/s390_ksyms.c
 
-On Mon, Feb 1, 2016 at 3:53 PM, Al Viro <viro@zeniv.linux.org.uk> wrote:
-> On Mon, Feb 01, 2016 at 02:30:16PM +0100, Geert Uytterhoeven wrote:
->> The kernel has all the *di3 variants:
->>
->> 002eae2c T __ashldi3
->> 002eae70 T __ashrdi3
->> 002eaebc T __lshrdi3
->> 002eaf00 T __muldi3
->> 0038a6d0 R __ksymtab___ashldi3
->> 0038a6d8 R __ksymtab___ashrdi3
->> 0038ab68 R __ksymtab___lshrdi3
->> 0038ab90 R __ksymtab___muldi3
->> 003a8a5a r __kstrtab___ashldi3
->> 003a8a64 r __kstrtab___ashrdi3
->> 003a8a6e r __kstrtab___lshrdi3
->> 003a8a78 r __kstrtab___muldi3
->>
->> Hence the *si3 are missing:
->>
->> __divsi3
->> __modsi3
->> __mulsi3
->> __udivsi3
->> __umodsi3
->
-> Does your .config have CPU_HAS_NO_MULDIV64?  Because otherwise these objects
-> won't be built and their exports had been conditional on that as well:
->
-> #if defined(CONFIG_CPU_HAS_NO_MULDIV64)
-> /*
->  * Simpler 68k and ColdFire parts also need a few other gcc functions.
->  */
-> extern long long __divsi3(long long, long long);
-> extern long long __modsi3(long long, long long);
-> extern long long __mulsi3(long long, long long);
-> extern long long __udivsi3(long long, long long);
-> extern long long __umodsi3(long long, long long);
->
-> EXPORT_SYMBOL(__divsi3);
-> EXPORT_SYMBOL(__modsi3);
-> EXPORT_SYMBOL(__mulsi3);
-> EXPORT_SYMBOL(__udivsi3);
-> EXPORT_SYMBOL(__umodsi3);
-> #endif
+Acked-by: Heiko Carstens <heiko.carstens@de.ibm.com>
 
-Oh, I hadn't actually noticed that dependency.
-No, CPU_HAS_NO_MULDIV64 is not set, as I handle the parts with MMU only.
-
-> is what we have in mainline m68k_ksyms.c.  Neither allmodconfig, nor any of
-> defconfigs have it.  And on a coldfire build they are built and exported as
-> expected:
-
-[...]
-
-Then I assume everything is OK. Thanks!
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
