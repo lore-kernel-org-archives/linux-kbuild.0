@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from zeniv.linux.org.uk ([195.92.253.2]:43435 "EHLO
+Received: from zeniv.linux.org.uk ([195.92.253.2]:43430 "EHLO
 	ZenIV.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753432AbcBCVUr (ORCPT
+	with ESMTP id S1751075AbcBCVUq (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 3 Feb 2016 16:20:47 -0500
+	Wed, 3 Feb 2016 16:20:46 -0500
 From: Al Viro <viro@ZenIV.linux.org.uk>
-Subject: [PATCH v2 06/13] s390: move exports to definitions
-Date: Wed,  3 Feb 2016 21:20:38 +0000
-Message-Id: <1454534445-16759-6-git-send-email-viro@ZenIV.linux.org.uk>
+Subject: [PATCH v2 01/13] [kbuild] handle exports in lib-y objects reliably
+Date: Wed,  3 Feb 2016 21:20:33 +0000
+Message-Id: <1454534445-16759-1-git-send-email-viro@ZenIV.linux.org.uk>
 In-Reply-To: <20160203211953.GT17997@ZenIV.linux.org.uk>
 References: <20160203211953.GT17997@ZenIV.linux.org.uk>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -17,141 +17,109 @@ Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
 From: Al Viro <viro@zeniv.linux.org.uk>
 
-Acked-by: Heiko Carstens <heiko.carstens@de.ibm.com>
+Collect the symbols exported by anything that goes into lib.a and
+add an empty object (lib-exports.o) with explicit undefs for each
+of those to obj-y.
+
+That allows to relax the rules regarding the use of exports in
+lib-* objects - right now an object with export can be in lib-*
+only if we are guaranteed that there always will be users in
+built-in parts of the tree, otherwise it needs to be in obj-*.
+As the result, we have an unholy mix of lib- and obj- in lib/Makefile
+and (especially) in arch/*/lib/Makefile.  Moreover, a change in
+generic part of the kernel can lead to mysteriously missing exports
+on some configs.  With this change we don't have to worry about
+that anymore.
+
+One side effect is that built-in.o now pulls everything with exports
+from the corresponding lib.a (if such exists).  That's exactly what
+we want for linking vmlinux and fortunately it's almost the only thing
+built-in.o is used in.  arch/ia64/hp/sim/boot/bootloader is the only
+exception and it's easy to get rid of now - just turn everything in
+arch/ia64/lib into lib-* and don't bother with arch/ia64/lib/built-in.o
+anymore.
+
 Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
 ---
- arch/s390/include/asm/Kbuild  |  1 +
- arch/s390/kernel/Makefile     |  2 +-
- arch/s390/kernel/entry.S      |  6 ++++++
- arch/s390/kernel/mcount.S     |  3 +++
- arch/s390/kernel/s390_ksyms.c | 15 ---------------
- arch/s390/lib/mem.S           |  3 +++
- 6 files changed, 14 insertions(+), 16 deletions(-)
- delete mode 100644 arch/s390/kernel/s390_ksyms.c
+ arch/ia64/hp/sim/boot/Makefile |  2 +-
+ arch/ia64/lib/Makefile         |  8 +++-----
+ scripts/Makefile.build         | 20 ++++++++++++++++++++
+ 3 files changed, 24 insertions(+), 6 deletions(-)
 
-diff --git a/arch/s390/include/asm/Kbuild b/arch/s390/include/asm/Kbuild
-index 9043d2e1..20f196b8 100644
---- a/arch/s390/include/asm/Kbuild
-+++ b/arch/s390/include/asm/Kbuild
-@@ -1,6 +1,7 @@
+diff --git a/arch/ia64/hp/sim/boot/Makefile b/arch/ia64/hp/sim/boot/Makefile
+index 2e805e0..df6e996 100644
+--- a/arch/ia64/hp/sim/boot/Makefile
++++ b/arch/ia64/hp/sim/boot/Makefile
+@@ -33,5 +33,5 @@ $(obj)/vmlinux.bin: vmlinux FORCE
+ LDFLAGS_bootloader = -static -T
  
+ $(obj)/bootloader: $(src)/bootloader.lds $(obj)/bootloader.o $(obj)/boot_head.o $(obj)/fw-emu.o \
+-                   lib/lib.a arch/ia64/lib/built-in.o arch/ia64/lib/lib.a FORCE
++                   lib/lib.a arch/ia64/lib/lib.a FORCE
+ 	$(call if_changed,ld)
+diff --git a/arch/ia64/lib/Makefile b/arch/ia64/lib/Makefile
+index 98771e2..1f3d387 100644
+--- a/arch/ia64/lib/Makefile
++++ b/arch/ia64/lib/Makefile
+@@ -2,17 +2,15 @@
+ # Makefile for ia64-specific library routines..
+ #
  
- generic-y += clkdev.h
-+generic-y += export.h
- generic-y += irq_work.h
- generic-y += mcs_spinlock.h
- generic-y += mm-arch-hooks.h
-diff --git a/arch/s390/kernel/Makefile b/arch/s390/kernel/Makefile
-index 2f5586a..32bbf01 100644
---- a/arch/s390/kernel/Makefile
-+++ b/arch/s390/kernel/Makefile
-@@ -50,7 +50,7 @@ obj-y	+= entry.o reipl.o relocate_kernel.o
- 
- extra-y				+= head.o head64.o vmlinux.lds
- 
--obj-$(CONFIG_MODULES)		+= s390_ksyms.o module.o
-+obj-$(CONFIG_MODULES)		+= module.o
- obj-$(CONFIG_SMP)		+= smp.o
- obj-$(CONFIG_SCHED_TOPOLOGY)	+= topology.o
- obj-$(CONFIG_HIBERNATION)	+= suspend.o swsusp.o
-diff --git a/arch/s390/kernel/entry.S b/arch/s390/kernel/entry.S
-index cd5a191..ca5bf0e 100644
---- a/arch/s390/kernel/entry.S
-+++ b/arch/s390/kernel/entry.S
-@@ -23,6 +23,7 @@
- #include <asm/vx-insn.h>
- #include <asm/setup.h>
- #include <asm/nmi.h>
-+#include <asm/export.h>
- 
- __PT_R0      =	__PT_GPRS
- __PT_R1      =	__PT_GPRS + 8
-@@ -249,6 +250,8 @@ sie_exit:
- 
- 	EX_TABLE(.Lrewind_pad,.Lsie_fault)
- 	EX_TABLE(sie_exit,.Lsie_fault)
-+EXPORT_SYMBOL(sie64a)
-+EXPORT_SYMBOL(sie_exit)
- #endif
- 
- /*
-@@ -815,6 +818,9 @@ ENTRY(save_fpu_regs)
- 	oi	__LC_CPU_FLAGS+7,_CIF_FPU
- 	br	%r14
- .Lsave_fpu_regs_end:
-+#if IS_ENABLED(CONFIG_KVM)
-+EXPORT_SYMBOL(save_fpu_regs)
-+#endif
- 
- /*
-  * Load floating-point controls and floating-point or vector registers.
-diff --git a/arch/s390/kernel/mcount.S b/arch/s390/kernel/mcount.S
-index e499370..9a17e44 100644
---- a/arch/s390/kernel/mcount.S
-+++ b/arch/s390/kernel/mcount.S
-@@ -9,6 +9,7 @@
- #include <asm/asm-offsets.h>
- #include <asm/ftrace.h>
- #include <asm/ptrace.h>
-+#include <asm/export.h>
- 
- 	.section .kprobes.text, "ax"
- 
-@@ -23,6 +24,8 @@ ENTRY(ftrace_stub)
- ENTRY(_mcount)
- 	br	%r14
- 
-+EXPORT_SYMBOL(_mcount)
-+
- ENTRY(ftrace_caller)
- 	.globl	ftrace_regs_caller
- 	.set	ftrace_regs_caller,ftrace_caller
-diff --git a/arch/s390/kernel/s390_ksyms.c b/arch/s390/kernel/s390_ksyms.c
-deleted file mode 100644
-index e67453b..0000000
---- a/arch/s390/kernel/s390_ksyms.c
-+++ /dev/null
-@@ -1,15 +0,0 @@
--#include <linux/module.h>
--#include <linux/kvm_host.h>
--#include <asm/fpu/api.h>
--#include <asm/ftrace.h>
+-obj-y := io.o
 -
--#ifdef CONFIG_FUNCTION_TRACER
--EXPORT_SYMBOL(_mcount);
--#endif
--#if IS_ENABLED(CONFIG_KVM)
--EXPORT_SYMBOL(sie64a);
--EXPORT_SYMBOL(sie_exit);
--EXPORT_SYMBOL(save_fpu_regs);
--#endif
--EXPORT_SYMBOL(memcpy);
--EXPORT_SYMBOL(memset);
-diff --git a/arch/s390/lib/mem.S b/arch/s390/lib/mem.S
-index c6d553e..be9fa65 100644
---- a/arch/s390/lib/mem.S
-+++ b/arch/s390/lib/mem.S
-@@ -5,6 +5,7 @@
-  */
+-lib-y := __divsi3.o __udivsi3.o __modsi3.o __umodsi3.o			\
++lib-y := io.o __divsi3.o __udivsi3.o __modsi3.o __umodsi3.o		\
+ 	__divdi3.o __udivdi3.o __moddi3.o __umoddi3.o			\
+ 	checksum.o clear_page.o csum_partial_copy.o			\
+ 	clear_user.o strncpy_from_user.o strlen_user.o strnlen_user.o	\
+ 	flush.o ip_fast_csum.o do_csum.o				\
+ 	memset.o strlen.o xor.o
  
- #include <linux/linkage.h>
-+#include <asm/export.h>
+-obj-$(CONFIG_ITANIUM)	+= copy_page.o copy_user.o memcpy.o
+-obj-$(CONFIG_MCKINLEY)	+= copy_page_mck.o memcpy_mck.o
++lib-$(CONFIG_ITANIUM)	+= copy_page.o copy_user.o memcpy.o
++lib-$(CONFIG_MCKINLEY)	+= copy_page_mck.o memcpy_mck.o
+ lib-$(CONFIG_PERFMON)	+= carta_random.o
  
- /*
-  * memset implementation
-@@ -60,6 +61,7 @@ ENTRY(memset)
- 	xc	0(1,%r1),0(%r1)
- .Lmemset_mvc:
- 	mvc	1(1,%r1),0(%r1)
-+EXPORT_SYMBOL(memset)
+ AFLAGS___divdi3.o	=
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index 2c47f9c..d041013 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -81,6 +81,7 @@ endif
  
- /*
-  * memcpy implementation
-@@ -86,3 +88,4 @@ ENTRY(memcpy)
- 	j	.Lmemcpy_rest
- .Lmemcpy_mvc:
- 	mvc	0(1,%r1),0(%r3)
-+EXPORT_SYMBOL(memcpy)
+ ifneq ($(strip $(lib-y) $(lib-m) $(lib-)),)
+ lib-target := $(obj)/lib.a
++obj-y += $(obj)/lib-ksyms.o
+ endif
+ 
+ ifneq ($(strip $(obj-y) $(obj-m) $(obj-) $(subdir-m) $(lib-target)),)
+@@ -363,6 +364,25 @@ $(lib-target): $(lib-y) FORCE
+ 	$(call if_changed,link_l_target)
+ 
+ targets += $(lib-target)
++
++dummy-object = $(obj)/__lib_exports.o
++ksyms-lds = $(obj)/lib-ksyms.lds
++ifdef CONFIG_HAVE_UNDERSCORE_SYMBOL_PREFIX
++ref_prefix = EXTERN(_
++else
++ref_prefix = EXTERN(
++endif
++
++quiet_cmd_export_list = EXPORTS $@
++cmd_export_list = $(OBJDUMP) -h $< | \
++	sed -ne '/___ksymtab/{s/.*+/$(ref_prefix)/;s/ .*/)/;p}' >$(ksyms-lds);\
++	rm -f $(dummy-object);\
++	$(AR) rcs$(KBUILD_ARFLAGS) $(dummy-object);\
++	$(LD) $(ld_flags) -r -o $@ -T $(ksyms-lds) $(dummy-object);\
++	rm $(dummy-object) $(ksyms-lds)
++
++$(obj)/lib-ksyms.o: $(lib-target) FORCE
++	$(call if_changed,export_list)
+ endif
+ 
+ #
 -- 
 2.1.4
 
