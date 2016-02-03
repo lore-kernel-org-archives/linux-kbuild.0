@@ -1,41 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from e06smtp07.uk.ibm.com ([195.75.94.103]:38661 "EHLO
-	e06smtp07.uk.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754588AbcBBL3h (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 2 Feb 2016 06:29:37 -0500
-Received: from localhost
-	by e06smtp07.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-kbuild@vger.kernel.org> from <heiko.carstens@de.ibm.com>;
-	Tue, 2 Feb 2016 11:29:36 -0000
-Date: Tue, 2 Feb 2016 12:29:31 +0100
-From: Heiko Carstens <heiko.carstens@de.ibm.com>
-Subject: Re: [PATCH 06/12] s390: move exports to definitions
-Message-ID: <20160202112931.GD3990@osiris>
-References: <20160129191744.GB17997@ZenIV.linux.org.uk>
- <1454095114-4128-6-git-send-email-viro@ZenIV.linux.org.uk>
+Received: from mail.kernel.org ([198.145.29.136]:55054 "EHLO mail.kernel.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S932588AbcBCDbx (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 2 Feb 2016 22:31:53 -0500
+Received: from mail.kernel.org (localhost [127.0.0.1])
+	by mail.kernel.org (Postfix) with ESMTP id 4376820251
+	for <linux-kbuild@vger.kernel.org>; Wed,  3 Feb 2016 03:31:52 +0000 (UTC)
+Received: from mail-ob0-f177.google.com (mail-ob0-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by mail.kernel.org (Postfix) with ESMTPSA id B344F20260
+	for <linux-kbuild@vger.kernel.org>; Wed,  3 Feb 2016 03:31:50 +0000 (UTC)
+Received: by mail-ob0-f177.google.com with SMTP id ba1so12366331obb.3
+        for <linux-kbuild@vger.kernel.org>; Tue, 02 Feb 2016 19:31:50 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1454095114-4128-6-git-send-email-viro@ZenIV.linux.org.uk>
+From: Andy Lutomirski <luto@kernel.org>
+Date: Tue, 2 Feb 2016 19:31:30 -0800
+Message-ID: <CALCETrUh1jq7Di0gTO0R3wN51x=vmd5wU4ODmE0kXK13MhQDnA@mail.gmail.com>
+Subject: Adding Xen to the kbuild bot?
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Al Viro <viro@ZenIV.linux.org.uk>
-Cc: linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Fengguang Wu <fengguang.wu@intel.com>, LKP <lkp@01.org>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
 
-On Fri, Jan 29, 2016 at 07:18:28PM +0000, Al Viro wrote:
-> From: Al Viro <viro@zeniv.linux.org.uk>
-> 
-> Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
-> ---
->  arch/s390/include/asm/Kbuild  |  1 +
->  arch/s390/kernel/Makefile     |  2 +-
->  arch/s390/kernel/entry.S      |  6 ++++++
->  arch/s390/kernel/mcount.S     |  3 +++
->  arch/s390/kernel/s390_ksyms.c | 15 ---------------
->  arch/s390/lib/mem.S           |  3 +++
->  6 files changed, 14 insertions(+), 16 deletions(-)
->  delete mode 100644 arch/s390/kernel/s390_ksyms.c
+Hi all-
 
-Acked-by: Heiko Carstens <heiko.carstens@de.ibm.com>
+Would it make sense to add some basic Xen PV testing to the kbuild bot?
 
+qemu can boot Xen like this:
+
+qemu-system-x86_64 -kernel path/to/xen-4.5.2 -initrd 'path/to/bzImage
+kernelarg otherkernelarg=value" -append 'xenarg other_xen_arg'
+
+This should work with any kernel image for x86 or x86_64 with CONFIG_XEN=y.
+
+Linux has never been been able to do virtio under Xen, which will
+screw up your scripts, but I'm cautiously optimistic that virtio will
+work as expected on a Xen guest starting with Linux 4.6.  If you want
+to play around, it should work in this tree:
+
+https://git.kernel.org/cgit/linux/kernel/git/luto/linux.git/log/?h=virtio_dma
+
+I'm hoping to get that queued up for real in the next couple of days.
+
+--Andy
