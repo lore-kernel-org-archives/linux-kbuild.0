@@ -1,57 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.bmw-carit.de ([62.245.222.98]:35262 "EHLO
-	mail.bmw-carit.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751102AbcBEIQM (ORCPT
+Received: from mail-oi0-f46.google.com ([209.85.218.46]:34402 "EHLO
+	mail-oi0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754962AbcBEULR (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 5 Feb 2016 03:16:12 -0500
-Subject: Re: [PATCH tip v6 2/5] kbuild: Add option to turn incompatible
- pointer check into error
-References: <1453992270-4688-1-git-send-email-daniel.wagner@bmw-carit.de>
- <1453992270-4688-3-git-send-email-daniel.wagner@bmw-carit.de>
- <56AB5867.6020405@bmw-carit.de> <20160129185523.GZ8889@windriver.com>
- <56AEFFF1.1010404@bmw-carit.de>
-From: Daniel Wagner <daniel.wagner@bmw-carit.de>
-Message-ID: <56B45A47.4090400@bmw-carit.de>
-Date: Fri, 5 Feb 2016 09:16:07 +0100
+	Fri, 5 Feb 2016 15:11:17 -0500
+Received: by mail-oi0-f46.google.com with SMTP id w5so47985529oie.1
+        for <linux-kbuild@vger.kernel.org>; Fri, 05 Feb 2016 12:11:17 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <56AEFFF1.1010404@bmw-carit.de>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20160205031116.GB30154@wfg-t540p.sh.intel.com>
+References: <CALCETrUh1jq7Di0gTO0R3wN51x=vmd5wU4ODmE0kXK13MhQDnA@mail.gmail.com>
+ <20160205031116.GB30154@wfg-t540p.sh.intel.com>
+From: Andy Lutomirski <luto@amacapital.net>
+Date: Fri, 5 Feb 2016 12:10:56 -0800
+Message-ID: <CALCETrVssJ2oCqT9eKzoXQ0VWz1O1XB=Gt97djrgPYTfZYt_ug@mail.gmail.com>
+Subject: Re: Adding Xen to the kbuild bot?
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Paul Gortmaker <paul.gortmaker@windriver.com>
-Cc: linux-kernel@vger.kernel.org, linux-rt-users@vger.kernel.org, linux-kbuild@vger.kernel.org, Marcelo Tosatti <mtosatti@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Paul E . McKenney" <paulmck@linux.vnet.ibm.com>, Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, Steven Rostedt <rostedt@goodmis.org>, Boqun Feng <boqun.feng@gmail.com>
+To: Fengguang Wu <fengguang.wu@intel.com>
+Cc: "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, Ian Campbell <ian.campbell@citrix.com>, LKP <lkp@01.org>, "Hu, Robert" <robert.hu@intel.com>, Ian Jackson <Ian.Jackson@eu.citrix.com>
 
-On 02/01/2016 07:49 AM, Daniel Wagner wrote:
-> On 01/29/2016 07:55 PM, Paul Gortmaker wrote:
->> [Re: [PATCH tip v6 2/5] kbuild: Add option to turn incompatible pointer check into error] On 29/01/2016 (Fri 13:17) Daniel Wagner wrote:
->>
->>> On 01/28/2016 03:44 PM, Daniel Wagner wrote:
->>>> +# enforce correct pointer usage
->>>> +KBUILD_CFLAGS += $(call cc-option,-Werror=incompatible-pointer-types)
->>>> +
->>>
->>> As it turns out there are a few fallouts by that one. I'll send fixes
->>> for it.
->>
->> Did you try non-x86 builds with this applied?   I'd be really surprised
->> if there were just a few, once you did allyesconfig/allmodconfig for
->> ARM, MIPS, PPC, etc.
-> 
-> I have tried this with non-x86 builds and apart of a few problems all
-> looked fine. As it turns out I was using too old cross tools from
-> kernel.org [1]. Luckily Fengguang's kbuild robot did catch a bunch of
-> them (see the patches in this series).
+On Feb 4, 2016 7:11 PM, "Fengguang Wu" <fengguang.wu@intel.com> wrote:
+>
+> Hi Andy,
+>
+> CC more people on Xen testing -- in case OSStest already (or plans to)
+> cover such test case.
+>
+> On Tue, Feb 02, 2016 at 07:31:30PM -0800, Andy Lutomirski wrote:
+> > Hi all-
+> >
+> > Would it make sense to add some basic Xen PV testing to the kbuild bot?
+>
+> Do you mean to run basic Xen testing on the various kernel trees that
+> 0day robot covers? That is, to catch kernel regressions when running
+> under Xen.
+>
 
-It turns out this week was particular bad for doing anything productive.
-Anyway, I found some time to fire up some cross compilers and it looks
-promising.
+Yes, exactly.  I've personally broken Linux as a Xen guest at least twice.
 
-I used the cross compiler version 5.2.1 shipped by Fedora 23
-and run allyesconfig/allmodconfig for ARM, ARM64, MIPS64, PPC64
-(swait-v7 and 4.5-rc2). No new errors popped up.
+> If the intention is to catch Xen regressions, the OSStest
+> infrastructure may be a better option:
+>
+>         git://xenbits.xen.org/osstest.git
 
-With some luck I get some more architectures covered soon.
+No, I think that 0day should pick one Xen version and stick with it
+for a while rather than trying to track the latest version.
 
-cheers,
-daniel
+>
+> > qemu can boot Xen like this:
+> >
+> > qemu-system-x86_64 -kernel path/to/xen-4.5.2 -initrd 'path/to/bzImage
+> > kernelarg otherkernelarg=value" -append 'xenarg other_xen_arg'
+> >
+> > This should work with any kernel image for x86 or x86_64 with CONFIG_XEN=y.
+>
+> Got it. If you have simple working test scripts to illustrate test
+> details, it'd be a great help for integrating into OSStest or 0day.
+
+I have a script that will boot to a command prompt, but I don't know
+if that's the right way to do it.  I'm not really sure how 0day works
+under the hood, but treating Xen as a different configuration or arch
+instead of treating it as a different test case might make more sense.
+
+--Andy
