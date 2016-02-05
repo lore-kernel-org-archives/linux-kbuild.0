@@ -1,37 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from zeniv.linux.org.uk ([195.92.253.2]:57305 "EHLO
-	ZenIV.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752562AbcBEASJ (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 4 Feb 2016 19:18:09 -0500
-Date: Fri, 5 Feb 2016 00:18:07 +0000
-From: Al Viro <viro@ZenIV.linux.org.uk>
-Subject: Re: [PATCH v2 01/13] [kbuild] handle exports in lib-y objects
- reliably
-Message-ID: <20160205001807.GV17997@ZenIV.linux.org.uk>
-References: <20160203211953.GT17997@ZenIV.linux.org.uk>
- <1454534445-16759-1-git-send-email-viro@ZenIV.linux.org.uk>
- <56B3D1B7.4080305@suse.cz>
+Received: from mga03.intel.com ([134.134.136.65]:12411 "EHLO mga03.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750723AbcBEDLV (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 4 Feb 2016 22:11:21 -0500
+Date: Fri, 5 Feb 2016 11:11:16 +0800
+From: Fengguang Wu <fengguang.wu@intel.com>
+Subject: Re: Adding Xen to the kbuild bot?
+Message-ID: <20160205031116.GB30154@wfg-t540p.sh.intel.com>
+References: <CALCETrUh1jq7Di0gTO0R3wN51x=vmd5wU4ODmE0kXK13MhQDnA@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <56B3D1B7.4080305@suse.cz>
+In-Reply-To: <CALCETrUh1jq7Di0gTO0R3wN51x=vmd5wU4ODmE0kXK13MhQDnA@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Andy Lutomirski <luto@kernel.org>
+Cc: LKP <lkp@01.org>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, "Hu, Robert" <robert.hu@intel.com>, Ian Jackson <Ian.Jackson@eu.citrix.com>, Ian Campbell <ian.campbell@citrix.com>
 
-On Thu, Feb 04, 2016 at 11:33:27PM +0100, Michal Marek wrote:
-> Acked-by: Michal Marek <mmarek@suse.cz>
-> 
-> Sorry for the delay.
-> > +dummy-object = $(obj)/__lib_exports.o
-> > +ksyms-lds = $(obj)/lib-ksyms.lds
-> 
-> Just a really minor nitpick (no need to resend just because of it): We
-> typically use dotfiles for temporary stuff, e.g.
-> 
-> dummy-object = $(obj)/.lib_exports.o
-> ksyms-lds = $(dot-target).lds
+Hi Andy,
 
-Folded and pushed...
+CC more people on Xen testing -- in case OSStest already (or plans to)
+cover such test case.
+
+On Tue, Feb 02, 2016 at 07:31:30PM -0800, Andy Lutomirski wrote:
+> Hi all-
+> 
+> Would it make sense to add some basic Xen PV testing to the kbuild bot?
+
+Do you mean to run basic Xen testing on the various kernel trees that
+0day robot covers? That is, to catch kernel regressions when running
+under Xen.
+
+If the intention is to catch Xen regressions, the OSStest
+infrastructure may be a better option:
+
+        git://xenbits.xen.org/osstest.git
+
+> qemu can boot Xen like this:
+> 
+> qemu-system-x86_64 -kernel path/to/xen-4.5.2 -initrd 'path/to/bzImage
+> kernelarg otherkernelarg=value" -append 'xenarg other_xen_arg'
+> 
+> This should work with any kernel image for x86 or x86_64 with CONFIG_XEN=y.
+
+Got it. If you have simple working test scripts to illustrate test
+details, it'd be a great help for integrating into OSStest or 0day.
+
+> Linux has never been been able to do virtio under Xen, which will
+> screw up your scripts, but I'm cautiously optimistic that virtio will
+> work as expected on a Xen guest starting with Linux 4.6.  If you want
+> to play around, it should work in this tree:
+> 
+> https://git.kernel.org/cgit/linux/kernel/git/luto/linux.git/log/?h=virtio_dma
+> 
+> I'm hoping to get that queued up for real in the next couple of days.
+
+Thanks,
+Fengguang
