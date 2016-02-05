@@ -1,66 +1,91 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi0-f46.google.com ([209.85.218.46]:34402 "EHLO
-	mail-oi0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754962AbcBEULR (ORCPT
+Received: from smtp06.smtpout.orange.fr ([80.12.242.128]:31516 "EHLO
+	smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751586AbcBEVaP (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 5 Feb 2016 15:11:17 -0500
-Received: by mail-oi0-f46.google.com with SMTP id w5so47985529oie.1
-        for <linux-kbuild@vger.kernel.org>; Fri, 05 Feb 2016 12:11:17 -0800 (PST)
+	Fri, 5 Feb 2016 16:30:15 -0500
+From: Robert Jarzmik <robert.jarzmik@free.fr>
+Subject: Re: kbuild: global makefile and spaces in path
+References: <87lh8nfrx8.fsf@belgarion.home> <568D2927.2010106@suse.com>
+	<87mvshdpjh.fsf@belgarion.home>
+Date: Fri, 05 Feb 2016 22:30:09 +0100
+In-Reply-To: <87mvshdpjh.fsf@belgarion.home> (Robert Jarzmik's message of
+	"Thu, 07 Jan 2016 22:53:54 +0100")
+Message-ID: <87si164zha.fsf@belgarion.home>
 MIME-Version: 1.0
-In-Reply-To: <20160205031116.GB30154@wfg-t540p.sh.intel.com>
-References: <CALCETrUh1jq7Di0gTO0R3wN51x=vmd5wU4ODmE0kXK13MhQDnA@mail.gmail.com>
- <20160205031116.GB30154@wfg-t540p.sh.intel.com>
-From: Andy Lutomirski <luto@amacapital.net>
-Date: Fri, 5 Feb 2016 12:10:56 -0800
-Message-ID: <CALCETrVssJ2oCqT9eKzoXQ0VWz1O1XB=Gt97djrgPYTfZYt_ug@mail.gmail.com>
-Subject: Re: Adding Xen to the kbuild bot?
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Fengguang Wu <fengguang.wu@intel.com>
-Cc: "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, Ian Campbell <ian.campbell@citrix.com>, LKP <lkp@01.org>, "Hu, Robert" <robert.hu@intel.com>, Ian Jackson <Ian.Jackson@eu.citrix.com>
+To: Michal Marek <mmarek@suse.com>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On Feb 4, 2016 7:11 PM, "Fengguang Wu" <fengguang.wu@intel.com> wrote:
->
-> Hi Andy,
->
-> CC more people on Xen testing -- in case OSStest already (or plans to)
-> cover such test case.
->
-> On Tue, Feb 02, 2016 at 07:31:30PM -0800, Andy Lutomirski wrote:
-> > Hi all-
-> >
-> > Would it make sense to add some basic Xen PV testing to the kbuild bot?
->
-> Do you mean to run basic Xen testing on the various kernel trees that
-> 0day robot covers? That is, to catch kernel regressions when running
-> under Xen.
->
+Robert Jarzmik <robert.jarzmik@free.fr> writes:
 
-Yes, exactly.  I've personally broken Linux as a Xen guest at least twice.
-
-> If the intention is to catch Xen regressions, the OSStest
-> infrastructure may be a better option:
+> Michal Marek <mmarek@suse.com> writes:
 >
->         git://xenbits.xen.org/osstest.git
-
-No, I think that 0day should pick one Xen version and stick with it
-for a while rather than trying to track the latest version.
-
+>> On 2015-12-21 21:49, Robert Jarzmik wrote:
+>>> Hi Michal,
+>>> 
+>>> I compiled my kernel in a directory /home/robert jarzmik/kernel, and that's the
+>>> first time I encountered a space in the path containing my kernel in years.
+>>> 
+>>> I was wondering if there is a known constraint that the linux kernel source
+>>> should be contained within a path without any space ?
+>> Whitespace and colons are problematic.
+> Ok.
 >
-> > qemu can boot Xen like this:
-> >
-> > qemu-system-x86_64 -kernel path/to/xen-4.5.2 -initrd 'path/to/bzImage
-> > kernelarg otherkernelarg=value" -append 'xenarg other_xen_arg'
-> >
-> > This should work with any kernel image for x86 or x86_64 with CONFIG_XEN=y.
+>>> If no such constraint is known, maybe you could consider the patch in [1].
+>> I expect it is going to break in lot more places, especially if you do
+>> an O= build. I think it's better to just check for this and error out early.
+> Ok, I'll try to do that. Let's see if the patch at the end of this mail is what
+> you're expecting.
 >
-> Got it. If you have simple working test scripts to illustrate test
-> details, it'd be a great help for integrating into OSStest or 0day.
+> Cheers.
+>
+> -- 
+> Robert
+>
+> ---8<---
+> From 68bcedba135cc50254a234a949ed5cd3b4e92b7a Mon Sep 17 00:00:00 2001
+> From: Robert Jarzmik <robert.jarzmik@free.fr>
+> Date: Thu, 7 Jan 2016 22:39:51 +0100
+> Subject: [PATCH] kbuild: forbid kernel directory to contain spaces
+>
+> When the kernel path contains a space somewhere in the path name, the
+> modules_install target doesn't work anymore, as the path names are not
+> enclosed in double quotes. It is also supposed that and O= build will
+> suffer from the same weakness as modules_install.
+>
+> Instead of checking and improving kbuild to resist to directories
+> including spaces, error out early to prevent any build if the kernel's
+> main directory contains a space.
+>
+> Signed-off-by: Robert Jarzmik <robert.jarzmik@free.fr>
+> ---
+>  Makefile | 4 ++++
+>  1 file changed, 4 insertions(+)
+>
+> diff --git a/Makefile b/Makefile
+> index 45ec34644b4f..72e9b7371b0d 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -128,6 +128,10 @@ _all:
+>  # Cancel implicit rules on top Makefile
+>  $(CURDIR)/Makefile Makefile: ;
+>  
+> +ifneq ($(words $(CURDIR)),1)
+> +  $(error main directory cannot contain spaces)
+> +endif
+> +
+>  ifneq ($(KBUILD_OUTPUT),)
+>  # Invoke a second make in the output directory, passing relevant variables
+>  # check that the output directory actually exists
 
-I have a script that will boot to a command prompt, but I don't know
-if that's the right way to do it.  I'm not really sure how 0day works
-under the hood, but treating Xen as a different configuration or arch
-instead of treating it as a different test case might make more sense.
+Hi Michal,
 
---Andy
+Have you had the time to look at the patch above ?
+
+Cheers.
+
+-- 
+Robert
