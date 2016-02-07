@@ -1,67 +1,27 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail5.windriver.com ([192.103.53.11]:44284 "EHLO mail5.wrs.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752199AbcBGEmR (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 6 Feb 2016 23:42:17 -0500
-Date: Sat, 6 Feb 2016 23:39:17 -0500
-From: Paul Gortmaker <paul.gortmaker@windriver.com>
-Subject: Re: [PATCH tip v6 2/5] kbuild: Add option to turn incompatible
- pointer check into error
-Message-ID: <20160207043916.GR18489@windriver.com>
-References: <1453992270-4688-1-git-send-email-daniel.wagner@bmw-carit.de>
- <1453992270-4688-3-git-send-email-daniel.wagner@bmw-carit.de>
- <56AB5867.6020405@bmw-carit.de>
- <20160129185523.GZ8889@windriver.com>
- <56AEFFF1.1010404@bmw-carit.de>
- <56B45A47.4090400@bmw-carit.de>
+Received: from nbjjceehccei.turbo-smtp.net ([199.244.72.248]:28061 "HELO
+	nbjjceehccei.turbo-smtp.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with SMTP id S1753697AbcBGOoL (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 7 Feb 2016 09:44:11 -0500
+Message-ID: <56B756A9.8040701@sysam.it>
+Date: Sun, 07 Feb 2016 15:37:29 +0100
+From: Angelo Dureghello <angelo@sysam.it>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <56B45A47.4090400@bmw-carit.de>
+Subject: menuconfig project
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Daniel Wagner <daniel.wagner@bmw-carit.de>
-Cc: linux-kernel@vger.kernel.org, linux-rt-users@vger.kernel.org, linux-kbuild@vger.kernel.org, Marcelo Tosatti <mtosatti@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Paul E . McKenney" <paulmck@linux.vnet.ibm.com>, Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, Steven Rostedt <rostedt@goodmis.org>, Boqun Feng <boqun.feng@gmail.com>
+To: linux-kbuild@vger.kernel.org
 
-[Re: [PATCH tip v6 2/5] kbuild: Add option to turn incompatible pointer check into error] On 05/02/2016 (Fri 09:16) Daniel Wagner wrote:
+Hi,
 
-> On 02/01/2016 07:49 AM, Daniel Wagner wrote:
-> > On 01/29/2016 07:55 PM, Paul Gortmaker wrote:
-> >> [Re: [PATCH tip v6 2/5] kbuild: Add option to turn incompatible pointer check into error] On 29/01/2016 (Fri 13:17) Daniel Wagner wrote:
-> >>
-> >>> On 01/28/2016 03:44 PM, Daniel Wagner wrote:
-> >>>> +# enforce correct pointer usage
-> >>>> +KBUILD_CFLAGS += $(call cc-option,-Werror=incompatible-pointer-types)
-> >>>> +
-> >>>
-> >>> As it turns out there are a few fallouts by that one. I'll send fixes
-> >>> for it.
-> >>
-> >> Did you try non-x86 builds with this applied?   I'd be really surprised
-> >> if there were just a few, once you did allyesconfig/allmodconfig for
-> >> ARM, MIPS, PPC, etc.
-> > 
-> > I have tried this with non-x86 builds and apart of a few problems all
-> > looked fine. As it turns out I was using too old cross tools from
-> > kernel.org [1]. Luckily Fengguang's kbuild robot did catch a bunch of
-> > them (see the patches in this series).
-> 
-> It turns out this week was particular bad for doing anything productive.
-> Anyway, I found some time to fire up some cross compilers and it looks
-> promising.
-> 
-> I used the cross compiler version 5.2.1 shipped by Fedora 23
-> and run allyesconfig/allmodconfig for ARM, ARM64, MIPS64, PPC64
-> (swait-v7 and 4.5-rc2). No new errors popped up.
+i have seen there is a new look "menuconfig" project open, and would 
+like to contribute if there is any chance.
 
-SOunds good ; guess my gut feeling about this causing more fallout was
-off the mark.
+Let me know.
 
-P.
---
+Best regards
+Angelo Dureghello
 
-> 
-> With some luck I get some more architectures covered soon.
-> 
-> cheers,
-> daniel
