@@ -1,83 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga03.intel.com ([134.134.136.65]:34259 "EHLO mga03.intel.com"
+Received: from mail5.windriver.com ([192.103.53.11]:44284 "EHLO mail5.wrs.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750748AbcBFBRt (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 5 Feb 2016 20:17:49 -0500
-Date: Sat, 6 Feb 2016 09:17:42 +0800
-From: Fengguang Wu <fengguang.wu@intel.com>
-Subject: Re: Adding Xen to the kbuild bot?
-Message-ID: <20160206011742.GA13627@wfg-t540p.sh.intel.com>
-References: <CALCETrUh1jq7Di0gTO0R3wN51x=vmd5wU4ODmE0kXK13MhQDnA@mail.gmail.com>
- <20160205031116.GB30154@wfg-t540p.sh.intel.com>
- <CALCETrVssJ2oCqT9eKzoXQ0VWz1O1XB=Gt97djrgPYTfZYt_ug@mail.gmail.com>
+	id S1752199AbcBGEmR (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 6 Feb 2016 23:42:17 -0500
+Date: Sat, 6 Feb 2016 23:39:17 -0500
+From: Paul Gortmaker <paul.gortmaker@windriver.com>
+Subject: Re: [PATCH tip v6 2/5] kbuild: Add option to turn incompatible
+ pointer check into error
+Message-ID: <20160207043916.GR18489@windriver.com>
+References: <1453992270-4688-1-git-send-email-daniel.wagner@bmw-carit.de>
+ <1453992270-4688-3-git-send-email-daniel.wagner@bmw-carit.de>
+ <56AB5867.6020405@bmw-carit.de>
+ <20160129185523.GZ8889@windriver.com>
+ <56AEFFF1.1010404@bmw-carit.de>
+ <56B45A47.4090400@bmw-carit.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <CALCETrVssJ2oCqT9eKzoXQ0VWz1O1XB=Gt97djrgPYTfZYt_ug@mail.gmail.com>
+In-Reply-To: <56B45A47.4090400@bmw-carit.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andy Lutomirski <luto@amacapital.net>
-Cc: "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, Ian Campbell <ian.campbell@citrix.com>, LKP <lkp@01.org>, "Hu, Robert" <robert.hu@intel.com>, Ian Jackson <Ian.Jackson@eu.citrix.com>
+To: Daniel Wagner <daniel.wagner@bmw-carit.de>
+Cc: linux-kernel@vger.kernel.org, linux-rt-users@vger.kernel.org, linux-kbuild@vger.kernel.org, Marcelo Tosatti <mtosatti@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Paul E . McKenney" <paulmck@linux.vnet.ibm.com>, Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, Steven Rostedt <rostedt@goodmis.org>, Boqun Feng <boqun.feng@gmail.com>
 
-On Fri, Feb 05, 2016 at 12:10:56PM -0800, Andy Lutomirski wrote:
-> On Feb 4, 2016 7:11 PM, "Fengguang Wu" <fengguang.wu@intel.com> wrote:
-> >
-> > Hi Andy,
-> >
-> > CC more people on Xen testing -- in case OSStest already (or plans to)
-> > cover such test case.
-> >
-> > On Tue, Feb 02, 2016 at 07:31:30PM -0800, Andy Lutomirski wrote:
-> > > Hi all-
-> > >
-> > > Would it make sense to add some basic Xen PV testing to the kbuild bot?
-> >
-> > Do you mean to run basic Xen testing on the various kernel trees that
-> > 0day robot covers? That is, to catch kernel regressions when running
-> > under Xen.
-> >
+[Re: [PATCH tip v6 2/5] kbuild: Add option to turn incompatible pointer check into error] On 05/02/2016 (Fri 09:16) Daniel Wagner wrote:
+
+> On 02/01/2016 07:49 AM, Daniel Wagner wrote:
+> > On 01/29/2016 07:55 PM, Paul Gortmaker wrote:
+> >> [Re: [PATCH tip v6 2/5] kbuild: Add option to turn incompatible pointer check into error] On 29/01/2016 (Fri 13:17) Daniel Wagner wrote:
+> >>
+> >>> On 01/28/2016 03:44 PM, Daniel Wagner wrote:
+> >>>> +# enforce correct pointer usage
+> >>>> +KBUILD_CFLAGS += $(call cc-option,-Werror=incompatible-pointer-types)
+> >>>> +
+> >>>
+> >>> As it turns out there are a few fallouts by that one. I'll send fixes
+> >>> for it.
+> >>
+> >> Did you try non-x86 builds with this applied?   I'd be really surprised
+> >> if there were just a few, once you did allyesconfig/allmodconfig for
+> >> ARM, MIPS, PPC, etc.
+> > 
+> > I have tried this with non-x86 builds and apart of a few problems all
+> > looked fine. As it turns out I was using too old cross tools from
+> > kernel.org [1]. Luckily Fengguang's kbuild robot did catch a bunch of
+> > them (see the patches in this series).
 > 
-> Yes, exactly.  I've personally broken Linux as a Xen guest at least twice.
+> It turns out this week was particular bad for doing anything productive.
+> Anyway, I found some time to fire up some cross compilers and it looks
+> promising.
 > 
-> > If the intention is to catch Xen regressions, the OSStest
-> > infrastructure may be a better option:
-> >
-> >         git://xenbits.xen.org/osstest.git
+> I used the cross compiler version 5.2.1 shipped by Fedora 23
+> and run allyesconfig/allmodconfig for ARM, ARM64, MIPS64, PPC64
+> (swait-v7 and 4.5-rc2). No new errors popped up.
+
+SOunds good ; guess my gut feeling about this causing more fallout was
+off the mark.
+
+P.
+--
+
 > 
-> No, I think that 0day should pick one Xen version and stick with it
-> for a while rather than trying to track the latest version.
-
-OK, got it. So it's suitable to run in 0day.
-
-> > > qemu can boot Xen like this:
-> > >
-> > > qemu-system-x86_64 -kernel path/to/xen-4.5.2 -initrd 'path/to/bzImage
-> > > kernelarg otherkernelarg=value" -append 'xenarg other_xen_arg'
-> > >
-> > > This should work with any kernel image for x86 or x86_64 with CONFIG_XEN=y.
-> >
-> > Got it. If you have simple working test scripts to illustrate test
-> > details, it'd be a great help for integrating into OSStest or 0day.
+> With some luck I get some more architectures covered soon.
 > 
-> I have a script that will boot to a command prompt, but I don't know
-> if that's the right way to do it.  I'm not really sure how 0day works
-> under the hood, but treating Xen as a different configuration or arch
-> instead of treating it as a different test case might make more sense.
-
-We can check the script first, then determine the most suitable way to
-integrate it into 0day. My guess is, it might be suitable to run as a
-new kind of VM host, like this
-
-https://git.kernel.org/cgit/linux/kernel/git/wfg/lkp-tests.git/tree/hosts/vm-kbuild-1G
-
-model: qemu-system-x86_64 -enable-kvm -cpu Haswell,+smep,+smap
-nr_vm: 12
-nr_cpu: 2
-memory: 1G
-disk_type: virtio-scsi
-rootfs: debian-x86_64.cgz
-hdd_partitions: /dev/sda /dev/sdb /dev/sdc /dev/sdd
-swap_partitions: /dev/sde
-
-Thanks,
-Fengguang
+> cheers,
+> daniel
