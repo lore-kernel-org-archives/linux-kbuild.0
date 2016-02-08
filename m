@@ -1,64 +1,31 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f47.google.com ([74.125.82.47]:38626 "EHLO
-	mail-wm0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755273AbcBHVdI (ORCPT
+Received: from asavdk4.altibox.net ([109.247.116.15]:60952 "EHLO
+	asavdk4.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755975AbcBHWUY (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 8 Feb 2016 16:33:08 -0500
-Received: by mail-wm0-f47.google.com with SMTP id p63so134210532wmp.1
-        for <linux-kbuild@vger.kernel.org>; Mon, 08 Feb 2016 13:33:07 -0800 (PST)
-Date: Mon, 8 Feb 2016 22:31:23 +0100
-From: Emese Revfy <re.emese@gmail.com>
-Subject: Re: [PATCH 1/3] GCC plugin infrastructure
-Message-Id: <20160208223123.dae6ad74cde807f3c721f580@gmail.com>
-In-Reply-To: <56B8FA5D.20104@suse.com>
-References: <20160207222721.e0087a07fa604b5dac79a109@gmail.com>
-	<20160207222844.dc001c6608c3f3f4cb7a8e22@gmail.com>
-	<56B8FA5D.20104@suse.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+	Mon, 8 Feb 2016 17:20:24 -0500
+Date: Mon, 8 Feb 2016 23:12:57 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH 1/6] kbuild: record needed exported symbols for modules
+Message-ID: <20160208221256.GA13832@ravnborg.org>
+References: <1454963315-20468-1-git-send-email-nicolas.pitre@linaro.org>
+ <1454963315-20468-2-git-send-email-nicolas.pitre@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1454963315-20468-2-git-send-email-nicolas.pitre@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>
-Cc: linux-kbuild@vger.kernel.org, pageexec@freemail.hu, spender@grsecurity.net, kernel-hardening@lists.openwall.com, keescook@chromium.org
+To: Nicolas Pitre <nicolas.pitre@linaro.org>
+Cc: Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Al Viro <viro@ZenIV.linux.org.uk>, Rusty Russell <rusty@rustcorp.com.au>
 
-On Mon, 8 Feb 2016 21:28:13 +0100
-Michal Marek <mmarek@suse.com> wrote:
+>  
+> +# List module undefined symbols
+> +ifdef CONFIG_TRIM_UNUSED_EXPSYMS
+> +cmd_undef_syms = $(NM) $@ | sed -n 's/^ \+U \(.*\)/\1/p' | xargs echo
+> +else
+> +cmd_undef_syms = echo
+> +endif
+Use ":" as a "do nothing" cammand. Then you do not emit an empty line.
 
-> Dne 7.2.2016 v 22:28 Emese Revfy napsal(a):
-> > This patch allows to build the whole kernel with GCC plugins. It was ported from
-> > grsecurity/PaX. The infrastructure supports building out-of-tree modules and
-> > building in a separate directory. Cross-compilation is supported too but
-> > currently only the x86 architecture enables plugins.
-> > 
-> > The directory of the gcc plugins is tools/gcc. You can use a file or a directory
-> > there. The plugins compile with these options:
-> >  * -fno-rtti: gcc is compiled with this option so the plugins must use it too
-> >  * -fno-exceptions: this is inherited from gcc too
-> >  * -fasynchronous-unwind-tables: this is inherited from gcc too
-> >  * -ggdb: it is useful for debugging a plugin (better backtrace on internal
-> >     errors)
-> >  * -Wno-narrowing: to suppress warnings from gcc headers (ipa-utils.h)
-> >  * -Wno-unused-variable: to suppress warnings from gcc headers (gcc_version
-> >     variable, plugin-version.h)
-> > 
-> > The infrastructure introduces a new Makefile target called gcc-plugins. It
-> > supports all gcc versions from 4.5 to 6.0. The scripts/gcc-plugin.sh script
-> > chooses the proper host compiler (gcc-4.7 can be built by either gcc or g++).
-> > This script also checks the availability of the included headers in
-> > tools/gcc/gcc-common.h.
-> > 
-> > The gcc-common.h header contains frequently included headers for GCC plugins
-> > and it has a compatibility layer for the supported gcc versions.
-> 
-> The changelog is missing an explanation as to why this needs to be part
-> of the kernel build system. To me it looks like building the kernel with
-> a modified build system and non-default compiler flags, which can be
-> achieved by doing make CC=my-gcc-wrapper or somesuch. But I'd love to be
-> corrected.
-
-These compiler options compile the gcc plugins not the kernel. The new gcc option
-used for building the kernel is the -fplugin option.
-
--- 
-Emese
+	Sam
