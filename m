@@ -1,240 +1,115 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from relais.videotron.ca ([24.201.245.36]:26767 "EHLO
-	relais.videotron.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755611AbcBHUnl (ORCPT
+Received: from mail-wm0-f53.google.com ([74.125.82.53]:37996 "EHLO
+	mail-wm0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756104AbcBHVWc (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 8 Feb 2016 15:43:41 -0500
-Content-transfer-encoding: 7BIT
-From: Nicolas Pitre <nicolas.pitre@linaro.org>
-Subject: [PATCH 4/6] fixdep: add fine grained build dependencies for exported
- symbols
-Date: Mon, 08 Feb 2016 15:28:33 -0500
-Message-id: <1454963315-20468-5-git-send-email-nicolas.pitre@linaro.org>
-In-reply-to: <1454963315-20468-1-git-send-email-nicolas.pitre@linaro.org>
-References: <1454963315-20468-1-git-send-email-nicolas.pitre@linaro.org>
+	Mon, 8 Feb 2016 16:22:32 -0500
+Received: by mail-wm0-f53.google.com with SMTP id p63so133890854wmp.1
+        for <linux-kbuild@vger.kernel.org>; Mon, 08 Feb 2016 13:22:32 -0800 (PST)
+Date: Mon, 8 Feb 2016 22:20:47 +0100
+From: Emese Revfy <re.emese@gmail.com>
+Subject: Re: [PATCH 2/3] Add Cyclomatic complexity GCC plugin
+Message-Id: <20160208222047.ac76b445fbf38416a6095425@gmail.com>
+In-Reply-To: <87mvrcdsus.fsf@rasmusvillemoes.dk>
+References: <20160207222721.e0087a07fa604b5dac79a109@gmail.com>
+	<20160207223140.830691e83ab579f46f991410@gmail.com>
+	<87mvrcdsus.fsf@rasmusvillemoes.dk>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Al Viro <viro@ZenIV.linux.org.uk>, Rusty Russell <rusty@rustcorp.com.au>
+To: Rasmus Villemoes <linux@rasmusvillemoes.dk>
+Cc: linux-kbuild@vger.kernel.org, pageexec@freemail.hu, spender@grsecurity.net, kernel-hardening@lists.openwall.com, mmarek@suse.com, keescook@chromium.org
 
-Like for kconfig options, we now have the ability to compile in and out
-individual EXPORT_SYMBOL() declarations based on the content of
-include/generated/expsyms.h.  However we don't want the entire world
-to be rebuilt whenever that file is touched.
+On Mon, 08 Feb 2016 00:05:15 +0100
+Rasmus Villemoes <linux@rasmusvillemoes.dk> wrote:
 
-Let's apply the same build dependency trick used with config symbols to
-those EXPORT_SYMBOL() instances. The key in this case is the actual symbol
-name being exported. All symbol names are collapsed to lowercase path
-names whose time stamp provide fine grained dependencies.
+> having all this in the main makefile. Can't all the plugin-related stuff
+> live in a separate makefile? The same goes for the Kconfig part.
 
-Because of the lowercasing, there might be name collisions triggering
-spurious rebuilds for similar symbols. But this shouldn't be a big issue
-in practice. (This is the case for CONFIG symbols and I didn't want to
-be different here, whatever the original reason for doing so.)
+I will do the Makefile separation but I'm not sure about a separate arch/Kconfig.gcc-plugins
+as arch/Kconfig seems to be a general collection of arch/toolchain dependent features
+so I would rather stick to it until there is a general decision to break it up into smaller pieces.
 
-To avoid needless build overhead, the exported symbol name parsing is
-performed only when CONFIG_TRIM_UNUSED_EXPSYMS is selected. A new cmdline
-argument is added to that effect.
+> Also, I think the compile command lines are already complicated enough
+> (I sometimes use V=1 to see what's going on), so I think it's better
+> that the plugins that need to make themselves known do so "from within"
+> gcc; something like
+> 
+> static void define_feature_macro(void __unused *event_data, void __unused *data)
+> {
+> 	cpp_define(parse_in, "HAVE_ATTRIBUTE_FOOBAR");	
+> }
 
-Signed-off-by: Nicolas Pitre <nico@linaro.org>
----
- scripts/Kbuild.include |  3 ++-
- scripts/Makefile.build |  3 ++-
- scripts/basic/fixdep.c | 67 +++++++++++++++++++++++++++++++++++++++++---------
- 3 files changed, 60 insertions(+), 13 deletions(-)
+I think it is better in the Makefile because -DPLUGIN doesn't matter much in the compile command
+compared to -fplugin and -fplugin-arg. An exmaple compile command with more plugins looks like this:
 
-diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index 1db6d73c8d..13b4032d42 100644
---- a/scripts/Kbuild.include
-+++ b/scripts/Kbuild.include
-@@ -257,7 +257,8 @@ if_changed = $(if $(strip $(any-prereq) $(arg-check)),                       \
- if_changed_dep = $(if $(strip $(any-prereq) $(arg-check) ),                  \
- 	@set -e;                                                             \
- 	$(echo-cmd) $(cmd_$(1));                                             \
--	scripts/basic/fixdep $(depfile) $@ '$(make-cmd)' > $(dot-target).tmp;\
-+	scripts/basic/fixdep $(if $(CONFIG_TRIM_UNUSED_EXPSYMS),-e)	     \
-+		 $(depfile) $@ '$(make-cmd)' > $(dot-target).tmp;	     \
- 	rm -f $(depfile);                                                    \
- 	mv -f $(dot-target).tmp $(dot-target).cmd)
- 
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 1d8b07ea3e..f2c4d93726 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -247,7 +247,8 @@ define rule_cc_o_c
- 	$(cmd_modversions)						  \
- 	$(call echo-cmd,record_mcount)					  \
- 	$(cmd_record_mcount)						  \
--	scripts/basic/fixdep $(depfile) $@ '$(call make-cmd,cc_o_c)' >    \
-+	scripts/basic/fixdep $(if $(CONFIG_TRIM_UNUSED_EXPSYMS),-e)	  \
-+	                     $(depfile) $@ '$(call make-cmd,cc_o_c)' >    \
- 	                                              $(dot-target).tmp;  \
- 	rm -f $(depfile);						  \
- 	mv -f $(dot-target).tmp $(dot-target).cmd
-diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
-index 63f129021d..71099ffe67 100644
---- a/scripts/basic/fixdep.c
-+++ b/scripts/basic/fixdep.c
-@@ -120,13 +120,20 @@
- #define INT_NFIG ntohl(0x4e464947)
- #define INT_FIG_ ntohl(0x4649475f)
- 
-+#define INT_EXPO ntohl(0x4558504f)
-+#define INT_XPOR ntohl(0x58504f52)
-+#define INT_PORT ntohl(0x504f5254)
-+#define INT_ORT_ ntohl(0x4f52545f)
-+
-+int parse_export_symbol;
- char *target;
- char *depfile;
- char *cmdline;
- 
- static void usage(void)
- {
--	fprintf(stderr, "Usage: fixdep <depfile> <target> <cmdline>\n");
-+	fprintf(stderr, "Usage: fixdep [-e] <depfile> <target> <cmdline>\n");
-+	fprintf(stderr, " -e  parse EXPORT_SYMBOL_* too.\n");
- 	exit(1);
- }
- 
-@@ -140,6 +147,7 @@ static void print_cmdline(void)
- 
- struct item {
- 	struct item	*next;
-+	const char	*type;
- 	unsigned int	len;
- 	unsigned int	hash;
- 	char		name[0];
-@@ -161,12 +169,12 @@ static unsigned int strhash(const char *str, unsigned int sz)
- /*
-  * Lookup a value in the configuration string.
-  */
--static int is_defined_config(const char *name, int len, unsigned int hash)
-+static int is_defined_string(const char *type, const char *name, int len, unsigned int hash)
- {
- 	struct item *aux;
- 
- 	for (aux = hashtab[hash % HASHSZ]; aux; aux = aux->next) {
--		if (aux->hash == hash && aux->len == len &&
-+		if (aux->hash == hash && aux->len == len && aux->type == type &&
- 		    memcmp(aux->name, name, len) == 0)
- 			return 1;
- 	}
-@@ -176,7 +184,7 @@ static int is_defined_config(const char *name, int len, unsigned int hash)
- /*
-  * Add a new value to the configuration string.
-  */
--static void define_config(const char *name, int len, unsigned int hash)
-+static void define_string(const char *type, const char *name, int len, unsigned int hash)
- {
- 	struct item *aux = malloc(sizeof(*aux) + len);
- 
-@@ -186,25 +194,26 @@ static void define_config(const char *name, int len, unsigned int hash)
- 	}
- 	memcpy(aux->name, name, len);
- 	aux->len = len;
-+	aux->type = type;
- 	aux->hash = hash;
- 	aux->next = hashtab[hash % HASHSZ];
- 	hashtab[hash % HASHSZ] = aux;
- }
- 
- /*
-- * Record the use of a CONFIG_* word.
-+ * Record the use of a CONFIG_* word, or the argument to EXPORT_MODULE*()
-  */
--static void use_config(const char *m, int slen)
-+static void use_dep(const char *type, const char *m, int slen)
- {
- 	unsigned int hash = strhash(m, slen);
- 	int c, i;
- 
--	if (is_defined_config(m, slen, hash))
-+	if (is_defined_string(type, m, slen, hash))
- 	    return;
- 
--	define_config(m, slen, hash);
-+	define_string(type, m, slen, hash);
- 
--	printf("    $(wildcard include/config/");
-+	printf("    $(wildcard include/%s/", type);
- 	for (i = 0; i < slen; i++) {
- 		c = m[i];
- 		if (c == '_')
-@@ -228,7 +237,17 @@ static void parse_config_file(const char *map, size_t len)
- 		if (*m == INT_ONFI) { p = (char *) m-1; goto conf; }
- 		if (*m == INT_NFIG) { p = (char *) m-2; goto conf; }
- 		if (*m == INT_FIG_) { p = (char *) m-3; goto conf; }
-+
-+		if (!parse_export_symbol)
-+			continue;
-+
-+		if (*m == INT_EXPO) { p = (char *) m  ; goto export; }
-+		if (*m == INT_XPOR) { p = (char *) m-1; goto export; }
-+		if (*m == INT_PORT) { p = (char *) m-2; goto export; }
-+		if (*m == INT_ORT_) { p = (char *) m-3; goto export; }
-+
- 		continue;
-+
- 	conf:
- 		if (p > map + len - 7)
- 			continue;
-@@ -240,12 +259,34 @@ static void parse_config_file(const char *map, size_t len)
- 				if (!memcmp(q - 7, "_MODULE", 7))
- 					q -= 7;
- 				if (q - p > 0)
--					use_config(p, q - p);
-+					use_dep("config", p, q - p);
- 				break;
- 			}
- 		}
- 		continue;
- 
-+	export:
-+		if (p[-1] == '_')
-+			continue;
-+		if (p > map + len - 7 || memcmp(p, "EXPORT_", 7) != 0)
-+			continue;
-+		p += 7;
-+		if (p <= map + len - 8 && memcmp(p, "PER_CPU_", 8) == 0)
-+			p += 8;
-+		if (p > map + len - 6 || memcmp(p, "SYMBOL", 6) != 0)
-+			continue;
-+		p += 6;
-+		while (p < map + len && *p != '(' && *p != '\n')
-+			p++;
-+		q = p + 1;
-+		while (q < map + len && *q != ')' && *q != '\n' && *q != '#')
-+			q++;
-+		if (q >= map + len || *p != '(' || *q != ')')
-+			continue;
-+		while (isblank(*++p));
-+		while (isblank(q[-1])) q--;
-+		if (q - p > 0)
-+			use_dep("config/expsym", p, q - p);
- 	}
- }
- 
-@@ -330,6 +371,7 @@ static void parse_dep_file(void *map, size_t len)
- 			if (strrcmp(s, "include/generated/autoconf.h") &&
- 			    strrcmp(s, "arch/um/include/uml-config.h") &&
- 			    strrcmp(s, "include/linux/kconfig.h") &&
-+			    strrcmp(s, "include/generated/expsyms.h") &&
- 			    strrcmp(s, ".ver")) {
- 				/*
- 				 * Do not list the source file as dependency,
-@@ -429,7 +471,10 @@ int main(int argc, char *argv[])
- {
- 	traps();
- 
--	if (argc != 4)
-+	if (argc == 5 && !strcmp(argv[1], "-e")) {
-+		parse_export_symbol = 1;
-+		argv++;
-+	} else if (argc != 4)
- 		usage();
- 
- 	depfile = argv[1];
+gcc -Wp,-MD,fs/.exec.o.d  -nostdinc -isystem /usr/lib/gcc/x86_64-pc-linux-gnu/4.9.3/include
+-I./arch/x86/include -Iarch/x86/include/generated/uapi -Iarch/x86/include/generated  -Iinclude
+-I./arch/x86/include/uapi -Iarch/x86/include/generated/uapi -I./include/uapi -Iinclude/generated/uapi
+-include ./include/linux/kconfig.h -D__KERNEL__ -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs
+-fno-strict-aliasing -fno-common -Werror-implicit-function-declaration -Wno-format-security -std=gnu89
+-mno-sse -mno-mmx -mno-sse2 -mno-3dnow -mno-avx -m64 -falign-jumps=1 -falign-loops=1 -mno-80387 -mno-fp-ret-in-387
+-mpreferred-stack-boundary=3 -mtune=generic -mno-red-zone -mcmodel=kernel -funit-at-a-time -maccumulate-outgoing-args
+-ffreestanding -DCONFIG_X86_X32_ABI -DCONFIG_AS_FXSAVEQ=1 -DCONFIG_AS_SSSE3=1 -DCONFIG_AS_CRC32=1 -DCONFIG_AS_AVX=1 
+-DCONFIG_AS_AVX2=1 -pipe -Wno-sign-compare -fno-asynchronous-unwind-tables -fno-delete-null-pointer-checks -Os
+-Wno-maybe-uninitialized --param=allow-store-data-races=0 -fno-reorder-blocks -fno-ipa-cp-clone -fno-partial-inlining
+-Wframe-larger-than=2048 -fno-stack-protector -Wno-unused-but-set-variable -fno-omit-frame-pointer
+-fno-optimize-sibling-calls -fno-var-tracking-assignments -fno-inline-functions-called-once -Wdeclaration-after-statement
+-Wno-pointer-sign -fno-strict-overflow -fconserve-stack -Werror=implicit-int -Werror=strict-prototypes -Werror=date-time
+-DCC_HAVE_ASM_GOTO -fplugin=./tools/gcc/stackleak_plugin.so -DSTACKLEAK_PLUGIN
+-fplugin-arg-stackleak_plugin-track-lowest-sp=100 -fplugin=./tools/gcc/colorize_plugin.so
+-fplugin=./tools/gcc/size_overflow_plugin/size_overflow_plugin.so -DSIZE_OVERFLOW_PLUGIN
+-fplugin=./tools/gcc/latent_entropy_plugin.so -DLATENT_ENTROPY_PLUGIN -fplugin=./tools/gcc/structleak_plugin.so 
+-DSTRUCTLEAK_PLUGIN -fplugin=./tools/gcc/initify_plugin.so -DINITIFY_PLUGIN -fplugin=./tools/gcc/randomize_layout_plugin.so
+-DRANDSTRUCT_PLUGIN -fplugin-arg-randomize_layout_plugin-performance-mode    -D"KBUILD_STR(s)=#s" 
+-D"KBUILD_BASENAME=KBUILD_STR(exec)"  -D"KBUILD_MODNAME=KBUILD_STR(exec)" -c -o fs/.tmp_exec.o fs/exec.c
+
+> > +#if BUILDING_GCC_VERSION >= 4009
+> > +namespace {
+> > +static const struct pass_data cyc_complexity_pass_data = {
+> > +#else
+> > +static struct gimple_opt_pass cyc_complexity_pass = {
+> > +	.pass = {
+> > +#endif
+> > +		.type			= GIMPLE_PASS,
+> > +		.name			= "cyc_complexity",
+> > +#if BUILDING_GCC_VERSION >= 4008
+> > +		.optinfo_flags		= OPTGROUP_NONE,
+> > +#endif
+> > +#if BUILDING_GCC_VERSION >= 5000
+> > +#elif BUILDING_GCC_VERSION >= 4009
+> > +		.has_gate		= false,
+> > +		.has_execute		= true,
+> > +#else
+> > +		.gate			= NULL,
+> > +		.execute		= handle_function,
+> > +		.sub			= NULL,
+> > +		.next			= NULL,
+> > +		.static_pass_number	= 0,
+> > +#endif
+> > +		.tv_id			= TV_NONE,
+> > +		.properties_required	= 0,
+> > +		.properties_provided	= 0,
+> > +		.properties_destroyed	= 0,
+> > +		.todo_flags_start	= 0,
+> > +		.todo_flags_finish	= TODO_dump_func
+> > +#if BUILDING_GCC_VERSION < 4009
+> > +	}
+> > +#endif
+> > +};
+> > +
+> 
+> This is really yucky. Is there any way a mere mortal could figure out
+> how to write this? Or could the compatibility layer provide some utility
+> macros that would take care of the boilerplate?
+
+Yes, it isn't too nice but if I put them into macros (for GIMPLE, IPA and RTL) then
+they would have a lot of parameters because the user can and must define too many values
+(especially for an IPA pass which has even more fields).
+The compatibility with all gcc versions makes it further complicated so I think
+the end result would be uglier than it is now.
+
 -- 
-2.5.0
-
+Emese
