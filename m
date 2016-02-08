@@ -1,35 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp09.smtpout.orange.fr ([80.12.242.131]:38536 "EHLO
-	smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750781AbcBHULF (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 8 Feb 2016 15:11:05 -0500
-From: Robert Jarzmik <robert.jarzmik@free.fr>
-Subject: Re: kbuild: global makefile and spaces in path
-References: <87lh8nfrx8.fsf@belgarion.home> <568D2927.2010106@suse.com>
-	<87mvshdpjh.fsf@belgarion.home> <87si164zha.fsf@belgarion.home>
-	<56B8F474.8090302@suse.com>
-Date: Mon, 08 Feb 2016 21:10:59 +0100
-In-Reply-To: <56B8F474.8090302@suse.com> (Michal Marek's message of "Mon, 8
-	Feb 2016 21:03:00 +0100")
-Message-ID: <87h9hj2ca4.fsf@belgarion.home>
+Received: from mx2.suse.de ([195.135.220.15]:46461 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753082AbcBHU2P (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 8 Feb 2016 15:28:15 -0500
+Subject: Re: [PATCH 1/3] GCC plugin infrastructure
+References: <20160207222721.e0087a07fa604b5dac79a109@gmail.com>
+ <20160207222844.dc001c6608c3f3f4cb7a8e22@gmail.com>
+From: Michal Marek <mmarek@suse.com>
+Message-ID: <56B8FA5D.20104@suse.com>
+Date: Mon, 8 Feb 2016 21:28:13 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20160207222844.dc001c6608c3f3f4cb7a8e22@gmail.com>
+Content-Type: text/plain; charset=iso-8859-2
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Emese Revfy <re.emese@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, pageexec@freemail.hu, spender@grsecurity.net, kernel-hardening@lists.openwall.com, keescook@chromium.org
 
-Michal Marek <mmarek@suse.com> writes:
+Dne 7.2.2016 v 22:28 Emese Revfy napsal(a):
+> This patch allows to build the whole kernel with GCC plugins. It was ported from
+> grsecurity/PaX. The infrastructure supports building out-of-tree modules and
+> building in a separate directory. Cross-compilation is supported too but
+> currently only the x86 architecture enables plugins.
+> 
+> The directory of the gcc plugins is tools/gcc. You can use a file or a directory
+> there. The plugins compile with these options:
+>  * -fno-rtti: gcc is compiled with this option so the plugins must use it too
+>  * -fno-exceptions: this is inherited from gcc too
+>  * -fasynchronous-unwind-tables: this is inherited from gcc too
+>  * -ggdb: it is useful for debugging a plugin (better backtrace on internal
+>     errors)
+>  * -Wno-narrowing: to suppress warnings from gcc headers (ipa-utils.h)
+>  * -Wno-unused-variable: to suppress warnings from gcc headers (gcc_version
+>     variable, plugin-version.h)
+> 
+> The infrastructure introduces a new Makefile target called gcc-plugins. It
+> supports all gcc versions from 4.5 to 6.0. The scripts/gcc-plugin.sh script
+> chooses the proper host compiler (gcc-4.7 can be built by either gcc or g++).
+> This script also checks the availability of the included headers in
+> tools/gcc/gcc-common.h.
+> 
+> The gcc-common.h header contains frequently included headers for GCC plugins
+> and it has a compatibility layer for the supported gcc versions.
 
->
-> Hi Robert,
->
-> sorry for the delay. We should also check for colons in path, because
-> they break the build in a similar way.
-Okay, no problem, I'm on it.
+The changelog is missing an explanation as to why this needs to be part
+of the kernel build system. To me it looks like building the kernel with
+a modified build system and non-default compiler flags, which can be
+achieved by doing make CC=my-gcc-wrapper or somesuch. But I'd love to be
+corrected.
 
-Cheers.
-
--- 
-Robert
+Michal
