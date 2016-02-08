@@ -1,141 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f44.google.com ([74.125.82.44]:33226 "EHLO
-	mail-wm0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754645AbcBGXFU (ORCPT
+Received: from mail.linuxfoundation.org ([140.211.169.12]:50834 "EHLO
+	mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754611AbcBHCkZ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 7 Feb 2016 18:05:20 -0500
-Received: by mail-wm0-f44.google.com with SMTP id g62so112250286wme.0
-        for <linux-kbuild@vger.kernel.org>; Sun, 07 Feb 2016 15:05:19 -0800 (PST)
-From: Rasmus Villemoes <linux@rasmusvillemoes.dk>
-Subject: Re: [PATCH 2/3] Add Cyclomatic complexity GCC plugin
-References: <20160207222721.e0087a07fa604b5dac79a109@gmail.com>
-	<20160207223140.830691e83ab579f46f991410@gmail.com>
-Date: Mon, 08 Feb 2016 00:05:15 +0100
-In-Reply-To: <20160207223140.830691e83ab579f46f991410@gmail.com> (Emese
-	Revfy's message of "Sun, 7 Feb 2016 22:31:40 +0100")
-Message-ID: <87mvrcdsus.fsf@rasmusvillemoes.dk>
+	Sun, 7 Feb 2016 21:40:25 -0500
+Date: Sun, 7 Feb 2016 18:40:24 -0800
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH] staging: drop kbuild workaround dummy module from top dir
+Message-ID: <20160208024024.GA14842@kroah.com>
+References: <1447721929-45813-1-git-send-email-paul.gortmaker@windriver.com>
+ <564CB927.5020105@suse.com>
+ <20151118175330.GA5988@kroah.com>
+ <20151209210609.GR22885@windriver.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20151209210609.GR22885@windriver.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Emese Revfy <re.emese@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, pageexec@freemail.hu, spender@grsecurity.net, kernel-hardening@lists.openwall.com, mmarek@suse.com, keescook@chromium.org
+To: Paul Gortmaker <paul.gortmaker@windriver.com>
+Cc: Michal Marek <mmarek@suse.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Sun, Feb 07 2016, Emese Revfy <re.emese@gmail.com> wrote:
+On Wed, Dec 09, 2015 at 04:06:10PM -0500, Paul Gortmaker wrote:
+> [Re: [PATCH] staging: drop kbuild workaround dummy module from top dir] On 18/11/2015 (Wed 09:53) Greg Kroah-Hartman wrote:
+> 
+> > On Wed, Nov 18, 2015 at 06:45:11PM +0100, Michal Marek wrote:
+> > > Dne 17.11.2015 v 01:58 Paul Gortmaker napsal(a):
+> > > > This is essentially a revert of 86f69fe9c069dd8608d238581eea259caa1dfc99
+> > > > ("Staging: workaround build system bug"), but to call it a revert would
+> > > > imply it was wrong -- rather it seems more like it is just no longer
+> > > > required anymore.
+> > > 
+> > > Acked-by: Michal Marek <mmarek@suse.com>
+> > > 
+> > > In fact, I can't even reproduce the original bug with 2.6.27 + the
+> > > initial staging series. I also do not remember any fix for such bug in
+> > > the recent years. 4b024242e8a4 ("kbuild: Fix linking error built-in.o no
+> > > such file or directory") is related, but fixing a different problem.
+> > 
+> > I can't remember the issue at the moment either, but it was a problem
+> > with some sort of config, I'll queue this up and see if anything breaks
+> > :)
+> 
+> Did you detect any fallout?  Just wondering since I didn't see it loop
+> around in linux-next via staging #staging-next yet...
 
-> Add a very simple plugin to demonstrate the GCC plugin infrastructure.
-> This GCC plugin computes the cyclomatic complexity of each function.
->
-> The complexity M of a function's control flow graph is defined as:
->  M = E - N + 2P
-> where
->  E = the number of edges
->  N = the number of nodes
->  P = the number of connected components (exit nodes).
->
-> ---
->  Makefile                          |   6 +-
->  arch/Kconfig                      |  16 +++++
->  tools/gcc/Makefile                |   4 ++
->  tools/gcc/cyc_complexity_plugin.c | 120 ++++++++++++++++++++++++++++++++++++++
->  4 files changed, 145 insertions(+), 1 deletion(-)
->  create mode 100644 tools/gcc/cyc_complexity_plugin.c
->
-> diff --git a/Makefile b/Makefile
-> index 96ce015..9f76c26 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -628,7 +628,11 @@ else
->  PLUGINCC := $(shell $(CONFIG_SHELL) $(srctree)/scripts/gcc-plugin.sh "$(HOSTCC)" "$(HOSTCXX)" "$(CC)")
->  endif
->  ifneq ($(PLUGINCC),)
-> -export PLUGINCC GCC_PLUGINS_CFLAGS GCC_PLUGINS_AFLAGS
-> +ifdef CONFIG_GCC_PLUGIN_CYC_COMPLEXITY
-> +GCC_PLUGIN_CYC_COMPLEXITY_CFLAGS := -fplugin=$(objtree)/tools/gcc/cyc_complexity_plugin.so -DGCC_PLUGIN_CYC_COMPLEXITY
-> +endif
-> +GCC_PLUGINS_CFLAGS := $(GCC_PLUGIN_CYC_COMPLEXITY_CFLAGS)
-> +export PLUGINCC GCC_PLUGINS_CFLAGS GCC_PLUGINS_AFLAGS GCC_PLUGIN_CYC_COMPLEXITY
-
-Hm, when the number of plugins grow, I think it'll be somewhat ugly
-having all this in the main makefile. Can't all the plugin-related stuff
-live in a separate makefile? The same goes for the Kconfig part.
-
-Also, I think the compile command lines are already complicated enough
-(I sometimes use V=1 to see what's going on), so I think it's better
-that the plugins that need to make themselves known do so "from within"
-gcc; something like
-
-static void define_feature_macro(void __unused *event_data, void __unused *data)
-{
-	cpp_define(parse_in, "HAVE_ATTRIBUTE_FOOBAR");	
-}
-
-...
-
-	register_callback(plugin_name, PLUGIN_START_UNIT, &define_feature_macro, NULL);
-
-
-> +
-> +#include "gcc-common.h"
-> +
-> +int plugin_is_GPL_compatible;
-> +
-> +static struct plugin_info cyc_complexity_plugin_info = {
-> +	.version	= "20150523",
-> +	.help		= "Cyclomatic Complexity\n",
-> +};
-> +
-> +static unsigned int handle_function(void)
-> +{
-> +	int complexity;
-> +	expanded_location xloc;
-> +
-> +	// M = E - N + 2P
-> +	complexity = n_edges_for_fn(cfun) - n_basic_blocks_for_fn(cfun) + 2;
-> +
-> +	xloc = expand_location(DECL_SOURCE_LOCATION(current_function_decl));
-> +	fprintf(stderr, "Cyclomatic Complexity %d %s:%s\n", complexity, xloc.file, DECL_NAME_POINTER(current_function_decl));
-> +
-> +	return 0;
-> +}
-> +
-> +#if BUILDING_GCC_VERSION >= 4009
-> +namespace {
-> +static const struct pass_data cyc_complexity_pass_data = {
-> +#else
-> +static struct gimple_opt_pass cyc_complexity_pass = {
-> +	.pass = {
-> +#endif
-> +		.type			= GIMPLE_PASS,
-> +		.name			= "cyc_complexity",
-> +#if BUILDING_GCC_VERSION >= 4008
-> +		.optinfo_flags		= OPTGROUP_NONE,
-> +#endif
-> +#if BUILDING_GCC_VERSION >= 5000
-> +#elif BUILDING_GCC_VERSION >= 4009
-> +		.has_gate		= false,
-> +		.has_execute		= true,
-> +#else
-> +		.gate			= NULL,
-> +		.execute		= handle_function,
-> +		.sub			= NULL,
-> +		.next			= NULL,
-> +		.static_pass_number	= 0,
-> +#endif
-> +		.tv_id			= TV_NONE,
-> +		.properties_required	= 0,
-> +		.properties_provided	= 0,
-> +		.properties_destroyed	= 0,
-> +		.todo_flags_start	= 0,
-> +		.todo_flags_finish	= TODO_dump_func
-> +#if BUILDING_GCC_VERSION < 4009
-> +	}
-> +#endif
-> +};
-> +
-
-This is really yucky. Is there any way a mere mortal could figure out
-how to write this? Or could the compatibility layer provide some utility
-macros that would take care of the boilerplate?
-
-Rasmus
+Sorry, it now just got applied, got way behind on patches :(
