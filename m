@@ -1,42 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qk0-f170.google.com ([209.85.220.170]:35660 "EHLO
-	mail-qk0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932689AbcBIREz (ORCPT
+Received: from mail-wm0-f65.google.com ([74.125.82.65]:35606 "EHLO
+	mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752931AbcBIS5S (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 9 Feb 2016 12:04:55 -0500
-Received: by mail-qk0-f170.google.com with SMTP id o6so72714946qkc.2
-        for <linux-kbuild@vger.kernel.org>; Tue, 09 Feb 2016 09:04:55 -0800 (PST)
-Date: Tue, 9 Feb 2016 12:04:52 -0500 (EST)
-From: Nicolas Pitre <nicolas.pitre@linaro.org>
-Subject: Re: [PATCH 6/6] kconfig option for TRIM_UNUSED_EXPSYMS
-In-Reply-To: <20160209132840.GA7303@infradead.org>
-Message-ID: <alpine.LFD.2.20.1602091158360.17825@knanqh.ubzr>
-References: <1454963315-20468-1-git-send-email-nicolas.pitre@linaro.org> <1454963315-20468-7-git-send-email-nicolas.pitre@linaro.org> <20160209132840.GA7303@infradead.org>
-MIME-Version: 1.0
+	Tue, 9 Feb 2016 13:57:18 -0500
+Received: by mail-wm0-f65.google.com with SMTP id g62so5165073wme.2
+        for <linux-kbuild@vger.kernel.org>; Tue, 09 Feb 2016 10:57:18 -0800 (PST)
+Date: Tue, 9 Feb 2016 19:55:32 +0100
+From: Emese Revfy <re.emese@gmail.com>
+Subject: Re: [PATCH 2/3] Add Cyclomatic complexity GCC plugin
+Message-Id: <20160209195532.fb72f47c5543cc0ada11653a@gmail.com>
+In-Reply-To: <CAGXu5jJb4aJKQDTscJqUve6tO4S=5zU+X7ZGw87MfDoFMQSxLw@mail.gmail.com>
+References: <20160207222721.e0087a07fa604b5dac79a109@gmail.com>
+	<20160207223140.830691e83ab579f46f991410@gmail.com>
+	<CAGXu5jJb4aJKQDTscJqUve6tO4S=5zU+X7ZGw87MfDoFMQSxLw@mail.gmail.com>
+Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Al Viro <viro@ZenIV.linux.org.uk>, Rusty Russell <rusty@rustcorp.com.au>
+To: Kees Cook <keescook@chromium.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, PaX Team <pageexec@freemail.hu>, Brad Spengler <spender@grsecurity.net>, "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, Michal Marek <mmarek@suse.com>
 
-On Tue, 9 Feb 2016, Christoph Hellwig wrote:
-
-> On Mon, Feb 08, 2016 at 03:28:35PM -0500, Nicolas Pitre wrote:
-> > The config option to enable it all.
+On Mon, 8 Feb 2016 20:23:12 -0800
+Kees Cook <keescook@chromium.org> wrote:
+> > +         The complexity M of a function's control flow graph is defined as:
+> > +          M = E - N + 2P
+> > +         where
+> > +
+> > +         E = the number of edges
+> > +         N = the number of nodes
+> > +         P = the number of connected components (exit nodes).
+> > +
+> > +         See Documentation/gcc-plugins.txt for details.
 > 
-> Just enable it by default..
+> Is this plugin documented there? I don't see a chunk for that in this patch.
 
-:-)
+No yet, please see my other response.
 
-Viro took the opposite view with this patch:
-
-http://lkml.org/lkml/2016/2/3/1068
-
-where he's ensuring that no exports are dropped, even if obviously 
-they're not used (otherwise some complaints would have come about).  So 
-I'm not sure if having this turned on by default is a good thing.
-
-But I don't mind being convinced otherwise.
-
-
-Nicolas
+--
+Emese
