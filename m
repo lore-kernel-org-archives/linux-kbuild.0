@@ -1,72 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f67.google.com ([74.125.82.67]:36236 "EHLO
-	mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932542AbcBITQQ (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 9 Feb 2016 14:16:16 -0500
-Date: Tue, 9 Feb 2016 20:14:30 +0100
-From: Emese Revfy <re.emese@gmail.com>
-Subject: Re: [PATCH 3/3] Documentation for the GCC plugin infrastructure
-Message-Id: <20160209201430.67b852830e40e74e4e80762f@gmail.com>
-In-Reply-To: <CAGXu5j+ugmECzm7-ppjVLd=oii5tewUxrRVc5T25hdodeVkq2g@mail.gmail.com>
-References: <20160207222721.e0087a07fa604b5dac79a109@gmail.com>
-	<20160207223257.28ca7020daa09c082e6b9c62@gmail.com>
-	<CAGXu5j+ugmECzm7-ppjVLd=oii5tewUxrRVc5T25hdodeVkq2g@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Received: from ozlabs.org ([103.22.144.67]:39047 "EHLO ozlabs.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754218AbcBIXhG (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 9 Feb 2016 18:37:06 -0500
+From: Rusty Russell <rusty@rustcorp.com.au>
+Subject: Re: [PATCH 6/6] kconfig option for TRIM_UNUSED_EXPSYMS
+In-Reply-To: <alpine.LFD.2.20.1602091158360.17825@knanqh.ubzr>
+References: <1454963315-20468-1-git-send-email-nicolas.pitre@linaro.org> <1454963315-20468-7-git-send-email-nicolas.pitre@linaro.org> <20160209132840.GA7303@infradead.org> <alpine.LFD.2.20.1602091158360.17825@knanqh.ubzr>
+Date: Wed, 10 Feb 2016 10:00:25 +1030
+Message-ID: <87twlhzcku.fsf@rustcorp.com.au>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kees Cook <keescook@chromium.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, PaX Team <pageexec@freemail.hu>, Brad Spengler <spender@grsecurity.net>, "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, Michal Marek <mmarek@suse.com>, "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>
+To: Nicolas Pitre <nicolas.pitre@linaro.org>, Christoph Hellwig <hch@infradead.org>
+Cc: Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Al Viro <viro@ZenIV.linux.org.uk>
 
-On Mon, 8 Feb 2016 20:27:31 -0800
-Kees Cook <keescook@chromium.org> wrote:
+Nicolas Pitre <nicolas.pitre@linaro.org> writes:
+> On Tue, 9 Feb 2016, Christoph Hellwig wrote:
+>
+>> On Mon, Feb 08, 2016 at 03:28:35PM -0500, Nicolas Pitre wrote:
+>> > The config option to enable it all.
+>> 
+>> Just enable it by default..
+>
+> :-)
+>
+> Viro took the opposite view with this patch:
+>
+> http://lkml.org/lkml/2016/2/3/1068
+>
+> where he's ensuring that no exports are dropped, even if obviously 
+> they're not used (otherwise some complaints would have come about).  So 
+> I'm not sure if having this turned on by default is a good thing.
+>
+> But I don't mind being convinced otherwise.
 
-> On Sun, Feb 7, 2016 at 1:32 PM, Emese Revfy <re.emese@gmail.com> wrote:
-> > This is the GCC infrastructure documentation about its operation, how to add
-> > and use a new plugin with an example.
-> >
-> > ---
-> >  Documentation/example_gcc_plugin.c | 103 +++++++++++++++++++++++++++++++++++++
-> 
-> Perhaps this example should live in samples/gcc_plugin/ ?
+People do build out-of-tree modules.  Dropping support for that would
+simplify our lives, but seems fairly controversial :)
 
-Perhaps the example plugin is unnecessary. I should use the cyclomatic complexity plugin
-because I already wrote about it in the sections "Usage" and "How to add a new GCC plugin"
-and they differ by only two lines.
-
-> For an example, I'd expect verbose comments. :) Imagine someone
-> reading it who knows very little about plugins or compiler internals.
-
-I think gcc has very good documentation about plugins, I reference them from gcc-plugins.txt,
-you can see it below. If you think it isn't enough tell me please what you would like to
-see as additional documentation.  
-
-> > +1. Introduction
-> > +===============
-> > +
-> > +GCC plugins are loadable modules that provide extra features to the
-> > +compiler [1]. They are useful for runtime instrumentation and static analysis.
-> > +We can analyse, change and add further code during compilation via
-> > +callbacks [2], GIMPLE [3], IPA [4] and RTL passes [5].
-> > +
-> > +The GCC plugin infrastructure of the kernel supports all gcc versions from
-> > +4.5 to 6.0, building out-of-tree modules, cross-compilation and building in a
-> > +separate directory.
-> > +
-> > +Currently the GCC plugin infrastructure supports only the x86 architecture.
-> > +
-> > +This infrastructure was ported from grsecurity [6] and PaX [7].
-> > +
-> > +--
-> > +[1] https://gcc.gnu.org/onlinedocs/gccint/Plugins.html
-> > +[2] https://gcc.gnu.org/onlinedocs/gccint/Plugin-API.html#Plugin-API
-> > +[3] https://gcc.gnu.org/onlinedocs/gccint/GIMPLE.html
-> > +[4] https://gcc.gnu.org/onlinedocs/gccint/IPA.html
-> > +[5] https://gcc.gnu.org/onlinedocs/gccint/RTL.html
-> > +[6] https://grsecurity.net/
-> > +[7] https://pax.grsecurity.net/
-
--- 
-Emese
+Cheers,
+Rusty.
