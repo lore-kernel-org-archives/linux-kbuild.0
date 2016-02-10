@@ -1,14 +1,14 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
 Received: from relais.videotron.ca ([24.201.245.36]:21848 "EHLO
 	relais.videotron.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750803AbcBJFIk (ORCPT
+	with ESMTP id S1751456AbcBJFIj (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 10 Feb 2016 00:08:40 -0500
+	Wed, 10 Feb 2016 00:08:39 -0500
 Content-transfer-encoding: 7BIT
 From: Nicolas Pitre <nicolas.pitre@linaro.org>
-Subject: [PATCH v2 6/6] kconfig option for TRIM_UNUSED_KSYMS
-Date: Wed, 10 Feb 2016 00:08:28 -0500
-Message-id: <1455080908-22272-7-git-send-email-nicolas.pitre@linaro.org>
+Subject: [PATCH v2 3/6] fixdep: minor cleanup
+Date: Wed, 10 Feb 2016 00:08:25 -0500
+Message-id: <1455080908-22272-4-git-send-email-nicolas.pitre@linaro.org>
 In-reply-to: <1455080908-22272-1-git-send-email-nicolas.pitre@linaro.org>
 References: <1455080908-22272-1-git-send-email-nicolas.pitre@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -16,41 +16,48 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org, Al Viro <viro@ZenIV.linux.org.uk>, Rusty Russell <rusty@rustcorp.com.au>
 
-The config option to enable it all.
+Simple code reorganization to make coming changes more obvious.
 
 Signed-off-by: Nicolas Pitre <nico@linaro.org>
 Acked-by: Rusty Russell <rusty@rustcorp.com.au>
 ---
- init/Kconfig | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ scripts/basic/fixdep.c | 17 ++++++++---------
+ 1 file changed, 8 insertions(+), 9 deletions(-)
 
-diff --git a/init/Kconfig b/init/Kconfig
-index 22320804fb..e6f666331b 100644
---- a/init/Kconfig
-+++ b/init/Kconfig
-@@ -1990,6 +1990,22 @@ config MODULE_COMPRESS_XZ
+diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
+index 5b327c67a8..63f129021d 100644
+--- a/scripts/basic/fixdep.c
++++ b/scripts/basic/fixdep.c
+@@ -236,21 +236,20 @@ static void parse_config_file(const char *map, size_t len)
+ 			continue;
+ 		p += 7;
+ 		for (q = p; q < map + len; q++) {
+-			if (!(isalnum(*q) || *q == '_'))
+-				goto found;
++			if (!(isalnum(*q) || *q == '_')) {
++				if (!memcmp(q - 7, "_MODULE", 7))
++					q -= 7;
++				if (q - p > 0)
++					use_config(p, q - p);
++				break;
++			}
+ 		}
+ 		continue;
  
- endchoice
+-	found:
+-		if (!memcmp(q - 7, "_MODULE", 7))
+-			q -= 7;
+-		if (q - p < 0)
+-			continue;
+-		use_config(p, q - p);
+ 	}
+ }
  
-+config TRIM_UNUSED_KSYMS
-+	bool "Trim unused exported kernel symbols"
-+	depends on MODULES && !UNUSED_SYMBOLS
-+	help
-+	  The kernel and some modules make many symbols available for
-+	  other modules to use via EXPORT_SYMBOL() and variants. Depending
-+	  on the set of modules being selected in your kernel configuration,
-+	  many of those exported symbols might never be used.
-+
-+	  This option allows for unused exported symbols to be dropped from
-+	  the build. In turn, this provides the compiler more opportunities
-+	  (especially when using LTO) for optimizing the code and reducing
-+	  binary size.  This might have some security advantages as well.
-+
-+	  If unsure say N.
-+
- endif # MODULES
- 
- config MODULES_TREE_LOOKUP
+-/* test is s ends in sub */
++/* test if s ends in sub */
+ static int strrcmp(const char *s, const char *sub)
+ {
+ 	int slen = strlen(s);
 -- 
 2.5.0
 
