@@ -1,15 +1,14 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from relais.videotron.ca ([24.201.245.36]:38740 "EHLO
+Received: from relais.videotron.ca ([24.201.245.36]:25651 "EHLO
 	relais.videotron.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750940AbcBJFIh (ORCPT
+	with ESMTP id S1750913AbcBJFIg (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 10 Feb 2016 00:08:37 -0500
+	Wed, 10 Feb 2016 00:08:36 -0500
 Content-transfer-encoding: 7BIT
 From: Nicolas Pitre <nicolas.pitre@linaro.org>
-Subject: [PATCH v2 4/6] fixdep: add fine grained build dependencies for
- exported symbols
-Date: Wed, 10 Feb 2016 00:08:26 -0500
-Message-id: <1455080908-22272-5-git-send-email-nicolas.pitre@linaro.org>
+Subject: [PATCH v2 5/6] create/adjust generated/autoksyms.h
+Date: Wed, 10 Feb 2016 00:08:27 -0500
+Message-id: <1455080908-22272-6-git-send-email-nicolas.pitre@linaro.org>
 In-reply-to: <1455080908-22272-1-git-send-email-nicolas.pitre@linaro.org>
 References: <1455080908-22272-1-git-send-email-nicolas.pitre@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -17,227 +16,160 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org, Al Viro <viro@ZenIV.linux.org.uk>, Rusty Russell <rusty@rustcorp.com.au>
 
-Like for kconfig options, we now have the ability to compile in and
-out individual EXPORT_SYMBOL() declarations based on the content of
-include/generated/autoksyms.h.  However we don't want the entire
-world to be rebuilt whenever that file is touched.
+Given the list of exported symbols needed by all modules, we can create
+a header file containing preprocessor defines for each of those symbols.
+Also, when some symbols are added and/or removed from the list, we can
+update the time on the corresponding files used as build dependencies for
+those symbols. And finally, if any symbol did change state, the
+corresponding source files must be rebuilt.
 
-Let's apply the same build dependency trick used with config symbols
-to those EXPORT_SYMBOL() instances. The key in this case is the actual
-symbol name being exported. All symbol names are collapsed to lowercase
-path names whose time stamp provide fine grained dependencies.
-
-Because of the lowercasing, there might be name collisions triggering
-spurious rebuilds for similar symbols. But this shouldn't be a big issue
-in practice. (This is the case for CONFIG symbols and I didn't want to
-be different here, whatever the original reason for doing so.)
-
-To avoid needless build overhead, the exported symbol name parsing is
-performed only when CONFIG_TRIM_UNUSED_KSYMS is selected. A new cmdline
-argument is added to that effect.
+The insertion or removal of an EXPORT_SYMBOL() entry within a module may
+create or remove the need for another exported symbol.  This is why this
+operation has to be repeated until the list of needed exported symbols
+becomes stable. Only then the final kernel and modules link take place.
 
 Signed-off-by: Nicolas Pitre <nico@linaro.org>
 Acked-by: Rusty Russell <rusty@rustcorp.com.au>
 ---
- scripts/Kbuild.include |  3 ++-
- scripts/Makefile.build |  3 ++-
- scripts/basic/fixdep.c | 69 ++++++++++++++++++++++++++++++++++++++++++--------
- 3 files changed, 62 insertions(+), 13 deletions(-)
+ Makefile                    | 13 ++++++
+ scripts/adjust_autoksyms.sh | 97 +++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 110 insertions(+)
+ create mode 100755 scripts/adjust_autoksyms.sh
 
-diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index 1db6d73c8d..e28afc039a 100644
---- a/scripts/Kbuild.include
-+++ b/scripts/Kbuild.include
-@@ -257,7 +257,8 @@ if_changed = $(if $(strip $(any-prereq) $(arg-check)),                       \
- if_changed_dep = $(if $(strip $(any-prereq) $(arg-check) ),                  \
- 	@set -e;                                                             \
- 	$(echo-cmd) $(cmd_$(1));                                             \
--	scripts/basic/fixdep $(depfile) $@ '$(make-cmd)' > $(dot-target).tmp;\
-+	scripts/basic/fixdep $(if $(CONFIG_TRIM_UNUSED_KSYMS),-e)	     \
-+		 $(depfile) $@ '$(make-cmd)' > $(dot-target).tmp;	     \
- 	rm -f $(depfile);                                                    \
- 	mv -f $(dot-target).tmp $(dot-target).cmd)
+diff --git a/Makefile b/Makefile
+index e916428cf7..bb865095ca 100644
+--- a/Makefile
++++ b/Makefile
+@@ -921,6 +921,10 @@ quiet_cmd_link-vmlinux = LINK    $@
+ # Include targets which we want to
+ # execute if the rest of the kernel build went well.
+ vmlinux: scripts/link-vmlinux.sh $(vmlinux-deps) FORCE
++ifdef CONFIG_TRIM_UNUSED_KSYMS
++	$(Q)$(CONFIG_SHELL) scripts/adjust_autoksyms.sh \
++	  "$(MAKE) KBUILD_MODULES=1 -f $(srctree)/Makefile autoksyms_recursive"
++endif
+ ifdef CONFIG_HEADERS_CHECK
+ 	$(Q)$(MAKE) -f $(srctree)/Makefile headers_check
+ endif
+@@ -935,6 +939,15 @@ ifdef CONFIG_GDB_SCRIPTS
+ endif
+ 	+$(call if_changed,link-vmlinux)
  
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index f4b4320e0d..01b3eae7ed 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -247,7 +247,8 @@ define rule_cc_o_c
- 	$(cmd_modversions)						  \
- 	$(call echo-cmd,record_mcount)					  \
- 	$(cmd_record_mcount)						  \
--	scripts/basic/fixdep $(depfile) $@ '$(call make-cmd,cc_o_c)' >    \
-+	scripts/basic/fixdep $(if $(CONFIG_TRIM_UNUSED_KSYMS),-e)	  \
-+	                     $(depfile) $@ '$(call make-cmd,cc_o_c)' >    \
- 	                                              $(dot-target).tmp;  \
- 	rm -f $(depfile);						  \
- 	mv -f $(dot-target).tmp $(dot-target).cmd
-diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
-index 63f129021d..3fa3e00aca 100644
---- a/scripts/basic/fixdep.c
-+++ b/scripts/basic/fixdep.c
-@@ -120,13 +120,20 @@
- #define INT_NFIG ntohl(0x4e464947)
- #define INT_FIG_ ntohl(0x4649475f)
- 
-+#define INT_EXPO ntohl(0x4558504f)
-+#define INT_XPOR ntohl(0x58504f52)
-+#define INT_PORT ntohl(0x504f5254)
-+#define INT_ORT_ ntohl(0x4f52545f)
++autoksyms_recursive: $(vmlinux-deps)
++	$(Q)$(CONFIG_SHELL) scripts/adjust_autoksyms.sh \
++	  "$(MAKE) KBUILD_MODULES=1 -f $(srctree)/Makefile autoksyms_recursive"
++PHONY += autoksyms_recursive
 +
-+int parse_export_symbol;
- char *target;
- char *depfile;
- char *cmdline;
- 
- static void usage(void)
- {
--	fprintf(stderr, "Usage: fixdep <depfile> <target> <cmdline>\n");
-+	fprintf(stderr, "Usage: fixdep [-e] <depfile> <target> <cmdline>\n");
-+	fprintf(stderr, " -e  parse EXPORT_SYMBOL_* too.\n");
- 	exit(1);
- }
- 
-@@ -140,6 +147,7 @@ static void print_cmdline(void)
- 
- struct item {
- 	struct item	*next;
-+	const char	*type;
- 	unsigned int	len;
- 	unsigned int	hash;
- 	char		name[0];
-@@ -161,12 +169,12 @@ static unsigned int strhash(const char *str, unsigned int sz)
- /*
-  * Lookup a value in the configuration string.
-  */
--static int is_defined_config(const char *name, int len, unsigned int hash)
-+static int is_defined_string(const char *type, const char *name, int len, unsigned int hash)
- {
- 	struct item *aux;
- 
- 	for (aux = hashtab[hash % HASHSZ]; aux; aux = aux->next) {
--		if (aux->hash == hash && aux->len == len &&
-+		if (aux->hash == hash && aux->len == len && aux->type == type &&
- 		    memcmp(aux->name, name, len) == 0)
- 			return 1;
- 	}
-@@ -176,7 +184,7 @@ static int is_defined_config(const char *name, int len, unsigned int hash)
- /*
-  * Add a new value to the configuration string.
-  */
--static void define_config(const char *name, int len, unsigned int hash)
-+static void define_string(const char *type, const char *name, int len, unsigned int hash)
- {
- 	struct item *aux = malloc(sizeof(*aux) + len);
- 
-@@ -186,25 +194,26 @@ static void define_config(const char *name, int len, unsigned int hash)
- 	}
- 	memcpy(aux->name, name, len);
- 	aux->len = len;
-+	aux->type = type;
- 	aux->hash = hash;
- 	aux->next = hashtab[hash % HASHSZ];
- 	hashtab[hash % HASHSZ] = aux;
- }
- 
- /*
-- * Record the use of a CONFIG_* word.
-+ * Record the use of a CONFIG_* word, or the argument to EXPORT_MODULE*()
-  */
--static void use_config(const char *m, int slen)
-+static void use_dep(const char *type, const char *m, int slen)
- {
- 	unsigned int hash = strhash(m, slen);
- 	int c, i;
- 
--	if (is_defined_config(m, slen, hash))
-+	if (is_defined_string(type, m, slen, hash))
- 	    return;
- 
--	define_config(m, slen, hash);
-+	define_string(type, m, slen, hash);
- 
--	printf("    $(wildcard include/config/");
-+	printf("    $(wildcard include/%s/", type);
- 	for (i = 0; i < slen; i++) {
- 		c = m[i];
- 		if (c == '_')
-@@ -228,7 +237,17 @@ static void parse_config_file(const char *map, size_t len)
- 		if (*m == INT_ONFI) { p = (char *) m-1; goto conf; }
- 		if (*m == INT_NFIG) { p = (char *) m-2; goto conf; }
- 		if (*m == INT_FIG_) { p = (char *) m-3; goto conf; }
++# standalone target for easier testing
++include/generated/autoksyms.h: FORCE
++	$(Q)$(CONFIG_SHELL) scripts/adjust_autoksyms.sh true
 +
-+		if (!parse_export_symbol)
-+			continue;
+ # The actual objects are generated when descending,
+ # make sure no implicit rule kicks in
+ $(sort $(vmlinux-deps)): $(vmlinux-dirs) ;
+diff --git a/scripts/adjust_autoksyms.sh b/scripts/adjust_autoksyms.sh
+new file mode 100755
+index 0000000000..0cc8ac3349
+--- /dev/null
++++ b/scripts/adjust_autoksyms.sh
+@@ -0,0 +1,97 @@
++#!/bin/sh
 +
-+		if (*m == INT_EXPO) { p = (char *) m  ; goto export; }
-+		if (*m == INT_XPOR) { p = (char *) m-1; goto export; }
-+		if (*m == INT_PORT) { p = (char *) m-2; goto export; }
-+		if (*m == INT_ORT_) { p = (char *) m-3; goto export; }
++# Script to create/update include/generated/autoksyms.h and dependency files
++#
++# Copyright:	(C) 2016  Linaro Limited
++# Created by:	Nicolas Pitre, January 2016
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License version 2 as
++# published by the Free Software Foundation.
 +
- 		continue;
++# Create/update the include/generated/autoksyms.h file from the list
++# of all module's needed symbols as recorded on the third line of
++# .tmp_versions/*.mod files.
++#
++# For each symbol being added or removed, the corresponding dependency
++# file's timestamp is updated to force a rebuild of the affected source
++# file. All arguments passed to this script are assumed to be a command
++# to be exec'd to trigger a rebuild of those files.
 +
- 	conf:
- 		if (p > map + len - 7)
- 			continue;
-@@ -240,12 +259,36 @@ static void parse_config_file(const char *map, size_t len)
- 				if (!memcmp(q - 7, "_MODULE", 7))
- 					q -= 7;
- 				if (q - p > 0)
--					use_config(p, q - p);
-+					use_dep("config", p, q - p);
- 				break;
- 			}
- 		}
- 		continue;
- 
-+	export:
-+		if (p[-1] == '_' && (p >= map + 2 && p[-2] == '_'))
-+			continue;
-+		if (p > map + len - 7 || memcmp(p, "EXPORT_", 7) != 0)
-+			continue;
-+		p += 7;
-+		if (p <= map + len - 6 && memcmp(p, "EARLY_", 6) == 0)
-+			p += 6;
-+		if (p <= map + len - 8 && memcmp(p, "PER_CPU_", 8) == 0)
-+			p += 8;
-+		if (p > map + len - 6 || memcmp(p, "SYMBOL", 6) != 0)
-+			continue;
-+		p += 6;
-+		while (p < map + len && *p != '(' && *p != '\n')
-+			p++;
-+		q = p + 1;
-+		while (q < map + len && *q != ')' && *q != '\n' && *q != '#')
-+			q++;
-+		if (q >= map + len || *p != '(' || *q != ')')
-+			continue;
-+		while (isblank(*++p));
-+		while (isblank(q[-1])) q--;
-+		if (q - p > 0)
-+			use_dep("config/ksym", p, q - p);
- 	}
- }
- 
-@@ -330,6 +373,7 @@ static void parse_dep_file(void *map, size_t len)
- 			if (strrcmp(s, "include/generated/autoconf.h") &&
- 			    strrcmp(s, "arch/um/include/uml-config.h") &&
- 			    strrcmp(s, "include/linux/kconfig.h") &&
-+			    strrcmp(s, "include/generated/autoksyms.h") &&
- 			    strrcmp(s, ".ver")) {
- 				/*
- 				 * Do not list the source file as dependency,
-@@ -429,7 +473,10 @@ int main(int argc, char *argv[])
- {
- 	traps();
- 
--	if (argc != 4)
-+	if (argc == 5 && !strcmp(argv[1], "-e")) {
-+		parse_export_symbol = 1;
-+		argv++;
-+	} else if (argc != 4)
- 		usage();
- 
- 	depfile = argv[1];
++set -e
++
++cur_ksyms_file="include/generated/autoksyms.h"
++new_ksyms_file="include/generated/autoksyms.h.tmpnew"
++
++info() { [ "$quiet" != "silent_" ] && printf "  %-7s %s\n" "$1" "$2"; }
++
++info "CHK" "$cur_ksyms_file"
++
++# Use "make V=1" to debug this script.
++case "$KBUILD_VERBOSE" in
++*1*)
++	set -x
++	;;
++esac
++
++# We need access to CONFIG_ symbols
++case "${KCONFIG_CONFIG}" in
++*/*)
++	. "${KCONFIG_CONFIG}"
++	;;
++*)
++	# Force using a file from the current directory
++	. "./${KCONFIG_CONFIG}"
++esac
++
++# In case it doesn't exist yet...
++[ -e "$cur_ksyms_file" ] || touch "$cur_ksyms_file"
++
++# Generate a new ksym list file with symbols needed by the current
++# set of modules.
++cat > "$new_ksyms_file" << EOT
++/*
++ * Automatically generated file; DO NOT EDIT.
++ */
++
++EOT
++sed -ns -e '3s/ /\n/gp' "$MODVERDIR"/*.mod | sort -u |
++while read sym; do
++	if [ -n "$CONFIG_HAVE_UNDERSCORE_SYMBOL_PREFIX" ]; then
++		sym=$(sed 's/^_//' <<< "$sym")
++	fi
++	echo "#define __KSYM_${sym} 1"
++done >> "$new_ksyms_file"
++
++# Special case for modversions (see modpost.c)
++if [ -n "$CONFIG_MODVERSIONS" ]; then
++	echo "#define __KSYM_module_layout 1" >> "$new_ksyms_file"
++fi
++
++# Extract changes between old and new list and touch corresponding
++# dependency files.
++# Note: sort -m doesn't work well with underscore prefixed symbols so we
++# use 'cat ... | sort' instead.
++changed=0
++while read sympath; do
++	[ -z "$sympath" ] && continue
++	depfile="include/config/ksym/${sympath}.h"
++	mkdir -p "$(dirname "$depfile")"
++	touch "$depfile"
++	changed=$((changed + 1))
++done <<< "$(
++	cat "$cur_ksyms_file" "$new_ksyms_file" | sort | uniq -u |
++	sed -n 's/^#define __KSYM_\(.*\) 1/\1/p' | tr "A-Z_" "a-z/"  )"
++
++if [ $changed -gt 0 ]; then
++	# Replace the old list with tne new one
++	old=$(grep -c "^#define __KSYM_" "$cur_ksyms_file" || true)
++	new=$(grep -c "^#define __KSYM_" "$new_ksyms_file" || true)
++	info "KSYMS" "symbols: $old old, $new new, $changed changed"
++	info "UPD" "$cur_ksyms_file"
++	mv -f "$new_ksyms_file" "$cur_ksyms_file"
++	# Then trigger a rebuild of affected source files
++	exec $@
++else
++	rm -f "$new_ksyms_file"
++fi
 -- 
 2.5.0
 
