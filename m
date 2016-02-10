@@ -1,43 +1,101 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([103.22.144.67]:39047 "EHLO ozlabs.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754218AbcBIXhG (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 9 Feb 2016 18:37:06 -0500
-From: Rusty Russell <rusty@rustcorp.com.au>
-Subject: Re: [PATCH 6/6] kconfig option for TRIM_UNUSED_EXPSYMS
-In-Reply-To: <alpine.LFD.2.20.1602091158360.17825@knanqh.ubzr>
-References: <1454963315-20468-1-git-send-email-nicolas.pitre@linaro.org> <1454963315-20468-7-git-send-email-nicolas.pitre@linaro.org> <20160209132840.GA7303@infradead.org> <alpine.LFD.2.20.1602091158360.17825@knanqh.ubzr>
-Date: Wed, 10 Feb 2016 10:00:25 +1030
-Message-ID: <87twlhzcku.fsf@rustcorp.com.au>
-MIME-Version: 1.0
-Content-Type: text/plain
+Received: from relais.videotron.ca ([24.201.245.36]:38740 "EHLO
+	relais.videotron.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750803AbcBJFIg (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 10 Feb 2016 00:08:36 -0500
+Content-transfer-encoding: 7BIT
+From: Nicolas Pitre <nicolas.pitre@linaro.org>
+Subject: [PATCH v2 2/6] allow for per-symbol configurable EXPORT_SYMBOL()
+Date: Wed, 10 Feb 2016 00:08:24 -0500
+Message-id: <1455080908-22272-3-git-send-email-nicolas.pitre@linaro.org>
+In-reply-to: <1455080908-22272-1-git-send-email-nicolas.pitre@linaro.org>
+References: <1455080908-22272-1-git-send-email-nicolas.pitre@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicolas Pitre <nicolas.pitre@linaro.org>, Christoph Hellwig <hch@infradead.org>
-Cc: Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Al Viro <viro@ZenIV.linux.org.uk>
+To: Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Al Viro <viro@ZenIV.linux.org.uk>, Rusty Russell <rusty@rustcorp.com.au>
 
-Nicolas Pitre <nicolas.pitre@linaro.org> writes:
-> On Tue, 9 Feb 2016, Christoph Hellwig wrote:
->
->> On Mon, Feb 08, 2016 at 03:28:35PM -0500, Nicolas Pitre wrote:
->> > The config option to enable it all.
->> 
->> Just enable it by default..
->
-> :-)
->
-> Viro took the opposite view with this patch:
->
-> http://lkml.org/lkml/2016/2/3/1068
->
-> where he's ensuring that no exports are dropped, even if obviously 
-> they're not used (otherwise some complaints would have come about).  So 
-> I'm not sure if having this turned on by default is a good thing.
->
-> But I don't mind being convinced otherwise.
+Similar to include/generated/autoconf.h, include/generated/autoksyms.h
+will contain a list of defines for each EXPORT_SYMBOL() that we want
+active. The format is:
 
-People do build out-of-tree modules.  Dropping support for that would
-simplify our lives, but seems fairly controversial :)
+  #define __KSYM_<symbol_name> 1
 
-Cheers,
-Rusty.
+This list will be auto-generated with another patch.  For now we only
+include the preprocessor magic to automatically create or omit the
+corresponding struct kernel_symbol declaration.
+
+Given the content of include/generated/autoksyms.h may not be known in
+advance, an empty file is created early on to let the build proceed.
+
+Signed-off-by: Nicolas Pitre <nico@linaro.org>
+Acked-by: Rusty Russell <rusty@rustcorp.com.au>
+---
+ Makefile               |  2 ++
+ include/linux/export.h | 22 ++++++++++++++++++++--
+ 2 files changed, 22 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 6c1a3c2479..e916428cf7 100644
+--- a/Makefile
++++ b/Makefile
+@@ -986,6 +986,8 @@ prepare2: prepare3 outputmakefile asm-generic
+ prepare1: prepare2 $(version_h) include/generated/utsrelease.h \
+                    include/config/auto.conf
+ 	$(cmd_crmodverdir)
++	$(Q)test -e include/generated/autoksyms.h || \
++	    touch   include/generated/autoksyms.h
+ 
+ archprepare: archheaders archscripts prepare1 scripts_basic
+ 
+diff --git a/include/linux/export.h b/include/linux/export.h
+index 96e45ea463..77afdb2a25 100644
+--- a/include/linux/export.h
++++ b/include/linux/export.h
+@@ -38,7 +38,7 @@ extern struct module __this_module;
+ 
+ #ifdef CONFIG_MODULES
+ 
+-#ifndef __GENKSYMS__
++#if defined(__KERNEL__) && !defined(__GENKSYMS__)
+ #ifdef CONFIG_MODVERSIONS
+ /* Mark the CRC weak since genksyms apparently decides not to
+  * generate a checksums for some symbols */
+@@ -53,7 +53,7 @@ extern struct module __this_module;
+ #endif
+ 
+ /* For every exported symbol, place a struct in the __ksymtab section */
+-#define __EXPORT_SYMBOL(sym, sec)				\
++#define ___EXPORT_SYMBOL(sym, sec)				\
+ 	extern typeof(sym) sym;					\
+ 	__CRC_SYMBOL(sym, sec)					\
+ 	static const char __kstrtab_##sym[]			\
+@@ -65,6 +65,24 @@ extern struct module __this_module;
+ 	__attribute__((section("___ksymtab" sec "+" #sym), unused))	\
+ 	= { (unsigned long)&sym, __kstrtab_##sym }
+ 
++#ifdef CONFIG_TRIM_UNUSED_KSYMS
++
++#include <linux/kconfig.h>
++#include <generated/autoksyms.h>
++
++#define __EXPORT_SYMBOL(sym, sec)				\
++	__cond_export_sym(sym, sec, config_enabled(__KSYM_##sym))
++#define __cond_export_sym(sym, sec, conf)			\
++	___cond_export_sym(sym, sec, conf)
++#define ___cond_export_sym(sym, sec, enabled)			\
++	__cond_export_sym_##enabled(sym, sec)
++#define __cond_export_sym_1(sym, sec) ___EXPORT_SYMBOL(sym, sec)
++#define __cond_export_sym_0(sym, sec) /* nothing */
++
++#else
++#define __EXPORT_SYMBOL ___EXPORT_SYMBOL
++#endif
++
+ #define EXPORT_SYMBOL(sym)					\
+ 	__EXPORT_SYMBOL(sym, "")
+ 
+-- 
+2.5.0
+
