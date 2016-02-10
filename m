@@ -1,63 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
 Received: from relais.videotron.ca ([24.201.245.36]:21848 "EHLO
 	relais.videotron.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751456AbcBJFIj (ORCPT
+	with ESMTP id S1750864AbcBJFIg (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 10 Feb 2016 00:08:39 -0500
+	Wed, 10 Feb 2016 00:08:36 -0500
 Content-transfer-encoding: 7BIT
 From: Nicolas Pitre <nicolas.pitre@linaro.org>
-Subject: [PATCH v2 3/6] fixdep: minor cleanup
-Date: Wed, 10 Feb 2016 00:08:25 -0500
-Message-id: <1455080908-22272-4-git-send-email-nicolas.pitre@linaro.org>
-In-reply-to: <1455080908-22272-1-git-send-email-nicolas.pitre@linaro.org>
-References: <1455080908-22272-1-git-send-email-nicolas.pitre@linaro.org>
+Subject: [PATCH v2 0/6] Trim unused exported kernel symbols
+Date: Wed, 10 Feb 2016 00:08:22 -0500
+Message-id: <1455080908-22272-1-git-send-email-nicolas.pitre@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org, Al Viro <viro@ZenIV.linux.org.uk>, Rusty Russell <rusty@rustcorp.com.au>
 
-Simple code reorganization to make coming changes more obvious.
+This patch series provides the option to omit exported symbols from
+the kernel and modules that are never referenced by any of the selected
+modules in the current kernel configuration.
 
-Signed-off-by: Nicolas Pitre <nico@linaro.org>
-Acked-by: Rusty Russell <rusty@rustcorp.com.au>
----
- scripts/basic/fixdep.c | 17 ++++++++---------
- 1 file changed, 8 insertions(+), 9 deletions(-)
+The original cover letter with lots of test results can be found here:
 
-diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
-index 5b327c67a8..63f129021d 100644
---- a/scripts/basic/fixdep.c
-+++ b/scripts/basic/fixdep.c
-@@ -236,21 +236,20 @@ static void parse_config_file(const char *map, size_t len)
- 			continue;
- 		p += 7;
- 		for (q = p; q < map + len; q++) {
--			if (!(isalnum(*q) || *q == '_'))
--				goto found;
-+			if (!(isalnum(*q) || *q == '_')) {
-+				if (!memcmp(q - 7, "_MODULE", 7))
-+					q -= 7;
-+				if (q - p > 0)
-+					use_config(p, q - p);
-+				break;
-+			}
- 		}
- 		continue;
+	https://lkml.org/lkml/2016/2/8/813
+
+A git branch with those patches is also available here:
+
+	http://git.linaro.org/people/nicolas.pitre/linux.git autoksyms
+
+Changes from v1:
+
+- Replaced "exp" that doesn't convey the right meaning as noted by
+  Sam Ravnborg. The "ksym" identifier is actually what the kernel
+  already uses for this. Therefore:
+  - CONFIG_TRIM_UNUSED_EXPSYMS --> CONFIG_TRIM_UNUSED_KSYMS
+  - include/generated/expsyms.h --> include/generated/autoksyms.h
+  - #define __EXPSYM_* --> #define __KSYM_*
+
+- Some sed regexp improvements as suggested by Al Viro.
+
+- Renamed vmlinux_recursive target to autoksyms_recursive.
+
+- Accept EXPORT_SYMBOL variants with a prefix, e.g. ACPI_EXPORT_SYMBOL.
+
+- Minor commit log clarifications.
+
+- Added Rusty's ACK.
  
--	found:
--		if (!memcmp(q - 7, "_MODULE", 7))
--			q -= 7;
--		if (q - p < 0)
--			continue;
--		use_config(p, q - p);
- 	}
- }
- 
--/* test is s ends in sub */
-+/* test if s ends in sub */
- static int strrcmp(const char *s, const char *sub)
- {
- 	int slen = strlen(s);
--- 
-2.5.0
-
