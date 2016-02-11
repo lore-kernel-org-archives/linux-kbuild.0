@@ -1,58 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from eddie.linux-mips.org ([148.251.95.138]:46094 "EHLO
-	cvs.linux-mips.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752170AbcBKNAf (ORCPT
+Received: from mailapp01.imgtec.com ([195.59.15.196]:16341 "EHLO
+	mailapp01.imgtec.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751153AbcBKOZq (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 11 Feb 2016 08:00:35 -0500
-Received: (from localhost user: 'macro', uid#1010) by eddie.linux-mips.org
-        with ESMTP id S27012512AbcBKNAcCrZkJ (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org> + 1 other);
-        Thu, 11 Feb 2016 14:00:32 +0100
-Date: Thu, 11 Feb 2016 13:00:32 +0000 (GMT)
-From: "Maciej W. Rozycki" <macro@linux-mips.org>
-Subject: Re: [PATCH] ld-version: fix it on Fedora
-In-Reply-To: <20160107181920.GE17031@linux-mips.org>
-Message-ID: <alpine.LFD.2.20.1602111249400.2715@eddie.linux-mips.org>
-References: <1452189189-31188-1-git-send-email-mst@redhat.com> <20160107181920.GE17031@linux-mips.org>
+	Thu, 11 Feb 2016 09:25:46 -0500
+Date: Thu, 11 Feb 2016 14:25:43 +0000
+From: "Maciej W. Rozycki" <macro@imgtec.com>
+Subject: [PATCH] ld-version: Drop the 4th and 5th version components
+Message-ID: <alpine.DEB.2.00.1602111359390.15885@tp.orcam.me.uk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="US-ASCII"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Ralf Baechle <ralf@linux-mips.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, linux-mips@linux-mips.org, James Hogan <james.hogan@imgtec.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Michal Marek <mmarek@suse.com>, James Hogan <james.hogan@imgtec.com>, linux-kbuild@vger.kernel.org, linux-mips@linux-mips.org, linux-kernel@vger.kernel.org
 
-On Thu, 7 Jan 2016, Ralf Baechle wrote:
-
-> > GNU ld version 2.25-15.fc23
-> > 
-> > But ld-version.sh fails to parse this, so e.g.  mips build fails to
-> > enable VDSO, printing a warning that binutils >= 2.24 is required.
-> > 
-> > To fix, teach ld-version to parse this format.
-> > 
-> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > ---
-> > 
-> > Which tree should this be merged through? Mine? MIPS?
-> 
-> MIPS is the sole user of ld-ifversion at this time and taking this through
-> the MIPS tree will avoid possible merge conflicts with James Hogan's
-> pending d5ece1cb074b2c7082c9a2948ac598dd0ad40657 fix ("Fix ld-version.sh to
-> handle large 3rd version part").  So I think I should take this through
-> the MIPS tree.
-
- FYI, I'm still getting a failure here, with:
+... making upstream development binutils snapshots work as expected,
+e.g.:
 
 $ mips64el-linux-ld --version
 GNU ld (GNU Binutils) 2.20.1.20100303
 [...]
-$
+$ 
 
--- so this is a plain upstream development snapshot as these have their 
-date appended.  Can we just get rid of the subversion components beyond 
-the third, as I already suggested?  I.e. stop on the third point and in 
-any case on a non-point-non-digit.
+Signed-off-by: Maciej W. Rozycki <macro@imgtec.com>
+---
+ It may well actually have been a release mistake with the proper 2.20.1 
+maintenance release as I reckon the development vs release build switch is 
+a knob that used to require to be flipped in the sources by the release 
+manager; maybe it still does.  Either way this version guarantees all the 
+2.20.1 stuff to be present as the version number is only bumped up as a 
+release is being made, so any prior snapshot would report 2.20.0.20100302, 
+etc., or maybe even 2.20.0.20100303 if made earlier on on the same day.
 
- I'll post a minimal fix shortly, feel free to enhance it if needed.
+ So please apply, or anyone is welcome to improve it, as my limited awk-fu 
+(which I'll be happy to get corrected) tells me the script doesn't really 
+terminate parsing on a non-point-non-digit character.
+
+ NB comments in scripts/Kbuild.include around `ld-version' have not been 
+accordingly updated in the course of changes made to `ld-version.sh' and 
+they still need such an update, unless we right-shift the version code 
+calculated back by 4 decimal digits, which I hesitated doing here for 
+simplicity.  What was the original reason to add the 4th and 5th 
+components?
 
   Maciej
+
+linux-mips-ld-version-fix.diff
+Index: linux-20160211/scripts/ld-version.sh
+===================================================================
+--- linux-20160211.orig/scripts/ld-version.sh
++++ linux-20160211/scripts/ld-version.sh
+@@ -5,6 +5,6 @@
+ 	gsub(".*version ", "");
+ 	gsub("-.*", "");
+ 	split($1,a, ".");
+-	print a[1]*100000000 + a[2]*1000000 + a[3]*10000 + a[4]*100 + a[5];
++	print a[1]*100000000 + a[2]*1000000 + a[3]*10000;
+ 	exit
+ 	}
