@@ -1,119 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f67.google.com ([74.125.82.67]:34389 "EHLO
-	mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750976AbcBKWor (ORCPT
+Received: from mout.kundenserver.de ([212.227.126.130]:64636 "EHLO
+	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751001AbcBLQHK (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 11 Feb 2016 17:44:47 -0500
-Received: by mail-wm0-f67.google.com with SMTP id p63so13155699wmp.1
-        for <linux-kbuild@vger.kernel.org>; Thu, 11 Feb 2016 14:44:46 -0800 (PST)
-Date: Thu, 11 Feb 2016 23:43:01 +0100
-From: Emese Revfy <re.emese@gmail.com>
-Subject: [PATCH v2 3/3] Documentation for the GCC plugin infrastructure
-Message-Id: <20160211234301.84a5ff8e513f5d5f78478283@gmail.com>
-In-Reply-To: <20160211233646.97c2af3675dc5b0f525f0489@gmail.com>
-References: <20160211233646.97c2af3675dc5b0f525f0489@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+	Fri, 12 Feb 2016 11:07:10 -0500
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH 0/5] gcov fixes and maybe-uninitialized warnings
+Date: Fri, 12 Feb 2016 17:06:17 +0100
+Message-Id: <1455293187-179811-1-git-send-email-arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: pageexec@freemail.hu, spender@grsecurity.net, kernel-hardening@lists.openwall.com, mmarek@suse.com, keescook@chromium.org, linux@rasmusvillemoes.dk
+To: Michal Marek <mmarek@suse.com>
+Cc: linux-arm-kernel@lists.infradead.org, Peter Oberparleiter <oberpar@linux.vnet.ibm.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>
 
-This is the GCC infrastructure documentation about its operation, how to add
-and use a new plugin with an example.
----
- Documentation/gcc-plugins.txt | 68 +++++++++++++++++++++++++++++++++++++++++++
- arch/Kconfig                  |  2 ++
- 2 files changed, 70 insertions(+)
- create mode 100644 Documentation/gcc-plugins.txt
+This series tries to address two related problems:
 
-diff --git a/Documentation/gcc-plugins.txt b/Documentation/gcc-plugins.txt
-new file mode 100644
-index 0000000..e1171c2
---- /dev/null
-+++ b/Documentation/gcc-plugins.txt
-@@ -0,0 +1,68 @@
-+GCC plugin infrastructure
-+=========================
-+
-+
-+1. Introduction
-+===============
-+
-+GCC plugins are loadable modules that provide extra features to the
-+compiler [1]. They are useful for runtime instrumentation and static analysis.
-+We can analyse, change and add further code during compilation via
-+callbacks [2], GIMPLE [3], IPA [4] and RTL passes [5].
-+
-+The GCC plugin infrastructure of the kernel supports all gcc versions from
-+4.5 to 6.0, building out-of-tree modules, cross-compilation and building in a
-+separate directory.
-+
-+Currently the GCC plugin infrastructure supports only the x86 architecture.
-+
-+This infrastructure was ported from grsecurity [6] and PaX [7].
-+
-+--
-+[1] https://gcc.gnu.org/onlinedocs/gccint/Plugins.html
-+[2] https://gcc.gnu.org/onlinedocs/gccint/Plugin-API.html#Plugin-API
-+[3] https://gcc.gnu.org/onlinedocs/gccint/GIMPLE.html
-+[4] https://gcc.gnu.org/onlinedocs/gccint/IPA.html
-+[5] https://gcc.gnu.org/onlinedocs/gccint/RTL.html
-+[6] https://grsecurity.net/
-+[7] https://pax.grsecurity.net/
-+
-+
-+2. Files
-+========
-+
-+$(src)/tools/gcc
-+	This is the directory of the GCC plugins.
-+
-+$(src)/tools/gcc/gcc-common.h
-+	This is a compatibility header for GCC plugins.
-+	It should be always included instead of individual gcc headers.
-+
-+$(src)/scripts/gcc-plugin.sh
-+	This script checks the availability of the included headers in
-+	gcc-common.h and chooses the proper host compiler to build the plugins
-+	(gcc-4.7 can be built by either gcc or g++).
-+
-+
-+3. Usage
-+========
-+
-+Enable a GCC plugin based feature in the kernel config:
-+
-+	CONFIG_GCC_PLUGIN_CYC_COMPLEXITY = y
-+
-+To compile only the plugin(s):
-+
-+	make gcc-plugins
-+
-+or just run the kernel make and compile the whole kernel with
-+the cyclomatic complexity GCC plugin.
-+
-+
-+4. How to add a new GCC plugin
-+==============================
-+
-+The GCC plugins are in $(src)/tools/gcc/. You can use a file or a directory
-+here. It must be added to $(src)/tools/gcc/Makefile,
-+$(src)/scripts/Makefile.gcc-plugins and $(src)/arch/Kconfig.
-+See the cyc_complexity_plugin.c (CONFIG_GCC_PLUGIN_CYC_COMPLEXITY) GCC plugin.
-diff --git a/arch/Kconfig b/arch/Kconfig
-index a558ecb..38964dd 100644
---- a/arch/Kconfig
-+++ b/arch/Kconfig
-@@ -377,6 +377,8 @@ config GCC_PLUGIN_CYC_COMPLEXITY
- 	  N = the number of nodes
- 	  P = the number of connected components (exit nodes).
- 
-+	  See Documentation/gcc-plugins.txt for details.
-+
- endmenu # "GCC plugins"
- 
- config HAVE_CC_STACKPROTECTOR
+* getting better "variable may be used uninitialized" warnings
+  in allmodconfig and randconfig builds
+
+* improving GCOV_PROFILE support
+
+Surprisingly, these two are related, so I have a single series that
+I hope to get merged through the Kbuild tree.
+
+I have built many thousands of ARM randconfig kernels and created
+patches for every single warning and error I found, and submitted
+most of them for inclusion. The "may be used uninitialized" warnings
+are both the most annoying and the most helpful ones that gcc
+gives us, so this tries to make them more useful, including three
+steps:
+
+1. Limit the false positives as much as we can: Aside from
+   CC_OPTIMIZE_FOR_SIZE, three other options (UBSAN_SANITIZE_ALL,
+   PROFILE_ALL_BRANCHES and GCOV_PROFILE_ALL) confuse the
+   compiler (in versions 4.9 through 5.3, and to a lesser degree
+   on older versions) so we get a lot of extra warnings. We
+   already disable the warnings for CC_OPTIMIZE_FOR_SIZE, and
+   this series also disables them for the other two, which are
+   rarely used in practice but do show up in randconfig builds
+   all the time.
+2. Ensure we actually see them on 'allmodconfig' builds: Today they
+   are disabled, because CC_OPTIMIZE_FOR_SIZE disables them.
+   UBSAN_SANITIZE_ALL and PROFILE_ALL_BRANCHES are defined in
+   a way that they don't get turned on for allmodconfig, and
+   we need to do the samem for GCOV_PROFILE_ALL and
+   CC_OPTIMIZE_FOR_SIZE.
+3. Fix all known such warnings: The warnings should stick out,
+   so we can fix them once they first appear. Today they often
+   get ignored because of all the false positives.
+
+For GCOV support, another problem showed up, resulting in an increased
+risk for kernel stack overflow, aside from getting a number of
+warnings about the stack size. I'm also including a patch to
+address that here.
+
+	Arnd
+
+Arnd Bergmann (5):
+  Kbuild: change CC_OPTIMIZE_FOR_SIZE definition
+  Kbuild: disable 'maybe-uninitialized' warning for
+    CONFIG_PROFILE_ALL_BRANCHES
+  gcov: disable for COMPILE_TEST
+  gcov: disable tree-loop-im to reduce stack usage
+  gcov: disable -Wmaybe-uninitialized warning
+
+ Makefile            |  8 ++++++--
+ init/Kconfig        | 13 +++++++++++++
+ kernel/gcov/Kconfig |  1 +
+ 3 files changed, 20 insertions(+), 2 deletions(-)
+
 -- 
-2.4.1
+2.7.0
+
