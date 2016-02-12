@@ -1,70 +1,101 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.126.131]:55132 "EHLO
-	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750917AbcBLQHZ (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 12 Feb 2016 11:07:25 -0500
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH 1/5] Kbuild: change CC_OPTIMIZE_FOR_SIZE definition
-Date: Fri, 12 Feb 2016 17:06:18 +0100
-Message-Id: <1455293187-179811-2-git-send-email-arnd@arndb.de>
-In-Reply-To: <1455293187-179811-1-git-send-email-arnd@arndb.de>
-References: <1455293187-179811-1-git-send-email-arnd@arndb.de>
+Received: from lists.s-osg.org ([54.187.51.154]:48120 "EHLO lists.s-osg.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751016AbcBLQKu (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 12 Feb 2016 11:10:50 -0500
+Subject: Re: [PATCH v4 0/2] Create specific kconfig for kselftest
+References: <1452238054-15482-1-git-send-email-bamvor.zhangjian@linaro.org>
+From: Shuah Khan <shuahkh@osg.samsung.com>
+Message-ID: <56BE03EF.70607@osg.samsung.com>
+Date: Fri, 12 Feb 2016 09:10:23 -0700
+MIME-Version: 1.0
+In-Reply-To: <1452238054-15482-1-git-send-email-bamvor.zhangjian@linaro.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>
-Cc: linux-arm-kernel@lists.infradead.org, Peter Oberparleiter <oberpar@linux.vnet.ibm.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>
+To: Bamvor Jian Zhang <bamvor.zhangjian@linaro.org>, linux-api@vger.kernel.org, mmarek@suse.com, Shuah Khan <shuahkh@osg.samsung.com>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, yann.morin.1998@free.fr, khilman@linaro.org, tyler.baker@linaro.org, broonie@kernel.org, mpe@ellerman.id.au, dvhart@infradead.org
 
-CC_OPTIMIZE_FOR_SIZE disables the often useful -Wmaybe-unused warning,
-because that causes a ridiculous amount of false positives when combined
-with -Os.
+On 01/08/2016 12:27 AM, Bamvor Jian Zhang wrote:
+> There is a discussion about improving the usability of kselftest by
+> creating test-specific kconfig in recent kernel Summit. The first
+> three versions could be found at [1], [2], [3].
+> 
+> Patch 1 keep test-specific kconfig fragments inside each selftest so
+> that merge_configs.sh could build up a kernel configuration that can
+> test the specific or all feature(s).
+> 
+> Patch 2 add config option(kselftest-merge) in make file as a
+> helper to merge all the test config dependecies to .config.
 
-This means a lot of warnings don't show up in testing by the developers
-that should see them with an 'allmodconfig' kernel that has
-CC_OPTIMIZE_FOR_SIZE enabled, but only later in randconfig builds
-that don't.
+Hi Michal,
 
-This changes the Kconfig logic around CC_OPTIMIZE_FOR_SIZE to make
-it a 'choice' statement defaulting to CC_OPTIMIZE_FOR_PERFORMANCE
-that gets added for this purpose. The allmodconfig and allyesconfig
-kernels now default to -O2 with the maybe-unused warning enabled.
+Are you okay with the changes to the second patch
+in this series? Would you like to me to send the
+second one up through linux-kselftest tree or do
+you want to take this through your tree?
 
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- init/Kconfig | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+Please let me know.
 
-diff --git a/init/Kconfig b/init/Kconfig
-index 651ec15ecddb..159a542ef3fc 100644
---- a/init/Kconfig
-+++ b/init/Kconfig
-@@ -1305,6 +1305,17 @@ source "usr/Kconfig"
- 
- endif
- 
-+choice
-+	prompt "Compiler optimization level"
-+	default CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE
-+
-+config CC_OPTIMIZE_FOR_PERFORMANCE
-+	bool "Optimize for performance"
-+	help
-+	  This is the default optimization level for the kernel, building
-+	  with the "-O2" compiler flag for best performance and most
-+	  helpful compile-time warnings.
-+
- config CC_OPTIMIZE_FOR_SIZE
- 	bool "Optimize for size"
- 	help
-@@ -1313,6 +1324,8 @@ config CC_OPTIMIZE_FOR_SIZE
- 
- 	  If unsure, say N.
- 
-+endchoice
-+
- config SYSCTL
- 	bool
- 
+thanks,
+-- Shuah
+> 
+> Changes since v3:
+> 1.  move the target kselftest-mergeconfig from scripts/kconfig/Makfile
+>     to toplevel Makefile. And rename to kselftest-merge to avoid the
+>     conflict with "%config" target.
+> 
+> Changes since v2:
+> 1.  Fix the misuse of objtree and srctree in the
+>     kselftest-mergeconfig target.
+> 
+> Changes since v1:
+> 1.  Add kselftest-mergeconfig in scripts/kconfig/Makefile according
+>     to the suggestion from Michael.
+> 
+> [1] http://www.spinics.net/lists/linux-api/msg15533.html
+> [2] http://www.spinics.net/lists/linux-api/msg15593.html
+> [3] http://comments.gmane.org/gmane.linux.kernel/2110565
+> 
+> Bamvor Jian Zhang (2):
+>   selftests: create test-specific kconfig fragments
+>   Makefile: add kselftest-merge
+> 
+>  Makefile                                      | 11 +++++++++++
+>  tools/testing/selftests/cpu-hotplug/config    |  2 ++
+>  tools/testing/selftests/firmware/config       |  1 +
+>  tools/testing/selftests/ftrace/config         |  1 +
+>  tools/testing/selftests/ipc/config            |  2 ++
+>  tools/testing/selftests/memory-hotplug/config |  4 ++++
+>  tools/testing/selftests/mount/config          |  2 ++
+>  tools/testing/selftests/net/config            |  3 +++
+>  tools/testing/selftests/pstore/config         |  4 ++++
+>  tools/testing/selftests/seccomp/config        |  2 ++
+>  tools/testing/selftests/static_keys/config    |  1 +
+>  tools/testing/selftests/user/config           |  1 +
+>  tools/testing/selftests/vm/config             |  1 +
+>  tools/testing/selftests/zram/config           |  2 ++
+>  14 files changed, 37 insertions(+)
+>  create mode 100644 tools/testing/selftests/cpu-hotplug/config
+>  create mode 100644 tools/testing/selftests/firmware/config
+>  create mode 100644 tools/testing/selftests/ftrace/config
+>  create mode 100644 tools/testing/selftests/ipc/config
+>  create mode 100644 tools/testing/selftests/memory-hotplug/config
+>  create mode 100644 tools/testing/selftests/mount/config
+>  create mode 100644 tools/testing/selftests/net/config
+>  create mode 100644 tools/testing/selftests/pstore/config
+>  create mode 100644 tools/testing/selftests/seccomp/config
+>  create mode 100644 tools/testing/selftests/static_keys/config
+>  create mode 100644 tools/testing/selftests/user/config
+>  create mode 100644 tools/testing/selftests/vm/config
+>  create mode 100644 tools/testing/selftests/zram/config
+> 
+
+
 -- 
-2.7.0
-
+Shuah Khan
+Sr. Linux Kernel Developer
+Open Source Innovation Group
+Samsung Research America (Silicon Valley)
+shuahkh@osg.samsung.com | (970) 217-8978
