@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.126.134]:52765 "EHLO
+Received: from mout.kundenserver.de ([212.227.126.131]:55132 "EHLO
 	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750917AbcBLQHe (ORCPT
+	with ESMTP id S1750917AbcBLQHZ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 12 Feb 2016 11:07:34 -0500
+	Fri, 12 Feb 2016 11:07:25 -0500
 From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH 2/5] Kbuild: disable 'maybe-uninitialized' warning for CONFIG_PROFILE_ALL_BRANCHES
-Date: Fri, 12 Feb 2016 17:06:19 +0100
-Message-Id: <1455293187-179811-3-git-send-email-arnd@arndb.de>
+Subject: [PATCH 1/5] Kbuild: change CC_OPTIMIZE_FOR_SIZE definition
+Date: Fri, 12 Feb 2016 17:06:18 +0100
+Message-Id: <1455293187-179811-2-git-send-email-arnd@arndb.de>
 In-Reply-To: <1455293187-179811-1-git-send-email-arnd@arndb.de>
 References: <1455293187-179811-1-git-send-email-arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,51 +15,56 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.com>
 Cc: linux-arm-kernel@lists.infradead.org, Peter Oberparleiter <oberpar@linux.vnet.ibm.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>
 
-CONFIG_PROFILE_ALL_BRANCHES confuses gcc-5.x to the degree that it prints
-incorrect warnings about a lot of variables that it thinks can be used
-uninitialized, e.g.:
+CC_OPTIMIZE_FOR_SIZE disables the often useful -Wmaybe-unused warning,
+because that causes a ridiculous amount of false positives when combined
+with -Os.
 
-i2c/busses/i2c-diolan-u2c.c: In function 'diolan_usb_xfer':
-i2c/busses/i2c-diolan-u2c.c:391:16: warning: 'byte' may be used uninitialized in this function
-iio/gyro/itg3200_core.c: In function 'itg3200_probe':
-iio/gyro/itg3200_core.c:213:6: warning: 'val' may be used uninitialized in this function
-leds/leds-lp55xx-common.c: In function 'lp55xx_update_bits':
-leds/leds-lp55xx-common.c:350:6: warning: 'tmp' may be used uninitialized in this function
-misc/bmp085.c: In function 'show_pressure':
-misc/bmp085.c:363:10: warning: 'pressure' may be used uninitialized in this function
-power/ds2782_battery.c: In function 'ds2786_get_capacity':
-power/ds2782_battery.c:214:17: warning: 'raw' may be used uninitialized in this function
+This means a lot of warnings don't show up in testing by the developers
+that should see them with an 'allmodconfig' kernel that has
+CC_OPTIMIZE_FOR_SIZE enabled, but only later in randconfig builds
+that don't.
 
-These are all false positives that either rob someone's time when trying
-to figure out whether they are real, or they get people to send wrong
-patches to shut up the warnings.
-
-Nobody normally wants to run a CONFIG_PROFILE_ALL_BRANCHES kernel in
-production, so disabling the whole class of warnings for this configuration
-has no serious downsides either.
+This changes the Kconfig logic around CC_OPTIMIZE_FOR_SIZE to make
+it a 'choice' statement defaulting to CC_OPTIMIZE_FOR_PERFORMANCE
+that gets added for this purpose. The allmodconfig and allyesconfig
+kernels now default to -O2 with the maybe-unused warning enabled.
 
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- Makefile | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ init/Kconfig | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/Makefile b/Makefile
-index 9092c16fa6cf..352f55ccc54e 100644
---- a/Makefile
-+++ b/Makefile
-@@ -617,7 +617,11 @@ KBUILD_CFLAGS	+= $(call cc-option,-fno-delete-null-pointer-checks,)
- ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
- KBUILD_CFLAGS	+= -Os $(call cc-disable-warning,maybe-uninitialized,)
- else
--KBUILD_CFLAGS	+= -O2
-+ifdef CONFIG_PROFILE_ALL_BRANCHES
-+KBUILD_CFLAGS	+= -O2 $(call cc-disable-warning,maybe-uninitialized,)
-+else
-+KBUILD_CFLAGS   += -O2
-+endif
+diff --git a/init/Kconfig b/init/Kconfig
+index 651ec15ecddb..159a542ef3fc 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -1305,6 +1305,17 @@ source "usr/Kconfig"
+ 
  endif
  
- # Tell gcc to never replace conditional load with a non-conditional one
++choice
++	prompt "Compiler optimization level"
++	default CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE
++
++config CC_OPTIMIZE_FOR_PERFORMANCE
++	bool "Optimize for performance"
++	help
++	  This is the default optimization level for the kernel, building
++	  with the "-O2" compiler flag for best performance and most
++	  helpful compile-time warnings.
++
+ config CC_OPTIMIZE_FOR_SIZE
+ 	bool "Optimize for size"
+ 	help
+@@ -1313,6 +1324,8 @@ config CC_OPTIMIZE_FOR_SIZE
+ 
+ 	  If unsure, say N.
+ 
++endchoice
++
+ config SYSCTL
+ 	bool
+ 
 -- 
 2.7.0
 
