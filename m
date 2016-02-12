@@ -1,74 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.126.130]:64636 "EHLO
+Received: from mout.kundenserver.de ([212.227.126.131]:49734 "EHLO
 	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751001AbcBLQHK (ORCPT
+	with ESMTP id S1751451AbcBLQHs (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 12 Feb 2016 11:07:10 -0500
+	Fri, 12 Feb 2016 11:07:48 -0500
 From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH 0/5] gcov fixes and maybe-uninitialized warnings
-Date: Fri, 12 Feb 2016 17:06:17 +0100
-Message-Id: <1455293187-179811-1-git-send-email-arnd@arndb.de>
+Subject: [PATCH 4/5] gcov: disable tree-loop-im to reduce stack usage
+Date: Fri, 12 Feb 2016 17:06:21 +0100
+Message-Id: <1455293187-179811-5-git-send-email-arnd@arndb.de>
+In-Reply-To: <1455293187-179811-1-git-send-email-arnd@arndb.de>
+References: <1455293187-179811-1-git-send-email-arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.com>
 Cc: linux-arm-kernel@lists.infradead.org, Peter Oberparleiter <oberpar@linux.vnet.ibm.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>
 
-This series tries to address two related problems:
+Enabling CONFIG_GCOV_PROFILE_ALL produces us a lot of warnings like
 
-* getting better "variable may be used uninitialized" warnings
-  in allmodconfig and randconfig builds
+lib/lz4/lz4hc_compress.c: In function 'lz4_compresshcctx':
+lib/lz4/lz4hc_compress.c:514:1: warning: the frame size of 1504 bytes is larger than 1024 bytes [-Wframe-larger-than=]
 
-* improving GCOV_PROFILE support
+After some investigation, I found that this behavior started with gcc-4.9,
+and opened https://gcc.gnu.org/bugzilla/show_bug.cgi?id=69702.
+A suggested workaround for it is to use the -fno-tree-loop-im
+flag that turns off one of the optimization stages in gcc, so the
+code runs a little slower but does not use excessive amounts
+of stack.
 
-Surprisingly, these two are related, so I have a single series that
-I hope to get merged through the Kbuild tree.
+We could make this conditional on the gcc version, but I could not
+find an easy way to do this in Kbuild and the benefit would be
+fairly small, given that most of the gcc version in production are
+affected now.
 
-I have built many thousands of ARM randconfig kernels and created
-patches for every single warning and error I found, and submitted
-most of them for inclusion. The "may be used uninitialized" warnings
-are both the most annoying and the most helpful ones that gcc
-gives us, so this tries to make them more useful, including three
-steps:
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-1. Limit the false positives as much as we can: Aside from
-   CC_OPTIMIZE_FOR_SIZE, three other options (UBSAN_SANITIZE_ALL,
-   PROFILE_ALL_BRANCHES and GCOV_PROFILE_ALL) confuse the
-   compiler (in versions 4.9 through 5.3, and to a lesser degree
-   on older versions) so we get a lot of extra warnings. We
-   already disable the warnings for CC_OPTIMIZE_FOR_SIZE, and
-   this series also disables them for the other two, which are
-   rarely used in practice but do show up in randconfig builds
-   all the time.
-2. Ensure we actually see them on 'allmodconfig' builds: Today they
-   are disabled, because CC_OPTIMIZE_FOR_SIZE disables them.
-   UBSAN_SANITIZE_ALL and PROFILE_ALL_BRANCHES are defined in
-   a way that they don't get turned on for allmodconfig, and
-   we need to do the samem for GCOV_PROFILE_ALL and
-   CC_OPTIMIZE_FOR_SIZE.
-3. Fix all known such warnings: The warnings should stick out,
-   so we can fix them once they first appear. Today they often
-   get ignored because of all the false positives.
-
-For GCOV support, another problem showed up, resulting in an increased
-risk for kernel stack overflow, aside from getting a number of
-warnings about the stack size. I'm also including a patch to
-address that here.
-
-	Arnd
-
-Arnd Bergmann (5):
-  Kbuild: change CC_OPTIMIZE_FOR_SIZE definition
-  Kbuild: disable 'maybe-uninitialized' warning for
-    CONFIG_PROFILE_ALL_BRANCHES
-  gcov: disable for COMPILE_TEST
-  gcov: disable tree-loop-im to reduce stack usage
-  gcov: disable -Wmaybe-uninitialized warning
-
- Makefile            |  8 ++++++--
- init/Kconfig        | 13 +++++++++++++
- kernel/gcov/Kconfig |  1 +
- 3 files changed, 20 insertions(+), 2 deletions(-)
-
+diff --git a/Makefile b/Makefile
+index 352f55ccc54e..6bb89728a9d1 100644
+--- a/Makefile
++++ b/Makefile
+@@ -364,7 +364,7 @@ AFLAGS_MODULE   =
+ LDFLAGS_MODULE  =
+ CFLAGS_KERNEL	=
+ AFLAGS_KERNEL	=
+-CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage
++CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage -fno-tree-loop-im
+ CFLAGS_KCOV	= -fsanitize-coverage=trace-pc
+ 
+ 
 -- 
 2.7.0
 
