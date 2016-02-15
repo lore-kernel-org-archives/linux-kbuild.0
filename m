@@ -1,75 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from cdptpa-outbound-snat.email.rr.com ([107.14.166.231]:51466 "EHLO
-	cdptpa-oedge-vip.email.rr.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1751758AbcBORxX (ORCPT
+Received: from server159.web-hosting.com ([68.65.120.118]:57112 "EHLO
+	s159.web-hosting.com" rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org
+	with ESMTP id S1752037AbcBOUh0 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 15 Feb 2016 12:53:23 -0500
-Date: Mon, 15 Feb 2016 12:46:06 -0500
-From: Steven Rostedt <rostedt@goodmis.org>
-Subject: Re: [PATCH 2/5] Kbuild: disable 'maybe-uninitialized' warning for
- CONFIG_PROFILE_ALL_BRANCHES
-Message-ID: <20160215174606.GA11406@home.goodmis.org>
-References: <1455293187-179811-1-git-send-email-arnd@arndb.de>
- <1455293187-179811-3-git-send-email-arnd@arndb.de>
+	Mon, 15 Feb 2016 15:37:26 -0500
+Received: from mail-lb0-f178.google.com ([209.85.217.178]:34478)
+	by server159.web-hosting.com with esmtpsa (TLSv1.2:AES128-GCM-SHA256:128)
+	(Exim 4.86)
+	(envelope-from <jteki@openedev.com>)
+	id 1aVO4u-002HL7-BB
+	for linux-kbuild@vger.kernel.org; Mon, 15 Feb 2016 13:40:57 -0500
+Received: by mail-lb0-f178.google.com with SMTP id ut4so7098077lbc.1
+        for <linux-kbuild@vger.kernel.org>; Mon, 15 Feb 2016 10:40:56 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1455293187-179811-3-git-send-email-arnd@arndb.de>
+Date: Tue, 16 Feb 2016 00:10:54 +0530
+Message-ID: <CAD6G_RRNi2BzVdCeqOLc=-taaiQRs2NRxtaNC1FjHT35MeFEdw@mail.gmail.com>
+Subject: Kconfig 'select' forcing config selecting even if dependent undefined
+From: Jagan Teki <jteki@openedev.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Michal Marek <mmarek@suse.com>, linux-arm-kernel@lists.infradead.org, Peter Oberparleiter <oberpar@linux.vnet.ibm.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
 
-On Fri, Feb 12, 2016 at 05:06:19PM +0100, Arnd Bergmann wrote:
-> CONFIG_PROFILE_ALL_BRANCHES confuses gcc-5.x to the degree that it prints
-> incorrect warnings about a lot of variables that it thinks can be used
-> uninitialized, e.g.:
-> 
-> i2c/busses/i2c-diolan-u2c.c: In function 'diolan_usb_xfer':
-> i2c/busses/i2c-diolan-u2c.c:391:16: warning: 'byte' may be used uninitialized in this function
-> iio/gyro/itg3200_core.c: In function 'itg3200_probe':
-> iio/gyro/itg3200_core.c:213:6: warning: 'val' may be used uninitialized in this function
-> leds/leds-lp55xx-common.c: In function 'lp55xx_update_bits':
-> leds/leds-lp55xx-common.c:350:6: warning: 'tmp' may be used uninitialized in this function
-> misc/bmp085.c: In function 'show_pressure':
-> misc/bmp085.c:363:10: warning: 'pressure' may be used uninitialized in this function
-> power/ds2782_battery.c: In function 'ds2786_get_capacity':
-> power/ds2782_battery.c:214:17: warning: 'raw' may be used uninitialized in this function
-> 
-> These are all false positives that either rob someone's time when trying
-> to figure out whether they are real, or they get people to send wrong
-> patches to shut up the warnings.
-> 
-> Nobody normally wants to run a CONFIG_PROFILE_ALL_BRANCHES kernel in
-> production, so disabling the whole class of warnings for this configuration
-> has no serious downsides either.
-> 
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Hi,
 
-Acked-by: Steven Rostedt <rostedt@goodmis.org>
+This is my kconfig file.
 
--- Steve
+config MTD_SPI_NOR
+      tristate "SPI-NOR support"
+      select HAVE_MTD_SPI_NOR
+      help
 
-> ---
->  Makefile | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/Makefile b/Makefile
-> index 9092c16fa6cf..352f55ccc54e 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -617,7 +617,11 @@ KBUILD_CFLAGS	+= $(call cc-option,-fno-delete-null-pointer-checks,)
->  ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
->  KBUILD_CFLAGS	+= -Os $(call cc-disable-warning,maybe-uninitialized,)
->  else
-> -KBUILD_CFLAGS	+= -O2
-> +ifdef CONFIG_PROFILE_ALL_BRANCHES
-> +KBUILD_CFLAGS	+= -O2 $(call cc-disable-warning,maybe-uninitialized,)
-> +else
-> +KBUILD_CFLAGS   += -O2
-> +endif
->  endif
->  
->  # Tell gcc to never replace conditional load with a non-conditional one
-> -- 
-> 2.7.0
+config HAVE_MTD_SPI_NOR
+     tristate
+     depends on SPI_MASTER
+
+My intention was not to add extra config HAVE_MTD_SPI_NOR on
+individual defconfigs. So  MTD_SPI_NOR is selecting HAVE_MTD_SPI_NOR
+and there HAVE_MTD_SPI_NOR is depends on SPI_MASTER config.
+
+1) HAVE_MTD_SPI_NOR will select If SPI_MASTER defined
+2) HAVE_MTD_SPI_NOR will un-select if SPI_MASTER undefined
+
+case 2) here is forcing HAVE_MTD_SPI_NOR selecting even if SPI_MASTER
+is undefined, any idea how to fix this? I saw the Linux
+Documentation/kbuild/kconfig-language.txt have similar issue with
+"Adding common features and make the usage configurable" but couldn't
+find any solution.
+
+thanks!
+-- 
+Jagan.
