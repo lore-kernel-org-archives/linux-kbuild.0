@@ -1,70 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from e06smtp15.uk.ibm.com ([195.75.94.111]:47448 "EHLO
-	e06smtp15.uk.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753330AbcBOOf0 (ORCPT
+Received: from cdptpa-outbound-snat.email.rr.com ([107.14.166.231]:51466 "EHLO
+	cdptpa-oedge-vip.email.rr.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1751758AbcBORxX (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 15 Feb 2016 09:35:26 -0500
-Received: from localhost
-	by e06smtp15.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-kbuild@vger.kernel.org> from <oberpar@linux.vnet.ibm.com>;
-	Mon, 15 Feb 2016 14:35:24 -0000
-Subject: Re: [PATCH 5/5] gcov: disable -Wmaybe-uninitialized warning
+	Mon, 15 Feb 2016 12:53:23 -0500
+Date: Mon, 15 Feb 2016 12:46:06 -0500
+From: Steven Rostedt <rostedt@goodmis.org>
+Subject: Re: [PATCH 2/5] Kbuild: disable 'maybe-uninitialized' warning for
+ CONFIG_PROFILE_ALL_BRANCHES
+Message-ID: <20160215174606.GA11406@home.goodmis.org>
 References: <1455293187-179811-1-git-send-email-arnd@arndb.de>
- <1455293187-179811-6-git-send-email-arnd@arndb.de>
-From: Peter Oberparleiter <oberpar@linux.vnet.ibm.com>
-Message-ID: <56C1E229.4050308@linux.vnet.ibm.com>
-Date: Mon, 15 Feb 2016 15:35:21 +0100
+ <1455293187-179811-3-git-send-email-arnd@arndb.de>
 MIME-Version: 1.0
-In-Reply-To: <1455293187-179811-6-git-send-email-arnd@arndb.de>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1455293187-179811-3-git-send-email-arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>, Michal Marek <mmarek@suse.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Michal Marek <mmarek@suse.com>, linux-arm-kernel@lists.infradead.org, Peter Oberparleiter <oberpar@linux.vnet.ibm.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 12.02.2016 17:06, Arnd Bergmann wrote:
-> When gcov profiling is enabled, we see a lot of spurious warnings about
-> possibly uninitialized variables being used:
+On Fri, Feb 12, 2016 at 05:06:19PM +0100, Arnd Bergmann wrote:
+> CONFIG_PROFILE_ALL_BRANCHES confuses gcc-5.x to the degree that it prints
+> incorrect warnings about a lot of variables that it thinks can be used
+> uninitialized, e.g.:
 > 
-> arch/arm/mm/dma-mapping.c: In function 'arm_coherent_iommu_map_page':
-> arch/arm/mm/dma-mapping.c:1085:16: warning: 'start' may be used uninitialized in this function [-Wmaybe-uninitialized]
-> drivers/clk/st/clk-flexgen.c: In function 'st_of_flexgen_setup':
-> drivers/clk/st/clk-flexgen.c:323:9: warning: 'num_parents' may be used uninitialized in this function [-Wmaybe-uninitialized]
-> kernel/cgroup.c: In function 'cgroup_mount':
-> kernel/cgroup.c:2119:11: warning: 'root' may be used uninitialized in this function [-Wmaybe-uninitialized]
+> i2c/busses/i2c-diolan-u2c.c: In function 'diolan_usb_xfer':
+> i2c/busses/i2c-diolan-u2c.c:391:16: warning: 'byte' may be used uninitialized in this function
+> iio/gyro/itg3200_core.c: In function 'itg3200_probe':
+> iio/gyro/itg3200_core.c:213:6: warning: 'val' may be used uninitialized in this function
+> leds/leds-lp55xx-common.c: In function 'lp55xx_update_bits':
+> leds/leds-lp55xx-common.c:350:6: warning: 'tmp' may be used uninitialized in this function
+> misc/bmp085.c: In function 'show_pressure':
+> misc/bmp085.c:363:10: warning: 'pressure' may be used uninitialized in this function
+> power/ds2782_battery.c: In function 'ds2786_get_capacity':
+> power/ds2782_battery.c:214:17: warning: 'raw' may be used uninitialized in this function
 > 
-> All of these are false positives, so it seems better to just disable
-> the warnings whenever GCOV is enabled. Most users don't enable GCOV,
-> and based on a prior patch, it is now also disabled for 'allmodconfig'
-> builds, so there should be no downsides of doing this.
+> These are all false positives that either rob someone's time when trying
+> to figure out whether they are real, or they get people to send wrong
+> patches to shut up the warnings.
+> 
+> Nobody normally wants to run a CONFIG_PROFILE_ALL_BRANCHES kernel in
+> production, so disabling the whole class of warnings for this configuration
+> has no serious downsides either.
 > 
 > Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
-Sounds sane.
+Acked-by: Steven Rostedt <rostedt@goodmis.org>
 
-Acked-by: Peter Oberparleiter <oberpar@linux.vnet.ibm.com>
+-- Steve
 
 > ---
->  Makefile | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  Makefile | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
 > 
 > diff --git a/Makefile b/Makefile
-> index 6bb89728a9d1..7b6900931a47 100644
+> index 9092c16fa6cf..352f55ccc54e 100644
 > --- a/Makefile
 > +++ b/Makefile
-> @@ -364,7 +364,7 @@ AFLAGS_MODULE   =
->  LDFLAGS_MODULE  =
->  CFLAGS_KERNEL	=
->  AFLAGS_KERNEL	=
-> -CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage -fno-tree-loop-im
-> +CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage -fno-tree-loop-im -Wno-maybe-uninitialized
->  CFLAGS_KCOV	= -fsanitize-coverage=trace-pc
-> 
-> 
-
-
--- 
-Peter Oberparleiter
-Linux on z Systems Development - IBM Germany
-
+> @@ -617,7 +617,11 @@ KBUILD_CFLAGS	+= $(call cc-option,-fno-delete-null-pointer-checks,)
+>  ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
+>  KBUILD_CFLAGS	+= -Os $(call cc-disable-warning,maybe-uninitialized,)
+>  else
+> -KBUILD_CFLAGS	+= -O2
+> +ifdef CONFIG_PROFILE_ALL_BRANCHES
+> +KBUILD_CFLAGS	+= -O2 $(call cc-disable-warning,maybe-uninitialized,)
+> +else
+> +KBUILD_CFLAGS   += -O2
+> +endif
+>  endif
+>  
+>  # Tell gcc to never replace conditional load with a non-conditional one
+> -- 
+> 2.7.0
