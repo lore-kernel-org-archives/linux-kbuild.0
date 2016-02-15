@@ -1,101 +1,68 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lists.s-osg.org ([54.187.51.154]:48120 "EHLO lists.s-osg.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751016AbcBLQKu (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 12 Feb 2016 11:10:50 -0500
-Subject: Re: [PATCH v4 0/2] Create specific kconfig for kselftest
-References: <1452238054-15482-1-git-send-email-bamvor.zhangjian@linaro.org>
-From: Shuah Khan <shuahkh@osg.samsung.com>
-Message-ID: <56BE03EF.70607@osg.samsung.com>
-Date: Fri, 12 Feb 2016 09:10:23 -0700
+Received: from e06smtp13.uk.ibm.com ([195.75.94.109]:42669 "EHLO
+	e06smtp13.uk.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751471AbcBOOXZ (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 15 Feb 2016 09:23:25 -0500
+Received: from localhost
+	by e06smtp13.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-kbuild@vger.kernel.org> from <oberpar@linux.vnet.ibm.com>;
+	Mon, 15 Feb 2016 14:23:24 -0000
+Subject: Re: [PATCH 3/5] gcov: disable for COMPILE_TEST
+References: <1455293187-179811-1-git-send-email-arnd@arndb.de>
+ <1455293187-179811-4-git-send-email-arnd@arndb.de>
+From: Peter Oberparleiter <oberpar@linux.vnet.ibm.com>
+Message-ID: <56C1DF57.50601@linux.vnet.ibm.com>
+Date: Mon, 15 Feb 2016 15:23:19 +0100
 MIME-Version: 1.0
-In-Reply-To: <1452238054-15482-1-git-send-email-bamvor.zhangjian@linaro.org>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <1455293187-179811-4-git-send-email-arnd@arndb.de>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Bamvor Jian Zhang <bamvor.zhangjian@linaro.org>, linux-api@vger.kernel.org, mmarek@suse.com, Shuah Khan <shuahkh@osg.samsung.com>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, yann.morin.1998@free.fr, khilman@linaro.org, tyler.baker@linaro.org, broonie@kernel.org, mpe@ellerman.id.au, dvhart@infradead.org
+To: Arnd Bergmann <arnd@arndb.de>, Michal Marek <mmarek@suse.com>
+Cc: linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 01/08/2016 12:27 AM, Bamvor Jian Zhang wrote:
-> There is a discussion about improving the usability of kselftest by
-> creating test-specific kconfig in recent kernel Summit. The first
-> three versions could be found at [1], [2], [3].
+On 12.02.2016 17:06, Arnd Bergmann wrote:
+> Enabling gcov is counterproductive to compile testing: it significantly
+> increases the kernel image size, compile time, and it produces lots
+> of false positive "may be used uninitialized" warnings as the result
+> of missed optimizations.
 > 
-> Patch 1 keep test-specific kconfig fragments inside each selftest so
-> that merge_configs.sh could build up a kernel configuration that can
-> test the specific or all feature(s).
+> This is in line with how UBSAN_SANITIZE_ALL and PROFILE_ALL_BRANCHES
+> work, both of which have similar problems.
 > 
-> Patch 2 add config option(kselftest-merge) in make file as a
-> helper to merge all the test config dependecies to .config.
+> With an ARM allmodconfig kernel, I see the build time drop from
+> 283 minutes CPU time to 225 minutes, and the vmlinux size drops
+> from 43MB to 26MB.
+> 
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
-Hi Michal,
+Agreed that COMPILE_TEST + GCOV_PROFILE_ALL is a very exotic combination
+with little added use.
 
-Are you okay with the changes to the second patch
-in this series? Would you like to me to send the
-second one up through linux-kselftest tree or do
-you want to take this through your tree?
+Acked-by: Peter Oberparleiter <oberpar@linux.vnet.ibm.com>
 
-Please let me know.
-
-thanks,
--- Shuah
+> ---
+>  kernel/gcov/Kconfig | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> Changes since v3:
-> 1.  move the target kselftest-mergeconfig from scripts/kconfig/Makfile
->     to toplevel Makefile. And rename to kselftest-merge to avoid the
->     conflict with "%config" target.
+> diff --git a/kernel/gcov/Kconfig b/kernel/gcov/Kconfig
+> index c92e44855ddd..1276aabaab55 100644
+> --- a/kernel/gcov/Kconfig
+> +++ b/kernel/gcov/Kconfig
+> @@ -37,6 +37,7 @@ config ARCH_HAS_GCOV_PROFILE_ALL
 > 
-> Changes since v2:
-> 1.  Fix the misuse of objtree and srctree in the
->     kselftest-mergeconfig target.
-> 
-> Changes since v1:
-> 1.  Add kselftest-mergeconfig in scripts/kconfig/Makefile according
->     to the suggestion from Michael.
-> 
-> [1] http://www.spinics.net/lists/linux-api/msg15533.html
-> [2] http://www.spinics.net/lists/linux-api/msg15593.html
-> [3] http://comments.gmane.org/gmane.linux.kernel/2110565
-> 
-> Bamvor Jian Zhang (2):
->   selftests: create test-specific kconfig fragments
->   Makefile: add kselftest-merge
-> 
->  Makefile                                      | 11 +++++++++++
->  tools/testing/selftests/cpu-hotplug/config    |  2 ++
->  tools/testing/selftests/firmware/config       |  1 +
->  tools/testing/selftests/ftrace/config         |  1 +
->  tools/testing/selftests/ipc/config            |  2 ++
->  tools/testing/selftests/memory-hotplug/config |  4 ++++
->  tools/testing/selftests/mount/config          |  2 ++
->  tools/testing/selftests/net/config            |  3 +++
->  tools/testing/selftests/pstore/config         |  4 ++++
->  tools/testing/selftests/seccomp/config        |  2 ++
->  tools/testing/selftests/static_keys/config    |  1 +
->  tools/testing/selftests/user/config           |  1 +
->  tools/testing/selftests/vm/config             |  1 +
->  tools/testing/selftests/zram/config           |  2 ++
->  14 files changed, 37 insertions(+)
->  create mode 100644 tools/testing/selftests/cpu-hotplug/config
->  create mode 100644 tools/testing/selftests/firmware/config
->  create mode 100644 tools/testing/selftests/ftrace/config
->  create mode 100644 tools/testing/selftests/ipc/config
->  create mode 100644 tools/testing/selftests/memory-hotplug/config
->  create mode 100644 tools/testing/selftests/mount/config
->  create mode 100644 tools/testing/selftests/net/config
->  create mode 100644 tools/testing/selftests/pstore/config
->  create mode 100644 tools/testing/selftests/seccomp/config
->  create mode 100644 tools/testing/selftests/static_keys/config
->  create mode 100644 tools/testing/selftests/user/config
->  create mode 100644 tools/testing/selftests/vm/config
->  create mode 100644 tools/testing/selftests/zram/config
+>  config GCOV_PROFILE_ALL
+>  	bool "Profile entire Kernel"
+> +	depends on !COMPILE_TEST
+>  	depends on GCOV_KERNEL
+>  	depends on ARCH_HAS_GCOV_PROFILE_ALL
+>  	default n
 > 
 
 
 -- 
-Shuah Khan
-Sr. Linux Kernel Developer
-Open Source Innovation Group
-Samsung Research America (Silicon Valley)
-shuahkh@osg.samsung.com | (970) 217-8978
+Peter Oberparleiter
+Linux on z Systems Development - IBM Germany
+
