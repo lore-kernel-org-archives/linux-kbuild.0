@@ -1,79 +1,90 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.bmw-carit.de ([62.245.222.98]:55950 "EHLO
-	mail.bmw-carit.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1161335AbcBQNE4 (ORCPT
+Received: from mail-ob0-f169.google.com ([209.85.214.169]:33147 "EHLO
+	mail-ob0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S965137AbcBQUrJ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 17 Feb 2016 08:04:56 -0500
-Subject: Re: [PATCH tip v6 2/5] kbuild: Add option to turn incompatible
- pointer check into error
-References: <1453992270-4688-1-git-send-email-daniel.wagner@bmw-carit.de>
- <1453992270-4688-3-git-send-email-daniel.wagner@bmw-carit.de>
- <56AB5867.6020405@bmw-carit.de> <20160129185523.GZ8889@windriver.com>
- <56AEFFF1.1010404@bmw-carit.de> <56B45A47.4090400@bmw-carit.de>
- <20160207043916.GR18489@windriver.com>
-From: Daniel Wagner <daniel.wagner@bmw-carit.de>
-Message-ID: <56C46FF3.1000201@bmw-carit.de>
-Date: Wed, 17 Feb 2016 14:04:51 +0100
+	Wed, 17 Feb 2016 15:47:09 -0500
+Received: by mail-ob0-f169.google.com with SMTP id jq7so33787650obb.0
+        for <linux-kbuild@vger.kernel.org>; Wed, 17 Feb 2016 12:47:08 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20160207043916.GR18489@windriver.com>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20160206011742.GA13627@wfg-t540p.sh.intel.com>
+References: <CALCETrUh1jq7Di0gTO0R3wN51x=vmd5wU4ODmE0kXK13MhQDnA@mail.gmail.com>
+ <20160205031116.GB30154@wfg-t540p.sh.intel.com> <CALCETrVssJ2oCqT9eKzoXQ0VWz1O1XB=Gt97djrgPYTfZYt_ug@mail.gmail.com>
+ <20160206011742.GA13627@wfg-t540p.sh.intel.com>
+From: Andy Lutomirski <luto@amacapital.net>
+Date: Wed, 17 Feb 2016 12:46:49 -0800
+Message-ID: <CALCETrUA-mueravS9YvV8dGy2MP38xitD_2eVyRqDXrT0ixPhw@mail.gmail.com>
+Subject: Re: Adding Xen to the kbuild bot?
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Paul Gortmaker <paul.gortmaker@windriver.com>
-Cc: linux-kernel@vger.kernel.org, linux-rt-users@vger.kernel.org, linux-kbuild@vger.kernel.org, Marcelo Tosatti <mtosatti@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, "Paul E . McKenney" <paulmck@linux.vnet.ibm.com>, Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, Steven Rostedt <rostedt@goodmis.org>, Boqun Feng <boqun.feng@gmail.com>
+To: Fengguang Wu <fengguang.wu@intel.com>
+Cc: "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, Ian Campbell <ian.campbell@citrix.com>, LKP <lkp@01.org>, "Hu, Robert" <robert.hu@intel.com>, Ian Jackson <Ian.Jackson@eu.citrix.com>
 
-On 02/07/2016 05:39 AM, Paul Gortmaker wrote:
->> I used the cross compiler version 5.2.1 shipped by Fedora 23
->> and run allyesconfig/allmodconfig for ARM, ARM64, MIPS64, PPC64
->> (swait-v7 and 4.5-rc2). No new errors popped up.
-> 
-> SOunds good ; guess my gut feeling about this causing more fallout was
-> off the mark.
+On Fri, Feb 5, 2016 at 5:17 PM, Fengguang Wu <fengguang.wu@intel.com> wrote:
+> On Fri, Feb 05, 2016 at 12:10:56PM -0800, Andy Lutomirski wrote:
+>> On Feb 4, 2016 7:11 PM, "Fengguang Wu" <fengguang.wu@intel.com> wrote:
+>> >
+>> > Hi Andy,
+>> >
+>> > CC more people on Xen testing -- in case OSStest already (or plans to)
+>> > cover such test case.
+>> >
+>> > On Tue, Feb 02, 2016 at 07:31:30PM -0800, Andy Lutomirski wrote:
+>> > > Hi all-
+>> > >
+>> > > Would it make sense to add some basic Xen PV testing to the kbuild bot?
+>> >
+>> > Do you mean to run basic Xen testing on the various kernel trees that
+>> > 0day robot covers? That is, to catch kernel regressions when running
+>> > under Xen.
+>> >
+>>
+>> Yes, exactly.  I've personally broken Linux as a Xen guest at least twice.
+>>
+>> > If the intention is to catch Xen regressions, the OSStest
+>> > infrastructure may be a better option:
+>> >
+>> >         git://xenbits.xen.org/osstest.git
+>>
+>> No, I think that 0day should pick one Xen version and stick with it
+>> for a while rather than trying to track the latest version.
+>
+> OK, got it. So it's suitable to run in 0day.
+>
+>> > > qemu can boot Xen like this:
+>> > >
+>> > > qemu-system-x86_64 -kernel path/to/xen-4.5.2 -initrd 'path/to/bzImage
+>> > > kernelarg otherkernelarg=value" -append 'xenarg other_xen_arg'
+>> > >
+>> > > This should work with any kernel image for x86 or x86_64 with CONFIG_XEN=y.
+>> >
+>> > Got it. If you have simple working test scripts to illustrate test
+>> > details, it'd be a great help for integrating into OSStest or 0day.
+>>
+>> I have a script that will boot to a command prompt, but I don't know
+>> if that's the right way to do it.  I'm not really sure how 0day works
+>> under the hood, but treating Xen as a different configuration or arch
+>> instead of treating it as a different test case might make more sense.
+>
+> We can check the script first, then determine the most suitable way to
+> integrate it into 0day. My guess is, it might be suitable to run as a
+> new kind of VM host, like this
+>
+> https://git.kernel.org/cgit/linux/kernel/git/wfg/lkp-tests.git/tree/hosts/vm-kbuild-1G
+>
+> model: qemu-system-x86_64 -enable-kvm -cpu Haswell,+smep,+smap
+> nr_vm: 12
+> nr_cpu: 2
+> memory: 1G
+> disk_type: virtio-scsi
+> rootfs: debian-x86_64.cgz
+> hdd_partitions: /dev/sda /dev/sdb /dev/sdc /dev/sdd
+> swap_partitions: /dev/sde
 
-The fallouts I found are on the way to mainline or are already
-in mainline:
+This makes sense to me, but I think it would need an extension to the
+configuration language.
 
-fbdev: https://git.kernel.org/tomba/c/206fc20598157ce15597822cf01b94377e30075b
-mips:  https://git.kernel.org/torvalds/c/f4d3d504198d464e406171cfa554a59bd4773d79
+The guest virtio code should be in the next -next release.
 
-There was also a hickup on alpha. The patch is on the way. 
-
-Here is the list of archs and config I tried out. First run was with the
-config listed, followed by a allyesconfig and allmodconfig build. 
-
-#    name      ARCH     CROSS_COMPILE        config
-declare -a config=(
-    "alpha     alpha    alpha-linux-gnu-     defconfig"
-    "arm32     arm      arm-linux-gnu-       versatile_defconfig"
-    "arm64     arm64    aarch64-linux-gnu-   defconfig"
-    "cris10    cris     cris-linux-gnu-      etrax-100lx_defconfig"
-    "frv       frv      frv-linux-gnu-       defconfig"
-    "ia64      ia64     ia64-linux-gnu-      generic_defconfig"
-    "m68k      m68k     m68k-linux-gnu-      amiga_defconfig"
-    "mips32    mips     mips64-linux-gnu-    ar7_defconfig"
-    "mips64    mips     mips64-linux-gnu-    bigsur_defconfig"
-    "ppc64     powerpc  powerpc64-linux-gnu- pseries_defconfig"
-    "s390      s390     s390x-linux-gnu-     defconfig"
-    "sparc32   sparc    sparc64-linux-gnu-   sparc32_defconfig"
-    "sparc64   sparc    sparc64-linux-gnu-   sparc64_defconfig"
-    "um_x86_64 um       gcc                  defconfig"
-    "x86_64    x86_64   gcc                  defconfig"
-
-# known broken configurations on F23
-#   "alpha     alpha    alpha-linux-gnu-     allyesconfig"
-#   "avr32     avr32    avr32-linux-gnu-     defconfig"
-#   "blackfin  blackfin bfin-linux-gnu-      BF518F-EZBRD_defconfig"
-#   "cris32    cris     cris-linux-gnu-      etraxfs_defconfig"
-#   "m32r      m32r     m32r-linux-gnu-      mappi3.smp_defconfig"
-#   "parisc    parisc   hppa-linux-gnu-      default_defconfig"
-#   "parisc64  parisc   hppa-linux-gnu-      a500_defconfig"
-#   "ppc32     powerpc  powerpc64-linux-gnu- mpc512x_defconfig"
-#   "sh32      sh       sh-linux-gnu-        defconfig"
-#   "sh64      sh64     sh64-linux-gnu-      defconfig"
-#   "tile      tile     tile-linux-gnu-      defconfig"
-#   "xtensa    xtensa   xtensa-linux-gnu-    common_defconfig"
-)
-
-cheers,
-daniel
+--Andy
