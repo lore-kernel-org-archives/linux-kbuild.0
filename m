@@ -1,52 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-io0-f173.google.com ([209.85.223.173]:36087 "EHLO
-	mail-io0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1426658AbcBRRyj (ORCPT
+Received: from relais.videotron.ca ([24.201.245.36]:24212 "EHLO
+	relais.videotron.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1423897AbcBRUHH (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 18 Feb 2016 12:54:39 -0500
-Received: by mail-io0-f173.google.com with SMTP id l127so81780134iof.3
-        for <linux-kbuild@vger.kernel.org>; Thu, 18 Feb 2016 09:54:38 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <56C59083.7060501@suse.com>
-References: <20160206004438.GA21780@www.outflux.net>
-	<CAGXu5jKOqnAGkpgr0iY47gFYAuJXQnsF5dQO655D00voVkX5UQ@mail.gmail.com>
-	<56C59083.7060501@suse.com>
-Date: Thu, 18 Feb 2016 09:54:38 -0800
-Message-ID: <CAGXu5jJaMV+OwfEuAE5V28HVY=_4EnhrkTpmHXROLvQzd7fgsA@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: disable Android-specific compiler features
-From: Kees Cook <keescook@chromium.org>
-Content-Type: text/plain; charset=UTF-8
+	Thu, 18 Feb 2016 15:07:07 -0500
+Content-transfer-encoding: 7BIT
+From: Nicolas Pitre <nicolas.pitre@linaro.org>
+Subject: [PATCH v3 0/7] Trim unused exported kernel symbols
+Date: Thu, 18 Feb 2016 15:06:56 -0500
+Message-id: <1455826023-2134-1-git-send-email-nicolas.pitre@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Al Viro <viro@ZenIV.linux.org.uk>, Rusty Russell <rusty@rustcorp.com.au>
 
-On Thu, Feb 18, 2016 at 1:36 AM, Michal Marek <mmarek@suse.com> wrote:
-> Dne 18.2.2016 v 00:03 Kees Cook napsal(a):
->> On Fri, Feb 5, 2016 at 4:44 PM, Kees Cook <keescook@chromium.org> wrote:
->>> The Android compilers enable some non-standard features by default. While
->>> most Android build systems inject the needed "-mno-android" option via
->>> KCFLAGS, it happens too late (at least on x86_64), since KBUILD_CFLAGS
->>> gains KCFLAGS after running (and failing) many cc-option tests. (For
->>> example, the stack-protector tests happen after arch-specific
->>> KBUILD_CFLAGS are added but before the external KCFLAGS are added.) As
->>> such, we should notice this option and immediately turn it on as the
->>> first cc-option test we run.
->>>
->>> Signed-off-by: Kees Cook <keescook@chromium.org>
->>
->> Michal, is this okay? I'd like to get it into -next soon if possible.
->
-> Is there a way to detect these compilers and are there some canonical
-> versions of these? I do not think it's a good idea to add workaround for
-> each random gcc fork.
+This patch series provides the option to omit exported symbols from
+the kernel and modules that are never referenced by any of the selected
+modules in the current kernel configuration.
 
-It's detectable by -mno-android being a valid option. It's not a
-random gcc fork, as it's part of the Android SDK gcc prebuilts that
-all Android vendors and hobbiests use to build their kernels.
+The original cover letter with lots of test results can be found here:
 
--Kees
+        https://lkml.org/lkml/2016/2/8/813
 
--- 
-Kees Cook
-Chrome OS & Brillo Security
+A git branch with those patches is also available here:
+
+        http://git.linaro.org/people/nicolas.pitre/linux.git autoksyms
+
+Please consider for merging.
+
+Changes from v2:
+
+- Generating the build dependencies by parsing the source with fixdep
+  turned out to be unreliable due to all the EXPORT_SYMBOL() variants,
+  and especially their use within macros where the actual symbol name
+  is known only after running the preprocessor. This list of symbol names
+  is now obtained from the preprocessor directly, fixing allmodconfig
+  builds.
+
+Changes from v1:
+
+- Replaced "exp" that doesn't convey the right meaning as noted by
+  Sam Ravnborg. The "ksym" identifier is actually what the kernel
+  already uses for this. Therefore:
+  - CONFIG_TRIM_UNUSED_EXPSYMS --> CONFIG_TRIM_UNUSED_KSYMS
+  - include/generated/expsyms.h --> include/generated/autoksyms.h
+  - #define __EXPSYM_* --> #define __KSYM_*
+
+- Some sed regexp improvements as suggested by Al Viro.
+
+- Renamed vmlinux_recursive target to autoksyms_recursive.
+
+- Accept EXPORT_SYMBOL variants with a prefix, e.g. ACPI_EXPORT_SYMBOL.
+
+- Minor commit log clarifications.
+
+- Added Rusty's ACK.
+
