@@ -1,85 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from relais.videotron.ca ([24.201.245.36]:24212 "EHLO
-	relais.videotron.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1426999AbcBRUHI (ORCPT
+Received: from mail-wm0-f50.google.com ([74.125.82.50]:36526 "EHLO
+	mail-wm0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756988AbcBRVXq (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 18 Feb 2016 15:07:08 -0500
-Content-transfer-encoding: 7BIT
-From: Nicolas Pitre <nicolas.pitre@linaro.org>
-Subject: [PATCH v3 1/7] kbuild: record needed exported symbols for modules
-Date: Thu, 18 Feb 2016 15:06:57 -0500
-Message-id: <1455826023-2134-2-git-send-email-nicolas.pitre@linaro.org>
-In-reply-to: <1455826023-2134-1-git-send-email-nicolas.pitre@linaro.org>
-References: <1455826023-2134-1-git-send-email-nicolas.pitre@linaro.org>
+	Thu, 18 Feb 2016 16:23:46 -0500
+Received: by mail-wm0-f50.google.com with SMTP id g62so48381556wme.1
+        for <linux-kbuild@vger.kernel.org>; Thu, 18 Feb 2016 13:23:45 -0800 (PST)
+Date: Thu, 18 Feb 2016 22:21:55 +0100
+From: Emese Revfy <re.emese@gmail.com>
+Subject: Re: [PATCH v2 1/3] GCC plugin infrastructure
+Message-Id: <20160218222155.85bf19be5ab9c48efc2fec66@gmail.com>
+In-Reply-To: <CAGXu5jJcxDObPaVN25Keru6Gj9jo=EgvzhrLUUPcC0pki8pp_g@mail.gmail.com>
+References: <20160211233646.97c2af3675dc5b0f525f0489@gmail.com>
+	<20160211233903.d976f6d4457d8fe414158824@gmail.com>
+	<CAGXu5jJcxDObPaVN25Keru6Gj9jo=EgvzhrLUUPcC0pki8pp_g@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Al Viro <viro@ZenIV.linux.org.uk>, Rusty Russell <rusty@rustcorp.com.au>
+To: Kees Cook <keescook@chromium.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, PaX Team <pageexec@freemail.hu>, Brad Spengler <spender@grsecurity.net>, "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, Michal Marek <mmarek@suse.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>
 
-Kernel modules are partially linked object files with some undefined
-symbols that are expected to be matched with EXPORT_SYMBOL() entries
-from elsewhere.
-
-Each .tmp_versions/*.mod file currently contains two line of text
-separated by a newline character. The first line has the actual module
-file name while the second line has a list of object files constituting
-that module. Those files are parsed by modpost (scripts/mod/sumversion.c),
-scripts/Makefile.modpost, scripts/Makefile.modsign, etc.  Only the
-modpost utility cares about the second line while the others retrieve
-only the first line.
-
-Therefore we can add a third line to record the list of undefined symbols
-aka required EXPORT_SYMBOL() entries for each module into that file
-without breaking anything. Like for the second line, symbols are separated
-by a blank and the list is terminated with a newline character.
-
-To avoid needless build overhead, the undefined symbols extraction is
-performed only when CONFIG_TRIM_UNUSED_KSYMS is selected.
-
-Signed-off-by: Nicolas Pitre <nico@linaro.org>
-Acked-by: Rusty Russell <rusty@rustcorp.com.au>
----
- scripts/Makefile.build | 13 +++++++++++--
- 1 file changed, 11 insertions(+), 2 deletions(-)
-
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 2c47f9c305..f4b4320e0d 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -253,6 +253,13 @@ define rule_cc_o_c
- 	mv -f $(dot-target).tmp $(dot-target).cmd
- endef
  
-+# List module undefined symbols (or empty line if not enabled)
-+ifdef CONFIG_TRIM_UNUSED_KSYMS
-+cmd_undef_syms = $(NM) $@ | sed -n 's/^ \+U //p' | xargs echo
-+else
-+cmd_undef_syms = echo
-+endif
-+
- # Built-in and composite module parts
- $(obj)/%.o: $(src)/%.c $(recordmcount_source) FORCE
- 	$(call cmd,force_checksrc)
-@@ -263,7 +270,8 @@ $(obj)/%.o: $(src)/%.c $(recordmcount_source) FORCE
- $(single-used-m): $(obj)/%.o: $(src)/%.c $(recordmcount_source) FORCE
- 	$(call cmd,force_checksrc)
- 	$(call if_changed_rule,cc_o_c)
--	@{ echo $(@:.o=.ko); echo $@; } > $(MODVERDIR)/$(@F:.o=.mod)
-+	@{ echo $(@:.o=.ko); echo $@; \
-+	   $(cmd_undef_syms); } > $(MODVERDIR)/$(@F:.o=.mod)
- 
- quiet_cmd_cc_lst_c = MKLST   $@
-       cmd_cc_lst_c = $(CC) $(c_flags) -g -c -o $*.o $< && \
-@@ -393,7 +401,8 @@ $(call multi_depend, $(multi-used-y), .o, -objs -y)
- 
- $(multi-used-m): FORCE
- 	$(call if_changed,link_multi-m)
--	@{ echo $(@:.o=.ko); echo $(link_multi_deps); } > $(MODVERDIR)/$(@F:.o=.mod)
-+	@{ echo $(@:.o=.ko); echo $(link_multi_deps); \
-+	   $(cmd_undef_syms); } > $(MODVERDIR)/$(@F:.o=.mod)
- $(call multi_depend, $(multi-used-m), .o, -objs -y -m)
- 
- targets += $(multi-used-y) $(multi-used-m)
+> > +ifeq ($(call cc-ifversion, -ge, 0408, y), y)
+> > +       $(CONFIG_SHELL) -x $(srctree)/scripts/gcc-plugin.sh "$(HOSTCXX)" "$(HOSTCXX)" "$(CC)"
+> > +else
+> > +       $(CONFIG_SHELL) -x $(srctree)/scripts/gcc-plugin.sh "$(HOSTCC)" "$(HOSTCXX)" "$(CC)"
+> 
+> Is there a reason for these to be running with -x? This makes it noisy
+> when running with V=0 (the default).
+
+I think -x is useful, it prints out e.g., which headers are missing. gcc-plugin.sh with -x runs
+only when there is something wrong (as you can see it in the kbuild test bot mails).
+
 -- 
-2.5.0
-
+Emese
