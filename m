@@ -1,141 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-io0-f169.google.com ([209.85.223.169]:34923 "EHLO
-	mail-io0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1161084AbcBRAfQ (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 17 Feb 2016 19:35:16 -0500
-Received: by mail-io0-f169.google.com with SMTP id g203so56484116iof.2
-        for <linux-kbuild@vger.kernel.org>; Wed, 17 Feb 2016 16:35:16 -0800 (PST)
+Received: from mx2.suse.de ([195.135.220.15]:56200 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1425615AbcBRJgH (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 18 Feb 2016 04:36:07 -0500
+Subject: Re: [PATCH] kbuild: disable Android-specific compiler features
+References: <20160206004438.GA21780@www.outflux.net>
+ <CAGXu5jKOqnAGkpgr0iY47gFYAuJXQnsF5dQO655D00voVkX5UQ@mail.gmail.com>
+From: Michal Marek <mmarek@suse.com>
+Message-ID: <56C59083.7060501@suse.com>
+Date: Thu, 18 Feb 2016 10:36:03 +0100
 MIME-Version: 1.0
-In-Reply-To: <20160211234301.84a5ff8e513f5d5f78478283@gmail.com>
-References: <20160211233646.97c2af3675dc5b0f525f0489@gmail.com>
-	<20160211234301.84a5ff8e513f5d5f78478283@gmail.com>
-Date: Wed, 17 Feb 2016 16:35:15 -0800
-Message-ID: <CAGXu5j+1OQ81cxU57s_h_T60Z0ng54+X_jDtSdUePPQ7_Ak0Jg@mail.gmail.com>
-Subject: Re: [PATCH v2 3/3] Documentation for the GCC plugin infrastructure
-From: Kees Cook <keescook@chromium.org>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <CAGXu5jKOqnAGkpgr0iY47gFYAuJXQnsF5dQO655D00voVkX5UQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Emese Revfy <re.emese@gmail.com>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, PaX Team <pageexec@freemail.hu>, Brad Spengler <spender@grsecurity.net>, "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, Michal Marek <mmarek@suse.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>
+To: Kees Cook <keescook@chromium.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On Thu, Feb 11, 2016 at 2:43 PM, Emese Revfy <re.emese@gmail.com> wrote:
-> This is the GCC infrastructure documentation about its operation, how to add
-> and use a new plugin with an example.
-> ---
->  Documentation/gcc-plugins.txt | 68 +++++++++++++++++++++++++++++++++++++++++++
->  arch/Kconfig                  |  2 ++
->  2 files changed, 70 insertions(+)
->  create mode 100644 Documentation/gcc-plugins.txt
->
-> diff --git a/Documentation/gcc-plugins.txt b/Documentation/gcc-plugins.txt
-> new file mode 100644
-> index 0000000..e1171c2
-> --- /dev/null
-> +++ b/Documentation/gcc-plugins.txt
-> @@ -0,0 +1,68 @@
-> +GCC plugin infrastructure
-> +=========================
-> +
-> +
-> +1. Introduction
-> +===============
-> +
-> +GCC plugins are loadable modules that provide extra features to the
-> +compiler [1]. They are useful for runtime instrumentation and static analysis.
-> +We can analyse, change and add further code during compilation via
-> +callbacks [2], GIMPLE [3], IPA [4] and RTL passes [5].
-> +
-> +The GCC plugin infrastructure of the kernel supports all gcc versions from
-> +4.5 to 6.0, building out-of-tree modules, cross-compilation and building in a
-> +separate directory.
-> +
-> +Currently the GCC plugin infrastructure supports only the x86 architecture.
+Dne 18.2.2016 v 00:03 Kees Cook napsal(a):
+> On Fri, Feb 5, 2016 at 4:44 PM, Kees Cook <keescook@chromium.org> wrote:
+>> The Android compilers enable some non-standard features by default. While
+>> most Android build systems inject the needed "-mno-android" option via
+>> KCFLAGS, it happens too late (at least on x86_64), since KBUILD_CFLAGS
+>> gains KCFLAGS after running (and failing) many cc-option tests. (For
+>> example, the stack-protector tests happen after arch-specific
+>> KBUILD_CFLAGS are added but before the external KCFLAGS are added.) As
+>> such, we should notice this option and immediately turn it on as the
+>> first cc-option test we run.
+>>
+>> Signed-off-by: Kees Cook <keescook@chromium.org>
+> 
+> Michal, is this okay? I'd like to get it into -next soon if possible.
 
-What's needed to support other architectures?
+Is there a way to detect these compilers and are there some canonical
+versions of these? I do not think it's a good idea to add workaround for
+each random gcc fork.
 
-> +
-> +This infrastructure was ported from grsecurity [6] and PaX [7].
-> +
-> +--
-> +[1] https://gcc.gnu.org/onlinedocs/gccint/Plugins.html
-> +[2] https://gcc.gnu.org/onlinedocs/gccint/Plugin-API.html#Plugin-API
-> +[3] https://gcc.gnu.org/onlinedocs/gccint/GIMPLE.html
-> +[4] https://gcc.gnu.org/onlinedocs/gccint/IPA.html
-> +[5] https://gcc.gnu.org/onlinedocs/gccint/RTL.html
-> +[6] https://grsecurity.net/
-> +[7] https://pax.grsecurity.net/
-> +
-> +
-> +2. Files
-> +========
-> +
-> +$(src)/tools/gcc
-> +       This is the directory of the GCC plugins.
-> +
-> +$(src)/tools/gcc/gcc-common.h
-> +       This is a compatibility header for GCC plugins.
-> +       It should be always included instead of individual gcc headers.
-> +
-> +$(src)/scripts/gcc-plugin.sh
-> +       This script checks the availability of the included headers in
-> +       gcc-common.h and chooses the proper host compiler to build the plugins
-> +       (gcc-4.7 can be built by either gcc or g++).
-
-The part about the proper host compiler isn't clear to me. It looks
-like each of three compilers are examined:
-$CC for the header location
-$HOSTCC for actually doing the build, or
-$HOSTCXX for doing the plugin build?
-
-Shouldn't the headers be coming from the compiler that is actually
-going to be used to build the .so file?
-
-> +
-> +
-> +3. Usage
-> +========
-> +
-> +Enable a GCC plugin based feature in the kernel config:
-> +
-> +       CONFIG_GCC_PLUGIN_CYC_COMPLEXITY = y
-> +
-> +To compile only the plugin(s):
-> +
-> +       make gcc-plugins
-> +
-> +or just run the kernel make and compile the whole kernel with
-> +the cyclomatic complexity GCC plugin.
-> +
-> +
-> +4. How to add a new GCC plugin
-> +==============================
-> +
-> +The GCC plugins are in $(src)/tools/gcc/. You can use a file or a directory
-> +here. It must be added to $(src)/tools/gcc/Makefile,
-> +$(src)/scripts/Makefile.gcc-plugins and $(src)/arch/Kconfig.
-> +See the cyc_complexity_plugin.c (CONFIG_GCC_PLUGIN_CYC_COMPLEXITY) GCC plugin.
-> diff --git a/arch/Kconfig b/arch/Kconfig
-> index a558ecb..38964dd 100644
-> --- a/arch/Kconfig
-> +++ b/arch/Kconfig
-> @@ -377,6 +377,8 @@ config GCC_PLUGIN_CYC_COMPLEXITY
->           N = the number of nodes
->           P = the number of connected components (exit nodes).
->
-> +         See Documentation/gcc-plugins.txt for details.
-> +
->  endmenu # "GCC plugins"
->
->  config HAVE_CC_STACKPROTECTOR
-> --
-> 2.4.1
-
-Thanks! I'm looking forward to more plugins. :)
-
--Kees
-
--- 
-Kees Cook
-Chrome OS & Brillo Security
+Michal
