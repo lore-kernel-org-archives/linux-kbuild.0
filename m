@@ -1,14 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from relais.videotron.ca ([24.201.245.36]:50003 "EHLO
+Received: from relais.videotron.ca ([24.201.245.36]:49817 "EHLO
 	relais.videotron.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1425675AbcBRUHH (ORCPT
+	with ESMTP id S1426608AbcBRUHH (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Thu, 18 Feb 2016 15:07:07 -0500
 Content-transfer-encoding: 7BIT
 From: Nicolas Pitre <nicolas.pitre@linaro.org>
-Subject: [PATCH v3 3/7] fixdep: accept extra dependencies on stdin
-Date: Thu, 18 Feb 2016 15:06:59 -0500
-Message-id: <1455826023-2134-4-git-send-email-nicolas.pitre@linaro.org>
+Subject: [PATCH v3 5/7] kbuild: add fine grained build dependencies for
+ exported symbols
+Date: Thu, 18 Feb 2016 15:07:01 -0500
+Message-id: <1455826023-2134-6-git-send-email-nicolas.pitre@linaro.org>
 In-reply-to: <1455826023-2134-1-git-send-email-nicolas.pitre@linaro.org>
 References: <1455826023-2134-1-git-send-email-nicolas.pitre@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -16,130 +17,136 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org, Al Viro <viro@ZenIV.linux.org.uk>, Rusty Russell <rusty@rustcorp.com.au>
 
-... and merge them in the list of parsed dependencies.
+Like with kconfig options, we now have the ability to compile in and
+out individual EXPORT_SYMBOL() declarations based on the content of
+include/generated/autoksyms.h.  However we don't want the entire
+world to be rebuilt whenever that file is touched.
+
+Let's apply the same build dependency trick used for CONFIG_* symbols
+where the time stamp of empty files whose paths matching those symbols
+is used to trigger fine grained rebuilds. In our case the key is the
+symbol name passed to EXPORT_SYMBOL().
+
+However, unlike config options, we cannot just use fixdep to parse
+the source code for EXPORT_SYMBOL(ksym) because several variants exist
+and parsing them all in a separate tool, and keeping it in synch, is
+not trivially maintainable.  Furthermore, there are variants such as
+
+	EXPORT_SYMBOL_GPL(pci_user_read_config_##size);
+
+that are instanciated via a macro for which we can't easily determine
+the actual exported symbol name(s) short of actually running the
+preprocessor on them.
+
+Storing the symbol name string in a special ELF section doesn't work
+for targets that output assembly or preprocessed source.
+
+So the best way is really to leverage the preprocessor by having it emit
+a warning for each EXPORT_SYMBOL() instance and filtering those apart
+from stderr by the build system. Then the list of symbols is simply fed
+to fixdep to be merged with the other dependencies.
+
+Because of the lowercasing performed by fixdep, there might be name
+collisions triggering spurious rebuilds for similar symbols. But this
+shouldn't be a big issue in practice. (This is the case for CONFIG_*
+symbols and I didn't want to be different here, whatever the original
+reason for doing so.)
+
+To avoid needless build overhead, the exported symbol name gathering is
+performed only when CONFIG_TRIM_UNUSED_KSYMS is selected.
 
 Signed-off-by: Nicolas Pitre <nico@linaro.org>
+Acked-by: Rusty Russell <rusty@rustcorp.com.au>
 ---
- scripts/basic/fixdep.c | 60 +++++++++++++++++++++++++++++++++++++-------------
- 1 file changed, 45 insertions(+), 15 deletions(-)
+ include/linux/export.h | 16 ++++++++++++++--
+ scripts/Kbuild.include | 28 ++++++++++++++++++++++++++++
+ scripts/basic/fixdep.c |  1 +
+ 3 files changed, 43 insertions(+), 2 deletions(-)
 
+diff --git a/include/linux/export.h b/include/linux/export.h
+index 77afdb2a25..794392102d 100644
+--- a/include/linux/export.h
++++ b/include/linux/export.h
+@@ -76,8 +76,20 @@ extern struct module __this_module;
+ 	___cond_export_sym(sym, sec, conf)
+ #define ___cond_export_sym(sym, sec, enabled)			\
+ 	__cond_export_sym_##enabled(sym, sec)
+-#define __cond_export_sym_1(sym, sec) ___EXPORT_SYMBOL(sym, sec)
+-#define __cond_export_sym_0(sym, sec) /* nothing */
++#define __cond_export_sym_1(sym, sec)				\
++	__KSYM_DEP(sym) ___EXPORT_SYMBOL(sym, sec)
++#define __cond_export_sym_0(sym, sec)				\
++	__KSYM_DEP(sym) /* nothing */
++
++/*
++ * For fine grained build dependencies, we want to tell the build system
++ * about each possible exported symbol even if they're not actually exported.
++ * This is accomplished with a preprocessor warning that gets captured by
++ * the make rule (see ksym_dep_filter in scripts/Kbuild.include).
++ */
++#define __KSYM_DEP(sym) __pragma_string( KBUILD_AUTOKSYM_DEP: sym )
++#define __pragma_string(x) __emit_pragma( GCC warning #x )
++#define __emit_pragma(x) _Pragma(#x)
+ 
+ #else
+ #define __EXPORT_SYMBOL ___EXPORT_SYMBOL
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index 8a257fa663..0b69479310 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -258,12 +258,40 @@ if_changed_dep = $(if $(strip $(any-prereq) $(arg-check) ),                  \
+ 	@set -e;                                                             \
+ 	$(cmd_and_fixdep))
+ 
++ifndef CONFIG_TRIM_UNUSED_KSYMS
++
+ cmd_and_fixdep =                                                             \
+ 	$(echo-cmd) $(cmd_$(1));                                             \
+ 	scripts/basic/fixdep $(depfile) $@ '$(make-cmd)' > $(dot-target).tmp;\
+ 	rm -f $(depfile);                                                    \
+ 	mv -f $(dot-target).tmp $(dot-target).cmd;
+ 
++else
++
++# Filter out exported kernel symbol names advertised as warning pragmas
++# by the preprocessor and write them to $(1). We must consider continuation
++# lines as well: they start with a blank, or the preceeding line ends with
++# a ':'. Anything else is passed through as is.
++# See also __KSYM_DEP() in include/linux/export.h.
++ksym_dep_filter = sed -n \
++	-e '1 {x; $$!d}' \
++	-e '/^ / {H; $$!d}' \
++	-e 'x; /:$$/ {x; H; $$!d; s/^/ /; x}' \
++	-e ':filter; /^.*KBUILD_AUTOKSYM_DEP: /! {p; b next}' \
++	-e 's//KSYM_/; s/\n.*//; w $(1)' \
++	-e ':next; $$!d' \
++	-e '1 q; s/^/ /; x; /^ /! b filter'
++
++cmd_and_fixdep =                                                             \
++	$(echo-cmd)                                                          \
++	$(cmd_$(1)) 2>&1 | $(call ksym_dep_filter,$(dot-target).ksym.tmp) >&2;\
++	scripts/basic/fixdep -e $(depfile) $@ '$(make-cmd)'                  \
++	    < $(dot-target).ksym.tmp > $(dot-target).tmp;	             \
++	rm -f $(dot-target).ksym.tmp $(depfile);                             \
++	mv -f $(dot-target).tmp $(dot-target).cmd;
++
++endif
++
+ # Usage: $(call if_changed_rule,foo)
+ # Will check if $(cmd_foo) or any of the prerequisites changed,
+ # and if so will execute $(rule_foo).
 diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
-index 5b327c67a8..d984deb120 100644
+index d984deb120..2dc6bf754a 100644
 --- a/scripts/basic/fixdep.c
 +++ b/scripts/basic/fixdep.c
-@@ -120,13 +120,15 @@
- #define INT_NFIG ntohl(0x4e464947)
- #define INT_FIG_ ntohl(0x4649475f)
+@@ -354,6 +354,7 @@ static void parse_dep_file(void *map, size_t len)
  
-+int insert_extra_deps;
- char *target;
- char *depfile;
- char *cmdline;
- 
- static void usage(void)
- {
--	fprintf(stderr, "Usage: fixdep <depfile> <target> <cmdline>\n");
-+	fprintf(stderr, "Usage: fixdep [-e] <depfile> <target> <cmdline>\n");
-+	fprintf(stderr, " -e  insert extra dependencies given on stdin\n");
- 	exit(1);
- }
- 
-@@ -138,6 +140,40 @@ static void print_cmdline(void)
- 	printf("cmd_%s := %s\n\n", target, cmdline);
- }
- 
-+/*
-+ * Print out a dependency path from a symbol name
-+ */
-+static void print_config(const char *m, int slen)
-+{
-+	int c, i;
-+
-+	printf("    $(wildcard include/config/");
-+	for (i = 0; i < slen; i++) {
-+		c = m[i];
-+		if (c == '_')
-+			c = '/';
-+		else
-+			c = tolower(c);
-+		putchar(c);
-+	}
-+	printf(".h) \\\n");
-+}
-+
-+static void do_extra_deps(void)
-+{
-+	if (insert_extra_deps) {
-+		char buf[80];
-+		while(fgets(buf, sizeof(buf), stdin)) {
-+			int len = strlen(buf);
-+			if (len < 2 || buf[len-1] != '\n') {
-+				fprintf(stderr, "fixdep: bad data on stdin\n");
-+				exit(1);
-+			}
-+			print_config(buf, len-1);
-+		}
-+	}
-+}
-+
- struct item {
- 	struct item	*next;
- 	unsigned int	len;
-@@ -197,23 +233,12 @@ static void define_config(const char *name, int len, unsigned int hash)
- static void use_config(const char *m, int slen)
- {
- 	unsigned int hash = strhash(m, slen);
--	int c, i;
- 
- 	if (is_defined_config(m, slen, hash))
- 	    return;
- 
- 	define_config(m, slen, hash);
--
--	printf("    $(wildcard include/config/");
--	for (i = 0; i < slen; i++) {
--		c = m[i];
--		if (c == '_')
--			c = '/';
--		else
--			c = tolower(c);
--		putchar(c);
--	}
--	printf(".h) \\\n");
-+	print_config(m, slen);
- }
- 
- static void parse_config_file(const char *map, size_t len)
-@@ -250,7 +275,7 @@ static void parse_config_file(const char *map, size_t len)
- 	}
- }
- 
--/* test is s ends in sub */
-+/* test if s ends in sub */
- static int strrcmp(const char *s, const char *sub)
- {
- 	int slen = strlen(s);
-@@ -374,6 +399,8 @@ static void parse_dep_file(void *map, size_t len)
- 		exit(1);
- 	}
- 
-+	do_extra_deps();
-+
- 	printf("\n%s: $(deps_%s)\n\n", target, target);
- 	printf("$(deps_%s):\n", target);
- }
-@@ -430,7 +457,10 @@ int main(int argc, char *argv[])
- {
- 	traps();
- 
--	if (argc != 4)
-+	if (argc == 5 && !strcmp(argv[1], "-e")) {
-+		insert_extra_deps = 1;
-+		argv++;
-+	} else if (argc != 4)
- 		usage();
- 
- 	depfile = argv[1];
+ 			/* Ignore certain dependencies */
+ 			if (strrcmp(s, "include/generated/autoconf.h") &&
++			    strrcmp(s, "include/generated/autoksyms.h") &&
+ 			    strrcmp(s, "arch/um/include/uml-config.h") &&
+ 			    strrcmp(s, "include/linux/kconfig.h") &&
+ 			    strrcmp(s, ".ver")) {
 -- 
 2.5.0
 
