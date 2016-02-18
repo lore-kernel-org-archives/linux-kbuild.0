@@ -1,14 +1,14 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
 Received: from relais.videotron.ca ([24.201.245.36]:37142 "EHLO
 	relais.videotron.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1425675AbcBRUHN (ORCPT
+	with ESMTP id S1427034AbcBRUHO (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 18 Feb 2016 15:07:13 -0500
+	Thu, 18 Feb 2016 15:07:14 -0500
 Content-transfer-encoding: 7BIT
 From: Nicolas Pitre <nicolas.pitre@linaro.org>
-Subject: [PATCH v3 4/7] kbuild: de-duplicate fixdep usage
-Date: Thu, 18 Feb 2016 15:07:00 -0500
-Message-id: <1455826023-2134-5-git-send-email-nicolas.pitre@linaro.org>
+Subject: [PATCH v3 7/7] kconfig option for TRIM_UNUSED_KSYMS
+Date: Thu, 18 Feb 2016 15:07:03 -0500
+Message-id: <1455826023-2134-8-git-send-email-nicolas.pitre@linaro.org>
 In-reply-to: <1455826023-2134-1-git-send-email-nicolas.pitre@linaro.org>
 References: <1455826023-2134-1-git-send-email-nicolas.pitre@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -16,61 +16,41 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org, Al Viro <viro@ZenIV.linux.org.uk>, Rusty Russell <rusty@rustcorp.com.au>
 
-The generation and postprocessing of automatic dependency rules is
-duplicated in rule_cc_o_c and if_changed_dep. Since this is not a
-trivial one-liner action, it is now abstracted under cmd_and_fixdep
-to simplify things and make future changes easier.
-
-In the rule_cc_o_c case that means the order of some commands has been
-altered, namely fixdep and related file manipulations are executed
-earlier, but they didn't depend on those commands that now execute later.
+The config option to enable it all.
 
 Signed-off-by: Nicolas Pitre <nico@linaro.org>
+Acked-by: Rusty Russell <rusty@rustcorp.com.au>
 ---
- scripts/Kbuild.include | 5 ++++-
- scripts/Makefile.build | 9 ++-------
- 2 files changed, 6 insertions(+), 8 deletions(-)
+ init/Kconfig | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index 1db6d73c8d..8a257fa663 100644
---- a/scripts/Kbuild.include
-+++ b/scripts/Kbuild.include
-@@ -256,10 +256,13 @@ if_changed = $(if $(strip $(any-prereq) $(arg-check)),                       \
- # Execute the command and also postprocess generated .d dependencies file.
- if_changed_dep = $(if $(strip $(any-prereq) $(arg-check) ),                  \
- 	@set -e;                                                             \
-+	$(cmd_and_fixdep))
+diff --git a/init/Kconfig b/init/Kconfig
+index 22320804fb..e6f666331b 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -1990,6 +1990,22 @@ config MODULE_COMPRESS_XZ
+ 
+ endchoice
+ 
++config TRIM_UNUSED_KSYMS
++	bool "Trim unused exported kernel symbols"
++	depends on MODULES && !UNUSED_SYMBOLS
++	help
++	  The kernel and some modules make many symbols available for
++	  other modules to use via EXPORT_SYMBOL() and variants. Depending
++	  on the set of modules being selected in your kernel configuration,
++	  many of those exported symbols might never be used.
 +
-+cmd_and_fixdep =                                                             \
- 	$(echo-cmd) $(cmd_$(1));                                             \
- 	scripts/basic/fixdep $(depfile) $@ '$(make-cmd)' > $(dot-target).tmp;\
- 	rm -f $(depfile);                                                    \
--	mv -f $(dot-target).tmp $(dot-target).cmd)
-+	mv -f $(dot-target).tmp $(dot-target).cmd;
++	  This option allows for unused exported symbols to be dropped from
++	  the build. In turn, this provides the compiler more opportunities
++	  (especially when using LTO) for optimizing the code and reducing
++	  binary size.  This might have some security advantages as well.
++
++	  If unsure say N.
++
+ endif # MODULES
  
- # Usage: $(call if_changed_rule,foo)
- # Will check if $(cmd_foo) or any of the prerequisites changed,
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index f4b4320e0d..8134ee81ad 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -243,14 +243,9 @@ endif
- 
- define rule_cc_o_c
- 	$(call echo-cmd,checksrc) $(cmd_checksrc)			  \
--	$(call echo-cmd,cc_o_c) $(cmd_cc_o_c);				  \
-+	$(call cmd_and_fixdep,cc_o_c)					  \
- 	$(cmd_modversions)						  \
--	$(call echo-cmd,record_mcount)					  \
--	$(cmd_record_mcount)						  \
--	scripts/basic/fixdep $(depfile) $@ '$(call make-cmd,cc_o_c)' >    \
--	                                              $(dot-target).tmp;  \
--	rm -f $(depfile);						  \
--	mv -f $(dot-target).tmp $(dot-target).cmd
-+	$(call echo-cmd,record_mcount) $(cmd_record_mcount)
- endef
- 
- # List module undefined symbols (or empty line if not enabled)
+ config MODULES_TREE_LOOKUP
 -- 
 2.5.0
 
