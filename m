@@ -1,55 +1,85 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f43.google.com ([74.125.82.43]:33394 "EHLO
-	mail-wm0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1426696AbcBRWPH (ORCPT
+Received: from conuserg010.nifty.com ([202.248.44.36]:25501 "EHLO
+	conuserg010-v.nifty.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1425341AbcBSGGP (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 18 Feb 2016 17:15:07 -0500
-Received: by mail-wm0-f43.google.com with SMTP id g62so44959054wme.0
-        for <linux-kbuild@vger.kernel.org>; Thu, 18 Feb 2016 14:15:06 -0800 (PST)
-Date: Thu, 18 Feb 2016 23:13:15 +0100
-From: Emese Revfy <re.emese@gmail.com>
-Subject: Re: [PATCH v2 3/3] Documentation for the GCC plugin infrastructure
-Message-Id: <20160218231315.b1edfb403c1dc6eb0d0a20df@gmail.com>
-In-Reply-To: <CAGXu5j+1OQ81cxU57s_h_T60Z0ng54+X_jDtSdUePPQ7_Ak0Jg@mail.gmail.com>
-References: <20160211233646.97c2af3675dc5b0f525f0489@gmail.com>
-	<20160211234301.84a5ff8e513f5d5f78478283@gmail.com>
-	<CAGXu5j+1OQ81cxU57s_h_T60Z0ng54+X_jDtSdUePPQ7_Ak0Jg@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+	Fri, 19 Feb 2016 01:06:15 -0500
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH] arm64, kbuild:  make "make install" not depend on vmlinux
+Date: Fri, 19 Feb 2016 15:05:50 +0900
+Message-Id: <1455861950-21832-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kees Cook <keescook@chromium.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, PaX Team <pageexec@freemail.hu>, Brad Spengler <spender@grsecurity.net>, "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, Michal Marek <mmarek@suse.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>
+To: linux-kbuild@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.cz>, Robert Richter <rric@kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org, Will Deacon <will.deacon@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Olof Johansson <olof@lixom.net>, linux-arm-kernel@lists.infradead.org
 
-On Wed, 17 Feb 2016 16:35:15 -0800
-Kees Cook <keescook@chromium.org> wrote:
+For the same reason as commit 19514fc665ff (arm, kbuild: make "make
+install" not depend on vmlinux), the install targets should never
+trigger the rebuild of the kernel.
 
-> > +Currently the GCC plugin infrastructure supports only the x86 architecture.
-> 
-> What's needed to support other architectures?
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
-Sadly gcc doesn't always install all necessary plugin headers (moreover some headers
-come from the build tree). The gcc developers don't test gcc with installed headers
-so they don't see these bugs.
-I think arm support would be good. I can test it easily because I know what headers are
-missing there but I don't know if it is acceptable for the vanilla kernel (installing
-the headers by hand isn't too nice and user friendly).
+ arch/arm64/Makefile        |  2 +-
+ arch/arm64/boot/Makefile   |  4 ++--
+ arch/arm64/boot/install.sh | 14 ++++++++++++++
+ 3 files changed, 17 insertions(+), 3 deletions(-)
 
-> The part about the proper host compiler isn't clear to me. It looks
-> like each of three compilers are examined:
-> $CC for the header location
-> $HOSTCC for actually doing the build, or
-> $HOSTCXX for doing the plugin build?
-
-$HOSTCC and $HOSTCXX are used for building a plugin. Their use depends on which gcc version
-(c or c++ based) you use.
-
-> Shouldn't the headers be coming from the compiler that is actually
-> going to be used to build the .so file?
-
-No, they have to come from the compiler that will load the plugin (the plugin itself
-could even be compiled by clang for example).
-
+diff --git a/arch/arm64/Makefile b/arch/arm64/Makefile
+index 307237c..b5e3f6d 100644
+--- a/arch/arm64/Makefile
++++ b/arch/arm64/Makefile
+@@ -88,7 +88,7 @@ Image: vmlinux
+ Image.%: vmlinux
+ 	$(Q)$(MAKE) $(build)=$(boot) $(boot)/$@
+ 
+-zinstall install: vmlinux
++zinstall install:
+ 	$(Q)$(MAKE) $(build)=$(boot) $@
+ 
+ %.dtb: scripts
+diff --git a/arch/arm64/boot/Makefile b/arch/arm64/boot/Makefile
+index abcbba2..305c552 100644
+--- a/arch/arm64/boot/Makefile
++++ b/arch/arm64/boot/Makefile
+@@ -34,10 +34,10 @@ $(obj)/Image.lzma: $(obj)/Image FORCE
+ $(obj)/Image.lzo: $(obj)/Image FORCE
+ 	$(call if_changed,lzo)
+ 
+-install: $(obj)/Image
++install:
+ 	$(CONFIG_SHELL) $(srctree)/$(src)/install.sh $(KERNELRELEASE) \
+ 	$(obj)/Image System.map "$(INSTALL_PATH)"
+ 
+-zinstall: $(obj)/Image.gz
++zinstall:
+ 	$(CONFIG_SHELL) $(srctree)/$(src)/install.sh $(KERNELRELEASE) \
+ 	$(obj)/Image.gz System.map "$(INSTALL_PATH)"
+diff --git a/arch/arm64/boot/install.sh b/arch/arm64/boot/install.sh
+index 12ed78a..d91e1f0 100644
+--- a/arch/arm64/boot/install.sh
++++ b/arch/arm64/boot/install.sh
+@@ -20,6 +20,20 @@
+ #   $4 - default install path (blank if root directory)
+ #
+ 
++verify () {
++	if [ ! -f "$1" ]; then
++		echo ""                                                   1>&2
++		echo " *** Missing file: $1"                              1>&2
++		echo ' *** You need to run "make" before "make install".' 1>&2
++		echo ""                                                   1>&2
++		exit 1
++	fi
++}
++
++# Make sure the files actually exist
++verify "$2"
++verify "$3"
++
+ # User may have a custom install script
+ if [ -x ~/bin/${INSTALLKERNEL} ]; then exec ~/bin/${INSTALLKERNEL} "$@"; fi
+ if [ -x /sbin/${INSTALLKERNEL} ]; then exec /sbin/${INSTALLKERNEL} "$@"; fi
 -- 
-Emese
+1.9.1
+
