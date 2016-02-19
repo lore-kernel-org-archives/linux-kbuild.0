@@ -1,85 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg010.nifty.com ([202.248.44.36]:25501 "EHLO
-	conuserg010-v.nifty.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1425341AbcBSGGP (ORCPT
+Received: from smtp02.citrix.com ([66.165.176.63]:26727 "EHLO
+	SMTP02.CITRIX.COM" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757237AbcBSRG3 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 19 Feb 2016 01:06:15 -0500
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] arm64, kbuild:  make "make install" not depend on vmlinux
-Date: Fri, 19 Feb 2016 15:05:50 +0900
-Message-Id: <1455861950-21832-1-git-send-email-yamada.masahiro@socionext.com>
+	Fri, 19 Feb 2016 12:06:29 -0500
+From: Ian Jackson <Ian.Jackson@eu.citrix.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+Message-ID: <22215.19335.684167.840646@mariner.uk.xensource.com>
+Date: Fri, 19 Feb 2016 17:06:15 +0000
+Subject: Re: Adding Xen to the kbuild bot?
+In-Reply-To: <CALCETrVssJ2oCqT9eKzoXQ0VWz1O1XB=Gt97djrgPYTfZYt_ug@mail.gmail.com>
+References: <CALCETrUh1jq7Di0gTO0R3wN51x=vmd5wU4ODmE0kXK13MhQDnA@mail.gmail.com>
+	<20160205031116.GB30154@wfg-t540p.sh.intel.com>
+	<CALCETrVssJ2oCqT9eKzoXQ0VWz1O1XB=Gt97djrgPYTfZYt_ug@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Michal Marek <mmarek@suse.cz>, Robert Richter <rric@kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org, Will Deacon <will.deacon@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Olof Johansson <olof@lixom.net>, linux-arm-kernel@lists.infradead.org
+To: Andy Lutomirski <luto@amacapital.net>
+Cc: Fengguang Wu <fengguang.wu@intel.com>, "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, Ian Campbell <ian.campbell@citrix.com>, LKP <lkp@01.org>, "Hu, Robert" <robert.hu@intel.com>
 
-For the same reason as commit 19514fc665ff (arm, kbuild: make "make
-install" not depend on vmlinux), the install targets should never
-trigger the rebuild of the kernel.
+Andy Lutomirski writes ("Re: Adding Xen to the kbuild bot?"):
+> On Feb 4, 2016 7:11 PM, "Fengguang Wu" <fengguang.wu@intel.com> wrote:
+> > Do you mean to run basic Xen testing on the various kernel trees that
+> > 0day robot covers? That is, to catch kernel regressions when running
+> > under Xen.
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
+This would be great.
 
- arch/arm64/Makefile        |  2 +-
- arch/arm64/boot/Makefile   |  4 ++--
- arch/arm64/boot/install.sh | 14 ++++++++++++++
- 3 files changed, 17 insertions(+), 3 deletions(-)
+> > If the intention is to catch Xen regressions, the OSStest
+> > infrastructure may be a better option:
+> >
+> >         git://xenbits.xen.org/osstest.git
+> 
+> No, I think that 0day should pick one Xen version and stick with it
+> for a while rather than trying to track the latest version.
 
-diff --git a/arch/arm64/Makefile b/arch/arm64/Makefile
-index 307237c..b5e3f6d 100644
---- a/arch/arm64/Makefile
-+++ b/arch/arm64/Makefile
-@@ -88,7 +88,7 @@ Image: vmlinux
- Image.%: vmlinux
- 	$(Q)$(MAKE) $(build)=$(boot) $(boot)/$@
- 
--zinstall install: vmlinux
-+zinstall install:
- 	$(Q)$(MAKE) $(build)=$(boot) $@
- 
- %.dtb: scripts
-diff --git a/arch/arm64/boot/Makefile b/arch/arm64/boot/Makefile
-index abcbba2..305c552 100644
---- a/arch/arm64/boot/Makefile
-+++ b/arch/arm64/boot/Makefile
-@@ -34,10 +34,10 @@ $(obj)/Image.lzma: $(obj)/Image FORCE
- $(obj)/Image.lzo: $(obj)/Image FORCE
- 	$(call if_changed,lzo)
- 
--install: $(obj)/Image
-+install:
- 	$(CONFIG_SHELL) $(srctree)/$(src)/install.sh $(KERNELRELEASE) \
- 	$(obj)/Image System.map "$(INSTALL_PATH)"
- 
--zinstall: $(obj)/Image.gz
-+zinstall:
- 	$(CONFIG_SHELL) $(srctree)/$(src)/install.sh $(KERNELRELEASE) \
- 	$(obj)/Image.gz System.map "$(INSTALL_PATH)"
-diff --git a/arch/arm64/boot/install.sh b/arch/arm64/boot/install.sh
-index 12ed78a..d91e1f0 100644
---- a/arch/arm64/boot/install.sh
-+++ b/arch/arm64/boot/install.sh
-@@ -20,6 +20,20 @@
- #   $4 - default install path (blank if root directory)
- #
- 
-+verify () {
-+	if [ ! -f "$1" ]; then
-+		echo ""                                                   1>&2
-+		echo " *** Missing file: $1"                              1>&2
-+		echo ' *** You need to run "make" before "make install".' 1>&2
-+		echo ""                                                   1>&2
-+		exit 1
-+	fi
-+}
-+
-+# Make sure the files actually exist
-+verify "$2"
-+verify "$3"
-+
- # User may have a custom install script
- if [ -x ~/bin/${INSTALLKERNEL} ]; then exec ~/bin/${INSTALLKERNEL} "$@"; fi
- if [ -x /sbin/${INSTALLKERNEL} ]; then exec /sbin/${INSTALLKERNEL} "$@"; fi
--- 
-1.9.1
+I don't have an opinion about whether more kernel testing for Xen
+problems should be done with 0day or with wider use of osstest.
 
+In any case, we in the Xen Project have a number of git branches of
+Xen which might well suitable for use as a stable input to something
+like 0day.
+
+The most obvious would be the osstest output branch for the latest Xen
+stable release, which is at
+   git://xenbits.xen.org/osstest.git#stable-4.6
+(and when 4.7 is released, ...-4.7).  This is subjected to the osstest
+push gate so it is known not to be totally broken.
+
+There is also the tested upstream development branch:
+   git://xenbits.xen.org/osstest.git#master
+which is also the output of an osstest push gate.  The advantage of
+using that is that there is no need to explicitly update to a new
+Xen release; the disadvantage is that it does change continously.
+
+But both of these have been tested with at least one (usually, older)
+version of Linux as dom0 and known to boot a variety of guests.
+
+Ian.
