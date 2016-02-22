@@ -1,52 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg001.nifty.com ([202.248.44.39]:53341 "EHLO
-	conssluserg001-v.nifty.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1754408AbcBVMIW (ORCPT
+Received: from pandora.arm.linux.org.uk ([78.32.30.218]:40834 "EHLO
+	pandora.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754382AbcBVMSS (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 22 Feb 2016 07:08:22 -0500
-MIME-Version: 1.0
-In-Reply-To: <20160222113625.GC19428@n2100.arm.linux.org.uk>
-References: <1456126277-14633-1-git-send-email-yamada.masahiro@socionext.com>
-	<20160222113625.GC19428@n2100.arm.linux.org.uk>
-Date: Mon, 22 Feb 2016 21:08:05 +0900
-Message-ID: <CAK7LNAQEwm=2bHX+kTxFVJTh-sFX+3MBgwuEmmNM-XoyvdbWRA@mail.gmail.com>
+	Mon, 22 Feb 2016 07:18:18 -0500
+Date: Mon, 22 Feb 2016 12:18:05 +0000
+From: Russell King - ARM Linux <linux@arm.linux.org.uk>
 Subject: Re: [PATCH 0/6] ARM: decompressor: several cleanups
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Content-Type: text/plain; charset=UTF-8
+Message-ID: <20160222121805.GD19428@n2100.arm.linux.org.uk>
+References: <1456126277-14633-1-git-send-email-yamada.masahiro@socionext.com>
+ <20160222113625.GC19428@n2100.arm.linux.org.uk>
+ <CAK7LNAQEwm=2bHX+kTxFVJTh-sFX+3MBgwuEmmNM-XoyvdbWRA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAK7LNAQEwm=2bHX+kTxFVJTh-sFX+3MBgwuEmmNM-XoyvdbWRA@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Russell King - ARM Linux <linux@arm.linux.org.uk>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
 Cc: Michal Marek <mmarek@suse.cz>, Kees Cook <keescook@chromium.org>, Arnd Bergmann <arnd@arndb.de>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Magnus Damm <damm+renesas@opensource.se>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Roy Franz <roy.franz@linaro.org>, Olof Johansson <olof@lixom.net>, Simon Horman <horms+renesas@verge.net.au>, Geert Uytterhoeven <geert+renesas@glider.be>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
 
-Hi Russell,
+On Mon, Feb 22, 2016 at 09:08:05PM +0900, Masahiro Yamada wrote:
+> I did build-test, changing the configuration
+> CONFIG_KERNEL_GZIP -> CONFIG_KERNEL_LZMA -> CONFIG_KERNEL_XZ -> ...
+> 
+> I confirmed zImage was created from the expected piggy.
+> 
+> For run-test, it worked fine too.
 
-
-2016-02-22 20:36 GMT+09:00 Russell King - ARM Linux <linux@arm.linux.org.uk>:
-> On Mon, Feb 22, 2016 at 04:31:11PM +0900, Masahiro Yamada wrote:
->> Masahiro Yamada (6):
->>   ARM: decompressor: drop unneeded assignments to "targets"
->>   ARM: decompressor: drop more unneeded assignments to "targets"
->>   ARM: decompressor: use clean-files instead of extra-y to clean files
->>   ARM: decompressor: drop redundant FORCE in Makefile
->>   ARM: decompressor: merge piggy.*.S and simplify Makefile
->>   ARM: decompressor: rename suffix_y to compress-y
->
-> Most of this looks fine to me, but I've a question about how thoroughly
-> patch 5 has been tested: iow, do we get correct behaviour if only the
-> compression method is changed?
->
-> Thanks.
-
-
-I did build-test, changing the configuration
-CONFIG_KERNEL_GZIP -> CONFIG_KERNEL_LZMA -> CONFIG_KERNEL_XZ -> ...
-
-I confirmed zImage was created from the expected piggy.
-
-For run-test, it worked fine too.
-
-
+Okay, please drop them into the patch system, thanks.
 
 -- 
-Best Regards
-Masahiro Yamada
+RMK's Patch system: http://www.arm.linux.org.uk/developer/patches/
+FTTC broadband for 0.8mile line: currently at 9.6Mbps down 400kbps up
+according to speedtest.net.
