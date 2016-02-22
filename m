@@ -1,47 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg011.nifty.com ([202.248.44.37]:32571 "EHLO
-	conuserg011-v.nifty.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753474AbcBVHb7 (ORCPT
+Received: from pandora.arm.linux.org.uk ([78.32.30.218]:40742 "EHLO
+	pandora.arm.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754552AbcBVLgu (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 22 Feb 2016 02:31:59 -0500
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 4/6] ARM: decompressor: drop redundant FORCE in Makefile
-Date: Mon, 22 Feb 2016 16:31:15 +0900
-Message-Id: <1456126277-14633-5-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1456126277-14633-1-git-send-email-yamada.masahiro@socionext.com>
+	Mon, 22 Feb 2016 06:36:50 -0500
+Date: Mon, 22 Feb 2016 11:36:25 +0000
+From: Russell King - ARM Linux <linux@arm.linux.org.uk>
+Subject: Re: [PATCH 0/6] ARM: decompressor: several cleanups
+Message-ID: <20160222113625.GC19428@n2100.arm.linux.org.uk>
 References: <1456126277-14633-1-git-send-email-yamada.masahiro@socionext.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1456126277-14633-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-arm-kernel@lists.infradead.org
-Cc: Russell King <rmk+kernel@arm.linux.org.uk>, Arnd Bergmann <arnd@arndb.de>, Olof Johansson <olof@lixom.net>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Magnus Damm <damm+renesas@opensource.se>, Kees Cook <keescook@chromium.org>, linux-kernel@vger.kernel.org, Roy Franz <roy.franz@linaro.org>, Russell King <linux@arm.linux.org.uk>, Geert Uytterhoeven <geert+renesas@glider.be>, Simon Horman <horms+renesas@verge.net.au>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-arm-kernel@lists.infradead.org, Arnd Bergmann <arnd@arndb.de>, Olof Johansson <olof@lixom.net>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, Magnus Damm <damm+renesas@opensource.se>, Kees Cook <keescook@chromium.org>, linux-kernel@vger.kernel.org, Roy Franz <roy.franz@linaro.org>, Geert Uytterhoeven <geert+renesas@glider.be>, Simon Horman <horms+renesas@verge.net.au>
 
-The object "piggy.$(suffix_y).o" is created from "piggy.$(suffix).S"
-by the following pattern rule defined in scripts/Makefile.build:
+On Mon, Feb 22, 2016 at 04:31:11PM +0900, Masahiro Yamada wrote:
+> Masahiro Yamada (6):
+>   ARM: decompressor: drop unneeded assignments to "targets"
+>   ARM: decompressor: drop more unneeded assignments to "targets"
+>   ARM: decompressor: use clean-files instead of extra-y to clean files
+>   ARM: decompressor: drop redundant FORCE in Makefile
+>   ARM: decompressor: merge piggy.*.S and simplify Makefile
+>   ARM: decompressor: rename suffix_y to compress-y
 
-  $(obj)/%.o: $(src)/%.S FORCE
-          $(call if_changed_dep,as_o_S)
+Most of this looks fine to me, but I've a question about how thoroughly
+patch 5 has been tested: iow, do we get correct behaviour if only the
+compression method is changed?
 
-FORCE is already added to the prerequisite of the object there.
+Thanks.
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
-
- arch/arm/boot/compressed/Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/arch/arm/boot/compressed/Makefile b/arch/arm/boot/compressed/Makefile
-index f9e8e68..903b953 100644
---- a/arch/arm/boot/compressed/Makefile
-+++ b/arch/arm/boot/compressed/Makefile
-@@ -187,7 +187,7 @@ $(obj)/vmlinux: $(obj)/vmlinux.lds $(obj)/$(HEAD) $(obj)/piggy.$(suffix_y).o \
- $(obj)/piggy.$(suffix_y): $(obj)/../Image FORCE
- 	$(call if_changed,$(suffix_y))
- 
--$(obj)/piggy.$(suffix_y).o:  $(obj)/piggy.$(suffix_y) FORCE
-+$(obj)/piggy.$(suffix_y).o:  $(obj)/piggy.$(suffix_y)
- 
- CFLAGS_font.o := -Dstatic=
- 
 -- 
-1.9.1
-
+RMK's Patch system: http://www.arm.linux.org.uk/developer/patches/
+FTTC broadband for 0.8mile line: currently at 9.6Mbps down 400kbps up
+according to speedtest.net.
