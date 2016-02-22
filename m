@@ -1,134 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f48.google.com ([74.125.82.48]:34168 "EHLO
-	mail-wm0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752098AbcBVTS7 (ORCPT
+Received: from mail-ig0-f169.google.com ([209.85.213.169]:36726 "EHLO
+	mail-ig0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752980AbcBVXDA (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 22 Feb 2016 14:18:59 -0500
-Received: by mail-wm0-f48.google.com with SMTP id b205so169741076wmb.1
-        for <linux-kbuild@vger.kernel.org>; Mon, 22 Feb 2016 11:18:58 -0800 (PST)
-Date: Mon, 22 Feb 2016 20:17:06 +0100
-From: Emese Revfy <re.emese@gmail.com>
-Subject: [PATCH v3 3/3] Documentation for the GCC plugin infrastructure
-Message-Id: <20160222201706.be4f5f89a277e5d116f97698@gmail.com>
-In-Reply-To: <20160222201335.449323716ca4d929f92424d5@gmail.com>
-References: <20160222201335.449323716ca4d929f92424d5@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+	Mon, 22 Feb 2016 18:03:00 -0500
+Received: by mail-ig0-f169.google.com with SMTP id xg9so87830971igb.1
+        for <linux-kbuild@vger.kernel.org>; Mon, 22 Feb 2016 15:03:00 -0800 (PST)
+MIME-Version: 1.0
+Date: Mon, 22 Feb 2016 15:02:59 -0800
+Message-ID: <CAGXu5jJR2ysc=g9879=o7AJtsygV4PR8VVZ5ojQGCsqqgWBH2g@mail.gmail.com>
+Subject: In-place changes to a target?
+From: Kees Cook <keescook@google.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: pageexec@freemail.hu, spender@grsecurity.net, kernel-hardening@lists.openwall.com, mmarek@suse.com, keescook@chromium.org, linux@rasmusvillemoes.dk
+To: linux-kbuild <linux-kbuild@vger.kernel.org>
+Cc: Laura Abbott <labbott@redhat.com>, PaX Team <pageexec@freemail.hu>, Arnd Bergmann <arnd@arndb.de>, Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-This is the GCC infrastructure documentation about its operation, how to add
-and use a new plugin with an example.
----
- Documentation/gcc-plugins.txt | 82 +++++++++++++++++++++++++++++++++++++++++++
- arch/Kconfig                  |  2 ++
- 2 files changed, 84 insertions(+)
- create mode 100644 Documentation/gcc-plugins.txt
+Hi,
 
-diff --git a/Documentation/gcc-plugins.txt b/Documentation/gcc-plugins.txt
-new file mode 100644
-index 0000000..ffb56a3
---- /dev/null
-+++ b/Documentation/gcc-plugins.txt
-@@ -0,0 +1,82 @@
-+GCC plugin infrastructure
-+=========================
-+
-+
-+1. Introduction
-+===============
-+
-+GCC plugins are loadable modules that provide extra features to the
-+compiler [1]. They are useful for runtime instrumentation and static analysis.
-+We can analyse, change and add further code during compilation via
-+callbacks [2], GIMPLE [3], IPA [4] and RTL passes [5].
-+
-+The GCC plugin infrastructure of the kernel supports all gcc versions from
-+4.5 to 6.0, building out-of-tree modules, cross-compilation and building in a
-+separate directory.
-+
-+Currently the GCC plugin infrastructure supports only the x86 architecture.
-+
-+This infrastructure was ported from grsecurity [6] and PaX [7].
-+
-+--
-+[1] https://gcc.gnu.org/onlinedocs/gccint/Plugins.html
-+[2] https://gcc.gnu.org/onlinedocs/gccint/Plugin-API.html#Plugin-API
-+[3] https://gcc.gnu.org/onlinedocs/gccint/GIMPLE.html
-+[4] https://gcc.gnu.org/onlinedocs/gccint/IPA.html
-+[5] https://gcc.gnu.org/onlinedocs/gccint/RTL.html
-+[6] https://grsecurity.net/
-+[7] https://pax.grsecurity.net/
-+
-+
-+2. Files
-+========
-+
-+$(src)/tools/gcc
-+	This is the directory of the GCC plugins.
-+
-+$(src)/tools/gcc/gcc-common.h
-+	This is a compatibility header for GCC plugins.
-+	It should be always included instead of individual gcc headers.
-+
-+$(src)/scripts/gcc-plugin.sh
-+	This script checks the availability of the included headers in
-+	gcc-common.h and chooses the proper host compiler to build the plugins
-+	(gcc-4.7 can be built by either gcc or g++).
-+
-+$(src)/tools/gcc/gcc-generate-gimple-pass.h
-+$(src)/tools/gcc/gcc-generate-ipa-pass.h
-+$(src)/tools/gcc/gcc-generate-simple_ipa-pass.h
-+$(src)/tools/gcc/gcc-generate-rtl-pass.h
-+	These headers automatically generate the registration structures for
-+	GIMPLE, SIMPLE_IPA, IPA and RTL passes. They support all gcc versions
-+	from 4.5 to 6.0.
-+	They should be preferred to creating the structures by hand.
-+
-+
-+3. Usage
-+========
-+
-+You must install the gcc plugin headers for your gcc version,
-+e.g., on Ubuntu for gcc-4.9:
-+
-+	apt-get install gcc-4.9-plugin-dev
-+
-+Enable a GCC plugin based feature in the kernel config:
-+
-+	CONFIG_GCC_PLUGIN_CYC_COMPLEXITY = y
-+
-+To compile only the plugin(s):
-+
-+	make gcc-plugins
-+
-+or just run the kernel make and compile the whole kernel with
-+the cyclomatic complexity GCC plugin.
-+
-+
-+4. How to add a new GCC plugin
-+==============================
-+
-+The GCC plugins are in $(src)/tools/gcc/. You can use a file or a directory
-+here. It must be added to $(src)/tools/gcc/Makefile,
-+$(src)/scripts/Makefile.gcc-plugins and $(src)/arch/Kconfig.
-+See the cyc_complexity_plugin.c (CONFIG_GCC_PLUGIN_CYC_COMPLEXITY) GCC plugin.
-diff --git a/arch/Kconfig b/arch/Kconfig
-index b8b1afc..a490f17 100644
---- a/arch/Kconfig
-+++ b/arch/Kconfig
-@@ -377,6 +377,8 @@ config GCC_PLUGIN_CYC_COMPLEXITY
- 	  N = the number of nodes
- 	  P = the number of connected components (exit nodes).
- 
-+	  See Documentation/gcc-plugins.txt for details.
-+
- endmenu # "GCC plugins"
- 
- config HAVE_CC_STACKPROTECTOR
+I'm attempting to do some strange things in drivers/misc/lkdtm.c, and
+I'm stumped on how to do it "best" in kbuild.
+
+What I want: an empty function that just returns, but the code lives in .rodata.
+
+Since I want to be architecture agnostic, I want to use gcc to
+generate assembly. If I force the section name (via
+"__section(.rodata)" gcc adds the wrong flags ("ax" instead of "a"). I
+can't trick the assembler output using a comment because each
+architecture has different comment characters (once again, I want to
+be architecture agnostic).
+
+I can use objcopy to change the flags, but kbuild expects to copy from
+one target to another target, rather than doing it in-place:
+
+OBJCOPYFLAGS_lkdtm_objcopy.o := \
+                        --set-section-flags .text.rodata=alloc,readonly \
+                        --rename-section .text.rodata=.rodata
+$(obj)/lkdtm_objcopy.o: $(src)/lkdtm.o FORCE
+        $(call if_changed,objcopy)
+
+But I haven't found a way to either replace this new target or even
+add it (if built from a separate file) without also needing to rename
+lkdtm.c. If I do this:
+
+lkdtm-$(CONFIG_LKDTM) += lkdtm_objcopy.o
+
+I end up with a circular dependency. I can't find a way to have either
+lkdtm_objcopy.o replace lkdtm.o or even to simply add lkdtm_objcopy.o
+to lkdtm.o without renaming lkdtm.c. For example, this works (after a
+"mv lkdtm.c lkdtm_core.c" and putting the special function in a
+separate file named "lkdtm_rodata.c"):
+
+lkdtm-$(CONFIG_LKDTM)          += lkdtm_core.o
+lkdtm-$(CONFIG_LKDTM)          += lkdtm_rodata_objcopy.o
+
+OBJCOPYFLAGS_lkdtm_rodata_objcopy.o := \
+                       --set-section-flags .text.rodata=alloc,readonly \
+                       --rename-section .text.rodata=.rodata
+$(obj)/lkdtm_rodata_objcopy.o: $(obj)/lkdtm_rodata.o
+       $(call if_changed,objcopy)
+
+Is there some way to either append to the lkdtm.o rule to do an
+in-place objcopy, or append another .o file to lkdtm.o? I'd really
+rather not have to rename lkdtm.c...
+
+Thanks for any help!
+
+-Kees
+
 -- 
-2.4.1
-
+Kees Cook
+Chrome OS & Brillo Security
