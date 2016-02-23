@@ -1,110 +1,77 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mailapp01.imgtec.com ([195.59.15.196]:35158 "EHLO
-	imgpgp01.kl.imgtec.org" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1750740AbcBWJvK (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 23 Feb 2016 04:51:10 -0500
-Date: Tue, 23 Feb 2016 09:51:07 +0000
-From: James Hogan <james.hogan@imgtec.com>
-Subject: Re: [PATCH v2 2/2] kbuild: Remove stale asm-generic wrappers
-Message-ID: <20160223095107.GC21143@jhogan-linux.le.imgtec.org>
-References: <1453210670-12596-1-git-send-email-james.hogan@imgtec.com>
- <1667268.iM977TQnEK@wuerfel>
- <20160119142213.GA12679@jhogan-linux.le.imgtec.org>
- <4206493.gjdgtfndZ8@wuerfel>
+Received: from lists.s-osg.org ([54.187.51.154]:39116 "EHLO lists.s-osg.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751119AbcBWOeN (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 23 Feb 2016 09:34:13 -0500
+Subject: Re: [PATCH v4 2/2] Makefile: add kselftest-merge
+References: <1452238054-15482-1-git-send-email-bamvor.zhangjian@linaro.org>
+ <1452238054-15482-3-git-send-email-bamvor.zhangjian@linaro.org>
+From: Shuah Khan <shuahkh@osg.samsung.com>
+Message-ID: <56CC6DDD.9080803@osg.samsung.com>
+Date: Tue, 23 Feb 2016 07:34:05 -0700
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="4ZLFUWh1odzi/v6L"
-Content-Disposition: inline
-In-Reply-To: <4206493.gjdgtfndZ8@wuerfel>
+In-Reply-To: <1452238054-15482-3-git-send-email-bamvor.zhangjian@linaro.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>
-Cc: Arnd Bergmann <arnd@arndb.de>, linux-kernel@vger.kernel.org, Heinrich Schuchardt <xypron.glpk@gmx.de>, Ralf Baechle <ralf@linux-mips.org>, Paul Burton <paul.burton@imgtec.com>, Florian Fainelli <f.fainelli@gmail.com>, linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org, linux-mips@linux-mips.org
+To: Bamvor Jian Zhang <bamvor.zhangjian@linaro.org>, mmarek@suse.com, Shuah Khan <shuahkh@osg.samsung.com>
+Cc: linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, yann.morin.1998@free.fr, khilman@linaro.org, tyler.baker@linaro.org, broonie@kernel.org, mpe@ellerman.id.au, dvhart@infradead.org
 
---4ZLFUWh1odzi/v6L
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 01/08/2016 12:27 AM, Bamvor Jian Zhang wrote:
+> Add kselftest-merge to enable the dependencies of kernel config
+> for all the kselftest testcases. User should call it after create
+> the kernel configuration(.config), eg:
+> 
+> $ make kselftest-merge
+> 
+> Signed-off-by: Bamvor Jian Zhang <bamvor.zhangjian@linaro.org>
 
-Hi Michal,
+Could you please ACK this patch if you are okay
+with the changes? I will take this through ksleftest
+tree.
 
-On Tue, Jan 19, 2016 at 03:27:24PM +0100, Arnd Bergmann wrote:
-> On Tuesday 19 January 2016 14:22:13 James Hogan wrote:
-> > On Tue, Jan 19, 2016 at 03:09:14PM +0100, Arnd Bergmann wrote:
-> > > On Tuesday 19 January 2016 13:37:50 James Hogan wrote:
-> > > > When a header file is removed from generic-y (often accompanied by =
-the
-> > > > addition of an arch specific header), the generated wrapper file wi=
-ll
-> > > > persist, and in some cases may still take precedence over the new a=
-rch
-> > > > header.
-> > > >=20
-> > > > For example commit f1fe2d21f4e1 ("MIPS: Add definitions for extended
-> > > > context") removed ucontext.h from generic-y in arch/mips/include/as=
-m/,
-> > > > and added an arch/mips/include/uapi/asm/ucontext.h. The continued u=
-se of
-> > > > the wrapper when reusing a dirty build tree resulted in build failu=
-res
-> > > > in arch/mips/kernel/signal.c:
-> > > >=20
-> > > > arch/mips/kernel/signal.c: In function =E2=80=98sc_to_extcontext=E2=
-=80=99:
-> > > > arch/mips/kernel/signal.c:142:12: error: =E2=80=98struct ucontext=
-=E2=80=99 has no member named =E2=80=98uc_extcontext=E2=80=99
-> > > >   return &uc->uc_extcontext;
-> > > >             ^
-> > > >=20
-> > > > Fix by detecting and removing wrapper headers in generated header
-> > > > directories that do not correspond to a filename in generic-y, genh=
-dr-y,
-> > > > or the newly introduced generated-y.
-> > >=20
-> > > Good idea.
-> > >=20
-> > > Acked-by: Arnd Bergmann <arnd@arndb.de>
-> >=20
-> > Thanks Arnd
-> >=20
-> > > Can you merge this through the mips tree, or do you need me to pick it
-> > > up through asm-generic?
-> >=20
-> > I was envisaging the kbuild tree tbh, but I don't really mind how it
-> > gets merged. This patch depends on patch 1, which adds generated-y to
-> > x86 so we don't delete their other generated headers, but other than
-> > that it doesn't really have any dependencies.
->=20
-> Ok, the kbuild tree works fine too, and I guess the x86 tree would
-> also be fine if that helps avoid the dependency.
+thanks,
+-- Shuah
 
-Were you okay to take these patches, or would you prefer they go via the
-MIPS tree?
+> ---
+>  Makefile | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
+> 
+> diff --git a/Makefile b/Makefile
+> index cd40956..bfb9faa 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -1104,6 +1104,14 @@ kselftest:
+>  kselftest-clean:
+>  	$(Q)$(MAKE) -C tools/testing/selftests clean
+>  
+> +PHONY += kselftest-merge
+> +kselftest-merge:
+> +	$(if $(wildcard $(objtree)/.config),, $(error No .config exists, config your kernel first!))
+> +	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/kconfig/merge_config.sh \
+> +		-m $(objtree)/.config \
+> +		$(srctree)/tools/testing/selftests/*/config
+> +	+$(Q)$(MAKE) -f $(srctree)/Makefile olddefconfig
+> +
+>  # ---------------------------------------------------------------------------
+>  # Modules
+>  
+> @@ -1312,6 +1320,8 @@ help:
+>  	@echo  '                    Build, install, and boot kernel before'
+>  	@echo  '                    running kselftest on it'
+>  	@echo  '  kselftest-clean - Remove all generated kselftest files'
+> +	@echo  '  kselftest-merge - Merge all the config dependencies of kselftest to existed'
+> +	@echo  '                    .config.'
+>  	@echo  ''
+>  	@echo  'Kernel packaging:'
+>  	@$(MAKE) $(build)=$(package-dir) help
+> 
 
-Thanks
-James
 
---4ZLFUWh1odzi/v6L
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQIcBAEBCAAGBQJWzCuLAAoJEGwLaZPeOHZ6y0QQAJL67+KgctHHDL1wPNksjxaR
-fvBuO401HDcxEG3gSlbFHYseQoUoamOO/VnMOJuExDdI7Ni4smf3RLZSNCtq4Z3a
-KmGIQKwUfqfZqaQUCqwSUM84wd5ZravahegTLiIO1eQD+KZAIJ1GJACm0i+PCf3R
-FlhvoFaszx1wbPB9IquNJ56EEq+KW0UrmLdRBaJ8l1h1BKU5yKRNHWToQ8Y5c9wn
-zrW59Rdo6ApU38KKjueycEw/vV4PUl0V3sd+TUhaFTNfnHvqyrEoq3UWPxYD/NFI
-6xlkuwj5zw9pDRhSDQ/garAUBXxnzlSCs3ckp6Qn3zqXFbQfVVRYuifUVe6+2Ghw
-Lo23XwXO1785ctY6Ucqbn+ayn+fJrp1HMDPSSh48njX/2pZzqRG6bCf2V7Y9nqmR
-xelqodsIgBQLwaLhc2GHWCsomYC2nmyuWYc+62ejKWaJlZPzWcyPORqs6fbXrUKl
-8wU1i9DcbyyPae2yMXb5U55vtLpk6s0ZJgA5eXnGGeWj6a6dm+9gXHvo+hEriWNG
-ZhrDni2JPVDm5NzlpModcNEmeeRFSgJpe/+UVhP9krpQ8ehKxJybYToAQbUEug/i
-Onzk6FlkFiLiOmJPUBsoDC0hWD0mAZ9cPEvPwxTPEeqq6bMi+MO7SCiTkTvB9P9u
-q6ObpxlafO+ioYNFdHa8
-=zDnk
------END PGP SIGNATURE-----
-
---4ZLFUWh1odzi/v6L--
+-- 
+Shuah Khan
+Sr. Linux Kernel Developer
+Open Source Innovation Group
+Samsung Research America (Silicon Valley)
+shuahkh@osg.samsung.com | (970) 217-8978
