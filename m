@@ -1,94 +1,110 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-io0-f173.google.com ([209.85.223.173]:36702 "EHLO
-	mail-io0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755986AbcBWAUl (ORCPT
+Received: from mailapp01.imgtec.com ([195.59.15.196]:35158 "EHLO
+	imgpgp01.kl.imgtec.org" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1750740AbcBWJvK (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 22 Feb 2016 19:20:41 -0500
-Received: by mail-io0-f173.google.com with SMTP id l127so195849992iof.3
-        for <linux-kbuild@vger.kernel.org>; Mon, 22 Feb 2016 16:20:41 -0800 (PST)
+	Tue, 23 Feb 2016 04:51:10 -0500
+Date: Tue, 23 Feb 2016 09:51:07 +0000
+From: James Hogan <james.hogan@imgtec.com>
+Subject: Re: [PATCH v2 2/2] kbuild: Remove stale asm-generic wrappers
+Message-ID: <20160223095107.GC21143@jhogan-linux.le.imgtec.org>
+References: <1453210670-12596-1-git-send-email-james.hogan@imgtec.com>
+ <1667268.iM977TQnEK@wuerfel>
+ <20160119142213.GA12679@jhogan-linux.le.imgtec.org>
+ <4206493.gjdgtfndZ8@wuerfel>
 MIME-Version: 1.0
-In-Reply-To: <20160222201335.449323716ca4d929f92424d5@gmail.com>
-References: <20160222201335.449323716ca4d929f92424d5@gmail.com>
-Date: Mon, 22 Feb 2016 16:20:40 -0800
-Message-ID: <CAGXu5jL0-Kq=paYLsq5KC+cKL1-1U=b_CBLuKQr_KtwG2fqdLg@mail.gmail.com>
-Subject: Re: [PATCH v3 0/3] Introduce GCC plugin infrastructure
-From: Kees Cook <keescook@chromium.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="4ZLFUWh1odzi/v6L"
+Content-Disposition: inline
+In-Reply-To: <4206493.gjdgtfndZ8@wuerfel>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Emese Revfy <re.emese@gmail.com>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, PaX Team <pageexec@freemail.hu>, Brad Spengler <spender@grsecurity.net>, "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, Michal Marek <mmarek@suse.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>
+To: Michal Marek <mmarek@suse.com>
+Cc: Arnd Bergmann <arnd@arndb.de>, linux-kernel@vger.kernel.org, Heinrich Schuchardt <xypron.glpk@gmx.de>, Ralf Baechle <ralf@linux-mips.org>, Paul Burton <paul.burton@imgtec.com>, Florian Fainelli <f.fainelli@gmail.com>, linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org, linux-mips@linux-mips.org
 
-On Mon, Feb 22, 2016 at 11:13 AM, Emese Revfy <re.emese@gmail.com> wrote:
-> This patch set introduce the GCC plugin infrastructure with examples for testing
-> and documentation.
->
-> GCC plugins are loadable modules that provide extra features to the compiler.
-> They are useful for runtime instrumentation and static analysis.
->
-> The infrastructure supports all gcc versions from 4.5 to 6.0, building
-> out-of-tree modules and building in a separate directory. Cross-compilation
-> is supported too but currently only the x86 architecture enables plugins.
->
-> This infrastructure was ported from grsecurity/PaX. It is a CII project
-> supported by the Linux Foundation.
->
-> Emese Revfy (3):
->  GCC plugin infrastructure
->  Add Cyclomatic complexity plugin
->  Documentations of the GCC plugin infrastructre
->
-> Changes from v2:
->  * Fixed incorrectly encoded characters
->  * Generate the GIMPLE, IPA, SIMPLE_IPA and RTL pass structures
->    (Suggested-by: Rasmus Villemoes <linux@rasmusvillemoes.dk>)
->  * Write plugin related warning messages to stderr instead of stdout
->    (Suggested-by: Kees Cook <keescook@chromium.org>)
->  * Mention the installation of the gcc plugin headers (Documentation)
->
-> Changes from v1:
->  * Move the gcc-plugins make target into a separate Makefile because there may
->    be a lot of plugins (Suggested-by: Rasmus Villemoes)
->  * Simplify the dependencies of the plugin related config option
->    (Suggested-by: Kees Cook <keescook@chromium.org>)
->  * Removed the unnecessary example plugin
+--4ZLFUWh1odzi/v6L
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Oh, I totally missed a detail from v2 that still applies to v3:
+Hi Michal,
 
-You're missing your Signed-off-by lines in the patches.
+On Tue, Jan 19, 2016 at 03:27:24PM +0100, Arnd Bergmann wrote:
+> On Tuesday 19 January 2016 14:22:13 James Hogan wrote:
+> > On Tue, Jan 19, 2016 at 03:09:14PM +0100, Arnd Bergmann wrote:
+> > > On Tuesday 19 January 2016 13:37:50 James Hogan wrote:
+> > > > When a header file is removed from generic-y (often accompanied by =
+the
+> > > > addition of an arch specific header), the generated wrapper file wi=
+ll
+> > > > persist, and in some cases may still take precedence over the new a=
+rch
+> > > > header.
+> > > >=20
+> > > > For example commit f1fe2d21f4e1 ("MIPS: Add definitions for extended
+> > > > context") removed ucontext.h from generic-y in arch/mips/include/as=
+m/,
+> > > > and added an arch/mips/include/uapi/asm/ucontext.h. The continued u=
+se of
+> > > > the wrapper when reusing a dirty build tree resulted in build failu=
+res
+> > > > in arch/mips/kernel/signal.c:
+> > > >=20
+> > > > arch/mips/kernel/signal.c: In function =E2=80=98sc_to_extcontext=E2=
+=80=99:
+> > > > arch/mips/kernel/signal.c:142:12: error: =E2=80=98struct ucontext=
+=E2=80=99 has no member named =E2=80=98uc_extcontext=E2=80=99
+> > > >   return &uc->uc_extcontext;
+> > > >             ^
+> > > >=20
+> > > > Fix by detecting and removing wrapper headers in generated header
+> > > > directories that do not correspond to a filename in generic-y, genh=
+dr-y,
+> > > > or the newly introduced generated-y.
+> > >=20
+> > > Good idea.
+> > >=20
+> > > Acked-by: Arnd Bergmann <arnd@arndb.de>
+> >=20
+> > Thanks Arnd
+> >=20
+> > > Can you merge this through the mips tree, or do you need me to pick it
+> > > up through asm-generic?
+> >=20
+> > I was envisaging the kbuild tree tbh, but I don't really mind how it
+> > gets merged. This patch depends on patch 1, which adds generated-y to
+> > x86 so we don't delete their other generated headers, but other than
+> > that it doesn't really have any dependencies.
+>=20
+> Ok, the kbuild tree works fine too, and I guess the x86 tree would
+> also be fine if that helps avoid the dependency.
 
-Running each patch through scripts/checkpatch.pl produces a number of
-other warnings (I ignored all the C++isms), mostly around lines >80
-characters, function definitions (missing void), and the suggestion to
-create yourself a MAINTAINTERS line for this directory.
+Were you okay to take these patches, or would you prefer they go via the
+MIPS tree?
 
--Kees
+Thanks
+James
 
-> ---
->  Documentation/dontdiff                   |   1 +
->  Documentation/gcc-plugins.txt            |  80 ++++
->  Makefile                                 |  41 +-
->  arch/Kconfig                             |  24 +
->  arch/x86/Kconfig                         |   1 +
->  init/Makefile                            |   3 +
->  scripts/Makefile.build                   |   2 +-
->  scripts/Makefile.clean                   |   3 +-
->  scripts/Makefile.gcc-plugins             |  30 ++
->  scripts/Makefile.host                    |  69 ++-
->  scripts/gcc-plugin.sh                    |  51 ++
->  scripts/link-vmlinux.sh                  |   2 +-
->  scripts/package/builddeb                 |   1 +
->  tools/gcc/Makefile                       |  19 +
->  tools/gcc/cyc_complexity_plugin.c        |  70 +++
->  tools/gcc/gcc-common.h                   | 794 +++++++++++++++++++++++++++++++
->  tools/gcc/gcc-generate-gimple-pass.h     | 172 +++++++
->  tools/gcc/gcc-generate-ipa-pass.h        | 286 +++++++++++
->  tools/gcc/gcc-generate-rtl-pass.h        | 172 +++++++
->  tools/gcc/gcc-generate-simple_ipa-pass.h | 172 +++++++
->  20 files changed, 1978 insertions(+), 15 deletions(-)
+--4ZLFUWh1odzi/v6L
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
 
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
 
+iQIcBAEBCAAGBQJWzCuLAAoJEGwLaZPeOHZ6y0QQAJL67+KgctHHDL1wPNksjxaR
+fvBuO401HDcxEG3gSlbFHYseQoUoamOO/VnMOJuExDdI7Ni4smf3RLZSNCtq4Z3a
+KmGIQKwUfqfZqaQUCqwSUM84wd5ZravahegTLiIO1eQD+KZAIJ1GJACm0i+PCf3R
+FlhvoFaszx1wbPB9IquNJ56EEq+KW0UrmLdRBaJ8l1h1BKU5yKRNHWToQ8Y5c9wn
+zrW59Rdo6ApU38KKjueycEw/vV4PUl0V3sd+TUhaFTNfnHvqyrEoq3UWPxYD/NFI
+6xlkuwj5zw9pDRhSDQ/garAUBXxnzlSCs3ckp6Qn3zqXFbQfVVRYuifUVe6+2Ghw
+Lo23XwXO1785ctY6Ucqbn+ayn+fJrp1HMDPSSh48njX/2pZzqRG6bCf2V7Y9nqmR
+xelqodsIgBQLwaLhc2GHWCsomYC2nmyuWYc+62ejKWaJlZPzWcyPORqs6fbXrUKl
+8wU1i9DcbyyPae2yMXb5U55vtLpk6s0ZJgA5eXnGGeWj6a6dm+9gXHvo+hEriWNG
+ZhrDni2JPVDm5NzlpModcNEmeeRFSgJpe/+UVhP9krpQ8ehKxJybYToAQbUEug/i
+Onzk6FlkFiLiOmJPUBsoDC0hWD0mAZ9cPEvPwxTPEeqq6bMi+MO7SCiTkTvB9P9u
+q6ObpxlafO+ioYNFdHa8
+=zDnk
+-----END PGP SIGNATURE-----
 
--- 
-Kees Cook
-Chrome OS & Brillo Security
+--4ZLFUWh1odzi/v6L--
