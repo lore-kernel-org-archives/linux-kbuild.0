@@ -1,57 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.136]:33762 "EHLO mail.kernel.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754388AbcBXBgr (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 23 Feb 2016 20:36:47 -0500
+Received: from mail-qk0-f173.google.com ([209.85.220.173]:34186 "EHLO
+	mail-qk0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753475AbcBXPTr (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 24 Feb 2016 10:19:47 -0500
+Received: by mail-qk0-f173.google.com with SMTP id x1so7791725qkc.1
+        for <linux-kbuild@vger.kernel.org>; Wed, 24 Feb 2016 07:19:46 -0800 (PST)
+Date: Wed, 24 Feb 2016 10:19:44 -0500 (EST)
+From: Nicolas Pitre <nicolas.pitre@linaro.org>
+Subject: Re: [PATCH v3 0/7] Trim unused exported kernel symbols
+In-Reply-To: <1455826023-2134-1-git-send-email-nicolas.pitre@linaro.org>
+Message-ID: <alpine.LFD.2.20.1602241017490.13632@knanqh.ubzr>
+References: <1455826023-2134-1-git-send-email-nicolas.pitre@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <1455230079-26931-1-git-send-email-robh@kernel.org>
-References: <1455230079-26931-1-git-send-email-robh@kernel.org>
-From: Rob Herring <robh@kernel.org>
-Date: Tue, 23 Feb 2016 19:36:24 -0600
-Message-ID: <CAL_JsqJC1PAyaX-BSe+iMnaSpEcpGKbROqm2kQ+=_dbfSn9V9g@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: Allow using host dtc instead of kernel's copy
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>
-Cc: "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
 
-On Thu, Feb 11, 2016 at 4:34 PM, Rob Herring <robh@kernel.org> wrote:
-> Development of dtc happens in its own upstream repository, but testing
-> dtc changes against the kernel tree is useful. Change dtc to a variable
-> that users can override.
->
-> Signed-off-by: Rob Herring <robh@kernel.org>
-> Cc: Michal Marek <mmarek@suse.com>
-> Cc: linux-kbuild@vger.kernel.org
 
-Applied to DT tree.
+Gentle ping.
 
-> ---
->  scripts/Makefile.lib | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-> index 79e8661..ceceb53 100644
-> --- a/scripts/Makefile.lib
-> +++ b/scripts/Makefile.lib
-> @@ -262,6 +262,7 @@ cmd_gzip = (cat $(filter-out FORCE,$^) | gzip -n -f -9 > $@) || \
->
->  # DTC
->  # ---------------------------------------------------------------------------
-> +DTC ?= $(objtree)/scripts/dtc/dtc
->
->  # Generate an assembly file to wrap the output of the device tree compiler
->  quiet_cmd_dt_S_dtb= DTB     $@
-> @@ -284,7 +285,7 @@ $(obj)/%.dtb.S: $(obj)/%.dtb
->  quiet_cmd_dtc = DTC     $@
->  cmd_dtc = mkdir -p $(dir ${dtc-tmp}) ; \
->         $(CPP) $(dtc_cpp_flags) -x assembler-with-cpp -o $(dtc-tmp) $< ; \
-> -       $(objtree)/scripts/dtc/dtc -O dtb -o $@ -b 0 \
-> +       $(DTC) -O dtb -o $@ -b 0 \
->                 -i $(dir $<) $(DTC_FLAGS) \
->                 -d $(depfile).dtc.tmp $(dtc-tmp) ; \
->         cat $(depfile).pre.tmp $(depfile).dtc.tmp > $(depfile)
-> --
-> 2.5.0
->
+
+On Thu, 18 Feb 2016, Nicolas Pitre wrote:
+
+> This patch series provides the option to omit exported symbols from
+> the kernel and modules that are never referenced by any of the selected
+> modules in the current kernel configuration.
+> 
+> The original cover letter with lots of test results can be found here:
+> 
+>         https://lkml.org/lkml/2016/2/8/813
+> 
+> A git branch with those patches is also available here:
+> 
+>         http://git.linaro.org/people/nicolas.pitre/linux.git autoksyms
+> 
+> Please consider for merging.
+> 
+> Changes from v2:
+> 
+> - Generating the build dependencies by parsing the source with fixdep
+>   turned out to be unreliable due to all the EXPORT_SYMBOL() variants,
+>   and especially their use within macros where the actual symbol name
+>   is known only after running the preprocessor. This list of symbol names
+>   is now obtained from the preprocessor directly, fixing allmodconfig
+>   builds.
+> 
+> Changes from v1:
+> 
+> - Replaced "exp" that doesn't convey the right meaning as noted by
+>   Sam Ravnborg. The "ksym" identifier is actually what the kernel
+>   already uses for this. Therefore:
+>   - CONFIG_TRIM_UNUSED_EXPSYMS --> CONFIG_TRIM_UNUSED_KSYMS
+>   - include/generated/expsyms.h --> include/generated/autoksyms.h
+>   - #define __EXPSYM_* --> #define __KSYM_*
+> 
+> - Some sed regexp improvements as suggested by Al Viro.
+> 
+> - Renamed vmlinux_recursive target to autoksyms_recursive.
+> 
+> - Accept EXPORT_SYMBOL variants with a prefix, e.g. ACPI_EXPORT_SYMBOL.
+> 
+> - Minor commit log clarifications.
+> 
+> - Added Rusty's ACK.
+> 
+> 
