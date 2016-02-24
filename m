@@ -1,70 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qk0-f173.google.com ([209.85.220.173]:34186 "EHLO
-	mail-qk0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753475AbcBXPTr (ORCPT
+Received: from mail-wm0-f46.google.com ([74.125.82.46]:38678 "EHLO
+	mail-wm0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754163AbcBXW2G (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 24 Feb 2016 10:19:47 -0500
-Received: by mail-qk0-f173.google.com with SMTP id x1so7791725qkc.1
-        for <linux-kbuild@vger.kernel.org>; Wed, 24 Feb 2016 07:19:46 -0800 (PST)
-Date: Wed, 24 Feb 2016 10:19:44 -0500 (EST)
-From: Nicolas Pitre <nicolas.pitre@linaro.org>
-Subject: Re: [PATCH v3 0/7] Trim unused exported kernel symbols
-In-Reply-To: <1455826023-2134-1-git-send-email-nicolas.pitre@linaro.org>
-Message-ID: <alpine.LFD.2.20.1602241017490.13632@knanqh.ubzr>
-References: <1455826023-2134-1-git-send-email-nicolas.pitre@linaro.org>
-MIME-Version: 1.0
+	Wed, 24 Feb 2016 17:28:06 -0500
+Received: by mail-wm0-f46.google.com with SMTP id a4so3154218wme.1
+        for <linux-kbuild@vger.kernel.org>; Wed, 24 Feb 2016 14:28:05 -0800 (PST)
+Date: Wed, 24 Feb 2016 23:26:12 +0100
+From: Emese Revfy <re.emese@gmail.com>
+Subject: Re: [PATCH v3 0/3] Introduce GCC plugin infrastructure
+Message-Id: <20160224232612.e3e41985b1aa52e0e8f373a8@gmail.com>
+In-Reply-To: <CAGXu5jL0-Kq=paYLsq5KC+cKL1-1U=b_CBLuKQr_KtwG2fqdLg@mail.gmail.com>
+References: <20160222201335.449323716ca4d929f92424d5@gmail.com>
+	<CAGXu5jL0-Kq=paYLsq5KC+cKL1-1U=b_CBLuKQr_KtwG2fqdLg@mail.gmail.com>
+Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
+To: Kees Cook <keescook@chromium.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, PaX Team <pageexec@freemail.hu>, Brad Spengler <spender@grsecurity.net>, "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, Michal Marek <mmarek@suse.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>
 
+On Mon, 22 Feb 2016 16:20:40 -0800
+Kees Cook <keescook@chromium.org> wrote:
 
-Gentle ping.
+> characters, function definitions (missing void), and the suggestion to
+> create yourself a MAINTAINTERS line for this directory.
 
+I think the maintainer should be a more experienced kernel developer. 
+Would you like to be the maintainer? :)
 
-On Thu, 18 Feb 2016, Nicolas Pitre wrote:
-
-> This patch series provides the option to omit exported symbols from
-> the kernel and modules that are never referenced by any of the selected
-> modules in the current kernel configuration.
-> 
-> The original cover letter with lots of test results can be found here:
-> 
->         https://lkml.org/lkml/2016/2/8/813
-> 
-> A git branch with those patches is also available here:
-> 
->         http://git.linaro.org/people/nicolas.pitre/linux.git autoksyms
-> 
-> Please consider for merging.
-> 
-> Changes from v2:
-> 
-> - Generating the build dependencies by parsing the source with fixdep
->   turned out to be unreliable due to all the EXPORT_SYMBOL() variants,
->   and especially their use within macros where the actual symbol name
->   is known only after running the preprocessor. This list of symbol names
->   is now obtained from the preprocessor directly, fixing allmodconfig
->   builds.
-> 
-> Changes from v1:
-> 
-> - Replaced "exp" that doesn't convey the right meaning as noted by
->   Sam Ravnborg. The "ksym" identifier is actually what the kernel
->   already uses for this. Therefore:
->   - CONFIG_TRIM_UNUSED_EXPSYMS --> CONFIG_TRIM_UNUSED_KSYMS
->   - include/generated/expsyms.h --> include/generated/autoksyms.h
->   - #define __EXPSYM_* --> #define __KSYM_*
-> 
-> - Some sed regexp improvements as suggested by Al Viro.
-> 
-> - Renamed vmlinux_recursive target to autoksyms_recursive.
-> 
-> - Accept EXPORT_SYMBOL variants with a prefix, e.g. ACPI_EXPORT_SYMBOL.
-> 
-> - Minor commit log clarifications.
-> 
-> - Added Rusty's ACK.
-> 
-> 
+-- 
+Emese
