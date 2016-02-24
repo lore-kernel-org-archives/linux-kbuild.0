@@ -1,53 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lists.s-osg.org ([54.187.51.154]:39482 "EHLO lists.s-osg.org"
+Received: from mail.kernel.org ([198.145.29.136]:33762 "EHLO mail.kernel.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751806AbcBWSbf (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 23 Feb 2016 13:31:35 -0500
-Subject: Re: [PATCH v4 2/2] Makefile: add kselftest-merge
-References: <1452238054-15482-1-git-send-email-bamvor.zhangjian@linaro.org>
- <1452238054-15482-3-git-send-email-bamvor.zhangjian@linaro.org>
- <56CC6DDD.9080803@osg.samsung.com>
-From: Shuah Khan <shuahkh@osg.samsung.com>
-Message-ID: <56CCA584.9070504@osg.samsung.com>
-Date: Tue, 23 Feb 2016 11:31:32 -0700
+	id S1754388AbcBXBgr (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 23 Feb 2016 20:36:47 -0500
 MIME-Version: 1.0
-In-Reply-To: <56CC6DDD.9080803@osg.samsung.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <1455230079-26931-1-git-send-email-robh@kernel.org>
+References: <1455230079-26931-1-git-send-email-robh@kernel.org>
+From: Rob Herring <robh@kernel.org>
+Date: Tue, 23 Feb 2016 19:36:24 -0600
+Message-ID: <CAL_JsqJC1PAyaX-BSe+iMnaSpEcpGKbROqm2kQ+=_dbfSn9V9g@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: Allow using host dtc instead of kernel's copy
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Bamvor Jian Zhang <bamvor.zhangjian@linaro.org>, mmarek@suse.com
-Cc: linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, yann.morin.1998@free.fr, khilman@linaro.org, tyler.baker@linaro.org, broonie@kernel.org, mpe@ellerman.id.au, dvhart@infradead.org, Shuah Khan <shuahkh@osg.samsung.com>
+To: Michal Marek <mmarek@suse.com>
+Cc: "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On 02/23/2016 07:34 AM, Shuah Khan wrote:
-> On 01/08/2016 12:27 AM, Bamvor Jian Zhang wrote:
->> Add kselftest-merge to enable the dependencies of kernel config
->> for all the kselftest testcases. User should call it after create
->> the kernel configuration(.config), eg:
->>
->> $ make kselftest-merge
->>
->> Signed-off-by: Bamvor Jian Zhang <bamvor.zhangjian@linaro.org>
-> 
-> Could you please ACK this patch if you are okay
-> with the changes? I will take this through ksleftest
-> tree.
-> 
-> thanks,
-> -- Shuah
+On Thu, Feb 11, 2016 at 4:34 PM, Rob Herring <robh@kernel.org> wrote:
+> Development of dtc happens in its own upstream repository, but testing
+> dtc changes against the kernel tree is useful. Change dtc to a variable
+> that users can override.
+>
+> Signed-off-by: Rob Herring <robh@kernel.org>
+> Cc: Michal Marek <mmarek@suse.com>
+> Cc: linux-kbuild@vger.kernel.org
 
-Applied this patch to linux-kselftest next with
+Applied to DT tree.
 
-[PATCH v4 1/2] selftests: create test-specific kconfig fragments
-
-to get some testing in for now.
-
-thanks,
--- Shuah
-
--- 
-Shuah Khan
-Sr. Linux Kernel Developer
-Open Source Innovation Group
-Samsung Research America (Silicon Valley)
-shuahkh@osg.samsung.com | (970) 217-8978
+> ---
+>  scripts/Makefile.lib | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+> index 79e8661..ceceb53 100644
+> --- a/scripts/Makefile.lib
+> +++ b/scripts/Makefile.lib
+> @@ -262,6 +262,7 @@ cmd_gzip = (cat $(filter-out FORCE,$^) | gzip -n -f -9 > $@) || \
+>
+>  # DTC
+>  # ---------------------------------------------------------------------------
+> +DTC ?= $(objtree)/scripts/dtc/dtc
+>
+>  # Generate an assembly file to wrap the output of the device tree compiler
+>  quiet_cmd_dt_S_dtb= DTB     $@
+> @@ -284,7 +285,7 @@ $(obj)/%.dtb.S: $(obj)/%.dtb
+>  quiet_cmd_dtc = DTC     $@
+>  cmd_dtc = mkdir -p $(dir ${dtc-tmp}) ; \
+>         $(CPP) $(dtc_cpp_flags) -x assembler-with-cpp -o $(dtc-tmp) $< ; \
+> -       $(objtree)/scripts/dtc/dtc -O dtb -o $@ -b 0 \
+> +       $(DTC) -O dtb -o $@ -b 0 \
+>                 -i $(dir $<) $(DTC_FLAGS) \
+>                 -d $(depfile).dtc.tmp $(dtc-tmp) ; \
+>         cat $(depfile).pre.tmp $(depfile).dtc.tmp > $(depfile)
+> --
+> 2.5.0
+>
