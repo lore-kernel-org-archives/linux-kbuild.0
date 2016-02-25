@@ -1,107 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.126.187]:56677 "EHLO
-	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1760641AbcBYQcv (ORCPT
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:36696 "EHLO
+	mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750850AbcBYWrh (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 25 Feb 2016 11:32:51 -0500
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH] modsign: hide openssl output in silent builds
-Date: Thu, 25 Feb 2016 17:31:32 +0100
-Message-Id: <1456417901-2192433-1-git-send-email-arnd@arndb.de>
+	Thu, 25 Feb 2016 17:47:37 -0500
+Received: by mail-wm0-f67.google.com with SMTP id a4so6117447wme.3
+        for <linux-kbuild@vger.kernel.org>; Thu, 25 Feb 2016 14:47:36 -0800 (PST)
+Date: Thu, 25 Feb 2016 23:45:42 +0100
+From: Emese Revfy <re.emese@gmail.com>
+Subject: Re: [PATCH v3 0/3] Introduce GCC plugin infrastructure
+Message-Id: <20160225234542.3c02b799b9715fdbd3e9de93@gmail.com>
+In-Reply-To: <CAGXu5jL0-Kq=paYLsq5KC+cKL1-1U=b_CBLuKQr_KtwG2fqdLg@mail.gmail.com>
+References: <20160222201335.449323716ca4d929f92424d5@gmail.com>
+	<CAGXu5jL0-Kq=paYLsq5KC+cKL1-1U=b_CBLuKQr_KtwG2fqdLg@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: David Howells <dhowells@redhat.com>, David Woodhouse <dwmw2@infradead.org>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.com>, Arnd Bergmann <arnd@arndb.de>, keyrings@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Kees Cook <keescook@chromium.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, PaX Team <pageexec@freemail.hu>, Brad Spengler <spender@grsecurity.net>, "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, Michal Marek <mmarek@suse.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>
 
-When a user calls 'make -s', we can assume they don't want to
-see any output except for warnings and errors, but instead
-they see this for a warning free build:
+On Mon, 22 Feb 2016 16:20:40 -0800
+Kees Cook <keescook@chromium.org> wrote:
+> Running each patch through scripts/checkpatch.pl produces a number of
+> other warnings (I ignored all the C++isms), mostly around lines >80
+> characters, function definitions (missing void), and the suggestion to
 
- ###
- ### Now generating an X.509 key pair to be used for signing modules.
- ###
- ### If this takes a long time, you might wish to run rngd in the
- ### background to keep the supply of entropy topped up.  It
- ### needs to be run as root, and uses a hardware random
- ### number generator if one is available.
- ###
- Generating a 4096 bit RSA private key
- .................................................................................................................................................................................................................................++
- ..............................................................................................................................++
- writing new private key to 'certs/signing_key.pem'
- -----
- ###
- ### Key pair generated.
- ###
+I fixed only those >80 line type warnings that didn't impair the readability of the code:
+https://github.com/ephox-gcc-plugins/gcc-plugins_linux-next/commit/77c8e286fb
 
-The output can confuse simple build testing scripts that just check
-for an empty build log.
-
-This patch silences all the output:
- - "echo" is changed to "@$(kecho)", which is dropped when "-s" gets
-   passed
- - the openssl command itself is only printed with V=1, using the
-   $(Q) macro
- - The output of openssl gets redircted to /dev/null on "-s" builds.
-
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- certs/Makefile | 33 +++++++++++++++++++--------------
- 1 file changed, 19 insertions(+), 14 deletions(-)
-
-diff --git a/certs/Makefile b/certs/Makefile
-index 28ac694dd11a..2773c4afa24c 100644
---- a/certs/Makefile
-+++ b/certs/Makefile
-@@ -36,29 +36,34 @@ ifndef CONFIG_MODULE_SIG_HASH
- $(error Could not determine digest type to use from kernel config)
- endif
- 
-+redirect_openssl	= 2>&1
-+quiet_redirect_openssl	= 2>&1
-+silent_redirect_openssl = 2>/dev/null
-+
- # We do it this way rather than having a boolean option for enabling an
- # external private key, because 'make randconfig' might enable such a
- # boolean option and we unfortunately can't make it depend on !RANDCONFIG.
- ifeq ($(CONFIG_MODULE_SIG_KEY),"certs/signing_key.pem")
- $(obj)/signing_key.pem: $(obj)/x509.genkey
--	@echo "###"
--	@echo "### Now generating an X.509 key pair to be used for signing modules."
--	@echo "###"
--	@echo "### If this takes a long time, you might wish to run rngd in the"
--	@echo "### background to keep the supply of entropy topped up.  It"
--	@echo "### needs to be run as root, and uses a hardware random"
--	@echo "### number generator if one is available."
--	@echo "###"
--	openssl req -new -nodes -utf8 -$(CONFIG_MODULE_SIG_HASH) -days 36500 \
-+	@$(kecho) "###"
-+	@$(kecho) "### Now generating an X.509 key pair to be used for signing modules."
-+	@$(kecho) "###"
-+	@$(kecho) "### If this takes a long time, you might wish to run rngd in the"
-+	@$(kecho) "### background to keep the supply of entropy topped up.  It"
-+	@$(kecho) "### needs to be run as root, and uses a hardware random"
-+	@$(kecho) "### number generator if one is available."
-+	@$(kecho) "###"
-+	$(Q)openssl req -new -nodes -utf8 -$(CONFIG_MODULE_SIG_HASH) -days 36500 \
- 		-batch -x509 -config $(obj)/x509.genkey \
- 		-outform PEM -out $(obj)/signing_key.pem \
--		-keyout $(obj)/signing_key.pem 2>&1
--	@echo "###"
--	@echo "### Key pair generated."
--	@echo "###"
-+		-keyout $(obj)/signing_key.pem \
-+		$($(quiet)redirect_openssl)
-+	@$(kecho) "###"
-+	@$(kecho) "### Key pair generated."
-+	@$(kecho) "###"
- 
- $(obj)/x509.genkey:
--	@echo Generating X.509 key generation config
-+	@$(kecho) Generating X.509 key generation config
- 	@echo  >$@ "[ req ]"
- 	@echo >>$@ "default_bits = 4096"
- 	@echo >>$@ "distinguished_name = req_distinguished_name"
 -- 
-2.7.0
-
+Emese
