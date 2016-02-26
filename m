@@ -1,34 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f67.google.com ([74.125.82.67]:36696 "EHLO
-	mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750850AbcBYWrh (ORCPT
+Received: from mx1.redhat.com ([209.132.183.28]:49260 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752590AbcBZLUb convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 25 Feb 2016 17:47:37 -0500
-Received: by mail-wm0-f67.google.com with SMTP id a4so6117447wme.3
-        for <linux-kbuild@vger.kernel.org>; Thu, 25 Feb 2016 14:47:36 -0800 (PST)
-Date: Thu, 25 Feb 2016 23:45:42 +0100
-From: Emese Revfy <re.emese@gmail.com>
-Subject: Re: [PATCH v3 0/3] Introduce GCC plugin infrastructure
-Message-Id: <20160225234542.3c02b799b9715fdbd3e9de93@gmail.com>
-In-Reply-To: <CAGXu5jL0-Kq=paYLsq5KC+cKL1-1U=b_CBLuKQr_KtwG2fqdLg@mail.gmail.com>
-References: <20160222201335.449323716ca4d929f92424d5@gmail.com>
-	<CAGXu5jL0-Kq=paYLsq5KC+cKL1-1U=b_CBLuKQr_KtwG2fqdLg@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+	Fri, 26 Feb 2016 06:20:31 -0500
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <1456417901-2192433-1-git-send-email-arnd@arndb.de>
+References: <1456417901-2192433-1-git-send-email-arnd@arndb.de>
+Subject: Re: [PATCH] modsign: hide openssl output in silent builds
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <7538.1456485628.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: 8BIT
+Date: Fri, 26 Feb 2016 11:20:28 +0000
+Message-ID: <7539.1456485628@warthog.procyon.org.uk>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kees Cook <keescook@chromium.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, PaX Team <pageexec@freemail.hu>, Brad Spengler <spender@grsecurity.net>, "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, Michal Marek <mmarek@suse.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: dhowells@redhat.com, David Woodhouse <dwmw2@infradead.org>, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.com>, keyrings@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Mon, 22 Feb 2016 16:20:40 -0800
-Kees Cook <keescook@chromium.org> wrote:
-> Running each patch through scripts/checkpatch.pl produces a number of
-> other warnings (I ignored all the C++isms), mostly around lines >80
-> characters, function definitions (missing void), and the suggestion to
+Arnd Bergmann <arnd@arndb.de> wrote:
 
-I fixed only those >80 line type warnings that didn't impair the readability of the code:
-https://github.com/ephox-gcc-plugins/gcc-plugins_linux-next/commit/77c8e286fb
+> When a user calls 'make -s', we can assume they don't want to
+> see any output except for warnings and errors, but instead
+> they see this for a warning free build:
+> 
+>  ###
+>  ### Now generating an X.509 key pair to be used for signing modules.
+>  ###
+>  ### If this takes a long time, you might wish to run rngd in the
+>  ### background to keep the supply of entropy topped up.  It
+>  ### needs to be run as root, and uses a hardware random
+>  ### number generator if one is available.
+>  ###
+>  Generating a 4096 bit RSA private key
+>  .................................................................................................................................................................................................................................++
+>  ..............................................................................................................................++
+>  writing new private key to 'certs/signing_key.pem'
+>  -----
+>  ###
+>  ### Key pair generated.
+>  ###
+> 
+> The output can confuse simple build testing scripts that just check
+> for an empty build log.
+> 
+> This patch silences all the output:
+>  - "echo" is changed to "@$(kecho)", which is dropped when "-s" gets
+>    passed
+>  - the openssl command itself is only printed with V=1, using the
+>    $(Q) macro
+>  - The output of openssl gets redircted to /dev/null on "-s" builds.
+> 
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
--- 
-Emese
+Applied.
+
+David
