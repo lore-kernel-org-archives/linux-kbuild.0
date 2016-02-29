@@ -1,14 +1,14 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from relais.videotron.ca ([24.201.245.36]:50379 "EHLO
+Received: from relais.videotron.ca ([24.201.245.36]:26877 "EHLO
 	relais.videotron.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755154AbcB2DsV (ORCPT
+	with ESMTP id S1755225AbcB2DsW (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 28 Feb 2016 22:48:21 -0500
+	Sun, 28 Feb 2016 22:48:22 -0500
 Content-transfer-encoding: 7BIT
 From: Nicolas Pitre <nicolas.pitre@linaro.org>
-Subject: [PATCH v4 1/8] kbuild: record needed exported symbols for modules
-Date: Sun, 28 Feb 2016 22:48:04 -0500
-Message-id: <1456717691-28298-2-git-send-email-nicolas.pitre@linaro.org>
+Subject: [PATCH v4 2/8] allow for per-symbol configurable EXPORT_SYMBOL()
+Date: Sun, 28 Feb 2016 22:48:05 -0500
+Message-id: <1456717691-28298-3-git-send-email-nicolas.pitre@linaro.org>
 In-reply-to: <1456717691-28298-1-git-send-email-nicolas.pitre@linaro.org>
 References: <1456717691-28298-1-git-send-email-nicolas.pitre@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -16,70 +16,86 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.com>
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Kernel modules are partially linked object files with some undefined
-symbols that are expected to be matched with EXPORT_SYMBOL() entries
-from elsewhere.
+Similar to include/generated/autoconf.h, include/generated/autoksyms.h
+will contain a list of defines for each EXPORT_SYMBOL() that we want
+active. The format is:
 
-Each .tmp_versions/*.mod file currently contains two line of text
-separated by a newline character. The first line has the actual module
-file name while the second line has a list of object files constituting
-that module. Those files are parsed by modpost (scripts/mod/sumversion.c),
-scripts/Makefile.modpost, scripts/Makefile.modsign, etc.  Only the
-modpost utility cares about the second line while the others retrieve
-only the first line.
+  #define __KSYM_<symbol_name> 1
 
-Therefore we can add a third line to record the list of undefined symbols
-aka required EXPORT_SYMBOL() entries for each module into that file
-without breaking anything. Like for the second line, symbols are separated
-by a blank and the list is terminated with a newline character.
+This list will be auto-generated with another patch.  For now we only
+include the preprocessor magic to automatically create or omit the
+corresponding struct kernel_symbol declaration.
 
-To avoid needless build overhead, the undefined symbols extraction is
-performed only when CONFIG_TRIM_UNUSED_KSYMS is selected.
+Given the content of include/generated/autoksyms.h may not be known in
+advance, an empty file is created early on to let the build proceed.
 
 Signed-off-by: Nicolas Pitre <nico@linaro.org>
 Acked-by: Rusty Russell <rusty@rustcorp.com.au>
 ---
- scripts/Makefile.build | 13 +++++++++++--
- 1 file changed, 11 insertions(+), 2 deletions(-)
+ Makefile               |  2 ++
+ include/linux/export.h | 22 ++++++++++++++++++++--
+ 2 files changed, 22 insertions(+), 2 deletions(-)
 
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 2c47f9c305..f4b4320e0d 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -253,6 +253,13 @@ define rule_cc_o_c
- 	mv -f $(dot-target).tmp $(dot-target).cmd
- endef
+diff --git a/Makefile b/Makefile
+index 6c1a3c2479..e916428cf7 100644
+--- a/Makefile
++++ b/Makefile
+@@ -986,6 +986,8 @@ prepare2: prepare3 outputmakefile asm-generic
+ prepare1: prepare2 $(version_h) include/generated/utsrelease.h \
+                    include/config/auto.conf
+ 	$(cmd_crmodverdir)
++	$(Q)test -e include/generated/autoksyms.h || \
++	    touch   include/generated/autoksyms.h
  
-+# List module undefined symbols (or empty line if not enabled)
-+ifdef CONFIG_TRIM_UNUSED_KSYMS
-+cmd_undef_syms = $(NM) $@ | sed -n 's/^ \+U //p' | xargs echo
-+else
-+cmd_undef_syms = echo
-+endif
+ archprepare: archheaders archscripts prepare1 scripts_basic
+ 
+diff --git a/include/linux/export.h b/include/linux/export.h
+index 96e45ea463..77afdb2a25 100644
+--- a/include/linux/export.h
++++ b/include/linux/export.h
+@@ -38,7 +38,7 @@ extern struct module __this_module;
+ 
+ #ifdef CONFIG_MODULES
+ 
+-#ifndef __GENKSYMS__
++#if defined(__KERNEL__) && !defined(__GENKSYMS__)
+ #ifdef CONFIG_MODVERSIONS
+ /* Mark the CRC weak since genksyms apparently decides not to
+  * generate a checksums for some symbols */
+@@ -53,7 +53,7 @@ extern struct module __this_module;
+ #endif
+ 
+ /* For every exported symbol, place a struct in the __ksymtab section */
+-#define __EXPORT_SYMBOL(sym, sec)				\
++#define ___EXPORT_SYMBOL(sym, sec)				\
+ 	extern typeof(sym) sym;					\
+ 	__CRC_SYMBOL(sym, sec)					\
+ 	static const char __kstrtab_##sym[]			\
+@@ -65,6 +65,24 @@ extern struct module __this_module;
+ 	__attribute__((section("___ksymtab" sec "+" #sym), unused))	\
+ 	= { (unsigned long)&sym, __kstrtab_##sym }
+ 
++#ifdef CONFIG_TRIM_UNUSED_KSYMS
 +
- # Built-in and composite module parts
- $(obj)/%.o: $(src)/%.c $(recordmcount_source) FORCE
- 	$(call cmd,force_checksrc)
-@@ -263,7 +270,8 @@ $(obj)/%.o: $(src)/%.c $(recordmcount_source) FORCE
- $(single-used-m): $(obj)/%.o: $(src)/%.c $(recordmcount_source) FORCE
- 	$(call cmd,force_checksrc)
- 	$(call if_changed_rule,cc_o_c)
--	@{ echo $(@:.o=.ko); echo $@; } > $(MODVERDIR)/$(@F:.o=.mod)
-+	@{ echo $(@:.o=.ko); echo $@; \
-+	   $(cmd_undef_syms); } > $(MODVERDIR)/$(@F:.o=.mod)
++#include <linux/kconfig.h>
++#include <generated/autoksyms.h>
++
++#define __EXPORT_SYMBOL(sym, sec)				\
++	__cond_export_sym(sym, sec, config_enabled(__KSYM_##sym))
++#define __cond_export_sym(sym, sec, conf)			\
++	___cond_export_sym(sym, sec, conf)
++#define ___cond_export_sym(sym, sec, enabled)			\
++	__cond_export_sym_##enabled(sym, sec)
++#define __cond_export_sym_1(sym, sec) ___EXPORT_SYMBOL(sym, sec)
++#define __cond_export_sym_0(sym, sec) /* nothing */
++
++#else
++#define __EXPORT_SYMBOL ___EXPORT_SYMBOL
++#endif
++
+ #define EXPORT_SYMBOL(sym)					\
+ 	__EXPORT_SYMBOL(sym, "")
  
- quiet_cmd_cc_lst_c = MKLST   $@
-       cmd_cc_lst_c = $(CC) $(c_flags) -g -c -o $*.o $< && \
-@@ -393,7 +401,8 @@ $(call multi_depend, $(multi-used-y), .o, -objs -y)
- 
- $(multi-used-m): FORCE
- 	$(call if_changed,link_multi-m)
--	@{ echo $(@:.o=.ko); echo $(link_multi_deps); } > $(MODVERDIR)/$(@F:.o=.mod)
-+	@{ echo $(@:.o=.ko); echo $(link_multi_deps); \
-+	   $(cmd_undef_syms); } > $(MODVERDIR)/$(@F:.o=.mod)
- $(call multi_depend, $(multi-used-m), .o, -objs -y -m)
- 
- targets += $(multi-used-y) $(multi-used-m)
 -- 
 2.5.0
 
