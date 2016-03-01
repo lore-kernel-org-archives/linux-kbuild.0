@@ -1,54 +1,110 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.126.187]:49798 "EHLO
-	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752788AbcB2Ofm (ORCPT
+Received: from mail-wm0-f66.google.com ([74.125.82.66]:36363 "EHLO
+	mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751051AbcCARP4 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 29 Feb 2016 09:35:42 -0500
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH] lz4c: shut up lz4c output
-Date: Mon, 29 Feb 2016 15:35:09 +0100
-Message-ID: <2781274.5SXPMrqOdg@wuerfel>
-In-Reply-To: <56D44065.4070005@suse.com>
-References: <1456749618-1067584-1-git-send-email-arnd@arndb.de> <56D44065.4070005@suse.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+	Tue, 1 Mar 2016 12:15:56 -0500
+Received: by mail-wm0-f66.google.com with SMTP id l68so5211397wml.3
+        for <linux-kbuild@vger.kernel.org>; Tue, 01 Mar 2016 09:15:55 -0800 (PST)
+Date: Tue, 1 Mar 2016 18:14:00 +0100
+From: Emese Revfy <re.emese@gmail.com>
+Subject: [PATCH v4 0/3] Introduce GCC plugin infrastructure
+Message-Id: <20160301181400.9c623ee9230381da90b89b2a@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>
-Cc: linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: pageexec@freemail.hu, spender@grsecurity.net, kernel-hardening@lists.openwall.com, mmarek@suse.com, keescook@chromium.org, linux@rasmusvillemoes.dk, fengguang.wu@intel.com
 
-On Monday 29 February 2016 13:58:13 Michal Marek wrote:
-> On 2016-02-29 13:40, Arnd Bergmann wrote:
-> > When KERNEL_LZ4 is set, we always get an output even when building
-> > with 'make -s':
-> > 
-> >     *** LZ4 Compression CLI , by Yann Collet (May 31 2013) ***
-> >     ! Generating compressed LZ4 using Legacy format (deprecated !) !
-> >     Using stdin for input
-> >     Using stdout for output
-> >     Compressed 11213376 bytes into 4555781 bytes ==> 40.63%
-> >     Done in 0.63 s ==> 16.97 MB/s
-> > 
-> > The output is not helpful in the context of building the kernel,
-> > so this patch hides the stdout output of the lz4 binary completely.
-> 
-> > -     lz4c -l -c1 stdin stdout && $(call size_append, $(filter-out FORCE,$^))) > $@ || \
-> > +     lz4c -l -c1 stdin stdout && $(call size_append, $(filter-out FORCE,$^))) > $@ 2>&1 || \
-> >       (rm -f $@ ; false)
-> 
-> Hi Arnd,
-> 
-> this redirection does not hide it, but rather includes it in the
-> compressed image file.
+This patch set introduce the GCC plugin infrastructure with examples for testing
+and documentation.
 
-Oops, you are right. I was cleaning out some older patches I had in my
-queue and hadn't realized it was completely botched this way.
+GCC plugins are loadable modules that provide extra features to the compiler.
+They are useful for runtime instrumentation and static analysis.
 
-> BTW, my copy of lz4c only displays this warning with -v.
+The infrastructure supports all gcc versions from 4.5 to 6.0, building
+out-of-tree modules and building in a separate directory. Cross-compilation
+is supported too but currently only the x86 architecture enables plugins.
 
-I've updated my copy of lz4c now and can confirm that the output
-is completely gone (without -v). I won't follow up with a fixed version
-then, as the problem is already solved elsewhere.
+This infrastructure was ported from grsecurity/PaX. It is a CII project
+supported by the Linux Foundation.
 
-	Arnd
+Emese Revfy (3):
+ GCC plugin infrastructure
+ Add Cyclomatic complexity plugin
+ Documentations of the GCC plugin infrastructre
+
+
+Changes from v3:
+ * Fix some indentation related warnings
+   (Suggested by checkpatch.pl)
+ * Add maintainer entries
+ * Don't run gcc_plugin.sh when the GCC_PLUGINS option is disabled or unsupported
+   (Reported-by: Fengguang Wu <fengguang.wu@intel.com>)
+
+   I found a kbuild bug (or feature?) related to this patch. When a config option is disabled
+   then the symbol gets undefined only when you run make clean.
+   The easiest way to reproduce it is with e.g., CC_STACKPROTECTOR_STRONG:
+
+     * patch in warning here:
+
+diff --git a/Makefile b/Makefile
+index a1a7708..9e6961f 100644
+--- a/Makefile
++++ b/Makefile
+@@ -664,6 +664,7 @@ ifdef CONFIG_CC_STACKPROTECTOR_REGULAR
+ else
+ ifdef CONFIG_CC_STACKPROTECTOR_STRONG
+   stackp-flag := -fstack-protector-strong
++  $(warning AAAAAAAA)
+   ifeq ($(call cc-option, $(stackp-flag)),)
+     $(warning Cannot use CONFIG_CC_STACKPROTECTOR_STRONG: \
+ 	      -fstack-protector-strong not supported by compiler)
+
+     * enable CC_STACKPROTECTOR_STRONG in menuconfig
+     * run make and it prints out the "AAAAAAAA"
+     * enable CC_STACKPROTECTOR_NONE in menuconfig
+     * run make and it prints out the "AAAAAAAA"
+     * run make clean, run make again and it doesn't print out the "AAAAAAAA"
+
+
+Changes from v2:
+ * Fixed incorrectly encoded characters
+ * Generate the GIMPLE, IPA, SIMPLE_IPA and RTL pass structures
+   (Suggested-by: Rasmus Villemoes <linux@rasmusvillemoes.dk>)
+ * Write plugin related warning messages to stderr instead of stdout
+   (Suggested-by: Kees Cook <keescook@chromium.org>)
+ * Mention the installation of the gcc plugin headers (Documentation)
+
+
+Changes from v1:
+ * Move the gcc-plugins make target into a separate Makefile because there may
+   be a lot of plugins (Suggested-by: Rasmus Villemoes)
+ * Simplify the dependencies of the plugin related config option
+   (Suggested-by: Kees Cook <keescook@chromium.org>)
+ * Removed the unnecessary example plugin
+---
+ Documentation/dontdiff                   |   1 +
+ Documentation/gcc-plugins.txt            |  82 ++++
+ MAINTAINERS                              |   8 +
+ Makefile                                 |  41 +-
+ arch/Kconfig                             |  24 +
+ arch/x86/Kconfig                         |   1 +
+ init/Makefile                            |   3 +
+ scripts/Makefile.build                   |   2 +-
+ scripts/Makefile.clean                   |   3 +-
+ scripts/Makefile.gcc-plugins             |  32 ++
+ scripts/Makefile.host                    |  69 ++-
+ scripts/gcc-plugin.sh                    |  51 ++
+ scripts/link-vmlinux.sh                  |   2 +-
+ scripts/package/builddeb                 |   1 +
+ tools/gcc/Makefile                       |  19 +
+ tools/gcc/cyc_complexity_plugin.c        |  73 +++
+ tools/gcc/gcc-common.h                   | 803 +++++++++++++++++++++++++++++++
+ tools/gcc/gcc-generate-gimple-pass.h     | 173 +++++++
+ tools/gcc/gcc-generate-ipa-pass.h        | 287 +++++++++++
+ tools/gcc/gcc-generate-rtl-pass.h        | 173 +++++++
+ tools/gcc/gcc-generate-simple_ipa-pass.h | 173 +++++++
+ 21 files changed, 2006 insertions(+), 15 deletions(-)
