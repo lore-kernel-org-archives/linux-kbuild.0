@@ -1,19 +1,20 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:34233 "EHLO
-	mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751112AbcCBU7G (ORCPT
+Received: from mail-wm0-f65.google.com ([74.125.82.65]:33587 "EHLO
+	mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750797AbcCBVUk (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 2 Mar 2016 15:59:06 -0500
-Received: by mail-wm0-f68.google.com with SMTP id p65so769314wmp.1
-        for <linux-kbuild@vger.kernel.org>; Wed, 02 Mar 2016 12:59:05 -0800 (PST)
-Date: Wed, 2 Mar 2016 21:57:11 +0100
+	Wed, 2 Mar 2016 16:20:40 -0500
+Received: by mail-wm0-f65.google.com with SMTP id n186so866892wmn.0
+        for <linux-kbuild@vger.kernel.org>; Wed, 02 Mar 2016 13:20:39 -0800 (PST)
+Date: Wed, 2 Mar 2016 22:18:45 +0100
 From: Emese Revfy <re.emese@gmail.com>
 Subject: Re: [PATCH v4 1/3] GCC plugin infrastructure
-Message-Id: <20160302215711.7ba0301691f3eb3f5316b861@gmail.com>
-In-Reply-To: <CAGXu5j+gTWR_ZMk6nMzMZRfTvvi7VXg5ngoHx6cC+r-fe1OgNA@mail.gmail.com>
+Message-Id: <20160302221845.1025c8ca6a5039cb2d7dbb84@gmail.com>
+In-Reply-To: <CAGXu5j+tUDi0zhYq4gdnLmX8EXyERX8+YaiTyTCqdP37je=O8w@mail.gmail.com>
 References: <20160301181400.9c623ee9230381da90b89b2a@gmail.com>
 	<20160301181514.dc3dadeb7e18b77a09dddb7f@gmail.com>
-	<CAGXu5j+gTWR_ZMk6nMzMZRfTvvi7VXg5ngoHx6cC+r-fe1OgNA@mail.gmail.com>
+	<CAGXu5jKQUiZ0RQyMAKprWf30wMCXX7NvyfDLDgDz2zBqk-Xw6Q@mail.gmail.com>
+	<CAGXu5j+tUDi0zhYq4gdnLmX8EXyERX8+YaiTyTCqdP37je=O8w@mail.gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
@@ -22,32 +23,44 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Kees Cook <keescook@chromium.org>
 Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, PaX Team <pageexec@freemail.hu>, Brad Spengler <spender@grsecurity.net>, "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, Michal Marek <mmarek@suse.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Fengguang Wu <fengguang.wu@intel.com>
 
-On Tue, 1 Mar 2016 11:07:25 -0800
+On Tue, 1 Mar 2016 13:34:04 -0800
 Kees Cook <keescook@chromium.org> wrote:
 
-> I wonder if it might make sense to split the .so-building logic
-> changes from the gcc plugin changes to make things more readable for
-> review? Personally, I'm fine with this as-is, but it might benefit
-> other reviewers, if it's a sane split.
-
-I will split this patch in the next patch set.
-
-> > +GCC PLUGINS
-> > +M:     Kees Cook <keescook@chromium.org>
-> > +R:     Emese Revfy <re.emese@gmail.com>
-> > +L:     kernel-hardening@lists.openwall.com
-> > +S:     Maintained
-> > +F:     tools/gcc
+> On Tue, Mar 1, 2016 at 1:19 PM, Kees Cook <keescook@chromium.org> wrote:
+> > On Tue, Mar 1, 2016 at 9:15 AM, Emese Revfy <re.emese@gmail.com> wrote:
+> >> diff --git a/arch/Kconfig b/arch/Kconfig
+> >> index 155e6cd..4c54ef0 100644
+> >> --- a/arch/Kconfig
+> >> +++ b/arch/Kconfig
+> >> @@ -357,6 +357,19 @@ config SECCOMP_FILTER
+> >>
+> >>           See Documentation/prctl/seccomp_filter.txt for details.
+> >>
+> >> +config HAVE_GCC_PLUGINS
+> >> +       bool
+> >> +       help
+> >> +         An arch should select this symbol if it supports building with
+> >> +         GCC plugins.
+> >> +
+> >> +menuconfig GCC_PLUGINS
+> >> +       bool "GCC plugins"
+> >> +       depends on HAVE_GCC_PLUGINS
+> >> +       help
+> >> +         GCC plugins are loadable modules that provide extra features to the
+> >> +         compiler. They are useful for runtime instrumentation and static analysis.
+> >> +
+> >>  config HAVE_CC_STACKPROTECTOR
+> >>         bool
+> >>         help
+> >
+> > endmenu is missing?
 > 
-> I think that needs a trailing slash to indicate it's a tree to match.
+> Sorry, ignore my noise. However, my confusion does point on that maybe
+> gcc plugin config should live in tools/gcc/Kconfig and be included
+> here?
 
-I tested it with get_maintainer.pl and it is good.
-
-> > +F:     Documentation/gcc-plugins.txt
-> 
-> I wonder if this should be moved to Documentation/kbuild/ ?
-
-I don't know. Michal Marek, could you please tell me where I should put the documentation? 
+I don't know, there is no Kconfig under the tools subdirectory yet.
+Michal Marek, could you please tell me how you would like it?
 
 -- 
 Emese
