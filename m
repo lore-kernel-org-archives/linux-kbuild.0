@@ -1,95 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-io0-f171.google.com ([209.85.223.171]:36109 "EHLO
-	mail-io0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750920AbcCAWuK (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 1 Mar 2016 17:50:10 -0500
-Received: by mail-io0-f171.google.com with SMTP id l127so240146599iof.3
-        for <linux-kbuild@vger.kernel.org>; Tue, 01 Mar 2016 14:50:09 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <20160301181514.dc3dadeb7e18b77a09dddb7f@gmail.com>
-References: <20160301181400.9c623ee9230381da90b89b2a@gmail.com>
-	<20160301181514.dc3dadeb7e18b77a09dddb7f@gmail.com>
-Date: Tue, 1 Mar 2016 14:50:09 -0800
-Message-ID: <CAGXu5j+_3g-DAucJz+CYLZPEUauqfy52FmFDquh4xPOGB3Ek1g@mail.gmail.com>
-Subject: Re: [PATCH v4 1/3] GCC plugin infrastructure
-From: Kees Cook <keescook@chromium.org>
-Content-Type: text/plain; charset=UTF-8
+Received: from mx1.redhat.com ([209.132.183.28]:36239 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754186AbcCBO2n (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 2 Mar 2016 09:28:43 -0500
+From: Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH] kbuild/mkspec: clean boot loader configuration on rpm removal
+Date: Wed,  2 Mar 2016 15:28:00 +0100
+Message-Id: <cf947ffc2e633b0a2b75c21bd42c2061f3c5d418.1456925798.git.pabeni@redhat.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Emese Revfy <re.emese@gmail.com>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, PaX Team <pageexec@freemail.hu>, Brad Spengler <spender@grsecurity.net>, "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, Michal Marek <mmarek@suse.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Fengguang Wu <fengguang.wu@intel.com>
+To: linux-kernel@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.com>, Hannes Frederic Sowa <hannes@stressinduktion.org>
 
-On Tue, Mar 1, 2016 at 9:15 AM, Emese Revfy <re.emese@gmail.com> wrote:
-> This patch allows to build the whole kernel with GCC plugins. It was ported from
-> grsecurity/PaX. The infrastructure supports building out-of-tree modules and
-> building in a separate directory. Cross-compilation is supported too but
-> currently only the x86 architecture enables plugins.
+This patch add a rpm preuninstall scriptlet to cleanup the
+boot loader configuration on kernel package uninstall.
+The initrd for the to-be-removed kernel is deleted, too.
 
-Sorry for the piecemeal review. :) I keep finding little things...
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+---
+ scripts/package/mkspec | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-> diff --git a/scripts/Makefile.host b/scripts/Makefile.host
-> index 133edfa..4d180d9 100644
-> --- a/scripts/Makefile.host
-> +++ b/scripts/Makefile.host
-> @@ -124,5 +159,37 @@ quiet_cmd_host-cxxobjs     = HOSTCXX $@
->  $(host-cxxobjs): $(obj)/%.o: $(src)/%.cc FORCE
->         $(call if_changed_dep,host-cxxobjs)
->
-> +# Compile .c file, create position independent .o file
-> +# host-cshobjs -> .o
-> +quiet_cmd_host-cshobjs = HOSTCC  -fPIC $@
-
-Is there a reason to include the -fPIC and -shared (below) in the
-"quiet" output?
-
-I think this makes it harder to scan output, and is less "quiet" than
-I'd expect:
-
-...
-  SYSHDR  arch/x86/entry/syscalls/../../include/generated/uapi/asm/unistd_x32.h
-  HOSTCXX -fPIC tools/gcc/format_template.o
-  CHK     include/generated/uapi/linux/version.h
-  CHK     include/generated/utsrelease.h
-  HOSTLLD -shared tools/gcc/format_template.so
-  HOSTCC  arch/x86/tools/relocs_32.o
-...
-
-> +      cmd_host-cshobjs = $(HOSTCC) $(hostc_flags) -fPIC -c -o $@ $<
-> +$(host-cshobjs): $(obj)/%.o: $(src)/%.c FORCE
-> +       $(call if_changed_dep,host-cshobjs)
-> +
-> +# Compile .c file, create position independent .o file
-> +# host-cxxshobjs -> .o
-> +quiet_cmd_host-cxxshobjs       = HOSTCXX -fPIC $@
-> +      cmd_host-cxxshobjs       = $(HOSTCXX) $(hostcxx_flags) -fPIC -c -o $@ $<
-> +$(host-cxxshobjs): $(obj)/%.o: $(src)/%.c FORCE
-> +       $(call if_changed_dep,host-cxxshobjs)
-> +
-> +# Link a shared library, based on position independent .o files
-> +# *.o -> .so shared library (host-cshlib)
-> +quiet_cmd_host-cshlib  = HOSTLLD -shared $@
-> +      cmd_host-cshlib  = $(HOSTCC) $(HOSTLDFLAGS) -shared -o $@ \
-> +                         $(addprefix $(obj)/,$($(@F:.so=-objs))) \
-> +                         $(HOST_LOADLIBES) $(HOSTLOADLIBES_$(@F))
-> +$(host-cshlib): $(obj)/%: $(host-cshobjs) FORCE
-> +       $(call if_changed,host-cshlib)
-> +
-> +# Link a shared library, based on position independent .o files
-> +# *.o -> .so shared library (host-cxxshlib)
-> +quiet_cmd_host-cxxshlib        = HOSTLLD -shared $@
-> +      cmd_host-cxxshlib        = $(HOSTCXX) $(HOSTLDFLAGS) -shared -o $@ \
-> +                         $(addprefix $(obj)/,$($(@F:.so=-objs))) \
-> +                         $(HOST_LOADLIBES) $(HOSTLOADLIBES_$(@F))
-> +$(host-cxxshlib): $(obj)/%: $(host-cxxshobjs) FORCE
-> +       $(call if_changed,host-cxxshlib)
-> +
->  targets += $(host-csingle)  $(host-cmulti) $(host-cobjs)\
-> -          $(host-cxxmulti) $(host-cxxobjs)
-> +          $(host-cxxmulti) $(host-cxxobjs) $(host-cshlib) $(host-cshobjs) $(host-cxxshlib) $(host-cxxshobjs)
-
--Kees
-
+diff --git a/scripts/package/mkspec b/scripts/package/mkspec
+index fe44d68..b6de63c 100755
+--- a/scripts/package/mkspec
++++ b/scripts/package/mkspec
+@@ -138,6 +138,11 @@ echo "/sbin/installkernel $KERNELRELEASE /boot/.vmlinuz-$KERNELRELEASE-rpm /boot
+ echo "rm -f /boot/.vmlinuz-$KERNELRELEASE-rpm /boot/.System.map-$KERNELRELEASE-rpm"
+ echo "fi"
+ echo ""
++echo "%preun"
++echo "if [ -x /sbin/new-kernel-pkg ]; then"
++echo "new-kernel-pkg --remove $KERNELRELEASE --rminitrd --initrdfile=/boot/initramfs-$KERNELRELEASE.img"
++echo "fi"
++echo ""
+ echo "%files"
+ echo '%defattr (-, root, root)'
+ echo "/lib/modules/$KERNELRELEASE"
 -- 
-Kees Cook
-Chrome OS & Brillo Security
+1.8.3.1
+
