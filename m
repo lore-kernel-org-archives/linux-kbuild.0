@@ -1,86 +1,77 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg011.nifty.com ([202.248.44.37]:51088 "EHLO
-	conuserg011-v.nifty.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1751279AbcCCIg0 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 3 Mar 2016 03:36:26 -0500
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] kbuild: suppress annoying "... is up to date." message
-Date: Thu,  3 Mar 2016 17:36:30 +0900
-Message-Id: <1456994190-15582-1-git-send-email-yamada.masahiro@socionext.com>
+Received: from mx1.redhat.com ([209.132.183.28]:46249 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1756689AbcCCJJz (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 3 Mar 2016 04:09:55 -0500
+Message-ID: <1456996191.4882.17.camel@redhat.com>
+Subject: Re: [PATCH] kbuild/mkspec: clean boot loader configuration on rpm
+ removal
+From: Paolo Abeni <pabeni@redhat.com>
+Date: Thu, 03 Mar 2016 10:09:51 +0100
+In-Reply-To: <CA+5PVA6hxOA89gTiz-t4oK7qB4ug63R1DkGVXZ0FcD8ArPqkrg@mail.gmail.com>
+References: <cf947ffc2e633b0a2b75c21bd42c2061f3c5d418.1456925798.git.pabeni@redhat.com>
+	 <56D6FAD3.3000208@stressinduktion.org>
+	 <CA+5PVA6hxOA89gTiz-t4oK7qB4ug63R1DkGVXZ0FcD8ArPqkrg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, David Howells <dhowells@redhat.com>, Michal Marek <mmarek@suse.com>, David Woodhouse <David.Woodhouse@intel.com>, linux-kernel@vger.kernel.org
+To: Josh Boyer <jwboyer@fedoraproject.org>
+Cc: Hannes Frederic Sowa <hannes@stressinduktion.org>, "Linux-Kernel@Vger. Kernel. Org" <linux-kernel@vger.kernel.org>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.com>
 
-Under certain conditions, Kbuild shows "... is up to date" where
-if_changed or friends are used.
+On Wed, 2016-03-02 at 10:09 -0500, Josh Boyer wrote:
+> On Wed, Mar 2, 2016 at 9:38 AM, Hannes Frederic Sowa
+> <hannes@stressinduktion.org> wrote:
+> > On 02.03.2016 15:28, Paolo Abeni wrote:
+> >>
+> >> This patch add a rpm preuninstall scriptlet to cleanup the
+> >> boot loader configuration on kernel package uninstall.
+> >> The initrd for the to-be-removed kernel is deleted, too.
+> >>
+> >> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+> >> ---
+> >>   scripts/package/mkspec | 5 +++++
+> >>   1 file changed, 5 insertions(+)
+> >>
+> >> diff --git a/scripts/package/mkspec b/scripts/package/mkspec
+> >> index fe44d68..b6de63c 100755
+> >> --- a/scripts/package/mkspec
+> >> +++ b/scripts/package/mkspec
+> >> @@ -138,6 +138,11 @@ echo "/sbin/installkernel $KERNELRELEASE
+> >> /boot/.vmlinuz-$KERNELRELEASE-rpm /boot
+> >>   echo "rm -f /boot/.vmlinuz-$KERNELRELEASE-rpm
+> >> /boot/.System.map-$KERNELRELEASE-rpm"
+> >>   echo "fi"
+> >>   echo ""
+> >> +echo "%preun"
+> >> +echo "if [ -x /sbin/new-kernel-pkg ]; then"
+> >> +echo "new-kernel-pkg --remove $KERNELRELEASE --rminitrd
+> >> --initrdfile=/boot/initramfs-$KERNELRELEASE.img"
+> >> +echo "fi"
+> >> +echo ""
+> >>   echo "%files"
+> >>   echo '%defattr (-, root, root)'
+> >>   echo "/lib/modules/$KERNELRELEASE"
+> >>
+> >
+> > Maybe we should also switch to new-kernel-pkg for the postinstall call? How
+> > about switching to kernel-install?
+> 
+> new-kernel-pkg probably shouldn't be used here either.  The
+> installkernel binary is the distro agnostic kernel installation tool
+> and the various distros provide that as either the tool they use or as
+> a wrapper.  Switching to new-kernel-pkg implies this would only be
+> viable on grubby based distros, and using kernel-install would require
+> systemd.
 
-For example, the incremental build of ARM64 Linux shows this message
-when the kernel image has not been updated.
+I'm sorry, I try to dig a bit, but I did not find any distro agnostic
+kernel removal tools. Can you please point out some ?
 
-  $ make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu-
-    CHK     include/config/kernel.release
-    CHK     include/generated/uapi/linux/version.h
-    CHK     include/generated/utsrelease.h
-    CHK     include/generated/bounds.h
-    CHK     include/generated/timeconst.h
-    CHK     include/generated/asm-offsets.h
-    CALL    scripts/checksyscalls.sh
-    CHK     include/generated/compile.h
-    CHK     kernel/config_data.h
-  make[1]: `arch/arm64/boot/Image.gz' is up to date.
-    Building modules, stage 2.
-    MODPOST 0 modules
+Elsewhere can we stuck with new-kernel-pkg, plus eventual fall-back to
+other options, i.e. kernel-install?
 
-The following is the build rule in arch/arm64/boot/Makefile:
+Thank you,
 
-  $(obj)/Image.gz: $(obj)/Image FORCE
-          $(call if_changed,gzip)
-
-If the Image.gz is newer than the Image and the command line has not
-changed (i.e., $(any-prereq) and $(arg-check) are both empty), the
-build rule $(call if_changed,gzip) is evaluated to be empty, then
-GNU Make reports the target is up to date.  In order to make GNU Make
-quiet, we need to give it something to do, for example, "@:".  This
-should be fixed in the Kbuild core part rather than in each Makefile.
-
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
-
- scripts/Kbuild.include | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index 1db6d73..b2ab2a9 100644
---- a/scripts/Kbuild.include
-+++ b/scripts/Kbuild.include
-@@ -251,7 +251,7 @@ any-prereq = $(filter-out $(PHONY),$?) $(filter-out $(PHONY) $(wildcard $^),$^)
- if_changed = $(if $(strip $(any-prereq) $(arg-check)),                       \
- 	@set -e;                                                             \
- 	$(echo-cmd) $(cmd_$(1));                                             \
--	printf '%s\n' 'cmd_$@ := $(make-cmd)' > $(dot-target).cmd)
-+	printf '%s\n' 'cmd_$@ := $(make-cmd)' > $(dot-target).cmd, @:)
- 
- # Execute the command and also postprocess generated .d dependencies file.
- if_changed_dep = $(if $(strip $(any-prereq) $(arg-check) ),                  \
-@@ -259,14 +259,14 @@ if_changed_dep = $(if $(strip $(any-prereq) $(arg-check) ),                  \
- 	$(echo-cmd) $(cmd_$(1));                                             \
- 	scripts/basic/fixdep $(depfile) $@ '$(make-cmd)' > $(dot-target).tmp;\
- 	rm -f $(depfile);                                                    \
--	mv -f $(dot-target).tmp $(dot-target).cmd)
-+	mv -f $(dot-target).tmp $(dot-target).cmd, @:)
- 
- # Usage: $(call if_changed_rule,foo)
- # Will check if $(cmd_foo) or any of the prerequisites changed,
- # and if so will execute $(rule_foo).
- if_changed_rule = $(if $(strip $(any-prereq) $(arg-check) ),                 \
- 	@set -e;                                                             \
--	$(rule_$(1)))
-+	$(rule_$(1)), @:)
- 
- ###
- # why - tell why a a target got build
--- 
-1.9.1
+Paolo
 
