@@ -1,42 +1,86 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from r00tworld.com ([212.85.137.150]:47165 "EHLO r00tworld.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752727AbcCBVp7 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 2 Mar 2016 16:45:59 -0500
-From: "PaX Team" <pageexec@freemail.hu>
-Date: Wed, 02 Mar 2016 22:33:20 +0100
-MIME-Version: 1.0
-Subject: Re: [PATCH v4 1/3] GCC plugin infrastructure
-Reply-to: pageexec@freemail.hu
-Message-ID: <56D75C20.3969.4578E077@pageexec.freemail.hu>
-In-reply-to: <CAGXu5j+_3g-DAucJz+CYLZPEUauqfy52FmFDquh4xPOGB3Ek1g@mail.gmail.com>
-References: <20160301181400.9c623ee9230381da90b89b2a@gmail.com>, <20160301181514.dc3dadeb7e18b77a09dddb7f@gmail.com>, <CAGXu5j+_3g-DAucJz+CYLZPEUauqfy52FmFDquh4xPOGB3Ek1g@mail.gmail.com>
-Content-type: text/plain; charset=US-ASCII
-Content-transfer-encoding: 7BIT
-Content-description: Mail message body
+Received: from conuserg011.nifty.com ([202.248.44.37]:51088 "EHLO
+	conuserg011-v.nifty.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1751279AbcCCIg0 (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 3 Mar 2016 03:36:26 -0500
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH] kbuild: suppress annoying "... is up to date." message
+Date: Thu,  3 Mar 2016 17:36:30 +0900
+Message-Id: <1456994190-15582-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Emese Revfy <re.emese@gmail.com>, Kees Cook <keescook@chromium.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Brad Spengler <spender@grsecurity.net>, "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, Michal Marek <mmarek@suse.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Fengguang Wu <fengguang.wu@intel.com>
+To: linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, David Howells <dhowells@redhat.com>, Michal Marek <mmarek@suse.com>, David Woodhouse <David.Woodhouse@intel.com>, linux-kernel@vger.kernel.org
 
-On 1 Mar 2016 at 14:50, Kees Cook wrote:
+Under certain conditions, Kbuild shows "... is up to date" where
+if_changed or friends are used.
 
-> > @@ -124,5 +159,37 @@ quiet_cmd_host-cxxobjs     = HOSTCXX $@
-> >  $(host-cxxobjs): $(obj)/%.o: $(src)/%.cc FORCE
-> >         $(call if_changed_dep,host-cxxobjs)
-> >
-> > +# Compile .c file, create position independent .o file
-> > +# host-cshobjs -> .o
-> > +quiet_cmd_host-cshobjs = HOSTCC  -fPIC $@
-> 
-> Is there a reason to include the -fPIC and -shared (below) in the
-> "quiet" output?
+For example, the incremental build of ARM64 Linux shows this message
+when the kernel image has not been updated.
 
-this is how it used to be before the entire .so building infrastructure
-was nuked from the upstream kernel some time last year IIRC, i only kept
-it alive as it was in PaX. i guess the quiet command was more verbose to
-make it easier to spot shared objects during make which at the time were
-built as dependencies only, not as primary targets (as is the case now
-with the gcc plugins). in any case, this is just a visual clue and i don't
-particularly care about the color of this bikeshed :).
+  $ make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu-
+    CHK     include/config/kernel.release
+    CHK     include/generated/uapi/linux/version.h
+    CHK     include/generated/utsrelease.h
+    CHK     include/generated/bounds.h
+    CHK     include/generated/timeconst.h
+    CHK     include/generated/asm-offsets.h
+    CALL    scripts/checksyscalls.sh
+    CHK     include/generated/compile.h
+    CHK     kernel/config_data.h
+  make[1]: `arch/arm64/boot/Image.gz' is up to date.
+    Building modules, stage 2.
+    MODPOST 0 modules
+
+The following is the build rule in arch/arm64/boot/Makefile:
+
+  $(obj)/Image.gz: $(obj)/Image FORCE
+          $(call if_changed,gzip)
+
+If the Image.gz is newer than the Image and the command line has not
+changed (i.e., $(any-prereq) and $(arg-check) are both empty), the
+build rule $(call if_changed,gzip) is evaluated to be empty, then
+GNU Make reports the target is up to date.  In order to make GNU Make
+quiet, we need to give it something to do, for example, "@:".  This
+should be fixed in the Kbuild core part rather than in each Makefile.
+
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
+
+ scripts/Kbuild.include | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index 1db6d73..b2ab2a9 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -251,7 +251,7 @@ any-prereq = $(filter-out $(PHONY),$?) $(filter-out $(PHONY) $(wildcard $^),$^)
+ if_changed = $(if $(strip $(any-prereq) $(arg-check)),                       \
+ 	@set -e;                                                             \
+ 	$(echo-cmd) $(cmd_$(1));                                             \
+-	printf '%s\n' 'cmd_$@ := $(make-cmd)' > $(dot-target).cmd)
++	printf '%s\n' 'cmd_$@ := $(make-cmd)' > $(dot-target).cmd, @:)
+ 
+ # Execute the command and also postprocess generated .d dependencies file.
+ if_changed_dep = $(if $(strip $(any-prereq) $(arg-check) ),                  \
+@@ -259,14 +259,14 @@ if_changed_dep = $(if $(strip $(any-prereq) $(arg-check) ),                  \
+ 	$(echo-cmd) $(cmd_$(1));                                             \
+ 	scripts/basic/fixdep $(depfile) $@ '$(make-cmd)' > $(dot-target).tmp;\
+ 	rm -f $(depfile);                                                    \
+-	mv -f $(dot-target).tmp $(dot-target).cmd)
++	mv -f $(dot-target).tmp $(dot-target).cmd, @:)
+ 
+ # Usage: $(call if_changed_rule,foo)
+ # Will check if $(cmd_foo) or any of the prerequisites changed,
+ # and if so will execute $(rule_foo).
+ if_changed_rule = $(if $(strip $(any-prereq) $(arg-check) ),                 \
+ 	@set -e;                                                             \
+-	$(rule_$(1)))
++	$(rule_$(1)), @:)
+ 
+ ###
+ # why - tell why a a target got build
+-- 
+1.9.1
 
