@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from alt32.smtp-out.videotron.ca ([24.53.0.21]:10955 "EHLO
-	alt32.smtp-out.videotron.ca" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1752258AbcCDFz6 (ORCPT
+Received: from alt13.smtp-out.videotron.ca ([135.19.0.26]:36643 "EHLO
+	alt12.smtp-out.videotron.ca" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1751228AbcCDFz5 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 4 Mar 2016 00:55:58 -0500
+	Fri, 4 Mar 2016 00:55:57 -0500
 From: Nicolas Pitre <nicolas.pitre@linaro.org>
-Subject: [PATCH v5 8/8] kconfig option for TRIM_UNUSED_KSYMS
-Date: Fri,  4 Mar 2016 00:40:50 -0500
-Message-Id: <1457070050-1564-9-git-send-email-nicolas.pitre@linaro.org>
+Subject: [PATCH v5 1/8] kbuild: record needed exported symbols for modules
+Date: Fri,  4 Mar 2016 00:40:43 -0500
+Message-Id: <1457070050-1564-2-git-send-email-nicolas.pitre@linaro.org>
 In-Reply-To: <1457070050-1564-1-git-send-email-nicolas.pitre@linaro.org>
 References: <1457070050-1564-1-git-send-email-nicolas.pitre@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,41 +15,70 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.com>
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-The config option to enable it all.
+Kernel modules are partially linked object files with some undefined
+symbols that are expected to be matched with EXPORT_SYMBOL() entries
+from elsewhere.
+
+Each .tmp_versions/*.mod file currently contains two line of text
+separated by a newline character. The first line has the actual module
+file name while the second line has a list of object files constituting
+that module. Those files are parsed by modpost (scripts/mod/sumversion.c),
+scripts/Makefile.modpost, scripts/Makefile.modsign, etc.  Only the
+modpost utility cares about the second line while the others retrieve
+only the first line.
+
+Therefore we can add a third line to record the list of undefined symbols
+aka required EXPORT_SYMBOL() entries for each module into that file
+without breaking anything. Like for the second line, symbols are separated
+by a blank and the list is terminated with a newline character.
+
+To avoid needless build overhead, the undefined symbols extraction is
+performed only when CONFIG_TRIM_UNUSED_KSYMS is selected.
 
 Signed-off-by: Nicolas Pitre <nico@linaro.org>
 Acked-by: Rusty Russell <rusty@rustcorp.com.au>
 ---
- init/Kconfig | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ scripts/Makefile.build | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
-diff --git a/init/Kconfig b/init/Kconfig
-index 22320804fb..e6f666331b 100644
---- a/init/Kconfig
-+++ b/init/Kconfig
-@@ -1990,6 +1990,22 @@ config MODULE_COMPRESS_XZ
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index 2c47f9c305..f4b4320e0d 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -253,6 +253,13 @@ define rule_cc_o_c
+ 	mv -f $(dot-target).tmp $(dot-target).cmd
+ endef
  
- endchoice
++# List module undefined symbols (or empty line if not enabled)
++ifdef CONFIG_TRIM_UNUSED_KSYMS
++cmd_undef_syms = $(NM) $@ | sed -n 's/^ \+U //p' | xargs echo
++else
++cmd_undef_syms = echo
++endif
++
+ # Built-in and composite module parts
+ $(obj)/%.o: $(src)/%.c $(recordmcount_source) FORCE
+ 	$(call cmd,force_checksrc)
+@@ -263,7 +270,8 @@ $(obj)/%.o: $(src)/%.c $(recordmcount_source) FORCE
+ $(single-used-m): $(obj)/%.o: $(src)/%.c $(recordmcount_source) FORCE
+ 	$(call cmd,force_checksrc)
+ 	$(call if_changed_rule,cc_o_c)
+-	@{ echo $(@:.o=.ko); echo $@; } > $(MODVERDIR)/$(@F:.o=.mod)
++	@{ echo $(@:.o=.ko); echo $@; \
++	   $(cmd_undef_syms); } > $(MODVERDIR)/$(@F:.o=.mod)
  
-+config TRIM_UNUSED_KSYMS
-+	bool "Trim unused exported kernel symbols"
-+	depends on MODULES && !UNUSED_SYMBOLS
-+	help
-+	  The kernel and some modules make many symbols available for
-+	  other modules to use via EXPORT_SYMBOL() and variants. Depending
-+	  on the set of modules being selected in your kernel configuration,
-+	  many of those exported symbols might never be used.
-+
-+	  This option allows for unused exported symbols to be dropped from
-+	  the build. In turn, this provides the compiler more opportunities
-+	  (especially when using LTO) for optimizing the code and reducing
-+	  binary size.  This might have some security advantages as well.
-+
-+	  If unsure say N.
-+
- endif # MODULES
+ quiet_cmd_cc_lst_c = MKLST   $@
+       cmd_cc_lst_c = $(CC) $(c_flags) -g -c -o $*.o $< && \
+@@ -393,7 +401,8 @@ $(call multi_depend, $(multi-used-y), .o, -objs -y)
  
- config MODULES_TREE_LOOKUP
+ $(multi-used-m): FORCE
+ 	$(call if_changed,link_multi-m)
+-	@{ echo $(@:.o=.ko); echo $(link_multi_deps); } > $(MODVERDIR)/$(@F:.o=.mod)
++	@{ echo $(@:.o=.ko); echo $(link_multi_deps); \
++	   $(cmd_undef_syms); } > $(MODVERDIR)/$(@F:.o=.mod)
+ $(call multi_depend, $(multi-used-m), .o, -objs -y -m)
+ 
+ targets += $(multi-used-y) $(multi-used-m)
 -- 
 2.5.0
 
