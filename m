@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from alt13.smtp-out.videotron.ca ([135.19.0.26]:36643 "EHLO
-	alt12.smtp-out.videotron.ca" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1751228AbcCDFz5 (ORCPT
+Received: from alt22.smtp-out.videotron.ca ([70.80.0.73]:46616 "EHLO
+	alt22.smtp-out.videotron.ca" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751114AbcCDFz5 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Fri, 4 Mar 2016 00:55:57 -0500
 From: Nicolas Pitre <nicolas.pitre@linaro.org>
-Subject: [PATCH v5 1/8] kbuild: record needed exported symbols for modules
-Date: Fri,  4 Mar 2016 00:40:43 -0500
-Message-Id: <1457070050-1564-2-git-send-email-nicolas.pitre@linaro.org>
+Subject: [PATCH v5 4/8] kbuild: de-duplicate fixdep usage
+Date: Fri,  4 Mar 2016 00:40:46 -0500
+Message-Id: <1457070050-1564-5-git-send-email-nicolas.pitre@linaro.org>
 In-Reply-To: <1457070050-1564-1-git-send-email-nicolas.pitre@linaro.org>
 References: <1457070050-1564-1-git-send-email-nicolas.pitre@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,70 +15,61 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.com>
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Kernel modules are partially linked object files with some undefined
-symbols that are expected to be matched with EXPORT_SYMBOL() entries
-from elsewhere.
+The generation and postprocessing of automatic dependency rules is
+duplicated in rule_cc_o_c and if_changed_dep. Since this is not a
+trivial one-liner action, it is now abstracted under cmd_and_fixdep
+to simplify things and make future changes easier.
 
-Each .tmp_versions/*.mod file currently contains two line of text
-separated by a newline character. The first line has the actual module
-file name while the second line has a list of object files constituting
-that module. Those files are parsed by modpost (scripts/mod/sumversion.c),
-scripts/Makefile.modpost, scripts/Makefile.modsign, etc.  Only the
-modpost utility cares about the second line while the others retrieve
-only the first line.
-
-Therefore we can add a third line to record the list of undefined symbols
-aka required EXPORT_SYMBOL() entries for each module into that file
-without breaking anything. Like for the second line, symbols are separated
-by a blank and the list is terminated with a newline character.
-
-To avoid needless build overhead, the undefined symbols extraction is
-performed only when CONFIG_TRIM_UNUSED_KSYMS is selected.
+In the rule_cc_o_c case that means the order of some commands has been
+altered, namely fixdep and related file manipulations are executed
+earlier, but they didn't depend on those commands that now execute later.
 
 Signed-off-by: Nicolas Pitre <nico@linaro.org>
-Acked-by: Rusty Russell <rusty@rustcorp.com.au>
 ---
- scripts/Makefile.build | 13 +++++++++++--
- 1 file changed, 11 insertions(+), 2 deletions(-)
+ scripts/Kbuild.include | 5 ++++-
+ scripts/Makefile.build | 9 ++-------
+ 2 files changed, 6 insertions(+), 8 deletions(-)
 
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index 1db6d73c8d..8a257fa663 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -256,10 +256,13 @@ if_changed = $(if $(strip $(any-prereq) $(arg-check)),                       \
+ # Execute the command and also postprocess generated .d dependencies file.
+ if_changed_dep = $(if $(strip $(any-prereq) $(arg-check) ),                  \
+ 	@set -e;                                                             \
++	$(cmd_and_fixdep))
++
++cmd_and_fixdep =                                                             \
+ 	$(echo-cmd) $(cmd_$(1));                                             \
+ 	scripts/basic/fixdep $(depfile) $@ '$(make-cmd)' > $(dot-target).tmp;\
+ 	rm -f $(depfile);                                                    \
+-	mv -f $(dot-target).tmp $(dot-target).cmd)
++	mv -f $(dot-target).tmp $(dot-target).cmd;
+ 
+ # Usage: $(call if_changed_rule,foo)
+ # Will check if $(cmd_foo) or any of the prerequisites changed,
 diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 2c47f9c305..f4b4320e0d 100644
+index f4b4320e0d..8134ee81ad 100644
 --- a/scripts/Makefile.build
 +++ b/scripts/Makefile.build
-@@ -253,6 +253,13 @@ define rule_cc_o_c
- 	mv -f $(dot-target).tmp $(dot-target).cmd
+@@ -243,14 +243,9 @@ endif
+ 
+ define rule_cc_o_c
+ 	$(call echo-cmd,checksrc) $(cmd_checksrc)			  \
+-	$(call echo-cmd,cc_o_c) $(cmd_cc_o_c);				  \
++	$(call cmd_and_fixdep,cc_o_c)					  \
+ 	$(cmd_modversions)						  \
+-	$(call echo-cmd,record_mcount)					  \
+-	$(cmd_record_mcount)						  \
+-	scripts/basic/fixdep $(depfile) $@ '$(call make-cmd,cc_o_c)' >    \
+-	                                              $(dot-target).tmp;  \
+-	rm -f $(depfile);						  \
+-	mv -f $(dot-target).tmp $(dot-target).cmd
++	$(call echo-cmd,record_mcount) $(cmd_record_mcount)
  endef
  
-+# List module undefined symbols (or empty line if not enabled)
-+ifdef CONFIG_TRIM_UNUSED_KSYMS
-+cmd_undef_syms = $(NM) $@ | sed -n 's/^ \+U //p' | xargs echo
-+else
-+cmd_undef_syms = echo
-+endif
-+
- # Built-in and composite module parts
- $(obj)/%.o: $(src)/%.c $(recordmcount_source) FORCE
- 	$(call cmd,force_checksrc)
-@@ -263,7 +270,8 @@ $(obj)/%.o: $(src)/%.c $(recordmcount_source) FORCE
- $(single-used-m): $(obj)/%.o: $(src)/%.c $(recordmcount_source) FORCE
- 	$(call cmd,force_checksrc)
- 	$(call if_changed_rule,cc_o_c)
--	@{ echo $(@:.o=.ko); echo $@; } > $(MODVERDIR)/$(@F:.o=.mod)
-+	@{ echo $(@:.o=.ko); echo $@; \
-+	   $(cmd_undef_syms); } > $(MODVERDIR)/$(@F:.o=.mod)
- 
- quiet_cmd_cc_lst_c = MKLST   $@
-       cmd_cc_lst_c = $(CC) $(c_flags) -g -c -o $*.o $< && \
-@@ -393,7 +401,8 @@ $(call multi_depend, $(multi-used-y), .o, -objs -y)
- 
- $(multi-used-m): FORCE
- 	$(call if_changed,link_multi-m)
--	@{ echo $(@:.o=.ko); echo $(link_multi_deps); } > $(MODVERDIR)/$(@F:.o=.mod)
-+	@{ echo $(@:.o=.ko); echo $(link_multi_deps); \
-+	   $(cmd_undef_syms); } > $(MODVERDIR)/$(@F:.o=.mod)
- $(call multi_depend, $(multi-used-m), .o, -objs -y -m)
- 
- targets += $(multi-used-y) $(multi-used-m)
+ # List module undefined symbols (or empty line if not enabled)
 -- 
 2.5.0
 
