@@ -1,100 +1,88 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from alt22.smtp-out.videotron.ca ([70.80.0.73]:44583 "EHLO
+Received: from alt22.smtp-out.videotron.ca ([70.80.0.73]:53577 "EHLO
 	alt22.smtp-out.videotron.ca" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1750903AbcCDFz4 (ORCPT
+	by vger.kernel.org with ESMTP id S1751090AbcCDFz5 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 4 Mar 2016 00:55:56 -0500
+	Fri, 4 Mar 2016 00:55:57 -0500
 From: Nicolas Pitre <nicolas.pitre@linaro.org>
-Subject: [PATCH v5 2/8] allow for per-symbol configurable EXPORT_SYMBOL()
-Date: Fri,  4 Mar 2016 00:40:44 -0500
-Message-Id: <1457070050-1564-3-git-send-email-nicolas.pitre@linaro.org>
-In-Reply-To: <1457070050-1564-1-git-send-email-nicolas.pitre@linaro.org>
-References: <1457070050-1564-1-git-send-email-nicolas.pitre@linaro.org>
+Subject: [PATCH v5 0/8] Trim unused exported kernel symbols
+Date: Fri,  4 Mar 2016 00:40:42 -0500
+Message-Id: <1457070050-1564-1-git-send-email-nicolas.pitre@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.com>
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Similar to include/generated/autoconf.h, include/generated/autoksyms.h
-will contain a list of defines for each EXPORT_SYMBOL() that we want
-active. The format is:
+This patch series provides the option to omit exported symbols from
+the kernel and modules that are never referenced by any of the selected
+modules in the current kernel configuration. this allows for optimizing
+the compiled code and reducing final binaries' size. When using LTO the
+binary size reduction is even more effective. It could also be argued
+that this could bring some security advantages.
 
-  #define __KSYM_<symbol_name> 1
+The original cover letter with lots of test results can be found here:
 
-This list will be auto-generated with another patch.  For now we only
-include the preprocessor magic to automatically create or omit the
-corresponding struct kernel_symbol declaration.
+	https://lkml.org/lkml/2016/2/8/813
 
-Given the content of include/generated/autoksyms.h may not be known in
-advance, an empty file is created early on to let the build proceed.
+Please consider for merging into your tree. Alternately, the following
+branch can be pulled:
 
-Signed-off-by: Nicolas Pitre <nico@linaro.org>
-Acked-by: Rusty Russell <rusty@rustcorp.com.au>
----
- Makefile               |  2 ++
- include/linux/export.h | 22 ++++++++++++++++++++--
- 2 files changed, 22 insertions(+), 2 deletions(-)
+	http://git.linaro.org/people/nicolas.pitre/linux.git autoksyms
 
-diff --git a/Makefile b/Makefile
-index 6c1a3c2479..e916428cf7 100644
---- a/Makefile
-+++ b/Makefile
-@@ -986,6 +986,8 @@ prepare2: prepare3 outputmakefile asm-generic
- prepare1: prepare2 $(version_h) include/generated/utsrelease.h \
-                    include/config/auto.conf
- 	$(cmd_crmodverdir)
-+	$(Q)test -e include/generated/autoksyms.h || \
-+	    touch   include/generated/autoksyms.h
- 
- archprepare: archheaders archscripts prepare1 scripts_basic
- 
-diff --git a/include/linux/export.h b/include/linux/export.h
-index 96e45ea463..77afdb2a25 100644
---- a/include/linux/export.h
-+++ b/include/linux/export.h
-@@ -38,7 +38,7 @@ extern struct module __this_module;
- 
- #ifdef CONFIG_MODULES
- 
--#ifndef __GENKSYMS__
-+#if defined(__KERNEL__) && !defined(__GENKSYMS__)
- #ifdef CONFIG_MODVERSIONS
- /* Mark the CRC weak since genksyms apparently decides not to
-  * generate a checksums for some symbols */
-@@ -53,7 +53,7 @@ extern struct module __this_module;
- #endif
- 
- /* For every exported symbol, place a struct in the __ksymtab section */
--#define __EXPORT_SYMBOL(sym, sec)				\
-+#define ___EXPORT_SYMBOL(sym, sec)				\
- 	extern typeof(sym) sym;					\
- 	__CRC_SYMBOL(sym, sec)					\
- 	static const char __kstrtab_##sym[]			\
-@@ -65,6 +65,24 @@ extern struct module __this_module;
- 	__attribute__((section("___ksymtab" sec "+" #sym), unused))	\
- 	= { (unsigned long)&sym, __kstrtab_##sym }
- 
-+#ifdef CONFIG_TRIM_UNUSED_KSYMS
-+
-+#include <linux/kconfig.h>
-+#include <generated/autoksyms.h>
-+
-+#define __EXPORT_SYMBOL(sym, sec)				\
-+	__cond_export_sym(sym, sec, config_enabled(__KSYM_##sym))
-+#define __cond_export_sym(sym, sec, conf)			\
-+	___cond_export_sym(sym, sec, conf)
-+#define ___cond_export_sym(sym, sec, enabled)			\
-+	__cond_export_sym_##enabled(sym, sec)
-+#define __cond_export_sym_1(sym, sec) ___EXPORT_SYMBOL(sym, sec)
-+#define __cond_export_sym_0(sym, sec) /* nothing */
-+
-+#else
-+#define __EXPORT_SYMBOL ___EXPORT_SYMBOL
-+#endif
-+
- #define EXPORT_SYMBOL(sym)					\
- 	__EXPORT_SYMBOL(sym, "")
- 
--- 
-2.5.0
+Thanks.
+
+Changes from v4:
+
+- Correctness changes plus small cleanup to adjust_autoksyms.sh as
+  suggested by Michal Marek.
+
+- Changed ksym build dependency generation by re-running the preprocessor
+  rather than collecting those dependencies as warnings through stderr
+  which was too fragile.
+
+Changes from v3:
+
+- Shell portability changes to adjust_autoksyms.sh, partly from
+  suggestions by Zev Weiss.
+
+- Fix sample modules by building them before adjust_autoksyms.sh is run.
+
+Changes from v2:
+
+- Generating the build dependencies by parsing the source with fixdep
+  turned out to be unreliable due to all the EXPORT_SYMBOL() variants,
+  and especially their use within macros where the actual symbol name
+  is known only after running the preprocessor. This list of symbol names
+  is now obtained from the preprocessor directly, fixing allmodconfig
+  builds.
+
+Changes from v1:
+
+- Replaced "exp" that doesn't convey the right meaning as noted by
+  Sam Ravnborg. The "ksym" identifier is actually what the kernel
+  already uses for this. Therefore:
+  - CONFIG_TRIM_UNUSED_EXPSYMS --> CONFIG_TRIM_UNUSED_KSYMS
+  - include/generated/expsyms.h --> include/generated/autoksyms.h
+  - #define __EXPSYM_* --> #define __KSYM_*
+
+- Some sed regexp improvements as suggested by Al Viro.
+
+- Renamed vmlinux_recursive target to autoksyms_recursive.
+
+- Accept EXPORT_SYMBOL variants with a prefix, e.g. ACPI_EXPORT_SYMBOL.
+
+- Minor commit log clarifications.
+
+- Added Rusty's ACK.
+
+diffstat:
+
+ Makefile                    |  23 ++++++--
+ include/linux/export.h      |  33 +++++++++++-
+ init/Kconfig                |  16 ++++++
+ scripts/Kbuild.include      |  29 ++++++++++-
+ scripts/Makefile.build      |  22 ++++----
+ scripts/adjust_autoksyms.sh | 101 ++++++++++++++++++++++++++++++++++++
+ scripts/basic/fixdep.c      |  61 ++++++++++++++++------
+ 7 files changed, 255 insertions(+), 30 deletions(-)
 
