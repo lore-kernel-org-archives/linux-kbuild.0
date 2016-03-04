@@ -1,144 +1,91 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from alt22.smtp-out.videotron.ca ([70.80.0.73]:50494 "EHLO
-	alt22.smtp-out.videotron.ca" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751088AbcCDFz5 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 4 Mar 2016 00:55:57 -0500
-From: Nicolas Pitre <nicolas.pitre@linaro.org>
-Subject: [PATCH v5 3/8] fixdep: accept extra dependencies on stdin
-Date: Fri,  4 Mar 2016 00:40:45 -0500
-Message-Id: <1457070050-1564-4-git-send-email-nicolas.pitre@linaro.org>
-In-Reply-To: <1457070050-1564-1-git-send-email-nicolas.pitre@linaro.org>
-References: <1457070050-1564-1-git-send-email-nicolas.pitre@linaro.org>
+Received: from mx2.suse.de ([195.135.220.15]:39655 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751557AbcCDKLB (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 4 Mar 2016 05:11:01 -0500
+Subject: Re: [PATCH v4 5/8] kbuild: add fine grained build dependencies for
+ exported symbols
+References: <1456717691-28298-1-git-send-email-nicolas.pitre@linaro.org>
+ <1456717691-28298-6-git-send-email-nicolas.pitre@linaro.org>
+ <56D8C174.70602@suse.com> <alpine.LFD.2.20.1603032053490.13632@knanqh.ubzr>
+From: Michal Marek <mmarek@suse.com>
+Message-ID: <56D95F33.4050800@suse.com>
+Date: Fri, 4 Mar 2016 11:10:59 +0100
+MIME-Version: 1.0
+In-Reply-To: <alpine.LFD.2.20.1603032053490.13632@knanqh.ubzr>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>
+To: Nicolas Pitre <nicolas.pitre@linaro.org>
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-... and merge them in the list of parsed dependencies.
+On 2016-03-04 03:46, Nicolas Pitre wrote:
+> On Thu, 3 Mar 2016, Michal Marek wrote:
+> 
+>> Dne 29.2.2016 v 04:48 Nicolas Pitre napsal(a):
+>>> +# Filter out exported kernel symbol names advertised as warning pragmas
+>>> +# by the preprocessor and write them to $(1). We must consider continuation
+>>> +# lines as well: they start with a blank, or the preceeding line ends with
+>>> +# a ':'. Anything else is passed through as is.
+>>> +# See also __KSYM_DEP() in include/linux/export.h.
+>>> +ksym_dep_filter = sed -n \
+>>> +	-e '1 {x; $$!d}' \
+>>> +	-e '/^ / {H; $$!d}' \
+>>> +	-e 'x; /:$$/ {x; H; $$!d; s/^/ /; x}' \
+>>> +	-e ':filter; /^.*KBUILD_AUTOKSYM_DEP: /! {p; b next}' \
+>>> +	-e 's//KSYM_/; s/\n.*//; w $(1)' \
+>>> +	-e ':next; $$!d' \
+>>> +	-e '1 q; s/^/ /; x; /^ /! b filter'
+>>
+>> This is unreadable and it does not work with my gcc version. I get
+>> dependencies like
+>>
+>>     $(wildcard include/config/ksym/simple/strtoull [enabled by default].h) \
+> 
+> That's too bad.  This had almost zero overhead as the preprocessor 
+> didn't have to be executed twice.
 
-Signed-off-by: Nicolas Pitre <nico@linaro.org>
----
- scripts/basic/fixdep.c | 60 +++++++++++++++++++++++++++++++++++++-------------
- 1 file changed, 45 insertions(+), 15 deletions(-)
+I know you are trying to collect the exports in a single pass, but
+parsing the compiler warnings is really fragile.
 
-diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
-index 5b327c67a8..d984deb120 100644
---- a/scripts/basic/fixdep.c
-+++ b/scripts/basic/fixdep.c
-@@ -120,13 +120,15 @@
- #define INT_NFIG ntohl(0x4e464947)
- #define INT_FIG_ ntohl(0x4649475f)
- 
-+int insert_extra_deps;
- char *target;
- char *depfile;
- char *cmdline;
- 
- static void usage(void)
- {
--	fprintf(stderr, "Usage: fixdep <depfile> <target> <cmdline>\n");
-+	fprintf(stderr, "Usage: fixdep [-e] <depfile> <target> <cmdline>\n");
-+	fprintf(stderr, " -e  insert extra dependencies given on stdin\n");
- 	exit(1);
- }
- 
-@@ -138,6 +140,40 @@ static void print_cmdline(void)
- 	printf("cmd_%s := %s\n\n", target, cmdline);
- }
- 
-+/*
-+ * Print out a dependency path from a symbol name
-+ */
-+static void print_config(const char *m, int slen)
-+{
-+	int c, i;
-+
-+	printf("    $(wildcard include/config/");
-+	for (i = 0; i < slen; i++) {
-+		c = m[i];
-+		if (c == '_')
-+			c = '/';
-+		else
-+			c = tolower(c);
-+		putchar(c);
-+	}
-+	printf(".h) \\\n");
-+}
-+
-+static void do_extra_deps(void)
-+{
-+	if (insert_extra_deps) {
-+		char buf[80];
-+		while(fgets(buf, sizeof(buf), stdin)) {
-+			int len = strlen(buf);
-+			if (len < 2 || buf[len-1] != '\n') {
-+				fprintf(stderr, "fixdep: bad data on stdin\n");
-+				exit(1);
-+			}
-+			print_config(buf, len-1);
-+		}
-+	}
-+}
-+
- struct item {
- 	struct item	*next;
- 	unsigned int	len;
-@@ -197,23 +233,12 @@ static void define_config(const char *name, int len, unsigned int hash)
- static void use_config(const char *m, int slen)
- {
- 	unsigned int hash = strhash(m, slen);
--	int c, i;
- 
- 	if (is_defined_config(m, slen, hash))
- 	    return;
- 
- 	define_config(m, slen, hash);
--
--	printf("    $(wildcard include/config/");
--	for (i = 0; i < slen; i++) {
--		c = m[i];
--		if (c == '_')
--			c = '/';
--		else
--			c = tolower(c);
--		putchar(c);
--	}
--	printf(".h) \\\n");
-+	print_config(m, slen);
- }
- 
- static void parse_config_file(const char *map, size_t len)
-@@ -250,7 +275,7 @@ static void parse_config_file(const char *map, size_t len)
- 	}
- }
- 
--/* test is s ends in sub */
-+/* test if s ends in sub */
- static int strrcmp(const char *s, const char *sub)
- {
- 	int slen = strlen(s);
-@@ -374,6 +399,8 @@ static void parse_dep_file(void *map, size_t len)
- 		exit(1);
- 	}
- 
-+	do_extra_deps();
-+
- 	printf("\n%s: $(deps_%s)\n\n", target, target);
- 	printf("$(deps_%s):\n", target);
- }
-@@ -430,7 +457,10 @@ int main(int argc, char *argv[])
- {
- 	traps();
- 
--	if (argc != 4)
-+	if (argc == 5 && !strcmp(argv[1], "-e")) {
-+		insert_extra_deps = 1;
-+		argv++;
-+	} else if (argc != 4)
- 		usage();
- 
- 	depfile = argv[1];
--- 
-2.5.0
+
+> Probably adding s/ .*//; before w $(1) would fix that.  But I agree this 
+> is fragile.  What gcc version is this?
+
+$ gcc --version
+gcc (SUSE Linux) 4.8.3 20140627 [gcc-4_8-branch revision 212064]
+...
+
+The output looks like this:
+$ echo '_Pragma("GCC warning \"KBUILD_AUTOKSYM_DEP: test\"")' | gcc
+-Wall -c -xc -
+<stdin>:1:13: warning: KBUILD_AUTOKSYM_DEP: test [enabled by default]
+
+Clang output is similar, except that the text appears twice in the output:
+$ echo '_Pragma("GCC warning \"KBUILD_AUTOKSYM_DEP: test\"")' | clang
+-Wall -c -xc -
+<stdin>:1:1: warning: KBUILD_AUTOKSYM_DEP: test [-W#pragma-messages]
+_Pragma("GCC warning \"KBUILD_AUTOKSYM_DEP: test\"")
+^
+<scratch space>:2:6: note: expanded from here
+ GCC warning "KBUILD_AUTOKSYM_DEP: test"
+     ^
+
+What is worse, older gccs do not support the GCC warning pragma:
+$ gcc --version
+gcc (GCC) 4.1.2 20070115 (SUSE Linux)
+...
+$ echo '_Pragma("GCC warning \"KBUILD_AUTOKSYM_DEP: test\"")' | gcc
+-Wall -c -xc  -
+<stdin>:1: warning: ignoring #pragma GCC warning
+
+
+> Oh and who said that a sed script had to, or could be readable?  ;-)
+
+I guess I could live with a non-redable sed script embedded in a
+Makefile, if I knew that it won't need updating for each new compiler
+release :).
+
+Michal
 
