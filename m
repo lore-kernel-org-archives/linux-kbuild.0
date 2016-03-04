@@ -1,65 +1,100 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qg0-f49.google.com ([209.85.192.49]:35211 "EHLO
-	mail-qg0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756212AbcCDCql (ORCPT
+Received: from alt22.smtp-out.videotron.ca ([70.80.0.73]:44583 "EHLO
+	alt22.smtp-out.videotron.ca" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1750903AbcCDFz4 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 3 Mar 2016 21:46:41 -0500
-Received: by mail-qg0-f49.google.com with SMTP id y89so33670036qge.2
-        for <linux-kbuild@vger.kernel.org>; Thu, 03 Mar 2016 18:46:40 -0800 (PST)
-Date: Thu, 3 Mar 2016 21:46:38 -0500 (EST)
+	Fri, 4 Mar 2016 00:55:56 -0500
 From: Nicolas Pitre <nicolas.pitre@linaro.org>
-Subject: Re: [PATCH v4 5/8] kbuild: add fine grained build dependencies for
- exported symbols
-In-Reply-To: <56D8C174.70602@suse.com>
-Message-ID: <alpine.LFD.2.20.1603032053490.13632@knanqh.ubzr>
-References: <1456717691-28298-1-git-send-email-nicolas.pitre@linaro.org> <1456717691-28298-6-git-send-email-nicolas.pitre@linaro.org> <56D8C174.70602@suse.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Subject: [PATCH v5 2/8] allow for per-symbol configurable EXPORT_SYMBOL()
+Date: Fri,  4 Mar 2016 00:40:44 -0500
+Message-Id: <1457070050-1564-3-git-send-email-nicolas.pitre@linaro.org>
+In-Reply-To: <1457070050-1564-1-git-send-email-nicolas.pitre@linaro.org>
+References: <1457070050-1564-1-git-send-email-nicolas.pitre@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.com>
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Thu, 3 Mar 2016, Michal Marek wrote:
+Similar to include/generated/autoconf.h, include/generated/autoksyms.h
+will contain a list of defines for each EXPORT_SYMBOL() that we want
+active. The format is:
 
-> Dne 29.2.2016 v 04:48 Nicolas Pitre napsal(a):
-> > +# Filter out exported kernel symbol names advertised as warning pragmas
-> > +# by the preprocessor and write them to $(1). We must consider continuation
-> > +# lines as well: they start with a blank, or the preceeding line ends with
-> > +# a ':'. Anything else is passed through as is.
-> > +# See also __KSYM_DEP() in include/linux/export.h.
-> > +ksym_dep_filter = sed -n \
-> > +	-e '1 {x; $$!d}' \
-> > +	-e '/^ / {H; $$!d}' \
-> > +	-e 'x; /:$$/ {x; H; $$!d; s/^/ /; x}' \
-> > +	-e ':filter; /^.*KBUILD_AUTOKSYM_DEP: /! {p; b next}' \
-> > +	-e 's//KSYM_/; s/\n.*//; w $(1)' \
-> > +	-e ':next; $$!d' \
-> > +	-e '1 q; s/^/ /; x; /^ /! b filter'
-> 
-> This is unreadable and it does not work with my gcc version. I get
-> dependencies like
-> 
->     $(wildcard include/config/ksym/simple/strtoull [enabled by default].h) \
+  #define __KSYM_<symbol_name> 1
 
-That's too bad.  This had almost zero overhead as the preprocessor 
-didn't have to be executed twice.
+This list will be auto-generated with another patch.  For now we only
+include the preprocessor magic to automatically create or omit the
+corresponding struct kernel_symbol declaration.
 
-Probably adding s/ .*//; before w $(1) would fix that.  But I agree this 
-is fragile.  What gcc version is this?
+Given the content of include/generated/autoksyms.h may not be known in
+advance, an empty file is created early on to let the build proceed.
 
-> Please use some other way, which does not require parsing the compiler
-> diagnostic messages. A straightforward solution is to do something
-> similar to genksyms: A separate preprocessor pass with -Dsomething that
-> leaves the EXPORT_SYMBOL statements alone and just collect their occurences.
+Signed-off-by: Nicolas Pitre <nico@linaro.org>
+Acked-by: Rusty Russell <rusty@rustcorp.com.au>
+---
+ Makefile               |  2 ++
+ include/linux/export.h | 22 ++++++++++++++++++++--
+ 2 files changed, 22 insertions(+), 2 deletions(-)
 
-I went that route at some point. But here I need to extract those 
-EXPORT_SYMBOL() instances for all if_changed_dep uses.  That includes 
-cc_o_c, cc_s_c, cc_i_c, cc_lst_c, as_s_S, as_o_S, etc. etc.  I need the 
-corresponding preprocessor flags without the usual target flags.  Let's 
-see what I can do that is more readable than a sed script.
+diff --git a/Makefile b/Makefile
+index 6c1a3c2479..e916428cf7 100644
+--- a/Makefile
++++ b/Makefile
+@@ -986,6 +986,8 @@ prepare2: prepare3 outputmakefile asm-generic
+ prepare1: prepare2 $(version_h) include/generated/utsrelease.h \
+                    include/config/auto.conf
+ 	$(cmd_crmodverdir)
++	$(Q)test -e include/generated/autoksyms.h || \
++	    touch   include/generated/autoksyms.h
+ 
+ archprepare: archheaders archscripts prepare1 scripts_basic
+ 
+diff --git a/include/linux/export.h b/include/linux/export.h
+index 96e45ea463..77afdb2a25 100644
+--- a/include/linux/export.h
++++ b/include/linux/export.h
+@@ -38,7 +38,7 @@ extern struct module __this_module;
+ 
+ #ifdef CONFIG_MODULES
+ 
+-#ifndef __GENKSYMS__
++#if defined(__KERNEL__) && !defined(__GENKSYMS__)
+ #ifdef CONFIG_MODVERSIONS
+ /* Mark the CRC weak since genksyms apparently decides not to
+  * generate a checksums for some symbols */
+@@ -53,7 +53,7 @@ extern struct module __this_module;
+ #endif
+ 
+ /* For every exported symbol, place a struct in the __ksymtab section */
+-#define __EXPORT_SYMBOL(sym, sec)				\
++#define ___EXPORT_SYMBOL(sym, sec)				\
+ 	extern typeof(sym) sym;					\
+ 	__CRC_SYMBOL(sym, sec)					\
+ 	static const char __kstrtab_##sym[]			\
+@@ -65,6 +65,24 @@ extern struct module __this_module;
+ 	__attribute__((section("___ksymtab" sec "+" #sym), unused))	\
+ 	= { (unsigned long)&sym, __kstrtab_##sym }
+ 
++#ifdef CONFIG_TRIM_UNUSED_KSYMS
++
++#include <linux/kconfig.h>
++#include <generated/autoksyms.h>
++
++#define __EXPORT_SYMBOL(sym, sec)				\
++	__cond_export_sym(sym, sec, config_enabled(__KSYM_##sym))
++#define __cond_export_sym(sym, sec, conf)			\
++	___cond_export_sym(sym, sec, conf)
++#define ___cond_export_sym(sym, sec, enabled)			\
++	__cond_export_sym_##enabled(sym, sec)
++#define __cond_export_sym_1(sym, sec) ___EXPORT_SYMBOL(sym, sec)
++#define __cond_export_sym_0(sym, sec) /* nothing */
++
++#else
++#define __EXPORT_SYMBOL ___EXPORT_SYMBOL
++#endif
++
+ #define EXPORT_SYMBOL(sym)					\
+ 	__EXPORT_SYMBOL(sym, "")
+ 
+-- 
+2.5.0
 
-Oh and who said that a sed script had to, or could be readable?  ;-)
-
-
-Nicolas
