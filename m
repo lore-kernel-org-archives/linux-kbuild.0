@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from alt22.smtp-out.videotron.ca ([70.80.0.73]:46616 "EHLO
+Received: from alt22.smtp-out.videotron.ca ([70.80.0.73]:50494 "EHLO
 	alt22.smtp-out.videotron.ca" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1751114AbcCDFz5 (ORCPT
+	by vger.kernel.org with ESMTP id S1751088AbcCDFz5 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Fri, 4 Mar 2016 00:55:57 -0500
 From: Nicolas Pitre <nicolas.pitre@linaro.org>
-Subject: [PATCH v5 4/8] kbuild: de-duplicate fixdep usage
-Date: Fri,  4 Mar 2016 00:40:46 -0500
-Message-Id: <1457070050-1564-5-git-send-email-nicolas.pitre@linaro.org>
+Subject: [PATCH v5 3/8] fixdep: accept extra dependencies on stdin
+Date: Fri,  4 Mar 2016 00:40:45 -0500
+Message-Id: <1457070050-1564-4-git-send-email-nicolas.pitre@linaro.org>
 In-Reply-To: <1457070050-1564-1-git-send-email-nicolas.pitre@linaro.org>
 References: <1457070050-1564-1-git-send-email-nicolas.pitre@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,61 +15,130 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.com>
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-The generation and postprocessing of automatic dependency rules is
-duplicated in rule_cc_o_c and if_changed_dep. Since this is not a
-trivial one-liner action, it is now abstracted under cmd_and_fixdep
-to simplify things and make future changes easier.
-
-In the rule_cc_o_c case that means the order of some commands has been
-altered, namely fixdep and related file manipulations are executed
-earlier, but they didn't depend on those commands that now execute later.
+... and merge them in the list of parsed dependencies.
 
 Signed-off-by: Nicolas Pitre <nico@linaro.org>
 ---
- scripts/Kbuild.include | 5 ++++-
- scripts/Makefile.build | 9 ++-------
- 2 files changed, 6 insertions(+), 8 deletions(-)
+ scripts/basic/fixdep.c | 60 +++++++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 45 insertions(+), 15 deletions(-)
 
-diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index 1db6d73c8d..8a257fa663 100644
---- a/scripts/Kbuild.include
-+++ b/scripts/Kbuild.include
-@@ -256,10 +256,13 @@ if_changed = $(if $(strip $(any-prereq) $(arg-check)),                       \
- # Execute the command and also postprocess generated .d dependencies file.
- if_changed_dep = $(if $(strip $(any-prereq) $(arg-check) ),                  \
- 	@set -e;                                                             \
-+	$(cmd_and_fixdep))
+diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
+index 5b327c67a8..d984deb120 100644
+--- a/scripts/basic/fixdep.c
++++ b/scripts/basic/fixdep.c
+@@ -120,13 +120,15 @@
+ #define INT_NFIG ntohl(0x4e464947)
+ #define INT_FIG_ ntohl(0x4649475f)
+ 
++int insert_extra_deps;
+ char *target;
+ char *depfile;
+ char *cmdline;
+ 
+ static void usage(void)
+ {
+-	fprintf(stderr, "Usage: fixdep <depfile> <target> <cmdline>\n");
++	fprintf(stderr, "Usage: fixdep [-e] <depfile> <target> <cmdline>\n");
++	fprintf(stderr, " -e  insert extra dependencies given on stdin\n");
+ 	exit(1);
+ }
+ 
+@@ -138,6 +140,40 @@ static void print_cmdline(void)
+ 	printf("cmd_%s := %s\n\n", target, cmdline);
+ }
+ 
++/*
++ * Print out a dependency path from a symbol name
++ */
++static void print_config(const char *m, int slen)
++{
++	int c, i;
 +
-+cmd_and_fixdep =                                                             \
- 	$(echo-cmd) $(cmd_$(1));                                             \
- 	scripts/basic/fixdep $(depfile) $@ '$(make-cmd)' > $(dot-target).tmp;\
- 	rm -f $(depfile);                                                    \
--	mv -f $(dot-target).tmp $(dot-target).cmd)
-+	mv -f $(dot-target).tmp $(dot-target).cmd;
++	printf("    $(wildcard include/config/");
++	for (i = 0; i < slen; i++) {
++		c = m[i];
++		if (c == '_')
++			c = '/';
++		else
++			c = tolower(c);
++		putchar(c);
++	}
++	printf(".h) \\\n");
++}
++
++static void do_extra_deps(void)
++{
++	if (insert_extra_deps) {
++		char buf[80];
++		while(fgets(buf, sizeof(buf), stdin)) {
++			int len = strlen(buf);
++			if (len < 2 || buf[len-1] != '\n') {
++				fprintf(stderr, "fixdep: bad data on stdin\n");
++				exit(1);
++			}
++			print_config(buf, len-1);
++		}
++	}
++}
++
+ struct item {
+ 	struct item	*next;
+ 	unsigned int	len;
+@@ -197,23 +233,12 @@ static void define_config(const char *name, int len, unsigned int hash)
+ static void use_config(const char *m, int slen)
+ {
+ 	unsigned int hash = strhash(m, slen);
+-	int c, i;
  
- # Usage: $(call if_changed_rule,foo)
- # Will check if $(cmd_foo) or any of the prerequisites changed,
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index f4b4320e0d..8134ee81ad 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -243,14 +243,9 @@ endif
+ 	if (is_defined_config(m, slen, hash))
+ 	    return;
  
- define rule_cc_o_c
- 	$(call echo-cmd,checksrc) $(cmd_checksrc)			  \
--	$(call echo-cmd,cc_o_c) $(cmd_cc_o_c);				  \
-+	$(call cmd_and_fixdep,cc_o_c)					  \
- 	$(cmd_modversions)						  \
--	$(call echo-cmd,record_mcount)					  \
--	$(cmd_record_mcount)						  \
--	scripts/basic/fixdep $(depfile) $@ '$(call make-cmd,cc_o_c)' >    \
--	                                              $(dot-target).tmp;  \
--	rm -f $(depfile);						  \
--	mv -f $(dot-target).tmp $(dot-target).cmd
-+	$(call echo-cmd,record_mcount) $(cmd_record_mcount)
- endef
+ 	define_config(m, slen, hash);
+-
+-	printf("    $(wildcard include/config/");
+-	for (i = 0; i < slen; i++) {
+-		c = m[i];
+-		if (c == '_')
+-			c = '/';
+-		else
+-			c = tolower(c);
+-		putchar(c);
+-	}
+-	printf(".h) \\\n");
++	print_config(m, slen);
+ }
  
- # List module undefined symbols (or empty line if not enabled)
+ static void parse_config_file(const char *map, size_t len)
+@@ -250,7 +275,7 @@ static void parse_config_file(const char *map, size_t len)
+ 	}
+ }
+ 
+-/* test is s ends in sub */
++/* test if s ends in sub */
+ static int strrcmp(const char *s, const char *sub)
+ {
+ 	int slen = strlen(s);
+@@ -374,6 +399,8 @@ static void parse_dep_file(void *map, size_t len)
+ 		exit(1);
+ 	}
+ 
++	do_extra_deps();
++
+ 	printf("\n%s: $(deps_%s)\n\n", target, target);
+ 	printf("$(deps_%s):\n", target);
+ }
+@@ -430,7 +457,10 @@ int main(int argc, char *argv[])
+ {
+ 	traps();
+ 
+-	if (argc != 4)
++	if (argc == 5 && !strcmp(argv[1], "-e")) {
++		insert_extra_deps = 1;
++		argv++;
++	} else if (argc != 4)
+ 		usage();
+ 
+ 	depfile = argv[1];
 -- 
 2.5.0
 
