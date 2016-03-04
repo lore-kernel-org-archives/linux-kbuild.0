@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from alt13.smtp-out.videotron.ca ([135.19.0.26]:36546 "EHLO
-	alt12.smtp-out.videotron.ca" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1751557AbcCDFz6 (ORCPT
+Received: from alt32.smtp-out.videotron.ca ([24.53.0.21]:10955 "EHLO
+	alt32.smtp-out.videotron.ca" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1752258AbcCDFz6 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Fri, 4 Mar 2016 00:55:58 -0500
 From: Nicolas Pitre <nicolas.pitre@linaro.org>
-Subject: [PATCH v5 7/8] kbuild: build sample modules along with the rest of the kernel
-Date: Fri,  4 Mar 2016 00:40:49 -0500
-Message-Id: <1457070050-1564-8-git-send-email-nicolas.pitre@linaro.org>
+Subject: [PATCH v5 8/8] kconfig option for TRIM_UNUSED_KSYMS
+Date: Fri,  4 Mar 2016 00:40:50 -0500
+Message-Id: <1457070050-1564-9-git-send-email-nicolas.pitre@linaro.org>
 In-Reply-To: <1457070050-1564-1-git-send-email-nicolas.pitre@linaro.org>
 References: <1457070050-1564-1-git-send-email-nicolas.pitre@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,42 +15,41 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.com>
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Make sample modules in parallel with the rest of the kernel rather
-than having them built from the vmlinux target. This makes the build
-slightly faster, and those modules are properly considered when
-adjust_autoksyms.sh is executed.
+The config option to enable it all.
 
 Signed-off-by: Nicolas Pitre <nico@linaro.org>
+Acked-by: Rusty Russell <rusty@rustcorp.com.au>
 ---
- Makefile | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ init/Kconfig | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/Makefile b/Makefile
-index bb865095ca..f5daa4bbf3 100644
---- a/Makefile
-+++ b/Makefile
-@@ -928,9 +928,6 @@ endif
- ifdef CONFIG_HEADERS_CHECK
- 	$(Q)$(MAKE) -f $(srctree)/Makefile headers_check
- endif
--ifdef CONFIG_SAMPLES
--	$(Q)$(MAKE) $(build)=samples
--endif
- ifdef CONFIG_BUILD_DOCSRC
- 	$(Q)$(MAKE) $(build)=Documentation
- endif
-@@ -948,6 +945,11 @@ PHONY += autoksyms_recursive
- include/generated/autoksyms.h: FORCE
- 	$(Q)$(CONFIG_SHELL) scripts/adjust_autoksyms.sh true
+diff --git a/init/Kconfig b/init/Kconfig
+index 22320804fb..e6f666331b 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -1990,6 +1990,22 @@ config MODULE_COMPRESS_XZ
  
-+# Build samples along the rest of the kernel
-+ifdef CONFIG_SAMPLES
-+vmlinux-dirs += samples
-+endif
+ endchoice
+ 
++config TRIM_UNUSED_KSYMS
++	bool "Trim unused exported kernel symbols"
++	depends on MODULES && !UNUSED_SYMBOLS
++	help
++	  The kernel and some modules make many symbols available for
++	  other modules to use via EXPORT_SYMBOL() and variants. Depending
++	  on the set of modules being selected in your kernel configuration,
++	  many of those exported symbols might never be used.
 +
- # The actual objects are generated when descending,
- # make sure no implicit rule kicks in
- $(sort $(vmlinux-deps)): $(vmlinux-dirs) ;
++	  This option allows for unused exported symbols to be dropped from
++	  the build. In turn, this provides the compiler more opportunities
++	  (especially when using LTO) for optimizing the code and reducing
++	  binary size.  This might have some security advantages as well.
++
++	  If unsure say N.
++
+ endif # MODULES
+ 
+ config MODULES_TREE_LOOKUP
 -- 
 2.5.0
 
