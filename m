@@ -1,57 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:56477 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:57804 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1760378AbcCDWUh (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 4 Mar 2016 17:20:37 -0500
-Date: Fri, 4 Mar 2016 23:20:34 +0100
-From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] kbuild: suppress annoying "... is up to date." message
-Message-ID: <20160304222034.GA19855@pobox.suse.cz>
-References: <1456994190-15582-1-git-send-email-yamada.masahiro@socionext.com>
+	id S1759311AbcCDWwB (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 4 Mar 2016 17:52:01 -0500
+Subject: Re: [PATCH v5 5/8] kbuild: add fine grained build dependencies for
+ exported symbols
+References: <1457070050-1564-1-git-send-email-nicolas.pitre@linaro.org>
+ <1457070050-1564-6-git-send-email-nicolas.pitre@linaro.org>
+From: Michal Marek <mmarek@suse.com>
+Message-ID: <56DA118E.20106@suse.com>
+Date: Fri, 4 Mar 2016 23:51:58 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1456994190-15582-1-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1457070050-1564-6-git-send-email-nicolas.pitre@linaro.org>
+Content-Type: text/plain; charset=iso-8859-2
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild@vger.kernel.org, David Howells <dhowells@redhat.com>, Michal Marek <mmarek@suse.com>, David Woodhouse <David.Woodhouse@intel.com>, linux-kernel@vger.kernel.org
+To: Nicolas Pitre <nicolas.pitre@linaro.org>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Thu, Mar 03, 2016 at 05:36:30PM +0900, Masahiro Yamada wrote:
-> Under certain conditions, Kbuild shows "... is up to date" where
-> if_changed or friends are used.
-> 
-> For example, the incremental build of ARM64 Linux shows this message
-> when the kernel image has not been updated.
-> 
->   $ make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu-
->     CHK     include/config/kernel.release
->     CHK     include/generated/uapi/linux/version.h
->     CHK     include/generated/utsrelease.h
->     CHK     include/generated/bounds.h
->     CHK     include/generated/timeconst.h
->     CHK     include/generated/asm-offsets.h
->     CALL    scripts/checksyscalls.sh
->     CHK     include/generated/compile.h
->     CHK     kernel/config_data.h
->   make[1]: `arch/arm64/boot/Image.gz' is up to date.
->     Building modules, stage 2.
->     MODPOST 0 modules
-> 
-> The following is the build rule in arch/arm64/boot/Makefile:
-> 
->   $(obj)/Image.gz: $(obj)/Image FORCE
->           $(call if_changed,gzip)
-> 
-> If the Image.gz is newer than the Image and the command line has not
-> changed (i.e., $(any-prereq) and $(arg-check) are both empty), the
-> build rule $(call if_changed,gzip) is evaluated to be empty, then
-> GNU Make reports the target is up to date.  In order to make GNU Make
-> quiet, we need to give it something to do, for example, "@:".  This
-> should be fixed in the Kbuild core part rather than in each Makefile.
-> 
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+Dne 4.3.2016 v 06:40 Nicolas Pitre napsal(a):
+> +cmd_and_fixdep =                                                             \
+> +	$(echo-cmd) $(cmd_$(1));                                             \
+> +	$(ksym_dep_filter) |                                                 \
+> +		scripts/basic/fixdep -e $(depfile) $@ '$(make-cmd)'          \
+> +			> $(dot-target).tmp;	                             \
+> +	rm -f $(depfile);                                                    \
+> +	mv -f $(dot-target).tmp $(dot-target).cmd;
 
-Thanks, applied to kbuild.git#kbuild.
+While trying this, I got a SIGBUS from fixdep once. My theory is that
+the depfile is mmap()ed by fixdep and modified by the preprocesor run at
+the same time. I could not reproduce this so far (still trying). But if
+it's really this race, the fix would be to disable dependency generation
+in the preprocessor by passing -Wp,MD,/dev/null or somesuch. But we
+never had this problem with genksyms, which is weird. It could as well
+be that my build machine's memory is faulty :(.
 
 Michal
