@@ -1,51 +1,95 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lb0-f170.google.com ([209.85.217.170]:34134 "EHLO
-	mail-lb0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751182AbcCFVEJ (ORCPT
+Received: from mail-wm0-f65.google.com ([74.125.82.65]:36591 "EHLO
+	mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751884AbcCFXEG (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 6 Mar 2016 16:04:09 -0500
-Received: by mail-lb0-f170.google.com with SMTP id xr8so14147119lbb.1
-        for <linux-kbuild@vger.kernel.org>; Sun, 06 Mar 2016 13:04:08 -0800 (PST)
-Received: from lenovo.home ([93.171.170.21])
-        by smtp.gmail.com with ESMTPSA id z194sm2300129lfd.20.2016.03.06.13.04.05
-        for <linux-kbuild@vger.kernel.org>
-        (version=TLSv1/SSLv3 cipher=OTHER);
-        Sun, 06 Mar 2016 13:04:06 -0800 (PST)
-From: Ruslan Kuprieiev <kupruser@gmail.com>
-Subject: rela sections in vmlinux
-Message-ID: <56DC9B44.6020104@gmail.com>
-Date: Sun, 6 Mar 2016 23:04:04 +0200
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+	Sun, 6 Mar 2016 18:04:06 -0500
+Date: Mon, 7 Mar 2016 00:02:08 +0100
+From: Emese Revfy <re.emese@gmail.com>
+Subject: [PATCH v5 0/5] Introduce GCC plugin infrastructure
+Message-Id: <20160307000208.1bec3e7dc874489d1b4fcbb4@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
+Cc: pageexec@freemail.hu, spender@grsecurity.net, kernel-hardening@lists.openwall.com, mmarek@suse.com, keescook@chromium.org, linux@rasmusvillemoes.dk, fengguang.wu@intel.com, dvyukov@google.com, linux-kernel@vger.kernel.org
 
-Hi!
+This patch set introduce the GCC plugin infrastructure with examples for testing
+and documentation.
 
-I'm trying to figure out how CONFIG_RELOCATABLE works and one of the things
-that I've noticed is that vmlinux itself doesn't have any rela sections, 
-which is
-confusing for me considering the name of the option. I did read the 
-patches that
-introduced this option but it is still not clear to me how exactly it 
-works and why
-there are no relocations left in the vmlinux. Could you please give me a 
-hint on
-why it happens and point me where to read more?
+GCC plugins are loadable modules that provide extra features to the compiler.
+They are useful for runtime instrumentation and static analysis.
 
-I also see that vmlinux.o has all the rela sections I'm looking for(as 
-an object file
-should =)), so it raises another question: Is it possible to make 
-vmlinux keep that
-rela sections? I also went through makefiles but couldn't figure out 
-where to
-make a proper change to achieve that.
+The infrastructure supports all gcc versions from 4.5 to 6.0, building
+out-of-tree modules and building in a separate directory. Cross-compilation
+is supported too but currently only the x86 architecture enables plugins.
 
-I'm using default 3.10.0-229.20.1.el7.x86_64 centos7 kernel with 
-CONFIG_RELOCATABLE
-enabled.
+This infrastructure was ported from grsecurity/PaX. It is a CII project
+supported by the Linux Foundation.
 
-Thanks,
-Ruslan
+Emese Revfy (5):
+ Shared library support
+ GCC plugin infrastructure
+ Add Cyclomatic complexity plugin
+ Documentations of the GCC plugin infrastructre
+ Add sancov plugin
+
+
+Changes from v4:
+ * Moved shared library support from the GCC plugin infrastructure patch into
+   a different patch
+ * Update gcc-*.h from PaX
+   * Fixed gcc-common.h for gcc 6
+   * Added pass cloning support to the gcc pass generators
+ * Disable all plugins in vdso because it is userland code
+ * Add sancov gcc plugin: another use case for gcc plugin support in the kernel
+   is when there is a feature in the latest gcc version and we would like to use
+   it with older gcc versions as well (e.g., distros).
+
+Changes from v3:
+ * Fix some indentation related warnings
+   (Suggested by checkpatch.pl)
+ * Add maintainer entries
+ * Don't run gcc_plugin.sh when the GCC_PLUGINS option is disabled or unsupported
+   (Reported-by: Fengguang Wu <fengguang.wu@intel.com>)
+
+Changes from v2:
+ * Fixed incorrectly encoded characters
+ * Generate the GIMPLE, IPA, SIMPLE_IPA and RTL pass structures
+   (Suggested-by: Rasmus Villemoes <linux@rasmusvillemoes.dk>)
+ * Write plugin related warning messages to stderr instead of stdout
+   (Suggested-by: Kees Cook <keescook@chromium.org>)
+ * Mention the installation of the gcc plugin headers (Documentation)
+
+Changes from v1:
+ * Move the gcc-plugins make target into a separate Makefile because there may
+   be a lot of plugins (Suggested-by: Rasmus Villemoes)
+ * Simplify the dependencies of the plugin related config option
+   (Suggested-by: Kees Cook <keescook@chromium.org>)
+ * Removed the unnecessary example plugin
+
+---
+ Documentation/dontdiff                   |   1 +
+ Documentation/gcc-plugins.txt            |  82 ++++++++++++++++++
+ MAINTAINERS                              |   8 ++
+ Makefile                                 |  41 ++++++---
+ arch/Kconfig                             |  36 ++++++++
+ arch/x86/Kconfig                         |   1 +
+ arch/x86/entry/vdso/Makefile             |   2 +-
+ init/Makefile                            |   3 +
+ scripts/Makefile.gcc-plugins             |  35 ++++++++
+ scripts/gcc-plugin.sh                    |  51 +++++++++++
+ scripts/link-vmlinux.sh                  |   2 +-
+ scripts/package/builddeb                 |   1 +
+ tools/gcc/Makefile                       |  21 +++++
+ tools/gcc/cyc_complexity_plugin.c        |  73 ++++++++++++++++
+ tools/gcc/gcc-common.h                   | 830 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ tools/gcc/gcc-generate-gimple-pass.h     | 175 ++++++++++++++++++++++++++++++++++++++
+ tools/gcc/gcc-generate-ipa-pass.h        | 289 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ tools/gcc/gcc-generate-rtl-pass.h        | 175 ++++++++++++++++++++++++++++++++++++++
+ tools/gcc/gcc-generate-simple_ipa-pass.h | 175 ++++++++++++++++++++++++++++++++++++++
+ tools/gcc/sancov_plugin.c                | 133 +++++++++++++++++++++++++++++
+ 20 files changed, 2121 insertions(+), 13 deletions(-)
+
