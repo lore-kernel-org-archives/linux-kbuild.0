@@ -1,231 +1,91 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f67.google.com ([74.125.82.67]:36712 "EHLO
-	mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751634AbcCFXJ3 (ORCPT
+Received: from mx1.redhat.com ([209.132.183.28]:51244 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752930AbcCGQTg convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 6 Mar 2016 18:09:29 -0500
-Date: Mon, 7 Mar 2016 00:07:30 +0100
-From: Emese Revfy <re.emese@gmail.com>
-Subject: [PATCH v5 5/5] Add sancov plugin
-Message-Id: <20160307000730.5f5b379d0e88b97fc0112c8e@gmail.com>
-In-Reply-To: <20160307000208.1bec3e7dc874489d1b4fcbb4@gmail.com>
-References: <20160307000208.1bec3e7dc874489d1b4fcbb4@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+	Mon, 7 Mar 2016 11:19:36 -0500
+Received: from int-mx14.intmail.prod.int.phx2.redhat.com (int-mx14.intmail.prod.int.phx2.redhat.com [10.5.11.27])
+	by mx1.redhat.com (Postfix) with ESMTPS id A40BE335E84
+	for <linux-kbuild@vger.kernel.org>; Mon,  7 Mar 2016 16:19:35 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+Subject: Kconfig problem
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <19063.1457367574.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: 8BIT
+Date: Mon, 07 Mar 2016 16:19:34 +0000
+Message-ID: <19064.1457367574@warthog.procyon.org.uk>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: pageexec@freemail.hu, spender@grsecurity.net, kernel-hardening@lists.openwall.com, mmarek@suse.com, keescook@chromium.org, linux@rasmusvillemoes.dk, fengguang.wu@intel.com, dvyukov@google.com, linux-kernel@vger.kernel.org
+Cc: dhowells@redhat.com
 
-The sancov gcc plugin inserts a __sanitizer_cov_trace_pc() call
-at the start of basic blocks.
+Hi,
 
-This plugin is a helper plugin for the kcov feature. It supports
-all gcc versions with plugin support (from gcc-4.5 on).
-It is based on the gcc commit "Add fuzzing coverage support" by Dmitry Vyukov
-(https://gcc.gnu.org/viewcvs/gcc?limit_changes=0&view=revision&revision=231296).
+I'm having some problems with Kconfig - the dependency resolver seems to be
+getting things wrong.
 
-Signed-off-by: Emese Revfy <re.emese@gmail.com>
----
- arch/Kconfig                 |   9 +++
- scripts/Makefile.gcc-plugins |   7 ++-
- tools/gcc/Makefile           |   2 +
- tools/gcc/sancov_plugin.c    | 133 +++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 149 insertions(+), 2 deletions(-)
- create mode 100644 tools/gcc/sancov_plugin.c
+I have an option:
 
-diff --git a/arch/Kconfig b/arch/Kconfig
-index 32583b7..30632fa 100644
---- a/arch/Kconfig
-+++ b/arch/Kconfig
-@@ -384,6 +384,15 @@ config GCC_PLUGIN_CYC_COMPLEXITY
- 	  N = the number of nodes
- 	  P = the number of connected components (exit nodes).
- 
-+config GCC_PLUGIN_SANCOV
-+	bool "Helper plugin for the kcov feature"
-+	depends on GCC_PLUGINS
-+	help
-+	  This plugin inserts a __sanitizer_cov_trace_pc() call at the start of
-+	  basic blocks. It supports all gcc versions with plugin support (from
-+	  gcc-4.5 on). It is based on the commit "Add fuzzing coverage support"
-+	  by Dmitry Vyukov <dvyukov@google.com>.
-+
- config HAVE_CC_STACKPROTECTOR
- 	bool
- 	help
-diff --git a/scripts/Makefile.gcc-plugins b/scripts/Makefile.gcc-plugins
-index dd7b56d..dc11503 100644
---- a/scripts/Makefile.gcc-plugins
-+++ b/scripts/Makefile.gcc-plugins
-@@ -8,8 +8,11 @@ ifneq ($(PLUGINCC),)
- ifdef CONFIG_GCC_PLUGIN_CYC_COMPLEXITY
- GCC_PLUGIN_CYC_COMPLEXITY_CFLAGS := -fplugin=$(objtree)/tools/gcc/cyc_complexity_plugin.so
- endif
--GCC_PLUGINS_CFLAGS := $(GCC_PLUGIN_CYC_COMPLEXITY_CFLAGS)
--export PLUGINCC GCC_PLUGINS_CFLAGS GCC_PLUGINS_AFLAGS GCC_PLUGIN_CYC_COMPLEXITY
-+ifdef CONFIG_GCC_PLUGIN_SANCOV
-+GCC_PLUGIN_SANCOV_CFLAGS := -fplugin=$(objtree)/tools/gcc/sancov_plugin.so
-+endif
-+GCC_PLUGINS_CFLAGS := $(GCC_PLUGIN_CYC_COMPLEXITY_CFLAGS) $(GCC_PLUGIN_SANCOV_CFLAGS)
-+export PLUGINCC GCC_PLUGINS_CFLAGS GCC_PLUGINS_AFLAGS GCC_PLUGIN_CYC_COMPLEXITY GCC_PLUGIN_SANCOV
- ifeq ($(KBUILD_EXTMOD),)
- gcc-plugins:
- 	$(Q)$(MAKE) $(build)=tools/gcc
-diff --git a/tools/gcc/Makefile b/tools/gcc/Makefile
-index 31c72bf..97a923f 100644
---- a/tools/gcc/Makefile
-+++ b/tools/gcc/Makefile
-@@ -13,7 +13,9 @@ endif
- export GCCPLUGINS_DIR HOSTLIBS
- 
- $(HOSTLIBS)-$(CONFIG_GCC_PLUGIN_CYC_COMPLEXITY) := cyc_complexity_plugin.so
-+$(HOSTLIBS)-$(CONFIG_GCC_PLUGIN_SANCOV) += sancov_plugin.so
- 
- always := $($(HOSTLIBS)-y)
- 
- cyc_complexity_plugin-objs := cyc_complexity_plugin.o
-+sancov_plugin-objs := sancov_plugin.o
-diff --git a/tools/gcc/sancov_plugin.c b/tools/gcc/sancov_plugin.c
-new file mode 100644
-index 0000000..5a9179b
---- /dev/null
-+++ b/tools/gcc/sancov_plugin.c
-@@ -0,0 +1,133 @@
-+/*
-+ * Copyright 2011-2016 by Emese Revfy <re.emese@gmail.com>
-+ * Licensed under the GPL v2, or (at your option) v3
-+ *
-+ * Homepage:
-+ * https://github.com/ephox-gcc-plugins/sancov
-+ *
-+ * This plugin inserts a __sanitizer_cov_trace_pc() call at the start of basic blocks.
-+ * It supports all gcc versions with plugin support (from gcc-4.5 on).
-+ * It is based on the commit "Add fuzzing coverage support" by Dmitry Vyukov <dvyukov@google.com>.
-+ *
-+ * You can read about it more here:
-+ *  https://gcc.gnu.org/viewcvs/gcc?limit_changes=0&view=revision&revision=231296
-+ *  http://lwn.net/Articles/674854/
-+ *  https://github.com/google/syzkaller
-+ *  https://lwn.net/Articles/677764/
-+ *
-+ * Usage:
-+ * make run
-+ */
-+
-+#include "gcc-common.h"
-+
-+int plugin_is_GPL_compatible;
-+
-+tree sancov_fndecl;
-+
-+static struct plugin_info sancov_plugin_info = {
-+	.version	= "20160305",
-+	.help		= "sancov plugin\n",
-+};
-+
-+static unsigned int sancov_execute(void)
-+{
-+	basic_block bb;
-+
-+	/* Remove this line when this plugin and kcov will be in the kernel. */
-+	if (!strcmp(DECL_NAME_POINTER(current_function_decl), DECL_NAME_POINTER(sancov_fndecl)))
-+		return 0;
-+
-+	FOR_EACH_BB_FN(bb, cfun) {
-+		const_gimple stmt;
-+		gcall *gcall;
-+		gimple_stmt_iterator gsi = gsi_after_labels(bb);
-+
-+		if (gsi_end_p(gsi))
-+			continue;
-+
-+		stmt = gsi_stmt(gsi);
-+		gcall = as_a_gcall(gimple_build_call(sancov_fndecl, 0));
-+		gimple_set_location(gcall, gimple_location(stmt));
-+		gsi_insert_before(&gsi, gcall, GSI_SAME_STMT);
-+	}
-+	return 0;
-+}
-+
-+#define PASS_NAME sancov
-+
-+#define NO_GATE
-+#define TODO_FLAGS_FINISH TODO_dump_func | TODO_verify_stmts | TODO_update_ssa_no_phi | TODO_verify_flow
-+
-+#include "gcc-generate-gimple-pass.h"
-+
-+static void sancov_start_unit(void __unused *gcc_data, void __unused *user_data)
-+{
-+	tree leaf_attr, nothrow_attr;
-+	tree BT_FN_VOID = build_function_type_list(void_type_node, NULL_TREE);
-+
-+	sancov_fndecl = build_fn_decl("__sanitizer_cov_trace_pc", BT_FN_VOID);
-+
-+	nothrow_attr = tree_cons(get_identifier("nothrow"), NULL, NULL);
-+	decl_attributes(&sancov_fndecl, nothrow_attr, 0);
-+	gcc_assert(TREE_NOTHROW(sancov_fndecl));
-+	leaf_attr = tree_cons(get_identifier("leaf"), NULL, NULL);
-+	decl_attributes(&sancov_fndecl, leaf_attr, 0);
-+}
-+
-+int plugin_init(struct plugin_name_args *plugin_info, struct plugin_gcc_version *version)
-+{
-+	int i;
-+	struct register_pass_info sancov_plugin_pass_info;
-+	const char * const plugin_name = plugin_info->base_name;
-+	const int argc = plugin_info->argc;
-+	const struct plugin_argument * const argv = plugin_info->argv;
-+	bool enable = true;
-+
-+	static const struct ggc_root_tab gt_ggc_r_gt_sancov[] = {
-+		{
-+			.base = &sancov_fndecl,
-+			.nelt = 1,
-+			.stride = sizeof(sancov_fndecl),
-+			.cb = &gt_ggc_mx_tree_node,
-+			.pchw = &gt_pch_nx_tree_node
-+		},
-+		LAST_GGC_ROOT_TAB
-+	};
-+
-+	/* BBs can be split afterwards?? */
-+	sancov_plugin_pass_info.pass				= make_sancov_pass();
-+#if BUILDING_GCC_VERSION >= 4009
-+	sancov_plugin_pass_info.reference_pass_name		= "asan";
-+#else
-+	sancov_plugin_pass_info.reference_pass_name		= "nrv";
-+#endif
-+	sancov_plugin_pass_info.ref_pass_instance_number	= 0;
-+	sancov_plugin_pass_info.pos_op				= PASS_POS_INSERT_BEFORE;
-+
-+	if (!plugin_default_version_check(version, &gcc_version)) {
-+		error(G_("incompatible gcc/plugin versions"));
-+		return 1;
-+	}
-+
-+	for (i = 0; i < argc; ++i) {
-+		if (!strcmp(argv[i].key, "no-sancov")) {
-+			enable = false;
-+			continue;
-+		}
-+		error(G_("unkown option '-fplugin-arg-%s-%s'"), plugin_name, argv[i].key);
-+	}
-+
-+	register_callback(plugin_name, PLUGIN_INFO, NULL, &sancov_plugin_info);
-+
-+	if (!enable)
-+		return 0;
-+
-+#if BUILDING_GCC_VERSION < 6000
-+	register_callback(plugin_name, PLUGIN_START_UNIT, &sancov_start_unit, NULL);
-+	register_callback(plugin_name, PLUGIN_REGISTER_GGC_ROOTS, NULL, (void *)&gt_ggc_r_gt_sancov);
-+	register_callback(plugin_name, PLUGIN_PASS_MANAGER_SETUP, NULL, &sancov_plugin_pass_info);
-+#endif
-+
-+	return 0;
-+}
--- 
-2.4.1
+	config SYSTEM_TRUSTED_KEYRING
+		bool "Provide system-wide ring of trusted keys"
+		depends on KEYS
+		depends on ASYMMETRIC_KEY_TYPE
 
+which, as can be seen, depends on:
+
+	menuconfig ASYMMETRIC_KEY_TYPE
+		tristate "Asymmetric (public-key cryptographic) key type"
+		depends on KEYS
+
+But I can set CONFIG_SYSTEM_TRUSTED_KEYRING=y and CONFIG_ASYMMETRIC_KEY_TYPE=m
+and the Kconfig processor is quite happy - but, of course, the kernel doesn't
+link.
+
+Yes, I could set ASYMMETRIC_KEY_TYPE to be a bool, but if
+SYSTEM_TRUSTED_KEYRING is not set, there's no reason it couldn't be a module.
+
+If I change the first option to:
+
+	config SYSTEM_TRUSTED_KEYRING
+		bool "Provide system-wide ring of trusted keys"
+		select KEYS
+		select ASYMMETRIC_KEY_TYPE
+
+then it complains that there's a dependency loop.
+
+	scripts/kconfig/conf  --silentoldconfig Kconfig
+	crypto/Kconfig:15:error: recursive dependency detected!
+	For a resolution refer to Documentation/kbuild/kconfig-language.txt
+	subsection "Kconfig recursive dependency limitations"
+	crypto/Kconfig:15:	symbol CRYPTO is selected by TRUSTED_KEYS
+	For a resolution refer to Documentation/kbuild/kconfig-language.txt
+	subsection "Kconfig recursive dependency limitations"
+	security/keys/Kconfig:51:	symbol TRUSTED_KEYS depends on KEYS
+	For a resolution refer to Documentation/kbuild/kconfig-language.txt
+	subsection "Kconfig recursive dependency limitations"
+	security/keys/Kconfig:5:	symbol KEYS is selected by SYSTEM_TRUSTED_KEYRING
+	For a resolution refer to Documentation/kbuild/kconfig-language.txt
+	subsection "Kconfig recursive dependency limitations"
+	certs/Kconfig:17:	symbol SYSTEM_TRUSTED_KEYRING is selected by KEXEC_BZIMAGE_VERIFY_SIG
+	For a resolution refer to Documentation/kbuild/kconfig-language.txt
+	subsection "Kconfig recursive dependency limitations"
+	arch/x86/Kconfig:1815:	symbol KEXEC_BZIMAGE_VERIFY_SIG depends on KEXEC_VERIFY_SIG
+	For a resolution refer to Documentation/kbuild/kconfig-language.txt
+	subsection "Kconfig recursive dependency limitations"
+	arch/x86/Kconfig:1804:	symbol KEXEC_VERIFY_SIG depends on KEXEC_FILE
+	For a resolution refer to Documentation/kbuild/kconfig-language.txt
+	subsection "Kconfig recursive dependency limitations"
+	arch/x86/Kconfig:1791:	symbol KEXEC_FILE depends on CRYPTO
+	warning: (EXT4_ENCRYPTION && F2FS_FS_ENCRYPTION && EVM) selects ENCRYPTED_KEYS which has unmet direct dependencies (KEYS)
+	warning: (MAC802154 && EXT4_ENCRYPTION && F2FS_FS_ENCRYPTION) selects CRYPTO_CTR which has unmet direct dependencies (CRYPTO)
+	warning: (MODULE_SIG_SHA224 && MODULE_SIG_SHA256 && BT && LUSTRE_FS && EXT4_ENCRYPTION && F2FS_FS_ENCRYPTION && CIFS && ENCRYPTED_KEYS) selects CRYPTO_SHA256 which has unmet direct dependencies (CRYPTO)
+
+
+If there's a dependency loop with select here, then there must be a dependency
+loop with depends on here too, since A selects B is a dependency of A on B,
+just as is A depends on B.
+
+Any thoughts on how to resolve this?
+
+David
