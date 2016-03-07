@@ -1,42 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ig0-f172.google.com ([209.85.213.172]:38474 "EHLO
-	mail-ig0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753103AbcCGVFR (ORCPT
+Received: from mail-io0-f175.google.com ([209.85.223.175]:33159 "EHLO
+	mail-io0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753345AbcCGVHd (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 7 Mar 2016 16:05:17 -0500
-Received: by mail-ig0-f172.google.com with SMTP id ig19so1597534igb.1
-        for <linux-kbuild@vger.kernel.org>; Mon, 07 Mar 2016 13:05:17 -0800 (PST)
+	Mon, 7 Mar 2016 16:07:33 -0500
+Received: by mail-io0-f175.google.com with SMTP id n190so2543658iof.0
+        for <linux-kbuild@vger.kernel.org>; Mon, 07 Mar 2016 13:07:32 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20160307000329.a51b2b8f4fdb0e60344f0b20@gmail.com>
+In-Reply-To: <20160307000730.5f5b379d0e88b97fc0112c8e@gmail.com>
 References: <20160307000208.1bec3e7dc874489d1b4fcbb4@gmail.com>
-	<20160307000329.a51b2b8f4fdb0e60344f0b20@gmail.com>
-Date: Mon, 7 Mar 2016 13:05:16 -0800
-Message-ID: <CAGXu5j+BH-0rOP-rsZWCXGftAfOe-bqa4+L0Wj1kBddDvTT5_Q@mail.gmail.com>
-Subject: Re: [PATCH v5 1/5] Shared library support
+	<20160307000730.5f5b379d0e88b97fc0112c8e@gmail.com>
+Date: Mon, 7 Mar 2016 13:07:32 -0800
+Message-ID: <CAGXu5jLEizJK=YBrErDZGbANwWe2AdnsRPLAQL=nvnuCC_Q8LQ@mail.gmail.com>
+Subject: Re: [PATCH v5 5/5] Add sancov plugin
 From: Kees Cook <keescook@chromium.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Emese Revfy <re.emese@gmail.com>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, PaX Team <pageexec@freemail.hu>, Brad Spengler <spender@grsecurity.net>, "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, Michal Marek <mmarek@suse.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Fengguang Wu <fengguang.wu@intel.com>, Dmitry Vyukov <dvyukov@google.com>, LKML <linux-kernel@vger.kernel.org>
+To: Dmitry Vyukov <dvyukov@google.com>, Emese Revfy <re.emese@gmail.com>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, PaX Team <pageexec@freemail.hu>, Brad Spengler <spender@grsecurity.net>, "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, Michal Marek <mmarek@suse.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Fengguang Wu <fengguang.wu@intel.com>, LKML <linux-kernel@vger.kernel.org>
 
-On Sun, Mar 6, 2016 at 3:03 PM, Emese Revfy <re.emese@gmail.com> wrote:
-> Infrastructure for building independent shared library targets.
-> This effectively also reverts commit 62e2210798ed38928ab24841e8b4878a
-> (Masahiro Yamada, kbuild: drop shared library support from Makefile.host).
+On Sun, Mar 6, 2016 at 3:07 PM, Emese Revfy <re.emese@gmail.com> wrote:
+> The sancov gcc plugin inserts a __sanitizer_cov_trace_pc() call
+> at the start of basic blocks.
+>
+> This plugin is a helper plugin for the kcov feature. It supports
+> all gcc versions with plugin support (from gcc-4.5 on).
+> It is based on the gcc commit "Add fuzzing coverage support" by Dmitry Vyukov
+> (https://gcc.gnu.org/viewcvs/gcc?limit_changes=0&view=revision&revision=231296).
 
-Should this literally be a revert? If so, we'd gain the Documentation
-changes back too.
+Very cool! Dmitry, is this something you could put to good use?
+
+> [...]
+> diff --git a/tools/gcc/sancov_plugin.c b/tools/gcc/sancov_plugin.c
+> new file mode 100644
+> index 0000000..5a9179b
+> --- /dev/null
+> +++ b/tools/gcc/sancov_plugin.c
+> @@ -0,0 +1,133 @@
+> +/*
+> + * Copyright 2011-2016 by Emese Revfy <re.emese@gmail.com>
+> + * Licensed under the GPL v2, or (at your option) v3
+> + *
+> + * Homepage:
+> + * https://github.com/ephox-gcc-plugins/sancov
+> + *
+> + * This plugin inserts a __sanitizer_cov_trace_pc() call at the start of basic blocks.
+> + * It supports all gcc versions with plugin support (from gcc-4.5 on).
+> + * It is based on the commit "Add fuzzing coverage support" by Dmitry Vyukov <dvyukov@google.com>.
+> + *
+> + * You can read about it more here:
+> + *  https://gcc.gnu.org/viewcvs/gcc?limit_changes=0&view=revision&revision=231296
+> + *  http://lwn.net/Articles/674854/
+> + *  https://github.com/google/syzkaller
+> + *  https://lwn.net/Articles/677764/
+> + *
+> + * Usage:
+> + * make run
+
+Is this accurate? Wouldn't it just be selected from CONFIGs during kernel build?
 
 -Kees
-
->
-> Signed-off-by: Emese Revfy <re.emese@gmail.com>
-> ---
->  scripts/Makefile.build |  2 +-
->  scripts/Makefile.clean |  3 ++-
->  scripts/Makefile.host  | 69 +++++++++++++++++++++++++++++++++++++++++++++++++-
->  3 files changed, 71 insertions(+), 3 deletions(-)
 
 -- 
 Kees Cook
