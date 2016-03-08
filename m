@@ -1,37 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f47.google.com ([74.125.82.47]:35463 "EHLO
-	mail-wm0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932567AbcCHKyu (ORCPT
+Received: from mailapp01.imgtec.com ([195.59.15.196]:61181 "EHLO
+	mailapp01.imgtec.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932545AbcCHQsd (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 8 Mar 2016 05:54:50 -0500
-Received: by mail-wm0-f47.google.com with SMTP id l68so125537891wml.0
-        for <linux-kbuild@vger.kernel.org>; Tue, 08 Mar 2016 02:54:49 -0800 (PST)
+	Tue, 8 Mar 2016 11:48:33 -0500
+From: James Hogan <james.hogan@imgtec.com>
+Subject: [PATCH] ld-version: Fix awk regex compile failure
+Date: Tue, 8 Mar 2016 16:47:53 +0000
+Message-ID: <1457455673-12219-1-git-send-email-james.hogan@imgtec.com>
 MIME-Version: 1.0
-In-Reply-To: <CAGXu5jLEizJK=YBrErDZGbANwWe2AdnsRPLAQL=nvnuCC_Q8LQ@mail.gmail.com>
-References: <20160307000208.1bec3e7dc874489d1b4fcbb4@gmail.com>
- <20160307000730.5f5b379d0e88b97fc0112c8e@gmail.com> <CAGXu5jLEizJK=YBrErDZGbANwWe2AdnsRPLAQL=nvnuCC_Q8LQ@mail.gmail.com>
-From: Dmitry Vyukov <dvyukov@google.com>
-Date: Tue, 8 Mar 2016 11:54:29 +0100
-Message-ID: <CACT4Y+axEAF=m+=15ymTzveY9uWOLQsBoDkzKY-K0XnTngKwOw@mail.gmail.com>
-Subject: Re: [PATCH v5 5/5] Add sancov plugin
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kees Cook <keescook@chromium.org>
-Cc: Emese Revfy <re.emese@gmail.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, PaX Team <pageexec@freemail.hu>, Brad Spengler <spender@grsecurity.net>, "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, Michal Marek <mmarek@suse.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Fengguang Wu <fengguang.wu@intel.com>, LKML <linux-kernel@vger.kernel.org>
+To: Ralf Baechle <ralf@linux-mips.org>, Michal Marek <mmarek@suse.com>, Andi Kleen <ak@linux.intel.com>, Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: James Hogan <james.hogan@imgtec.com>, "Michael S. Tsirkin" <mst@redhat.com>, linux-mips@linux-mips.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
 
-On Mon, Mar 7, 2016 at 10:07 PM, Kees Cook <keescook@chromium.org> wrote:
-> On Sun, Mar 6, 2016 at 3:07 PM, Emese Revfy <re.emese@gmail.com> wrote:
->> The sancov gcc plugin inserts a __sanitizer_cov_trace_pc() call
->> at the start of basic blocks.
->>
->> This plugin is a helper plugin for the kcov feature. It supports
->> all gcc versions with plugin support (from gcc-4.5 on).
->> It is based on the gcc commit "Add fuzzing coverage support" by Dmitry Vyukov
->> (https://gcc.gnu.org/viewcvs/gcc?limit_changes=0&view=revision&revision=231296).
->
-> Very cool! Dmitry, is this something you could put to good use?
+The ld-version.sh script fails on some versions of awk with the
+following error, resulting in build failures for MIPS:
 
-I am using gcc with sancov as a regular pass, so I don't a good use
-for this right now. Maybe it will help with deployment for Android. I
-don't know. Though, it will require backporting this plugin support.
+awk: scripts/ld-version.sh: line 4: regular expression compile failed (missing '(')
+
+This is due to the regular expression ".*)", meant to strip off the
+beginning of the ld version string up to the close bracket, however
+brackets have a meaning in regular expressions, so lets escape it so
+that awk doesn't expect a corresponding open bracket.
+
+Fixes: ccbef1674a15 ("Kbuild, lto: add ld-version and ld-ifversion ...")
+Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
+Signed-off-by: James Hogan <james.hogan@imgtec.com>
+Cc: Ralf Baechle <ralf@linux-mips.org>
+Cc: Michal Marek <mmarek@suse.com>
+Cc: Andi Kleen <ak@linux.intel.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: linux-mips@linux-mips.org
+Cc: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: <stable@vger.kernel.org> # 4.4.x-
+---
+I've only tested this with GNU Awk 4.0.2, which seems a bit more
+lenient than whatever version of awk Geert's build machine is using.
+
+I'd appreciated if somebody experiencing the error could give this patch
+a spin to check it fixes it.
+---
+ scripts/ld-version.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/ld-version.sh b/scripts/ld-version.sh
+index d154f0877fd8..7bfe9fa1c8dc 100755
+--- a/scripts/ld-version.sh
++++ b/scripts/ld-version.sh
+@@ -1,7 +1,7 @@
+ #!/usr/bin/awk -f
+ # extract linker version number from stdin and turn into single number
+ 	{
+-	gsub(".*)", "");
++	gsub(".*\\)", "");
+ 	gsub(".*version ", "");
+ 	gsub("-.*", "");
+ 	split($1,a, ".");
+-- 
+2.4.10
+
