@@ -1,72 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:40104 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932998AbcCHQzM (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 8 Mar 2016 11:55:12 -0500
-Date: Tue, 8 Mar 2016 18:55:02 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH] ld-version: Fix awk regex compile failure
-Message-ID: <20160308185430-mutt-send-email-mst@redhat.com>
-References: <1457455673-12219-1-git-send-email-james.hogan@imgtec.com>
+Received: from mail-pf0-f182.google.com ([209.85.192.182]:34362 "EHLO
+	mail-pf0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752214AbcCIJBT (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 9 Mar 2016 04:01:19 -0500
+Received: by mail-pf0-f182.google.com with SMTP id 129so35274269pfw.1
+        for <linux-kbuild@vger.kernel.org>; Wed, 09 Mar 2016 01:01:19 -0800 (PST)
+Date: Wed, 9 Mar 2016 02:01:15 -0700
+From: David Brown <david.brown@linaro.org>
+Subject: Re: [kernel-hardening] [PATCH v5 2/5] GCC plugin infrastructure
+Message-ID: <20160309090115.GA6964@davidb.org>
+References: <20160307000208.1bec3e7dc874489d1b4fcbb4@gmail.com>
+ <20160307000427.c82f18670568e1e656fc9532@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <1457455673-12219-1-git-send-email-james.hogan@imgtec.com>
+In-Reply-To: <20160307000427.c82f18670568e1e656fc9532@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: James Hogan <james.hogan@imgtec.com>
-Cc: Ralf Baechle <ralf@linux-mips.org>, Michal Marek <mmarek@suse.com>, Andi Kleen <ak@linux.intel.com>, Geert Uytterhoeven <geert@linux-m68k.org>, linux-mips@linux-mips.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
+To: Emese Revfy <re.emese@gmail.com>
+Cc: kernel-hardening@lists.openwall.com, linux-kbuild@vger.kernel.org, pageexec@freemail.hu, spender@grsecurity.net, mmarek@suse.com, keescook@chromium.org, linux@rasmusvillemoes.dk, fengguang.wu@intel.com, dvyukov@google.com, linux-kernel@vger.kernel.org
 
-On Tue, Mar 08, 2016 at 04:47:53PM +0000, James Hogan wrote:
-> The ld-version.sh script fails on some versions of awk with the
-> following error, resulting in build failures for MIPS:
-> 
-> awk: scripts/ld-version.sh: line 4: regular expression compile failed (missing '(')
-> 
-> This is due to the regular expression ".*)", meant to strip off the
-> beginning of the ld version string up to the close bracket, however
-> brackets have a meaning in regular expressions, so lets escape it so
-> that awk doesn't expect a corresponding open bracket.
-> 
-> Fixes: ccbef1674a15 ("Kbuild, lto: add ld-version and ld-ifversion ...")
-> Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
-> Signed-off-by: James Hogan <james.hogan@imgtec.com>
-> Cc: Ralf Baechle <ralf@linux-mips.org>
-> Cc: Michal Marek <mmarek@suse.com>
-> Cc: Andi Kleen <ak@linux.intel.com>
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: linux-mips@linux-mips.org
-> Cc: linux-kbuild@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> Cc: <stable@vger.kernel.org> # 4.4.x-
+On Mon, Mar 07, 2016 at 12:04:27AM +0100, Emese Revfy wrote:
 
-Tested-by: Michael S. Tsirkin <mst@redhat.com>
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
+>This patch allows to build the whole kernel with GCC plugins. It was ported from
+>grsecurity/PaX. The infrastructure supports building out-of-tree modules and
+>building in a separate directory. Cross-compilation is supported too but
+>currently only the x86 architecture enables plugins.
 
+I've tested this with both ARM and ARM64.  There are some missing
+headers in the arm64 gcc, reported here:
+https://bugs.linaro.org/show_bug.cgi?id=2123 (also upstream), but this
+should work once that is fixed.
 
+Feel free to fold these into your patch, or, if you prefer, I can send
+out separate patches for them.
 
-> ---
-> I've only tested this with GNU Awk 4.0.2, which seems a bit more
-> lenient than whatever version of awk Geert's build machine is using.
-> 
-> I'd appreciated if somebody experiencing the error could give this patch
-> a spin to check it fixes it.
-> ---
->  scripts/ld-version.sh | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/scripts/ld-version.sh b/scripts/ld-version.sh
-> index d154f0877fd8..7bfe9fa1c8dc 100755
-> --- a/scripts/ld-version.sh
-> +++ b/scripts/ld-version.sh
-> @@ -1,7 +1,7 @@
->  #!/usr/bin/awk -f
->  # extract linker version number from stdin and turn into single number
->  	{
-> -	gsub(".*)", "");
-> +	gsub(".*\\)", "");
->  	gsub(".*version ", "");
->  	gsub("-.*", "");
->  	split($1,a, ".");
-> -- 
-> 2.4.10
+Signed-off-by: David Brown <david.brown@linaro.org>
+
+diff --git a/arch/arm/Kconfig b/arch/arm/Kconfig
+index 4f799e5..67ee8e3 100644
+--- a/arch/arm/Kconfig
++++ b/arch/arm/Kconfig
+@@ -54,6 +54,7 @@ config ARM
+ 	select HAVE_FUNCTION_GRAPH_TRACER if (!THUMB2_KERNEL)
+ 	select HAVE_FUNCTION_TRACER if (!XIP_KERNEL)
+ 	select HAVE_GENERIC_DMA_COHERENT
++	select HAVE_GCC_PLUGINS
+ 	select HAVE_HW_BREAKPOINT if (PERF_EVENTS && (CPU_V6 || CPU_V6K || CPU_V7))
+ 	select HAVE_IDE if PCI || ISA || PCMCIA
+ 	select HAVE_IRQ_TIME_ACCOUNTING
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index 8cc6228..6d6e4f8 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -70,6 +70,7 @@ config ARM64
+ 	select HAVE_FTRACE_MCOUNT_RECORD
+ 	select HAVE_FUNCTION_TRACER
+ 	select HAVE_FUNCTION_GRAPH_TRACER
++	select HAVE_GCC_PLUGINS
+ 	select HAVE_GENERIC_DMA_COHERENT
+ 	select HAVE_HW_BREAKPOINT if PERF_EVENTS
+ 	select HAVE_IRQ_TIME_ACCOUNTING
+-- 
