@@ -1,122 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx-rz-1.rrze.uni-erlangen.de ([131.188.11.20]:37384 "EHLO
-	mx-rz-1.rrze.uni-erlangen.de" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1750773AbcCJNHs (ORCPT
+Received: from mail-pa0-f48.google.com ([209.85.220.48]:33677 "EHLO
+	mail-pa0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752865AbcCJRuF (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 10 Mar 2016 08:07:48 -0500
-In-Reply-To: 19064.1457367574@warthog.procyon.org.uk
-From: Andreas Ziegler <andreas.ziegler@fau.de>
-Subject: Re: Kconfig problem
-Message-ID: <56E16F6A.10907@fau.de>
-Date: Thu, 10 Mar 2016 13:58:18 +0100
+	Thu, 10 Mar 2016 12:50:05 -0500
+Message-ID: <56E1B3C5.7040204@gmail.com>
+Date: Thu, 10 Mar 2016 23:19:57 +0530
+From: Sudip Mukherjee <sudipm.mukherjee@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] ld-version: Fix awk regex compile failure
+References: <1457455673-12219-1-git-send-email-james.hogan@imgtec.com>
+In-Reply-To: <1457455673-12219-1-git-send-email-james.hogan@imgtec.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: linux-kbuild@vger.kernel.org
+To: James Hogan <james.hogan@imgtec.com>, Ralf Baechle <ralf@linux-mips.org>, Michal Marek <mmarek@suse.com>, Andi Kleen <ak@linux.intel.com>, Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, linux-mips@linux-mips.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
 
-Hi,
+On Tuesday 08 March 2016 10:17 PM, James Hogan wrote:
+> The ld-version.sh script fails on some versions of awk with the
+> following error, resulting in build failures for MIPS:
+>
+> awk: scripts/ld-version.sh: line 4: regular expression compile failed (missing '(')
+>
+> This is due to the regular expression ".*)", meant to strip off the
+> beginning of the ld version string up to the close bracket, however
+> brackets have a meaning in regular expressions, so lets escape it so
+> that awk doesn't expect a corresponding open bracket.
+>
+> Fixes: ccbef1674a15 ("Kbuild, lto: add ld-version and ld-ifversion ...")
+> Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
+> Signed-off-by: James Hogan <james.hogan@imgtec.com>
 
-> Hi,
-> 
-> I'm having some problems with Kconfig - the dependency resolver seems to be
-> getting things wrong.
-> 
-> I have an option:
-> 
-> 	config SYSTEM_TRUSTED_KEYRING
-> 		bool "Provide system-wide ring of trusted keys"
-> 		depends on KEYS
-> 		depends on ASYMMETRIC_KEY_TYPE
-> 
-> which, as can be seen, depends on:
-> 
-> 	menuconfig ASYMMETRIC_KEY_TYPE
-> 		tristate "Asymmetric (public-key cryptographic) key type"
-> 		depends on KEYS
-> 
-> But I can set CONFIG_SYSTEM_TRUSTED_KEYRING=y and CONFIG_ASYMMETRIC_KEY_TYPE=m
-> and the Kconfig processor is quite happy - but, of course, the kernel doesn't
-> link.
-> 
-> Yes, I could set ASYMMETRIC_KEY_TYPE to be a bool, but if
-> SYSTEM_TRUSTED_KEYRING is not set, there's no reason it couldn't be a module.
-> 
-> If I change the first option to:
-> 
-> 	config SYSTEM_TRUSTED_KEYRING
-> 		bool "Provide system-wide ring of trusted keys"
-> 		select KEYS
-> 		select ASYMMETRIC_KEY_TYPE
-> 
-> then it complains that there's a dependency loop.
-> [...]
-> 
-> If there's a dependency loop with select here, then there must be a dependency
-> loop with depends on here too, since A selects B is a dependency of A on B,
-> just as is A depends on B.
-> 
+This error was only coming in my gitlab builds but was not showing in 
+the build of travis-ci. Maybe it depends on the version of awk also.
+Build log at: https://gitlab.com/sudipm/linux-next/builds/839573
 
-no, selects are essentially defined as 'reverse dependencies' (see
-Documentation/kbuild/kconfig-language.txt), which would translate to 'A selects
-B is a dependency of B on A'. That way, if you modify the definition of
-SYSTEM_TRUSTED_KEYRING like the following (there's no need to change the
-dependency on KEYS, I think; even though there is a longer loop - the one you
-posted in the original mail -, it's the same underlying problem):
+Tested-by: Sudip Mukherjee <sudip.mukherjee@codethink.co.uk>
 
-config SYSTEM_TRUSTED_KEYRING
-	bool "Provide system-wide ring of trusted keys"
-	depends on KEYS
-	select ASYMMETRIC_KEY_TYPE
-
-then Kconfig sees the following loop (sorry for my ASCII drawing skills):
-
-        select                                        select
-        --------------- SYSTEM_TRUSTED_KEYRING <---------
-        |                                               |
-        v                                               |
-ASYMMETRIC_KEY_TYPE                            KEXEC_BZIMAGE_VERIFY_SIG
-        |                                               ^
-        |                                               |
-        ----------->  SIGNED_PE_FILE_VERIFICATION ------
-        depends on                                    dep. on
-
-In addition, it's important to be aware of the fact that selects do not care
-about dependencies of the selected option (which I think makes them even harder
-to understand...). select just forces the target option to a minimum value
-(e.g., 'm' or 'y', if all selecting options are 'm', and 'y' if any selecting
-option is 'y' itself).
-
-In this particular case, the definition of KEXEC_BZIMAGE_VERIFY_SIG (in
-arch/x86/Kconfig) additionally violates the rules from
-Documentation/kbuild/kconfig-language.txt (Quote: "In general use select only
-for non-visible symbols (no prompts anywhere) and for symbols with no
-dependencies.), as SYSTEM_TRUSTED_KEYRING has a prompt _and_ depends on another
-option, KEYS.
-
-> Any thoughts on how to resolve this?
-> 
-
-Well, if you break the loop above (by changing the 'select' in
-KEXEC_BZIMAGE_VERIFY_SIG to a 'depends on', which would make more sense
-semantically), then selecting ASYMMETRIC_KEY_TYPE from SYSTEM_TRUSTED_KEYRING
-would work and would enforce ASYMMETRIC_KEY_TYPE to be 'y' if
-SYSTEM_TRUSTED_KEYRING is 'y', but that of course requires some arguing over
-KEXEC_BZIMAGE_VERIFY_SIG.
-
-To me it seems that people sometimes misuse 'select' to make the selection of
-symbols "easier" for the user: If you use 'depends on', the user configuring the
-kernel can only see the prompt if all dependencies are already fulfilled (which
-might only be true a lot later in the configuration process, arch/x86/Kconfig is
-evaluated a lot earlier than security/Kconfig - not a problem in menuconfig, but
-e.g. in oldconfig). On the other hand, if you use 'select', Kconfig does show
-the prompt and forces the selected symbol to be enabled.
-
-Hope this clarifies things a bit...
-
-Best regards,
-
-Andreas
+regards
+sudip
 
