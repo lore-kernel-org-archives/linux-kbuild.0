@@ -1,106 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg004.nifty.com ([202.248.44.42]:59763 "EHLO
-	conssluserg004-v.nifty.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1753075AbcCKG1H (ORCPT
+Received: from mail-pa0-f68.google.com ([209.85.220.68]:33731 "EHLO
+	mail-pa0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S935365AbcCKIn4 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 11 Mar 2016 01:27:07 -0500
-MIME-Version: 1.0
-In-Reply-To: <20160307000531.d43ae7df74bfa5e9e9e29087@gmail.com>
-References: <20160307000208.1bec3e7dc874489d1b4fcbb4@gmail.com>
-	<20160307000531.d43ae7df74bfa5e9e9e29087@gmail.com>
-Date: Fri, 11 Mar 2016 15:26:39 +0900
-Message-ID: <CAK7LNARmTT2ixjwXWBZJOF+E79NAsRP3fTcfM3Fk9hf1zvFNVA@mail.gmail.com>
-Subject: Re: [PATCH v5 3/5] Add Cyclomatic complexity GCC plugin
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Content-Type: text/plain; charset=UTF-8
+	Fri, 11 Mar 2016 03:43:56 -0500
+From: laerdevstudios@gmail.com
+Subject: [PATCH] Fixed 1 multiple equals checkpatch warning.
+Date: Fri, 11 Mar 2016 08:43:49 +0000
+Message-Id: <1457685829-7018-1-git-send-email-laerdevstudios@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Emese Revfy <re.emese@gmail.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, pageexec@freemail.hu, spender@grsecurity.net, kernel-hardening@lists.openwall.com, Michal Marek <mmarek@suse.com>, Kees Cook <keescook@chromium.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, fengguang.wu@intel.com, Dmitry Vyukov <dvyukov@google.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: mmarek@suse.com
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Parth Sane <laerdevstudios@gmail.com>
 
-Hi Emese,
+From: Parth Sane <laerdevstudios@gmail.com>
 
-
-2016-03-07 8:05 GMT+09:00 Emese Revfy <re.emese@gmail.com>:
-> Add a very simple plugin to demonstrate the GCC plugin infrastructure. This GCC
-> plugin computes the cyclomatic complexity of each function.
->
-> The complexity M of a function's control flow graph is defined as:
->  M = E - N + 2P
-> where
->  E = the number of edges
->  N = the number of nodes
->  P = the number of connected components (exit nodes).
->
-> Signed-off-by: Emese Revfy <re.emese@gmail.com>
-> ---
->  arch/Kconfig                      | 12 +++++++
->  scripts/Makefile.gcc-plugins      |  6 +++-
->  tools/gcc/Makefile                |  4 +++
->  tools/gcc/cyc_complexity_plugin.c | 73 +++++++++++++++++++++++++++++++++++++++
->  4 files changed, 94 insertions(+), 1 deletion(-)
->  create mode 100644 tools/gcc/cyc_complexity_plugin.c
->
-> diff --git a/arch/Kconfig b/arch/Kconfig
-> index e090642..59bde9b 100644
-> --- a/arch/Kconfig
-> +++ b/arch/Kconfig
-> @@ -370,6 +370,18 @@ menuconfig GCC_PLUGINS
->           GCC plugins are loadable modules that provide extra features to the
->           compiler. They are useful for runtime instrumentation and static analysis.
->
-> +config GCC_PLUGIN_CYC_COMPLEXITY
-> +       bool "Compute the cyclomatic complexity of a function"
-> +       depends on GCC_PLUGINS
-> +       help
-> +         The complexity M of a function's control flow graph is defined as:
-> +          M = E - N + 2P
-> +         where
-> +
-> +         E = the number of edges
-> +         N = the number of nodes
-> +         P = the number of connected components (exit nodes).
-> +
->  config HAVE_CC_STACKPROTECTOR
->         bool
->         help
-> diff --git a/scripts/Makefile.gcc-plugins b/scripts/Makefile.gcc-plugins
-> index 7c85bf2..dd7b56d 100644
-> --- a/scripts/Makefile.gcc-plugins
-> +++ b/scripts/Makefile.gcc-plugins
-> @@ -5,7 +5,11 @@ else
->  PLUGINCC := $(shell $(CONFIG_SHELL) $(srctree)/scripts/gcc-plugin.sh "$(HOSTCC)" "$(HOSTCXX)" "$(CC)")
->  endif
->  ifneq ($(PLUGINCC),)
-> -export PLUGINCC GCC_PLUGINS_CFLAGS GCC_PLUGINS_AFLAGS
-> +ifdef CONFIG_GCC_PLUGIN_CYC_COMPLEXITY
-> +GCC_PLUGIN_CYC_COMPLEXITY_CFLAGS := -fplugin=$(objtree)/tools/gcc/cyc_complexity_plugin.so
-> +endif
-> +GCC_PLUGINS_CFLAGS := $(GCC_PLUGIN_CYC_COMPLEXITY_CFLAGS)
-> +export PLUGINCC GCC_PLUGINS_CFLAGS GCC_PLUGINS_AFLAGS GCC_PLUGIN_CYC_COMPLEXITY
-
-
-Do you need to export "GCC_PLUGIN_CYC_COMPLEXITY"?
-I do not see any reference to it.
-
-If we expect more and more plugins in the future,
-is it better to do like this?
-
-gcc-plugin-$(CONFIG_GCC_PLUGIN_CYC_COMPLEXITY)  += cyc_complexity_plugin.so
-gcc-plugin-$(CONFIG_GCC_PLUGIN_SANCOV)          += sancov_plugin.so
-gcc-plugin-$(CONFIG_GCC_PLUGIN_FOO)             += foo_plugin.so
-
-
-GCC_PLUGINS_CFLAGS := $(addprefix -fplugin=$(objtree)/tools/gcc/,
-$(gcc-plugin-y))
-
-
-
-
-
-
-
-
+diff --git a/drivers/staging/netlogic/platform_net.c b/drivers/staging/netlogic/platform_net.c
+index 7806c2b..de2c3cb 100644
+--- a/drivers/staging/netlogic/platform_net.c
++++ b/drivers/staging/netlogic/platform_net.c
+@@ -86,7 +86,8 @@ static void xlr_resource_init(struct resource *res, int offset, int irq)
+ 
+ 	res++;
+ 	res->name = "gmac";
+-	res->start = res->end = irq;
++	res->end = irq;
++        res->start = res->end;
+ 	res->flags = IORESOURCE_IRQ;
+ }
+ 
 -- 
-Best Regards
-Masahiro Yamada
+2.1.4
+
