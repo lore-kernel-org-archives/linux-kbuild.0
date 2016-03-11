@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pa0-f66.google.com ([209.85.220.66]:36039 "EHLO
-	mail-pa0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752460AbcCKJEp (ORCPT
+Received: from mail-pa0-f67.google.com ([209.85.220.67]:35095 "EHLO
+	mail-pa0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750742AbcCKJQH (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 11 Mar 2016 04:04:45 -0500
+	Fri, 11 Mar 2016 04:16:07 -0500
 From: laerdevstudios@gmail.com
-Subject: [PATCH] staging: netlogic: Fixed 1 multiple assignment checkpatch warning.
-Date: Fri, 11 Mar 2016 09:04:33 +0000
-Message-Id: <1457687073-7782-1-git-send-email-laerdevstudios@gmail.com>
+Subject: [PATCH] staging: netlogic: removed 1 multiple assignment checkpatch warning
+Date: Fri, 11 Mar 2016 09:15:19 +0000
+Message-Id: <1457687719-8057-1-git-send-email-laerdevstudios@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: mmarek@suse.com
