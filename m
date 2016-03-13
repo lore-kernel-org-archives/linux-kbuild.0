@@ -1,41 +1,113 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pa0-f51.google.com ([209.85.220.51]:36578 "EHLO
-	mail-pa0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750705AbcCKJW6 (ORCPT
+Received: from conuserg011.nifty.com ([202.248.44.37]:27059 "EHLO
+	conuserg011-v.nifty.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+	with ESMTP id S1752932AbcCMAQ2 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 11 Mar 2016 04:22:58 -0500
-From: laerdevstudios@gmail.com
-Subject: [PATCH] staging: netlogic: removed 1 multiple assignment checkpatch warning
-Date: Fri, 11 Mar 2016 09:22:27 +0000
-Message-Id: <1457688147-8191-1-git-send-email-laerdevstudios@gmail.com>
+	Sat, 12 Mar 2016 19:16:28 -0500
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH] kbuild: drop FORCE from PHONY targets
+Date: Sun, 13 Mar 2016 09:13:55 +0900
+Message-Id: <1457828035-30584-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mmarek@suse.com
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Parth Sane <laerdevstudios@gmail.com>
+To: linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Tony Luck <tony.luck@intel.com>, Nathan Lynch <nathan_lynch@mentor.com>, linux-ia64@vger.kernel.org, Michal Marek <mmarek@suse.com>, x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, Russell King <linux@arm.linux.org.uk>, Andy Lutomirski <luto@amacapital.net>, Ingo Molnar <mingo@redhat.com>, Fenghua Yu <fenghua.yu@intel.com>, linux-arm-kernel@lists.infradead.org
 
-From: Parth Sane <laerdevstudios@gmail.com>
+These targets are marked as PHONY.  No need to add FORCE to their
+dependency.
 
-Fixed netlogic checkpatch multiple assignment warning in platform_net.c
-
-Signed-off-by: Parth Sane <laerdevstudios@gmail.com>
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
- drivers/staging/netlogic/platform_net.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/staging/netlogic/platform_net.c b/drivers/staging/netlogic/platform_net.c
-index 7806c2b..daee1b2 100644
---- a/drivers/staging/netlogic/platform_net.c
-+++ b/drivers/staging/netlogic/platform_net.c
-@@ -86,7 +86,8 @@ static void xlr_resource_init(struct resource *res, int offset, int irq)
+ Makefile                     | 8 ++++----
+ arch/arm/vdso/Makefile       | 2 +-
+ arch/ia64/Makefile           | 4 ++--
+ arch/x86/entry/vdso/Makefile | 4 ++--
+ 4 files changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 2d519d2..e3ef6b6 100644
+--- a/Makefile
++++ b/Makefile
+@@ -142,7 +142,7 @@ PHONY += $(MAKECMDGOALS) sub-make
+ $(filter-out _all sub-make $(CURDIR)/Makefile, $(MAKECMDGOALS)) _all: sub-make
+ 	@:
  
- 	res++;
- 	res->name = "gmac";
--	res->start = res->end = irq;
-+	res->end = irq;
-+	res->start = res->end;
- 	res->flags = IORESOURCE_IRQ;
- }
+-sub-make: FORCE
++sub-make:
+ 	$(Q)$(MAKE) -C $(KBUILD_OUTPUT) KBUILD_SRC=$(CURDIR) \
+ 	-f $(CURDIR)/Makefile $(filter-out _all sub-make,$(MAKECMDGOALS))
  
+@@ -989,7 +989,7 @@ prepare1: prepare2 $(version_h) include/generated/utsrelease.h \
+ 
+ archprepare: archheaders archscripts prepare1 scripts_basic
+ 
+-prepare0: archprepare FORCE
++prepare0: archprepare
+ 	$(Q)$(MAKE) $(build)=.
+ 
+ # All the preparing..
+@@ -1034,7 +1034,7 @@ INSTALL_FW_PATH=$(INSTALL_MOD_PATH)/lib/firmware
+ export INSTALL_FW_PATH
+ 
+ PHONY += firmware_install
+-firmware_install: FORCE
++firmware_install:
+ 	@mkdir -p $(objtree)/firmware
+ 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.fwinst obj=firmware __fw_install
+ 
+@@ -1054,7 +1054,7 @@ PHONY += archscripts
+ archscripts:
+ 
+ PHONY += __headers
+-__headers: $(version_h) scripts_basic asm-generic archheaders archscripts FORCE
++__headers: $(version_h) scripts_basic asm-generic archheaders archscripts
+ 	$(Q)$(MAKE) $(build)=scripts build_unifdef
+ 
+ PHONY += headers_install_all
+diff --git a/arch/arm/vdso/Makefile b/arch/arm/vdso/Makefile
+index 1160434..59a8fa7 100644
+--- a/arch/arm/vdso/Makefile
++++ b/arch/arm/vdso/Makefile
+@@ -74,5 +74,5 @@ $(MODLIB)/vdso: FORCE
+ 	@mkdir -p $(MODLIB)/vdso
+ 
+ PHONY += vdso_install
+-vdso_install: $(obj)/vdso.so.dbg $(MODLIB)/vdso FORCE
++vdso_install: $(obj)/vdso.so.dbg $(MODLIB)/vdso
+ 	$(call cmd,vdso_install)
+diff --git a/arch/ia64/Makefile b/arch/ia64/Makefile
+index 970d0bd..648f1ce 100644
+--- a/arch/ia64/Makefile
++++ b/arch/ia64/Makefile
+@@ -95,8 +95,8 @@ define archhelp
+   echo '* unwcheck	- Check vmlinux for invalid unwind info'
+ endef
+ 
+-archprepare: make_nr_irqs_h FORCE
++archprepare: make_nr_irqs_h
+ PHONY += make_nr_irqs_h FORCE
+ 
+-make_nr_irqs_h: FORCE
++make_nr_irqs_h:
+ 	$(Q)$(MAKE) $(build)=arch/ia64/kernel include/generated/nr-irqs.h
+diff --git a/arch/x86/entry/vdso/Makefile b/arch/x86/entry/vdso/Makefile
+index c854541..a81b539 100644
+--- a/arch/x86/entry/vdso/Makefile
++++ b/arch/x86/entry/vdso/Makefile
+@@ -188,10 +188,10 @@ vdso_img_insttargets := $(vdso_img_sodbg:%.dbg=install_%)
+ $(MODLIB)/vdso: FORCE
+ 	@mkdir -p $(MODLIB)/vdso
+ 
+-$(vdso_img_insttargets): install_%: $(obj)/%.dbg $(MODLIB)/vdso FORCE
++$(vdso_img_insttargets): install_%: $(obj)/%.dbg $(MODLIB)/vdso
+ 	$(call cmd,vdso_install)
+ 
+ PHONY += vdso_install $(vdso_img_insttargets)
+-vdso_install: $(vdso_img_insttargets) FORCE
++vdso_install: $(vdso_img_insttargets)
+ 
+ clean-files := vdso32.so vdso32.so.dbg vdso64* vdso-image-*.c vdsox32.so*
 -- 
-2.1.4
+1.9.1
 
