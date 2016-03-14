@@ -1,32 +1,84 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ob0-f172.google.com ([209.85.214.172]:35154 "EHLO
-	mail-ob0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933076AbcCNAkD (ORCPT
+Received: from alt13.smtp-out.videotron.ca ([135.19.0.26]:50654 "EHLO
+	alt12.smtp-out.videotron.ca" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1754397AbcCNCnE (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 13 Mar 2016 20:40:03 -0400
-Received: by mail-ob0-f172.google.com with SMTP id fp4so161287084obb.2
-        for <linux-kbuild@vger.kernel.org>; Sun, 13 Mar 2016 17:40:02 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <1457828035-30584-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1457828035-30584-1-git-send-email-yamada.masahiro@socionext.com>
-From: Andy Lutomirski <luto@amacapital.net>
-Date: Sun, 13 Mar 2016 17:39:42 -0700
-Message-ID: <CALCETrVqzidL7SXsCVm8wWrcQMR9dFOLGnDtC-eEYMO4a+yszA@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: drop FORCE from PHONY targets
-Content-Type: text/plain; charset=UTF-8
+	Sun, 13 Mar 2016 22:43:04 -0400
+From: Nicolas Pitre <nicolas.pitre@linaro.org>
+Subject: [PATCH v6 1/8] kbuild: record needed exported symbols for modules
+Date: Sun, 13 Mar 2016 22:42:09 -0400
+Message-Id: <1457923336-2732-2-git-send-email-nicolas.pitre@linaro.org>
+In-Reply-To: <1457923336-2732-1-git-send-email-nicolas.pitre@linaro.org>
+References: <1457923336-2732-1-git-send-email-nicolas.pitre@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Fenghua Yu <fenghua.yu@intel.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Russell King <linux@arm.linux.org.uk>, Michal Marek <mmarek@suse.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, Nathan Lynch <nathan_lynch@mentor.com>, Tony Luck <tony.luck@intel.com>, "linux-ia64@vger.kernel.org" <linux-ia64@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "H. Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>
+To: Michal Marek <mmarek@suse.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Mar 12, 2016 4:14 PM, "Masahiro Yamada"
-<yamada.masahiro@socionext.com> wrote:
->
-> These targets are marked as PHONY.  No need to add FORCE to their
-> dependency.
+Kernel modules are partially linked object files with some undefined
+symbols that are expected to be matched with EXPORT_SYMBOL() entries
+from elsewhere.
 
-If this is, in fact, correct, can you update
-Documentation/kbuild/makefiles.txt as well?
+Each .tmp_versions/*.mod file currently contains two line of text
+separated by a newline character. The first line has the actual module
+file name while the second line has a list of object files constituting
+that module. Those files are parsed by modpost (scripts/mod/sumversion.c),
+scripts/Makefile.modpost, scripts/Makefile.modsign, etc.  Only the
+modpost utility cares about the second line while the others retrieve
+only the first line.
 
-Thanks,
-Andy
+Therefore we can add a third line to record the list of undefined symbols
+aka required EXPORT_SYMBOL() entries for each module into that file
+without breaking anything. Like for the second line, symbols are separated
+by a blank and the list is terminated with a newline character.
+
+To avoid needless build overhead, the undefined symbols extraction is
+performed only when CONFIG_TRIM_UNUSED_KSYMS is selected.
+
+Signed-off-by: Nicolas Pitre <nico@linaro.org>
+Acked-by: Rusty Russell <rusty@rustcorp.com.au>
+---
+ scripts/Makefile.build | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index 2c47f9c305..f4b4320e0d 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -253,6 +253,13 @@ define rule_cc_o_c
+ 	mv -f $(dot-target).tmp $(dot-target).cmd
+ endef
+ 
++# List module undefined symbols (or empty line if not enabled)
++ifdef CONFIG_TRIM_UNUSED_KSYMS
++cmd_undef_syms = $(NM) $@ | sed -n 's/^ \+U //p' | xargs echo
++else
++cmd_undef_syms = echo
++endif
++
+ # Built-in and composite module parts
+ $(obj)/%.o: $(src)/%.c $(recordmcount_source) FORCE
+ 	$(call cmd,force_checksrc)
+@@ -263,7 +270,8 @@ $(obj)/%.o: $(src)/%.c $(recordmcount_source) FORCE
+ $(single-used-m): $(obj)/%.o: $(src)/%.c $(recordmcount_source) FORCE
+ 	$(call cmd,force_checksrc)
+ 	$(call if_changed_rule,cc_o_c)
+-	@{ echo $(@:.o=.ko); echo $@; } > $(MODVERDIR)/$(@F:.o=.mod)
++	@{ echo $(@:.o=.ko); echo $@; \
++	   $(cmd_undef_syms); } > $(MODVERDIR)/$(@F:.o=.mod)
+ 
+ quiet_cmd_cc_lst_c = MKLST   $@
+       cmd_cc_lst_c = $(CC) $(c_flags) -g -c -o $*.o $< && \
+@@ -393,7 +401,8 @@ $(call multi_depend, $(multi-used-y), .o, -objs -y)
+ 
+ $(multi-used-m): FORCE
+ 	$(call if_changed,link_multi-m)
+-	@{ echo $(@:.o=.ko); echo $(link_multi_deps); } > $(MODVERDIR)/$(@F:.o=.mod)
++	@{ echo $(@:.o=.ko); echo $(link_multi_deps); \
++	   $(cmd_undef_syms); } > $(MODVERDIR)/$(@F:.o=.mod)
+ $(call multi_depend, $(multi-used-m), .o, -objs -y -m)
+ 
+ targets += $(multi-used-y) $(multi-used-m)
+-- 
+2.5.0
+
