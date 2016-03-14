@@ -1,46 +1,32 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg010.nifty.com ([202.248.44.36]:17309 "EHLO
-	conuserg010-v.nifty.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with ESMTP id S1753746AbcCMAkK (ORCPT
+Received: from mail-ob0-f172.google.com ([209.85.214.172]:35154 "EHLO
+	mail-ob0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933076AbcCNAkD (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 12 Mar 2016 19:40:10 -0500
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] kbuild: mark help target as PHONY
-Date: Sun, 13 Mar 2016 09:39:55 +0900
-Message-Id: <1457829595-31866-1-git-send-email-yamada.masahiro@socionext.com>
+	Sun, 13 Mar 2016 20:40:03 -0400
+Received: by mail-ob0-f172.google.com with SMTP id fp4so161287084obb.2
+        for <linux-kbuild@vger.kernel.org>; Sun, 13 Mar 2016 17:40:02 -0700 (PDT)
+MIME-Version: 1.0
+In-Reply-To: <1457828035-30584-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1457828035-30584-1-git-send-email-yamada.masahiro@socionext.com>
+From: Andy Lutomirski <luto@amacapital.net>
+Date: Sun, 13 Mar 2016 17:39:42 -0700
+Message-ID: <CALCETrVqzidL7SXsCVm8wWrcQMR9dFOLGnDtC-eEYMO4a+yszA@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: drop FORCE from PHONY targets
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, linux-kernel@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Fenghua Yu <fenghua.yu@intel.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Russell King <linux@arm.linux.org.uk>, Michal Marek <mmarek@suse.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, Nathan Lynch <nathan_lynch@mentor.com>, Tony Luck <tony.luck@intel.com>, "linux-ia64@vger.kernel.org" <linux-ia64@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, "H. Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>
 
-Obviously, the "help" should be a PHONY target.
+On Mar 12, 2016 4:14 PM, "Masahiro Yamada"
+<yamada.masahiro@socionext.com> wrote:
+>
+> These targets are marked as PHONY.  No need to add FORCE to their
+> dependency.
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
+If this is, in fact, correct, can you update
+Documentation/kbuild/makefiles.txt as well?
 
- Makefile | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/Makefile b/Makefile
-index 64cf099..848a7dc 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1249,6 +1249,7 @@ boards := $(sort $(notdir $(boards)))
- board-dirs := $(dir $(wildcard $(srctree)/arch/$(SRCARCH)/configs/*/*_defconfig))
- board-dirs := $(sort $(notdir $(board-dirs:/=)))
- 
-+PHONY += help
- help:
- 	@echo  'Cleaning targets:'
- 	@echo  '  clean		  - Remove most generated files but keep the config and'
-@@ -1417,6 +1418,7 @@ $(clean-dirs):
- clean:	rm-dirs := $(MODVERDIR)
- clean: rm-files := $(KBUILD_EXTMOD)/Module.symvers
- 
-+PHONY += help
- help:
- 	@echo  '  Building external modules.'
- 	@echo  '  Syntax: make -C path/to/kernel/src M=$$PWD target'
--- 
-1.9.1
-
+Thanks,
+Andy
