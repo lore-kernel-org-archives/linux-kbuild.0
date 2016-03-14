@@ -1,144 +1,97 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from alt13.smtp-out.videotron.ca ([135.19.0.26]:62452 "EHLO
+Received: from alt13.smtp-out.videotron.ca ([135.19.0.26]:35234 "EHLO
 	alt12.smtp-out.videotron.ca" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1754446AbcCNCnE (ORCPT
+	by vger.kernel.org with ESMTP id S1754437AbcCNCnE (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Sun, 13 Mar 2016 22:43:04 -0400
 From: Nicolas Pitre <nicolas.pitre@linaro.org>
-Subject: [PATCH v6 3/8] fixdep: accept extra dependencies on stdin
-Date: Sun, 13 Mar 2016 22:42:11 -0400
-Message-Id: <1457923336-2732-4-git-send-email-nicolas.pitre@linaro.org>
-In-Reply-To: <1457923336-2732-1-git-send-email-nicolas.pitre@linaro.org>
-References: <1457923336-2732-1-git-send-email-nicolas.pitre@linaro.org>
+Subject: [PATCH v6 0/8]/[PULL REQUEST] Trim unused exported kernel symbols
+Date: Sun, 13 Mar 2016 22:42:08 -0400
+Message-Id: <1457923336-2732-1-git-send-email-nicolas.pitre@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.com>
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-... and merge them in the list of parsed dependencies.
+This patch series provides the option to omit exported symbols from
+the kernel and modules that are never referenced by any of the selected
+modules in the current kernel configuration. this allows for optimizing
+the compiled code and reducing final binaries' size. When using LTO the
+binary size reduction is even more effective. It could also be argued
+that this could bring some security advantages.
 
-Signed-off-by: Nicolas Pitre <nico@linaro.org>
----
- scripts/basic/fixdep.c | 60 +++++++++++++++++++++++++++++++++++++-------------
- 1 file changed, 45 insertions(+), 15 deletions(-)
+The original cover letter with lots of test results can be found here:
 
-diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
-index 5b327c67a8..d984deb120 100644
---- a/scripts/basic/fixdep.c
-+++ b/scripts/basic/fixdep.c
-@@ -120,13 +120,15 @@
- #define INT_NFIG ntohl(0x4e464947)
- #define INT_FIG_ ntohl(0x4649475f)
- 
-+int insert_extra_deps;
- char *target;
- char *depfile;
- char *cmdline;
- 
- static void usage(void)
- {
--	fprintf(stderr, "Usage: fixdep <depfile> <target> <cmdline>\n");
-+	fprintf(stderr, "Usage: fixdep [-e] <depfile> <target> <cmdline>\n");
-+	fprintf(stderr, " -e  insert extra dependencies given on stdin\n");
- 	exit(1);
- }
- 
-@@ -138,6 +140,40 @@ static void print_cmdline(void)
- 	printf("cmd_%s := %s\n\n", target, cmdline);
- }
- 
-+/*
-+ * Print out a dependency path from a symbol name
-+ */
-+static void print_config(const char *m, int slen)
-+{
-+	int c, i;
-+
-+	printf("    $(wildcard include/config/");
-+	for (i = 0; i < slen; i++) {
-+		c = m[i];
-+		if (c == '_')
-+			c = '/';
-+		else
-+			c = tolower(c);
-+		putchar(c);
-+	}
-+	printf(".h) \\\n");
-+}
-+
-+static void do_extra_deps(void)
-+{
-+	if (insert_extra_deps) {
-+		char buf[80];
-+		while(fgets(buf, sizeof(buf), stdin)) {
-+			int len = strlen(buf);
-+			if (len < 2 || buf[len-1] != '\n') {
-+				fprintf(stderr, "fixdep: bad data on stdin\n");
-+				exit(1);
-+			}
-+			print_config(buf, len-1);
-+		}
-+	}
-+}
-+
- struct item {
- 	struct item	*next;
- 	unsigned int	len;
-@@ -197,23 +233,12 @@ static void define_config(const char *name, int len, unsigned int hash)
- static void use_config(const char *m, int slen)
- {
- 	unsigned int hash = strhash(m, slen);
--	int c, i;
- 
- 	if (is_defined_config(m, slen, hash))
- 	    return;
- 
- 	define_config(m, slen, hash);
--
--	printf("    $(wildcard include/config/");
--	for (i = 0; i < slen; i++) {
--		c = m[i];
--		if (c == '_')
--			c = '/';
--		else
--			c = tolower(c);
--		putchar(c);
--	}
--	printf(".h) \\\n");
-+	print_config(m, slen);
- }
- 
- static void parse_config_file(const char *map, size_t len)
-@@ -250,7 +275,7 @@ static void parse_config_file(const char *map, size_t len)
- 	}
- }
- 
--/* test is s ends in sub */
-+/* test if s ends in sub */
- static int strrcmp(const char *s, const char *sub)
- {
- 	int slen = strlen(s);
-@@ -374,6 +399,8 @@ static void parse_dep_file(void *map, size_t len)
- 		exit(1);
- 	}
- 
-+	do_extra_deps();
-+
- 	printf("\n%s: $(deps_%s)\n\n", target, target);
- 	printf("$(deps_%s):\n", target);
- }
-@@ -430,7 +457,10 @@ int main(int argc, char *argv[])
- {
- 	traps();
- 
--	if (argc != 4)
-+	if (argc == 5 && !strcmp(argv[1], "-e")) {
-+		insert_extra_deps = 1;
-+		argv++;
-+	} else if (argc != 4)
- 		usage();
- 
- 	depfile = argv[1];
--- 
-2.5.0
+	https://lkml.org/lkml/2016/2/8/813
 
+Please consider for merging into your tree. Alternately, the following
+branch can be pulled:
+
+	http://git.linaro.org/people/nicolas.pitre/linux.git autoksyms
+
+Thanks.
+
+Changes from v5:
+
+- Disable automatic dependency file generation during the preprocessor
+  pass when gathering exported symbol names.  Not only it is redundant
+  but in some conditions this crashes fixdep that might be reading the
+  previous dependency file at the same time. Reported by Michal Marek.
+
+- Redirect error messages to stderr rather than pass it as a symbol name
+  dependency.
+
+Changes from v4:
+
+- Correctness changes plus small cleanup to adjust_autoksyms.sh as
+  suggested by Michal Marek.
+
+- Changed ksym build dependency generation by re-running the preprocessor
+  rather than collecting those dependencies as warnings through stderr
+  which was too fragile.
+
+Changes from v3:
+
+- Shell portability changes to adjust_autoksyms.sh, partly from
+  suggestions by Zev Weiss.
+
+- Fix sample modules by building them before adjust_autoksyms.sh is run.
+
+Changes from v2:
+
+- Generating the build dependencies by parsing the source with fixdep
+  turned out to be unreliable due to all the EXPORT_SYMBOL() variants,
+  and especially their use within macros where the actual symbol name
+  is known only after running the preprocessor. This list of symbol names
+  is now obtained from the preprocessor directly, fixing allmodconfig
+  builds.
+
+Changes from v1:
+
+- Replaced "exp" that doesn't convey the right meaning as noted by
+  Sam Ravnborg. The "ksym" identifier is actually what the kernel
+  already uses for this. Therefore:
+  - CONFIG_TRIM_UNUSED_EXPSYMS --> CONFIG_TRIM_UNUSED_KSYMS
+  - include/generated/expsyms.h --> include/generated/autoksyms.h
+  - #define __EXPSYM_* --> #define __KSYM_*
+
+- Some sed regexp improvements as suggested by Al Viro.
+
+- Renamed vmlinux_recursive target to autoksyms_recursive.
+
+- Accept EXPORT_SYMBOL variants with a prefix, e.g. ACPI_EXPORT_SYMBOL.
+
+- Minor commit log clarifications.
+
+- Added Rusty's ACK.
+
+diffstat:
+
+ Makefile                    |  23 ++++++--
+ include/linux/export.h      |  33 +++++++++++-
+ init/Kconfig                |  16 ++++++
+ scripts/Kbuild.include      |  32 +++++++++++-
+ scripts/Makefile.build      |  22 ++++----
+ scripts/adjust_autoksyms.sh | 101 ++++++++++++++++++++++++++++++++++++
+ scripts/basic/fixdep.c      |  61 ++++++++++++++++------
+ 7 files changed, 258 insertions(+), 30 deletions(-)
