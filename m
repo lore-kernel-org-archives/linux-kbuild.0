@@ -1,38 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from imap.thunk.org ([74.207.234.97]:46690 "EHLO imap.thunk.org"
+Received: from mx2.suse.de ([195.135.220.15]:57014 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750892AbcCOPQb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 15 Mar 2016 11:16:31 -0400
-Date: Tue, 15 Mar 2016 11:16:18 -0400
-From: Theodore Ts'o <tytso@mit.edu>
-Subject: Re: [GIT PULL v4.6] MDB Linux Kernel Debugger x86/x86_64
-Message-ID: <20160315151618.GQ29218@thunk.org>
-References: <20160314235035.GA5799@localhost.localdomain>
- <1457999823.11972.143.camel@perches.com>
- <20160315112458.7248d665@canb.auug.org.au>
- <CA+ekxPU9D9dfhtzEP+bEvTthg3M_UWyY1zQHaRb0APppp-t7-g@mail.gmail.com>
- <20160315130339.688689bd@canb.auug.org.au>
+	id S1754130AbcCOQJu (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 15 Mar 2016 12:09:50 -0400
+Subject: Re: [PATCH] staging: netlogic: removed 1 multiple assignment
+ checkpatch warning
+References: <1457688147-8191-1-git-send-email-laerdevstudios@gmail.com>
+From: Michal Marek <mmarek@suse.com>
+Message-ID: <56E833CB.1060407@suse.com>
+Date: Tue, 15 Mar 2016 17:09:47 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20160315130339.688689bd@canb.auug.org.au>
+In-Reply-To: <1457688147-8191-1-git-send-email-laerdevstudios@gmail.com>
+Content-Type: text/plain; charset=iso-8859-2
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Stephen Rothwell <sfr@canb.auug.org.au>
-Cc: Jeffrey Merkey <jeffmerkey@gmail.com>, Joe Perches <joe@perches.com>, linux-kernel@vger.kernel.org, torvalds@linux-foundation.org, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: laerdevstudios@gmail.com
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, driverdev-devel@linuxdriverproject.org
 
-On Tue, Mar 15, 2016 at 01:03:39PM +1100, Stephen Rothwell wrote:
-> We don't generally PGP (GPG) sign commits in the kernel tree (so "-S"
-> is not required), just tags.  However we always require that anyone who
-> handles a patch adds a Signed-off-by line to the final commit.  See
-> Documentation/SubmittingPatches Section 11.
+This should go to the staging mailing list.
 
-In general all commits should have a Signed-Off-By line added.  Once
-the git branch gets merged, it's hard to tell what is the final commit
-and what isn't, and in general different commits will have different
-people needing to vouch for the origins for the contents of that commit.
+Michal
 
-Cheers,
+Dne 11.3.2016 v 10:22 laerdevstudios@gmail.com napsal(a):
+> From: Parth Sane <laerdevstudios@gmail.com>
+> 
+> Fixed netlogic checkpatch multiple assignment warning in platform_net.c
+> 
+> Signed-off-by: Parth Sane <laerdevstudios@gmail.com>
+> ---
+>  drivers/staging/netlogic/platform_net.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/staging/netlogic/platform_net.c b/drivers/staging/netlogic/platform_net.c
+> index 7806c2b..daee1b2 100644
+> --- a/drivers/staging/netlogic/platform_net.c
+> +++ b/drivers/staging/netlogic/platform_net.c
+> @@ -86,7 +86,8 @@ static void xlr_resource_init(struct resource *res, int offset, int irq)
+>  
+>  	res++;
+>  	res->name = "gmac";
+> -	res->start = res->end = irq;
+> +	res->end = irq;
+> +	res->start = res->end;
+>  	res->flags = IORESOURCE_IRQ;
+>  }
+>  
+> 
 
-							- Ted
-							
