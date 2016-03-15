@@ -1,50 +1,71 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ob0-f171.google.com ([209.85.214.171]:34804 "EHLO
-	mail-ob0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S965881AbcCOUse (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 15 Mar 2016 16:48:34 -0400
-Received: by mail-ob0-f171.google.com with SMTP id ts10so30659226obc.1
-        for <linux-kbuild@vger.kernel.org>; Tue, 15 Mar 2016 13:48:33 -0700 (PDT)
+Received: from mx2.suse.de ([195.135.220.15]:50890 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S932474AbcCOVfH (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 15 Mar 2016 17:35:07 -0400
+Subject: Re: [PATCH] kbuild: Add option to turn incompatible pointer check
+ into error
+References: <1457425749-24110-1-git-send-email-wagi@monom.org>
+ <alpine.DEB.2.11.1603081010000.6083@nanos> <20160308091941.GD12413@gmail.com>
+From: Michal Marek <mmarek@suse.com>
+Message-ID: <56E88003.3050708@suse.com>
+Date: Tue, 15 Mar 2016 22:34:59 +0100
 MIME-Version: 1.0
-In-Reply-To: <56E87463.9020300@suse.com>
-References: <1457828035-30584-1-git-send-email-yamada.masahiro@socionext.com>
- <CALCETrVqzidL7SXsCVm8wWrcQMR9dFOLGnDtC-eEYMO4a+yszA@mail.gmail.com>
- <CAK7LNARELkQbhAfBdh9Tx7gVGkpN9gTJzoqJwOF-0CH4zm+wcw@mail.gmail.com>
- <CALCETrVgSUy4ofeBmkZ7TurKvmQVX8C1aj__SLOL6SboQ3S-WA@mail.gmail.com>
- <CAK7LNAQOJjcn7Q+s_pKqzUuojMBtOsRNKsmVwDFXvTeU-zvSeQ@mail.gmail.com>
- <CALCETrU+6sj=reBgPBy7Mq6KYY7BKkVLGwm4XrVzOzb8aU+meg@mail.gmail.com>
- <CAK7LNATAeMmfwWiZha17mbyWhF6bR5RGjv+gbsQTvL4teoTiPQ@mail.gmail.com>
- <CALCETrVNMv5XwpXTJcevVLCfTSMbsqKsjzzukoGr7VAHuumFpg@mail.gmail.com> <56E87463.9020300@suse.com>
-From: Andy Lutomirski <luto@amacapital.net>
-Date: Tue, 15 Mar 2016 13:48:13 -0700
-Message-ID: <CALCETrW2h+Rt5oEmr09Faf9OesFWYZ_SXmj=zHE4+rDYO85p6Q@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: drop FORCE from PHONY targets
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20160308091941.GD12413@gmail.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Fenghua Yu <fenghua.yu@intel.com>, Thomas Gleixner <tglx@linutronix.de>, Russell King <linux@arm.linux.org.uk>, Ingo Molnar <mingo@redhat.com>, X86 ML <x86@kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Tony Luck <tony.luck@intel.com>, Nathan Lynch <nathan_lynch@mentor.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-ia64@vger.kernel.org" <linux-ia64@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "H. Peter Anvin" <hpa@zytor.com>
+To: Ingo Molnar <mingo@kernel.org>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Daniel Wagner <wagi@monom.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Ingo Molnar <mingo@redhat.com>, Daniel Wagner <daniel.wagner@bmw-carit.de>
 
-On Tue, Mar 15, 2016 at 1:45 PM, Michal Marek <mmarek@suse.com> wrote:
-> Dne 15.3.2016 v 19:27 Andy Lutomirski napsal(a):
->> Fair enough, although I'm curious why this happens.  It might be worth
->> changing the docs to say that .PHONY is *not* an substitute for FORCE
->> in that context, then.
->
-> These two are unrelated, except that FORCE is redundant for a .PHONY
-> target. FORCE is our idiom to tell make to always remake the target and
-> let us handle the dependencies manually. Listing a target as .PHONY
-> tells make that the target will not produce a file of the same name
-> (typically, "all", "install", etc).
->
+Dne 8.3.2016 v 10:19 Ingo Molnar napsal(a):
+> 
+> * Thomas Gleixner <tglx@linutronix.de> wrote:
+> 
+>> On Tue, 8 Mar 2016, Daniel Wagner wrote:
+>>
+>>> From: Daniel Wagner <daniel.wagner@bmw-carit.de>
+>>>
+>>> With the introduction of the simple wait API we have two very
+>>> similar APIs in the kernel. For example wake_up() and swake_up()
+>>> is only one character away. Although the compiler will warn
+>>> happily the wrong usage it keeps on going an even links the kernel.
+>>> Thomas and Peter would rather like to see early missuses reported
+>>> as error early on.
+>>>
+>>> In a first attempt we tried to wrap all swait and wait calls
+>>> into a macro which has an compile time type assertion. The result
+>>> was pretty ugly and wasn't able to catch all wrong usages.
+>>> woken_wake_function(), autoremove_wake_function() and wake_bit_function()
+>>> are assigned as function pointers. Wrapping them with a macro around is
+>>> not possible. Prefixing them with '_' was also not a real option
+>>> because there some users in the kernel which do use them as well.
+>>> All in all this attempt looked to intrusive and too ugly.
+>>>
+>>> An alternative is to turn the pointer type check into an error which
+>>> catches wrong type uses. Obviously not only the swait/wait ones. That
+>>> isn't a bad thing either.
+>>>
+>>> Signed-off-by: Daniel Wagner <daniel.wagner@bmw-carit.de>
+>>> Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+>>> Cc: Thomas Gleixner <tglx@linutronix.de>
+>>
+>> Acked-by: Thomas Gleixner <tglx@linutronix.de>
 
-Except that apparently if-changed doesn't work on .PHONY targets that
-don't specify FORCE, which confuses me.
+Applied to kbuild.git#kbuild.
 
---Andy
+> 
+> Note that there will be a few build failures triggered by this, for example this 
+> fix from linux-next is needed:
+> 
+>> commit db9b60400f9253c25ae639797df2d0ff7a35d9d8
+>> Author: Sudip Mukherjee <sudipm.mukherjee@gmail.com>
+>> Date:   Tue Feb 2 11:35:55 2016 +0530
+>>
+>>     drm/gma500: remove helper function
 
+OK. I will send a pull request to Linus only after at least
+x86_64/allyescofnig is fixed.
 
--- 
-Andy Lutomirski
-AMA Capital Management, LLC
+Michal
