@@ -1,41 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtprelay0031.hostedemail.com ([216.40.44.31]:45519 "EHLO
-	smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1753205AbcCOAG3 (ORCPT
+Received: from mail-lb0-f180.google.com ([209.85.217.180]:34945 "EHLO
+	mail-lb0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750853AbcCOAKk (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 14 Mar 2016 20:06:29 -0400
-Received: from smtprelay.hostedemail.com (10.5.19.251.rfc1918.com [10.5.19.251])
-	by smtpgrave06.hostedemail.com (Postfix) with ESMTP id 934D61729CD
-	for <linux-kbuild@vger.kernel.org>; Mon, 14 Mar 2016 23:57:07 +0000 (UTC)
-Message-ID: <1457999823.11972.143.camel@perches.com>
-Subject: Re: [GIT PULL v4.6]  MDB Linux Kernel Debugger x86/x86_64
-From: Joe Perches <joe@perches.com>
-Date: Mon, 14 Mar 2016 16:57:03 -0700
-In-Reply-To: <20160314235035.GA5799@localhost.localdomain>
-References: <20160314235035.GA5799@localhost.localdomain>
-Content-Type: text/plain; charset="ISO-8859-1"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
+	Mon, 14 Mar 2016 20:10:40 -0400
+Received: by mail-lb0-f180.google.com with SMTP id bc4so1380168lbc.2
+        for <linux-kbuild@vger.kernel.org>; Mon, 14 Mar 2016 17:10:39 -0700 (PDT)
+Received: from lenovo.home ([93.171.170.21])
+        by smtp.gmail.com with ESMTPSA id s5sm3910671lbr.12.2016.03.14.17.10.36
+        for <linux-kbuild@vger.kernel.org>
+        (version=TLSv1/SSLv3 cipher=OTHER);
+        Mon, 14 Mar 2016 17:10:37 -0700 (PDT)
+Subject: Re: rela sections in vmlinux
+References: <56DC9B44.6020104@gmail.com>
+From: Ruslan Kuprieiev <kupruser@gmail.com>
+Message-ID: <56E752FB.6000300@gmail.com>
+Date: Tue, 15 Mar 2016 02:10:35 +0200
+MIME-Version: 1.0
+In-Reply-To: <56DC9B44.6020104@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jeffrey Merkey <jeffmerkey@gmail.com>, linux-kernel@vger.kernel.org, torvalds@linux-foundation.org
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
 
-On Mon, 2016-03-14 at 17:50 -0600, Jeffrey Merkey wrote:
-> The following changes since commit b562e44f507e863c6792946e4e1b1449fbbac85d:
-> 
->   Linux 4.5 (2016-03-13 21:28:54 -0700)
-> 
-> are available in the git repository at:
-> 
->   https://github.com/jeffmerkey/linux.git tags/mdb-v4.5-signed
-> 
-> for you to fetch changes up to 2e9c184e1215dca2b4c59c347f40a0986b8e7460:
-> 
->   Add MDB Debugger to linux v4.5 (2016-03-14 15:17:44 -0600)
+Hi All,
 
-If Linus doesn't pull this, Stephen, could you please add this
-tree to -next so it has some testing and validation done?
+Just wanted to answer my own question.
 
-Maybe the build-bot could do some coverage testing too?
+The problem was that I forgot to add --emit-relocs to my own script and
+that's why I didn't find any rela sections in vmlinux. After adding proper
+ld options everything started to make sense =).
+
+Thanks,
+Ruslan
+
+On 03/06/2016 11:04 PM, Ruslan Kuprieiev wrote:
+> Hi!
+>
+> I'm trying to figure out how CONFIG_RELOCATABLE works and one of the 
+> things
+> that I've noticed is that vmlinux itself doesn't have any rela 
+> sections, which is
+> confusing for me considering the name of the option. I did read the 
+> patches that
+> introduced this option but it is still not clear to me how exactly it 
+> works and why
+> there are no relocations left in the vmlinux. Could you please give me 
+> a hint on
+> why it happens and point me where to read more?
+>
+> I also see that vmlinux.o has all the rela sections I'm looking for(as 
+> an object file
+> should =)), so it raises another question: Is it possible to make 
+> vmlinux keep that
+> rela sections? I also went through makefiles but couldn't figure out 
+> where to
+> make a proper change to achieve that.
+>
+> I'm using default 3.10.0-229.20.1.el7.x86_64 centos7 kernel with 
+> CONFIG_RELOCATABLE
+> enabled.
+>
+> Thanks,
+> Ruslan
 
