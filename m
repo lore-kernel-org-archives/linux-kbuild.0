@@ -1,265 +1,69 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi0-f43.google.com ([209.85.218.43]:34071 "EHLO
-	mail-oi0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S965646AbcCOS2R (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 15 Mar 2016 14:28:17 -0400
-Received: by mail-oi0-f43.google.com with SMTP id m82so20061144oif.1
-        for <linux-kbuild@vger.kernel.org>; Tue, 15 Mar 2016 11:28:16 -0700 (PDT)
+Received: from mx2.suse.de ([195.135.220.15]:38965 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S932347AbcCOUdU (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 15 Mar 2016 16:33:20 -0400
+Subject: Re: [PATCH v6 5/8] kbuild: add fine grained build dependencies for
+ exported symbols
+References: <1457923336-2732-1-git-send-email-nicolas.pitre@linaro.org>
+ <1457923336-2732-6-git-send-email-nicolas.pitre@linaro.org>
+From: Michal Marek <mmarek@suse.com>
+Message-ID: <56E8718E.9010607@suse.com>
+Date: Tue, 15 Mar 2016 21:33:18 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNATAeMmfwWiZha17mbyWhF6bR5RGjv+gbsQTvL4teoTiPQ@mail.gmail.com>
-References: <1457828035-30584-1-git-send-email-yamada.masahiro@socionext.com>
- <CALCETrVqzidL7SXsCVm8wWrcQMR9dFOLGnDtC-eEYMO4a+yszA@mail.gmail.com>
- <CAK7LNARELkQbhAfBdh9Tx7gVGkpN9gTJzoqJwOF-0CH4zm+wcw@mail.gmail.com>
- <CALCETrVgSUy4ofeBmkZ7TurKvmQVX8C1aj__SLOL6SboQ3S-WA@mail.gmail.com>
- <CAK7LNAQOJjcn7Q+s_pKqzUuojMBtOsRNKsmVwDFXvTeU-zvSeQ@mail.gmail.com>
- <CALCETrU+6sj=reBgPBy7Mq6KYY7BKkVLGwm4XrVzOzb8aU+meg@mail.gmail.com> <CAK7LNATAeMmfwWiZha17mbyWhF6bR5RGjv+gbsQTvL4teoTiPQ@mail.gmail.com>
-From: Andy Lutomirski <luto@amacapital.net>
-Date: Tue, 15 Mar 2016 11:27:56 -0700
-Message-ID: <CALCETrVNMv5XwpXTJcevVLCfTSMbsqKsjzzukoGr7VAHuumFpg@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: drop FORCE from PHONY targets
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <1457923336-2732-6-git-send-email-nicolas.pitre@linaro.org>
+Content-Type: text/plain; charset=iso-8859-2
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Fenghua Yu <fenghua.yu@intel.com>, Thomas Gleixner <tglx@linutronix.de>, Russell King <linux@arm.linux.org.uk>, Ingo Molnar <mingo@redhat.com>, Michal Marek <mmarek@suse.com>, X86 ML <x86@kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Tony Luck <tony.luck@intel.com>, Nathan Lynch <nathan_lynch@mentor.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-ia64@vger.kernel.org" <linux-ia64@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "H. Peter Anvin" <hpa@zytor.com>
+To: Nicolas Pitre <nicolas.pitre@linaro.org>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Mar 13, 2016 11:26 PM, "Masahiro Yamada"
-<yamada.masahiro@socionext.com> wrote:
->
-> Hi Andy,
->
->
-> 2016-03-14 13:44 GMT+09:00 Andy Lutomirski <luto@amacapital.net>:
-> > On Sun, Mar 13, 2016 at 9:36 PM, Masahiro Yamada
-> > <yamada.masahiro@socionext.com> wrote:
-> >> 2016-03-14 13:28 GMT+09:00 Andy Lutomirski <luto@amacapital.net>:
-> >>> On Sun, Mar 13, 2016 at 9:08 PM, Masahiro Yamada
-> >>> <yamada.masahiro@socionext.com> wrote:
-> >>>>
-> >>>> Hi Andy
-> >>>>
-> >>>> 2016-03-14 9:39 GMT+09:00 Andy Lutomirski <luto@amacapital.net>:
-> >>>> > On Mar 12, 2016 4:14 PM, "Masahiro Yamada"
-> >>>> > <yamada.masahiro@socionext.com> wrote:
-> >>>> >>
-> >>>> >> These targets are marked as PHONY.  No need to add FORCE to their
-> >>>> >> dependency.
-> >>>> >
-> >>>> > If this is, in fact, correct, can you update
-> >>>> > Documentation/kbuild/makefiles.txt as well?
-> >>>>
-> >>>> Which line do you want me to update?
-> >>>>
-> >>>
-> >>> All the references to FORCE should probably mention .PHONY as an alternative.
-> >>
-> >> I do not get your point.
-> >>
-> >> All the examples in the makefile.txt correctly reference to FORCE.
-> >> They are not PHONY targets.
-> >> No need to update.
-> >
-> > But they could be.  For example:
-> >
-> >                 $(obj)/image: vmlinux FORCE
-> >                         $(call if_changed,objcopy)
-> >
-> > could be:
-> >
-> >                  .PHONY: $(obj)/image
-> >                 $(obj)/image: vmlinux
-> >                         $(call if_changed,objcopy)
-> >
-> > I would at least change:
-> >
-> > Note: It is a typical mistake to forget the FORCE prerequisite.
-> >
-> > to:
-> >
-> > Note: if-changed is only useful if make executes it, which won't
-> > happen if it determines that the inputs have not changed since the
-> > output was built.  This can be avoided by specifying FORCE as a
-> > prerequisite or by making declaring the output as .PHONY.
-> >
->
->
-> No. This is absolutely wrong.
-> PHONY and FORCE are not interchangeable.
->
-> They have different behavior.
-> I will show you how they behave differently.
->
->
-> BTW, Linux 4.5 is out now.
->
-> Let's try a simple experiment on it.
->
->
-> The following shows that my source tree is v4.5
->
-> yamada@beagle:~/workspace/linux$ git describe
-> v4.5
->
->
->
-> Example 1)
->
->
-> Add the following code to the top Makefile.
->
-> Please note "FORCE" is used here.
->
->
-> yamada@beagle:~/workspace/linux$ git diff
-> diff --git a/Makefile b/Makefile
-> index 7b3ecdc..89b7d0d 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -914,6 +914,22 @@ export KBUILD_ALLDIRS := $(sort $(filter-out
-> arch/%,$(vmlinux-
->
->  vmlinux-deps := $(KBUILD_LDS) $(KBUILD_VMLINUX_INIT) $(KBUILD_VMLINUX_MAIN)
->
-> +quiet_cmd_gen_foo = FOO     $@
-> +      cmd_gen_foo = (cat $<; echo hello) > $@
+Dne 14.3.2016 v 03:42 Nicolas Pitre napsal(a):
+> +# Filter out exported kernel symbol names from the preprocessor output.
+> +# See also __KSYM_DEPS__ in include/linux/export.h.
+> +# We disable the depfile generation here, so as not to overwrite the existing
+> +# depfile while fixdep is parsing it
+> +flags_nodeps = $(filter-out -Wp$(comma)-M%, $($(1)))
+> +ksym_dep_filter =                                                            \
+> +	case "$(1)" in                                                       \
+> +	cc_*_c) $(CPP) $(call flags_nodeps,c_flags) -D__KSYM_DEPS__ $< ;;    \
+> +	as_*_S) $(CPP) $(call flags_nodeps,a_flags) -D__KSYM_DEPS__ $< ;;    \
+> +	cpp_lds_S) : ;;                                                      \
+> +	*) echo "Don't know how to preprocess $(1)" >&2; false ;;            \
+> +	esac | sed -rn 's/^.*=== __KSYM_(.*) ===.*$$/KSYM_\1/p'
 > +
-> +foo: bar FORCE
-> +       $(call if_changed,gen_foo)
+> +cmd_and_fixdep =                                                             \
+> +	$(echo-cmd) $(cmd_$(1));                                             \
+> +	$(ksym_dep_filter) |                                                 \
+> +		scripts/basic/fixdep -e $(depfile) $@ '$(make-cmd)'          \
+> +			> $(dot-target).tmp;	                             \
+> +	rm -f $(depfile);                                                    \
+> +	mv -f $(dot-target).tmp $(dot-target).cmd;
 > +
-> +quiet_cmd_gen_bar = BAR     $@
-> +      cmd_gen_bar = (cat $<; echo $(GREETING)) > $@
-> +
-> +bar: baz FORCE
-> +       $(call if_changed,gen_bar)
-> +
-> +baz:
-> +       @touch $@
-> +
-> +
->  # Final link of vmlinux
->        cmd_link-vmlinux = $(CONFIG_SHELL) $< $(LD) $(LDFLAGS) $(LDFLAGS_vmlinux)
->  quiet_cmd_link-vmlinux = LINK    $@
->
->
->
-> Try the following.
->
-> yamada@beagle:~/workspace/linux$ git clean -x -f
-> yamada@beagle:~/workspace/linux$ make -s defconfig
-> yamada@beagle:~/workspace/linux$ make GREETING=GoodMorning foo
-> scripts/kconfig/conf  --silentoldconfig Kconfig
->   BAR     bar
->   FOO     foo
-> yamada@beagle:~/workspace/linux$ make GREETING=GoodMorning foo
-> make: `foo' is up to date.
-> yamada@beagle:~/workspace/linux$ make GREETING=GoodAfternoon foo
->   BAR     bar
->   FOO     foo
-> yamada@beagle:~/workspace/linux$ make GREETING=GoodAfternoon foo
-> make: `foo' is up to date.
-> yamada@beagle:~/workspace/linux$ make GREETING=GoodEvening foo
->   BAR     bar
->   FOO     foo
-> yamada@beagle:~/workspace/linux$ make GREETING=GoodEvening foo
-> make: `foo' is up to date.
->
->
->
->
-> Please notice "foo" and "bar" were not rebuilt
-> when I gave the same command line as the previous run.
->
->
-> When I changed the command line, "bar"  was update
-> and "foo" was also updated because "foo" depends on "bar".
->
->
-> It means $(call if_changed,...) is working as expected.
->
->
->
->
->
->
-> Example 2)
->
->
-> Add the following to the top Makefile.
-> Please notice that I just replaced "FORCE" with ".PHONY".
->
->
->
-> diff --git a/Makefile b/Makefile
-> index 7b3ecdc..a0899c3 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -914,6 +914,24 @@ export KBUILD_ALLDIRS := $(sort $(filter-out
-> arch/%,$(vmlinux-
->
->  vmlinux-deps := $(KBUILD_LDS) $(KBUILD_VMLINUX_INIT) $(KBUILD_VMLINUX_MAIN)
->
-> +quiet_cmd_gen_foo = FOO     $@
-> +      cmd_gen_foo = (cat $<; echo hello) > $@
-> +
-> +.PHONY: foo
-> +foo: bar
-> +       $(call if_changed,gen_foo)
-> +
-> +quiet_cmd_gen_bar = BAR     $@
-> +      cmd_gen_bar = (cat $<; echo $(GREETING)) > $@
-> +
-> +.PHONY: bar
-> +bar: baz
-> +       $(call if_changed,gen_bar)
-> +
-> +baz:
-> +       @touch $@
-> +
-> +
->  # Final link of vmlinux
->        cmd_link-vmlinux = $(CONFIG_SHELL) $< $(LD) $(LDFLAGS) $(LDFLAGS_vmlinux)
->  quiet_cmd_link-vmlinux = LINK    $@
->
->
->
-> Let's try the same thing.
->
->
->
-> yamada@beagle:~/workspace/linux$ git clean -x -f
-> yamada@beagle:~/workspace/linux$ make -s defconfig
-> yamada@beagle:~/workspace/linux$ make GREETING=GoodMorning foo
-> scripts/kconfig/conf  --silentoldconfig Kconfig
->   BAR     bar
->   FOO     foo
-> yamada@beagle:~/workspace/linux$ make GREETING=GoodMorning foo
->   BAR     bar
->   FOO     foo
-> yamada@beagle:~/workspace/linux$ make GREETING=GoodMorning foo
->   BAR     bar
->   FOO     foo
-> yamada@beagle:~/workspace/linux$ make GREETING=GoodAfternoon foo
->   BAR     bar
->   FOO     foo
-> yamada@beagle:~/workspace/linux$ make GREETING=GoodAfternoon foo
->   BAR     bar
->   FOO     foo
-> yamada@beagle:~/workspace/linux$ make GREETING=GoodAfternoon foo
->   BAR     bar
->   FOO     foo
->
->
-> Did you notice the difference?
->
-> The "foo" and "bar" are always rebuilt
-> regardless the command line is changed or not.
->
-> It means $(call if_changed,...) is not working.
->
+> +endif
 
-Fair enough, although I'm curious why this happens.  It might be worth
-changing the docs to say that .PHONY is *not* an substitute for FORCE
-in that context, then.
+Not sure what happened this time, but I got
 
---Andy
+drivers/md/.dm-round-robin.mod.o.cmd:5: *** unterminated call to
+function 'wildcard': missing ')'.  Stop.
+
+The depfile is indeed corrupt (truncated):
+tail drivers/md/.dm-round-robin.mod.o.cmd
+  arch/x86/include/asm/disabled-features.h \
+    $(wildcard include/config/x86/intel/mpx.h) \
+  arch/x86/include/asm/rmwcc.h \
+  arch/x86/include/asm/barrier.h \
+    $(wildcard include/config/x86/ppro/fence.h) \
+  arch/x86/include/asm/nops.h \
+    $(wildcard include/config/mk7.h) \
+  include/asm-generic/barrier.h \
+  include/asm-generic/bitops/find.h \
+    $(wildcard include/config/generic/
+
+The file is exactly 8kB long:
+$ ls -l drivers/md/.dm-round-robin.mod.o.cmd
+-rw-r--r-- 1 mmarek users 8192 Mar  8 13:33
+drivers/md/.dm-round-robin.mod.o.cmd
+
+Michal
