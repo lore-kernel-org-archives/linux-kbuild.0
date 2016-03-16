@@ -1,148 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qg0-f53.google.com ([209.85.192.53]:35489 "EHLO
-	mail-qg0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S966843AbcCPPFq (ORCPT
+Received: from lb2-smtp-cloud3.xs4all.net ([194.109.24.26]:47154 "EHLO
+	lb2-smtp-cloud3.xs4all.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S967119AbcCPU1b (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 16 Mar 2016 11:05:46 -0400
-Received: by mail-qg0-f53.google.com with SMTP id y89so45630033qge.2
-        for <linux-kbuild@vger.kernel.org>; Wed, 16 Mar 2016 08:05:45 -0700 (PDT)
-Date: Wed, 16 Mar 2016 11:05:43 -0400 (EDT)
-From: Nicolas Pitre <nicolas.pitre@linaro.org>
-Subject: Re: [PATCH v6 5/8] kbuild: add fine grained build dependencies for
- exported symbols
-In-Reply-To: <56E9518E.1020206@suse.com>
-Message-ID: <alpine.LFD.2.20.1603161050160.30579@knanqh.ubzr>
-References: <1457923336-2732-1-git-send-email-nicolas.pitre@linaro.org> <1457923336-2732-6-git-send-email-nicolas.pitre@linaro.org> <56E8718E.9010607@suse.com> <fvfraWW5gnPSEfvfsaDPXE@videotron.ca> <alpine.LFD.2.20.1603151853410.30579@knanqh.ubzr>
- <56E9518E.1020206@suse.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+	Wed, 16 Mar 2016 16:27:31 -0400
+From: Paul Bolle <pebolle@tiscali.nl>
+Subject: [PATCH v2] kconfig: add unexpected data itself to warning
+Date: Wed, 16 Mar 2016 21:27:27 +0100
+Message-Id: <1458160047-8292-1-git-send-email-pebolle@tiscali.nl>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Josh Boyer <jwboyer@fedoraproject.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Wed, 16 Mar 2016, Michal Marek wrote:
+If the .config parser runs into unexpected data it emits warnings like:
+    .config:6911:warning: unexpected data
 
-> On 2016-03-16 00:14, Nicolas Pitre wrote:
-> > On Tue, 15 Mar 2016, Michal Marek wrote:
-> > 
-> >> Dne 14.3.2016 v 03:42 Nicolas Pitre napsal(a):
-> >>> +# Filter out exported kernel symbol names from the preprocessor output.
-> >>> +# See also __KSYM_DEPS__ in include/linux/export.h.
-> >>> +# We disable the depfile generation here, so as not to overwrite the existing
-> >>> +# depfile while fixdep is parsing it
-> >>> +flags_nodeps = $(filter-out -Wp$(comma)-M%, $($(1)))
-> >>> +ksym_dep_filter =                                                            \
-> >>> +	case "$(1)" in                                                       \
-> >>> +	cc_*_c) $(CPP) $(call flags_nodeps,c_flags) -D__KSYM_DEPS__ $< ;;    \
-> >>> +	as_*_S) $(CPP) $(call flags_nodeps,a_flags) -D__KSYM_DEPS__ $< ;;    \
-> >>> +	cpp_lds_S) : ;;                                                      \
-> >>> +	*) echo "Don't know how to preprocess $(1)" >&2; false ;;            \
-> >>> +	esac | sed -rn 's/^.*=== __KSYM_(.*) ===.*$$/KSYM_\1/p'
-> >>> +
-> >>> +cmd_and_fixdep =                                                             \
-> >>> +	$(echo-cmd) $(cmd_$(1));                                             \
-> >>> +	$(ksym_dep_filter) |                                                 \
-> >>> +		scripts/basic/fixdep -e $(depfile) $@ '$(make-cmd)'          \
-> >>> +			> $(dot-target).tmp;	                             \
-> >>> +	rm -f $(depfile);                                                    \
-> >>> +	mv -f $(dot-target).tmp $(dot-target).cmd;
-> >>> +
-> >>> +endif
-> >>
-> >> Not sure what happened this time, but I got
-> >>
-> >> drivers/md/.dm-round-robin.mod.o.cmd:5: *** unterminated call to
-> >> function 'wildcard': missing ')'.  Stop.
-> >>
-> >> The depfile is indeed corrupt (truncated):
-> >> tail drivers/md/.dm-round-robin.mod.o.cmd
-> >>   arch/x86/include/asm/disabled-features.h \
-> >>     $(wildcard include/config/x86/intel/mpx.h) \
-> >>   arch/x86/include/asm/rmwcc.h \
-> >>   arch/x86/include/asm/barrier.h \
-> >>     $(wildcard include/config/x86/ppro/fence.h) \
-> >>   arch/x86/include/asm/nops.h \
-> >>     $(wildcard include/config/mk7.h) \
-> >>   include/asm-generic/barrier.h \
-> >>   include/asm-generic/bitops/find.h \
-> >>     $(wildcard include/config/generic/
-> >>
-> >> The file is exactly 8kB long:
-> >> $ ls -l drivers/md/.dm-round-robin.mod.o.cmd
-> >> -rw-r--r-- 1 mmarek users 8192 Mar  8 13:33
-> >> drivers/md/.dm-round-robin.mod.o.cmd
-> > 
-> > [...]
-> > 
-> >> Forgot to add: This was an allmodconfig build without
-> >> CONFIG_TRIM_UNUSED_SYMS.
-> > 
-> > If CONFIG_TRIM_UNUSED_SYMS is actually not selected, then I really don't 
-> > see how my changes can be involved in this failure.
-> 
-> I have no idea either.
-> 
-> 
-> > And I cannot reproduce here so far. I didn't receive anything from 
-> > kbuild test robot since February 15 either. Is this something that you 
-> > are able to reproduce on your side?
-> 
-> I started a build loop now.
-> 
-> 
-> > If so, do you get suspicious output on stderr during the build?  Maybe 
-> > fixdep exits prematurelywith "fixdep: bad data on stdin"?  However, that 
-> > cannot happen if CONFIG_TRIM_UNUSED_SYMS=n.
-> > 
-> > Did you test my git branch, or did you apply the posted patches to your 
-> > tree?  If the later, could you publish a branch for it so I could test 
-> > the same tree as you do?
-> 
-> I applied the patches to my -rc1 based kbuild branch and yes, there was
-> a conflict with 2aedcd098a94 ("kbuild: suppress annoying "... is up to
-> date." message"). So it's possible that I screwed it up. I pushed the
-> branch to
-> 
-> git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git
-> tmp.autoksyms6
+Add the unexpected data itself to this warning. That makes it easier to
+discover what is actually going wrong:
+     .config:6911:warning: unexpected data: CONFOG_CHARGER_TPS65217=m
 
-As far as I can see, the conflict resolution is correct.
+Signed-off-by: Paul Bolle <pebolle@tiscali.nl>
+---
+This v2 uses strcspn, as Michal suggesed. That turns a two patch series into a
+more elegant oneliner. It apparently pays off to know what string.h has to
+offer!
 
-Testing your branch now. No failure so far.
+ scripts/kconfig/confdata.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-I did notice spurious error messages after cleaning my build tree.  
-They're unrelated to your failure case though. Regardless, here's a 
-patch to silence them.
+diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+index 0b7dc2fd7bac..6e22176cd6d6 100644
+--- a/scripts/kconfig/confdata.c
++++ b/scripts/kconfig/confdata.c
+@@ -377,7 +377,9 @@ load:
+ 				continue;
+ 		} else {
+ 			if (line[0] != '\r' && line[0] != '\n')
+-				conf_warning("unexpected data");
++				conf_warning("unexpected data: %.*s",
++					     (int)strcspn(line, "\r\n"), line);
++
+ 			continue;
+ 		}
+ setsym:
+-- 
+2.4.3
 
------ >8
-From: Nicolas Pitre <nicolas.pitre@linaro.org>
-Subject: kbuild: don't complain about existing if_changed_dep targets
-
-There are more if_changed_dep cases for which we know there is no
-ksyms to parse. Add them to the list.
-
-Also add a full stop to the comment.
-
-Signed-off-by: Nicolas Pitre <nico@linaro.org>
-
-diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index f8631a935e..a09927e027 100644
---- a/scripts/Kbuild.include
-+++ b/scripts/Kbuild.include
-@@ -271,13 +271,13 @@ else
- # Filter out exported kernel symbol names from the preprocessor output.
- # See also __KSYM_DEPS__ in include/linux/export.h.
- # We disable the depfile generation here, so as not to overwrite the existing
--# depfile while fixdep is parsing it
-+# depfile while fixdep is parsing it.
- flags_nodeps = $(filter-out -Wp$(comma)-M%, $($(1)))
- ksym_dep_filter =                                                            \
- 	case "$(1)" in                                                       \
- 	cc_*_c) $(CPP) $(call flags_nodeps,c_flags) -D__KSYM_DEPS__ $< ;;    \
- 	as_*_S) $(CPP) $(call flags_nodeps,a_flags) -D__KSYM_DEPS__ $< ;;    \
--	cpp_lds_S) : ;;                                                      \
-+	boot*|build*|*cpp_lds_S|dtc|host*|vdso*) : ;;                        \
- 	*) echo "Don't know how to preprocess $(1)" >&2; false ;;            \
- 	esac | sed -rn 's/^.*=== __KSYM_(.*) ===.*$$/KSYM_\1/p'
- 
