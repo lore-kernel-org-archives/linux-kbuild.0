@@ -1,96 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from benson.default.arb33.uk0.bigv.io ([46.43.0.16]:44482 "EHLO
-	benson.default.arb33.uk0.bigv.io" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S932130AbcCPJ3N (ORCPT
+Received: from lb2-smtp-cloud3.xs4all.net ([194.109.24.26]:50799 "EHLO
+	lb2-smtp-cloud3.xs4all.net" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S966245AbcCPKxo (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 16 Mar 2016 05:29:13 -0400
-Message-ID: <1458118474.28250.54.camel@debian.org>
-Subject: dtbs_install recursing on subdirs-y and dtbs-subdir leading to race?
-From: Ian Campbell <ijc@debian.org>
-Date: Wed, 16 Mar 2016 08:54:34 +0000
-Content-Type: text/plain; charset="ISO-8859-1"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
+	Wed, 16 Mar 2016 06:53:44 -0400
+From: Paul Bolle <pebolle@tiscali.nl>
+Subject: [PATCH 2/2] kconfig: add unexpected data itself to warning
+Date: Wed, 16 Mar 2016 11:53:39 +0100
+Message-Id: <1458125619-28093-2-git-send-email-pebolle@tiscali.nl>
+In-Reply-To: <1458125619-28093-1-git-send-email-pebolle@tiscali.nl>
+References: <1458125619-28093-1-git-send-email-pebolle@tiscali.nl>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>
-Cc: devicetree@vger.kernel.org, debian-kernel <debian-kernel@lists.debian.org>, linux-arm-kernel@lists.infradead.org, Ben Hutchings <ben@decadent.org.uk>, Robert Richter <rrichter@cavium.com>, Will Deacon <will.deacon@arm.com>, Catalin Marinas <catalin.marinas@arm.com>
+To: Michal Marek <mmarek@suse.com>
+Cc: Josh Boyer <jwboyer@fedoraproject.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hello,
+If the .config parser runs into unexpected data it emits a warnings like
+    .config:6911:warning: unexpected data
 
-As part of an automated build of the Debian Linux kernel packages I
-think we have observed a race (or at least some unexpected extra
-recursion) in the handling of dtb-subdirs vs subdirs-y in
-arch/arm64/boot/dts when using make -j<N>.
+Add the unexpected data itself to the warning too, to make it easier to
+discover what is going wrong:
+     .config:6911:warning: unexpected data: CONFOG_CHARGER_TPS65217=m
 
-Looking at the log at [0] and removing the unrelated stuff happening
-due to other parallelism we see:
+Signed-off-by: Paul Bolle <pebolle@tiscali.nl>
+---
+ scripts/kconfig/confdata.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-    make[8]: Nothing to be done for '__dtbs_install'.
-mv: cannot stat '/«PKGBUILDDIR»/debian/linux-image-4.5.0-rc7-arm64/usr/lib/linux-image-4.5.0-rc7-arm64': No such file or directory
-mv: cannot stat '/«PKGBUILDDIR»/debian/linux-image-4.5.0-rc7-arm64/usr/lib/linux-image-4.5.0-rc7-arm64': No such file or directory
-/«PKGBUILDDIR»/scripts/Makefile.dtbinst:26: recipe for target '__dtbs_install_prep' failed
-make[8]: *** [__dtbs_install_prep] Error 1
-/«PKGBUILDDIR»/scripts/Makefile.dtbinst:26: recipe for target '__dtbs_install_prep' failed
-make[8]: *** [__dtbs_install_prep] Error 1
-  INSTALL net/bridge/netfilter/ebtable_nat.ko
-/«PKGBUILDDIR»/scripts/Makefile.dtbinst:46: recipe for target 'apm' failed
-make[7]: *** [apm] Error 2
-make[7]: *** Waiting for unfinished jobs....
-/«PKGBUILDDIR»/scripts/Makefile.dtbinst:46: recipe for target 'arm' failed
-make[7]: *** [arm] Error 2
-make[8]: Nothing to be done for '__dtbs_install'.
-arch/arm64/Makefile:103: recipe for target 'dtbs_install' failed
-make[6]: *** [dtbs_install] Error 2
-Makefile:146: recipe for target 'sub-make' failed
-make[5]: *** [sub-make] Error 2
-Makefile:24: recipe for target '__sub-make' failed
-make[4]: *** [__sub-make] Error 2
-make[4]: Leaving directory '/«PKGBUILDDIR»/debian/build/build_arm64_none_arm64'
-debian/rules.real:394: recipe for target 'install-image_arm64_none_arm64_dt' failed
-make[3]: *** [install-image_arm64_none_arm64_dt] Error 2
-make[3]: Leaving directory '/«PKGBUILDDIR»'
-debian/rules.real:362: recipe for target 'install-image_arm64_none_arm64' failed
-make[2]: *** [install-image_arm64_none_arm64] Error 2
-make[2]: *** Waiting for unfinished jobs....
+diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
+index 51904c423411..62df2594bc24 100644
+--- a/scripts/kconfig/confdata.c
++++ b/scripts/kconfig/confdata.c
+@@ -398,8 +398,12 @@ load:
+ 			if (conf_set_sym_val(sym, def, def_flags, p))
+ 				continue;
+ 		} else {
+-			if (line[0] != '\r' && line[0] != '\n')
+-				conf_warning("unexpected data");
++			if (line[0] != '\r' && line[0] != '\n') {
++				char *tmp = chomp(line);
++
++				conf_warning("unexpected data: %s", tmp);
++				free(tmp);
++			}
+ 			continue;
+ 		}
+ setsym:
+-- 
+2.4.3
 
-Where it appears that multiple instance of __dtbs_install_prep have
-been running in parallel at least the apm and arm subdirectories of
-arch/arm64/boot/dts, with both of them then racing in the 
-    $(Q)if [ -d $(INSTALL_DTBS_PATH) ]; then mv $(INSTALL_DTBS_PATH) $(INSTALL_DTBS_PATH).old; fi
-rule since apparently $(INSTALL_DTBS_PATH) existed during the "-d"
-check but had gone by the time of the move. The build is in an
-automated buildd pristine environment with INSTALL_DTBS_PATH pointing
-to a brand new directory, so for $(INSTALL_DTBS_PATH) to exist at all
-there must have been a third instance of __dtbs_install_prep earlier
-which created it.
-
-I understand that the mv bit of the rule in question is likely to be
-removed quite soon[1] but I think the underlying race / extra recursion
-still exits and might have other implications.
-
-Ben and I have hypothesised that this is because
-arch/arm64/boot/dts/Makefile has:
-
-    subdir-y        := $(dts-dirs)
-
-which means that dtbs_install recurses twice, once due to the dts-dirs
-handling in scripts/Makefile.dtbinst rules (via $(dtbsinst-dirs)) and
-once again for the (generic) subdir-y handling. BTW many of the subdir
-Makefiles have the same construct, I'm not sure why since they have no
-sub-sub-dirs, although it seems more harmless in that context.
-
-By my reading the __dtbs_install_prep rule is supposed to run once as
-part of arch/*/boot/dts/Makefile and not as part of any each of the
-subdirectories.
-
-I've experimented with removing the subdir-y assignment, but that seems
-to break the dtbs and clean rules.
-
-I'm not sure how else this can/should be fixed with Kbuild. Any ideas?
-
-Thanks,
-Ian.
-
-[0] https://buildd.debian.org/status/fetch.php?pkg=linux&arch=arm64&ver=4.5~rc7-1~exp1&stamp=1457444794
-[1] https://git.kernel.org/cgit/linux/kernel/git/mmarek/kbuild.git/commit/?id=5399eb9b39081d6d2fc1a13d4ea85f1ceb2c8b44
