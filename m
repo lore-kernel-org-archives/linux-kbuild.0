@@ -1,98 +1,148 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from r00tworld.com ([212.85.137.150]:58300 "EHLO r00tworld.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S934199AbcCPMuP (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 16 Mar 2016 08:50:15 -0400
-From: "PaX Team" <pageexec@freemail.hu>
-Date: Wed, 16 Mar 2016 13:49:52 +0100
+Received: from mail-qg0-f53.google.com ([209.85.192.53]:35489 "EHLO
+	mail-qg0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S966843AbcCPPFq (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 16 Mar 2016 11:05:46 -0400
+Received: by mail-qg0-f53.google.com with SMTP id y89so45630033qge.2
+        for <linux-kbuild@vger.kernel.org>; Wed, 16 Mar 2016 08:05:45 -0700 (PDT)
+Date: Wed, 16 Mar 2016 11:05:43 -0400 (EDT)
+From: Nicolas Pitre <nicolas.pitre@linaro.org>
+Subject: Re: [PATCH v6 5/8] kbuild: add fine grained build dependencies for
+ exported symbols
+In-Reply-To: <56E9518E.1020206@suse.com>
+Message-ID: <alpine.LFD.2.20.1603161050160.30579@knanqh.ubzr>
+References: <1457923336-2732-1-git-send-email-nicolas.pitre@linaro.org> <1457923336-2732-6-git-send-email-nicolas.pitre@linaro.org> <56E8718E.9010607@suse.com> <fvfraWW5gnPSEfvfsaDPXE@videotron.ca> <alpine.LFD.2.20.1603151853410.30579@knanqh.ubzr>
+ <56E9518E.1020206@suse.com>
 MIME-Version: 1.0
-Subject: Re: [PATCH v5 2/5] GCC plugin infrastructure
-Reply-to: pageexec@freemail.hu
-Message-ID: <56E95670.32699.2E48F0FA@pageexec.freemail.hu>
-In-reply-to: <CAK7LNAQjjTdkO454bL9h=ad_LzCnW_s4qO9gJmOUvVCH_1b+GQ@mail.gmail.com>
-References: <20160307000208.1bec3e7dc874489d1b4fcbb4@gmail.com>, <56E72C58.28997.25D483C7@pageexec.freemail.hu>, <CAK7LNAQjjTdkO454bL9h=ad_LzCnW_s4qO9gJmOUvVCH_1b+GQ@mail.gmail.com>
-Content-type: text/plain; charset=US-ASCII
-Content-transfer-encoding: 7BIT
-Content-description: Mail message body
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Emese Revfy <re.emese@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, spender@grsecurity.net, kernel-hardening@lists.openwall.com, Michal Marek <mmarek@suse.com>, Kees Cook <keescook@chromium.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, fengguang.wu@intel.com, Dmitry Vyukov <dvyukov@google.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Michal Marek <mmarek@suse.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 16 Mar 2016 at 16:34, Masahiro Yamada wrote:
+On Wed, 16 Mar 2016, Michal Marek wrote:
 
-Hi,
-
-> >> As mentioned above, I want you to use "..." style
-> >> when you need to use relative path from the source.
+> On 2016-03-16 00:14, Nicolas Pitre wrote:
+> > On Tue, 15 Mar 2016, Michal Marek wrote:
+> > 
+> >> Dne 14.3.2016 v 03:42 Nicolas Pitre napsal(a):
+> >>> +# Filter out exported kernel symbol names from the preprocessor output.
+> >>> +# See also __KSYM_DEPS__ in include/linux/export.h.
+> >>> +# We disable the depfile generation here, so as not to overwrite the existing
+> >>> +# depfile while fixdep is parsing it
+> >>> +flags_nodeps = $(filter-out -Wp$(comma)-M%, $($(1)))
+> >>> +ksym_dep_filter =                                                            \
+> >>> +	case "$(1)" in                                                       \
+> >>> +	cc_*_c) $(CPP) $(call flags_nodeps,c_flags) -D__KSYM_DEPS__ $< ;;    \
+> >>> +	as_*_S) $(CPP) $(call flags_nodeps,a_flags) -D__KSYM_DEPS__ $< ;;    \
+> >>> +	cpp_lds_S) : ;;                                                      \
+> >>> +	*) echo "Don't know how to preprocess $(1)" >&2; false ;;            \
+> >>> +	esac | sed -rn 's/^.*=== __KSYM_(.*) ===.*$$/KSYM_\1/p'
+> >>> +
+> >>> +cmd_and_fixdep =                                                             \
+> >>> +	$(echo-cmd) $(cmd_$(1));                                             \
+> >>> +	$(ksym_dep_filter) |                                                 \
+> >>> +		scripts/basic/fixdep -e $(depfile) $@ '$(make-cmd)'          \
+> >>> +			> $(dot-target).tmp;	                             \
+> >>> +	rm -f $(depfile);                                                    \
+> >>> +	mv -f $(dot-target).tmp $(dot-target).cmd;
+> >>> +
+> >>> +endif
 > >>
-> >> I do not see most of them in tools/gcc/.
-> >
-> > no, that'd be incorrect for several reasons. first, the rule to use <...> vs. "..."
-> > include directives is not about the header being in the same directory but whether
-> > the header is a system header or one provided by the given program. roughly speaking,
-> > system headers are those that are available through the compiler's default include
-> > paths (gcc's own headers, those of glibc and other libraries under /usr/include, etc).
-> > gcc plugin headers are *not* available by default, one has to query the compiler about
-> > their path (see -print-file-name=plugin above) and explicitly add it to the compiler's
-> > include search path.
+> >> Not sure what happened this time, but I got
+> >>
+> >> drivers/md/.dm-round-robin.mod.o.cmd:5: *** unterminated call to
+> >> function 'wildcard': missing ')'.  Stop.
+> >>
+> >> The depfile is indeed corrupt (truncated):
+> >> tail drivers/md/.dm-round-robin.mod.o.cmd
+> >>   arch/x86/include/asm/disabled-features.h \
+> >>     $(wildcard include/config/x86/intel/mpx.h) \
+> >>   arch/x86/include/asm/rmwcc.h \
+> >>   arch/x86/include/asm/barrier.h \
+> >>     $(wildcard include/config/x86/ppro/fence.h) \
+> >>   arch/x86/include/asm/nops.h \
+> >>     $(wildcard include/config/mk7.h) \
+> >>   include/asm-generic/barrier.h \
+> >>   include/asm-generic/bitops/find.h \
+> >>     $(wildcard include/config/generic/
+> >>
+> >> The file is exactly 8kB long:
+> >> $ ls -l drivers/md/.dm-round-robin.mod.o.cmd
+> >> -rw-r--r-- 1 mmarek users 8192 Mar  8 13:33
+> >> drivers/md/.dm-round-robin.mod.o.cmd
+> > 
+> > [...]
+> > 
+> >> Forgot to add: This was an allmodconfig build without
+> >> CONFIG_TRIM_UNUSED_SYMS.
+> > 
+> > If CONFIG_TRIM_UNUSED_SYMS is actually not selected, then I really don't 
+> > see how my changes can be involved in this failure.
 > 
-> Are you sure?
-
-sure about which part? ;) the use of <...> vs "..." is a matter of convention (to
-differentiate between 'system' headers from the program's own) and for gcc the plugin
-headers don't count as 'system' headers, gcc uses "..." throughout its codebase itself
-(so does clang/llvm). it'd look weird and inconsistent if compiler plugins used <...>.
-
-at the end of the day this comes down to whether gcc plugins are considered kernel
-code and thus the kernel style applies to them (the kernel itself uses <...> because
-it's a freestanding program so its 'system' headers are mostly what it provides
-itself, not those of the compiler let alone userland libs) or gcc extensions and thus
-the gcc include style applies to them. as you can guess, i'm arguing for the latter,
-because gcc plugins are meant for the compiler, not the kernel per se, and in fact
-we have several plugins already that can be used in userland as well (e.g., Emese's
-size overflow plugin).
-
-the one thing for plugins that i borrowed from the kernel instead of gcc is the code
-formatting style as the GNU one is as bad as Linus argued decades ago ;).
-
-> > second, regardless of whether plugin headers are available by default or not, we
-> > still couldn't use them during cross-compilation as the plugin headers we want are
-> > those of the target compiler (that will load the plugin eventually), not that of
-> > the host compiler (which merely compiles the plugin and in theory doesn't even have
-> > to be gcc or a plugin capable gcc).
+> I have no idea either.
 > 
-> So, how could this be the reason why we should avoid #include <file>?
-
-because <...> is meant for headers that are on the compiler's default search path
-and even if gcc plugin headers were there (they aren't) they'd be the wrong ones
-to use, you'd have to specifically override the include path with that of the target
-compiler which is a sign that you're no longer including 'system' headers (again,
-this convention holds for hosted programs, freestanding ones don't have anything
-but 'system' headers usually).
-
-> > for these reasons the correct include directive is "..." and not <...>. if it helps
-> > to understand the situation better, consider that gcc plugins are to gcc as kernel
-> > modules are to vmlinux and all kernel headers are included via "..." as well, regardless
-                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-sorry, i take that back, the kernel uses <...> but for a reason that in my opinion
-doesn't apply to compiler plugins (see above).
-
-> > of whether they're in the same directory or not.
 > 
-> Of course, you could use #include "..." as well to include kernel headers,
-> but you should not do that.
+> > And I cannot reproduce here so far. I didn't receive anything from 
+> > kbuild test robot since February 15 either. Is this something that you 
+> > are able to reproduce on your side?
 > 
-> You should do so only when you need to include headers that are local
-> to your directory.
+> I started a build loop now.
+> 
+> 
+> > If so, do you get suspicious output on stderr during the build?  Maybe 
+> > fixdep exits prematurelywith "fixdep: bad data on stdin"?  However, that 
+> > cannot happen if CONFIG_TRIM_UNUSED_SYMS=n.
+> > 
+> > Did you test my git branch, or did you apply the posted patches to your 
+> > tree?  If the later, could you publish a branch for it so I could test 
+> > the same tree as you do?
+> 
+> I applied the patches to my -rc1 based kbuild branch and yes, there was
+> a conflict with 2aedcd098a94 ("kbuild: suppress annoying "... is up to
+> date." message"). So it's possible that I screwed it up. I pushed the
+> branch to
+> 
+> git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git
+> tmp.autoksyms6
 
-sure, a header in the same directory is a sign that it's not a 'system' header but
-i'm also saying that there can be other non-system headers in a program in other
-directories as well. FWIW, the kernel itself has several "..." directives that
-reference headers outside of the same directory, e.g., try this in a kernel tree:
+As far as I can see, the conflict resolution is correct.
 
-  grep "#include.*\"\." -rn
+Testing your branch now. No failure so far.
 
-cheers,
- PaX Team
+I did notice spurious error messages after cleaning my build tree.  
+They're unrelated to your failure case though. Regardless, here's a 
+patch to silence them.
 
+----- >8
+From: Nicolas Pitre <nicolas.pitre@linaro.org>
+Subject: kbuild: don't complain about existing if_changed_dep targets
+
+There are more if_changed_dep cases for which we know there is no
+ksyms to parse. Add them to the list.
+
+Also add a full stop to the comment.
+
+Signed-off-by: Nicolas Pitre <nico@linaro.org>
+
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index f8631a935e..a09927e027 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -271,13 +271,13 @@ else
+ # Filter out exported kernel symbol names from the preprocessor output.
+ # See also __KSYM_DEPS__ in include/linux/export.h.
+ # We disable the depfile generation here, so as not to overwrite the existing
+-# depfile while fixdep is parsing it
++# depfile while fixdep is parsing it.
+ flags_nodeps = $(filter-out -Wp$(comma)-M%, $($(1)))
+ ksym_dep_filter =                                                            \
+ 	case "$(1)" in                                                       \
+ 	cc_*_c) $(CPP) $(call flags_nodeps,c_flags) -D__KSYM_DEPS__ $< ;;    \
+ 	as_*_S) $(CPP) $(call flags_nodeps,a_flags) -D__KSYM_DEPS__ $< ;;    \
+-	cpp_lds_S) : ;;                                                      \
++	boot*|build*|*cpp_lds_S|dtc|host*|vdso*) : ;;                        \
+ 	*) echo "Don't know how to preprocess $(1)" >&2; false ;;            \
+ 	esac | sed -rn 's/^.*=== __KSYM_(.*) ===.*$$/KSYM_\1/p'
+ 
