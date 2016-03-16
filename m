@@ -1,49 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lb2-smtp-cloud3.xs4all.net ([194.109.24.26]:47154 "EHLO
-	lb2-smtp-cloud3.xs4all.net" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S967119AbcCPU1b (ORCPT
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:34716 "EHLO
+	mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755856AbcCPVIL (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 16 Mar 2016 16:27:31 -0400
-From: Paul Bolle <pebolle@tiscali.nl>
-Subject: [PATCH v2] kconfig: add unexpected data itself to warning
-Date: Wed, 16 Mar 2016 21:27:27 +0100
-Message-Id: <1458160047-8292-1-git-send-email-pebolle@tiscali.nl>
+	Wed, 16 Mar 2016 17:08:11 -0400
+Date: Wed, 16 Mar 2016 22:06:02 +0100
+From: Emese Revfy <re.emese@gmail.com>
+Subject: Re: [PATCH v5 2/5] GCC plugin infrastructure
+Message-Id: <20160316220602.5269b38c162daa97f3cbe044@gmail.com>
+In-Reply-To: <CAK7LNARDyW3Si45rUaUpHhhmqO4hmN-mTdVK4zxqg23cuByAtQ@mail.gmail.com>
+References: <20160307000208.1bec3e7dc874489d1b4fcbb4@gmail.com>
+	<20160307000427.c82f18670568e1e656fc9532@gmail.com>
+	<CAK7LNASCOaEi46+b7Obt0D6GtiBmCfwBEkdbYSnpBDzzQOXpvA@mail.gmail.com>
+	<20160314215217.7fa20e0c85bfda75dc11b70c@gmail.com>
+	<CAK7LNARDyW3Si45rUaUpHhhmqO4hmN-mTdVK4zxqg23cuByAtQ@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>
-Cc: Josh Boyer <jwboyer@fedoraproject.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, pageexec@freemail.hu, spender@grsecurity.net, kernel-hardening@lists.openwall.com, Michal Marek <mmarek@suse.com>, Kees Cook <keescook@chromium.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, fengguang.wu@intel.com, Dmitry Vyukov <dvyukov@google.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-If the .config parser runs into unexpected data it emits warnings like:
-    .config:6911:warning: unexpected data
+On Wed, 16 Mar 2016 16:41:36 +0900
+Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
 
-Add the unexpected data itself to this warning. That makes it easier to
-discover what is actually going wrong:
-     .config:6911:warning: unexpected data: CONFOG_CHARGER_TPS65217=m
+> > The scripts name also doesn't describe gcc plugins well.
+> 
+> With my suggestion "scripts/gcc-plugins/",
+> the sub-directory name describes it very well.
+> 
+> 
+> > Plugins take part in the image building process
+> > in a different way than these tools and scripts do.
+> > Since there doesn't seen to be a good place for compiler plugins, maybe we should create a new toplevel directory
+> > called "build". Compiler plugins and other existing build tools could live there. What do you think?
+> 
+> In my understanding, they are plug-in'ed into the cross-compiler that
+> compiles vmlinux.
+> 
+> If so, GCC plugins should be happy in "scripts/"
+> because Kbuild descends into "scripts/" before building any objects for vmlinux.
 
-Signed-off-by: Paul Bolle <pebolle@tiscali.nl>
----
-This v2 uses strcspn, as Michal suggesed. That turns a two patch series into a
-more elegant oneliner. It apparently pays off to know what string.h has to
-offer!
+Ok, I'll move them under scripts/ in the next patch set.
 
- scripts/kconfig/confdata.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/scripts/kconfig/confdata.c b/scripts/kconfig/confdata.c
-index 0b7dc2fd7bac..6e22176cd6d6 100644
---- a/scripts/kconfig/confdata.c
-+++ b/scripts/kconfig/confdata.c
-@@ -377,7 +377,9 @@ load:
- 				continue;
- 		} else {
- 			if (line[0] != '\r' && line[0] != '\n')
--				conf_warning("unexpected data");
-+				conf_warning("unexpected data: %.*s",
-+					     (int)strcspn(line, "\r\n"), line);
-+
- 			continue;
- 		}
- setsym:
 -- 
-2.4.3
-
+Emese
