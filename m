@@ -1,47 +1,96 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from benson.default.arb33.uk0.bigv.io ([46.43.0.16]:44371 "EHLO
+Received: from benson.default.arb33.uk0.bigv.io ([46.43.0.16]:44482 "EHLO
 	benson.default.arb33.uk0.bigv.io" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S965067AbcCPJNH (ORCPT
+	by vger.kernel.org with ESMTP id S932130AbcCPJ3N (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 16 Mar 2016 05:13:07 -0400
-Message-ID: <1458119588.28250.61.camel@debian.org>
-Subject: Re: dtbs_install recursing on subdirs-y and dtbs-subdir leading to
- race?
+	Wed, 16 Mar 2016 05:29:13 -0400
+Message-ID: <1458118474.28250.54.camel@debian.org>
+Subject: dtbs_install recursing on subdirs-y and dtbs-subdir leading to race?
 From: Ian Campbell <ijc@debian.org>
-Date: Wed, 16 Mar 2016 09:13:08 +0000
-In-Reply-To: <20160316090449.GW19428@n2100.arm.linux.org.uk>
-References: <1458118474.28250.54.camel@debian.org>
-	 <20160316090449.GW19428@n2100.arm.linux.org.uk>
+Date: Wed, 16 Mar 2016 08:54:34 +0000
 Content-Type: text/plain; charset="ISO-8859-1"
 Mime-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Russell King - ARM Linux <linux@arm.linux.org.uk>
-Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>, devicetree@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Robert Richter <rrichter@cavium.com>, Ben Hutchings <ben@decadent.org.uk>, linux-arm-kernel@lists.infradead.org, debian-kernel <debian-kernel@lists.debian.org>
+To: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.cz>
+Cc: devicetree@vger.kernel.org, debian-kernel <debian-kernel@lists.debian.org>, linux-arm-kernel@lists.infradead.org, Ben Hutchings <ben@decadent.org.uk>, Robert Richter <rrichter@cavium.com>, Will Deacon <will.deacon@arm.com>, Catalin Marinas <catalin.marinas@arm.com>
 
-On Wed, 2016-03-16 at 09:04 +0000, Russell King - ARM Linux wrote:
-> On Wed, Mar 16, 2016 at 08:54:34AM +0000, Ian Campbell wrote:
-> > Where it appears that multiple instance of __dtbs_install_prep have
-> > been running in parallel at least the apm and arm subdirectories of
-> > arch/arm64/boot/dts, with both of them then racing in the 
-> >     $(Q)if [ -d $(INSTALL_DTBS_PATH) ]; then mv
-> $(INSTALL_DTBS_PATH) $(INSTALL_DTBS_PATH).old; fi
-> > rule since apparently $(INSTALL_DTBS_PATH) existed during the "-d"
-> > check but had gone by the time of the move.
-> 
-> I've already sent a patch several times to remove this line, I believe
-> it's finally queued for this merge window.
+Hello,
 
-Yes, as I said further down in my mail:
+As part of an automated build of the Debian Linux kernel packages I
+think we have observed a race (or at least some unexpected extra
+recursion) in the handling of dtb-subdirs vs subdirs-y in
+arch/arm64/boot/dts when using make -j<N>.
 
-    I understand that the mv bit of the rule in question is likely to be
-    removed quite soon[1] but I think the underlying race / extra recursion
-    still exits and might have other implications.
+Looking at the log at [0] and removing the unrelated stuff happening
+due to other parallelism we see:
 
-(where [1] was a link to your patch).
+    make[8]: Nothing to be done for '__dtbs_install'.
+mv: cannot stat '/«PKGBUILDDIR»/debian/linux-image-4.5.0-rc7-arm64/usr/lib/linux-image-4.5.0-rc7-arm64': No such file or directory
+mv: cannot stat '/«PKGBUILDDIR»/debian/linux-image-4.5.0-rc7-arm64/usr/lib/linux-image-4.5.0-rc7-arm64': No such file or directory
+/«PKGBUILDDIR»/scripts/Makefile.dtbinst:26: recipe for target '__dtbs_install_prep' failed
+make[8]: *** [__dtbs_install_prep] Error 1
+/«PKGBUILDDIR»/scripts/Makefile.dtbinst:26: recipe for target '__dtbs_install_prep' failed
+make[8]: *** [__dtbs_install_prep] Error 1
+  INSTALL net/bridge/netfilter/ebtable_nat.ko
+/«PKGBUILDDIR»/scripts/Makefile.dtbinst:46: recipe for target 'apm' failed
+make[7]: *** [apm] Error 2
+make[7]: *** Waiting for unfinished jobs....
+/«PKGBUILDDIR»/scripts/Makefile.dtbinst:46: recipe for target 'arm' failed
+make[7]: *** [arm] Error 2
+make[8]: Nothing to be done for '__dtbs_install'.
+arch/arm64/Makefile:103: recipe for target 'dtbs_install' failed
+make[6]: *** [dtbs_install] Error 2
+Makefile:146: recipe for target 'sub-make' failed
+make[5]: *** [sub-make] Error 2
+Makefile:24: recipe for target '__sub-make' failed
+make[4]: *** [__sub-make] Error 2
+make[4]: Leaving directory '/«PKGBUILDDIR»/debian/build/build_arm64_none_arm64'
+debian/rules.real:394: recipe for target 'install-image_arm64_none_arm64_dt' failed
+make[3]: *** [install-image_arm64_none_arm64_dt] Error 2
+make[3]: Leaving directory '/«PKGBUILDDIR»'
+debian/rules.real:362: recipe for target 'install-image_arm64_none_arm64' failed
+make[2]: *** [install-image_arm64_none_arm64] Error 2
+make[2]: *** Waiting for unfinished jobs....
 
-I still think it is unexpected (or at least unintended) that this rune
-is run in all subdirectories.
+Where it appears that multiple instance of __dtbs_install_prep have
+been running in parallel at least the apm and arm subdirectories of
+arch/arm64/boot/dts, with both of them then racing in the 
+    $(Q)if [ -d $(INSTALL_DTBS_PATH) ]; then mv $(INSTALL_DTBS_PATH) $(INSTALL_DTBS_PATH).old; fi
+rule since apparently $(INSTALL_DTBS_PATH) existed during the "-d"
+check but had gone by the time of the move. The build is in an
+automated buildd pristine environment with INSTALL_DTBS_PATH pointing
+to a brand new directory, so for $(INSTALL_DTBS_PATH) to exist at all
+there must have been a third instance of __dtbs_install_prep earlier
+which created it.
 
+I understand that the mv bit of the rule in question is likely to be
+removed quite soon[1] but I think the underlying race / extra recursion
+still exits and might have other implications.
+
+Ben and I have hypothesised that this is because
+arch/arm64/boot/dts/Makefile has:
+
+    subdir-y        := $(dts-dirs)
+
+which means that dtbs_install recurses twice, once due to the dts-dirs
+handling in scripts/Makefile.dtbinst rules (via $(dtbsinst-dirs)) and
+once again for the (generic) subdir-y handling. BTW many of the subdir
+Makefiles have the same construct, I'm not sure why since they have no
+sub-sub-dirs, although it seems more harmless in that context.
+
+By my reading the __dtbs_install_prep rule is supposed to run once as
+part of arch/*/boot/dts/Makefile and not as part of any each of the
+subdirectories.
+
+I've experimented with removing the subdir-y assignment, but that seems
+to break the dtbs and clean rules.
+
+I'm not sure how else this can/should be fixed with Kbuild. Any ideas?
+
+Thanks,
 Ian.
+
+[0] https://buildd.debian.org/status/fetch.php?pkg=linux&arch=arm64&ver=4.5~rc7-1~exp1&stamp=1457444794
+[1] https://git.kernel.org/cgit/linux/kernel/git/mmarek/kbuild.git/commit/?id=5399eb9b39081d6d2fc1a13d4ea85f1ceb2c8b44
