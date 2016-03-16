@@ -1,48 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f67.google.com ([74.125.82.67]:34716 "EHLO
-	mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755856AbcCPVIL (ORCPT
+Received: from mail-vk0-f47.google.com ([209.85.213.47]:35752 "EHLO
+	mail-vk0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S934565AbcCPX1u (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 16 Mar 2016 17:08:11 -0400
-Date: Wed, 16 Mar 2016 22:06:02 +0100
-From: Emese Revfy <re.emese@gmail.com>
-Subject: Re: [PATCH v5 2/5] GCC plugin infrastructure
-Message-Id: <20160316220602.5269b38c162daa97f3cbe044@gmail.com>
-In-Reply-To: <CAK7LNARDyW3Si45rUaUpHhhmqO4hmN-mTdVK4zxqg23cuByAtQ@mail.gmail.com>
-References: <20160307000208.1bec3e7dc874489d1b4fcbb4@gmail.com>
-	<20160307000427.c82f18670568e1e656fc9532@gmail.com>
-	<CAK7LNASCOaEi46+b7Obt0D6GtiBmCfwBEkdbYSnpBDzzQOXpvA@mail.gmail.com>
-	<20160314215217.7fa20e0c85bfda75dc11b70c@gmail.com>
-	<CAK7LNARDyW3Si45rUaUpHhhmqO4hmN-mTdVK4zxqg23cuByAtQ@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+	Wed, 16 Mar 2016 19:27:50 -0400
+MIME-Version: 1.0
+In-Reply-To: <20160315151618.GQ29218@thunk.org>
+References: <20160314235035.GA5799@localhost.localdomain>
+	<1457999823.11972.143.camel@perches.com>
+	<20160315112458.7248d665@canb.auug.org.au>
+	<CA+ekxPU9D9dfhtzEP+bEvTthg3M_UWyY1zQHaRb0APppp-t7-g@mail.gmail.com>
+	<20160315130339.688689bd@canb.auug.org.au>
+	<20160315151618.GQ29218@thunk.org>
+Date: Wed, 16 Mar 2016 17:27:49 -0600
+Message-ID: <CA+ekxPUKXFHsUnUme2J12P8tuv5Obb3r7+vO9BOd551Uzp-btg@mail.gmail.com>
+Subject: Re: [GIT PULL v4.6] MDB Linux Kernel Debugger x86/x86_64
+From: Jeffrey Merkey <jeffmerkey@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, pageexec@freemail.hu, spender@grsecurity.net, kernel-hardening@lists.openwall.com, Michal Marek <mmarek@suse.com>, Kees Cook <keescook@chromium.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, fengguang.wu@intel.com, Dmitry Vyukov <dvyukov@google.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Theodore Ts'o <tytso@mit.edu>, Stephen Rothwell <sfr@canb.auug.org.au>, Jeffrey Merkey <jeffmerkey@gmail.com>, Joe Perches <joe@perches.com>, linux-kernel@vger.kernel.org, torvalds@linux-foundation.org, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On Wed, 16 Mar 2016 16:41:36 +0900
-Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
+On 3/15/16, Theodore Ts'o <tytso@mit.edu> wrote:
+> On Tue, Mar 15, 2016 at 01:03:39PM +1100, Stephen Rothwell wrote:
+>> We don't generally PGP (GPG) sign commits in the kernel tree (so "-S"
+>> is not required), just tags.  However we always require that anyone who
+>> handles a patch adds a Signed-off-by line to the final commit.  See
+>> Documentation/SubmittingPatches Section 11.
+>
+> In general all commits should have a Signed-Off-By line added.  Once
+> the git branch gets merged, it's hard to tell what is the final commit
+> and what isn't, and in general different commits will have different
+> people needing to vouch for the origins for the contents of that commit.
+>
+> Cheers,
+>
+> 							- Ted
+> 							
+>
 
-> > The scripts name also doesn't describe gcc plugins well.
-> 
-> With my suggestion "scripts/gcc-plugins/",
-> the sub-directory name describes it very well.
-> 
-> 
-> > Plugins take part in the image building process
-> > in a different way than these tools and scripts do.
-> > Since there doesn't seen to be a good place for compiler plugins, maybe we should create a new toplevel directory
-> > called "build". Compiler plugins and other existing build tools could live there. What do you think?
-> 
-> In my understanding, they are plug-in'ed into the cross-compiler that
-> compiles vmlinux.
-> 
-> If so, GCC plugins should be happy in "scripts/"
-> because Kbuild descends into "scripts/" before building any objects for vmlinux.
+Hi Ted,
 
-Ok, I'll move them under scripts/ in the next patch set.
+I will repost this pull request with a signed-off by line for Linus to
+consider.    I am not certain who all should be included in the review
+and I have to be careful how many email recipients I copy.   I will
+post to the folks Joe Perches copied.
 
--- 
-Emese
+Jeff
