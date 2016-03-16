@@ -1,93 +1,112 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qg0-f45.google.com ([209.85.192.45]:35865 "EHLO
-	mail-qg0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933703AbcCOXOn (ORCPT
+Received: from conssluserg003.nifty.com ([202.248.44.41]:38093 "EHLO
+	conssluserg003-v.nifty.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S932113AbcCPHeJ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 15 Mar 2016 19:14:43 -0400
-Received: by mail-qg0-f45.google.com with SMTP id u110so28872770qge.3
-        for <linux-kbuild@vger.kernel.org>; Tue, 15 Mar 2016 16:14:42 -0700 (PDT)
-Date: Tue, 15 Mar 2016 19:14:38 -0400 (EDT)
-From: Nicolas Pitre <nicolas.pitre@linaro.org>
-Subject: Re: [PATCH v6 5/8] kbuild: add fine grained build dependencies for
- exported symbols
-In-Reply-To: <fvfraWW5gnPSEfvfsaDPXE@videotron.ca>
-Message-ID: <alpine.LFD.2.20.1603151853410.30579@knanqh.ubzr>
-References: <1457923336-2732-1-git-send-email-nicolas.pitre@linaro.org> <1457923336-2732-6-git-send-email-nicolas.pitre@linaro.org> <56E8718E.9010607@suse.com> <fvfraWW5gnPSEfvfsaDPXE@videotron.ca>
+	Wed, 16 Mar 2016 03:34:09 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <56E72C58.28997.25D483C7@pageexec.freemail.hu>
+References: <20160307000208.1bec3e7dc874489d1b4fcbb4@gmail.com>
+	<20160307000427.c82f18670568e1e656fc9532@gmail.com>
+	<CAK7LNASCOaEi46+b7Obt0D6GtiBmCfwBEkdbYSnpBDzzQOXpvA@mail.gmail.com>
+	<56E72C58.28997.25D483C7@pageexec.freemail.hu>
+Date: Wed, 16 Mar 2016 16:34:02 +0900
+Message-ID: <CAK7LNAQjjTdkO454bL9h=ad_LzCnW_s4qO9gJmOUvVCH_1b+GQ@mail.gmail.com>
+Subject: Re: [PATCH v5 2/5] GCC plugin infrastructure
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>, Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: pageexec@freemail.hu
+Cc: Emese Revfy <re.emese@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, spender@grsecurity.net, kernel-hardening@lists.openwall.com, Michal Marek <mmarek@suse.com>, Kees Cook <keescook@chromium.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, fengguang.wu@intel.com, Dmitry Vyukov <dvyukov@google.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Tue, 15 Mar 2016, Michal Marek wrote:
-
-> Dne 14.3.2016 v 03:42 Nicolas Pitre napsal(a):
-> > +# Filter out exported kernel symbol names from the preprocessor output.
-> > +# See also __KSYM_DEPS__ in include/linux/export.h.
-> > +# We disable the depfile generation here, so as not to overwrite the existing
-> > +# depfile while fixdep is parsing it
-> > +flags_nodeps = $(filter-out -Wp$(comma)-M%, $($(1)))
-> > +ksym_dep_filter =                                                            \
-> > +	case "$(1)" in                                                       \
-> > +	cc_*_c) $(CPP) $(call flags_nodeps,c_flags) -D__KSYM_DEPS__ $< ;;    \
-> > +	as_*_S) $(CPP) $(call flags_nodeps,a_flags) -D__KSYM_DEPS__ $< ;;    \
-> > +	cpp_lds_S) : ;;                                                      \
-> > +	*) echo "Don't know how to preprocess $(1)" >&2; false ;;            \
-> > +	esac | sed -rn 's/^.*=== __KSYM_(.*) ===.*$$/KSYM_\1/p'
-> > +
-> > +cmd_and_fixdep =                                                             \
-> > +	$(echo-cmd) $(cmd_$(1));                                             \
-> > +	$(ksym_dep_filter) |                                                 \
-> > +		scripts/basic/fixdep -e $(depfile) $@ '$(make-cmd)'          \
-> > +			> $(dot-target).tmp;	                             \
-> > +	rm -f $(depfile);                                                    \
-> > +	mv -f $(dot-target).tmp $(dot-target).cmd;
-> > +
-> > +endif
-> 
-> Not sure what happened this time, but I got
-> 
-> drivers/md/.dm-round-robin.mod.o.cmd:5: *** unterminated call to
-> function 'wildcard': missing ')'.  Stop.
-> 
-> The depfile is indeed corrupt (truncated):
-> tail drivers/md/.dm-round-robin.mod.o.cmd
->   arch/x86/include/asm/disabled-features.h \
->     $(wildcard include/config/x86/intel/mpx.h) \
->   arch/x86/include/asm/rmwcc.h \
->   arch/x86/include/asm/barrier.h \
->     $(wildcard include/config/x86/ppro/fence.h) \
->   arch/x86/include/asm/nops.h \
->     $(wildcard include/config/mk7.h) \
->   include/asm-generic/barrier.h \
->   include/asm-generic/bitops/find.h \
->     $(wildcard include/config/generic/
-> 
-> The file is exactly 8kB long:
-> $ ls -l drivers/md/.dm-round-robin.mod.o.cmd
-> -rw-r--r-- 1 mmarek users 8192 Mar  8 13:33
-> drivers/md/.dm-round-robin.mod.o.cmd
-
-[...]
-
-> Forgot to add: This was an allmodconfig build without
-> CONFIG_TRIM_UNUSED_SYMS.
-
-If CONFIG_TRIM_UNUSED_SYMS is actually not selected, then I really don't 
-see how my changes can be involved in this failure.
-
-And I cannot reproduce here so far. I didn't receive anything from 
-kbuild test robot since February 15 either. Is this something that you 
-are able to reproduce on your side?
-
-If so, do you get suspicious output on stderr during the build?  Maybe 
-fixdep exits prematurelywith "fixdep: bad data on stdin"?  However, that 
-cannot happen if CONFIG_TRIM_UNUSED_SYMS=n.
-
-Did you test my git branch, or did you apply the posted patches to your 
-tree?  If the later, could you publish a branch for it so I could test 
-the same tree as you do?
+Hi PaX,
 
 
-Nicolas
+2016-03-15 6:25 GMT+09:00 PaX Team <pageexec@freemail.hu>:
+> On 11 Mar 2016 at 15:25, Masahiro Yamada wrote:
+>
+>> > diff --git a/scripts/gcc-plugin.sh b/scripts/gcc-plugin.sh
+>> > new file mode 100644
+>> > index 0000000..eaa4fce
+>> > --- /dev/null
+>> > +++ b/scripts/gcc-plugin.sh
+>> > @@ -0,0 +1,51 @@
+>> > +#!/bin/sh
+>> > +srctree=$(dirname "$0")
+>> > +gccplugins_dir=$($3 -print-file-name=plugin)
+>> > +plugincc=$($1 -E -x c++ - -o /dev/null -I"${srctree}"/../tools/gcc -I"${gccplugins_dir}"/include 2>&1 <<EOF
+>> > +#include "gcc-common.h"
+>>
+>>
+>> Maybe <gcc-common.h> because it is not located at the same directory?
+>
+> [snip]
+>> > +#include "emit-rtl.h"
+>> > +#include "debug.h"
+>> > +#include "target.h"
+>> > +#include "langhooks.h"
+>> > +#include "cfgloop.h"
+>> > +#include "cgraph.h"
+>> > +#include "opts.h"
+>>
+>> All of these are included by "...", not <...>.
+>>
+>>
+>> As mentioned above, I want you to use "..." style
+>> when you need to use relative path from the source.
+>>
+>> I do not see most of them in tools/gcc/.
+>
+> no, that'd be incorrect for several reasons. first, the rule to use <...> vs. "..."
+> include directives is not about the header being in the same directory but whether
+> the header is a system header or one provided by the given program. roughly speaking,
+> system headers are those that are available through the compiler's default include
+> paths (gcc's own headers, those of glibc and other libraries under /usr/include, etc).
+> gcc plugin headers are *not* available by default, one has to query the compiler about
+> their path (see -print-file-name=plugin above) and explicitly add it to the compiler's
+> include search path.
+
+Are you sure?
+
+I'd recommend you to read the following:
+https://gcc.gnu.org/onlinedocs/cpp/Search-Path.html
+
+
+scripts/gcc-plugin.sh adds
+  - ${srctree}"/../tools/gcc
+  - ${gccplugins_dir}/include
+
+to the header search path with "-I" option.
+
+
+GCC looks for headers requested with #include <file>
+in directories specified with "-I" as well as in the default ones.
+
+
+
+> second, regardless of whether plugin headers are available by default or not, we
+> still couldn't use them during cross-compilation as the plugin headers we want are
+> those of the target compiler (that will load the plugin eventually), not that of
+> the host compiler (which merely compiles the plugin and in theory doesn't even have
+> to be gcc or a plugin capable gcc).
+
+So, how could this be the reason why we should avoid #include <file>?
+
+
+
+> for these reasons the correct include directive is "..." and not <...>. if it helps
+> to understand the situation better, consider that gcc plugins are to gcc as kernel
+> modules are to vmlinux and all kernel headers are included via "..." as well, regardless
+> of whether they're in the same directory or not.
+
+Of course, you could use #include "..." as well to include kernel headers,
+but you should not do that.
+
+You should do so only when you need to include headers that are local
+to your directory.
+
+
+-- 
+Best Regards
+Masahiro Yamada
