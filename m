@@ -1,186 +1,123 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg002.nifty.com ([202.248.44.40]:60988 "EHLO
-	conssluserg002-v.nifty.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1752406AbcCQDwz (ORCPT
+Received: from conssluserg003.nifty.com ([202.248.44.41]:22875 "EHLO
+	conssluserg003-v.nifty.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1750748AbcCQEKA (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 16 Mar 2016 23:52:55 -0400
+	Thu, 17 Mar 2016 00:10:00 -0400
 MIME-Version: 1.0
-In-Reply-To: <CALCETrW2h+Rt5oEmr09Faf9OesFWYZ_SXmj=zHE4+rDYO85p6Q@mail.gmail.com>
-References: <1457828035-30584-1-git-send-email-yamada.masahiro@socionext.com>
-	<CALCETrVqzidL7SXsCVm8wWrcQMR9dFOLGnDtC-eEYMO4a+yszA@mail.gmail.com>
-	<CAK7LNARELkQbhAfBdh9Tx7gVGkpN9gTJzoqJwOF-0CH4zm+wcw@mail.gmail.com>
-	<CALCETrVgSUy4ofeBmkZ7TurKvmQVX8C1aj__SLOL6SboQ3S-WA@mail.gmail.com>
-	<CAK7LNAQOJjcn7Q+s_pKqzUuojMBtOsRNKsmVwDFXvTeU-zvSeQ@mail.gmail.com>
-	<CALCETrU+6sj=reBgPBy7Mq6KYY7BKkVLGwm4XrVzOzb8aU+meg@mail.gmail.com>
-	<CAK7LNATAeMmfwWiZha17mbyWhF6bR5RGjv+gbsQTvL4teoTiPQ@mail.gmail.com>
-	<CALCETrVNMv5XwpXTJcevVLCfTSMbsqKsjzzukoGr7VAHuumFpg@mail.gmail.com>
-	<56E87463.9020300@suse.com>
-	<CALCETrW2h+Rt5oEmr09Faf9OesFWYZ_SXmj=zHE4+rDYO85p6Q@mail.gmail.com>
-Date: Thu, 17 Mar 2016 12:52:39 +0900
-Message-ID: <CAK7LNARQogVrkpGLkmtRJpJQ1zf6m_5yBv0dy+x+_3HF9dyQxA@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: drop FORCE from PHONY targets
+In-Reply-To: <56E95670.32699.2E48F0FA@pageexec.freemail.hu>
+References: <20160307000208.1bec3e7dc874489d1b4fcbb4@gmail.com>
+	<56E72C58.28997.25D483C7@pageexec.freemail.hu>
+	<CAK7LNAQjjTdkO454bL9h=ad_LzCnW_s4qO9gJmOUvVCH_1b+GQ@mail.gmail.com>
+	<56E95670.32699.2E48F0FA@pageexec.freemail.hu>
+Date: Thu, 17 Mar 2016 13:09:37 +0900
+Message-ID: <CAK7LNATU+zh7PR6LJz6nX8grrWy55wHrikSAVStCvhspH7gnCw@mail.gmail.com>
+Subject: Re: [PATCH v5 2/5] GCC plugin infrastructure
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andy Lutomirski <luto@amacapital.net>
-Cc: Michal Marek <mmarek@suse.com>, Fenghua Yu <fenghua.yu@intel.com>, Thomas Gleixner <tglx@linutronix.de>, Russell King <linux@arm.linux.org.uk>, Ingo Molnar <mingo@redhat.com>, X86 ML <x86@kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Tony Luck <tony.luck@intel.com>, Nathan Lynch <nathan_lynch@mentor.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-ia64@vger.kernel.org" <linux-ia64@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "H. Peter Anvin" <hpa@zytor.com>
+To: pageexec@freemail.hu
+Cc: Emese Revfy <re.emese@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, spender@grsecurity.net, kernel-hardening@lists.openwall.com, Michal Marek <mmarek@suse.com>, Kees Cook <keescook@chromium.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, fengguang.wu@intel.com, Dmitry Vyukov <dvyukov@google.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-Hi Andy,
-
-2016-03-16 5:48 GMT+09:00 Andy Lutomirski <luto@amacapital.net>:
-> On Tue, Mar 15, 2016 at 1:45 PM, Michal Marek <mmarek@suse.com> wrote:
->> Dne 15.3.2016 v 19:27 Andy Lutomirski napsal(a):
->>> Fair enough, although I'm curious why this happens.  It might be worth
->>> changing the docs to say that .PHONY is *not* an substitute for FORCE
->>> in that context, then.
->>
->> These two are unrelated, except that FORCE is redundant for a .PHONY
->> target. FORCE is our idiom to tell make to always remake the target and
->> let us handle the dependencies manually. Listing a target as .PHONY
->> tells make that the target will not produce a file of the same name
->> (typically, "all", "install", etc).
->>
+2016-03-16 21:49 GMT+09:00 PaX Team <pageexec@freemail.hu>:
+> On 16 Mar 2016 at 16:34, Masahiro Yamada wrote:
 >
-> Except that apparently if-changed doesn't work on .PHONY targets that
-> don't specify FORCE, which confuses me.
+> Hi,
+>
+>> >> As mentioned above, I want you to use "..." style
+>> >> when you need to use relative path from the source.
+>> >>
+>> >> I do not see most of them in tools/gcc/.
+>> >
+>> > no, that'd be incorrect for several reasons. first, the rule to use <...> vs. "..."
+>> > include directives is not about the header being in the same directory but whether
+>> > the header is a system header or one provided by the given program. roughly speaking,
+>> > system headers are those that are available through the compiler's default include
+>> > paths (gcc's own headers, those of glibc and other libraries under /usr/include, etc).
+>> > gcc plugin headers are *not* available by default, one has to query the compiler about
+>> > their path (see -print-file-name=plugin above) and explicitly add it to the compiler's
+>> > include search path.
+>>
+>> Are you sure?
+>
+> sure about which part? ;)
+
+You said "that'd be incorrect", but
+there is no "correct" or "incorrect" in either way as long as it works.
+
+This decision varies from project to project.
+
+At least in Linux, it generally uses #include <file> style
+except ones in local directories.
+I guess it is debatable if this rule also applies to host tools or not.
 
 
-OK, I will try to explain it.
-I hope this will help you, not confuse you even more...
+> the use of <...> vs "..." is a matter of convention (to
+> differentiate between 'system' headers from the program's own) and for gcc the plugin
+> headers don't count as 'system' headers, gcc uses "..." throughout its codebase itself
+> (so does clang/llvm). it'd look weird and inconsistent if compiler plugins used <...>.
+>
+> at the end of the day this comes down to whether gcc plugins are considered kernel
+> code and thus the kernel style applies to them (the kernel itself uses <...> because
+> it's a freestanding program so its 'system' headers are mostly what it provides
+> itself, not those of the compiler let alone userland libs) or gcc extensions and thus
+> the gcc include style applies to them. as you can guess, i'm arguing for the latter,
+> because gcc plugins are meant for the compiler, not the kernel per se, and in fact
+> we have several plugins already that can be used in userland as well (e.g., Emese's
+> size overflow plugin).
+>
+> the one thing for plugins that i borrowed from the kernel instead of gcc is the code
+> formatting style as the GNU one is as bad as Linus argued decades ago ;).
+>
+>> > second, regardless of whether plugin headers are available by default or not, we
+>> > still couldn't use them during cross-compilation as the plugin headers we want are
+>> > those of the target compiler (that will load the plugin eventually), not that of
+>> > the host compiler (which merely compiles the plugin and in theory doesn't even have
+>> > to be gcc or a plugin capable gcc).
+>>
+>> So, how could this be the reason why we should avoid #include <file>?
+>
+> because <...> is meant for headers that are on the compiler's default search path
+> and even if gcc plugin headers were there (they aren't) they'd be the wrong ones
+> to use, you'd have to specifically override the include path with that of the target
+> compiler which is a sign that you're no longer including 'system' headers (again,
+> this convention holds for hosted programs, freestanding ones don't have anything
+> but 'system' headers usually).
+>
+>> > for these reasons the correct include directive is "..." and not <...>. if it helps
+>> > to understand the situation better, consider that gcc plugins are to gcc as kernel
+>> > modules are to vmlinux and all kernel headers are included via "..." as well, regardless
+>                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> sorry, i take that back, the kernel uses <...> but for a reason that in my opinion
+> doesn't apply to compiler plugins (see above).
+>
+>> > of whether they're in the same directory or not.
+>>
+>> Of course, you could use #include "..." as well to include kernel headers,
+>> but you should not do that.
+>>
+>> You should do so only when you need to include headers that are local
+>> to your directory.
+>
+> sure, a header in the same directory is a sign that it's not a 'system' header but
+> i'm also saying that there can be other non-system headers in a program in other
+> directories as well. FWIW, the kernel itself has several "..." directives that
+> reference headers outside of the same directory, e.g., try this in a kernel tree:
+>
+>   grep "#include.*\"\." -rn
+>
 
+To sum up, your suggestion for GCC plugins is
 
-I think the difference of Kbuild behavior
-comes down to "$?" behavior of GNU Make.
+  - Use #include <...> to include header files provided by the host compiler
+  - Use #include "..." to include header files provided by the cross
+compiler (plugin directory)
+  - Use #include "..." to include header files in the local project
 
+Correct?
 
-
-
-Please see the definition of "if_changed".
-
-
-if_changed = $(if $(strip $(any-prereq) $(arg-check)),                       \
-        @set -e;                                                             \
-        $(echo-cmd) $(cmd_$(1));                                             \
-        printf '%s\n' 'cmd_$@ := $(make-cmd)' > $(dot-target).cmd)
-
-
-
-The "if_changed" does some actions if "any-prereq" or "arg-check" is non-empty.
-
-
-
-Next, let's take a look at the definition of "any-prereq"
-
-any-prereq = $(filter-out $(PHONY),$?) $(filter-out $(PHONY) $(wildcard $^),$^)
-
-
-
-It seems $? makes the difference between FORCE and PHONY.
-
-
-The GNU Make manual says as follows:
--------------------->8-----------------------------------
-$?    The names of all prerequisites that are newer than the target,
-      separated by spaces.
---------------------8<-----------------------------------
-
-From this statement, it is unclear what happens to $? if the target is
-a PHONY target.
-I am not a GNU Make developer, so I have no idea about the detailed
-implementation,
-but anyway let's try simple experiments.
-
-
-
-[Example 3]
-
-Let's write a simple Makefile as follows.
-
---------------------->8---------------------
-foo: bar FORCE
-        echo $$? is "$?"
-        cp $< $@
-
-bar:
-        touch $@
-
-.PHONY: FORCE
-FORCE:
-----------------------8<--------------------
-
-yamada@beagle:~/workspace/test$ rm -f foo bar
-yamada@beagle:~/workspace/test$ make
-touch bar
-echo $? is "bar FORCE"
-0 is bar FORCE
-cp bar foo
-yamada@beagle:~/workspace/test$ make
-echo $? is ""
-0 is
-cp bar foo
-yamada@beagle:~/workspace/test$ make
-echo $? is ""
-0 is
-cp bar foo
-
-
-As we expected, $? contains the prerequisite "bar",
-but it is empty for the second run or later (because "foo" is newer than "bar").
-
-
-
-[Example 4]
-
-Let's replace the FORCE with PHONY.
-
---------------------->8---------------------
-.PHONY: foo
-foo: bar
-        echo $$? is "$?"
-        cp $< $@
-
-bar:
-        touch $@
-----------------------8<--------------------
-
-
-yamada@beagle:~/workspace/test2$ rm -f foo bar
-yamada@beagle:~/workspace/test2$ make
-touch bar
-echo $? is "bar"
-0 is bar
-cp bar foo
-yamada@beagle:~/workspace/test2$ make
-echo $? is "bar"
-0 is bar
-cp bar foo
-yamada@beagle:~/workspace/test2$ make
-echo $? is "bar"
-0 is bar
-cp bar foo
-
-
-This time, $? always contains "bar"
-nevertheless "foo" is newer than "bar" on the second run or later.
-
-
-So, it looks like GNU Make assumes that
-all the prerequisites of a PHONY target are always newer than the target.
-
-
-
-Go back to the definition of "any-prereq",
-
-any-prereq = $(filter-out $(PHONY),$?) $(filter-out $(PHONY) $(wildcard $^),$^)
-
-If the prerequisite is not a PHONY target  (like the "baz" in the
-example 2 in my former email),
-it is not filtered out from $?.  So, any-prereq is non-empty and
-if_changed updates the target.
-
-
-
+I leave the final decision to others.
 
 
 -- 
