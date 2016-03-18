@@ -1,75 +1,84 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vk0-f53.google.com ([209.85.213.53]:35244 "EHLO
-	mail-vk0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753892AbcCRFnr (ORCPT
+Received: from smtprelay4.synopsys.com ([198.182.47.9]:56937 "EHLO
+	smtprelay.synopsys.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750937AbcCRIqs (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 18 Mar 2016 01:43:47 -0400
+	Fri, 18 Mar 2016 04:46:48 -0400
+From: Vineet Gupta <Vineet.Gupta1@synopsys.com>
+Subject: [PATCH] ARC: build: Turn off -Wmaybe-uninitialized for ARC gcc 4.8
+Date: Fri, 18 Mar 2016 14:16:23 +0530
+Message-ID: <1458290783-31491-1-git-send-email-vgupta@synopsys.com>
 MIME-Version: 1.0
-In-Reply-To: <1458279643.9556.52.camel@perches.com>
-References: <20160314235035.GA5799@localhost.localdomain>
-	<1457999823.11972.143.camel@perches.com>
-	<20160315112458.7248d665@canb.auug.org.au>
-	<CA+ekxPU9D9dfhtzEP+bEvTthg3M_UWyY1zQHaRb0APppp-t7-g@mail.gmail.com>
-	<20160315130339.688689bd@canb.auug.org.au>
-	<20160315151618.GQ29218@thunk.org>
-	<CA+ekxPUKXFHsUnUme2J12P8tuv5Obb3r7+vO9BOd551Uzp-btg@mail.gmail.com>
-	<CA+ekxPUten_O4=bUnnGbOGosO3vOe4zpteuWKDatwY4i-aVB7w@mail.gmail.com>
-	<1458279643.9556.52.camel@perches.com>
-Date: Thu, 17 Mar 2016 23:43:46 -0600
-Message-ID: <CA+ekxPWrjejgJcd2bH-E2YrCseQKhxxk3teitRVgVr5ybbBrYw@mail.gmail.com>
-Subject: Re: [GIT PULL v4.6] MDB Linux Kernel Debugger x86/x86_64
-From: Jeffrey Merkey <jeffmerkey@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Joe Perches <joe@perches.com>
-Cc: Theodore Ts'o <tytso@mit.edu>, Stephen Rothwell <sfr@canb.auug.org.au>, linux-kernel@vger.kernel.org, torvalds@linux-foundation.org, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: linux-snps-arc@lists.infradead.org
+Cc: Vineet Gupta <Vineet.Gupta1@synopsys.com>, Claudiu Zissulescu <Claudiu.Zissulescu@synopsys.com>, Arnd Bergmann <arnd@arndb.de>, Michal Marek <mmarek@suse.cz>, Geert Uytterhoeven <geert@linux-m68k.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 3/17/16, Joe Perches <joe@perches.com> wrote:
-> On Thu, 2016-03-17 at 23:31 -0600, Jeffrey Merkey wrote:
->> On 3/16/16, Jeffrey Merkey <jeffmerkey@gmail.com> wrote:
->> > On 3/15/16, Theodore Ts'o <tytso@mit.edu> wrote:
->> > > On Tue, Mar 15, 2016 at 01:03:39PM +1100, Stephen Rothwell wrote:
->> > > >
->> > > > We don't generally PGP (GPG) sign commits in the kernel tree (so
->> > > > "-S"
->> > > > is not required), just tags.  However we always require that anyone
->> > > > who
->> > > > handles a patch adds a Signed-off-by line to the final commit.  See
->> > > > Documentation/SubmittingPatches Section 11.
->> > > In general all commits should have a Signed-Off-By line added.  Once
->> > > the git branch gets merged, it's hard to tell what is the final
->> > > commit
->> > > and what isn't, and in general different commits will have different
->> > > people needing to vouch for the origins for the contents of that
->> > > commit.
-> []
->> > I will repost this pull request with a signed-off by line for Linus to
->> > consider.    I am not certain who all should be included in the review
->> > and I have to be careful how many email recipients I copy.   I will
->> > post to the folks Joe Perches copied.
-> []
->> Well, Joe updated checkpatch.pl so now there are some more areas of
->> cleanup I need to do on the code to remove unsigned casts and replace
->> them with unsigned int.  I will resubmit at the next merge window for
->> 4.7.  Have not heard a word from Linus about this, Hey Linus, please
->> don't lion-us by throwing us to the lions.  :-)
->
-> I rather doubt Linus is going to pull this code during
-> this merge window.
->
-> I think you should try to get this into -next immediately
-> after this current merge window closes in a 10 or so days.
->
-> I think you don't have to do random cleanups just to
-> satisfy checkpatch.  Get the code in -next and then
-> cleanup stuff as you see fit.  There will then be
-> individual commit changelogs for the mostly whitespace
-> changes that checkpatch might point out.
->
->
+linux-next has been reporting gazillion warnings for ARC build and
+I finally decided to take a bite:
 
-OK, then I will setup a pull request for Stephen to pull against the
--next tree.   He can pull it at his convenience.
+http://kisskb.ellerman.id.au/kisskb/buildresult/12638735/
 
-Jeff
+Most of the them are due to -Wmaybe-uninitialized
+
+| ../kernel/sysctl.c: In function '__do_proc_doulongvec_minmax':
+| ../kernel/sysctl.c:1928:12: warning: 'p' may be used uninitialized in this function [-Wmaybe-uninitialized]
+|   ret = tmp - *buf;
+|            ^
+| ../kernel/sysctl.c:2342:29: note: 'p' was declared here
+|  char *kbuf = NULL, *p;
+|                     ^
+| ...
+| ...
+
+Cursory look at code seemed fine and a definite gcc false positive in say
+kernel/sysctl.c
+
+Mystery was why only for ARC (and not with ARM linaro toolchain based
+off same gcc 4.8). Turns out that -O3 (default for ARC) triggers these
+and if I enable -O3 for ARM kernel build, I see the same splat.
+
+I doubt if gcc folks are going to fix warnings in gcc 4.8 (specially when this
+was the much advertised front page feature @
+https://gcc.gnu.org/gcc-4.8/porting_to.html
+
+Better to to silent these for ARC, atleast for gcc 4.8 when we know that
+these warnings are likely benign.
+
+When we switch to later gcc, these will come back on and at that time we
+could fixing gcc and/or relevant kernel code.
+
+Cc: Claudiu Zissulescu <Claudiu.Zissulescu@synopsys.com>
+Cc: Arnd Bergmann <arnd@arndb.de>
+Cc: Michal Marek <mmarek@suse.cz>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Signed-off-by: Vineet Gupta <vgupta@synopsys.com>
+---
+ arch/arc/Makefile | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/arch/arc/Makefile b/arch/arc/Makefile
+index fed12f39d8ce..aeb101e8e674 100644
+--- a/arch/arc/Makefile
++++ b/arch/arc/Makefile
+@@ -48,9 +48,14 @@ endif
+ upto_gcc44    :=  $(call cc-ifversion, -le, 0404, y)
+ atleast_gcc44 :=  $(call cc-ifversion, -ge, 0404, y)
+ atleast_gcc48 :=  $(call cc-ifversion, -ge, 0408, y)
++is_gcc48      :=  $(call cc-ifversion, -eq, 0408, y)
+ 
+ cflags-$(atleast_gcc44)			+= -fsection-anchors
+ 
++# gcc 4.8 spits out false positives for default -O3
++# disable these for 4.8 and revisit when we upgrade to newer ver
++cflags-$(is_gcc48)			+= $(call cc-disable-warning,maybe-uninitialized,)
++
+ cflags-$(CONFIG_ARC_HAS_LLSC)		+= -mlock
+ cflags-$(CONFIG_ARC_HAS_SWAPE)		+= -mswape
+ 
+-- 
+2.5.0
+
