@@ -1,125 +1,60 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg003.nifty.com ([202.248.44.41]:22875 "EHLO
-	conssluserg003-v.nifty.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1750748AbcCQEKA (ORCPT
+Received: from mail-vk0-f49.google.com ([209.85.213.49]:33694 "EHLO
+	mail-vk0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750895AbcCRFbh (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 17 Mar 2016 00:10:00 -0400
+	Fri, 18 Mar 2016 01:31:37 -0400
 MIME-Version: 1.0
-In-Reply-To: <56E95670.32699.2E48F0FA@pageexec.freemail.hu>
-References: <20160307000208.1bec3e7dc874489d1b4fcbb4@gmail.com>
-	<56E72C58.28997.25D483C7@pageexec.freemail.hu>
-	<CAK7LNAQjjTdkO454bL9h=ad_LzCnW_s4qO9gJmOUvVCH_1b+GQ@mail.gmail.com>
-	<56E95670.32699.2E48F0FA@pageexec.freemail.hu>
-Date: Thu, 17 Mar 2016 13:09:37 +0900
-Message-ID: <CAK7LNATU+zh7PR6LJz6nX8grrWy55wHrikSAVStCvhspH7gnCw@mail.gmail.com>
-Subject: Re: [PATCH v5 2/5] GCC plugin infrastructure
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
+In-Reply-To: <CA+ekxPUKXFHsUnUme2J12P8tuv5Obb3r7+vO9BOd551Uzp-btg@mail.gmail.com>
+References: <20160314235035.GA5799@localhost.localdomain>
+	<1457999823.11972.143.camel@perches.com>
+	<20160315112458.7248d665@canb.auug.org.au>
+	<CA+ekxPU9D9dfhtzEP+bEvTthg3M_UWyY1zQHaRb0APppp-t7-g@mail.gmail.com>
+	<20160315130339.688689bd@canb.auug.org.au>
+	<20160315151618.GQ29218@thunk.org>
+	<CA+ekxPUKXFHsUnUme2J12P8tuv5Obb3r7+vO9BOd551Uzp-btg@mail.gmail.com>
+Date: Thu, 17 Mar 2016 23:31:36 -0600
+Message-ID: <CA+ekxPUten_O4=bUnnGbOGosO3vOe4zpteuWKDatwY4i-aVB7w@mail.gmail.com>
+Subject: Re: [GIT PULL v4.6] MDB Linux Kernel Debugger x86/x86_64
+From: Jeffrey Merkey <jeffmerkey@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: pageexec@freemail.hu
-Cc: Emese Revfy <re.emese@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, spender@grsecurity.net, kernel-hardening@lists.openwall.com, Michal Marek <mmarek@suse.com>, Kees Cook <keescook@chromium.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, fengguang.wu@intel.com, Dmitry Vyukov <dvyukov@google.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Theodore Ts'o <tytso@mit.edu>, Stephen Rothwell <sfr@canb.auug.org.au>, Jeffrey Merkey <jeffmerkey@gmail.com>, Joe Perches <joe@perches.com>, linux-kernel@vger.kernel.org, torvalds@linux-foundation.org, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-2016-03-16 21:49 GMT+09:00 PaX Team <pageexec@freemail.hu>:
-> On 16 Mar 2016 at 16:34, Masahiro Yamada wrote:
->
-> Hi,
->
->> >> As mentioned above, I want you to use "..." style
->> >> when you need to use relative path from the source.
->> >>
->> >> I do not see most of them in tools/gcc/.
->> >
->> > no, that'd be incorrect for several reasons. first, the rule to use <...> vs. "..."
->> > include directives is not about the header being in the same directory but whether
->> > the header is a system header or one provided by the given program. roughly speaking,
->> > system headers are those that are available through the compiler's default include
->> > paths (gcc's own headers, those of glibc and other libraries under /usr/include, etc).
->> > gcc plugin headers are *not* available by default, one has to query the compiler about
->> > their path (see -print-file-name=plugin above) and explicitly add it to the compiler's
->> > include search path.
+On 3/16/16, Jeffrey Merkey <jeffmerkey@gmail.com> wrote:
+> On 3/15/16, Theodore Ts'o <tytso@mit.edu> wrote:
+>> On Tue, Mar 15, 2016 at 01:03:39PM +1100, Stephen Rothwell wrote:
+>>> We don't generally PGP (GPG) sign commits in the kernel tree (so "-S"
+>>> is not required), just tags.  However we always require that anyone who
+>>> handles a patch adds a Signed-off-by line to the final commit.  See
+>>> Documentation/SubmittingPatches Section 11.
 >>
->> Are you sure?
->
-> sure about which part? ;)
-
-You said "that'd be incorrect", but
-there is no "correct" or "incorrect" in either way as long as it works.
-
-This decision varies from project to project.
-
-At least in Linux, it generally uses #include <file> style
-except ones in local directories.
-I guess it is debatable if this rule also applies to host tools or not.
-
-
-> the use of <...> vs "..." is a matter of convention (to
-> differentiate between 'system' headers from the program's own) and for gcc the plugin
-> headers don't count as 'system' headers, gcc uses "..." throughout its codebase itself
-> (so does clang/llvm). it'd look weird and inconsistent if compiler plugins used <...>.
->
-> at the end of the day this comes down to whether gcc plugins are considered kernel
-> code and thus the kernel style applies to them (the kernel itself uses <...> because
-> it's a freestanding program so its 'system' headers are mostly what it provides
-> itself, not those of the compiler let alone userland libs) or gcc extensions and thus
-> the gcc include style applies to them. as you can guess, i'm arguing for the latter,
-> because gcc plugins are meant for the compiler, not the kernel per se, and in fact
-> we have several plugins already that can be used in userland as well (e.g., Emese's
-> size overflow plugin).
->
-> the one thing for plugins that i borrowed from the kernel instead of gcc is the code
-> formatting style as the GNU one is as bad as Linus argued decades ago ;).
->
->> > second, regardless of whether plugin headers are available by default or not, we
->> > still couldn't use them during cross-compilation as the plugin headers we want are
->> > those of the target compiler (that will load the plugin eventually), not that of
->> > the host compiler (which merely compiles the plugin and in theory doesn't even have
->> > to be gcc or a plugin capable gcc).
+>> In general all commits should have a Signed-Off-By line added.  Once
+>> the git branch gets merged, it's hard to tell what is the final commit
+>> and what isn't, and in general different commits will have different
+>> people needing to vouch for the origins for the contents of that commit.
 >>
->> So, how could this be the reason why we should avoid #include <file>?
->
-> because <...> is meant for headers that are on the compiler's default search path
-> and even if gcc plugin headers were there (they aren't) they'd be the wrong ones
-> to use, you'd have to specifically override the include path with that of the target
-> compiler which is a sign that you're no longer including 'system' headers (again,
-> this convention holds for hosted programs, freestanding ones don't have anything
-> but 'system' headers usually).
->
->> > for these reasons the correct include directive is "..." and not <...>. if it helps
->> > to understand the situation better, consider that gcc plugins are to gcc as kernel
->> > modules are to vmlinux and all kernel headers are included via "..." as well, regardless
->                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-> sorry, i take that back, the kernel uses <...> but for a reason that in my opinion
-> doesn't apply to compiler plugins (see above).
->
->> > of whether they're in the same directory or not.
+>> Cheers,
 >>
->> Of course, you could use #include "..." as well to include kernel headers,
->> but you should not do that.
+>> 							- Ted
+>> 							
 >>
->> You should do so only when you need to include headers that are local
->> to your directory.
 >
-> sure, a header in the same directory is a sign that it's not a 'system' header but
-> i'm also saying that there can be other non-system headers in a program in other
-> directories as well. FWIW, the kernel itself has several "..." directives that
-> reference headers outside of the same directory, e.g., try this in a kernel tree:
+> Hi Ted,
 >
->   grep "#include.*\"\." -rn
+> I will repost this pull request with a signed-off by line for Linus to
+> consider.    I am not certain who all should be included in the review
+> and I have to be careful how many email recipients I copy.   I will
+> post to the folks Joe Perches copied.
+>
+> Jeff
 >
 
-To sum up, your suggestion for GCC plugins is
+Well, Joe updated checkpatch.pl so now there are some more areas of
+cleanup I need to do on the code to remove unsigned casts and replace
+them with unsigned int.  I will resubmit at the next merge window for
+4.7.  Have not heard a word from Linus about this, Hey Linus, please
+don't lion-us by throwing us to the lions.  :-)
 
-  - Use #include <...> to include header files provided by the host compiler
-  - Use #include "..." to include header files provided by the cross
-compiler (plugin directory)
-  - Use #include "..." to include header files in the local project
-
-Correct?
-
-I leave the final decision to others.
-
-
--- 
-Best Regards
-Masahiro Yamada
+Jeff
