@@ -1,32 +1,26 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:39598 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:39812 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751163AbcCXUse (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 24 Mar 2016 16:48:34 -0400
-Date: Thu, 24 Mar 2016 21:48:30 +0100
+	id S1751236AbcCXUvV (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 24 Mar 2016 16:51:21 -0400
+Date: Thu, 24 Mar 2016 21:51:19 +0100
 From: Michal Marek <mmarek@suse.cz>
-Subject: [GIT PULL] kbuild changes for v4.6-rc1
-Message-ID: <20160324204830.GA10385@pobox.suse.cz>
+Subject: [GIT PULL] kconfig changes for v4.6-rc1
+Message-ID: <20160324205119.GA11597@pobox.suse.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: ard.biesheuvel@linaro.org, arnd@arndb.de, daniel.wagner@bmw-carit.de, rmk+kernel@arm.linux.org.uk, trini@konsulko.com, yamada.masahiro@socionext.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: JBeulich@suse.com, viro@ZenIV.linux.org.uk, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hi Linus,
 
-please pull these kbuild changes for v4.6-rc1:
-- make dtbs_install fix
-- Error handling fix fixdep and link-vmlinux.sh
-- __UNIQUE_ID fix for clang
-- Fix for if_changed_* to suppress the "is up to date." message
-- The kernel is built with -Werror=incompatible-pointer-types.
-
-The last change needed a drm fix: db9b60400f92 ("drm/gma500: remove helper
-function") to  not break build. It is in since Monday, so there should
-be no problem.
+just two kconfig commits this time:
+- kconfig Makefile fix for make 3.80
+- Fix calculating symbols so that KCONFIG_ALLCONFIG=... does not disable
+  CONFIG_MODULES silently
 
 Michal
 
@@ -36,35 +30,19 @@ The following changes since commit 92e963f50fc74041b5e9e744c330dca48e04f08d:
 
 are available in the git repository at:
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git kbuild
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git kconfig
 
-for you to fetch changes up to ea8daa7b97842aab8507b5b5b1e3226cf2d514a6:
+for you to fetch changes up to 6b87b70c5339f30e3c5b32085e69625906513dc2:
 
-  kbuild: Add option to turn incompatible pointer check into error (2016-03-15 21:51:54 +0100)
+  unbreak allmodconfig KCONFIG_ALLCONFIG=... (2016-02-01 15:12:40 +0100)
 
 ----------------------------------------------------------------
-Ard Biesheuvel (1):
-      scripts/link-vmlinux.sh: force error on kallsyms failure
+Al Viro (1):
+      unbreak allmodconfig KCONFIG_ALLCONFIG=...
 
-Arnd Bergmann (1):
-      Kbuild: provide a __UNIQUE_ID for clang
+Jan Beulich (1):
+      scripts/kconfig: allow building with make 3.80 again
 
-Daniel Wagner (1):
-      kbuild: Add option to turn incompatible pointer check into error
-
-Masahiro Yamada (1):
-      kbuild: suppress annoying "... is up to date." message
-
-Russell King (1):
-      dtbsinstall: don't move target directory out of the way
-
-Tom Rini (1):
-      kbuild: fixdep: Check fstat(2) return value
-
- Makefile                       | 3 +++
- include/linux/compiler-clang.h | 5 +++++
- scripts/Kbuild.include         | 6 +++---
- scripts/Makefile.dtbinst       | 2 --
- scripts/basic/fixdep.c         | 6 +++++-
- scripts/link-vmlinux.sh        | 7 ++++---
- 6 files changed, 20 insertions(+), 9 deletions(-)
+ scripts/kconfig/Makefile   |  4 +++-
+ scripts/kconfig/confdata.c | 12 +++++++-----
+ 2 files changed, 10 insertions(+), 6 deletions(-)
