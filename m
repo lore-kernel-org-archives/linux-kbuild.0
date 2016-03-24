@@ -1,45 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from relay06.alfahosting-server.de ([109.237.142.242]:38462 "EHLO
-	relay06.alfahosting-server.de" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S1755278AbcCTLl6 (ORCPT
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:34038 "EHLO
+	mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751830AbcCXAKJ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 20 Mar 2016 07:41:58 -0400
-Date: Sun, 20 Mar 2016 12:35:50 +0100
-From: Richard Leitner <dev@g0hl1n.net>
-Subject: menuconfig doesn't reset terminal colors correctly
-Message-ID: <20160320123550.5331cfb6@frodo>
-MIME-Version: 1.0
+	Wed, 23 Mar 2016 20:10:09 -0400
+Date: Thu, 24 Mar 2016 01:07:49 +0100
+From: Emese Revfy <re.emese@gmail.com>
+Subject: Re: [PATCH v5 2/5] GCC plugin infrastructure
+Message-Id: <20160324010749.f7e547e1df12b4944c5fa490@gmail.com>
+In-Reply-To: <CAK7LNASCOaEi46+b7Obt0D6GtiBmCfwBEkdbYSnpBDzzQOXpvA@mail.gmail.com>
+References: <20160307000208.1bec3e7dc874489d1b4fcbb4@gmail.com>
+	<20160307000427.c82f18670568e1e656fc9532@gmail.com>
+	<CAK7LNASCOaEi46+b7Obt0D6GtiBmCfwBEkdbYSnpBDzzQOXpvA@mail.gmail.com>
+Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: yann.morin.1998@free.fr, linux-kbuild@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, pageexec@freemail.hu, spender@grsecurity.net, kernel-hardening@lists.openwall.com, Michal Marek <mmarek@suse.com>, Kees Cook <keescook@chromium.org>, linux@rasmusvillemoes.dk, fengguang.wu@intel.com, dvyukov@google.com, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-Hello,
-I just noticed that "make menuconfig" doesn't reset the terminal colors correctly.
-I'm running a XFCE Terminal with "xterm" emulation setting configured with black on white.
-After "make menuconfig" exits all terminal output is white on black.
+On Fri, 11 Mar 2016 15:25:19 +0900
+Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
 
-I've added fprintf's with the ANSI reset code for stdout and stderr to the mconf.c:handle_exit:
+> You sprinkle "gcc-plugins" target in the top Makefile, which I do not like.
+> 
+> Can you descend into scripts/gcc-plugins from scripts/Makefile?
+> 
+> 
+>  subdir-$(CONFIG_MODVERSIONS) += genksyms
+>  subdir-y                     += mod
+>  subdir-$(CONFIG_SECURITY_SELINUX) += selinux
+>  subdir-$(CONFIG_DTC)         += dtc
+>  subdir-$(CONFIG_GDB_SCRIPTS) += gdb
+> +subdir-$(CONFIG_GCC_PLUGINS) += gcc-plugins
+> 
+> 
+> This is how other host tools do, I think.
 
---- a/scripts/kconfig/mconf.c
-+++ b/scripts/kconfig/mconf.c
-@@ -969,6 +969,10 @@ static int handle_exit(void)
- 
- 	end_dialog(saved_x, saved_y);
- 
-+	/* reset terminal */
-+	fprintf(stdout, "\033[0m");
-+	fprintf(stderr, "\033[0m");
-+
- 	switch (res) {
- 	case 0:
- 		if (conf_write(filename)) {
+Hi,
 
+I tried to remove the gcc-plugins target but sadly in this case the plugins aren't complied.
+I don't know if I understand how it should work. I pushed a commit:
+https://github.com/ephox-gcc-plugins/gcc-plugins_linux-next/commit/0b005b886bde6c4b9134d01f830d88d464911a65
+Could you please help me with what I did wrong?
 
-Basically this works for my tests, but I'm not sure if this is a desired solution...
-Any comments? Should I prepare a patch for that or is this approach completely wrong?
-
-thanks & regards,
-Richard
-
+Thanks
+-- 
+Emese
