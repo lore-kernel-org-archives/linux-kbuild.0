@@ -1,72 +1,79 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from aserp1040.oracle.com ([141.146.126.69]:23243 "EHLO
-	aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752150AbcCZR3t (ORCPT
+Received: from gagarine.paulk.fr ([109.190.93.129]:61080 "EHLO
+	gagarine.paulk.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753339AbcCZSh3 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 26 Mar 2016 13:29:49 -0400
-From: Sasha Levin <sasha.levin@oracle.com>
-Subject: [added to the 4.1 stable tree] ld-version: Fix awk regex compile failure
-Date: Sat, 26 Mar 2016 13:28:38 -0400
-Message-Id: <1459013330-15318-34-git-send-email-sasha.levin@oracle.com>
-In-Reply-To: <1459013330-15318-1-git-send-email-sasha.levin@oracle.com>
-References: <1459013330-15318-1-git-send-email-sasha.levin@oracle.com>
+	Sat, 26 Mar 2016 14:37:29 -0400
+From: Paul Kocialkowski <contact@paulk.fr>
+Subject: [PATCH] kconfig: Add localdefconfig helper
+Date: Sat, 26 Mar 2016 19:31:27 +0100
+Message-Id: <1459017087-11640-1-git-send-email-contact@paulk.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: stable@vger.kernel.org, stable-commits@vger.kernel.org
-Cc: James Hogan <james.hogan@imgtec.com>, Michal Marek <mmarek@suse.com>, Andi Kleen <ak@linux.intel.com>, Geert Uytterhoeven <geert@linux-m68k.org>, linux-mips@linux-mips.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Ralf Baechle <ralf@linux-mips.org>, Sasha Levin <sasha.levin@oracle.com>
+To: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.com>, "Yann E . MORIN" <yann.morin.1998@free.fr>, Paul Kocialkowski <contact@paulk.fr>
 
-From: James Hogan <james.hogan@imgtec.com>
+This introduces a localdefconfig make target to specify out-of-tree default
+configs. The out-of-tree default target is selected by defining
+KBUILD_LOCALDEFCONFIG in the make command line.
 
-This patch has been added to the 4.1 stable tree. If you have any
-objections, please let us know.
+The intent of this change is to easily allow using default configs that are not
+part of the kernel source (e.g. for a specific device or use case), without ever
+touching the kernel source tree.
 
-===============
+This is somewhat equivalent to copying the default config to the output .config
+and running olddefconfig. However, it seems better to make this part of the
+kernel helpers since this use case is likely to be needed widely. In addition,
+it keeps all the path handling logic inside the Makefiles, as opposed to
+delegating some of it to a wrapper script or such, when copying the default
+configuration to .config.
 
-[ Upstream commit 4b7b1ef2c2f83d702272555e8adb839a50ba0f8e ]
-
-The ld-version.sh script fails on some versions of awk with the
-following error, resulting in build failures for MIPS:
-
-awk: scripts/ld-version.sh: line 4: regular expression compile failed (missing '(')
-
-This is due to the regular expression ".*)", meant to strip off the
-beginning of the ld version string up to the close bracket, however
-brackets have a meaning in regular expressions, so lets escape it so
-that awk doesn't expect a corresponding open bracket.
-
-Fixes: ccbef1674a15 ("Kbuild, lto: add ld-version and ld-ifversion ...")
-Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
-Signed-off-by: James Hogan <james.hogan@imgtec.com>
-Tested-by: Michael S. Tsirkin <mst@redhat.com>
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
-Tested-by: Sudip Mukherjee <sudip.mukherjee@codethink.co.uk>
-Cc: Michal Marek <mmarek@suse.com>
-Cc: Andi Kleen <ak@linux.intel.com>
-Cc: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: linux-mips@linux-mips.org
-Cc: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Cc: stable@vger.kernel.org # 4.4.x-
-Patchwork: https://patchwork.linux-mips.org/patch/12838/
-Signed-off-by: Ralf Baechle <ralf@linux-mips.org>
-Signed-off-by: Sasha Levin <sasha.levin@oracle.com>
+Signed-off-by: Paul Kocialkowski <contact@paulk.fr>
 ---
- scripts/ld-version.sh | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ Makefile                 | 2 +-
+ scripts/kconfig/Makefile | 9 +++++++++
+ 2 files changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/scripts/ld-version.sh b/scripts/ld-version.sh
-index 198580d..1659b40 100755
---- a/scripts/ld-version.sh
-+++ b/scripts/ld-version.sh
-@@ -1,7 +1,7 @@
- #!/usr/bin/awk -f
- # extract linker version number from stdin and turn into single number
- 	{
--	gsub(".*)", "");
-+	gsub(".*\\)", "");
- 	split($1,a, ".");
- 	print a[1]*10000000 + a[2]*100000 + a[3]*10000 + a[4]*100 + a[5];
- 	exit
+diff --git a/Makefile b/Makefile
+index ed69074..0c2d209 100644
+--- a/Makefile
++++ b/Makefile
+@@ -529,7 +529,7 @@ ifeq ($(config-targets),1)
+ # KBUILD_DEFCONFIG may point out an alternative default configuration
+ # used for 'make defconfig'
+ include arch/$(SRCARCH)/Makefile
+-export KBUILD_DEFCONFIG KBUILD_KCONFIG
++export KBUILD_DEFCONFIG KBUILD_LOCALDEFCONFIG KBUILD_KCONFIG
+ 
+ config: scripts_basic outputmakefile FORCE
+ 	$(Q)$(MAKE) $(build)=scripts/kconfig $@
+diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+index ebced77..6fff25d 100644
+--- a/scripts/kconfig/Makefile
++++ b/scripts/kconfig/Makefile
+@@ -106,6 +106,14 @@ else
+ endif
+ endif
+ 
++localdefconfig: $(obj)/conf
++ifeq ($(KBUILD_LOCALDEFCONFIG),)
++	$(Q)$< $(silent) $(Kconfig)
++else
++	@$(kecho) "*** Default configuration is based on '$(KBUILD_LOCALDEFCONFIG)'"
++	$(Q)$< $(silent) --defconfig=$(KBUILD_LOCALDEFCONFIG) $(Kconfig)
++endif
++
+ %_defconfig: $(obj)/conf
+ 	$(Q)$< $(silent) --defconfig=arch/$(SRCARCH)/configs/$@ $(Kconfig)
+ 
+@@ -148,6 +156,7 @@ help:
+ 	@echo  '  alldefconfig    - New config with all symbols set to default'
+ 	@echo  '  randconfig	  - New config with random answer to all options'
+ 	@echo  '  listnewconfig   - List new options'
++	@echo  '  localdefconfig  - New config with defaults from KBUILD_LOCALDEFCONFIG'
+ 	@echo  '  olddefconfig	  - Same as silentoldconfig but sets new symbols to their'
+ 	@echo  '                    default value'
+ 	@echo  '  kvmconfig	  - Enable additional options for kvm guest kernel support'
 -- 
-2.5.0
+2.7.4
 
