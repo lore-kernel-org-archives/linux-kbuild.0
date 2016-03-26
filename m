@@ -1,101 +1,72 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg001.nifty.com ([202.248.44.39]:63808 "EHLO
-	conssluserg001-v.nifty.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1752074AbcCZCjh (ORCPT
+Received: from aserp1040.oracle.com ([141.146.126.69]:23243 "EHLO
+	aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752150AbcCZR3t (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 25 Mar 2016 22:39:37 -0400
-MIME-Version: 1.0
-In-Reply-To: <20160324010749.f7e547e1df12b4944c5fa490@gmail.com>
-References: <20160307000208.1bec3e7dc874489d1b4fcbb4@gmail.com>
-	<20160307000427.c82f18670568e1e656fc9532@gmail.com>
-	<CAK7LNASCOaEi46+b7Obt0D6GtiBmCfwBEkdbYSnpBDzzQOXpvA@mail.gmail.com>
-	<20160324010749.f7e547e1df12b4944c5fa490@gmail.com>
-Date: Sat, 26 Mar 2016 11:39:32 +0900
-Message-ID: <CAK7LNATK-r09tJ5K8u8vRdRR0dXywAJ=LbbhaigZkfMm3UUPmA@mail.gmail.com>
-Subject: Re: [PATCH v5 2/5] GCC plugin infrastructure
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Content-Type: text/plain; charset=UTF-8
+	Sat, 26 Mar 2016 13:29:49 -0400
+From: Sasha Levin <sasha.levin@oracle.com>
+Subject: [added to the 4.1 stable tree] ld-version: Fix awk regex compile failure
+Date: Sat, 26 Mar 2016 13:28:38 -0400
+Message-Id: <1459013330-15318-34-git-send-email-sasha.levin@oracle.com>
+In-Reply-To: <1459013330-15318-1-git-send-email-sasha.levin@oracle.com>
+References: <1459013330-15318-1-git-send-email-sasha.levin@oracle.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Emese Revfy <re.emese@gmail.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, pageexec@freemail.hu, spender@grsecurity.net, kernel-hardening@lists.openwall.com, Michal Marek <mmarek@suse.com>, Kees Cook <keescook@chromium.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, fengguang.wu@intel.com, Dmitry Vyukov <dvyukov@google.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: stable@vger.kernel.org, stable-commits@vger.kernel.org
+Cc: James Hogan <james.hogan@imgtec.com>, Michal Marek <mmarek@suse.com>, Andi Kleen <ak@linux.intel.com>, Geert Uytterhoeven <geert@linux-m68k.org>, linux-mips@linux-mips.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Ralf Baechle <ralf@linux-mips.org>, Sasha Levin <sasha.levin@oracle.com>
 
-Hi Emese,
+From: James Hogan <james.hogan@imgtec.com>
 
+This patch has been added to the 4.1 stable tree. If you have any
+objections, please let us know.
 
+===============
 
-2016-03-24 9:07 GMT+09:00 Emese Revfy <re.emese@gmail.com>:
-> On Fri, 11 Mar 2016 15:25:19 +0900
-> Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
->
->> You sprinkle "gcc-plugins" target in the top Makefile, which I do not like.
->>
->> Can you descend into scripts/gcc-plugins from scripts/Makefile?
->>
->>
->>  subdir-$(CONFIG_MODVERSIONS) += genksyms
->>  subdir-y                     += mod
->>  subdir-$(CONFIG_SECURITY_SELINUX) += selinux
->>  subdir-$(CONFIG_DTC)         += dtc
->>  subdir-$(CONFIG_GDB_SCRIPTS) += gdb
->> +subdir-$(CONFIG_GCC_PLUGINS) += gcc-plugins
->>
->>
->> This is how other host tools do, I think.
->
-> Hi,
->
-> I tried to remove the gcc-plugins target but sadly in this case the plugins aren't complied.
-> I don't know if I understand how it should work. I pushed a commit:
-> https://github.com/ephox-gcc-plugins/gcc-plugins_linux-next/commit/0b005b886bde6c4b9134d01f830d88d464911a65
-> Could you please help me with what I did wrong?
->
+[ Upstream commit 4b7b1ef2c2f83d702272555e8adb839a50ba0f8e ]
 
+The ld-version.sh script fails on some versions of awk with the
+following error, resulting in build failures for MIPS:
 
-Sorry, I missed this problem.
+awk: scripts/ld-version.sh: line 4: regular expression compile failed (missing '(')
 
-GCC-plugins must be compiled before descending into ./Kbuild.
+This is due to the regular expression ".*)", meant to strip off the
+beginning of the ld version string up to the close bracket, however
+brackets have a meaning in regular expressions, so lets escape it so
+that awk doesn't expect a corresponding open bracket.
 
+Fixes: ccbef1674a15 ("Kbuild, lto: add ld-version and ld-ifversion ...")
+Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
+Signed-off-by: James Hogan <james.hogan@imgtec.com>
+Tested-by: Michael S. Tsirkin <mst@redhat.com>
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+Tested-by: Sudip Mukherjee <sudip.mukherjee@codethink.co.uk>
+Cc: Michal Marek <mmarek@suse.com>
+Cc: Andi Kleen <ak@linux.intel.com>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: linux-mips@linux-mips.org
+Cc: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: stable@vger.kernel.org # 4.4.x-
+Patchwork: https://patchwork.linux-mips.org/patch/12838/
+Signed-off-by: Ralf Baechle <ralf@linux-mips.org>
+Signed-off-by: Sasha Levin <sasha.levin@oracle.com>
+---
+ scripts/ld-version.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Please apply the following on top of commit 0b005b88
-and check if it works.
-
-
-
-
-diff --git a/Makefile b/Makefile
-index 1c7a379..bd643d3 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1009,6 +1009,9 @@ archprepare: archheaders archscripts prepare1
-scripts_basic
- prepare0: KBUILD_CFLAGS += $(GCC_PLUGINS_CFLAGS)
- prepare0: KBUILD_AFLAGS += $(GCC_PLUGINS_AFLAGS)
- prepare0: archprepare FORCE
-+ifdef CONFIG_GCC_PLUGINS
-+       $(Q)$(MAKE) $(build)=scripts/gcc-plugins
-+endif
-        $(Q)$(MAKE) $(build)=.
-
- # All the preparing..
-diff --git a/scripts/Makefile b/scripts/Makefile
-index 0ba652c..1d80897 100644
---- a/scripts/Makefile
-+++ b/scripts/Makefile
-@@ -45,7 +45,6 @@ subdir-y                     += mod
- subdir-$(CONFIG_SECURITY_SELINUX) += selinux
- subdir-$(CONFIG_DTC)         += dtc
- subdir-$(CONFIG_GDB_SCRIPTS) += gdb
--subdir-$(CONFIG_GCC_PLUGINS) += gcc-plugins
-
- # Let clean descend into subdirs
--subdir-        += basic kconfig package
-+subdir-        += basic kconfig package gcc-plugins
-
-
-
-
-
+diff --git a/scripts/ld-version.sh b/scripts/ld-version.sh
+index 198580d..1659b40 100755
+--- a/scripts/ld-version.sh
++++ b/scripts/ld-version.sh
+@@ -1,7 +1,7 @@
+ #!/usr/bin/awk -f
+ # extract linker version number from stdin and turn into single number
+ 	{
+-	gsub(".*)", "");
++	gsub(".*\\)", "");
+ 	split($1,a, ".");
+ 	print a[1]*10000000 + a[2]*100000 + a[3]*10000 + a[4]*100 + a[5];
+ 	exit
 -- 
-Best Regards
-Masahiro Yamada
+2.5.0
+
