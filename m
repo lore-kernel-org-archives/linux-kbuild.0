@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from alt13.smtp-out.videotron.ca ([135.19.0.26]:15226 "EHLO
+Received: from alt13.smtp-out.videotron.ca ([135.19.0.26]:21433 "EHLO
 	alt12.smtp-out.videotron.ca" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1754204AbcC2UpK (ORCPT
+	by vger.kernel.org with ESMTP id S1754344AbcC2UpK (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Tue, 29 Mar 2016 16:45:10 -0400
 From: Nicolas Pitre <nicolas.pitre@linaro.org>
-Subject: [PATCH v7 3/8] fixdep: accept extra dependencies on stdin
-Date: Tue, 29 Mar 2016 16:44:37 -0400
-Message-Id: <1459284282-6676-4-git-send-email-nicolas.pitre@linaro.org>
+Subject: [PATCH v7 1/8] kbuild: record needed exported symbols for modules
+Date: Tue, 29 Mar 2016 16:44:35 -0400
+Message-Id: <1459284282-6676-2-git-send-email-nicolas.pitre@linaro.org>
 In-Reply-To: <1459284282-6676-1-git-send-email-nicolas.pitre@linaro.org>
 References: <1459284282-6676-1-git-send-email-nicolas.pitre@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,130 +15,70 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.com>
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-... and merge them in the list of parsed dependencies.
+Kernel modules are partially linked object files with some undefined
+symbols that are expected to be matched with EXPORT_SYMBOL() entries
+from elsewhere.
+
+Each .tmp_versions/*.mod file currently contains two line of text
+separated by a newline character. The first line has the actual module
+file name while the second line has a list of object files constituting
+that module. Those files are parsed by modpost (scripts/mod/sumversion.c),
+scripts/Makefile.modpost, scripts/Makefile.modsign, etc.  Only the
+modpost utility cares about the second line while the others retrieve
+only the first line.
+
+Therefore we can add a third line to record the list of undefined symbols
+aka required EXPORT_SYMBOL() entries for each module into that file
+without breaking anything. Like for the second line, symbols are separated
+by a blank and the list is terminated with a newline character.
+
+To avoid needless build overhead, the undefined symbols extraction is
+performed only when CONFIG_TRIM_UNUSED_KSYMS is selected.
 
 Signed-off-by: Nicolas Pitre <nico@linaro.org>
+Acked-by: Rusty Russell <rusty@rustcorp.com.au>
 ---
- scripts/basic/fixdep.c | 60 +++++++++++++++++++++++++++++++++++++-------------
- 1 file changed, 45 insertions(+), 15 deletions(-)
+ scripts/Makefile.build | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
-diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
-index caef815d17..7e90a1f7de 100644
---- a/scripts/basic/fixdep.c
-+++ b/scripts/basic/fixdep.c
-@@ -120,13 +120,15 @@
- #define INT_NFIG ntohl(0x4e464947)
- #define INT_FIG_ ntohl(0x4649475f)
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index e1bc190709..74556e5e4e 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -286,6 +286,13 @@ define rule_as_o_S
+ 	mv -f $(dot-target).tmp $(dot-target).cmd
+ endef
  
-+int insert_extra_deps;
- char *target;
- char *depfile;
- char *cmdline;
- 
- static void usage(void)
- {
--	fprintf(stderr, "Usage: fixdep <depfile> <target> <cmdline>\n");
-+	fprintf(stderr, "Usage: fixdep [-e] <depfile> <target> <cmdline>\n");
-+	fprintf(stderr, " -e  insert extra dependencies given on stdin\n");
- 	exit(1);
- }
- 
-@@ -138,6 +140,40 @@ static void print_cmdline(void)
- 	printf("cmd_%s := %s\n\n", target, cmdline);
- }
- 
-+/*
-+ * Print out a dependency path from a symbol name
-+ */
-+static void print_config(const char *m, int slen)
-+{
-+	int c, i;
++# List module undefined symbols (or empty line if not enabled)
++ifdef CONFIG_TRIM_UNUSED_KSYMS
++cmd_undef_syms = $(NM) $@ | sed -n 's/^ \+U //p' | xargs echo
++else
++cmd_undef_syms = echo
++endif
 +
-+	printf("    $(wildcard include/config/");
-+	for (i = 0; i < slen; i++) {
-+		c = m[i];
-+		if (c == '_')
-+			c = '/';
-+		else
-+			c = tolower(c);
-+		putchar(c);
-+	}
-+	printf(".h) \\\n");
-+}
-+
-+static void do_extra_deps(void)
-+{
-+	if (insert_extra_deps) {
-+		char buf[80];
-+		while(fgets(buf, sizeof(buf), stdin)) {
-+			int len = strlen(buf);
-+			if (len < 2 || buf[len-1] != '\n') {
-+				fprintf(stderr, "fixdep: bad data on stdin\n");
-+				exit(1);
-+			}
-+			print_config(buf, len-1);
-+		}
-+	}
-+}
-+
- struct item {
- 	struct item	*next;
- 	unsigned int	len;
-@@ -197,23 +233,12 @@ static void define_config(const char *name, int len, unsigned int hash)
- static void use_config(const char *m, int slen)
- {
- 	unsigned int hash = strhash(m, slen);
--	int c, i;
+ # Built-in and composite module parts
+ $(obj)/%.o: $(src)/%.c $(recordmcount_source) $(objtool_obj) FORCE
+ 	$(call cmd,force_checksrc)
+@@ -296,7 +303,8 @@ $(obj)/%.o: $(src)/%.c $(recordmcount_source) $(objtool_obj) FORCE
+ $(single-used-m): $(obj)/%.o: $(src)/%.c $(recordmcount_source) $(objtool_obj) FORCE
+ 	$(call cmd,force_checksrc)
+ 	$(call if_changed_rule,cc_o_c)
+-	@{ echo $(@:.o=.ko); echo $@; } > $(MODVERDIR)/$(@F:.o=.mod)
++	@{ echo $(@:.o=.ko); echo $@; \
++	   $(cmd_undef_syms); } > $(MODVERDIR)/$(@F:.o=.mod)
  
- 	if (is_defined_config(m, slen, hash))
- 	    return;
+ quiet_cmd_cc_lst_c = MKLST   $@
+       cmd_cc_lst_c = $(CC) $(c_flags) -g -c -o $*.o $< && \
+@@ -426,7 +434,8 @@ $(call multi_depend, $(multi-used-y), .o, -objs -y)
  
- 	define_config(m, slen, hash);
--
--	printf("    $(wildcard include/config/");
--	for (i = 0; i < slen; i++) {
--		c = m[i];
--		if (c == '_')
--			c = '/';
--		else
--			c = tolower(c);
--		putchar(c);
--	}
--	printf(".h) \\\n");
-+	print_config(m, slen);
- }
+ $(multi-used-m): FORCE
+ 	$(call if_changed,link_multi-m)
+-	@{ echo $(@:.o=.ko); echo $(link_multi_deps); } > $(MODVERDIR)/$(@F:.o=.mod)
++	@{ echo $(@:.o=.ko); echo $(link_multi_deps); \
++	   $(cmd_undef_syms); } > $(MODVERDIR)/$(@F:.o=.mod)
+ $(call multi_depend, $(multi-used-m), .o, -objs -y -m)
  
- static void parse_config_file(const char *map, size_t len)
-@@ -250,7 +275,7 @@ static void parse_config_file(const char *map, size_t len)
- 	}
- }
- 
--/* test is s ends in sub */
-+/* test if s ends in sub */
- static int strrcmp(const char *s, const char *sub)
- {
- 	int slen = strlen(s);
-@@ -378,6 +403,8 @@ static void parse_dep_file(void *map, size_t len)
- 		exit(1);
- 	}
- 
-+	do_extra_deps();
-+
- 	printf("\n%s: $(deps_%s)\n\n", target, target);
- 	printf("$(deps_%s):\n", target);
- }
-@@ -434,7 +461,10 @@ int main(int argc, char *argv[])
- {
- 	traps();
- 
--	if (argc != 4)
-+	if (argc == 5 && !strcmp(argv[1], "-e")) {
-+		insert_extra_deps = 1;
-+		argv++;
-+	} else if (argc != 4)
- 		usage();
- 
- 	depfile = argv[1];
+ targets += $(multi-used-y) $(multi-used-m)
 -- 
 2.5.5
 
