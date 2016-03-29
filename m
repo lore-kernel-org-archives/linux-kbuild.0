@@ -1,56 +1,100 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-am1hn0252.outbound.protection.outlook.com ([157.56.112.252]:3713
-	"EHLO emea01-am1-obe.outbound.protection.outlook.com"
-	rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-	id S1750717AbcC2HHL convert rfc822-to-8bit (ORCPT
+Received: from alt13.smtp-out.videotron.ca ([135.19.0.26]:13044 "EHLO
+	alt12.smtp-out.videotron.ca" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1753794AbcC2UpK (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 29 Mar 2016 03:07:11 -0400
-Content-Type: text/plain; charset="iso-8859-1"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8BIT
-Content-Description: Mail message body
-Subject: Von: Mr Richard Williams.
-From: "Mr. Richard Williams" <rwilliams10929@richardwilliams.hk.tn>
-Date: Tue, 29 Mar 2016 07:13:50 +0100
-Reply-To: <richard.williamsmr02@gmail.com>
-Message-ID: <AM3PR02MB04234FD77D126675D653A873C5870@AM3PR02MB0423.eurprd02.prod.outlook.com>
+	Tue, 29 Mar 2016 16:45:10 -0400
+From: Nicolas Pitre <nicolas.pitre@linaro.org>
+Subject: [PATCH v7 2/8] export.h: allow for per-symbol configurable EXPORT_SYMBOL()
+Date: Tue, 29 Mar 2016 16:44:36 -0400
+Message-Id: <1459284282-6676-3-git-send-email-nicolas.pitre@linaro.org>
+In-Reply-To: <1459284282-6676-1-git-send-email-nicolas.pitre@linaro.org>
+References: <1459284282-6676-1-git-send-email-nicolas.pitre@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Recipients <rwilliams10929@richardwilliams.hk.tn>
+To: Michal Marek <mmarek@suse.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Von: Mr Richard Williams.
+Similar to include/generated/autoconf.h, include/generated/autoksyms.h
+will contain a list of defines for each EXPORT_SYMBOL() that we want
+active. The format is:
 
+  #define __KSYM_<symbol_name> 1
 
-Nehmen Sie meine aufrichtige Entschuldigung, wenn meine Post Ihre persönliche Ethik nicht erfüllt.
+This list will be auto-generated with another patch.  For now we only
+include the preprocessor magic to automatically create or omit the
+corresponding struct kernel_symbol declaration.
 
-Ich werde mich als Herr Richard Williams vorstellen; Ich bin ein Bürger Virgin Islands
-Ein britischer Wohnsitz in London. Ein Direktor in der Kontenverwaltung Abschnitt, Überwachung Finanzgruppe hier im Vereinigten Königreich.
+Given the content of include/generated/autoksyms.h may not be known in
+advance, an empty file is created early on to let the build proceed.
 
-Dies ist das Detail, was ich will Sie, mir zu helfen dabei, eines unserer Konten mit Saldo von zwanzig Millionen fünfhunderttausend Pfund Sterling halten.
-Wurde dormant und wurde in den letzten fünfzehn Jahren (15 Jahre) nicht betätigt wird.
+Signed-off-by: Nicolas Pitre <nico@linaro.org>
+Acked-by: Rusty Russell <rusty@rustcorp.com.au>
+---
+ Makefile               |  2 ++
+ include/linux/export.h | 22 ++++++++++++++++++++--
+ 2 files changed, 22 insertions(+), 2 deletions(-)
 
-Aus meiner Untersuchungen und Bestätigungen, starb der Inhaber dieses Kontos, ein Ausländer nach Name (Ost Bob) Am 31. Januar 2000.
-
-
-Und seitdem hat niemand etwas getan in Bezug auf die Inanspruchnahme dieses Geld, weil er keine Familienmitglieder, die weder von der Existenz des Kontos bewusst sind, hat noch die Mittel.
-
-Ich suche Ihre Zustimmung an Sie als nächsten Angehörigen / Will Berechtigte an den Verstorbenen, so dass die Erlöse aus diesem Konto im Wert von (zwanzig Millionen fünfhundert gbp) zu präsentieren. kann in Ihrem Land (Transfer) in Ihrem privaten Bankkonto bezahlt werden.
-
-
-Dies wird in den folgenden Prozentsätze ausgezahlt oder geteilt werden, 55% für mich und 45% auf Sie, 5% wird für alle expencies verwendet werden, die incured werden, alle notwendigen rechtlichen Dokumente, die verwendet werden können, diese Behauptung zu untermauern wird gesichert von uns.
-
-Bitte geben Sie mir die folgenden, wie wir haben 7 Tage, es zu durchlaufen.
-Das ist sehr, sehr URGENT PLEASE.
+diff --git a/Makefile b/Makefile
+index 916b26e999..451acbebee 100644
+--- a/Makefile
++++ b/Makefile
+@@ -998,6 +998,8 @@ prepare2: prepare3 outputmakefile asm-generic
+ prepare1: prepare2 $(version_h) include/generated/utsrelease.h \
+                    include/config/auto.conf
+ 	$(cmd_crmodverdir)
++	$(Q)test -e include/generated/autoksyms.h || \
++	    touch   include/generated/autoksyms.h
  
-1. Vollständiger Name.
-2. Der direkte Handynummer.
-3. Ihre Kontaktadresse.
-4. Ihr Alter.
-5. Ihr Beruf.
-6. Faxnummer.
-
-Ihre Zustimmung zu dieser E-Mail und Business-Vorschlag wird sehr geschätzt.
+ archprepare: archheaders archscripts prepare1 scripts_basic
  
-Grüße,
-Herr Richard Williams.
-+447 0457 67766
+diff --git a/include/linux/export.h b/include/linux/export.h
+index 96e45ea463..77afdb2a25 100644
+--- a/include/linux/export.h
++++ b/include/linux/export.h
+@@ -38,7 +38,7 @@ extern struct module __this_module;
+ 
+ #ifdef CONFIG_MODULES
+ 
+-#ifndef __GENKSYMS__
++#if defined(__KERNEL__) && !defined(__GENKSYMS__)
+ #ifdef CONFIG_MODVERSIONS
+ /* Mark the CRC weak since genksyms apparently decides not to
+  * generate a checksums for some symbols */
+@@ -53,7 +53,7 @@ extern struct module __this_module;
+ #endif
+ 
+ /* For every exported symbol, place a struct in the __ksymtab section */
+-#define __EXPORT_SYMBOL(sym, sec)				\
++#define ___EXPORT_SYMBOL(sym, sec)				\
+ 	extern typeof(sym) sym;					\
+ 	__CRC_SYMBOL(sym, sec)					\
+ 	static const char __kstrtab_##sym[]			\
+@@ -65,6 +65,24 @@ extern struct module __this_module;
+ 	__attribute__((section("___ksymtab" sec "+" #sym), unused))	\
+ 	= { (unsigned long)&sym, __kstrtab_##sym }
+ 
++#ifdef CONFIG_TRIM_UNUSED_KSYMS
++
++#include <linux/kconfig.h>
++#include <generated/autoksyms.h>
++
++#define __EXPORT_SYMBOL(sym, sec)				\
++	__cond_export_sym(sym, sec, config_enabled(__KSYM_##sym))
++#define __cond_export_sym(sym, sec, conf)			\
++	___cond_export_sym(sym, sec, conf)
++#define ___cond_export_sym(sym, sec, enabled)			\
++	__cond_export_sym_##enabled(sym, sec)
++#define __cond_export_sym_1(sym, sec) ___EXPORT_SYMBOL(sym, sec)
++#define __cond_export_sym_0(sym, sec) /* nothing */
++
++#else
++#define __EXPORT_SYMBOL ___EXPORT_SYMBOL
++#endif
++
+ #define EXPORT_SYMBOL(sym)					\
+ 	__EXPORT_SYMBOL(sym, "")
+ 
+-- 
+2.5.5
+
