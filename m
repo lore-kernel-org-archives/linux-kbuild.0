@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from alt13.smtp-out.videotron.ca ([135.19.0.26]:21433 "EHLO
+Received: from alt13.smtp-out.videotron.ca ([135.19.0.26]:15237 "EHLO
 	alt12.smtp-out.videotron.ca" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1754344AbcC2UpK (ORCPT
+	by vger.kernel.org with ESMTP id S1754332AbcC2UpK (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
 	Tue, 29 Mar 2016 16:45:10 -0400
 From: Nicolas Pitre <nicolas.pitre@linaro.org>
-Subject: [PATCH v7 1/8] kbuild: record needed exported symbols for modules
-Date: Tue, 29 Mar 2016 16:44:35 -0400
-Message-Id: <1459284282-6676-2-git-send-email-nicolas.pitre@linaro.org>
+Subject: [PATCH v7 4/8] kbuild: de-duplicate fixdep usage
+Date: Tue, 29 Mar 2016 16:44:38 -0400
+Message-Id: <1459284282-6676-5-git-send-email-nicolas.pitre@linaro.org>
 In-Reply-To: <1459284282-6676-1-git-send-email-nicolas.pitre@linaro.org>
 References: <1459284282-6676-1-git-send-email-nicolas.pitre@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,70 +15,76 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.com>
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Kernel modules are partially linked object files with some undefined
-symbols that are expected to be matched with EXPORT_SYMBOL() entries
-from elsewhere.
+The generation and postprocessing of automatic dependency rules is
+duplicated in rule_cc_o_c, rule_as_o_S and if_changed_dep. Since
+this is not a trivial one-liner action, it is now abstracted under
+cmd_and_fixdep to simplify things and make future changes in this area
+easier.
 
-Each .tmp_versions/*.mod file currently contains two line of text
-separated by a newline character. The first line has the actual module
-file name while the second line has a list of object files constituting
-that module. Those files are parsed by modpost (scripts/mod/sumversion.c),
-scripts/Makefile.modpost, scripts/Makefile.modsign, etc.  Only the
-modpost utility cares about the second line while the others retrieve
-only the first line.
-
-Therefore we can add a third line to record the list of undefined symbols
-aka required EXPORT_SYMBOL() entries for each module into that file
-without breaking anything. Like for the second line, symbols are separated
-by a blank and the list is terminated with a newline character.
-
-To avoid needless build overhead, the undefined symbols extraction is
-performed only when CONFIG_TRIM_UNUSED_KSYMS is selected.
+In the rule_cc_o_c and rule_as_o_S cases that means the order of some
+commands has been altered, namely fixdep and related file manipulations
+are executed earlier, but they didn't depend on those commands that now
+execute later.
 
 Signed-off-by: Nicolas Pitre <nico@linaro.org>
-Acked-by: Rusty Russell <rusty@rustcorp.com.au>
 ---
- scripts/Makefile.build | 13 +++++++++++--
- 1 file changed, 11 insertions(+), 2 deletions(-)
+ scripts/Kbuild.include |  5 ++++-
+ scripts/Makefile.build | 19 +++++--------------
+ 2 files changed, 9 insertions(+), 15 deletions(-)
 
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index b2ab2a92a3..80ca538bfb 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -256,10 +256,13 @@ if_changed = $(if $(strip $(any-prereq) $(arg-check)),                       \
+ # Execute the command and also postprocess generated .d dependencies file.
+ if_changed_dep = $(if $(strip $(any-prereq) $(arg-check) ),                  \
+ 	@set -e;                                                             \
++	$(cmd_and_fixdep), @:)
++
++cmd_and_fixdep =                                                             \
+ 	$(echo-cmd) $(cmd_$(1));                                             \
+ 	scripts/basic/fixdep $(depfile) $@ '$(make-cmd)' > $(dot-target).tmp;\
+ 	rm -f $(depfile);                                                    \
+-	mv -f $(dot-target).tmp $(dot-target).cmd, @:)
++	mv -f $(dot-target).tmp $(dot-target).cmd;
+ 
+ # Usage: $(call if_changed_rule,foo)
+ # Will check if $(cmd_foo) or any of the prerequisites changed,
 diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index e1bc190709..74556e5e4e 100644
+index 74556e5e4e..12821d9eae 100644
 --- a/scripts/Makefile.build
 +++ b/scripts/Makefile.build
-@@ -286,6 +286,13 @@ define rule_as_o_S
- 	mv -f $(dot-target).tmp $(dot-target).cmd
+@@ -266,24 +266,15 @@ endif # CONFIG_STACK_VALIDATION
+ 
+ define rule_cc_o_c
+ 	$(call echo-cmd,checksrc) $(cmd_checksrc)			  \
+-	$(call echo-cmd,cc_o_c) $(cmd_cc_o_c);				  \
++	$(call cmd_and_fixdep,cc_o_c)					  \
+ 	$(cmd_modversions)						  \
+-	$(cmd_objtool)						  \
+-	$(call echo-cmd,record_mcount)					  \
+-	$(cmd_record_mcount)						  \
+-	scripts/basic/fixdep $(depfile) $@ '$(call make-cmd,cc_o_c)' >    \
+-	                                              $(dot-target).tmp;  \
+-	rm -f $(depfile);						  \
+-	mv -f $(dot-target).tmp $(dot-target).cmd
++	$(cmd_objtool)						          \
++	$(call echo-cmd,record_mcount) $(cmd_record_mcount)
  endef
  
-+# List module undefined symbols (or empty line if not enabled)
-+ifdef CONFIG_TRIM_UNUSED_KSYMS
-+cmd_undef_syms = $(NM) $@ | sed -n 's/^ \+U //p' | xargs echo
-+else
-+cmd_undef_syms = echo
-+endif
-+
- # Built-in and composite module parts
- $(obj)/%.o: $(src)/%.c $(recordmcount_source) $(objtool_obj) FORCE
- 	$(call cmd,force_checksrc)
-@@ -296,7 +303,8 @@ $(obj)/%.o: $(src)/%.c $(recordmcount_source) $(objtool_obj) FORCE
- $(single-used-m): $(obj)/%.o: $(src)/%.c $(recordmcount_source) $(objtool_obj) FORCE
- 	$(call cmd,force_checksrc)
- 	$(call if_changed_rule,cc_o_c)
--	@{ echo $(@:.o=.ko); echo $@; } > $(MODVERDIR)/$(@F:.o=.mod)
-+	@{ echo $(@:.o=.ko); echo $@; \
-+	   $(cmd_undef_syms); } > $(MODVERDIR)/$(@F:.o=.mod)
+ define rule_as_o_S
+-	$(call echo-cmd,as_o_S) $(cmd_as_o_S);				  \
+-	$(cmd_objtool)						  \
+-	scripts/basic/fixdep $(depfile) $@ '$(call make-cmd,as_o_S)' >    \
+-	                                              $(dot-target).tmp;  \
+-	rm -f $(depfile);						  \
+-	mv -f $(dot-target).tmp $(dot-target).cmd
++	$(call cmd_and_fixdep,as_o_S)					  \
++	$(cmd_objtool)
+ endef
  
- quiet_cmd_cc_lst_c = MKLST   $@
-       cmd_cc_lst_c = $(CC) $(c_flags) -g -c -o $*.o $< && \
-@@ -426,7 +434,8 @@ $(call multi_depend, $(multi-used-y), .o, -objs -y)
- 
- $(multi-used-m): FORCE
- 	$(call if_changed,link_multi-m)
--	@{ echo $(@:.o=.ko); echo $(link_multi_deps); } > $(MODVERDIR)/$(@F:.o=.mod)
-+	@{ echo $(@:.o=.ko); echo $(link_multi_deps); \
-+	   $(cmd_undef_syms); } > $(MODVERDIR)/$(@F:.o=.mod)
- $(call multi_depend, $(multi-used-m), .o, -objs -y -m)
- 
- targets += $(multi-used-y) $(multi-used-m)
+ # List module undefined symbols (or empty line if not enabled)
 -- 
 2.5.5
 
