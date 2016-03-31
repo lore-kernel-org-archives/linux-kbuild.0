@@ -1,47 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ob0-f178.google.com ([209.85.214.178]:34503 "EHLO
-	mail-ob0-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756150AbcCaQqb (ORCPT
+Received: from smtp.codeaurora.org ([198.145.29.96]:39604 "EHLO
+	smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756284AbcCaRbl (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 31 Mar 2016 12:46:31 -0400
-From: Rob Herring <robh@kernel.org>
-Subject: [PATCH] dtc: turn off dtc unit address warnings by default
-Date: Thu, 31 Mar 2016 11:46:18 -0500
-Message-Id: <1459442778-12175-1-git-send-email-robh@kernel.org>
+	Thu, 31 Mar 2016 13:31:41 -0400
+From: Azriel Samson <asamson@codeaurora.org>
+Subject: [PATCH v1] builddeb: fix missing headers in linux-headers package
+Date: Thu, 31 Mar 2016 11:31:18 -0600
+Message-Id: <1459445479-10948-1-git-send-email-asamson@codeaurora.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org, devicetree@vger.kernel.org
-Cc: Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org
+To: Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org, cov@codeaurora.org, Timur Tabi <timur@codeaurora.org>, Azriel Samson <asamson@codeaurora.org>
 
-The newly added dtc warning to check DT unit-address without reg
-property and vice-versa generates lots of warnings. Turn off the check
-unless building with W=1 or W=2.
+The kernel headers package (linux-headers) doesn't include
+header files from other architectures required to build
+out-of-tree modules.
 
-Signed-off-by: Rob Herring <robh@kernel.org>
-Cc: Michal Marek <mmarek@suse.com>
-Cc: linux-kbuild@vger.kernel.org
+For e.g. on ARM64, opcodes.h includes the same file from ARM
+which causes the following error:
+./arch/arm64/include/asm/opcodes.h:1:43: fatal error:
+../../arm/include/asm/opcodes.h: No such file or directory
+compilation terminated.
+
+Signed-off-by: Azriel Samson <asamson@codeaurora.org>
 ---
-Michal, I plan to apply this with the corresponding dtc update.
+ scripts/package/builddeb | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
- scripts/Makefile.lib | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index ddf83d0..ed1b7c4 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -277,6 +277,11 @@ cmd_gzip = (cat $(filter-out FORCE,$^) | gzip -n -f -9 > $@) || \
- # ---------------------------------------------------------------------------
- DTC ?= $(objtree)/scripts/dtc/dtc
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index 6c3b038..06ba0d9 100755
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -322,7 +322,7 @@ fi
  
-+# Disable noisy checks by default
-+ifeq ($(KBUILD_ENABLE_EXTRA_GCC_CHECKS),)
-+DTC_FLAGS += -Wno-unit_address_vs_reg
-+endif
-+
- # Generate an assembly file to wrap the output of the device tree compiler
- quiet_cmd_dt_S_dtb= DTB     $@
- cmd_dt_S_dtb=						\
+ # Build kernel header package
+ (cd $srctree; find . -name Makefile\* -o -name Kconfig\* -o -name \*.pl) > "$objtree/debian/hdrsrcfiles"
+-(cd $srctree; find arch/$SRCARCH/include include scripts -type f) >> "$objtree/debian/hdrsrcfiles"
++(cd $srctree; find arch/*/include include scripts -type f) >> "$objtree/debian/hdrsrcfiles"
+ (cd $srctree; find arch/$SRCARCH -name module.lds -o -name Kbuild.platforms -o -name Platform) >> "$objtree/debian/hdrsrcfiles"
+ (cd $srctree; find $(find arch/$SRCARCH -name include -o -name scripts -type d) -type f) >> "$objtree/debian/hdrsrcfiles"
+ (cd $objtree; find arch/$SRCARCH/include Module.symvers include scripts -type f) >> "$objtree/debian/hdrobjfiles"
 -- 
-2.5.0
+Qualcomm Innovation Center, Inc.
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
+a Linux Foundation Collaborative Project.
 
