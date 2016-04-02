@@ -1,79 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:43392 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751006AbcDBRzs (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 2 Apr 2016 13:55:48 -0400
-From: Benjamin Poirier <bpoirier@suse.com>
-Subject: [PATCH 2/2] localmodconfig: Reset certificate paths
-Date: Sat,  2 Apr 2016 10:55:22 -0700
-Message-Id: <1459619722-13695-2-git-send-email-bpoirier@suse.com>
-In-Reply-To: <1459619722-13695-1-git-send-email-bpoirier@suse.com>
-References: <1459619722-13695-1-git-send-email-bpoirier@suse.com>
+Received: from smtp01.smtpout.orange.fr ([80.12.242.123]:43506 "EHLO
+	smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750978AbcDBTjC (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 2 Apr 2016 15:39:02 -0400
+From: Robert Jarzmik <robert.jarzmik@free.fr>
+Subject: [PATCH v2] kbuild: forbid kernel directory to contain spaces and colons
+Date: Sat,  2 Apr 2016 21:38:53 +0200
+Message-Id: <1459625933-20677-1-git-send-email-robert.jarzmik@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: Michal Marek <mmarek@suse.cz>, joeyli <jlee@suse.com>, "Yann E . MORIN " <yann.morin.1998@free.fr>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Michal Marek <mmarek@suse.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Robert Jarzmik <robert.jarzmik@free.fr>
 
-When using `make localmodconfig` and friends, if the input config comes
-from a kernel that was built in a different environment (for example, the
-canonical case of using localmodconfig to trim a distribution kernel
-config) the key files for module signature checking will not be available
-and should be regenerated or omitted. Otherwise, the user will be faced
-with annoying errors when trying to build with the generated .config:
+When the kernel path contains a space or a colon somewhere in the path
+name, the modules_install target doesn't work anymore, as the path names
+are not enclosed in double quotes. It is also supposed that and O= build
+will suffer from the same weakness as modules_install.
 
-make[1]: *** No rule to make target 'keyring.crt', needed by 'certs/x509_certificate_list'.  Stop.
-Makefile:1576: recipe for target 'certs/' failed
+Instead of checking and improving kbuild to resist to directories
+including these characters, error out early to prevent any build if the
+kernel's main directory contains a space.
 
-Signed-off-by: Benjamin Poirier <bpoirier@suse.com>
+Signed-off-by: Robert Jarzmik <robert.jarzmik@free.fr>
 ---
- scripts/kconfig/streamline_config.pl | 34 ++++++++++++++++++++++++++++++++++
- 1 file changed, 34 insertions(+)
+Since v1: add colon check as requested by Michal.
+---
+ Makefile | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
-index 7036ae3..514735d 100755
---- a/scripts/kconfig/streamline_config.pl
-+++ b/scripts/kconfig/streamline_config.pl
-@@ -610,6 +610,40 @@ foreach my $line (@config_file) {
- 	next;
-     }
+diff --git a/Makefile b/Makefile
+index 916b26e999d8..42e01dab13e7 100644
+--- a/Makefile
++++ b/Makefile
+@@ -128,6 +128,10 @@ _all:
+ # Cancel implicit rules on top Makefile
+ $(CURDIR)/Makefile Makefile: ;
  
-+    if (/CONFIG_MODULE_SIG_KEY="(.+)"/) {
-+        my $orig_cert = $1;
-+        my $default_cert = "certs/signing_key.pem";
++ifneq ($(words $(subst :, ,$(CURDIR))), 1)
++  $(error main directory cannot contain spaces nor colons)
++endif
 +
-+        # Check that the logic in this script still matches the one in Kconfig
-+        if (!defined($depends{"MODULE_SIG_KEY"}) ||
-+            $depends{"MODULE_SIG_KEY"} !~ /"\Q$default_cert\E"/) {
-+            die "Assertion failure, update needed";
-+        }
-+
-+        if ($orig_cert ne $default_cert && ! -f $orig_cert) {
-+            print STDERR "Module signature verification enabled but ",
-+                "module signing key \"$orig_cert\" not found. Resetting ",
-+                "signing key to default value.\n";
-+            print "CONFIG_MODULE_SIG_KEY=\"$default_cert\"\n";
-+        } else {
-+            print;
-+        }
-+        next;
-+    }
-+
-+    if (/CONFIG_SYSTEM_TRUSTED_KEYS="(.+)"/) {
-+        my $orig_keys = $1;
-+
-+        if (! -f $orig_keys) {
-+            print STDERR "System keyring enabled but keys \"$orig_keys\" ",
-+                "not found. Resetting keys to default value.\n";
-+            print "CONFIG_SYSTEM_TRUSTED_KEYS=\"\"\n";
-+        } else {
-+            print;
-+        }
-+        next;
-+    }
-+
-     if (/^(CONFIG.*)=(m|y)/) {
- 	if (defined($configs{$1})) {
- 	    if ($localyesconfig) {
+ ifneq ($(KBUILD_OUTPUT),)
+ # Invoke a second make in the output directory, passing relevant variables
+ # check that the output directory actually exists
 -- 
-2.7.2
+2.1.4
 
