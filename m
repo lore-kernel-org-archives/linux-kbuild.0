@@ -1,124 +1,28 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qk0-f176.google.com ([209.85.220.176]:34785 "EHLO
-	mail-qk0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750867AbcDFN7o (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 6 Apr 2016 09:59:44 -0400
-Received: by mail-qk0-f176.google.com with SMTP id r184so17779234qkc.1
-        for <linux-kbuild@vger.kernel.org>; Wed, 06 Apr 2016 06:59:44 -0700 (PDT)
-Date: Wed, 6 Apr 2016 09:59:41 -0400 (EDT)
-From: Nicolas Pitre <nicolas.pitre@linaro.org>
-Subject: Re: [PATCH v7 0/8]/[PULL REQUEST] Trim unused exported kernel
- symbols
-In-Reply-To: <l0Vnaswuk0zQ0l0Vpa1Uwn@videotron.ca>
-Message-ID: <alpine.LFD.2.20.1604060955590.1758@knanqh.ubzr>
-References: <l0Vnaswuk0zQ0l0Vpa1Uwn@videotron.ca>
-MIME-Version: 1.0
+Received: from smtp104.biz.mail.gq1.yahoo.com ([98.137.12.179]:39408 "EHLO
+	smtp104.biz.mail.gq1.yahoo.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S1751547AbcDFRdY convert rfc822-to-8bit
+	(ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 6 Apr 2016 13:33:24 -0400
+Message-ID: <664862.67471.qm@smtp104.biz.mail.gq1.yahoo.com>
 Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7BIT
+Content-Description: Mail message body
+Subject: how are you doing
+From: yolandaa@my-yd-web.net
+Date: Wed, 06 Apr 2016 17:26:30 +0000
+Reply-To: susanyolanda@hotmail.com
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Recipients <yolandaa@my-yd-web.net>
 
+Hello
 
-Gentle ping...
+how are you doing i hope you are fine i will like to know more about you
 
-If possible, I'd like for those patches to be sorted out before the 
-opening of the merge window gets too close like last time.
+writ me back so we can know each other very well
 
+am waiting for ur mail  susanyolanda@hotmail.com
 
-On Tue, 29 Mar 2016, Nicolas Pitre wrote:
-
-> This patch series provides the option to omit exported symbols from
-> the kernel and modules that are never referenced by any of the selected
-> modules in the current kernel configuration. this allows for optimizing
-> the compiled code and reducing final binaries' size. When using LTO the
-> binary size reduction is even more effective. It could also be argued
-> that this could bring some security advantages.
-> 
-> The original cover letter with lots of test results can be found here:
-> 
-> 	https://lkml.org/lkml/2016/2/8/813
-> 
-> Please consider for merging into your tree.
-> 
-> Alternately, the following branch can be pulled:
-> 
-> 	http://git.linaro.org/people/nicolas.pitre/linux.git autoksyms
-> 
-> Thanks.
-> 
-> Changes from v6:
-> 
-> - Rebased on v4.6-rc1, including adjustments to the recently introduced
->   rule_as_o_S.
-> 
-> - Explicitly ignored more if_changed_dep callers for which no EXPORT_SYMBOL
->   can be parsed.
-> 
-> Changes from v5:
-> 
-> - Disable automatic dependency file generation during the preprocessor
->   pass when gathering exported symbol names.  Not only it is redundant
->   but in some conditions this crashes fixdep that might be reading the
->   previous dependency file at the same time. Reported by Michal Marek.
-> 
-> - Redirect error messages to stderr rather than pass it as a symbol name
->   dependency.
-> 
-> Changes from v4:
-> 
-> - Correctness changes plus small cleanup to adjust_autoksyms.sh as
->   suggested by Michal Marek.
-> 
-> - Changed ksym build dependency generation by re-running the preprocessor
->   rather than collecting those dependencies as warnings through stderr
->   which was too fragile.
-> 
-> Changes from v3:
-> 
-> - Shell portability changes to adjust_autoksyms.sh, partly from
->   suggestions by Zev Weiss.
-> 
-> - Fix sample modules by building them before adjust_autoksyms.sh is run.
-> 
-> Changes from v2:
-> 
-> - Generating the build dependencies by parsing the source with fixdep
->   turned out to be unreliable due to all the EXPORT_SYMBOL() variants,
->   and especially their use within macros where the actual symbol name
->   is known only after running the preprocessor. This list of symbol names
->   is now obtained from the preprocessor directly, fixing allmodconfig
->   builds.
-> 
-> Changes from v1:
-> 
-> - Replaced "exp" that doesn't convey the right meaning as noted by
->   Sam Ravnborg. The "ksym" identifier is actually what the kernel
->   already uses for this. Therefore:
->   - CONFIG_TRIM_UNUSED_EXPSYMS --> CONFIG_TRIM_UNUSED_KSYMS
->   - include/generated/expsyms.h --> include/generated/autoksyms.h
->   - #define __EXPSYM_* --> #define __KSYM_*
-> 
-> - Some sed regexp improvements as suggested by Al Viro.
-> 
-> - Renamed vmlinux_recursive target to autoksyms_recursive.
-> 
-> - Accept EXPORT_SYMBOL variants with a prefix, e.g. ACPI_EXPORT_SYMBOL.
-> 
-> - Minor commit log clarifications.
-> 
-> - Added Rusty's ACK.
-> 
-> diffstat:
-> 
->  Makefile                    |  23 +++++++--
->  include/linux/export.h      |  33 ++++++++++++-
->  init/Kconfig                |  16 ++++++
->  scripts/Kbuild.include      |  32 +++++++++++-
->  scripts/Makefile.build      |  32 ++++++------
->  scripts/adjust_autoksyms.sh | 101 ++++++++++++++++++++++++++++++++++++++
->  scripts/basic/fixdep.c      |  61 +++++++++++++++++------
->  7 files changed, 261 insertions(+), 37 deletions(-)
-> 
-> 
+thank you 
