@@ -1,94 +1,124 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi0-f51.google.com ([209.85.218.51]:33076 "EHLO
-	mail-oi0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752360AbcDEDyN (ORCPT
+Received: from mail-qk0-f176.google.com ([209.85.220.176]:34785 "EHLO
+	mail-qk0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750867AbcDFN7o (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 4 Apr 2016 23:54:13 -0400
-Received: by mail-oi0-f51.google.com with SMTP id w85so2383151oiw.0
-        for <linux-kbuild@vger.kernel.org>; Mon, 04 Apr 2016 20:54:13 -0700 (PDT)
+	Wed, 6 Apr 2016 09:59:44 -0400
+Received: by mail-qk0-f176.google.com with SMTP id r184so17779234qkc.1
+        for <linux-kbuild@vger.kernel.org>; Wed, 06 Apr 2016 06:59:44 -0700 (PDT)
+Date: Wed, 6 Apr 2016 09:59:41 -0400 (EDT)
+From: Nicolas Pitre <nicolas.pitre@linaro.org>
+Subject: Re: [PATCH v7 0/8]/[PULL REQUEST] Trim unused exported kernel
+ symbols
+In-Reply-To: <l0Vnaswuk0zQ0l0Vpa1Uwn@videotron.ca>
+Message-ID: <alpine.LFD.2.20.1604060955590.1758@knanqh.ubzr>
+References: <l0Vnaswuk0zQ0l0Vpa1Uwn@videotron.ca>
 MIME-Version: 1.0
-In-Reply-To: <CALCETrUA-mueravS9YvV8dGy2MP38xitD_2eVyRqDXrT0ixPhw@mail.gmail.com>
-References: <CALCETrUh1jq7Di0gTO0R3wN51x=vmd5wU4ODmE0kXK13MhQDnA@mail.gmail.com>
- <20160205031116.GB30154@wfg-t540p.sh.intel.com> <CALCETrVssJ2oCqT9eKzoXQ0VWz1O1XB=Gt97djrgPYTfZYt_ug@mail.gmail.com>
- <20160206011742.GA13627@wfg-t540p.sh.intel.com> <CALCETrUA-mueravS9YvV8dGy2MP38xitD_2eVyRqDXrT0ixPhw@mail.gmail.com>
-From: Andy Lutomirski <luto@amacapital.net>
-Date: Mon, 4 Apr 2016 20:53:53 -0700
-Message-ID: <CALCETrU4+wjm2ZZjy-XGe4bfeHmVAy3A=OKbCppC0ho3mt539A@mail.gmail.com>
-Subject: Re: Adding Xen to the kbuild bot?
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Fengguang Wu <fengguang.wu@intel.com>
-Cc: "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, Ian Campbell <ian.campbell@citrix.com>, LKP <lkp@01.org>, "Hu, Robert" <robert.hu@intel.com>, Ian Jackson <Ian.Jackson@eu.citrix.com>
+To: Michal Marek <mmarek@suse.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Wed, Feb 17, 2016 at 12:46 PM, Andy Lutomirski <luto@amacapital.net> wrote:
-> On Fri, Feb 5, 2016 at 5:17 PM, Fengguang Wu <fengguang.wu@intel.com> wrote:
->> On Fri, Feb 05, 2016 at 12:10:56PM -0800, Andy Lutomirski wrote:
->>> On Feb 4, 2016 7:11 PM, "Fengguang Wu" <fengguang.wu@intel.com> wrote:
->>> >
->>> > Hi Andy,
->>> >
->>> > CC more people on Xen testing -- in case OSStest already (or plans to)
->>> > cover such test case.
->>> >
->>> > On Tue, Feb 02, 2016 at 07:31:30PM -0800, Andy Lutomirski wrote:
->>> > > Hi all-
->>> > >
->>> > > Would it make sense to add some basic Xen PV testing to the kbuild bot?
->>> >
->>> > Do you mean to run basic Xen testing on the various kernel trees that
->>> > 0day robot covers? That is, to catch kernel regressions when running
->>> > under Xen.
->>> >
->>>
->>> Yes, exactly.  I've personally broken Linux as a Xen guest at least twice.
->>>
->>> > If the intention is to catch Xen regressions, the OSStest
->>> > infrastructure may be a better option:
->>> >
->>> >         git://xenbits.xen.org/osstest.git
->>>
->>> No, I think that 0day should pick one Xen version and stick with it
->>> for a while rather than trying to track the latest version.
->>
->> OK, got it. So it's suitable to run in 0day.
->>
->>> > > qemu can boot Xen like this:
->>> > >
->>> > > qemu-system-x86_64 -kernel path/to/xen-4.5.2 -initrd 'path/to/bzImage
->>> > > kernelarg otherkernelarg=value" -append 'xenarg other_xen_arg'
->>> > >
->>> > > This should work with any kernel image for x86 or x86_64 with CONFIG_XEN=y.
->>> >
->>> > Got it. If you have simple working test scripts to illustrate test
->>> > details, it'd be a great help for integrating into OSStest or 0day.
->>>
->>> I have a script that will boot to a command prompt, but I don't know
->>> if that's the right way to do it.  I'm not really sure how 0day works
->>> under the hood, but treating Xen as a different configuration or arch
->>> instead of treating it as a different test case might make more sense.
->>
->> We can check the script first, then determine the most suitable way to
->> integrate it into 0day. My guess is, it might be suitable to run as a
->> new kind of VM host, like this
->>
->> https://git.kernel.org/cgit/linux/kernel/git/wfg/lkp-tests.git/tree/hosts/vm-kbuild-1G
->>
->> model: qemu-system-x86_64 -enable-kvm -cpu Haswell,+smep,+smap
->> nr_vm: 12
->> nr_cpu: 2
->> memory: 1G
->> disk_type: virtio-scsi
->> rootfs: debian-x86_64.cgz
->> hdd_partitions: /dev/sda /dev/sdb /dev/sdc /dev/sdd
->> swap_partitions: /dev/sde
->
-> This makes sense to me, but I think it would need an extension to the
-> configuration language.
->
-> The guest virtio code should be in the next -next release.
->
 
-FWIW, 4.6-rc1 works when booted via Xen on QEMU/KVM with virtio out of the box.
+Gentle ping...
 
---Andy
+If possible, I'd like for those patches to be sorted out before the 
+opening of the merge window gets too close like last time.
+
+
+On Tue, 29 Mar 2016, Nicolas Pitre wrote:
+
+> This patch series provides the option to omit exported symbols from
+> the kernel and modules that are never referenced by any of the selected
+> modules in the current kernel configuration. this allows for optimizing
+> the compiled code and reducing final binaries' size. When using LTO the
+> binary size reduction is even more effective. It could also be argued
+> that this could bring some security advantages.
+> 
+> The original cover letter with lots of test results can be found here:
+> 
+> 	https://lkml.org/lkml/2016/2/8/813
+> 
+> Please consider for merging into your tree.
+> 
+> Alternately, the following branch can be pulled:
+> 
+> 	http://git.linaro.org/people/nicolas.pitre/linux.git autoksyms
+> 
+> Thanks.
+> 
+> Changes from v6:
+> 
+> - Rebased on v4.6-rc1, including adjustments to the recently introduced
+>   rule_as_o_S.
+> 
+> - Explicitly ignored more if_changed_dep callers for which no EXPORT_SYMBOL
+>   can be parsed.
+> 
+> Changes from v5:
+> 
+> - Disable automatic dependency file generation during the preprocessor
+>   pass when gathering exported symbol names.  Not only it is redundant
+>   but in some conditions this crashes fixdep that might be reading the
+>   previous dependency file at the same time. Reported by Michal Marek.
+> 
+> - Redirect error messages to stderr rather than pass it as a symbol name
+>   dependency.
+> 
+> Changes from v4:
+> 
+> - Correctness changes plus small cleanup to adjust_autoksyms.sh as
+>   suggested by Michal Marek.
+> 
+> - Changed ksym build dependency generation by re-running the preprocessor
+>   rather than collecting those dependencies as warnings through stderr
+>   which was too fragile.
+> 
+> Changes from v3:
+> 
+> - Shell portability changes to adjust_autoksyms.sh, partly from
+>   suggestions by Zev Weiss.
+> 
+> - Fix sample modules by building them before adjust_autoksyms.sh is run.
+> 
+> Changes from v2:
+> 
+> - Generating the build dependencies by parsing the source with fixdep
+>   turned out to be unreliable due to all the EXPORT_SYMBOL() variants,
+>   and especially their use within macros where the actual symbol name
+>   is known only after running the preprocessor. This list of symbol names
+>   is now obtained from the preprocessor directly, fixing allmodconfig
+>   builds.
+> 
+> Changes from v1:
+> 
+> - Replaced "exp" that doesn't convey the right meaning as noted by
+>   Sam Ravnborg. The "ksym" identifier is actually what the kernel
+>   already uses for this. Therefore:
+>   - CONFIG_TRIM_UNUSED_EXPSYMS --> CONFIG_TRIM_UNUSED_KSYMS
+>   - include/generated/expsyms.h --> include/generated/autoksyms.h
+>   - #define __EXPSYM_* --> #define __KSYM_*
+> 
+> - Some sed regexp improvements as suggested by Al Viro.
+> 
+> - Renamed vmlinux_recursive target to autoksyms_recursive.
+> 
+> - Accept EXPORT_SYMBOL variants with a prefix, e.g. ACPI_EXPORT_SYMBOL.
+> 
+> - Minor commit log clarifications.
+> 
+> - Added Rusty's ACK.
+> 
+> diffstat:
+> 
+>  Makefile                    |  23 +++++++--
+>  include/linux/export.h      |  33 ++++++++++++-
+>  init/Kconfig                |  16 ++++++
+>  scripts/Kbuild.include      |  32 +++++++++++-
+>  scripts/Makefile.build      |  32 ++++++------
+>  scripts/adjust_autoksyms.sh | 101 ++++++++++++++++++++++++++++++++++++++
+>  scripts/basic/fixdep.c      |  61 +++++++++++++++++------
+>  7 files changed, 261 insertions(+), 37 deletions(-)
+> 
+> 
