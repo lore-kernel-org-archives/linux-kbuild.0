@@ -1,91 +1,87 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.nue.novell.com ([195.135.221.5]:32942 "EHLO
-	smtp.nue.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1758180AbcDHPAH (ORCPT
-	<rfc822;groupwise-linux-kbuild@vger.kernel.org:0:0>);
-	Fri, 8 Apr 2016 11:00:07 -0400
-Date: Fri, 8 Apr 2016 22:59:56 +0800
-From: joeyli <jlee@suse.com>
-Subject: Re: [PATCH 2/2] localmodconfig: Reset certificate paths
-Message-ID: <20160408145956.GI29941@linux-rxt1.site>
-References: <1459619722-13695-1-git-send-email-bpoirier@suse.com>
- <1459619722-13695-2-git-send-email-bpoirier@suse.com>
+Received: from mx1.redhat.com ([209.132.183.28]:58972 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S932725AbcDHPBC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 8 Apr 2016 11:01:02 -0400
+Date: Fri, 8 Apr 2016 12:00:57 -0300
+From: Arnaldo Carvalho de Melo <acme@redhat.com>
+Subject: Re: [PATCH 1/2] kbuild: rename cmd_cc_i_c to cmd_cpp_i_c
+Message-ID: <20160408150057.GF5327@redhat.com>
+References: <1460082288-31817-1-git-send-email-yamada.masahiro@socionext.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1459619722-13695-2-git-send-email-bpoirier@suse.com>
+In-Reply-To: <1460082288-31817-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Benjamin Poirier <bpoirier@suse.com>
-Cc: Steven Rostedt <rostedt@goodmis.org>, Michal Marek <mmarek@suse.cz>, "Yann E . MORIN " <yann.morin.1998@free.fr>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-kbuild@vger.kernel.org, Aaro Koskinen <aaro.koskinen@nokia.com>, Adrian Hunter <adrian.hunter@intel.com>, Michal Marek <mmarek@suse.com>, linux-kernel@vger.kernel.org, Arnaldo Carvalho de Melo <acme@kernel.org>, Lukas Wunner <lukas@wunner.de>, Jiri Olsa <jolsa@kernel.org>
 
-On Sat, Apr 02, 2016 at 10:55:22AM -0700, Benjamin Poirier wrote:
-> When using `make localmodconfig` and friends, if the input config comes
-> from a kernel that was built in a different environment (for example, the
-> canonical case of using localmodconfig to trim a distribution kernel
-> config) the key files for module signature checking will not be available
-> and should be regenerated or omitted. Otherwise, the user will be faced
-> with annoying errors when trying to build with the generated .config:
-> 
-> make[1]: *** No rule to make target 'keyring.crt', needed by 'certs/x509_certificate_list'.  Stop.
-> Makefile:1576: recipe for target 'certs/' failed
-> 
-> Signed-off-by: Benjamin Poirier <bpoirier@suse.com>
+Em Fri, Apr 08, 2016 at 11:24:47AM +0900, Masahiro Yamada escreveu:
+> This command just preprocesses .c files into .i files, so cmd_cpp_i_c
+> seems more suitable.
 
-Tested-by: Lee, Chun-Yi <jlee@suse.com>
+Thanks for doing it to the tools/build/ copy, looks sensible, I guess
+this can go via the kbuild tree?
 
+Acked-by: Arnaldo Carvalho de Melo <acme@redhat.com>
 
-Regards
-Joey Lee
-
+- Arnaldo
+ 
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 > ---
->  scripts/kconfig/streamline_config.pl | 34 ++++++++++++++++++++++++++++++++++
->  1 file changed, 34 insertions(+)
 > 
-> diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
-> index 7036ae3..514735d 100755
-> --- a/scripts/kconfig/streamline_config.pl
-> +++ b/scripts/kconfig/streamline_config.pl
-> @@ -610,6 +610,40 @@ foreach my $line (@config_file) {
->  	next;
->      }
+>  scripts/Makefile.build     | 6 +++---
+>  tools/build/Makefile.build | 8 ++++----
+>  2 files changed, 7 insertions(+), 7 deletions(-)
+> 
+> diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+> index e1bc190..7e4df13 100644
+> --- a/scripts/Makefile.build
+> +++ b/scripts/Makefile.build
+> @@ -152,11 +152,11 @@ cmd_cc_s_c       = $(CC) $(c_flags) $(DISABLE_LTO) -fverbose-asm -S -o $@ $<
+>  $(obj)/%.s: $(src)/%.c FORCE
+>  	$(call if_changed_dep,cc_s_c)
 >  
-> +    if (/CONFIG_MODULE_SIG_KEY="(.+)"/) {
-> +        my $orig_cert = $1;
-> +        my $default_cert = "certs/signing_key.pem";
-> +
-> +        # Check that the logic in this script still matches the one in Kconfig
-> +        if (!defined($depends{"MODULE_SIG_KEY"}) ||
-> +            $depends{"MODULE_SIG_KEY"} !~ /"\Q$default_cert\E"/) {
-> +            die "Assertion failure, update needed";
-> +        }
-> +
-> +        if ($orig_cert ne $default_cert && ! -f $orig_cert) {
-> +            print STDERR "Module signature verification enabled but ",
-> +                "module signing key \"$orig_cert\" not found. Resetting ",
-> +                "signing key to default value.\n";
-> +            print "CONFIG_MODULE_SIG_KEY=\"$default_cert\"\n";
-> +        } else {
-> +            print;
-> +        }
-> +        next;
-> +    }
-> +
-> +    if (/CONFIG_SYSTEM_TRUSTED_KEYS="(.+)"/) {
-> +        my $orig_keys = $1;
-> +
-> +        if (! -f $orig_keys) {
-> +            print STDERR "System keyring enabled but keys \"$orig_keys\" ",
-> +                "not found. Resetting keys to default value.\n";
-> +            print "CONFIG_SYSTEM_TRUSTED_KEYS=\"\"\n";
-> +        } else {
-> +            print;
-> +        }
-> +        next;
-> +    }
-> +
->      if (/^(CONFIG.*)=(m|y)/) {
->  	if (defined($configs{$1})) {
->  	    if ($localyesconfig) {
+> -quiet_cmd_cc_i_c = CPP $(quiet_modtag) $@
+> -cmd_cc_i_c       = $(CPP) $(c_flags)   -o $@ $<
+> +quiet_cmd_cpp_i_c = CPP $(quiet_modtag) $@
+> +cmd_cpp_i_c       = $(CPP) $(c_flags) -o $@ $<
+>  
+>  $(obj)/%.i: $(src)/%.c FORCE
+> -	$(call if_changed_dep,cc_i_c)
+> +	$(call if_changed_dep,cpp_i_c)
+>  
+>  cmd_gensymtypes =                                                           \
+>      $(CPP) -D__GENKSYMS__ $(c_flags) $< |                                   \
+> diff --git a/tools/build/Makefile.build b/tools/build/Makefile.build
+> index ee566e8..27f3583 100644
+> --- a/tools/build/Makefile.build
+> +++ b/tools/build/Makefile.build
+> @@ -58,8 +58,8 @@ quiet_cmd_mkdir = MKDIR    $(dir $@)
+>  quiet_cmd_cc_o_c = CC       $@
+>        cmd_cc_o_c = $(CC) $(c_flags) -c -o $@ $<
+>  
+> -quiet_cmd_cc_i_c = CPP      $@
+> -      cmd_cc_i_c = $(CC) $(c_flags) -E -o $@ $<
+> +quiet_cmd_cpp_i_c = CPP      $@
+> +      cmd_cpp_i_c = $(CC) $(c_flags) -E -o $@ $<
+>  
+>  quiet_cmd_cc_s_c = AS       $@
+>        cmd_cc_s_c = $(CC) $(c_flags) -S -o $@ $<
+> @@ -83,11 +83,11 @@ $(OUTPUT)%.o: %.S FORCE
+>  
+>  $(OUTPUT)%.i: %.c FORCE
+>  	$(call rule_mkdir)
+> -	$(call if_changed_dep,cc_i_c)
+> +	$(call if_changed_dep,cpp_i_c)
+>  
+>  $(OUTPUT)%.s: %.S FORCE
+>  	$(call rule_mkdir)
+> -	$(call if_changed_dep,cc_i_c)
+> +	$(call if_changed_dep,cpp_i_c)
+>  
+>  $(OUTPUT)%.s: %.c FORCE
+>  	$(call rule_mkdir)
 > -- 
-> 2.7.2
+> 1.9.1
