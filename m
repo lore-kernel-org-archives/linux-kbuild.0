@@ -1,61 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f45.google.com ([74.125.82.45]:34716 "EHLO
-	mail-wm0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752047AbcDHJQE (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 8 Apr 2016 05:16:04 -0400
-From: Thierry Reding <thierry.reding@gmail.com>
-Subject: [PATCH] tools: Use builtin $(abspath ...) instead of $(shell cd ... && pwd)
-Date: Fri,  8 Apr 2016 11:15:59 +0200
-Message-Id: <1460106959-6684-1-git-send-email-thierry.reding@gmail.com>
+Received: from smtp.nue.novell.com ([195.135.221.5]:42763 "EHLO
+	smtp.nue.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1758260AbcDHO7O (ORCPT
+	<rfc822;groupwise-linux-kbuild@vger.kernel.org:0:0>);
+	Fri, 8 Apr 2016 10:59:14 -0400
+Date: Fri, 8 Apr 2016 22:59:02 +0800
+From: joeyli <jlee@suse.com>
+Subject: Re: [PATCH 1/2] localmodconfig: Fix parsing of Kconfig "source"
+ statements
+Message-ID: <20160408145902.GH29941@linux-rxt1.site>
+References: <1459619722-13695-1-git-send-email-bpoirier@suse.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1459619722-13695-1-git-send-email-bpoirier@suse.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Benjamin Poirier <bpoirier@suse.com>
+Cc: Steven Rostedt <rostedt@goodmis.org>, Michal Marek <mmarek@suse.cz>, "Yann E . MORIN " <yann.morin.1998@free.fr>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-From: Thierry Reding <treding@nvidia.com>
+On Sat, Apr 02, 2016 at 10:55:21AM -0700, Benjamin Poirier wrote:
+> The parameter of Kconfig "source" statements does not need to be quoted.
+> The current regex causes many kconfig files to be skipped and hence,
+> dependencies to be missed.
+> 
+> Also fix the whitespace repeat count.
+> 
+> Signed-off-by: Benjamin Poirier <bpoirier@suse.com>
 
-Avoid forking off a shell to resolve the absolute path of the output
-directory when make's builtin $(abspath ...) function will do an
-adequate job.
+Tested-by: Lee, Chun-Yi <jlee@suse.com>
 
-Signed-off-by: Thierry Reding <treding@nvidia.com>
----
- Makefile                       | 4 ++--
- tools/scripts/Makefile.include | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+> ---
+>  scripts/kconfig/streamline_config.pl | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
+> index f3d3fb4..7036ae3 100755
+> --- a/scripts/kconfig/streamline_config.pl
+> +++ b/scripts/kconfig/streamline_config.pl
+> @@ -188,7 +188,7 @@ sub read_kconfig {
+>  	$cont = 0;
+>  
+>  	# collect any Kconfig sources
+> -	if (/^source\s*"(.*)"/) {
+> +	if (/^source\s+"?([^"]+)/) {
+>  	    my $kconfig = $1;
+>  	    # prevent reading twice.
+>  	    if (!defined($read_kconfigs{$kconfig})) {
+> -- 
+> 2.7.2
 
-diff --git a/Makefile b/Makefile
-index 173437debc87..c1e3ece3684f 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1542,11 +1542,11 @@ image_name:
- # Clear a bunch of variables before executing the submake
- tools/: FORCE
- 	$(Q)mkdir -p $(objtree)/tools
--	$(Q)$(MAKE) LDFLAGS= MAKEFLAGS="$(filter --j% -j,$(MAKEFLAGS))" O=$(shell cd $(objtree) && /bin/pwd) subdir=tools -C $(src)/tools/
-+	$(Q)$(MAKE) LDFLAGS= MAKEFLAGS="$(filter --j% -j,$(MAKEFLAGS))" O=$(abspath $(objtree)) subdir=tools -C $(src)/tools/
- 
- tools/%: FORCE
- 	$(Q)mkdir -p $(objtree)/tools
--	$(Q)$(MAKE) LDFLAGS= MAKEFLAGS="$(filter --j% -j,$(MAKEFLAGS))" O=$(shell cd $(objtree) && /bin/pwd) subdir=tools -C $(src)/tools/ $*
-+	$(Q)$(MAKE) LDFLAGS= MAKEFLAGS="$(filter --j% -j,$(MAKEFLAGS))" O=$(abspath $(objtree)) subdir=tools -C $(src)/tools/ $*
- 
- # Single targets
- # ---------------------------------------------------------------------------
-diff --git a/tools/scripts/Makefile.include b/tools/scripts/Makefile.include
-index 5467da41dc72..4d34d0729ac9 100644
---- a/tools/scripts/Makefile.include
-+++ b/tools/scripts/Makefile.include
-@@ -1,7 +1,7 @@
- ifneq ($(O),)
- ifeq ($(origin O), command line)
- 	dummy := $(if $(shell test -d $(O) || echo $(O)),$(error O=$(O) does not exist),)
--	ABSOLUTE_O := $(shell cd $(O) ; pwd)
-+	ABSOLUTE_O := $(abspath $(O))
- 	OUTPUT := $(ABSOLUTE_O)/$(if $(subdir),$(subdir)/)
- 	COMMAND_O := O=$(ABSOLUTE_O)
- ifeq ($(objtree),)
--- 
-2.8.0
-
+Regards
+Joey Lee
