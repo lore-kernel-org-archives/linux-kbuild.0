@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:42307 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:42314 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751808AbcDKAHH (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 10 Apr 2016 20:07:07 -0400
+	id S1752147AbcDKAHL (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 10 Apr 2016 20:07:11 -0400
 From: Benjamin Poirier <bpoirier@suse.com>
-Subject: [PATCH 3/4] localmodconfig: Add missing $ to reference a variable
-Date: Sun, 10 Apr 2016 17:06:32 -0700
-Message-Id: <1460333193-16361-3-git-send-email-bpoirier@suse.com>
+Subject: [PATCH 4/4] localmodconfig: Recognize standalone "prompt"
+Date: Sun, 10 Apr 2016 17:06:33 -0700
+Message-Id: <1460333193-16361-4-git-send-email-bpoirier@suse.com>
 In-Reply-To: <1460333193-16361-1-git-send-email-bpoirier@suse.com>
 References: <20160410235234.GA13689@f1.synalogic.ca>
  <1460333193-16361-1-git-send-email-bpoirier@suse.com>
@@ -15,11 +15,11 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Steven Rostedt <rostedt@goodmis.org>
 Cc: Michal Marek <mmarek@suse.cz>, joeyli <jlee@suse.com>, "Yann E . MORIN " <yann.morin.1998@free.fr>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-That is clearly what the original intention was. This does not change the
-output .config but it prevents some useless processing.
+Note that this may change the resulting .config, causing it to have fewer
+symbols turned on. Before this patch we incorrectly identified some symbols
+as not having a prompt and needing to be selected by something else.
 
-! eq "m" is changed to the simpler eq "y"; symbols with values other than
-m|y are not included in %orig_configs.
+Also fix the whitespace repeat after "tristate".
 
 Signed-off-by: Benjamin Poirier <bpoirier@suse.com>
 ---
@@ -27,17 +27,17 @@ Signed-off-by: Benjamin Poirier <bpoirier@suse.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
-index f06972a..bbc160c 100755
+index bbc160c..d465672 100755
 --- a/scripts/kconfig/streamline_config.pl
 +++ b/scripts/kconfig/streamline_config.pl
-@@ -454,7 +454,7 @@ sub parse_config_depends
- 	    $p =~ s/^[^$valid]*[$valid]+//;
- 
- 	    # We only need to process if the depend config is a module
--	    if (!defined($orig_configs{$conf}) || !$orig_configs{conf} eq "m") {
-+	    if (!defined($orig_configs{$conf}) || $orig_configs{$conf} eq "y") {
- 		next;
+@@ -237,7 +237,7 @@ sub read_kconfig {
  	    }
+ 
+ 	# configs without prompts must be selected
+-	} elsif ($state ne "NONE" && /^\s*tristate\s\S/) {
++	} elsif ($state ne "NONE" && /^\s*(tristate\s+\S|prompt\b)/) {
+ 	    # note if the config has a prompt
+ 	    $prompts{$config} = 1;
  
 -- 
 2.7.4
