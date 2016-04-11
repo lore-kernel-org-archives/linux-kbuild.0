@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:42314 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:42300 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752147AbcDKAHL (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 10 Apr 2016 20:07:11 -0400
+	id S1751719AbcDKAG6 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sun, 10 Apr 2016 20:06:58 -0400
 From: Benjamin Poirier <bpoirier@suse.com>
-Subject: [PATCH 4/4] localmodconfig: Recognize standalone "prompt"
-Date: Sun, 10 Apr 2016 17:06:33 -0700
-Message-Id: <1460333193-16361-4-git-send-email-bpoirier@suse.com>
+Subject: [PATCH 2/4] localmodconfig: Fix parsing of "help" text
+Date: Sun, 10 Apr 2016 17:06:31 -0700
+Message-Id: <1460333193-16361-2-git-send-email-bpoirier@suse.com>
 In-Reply-To: <1460333193-16361-1-git-send-email-bpoirier@suse.com>
 References: <20160410235234.GA13689@f1.synalogic.ca>
  <1460333193-16361-1-git-send-email-bpoirier@suse.com>
@@ -15,11 +15,11 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Steven Rostedt <rostedt@goodmis.org>
 Cc: Michal Marek <mmarek@suse.cz>, joeyli <jlee@suse.com>, "Yann E . MORIN " <yann.morin.1998@free.fr>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Note that this may change the resulting .config, causing it to have fewer
-symbols turned on. Before this patch we incorrectly identified some symbols
-as not having a prompt and needing to be selected by something else.
+Help text may start with "help" or "---help---". This patch fixes
+read_kconfig() to recognize the second variant.
 
-Also fix the whitespace repeat after "tristate".
+This removes useless junk from %depends and %selects. That junk is due to
+help text that contains the words "selects" and "depends".
 
 Signed-off-by: Benjamin Poirier <bpoirier@suse.com>
 ---
@@ -27,18 +27,18 @@ Signed-off-by: Benjamin Poirier <bpoirier@suse.com>
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
-index bbc160c..d465672 100755
+index c5b388c..f06972a 100755
 --- a/scripts/kconfig/streamline_config.pl
 +++ b/scripts/kconfig/streamline_config.pl
-@@ -237,7 +237,7 @@ sub read_kconfig {
- 	    }
+@@ -257,7 +257,7 @@ sub read_kconfig {
+ 	    $iflevel-- if ($iflevel);
  
- 	# configs without prompts must be selected
--	} elsif ($state ne "NONE" && /^\s*tristate\s\S/) {
-+	} elsif ($state ne "NONE" && /^\s*(tristate\s+\S|prompt\b)/) {
- 	    # note if the config has a prompt
- 	    $prompts{$config} = 1;
- 
+ 	# stop on "help" and keywords that end a menu entry
+-	} elsif (/^\s*help\s*$/ || /^(comment|choice|menu)\b/) {
++	} elsif (/^\s*(---)?help(---)?\s*$/ || /^(comment|choice|menu)\b/) {
+ 	    $state = "NONE";
+ 	}
+     }
 -- 
 2.7.4
 
