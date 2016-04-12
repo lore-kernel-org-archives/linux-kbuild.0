@@ -1,51 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-io0-f176.google.com ([209.85.223.176]:34475 "EHLO
-	mail-io0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932781AbcDLRqL (ORCPT
+Received: from mail-wm0-f45.google.com ([74.125.82.45]:34348 "EHLO
+	mail-wm0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933745AbcDLS1y (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 12 Apr 2016 13:46:11 -0400
-Received: by mail-io0-f176.google.com with SMTP id 2so38180761ioy.1
-        for <linux-kbuild@vger.kernel.org>; Tue, 12 Apr 2016 10:46:11 -0700 (PDT)
-Date: Tue, 12 Apr 2016 11:46:07 -0600
-From: David Brown <david.brown@linaro.org>
-Subject: Re: [PATCH v6 0/6] Introduce GCC plugin infrastructure
-Message-ID: <20160412174607.GA92143@davidb.org>
-References: <20160407231023.5f1307ffc79f0cdd880eedb7@gmail.com>
+	Tue, 12 Apr 2016 14:27:54 -0400
+Received: by mail-wm0-f45.google.com with SMTP id l6so199249209wml.1
+        for <linux-kbuild@vger.kernel.org>; Tue, 12 Apr 2016 11:27:53 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20160407231023.5f1307ffc79f0cdd880eedb7@gmail.com>
+In-Reply-To: <20160412174607.GA92143@davidb.org>
+References: <20160407231023.5f1307ffc79f0cdd880eedb7@gmail.com>
+	<20160412174607.GA92143@davidb.org>
+Date: Tue, 12 Apr 2016 11:27:52 -0700
+Message-ID: <CAGXu5jKPqkG52ckYAJPscySfyg+YHEVsMvPq-05YM4A3Ypx4Kg@mail.gmail.com>
+Subject: Re: [PATCH v6 0/6] Introduce GCC plugin infrastructure
+From: Kees Cook <keescook@chromium.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Emese Revfy <re.emese@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, pageexec@freemail.hu, spender@grsecurity.net, kernel-hardening@lists.openwall.com, mmarek@suse.com, keescook@chromium.org, linux@rasmusvillemoes.dk, fengguang.wu@intel.com, dvyukov@google.com, linux-kernel@vger.kernel.org, yamada.masahiro@socionext.com
+To: David Brown <david.brown@linaro.org>, Emese Revfy <re.emese@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, PaX Team <pageexec@freemail.hu>, Brad Spengler <spender@grsecurity.net>, "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Fengguang Wu <fengguang.wu@intel.com>, Dmitry Vyukov <dvyukov@google.com>, LKML <linux-kernel@vger.kernel.org>
 
-On Thu, Apr 07, 2016 at 11:10:23PM +0200, Emese Revfy wrote:
->This patch set introduce the GCC plugin infrastructure with examples for testing
->and documentation.
+On Tue, Apr 12, 2016 at 10:46 AM, David Brown <david.brown@linaro.org> wrote:
+> On Thu, Apr 07, 2016 at 11:10:23PM +0200, Emese Revfy wrote:
+>>
+>> This patch set introduce the GCC plugin infrastructure with examples for
+>> testing
+>> and documentation.
+>>
+>> GCC plugins are loadable modules that provide extra features to the
+>> compiler.
+>> They are useful for runtime instrumentation and static analysis.
+>>
+>> The infrastructure supports all gcc versions from 4.5 to 6.0, building
+>> out-of-tree modules and building in a separate directory.
+>> Cross-compilation
+>> is supported too but currently only the x86, arm and arm64 architectures
+>> enables plugins.
+>>
+>> This infrastructure was ported from grsecurity/PaX. It is a CII project
+>> supported by the Linux Foundation.
+>>
+>> Emese Revfy (6):
+>> Shared library support
+>> GCC plugin infrastructure
+>> The GCC plugin infrastructure supports the arm and arm64 architectures too
+>> Add Cyclomatic complexity plugin
+>> Documentations of the GCC plugin infrastructre
+>> Add sancov plugin
 >
->GCC plugins are loadable modules that provide extra features to the compiler.
->They are useful for runtime instrumentation and static analysis.
 >
->The infrastructure supports all gcc versions from 4.5 to 6.0, building
->out-of-tree modules and building in a separate directory. Cross-compilation
->is supported too but currently only the x86, arm and arm64 architectures enables plugins.
+> I've tested the v6 patches on arm, and partially on arm64.  The arm64
+> gcc has a bug in make install that doesn't install all necessary
+> headers to build plugins.  I believe the patch will work once that
+> version gets out.  It does, however, print a helpful message now
+> explaining the likely cause of the failure.
 >
->This infrastructure was ported from grsecurity/PaX. It is a CII project
->supported by the Linux Foundation.
->
->Emese Revfy (6):
-> Shared library support
-> GCC plugin infrastructure
-> The GCC plugin infrastructure supports the arm and arm64 architectures too
-> Add Cyclomatic complexity plugin
-> Documentations of the GCC plugin infrastructre
-> Add sancov plugin
+> Tested-by: David Brown <david.brown@linaro.org>
 
-I've tested the v6 patches on arm, and partially on arm64.  The arm64
-gcc has a bug in make install that doesn't install all necessary
-headers to build plugins.  I believe the patch will work once that
-version gets out.  It does, however, print a helpful message now
-explaining the likely cause of the failure.
+Awesome! Thanks for testing this. I still need to finish getting my
+arm64 environment built...
 
-Tested-by: David Brown <david.brown@linaro.org>
+Do you happen to know if there's already a gcc bug open for the make
+install problem?
+
+Masahiro and Michal, does this series look good to you? I'd really
+like to get this into -next for wider testing.
+
+Emese, were you thinking of doing the initify plugin next after this
+infrastructure lands?
+
+-Kees
+
+-- 
+Kees Cook
+Chrome OS & Brillo Security
