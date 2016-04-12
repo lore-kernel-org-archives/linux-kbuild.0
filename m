@@ -1,44 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:42300 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751719AbcDKAG6 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 10 Apr 2016 20:06:58 -0400
-From: Benjamin Poirier <bpoirier@suse.com>
-Subject: [PATCH 2/4] localmodconfig: Fix parsing of "help" text
-Date: Sun, 10 Apr 2016 17:06:31 -0700
-Message-Id: <1460333193-16361-2-git-send-email-bpoirier@suse.com>
-In-Reply-To: <1460333193-16361-1-git-send-email-bpoirier@suse.com>
-References: <20160410235234.GA13689@f1.synalogic.ca>
- <1460333193-16361-1-git-send-email-bpoirier@suse.com>
+Received: from mail-io0-f176.google.com ([209.85.223.176]:34475 "EHLO
+	mail-io0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932781AbcDLRqL (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 12 Apr 2016 13:46:11 -0400
+Received: by mail-io0-f176.google.com with SMTP id 2so38180761ioy.1
+        for <linux-kbuild@vger.kernel.org>; Tue, 12 Apr 2016 10:46:11 -0700 (PDT)
+Date: Tue, 12 Apr 2016 11:46:07 -0600
+From: David Brown <david.brown@linaro.org>
+Subject: Re: [PATCH v6 0/6] Introduce GCC plugin infrastructure
+Message-ID: <20160412174607.GA92143@davidb.org>
+References: <20160407231023.5f1307ffc79f0cdd880eedb7@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20160407231023.5f1307ffc79f0cdd880eedb7@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: Michal Marek <mmarek@suse.cz>, joeyli <jlee@suse.com>, "Yann E . MORIN " <yann.morin.1998@free.fr>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Emese Revfy <re.emese@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, pageexec@freemail.hu, spender@grsecurity.net, kernel-hardening@lists.openwall.com, mmarek@suse.com, keescook@chromium.org, linux@rasmusvillemoes.dk, fengguang.wu@intel.com, dvyukov@google.com, linux-kernel@vger.kernel.org, yamada.masahiro@socionext.com
 
-Help text may start with "help" or "---help---". This patch fixes
-read_kconfig() to recognize the second variant.
+On Thu, Apr 07, 2016 at 11:10:23PM +0200, Emese Revfy wrote:
+>This patch set introduce the GCC plugin infrastructure with examples for testing
+>and documentation.
+>
+>GCC plugins are loadable modules that provide extra features to the compiler.
+>They are useful for runtime instrumentation and static analysis.
+>
+>The infrastructure supports all gcc versions from 4.5 to 6.0, building
+>out-of-tree modules and building in a separate directory. Cross-compilation
+>is supported too but currently only the x86, arm and arm64 architectures enables plugins.
+>
+>This infrastructure was ported from grsecurity/PaX. It is a CII project
+>supported by the Linux Foundation.
+>
+>Emese Revfy (6):
+> Shared library support
+> GCC plugin infrastructure
+> The GCC plugin infrastructure supports the arm and arm64 architectures too
+> Add Cyclomatic complexity plugin
+> Documentations of the GCC plugin infrastructre
+> Add sancov plugin
 
-This removes useless junk from %depends and %selects. That junk is due to
-help text that contains the words "selects" and "depends".
+I've tested the v6 patches on arm, and partially on arm64.  The arm64
+gcc has a bug in make install that doesn't install all necessary
+headers to build plugins.  I believe the patch will work once that
+version gets out.  It does, however, print a helpful message now
+explaining the likely cause of the failure.
 
-Signed-off-by: Benjamin Poirier <bpoirier@suse.com>
----
- scripts/kconfig/streamline_config.pl | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
-index c5b388c..f06972a 100755
---- a/scripts/kconfig/streamline_config.pl
-+++ b/scripts/kconfig/streamline_config.pl
-@@ -257,7 +257,7 @@ sub read_kconfig {
- 	    $iflevel-- if ($iflevel);
- 
- 	# stop on "help" and keywords that end a menu entry
--	} elsif (/^\s*help\s*$/ || /^(comment|choice|menu)\b/) {
-+	} elsif (/^\s*(---)?help(---)?\s*$/ || /^(comment|choice|menu)\b/) {
- 	    $state = "NONE";
- 	}
-     }
--- 
-2.7.4
-
+Tested-by: David Brown <david.brown@linaro.org>
