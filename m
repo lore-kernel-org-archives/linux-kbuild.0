@@ -1,29 +1,31 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.univ-ouargla.dz ([193.194.92.3]:51539 "HELO
-	mail.univ-ouargla.dz" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-	with SMTP id S1751738AbcDRFOC convert rfc822-to-8bit (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 18 Apr 2016 01:14:02 -0400
-Content-Type: text/plain; charset=US-ASCII
+Received: from mx2.suse.de ([195.135.220.15]:37233 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751486AbcDROq6 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 18 Apr 2016 10:46:58 -0400
+Subject: Re: [PATCH] tools: Use builtin $(abspath ...) instead of $(shell cd
+ ... && pwd)
+References: <1460106959-6684-1-git-send-email-thierry.reding@gmail.com>
+From: Michal Marek <mmarek@suse.com>
+Message-ID: <5714F35D.5050603@suse.com>
+Date: Mon, 18 Apr 2016 16:46:53 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Description: Mail message body
-Subject: Sinopec Corporation
-From: "WenDongfen <WenDongfen"@Sinopec.com
-Date: Mon, 18 Apr 2016 05:31:18 +0100
-Reply-To: wen.dongfen@hotmail.com
-Message-Id: <20160418052100.070CCB180635@mail.univ-ouargla.dz>
+In-Reply-To: <1460106959-6684-1-git-send-email-thierry.reding@gmail.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Recipients <WenDongfen@Sinopec.com>
+To: Thierry Reding <thierry.reding@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
+On 2016-04-08 11:15, Thierry Reding wrote:
+> From: Thierry Reding <treding@nvidia.com>
+> 
+> Avoid forking off a shell to resolve the absolute path of the output
+> directory when make's builtin $(abspath ...) function will do an
+> adequate job.
 
-Hello
+The abspath function is not available in make 3.80.
 
-I seek for your sincerity and trust in a deal which involved a total of 60,000,000.00 United states dollars. I need to know you and know your location. This really matter to the success of this deal. Please respond to me. Please note only serious individuals needed as this is no jokes. 
+Michal
 
-Yours Sincerely,
-
-Wen Dongfen
-the Cheif Finance Officer
-Sinopec Corporation in China
