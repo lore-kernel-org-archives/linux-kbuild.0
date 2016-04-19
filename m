@@ -1,37 +1,133 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:40395 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751441AbcDRXuF (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 18 Apr 2016 19:50:05 -0400
-Date: Mon, 18 Apr 2016 16:49:56 -0700
-From: Benjamin Poirier <bpoirier@suse.com>
-Subject: Re: [PATCH 1/2] localmodconfig: Fix parsing of Kconfig "source"
- statements
-Message-ID: <20160418234956.GA21039@f1.synalogic.ca>
-References: <1459619722-13695-1-git-send-email-bpoirier@suse.com>
- <20160408142940.6de077d5@gandalf.local.home>
- <20160410235234.GA13689@f1.synalogic.ca>
- <20160418202912.GA15025@f1.synalogic.ca>
- <20160418174326.60d92201@gandalf.local.home>
+Received: from mail-qg0-f54.google.com ([209.85.192.54]:35878 "EHLO
+	mail-qg0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752120AbcDSDcY (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 18 Apr 2016 23:32:24 -0400
+Received: by mail-qg0-f54.google.com with SMTP id f52so2141840qga.3
+        for <linux-kbuild@vger.kernel.org>; Mon, 18 Apr 2016 20:32:23 -0700 (PDT)
+Date: Mon, 18 Apr 2016 23:32:20 -0400 (EDT)
+From: Nicolas Pitre <nicolas.pitre@linaro.org>
+Subject: Re: [PATCH v7 0/8]/[PULL REQUEST] Trim unused exported kernel
+ symbols
+In-Reply-To: <nnzoaR8KUeMRCnnzpaKqKi@videotron.ca>
+Message-ID: <alpine.LFD.2.20.1604182326490.27452@knanqh.ubzr>
+References: <l0Vnaswuk0zQ0l0Vpa1Uwn@videotron.ca> <nnzoaR8KUeMRCnnzpaKqKi@videotron.ca>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20160418174326.60d92201@gandalf.local.home>
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: Michal Marek <mmarek@suse.cz>, joeyli <jlee@suse.com>, "Yann E . MORIN " <yann.morin.1998@free.fr>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Michal Marek <mmarek@suse.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 2016/04/18 17:43, Steven Rostedt wrote:
-[...]
-> > Hi Steven,
+Ping !
+
+/me only hears back empty cave echoes ...
+
+
+On Wed, 6 Apr 2016, Nicolas Pitre wrote:
+
+> 
+> Gentle ping...
+> 
+> If possible, I'd like for those patches to be sorted out before the 
+> opening of the merge window gets too close like last time.
+> 
+> 
+> On Tue, 29 Mar 2016, Nicolas Pitre wrote:
+> 
+> > This patch series provides the option to omit exported symbols from
+> > the kernel and modules that are never referenced by any of the selected
+> > modules in the current kernel configuration. this allows for optimizing
+> > the compiled code and reducing final binaries' size. When using LTO the
+> > binary size reduction is even more effective. It could also be argued
+> > that this could bring some security advantages.
 > > 
-> > Can you please merge these six patches (2 original + 4 followups)?
+> > The original cover letter with lots of test results can be found here:
+> > 
+> > 	https://lkml.org/lkml/2016/2/8/813
+> > 
+> > Please consider for merging into your tree.
+> > 
+> > Alternately, the following branch can be pulled:
+> > 
+> > 	http://git.linaro.org/people/nicolas.pitre/linux.git autoksyms
+> > 
+> > Thanks.
+> > 
+> > Changes from v6:
+> > 
+> > - Rebased on v4.6-rc1, including adjustments to the recently introduced
+> >   rule_as_o_S.
+> > 
+> > - Explicitly ignored more if_changed_dep callers for which no EXPORT_SYMBOL
+> >   can be parsed.
+> > 
+> > Changes from v5:
+> > 
+> > - Disable automatic dependency file generation during the preprocessor
+> >   pass when gathering exported symbol names.  Not only it is redundant
+> >   but in some conditions this crashes fixdep that might be reading the
+> >   previous dependency file at the same time. Reported by Michal Marek.
+> > 
+> > - Redirect error messages to stderr rather than pass it as a symbol name
+> >   dependency.
+> > 
+> > Changes from v4:
+> > 
+> > - Correctness changes plus small cleanup to adjust_autoksyms.sh as
+> >   suggested by Michal Marek.
+> > 
+> > - Changed ksym build dependency generation by re-running the preprocessor
+> >   rather than collecting those dependencies as warnings through stderr
+> >   which was too fragile.
+> > 
+> > Changes from v3:
+> > 
+> > - Shell portability changes to adjust_autoksyms.sh, partly from
+> >   suggestions by Zev Weiss.
+> > 
+> > - Fix sample modules by building them before adjust_autoksyms.sh is run.
+> > 
+> > Changes from v2:
+> > 
+> > - Generating the build dependencies by parsing the source with fixdep
+> >   turned out to be unreliable due to all the EXPORT_SYMBOL() variants,
+> >   and especially their use within macros where the actual symbol name
+> >   is known only after running the preprocessor. This list of symbol names
+> >   is now obtained from the preprocessor directly, fixing allmodconfig
+> >   builds.
+> > 
+> > Changes from v1:
+> > 
+> > - Replaced "exp" that doesn't convey the right meaning as noted by
+> >   Sam Ravnborg. The "ksym" identifier is actually what the kernel
+> >   already uses for this. Therefore:
+> >   - CONFIG_TRIM_UNUSED_EXPSYMS --> CONFIG_TRIM_UNUSED_KSYMS
+> >   - include/generated/expsyms.h --> include/generated/autoksyms.h
+> >   - #define __EXPSYM_* --> #define __KSYM_*
+> > 
+> > - Some sed regexp improvements as suggested by Al Viro.
+> > 
+> > - Renamed vmlinux_recursive target to autoksyms_recursive.
+> > 
+> > - Accept EXPORT_SYMBOL variants with a prefix, e.g. ACPI_EXPORT_SYMBOL.
+> > 
+> > - Minor commit log clarifications.
+> > 
+> > - Added Rusty's ACK.
+> > 
+> > diffstat:
+> > 
+> >  Makefile                    |  23 +++++++--
+> >  include/linux/export.h      |  33 ++++++++++++-
+> >  init/Kconfig                |  16 ++++++
+> >  scripts/Kbuild.include      |  32 +++++++++++-
+> >  scripts/Makefile.build      |  32 ++++++------
+> >  scripts/adjust_autoksyms.sh | 101 ++++++++++++++++++++++++++++++++++++++
+> >  scripts/basic/fixdep.c      |  61 +++++++++++++++++------
+> >  7 files changed, 261 insertions(+), 37 deletions(-)
+> > 
 > > 
 > 
-> OK, I've marked them as todo. I've just come back from two weeks of
-> conferences and I'm working on catching up.
 > 
-
-Ah I see, thanks. I just wanted to be sure they didn't fall through the
-cracks.
