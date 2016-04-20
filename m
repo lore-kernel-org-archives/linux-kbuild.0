@@ -1,36 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:48827 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:49126 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752664AbcDTItp (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 20 Apr 2016 04:49:45 -0400
-Date: Wed, 20 Apr 2016 10:49:43 +0200
-From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH 1/2] kbuild: rename cmd_cc_i_c to cmd_cpp_i_c
-Message-ID: <20160420084943.GG15339@pobox.suse.cz>
-References: <1460082288-31817-1-git-send-email-yamada.masahiro@socionext.com> <20160408150057.GF5327@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20160408150057.GF5327@redhat.com>
+	id S1754403AbcDTIxd (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 20 Apr 2016 04:53:33 -0400
+From: Michal Marek <mmarek@suse.com>
+Subject: [PATCH] kbuild: Get rid of KBUILD_STR
+Date: Wed, 20 Apr 2016 10:53:17 +0200
+Message-Id: <1461142397-18119-1-git-send-email-mmarek@suse.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnaldo Carvalho de Melo <acme@redhat.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org, Aaro Koskinen <aaro.koskinen@nokia.com>, Adrian Hunter <adrian.hunter@intel.com>, Michal Marek <mmarek@suse.com>, linux-kernel@vger.kernel.org, Arnaldo Carvalho de Melo <acme@kernel.org>, Lukas Wunner <lukas@wunner.de>, Jiri Olsa <jolsa@kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
 
-On Fri, Apr 08, 2016 at 12:00:57PM -0300, Arnaldo Carvalho de Melo wrote:
-> Em Fri, Apr 08, 2016 at 11:24:47AM +0900, Masahiro Yamada escreveu:
-> > This command just preprocesses .c files into .i files, so cmd_cpp_i_c
-> > seems more suitable.
-> 
-> Thanks for doing it to the tools/build/ copy, looks sensible, I guess
-> this can go via the kbuild tree?
-> 
-> Acked-by: Arnaldo Carvalho de Melo <acme@redhat.com>
-> 
-> - Arnaldo
->  
-> > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+The compiler can accept -DKBUILD_MODNAME="foo", it's just a matter of
+quoting. That way, we reduce the gcc command line a bit.
 
-Applied both patches to kbuild.git#kbuild.
+Signed-off-by: Michal Marek <mmarek@suse.com>
+---
+ scripts/Makefile.lib | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-Michal
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index ddf83d0..e64ad0d 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -96,10 +96,10 @@ obj-dirs	:= $(addprefix $(obj)/,$(obj-dirs))
+ # Note: Files that end up in two or more modules are compiled without the
+ #       KBUILD_MODNAME definition. The reason is that any made-up name would
+ #       differ in different configs.
+-name-fix = $(subst $(comma),_,$(subst -,_,$1))
+-basename_flags = -D"KBUILD_BASENAME=KBUILD_STR($(call name-fix,$(basetarget)))"
++name-fix = $(squote)$(quote)$(subst $(comma),_,$(subst -,_,$1))$(quote)$(squote)
++basename_flags = -DKBUILD_BASENAME=$(call name-fix,$(basetarget))
+ modname_flags  = $(if $(filter 1,$(words $(modname))),\
+-                 -D"KBUILD_MODNAME=KBUILD_STR($(call name-fix,$(modname)))")
++                 -DKBUILD_MODNAME=$(call name-fix,$(modname)))
+ 
+ orig_c_flags   = $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS) $(KBUILD_SUBDIR_CCFLAGS) \
+                  $(ccflags-y) $(CFLAGS_$(basetarget).o)
+@@ -162,7 +162,7 @@ endif
+ 
+ c_flags        = -Wp,-MD,$(depfile) $(NOSTDINC_FLAGS) $(LINUXINCLUDE)     \
+ 		 $(__c_flags) $(modkern_cflags)                           \
+-		 -D"KBUILD_STR(s)=\#s" $(basename_flags) $(modname_flags)
++		 $(basename_flags) $(modname_flags)
+ 
+ a_flags        = -Wp,-MD,$(depfile) $(NOSTDINC_FLAGS) $(LINUXINCLUDE)     \
+ 		 $(__a_flags) $(modkern_aflags)
+-- 
+1.9.2
+
