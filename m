@@ -1,46 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:46519 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:47839 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752457AbcDTIEN (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 20 Apr 2016 04:04:13 -0400
-Date: Wed, 20 Apr 2016 10:04:09 +0200
-From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH] kbuild/mkspec: support 'update-bootloader'-based
-	systems
-Message-ID: <20160420080409.GB15339@pobox.suse.cz>
-References: <alpine.LNX.2.00.1604071459520.27368@cbobk.fhfr.pm>
+	id S1753346AbcDTI3R (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 20 Apr 2016 04:29:17 -0400
+Subject: Re: [PATCH] kbuild: drop FORCE from PHONY targets
+References: <1457828035-30584-1-git-send-email-yamada.masahiro@socionext.com>
+From: Michal Marek <mmarek@suse.com>
+Message-ID: <57173DD7.6020601@suse.com>
+Date: Wed, 20 Apr 2016 10:29:11 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <alpine.LNX.2.00.1604071459520.27368@cbobk.fhfr.pm>
+In-Reply-To: <1457828035-30584-1-git-send-email-yamada.masahiro@socionext.com>
+Content-Type: text/plain; charset=iso-8859-2
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jiri Kosina <jikos@kernel.org>
-Cc: Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
+Cc: Tony Luck <tony.luck@intel.com>, Nathan Lynch <nathan_lynch@mentor.com>, linux-ia64@vger.kernel.org, x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, Russell King <linux@arm.linux.org.uk>, Andy Lutomirski <luto@amacapital.net>, Ingo Molnar <mingo@redhat.com>, Fenghua Yu <fenghua.yu@intel.com>, linux-arm-kernel@lists.infradead.org
 
-On Thu, Apr 07, 2016 at 03:00:54PM +0200, Jiri Kosina wrote:
-> From: Jiri Kosina <jkosina@suse.cz>
+Dne 13.3.2016 v 01:13 Masahiro Yamada napsal(a):
+> These targets are marked as PHONY.  No need to add FORCE to their
+> dependency.
 > 
-> When uninstalling kernel RPM, we're unconditionally calling 
-> "new-kernel-pkg --remove".
-
-There is of course a test whether the script exists.
-
-
-> This is useless on systems which are based on 
-> 'update-bootloader' script instead.
-
-Right.
-
- 
-> Support update-bootloader removal method as well in case the script is 
-> present; contrary to new-kernel-pkg, this needs to be done in %postun, 
-> otherwise update-bootloader will refuse to remove entry for kernel for 
-> which the binary still exists.
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> ---
 > 
-> Signed-off-by: Jiri Kosina <jkosina@suse.cz>
+>  Makefile                     | 8 ++++----
+>  arch/arm/vdso/Makefile       | 2 +-
+>  arch/ia64/Makefile           | 4 ++--
+>  arch/x86/entry/vdso/Makefile | 4 ++--
+>  4 files changed, 9 insertions(+), 9 deletions(-)
 
-Applied to kbuild.git#misc. Let's see what other rpm-based distros are
-going to need.
+Applied to kbuild.git#kbuild now, sorry for the delay.
 
 Michal
+
