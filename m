@@ -1,36 +1,29 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:47839 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:47878 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753346AbcDTI3R (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 20 Apr 2016 04:29:17 -0400
-Subject: Re: [PATCH] kbuild: drop FORCE from PHONY targets
-References: <1457828035-30584-1-git-send-email-yamada.masahiro@socionext.com>
-From: Michal Marek <mmarek@suse.com>
-Message-ID: <57173DD7.6020601@suse.com>
-Date: Wed, 20 Apr 2016 10:29:11 +0200
+	id S1752718AbcDTIaG (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 20 Apr 2016 04:30:06 -0400
+Date: Wed, 20 Apr 2016 10:30:04 +0200
+From: Michal Marek <mmarek@suse.cz>
+Subject: Re: [PATCH] kbuild: specify modules(_install) as PHONY rather than
+	FORCE
+Message-ID: <20160420083004.GC15339@pobox.suse.cz>
+References: <1457829562-31752-1-git-send-email-yamada.masahiro@socionext.com>
 MIME-Version: 1.0
-In-Reply-To: <1457828035-30584-1-git-send-email-yamada.masahiro@socionext.com>
-Content-Type: text/plain; charset=iso-8859-2
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1457829562-31752-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
-Cc: Tony Luck <tony.luck@intel.com>, Nathan Lynch <nathan_lynch@mentor.com>, linux-ia64@vger.kernel.org, x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, Russell King <linux@arm.linux.org.uk>, Andy Lutomirski <luto@amacapital.net>, Ingo Molnar <mingo@redhat.com>, Fenghua Yu <fenghua.yu@intel.com>, linux-arm-kernel@lists.infradead.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.com>, linux-kernel@vger.kernel.org
 
-Dne 13.3.2016 v 01:13 Masahiro Yamada napsal(a):
-> These targets are marked as PHONY.  No need to add FORCE to their
-> dependency.
+On Sun, Mar 13, 2016 at 09:39:22AM +0900, Masahiro Yamada wrote:
+> As in other places, PHONY is a better fit for "modules" and
+> "modules_install".
 > 
 > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> ---
-> 
->  Makefile                     | 8 ++++----
->  arch/arm/vdso/Makefile       | 2 +-
->  arch/ia64/Makefile           | 4 ++--
->  arch/x86/entry/vdso/Makefile | 4 ++--
->  4 files changed, 9 insertions(+), 9 deletions(-)
 
-Applied to kbuild.git#kbuild now, sorry for the delay.
+Applied to kbuild.git#kbuild.
 
 Michal
-
