@@ -1,72 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.9]:58671 "EHLO
-	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754464AbcDVRDF (ORCPT
+Received: from mail-qg0-f44.google.com ([209.85.192.44]:35012 "EHLO
+	mail-qg0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932333AbcDVRsw (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 22 Apr 2016 13:03:05 -0400
-Subject: Re: [PATCH] scripts: kconfig: implement a sort method
-References: <1461269279-11525-1-git-send-email-felipe.balbi@linux.intel.com>
- <57195E78.9080805@infradead.org> <87shye84u0.fsf@intel.com>
-From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <571A5946.3@infradead.org>
-Date: Fri, 22 Apr 2016 10:03:02 -0700
+	Fri, 22 Apr 2016 13:48:52 -0400
+Received: by mail-qg0-f44.google.com with SMTP id f74so56373324qge.2
+        for <linux-kbuild@vger.kernel.org>; Fri, 22 Apr 2016 10:48:51 -0700 (PDT)
+Date: Fri, 22 Apr 2016 13:48:48 -0400 (EDT)
+From: Nicolas Pitre <nicolas.pitre@linaro.org>
+Subject: Re: linux-next: Tree for Apr 22 (adjust_autoksyms.sh)
+In-Reply-To: <571A56C4.7030907@infradead.org>
+Message-ID: <alpine.LFD.2.20.1604221345340.27452@knanqh.ubzr>
+References: <20160422153503.24aa389e@canb.auug.org.au> <571A56C4.7030907@infradead.org>
 MIME-Version: 1.0
-In-Reply-To: <87shye84u0.fsf@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Felipe Balbi <balbi@kernel.org>, Felipe Balbi <balbif@gmail.com>, yann.morin.1998@free.fr
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>, linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.cz>
 
-On 04/22/16 00:45, Felipe Balbi wrote:
+On Fri, 22 Apr 2016, Randy Dunlap wrote:
+
+> on x86_64:
 > 
-> Hi,
+> I'm seeing:
 > 
-> Randy Dunlap <rdunlap@infradead.org> writes:
->> On 04/21/16 13:07, Felipe Balbi wrote:
->>> With a growing amount of Kernel configuration, it's
->>> getting ever more difficult to find anything on
->>> menuconfig. Because of that, implement mergesort for
->>> kconfig to make it a little easier for anybody
->>> building kernels.
->>
->> Hi,
->>
->> Please explain the problem and the solution better.  I don't
->> get it.
+> /bin/sh: scripts/adjust_autoksyms.sh: No such file or directory
+> /local/lnx/next/linux-next-20160422/Makefile:937: recipe for target 'vmlinux' failed
 > 
-> it's unclear to me what you don't understand from description above. Try
-> to find and enable some random driver on menuconfig. Here's a
-> suggestion:
+> when using O=subdir for the build output directory.
 > 
-> "Maxim Semiconductor MAX77843 PMIC Support"
 > 
+> Is there a missing $(objtree) somewhere?
 
-yeah, I had no problem with that.  / (Search) works very well, sorted
-or not.
+Rather a $(srctree).  Please try the patch below.
 
-Maybe I'm not in your target market.
+----- >8
 
+Subject: [PATCH] kbuild: fix CONFIG_TRIM_UNUSED_KSYMS=y with a separate output  directory
 
-> In any case, the idea is the following:
-> 
-> menuconfig has too many options, they are unsorted -> sort them
-> 
+This fixes the following:
 
+/bin/sh: scripts/adjust_autoksyms.sh: No such file or directory
 
-The addition of < Sort > to the bottom menu items is displayed (partially)
-in an 80-column-wide terminal window: (oh, I see, it wraps, still not good)
+Signed-off-by: Nicolas Pitre <nico@linaro.org>
 
-  ├─────────────────────────────────────────────────────────────────────────┤  
-  │        <Select>    < Exit >    < Help >    < Save >    < Load >    < Sort  
-   >────────────────────────────────────────────────────────────────────────┘  
-    
-
-
-I still think that you have an inadequate problem statement to justify
-the patch.  Nothing against the patch itself.
-
-thanks,
--- 
-~Randy
+diff --git a/Makefile b/Makefile
+index e3af48068c..e9ad498238 100644
+--- a/Makefile
++++ b/Makefile
+@@ -934,7 +934,7 @@ quiet_cmd_link-vmlinux = LINK    $@
+ # execute if the rest of the kernel build went well.
+ vmlinux: scripts/link-vmlinux.sh $(vmlinux-deps) FORCE
+ ifdef CONFIG_TRIM_UNUSED_KSYMS
+-	$(Q)$(CONFIG_SHELL) scripts/adjust_autoksyms.sh \
++	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/adjust_autoksyms.sh \
+ 	  "$(MAKE) KBUILD_MODULES=1 -f $(srctree)/Makefile autoksyms_recursive"
+ endif
+ ifdef CONFIG_HEADERS_CHECK
+@@ -949,13 +949,13 @@ endif
+ 	+$(call if_changed,link-vmlinux)
+ 
+ autoksyms_recursive: $(vmlinux-deps)
+-	$(Q)$(CONFIG_SHELL) scripts/adjust_autoksyms.sh \
++	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/adjust_autoksyms.sh \
+ 	  "$(MAKE) KBUILD_MODULES=1 -f $(srctree)/Makefile autoksyms_recursive"
+ PHONY += autoksyms_recursive
+ 
+ # standalone target for easier testing
+ include/generated/autoksyms.h: FORCE
+-	$(Q)$(CONFIG_SHELL) scripts/adjust_autoksyms.sh true
++	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/adjust_autoksyms.sh true
+ 
+ # Build samples along the rest of the kernel
+ ifdef CONFIG_SAMPLES
