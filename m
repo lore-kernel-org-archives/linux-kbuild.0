@@ -1,81 +1,33 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.126.130]:54124 "EHLO
-	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932937AbcDYQD3 (ORCPT
+Received: from mail-qg0-f47.google.com ([209.85.192.47]:34478 "EHLO
+	mail-qg0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932882AbcDYQVA (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 25 Apr 2016 12:03:29 -0400
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH v2 2/2] samples: v4l: from Documentation to samples directory
-Date: Mon, 25 Apr 2016 18:03:09 +0200
-Message-Id: <1461600189-2207716-3-git-send-email-arnd@arndb.de>
-In-Reply-To: <1461600189-2207716-1-git-send-email-arnd@arndb.de>
-References: <1461600189-2207716-1-git-send-email-arnd@arndb.de>
+	Mon, 25 Apr 2016 12:21:00 -0400
+Received: by mail-qg0-f47.google.com with SMTP id c6so88517635qga.1
+        for <linux-kbuild@vger.kernel.org>; Mon, 25 Apr 2016 09:20:59 -0700 (PDT)
+Date: Mon, 25 Apr 2016 12:20:56 -0400 (EDT)
+From: Nicolas Pitre <nicolas.pitre@linaro.org>
+Subject: kbuild fix branch for linux-next
+Message-ID: <alpine.LFD.2.20.1604251203100.5091@knanqh.ubzr>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>
-Cc: linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, linux-kernel@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, Arnd Bergmann <arnd@arndb.de>
+To: Stephen Rothwell <sfr@canb.auug.org.au>
+Cc: Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-A small bug with the new autoksyms support showed that there are
-two kernel modules in the Documentation directory that qualify
-as samples, while all other samples are in the samples/ directory.
+Hello Stephen,
 
-This patch was originally meant as a workaround for that bug, but
-it has now been solved in a different way. However, I still think
-it makes sense as a cleanup to consolidate all sample code in
-one place.
+Could you please add the following branch to the linux-next tree:
 
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- Documentation/Makefile                                         | 3 +--
- Documentation/video4linux/v4l2-framework.txt                   | 2 +-
- samples/Makefile                                               | 2 +-
- {Documentation/video4linux => samples/v4l}/Makefile            | 0
- {Documentation/video4linux => samples/v4l}/v4l2-pci-skeleton.c | 0
- 5 files changed, 3 insertions(+), 4 deletions(-)
- rename {Documentation/video4linux => samples/v4l}/Makefile (100%)
- rename {Documentation/video4linux => samples/v4l}/v4l2-pci-skeleton.c (100%)
+	git://git.linaro.org/people/nicolas.pitre/linux kbuild
 
-diff --git a/Documentation/Makefile b/Documentation/Makefile
-index 13b5ae1b87aa..de955e151af8 100644
---- a/Documentation/Makefile
-+++ b/Documentation/Makefile
-@@ -1,4 +1,3 @@
- subdir-y := accounting auxdisplay blackfin \
- 	filesystems filesystems ia64 laptops mic misc-devices \
--	networking pcmcia prctl ptp timers vDSO video4linux \
--	watchdog
-+	networking pcmcia prctl ptp timers vDSO watchdog
-diff --git a/Documentation/video4linux/v4l2-framework.txt b/Documentation/video4linux/v4l2-framework.txt
-index fa41608ab2b4..cbefc7902f5f 100644
---- a/Documentation/video4linux/v4l2-framework.txt
-+++ b/Documentation/video4linux/v4l2-framework.txt
-@@ -35,7 +35,7 @@ need and this same framework should make it much easier to refactor
- common code into utility functions shared by all drivers.
- 
- A good example to look at as a reference is the v4l2-pci-skeleton.c
--source that is available in this directory. It is a skeleton driver for
-+source that is available in samples/v4l/. It is a skeleton driver for
- a PCI capture card, and demonstrates how to use the V4L2 driver
- framework. It can be used as a template for real PCI video capture driver.
- 
-diff --git a/samples/Makefile b/samples/Makefile
-index 594ef7d9fa2a..2e3b523d7097 100644
---- a/samples/Makefile
-+++ b/samples/Makefile
-@@ -2,4 +2,4 @@
- 
- obj-$(CONFIG_SAMPLES)	+= kobject/ kprobes/ trace_events/ livepatch/ \
- 			   hw_breakpoint/ kfifo/ kdb/ hidraw/ rpmsg/ seccomp/ \
--			   configfs/ connector/
-+			   configfs/ connector/ v4l/
-diff --git a/Documentation/video4linux/Makefile b/samples/v4l/Makefile
-similarity index 100%
-rename from Documentation/video4linux/Makefile
-rename to samples/v4l/Makefile
-diff --git a/Documentation/video4linux/v4l2-pci-skeleton.c b/samples/v4l/v4l2-pci-skeleton.c
-similarity index 100%
-rename from Documentation/video4linux/v4l2-pci-skeleton.c
-rename to samples/v4l/v4l2-pci-skeleton.c
--- 
-2.7.0
+It includes 3 patches on top of Michal's kbuild branch already in your 
+tree. Those patches fix issues that have been reported by 3 people 
+already, and I'd like those fixes to appear in linux-next until Michal 
+picks them up, which should happen in, well, some "undefined" amount of 
+time.  ;-)
 
+
+Nicolas
