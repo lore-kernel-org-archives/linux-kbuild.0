@@ -1,60 +1,60 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:38065 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932162AbcDYMfw (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 25 Apr 2016 08:35:52 -0400
-Subject: Re: [PATCH] scripts/tags.sh: Exit gracefully if *tags tool not found
-References: <1461516120-5600-1-git-send-email-eugeniu.m.rosca@gmail.com>
-From: Michal Marek <mmarek@suse.com>
-Message-ID: <571E0F1F.8090204@suse.com>
-Date: Mon, 25 Apr 2016 14:35:43 +0200
-MIME-Version: 1.0
-In-Reply-To: <1461516120-5600-1-git-send-email-eugeniu.m.rosca@gmail.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Received: from mout.kundenserver.de ([212.227.126.131]:59376 "EHLO
+	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932544AbcDYNTM (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 25 Apr 2016 09:19:12 -0400
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH 1/3] kbuild: call adjust_autoksyms.sh from source directory
+Date: Mon, 25 Apr 2016 15:17:19 +0200
+Message-Id: <1461590265-1397577-1-git-send-email-arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Eugeniu Rosca <eugeniu.m.rosca@gmail.com>, mpe@ellerman.id.au, kirill.shutemov@linux.intel.com, naveen.n.rao@linux.vnet.ibm.com, akpm@linux-foundation.org, sboyd@codeaurora.org, paul.gortmaker@windriver.com
-Cc: linux-kbuild@vger.kernel.org
+To: Michal Marek <mmarek@suse.com>
+Cc: Nicolas Pitre <nico@linaro.org>, Rusty Russell <rusty@rustcorp.com.au>, Arnd Bergmann <arnd@arndb.de>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 2016-04-24 18:42, Eugeniu Rosca wrote:
-> If the needed host utility is not found, current behavior is:
-> 
-> $> make cscope
->   GEN     cscope
-> ./scripts/tags.sh: line 140: cscope: command not found
-> $> make gtags
->   GEN     gtags
-> ./scripts/tags.sh: line 145: gtags: command not found
-> $> make tags
->   GEN     tags
-> xargs: ctags: No such file or directory
-> sed: can't read tags: No such file or directory
-> Makefile:1509: recipe for target 'tags' failed
-> make: *** [tags] Error 2
-> $> make TAGS
->   GEN     TAGS
-> xargs: etags: No such file or directory
-> sed: can't read TAGS: No such file or directory
-> Makefile:1509: recipe for target 'TAGS' failed
-> make: *** [TAGS] Error 2
-> 
-> This patch allows to exit gracefully in such a situation:
-> 
-> $> make cscope
->   GEN     cscope
-> cscope - not installed?
-> $> make gtags
->   GEN     gtags
-> gtags - not installed?
-> $> make tags
->   GEN     tags
-> ctags - not installed?
-> $> make TAGS
->   GEN     TAGS
-> etags - not installed?
+When building with separate object trees, scripts/adjust_autoksyms.sh
+cannot be called from the object directory:
 
-It should fail if it's unable to create the requested file, though.
-Appending '|| exit' to the docscope/dogtags/xtags calls should suffice.
+/bin/bash: scripts/adjust_autoksyms.sh: No such file or directory
 
-Michal
+This adds a $(src) prefix, as we do for all other shell scripts.
+
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Fixes: 23121ca2b56b ("kbuild: create/adjust generated/autoksyms.h")
+---
+ Makefile | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 81534210dcb9..b5c67617a98d 100644
+--- a/Makefile
++++ b/Makefile
+@@ -945,7 +945,7 @@ quiet_cmd_link-vmlinux = LINK    $@
+ # execute if the rest of the kernel build went well.
+ vmlinux: scripts/link-vmlinux.sh $(vmlinux-deps) FORCE
+ ifdef CONFIG_TRIM_UNUSED_KSYMS
+-	$(Q)$(CONFIG_SHELL) scripts/adjust_autoksyms.sh \
++	$(Q)$(CONFIG_SHELL) $(src)/scripts/adjust_autoksyms.sh \
+ 	  "$(MAKE) KBUILD_MODULES=1 -f $(srctree)/Makefile autoksyms_recursive"
+ endif
+ ifdef CONFIG_HEADERS_CHECK
+@@ -960,13 +960,13 @@ endif
+ 	+$(call if_changed,link-vmlinux)
+ 
+ autoksyms_recursive: $(vmlinux-deps)
+-	$(Q)$(CONFIG_SHELL) scripts/adjust_autoksyms.sh \
++	$(Q)$(CONFIG_SHELL) $(src)/scripts/adjust_autoksyms.sh \
+ 	  "$(MAKE) KBUILD_MODULES=1 -f $(srctree)/Makefile autoksyms_recursive"
+ PHONY += autoksyms_recursive
+ 
+ # standalone target for easier testing
+ include/generated/autoksyms.h: FORCE
+-	$(Q)$(CONFIG_SHELL) scripts/adjust_autoksyms.sh true
++	$(Q)$(CONFIG_SHELL) $(src)/scripts/adjust_autoksyms.sh true
+ 
+ # Build samples along the rest of the kernel
+ ifdef CONFIG_SAMPLES
+-- 
+2.7.0
+
