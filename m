@@ -1,104 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f66.google.com ([74.125.82.66]:36120 "EHLO
-	mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752818AbcDXQnE (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 24 Apr 2016 12:43:04 -0400
-Received: by mail-wm0-f66.google.com with SMTP id w143so15468465wmw.3
-        for <linux-kbuild@vger.kernel.org>; Sun, 24 Apr 2016 09:43:03 -0700 (PDT)
-From: Eugeniu Rosca <eugeniu.m.rosca@gmail.com>
-Subject: [PATCH] scripts/tags.sh: Exit gracefully if *tags tool not found
-Date: Sun, 24 Apr 2016 18:42:00 +0200
-Message-Id: <1461516120-5600-1-git-send-email-eugeniu.m.rosca@gmail.com>
+Received: from mx2.suse.de ([195.135.220.15]:35313 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754372AbcDYMHg (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 25 Apr 2016 08:07:36 -0400
+Subject: Re: [PATCH] kbuild: drop redundant "PHONY += FORCE"
+References: <1460081770-29437-1-git-send-email-yamada.masahiro@socionext.com>
+ <20160420084710.GF15339@pobox.suse.cz>
+ <CAK7LNATv51PRc9bGU7Q8_oTk9=C5ryfu7vMsKbG5drcgVbf1-Q@mail.gmail.com>
+From: Michal Marek <mmarek@suse.cz>
+Message-ID: <571E0883.5020904@suse.cz>
+Date: Mon, 25 Apr 2016 14:07:31 +0200
+MIME-Version: 1.0
+In-Reply-To: <CAK7LNATv51PRc9bGU7Q8_oTk9=C5ryfu7vMsKbG5drcgVbf1-Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mmarek@suse.com, mpe@ellerman.id.au, kirill.shutemov@linux.intel.com, naveen.n.rao@linux.vnet.ibm.com, akpm@linux-foundation.org, sboyd@codeaurora.org, paul.gortmaker@windriver.com
-Cc: linux-kbuild@vger.kernel.org, Eugeniu Rosca <eugeniu.m.rosca@gmail.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Fenghua Yu <fenghua.yu@intel.com>, Tony Luck <tony.luck@intel.com>, Russell King <linux@arm.linux.org.uk>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-ia64@vger.kernel.org, Guan Xuetao <gxt@mprc.pku.edu.cn>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
 
-If the needed host utility is not found, current behavior is:
+On 2016-04-20 10:56, Masahiro Yamada wrote:
+> Hi Michal,
+> 
+> 2016-04-20 17:47 GMT+09:00 Michal Marek <mmarek@suse.cz>:
+>> On Fri, Apr 08, 2016 at 11:16:10AM +0900, Masahiro Yamada wrote:
+>>> "PHONY += FORCE" is already cared by scripts/Makefile.build,
+>>> which these files are included from.
+>>
+>> arch/ia64/Makefile is in fact included via the main Makefile. But this
+>> one also has the PHONY += FORCE statement. Maybe we should initialize
+>> PHONY with FORCE in Kbuild.include. Nevertheless, this patch is correct.
+>>
+>> Michal
+> 
+> Ah, right.
+> 
+> If it is not too late and you do not mind,
+> could you rephrase the git-log?
 
-$> make cscope
-  GEN     cscope
-./scripts/tags.sh: line 140: cscope: command not found
-$> make gtags
-  GEN     gtags
-./scripts/tags.sh: line 145: gtags: command not found
-$> make tags
-  GEN     tags
-xargs: ctags: No such file or directory
-sed: can't read tags: No such file or directory
-Makefile:1509: recipe for target 'tags' failed
-make: *** [tags] Error 2
-$> make TAGS
-  GEN     TAGS
-xargs: etags: No such file or directory
-sed: can't read TAGS: No such file or directory
-Makefile:1509: recipe for target 'TAGS' failed
-make: *** [TAGS] Error 2
+Hi Masahiro,
 
-This patch allows to exit gracefully in such a situation:
+I'd rather not rewrite the git log. It was just a minor nitpick and
+there is not so much going on in arch/ia64 to cause confusion.
 
-$> make cscope
-  GEN     cscope
-cscope - not installed?
-$> make gtags
-  GEN     gtags
-gtags - not installed?
-$> make tags
-  GEN     tags
-ctags - not installed?
-$> make TAGS
-  GEN     TAGS
-etags - not installed?
-
-Signed-off-by: Eugeniu Rosca <eugeniu.m.rosca@gmail.com>
----
- scripts/tags.sh | 11 +++++++++++
- 1 file changed, 11 insertions(+)
-
-diff --git a/scripts/tags.sh b/scripts/tags.sh
-index f72f48f..e7f6125 100755
---- a/scripts/tags.sh
-+++ b/scripts/tags.sh
-@@ -289,6 +289,13 @@ xtags()
- 	fi
- }
- 
-+# Check if a specific utility is accessible on the host
-+tool_exists() {
-+	[ -x "$(which $1 2> /dev/null)" ] || \
-+		{ echo "$1 - not installed?" && return 1; }
-+	return 0
-+}
-+
- # Support um (which uses SUBARCH)
- if [ "${ARCH}" = "um" ]; then
- 	if [ "$SUBARCH" = "i386" ]; then
-@@ -318,20 +325,24 @@ fi
- remove_structs=
- case "$1" in
- 	"cscope")
-+		tool_exists cscope || exit 0
- 		docscope
- 		;;
- 
- 	"gtags")
-+		tool_exists gtags || exit 0
- 		dogtags
- 		;;
- 
- 	"tags")
-+		tool_exists ctags || exit 0
- 		rm -f tags
- 		xtags ctags
- 		remove_structs=y
- 		;;
- 
- 	"TAGS")
-+		tool_exists etags || exit 0
- 		rm -f TAGS
- 		xtags etags
- 		remove_structs=y
--- 
-2.7.4
-
+Michal
