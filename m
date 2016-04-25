@@ -1,46 +1,60 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:35313 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:38065 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754372AbcDYMHg (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 25 Apr 2016 08:07:36 -0400
-Subject: Re: [PATCH] kbuild: drop redundant "PHONY += FORCE"
-References: <1460081770-29437-1-git-send-email-yamada.masahiro@socionext.com>
- <20160420084710.GF15339@pobox.suse.cz>
- <CAK7LNATv51PRc9bGU7Q8_oTk9=C5ryfu7vMsKbG5drcgVbf1-Q@mail.gmail.com>
-From: Michal Marek <mmarek@suse.cz>
-Message-ID: <571E0883.5020904@suse.cz>
-Date: Mon, 25 Apr 2016 14:07:31 +0200
+	id S932162AbcDYMfw (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 25 Apr 2016 08:35:52 -0400
+Subject: Re: [PATCH] scripts/tags.sh: Exit gracefully if *tags tool not found
+References: <1461516120-5600-1-git-send-email-eugeniu.m.rosca@gmail.com>
+From: Michal Marek <mmarek@suse.com>
+Message-ID: <571E0F1F.8090204@suse.com>
+Date: Mon, 25 Apr 2016 14:35:43 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNATv51PRc9bGU7Q8_oTk9=C5ryfu7vMsKbG5drcgVbf1-Q@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1461516120-5600-1-git-send-email-eugeniu.m.rosca@gmail.com>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Fenghua Yu <fenghua.yu@intel.com>, Tony Luck <tony.luck@intel.com>, Russell King <linux@arm.linux.org.uk>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-ia64@vger.kernel.org, Guan Xuetao <gxt@mprc.pku.edu.cn>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+To: Eugeniu Rosca <eugeniu.m.rosca@gmail.com>, mpe@ellerman.id.au, kirill.shutemov@linux.intel.com, naveen.n.rao@linux.vnet.ibm.com, akpm@linux-foundation.org, sboyd@codeaurora.org, paul.gortmaker@windriver.com
+Cc: linux-kbuild@vger.kernel.org
 
-On 2016-04-20 10:56, Masahiro Yamada wrote:
-> Hi Michal,
+On 2016-04-24 18:42, Eugeniu Rosca wrote:
+> If the needed host utility is not found, current behavior is:
 > 
-> 2016-04-20 17:47 GMT+09:00 Michal Marek <mmarek@suse.cz>:
->> On Fri, Apr 08, 2016 at 11:16:10AM +0900, Masahiro Yamada wrote:
->>> "PHONY += FORCE" is already cared by scripts/Makefile.build,
->>> which these files are included from.
->>
->> arch/ia64/Makefile is in fact included via the main Makefile. But this
->> one also has the PHONY += FORCE statement. Maybe we should initialize
->> PHONY with FORCE in Kbuild.include. Nevertheless, this patch is correct.
->>
->> Michal
+> $> make cscope
+>   GEN     cscope
+> ./scripts/tags.sh: line 140: cscope: command not found
+> $> make gtags
+>   GEN     gtags
+> ./scripts/tags.sh: line 145: gtags: command not found
+> $> make tags
+>   GEN     tags
+> xargs: ctags: No such file or directory
+> sed: can't read tags: No such file or directory
+> Makefile:1509: recipe for target 'tags' failed
+> make: *** [tags] Error 2
+> $> make TAGS
+>   GEN     TAGS
+> xargs: etags: No such file or directory
+> sed: can't read TAGS: No such file or directory
+> Makefile:1509: recipe for target 'TAGS' failed
+> make: *** [TAGS] Error 2
 > 
-> Ah, right.
+> This patch allows to exit gracefully in such a situation:
 > 
-> If it is not too late and you do not mind,
-> could you rephrase the git-log?
+> $> make cscope
+>   GEN     cscope
+> cscope - not installed?
+> $> make gtags
+>   GEN     gtags
+> gtags - not installed?
+> $> make tags
+>   GEN     tags
+> ctags - not installed?
+> $> make TAGS
+>   GEN     TAGS
+> etags - not installed?
 
-Hi Masahiro,
-
-I'd rather not rewrite the git log. It was just a minor nitpick and
-there is not so much going on in arch/ia64 to cause confusion.
+It should fail if it's unable to create the requested file, though.
+Appending '|| exit' to the docscope/dogtags/xtags calls should suffice.
 
 Michal
