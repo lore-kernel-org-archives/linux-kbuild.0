@@ -1,61 +1,81 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtprelay0160.hostedemail.com ([216.40.44.160]:52461 "EHLO
-	smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1751317AbcDZPLl (ORCPT
+Received: from mail-qk0-f170.google.com ([209.85.220.170]:33554 "EHLO
+	mail-qk0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751829AbcDZPRv (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 26 Apr 2016 11:11:41 -0400
-Date: Tue, 26 Apr 2016 11:11:36 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-Subject: Re: [PATCH 4/4] localmodconfig: Recognize standalone "prompt"
-Message-ID: <20160426111136.6f8c197f@gandalf.local.home>
-In-Reply-To: <1460333193-16361-4-git-send-email-bpoirier@suse.com>
-References: <20160410235234.GA13689@f1.synalogic.ca>
-	<1460333193-16361-1-git-send-email-bpoirier@suse.com>
-	<1460333193-16361-4-git-send-email-bpoirier@suse.com>
+	Tue, 26 Apr 2016 11:17:51 -0400
+Received: by mail-qk0-f170.google.com with SMTP id n63so6723153qkf.0
+        for <linux-kbuild@vger.kernel.org>; Tue, 26 Apr 2016 08:17:50 -0700 (PDT)
+Date: Tue, 26 Apr 2016 11:17:47 -0400 (EDT)
+From: Nicolas Pitre <nicolas.pitre@linaro.org>
+Subject: Re: [PATCH v7 0/8]/[PULL REQUEST] Trim unused exported kernel
+ symbols
+In-Reply-To: <571F2424.10907@suse.com>
+Message-ID: <alpine.LFD.2.20.1604261116480.5091@knanqh.ubzr>
+References: <l0Vnaswuk0zQ0l0Vpa1Uwn@videotron.ca> <nnzoaR8KUeMRCnnzpaKqKi@videotron.ca> <alpine.LFD.2.20.1604182326490.27452@knanqh.ubzr> <57172CB2.1040801@suse.com> <alpine.LFD.2.20.1604201154060.27452@knanqh.ubzr> <alpine.LFD.2.20.1604201512410.27452@knanqh.ubzr>
+ <571F2424.10907@suse.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Benjamin Poirier <bpoirier@suse.com>
-Cc: Michal Marek <mmarek@suse.cz>, joeyli <jlee@suse.com>, "Yann E . MORIN " <yann.morin.1998@free.fr>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Michal Marek <mmarek@suse.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Sun, 10 Apr 2016 17:06:33 -0700
-Benjamin Poirier <bpoirier@suse.com> wrote:
+On Tue, 26 Apr 2016, Michal Marek wrote:
 
-> Note that this may change the resulting .config, causing it to have fewer
-> symbols turned on. Before this patch we incorrectly identified some symbols
-> as not having a prompt and needing to be selected by something else.
+> On 2016-04-20 21:26, Nicolas Pitre wrote:
+> > On Wed, 20 Apr 2016, Nicolas Pitre wrote:
+> > 
+> >> On Wed, 20 Apr 2016, Michal Marek wrote:
+> >>
+> >>> Dne 19.4.2016 v 05:32 Nicolas Pitre napsal(a):
+> >>>> Ping !
+> >>>>
+> >>>> /me only hears back empty cave echoes ...
+> >>>
+> >>> Pulled now, sorry for the delay.
+> >>
+> >> Thanks!
+> > 
+> > Looking at your kbuild branch, I see subsequent changes that require 
+> > minor adjustments. Please merge the following patch:
+> > 
+> > ----- >8
+> > From a14d6e7a2902af78ee43ab075c7caf829fdfa4b2 Mon Sep 17 00:00:00 2001
+> > From: Nicolas Pitre <nicolas.pitre@linaro.org>
+> > Date: Wed, 20 Apr 2016 15:16:01 -0400
+> > Subject: [PATCH] kbuild: adjust ksym_dep_filter for some cmd renames
+> > 
+> > The following renames occurred recently:
+> > 
+> >   cmd_cc_i_c --> cmd_cpp_i_c
+> >   cmd_as_s_S --> cmd_cpp_s_S
+> > 
+> > The respective cc_*_c and as_*_S patterns no longer match the above
+> > therefore additional patterns are needed.
+> > 
+> > Signed-off-by: Nicolas Pitre <nico@linaro.org>
+> > 
+> > diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+> > index a09927e027..bd6bd048cf 100644
+> > --- a/scripts/Kbuild.include
+> > +++ b/scripts/Kbuild.include
+> > @@ -275,8 +275,10 @@ else
+> >  flags_nodeps = $(filter-out -Wp$(comma)-M%, $($(1)))
+> >  ksym_dep_filter =                                                            \
+> >  	case "$(1)" in                                                       \
+> > -	cc_*_c) $(CPP) $(call flags_nodeps,c_flags) -D__KSYM_DEPS__ $< ;;    \
+> > -	as_*_S) $(CPP) $(call flags_nodeps,a_flags) -D__KSYM_DEPS__ $< ;;    \
+> > +	cc_*_c)  $(CPP) $(call flags_nodeps,c_flags) -D__KSYM_DEPS__ $< ;;   \
+> > +	as_*_S)  $(CPP) $(call flags_nodeps,a_flags) -D__KSYM_DEPS__ $< ;;   \
+> > +	cpp_i_c) $(CPP) $(call flags_nodeps,c_flags) -D__KSYM_DEPS__ $< ;;   \
+> > +	cpp_s_S) $(CPP) $(call flags_nodeps,a_flags) -D__KSYM_DEPS__ $< ;;   \
 > 
-> Also fix the whitespace repeat after "tristate".
-> 
-> Signed-off-by: Benjamin Poirier <bpoirier@suse.com>
-> ---
->  scripts/kconfig/streamline_config.pl | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
-> index bbc160c..d465672 100755
-> --- a/scripts/kconfig/streamline_config.pl
-> +++ b/scripts/kconfig/streamline_config.pl
-> @@ -237,7 +237,7 @@ sub read_kconfig {
->  	    }
->  
->  	# configs without prompts must be selected
-> -	} elsif ($state ne "NONE" && /^\s*tristate\s\S/) {
-> +	} elsif ($state ne "NONE" && /^\s*(tristate\s+\S|prompt\b)/) {
+> Please make it
+> cc_*_c | cpp_i_c) ...
+> as_*_S | cpp_s_S) ...
 
-I'm curious. What modules have tristate and a specified prompt?
+Sure. Patch follows
 
-That is, what modules are removed with this patch?
 
-I applied the first three so far.
-
-Thanks,
-
--- Steve
-
->  	    # note if the config has a prompt
->  	    $prompts{$config} = 1;
->  
-
+Nicolas
