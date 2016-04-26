@@ -1,87 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf0-f172.google.com ([209.85.192.172]:35353 "EHLO
-	mail-pf0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752463AbcDZRgP (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 26 Apr 2016 13:36:15 -0400
-Date: Tue, 26 Apr 2016 10:36:10 -0700
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Subject: Re: [net-next PATCH V2 5/5] samples/bpf: like LLC also verify and
- allow redefining CLANG command
-Message-ID: <20160426173608.GF42777@ast-mbp.thefacebook.com>
-References: <20160426162650.22962.20516.stgit@firesoul>
- <20160426162732.22962.73140.stgit@firesoul>
+Received: from mx2.suse.de ([195.135.220.15]:34019 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752456AbcDZSva (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 26 Apr 2016 14:51:30 -0400
+Date: Tue, 26 Apr 2016 11:51:22 -0700
+From: Benjamin Poirier <bpoirier@suse.com>
+Subject: Re: [PATCH 2/2] localmodconfig: Reset certificate paths
+Message-ID: <20160426185122.GA2979@f1.synalogic.ca>
+References: <1459619722-13695-1-git-send-email-bpoirier@suse.com>
+ <1459619722-13695-2-git-send-email-bpoirier@suse.com>
+ <20160426100214.08f3569a@gandalf.local.home>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20160426162732.22962.73140.stgit@firesoul>
+In-Reply-To: <20160426100214.08f3569a@gandalf.local.home>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jesper Dangaard Brouer <brouer@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kbuild@vger.kernel.org, bblanco@plumgrid.com, naveen.n.rao@linux.vnet.ibm.com, borkmann@iogearbox.net
+To: Steven Rostedt <rostedt@goodmis.org>
+Cc: Michal Marek <mmarek@suse.cz>, joeyli <jlee@suse.com>, "Yann E . MORIN " <yann.morin.1998@free.fr>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Tue, Apr 26, 2016 at 06:27:32PM +0200, Jesper Dangaard Brouer wrote:
-> Users are likely to manually compile both LLVM 'llc' and 'clang'
-> tools.  Thus, also allow redefining CLANG and verify command exist.
+On 2016/04/26 10:02, Steven Rostedt wrote:
+> On Sat,  2 Apr 2016 10:55:22 -0700
+> Benjamin Poirier <bpoirier@suse.com> wrote:
 > 
-> Makefile implementation wise, the target that verify the command have
-> been generalized.
+> > When using `make localmodconfig` and friends, if the input config comes
+> > from a kernel that was built in a different environment (for example, the
+> > canonical case of using localmodconfig to trim a distribution kernel
+> > config) the key files for module signature checking will not be available
+> > and should be regenerated or omitted. Otherwise, the user will be faced
+> > with annoying errors when trying to build with the generated .config:
+> > 
+> > make[1]: *** No rule to make target 'keyring.crt', needed by 'certs/x509_certificate_list'.  Stop.
+> > Makefile:1576: recipe for target 'certs/' failed
+> > 
+> > Signed-off-by: Benjamin Poirier <bpoirier@suse.com>
+> > ---
+> >  scripts/kconfig/streamline_config.pl | 34 ++++++++++++++++++++++++++++++++++
+> >  1 file changed, 34 insertions(+)
+> > 
+> > diff --git a/scripts/kconfig/streamline_config.pl b/scripts/kconfig/streamline_config.pl
+> > index 7036ae3..514735d 100755
+> > --- a/scripts/kconfig/streamline_config.pl
+> > +++ b/scripts/kconfig/streamline_config.pl
+> > @@ -610,6 +610,40 @@ foreach my $line (@config_file) {
+> >  	next;
+> >      }
+> >  
+> > +    if (/CONFIG_MODULE_SIG_KEY="(.+)"/) {
+> > +        my $orig_cert = $1;
+> > +        my $default_cert = "certs/signing_key.pem";
+> > +
+> > +        # Check that the logic in this script still matches the one in Kconfig
+> > +        if (!defined($depends{"MODULE_SIG_KEY"}) ||
+> > +            $depends{"MODULE_SIG_KEY"} !~ /"\Q$default_cert\E"/) {
+> > +            die "Assertion failure, update needed";
 > 
-> Signed-off-by: Jesper Dangaard Brouer <brouer@redhat.com>
-> ---
->  samples/bpf/Makefile   |   23 +++++++++++++----------
->  samples/bpf/README.rst |    6 +++---
->  2 files changed, 16 insertions(+), 13 deletions(-)
-> 
-> diff --git a/samples/bpf/Makefile b/samples/bpf/Makefile
-> index dd63521832d8..c02ea9d2a248 100644
-> --- a/samples/bpf/Makefile
-> +++ b/samples/bpf/Makefile
-> @@ -81,9 +81,10 @@ HOSTLOADLIBES_spintest += -lelf
->  HOSTLOADLIBES_map_perf_test += -lelf -lrt
->  HOSTLOADLIBES_test_overhead += -lelf -lrt
->  
-> -# Allows pointing LLC to a LLVM backend with bpf support, redefine on cmdline:
-> -#  make samples/bpf/ LLC=~/git/llvm/build/bin/llc
-> +# Allows pointing LLC/CLANG to a LLVM backend with bpf support, redefine on cmdline:
-> +#  make samples/bpf/ LLC=~/git/llvm/build/bin/llc CLANG=~/git/llvm/build/bin/clang
->  LLC ?= llc
-> +CLANG ?= clang
->  
->  # Trick to allow make to be run from this directory
->  all:
-> @@ -94,15 +95,17 @@ clean:
->  	@rm -f *~
->  
->  # Verify LLVM compiler is available and bpf target is supported
-> -.PHONY: verify_cmd_llc verify_target_bpf
-> +.PHONY: verify_cmd_llc verify_target_bpf $(CLANG) $(LLC)
->  
-> -verify_cmd_llc:
-> -	@if ! (which "${LLC}" > /dev/null 2>&1); then \
-> -		echo "*** ERROR: Cannot find LLVM tool 'llc' (${LLC})" ;\
-> -		exit 1; \
-> -	else true; fi
-> +verify_cmds: $(CLANG) $(LLC)
-> +	@for TOOL in $^ ; do \
-> +		if ! (which "$${TOOL}" > /dev/null 2>&1); then \
-> +			echo "*** ERROR: Cannot find LLVM tool $${TOOL}" ;\
-> +			exit 1; \
-> +		else true; fi; \
-> +	done
->  
-> -verify_target_bpf: verify_cmd_llc
-> +verify_target_bpf: verify_cmds
->  	@if ! (${LLC} -march=bpf -mattr=help > /dev/null 2>&1); then \
->  		echo "*** ERROR: LLVM (${LLC}) does not support 'bpf' target" ;\
->  		echo "   NOTICE: LLVM version >= 3.7.1 required" ;\
+> Instead of dieing here, what about just going back to the current
+> behavior, and ignore the sig keys?
 
-If I read the patch correctly, it only checks that any version
-of clang is available and llc supports -march=bpf.
-That's correct.
-There is no need to build the latest clang most of the time.
-clang 3.4 and 3.5 are fine to compile samples/bpf/
-since llvm ir is mostly compatible with llc from 3.7 or 3.8
-
-Acked-by: Alexei Starovoitov <ast@kernel.org>
-
+I was concerned that the warning may go unnoticed but I think you're right. It
+is the same kind of concern between a BUG() or a WARN_ON(). In this case it
+certainly is possible to keep going and ignore the certificate check, as you
+suggest.
