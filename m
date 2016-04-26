@@ -1,59 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:49122 "EHLO mx1.redhat.com"
+Received: from mx2.suse.de ([195.135.220.15]:59957 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752579AbcDZLJZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 26 Apr 2016 07:09:25 -0400
-Subject: [net-next PATCH 2/4] samples/bpf: Makefile verify LLVM compiler
- avail and bpf target is supported
-From: Jesper Dangaard Brouer <brouer@redhat.com>
-Date: Tue, 26 Apr 2016 13:09:22 +0200
-Message-ID: <20160426110922.20716.11333.stgit@firesoul>
-In-Reply-To: <20160426110828.20716.13392.stgit@firesoul>
-References: <20160426110828.20716.13392.stgit@firesoul>
+	id S1751548AbcDZLTn (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 26 Apr 2016 07:19:43 -0400
+Subject: Re: linux-next: Tree for Apr 22 (adjust_autoksyms.sh)
+References: <20160422153503.24aa389e@canb.auug.org.au>
+ <571A56C4.7030907@infradead.org>
+ <alpine.LFD.2.20.1604221345340.27452@knanqh.ubzr>
+ <571A6BCE.9040904@infradead.org>
+ <alpine.LFD.2.20.1604221423300.27452@knanqh.ubzr>
+ <alpine.LFD.2.20.1604221542270.27452@knanqh.ubzr>
+ <571AABCF.4050609@infradead.org>
+From: Michal Marek <mmarek@suse.cz>
+Message-ID: <571F4ECC.5020902@suse.cz>
+Date: Tue, 26 Apr 2016 13:19:40 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <571AABCF.4050609@infradead.org>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: netdev@vger.kernel.org
-Cc: bblanco@plumgrid.com, borkmann@iogearbox.net, alexei.starovoitov@gmail.com, linux-kbuild@vger.kernel.org, Jesper Dangaard Brouer <brouer@redhat.com>
+To: Randy Dunlap <rdunlap@infradead.org>, Nicolas Pitre <nicolas.pitre@linaro.org>
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>, linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-Make compiling samples/bpf more user friendly, by detecting if LLVM
-compiler tool 'llc' is available, and also detect if the 'bpf' target
-is available in this version of LLVM.
+On 2016-04-23 00:55, Randy Dunlap wrote:
+> On 04/22/16 12:44, Nicolas Pitre wrote:
+>> On Fri, 22 Apr 2016, Nicolas Pitre wrote:
+>>
+>>> On Fri, 22 Apr 2016, Randy Dunlap wrote:
+>>>
+>>>> Yes, this patch helps, but I think there is still a problem.
+>>>> I think that trim needs to be done after CONFIG_BUILD_DOCSRC and possibly
+>>>> after CONFIG_SAMPLES are built.
+>>>
+>>> The later is already taken care of with commit dd92478a15.
+>>>
+>>>> At least CONFIG_BUILD_DOCSRC seems to
+>>>> cause this error:
+>>>>
+>>>> Setup is 16508 bytes (padded to 16896 bytes).
+>>>> System is 6125 kB
+>>>> CRC 8aa70f94
+>>>> Kernel: arch/x86/boot/bzImage is ready  (#9)
+>>>> ERROR: "cn_del_callback" [Documentation/connector/cn_test.ko] undefined!
+>>>> ERROR: "cn_add_callback" [Documentation/connector/cn_test.ko] undefined!
+>>>> ERROR: "cn_netlink_send" [Documentation/connector/cn_test.ko] undefined!
+>>>> ../scripts/Makefile.modpost:91: recipe for target '__modpost' failed
+>>>> make[2]: *** [__modpost] Error 1
+>>>
+>>> This one is indeed a problem.
+>>
+>> Please try the following:
+> 
+> Yes, this works.  Thanks.
+> 
+> Acked-by: Randy Dunlap <rdunlap@infradead.org>
+> Tested-by: Randy Dunlap <rdunlap@infradead.org>
 
-Signed-off-by: Jesper Dangaard Brouer <brouer@redhat.com>
----
- samples/bpf/Makefile |   18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+Applied to kbuild.git#kbuild.
 
-diff --git a/samples/bpf/Makefile b/samples/bpf/Makefile
-index 5bae9536f100..7ac66f5bbbf5 100644
---- a/samples/bpf/Makefile
-+++ b/samples/bpf/Makefile
-@@ -85,6 +85,24 @@ HOSTLOADLIBES_test_overhead += -lelf -lrt
- #  make samples/bpf/ LLC=~/git/llvm/build/bin/llc
- LLC ?= llc
- 
-+# Verify LLVM compiler is available and bpf target is supported
-+.PHONY: verify_cmd_llc verify_target_bpf
-+
-+verify_cmd_llc:
-+	@if ! (which "${LLC}" > /dev/null 2>&1); then \
-+		echo "*** ERROR: Cannot find LLVM tool 'llc' (${LLC})" ;\
-+		exit 1; \
-+	else true; fi
-+
-+verify_target_bpf: verify_cmd_llc
-+	@if ! (${LLC} -march=bpf -mattr=help > /dev/null 2>&1); then \
-+		echo "*** ERROR: LLVM (${LLC}) does not support 'bpf' target" ;\
-+		echo "   NOTICE: LLVM version >= 3.7.0 required" ;\
-+		exit 2; \
-+	else true; fi
-+
-+$(src)/*.c: verify_target_bpf
-+
- # asm/sysreg.h - inline assembly used by it is incompatible with llvm.
- # But, there is no easy way to fix it, so just exclude it since it is
- # useless for BPF samples.
+Michal
 
