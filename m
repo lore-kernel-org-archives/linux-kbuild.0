@@ -1,15 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:44688 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:49402 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752703AbcDZQ13 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 26 Apr 2016 12:27:29 -0400
-Subject: [net-next PATCH V2 4/5] samples/bpf: allow make to be run from
- samples/bpf/ directory
+	id S1751966AbcDZQ1J (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 26 Apr 2016 12:27:09 -0400
+Subject: [net-next PATCH V2 0/5] samples/bpf: Improve user experience
 From: Jesper Dangaard Brouer <brouer@redhat.com>
-Date: Tue, 26 Apr 2016 18:27:27 +0200
-Message-ID: <20160426162727.22962.51631.stgit@firesoul>
-In-Reply-To: <20160426162650.22962.20516.stgit@firesoul>
-References: <20160426162650.22962.20516.stgit@firesoul>
+Date: Tue, 26 Apr 2016 18:27:06 +0200
+Message-ID: <20160426162650.22962.20516.stgit@firesoul>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
@@ -18,54 +15,33 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: netdev@vger.kernel.org
 Cc: linux-kbuild@vger.kernel.org, bblanco@plumgrid.com, Jesper Dangaard Brouer <brouer@redhat.com>, naveen.n.rao@linux.vnet.ibm.com, borkmann@iogearbox.net, alexei.starovoitov@gmail.com
 
-It is not intuitive that 'make' must be run from the top level
-directory with argument "samples/bpf/" to compile these eBPF samples.
+It is a steep learning curve getting started with using the eBPF
+examples in samples/bpf/.  There are several dependencies, and
+specific versions of these dependencies.  Invoking make in the correct
+manor is also slightly obscure.
 
-Introduce a kbuild make file trick that allow make to be run from the
-"samples/bpf/" directory itself.  It basically change to the top level
-directory and call "make samples/bpf/" with the "/" slash after the
-directory name.
+This patchset cleanup, document and hopefully improves the first time
+user experience with the eBPF samples directory by auto-detecting
+certain scenarios.
 
-Also add a clean target that only cleans this directory, by taking
-advantage of the kbuild external module setting M=$PWD.
+V2:
+ - Adjusted recommend minimum versions to 3.7.1
+ - Included clang build instructions
+ - New patch adding CLANG variable and validation of command
 
-Signed-off-by: Jesper Dangaard Brouer <brouer@redhat.com>
 ---
- samples/bpf/Makefile   |    8 ++++++++
- samples/bpf/README.rst |    3 +++
- 2 files changed, 11 insertions(+)
 
-diff --git a/samples/bpf/Makefile b/samples/bpf/Makefile
-index 45859c99f573..dd63521832d8 100644
---- a/samples/bpf/Makefile
-+++ b/samples/bpf/Makefile
-@@ -85,6 +85,14 @@ HOSTLOADLIBES_test_overhead += -lelf -lrt
- #  make samples/bpf/ LLC=~/git/llvm/build/bin/llc
- LLC ?= llc
- 
-+# Trick to allow make to be run from this directory
-+all:
-+	$(MAKE) -C ../../ $$PWD/
-+
-+clean:
-+	$(MAKE) -C ../../ M=$$PWD clean
-+	@rm -f *~
-+
- # Verify LLVM compiler is available and bpf target is supported
- .PHONY: verify_cmd_llc verify_target_bpf
- 
-diff --git a/samples/bpf/README.rst b/samples/bpf/README.rst
-index c7ccf553af0d..1ec4b08a7b40 100644
---- a/samples/bpf/README.rst
-+++ b/samples/bpf/README.rst
-@@ -47,6 +47,9 @@ For compiling goto kernel top level build directory and run make like::
- 
- Do notice the "/" slash after the directory name.
- 
-+It is also possible to call make from this directory.  This will just
-+hide the the invocation of make as above with the appended "/".
-+
- Manually compiling LLVM with 'bpf' support
- ------------------------------------------
- 
+Jesper Dangaard Brouer (5):
+      samples/bpf: add back functionality to redefine LLC command
+      samples/bpf: Makefile verify LLVM compiler avail and bpf target is supported
+      samples/bpf: add a README file to get users started
+      samples/bpf: allow make to be run from samples/bpf/ directory
+      samples/bpf: like LLC also verify and allow redefining CLANG command
 
+
+ samples/bpf/Makefile   |   37 +++++++++++++++++++++-
+ samples/bpf/README.rst |   80 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 115 insertions(+), 2 deletions(-)
+ create mode 100644 samples/bpf/README.rst
+
+--
