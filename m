@@ -1,59 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:53151 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752546AbcDZQ1S (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 26 Apr 2016 12:27:18 -0400
-Subject: [net-next PATCH V2 2/5] samples/bpf: Makefile verify LLVM compiler
- avail and bpf target is supported
-From: Jesper Dangaard Brouer <brouer@redhat.com>
-Date: Tue, 26 Apr 2016 18:27:16 +0200
-Message-ID: <20160426162716.22962.36473.stgit@firesoul>
-In-Reply-To: <20160426162650.22962.20516.stgit@firesoul>
+Received: from mail-pa0-f42.google.com ([209.85.220.42]:34584 "EHLO
+	mail-pa0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752753AbcDZR2R (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 26 Apr 2016 13:28:17 -0400
+Date: Tue, 26 Apr 2016 10:28:12 -0700
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Subject: Re: [net-next PATCH V2 1/5] samples/bpf: add back functionality to
+ redefine LLC command
+Message-ID: <20160426172810.GB42777@ast-mbp.thefacebook.com>
 References: <20160426162650.22962.20516.stgit@firesoul>
+ <20160426162711.22962.13821.stgit@firesoul>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20160426162711.22962.13821.stgit@firesoul>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: netdev@vger.kernel.org
-Cc: linux-kbuild@vger.kernel.org, bblanco@plumgrid.com, Jesper Dangaard Brouer <brouer@redhat.com>, naveen.n.rao@linux.vnet.ibm.com, borkmann@iogearbox.net, alexei.starovoitov@gmail.com
+To: Jesper Dangaard Brouer <brouer@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kbuild@vger.kernel.org, bblanco@plumgrid.com, naveen.n.rao@linux.vnet.ibm.com, borkmann@iogearbox.net
 
-Make compiling samples/bpf more user friendly, by detecting if LLVM
-compiler tool 'llc' is available, and also detect if the 'bpf' target
-is available in this version of LLVM.
+On Tue, Apr 26, 2016 at 06:27:11PM +0200, Jesper Dangaard Brouer wrote:
+> It is practical to be-able-to redefine the location of the LLVM
+> command 'llc', because not all distros have a LLVM version with bpf
+> target support.  Thus, it is sometimes required to compile LLVM from
+> source, and sometimes it is not desired to overwrite the distros
+> default LLVM version.
+> 
+> This feature was removed with 128d1514be35 ("samples/bpf: Use llc in
+> PATH, rather than a hardcoded value").
+> 
+> Add this features back. Note that it is possible to redefine the LLC
+> on the make command like:
+> 
+>  make samples/bpf/ LLC=~/git/llvm/build/bin/llc
+> 
+> Fixes: 128d1514be35 ("samples/bpf: Use llc in PATH, rather than a hardcoded value")
+> Signed-off-by: Jesper Dangaard Brouer <brouer@redhat.com>
 
-Signed-off-by: Jesper Dangaard Brouer <brouer@redhat.com>
----
- samples/bpf/Makefile |   18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
-
-diff --git a/samples/bpf/Makefile b/samples/bpf/Makefile
-index 5bae9536f100..45859c99f573 100644
---- a/samples/bpf/Makefile
-+++ b/samples/bpf/Makefile
-@@ -85,6 +85,24 @@ HOSTLOADLIBES_test_overhead += -lelf -lrt
- #  make samples/bpf/ LLC=~/git/llvm/build/bin/llc
- LLC ?= llc
- 
-+# Verify LLVM compiler is available and bpf target is supported
-+.PHONY: verify_cmd_llc verify_target_bpf
-+
-+verify_cmd_llc:
-+	@if ! (which "${LLC}" > /dev/null 2>&1); then \
-+		echo "*** ERROR: Cannot find LLVM tool 'llc' (${LLC})" ;\
-+		exit 1; \
-+	else true; fi
-+
-+verify_target_bpf: verify_cmd_llc
-+	@if ! (${LLC} -march=bpf -mattr=help > /dev/null 2>&1); then \
-+		echo "*** ERROR: LLVM (${LLC}) does not support 'bpf' target" ;\
-+		echo "   NOTICE: LLVM version >= 3.7.1 required" ;\
-+		exit 2; \
-+	else true; fi
-+
-+$(src)/*.c: verify_target_bpf
-+
- # asm/sysreg.h - inline assembly used by it is incompatible with llvm.
- # But, there is no easy way to fix it, so just exclude it since it is
- # useless for BPF samples.
+Acked-by: Alexei Starovoitov <ast@kernel.org>
 
