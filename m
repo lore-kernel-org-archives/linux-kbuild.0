@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:48258 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:52342 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752382AbcDZLJT (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 26 Apr 2016 07:09:19 -0400
-Subject: [net-next PATCH 1/4] samples/bpf: add back functionality to
- redefine LLC command
+	id S1752621AbcDZLJe (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 26 Apr 2016 07:09:34 -0400
+Subject: [net-next PATCH 4/4] samples/bpf: allow make to be run from
+ samples/bpf/ directory
 From: Jesper Dangaard Brouer <brouer@redhat.com>
-Date: Tue, 26 Apr 2016 13:09:17 +0200
-Message-ID: <20160426110917.20716.43051.stgit@firesoul>
+Date: Tue, 26 Apr 2016 13:09:32 +0200
+Message-ID: <20160426110932.20716.51360.stgit@firesoul>
 In-Reply-To: <20160426110828.20716.13392.stgit@firesoul>
 References: <20160426110828.20716.13392.stgit@firesoul>
 MIME-Version: 1.0
@@ -18,44 +18,54 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: netdev@vger.kernel.org
 Cc: bblanco@plumgrid.com, borkmann@iogearbox.net, alexei.starovoitov@gmail.com, linux-kbuild@vger.kernel.org, Jesper Dangaard Brouer <brouer@redhat.com>
 
-It is practical to be-able-to redefine the location of the LLVM
-command 'llc', because not all distros have a LLVM version with bpf
-target support.  Thus, it is sometimes required to compile LLVM from
-source, and sometimes it is not desired to overwrite the distros
-default LLVM version.
+It is not intuitive that 'make' must be run from the top level
+directory with argument "samples/bpf/" to compile these eBPF samples.
 
-This feature was removed with 128d1514be35 ("samples/bpf: Use llc in
-PATH, rather than a hardcoded value").
+Introduce a kbuild make file trick that allow make to be run from the
+"samples/bpf/" directory itself.  It basically change to the top level
+directory and call "make samples/bpf/" with the "/" slash after the
+directory name.
 
-Add this features back. Note that it is possible to redefine the LLC
-on the make command like:
+Also add a clean target that only cleans this directory, by taking
+advantage of the kbuild external module setting M=$PWD.
 
- make samples/bpf/ LLC=~/git/llvm/build/bin/llc
-
-Fixes: 128d1514be35 ("samples/bpf: Use llc in PATH, rather than a hardcoded value")
 Signed-off-by: Jesper Dangaard Brouer <brouer@redhat.com>
 ---
- samples/bpf/Makefile |    6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ samples/bpf/Makefile   |    8 ++++++++
+ samples/bpf/README.rst |    3 +++
+ 2 files changed, 11 insertions(+)
 
 diff --git a/samples/bpf/Makefile b/samples/bpf/Makefile
-index 744dd7a16144..5bae9536f100 100644
+index 7ac66f5bbbf5..7370dfee482f 100644
 --- a/samples/bpf/Makefile
 +++ b/samples/bpf/Makefile
-@@ -81,10 +81,14 @@ HOSTLOADLIBES_spintest += -lelf
- HOSTLOADLIBES_map_perf_test += -lelf -lrt
- HOSTLOADLIBES_test_overhead += -lelf -lrt
+@@ -85,6 +85,14 @@ HOSTLOADLIBES_test_overhead += -lelf -lrt
+ #  make samples/bpf/ LLC=~/git/llvm/build/bin/llc
+ LLC ?= llc
  
-+# Allows pointing LLC to a LLVM backend with bpf support, redefine on cmdline:
-+#  make samples/bpf/ LLC=~/git/llvm/build/bin/llc
-+LLC ?= llc
++# Trick to allow make to be run from this directory
++all:
++	$(MAKE) -C ../../ $$PWD/
 +
- # asm/sysreg.h - inline assembly used by it is incompatible with llvm.
- # But, there is no easy way to fix it, so just exclude it since it is
- # useless for BPF samples.
- $(obj)/%.o: $(src)/%.c
- 	clang $(NOSTDINC_FLAGS) $(LINUXINCLUDE) $(EXTRA_CFLAGS) \
- 		-D__KERNEL__ -D__ASM_SYSREG_H -Wno-unused-value -Wno-pointer-sign \
--		-O2 -emit-llvm -c $< -o -| llc -march=bpf -filetype=obj -o $@
-+		-O2 -emit-llvm -c $< -o -| $(LLC) -march=bpf -filetype=obj -o $@
++clean:
++	$(MAKE) -C ../../ M=$$PWD clean
++	@rm -f *~
++
+ # Verify LLVM compiler is available and bpf target is supported
+ .PHONY: verify_cmd_llc verify_target_bpf
+ 
+diff --git a/samples/bpf/README.rst b/samples/bpf/README.rst
+index 3e1ac05d8e7c..3a9e6c4099aa 100644
+--- a/samples/bpf/README.rst
++++ b/samples/bpf/README.rst
+@@ -47,6 +47,9 @@ For compiling goto kernel top level build directory and run make like::
+ 
+ Do notice the "/" slash after the directory name.
+ 
++It is also possible to call make from this directory.  This will just
++hide the the invocation of make as above with the appended "/".
++
+ Manually compiling LLVM with 'bpf' support
+ ------------------------------------------
+ 
 
