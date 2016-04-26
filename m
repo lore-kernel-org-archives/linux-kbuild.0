@@ -1,51 +1,121 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qg0-f53.google.com ([209.85.192.53]:34041 "EHLO
-	mail-qg0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752246AbcDZPVh (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 26 Apr 2016 11:21:37 -0400
-Received: by mail-qg0-f53.google.com with SMTP id c6so7058827qga.1
-        for <linux-kbuild@vger.kernel.org>; Tue, 26 Apr 2016 08:21:37 -0700 (PDT)
-Date: Tue, 26 Apr 2016 11:21:34 -0400 (EDT)
-From: Nicolas Pitre <nicolas.pitre@linaro.org>
-Subject: [PATCH] kbuild: adjust ksym_dep_filter for some cmd_* renames
-Message-ID: <alpine.LFD.2.20.1604261118060.5091@knanqh.ubzr>
+Received: from mx1.redhat.com ([209.132.183.28]:44671 "EHLO mx1.redhat.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752703AbcDZQ1X (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 26 Apr 2016 12:27:23 -0400
+Subject: [net-next PATCH V2 3/5] samples/bpf: add a README file to get users
+ started
+From: Jesper Dangaard Brouer <brouer@redhat.com>
+Date: Tue, 26 Apr 2016 18:27:22 +0200
+Message-ID: <20160426162721.22962.25054.stgit@firesoul>
+In-Reply-To: <20160426162650.22962.20516.stgit@firesoul>
+References: <20160426162650.22962.20516.stgit@firesoul>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: netdev@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org, bblanco@plumgrid.com, Jesper Dangaard Brouer <brouer@redhat.com>, naveen.n.rao@linux.vnet.ibm.com, borkmann@iogearbox.net, alexei.starovoitov@gmail.com
 
+Getting started with using examples in samples/bpf/ is not
+straightforward.  There are several dependencies, and specific
+versions of these dependencies.
 
-The following renames occurred recently:
+Just compiling the example tool is also slightly obscure, e.g. one
+need to call make like:
 
-  cmd_cc_i_c --> cmd_cpp_i_c
-  cmd_as_s_S --> cmd_cpp_s_S
+ make samples/bpf/
 
-The respective cc_*_c and as_*_S patterns no longer match the above
-therefore additional patterns are needed.
+Do notice the "/" slash after the directory name.
 
-Signed-off-by: Nicolas Pitre <nico@linaro.org>
+Signed-off-by: Jesper Dangaard Brouer <brouer@redhat.com>
+---
+ samples/bpf/README.rst |   77 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 77 insertions(+)
+ create mode 100644 samples/bpf/README.rst
 
-diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index a09927e027..36e9475395 100644
---- a/scripts/Kbuild.include
-+++ b/scripts/Kbuild.include
-@@ -275,10 +275,12 @@ else
- flags_nodeps = $(filter-out -Wp$(comma)-M%, $($(1)))
- ksym_dep_filter =                                                            \
- 	case "$(1)" in                                                       \
--	cc_*_c) $(CPP) $(call flags_nodeps,c_flags) -D__KSYM_DEPS__ $< ;;    \
--	as_*_S) $(CPP) $(call flags_nodeps,a_flags) -D__KSYM_DEPS__ $< ;;    \
--	boot*|build*|*cpp_lds_S|dtc|host*|vdso*) : ;;                        \
--	*) echo "Don't know how to preprocess $(1)" >&2; false ;;            \
-+	  cc_*_c|cpp_i_c)                                                    \
-+	    $(CPP) $(call flags_nodeps,c_flags) -D__KSYM_DEPS__ $< ;;        \
-+	  as_*_S|cpp_s_S)                                                    \
-+	    $(CPP) $(call flags_nodeps,a_flags) -D__KSYM_DEPS__ $< ;;        \
-+	  boot*|build*|*cpp_lds_S|dtc|host*|vdso*) : ;;                      \
-+	  *) echo "Don't know how to preprocess $(1)" >&2; false ;;          \
- 	esac | sed -rn 's/^.*=== __KSYM_(.*) ===.*$$/KSYM_\1/p'
- 
- cmd_and_fixdep =                                                             \
+diff --git a/samples/bpf/README.rst b/samples/bpf/README.rst
+new file mode 100644
+index 000000000000..c7ccf553af0d
+--- /dev/null
++++ b/samples/bpf/README.rst
+@@ -0,0 +1,77 @@
++eBPF sample programs
++====================
++
++This kernel samples/bpf directory contains a mini eBPF library, test
++stubs, verifier test-suite and examples for using eBPF.
++
++Build dependencies
++==================
++
++Compiling requires having installed:
++ * clang
++ * llvm >= version 3.7.1
++
++Note that LLVM's tool 'llc' must support target 'bpf', list with command::
++
++ $ llc --version
++ LLVM (http://llvm.org/):
++  LLVM version 3.x.y
++  [...]
++  Host CPU: xxx
++
++  Registered Targets:
++    [...]
++    bpf        - BPF (host endian)
++    bpfeb      - BPF (big endian)
++    bpfel      - BPF (little endian)
++    [...]
++
++Kernel headers
++--------------
++
++There are usually dependencies to header files of the current kernel.
++To avoid installing devel kernel headers system wide, as a normal
++user, simply call::
++
++ make headers_install
++
++This will creates a local "usr/include" directory in the git/build top
++level directory, that the make system automatically pickup first.
++
++Compiling
++=========
++
++For compiling goto kernel top level build directory and run make like::
++
++ make samples/bpf/
++
++Do notice the "/" slash after the directory name.
++
++Manually compiling LLVM with 'bpf' support
++------------------------------------------
++
++In some LLVM versions the BPF target were marked experimental. They
++needed the 'cmake .. -DLLVM_EXPERIMENTAL_TARGETS_TO_BUILD=BPF'.  Since
++version 3.7.1, LLVM adds a proper LLVM backend target for the BPF
++bytecode architecture.
++
++By default llvm will build all non-experimental backends including bpf.
++To generate a smaller llc binary one can use::
++
++ -DLLVM_TARGETS_TO_BUILD="BPF;X86"
++
++Quick sniplet for manually compiling LLVM and clang
++(build dependencies are cmake and gcc-c++)::
++
++ $ git clone http://llvm.org/git/llvm.git
++ $ cd llvm/tools
++ $ git clone --depth 1 http://llvm.org/git/clang.git
++ $ cd ..; mkdir build; cd build
++ $ cmake .. -DLLVM_TARGETS_TO_BUILD="BPF;X86"
++ $ make -j $(getconf _NPROCESSORS_ONLN)
++
++It is also possible to point make to the newly compile 'llc' command
++via redefining LLC on the make command line::
++
++ make samples/bpf/ LLC=~/git/llvm/build/bin/llc
++
+
