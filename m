@@ -1,64 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lists.s-osg.org ([54.187.51.154]:60923 "EHLO lists.s-osg.org"
+Received: from mx1.redhat.com ([209.132.183.28]:53954 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751060AbcDZKzm (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 26 Apr 2016 06:55:42 -0400
-Date: Tue, 26 Apr 2016 07:55:33 -0300
-From: Mauro Carvalho Chehab <mchehab@osg.samsung.com>
-Subject: Re: [PATCH v2 0/2] moves samples out of Documentation directory
-Message-ID: <20160426075533.71a11ede@recife.lan>
-In-Reply-To: <571F42DA.60005@cisco.com>
-References: <1461600189-2207716-1-git-send-email-arnd@arndb.de>
-	<20160426035939.51649686@lwn.net>
-	<571F42DA.60005@cisco.com>
+	id S1752382AbcDZLJP (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 26 Apr 2016 07:09:15 -0400
+Subject: [net-next PATCH 0/4] samples/bpf: Improve user experience
+From: Jesper Dangaard Brouer <brouer@redhat.com>
+Date: Tue, 26 Apr 2016 13:09:12 +0200
+Message-ID: <20160426110828.20716.13392.stgit@firesoul>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Hans Verkuil <hansverk@cisco.com>
-Cc: Jonathan Corbet <corbet@lwn.net>, Arnd Bergmann <arnd@arndb.de>, Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, Hans Verkuil <hans.verkuil@cisco.com>
+To: netdev@vger.kernel.org
+Cc: bblanco@plumgrid.com, borkmann@iogearbox.net, alexei.starovoitov@gmail.com, linux-kbuild@vger.kernel.org, Jesper Dangaard Brouer <brouer@redhat.com>
 
-Em Tue, 26 Apr 2016 12:28:42 +0200
-Hans Verkuil <hansverk@cisco.com> escreveu:
+It is a steep learning curve getting started with using the eBPF
+examples in samples/bpf/.  There are several dependencies, and
+specific versions of these dependencies.  Invoking make in the correct
+manor is also slightly obscure.
 
-> On 04/26/2016 11:59 AM, Jonathan Corbet wrote:
-> > On Mon, 25 Apr 2016 18:03:07 +0200
-> > Arnd Bergmann <arnd@arndb.de> wrote:
-> >   
-> >> As suggested by Nicolas Pitre, here is a resend of two patches to
-> >> move the kernel modules from Documentation/*/ to samples/*/.
-> >>
-> >> With Nico's changes in place, it's no longer necessary to do this,
-> >> but it seems like a good idea anyway for consistency.
-> >> Not sure who would be the best person to pick up the patches, I'd
-> >> probably either the Documentation or the kbuild maintainers.
-> >>
-> >> 	Arnd
-> >>
-> >> [PATCH v2 1/2] samples: connector: from Documentation to samples
-> >> [PATCH v2 2/2] samples: v4l: from Documentation to samples directory  
-> > 
-> > I can take them through the docs tree.
-> > 
-> > Hans [added], are you OK with moving v4l2-pci-skeleton.c over to
-> > the samples directory?  
-> 
-> Yes, that's fine. For the record:
-> 
-> Acked-by: Hans Verkuil <hans.verkuil@cisco.com>
+This patchset cleanup, document and hopefully improves the first time
+user experience with the eBPF samples directory by auto-detecting
+certain scenarios.
 
-Acked-by: Mauro Carvalho Chehab <mchehab@osg.samsung.com>
-> 
-> Regards,
-> 
-> 	Hans
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-doc" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+---
+
+Jesper Dangaard Brouer (4):
+      samples/bpf: add back functionality to redefine LLC command
+      samples/bpf: Makefile verify LLVM compiler avail and bpf target is supported
+      samples/bpf: add a README file to get users started
+      samples/bpf: allow make to be run from samples/bpf/ directory
 
 
--- 
-Thanks,
-Mauro
+ samples/bpf/Makefile   |   32 +++++++++++++++++++++-
+ samples/bpf/README.rst |   70 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 101 insertions(+), 1 deletion(-)
+ create mode 100644 samples/bpf/README.rst
+
+--
