@@ -1,125 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from www62.your-server.de ([213.133.104.62]:50727 "EHLO
-	www62.your-server.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751363AbcDZMk5 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 26 Apr 2016 08:40:57 -0400
-Message-ID: <571F61D6.50101@iogearbox.net>
-Date: Tue, 26 Apr 2016 14:40:54 +0200
-From: Daniel Borkmann <daniel@iogearbox.net>
+Received: from ozlabs.org ([103.22.144.67]:53574 "EHLO ozlabs.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750835AbcDZNHq (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 26 Apr 2016 09:07:46 -0400
+Date: Tue, 26 Apr 2016 23:07:43 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+Subject: Re: linux-next: Tree for Apr 22 (adjust_autoksyms.sh)
+Message-ID: <20160426230743.26d00e67@canb.auug.org.au>
+In-Reply-To: <571F4ECC.5020902@suse.cz>
+References: <20160422153503.24aa389e@canb.auug.org.au>
+	<571A56C4.7030907@infradead.org>
+	<alpine.LFD.2.20.1604221345340.27452@knanqh.ubzr>
+	<571A6BCE.9040904@infradead.org>
+	<alpine.LFD.2.20.1604221423300.27452@knanqh.ubzr>
+	<alpine.LFD.2.20.1604221542270.27452@knanqh.ubzr>
+	<571AABCF.4050609@infradead.org>
+	<571F4ECC.5020902@suse.cz>
 MIME-Version: 1.0
-Subject: Re: [net-next PATCH 3/4] samples/bpf: add a README file to get users
- started
-References: <20160426110828.20716.13392.stgit@firesoul>	<20160426110927.20716.89620.stgit@firesoul>	<571F5486.7090902@iogearbox.net> <20160426135647.7faf9a87@redhat.com>
-In-Reply-To: <20160426135647.7faf9a87@redhat.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jesper Dangaard Brouer <brouer@redhat.com>
-Cc: netdev@vger.kernel.org, bblanco@plumgrid.com, borkmann@iogearbox.net, alexei.starovoitov@gmail.com, linux-kbuild@vger.kernel.org
+To: Michal Marek <mmarek@suse.cz>
+Cc: Randy Dunlap <rdunlap@infradead.org>, Nicolas Pitre <nicolas.pitre@linaro.org>, linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-On 04/26/2016 01:56 PM, Jesper Dangaard Brouer wrote:
-> On Tue, 26 Apr 2016 13:44:06 +0200
-> Daniel Borkmann <daniel@iogearbox.net> wrote:
+Hi Michal,
+
+On Tue, 26 Apr 2016 13:19:40 +0200 Michal Marek <mmarek@suse.cz> wrote:
 >
->> On 04/26/2016 01:09 PM, Jesper Dangaard Brouer wrote:
->>> Getting started with using examples in samples/bpf/ is not
->>> straightforward.  There are several dependencies, and specific
->>> versions of these dependencies.
->>>
->>> Just compiling the example tool is also slightly obscure, e.g. one
->>> need to call make like:
->>>
->>>    make samples/bpf/
->>>
->>> Do notice the "/" slash after the directory name.
->>>
->>> Signed-off-by: Jesper Dangaard Brouer <brouer@redhat.com>
->>> ---
->>>    samples/bpf/README.rst |   67 ++++++++++++++++++++++++++++++++++++++++++++++++
->>>    1 file changed, 67 insertions(+)
->>>    create mode 100644 samples/bpf/README.rst
->>>
->>> diff --git a/samples/bpf/README.rst b/samples/bpf/README.rst
->>> new file mode 100644
->>> index 000000000000..3e1ac05d8e7c
->>> --- /dev/null
->>> +++ b/samples/bpf/README.rst
->>> @@ -0,0 +1,67 @@
->>> +eBPF sample programs
->>> +====================
->>> +
->>> +This kernel samples/bpf directory contains a mini eBPF library, test
->>> +stubs, verifier test-suite and examples for using eBPF.
->>> +
->>> +Build dependencies
->>> +==================
->>> +
->>> +Compiling requires having installed:
->>> + * clang
->>> + * llvm >= version 3.7.0
->>> +
->>> +Note that LLVM's tool 'llc' must support target 'bpf', list with command::
->>> +
->>> + $ llc --version
->>> + LLVM (http://llvm.org/):
->>> +  LLVM version 3.x.y
->>> +  [...]
->>> +  Host CPU: xxx
->>> +
->>> +  Registered Targets:
->>> +    [...]
->>> +    bpf        - BPF (host endian)
->>> +    bpfeb      - BPF (big endian)
->>> +    bpfel      - BPF (little endian)
->>> +    [...]
->>> +
->>> +Kernel headers
->>> +--------------
->>> +
->>> +There are usually dependencies to header files of the current kernel.
->>> +To avoid installing devel kernel headers system wide, as a normal
->>> +user, simply call::
->>> +
->>> + make headers_install
->>> +
->>> +This will creates a local "usr/include" directory in the git/build top
->>> +level directory, that the make system automatically pickup first.
->>> +
->>> +Compiling
->>> +=========
->>> +
->>> +For compiling goto kernel top level build directory and run make like::
->>> +
->>> + make samples/bpf/
->>> +
->>> +Do notice the "/" slash after the directory name.
->>> +
->>> +Manually compiling LLVM with 'bpf' support
->>> +------------------------------------------
->>> +
->>> +In some LLVM versions the BPF target were marked experimental.  To
->>> +compile LLVM manually and enable BPF target run (build dependencies
->>> +are cmake and gcc-c++)::
->>> +
->>> + $ git clone http://llvm.org/git/llvm.git
->>> + $ cd llvm
->>> + $ mkdir build; cd build
->>> + $ cmake .. -DLLVM_EXPERIMENTAL_TARGETS_TO_BUILD=BPF
->>> + $ make
->>
->> That's perhaps a bit misleading in the sense that when you clone the
->> tree from git, you'd nowadays invoke cmake normally with LLVM_TARGETS_TO_BUILD
->> instead of LLVM_EXPERIMENTAL_TARGETS_TO_BUILD for BPF, as BPF is not an
->> experimental target anymore. It's probably also recommended to clone
->> clang into tools/ dir as well under your llvm/ repo when you compile
->> from scratch anyways.
->
-> Can you come up with a formulation/desc I can use instead then?
+> On 2016-04-23 00:55, Randy Dunlap wrote:
+> > On 04/22/16 12:44, Nicolas Pitre wrote:  
+> >> On Fri, 22 Apr 2016, Nicolas Pitre wrote:
+> >>  
+> >>> On Fri, 22 Apr 2016, Randy Dunlap wrote:
+> >>>  
+> >>>> Yes, this patch helps, but I think there is still a problem.
+> >>>> I think that trim needs to be done after CONFIG_BUILD_DOCSRC and possibly
+> >>>> after CONFIG_SAMPLES are built.  
+> >>>
+> >>> The later is already taken care of with commit dd92478a15.
+> >>>  
+> >>>> At least CONFIG_BUILD_DOCSRC seems to
+> >>>> cause this error:
+> >>>>
+> >>>> Setup is 16508 bytes (padded to 16896 bytes).
+> >>>> System is 6125 kB
+> >>>> CRC 8aa70f94
+> >>>> Kernel: arch/x86/boot/bzImage is ready  (#9)
+> >>>> ERROR: "cn_del_callback" [Documentation/connector/cn_test.ko] undefined!
+> >>>> ERROR: "cn_add_callback" [Documentation/connector/cn_test.ko] undefined!
+> >>>> ERROR: "cn_netlink_send" [Documentation/connector/cn_test.ko] undefined!
+> >>>> ../scripts/Makefile.modpost:91: recipe for target '__modpost' failed
+> >>>> make[2]: *** [__modpost] Error 1  
+> >>>
+> >>> This one is indeed a problem.  
+> >>
+> >> Please try the following:  
+> > 
+> > Yes, this works.  Thanks.
+> > 
+> > Acked-by: Randy Dunlap <rdunlap@infradead.org>
+> > Tested-by: Randy Dunlap <rdunlap@infradead.org>  
+> 
+> Applied to kbuild.git#kbuild.
 
-You mean how to build with clang? There are various docs/snippets out
-there, for example, see the 'Build LLVM and Clang development libs'
-part of [1], that you can tweak for your README with.
+Unfortunately, that was the commit I had to revert from linux-next
+today - see my email report.  It breaks what looks like correct
+additions to the block tree.
 
-   [1] https://gist.github.com/brendangregg/cfa482acb71aa577789c
+-- 
+Cheers,
+Stephen Rothwell
