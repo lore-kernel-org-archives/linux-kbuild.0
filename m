@@ -1,63 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:59957 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751548AbcDZLTn (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 26 Apr 2016 07:19:43 -0400
-Subject: Re: linux-next: Tree for Apr 22 (adjust_autoksyms.sh)
-References: <20160422153503.24aa389e@canb.auug.org.au>
- <571A56C4.7030907@infradead.org>
- <alpine.LFD.2.20.1604221345340.27452@knanqh.ubzr>
- <571A6BCE.9040904@infradead.org>
- <alpine.LFD.2.20.1604221423300.27452@knanqh.ubzr>
- <alpine.LFD.2.20.1604221542270.27452@knanqh.ubzr>
- <571AABCF.4050609@infradead.org>
-From: Michal Marek <mmarek@suse.cz>
-Message-ID: <571F4ECC.5020902@suse.cz>
-Date: Tue, 26 Apr 2016 13:19:40 +0200
+Received: from www62.your-server.de ([213.133.104.62]:40886 "EHLO
+	www62.your-server.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751742AbcDZLhD (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 26 Apr 2016 07:37:03 -0400
+Message-ID: <571F52DB.7050904@iogearbox.net>
+Date: Tue, 26 Apr 2016 13:36:59 +0200
+From: Daniel Borkmann <daniel@iogearbox.net>
 MIME-Version: 1.0
-In-Reply-To: <571AABCF.4050609@infradead.org>
-Content-Type: text/plain; charset=windows-1252
+Subject: Re: [net-next PATCH 1/4] samples/bpf: add back functionality to redefine
+ LLC command
+References: <20160426110828.20716.13392.stgit@firesoul> <20160426110917.20716.43051.stgit@firesoul>
+In-Reply-To: <20160426110917.20716.43051.stgit@firesoul>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@infradead.org>, Nicolas Pitre <nicolas.pitre@linaro.org>
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>, linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Jesper Dangaard Brouer <brouer@redhat.com>, netdev@vger.kernel.org
+Cc: bblanco@plumgrid.com, borkmann@iogearbox.net, alexei.starovoitov@gmail.com, linux-kbuild@vger.kernel.org
 
-On 2016-04-23 00:55, Randy Dunlap wrote:
-> On 04/22/16 12:44, Nicolas Pitre wrote:
->> On Fri, 22 Apr 2016, Nicolas Pitre wrote:
->>
->>> On Fri, 22 Apr 2016, Randy Dunlap wrote:
->>>
->>>> Yes, this patch helps, but I think there is still a problem.
->>>> I think that trim needs to be done after CONFIG_BUILD_DOCSRC and possibly
->>>> after CONFIG_SAMPLES are built.
->>>
->>> The later is already taken care of with commit dd92478a15.
->>>
->>>> At least CONFIG_BUILD_DOCSRC seems to
->>>> cause this error:
->>>>
->>>> Setup is 16508 bytes (padded to 16896 bytes).
->>>> System is 6125 kB
->>>> CRC 8aa70f94
->>>> Kernel: arch/x86/boot/bzImage is ready  (#9)
->>>> ERROR: "cn_del_callback" [Documentation/connector/cn_test.ko] undefined!
->>>> ERROR: "cn_add_callback" [Documentation/connector/cn_test.ko] undefined!
->>>> ERROR: "cn_netlink_send" [Documentation/connector/cn_test.ko] undefined!
->>>> ../scripts/Makefile.modpost:91: recipe for target '__modpost' failed
->>>> make[2]: *** [__modpost] Error 1
->>>
->>> This one is indeed a problem.
->>
->> Please try the following:
-> 
-> Yes, this works.  Thanks.
-> 
-> Acked-by: Randy Dunlap <rdunlap@infradead.org>
-> Tested-by: Randy Dunlap <rdunlap@infradead.org>
+On 04/26/2016 01:09 PM, Jesper Dangaard Brouer wrote:
+> It is practical to be-able-to redefine the location of the LLVM
+> command 'llc', because not all distros have a LLVM version with bpf
+> target support.  Thus, it is sometimes required to compile LLVM from
+> source, and sometimes it is not desired to overwrite the distros
+> default LLVM version.
+>
+> This feature was removed with 128d1514be35 ("samples/bpf: Use llc in
+> PATH, rather than a hardcoded value").
+>
+> Add this features back. Note that it is possible to redefine the LLC
+> on the make command like:
+>
+>   make samples/bpf/ LLC=~/git/llvm/build/bin/llc
+>
+> Fixes: 128d1514be35 ("samples/bpf: Use llc in PATH, rather than a hardcoded value")
+> Signed-off-by: Jesper Dangaard Brouer <brouer@redhat.com>
+> ---
+>   samples/bpf/Makefile |    6 +++++-
+>   1 file changed, 5 insertions(+), 1 deletion(-)
+>
+> diff --git a/samples/bpf/Makefile b/samples/bpf/Makefile
+> index 744dd7a16144..5bae9536f100 100644
+> --- a/samples/bpf/Makefile
+> +++ b/samples/bpf/Makefile
+> @@ -81,10 +81,14 @@ HOSTLOADLIBES_spintest += -lelf
+>   HOSTLOADLIBES_map_perf_test += -lelf -lrt
+>   HOSTLOADLIBES_test_overhead += -lelf -lrt
+>
+> +# Allows pointing LLC to a LLVM backend with bpf support, redefine on cmdline:
+> +#  make samples/bpf/ LLC=~/git/llvm/build/bin/llc
+> +LLC ?= llc
+> +
+>   # asm/sysreg.h - inline assembly used by it is incompatible with llvm.
+>   # But, there is no easy way to fix it, so just exclude it since it is
+>   # useless for BPF samples.
+>   $(obj)/%.o: $(src)/%.c
+>   	clang $(NOSTDINC_FLAGS) $(LINUXINCLUDE) $(EXTRA_CFLAGS) \
+>   		-D__KERNEL__ -D__ASM_SYSREG_H -Wno-unused-value -Wno-pointer-sign \
+> -		-O2 -emit-llvm -c $< -o -| llc -march=bpf -filetype=obj -o $@
+> +		-O2 -emit-llvm -c $< -o -| $(LLC) -march=bpf -filetype=obj -o $@
 
-Applied to kbuild.git#kbuild.
-
-Michal
-
+Why not doing the same for clang? True that we're not using 'clang -target bpf'
+here, but when someone builds llvm from git, it's very likely that clang is cloned
+and built along with it.
