@@ -1,54 +1,78 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([103.22.144.67]:37488 "EHLO ozlabs.org"
+Received: from mx2.suse.de ([195.135.220.15]:57682 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751197AbcDYW5Z (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 25 Apr 2016 18:57:25 -0400
-Date: Tue, 26 Apr 2016 08:57:22 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-Subject: Re: kbuild fix branch for linux-next
-Message-ID: <20160426085722.35a6a826@canb.auug.org.au>
-In-Reply-To: <alpine.LFD.2.20.1604251203100.5091@knanqh.ubzr>
-References: <alpine.LFD.2.20.1604251203100.5091@knanqh.ubzr>
+	id S1752004AbcDZIRn (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 26 Apr 2016 04:17:43 -0400
+Subject: Re: [PATCH v7 0/8]/[PULL REQUEST] Trim unused exported kernel symbols
+References: <l0Vnaswuk0zQ0l0Vpa1Uwn@videotron.ca>
+ <nnzoaR8KUeMRCnnzpaKqKi@videotron.ca>
+ <alpine.LFD.2.20.1604182326490.27452@knanqh.ubzr> <57172CB2.1040801@suse.com>
+ <alpine.LFD.2.20.1604201154060.27452@knanqh.ubzr>
+ <alpine.LFD.2.20.1604201512410.27452@knanqh.ubzr>
+From: Michal Marek <mmarek@suse.com>
+Message-ID: <571F2424.10907@suse.com>
+Date: Tue, 26 Apr 2016 10:17:40 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <alpine.LFD.2.20.1604201512410.27452@knanqh.ubzr>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Nicolas Pitre <nicolas.pitre@linaro.org>
-Cc: Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hi Nicolas,
-
-On Mon, 25 Apr 2016 12:20:56 -0400 (EDT) Nicolas Pitre <nicolas.pitre@linaro.org> wrote:
->
-> Could you please add the following branch to the linux-next tree:
+On 2016-04-20 21:26, Nicolas Pitre wrote:
+> On Wed, 20 Apr 2016, Nicolas Pitre wrote:
 > 
-> 	git://git.linaro.org/people/nicolas.pitre/linux kbuild
+>> On Wed, 20 Apr 2016, Michal Marek wrote:
+>>
+>>> Dne 19.4.2016 v 05:32 Nicolas Pitre napsal(a):
+>>>> Ping !
+>>>>
+>>>> /me only hears back empty cave echoes ...
+>>>
+>>> Pulled now, sorry for the delay.
+>>
+>> Thanks!
 > 
-> It includes 3 patches on top of Michal's kbuild branch already in your 
-> tree. Those patches fix issues that have been reported by 3 people 
-> already, and I'd like those fixes to appear in linux-next until Michal 
-> picks them up, which should happen in, well, some "undefined" amount of 
-> time.  ;-)
+> Looking at your kbuild branch, I see subsequent changes that require 
+> minor adjustments. Please merge the following patch:
+> 
+> ----- >8
+> From a14d6e7a2902af78ee43ab075c7caf829fdfa4b2 Mon Sep 17 00:00:00 2001
+> From: Nicolas Pitre <nicolas.pitre@linaro.org>
+> Date: Wed, 20 Apr 2016 15:16:01 -0400
+> Subject: [PATCH] kbuild: adjust ksym_dep_filter for some cmd renames
+> 
+> The following renames occurred recently:
+> 
+>   cmd_cc_i_c --> cmd_cpp_i_c
+>   cmd_as_s_S --> cmd_cpp_s_S
+> 
+> The respective cc_*_c and as_*_S patterns no longer match the above
+> therefore additional patterns are needed.
+> 
+> Signed-off-by: Nicolas Pitre <nico@linaro.org>
+> 
+> diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+> index a09927e027..bd6bd048cf 100644
+> --- a/scripts/Kbuild.include
+> +++ b/scripts/Kbuild.include
+> @@ -275,8 +275,10 @@ else
+>  flags_nodeps = $(filter-out -Wp$(comma)-M%, $($(1)))
+>  ksym_dep_filter =                                                            \
+>  	case "$(1)" in                                                       \
+> -	cc_*_c) $(CPP) $(call flags_nodeps,c_flags) -D__KSYM_DEPS__ $< ;;    \
+> -	as_*_S) $(CPP) $(call flags_nodeps,a_flags) -D__KSYM_DEPS__ $< ;;    \
+> +	cc_*_c)  $(CPP) $(call flags_nodeps,c_flags) -D__KSYM_DEPS__ $< ;;   \
+> +	as_*_S)  $(CPP) $(call flags_nodeps,a_flags) -D__KSYM_DEPS__ $< ;;   \
+> +	cpp_i_c) $(CPP) $(call flags_nodeps,c_flags) -D__KSYM_DEPS__ $< ;;   \
+> +	cpp_s_S) $(CPP) $(call flags_nodeps,a_flags) -D__KSYM_DEPS__ $< ;;   \
 
-Thanks for adding your subsystem tree as a participant of linux-next.  As
-you may know, this is not a judgement of your code.  The purpose of
-linux-next is for integration testing and to lower the impact of
-conflicts between subsystems in the next merge window. 
+Please make it
+cc_*_c | cpp_i_c) ...
+as_*_S | cpp_s_S) ...
 
-You will need to ensure that the patches/commits in your tree/series have
-been:
-     * submitted under GPL v2 (or later) and include the Contributor's
-        Signed-off-by,
-     * posted to the relevant mailing list,
-     * reviewed by you (or another maintainer of your subsystem tree),
-     * successfully unit tested, and 
-     * destined for the current or next Linux merge window.
+Thanks,
+Michal
 
-Basically, this should be just what you would send to Linus (or ask him
-to fetch).  It is allowed to be rebased if you deem it necessary.
-
--- 
-Cheers,
-Stephen Rothwell 
-sfr@canb.auug.org.au
