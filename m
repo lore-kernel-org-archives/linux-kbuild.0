@@ -1,68 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp-out4.electric.net ([192.162.216.182]:63596 "EHLO
-	smtp-out4.electric.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752039AbcD0NkM convert rfc822-to-8bit (ORCPT
+Received: from smtp-out6.electric.net ([192.162.217.184]:56807 "EHLO
+	smtp-out6.electric.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751967AbcD0OLO (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 27 Apr 2016 09:40:12 -0400
+	Wed, 27 Apr 2016 10:11:14 -0400
 From: David Laight <David.Laight@ACULAB.COM>
-Subject: RE: [net-next PATCH 4/4] samples/bpf: allow make to be run from
- samples/bpf/ directory
-Date: Wed, 27 Apr 2016 13:15:42 +0000
-Message-ID: <063D6719AE5E284EB5DD2968C1650D6D5F4AB7FE@AcuExch.aculab.com>
-References: <20160426110828.20716.13392.stgit@firesoul>
- <20160426110932.20716.51360.stgit@firesoul>
- <20160426143524.GB39797@ast-mbp.thefacebook.com>
-In-Reply-To: <20160426143524.GB39797@ast-mbp.thefacebook.com>
+Subject: RE: [net-next PATCH V2 2/5] samples/bpf: Makefile verify LLVM
+ compiler avail and bpf target is supported
+Date: Wed, 27 Apr 2016 13:52:49 +0000
+Message-ID: <063D6719AE5E284EB5DD2968C1650D6D5F4AB86F@AcuExch.aculab.com>
+References: <20160426162650.22962.20516.stgit@firesoul>
+ <20160426162716.22962.36473.stgit@firesoul>
+In-Reply-To: <20160426162716.22962.36473.stgit@firesoul>
 Content-Language: en-US
-Content-Type: text/plain; charset="Windows-1252"
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: 'Alexei Starovoitov' <alexei.starovoitov@gmail.com>, Jesper Dangaard Brouer <brouer@redhat.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "bblanco@plumgrid.com" <bblanco@plumgrid.com>, "borkmann@iogearbox.net" <borkmann@iogearbox.net>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>
+To: 'Jesper Dangaard Brouer' <brouer@redhat.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Cc: "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "bblanco@plumgrid.com" <bblanco@plumgrid.com>, "naveen.n.rao@linux.vnet.ibm.com" <naveen.n.rao@linux.vnet.ibm.com>, "borkmann@iogearbox.net" <borkmann@iogearbox.net>, "alexei.starovoitov@gmail.com" <alexei.starovoitov@gmail.com>
 
-From: Alexei Starovoitov
-> Sent: 26 April 2016 15:35
-> On Tue, Apr 26, 2016 at 01:09:32PM +0200, Jesper Dangaard Brouer wrote:
-> > It is not intuitive that 'make' must be run from the top level
-> > directory with argument "samples/bpf/" to compile these eBPF samples.
-> >
-> > Introduce a kbuild make file trick that allow make to be run from the
-> > "samples/bpf/" directory itself.  It basically change to the top level
-> > directory and call "make samples/bpf/" with the "/" slash after the
-> > directory name.
-> >
-> > Also add a clean target that only cleans this directory, by taking
-> > advantage of the kbuild external module setting M=$PWD.
-> >
-> > Signed-off-by: Jesper Dangaard Brouer <brouer@redhat.com>
-> > ---
-> >  samples/bpf/Makefile   |    8 ++++++++
-> >  samples/bpf/README.rst |    3 +++
-> >  2 files changed, 11 insertions(+)
-> >
-> > diff --git a/samples/bpf/Makefile b/samples/bpf/Makefile
-> > index 7ac66f5bbbf5..7370dfee482f 100644
-> > --- a/samples/bpf/Makefile
-> > +++ b/samples/bpf/Makefile
-> > @@ -85,6 +85,14 @@ HOSTLOADLIBES_test_overhead += -lelf -lrt
-> >  #  make samples/bpf/ LLC=~/git/llvm/build/bin/llc
-> >  LLC ?= llc
-> >
-> > +# Trick to allow make to be run from this directory
-> > +all:
-> > +	$(MAKE) -C ../../ $$PWD/
-> > +
-> > +clean:
-> > +	$(MAKE) -C ../../ M=$$PWD clean
-> > +	@rm -f *~
-> > +
-> 
-> nice trick!
-
-Another nice 'trick' is to write a GNUmakefie containing the local rules.
-GNU make will read it in preference to Makefile and makefile.
-
-	David
-
+RnJvbTogSmVzcGVyIERhbmdhYXJkIEJyb3Vlcg0KPiBTZW50OiAyNiBBcHJpbCAyMDE2IDE3OjI3
+DQo+IE1ha2UgY29tcGlsaW5nIHNhbXBsZXMvYnBmIG1vcmUgdXNlciBmcmllbmRseSwgYnkgZGV0
+ZWN0aW5nIGlmIExMVk0NCj4gY29tcGlsZXIgdG9vbCAnbGxjJyBpcyBhdmFpbGFibGUsIGFuZCBh
+bHNvIGRldGVjdCBpZiB0aGUgJ2JwZicgdGFyZ2V0DQo+IGlzIGF2YWlsYWJsZSBpbiB0aGlzIHZl
+cnNpb24gb2YgTExWTS4NCi4uLg0KPiBkaWZmIC0tZ2l0IGEvc2FtcGxlcy9icGYvTWFrZWZpbGUg
+Yi9zYW1wbGVzL2JwZi9NYWtlZmlsZQ0KPiBpbmRleCA1YmFlOTUzNmYxMDAuLjQ1ODU5Yzk5ZjU3
+MyAxMDA2NDQNCj4gLS0tIGEvc2FtcGxlcy9icGYvTWFrZWZpbGUNCj4gKysrIGIvc2FtcGxlcy9i
+cGYvTWFrZWZpbGUNCj4gQEAgLTg1LDYgKzg1LDI0IEBAIEhPU1RMT0FETElCRVNfdGVzdF9vdmVy
+aGVhZCArPSAtbGVsZiAtbHJ0DQo+ICAjICBtYWtlIHNhbXBsZXMvYnBmLyBMTEM9fi9naXQvbGx2
+bS9idWlsZC9iaW4vbGxjDQo+ICBMTEMgPz0gbGxjDQo+IA0KPiArIyBWZXJpZnkgTExWTSBjb21w
+aWxlciBpcyBhdmFpbGFibGUgYW5kIGJwZiB0YXJnZXQgaXMgc3VwcG9ydGVkDQo+ICsuUEhPTlk6
+IHZlcmlmeV9jbWRfbGxjIHZlcmlmeV90YXJnZXRfYnBmDQo+ICsNCj4gK3ZlcmlmeV9jbWRfbGxj
+Og0KPiArCUBpZiAhICh3aGljaCAiJHtMTEN9IiA+IC9kZXYvbnVsbCAyPiYxKTsgdGhlbiBcDQoN
+CllvdSBzaG91bGQgdXNlICd0eXBlJyBub3QgJ3doaWNoJy4NCid0eXBlJyBpcyBhIHBvc2l4IHNo
+ZWxsIGJ1aWx0aW4sICd3aGljaCcgaXMgYSBzY3JpcHQvcHJvZ3JhbQ0KdGhhdCB0cmllcyB0byBl
+bXVsYXRlIGEgJ2NzaCcgYnVpbHRpbi4NCllvdSB3YW50IHRvIGtub3cgd2hldGhlciB0aGUgc2hl
+bGwgdGhhdCBtYWtlIHJ1bnMgY2FuIGV4ZWN1dGUgJHtMTEN9DQpub3Qgd2hldGhlciBhIGNzaCB3
+b3VsZCBiZSBhYmxlIHRvIHJ1biBpdC4NCg0KWW91IG1pZ2h0IGFsc28gd2FudCB0byB3b3JyeSBh
+Ym91dDoNCiAgICBMTEM9Ii9wYXRoX3RvX2xsYy9sbGMgLWV4dHJhX2FyZyIgbWFrZSBmdWJhcg0K
+DQoJRGF2aWQNCg0K
