@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:36409 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:51172 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752891AbcD1MVA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 28 Apr 2016 08:21:00 -0400
-Subject: [net-next PATCH V4 2/5] samples/bpf: Makefile verify LLVM compiler
- avail and bpf target is supported
+	id S1753120AbcD1MVG (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 28 Apr 2016 08:21:06 -0400
+Subject: [net-next PATCH V4 3/5] samples/bpf: add a README file to get users
+ started
 From: Jesper Dangaard Brouer <brouer@redhat.com>
-Date: Thu, 28 Apr 2016 14:20:58 +0200
-Message-ID: <20160428122058.16807.38757.stgit@firesoul>
+Date: Thu, 28 Apr 2016 14:21:04 +0200
+Message-ID: <20160428122103.16807.41837.stgit@firesoul>
 In-Reply-To: <20160428121949.16807.84828.stgit@firesoul>
 References: <20160428121949.16807.84828.stgit@firesoul>
 MIME-Version: 1.0
@@ -18,43 +18,91 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: netdev@vger.kernel.org
 Cc: linux-kbuild@vger.kernel.org, bblanco@plumgrid.com, Jesper Dangaard Brouer <brouer@redhat.com>, naveen.n.rao@linux.vnet.ibm.com, borkmann@iogearbox.net, alexei.starovoitov@gmail.com
 
-Make compiling samples/bpf more user friendly, by detecting if LLVM
-compiler tool 'llc' is available, and also detect if the 'bpf' target
-is available in this version of LLVM.
+Getting started with using examples in samples/bpf/ is not
+straightforward.  There are several dependencies, and specific
+versions of these dependencies.
+
+Just compiling the example tool is also slightly obscure, e.g. one
+need to call make like:
+
+ make samples/bpf/
+
+Do notice the "/" slash after the directory name.
 
 Signed-off-by: Jesper Dangaard Brouer <brouer@redhat.com>
-Acked-by: Alexei Starovoitov <ast@kernel.org>
 ---
- samples/bpf/Makefile |   18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ samples/bpf/README.rst |   64 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 64 insertions(+)
+ create mode 100644 samples/bpf/README.rst
 
-diff --git a/samples/bpf/Makefile b/samples/bpf/Makefile
-index 5bae9536f100..45859c99f573 100644
---- a/samples/bpf/Makefile
-+++ b/samples/bpf/Makefile
-@@ -85,6 +85,24 @@ HOSTLOADLIBES_test_overhead += -lelf -lrt
- #  make samples/bpf/ LLC=~/git/llvm/build/bin/llc
- LLC ?= llc
- 
-+# Verify LLVM compiler is available and bpf target is supported
-+.PHONY: verify_cmd_llc verify_target_bpf
+diff --git a/samples/bpf/README.rst b/samples/bpf/README.rst
+new file mode 100644
+index 000000000000..993d280184fa
+--- /dev/null
++++ b/samples/bpf/README.rst
+@@ -0,0 +1,64 @@
++eBPF sample programs
++====================
 +
-+verify_cmd_llc:
-+	@if ! (which "${LLC}" > /dev/null 2>&1); then \
-+		echo "*** ERROR: Cannot find LLVM tool 'llc' (${LLC})" ;\
-+		exit 1; \
-+	else true; fi
++This directory contains a mini eBPF library, test stubs, verifier
++test-suite and examples for using eBPF.
 +
-+verify_target_bpf: verify_cmd_llc
-+	@if ! (${LLC} -march=bpf -mattr=help > /dev/null 2>&1); then \
-+		echo "*** ERROR: LLVM (${LLC}) does not support 'bpf' target" ;\
-+		echo "   NOTICE: LLVM version >= 3.7.1 required" ;\
-+		exit 2; \
-+	else true; fi
++Build dependencies
++==================
 +
-+$(src)/*.c: verify_target_bpf
++Compiling requires having installed:
++ * clang >= version 3.4.0
++ * llvm >= version 3.7.1
 +
- # asm/sysreg.h - inline assembly used by it is incompatible with llvm.
- # But, there is no easy way to fix it, so just exclude it since it is
- # useless for BPF samples.
++Note that LLVM's tool 'llc' must support target 'bpf', list version
++and supported targets with command: ``llc --version``
++
++Kernel headers
++--------------
++
++There are usually dependencies to header files of the current kernel.
++To avoid installing devel kernel headers system wide, as a normal
++user, simply call::
++
++ make headers_install
++
++This will creates a local "usr/include" directory in the git/build top
++level directory, that the make system automatically pickup first.
++
++Compiling
++=========
++
++For building the BPF samples, issue the below command from the kernel
++top level directory::
++
++ make samples/bpf/
++
++Do notice the "/" slash after the directory name.
++
++Manually compiling LLVM with 'bpf' support
++------------------------------------------
++
++Since version 3.7.0, LLVM adds a proper LLVM backend target for the
++BPF bytecode architecture.
++
++By default llvm will build all non-experimental backends including bpf.
++To generate a smaller llc binary one can use::
++
++ -DLLVM_TARGETS_TO_BUILD="BPF"
++
++Quick sniplet for manually compiling LLVM and clang
++(build dependencies are cmake and gcc-c++)::
++
++ $ git clone http://llvm.org/git/llvm.git
++ $ cd llvm/tools
++ $ git clone --depth 1 http://llvm.org/git/clang.git
++ $ cd ..; mkdir build; cd build
++ $ cmake .. -DLLVM_TARGETS_TO_BUILD="BPF;X86"
++ $ make -j $(getconf _NPROCESSORS_ONLN)
++
++It is also possible to point make to the newly compiled 'llc' command
++via redefining LLC on the make command line::
++
++ make samples/bpf/ LLC=~/git/llvm/build/bin/llc
++
 
