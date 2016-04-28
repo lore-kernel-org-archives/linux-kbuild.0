@@ -1,58 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from e28smtp01.in.ibm.com ([125.16.236.1]:40483 "EHLO
-	e28smtp01.in.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750867AbcD1OuU (ORCPT
+Received: from mail-pf0-f169.google.com ([209.85.192.169]:35745 "EHLO
+	mail-pf0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752909AbcD1QtL (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 28 Apr 2016 10:50:20 -0400
-Received: from localhost
-	by e28smtp01.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-kbuild@vger.kernel.org> from <naveen.n.rao@linux.vnet.ibm.com>;
-	Thu, 28 Apr 2016 20:20:17 +0530
-Date: Thu, 28 Apr 2016 20:20:03 +0530
-From: "Naveen N. Rao" <naveen.n.rao@linux.vnet.ibm.com>
-Subject: Re: [net-next PATCH V4 1/5] samples/bpf: add back functionality to
- redefine LLC command
-Message-ID: <20160428144949.GG7880@naverao1-tp.in.ibm.com>
+	Thu, 28 Apr 2016 12:49:11 -0400
+Date: Thu, 28 Apr 2016 09:49:06 -0700
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Subject: Re: [net-next PATCH V4 3/5] samples/bpf: add a README file to get
+ users started
+Message-ID: <20160428164904.GA81443@ast-mbp.thefacebook.com>
 References: <20160428121949.16807.84828.stgit@firesoul>
- <20160428122053.16807.93143.stgit@firesoul>
- <20160428132132.GB7880@naverao1-tp.in.ibm.com>
- <20160428164046.0998f03d@redhat.com>
+ <20160428122103.16807.41837.stgit@firesoul>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20160428164046.0998f03d@redhat.com>
+In-Reply-To: <20160428122103.16807.41837.stgit@firesoul>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Jesper Dangaard Brouer <brouer@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kbuild@vger.kernel.org, bblanco@plumgrid.com, borkmann@iogearbox.net, alexei.starovoitov@gmail.com
+Cc: netdev@vger.kernel.org, linux-kbuild@vger.kernel.org, bblanco@plumgrid.com, naveen.n.rao@linux.vnet.ibm.com, borkmann@iogearbox.net
 
-On 2016/04/28 04:40PM, Jesper Dangaard Brouer wrote:
-> On Thu, 28 Apr 2016 18:51:33 +0530
-> "Naveen N. Rao" <naveen.n.rao@linux.vnet.ibm.com> wrote:
+On Thu, Apr 28, 2016 at 02:21:04PM +0200, Jesper Dangaard Brouer wrote:
+> Getting started with using examples in samples/bpf/ is not
+> straightforward.  There are several dependencies, and specific
+> versions of these dependencies.
 > 
-> > > Add this features back. Note that it is possible to redefine the LLC
-> > > on the make command like:
-> > > 
-> > >  make samples/bpf/ LLC=~/git/llvm/build/bin/llc  
-> > 
-> > I don't have an objection to this patch, but you didn't explain why/how 
-> > this approach is better than just doing:
-> >   PATH=~/git/llvm/build/bin make samples/bpf/
+> Just compiling the example tool is also slightly obscure, e.g. one
+> need to call make like:
 > 
-> It is almost the same. There is always another way to do the same.
+>  make samples/bpf/
 > 
-> I explicitly use this to test different combinations of LLC and CLANG,
-> in-order to validate Alexei's claim that older versions of CLANG could
-> still work with a newer version of LLC.  Thus, one use-case you
-> approach cannot cover ;-)
+> Do notice the "/" slash after the directory name.
 > 
-> And clang seems to install a clang-3.9, which my solution also covers
-> by explicitly specifying CLANG=clang-3.9, if several avail clang's are
-> in the PATH.
+> Signed-off-by: Jesper Dangaard Brouer <brouer@redhat.com>
 
-Ah, so a very niche use-case.
-
-Acked-by: Naveen N. Rao <naveen.n.rao@linux.vnet.ibm.com>
-
-- Naveen
+Acked-by: Alexei Starovoitov <ast@kernel.org>
 
