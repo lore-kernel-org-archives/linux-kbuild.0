@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:36396 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:36409 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752845AbcD1MUz (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 28 Apr 2016 08:20:55 -0400
-Subject: [net-next PATCH V4 1/5] samples/bpf: add back functionality to
- redefine LLC command
+	id S1752891AbcD1MVA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 28 Apr 2016 08:21:00 -0400
+Subject: [net-next PATCH V4 2/5] samples/bpf: Makefile verify LLVM compiler
+ avail and bpf target is supported
 From: Jesper Dangaard Brouer <brouer@redhat.com>
-Date: Thu, 28 Apr 2016 14:20:53 +0200
-Message-ID: <20160428122053.16807.93143.stgit@firesoul>
+Date: Thu, 28 Apr 2016 14:20:58 +0200
+Message-ID: <20160428122058.16807.38757.stgit@firesoul>
 In-Reply-To: <20160428121949.16807.84828.stgit@firesoul>
 References: <20160428121949.16807.84828.stgit@firesoul>
 MIME-Version: 1.0
@@ -18,45 +18,43 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: netdev@vger.kernel.org
 Cc: linux-kbuild@vger.kernel.org, bblanco@plumgrid.com, Jesper Dangaard Brouer <brouer@redhat.com>, naveen.n.rao@linux.vnet.ibm.com, borkmann@iogearbox.net, alexei.starovoitov@gmail.com
 
-It is practical to be-able-to redefine the location of the LLVM
-command 'llc', because not all distros have a LLVM version with bpf
-target support.  Thus, it is sometimes required to compile LLVM from
-source, and sometimes it is not desired to overwrite the distros
-default LLVM version.
+Make compiling samples/bpf more user friendly, by detecting if LLVM
+compiler tool 'llc' is available, and also detect if the 'bpf' target
+is available in this version of LLVM.
 
-This feature was removed with 128d1514be35 ("samples/bpf: Use llc in
-PATH, rather than a hardcoded value").
-
-Add this features back. Note that it is possible to redefine the LLC
-on the make command like:
-
- make samples/bpf/ LLC=~/git/llvm/build/bin/llc
-
-Fixes: 128d1514be35 ("samples/bpf: Use llc in PATH, rather than a hardcoded value")
 Signed-off-by: Jesper Dangaard Brouer <brouer@redhat.com>
 Acked-by: Alexei Starovoitov <ast@kernel.org>
 ---
- samples/bpf/Makefile |    6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ samples/bpf/Makefile |   18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
 diff --git a/samples/bpf/Makefile b/samples/bpf/Makefile
-index 744dd7a16144..5bae9536f100 100644
+index 5bae9536f100..45859c99f573 100644
 --- a/samples/bpf/Makefile
 +++ b/samples/bpf/Makefile
-@@ -81,10 +81,14 @@ HOSTLOADLIBES_spintest += -lelf
- HOSTLOADLIBES_map_perf_test += -lelf -lrt
- HOSTLOADLIBES_test_overhead += -lelf -lrt
+@@ -85,6 +85,24 @@ HOSTLOADLIBES_test_overhead += -lelf -lrt
+ #  make samples/bpf/ LLC=~/git/llvm/build/bin/llc
+ LLC ?= llc
  
-+# Allows pointing LLC to a LLVM backend with bpf support, redefine on cmdline:
-+#  make samples/bpf/ LLC=~/git/llvm/build/bin/llc
-+LLC ?= llc
++# Verify LLVM compiler is available and bpf target is supported
++.PHONY: verify_cmd_llc verify_target_bpf
++
++verify_cmd_llc:
++	@if ! (which "${LLC}" > /dev/null 2>&1); then \
++		echo "*** ERROR: Cannot find LLVM tool 'llc' (${LLC})" ;\
++		exit 1; \
++	else true; fi
++
++verify_target_bpf: verify_cmd_llc
++	@if ! (${LLC} -march=bpf -mattr=help > /dev/null 2>&1); then \
++		echo "*** ERROR: LLVM (${LLC}) does not support 'bpf' target" ;\
++		echo "   NOTICE: LLVM version >= 3.7.1 required" ;\
++		exit 2; \
++	else true; fi
++
++$(src)/*.c: verify_target_bpf
 +
  # asm/sysreg.h - inline assembly used by it is incompatible with llvm.
  # But, there is no easy way to fix it, so just exclude it since it is
  # useless for BPF samples.
- $(obj)/%.o: $(src)/%.c
- 	clang $(NOSTDINC_FLAGS) $(LINUXINCLUDE) $(EXTRA_CFLAGS) \
- 		-D__KERNEL__ -D__ASM_SYSREG_H -Wno-unused-value -Wno-pointer-sign \
--		-O2 -emit-llvm -c $< -o -| llc -march=bpf -filetype=obj -o $@
-+		-O2 -emit-llvm -c $< -o -| $(LLC) -march=bpf -filetype=obj -o $@
 
