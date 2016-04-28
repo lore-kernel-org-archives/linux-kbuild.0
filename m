@@ -1,47 +1,119 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from e28smtp09.in.ibm.com ([125.16.236.9]:59322 "EHLO
-	e28smtp09.in.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752195AbcD1NVz (ORCPT
+Received: from e28smtp06.in.ibm.com ([125.16.236.6]:33195 "EHLO
+	e28smtp06.in.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751907AbcD1NiE (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 28 Apr 2016 09:21:55 -0400
+	Thu, 28 Apr 2016 09:38:04 -0400
 Received: from localhost
-	by e28smtp09.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	by e28smtp06.in.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
 	for <linux-kbuild@vger.kernel.org> from <naveen.n.rao@linux.vnet.ibm.com>;
-	Thu, 28 Apr 2016 18:51:52 +0530
-Date: Thu, 28 Apr 2016 18:51:33 +0530
+	Thu, 28 Apr 2016 19:08:01 +0530
+Date: Thu, 28 Apr 2016 19:07:45 +0530
 From: "Naveen N. Rao" <naveen.n.rao@linux.vnet.ibm.com>
-Subject: Re: [net-next PATCH V4 1/5] samples/bpf: add back functionality to
- redefine LLC command
-Message-ID: <20160428132132.GB7880@naverao1-tp.in.ibm.com>
+Subject: Re: [net-next PATCH V4 3/5] samples/bpf: add a README file to get
+ users started
+Message-ID: <20160428133740.GC7880@naverao1-tp.in.ibm.com>
 References: <20160428121949.16807.84828.stgit@firesoul>
- <20160428122053.16807.93143.stgit@firesoul>
+ <20160428122103.16807.41837.stgit@firesoul>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20160428122053.16807.93143.stgit@firesoul>
+In-Reply-To: <20160428122103.16807.41837.stgit@firesoul>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Jesper Dangaard Brouer <brouer@redhat.com>
 Cc: netdev@vger.kernel.org, linux-kbuild@vger.kernel.org, bblanco@plumgrid.com, borkmann@iogearbox.net, alexei.starovoitov@gmail.com
 
-On 2016/04/28 02:20PM, Jesper Dangaard Brouer wrote:
-> It is practical to be-able-to redefine the location of the LLVM
-> command 'llc', because not all distros have a LLVM version with bpf
-> target support.  Thus, it is sometimes required to compile LLVM from
-> source, and sometimes it is not desired to overwrite the distros
-> default LLVM version.
+On 2016/04/28 02:21PM, Jesper Dangaard Brouer wrote:
+> Getting started with using examples in samples/bpf/ is not
+> straightforward.  There are several dependencies, and specific
+> versions of these dependencies.
 > 
-> This feature was removed with 128d1514be35 ("samples/bpf: Use llc in
-> PATH, rather than a hardcoded value").
+> Just compiling the example tool is also slightly obscure, e.g. one
+> need to call make like:
 > 
-> Add this features back. Note that it is possible to redefine the LLC
-> on the make command like:
+>  make samples/bpf/
 > 
->  make samples/bpf/ LLC=~/git/llvm/build/bin/llc
+> Do notice the "/" slash after the directory name.
+> 
+> Signed-off-by: Jesper Dangaard Brouer <brouer@redhat.com>
 
-I don't have an objection to this patch, but you didn't explain why/how 
-this approach is better than just doing:
-  PATH=~/git/llvm/build/bin make samples/bpf/
+Acked-by: Naveen N. Rao <naveen.n.rao@linux.vnet.ibm.com>
 
-- Naveen
+> ---
+>  samples/bpf/README.rst |   64 ++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 64 insertions(+)
+>  create mode 100644 samples/bpf/README.rst
+> 
+> diff --git a/samples/bpf/README.rst b/samples/bpf/README.rst
+> new file mode 100644
+> index 000000000000..993d280184fa
+> --- /dev/null
+> +++ b/samples/bpf/README.rst
+> @@ -0,0 +1,64 @@
+> +eBPF sample programs
+> +====================
+> +
+> +This directory contains a mini eBPF library, test stubs, verifier
+> +test-suite and examples for using eBPF.
+> +
+> +Build dependencies
+> +==================
+> +
+> +Compiling requires having installed:
+> + * clang >= version 3.4.0
+> + * llvm >= version 3.7.1
+> +
+> +Note that LLVM's tool 'llc' must support target 'bpf', list version
+> +and supported targets with command: ``llc --version``
+> +
+> +Kernel headers
+> +--------------
+> +
+> +There are usually dependencies to header files of the current kernel.
+> +To avoid installing devel kernel headers system wide, as a normal
+> +user, simply call::
+> +
+> + make headers_install
+> +
+> +This will creates a local "usr/include" directory in the git/build top
+> +level directory, that the make system automatically pickup first.
+> +
+> +Compiling
+> +=========
+> +
+> +For building the BPF samples, issue the below command from the kernel
+> +top level directory::
+> +
+> + make samples/bpf/
+> +
+> +Do notice the "/" slash after the directory name.
+> +
+> +Manually compiling LLVM with 'bpf' support
+> +------------------------------------------
+> +
+> +Since version 3.7.0, LLVM adds a proper LLVM backend target for the
+> +BPF bytecode architecture.
+> +
+> +By default llvm will build all non-experimental backends including bpf.
+> +To generate a smaller llc binary one can use::
+> +
+> + -DLLVM_TARGETS_TO_BUILD="BPF"
+> +
+> +Quick sniplet for manually compiling LLVM and clang
+> +(build dependencies are cmake and gcc-c++)::
+> +
+> + $ git clone http://llvm.org/git/llvm.git
+> + $ cd llvm/tools
+> + $ git clone --depth 1 http://llvm.org/git/clang.git
+> + $ cd ..; mkdir build; cd build
+> + $ cmake .. -DLLVM_TARGETS_TO_BUILD="BPF;X86"
+> + $ make -j $(getconf _NPROCESSORS_ONLN)
+> +
+> +It is also possible to point make to the newly compiled 'llc' command
+> +via redefining LLC on the make command line::
+> +
+> + make samples/bpf/ LLC=~/git/llvm/build/bin/llc
+> +
+> 
 
