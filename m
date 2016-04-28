@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:51172 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:57888 "EHLO mx1.redhat.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753120AbcD1MVG (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 28 Apr 2016 08:21:06 -0400
-Subject: [net-next PATCH V4 3/5] samples/bpf: add a README file to get users
- started
+	id S1753105AbcD1MVK (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 28 Apr 2016 08:21:10 -0400
+Subject: [net-next PATCH V4 4/5] samples/bpf: allow make to be run from
+ samples/bpf/ directory
 From: Jesper Dangaard Brouer <brouer@redhat.com>
-Date: Thu, 28 Apr 2016 14:21:04 +0200
-Message-ID: <20160428122103.16807.41837.stgit@firesoul>
+Date: Thu, 28 Apr 2016 14:21:09 +0200
+Message-ID: <20160428122109.16807.59535.stgit@firesoul>
 In-Reply-To: <20160428121949.16807.84828.stgit@firesoul>
 References: <20160428121949.16807.84828.stgit@firesoul>
 MIME-Version: 1.0
@@ -18,91 +18,55 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: netdev@vger.kernel.org
 Cc: linux-kbuild@vger.kernel.org, bblanco@plumgrid.com, Jesper Dangaard Brouer <brouer@redhat.com>, naveen.n.rao@linux.vnet.ibm.com, borkmann@iogearbox.net, alexei.starovoitov@gmail.com
 
-Getting started with using examples in samples/bpf/ is not
-straightforward.  There are several dependencies, and specific
-versions of these dependencies.
+It is not intuitive that 'make' must be run from the top level
+directory with argument "samples/bpf/" to compile these eBPF samples.
 
-Just compiling the example tool is also slightly obscure, e.g. one
-need to call make like:
+Introduce a kbuild make file trick that allow make to be run from the
+"samples/bpf/" directory itself.  It basically change to the top level
+directory and call "make samples/bpf/" with the "/" slash after the
+directory name.
 
- make samples/bpf/
-
-Do notice the "/" slash after the directory name.
+Also add a clean target that only cleans this directory, by taking
+advantage of the kbuild external module setting M=$PWD.
 
 Signed-off-by: Jesper Dangaard Brouer <brouer@redhat.com>
+Acked-by: Alexei Starovoitov <ast@kernel.org>
 ---
- samples/bpf/README.rst |   64 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 64 insertions(+)
- create mode 100644 samples/bpf/README.rst
+ samples/bpf/Makefile   |    8 ++++++++
+ samples/bpf/README.rst |    3 +++
+ 2 files changed, 11 insertions(+)
 
+diff --git a/samples/bpf/Makefile b/samples/bpf/Makefile
+index 45859c99f573..dd63521832d8 100644
+--- a/samples/bpf/Makefile
++++ b/samples/bpf/Makefile
+@@ -85,6 +85,14 @@ HOSTLOADLIBES_test_overhead += -lelf -lrt
+ #  make samples/bpf/ LLC=~/git/llvm/build/bin/llc
+ LLC ?= llc
+ 
++# Trick to allow make to be run from this directory
++all:
++	$(MAKE) -C ../../ $$PWD/
++
++clean:
++	$(MAKE) -C ../../ M=$$PWD clean
++	@rm -f *~
++
+ # Verify LLVM compiler is available and bpf target is supported
+ .PHONY: verify_cmd_llc verify_target_bpf
+ 
 diff --git a/samples/bpf/README.rst b/samples/bpf/README.rst
-new file mode 100644
-index 000000000000..993d280184fa
---- /dev/null
+index 993d280184fa..0da069ffa434 100644
+--- a/samples/bpf/README.rst
 +++ b/samples/bpf/README.rst
-@@ -0,0 +1,64 @@
-+eBPF sample programs
-+====================
+@@ -36,6 +36,9 @@ top level directory::
+ 
+ Do notice the "/" slash after the directory name.
+ 
++It is also possible to call make from this directory.  This will just
++hide the the invocation of make as above with the appended "/".
 +
-+This directory contains a mini eBPF library, test stubs, verifier
-+test-suite and examples for using eBPF.
-+
-+Build dependencies
-+==================
-+
-+Compiling requires having installed:
-+ * clang >= version 3.4.0
-+ * llvm >= version 3.7.1
-+
-+Note that LLVM's tool 'llc' must support target 'bpf', list version
-+and supported targets with command: ``llc --version``
-+
-+Kernel headers
-+--------------
-+
-+There are usually dependencies to header files of the current kernel.
-+To avoid installing devel kernel headers system wide, as a normal
-+user, simply call::
-+
-+ make headers_install
-+
-+This will creates a local "usr/include" directory in the git/build top
-+level directory, that the make system automatically pickup first.
-+
-+Compiling
-+=========
-+
-+For building the BPF samples, issue the below command from the kernel
-+top level directory::
-+
-+ make samples/bpf/
-+
-+Do notice the "/" slash after the directory name.
-+
-+Manually compiling LLVM with 'bpf' support
-+------------------------------------------
-+
-+Since version 3.7.0, LLVM adds a proper LLVM backend target for the
-+BPF bytecode architecture.
-+
-+By default llvm will build all non-experimental backends including bpf.
-+To generate a smaller llc binary one can use::
-+
-+ -DLLVM_TARGETS_TO_BUILD="BPF"
-+
-+Quick sniplet for manually compiling LLVM and clang
-+(build dependencies are cmake and gcc-c++)::
-+
-+ $ git clone http://llvm.org/git/llvm.git
-+ $ cd llvm/tools
-+ $ git clone --depth 1 http://llvm.org/git/clang.git
-+ $ cd ..; mkdir build; cd build
-+ $ cmake .. -DLLVM_TARGETS_TO_BUILD="BPF;X86"
-+ $ make -j $(getconf _NPROCESSORS_ONLN)
-+
-+It is also possible to point make to the newly compiled 'llc' command
-+via redefining LLC on the make command line::
-+
-+ make samples/bpf/ LLC=~/git/llvm/build/bin/llc
-+
+ Manually compiling LLVM with 'bpf' support
+ ------------------------------------------
+ 
 
