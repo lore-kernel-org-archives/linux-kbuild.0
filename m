@@ -1,60 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from services.gouders.net ([141.101.32.176]:35468 "EHLO
-	services.gouders.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752595AbcD2Kn4 (ORCPT
+Received: from shards.monkeyblade.net ([149.20.54.216]:54682 "EHLO
+	shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750714AbcD2S06 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 29 Apr 2016 06:43:56 -0400
-From: Dirk Gouders <dirk@gouders.net>
-Subject: [PATCH 2/2] kconfig-language: elaborate on the type of a choice
-In-Reply-To: <gh60v04s4s.fsf@lena.gouders.net> (Dirk Gouders's message of
-	"Fri, 29 Apr 2016 12:25:34 +0200")
-References: <gh60v04s4s.fsf@lena.gouders.net>
-Date: Fri, 29 Apr 2016 12:43:38 +0200
-Message-ID: <ghwpng3db9.fsf@lena.gouders.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+	Fri, 29 Apr 2016 14:26:58 -0400
+Date: Fri, 29 Apr 2016 14:26:55 -0400 (EDT)
+Message-Id: <20160429.142655.123465258723452162.davem@davemloft.net>
+Subject: Re: [net-next PATCH V4 0/5] samples/bpf: Improve user experience
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <20160428121949.16807.84828.stgit@firesoul>
+References: <20160428121949.16807.84828.stgit@firesoul>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>
-Cc: Jonathan Corbet <corbet@lwn.net>, linux-kbuild@vger.kernel.org
+To: brouer@redhat.com
+Cc: netdev@vger.kernel.org, linux-kbuild@vger.kernel.org, bblanco@plumgrid.com, naveen.n.rao@linux.vnet.ibm.com, borkmann@iogearbox.net, alexei.starovoitov@gmail.com
 
+From: Jesper Dangaard Brouer <brouer@redhat.com>
+Date: Thu, 28 Apr 2016 14:20:48 +0200
 
-The type of a choice can be specified explicitely or it will be
-set according to members of the choice group, see menu.c:menu_finalize().
+> It is a steep learning curve getting started with using the eBPF
+> examples in samples/bpf/.  There are several dependencies, and
+> specific versions of these dependencies.  Invoking make in the correct
+> manor is also slightly obscure.
+> 
+> This patchset cleanup, document and hopefully improves the first time
+> user experience with the eBPF samples directory by auto-detecting
+> certain scenarios.
+> 
+> V4:
+>  - Address Naveen's nitpicks
+>  - Handle/fail if extra args are passed in LLC or CLANG (David Laight)
+> 
+> V3:
+>  - Add Alexei's ACKs
+>  - Remove README paragraph about LLVM experimental BPF target
+>    as it only existed between LLVM version 3.6 to 3.7.
+> 
+> V2:
+>  - Adjusted recommend minimum versions to 3.7.1
+>  - Included clang build instructions
+>  - New patch adding CLANG variable and validation of command
 
-Signed-off-by: Dirk Gouders <dirk@gouders.net>
----
- Documentation/kbuild/kconfig-language.txt | 17 +++++++++++------
- 1 file changed, 11 insertions(+), 6 deletions(-)
-
-diff --git a/Documentation/kbuild/kconfig-language.txt b/Documentation/kbuild/kconfig-language.txt
-index 14dd131..db10185 100644
---- a/Documentation/kbuild/kconfig-language.txt
-+++ b/Documentation/kbuild/kconfig-language.txt
-@@ -284,12 +284,17 @@ choices:
- 	"endchoice"
- 
- This defines a choice group and accepts any of the above attributes as
--options. A choice can only be of type bool or tristate, while a boolean
--choice only allows a single config entry to be selected, a tristate
--choice also allows any number of config entries to be set to 'm'. This
--can be used if multiple drivers for a single hardware exists and only a
--single driver can be compiled/loaded into the kernel, but all drivers
--can be compiled as modules.
-+options. A choice can only be of type bool or tristate.  If no type is
-+specified for a choice, it's type will be determined by the type of
-+the first choice element in the group or remain unknown if none of the
-+choice elements have a type specified, as well.
-+
-+While a boolean choice only allows a single config entry to be
-+selected, a tristate choice also allows any number of config entries
-+to be set to 'm'. This can be used if multiple drivers for a single
-+hardware exists and only a single driver can be compiled/loaded into
-+the kernel, but all drivers can be compiled as modules.
-+
- A choice accepts another option "optional", which allows to set the
- choice to 'n' and no entry needs to be selected.
- If no [symbol] is associated with a choice, then you can not have multiple
--- 
-2.8.1
-
+Series applied, thanks Jesper.
