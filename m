@@ -1,120 +1,275 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from services.gouders.net ([141.101.32.176]:43562 "EHLO
-	services.gouders.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752223AbcD3IPr (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:43121 "EHLO
+	conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750724AbcEBFDK (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 30 Apr 2016 04:15:47 -0400
-From: Dirk Gouders <dirk@gouders.net>
-Subject: [RFC PATCH] mconf: expand show_all_options to choices' checklist menus
-Date: Sat, 30 Apr 2016 10:15:36 +0200
-Message-ID: <ghd1p78qc7.fsf@quad.gouders.net>
+	Mon, 2 May 2016 01:03:10 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20160422202138.d50937e812b30aaba4f38a92@gmail.com>
+References: <20160422201957.97ce16f0e67377d0ce613d19@gmail.com>
+	<20160422202138.d50937e812b30aaba4f38a92@gmail.com>
+Date: Mon, 2 May 2016 14:03:00 +0900
+Message-ID: <CAK7LNAR-+4+Xdhbs6hoPUTYppLqFwY8dxqdSuw_5j6Pge4uYVg@mail.gmail.com>
+Subject: Re: [PATCH v7 1/6] Shared library support
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Emese Revfy <re.emese@gmail.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, PaX Team <pageexec@freemail.hu>, Brad Spengler <spender@grsecurity.net>, kernel-hardening@lists.openwall.com, Michal Marek <mmarek@suse.com>, Kees Cook <keescook@chromium.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Fengguang Wu <fengguang.wu@intel.com>, Dmitry Vyukov <dvyukov@google.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, David Brown <david.brown@linaro.org>
 
-Boolean choices' checklist menus are currently immune against the 'z'
-key that toggles visibility of all options.
+Hi Emese,
 
-Expansion of the 'z' toggle could be of use when debugging problems
-with comlex choice menus.
 
-A new tag 'z' for dialog_items was introduced for this purpose.
+2016-04-23 3:21 GMT+09:00 Emese Revfy <re.emese@gmail.com>:
+> Infrastructure for building independent shared library targets.
+> This effectively also reverts commit 62e2210798ed38928ab24841e8b4878a
+> (Masahiro Yamada, kbuild: drop shared library support from Makefile.host).
+>
+> Signed-off-by: Emese Revfy <re.emese@gmail.com>
+> ---
+>  Documentation/kbuild/makefiles.txt | 39 ++++++++++++++++-----
+>  scripts/Makefile.build             |  2 +-
+>  scripts/Makefile.clean             |  3 +-
+>  scripts/Makefile.host              | 70 +++++++++++++++++++++++++++++++++++++-
+>  4 files changed, 103 insertions(+), 11 deletions(-)
+>
+> diff --git a/Documentation/kbuild/makefiles.txt b/Documentation/kbuild/makefiles.txt
+> index 13f888a..250729b 100644
+> --- a/Documentation/kbuild/makefiles.txt
+> +++ b/Documentation/kbuild/makefiles.txt
+> @@ -23,10 +23,11 @@ This document describes the Linux kernel Makefiles.
+>         === 4 Host Program support
+>            --- 4.1 Simple Host Program
+>            --- 4.2 Composite Host Programs
+> -          --- 4.3 Using C++ for host programs
+> -          --- 4.4 Controlling compiler options for host programs
+> -          --- 4.5 When host programs are actually built
+> -          --- 4.6 Using hostprogs-$(CONFIG_FOO)
+> +          --- 4.3 Defining shared libraries
+> +          --- 4.4 Using C++ for host programs
+> +          --- 4.5 Controlling compiler options for host programs
+> +          --- 4.6 When host programs are actually built
+> +          --- 4.7 Using hostprogs-$(CONFIG_FOO)
+>
+>         === 5 Kbuild clean infrastructure
+>
+> @@ -643,7 +644,29 @@ Both possibilities are described in the following.
+>         Finally, the two .o files are linked to the executable, lxdialog.
+>         Note: The syntax <executable>-y is not permitted for host-programs.
+>
+> ---- 4.3 Using C++ for host programs
+> +--- 4.3 Defining shared libraries
+> +
+> +       Objects with extension .so are considered shared libraries, and
+> +       will be compiled as position independent objects.
+> +       Kbuild provides support for shared libraries, but the usage
+> +       shall be restricted.
+> +       In the following example the libkconfig.so shared library is used
+> +       to link the executable conf.
+> +
+> +       Example:
+> +               #scripts/kconfig/Makefile
+> +               hostprogs-y     := conf
+> +               conf-objs       := conf.o libkconfig.so
+> +               libkconfig-objs := expr.o type.o
 
-Signed-off-by: Dirk Gouders <dirk@gouders.net>
----
- scripts/kconfig/lxdialog/checklist.c | 31 ++++++++++++++++++++++++++-----
- scripts/kconfig/mconf.c              | 11 ++++++++---
- 2 files changed, 34 insertions(+), 8 deletions(-)
 
-diff --git a/scripts/kconfig/lxdialog/checklist.c b/scripts/kconfig/lxdialog/checklist.c
-index 8d016fa..2e3bc33 100644
---- a/scripts/kconfig/lxdialog/checklist.c
-+++ b/scripts/kconfig/lxdialog/checklist.c
-@@ -46,7 +46,14 @@ static void print_item(WINDOW * win, int choice, int selected)
- 	wattrset(win, selected ? dlg.check_selected.atr
- 		 : dlg.check.atr);
- 	if (!item_is_tag(':'))
--		wprintw(win, "(%c)", item_is_tag('X') ? 'X' : ' ');
-+		if (item_is_tag('z'))
-+			/*
-+			 * inactive items visible because of
-+			 * show_all_options.
-+			 */
-+			wprintw(win, "- -");
-+		else
-+			wprintw(win, "(%c)", item_is_tag('X') ? 'X' : ' ');
- 
- 	wattrset(win, selected ? dlg.tag_selected.atr : dlg.tag.atr);
- 	mvwaddch(win, choice, item_x, list_item[0]);
-@@ -296,10 +303,18 @@ do_resize:
- 			item_foreach()
- 				item_set_selected(0);
- 			item_set(scroll + choice);
--			item_set_selected(1);
--			delwin(list);
--			delwin(dialog);
--			return button;
-+			if (!item_is_tag('z') || button == 1) {
-+				/*
-+				  Return if selected item isn't an
-+				  item only visible because of
-+				  show_all options or if help was selected.
-+				 */
-+				item_set_selected(1);
-+				delwin(list);
-+				delwin(dialog);
-+				return button;
-+			}
-+			continue;
- 		case TAB:
- 		case KEY_LEFT:
- 		case KEY_RIGHT:
-@@ -316,6 +331,12 @@ do_resize:
- 		case KEY_ESC:
- 			key = on_key_esc(dialog);
- 			break;
-+		case 'z':
-+		case 'Z':
-+			button = 2; /* toggle show_all_options */
-+			delwin(list);
-+			delwin(dialog);
-+			return button;
- 		case KEY_RESIZE:
- 			delwin(list);
- 			delwin(dialog);
-diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
-index 315ce2c..e87a117 100644
---- a/scripts/kconfig/mconf.c
-+++ b/scripts/kconfig/mconf.c
-@@ -811,11 +811,13 @@ static void conf_choice(struct menu *menu)
- 
- 		current_menu = menu;
- 		for (child = menu->list; child; child = child->next) {
--			if (!menu_is_visible(child))
-+			if (!menu_is_visible(child) && !show_all_options)
- 				continue;
--			if (child->sym)
-+			if (child->sym) {
- 				item_make("%s", _(menu_get_prompt(child)));
--			else {
-+				if (!menu_is_visible(child))
-+					item_set_tag('z');
-+			} else {
- 				item_make("*** %s ***", _(menu_get_prompt(child)));
- 				item_set_tag(':');
- 			}
-@@ -850,6 +852,9 @@ static void conf_choice(struct menu *menu)
- 			} else
- 				show_help(menu);
- 			break;
-+		case 2:
-+			show_all_options = !show_all_options;
-+			break;
- 		case KEY_ESC:
- 			return;
- 		case -ERRDISPLAYTOOSMALL:
+Do you use this case?
+
+
+> +       Shared libraries always require a corresponding -objs line, and
+> +       in the example above the shared library libkconfig is composed by
+> +       the two objects expr.o and type.o.
+> +       expr.o and type.o will be built as position independent code and
+> +       linked as a shared library libkconfig.so. C++ is not supported for
+> +       shared libraries.
+
+You are supporting C++ shared libraries.
+
+Please do not revert as is, but change the comments to make sense.
+
+
+In the first place,
+I am wondering if we need to revive this documentation.
+What this commit is only interested in *.so generation,
+not host program support.
+
+
+
+
+
+> --- a/scripts/Makefile.build
+> +++ b/scripts/Makefile.build
+> @@ -60,7 +60,7 @@ endif
+>  endif
+>
+>  # Do not include host rules unless needed
+> -ifneq ($(hostprogs-y)$(hostprogs-m),)
+> +ifneq ($(hostprogs-y)$(hostprogs-m)$(hostlibs-y)$(hostlibs-m)$(hostcxxlibs-y)$(hostcxxlibs-m),)
+>  include scripts/Makefile.host
+>  endif
+>
+> diff --git a/scripts/Makefile.clean b/scripts/Makefile.clean
+> index 55c96cb..e4e88ab 100644
+> --- a/scripts/Makefile.clean
+> +++ b/scripts/Makefile.clean
+> @@ -38,7 +38,8 @@ subdir-ymn    := $(addprefix $(obj)/,$(subdir-ymn))
+>  __clean-files  := $(extra-y) $(extra-m) $(extra-)       \
+>                    $(always) $(targets) $(clean-files)   \
+>                    $(host-progs)                         \
+> -                  $(hostprogs-y) $(hostprogs-m) $(hostprogs-)
+> +                  $(hostprogs-y) $(hostprogs-m) $(hostprogs-) \
+> +                  $(hostlibs-y) $(hostlibs-m) $(hostlibs-)
+
+$(hostcxxlibs-y)$(hostcxxlibs-m) is missing here.
+
+
+BTW, are you planning to support hostlibs without .so extention in the future?
+
+
+You are changing the top Makefile to clean with "*.so" pattern rule.
+
+Do you need to change both the top Makefile and Makefile.clean
+for belt-and-braces cleaning?
+
+
+
+
+>  __clean-files   := $(filter-out $(no-clean-files), $(__clean-files))
+>
+> diff --git a/scripts/Makefile.host b/scripts/Makefile.host
+> index 133edfa..3439bd8 100644
+> --- a/scripts/Makefile.host
+> +++ b/scripts/Makefile.host
+> @@ -20,7 +20,25 @@
+>  # Will compile qconf as a C++ program, and menu as a C program.
+>  # They are linked as C++ code to the executable qconf
+>
+> +# hostprogs-y := conf
+> +# conf-objs  := conf.o libkconfig.so
+> +# libkconfig-objs := expr.o type.o
+> +# Will create a shared library named libkconfig.so that consists of
+> +# expr.o and type.o (they are both compiled as C code and the object files
+> +# are made as position independent code).
+> +# conf.c is compiled as a C program, and conf.o is linked together with
+> +# libkconfig.so as the executable conf.
+> +# Note: Shared libraries consisting of C++ files are not supported
+
+Again, do you need to support "hostprogs-y" based on .so library?
+
+
+
+> +# hostcc-option
+> +# Usage: cflags-y += $(call hostcc-option,-march=winchip-c6,-march=i586)
+> +
+> +hostcc-option = $(call try-run,\
+> +       $(HOSTCC) $(HOSTCFLAGS) $(HOST_EXTRACFLAGS) $(1) -c -x c /dev/null -o "$$TMP",$(1),$(2))
+> +
+>  __hostprogs := $(sort $(hostprogs-y) $(hostprogs-m))
+> +__hostlibs := $(sort $(hostlibs-y) $(hostlibs-m))
+> +__hostcxxlibs := $(sort $(hostcxxlibs-y) $(hostcxxlibs-m))
+>
+>  # C code
+>  # Executables compiled from a single .c file
+> @@ -42,6 +60,18 @@ host-cxxmulti        := $(foreach m,$(__hostprogs),$(if $($(m)-cxxobjs),$(m)))
+>  # C++ Object (.o) files compiled from .cc files
+>  host-cxxobjs   := $(sort $(foreach m,$(host-cxxmulti),$($(m)-cxxobjs)))
+>
+> +# Shared libaries (only .c supported)
+> +# Shared libraries (.so) - all .so files referenced in "xxx-objs"
+> +host-cshlib    := $(sort $(filter %.so, $(__hostlibs)))
+> +host-cxxshlib  := $(sort $(filter %.so, $(__hostcxxlibs)))
+
+
+Do you use $(filter %.so, ...) on purpose?
+i.e.  are you planning to support both hostlibs with/without .so?
+
+
+
+> +# Remove .so files from "xxx-objs"
+> +host-cobjs     := $(filter-out %.so,$(host-cobjs))
+> +host-cxxobjs   := $(filter-out %.so,$(host-cxxobjs))
+
+Why do you need to do this?
+
+
+> +# Object (.o) files used by the shared libaries
+> +host-cshobjs   := $(sort $(foreach m,$(host-cshlib),$($(m:.so=-objs))))
+> +host-cxxshobjs := $(sort $(foreach m,$(host-cxxshlib),$($(m:.so=-objs))))
+> +
+>  # output directory for programs/.o files
+>  # hostprogs-y := tools/build may have been specified.
+>  # Retrieve also directory of .o files from prog-objs or prog-cxxobjs notation
+> @@ -56,6 +86,10 @@ host-cmulti  := $(addprefix $(obj)/,$(host-cmulti))
+>  host-cobjs     := $(addprefix $(obj)/,$(host-cobjs))
+>  host-cxxmulti  := $(addprefix $(obj)/,$(host-cxxmulti))
+>  host-cxxobjs   := $(addprefix $(obj)/,$(host-cxxobjs))
+> +host-cshlib    := $(addprefix $(obj)/,$(host-cshlib))
+> +host-cxxshlib  := $(addprefix $(obj)/,$(host-cxxshlib))
+> +host-cshobjs   := $(addprefix $(obj)/,$(host-cshobjs))
+> +host-cxxshobjs := $(addprefix $(obj)/,$(host-cxxshobjs))
+>  host-objdirs    := $(addprefix $(obj)/,$(host-objdirs))
+>
+>  obj-dirs += $(host-objdirs)
+> @@ -124,5 +158,39 @@ quiet_cmd_host-cxxobjs     = HOSTCXX $@
+>  $(host-cxxobjs): $(obj)/%.o: $(src)/%.cc FORCE
+>         $(call if_changed_dep,host-cxxobjs)
+>
+> +# Compile .c file, create position independent .o file
+> +# host-cshobjs -> .o
+> +quiet_cmd_host-cshobjs = HOSTCC  -fPIC $@
+> +      cmd_host-cshobjs = $(HOSTCC) $(hostc_flags) -fPIC -c -o $@ $<
+> +$(host-cshobjs): $(obj)/%.o: $(src)/%.c FORCE
+> +       $(call if_changed_dep,host-cshobjs)
+> +
+> +# Compile .c file, create position independent .o file
+
+
+Please explain why c++ compiler should be used to compile .c files.
+
+This is not clear, so worth commenting.
+
+
+
+> +# host-cxxshobjs -> .o
+> +quiet_cmd_host-cxxshobjs       = HOSTCXX -fPIC $@
+> +      cmd_host-cxxshobjs       = $(HOSTCXX) $(hostcxx_flags) -fPIC -c -o $@ $<
+> +$(host-cxxshobjs): $(obj)/%.o: $(src)/%.c FORCE
+> +       $(call if_changed_dep,host-cxxshobjs)
+> +
+> +# Link a shared library, based on position independent .o files
+> +# *.o -> .so shared library (host-cshlib)
+> +quiet_cmd_host-cshlib  = HOSTLLD -shared $@
+> +      cmd_host-cshlib  = $(HOSTCC) $(HOSTLDFLAGS) -shared -o $@ \
+> +                         $(addprefix $(obj)/,$($(@F:.so=-objs))) \
+> +                         $(HOST_LOADLIBES) $(HOSTLOADLIBES_$(@F))
+> +$(host-cshlib): FORCE
+> +       $(call if_changed,host-cshlib)
+> +$(call multi_depend, $(host-cshlib), .so, -objs -cshobjs)
+
+should be
+
+$(call multi_depend, $(host-cshlib), .so, -objs)
+
+
+> +# Link a shared library, based on position independent .o files
+> +# *.o -> .so shared library (host-cxxshlib)
+> +quiet_cmd_host-cxxshlib        = HOSTLLD -shared $@
+> +      cmd_host-cxxshlib        = $(HOSTCXX) $(HOSTLDFLAGS) -shared -o $@ \
+> +                         $(addprefix $(obj)/,$($(@F:.so=-objs))) \
+> +                         $(HOST_LOADLIBES) $(HOSTLOADLIBES_$(@F))
+> +$(host-cxxshlib): FORCE
+> +       $(call if_changed,host-cxxshlib)
+> +$(call multi_depend, $(host-cxxshlib), .so, -objs -cxxshobjs)
+
+should be
+
+$(call multi_depend, $(host-cxxshlib), .so, -objs)
+
+
+
+
 -- 
-2.8.1
-
+Best Regards
+Masahiro Yamada
