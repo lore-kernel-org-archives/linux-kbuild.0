@@ -1,16 +1,16 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:47299 "EHLO
-	conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751275AbcEBFKI (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:43202 "EHLO
+	conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751275AbcEBFK0 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 2 May 2016 01:10:08 -0400
+	Mon, 2 May 2016 01:10:26 -0400
 MIME-Version: 1.0
-In-Reply-To: <20160422202454.b346331b5c1640ca31167a82@gmail.com>
+In-Reply-To: <20160422202603.5daf3b4c09a20a6c515ac70e@gmail.com>
 References: <20160422201957.97ce16f0e67377d0ce613d19@gmail.com>
-	<20160422202454.b346331b5c1640ca31167a82@gmail.com>
-Date: Mon, 2 May 2016 14:09:55 +0900
-Message-ID: <CAK7LNASxXirCzAQvj3Lz_0NC2k_yrLmYC+obzd=d9ZED6Xq6Sg@mail.gmail.com>
-Subject: Re: [PATCH v7 4/6] Add Cyclomatic complexity GCC plugin
+	<20160422202603.5daf3b4c09a20a6c515ac70e@gmail.com>
+Date: Mon, 2 May 2016 14:10:21 +0900
+Message-ID: <CAK7LNAS_tNoWB8xAg0a_xgrOyoV5KM8T6ya2B48BaZZmYtLc3Q@mail.gmail.com>
+Subject: Re: [PATCH v7 5/6] Documentation for the GCC plugin infrastructure
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -20,52 +20,14 @@ Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, PaX Team <pageexec
 
 Hi Emese,
 
-
-2016-04-23 3:24 GMT+09:00 Emese Revfy <re.emese@gmail.com>:
-
-> diff --git a/scripts/Makefile.gcc-plugins b/scripts/Makefile.gcc-plugins
-> index e6d66e2..282d63a 100644
-> --- a/scripts/Makefile.gcc-plugins
-> +++ b/scripts/Makefile.gcc-plugins
-> @@ -2,6 +2,8 @@ ifdef CONFIG_GCC_PLUGINS
->    __PLUGINCC := $(call cc-ifversion, -ge, 0408, $(HOSTCXX), $(HOSTCC))
->    PLUGINCC := $(shell $(CONFIG_SHELL) $(srctree)/scripts/gcc-plugin.sh "$(__PLUGINCC)" "$(HOSTCXX)" "$(CC)")
+2016-04-23 3:26 GMT+09:00 Emese Revfy <re.emese@gmail.com>:
+> This is the GCC infrastructure documentation about its operation, how to add
+> and use a new plugin with an example.
 >
-> +  gcc-plugin-$(CONFIG_GCC_PLUGIN_CYC_COMPLEXITY)       += cyc_complexity_plugin.so
-> +
->    GCC_PLUGINS_CFLAGS := $(addprefix -fplugin=$(objtree)/scripts/gcc-plugins/, $(gcc-plugin-y))
->
->    ifeq ($(PLUGINCC),)
-> diff --git a/scripts/gcc-plugins/Makefile b/scripts/gcc-plugins/Makefile
-> index b2d64af..31c72bf 100644
-> --- a/scripts/gcc-plugins/Makefile
-> +++ b/scripts/gcc-plugins/Makefile
-> @@ -12,4 +12,8 @@ endif
->
->  export GCCPLUGINS_DIR HOSTLIBS
->
-> +$(HOSTLIBS)-$(CONFIG_GCC_PLUGIN_CYC_COMPLEXITY) := cyc_complexity_plugin.so
+> Signed-off-by: Emese Revfy <re.emese@gmail.com>
 
 
-I noticed we need to add the same string into "gcc-plugin-y" and "$(HOSTLIBS)-y"
-
-
-Maybe can we do like this?
-
-$(HOSTLIBS)-y := $(gcc-plugin-y)
-
-
-
->  always := $($(HOSTLIBS)-y)
-> +
-> +cyc_complexity_plugin-objs := cyc_complexity_plugin.o
-
-
-
-
-
-
-
+Perhaps, this documentation should be included in 2/6 ?
 
 
 
