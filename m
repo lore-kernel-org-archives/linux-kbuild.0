@@ -1,36 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:43202 "EHLO
-	conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751275AbcEBFK0 (ORCPT
+Received: from mout.kundenserver.de ([212.227.126.187]:64794 "EHLO
+	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751890AbcEBHY1 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 2 May 2016 01:10:26 -0400
+	Mon, 2 May 2016 03:24:27 -0400
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: Re: mainline build: 896 warnings 1 failures (mainline/v4.6-rc5-224-gda9373d)
+Date: Mon, 02 May 2016 09:24:19 +0200
+Message-ID: <1535117.FXDhxv6m8v@wuerfel>
+In-Reply-To: <CAOesGMiwACS7Gq41c1p58h_Uj1RBz-_g-BQFZwgRTaKs6QwmvQ@mail.gmail.com>
+References: <57267469.8ade420a.aec17.ffffc1ee@mx.google.com> <CAOesGMiwACS7Gq41c1p58h_Uj1RBz-_g-BQFZwgRTaKs6QwmvQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20160422202603.5daf3b4c09a20a6c515ac70e@gmail.com>
-References: <20160422201957.97ce16f0e67377d0ce613d19@gmail.com>
-	<20160422202603.5daf3b4c09a20a6c515ac70e@gmail.com>
-Date: Mon, 2 May 2016 14:10:21 +0900
-Message-ID: <CAK7LNAS_tNoWB8xAg0a_xgrOyoV5KM8T6ya2B48BaZZmYtLc3Q@mail.gmail.com>
-Subject: Re: [PATCH v7 5/6] Documentation for the GCC plugin infrastructure
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Emese Revfy <re.emese@gmail.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, PaX Team <pageexec@freemail.hu>, Brad Spengler <spender@grsecurity.net>, kernel-hardening@lists.openwall.com, Michal Marek <mmarek@suse.com>, Kees Cook <keescook@chromium.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Fengguang Wu <fengguang.wu@intel.com>, Dmitry Vyukov <dvyukov@google.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, David Brown <david.brown@linaro.org>
+To: kernel-build-reports@lists.linaro.org
+Cc: Olof Johansson <olof@lixom.net>, Olof's autobuilder <build@lixom.net>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hi Emese,
+On Sunday 01 May 2016 16:19:53 Olof Johansson wrote:
+> On Sun, May 1, 2016 at 2:26 PM, Olof's autobuilder <build@lixom.net> wrote:
+> > Here are the build results from automated periodic testing.
+> >
+> > The tree being built was mainline, found at:
+> >
+> > http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git (master branch)
+> >
+> > Topmost commit:
+> >
+> > da9373d Merge branch 'fixes' of git://git.kernel.org/pub/scm/linux/kernel/git/evalenti/linux-soc-thermal
+> >
+> > Build logs (stderr only) can be found at the following link (experimental):
+> >
+> > http://arm-soc.lixom.net/buildlogs/mainline/v4.6-rc5-224-gda9373d/
+> >
+> >
+> >         Runtime:                5m 0s
+> >
+> >         Passed:                 117
+> >         Failed:                 1
+> >
+> >         Warnings:               896
+> >
+> >         Section mismatches:     0
+> 
+> So, yeah, I updated to GCC 6.1.0 and it looks noisy. If it doesn't get
+> whittled down pretty quickly I might switch to an older compiler
+> again.
 
-2016-04-23 3:26 GMT+09:00 Emese Revfy <re.emese@gmail.com>:
-> This is the GCC infrastructure documentation about its operation, how to add
-> and use a new plugin with an example.
->
-> Signed-off-by: Emese Revfy <re.emese@gmail.com>
+Oops, it looks like I never submitted a patch to shut up
+-Wunused-const-variable, though I've been building that way
+myself here and fixing all /other/ warnings.
+
+I think we want to have -Wunused-const-variable at the W=1 level, but
+not by default.
+
+	Arnd
 
 
-Perhaps, this documentation should be included in 2/6 ?
 
-
-
--- 
-Best Regards
-Masahiro Yamada
