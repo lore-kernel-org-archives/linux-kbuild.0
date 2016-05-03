@@ -1,71 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.17.13]:60672 "EHLO
-	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756239AbcECUQo (ORCPT
+Received: from mail-wm0-f53.google.com ([74.125.82.53]:35292 "EHLO
+	mail-wm0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756136AbcECVSP (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 3 May 2016 16:16:44 -0400
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: mainline build: 896 warnings 1 failures (mainline/v4.6-rc5-224-gda9373d)
-Date: Tue, 03 May 2016 22:16:31 +0200
-Message-ID: <1967190.iUkQd8aPov@wuerfel>
-In-Reply-To: <CAOesGMgb=Z1hjKaEG96dOpvKuEFOJQ=TQB_Dag0C-AXNBNTTgg@mail.gmail.com>
-References: <57267469.8ade420a.aec17.ffffc1ee@mx.google.com> <1535117.FXDhxv6m8v@wuerfel> <CAOesGMgb=Z1hjKaEG96dOpvKuEFOJQ=TQB_Dag0C-AXNBNTTgg@mail.gmail.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+	Tue, 3 May 2016 17:18:15 -0400
+Date: Tue, 3 May 2016 23:25:27 +0200
+From: Emese Revfy <re.emese@gmail.com>
+Subject: Re: [PATCH v7 1/6] Shared library support
+Message-Id: <20160503232527.6e02867a5d4b8f28f6c0f854@gmail.com>
+In-Reply-To: <CAK7LNAR-+4+Xdhbs6hoPUTYppLqFwY8dxqdSuw_5j6Pge4uYVg@mail.gmail.com>
+References: <20160422201957.97ce16f0e67377d0ce613d19@gmail.com>
+	<20160422202138.d50937e812b30aaba4f38a92@gmail.com>
+	<CAK7LNAR-+4+Xdhbs6hoPUTYppLqFwY8dxqdSuw_5j6Pge4uYVg@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Olof Johansson <olof@lixom.net>
-Cc: Kernel Build Reports Mailman List <kernel-build-reports@lists.linaro.org>, Olof's autobuilder <build@lixom.net>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, PaX Team <pageexec@freemail.hu>, Brad Spengler <spender@grsecurity.net>, kernel-hardening@lists.openwall.com, Michal Marek <mmarek@suse.com>, Kees Cook <keescook@chromium.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Fengguang Wu <fengguang.wu@intel.com>, Dmitry Vyukov <dvyukov@google.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, David Brown <david.brown@linaro.org>
 
-On Monday 02 May 2016 19:12:31 Olof Johansson wrote:
-> On Mon, May 2, 2016 at 12:24 AM, Arnd Bergmann <arnd@arndb.de> wrote:
-> > On Sunday 01 May 2016 16:19:53 Olof Johansson wrote:
-> >> On Sun, May 1, 2016 at 2:26 PM, Olof's autobuilder <build@lixom.net> wrote:
-> >> > Here are the build results from automated periodic testing.
-> >> >
-> >> > The tree being built was mainline, found at:
-> >> >
-> >> > http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git (master branch)
-> >> >
-> >> > Topmost commit:
-> >> >
-> >> > da9373d Merge branch 'fixes' of git://git.kernel.org/pub/scm/linux/kernel/git/evalenti/linux-soc-thermal
-> >> >
-> >> > Build logs (stderr only) can be found at the following link (experimental):
-> >> >
-> >> > http://arm-soc.lixom.net/buildlogs/mainline/v4.6-rc5-224-gda9373d/
-> >> >
-> >> >
-> >> >         Runtime:                5m 0s
-> >> >
-> >> >         Passed:                 117
-> >> >         Failed:                 1
-> >> >
-> >> >         Warnings:               896
-> >> >
-> >> >         Section mismatches:     0
-> >>
-> >> So, yeah, I updated to GCC 6.1.0 and it looks noisy. If it doesn't get
-> >> whittled down pretty quickly I might switch to an older compiler
-> >> again.
-> >
-> > Oops, it looks like I never submitted a patch to shut up
-> > -Wunused-const-variable, though I've been building that way
-> > myself here and fixing all /other/ warnings.
-> >
-> > I think we want to have -Wunused-const-variable at the W=1 level, but
-> > not by default.
+On Mon, 2 May 2016 14:03:00 +0900
+Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
+
+Hi,
+
+> > diff --git a/scripts/Makefile.clean b/scripts/Makefile.clean
+> > index 55c96cb..e4e88ab 100644
+> > --- a/scripts/Makefile.clean
+> > +++ b/scripts/Makefile.clean
+> > @@ -38,7 +38,8 @@ subdir-ymn    := $(addprefix $(obj)/,$(subdir-ymn))
+> >  __clean-files  := $(extra-y) $(extra-m) $(extra-)       \
+> >                    $(always) $(targets) $(clean-files)   \
+> >                    $(host-progs)                         \
+> > -                  $(hostprogs-y) $(hostprogs-m) $(hostprogs-)
+> > +                  $(hostprogs-y) $(hostprogs-m) $(hostprogs-) \
+> > +                  $(hostlibs-y) $(hostlibs-m) $(hostlibs-)
 > 
-> Agreed, at least as long as it is as noisy as it is today.
+> $(hostcxxlibs-y)$(hostcxxlibs-m) is missing here.
 > 
-> Care to send it in so we can see it in 4.6?
+> 
+> BTW, are you planning to support hostlibs without .so extention in the future?
+> 
+> 
+> You are changing the top Makefile to clean with "*.so" pattern rule.
+> 
+> Do you need to change both the top Makefile and Makefile.clean
+> for belt-and-braces cleaning?
 
-Sure, I'll try.
+It doesn't delete the *.so files without the hunk from the top Makefile. 
+The mrproper and distclean targets remove them with this patch:
+https://github.com/ephox-gcc-plugins/gcc-plugins_linux-next/commit/f23b7eb247ccc9f1007e53313af343980dd52591
+But I think this isn't the best solution much like doing it from the top Makefile.
 
-I seem to have a low success rate getting Makefile changes like this
-merged: My best guess is that Michal Marek should pick them up, but
-he ignored my last few submission for warning changes, so I don't
-know if I should instead send them to Andrew Morton or someone else.
-
-	Arnd
+-- 
+Emese
