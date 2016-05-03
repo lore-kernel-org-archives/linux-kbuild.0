@@ -1,46 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:61958 "EHLO
-	conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932343AbcECCGJ (ORCPT
+Received: from mail-oi0-f50.google.com ([209.85.218.50]:32833 "EHLO
+	mail-oi0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932278AbcECCMd (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 2 May 2016 22:06:09 -0400
+	Mon, 2 May 2016 22:12:33 -0400
+Received: by mail-oi0-f50.google.com with SMTP id v145so8401359oie.0
+        for <linux-kbuild@vger.kernel.org>; Mon, 02 May 2016 19:12:32 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20160502195617.9b2b7e07ced214a8f2136364@gmail.com>
-References: <20160422201957.97ce16f0e67377d0ce613d19@gmail.com>
-	<20160422202138.d50937e812b30aaba4f38a92@gmail.com>
-	<CAK7LNAR-+4+Xdhbs6hoPUTYppLqFwY8dxqdSuw_5j6Pge4uYVg@mail.gmail.com>
-	<20160502195617.9b2b7e07ced214a8f2136364@gmail.com>
-Date: Tue, 3 May 2016 11:06:02 +0900
-Message-ID: <CAK7LNASF_0eWJqC6ugFf4hRAw0pe1HuRAWaOF8M_nWXCKmQAOQ@mail.gmail.com>
-Subject: Re: [PATCH v7 1/6] Shared library support
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
+In-Reply-To: <1535117.FXDhxv6m8v@wuerfel>
+References: <57267469.8ade420a.aec17.ffffc1ee@mx.google.com>
+	<CAOesGMiwACS7Gq41c1p58h_Uj1RBz-_g-BQFZwgRTaKs6QwmvQ@mail.gmail.com>
+	<1535117.FXDhxv6m8v@wuerfel>
+Date: Mon, 2 May 2016 19:12:31 -0700
+Message-ID: <CAOesGMgb=Z1hjKaEG96dOpvKuEFOJQ=TQB_Dag0C-AXNBNTTgg@mail.gmail.com>
+Subject: Re: mainline build: 896 warnings 1 failures (mainline/v4.6-rc5-224-gda9373d)
+From: Olof Johansson <olof@lixom.net>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Emese Revfy <re.emese@gmail.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, PaX Team <pageexec@freemail.hu>, Brad Spengler <spender@grsecurity.net>, kernel-hardening@lists.openwall.com, Michal Marek <mmarek@suse.com>, Kees Cook <keescook@chromium.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Fengguang Wu <fengguang.wu@intel.com>, Dmitry Vyukov <dvyukov@google.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, David Brown <david.brown@linaro.org>
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Kernel Build Reports Mailman List <kernel-build-reports@lists.linaro.org>, Olof's autobuilder <build@lixom.net>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 
-Hi Emese,
-
-2016-05-03 2:56 GMT+09:00 Emese Revfy <re.emese@gmail.com>:
-> On Mon, 2 May 2016 14:03:00 +0900
-> Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
+On Mon, May 2, 2016 at 12:24 AM, Arnd Bergmann <arnd@arndb.de> wrote:
+> On Sunday 01 May 2016 16:19:53 Olof Johansson wrote:
+>> On Sun, May 1, 2016 at 2:26 PM, Olof's autobuilder <build@lixom.net> wrote:
+>> > Here are the build results from automated periodic testing.
+>> >
+>> > The tree being built was mainline, found at:
+>> >
+>> > http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git (master branch)
+>> >
+>> > Topmost commit:
+>> >
+>> > da9373d Merge branch 'fixes' of git://git.kernel.org/pub/scm/linux/kernel/git/evalenti/linux-soc-thermal
+>> >
+>> > Build logs (stderr only) can be found at the following link (experimental):
+>> >
+>> > http://arm-soc.lixom.net/buildlogs/mainline/v4.6-rc5-224-gda9373d/
+>> >
+>> >
+>> >         Runtime:                5m 0s
+>> >
+>> >         Passed:                 117
+>> >         Failed:                 1
+>> >
+>> >         Warnings:               896
+>> >
+>> >         Section mismatches:     0
+>>
+>> So, yeah, I updated to GCC 6.1.0 and it looks noisy. If it doesn't get
+>> whittled down pretty quickly I might switch to an older compiler
+>> again.
 >
->> In the first place,
->> I am wondering if we need to revive this documentation.
->> What this commit is only interested in *.so generation,
->> not host program support.
+> Oops, it looks like I never submitted a patch to shut up
+> -Wunused-const-variable, though I've been building that way
+> myself here and fixing all /other/ warnings.
 >
-> I agree that we don't need this documentation. I'll remove it.
+> I think we want to have -Wunused-const-variable at the W=1 level, but
+> not by default.
 
-OK.
-Also, rephrase the git-log of this patch.
+Agreed, at least as long as it is as noisy as it is today.
 
-This patch is almost your original code,
-not reverting 62e2210798ed38928ab24841e8b4878a.
+Care to send it in so we can see it in 4.6?
 
-
-
--- 
-Best Regards
-Masahiro Yamada
+-Olof
