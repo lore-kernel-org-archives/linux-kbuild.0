@@ -1,83 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:26355 "EHLO
-	conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750798AbcEDEJO (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 4 May 2016 00:09:14 -0400
+Received: from canardo.mork.no ([148.122.252.1]:59218 "EHLO canardo.mork.no"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751621AbcEDNfy (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 4 May 2016 09:35:54 -0400
+From: =?UTF-8?q?Bj=C3=B8rn=20Mork?= <bjorn@mork.no>
+Subject: [PATCH] builddeb: include objtool binary in headers package
+Date: Wed,  4 May 2016 15:35:39 +0200
+Message-Id: <1462368939-1018-1-git-send-email-bjorn@mork.no>
 MIME-Version: 1.0
-In-Reply-To: <20160503232932.706dd3bb081df5d04a390de9@gmail.com>
-References: <20160422201957.97ce16f0e67377d0ce613d19@gmail.com>
-	<20160422202138.d50937e812b30aaba4f38a92@gmail.com>
-	<CAK7LNAR-+4+Xdhbs6hoPUTYppLqFwY8dxqdSuw_5j6Pge4uYVg@mail.gmail.com>
-	<20160502195617.9b2b7e07ced214a8f2136364@gmail.com>
-	<CAK7LNATQY7AWjmEEjDFgpLPkO_oQgkNKutgGb17v7=R8RPb5zA@mail.gmail.com>
-	<20160503232932.706dd3bb081df5d04a390de9@gmail.com>
-Date: Wed, 4 May 2016 13:09:05 +0900
-Message-ID: <CAK7LNAT7eOHQ94qscQgTDXTBi+NZsE4SQzw=h3xcK9PCRigFag@mail.gmail.com>
-Subject: Re: [PATCH v7 1/6] Shared library support
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
 Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Emese Revfy <re.emese@gmail.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, PaX Team <pageexec@freemail.hu>, Brad Spengler <spender@grsecurity.net>, kernel-hardening@lists.openwall.com, Michal Marek <mmarek@suse.com>, Kees Cook <keescook@chromium.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Fengguang Wu <fengguang.wu@intel.com>, Dmitry Vyukov <dvyukov@google.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, David Brown <david.brown@linaro.org>
+To: Michal Marek <mmarek@suse.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, =?UTF-8?q?Bj=C3=B8rn=20Mork?= <bjorn@mork.no>
 
-Hi Emese,
+"objtool" is required for building external m dules if "Compile-time
+stack metadata validation" is enabled.  Otherwise all builds based
+on the headers package fail with:
 
+ make[1]: Entering directory '/usr/src/linux-headers-4.6.0-rc6'
+ make[2]: *** No rule to make target 'tools/objtool/objtool', needed by 'foo.o'.  Stop.
+ Makefile:1598: recipe for target 'foo.ko' failed
+ make[1]: *** [foo.ko] Error 2
+ make[1]: Leaving directory '/usr/src/linux-headers-4.6.0-rc6'
 
-2016-05-04 6:29 GMT+09:00 Emese Revfy <re.emese@gmail.com>:
-> On Tue, 3 May 2016 11:00:56 +0900
-> Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
->
-> Hi,
->
->> # Compile .c file, create position independent .o file
->> # host-cxxshobjs -> .o
->> quiet_cmd_host-cxxshobjs = HOSTCXX -fPIC $@
->>       cmd_host-cxxshobjs = $(HOSTCXX) $(hostcxx_flags) -fPIC -c -o $@ $<
->>                            $(host-cxxshobjs): $(obj)/%.o: $(src)/%.c FORCE
->>                            $(call if_changed_dep,host-cxxshobjs)
->>
->>
->>
->>
->> We generally use HOSTCC to compile *.c files,
->> and HOSTCXX to compile *.cc files.
->>
->>
->> But, here, you mention to use HOSTCXX to compile .c files
->> such as cyc_complexity_plugin.c, sancov_plugin.c, etc.
->>
->> This is not straight-forward.  It is worthwhile to comment the reason.
->
-> I wrote a comment about it here:
-> https://github.com/ephox-gcc-plugins/gcc-plugins_linux-next/commit/74f6343a7f13c071e00c417332051e25f15009ea
->
+Signed-off-by: Bjørn Mork <bjorn@mork.no>
+---
+ scripts/package/builddeb | 3 +++
+ 1 file changed, 3 insertions(+)
 
-
-
-+# Note that plugin capable gcc versions can be either C or C++ based
-+# therefore plugin source files have to be compilable in both C and C++ mode.
-+# This is why a C++ compiler is invoked on a .c file.
-
-Thanks.
-
-Please let me confirm if I understood correctly.
-
-
-We generally have to do something with the name-space conflict
-(with 'extern "C"') in the mixture of C/C++.
-
-Depending on the GCC version,
-GCC-plugin-related libraries could be built for C or C++.
-
-So, we need to check the GCC version and choose correct one
-from C or C++.
-
-
-Am I right?
-
-
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index 6c3b038ef40d..93d3b157298d 100755
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -322,6 +322,9 @@ fi
+ 
+ # Build kernel header package
+ (cd $srctree; find . -name Makefile\* -o -name Kconfig\* -o -name \*.pl) > "$objtree/debian/hdrsrcfiles"
++if grep -q '^CONFIG_STACK_VALIDATION=y' $KCONFIG_CONFIG ; then
++	(cd $srctree; find tools/objtool -type f -executable) >> "$objtree/debian/hdrsrcfiles"
++fi
+ (cd $srctree; find arch/$SRCARCH/include include scripts -type f) >> "$objtree/debian/hdrsrcfiles"
+ (cd $srctree; find arch/$SRCARCH -name module.lds -o -name Kbuild.platforms -o -name Platform) >> "$objtree/debian/hdrsrcfiles"
+ (cd $srctree; find $(find arch/$SRCARCH -name include -o -name scripts -type d) -type f) >> "$objtree/debian/hdrsrcfiles"
 -- 
-Best Regards
-Masahiro Yamada
+2.1.4
+
