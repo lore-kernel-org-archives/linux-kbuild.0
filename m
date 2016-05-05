@@ -1,49 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from canardo.mork.no ([148.122.252.1]:59218 "EHLO canardo.mork.no"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751621AbcEDNfy (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 4 May 2016 09:35:54 -0400
-From: =?UTF-8?q?Bj=C3=B8rn=20Mork?= <bjorn@mork.no>
-Subject: [PATCH] builddeb: include objtool binary in headers package
-Date: Wed,  4 May 2016 15:35:39 +0200
-Message-Id: <1462368939-1018-1-git-send-email-bjorn@mork.no>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Received: from conuserg-09.nifty.com ([210.131.2.76]:44026 "EHLO
+	conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751528AbcEEHon (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 5 May 2016 03:44:43 -0400
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH] kbuild: fix if_change and friends to consider argument order
+Date: Thu,  5 May 2016 16:45:12 +0900
+Message-Id: <1462434312-19422-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, =?UTF-8?q?Bj=C3=B8rn=20Mork?= <bjorn@mork.no>
+To: linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, David Howells <dhowells@redhat.com>, David Woodhouse <David.Woodhouse@intel.com>, linux-kernel@vger.kernel.org
 
-"objtool" is required for building external m dules if "Compile-time
-stack metadata validation" is enabled.  Otherwise all builds based
-on the headers package fail with:
+Currently, arg-check is implemented as follows:
 
- make[1]: Entering directory '/usr/src/linux-headers-4.6.0-rc6'
- make[2]: *** No rule to make target 'tools/objtool/objtool', needed by 'foo.o'.  Stop.
- Makefile:1598: recipe for target 'foo.ko' failed
- make[1]: *** [foo.ko] Error 2
- make[1]: Leaving directory '/usr/src/linux-headers-4.6.0-rc6'
+  arg-check = $(strip $(filter-out $(cmd_$(1)), $(cmd_$@)) \
+                      $(filter-out $(cmd_$@),   $(cmd_$(1))) )
 
-Signed-off-by: Bjørn Mork <bjorn@mork.no>
+This does not care about the order of arguments that appear in
+$(cmd_$(1)) and $(cmd_$@).  So, if_changed and friends never rebuild
+the target if only the argument order is changed.  This is a problem
+when the link order is changed.
+
+Apparently,
+
+  obj-y += foo.o
+  obj-y += bar.o
+
+and
+
+  obj-y += bar.o
+  obj-y += foo.o
+
+should be distinguished because the link order determines the probe
+order of drivers.  So, built-in.o should be rebuilt if the order of
+objects is changed.
+
+This commit fixes arg-check to compare two strings as a whole.
+$(strip ...) is important because we want to ignore the difference
+that comes from white-spaces.
+
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
- scripts/package/builddeb | 3 +++
- 1 file changed, 3 insertions(+)
 
-diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index 6c3b038ef40d..93d3b157298d 100755
---- a/scripts/package/builddeb
-+++ b/scripts/package/builddeb
-@@ -322,6 +322,9 @@ fi
- 
- # Build kernel header package
- (cd $srctree; find . -name Makefile\* -o -name Kconfig\* -o -name \*.pl) > "$objtree/debian/hdrsrcfiles"
-+if grep -q '^CONFIG_STACK_VALIDATION=y' $KCONFIG_CONFIG ; then
-+	(cd $srctree; find tools/objtool -type f -executable) >> "$objtree/debian/hdrsrcfiles"
-+fi
- (cd $srctree; find arch/$SRCARCH/include include scripts -type f) >> "$objtree/debian/hdrsrcfiles"
- (cd $srctree; find arch/$SRCARCH -name module.lds -o -name Kbuild.platforms -o -name Platform) >> "$objtree/debian/hdrsrcfiles"
- (cd $srctree; find $(find arch/$SRCARCH -name include -o -name scripts -type d) -type f) >> "$objtree/debian/hdrsrcfiles"
+ scripts/Kbuild.include | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index b2ab2a9..2d03480 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -228,8 +228,8 @@ objectify = $(foreach o,$(1),$(if $(filter /%,$(o)),$(o),$(obj)/$(o)))
+ ifneq ($(KBUILD_NOCMDDEP),1)
+ # Check if both arguments has same arguments. Result is empty string if equal.
+ # User may override this check using make KBUILD_NOCMDDEP=1
+-arg-check = $(strip $(filter-out $(cmd_$(1)), $(cmd_$@)) \
+-                    $(filter-out $(cmd_$@),   $(cmd_$(1))) )
++arg-check = $(filter-out $(quote)$(strip $(cmd_$1))$(quote), \
++                         $(quote)$(strip $(cmd_$@))$(quote))
+ else
+ arg-check = $(if $(strip $(cmd_$@)),,1)
+ endif
 -- 
-2.1.4
+1.9.1
 
