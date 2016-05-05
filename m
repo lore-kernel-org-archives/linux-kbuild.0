@@ -1,60 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.codeaurora.org ([198.145.29.96]:56430 "EHLO
-	smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1756734AbcEEOmR (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:49534 "EHLO
+	conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757359AbcEEOuQ convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 5 May 2016 10:42:17 -0400
-Subject: Re: [PATCH v1] builddeb: fix missing headers in linux-headers package
-References: <1459445479-10948-1-git-send-email-asamson@codeaurora.org>
-From: Christopher Covington <cov@codeaurora.org>
-Message-ID: <572B5BC4.7080402@codeaurora.org>
-Date: Thu, 5 May 2016 10:42:12 -0400
+	Thu, 5 May 2016 10:50:16 -0400
 MIME-Version: 1.0
-In-Reply-To: <1459445479-10948-1-git-send-email-asamson@codeaurora.org>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <1462435694.44077.9.camel@intel.com>
+References: <1462434312-19422-1-git-send-email-yamada.masahiro@socionext.com>
+	<1462435694.44077.9.camel@intel.com>
+Date: Thu, 5 May 2016 23:49:56 +0900
+Message-ID: <CAK7LNAT4XMudrUvUVzqcUGpXGvGAniY8=6nwy64241AipVhfaA@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: fix if_change and friends to consider argument order
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: Azriel Samson <asamson@codeaurora.org>, linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org, Timur Tabi <timur@codeaurora.org>
+To: "Woodhouse, David" <david.woodhouse@intel.com>
+Cc: "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "mmarek@suse.com" <mmarek@suse.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "dhowells@redhat.com" <dhowells@redhat.com>
 
-On 03/31/2016 01:31 PM, Azriel Samson wrote:
-> The kernel headers package (linux-headers) doesn't include
-> header files from other architectures required to build
-> out-of-tree modules.
-> 
-> For e.g. on ARM64, opcodes.h includes the same file from ARM
-> which causes the following error:
-> ./arch/arm64/include/asm/opcodes.h:1:43: fatal error:
-> ../../arm/include/asm/opcodes.h: No such file or directory
-> compilation terminated.
-> 
-> Signed-off-by: Azriel Samson <asamson@codeaurora.org>
-> ---
->  scripts/package/builddeb | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-> index 6c3b038..06ba0d9 100755
-> --- a/scripts/package/builddeb
-> +++ b/scripts/package/builddeb
-> @@ -322,7 +322,7 @@ fi
->  
->  # Build kernel header package
->  (cd $srctree; find . -name Makefile\* -o -name Kconfig\* -o -name \*.pl) > "$objtree/debian/hdrsrcfiles"
-> -(cd $srctree; find arch/$SRCARCH/include include scripts -type f) >> "$objtree/debian/hdrsrcfiles"
-> +(cd $srctree; find arch/*/include include scripts -type f) >> "$objtree/debian/hdrsrcfiles"
->  (cd $srctree; find arch/$SRCARCH -name module.lds -o -name Kbuild.platforms -o -name Platform) >> "$objtree/debian/hdrsrcfiles"
->  (cd $srctree; find $(find arch/$SRCARCH -name include -o -name scripts -type d) -type f) >> "$objtree/debian/hdrsrcfiles"
->  (cd $objtree; find arch/$SRCARCH/include Module.symvers include scripts -type f) >> "$objtree/debian/hdrobjfiles"
+2016-05-05 17:08 GMT+09:00 Woodhouse, David <david.woodhouse@intel.com>:
+> On Thu, 2016-05-05 at 16:45 +0900, Masahiro Yamada wrote:
+>>
+>> This commit fixes arg-check to compare two strings as a whole.
+>> $(strip ...) is important because we want to ignore the difference
+>> that comes from white-spaces.
+>
+> Do we?
+>
+> I can construct a hypothetical situation in which whitespace differs
+> and we *do* want it to make a difference (for example I used to sign
+> with a key called 'My Signing Key.pem' and now I've changed to use
+> 'My  Signing  Key.pem'. (OK, it's a *stupid* example but still...)
+>
+> I couldn't come up with the converse — where whitespace does change for
+> some reason, but we really don't want to rebuild.
+>
+> Should we err on the side of caution, and let whitespace changes
+> trigger a rebuild?
+>
+> --
+> David Woodhouse                            Open Source Technology Centre
+> David.Woodhouse@intel.com                              Intel Corporation
+>
 
-Any feedback on this? Michal, do you think this would be appropriate to
-include in 4.7?
 
-Thanks,
-Christopher Covington
+
+Please hold on.
+
+I noticed some side effect on this patch.
+
+I need to test it more carefully.
+
+
 
 -- 
-Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum,
-a Linux Foundation Collaborative Project
+Best Regards
+Masahiro Yamada
