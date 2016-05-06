@@ -1,38 +1,78 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f42.google.com ([74.125.82.42]:36973 "EHLO
-	mail-wm0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754682AbcEESgf (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:65456 "EHLO
+	conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757107AbcEFCMW (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 5 May 2016 14:36:35 -0400
-Date: Thu, 5 May 2016 20:43:45 +0200
-From: Emese Revfy <re.emese@gmail.com>
-Subject: Re: [PATCH v7 1/6] Shared library support
-Message-Id: <20160505204345.4f936cd3ad2207c705d49c6a@gmail.com>
-In-Reply-To: <20160503232527.6e02867a5d4b8f28f6c0f854@gmail.com>
-References: <20160422201957.97ce16f0e67377d0ce613d19@gmail.com>
-	<20160422202138.d50937e812b30aaba4f38a92@gmail.com>
-	<CAK7LNAR-+4+Xdhbs6hoPUTYppLqFwY8dxqdSuw_5j6Pge4uYVg@mail.gmail.com>
-	<20160503232527.6e02867a5d4b8f28f6c0f854@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+	Thu, 5 May 2016 22:12:22 -0400
+MIME-Version: 1.0
+In-Reply-To: <1462435694.44077.9.camel@intel.com>
+References: <1462434312-19422-1-git-send-email-yamada.masahiro@socionext.com>
+	<1462435694.44077.9.camel@intel.com>
+Date: Fri, 6 May 2016 11:12:03 +0900
+Message-ID: <CAK7LNAQXqVaGEQVoZ9kJ2_Hvtn5NQQdLfqGrxetbkNRwSZVPog@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: fix if_change and friends to consider argument order
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, PaX Team <pageexec@freemail.hu>, Brad Spengler <spender@grsecurity.net>, kernel-hardening@lists.openwall.com, Michal Marek <mmarek@suse.com>, Kees Cook <keescook@chromium.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Fengguang Wu <fengguang.wu@intel.com>, Dmitry Vyukov <dvyukov@google.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, David Brown <david.brown@linaro.org>
+To: "Woodhouse, David" <david.woodhouse@intel.com>
+Cc: "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "mmarek@suse.com" <mmarek@suse.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "dhowells@redhat.com" <dhowells@redhat.com>
 
-On Tue, 3 May 2016 23:25:27 +0200
-Emese Revfy <re.emese@gmail.com> wrote:
+Hi David,
 
-> > Do you need to change both the top Makefile and Makefile.clean
-> > for belt-and-braces cleaning?
-> 
-> It doesn't delete the *.so files without the hunk from the top Makefile. 
-> The mrproper and distclean targets remove them with this patch:
-> https://github.com/ephox-gcc-plugins/gcc-plugins_linux-next/commit/f23b7eb247ccc9f1007e53313af343980dd52591
-> But I think this isn't the best solution much like doing it from the top Makefile.
 
-Do you think this patch will be good enough? In this case I can resend the patch set.
+2016-05-05 17:08 GMT+09:00 Woodhouse, David <david.woodhouse@intel.com>:
+> On Thu, 2016-05-05 at 16:45 +0900, Masahiro Yamada wrote:
+>>
+>> This commit fixes arg-check to compare two strings as a whole.
+>> $(strip ...) is important because we want to ignore the difference
+>> that comes from white-spaces.
+>
+> Do we?
+>
+> I can construct a hypothetical situation in which whitespace differs
+> and we *do* want it to make a difference (for example I used to sign
+> with a key called 'My Signing Key.pem' and now I've changed to use
+> 'My  Signing  Key.pem'. (OK, it's a *stupid* example but still...)
+>
+
+Have you ever succeeded in passing such a string in Kbuild in the first place?
+
+For example, I added the following line into init/Makefile
+
+CFLAGS_main.o += -DHELLO_WORLD='"hello        world!"'
+
+
+and
+
+     printk("%s\n", HELLO_WORLD);
+
+to start_kernel().
+
+
+
+But, I got the console log
+
+[     0.001639] hello world!
+
+
+
+
+The root cause of this problem is the following line
+
+_c_flags       = $(filter-out $(CFLAGS_REMOVE_$(basetarget).o), $(orig_c_flags))
+
+
+$(filter-out  ) strips extra spaces, so Kbuild can not keep
+white-spaces as they are.
+
+
+Maybe, we can fix this problem.  (This is another problem, though)
+
+Thank you for spotting this.
+
+
 
 -- 
-Emese
+Best Regards
+Masahiro Yamada
