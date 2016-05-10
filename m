@@ -1,40 +1,35 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:52033 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:52844 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751994AbcEJPFz (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 10 May 2016 11:05:55 -0400
-Date: Tue, 10 May 2016 17:05:55 +0200
+	id S1751568AbcEJPOh (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 10 May 2016 11:14:37 -0400
+Date: Tue, 10 May 2016 17:14:37 +0200
 From: Michal Marek <mmarek@suse.cz>
-Subject: Re: [PATCH v2] kbuild: forbid kernel directory to contain spaces
-	and colons
-Message-ID: <20160510150554.GA30705@pobox.suse.cz>
-References: <1459625933-20677-1-git-send-email-robert.jarzmik@free.fr>
+Subject: Re: [RESEND PATCH 0/5] gcov fixes and maybe-uninitialized warnings
+Message-ID: <20160510151437.GA12889@pobox.suse.cz>
+References: <1461598531-2190169-1-git-send-email-arnd@arndb.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1459625933-20677-1-git-send-email-robert.jarzmik@free.fr>
+In-Reply-To: <1461598531-2190169-1-git-send-email-arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Robert Jarzmik <robert.jarzmik@free.fr>
-Cc: Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, Peter Oberparleiter <oberpar@linux.vnet.ibm.com>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
 
-On Sat, Apr 02, 2016 at 09:38:53PM +0200, Robert Jarzmik wrote:
-> When the kernel path contains a space or a colon somewhere in the path
-> name, the modules_install target doesn't work anymore, as the path names
-> are not enclosed in double quotes. It is also supposed that and O= build
-> will suffer from the same weakness as modules_install.
+On Mon, Apr 25, 2016 at 05:35:26PM +0200, Arnd Bergmann wrote:
+> Hi Michal,
 > 
-> Instead of checking and improving kbuild to resist to directories
-> including these characters, error out early to prevent any build if the
-> kernel's main directory contains a space.
+> This is a resend of a series I originally sent back in February, but
+> unfortunately I never heard back from you. Could you apply these
+> patches for v4.7?
 > 
-> Signed-off-by: Robert Jarzmik <robert.jarzmik@free.fr>
-> ---
-> Since v1: add colon check as requested by Michal.
-> ---
->  Makefile | 4 ++++
->  1 file changed, 4 insertions(+)
+> [PATCH 1/5] Kbuild: change CC_OPTIMIZE_FOR_SIZE definition
+> [PATCH 2/5] Kbuild: disable 'maybe-uninitialized' warning for
+> [PATCH 3/5] gcov: disable for COMPILE_TEST
+> [PATCH 4/5] gcov: disable tree-loop-im to reduce stack usage
+> [PATCH 5/5] gcov: disable -Wmaybe-uninitialized warning
 
-Applied to kbuild.git#kbuild.
+Applied now, sorry for the delay.
 
 Michal
