@@ -1,37 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:54886 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:55395 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751145AbcEJPhO (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 10 May 2016 11:37:14 -0400
-Date: Tue, 10 May 2016 17:37:13 +0200
+	id S1751561AbcEJPl2 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 10 May 2016 11:41:28 -0400
+Date: Tue, 10 May 2016 17:41:28 +0200
 From: Michal Marek <mmarek@suse.com>
-Subject: Re: [PATCH 0/2] kconfig-language: Fix and choices details
-Message-ID: <20160510153713.GD13314@pobox.suse.cz>
-References: <gh60v04s4s.fsf@lena.gouders.net>
+Subject: Re: [PATCH] builddeb: include objtool binary in headers package
+Message-ID: <20160510154128.GE13314@pobox.suse.cz>
+References: <1462368939-1018-1-git-send-email-bjorn@mork.no>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <gh60v04s4s.fsf@lena.gouders.net>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1462368939-1018-1-git-send-email-bjorn@mork.no>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dirk Gouders <dirk@gouders.net>
-Cc: Jonathan Corbet <corbet@lwn.net>, linux-kbuild@vger.kernel.org
+To: =?iso-8859-1?Q?Bj=F8rn?= Mork <bjorn@mork.no>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Fri, Apr 29, 2016 at 12:25:34PM +0200, Dirk Gouders wrote:
+On Wed, May 04, 2016 at 03:35:39PM +0200, Bjørn Mork wrote:
+> "objtool" is required for building external m dules if "Compile-time
+> stack metadata validation" is enabled.  Otherwise all builds based
+> on the headers package fail with:
 > 
-> Hi,
+>  make[1]: Entering directory '/usr/src/linux-headers-4.6.0-rc6'
+>  make[2]: *** No rule to make target 'tools/objtool/objtool', needed by 'foo.o'.  Stop.
+>  Makefile:1598: recipe for target 'foo.ko' failed
+>  make[1]: *** [foo.ko] Error 2
+>  make[1]: Leaving directory '/usr/src/linux-headers-4.6.0-rc6'
 > 
-> following are two patches for kconfig-language.txt.
-> 
-> The first one IMHO fixes wrong information, the second one includes more
-> elaborate information about the type of choices that I gathered while working on a patch.
-> 
-> Dirk
-> 
-> Dirk Gouders (2):
->   kconfig-language: fix comment on dependency-generated menu structures.
->   kconfig-language: elaborate on the type of a choice
+> Signed-off-by: Bjørn Mork <bjorn@mork.no>
+> ---
+>  scripts/package/builddeb | 3 +++
+>  1 file changed, 3 insertions(+)
 
-Applied to kbuild.git#kconfig.
+Applied to kbuild.git#misc.
 
 Michal
