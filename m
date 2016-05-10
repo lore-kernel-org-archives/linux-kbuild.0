@@ -1,39 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:55395 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:55657 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751561AbcEJPl2 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 10 May 2016 11:41:28 -0400
-Date: Tue, 10 May 2016 17:41:28 +0200
+	id S1751409AbcEJPpR (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 10 May 2016 11:45:17 -0400
+Date: Tue, 10 May 2016 17:45:17 +0200
 From: Michal Marek <mmarek@suse.com>
-Subject: Re: [PATCH] builddeb: include objtool binary in headers package
-Message-ID: <20160510154128.GE13314@pobox.suse.cz>
-References: <1462368939-1018-1-git-send-email-bjorn@mork.no>
+Subject: Re: [PATCH v1] builddeb: fix missing headers in linux-headers
+	package
+Message-ID: <20160510154516.GF13314@pobox.suse.cz>
+References: <1459445479-10948-1-git-send-email-asamson@codeaurora.org> <572B5BC4.7080402@codeaurora.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1462368939-1018-1-git-send-email-bjorn@mork.no>
+In-Reply-To: <572B5BC4.7080402@codeaurora.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: =?iso-8859-1?Q?Bj=F8rn?= Mork <bjorn@mork.no>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Christopher Covington <cov@codeaurora.org>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Azriel Samson <asamson@codeaurora.org>, linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org, Timur Tabi <timur@codeaurora.org>
 
-On Wed, May 04, 2016 at 03:35:39PM +0200, Bjørn Mork wrote:
-> "objtool" is required for building external m dules if "Compile-time
-> stack metadata validation" is enabled.  Otherwise all builds based
-> on the headers package fail with:
+On Thu, May 05, 2016 at 10:42:12AM -0400, Christopher Covington wrote:
+> On 03/31/2016 01:31 PM, Azriel Samson wrote:
+> > The kernel headers package (linux-headers) doesn't include
+> > header files from other architectures required to build
+> > out-of-tree modules.
+> > 
+> > For e.g. on ARM64, opcodes.h includes the same file from ARM
+> > which causes the following error:
+> > ./arch/arm64/include/asm/opcodes.h:1:43: fatal error:
+> > ../../arm/include/asm/opcodes.h: No such file or directory
+> > compilation terminated.
+> > 
+> > Signed-off-by: Azriel Samson <asamson@codeaurora.org>
+> > ---
+> >  scripts/package/builddeb | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+> > index 6c3b038..06ba0d9 100755
+> > --- a/scripts/package/builddeb
+> > +++ b/scripts/package/builddeb
+> > @@ -322,7 +322,7 @@ fi
+> >  
+> >  # Build kernel header package
+> >  (cd $srctree; find . -name Makefile\* -o -name Kconfig\* -o -name \*.pl) > "$objtree/debian/hdrsrcfiles"
+> > -(cd $srctree; find arch/$SRCARCH/include include scripts -type f) >> "$objtree/debian/hdrsrcfiles"
+> > +(cd $srctree; find arch/*/include include scripts -type f) >> "$objtree/debian/hdrsrcfiles"
+> >  (cd $srctree; find arch/$SRCARCH -name module.lds -o -name Kbuild.platforms -o -name Platform) >> "$objtree/debian/hdrsrcfiles"
+> >  (cd $srctree; find $(find arch/$SRCARCH -name include -o -name scripts -type d) -type f) >> "$objtree/debian/hdrsrcfiles"
+> >  (cd $objtree; find arch/$SRCARCH/include Module.symvers include scripts -type f) >> "$objtree/debian/hdrobjfiles"
 > 
->  make[1]: Entering directory '/usr/src/linux-headers-4.6.0-rc6'
->  make[2]: *** No rule to make target 'tools/objtool/objtool', needed by 'foo.o'.  Stop.
->  Makefile:1598: recipe for target 'foo.ko' failed
->  make[1]: *** [foo.ko] Error 2
->  make[1]: Leaving directory '/usr/src/linux-headers-4.6.0-rc6'
-> 
-> Signed-off-by: Bjørn Mork <bjorn@mork.no>
-> ---
->  scripts/package/builddeb | 3 +++
->  1 file changed, 3 insertions(+)
+> Any feedback on this? Michal, do you think this would be appropriate to
+> include in 4.7?
 
-Applied to kbuild.git#misc.
+Applied to kbuild.git#misc now.
 
 Michal
