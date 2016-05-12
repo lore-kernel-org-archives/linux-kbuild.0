@@ -1,134 +1,155 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from foss.arm.com ([217.140.101.70]:60082 "EHLO foss.arm.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752779AbcELQjm (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 12 May 2016 12:39:42 -0400
-From: Kevin Brodsky <kevin.brodsky@arm.com>
-Subject: [PATCH RESEND] arm64: fix vdso-offsets.h dependency
-Date: Thu, 12 May 2016 17:39:15 +0100
-Message-Id: <1463071155-7435-1-git-send-email-kevin.brodsky@arm.com>
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:36755 "EHLO
+	mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753076AbcELXrw (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 12 May 2016 19:47:52 -0400
+Date: Fri, 13 May 2016 01:54:56 +0200
+From: Emese Revfy <re.emese@gmail.com>
+Subject: [PATCH v8 0/4] Introduce GCC plugin infrastructure
+Message-Id: <20160513015456.01415979f20a68eb7d2d9290@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-arm-kernel@lists.infradead.org
-Cc: linux-kbuild@vger.kernel.org, Kevin Brodsky <kevin.brodsky@arm.com>, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, Michal Marek <mmarek@suse.com>
+To: linux-kbuild@vger.kernel.org
+Cc: pageexec@freemail.hu, spender@grsecurity.net, kernel-hardening@lists.openwall.com, mmarek@suse.com, keescook@chromium.org, linux@rasmusvillemoes.dk, fengguang.wu@intel.com, dvyukov@google.com, linux-kernel@vger.kernel.org, david.brown@linaro.org, yamada.masahiro@socionext.com
 
-arm64/kernel/{vdso,signal}.c include vdso-offsets.h, as well as any
-file that includes asm/vdso.h. Therefore, vdso-offsets.h must be
-generated before these files are compiled.
+This patch set introduce the GCC plugin infrastructure with examples for testing
+and documentation.
 
-The current rules in arm64/kernel/Makefile do not actually enforce
-this, because even though $(obj)/vdso is listed as a prerequisite for
-vdso-offsets.h, this does not result in the intended effect of
-building the vdso subdirectory (before all the other objects). As a
-consequence, depending on the order in which the rules are followed,
-vdso-offsets.h is updated or not before arm64/kernel/{vdso,signal}.o
-are built. The current rules also impose an unnecessary dependency on
-vdso-offsets.h for all arm64/kernel/*.o, resulting in unnecessary
-rebuilds. This is made obvious when using make -j:
+GCC plugins are loadable modules that provide extra features to the compiler.
+They are useful for runtime instrumentation and static analysis.
 
-  touch arch/arm64/kernel/vdso/gettimeofday.S && make -j$NCPUS arch/arm64/kernel
+The infrastructure supports all gcc versions from 4.5 to 6.0, building
+out-of-tree modules and building in a separate directory. Cross-compilation
+is supported too but currently only the x86, arm, arm64 and uml architectures enable plugins.
 
-will sometimes result in none of arm64/kernel/*.o being
-rebuilt, sometimes all of them, or even just some of them.
+This infrastructure was ported from grsecurity/PaX. It is a CII project
+supported by the Linux Foundation.
 
-It is quite difficult to ensure that a header is generated before it
-is used with recursive Makefiles by using normal rules.  Instead,
-arch-specific generated headers are normally built in the archprepare
-recipe in the arch Makefile (see for instance arch/ia64/Makefile).
-Unfortunately, asm-offsets.h is included in gettimeofday.S, and must
-therefore be generated before vdso-offsets.h, which is not the case if
-archprepare is used. For this reason, a rule run after archprepare has
-to be used.
+Emese Revfy (4):
+ Shared library support
+ GCC plugin infrastructure
+ Add Cyclomatic complexity plugin
+ Add sancov plugin
 
-This commit adds rules in arm64/Makefile to build vdso-offsets.h
-during the prepare step, ensuring that vdso-offsets.h is generated
-before building anything. It also removes the now-unnecessary
-dependencies on vdso-offsets.h in arm64/kernel/Makefile. Finally, it
-removes the duplication of asm-offsets.h between arm64/kernel/vdso/
-and include/generated/ and makes include/generated/vdso-offsets.h a
-target in arm64/kernel/vdso/Makefile.
 
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Will Deacon <will.deacon@arm.com>
-Cc: Michal Marek <mmarek@suse.com>
-Signed-off-by: Kevin Brodsky <kevin.brodsky@arm.com>
+Changes from v7:
+ * Moved the "The GCC plugin infrastructure supports the arm and arm64 architectures too"
+   and the "Documentations of the GCC plugin infrastructre" patches
+   into the "GCC plugin infrastructure" patch
+    (Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com>)
+ * Add gcc-plugin.sh to MAINTAINERS
+    (Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com>)
+ * Makefile.host: Remove *shobjs from multi-depend
+    (Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com>)
+ * Have distclean and mrproper targets clean the *.so files
+    (Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com>)
+ * Simplied gcc-plugin-y to add plugins to HOSTLIBS
+    (Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com>)
+ * Simplified Makefile.host
+    (Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com>)
+ * Clean *.c.[012]*.*
+    (Suggested-by: Michal Marek <mmarek@suse.com>)
+ * Documentation: gcc plugins have to compilable as C and C++
+ * Enable GCC plugins for UML
+
+Changes from v6:
+ * Disable the sancov plugin whenever KCOV_INSTRUMENT is disabled
+    (Reported-by: Huang Ying <ying.huang@linux.intel.com>)
+ * Disable KCOV/sancov plugin because this is not a regular kernel code
+    (Reported-by: Huang Ying <ying.huang@linux.intel.com>)
+ * Removed unnecessary gcc plugin cflags
+    (Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>)
+ * Removed unnecessary gcc plugin aflags
+
+Changes from v5:
+ * Set important properties on the external fndecl (Add sancov plugin)
+ * Revert documentation change too (Shared library support)
+    (Suggested-by: Kees Cook <keescook@chromium.org>)
+ * The GCC plugin infrastructure now supports the arm and arm64 architectures too
+    (Signed-off-by: David Brown <david.brown@linaro.org>)
+ * Simplify the computation of PLUGINCC (GCC plugin infrastructure)
+    (Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com>)
+ * Simplify the invocation of gcc-plugin.sh (GCC plugin infrastructure)
+    (Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com>)
+ * Make use of multi-depend (Shared library support)
+    (Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com>)
+ * Remove unnecessary exports (GCC plugin infrastructure)
+    (Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com>)
+ * Simplify Makefile by using addprefix (GCC plugin infrastructure)
+    (Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com>)
+ * Moved the gcc plugins from tools/ to scripts/ (GCC plugin infrastructure)
+    (Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com>)
+ * Removed plugins from KBUILD_CFLAGS_32 (GCC plugin infrastructure)
+ * Remove gcc-plugin target everywhere
+    (Suggested-by and partly Written-by: Masahiro Yamada <yamada.masahiro@socionext.com>)
+ * There is no leaf gcc attribute in gcc-4.5 (Add sancov plugin)
+ * Added support to the sancov plugin with kcov (Add sancov plugin)
+
+Changes from v4:
+ * Moved shared library support from the GCC plugin infrastructure patch into
+   a different patch
+ * Update gcc-*.h from PaX
+   * Fixed gcc-common.h for gcc 6
+   * Added pass cloning support to the gcc pass generators
+ * Disable all plugins in vdso because it is userland code
+ * Add sancov gcc plugin: another use case for gcc plugin support in the kernel
+   is when there is a feature in the latest gcc version and we would like to use
+   it with older gcc versions as well (e.g., distros).
+
+Changes from v3:
+ * Fix some indentation related warnings
+   (Suggested by checkpatch.pl)
+ * Add maintainer entries
+ * Don't run gcc_plugin.sh when the GCC_PLUGINS option is disabled or unsupported
+   (Reported-by: Fengguang Wu <fengguang.wu@intel.com>)
+
+Changes from v2:
+ * Fixed incorrectly encoded characters
+ * Generate the GIMPLE, IPA, SIMPLE_IPA and RTL pass structures
+   (Suggested-by: Rasmus Villemoes <linux@rasmusvillemoes.dk>)
+ * Write plugin related warning messages to stderr instead of stdout
+   (Suggested-by: Kees Cook <keescook@chromium.org>)
+ * Mention the installation of the gcc plugin headers (Documentation)
+
+Changes from v1:
+ * Move the gcc-plugins make target into a separate Makefile because there may
+   be a lot of plugins (Suggested-by: Rasmus Villemoes)
+ * Simplify the dependencies of the plugin related config option
+   (Suggested-by: Kees Cook <keescook@chromium.org>)
+ * Removed the unnecessary example plugin
+
 ---
-
-Resending with linux-kbuild in cc, hopefully some people there will have
-an opinion on this.
-
-I am not completely satisfied with the fix, since it uses a hack with
-the prepare and prepare0 rules that should not be used in arch
-Makefiles. However, all of my other attempts (including explicit
-dependencies on gettimeofday.S, etc. in arm64/kernel/Makefile) failed
-in some way. Hopefully, a Makefile wizard will come up with a better
-solution.
-
- arch/arm64/Makefile             | 10 ++++++++++
- arch/arm64/kernel/Makefile      |  4 ----
- arch/arm64/kernel/vdso/Makefile |  7 +++----
- 3 files changed, 13 insertions(+), 8 deletions(-)
-
-diff --git a/arch/arm64/Makefile b/arch/arm64/Makefile
-index 354d75402ace..7bb702a0f1e2 100644
---- a/arch/arm64/Makefile
-+++ b/arch/arm64/Makefile
-@@ -119,6 +119,16 @@ archclean:
- 	$(Q)$(MAKE) $(clean)=$(boot)
- 	$(Q)$(MAKE) $(clean)=$(boot)/dts
- 
-+# We need to generate vdso-offsets.h before compiling certain files in kernel/.
-+# In order to do that, we should use the archprepare target, but we can't since
-+# asm-offsets.h is included in some files used to generate vdso-offsets.h, and
-+# asm-offsets.h is built in prepare0, for which archprepare is a dependency.
-+# Therefore we need to generate the header after prepare0 has been made, hence
-+# this hack.
-+prepare: vdso_prepare
-+vdso_prepare: prepare0
-+	$(Q)$(MAKE) $(build)=arch/arm64/kernel/vdso include/generated/vdso-offsets.h
-+
- define archhelp
-   echo  '* Image.gz      - Compressed kernel image (arch/$(ARCH)/boot/Image.gz)'
-   echo  '  Image         - Uncompressed kernel image (arch/$(ARCH)/boot/Image)'
-diff --git a/arch/arm64/kernel/Makefile b/arch/arm64/kernel/Makefile
-index 3793003e16a2..bab85990691d 100644
---- a/arch/arm64/kernel/Makefile
-+++ b/arch/arm64/kernel/Makefile
-@@ -50,7 +50,3 @@ obj-y					+= $(arm64-obj-y) vdso/
- obj-m					+= $(arm64-obj-m)
- head-y					:= head.o
- extra-y					+= $(head-y) vmlinux.lds
--
--# vDSO - this must be built first to generate the symbol offsets
--$(call objectify,$(arm64-obj-y)): $(obj)/vdso/vdso-offsets.h
--$(obj)/vdso/vdso-offsets.h: $(obj)/vdso
-diff --git a/arch/arm64/kernel/vdso/Makefile b/arch/arm64/kernel/vdso/Makefile
-index b467fd0a384b..62c84f7cb01b 100644
---- a/arch/arm64/kernel/vdso/Makefile
-+++ b/arch/arm64/kernel/vdso/Makefile
-@@ -23,7 +23,7 @@ GCOV_PROFILE := n
- ccflags-y += -Wl,-shared
- 
- obj-y += vdso.o
--extra-y += vdso.lds vdso-offsets.h
-+extra-y += vdso.lds
- CPPFLAGS_vdso.lds += -P -C -U$(ARCH)
- 
- # Force dependency (incbin is bad)
-@@ -42,11 +42,10 @@ $(obj)/%.so: $(obj)/%.so.dbg FORCE
- gen-vdsosym := $(srctree)/$(src)/gen_vdso_offsets.sh
- quiet_cmd_vdsosym = VDSOSYM $@
- define cmd_vdsosym
--	$(NM) $< | $(gen-vdsosym) | LC_ALL=C sort > $@ && \
--	cp $@ include/generated/
-+	$(NM) $< | $(gen-vdsosym) | LC_ALL=C sort > $@
- endef
- 
--$(obj)/vdso-offsets.h: $(obj)/vdso.so.dbg FORCE
-+include/generated/vdso-offsets.h: $(obj)/vdso.so.dbg FORCE
- 	$(call if_changed,vdsosym)
- 
- # Assembly rules for the .S files
--- 
-2.8.0
-
+ .gitignore                                         |   1 +
+ Documentation/dontdiff                             |   1 +
+ Documentation/gcc-plugins.txt                      |  87 +++
+ MAINTAINERS                                        |   9 +
+ Makefile                                           |  24 +-
+ arch/Kconfig                                       |  36 +
+ arch/arm/Kconfig                                   |   1 +
+ arch/arm64/Kconfig                                 |   1 +
+ arch/um/Kconfig.common                             |   1 +
+ arch/x86/Kconfig                                   |   1 +
+ arch/x86/entry/vdso/Makefile                       |   3 +-
+ arch/x86/purgatory/Makefile                        |   2 +
+ lib/Kconfig.debug                                  |   2 +
+ scripts/Makefile                                   |   2 +-
+ scripts/Makefile.build                             |   2 +-
+ scripts/Makefile.clean                             |   4 +-
+ scripts/Makefile.gcc-plugins                       |  41 +
+ scripts/Makefile.host                              |  55 +-
+ scripts/gcc-plugin.sh                              |  51 ++
+ scripts/gcc-plugins/Makefile                       |  27 +
+ scripts/gcc-plugins/cyc_complexity_plugin.c        |  73 ++
+ scripts/gcc-plugins/gcc-common.h                   | 830 +++++++++++++++++++++
+ scripts/gcc-plugins/gcc-generate-gimple-pass.h     | 175 +++++
+ scripts/gcc-plugins/gcc-generate-ipa-pass.h        | 289 +++++++
+ scripts/gcc-plugins/gcc-generate-rtl-pass.h        | 175 +++++
+ scripts/gcc-plugins/gcc-generate-simple_ipa-pass.h | 175 +++++
+ scripts/gcc-plugins/sancov_plugin.c                | 144 ++++
+ scripts/link-vmlinux.sh                            |   2 +-
+ scripts/package/builddeb                           |   1 +
+ 29 files changed, 2199 insertions(+), 16 deletions(-)
