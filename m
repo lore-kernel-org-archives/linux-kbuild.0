@@ -1,40 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:46258 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751807AbcEKLYe (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 11 May 2016 07:24:34 -0400
-Subject: Re: [PATCH v7 2/6] GCC plugin infrastructure
-References: <20160422201957.97ce16f0e67377d0ce613d19@gmail.com>
- <20160422202248.f3a31c6956a9135e9bdc0205@gmail.com>
-From: Michal Marek <mmarek@suse.com>
-Message-ID: <5733166E.4070401@suse.com>
-Date: Wed, 11 May 2016 13:24:30 +0200
+Received: from eu-smtp-delivery-143.mimecast.com ([207.82.80.143]:60428 "EHLO
+	eu-smtp-delivery-143.mimecast.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S932267AbcELJFJ convert rfc822-to-8bit
+	(ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 12 May 2016 05:05:09 -0400
+From: Huang Shijie <shijie.huang@arm.com>
+Subject: [PATCH] deb-pkg: add the shared header file for arm64
+Date: Thu, 12 May 2016 17:03:57 +0800
+Message-ID: <1463043837-4348-1-git-send-email-shijie.huang@arm.com>
 MIME-Version: 1.0
-In-Reply-To: <20160422202248.f3a31c6956a9135e9bdc0205@gmail.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Emese Revfy <re.emese@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, pageexec@freemail.hu, spender@grsecurity.net, kernel-hardening@lists.openwall.com, keescook@chromium.org, linux@rasmusvillemoes.dk, fengguang.wu@intel.com, dvyukov@google.com, linux-kernel@vger.kernel.org, david.brown@linaro.org, yamada.masahiro@socionext.com
+To: mmarek@suse.com
+Cc: nd@arm.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, steve.capper@arm.com, Huang Shijie <shijie.huang@arm.com>
 
-On 2016-04-22 20:22, Emese Revfy wrote:
-> diff --git a/Documentation/dontdiff b/Documentation/dontdiff
-> index 8ea834f..5385cba 100644
-> --- a/Documentation/dontdiff
-> +++ b/Documentation/dontdiff
-> @@ -3,6 +3,7 @@
->  *.bc
->  *.bin
->  *.bz2
-> +*.c.[012]*.*
->  *.cis
->  *.cpio
->  *.csp
+The arch/arm/include/asm/opcodes.h is also used by the arm64.
+This patch copies it to the arm64 deb package.
 
-Hi Emese,
+Signed-off-by: Huang Shijie <shijie.huang@arm.com>
+---
+ scripts/package/builddeb | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-Where are these files generated? It should be added to .gitignore and
-the clean or mrproper rule if it's needed.
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index 6c3b038..f4de0d7 100755
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -323,6 +323,12 @@ fi
+ # Build kernel header package
+ (cd $srctree; find . -name Makefile\* -o -name Kconfig\* -o -name \*.pl) > "$objtree/debian/hdrsrcfiles"
+ (cd $srctree; find arch/$SRCARCH/include include scripts -type f) >> "$objtree/debian/hdrsrcfiles"
++
++if [ "$ARCH" = "arm64" ]; then
++	# The arm64 shares the same header file with the arm
++	(cd $srctree; echo arch/arm/include/asm/opcodes.h) >> "$objtree/debian/hdrsrcfiles"
++fi
++
+ (cd $srctree; find arch/$SRCARCH -name module.lds -o -name Kbuild.platforms -o -name Platform) >> "$objtree/debian/hdrsrcfiles"
+ (cd $srctree; find $(find arch/$SRCARCH -name include -o -name scripts -type d) -type f) >> "$objtree/debian/hdrsrcfiles"
+ (cd $objtree; find arch/$SRCARCH/include Module.symvers include scripts -type f) >> "$objtree/debian/hdrobjfiles"
+-- 
+2.1.4
 
-Michal
