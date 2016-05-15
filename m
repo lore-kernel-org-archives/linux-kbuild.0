@@ -1,66 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pa0-f53.google.com ([209.85.220.53]:33680 "EHLO
-	mail-pa0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751208AbcENAhD (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 13 May 2016 20:37:03 -0400
-Received: by mail-pa0-f53.google.com with SMTP id xk12so45846287pac.0
-        for <linux-kbuild@vger.kernel.org>; Fri, 13 May 2016 17:37:02 -0700 (PDT)
-From: Martin Kelly <martin@surround.io>
-Subject: [PATCH] kconfig/merge_config.sh: add -C to choose make dir
-Date: Fri, 13 May 2016 17:36:20 -0700
-Message-Id: <1463186180-31967-1-git-send-email-martin@surround.io>
+Received: from mga04.intel.com ([192.55.52.120]:44254 "EHLO mga04.intel.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753994AbcEODJD (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 14 May 2016 23:09:03 -0400
+From: Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>
+Subject: [PATCH] scripts/package/Makefile: rpmbuild add support of RPMOPTS
+Date: Sat, 14 May 2016 20:09:52 -0700
+Message-Id: <1463281792-19129-1-git-send-email-srinivas.pandruvada@linux.intel.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org, yann.morin.1998@free.fr
-Cc: linux-kernel@vger.kernel.org, Martin Kelly <martin@surround.io>
+To: mmarek@suse.com, jim.epost@gmail.com
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>, stable@vger.kernel.org
 
-This is useful for running the script from somewhere besides the root of
-the source tree.
+After commit 21a59991ce0c ("scripts/package/Makefile: rpmbuild is needed
+for rpm targets"), it is no longer possible to specify RPMOPTS.
+For example, we can no longer able to control _topdir using the following
+make command.
+make RPMOPTS="--define '_topdir /home/xyz/workspace/'" binrpm-pkg
 
-Signed-off-by: Martin Kelly <martin@surround.io>
+Fixes: 21a59991ce0c ("scripts/package/Makefile: rpmbuild is needed
+for rpm targets")
+Cc: <stable@vger.kernel.org> # 4.3+
+Signed-off-by: Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>
 ---
- scripts/kconfig/merge_config.sh | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+ scripts/package/Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/scripts/kconfig/merge_config.sh b/scripts/kconfig/merge_config.sh
-index 67d1314..36b545d 100755
---- a/scripts/kconfig/merge_config.sh
-+++ b/scripts/kconfig/merge_config.sh
-@@ -32,6 +32,7 @@ usage() {
- 	echo "  -m    only merge the fragments, do not execute the make command"
- 	echo "  -n    use allnoconfig instead of alldefconfig"
- 	echo "  -r    list redundant entries when merging fragments"
-+	echo "  -C    dir in which to run make"
- 	echo "  -O    dir to put generated output files.  Consider setting \$KCONFIG_CONFIG instead."
- }
+diff --git a/scripts/package/Makefile b/scripts/package/Makefile
+index c2c7389..71b4a8a 100644
+--- a/scripts/package/Makefile
++++ b/scripts/package/Makefile
+@@ -52,7 +52,7 @@ rpm-pkg rpm: FORCE
+ 	$(call cmd,src_tar,$(KERNELPATH),kernel.spec)
+ 	$(CONFIG_SHELL) $(srctree)/scripts/mkversion > $(objtree)/.tmp_version
+ 	mv -f $(objtree)/.tmp_version $(objtree)/.version
+-	rpmbuild --target $(UTS_MACHINE) -ta $(KERNELPATH).tar.gz
++	rpmbuild $(RPMOPTS) --target $(UTS_MACHINE) -ta $(KERNELPATH).tar.gz
+ 	rm $(KERNELPATH).tar.gz kernel.spec
  
-@@ -61,6 +62,16 @@ while true; do
- 		shift
- 		continue
- 		;;
-+	"-C")
-+		if [ -d $2 ];then
-+			MAKEDIR=$(echo $2 | sed 's/\/*$//')
-+		else
-+			echo "make directory $2 does not exist" 1>&2
-+			exit 1
-+		fi
-+		shift 2
-+		continue
-+		;;
- 	"-O")
- 		if [ -d $2 ];then
- 			OUTPUT=$(echo $2 | sed 's/\/*$//')
-@@ -151,7 +162,7 @@ fi
- # Use the merged file as the starting point for:
- # alldefconfig: Fills in any missing symbols with Kconfig default
- # allnoconfig: Fills in any missing symbols with # CONFIG_* is not set
--make KCONFIG_ALLCONFIG=$TMP_FILE $OUTPUT_ARG $ALLTARGET
-+make -C "$MAKEDIR" KCONFIG_ALLCONFIG=$TMP_FILE $OUTPUT_ARG $ALLTARGET
+ # binrpm-pkg
+@@ -63,7 +63,7 @@ binrpm-pkg: FORCE
+ 	$(CONFIG_SHELL) $(srctree)/scripts/mkversion > $(objtree)/.tmp_version
+ 	mv -f $(objtree)/.tmp_version $(objtree)/.version
  
+-	rpmbuild --define "_builddir $(objtree)" --target \
++	rpmbuild $(RPMOPTS) --define "_builddir $(objtree)" --target \
+ 		$(UTS_MACHINE) -bb $(objtree)/binkernel.spec
+ 	rm binkernel.spec
  
- # Check all specified config values took (might have missed-dependency issues)
 -- 
-2.1.4
+2.5.5
 
