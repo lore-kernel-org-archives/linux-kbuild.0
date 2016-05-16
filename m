@@ -1,36 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:45146 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:47645 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752451AbcEPHGR (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 16 May 2016 03:06:17 -0400
-Subject: Re: [PATCH] scripts/tags.sh: Exit gracefully if *tags tool not found
-References: <1461516120-5600-1-git-send-email-eugeniu.m.rosca@gmail.com>
- <571E0F1F.8090204@suse.com> <20160515134413.GA14628@eugeniu-X230>
+	id S1751550AbcEPMCb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 16 May 2016 08:02:31 -0400
+Date: Mon, 16 May 2016 14:02:28 +0200
 From: Michal Marek <mmarek@suse.com>
-Message-ID: <57397167.4000000@suse.com>
-Date: Mon, 16 May 2016 09:06:15 +0200
+Subject: Re: [PATCH] scripts/package/Makefile: rpmbuild add support of RPMOPTS
+Message-ID: <20160516120228.GC2660@sepie.suse.cz>
+References: <1463281792-19129-1-git-send-email-srinivas.pandruvada@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20160515134413.GA14628@eugeniu-X230>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1463281792-19129-1-git-send-email-srinivas.pandruvada@linux.intel.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Eugeniu Rosca <eugeniu.m.rosca@gmail.com>
-Cc: linux-kbuild@vger.kernel.org
+To: Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>
+Cc: jim.epost@gmail.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org
 
-On 2016-05-15 15:44, Eugeniu Rosca wrote:
-> I would kindly ask you to select one of the options provided below:
+On Sat, May 14, 2016 at 08:09:52PM -0700, Srinivas Pandruvada wrote:
+> After commit 21a59991ce0c ("scripts/package/Makefile: rpmbuild is needed
+> for rpm targets"), it is no longer possible to specify RPMOPTS.
+> For example, we can no longer able to control _topdir using the following
+> make command.
+> make RPMOPTS="--define '_topdir /home/xyz/workspace/'" binrpm-pkg
 > 
-> OPTION 1: Append '|| exit' to the docscope/dogtags/xtags calls.
-> RESULT: This produces more error messages than with the original script:
-> 
-> $> make cscope
->   GEN     cscope
-> ./scripts/tags.sh: line 140: cscope: command not found
-> Makefile:1517: recipe for target 'cscope' failed
-> make: *** [cscope] Error 127
-> [...]
+> Fixes: 21a59991ce0c ("scripts/package/Makefile: rpmbuild is needed
+> for rpm targets")
+> Cc: <stable@vger.kernel.org> # 4.3+
+> Signed-off-by: Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>
+> ---
+>  scripts/package/Makefile | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
-This is the correct behavior because a missing tool is an error.
+Applied to kbuild.git#misc.
 
 Michal
