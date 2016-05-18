@@ -1,68 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:36729 "EHLO
-	mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752042AbcERKtx (ORCPT
+Received: from e23smtp09.au.ibm.com ([202.81.31.142]:56709 "EHLO
+	e23smtp09.au.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752763AbcERVQD (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 18 May 2016 06:49:53 -0400
-Date: Wed, 18 May 2016 12:56:59 +0200
-From: Emese Revfy <re.emese@gmail.com>
-Subject: Re: [PATCH v8 2/4] GCC plugin infrastructure
-Message-Id: <20160518125659.a608972488e2c33f9ec3ed7b@gmail.com>
-In-Reply-To: <573B2A75.9030603@suse.com>
+	Wed, 18 May 2016 17:16:03 -0400
+Received: from localhost
+	by e23smtp09.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-kbuild@vger.kernel.org> from <andrew.donnellan@au1.ibm.com>;
+	Thu, 19 May 2016 07:16:00 +1000
+Subject: Re: [kernel-hardening] [PATCH v8 2/4] GCC plugin infrastructure
 References: <20160513015456.01415979f20a68eb7d2d9290@gmail.com>
-	<20160513015725.30223ee16a2a3860b4392b90@gmail.com>
-	<573B2A75.9030603@suse.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+ <20160513015725.30223ee16a2a3860b4392b90@gmail.com>
+ <573C2CFE.8060305@au1.ibm.com>
+ <20160518123327.9018f73af78a47b4456b2027@gmail.com>
+From: Andrew Donnellan <andrew.donnellan@au1.ibm.com>
+Message-ID: <573CDB52.30701@au1.ibm.com>
+Date: Thu, 19 May 2016 07:14:58 +1000
+MIME-Version: 1.0
+In-Reply-To: <20160518123327.9018f73af78a47b4456b2027@gmail.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>
-Cc: linux-kbuild@vger.kernel.org, pageexec@freemail.hu, spender@grsecurity.net, kernel-hardening@lists.openwall.com, keescook@chromium.org, linux@rasmusvillemoes.dk, fengguang.wu@intel.com, dvyukov@google.com, linux-kernel@vger.kernel.org, david.brown@linaro.org, yamada.masahiro@socionext.com
+To: Emese Revfy <re.emese@gmail.com>, kernel-hardening@lists.openwall.com
+Cc: linux-kbuild@vger.kernel.org, pageexec@freemail.hu, spender@grsecurity.net, mmarek@suse.com, keescook@chromium.org, linux@rasmusvillemoes.dk, fengguang.wu@intel.com, dvyukov@google.com, linux-kernel@vger.kernel.org, david.brown@linaro.org, yamada.masahiro@socionext.com, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, Michael Ellerman <mpe@ellerman.id.au>, Daniel Axtens <dja@axtens.net>
 
-On Tue, 17 May 2016 16:28:05 +0200
-Michal Marek <mmarek@suse.com> wrote:
+On 18/05/16 20:33, Emese Revfy wrote:
+> Did you test the plugins with all gcc versions (4.5-6)?
 
-> Dne 13.5.2016 v 01:57 Emese Revfy napsal(a):
-> > --- /dev/null
-> > +++ b/scripts/Makefile.gcc-plugins
-> > @@ -0,0 +1,21 @@
-> > +ifdef CONFIG_GCC_PLUGINS
-> > +  __PLUGINCC := $(call cc-ifversion, -ge, 0408, $(HOSTCXX), $(HOSTCC))
-> > +  PLUGINCC := $(shell $(CONFIG_SHELL) $(srctree)/scripts/gcc-plugin.sh "$(__PLUGINCC)" "$(HOSTCXX)" "$(CC)")
-> > +
-> > +  GCC_PLUGINS_CFLAGS := $(addprefix -fplugin=$(objtree)/scripts/gcc-plugins/, $(gcc-plugin-y))
-> > +
-> > +  ifeq ($(PLUGINCC),)
-> > +    ifneq ($(GCC_PLUGINS_CFLAGS),)
-> > +      ifeq ($(call cc-ifversion, -ge, 0405, y), y)
-> > +        PLUGINCC := $(shell $(CO, NFIG_SHELL) -x $(srctree)/scripts/gcc-plugin.sh "$(__PLUGINCC)" "$(HOSTCXX)" "$(CC)")
-> > +        $(error error, your gcc installation does not support plugins, perhaps the necessary headers are missing?)
-> > +      else
-> > +        $(error error, your gcc version does not support plugins, you should upgrade it to gcc 4.5 at least)
-> > +      endif
-> > +    endif
-> > +  endif
-> > +
-> > +  KBUILD_CFLAGS += $(GCC_PLUGINS_CFLAGS)
-> > +  GCC_PLUGIN := $(gcc-plugin-y)
-> > +
-> > +endif
-> 
-> Hi Emese,
-> 
-> sorry for the late feedback. A problem I ran into now is that if you
-> have a compiler that is either too old or built with plugin support
-> disabled, scripts/Makefile.gcc-plugins errors out immediately. This is
-> going to be an issue with allmodconfig/allyesconfig test builds. A
-> solution would either be to make the respective options depend on
-> !COMPILE_TEST, or turn the errors into warnings and do nothing if the
-> compiler lacks plugin support. We are handling CONFIG_CC_STACKPROTECTOR
-> on x86 this way already.
-
-Hi,
-
-I'll change the errors to warnings in the next patch set.
+No, I tested with 4.8 and 5.2 as those are the toolchains I have on hand 
+- I'll try to test with the rest of 4.5 - 6.1.
 
 -- 
-Emese
+Andrew Donnellan              OzLabs, ADL Canberra
+andrew.donnellan@au1.ibm.com  IBM Australia Limited
+
