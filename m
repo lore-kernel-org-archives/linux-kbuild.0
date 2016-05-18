@@ -1,58 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:39765 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751204AbcEQO2J (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 17 May 2016 10:28:09 -0400
-Subject: Re: [PATCH v8 2/4] GCC plugin infrastructure
+Received: from e23smtp03.au.ibm.com ([202.81.31.145]:43689 "EHLO
+	e23smtp03.au.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751583AbcERI2T (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 18 May 2016 04:28:19 -0400
+Received: from localhost
+	by e23smtp03.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+	for <linux-kbuild@vger.kernel.org> from <andrew.donnellan@au1.ibm.com>;
+	Wed, 18 May 2016 18:28:16 +1000
+Subject: Re: [kernel-hardening] [PATCH v8 3/4] Add Cyclomatic complexity GCC
+ plugin
 References: <20160513015456.01415979f20a68eb7d2d9290@gmail.com>
- <20160513015725.30223ee16a2a3860b4392b90@gmail.com>
-From: Michal Marek <mmarek@suse.com>
-Message-ID: <573B2A75.9030603@suse.com>
-Date: Tue, 17 May 2016 16:28:05 +0200
+ <20160513015833.cfb5334d075525b27269649c@gmail.com>
+From: Andrew Donnellan <andrew.donnellan@au1.ibm.com>
+Message-ID: <573C26DC.6020607@au1.ibm.com>
+Date: Wed, 18 May 2016 18:25:00 +1000
 MIME-Version: 1.0
-In-Reply-To: <20160513015725.30223ee16a2a3860b4392b90@gmail.com>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <20160513015833.cfb5334d075525b27269649c@gmail.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Emese Revfy <re.emese@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, pageexec@freemail.hu, spender@grsecurity.net, kernel-hardening@lists.openwall.com, keescook@chromium.org, linux@rasmusvillemoes.dk, fengguang.wu@intel.com, dvyukov@google.com, linux-kernel@vger.kernel.org, david.brown@linaro.org, yamada.masahiro@socionext.com
+To: kernel-hardening@lists.openwall.com, linux-kbuild@vger.kernel.org
+Cc: pageexec@freemail.hu, spender@grsecurity.net, mmarek@suse.com, keescook@chromium.org, linux@rasmusvillemoes.dk, fengguang.wu@intel.com, dvyukov@google.com, linux-kernel@vger.kernel.org, david.brown@linaro.org, yamada.masahiro@socionext.com
 
-Dne 13.5.2016 v 01:57 Emese Revfy napsal(a):
-> --- /dev/null
-> +++ b/scripts/Makefile.gcc-plugins
-> @@ -0,0 +1,21 @@
-> +ifdef CONFIG_GCC_PLUGINS
-> +  __PLUGINCC := $(call cc-ifversion, -ge, 0408, $(HOSTCXX), $(HOSTCC))
-> +  PLUGINCC := $(shell $(CONFIG_SHELL) $(srctree)/scripts/gcc-plugin.sh "$(__PLUGINCC)" "$(HOSTCXX)" "$(CC)")
-> +
-> +  GCC_PLUGINS_CFLAGS := $(addprefix -fplugin=$(objtree)/scripts/gcc-plugins/, $(gcc-plugin-y))
-> +
-> +  ifeq ($(PLUGINCC),)
-> +    ifneq ($(GCC_PLUGINS_CFLAGS),)
-> +      ifeq ($(call cc-ifversion, -ge, 0405, y), y)
-> +        PLUGINCC := $(shell $(CO, NFIG_SHELL) -x $(srctree)/scripts/gcc-plugin.sh "$(__PLUGINCC)" "$(HOSTCXX)" "$(CC)")
-> +        $(error error, your gcc installation does not support plugins, perhaps the necessary headers are missing?)
-> +      else
-> +        $(error error, your gcc version does not support plugins, you should upgrade it to gcc 4.5 at least)
-> +      endif
-> +    endif
-> +  endif
-> +
-> +  KBUILD_CFLAGS += $(GCC_PLUGINS_CFLAGS)
-> +  GCC_PLUGIN := $(gcc-plugin-y)
-> +
-> +endif
+On 13/05/16 09:58, Emese Revfy wrote:
+> Add a very simple plugin to demonstrate the GCC plugin infrastructure. This GCC
+> plugin computes the cyclomatic complexity of each function.
 
-Hi Emese,
+...
 
-sorry for the late feedback. A problem I ran into now is that if you
-have a compiler that is either too old or built with plugin support
-disabled, scripts/Makefile.gcc-plugins errors out immediately. This is
-going to be an issue with allmodconfig/allyesconfig test builds. A
-solution would either be to make the respective options depend on
-!COMPILE_TEST, or turn the errors into warnings and do nothing if the
-compiler lacks plugin support. We are handling CONFIG_CC_STACKPROTECTOR
-on x86 this way already.
+> +config GCC_PLUGIN_CYC_COMPLEXITY
+> +	bool "Compute the cyclomatic complexity of a function"
+> +	depends on GCC_PLUGINS
+> +	help
+> +	  The complexity M of a function's control flow graph is defined as:
+> +	   M = E - N + 2P
+> +	  where
+> +
+> +	  E = the number of edges
+> +	  N = the number of nodes
+> +	  P = the number of connected components (exit nodes).
+> +
 
-Michal
+If this plugin is intended primarily as a demonstration it's probably 
+worth mentioning this in the Kconfig description.
+
+-- 
+Andrew Donnellan              OzLabs, ADL Canberra
+andrew.donnellan@au1.ibm.com  IBM Australia Limited
+
