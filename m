@@ -1,37 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from e23smtp09.au.ibm.com ([202.81.31.142]:56709 "EHLO
-	e23smtp09.au.ibm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752763AbcERVQD (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 18 May 2016 17:16:03 -0400
-Received: from localhost
-	by e23smtp09.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-	for <linux-kbuild@vger.kernel.org> from <andrew.donnellan@au1.ibm.com>;
-	Thu, 19 May 2016 07:16:00 +1000
+Received: from ozlabs.org ([103.22.144.67]:41457 "EHLO ozlabs.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752061AbcESGWQ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 19 May 2016 02:22:16 -0400
+Message-ID: <1463638931.10451.10.camel@ellerman.id.au>
 Subject: Re: [kernel-hardening] [PATCH v8 2/4] GCC plugin infrastructure
-References: <20160513015456.01415979f20a68eb7d2d9290@gmail.com>
- <20160513015725.30223ee16a2a3860b4392b90@gmail.com>
- <573C2CFE.8060305@au1.ibm.com>
- <20160518123327.9018f73af78a47b4456b2027@gmail.com>
-From: Andrew Donnellan <andrew.donnellan@au1.ibm.com>
-Message-ID: <573CDB52.30701@au1.ibm.com>
-Date: Thu, 19 May 2016 07:14:58 +1000
-MIME-Version: 1.0
+From: Michael Ellerman <mpe@ellerman.id.au>
+Date: Thu, 19 May 2016 16:22:11 +1000
 In-Reply-To: <20160518123327.9018f73af78a47b4456b2027@gmail.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+References: <20160513015456.01415979f20a68eb7d2d9290@gmail.com>
+	 <20160513015725.30223ee16a2a3860b4392b90@gmail.com>
+	 <573C2CFE.8060305@au1.ibm.com>
+	 <20160518123327.9018f73af78a47b4456b2027@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Emese Revfy <re.emese@gmail.com>, kernel-hardening@lists.openwall.com
-Cc: linux-kbuild@vger.kernel.org, pageexec@freemail.hu, spender@grsecurity.net, mmarek@suse.com, keescook@chromium.org, linux@rasmusvillemoes.dk, fengguang.wu@intel.com, dvyukov@google.com, linux-kernel@vger.kernel.org, david.brown@linaro.org, yamada.masahiro@socionext.com, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, Michael Ellerman <mpe@ellerman.id.au>, Daniel Axtens <dja@axtens.net>
+Cc: Andrew Donnellan <andrew.donnellan@au1.ibm.com>, linux-kbuild@vger.kernel.org, pageexec@freemail.hu, spender@grsecurity.net, mmarek@suse.com, keescook@chromium.org, linux@rasmusvillemoes.dk, fengguang.wu@intel.com, dvyukov@google.com, linux-kernel@vger.kernel.org, david.brown@linaro.org, yamada.masahiro@socionext.com, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, Daniel Axtens <dja@axtens.net>
 
-On 18/05/16 20:33, Emese Revfy wrote:
+On Wed, 2016-05-18 at 12:33 +0200, Emese Revfy wrote:
+
+> > I've done some basic sanity testing on powerpc with the cyclomatic 
+> > complexity plugin (with LE native + cross-compilers) and it seems to 
+> > work with the patch below.
+> > 
+> > Signed-off-by: Andrew Donnellan <andrew.donnellan@au1.ibm.com>
+> > 
+> > diff --git a/arch/powerpc/Kconfig b/arch/powerpc/Kconfig
+> > index a18a0dc..0cfed5b 100644
+> > --- a/arch/powerpc/Kconfig
+> > +++ b/arch/powerpc/Kconfig
+> > @@ -97,6 +97,7 @@ config PPC
+> >          select HAVE_DYNAMIC_FTRACE_WITH_REGS if MPROFILE_KERNEL
+> >          select HAVE_FUNCTION_TRACER
+> >          select HAVE_FUNCTION_GRAPH_TRACER
+> > +       select HAVE_GCC_PLUGINS
+> >          select SYSCTL_EXCEPTION_TRACE
+> >          select ARCH_WANT_OPTIONAL_GPIOLIB
+> >          select VIRT_TO_BUS if !PPC64
+> 
+> Hi,
+> 
 > Did you test the plugins with all gcc versions (4.5-6)?
 
-No, I tested with 4.8 and 5.2 as those are the toolchains I have on hand 
-- I'll try to test with the rest of 4.5 - 6.1.
+What's the concern about gcc versions? Just not breaking the build on old
+compilers?
 
--- 
-Andrew Donnellan              OzLabs, ADL Canberra
-andrew.donnellan@au1.ibm.com  IBM Australia Limited
+I'm pretty sure powerpc big endian still builds with gcc 4.4.
+
+However if Andrew's only tested on little endian, then that select should be
+guarded with an "if CPU_LITTLE_ENDIAN". And to build LE you need gcc >= 4.9.
+
+cheers
 
