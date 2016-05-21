@@ -1,60 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([103.22.144.67]:51537 "EHLO ozlabs.org"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755227AbcETKKf (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 20 May 2016 06:10:35 -0400
-Message-ID: <1463739032.23394.8.camel@ellerman.id.au>
-Subject: Re: [kernel-hardening] [PATCH v8 2/4] GCC plugin infrastructure
-From: Michael Ellerman <mpe@ellerman.id.au>
-Date: Fri, 20 May 2016 20:10:32 +1000
-In-Reply-To: <573D782D.10392.75A275C@pageexec.freemail.hu>
-References: <20160513015456.01415979f20a68eb7d2d9290@gmail.com>
-	, <20160518123327.9018f73af78a47b4456b2027@gmail.com>
-	, <1463638931.10451.10.camel@ellerman.id.au>
-	 <573D782D.10392.75A275C@pageexec.freemail.hu>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Received: from mail-lf0-f65.google.com ([209.85.215.65]:33372 "EHLO
+	mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750941AbcEULlf (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Sat, 21 May 2016 07:41:35 -0400
+From: Andrea Gelmini <andrea.gelmini@gelma.net>
+Subject: [PATCH 0044/1529] Fix typo
+Date: Sat, 21 May 2016 13:41:28 +0200
+Message-Id: <20160521114128.1197-1-andrea.gelmini@gelma.net>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: pageexec@freemail.hu, Emese Revfy <re.emese@gmail.com>, kernel-hardening@lists.openwall.com
-Cc: Andrew Donnellan <andrew.donnellan@au1.ibm.com>, linux-kbuild@vger.kernel.org, spender@grsecurity.net, mmarek@suse.com, keescook@chromium.org, linux@rasmusvillemoes.dk, fengguang.wu@intel.com, dvyukov@google.com, linux-kernel@vger.kernel.org, david.brown@linaro.org, yamada.masahiro@socionext.com, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, Daniel Axtens <dja@axtens.net>
+To: andrea.gelmini@gelma.net
+Cc: trivial@kernel.org, yann.morin.1998@free.fr, mmarek@suse.com, corbet@lwn.net, linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org
 
-On Thu, 2016-05-19 at 10:24 +0200, PaX Team wrote:
-> On 19 May 2016 at 16:22, Michael Ellerman wrote:
-> > On Wed, 2016-05-18 at 12:33 +0200, Emese Revfy wrote:
-> > > Did you test the plugins with all gcc versions (4.5-6)?
-> > 
-> > What's the concern about gcc versions? Just not breaking the build on old
-> > compilers?
-> 
-> the earlier plugin capable gcc versions used to install gcc headers in a somewhat
-> ad-hoc manner resulting in compile time breakage for plugins and since some of
-> those potentially missing headers are target specific, each target arch should
-> be verified before enabling plugin support on them. things have much improved with
-> gcc 5 (see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=61176) though there's still
-> an occasional missing header but with wider use of plugins they will hopefully be
-> discovered earlier now. 
+Signed-off-by: Andrea Gelmini <andrea.gelmini@gelma.net>
+---
+ Documentation/kbuild/kconfig-language.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-OK thanks.
-
-> perhaps linux-arch should be cc'ed on the plugin infrastructure
-> so that arch maintainers are aware of this?
-
-linux-arch is still fairly high traffic, so it's no guarantee arch maintainers
-will see it, but it's probably worth a try.
-
-> > I'm pretty sure powerpc big endian still builds with gcc 4.4.
-> > 
-> > However if Andrew's only tested on little endian, then that select should be
-> > guarded with an "if CPU_LITTLE_ENDIAN". And to build LE you need gcc >= 4.9.
-> 
-> i guess that's part of the target tuple so in general arch maintainers should test
-> the target tuples used on their arch with all the supported gcc versions (speaking
-> of CC, not HOSTCC/HOSTCXX).
-
-Yeah. I think we'll probably enable it gradually as folks get time to test it.
-ie. ppc64le first, then ppc64 (BE), and then 32-bit if someone is interested.
-
-cheers
+diff --git a/Documentation/kbuild/kconfig-language.txt b/Documentation/kbuild/kconfig-language.txt
+index c52856d..14783c7 100644
+--- a/Documentation/kbuild/kconfig-language.txt
++++ b/Documentation/kbuild/kconfig-language.txt
+@@ -511,7 +511,7 @@ the use of the xconfig configurator [1]. Work should be done to confirm if
+ the deduced semantics matches our intended Kconfig design goals.
+ 
+ Having well defined semantics can be useful for tools for practical
+-evaluation of depenencies, for instance one such use known case was work to
++evaluation of dependencies, for instance one such use known case was work to
+ express in boolean abstraction of the inferred semantics of Kconfig to
+ translate Kconfig logic into boolean formulas and run a SAT solver on this to
+ find dead code / features (always inactive), 114 dead features were found in
+-- 
+2.8.2.534.g1f66975
 
