@@ -1,116 +1,72 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:33540 "EHLO
-	mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753046AbcEWWKg (ORCPT
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:35333 "EHLO
+	mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751124AbcEWXC2 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 23 May 2016 18:10:36 -0400
-Date: Tue, 24 May 2016 00:17:36 +0200
-From: Emese Revfy <re.emese@gmail.com>
-Subject: [PATCH v1 3/3] Add the extra_latent_entropy kernel parameter
-Message-Id: <20160524001736.135ae3cdc101ecec3232a493@gmail.com>
-In-Reply-To: <20160524001405.3e6abd1d5a63a871cc366cff@gmail.com>
-References: <20160524001405.3e6abd1d5a63a871cc366cff@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+	Mon, 23 May 2016 19:02:28 -0400
+Received: by mail-wm0-f67.google.com with SMTP id f75so847988wmf.2
+        for <linux-kbuild@vger.kernel.org>; Mon, 23 May 2016 16:02:28 -0700 (PDT)
+From: Kieran Bingham <kieran@ksquared.org.uk>
+Subject: Automatic dependency resolution on generated python file
+Message-ID: <57438C01.6090601@bingham.xyz>
+Date: Tue, 24 May 2016 00:02:25 +0100
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: kernel-hardening@lists.openwall.com
-Cc: pageexec@freemail.hu, spender@grsecurity.net, mmarek@suse.com, keescook@chromium.org, linux-kernel@vger.kernel.org, yamada.masahiro@socionext.com, linux-kbuild@vger.kernel.org, tytso@mit.edu, akpm@linux-foundation.org, linux-mm@kvack.org, axboe@kernel.dk, viro@zeniv.linux.org.uk, paulmck@linux.vnet.ibm.com, mingo@redhat.com, tglx@linutronix.de, bart.vanassche@sandisk.com, davem@davemloft.net
+To: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.com>
+Cc: Jan Kiszka <jan.kiszka@web.de>
 
-When extra_latent_entropy is passed on the kernel command line,
-entropy will be extracted from up to the first 4GB of RAM while the
-runtime memory allocator is being initialized.
+Hi Kbuild / Michal,
 
-Based on work created by the PaX Team.
+I've been working through a problem that Jan has reported whereby if we
+modify a file included by our template  for constants.py, the generated
+file is not rebuilt.
 
-Signed-off-by: Emese Revfy <re.emese@gmail.com>
----
- Documentation/kernel-parameters.txt |  5 +++++
- arch/Kconfig                        |  5 +++++
- mm/page_alloc.c                     | 23 +++++++++++++++++++++++
- 3 files changed, 33 insertions(+)
+The rule/cmd [0] to generate the python constants is
+cmd_gen_constants_py which uses the $(CPP) with $(c_flags) to create the
+output.
 
-diff --git a/Documentation/kernel-parameters.txt b/Documentation/kernel-parameters.txt
-index 5349363..6c2496e 100644
---- a/Documentation/kernel-parameters.txt
-+++ b/Documentation/kernel-parameters.txt
-@@ -2862,6 +2862,11 @@ bytes respectively. Such letter suffixes can also be entirely omitted.
- 			the specified number of seconds.  This is to be used if
- 			your oopses keep scrolling off the screen.
- 
-+	extra_latent_entropy
-+			Enable a very simple form of latent entropy extraction
-+			from the first 4GB of memory as the bootmem allocator
-+			passes the memory pages to the buddy allocator.
-+
- 	pcbit=		[HW,ISDN]
- 
- 	pcd.		[PARIDE]
-diff --git a/arch/Kconfig b/arch/Kconfig
-index 74489df..327d1e4 100644
---- a/arch/Kconfig
-+++ b/arch/Kconfig
-@@ -403,6 +403,11 @@ config GCC_PLUGIN_LATENT_ENTROPY
- 	  there is little 'natural' source of entropy normally.  The cost
- 	  is some slowdown of the boot process and fork and irq processing.
- 
-+	  When extra_latent_entropy is passed on the kernel command line,
-+	  entropy will be extracted from up to the first 4GB of RAM while the
-+	  runtime memory allocator is being initialized.  This costs even more
-+	  slowdown of the boot process.
-+
- 	  Note that entropy extracted this way is not known to be cryptographically
- 	  secure!
- 
-diff --git a/mm/page_alloc.c b/mm/page_alloc.c
-index ffc4f4a..c79407b 100644
---- a/mm/page_alloc.c
-+++ b/mm/page_alloc.c
-@@ -63,6 +63,7 @@
- #include <linux/sched/rt.h>
- #include <linux/page_owner.h>
- #include <linux/kthread.h>
-+#include <linux/random.h>
- 
- #include <asm/sections.h>
- #include <asm/tlbflush.h>
-@@ -1235,6 +1236,15 @@ static void __free_pages_ok(struct page *page, unsigned int order)
- }
- 
- #ifdef CONFIG_GCC_PLUGIN_LATENT_ENTROPY
-+bool __meminitdata extra_latent_entropy;
-+
-+static int __init setup_extra_latent_entropy(char *str)
-+{
-+	extra_latent_entropy = true;
-+	return 0;
-+}
-+early_param("extra_latent_entropy", setup_extra_latent_entropy);
-+
- volatile u64 latent_entropy __latent_entropy;
- EXPORT_SYMBOL(latent_entropy);
- #endif
-@@ -1254,6 +1264,19 @@ static void __init __free_pages_boot_core(struct page *page, unsigned int order)
- 	__ClearPageReserved(p);
- 	set_page_count(p, 0);
- 
-+#ifdef CONFIG_GCC_PLUGIN_LATENT_ENTROPY
-+	if (extra_latent_entropy && !PageHighMem(page) && page_to_pfn(page) < 0x100000) {
-+		u64 hash = 0;
-+		size_t index, end = PAGE_SIZE * nr_pages / sizeof hash;
-+		const u64 *data = lowmem_page_address(page);
-+
-+		for (index = 0; index < end; index++)
-+			hash ^= hash + data[index];
-+		latent_entropy ^= hash;
-+		add_device_randomness((const void *)&latent_entropy, sizeof(latent_entropy));
-+	}
-+#endif
-+
- 	page_zone(page)->managed_pages += nr_pages;
- 	set_page_refcounted(page);
- 	__free_pages(page, order);
+One benefit of this is that it already creates the $(depfile) through
+the addition of the flags provided by $(c_flags), however as yet it
+would seem that my efforts to understand how the $(depfile) gets
+included have failed.
+
+From what I can tell, the $(call if_changed...) rule is generating my
+targets .constants.py.cmd, but the .d file is not being utilised.
+
+By swapping $(call if_changed, ) to $(call if_changed_dep,...) I can see
+that my .constants.py.cmd [1] file now has (apparently) correct
+dependency rules being generated. However they still don't take actual
+effect. If I 'touch/modify' one of the files I have added to the
+#includes, then my target is not rebuilt (I have added
+include/linux/kieran.h for testing this specifically without rebuilding
+all other objects)
+
+I can see at the bottom of my .constants.py.cmd :
+  scripts/gdb/linux/constants.py: $(deps_scripts/gdb/linux/constants.py)
+  $(deps_scripts/gdb/linux/constants.py):
+
+which looks like it's doing the right thing to me ... except it's not
+actually allowing the rule to run if a dependency is updated.
+
+Is this failing because it is being called from the top Kbuild, as part
+of making sure it is built after bounds.h, or is it because I'm not
+generating from the builtin rules?
+
+I'm hoping perhaps I've missed a stage or something obvious that will
+make this automatic dependency resolution 'just-work' for recreating the
+constants file.
+
 -- 
-2.8.1
+Regards
+
+Kieran Bingham
+
+
+[0]
+https://git.kernel.org/cgit/linux/kernel/git/next/linux-next.git/tree/scripts/gdb/linux/Makefile
+
+[1] http://paste.ubuntu.com/16645481/
 
