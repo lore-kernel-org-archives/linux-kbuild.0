@@ -1,64 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f44.google.com ([74.125.82.44]:38692 "EHLO
-	mail-wm0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751278AbcEYCzU (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 24 May 2016 22:55:20 -0400
-Received: by mail-wm0-f44.google.com with SMTP id n129so45409076wmn.1
-        for <linux-kbuild@vger.kernel.org>; Tue, 24 May 2016 19:55:19 -0700 (PDT)
+Received: from mx2.suse.de ([195.135.220.15]:51820 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750765AbcEYKqV (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 25 May 2016 06:46:21 -0400
+Subject: Re: [PATCH v9 0/4] Introduce GCC plugin infrastructure
+References: <20160524000719.b456ed0cd2aafacb4e53f177@gmail.com>
+ <CAGXu5jKC=HuCe3FPuuzjAZ+SX6C5AnhMp5BWwLhi8xVXhTGjEg@mail.gmail.com>
+From: Michal Marek <mmarek@suse.com>
+Message-ID: <57458279.6080009@suse.com>
+Date: Wed, 25 May 2016 12:46:17 +0200
 MIME-Version: 1.0
-In-Reply-To: <5744E665.28844.9DDA03D@pageexec.freemail.hu>
-References: <20160524001405.3e6abd1d5a63a871cc366cff@gmail.com>
- <20160524001529.0e69232eff0b1b5bc566a763@gmail.com> <CAGXu5jJHenHARDZt=51m1XbSStTxpG90Dv=Fpkn79A6pZYtGOw@mail.gmail.com>
- <5744E665.28844.9DDA03D@pageexec.freemail.hu>
-From: Kees Cook <keescook@chromium.org>
-Date: Tue, 24 May 2016 19:55:17 -0700
-Message-ID: <CAGXu5jJ4iOHw+9khys3HVKAJH6q4Vu+8aSabycYWUCdK9GonKw@mail.gmail.com>
-Subject: Re: [PATCH v1 1/3] Add the latent_entropy gcc plugin
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <CAGXu5jKC=HuCe3FPuuzjAZ+SX6C5AnhMp5BWwLhi8xVXhTGjEg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: PaX Team <pageexec@freemail.hu>
-Cc: Emese Revfy <re.emese@gmail.com>, "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, Brad Spengler <spender@grsecurity.net>, Michal Marek <mmarek@suse.com>, LKML <linux-kernel@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, Theodore Ts'o <tytso@mit.edu>, Andrew Morton <akpm@linux-foundation.org>, Linux-MM <linux-mm@kvack.org>, Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>, Paul McKenney <paulmck@linux.vnet.ibm.com>, Ingo Molnar <mingo@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, bart.vanassche@sandisk.com, "David S. Miller" <davem@davemloft.net>
+To: Kees Cook <keescook@chromium.org>, Emese Revfy <re.emese@gmail.com>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, PaX Team <pageexec@freemail.hu>, Brad Spengler <spender@grsecurity.net>, "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Fengguang Wu <fengguang.wu@intel.com>, Dmitry Vyukov <dvyukov@google.com>, LKML <linux-kernel@vger.kernel.org>, David Brown <david.brown@linaro.org>, Masahiro Yamada <yamada.masahiro@socionext.com>
 
-On Tue, May 24, 2016 at 4:40 PM, PaX Team <pageexec@freemail.hu> wrote:
-> On 24 May 2016 at 10:32, Kees Cook wrote:
->
->> On Mon, May 23, 2016 at 3:15 PM, Emese Revfy <re.emese@gmail.com> wrote:
->> > This plugin mitigates the problem of the kernel having too little entropy during
->> > and after boot for generating crypto keys.
->> >
->> I'm excited to see this! This looks like it'll help a lot with early
->> entropy, which is something that'll be a problem for some
->> architectures that are trying to do early randomish things (e.g. the
->> heap layout randomization, various canaries, etc).
+On 2016-05-24 19:04, Kees Cook wrote:
+> On Mon, May 23, 2016 at 3:07 PM, Emese Revfy <re.emese@gmail.com> wrote:
+>> This patch set introduce the GCC plugin infrastructure with examples for testing
+>> and documentation.
 >>
->> Do you have any good examples of a before/after case of early
->> randomness being fixed by this?
->
-> unfortunately, i don't know of a way to quantify this kind of PRNG as the effective
-> algorithm is not something simple and well-structured for which we have theories and
-> tools to analyze already. of course this cuts both ways, an attacker faces the same
-> barrier of non-analyzability.
->
-> what can at most be observed is the state of the latent_entropy global variable after
-> init across many boots but that'd provide a rather low and useless lower estimate only
-> (e.g., up to 20 bits for a million reboots, or 30 bits for a billion reboots, etc).
->
-> to answer your question, i'd like to believe that there's enough latent entropy in
-> program state that can be harnessed to (re)seed the entropy pool but we'll probably
-> never know just how well we are doing it so accounting for it and claiming 'fixed'
-> will stay in the realm of wishful thinking i'm afraid.
+>> GCC plugins are loadable modules that provide extra features to the compiler.
+>> They are useful for runtime instrumentation and static analysis.
+>>
+>> The infrastructure supports all gcc versions from 4.5 to 6.0, building
+>> out-of-tree modules and building in a separate directory. Cross-compilation
+>> is supported too but currently only the x86, arm, arm64 and uml architectures enable plugins.
+>>
+>> This infrastructure was ported from grsecurity/PaX. Based on work created by the PaX Team.
+>> It is a CII project supported by the Linux Foundation.
+>>
+>> Emese Revfy (4):
+>>  Shared library support
+>>  GCC plugin infrastructure
+>>  Add Cyclomatic complexity plugin
+>>  Add sancov plugin
+> 
+> Michal, once -rc1 is out, can you carry this for -next?
 
-Yeah, answering "how random is this?" is not easy, but that's not what
-I meant. I'm more curious about specific build configs or hardware
-where calling get_random_int() early enough would always produce the
-same value (or the same value across all threads, etc), and in these
-cases, the new entropy should be visible when using the latent entropy
-plugin.
+Yes.
 
--Kees
+Michal
 
--- 
-Kees Cook
-Chrome OS & Brillo Security
