@@ -1,26 +1,30 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:56926 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:57884 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754559AbcEZUmj (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 26 May 2016 16:42:39 -0400
-Date: Thu, 26 May 2016 22:42:39 +0200
+	id S1755240AbcEZUvd (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 26 May 2016 16:51:33 -0400
+Date: Thu, 26 May 2016 22:51:34 +0200
 From: Michal Marek <mmarek@suse.com>
-Subject: [GIT PULL] kconfig updates for v4.7-rc1
-Message-ID: <20160526204239.GA4875@pobox.suse.cz>
+Subject: [GIT PULL] kbuild misc changes for v4.7-rc1
+Message-ID: <20160526205134.GA5103@pobox.suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: dirk@gouders.net, pebolle@tiscali.nl, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: asamson@codeaurora.org, bjorn@mork.no, jkosina@suse.cz, keescook@chromium.org, srinivas.pandruvada@linux.intel.com, vaishali.thakkar@oracle.com, wsa@the-dreams.de, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hi Linus,
 
-Please pull these kconfig fixes for v4.7-rc1:
-- Fix for behavior of tristate choice items and fix for documentation
-  of existing kconfig behavior [Dirk Gouders]
-- More helpful "unexpected data" kconfig warning [Paul Bolle]
+this is the non-critical part of kbuild:
+- Coccinelle fixes, one semantic patch less in this round [Vaishali
+  Thakkar, Wolfram Sang, Kees Cook]
+- rpm-pkg support for (open)SUSE's update-bootloader [Jiří Kosian]
+- rpm-pkg restored support for $RPMOPTS [Srinivas Pandruvada]
+- deb-pkg fixes for the linux-headers package [Bjørn Mork, Azriel
+  Samson]
 
 Thanks,
 Michal
@@ -31,22 +35,39 @@ The following changes since commit f55532a0c0b8bb6148f4e07853b876ef73bc69ca:
 
 are available in the git repository at:
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git kconfig
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git misc
 
-for you to fetch changes up to fa64e5f6a35efd5e77d639125d973077ca506074:
+for you to fetch changes up to 2552a39facb6609007a02eeda5d5edee4fcaca30:
 
-  kconfig/symbol.c: handle choice_values that depend on 'm' symbols (2016-05-10 21:14:27 +0200)
+  coccicheck: Fix missing 0 index in kill loop (2016-05-19 09:56:59 +0200)
 
 ----------------------------------------------------------------
-Dirk Gouders (3):
-      kconfig-language: fix comment on dependency-generated menu structures.
-      kconfig-language: elaborate on the type of a choice
-      kconfig/symbol.c: handle choice_values that depend on 'm' symbols
+Azriel Samson (1):
+      builddeb: fix missing headers in linux-headers package
 
-Paul Bolle (1):
-      kconfig: add unexpected data itself to warning
+Bjørn Mork (1):
+      builddeb: include objtool binary in headers package
 
- Documentation/kbuild/kconfig-language.txt | 22 +++++++++++++---------
- scripts/kconfig/confdata.c                |  4 +++-
- scripts/kconfig/symbol.c                  | 14 ++++++++++++++
- 3 files changed, 30 insertions(+), 10 deletions(-)
+Jiri Kosina (1):
+      kbuild/mkspec: support 'update-bootloader'-based systems
+
+Kees Cook (1):
+      coccicheck: Fix missing 0 index in kill loop
+
+Srinivas Pandruvada (1):
+      scripts/package/Makefile: rpmbuild add support of RPMOPTS
+
+Vaishali Thakkar (1):
+      Coccinelle: setup_timer: Add space in front of parentheses
+
+Wolfram Sang (1):
+      scripts: coccinelle: remove check to move constants to right
+
+ scripts/coccicheck                             |   2 +-
+ scripts/coccinelle/api/setup_timer.cocci       |   4 +-
+ scripts/coccinelle/misc/compare_const_fl.cocci | 171 -------------------------
+ scripts/package/Makefile                       |   4 +-
+ scripts/package/builddeb                       |   5 +-
+ scripts/package/mkspec                         |   5 +
+ 6 files changed, 14 insertions(+), 177 deletions(-)
+ delete mode 100644 scripts/coccinelle/misc/compare_const_fl.cocci
