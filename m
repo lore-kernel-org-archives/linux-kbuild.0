@@ -1,73 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:57884 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755240AbcEZUvd (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 26 May 2016 16:51:33 -0400
-Date: Thu, 26 May 2016 22:51:34 +0200
-From: Michal Marek <mmarek@suse.com>
-Subject: [GIT PULL] kbuild misc changes for v4.7-rc1
-Message-ID: <20160526205134.GA5103@pobox.suse.cz>
+Received: from mail-ig0-f193.google.com ([209.85.213.193]:33538 "EHLO
+	mail-ig0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750914AbcE0F0v convert rfc822-to-8bit (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 27 May 2016 01:26:51 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20160526203346.GA4734@pobox.suse.cz>
+References: <20160526203346.GA4734@pobox.suse.cz>
+Date: Thu, 26 May 2016 22:26:50 -0700
+Message-ID: <CA+55aFzQxws_ipKZhV9cFrJdV8CvKy=m9AxGe5cjM=FYceNbZQ@mail.gmail.com>
+Subject: Re: [GIT PULL] kbuild updates for v4.7-rc1
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: asamson@codeaurora.org, bjorn@mork.no, jkosina@suse.cz, keescook@chromium.org, srinivas.pandruvada@linux.intel.com, vaishali.thakkar@oracle.com, wsa@the-dreams.de, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Michal Marek <mmarek@suse.com>
+Cc: Arnd Bergmann <arnd@arndb.de>, mussitantesmortem@gmail.com, nicolas.ferre@atmel.com, Nicolas Pitre <nicolas.pitre@linaro.org>, robert.jarzmik@free.fr, yamada.masahiro@socionext.com, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-Hi Linus,
+On Thu, May 26, 2016 at 1:33 PM, Michal Marek <mmarek@suse.com> wrote:
+>
+>   git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git kbuild
 
-this is the non-critical part of kbuild:
-- Coccinelle fixes, one semantic patch less in this round [Vaishali
-  Thakkar, Wolfram Sang, Kees Cook]
-- rpm-pkg support for (open)SUSE's update-bootloader [Jiří Kosian]
-- rpm-pkg restored support for $RPMOPTS [Srinivas Pandruvada]
-- deb-pkg fixes for the linux-headers package [Bjørn Mork, Azriel
-  Samson]
+This pull results in new warnings.
 
-Thanks,
-Michal
+I get new "may be uninitialized" warnings now for me allmodconfig
+build, and while I didn't look at them all, the one I looked at was
+just entirely crap:
 
-The following changes since commit f55532a0c0b8bb6148f4e07853b876ef73bc69ca:
+   fs/gfs2/dir.c: In function ‘dir_split_leaf.isra.16’:
+   fs/gfs2/dir.c:1021:8: warning: ‘leaf_no’ may be used uninitialized
+in this function [-Wmaybe-uninitialized]
+     error = get_leaf(dip, leaf_no, &obh);
+           ^
 
-  Linux 4.6-rc1 (2016-03-26 16:03:24 -0700)
+yeah no, leaf_no is initialized a few lines up by
 
-are available in the git repository at:
+        error = get_leaf_nr(dip, index, &leaf_no);
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git misc
+and the fact that gcc can't follow the trivial  error handling is not
+our fault. It looks *so* trivial that I wonder why.
 
-for you to fetch changes up to 2552a39facb6609007a02eeda5d5edee4fcaca30:
+That said, I don't see exactly what in the pull request causes this.
 
-  coccicheck: Fix missing 0 index in kill loop (2016-05-19 09:56:59 +0200)
+My reading of the diff seems to say that you are actually adding
+*more* cases of -Wno-maybe-uninitialized, not less.
 
-----------------------------------------------------------------
-Azriel Samson (1):
-      builddeb: fix missing headers in linux-headers package
+So I suspect it's almost accidental in just how the Kconfig option
+CC_OPTIMIZE_FOR_PERFORMANCE happened, which in turn probably just
+changes the options for "make allmiodconfig", and it now picks a
+non-size-optimized build that always showed those warnings and I just
+didn't see them.
 
-Bjørn Mork (1):
-      builddeb: include objtool binary in headers package
+Annoying. I've pulled it, but I wish you would look at this.
 
-Jiri Kosina (1):
-      kbuild/mkspec: support 'update-bootloader'-based systems
-
-Kees Cook (1):
-      coccicheck: Fix missing 0 index in kill loop
-
-Srinivas Pandruvada (1):
-      scripts/package/Makefile: rpmbuild add support of RPMOPTS
-
-Vaishali Thakkar (1):
-      Coccinelle: setup_timer: Add space in front of parentheses
-
-Wolfram Sang (1):
-      scripts: coccinelle: remove check to move constants to right
-
- scripts/coccicheck                             |   2 +-
- scripts/coccinelle/api/setup_timer.cocci       |   4 +-
- scripts/coccinelle/misc/compare_const_fl.cocci | 171 -------------------------
- scripts/package/Makefile                       |   4 +-
- scripts/package/builddeb                       |   5 +-
- scripts/package/mkspec                         |   5 +
- 6 files changed, 14 insertions(+), 177 deletions(-)
- delete mode 100644 scripts/coccinelle/misc/compare_const_fl.cocci
+              Linus
