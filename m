@@ -1,67 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.linuxfoundation.org ([140.211.169.12]:45810 "EHLO
-	mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755355AbcE0VqH (ORCPT
+Received: from zeniv.linux.org.uk ([195.92.253.2]:33734 "EHLO
+	ZenIV.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1756572AbcE0Vw0 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 27 May 2016 17:46:07 -0400
-Date: Fri, 27 May 2016 14:46:05 -0700
-From: Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH] remove lots of IS_ERR_VALUE abuses
-Message-Id: <20160527144605.f2a52ea02cad1297ff188691@linux-foundation.org>
-In-Reply-To: <1464384685-347275-1-git-send-email-arnd@arndb.de>
-References: <1464384685-347275-1-git-send-email-arnd@arndb.de>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+	Fri, 27 May 2016 17:52:26 -0400
+Date: Fri, 27 May 2016 22:52:10 +0100
+From: Al Viro <viro@ZenIV.linux.org.uk>
+Subject: Re: [GIT PULL] kbuild updates for v4.7-rc1
+Message-ID: <20160527215210.GU14480@ZenIV.linux.org.uk>
+References: <20160526203346.GA4734@pobox.suse.cz>
+ <5345273.JScMX9oohG@wuerfel>
+ <CA+55aFw0RN=7XZa7Kt2bcvk1a_5yAxYW1tVhr-jjCnozsf1MSw@mail.gmail.com>
+ <9633365.kM71HHzq9d@wuerfel>
+ <CA+55aFzQ4oe6cT5xf=3xT1d6ji2L_her8AmJxpsixFw_GavDvg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+55aFzQ4oe6cT5xf=3xT1d6ji2L_her8AmJxpsixFw_GavDvg@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Andrzej Hajda <a.hajda@samsung.com>, "Rafael J. Wysocki" <rjw@rjwysocki.net>, Maxime Ripard <maxime.ripard@free-electrons.com>, David Airlie <airlied@linux.ie>, Robin Murphy <robin.murphy@arm.com>, Thomas Gleixner <tglx@linutronix.de>, Adrian Hunter <adrian.hunter@intel.com>, Srinivas Kandagatla <srinivas.kandagatla@linaro.org>, Russell King <linux@armlinux.org.uk>, Bob Peterson <rpeterso@redhat.com>, linux-acpi@vger.kernel.org, iommu@lists.linux-foundation.org, linux-media@vger.kernel.org, netdev@vger.kernel.org, linux-wireless@vger.kernel.org, v9fs-developer@lists.sourceforge.net
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Arnd Bergmann <arnd@arndb.de>, Michal Marek <mmarek@suse.com>, =?utf-8?B?0JzQsNC60YEg0JbRg9C60L7Qsg==?= <mussitantesmortem@gmail.com>, nicolas.ferre@atmel.com, Nicolas Pitre <nicolas.pitre@linaro.org>, robert.jarzmik@free.fr, yamada.masahiro@socionext.com, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Bob Peterson <rpeterso@redhat.com>
 
-On Fri, 27 May 2016 23:23:25 +0200 Arnd Bergmann <arnd@arndb.de> wrote:
+On Fri, May 27, 2016 at 01:20:29PM -0700, Linus Torvalds wrote:
 
-> Most users of IS_ERR_VALUE() in the kernel are wrong, as they
-> pass an 'int' into a function that takes an 'unsigned long'
-> argument. This happens to work because the type is sign-extended
-> on 64-bit architectures before it gets converted into an
-> unsigned type.
+> I didn't look at the details of your patch, but I did look at several
+> IS_ERR_VALUE() uses in the standard kernel, and they were basically
+> all wrong. Even the ones that used it for the rigth reason (vm_brk()
+> that returns a pointer or an error in an "unsigned long") had actively
+> screwed up and truncated that (correct) unsigned long value to "int"
+> before doing the IS_ERR_VALUE(), which made it all wrong again.
 > 
-> However, anything that passes an 'unsigned short' or 'unsigned int'
-> argument into IS_ERR_VALUE() is guaranteed to be broken, as are
-> 8-bit integers and types that are wider than 'unsigned long'.
-> 
-> Andrzej Hajda has already fixed a lot of the worst abusers that
-> were causing actual bugs, but it would be nice to prevent any
-> users that are not passing 'unsigned long' arguments.
-> 
-> This patch changes all users of IS_ERR_VALUE() that I could find
-> on 32-bit ARM randconfig builds and x86 allmodconfig. For the
-> moment, this doesn't change the definition of IS_ERR_VALUE()
-> because there are probably still architecture specific users
-> elsewhere.
+> And the other users just looked entirely bogus, and were all just
+> "zero or negative error code" that has nothing to do with
+> IS_ERR_VALUE(). The code should just check against zero, not use that
+> macro that was designed for something different.
 
-So you do plan to add some sort of typechecking into IS_ERR_VALUE()?
+Both gfs2 ones and the one in fs/romfs are crap.  AFS one is simply ridiculous -
+        result = generic_file_write_iter(iocb, from);
+        if (IS_ERR_VALUE(result)) {
+                _leave(" = %zd", result);
+                return result;
+        }
 
-> Almost all the warnings I got are for files that are better off
-> using 'if (err)' or 'if (err < 0)'.
-> The only legitimate user I could find that we get a warning for
-> is the (32-bit only) freescale fman driver, so I did not remove
-> the IS_ERR_VALUE() there but changed the type to 'unsigned long'.
-> For 9pfs, I just worked around one user whose calling conventions
-> are so obscure that I did not dare change the behavior.
-> 
-> I was using this definition for testing:
-> 
->  #define IS_ERR_VALUE(x) ((unsigned long*)NULL == (typeof (x)*)NULL && \
->        unlikely((unsigned long long)(x) >= (unsigned long long)(typeof(x))-MAX_ERRNO))
-> 
-> which ends up making all 16-bit or wider types work correctly with
-> the most plausible interpretation of what IS_ERR_VALUE() was supposed
-> to return according to its users, but also causes a compile-time
-> warning for any users that do not pass an 'unsigned long' argument.
-> 
-> I suggested this approach earlier this year, but back then we ended
-> up deciding to just fix the users that are obviously broken. After
-> the initial warning that caused me to get involved in the discussion
-> (fs/gfs2/dir.c) showed up again in the mainline kernel, Linus
-> asked me to send the whole thing again.
+        _leave(" = %zd", result);
+        return result;
+In binfmt*.c some callers are valid (vm_mmap and vm_brk values; BTW, the
+code in binfmt_flat.c checks for vm_mmap returning 0, which should never
+happen, AFAICS).  Most of binfmt_flat.c ones are pure cargo-culting.
+
+net/9p/client.c ones are results of serious mistake in design of 9P.L
+extensions to 9P - they assume that numeric values of E... are
+architecture-independent and send them over the wire.  The uses of
+IS_ERR_VALUE there are papering over that.  Badly.
+
+A couple of sound/* ones should be simply "is negative".
+
+netfilter ones are caused by bad calling conventions of
+xt_percpu_counter_alloc().
+
+I hadn't looked through drivers/* users, but judging by fs/, net/ and sound/,
+I would expect them to be pointless garbage in the best case and red flags
+for broken code in the worst.
+
+IMO IS_ERR_VALUE() should be renamed to something less generic and be used
+a lot less than it is right now.
