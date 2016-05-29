@@ -1,24 +1,24 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp485.redcondor.net ([208.80.204.85]:58308 "EHLO
-	smtp485.redcondor.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S932244AbcE2QF6 (ORCPT
+Received: from smtp484.redcondor.net ([208.80.204.84]:33562 "EHLO
+	smtp484.redcondor.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S964772AbcE2QyJ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 29 May 2016 12:05:58 -0400
+	Sun, 29 May 2016 12:54:09 -0400
 Received: from astoria.ccjclearline.com ([64.235.106.9])
-          by smtp485.redcondor.net ({3be039ea-4351-44b0-a8af-642c38b25916})
-          via TCP (outbound) with ESMTPS id 20160529155458164_0485
+          by smtp484.redcondor.net ({c48374e7-08df-40d9-a0de-96cc9883a037})
+          via TCP (outbound) with ESMTPS id 20160529165406945_0484
           for <linux-kbuild@vger.kernel.org>;
-          Sun, 29 May 2016 15:54:58 +0000
-Received: from [99.240.204.5] (port=44658 helo=crashcourse.ca)
+          Sun, 29 May 2016 16:54:06 +0000
+Received: from [99.240.204.5] (port=46114 helo=crashcourse.ca)
 	by astoria.ccjclearline.com with esmtpsa (TLSv1:AES256-SHA:256)
 	(Exim 4.80)
 	(envelope-from <rpjday@crashcourse.ca>)
-	id 1b734t-0001vK-7v
-	for linux-kbuild@vger.kernel.org; Sun, 29 May 2016 11:56:35 -0400
-Date: Sun, 29 May 2016 11:54:11 -0400 (EDT)
+	id 1b7408-000098-32
+	for linux-kbuild@vger.kernel.org; Sun, 29 May 2016 12:55:44 -0400
+Date: Sun, 29 May 2016 12:53:26 -0400 (EDT)
 From: "Robert P. J. Day" <rpjday@crashcourse.ca>
-Subject: looking to clarify picky details about exporting kernel headers
-Message-ID: <alpine.LFD.2.20.1605291118350.14949@localhost.localdomain>
+Subject: is there any reason to *explicitly* include a UAPI header file?
+Message-ID: <alpine.LFD.2.20.1605291246080.31954@localhost.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -26,63 +26,45 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
 
-  i'm trying to summarize (and write up for some future courses) all
-the grotty little details about the exporting of kernel headers to
-user space, so after reading the docs and perusing a good chunk of the
-code, i want to ask a pile of questions, mostly just whether i
-understand things correctly. so without further ado ...
+  i'm well aware of the header file search path defined in the
+top-level Makefile:
 
+  # Use USERINCLUDE when you must reference the UAPI directories only.
+  USERINCLUDE    := \
+                -I$(srctree)/arch/$(hdr-arch)/include/uapi \
+                -Iarch/$(hdr-arch)/include/generated/uapi \
+                -I$(srctree)/include/uapi \
+                -Iinclude/generated/uapi \
+                -include $(srctree)/include/linux/kconfig.h
 
-  first, is it true that all such exporting *requires* a Kbuild file
-in the same directory as any possibly exported kernel header file?
-it *looks* that way ... is there any way that a header file in the
-kernel source tree could possibly be exported any other way,
-indirectly through some other Kbuild file or something else?
+  # Use LINUXINCLUDE when you must reference the include/ directory.
+  # Needed to be compatible with the O= option
+  LINUXINCLUDE    := \
+                -I$(srctree)/arch/$(hdr-arch)/include \
+                -Iarch/$(hdr-arch)/include/generated/uapi \
+                -Iarch/$(hdr-arch)/include/generated \
+                $(if $(KBUILD_SRC), -I$(srctree)/include) \
+                -Iinclude \
+                $(USERINCLUDE)
 
+so given that "kernel" header files will be found before "user" header
+files of the same name, is there any defense to doing something like
+this in include/linux/netdevice.h:
 
-  NEXT, is there any value to an empty Kbuild file? i noticed a few of
-these, like ./arch/cris/include/arch-v10/arch/Kbuild:
+  #include <uapi/linux/netdevice.h>
+  #include <uapi/linux/if_bonding.h>
+  #include <uapi/linux/pkt_cls.h>
 
-  # CRISv10 arch
+why would someone, in kernel code, explicitly include a header file in
+uapi/?
 
-obviously(?), empty Kbuild files don't hurt, but do they serve any
-obscure purpose? is that comment used for anything?
+  it would seem that there are two possibilities. if there is only one
+version of that file in uapi/, it'll be found eventually, and if there
+is a version of that file in, say, include/linux/, then it's the one
+that should be included, because one assumes that version would
+include the one under uapi/, no?
 
-
-  NEXT, (and i think i know the answer to this), if you want to
-export an existing header file that is currently unexported, and you
-want to add a Kbuild file to an arbitrary directory, it must be
-somehow "hooked into" the current Kbuild hierarchy, right?
-
-  as in, you can't just toss a Kbuild file into any random directory
-and expect it to have any effect, unless that directory is somehow
-referred to by some *existing* Kbuild file, so that the standard
-Kbuild processing will eventually descend into that directory.
-
-
-  NEXT, i was unaware of this until recently to export a header file,
-but even if you take advantage of a uapi/ directory, sometimes it's
-easier to just toss a header file into a uapi/ directory unchanged
-rather than trying to refactor it into kernel versus user space parts,
-yes? all exported header files are going to sanitized via "unifdef",
-anyway, so if it would too much of a nuisance to refactor it, it's
-acceptable to just move it to a uapi/ directory, correct?
-
-
-  NEXT, is there any value to header files in uapi/ directories that
-are not referenced from the Kbuild file? as an example, in
-include/uapi/drm, there are three header files in that directory that
-are not mentioned in the Kbuild file:
-
-  * armada_drm.h
-  * etnaviv_drm.h
-  * omap_drm.h
-
-is this just an oversight from a previous patch? or is there actually
-some rationale for this? (it's not the only place i've seen this.)
-
-  i think that should do for now while i dive back into the code and
-docs.
+  thoughts? am i just massively misunderstanding something?
 
 rday
 
