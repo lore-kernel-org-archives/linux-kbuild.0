@@ -1,118 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:34330 "EHLO
-	mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1161967AbcE3X1K (ORCPT
+Received: from mail.linuxfoundation.org ([140.211.169.12]:39989 "EHLO
+	mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750720AbcFATm3 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 30 May 2016 19:27:10 -0400
-Date: Tue, 31 May 2016 01:34:02 +0200
-From: Emese Revfy <re.emese@gmail.com>
-Subject: [PATCH v2 3/3] Add the extra_latent_entropy kernel parameter
-Message-Id: <20160531013402.087751d6ab3a568164e8b9ae@gmail.com>
-In-Reply-To: <20160531013029.4c5db8b570d86527b0b53fe4@gmail.com>
+	Wed, 1 Jun 2016 15:42:29 -0400
+Date: Wed, 1 Jun 2016 12:42:27 -0700
+From: Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH v2 1/3] Add the latent_entropy gcc plugin
+Message-Id: <20160601124227.e922af8299168c09308d5e1b@linux-foundation.org>
+In-Reply-To: <20160531013145.612696c12f2ef744af739803@gmail.com>
 References: <20160531013029.4c5db8b570d86527b0b53fe4@gmail.com>
+	<20160531013145.612696c12f2ef744af739803@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: kernel-hardening@lists.openwall.com
-Cc: pageexec@freemail.hu, spender@grsecurity.net, mmarek@suse.com, keescook@chromium.org, linux-kernel@vger.kernel.org, yamada.masahiro@socionext.com, linux-kbuild@vger.kernel.org, tytso@mit.edu, akpm@linux-foundation.org, linux-mm@kvack.org, axboe@kernel.dk, viro@zeniv.linux.org.uk, paulmck@linux.vnet.ibm.com, mingo@redhat.com, tglx@linutronix.de, bart.vanassche@sandisk.com, davem@davemloft.net
+To: Emese Revfy <re.emese@gmail.com>
+Cc: kernel-hardening@lists.openwall.com, pageexec@freemail.hu, spender@grsecurity.net, mmarek@suse.com, keescook@chromium.org, linux-kernel@vger.kernel.org, yamada.masahiro@socionext.com, linux-kbuild@vger.kernel.org, tytso@mit.edu, linux-mm@kvack.org, axboe@kernel.dk, viro@zeniv.linux.org.uk, paulmck@linux.vnet.ibm.com, mingo@redhat.com, tglx@linutronix.de, bart.vanassche@sandisk.com, davem@davemloft.net
 
-When extra_latent_entropy is passed on the kernel command line,
-entropy will be extracted from up to the first 4GB of RAM while the
-runtime memory allocator is being initialized.
+On Tue, 31 May 2016 01:31:45 +0200 Emese Revfy <re.emese@gmail.com> wrote:
 
-Based on work created by the PaX Team.
+> This plugin mitigates the problem of the kernel having too little entropy during
+> and after boot for generating crypto keys.
+> 
+> It creates a local variable in every marked function. The value of this variable is
+> modified by randomly chosen operations (add, xor and rol) and
+> random values (gcc generates them at compile time and the stack pointer at runtime).
+> It depends on the control flow (e.g., loops, conditions).
+> 
+> Before the function returns the plugin writes this local variable
+> into the latent_entropy global variable. The value of this global variable is
+> added to the kernel entropy pool in do_one_initcall() and _do_fork().
 
-Signed-off-by: Emese Revfy <re.emese@gmail.com>
----
- Documentation/kernel-parameters.txt |  5 +++++
- arch/Kconfig                        |  5 +++++
- mm/page_alloc.c                     | 25 +++++++++++++++++++++++++
- 3 files changed, 35 insertions(+)
-
-diff --git a/Documentation/kernel-parameters.txt b/Documentation/kernel-parameters.txt
-index 5349363..6c2496e 100644
---- a/Documentation/kernel-parameters.txt
-+++ b/Documentation/kernel-parameters.txt
-@@ -2862,6 +2862,11 @@ bytes respectively. Such letter suffixes can also be entirely omitted.
- 			the specified number of seconds.  This is to be used if
- 			your oopses keep scrolling off the screen.
- 
-+	extra_latent_entropy
-+			Enable a very simple form of latent entropy extraction
-+			from the first 4GB of memory as the bootmem allocator
-+			passes the memory pages to the buddy allocator.
-+
- 	pcbit=		[HW,ISDN]
- 
- 	pcd.		[PARIDE]
-diff --git a/arch/Kconfig b/arch/Kconfig
-index 7115867..cbfa8d3 100644
---- a/arch/Kconfig
-+++ b/arch/Kconfig
-@@ -404,6 +404,11 @@ config GCC_PLUGIN_LATENT_ENTROPY
- 	  is some slowdown of the boot process (about 0.5%) and fork and
- 	  irq processing.
- 
-+	  When extra_latent_entropy is passed on the kernel command line,
-+	  entropy will be extracted from up to the first 4GB of RAM while the
-+	  runtime memory allocator is being initialized.  This costs even more
-+	  slowdown of the boot process.
-+
- 	  Note that entropy extracted this way is not known to be cryptographically
- 	  secure!
- 
-diff --git a/mm/page_alloc.c b/mm/page_alloc.c
-index ffc4f4a..72c61bd 100644
---- a/mm/page_alloc.c
-+++ b/mm/page_alloc.c
-@@ -63,6 +63,7 @@
- #include <linux/sched/rt.h>
- #include <linux/page_owner.h>
- #include <linux/kthread.h>
-+#include <linux/random.h>
- 
- #include <asm/sections.h>
- #include <asm/tlbflush.h>
-@@ -1234,6 +1235,15 @@ static void __free_pages_ok(struct page *page, unsigned int order)
- 	local_irq_restore(flags);
- }
- 
-+bool __meminitdata extra_latent_entropy;
-+
-+static int __init setup_extra_latent_entropy(char *str)
-+{
-+	extra_latent_entropy = true;
-+	return 0;
-+}
-+early_param("extra_latent_entropy", setup_extra_latent_entropy);
-+
- #ifdef CONFIG_GCC_PLUGIN_LATENT_ENTROPY
- volatile u64 latent_entropy __latent_entropy;
- EXPORT_SYMBOL(latent_entropy);
-@@ -1254,6 +1264,21 @@ static void __init __free_pages_boot_core(struct page *page, unsigned int order)
- 	__ClearPageReserved(p);
- 	set_page_count(p, 0);
- 
-+	if (extra_latent_entropy && !PageHighMem(page) && page_to_pfn(page) < 0x100000) {
-+		u64 hash = 0;
-+		size_t index, end = PAGE_SIZE * nr_pages / sizeof hash;
-+		const u64 *data = lowmem_page_address(page);
-+
-+		for (index = 0; index < end; index++)
-+			hash ^= hash + data[index];
-+#ifdef CONFIG_GCC_PLUGIN_LATENT_ENTROPY
-+		latent_entropy ^= hash;
-+		add_device_randomness((const void *)&latent_entropy, sizeof(latent_entropy));
-+#else
-+		add_device_randomness((const void *)&hash, sizeof(hash));
-+#endif
-+	}
-+
- 	page_zone(page)->managed_pages += nr_pages;
- 	set_page_refcounted(page);
- 	__free_pages(page, order);
--- 
-2.8.1
-
+I don't think I'm really understanding.  Won't this produce the same
+value on each and every boot?
