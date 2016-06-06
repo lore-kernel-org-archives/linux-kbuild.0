@@ -1,46 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from sauhun.de ([89.238.76.85]:49955 "EHLO pokefinder.org"
+Received: from r00tworld.com ([212.85.137.150]:46100 "EHLO r00tworld.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751043AbcFFTAr (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 6 Jun 2016 15:00:47 -0400
-From: Wolfram Sang <wsa@the-dreams.de>
-Subject: [PATCH] kbuild: setlocalversion: print error to STDERR
-Date: Mon,  6 Jun 2016 21:00:38 +0200
-Message-Id: <1465239638-20314-1-git-send-email-wsa@the-dreams.de>
+	id S1751217AbcFFTcN (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 6 Jun 2016 15:32:13 -0400
+From: "PaX Team" <pageexec@freemail.hu>
+Date: Mon, 06 Jun 2016 21:30:12 +0200
+MIME-Version: 1.0
+Subject: Re: [kernel-hardening] Re: [PATCH v2 1/3] Add the latent_entropy gcc plugin
+Reply-to: pageexec@freemail.hu
+Message-ID: <5755CF44.24670.9C7568D@pageexec.freemail.hu>
+In-reply-to: <20160606133801.GA6136@davidb.org>
+References: <20160531013029.4c5db8b570d86527b0b53fe4@gmail.com>, <20160603194252.91064b8e682ad988283fc569@gmail.com>, <20160606133801.GA6136@davidb.org>
+Content-type: text/plain; charset=US-ASCII
+Content-transfer-encoding: 7BIT
+Content-description: Mail message body
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.com>, Wolfram Sang <wsa@the-dreams.de>
+To: kernel-hardening@lists.openwall.com, David Brown <david.brown@linaro.org>, emese Revfy <re.emese@gmail.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, spender@grsecurity.net, mmarek@suse.com, keescook@chromium.org, linux-kernel@vger.kernel.org, yamada.masahiro@socionext.com, linux-kbuild@vger.kernel.org, tytso@mit.edu, linux-mm@kvack.org, axboe@kernel.dk, viro@zeniv.linux.org.uk, paulmck@linux.vnet.ibm.com, mingo@redhat.com, tglx@linutronix.de, bart.vanassche@sandisk.com, davem@davemloft.net
 
-I tried to use 'make O=...' from an unclean source tree. This triggered
-the error path of setlocalversion. But by printing to STDOUT, it created
-a broken localversion which then caused another (unrelated) error:
+On 6 Jun 2016 at 7:38, David Brown wrote:
 
-"4.7.0-rc2Error: kernelrelease not valid - run make prepare to update it" exceeds 64 characters
+> On Fri, Jun 03, 2016 at 07:42:52PM +0200, Emese Revfy wrote:
+> >On Wed, 1 Jun 2016 12:42:27 -0700
+> >Andrew Morton <akpm@linux-foundation.org> wrote:
+> >
+> >> I don't think I'm really understanding.  Won't this produce the same
+> >> value on each and every boot?
+> >
+> >No, because of interrupts and intentional data races.
+> 
+> Wouldn't that result in the value having one of a small number of
+> values, then?  Even if it was just one of thousands or millions of
+> values, it would make the search space quite small.
 
-After printing to STDERR, the true build error gets displayed later:
+what matters for latent entropy is not the actual values fed into the entropy
+pool (they're effectively compile time constants save for runtime data dependent
+computations) but the precise sequence of them. interrupts stir this sequence
+and thus extract entropy. perhaps as a small example imagine that an uninterrupted
+kernel boot sequence feeds these values into the entropy pool:
+  A B C
 
-  /home/wsa/Kernel/linux is not clean, please run 'make mrproper'
-  in the '/home/wsa/Kernel/linux' directory.
+now imagine that a single interrupt can occur around any one of these values:
+  I A B C
+  A I B C
+  A B I C
+  A B C I
 
-Signed-off-by: Wolfram Sang <wsa@the-dreams.de>
----
- scripts/setlocalversion | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+this way we can obtain 4 different final pool states that translate into up
+to 2 bits of latent entropy (depends on how probable each sequence is). note
+that this works regardless whether the underlying hardware has a high resolution
+timer whose values the interrupt handler would feed into the pool.
 
-diff --git a/scripts/setlocalversion b/scripts/setlocalversion
-index 63d91e22ed7ccd..966dd3924ea9cb 100755
---- a/scripts/setlocalversion
-+++ b/scripts/setlocalversion
-@@ -143,7 +143,7 @@ fi
- if test -e include/config/auto.conf; then
- 	. include/config/auto.conf
- else
--	echo "Error: kernelrelease not valid - run 'make prepare' to update it"
-+	echo "Error: kernelrelease not valid - run 'make prepare' to update it" >&2
- 	exit 1
- fi
- 
--- 
-2.8.1
+the kernel boot process executes many of the above sequences with each sequence
+potentially having a different length (the number of __init functions and initcalls
+depends on the kernel config, initcalls execute for different lengths of time,
+interrupt windows have different lengths, etc). how all this translates into
+something measurable is a good question as i said elsewhere in the thread, my
+completely unscientific guess would be that the number of interrupts is somehow
+proportional to the extracted latent entropy.
+
+cheers,
+ PaX Team
 
