@@ -1,75 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f49.google.com ([74.125.82.49]:36819 "EHLO
-	mail-wm0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751833AbcFFPuk (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 6 Jun 2016 11:50:40 -0400
-Received: by mail-wm0-f49.google.com with SMTP id n184so98981533wmn.1
-        for <linux-kbuild@vger.kernel.org>; Mon, 06 Jun 2016 08:50:40 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20160606133801.GA6136@davidb.org>
-References: <20160531013029.4c5db8b570d86527b0b53fe4@gmail.com>
- <20160531013145.612696c12f2ef744af739803@gmail.com> <20160601124227.e922af8299168c09308d5e1b@linux-foundation.org>
- <20160603194252.91064b8e682ad988283fc569@gmail.com> <20160606133801.GA6136@davidb.org>
-From: Kees Cook <keescook@chromium.org>
-Date: Mon, 6 Jun 2016 08:50:38 -0700
-Message-ID: <CAGXu5jKDdPsRU+oa8hKpFCyf2Q-BvnNJ0ZrPM_b6frw-h0Cg_w@mail.gmail.com>
-Subject: Re: [kernel-hardening] Re: [PATCH v2 1/3] Add the latent_entropy gcc plugin
-Content-Type: text/plain; charset=UTF-8
+Received: from sauhun.de ([89.238.76.85]:49955 "EHLO pokefinder.org"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751043AbcFFTAr (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 6 Jun 2016 15:00:47 -0400
+From: Wolfram Sang <wsa@the-dreams.de>
+Subject: [PATCH] kbuild: setlocalversion: print error to STDERR
+Date: Mon,  6 Jun 2016 21:00:38 +0200
+Message-Id: <1465239638-20314-1-git-send-email-wsa@the-dreams.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: David Brown <david.brown@linaro.org>
-Cc: "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, Andrew Morton <akpm@linux-foundation.org>, PaX Team <pageexec@freemail.hu>, Brad Spengler <spender@grsecurity.net>, Michal Marek <mmarek@suse.com>, LKML <linux-kernel@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, Theodore Ts'o <tytso@mit.edu>, Linux-MM <linux-mm@kvack.org>, Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>, Paul McKenney <paulmck@linux.vnet.ibm.com>, Ingo Molnar <mingo@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, bart.vanassche@sandisk.com, "David S. Miller" <davem@davemloft.net>
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.com>, Wolfram Sang <wsa@the-dreams.de>
 
-On Mon, Jun 6, 2016 at 6:38 AM, David Brown <david.brown@linaro.org> wrote:
-> On Fri, Jun 03, 2016 at 07:42:52PM +0200, Emese Revfy wrote:
->>
->> On Wed, 1 Jun 2016 12:42:27 -0700
->> Andrew Morton <akpm@linux-foundation.org> wrote:
->>
->>> On Tue, 31 May 2016 01:31:45 +0200 Emese Revfy <re.emese@gmail.com>
->>> wrote:
->>>
->>> > This plugin mitigates the problem of the kernel having too little
->>> > entropy during
->>> > and after boot for generating crypto keys.
->>> >
->>> > It creates a local variable in every marked function. The value of this
->>> > variable is
->>> > modified by randomly chosen operations (add, xor and rol) and
->>> > random values (gcc generates them at compile time and the stack pointer
->>> > at runtime).
->>> > It depends on the control flow (e.g., loops, conditions).
->>> >
->>> > Before the function returns the plugin writes this local variable
->>> > into the latent_entropy global variable. The value of this global
->>> > variable is
->>> > added to the kernel entropy pool in do_one_initcall() and _do_fork().
->>>
->>> I don't think I'm really understanding.  Won't this produce the same
->>> value on each and every boot?
->>
->>
->> No, because of interrupts and intentional data races.
->
->
-> Wouldn't that result in the value having one of a small number of
-> values, then?  Even if it was just one of thousands or millions of
-> values, it would make the search space quite small.
+I tried to use 'make O=...' from an unclean source tree. This triggered
+the error path of setlocalversion. But by printing to STDOUT, it created
+a broken localversion which then caused another (unrelated) error:
 
-My understanding is that it's not cryptographically secure, but it
-provides a way for different machines and different boots to end up
-with different seeds here, which is a big improvement over some of the
-embedded devices that all boot with the same entropy every time.
+"4.7.0-rc2Error: kernelrelease not valid - run make prepare to update it" exceeds 64 characters
 
-I would, however, like to see the documentation improved to describe
-the "How" and "Why". The "What" is pretty well covered. Adding
-comments to the plugin for kernel developers (not compiler developers)
-would help a lot: assume the reader knows nothing about gcc plugins.
-:)
+After printing to STDERR, the true build error gets displayed later:
 
--Kees
+  /home/wsa/Kernel/linux is not clean, please run 'make mrproper'
+  in the '/home/wsa/Kernel/linux' directory.
 
+Signed-off-by: Wolfram Sang <wsa@the-dreams.de>
+---
+ scripts/setlocalversion | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/setlocalversion b/scripts/setlocalversion
+index 63d91e22ed7ccd..966dd3924ea9cb 100755
+--- a/scripts/setlocalversion
++++ b/scripts/setlocalversion
+@@ -143,7 +143,7 @@ fi
+ if test -e include/config/auto.conf; then
+ 	. include/config/auto.conf
+ else
+-	echo "Error: kernelrelease not valid - run 'make prepare' to update it"
++	echo "Error: kernelrelease not valid - run 'make prepare' to update it" >&2
+ 	exit 1
+ fi
+ 
 -- 
-Kees Cook
-Chrome OS & Brillo Security
+2.8.1
+
