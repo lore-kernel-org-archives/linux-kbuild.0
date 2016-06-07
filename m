@@ -1,80 +1,80 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga03.intel.com ([134.134.136.65]:40568 "EHLO mga03.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752073AbcFGBin (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 6 Jun 2016 21:38:43 -0400
-From: "Zanoni, Paulo R" <paulo.r.zanoni@intel.com>
-Subject: Regression in "kbuild: fix if_change and friends to consider
- argument order"
-Date: Tue, 7 Jun 2016 01:38:40 +0000
-Message-ID: <1465263518.3885.9.camel@intel.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <D8F9CF39CB5BA44BA7C52110EEDD4495@intel.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
+Received: from conuserg-12.nifty.com ([210.131.2.79]:48673 "EHLO
+	conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751263AbcFGFRr (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 7 Jun 2016 01:17:47 -0400
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH] kbuild: do not append NOSTDINC_FLAGS to avoid rebuild in package targets
+Date: Tue,  7 Jun 2016 14:18:01 +0900
+Message-Id: <1465276681-23700-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "mmarek@suse.com" <mmarek@suse.com>, "yamada.masahiro@socionext.com" <yamada.masahiro@socionext.com>
-Cc: "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "nicolas.pitre@linaro.org" <nicolas.pitre@linaro.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Rik van Riel <riel@redhat.com>, Paulo Zanoni <paulo.r.zanoni@intel.com>, Michal Marek <mmarek@suse.cz>, Andrew Morton <akpm@linux-foundation.org>, Linus Torvalds <torvalds@linux-foundation.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, linux-kernel@vger.kernel.org
 
-SGkNCg0KSSByZWNlbnRseSBub3RpY2VkIHRoYXQgYWx0ZXJuYXRpbmcgYmV0d2VlbiAibWFrZSIg
-YW5kICJtYWtlIHRhcmd6LXBrZyINCnJlYnVpbGRzIHRoZSB3aG9sZSBLZXJuZWwuIFRoaXMgd2Fz
-IG5vdCBoYXBwZW5pbmcgYmVmb3JlLiBBcyBhIEtlcm5lbA0KZGV2ZWxvcGVyLCBteSBidWlsZC9p
-bnN0YWxsL3Rlc3QgZW52aXJvbm1lbnQgaGVhdmlseSByZWxpZXMgb24gdGhlIGZhY3QNCnRoYXQg
-Im1ha2UgdGFyZ3otcGtnIiBvbmx5IHF1aWNrbHkgZ2VuZXJhdGVzIHRoZSB0YXJiYWxsIGlmIGV2
-ZXJ5dGhpbmcNCmlzIGFscmVhZHkgYnVpbHQsIHNvIHRoaXMgY2hhbmdlIGlzIGhlYXZpbHkgaW1w
-YWN0aW5nIG15IGRldmVsb3BtZW50DQplbnZpcm9ubWVudC4NCg0KSSBkaWQgc29tZSBiaXNlY3Rp
-b24gYW5kIGNvbmNsdWRlZCB0aGF0IHRoZSBmaXJzdCBiYWQgY29tbWl0IGlzOg0KDQpjb21taXQg
-OWM4ZmE5YmMwOGY2MGFjNjU3NzUxZGFiYTlmY2NmODI4YTM2Y2ZlZA0KQXV0aG9yOiBNYXNhaGly
-byBZYW1hZGENCkRhdGU6wqDCoMKgU2F0IE1heSA3IDE1OjQ4OjI2IDIwMTYgKzA5MDANCsKgIMKg
-IGtidWlsZDogZml4IGlmX2NoYW5nZSBhbmQgZnJpZW5kcyB0byBjb25zaWRlciBhcmd1bWVudCBv
-cmRlcg0KDQpJIGFsc28gdmVyaWZpZWQgdGhhdCBpZiBJIGp1c3QgcmV2ZXJ0IHRoaXMgY29tbWl0
-IG9uIHRvcCBvZiB0aGUNCm1vc3QgcmVjZW50IHRyZWUgaXQgZ29lcyBiYWNrIHRvIHRoZSB1c3Vh
-bCBiZWhhdmlvci4NCg0KSSByZWFkIHRoZSBjb21taXQgbWVzc2FnZSBhbmQgaXQgc2VlbXMgdGhh
-dCBzb21lIHVubmVlZGVkIHJlYnVpbGRzIGFyZQ0Kc29tZXdoYXQgZXhwZWN0ZWQsIGJ1dCBJIGNh
-bid0IHVuZGVyc3RhbmQgd2h5IHN1Y2ggYSBjaGFuZ2UgaW4gdGhlDQpjb21tYW5kIGxpbmUgbGlr
-ZSB0aGUgb25lIEkgZGlkIHRyaWdnZXJzIGV2ZXJ5dGhpbmcgdG8gYmUgcmVidWlsdC4NCklNSE8s
-IGl0IHJlYWxseSBzaG91bGRuJ3QuIEkgYWxzbyB3b25kZXIgdGhhdCBtYXliZSB0aGUgcmVncmVz
-c2lvbiBJJ20NCmV4cGVyaWVuY2luZyB3YXMgbm90IGV4cGVjdGVkIGluIHRoZSBvcmlnaW5hbCBj
-aGFuZ2UsIHNvIG1heWJlIHRoZXJlJ3MNCmEgd2F5IHRvIGtlZXAgdGhlIG9yaWdpbmFsIGltcHJv
-dmVtZW50IGNhdXNlZCBieSB0aGUgbWVudGlvbmVkIHBhdGNoDQp3aXRob3V0IHRoZSByZWdyZXNz
-aW9uIEknbSBleHBlcmllbmNpbmcuDQoNCkhvdyB0byByZXByb2R1Y2UgKGV4YWN0IGNvbW1hbmRz
-IEkgdXNlZCBhdCBldmVyeSBiaXNlY3Qgc3RlcCk6DQoNCiQgbWFrZSB0aW55Y29uZmlnDQokIHRp
-bWUgbWFrZSAtajQgVj0yICMgdGhpcyBzaG91bGQgYnVpbGQgdGhpbmdzDQokIHRpbWUgbWFrZSAt
-ajQgVj0yICMganVzdCB0byBtYWtlIHN1cmUgbm90aGluZyB3aWxsIGJlIHJlYnVpbHQNCiQgdGlt
-ZSBtYWtlIC1qNCBWPTIgdGFyZ3otcGtnDQoNCkluIGJhZCBjb21taXRzLCB0aGUgbGFzdCBjb21t
-YW5kIHdpbGwgdHJpZ2dlciBhIHJlYnVpbGQgb2YgdGhlIHdob2xlDQpLZXJuZWwsIG1lbnRpb25p
-bmcgImR1ZSB0byBjb21tYW5kIGxpbmUgY2hhbmdlIiBhcyBhIHJlYXNvbiB0byByZWJ1aWxkDQpl
-dmVyeSBvYmplY3QgZmlsZS4gSW4gZ29vZCBjb21taXRzLCB0aGUgbGFzdCBjb21tYW5kIHdpbGwg
-ZmluaXNoIGFmdGVyDQphIGZldyBzZWNvbmRzLCBub3QgcmVidWlsZGluZyBhbnl0aGluZywganVz
-dCBnaXZpbmcgdXMgYSBuaWNlIHRhcmJhbGwuDQoNCkFsc28gbm90aWNlIHRoYXQgaWYgeW91IGRv
-IHdhaXQgZm9yIHRoZSB3aG9sZSB0YXJnei1wa2cgYnVpbGQsIGFuZA0KbGF0ZXIgZ28gYmFjayB0
-byAibWFrZSAtajQgVj0yIiAod2l0aG91dCB0YXJnei1wa2cpLCBpdCB3aWxsLCBhZ2FpbiwNCnJl
-YnVpbGQgZXZlcnl0aGluZywgd2hpY2ggaXMgYWxzbyBub3QgdGhlIG9sZCBiZWhhdmlvci4NCg0K
-QWZ0ZXIgc29tZSBpbnZlc3RpZ2F0aW9uLCBpdCBsb29rcyBsaWtlIHRoZSAub2JqLmNtZCBmaWxl
-cyBhcmUgd2hhdCdzDQpjb21wYXJlZCBoZXJlLCBzbyBsZXQgbWUgcHJvdmlkZSB5b3UgYW4gZXhh
-bXBsZSB0aGF0IHdpbGwgaG9wZWZ1bGx5DQpoZWxwIHlvdSBkZWJ1ZzoNCg0KJCB0aW1lIG1ha2Ug
-LWo0IFY9Mg0KJCBjcCBpbml0Ly5tYWluLm8uY21kIC90bXAvbWFpbi1iZWZvcmUuY21kDQokIHRp
-bWUgbWFrZSAtajQgVj0yIHRhcmd6LXBrZw0KJCBkaWZmIC1OcnVwIC90bXAvbWFpbi1iZWZvcmUu
-Y21kIGluaXQvLm1haW4uby5jbWQgPiAvdG1wL2NtZC0NCmRpZmYucGF0Y2gNCg0KWW91IGNhbiBh
-Y2Nlc3MgdGhlIGRpZmYgZmlsZSBoZXJlOg0KwqAgaHR0cHM6Ly9wZW9wbGUuZnJlZWRlc2t0b3Au
-b3JnL35wemFub25pL2NtZC1kaWZmLnBhdGNoDQoNCklmIHlvdSB0YWtlIGEgbG9vaywgeW91J2xs
-IHNlZSB0aGF0IHRoZSBvbmx5IGRpZmZlcmVuY2UgaXMgdGhhdCB0aGUgY21kDQpmaWxlIGdlbmVy
-YXRlZCBkdXJpbmcgdGFyZ3otcGtnIGNvbnRhaW5zIHRoZXNlIGV4dHJhIGNoYXJzIGluIHRoZQ0K
-Y21kX2luaXQvbWFpbi5vIGRlY2xhcmF0aW9uOg0KwqAgLW5vc3RkaW5jIC1pc3lzdGVtIC91c3Iv
-bGliL2djYy94ODZfNjQtbGludXgtZ251LzUvaW5jbHVkZQ0KDQpCdXQgcGxlYXNlIG5vdGljZSB0
-aGF0IHRoZXNlIGFyZ3VtZW50cyBhcmUgcmVwZWF0ZWQhIFRoZSBtYWluLQ0KYmVmb3JlLmNtZCBm
-aWxlIGNvbnRhaW5zIHRob3NlIGFyZ3VtZW50cyBvbmx5IG9uY2UsIHdoaWxlIHRoZSBuZXcgZmls
-ZQ0KY29udGFpbnMgdGhlbSB0d2ljZS4gSSBkb24ndCBrbm93IHdoeSAibWFrZSB0YXJnei1wa2ci
-IG1ha2VzIHRoZXNlDQphcmd1bWVudHMgYXBwZWFyIHR3aWNlLiBNYXliZSBmaXhpbmcgdGhpcyB3
-b3VsZCBiZSBhIGJldHRlciB3YXkgdG8NCnNvbHZlIHRoZSByZWdyZXNzaW9uIGluc3RlYWQgb2Yg
-anVzdCByZXZlcnRpbmcgdGhlICJmaXJzdCBiYWQgY29tbWl0Ij8NCg0KSSBkaWRuJ3QgZGVidWcg
-dGhlIHByb2JsZW0gZnVydGhlci4gSSdtIGhvcGluZyB0aGUgaW5mbyBJIHByb3ZpZGVkIGlzDQpl
-bm91Z2ggZm9yIHlvdSB0byBrZWVwIHRoaW5ncyBtb3ZpbmcsIGJ1dCBpZiB5b3UgaGF2ZSBhbnkg
-cGF0Y2hlcyBvcg0KdGlwcyBvbiB3aGVyZSBJIGNvdWxkIGNvbnRpbnVlIGRpZ2dpbmcsIHBsZWFz
-ZSB0ZWxsIG1lLiBJIHN1cHBvc2UgdGhlDQpwcm9ibGVtIHNob3VsZCBiZSBlYXNpbHkgcmVwcm9k
-dWNpYmxlIGV2ZXJ5d2hlcmUuDQoNCkluIHRoZSBtZWFudGltZSwgc2luY2UgSSBjYW4ndCBwYXkg
-dGhlIHByaWNlIG9mIDIgZnVsbCByZWJ1aWxkcyBmb3INCmV2ZXJ5IHRlc3RlZCBLZXJuZWwsIEkg
-c3VwcG9zZSBJJ2xsIGJlIGNhcnJ5aW5nIGEgbG9jYWwgcmV2ZXJ0LCBidXQgSSdkDQpiZSByZWFs
-bHkgaGFwcHkgdG8gc2VlIGFuIHVwc3RyZWFtIHNvbHV0aW9uLg0KDQpUaGFua3MsDQpQYXVsbw==
+For package building, the scripts/package/Makefile invokes
+"$(MAKE) KBUILD_SRC=", so the top Makefile is invoked recursively.
+
+Notice NOSTDINC_FLAGS is exported and assigned with "+=", not ":=".
+It means, NOSTDINC_FLAGS is accumulated in the call loop of package
+build: top Makefile -> scripts/package/Makefile -> top Makefile.
+
+Before, it was not a big deal because GCC just ignores the repeated
+compile options, and $(call if_changed,...) compared the old/new
+commands as a set of arguments.
+
+However, the situation was changed by commit 9c8fa9bc08f6 ("kbuild:
+fix if_change and friends to consider argument order").  Now Kbuild
+compares old/new commands more precisely.
+
+Since then, "make" followed by "make targz-pkg" always rebuilds the
+whole kernel.  The NOSTDINC_FLAGS is added just once for "make",
+whilst twice for "make targz-pkg" as mentioned above.  So, Kbuild
+considers that the build command has changed despite that we want a
+tarball straight away if everything is already built.
+
+The easiest way to fix this problem is to change "+=" to ":="
+for NOSTDINC_FLAGS assignment.
+
+This effectively reverts commit e8f5bdb02ce0 ("[PATCH] Makefile
+include path ordering").  Its log says that the arch Makefile may
+override the include path order, but I see no arch Makefile touching
+NOSTDINC_FLAGS.  So, this change should have no impact unless
+something outside of the kernel needs to override it.
+
+Reported-by: Paulo Zanoni <paulo.r.zanoni@intel.com>
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
+
+This patch is fixing the problem reported by:
+http://www.gossamer-threads.com/lists/linux/kernel/2454440
+
+Paulo,
+Thanks for your report!
+
+Rik,
+This patch is reverting your commit applied more than a decide ago.
+As far as I see the kernel tree, I am not sure if it is still needed.
+I am not familiar with Xen at all, so your review is very appreciated.
+
+
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile b/Makefile
+index 8d1301a..58c06be 100644
+--- a/Makefile
++++ b/Makefile
+@@ -767,7 +767,7 @@ KBUILD_CFLAGS += $(call cc-option, -fno-inline-functions-called-once)
+ endif
+ 
+ # arch Makefile may override CC so keep this after arch Makefile is included
+-NOSTDINC_FLAGS += -nostdinc -isystem $(shell $(CC) -print-file-name=include)
++NOSTDINC_FLAGS := -nostdinc -isystem $(shell $(CC) -print-file-name=include)
+ CHECKFLAGS     += $(NOSTDINC_FLAGS)
+ 
+ # warn about C99 declaration after statement
+-- 
+1.9.1
+
