@@ -1,93 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:29361 "EHLO
-	conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752401AbcFGLaP (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 7 Jun 2016 07:30:15 -0400
+Received: from r00tworld.com ([212.85.137.150]:37559 "EHLO r00tworld.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1753590AbcFGMUR (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 7 Jun 2016 08:20:17 -0400
+From: "PaX Team" <pageexec@freemail.hu>
+Date: Tue, 07 Jun 2016 14:19:14 +0200
 MIME-Version: 1.0
-In-Reply-To: <5756A675.3080003@suse.cz>
-References: <1465263518.3885.9.camel@intel.com> <5756960E.5020706@suse.com>
- <57569ACC.8050503@suse.cz> <CAK7LNARPUqD9BY5p-=M49KkQM7+j0bVFBX2On_rqdJjRs=zeTQ@mail.gmail.com>
- <5756A675.3080003@suse.cz>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 7 Jun 2016 20:29:57 +0900
-Message-ID: <CAK7LNAS4228scb3Ep1MT_FZhHS_+ckJCJZSDT-TN9hcvJ7Wq0A@mail.gmail.com>
-Subject: Re: Regression in "kbuild: fix if_change and friends to consider
- argument order"
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [kernel-hardening] Re: [PATCH v2 1/3] Add the latent_entropy gcc plugin
+Reply-to: pageexec@freemail.hu
+Message-ID: <5756BBC2.3735.D63200E@pageexec.freemail.hu>
+In-reply-to: <20160606231319.GC7057@thunk.org>
+References: <20160531013029.4c5db8b570d86527b0b53fe4@gmail.com>, <5755CF44.24670.9C7568D@pageexec.freemail.hu>, <20160606231319.GC7057@thunk.org>
+Content-type: text/plain; charset=US-ASCII
+Content-transfer-encoding: 7BIT
+Content-description: Mail message body
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: "Zanoni, Paulo R" <paulo.r.zanoni@intel.com>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "nicolas.pitre@linaro.org" <nicolas.pitre@linaro.org>
+To: Theodore Ts'o <tytso@mit.edu>
+Cc: kernel-hardening@lists.openwall.com, David Brown <david.brown@linaro.org>, emese Revfy <re.emese@gmail.com>, Andrew Morton <akpm@linux-foundation.org>, spender@grsecurity.net, mmarek@suse.com, keescook@chromium.org, linux-kernel@vger.kernel.org, yamada.masahiro@socionext.com, linux-kbuild@vger.kernel.org, linux-mm@kvack.org, axboe@kernel.dk, viro@zeniv.linux.org.uk, paulmck@linux.vnet.ibm.com, mingo@redhat.com, tglx@linutronix.de, bart.vanassche@sandisk.com, davem@davemloft.net
 
-2016-06-07 19:48 GMT+09:00 Michal Marek <mmarek@suse.cz>:
-> On 2016-06-07 12:03, Masahiro Yamada wrote:
->> 2016-06-07 18:58 GMT+09:00 Michal Marek <mmarek@suse.cz>:
->>> On 2016-06-07 11:38, Michal Marek wrote:
->>>> On 2016-06-07 03:38, Zanoni, Paulo R wrote:
->>>>> Hi
->>>>>
->>>>> I recently noticed that alternating between "make" and "make targz-pkg"
->>>>> rebuilds the whole Kernel. This was not happening before. As a Kernel
->>>>> developer, my build/install/test environment heavily relies on the fact
->>>>> that "make targz-pkg" only quickly generates the tarball if everything
->>>>> is already built, so this change is heavily impacting my development
->>>>> environment.
->>>>>
->>>>> I did some bisection and concluded that the first bad commit is:
->>>>>
->>>>> commit 9c8fa9bc08f60ac657751daba9fccf828a36cfed
->>>>> Author: Masahiro Yamada
->>>>> Date:   Sat May 7 15:48:26 2016 +0900
->>>>>     kbuild: fix if_change and friends to consider argument order
->>>>>
->>>>> I also verified that if I just revert this commit on top of the
->>>>> most recent tree it goes back to the usual behavior.
->>>>>
->>>>> I read the commit message and it seems that some unneeded rebuilds are
->>>>> somewhat expected, but I can't understand why such a change in the
->>>>> command line like the one I did triggers everything to be rebuilt.
->>>>> IMHO, it really shouldn't. I also wonder that maybe the regression I'm
->>>>> experiencing was not expected in the original change, so maybe there's
->>>>> a way to keep the original improvement caused by the mentioned patch
->>>>> without the regression I'm experiencing.
->>>>>
->>>>> How to reproduce (exact commands I used at every bisect step):
->>>>>
->>>>> $ make tinyconfig
->>>>> $ time make -j4 V=2 # this should build things
->>>>> $ time make -j4 V=2 # just to make sure nothing will be rebuilt
->>>>> $ time make -j4 V=2 targz-pkg
->>>>
->>>> I can reproduce it.
->>>
->>> Try the attached patch.
->>>
->>> Michal
->>>
->>
->>
->> Right.
->>
->> I had already sent a similar patch.
->> https://patchwork.kernel.org/patch/9159863/
->
-> I see. I hadn't read all my mail before replying.
->
->
->> My concern is it is effectively
->> reverting e8f5bdb02ce0.
->> I hope Rik can comment on that.
->
-> My patch just resets NOSTDINC_FLAGS before including the arch Makefile.
->
+On 6 Jun 2016 at 19:13, Theodore Ts'o wrote:
 
-Ah, I missed that, sorry.
+> On Mon, Jun 06, 2016 at 09:30:12PM +0200, PaX Team wrote:
+> > 
+> > what matters for latent entropy is not the actual values fed into the entropy
+> > pool (they're effectively compile time constants save for runtime data dependent
+> > computations) but the precise sequence of them. interrupts stir this sequence
+> > and thus extract entropy. perhaps as a small example imagine that an uninterrupted
+> > kernel boot sequence feeds these values into the entropy pool:
+> >   A B C
+> > 
+> > now imagine that a single interrupt can occur around any one of these values:
+> >   I A B C
+> >   A I B C
+> >   A B I C
+> >   A B C I
+> > 
+> > this way we can obtain 4 different final pool states that translate into up
+> > to 2 bits of latent entropy (depends on how probable each sequence is). note
+> > that this works regardless whether the underlying hardware has a high resolution
+> > timer whose values the interrupt handler would feed into the pool.
+> 
+> Right, but if it's only about interrupts,
 
-Then, yours should be no problem.
+(i believe that) latent entropy is found in more than just interrupt timing, there're
+also data dependent computations that can have entropy, either on a single system or
+across a population of them.
 
+> we're doing this already inside modern Linux kernels.  On every single
+> interrupt we are mixing into a per-CPU "fast mix" pool the IP from the
+> interrupt registers. 
 
+i agree that sampling the kernel register state can have entropy (the plugin
+already extracts the current stack pointer) but i'm much less sure about
+userland (at least i see no dependence on !user_mode(...)) since an attacker
+could feed no entropy into the pool but still get it credited.
 
--- 
-Best Regards
-Masahiro Yamada
+cheers,
+ PaX Team
+
