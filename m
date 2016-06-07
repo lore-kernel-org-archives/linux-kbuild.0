@@ -1,114 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:36505 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932163AbcFGVwl (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 7 Jun 2016 17:52:41 -0400
-Date: Tue, 7 Jun 2016 23:52:37 +0200
-From: Michal Marek <mmarek@suse.com>
-Subject: Re: Regression in "kbuild: fix if_change and friends to consider
- argument order"
-Message-ID: <20160607215237.GA13237@sepie.suse.cz>
-References: <1465263518.3885.9.camel@intel.com>
- <5756960E.5020706@suse.com>
- <57569ACC.8050503@suse.cz>
- <CAK7LNARPUqD9BY5p-=M49KkQM7+j0bVFBX2On_rqdJjRs=zeTQ@mail.gmail.com>
- <5756A675.3080003@suse.cz>
- <CAK7LNAS4228scb3Ep1MT_FZhHS_+ckJCJZSDT-TN9hcvJ7Wq0A@mail.gmail.com>
- <1465308627.3885.61.camel@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1465308627.3885.61.camel@intel.com>
+Received: from mail-wm0-f65.google.com ([74.125.82.65]:34568 "EHLO
+	mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S933273AbcFGVwm (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 7 Jun 2016 17:52:42 -0400
+Date: Tue, 7 Jun 2016 23:59:35 +0200
+From: Emese Revfy <re.emese@gmail.com>
+Subject: Re: [PATCH v9 0/4] Introduce GCC plugin infrastructure
+Message-Id: <20160607235935.60ef8505b54f052a464bc4de@gmail.com>
+In-Reply-To: <CAGXu5j+y-fb7qj+C2xNXzqT1-ob-CJq7D6cLHGNTcpCWMPGA4Q@mail.gmail.com>
+References: <20160524000719.b456ed0cd2aafacb4e53f177@gmail.com>
+	<CAGXu5jKC=HuCe3FPuuzjAZ+SX6C5AnhMp5BWwLhi8xVXhTGjEg@mail.gmail.com>
+	<57458279.6080009@suse.com>
+	<CAGXu5jKw_oQNCVUH+o_k-W+5Z7LDXgJ3UpP24a+y4S0Ny+gvvw@mail.gmail.com>
+	<57573559.1010607@suse.com>
+	<CAGXu5j+y-fb7qj+C2xNXzqT1-ob-CJq7D6cLHGNTcpCWMPGA4Q@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Zanoni, Paulo R" <paulo.r.zanoni@intel.com>
-Cc: "yamada.masahiro@socionext.com" <yamada.masahiro@socionext.com>, "mmarek@suse.cz" <mmarek@suse.cz>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "nicolas.pitre@linaro.org" <nicolas.pitre@linaro.org>
+To: Kees Cook <keescook@chromium.org>
+Cc: Michal Marek <mmarek@suse.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, PaX Team <pageexec@freemail.hu>, Brad Spengler <spender@grsecurity.net>, "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Fengguang Wu <fengguang.wu@intel.com>, Dmitry Vyukov <dvyukov@google.com>, LKML <linux-kernel@vger.kernel.org>, David Brown <david.brown@linaro.org>, Masahiro Yamada <yamada.masahiro@socionext.com>
 
-On Tue, Jun 07, 2016 at 02:10:28PM +0000, Zanoni, Paulo R wrote:
-> I tested both patches you provided:
->  - kbuild: do not append NOSTDINC_FLAGS to avoid rebuild in package
-> targets
->  - kbuild: Initialize NOSTDINC_CFLAGS
+On Tue, 7 Jun 2016 13:59:53 -0700
+Kees Cook <keescook@chromium.org> wrote:
+
+> >
+> > I applied the series to kbuild.git#kbuild now, sorry for the delay.
 > 
-> Both seem to improve the situation to a point where, at least for a
-> tinyconfig, timings are acceptable. But it's important to notice that
-> none of the changes are equivalent to just reverting the first bad
-> commit. We still recompile some additional files that were not compiled
-> with the full revert. Let me show you:
+> Awesome! Thank you very much. I'll prepare the latent entropy plugin
+> for -next now too.
 
-[...]
+I'll send a new patch series this week because I'm developing a small feature and
+I'm fixing the handling of tail calls.
 
-> So after some grepping, I tried to also initialize LDFLAGS_vmlinux, in
-> the same way you did with NOSTDINC_FLAGS, and it fixed the problem for
-> me:
-
-Good catch! I my tests, I was interrupting the build early and only
-checking the content of kernel/.bounds.s.cmd; lazy me :). I'm going to
-apply the patch below to kbuild.git#rc-fixes.
-
-
-> I also wondered that maybe we need to also initialize
-> KBUILD_LDFLAGS_MODULE, but it seems what fixed the problem was just
-> LDFLAGS_vmlinux. So I'm not sure if we'll need this. I also have no
-> idea whether this would cause other unintended regressions. It's up to
-> you, Makefile maintainers, to judge. 
-
-I did check the += assignments now and I only see
-
-$ awk '/\+=/ { print $1 }' Makefile  | sort -u | while read v; do grep
--m1 "$v" Makefile; done | grep '+='
-CLEAN_DIRS  += $(MODVERDIR)
-MAKEFLAGS += -rR --include-dir=$(CURDIR)
-MRPROPER_DIRS  += include/config usr/include include/generated
-\
-MRPROPER_FILES += .config .config.old .version .old_version \
-
-The MAKEFLAGS assignment is correct, the CLEAN_DIRS and MRPROPER_*
-+= assignments are unnecessary, but none of these variables is exported.
-So we are fine _with respect to the main Makefile_. It's possible that
-e.g. some arch Makefile has a skeleton in the cupboard. We will see.
-
-Michal
-
-
-From b36fad65d61fffe4b662d4bfb1ed673c455a36a2 Mon Sep 17 00:00:00 2001
-From: Michal Marek <mmarek@suse.com>
-Date: Tue, 7 Jun 2016 11:57:02 +0200
-Subject: [PATCH] kbuild: Initialize exported variables
-
-The NOSTDINC_FLAGS variable is exported, so it needs to be cleared to
-avoid duplicating its content when running make from within make (e.g.
-in the packaging targets). This became an issue after commit
-9c8fa9bc08f6 ("kbuild: fix if_change and friends to consider argument
-order"), which no longer ignores the duplicate options. As Paulo Zanoni
-points out, the LDFLAGS_vmlinux variable has the same problem.
-
-Reported-by: "Zanoni, Paulo R" <paulo.r.zanoni@intel.com>
-Fixes: 9c8fa9bc08f6 ("kbuild: fix if_change and friends to consider argument order")
-Signed-off-by: Michal Marek <mmarek@suse.com>
----
- Makefile | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/Makefile b/Makefile
-index 0f70de63cfdb..af0c463e908f 100644
---- a/Makefile
-+++ b/Makefile
-@@ -363,11 +363,13 @@ CHECK		= sparse
- 
- CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
- 		  -Wbitwise -Wno-return-void $(CF)
-+NOSTDINC_FLAGS  =
- CFLAGS_MODULE   =
- AFLAGS_MODULE   =
- LDFLAGS_MODULE  =
- CFLAGS_KERNEL	=
- AFLAGS_KERNEL	=
-+LDFLAGS_vmlinux =
- CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage -fno-tree-loop-im -Wno-maybe-uninitialized
- CFLAGS_KCOV	= -fsanitize-coverage=trace-pc
- 
 -- 
-2.6.2
-
+Emese
