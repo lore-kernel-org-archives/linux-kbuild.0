@@ -1,54 +1,80 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from imap.thunk.org ([74.207.234.97]:48640 "EHLO imap.thunk.org"
+Received: from mga03.intel.com ([134.134.136.65]:40568 "EHLO mga03.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751884AbcFFXNq (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 6 Jun 2016 19:13:46 -0400
-Date: Mon, 6 Jun 2016 19:13:19 -0400
-From: Theodore Ts'o <tytso@mit.edu>
-Subject: Re: [kernel-hardening] Re: [PATCH v2 1/3] Add the latent_entropy gcc
- plugin
-Message-ID: <20160606231319.GC7057@thunk.org>
-References: <20160531013029.4c5db8b570d86527b0b53fe4@gmail.com>
- <20160603194252.91064b8e682ad988283fc569@gmail.com>
- <20160606133801.GA6136@davidb.org>
- <5755CF44.24670.9C7568D@pageexec.freemail.hu>
+	id S1752073AbcFGBin (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 6 Jun 2016 21:38:43 -0400
+From: "Zanoni, Paulo R" <paulo.r.zanoni@intel.com>
+Subject: Regression in "kbuild: fix if_change and friends to consider
+ argument order"
+Date: Tue, 7 Jun 2016 01:38:40 +0000
+Message-ID: <1465263518.3885.9.camel@intel.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <D8F9CF39CB5BA44BA7C52110EEDD4495@intel.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5755CF44.24670.9C7568D@pageexec.freemail.hu>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: PaX Team <pageexec@freemail.hu>
-Cc: kernel-hardening@lists.openwall.com, David Brown <david.brown@linaro.org>, emese Revfy <re.emese@gmail.com>, Andrew Morton <akpm@linux-foundation.org>, spender@grsecurity.net, mmarek@suse.com, keescook@chromium.org, linux-kernel@vger.kernel.org, yamada.masahiro@socionext.com, linux-kbuild@vger.kernel.org, linux-mm@kvack.org, axboe@kernel.dk, viro@zeniv.linux.org.uk, paulmck@linux.vnet.ibm.com, mingo@redhat.com, tglx@linutronix.de, bart.vanassche@sandisk.com, davem@davemloft.net
+To: "mmarek@suse.com" <mmarek@suse.com>, "yamada.masahiro@socionext.com" <yamada.masahiro@socionext.com>
+Cc: "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "nicolas.pitre@linaro.org" <nicolas.pitre@linaro.org>
 
-On Mon, Jun 06, 2016 at 09:30:12PM +0200, PaX Team wrote:
-> 
-> what matters for latent entropy is not the actual values fed into the entropy
-> pool (they're effectively compile time constants save for runtime data dependent
-> computations) but the precise sequence of them. interrupts stir this sequence
-> and thus extract entropy. perhaps as a small example imagine that an uninterrupted
-> kernel boot sequence feeds these values into the entropy pool:
->   A B C
-> 
-> now imagine that a single interrupt can occur around any one of these values:
->   I A B C
->   A I B C
->   A B I C
->   A B C I
-> 
-> this way we can obtain 4 different final pool states that translate into up
-> to 2 bits of latent entropy (depends on how probable each sequence is). note
-> that this works regardless whether the underlying hardware has a high resolution
-> timer whose values the interrupt handler would feed into the pool.
-
-Right, but if it's only about interrupts, we're doing this already
-inside modern Linux kernels.  On every single interrupt we are mixing
-into a per-CPU "fast mix" pool the IP from the interrupt registers.
-
-Since we're not claiming any additional entropy, I suppose it won't
-hurt to do it twice, two different ways, but I'm not sure how much it
-will actually help, and by doing the instrumentation in every single
-basic block, instead of in the interrupt handler, I would think it
-would be cheaper to do it in the interrupt handler.
-
-      	 	       	     - Ted
+SGkNCg0KSSByZWNlbnRseSBub3RpY2VkIHRoYXQgYWx0ZXJuYXRpbmcgYmV0d2VlbiAibWFrZSIg
+YW5kICJtYWtlIHRhcmd6LXBrZyINCnJlYnVpbGRzIHRoZSB3aG9sZSBLZXJuZWwuIFRoaXMgd2Fz
+IG5vdCBoYXBwZW5pbmcgYmVmb3JlLiBBcyBhIEtlcm5lbA0KZGV2ZWxvcGVyLCBteSBidWlsZC9p
+bnN0YWxsL3Rlc3QgZW52aXJvbm1lbnQgaGVhdmlseSByZWxpZXMgb24gdGhlIGZhY3QNCnRoYXQg
+Im1ha2UgdGFyZ3otcGtnIiBvbmx5IHF1aWNrbHkgZ2VuZXJhdGVzIHRoZSB0YXJiYWxsIGlmIGV2
+ZXJ5dGhpbmcNCmlzIGFscmVhZHkgYnVpbHQsIHNvIHRoaXMgY2hhbmdlIGlzIGhlYXZpbHkgaW1w
+YWN0aW5nIG15IGRldmVsb3BtZW50DQplbnZpcm9ubWVudC4NCg0KSSBkaWQgc29tZSBiaXNlY3Rp
+b24gYW5kIGNvbmNsdWRlZCB0aGF0IHRoZSBmaXJzdCBiYWQgY29tbWl0IGlzOg0KDQpjb21taXQg
+OWM4ZmE5YmMwOGY2MGFjNjU3NzUxZGFiYTlmY2NmODI4YTM2Y2ZlZA0KQXV0aG9yOiBNYXNhaGly
+byBZYW1hZGENCkRhdGU6wqDCoMKgU2F0IE1heSA3IDE1OjQ4OjI2IDIwMTYgKzA5MDANCsKgIMKg
+IGtidWlsZDogZml4IGlmX2NoYW5nZSBhbmQgZnJpZW5kcyB0byBjb25zaWRlciBhcmd1bWVudCBv
+cmRlcg0KDQpJIGFsc28gdmVyaWZpZWQgdGhhdCBpZiBJIGp1c3QgcmV2ZXJ0IHRoaXMgY29tbWl0
+IG9uIHRvcCBvZiB0aGUNCm1vc3QgcmVjZW50IHRyZWUgaXQgZ29lcyBiYWNrIHRvIHRoZSB1c3Vh
+bCBiZWhhdmlvci4NCg0KSSByZWFkIHRoZSBjb21taXQgbWVzc2FnZSBhbmQgaXQgc2VlbXMgdGhh
+dCBzb21lIHVubmVlZGVkIHJlYnVpbGRzIGFyZQ0Kc29tZXdoYXQgZXhwZWN0ZWQsIGJ1dCBJIGNh
+bid0IHVuZGVyc3RhbmQgd2h5IHN1Y2ggYSBjaGFuZ2UgaW4gdGhlDQpjb21tYW5kIGxpbmUgbGlr
+ZSB0aGUgb25lIEkgZGlkIHRyaWdnZXJzIGV2ZXJ5dGhpbmcgdG8gYmUgcmVidWlsdC4NCklNSE8s
+IGl0IHJlYWxseSBzaG91bGRuJ3QuIEkgYWxzbyB3b25kZXIgdGhhdCBtYXliZSB0aGUgcmVncmVz
+c2lvbiBJJ20NCmV4cGVyaWVuY2luZyB3YXMgbm90IGV4cGVjdGVkIGluIHRoZSBvcmlnaW5hbCBj
+aGFuZ2UsIHNvIG1heWJlIHRoZXJlJ3MNCmEgd2F5IHRvIGtlZXAgdGhlIG9yaWdpbmFsIGltcHJv
+dmVtZW50IGNhdXNlZCBieSB0aGUgbWVudGlvbmVkIHBhdGNoDQp3aXRob3V0IHRoZSByZWdyZXNz
+aW9uIEknbSBleHBlcmllbmNpbmcuDQoNCkhvdyB0byByZXByb2R1Y2UgKGV4YWN0IGNvbW1hbmRz
+IEkgdXNlZCBhdCBldmVyeSBiaXNlY3Qgc3RlcCk6DQoNCiQgbWFrZSB0aW55Y29uZmlnDQokIHRp
+bWUgbWFrZSAtajQgVj0yICMgdGhpcyBzaG91bGQgYnVpbGQgdGhpbmdzDQokIHRpbWUgbWFrZSAt
+ajQgVj0yICMganVzdCB0byBtYWtlIHN1cmUgbm90aGluZyB3aWxsIGJlIHJlYnVpbHQNCiQgdGlt
+ZSBtYWtlIC1qNCBWPTIgdGFyZ3otcGtnDQoNCkluIGJhZCBjb21taXRzLCB0aGUgbGFzdCBjb21t
+YW5kIHdpbGwgdHJpZ2dlciBhIHJlYnVpbGQgb2YgdGhlIHdob2xlDQpLZXJuZWwsIG1lbnRpb25p
+bmcgImR1ZSB0byBjb21tYW5kIGxpbmUgY2hhbmdlIiBhcyBhIHJlYXNvbiB0byByZWJ1aWxkDQpl
+dmVyeSBvYmplY3QgZmlsZS4gSW4gZ29vZCBjb21taXRzLCB0aGUgbGFzdCBjb21tYW5kIHdpbGwg
+ZmluaXNoIGFmdGVyDQphIGZldyBzZWNvbmRzLCBub3QgcmVidWlsZGluZyBhbnl0aGluZywganVz
+dCBnaXZpbmcgdXMgYSBuaWNlIHRhcmJhbGwuDQoNCkFsc28gbm90aWNlIHRoYXQgaWYgeW91IGRv
+IHdhaXQgZm9yIHRoZSB3aG9sZSB0YXJnei1wa2cgYnVpbGQsIGFuZA0KbGF0ZXIgZ28gYmFjayB0
+byAibWFrZSAtajQgVj0yIiAod2l0aG91dCB0YXJnei1wa2cpLCBpdCB3aWxsLCBhZ2FpbiwNCnJl
+YnVpbGQgZXZlcnl0aGluZywgd2hpY2ggaXMgYWxzbyBub3QgdGhlIG9sZCBiZWhhdmlvci4NCg0K
+QWZ0ZXIgc29tZSBpbnZlc3RpZ2F0aW9uLCBpdCBsb29rcyBsaWtlIHRoZSAub2JqLmNtZCBmaWxl
+cyBhcmUgd2hhdCdzDQpjb21wYXJlZCBoZXJlLCBzbyBsZXQgbWUgcHJvdmlkZSB5b3UgYW4gZXhh
+bXBsZSB0aGF0IHdpbGwgaG9wZWZ1bGx5DQpoZWxwIHlvdSBkZWJ1ZzoNCg0KJCB0aW1lIG1ha2Ug
+LWo0IFY9Mg0KJCBjcCBpbml0Ly5tYWluLm8uY21kIC90bXAvbWFpbi1iZWZvcmUuY21kDQokIHRp
+bWUgbWFrZSAtajQgVj0yIHRhcmd6LXBrZw0KJCBkaWZmIC1OcnVwIC90bXAvbWFpbi1iZWZvcmUu
+Y21kIGluaXQvLm1haW4uby5jbWQgPiAvdG1wL2NtZC0NCmRpZmYucGF0Y2gNCg0KWW91IGNhbiBh
+Y2Nlc3MgdGhlIGRpZmYgZmlsZSBoZXJlOg0KwqAgaHR0cHM6Ly9wZW9wbGUuZnJlZWRlc2t0b3Au
+b3JnL35wemFub25pL2NtZC1kaWZmLnBhdGNoDQoNCklmIHlvdSB0YWtlIGEgbG9vaywgeW91J2xs
+IHNlZSB0aGF0IHRoZSBvbmx5IGRpZmZlcmVuY2UgaXMgdGhhdCB0aGUgY21kDQpmaWxlIGdlbmVy
+YXRlZCBkdXJpbmcgdGFyZ3otcGtnIGNvbnRhaW5zIHRoZXNlIGV4dHJhIGNoYXJzIGluIHRoZQ0K
+Y21kX2luaXQvbWFpbi5vIGRlY2xhcmF0aW9uOg0KwqAgLW5vc3RkaW5jIC1pc3lzdGVtIC91c3Iv
+bGliL2djYy94ODZfNjQtbGludXgtZ251LzUvaW5jbHVkZQ0KDQpCdXQgcGxlYXNlIG5vdGljZSB0
+aGF0IHRoZXNlIGFyZ3VtZW50cyBhcmUgcmVwZWF0ZWQhIFRoZSBtYWluLQ0KYmVmb3JlLmNtZCBm
+aWxlIGNvbnRhaW5zIHRob3NlIGFyZ3VtZW50cyBvbmx5IG9uY2UsIHdoaWxlIHRoZSBuZXcgZmls
+ZQ0KY29udGFpbnMgdGhlbSB0d2ljZS4gSSBkb24ndCBrbm93IHdoeSAibWFrZSB0YXJnei1wa2ci
+IG1ha2VzIHRoZXNlDQphcmd1bWVudHMgYXBwZWFyIHR3aWNlLiBNYXliZSBmaXhpbmcgdGhpcyB3
+b3VsZCBiZSBhIGJldHRlciB3YXkgdG8NCnNvbHZlIHRoZSByZWdyZXNzaW9uIGluc3RlYWQgb2Yg
+anVzdCByZXZlcnRpbmcgdGhlICJmaXJzdCBiYWQgY29tbWl0Ij8NCg0KSSBkaWRuJ3QgZGVidWcg
+dGhlIHByb2JsZW0gZnVydGhlci4gSSdtIGhvcGluZyB0aGUgaW5mbyBJIHByb3ZpZGVkIGlzDQpl
+bm91Z2ggZm9yIHlvdSB0byBrZWVwIHRoaW5ncyBtb3ZpbmcsIGJ1dCBpZiB5b3UgaGF2ZSBhbnkg
+cGF0Y2hlcyBvcg0KdGlwcyBvbiB3aGVyZSBJIGNvdWxkIGNvbnRpbnVlIGRpZ2dpbmcsIHBsZWFz
+ZSB0ZWxsIG1lLiBJIHN1cHBvc2UgdGhlDQpwcm9ibGVtIHNob3VsZCBiZSBlYXNpbHkgcmVwcm9k
+dWNpYmxlIGV2ZXJ5d2hlcmUuDQoNCkluIHRoZSBtZWFudGltZSwgc2luY2UgSSBjYW4ndCBwYXkg
+dGhlIHByaWNlIG9mIDIgZnVsbCByZWJ1aWxkcyBmb3INCmV2ZXJ5IHRlc3RlZCBLZXJuZWwsIEkg
+c3VwcG9zZSBJJ2xsIGJlIGNhcnJ5aW5nIGEgbG9jYWwgcmV2ZXJ0LCBidXQgSSdkDQpiZSByZWFs
+bHkgaGFwcHkgdG8gc2VlIGFuIHVwc3RyZWFtIHNvbHV0aW9uLg0KDQpUaGFua3MsDQpQYXVsbw==
