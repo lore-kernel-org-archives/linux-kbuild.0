@@ -1,47 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:60026 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1750837AbcFHG76 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 8 Jun 2016 02:59:58 -0400
-Subject: Re: [PATCH v9 0/4] Introduce GCC plugin infrastructure
-References: <20160524000719.b456ed0cd2aafacb4e53f177@gmail.com>
- <CAGXu5jKC=HuCe3FPuuzjAZ+SX6C5AnhMp5BWwLhi8xVXhTGjEg@mail.gmail.com>
- <57458279.6080009@suse.com>
- <CAGXu5jKw_oQNCVUH+o_k-W+5Z7LDXgJ3UpP24a+y4S0Ny+gvvw@mail.gmail.com>
- <57573559.1010607@suse.com>
- <CAGXu5j+y-fb7qj+C2xNXzqT1-ob-CJq7D6cLHGNTcpCWMPGA4Q@mail.gmail.com>
- <20160607235935.60ef8505b54f052a464bc4de@gmail.com>
- <CAGXu5jLGCCoM83wXXasVz=1neBKbfZmrcrT39ZXqXTh7FUgEaA@mail.gmail.com>
-From: Michal Marek <mmarek@suse.com>
-Message-ID: <5757C262.4010000@suse.com>
-Date: Wed, 8 Jun 2016 08:59:46 +0200
-MIME-Version: 1.0
-In-Reply-To: <CAGXu5jLGCCoM83wXXasVz=1neBKbfZmrcrT39ZXqXTh7FUgEaA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Received: from smtprelay0111.hostedemail.com ([216.40.44.111]:33986 "EHLO
+	smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1752365AbcFHPqJ (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 8 Jun 2016 11:46:09 -0400
+Message-ID: <1465400332.25087.56.camel@perches.com>
+Subject: kbuild: default n removals? (was: Re: [PATCH v3 4/6] watchdog: add
+ watchdog pretimeout framework)
+From: Joe Perches <joe@perches.com>
+Date: Wed, 08 Jun 2016 08:38:52 -0700
+In-Reply-To: <5758358A.602@mentor.com>
+References: <1465321127-19522-1-git-send-email-vladimir_zapolskiy@mentor.com>
+	 <1465321127-19522-5-git-send-email-vladimir_zapolskiy@mentor.com>
+	 <20160607214309.GA17129@roeck-us.net> <57581FB2.10806@mentor.com>
+	 <57582363.8050406@roeck-us.net> <5758358A.602@mentor.com>
+Content-Type: text/plain; charset="ISO-8859-1"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kees Cook <keescook@chromium.org>, Emese Revfy <re.emese@gmail.com>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, PaX Team <pageexec@freemail.hu>, Brad Spengler <spender@grsecurity.net>, "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, Fengguang Wu <fengguang.wu@intel.com>, Dmitry Vyukov <dvyukov@google.com>, LKML <linux-kernel@vger.kernel.org>, David Brown <david.brown@linaro.org>, Masahiro Yamada <yamada.masahiro@socionext.com>
+To: Vladimir Zapolskiy <vladimir_zapolskiy@mentor.com>, Guenter Roeck <linux@roeck-us.net>, Michal Marek <mmarek@suse.com>
+Cc: Wim Van Sebroeck <wim@iguana.be>, Wolfram Sang <wsa@the-dreams.de>, Robin Gong <b38343@freescale.com>, linux-watchdog@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-Dne 7.6.2016 v 23:58 Kees Cook napsal(a):
-> On Tue, Jun 7, 2016 at 2:59 PM, Emese Revfy <re.emese@gmail.com> wrote:
->> On Tue, 7 Jun 2016 13:59:53 -0700
->> Kees Cook <keescook@chromium.org> wrote:
->>
->>>>
->>>> I applied the series to kbuild.git#kbuild now, sorry for the delay.
->>>
->>> Awesome! Thank you very much. I'll prepare the latent entropy plugin
->>> for -next now too.
->>
->> I'll send a new patch series this week because I'm developing a small feature and
->> I'm fixing the handling of tail calls.
+(Adding Michal Marek and linux-kbuild)
+
+On Wed, 2016-06-08 at 18:11 +0300, Vladimir Zapolskiy wrote:
+> On 08.06.2016 16:53, Guenter Roeck wrote:
+> > On 06/08/2016 06:37 AM, Vladimir Zapolskiy wrote:
+> > > > > +comment "Watchdog Pretimeout Governors"
+> > > > > +
+> > > > > +config WATCHDOG_PRETIMEOUT_GOV
+> > > > > +	bool "Enable watchdog pretimeout governors"
+> > > > > +	default n
+> > > > I don't think 'default n" is needed.
+> > > > 
+> > > No strict objections, but probably 'default n' may save quite many
+> > > lines in defconfigs.
+> > > 
+> > I always wondered why it would be necessary to say "default n".
+> > What is the difference between "default n" and no explicit default ?
+> > 
+> I pointed out that it may have impact on defconfig, but experimentally
+> it has no effect.
 > 
-> Depending on timing, it may be best to send a delta patch from
-> kbuild.git#kbuild. I assume that would be easier for Michal to carry.
+> Users of "make oldconfig" get a prompt in both cases as well.
+> 
+> Also I haven't found any difference for silentoldconfig, olddefconfig
+> and alldefconfig, I assume explicit "default n" and "def_bool n"
+> can be safely dropped.
 
-Right.
+It's not completely clear removals are always appropriate.
 
-Michal
+from: Documentation/kbuild/kconfig-language.txt:
+------------------------------------------------------------------
+- default value: "default" <expr> ["if" <expr>]
+  A config option can have any number of default values. If multiple
+  default values are visible, only the first defined one is active.
+  Default values are not limited to the menu entry where they are
+  defined. This means the default can be defined somewhere else or be
+  overridden by an earlier definition.
+  The default value is only assigned to the config symbol if no other
+  value was set by the user (via the input prompt above). If an input
+  prompt is visible the default value is presented to the user and can
+  be overridden by him.
+  Optionally, dependencies only for this default value can be added with
+  "if".
+------------------------------------------------------------------
 
+Michal?  Do you have an opinion or clarification?
