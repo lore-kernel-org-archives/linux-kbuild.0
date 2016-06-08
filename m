@@ -1,83 +1,141 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bh-25.webhostbox.net ([208.91.199.152]:58479 "EHLO
-	bh-25.webhostbox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752248AbcFHSFt (ORCPT
+Received: from bombadil.infradead.org ([198.137.202.9]:53230 "EHLO
+	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751399AbcFHV5r (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 8 Jun 2016 14:05:49 -0400
-Date: Wed, 8 Jun 2016 11:05:36 -0700
-From: Guenter Roeck <linux@roeck-us.net>
-Subject: Re: kbuild: default n removals? (was: Re: [PATCH v3 4/6] watchdog:
- add watchdog pretimeout framework)
-Message-ID: <20160608180536.GB17549@roeck-us.net>
-References: <1465321127-19522-1-git-send-email-vladimir_zapolskiy@mentor.com>
- <1465321127-19522-5-git-send-email-vladimir_zapolskiy@mentor.com>
- <20160607214309.GA17129@roeck-us.net>
- <57581FB2.10806@mentor.com>
- <57582363.8050406@roeck-us.net>
- <5758358A.602@mentor.com>
- <1465400332.25087.56.camel@perches.com>
+	Wed, 8 Jun 2016 17:57:47 -0400
+Date: Wed, 8 Jun 2016 14:57:44 -0700
+From: Darren Hart <dvhart@infradead.org>
+Subject: Re: [PATCH 1/2] dell-wmi, dell-laptop: hide dell-smbios
+Message-ID: <20160608215744.GI28348@f23x64.localdomain>
+References: <20160526114212.2b17ee2d@endymion>
+ <20160602110333.GA2575@eudyptula.hq.kempniu.pl>
+ <20160602111029.GO29844@pali>
+ <20160602230336.431d854a@endymion>
+ <20160607113019.GD29844@pali>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <1465400332.25087.56.camel@perches.com>
+In-Reply-To: <20160607113019.GD29844@pali>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Joe Perches <joe@perches.com>
-Cc: Vladimir Zapolskiy <vladimir_zapolskiy@mentor.com>, Michal Marek <mmarek@suse.com>, Wim Van Sebroeck <wim@iguana.be>, Wolfram Sang <wsa@the-dreams.de>, Robin Gong <b38343@freescale.com>, linux-watchdog@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Pali =?iso-8859-1?Q?Roh=E1r?= <pali.rohar@gmail.com>
+Cc: Jean Delvare <jdelvare@suse.de>, =?utf-8?B?TWljaGHFgiBLxJlwaWXFhA==?= <kernel@kempniu.pl>, platform-driver-x86@vger.kernel.org, linux-kbuild@vger.kernel.org, "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-On Wed, Jun 08, 2016 at 08:38:52AM -0700, Joe Perches wrote:
-> (Adding Michal Marek and linux-kbuild)
-> 
-> On Wed, 2016-06-08 at 18:11 +0300, Vladimir Zapolskiy wrote:
-> > On 08.06.2016 16:53, Guenter Roeck wrote:
-> > > On 06/08/2016 06:37 AM, Vladimir Zapolskiy wrote:
-> > > > > > +comment "Watchdog Pretimeout Governors"
-> > > > > > +
-> > > > > > +config WATCHDOG_PRETIMEOUT_GOV
-> > > > > > +	bool "Enable watchdog pretimeout governors"
-> > > > > > +	default n
-> > > > > I don't think 'default n" is needed.
+On Tue, Jun 07, 2016 at 01:30:19PM +0200, Pali Roh√°r wrote:
+> On Thursday 02 June 2016 23:03:36 Jean Delvare wrote:
+> > Hi Pali,
+> > 
+> > On Thu, 2 Jun 2016 13:10:29 +0200, Pali Roh√°r wrote:
+> > > On Thursday 02 June 2016 13:03:33 Micha≈Ç Kƒôpie≈Ñ wrote:
+> > > > > Dell-smbios is a helper module, it serves no purpose on its own, so
+> > > > > do not present it as an option to the user. Instead, select it
+> > > > > automatically whenever a driver which needs it is selected.
+
+Hi Yann,
+
+We have a question regarding best practice of depends and selects instigated by
+the following patch from Jean.
+
 > > > > > 
-> > > > No strict objections, but probably 'default n' may save quite many
-> > > > lines in defconfigs.
+> > > > > Signed-off-by: Jean Delvare <jdelvare@suse.de>
+> > > > > Cc: Micha≈Ç Kƒôpie≈Ñ <kernel@kempniu.pl>
+> > > > > Cc: Pali Roh√°r <pali.rohar@gmail.com>
+> > > > > Cc: Darren Hart <dvhart@infradead.org>
+> > > > > ---
+> > > > >  drivers/platform/x86/Kconfig |    8 +++++---
+> > > > >  1 file changed, 5 insertions(+), 3 deletions(-)
+> > > > > 
+> > > > > --- linux-4.6.orig/drivers/platform/x86/Kconfig	2016-05-16 00:43:13.000000000 +0200
+> > > > > +++ linux-4.6/drivers/platform/x86/Kconfig	2016-05-26 11:18:50.029103790 +0200
+> > > > > @@ -92,7 +92,7 @@ config ASUS_LAPTOP
+> > > > >  	  If you have an ACPI-compatible ASUS laptop, say Y or M here.
+> > > > >  
+> > > > >  config DELL_SMBIOS
+> > > > > -	tristate "Dell SMBIOS Support"
+> > > > > +	tristate
+> > > > >  	depends on DCDBAS
+> > > > >  	default n
+> > > > >  	---help---
+> > > > > @@ -104,12 +104,13 @@ config DELL_SMBIOS
+> > > > >  config DELL_LAPTOP
+> > > > >  	tristate "Dell Laptop Extras"
+> > > > >  	depends on X86
+> > > > > -	depends on DELL_SMBIOS
+> > > > >  	depends on DMI
+> > > > >  	depends on BACKLIGHT_CLASS_DEVICE
+> > > > >  	depends on ACPI_VIDEO || ACPI_VIDEO = n
+> > > > >  	depends on RFKILL || RFKILL = n
+> > > > >  	depends on SERIO_I8042
+> > > > > +	depends on DCDBAS
+> > > > > +	select DELL_SMBIOS
+> > > > >  	select POWER_SUPPLY
+> > > > >  	select LEDS_CLASS
+> > > > >  	select NEW_LEDS
+> > > > > @@ -124,7 +125,8 @@ config DELL_WMI
+> > > > >  	depends on DMI
+> > > > >  	depends on INPUT
+> > > > >  	depends on ACPI_VIDEO || ACPI_VIDEO = n
+> > > > > -	depends on DELL_SMBIOS
+> > > > > +	depends on DCDBAS
+> > > > > +	select DELL_SMBIOS
+> > > > >  	select INPUT_SPARSEKMAP
+> > > > >  	---help---
+> > > > >  	  Say Y here if you want to support WMI-based hotkeys on Dell laptops.
 > > > > 
-> > > I always wondered why it would be necessary to say "default n".
-> > > What is the difference between "default n" and no explicit default ?
+> > > > While I'm not a maintainer, I feel obliged to respond as I introduced
+> > > > the changes which this patch applies to.
 > > > 
-> > I pointed out that it may have impact on defconfig, but experimentally
-> > it has no effect.
+> > > Well, I'm on maintainer list of dell modules, but I do care about kbuild
+> > > configuration if it is working. So I let review of this change to other
+> > > people who understand kbuild better.
+> > > 
+> > > What I see in this change is adding "duplicate" or "redundant"
+> > > transitive dependency from DELL_WMI to DCDBAS. But DELL_WMI does not use
+> > > or need DCDBAS. It just needs DELL_SMIBIOS and basically DELL_WMI does
+> > > not care what DELL_SMBIOS is using (if DCDBAS, ACPI or any other thing).
+> > > So from my graph dependency point of view it is not correct, but I do
+> > > not know how kbuild is working...
 > > 
-> > Users of "make oldconfig" get a prompt in both cases as well.
+> > Sadly, options which select other options do not inherit from their
+> > dependencies, so kconfig would complain about unmet dependencies if you
+> > let the user enable an option which selects something that depends on
+> > something which is missing or not selected. I wish kconfig was smarter
+> > and would inherit dependencies in this case, but this doesn't happen. I
+> > don't know if it is a design decision, a limitation, or just the way it
+> > is for no specific reason.
 > > 
-> > Also I haven't found any difference for silentoldconfig, olddefconfig
-> > and alldefconfig, I assume explicit "default n" and "def_bool n"
-> > can be safely dropped.
+> > The only way I know of to avoid the duplicate dependency would be to
+> > let DELL_SMBIOS select DCDBAS instead of depending on it. But this is a
+> > more intrusive change. If it were just me I'd use select a lot more, as
+> > I don't think it is user-friendly to have drivers in one subsystem
+> > silently depend on options from another subsystem. But not everybody
+> > agrees with that.
+> > 
+> > > So I think kbuild developers should review this change.
+
+Let's ask them then.
++Yann
++linux-kbuild
+
+> > 
+> > Sounds unrealistic to me. It's as if you would ask Kernighan and Ritchie
+> > to review your driver code because they invented the C language ;-)
 > 
-> It's not completely clear removals are always appropriate.
+> No, that is not same. It is about that restriction that kbuild does not
+> support (correctly) transitive dependences and this is probably good
+> proposal either for extending kbuild or fixing something else. And
+> kbuild maintainers/developers either confirm this is really problem in
+> kbuild (which should be fixed) or show us how to write such thing
+> correctly. Or we are trying to use kbuild for something for which kbuild
+> is not designed...
 > 
-> from: Documentation/kbuild/kconfig-language.txt:
-> ------------------------------------------------------------------
-> - default value: "default" <expr> ["if" <expr>]
-> † A config option can have any number of default values. If multiple
-> † default values are visible, only the first defined one is active.
-> † Default values are not limited to the menu entry where they are
-> † defined. This means the default can be defined somewhere else or be
-> † overridden by an earlier definition.
-> † The default value is only assigned to the config symbol if no other
-> † value was set by the user (via the input prompt above). If an input
-> † prompt is visible the default value is presented to the user and can
-> † be overridden by him.
-> † Optionally, dependencies only for this default value can be added with
-> † "if".
+> -- 
+> Pali Roh√°r
+> pali.rohar@gmail.com
+> 
 
-This describes default settings such as
-	default n if <expr>
-	default y
-
-which would set the default to y unless <expr> is true.
-
-Question here was about the stand-alone "default n" which always
-perplexed me.
-
-Guenter
+-- 
+Darren Hart
+Intel Open Source Technology Center
