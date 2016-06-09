@@ -1,72 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f53.google.com ([74.125.82.53]:36397 "EHLO
-	mail-wm0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752800AbcFIVSV (ORCPT
+Received: from mail-wm0-f54.google.com ([74.125.82.54]:38415 "EHLO
+	mail-wm0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750756AbcFIX0x (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 9 Jun 2016 17:18:21 -0400
-Received: by mail-wm0-f53.google.com with SMTP id n184so242145364wmn.1
-        for <linux-kbuild@vger.kernel.org>; Thu, 09 Jun 2016 14:18:20 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20160531013029.4c5db8b570d86527b0b53fe4@gmail.com>
-References: <20160531013029.4c5db8b570d86527b0b53fe4@gmail.com>
-From: Kees Cook <keescook@chromium.org>
-Date: Thu, 9 Jun 2016 14:18:08 -0700
-Message-ID: <CAGXu5jLS_NNFYPXgjaHfiF6Bfg4TbzogadOPkdTcxXG8nm7Y2A@mail.gmail.com>
+	Thu, 9 Jun 2016 19:26:53 -0400
+Date: Fri, 10 Jun 2016 01:33:43 +0200
+From: Emese Revfy <re.emese@gmail.com>
 Subject: Re: [PATCH v2 0/3] Introduce the latent_entropy gcc plugin
-Content-Type: text/plain; charset=UTF-8
+Message-Id: <20160610013343.bad451f3e132b76ba2458e39@gmail.com>
+In-Reply-To: <CAGXu5jLS_NNFYPXgjaHfiF6Bfg4TbzogadOPkdTcxXG8nm7Y2A@mail.gmail.com>
+References: <20160531013029.4c5db8b570d86527b0b53fe4@gmail.com>
+	<CAGXu5jLS_NNFYPXgjaHfiF6Bfg4TbzogadOPkdTcxXG8nm7Y2A@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Emese Revfy <re.emese@gmail.com>
+To: Kees Cook <keescook@chromium.org>
 Cc: "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, PaX Team <pageexec@freemail.hu>, Brad Spengler <spender@grsecurity.net>, Michal Marek <mmarek@suse.com>, LKML <linux-kernel@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, Theodore Ts'o <tytso@mit.edu>, Andrew Morton <akpm@linux-foundation.org>, Linux-MM <linux-mm@kvack.org>, Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>, Paul McKenney <paulmck@linux.vnet.ibm.com>, Ingo Molnar <mingo@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, bart.vanassche@sandisk.com, "David S. Miller" <davem@davemloft.net>
 
-On Mon, May 30, 2016 at 4:30 PM, Emese Revfy <re.emese@gmail.com> wrote:
-> I would like to introduce the latent_entropy gcc plugin. This plugin mitigates
-> the problem of the kernel having too little entropy during and after boot
-> for generating crypto keys.
->
-> This plugin mixes random values into the latent_entropy global variable
-> in functions marked by the __latent_entropy attribute.
-> The value of this global variable is added to the kernel entropy pool
-> to increase the entropy.
->
-> It is a CII project supported by the Linux Foundation.
->
-> The latent_entropy plugin was ported from grsecurity/PaX originally written by
-> the PaX Team. You can find more about the plugin here:
-> https://grsecurity.net/pipermail/grsecurity/2012-July/001093.html
->
-> The plugin supports all gcc version from 4.5 to 6.0.
->
-> I do some changes above the PaX version. The important one is mixing
-> the stack pointer into the global variable too.
-> You can find more about the changes here:
-> https://github.com/ephox-gcc-plugins/latent_entropy
->
-> This patch set is based on the "Introduce GCC plugin infrastructure" patch set (v9 next-20160520).
->
-> Emese Revfy (3):
->  Add the latent_entropy gcc plugin
->  Mark functions with the latent_entropy attribute
->  Add the extra_latent_entropy kernel parameter
->
->
-> Changes from v1:
->   * Remove unnecessary ifdefs
->     (Suggested-by: Kees Cook <keescook@chromium.org>)
->   * Separate the two definitions of add_latent_entropy()
->     (Suggested-by: Kees Cook <keescook@chromium.org>)
->   * Removed unnecessary global variable (latent_entropy_plugin.c)
->   * About the latent_entropy gcc attribute (latent_entropy_plugin.c)
->   * Measure the boot time performance impact of the latent_entropy plugin (arch/Kconfig)
+On Thu, 9 Jun 2016 14:18:08 -0700
+Kees Cook <keescook@chromium.org> wrote:
 
-By the way, as you work on v3, can you also be sure to put your
-patches through scripts/checkpatch.pl? There are a lot of >80
-character lines, and other nits. I'd like to minimize the warnings.
+> By the way, as you work on v3, can you also be sure to put your
+> patches through scripts/checkpatch.pl? There are a lot of >80
+> character lines, and other nits. I'd like to minimize the warnings.
 
-Thanks!
-
--Kees
+I only split those lines where the split doesn't make the code worse.
+I checked it again and I made some changes:
+https://github.com/ephox-gcc-plugins/latent_entropy/commit/e8e7c885b49db16903ea5bd4d6318ce1246f85f3
 
 -- 
-Kees Cook
-Chrome OS & Brillo Security
+Emese
