@@ -1,34 +1,72 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f54.google.com ([74.125.82.54]:38415 "EHLO
-	mail-wm0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750756AbcFIX0x (ORCPT
+Received: from mout.kundenserver.de ([212.227.126.134]:54257 "EHLO
+	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1423106AbcFMVSb (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 9 Jun 2016 19:26:53 -0400
-Date: Fri, 10 Jun 2016 01:33:43 +0200
-From: Emese Revfy <re.emese@gmail.com>
-Subject: Re: [PATCH v2 0/3] Introduce the latent_entropy gcc plugin
-Message-Id: <20160610013343.bad451f3e132b76ba2458e39@gmail.com>
-In-Reply-To: <CAGXu5jLS_NNFYPXgjaHfiF6Bfg4TbzogadOPkdTcxXG8nm7Y2A@mail.gmail.com>
-References: <20160531013029.4c5db8b570d86527b0b53fe4@gmail.com>
-	<CAGXu5jLS_NNFYPXgjaHfiF6Bfg4TbzogadOPkdTcxXG8nm7Y2A@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+	Mon, 13 Jun 2016 17:18:31 -0400
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH 2/3] Kbuild: don't add obj tree in additional includes
+Date: Mon, 13 Jun 2016 23:19:45 +0200
+Message-Id: <1465852786-3559357-2-git-send-email-arnd@arndb.de>
+In-Reply-To: <1465852786-3559357-1-git-send-email-arnd@arndb.de>
+References: <1465852786-3559357-1-git-send-email-arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kees Cook <keescook@chromium.org>
-Cc: "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, PaX Team <pageexec@freemail.hu>, Brad Spengler <spender@grsecurity.net>, Michal Marek <mmarek@suse.com>, LKML <linux-kernel@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, Theodore Ts'o <tytso@mit.edu>, Andrew Morton <akpm@linux-foundation.org>, Linux-MM <linux-mm@kvack.org>, Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>, Paul McKenney <paulmck@linux.vnet.ibm.com>, Ingo Molnar <mingo@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, bart.vanassche@sandisk.com, "David S. Miller" <davem@davemloft.net>
+To: Michal Marek <mmarek@suse.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>
 
-On Thu, 9 Jun 2016 14:18:08 -0700
-Kees Cook <keescook@chromium.org> wrote:
+When building with separate object directories and driver specific
+Makefiles that add additional header include paths, Kbuild adjusts
+the gcc flags so that we include both the directory in the source
+tree and in the object tree.
 
-> By the way, as you work on v3, can you also be sure to put your
-> patches through scripts/checkpatch.pl? There are a lot of >80
-> character lines, and other nits. I'd like to minimize the warnings.
+However, due to another bug I fixed earlier, this did not actually
+include the correct directory in the object tree, so we know that
+we only really need the source tree here. Also, including the
+object tree sometimes causes warnings about nonexisting directories
+when the include path only exists in the source.
 
-I only split those lines where the split doesn't make the code worse.
-I checked it again and I made some changes:
-https://github.com/ephox-gcc-plugins/latent_entropy/commit/e8e7c885b49db16903ea5bd4d6318ce1246f85f3
+This changes the logic to only emit the -I argument for the srctree,
+not for objects. We still need both $(srctree)/$(src) and $(obj)
+though, so I'm adding them manually.
 
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ scripts/Kbuild.include | 2 +-
+ scripts/Makefile.lib   | 7 ++++---
+ 2 files changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index f8b45eb47ed3..f8f95e32a746 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -202,7 +202,7 @@ hdr-inst := -f $(srctree)/scripts/Makefile.headersinst obj
+ # Prefix -I with $(srctree) if it is not an absolute path.
+ # skip if -I has no parameter
+ addtree = $(if $(patsubst -I%,%,$(1)), \
+-$(if $(filter-out -I/% -I../%,$(1)),$(patsubst -I%,-I$(srctree)/%,$(1))) $(1))
++$(if $(filter-out -I/% -I../%,$(1)),$(patsubst -I%,-I$(srctree)/%,$(1)),$(1)))
+ 
+ # Find all -I options and call addtree
+ flags = $(foreach o,$($(1)),$(if $(filter -I%,$(o)),$(call addtree,$(o)),$(o)))
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index 76494e15417b..0a07f9014944 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -155,9 +155,10 @@ else
+ # $(call addtree,-I$(obj)) locates .h files in srctree, from generated .c files
+ #   and locates generated .h files
+ # FIXME: Replace both with specific CFLAGS* statements in the makefiles
+-__c_flags	= $(call addtree,-I$(obj)) $(call flags,_c_flags)
+-__a_flags	=                          $(call flags,_a_flags)
+-__cpp_flags     =                          $(call flags,_cpp_flags)
++__c_flags	= $(if $(obj),-I$(srctree)/$(src) -I$(obj)) \
++		  $(call flags,_c_flags)
++__a_flags	= $(call flags,_a_flags)
++__cpp_flags     = $(call flags,_cpp_flags)
+ endif
+ 
+ c_flags        = -Wp,-MD,$(depfile) $(NOSTDINC_FLAGS) $(LINUXINCLUDE)     \
 -- 
-Emese
+2.7.0
+
