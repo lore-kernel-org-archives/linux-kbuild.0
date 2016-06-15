@@ -1,48 +1,68 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.17.10]:60807 "EHLO
+Received: from mout.kundenserver.de ([212.227.17.13]:52238 "EHLO
 	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933302AbcFOPpN (ORCPT
+	with ESMTP id S932871AbcFOPqF (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 15 Jun 2016 11:45:13 -0400
+	Wed, 15 Jun 2016 11:46:05 -0400
 From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH v2 11/11] [EXPERIMENTAL] Kbuild: enable -Wmissing-include-dirs by default
-Date: Wed, 15 Jun 2016 17:45:53 +0200
-Message-Id: <20160615154553.3177021-12-arnd@arndb.de>
-In-Reply-To: <20160615154553.3177021-1-arnd@arndb.de>
-References: <20160615154553.3177021-1-arnd@arndb.de>
+Subject: [PATCH v2 00/11] Kbuild: fix -Wmissing-include-path warnings
+Date: Wed, 15 Jun 2016 17:45:42 +0200
+Message-Id: <20160615154553.3177021-1-arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.com>
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org, dri-devel@lists.freedesktop.org, Arnd Bergmann <arnd@arndb.de>
 
-I have fixed up all -Wmissing-include-dirs on ARM randconfig builds,
-so we could make this the default, but I have not tested this at all
-on other architectures.
+This warning is enabled at "make W=1" level, and found a bunch of
+actual problems in code that adds -I flags to nonexisting directories.
+All of these are harmless, but clearly wrong.
 
-This enables it anyway, just to see what other warnings we get
-when the build bot analyses the branch.
+Kbuild itself also adds a bunch of extra directories, including in
+some cases those outside of the kernel tree (e.g. ../../include),
+which can have surprising consequences.
 
-Don't apply (yet).
+This series fixes all the warnings I found with -Wmissing-include-dirs
+enabled on ARM randconfigs and x86 allmodconfig. The non-Kbuild
+patches can all be applied independently, while we probably want
+the Kbuild stuff to be kept as a series, if we decide to merge them.
 
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- Makefile | 3 +++
- 1 file changed, 3 insertions(+)
+I have added my test patch at the end, mainly to see if the Kbuild
+bot finds any other warnings on additional architectures.
 
-diff --git a/Makefile b/Makefile
-index 969924783543..2305cbd61e60 100644
---- a/Makefile
-+++ b/Makefile
-@@ -781,6 +781,9 @@ endif
- NOSTDINC_FLAGS += -nostdinc -isystem $(shell $(CC) -print-file-name=include)
- CHECKFLAGS     += $(NOSTDINC_FLAGS)
- 
-+# warn about incorrect -I include paths
-+KBUILD_CFLAGS += -Wmissing-include-dirs
-+
- # warn about C99 declaration after statement
- KBUILD_CFLAGS += $(call cc-option,-Wdeclaration-after-statement,)
- 
+	Arnd
+
+Arnd Bergmann (11):
+  Kbuild: don't add ../../ to include path
+  Kbuild: avoid duplicate include path
+  Kbuild: always prefix objtree in LINUXINCLUDE
+  Kbuild: arch: look for generated headers in obtree
+  Kbuild: don't add obj tree in additional includes
+  ARM: don't include removed directories
+  ARM: hide mach-*/ include for ARM_SINGLE_ARMV7M
+  drm: amd: remove broken include path
+  net: skfb: remove obsolete -I cflag
+  rtlwifi: don't add include path for rtl8188ee
+  [EXPERIMENTAL] Kbuild: enable -Wmissing-include-dirs by default
+
+ Makefile                                                | 16 ++++++++++------
+ arch/alpha/boot/Makefile                                |  2 +-
+ arch/arm/Makefile                                       |  2 ++
+ arch/arm/mach-mvebu/Makefile                            |  3 +--
+ arch/arm/mach-realview/Makefile                         |  3 +--
+ arch/arm/mach-s5pv210/Makefile                          |  2 +-
+ arch/powerpc/boot/Makefile                              |  2 +-
+ arch/powerpc/kvm/Makefile                               |  2 +-
+ arch/s390/boot/compressed/Makefile                      |  4 ++--
+ arch/um/Makefile                                        |  4 ++--
+ arch/x86/boot/Makefile                                  |  2 +-
+ arch/x86/realmode/rm/Makefile                           |  2 +-
+ drivers/gpu/drm/amd/acp/Makefile                        |  2 --
+ drivers/net/fddi/skfp/Makefile                          |  2 +-
+ drivers/net/wireless/realtek/rtlwifi/rtl8188ee/Makefile |  2 +-
+ scripts/Kbuild.include                                  |  2 +-
+ scripts/Makefile.lib                                    |  7 ++++---
+ 17 files changed, 31 insertions(+), 28 deletions(-)
+
 -- 
 2.9.0
 
