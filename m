@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.17.13]:54972 "EHLO
+Received: from mout.kundenserver.de ([212.227.17.24]:59103 "EHLO
 	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1161213AbcFOPqP (ORCPT
+	with ESMTP id S1161241AbcFOPqV (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 15 Jun 2016 11:46:15 -0400
+	Wed, 15 Jun 2016 11:46:21 -0400
 From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH v2 01/11] Kbuild: don't add ../../ to include path
-Date: Wed, 15 Jun 2016 17:45:43 +0200
-Message-Id: <20160615154553.3177021-2-arnd@arndb.de>
+Subject: [PATCH v2 10/11] rtlwifi: don't add include path for rtl8188ee
+Date: Wed, 15 Jun 2016 17:45:52 +0200
+Message-Id: <20160615154553.3177021-11-arnd@arndb.de>
 In-Reply-To: <20160615154553.3177021-1-arnd@arndb.de>
 References: <20160615154553.3177021-1-arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,45 +15,26 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.com>
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org, dri-devel@lists.freedesktop.org, Arnd Bergmann <arnd@arndb.de>
 
-When we build with O=objdir and objdir is directly below the source tree,
-$(srctree) becomes '..'.
-
-When a Makefile adds a CFLAGS option like -Ipath/to/headers and
-we are building with a separate object directory, Kbuild tries to
-add two -I options, one for the source tree and one for the object
-tree. An absolute path is treated as a special case, and don't add
-this one twice. This also normally catches -I$(srctree)/$(src)
-as $(srctree) usually is an absolute directory like /home/arnd/linux/.
-
-The combination of the two behaviors however results in an invalid
-path name to be included: we get both ../$(src) and ../../$(src),
-the latter one pointing outside of the source tree, usually to a
-nonexisting directory. Building with 'make W=1' makes this obvious:
-
-cc1: error: ../../arch/arm/mach-s3c24xx/include: No such file or directory [-Werror=missing-include-dirs]
-
-This adds another special case, treating path names starting with ../
-like those starting with / so we don't try to prefix that with
-$(srctree).
+For rtl8188ee, we pass -Idrivers/net/wireless/rtlwifi/ to gcc,
+however that directy no longer exists, so evidently this option
+is no longer required here and can be removed to avoid a warning
+when building with 'make W=1' or 'gcc -Wmissing-include-dirs'
 
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- scripts/Kbuild.include | 2 +-
+ drivers/net/wireless/realtek/rtlwifi/rtl8188ee/Makefile | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index 0f82314621f2..f8b45eb47ed3 100644
---- a/scripts/Kbuild.include
-+++ b/scripts/Kbuild.include
-@@ -202,7 +202,7 @@ hdr-inst := -f $(srctree)/scripts/Makefile.headersinst obj
- # Prefix -I with $(srctree) if it is not an absolute path.
- # skip if -I has no parameter
- addtree = $(if $(patsubst -I%,%,$(1)), \
--$(if $(filter-out -I/%,$(1)),$(patsubst -I%,-I$(srctree)/%,$(1))) $(1))
-+$(if $(filter-out -I/% -I../%,$(1)),$(patsubst -I%,-I$(srctree)/%,$(1))) $(1))
+diff --git a/drivers/net/wireless/realtek/rtlwifi/rtl8188ee/Makefile b/drivers/net/wireless/realtek/rtlwifi/rtl8188ee/Makefile
+index a85419a37651..676e7de27f27 100644
+--- a/drivers/net/wireless/realtek/rtlwifi/rtl8188ee/Makefile
++++ b/drivers/net/wireless/realtek/rtlwifi/rtl8188ee/Makefile
+@@ -12,4 +12,4 @@ rtl8188ee-objs :=		\
  
- # Find all -I options and call addtree
- flags = $(foreach o,$($(1)),$(if $(filter -I%,$(o)),$(call addtree,$(o)),$(o)))
+ obj-$(CONFIG_RTL8188EE) += rtl8188ee.o
+ 
+-ccflags-y += -Idrivers/net/wireless/rtlwifi -D__CHECK_ENDIAN__
++ccflags-y += -D__CHECK_ENDIAN__
 -- 
 2.9.0
 
