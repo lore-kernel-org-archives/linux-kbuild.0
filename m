@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([217.72.192.73]:62280 "EHLO
+Received: from mout.kundenserver.de ([212.227.17.10]:60807 "EHLO
 	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1161057AbcFOPpR (ORCPT
+	with ESMTP id S933302AbcFOPpN (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 15 Jun 2016 11:45:17 -0400
+	Wed, 15 Jun 2016 11:45:13 -0400
 From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH v2 03/11] Kbuild: always prefix objtree in LINUXINCLUDE
-Date: Wed, 15 Jun 2016 17:45:45 +0200
-Message-Id: <20160615154553.3177021-4-arnd@arndb.de>
+Subject: [PATCH v2 11/11] [EXPERIMENTAL] Kbuild: enable -Wmissing-include-dirs by default
+Date: Wed, 15 Jun 2016 17:45:53 +0200
+Message-Id: <20160615154553.3177021-12-arnd@arndb.de>
 In-Reply-To: <20160615154553.3177021-1-arnd@arndb.de>
 References: <20160615154553.3177021-1-arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,52 +15,33 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.com>
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org, dri-devel@lists.freedesktop.org, Arnd Bergmann <arnd@arndb.de>
 
-When $(LINUXINCLUDE) is added to the cflags of a target that
-normall doesn't have it (e.g. HOSTCFLAGS), each entry in the
-list is expanded so that we search both $(objtree) and $(srctree),
-which is a bit silly, as we already know which of the two we
-want for each entry in LINUXINCLUDE.
+I have fixed up all -Wmissing-include-dirs on ARM randconfig builds,
+so we could make this the default, but I have not tested this at all
+on other architectures.
 
-Also, a follow-up patch changes the behavior so we only look in
-$(srctree) for manually added include path, and that breaks finding
-the generated headers.
+This enables it anyway, just to see what other warnings we get
+when the build bot analyses the branch.
 
-This adds an explicit $(objtree) for each tree that we want to
-look for generated files.
+Don't apply (yet).
 
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- Makefile | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ Makefile | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/Makefile b/Makefile
-index 45159861e645..969924783543 100644
+index 969924783543..2305cbd61e60 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -377,19 +377,19 @@ CFLAGS_KCOV	:= $(call cc-option,-fsanitize-coverage=trace-pc,)
- # Use USERINCLUDE when you must reference the UAPI directories only.
- USERINCLUDE    := \
- 		-I$(srctree)/arch/$(hdr-arch)/include/uapi \
--		-Iarch/$(hdr-arch)/include/generated/uapi \
-+		-I$(objtree)/arch/$(hdr-arch)/include/generated/uapi \
- 		-I$(srctree)/include/uapi \
--		-Iinclude/generated/uapi \
-+		-I$(objtree)/include/generated/uapi \
-                 -include $(srctree)/include/linux/kconfig.h
+@@ -781,6 +781,9 @@ endif
+ NOSTDINC_FLAGS += -nostdinc -isystem $(shell $(CC) -print-file-name=include)
+ CHECKFLAGS     += $(NOSTDINC_FLAGS)
  
- # Use LINUXINCLUDE when you must reference the include/ directory.
- # Needed to be compatible with the O= option
- LINUXINCLUDE    := \
- 		-I$(srctree)/arch/$(hdr-arch)/include \
--		-Iarch/$(hdr-arch)/include/generated/uapi \
--		-Iarch/$(hdr-arch)/include/generated \
-+		-I$(objtree)/arch/$(hdr-arch)/include/generated/uapi \
-+		-I$(objtree)/arch/$(hdr-arch)/include/generated \
- 		$(if $(KBUILD_SRC), -I$(srctree)/include) \
--		-Iinclude
-+		-I$(objtree)/include
- 
- LINUXINCLUDE	+= $(filter-out $(LINUXINCLUDE),$(USERINCLUDE))
++# warn about incorrect -I include paths
++KBUILD_CFLAGS += -Wmissing-include-dirs
++
+ # warn about C99 declaration after statement
+ KBUILD_CFLAGS += $(call cc-option,-Wdeclaration-after-statement,)
  
 -- 
 2.9.0
