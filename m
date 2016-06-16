@@ -1,67 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtprelay0057.hostedemail.com ([216.40.44.57]:47138 "EHLO
-	smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1753203AbcFOXKR (ORCPT
+Received: from shards.monkeyblade.net ([149.20.54.216]:36639 "EHLO
+	shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750982AbcFPFGu (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 15 Jun 2016 19:10:17 -0400
-Message-ID: <1466032209.19647.20.camel@perches.com>
-Subject: Re: [PATCH v3 0/4] Introduce the latent_entropy gcc plugin
-From: Joe Perches <joe@perches.com>
-Date: Wed, 15 Jun 2016 16:10:09 -0700
-In-Reply-To: <CAGXu5jJH2FNenOpAE3Rqh8q=s01sbHmf=QobT98u4h=anjRubw@mail.gmail.com>
-References: <20160615001754.f9e986cf961d1466f5e086dc@gmail.com>
-	 <CAGXu5jK-QVhbuOnNENq9PesPTdPCnbgODzb0qn=q4ZMS0-ndBA@mail.gmail.com>
-	 <20160615223952.f3a4ece452b15c62babf4629@gmail.com>
-	 <CAGXu5jJH2FNenOpAE3Rqh8q=s01sbHmf=QobT98u4h=anjRubw@mail.gmail.com>
-Content-Type: text/plain; charset="ISO-8859-1"
+	Thu, 16 Jun 2016 01:06:50 -0400
+Date: Wed, 15 Jun 2016 22:06:48 -0700 (PDT)
+Message-Id: <20160615.220648.2135362761704622234.davem@davemloft.net>
+Subject: Re: [PATCH v2 09/11] net: skfb: remove obsolete -I cflag
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <20160615154553.3177021-10-arnd@arndb.de>
+References: <20160615154553.3177021-1-arnd@arndb.de>
+	<20160615154553.3177021-10-arnd@arndb.de>
 Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kees Cook <keescook@chromium.org>, Emese Revfy <re.emese@gmail.com>, Greg KH <gregkh@linuxfoundation.org>
-Cc: "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, PaX Team <pageexec@freemail.hu>, Brad Spengler <spender@grsecurity.net>, Michal Marek <mmarek@suse.com>, LKML <linux-kernel@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, Theodore Ts'o <tytso@mit.edu>, Andrew Morton <akpm@linux-foundation.org>, Linux-MM <linux-mm@kvack.org>, Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>, Paul McKenney <paulmck@linux.vnet.ibm.com>, Ingo Molnar <mingo@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, bart.vanassche@sandisk.com, "David S. Miller" <davem@davemloft.net>
+To: arnd@arndb.de
+Cc: mmarek@suse.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org, dri-devel@lists.freedesktop.org
 
-On Wed, 2016-06-15 at 16:01 -0700, Kees Cook wrote:
-> On Wed, Jun 15, 2016 at 1:39 PM, Emese Revfy <re.emese@gmail.com> wrote:
-> > On Wed, 15 Jun 2016 11:55:44 -0700 Kees Cook <keescook@chromium.org> wrote:
-> > >  The limit on the length of lines is 80 columns and this is a strongly
-> > >  preferred limit.
-> > I think the code looks worse when it is truncated to 80 columns but
-> > I'll do it and resend the patches.
-> Yup, I understand your concerns, but since we're optimizing for
-> readability by a larger audience that has agreed to the guidelines in
-> CodingStyle, this is what we get. :)
-> 
-> One area I'm unclear on with kernel coding style, though, is if
-> splitting all the stuff prior to function name onto a separate line is
-> "acceptable", since that solves most of the long lines where
-> __latent_entropy has been added. For example, I don't know which is
-> better:
-> 
-> All on one line (gmail may split this, but my intention is all one line):
-> 
-> static __latent_entropy void rcu_process_callbacks(struct
-> softirq_action *unused)
-> 
-> Types and attributes on a separate line:
-> 
-> static __latent_entropy void
-> rcu_process_callbacks(struct softirq_action *unused)
-> 
-> All arguments on the next line:
-> 
-> static __latent_entropy void rcu_process_callbacks(
->                                                           struct
-> softirq_action *unused)
-> 
-> 
-> Greg, do you have a better sense of how to split (or not split) these
-> kinds of long lines?
+From: Arnd Bergmann <arnd@arndb.de>
+Date: Wed, 15 Jun 2016 17:45:51 +0200
 
-Another option is to add __latent_entropy the same way most
-__printf uses are done - on a separate line before the function
+> The skfp driver has been moved to drivers/net/fddi/skfp a long time
+> ago, but we still attempt to include headers from the old location,
+> which causes a warning when building with W=1:
+> 
+> cc1: error: /git/arm-soc/drivers/net/skfp: No such file or directory [-Werror=missing-include-dirs]
+> cc1: error: drivers/net/skfp: No such file or directory [-Werror=missing-include-dirs]
+> 
+> Clearly this include directive is not needed any more, so we can
+> just remove it now.
+> 
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
-__latent_entropy
-static void foo(...)
-
-
+Applied.
