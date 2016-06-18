@@ -1,164 +1,143 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pa0-f48.google.com ([209.85.220.48]:36175 "EHLO
-	mail-pa0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751480AbcFRSIE (ORCPT
+Received: from mail-pf0-f172.google.com ([209.85.192.172]:36299 "EHLO
+	mail-pf0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751458AbcFRSOj (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 18 Jun 2016 14:08:04 -0400
-Received: by mail-pa0-f48.google.com with SMTP id wo6so1499886pac.3
-        for <linux-kbuild@vger.kernel.org>; Sat, 18 Jun 2016 11:08:02 -0700 (PDT)
-Date: Sat, 18 Jun 2016 11:08:00 -0700
+	Sat, 18 Jun 2016 14:14:39 -0400
+Received: by mail-pf0-f172.google.com with SMTP id t190so40569530pfb.3
+        for <linux-kbuild@vger.kernel.org>; Sat, 18 Jun 2016 11:14:39 -0700 (PDT)
+Date: Sat, 18 Jun 2016 11:14:37 -0700
 From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH] kbuild: Abort build on bad stack protector flag
-Message-ID: <20160618180800.GA1006@www.outflux.net>
+Subject: [RFC][PATCH] gcc-plugins: abort builds cleanly when not supported
+Message-ID: <20160618181437.GA2633@www.outflux.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, x86@kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Emese Revfy <re.emese@gmail.com>
+Cc: Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, kernel-hardening@lists.openwall.com
 
-Before, the stack protector flag was sanity checked before .config had
-been reprocessed. This meant the build couldn't be aborted early, and
-only a warning could be emitted followed later by the compiler blowing
-up with an unknown flag. This has caused a lot of confusion over time,
-so this splits the flag selection from sanity checking and performs the
-sanity checking after the make has been restarted from a reprocessed
-.config, so builds can be aborted as early as possible now.
-
-Additionally moves the x86-specific sanity check to the same location,
-since it suffered from the same warn-then-wait-for-compiler-failure
-problem.
+When the compiler doesn't support gcc plugins (either due to missing
+headers or too old a version), report the problem and abort the build
+instead of emitting a warning and letting the build founder with arcane
+compiler errors.
 
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- Makefile          | 69 +++++++++++++++++++++++++++++++++----------------------
- arch/x86/Makefile |  8 -------
- 2 files changed, 42 insertions(+), 35 deletions(-)
+I think this greatly improves the failure case when trying to use the
+gcc plugin infrastructure. Emese, what do you think of this?
+---
+ Makefile                     |  7 -------
+ scripts/Makefile.gcc-plugins | 34 +++++++++++++++++++++++++---------
+ scripts/gcc-plugin.sh        | 14 ++++++++++++++
+ 3 files changed, 39 insertions(+), 16 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 6a170fc856b2..ab124a0e5e0d 100644
+index ab124a0e5e0d..5c61a7155d50 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -656,41 +656,28 @@ ifneq ($(CONFIG_FRAME_WARN),0)
- KBUILD_CFLAGS += $(call cc-option,-Wframe-larger-than=${CONFIG_FRAME_WARN})
- endif
+@@ -633,13 +633,6 @@ endif
+ # Tell gcc to never replace conditional load with a non-conditional one
+ KBUILD_CFLAGS	+= $(call cc-option,--param=allow-store-data-races=0)
  
--# Handle stack protector mode.
--#
--# Since kbuild can potentially perform two passes (first with the old
--# .config values and then with updated .config values), we cannot error out
--# if a desired compiler option is unsupported. If we were to error, kbuild
--# could never get to the second pass and actually notice that we changed
--# the option to something that was supported.
--#
--# Additionally, we don't want to fallback and/or silently change which compiler
--# flags will be used, since that leads to producing kernels with different
--# security feature characteristics depending on the compiler used. ("But I
--# selected CC_STACKPROTECTOR_STRONG! Why did it build with _REGULAR?!")
--#
--# The middle ground is to warn here so that the failed option is obvious, but
--# to let the build fail with bad compiler flags so that we can't produce a
--# kernel when there is a CONFIG and compiler mismatch.
--#
-+# This selects the stack protector compiler flag. Testing it is delayed
-+# until after .config has been reprocessed, in the prepare-compiler-check
-+# target.
- ifdef CONFIG_CC_STACKPROTECTOR_REGULAR
-   stackp-flag := -fstack-protector
--  ifeq ($(call cc-option, $(stackp-flag)),)
--    $(warning Cannot use CONFIG_CC_STACKPROTECTOR_REGULAR: \
--             -fstack-protector not supported by compiler)
--  endif
-+  stackp-name := REGULAR
- else
- ifdef CONFIG_CC_STACKPROTECTOR_STRONG
-   stackp-flag := -fstack-protector-strong
--  ifeq ($(call cc-option, $(stackp-flag)),)
--    $(warning Cannot use CONFIG_CC_STACKPROTECTOR_STRONG: \
--	      -fstack-protector-strong not supported by compiler)
--  endif
-+  stackp-name := STRONG
- else
-   # Force off for distro compilers that enable stack protector by default.
-   stackp-flag := $(call cc-option, -fno-stack-protector)
- endif
- endif
-+# Find arch-specific stack protector compiler sanity-checking script.
-+ifdef CONFIG_CC_STACKPROTECTOR
-+  stackp-path := $(srctree)/scripts/gcc-$(ARCH)_$(BITS)-has-stack-protector.sh
-+  ifneq ($(wildcard $(stackp-path)),)
-+    stackp-check := $(stackp-path)
+-PHONY += gcc-plugins
+-gcc-plugins: scripts_basic
+-ifdef CONFIG_GCC_PLUGINS
+-	$(Q)$(MAKE) $(build)=scripts/gcc-plugins
+-endif
+-	@:
+-
+ include scripts/Makefile.gcc-plugins
+ 
+ ifdef CONFIG_READABLE_ASM
+diff --git a/scripts/Makefile.gcc-plugins b/scripts/Makefile.gcc-plugins
+index cd7902ccd119..61fc4bbe0c21 100644
+--- a/scripts/Makefile.gcc-plugins
++++ b/scripts/Makefile.gcc-plugins
+@@ -29,21 +29,37 @@ ifdef CONFIG_GCC_PLUGINS
+ 
+   export PLUGINCC GCC_PLUGINS_CFLAGS GCC_PLUGIN SANCOV_PLUGIN DISABLE_LATENT_ENTROPY_PLUGIN
+ 
++  ifneq ($(PLUGINCC),)
++    # SANCOV_PLUGIN can be only in CFLAGS_KCOV because avoid duplication.
++    GCC_PLUGINS_CFLAGS := $(filter-out $(SANCOV_PLUGIN), $(GCC_PLUGINS_CFLAGS))
 +  endif
++
++  KBUILD_CFLAGS += $(GCC_PLUGINS_CFLAGS)
++  GCC_PLUGIN := $(gcc-plugin-y)
 +endif
- KBUILD_CFLAGS += $(stackp-flag)
- 
- ifeq ($(cc-name),clang)
-@@ -1018,8 +1005,10 @@ ifneq ($(KBUILD_SRC),)
- 	fi;
- endif
- 
--# prepare2 creates a makefile if using a separate output directory
--prepare2: prepare3 outputmakefile asm-generic
-+# prepare2 creates a makefile if using a separate output directory.
-+# From this point forward, .config has been reprocessed, so any rules
-+# that need to depend on updated CONFIG_* values can be checked here.
-+prepare2: prepare3 prepare-compiler-check outputmakefile asm-generic
- 
- prepare1: prepare2 $(version_h) include/generated/utsrelease.h \
-                    include/config/auto.conf
-@@ -1050,6 +1039,32 @@ endif
- PHONY += prepare-objtool
- prepare-objtool: $(objtool_target)
- 
-+# Check for CONFIG flags that require compiler support. Abort the build
-+# after .config has been processed, but before the kernel build starts.
-+#
-+# For security-sensitive CONFIG options, we don't want to fallback and/or
-+# silently change which compiler flags will be used, since that leads to
-+# producing kernels with different security feature characteristics
-+# depending on the compiler used. (For example, "But I selected
-+# CC_STACKPROTECTOR_STRONG! Why did it build with _REGULAR?!")
-+PHONY += prepare-compiler-check
-+prepare-compiler-check: FORCE
-+# Make sure compiler supports requested stack protector flag.
-+ifdef stackp-name
-+  ifeq ($(call cc-option, $(stackp-flag)),)
-+	@echo Cannot use CONFIG_CC_STACKPROTECTOR_$(stackp-name): \
-+		  $(stackp-flag) not supported by compiler >&2 && exit 1
-+  endif
-+endif
-+# Make sure compiler does not have buggy stack-protector support.
-+ifdef stackp-check
-+  ifneq ($(shell $(CONFIG_SHELL) $(stackp-check) $(CC) $(KBUILD_CPPFLAGS) $(biarch)),y)
-+	@echo Cannot use CONFIG_CC_STACKPROTECTOR_$(stackp-name): \
-+                  $(stackp-flag) available but compiler is broken >&2 && exit 1
-+  endif
++
++# If plugins aren't supported, abort the build before hard-to-read compiler
++# errors start getting spewed by the main build.
++PHONY += gcc-plugins-check
++gcc-plugins-check: FORCE
++ifdef CONFIG_GCC_PLUGINS
+   ifeq ($(PLUGINCC),)
+     ifneq ($(GCC_PLUGINS_CFLAGS),)
+       ifeq ($(call cc-ifversion, -ge, 0405, y), y)
+-        PLUGINCC := $(shell $(CONFIG_SHELL) -x $(srctree)/scripts/gcc-plugin.sh "$(__PLUGINCC)" "$(HOSTCXX)" "$(CC)")
+-        $(warning warning: your gcc installation does not support plugins, perhaps the necessary headers are missing?)
++	$(Q)$(srctree)/scripts/gcc-plugin.sh --show-error "$(__PLUGINCC)" "$(HOSTCXX)" "$(CC)" || true
++	@echo "Cannot use CONFIG_GCC_PLUGINS: your gcc installation does not support plugins, perhaps the necessary headers are missing?" >&2 && exit 1
+       else
+-        $(warning warning: your gcc version does not support plugins, you should upgrade it to gcc 4.5 at least)
++	@echo "Cannot use CONFIG_GCC_PLUGINS: your gcc version does not support plugins, you should upgrade it to at least gcc 4.5" >&2 && exit 1
+       endif
+     endif
+-  else
+-    # SANCOV_PLUGIN can be only in CFLAGS_KCOV because avoid duplication.
+-    GCC_PLUGINS_CFLAGS := $(filter-out $(SANCOV_PLUGIN), $(GCC_PLUGINS_CFLAGS))
+   endif
 +endif
 +	@:
-+
- # Generate some files
- # ---------------------------------------------------------------------------
  
-diff --git a/arch/x86/Makefile b/arch/x86/Makefile
-index 6fce7f096b88..830ed391e7ef 100644
---- a/arch/x86/Makefile
-+++ b/arch/x86/Makefile
-@@ -126,14 +126,6 @@ else
-         KBUILD_CFLAGS += $(call cc-option,-maccumulate-outgoing-args)
- endif
- 
--# Make sure compiler does not have buggy stack-protector support.
--ifdef CONFIG_CC_STACKPROTECTOR
--	cc_has_sp := $(srctree)/scripts/gcc-x86_$(BITS)-has-stack-protector.sh
--        ifneq ($(shell $(CONFIG_SHELL) $(cc_has_sp) $(CC) $(KBUILD_CPPFLAGS) $(biarch)),y)
--                $(warning stack-protector enabled but compiler support broken)
--        endif
--endif
+-  KBUILD_CFLAGS += $(GCC_PLUGINS_CFLAGS)
+-  GCC_PLUGIN := $(gcc-plugin-y)
 -
- ifdef CONFIG_X86_X32
- 	x32_ld_ok := $(call try-run,\
- 			/bin/echo -e '1: .quad 1b' | \
++# Actually do the build, if requested.
++PHONY += gcc-plugins
++gcc-plugins: scripts_basic gcc-plugins-check
++ifdef CONFIG_GCC_PLUGINS
++	$(Q)$(MAKE) $(build)=scripts/gcc-plugins
+ endif
++	@:
+diff --git a/scripts/gcc-plugin.sh b/scripts/gcc-plugin.sh
+index fb9207565471..b65224bfb847 100755
+--- a/scripts/gcc-plugin.sh
++++ b/scripts/gcc-plugin.sh
+@@ -1,5 +1,12 @@
+ #!/bin/sh
+ srctree=$(dirname "$0")
++
++SHOW_ERROR=
++if [ "$1" = "--show-error" ] ; then
++	SHOW_ERROR=1
++	shift || true
++fi
++
+ gccplugins_dir=$($3 -print-file-name=plugin)
+ plugincc=$($1 -E -x c++ - -o /dev/null -I"${srctree}"/gcc-plugins -I"${gccplugins_dir}"/include 2>&1 <<EOF
+ #include "gcc-common.h"
+@@ -13,6 +20,9 @@ EOF
+ 
+ if [ $? -ne 0 ]
+ then
++	if [ -n "$SHOW_ERROR" ] ; then
++		echo "${plugincc}" >&2
++	fi
+ 	exit 1
+ fi
+ 
+@@ -48,4 +58,8 @@ then
+ 	echo "$2"
+ 	exit 0
+ fi
++
++if [ -n "$SHOW_ERROR" ] ; then
++	echo "${plugincc}" >&2
++fi
+ exit 1
 -- 
 2.7.4
 
