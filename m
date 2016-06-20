@@ -1,119 +1,117 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:33613 "EHLO
-	mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S933153AbcFTSg6 (ORCPT
+Received: from merlin.infradead.org ([205.233.59.134]:44293 "EHLO
+	merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754075AbcFTWYi (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 20 Jun 2016 14:36:58 -0400
-Date: Mon, 20 Jun 2016 20:43:36 +0200
-From: Emese Revfy <re.emese@gmail.com>
-Subject: [PATCH v4 4/4] Add the extra_latent_entropy kernel parameter
-Message-Id: <20160620204336.9f5ca671b32acf298ab4bc17@gmail.com>
-In-Reply-To: <20160620203910.a8b6b5b10d18f24661916e7b@gmail.com>
-References: <20160620203910.a8b6b5b10d18f24661916e7b@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+	Mon, 20 Jun 2016 18:24:38 -0400
+From: Arnaldo Carvalho de Melo <acme@kernel.org>
+Subject: [GIT PULL 00/10] perf/core improvements and fixes
+Date: Mon, 20 Jun 2016 19:23:20 -0300
+Message-Id: <1466461410-13778-1-git-send-email-acme@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: kernel-hardening@lists.openwall.com
-Cc: pageexec@freemail.hu, spender@grsecurity.net, mmarek@suse.com, keescook@chromium.org, linux-kernel@vger.kernel.org, yamada.masahiro@socionext.com, linux-kbuild@vger.kernel.org, tytso@mit.edu, akpm@linux-foundation.org, linux-mm@kvack.org, axboe@kernel.dk, viro@zeniv.linux.org.uk, paulmck@linux.vnet.ibm.com, mingo@redhat.com, tglx@linutronix.de, bart.vanassche@sandisk.com, davem@davemloft.net
+To: Ingo Molnar <mingo@kernel.org>
+Cc: linux-kernel@vger.kernel.org, Arnaldo Carvalho de Melo <acme@kernel.org>, Adrian Hunter <adrian.hunter@intel.com>, Alexander Shishkin <alexander.shishkin@linux.intel.com>, Alexei Starovoitov <ast@kernel.org>, Andi Kleen <ak@linux.intel.com>, Brendan Gregg <bgregg@netflix.com>, David Ahern <dsahern@gmail.com>, Ekaterina Tumanova <tumanova@linux.vnet.ibm.com>, He Kuang <hekuang@huawei.com>, Jean Delvare <jdelvare@suse.de>, Jiri Olsa <jolsa@redhat.com>, Josh Poimboeuf <jpoimboe@redhat.com>, Kan Liang <kan.liang@intel.com>, linux-kbuild@vger.kernel.org, Masami Hiramatsu <mhiramat@kernel.org>, Michal Marek <mmarek@suse.com>, Namhyung Kim <namhyung@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>, Pekka Enberg <penberg@kernel.org>, Peter Zijlstra <peterz@infradead.org>, pi3orama@163.com, Stephane Eranian <eranian@google.com>, Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>, Wang Nan <wangnan0@huawei.com>, Zefan Li <lizefan@huawei.com>, Arnaldo Carvalho de Melo <acme@redhat.com>
 
-When extra_latent_entropy is passed on the kernel command line,
-entropy will be extracted from up to the first 4GB of RAM while the
-runtime memory allocator is being initialized.
+Hi Ingo,
 
-Based on work created by the PaX Team.
+	Please consider pulling,
 
-Signed-off-by: Emese Revfy <re.emese@gmail.com>
----
- Documentation/kernel-parameters.txt |  5 +++++
- arch/Kconfig                        |  5 +++++
- mm/page_alloc.c                     | 26 ++++++++++++++++++++++++++
- 3 files changed, 36 insertions(+)
+- Arnaldo
 
-diff --git a/Documentation/kernel-parameters.txt b/Documentation/kernel-parameters.txt
-index 82b42c9..d870702 100644
---- a/Documentation/kernel-parameters.txt
-+++ b/Documentation/kernel-parameters.txt
-@@ -2862,6 +2862,11 @@ bytes respectively. Such letter suffixes can also be entirely omitted.
- 			the specified number of seconds.  This is to be used if
- 			your oopses keep scrolling off the screen.
- 
-+	extra_latent_entropy
-+			Enable a very simple form of latent entropy extraction
-+			from the first 4GB of memory as the bootmem allocator
-+			passes the memory pages to the buddy allocator.
-+
- 	pcbit=		[HW,ISDN]
- 
- 	pcd.		[PARIDE]
-diff --git a/arch/Kconfig b/arch/Kconfig
-index 4b7cc2f..3374d50 100644
---- a/arch/Kconfig
-+++ b/arch/Kconfig
-@@ -404,6 +404,11 @@ config GCC_PLUGIN_LATENT_ENTROPY
- 	  is some slowdown of the boot process (about 0.5%) and fork and
- 	  irq processing.
- 
-+	  When extra_latent_entropy is passed on the kernel command line,
-+	  entropy will be extracted from up to the first 4GB of RAM while the
-+	  runtime memory allocator is being initialized. This costs even more
-+	  slowdown of the boot process.
-+
- 	  Note that entropy extracted this way is not cryptographically
- 	  secure!
- 
-diff --git a/mm/page_alloc.c b/mm/page_alloc.c
-index ffc4f4a..0a40c12 100644
---- a/mm/page_alloc.c
-+++ b/mm/page_alloc.c
-@@ -63,6 +63,7 @@
- #include <linux/sched/rt.h>
- #include <linux/page_owner.h>
- #include <linux/kthread.h>
-+#include <linux/random.h>
- 
- #include <asm/sections.h>
- #include <asm/tlbflush.h>
-@@ -1234,6 +1235,15 @@ static void __free_pages_ok(struct page *page, unsigned int order)
- 	local_irq_restore(flags);
- }
- 
-+bool __meminitdata extra_latent_entropy;
-+
-+static int __init setup_extra_latent_entropy(char *str)
-+{
-+	extra_latent_entropy = true;
-+	return 0;
-+}
-+early_param("extra_latent_entropy", setup_extra_latent_entropy);
-+
- #ifdef CONFIG_GCC_PLUGIN_LATENT_ENTROPY
- volatile u64 latent_entropy __latent_entropy;
- EXPORT_SYMBOL(latent_entropy);
-@@ -1254,6 +1264,22 @@ static void __init __free_pages_boot_core(struct page *page, unsigned int order)
- 	__ClearPageReserved(p);
- 	set_page_count(p, 0);
- 
-+	if (extra_latent_entropy && !PageHighMem(page) &&
-+		page_to_pfn(page) < 0x100000) {
-+		u64 hash = 0;
-+		size_t index, end = PAGE_SIZE * nr_pages / sizeof(hash);
-+		const u64 *data = lowmem_page_address(page);
-+
-+		for (index = 0; index < end; index++)
-+			hash ^= hash + data[index];
-+#ifdef CONFIG_GCC_PLUGIN_LATENT_ENTROPY
-+		latent_entropy ^= hash;
-+		add_device_randomness((const void *)&latent_entropy, sizeof(latent_entropy));
-+#else
-+		add_device_randomness((const void *)&hash, sizeof(hash));
-+#endif
-+	}
-+
- 	page_zone(page)->managed_pages += nr_pages;
- 	set_page_refcounted(page);
- 	__free_pages(page, order);
--- 
-2.8.1
+The following changes since commit 02469a95096a549508c5adf61d84a1d72851c85b:
 
+  Merge tag 'perf-core-for-mingo-20160615' of git://git.kernel.org/pub/scm/linux/kernel/git/acme/linux into perf/core (2016-06-16 10:27:35 +0200)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/acme/linux.git tags/perf-core-for-mingo-20160620
+
+for you to fetch changes up to 2a0a7c72702bac1b87cd4d49196a334483386fab:
+
+  perf script: Add stackcollapse.py script (2016-06-20 17:50:39 -0300)
+
+----------------------------------------------------------------
+perf/core improvements and fixes:
+
+New features:
+
+. Add --dry-run option to 'perf record' to check if command line options can be
+  parsed, but not doing any recording (Wang Nan)
+
+. Allow dumping the object files generated by llvm when processing eBPF
+  scriptlet events (Wang Nan)
+
+- Add stackcollapse.py script to help generating flame graphs (Paolo Bonzini)
+
+Documentation:
+
+. Fix 'perf script'  documentation of '-f' when it should be '-F' (Adrian Hunter)
+
+Infrastructure:
+
+- Fix write_backwards fallback when using a new tool on older kernels
+  without support for this feature (Arnaldo Carvalho de Melo)
+
+- Find vdso file in cross-platform perf.data file processing scenarios (He Kuang)
+
+- Remove some leftovers from the initial codebase copying from git
+  (Arnaldo Carvalho de Melo)
+
+- List libelf-devel as an alternative, as this is how the libelf
+  development package is called on OpenSuSE (Jean Delvare)
+
+- Rename __hists__add_entry to hists__add_entry (Jiri Olsa)
+
+Signed-off-by: Arnaldo Carvalho de Melo <acme@redhat.com>
+
+----------------------------------------------------------------
+Adrian Hunter (1):
+      perf script: Fix documentation of '-f' when it should be '-F'
+
+Arnaldo Carvalho de Melo (3):
+      perf tools: Remove some unused functions
+      perf tools: Remove --perf-dir and --work-dir
+      perf evsel: Fix write_backwards fallback
+
+He Kuang (1):
+      perf tools: Find vdso with the consider of cross-platform
+
+Jean Delvare (1):
+      kbuild: List libelf-devel as an alternative
+
+Jiri Olsa (1):
+      perf hists: Rename __hists__add_entry to hists__add_entry
+
+Paolo Bonzini (1):
+      perf script: Add stackcollapse.py script
+
+Wang Nan (2):
+      perf llvm: Allow dump llvm output object file using llvm.dump-obj
+      perf record: Add --dry-run option to check cmdline options
+
+ Makefile                                           |   2 +-
+ tools/perf/Documentation/perf-record.txt           |   7 ++
+ tools/perf/Documentation/perf-script.txt           |  20 ++--
+ tools/perf/builtin-annotate.c                      |   2 +-
+ tools/perf/builtin-diff.c                          |  12 +-
+ tools/perf/builtin-record.c                        |   7 ++
+ tools/perf/config/Makefile                         |   2 +-
+ tools/perf/perf.c                                  |  36 ------
+ tools/perf/scripts/python/bin/stackcollapse-record |   8 ++
+ tools/perf/scripts/python/bin/stackcollapse-report |   3 +
+ tools/perf/scripts/python/stackcollapse.py         | 127 +++++++++++++++++++++
+ tools/perf/tests/hists_link.c                      |   4 +-
+ tools/perf/util/cache.h                            |   9 --
+ tools/perf/util/config.c                           |   2 +-
+ tools/perf/util/evsel.c                            |  23 ++--
+ tools/perf/util/hist.c                             |  34 +++---
+ tools/perf/util/hist.h                             |  14 +--
+ tools/perf/util/llvm-utils.c                       |  42 +++++++
+ tools/perf/util/llvm-utils.h                       |   5 +
+ tools/perf/util/path.c                             |  65 +----------
+ tools/perf/util/vdso.c                             |  40 ++++++-
+ 21 files changed, 288 insertions(+), 176 deletions(-)
+ create mode 100755 tools/perf/scripts/python/bin/stackcollapse-record
+ create mode 100755 tools/perf/scripts/python/bin/stackcollapse-report
+ create mode 100755 tools/perf/scripts/python/stackcollapse.py
