@@ -1,40 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f54.google.com ([74.125.82.54]:37646 "EHLO
-	mail-wm0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751270AbcFSShl (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 19 Jun 2016 14:37:41 -0400
-Received: by mail-wm0-f54.google.com with SMTP id a66so50956304wme.0
-        for <linux-kbuild@vger.kernel.org>; Sun, 19 Jun 2016 11:37:40 -0700 (PDT)
-Date: Sun, 19 Jun 2016 20:44:20 +0200
-From: Emese Revfy <re.emese@gmail.com>
-Subject: Re: [RFC][PATCH] gcc-plugins: abort builds cleanly when not
- supported
-Message-Id: <20160619204420.95bf779ca0273dbda7415c27@gmail.com>
-In-Reply-To: <20160618181437.GA2633@www.outflux.net>
-References: <20160618181437.GA2633@www.outflux.net>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Received: from mx2.suse.de ([195.135.220.15]:49710 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1755466AbcFTPFA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 20 Jun 2016 11:05:00 -0400
+Subject: Re: Automatic dependency resolution on generated python file
+References: <57438C01.6090601@bingham.xyz>
+From: Michal Marek <mmarek@suse.com>
+Message-ID: <576802A4.5040804@suse.com>
+Date: Mon, 20 Jun 2016 16:50:12 +0200
+MIME-Version: 1.0
+In-Reply-To: <57438C01.6090601@bingham.xyz>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kees Cook <keescook@chromium.org>
-Cc: Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, kernel-hardening@lists.openwall.com
+To: Kieran Bingham <kieran@ksquared.org.uk>
+Cc: linux-kbuild@vger.kernel.org, Jan Kiszka <jan.kiszka@web.de>
 
-On Sat, 18 Jun 2016 11:14:37 -0700
-Kees Cook <keescook@chromium.org> wrote:
-
-> When the compiler doesn't support gcc plugins (either due to missing
-> headers or too old a version), report the problem and abort the build
-> instead of emitting a warning and letting the build founder with arcane
-> compiler errors.
+On 2016-05-24 01:02, Kieran Bingham wrote:
+> Hi Kbuild / Michal,
 > 
-> Signed-off-by: Kees Cook <keescook@chromium.org>
-> ---
-> I think this greatly improves the failure case when trying to use the
-> gcc plugin infrastructure. Emese, what do you think of this?
+> I've been working through a problem that Jan has reported whereby if we
+> modify a file included by our template  for constants.py, the generated
+> file is not rebuilt.
+> 
+> The rule/cmd [0] to generate the python constants is
+> cmd_gen_constants_py which uses the $(CPP) with $(c_flags) to create the
+> output.
+> 
+> One benefit of this is that it already creates the $(depfile) through
+> the addition of the flags provided by $(c_flags), however as yet it
+> would seem that my efforts to understand how the $(depfile) gets
+> included have failed.
+> 
+> From what I can tell, the $(call if_changed...) rule is generating my
+> targets .constants.py.cmd, but the .d file is not being utilised.
+> 
+> By swapping $(call if_changed, ) to $(call if_changed_dep,...) I can see
+> that my .constants.py.cmd [1] file now has (apparently) correct
+> dependency rules being generated. However they still don't take actual
+> effect. If I 'touch/modify' one of the files I have added to the
+> #includes, then my target is not rebuilt (I have added
+> include/linux/kieran.h for testing this specifically without rebuilding
+> all other objects)
 
-I like it, it has much better error handling. :)
+Hi Kieran,
 
--- 
-Emese
+sorry for the late reply. In case this is still relevant: For
+if_changed/if_changed_dep to work, you must list the target in the
+$(targets) list (without the $(obj) prefix) and add FORCE as a
+prerequisite of the rule.
+
+Michal
