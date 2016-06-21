@@ -1,44 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lb0-f170.google.com ([209.85.217.170]:35151 "EHLO
-	mail-lb0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751922AbcFUQNz (ORCPT
+Received: from mail-lb0-f182.google.com ([209.85.217.182]:33998 "EHLO
+	mail-lb0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752831AbcFUSkT (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 21 Jun 2016 12:13:55 -0400
-Received: by mail-lb0-f170.google.com with SMTP id o4so14434817lbp.2
-        for <linux-kbuild@vger.kernel.org>; Tue, 21 Jun 2016 09:13:54 -0700 (PDT)
+	Tue, 21 Jun 2016 14:40:19 -0400
+Received: by mail-lb0-f182.google.com with SMTP id oe3so15877581lbb.1
+        for <linux-kbuild@vger.kernel.org>; Tue, 21 Jun 2016 11:40:18 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20160621125807.GA19065@infradead.org>
+In-Reply-To: <20160620203910.a8b6b5b10d18f24661916e7b@gmail.com>
 References: <20160620203910.a8b6b5b10d18f24661916e7b@gmail.com>
- <20160620204119.6299c961570a7a9ad6cbdd51@gmail.com> <20160621125807.GA19065@infradead.org>
 From: Kees Cook <keescook@chromium.org>
-Date: Tue, 21 Jun 2016 09:13:52 -0700
-Message-ID: <CAGXu5jJ+seDJgknrFTNVw8A3CuVkjnKH6LFfti5zyJgFTM2q+A@mail.gmail.com>
-Subject: Re: [PATCH v4 2/4] Add the latent_entropy gcc plugin
+Date: Tue, 21 Jun 2016 11:40:16 -0700
+Message-ID: <CAGXu5jJ4G0u8JPG49ehmgPPk4tQG=nrXm0qPRCbT6PcbwD8hSw@mail.gmail.com>
+Subject: Re: [PATCH v4 0/4] Introduce the latent_entropy gcc plugin
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Christoph Hellwig <hch@infradead.org>
-Cc: Emese Revfy <re.emese@gmail.com>, "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, PaX Team <pageexec@freemail.hu>, Brad Spengler <spender@grsecurity.net>, Michal Marek <mmarek@suse.com>, LKML <linux-kernel@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, Theodore Ts'o <tytso@mit.edu>, Andrew Morton <akpm@linux-foundation.org>, Linux-MM <linux-mm@kvack.org>, Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>, Paul McKenney <paulmck@linux.vnet.ibm.com>, Ingo Molnar <mingo@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, bart.vanassche@sandisk.com, "David S. Miller" <davem@davemloft.net>
+To: Emese Revfy <re.emese@gmail.com>
+Cc: "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, PaX Team <pageexec@freemail.hu>, Brad Spengler <spender@grsecurity.net>, Michal Marek <mmarek@suse.com>, LKML <linux-kernel@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, Theodore Ts'o <tytso@mit.edu>, Andrew Morton <akpm@linux-foundation.org>, Linux-MM <linux-mm@kvack.org>, Jens Axboe <axboe@kernel.dk>, Al Viro <viro@zeniv.linux.org.uk>, Paul McKenney <paulmck@linux.vnet.ibm.com>, Ingo Molnar <mingo@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, bart.vanassche@sandisk.com, "David S. Miller" <davem@davemloft.net>
 
-On Tue, Jun 21, 2016 at 5:58 AM, Christoph Hellwig <hch@infradead.org> wrote:
-> On Mon, Jun 20, 2016 at 08:41:19PM +0200, Emese Revfy wrote:
->> --- /dev/null
->> +++ b/scripts/gcc-plugins/latent_entropy_plugin.c
->> @@ -0,0 +1,639 @@
->> +/*
->> + * Copyright 2012-2016 by the PaX Team <pageexec@freemail.hu>
->> + * Copyright 2016 by Emese Revfy <re.emese@gmail.com>
->> + * Licensed under the GPL v2
->> + *
->> + * Note: the choice of the license means that the compilation process is
->> + *       NOT 'eligible' as defined by gcc's library exception to the GPL v3,
->> + *       but for the kernel it doesn't matter since it doesn't link against
->> + *       any of the gcc libraries
+On Mon, Jun 20, 2016 at 11:39 AM, Emese Revfy <re.emese@gmail.com> wrote:
+> I would like to introduce the latent_entropy gcc plugin. This plugin
+> mitigates the problem of the kernel having too little entropy during and
+> after boot for generating crypto keys.
 >
-> I remember we used to have architectures that actually linked against
-> libgcc.  Isn't that the case anymore?
+> This plugin mixes random values into the latent_entropy global variable
+> in functions marked by the __latent_entropy attribute.
+> The value of this global variable is added to the kernel entropy pool
+> to increase the entropy.
+>
+> It is a CII project supported by the Linux Foundation.
+>
+> The latent_entropy plugin was ported from grsecurity/PaX originally written
+> by the PaX Team. You can find more about the plugin here:
+> https://grsecurity.net/pipermail/grsecurity/2012-July/001093.html
+>
+> The plugin supports all gcc version from 4.5 to 6.0.
+>
+> I do some changes above the PaX version. The important one is mixing
+> the stack pointer into the global variable too.
+> You can find more about the changes here:
+> https://github.com/ephox-gcc-plugins/latent_entropy
+>
+> This patch set is based on the "Introduce GCC plugin infrastructure"
+> patch set (git/mmarek/kbuild.git#kbuild HEAD: 543c37cb165049c3be).
+>
+> Emese Revfy (4):
+>  Add support for passing gcc plugin arguments
+>  Add the latent_entropy gcc plugin
+>  Mark functions with the latent_entropy attribute
+>  Add the extra_latent_entropy kernel parameter
 
-There are a few, but they don't (and won't) select HAVE_GCC_PLUGINS.
+Thanks! This looks good to me. I've adjusted some of the commit
+message language for clarity and fixed a few other >80 lines that
+stood out to me.
+
+I've applied this to for-next/kspp and after I finish local build
+testing, it should appear in linux-next.
+
+Yay! :)
 
 -Kees
 
