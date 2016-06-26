@@ -1,103 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mailapp01.imgtec.com ([195.59.15.196]:9562 "EHLO
-	mailapp01.imgtec.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751053AbcFXWmt (ORCPT
+Received: from basicbox7.server-home.net ([195.137.212.29]:60539 "EHLO
+	basicbox7.server-home.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752233AbcFZKxG (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 24 Jun 2016 18:42:49 -0400
-From: James Hogan <james.hogan@imgtec.com>
-Subject: [PATCH v4 2/2] kbuild: Remove stale asm-generic wrappers
-Date: Fri, 24 Jun 2016 23:42:24 +0100
-Message-ID: <1466808144-23209-3-git-send-email-james.hogan@imgtec.com>
-In-Reply-To: <1466808144-23209-1-git-send-email-james.hogan@imgtec.com>
-References: <1466808144-23209-1-git-send-email-james.hogan@imgtec.com>
+	Sun, 26 Jun 2016 06:53:06 -0400
+Subject: Re: Regression in "kbuild: fix if_change and friends to consider
+ argument order"
+References: <1465263518.3885.9.camel@intel.com> <5756960E.5020706@suse.com>
+ <57569ACC.8050503@suse.cz>
+ <CAK7LNARPUqD9BY5p-=M49KkQM7+j0bVFBX2On_rqdJjRs=zeTQ@mail.gmail.com>
+ <5756A675.3080003@suse.cz>
+ <CAK7LNAS4228scb3Ep1MT_FZhHS_+ckJCJZSDT-TN9hcvJ7Wq0A@mail.gmail.com>
+ <1465308627.3885.61.camel@intel.com> <20160607215237.GA13237@sepie.suse.cz>
+ <1465428562.3885.75.camel@intel.com>
+From: Thorsten Leemhuis <regressions@leemhuis.info>
+Message-ID: <2d0fa5b3-eb47-60af-9c92-49c31ae0fe86@leemhuis.info>
+Date: Sun, 26 Jun 2016 12:43:23 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <1465428562.3885.75.camel@intel.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Thomas Gleixner <tglx@linutronix.de>
-Cc: linux-kernel@vger.kernel.org, James Hogan <james.hogan@imgtec.com>, Michal Marek <mmarek@suse.com>, Arnd Bergmann <arnd@arndb.de>, Ralf Baechle <ralf@linux-mips.org>, Paul Burton <paul.burton@imgtec.com>, Florian Fainelli <f.fainelli@gmail.com>, linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org, linux-mips@linux-mips.org
+To: "Zanoni, Paulo R" <paulo.r.zanoni@intel.com>, "mmarek@suse.com" <mmarek@suse.com>
+Cc: "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "yamada.masahiro@socionext.com" <yamada.masahiro@socionext.com>, "mmarek@suse.cz" <mmarek@suse.cz>, "nicolas.pitre@linaro.org" <nicolas.pitre@linaro.org>
 
-When a header file is removed from generic-y (often accompanied by the
-addition of an arch specific header), the generated wrapper file will
-persist, and in some cases may still take precedence over the new arch
-header.
+On 09.06.2016 01:29, Zanoni, Paulo R wrote:
+> Em Ter, 2016-06-07 às 23:52 +0200, Michal Marek escreveu:
+>> On Tue, Jun 07, 2016 at 02:10:28PM +0000, Zanoni, Paulo R wrote:
+>> From b36fad65d61fffe4b662d4bfb1ed673c455a36a2 Mon Sep 17 00:00:00
+>> 2001
+>> From: Michal Marek <mmarek@suse.com>
+>> Date: Tue, 7 Jun 2016 11:57:02 +0200
+>> Subject: [PATCH] kbuild: Initialize exported variables
+>>
+>> The NOSTDINC_FLAGS variable is exported, so it needs to be cleared to
+>> avoid duplicating its content when running make from within make
+>> (e.g.
+>> in the packaging targets). This became an issue after commit
+>> 9c8fa9bc08f6 ("kbuild: fix if_change and friends to consider argument
+>> order"), which no longer ignores the duplicate options. As Paulo
+>> Zanoni
+>> points out, the LDFLAGS_vmlinux variable has the same problem.
+>>
+>> Reported-by: "Zanoni, Paulo R" <paulo.r.zanoni@intel.com>
+>> Fixes: 9c8fa9bc08f6 ("kbuild: fix if_change and friends to consider
+>> argument order")
+>> Signed-off-by: Michal Marek <mmarek@suse.com>
+> Works for me.
+> Tested-by: Paulo Zanoni <paulo.r.zanoni@intel.com>
 
-For example commit f1fe2d21f4e1 ("MIPS: Add definitions for extended
-context") removed ucontext.h from generic-y in arch/mips/include/asm/,
-and added an arch/mips/include/uapi/asm/ucontext.h. The continued use of
-the wrapper when reusing a dirty build tree resulted in build failures
-in arch/mips/kernel/signal.c:
+Michal, what's the status here? This made it on my 4.7 regressions
+report due to the "regression" keyword in the subject. Is this an older
+regression or something that will get fixed post 4.7? It's not fixed in
+mainline afaics, but maybe I missed something.
 
-arch/mips/kernel/signal.c: In function ‘sc_to_extcontext’:
-arch/mips/kernel/signal.c:142:12: error: ‘struct ucontext’ has no member named ‘uc_extcontext’
-  return &uc->uc_extcontext;
-            ^
-
-Fix by detecting and removing wrapper headers in generated header
-directories that do not correspond to a filename in generic-y, genhdr-y,
-or the newly introduced generated-y.
-
-Reported-by: Jacek Anaszewski <j.anaszewski@samsung.com>
-Reported-by: Hauke Mehrtens <hauke@hauke-m.de>
-Reported-by: Heinrich Schuchardt <xypron.glpk@gmx.de>
-Signed-off-by: James Hogan <james.hogan@imgtec.com>
-Acked-by: Arnd Bergmann <arnd@arndb.de>
-Acked-by: Florian Fainelli <f.fainelli@gmail.com>
-Cc: Michal Marek <mmarek@suse.com>
-Cc: Arnd Bergmann <arnd@arndb.de>
-Cc: Ralf Baechle <ralf@linux-mips.org>
-Cc: Paul Burton <paul.burton@imgtec.com>
-Cc: Florian Fainelli <f.fainelli@gmail.com>
-Cc: linux-kbuild@vger.kernel.org
-Cc: linux-arch@vger.kernel.org
-Cc: linux-mips@linux-mips.org
----
-Changes in v4:
-- None (resend).
-
-Changes in v3:
-- Ensure FORCE actually gets marked .PHONY.
-
-Changes in v2:
-- Rewrite a bit, drawing inspiration from Makefile.headersinst.
-- Exclude genhdr-y and generated-y (thanks to kbuild test robot).
----
- scripts/Makefile.asm-generic | 17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
-
-diff --git a/scripts/Makefile.asm-generic b/scripts/Makefile.asm-generic
-index 045e0098e962..e4d017d53819 100644
---- a/scripts/Makefile.asm-generic
-+++ b/scripts/Makefile.asm-generic
-@@ -13,11 +13,26 @@ include scripts/Kbuild.include
- # Create output directory if not already present
- _dummy := $(shell [ -d $(obj) ] || mkdir -p $(obj))
- 
-+# Stale wrappers when the corresponding files are removed from generic-y
-+# need removing.
-+generated-y   := $(generic-y) $(genhdr-y) $(generated-y)
-+all-files     := $(patsubst %, $(obj)/%, $(generated-y))
-+old-headers   := $(wildcard $(obj)/*.h)
-+unwanted      := $(filter-out $(all-files),$(old-headers))
-+
- quiet_cmd_wrap = WRAP    $@
- cmd_wrap = echo "\#include <asm-generic/$*.h>" >$@
- 
--all: $(patsubst %, $(obj)/%, $(generic-y))
-+quiet_cmd_remove = REMOVE  $(unwanted)
-+cmd_remove = rm -f $(unwanted)
-+
-+all: $(patsubst %, $(obj)/%, $(generic-y)) FORCE
-+	$(if $(unwanted),$(call cmd,remove),)
- 	@:
- 
- $(obj)/%.h:
- 	$(call cmd,wrap)
-+
-+PHONY += FORCE
-+.PHONY: $(PHONY)
-+FORCE: ;
--- 
-2.4.10
-
+Sincerely, your regression tracker for Linux 4.7 (http://bit.ly/28JRmJo)
+ Thorsten
