@@ -1,15 +1,16 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:36410 "EHLO
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:35751 "EHLO
 	mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752024AbcFZPaL (ORCPT
+	with ESMTP id S1751821AbcFZPtC (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sun, 26 Jun 2016 11:30:11 -0400
-Received: by mail-wm0-f68.google.com with SMTP id c82so18268800wme.3
-        for <linux-kbuild@vger.kernel.org>; Sun, 26 Jun 2016 08:30:11 -0700 (PDT)
-Date: Sun, 26 Jun 2016 17:36:43 +0200
+	Sun, 26 Jun 2016 11:49:02 -0400
+Received: by mail-wm0-f68.google.com with SMTP id a66so18294143wme.2
+        for <linux-kbuild@vger.kernel.org>; Sun, 26 Jun 2016 08:49:02 -0700 (PDT)
+Date: Sun, 26 Jun 2016 17:38:20 +0200
 From: Emese Revfy <re.emese@gmail.com>
-Subject: [PATCH] Automate make rule generation for gcc plugin objects
-Message-Id: <20160626173643.c05fd4d559ee9214ad1253c6@gmail.com>
+Subject: [PATCH] Add support for complex gcc plugins that don't fit in a
+ single file
+Message-Id: <20160626173820.13ad67e14e7a29a6563fe129@gmail.com>
 Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
@@ -22,23 +23,55 @@ Cc: mmarek@suse.com, linux-kbuild@vger.kernel.org, kernel-hardening@lists.openwa
 Reported-by: PaX Team <pageexec@freemail.hu>
 Signed-off-by: Emese Revfy <re.emese@gmail.com>
 ---
- scripts/gcc-plugins/Makefile | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+ scripts/Makefile.gcc-plugins | 3 ++-
+ scripts/gcc-plugins/Makefile | 9 ++++++---
+ 2 files changed, 8 insertions(+), 4 deletions(-)
 
+diff --git a/scripts/Makefile.gcc-plugins b/scripts/Makefile.gcc-plugins
+index 61fc4bb..1f922df 100644
+--- a/scripts/Makefile.gcc-plugins
++++ b/scripts/Makefile.gcc-plugins
+@@ -27,7 +27,7 @@ ifdef CONFIG_GCC_PLUGINS
+ 
+   GCC_PLUGINS_CFLAGS := $(strip $(addprefix -fplugin=$(objtree)/scripts/gcc-plugins/, $(gcc-plugin-y)) $(gcc-plugin-cflags-y))
+ 
+-  export PLUGINCC GCC_PLUGINS_CFLAGS GCC_PLUGIN SANCOV_PLUGIN DISABLE_LATENT_ENTROPY_PLUGIN
++  export PLUGINCC GCC_PLUGINS_CFLAGS GCC_PLUGIN GCC_PLUGIN_SUBDIR SANCOV_PLUGIN DISABLE_LATENT_ENTROPY_PLUGIN
+ 
+   ifneq ($(PLUGINCC),)
+     # SANCOV_PLUGIN can be only in CFLAGS_KCOV because avoid duplication.
+@@ -36,6 +36,7 @@ ifdef CONFIG_GCC_PLUGINS
+ 
+   KBUILD_CFLAGS += $(GCC_PLUGINS_CFLAGS)
+   GCC_PLUGIN := $(gcc-plugin-y)
++  GCC_PLUGIN_SUBDIR := $(gcc-plugin-subdir-y)
+ endif
+ 
+ # If plugins aren't supported, abort the build before hard-to-read compiler
 diff --git a/scripts/gcc-plugins/Makefile b/scripts/gcc-plugins/Makefile
-index a3f8ca4a..898449d 100644
+index 898449d..94fa139 100644
 --- a/scripts/gcc-plugins/Makefile
 +++ b/scripts/gcc-plugins/Makefile
-@@ -20,9 +20,6 @@ endif
+@@ -12,14 +12,17 @@ else
+   export HOST_EXTRACXXFLAGS
+ endif
  
- $(HOSTLIBS)-y := $(GCC_PLUGIN)
- always := $($(HOSTLIBS)-y)
+-export GCCPLUGINS_DIR HOSTLIBS
 -
--cyc_complexity_plugin-objs := cyc_complexity_plugin.o
--sancov_plugin-objs := sancov_plugin.o
--latent_entropy_plugin-objs := latent_entropy_plugin.o
-+$(foreach p,$($(HOSTLIBS)-y:%.so=%),$(eval $(p)-objs := $(p).o))
+ ifneq ($(CFLAGS_KCOV), $(SANCOV_PLUGIN))
+   GCC_PLUGIN := $(filter-out $(SANCOV_PLUGIN), $(GCC_PLUGIN))
+ endif
  
+-$(HOSTLIBS)-y := $(GCC_PLUGIN)
++export HOSTLIBS
++
++$(HOSTLIBS)-y := $(foreach p,$(GCC_PLUGIN),$(if $(findstring /,$(p)),,$(p)))
+ always := $($(HOSTLIBS)-y)
+ $(foreach p,$($(HOSTLIBS)-y:%.so=%),$(eval $(p)-objs := $(p).o))
+ 
++subdir-y := $(GCC_PLUGIN_SUBDIR)
++subdir-  += $(GCC_PLUGIN_SUBDIR)
++
  clean-files += *.so
 -- 
 2.8.1
