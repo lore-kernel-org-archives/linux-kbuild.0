@@ -1,64 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f46.google.com ([74.125.82.46]:37708 "EHLO
-	mail-wm0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750869AbcF0QFL (ORCPT
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:33101 "EHLO
+	mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751891AbcF0S2y (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 27 Jun 2016 12:05:11 -0400
-Received: by mail-wm0-f46.google.com with SMTP id a66so122206326wme.0
-        for <linux-kbuild@vger.kernel.org>; Mon, 27 Jun 2016 09:05:10 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20160626173451.c8406cd0c7a87cc3f94d9753@gmail.com>
-References: <20160626173451.c8406cd0c7a87cc3f94d9753@gmail.com>
-From: Kees Cook <keescook@chromium.org>
-Date: Mon, 27 Jun 2016 09:05:08 -0700
-Message-ID: <CAGXu5jJw-HcYRo8muSQ7Av9ZGuO3jTgV2x_xDcqmK-i=2nu1aw@mail.gmail.com>
-Subject: Re: [PATCH] powerpc/kernel: Disable the latent entropy plugin unconditionally
-Content-Type: text/plain; charset=UTF-8
+	Mon, 27 Jun 2016 14:28:54 -0400
+From: Rabin Vincent <rabin@rab.in>
+Subject: [PATCH 1/2] Makefile: evaluate LDFLAGS_BUILD_ID only once
+Date: Mon, 27 Jun 2016 20:28:26 +0200
+Message-Id: <1467052107-26735-1-git-send-email-rabin@rab.in>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Emese Revfy <re.emese@gmail.com>
-Cc: Michal Marek <mmarek@suse.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, PaX Team <pageexec@freemail.hu>
+To: mmarek@suse.com
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Rabin Vincent <rabin@rab.in>
 
-On Sun, Jun 26, 2016 at 8:34 AM, Emese Revfy <re.emese@gmail.com> wrote:
->
-> Reported-by: PaX Team <pageexec@freemail.hu>
-> Signed-off-by: Emese Revfy <re.emese@gmail.com>
+Evaluate LDFLAGS_BUILD_ID (which involves invoking the compiler) only
+once instead of over and over.
 
-Thanks! Can you include a body in the commit message? For this, something like:
+This provides a 20% reduction in null build time with x86 allnoconfig on
+my machine:
 
-Disable the gcc-plugin unconditionlly here because ... *reason it is required*
+$ make -j8 && perf stat -r5 make -j8
+Before: 1,086617617 seconds time elapsed ( +-  0,37% )
+ After: 0,864487173 seconds time elapsed ( +-  0,35% )
 
-etc
+Signed-off-by: Rabin Vincent <rabin@rab.in>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
--Kees
-
-> ---
->  arch/powerpc/kernel/Makefile | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/powerpc/kernel/Makefile b/arch/powerpc/kernel/Makefile
-> index 01935b8..e9ef44f 100644
-> --- a/arch/powerpc/kernel/Makefile
-> +++ b/arch/powerpc/kernel/Makefile
-> @@ -14,11 +14,12 @@ CFLAGS_prom_init.o      += -fPIC
->  CFLAGS_btext.o         += -fPIC
->  endif
->
-> -ifdef CONFIG_FUNCTION_TRACER
->  CFLAGS_cputable.o += $(DISABLE_LATENT_ENTROPY_PLUGIN)
->  CFLAGS_init.o += $(DISABLE_LATENT_ENTROPY_PLUGIN)
->  CFLAGS_btext.o += $(DISABLE_LATENT_ENTROPY_PLUGIN)
->  CFLAGS_prom.o += $(DISABLE_LATENT_ENTROPY_PLUGIN)
-> +
-> +ifdef CONFIG_FUNCTION_TRACER
->  # Do not trace early boot code
->  CFLAGS_REMOVE_cputable.o = -mno-sched-epilog $(CC_FLAGS_FTRACE)
->  CFLAGS_REMOVE_prom_init.o = -mno-sched-epilog $(CC_FLAGS_FTRACE)
-> --
-> 2.8.1
-
-
-
+diff --git a/Makefile b/Makefile
+index 6471f20ca400..91baa282f3fa 100644
+--- a/Makefile
++++ b/Makefile
+@@ -814,7 +814,7 @@ KBUILD_AFLAGS   += $(ARCH_AFLAGS)   $(KAFLAGS)
+ KBUILD_CFLAGS   += $(ARCH_CFLAGS)   $(KCFLAGS)
+ 
+ # Use --build-id when available.
+-LDFLAGS_BUILD_ID = $(patsubst -Wl$(comma)%,%,\
++LDFLAGS_BUILD_ID := $(patsubst -Wl$(comma)%,%,\
+ 			      $(call cc-ldoption, -Wl$(comma)--build-id,))
+ KBUILD_LDFLAGS_MODULE += $(LDFLAGS_BUILD_ID)
+ LDFLAGS_vmlinux += $(LDFLAGS_BUILD_ID)
 -- 
-Kees Cook
-Chrome OS & Brillo Security
+2.8.1
+
