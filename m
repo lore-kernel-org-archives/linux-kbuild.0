@@ -1,59 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtprelay0040.hostedemail.com ([216.40.44.40]:58925 "EHLO
-	smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1751068AbcF1StA (ORCPT
+Received: from mail-wm0-f45.google.com ([74.125.82.45]:32892 "EHLO
+	mail-wm0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752257AbcF1TC6 (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 28 Jun 2016 14:49:00 -0400
-Message-ID: <1467139734.24287.45.camel@perches.com>
+	Tue, 28 Jun 2016 15:02:58 -0400
+Received: by mail-wm0-f45.google.com with SMTP id r190so29045694wmr.0
+        for <linux-kbuild@vger.kernel.org>; Tue, 28 Jun 2016 12:02:57 -0700 (PDT)
+From: Rasmus Villemoes <linux@rasmusvillemoes.dk>
 Subject: Re: [PATCH v1 0/2] Introduce the initify gcc plugin
-From: Joe Perches <joe@perches.com>
-Date: Tue, 28 Jun 2016 11:48:54 -0700
-In-Reply-To: <1467131708.24287.29.camel@perches.com>
 References: <20160628133407.10c2ea1ecd194e8085e84c5a@gmail.com>
-	 <1467131708.24287.29.camel@perches.com>
-Content-Type: text/plain; charset="ISO-8859-1"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+	<1467131708.24287.29.camel@perches.com>
+	<1467139734.24287.45.camel@perches.com>
+Date: Tue, 28 Jun 2016 21:02:54 +0200
+In-Reply-To: <1467139734.24287.45.camel@perches.com> (Joe Perches's message of
+	"Tue, 28 Jun 2016 11:48:54 -0700")
+Message-ID: <87h9cdi1b5.fsf@rasmusvillemoes.dk>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Emese Revfy <re.emese@gmail.com>, kernel-hardening@lists.openwall.com, Mathias Krause <minipli@googlemail.com>
-Cc: pageexec@freemail.hu, spender@grsecurity.net, mmarek@suse.com, keescook@chromium.org, linux-kernel@vger.kernel.org, yamada.masahiro@socionext.com, linux-kbuild@vger.kernel.org, minipli@ld-linux.so, linux@armlinux.org.uk, catalin.marinas@arm.com, linux@rasmusvillemoes.dk, david.brown@linaro.org, benh@kernel.crashing.org, tglx@linutronix.de, akpm@linux-foundation.org, jlayton@poochiereds.net, arnd@arndb.de
+To: Joe Perches <joe@perches.com>
+Cc: Emese Revfy <re.emese@gmail.com>, kernel-hardening@lists.openwall.com, Mathias Krause <minipli@googlemail.com>, pageexec@freemail.hu, spender@grsecurity.net, mmarek@suse.com, keescook@chromium.org, linux-kernel@vger.kernel.org, yamada.masahiro@socionext.com, linux-kbuild@vger.kernel.org, minipli@ld-linux.so, linux@armlinux.org.uk, catalin.marinas@arm.com, david.brown@linaro.org, benh@kernel.crashing.org, tglx@linutronix.de, akpm@linux-foundation.org, jlayton@poochiereds.net, arnd@arndb.de
 
-On Tue, 2016-06-28 at 09:35 -0700, Joe Perches wrote:
-> (adding Mathias Krause who did something similar via macros in 2014)
-> 
-> https://lkml.org/lkml/2014/6/22/149
-> 
-> On Tue, 2016-06-28 at 13:34 +0200, Emese Revfy wrote:
-> > 
-> > I would like to introduce the initify gcc plugin. The kernel already
-> > has
-> > a mechanism to free up code and data memory that is only used during
-> > kernel
-> > or module initialization.
-> > This plugin will teach the compiler to find more such code and data
-> > that
-> > can be freed after initialization. It reduces memory usage.
-> > The initify gcc plugin can be useful for embedded systems.
-> What happens to string deduplication when one string
-> is in an init function and the same string is also used
-> in a non-init function in the same compilation unit?
-> 
-> foo.c
-> 
-> __init void initfunc(void)
-> {
-> 	pr_info("%s: I'm here\n", __func__);
-> }
-> 
-> void runtimefunc(void)
-> {
-> 	pr_info("I'm here: %s\n", __func__);
-> }
-> 
-> In what section does the string "I'm here: %s\n" get placed
-> or does it get placed into multiple sections?
+On Tue, Jun 28 2016, Joe Perches <joe@perches.com> wrote:
 
-Sorry, Joe can't type.
-That was meant to be the identical string in both functions.
+>> What happens to string deduplication when one string
+>> is in an init function and the same string is also used
+>> in a non-init function in the same compilation unit?
+>> 
+>> foo.c
+>> 
+>> __init void initfunc(void)
+>> {
+>> 	pr_info("%s: I'm here\n", __func__);
+>> }
+>> 
+>> void runtimefunc(void)
+>> {
+>> 	pr_info("I'm here: %s\n", __func__);
+>> }
+>> 
+>> In what section does the string "I'm here: %s\n" get placed
+>> or does it get placed into multiple sections?
 
+It'll get placed in multiple sections by the compiler, and nothing bad
+happens. String deduplication is something the linker does to sections
+equipped with appropriate flags. So in this case that of course means
+that the kernel image itself would be slightly bigger, while the used
+data after init would be the same. But I don't think there's a lot of
+these cases. (Also, "initfunc" would at least vanish).
