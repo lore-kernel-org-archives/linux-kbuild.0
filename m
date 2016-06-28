@@ -1,57 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail0.toppoint.de ([217.70.197.20]:55625 "EHLO
-	mail0.toppoint.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752203AbcF1Mb2 (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 28 Jun 2016 08:31:28 -0400
-Date: Tue, 28 Jun 2016 12:21:33 +0000
-From: Wilfried Klaebe <linux-kernel@lebenslange-mailadresse.de>
-Subject: [REPOST 2, PATCH] builddeb: really include objtool binary in headers
- package
-Message-ID: <20160628122133.GE3554@kaos.lebenslange-mailadresse.de>
+Received: from foss.arm.com ([217.140.101.70]:47274 "EHLO foss.arm.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752098AbcF1M55 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 28 Jun 2016 08:57:57 -0400
+Date: Tue, 28 Jun 2016 13:57:49 +0100
+From: Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [kernel-hardening] [PATCH v1 0/2] Introduce the initify gcc
+ plugin
+Message-ID: <20160628125748.GK31744@leverpostej>
+References: <20160628133407.10c2ea1ecd194e8085e84c5a@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20160628133407.10c2ea1ecd194e8085e84c5a@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
-Cc: bjorn@mork.no, mmarek@suse.cz
+To: Emese Revfy <re.emese@gmail.com>
+Cc: kernel-hardening@lists.openwall.com, pageexec@freemail.hu, spender@grsecurity.net, mmarek@suse.com, keescook@chromium.org, linux-kernel@vger.kernel.org, yamada.masahiro@socionext.com, linux-kbuild@vger.kernel.org, minipli@ld-linux.so, linux@armlinux.org.uk, catalin.marinas@arm.com, linux@rasmusvillemoes.dk, david.brown@linaro.org, benh@kernel.crashing.org, tglx@linutronix.de, akpm@linux-foundation.org, jlayton@poochiereds.net, arnd@arndb.de
 
-[added linux-kbuild@vger.kernel.org to Cc:, added Fixes:]
+On Tue, Jun 28, 2016 at 01:34:07PM +0200, Emese Revfy wrote:
+> I would like to introduce the initify gcc plugin. The kernel already has
+> a mechanism to free up code and data memory that is only used during kernel
+> or module initialization.
+> This plugin will teach the compiler to find more such code and data that
+> can be freed after initialization. It reduces memory usage.
+> The initify gcc plugin can be useful for embedded systems.
+> 
+> It is a CII project supported by the Linux Foundation.
+> 
+> This plugin is the part of grsecurity/PaX.
+> 
+> The plugin supports all gcc versions from 4.5 to 6.0.
+> 
+> I made some changes on top of the PaX version (since March 6.). These are
+> the important ones:
+>  * move all local strings to init.rodata.str and exit.rodata.str
+>    (not just __func__)
+>  * report all initified strings and functions
+>    (GCC_PLUGIN_INITIFY_VERBOSE config option)
+>  * automatically discover init/exit functions and apply the __init or
+>    __exit attributes on them
+> 
+> You can find more about the changes here:
+> https://github.com/ephox-gcc-plugins/initify
+> 
+> This patch set is based on the "Add support for complex gcc plugins that
+> don't fit in a single file" patch set (git/kees/linux.git#kspp HEAD:
+> e5d4798b284cd192c8b).
 
-On May 4th, Bjørn Mork provided patch
-697bbc7b832048d3a679cd55caf2268a325efbe0 to include objtool binaries in
-the headers package. However, that one only works if $srctree=$objtree,
-because the objtool binaries are not written to the srctree, but
-to the objtree.
+I was hoping to give this a spin on arm/arm64, but I couldn't find the
+prerequisite branch/tag/commit in that tree:
 
-Signed-off-by: Wilfried Klaebe <linux-kernel@lebenslange-mailadresse.de>
-Fixes: 697bbc7b8320 ("builddeb: include objtool binary in headers package")
----
- builddeb |    6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index 86e56fe..202d6e7 100755
---- a/scripts/package/builddeb
-+++ b/scripts/package/builddeb
-@@ -322,12 +322,12 @@ fi
- 
- # Build kernel header package
- (cd $srctree; find . -name Makefile\* -o -name Kconfig\* -o -name \*.pl) > "$objtree/debian/hdrsrcfiles"
--if grep -q '^CONFIG_STACK_VALIDATION=y' $KCONFIG_CONFIG ; then
--	(cd $srctree; find tools/objtool -type f -executable) >> "$objtree/debian/hdrsrcfiles"
--fi
- (cd $srctree; find arch/*/include include scripts -type f) >> "$objtree/debian/hdrsrcfiles"
- (cd $srctree; find arch/$SRCARCH -name module.lds -o -name Kbuild.platforms -o -name Platform) >> "$objtree/debian/hdrsrcfiles"
- (cd $srctree; find $(find arch/$SRCARCH -name include -o -name scripts -type d) -type f) >> "$objtree/debian/hdrsrcfiles"
-+if grep -q '^CONFIG_STACK_VALIDATION=y' $KCONFIG_CONFIG ; then
-+	(cd $objtree; find tools/objtool -type f -executable) >> "$objtree/debian/hdrobjfiles"
-+fi
- (cd $objtree; find arch/$SRCARCH/include Module.symvers include scripts -type f) >> "$objtree/debian/hdrobjfiles"
- destdir=$kernel_headers_dir/usr/src/linux-headers-$version
- mkdir -p "$destdir"
--- 
+https://git.kernel.org/cgit/linux/kernel/git/kees/linux.git/commit/?id=e5d4798b284cd192c8b
 
+Where should I be looking?
 
-
+Thanks,
+Mark.
