@@ -1,60 +1,91 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:60767 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751745AbcF0UKT (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 27 Jun 2016 16:10:19 -0400
-Subject: Re: Regression in "kbuild: fix if_change and friends to consider
- argument order"
-References: <1465263518.3885.9.camel@intel.com> <5756960E.5020706@suse.com>
- <57569ACC.8050503@suse.cz>
- <CAK7LNARPUqD9BY5p-=M49KkQM7+j0bVFBX2On_rqdJjRs=zeTQ@mail.gmail.com>
- <5756A675.3080003@suse.cz>
- <CAK7LNAS4228scb3Ep1MT_FZhHS_+ckJCJZSDT-TN9hcvJ7Wq0A@mail.gmail.com>
- <1465308627.3885.61.camel@intel.com> <20160607215237.GA13237@sepie.suse.cz>
- <1465428562.3885.75.camel@intel.com>
- <2d0fa5b3-eb47-60af-9c92-49c31ae0fe86@leemhuis.info>
-From: Michal Marek <mmarek@suse.com>
-Message-ID: <57718823.9030009@suse.com>
-Date: Mon, 27 Jun 2016 22:10:11 +0200
-MIME-Version: 1.0
-In-Reply-To: <2d0fa5b3-eb47-60af-9c92-49c31ae0fe86@leemhuis.info>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:33108 "EHLO
+	mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751673AbcF1L1k (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 28 Jun 2016 07:27:40 -0400
+Date: Tue, 28 Jun 2016 13:34:07 +0200
+From: Emese Revfy <re.emese@gmail.com>
+Subject: [PATCH v1 0/2] Introduce the initify gcc plugin
+Message-Id: <20160628133407.10c2ea1ecd194e8085e84c5a@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Thorsten Leemhuis <regressions@leemhuis.info>, "Zanoni, Paulo R" <paulo.r.zanoni@intel.com>
-Cc: "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "yamada.masahiro@socionext.com" <yamada.masahiro@socionext.com>, "mmarek@suse.cz" <mmarek@suse.cz>, "nicolas.pitre@linaro.org" <nicolas.pitre@linaro.org>
+To: kernel-hardening@lists.openwall.com
+Cc: pageexec@freemail.hu, spender@grsecurity.net, mmarek@suse.com, keescook@chromium.org, linux-kernel@vger.kernel.org, yamada.masahiro@socionext.com, linux-kbuild@vger.kernel.org, minipli@ld-linux.so, linux@armlinux.org.uk, catalin.marinas@arm.com, linux@rasmusvillemoes.dk, david.brown@linaro.org, benh@kernel.crashing.org, tglx@linutronix.de, akpm@linux-foundation.org, jlayton@poochiereds.net, arnd@arndb.de
 
-Dne 26.6.2016 v 12:43 Thorsten Leemhuis napsal(a):
-> On 09.06.2016 01:29, Zanoni, Paulo R wrote:
->> Em Ter, 2016-06-07 às 23:52 +0200, Michal Marek escreveu:
->>> On Tue, Jun 07, 2016 at 02:10:28PM +0000, Zanoni, Paulo R wrote:
->>> From b36fad65d61fffe4b662d4bfb1ed673c455a36a2 Mon Sep 17 00:00:00
->>> 2001
->>> From: Michal Marek <mmarek@suse.com>
->>> Date: Tue, 7 Jun 2016 11:57:02 +0200
->>> Subject: [PATCH] kbuild: Initialize exported variables
->>>
->>> The NOSTDINC_FLAGS variable is exported, so it needs to be cleared to
->>> avoid duplicating its content when running make from within make
->>> (e.g.
->>> in the packaging targets). This became an issue after commit
->>> 9c8fa9bc08f6 ("kbuild: fix if_change and friends to consider argument
->>> order"), which no longer ignores the duplicate options. As Paulo
->>> Zanoni
->>> points out, the LDFLAGS_vmlinux variable has the same problem.
->>>
->>> Reported-by: "Zanoni, Paulo R" <paulo.r.zanoni@intel.com>
->>> Fixes: 9c8fa9bc08f6 ("kbuild: fix if_change and friends to consider
->>> argument order")
->>> Signed-off-by: Michal Marek <mmarek@suse.com>
->> Works for me.
->> Tested-by: Paulo Zanoni <paulo.r.zanoni@intel.com>
-> 
-> Michal, what's the status here? This made it on my 4.7 regressions
-> report due to the "regression" keyword in the subject.
+I would like to introduce the initify gcc plugin. The kernel already has
+a mechanism to free up code and data memory that is only used during kernel
+or module initialization.
+This plugin will teach the compiler to find more such code and data that
+can be freed after initialization. It reduces memory usage.
+The initify gcc plugin can be useful for embedded systems.
 
-I forgot to send it to Linus, fixed now. Thanks for the reminder.
+It is a CII project supported by the Linux Foundation.
 
-Michal
+This plugin is the part of grsecurity/PaX.
 
+The plugin supports all gcc versions from 4.5 to 6.0.
+
+I made some changes on top of the PaX version (since March 6.). These are
+the important ones:
+ * move all local strings to init.rodata.str and exit.rodata.str
+   (not just __func__)
+ * report all initified strings and functions
+   (GCC_PLUGIN_INITIFY_VERBOSE config option)
+ * automatically discover init/exit functions and apply the __init or
+   __exit attributes on them
+
+You can find more about the changes here:
+https://github.com/ephox-gcc-plugins/initify
+
+This patch set is based on the "Add support for complex gcc plugins that
+don't fit in a single file" patch set (git/kees/linux.git#kspp HEAD:
+e5d4798b284cd192c8b).
+
+Some statistics about the plugin:
+
+On allyes config (amd64, gcc-6):
+* 7731 initified strings
+*  231 initified functions
+
+On allmod config (i386, gcc-6):
+* 8846 initified strings
+*  252 initified functions
+
+On allyes config (amd64, gcc-6):
+
+section         vanilla                 vanilla + initify        change
+-----------------------------------------------------------------------
+.rodata         39059688 (0x25400e8)    38527210 (0x24be0ea)    -532478
+.data           45744128 (0x2ba0000)    45404160 (0x2b4d000)    -339968
+.init.data       1361144  (0x14c4f8)     1674200  (0x198bd8)    +313056
+.text           77615128 (0x4a05018)    77576664 (0x49fb9d8)     -38464
+.init.text       1108455  (0x10e9e7)     1137618  (0x115bd2)     +29163
+
+
+Emese Revfy (2):
+ Add the initify gcc plugin
+ Mark functions with the __nocapture attribute
+
+---
+ arch/Kconfig                         |   23 +
+ arch/arm/include/asm/string.h        |   10 +-
+ arch/arm64/include/asm/string.h      |   23 +-
+ arch/powerpc/include/asm/string.h    |   19 +-
+ arch/x86/boot/string.h               |    4 +-
+ arch/x86/include/asm/string_32.h     |   21 +-
+ arch/x86/include/asm/string_64.h     |   18 +-
+ arch/x86/kernel/hpet.c               |    2 +-
+ include/asm-generic/bug.h            |    6 +-
+ include/asm-generic/vmlinux.lds.h    |    2 +
+ include/linux/compiler-gcc.h         |   10 +-
+ include/linux/compiler.h             |    4 +
+ include/linux/fs.h                   |    5 +-
+ include/linux/printk.h               |    2 +-
+ include/linux/string.h               |   73 +--
+ scripts/Makefile.gcc-plugins         |    4 +
+ scripts/gcc-plugins/initify_plugin.c | 1147 ++++++++++++++++++++++++++++++++++
+ 17 files changed, 1283 insertions(+), 90 deletions(-)
