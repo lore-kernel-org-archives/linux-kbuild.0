@@ -1,57 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtprelay0040.hostedemail.com ([216.40.44.40]:53407 "EHLO
-	smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1752423AbcF1XzD (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 28 Jun 2016 19:55:03 -0400
-Message-ID: <1467158049.24287.90.camel@perches.com>
-Subject: Re: [kernel-hardening] Re: [PATCH v1 0/2] Introduce the initify gcc
+Received: from foss.arm.com ([217.140.101.70]:52419 "EHLO foss.arm.com"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1751427AbcF2IVv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 29 Jun 2016 04:21:51 -0400
+Date: Wed, 29 Jun 2016 09:21:38 +0100
+From: Mark Rutland <mark.rutland@arm.com>
+Subject: Re: [kernel-hardening] [PATCH v1 0/2] Introduce the initify gcc
  plugin
-From: Joe Perches <joe@perches.com>
-Date: Tue, 28 Jun 2016 16:54:09 -0700
-In-Reply-To: <47053.1467151621@turing-police.cc.vt.edu>
+Message-ID: <20160629082137.GA16387@leverpostej>
 References: <20160628133407.10c2ea1ecd194e8085e84c5a@gmail.com>
-	 <1467150555.24287.77.camel@perches.com>
-	 <47053.1467151621@turing-police.cc.vt.edu>
-Content-Type: text/plain; charset="ISO-8859-1"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
+ <20160628125748.GK31744@leverpostej>
+ <20160628181456.21c1f567271b6f19fac1d886@gmail.com>
+ <CAGXu5jLa20aqna_RW6Egd7Y1Wd4yajkZpj8rP5BWWZyUkfWbKQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAGXu5jLa20aqna_RW6Egd7Y1Wd4yajkZpj8rP5BWWZyUkfWbKQ@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Valdis.Kletnieks@vt.edu, kernel-hardening@lists.openwall.com
-Cc: Emese Revfy <re.emese@gmail.com>, Matt Davis <mattdavis9@gmail.com>, pageexec@freemail.hu, spender@grsecurity.net, mmarek@suse.com, keescook@chromium.org, linux-kernel@vger.kernel.org, yamada.masahiro@socionext.com, linux-kbuild@vger.kernel.org, minipli@ld-linux.so, linux@armlinux.org.uk, catalin.marinas@arm.com, linux@rasmusvillemoes.dk, david.brown@linaro.org, benh@kernel.crashing.org, tglx@linutronix.de, akpm@linux-foundation.org, jlayton@poochiereds.net, arnd@arndb.de
+To: Kees Cook <keescook@chromium.org>
+Cc: Emese Revfy <re.emese@gmail.com>, "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, PaX Team <pageexec@freemail.hu>, Brad Spengler <spender@grsecurity.net>, Michal Marek <mmarek@suse.com>, LKML <linux-kernel@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, minipli@ld-linux.so, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, David Brown <david.brown@linaro.org>, "benh@kernel.crashing.org" <benh@kernel.crashing.org>, Thomas Gleixner <tglx@linutronix.de>, Andrew Morton <akpm@linux-foundation.org>, jlayton@poochiereds.net, Arnd Bergmann <arnd@arndb.de>
 
-On Tue, 2016-06-28 at 18:07 -0400, Valdis.Kletnieks@vt.edu wrote:
-> On Tue, 28 Jun 2016 14:49:15 -0700, Joe Perches said:
+On Tue, Jun 28, 2016 at 01:46:04PM -0700, Kees Cook wrote:
+> On Tue, Jun 28, 2016 at 9:14 AM, Emese Revfy <re.emese@gmail.com> wrote:
+> > On Tue, 28 Jun 2016 13:57:49 +0100
+> > Mark Rutland <mark.rutland@arm.com> wrote:
+> >
+> >> On Tue, Jun 28, 2016 at 01:34:07PM +0200, Emese Revfy wrote:
+> >> > This patch set is based on the "Add support for complex gcc plugins that
+> >> > don't fit in a single file" patch set (git/kees/linux.git#kspp HEAD:
+> >> > e5d4798b284cd192c8b).
+> >>
+> >> I was hoping to give this a spin on arm/arm64, but I couldn't find the
+> >> prerequisite branch/tag/commit in that tree:
+> >>
+> >> https://git.kernel.org/cgit/linux/kernel/git/kees/linux.git/commit/?id=e5d4798b284cd192c8b
+> >>
+> >> Where should I be looking?
+> >
+> > Sorry, this commit was disappear. You can apply these patches to this tree:
+> > https://github.com/ephox-gcc-plugins/gcc-plugins_linux-next.git (initify branch)
 > 
-> > 
-> > Another potentially useful plugin, especially for embedded systems,
-> > would be to compress any string literal marked with
-> > 
-> > 	 __attribute__((format(printf, string-index,)))
-> > 
-> > and decompress the compressed format on the stack in lib/vsprintf.c
-> > vsnprintf just before use.
-> Are there enough such strings in the kernel to make it worth the effort?
-> I'm assuming that the string literals in printk("some string here") are
-> automatically so marked?
+> The linux-next tree should have what you need for the plugin support.
+> This is merging from my KSPP tree:
+> 
+> https://git.kernel.org/linux/kernel/git/kees/linux.git for-next/kspp
 
-Yes, that's the concept.
+I didn't see the complex gcc plugins patch in that branch or linux-next,
+so I take it you mean a a base for applying the complex plugin patch and
+initify patches.
 
-> Is there a minimum length under which the compression overhead actually
-> makes it larger?
+I'll try to give that a go shortly.
 
-No, compression would have to be possible, otherwise it'd
-be stored directly.  Compression would use a special
-"compressed string" header with a 2 byte overhead and
-then stored with no trailing \0.
-
-Something like struct compressed_format_header {
-	u8	flag;	/* Must be ASCII STX or "\b" */
-	u8	length;
-}
-
-Depends on the config of course, but it could reduce total
-image size ~50k on an x86-32 defconfig
-
-
+Thanks,
+Mark.
