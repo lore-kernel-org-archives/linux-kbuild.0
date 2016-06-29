@@ -1,49 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f53.google.com ([74.125.82.53]:38672 "EHLO
-	mail-wm0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752048AbcF2Ou2 (ORCPT
+Received: from mail-vk0-f67.google.com ([209.85.213.67]:33997 "EHLO
+	mail-vk0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751499AbcF2Q5E (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 29 Jun 2016 10:50:28 -0400
-Received: by mail-wm0-f53.google.com with SMTP id r201so77635373wme.1
-        for <linux-kbuild@vger.kernel.org>; Wed, 29 Jun 2016 07:50:28 -0700 (PDT)
+	Wed, 29 Jun 2016 12:57:04 -0400
 MIME-Version: 1.0
-In-Reply-To: <87vb0tgh1n.fsf@rasmusvillemoes.dk>
-References: <20160628133407.10c2ea1ecd194e8085e84c5a@gmail.com>
- <20160628133520.5baf644afca97c464b9cdb17@gmail.com> <87vb0tgh1n.fsf@rasmusvillemoes.dk>
-From: Kees Cook <keescook@chromium.org>
-Date: Wed, 29 Jun 2016 07:50:25 -0700
-Message-ID: <CAGXu5jLMsdeQ6XwBm-+kT0OkQtm78SQJRPFWueZ=wSUPeadwsw@mail.gmail.com>
-Subject: Re: [PATCH v1 1/2] Add the initify gcc plugin
+In-Reply-To: <1467052107-26735-2-git-send-email-rabin@rab.in>
+References: <1467052107-26735-1-git-send-email-rabin@rab.in> <1467052107-26735-2-git-send-email-rabin@rab.in>
+From: Jim Davis <jim.epost@gmail.com>
+Date: Wed, 29 Jun 2016 09:57:02 -0700
+Message-ID: <CA+r1ZhgE3PHYU9N8yE3R2-=n7QzgApVGqueKQ8QqvQD1tj-X9A@mail.gmail.com>
+Subject: Re: [PATCH 2/2] kbuild: add shell cache
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rasmus Villemoes <linux@rasmusvillemoes.dk>
-Cc: Emese Revfy <re.emese@gmail.com>, "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, PaX Team <pageexec@freemail.hu>, Brad Spengler <spender@grsecurity.net>, Michal Marek <mmarek@suse.com>, LKML <linux-kernel@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, minipli@ld-linux.so, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, David Brown <david.brown@linaro.org>, "benh@kernel.crashing.org" <benh@kernel.crashing.org>, Thomas Gleixner <tglx@linutronix.de>, Andrew Morton <akpm@linux-foundation.org>, jlayton@poochiereds.net, Arnd Bergmann <arnd@arndb.de>
+To: Rabin Vincent <rabin@rab.in>
+Cc: mmarek@suse.com, linux-kbuild@vger.kernel.org, linux-kernel <linux-kernel@vger.kernel.org>
 
-On Tue, Jun 28, 2016 at 2:05 PM, Rasmus Villemoes
-<linux@rasmusvillemoes.dk> wrote:
-> On Tue, Jun 28 2016, Emese Revfy <re.emese@gmail.com> wrote:
+On Mon, Jun 27, 2016 at 11:28 AM, Rabin Vincent <rabin@rab.in> wrote:
+> Running make results in over 40 invocations of the compiler just during
+> processing of the Makefile, before any actual rules are run.
 >
->> The kernel already has a mechanism to free up code and data memory that
->> is only used during kernel or module initialization.
->> This plugin will teach the compiler to find more such code and data that
->> can be freed after initialization.
->> It has two passes. The first one tries to find all functions that
->> can be become __init/__exit. The second one moves string constants
->> (local variables and function string arguments marked by
->> the nocapture attribute) only referenced in __init/__exit functions
->> to the __initconst/__exitconst sections.
->> It reduces memory usage. This plugin can be useful for embedded systems.
->
-> May I suggest, as a followup patch, a debug option/plugin parameter to
-> put the strings in a section which will not be reaped after init, but
-> just marked inaccessible, with graceful handling of bad accesses (print
-> a big fat warning, make the page(s) readable, continue)?
+> To reduce this overhead, cache the results of $(shell) calls to the
+> compiler.
 
-Is there a clean way to do this that isn't arch-specific?
+Clever.   Looks like lisp with all those parens!
 
--Kees
+One quirk with distclean:
+
+jim@krebstar:~/linux-rc$ make defconfig >/dev/null
+jim@krebstar:~/linux-rc$ ls -la .shellcache
+-rw-rw-r-- 1 jim jim 7876 Jun 29 09:51 .shellcache
+jim@krebstar:~/linux-rc$ make distclean | grep '\.shellcache'
+  CLEAN   .shellcache
+jim@krebstar:~/linux-rc$ ls -la .shellcache
+-rw-rw-r-- 1 jim jim 1061 Jun 29 09:52 .shellcache
 
 -- 
-Kees Cook
-Chrome OS & Brillo Security
+Jim
