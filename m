@@ -1,58 +1,28 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f66.google.com ([74.125.82.66]:34691 "EHLO
-	mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751193AbcGAN5I (ORCPT
+Received: from mail.univ-ouargla.dz ([193.194.92.3]:35136 "HELO
+	mail.univ-ouargla.dz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with SMTP id S1750757AbcGDEwK convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 1 Jul 2016 09:57:08 -0400
-Date: Fri, 1 Jul 2016 16:03:30 +0200
-From: Emese Revfy <re.emese@gmail.com>
-Subject: Re: [PATCH v1 2/2] Mark functions with the __nocapture attribute
-Message-Id: <20160701160330.1ce5a95e8c64c89af49155bb@gmail.com>
-In-Reply-To: <1467245565.24287.115.camel@perches.com>
-References: <20160628133407.10c2ea1ecd194e8085e84c5a@gmail.com>
-	<20160628133645.8f3cac0df4fc363e308426ac@gmail.com>
-	<1467132211.24287.31.camel@perches.com>
-	<20160628224043.c543b2b01e776e7757bbb3f4@gmail.com>
-	<1467147657.24287.59.camel@perches.com>
-	<20160629204204.859692ea2b7f570260ed18a0@gmail.com>
-	<1467245565.24287.115.camel@perches.com>
-Mime-Version: 1.0
+	Mon, 4 Jul 2016 00:52:10 -0400
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7BIT
+Content-Description: Mail message body
+Subject: Sinopec Corporation
+From: WenDongfen@Sinopec.com
+Date: Mon, 04 Jul 2016 02:16:20 +0100
+Reply-To: wen.dongfen2@gmail.com
+Message-Id: <20160704020449.024B9B104368@mail.univ-ouargla.dz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Joe Perches <joe@perches.com>
-Cc: kernel-hardening@lists.openwall.com, pageexec@freemail.hu, spender@grsecurity.net, mmarek@suse.com, keescook@chromium.org, linux-kernel@vger.kernel.org, yamada.masahiro@socionext.com, linux-kbuild@vger.kernel.org, minipli@ld-linux.so, linux@armlinux.org.uk, catalin.marinas@arm.com, linux@rasmusvillemoes.dk, david.brown@linaro.org, benh@kernel.crashing.org, tglx@linutronix.de, akpm@linux-foundation.org, jlayton@poochiereds.net, arnd@arndb.de
+To: Recipients <WenDongfen@Sinopec.com>
 
-On Wed, 29 Jun 2016 17:12:45 -0700
-Joe Perches <joe@perches.com> wrote:
+Hello
 
-> On Wed, 2016-06-29 at 20:42 +0200, Emese Revfy wrote:
-> > On Tue, 28 Jun 2016 14:00:57 -0700 Joe Perches <joe@perches.com> wrote:
-> > > On Tue, 2016-06-28 at 22:40 +0200, Emese Revfy wrote:
-> > > > On Tue, 28 Jun 2016 09:43:31 -0700 Joe Perches <joe@perches.com> wrote:
-> > > > > On Tue, 2016-06-28 at 13:36 +0200, Emese Revfy wrote:
-> > > > > > The nocapture gcc attribute can be on functions only.
-> > > > > > The attribute takes one or more unsigned integer constants as parameters
-> > > > > > that specify the function argument(s) of const char* type to initify.
-> > > > > Perhaps this should be const <void>*
-> > > > For me function arguments are the values passed to a function call so
-> > > > the const char* type is good because this is the only one that the plugin handles
-> > > > (for now at least).
-> > > OK, but this function prototype specified takes a const void *
-> > > 
-> > > +extern void * memcpy(void *, const void *, __kernel_size_t) __nocapture(2);
-> > What matters for the plugin is the type of the passed arguments (which can be const char*
-> > in the current implementation), not that of the parameters.
-> 
-> And how does this work when the prototype requires the compiler to
-> implicit cast to const void * before calling the function?
+I seek for your sincerity and trust in a deal which involved a total of 60,000,000.00 United states dollars. I need to know you and know your location. This really matter to the success of this deal. Please respond to me. Please note only serious individuals needed as this is no jokes. 
 
+Yours Sincerely,
 
-The plugin searches for the nocapture attribute that does not depend on the type.
-If the function argument is not a string constant just a pointer then
-the plugin walks the data flow (use-def chain) and tries to find a string constant.
-If there is a cast to void * then the use-def chain will walk across it.
-
--- 
-Emese
+Wen Dongfen
+the Cheif Finance Officer
+Sinopec Corporation in China
