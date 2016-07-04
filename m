@@ -1,63 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp-fw-4101.amazon.com ([72.21.198.25]:52794 "EHLO
-	smtp-fw-4101.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753828AbcGDNzJ convert rfc822-to-8bit (ORCPT
+Received: from mout.kundenserver.de ([212.227.17.13]:52842 "EHLO
+	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750713AbcGDOXd (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 4 Jul 2016 09:55:09 -0400
-From: "Tautschnig, Michael" <tautschn@amazon.co.uk>
-Subject: [PATCH] scripts: Fix size mismatch of kexec_purgatory_size
-Date: Mon, 4 Jul 2016 13:55:04 +0000
-Message-ID: <BE389624-FFFE-42F1-A89F-5E5598190D4A@amazon.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <4D79288BAE707244A17A0CCC53700D7D@ant.amazon.com>
-Content-Transfer-Encoding: 8BIT
-MIME-Version: 1.0
+	Mon, 4 Jul 2016 10:23:33 -0400
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH] [RFC] Kbuild: avoid "make tinyconfig" warnings
+Date: Mon,  4 Jul 2016 16:25:55 +0200
+Message-Id: <20160704142608.2069991-1-arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "kexec@lists.infradead.org" <kexec@lists.infradead.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Cc: Michal Marek <mmarek@suse.com>, Vivek Goyal <vgoyal@redhat.com>
+To: Michal Marek <mmarek@suse.cz>, "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Josh Triplett <josh@joshtriplett.org>, Darren Hart <dvhart@linux.intel.com>, linux-kbuild@vger.kernel.org, kernel-build-reports@lists.linaro.org, Arnd Bergmann <arnd@arndb.de>, Michal Marek <mmarek@suse.com>, Thiago Macieira <thiago.macieira@intel.com>, linux-kernel@vger.kernel.org
 
-bin2c is used to create a valid C file out of a binary file where two
-symbols will be globally defined: <name> and <name>_size. <name> is
-passed as the first parameter of the host binary.
+The introduction of "make *.config" as a shorthand for merging configuration
+files unfortunately introduced some build warnings that we see in every
+single run of the various build bots testing tinyconfig:
 
-Building using goto-cc reported that the purgatory binary code (the only
-current user of this utility) declares kexec_purgatory_size as 'size_t'
-where bin2c generate <name>_size to be 'int' so in a 64-bit host where
-sizeof(size_t) > sizeof(int) this type mismatch will always yield the
-wrong value for big-endian architectures while for little-endian it will
-be wrong if the object laid in memory directly after
-kexec_purgatory_size contains non-zero value at the time of reading.
+.config:966:warning: override: NOHIGHMEM changes choice state
+.config:965:warning: override: SLOB changes choice state
+.config:963:warning: override: KERNEL_XZ changes choice state
+.config:962:warning: override: CC_OPTIMIZE_FOR_SIZE changes choice state
+.config:933:warning: override: SLOB changes choice state
+.config:930:warning: override: CC_OPTIMIZE_FOR_SIZE changes choice state
+.config:870:warning: override: SLOB changes choice state
+.config:868:warning: override: KERNEL_XZ changes choice state
+.config:867:warning: override: CC_OPTIMIZE_FOR_SIZE changes choice state
 
-This commit changes <name>_size to be size_t instead.
+This changes the behavior for tinyconfig again, so we call the special
+allnoconfig target directly, with the fragment as the KCONFIG_ALLCONFIG
+file so it gets merged into the configuration. The disadvantage of
+this approach is that we cannot pass another KCONFIG_ALLCONFIG on
+the command line, that would again have to be done using the mergeconfig
+script afterwards.
 
-Note:
-
-Another way to fix the problem is to change the type of
-kexec_purgatory_size to be 'int' as there's this check in code:
-(kexec_purgatory_size <= 0)
-
-Signed-off-by: Michael Tautschnig <tautschn@amazon.com>
-Cc: Michal Marek <mmarek@suse.com>
-Cc: Vivek Goyal <vgoyal@redhat.com>
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Fixes: 63a91033d52e ("kbuild: add generic mergeconfig target, %.config")
+Link: https://storage.kernelci.org/mainline/v4.7-rc6/x86-tinyconfig/build.log
 ---
- scripts/basic/bin2c.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ scripts/kconfig/Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/scripts/basic/bin2c.c b/scripts/basic/bin2c.c
-index af187e6..c3d7eef 100644
---- a/scripts/basic/bin2c.c
-+++ b/scripts/basic/bin2c.c
-@@ -29,7 +29,8 @@ int main(int argc, char *argv[])
- 	} while (ch != EOF);
+diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+index ebced77deb9c..35d0e191fe3f 100644
+--- a/scripts/kconfig/Makefile
++++ b/scripts/kconfig/Makefile
+@@ -125,8 +125,8 @@ xenconfig: xen.config
+ 	@:
+ 
+ PHONY += tinyconfig
+-tinyconfig:
+-	$(Q)$(MAKE) -f $(srctree)/Makefile allnoconfig tiny.config
++tinyconfig: $(obj)/conf
++	$(Q)$(MAKE) -f $(srctree)/Makefile allnoconfig KCONFIG_ALLCONFIG=$(wildcard $(srctree)/kernel/configs/tiny.config $(srctree)/arch/$(SRCARCH)/configs/tiny.config)
+ 
+ # Help text used by make help
+ help:
+-- 
+2.9.0
 
- 	if (argc > 1)
--		printf("\t;\n\nconst int %s_size = %d;\n", argv[1], total);
-+		printf("\t;\n\n#include <linux/types.h>\n\nconst size_t %s_size = %d;\n",
-+		       argv[1], total);
-
- 	return 0;
- }
---
-2.7.3.AMZN
