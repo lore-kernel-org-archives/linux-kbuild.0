@@ -1,84 +1,150 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from relay4-d.mail.gandi.net ([217.70.183.196]:58195 "EHLO
-	relay4-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753620AbcGDT61 (ORCPT
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:33595 "EHLO
+	mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753490AbcGDXdI (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 4 Jul 2016 15:58:27 -0400
-Date: Mon, 4 Jul 2016 12:58:15 -0700
-From: Josh Triplett <josh@joshtriplett.org>
-Subject: Re: [PATCH] [RFC] Kbuild: avoid "make tinyconfig" warnings
-Message-ID: <20160704195815.GA10294@x>
-References: <20160704142608.2069991-1-arnd@arndb.de>
- <20160704195156.GA10164@x>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20160704195156.GA10164@x>
+	Mon, 4 Jul 2016 19:33:08 -0400
+Date: Tue, 5 Jul 2016 01:39:28 +0200
+From: Emese Revfy <re.emese@gmail.com>
+Subject: [PATCH v2 0/3] Introduce the initify gcc plugin
+Message-Id: <20160705013928.396ce4a7cbbc40e6c09efc43@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Michal Marek <mmarek@suse.cz>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Masahiro Yamada <yamada.masahiro@socionext.com>, Darren Hart <dvhart@linux.intel.com>, linux-kbuild@vger.kernel.org, kernel-build-reports@lists.linaro.org, Michal Marek <mmarek@suse.com>, Thiago Macieira <thiago.macieira@intel.com>, linux-kernel@vger.kernel.org
+To: kernel-hardening@lists.openwall.com
+Cc: pageexec@freemail.hu, spender@grsecurity.net, mmarek@suse.com, keescook@chromium.org, linux-kernel@vger.kernel.org, yamada.masahiro@socionext.com, linux-kbuild@vger.kernel.org, minipli@ld-linux.so, linux@armlinux.org.uk, catalin.marinas@arm.com, linux@rasmusvillemoes.dk, david.brown@linaro.org, benh@kernel.crashing.org, tglx@linutronix.de, akpm@linux-foundation.org, jlayton@poochiereds.net, arnd@arndb.de, sam@ravnborg.org, isdn@linux-pingi.de
 
-On Mon, Jul 04, 2016 at 12:51:56PM -0700, Josh Triplett wrote:
-> On Mon, Jul 04, 2016 at 04:25:55PM +0200, Arnd Bergmann wrote:
-> > The introduction of "make *.config" as a shorthand for merging configuration
-> > files unfortunately introduced some build warnings that we see in every
-> > single run of the various build bots testing tinyconfig:
-> > 
-> > .config:966:warning: override: NOHIGHMEM changes choice state
-> > .config:965:warning: override: SLOB changes choice state
-> > .config:963:warning: override: KERNEL_XZ changes choice state
-> > .config:962:warning: override: CC_OPTIMIZE_FOR_SIZE changes choice state
-> > .config:933:warning: override: SLOB changes choice state
-> > .config:930:warning: override: CC_OPTIMIZE_FOR_SIZE changes choice state
-> > .config:870:warning: override: SLOB changes choice state
-> > .config:868:warning: override: KERNEL_XZ changes choice state
-> > .config:867:warning: override: CC_OPTIMIZE_FOR_SIZE changes choice state
-> > 
-> > This changes the behavior for tinyconfig again, so we call the special
-> > allnoconfig target directly, with the fragment as the KCONFIG_ALLCONFIG
-> > file so it gets merged into the configuration. The disadvantage of
-> > this approach is that we cannot pass another KCONFIG_ALLCONFIG on
-> > the command line, that would again have to be done using the mergeconfig
-> > script afterwards.
-> > 
-> > Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> > Fixes: 63a91033d52e ("kbuild: add generic mergeconfig target, %.config")
-> > Link: https://storage.kernelci.org/mainline/v4.7-rc6/x86-tinyconfig/build.log
-> 
-> Thanks for fixing this.
-> Reviewed-by: Josh Triplett <josh@joshtriplett.org>
-> 
-> As another possibility, which would preserve the ability to use
-> KCONFIG_ALLCONFIG, what about adding a parameter to mergeconfig to
-> disable this warning?  I've seen many other uses of mergeconfig in
-> production systems that have the same problem.
+I would like to introduce the initify gcc plugin. The kernel already has
+a mechanism to free up code and data memory that is only used during kernel
+or module initialization.
+This plugin will teach the compiler to find more such code and data that
+can be freed after initialization. It reduces memory usage.
+The initify gcc plugin can be useful for embedded systems.
 
-Actually, I just realized something: does this actually do the right
-thing if both tiny.config files exist?  The documentation for
-KCONFIG_ALLCONFIG doesn't suggest that it can take two files as
-arguments.  And if it can, this also need quotes; otherwise, this will
-expand to "... allnoconfig KCONFIG=path/to/a/tiny.config
-another/path/to/a/tiny.config".
+It is a CII project supported by the Linux Foundation.
 
-> >  scripts/kconfig/Makefile | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-> > index ebced77deb9c..35d0e191fe3f 100644
-> > --- a/scripts/kconfig/Makefile
-> > +++ b/scripts/kconfig/Makefile
-> > @@ -125,8 +125,8 @@ xenconfig: xen.config
-> >  	@:
-> >  
-> >  PHONY += tinyconfig
-> > -tinyconfig:
-> > -	$(Q)$(MAKE) -f $(srctree)/Makefile allnoconfig tiny.config
-> > +tinyconfig: $(obj)/conf
-> > +	$(Q)$(MAKE) -f $(srctree)/Makefile allnoconfig KCONFIG_ALLCONFIG=$(wildcard $(srctree)/kernel/configs/tiny.config $(srctree)/arch/$(SRCARCH)/configs/tiny.config)
-> >  
-> >  # Help text used by make help
-> >  help:
-> > -- 
-> > 2.9.0
-> > 
+This plugin is the part of grsecurity/PaX.
+
+The plugin supports all gcc versions from 4.5 to 6.0.
+
+I made some changes on top of the PaX version (since March 6.). These are
+the important ones:
+ * move all local strings to init.rodata.str and exit.rodata.str
+   (not just __func__)
+ * report all initified strings and functions
+   (GCC_PLUGIN_INITIFY_VERBOSE config option)
+ * automatically discover init/exit functions and apply the __init or
+   __exit attributes on them
+
+You can find more about the changes here:
+https://github.com/ephox-gcc-plugins/initify
+
+This patch set is based on the "Add support for complex gcc plugins that
+don't fit in a single file" patch set
+(https://github.com/ephox-gcc-plugins/gcc-plugins_linux-next.git#initify
+HEAD: e08eda5d85f7f52641640).
+
+Some statistics about the plugin:
+
+On allyes config (amd64, gcc-6):
+* 7765 initified strings
+*  231 initified functions
+
+On allmod config (i386, gcc-6):
+* 9177 initified strings
+*  288 initified functions
+
+On allyes config (amd64, gcc-6):
+
+section         vanilla                 vanilla + initify        change
+-----------------------------------------------------------------------
+.rodata		19054824 (0x122c0e8)	18841832 (0x11f80e8)	-212992
+.init.data	 1273768  (0x136fa8)	 1583496  (0x182988)	+309728
+.text		46126301 (0x2bfd4dd)	46099805 (0x2bf6d5d)	 -26496
+.init.text	  836339  (0x0cc2f3)	  855952  (0x0d0f90)	 +19613
+.exit.data	     104  (0x000068)	   16736  (0x004160)	 +16632
+.exit.text	  125511  (0x01ea47)	  133267  (0x020893)	  +7756
+
+	FileSiz (vanilla)	FileSiz (vanilla + initify)	 change
+------------------------------------------------------------------------
+00	67727360 (0x4097000)	65417216 (0x3e63000)		-2310144
+03	 2453504  (0x257000)	 2809856  (0x2ae000)		 +356352
+
+00     .text .notes __ex_table .rodata __bug_table .pci_fixup .builtin_fw
+       .tracedata __ksymtab __ksymtab_gpl __ksymtab_strings __init_rodata
+       __param __modver
+03     .init.text .altinstr_aux .init.data .x86_cpu_dev.init
+       .parainstructions .altinstructions .altinstr_replacement
+       .iommu_table .apicdrivers .exit.text .exit.data .smp_locks .bss .brk
+
+
+On defconfig (amd64, gcc-6):
+* 2044 initified strings
+*   43 initified functions
+
+On defconfig (amd64, gcc-6):
+
+section         vanilla                 vanilla + initify        change
+-----------------------------------------------------------------------
+.rodata		2466736 (0x25a3b0)	2405296 (0x24b3b0)	-61440
+.init.data	 564656 (0x089db0)	 645616 (0x09d9f0)	+80960
+.text		9364727 (0x8ee4f7)	9360823 (0x8ed5b7)	 -3904
+.init.text	 436097 (0x06a781)	 439161 (0x06b379)	 +3064
+.exit.data	      0			    864 (0x000360)	  +864
+.exit.text	   8806 (0x002266)	   9824 (0x002660)	 +1018
+
+	FileSiz (vanilla)	FileSiz (vanilla + initify)	 change
+------------------------------------------------------------------------
+00	13340672 (0xcb9000)	13279232 (0xcaa000)		-61440
+03	 1097728 (0x10c000)	 1183744 (0x121000)		+86016
+
+00     .text .notes __ex_table .rodata __bug_table .pci_fixup .builtin_fw
+       .tracedata __ksymtab __ksymtab_gpl __ksymtab_strings __init_rodata
+       __param __modver
+03     .init.text .altinstr_aux .init.data .x86_cpu_dev.init
+       .parainstructions .altinstructions .altinstr_replacement
+       .iommu_table .apicdrivers .exit.text .exit.data .smp_locks .bss .brk
+
+
+Emese Revfy (3):
+ Add the initify gcc plugin
+ Mark functions with the __nocapture attribute
+ Constify some function parameters
+
+
+Changes from v1:
+ * Removed unnecessary nocapture attributes from boot code
+   (Reported-by: PaX Team <pageexec@freemail.hu>)
+ * Removed nocapture attributes from functions that return
+   the marked parameter
+   (Reported-by: Rasmus Villemoes <linux@rasmusvillemoes.dk>)
+ * Added nocapture attribute to strlen()
+ * Updated gcc-common.h from PaX
+ * Don't forcibly constify initified string types
+   this caused the size reduction of the .data section
+   (initify_plugin.c)
+ * Added the section mismatch problem in the commit message
+
+---
+ arch/Kconfig                         |   23 +
+ arch/arm/include/asm/string.h        |    4 +-
+ arch/arm64/include/asm/string.h      |   19 +-
+ arch/powerpc/include/asm/string.h    |   19 +-
+ arch/x86/include/asm/string_32.h     |   21 +-
+ arch/x86/include/asm/string_64.h     |   20 +-
+ arch/x86/kernel/hpet.c               |    2 +-
+ drivers/isdn/hisax/config.c          |    4 +-
+ drivers/isdn/hisax/hisax.h           |    4 +-
+ include/asm-generic/bug.h            |    6 +-
+ include/asm-generic/vmlinux.lds.h    |    2 +
+ include/linux/compiler-gcc.h         |   10 +-
+ include/linux/compiler.h             |    4 +
+ include/linux/fs.h                   |    5 +-
+ include/linux/printk.h               |    2 +-
+ include/linux/string.h               |   63 +-
+ scripts/Makefile.gcc-plugins         |    4 +
+ scripts/gcc-plugins/gcc-common.h     |   41 ++
+ scripts/gcc-plugins/initify_plugin.c | 1183 ++++++++++++++++++++++++++++++++++
+ 19 files changed, 1353 insertions(+), 83 deletions(-)
