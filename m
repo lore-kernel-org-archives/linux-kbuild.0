@@ -1,51 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([217.72.192.75]:60852 "EHLO
-	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750805AbcGDOhB (ORCPT
+Received: from relay5-d.mail.gandi.net ([217.70.183.197]:39728 "EHLO
+	relay5-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753507AbcGDTwH (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 4 Jul 2016 10:37:01 -0400
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH] kbuild: make samples depend on headers_install
-Date: Mon,  4 Jul 2016 16:39:35 +0200
-Message-Id: <20160704143949.2357806-1-arnd@arndb.de>
+	Mon, 4 Jul 2016 15:52:07 -0400
+Date: Mon, 4 Jul 2016 12:51:56 -0700
+From: Josh Triplett <josh@joshtriplett.org>
+Subject: Re: [PATCH] [RFC] Kbuild: avoid "make tinyconfig" warnings
+Message-ID: <20160704195156.GA10164@x>
+References: <20160704142608.2069991-1-arnd@arndb.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20160704142608.2069991-1-arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>, Michal Marek <mmarek@suse.com>
-Cc: linux-kbuild@vger.kernel.org, Peter Foley <pefoley2@pefoley.com>, Jiri Kosina <jkosina@suse.cz>, Arnd Bergmann <arnd@arndb.de>, linux-kernel@vger.kernel.org
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Michal Marek <mmarek@suse.cz>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Masahiro Yamada <yamada.masahiro@socionext.com>, Darren Hart <dvhart@linux.intel.com>, linux-kbuild@vger.kernel.org, kernel-build-reports@lists.linaro.org, Michal Marek <mmarek@suse.com>, Thiago Macieira <thiago.macieira@intel.com>, linux-kernel@vger.kernel.org
 
-Olof's build test setup keeps failing to compile arm64 kernels
-because of a toolchain that uses outdated kernel headers:
+On Mon, Jul 04, 2016 at 04:25:55PM +0200, Arnd Bergmann wrote:
+> The introduction of "make *.config" as a shorthand for merging configuration
+> files unfortunately introduced some build warnings that we see in every
+> single run of the various build bots testing tinyconfig:
+> 
+> .config:966:warning: override: NOHIGHMEM changes choice state
+> .config:965:warning: override: SLOB changes choice state
+> .config:963:warning: override: KERNEL_XZ changes choice state
+> .config:962:warning: override: CC_OPTIMIZE_FOR_SIZE changes choice state
+> .config:933:warning: override: SLOB changes choice state
+> .config:930:warning: override: CC_OPTIMIZE_FOR_SIZE changes choice state
+> .config:870:warning: override: SLOB changes choice state
+> .config:868:warning: override: KERNEL_XZ changes choice state
+> .config:867:warning: override: CC_OPTIMIZE_FOR_SIZE changes choice state
+> 
+> This changes the behavior for tinyconfig again, so we call the special
+> allnoconfig target directly, with the fragment as the KCONFIG_ALLCONFIG
+> file so it gets merged into the configuration. The disadvantage of
+> this approach is that we cannot pass another KCONFIG_ALLCONFIG on
+> the command line, that would again have to be done using the mergeconfig
+> script afterwards.
+> 
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> Fixes: 63a91033d52e ("kbuild: add generic mergeconfig target, %.config")
+> Link: https://storage.kernelci.org/mainline/v4.7-rc6/x86-tinyconfig/build.log
 
-/work/build/batch/samples/seccomp/bpf-fancy.c:13:27: fatal error: linux/seccomp.h: No such file or directory
+Thanks for fixing this.
+Reviewed-by: Josh Triplett <josh@joshtriplett.org>
 
-This is of course something he could change, but it also indicates
-that others may run into the same problem. Running 'make headers_install'
-avoids the issue by ensuring that the kernel headers are put into
-the $(objdir)/usr/include path before we build the samples.
+As another possibility, which would preserve the ability to use
+KCONFIG_ALLCONFIG, what about adding a parameter to mergeconfig to
+disable this warning?  I've seen many other uses of mergeconfig in
+production systems that have the same problem.
 
-The same problem happened for the Documentation build in the
-past and was fixed up with commit 8e2faea877eb ("Make Documenation
-depend on headers_install"). This adds an identical Makefile dependency
-for the samples/ subdirectory.
-
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/Makefile b/Makefile
-index ec355167cf36..4a44055e3433 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1633,7 +1633,7 @@ endif
- 	$(Q)$(MAKE) KBUILD_MODULES=$(if $(CONFIG_MODULES),1) \
- 	$(build)=$(build-dir)
- # Make sure the latest headers are built for Documentation
--Documentation/: headers_install
-+Documentation/ samples/: headers_install
- %/: prepare scripts FORCE
- 	$(cmd_crmodverdir)
- 	$(Q)$(MAKE) KBUILD_MODULES=$(if $(CONFIG_MODULES),1) \
--- 
-2.9.0
-
+>  scripts/kconfig/Makefile | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+> index ebced77deb9c..35d0e191fe3f 100644
+> --- a/scripts/kconfig/Makefile
+> +++ b/scripts/kconfig/Makefile
+> @@ -125,8 +125,8 @@ xenconfig: xen.config
+>  	@:
+>  
+>  PHONY += tinyconfig
+> -tinyconfig:
+> -	$(Q)$(MAKE) -f $(srctree)/Makefile allnoconfig tiny.config
+> +tinyconfig: $(obj)/conf
+> +	$(Q)$(MAKE) -f $(srctree)/Makefile allnoconfig KCONFIG_ALLCONFIG=$(wildcard $(srctree)/kernel/configs/tiny.config $(srctree)/arch/$(SRCARCH)/configs/tiny.config)
+>  
+>  # Help text used by make help
+>  help:
+> -- 
+> 2.9.0
+> 
