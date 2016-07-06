@@ -1,86 +1,97 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from foss.arm.com ([217.140.101.70]:59555 "EHLO foss.arm.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752945AbcGFR5n (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 6 Jul 2016 13:57:43 -0400
-Date: Wed, 6 Jul 2016 18:57:39 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH RESEND] arm64: fix vdso-offsets.h dependency
-Message-ID: <20160706175739.GB22615@e104818-lin.cambridge.arm.com>
-References: <1463071155-7435-1-git-send-email-kevin.brodsky@arm.com>
+Received: from relay3-d.mail.gandi.net ([217.70.183.195]:49890 "EHLO
+	relay3-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754676AbcGFSdA (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 6 Jul 2016 14:33:00 -0400
+Date: Wed, 6 Jul 2016 11:32:50 -0700
+From: Josh Triplett <josh@joshtriplett.org>
+Subject: Re: [PATCH] [RFC] Kbuild: avoid "make tinyconfig" warnings
+Message-ID: <20160706183250.GA28362@x>
+References: <20160704142608.2069991-1-arnd@arndb.de>
+ <20160704195156.GA10164@x>
+ <20160704195815.GA10294@x>
+ <7677316.bvNVmygFDv@wuerfel>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1463071155-7435-1-git-send-email-kevin.brodsky@arm.com>
+In-Reply-To: <7677316.bvNVmygFDv@wuerfel>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kevin Brodsky <kevin.brodsky@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, Will Deacon <will.deacon@arm.com>, Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Michal Marek <mmarek@suse.cz>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Masahiro Yamada <yamada.masahiro@socionext.com>, Darren Hart <dvhart@linux.intel.com>, linux-kbuild@vger.kernel.org, kernel-build-reports@lists.linaro.org, Michal Marek <mmarek@suse.com>, Thiago Macieira <thiago.macieira@intel.com>, linux-kernel@vger.kernel.org
 
-On Thu, May 12, 2016 at 05:39:15PM +0100, Kevin Brodsky wrote:
-> +# We need to generate vdso-offsets.h before compiling certain files in kernel/.
-> +# In order to do that, we should use the archprepare target, but we can't since
-> +# asm-offsets.h is included in some files used to generate vdso-offsets.h, and
-> +# asm-offsets.h is built in prepare0, for which archprepare is a dependency.
-> +# Therefore we need to generate the header after prepare0 has been made, hence
-> +# this hack.
-> +prepare: vdso_prepare
-> +vdso_prepare: prepare0
-> +	$(Q)$(MAKE) $(build)=arch/arm64/kernel/vdso include/generated/vdso-offsets.h
+On Wed, Jul 06, 2016 at 03:56:25PM +0200, Arnd Bergmann wrote:
+> On Monday, July 4, 2016 12:58:15 PM CEST Josh Triplett wrote:
+> > On Mon, Jul 04, 2016 at 12:51:56PM -0700, Josh Triplett wrote:
+> > > On Mon, Jul 04, 2016 at 04:25:55PM +0200, Arnd Bergmann wrote:
+> > > > The introduction of "make *.config" as a shorthand for merging configuration
+> > > > files unfortunately introduced some build warnings that we see in every
+> > > > single run of the various build bots testing tinyconfig:
+> > > > 
+> > > > .config:966:warning: override: NOHIGHMEM changes choice state
+> > > > .config:965:warning: override: SLOB changes choice state
+> > > > .config:963:warning: override: KERNEL_XZ changes choice state
+> > > > .config:962:warning: override: CC_OPTIMIZE_FOR_SIZE changes choice state
+> > > > .config:933:warning: override: SLOB changes choice state
+> > > > .config:930:warning: override: CC_OPTIMIZE_FOR_SIZE changes choice state
+> > > > .config:870:warning: override: SLOB changes choice state
+> > > > .config:868:warning: override: KERNEL_XZ changes choice state
+> > > > .config:867:warning: override: CC_OPTIMIZE_FOR_SIZE changes choice state
+> > > > 
+> > > > This changes the behavior for tinyconfig again, so we call the special
+> > > > allnoconfig target directly, with the fragment as the KCONFIG_ALLCONFIG
+> > > > file so it gets merged into the configuration. The disadvantage of
+> > > > this approach is that we cannot pass another KCONFIG_ALLCONFIG on
+> > > > the command line, that would again have to be done using the mergeconfig
+> > > > script afterwards.
+> > > > 
+> > > > Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> > > > Fixes: 63a91033d52e ("kbuild: add generic mergeconfig target, %.config")
+> > > > Link: https://storage.kernelci.org/mainline/v4.7-rc6/x86-tinyconfig/build.log
+> > > 
+> > > Thanks for fixing this.
+> > > Reviewed-by: Josh Triplett <josh@joshtriplett.org>
+> > > 
+> > > As another possibility, which would preserve the ability to use
+> > > KCONFIG_ALLCONFIG, what about adding a parameter to mergeconfig to
+> > > disable this warning?  I've seen many other uses of mergeconfig in
+> > > production systems that have the same problem.
+> > 
+> > Actually, I just realized something: does this actually do the right
+> > thing if both tiny.config files exist?  The documentation for
+> > KCONFIG_ALLCONFIG doesn't suggest that it can take two files as
+> > arguments.  And if it can, this also need quotes; otherwise, this will
+> > expand to "... allnoconfig KCONFIG=path/to/a/tiny.config
+> > another/path/to/a/tiny.config".
+> 
+> You are right, my patch doesn't work.
+> 
+> I can think of a few other ways to work around this, though none seems
+> perfect:
+> 
+> - add a flag to the kconfig tool to ignore 'choice' symbol overrides and not
+>   warn about them (as you suggested). This may be problematic if there
+>   are cases in which the warning is actually helpful.
 
-This indeed looks dodgy. I'm not sure about the makefile rules but would
-the above override the "prepare" target in the top Makefile?
+As long as this remains an option and not the default, I don't think it
+would cause problems.
 
-I think a dependency problem we have is that arch/arm64/kernel/signal.o
-depends on include/generated/vdso-offsets.h. However, we don't have any
-target for the latter, only for
-$(objtree)arch/arm64/kernel/vdso/vdso-offsets.h which no-one is
-including. Because of this, we have a fake dependency in
-arch/arm64/kernel/Makefile.
+> - drop the feature of allowing multiple tiny.config files to be combined
+>   and instead have the x86 file include everything from the architecture
+>   independent file. This would only be a small annoyance, but it doesn't
+>   solve the other cases you mention in which we see similar warnings.
 
-It's been a long time since I wrote makefiles but I think a simpler
-approach may be to just get the include/generated/vdso-offsets.h target
-and remove the arch/arm64/kernel/vdso/vdso-offsets.h one entirely like
-below. Otherwise, we give up on storing the generated file in
-include/generated/ and move arch/arm64/include/asm/vdso.h to
-arch/arm64/kernel/vdso/.
+And I'd rather not duplicate the base config into every
+architecture-specific tiny.config; that'll become even more problematic
+if other architectures add their own.
 
------------8<-------------------------
-diff --git a/arch/arm64/kernel/Makefile b/arch/arm64/kernel/Makefile
-index 7700c0c23962..9bdacbf59091 100644
---- a/arch/arm64/kernel/Makefile
-+++ b/arch/arm64/kernel/Makefile
-@@ -55,5 +55,4 @@ head-y					:= head.o
- extra-y					+= $(head-y) vmlinux.lds
- 
- # vDSO - this must be built first to generate the symbol offsets
--$(call objectify,$(arm64-obj-y)): $(obj)/vdso/vdso-offsets.h
--$(obj)/vdso/vdso-offsets.h: $(obj)/vdso
-+$(objtree)/include/generated/vdso-offsets.h: $(obj)/vdso
-diff --git a/arch/arm64/kernel/vdso/Makefile b/arch/arm64/kernel/vdso/Makefile
-index b467fd0a384b..44c20e3c9f43 100644
---- a/arch/arm64/kernel/vdso/Makefile
-+++ b/arch/arm64/kernel/vdso/Makefile
-@@ -23,7 +23,7 @@ GCOV_PROFILE := n
- ccflags-y += -Wl,-shared
- 
- obj-y += vdso.o
--extra-y += vdso.lds vdso-offsets.h
-+extra-y += vdso.lds ../../../../include/generated/vdso-offsets.h
- CPPFLAGS_vdso.lds += -P -C -U$(ARCH)
- 
- # Force dependency (incbin is bad)
-@@ -42,11 +42,10 @@ $(obj)/%.so: $(obj)/%.so.dbg FORCE
- gen-vdsosym := $(srctree)/$(src)/gen_vdso_offsets.sh
- quiet_cmd_vdsosym = VDSOSYM $@
- define cmd_vdsosym
--	$(NM) $< | $(gen-vdsosym) | LC_ALL=C sort > $@ && \
--	cp $@ include/generated/
-+	$(NM) $< | $(gen-vdsosym) | LC_ALL=C sort > $@
- endef
- 
--$(obj)/vdso-offsets.h: $(obj)/vdso.so.dbg FORCE
-+$(obj)/../../../../include/generated/vdso-offsets.h: $(obj)/vdso.so.dbg FORCE
- 	$(call if_changed,vdsosym)
- 
- # Assembly rules for the .S files
+> - change merge_config.sh to do a 'savedefconfig' step before applying
+>   the fragment, so it doesn't warn about choice statements that are
+>   overridden from their default, as opposed to having conflicting choices.
+
+This sounds like a potentially interesting approach.  This would produce
+warnings only if overriding explicit configuration, but not when
+changing a choice from the implicit default?
+
+- Josh Triplett
