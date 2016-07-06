@@ -1,97 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from relay3-d.mail.gandi.net ([217.70.183.195]:49890 "EHLO
-	relay3-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1754676AbcGFSdA (ORCPT
+Received: from mail-wm0-f45.google.com ([74.125.82.45]:38155 "EHLO
+	mail-wm0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S932276AbcGFSzu (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 6 Jul 2016 14:33:00 -0400
-Date: Wed, 6 Jul 2016 11:32:50 -0700
-From: Josh Triplett <josh@joshtriplett.org>
-Subject: Re: [PATCH] [RFC] Kbuild: avoid "make tinyconfig" warnings
-Message-ID: <20160706183250.GA28362@x>
-References: <20160704142608.2069991-1-arnd@arndb.de>
- <20160704195156.GA10164@x>
- <20160704195815.GA10294@x>
- <7677316.bvNVmygFDv@wuerfel>
+	Wed, 6 Jul 2016 14:55:50 -0400
+Received: by mail-wm0-f45.google.com with SMTP id r201so4483436wme.1
+        for <linux-kbuild@vger.kernel.org>; Wed, 06 Jul 2016 11:55:49 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7677316.bvNVmygFDv@wuerfel>
+In-Reply-To: <20160626173643.c05fd4d559ee9214ad1253c6@gmail.com>
+References: <20160626173643.c05fd4d559ee9214ad1253c6@gmail.com>
+From: Kees Cook <keescook@chromium.org>
+Date: Wed, 6 Jul 2016 14:55:47 -0400
+Message-ID: <CAGXu5jLGEo-5WbOwbxSTubU6zq==adVcwVt1_g8CrRkrUHw4jw@mail.gmail.com>
+Subject: Re: [PATCH] Automate make rule generation for gcc plugin objects
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Michal Marek <mmarek@suse.cz>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Masahiro Yamada <yamada.masahiro@socionext.com>, Darren Hart <dvhart@linux.intel.com>, linux-kbuild@vger.kernel.org, kernel-build-reports@lists.linaro.org, Michal Marek <mmarek@suse.com>, Thiago Macieira <thiago.macieira@intel.com>, linux-kernel@vger.kernel.org
+To: Emese Revfy <re.emese@gmail.com>
+Cc: Michal Marek <mmarek@suse.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, PaX Team <pageexec@freemail.hu>
 
-On Wed, Jul 06, 2016 at 03:56:25PM +0200, Arnd Bergmann wrote:
-> On Monday, July 4, 2016 12:58:15 PM CEST Josh Triplett wrote:
-> > On Mon, Jul 04, 2016 at 12:51:56PM -0700, Josh Triplett wrote:
-> > > On Mon, Jul 04, 2016 at 04:25:55PM +0200, Arnd Bergmann wrote:
-> > > > The introduction of "make *.config" as a shorthand for merging configuration
-> > > > files unfortunately introduced some build warnings that we see in every
-> > > > single run of the various build bots testing tinyconfig:
-> > > > 
-> > > > .config:966:warning: override: NOHIGHMEM changes choice state
-> > > > .config:965:warning: override: SLOB changes choice state
-> > > > .config:963:warning: override: KERNEL_XZ changes choice state
-> > > > .config:962:warning: override: CC_OPTIMIZE_FOR_SIZE changes choice state
-> > > > .config:933:warning: override: SLOB changes choice state
-> > > > .config:930:warning: override: CC_OPTIMIZE_FOR_SIZE changes choice state
-> > > > .config:870:warning: override: SLOB changes choice state
-> > > > .config:868:warning: override: KERNEL_XZ changes choice state
-> > > > .config:867:warning: override: CC_OPTIMIZE_FOR_SIZE changes choice state
-> > > > 
-> > > > This changes the behavior for tinyconfig again, so we call the special
-> > > > allnoconfig target directly, with the fragment as the KCONFIG_ALLCONFIG
-> > > > file so it gets merged into the configuration. The disadvantage of
-> > > > this approach is that we cannot pass another KCONFIG_ALLCONFIG on
-> > > > the command line, that would again have to be done using the mergeconfig
-> > > > script afterwards.
-> > > > 
-> > > > Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> > > > Fixes: 63a91033d52e ("kbuild: add generic mergeconfig target, %.config")
-> > > > Link: https://storage.kernelci.org/mainline/v4.7-rc6/x86-tinyconfig/build.log
-> > > 
-> > > Thanks for fixing this.
-> > > Reviewed-by: Josh Triplett <josh@joshtriplett.org>
-> > > 
-> > > As another possibility, which would preserve the ability to use
-> > > KCONFIG_ALLCONFIG, what about adding a parameter to mergeconfig to
-> > > disable this warning?  I've seen many other uses of mergeconfig in
-> > > production systems that have the same problem.
-> > 
-> > Actually, I just realized something: does this actually do the right
-> > thing if both tiny.config files exist?  The documentation for
-> > KCONFIG_ALLCONFIG doesn't suggest that it can take two files as
-> > arguments.  And if it can, this also need quotes; otherwise, this will
-> > expand to "... allnoconfig KCONFIG=path/to/a/tiny.config
-> > another/path/to/a/tiny.config".
-> 
-> You are right, my patch doesn't work.
-> 
-> I can think of a few other ways to work around this, though none seems
-> perfect:
-> 
-> - add a flag to the kconfig tool to ignore 'choice' symbol overrides and not
->   warn about them (as you suggested). This may be problematic if there
->   are cases in which the warning is actually helpful.
+On Sun, Jun 26, 2016 at 11:36 AM, Emese Revfy <re.emese@gmail.com> wrote:
+>
+> Reported-by: PaX Team <pageexec@freemail.hu>
+> Signed-off-by: Emese Revfy <re.emese@gmail.com>
 
-As long as this remains an option and not the default, I don't think it
-would cause problems.
+I've added a commit message body and applied this to my tree.
 
-> - drop the feature of allowing multiple tiny.config files to be combined
->   and instead have the x86 file include everything from the architecture
->   independent file. This would only be a small annoyance, but it doesn't
->   solve the other cases you mention in which we see similar warnings.
+-Kees
 
-And I'd rather not duplicate the base config into every
-architecture-specific tiny.config; that'll become even more problematic
-if other architectures add their own.
+> ---
+>  scripts/gcc-plugins/Makefile | 5 +----
+>  1 file changed, 1 insertion(+), 4 deletions(-)
+>
+> diff --git a/scripts/gcc-plugins/Makefile b/scripts/gcc-plugins/Makefile
+> index a3f8ca4a..898449d 100644
+> --- a/scripts/gcc-plugins/Makefile
+> +++ b/scripts/gcc-plugins/Makefile
+> @@ -20,9 +20,6 @@ endif
+>
+>  $(HOSTLIBS)-y := $(GCC_PLUGIN)
+>  always := $($(HOSTLIBS)-y)
+> -
+> -cyc_complexity_plugin-objs := cyc_complexity_plugin.o
+> -sancov_plugin-objs := sancov_plugin.o
+> -latent_entropy_plugin-objs := latent_entropy_plugin.o
+> +$(foreach p,$($(HOSTLIBS)-y:%.so=%),$(eval $(p)-objs := $(p).o))
+>
+>  clean-files += *.so
+> --
+> 2.8.1
 
-> - change merge_config.sh to do a 'savedefconfig' step before applying
->   the fragment, so it doesn't warn about choice statements that are
->   overridden from their default, as opposed to having conflicting choices.
 
-This sounds like a potentially interesting approach.  This would produce
-warnings only if overriding explicit configuration, but not when
-changing a choice from the implicit default?
 
-- Josh Triplett
+-- 
+Kees Cook
+Chrome OS & Brillo Security
