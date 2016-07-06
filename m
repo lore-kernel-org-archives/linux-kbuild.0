@@ -1,85 +1,115 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([217.72.192.75]:53859 "EHLO
-	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755145AbcGFNxh (ORCPT
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:33583 "EHLO
+	mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1753917AbcGFQiJ (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 6 Jul 2016 09:53:37 -0400
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH] [RFC] Kbuild: avoid "make tinyconfig" warnings
-Date: Wed, 06 Jul 2016 15:56:25 +0200
-Message-ID: <7677316.bvNVmygFDv@wuerfel>
-In-Reply-To: <20160704195815.GA10294@x>
-References: <20160704142608.2069991-1-arnd@arndb.de> <20160704195156.GA10164@x> <20160704195815.GA10294@x>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+	Wed, 6 Jul 2016 12:38:09 -0400
+Date: Wed, 6 Jul 2016 18:44:28 +0200
+From: Emese Revfy <re.emese@gmail.com>
+Subject: [PATCH v2 3/3] Constify some function parameters
+Message-Id: <20160706184428.ea8500af0297971892249dc6@gmail.com>
+In-Reply-To: <20160705014315.c44b7c41fcb6900e10d9f4a2@gmail.com>
+References: <20160705013928.396ce4a7cbbc40e6c09efc43@gmail.com>
+	<20160705014315.c44b7c41fcb6900e10d9f4a2@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Josh Triplett <josh@joshtriplett.org>
-Cc: Michal Marek <mmarek@suse.cz>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Masahiro Yamada <yamada.masahiro@socionext.com>, Darren Hart <dvhart@linux.intel.com>, linux-kbuild@vger.kernel.org, kernel-build-reports@lists.linaro.org, Michal Marek <mmarek@suse.com>, Thiago Macieira <thiago.macieira@intel.com>, linux-kernel@vger.kernel.org
+To: kernel-hardening@lists.openwall.com
+Cc: pageexec@freemail.hu, spender@grsecurity.net, mmarek@suse.com, keescook@chromium.org, linux-kernel@vger.kernel.org, yamada.masahiro@socionext.com, linux-kbuild@vger.kernel.org, minipli@ld-linux.so, linux@armlinux.org.uk, catalin.marinas@arm.com, linux@rasmusvillemoes.dk, david.brown@linaro.org, benh@kernel.crashing.org, tglx@linutronix.de, akpm@linux-foundation.org, jlayton@poochiereds.net, arnd@arndb.de, sam@ravnborg.org, isdn@linux-pingi.de
 
-On Monday, July 4, 2016 12:58:15 PM CEST Josh Triplett wrote:
-> On Mon, Jul 04, 2016 at 12:51:56PM -0700, Josh Triplett wrote:
-> > On Mon, Jul 04, 2016 at 04:25:55PM +0200, Arnd Bergmann wrote:
-> > > The introduction of "make *.config" as a shorthand for merging configuration
-> > > files unfortunately introduced some build warnings that we see in every
-> > > single run of the various build bots testing tinyconfig:
-> > > 
-> > > .config:966:warning: override: NOHIGHMEM changes choice state
-> > > .config:965:warning: override: SLOB changes choice state
-> > > .config:963:warning: override: KERNEL_XZ changes choice state
-> > > .config:962:warning: override: CC_OPTIMIZE_FOR_SIZE changes choice state
-> > > .config:933:warning: override: SLOB changes choice state
-> > > .config:930:warning: override: CC_OPTIMIZE_FOR_SIZE changes choice state
-> > > .config:870:warning: override: SLOB changes choice state
-> > > .config:868:warning: override: KERNEL_XZ changes choice state
-> > > .config:867:warning: override: CC_OPTIMIZE_FOR_SIZE changes choice state
-> > > 
-> > > This changes the behavior for tinyconfig again, so we call the special
-> > > allnoconfig target directly, with the fragment as the KCONFIG_ALLCONFIG
-> > > file so it gets merged into the configuration. The disadvantage of
-> > > this approach is that we cannot pass another KCONFIG_ALLCONFIG on
-> > > the command line, that would again have to be done using the mergeconfig
-> > > script afterwards.
-> > > 
-> > > Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> > > Fixes: 63a91033d52e ("kbuild: add generic mergeconfig target, %.config")
-> > > Link: https://storage.kernelci.org/mainline/v4.7-rc6/x86-tinyconfig/build.log
-> > 
-> > Thanks for fixing this.
-> > Reviewed-by: Josh Triplett <josh@joshtriplett.org>
-> > 
-> > As another possibility, which would preserve the ability to use
-> > KCONFIG_ALLCONFIG, what about adding a parameter to mergeconfig to
-> > disable this warning?  I've seen many other uses of mergeconfig in
-> > production systems that have the same problem.
-> 
-> Actually, I just realized something: does this actually do the right
-> thing if both tiny.config files exist?  The documentation for
-> KCONFIG_ALLCONFIG doesn't suggest that it can take two files as
-> arguments.  And if it can, this also need quotes; otherwise, this will
-> expand to "... allnoconfig KCONFIG=path/to/a/tiny.config
-> another/path/to/a/tiny.config".
+Initify needs const pointer types, the initify plugin caught some __printf
+arguments that weren't const yet.
 
-You are right, my patch doesn't work.
+Signed-off-by: Emese Revfy <re.emese@gmail.com>
+---
+ drivers/isdn/hisax/config.c | 16 ++++++++--------
+ drivers/isdn/hisax/hisax.h  |  4 ++--
+ 2 files changed, 10 insertions(+), 10 deletions(-)
 
-I can think of a few other ways to work around this, though none seems
-perfect:
+diff --git a/drivers/isdn/hisax/config.c b/drivers/isdn/hisax/config.c
+index bf04d2a..2d12c6c 100644
+--- a/drivers/isdn/hisax/config.c
++++ b/drivers/isdn/hisax/config.c
+@@ -659,7 +659,7 @@ int jiftime(char *s, long mark)
+ 
+ static u_char tmpbuf[HISAX_STATUS_BUFSIZE];
+ 
+-void VHiSax_putstatus(struct IsdnCardState *cs, char *head, char *fmt,
++void VHiSax_putstatus(struct IsdnCardState *cs, char *head, const char *fmt,
+ 		      va_list args)
+ {
+ 	/* if head == NULL the fmt contains the full info */
+@@ -669,23 +669,24 @@ void VHiSax_putstatus(struct IsdnCardState *cs, char *head, char *fmt,
+ 	u_char		*p;
+ 	isdn_ctrl	ic;
+ 	int		len;
++	const u_char	*data;
+ 
+ 	if (!cs) {
+ 		printk(KERN_WARNING "HiSax: No CardStatus for message");
+ 		return;
+ 	}
+ 	spin_lock_irqsave(&cs->statlock, flags);
+-	p = tmpbuf;
+ 	if (head) {
++		p = tmpbuf;
+ 		p += jiftime(p, jiffies);
+ 		p += sprintf(p, " %s", head);
+ 		p += vsprintf(p, fmt, args);
+ 		*p++ = '\n';
+ 		*p = 0;
+ 		len = p - tmpbuf;
+-		p = tmpbuf;
++		data = tmpbuf;
+ 	} else {
+-		p = fmt;
++		data = fmt;
+ 		len = strlen(fmt);
+ 	}
+ 	if (len > HISAX_STATUS_BUFSIZE) {
+@@ -699,13 +700,12 @@ void VHiSax_putstatus(struct IsdnCardState *cs, char *head, char *fmt,
+ 	if (i >= len)
+ 		i = len;
+ 	len -= i;
+-	memcpy(cs->status_write, p, i);
++	memcpy(cs->status_write, data, i);
+ 	cs->status_write += i;
+ 	if (cs->status_write > cs->status_end)
+ 		cs->status_write = cs->status_buf;
+-	p += i;
+ 	if (len) {
+-		memcpy(cs->status_write, p, len);
++		memcpy(cs->status_write, data + i, len);
+ 		cs->status_write += len;
+ 	}
+ #ifdef KERNELSTACK_DEBUG
+@@ -729,7 +729,7 @@ void VHiSax_putstatus(struct IsdnCardState *cs, char *head, char *fmt,
+ 	}
+ }
+ 
+-void HiSax_putstatus(struct IsdnCardState *cs, char *head, char *fmt, ...)
++void HiSax_putstatus(struct IsdnCardState *cs, char *head, const char *fmt, ...)
+ {
+ 	va_list args;
+ 
+diff --git a/drivers/isdn/hisax/hisax.h b/drivers/isdn/hisax/hisax.h
+index 6ead6314..338d040 100644
+--- a/drivers/isdn/hisax/hisax.h
++++ b/drivers/isdn/hisax/hisax.h
+@@ -1288,9 +1288,9 @@ int jiftime(char *s, long mark);
+ int HiSax_command(isdn_ctrl *ic);
+ int HiSax_writebuf_skb(int id, int chan, int ack, struct sk_buff *skb);
+ __printf(3, 4)
+-void HiSax_putstatus(struct IsdnCardState *cs, char *head, char *fmt, ...);
++void HiSax_putstatus(struct IsdnCardState *cs, char *head, const char *fmt, ...);
+ __printf(3, 0)
+-void VHiSax_putstatus(struct IsdnCardState *cs, char *head, char *fmt, va_list args);
++void VHiSax_putstatus(struct IsdnCardState *cs, char *head, const char *fmt, va_list args);
+ void HiSax_reportcard(int cardnr, int sel);
+ int QuickHex(char *txt, u_char *p, int cnt);
+ void LogFrame(struct IsdnCardState *cs, u_char *p, int size);
+-- 
+2.8.1
 
-- add a flag to the kconfig tool to ignore 'choice' symbol overrides and not
-  warn about them (as you suggested). This may be problematic if there
-  are cases in which the warning is actually helpful.
-
-- drop the feature of allowing multiple tiny.config files to be combined
-  and instead have the x86 file include everything from the architecture
-  independent file. This would only be a small annoyance, but it doesn't
-  solve the other cases you mention in which we see similar warnings.
-
-- merge the fragments first and then use the combined fragment as the
-  KCONFIG_ALLCONFIG file.
-
-- change merge_config.sh to do a 'savedefconfig' step before applying
-  the fragment, so it doesn't warn about choice statements that are
-  overridden from their default, as opposed to having conflicting choices.
-
-	Arnd
