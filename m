@@ -1,53 +1,86 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f52.google.com ([74.125.82.52]:35577 "EHLO
-	mail-wm0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1755543AbcGFS5K (ORCPT
+Received: from mout.kundenserver.de ([212.227.126.134]:51417 "EHLO
+	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755526AbcGFTzc (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 6 Jul 2016 14:57:10 -0400
-Received: by mail-wm0-f52.google.com with SMTP id z126so122468469wme.0
-        for <linux-kbuild@vger.kernel.org>; Wed, 06 Jul 2016 11:57:10 -0700 (PDT)
+	Wed, 6 Jul 2016 15:55:32 -0400
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH] [RFC] Kbuild: avoid "make tinyconfig" warnings
+Date: Wed, 06 Jul 2016 21:58:13 +0200
+Message-ID: <4422475.YhNHUqYhih@wuerfel>
+In-Reply-To: <20160706183250.GA28362@x>
+References: <20160704142608.2069991-1-arnd@arndb.de> <7677316.bvNVmygFDv@wuerfel> <20160706183250.GA28362@x>
 MIME-Version: 1.0
-In-Reply-To: <20160628133942.3ef9ea556a38f98a4c5dcd05@gmail.com>
-References: <20160626173451.c8406cd0c7a87cc3f94d9753@gmail.com>
- <CAGXu5jJw-HcYRo8muSQ7Av9ZGuO3jTgV2x_xDcqmK-i=2nu1aw@mail.gmail.com> <20160628133942.3ef9ea556a38f98a4c5dcd05@gmail.com>
-From: Kees Cook <keescook@chromium.org>
-Date: Wed, 6 Jul 2016 14:57:08 -0400
-Message-ID: <CAGXu5jL6H=Y+o5AmZrmZDdLRBiHi5O=51Uro1BzutRBYqDDT+w@mail.gmail.com>
-Subject: Re: [PATCH] powerpc/kernel: Disable the latent entropy plugin unconditionally
-Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Emese Revfy <re.emese@gmail.com>
-Cc: Michal Marek <mmarek@suse.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, PaX Team <pageexec@freemail.hu>
+To: Josh Triplett <josh@joshtriplett.org>
+Cc: Michal Marek <mmarek@suse.cz>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Masahiro Yamada <yamada.masahiro@socionext.com>, Darren Hart <dvhart@linux.intel.com>, linux-kbuild@vger.kernel.org, kernel-build-reports@lists.linaro.org, Michal Marek <mmarek@suse.com>, Thiago Macieira <thiago.macieira@intel.com>, linux-kernel@vger.kernel.org
 
-On Tue, Jun 28, 2016 at 7:39 AM, Emese Revfy <re.emese@gmail.com> wrote:
-> On Mon, 27 Jun 2016 09:05:08 -0700
-> Kees Cook <keescook@chromium.org> wrote:
->
->> On Sun, Jun 26, 2016 at 8:34 AM, Emese Revfy <re.emese@gmail.com> wrote:
->> >
->> > Reported-by: PaX Team <pageexec@freemail.hu>
->> > Signed-off-by: Emese Revfy <re.emese@gmail.com>
->>
->> Thanks! Can you include a body in the commit message? For this, something like:
->>
->> Disable the gcc-plugin unconditionlly here because ... *reason it is required*
->
-> Hi,
->
-> You can see it here:
-> https://github.com/ephox-gcc-plugins/gcc-plugins_linux-next/commit/a1bb2bd3fd9ac414623ec3210e9c514d9d38cf9e
+On Wednesday, July 6, 2016 11:32:50 AM CEST Josh Triplett wrote:
+> On Wed, Jul 06, 2016 at 03:56:25PM +0200, Arnd Bergmann wrote:
+> > On Monday, July 4, 2016 12:58:15 PM CEST Josh Triplett wrote:
+> > > On Mon, Jul 04, 2016 at 12:51:56PM -0700, Josh Triplett wrote:
+> > > > As another possibility, which would preserve the ability to use
+> > > > KCONFIG_ALLCONFIG, what about adding a parameter to mergeconfig to
+> > > > disable this warning?  I've seen many other uses of mergeconfig in
+> > > > production systems that have the same problem.
+> > > 
+> > > Actually, I just realized something: does this actually do the right
+> > > thing if both tiny.config files exist?  The documentation for
+> > > KCONFIG_ALLCONFIG doesn't suggest that it can take two files as
+> > > arguments.  And if it can, this also need quotes; otherwise, this will
+> > > expand to "... allnoconfig KCONFIG=path/to/a/tiny.config
+> > > another/path/to/a/tiny.config".
+> > 
+> > You are right, my patch doesn't work.
+> > 
+> > I can think of a few other ways to work around this, though none seems
+> > perfect:
+> > 
+> > - add a flag to the kconfig tool to ignore 'choice' symbol overrides and not
+> >   warn about them (as you suggested). This may be problematic if there
+> >   are cases in which the warning is actually helpful.
+> 
+> As long as this remains an option and not the default, I don't think it
+> would cause problems.
+> 
+> > - drop the feature of allowing multiple tiny.config files to be combined
+> >   and instead have the x86 file include everything from the architecture
+> >   independent file. This would only be a small annoyance, but it doesn't
+> >   solve the other cases you mention in which we see similar warnings.
+> 
+> And I'd rather not duplicate the base config into every
+> architecture-specific tiny.config; that'll become even more problematic
+> if other architectures add their own.
 
-Thanks, I've squashed this into the latenty_entropy initial commit in my tree.
+Fair enough.
 
--Kees
+> > - change merge_config.sh to do a 'savedefconfig' step before applying
+> >   the fragment, so it doesn't warn about choice statements that are
+> >   overridden from their default, as opposed to having conflicting choices.
+> 
+> This sounds like a potentially interesting approach.  This would produce
+> warnings only if overriding explicit configuration, but not when
+> changing a choice from the implicit default?
 
->
-> --
-> Emese
+Yes, that is the idea. Actually after looking at merge_config.sh I think
+this is not the best approach though, based on the way it works: it
+looks at all the fragments and merges them together first, then applies
+the combined fragment as a single override file, prioritizing this
+override over ${objdir}/config, which in turn looks at either
+the "olddefconfig" or "allnoconfig" defaults as a fallback.
 
+Our "%.config" Makefile rule in turn passes the current .config into
+mergeconfig.sh, so the current defaults get passed in twice. What I
+think would work better here is to have an unchanged mergeconfig.sh,
+and then change the Makefile to call 'savedefconfig' first, remove
+the .config file and then merge the saved defconfig with the other
+fragments. It should not be hard to do, but I don't think I can
+implement this correctly at the moment for lack of attention.
 
+If any of the folks on Cc could give this a try, that would be very
+nice, otherwise I can try to come up with something next week.
 
--- 
-Kees Cook
-Chrome OS & Brillo Security
+	Arnd
