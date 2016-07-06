@@ -1,73 +1,88 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:37420 "EHLO mx1.redhat.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751007AbcGFIpo (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 6 Jul 2016 04:45:44 -0400
-Date: Wed, 6 Jul 2016 16:45:38 +0800
-From: Dave Young <dyoung@redhat.com>
-Subject: Re: [PATCH] scripts: Fix size mismatch of kexec_purgatory_size
-Message-ID: <20160706084538.GA11783@dhcp-128-65.nay.redhat.com>
-References: <BE389624-FFFE-42F1-A89F-5E5598190D4A@amazon.com>
+Received: from mout.kundenserver.de ([217.72.192.74]:64762 "EHLO
+	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754246AbcGFNsK (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 6 Jul 2016 09:48:10 -0400
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH] [RFC] Kbuild: avoid "make tinyconfig" warnings
+Date: Wed, 06 Jul 2016 15:49:18 +0200
+Message-ID: <5717639.GLOFncF6tL@wuerfel>
+In-Reply-To: <CAK7LNAT4mZ_W46wvmM9BWY8VDznfi7mXOHDQvV2sXXrUiH5sVQ@mail.gmail.com>
+References: <20160704142608.2069991-1-arnd@arndb.de> <CAK7LNAT4mZ_W46wvmM9BWY8VDznfi7mXOHDQvV2sXXrUiH5sVQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BE389624-FFFE-42F1-A89F-5E5598190D4A@amazon.com>
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Tautschnig, Michael" <tautschn@amazon.co.uk>
-Cc: "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "kexec@lists.infradead.org" <kexec@lists.infradead.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Vivek Goyal <vgoyal@redhat.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Michal Marek <mmarek@suse.cz>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Josh Triplett <josh@joshtriplett.org>, Darren Hart <dvhart@linux.intel.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, kernel-build-reports@lists.linaro.org, Michal Marek <mmarek@suse.com>, Thiago Macieira <thiago.macieira@intel.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On 07/04/16 at 01:55pm, Tautschnig, Michael wrote:
-> bin2c is used to create a valid C file out of a binary file where two
-> symbols will be globally defined: <name> and <name>_size. <name> is
-> passed as the first parameter of the host binary.
+On Wednesday, July 6, 2016 11:00:01 AM CEST Masahiro Yamada wrote:
+> Hi Arnd,
 > 
-> Building using goto-cc reported that the purgatory binary code (the only
-> current user of this utility) declares kexec_purgatory_size as 'size_t'
-> where bin2c generate <name>_size to be 'int' so in a 64-bit host where
-> sizeof(size_t) > sizeof(int) this type mismatch will always yield the
-> wrong value for big-endian architectures while for little-endian it will
-> be wrong if the object laid in memory directly after
-> kexec_purgatory_size contains non-zero value at the time of reading.
 > 
-> This commit changes <name>_size to be size_t instead.
+> 2016-07-04 23:25 GMT+09:00 Arnd Bergmann <arnd@arndb.de>:
+> > The introduction of "make *.config" as a shorthand for merging configuration
+> > files unfortunately introduced some build warnings that we see in every
+> > single run of the various build bots testing tinyconfig:
 > 
-> Note:
+> I am not convinced with this statement.
 > 
-> Another way to fix the problem is to change the type of
-> kexec_purgatory_size to be 'int' as there's this check in code:
-> (kexec_purgatory_size <= 0)
+> Why do you think 63a91033d52e is a bad commit?
 > 
-> Signed-off-by: Michael Tautschnig <tautschn@amazon.com>
-> Cc: Michal Marek <mmarek@suse.com>
-> Cc: Vivek Goyal <vgoyal@redhat.com>
-> ---
->  scripts/basic/bin2c.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
 > 
-> diff --git a/scripts/basic/bin2c.c b/scripts/basic/bin2c.c
-> index af187e6..c3d7eef 100644
-> --- a/scripts/basic/bin2c.c
-> +++ b/scripts/basic/bin2c.c
-> @@ -29,7 +29,8 @@ int main(int argc, char *argv[])
->  	} while (ch != EOF);
+> With/without 63a91033d52e, I see the same warnings.
 > 
->  	if (argc > 1)
-> -		printf("\t;\n\nconst int %s_size = %d;\n", argv[1], total);
-> +		printf("\t;\n\n#include <linux/types.h>\n\nconst size_t %s_size = %d;\n",
-> +		       argv[1], total);
 > 
->  	return 0;
->  }
-> --
-> 2.7.3.AMZN
+> $ git log --oneline  -1
+> 63a9103 kbuild: add generic mergeconfig target, %.config
+> $ make -s mrproper
+> $ make tinyconfig >/dev/null
+> .config:871:warning: override: KERNEL_XZ changes choice state
+> .config:873:warning: override: SLOB changes choice state
+> .config:874:warning: override: NOHIGHMEM changes choice state
+> $ git checkout HEAD^
+> Previous HEAD position was 63a9103... kbuild: add generic mergeconfig
+> target, %.config
+> HEAD is now at bc8f8f5... merge_config.sh: rename MAKE to RUNMAKE
+> $ git log --oneline  -1
+> bc8f8f5 merge_config.sh: rename MAKE to RUNMAKE
+> $ make -s mrproper
+> $ make tinyconfig >/dev/null
+> .config:871:warning: override: KERNEL_XZ changes choice state
+> .config:873:warning: override: SLOB changes choice state
+> .config:874:warning: override: NOHIGHMEM changes choice state
 > 
-> _______________________________________________
-> kexec mailing list
-> kexec@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/kexec
 
-Acked-by: Dave Young <dyoung@redhat.com>
+Sorry about, my mistake. I misread the original Makefile contents.
 
-Thanks
-Dave
+> >  PHONY += tinyconfig
+> > -tinyconfig:
+> > -       $(Q)$(MAKE) -f $(srctree)/Makefile allnoconfig tiny.config
+> > +tinyconfig: $(obj)/conf
+> > +       $(Q)$(MAKE) -f $(srctree)/Makefile allnoconfig KCONFIG_ALLCONFIG=$(wildcard $(srctree)/kernel/configs/tiny.config $(srctree)/arch/$(SRCARCH)/configs/tiny.config)
+> >
+> >  # Help text used by make help
+> >  help:
+> 
+> 
+> The dependency "tinyconfig: $(obj)/conf" is redundant.
+> 
+> 
+> It is already specified by:
+> 
+> allnoconfig allyesconfig allmodconfig alldefconfig randconfig: $(obj)/conf
+>          $< --$@ $(Kconfig)
+
+
+I don't see that yet. How does this line provide the dependency?
+ 
+> What is worse, this patch breaks "make tinyconfig" on x86.
+
+Right, Josh also pointed this out.
+
+So, let's ignore my incorrect patch for the moment. Do you have
+any other idea for how to avoid the warning?
+
+	Arnd
