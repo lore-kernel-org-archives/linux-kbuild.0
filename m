@@ -1,81 +1,72 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from foss.arm.com ([217.140.101.70]:35663 "EHLO foss.arm.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751567AbcGGLX3 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 7 Jul 2016 07:23:29 -0400
-Date: Thu, 7 Jul 2016 12:23:25 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH RESEND] arm64: fix vdso-offsets.h dependency
-Message-ID: <20160707112325.GB27180@e104818-lin.cambridge.arm.com>
-References: <1463071155-7435-1-git-send-email-kevin.brodsky@arm.com>
- <20160706175739.GB22615@e104818-lin.cambridge.arm.com>
- <20160707102601.GA27180@e104818-lin.cambridge.arm.com>
+Received: from goliath.siemens.de ([192.35.17.28]:52006 "EHLO
+	goliath.siemens.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751310AbcGGOyP (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 7 Jul 2016 10:54:15 -0400
+Date: Thu, 7 Jul 2016 16:56:49 +0200
+From: Henning Schild <henning.schild@siemens.com>
+Subject: Re: [PATCH] builddeb: fix file permissions before packaging
+Message-ID: <20160707165649.1fe18f84@md1em3qc>
+In-Reply-To: <1467903037-11785-1-git-send-email-henning.schild@siemens.com>
+References: <1467903037-11785-1-git-send-email-henning.schild@siemens.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20160707102601.GA27180@e104818-lin.cambridge.arm.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kevin Brodsky <kevin.brodsky@arm.com>
-Cc: Michal Marek <mmarek@suse.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org
+To: Michal Marek <mmarek@suse.com>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Thu, Jul 07, 2016 at 11:26:01AM +0100, Catalin Marinas wrote:
-> On Wed, Jul 06, 2016 at 06:57:39PM +0100, Catalin Marinas wrote:
-> > On Thu, May 12, 2016 at 05:39:15PM +0100, Kevin Brodsky wrote:
-> > > +# We need to generate vdso-offsets.h before compiling certain files in kernel/.
-> > > +# In order to do that, we should use the archprepare target, but we can't since
-> > > +# asm-offsets.h is included in some files used to generate vdso-offsets.h, and
-> > > +# asm-offsets.h is built in prepare0, for which archprepare is a dependency.
-> > > +# Therefore we need to generate the header after prepare0 has been made, hence
-> > > +# this hack.
-> > > +prepare: vdso_prepare
-> > > +vdso_prepare: prepare0
-> > > +	$(Q)$(MAKE) $(build)=arch/arm64/kernel/vdso include/generated/vdso-offsets.h
-> > 
-> > This indeed looks dodgy. I'm not sure about the makefile rules but would
-> > the above override the "prepare" target in the top Makefile?
-> > 
-> > I think a dependency problem we have is that arch/arm64/kernel/signal.o
-> > depends on include/generated/vdso-offsets.h. However, we don't have any
-> > target for the latter, only for
-> > $(objtree)arch/arm64/kernel/vdso/vdso-offsets.h which no-one is
-> > including. Because of this, we have a fake dependency in
-> > arch/arm64/kernel/Makefile.
-> > 
-> > -----------8<-------------------------
-> > diff --git a/arch/arm64/kernel/Makefile b/arch/arm64/kernel/Makefile
-> > index 7700c0c23962..9bdacbf59091 100644
-> > --- a/arch/arm64/kernel/Makefile
-> > +++ b/arch/arm64/kernel/Makefile
-> > @@ -55,5 +55,4 @@ head-y					:= head.o
-> >  extra-y					+= $(head-y) vmlinux.lds
-> >  
-> >  # vDSO - this must be built first to generate the symbol offsets
-> > -$(call objectify,$(arm64-obj-y)): $(obj)/vdso/vdso-offsets.h
-> > -$(obj)/vdso/vdso-offsets.h: $(obj)/vdso
-> > +$(objtree)/include/generated/vdso-offsets.h: $(obj)/vdso
+On Thu, 7 Jul 2016 16:50:37 +0200
+Henning Schild <henning.schild@siemens.com> wrote:
+
+> Builddep is not very explicit about file permissions. Actually the
+> file permissions in the package are largely influenced by the umask
+> of the user cloning the git and building the package. If that umask
+> does not set go+r the resulting linux-headers package will prevent
+> non-root users from building out-of-tree modules. And that is
+> probably just one unexpected effect.
+
+This problem was found in a CI-system (buildbot) running with a 0077
+umask and building packages. These packages contained headers with 600
+instead of 644 and users could not build there modules anymore.
+
+Reproduce with "umask 0077", "git clone ..", ... "make deb-pkg"
+
+> Being a packaging/install tool builddep should make sure the file
+> permissions are set correctly and not just derived from a value that
+> is never checked.
+
+If that patch is not accepted i strongly suggest at least asserting
+that the headers in linux-headers.deb have 644. I am not sure which is
+the better solution, but builddeb should not produce such broken
+packages.
+
+> This patch derives the "r" and "x" bits for all files from the file
+> owner, all directories in the package will be 755.
 > 
-> This didn't work either. Basically, when building
-> arch/arm64/kernel/signal.o for example, it doesn't figure out that
-> vdso-offsets.h has additional dependencies like the vdso.so.dbg so that
-> it builds the vdso object first. I'll look for a little longer, maybe I
-> find a better workaround.
+> Signed-off-by: Henning Schild <henning.schild@siemens.com>
+> ---
+>  scripts/package/builddeb | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+> index 86e56fe..615e0ed 100755
+> --- a/scripts/package/builddeb
+> +++ b/scripts/package/builddeb
+> @@ -26,6 +26,11 @@ create_package() {
+>  	# Fix ownership and permissions
+>  	chown -R root:root "$pdir"
+>  	chmod -R go-w "$pdir"
+> +	# in case we are in a restrictive umask environment like 0077
+> +	# set permissions for dirs and derive "go"-"rx" permissions
+> from "u"
+> +	find $pdir -type d -exec chmod 0755 {} +
+> +	find $pdir -type f -perm -u+r -exec chmod go+r {} +
+> +	find $pdir -type f -perm -u+x -exec chmod go+x {} +
+>  
+>  	# Create the package
+>  	dpkg-gencontrol $forcearch -Vkernel:debarch="${debarch}"
+> -p$pname -P"$pdir"
 
-If I also add the patch below, it works fine but I'm not sure we can
-guarantee that kbuild first dives into subdirectories with a parallel
-build:
-
---- a/arch/arm64/kernel/Makefile
-+++ b/arch/arm64/kernel/Makefile
-@@ -49,11 +49,7 @@ arm64-obj-$(CONFIG_HIBERNATION)		+= hibernate.o hibernate-asm.o
- arm64-obj-$(CONFIG_KEXEC)		+= machine_kexec.o relocate_kernel.o	\
- 					   cpu-reset.o
- 
--obj-y					+= $(arm64-obj-y) vdso/
-+obj-y					+= vdso/ $(arm64-obj-y)
- obj-m					+= $(arm64-obj-m)
- head-y					:= head.o
- extra-y					+= $(head-y) vmlinux.lds
-
--- 
-Catalin
