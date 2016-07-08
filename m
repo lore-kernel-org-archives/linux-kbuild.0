@@ -1,110 +1,87 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from foss.arm.com ([217.140.101.70]:41948 "EHLO foss.arm.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1755005AbcGHL2F (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 8 Jul 2016 07:28:05 -0400
-Date: Fri, 8 Jul 2016 12:27:59 +0100
-From: Catalin Marinas <catalin.marinas@arm.com>
-Subject: Re: [PATCH RESEND] arm64: fix vdso-offsets.h dependency
-Message-ID: <20160708112759.GA22099@e104818-lin.cambridge.arm.com>
-References: <1463071155-7435-1-git-send-email-kevin.brodsky@arm.com>
+Received: from mout.kundenserver.de ([212.227.126.134]:56370 "EHLO
+	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1754944AbcGHLrt (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 8 Jul 2016 07:47:49 -0400
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH] [RFC] Kbuild: avoid "make tinyconfig" warnings
+Date: Fri, 08 Jul 2016 13:50:36 +0200
+Message-ID: <4257104.nQPxdqsVCl@wuerfel>
+In-Reply-To: <CAK7LNATAp0vbHD5r9gboKGyozNhruMbn9mHM1ggYtfTtnzC1Tw@mail.gmail.com>
+References: <20160704142608.2069991-1-arnd@arndb.de> <5717639.GLOFncF6tL@wuerfel> <CAK7LNATAp0vbHD5r9gboKGyozNhruMbn9mHM1ggYtfTtnzC1Tw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1463071155-7435-1-git-send-email-kevin.brodsky@arm.com>
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kevin Brodsky <kevin.brodsky@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, Will Deacon <will.deacon@arm.com>, Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Michal Marek <mmarek@suse.cz>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Josh Triplett <josh@joshtriplett.org>, Darren Hart <dvhart@linux.intel.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, kernel-build-reports@lists.linaro.org, Michal Marek <mmarek@suse.com>, Thiago Macieira <thiago.macieira@intel.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Thu, May 12, 2016 at 05:39:15PM +0100, Kevin Brodsky wrote:
-> I am not completely satisfied with the fix, since it uses a hack with
-> the prepare and prepare0 rules that should not be used in arch
-> Makefiles. However, all of my other attempts (including explicit
-> dependencies on gettimeofday.S, etc. in arm64/kernel/Makefile) failed
-> in some way. Hopefully, a Makefile wizard will come up with a better
-> solution.
+On Friday, July 8, 2016 10:41:57 AM CEST Masahiro Yamada wrote: 
+> 2016-07-06 22:49 GMT+09:00 Arnd Bergmann <arnd@arndb.de>:
+> >> It is already specified by:
+> >>
+> >> allnoconfig allyesconfig allmodconfig alldefconfig randconfig: $(obj)/conf
+> >>          $< --$@ $(Kconfig)
+> >
+> >
+> > I don't see that yet. How does this line provide the dependency?
+> 
+> 
+> "make tinyconfig" works like this:
+> 
+> This means, run "make allnoconfig", then "make tiny.config"
+> in this order.
 
-This is the patch I'm going to push to arm64 for-next/core. Thanks for
-the report and attempt at fixing it, it saved me from trying to
-understand what was going on:
+Ok, got it, sorry for being slow here.
 
--------------8<------------------------------------
-From 19a5ab422b6ca3b3c8f656ca6d697dbfb577d360 Mon Sep 17 00:00:00 2001
-From: Catalin Marinas <catalin.marinas@arm.com>
-Date: Fri, 8 Jul 2016 12:13:20 +0100
-Subject: [PATCH] arm64: Fix vdso-offsets.h dependency
+> > So, let's ignore my incorrect patch for the moment. Do you have
+> > any other idea for how to avoid the warning?
+> 
+> 
+> Of your four ideas, I do not like the first two,
+> but the others sound reasonable.
 
-arch/arm64/kernel/{vdso,signal}.c include generated/vdso-offsets.h, and
-therefore the symbol offsets must be generated before these files are
-compiled.
+ok
 
-The current rules in arm64/kernel/Makefile do not actually enforce
-this, because even though $(obj)/vdso is listed as a prerequisite for
-vdso-offsets.h, this does not result in the intended effect of
-building the vdso subdirectory (before all the other objects). As a
-consequence, depending on the order in which the rules are followed,
-vdso-offsets.h is updated or not before arm64/kernel/{vdso,signal}.o
-are built. The current rules also impose an unnecessary dependency on
-vdso-offsets.h for all arm64/kernel/*.o, resulting in unnecessary
-rebuilds.
+> > - merge the fragments first and then use the combined fragment as the
+> >   KCONFIG_ALLCONFIG file.
+> 
+> This is a strait-forward solution.
+> I thought of this one, too.
+> 
+> 
+> > - change merge_config.sh to do a 'savedefconfig' step before applying
+> >   the fragment, so it doesn't warn about choice statements that are
+> >   overridden from their default, as opposed to having conflicting choices.
+> 
+> This sounds interesting.
+> 
+> 
+> 
+> 
+> 
+> BTW, I have been wondering if we could support merge_config
+> as a native feature of Kconfig instead of by a separate shell script.
+> 
+> If we could support KCONFIG_ALLCONFIG for "make oldconfig"
+> perhaps merge_config.sh will go away?
+> Maybe I am missing something, though.
 
-This patch removes the arch/arm64/kernel/vdso/vdso-offsets.h file
-generation, leaving only the include/generated/vdso-offsets.h one. It
-adds a forced dependency check of the vdso-offsets.h file in
-arch/arm64/kernel/Makefile which, if not up to date according to the
-arch/arm64/kernel/vdso/Makefile rules (depending on vdso.so.dbg), will
-trigger the vdso/ subdirectory build and vdso-offsets.h re-generation.
-Automatic kbuild dependency rules between kernel/{vdso,signal}.c rules
-and vdso-offsets.h will guarantee that the vDSO object is built first,
-followed by the generated symbol offsets header file.
+I agree this sounds really nice, but I see two problems with it:
 
-Reported-by: Kevin Brodsky <kevin.brodsky@arm.com>
-Signed-off-by: Catalin Marinas <catalin.marinas@arm.com>
----
- arch/arm64/kernel/Makefile      | 7 ++++---
- arch/arm64/kernel/vdso/Makefile | 7 +++----
- 2 files changed, 7 insertions(+), 7 deletions(-)
+- at the moment, we always read exactly one input file from the
+  kconfig tool, and that can be one of
+	.config
+	arch/${ARCH}/defconfig
+	arch/${ARCH}/configs/*_defconfig
+	the KCONFIG_ALLCONFIG contents
+	./all{no,yes,mod,def,random}.config
+  Teaching the tool to have two input files basically means reimplementing
+  merge_config.sh in C. Definitely doable, and probably nicer than what
+  we have, but not trivial.
+- It doesn't actually solve the problem of the warnings that I'm trying to
+  address, that would still have to be done on top of the reimplementation.
 
-diff --git a/arch/arm64/kernel/Makefile b/arch/arm64/kernel/Makefile
-index 7700c0c23962..b4f0a03dc830 100644
---- a/arch/arm64/kernel/Makefile
-+++ b/arch/arm64/kernel/Makefile
-@@ -54,6 +54,7 @@ obj-m					+= $(arm64-obj-m)
- head-y					:= head.o
- extra-y					+= $(head-y) vmlinux.lds
- 
--# vDSO - this must be built first to generate the symbol offsets
--$(call objectify,$(arm64-obj-y)): $(obj)/vdso/vdso-offsets.h
--$(obj)/vdso/vdso-offsets.h: $(obj)/vdso
-+# Check that the vDSO symbol offsets header file is up to date and re-generate
-+# it if necessary.
-+$(objtree)/include/generated/vdso-offsets.h: FORCE
-+	$(Q)$(MAKE) $(build)=$(obj)/vdso $@
-diff --git a/arch/arm64/kernel/vdso/Makefile b/arch/arm64/kernel/vdso/Makefile
-index b467fd0a384b..70fb663ddf7b 100644
---- a/arch/arm64/kernel/vdso/Makefile
-+++ b/arch/arm64/kernel/vdso/Makefile
-@@ -23,7 +23,7 @@ GCOV_PROFILE := n
- ccflags-y += -Wl,-shared
- 
- obj-y += vdso.o
--extra-y += vdso.lds vdso-offsets.h
-+extra-y += vdso.lds
- CPPFLAGS_vdso.lds += -P -C -U$(ARCH)
- 
- # Force dependency (incbin is bad)
-@@ -42,11 +42,10 @@ $(obj)/%.so: $(obj)/%.so.dbg FORCE
- gen-vdsosym := $(srctree)/$(src)/gen_vdso_offsets.sh
- quiet_cmd_vdsosym = VDSOSYM $@
- define cmd_vdsosym
--	$(NM) $< | $(gen-vdsosym) | LC_ALL=C sort > $@ && \
--	cp $@ include/generated/
-+	$(NM) $< | $(gen-vdsosym) | LC_ALL=C sort > $@
- endef
- 
--$(obj)/vdso-offsets.h: $(obj)/vdso.so.dbg FORCE
-+$(objtree)/include/generated/vdso-offsets.h: $(obj)/vdso.so.dbg
- 	$(call if_changed,vdsosym)
- 
- # Assembly rules for the .S files
+	Arnd
