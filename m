@@ -1,55 +1,93 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f41.google.com ([74.125.82.41]:38447 "EHLO
-	mail-wm0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751829AbcGIQ7T (ORCPT
+Received: from mail-wm0-f66.google.com ([74.125.82.66]:34466 "EHLO
+	mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1757034AbcGJJQM (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 9 Jul 2016 12:59:19 -0400
-Received: by mail-wm0-f41.google.com with SMTP id o80so794635wme.1
-        for <linux-kbuild@vger.kernel.org>; Sat, 09 Jul 2016 09:59:18 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20160709120302.GB26253@gmail.com>
-References: <20160618180800.GA1006@www.outflux.net> <20160709120302.GB26253@gmail.com>
-From: Kees Cook <keescook@chromium.org>
-Date: Sat, 9 Jul 2016 09:59:16 -0700
-Message-ID: <CAGXu5jLJt3P0-VYqn6K3-1mpTS4n3JRwMzkJwR3+x4Azqk3eUw@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: Abort build on bad stack protector flag
-Content-Type: text/plain; charset=UTF-8
+	Sun, 10 Jul 2016 05:16:12 -0400
+From: Eugeniu Rosca <eugeniu.m.rosca@gmail.com>
+Subject: [PATCH] kconfig: Fix menu/endmenu markers in zconfdump()
+Date: Sun, 10 Jul 2016 11:15:23 +0200
+Message-Id: <1468142123-13059-1-git-send-email-eugeniu.m.rosca@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ingo Molnar <mingo@kernel.org>
-Cc: Michal Marek <mmarek@suse.com>, Andrew Morton <akpm@linux-foundation.org>, "x86@kernel.org" <x86@kernel.org>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: yann.morin.1998@free.fr, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Eugeniu Rosca <eugeniu.m.rosca@gmail.com>
 
-On Sat, Jul 9, 2016 at 5:03 AM, Ingo Molnar <mingo@kernel.org> wrote:
->
-> * Kees Cook <keescook@chromium.org> wrote:
->
->> Before, the stack protector flag was sanity checked before .config had
->> been reprocessed. This meant the build couldn't be aborted early, and
->> only a warning could be emitted followed later by the compiler blowing
->> up with an unknown flag. This has caused a lot of confusion over time,
->> so this splits the flag selection from sanity checking and performs the
->> sanity checking after the make has been restarted from a reprocessed
->> .config, so builds can be aborted as early as possible now.
->>
->> Additionally moves the x86-specific sanity check to the same location,
->> since it suffered from the same warn-then-wait-for-compiler-failure
->> problem.
->>
->> Signed-off-by: Kees Cook <keescook@chromium.org>
->> ---
->>  Makefile          | 69 +++++++++++++++++++++++++++++++++----------------------
->>  arch/x86/Makefile |  8 -------
->>  2 files changed, 42 insertions(+), 35 deletions(-)
->
-> What's the status of this patch? I can merge it if Michal acks the main Makefile
-> bits.
+Given a Kconfig.sample, implementing 2 empty and 2 non-empty menu
+entries:
 
-There's been no feedback yet, but I'd really like to see it landed: it
-removes a lot of ambiguity for this option (and creates a place for
-future similar options).
+menu EMPTY_MENU
+endmenu
 
--Kees
+menu NONEMPTY_MENU
+config DUMMY_1
+    bool "desc-1"
+endmenu
 
+menuconfig EMPTY_MENUCONFIG
+    bool "desc-2"
+
+menuconfig NONEMPTY_MENUCONFIG
+    bool "desc-3"
+
+if NONEMPTY_MENUCONFIG
+config DUMMY_2
+    bool "desc-4"
+endif
+
+The following can be observed (prerequisite: uncomment zconfdump()
+in scripts/kconfig/conf.c):
+> make KBUILD_KCONFIG=Kconfig.sample allnoconfig | grep -cw menu
+> 4
+> make KBUILD_KCONFIG=Kconfig.sample allnoconfig | grep -cw endmenu
+> 3
+
+It looks like zconfdump() has the following inconsistencies:
+A. It prints the start marker 'menu' both for empty and non-empty menu
+   entries, while printing the end marker 'endmenu' only for non-empty
+   menu entries.
+B. At the end of every dump, it prints the end marker of the root
+   menu, while skipping its start marker, so that even if (A) is fixed,
+   the number of start and end markers is still not equal.
+
+Fix (A) and (B).
+
+Signed-off-by: Eugeniu Rosca <eugeniu.m.rosca@gmail.com>
+---
+ scripts/kconfig/zconf.tab.c_shipped | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/scripts/kconfig/zconf.tab.c_shipped b/scripts/kconfig/zconf.tab.c_shipped
+index 7a4d658..727b7dd 100644
+--- a/scripts/kconfig/zconf.tab.c_shipped
++++ b/scripts/kconfig/zconf.tab.c_shipped
+@@ -2510,6 +2510,8 @@ static void print_symbol(FILE *out, struct menu *menu)
+ 			fputs( "  menu ", out);
+ 			print_quoted_string(out, prop->text);
+ 			fputc('\n', out);
++			if (!menu->list)
++				fputs("endmenu\n", out);
+ 			break;
+ 		default:
+ 			fprintf(out, "  unknown prop %d!\n", prop->type);
+@@ -2530,7 +2532,7 @@ void zconfdump(FILE *out)
+ 	struct symbol *sym;
+ 	struct menu *menu;
+ 
+-	menu = rootmenu.list;
++	menu = &rootmenu;
+ 	while (menu) {
+ 		if ((sym = menu->sym))
+ 			print_symbol(out, menu);
+@@ -2545,6 +2547,8 @@ void zconfdump(FILE *out)
+ 				fputs("\nmenu ", out);
+ 				print_quoted_string(out, prop->text);
+ 				fputs("\n", out);
++				if (!menu->list)
++					fputs("endmenu\n", out);
+ 				break;
+ 			default:
+ 				;
 -- 
-Kees Cook
-Chrome OS & Brillo Security
+2.7.4
+
