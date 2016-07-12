@@ -1,49 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f68.google.com ([209.85.215.68]:33555 "EHLO
-	mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750854AbcGLTmj (ORCPT
+Received: from mail-wm0-f42.google.com ([74.125.82.42]:37084 "EHLO
+	mail-wm0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751260AbcGLTqA (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 12 Jul 2016 15:42:39 -0400
-Received: by mail-lf0-f68.google.com with SMTP id f93so1995612lfi.0
-        for <linux-kbuild@vger.kernel.org>; Tue, 12 Jul 2016 12:42:38 -0700 (PDT)
-From: Marcin Mielniczuk <marmistrz.dev@gmail.com>
-Subject: [PATCH] Fix the Debian packaging script on systems with no codename
-Message-ID: <ce356ed3-4bee-6855-6906-a8bee29e7fde@gmail.com>
-Date: Tue, 12 Jul 2016 21:42:35 +0200
+	Tue, 12 Jul 2016 15:46:00 -0400
+Received: by mail-wm0-f42.google.com with SMTP id i5so38909187wmg.0
+        for <linux-kbuild@vger.kernel.org>; Tue, 12 Jul 2016 12:45:58 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20160705014033.afc9a463b518e2e239c6301b@gmail.com>
+References: <20160705013928.396ce4a7cbbc40e6c09efc43@gmail.com> <20160705014033.afc9a463b518e2e239c6301b@gmail.com>
+From: Kees Cook <keescook@chromium.org>
+Date: Tue, 12 Jul 2016 15:45:56 -0400
+Message-ID: <CAGXu5jLG6bprjCpu2oF6dexsu+8jU-WX59LY-=wUx27U459Y5Q@mail.gmail.com>
+Subject: Re: [PATCH v2 1/3] Add the initify gcc plugin
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mmarek@suse.com
-Cc: linux-kbuild@vger.kernel.org
+To: Emese Revfy <re.emese@gmail.com>
+Cc: "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, PaX Team <pageexec@freemail.hu>, Brad Spengler <spender@grsecurity.net>, Michal Marek <mmarek@suse.com>, LKML <linux-kernel@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, minipli@ld-linux.so, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, David Brown <david.brown@linaro.org>, "benh@kernel.crashing.org" <benh@kernel.crashing.org>, Thomas Gleixner <tglx@linutronix.de>, Andrew Morton <akpm@linux-foundation.org>, Jeff Layton <jlayton@poochiereds.net>, Arnd Bergmann <arnd@arndb.de>, Sam Ravnborg <sam@ravnborg.org>, Karsten Keil <isdn@linux-pingi.de>
 
-When calling `make deb-pkg` on a system with no codename (for example 
-Arch Linux), lsb_release sometimes outputs `n/a` as the codename.
+On Mon, Jul 4, 2016 at 7:40 PM, Emese Revfy <re.emese@gmail.com> wrote:
+> The kernel already has a mechanism to free up code and data memory that
+> is only used during kernel or module initialization.
+> This plugin will teach the compiler to find more such code and data that
+> can be freed after initialization.
+> It has two passes. The first one tries to find all functions that
+> can be become __init/__exit. The second one moves string constants
+> (local variables and function string arguments marked by
+> the nocapture attribute) only referenced in __init/__exit functions
+> to the __initconst/__exitconst sections.
+> It reduces memory usage. This plugin can be useful for embedded systems.
+>
+> If a function is called by __init and __exit functions as well then
+> the plugin moves it to the __exit section. This causes false positive
+> section mismatch errors/warnings that I don't know how to handle yet.
 
-This breaks dpkg-parsechangelog, which can't process the changelog 
-correctly.
+Should the mismatch checker be updated to recognize this case? Without
+the plugin, I assume these kinds of functions would only ever be
+marked for __exit? If so, should the plugin strip the __init marking
+and only add __exit?
 
-Signed-off-by: Marcin Mielniczuk <marmistrz.dev@gmail.com>
+> The instrumentation pass of the latent_entropy plugin must run after
+> the initify plugin to increase coverage.
+>
+> Signed-off-by: Emese Revfy <re.emese@gmail.com>
 
----
+Thanks for sending this! I'll get it added to my tree for some 0day
+build testing, and then get it into my -next tree.
 
-diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index 86e56fe..87753f5 100755
---- a/scripts/package/builddeb
-+++ b/scripts/package/builddeb
-@@ -238,7 +238,8 @@ maintainer="$name <$email>"
-  # Try to determine distribution
-  if [ -n "$KDEB_CHANGELOG_DIST" ]; then
-          distribution=$KDEB_CHANGELOG_DIST
--elif distribution=$(lsb_release -cs 2>/dev/null) && [ -n 
-"$distribution" ]; then
-+# In some cases lsb_release returns the codename as n/a, which breaks 
-dpkg-parsechangelog
-+elif distribution=$(lsb_release -cs 2>/dev/null) && [ -n 
-"$distribution" ] && [ "$distribution" != "n/a" ]; then
-          : # nothing to do in this case
-  else
-          distribution="unstable"
+-Kees
 
-
+-- 
+Kees Cook
+Chrome OS & Brillo Security
