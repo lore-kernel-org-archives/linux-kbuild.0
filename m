@@ -1,167 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf0-f175.google.com ([209.85.192.175]:34289 "EHLO
-	mail-pf0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750787AbcGLWaw (ORCPT
+Received: from mail-wm0-f49.google.com ([74.125.82.49]:35569 "EHLO
+	mail-wm0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752247AbcGLWjF (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 12 Jul 2016 18:30:52 -0400
-Received: by mail-pf0-f175.google.com with SMTP id h14so11225963pfe.1
-        for <linux-kbuild@vger.kernel.org>; Tue, 12 Jul 2016 15:30:46 -0700 (PDT)
-Date: Tue, 12 Jul 2016 15:30:43 -0700
-From: Kees Cook <keescook@chromium.org>
-Subject: [RESEND][PATCH] kbuild: Abort build on bad stack protector flag
-Message-ID: <20160712223043.GA11664@www.outflux.net>
+	Tue, 12 Jul 2016 18:39:05 -0400
+Received: by mail-wm0-f49.google.com with SMTP id f65so7198457wmi.0
+        for <linux-kbuild@vger.kernel.org>; Tue, 12 Jul 2016 15:38:59 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+In-Reply-To: <20160712220853.GU1041@n2100.armlinux.org.uk>
+References: <20160705013928.396ce4a7cbbc40e6c09efc43@gmail.com>
+ <20160705014033.afc9a463b518e2e239c6301b@gmail.com> <CAGXu5jLG6bprjCpu2oF6dexsu+8jU-WX59LY-=wUx27U459Y5Q@mail.gmail.com>
+ <20160712220853.GU1041@n2100.armlinux.org.uk>
+From: Kees Cook <keescook@chromium.org>
+Date: Tue, 12 Jul 2016 18:38:47 -0400
+Message-ID: <CAGXu5j+99nc9s-ci46s3r_CU5-6O6JeHERcW3mYRtnP71871rw@mail.gmail.com>
+Subject: Re: [PATCH v2 1/3] Add the initify gcc plugin
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>
-Cc: Ingo Molnar <mingo@kernel.org>, Andrew Morton <akpm@linux-foundation.org>, x86@kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Russell King - ARM Linux <linux@armlinux.org.uk>
+Cc: Emese Revfy <re.emese@gmail.com>, "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, PaX Team <pageexec@freemail.hu>, Brad Spengler <spender@grsecurity.net>, Michal Marek <mmarek@suse.com>, LKML <linux-kernel@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, minipli@ld-linux.so, Catalin Marinas <catalin.marinas@arm.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, David Brown <david.brown@linaro.org>, "benh@kernel.crashing.org" <benh@kernel.crashing.org>, Thomas Gleixner <tglx@linutronix.de>, Andrew Morton <akpm@linux-foundation.org>, Jeff Layton <jlayton@poochiereds.net>, Arnd Bergmann <arnd@arndb.de>, Sam Ravnborg <sam@ravnborg.org>, Karsten Keil <isdn@linux-pingi.de>
 
-Before, the stack protector flag was sanity checked before .config had
-been reprocessed. This meant the build couldn't be aborted early, and
-only a warning could be emitted followed later by the compiler blowing
-up with an unknown flag. This has caused a lot of confusion over time,
-so this splits the flag selection from sanity checking and performs the
-sanity checking after the make has been restarted from a reprocessed
-.config, so builds can be aborted as early as possible now.
+On Tue, Jul 12, 2016 at 6:08 PM, Russell King - ARM Linux
+<linux@armlinux.org.uk> wrote:
+> On Tue, Jul 12, 2016 at 03:45:56PM -0400, Kees Cook wrote:
+>> On Mon, Jul 4, 2016 at 7:40 PM, Emese Revfy <re.emese@gmail.com> wrote:
+>> > If a function is called by __init and __exit functions as well then
+>> > the plugin moves it to the __exit section. This causes false positive
+>> > section mismatch errors/warnings that I don't know how to handle yet.
+>>
+>> Should the mismatch checker be updated to recognize this case? Without
+>> the plugin, I assume these kinds of functions would only ever be
+>> marked for __exit? If so, should the plugin strip the __init marking
+>> and only add __exit?
+>
+> That sounds like a problem for architectures that still discard the
+> __exit section at link time to reduce the size of the linked kernel
+> image - though, obviously, if using the plugin results in a smaller
+> kernel image _with_ the exit sections, then there's a net benefit
+> size-wise.
 
-Additionally moves the x86-specific sanity check to the same location,
-since it suffered from the same warn-then-wait-for-compiler-failure
-problem.
+Ah right, __exit is dropped for non-modular builds. So, for "both
+__init and __exit" it sounds like the behavior depends on the build:
 
-Signed-off-by: Kees Cook <keescook@chromium.org>
----
- Makefile          | 69 +++++++++++++++++++++++++++++++++----------------------
- arch/x86/Makefile |  8 -------
- 2 files changed, 42 insertions(+), 35 deletions(-)
+- if modular: remove __init marking (since we need it after init)
+- if non-modular: remove __exit marking (since we'll never call exit)
 
-diff --git a/Makefile b/Makefile
-index b409076c7c18..0149ba60775a 100644
---- a/Makefile
-+++ b/Makefile
-@@ -645,41 +645,28 @@ ifneq ($(CONFIG_FRAME_WARN),0)
- KBUILD_CFLAGS += $(call cc-option,-Wframe-larger-than=${CONFIG_FRAME_WARN})
- endif
- 
--# Handle stack protector mode.
--#
--# Since kbuild can potentially perform two passes (first with the old
--# .config values and then with updated .config values), we cannot error out
--# if a desired compiler option is unsupported. If we were to error, kbuild
--# could never get to the second pass and actually notice that we changed
--# the option to something that was supported.
--#
--# Additionally, we don't want to fallback and/or silently change which compiler
--# flags will be used, since that leads to producing kernels with different
--# security feature characteristics depending on the compiler used. ("But I
--# selected CC_STACKPROTECTOR_STRONG! Why did it build with _REGULAR?!")
--#
--# The middle ground is to warn here so that the failed option is obvious, but
--# to let the build fail with bad compiler flags so that we can't produce a
--# kernel when there is a CONFIG and compiler mismatch.
--#
-+# This selects the stack protector compiler flag. Testing it is delayed
-+# until after .config has been reprocessed, in the prepare-compiler-check
-+# target.
- ifdef CONFIG_CC_STACKPROTECTOR_REGULAR
-   stackp-flag := -fstack-protector
--  ifeq ($(call cc-option, $(stackp-flag)),)
--    $(warning Cannot use CONFIG_CC_STACKPROTECTOR_REGULAR: \
--             -fstack-protector not supported by compiler)
--  endif
-+  stackp-name := REGULAR
- else
- ifdef CONFIG_CC_STACKPROTECTOR_STRONG
-   stackp-flag := -fstack-protector-strong
--  ifeq ($(call cc-option, $(stackp-flag)),)
--    $(warning Cannot use CONFIG_CC_STACKPROTECTOR_STRONG: \
--	      -fstack-protector-strong not supported by compiler)
--  endif
-+  stackp-name := STRONG
- else
-   # Force off for distro compilers that enable stack protector by default.
-   stackp-flag := $(call cc-option, -fno-stack-protector)
- endif
- endif
-+# Find arch-specific stack protector compiler sanity-checking script.
-+ifdef CONFIG_CC_STACKPROTECTOR
-+  stackp-path := $(srctree)/scripts/gcc-$(ARCH)_$(BITS)-has-stack-protector.sh
-+  ifneq ($(wildcard $(stackp-path)),)
-+    stackp-check := $(stackp-path)
-+  endif
-+endif
- KBUILD_CFLAGS += $(stackp-flag)
- 
- ifdef CONFIG_KCOV
-@@ -1015,8 +1002,10 @@ ifneq ($(KBUILD_SRC),)
- 	fi;
- endif
- 
--# prepare2 creates a makefile if using a separate output directory
--prepare2: prepare3 outputmakefile asm-generic
-+# prepare2 creates a makefile if using a separate output directory.
-+# From this point forward, .config has been reprocessed, so any rules
-+# that need to depend on updated CONFIG_* values can be checked here.
-+prepare2: prepare3 prepare-compiler-check outputmakefile asm-generic
- 
- prepare1: prepare2 $(version_h) include/generated/utsrelease.h \
-                    include/config/auto.conf
-@@ -1047,6 +1036,32 @@ endif
- PHONY += prepare-objtool
- prepare-objtool: $(objtool_target)
- 
-+# Check for CONFIG flags that require compiler support. Abort the build
-+# after .config has been processed, but before the kernel build starts.
-+#
-+# For security-sensitive CONFIG options, we don't want to fallback and/or
-+# silently change which compiler flags will be used, since that leads to
-+# producing kernels with different security feature characteristics
-+# depending on the compiler used. (For example, "But I selected
-+# CC_STACKPROTECTOR_STRONG! Why did it build with _REGULAR?!")
-+PHONY += prepare-compiler-check
-+prepare-compiler-check: FORCE
-+# Make sure compiler supports requested stack protector flag.
-+ifdef stackp-name
-+  ifeq ($(call cc-option, $(stackp-flag)),)
-+	@echo Cannot use CONFIG_CC_STACKPROTECTOR_$(stackp-name): \
-+		  $(stackp-flag) not supported by compiler >&2 && exit 1
-+  endif
-+endif
-+# Make sure compiler does not have buggy stack-protector support.
-+ifdef stackp-check
-+  ifneq ($(shell $(CONFIG_SHELL) $(stackp-check) $(CC) $(KBUILD_CPPFLAGS) $(biarch)),y)
-+	@echo Cannot use CONFIG_CC_STACKPROTECTOR_$(stackp-name): \
-+                  $(stackp-flag) available but compiler is broken >&2 && exit 1
-+  endif
-+endif
-+	@:
-+
- # Generate some files
- # ---------------------------------------------------------------------------
- 
-diff --git a/arch/x86/Makefile b/arch/x86/Makefile
-index 6fce7f096b88..830ed391e7ef 100644
---- a/arch/x86/Makefile
-+++ b/arch/x86/Makefile
-@@ -126,14 +126,6 @@ else
-         KBUILD_CFLAGS += $(call cc-option,-maccumulate-outgoing-args)
- endif
- 
--# Make sure compiler does not have buggy stack-protector support.
--ifdef CONFIG_CC_STACKPROTECTOR
--	cc_has_sp := $(srctree)/scripts/gcc-x86_$(BITS)-has-stack-protector.sh
--        ifneq ($(shell $(CONFIG_SHELL) $(cc_has_sp) $(CC) $(KBUILD_CPPFLAGS) $(biarch)),y)
--                $(warning stack-protector enabled but compiler support broken)
--        endif
--endif
--
- ifdef CONFIG_X86_X32
- 	x32_ld_ok := $(call try-run,\
- 			/bin/echo -e '1: .quad 1b' | \
--- 
-2.7.4
+Is this something the build itself (rather than the plugin) could
+notice and fix up? Hmmm
 
+-Kees
 
 -- 
 Kees Cook
