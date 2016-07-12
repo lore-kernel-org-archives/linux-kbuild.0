@@ -1,71 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qt0-f194.google.com ([209.85.216.194]:32839 "EHLO
-	mail-qt0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1750826AbcGLTYo (ORCPT
+Received: from mail-lf0-f68.google.com ([209.85.215.68]:33555 "EHLO
+	mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750854AbcGLTmj (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 12 Jul 2016 15:24:44 -0400
-Message-ID: <1468351439.32683.1.camel@gmail.com>
-Subject: Re: [kernel-hardening] Re: [PATCH v2 2/3] Mark functions with the
- __nocapture attribute
-From: Daniel Micay <danielmicay@gmail.com>
-Date: Tue, 12 Jul 2016 15:23:59 -0400
-In-Reply-To: <CAGXu5jKKd-VcuLooiRV-ktbnYuB_EaOtUbQOOy7e5VGNgWBU-A@mail.gmail.com>
-References: <20160705013928.396ce4a7cbbc40e6c09efc43@gmail.com>
-	 <20160705014209.caca7667ac0984c2975b4f41@gmail.com>
-	 <CAGXu5jKKd-VcuLooiRV-ktbnYuB_EaOtUbQOOy7e5VGNgWBU-A@mail.gmail.com>
-Content-Type: multipart/signed; micalg="pgp-sha256";
-	protocol="application/pgp-signature"; boundary="=-Y29sRYWzknlJzkFhq+5Y"
-Mime-Version: 1.0
+	Tue, 12 Jul 2016 15:42:39 -0400
+Received: by mail-lf0-f68.google.com with SMTP id f93so1995612lfi.0
+        for <linux-kbuild@vger.kernel.org>; Tue, 12 Jul 2016 12:42:38 -0700 (PDT)
+From: Marcin Mielniczuk <marmistrz.dev@gmail.com>
+Subject: [PATCH] Fix the Debian packaging script on systems with no codename
+Message-ID: <ce356ed3-4bee-6855-6906-a8bee29e7fde@gmail.com>
+Date: Tue, 12 Jul 2016 21:42:35 +0200
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: kernel-hardening@lists.openwall.com, Emese Revfy <re.emese@gmail.com>
-Cc: PaX Team <pageexec@freemail.hu>, Brad Spengler <spender@grsecurity.net>, Michal Marek <mmarek@suse.com>, LKML <linux-kernel@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, minipli@ld-linux.so, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, David Brown <david.brown@linaro.org>, "benh@kernel.crashing.org" <benh@kernel.crashing.org>, Thomas Gleixner <tglx@linutronix.de>, Andrew Morton <akpm@linux-foundation.org>, Jeff Layton <jlayton@poochiereds.net>, Arnd Bergmann <arnd@arndb.de>, Sam Ravnborg <sam@ravnborg.org>, Karsten Keil <isdn@linux-pingi.de>
+To: mmarek@suse.com
+Cc: linux-kbuild@vger.kernel.org
 
+When calling `make deb-pkg` on a system with no codename (for example 
+Arch Linux), lsb_release sometimes outputs `n/a` as the codename.
 
---=-Y29sRYWzknlJzkFhq+5Y
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+This breaks dpkg-parsechangelog, which can't process the changelog 
+correctly.
 
-On Tue, 2016-07-12 at 15:08 -0400, Kees Cook wrote:
-> On Mon, Jul 4, 2016 at 7:42 PM, Emese Revfy <re.emese@gmail.com>
-> wrote:
-> >=20
-> > The nocapture gcc attribute can be on functions only.
-> > The attribute takes one or more unsigned integer constants as
-> > parameters
-> > that specify the function argument(s) of const char* type to
-> > initify.
-> > If the marked argument is a vararg then the plugin initifies
-> > all vararg arguments.
->=20
-> Why is this called "nocapture"? Not captured by what? It seems like
-> it
-> means "initify this if possible". Am I misunderstanding its purpose?
+Signed-off-by: Marcin Mielniczuk <marmistrz.dev@gmail.com>
 
-It means they don't escape via that function, i.e. they aren't stored
-anywhere to be used in any way after the call.
---=-Y29sRYWzknlJzkFhq+5Y
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-Content-Transfer-Encoding: 7bit
+---
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index 86e56fe..87753f5 100755
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -238,7 +238,8 @@ maintainer="$name <$email>"
+  # Try to determine distribution
+  if [ -n "$KDEB_CHANGELOG_DIST" ]; then
+          distribution=$KDEB_CHANGELOG_DIST
+-elif distribution=$(lsb_release -cs 2>/dev/null) && [ -n 
+"$distribution" ]; then
++# In some cases lsb_release returns the codename as n/a, which breaks 
+dpkg-parsechangelog
++elif distribution=$(lsb_release -cs 2>/dev/null) && [ -n 
+"$distribution" ] && [ "$distribution" != "n/a" ]; then
+          : # nothing to do in this case
+  else
+          distribution="unstable"
 
-iQIzBAABCAAdBQJXhUPPFhxkYW5pZWxtaWNheUBnbWFpbC5jb20ACgkQ+ecS5Zr1
-8ioIrhAAkoGYfw4Z8fPR7cOJDfp5kG0LFds+25zqzQhR6cLw1K7pOJ0hNZO+DV9W
-Z2aSG99PYtPAipEiIuN3IZkaVq5Io2T51xyHil4ngNI+aZgnLTFSlklNAYDNjQjj
-XxLSNjneCJkl652jdGVxVcvv0kU2+PjHwO5AK/9Qbj+AwtTrRVgXHS3VTpRi9y6y
-8kneie8ChYCg29SmknoZaEuKuuwcI5Wld+nHvTkuZnBCqkgZfw+YRMz2K1S6jgQB
-vMBwiTeAj4HzzxyHerPKP6xUS+ARp+HFQEYc0M2n72GolpWfEiYKa6NxJ+wHEY5V
-ooD4wgI5y3Ee8YQJg9EV7bXR54HSv6VdxJcule5L2Ls6Wp4It5rwnPF8GL/e4Cz/
-PiSaPnfn2qYT+mX5CBplec93vAwEflm5J485RmAmJtyR7JewAMBb2hUZzmxBew2h
-uVO7DfN7PvgwfAB+XGS0Zk9PVKTZqXhNkuIviqd5S2qLORxYV9P1ckUCJECJ0Qk/
-xWJAoBChjVRcbC9BCii3fi55/RBVZgDIBMDCK/pS7ORuOwoWudNN4IXDzClxNg2G
-O0A8WJYE7LDX/9mBVZ9tUrqHcifKp6cecosvSij6QMZJ7GhNc+jLCgHfqsewVcFV
-VxQnFm6hee1rR3tn7MW/2/dhDXQe9eMcX2w1Eg7npMWgFp6Fugs=
-=aUpr
------END PGP SIGNATURE-----
-
---=-Y29sRYWzknlJzkFhq+5Y--
 
