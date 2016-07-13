@@ -1,56 +1,22 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f49.google.com ([74.125.82.49]:35569 "EHLO
-	mail-wm0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752247AbcGLWjF (ORCPT
+Received: from mail.customs.go.id ([202.61.126.135]:33488 "EHLO
+	mail.customs.go.id" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751431AbcGMUGP convert rfc822-to-8bit (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 12 Jul 2016 18:39:05 -0400
-Received: by mail-wm0-f49.google.com with SMTP id f65so7198457wmi.0
-        for <linux-kbuild@vger.kernel.org>; Tue, 12 Jul 2016 15:38:59 -0700 (PDT)
+	Wed, 13 Jul 2016 16:06:15 -0400
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-In-Reply-To: <20160712220853.GU1041@n2100.armlinux.org.uk>
-References: <20160705013928.396ce4a7cbbc40e6c09efc43@gmail.com>
- <20160705014033.afc9a463b518e2e239c6301b@gmail.com> <CAGXu5jLG6bprjCpu2oF6dexsu+8jU-WX59LY-=wUx27U459Y5Q@mail.gmail.com>
- <20160712220853.GU1041@n2100.armlinux.org.uk>
-From: Kees Cook <keescook@chromium.org>
-Date: Tue, 12 Jul 2016 18:38:47 -0400
-Message-ID: <CAGXu5j+99nc9s-ci46s3r_CU5-6O6JeHERcW3mYRtnP71871rw@mail.gmail.com>
-Subject: Re: [PATCH v2 1/3] Add the initify gcc plugin
-Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
+Content-Description: Mail message body
+Subject: Fast Loans 
+From: Financial Service <bambang.prasodjo@customs.go.id>
+Date: Wed, 13 Jul 2016 17:57:43 +0530
+Reply-To: m_rajeshkumar@aol.co.uk
+Message-Id: <20160713122828.0A8001BC8EA4@mail.customs.go.id>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Russell King - ARM Linux <linux@armlinux.org.uk>
-Cc: Emese Revfy <re.emese@gmail.com>, "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, PaX Team <pageexec@freemail.hu>, Brad Spengler <spender@grsecurity.net>, Michal Marek <mmarek@suse.com>, LKML <linux-kernel@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, minipli@ld-linux.so, Catalin Marinas <catalin.marinas@arm.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, David Brown <david.brown@linaro.org>, "benh@kernel.crashing.org" <benh@kernel.crashing.org>, Thomas Gleixner <tglx@linutronix.de>, Andrew Morton <akpm@linux-foundation.org>, Jeff Layton <jlayton@poochiereds.net>, Arnd Bergmann <arnd@arndb.de>, Sam Ravnborg <sam@ravnborg.org>, Karsten Keil <isdn@linux-pingi.de>
+To: Recipients <bambang.prasodjo@customs.go.id>
 
-On Tue, Jul 12, 2016 at 6:08 PM, Russell King - ARM Linux
-<linux@armlinux.org.uk> wrote:
-> On Tue, Jul 12, 2016 at 03:45:56PM -0400, Kees Cook wrote:
->> On Mon, Jul 4, 2016 at 7:40 PM, Emese Revfy <re.emese@gmail.com> wrote:
->> > If a function is called by __init and __exit functions as well then
->> > the plugin moves it to the __exit section. This causes false positive
->> > section mismatch errors/warnings that I don't know how to handle yet.
->>
->> Should the mismatch checker be updated to recognize this case? Without
->> the plugin, I assume these kinds of functions would only ever be
->> marked for __exit? If so, should the plugin strip the __init marking
->> and only add __exit?
->
-> That sounds like a problem for architectures that still discard the
-> __exit section at link time to reduce the size of the linked kernel
-> image - though, obviously, if using the plugin results in a smaller
-> kernel image _with_ the exit sections, then there's a net benefit
-> size-wise.
+Hae lainaa 3% vastaus tähän viestiin lisätietoja
 
-Ah right, __exit is dropped for non-modular builds. So, for "both
-__init and __exit" it sounds like the behavior depends on the build:
-
-- if modular: remove __init marking (since we need it after init)
-- if non-modular: remove __exit marking (since we'll never call exit)
-
-Is this something the build itself (rather than the plugin) could
-notice and fix up? Hmmm
-
--Kees
-
--- 
-Kees Cook
-Chrome OS & Brillo Security
+Apply for a loan at 3% reply to this Email for more Info
