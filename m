@@ -1,67 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:25043 "EHLO
-	conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751463AbcGPP2H (ORCPT
+Received: from mout.kundenserver.de ([217.72.192.73]:63670 "EHLO
+	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751370AbcGRMBv (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 16 Jul 2016 11:28:07 -0400
+	Mon, 18 Jul 2016 08:01:51 -0400
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: running "make dtbs" for test builds
+Date: Mon, 18 Jul 2016 14:01:17 +0200
+Message-ID: <8924490.SntxSU2FOC@wuerfel>
 MIME-Version: 1.0
-In-Reply-To: <20160713223433.GA20475@mwanda>
-References: <20160713223433.GA20475@mwanda>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sun, 17 Jul 2016 00:27:37 +0900
-Message-ID: <CAK7LNAS7EP+rJ2i8jxwRSA=LtXo-tCMkVez6QGg0DjkH7pwJ4w@mail.gmail.com>
-Subject: Re: [patch] kconfig: Add some missing curly braces
-Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dan Carpenter <dan.carpenter@oracle.com>
-Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, "Luis R. Rodriguez" <mcgrof@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org, Michal Marek <mmarek@suse.com>
+To: Fengguang Wu <lkp@intel.com>
+Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, Fengguang Wu <fengguang.wu@intel.com>, Thierry Reding <thierry.reding@gmail.com>, devicetree@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-2016-07-14 7:34 GMT+09:00 Dan Carpenter <dan.carpenter@oracle.com>:
-> There are missing curly braces here so we print some stuff to stderr
-> which we hadn't intended.
->
-> Fixes: 1c199f2878f6 ('kbuild: document recursive dependency limitation / resolution')
-> Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
->
-> diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
-> index 2432298..ff0feab 100644
-> --- a/scripts/kconfig/symbol.c
-> +++ b/scripts/kconfig/symbol.c
-> @@ -1127,11 +1127,12 @@ static void sym_check_print_recursive(struct symbol *last_sym)
->                                         break;
->                         }
->                 }
-> -               if (stack->sym == last_sym)
-> +               if (stack->sym == last_sym) {
->                         fprintf(stderr, "%s:%d:error: recursive dependency detected!\n",
->                                 prop->file->name, prop->lineno);
->                         fprintf(stderr, "For a resolution refer to Documentation/kbuild/kconfig-language.txt\n");
->                         fprintf(stderr, "subsection \"Kconfig recursive dependency limitations\"\n");
-> +               }
->                 if (stack->expr) {
->                         fprintf(stderr, "%s:%d:\tsymbol %s %s value contains %s\n",
->                                 prop->file->name, prop->lineno,
+Hi Fengguang,
 
+I've recently run into a number of cases in which I pulled a branch that
+was building fine with "make vmlinux", but that failed for "make dtbs",
+and I wonder if this is something that could be checked by the kbuild
+test robot so we catch it earlier.
 
+There are parts of this:
 
-Good catch!
+- running "make" without a target will build the default image file
+  and also do the "dtbs" target on ARM and other architectures. I
+  don't know if this is what you do, or if you always build
+  "make vmlinux ; make modules", which doesn't include it.
+  The dtbs makefile target is available on arc, arm, arm64, h8300,
+  metag, mips, nios2, and xtensa but not the others, so if you
+  call it explicitly, that has to be in an architecture specific
+  way.
 
+- setting CONFIG_OF_ALL_DTBS will catch all files, not just the
+  ones that are built by default for the set of configurations you
+  have. It's possible to simply override this on the command line,
+  using "make CONFIG_OF_ALL_DTBS=y", it doesn't actually have to
+  be part of the configuration. The result is independent of the
+  actual configuration, so it should be enough to do this once
+  per architecture and source revision.
 
-BTW, another solution is to concatenate three messages into one.
+Is this something you can add?
 
-if (stack->sym == last_sym)
-         fprintf(stderr,
-                 "%s:%d:error: recursive dependency detected!\n"
-                 "For a resolution refer to
-Documentation/kbuild/kconfig-language.txt\n"
-                 "subsection \"Kconfig recursive dependency limitations\"\n",
-                 prop->file->name, prop->lineno);
-
-
-Personally, I prefer this.
-It may be a matter of taste, though.
-
--- 
-Best Regards
-Masahiro Yamada
+	Arnd
