@@ -1,56 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga11.intel.com ([192.55.52.93]:8056 "EHLO mga11.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1751432AbcGRNAq (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 18 Jul 2016 09:00:46 -0400
-Date: Mon, 18 Jul 2016 21:00:39 +0800
-From: Fengguang Wu <lkp@intel.com>
-Subject: Re: running "make dtbs" for test builds
-Message-ID: <20160718130039.GA31368@wfg-t540p.sh.intel.com>
-References: <8924490.SntxSU2FOC@wuerfel>
- <20160718124122.GA30497@wfg-t540p.sh.intel.com>
- <1725840.UfqkDuJ4HB@wuerfel>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <1725840.UfqkDuJ4HB@wuerfel>
+Received: from mout.kundenserver.de ([212.227.126.133]:64511 "EHLO
+	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751320AbcGRQBc (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 18 Jul 2016 12:01:32 -0400
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH] kconfig: tinyconfig: provide whole choice blocks to avoid warnings
+Date: Mon, 18 Jul 2016 18:00:23 +0200
+Message-Id: <20160718160035.3062818-1-arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org, Thierry Reding <thierry.reding@gmail.com>, linux-kernel@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Michal Marek <mmarek@suse.cz>, "Yann E . MORIN" <yann.morin.1998@free.fr>, Josh Triplett <josh@joshtriplett.org>, Darren Hart <dvhart@linux.intel.com>, kernel-build-reports@lists.linaro.org, Thiago Macieira <thiago.macieira@intel.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Arnd Bergmann <arnd@arndb.de>
 
-On Mon, Jul 18, 2016 at 02:52:32PM +0200, Arnd Bergmann wrote:
->On Monday, July 18, 2016 8:41:22 PM CEST Fengguang Wu wrote:
->> Hi Arnd,
->>
->> On Mon, Jul 18, 2016 at 02:01:17PM +0200, Arnd Bergmann wrote:
->> >Hi Fengguang,
->> >
->> >I've recently run into a number of cases in which I pulled a branch that
->> >was building fine with "make vmlinux", but that failed for "make dtbs",
->> >and I wonder if this is something that could be checked by the kbuild
->> >test robot so we catch it earlier.
->>
->> We initially run "make" without vmlinux, however during bisect more
->> specific make targets will be used to speed it up. To do that it's
->> necessary to know the regex patterns of "make dtbs" error messages,
->> so that they can be correctly bisected.
->>
->> Can you give some "make dtbs" error messages or patterns?
->>
->
->A typical error looks like
->
->Error: arch/arm/boot/dts/sun7i-a20-bananapi-m1-plus.dts:252.1-18 Label or path usb_power_supply not found
->FATAL ERROR: Syntax error parsing input tree
->scripts/Makefile.lib:312: recipe for target 'arch/arm/boot/dts/sun7i-a20-bananapi-m1-plus.dtb' failed
->make[3]: *** [arch/arm/boot/dts/sun7i-a20-bananapi-m1-plus.dtb] Error 1
->
->There should be almost 100% correlation between seeing "arch/${ARCH}/boot/dts/"
->in stderr and having a problem in the "make dtbs" stage.
+Using "make tinyconfig" produces a couple of annoying warnings that show up
+for build test machines all the time:
 
-Got it, thank you for the tips!
+    .config:966:warning: override: NOHIGHMEM changes choice state
+    .config:965:warning: override: SLOB changes choice state
+    .config:963:warning: override: KERNEL_XZ changes choice state
+    .config:962:warning: override: CC_OPTIMIZE_FOR_SIZE changes choice state
+    .config:933:warning: override: SLOB changes choice state
+    .config:930:warning: override: CC_OPTIMIZE_FOR_SIZE changes choice state
+    .config:870:warning: override: SLOB changes choice state
+    .config:868:warning: override: KERNEL_XZ changes choice state
+    .config:867:warning: override: CC_OPTIMIZE_FOR_SIZE changes choice state
 
-Regards,
-Fengguang
+I've made a previous attempt at fixing them and we discussed a number of
+alternatives.
+
+I tried changing the Makefile to use "merge_config.sh -n $(fragment-list)"
+but couldn't get that to work properly.
+
+This is yet another approach, based on the observation that we do want
+to see a warning for conflicting 'choice' options, and that we can simply
+make them non-conflicting by listing all other options as disabled.
+This is a trivial patch that we can apply independent of plans for other
+changes.
+
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Link: https://storage.kernelci.org/mainline/v4.7-rc6/x86-tinyconfig/build.log
+https://patchwork.kernel.org/patch/9212749/
+---
+ kernel/configs/tiny.config | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/kernel/configs/tiny.config b/kernel/configs/tiny.config
+index c2de56ab0fce..3eeade4d876d 100644
+--- a/kernel/configs/tiny.config
++++ b/kernel/configs/tiny.config
+@@ -1,4 +1,12 @@
+ CONFIG_CC_OPTIMIZE_FOR_SIZE=y
++# CONFIG_CC_OPTIMIZE_FOR_PERFORMANCE is not set
+ CONFIG_KERNEL_XZ=y
++# CONFIG_KERNEL_GZIP is not set
++# CONFIG_KERNEL_BZIP2 is not set
++# CONFIG_KERNEL_LZMA is not set
++# CONFIG_KERNEL_LZO is not set
++# CONFIG_KERNEL_LZ4 is not set
+ CONFIG_OPTIMIZE_INLINING=y
++# CONFIG_SLUB is not set
++# CONFIG_SLAB is not set
+ CONFIG_SLOB=y
+-- 
+2.9.0
 
