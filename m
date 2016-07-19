@@ -1,36 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:36696 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752622AbcGSJhN (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 19 Jul 2016 05:37:13 -0400
-Date: Tue, 19 Jul 2016 11:37:09 +0200
-From: Michal Marek <mmarek@suse.com>
-Subject: Re: [REPOST 2, PATCH] builddeb: really include objtool binary in
- headers package
-Message-ID: <20160719093709.GA12864@sepie.suse.cz>
-References: <20160628122133.GE3554@kaos.lebenslange-mailadresse.de>
+Received: from smtp.codeaurora.org ([198.145.29.96]:44829 "EHLO
+	smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1752891AbcGSOdu (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 19 Jul 2016 10:33:50 -0400
+From: Kalle Valo <kvalo@codeaurora.org>
+Subject: Re: [PATCH v2 05/11] Kbuild: don't add obj tree in additional includes
+References: <20160615154553.3177021-1-arnd@arndb.de>
+	<20160615154553.3177021-6-arnd@arndb.de>
+	<20160718201439.GA9053@sepie.suse.cz> <21521763.EfAflxWUP8@wuerfel>
+Date: Tue, 19 Jul 2016 17:33:44 +0300
+In-Reply-To: <21521763.EfAflxWUP8@wuerfel> (Arnd Bergmann's message of "Tue,
+	19 Jul 2016 10:31:26 +0200")
+Message-ID: <87a8hdae9j.fsf@purkki.adurom.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20160628122133.GE3554@kaos.lebenslange-mailadresse.de>
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, bjorn@mork.no, mmarek@suse.cz
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: linux-arm-kernel@lists.infradead.org, Michal Marek <mmarek@suse.com>, netdev@vger.kernel.org, dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, akpm <akpm@linux-foundation.org>, linux-wireless@vger.kernel.org
 
-On Tue, Jun 28, 2016 at 12:21:33PM +0000, Wilfried Klaebe wrote:
-> [added linux-kbuild@vger.kernel.org to Cc:, added Fixes:]
-> 
-> On May 4th, Bjørn Mork provided patch
-> 697bbc7b832048d3a679cd55caf2268a325efbe0 to include objtool binaries in
-> the headers package. However, that one only works if $srctree=$objtree,
-> because the objtool binaries are not written to the srctree, but
-> to the objtree.
-> 
-> Signed-off-by: Wilfried Klaebe <linux-kernel@lebenslange-mailadresse.de>
-> Fixes: 697bbc7b8320 ("builddeb: include objtool binary in headers package")
+Arnd Bergmann <arnd@arndb.de> writes:
 
-Applied to kbuild.git#misc.
+> On Monday, July 18, 2016 10:14:39 PM CEST Michal Marek wrote:
+>> On Wed, Jun 15, 2016 at 05:45:47PM +0200, Arnd Bergmann wrote:
+>> > When building with separate object directories and driver specific
+>> > Makefiles that add additional header include paths, Kbuild adjusts
+>> > the gcc flags so that we include both the directory in the source
+>> > tree and in the object tree.
+>> > 
+>> > However, due to another bug I fixed earlier, this did not actually
+>> > include the correct directory in the object tree, so we know that
+>> > we only really need the source tree here. Also, including the
+>> > object tree sometimes causes warnings about nonexisting directories
+>> > when the include path only exists in the source.
+>> > 
+>> > This changes the logic to only emit the -I argument for the srctree,
+>> > not for objects. We still need both $(srctree)/$(src) and $(obj)
+>> > though, so I'm adding them manually.
+>> > 
+>> > Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+>> 
+>> Hi Arnd,
+>> 
+>> I applied the series up to this patch to kbuild.git#kbuild. The rest
+>> seem to be related but not dependent patches, so I'll leave it up to the
+>> respective maintainers to pick them up. Is that OK with you?
+>
+> I think that's fine, a couple were already picked up, and what I have
+> left now is
+>
+> a281bfa5713a [SUBMITTED 20160615] [EXPERIMENTAL] Kbuild: enable -Wmissing-include-dirs by default
+> 83934921e68e [SUBMITTED 20160615] rtlwifi: don't add include path for rtl8188ee
 
-Thanks,
-Michal
+Apparently[1] you didn't CC linux-wireless and that's why I didn't see
+the rtlwifi patch in wireless patchwork. Care to resend?
+
+[1] https://patchwork.kernel.org/patch/9178861/
+
+-- 
+Kalle Valo
