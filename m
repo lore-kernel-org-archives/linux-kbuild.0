@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.136]:53384 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.136]:53588 "EHLO mail.kernel.org"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1754515AbcGVVZe (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 22 Jul 2016 17:25:34 -0400
+	id S1754599AbcGVVZl (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 22 Jul 2016 17:25:41 -0400
 From: "Luis R. Rodriguez" <mcgrof@kernel.org>
-Subject: [RFC v3 11/13] dynamic_debug: port to use linker tables
-Date: Fri, 22 Jul 2016 14:24:45 -0700
-Message-Id: <1469222687-1600-12-git-send-email-mcgrof@kernel.org>
+Subject: [RFC v3 13/13] kprobes: port blacklist kprobes to linker table
+Date: Fri, 22 Jul 2016 14:24:47 -0700
+Message-Id: <1469222687-1600-14-git-send-email-mcgrof@kernel.org>
 In-Reply-To: <1469222687-1600-1-git-send-email-mcgrof@kernel.org>
 References: <1469222687-1600-1-git-send-email-mcgrof@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -14,137 +14,133 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: hpa@zytor.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, linux@arm.linux.org.uk, mhiramat@kernel.org, masami.hiramatsu.pt@hitachi.com, jbaron@akamai.com, heiko.carstens@de.ibm.com, ananth@linux.vnet.ibm.com, anil.s.keshavamurthy@intel.com, davem@davemloft.net, realmz6@gmail.com
 Cc: x86@kernel.org, luto@amacapital.net, keescook@chromium.org, torvalds@linux-foundation.org, gregkh@linuxfoundation.org, rusty@rustcorp.com.au, gnomes@lxorguk.ukuu.org.uk, alan@linux.intel.com, dwmw2@infradead.org, arnd@arndb.de, ming.lei@canonical.com, linux-arch@vger.kernel.org, benh@kernel.crashing.org, ananth@in.ibm.com, pebolle@tiscali.nl, fontana@sharpeleven.org, ciaran.farrell@suse.com, christopher.denicolo@suse.com, david.vrabel@citrix.com, konrad.wilk@oracle.com, mcb30@ipxe.org, jgross@suse.com, andrew.cooper3@citrix.com, andriy.shevchenko@linux.intel.com, paul.gortmaker@windriver.com, xen-devel@lists.xensource.com, ak@linux.intel.com, pali.rohar@gmail.com, dvhart@infradead.org, platform-driver-x86@vger.kernel.org, mmarek@suse.com, linux@rasmusvillemoes.dk, jkosina@suse.cz, korea.drzix@gmail.com, linux-kbuild@vger.kernel.org, tony.luck@intel.com, akpm@linux-foundation.org, linux-ia64@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sh@vger.kernel.org, sparclinux@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com, rostedt@goodmis.org, jpoimboe@redhat.com, "Luis R. Rodriguez" <mcgrof@kernel.org>
 
-This removes the custom vmlinux.lds.h hacks and uses
-the generalized solution for .data (SECTION_DATA)
-entries.
+kprobe makes use of two sections, the one dealing with the actual
+kprobes was recently ported using the standard section range API.
+The blacklist functionality of kprobes is still using a custom
+section and declaring its custom section using the linker script
+as follows:
 
-This is much more potential for further fine tuning here
-though in the future. For instance, linker tables enable
-an extra postfix for order level annotations, this could
-easily be used as the KBUILD_MODNAME and with a bit of
-linker table changes we may be able to get a direct O(1)
-count of the entries for that KBUILD_MODNAME: it would
-just be a count on the number of entries for the given
-order level. This should help make dynamic_debug_init()
-cleaner and also reduce the amount of time it takes at
-boot time. Instead of iterating over each print until we
-have all for a KBUILD_MODNAME, we'd instead directly
-operate on each KBUILD_MODNAME directly.
+type  Linux-section custom section name  begin                    end
+table .init.data    _kprobe_blacklist    __start_kprobe_blacklist __stop_kprobe_blacklist
 
-Tested dynamic debug with dyndbg query ana debugfs control
-and it works as expected, for both built-in code and modules.
+This ports the _kprobe_blacklist custom section to the standard
+Linux linker table API allowing us remove all the custom blacklist
+kprobe section declarations from the linker script.
 
-v3: added modular support
-v2: introduced this patch into the series
+This has been tested by trying to register a kprobe on a blacklisted
+symbol (these are declared with NOKPROBE_SYMBOL()), and confirms that
+this fails to work as expected. This was tested with:
+
+ # insmod samples/kprobes/kprobe_example.ko symbol="get_kprobe"
+
+This fails to load as expected with:
+
+insmod: ERROR: could not insert module samples/kprobes/kprobe_example.ko: Invalid parameters
+
+v3: this patch was introduced in this series
 
 Signed-off-by: Luis R. Rodriguez <mcgrof@kernel.org>
 ---
- include/asm-generic/vmlinux.lds.h |  5 -----
- include/linux/dynamic_debug.h     |  5 +++--
- lib/dynamic_debug.c               | 13 ++++++-------
- scripts/module-common.lds.S       |  1 +
- 4 files changed, 10 insertions(+), 14 deletions(-)
+ include/asm-generic/vmlinux.lds.h | 10 ----------
+ include/linux/kprobes.h           |  5 +++--
+ kernel/kprobes.c                  | 11 ++++-------
+ 3 files changed, 7 insertions(+), 19 deletions(-)
 
 diff --git a/include/asm-generic/vmlinux.lds.h b/include/asm-generic/vmlinux.lds.h
-index e186432a82e6..8048242b6a76 100644
+index 1664050e6560..0e4df8c61c18 100644
 --- a/include/asm-generic/vmlinux.lds.h
 +++ b/include/asm-generic/vmlinux.lds.h
-@@ -209,11 +209,6 @@
- 	*(.data.unlikely)						\
- 	STRUCT_ALIGN();							\
- 	*(__tracepoints)						\
--	/* implement dynamic printk debug */				\
--	. = ALIGN(8);							\
--	VMLINUX_SYMBOL(__start___verbose) = .;                          \
--	*(__verbose)                                                    \
--	VMLINUX_SYMBOL(__stop___verbose) = .;				\
- 	LIKELY_PROFILE()		       				\
- 	BRANCH_PROFILE()						\
- 	TRACE_PRINTKS()							\
-diff --git a/include/linux/dynamic_debug.h b/include/linux/dynamic_debug.h
-index 546d68057e3b..a52618a77b09 100644
---- a/include/linux/dynamic_debug.h
-+++ b/include/linux/dynamic_debug.h
-@@ -4,6 +4,7 @@
- #if defined(CC_HAVE_ASM_GOTO) && defined(CONFIG_JUMP_LABEL)
- #include <linux/jump_label.h>
+@@ -113,15 +113,6 @@
+ #define BRANCH_PROFILE()
  #endif
+ 
+-#ifdef CONFIG_KPROBES
+-#define KPROBE_BLACKLIST()	. = ALIGN(8);				      \
+-				VMLINUX_SYMBOL(__start_kprobe_blacklist) = .; \
+-				*(_kprobe_blacklist)			      \
+-				VMLINUX_SYMBOL(__stop_kprobe_blacklist) = .;
+-#else
+-#define KPROBE_BLACKLIST()
+-#endif
+-
+ #ifdef CONFIG_EVENT_TRACING
+ #define FTRACE_EVENTS()	. = ALIGN(8);					\
+ 			VMLINUX_SYMBOL(__start_ftrace_events) = .;	\
+@@ -519,7 +510,6 @@
+ 	*(SECTION_INIT_RODATA)						\
+ 	FTRACE_EVENTS()							\
+ 	TRACE_SYSCALLS()						\
+-	KPROBE_BLACKLIST()						\
+ 	MEM_DISCARD(init.rodata)					\
+ 	CLK_OF_TABLES()							\
+ 	RESERVEDMEM_OF_TABLES()						\
+diff --git a/include/linux/kprobes.h b/include/linux/kprobes.h
+index 3f46b282a3f9..c9bb9caef70c 100644
+--- a/include/linux/kprobes.h
++++ b/include/linux/kprobes.h
+@@ -43,9 +43,11 @@
+ 
+ #ifdef CONFIG_KPROBES
+ #include <linux/ranges.h>
 +#include <linux/tables.h>
+ #include <asm/kprobes.h>
  
- /*
-  * An instance of this structure is created in a special
-@@ -50,6 +51,7 @@ int ddebug_add_module(struct _ddebug *tab, unsigned int n,
- 				const char *modname);
+ DECLARE_SECTION_RANGE(kprobes);
++DECLARE_LINKTABLE(unsigned long, _kprobe_blacklist);
  
- #if defined(CONFIG_DYNAMIC_DEBUG)
-+DECLARE_LINKTABLE(struct _ddebug, __verbose);
- extern int ddebug_remove_module(const char *mod_name);
- extern __printf(2, 3)
- void __dynamic_pr_debug(struct _ddebug *descriptor, const char *fmt, ...);
-@@ -71,8 +73,7 @@ void __dynamic_netdev_dbg(struct _ddebug *descriptor,
- 			  const char *fmt, ...);
+ /* kprobe_status settings */
+ #define KPROBE_HIT_ACTIVE	0x00000001
+@@ -490,8 +492,7 @@ static inline int enable_jprobe(struct jprobe *jp)
+  * by using this macro.
+  */
+ #define __NOKPROBE_SYMBOL(fname)			\
+-static unsigned long __used				\
+-	__attribute__((section("_kprobe_blacklist")))	\
++static LINKTABLE_INIT_DATA(_kprobe_blacklist, all)		\
+ 	_kbl_addr_##fname = (unsigned long)fname;
+ #define NOKPROBE_SYMBOL(fname)	__NOKPROBE_SYMBOL(fname)
+ #else
+diff --git a/kernel/kprobes.c b/kernel/kprobes.c
+index 387605682622..4801aa3b4adf 100644
+--- a/kernel/kprobes.c
++++ b/kernel/kprobes.c
+@@ -2053,14 +2053,13 @@ NOKPROBE_SYMBOL(dump_kprobe);
+  * since a kprobe need not necessarily be at the beginning
+  * of a function.
+  */
+-static int __init populate_kprobe_blacklist(unsigned long *start,
+-					     unsigned long *end)
++static int __init populate_kprobe_blacklist(void)
+ {
+ 	unsigned long *iter;
+ 	struct kprobe_blacklist_entry *ent;
+ 	unsigned long entry, offset = 0, size = 0;
  
- #define DEFINE_DYNAMIC_DEBUG_METADATA_KEY(name, fmt, key, init)	\
--	static struct _ddebug  __aligned(8)			\
--	__attribute__((section("__verbose"))) name = {		\
-+	static LINKTABLE(__verbose, SECTION_ORDER_ANY) name = {	\
- 		.modname = KBUILD_MODNAME,			\
- 		.function = __func__,				\
- 		.filename = __FILE__,				\
-diff --git a/lib/dynamic_debug.c b/lib/dynamic_debug.c
-index da796e2dc4f5..f0060c84c654 100644
---- a/lib/dynamic_debug.c
-+++ b/lib/dynamic_debug.c
-@@ -37,8 +37,7 @@
- #include <linux/device.h>
- #include <linux/netdevice.h>
+-	for (iter = start; iter < end; iter++) {
++	LINKTABLE_FOR_EACH(iter, _kprobe_blacklist) {
+ 		entry = arch_deref_entry_point((void *)*iter);
  
--extern struct _ddebug __start___verbose[];
--extern struct _ddebug __stop___verbose[];
-+DEFINE_LINKTABLE(struct _ddebug, __verbose);
+ 		if (!kernel_text_address(entry) ||
+@@ -2125,8 +2124,7 @@ static struct notifier_block kprobe_module_nb = {
+ };
  
- struct ddebug_table {
- 	struct list_head link;
-@@ -978,14 +977,14 @@ static int __init dynamic_debug_init(void)
- 	int n = 0, entries = 0, modct = 0;
- 	int verbose_bytes = 0;
+ /* Markers of _kprobe_blacklist section */
+-extern unsigned long __start_kprobe_blacklist[];
+-extern unsigned long __stop_kprobe_blacklist[];
++DEFINE_LINKTABLE_INIT_DATA(unsigned long, _kprobe_blacklist);
  
--	if (__start___verbose == __stop___verbose) {
--		pr_warn("_ddebug table is empty in a CONFIG_DYNAMIC_DEBUG build\n");
-+	if (LINUX_SECTION_EMPTY(__verbose)) {
-+		pr_warn("dynamic debug linker table empty on CONFIG_DYNAMIC_DEBUG build\n");
- 		return 1;
+ /* Actual kprobes section range */
+ DEFINE_SECTION_RANGE(kprobes, SECTION_TEXT);
+@@ -2143,8 +2141,7 @@ static int __init init_kprobes(void)
+ 		raw_spin_lock_init(&(kretprobe_table_locks[i].lock));
  	}
--	iter = __start___verbose;
-+	iter = LINUX_SECTION_START(__verbose);
- 	modname = iter->modname;
- 	iter_start = iter;
--	for (; iter < __stop___verbose; iter++) {
-+	LINKTABLE_FOR_EACH(iter, __verbose) {
- 		entries++;
- 		verbose_bytes += strlen(iter->modname) + strlen(iter->function)
- 			+ strlen(iter->filename) + strlen(iter->format);
-@@ -1008,7 +1007,7 @@ static int __init dynamic_debug_init(void)
- 	ddebug_init_success = 1;
- 	vpr_info("%d modules, %d entries and %d bytes in ddebug tables, %d bytes in (readonly) verbose section\n",
- 		 modct, entries, (int)(modct * sizeof(struct ddebug_table)),
--		 verbose_bytes + (int)(__stop___verbose - __start___verbose));
-+		 verbose_bytes + (int)(LINUX_SECTION_SIZE(__verbose)));
  
- 	/* apply ddebug_query boot param, dont unload tables on err */
- 	if (ddebug_setup_string[0] != '\0') {
-diff --git a/scripts/module-common.lds.S b/scripts/module-common.lds.S
-index d51140103ece..fec57aa5f4f1 100644
---- a/scripts/module-common.lds.S
-+++ b/scripts/module-common.lds.S
-@@ -21,6 +21,7 @@ SECTIONS {
- 	__kcrctab_unused_gpl	0 : { *(SORT(___kcrctab_unused_gpl+*)) }
- 	__kcrctab_gpl_future	0 : { *(SORT(___kcrctab_gpl_future+*)) }
- 	__jump_table		0 : { *(SORT(SECTION_TBL(SECTION_DATA, __jump_table, *))) }
-+	__verbose		0 : { *(SORT(SECTION_TBL(SECTION_DATA, __verbose, *))) }
- 
- 	. = ALIGN(8);
- 	.init_array		0 : { *(SORT(.init_array.*)) *(.init_array) }
+-	err = populate_kprobe_blacklist(__start_kprobe_blacklist,
+-					__stop_kprobe_blacklist);
++	err = populate_kprobe_blacklist();
+ 	if (err) {
+ 		pr_err("kprobes: failed to populate blacklist: %d\n", err);
+ 		pr_err("Please take care of using kprobes.\n");
 -- 
 2.8.4
 
