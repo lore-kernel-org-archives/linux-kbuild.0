@@ -1,43 +1,30 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:48065 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:48732 "EHLO mx2.suse.de"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1757308AbcGZU1b (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 26 Jul 2016 16:27:31 -0400
-Subject: Re: [PATCHv2] builddeb: fix file permissions before packaging
-References: <57920E64.2030502@suse.com>
- <1469191612-21934-1-git-send-email-henning.schild@siemens.com>
+	id S1756109AbcGZUkH (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 26 Jul 2016 16:40:07 -0400
+Subject: Re: Officially vetted programming languages
+References: <CACVxJT-YRukBirLwzeiC0agZurR28J7u2EdNo9QjQTEN_C3x8w@mail.gmail.com>
 From: Michal Marek <mmarek@suse.com>
-Message-ID: <5797C7A7.90907@suse.com>
-Date: Tue, 26 Jul 2016 22:27:19 +0200
+Message-ID: <5797CA9D.1090803@suse.com>
+Date: Tue, 26 Jul 2016 22:39:57 +0200
 MIME-Version: 1.0
-In-Reply-To: <1469191612-21934-1-git-send-email-henning.schild@siemens.com>
-Content-Type: text/plain; charset=iso-8859-2
+In-Reply-To: <CACVxJT-YRukBirLwzeiC0agZurR28J7u2EdNo9QjQTEN_C3x8w@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Henning Schild <henning.schild@siemens.com>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Alexey Dobriyan <adobriyan@gmail.com>
+Cc: linux-kbuild@vger.kernel.org
 
-Dne 22.7.2016 v 14:46 Henning Schild napsal(a):
-> Builddep is not very explicit about file permissions. Actually the file
-> permissions in the package are largely influenced by the umask of the
-> user cloning the git and building the package. If that umask does not
-> set go+r the resulting linux-headers package will prevent non-root users
-> from building out-of-tree modules. And that is probably just one
-> unexpected effect.
-> Being a packaging/install tool builddep should make sure the file
-> permissions are set correctly and not just derived from a value that is
-> never checked.
-> 
-> This patch sets ugo read permissions for all packaged files and derives
-> the executable bit for directories and executables from the file-owner.
-> 
-> Signed-off-by: Henning Schild <henning.schild@siemens.com>
-> ---
->  scripts/package/builddeb | 2 ++
->  1 file changed, 2 insertions(+)
+Dne 25.7.2016 v 15:11 Alexey Dobriyan napsal(a):
+> Do I understand correctly that POSIX sh and GNU make are
+> the only acceptable languages in kernel build
 
-Applied to kbuild.git#misc, thanks.
+Also sed, awk and bc. Perl is required to some extent (by
+headers_install and some arch drivers). Plus ia64 has a python script.
+But you would need to provide a compelling reason for introducing
+another build dependency.
 
 Michal
 
