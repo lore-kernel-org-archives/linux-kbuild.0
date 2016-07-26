@@ -1,84 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f67.google.com ([74.125.82.67]:36502 "EHLO
-	mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1757322AbcGZUZF (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 26 Jul 2016 16:25:05 -0400
-Date: Tue, 26 Jul 2016 22:43:27 +0200
-From: Emese Revfy <re.emese@gmail.com>
-Subject: [PATCH v3 7/7] Mark functions with the __unverified_nocapture
- attribute
-Message-Id: <20160726224327.c9b41ba7c1c37771f49968ce@gmail.com>
-In-Reply-To: <20160726223541.513ce76f6de65389da6a6abe@gmail.com>
-References: <20160726223541.513ce76f6de65389da6a6abe@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Received: from mx2.suse.de ([195.135.220.15]:48065 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1757308AbcGZU1b (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 26 Jul 2016 16:27:31 -0400
+Subject: Re: [PATCHv2] builddeb: fix file permissions before packaging
+References: <57920E64.2030502@suse.com>
+ <1469191612-21934-1-git-send-email-henning.schild@siemens.com>
+From: Michal Marek <mmarek@suse.com>
+Message-ID: <5797C7A7.90907@suse.com>
+Date: Tue, 26 Jul 2016 22:27:19 +0200
+MIME-Version: 1.0
+In-Reply-To: <1469191612-21934-1-git-send-email-henning.schild@siemens.com>
+Content-Type: text/plain; charset=iso-8859-2
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: kernel-hardening@lists.openwall.com
-Cc: pageexec@freemail.hu, spender@grsecurity.net, mmarek@suse.com, keescook@chromium.org, linux-kernel@vger.kernel.org, yamada.masahiro@socionext.com, linux-kbuild@vger.kernel.org, minipli@ld-linux.so, linux@armlinux.org.uk, catalin.marinas@arm.com, linux@rasmusvillemoes.dk, david.brown@linaro.org, benh@kernel.crashing.org, tglx@linutronix.de, akpm@linux-foundation.org, jlayton@poochiereds.net, arnd@arndb.de, sam@ravnborg.org, isdn@linux-pingi.de
+To: Henning Schild <henning.schild@siemens.com>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-This attribute disables the compile data flow verification of the
-designated nocapture parameters of the function. Use it only on function
-parameters that are difficult for the plugin to analyze.
+Dne 22.7.2016 v 14:46 Henning Schild napsal(a):
+> Builddep is not very explicit about file permissions. Actually the file
+> permissions in the package are largely influenced by the umask of the
+> user cloning the git and building the package. If that umask does not
+> set go+r the resulting linux-headers package will prevent non-root users
+> from building out-of-tree modules. And that is probably just one
+> unexpected effect.
+> Being a packaging/install tool builddep should make sure the file
+> permissions are set correctly and not just derived from a value that is
+> never checked.
+> 
+> This patch sets ugo read permissions for all packaged files and derives
+> the executable bit for directories and executables from the file-owner.
+> 
+> Signed-off-by: Henning Schild <henning.schild@siemens.com>
+> ---
+>  scripts/package/builddeb | 2 ++
+>  1 file changed, 2 insertions(+)
 
-Signed-off-by: Emese Revfy <re.emese@gmail.com>
----
- include/linux/compiler-gcc.h | 1 +
- include/linux/compiler.h     | 4 ++++
- lib/vsprintf.c               | 4 ++--
- 3 files changed, 7 insertions(+), 2 deletions(-)
+Applied to kbuild.git#misc, thanks.
 
-diff --git a/include/linux/compiler-gcc.h b/include/linux/compiler-gcc.h
-index 6697ea3..76797b9 100644
---- a/include/linux/compiler-gcc.h
-+++ b/include/linux/compiler-gcc.h
-@@ -207,6 +207,7 @@
-  */
- #ifdef INITIFY_PLUGIN
- #define __nocapture(...) __attribute__((nocapture(__VA_ARGS__)))
-+#define __unverified_nocapture(...) __attribute__((unverified_nocapture(__VA_ARGS__)))
- #endif
- 
- /*
-diff --git a/include/linux/compiler.h b/include/linux/compiler.h
-index 391b48b..f0b4156 100644
---- a/include/linux/compiler.h
-+++ b/include/linux/compiler.h
-@@ -416,6 +416,10 @@ static __always_inline void __write_once_size(volatile void *p, void *res, int s
- # define __nocapture(...)
- #endif
- 
-+#ifndef __unverified_nocapture
-+# define __unverified_nocapture(...)
-+#endif
-+
- /*
-  * Tell gcc if a function is cold. The compiler will assume any path
-  * directly leading to the call is unlikely.
-diff --git a/lib/vsprintf.c b/lib/vsprintf.c
-index a192761..cb964b5 100644
---- a/lib/vsprintf.c
-+++ b/lib/vsprintf.c
-@@ -118,7 +118,7 @@ long long simple_strtoll(const char *cp, char **endp, unsigned int base)
- }
- EXPORT_SYMBOL(simple_strtoll);
- 
--static noinline_for_stack __nocapture(1)
-+static noinline_for_stack __nocapture(1) __unverified_nocapture(1)
- int skip_atoi(const char **s)
- {
- 	int i = 0;
-@@ -1570,7 +1570,7 @@ int kptr_restrict __read_mostly;
-  * function pointers are really function descriptors, which contain a
-  * pointer to the real address.
-  */
--static noinline_for_stack __nocapture(1)
-+static noinline_for_stack __nocapture(1) __unverified_nocapture(1)
- char *pointer(const char *fmt, char *buf, char *end, void *ptr,
- 	      struct printf_spec spec)
- {
--- 
-2.8.1
+Michal
 
