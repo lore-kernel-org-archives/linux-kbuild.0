@@ -1,324 +1,114 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:35480 "EHLO
-	mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753301AbcG0PQI (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Wed, 27 Jul 2016 11:16:08 -0400
-Date: Wed, 27 Jul 2016 17:34:29 +0200
-From: Emese Revfy <re.emese@gmail.com>
-Subject: [PATCH v3 6/7] Mark a few functions with the printf attribute
-Message-Id: <20160727173429.35abb2002ff2f64f26558924@gmail.com>
-In-Reply-To: <20160726224234.c680b28a327365604664cb2b@gmail.com>
-References: <20160726223541.513ce76f6de65389da6a6abe@gmail.com>
-	<20160726224234.c680b28a327365604664cb2b@gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Received: from mx2.suse.de ([195.135.220.15]:50276 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1162965AbcG0Wkv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 27 Jul 2016 18:40:51 -0400
+Date: Thu, 28 Jul 2016 00:40:46 +0200
+From: "Luis R. Rodriguez" <mcgrof@kernel.org>
+Subject: Re: [RFC v3 12/13] kprobes: port .kprobes.text to section range
+Message-ID: <20160727224046.GN5537@wotan.suse.de>
+References: <1469222687-1600-1-git-send-email-mcgrof@kernel.org>
+ <1469222687-1600-13-git-send-email-mcgrof@kernel.org>
+ <20160726001958.09b64d73e0bdda461ad1451c@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20160726001958.09b64d73e0bdda461ad1451c@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: kernel-hardening@lists.openwall.com
-Cc: pageexec@freemail.hu, spender@grsecurity.net, mmarek@suse.com, keescook@chromium.org, linux-kernel@vger.kernel.org, yamada.masahiro@socionext.com, linux-kbuild@vger.kernel.org, minipli@ld-linux.so, linux@armlinux.org.uk, catalin.marinas@arm.com, linux@rasmusvillemoes.dk, david.brown@linaro.org, benh@kernel.crashing.org, tglx@linutronix.de, akpm@linux-foundation.org, jlayton@poochiereds.net, arnd@arndb.de, sam@ravnborg.org, isdn@linux-pingi.de, robert.moore@intel.com, lv.zheng@intel.com
+To: Masami Hiramatsu <mhiramat@kernel.org>
+Cc: "Luis R. Rodriguez" <mcgrof@kernel.org>, hpa@zytor.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, linux@arm.linux.org.uk, masami.hiramatsu.pt@hitachi.com, jbaron@akamai.com, heiko.carstens@de.ibm.com, ananth@linux.vnet.ibm.com, anil.s.keshavamurthy@intel.com, davem@davemloft.net, realmz6@gmail.com, x86@kernel.org, luto@amacapital.net, keescook@chromium.org, torvalds@linux-foundation.org, gregkh@linuxfoundation.org, rusty@rustcorp.com.au, gnomes@lxorguk.ukuu.org.uk, alan@linux.intel.com, dwmw2@infradead.org, arnd@arndb.de, ming.lei@canonical.com, linux-arch@vger.kernel.org, benh@kernel.crashing.org, ananth@in.ibm.com, pebolle@tiscali.nl, fontana@sharpeleven.org, ciaran.farrell@suse.com, christopher.denicolo@suse.com, david.vrabel@citrix.com, konrad.wilk@oracle.com, mcb30@ipxe.org, jgross@suse.com, andrew.cooper3@citrix.com, andriy.shevchenko@linux.intel.com, paul.gortmaker@windriver.com, xen-devel@lists.xensource.com, ak@linux.intel.com, pali.rohar@gmail.com, dvhart@infradead.org, platform-driver-x86@vger.kernel.org, mmarek@suse.com, linux@rasmusvillemoes.dk, jkosina@suse.cz, korea.drzix@gmail.com, linux-kbuild@vger.kernel.org, tony.luck@intel.com, akpm@linux-foundation.org, linux-ia64@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sh@vger.kernel.org, sparclinux@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com, rostedt@goodmis.org, jpoimboe@redhat.com
 
-Fixed format strings warnings exposed by the printf attribute.
+On Tue, Jul 26, 2016 at 12:19:58AM +0900, Masami Hiramatsu wrote:
+> On Fri, 22 Jul 2016 14:24:46 -0700
+> "Luis R. Rodriguez" <mcgrof@kernel.org> wrote:
+> 
+> > kprobe makes use of two custom sections, each custom section
+> > is folded into one of the standard Linux sections types as follows,
+> > it currently relies on the linker script to fold the custom section
+> > onto the respective Linux section:
+> > 
+> > type  Linux-section custom section name  begin                    end
+> > table .init.data    _kprobe_blacklist    __start_kprobe_blacklist __stop_kprobe_blacklist
+> > range .text         .kprobes.text        __kprobes_text_start     __kprobes_text_end
+> > 
+> > This ports the .kprobes.text custom section to the standard
+> > Linux ranges API allowing us remove all the custom kprobe section
+> > declarations from the linker script.
+> > 
+> > Tested with CONFIG_KPROBES_SANITY_TEST, it passes with:
+> > 
+> > Kprobe smoke test: started
+> > Kprobe smoke test: passed successfully
+> > 
+> > Then tested CONFIG_SAMPLE_KPROBES on do_fork, and the kprobe bites
+> > and kicks as expected.
+> > 
+> > Also ran ./ftracetest with no issues:
+> > 
+> > $ sudo ./ftracetest
+> > === Ftrace unit tests ===
+> > [1] Basic trace file check      [PASS]
+> > [2] Basic test for tracers      [PASS]
+> > [3] Basic trace clock test      [PASS]
+> > [4] Basic event tracing check   [PASS]
+> > [5] event tracing - enable/disable with event level files       [PASS]
+> > [6] event tracing - restricts events based on pid       [PASS]
+> > [7] event tracing - enable/disable with subsystem level files   [PASS]
+> > [8] event tracing - enable/disable with top level files [PASS]
+> > [9] ftrace - function graph filters with stack tracer   [PASS]
+> > [10] ftrace - function graph filters    [PASS]
+> > [11] ftrace - function profiler with function tracing   [PASS]
+> > [12] Test creation and deletion of trace instances while setting an event[PASS]
+> > [13] Test creation and deletion of trace instances      [PASS]
+> > [14] Kprobe dynamic event - adding and removing [PASS]
+> > [15] Kprobe dynamic event - busy event check    [PASS]
+> > [16] Kprobe dynamic event with arguments        [PASS]
+> > [17] Kprobe dynamic event with function tracer  [PASS]
+> > [18] Kretprobe dynamic event with arguments     [PASS]
+> > [19] event trigger - test event enable/disable trigger  [PASS]
+> > [20] event trigger - test trigger filter        [PASS]
+> > [21] event trigger - test histogram modifiers   [PASS]
+> > [22] event trigger - test histogram trigger     [PASS]
+> > [23] event trigger - test multiple histogram triggers   [PASS]
+> > [24] event trigger - test snapshot-trigger      [PASS]
+> > [25] event trigger - test stacktrace-trigger    [PASS]
+> > [26] event trigger - test traceon/off trigger   [PASS]
+> > 
+> >  # of passed:  26
+> >  # of failed:  0
+> >  # of unresolved:  0
+> >  # of untested:  0
+> >  # of unsupported:  0
+> >  # of xfailed:  0
+> >  # of undefined(test bug):  0
+> 
+> Looks good to me except for the modpost part.
 
-Signed-off-by: Emese Revfy <re.emese@gmail.com>
----
- drivers/acpi/acpica/dbhistry.c     |  2 +-
- drivers/acpi/acpica/dbinput.c      | 10 ++---
- drivers/acpi/acpica/dbstats.c      | 88 +++++++++++++++++++-------------------
- drivers/acpi/acpica/utdebug.c      |  2 +-
- drivers/scsi/esas2r/esas2r_init.c  |  2 +-
- drivers/scsi/esas2r/esas2r_ioctl.c |  2 +-
- drivers/scsi/esas2r/esas2r_main.c  |  4 +-
- 7 files changed, 55 insertions(+), 55 deletions(-)
+OK thanks!
 
-diff --git a/drivers/acpi/acpica/dbhistry.c b/drivers/acpi/acpica/dbhistry.c
-index 46bd65d..ec9da48 100644
---- a/drivers/acpi/acpica/dbhistry.c
-+++ b/drivers/acpi/acpica/dbhistry.c
-@@ -155,7 +155,7 @@ void acpi_db_display_history(void)
- 
- 	for (i = 0; i < acpi_gbl_num_history; i++) {
- 		if (acpi_gbl_history_buffer[history_index].command) {
--			acpi_os_printf("%3ld %s\n",
-+			acpi_os_printf("%3u %s\n",
- 				       acpi_gbl_history_buffer[history_index].
- 				       cmd_num,
- 				       acpi_gbl_history_buffer[history_index].
-diff --git a/drivers/acpi/acpica/dbinput.c b/drivers/acpi/acpica/dbinput.c
-index 7cd5d2e..a837ce6 100644
---- a/drivers/acpi/acpica/dbinput.c
-+++ b/drivers/acpi/acpica/dbinput.c
-@@ -606,7 +606,7 @@ static u32 acpi_db_get_line(char *input_buffer)
- 	    (acpi_gbl_db_parsed_buf, sizeof(acpi_gbl_db_parsed_buf),
- 	     input_buffer)) {
- 		acpi_os_printf
--		    ("Buffer overflow while parsing input line (max %u characters)\n",
-+		    ("Buffer overflow while parsing input line (max %lu characters)\n",
- 		     sizeof(acpi_gbl_db_parsed_buf));
- 		return (0);
- 	}
-@@ -862,24 +862,24 @@ acpi_db_command_dispatch(char *input_buffer,
- 
- 		if (param_count == 0) {
- 			acpi_os_printf
--			    ("Current debug level for file output is:    %8.8lX\n",
-+			    ("Current debug level for file output is:    %8.8X\n",
- 			     acpi_gbl_db_debug_level);
- 			acpi_os_printf
--			    ("Current debug level for console output is: %8.8lX\n",
-+			    ("Current debug level for console output is: %8.8X\n",
- 			     acpi_gbl_db_console_debug_level);
- 		} else if (param_count == 2) {
- 			temp = acpi_gbl_db_console_debug_level;
- 			acpi_gbl_db_console_debug_level =
- 			    strtoul(acpi_gbl_db_args[1], NULL, 16);
- 			acpi_os_printf
--			    ("Debug Level for console output was %8.8lX, now %8.8lX\n",
-+			    ("Debug Level for console output was %8.8X, now %8.8X\n",
- 			     temp, acpi_gbl_db_console_debug_level);
- 		} else {
- 			temp = acpi_gbl_db_debug_level;
- 			acpi_gbl_db_debug_level =
- 			    strtoul(acpi_gbl_db_args[1], NULL, 16);
- 			acpi_os_printf
--			    ("Debug Level for file output was %8.8lX, now %8.8lX\n",
-+			    ("Debug Level for file output was %8.8X, now %8.8X\n",
- 			     temp, acpi_gbl_db_debug_level);
- 		}
- 		break;
-diff --git a/drivers/acpi/acpica/dbstats.c b/drivers/acpi/acpica/dbstats.c
-index a414e1f..de70230 100644
---- a/drivers/acpi/acpica/dbstats.c
-+++ b/drivers/acpi/acpica/dbstats.c
-@@ -377,17 +377,17 @@ acpi_status acpi_db_display_statistics(char *type_arg)
- 			       "ACPI_TYPE", "NODES", "OBJECTS");
- 
- 		for (i = 0; i < ACPI_TYPE_NS_NODE_MAX; i++) {
--			acpi_os_printf("%16.16s % 10ld% 10ld\n",
-+			acpi_os_printf("%16.16s % 10d% 10d\n",
- 				       acpi_ut_get_type_name(i),
- 				       acpi_gbl_node_type_count[i],
- 				       acpi_gbl_obj_type_count[i]);
- 		}
- 
--		acpi_os_printf("%16.16s % 10ld% 10ld\n", "Misc/Unknown",
-+		acpi_os_printf("%16.16s % 10d% 10d\n", "Misc/Unknown",
- 			       acpi_gbl_node_type_count_misc,
- 			       acpi_gbl_obj_type_count_misc);
- 
--		acpi_os_printf("%16.16s % 10ld% 10ld\n", "TOTALS:",
-+		acpi_os_printf("%16.16s % 10d% 10d\n", "TOTALS:",
- 			       acpi_gbl_num_nodes, acpi_gbl_num_objects);
- 		break;
- 
-@@ -415,16 +415,16 @@ acpi_status acpi_db_display_statistics(char *type_arg)
- 	case CMD_STAT_MISC:
- 
- 		acpi_os_printf("\nMiscellaneous Statistics:\n\n");
--		acpi_os_printf("Calls to AcpiPsFind:.. ........% 7ld\n",
-+		acpi_os_printf("Calls to AcpiPsFind:.. ........% 7u\n",
- 			       acpi_gbl_ps_find_count);
--		acpi_os_printf("Calls to AcpiNsLookup:..........% 7ld\n",
-+		acpi_os_printf("Calls to AcpiNsLookup:..........% 7u\n",
- 			       acpi_gbl_ns_lookup_count);
- 
- 		acpi_os_printf("\n");
- 
- 		acpi_os_printf("Mutex usage:\n\n");
- 		for (i = 0; i < ACPI_NUM_MUTEX; i++) {
--			acpi_os_printf("%-28s:     % 7ld\n",
-+			acpi_os_printf("%-28s:     % 7u\n",
- 				       acpi_ut_get_mutex_name(i),
- 				       acpi_gbl_mutex_info[i].use_count);
- 		}
-@@ -434,87 +434,87 @@ acpi_status acpi_db_display_statistics(char *type_arg)
- 
- 		acpi_os_printf("\nInternal object sizes:\n\n");
- 
--		acpi_os_printf("Common         %3d\n",
-+		acpi_os_printf("Common         %3lu\n",
- 			       sizeof(struct acpi_object_common));
--		acpi_os_printf("Number         %3d\n",
-+		acpi_os_printf("Number         %3lu\n",
- 			       sizeof(struct acpi_object_integer));
--		acpi_os_printf("String         %3d\n",
-+		acpi_os_printf("String         %3lu\n",
- 			       sizeof(struct acpi_object_string));
--		acpi_os_printf("Buffer         %3d\n",
-+		acpi_os_printf("Buffer         %3lu\n",
- 			       sizeof(struct acpi_object_buffer));
--		acpi_os_printf("Package        %3d\n",
-+		acpi_os_printf("Package        %3lu\n",
- 			       sizeof(struct acpi_object_package));
--		acpi_os_printf("BufferField    %3d\n",
-+		acpi_os_printf("BufferField    %3lu\n",
- 			       sizeof(struct acpi_object_buffer_field));
--		acpi_os_printf("Device         %3d\n",
-+		acpi_os_printf("Device         %3lu\n",
- 			       sizeof(struct acpi_object_device));
--		acpi_os_printf("Event          %3d\n",
-+		acpi_os_printf("Event          %3lu\n",
- 			       sizeof(struct acpi_object_event));
--		acpi_os_printf("Method         %3d\n",
-+		acpi_os_printf("Method         %3lu\n",
- 			       sizeof(struct acpi_object_method));
--		acpi_os_printf("Mutex          %3d\n",
-+		acpi_os_printf("Mutex          %3lu\n",
- 			       sizeof(struct acpi_object_mutex));
--		acpi_os_printf("Region         %3d\n",
-+		acpi_os_printf("Region         %3lu\n",
- 			       sizeof(struct acpi_object_region));
--		acpi_os_printf("PowerResource  %3d\n",
-+		acpi_os_printf("PowerResource  %3lu\n",
- 			       sizeof(struct acpi_object_power_resource));
--		acpi_os_printf("Processor      %3d\n",
-+		acpi_os_printf("Processor      %3lu\n",
- 			       sizeof(struct acpi_object_processor));
--		acpi_os_printf("ThermalZone    %3d\n",
-+		acpi_os_printf("ThermalZone    %3lu\n",
- 			       sizeof(struct acpi_object_thermal_zone));
--		acpi_os_printf("RegionField    %3d\n",
-+		acpi_os_printf("RegionField    %3lu\n",
- 			       sizeof(struct acpi_object_region_field));
--		acpi_os_printf("BankField      %3d\n",
-+		acpi_os_printf("BankField      %3lu\n",
- 			       sizeof(struct acpi_object_bank_field));
--		acpi_os_printf("IndexField     %3d\n",
-+		acpi_os_printf("IndexField     %3lu\n",
- 			       sizeof(struct acpi_object_index_field));
--		acpi_os_printf("Reference      %3d\n",
-+		acpi_os_printf("Reference      %3lu\n",
- 			       sizeof(struct acpi_object_reference));
--		acpi_os_printf("Notify         %3d\n",
-+		acpi_os_printf("Notify         %3lu\n",
- 			       sizeof(struct acpi_object_notify_handler));
--		acpi_os_printf("AddressSpace   %3d\n",
-+		acpi_os_printf("AddressSpace   %3lu\n",
- 			       sizeof(struct acpi_object_addr_handler));
--		acpi_os_printf("Extra          %3d\n",
-+		acpi_os_printf("Extra          %3lu\n",
- 			       sizeof(struct acpi_object_extra));
--		acpi_os_printf("Data           %3d\n",
-+		acpi_os_printf("Data           %3lu\n",
- 			       sizeof(struct acpi_object_data));
- 
- 		acpi_os_printf("\n");
- 
--		acpi_os_printf("ParseObject    %3d\n",
-+		acpi_os_printf("ParseObject    %3lu\n",
- 			       sizeof(struct acpi_parse_obj_common));
--		acpi_os_printf("ParseObjectNamed %3d\n",
-+		acpi_os_printf("ParseObjectNamed %3lu\n",
- 			       sizeof(struct acpi_parse_obj_named));
--		acpi_os_printf("ParseObjectAsl %3d\n",
-+		acpi_os_printf("ParseObjectAsl %3lu\n",
- 			       sizeof(struct acpi_parse_obj_asl));
--		acpi_os_printf("OperandObject  %3d\n",
-+		acpi_os_printf("OperandObject  %3lu\n",
- 			       sizeof(union acpi_operand_object));
--		acpi_os_printf("NamespaceNode  %3d\n",
-+		acpi_os_printf("NamespaceNode  %3lu\n",
- 			       sizeof(struct acpi_namespace_node));
--		acpi_os_printf("AcpiObject     %3d\n",
-+		acpi_os_printf("AcpiObject     %3lu\n",
- 			       sizeof(union acpi_object));
- 
- 		acpi_os_printf("\n");
- 
--		acpi_os_printf("Generic State  %3d\n",
-+		acpi_os_printf("Generic State  %3lu\n",
- 			       sizeof(union acpi_generic_state));
--		acpi_os_printf("Common State   %3d\n",
-+		acpi_os_printf("Common State   %3lu\n",
- 			       sizeof(struct acpi_common_state));
--		acpi_os_printf("Control State  %3d\n",
-+		acpi_os_printf("Control State  %3lu\n",
- 			       sizeof(struct acpi_control_state));
--		acpi_os_printf("Update State   %3d\n",
-+		acpi_os_printf("Update State   %3lu\n",
- 			       sizeof(struct acpi_update_state));
--		acpi_os_printf("Scope State    %3d\n",
-+		acpi_os_printf("Scope State    %3lu\n",
- 			       sizeof(struct acpi_scope_state));
--		acpi_os_printf("Parse Scope    %3d\n",
-+		acpi_os_printf("Parse Scope    %3lu\n",
- 			       sizeof(struct acpi_pscope_state));
--		acpi_os_printf("Package State  %3d\n",
-+		acpi_os_printf("Package State  %3lu\n",
- 			       sizeof(struct acpi_pkg_state));
--		acpi_os_printf("Thread State   %3d\n",
-+		acpi_os_printf("Thread State   %3lu\n",
- 			       sizeof(struct acpi_thread_state));
--		acpi_os_printf("Result Values  %3d\n",
-+		acpi_os_printf("Result Values  %3lu\n",
- 			       sizeof(struct acpi_result_values));
--		acpi_os_printf("Notify Info    %3d\n",
-+		acpi_os_printf("Notify Info    %3lu\n",
- 			       sizeof(struct acpi_notify_info));
- 		break;
- 
-diff --git a/drivers/acpi/acpica/utdebug.c b/drivers/acpi/acpica/utdebug.c
-index 5744222..4ac231a 100644
---- a/drivers/acpi/acpica/utdebug.c
-+++ b/drivers/acpi/acpica/utdebug.c
-@@ -189,7 +189,7 @@ acpi_debug_print(u32 requested_debug_level,
- 	 * Display the module name, current line number, thread ID (if requested),
- 	 * current procedure nesting level, and the current procedure name
- 	 */
--	acpi_os_printf("%9s-%04ld ", module_name, line_number);
-+	acpi_os_printf("%9s-%04u ", module_name, line_number);
- 
- #ifdef ACPI_APPLICATION
- 	/*
-diff --git a/drivers/scsi/esas2r/esas2r_init.c b/drivers/scsi/esas2r/esas2r_init.c
-index 78ce4d61..b3f6ff6 100644
---- a/drivers/scsi/esas2r/esas2r_init.c
-+++ b/drivers/scsi/esas2r/esas2r_init.c
-@@ -237,7 +237,7 @@ static void esas2r_claim_interrupts(struct esas2r_adapter *a)
- 		flags |= IRQF_SHARED;
- 
- 	esas2r_log(ESAS2R_LOG_INFO,
--		   "esas2r_claim_interrupts irq=%d (%p, %s, %x)",
-+		   "esas2r_claim_interrupts irq=%d (%p, %s, %lx)",
- 		   a->pcid->irq, a, a->name, flags);
- 
- 	if (request_irq(a->pcid->irq,
-diff --git a/drivers/scsi/esas2r/esas2r_ioctl.c b/drivers/scsi/esas2r/esas2r_ioctl.c
-index 3e84834..34976f9 100644
---- a/drivers/scsi/esas2r/esas2r_ioctl.c
-+++ b/drivers/scsi/esas2r/esas2r_ioctl.c
-@@ -1301,7 +1301,7 @@ int esas2r_ioctl_handler(void *hostdata, int cmd, void __user *arg)
- 	ioctl = kzalloc(sizeof(struct atto_express_ioctl), GFP_KERNEL);
- 	if (ioctl == NULL) {
- 		esas2r_log(ESAS2R_LOG_WARN,
--			   "ioctl_handler kzalloc failed for %d bytes",
-+			   "ioctl_handler kzalloc failed for %lu bytes",
- 			   sizeof(struct atto_express_ioctl));
- 		return -ENOMEM;
- 	}
-diff --git a/drivers/scsi/esas2r/esas2r_main.c b/drivers/scsi/esas2r/esas2r_main.c
-index 2aca4d1..cdee863 100644
---- a/drivers/scsi/esas2r/esas2r_main.c
-+++ b/drivers/scsi/esas2r/esas2r_main.c
-@@ -198,7 +198,7 @@ static ssize_t write_hw(struct file *file, struct kobject *kobj,
- 					      GFP_KERNEL);
- 		if (a->local_atto_ioctl == NULL) {
- 			esas2r_log(ESAS2R_LOG_WARN,
--				   "write_hw kzalloc failed for %d bytes",
-+				   "write_hw kzalloc failed for %lu bytes",
- 				   sizeof(struct atto_ioctl));
- 			return -ENOMEM;
- 		}
-@@ -1186,7 +1186,7 @@ retry:
- 		} else {
- 			esas2r_log(ESAS2R_LOG_CRIT,
- 				   "unable to allocate a request for a "
--				   "device reset (%d:%d)!",
-+				   "device reset (%d:%llu)!",
- 				   cmd->device->id,
- 				   cmd->device->lun);
- 		}
--- 
-2.8.1
+> > diff --git a/scripts/Makefile b/scripts/Makefile
+> > index 1d80897a9644..77a0cc91628c 100644
+> > --- a/scripts/Makefile
+> > +++ b/scripts/Makefile
+> > @@ -10,6 +10,7 @@
+> >  # check-lc_ctype: Used in Documentation/DocBook
+> >  
+> >  HOST_EXTRACFLAGS += -I$(srctree)/tools/include
+> > +HOST_EXTRACFLAGS += -U__KERNEL__
+> 
+> This looks a add-hoc hack. If we just need SECTION_RNG(SECTION_TEXT, kprobes)
+> to convert to section name, can we export the definitions outside of _KERNEL_ ?
 
+We can, it was just a matter of deciding if we were OK with open coding the
+section, copying over some defines, or sharing somehow (this was one way) the
+header files.
+
+Josh seems to prefer to open coding out the names on the tools we can certanly
+do that here as well, I think his point that the names should/will likely
+never change is sufficient motivation to avoid all this and prefer open coding
+this.
+
+Will do that in the next spin unless I hear otherwise.
+
+  Luis
