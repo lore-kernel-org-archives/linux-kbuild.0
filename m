@@ -1,512 +1,1225 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:38367 "EHLO mga01.intel.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752732AbcG0C2r (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 26 Jul 2016 22:28:47 -0400
-Date: Wed, 27 Jul 2016 10:27:21 +0800
-From: kbuild test robot <lkp@intel.com>
-Subject: Re: [PATCH v3 2/7] Split up struct warn_args
-Message-ID: <201607271038.RyShZqNM%fengguang.wu@intel.com>
-MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="YZ5djTAD1cGYuMQK"
-Content-Disposition: inline
-In-Reply-To: <20160726223813.16d7cfd7f7dc514c6f7f9e9d@gmail.com>
+Received: from bombadil.infradead.org ([198.137.202.9]:59397 "EHLO
+	bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1755558AbcG0Jcn (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Wed, 27 Jul 2016 05:32:43 -0400
+From: Mauro Carvalho Chehab <mchehab@s-opensource.com>
+Subject: [PATCH] doc-rst: Remove the media docbook
+Date: Wed, 27 Jul 2016 06:32:31 -0300
+Message-Id: <4fb2b55b3d3215b2f6c649417d749f8f27b2df77.1469611833.git.mchehab@s-opensource.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Emese Revfy <re.emese@gmail.com>
-Cc: kbuild-all@01.org, kernel-hardening@lists.openwall.com, pageexec@freemail.hu, spender@grsecurity.net, mmarek@suse.com, keescook@chromium.org, linux-kernel@vger.kernel.org, yamada.masahiro@socionext.com, linux-kbuild@vger.kernel.org, minipli@ld-linux.so, linux@armlinux.org.uk, catalin.marinas@arm.com, linux@rasmusvillemoes.dk, david.brown@linaro.org, benh@kernel.crashing.org, tglx@linutronix.de, akpm@linux-foundation.org, jlayton@poochiereds.net, arnd@arndb.de, sam@ravnborg.org, isdn@linux-pingi.de
+To: Jonathan Corbet <corbet@lwn.net>
+Cc: Mauro Carvalho Chehab <mchehab@s-opensource.com>, Linux Media Mailing List <linux-media@vger.kernel.org>, Mauro Carvalho Chehab <mchehab@infradead.org>, Michal Marek <mmarek@suse.com>, Jani Nikula <jani.nikula@intel.com>, Daniel Vetter <daniel.vetter@ffwll.ch>, Ben Hutchings <ben@decadent.org.uk>, Daniel Baluta <daniel.baluta@intel.com>, Danilo Cesar Lemes de Paula <danilo.cesar@collabora.co.uk>, linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org
 
+Now that all media documentation was converted to Sphinx, we
+should get rid of the old DocBook one, as we don't want people
+to submit patches against the old stuff.
 
---YZ5djTAD1cGYuMQK
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-Hi,
-
-[auto build test ERROR on next-20160726]
-[also build test ERROR on v4.7]
-[cannot apply to stable/master linus/master linux/master v4.7-rc7 v4.7-rc6 v4.7-rc5]
-[if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
-
-url:    https://github.com/0day-ci/linux/commits/Emese-Revfy/Introduce-the-initify-gcc-plugin/20160727-084514
-config: arm-u8500_defconfig (attached as .config)
-compiler: arm-linux-gnueabi-gcc (Debian 5.4.0-6) 5.4.0 20160609
-reproduce:
-        wget https://git.kernel.org/cgit/linux/kernel/git/wfg/lkp-tests.git/plain/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # save the attached .config to linux build tree
-        make.cross ARCH=arm 
-
-All error/warnings (new ones prefixed by >>):
-
-   In file included from include/uapi/linux/posix_types.h:4:0,
-                    from include/uapi/linux/types.h:13,
-                    from include/linux/compiler.h:201,
-                    from include/linux/linkage.h:4,
-                    from include/linux/kernel.h:6,
-                    from include/linux/debug_locks.h:4,
-                    from kernel/panic.c:11:
-   kernel/panic.c: In function 'warn_slowpath_null':
->> include/linux/stddef.h:7:14: error: incompatible type for argument 7 of '__warn'
-    #define NULL ((void *)0)
-                 ^
->> kernel/panic.c:544:74: note: in expansion of macro 'NULL'
-     __warn(file, line, __builtin_return_address(0), TAINT_WARN, NULL, NULL, NULL);
-                                                                             ^
-   kernel/panic.c:478:6: note: expected 'va_list {aka __va_list}' but argument is of type 'void *'
-    void __warn(const char *file, int line, void *caller, unsigned taint,
-         ^
---
-   In file included from include/uapi/linux/posix_types.h:4:0,
-                    from include/uapi/linux/types.h:13,
-                    from include/linux/types.h:5,
-                    from include/linux/list.h:4,
-                    from lib/bug.c:43:
-   lib/bug.c: In function 'report_bug':
->> include/linux/stddef.h:7:14: error: incompatible type for argument 7 of '__warn'
-    #define NULL ((void *)0)
-                 ^
->> lib/bug.c:171:16: note: in expansion of macro 'NULL'
-             NULL, NULL);
-                   ^
-   In file included from arch/arm/include/asm/bug.h:59:0,
-                    from include/linux/bug.h:4,
-                    from include/linux/thread_info.h:11,
-                    from include/asm-generic/preempt.h:4,
-                    from ./arch/arm/include/generated/asm/preempt.h:1,
-                    from include/linux/preempt.h:59,
-                    from include/linux/spinlock.h:50,
-                    from include/linux/seqlock.h:35,
-                    from include/linux/time.h:5,
-                    from include/linux/stat.h:18,
-                    from include/linux/module.h:10,
-                    from lib/bug.c:44:
-   include/asm-generic/bug.h:84:6: note: expected 'va_list {aka __va_list}' but argument is of type 'void *'
-    void __warn(const char *file, int line, void *caller, unsigned taint,
-         ^
-
-vim +/__warn +7 include/linux/stddef.h
-
-^1da177e Linus Torvalds   2005-04-16   1  #ifndef _LINUX_STDDEF_H
-^1da177e Linus Torvalds   2005-04-16   2  #define _LINUX_STDDEF_H
-^1da177e Linus Torvalds   2005-04-16   3  
-607ca46e David Howells    2012-10-13   4  #include <uapi/linux/stddef.h>
-^1da177e Linus Torvalds   2005-04-16   5  
-^1da177e Linus Torvalds   2005-04-16   6  #undef NULL
-^1da177e Linus Torvalds   2005-04-16  @7  #define NULL ((void *)0)
-6e218287 Richard Knutsson 2006-09-30   8  
-6e218287 Richard Knutsson 2006-09-30   9  enum {
-6e218287 Richard Knutsson 2006-09-30  10  	false	= 0,
-
-:::::: The code at line 7 was first introduced by commit
-:::::: 1da177e4c3f41524e886b7f1b8a0c1fc7321cac2 Linux-2.6.12-rc2
-
-:::::: TO: Linus Torvalds <torvalds@ppc970.osdl.org>
-:::::: CC: Linus Torvalds <torvalds@ppc970.osdl.org>
-
+Signed-off-by: Mauro Carvalho Chehab <mchehab@s-opensource.com>
 ---
-0-DAY kernel test infrastructure                Open Source Technology Center
-https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
 
---YZ5djTAD1cGYuMQK
-Content-Type: application/octet-stream
-Content-Disposition: attachment; filename=".config.gz"
-Content-Transfer-Encoding: base64
+Jon,
 
-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
+This patch should be applied after Linus handle my media documentation
+pull request. Do you prefer to send the patch yourself, or if I do it?
 
---YZ5djTAD1cGYuMQK--
+ Documentation/DocBook/Makefile                     |   10 +-
+ Documentation/DocBook/media/.gitignore             |    1 -
+ Documentation/DocBook/media/Makefile               |  427 --
+ Documentation/DocBook/media/bayer.png.b64          |  171 -
+ Documentation/DocBook/media/constraints.png.b64    |   59 -
+ Documentation/DocBook/media/crop.gif.b64           |  105 -
+ Documentation/DocBook/media/dvb/.gitignore         |    1 -
+ Documentation/DocBook/media/dvb/audio.xml          | 1314 -----
+ Documentation/DocBook/media/dvb/ca.xml             |  582 ---
+ Documentation/DocBook/media/dvb/demux.xml          | 1162 -----
+ Documentation/DocBook/media/dvb/dvbapi.xml         |  156 -
+ Documentation/DocBook/media/dvb/dvbproperty.xml    | 1680 ------
+ Documentation/DocBook/media/dvb/dvbstb.pdf         |  Bin 1881 -> 0 bytes
+ Documentation/DocBook/media/dvb/examples.xml       |  367 --
+ .../media/dvb/fe-diseqc-recv-slave-reply.xml       |   78 -
+ .../DocBook/media/dvb/fe-diseqc-reset-overload.xml |   51 -
+ .../DocBook/media/dvb/fe-diseqc-send-burst.xml     |   89 -
+ .../media/dvb/fe-diseqc-send-master-cmd.xml        |   72 -
+ .../media/dvb/fe-enable-high-lnb-voltage.xml       |   61 -
+ Documentation/DocBook/media/dvb/fe-get-info.xml    |  266 -
+ .../DocBook/media/dvb/fe-get-property.xml          |   81 -
+ Documentation/DocBook/media/dvb/fe-read-status.xml |  107 -
+ .../media/dvb/fe-set-frontend-tune-mode.xml        |   64 -
+ Documentation/DocBook/media/dvb/fe-set-tone.xml    |   91 -
+ Documentation/DocBook/media/dvb/fe-set-voltage.xml |   69 -
+ Documentation/DocBook/media/dvb/frontend.xml       |  269 -
+ .../DocBook/media/dvb/frontend_legacy_api.xml      |  654 ---
+ Documentation/DocBook/media/dvb/intro.xml          |  211 -
+ Documentation/DocBook/media/dvb/net.xml            |  238 -
+ Documentation/DocBook/media/dvb/video.xml          | 1968 -------
+ Documentation/DocBook/media/dvbstb.png.b64         |  398 --
+ Documentation/DocBook/media/fieldseq_bt.gif.b64    |  447 --
+ Documentation/DocBook/media/fieldseq_tb.gif.b64    |  445 --
+ Documentation/DocBook/media/nv12mt.gif.b64         |   37 -
+ Documentation/DocBook/media/nv12mt_example.gif.b64 |  121 -
+ Documentation/DocBook/media/pipeline.png.b64       |  213 -
+ Documentation/DocBook/media/selection.png.b64      |  206 -
+ .../DocBook/media/typical_media_device.svg         |   28 -
+ Documentation/DocBook/media/v4l/.gitignore         |    1 -
+ Documentation/DocBook/media/v4l/biblio.xml         |  381 --
+ Documentation/DocBook/media/v4l/capture.c.xml      |  659 ---
+ Documentation/DocBook/media/v4l/cec-api.xml        |   75 -
+ Documentation/DocBook/media/v4l/cec-func-close.xml |   64 -
+ Documentation/DocBook/media/v4l/cec-func-ioctl.xml |   78 -
+ Documentation/DocBook/media/v4l/cec-func-open.xml  |  104 -
+ Documentation/DocBook/media/v4l/cec-func-poll.xml  |   94 -
+ .../DocBook/media/v4l/cec-ioc-adap-g-caps.xml      |  151 -
+ .../DocBook/media/v4l/cec-ioc-adap-g-log-addrs.xml |  329 --
+ .../DocBook/media/v4l/cec-ioc-adap-g-phys-addr.xml |   86 -
+ .../DocBook/media/v4l/cec-ioc-dqevent.xml          |  202 -
+ Documentation/DocBook/media/v4l/cec-ioc-g-mode.xml |  255 -
+ .../DocBook/media/v4l/cec-ioc-receive.xml          |  274 -
+ Documentation/DocBook/media/v4l/common.xml         | 1102 ----
+ Documentation/DocBook/media/v4l/compat.xml         | 2723 ----------
+ Documentation/DocBook/media/v4l/controls.xml       | 5505 --------------------
+ Documentation/DocBook/media/v4l/crop.pdf           |  Bin 5846 -> 0 bytes
+ Documentation/DocBook/media/v4l/dev-capture.xml    |  110 -
+ Documentation/DocBook/media/v4l/dev-codec.xml      |   27 -
+ Documentation/DocBook/media/v4l/dev-effect.xml     |   17 -
+ Documentation/DocBook/media/v4l/dev-event.xml      |   43 -
+ Documentation/DocBook/media/v4l/dev-osd.xml        |  149 -
+ Documentation/DocBook/media/v4l/dev-output.xml     |  106 -
+ Documentation/DocBook/media/v4l/dev-overlay.xml    |  368 --
+ Documentation/DocBook/media/v4l/dev-radio.xml      |   49 -
+ Documentation/DocBook/media/v4l/dev-raw-vbi.xml    |  345 --
+ Documentation/DocBook/media/v4l/dev-rds.xml        |  196 -
+ Documentation/DocBook/media/v4l/dev-sdr.xml        |  126 -
+ Documentation/DocBook/media/v4l/dev-sliced-vbi.xml |  706 ---
+ Documentation/DocBook/media/v4l/dev-subdev.xml     |  478 --
+ Documentation/DocBook/media/v4l/dev-teletext.xml   |   29 -
+ Documentation/DocBook/media/v4l/driver.xml         |  200 -
+ Documentation/DocBook/media/v4l/fdl-appendix.xml   |  671 ---
+ Documentation/DocBook/media/v4l/fieldseq_bt.pdf    |  Bin 9185 -> 0 bytes
+ Documentation/DocBook/media/v4l/fieldseq_tb.pdf    |  Bin 9173 -> 0 bytes
+ Documentation/DocBook/media/v4l/func-close.xml     |   62 -
+ Documentation/DocBook/media/v4l/func-ioctl.xml     |   71 -
+ Documentation/DocBook/media/v4l/func-mmap.xml      |  183 -
+ Documentation/DocBook/media/v4l/func-munmap.xml    |   76 -
+ Documentation/DocBook/media/v4l/func-open.xml      |  113 -
+ Documentation/DocBook/media/v4l/func-poll.xml      |  142 -
+ Documentation/DocBook/media/v4l/func-read.xml      |  181 -
+ Documentation/DocBook/media/v4l/func-select.xml    |  130 -
+ Documentation/DocBook/media/v4l/func-write.xml     |  128 -
+ Documentation/DocBook/media/v4l/gen-errors.xml     |   77 -
+ Documentation/DocBook/media/v4l/io.xml             | 1545 ------
+ Documentation/DocBook/media/v4l/keytable.c.xml     |  172 -
+ Documentation/DocBook/media/v4l/libv4l.xml         |  160 -
+ .../DocBook/media/v4l/lirc_device_interface.xml    |  255 -
+ .../DocBook/media/v4l/media-controller.xml         |  105 -
+ .../DocBook/media/v4l/media-func-close.xml         |   59 -
+ .../DocBook/media/v4l/media-func-ioctl.xml         |   73 -
+ .../DocBook/media/v4l/media-func-open.xml          |   94 -
+ .../DocBook/media/v4l/media-ioc-device-info.xml    |  132 -
+ .../DocBook/media/v4l/media-ioc-enum-entities.xml  |  180 -
+ .../DocBook/media/v4l/media-ioc-enum-links.xml     |  160 -
+ .../DocBook/media/v4l/media-ioc-g-topology.xml     |  391 --
+ .../DocBook/media/v4l/media-ioc-setup-link.xml     |   84 -
+ Documentation/DocBook/media/v4l/media-types.xml    |  379 --
+ Documentation/DocBook/media/v4l/pipeline.pdf       |  Bin 20276 -> 0 bytes
+ Documentation/DocBook/media/v4l/pixfmt-grey.xml    |   62 -
+ Documentation/DocBook/media/v4l/pixfmt-m420.xml    |  139 -
+ Documentation/DocBook/media/v4l/pixfmt-nv12.xml    |  143 -
+ Documentation/DocBook/media/v4l/pixfmt-nv12m.xml   |  153 -
+ Documentation/DocBook/media/v4l/pixfmt-nv12mt.xml  |   66 -
+ Documentation/DocBook/media/v4l/pixfmt-nv16.xml    |  166 -
+ Documentation/DocBook/media/v4l/pixfmt-nv16m.xml   |  170 -
+ Documentation/DocBook/media/v4l/pixfmt-nv24.xml    |  121 -
+ .../DocBook/media/v4l/pixfmt-packed-rgb.xml        |  937 ----
+ .../DocBook/media/v4l/pixfmt-packed-yuv.xml        |  236 -
+ Documentation/DocBook/media/v4l/pixfmt-sbggr16.xml |   83 -
+ Documentation/DocBook/media/v4l/pixfmt-sbggr8.xml  |   67 -
+ .../DocBook/media/v4l/pixfmt-sdr-cs08.xml          |   44 -
+ .../DocBook/media/v4l/pixfmt-sdr-cs14le.xml        |   47 -
+ .../DocBook/media/v4l/pixfmt-sdr-cu08.xml          |   44 -
+ .../DocBook/media/v4l/pixfmt-sdr-cu16le.xml        |   46 -
+ .../DocBook/media/v4l/pixfmt-sdr-ru12le.xml        |   40 -
+ Documentation/DocBook/media/v4l/pixfmt-sgbrg8.xml  |   67 -
+ Documentation/DocBook/media/v4l/pixfmt-sgrbg8.xml  |   67 -
+ Documentation/DocBook/media/v4l/pixfmt-srggb10.xml |   90 -
+ .../DocBook/media/v4l/pixfmt-srggb10alaw8.xml      |   34 -
+ .../DocBook/media/v4l/pixfmt-srggb10dpcm8.xml      |   28 -
+ .../DocBook/media/v4l/pixfmt-srggb10p.xml          |   99 -
+ Documentation/DocBook/media/v4l/pixfmt-srggb12.xml |   90 -
+ Documentation/DocBook/media/v4l/pixfmt-srggb8.xml  |   67 -
+ Documentation/DocBook/media/v4l/pixfmt-uv8.xml     |   62 -
+ Documentation/DocBook/media/v4l/pixfmt-uyvy.xml    |  120 -
+ Documentation/DocBook/media/v4l/pixfmt-vyuy.xml    |  120 -
+ Documentation/DocBook/media/v4l/pixfmt-y10.xml     |   79 -
+ Documentation/DocBook/media/v4l/pixfmt-y10b.xml    |   43 -
+ Documentation/DocBook/media/v4l/pixfmt-y12.xml     |   79 -
+ Documentation/DocBook/media/v4l/pixfmt-y12i.xml    |   49 -
+ Documentation/DocBook/media/v4l/pixfmt-y16-be.xml  |   81 -
+ Documentation/DocBook/media/v4l/pixfmt-y16.xml     |   81 -
+ Documentation/DocBook/media/v4l/pixfmt-y41p.xml    |  149 -
+ Documentation/DocBook/media/v4l/pixfmt-y8i.xml     |   80 -
+ Documentation/DocBook/media/v4l/pixfmt-yuv410.xml  |  133 -
+ Documentation/DocBook/media/v4l/pixfmt-yuv411p.xml |  147 -
+ Documentation/DocBook/media/v4l/pixfmt-yuv420.xml  |  149 -
+ Documentation/DocBook/media/v4l/pixfmt-yuv420m.xml |  162 -
+ Documentation/DocBook/media/v4l/pixfmt-yuv422m.xml |  166 -
+ Documentation/DocBook/media/v4l/pixfmt-yuv422p.xml |  153 -
+ Documentation/DocBook/media/v4l/pixfmt-yuv444m.xml |  177 -
+ Documentation/DocBook/media/v4l/pixfmt-yuyv.xml    |  120 -
+ Documentation/DocBook/media/v4l/pixfmt-yvyu.xml    |  120 -
+ Documentation/DocBook/media/v4l/pixfmt-z16.xml     |   81 -
+ Documentation/DocBook/media/v4l/pixfmt.xml         | 2003 -------
+ Documentation/DocBook/media/v4l/planar-apis.xml    |   62 -
+ .../DocBook/media/v4l/remote_controllers.xml       |  320 --
+ Documentation/DocBook/media/v4l/selection-api.xml  |  317 --
+ .../DocBook/media/v4l/selections-common.xml        |  180 -
+ Documentation/DocBook/media/v4l/subdev-formats.xml | 4040 --------------
+ .../media/v4l/subdev-image-processing-crop.dia     |  614 ---
+ .../media/v4l/subdev-image-processing-crop.svg     |   63 -
+ .../media/v4l/subdev-image-processing-full.dia     | 1588 ------
+ .../media/v4l/subdev-image-processing-full.svg     |  163 -
+ ...ubdev-image-processing-scaling-multi-source.dia | 1152 ----
+ ...ubdev-image-processing-scaling-multi-source.svg |  116 -
+ Documentation/DocBook/media/v4l/v4l2.xml           |  728 ---
+ Documentation/DocBook/media/v4l/v4l2grab.c.xml     |  164 -
+ Documentation/DocBook/media/v4l/vbi_525.pdf        |  Bin 3395 -> 0 bytes
+ Documentation/DocBook/media/v4l/vbi_625.pdf        |  Bin 3683 -> 0 bytes
+ Documentation/DocBook/media/v4l/vbi_hsync.pdf      |  Bin 7405 -> 0 bytes
+ .../DocBook/media/v4l/vidioc-create-bufs.xml       |  158 -
+ Documentation/DocBook/media/v4l/vidioc-cropcap.xml |  166 -
+ .../DocBook/media/v4l/vidioc-dbg-g-chip-info.xml   |  207 -
+ .../DocBook/media/v4l/vidioc-dbg-g-register.xml    |  227 -
+ .../DocBook/media/v4l/vidioc-decoder-cmd.xml       |  259 -
+ Documentation/DocBook/media/v4l/vidioc-dqevent.xml |  471 --
+ .../DocBook/media/v4l/vidioc-dv-timings-cap.xml    |  210 -
+ .../DocBook/media/v4l/vidioc-encoder-cmd.xml       |  197 -
+ .../DocBook/media/v4l/vidioc-enum-dv-timings.xml   |  128 -
+ .../DocBook/media/v4l/vidioc-enum-fmt.xml          |  159 -
+ .../media/v4l/vidioc-enum-frameintervals.xml       |  260 -
+ .../DocBook/media/v4l/vidioc-enum-framesizes.xml   |  265 -
+ .../DocBook/media/v4l/vidioc-enum-freq-bands.xml   |  175 -
+ .../DocBook/media/v4l/vidioc-enumaudio.xml         |   76 -
+ .../DocBook/media/v4l/vidioc-enumaudioout.xml      |   79 -
+ .../DocBook/media/v4l/vidioc-enuminput.xml         |  316 --
+ .../DocBook/media/v4l/vidioc-enumoutput.xml        |  201 -
+ Documentation/DocBook/media/v4l/vidioc-enumstd.xml |  389 --
+ Documentation/DocBook/media/v4l/vidioc-expbuf.xml  |  205 -
+ Documentation/DocBook/media/v4l/vidioc-g-audio.xml |  172 -
+ .../DocBook/media/v4l/vidioc-g-audioout.xml        |  138 -
+ Documentation/DocBook/media/v4l/vidioc-g-crop.xml  |  129 -
+ Documentation/DocBook/media/v4l/vidioc-g-ctrl.xml  |  133 -
+ .../DocBook/media/v4l/vidioc-g-dv-timings.xml      |  343 --
+ Documentation/DocBook/media/v4l/vidioc-g-edid.xml  |  173 -
+ .../DocBook/media/v4l/vidioc-g-enc-index.xml       |  189 -
+ .../DocBook/media/v4l/vidioc-g-ext-ctrls.xml       |  456 --
+ Documentation/DocBook/media/v4l/vidioc-g-fbuf.xml  |  459 --
+ Documentation/DocBook/media/v4l/vidioc-g-fmt.xml   |  204 -
+ .../DocBook/media/v4l/vidioc-g-frequency.xml       |  148 -
+ Documentation/DocBook/media/v4l/vidioc-g-input.xml |   83 -
+ .../DocBook/media/v4l/vidioc-g-jpegcomp.xml        |  175 -
+ .../DocBook/media/v4l/vidioc-g-modulator.xml       |  252 -
+ .../DocBook/media/v4l/vidioc-g-output.xml          |   85 -
+ Documentation/DocBook/media/v4l/vidioc-g-parm.xml  |  314 --
+ .../DocBook/media/v4l/vidioc-g-priority.xml        |  135 -
+ .../DocBook/media/v4l/vidioc-g-selection.xml       |  233 -
+ .../DocBook/media/v4l/vidioc-g-sliced-vbi-cap.xml  |  255 -
+ Documentation/DocBook/media/v4l/vidioc-g-std.xml   |   98 -
+ Documentation/DocBook/media/v4l/vidioc-g-tuner.xml |  594 ---
+ .../DocBook/media/v4l/vidioc-log-status.xml        |   41 -
+ Documentation/DocBook/media/v4l/vidioc-overlay.xml |   74 -
+ .../DocBook/media/v4l/vidioc-prepare-buf.xml       |   88 -
+ Documentation/DocBook/media/v4l/vidioc-qbuf.xml    |  202 -
+ .../DocBook/media/v4l/vidioc-query-dv-timings.xml  |  115 -
+ .../DocBook/media/v4l/vidioc-querybuf.xml          |  106 -
+ .../DocBook/media/v4l/vidioc-querycap.xml          |  350 --
+ .../DocBook/media/v4l/vidioc-queryctrl.xml         |  661 ---
+ .../DocBook/media/v4l/vidioc-querystd.xml          |   85 -
+ Documentation/DocBook/media/v4l/vidioc-reqbufs.xml |  137 -
+ .../DocBook/media/v4l/vidioc-s-hw-freq-seek.xml    |  188 -
+ .../DocBook/media/v4l/vidioc-streamon.xml          |  136 -
+ .../v4l/vidioc-subdev-enum-frame-interval.xml      |  151 -
+ .../media/v4l/vidioc-subdev-enum-frame-size.xml    |  153 -
+ .../media/v4l/vidioc-subdev-enum-mbus-code.xml     |  118 -
+ .../DocBook/media/v4l/vidioc-subdev-g-crop.xml     |  158 -
+ .../DocBook/media/v4l/vidioc-subdev-g-fmt.xml      |  177 -
+ .../media/v4l/vidioc-subdev-g-frame-interval.xml   |  135 -
+ .../media/v4l/vidioc-subdev-g-selection.xml        |  159 -
+ .../DocBook/media/v4l/vidioc-subscribe-event.xml   |  130 -
+ Documentation/DocBook/media/vbi_525.gif.b64        |   84 -
+ Documentation/DocBook/media/vbi_625.gif.b64        |   90 -
+ Documentation/DocBook/media/vbi_hsync.gif.b64      |   43 -
+ Documentation/Makefile.sphinx                      |    1 -
+ Makefile                                           |    2 +-
+ 227 files changed, 3 insertions(+), 62418 deletions(-)
+ delete mode 100644 Documentation/DocBook/media/.gitignore
+ delete mode 100644 Documentation/DocBook/media/Makefile
+ delete mode 100644 Documentation/DocBook/media/bayer.png.b64
+ delete mode 100644 Documentation/DocBook/media/constraints.png.b64
+ delete mode 100644 Documentation/DocBook/media/crop.gif.b64
+ delete mode 100644 Documentation/DocBook/media/dvb/.gitignore
+ delete mode 100644 Documentation/DocBook/media/dvb/audio.xml
+ delete mode 100644 Documentation/DocBook/media/dvb/ca.xml
+ delete mode 100644 Documentation/DocBook/media/dvb/demux.xml
+ delete mode 100644 Documentation/DocBook/media/dvb/dvbapi.xml
+ delete mode 100644 Documentation/DocBook/media/dvb/dvbproperty.xml
+ delete mode 100644 Documentation/DocBook/media/dvb/dvbstb.pdf
+ delete mode 100644 Documentation/DocBook/media/dvb/examples.xml
+ delete mode 100644 Documentation/DocBook/media/dvb/fe-diseqc-recv-slave-reply.xml
+ delete mode 100644 Documentation/DocBook/media/dvb/fe-diseqc-reset-overload.xml
+ delete mode 100644 Documentation/DocBook/media/dvb/fe-diseqc-send-burst.xml
+ delete mode 100644 Documentation/DocBook/media/dvb/fe-diseqc-send-master-cmd.xml
+ delete mode 100644 Documentation/DocBook/media/dvb/fe-enable-high-lnb-voltage.xml
+ delete mode 100644 Documentation/DocBook/media/dvb/fe-get-info.xml
+ delete mode 100644 Documentation/DocBook/media/dvb/fe-get-property.xml
+ delete mode 100644 Documentation/DocBook/media/dvb/fe-read-status.xml
+ delete mode 100644 Documentation/DocBook/media/dvb/fe-set-frontend-tune-mode.xml
+ delete mode 100644 Documentation/DocBook/media/dvb/fe-set-tone.xml
+ delete mode 100644 Documentation/DocBook/media/dvb/fe-set-voltage.xml
+ delete mode 100644 Documentation/DocBook/media/dvb/frontend.xml
+ delete mode 100644 Documentation/DocBook/media/dvb/frontend_legacy_api.xml
+ delete mode 100644 Documentation/DocBook/media/dvb/intro.xml
+ delete mode 100644 Documentation/DocBook/media/dvb/net.xml
+ delete mode 100644 Documentation/DocBook/media/dvb/video.xml
+ delete mode 100644 Documentation/DocBook/media/dvbstb.png.b64
+ delete mode 100644 Documentation/DocBook/media/fieldseq_bt.gif.b64
+ delete mode 100644 Documentation/DocBook/media/fieldseq_tb.gif.b64
+ delete mode 100644 Documentation/DocBook/media/nv12mt.gif.b64
+ delete mode 100644 Documentation/DocBook/media/nv12mt_example.gif.b64
+ delete mode 100644 Documentation/DocBook/media/pipeline.png.b64
+ delete mode 100644 Documentation/DocBook/media/selection.png.b64
+ delete mode 100644 Documentation/DocBook/media/typical_media_device.svg
+ delete mode 100644 Documentation/DocBook/media/v4l/.gitignore
+ delete mode 100644 Documentation/DocBook/media/v4l/biblio.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/capture.c.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/cec-api.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/cec-func-close.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/cec-func-ioctl.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/cec-func-open.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/cec-func-poll.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/cec-ioc-adap-g-caps.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/cec-ioc-adap-g-log-addrs.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/cec-ioc-adap-g-phys-addr.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/cec-ioc-dqevent.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/cec-ioc-g-mode.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/cec-ioc-receive.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/common.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/compat.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/controls.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/crop.pdf
+ delete mode 100644 Documentation/DocBook/media/v4l/dev-capture.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/dev-codec.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/dev-effect.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/dev-event.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/dev-osd.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/dev-output.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/dev-overlay.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/dev-radio.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/dev-raw-vbi.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/dev-rds.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/dev-sdr.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/dev-sliced-vbi.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/dev-subdev.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/dev-teletext.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/driver.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/fdl-appendix.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/fieldseq_bt.pdf
+ delete mode 100644 Documentation/DocBook/media/v4l/fieldseq_tb.pdf
+ delete mode 100644 Documentation/DocBook/media/v4l/func-close.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/func-ioctl.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/func-mmap.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/func-munmap.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/func-open.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/func-poll.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/func-read.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/func-select.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/func-write.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/gen-errors.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/io.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/keytable.c.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/libv4l.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/lirc_device_interface.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/media-controller.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/media-func-close.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/media-func-ioctl.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/media-func-open.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/media-ioc-device-info.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/media-ioc-enum-entities.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/media-ioc-enum-links.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/media-ioc-g-topology.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/media-ioc-setup-link.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/media-types.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/pipeline.pdf
+ delete mode 100644 Documentation/DocBook/media/v4l/pixfmt-grey.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/pixfmt-m420.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/pixfmt-nv12.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/pixfmt-nv12m.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/pixfmt-nv12mt.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/pixfmt-nv16.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/pixfmt-nv16m.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/pixfmt-nv24.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/pixfmt-packed-rgb.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/pixfmt-packed-yuv.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/pixfmt-sbggr16.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/pixfmt-sbggr8.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/pixfmt-sdr-cs08.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/pixfmt-sdr-cs14le.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/pixfmt-sdr-cu08.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/pixfmt-sdr-cu16le.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/pixfmt-sdr-ru12le.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/pixfmt-sgbrg8.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/pixfmt-sgrbg8.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/pixfmt-srggb10.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/pixfmt-srggb10alaw8.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/pixfmt-srggb10dpcm8.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/pixfmt-srggb10p.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/pixfmt-srggb12.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/pixfmt-srggb8.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/pixfmt-uv8.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/pixfmt-uyvy.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/pixfmt-vyuy.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/pixfmt-y10.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/pixfmt-y10b.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/pixfmt-y12.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/pixfmt-y12i.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/pixfmt-y16-be.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/pixfmt-y16.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/pixfmt-y41p.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/pixfmt-y8i.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/pixfmt-yuv410.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/pixfmt-yuv411p.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/pixfmt-yuv420.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/pixfmt-yuv420m.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/pixfmt-yuv422m.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/pixfmt-yuv422p.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/pixfmt-yuv444m.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/pixfmt-yuyv.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/pixfmt-yvyu.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/pixfmt-z16.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/pixfmt.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/planar-apis.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/remote_controllers.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/selection-api.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/selections-common.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/subdev-formats.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/subdev-image-processing-crop.dia
+ delete mode 100644 Documentation/DocBook/media/v4l/subdev-image-processing-crop.svg
+ delete mode 100644 Documentation/DocBook/media/v4l/subdev-image-processing-full.dia
+ delete mode 100644 Documentation/DocBook/media/v4l/subdev-image-processing-full.svg
+ delete mode 100644 Documentation/DocBook/media/v4l/subdev-image-processing-scaling-multi-source.dia
+ delete mode 100644 Documentation/DocBook/media/v4l/subdev-image-processing-scaling-multi-source.svg
+ delete mode 100644 Documentation/DocBook/media/v4l/v4l2.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/v4l2grab.c.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vbi_525.pdf
+ delete mode 100644 Documentation/DocBook/media/v4l/vbi_625.pdf
+ delete mode 100644 Documentation/DocBook/media/v4l/vbi_hsync.pdf
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-create-bufs.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-cropcap.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-dbg-g-chip-info.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-dbg-g-register.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-decoder-cmd.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-dqevent.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-dv-timings-cap.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-encoder-cmd.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-enum-dv-timings.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-enum-fmt.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-enum-frameintervals.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-enum-framesizes.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-enum-freq-bands.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-enumaudio.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-enumaudioout.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-enuminput.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-enumoutput.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-enumstd.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-expbuf.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-g-audio.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-g-audioout.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-g-crop.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-g-ctrl.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-g-dv-timings.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-g-edid.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-g-enc-index.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-g-ext-ctrls.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-g-fbuf.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-g-fmt.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-g-frequency.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-g-input.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-g-jpegcomp.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-g-modulator.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-g-output.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-g-parm.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-g-priority.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-g-selection.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-g-sliced-vbi-cap.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-g-std.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-g-tuner.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-log-status.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-overlay.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-prepare-buf.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-qbuf.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-query-dv-timings.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-querybuf.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-querycap.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-queryctrl.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-querystd.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-reqbufs.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-s-hw-freq-seek.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-streamon.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-subdev-enum-frame-interval.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-subdev-enum-frame-size.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-subdev-enum-mbus-code.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-subdev-g-crop.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-subdev-g-fmt.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-subdev-g-frame-interval.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-subdev-g-selection.xml
+ delete mode 100644 Documentation/DocBook/media/v4l/vidioc-subscribe-event.xml
+ delete mode 100644 Documentation/DocBook/media/vbi_525.gif.b64
+ delete mode 100644 Documentation/DocBook/media/vbi_625.gif.b64
+ delete mode 100644 Documentation/DocBook/media/vbi_hsync.gif.b64
+
+diff --git a/Documentation/DocBook/Makefile b/Documentation/DocBook/Makefile
+index 01bab5014a4a..2bfd664b5e35 100644
+--- a/Documentation/DocBook/Makefile
++++ b/Documentation/DocBook/Makefile
+@@ -16,11 +16,9 @@ DOCBOOKS := z8530book.xml device-drivers.xml \
+ 	    genericirq.xml s390-drivers.xml uio-howto.xml scsi.xml \
+ 	    80211.xml debugobjects.xml sh.xml regulator.xml \
+ 	    alsa-driver-api.xml writing-an-alsa-driver.xml \
+-	    tracepoint.xml gpu.xml media_api.xml w1.xml \
++	    tracepoint.xml gpu.xml w1.xml \
+ 	    writing_musb_glue_layer.xml crypto-API.xml iio.xml
+ 
+-include Documentation/DocBook/media/Makefile
+-
+ ###
+ # The build process is as follows (targets):
+ #              (xmldocs) [by docproc]
+@@ -49,7 +47,6 @@ pdfdocs: $(PDF)
+ HTML := $(sort $(patsubst %.xml, %.html, $(BOOKS)))
+ htmldocs: $(HTML)
+ 	$(call cmd,build_main_index)
+-	$(call install_media_images)
+ 
+ MAN := $(patsubst %.xml, %.9, $(BOOKS))
+ mandocs: $(MAN)
+@@ -219,9 +216,6 @@ silent_gen_xml = :
+ 
+ else
+ 
+-# Needed, due to cleanmediadocs
+-include Documentation/DocBook/media/Makefile
+-
+ htmldocs:
+ pdfdocs:
+ psdocs:
+@@ -269,7 +263,7 @@ clean-files := $(DOCBOOKS) \
+ 
+ clean-dirs := $(patsubst %.xml,%,$(DOCBOOKS)) man
+ 
+-cleandocs: cleanmediadocs
++cleandocs:
+ 	$(Q)rm -f $(call objectify, $(clean-files))
+ 	$(Q)rm -rf $(call objectify, $(clean-dirs))
+ 
+diff --git a/Documentation/DocBook/media/.gitignore b/Documentation/DocBook/media/.gitignore
+deleted file mode 100644
+index e461c585fde8..000000000000
+diff --git a/Documentation/DocBook/media/Makefile b/Documentation/DocBook/media/Makefile
+deleted file mode 100644
+index fdc138624800..000000000000
+diff --git a/Documentation/DocBook/media/bayer.png.b64 b/Documentation/DocBook/media/bayer.png.b64
+deleted file mode 100644
+index ccdf2bcda95c..000000000000
+diff --git a/Documentation/DocBook/media/constraints.png.b64 b/Documentation/DocBook/media/constraints.png.b64
+deleted file mode 100644
+index 125b4a94962c..000000000000
+diff --git a/Documentation/DocBook/media/crop.gif.b64 b/Documentation/DocBook/media/crop.gif.b64
+deleted file mode 100644
+index 11d936ae72e8..000000000000
+diff --git a/Documentation/DocBook/media/dvb/.gitignore b/Documentation/DocBook/media/dvb/.gitignore
+deleted file mode 100644
+index d7ec32eafac9..000000000000
+diff --git a/Documentation/DocBook/media/dvb/audio.xml b/Documentation/DocBook/media/dvb/audio.xml
+deleted file mode 100644
+index ea56743ddbe7..000000000000
+diff --git a/Documentation/DocBook/media/dvb/ca.xml b/Documentation/DocBook/media/dvb/ca.xml
+deleted file mode 100644
+index d0b07e763908..000000000000
+diff --git a/Documentation/DocBook/media/dvb/demux.xml b/Documentation/DocBook/media/dvb/demux.xml
+deleted file mode 100644
+index 34f2fb1cd601..000000000000
+diff --git a/Documentation/DocBook/media/dvb/dvbapi.xml b/Documentation/DocBook/media/dvb/dvbapi.xml
+deleted file mode 100644
+index 8576481e20ae..000000000000
+diff --git a/Documentation/DocBook/media/dvb/dvbproperty.xml b/Documentation/DocBook/media/dvb/dvbproperty.xml
+deleted file mode 100644
+index e579ae5088ae..000000000000
+diff --git a/Documentation/DocBook/media/dvb/dvbstb.pdf b/Documentation/DocBook/media/dvb/dvbstb.pdf
+deleted file mode 100644
+index 0fa75d90c3eba1db9d07611ec6d86b4bc22d7a39..0000000000000000000000000000000000000000
+diff --git a/Documentation/DocBook/media/dvb/examples.xml b/Documentation/DocBook/media/dvb/examples.xml
+deleted file mode 100644
+index 837fb3b64b72..000000000000
+diff --git a/Documentation/DocBook/media/dvb/fe-diseqc-recv-slave-reply.xml b/Documentation/DocBook/media/dvb/fe-diseqc-recv-slave-reply.xml
+deleted file mode 100644
+index 4595dbfff208..000000000000
+diff --git a/Documentation/DocBook/media/dvb/fe-diseqc-reset-overload.xml b/Documentation/DocBook/media/dvb/fe-diseqc-reset-overload.xml
+deleted file mode 100644
+index c104df77ecd0..000000000000
+diff --git a/Documentation/DocBook/media/dvb/fe-diseqc-send-burst.xml b/Documentation/DocBook/media/dvb/fe-diseqc-send-burst.xml
+deleted file mode 100644
+index 9f6a68f32de3..000000000000
+diff --git a/Documentation/DocBook/media/dvb/fe-diseqc-send-master-cmd.xml b/Documentation/DocBook/media/dvb/fe-diseqc-send-master-cmd.xml
+deleted file mode 100644
+index 38cf313e121b..000000000000
+diff --git a/Documentation/DocBook/media/dvb/fe-enable-high-lnb-voltage.xml b/Documentation/DocBook/media/dvb/fe-enable-high-lnb-voltage.xml
+deleted file mode 100644
+index c11890b184ad..000000000000
+diff --git a/Documentation/DocBook/media/dvb/fe-get-info.xml b/Documentation/DocBook/media/dvb/fe-get-info.xml
+deleted file mode 100644
+index ed0eeb29dd65..000000000000
+diff --git a/Documentation/DocBook/media/dvb/fe-get-property.xml b/Documentation/DocBook/media/dvb/fe-get-property.xml
+deleted file mode 100644
+index 53a170ed3bd1..000000000000
+diff --git a/Documentation/DocBook/media/dvb/fe-read-status.xml b/Documentation/DocBook/media/dvb/fe-read-status.xml
+deleted file mode 100644
+index bc0dc2a55f19..000000000000
+diff --git a/Documentation/DocBook/media/dvb/fe-set-frontend-tune-mode.xml b/Documentation/DocBook/media/dvb/fe-set-frontend-tune-mode.xml
+deleted file mode 100644
+index 99fa8a015c7a..000000000000
+diff --git a/Documentation/DocBook/media/dvb/fe-set-tone.xml b/Documentation/DocBook/media/dvb/fe-set-tone.xml
+deleted file mode 100644
+index 62d44e4ccc39..000000000000
+diff --git a/Documentation/DocBook/media/dvb/fe-set-voltage.xml b/Documentation/DocBook/media/dvb/fe-set-voltage.xml
+deleted file mode 100644
+index c89a6f79b5af..000000000000
+diff --git a/Documentation/DocBook/media/dvb/frontend.xml b/Documentation/DocBook/media/dvb/frontend.xml
+deleted file mode 100644
+index 01210b33c130..000000000000
+diff --git a/Documentation/DocBook/media/dvb/frontend_legacy_api.xml b/Documentation/DocBook/media/dvb/frontend_legacy_api.xml
+deleted file mode 100644
+index 8fadf3a4ba44..000000000000
+diff --git a/Documentation/DocBook/media/dvb/intro.xml b/Documentation/DocBook/media/dvb/intro.xml
+deleted file mode 100644
+index b5b701f5d8c2..000000000000
+diff --git a/Documentation/DocBook/media/dvb/net.xml b/Documentation/DocBook/media/dvb/net.xml
+deleted file mode 100644
+index da095ed0b75c..000000000000
+diff --git a/Documentation/DocBook/media/dvb/video.xml b/Documentation/DocBook/media/dvb/video.xml
+deleted file mode 100644
+index 71547fcd7ba0..000000000000
+diff --git a/Documentation/DocBook/media/dvbstb.png.b64 b/Documentation/DocBook/media/dvbstb.png.b64
+deleted file mode 100644
+index e8b52fde3d11..000000000000
+diff --git a/Documentation/DocBook/media/fieldseq_bt.gif.b64 b/Documentation/DocBook/media/fieldseq_bt.gif.b64
+deleted file mode 100644
+index b5b557b88158..000000000000
+diff --git a/Documentation/DocBook/media/fieldseq_tb.gif.b64 b/Documentation/DocBook/media/fieldseq_tb.gif.b64
+deleted file mode 100644
+index 7b4c1766b407..000000000000
+diff --git a/Documentation/DocBook/media/nv12mt.gif.b64 b/Documentation/DocBook/media/nv12mt.gif.b64
+deleted file mode 100644
+index 083a7c85d107..000000000000
+diff --git a/Documentation/DocBook/media/nv12mt_example.gif.b64 b/Documentation/DocBook/media/nv12mt_example.gif.b64
+deleted file mode 100644
+index a512078c7f24..000000000000
+diff --git a/Documentation/DocBook/media/pipeline.png.b64 b/Documentation/DocBook/media/pipeline.png.b64
+deleted file mode 100644
+index 97d9ac007473..000000000000
+diff --git a/Documentation/DocBook/media/selection.png.b64 b/Documentation/DocBook/media/selection.png.b64
+deleted file mode 100644
+index 416186558cb2..000000000000
+diff --git a/Documentation/DocBook/media/typical_media_device.svg b/Documentation/DocBook/media/typical_media_device.svg
+deleted file mode 100644
+index f0c82f72c4b6..000000000000
+diff --git a/Documentation/DocBook/media/v4l/.gitignore b/Documentation/DocBook/media/v4l/.gitignore
+deleted file mode 100644
+index d7ec32eafac9..000000000000
+diff --git a/Documentation/DocBook/media/v4l/biblio.xml b/Documentation/DocBook/media/v4l/biblio.xml
+deleted file mode 100644
+index 87f1d24958aa..000000000000
+diff --git a/Documentation/DocBook/media/v4l/capture.c.xml b/Documentation/DocBook/media/v4l/capture.c.xml
+deleted file mode 100644
+index 22126a991b34..000000000000
+diff --git a/Documentation/DocBook/media/v4l/cec-api.xml b/Documentation/DocBook/media/v4l/cec-api.xml
+deleted file mode 100644
+index 7062c1fa4904..000000000000
+diff --git a/Documentation/DocBook/media/v4l/cec-func-close.xml b/Documentation/DocBook/media/v4l/cec-func-close.xml
+deleted file mode 100644
+index 0812c8cd9634..000000000000
+diff --git a/Documentation/DocBook/media/v4l/cec-func-ioctl.xml b/Documentation/DocBook/media/v4l/cec-func-ioctl.xml
+deleted file mode 100644
+index f92817a2dc80..000000000000
+diff --git a/Documentation/DocBook/media/v4l/cec-func-open.xml b/Documentation/DocBook/media/v4l/cec-func-open.xml
+deleted file mode 100644
+index 2edc5555b81a..000000000000
+diff --git a/Documentation/DocBook/media/v4l/cec-func-poll.xml b/Documentation/DocBook/media/v4l/cec-func-poll.xml
+deleted file mode 100644
+index 1bddbde0142d..000000000000
+diff --git a/Documentation/DocBook/media/v4l/cec-ioc-adap-g-caps.xml b/Documentation/DocBook/media/v4l/cec-ioc-adap-g-caps.xml
+deleted file mode 100644
+index 3523ef2259b1..000000000000
+diff --git a/Documentation/DocBook/media/v4l/cec-ioc-adap-g-log-addrs.xml b/Documentation/DocBook/media/v4l/cec-ioc-adap-g-log-addrs.xml
+deleted file mode 100644
+index 302b8294f7fc..000000000000
+diff --git a/Documentation/DocBook/media/v4l/cec-ioc-adap-g-phys-addr.xml b/Documentation/DocBook/media/v4l/cec-ioc-adap-g-phys-addr.xml
+deleted file mode 100644
+index d95f1785080c..000000000000
+diff --git a/Documentation/DocBook/media/v4l/cec-ioc-dqevent.xml b/Documentation/DocBook/media/v4l/cec-ioc-dqevent.xml
+deleted file mode 100644
+index 697dde575cd4..000000000000
+diff --git a/Documentation/DocBook/media/v4l/cec-ioc-g-mode.xml b/Documentation/DocBook/media/v4l/cec-ioc-g-mode.xml
+deleted file mode 100644
+index 26b4282ad134..000000000000
+diff --git a/Documentation/DocBook/media/v4l/cec-ioc-receive.xml b/Documentation/DocBook/media/v4l/cec-ioc-receive.xml
+deleted file mode 100644
+index fde9f8678e67..000000000000
+diff --git a/Documentation/DocBook/media/v4l/common.xml b/Documentation/DocBook/media/v4l/common.xml
+deleted file mode 100644
+index 8b5e014224d6..000000000000
+diff --git a/Documentation/DocBook/media/v4l/compat.xml b/Documentation/DocBook/media/v4l/compat.xml
+deleted file mode 100644
+index 82fa328abd58..000000000000
+diff --git a/Documentation/DocBook/media/v4l/controls.xml b/Documentation/DocBook/media/v4l/controls.xml
+deleted file mode 100644
+index e2e5484d2d9b..000000000000
+diff --git a/Documentation/DocBook/media/v4l/crop.pdf b/Documentation/DocBook/media/v4l/crop.pdf
+deleted file mode 100644
+index c9fb81cd32f34d2b08cb601f3a1575af77e14275..0000000000000000000000000000000000000000
+diff --git a/Documentation/DocBook/media/v4l/dev-capture.xml b/Documentation/DocBook/media/v4l/dev-capture.xml
+deleted file mode 100644
+index e1c5f9406d6a..000000000000
+diff --git a/Documentation/DocBook/media/v4l/dev-codec.xml b/Documentation/DocBook/media/v4l/dev-codec.xml
+deleted file mode 100644
+index ff44c16fc080..000000000000
+diff --git a/Documentation/DocBook/media/v4l/dev-effect.xml b/Documentation/DocBook/media/v4l/dev-effect.xml
+deleted file mode 100644
+index 2350a67c0710..000000000000
+diff --git a/Documentation/DocBook/media/v4l/dev-event.xml b/Documentation/DocBook/media/v4l/dev-event.xml
+deleted file mode 100644
+index 19f4becfae34..000000000000
+diff --git a/Documentation/DocBook/media/v4l/dev-osd.xml b/Documentation/DocBook/media/v4l/dev-osd.xml
+deleted file mode 100644
+index 54853329140b..000000000000
+diff --git a/Documentation/DocBook/media/v4l/dev-output.xml b/Documentation/DocBook/media/v4l/dev-output.xml
+deleted file mode 100644
+index 9130a3dc7880..000000000000
+diff --git a/Documentation/DocBook/media/v4l/dev-overlay.xml b/Documentation/DocBook/media/v4l/dev-overlay.xml
+deleted file mode 100644
+index cc6e0c5c960c..000000000000
+diff --git a/Documentation/DocBook/media/v4l/dev-radio.xml b/Documentation/DocBook/media/v4l/dev-radio.xml
+deleted file mode 100644
+index 3e6ac73b36af..000000000000
+diff --git a/Documentation/DocBook/media/v4l/dev-raw-vbi.xml b/Documentation/DocBook/media/v4l/dev-raw-vbi.xml
+deleted file mode 100644
+index 78599bbd58f7..000000000000
+diff --git a/Documentation/DocBook/media/v4l/dev-rds.xml b/Documentation/DocBook/media/v4l/dev-rds.xml
+deleted file mode 100644
+index be2f33737323..000000000000
+diff --git a/Documentation/DocBook/media/v4l/dev-sdr.xml b/Documentation/DocBook/media/v4l/dev-sdr.xml
+deleted file mode 100644
+index 6da1157fb5bd..000000000000
+diff --git a/Documentation/DocBook/media/v4l/dev-sliced-vbi.xml b/Documentation/DocBook/media/v4l/dev-sliced-vbi.xml
+deleted file mode 100644
+index 0aec62ed2bf8..000000000000
+diff --git a/Documentation/DocBook/media/v4l/dev-subdev.xml b/Documentation/DocBook/media/v4l/dev-subdev.xml
+deleted file mode 100644
+index f4bc27af83eb..000000000000
+diff --git a/Documentation/DocBook/media/v4l/dev-teletext.xml b/Documentation/DocBook/media/v4l/dev-teletext.xml
+deleted file mode 100644
+index bd21c64d70f3..000000000000
+diff --git a/Documentation/DocBook/media/v4l/driver.xml b/Documentation/DocBook/media/v4l/driver.xml
+deleted file mode 100644
+index 7c6638bacedb..000000000000
+diff --git a/Documentation/DocBook/media/v4l/fdl-appendix.xml b/Documentation/DocBook/media/v4l/fdl-appendix.xml
+deleted file mode 100644
+index 71299a3897c4..000000000000
+diff --git a/Documentation/DocBook/media/v4l/fieldseq_bt.pdf b/Documentation/DocBook/media/v4l/fieldseq_bt.pdf
+deleted file mode 100644
+index 26598b23f80daf8048fdaa9a83a39a0e8ba12f19..0000000000000000000000000000000000000000
+diff --git a/Documentation/DocBook/media/v4l/fieldseq_tb.pdf b/Documentation/DocBook/media/v4l/fieldseq_tb.pdf
+deleted file mode 100644
+index 4965b22ddb3a85aa27a4e6f98c931323605dd26e..0000000000000000000000000000000000000000
+diff --git a/Documentation/DocBook/media/v4l/func-close.xml b/Documentation/DocBook/media/v4l/func-close.xml
+deleted file mode 100644
+index 232920d2f3c6..000000000000
+diff --git a/Documentation/DocBook/media/v4l/func-ioctl.xml b/Documentation/DocBook/media/v4l/func-ioctl.xml
+deleted file mode 100644
+index 4394184a1a6d..000000000000
+diff --git a/Documentation/DocBook/media/v4l/func-mmap.xml b/Documentation/DocBook/media/v4l/func-mmap.xml
+deleted file mode 100644
+index f31ad71bf301..000000000000
+diff --git a/Documentation/DocBook/media/v4l/func-munmap.xml b/Documentation/DocBook/media/v4l/func-munmap.xml
+deleted file mode 100644
+index 860d49ca54a5..000000000000
+diff --git a/Documentation/DocBook/media/v4l/func-open.xml b/Documentation/DocBook/media/v4l/func-open.xml
+deleted file mode 100644
+index cf64e207c3ee..000000000000
+diff --git a/Documentation/DocBook/media/v4l/func-poll.xml b/Documentation/DocBook/media/v4l/func-poll.xml
+deleted file mode 100644
+index 4c73f115219b..000000000000
+diff --git a/Documentation/DocBook/media/v4l/func-read.xml b/Documentation/DocBook/media/v4l/func-read.xml
+deleted file mode 100644
+index e218bbfbd362..000000000000
+diff --git a/Documentation/DocBook/media/v4l/func-select.xml b/Documentation/DocBook/media/v4l/func-select.xml
+deleted file mode 100644
+index e12a60d9bd85..000000000000
+diff --git a/Documentation/DocBook/media/v4l/func-write.xml b/Documentation/DocBook/media/v4l/func-write.xml
+deleted file mode 100644
+index 575207885726..000000000000
+diff --git a/Documentation/DocBook/media/v4l/gen-errors.xml b/Documentation/DocBook/media/v4l/gen-errors.xml
+deleted file mode 100644
+index 7e29a4e1f696..000000000000
+diff --git a/Documentation/DocBook/media/v4l/io.xml b/Documentation/DocBook/media/v4l/io.xml
+deleted file mode 100644
+index 21a3dde8f95d..000000000000
+diff --git a/Documentation/DocBook/media/v4l/keytable.c.xml b/Documentation/DocBook/media/v4l/keytable.c.xml
+deleted file mode 100644
+index d53254a3be15..000000000000
+diff --git a/Documentation/DocBook/media/v4l/libv4l.xml b/Documentation/DocBook/media/v4l/libv4l.xml
+deleted file mode 100644
+index d3b71e20003c..000000000000
+diff --git a/Documentation/DocBook/media/v4l/lirc_device_interface.xml b/Documentation/DocBook/media/v4l/lirc_device_interface.xml
+deleted file mode 100644
+index f53ad58027a7..000000000000
+diff --git a/Documentation/DocBook/media/v4l/media-controller.xml b/Documentation/DocBook/media/v4l/media-controller.xml
+deleted file mode 100644
+index 5f2fc07a93d7..000000000000
+diff --git a/Documentation/DocBook/media/v4l/media-func-close.xml b/Documentation/DocBook/media/v4l/media-func-close.xml
+deleted file mode 100644
+index be149c802aeb..000000000000
+diff --git a/Documentation/DocBook/media/v4l/media-func-ioctl.xml b/Documentation/DocBook/media/v4l/media-func-ioctl.xml
+deleted file mode 100644
+index 39478d0fbcaa..000000000000
+diff --git a/Documentation/DocBook/media/v4l/media-func-open.xml b/Documentation/DocBook/media/v4l/media-func-open.xml
+deleted file mode 100644
+index 122374a3e894..000000000000
+diff --git a/Documentation/DocBook/media/v4l/media-ioc-device-info.xml b/Documentation/DocBook/media/v4l/media-ioc-device-info.xml
+deleted file mode 100644
+index b0a21ac300b8..000000000000
+diff --git a/Documentation/DocBook/media/v4l/media-ioc-enum-entities.xml b/Documentation/DocBook/media/v4l/media-ioc-enum-entities.xml
+deleted file mode 100644
+index 0c4f96bfc2de..000000000000
+diff --git a/Documentation/DocBook/media/v4l/media-ioc-enum-links.xml b/Documentation/DocBook/media/v4l/media-ioc-enum-links.xml
+deleted file mode 100644
+index 2bbeea9f3e18..000000000000
+diff --git a/Documentation/DocBook/media/v4l/media-ioc-g-topology.xml b/Documentation/DocBook/media/v4l/media-ioc-g-topology.xml
+deleted file mode 100644
+index e0d49fa329f0..000000000000
+diff --git a/Documentation/DocBook/media/v4l/media-ioc-setup-link.xml b/Documentation/DocBook/media/v4l/media-ioc-setup-link.xml
+deleted file mode 100644
+index fc2e522ee65a..000000000000
+diff --git a/Documentation/DocBook/media/v4l/media-types.xml b/Documentation/DocBook/media/v4l/media-types.xml
+deleted file mode 100644
+index 95aa1f9c836a..000000000000
+diff --git a/Documentation/DocBook/media/v4l/pipeline.pdf b/Documentation/DocBook/media/v4l/pipeline.pdf
+deleted file mode 100644
+index ee3e37f04b6a788e255ce26d1607e77ba2c119a3..0000000000000000000000000000000000000000
+diff --git a/Documentation/DocBook/media/v4l/pixfmt-grey.xml b/Documentation/DocBook/media/v4l/pixfmt-grey.xml
+deleted file mode 100644
+index bee970d3f76d..000000000000
+diff --git a/Documentation/DocBook/media/v4l/pixfmt-m420.xml b/Documentation/DocBook/media/v4l/pixfmt-m420.xml
+deleted file mode 100644
+index aadae92c5d04..000000000000
+diff --git a/Documentation/DocBook/media/v4l/pixfmt-nv12.xml b/Documentation/DocBook/media/v4l/pixfmt-nv12.xml
+deleted file mode 100644
+index 84dd4fd7cb80..000000000000
+diff --git a/Documentation/DocBook/media/v4l/pixfmt-nv12m.xml b/Documentation/DocBook/media/v4l/pixfmt-nv12m.xml
+deleted file mode 100644
+index f3a3d459fcdf..000000000000
+diff --git a/Documentation/DocBook/media/v4l/pixfmt-nv12mt.xml b/Documentation/DocBook/media/v4l/pixfmt-nv12mt.xml
+deleted file mode 100644
+index 8a70a1707b7a..000000000000
+diff --git a/Documentation/DocBook/media/v4l/pixfmt-nv16.xml b/Documentation/DocBook/media/v4l/pixfmt-nv16.xml
+deleted file mode 100644
+index 8ae1f8a810d0..000000000000
+diff --git a/Documentation/DocBook/media/v4l/pixfmt-nv16m.xml b/Documentation/DocBook/media/v4l/pixfmt-nv16m.xml
+deleted file mode 100644
+index fb2b5e35d665..000000000000
+diff --git a/Documentation/DocBook/media/v4l/pixfmt-nv24.xml b/Documentation/DocBook/media/v4l/pixfmt-nv24.xml
+deleted file mode 100644
+index fb255f2ca9dd..000000000000
+diff --git a/Documentation/DocBook/media/v4l/pixfmt-packed-rgb.xml b/Documentation/DocBook/media/v4l/pixfmt-packed-rgb.xml
+deleted file mode 100644
+index b60fb935b91b..000000000000
+diff --git a/Documentation/DocBook/media/v4l/pixfmt-packed-yuv.xml b/Documentation/DocBook/media/v4l/pixfmt-packed-yuv.xml
+deleted file mode 100644
+index 33fa5a47a865..000000000000
+diff --git a/Documentation/DocBook/media/v4l/pixfmt-sbggr16.xml b/Documentation/DocBook/media/v4l/pixfmt-sbggr16.xml
+deleted file mode 100644
+index 6494b05d84a1..000000000000
+diff --git a/Documentation/DocBook/media/v4l/pixfmt-sbggr8.xml b/Documentation/DocBook/media/v4l/pixfmt-sbggr8.xml
+deleted file mode 100644
+index 5eaf2b42d3f7..000000000000
+diff --git a/Documentation/DocBook/media/v4l/pixfmt-sdr-cs08.xml b/Documentation/DocBook/media/v4l/pixfmt-sdr-cs08.xml
+deleted file mode 100644
+index 6118d8f7a20c..000000000000
+diff --git a/Documentation/DocBook/media/v4l/pixfmt-sdr-cs14le.xml b/Documentation/DocBook/media/v4l/pixfmt-sdr-cs14le.xml
+deleted file mode 100644
+index e4b494ce1369..000000000000
+diff --git a/Documentation/DocBook/media/v4l/pixfmt-sdr-cu08.xml b/Documentation/DocBook/media/v4l/pixfmt-sdr-cu08.xml
+deleted file mode 100644
+index 2d80104c178b..000000000000
+diff --git a/Documentation/DocBook/media/v4l/pixfmt-sdr-cu16le.xml b/Documentation/DocBook/media/v4l/pixfmt-sdr-cu16le.xml
+deleted file mode 100644
+index 26288ffa9071..000000000000
+diff --git a/Documentation/DocBook/media/v4l/pixfmt-sdr-ru12le.xml b/Documentation/DocBook/media/v4l/pixfmt-sdr-ru12le.xml
+deleted file mode 100644
+index 3df076b99f94..000000000000
+diff --git a/Documentation/DocBook/media/v4l/pixfmt-sgbrg8.xml b/Documentation/DocBook/media/v4l/pixfmt-sgbrg8.xml
+deleted file mode 100644
+index fee65dca79c5..000000000000
+diff --git a/Documentation/DocBook/media/v4l/pixfmt-sgrbg8.xml b/Documentation/DocBook/media/v4l/pixfmt-sgrbg8.xml
+deleted file mode 100644
+index 7803b8c41b45..000000000000
+diff --git a/Documentation/DocBook/media/v4l/pixfmt-srggb10.xml b/Documentation/DocBook/media/v4l/pixfmt-srggb10.xml
+deleted file mode 100644
+index f34d03ebda3a..000000000000
+diff --git a/Documentation/DocBook/media/v4l/pixfmt-srggb10alaw8.xml b/Documentation/DocBook/media/v4l/pixfmt-srggb10alaw8.xml
+deleted file mode 100644
+index d2e5845e57fb..000000000000
+diff --git a/Documentation/DocBook/media/v4l/pixfmt-srggb10dpcm8.xml b/Documentation/DocBook/media/v4l/pixfmt-srggb10dpcm8.xml
+deleted file mode 100644
+index bde89878c5c5..000000000000
+diff --git a/Documentation/DocBook/media/v4l/pixfmt-srggb10p.xml b/Documentation/DocBook/media/v4l/pixfmt-srggb10p.xml
+deleted file mode 100644
+index a8cc102cde4f..000000000000
+diff --git a/Documentation/DocBook/media/v4l/pixfmt-srggb12.xml b/Documentation/DocBook/media/v4l/pixfmt-srggb12.xml
+deleted file mode 100644
+index 0c8e4adf417f..000000000000
+diff --git a/Documentation/DocBook/media/v4l/pixfmt-srggb8.xml b/Documentation/DocBook/media/v4l/pixfmt-srggb8.xml
+deleted file mode 100644
+index 2570e3be3cf1..000000000000
+diff --git a/Documentation/DocBook/media/v4l/pixfmt-uv8.xml b/Documentation/DocBook/media/v4l/pixfmt-uv8.xml
+deleted file mode 100644
+index c507c1f73cd0..000000000000
+diff --git a/Documentation/DocBook/media/v4l/pixfmt-uyvy.xml b/Documentation/DocBook/media/v4l/pixfmt-uyvy.xml
+deleted file mode 100644
+index b1f6801a17ff..000000000000
+diff --git a/Documentation/DocBook/media/v4l/pixfmt-vyuy.xml b/Documentation/DocBook/media/v4l/pixfmt-vyuy.xml
+deleted file mode 100644
+index 82803408b389..000000000000
+diff --git a/Documentation/DocBook/media/v4l/pixfmt-y10.xml b/Documentation/DocBook/media/v4l/pixfmt-y10.xml
+deleted file mode 100644
+index d065043db8d8..000000000000
+diff --git a/Documentation/DocBook/media/v4l/pixfmt-y10b.xml b/Documentation/DocBook/media/v4l/pixfmt-y10b.xml
+deleted file mode 100644
+index adb0ad808c93..000000000000
+diff --git a/Documentation/DocBook/media/v4l/pixfmt-y12.xml b/Documentation/DocBook/media/v4l/pixfmt-y12.xml
+deleted file mode 100644
+index ff417b858cc9..000000000000
+diff --git a/Documentation/DocBook/media/v4l/pixfmt-y12i.xml b/Documentation/DocBook/media/v4l/pixfmt-y12i.xml
+deleted file mode 100644
+index 4a2d1e5f67e4..000000000000
+diff --git a/Documentation/DocBook/media/v4l/pixfmt-y16-be.xml b/Documentation/DocBook/media/v4l/pixfmt-y16-be.xml
+deleted file mode 100644
+index cea53e1eaa43..000000000000
+diff --git a/Documentation/DocBook/media/v4l/pixfmt-y16.xml b/Documentation/DocBook/media/v4l/pixfmt-y16.xml
+deleted file mode 100644
+index ff4f727d5624..000000000000
+diff --git a/Documentation/DocBook/media/v4l/pixfmt-y41p.xml b/Documentation/DocBook/media/v4l/pixfmt-y41p.xml
+deleted file mode 100644
+index 98dcb91d2917..000000000000
+diff --git a/Documentation/DocBook/media/v4l/pixfmt-y8i.xml b/Documentation/DocBook/media/v4l/pixfmt-y8i.xml
+deleted file mode 100644
+index 99f389d4c6c8..000000000000
+diff --git a/Documentation/DocBook/media/v4l/pixfmt-yuv410.xml b/Documentation/DocBook/media/v4l/pixfmt-yuv410.xml
+deleted file mode 100644
+index 0869dce5f92c..000000000000
+diff --git a/Documentation/DocBook/media/v4l/pixfmt-yuv411p.xml b/Documentation/DocBook/media/v4l/pixfmt-yuv411p.xml
+deleted file mode 100644
+index 086dc731bf02..000000000000
+diff --git a/Documentation/DocBook/media/v4l/pixfmt-yuv420.xml b/Documentation/DocBook/media/v4l/pixfmt-yuv420.xml
+deleted file mode 100644
+index 48649fac1596..000000000000
+diff --git a/Documentation/DocBook/media/v4l/pixfmt-yuv420m.xml b/Documentation/DocBook/media/v4l/pixfmt-yuv420m.xml
+deleted file mode 100644
+index 7d13fe96657d..000000000000
+diff --git a/Documentation/DocBook/media/v4l/pixfmt-yuv422m.xml b/Documentation/DocBook/media/v4l/pixfmt-yuv422m.xml
+deleted file mode 100644
+index dd502802cb75..000000000000
+diff --git a/Documentation/DocBook/media/v4l/pixfmt-yuv422p.xml b/Documentation/DocBook/media/v4l/pixfmt-yuv422p.xml
+deleted file mode 100644
+index 4ce6463fe0a5..000000000000
+diff --git a/Documentation/DocBook/media/v4l/pixfmt-yuv444m.xml b/Documentation/DocBook/media/v4l/pixfmt-yuv444m.xml
+deleted file mode 100644
+index 1b7335940bc7..000000000000
+diff --git a/Documentation/DocBook/media/v4l/pixfmt-yuyv.xml b/Documentation/DocBook/media/v4l/pixfmt-yuyv.xml
+deleted file mode 100644
+index 58384092251a..000000000000
+diff --git a/Documentation/DocBook/media/v4l/pixfmt-yvyu.xml b/Documentation/DocBook/media/v4l/pixfmt-yvyu.xml
+deleted file mode 100644
+index bfffdc76d3da..000000000000
+diff --git a/Documentation/DocBook/media/v4l/pixfmt-z16.xml b/Documentation/DocBook/media/v4l/pixfmt-z16.xml
+deleted file mode 100644
+index 1d9cb1684bd3..000000000000
+diff --git a/Documentation/DocBook/media/v4l/pixfmt.xml b/Documentation/DocBook/media/v4l/pixfmt.xml
+deleted file mode 100644
+index 5a08aeea4360..000000000000
+diff --git a/Documentation/DocBook/media/v4l/planar-apis.xml b/Documentation/DocBook/media/v4l/planar-apis.xml
+deleted file mode 100644
+index 878ce2040488..000000000000
+diff --git a/Documentation/DocBook/media/v4l/remote_controllers.xml b/Documentation/DocBook/media/v4l/remote_controllers.xml
+deleted file mode 100644
+index b86844e80257..000000000000
+diff --git a/Documentation/DocBook/media/v4l/selection-api.xml b/Documentation/DocBook/media/v4l/selection-api.xml
+deleted file mode 100644
+index b764cba150d1..000000000000
+diff --git a/Documentation/DocBook/media/v4l/selections-common.xml b/Documentation/DocBook/media/v4l/selections-common.xml
+deleted file mode 100644
+index d6d56fb6f9c0..000000000000
+diff --git a/Documentation/DocBook/media/v4l/subdev-formats.xml b/Documentation/DocBook/media/v4l/subdev-formats.xml
+deleted file mode 100644
+index 199c84e3aede..000000000000
+diff --git a/Documentation/DocBook/media/v4l/subdev-image-processing-crop.dia b/Documentation/DocBook/media/v4l/subdev-image-processing-crop.dia
+deleted file mode 100644
+index e32ba5362e1d..000000000000
+diff --git a/Documentation/DocBook/media/v4l/subdev-image-processing-crop.svg b/Documentation/DocBook/media/v4l/subdev-image-processing-crop.svg
+deleted file mode 100644
+index 18b0f5de9ed2..000000000000
+diff --git a/Documentation/DocBook/media/v4l/subdev-image-processing-full.dia b/Documentation/DocBook/media/v4l/subdev-image-processing-full.dia
+deleted file mode 100644
+index a0d782927840..000000000000
+diff --git a/Documentation/DocBook/media/v4l/subdev-image-processing-full.svg b/Documentation/DocBook/media/v4l/subdev-image-processing-full.svg
+deleted file mode 100644
+index 3322cf4c0093..000000000000
+diff --git a/Documentation/DocBook/media/v4l/subdev-image-processing-scaling-multi-source.dia b/Documentation/DocBook/media/v4l/subdev-image-processing-scaling-multi-source.dia
+deleted file mode 100644
+index 0cd50a7bda80..000000000000
+diff --git a/Documentation/DocBook/media/v4l/subdev-image-processing-scaling-multi-source.svg b/Documentation/DocBook/media/v4l/subdev-image-processing-scaling-multi-source.svg
+deleted file mode 100644
+index 2340c0f8bc92..000000000000
+diff --git a/Documentation/DocBook/media/v4l/v4l2.xml b/Documentation/DocBook/media/v4l/v4l2.xml
+deleted file mode 100644
+index 42e626d6c936..000000000000
+diff --git a/Documentation/DocBook/media/v4l/v4l2grab.c.xml b/Documentation/DocBook/media/v4l/v4l2grab.c.xml
+deleted file mode 100644
+index bed12e40be27..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vbi_525.pdf b/Documentation/DocBook/media/v4l/vbi_525.pdf
+deleted file mode 100644
+index 9e72c25b208db6c7844ed85fe9742324602c0a5c..0000000000000000000000000000000000000000
+diff --git a/Documentation/DocBook/media/v4l/vbi_625.pdf b/Documentation/DocBook/media/v4l/vbi_625.pdf
+deleted file mode 100644
+index 765235e33a4de256a0b3fbf64ffe52946190cac4..0000000000000000000000000000000000000000
+diff --git a/Documentation/DocBook/media/v4l/vbi_hsync.pdf b/Documentation/DocBook/media/v4l/vbi_hsync.pdf
+deleted file mode 100644
+index 200b668189bf1d0761dbcd75f38e43cb4d703a33..0000000000000000000000000000000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-create-bufs.xml b/Documentation/DocBook/media/v4l/vidioc-create-bufs.xml
+deleted file mode 100644
+index 6528e97b8990..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-cropcap.xml b/Documentation/DocBook/media/v4l/vidioc-cropcap.xml
+deleted file mode 100644
+index 50cb940cbe5c..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-dbg-g-chip-info.xml b/Documentation/DocBook/media/v4l/vidioc-dbg-g-chip-info.xml
+deleted file mode 100644
+index f14a3bb1afaa..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-dbg-g-register.xml b/Documentation/DocBook/media/v4l/vidioc-dbg-g-register.xml
+deleted file mode 100644
+index 5877f68a5820..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-decoder-cmd.xml b/Documentation/DocBook/media/v4l/vidioc-decoder-cmd.xml
+deleted file mode 100644
+index 73eb5cfe698a..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-dqevent.xml b/Documentation/DocBook/media/v4l/vidioc-dqevent.xml
+deleted file mode 100644
+index c9c3c7713832..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-dv-timings-cap.xml b/Documentation/DocBook/media/v4l/vidioc-dv-timings-cap.xml
+deleted file mode 100644
+index ca9ffce9b4c1..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-encoder-cmd.xml b/Documentation/DocBook/media/v4l/vidioc-encoder-cmd.xml
+deleted file mode 100644
+index 70a4a08e9404..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-enum-dv-timings.xml b/Documentation/DocBook/media/v4l/vidioc-enum-dv-timings.xml
+deleted file mode 100644
+index 9b3d42018b69..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-enum-fmt.xml b/Documentation/DocBook/media/v4l/vidioc-enum-fmt.xml
+deleted file mode 100644
+index f8dfeed34fca..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-enum-frameintervals.xml b/Documentation/DocBook/media/v4l/vidioc-enum-frameintervals.xml
+deleted file mode 100644
+index 7c839ab0afbb..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-enum-framesizes.xml b/Documentation/DocBook/media/v4l/vidioc-enum-framesizes.xml
+deleted file mode 100644
+index 9ed68ac8f474..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-enum-freq-bands.xml b/Documentation/DocBook/media/v4l/vidioc-enum-freq-bands.xml
+deleted file mode 100644
+index a0608abc1ab8..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-enumaudio.xml b/Documentation/DocBook/media/v4l/vidioc-enumaudio.xml
+deleted file mode 100644
+index ea816ab2e49e..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-enumaudioout.xml b/Documentation/DocBook/media/v4l/vidioc-enumaudioout.xml
+deleted file mode 100644
+index 2e87cedb0d32..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-enuminput.xml b/Documentation/DocBook/media/v4l/vidioc-enuminput.xml
+deleted file mode 100644
+index 603fecef9083..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-enumoutput.xml b/Documentation/DocBook/media/v4l/vidioc-enumoutput.xml
+deleted file mode 100644
+index 773fb1258c24..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-enumstd.xml b/Documentation/DocBook/media/v4l/vidioc-enumstd.xml
+deleted file mode 100644
+index f18454e91752..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-expbuf.xml b/Documentation/DocBook/media/v4l/vidioc-expbuf.xml
+deleted file mode 100644
+index a6558a676ef3..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-g-audio.xml b/Documentation/DocBook/media/v4l/vidioc-g-audio.xml
+deleted file mode 100644
+index d7bb9b3738f6..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-g-audioout.xml b/Documentation/DocBook/media/v4l/vidioc-g-audioout.xml
+deleted file mode 100644
+index 200a2704a970..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-g-crop.xml b/Documentation/DocBook/media/v4l/vidioc-g-crop.xml
+deleted file mode 100644
+index e6c4efb9e8b4..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-g-ctrl.xml b/Documentation/DocBook/media/v4l/vidioc-g-ctrl.xml
+deleted file mode 100644
+index ee2820d6ca66..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-g-dv-timings.xml b/Documentation/DocBook/media/v4l/vidioc-g-dv-timings.xml
+deleted file mode 100644
+index 06952d7cc770..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-g-edid.xml b/Documentation/DocBook/media/v4l/vidioc-g-edid.xml
+deleted file mode 100644
+index b7602d30f596..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-g-enc-index.xml b/Documentation/DocBook/media/v4l/vidioc-g-enc-index.xml
+deleted file mode 100644
+index be25029a16f1..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-g-ext-ctrls.xml b/Documentation/DocBook/media/v4l/vidioc-g-ext-ctrls.xml
+deleted file mode 100644
+index eb82f7e7d06b..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-g-fbuf.xml b/Documentation/DocBook/media/v4l/vidioc-g-fbuf.xml
+deleted file mode 100644
+index 77607cc19688..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-g-fmt.xml b/Documentation/DocBook/media/v4l/vidioc-g-fmt.xml
+deleted file mode 100644
+index ffcb448251f0..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-g-frequency.xml b/Documentation/DocBook/media/v4l/vidioc-g-frequency.xml
+deleted file mode 100644
+index d1034fb61d15..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-g-input.xml b/Documentation/DocBook/media/v4l/vidioc-g-input.xml
+deleted file mode 100644
+index 1d43065090dd..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-g-jpegcomp.xml b/Documentation/DocBook/media/v4l/vidioc-g-jpegcomp.xml
+deleted file mode 100644
+index 098ff483802e..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-g-modulator.xml b/Documentation/DocBook/media/v4l/vidioc-g-modulator.xml
+deleted file mode 100644
+index 96e17b344c5d..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-g-output.xml b/Documentation/DocBook/media/v4l/vidioc-g-output.xml
+deleted file mode 100644
+index 4533068ecb8a..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-g-parm.xml b/Documentation/DocBook/media/v4l/vidioc-g-parm.xml
+deleted file mode 100644
+index 721728745407..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-g-priority.xml b/Documentation/DocBook/media/v4l/vidioc-g-priority.xml
+deleted file mode 100644
+index 6a81b4fe9538..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-g-selection.xml b/Documentation/DocBook/media/v4l/vidioc-g-selection.xml
+deleted file mode 100644
+index 997f4e96f297..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-g-sliced-vbi-cap.xml b/Documentation/DocBook/media/v4l/vidioc-g-sliced-vbi-cap.xml
+deleted file mode 100644
+index d05623c55403..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-g-std.xml b/Documentation/DocBook/media/v4l/vidioc-g-std.xml
+deleted file mode 100644
+index 4a898417de28..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-g-tuner.xml b/Documentation/DocBook/media/v4l/vidioc-g-tuner.xml
+deleted file mode 100644
+index 459b7e561f3c..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-log-status.xml b/Documentation/DocBook/media/v4l/vidioc-log-status.xml
+deleted file mode 100644
+index 5ded7d35e27b..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-overlay.xml b/Documentation/DocBook/media/v4l/vidioc-overlay.xml
+deleted file mode 100644
+index 250a7de1877f..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-prepare-buf.xml b/Documentation/DocBook/media/v4l/vidioc-prepare-buf.xml
+deleted file mode 100644
+index 7bde698760e4..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-qbuf.xml b/Documentation/DocBook/media/v4l/vidioc-qbuf.xml
+deleted file mode 100644
+index 8b98a0e421fc..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-query-dv-timings.xml b/Documentation/DocBook/media/v4l/vidioc-query-dv-timings.xml
+deleted file mode 100644
+index d41bf47ee5a2..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-querybuf.xml b/Documentation/DocBook/media/v4l/vidioc-querybuf.xml
+deleted file mode 100644
+index 50bfcb5e8508..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-querycap.xml b/Documentation/DocBook/media/v4l/vidioc-querycap.xml
+deleted file mode 100644
+index cd82148dedd7..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-queryctrl.xml b/Documentation/DocBook/media/v4l/vidioc-queryctrl.xml
+deleted file mode 100644
+index 55b7582cf314..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-querystd.xml b/Documentation/DocBook/media/v4l/vidioc-querystd.xml
+deleted file mode 100644
+index 3ceae35fab03..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-reqbufs.xml b/Documentation/DocBook/media/v4l/vidioc-reqbufs.xml
+deleted file mode 100644
+index 6f529e100ea4..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-s-hw-freq-seek.xml b/Documentation/DocBook/media/v4l/vidioc-s-hw-freq-seek.xml
+deleted file mode 100644
+index a5fc4c4880f3..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-streamon.xml b/Documentation/DocBook/media/v4l/vidioc-streamon.xml
+deleted file mode 100644
+index 89fd7ce964f9..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-subdev-enum-frame-interval.xml b/Documentation/DocBook/media/v4l/vidioc-subdev-enum-frame-interval.xml
+deleted file mode 100644
+index 9d0251a27e5f..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-subdev-enum-frame-size.xml b/Documentation/DocBook/media/v4l/vidioc-subdev-enum-frame-size.xml
+deleted file mode 100644
+index 9b91b8332ba9..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-subdev-enum-mbus-code.xml b/Documentation/DocBook/media/v4l/vidioc-subdev-enum-mbus-code.xml
+deleted file mode 100644
+index c67256ada87a..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-subdev-g-crop.xml b/Documentation/DocBook/media/v4l/vidioc-subdev-g-crop.xml
+deleted file mode 100644
+index 4cddd788c589..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-subdev-g-fmt.xml b/Documentation/DocBook/media/v4l/vidioc-subdev-g-fmt.xml
+deleted file mode 100644
+index 781089cba453..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-subdev-g-frame-interval.xml b/Documentation/DocBook/media/v4l/vidioc-subdev-g-frame-interval.xml
+deleted file mode 100644
+index 848ec789ddaa..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-subdev-g-selection.xml b/Documentation/DocBook/media/v4l/vidioc-subdev-g-selection.xml
+deleted file mode 100644
+index 8346b2e4a703..000000000000
+diff --git a/Documentation/DocBook/media/v4l/vidioc-subscribe-event.xml b/Documentation/DocBook/media/v4l/vidioc-subscribe-event.xml
+deleted file mode 100644
+index 5fd0ee78f880..000000000000
+diff --git a/Documentation/DocBook/media/vbi_525.gif.b64 b/Documentation/DocBook/media/vbi_525.gif.b64
+deleted file mode 100644
+index d5dcf06f2aef..000000000000
+diff --git a/Documentation/DocBook/media/vbi_625.gif.b64 b/Documentation/DocBook/media/vbi_625.gif.b64
+deleted file mode 100644
+index 831f49a02821..000000000000
+diff --git a/Documentation/DocBook/media/vbi_hsync.gif.b64 b/Documentation/DocBook/media/vbi_hsync.gif.b64
+deleted file mode 100644
+index cdafabed5c11..000000000000
+diff --git a/Documentation/Makefile.sphinx b/Documentation/Makefile.sphinx
+index fd565e1f1368..b10b6c598ae2 100644
+--- a/Documentation/Makefile.sphinx
++++ b/Documentation/Makefile.sphinx
+@@ -63,7 +63,6 @@ sgmldocs:
+ psdocs:
+ mandocs:
+ installmandocs:
+-cleanmediadocs:
+ 
+ cleandocs:
+ 	$(Q)rm -rf $(BUILDDIR)
+diff --git a/Makefile b/Makefile
+index 6cd4d62cb1c1..b993c42340d6 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1416,7 +1416,7 @@ $(help-board-dirs): help-%:
+ 
+ # Documentation targets
+ # ---------------------------------------------------------------------------
+-DOC_TARGETS := xmldocs sgmldocs psdocs pdfdocs htmldocs mandocs installmandocs epubdocs cleandocs cleanmediadocs
++DOC_TARGETS := xmldocs sgmldocs psdocs pdfdocs htmldocs mandocs installmandocs epubdocs cleandocs
+ PHONY += $(DOC_TARGETS)
+ $(DOC_TARGETS): scripts_basic FORCE
+ 	$(Q)$(MAKE) $(build)=scripts build_docproc build_check-lc_ctype
+-- 
+2.7.4
+
+
