@@ -1,83 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from terminus.zytor.com ([198.137.202.10]:52266 "EHLO mail.zytor.com"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1758917AbcG1RZx (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Thu, 28 Jul 2016 13:25:53 -0400
-Message-Id: <201607281708.u6SH8Uvl002361@mail.zytor.com>
-In-Reply-To: <20160727230218.GR5537@wotan.suse.de>
-References: <1469222687-1600-1-git-send-email-mcgrof@kernel.org> <1469222687-1600-8-git-send-email-mcgrof@kernel.org> <20160726003014.8e0424d2991ec71ad5e0ac5f@kernel.org> <20160727230218.GR5537@wotan.suse.de>
+Received: from ud10.udmedia.de ([194.117.254.50]:54870 "EHLO
+	mail.ud10.udmedia.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751169AbcG1SDb (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Thu, 28 Jul 2016 14:03:31 -0400
+Date: Thu, 28 Jul 2016 19:56:47 +0200
+From: Markus Trippelsdorf <markus@trippelsdorf.de>
+Subject: Re: [PATCH] Kbuild: Move -Wmaybe-uninitialized to W=1
+Message-ID: <20160728175647.GB316@x4>
+References: <20140616132045.GE8170@pd.tnic>
+ <20140616211405.GA7914@ravnborg.org>
+ <20140624213835.GD15068@pd.tnic>
+ <20140707105339.GA4776@pd.tnic>
+ <20160728042011.GA25498@nazgul.tnic>
+ <20160728082915.GA2349@gmail.com>
+ <20160728084624.GA30084@nazgul.tnic>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain;
- charset=UTF-8
-Subject: Re: [RFC v3 07/13] tables.h: add linker table support
-From: "H. Peter Anvin" <hpa@zytor.com>
-Date: Thu, 28 Jul 2016 10:08:20 -0700
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20160728084624.GA30084@nazgul.tnic>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Luis R. Rodriguez" <mcgrof@kernel.org>, Masami Hiramatsu <mhiramat@kernel.org>
+To: Borislav Petkov <bp@alien8.de>
+Cc: Ingo Molnar <mingo@kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, lkml <linux-kernel@vger.kernel.org>, Michael Matz <matz@suse.de>, linux-kbuild@vger.kernel.org, x86-ml <x86@kernel.org>
 
-tglx@linutronix.de,mingo@redhat.com,bp@alien8.de,linux@arm.linux.org.uk,masami.hiramatsu.pt@hitachi.com,jbaron@akamai.com,heiko.carstens@de.ibm.com,ananth@linux.vnet.ibm.com,anil.s.keshavamurthy@intel.com,davem@davemloft.net,realmz6@gmail.com,x86@kernel.org,luto@amacapital.net,keescook@chromium.org,torvalds@linux-foundation.org,gregkh@linuxfoundation.org,rusty@rustcorp.com.au,gnomes@lxorguk.ukuu.org.uk,alan@linux.intel.com,dwmw2@infradead.org,arnd@arndb.de,ming.lei@canonical.com,linux-arch@vger.kernel.org,benh@kernel.crashing.org,ananth@in.ibm.com,pebolle@tiscali.nl,fontana@sharpeleven.org,ciaran.farrell@suse.com,christopher.denicolo@suse.com,david.vrabel@citrix.com,konrad.wilk@oracle.com,mcb30@ipxe.org,jgross@suse.com,andrew.cooper3@citrix.com,andriy.shevchenko@linux.intel.com,paul.gortmaker@windriver.com,xen-devel@lists.xensource.com,ak@linux.intel.com,pali.rohar@gmail.com,dvhart@infradead.org,platform-driver-x86@vger.kernel.org,mmarek@suse.com,linux@rasmusvillemoes.dk,jko!
- sina@suse
-.cz,korea.drzix@gmail.com,linux-kbuild@vger.kernel.org,tony.luck@intel.com,akpm@linux-foundation.org,linux-ia64@vger.kernel.org,linux-arm-kernel@lists.infradead.org,linux-sh@vger.kernel.org,sparclinux@vger.kernel.org,catalin.marinas@arm.com,will.deacon@arm.com,rostedt@goodmis.org,jpoimboe@redhat.com
-Message-ID: <01FD20B1-E788-4CC6-81CF-BA26F000FFCB@zytor.com>
+On 2016.07.28 at 10:46 +0200, Borislav Petkov wrote:
+> On Thu, Jul 28, 2016 at 10:29:15AM +0200, Ingo Molnar wrote:
+> > BUT, isn't this the natural state of things, that the 'final' warnings
+> > that don't get fixed are the obnoxious, false positive ones - because
+> > anyone who looks at them will say "oh crap, idiotic compiler!"?
+> 
+> Hmm, so my experience is like Linus' - that -Wmaybe thing generates too
+> much noise and a lot of false positives. The thing is, as Micha (on CC)
+> explained it to me, that warning simply says that GCC sometimes *cannot*
+> know whether the variable will be used uninitialized or not and eagerly
+> issues the warning message, just in case.
 
-On July 27, 2016 4:02:18 PM PDT, "Luis R. Rodriguez" <mcgrof@kernel.org> wrote:
->On Tue, Jul 26, 2016 at 12:30:14AM +0900, Masami Hiramatsu wrote:
->> On Fri, 22 Jul 2016 14:24:41 -0700
->> "Luis R. Rodriguez" <mcgrof@kernel.org> wrote:
->> 
->> > +/**
->> > + * LINKTABLE_RUN_ALL - iterate and run through all entries on a
->linker table
->> > + *
->> > + * @tbl: linker table
->> > + * @func: structure name for the function name we want to call.
->> > + * @args...: arguments to pass to func
->> > + *
->> > + * Example usage:
->> > + *
->> > + *   LINKTABLE_RUN_ALL(frobnicator_fns, some_run,);
->> > + */
->> > +#define LINKTABLE_RUN_ALL(tbl, func, args...)				\
->> > +do {									\
->> > +	size_t i;							\
->> > +	for (i = 0; i < LINUX_SECTION_SIZE(tbl); i++)			\
->> > +		(tbl[i]).func (args);					\
->> > +} while (0);
->> > +
->> > +/**
->> > + * LINKTABLE_RUN_ERR - run each linker table entry func and return
->error if any
->> > + *
->> > + * @tbl: linker table
->> > + * @func: structure name for the function name we want to call.
->> > + * @args...: arguments to pass to func
->> > + *
->> > + * Example usage:
->> > + *
->> > + *   unsigned int err = LINKTABLE_RUN_ERR(frobnicator_fns,
->some_run,);
->> > + */
->> > +#define LINKTABLE_RUN_ERR(tbl, func, args...)				\
->> > +({									\
->> > +	size_t i;							\
->> > +	int err = 0;							\
->> > +	for (i = 0; !err && i < LINUX_SECTION_SIZE(tbl); i++)		\
->> > +		err = (tbl[i]).func (args);				\
->> > +		err; \
->> > +})
->> 
->> These iteration APIs are a bit dangerous, at least for these APIs
->we'd better change
->> name like as FUNCTABLE_RUN etc. because LINKTABLE can contain not
->only function address
->> but also some data (or address of data).
->
->Sure will do, thanks for the review.
->
->  Luis
+Another issue is that the number of warnings you get depend on the
+optimization level. So -Os may be different from -O2 and once you use
+-O3 (I know it is not officially supported) you will drown in false
+positives...
 
-I don't know if they are dangerous.  Keep in mind C type checking is still present.
 -- 
-Sent from my Android device with K-9 Mail. Please excuse brevity and formatting.
+Markus
