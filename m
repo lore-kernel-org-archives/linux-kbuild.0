@@ -1,64 +1,147 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi0-f44.google.com ([209.85.218.44]:33299 "EHLO
-	mail-oi0-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753312AbcG2S0R (ORCPT
+Received: from mail-wm0-f52.google.com ([74.125.82.52]:35066 "EHLO
+	mail-wm0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751168AbcGaUuo (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 29 Jul 2016 14:26:17 -0400
+	Sun, 31 Jul 2016 16:50:44 -0400
+Received: by mail-wm0-f52.google.com with SMTP id f65so347626055wmi.0
+        for <linux-kbuild@vger.kernel.org>; Sun, 31 Jul 2016 13:48:59 -0700 (PDT)
+Date: Sun, 31 Jul 2016 22:48:56 +0200
+From: Eugeniu Rosca <eugeniu.m.rosca@gmail.com>
+Subject: [PATCH v2] kconfig: Fix menu/endmenu markers in zconfdump()
+Message-ID: <20160731204856.GA16477@eugeniu-X230>
+References: <1468142123-13059-1-git-send-email-eugeniu.m.rosca@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20160729101932.GA27543@nazgul.tnic>
-References: <20140616132045.GE8170@pd.tnic> <CA+55aFznBSQC+_KFq39eT2yTOd_cidqQ5viBLG6mshb_U_Y2EA@mail.gmail.com>
- <CA+55aFxT4Wvg_yeKbiksoe5btDW59oW1SHK=JaBAJ-L3YGWxQQ@mail.gmail.com>
- <19202646.LtBeEUK5Qq@wuerfel> <20160729101932.GA27543@nazgul.tnic>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Fri, 29 Jul 2016 11:26:16 -0700
-Message-ID: <CA+55aFzuBLmHBz5zm4fWk_-1EnR9CkBKS-6h5ns1iBDEyVOp5Q@mail.gmail.com>
-Subject: Re: [PATCH] Kbuild: Move -Wmaybe-uninitialized to W=1
-Content-Type: text/plain; charset=UTF-8
+Content-Type: multipart/mixed; boundary="d6Gm4EdcadzBjdND"
+Content-Disposition: inline
+In-Reply-To: <1468142123-13059-1-git-send-email-eugeniu.m.rosca@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Borislav Petkov <bp@alien8.de>
-Cc: Arnd Bergmann <arnd@arndb.de>, Ingo Molnar <mingo@kernel.org>, Michal Marek <mmarek@suse.com>, Sam Ravnborg <sam@ravnborg.org>, lkml <linux-kernel@vger.kernel.org>, Michael Matz <matz@suse.de>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, x86-ml <x86@kernel.org>
+To: yann.morin.1998@free.fr, linux-kbuild@vger.kernel.org, mmarek@suse.cz
+Cc: eugeniu.m.rosca@gmail.com
 
-On Fri, Jul 29, 2016 at 3:19 AM, Borislav Petkov <bp@alien8.de> wrote:
->
-> So this is exactly the problem: we should not fix perfectly fine code
-> just so that gcc remains quiet. So when you say "fixed false positives"
-> you actually mean, "changed it so that gcc -Wmaybe-u... doesn't fire"
-> right?
->
-> And we should not do that.
 
-It's perfectly fine to do that when it makes sense and doesn't make
-the code worse. Adding a few unnecessary initializations to make the
-compiler shut up is not a problem.
+--d6Gm4EdcadzBjdND
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-But in the cases I looked at, that *really* didn't make sense. The
-pattern was along the lines of
 
-  struct something var;
+--d6Gm4EdcadzBjdND
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: inline; filename="v2-0001-kconfig-Fix-menu-endmenu-markers-in-zconfdump.patch"
 
-  if (initialize_var(&var) < 0)
-     return error;
+From 4af7b7801e2d7dffd8f943b03415659e42766610 Mon Sep 17 00:00:00 2001
+From: Eugeniu Rosca <eugeniu.m.rosca@gmail.com>
+Date: Sun, 10 Jul 2016 10:03:53 +0200
+Subject: [PATCH v2] kconfig: Fix menu/endmenu markers in zconfdump()
 
-  .. use "var.xyz" .. - gcc complains that "var.xyz" may be uninitialized
+Given a Kconfig.sample, implementing 2 empty and 2 non-empty menu
+entries:
 
-and quite frankly,. the code made sense, and adding crazy
-initializations for the fact that gcc has a shit-for-brains warning
-didn't work well seemed to just make the code worse.
+menu EMPTY_MENU
+endmenu
 
-And there was no sane *pattern* to why some cases warned. We have
-things like the above in many places. The issue seems to be that
-"initialize_var()" needs to be inlined (automatically or explicitly
-asked for), and then the error flow in the init function is just
-complex enough.
+menu NONEMPTY_MENU
+config C1
+    prompt "C1"
+endmenu
 
-At the point where it doesn't make sense when to initialize things
-explicitly, and it changes randomly depending on compiler version and
-compiler command line flags, there is *no* sane way to work around it.
+menuconfig EMPTY_MENUCONFIG
+    prompt "M1"
 
-We could do whack-a-mole with random code cases, but I really feel
-that when the warning is that unreliable and the changes to the source
-code to make the broken compiler warning shut up are completely
-arbitrary and random, it's worse than useless.
+menuconfig NONEMPTY_MENUCONFIG
+    prompt "M2"
 
-                Linus
+if NONEMPTY_MENUCONFIG
+config C2
+    prompt "C2"
+endif
+
+The following can be observed (prerequisite: uncomment zconfdump()
+in scripts/kconfig/conf.c):
+$ make KBUILD_KCONFIG=Kconfig.sample allnoconfig | grep -cw menu
+$ 4
+$ make KBUILD_KCONFIG=Kconfig.sample allnoconfig | grep -cw endmenu
+$ 3
+
+It looks like zconfdump() has the following inconsistencies:
+A. It prints the start marker 'menu' both for empty and non-empty menu
+   entries, while printing the end marker 'endmenu' only for non-empty
+   menu entries.
+B. At the end of every dump, it prints the end marker of the root
+   menu, while skipping its start marker, so that even if (A) is fixed,
+   the number of start and end markers is still not equal.
+
+Fix (A) and (B).
+
+Signed-off-by: Eugeniu Rosca <eugeniu.m.rosca@gmail.com>
+---
+
+ This is the second attempt to correct one of the zconfdump misbehaviors
+ regarding "menu" and "endmenu" markers. Without this patch, it is
+ practically impossible to import the kconfig symbol database into some
+ 3rd party program or script, as the 3rd party tool would rely on the
+ menu/endmenu keywords to identify the borders between menu entries.
+ With wrong information about menu borders, no correct connection can
+ be established between config symbols and their parent menu entries.
+
+ Changes from v1:
+ - Made sure "endmenu" is printed at the end of all menu properties.
+
+ scripts/kconfig/zconf.tab.c_shipped | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/scripts/kconfig/zconf.tab.c_shipped b/scripts/kconfig/zconf.tab.c_shipped
+index 7a4d658..c77a20a 100644
+--- a/scripts/kconfig/zconf.tab.c_shipped
++++ b/scripts/kconfig/zconf.tab.c_shipped
+@@ -2446,6 +2446,7 @@ static void print_symbol(FILE *out, struct menu *menu)
+ {
+ 	struct symbol *sym = menu->sym;
+ 	struct property *prop;
++	bool empty_menuconfig = false;
+ 
+ 	if (sym_is_choice(sym))
+ 		fprintf(out, "\nchoice\n");
+@@ -2510,6 +2511,8 @@ static void print_symbol(FILE *out, struct menu *menu)
+ 			fputs( "  menu ", out);
+ 			print_quoted_string(out, prop->text);
+ 			fputc('\n', out);
++			if (!menu->list)
++				empty_menuconfig = true;
+ 			break;
+ 		default:
+ 			fprintf(out, "  unknown prop %d!\n", prop->type);
+@@ -2522,6 +2525,9 @@ static void print_symbol(FILE *out, struct menu *menu)
+ 			menu->help[len] = 0;
+ 		fprintf(out, "  help\n%s\n", menu->help);
+ 	}
++	if (empty_menuconfig)
++		fputs("\nendmenu\n", out);
++
+ }
+ 
+ void zconfdump(FILE *out)
+@@ -2530,7 +2536,7 @@ void zconfdump(FILE *out)
+ 	struct symbol *sym;
+ 	struct menu *menu;
+ 
+-	menu = rootmenu.list;
++	menu = &rootmenu;
+ 	while (menu) {
+ 		if ((sym = menu->sym))
+ 			print_symbol(out, menu);
+@@ -2554,6 +2560,8 @@ void zconfdump(FILE *out)
+ 				expr_fprint(prop->visible.expr, out);
+ 				fputc('\n', out);
+ 			}
++			if ((prop->type == P_MENU) && !menu->list)
++				fputs("endmenu\n", out);
+ 		}
+ 
+ 		if (menu->list)
+-- 
+2.9.2
+
+
+--d6Gm4EdcadzBjdND--
