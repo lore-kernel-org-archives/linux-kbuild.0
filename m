@@ -1,48 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ec2-52-27-115-49.us-west-2.compute.amazonaws.com ([52.27.115.49]:36657
-	"EHLO s-opensource.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752781AbcHAL0G (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 1 Aug 2016 07:26:06 -0400
-Date: Mon, 1 Aug 2016 08:19:14 -0300
-From: Mauro Carvalho Chehab <mchehab@s-opensource.com>
+Received: from tex.lwn.net ([70.33.254.29]:41011 "EHLO vena.lwn.net"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1754319AbcHARkZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 1 Aug 2016 13:40:25 -0400
+Date: Mon, 1 Aug 2016 11:39:36 -0600
+From: Jonathan Corbet <corbet@lwn.net>
 Subject: Re: [PATCH] doc-rst: Remove the media docbook
-Message-ID: <20160801081914.4c01ddae@recife.lan>
-In-Reply-To: <87invkvmk3.fsf@intel.com>
+Message-ID: <20160801113936.6611478b@lwn.net>
+In-Reply-To: <20160801081914.4c01ddae@recife.lan>
 References: <4fb2b55b3d3215b2f6c649417d749f8f27b2df77.1469611833.git.mchehab@s-opensource.com>
 	<87invkvmk3.fsf@intel.com>
+	<20160801081914.4c01ddae@recife.lan>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jani Nikula <jani.nikula@intel.com>
-Cc: Jonathan Corbet <corbet@lwn.net>, Linux Media Mailing List <linux-media@vger.kernel.org>, Mauro Carvalho Chehab <mchehab@infradead.org>, Michal Marek <mmarek@suse.com>, Daniel Vetter <daniel.vetter@ffwll.ch>, Ben Hutchings <ben@decadent.org.uk>, Daniel Baluta <daniel.baluta@intel.com>, Danilo Cesar Lemes de Paula <danilo.cesar@collabora.co.uk>, linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Mauro Carvalho Chehab <mchehab@s-opensource.com>
+Cc: Jani Nikula <jani.nikula@intel.com>, Linux Media Mailing List <linux-media@vger.kernel.org>, Mauro Carvalho Chehab <mchehab@infradead.org>, Michal Marek <mmarek@suse.com>, Daniel Vetter <daniel.vetter@ffwll.ch>, Ben Hutchings <ben@decadent.org.uk>, Daniel Baluta <daniel.baluta@intel.com>, Danilo Cesar Lemes de Paula <danilo.cesar@collabora.co.uk>, linux-doc@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-Hi Jani,
+On Mon, 1 Aug 2016 08:19:14 -0300
+Mauro Carvalho Chehab <mchehab@s-opensource.com> wrote:
 
-Em Mon, 01 Aug 2016 12:57:32 +0300
-Jani Nikula <jani.nikula@intel.com> escreveu:
+> My general impression is that it is now a way easier to maintain the
+> media documentation and make it more consistent than with DocBook. 
 
-> On Wed, 27 Jul 2016, Mauro Carvalho Chehab <mchehab@s-opensource.com> wrote:
-> > Now that all media documentation was converted to Sphinx, we
-> > should get rid of the old DocBook one, as we don't want people
-> > to submit patches against the old stuff.  
-> 
-> Mauro, judging from the discussions we've had over the past six months,
-> I never would have guessed media docs would be among the first docbooks
-> converted. Fantastic job!
+Music to my ears - maybe this whole thing was worth it :)
 
-Thanks!
+Seriously, though, this whole thing was kind of dropped on you, many
+thanks for how you've run with it and helped to push it forward - much
+appreciated.
 
-Yeah, I opted to do the full conversion while all the discussions are
-fresh, as I found easier to remember what were the major issues and check
-if they were properly addressed on the conversion.
-
-Thanks for your and Markus support helping to address the issues!
-
-My general impression is that it is now a way easier to maintain the
-media documentation and make it more consistent than with DocBook. 
-
-Thanks,
-Mauro
+jon
