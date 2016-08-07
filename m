@@ -1,28 +1,27 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pa0-f65.google.com ([209.85.220.65]:34680 "EHLO
-	mail-pa0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1751223AbcHGDfF (ORCPT
+Received: from mail-qt0-f181.google.com ([209.85.216.181]:33985 "EHLO
+	mail-qt0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1750815AbcHGERV (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Sat, 6 Aug 2016 23:35:05 -0400
-Date: Sun, 7 Aug 2016 13:04:59 +0930
-From: Alan Modra <amodra@gmail.com>
+	Sun, 7 Aug 2016 00:17:21 -0400
+Received: by mail-qt0-f181.google.com with SMTP id u25so190584924qtb.1
+        for <linux-kbuild@vger.kernel.org>; Sat, 06 Aug 2016 21:17:21 -0700 (PDT)
+Date: Sun, 7 Aug 2016 00:17:18 -0400 (EDT)
+From: Nicolas Pitre <nicolas.pitre@linaro.org>
 Subject: Re: [PATCH 1/5] kbuild: allow architectures to use thin archives
  instead of ld -r
-Message-ID: <20160807033459.GT20904@bubble.grove.modra.org>
-References: <1470399123-8455-1-git-send-email-npiggin@gmail.com>
- <1470399123-8455-2-git-send-email-npiggin@gmail.com>
- <20160806201045.GA25821@ravnborg.org>
- <20160807114946.41b682f3@canb.auug.org.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 In-Reply-To: <20160807114946.41b682f3@canb.auug.org.au>
+Message-ID: <alpine.LFD.2.20.1608070008310.17623@knanqh.ubzr>
+References: <1470399123-8455-1-git-send-email-npiggin@gmail.com> <1470399123-8455-2-git-send-email-npiggin@gmail.com> <20160806201045.GA25821@ravnborg.org> <20160807114946.41b682f3@canb.auug.org.au>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Stephen Rothwell <sfr@canb.auug.org.au>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Nicholas Piggin <npiggin@gmail.com>, linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, Arnd Bergmann <arnd@arndb.de>, Nicolas Pitre <nico@linaro.org>, Segher Boessenkool <segher@kernel.crashing.org>
+Cc: Sam Ravnborg <sam@ravnborg.org>, Nicholas Piggin <npiggin@gmail.com>, linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, Arnd Bergmann <arnd@arndb.de>, Segher Boessenkool <segher@kernel.crashing.org>, Alan Modra <amodra@gmail.com>
 
-On Sun, Aug 07, 2016 at 11:49:46AM +1000, Stephen Rothwell wrote:
+On Sun, 7 Aug 2016, Stephen Rothwell wrote:
+
 > Hi Sam,
 > 
 > On Sat, 6 Aug 2016 22:10:45 +0200 Sam Ravnborg <sam@ravnborg.org> wrote:
@@ -34,16 +33,10 @@ On Sun, Aug 07, 2016 at 11:49:46AM +1000, Stephen Rothwell wrote:
 > The problem with that idea was that (at least for some versions of
 > binutils in use at the time) we hit a static limit to the number of
 > object files and ld just stopped at that point. :-(
-> 
-> > See below for an updated simple patch on top of mainline.
-> 
-> So, I guess it was fixed, but do we know in what version?
 
-I think the patch was
-https://sourceware.org/ml/binutils/2012-06/msg00201.html
+I played with a nearly identical patch to work around the inability to 
+do LTO and 'ld -r' with mainline binutils.  However this also requires 
+major changes to modpost otherwise it becomes ineffective.
 
-So, you need binutils 2.23 or later.
 
--- 
-Alan Modra
-Australia Development Lab, IBM
+Nicolas
