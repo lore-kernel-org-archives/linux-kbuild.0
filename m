@@ -1,47 +1,71 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.skyhub.de ([78.46.96.112]:56566 "EHLO mail.skyhub.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1752345AbcHIDz1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 8 Aug 2016 23:55:27 -0400
-Date: Tue, 9 Aug 2016 05:55:08 +0200
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [RFC v3 07/13] tables.h: add linker table support
-Message-ID: <20160809035508.GC11445@nazgul.tnic>
-References: <1469222687-1600-1-git-send-email-mcgrof@kernel.org>
- <1469222687-1600-8-git-send-email-mcgrof@kernel.org>
- <20160729100630.GA27271@nazgul.tnic>
- <20160808150539.GG3296@wotan.suse.de>
+Received: from mout.kundenserver.de ([212.227.17.24]:64015 "EHLO
+	mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+	with ESMTP id S1751194AbcHIIT2 (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 9 Aug 2016 04:19:28 -0400
+From: Christian Kujau <lists@nerdbynature.de>
+Subject: Re: [4.8-rc1] make bindeb-pkg O= fails
+References: <CAPq9eC_WASMqBms=fYUs09vKj=DhNwEUswFbVMvaryMU2r35rA@mail.gmail.com>
+Message-ID: <cf745f6e-0b02-7f63-4c8d-f61ad6a6ca32@nerdbynature.de>
+Date: Tue, 9 Aug 2016 01:19:21 -0700
 MIME-Version: 1.0
+In-Reply-To: <CAPq9eC_WASMqBms=fYUs09vKj=DhNwEUswFbVMvaryMU2r35rA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20160808150539.GG3296@wotan.suse.de>
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Luis R. Rodriguez" <mcgrof@kernel.org>
-Cc: hpa@zytor.com, tglx@linutronix.de, mingo@redhat.com, linux@arm.linux.org.uk, mhiramat@kernel.org, masami.hiramatsu.pt@hitachi.com, jbaron@akamai.com, heiko.carstens@de.ibm.com, ananth@linux.vnet.ibm.com, anil.s.keshavamurthy@intel.com, davem@davemloft.net, realmz6@gmail.com, x86@kernel.org, luto@amacapital.net, keescook@chromium.org, torvalds@linux-foundation.org, gregkh@linuxfoundation.org, rusty@rustcorp.com.au, gnomes@lxorguk.ukuu.org.uk, alan@linux.intel.com, dwmw2@infradead.org, arnd@arndb.de, ming.lei@canonical.com, linux-arch@vger.kernel.org, benh@kernel.crashing.org, ananth@in.ibm.com, pebolle@tiscali.nl, fontana@sharpeleven.org, ciaran.farrell@suse.com, christopher.denicolo@suse.com, david.vrabel@citrix.com, konrad.wilk@oracle.com, mcb30@ipxe.org, jgross@suse.com, andrew.cooper3@citrix.com, andriy.shevchenko@linux.intel.com, paul.gortmaker@windriver.com, xen-devel@lists.xensource.com, ak@linux.intel.com, pali.rohar@gmail.com, dvhart@infradead.org, platform-driver-x86@vger.kernel.org, mmarek@suse.com, linux@rasmusvillemoes.dk, jkosina@suse.cz, korea.drzix@gmail.com, linux-kbuild@vger.kernel.org, tony.luck@intel.com, akpm@linux-foundation.org, linux-ia64@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sh@vger.kernel.org, sparclinux@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com, rostedt@goodmis.org, jpoimboe@redhat.com
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Emese Revfy <re.emese@gmail.com>
 
-On Mon, Aug 08, 2016 at 05:05:39PM +0200, Luis R. Rodriguez wrote:
-> > So how can I disable those table-* things from even getting built? Avoid
-> > using table-y? But then everything declared table-y will be built
-> > unconditionally. I don't think I like that. :-\
+[re-send]
+
+On Mon, 8 Aug 2016, frank paulsen wrote:
+> in 4.8-rc1 "make bindeb-pkg O=../debian" fails:
+> | find: `scripts/gcc-plugins': No such file or directory
+> | /usr/src/linus/scripts/package/Makefile:97: recipe for target
+> 'bindeb-pkg' failed
 > 
-> I suppose we could make this configurable... But frankly I would prefer to
-> instead just document that this use should be carefully considered instead,
-> and let this be up to the maintainers. We can make it easily configurable so
-> we can do that later becomes a required, I don't think its needed though
-> given maintainers should use it only when needed.
+> this is due to a missing directory scripts/gcc-plugins if using O=
+> 
+> removing line 335 of scripts/package/builddeb helps:
+> | (cd $objtree; find scripts/gcc-plugins -name \*.so -o -name
+> gcc-common.h) >> "$objtree/debian/hdrobjfiles"
+> 
+> this clearly isn't the right fix, but i checked it anyway and the
+> paket gets built.
 
-You know how maintainers are just people, right? At least in most cases :-)
+This was introduced in 6b90bd4ba40b38dc13c2782469c1c77e4ed79915 ("GCC
+plugin infrastructure"). Not failing hard when scripts/gcc-plugins
+cannot be found, does the trick as well. But that too just papers over
+the issue. Hopefully Emese has a better idea on how to solve this :-)
 
-I think it would be better if it were machine-enforceable somehow.
-Maybe allow it only for core code and have a single, per-arch file
-arch/x86/linker_tables or so where all those statements are collected
-and can be eyeballed by more people. Dunno, just trying to think of
-something here...
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index e1c09e2..89757f6 100755
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -332,7 +332,7 @@ if grep -q '^CONFIG_STACK_VALIDATION=y'
+$KCONFIG_CONFIG ; then
+ 	(cd $objtree; find tools/objtool -type f -executable) >>
+"$objtree/debian/hdrobjfiles"
+ fi
+ (cd $objtree; find arch/$SRCARCH/include Module.symvers include scripts
+-type f) >> "$objtree/debian/hdrobjfiles"
+-(cd $objtree; find scripts/gcc-plugins -name \*.so -o -name
+gcc-common.h) >> "$objtree/debian/hdrobjfiles"
++(cd $objtree; find scripts/gcc-plugins -name \*.so -o -name
+gcc-common.h) >> "$objtree/debian/hdrobjfiles" || true
+ destdir=$kernel_headers_dir/usr/src/linux-headers-$version
+ mkdir -p "$destdir"
+ (cd $srctree; tar -c -f - -T -) < "$objtree/debian/hdrsrcfiles" | (cd
+$destdir; tar -xf -)
+
+
+Thanks,
+Christian.
+-- 
+BOFH excuse #269:
+
+Melting hard drives
 
 -- 
-Regards/Gruss,
-    Boris.
-
-ECO tip #101: Trim your mails when you reply.
---
+make bzImage, not war
