@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga03.intel.com ([134.134.136.65]:32968 "EHLO mga03.intel.com"
+Received: from mga14.intel.com ([192.55.52.115]:5202 "EHLO mga14.intel.com"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932521AbcHIXIK (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 9 Aug 2016 19:08:10 -0400
-Date: Tue, 9 Aug 2016 16:08:09 -0700
+	id S932574AbcHJAht (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 9 Aug 2016 20:37:49 -0400
+Date: Tue, 9 Aug 2016 17:37:42 -0700
 From: Andi Kleen <ak@linux.intel.com>
 Subject: Re: [PATCH 2/5] kbuild: allow archs to select build for link dead
  code/data elimination
-Message-ID: <20160809230809.GH3078@tassilo.jf.intel.com>
+Message-ID: <20160810003742.GI3078@tassilo.jf.intel.com>
 References: <1470399123-8455-1-git-send-email-npiggin@gmail.com>
  <1882847.dG563Vieov@wuerfel>
  <20160809031605.GF3078@tassilo.jf.intel.com>
@@ -40,8 +40,7 @@ On Wed, Aug 10, 2016 at 12:29:29AM +0200, Arnd Bergmann wrote:
 > in front of .text, and all .text.unlikely after exit.text into
 > one that mixes them with .text. What am I missing here?
 
-.text.hot is actually not used, the critical part is .text.unlikely
-which was not listed and was interleaved before the patch.
+No it doesn't mix .unlikely with .text, .unlikely is all in one place.
 
 -Andi
 
