@@ -1,41 +1,106 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pandora.armlinux.org.uk ([78.32.30.218]:34213 "EHLO
-	pandora.armlinux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1753115AbcHLOcj (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Fri, 12 Aug 2016 10:32:39 -0400
-Date: Fri, 12 Aug 2016 15:32:31 +0100
-From: Russell King - ARM Linux <linux@armlinux.org.uk>
-Subject: Re: [PATCH] arm: add an option for erratum 657417
-Message-ID: <20160812143231.GE1041@n2100.armlinux.org.uk>
-References: <1470989957-23671-1-git-send-email-npiggin@gmail.com>
- <20160812123314.GX1041@n2100.armlinux.org.uk>
- <6bc288d9-6bea-1ee2-572f-d397221adaff@arm.com>
- <20160812142325.GC1041@n2100.armlinux.org.uk>
+Received: from mx2.suse.de ([195.135.220.15]:60907 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752160AbcHLP3n (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Fri, 12 Aug 2016 11:29:43 -0400
+Date: Fri, 12 Aug 2016 17:28:05 +0200
+From: "Luis R. Rodriguez" <mcgrof@kernel.org>
+Subject: Re: [RFC v3 07/13] tables.h: add linker table support
+Message-ID: <20160812152805.GD3296@wotan.suse.de>
+References: <1469222687-1600-1-git-send-email-mcgrof@kernel.org>
+ <1469222687-1600-8-git-send-email-mcgrof@kernel.org>
+ <20160729100630.GA27271@nazgul.tnic>
+ <20160808150539.GG3296@wotan.suse.de>
+ <20160809035508.GC11445@nazgul.tnic>
+ <20160812035129.GA3296@wotan.suse.de>
+ <20160812052303.GB12013@nazgul.tnic>
+ <20160812065011.GB3296@wotan.suse.de>
+ <20160812072507.GC12013@nazgul.tnic>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20160812142325.GC1041@n2100.armlinux.org.uk>
+In-Reply-To: <20160812072507.GC12013@nazgul.tnic>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Robin Murphy <robin.murphy@arm.com>
-Cc: Nicolas Pitre <nicolas.pitre@linaro.org>, linux-arch@vger.kernel.org, Segher Boessenkool <segher@kernel.crashing.org>, Arnd Bergmann <arnd@arndb.de>, Alan Modra <amodra@gmail.com>, linux-kbuild@vger.kernel.org, Nicholas Piggin <npiggin@gmail.com>, Julian Brown <julian@codesourcery.com>, Michal Marek <mmarek@suse.com>, Stephen Rothwell <sfr@canb.auug.org.au>, Sam Ravnborg <sam@ravnborg.org>, linux-arm-kernel@lists.infradead.org
+To: Borislav Petkov <bp@alien8.de>
+Cc: "Luis R. Rodriguez" <mcgrof@kernel.org>, hpa@zytor.com, tglx@linutronix.de, mingo@redhat.com, linux@arm.linux.org.uk, mhiramat@kernel.org, masami.hiramatsu.pt@hitachi.com, jbaron@akamai.com, heiko.carstens@de.ibm.com, ananth@linux.vnet.ibm.com, anil.s.keshavamurthy@intel.com, davem@davemloft.net, realmz6@gmail.com, x86@kernel.org, luto@amacapital.net, keescook@chromium.org, torvalds@linux-foundation.org, gregkh@linuxfoundation.org, rusty@rustcorp.com.au, gnomes@lxorguk.ukuu.org.uk, alan@linux.intel.com, dwmw2@infradead.org, arnd@arndb.de, ming.lei@canonical.com, linux-arch@vger.kernel.org, benh@kernel.crashing.org, ananth@in.ibm.com, pebolle@tiscali.nl, fontana@sharpeleven.org, ciaran.farrell@suse.com, christopher.denicolo@suse.com, david.vrabel@citrix.com, konrad.wilk@oracle.com, mcb30@ipxe.org, jgross@suse.com, andrew.cooper3@citrix.com, andriy.shevchenko@linux.intel.com, paul.gortmaker@windriver.com, xen-devel@lists.xensource.com, ak@linux.intel.com, pali.rohar@gmail.com, dvhart@infradead.org, platform-driver-x86@vger.kernel.org, mmarek@suse.com, linux@rasmusvillemoes.dk, jkosina@suse.cz, korea.drzix@gmail.com, linux-kbuild@vger.kernel.org, tony.luck@intel.com, akpm@linux-foundation.org, linux-ia64@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sh@vger.kernel.org, sparclinux@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com, rostedt@goodmis.org, jpoimboe@redhat.com
 
-On Fri, Aug 12, 2016 at 03:23:25PM +0100, Russell King - ARM Linux wrote:
-> I've not actually looked at the errata document - I need to jump through
-> all sorts of stupid hoops to get it through the ARM website.  Ever since
-> I requested a change of my email address, it now wants all sorts of
-> personal information that I'm refusing to type in again.  I've no idea
-> why ARM Ltd wiped out all that information just because I asked for my
-> email address to be changed.
+On Fri, Aug 12, 2016 at 09:25:07AM +0200, Borislav Petkov wrote:
+> On Fri, Aug 12, 2016 at 08:50:11AM +0200, Luis R. Rodriguez wrote:
+> > On Fri, Aug 12, 2016 at 07:23:03AM +0200, Borislav Petkov wrote:
+> > > On Fri, Aug 12, 2016 at 05:51:29AM +0200, Luis R. Rodriguez wrote:
+> > > > OK I've added CONFIG_BUILD_AVOID_BITROT.
+> > > 
+> > > What does that do?
+> > 
+> > 
+> > Enabling it allows the forced compilation chosen by maintainers.
+> > Otherwise forced compilations with the new special targets are
+> > ignored.
+> 
+> Nice.
+> 
+> > I've gone with table-obj-y and table-lib-y as we have
+> > to support both lib-y and obj-y respective targets.
+> > 
+> > diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+> > index 33e2966dd741..7893e3b8da82 100644
+> > --- a/lib/Kconfig.debug
+> > +++ b/lib/Kconfig.debug
+> > @@ -1895,6 +1895,30 @@ config PROVIDE_OHCI1394_DMA_INIT
+> >  
+> >  	  See Documentation/debugging-via-ohci1394.txt for more information.
+> >  
+> > +config BUILD_AVOID_BITROT
+> > +	bool "Always force building specially annotated"
+> 
+> 					   ...annotated targets"
+> 
+> > +	default y
+> > +	help
+> > +	  If enabled then the the special table-* Makefile targets will always
+> > +	  be forced to be compiled even if their respective CONFIG_ option has
+> > +	  been disabled, but its objects will only be linked in if the same
+> > +	  respective CONFIG_ option has been enabled. This helps avoid code
+> > +	  bit rot issues, use for these targets should be carefully considred
+> > +	  by maintainers. You can safely enable this option at the expense of
+> > +	  increasing compile time slightly. Enabling this option helps avoid
+> 
+> s/slightly//
+> 
+> :-)
+> 
+> > +	  code bit rot by taking advantage of the facilities provided and
+> > +	  enabled by using linker tables documented under:
+> > +
+> > +	  include/linux/tables.h
+> > +
+> > +	  The special targets supported are:
+> > +
+> > +	    o table-obj-y
+> > +	    o table-lib-y
+> > +
+> > +	  Say Y unless you are a grumpy maintainer and don't trust other
+> > +	  maintainer's judgements on what code should always get compiled.
+> 
+> ... or you're running a tiny-config setup
 
-... oh, and it's forgotten that I'm supposed to be able to access
-that information too - it wants me to apply for approval to access
-errata documents.
+Even so, you don't link the compiled extra code so the only penalty
+here is when compiling, nothing more. And if you are compiling typically
+the cost here is just a few seconds.
 
-Maybe someone can send the appropriate document(s) my way instead.
+> ... or you're an embedded, resource-constrained person
 
--- 
-RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
-FTTC broadband for 0.8mile line: currently at 9.6Mbps down 400kbps up
-according to speedtest.net.
+For the compilation of th kernel ?
+
+> ... or you simply don't want to have stuff which is forcibly enabled on you even
+> if you're never going to need it
+> ...
+
+Which seems to be the same as the reason I noted ?
+
+> I got a million o'those :-)
+
+I can remove the grumpy maintainer description :)
+
+ Luis
