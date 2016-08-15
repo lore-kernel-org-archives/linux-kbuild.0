@@ -1,56 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pa0-f43.google.com ([209.85.220.43]:35214 "EHLO
-	mail-pa0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752856AbcHORgZ (ORCPT
+Received: from smtprelay0175.hostedemail.com ([216.40.44.175]:35716 "EHLO
+	smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S932182AbcHOVBN (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 15 Aug 2016 13:36:25 -0400
-Received: by mail-pa0-f43.google.com with SMTP id i5so17898719pat.2
-        for <linux-kbuild@vger.kernel.org>; Mon, 15 Aug 2016 10:36:25 -0700 (PDT)
-Date: Mon, 15 Aug 2016 10:36:22 -0700
-From: Kees Cook <keescook@chromium.org>
-Subject: [PATCH] builddeb: Skip gcc-plugins when not configured
-Message-ID: <20160815173622.GA24820@www.outflux.net>
+	Mon, 15 Aug 2016 17:01:13 -0400
+Date: Mon, 15 Aug 2016 17:00:55 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+Subject: Re: [RFC v3 00/13] linux: generalize sections, ranges and linker
+ tables
+Message-ID: <20160815170055.248eee3e@gandalf.local.home>
+In-Reply-To: <1471292106.5944.3.camel@linux.intel.com>
+References: <1469222687-1600-1-git-send-email-mcgrof@kernel.org>
+	<20160809152429.5bb1c077@lxorguk.ukuu.org.uk>
+	<1470758947.2299.47.camel@HansenPartnership.com>
+	<CALCETrVmDhPC6BMu4_xTanSFZBKeW9V6A4SeQ4qxnpVod-eLbQ@mail.gmail.com>
+	<1471292106.5944.3.camel@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>
-Cc: Frank Paulsen <frobnic+lkml@gmail.com>, Christian Kujau <lists@nerdbynature.de>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Alan Cox <alan@linux.intel.com>
+Cc: Andy Lutomirski <luto@amacapital.net>, James Bottomley <James.Bottomley@hansenpartnership.com>, benh@kernel.crashing.org, masami.hiramatsu.pt@hitachi.com, linux@rasmusvillemoes.dk, linux-kbuild@vger.kernel.org, linux-sh@vger.kernel.org, torvalds@linux-foundation.org, akpm@linux-foundation.org, dwmw2@infradead.org, xen-devel@lists.xensource.com, "Luis R. Rodriguez" <mcgrof@kernel.org>, anil.s.keshavamurthy@intel.com, will.deacon@arm.com, linux-ia64@vger.kernel.org, x86@kernel.org, korea.drzix@gmail.com, mingo@redhat.com, andrew.cooper3@citrix.com, jgross@suse.com, tglx@linutronix.de, keescook@chromium.org, ananth@linux.vnet.ibm.com, jpoimboe@redhat.com, hpa@zytor.com, arnd@arndb.de, davem@davemloft.net, One Thousand Gnomes <gnomes@lxorguk.ukuu.org.uk>, platform-driver-x86@vger.kernel.org, jkosina@suse.cz, david.vrabel@citrix.com, realmz6@gmail.com, fontana@sharpeleven.org, konrad.wilk@oracle.com, ananth@in.ibm.com, paul.gortmaker@windriver.com, pali.rohar@gmail.com, ak@linux.intel.com, pebolle@tiscali.nl, jbaron@akamai.com, mmarek@suse.com, rusty@rustcorp.com.au, tony.luck@intel.com, catalin.marinas@arm.com, dvhart@infradead.org, linux-arm-kernel@lists.infradead.org, ming.lei@canonical.com, linux@arm.linux.org.uk, andriy.shevchenko@linux.intel.com, christopher.denicolo@suse.com, linux-arch@vger.kernel.org, mcb30@ipxe.org, heiko.carstens@de.ibm.com, gregkh@linuxfoundation.org, mhiramat@kernel.org, ciaran.farrell@suse.com, bp@alien8.de, sparclinux@vger.kernel.org
 
-When attempting to build a Debian kernel package, the "scripts/gcc-plugins"
-directory does not exist in the output tree unless CONFIG_GCC_PLUGINS=y.
-To avoid errors when not defined, this wraps the failing "find" in a config
-test.
+On Mon, 15 Aug 2016 21:15:06 +0100
+Alan Cox <alan@linux.intel.com> wrote:
 
-Reported-by: Frank Paulsen <frobnic+lkml@gmail.com>
-Tested-by: Christian Kujau <lists@nerdbynature.de>
-Signed-off-by: Kees Cook <keescook@chromium.org>
----
-This should go into v4.8...
----
- scripts/package/builddeb | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+> > This is the module tag ... it says what licence the module is under,
+> > not the licence for the module combined with the kernel, which is
+> > always GPLv2 because the stricter licence rules.  
+> 
+> Because if I build a BSD licensed module against the kernel, give you
+> the binaries and refuse to give you the source I am conforming to the
+> BSD licence in letter. So to use it with the kernel it needs to be GPL
+> with additional rights (eg BSD including the source...)
+> 
 
-diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index e1c09e2f9be7..8ea9fd2b6573 100755
---- a/scripts/package/builddeb
-+++ b/scripts/package/builddeb
-@@ -332,7 +332,9 @@ if grep -q '^CONFIG_STACK_VALIDATION=y' $KCONFIG_CONFIG ; then
- 	(cd $objtree; find tools/objtool -type f -executable) >> "$objtree/debian/hdrobjfiles"
- fi
- (cd $objtree; find arch/$SRCARCH/include Module.symvers include scripts -type f) >> "$objtree/debian/hdrobjfiles"
--(cd $objtree; find scripts/gcc-plugins -name \*.so -o -name gcc-common.h) >> "$objtree/debian/hdrobjfiles"
-+if grep -q '^CONFIG_GCC_PLUGINS=y' $KCONFIG_CONFIG ; then
-+	(cd $objtree; find scripts/gcc-plugins -name \*.so -o -name gcc-common.h) >> "$objtree/debian/hdrobjfiles"
-+fi
- destdir=$kernel_headers_dir/usr/src/linux-headers-$version
- mkdir -p "$destdir"
- (cd $srctree; tar -c -f - -T -) < "$objtree/debian/hdrsrcfiles" | (cd $destdir; tar -xf -)
--- 
-2.7.4
+But that only pertains to the code that was modified to be used with
+the Linux kernel, right? That is, if there's a BSD licensed module for
+device FOO, and I port it to the Linux kernel, that will need to have a
+GPL added to it to be included in Linux. But the original BSD code is
+not affected. If a fix is made to the GPL Linux version, I'm assuming
+(because I've been asked when doing something like this), that the
+author of that fix will have to give it a dual license to be used back
+in the original BSD only code. Correct?
 
+I'm just trying to understand this. From what would make sense to me
+(but may or may not to a court of law, where it counts), is that the
+code added to Linux must be under GPL. But using that code depends on
+where you get it from. If you use BSD source, it stays under BSD. But
+any fixes to the GPL version will require permission to be put back to
+the BSD version. A change to the GPL version doesn't automatically get
+allowed back to the BSD only version?
 
--- 
-Kees Cook
-Nexus Security
+-- Steve
