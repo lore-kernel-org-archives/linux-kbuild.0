@@ -1,54 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:35882 "EHLO mx2.suse.de"
-	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S932184AbcHOWHe (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 15 Aug 2016 18:07:34 -0400
-Subject: Re: Building a subdirectory ignores parent subdir-ccflags
-References: <cover.1471289489.git.joe@perches.com>
- <5f9f49c1e0caeb3b9ee0656b6d922dbaf52a15b7.1471289489.git.joe@perches.com>
- <20160815210420.GA30864@kroah.com> <1471295658.4075.117.camel@perches.com>
- <1471296557.4075.127.camel@perches.com>
-From: Michal Marek <mmarek@suse.com>
-Message-ID: <57B23D16.8060405@suse.com>
-Date: Tue, 16 Aug 2016 00:07:18 +0200
-MIME-Version: 1.0
-In-Reply-To: <1471296557.4075.127.camel@perches.com>
-Content-Type: text/plain; charset=windows-1252
+Received: from bedivere.hansenpartnership.com ([66.63.167.143]:50600 "EHLO
+	bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
+	by vger.kernel.org with ESMTP id S932329AbcHOWkS (ORCPT
+	<rfc822;linux-kbuild@vger.kernel.org>);
+	Mon, 15 Aug 2016 18:40:18 -0400
+Message-ID: <1471300814.2428.45.camel@HansenPartnership.com>
+Subject: Re: [RFC v3 00/13] linux: generalize sections, ranges and linker
+ tables
+From: James Bottomley <James.Bottomley@HansenPartnership.com>
+Date: Mon, 15 Aug 2016 15:40:14 -0700
+In-Reply-To: <1471292106.5944.3.camel@linux.intel.com>
+References: <1469222687-1600-1-git-send-email-mcgrof@kernel.org>
+	 <20160809152429.5bb1c077@lxorguk.ukuu.org.uk>
+	 <1470758947.2299.47.camel@HansenPartnership.com>
+	 <CALCETrVmDhPC6BMu4_xTanSFZBKeW9V6A4SeQ4qxnpVod-eLbQ@mail.gmail.com>
+	 <1471292106.5944.3.camel@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Joe Perches <joe@perches.com>, linux-kbuild <linux-kbuild@vger.kernel.org>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Oleg Drokin <oleg.drokin@intel.com>, Andreas Dilger <andreas.dilger@intel.com>, devel@driverdev.osuosl.org, linux-kernel@vger.kernel.org, lustre-devel@lists.lustre.org
+To: Alan Cox <alan@linux.intel.com>, Andy Lutomirski <luto@amacapital.net>
+Cc: benh@kernel.crashing.org, masami.hiramatsu.pt@hitachi.com, linux@rasmusvillemoes.dk, linux-kbuild@vger.kernel.org, linux-sh@vger.kernel.org, torvalds@linux-foundation.org, akpm@linux-foundation.org, dwmw2@infradead.org, xen-devel@lists.xensource.com, "Luis R. Rodriguez" <mcgrof@kernel.org>, anil.s.keshavamurthy@intel.com, will.deacon@arm.com, linux-ia64@vger.kernel.org, x86@kernel.org, korea.drzix@gmail.com, mingo@redhat.com, andrew.cooper3@citrix.com, jgross@suse.com, tglx@linutronix.de, keescook@chromium.org, ananth@linux.vnet.ibm.com, jpoimboe@redhat.com, rostedt@goodmis.org, hpa@zytor.com, arnd@arndb.de, davem@davemloft.net, One Thousand Gnomes <gnomes@lxorguk.ukuu.org.uk>, platform-driver-x86@vger.kernel.org, jkosina@suse.cz, david.vrabel@citrix.com, realmz6@gmail.com, fontana@sharpeleven.org, konrad.wilk@oracle.com, ananth@in.ibm.com, paul.gortmaker@windriver.com, pali.rohar@gmail.com, ak@linux.intel.com, pebolle@tiscali.nl, jbaron@akamai.com, mmarek@suse.com, rusty@rustcorp.com.au, tony.luck@intel.com, catalin.marinas@arm.com, dvhart@infradead.org, linux-arm-kernel@lists.infradead.org, ming.lei@canonical.com, linux@arm.linux.org.uk, andriy.shevchenko@linux.intel.com, christopher.denicolo@suse.com, linux-arch@vger.kernel.org, mcb30@ipxe.org, heiko.carstens@de.ibm.com, gregkh@linuxfoundation.org, mhiramat@kernel.org, ciaran.farrell@suse.com, bp@alien8.de, sparclinux@vger.kernel.org
 
-Dne 15.8.2016 v 23:29 Joe Perches napsal(a):
-> On Mon, 2016-08-15 at 14:14 -0700, Joe Perches wrote:
->> On Mon, 2016-08-15 at 23:04 +0200, Greg Kroah-Hartman wrote:
->>> On Mon, Aug 15, 2016 at 12:33:23PM -0700, Joe Perches wrote:
->>>> Start to rationalize include paths in source code files.
->> []
->>>> diff --git a/drivers/staging/lustre/Makefile b/drivers/staging/lustre/Makefile
->> []
->>>> @@ -1,2 +1,5 @@
->>>> +subdir-ccflags-y += -I$(srctree)/drivers/staging/lustre/include/
->>>> +subdir-ccflags-y += -I$(srctree)/drivers/staging/lustre/lustre/include/
->>>> +
->>>>  obj-$(CONFIG_LNET)		+= lnet/
->>>>  obj-$(CONFIG_LUSTRE_FS)		+= lustre/
->>> This is good, but does this break the subdir make command:
->>> 	make M=drivers/staging/lustre/foo_dir/
->>> ?
->> hmm, yeah, it does.  Oh well, nevermind for awhile.
->>> I remember the last time I tried to clean this up, it took a while...
->> It seems like something the build tools should
->> handle correctly now, but I'll look at it.
+On Mon, 2016-08-15 at 21:15 +0100, Alan Cox wrote:
+> > This is the module tag ... it says what licence the module is 
+> > under, not the licence for the module combined with the kernel, 
+> > which is always GPLv2 because the stricter licence rules.
 > 
-> Perhaps making a specific directory should also walk up
-> any parent directory Makefiles looking for subdir flags.
-> 
-> Is that unreasonable?  Any suggestions?
+> Because if I build a BSD licensed module against the kernel, give you
+> the binaries and refuse to give you the source I am conforming to the
+> BSD licence in letter.
 
-I suggest to do make drivers/staging/lustre/. If building the lustre
-subdirectories is going to be a common use case, then you can propagate
-the subdir-ccflags-y assignment down to the individual Makefiles.
+No, you can't.  Forget dual licensing for a minute: I can produce a
+Linux kernel module under a pure BSD licence because BSD is compatible
+with GPL.  However, if we assume for the sake of argument that a binary
+module is a derived work of Linux, producing and distributing the
+binary for the module brings the combination under GPLv2 via the
+derivative works clause and I'm required to offer you corresponding
+source code in spite of the fact that my module *only* has a BSD
+licence.  The only known get out from this is if I make *you* produce
+the binary (the open source shim defence).
 
-Michal
+>  So to use it with the kernel it needs to be GPL with additional
+> rights (eg BSD including the source...)
+
+I'm not quite sure what you're disagreeing over?  Is it semantics of a
+Dual BSD/GPL licence vs a GPL with additional rights one?  Dual
+licensed code is a well settled area: the ruling licence is the one
+which permits the action.  So for a dual licencesed kernel module, if I
+compile the module as a binary and distribute it, I'm required to
+follow all the provisions of GPLv2 i.e. make you and offer of
+corresponding source.   Conversely, if I cut and paste a section of the
+driver source code into a BSD driver, I'm permitted to do this under
+the BSD licence, so the pasted code doesn't carry GPLv2 contamination
+into BSD.
+
+You can certainly call the Dual BSD/GPL licence a GPL licence with
+additional permission to include the source code in a BSD licensed
+system, but it's not a precise equivalence because a true Dual Licensed
+BSD/GPL driver may be cut and pasted into any code which is compatible
+either with the BSD or GPL licences, meaning it's actually less strict
+than your additional permission to include into BSD.
+
+James
+
