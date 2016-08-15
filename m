@@ -1,61 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bedivere.hansenpartnership.com ([66.63.167.143]:50730 "EHLO
-	bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
-	by vger.kernel.org with ESMTP id S932206AbcHOWov (ORCPT
+Received: from smtprelay0205.hostedemail.com ([216.40.44.205]:47220 "EHLO
+	smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
+	by vger.kernel.org with ESMTP id S1752258AbcHOWqm (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 15 Aug 2016 18:44:51 -0400
-Message-ID: <1471301087.2428.48.camel@HansenPartnership.com>
-Subject: Re: [RFC v3 00/13] linux: generalize sections, ranges and linker
- tables
-From: James Bottomley <James.Bottomley@HansenPartnership.com>
-Date: Mon, 15 Aug 2016 15:44:47 -0700
-In-Reply-To: <CALCETrVmDhPC6BMu4_xTanSFZBKeW9V6A4SeQ4qxnpVod-eLbQ@mail.gmail.com>
-References: <1469222687-1600-1-git-send-email-mcgrof@kernel.org>
-	 <20160809152429.5bb1c077@lxorguk.ukuu.org.uk>
-	 <1470758947.2299.47.camel@HansenPartnership.com>
-	 <CALCETrVmDhPC6BMu4_xTanSFZBKeW9V6A4SeQ4qxnpVod-eLbQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+	Mon, 15 Aug 2016 18:46:42 -0400
+Message-ID: <1471301196.4075.133.camel@perches.com>
+Subject: Re: Building a subdirectory ignores parent subdir-ccflags
+From: Joe Perches <joe@perches.com>
+Date: Mon, 15 Aug 2016 15:46:36 -0700
+In-Reply-To: <57B23D16.8060405@suse.com>
+References: <cover.1471289489.git.joe@perches.com>
+	 <5f9f49c1e0caeb3b9ee0656b6d922dbaf52a15b7.1471289489.git.joe@perches.com>
+	 <20160815210420.GA30864@kroah.com> <1471295658.4075.117.camel@perches.com>
+	 <1471296557.4075.127.camel@perches.com> <57B23D16.8060405@suse.com>
+Content-Type: text/plain; charset="ISO-8859-1"
 Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andy Lutomirski <luto@amacapital.net>
-Cc: benh@kernel.crashing.org, masami.hiramatsu.pt@hitachi.com, linux@rasmusvillemoes.dk, linux-kbuild@vger.kernel.org, linux-sh@vger.kernel.org, torvalds@linux-foundation.org, akpm@linux-foundation.org, dwmw2@infradead.org, xen-devel@lists.xensource.com, "Luis R. Rodriguez" <mcgrof@kernel.org>, anil.s.keshavamurthy@intel.com, will.deacon@arm.com, linux-ia64@vger.kernel.org, x86@kernel.org, korea.drzix@gmail.com, mingo@redhat.com, andrew.cooper3@citrix.com, jgross@suse.com, tglx@linutronix.de, keescook@chromium.org, ananth@linux.vnet.ibm.com, jpoimboe@redhat.com, rostedt@goodmis.org, hpa@zytor.com, arnd@arndb.de, davem@davemloft.net, One Thousand Gnomes <gnomes@lxorguk.ukuu.org.uk>, platform-driver-x86@vger.kernel.org, jkosina@suse.cz, david.vrabel@citrix.com, realmz6@gmail.com, fontana@sharpeleven.org, konrad.wilk@oracle.com, ananth@in.ibm.com, paul.gortmaker@windriver.com, pali.rohar@gmail.com, ak@linux.intel.com, pebolle@tiscali.nl, jbaron@akamai.com, mmarek@suse.com, rusty@rustcorp.com.au, tony.luck@intel.com, catalin.marinas@arm.com, dvhart@infradead.org, linux-arm-kernel@lists.infradead.org, ming.lei@canonical.com, linux@arm.linux.org.uk, andriy.shevchenko@linux.intel.com, christopher.denicolo@suse.com, linux-arch@vger.kernel.org, mcb30@ipxe.org, heiko.carstens@de.ibm.com, gregkh@linuxfoundation.org, mhiramat@kernel.org, ciaran.farrell@suse.com, bp@alien8.de, sparclinux@vger.kernel.org, alan@linux.intel.com
+To: Michal Marek <mmarek@suse.com>, linux-kbuild <linux-kbuild@vger.kernel.org>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Oleg Drokin <oleg.drokin@intel.com>, Andreas Dilger <andreas.dilger@intel.com>, devel@driverdev.osuosl.org, linux-kernel@vger.kernel.org, lustre-devel@lists.lustre.org
 
-On Tue, 2016-08-09 at 21:51 -0700, Andy Lutomirski wrote:
-> On Aug 9, 2016 7:09 PM, "James Bottomley" <
-> James.Bottomley@hansenpartnership.com> wrote:
+On Tue, 2016-08-16 at 00:07 +0200, Michal Marek wrote:
+
+Hi Michal.
+
+> > Perhaps making a specific directory should also walk up
+> > any parent directory Makefiles looking for subdir flags.
 > > 
-> > On Tue, 2016-08-09 at 15:24 +0100, One Thousand Gnomes wrote:
-> > > > table development go under copyleft-next, Rusty recently asked 
-> > > > for code to go in prior to the license tag being added denoting
-> > > > this license as GPL-compatible [3] -- I had noted in the patch
-> > > > submission which annotated copyleft-next's compatibility to 
-> > > > GPLv2 that copyleft-next is the license of choice for ongoing 
-> > > > kernel development on my end [4]. If this is objectionable I'm 
-> > > > happy to change it to GPLv2 however I'd like a reason provided 
-> > > > as I've gone through all possible channels to ensure this is 
-> > > > kosher, including vetting by 3 attorneys now, 2 at SUSE.
-> > > 
-> > > You don't need a new tag, you can use "GPL" or "GPL and 
-> > > additional rights". In fact you don't want any other tag because 
-> > > when combined  with the kernel it is GPLv2 anyway because the 
-> > > only way the two are fully compatible is for the kernel community 
-> > > to license the derived work under the GPL.
-> > 
-> > This is the module tag ... it says what licence the module is 
-> > under, not the licence for the module combined with the kernel, 
-> > which is always GPLv2 because the stricter licence rules.
-> 
-> Then why isn't "BSD" in the license_is_gpl_compatible list?
+> > Is that unreasonable?  Any suggestions?
+> I suggest to do make drivers/staging/lustre/. If building the lustre
+> subdirectories is going to be a common use case, then you can propagate
+> the subdir-ccflags-y assignment down to the individual Makefiles.
 
-[Sorry about this, the list seems to have stopped sending me copies of
-stuff I'm on the to: line for; not sure why.  Anyway, having fished
-this copy out of my trash:]
+I don't have a problem with that.
 
-It is, here specifically:
+Others might though for whatever reason.
 
-https://www.gnu.org/licenses/license-list.en.html#ModifiedBSD
+There are a couple other places in the tree that
+also use subdir-ccflags where the results of making
+a subdirectory would either fail or have unexpected
+results.
 
-James
+Does it matter?  Not much, but it could be nicer if
+it's possible for parent Makefile paths to be ascended.
 
+I'm not much of a Makefile person, but perhaps you have
+some clues/tips/suggestions for implementation?
