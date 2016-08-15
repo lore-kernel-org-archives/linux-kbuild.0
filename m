@@ -1,56 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtprelay0175.hostedemail.com ([216.40.44.175]:35716 "EHLO
+Received: from smtprelay0117.hostedemail.com ([216.40.44.117]:42055 "EHLO
 	smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S932182AbcHOVBN (ORCPT
+	by vger.kernel.org with ESMTP id S1752962AbcHOVfV (ORCPT
 	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 15 Aug 2016 17:01:13 -0400
-Date: Mon, 15 Aug 2016 17:00:55 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-Subject: Re: [RFC v3 00/13] linux: generalize sections, ranges and linker
- tables
-Message-ID: <20160815170055.248eee3e@gandalf.local.home>
-In-Reply-To: <1471292106.5944.3.camel@linux.intel.com>
-References: <1469222687-1600-1-git-send-email-mcgrof@kernel.org>
-	<20160809152429.5bb1c077@lxorguk.ukuu.org.uk>
-	<1470758947.2299.47.camel@HansenPartnership.com>
-	<CALCETrVmDhPC6BMu4_xTanSFZBKeW9V6A4SeQ4qxnpVod-eLbQ@mail.gmail.com>
-	<1471292106.5944.3.camel@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+	Mon, 15 Aug 2016 17:35:21 -0400
+Received: from smtprelay.hostedemail.com (10.5.19.251.rfc1918.com [10.5.19.251])
+	by smtpgrave02.hostedemail.com (Postfix) with ESMTP id CCBD2435F
+	for <linux-kbuild@vger.kernel.org>; Mon, 15 Aug 2016 21:29:27 +0000 (UTC)
+Message-ID: <1471296557.4075.127.camel@perches.com>
+Subject: Building a subdirectory ignores parent subdir-ccflags (was: Re:
+ [PATCH 1/2] staging: lustre: Add include path to Makefile)
+From: Joe Perches <joe@perches.com>
+Date: Mon, 15 Aug 2016 14:29:17 -0700
+In-Reply-To: <1471295658.4075.117.camel@perches.com>
+References: <cover.1471289489.git.joe@perches.com>
+	 <5f9f49c1e0caeb3b9ee0656b6d922dbaf52a15b7.1471289489.git.joe@perches.com>
+	 <20160815210420.GA30864@kroah.com> <1471295658.4075.117.camel@perches.com>
+Content-Type: text/plain; charset="ISO-8859-1"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Alan Cox <alan@linux.intel.com>
-Cc: Andy Lutomirski <luto@amacapital.net>, James Bottomley <James.Bottomley@hansenpartnership.com>, benh@kernel.crashing.org, masami.hiramatsu.pt@hitachi.com, linux@rasmusvillemoes.dk, linux-kbuild@vger.kernel.org, linux-sh@vger.kernel.org, torvalds@linux-foundation.org, akpm@linux-foundation.org, dwmw2@infradead.org, xen-devel@lists.xensource.com, "Luis R. Rodriguez" <mcgrof@kernel.org>, anil.s.keshavamurthy@intel.com, will.deacon@arm.com, linux-ia64@vger.kernel.org, x86@kernel.org, korea.drzix@gmail.com, mingo@redhat.com, andrew.cooper3@citrix.com, jgross@suse.com, tglx@linutronix.de, keescook@chromium.org, ananth@linux.vnet.ibm.com, jpoimboe@redhat.com, hpa@zytor.com, arnd@arndb.de, davem@davemloft.net, One Thousand Gnomes <gnomes@lxorguk.ukuu.org.uk>, platform-driver-x86@vger.kernel.org, jkosina@suse.cz, david.vrabel@citrix.com, realmz6@gmail.com, fontana@sharpeleven.org, konrad.wilk@oracle.com, ananth@in.ibm.com, paul.gortmaker@windriver.com, pali.rohar@gmail.com, ak@linux.intel.com, pebolle@tiscali.nl, jbaron@akamai.com, mmarek@suse.com, rusty@rustcorp.com.au, tony.luck@intel.com, catalin.marinas@arm.com, dvhart@infradead.org, linux-arm-kernel@lists.infradead.org, ming.lei@canonical.com, linux@arm.linux.org.uk, andriy.shevchenko@linux.intel.com, christopher.denicolo@suse.com, linux-arch@vger.kernel.org, mcb30@ipxe.org, heiko.carstens@de.ibm.com, gregkh@linuxfoundation.org, mhiramat@kernel.org, ciaran.farrell@suse.com, bp@alien8.de, sparclinux@vger.kernel.org
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Michal Marek <mmarek@suse.com>, linux-kbuild <linux-kbuild@vger.kernel.org>
+Cc: Oleg Drokin <oleg.drokin@intel.com>, Andreas Dilger <andreas.dilger@intel.com>, devel@driverdev.osuosl.org, linux-kernel@vger.kernel.org, lustre-devel@lists.lustre.org
 
-On Mon, 15 Aug 2016 21:15:06 +0100
-Alan Cox <alan@linux.intel.com> wrote:
+On Mon, 2016-08-15 at 14:14 -0700, Joe Perches wrote:
+> On Mon, 2016-08-15 at 23:04 +0200, Greg Kroah-Hartman wrote:
+> > On Mon, Aug 15, 2016 at 12:33:23PM -0700, Joe Perches wrote:
+> > > Start to rationalize include paths in source code files.
+> []
+> > > diff --git a/drivers/staging/lustre/Makefile b/drivers/staging/lustre/Makefile
+> []
+> > > @@ -1,2 +1,5 @@
+> > > +subdir-ccflags-y += -I$(srctree)/drivers/staging/lustre/include/
+> > > +subdir-ccflags-y += -I$(srctree)/drivers/staging/lustre/lustre/include/
+> > > +
+> > >  obj-$(CONFIG_LNET)		+= lnet/
+> > >  obj-$(CONFIG_LUSTRE_FS)		+= lustre/
+> > This is good, but does this break the subdir make command:
+> > 	make M=drivers/staging/lustre/foo_dir/
+> > ?
+> hmm, yeah, it does.  Oh well, nevermind for awhile.
+> > I remember the last time I tried to clean this up, it took a while...
+> It seems like something the build tools should
+> handle correctly now, but I'll look at it.
 
-> > This is the module tag ... it says what licence the module is under,
-> > not the licence for the module combined with the kernel, which is
-> > always GPLv2 because the stricter licence rules.  
-> 
-> Because if I build a BSD licensed module against the kernel, give you
-> the binaries and refuse to give you the source I am conforming to the
-> BSD licence in letter. So to use it with the kernel it needs to be GPL
-> with additional rights (eg BSD including the source...)
-> 
+Perhaps making a specific directory should also walk up
+any parent directory Makefiles looking for subdir flags.
 
-But that only pertains to the code that was modified to be used with
-the Linux kernel, right? That is, if there's a BSD licensed module for
-device FOO, and I port it to the Linux kernel, that will need to have a
-GPL added to it to be included in Linux. But the original BSD code is
-not affected. If a fix is made to the GPL Linux version, I'm assuming
-(because I've been asked when doing something like this), that the
-author of that fix will have to give it a dual license to be used back
-in the original BSD only code. Correct?
-
-I'm just trying to understand this. From what would make sense to me
-(but may or may not to a court of law, where it counts), is that the
-code added to Linux must be under GPL. But using that code depends on
-where you get it from. If you use BSD source, it stays under BSD. But
-any fixes to the GPL version will require permission to be put back to
-the BSD version. A change to the GPL version doesn't automatically get
-allowed back to the BSD only version?
-
--- Steve
+Is that unreasonable?  Any suggestions?
