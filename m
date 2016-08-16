@@ -1,49 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtprelay0205.hostedemail.com ([216.40.44.205]:47220 "EHLO
-	smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-	by vger.kernel.org with ESMTP id S1752258AbcHOWqm (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Mon, 15 Aug 2016 18:46:42 -0400
-Message-ID: <1471301196.4075.133.camel@perches.com>
-Subject: Re: Building a subdirectory ignores parent subdir-ccflags
-From: Joe Perches <joe@perches.com>
-Date: Mon, 15 Aug 2016 15:46:36 -0700
-In-Reply-To: <57B23D16.8060405@suse.com>
-References: <cover.1471289489.git.joe@perches.com>
-	 <5f9f49c1e0caeb3b9ee0656b6d922dbaf52a15b7.1471289489.git.joe@perches.com>
-	 <20160815210420.GA30864@kroah.com> <1471295658.4075.117.camel@perches.com>
-	 <1471296557.4075.127.camel@perches.com> <57B23D16.8060405@suse.com>
-Content-Type: text/plain; charset="ISO-8859-1"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Received: from mx2.suse.de ([195.135.220.15]:43054 "EHLO mx2.suse.de"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1750752AbcHPFsa (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 16 Aug 2016 01:48:30 -0400
+Subject: Re: [RFC][PATCHSET v2] allowing exports in *.S
+References: <20160129191744.GB17997@ZenIV.linux.org.uk>
+ <20160203211953.GT17997@ZenIV.linux.org.uk> <57A0A7B8.7080107@suse.cz>
+From: Michal Marek <mmarek@suse.com>
+Message-ID: <57B2A920.5000802@suse.com>
+Date: Tue, 16 Aug 2016 07:48:16 +0200
+MIME-Version: 1.0
+In-Reply-To: <57A0A7B8.7080107@suse.cz>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>, linux-kbuild <linux-kbuild@vger.kernel.org>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Oleg Drokin <oleg.drokin@intel.com>, Andreas Dilger <andreas.dilger@intel.com>, devel@driverdev.osuosl.org, linux-kernel@vger.kernel.org, lustre-devel@lists.lustre.org
+To: Al Viro <viro@ZenIV.linux.org.uk>
+Cc: linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Tue, 2016-08-16 at 00:07 +0200, Michal Marek wrote:
+Dne 2.8.2016 v 16:01 Michal Marek napsal(a):
+> On 2016-02-03 22:19, Al Viro wrote:
+>> Shortlog:
+>> Al Viro (13):
+>>       [kbuild] handle exports in lib-y objects reliably
+>>       EXPORT_SYMBOL() for asm
+>>       x86: move exports to actual definitions
+>>       alpha: move exports to actual definitions
+>>       m68k: move exports to definitions
+>>       s390: move exports to definitions
+>>       arm: move exports to definitions
+>>       ppc: move exports to definitions
+>>       ppc: get rid of unreachable abs() implementation
+>>       sparc: move exports to definitions
+>>       [sparc] unify 32bit and 64bit string.h
+>>       sparc32: debride memcpy.S a bit
+>>       ia64: move exports to definitions
+> 
+> After several pings by Al (sorry about that!), I got around to review a
+> rebased version of this patchset at
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/viro/vfs.git asm-exports
+> 
+> The kbuild commits are good, but since we are close to the end of the
+> merge window, I will apply them to my kbuild branch after 4.8-rc1.
 
-Hi Michal.
+The rebased patchset is now in kbuild.git#kbuild. Before pushing, I
+noticed one issue: For some reason,
+drivers/firmware/efi/libstub/lib-ksyms.o is regenerated each time,
+leading to relink of vmlinux. I'm looking into this.
 
-> > Perhaps making a specific directory should also walk up
-> > any parent directory Makefiles looking for subdir flags.
-> > 
-> > Is that unreasonable?  Any suggestions?
-> I suggest to do make drivers/staging/lustre/. If building the lustre
-> subdirectories is going to be a common use case, then you can propagate
-> the subdir-ccflags-y assignment down to the individual Makefiles.
-
-I don't have a problem with that.
-
-Others might though for whatever reason.
-
-There are a couple other places in the tree that
-also use subdir-ccflags where the results of making
-a subdirectory would either fail or have unexpected
-results.
-
-Does it matter?  Not much, but it could be nicer if
-it's possible for parent Makefile paths to be ascended.
-
-I'm not much of a Makefile person, but perhaps you have
-some clues/tips/suggestions for implementation?
+Michal
