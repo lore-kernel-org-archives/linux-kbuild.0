@@ -1,46 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mailhub.sw.ru ([195.214.232.25]:33394 "EHLO relay.sw.ru"
+Received: from mailhub.sw.ru ([195.214.232.25]:4730 "EHLO relay.sw.ru"
 	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-	id S1753498AbcHPNf1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	id S1753468AbcHPNf1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
 	Tue, 16 Aug 2016 09:35:27 -0400
 From: Dmitry Monakhov <dmonakhov@openvz.org>
-Subject: [PATCH 2/2] scripts: buildtar use parallel compress if available
-Date: Tue, 16 Aug 2016 17:35:14 +0400
-Message-Id: <1471354514-12323-2-git-send-email-dmonakhov@openvz.org>
-In-Reply-To: <1471354514-12323-1-git-send-email-dmonakhov@openvz.org>
-References: <1471354514-12323-1-git-send-email-dmonakhov@openvz.org>
+Subject: [PATCH 1/2] scripts: buildtar fix build w/o modules
+Date: Tue, 16 Aug 2016 17:35:13 +0400
+Message-Id: <1471354514-12323-1-git-send-email-dmonakhov@openvz.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: Dmitry Monakhov <dmonakhov@openvz.org>
 
+If build configured w/o modules script fails because lib/ is not exit.
+
 Signed-off-by: Dmitry Monakhov <dmonakhov@openvz.org>
 ---
- scripts/package/buildtar | 3 +++
- 1 file changed, 3 insertions(+)
+ scripts/package/buildtar | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/scripts/package/buildtar b/scripts/package/buildtar
-index c64e6eb..d0d790f 100755
+index e046bff..c64e6eb 100755
 --- a/scripts/package/buildtar
 +++ b/scripts/package/buildtar
-@@ -29,14 +29,17 @@ case "${1}" in
- 		;;
- 	targz-pkg)
- 		compress="gzip"
-+		type pigz >/dev/null 2>&1 && compress="pigz"
- 		file_ext=".gz"
- 		;;
- 	tarbz2-pkg)
- 		compress="bzip2"
-+		type lbzip2 >/dev/null 2>&1 && compress="lbzip2"
- 		file_ext=".bz2"
- 		;;
- 	tarxz-pkg)
- 		compress="xz"
-+		type pxz >/dev/null 2>&1 && compress="pxz"
- 		file_ext=".xz"
- 		;;
- 	*)
+@@ -129,7 +129,7 @@ esac
+ 	if tar --owner=root --group=root --help >/dev/null 2>&1; then
+ 		opts="--owner=root --group=root"
+ 	fi
+-	tar cf - -C "$tmpdir" boot/ lib/ $opts | ${compress} > "${tarball}${file_ext}"
++	tar cf - -C "$tmpdir" . $opts | ${compress} > "${tarball}${file_ext}"
+ )
+ 
+ echo "Tarball successfully created in ${tarball}${file_ext}"
 -- 
 2.7.4
 
