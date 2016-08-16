@@ -1,69 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f65.google.com ([74.125.82.65]:36847 "EHLO
-	mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-	with ESMTP id S1752420AbcHPVig (ORCPT
-	<rfc822;linux-kbuild@vger.kernel.org>);
-	Tue, 16 Aug 2016 17:38:36 -0400
-Received: by mail-wm0-f65.google.com with SMTP id i138so18542827wmf.3
-        for <linux-kbuild@vger.kernel.org>; Tue, 16 Aug 2016 14:37:25 -0700 (PDT)
+Received: from mailhub.sw.ru ([195.214.232.25]:24361 "EHLO relay.sw.ru"
+	rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+	id S1752041AbcHPVjo (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+	Tue, 16 Aug 2016 17:39:44 -0400
 From: Dmitry Monakhov <dmonakhov@openvz.org>
-Subject: Re: [PATCH 1/2] scripts: buildtar fix build w/o modules
-In-Reply-To: <CA+r1ZhgdtRUO3r1neBjgWJeC6D=6gK=Fos1icakYr9wV7yi+gw@mail.gmail.com>
-References: <1471354514-12323-1-git-send-email-dmonakhov@openvz.org> <CA+r1ZhgdtRUO3r1neBjgWJeC6D=6gK=Fos1icakYr9wV7yi+gw@mail.gmail.com>
-Date: Wed, 17 Aug 2016 00:37:17 +0300
-Message-ID: <87y43w8kfm.fsf@openvz.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
+Subject: [PATCH 1/2] scripts: buildtar fix build w/o modules v2
+Date: Wed, 17 Aug 2016 01:39:36 +0400
+Message-Id: <1471383577-18173-1-git-send-email-dmonakhov@openvz.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jim Davis <jim.epost@gmail.com>
-Cc: linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: Dmitry Monakhov <dmonakhov@openvz.org>
 
---=-=-=
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+If build configured w/o modules script fails because lib/ is not exit.
 
-Jim Davis <jim.epost@gmail.com> writes:
+Signed-off-by: Dmitry Monakhov <dmonakhov@openvz.org>
+---
+ scripts/package/buildtar | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-> On Tue, Aug 16, 2016 at 6:35 AM, Dmitry Monakhov <dmonakhov@openvz.org> w=
-rote:
->> If build configured w/o modules script fails because lib/ is not exit.
->
-> "does not exist"?
->
-> When I ran into this once before, it did seem the tar archive was
-> fine.  But it was disconcerting to see an error message, followed by
-> buildtar claiming that the tarball was successfully created...
->
->
->> +       tar cf - -C "$tmpdir" . $opts | ${compress} > "${tarball}${file_=
-ext}"
->
-> If, somehow, there are files in $tmpdir that aren't in /boot (or /lib)
-> then this would put things in the tar archive that weren't there
-> before the patch.  I don't offhand see how that could happen, but a
-> more conservative approach would be to test for /lib.
-$tmpdir dir was created by this script. So any files which in $tmpdir are
-definitely created with the purpose, and imho it it is reasonable to place
-it to tarball. But in order to be on a safe side let's preserve original
-behavior. I'll resend the patch.
->
-> --=20
-> Jim
+diff --git a/scripts/package/buildtar b/scripts/package/buildtar
+index e046bff..27a2ed3 100755
+--- a/scripts/package/buildtar
++++ b/scripts/package/buildtar
+@@ -17,7 +17,7 @@ set -e
+ #
+ tmpdir="${objtree}/tar-install"
+ tarball="${objtree}/linux-${KERNELRELEASE}-${ARCH}.tar"
+-
++tarball_dirs="boot"
+ 
+ #
+ # Figure out how to compress, if requested at all
+@@ -58,6 +58,7 @@ mkdir -p -- "${tmpdir}/boot"
+ #
+ if grep -q '^CONFIG_MODULES=y' "${objtree}/.config"; then
+ 	make ARCH="${ARCH}" O="${objtree}" KBUILD_SRC= INSTALL_MOD_PATH="${tmpdir}" modules_install
++	tarball_dirs="${tarball_dirs} lib"
+ fi
+ 
+ 
+@@ -129,7 +130,7 @@ esac
+ 	if tar --owner=root --group=root --help >/dev/null 2>&1; then
+ 		opts="--owner=root --group=root"
+ 	fi
+-	tar cf - -C "$tmpdir" boot/ lib/ $opts | ${compress} > "${tarball}${file_ext}"
++	tar cf - -C "$tmpdir" "$tarball_dirs" $opts | ${compress} > "${tarball}${file_ext}"
+ )
+ 
+ echo "Tarball successfully created in ${tarball}${file_ext}"
+-- 
+2.7.4
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2
-
-iQEcBAEBCgAGBQJXs4eNAAoJELhyPTmIL6kBUjUH/0Z7C0xGfVcKojmbcKU1ZO0X
-BU4yZBKhBsgaT/kH33HmfkNHcIy8u/k53tJjIpGrMxB1Vjap6aqC/NXsrgplrabJ
-QolBqj4U9rj8YlZYSzt/CWQXptz5TZL2cCzSM5P+x5C4CwutdP16pcag4h4KQBAb
-ItILnxIRawjOAGfXEVNW95g6zkBAr1tzi7jAkp3l19hEpNykxJSpNOvfbB0BfMK9
-OWShnjTrnRDX/YNLSpA4XaGtbdNeqll4o41muyWjccCcXWU56HLnysafHSrkjWDP
-bLE1/nStmBaqwhxqtQd/Bflk6Zu4c647mls6HCqx6kk5p7e9tfei8k2CdSz3IXE=
-=fP6W
------END PGP SIGNATURE-----
---=-=-=--
