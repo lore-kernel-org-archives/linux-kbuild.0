@@ -1,14 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.136]:38192 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.136]:42844 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1754462AbcHSVey (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 19 Aug 2016 17:34:54 -0400
+        id S1754449AbcHSVlO (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 19 Aug 2016 17:41:14 -0400
 From: mcgrof@kernel.org
-Subject: [PATCH v4 06/16] ranges.h: add helpers to build and identify Linux section ranges
-Date: Fri, 19 Aug 2016 14:32:55 -0700
-Message-Id: <1471642385-5629-7-git-send-email-mcgrof@kernel.org>
-In-Reply-To: <1471642385-5629-1-git-send-email-mcgrof@kernel.org>
-References: <1471642385-5629-1-git-send-email-mcgrof@kernel.org>
+Subject: [PATCH v4 00/16] linux: generalize sections, ranges and linker tables
+Date: Fri, 19 Aug 2016 14:32:49 -0700
+Message-Id: <1471642385-5629-1-git-send-email-mcgrof@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: hpa@zytor.com, tglx@linutronix.de, mingo@redhat.com, jpoimboe@redhat.com, bp@alien8.de, linux@arm.linux.org.uk, mhiramat@kernel.org, masami.hiramatsu.pt@hitachi.com, jbaron@akamai.com, heiko.carstens@de.ibm.com, ananth@linux.vnet.ibm.com, anil.s.keshavamurthy@intel.com, davem@davemloft.net, realmz6@gmail.com
@@ -16,756 +17,222 @@ Cc: x86@kernel.org, luto@amacapital.net, keescook@chromium.org, torvalds@linux-f
 
 From: "Luis R. Rodriguez" <mcgrof@kernel.org>
 
-Section ranges are on one of the types of custom sections
-types used in Linux. This provides a series of helpers for
-defining them and using them. Most importantly this also
-enables us to avoid modifying the linker script when we
-add a new section range.
+This v4 addresses feedback from the previous v3 series [0], and also
+addresses a huge array of additional tests against many architectures
+outside of what 0-day provides. As I mentioned in my last v3 series,
+0-day had only found one issue with the series, a blackfin architecture
+linker issue with the last series. Guenter Rock was kind enough to give
+my series a test spin on his test bed and he found quite a bit of other
+oddball issues with obscure architectures, and even on x86 with an old
+toolchain. After a lot of work and coordinating with a few maintainers
+I'm happy to report all issues found so far through all possible testing
+I could do are now fixed, this series also addresses all feedback from
+the last series, as such this goes submitted as PATCH form.
 
-It turns out a lot of custom sections are actually section ranges,
-and these are typically spelled out in their architecture specific
-asm/sections.h file -- we anable architectures to override what asm
-is used for section ranges but start by default trusting the
-asm-generic version all around.
+In addressing fixing this work on a few architectures some of the previous
+patches are further simplified. The kprobes port to linker tables is made
+much easier now that I've addressed moving out core kprobe declarations
+into asm-generic/kprobes.h. Refer to the patch "kprobes: move kprobe
+declarations to asm-generic/kprobes.h". This makes for a much cleaner
+solution across architectures.
 
-v4:
+Boris feedback on making the code bit rot feature optional is addressed
+by using a new Kconfig symbol for this, CONFIG_BUILD_AVOID_BITROT,
+but given Greg's concerns over lack of clarity over what this was all about
+I've ripped that functionality out into its own patch with a bit more
+extensive documentation and re-wording. See the patch "kbuild: enable option
+to force compile force-obj-y and force-lib-y". I hope makes it clear how
+linker tables can help with avoiding code bit rot. I've gone with a new
+Kconfig symbol CONFIG_BUILD_AVOID_BITROT given CONFIG_COMPILE_TEST is
+not available on UML, this feature is desirable on all architectures.
 
-o tons of documentation love
-o fix arch/x86/tools/relocs.c typo - which caused compilation issues
-  on old toolchains
-o port to new shiny sphinx documentation
-o sprinkle a few more needed VMLINUX_SYMBOL() - fixes
-  compilation on blackfin
-o name changes as suggested by Boris:
-- %s/SECTION_TYPE_RANGES/rng/g
-- %s/SECTION_TYPE/SECTION_CORE/g
-- %s/section_type_asmtype/section_core_type/g
-- %s/section_type/section_core/g
-- %s/section_rng/set_section_rng/g
-- rebrand DECLARE_SECTION_RNG() as DEFINE_SECTION_RANGE() - this is
-  the asm version of the respective C version, this will have a
-  userspace C demo added later.
-o move __LINUX_RANGE() and __LINUX_RANGE_ORDER() - fixes builds
-  on sparc
-o adds section ranges to linker script
-o rename SECTION_RANGE_ALL()
-o use default alignment, fixes builds on powerpc and arm for both
-  __LINUX_RANGE() and __LINUX_RANGE_ORDER()
-o expand documentation to document modules support
-o add maintainers
-o use generic-y
+The documentation is revamped, now that the DocBook format is deprecated
+I ported the documention into the trendy hipster Sphinx documentation
+format.
 
-v3: new in this series, uses copyleft-next
+AT Boris' request I've adapated the userspace linker table application
+forintegration into the kernel under tools/ to make it easier to keep
+things in sync, however since this requires a bit of changes to some headers
+in tools/ I'll submit that separately.
 
-Signed-off-by: Luis R. Rodriguez <mcgrof@kernel.org>
----
- Documentation/sections/index.rst   |   1 +
- Documentation/sections/ranges.rst  |  49 ++++++++++++++
- MAINTAINERS                        |  10 +++
- arch/alpha/include/asm/Kbuild      |   1 +
- arch/arc/include/asm/Kbuild        |   1 +
- arch/arm/include/asm/Kbuild        |   1 +
- arch/arm64/include/asm/Kbuild      |   1 +
- arch/avr32/include/asm/Kbuild      |   1 +
- arch/blackfin/include/asm/Kbuild   |   1 +
- arch/c6x/include/asm/Kbuild        |   1 +
- arch/cris/include/asm/Kbuild       |   1 +
- arch/frv/include/asm/Kbuild        |   1 +
- arch/h8300/include/asm/Kbuild      |   1 +
- arch/hexagon/include/asm/Kbuild    |   1 +
- arch/ia64/include/asm/Kbuild       |   1 +
- arch/m32r/include/asm/Kbuild       |   1 +
- arch/m68k/include/asm/Kbuild       |   1 +
- arch/metag/include/asm/Kbuild      |   1 +
- arch/microblaze/include/asm/Kbuild |   1 +
- arch/mips/include/asm/Kbuild       |   1 +
- arch/mn10300/include/asm/Kbuild    |   1 +
- arch/nios2/include/asm/Kbuild      |   1 +
- arch/openrisc/include/asm/Kbuild   |   1 +
- arch/parisc/include/asm/Kbuild     |   1 +
- arch/powerpc/include/asm/Kbuild    |   1 +
- arch/s390/include/asm/Kbuild       |   1 +
- arch/score/include/asm/Kbuild      |   1 +
- arch/sh/include/asm/Kbuild         |   1 +
- arch/sparc/include/asm/Kbuild      |   1 +
- arch/tile/include/asm/Kbuild       |   1 +
- arch/um/include/asm/Kbuild         |   1 +
- arch/unicore32/include/asm/Kbuild  |   1 +
- arch/x86/include/asm/Kbuild        |   1 +
- arch/x86/tools/relocs.c            |   2 +
- arch/xtensa/include/asm/Kbuild     |   1 +
- include/asm-generic/ranges.h       |  89 ++++++++++++++++++++++++++
- include/asm-generic/vmlinux.lds.h  |  12 +++-
- include/linux/ranges.h             | 128 +++++++++++++++++++++++++++++++++++++
- 38 files changed, 320 insertions(+), 2 deletions(-)
+[0] https://lkml.kernel.org/r/1469222687-1600-1-git-send-email-mcgrof@kernel.org
+
+If you'd like this in git-form, you can get it on the 20160819-linker-table-v4
+branch of my linux-next tree on kernel.org, this also includes the series of
+the linker table userspace sandbox:
+
+https://git.kernel.org/cgit/linux/kernel/git/mcgrof/linux-next.git/log/?h=20160819-linker-table-v4
+
+Please let me know if there are any concerns or questions.
+
+Luis R. Rodriguez (16):
+  x86: remove LTO_REFERENCE_INITCALL()
+  dell-smo8800: include uaccess.h
+  scripts/module-common.lds: enable generation
+  generic-sections: add section core helpers
+  xtensa: skip adding literal when SORT() is used
+  ranges.h: add helpers to build and identify Linux section ranges
+  tables.h: add linker table support
+  kbuild: enable option to force compile force-obj-y and force-lib-y
+  firmware/Makefile: force recompilation if makefile changes
+  firmware: port built-in section to linker table
+  jump_label: move guard #endif down where it belongs
+  jump_label: port __jump_table to linker tables
+  dynamic_debug: port to use linker tables
+  kprobes: move kprobe declarations to asm-generic/kprobes.h
+  kprobes: port .kprobes.text to section range
+  kprobes: port blacklist kprobes to linker table
+
+ .gitignore                                         |   2 +
+ Documentation/index.rst                            |   1 +
+ Documentation/kbuild/makefiles.txt                 |  36 ++
+ Documentation/sections/conf.py                     |   4 +
+ Documentation/sections/index.rst                   |  13 +
+ Documentation/sections/linker-tables.rst           | 202 +++++++
+ Documentation/sections/ranges.rst                  |  49 ++
+ Documentation/sections/section-core.rst            | 153 +++++
+ MAINTAINERS                                        |  37 ++
+ Makefile                                           |   6 +-
+ arch/alpha/include/asm/Kbuild                      |   4 +
+ arch/arc/include/asm/Kbuild                        |   3 +
+ arch/arc/include/asm/kprobes.h                     |   6 +-
+ arch/arc/kernel/vmlinux.lds.S                      |   1 -
+ arch/arm/include/asm/Kbuild                        |   3 +
+ arch/arm/include/asm/jump_label.h                  |   6 +-
+ arch/arm/include/asm/kprobes.h                     |   4 +
+ arch/arm/kernel/entry-armv.S                       |   3 +-
+ arch/arm/kernel/vmlinux-xip.lds.S                  |   1 -
+ arch/arm/kernel/vmlinux.lds.S                      |   1 -
+ arch/arm/probes/decode.h                           |   1 +
+ arch/arm64/include/asm/Kbuild                      |   3 +
+ arch/arm64/include/asm/jump_label.h                |   6 +-
+ arch/arm64/include/asm/kprobes.h                   |   4 +
+ arch/arm64/kernel/armv8_deprecated.c               |   1 +
+ arch/arm64/kernel/insn.c                           |   1 +
+ arch/arm64/kernel/probes/kprobes.c                 |   4 +-
+ arch/arm64/kernel/vmlinux.lds.S                    |   1 -
+ arch/avr32/include/asm/Kbuild                      |   3 +
+ arch/avr32/include/asm/kprobes.h                   |   4 +
+ arch/avr32/kernel/entry-avr32b.S                   |  13 +-
+ arch/avr32/kernel/vmlinux.lds.S                    |   1 -
+ arch/blackfin/include/asm/Kbuild                   |   4 +
+ arch/blackfin/kernel/vmlinux.lds.S                 |   1 -
+ arch/c6x/include/asm/Kbuild                        |   3 +
+ arch/c6x/include/asm/tables.h                      |  26 +
+ arch/c6x/kernel/vmlinux.lds.S                      |   1 -
+ arch/cris/include/asm/Kbuild                       |   4 +
+ arch/frv/include/asm/Kbuild                        |   4 +
+ arch/h8300/include/asm/Kbuild                      |   4 +
+ arch/hexagon/include/asm/Kbuild                    |   4 +
+ arch/hexagon/kernel/vmlinux.lds.S                  |   1 -
+ arch/ia64/include/asm/Kbuild                       |   3 +
+ arch/ia64/include/asm/kprobes.h                    |   7 +-
+ arch/ia64/kernel/jprobes.S                         |   3 +-
+ arch/ia64/kernel/vmlinux.lds.S                     |   1 -
+ arch/ia64/lib/flush.S                              |   6 +-
+ arch/m32r/include/asm/Kbuild                       |   4 +
+ arch/m68k/include/asm/Kbuild                       |   4 +
+ arch/metag/include/asm/Kbuild                      |   4 +
+ arch/metag/kernel/vmlinux.lds.S                    |   1 -
+ arch/microblaze/include/asm/Kbuild                 |   4 +
+ arch/microblaze/kernel/vmlinux.lds.S               |   1 -
+ arch/mips/include/asm/Kbuild                       |   3 +
+ arch/mips/include/asm/jump_label.h                 |   6 +-
+ arch/mips/include/asm/kprobes.h                    |   6 +-
+ arch/mips/kernel/vmlinux.lds.S                     |   1 -
+ arch/mn10300/include/asm/Kbuild                    |   3 +
+ arch/mn10300/include/asm/kprobes.h                 |   4 +
+ arch/mn10300/kernel/vmlinux.lds.S                  |   1 -
+ arch/nios2/include/asm/Kbuild                      |   4 +
+ arch/nios2/kernel/vmlinux.lds.S                    |   1 -
+ arch/openrisc/include/asm/Kbuild                   |   4 +
+ arch/openrisc/kernel/vmlinux.lds.S                 |   1 -
+ arch/parisc/include/asm/Kbuild                     |   4 +
+ arch/parisc/kernel/vmlinux.lds.S                   |   1 -
+ arch/powerpc/include/asm/Kbuild                    |   3 +
+ arch/powerpc/include/asm/jump_label.h              |   8 +-
+ arch/powerpc/include/asm/kprobes.h                 |   6 +
+ arch/powerpc/include/asm/ppc_asm.h                 |   7 +-
+ arch/powerpc/kernel/vmlinux.lds.S                  |   1 -
+ arch/s390/include/asm/Kbuild                       |   3 +
+ arch/s390/include/asm/jump_label.h                 |   6 +-
+ arch/s390/include/asm/kprobes.h                    |   4 +
+ arch/s390/kernel/entry.S                           |   5 +-
+ arch/s390/kernel/kprobes.c                         |   6 +-
+ arch/s390/kernel/mcount.S                          |   3 +-
+ arch/s390/kernel/vmlinux.lds.S                     |   1 -
+ arch/score/include/asm/Kbuild                      |   4 +
+ arch/score/kernel/vmlinux.lds.S                    |   1 -
+ arch/sh/include/asm/Kbuild                         |   3 +
+ arch/sh/include/asm/kprobes.h                      |   2 +
+ arch/sh/kernel/vmlinux.lds.S                       |   1 -
+ arch/sparc/include/asm/Kbuild                      |   3 +
+ arch/sparc/include/asm/jump_label.h                |   6 +-
+ arch/sparc/include/asm/kprobes.h                   |   5 +
+ arch/sparc/kernel/vmlinux.lds.S                    |   1 -
+ arch/sparc/mm/ultra.S                              |   3 +-
+ arch/tile/include/asm/Kbuild                       |   3 +
+ arch/tile/include/asm/kprobes.h                    |   6 +-
+ arch/tile/kernel/vmlinux.lds.S                     |   1 -
+ arch/um/include/asm/Kbuild                         |   4 +
+ arch/unicore32/include/asm/Kbuild                  |   3 +
+ arch/unicore32/include/asm/section-core.h          |  19 +
+ arch/x86/include/asm/Kbuild                        |   3 +
+ arch/x86/include/asm/jump_label.h                  |  10 +-
+ arch/x86/include/asm/kprobes.h                     |   6 +
+ arch/x86/kernel/cpu/microcode/core.c               |   8 +-
+ arch/x86/kernel/kprobes/core.c                     |  11 +-
+ arch/x86/kernel/vmlinux.lds.S                      |   1 -
+ arch/x86/tools/relocs.c                            |   4 +
+ arch/xtensa/include/asm/Kbuild                     |   4 +
+ arch/xtensa/kernel/Makefile                        |   8 +-
+ drivers/base/firmware_class.c                      |  12 +-
+ drivers/platform/x86/dell-smo8800.c                |   1 +
+ firmware/Makefile                                  |   6 +-
+ include/asm-generic/kprobes.h                      |  26 +
+ include/asm-generic/ranges.h                       | 103 ++++
+ include/asm-generic/section-core.h                 | 341 +++++++++++
+ include/asm-generic/sections.h                     |   4 +-
+ include/asm-generic/tables.h                       |  50 ++
+ include/asm-generic/vmlinux.lds.h                  |  73 +--
+ include/linux/compiler.h                           |   8 -
+ include/linux/dynamic_debug.h                      |   5 +-
+ include/linux/init.h                               |  20 +-
+ include/linux/jump_label.h                         |   8 +-
+ include/linux/kprobes.h                            |  24 +-
+ include/linux/ranges.h                             | 128 +++++
+ include/linux/sections.h                           | 111 ++++
+ include/linux/tables.h                             | 638 +++++++++++++++++++++
+ init/Kconfig                                       |  22 +
+ kernel/jump_label.c                                |  17 +-
+ kernel/kprobes.c                                   |  17 +-
+ lib/dynamic_debug.c                                |  13 +-
+ scripts/Makefile.build                             |   7 +-
+ scripts/Makefile.clean                             |   2 +
+ scripts/Makefile.lib                               |  11 +
+ scripts/Makefile.modpost                           |   2 +-
+ scripts/mod/modpost.c                              |   2 +-
+ scripts/{module-common.lds => module-common.lds.S} |   6 +
+ scripts/recordmcount.c                             |   2 +-
+ scripts/recordmcount.pl                            |   2 +-
+ tools/objtool/special.c                            |   2 +-
+ 133 files changed, 2328 insertions(+), 214 deletions(-)
+ create mode 100644 Documentation/sections/conf.py
+ create mode 100644 Documentation/sections/index.rst
+ create mode 100644 Documentation/sections/linker-tables.rst
  create mode 100644 Documentation/sections/ranges.rst
+ create mode 100644 Documentation/sections/section-core.rst
+ create mode 100644 arch/c6x/include/asm/tables.h
+ create mode 100644 arch/unicore32/include/asm/section-core.h
+ create mode 100644 include/asm-generic/kprobes.h
  create mode 100644 include/asm-generic/ranges.h
+ create mode 100644 include/asm-generic/section-core.h
+ create mode 100644 include/asm-generic/tables.h
  create mode 100644 include/linux/ranges.h
+ create mode 100644 include/linux/sections.h
+ create mode 100644 include/linux/tables.h
+ rename scripts/{module-common.lds => module-common.lds.S} (80%)
 
-diff --git a/Documentation/sections/index.rst b/Documentation/sections/index.rst
-index d411e9b22eb3..6dd93ddd5dbe 100644
---- a/Documentation/sections/index.rst
-+++ b/Documentation/sections/index.rst
-@@ -9,3 +9,4 @@ used throughout the kernel to help declare and define them.
-    :maxdepth: 4
- 
-    section-core
-+   ranges
-diff --git a/Documentation/sections/ranges.rst b/Documentation/sections/ranges.rst
-new file mode 100644
-index 000000000000..1293dcb3ab38
---- /dev/null
-+++ b/Documentation/sections/ranges.rst
-@@ -0,0 +1,49 @@
-+====================
-+Linux section ranges
-+====================
-+
-+This documents Linux' use of section ranges, how you can use
-+them and how they work.
-+
-+About section ranges
-+====================
-+
-+Introduction
-+------------
-+.. kernel-doc:: include/linux/ranges.h
-+   :doc: Introduction
-+
-+Section range module support
-+----------------------------
-+.. kernel-doc:: include/linux/ranges.h
-+   :doc: Section range module support
-+
-+Section range helpers
-+=====================
-+.. kernel-doc:: include/linux/ranges.h
-+   :doc: Section range helpers
-+
-+DECLARE_SECTION_RANGE
-+---------------------
-+.. kernel-doc:: include/linux/ranges.h
-+   :functions: DECLARE_SECTION_RANGE
-+
-+DEFINE_SECTION_RANGE
-+--------------------
-+.. kernel-doc:: include/linux/ranges.h
-+   :functions: DEFINE_SECTION_RANGE
-+
-+SECTION_ADDR_IN_RANGE
-+---------------------
-+.. kernel-doc:: include/linux/ranges.h
-+   :functions: SECTION_ADDR_IN_RANGE
-+
-+__LINUX_RANGE
-+-------------
-+.. kernel-doc:: include/asm-generic/ranges.h
-+   :functions: __LINUX_RANGE
-+
-+__LINUX_RANGE_ORDER
-+-------------------
-+.. kernel-doc:: include/asm-generic/ranges.h
-+   :functions: __LINUX_RANGE_ORDER
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 689c12075842..1a217751aa8a 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -5217,6 +5217,16 @@ S:	Supported
- F:	drivers/base/power/domain*.c
- F:	include/linux/pm_domain.h
- 
-+GENERIC SECTION RANGES
-+M:	"Luis R. Rodriguez" <mcgrof@kernel.org>
-+M:	"H. Peter Anvin" <hpa@zytor.com>
-+L:	linux-arch@vger.kernel.org
-+L:	linux-kernel@vger.kernel.org
-+S:	Supported
-+F:	include/asm-generic/ranges.h
-+F:	include/linux/ranges.h
-+F:	Documentation/sections/ranges.rst
-+
- GENERIC SECTIONS
- M:	"Luis R. Rodriguez" <mcgrof@kernel.org>
- M:	Josh Poimboeuf <jpoimboe@redhat.com>
-diff --git a/arch/alpha/include/asm/Kbuild b/arch/alpha/include/asm/Kbuild
-index 5422827f1585..e44c896b91c4 100644
---- a/arch/alpha/include/asm/Kbuild
-+++ b/arch/alpha/include/asm/Kbuild
-@@ -11,3 +11,4 @@ generic-y += preempt.h
- generic-y += sections.h
- generic-y += trace_clock.h
- generic-y += section-core.h
-+generic-y += ranges.h
-diff --git a/arch/arc/include/asm/Kbuild b/arch/arc/include/asm/Kbuild
-index 9a0929576de1..e5295413fdf8 100644
---- a/arch/arc/include/asm/Kbuild
-+++ b/arch/arc/include/asm/Kbuild
-@@ -51,3 +51,4 @@ generic-y += vga.h
- generic-y += word-at-a-time.h
- generic-y += xor.h
- generic-y += section-core.h
-+generic-y += ranges.h
-diff --git a/arch/arm/include/asm/Kbuild b/arch/arm/include/asm/Kbuild
-index 47923635be16..8e52300e1eed 100644
---- a/arch/arm/include/asm/Kbuild
-+++ b/arch/arm/include/asm/Kbuild
-@@ -40,3 +40,4 @@ generic-y += timex.h
- generic-y += trace_clock.h
- generic-y += unaligned.h
- generic-y += section-core.h
-+generic-y += ranges.h
-diff --git a/arch/arm64/include/asm/Kbuild b/arch/arm64/include/asm/Kbuild
-index 42d00806e4fb..5ff184574976 100644
---- a/arch/arm64/include/asm/Kbuild
-+++ b/arch/arm64/include/asm/Kbuild
-@@ -53,3 +53,4 @@ generic-y += user.h
- generic-y += vga.h
- generic-y += xor.h
- generic-y += section-core.h
-+generic-y += ranges.h
-diff --git a/arch/avr32/include/asm/Kbuild b/arch/avr32/include/asm/Kbuild
-index f2c3b656a0e7..edc176348d7c 100644
---- a/arch/avr32/include/asm/Kbuild
-+++ b/arch/avr32/include/asm/Kbuild
-@@ -23,3 +23,4 @@ generic-y += vga.h
- generic-y += word-at-a-time.h
- generic-y += xor.h
- generic-y += section-core.h
-+generic-y += ranges.h
-diff --git a/arch/blackfin/include/asm/Kbuild b/arch/blackfin/include/asm/Kbuild
-index 7de674411bed..35b7752e65c0 100644
---- a/arch/blackfin/include/asm/Kbuild
-+++ b/arch/blackfin/include/asm/Kbuild
-@@ -49,3 +49,4 @@ generic-y += user.h
- generic-y += word-at-a-time.h
- generic-y += xor.h
- generic-y += section-core.h
-+generic-y += ranges.h
-diff --git a/arch/c6x/include/asm/Kbuild b/arch/c6x/include/asm/Kbuild
-index 38127ce747be..cede2a950fbf 100644
---- a/arch/c6x/include/asm/Kbuild
-+++ b/arch/c6x/include/asm/Kbuild
-@@ -63,3 +63,4 @@ generic-y += vga.h
- generic-y += word-at-a-time.h
- generic-y += xor.h
- generic-y += section-core.h
-+generic-y += ranges.h
-diff --git a/arch/cris/include/asm/Kbuild b/arch/cris/include/asm/Kbuild
-index 385cd88a9d9e..fb8bb4112773 100644
---- a/arch/cris/include/asm/Kbuild
-+++ b/arch/cris/include/asm/Kbuild
-@@ -46,3 +46,4 @@ generic-y += vga.h
- generic-y += word-at-a-time.h
- generic-y += xor.h
- generic-y += section-core.h
-+generic-y += ranges.h
-diff --git a/arch/frv/include/asm/Kbuild b/arch/frv/include/asm/Kbuild
-index 46d7c599d9b8..5191fec655d7 100644
---- a/arch/frv/include/asm/Kbuild
-+++ b/arch/frv/include/asm/Kbuild
-@@ -9,3 +9,4 @@ generic-y += preempt.h
- generic-y += trace_clock.h
- generic-y += word-at-a-time.h
- generic-y += section-core.h
-+generic-y += ranges.h
-diff --git a/arch/h8300/include/asm/Kbuild b/arch/h8300/include/asm/Kbuild
-index 1ec04ec1c82b..7929a992566c 100644
---- a/arch/h8300/include/asm/Kbuild
-+++ b/arch/h8300/include/asm/Kbuild
-@@ -76,3 +76,4 @@ generic-y += vga.h
- generic-y += word-at-a-time.h
- generic-y += xor.h
- generic-y += section-core.h
-+generic-y += ranges.h
-diff --git a/arch/hexagon/include/asm/Kbuild b/arch/hexagon/include/asm/Kbuild
-index 37d7bfae7619..af17ee334788 100644
---- a/arch/hexagon/include/asm/Kbuild
-+++ b/arch/hexagon/include/asm/Kbuild
-@@ -61,3 +61,4 @@ generic-y += vga.h
- generic-y += word-at-a-time.h
- generic-y += xor.h
- generic-y += section-core.h
-+generic-y += ranges.h
-diff --git a/arch/ia64/include/asm/Kbuild b/arch/ia64/include/asm/Kbuild
-index 672c6d5da18c..d8f226b35a0a 100644
---- a/arch/ia64/include/asm/Kbuild
-+++ b/arch/ia64/include/asm/Kbuild
-@@ -10,3 +10,4 @@ generic-y += trace_clock.h
- generic-y += vtime.h
- generic-y += word-at-a-time.h
- generic-y += section-core.h
-+generic-y += ranges.h
-diff --git a/arch/m32r/include/asm/Kbuild b/arch/m32r/include/asm/Kbuild
-index 6111e1523750..1c6504d29312 100644
---- a/arch/m32r/include/asm/Kbuild
-+++ b/arch/m32r/include/asm/Kbuild
-@@ -12,3 +12,4 @@ generic-y += sections.h
- generic-y += trace_clock.h
- generic-y += word-at-a-time.h
- generic-y += section-core.h
-+generic-y += ranges.h
-diff --git a/arch/m68k/include/asm/Kbuild b/arch/m68k/include/asm/Kbuild
-index eef72c464c9b..d465f51c2088 100644
---- a/arch/m68k/include/asm/Kbuild
-+++ b/arch/m68k/include/asm/Kbuild
-@@ -36,3 +36,4 @@ generic-y += types.h
- generic-y += word-at-a-time.h
- generic-y += xor.h
- generic-y += section-core.h
-+generic-y += ranges.h
-diff --git a/arch/metag/include/asm/Kbuild b/arch/metag/include/asm/Kbuild
-index 50ebd5a30d16..c869b1ebd583 100644
---- a/arch/metag/include/asm/Kbuild
-+++ b/arch/metag/include/asm/Kbuild
-@@ -57,3 +57,4 @@ generic-y += vga.h
- generic-y += word-at-a-time.h
- generic-y += xor.h
- generic-y += section-core.h
-+generic-y += ranges.h
-diff --git a/arch/microblaze/include/asm/Kbuild b/arch/microblaze/include/asm/Kbuild
-index c6c2cf6edc98..63c083a1f8da 100644
---- a/arch/microblaze/include/asm/Kbuild
-+++ b/arch/microblaze/include/asm/Kbuild
-@@ -12,3 +12,4 @@ generic-y += syscalls.h
- generic-y += trace_clock.h
- generic-y += word-at-a-time.h
- generic-y += section-core.h
-+generic-y += ranges.h
-diff --git a/arch/mips/include/asm/Kbuild b/arch/mips/include/asm/Kbuild
-index 12f7c5984c03..ed225600c8a4 100644
---- a/arch/mips/include/asm/Kbuild
-+++ b/arch/mips/include/asm/Kbuild
-@@ -21,3 +21,4 @@ generic-y += user.h
- generic-y += word-at-a-time.h
- generic-y += xor.h
- generic-y += section-core.h
-+generic-y += ranges.h
-diff --git a/arch/mn10300/include/asm/Kbuild b/arch/mn10300/include/asm/Kbuild
-index f8145bc85835..656af7b69940 100644
---- a/arch/mn10300/include/asm/Kbuild
-+++ b/arch/mn10300/include/asm/Kbuild
-@@ -11,3 +11,4 @@ generic-y += sections.h
- generic-y += trace_clock.h
- generic-y += word-at-a-time.h
- generic-y += section-core.h
-+generic-y += ranges.h
-diff --git a/arch/nios2/include/asm/Kbuild b/arch/nios2/include/asm/Kbuild
-index c9c7cb82b00f..c55880659d67 100644
---- a/arch/nios2/include/asm/Kbuild
-+++ b/arch/nios2/include/asm/Kbuild
-@@ -64,3 +64,4 @@ generic-y += vga.h
- generic-y += word-at-a-time.h
- generic-y += xor.h
- generic-y += section-core.h
-+generic-y += ranges.h
-diff --git a/arch/openrisc/include/asm/Kbuild b/arch/openrisc/include/asm/Kbuild
-index 86175e701869..7d6a704b808c 100644
---- a/arch/openrisc/include/asm/Kbuild
-+++ b/arch/openrisc/include/asm/Kbuild
-@@ -72,3 +72,4 @@ generic-y += vga.h
- generic-y += word-at-a-time.h
- generic-y += xor.h
- generic-y += section-core.h
-+generic-y += ranges.h
-diff --git a/arch/parisc/include/asm/Kbuild b/arch/parisc/include/asm/Kbuild
-index 6f43f33f0e0f..1a263a7158e2 100644
---- a/arch/parisc/include/asm/Kbuild
-+++ b/arch/parisc/include/asm/Kbuild
-@@ -30,3 +30,4 @@ generic-y += vga.h
- generic-y += word-at-a-time.h
- generic-y += xor.h
- generic-y += section-core.h
-+generic-y += ranges.h
-diff --git a/arch/powerpc/include/asm/Kbuild b/arch/powerpc/include/asm/Kbuild
-index b49fab7bab2f..065c6e84fb67 100644
---- a/arch/powerpc/include/asm/Kbuild
-+++ b/arch/powerpc/include/asm/Kbuild
-@@ -8,3 +8,4 @@ generic-y += preempt.h
- generic-y += rwsem.h
- generic-y += vtime.h
- generic-y += section-core.h
-+generic-y += ranges.h
-diff --git a/arch/s390/include/asm/Kbuild b/arch/s390/include/asm/Kbuild
-index 89e74b59f32d..3e8b95927cb5 100644
---- a/arch/s390/include/asm/Kbuild
-+++ b/arch/s390/include/asm/Kbuild
-@@ -9,3 +9,4 @@ generic-y += preempt.h
- generic-y += trace_clock.h
- generic-y += word-at-a-time.h
- generic-y += section-core.h
-+generic-y += ranges.h
-diff --git a/arch/score/include/asm/Kbuild b/arch/score/include/asm/Kbuild
-index f089a264cd38..f0cdb2cbca4d 100644
---- a/arch/score/include/asm/Kbuild
-+++ b/arch/score/include/asm/Kbuild
-@@ -15,3 +15,4 @@ generic-y += xor.h
- generic-y += serial.h
- generic-y += word-at-a-time.h
- generic-y += section-core.h
-+generic-y += ranges.h
-diff --git a/arch/sh/include/asm/Kbuild b/arch/sh/include/asm/Kbuild
-index 7b0356dca562..c9bb7932a3d1 100644
---- a/arch/sh/include/asm/Kbuild
-+++ b/arch/sh/include/asm/Kbuild
-@@ -40,3 +40,4 @@ generic-y += trace_clock.h
- generic-y += ucontext.h
- generic-y += xor.h
- generic-y += section-core.h
-+generic-y += ranges.h
-diff --git a/arch/sparc/include/asm/Kbuild b/arch/sparc/include/asm/Kbuild
-index d51b84d6b4b7..79664d10e63b 100644
---- a/arch/sparc/include/asm/Kbuild
-+++ b/arch/sparc/include/asm/Kbuild
-@@ -23,3 +23,4 @@ generic-y += trace_clock.h
- generic-y += types.h
- generic-y += word-at-a-time.h
- generic-y += section-core.h
-+generic-y += ranges.h
-diff --git a/arch/tile/include/asm/Kbuild b/arch/tile/include/asm/Kbuild
-index 7b8a652e43ae..951fa4be571d 100644
---- a/arch/tile/include/asm/Kbuild
-+++ b/arch/tile/include/asm/Kbuild
-@@ -42,3 +42,4 @@ generic-y += trace_clock.h
- generic-y += types.h
- generic-y += xor.h
- generic-y += section-core.h
-+generic-y += ranges.h
-diff --git a/arch/um/include/asm/Kbuild b/arch/um/include/asm/Kbuild
-index e9849834d55e..99be54949b99 100644
---- a/arch/um/include/asm/Kbuild
-+++ b/arch/um/include/asm/Kbuild
-@@ -28,3 +28,4 @@ generic-y += trace_clock.h
- generic-y += word-at-a-time.h
- generic-y += xor.h
- generic-y += section-core.h
-+generic-y += ranges.h
-diff --git a/arch/unicore32/include/asm/Kbuild b/arch/unicore32/include/asm/Kbuild
-index 256c45b3ae34..6c35905fe371 100644
---- a/arch/unicore32/include/asm/Kbuild
-+++ b/arch/unicore32/include/asm/Kbuild
-@@ -64,3 +64,4 @@ generic-y += user.h
- generic-y += vga.h
- generic-y += word-at-a-time.h
- generic-y += xor.h
-+generic-y += ranges.h
-diff --git a/arch/x86/include/asm/Kbuild b/arch/x86/include/asm/Kbuild
-index f6914a57bc16..f790756fdb48 100644
---- a/arch/x86/include/asm/Kbuild
-+++ b/arch/x86/include/asm/Kbuild
-@@ -17,3 +17,4 @@ generic-y += early_ioremap.h
- generic-y += mcs_spinlock.h
- generic-y += mm-arch-hooks.h
- generic-y += section-core.h
-+generic-y += ranges.h
-diff --git a/arch/x86/tools/relocs.c b/arch/x86/tools/relocs.c
-index 0c2fae8d929d..c215db049920 100644
---- a/arch/x86/tools/relocs.c
-+++ b/arch/x86/tools/relocs.c
-@@ -68,6 +68,8 @@ static const char * const sym_regex_kernel[S_NSYMTYPES] = {
- 	"__end_rodata|"
- 	"__initramfs_start|"
- 	"(jiffies|jiffies_64)|"
-+	".rodata.rng.*|"
-+	".init.text.rng.*|"
- #if ELF_BITS == 64
- 	"__per_cpu_load|"
- 	"init_per_cpu__.*|"
-diff --git a/arch/xtensa/include/asm/Kbuild b/arch/xtensa/include/asm/Kbuild
-index 81ca6816bd72..221b6b652500 100644
---- a/arch/xtensa/include/asm/Kbuild
-+++ b/arch/xtensa/include/asm/Kbuild
-@@ -32,3 +32,4 @@ generic-y += trace_clock.h
- generic-y += word-at-a-time.h
- generic-y += xor.h
- generic-y += section-core.h
-+generic-y += ranges.h
-diff --git a/include/asm-generic/ranges.h b/include/asm-generic/ranges.h
-new file mode 100644
-index 000000000000..74cd941aa2f8
---- /dev/null
-+++ b/include/asm-generic/ranges.h
-@@ -0,0 +1,89 @@
-+#ifndef _ASM_GENERIC_RANGES_H_
-+#define _ASM_GENERIC_RANGES_H_
-+/*
-+ * Copyright (C) 2016 Luis R. Rodriguez <mcgrof@kernel.org>
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of copyleft-next (version 0.3.1 or later) as published
-+ * at http://copyleft-next.org/.
-+ */
-+#include <asm/section-core.h>
-+
-+#define SECTION_RNG(section, name)					\
-+	SECTION_CORE(section, rng, name,				\
-+		     SECTION_ORDER_ANY)
-+
-+#define SECTION_RNG_LEVEL(section, name, level)				\
-+	SECTION_CORE(section, rng, name, level)
-+
-+#define SECTION_RNG_ALL(section)					\
-+	SECTION_CORE_ALL(section,rng)
-+
-+#ifndef set_section_rng
-+# define set_section_rng(section, name, flags)				\
-+	 set_section_core(section, rng, name,				\
-+			  SECTION_ORDER_ANY, flags)
-+#endif
-+
-+#ifndef set_section_rng_type
-+# define set_section_rng_type(section, name, flags, type)		\
-+	 set_section_core_type(section, rng, name,			\
-+			       SECTION_ORDER_ANY, flags, type)
-+#endif
-+
-+#ifndef set_section_rng_level
-+# define set_section_rng_level(section, name, level, flags)		\
-+	 set_section_core(section, rng, name, level, flags)
-+#endif
-+
-+#ifndef push_section_rng
-+# define push_section_rng(section, name, flags)				\
-+	 push_section_core(section, rng, name,				\
-+			   SECTION_ORDER_ANY, flags)
-+#endif
-+
-+#ifndef push_section_rng_level
-+# define push_section_rng_level(section, name, level, flags)		\
-+	 push_section_core(section, rng, name,				\
-+			   level, flags)
-+#endif
-+
-+#ifndef __ASSEMBLY__
-+/**
-+ * __LINUX_RANGE - short hand association into a section range
-+ *
-+ * @section: ELF section name to place section range into
-+ * @name: section range name
-+ *
-+ * This helper can be used by subsystems to define their own subsystem
-+ * specific helpers to easily associate a piece of code being defined to a
-+ * section range.
-+ */
-+#define __LINUX_RANGE(section, name)					\
-+	__attribute__((__section__(SECTION_RNG(section, name))))
-+
-+/**
-+ * __LINUX_RANGE_ORDER - short hand association into a section range of order
-+ *
-+ * @section: ELF section name to place section range into
-+ * @name: section range name
-+ * @level: order level, a number. The order level gets tucked into the
-+ *	section as a postfix string. Order levels are sorted using
-+ * 	binutils SORT(), the number is sorted as a string, as such be
-+ * 	sure to fill with zeroes any empty digits. For instance if you are
-+ * 	using 3 levels of digits for order levels, use 001 for the first entry,
-+ * 	0002 for the second, 999 for the last entry. You can use however many
-+ * 	digits you need.
-+ *
-+ * This helper can be used by subsystems to define their own subsystem specific
-+ * helpers to easily associate a piece of code being defined to a section range
-+ * with an associated specific order level. The order level provides the
-+ * ability for explicit user ordering of code. Sorting takes place at link
-+ * time, after compilation.
-+ */
-+#define __LINUX_RANGE_ORDER(section, name, level)			\
-+	__attribute__((__section__(SECTION_RNG_LEVEL(section, name, level))))
-+
-+#endif /* __ASSEMBLY__ */
-+
-+#endif /* _ASM_GENERIC_RANGES_H_ */
-diff --git a/include/asm-generic/vmlinux.lds.h b/include/asm-generic/vmlinux.lds.h
-index 731087276a32..ad843555e6a4 100644
---- a/include/asm-generic/vmlinux.lds.h
-+++ b/include/asm-generic/vmlinux.lds.h
-@@ -56,6 +56,7 @@
- 
- #include <linux/export.h>
- #include <asm/section-core.h>
-+#include <asm/ranges.h>
- 
- /* Align . to a 8 byte boundary equals to maximum function alignment. */
- #define ALIGN_FUNCTION()  . = ALIGN(8)
-@@ -200,6 +201,7 @@
- /* .data section */
- #define DATA_DATA							\
- 	*(SECTION_DATA)							\
-+	*(SORT(SECTION_RNG_ALL(SECTION_DATA)))				\
- 	*(SECTION_REF_DATA)						\
- 	*(.data..shared_aligned) /* percpu related */			\
- 	MEM_KEEP(init.data)						\
-@@ -265,7 +267,9 @@
- 	. = ALIGN((align));						\
- 	SECTION_RODATA    : AT(ADDR(SECTION_RODATA) - LOAD_OFFSET) {	\
- 		VMLINUX_SYMBOL(__start_rodata) = .;			\
--		*(SECTION_RODATA) *(SECTION_ALL(SECTION_RODATA))	\
-+		*(SECTION_RODATA)					\
-+		*(SORT(SECTION_RNG_ALL(SECTION_RODATA)))		\
-+		*(SECTION_ALL(SECTION_RODATA))				\
- 		RO_AFTER_INIT_DATA	/* Read only after init */	\
- 		*(__vermagic)		/* Kernel version magic */	\
- 		. = ALIGN(8);						\
-@@ -433,7 +437,9 @@
-  * during second ld run in second ld pass when generating System.map */
- #define TEXT_TEXT							\
- 		ALIGN_FUNCTION();					\
--		*(.text.hot SECTION_TEXT .text.fixup .text.unlikely)	\
-+		*(.text.hot SECTION_TEXT)				\
-+		*(SORT(SECTION_RNG_ALL(SECTION_TEXT)))			\
-+		*(.text.fixup .text.unlikely)				\
- 		*(SECTION_REF)						\
- 	MEM_KEEP(init.text)						\
- 	MEM_KEEP(exit.text)						\
-@@ -529,6 +535,7 @@
- /* init and exit section handling */
- #define INIT_DATA							\
- 	*(SECTION_INIT_DATA)						\
-+	*(SORT(SECTION_RNG_ALL(SECTION_INIT_DATA)))			\
- 	MEM_DISCARD(init.data)						\
- 	KERNEL_CTORS()							\
- 	MCOUNT_REC()							\
-@@ -551,6 +558,7 @@
- 
- #define INIT_TEXT							\
- 	*(SECTION_INIT)							\
-+	*(SORT(SECTION_RNG_ALL(SECTION_INIT)))				\
- 	*(.text.startup)						\
- 	MEM_DISCARD(init.text)
- 
-diff --git a/include/linux/ranges.h b/include/linux/ranges.h
-new file mode 100644
-index 000000000000..30b2182bd484
---- /dev/null
-+++ b/include/linux/ranges.h
-@@ -0,0 +1,128 @@
-+#ifndef _LINUX_RANGES_H
-+#define _LINUX_RANGES_H
-+/*
-+ * Linux section ranges
-+ *
-+ * Copyright (C) 2016 Luis R. Rodriguez <mcgrof@kernel.org>
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of copyleft-next (version 0.3.1 or later) as published
-+ * at http://copyleft-next.org/.
-+ */
-+#include <linux/sections.h>
-+#include <asm/ranges.h>
-+
-+#ifndef __ASSEMBLY__
-+
-+/**
-+ * DOC: Introduction
-+ *
-+ * A section ranges consists of explicitly annotated series executable code
-+ * stitched together for the purpose of selective placement into standard or
-+ * architecture specific ELF sections. What ELF section is used is utility
-+ * specific. Linux has historically implicitly used section ranges, however
-+ * they were all built in an adhoc manner and typically required linker script
-+ * modifications per architecture. The section range API allows adding new
-+ * bundles of stiched executable code into custom ELF sections by only
-+ * modifying C or asm code in an architecture agnostic form.
-+ *
-+ * This documents the set of helpers available to declare, and define section
-+ * ranges and associate each section range to a specific Linux ELF section.
-+ */
-+
-+/**
-+ * DOC: Section range module support
-+ *
-+ * Modules can use section ranges, however the section range definition must be
-+ * built-in to the kernel. That is, the code that implements
-+ * DEFINE_SECTION_RANGE() must be built-in, and modular code cannot add more
-+ * items in to the section range (with __LINUX_RANGE() or
-+ * __LINUX_RANGE_ORDER()), unless kernel/module.c find_module_sections() and
-+ * module-common.lds.S are updated accordingly with a respective module
-+ * notifier to account for updates. This restriction may be enhanced in the
-+ * future.
-+ */
-+
-+/**
-+ * DOC: Section range helpers
-+ *
-+ * These are helpers for section ranges.
-+ */
-+
-+/**
-+ * DECLARE_SECTION_RANGE - Declares a section range
-+ *
-+ * @name: section range name
-+ *
-+ * Declares a section range to help code access the range. Typically if
-+ * a subsystems needs code to have direct access to the section range the
-+ * subsystem's header file would declare the section range. Care should be
-+ * taken to only declare the section range in a header file if access to it
-+ * is truly needed outside of the code defining it. You typically would
-+ * rather instead provide helpers which access the section range with special
-+ * code on behalf of the caller.
-+ */
-+#define DECLARE_SECTION_RANGE(name)					\
-+	DECLARE_LINUX_SECTION_RO(char, name)
-+
-+/**
-+ * __SECTION_RANGE_BEGIN - Constructs the beginning of a section range
-+ *
-+ * @name: section range name
-+ * @__section: ELF section to place section range into
-+ *
-+ * Constructs the beginning of a section range. You will typically not need
-+ * to use this directly.
-+ */
-+#define __SECTION_RANGE_BEGIN(name, __section)				\
-+	const __typeof__(VMLINUX_SYMBOL(name)[0])			\
-+	      __attribute__((used,					\
-+			     weak,					\
-+			     __aligned__(LINUX_SECTION_ALIGNMENT(name)),\
-+			     section(SECTION_RNG_LEVEL(__section, name,))))
-+
-+/**
-+ * __SECTION_RANGE_END - Constructs the end of a section range
-+ *
-+ * @name: section range name
-+ * @__section: ELF section to place section range into
-+ *
-+ * Constructs the end of a section range. You will typically not need
-+ * to use this directly.
-+ */
-+#define __SECTION_RANGE_END(name, __section)				\
-+	const __typeof__(VMLINUX_SYMBOL(name)[0])			\
-+	      __attribute__((used,					\
-+			     __aligned__(LINUX_SECTION_ALIGNMENT(name)),\
-+			     section(SECTION_RNG_LEVEL(__section, name, ~))))
-+
-+/**
-+ * DEFINE_SECTION_RANGE - Defines a section range
-+ *
-+ * @name: section range name
-+ * @section: ELF section name to place section range into
-+ *
-+ * Defines a section range, used for executable code. Section ranges are
-+ * defined in the code that takes ownership and makes use of the section
-+ * range.
-+ */
-+#define DEFINE_SECTION_RANGE(name, section)				\
-+	DECLARE_LINUX_SECTION_RO(char, name);				\
-+	__SECTION_RANGE_BEGIN(name, section) VMLINUX_SYMBOL(name)[0] = {};\
-+	__SECTION_RANGE_END(name, section) VMLINUX_SYMBOL(name##__end)[0] = {}
-+
-+/**
-+ * SECTION_ADDR_IN_RANGE - returns true if address is in range
-+ *
-+ * @name: section range name
-+ * @addr: address to query for
-+ *
-+ * Returns true if the address is in the section range.
-+ */
-+#define SECTION_ADDR_IN_RANGE(name, addr)				\
-+	 (addr >= (unsigned long) LINUX_SECTION_START(name) &&		\
-+	  addr <  (unsigned long) LINUX_SECTION_END(name))
-+
-+#endif /* __ASSEMBLY__ */
-+
-+#endif /* _LINUX_RANGES_H */
 -- 
 2.9.2
 
