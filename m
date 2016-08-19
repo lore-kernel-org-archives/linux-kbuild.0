@@ -1,15 +1,14 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.136]:38852 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.136]:38328 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1755137AbcHSVey (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        id S1754873AbcHSVey (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
         Fri, 19 Aug 2016 17:34:54 -0400
 From: mcgrof@kernel.org
-Subject: [PATCH v4 00/16] linux: generalize sections, ranges and linker tables
-Date: Fri, 19 Aug 2016 14:33:58 -0700
-Message-Id: <1471642454-5679-1-git-send-email-mcgrof@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Subject: [PATCH v4 08/16] kbuild: enable option to force compile force-obj-y and force-lib-y
+Date: Fri, 19 Aug 2016 14:32:57 -0700
+Message-Id: <1471642385-5629-9-git-send-email-mcgrof@kernel.org>
+In-Reply-To: <1471642385-5629-1-git-send-email-mcgrof@kernel.org>
+References: <1471642385-5629-1-git-send-email-mcgrof@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: hpa@zytor.com, tglx@linutronix.de, mingo@redhat.com, jpoimboe@redhat.com, bp@alien8.de, linux@arm.linux.org.uk, mhiramat@kernel.org, masami.hiramatsu.pt@hitachi.com, jbaron@akamai.com, heiko.carstens@de.ibm.com, ananth@linux.vnet.ibm.com, anil.s.keshavamurthy@intel.com, davem@davemloft.net, realmz6@gmail.com
@@ -17,222 +16,314 @@ Cc: x86@kernel.org, luto@amacapital.net, keescook@chromium.org, torvalds@linux-f
 
 From: "Luis R. Rodriguez" <mcgrof@kernel.org>
 
-This v4 addresses feedback from the previous v3 series [0], and also
-addresses a huge array of additional tests against many architectures
-outside of what 0-day provides. As I mentioned in my last v3 series,
-0-day had only found one issue with the series, a blackfin architecture
-linker issue with the last series. Guenter Rock was kind enough to give
-my series a test spin on his test bed and he found quite a bit of other
-oddball issues with obscure architectures, and even on x86 with an old
-toolchain. After a lot of work and coordinating with a few maintainers
-I'm happy to report all issues found so far through all possible testing
-I could do are now fixed, this series also addresses all feedback from
-the last series, as such this goes submitted as PATCH form.
+Linux provides a rich array of features, enabling each feature
+however increases the size of the kernel and there are many
+features which users often want disabled. The traditional
+solution to this problem is for each feature to have its own
+Kconfig symbol, followed by a series of #ifdef statements
+in C code and header files, allowing the feature to be compiled
+only when desirable. As the variability of Linux increases build
+tests can and are often done with random kernel configurations,
+allyesconfig, and allmodconfig to help find code issues. This
+however doesn't catch all errors and as a consequence code that
+is typically not enabled often can suffer from bit-rot over time.
 
-In addressing fixing this work on a few architectures some of the previous
-patches are further simplified. The kprobes port to linker tables is made
-much easier now that I've addressed moving out core kprobe declarations
-into asm-generic/kprobes.h. Refer to the patch "kprobes: move kprobe
-declarations to asm-generic/kprobes.h". This makes for a much cleaner
-solution across architectures.
+An alternative approach for subsystems, which refer to as the 'build-all
+link-selectively philosophy' is to keep the Kconfig symbols, replace
+the #ifdef approach by having each feature implemented it its own C file,
+and force compilation for all features to avoid the code bit-rot problem.
+With this strategy only features that are enabled via Kconfig get
+linked into the kernel, so the forced compilation has no size impact
+on the kernel. The practice of having each feature implemented in its own
+C file is already prevalent in many subsystems, however #ifdefs are still
+typically required during feature initialization. For instance in:
 
-Boris feedback on making the code bit rot feature optional is addressed
-by using a new Kconfig symbol for this, CONFIG_BUILD_AVOID_BITROT,
-but given Greg's concerns over lack of clarity over what this was all about
-I've ripped that functionality out into its own patch with a bit more
-extensive documentation and re-wording. See the patch "kbuild: enable option
-to force compile force-obj-y and force-lib-y". I hope makes it clear how
-linker tables can help with avoiding code bit rot. I've gone with a new
-Kconfig symbol CONFIG_BUILD_AVOID_BITROT given CONFIG_COMPILE_TEST is
-not available on UML, this feature is desirable on all architectures.
+  #ifdef CONFIG_FOO
+  foo_init();
+  #endif
 
-The documentation is revamped, now that the DocBook format is deprecated
-I ported the documention into the trendy hipster Sphinx documentation
-format.
+We cannot remove the #ifdef and leave foo_init() as we'd either
+need to always enable the feature or add a respective #ifdef in a
+foo.h which makes foo_init() do nothing when CONFIG_FOO is disabled.
 
-AT Boris' request I've adapated the userspace linker table application
-forintegration into the kernel under tools/ to make it easier to keep
-things in sync, however since this requires a bit of changes to some headers
-in tools/ I'll submit that separately.
+Linker tables enable lifting the requirement to use of #ifdefs during
+initialization. With linker tables initialization sequences can instead
+be aggregated into a custom ELF section at link time, during run time
+the table can be iterated over and each init sequence enabled can be called.
+A feature's init routine is only added to a table when its respective
+Kconfig symbols has been enabled and therefore linked in. Linker tables
+enable subsystems to completely do away with #ifdefs if one is comfortable
+in accepting all subsystem's feature's structural size implications.
 
-[0] https://lkml.kernel.org/r/1469222687-1600-1-git-send-email-mcgrof@kernel.org
+Subsystems which want to follow the 'build-all link-selectively
+philosophy' still need a way to easily express and annotate that they
+wish for all code to always be compiled to help avoid code bit rot,
+as such two new targets force-obj-y and force-lib-y are provided to
+help with this. Its not fair to require everyone to force compilation
+of all features of a subsystem though, so as a compromise, the new
+targets only force compilation when CONFIG_BUILD_AVOID_BITROT is
+enabled.
 
-If you'd like this in git-form, you can get it on the 20160819-linker-table-v4
-branch of my linux-next tree on kernel.org, this also includes the series of
-the linker table userspace sandbox:
+Only built-in features are supported at the moment. Module support
+is expected to be added after a generic solution to add linker
+tables to modules more easily is developed.
 
-https://git.kernel.org/cgit/linux/kernel/git/mcgrof/linux-next.git/log/?h=20160819-linker-table-v4
+v4: this patch was added to this series, it was split off from the
+    linker tables addition due to the confusion over the code bit
+    rot alternatives that are possible with linker tables.
 
-Please let me know if there are any concerns or questions.
+Signed-off-by: Luis R. Rodriguez <mcgrof@kernel.org>
+---
+ Documentation/kbuild/makefiles.txt       | 36 ++++++++++++++++
+ Documentation/sections/linker-tables.rst | 15 +++++++
+ include/linux/tables.h                   | 71 ++++++++++++++++++++++++++++++++
+ init/Kconfig                             | 22 ++++++++++
+ scripts/Makefile.build                   |  7 ++--
+ scripts/Makefile.lib                     | 11 +++++
+ 6 files changed, 159 insertions(+), 3 deletions(-)
 
-Luis R. Rodriguez (16):
-  x86: remove LTO_REFERENCE_INITCALL()
-  dell-smo8800: include uaccess.h
-  scripts/module-common.lds: enable generation
-  generic-sections: add section core helpers
-  xtensa: skip adding literal when SORT() is used
-  ranges.h: add helpers to build and identify Linux section ranges
-  tables.h: add linker table support
-  kbuild: enable option to force compile force-obj-y and force-lib-y
-  firmware/Makefile: force recompilation if makefile changes
-  firmware: port built-in section to linker table
-  jump_label: move guard #endif down where it belongs
-  jump_label: port __jump_table to linker tables
-  dynamic_debug: port to use linker tables
-  kprobes: move kprobe declarations to asm-generic/kprobes.h
-  kprobes: port .kprobes.text to section range
-  kprobes: port blacklist kprobes to linker table
-
- .gitignore                                         |   2 +
- Documentation/index.rst                            |   1 +
- Documentation/kbuild/makefiles.txt                 |  36 ++
- Documentation/sections/conf.py                     |   4 +
- Documentation/sections/index.rst                   |  13 +
- Documentation/sections/linker-tables.rst           | 202 +++++++
- Documentation/sections/ranges.rst                  |  49 ++
- Documentation/sections/section-core.rst            | 153 +++++
- MAINTAINERS                                        |  37 ++
- Makefile                                           |   6 +-
- arch/alpha/include/asm/Kbuild                      |   4 +
- arch/arc/include/asm/Kbuild                        |   3 +
- arch/arc/include/asm/kprobes.h                     |   6 +-
- arch/arc/kernel/vmlinux.lds.S                      |   1 -
- arch/arm/include/asm/Kbuild                        |   3 +
- arch/arm/include/asm/jump_label.h                  |   6 +-
- arch/arm/include/asm/kprobes.h                     |   4 +
- arch/arm/kernel/entry-armv.S                       |   3 +-
- arch/arm/kernel/vmlinux-xip.lds.S                  |   1 -
- arch/arm/kernel/vmlinux.lds.S                      |   1 -
- arch/arm/probes/decode.h                           |   1 +
- arch/arm64/include/asm/Kbuild                      |   3 +
- arch/arm64/include/asm/jump_label.h                |   6 +-
- arch/arm64/include/asm/kprobes.h                   |   4 +
- arch/arm64/kernel/armv8_deprecated.c               |   1 +
- arch/arm64/kernel/insn.c                           |   1 +
- arch/arm64/kernel/probes/kprobes.c                 |   4 +-
- arch/arm64/kernel/vmlinux.lds.S                    |   1 -
- arch/avr32/include/asm/Kbuild                      |   3 +
- arch/avr32/include/asm/kprobes.h                   |   4 +
- arch/avr32/kernel/entry-avr32b.S                   |  13 +-
- arch/avr32/kernel/vmlinux.lds.S                    |   1 -
- arch/blackfin/include/asm/Kbuild                   |   4 +
- arch/blackfin/kernel/vmlinux.lds.S                 |   1 -
- arch/c6x/include/asm/Kbuild                        |   3 +
- arch/c6x/include/asm/tables.h                      |  26 +
- arch/c6x/kernel/vmlinux.lds.S                      |   1 -
- arch/cris/include/asm/Kbuild                       |   4 +
- arch/frv/include/asm/Kbuild                        |   4 +
- arch/h8300/include/asm/Kbuild                      |   4 +
- arch/hexagon/include/asm/Kbuild                    |   4 +
- arch/hexagon/kernel/vmlinux.lds.S                  |   1 -
- arch/ia64/include/asm/Kbuild                       |   3 +
- arch/ia64/include/asm/kprobes.h                    |   7 +-
- arch/ia64/kernel/jprobes.S                         |   3 +-
- arch/ia64/kernel/vmlinux.lds.S                     |   1 -
- arch/ia64/lib/flush.S                              |   6 +-
- arch/m32r/include/asm/Kbuild                       |   4 +
- arch/m68k/include/asm/Kbuild                       |   4 +
- arch/metag/include/asm/Kbuild                      |   4 +
- arch/metag/kernel/vmlinux.lds.S                    |   1 -
- arch/microblaze/include/asm/Kbuild                 |   4 +
- arch/microblaze/kernel/vmlinux.lds.S               |   1 -
- arch/mips/include/asm/Kbuild                       |   3 +
- arch/mips/include/asm/jump_label.h                 |   6 +-
- arch/mips/include/asm/kprobes.h                    |   6 +-
- arch/mips/kernel/vmlinux.lds.S                     |   1 -
- arch/mn10300/include/asm/Kbuild                    |   3 +
- arch/mn10300/include/asm/kprobes.h                 |   4 +
- arch/mn10300/kernel/vmlinux.lds.S                  |   1 -
- arch/nios2/include/asm/Kbuild                      |   4 +
- arch/nios2/kernel/vmlinux.lds.S                    |   1 -
- arch/openrisc/include/asm/Kbuild                   |   4 +
- arch/openrisc/kernel/vmlinux.lds.S                 |   1 -
- arch/parisc/include/asm/Kbuild                     |   4 +
- arch/parisc/kernel/vmlinux.lds.S                   |   1 -
- arch/powerpc/include/asm/Kbuild                    |   3 +
- arch/powerpc/include/asm/jump_label.h              |   8 +-
- arch/powerpc/include/asm/kprobes.h                 |   6 +
- arch/powerpc/include/asm/ppc_asm.h                 |   7 +-
- arch/powerpc/kernel/vmlinux.lds.S                  |   1 -
- arch/s390/include/asm/Kbuild                       |   3 +
- arch/s390/include/asm/jump_label.h                 |   6 +-
- arch/s390/include/asm/kprobes.h                    |   4 +
- arch/s390/kernel/entry.S                           |   5 +-
- arch/s390/kernel/kprobes.c                         |   6 +-
- arch/s390/kernel/mcount.S                          |   3 +-
- arch/s390/kernel/vmlinux.lds.S                     |   1 -
- arch/score/include/asm/Kbuild                      |   4 +
- arch/score/kernel/vmlinux.lds.S                    |   1 -
- arch/sh/include/asm/Kbuild                         |   3 +
- arch/sh/include/asm/kprobes.h                      |   2 +
- arch/sh/kernel/vmlinux.lds.S                       |   1 -
- arch/sparc/include/asm/Kbuild                      |   3 +
- arch/sparc/include/asm/jump_label.h                |   6 +-
- arch/sparc/include/asm/kprobes.h                   |   5 +
- arch/sparc/kernel/vmlinux.lds.S                    |   1 -
- arch/sparc/mm/ultra.S                              |   3 +-
- arch/tile/include/asm/Kbuild                       |   3 +
- arch/tile/include/asm/kprobes.h                    |   6 +-
- arch/tile/kernel/vmlinux.lds.S                     |   1 -
- arch/um/include/asm/Kbuild                         |   4 +
- arch/unicore32/include/asm/Kbuild                  |   3 +
- arch/unicore32/include/asm/section-core.h          |  19 +
- arch/x86/include/asm/Kbuild                        |   3 +
- arch/x86/include/asm/jump_label.h                  |  10 +-
- arch/x86/include/asm/kprobes.h                     |   6 +
- arch/x86/kernel/cpu/microcode/core.c               |   8 +-
- arch/x86/kernel/kprobes/core.c                     |  11 +-
- arch/x86/kernel/vmlinux.lds.S                      |   1 -
- arch/x86/tools/relocs.c                            |   4 +
- arch/xtensa/include/asm/Kbuild                     |   4 +
- arch/xtensa/kernel/Makefile                        |   8 +-
- drivers/base/firmware_class.c                      |  12 +-
- drivers/platform/x86/dell-smo8800.c                |   1 +
- firmware/Makefile                                  |   6 +-
- include/asm-generic/kprobes.h                      |  26 +
- include/asm-generic/ranges.h                       | 103 ++++
- include/asm-generic/section-core.h                 | 341 +++++++++++
- include/asm-generic/sections.h                     |   4 +-
- include/asm-generic/tables.h                       |  50 ++
- include/asm-generic/vmlinux.lds.h                  |  73 +--
- include/linux/compiler.h                           |   8 -
- include/linux/dynamic_debug.h                      |   5 +-
- include/linux/init.h                               |  20 +-
- include/linux/jump_label.h                         |   8 +-
- include/linux/kprobes.h                            |  24 +-
- include/linux/ranges.h                             | 128 +++++
- include/linux/sections.h                           | 111 ++++
- include/linux/tables.h                             | 638 +++++++++++++++++++++
- init/Kconfig                                       |  22 +
- kernel/jump_label.c                                |  17 +-
- kernel/kprobes.c                                   |  17 +-
- lib/dynamic_debug.c                                |  13 +-
- scripts/Makefile.build                             |   7 +-
- scripts/Makefile.clean                             |   2 +
- scripts/Makefile.lib                               |  11 +
- scripts/Makefile.modpost                           |   2 +-
- scripts/mod/modpost.c                              |   2 +-
- scripts/{module-common.lds => module-common.lds.S} |   6 +
- scripts/recordmcount.c                             |   2 +-
- scripts/recordmcount.pl                            |   2 +-
- tools/objtool/special.c                            |   2 +-
- 133 files changed, 2328 insertions(+), 214 deletions(-)
- create mode 100644 Documentation/sections/conf.py
- create mode 100644 Documentation/sections/index.rst
- create mode 100644 Documentation/sections/linker-tables.rst
- create mode 100644 Documentation/sections/ranges.rst
- create mode 100644 Documentation/sections/section-core.rst
- create mode 100644 arch/c6x/include/asm/tables.h
- create mode 100644 arch/unicore32/include/asm/section-core.h
- create mode 100644 include/asm-generic/kprobes.h
- create mode 100644 include/asm-generic/ranges.h
- create mode 100644 include/asm-generic/section-core.h
- create mode 100644 include/asm-generic/tables.h
- create mode 100644 include/linux/ranges.h
- create mode 100644 include/linux/sections.h
- create mode 100644 include/linux/tables.h
- rename scripts/{module-common.lds => module-common.lds.S} (80%)
-
+diff --git a/Documentation/kbuild/makefiles.txt b/Documentation/kbuild/makefiles.txt
+index 385a5ef41c17..01c260913f5c 100644
+--- a/Documentation/kbuild/makefiles.txt
++++ b/Documentation/kbuild/makefiles.txt
+@@ -1089,6 +1089,42 @@ When kbuild executes, the following steps are followed (roughly):
+ 	In this example, extra-y is used to list object files that
+ 	shall be built, but shall not be linked as part of built-in.o.
+ 
++    force-obj-y force-lib-y
++
++	When CONFIG_BUILD_AVOID_BITROT is enabled using these targets for your
++	kconfig symbols forces compilation of the associated objects if the
++	kconfig's symbol's dependencies are met, the objects however are only
++	linked into to the kernel if and only if the kconfig symbol was
++	enabled. If CONFIG_BUILD_AVOID_BITROT is disabled the force-obj-y and
++	force-lib-y targets are functionally equilvalent to obj-y and lib-y
++	respectively.
++
++	Using force-obj-y and force-lib-y are part of a code architecture and
++	build philosophy further enabled by linker tables, for more details
++	refer to the documention in include/linux/tables.h, refer to the
++	sections:
++
++		o The code bit-rot problem
++		o The build-all selective-link philosophy
++		o Avoiding the code bit-rot problem with linker tables
++		o Linker table module support
++
++	Modules support is expected to be enhanced in the future, so for now
++	only built-in features are supported.
++
++	Example use:
++
++		force-obj-$(CONFIG_FEATURE_FOO) += foo.o
++
++	An alternative to using force-obj-y, is to use extra-y followed by the
++	respective obj-y:
++
++		extra-y += foo.o
++		obj-$(CONFIG_FEATURE_FOO) += foo.o
++
++	Using force-obj-y and force-lib-y can be used to help annotate the
++	targets follow the 'build-all selective-link philosophy' further
++	enabled by linker tables.
+ 
+ --- 6.7 Commands useful for building a boot image
+ 
+diff --git a/Documentation/sections/linker-tables.rst b/Documentation/sections/linker-tables.rst
+index df11c632dca7..e425c5cd36d6 100644
+--- a/Documentation/sections/linker-tables.rst
++++ b/Documentation/sections/linker-tables.rst
+@@ -30,6 +30,21 @@ How linker tables simplify initialization code
+ .. kernel-doc:: include/linux/tables.h
+    :doc: How linker tables simplify initialization code
+ 
++The code bit-rot problem
++------------------------
++.. kernel-doc:: include/linux/tables.h
++   :doc: The code bit-rot problem
++
++The build-all selective-link philosophy
++---------------------------------------
++.. kernel-doc:: include/linux/tables.h
++   :doc: The build-all selective-link philosophy
++
++Avoiding the code bit-rot problem with linker tables
++----------------------------------------------------
++.. kernel-doc:: include/linux/tables.h
++   :doc: Avoiding the code bit-rot problem with linker tables
++
+ Using linker tables in Linux
+ ============================
+ 
+diff --git a/include/linux/tables.h b/include/linux/tables.h
+index 423827eafb52..bf8fae7f9246 100644
+--- a/include/linux/tables.h
++++ b/include/linux/tables.h
+@@ -169,6 +169,77 @@
+  */
+ 
+ /**
++ * DOC: The code bit-rot problem
++ *
++ * Linux provides a rich array of features, enabling each feature
++ * however increases the size of the kernel and there are many
++ * features which users often want disabled. The traditional
++ * solution to this problem is for each feature to have its own
++ * Kconfig symbol, followed by a series of #ifdef statements
++ * in C code and header files, allowing the feature to be compiled
++ * only when desirable. As the variability of Linux increases build
++ * tests can and are often done with random kernel configurations,
++ * allyesconfig, and allmodconfig to help find code issues. This
++ * however doesn't catch all errors and as a consequence code that
++ * is typically not enabled often can suffer from bit-rot over time.
++ */
++
++/**
++ * DOC: The build-all selective-link philosophy
++ *
++ * A code architecture philosophy to help avoid code bit-rot consists
++ * of using Kconfig symbols for each subsystem feature, replace all #ifdefs
++ * by instead having each feature implemented it its own C file, and force
++ * compilation for all features. Only features that are enabled get linked in,
++ * the forced compilation therefore has no size impact on the final result of
++ * the kernel. The practice of having each feature implemented in its own C
++ * file is already prevalent in many subsystems, however #ifdefs are still
++ * typically required during feature initialization. For instance in::
++ *
++ *	#ifdef CONFIG_FOO
++ *	foo_init();
++ *	#endif
++ *
++ * We cannot remove the #ifdef and leave foo_init() as we'd either
++ * need to always enable the feature or add a respective #ifdef in a
++ * foo.h which makes foo_init() do nothing when ``CONFIG_FOO`` is disabled.
++ */
++
++/**
++ * DOC: Avoiding the code bit-rot problem with linker tables
++ *
++ * Linker tables can be used to further help avoid the code bit-rot problem
++ * when embracing the 'build-all selective-link philosophy' by lifting the
++ * requirement to use of #ifdefs during initialization. With linker tables
++ * initialization sequences can be aggregated into a custom ELF section at
++ * link time, during run time the table can be iterated over and each init
++ * sequence enabled can be called. A feature's init routine is only added to a
++ * table when its respective Kconfig symbols has been enabled and therefore
++ * linked in. Linker tables enable subsystems to completely do away with
++ * #ifdefs if one is comfortable in accepting all subsystem's feature's
++ * structural size implications.
++ *
++ * To further help with this the Linux build system supports two special
++ * targets, ``force-obj-y`` and ``force-lib-y``. A subsystem which wants to
++ * follow the 'build-all selective-link philosophy' can use these targets for a
++ * feature's kconfig symbol. Using these targets will always require
++ * compilation of the kconfig's objects if the kconfig symbol's dependencies
++ * are met but only link the objects into the kernel, and therefore enable the
++ * feature, if and only if the kconfig symbol has been enabled.
++ *
++ * Not all users or build systems may want to opt-in to compile all objects
++ * following the 'build-all selective-link philosophy', as such the targets
++ * ``force-obj-y`` and ``force-lib-y`` only force compilation when the kconfig
++ * symbol ``CONFIG_BUILD_AVOID_BITROT`` has been enabled. Disabling this feature
++ * makes ``force-obj-y`` and ``force-lib-y`` functionally equivalent to
++ * ``obj-y`` and ``lib-y`` respectively.
++ *
++ * Example use::
++ *
++ * 	force-obj-$(CONFIG_FEATURE_FOO) += foo.o
++ */
++
++/**
+  * DOC: Linker table module support
+  *
+  * Modules can use linker tables, however the linker table definition
+diff --git a/init/Kconfig b/init/Kconfig
+index cac3f096050d..ef09e83b9196 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -53,6 +53,28 @@ config CROSS_COMPILE
+ 	  need to set this unless you want the configured kernel build
+ 	  directory to select the cross-compiler automatically.
+ 
++config BUILD_AVOID_BITROT
++	bool "Enable force building of force-obj-y and force-lib-y"
++	default n
++	help
++	  When enabled objects under the force-obj-y and force-lib-y targets
++	  using a Kconfig symbol will be forced to compile if the Kconfig
++	  symbol's dependencies are met but only linked into the kernel if
++	  the Kconfig symbol is enabled. If a Kconfig symbol on a force-obj-y
++	  or force-lib-y target is disabled, it will be compiled but not linked
++	  into the kernel.
++
++	  The force-obj-y and force-lib-y targets can be used by subsystems
++	  which wish to want to follow the 'build-all selective-link philosophy'
++	  documented under include/linux/tables.h.
++
++	  Say Y if you have a decent build machine and would like to help test
++	  building code for more subsystems. Say N if you do you not have a
++	  good build machine or only want to compile what you've enabled for
++	  your kernel.
++
++	  Enabling this option never increases the size of your kernel.
++
+ config COMPILE_TEST
+ 	bool "Compile also drivers which will not load"
+ 	depends on !UML
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index cd9bf22bb027..cc2c7241d193 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -92,7 +92,8 @@ modorder-target := $(obj)/modules.order
+ 
+ # We keep a list of all modules in $(MODVERDIR)
+ 
+-__build: $(if $(KBUILD_BUILTIN),$(builtin-target) $(lib-target) $(extra-y)) \
++__build: $(if $(KBUILD_BUILTIN),$(builtin-target) $(lib-target) $(extra-y) \
++				$(force-obj-y)) \
+ 	 $(if $(KBUILD_MODULES),$(obj-m) $(modorder-target)) \
+ 	 $(subdir-ym) $(always)
+ 	@:
+@@ -326,8 +327,8 @@ cmd_as_o_S       = $(CC) $(a_flags) -c -o $@ $<
+ $(obj)/%.o: $(src)/%.S $(objtool_obj) FORCE
+ 	$(call if_changed_rule,as_o_S)
+ 
+-targets += $(real-objs-y) $(real-objs-m) $(lib-y)
+-targets += $(extra-y) $(MAKECMDGOALS) $(always)
++targets += $(real-objs-y) $(real-objs-m) $(lib-y) $(force-lib-y)
++targets += $(extra-y) $(force-obj-y) $(MAKECMDGOALS) $(always)
+ 
+ # Linker scripts preprocessor (.lds.S -> .lds)
+ # ---------------------------------------------------------------------------
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index 0a07f9014944..d1cb0cfdf1bf 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -12,6 +12,15 @@ export KBUILD_SUBDIR_CCFLAGS := $(KBUILD_SUBDIR_CCFLAGS) $(subdir-ccflags-y)
+ # Figure out what we need to build from the various variables
+ # ===========================================================================
+ 
++ifeq ($(CONFIG_BUILD_AVOID_BITROT),y)
++extra-y += $(force-obj-) $(force-lib-)
++endif
++
++obj-m += $(force-obj-m)
++obj-y += $(force-obj-y)
++lib-m += $(force-lib-m)
++lib-y += $(force-lib-y)
++
+ # When an object is listed to be built compiled-in and modular,
+ # only build the compiled-in version
+ 
+@@ -72,6 +81,8 @@ real-objs-m := $(foreach m, $(obj-m), $(if $(strip $($(m:.o=-objs)) $($(m:.o=-y)
+ # Add subdir path
+ 
+ extra-y		:= $(addprefix $(obj)/,$(extra-y))
++force-obj-y		:= $(addprefix $(obj)/,$(force-obj-y))
++force-obj-m		:= $(addprefix $(obj)/,$(force-obj-m))
+ always		:= $(addprefix $(obj)/,$(always))
+ targets		:= $(addprefix $(obj)/,$(targets))
+ modorder	:= $(addprefix $(obj)/,$(modorder))
 -- 
 2.9.2
 
