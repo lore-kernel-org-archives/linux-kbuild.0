@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.136]:43644 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.136]:43792 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1755721AbcHSVlg (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 19 Aug 2016 17:41:36 -0400
+        id S1755741AbcHSVlj (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 19 Aug 2016 17:41:39 -0400
 From: mcgrof@kernel.org
-Subject: [PATCH v1 4/7] tools: add __used and enable to override
-Date: Fri, 19 Aug 2016 14:41:12 -0700
-Message-Id: <1471642875-5957-5-git-send-email-mcgrof@kernel.org>
+Subject: [PATCH v1 5/7] tools: expand export.h with VMLINUX_SYMBOL()
+Date: Fri, 19 Aug 2016 14:41:13 -0700
+Message-Id: <1471642875-5957-6-git-send-email-mcgrof@kernel.org>
 In-Reply-To: <1471642875-5957-1-git-send-email-mcgrof@kernel.org>
 References: <1471642454-5679-1-git-send-email-mcgrof@kernel.org>
  <1471642875-5957-1-git-send-email-mcgrof@kernel.org>
@@ -17,34 +17,46 @@ Cc: x86@kernel.org, luto@amacapital.net, keescook@chromium.org, torvalds@linux-f
 
 From: "Luis R. Rodriguez" <mcgrof@kernel.org>
 
-This adds __used, to be used later in the userspace linker-tables
-sandbox. If any userspace applicaiton wants to override they can
-add their own definition and then use include_next.
-
-This definition should probably suffice for most uses cases though.
+This will be used later by the linker-table userspace sandbox.
 
 Signed-off-by: Luis R. Rodriguez <mcgrof@kernel.org>
 ---
- tools/include/linux/compiler.h | 6 ++++++
- 1 file changed, 6 insertions(+)
+ tools/include/linux/export.h | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
 
-diff --git a/tools/include/linux/compiler.h b/tools/include/linux/compiler.h
-index e33fc1df3935..556c991de212 100644
---- a/tools/include/linux/compiler.h
-+++ b/tools/include/linux/compiler.h
-@@ -5,6 +5,12 @@
- /* The "volatile" is due to gcc bugs */
- #define barrier() __asm__ __volatile__("": : :"memory")
+diff --git a/tools/include/linux/export.h b/tools/include/linux/export.h
+index d07e586b9ba0..cb7d6b490e08 100644
+--- a/tools/include/linux/export.h
++++ b/tools/include/linux/export.h
+@@ -1,6 +1,28 @@
+ #ifndef _TOOLS_LINUX_EXPORT_H_
+ #define _TOOLS_LINUX_EXPORT_H_
  
++/*
++ * Export symbols from the kernel to modules.  Forked from module.h
++ * to reduce the amount of pointless cruft we feed to gcc when only
++ * exporting a simple symbol or two.
++ *
++ * Try not to add #includes here.  It slows compilation and makes kernel
++ * hackers place grumpy comments in header files.
++ */
 +
-+/* You can override as you see fit on your userspace tool */
-+#ifndef __used
-+#define __used          __attribute__((__used__))
++/* Some toolchains use a `_' prefix for all user symbols. */
++#ifdef CONFIG_HAVE_UNDERSCORE_SYMBOL_PREFIX
++#define __VMLINUX_SYMBOL(x) _##x
++#define __VMLINUX_SYMBOL_STR(x) "_" #x
++#else
++#define __VMLINUX_SYMBOL(x) x
++#define __VMLINUX_SYMBOL_STR(x) #x
 +#endif
 +
- #ifndef __always_inline
- # define __always_inline	inline __attribute__((always_inline))
- #endif
++/* Indirect, so macros are expanded before pasting. */
++#define VMLINUX_SYMBOL(x) __VMLINUX_SYMBOL(x)
++#define VMLINUX_SYMBOL_STR(x) __VMLINUX_SYMBOL_STR(x)
++
+ #define EXPORT_SYMBOL(sym)
+ #define EXPORT_SYMBOL_GPL(sym)
+ #define EXPORT_SYMBOL_GPL_FUTURE(sym)
 -- 
 2.9.2
 
