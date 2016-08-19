@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.136]:43464 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.136]:43644 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1755664AbcHSVlc (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 19 Aug 2016 17:41:32 -0400
+        id S1755721AbcHSVlg (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 19 Aug 2016 17:41:36 -0400
 From: mcgrof@kernel.org
-Subject: [PATCH v1 3/7] tools: add init.h for tools
-Date: Fri, 19 Aug 2016 14:41:11 -0700
-Message-Id: <1471642875-5957-4-git-send-email-mcgrof@kernel.org>
+Subject: [PATCH v1 4/7] tools: add __used and enable to override
+Date: Fri, 19 Aug 2016 14:41:12 -0700
+Message-Id: <1471642875-5957-5-git-send-email-mcgrof@kernel.org>
 In-Reply-To: <1471642875-5957-1-git-send-email-mcgrof@kernel.org>
 References: <1471642454-5679-1-git-send-email-mcgrof@kernel.org>
  <1471642875-5957-1-git-send-email-mcgrof@kernel.org>
@@ -17,31 +17,34 @@ Cc: x86@kernel.org, luto@amacapital.net, keescook@chromium.org, torvalds@linux-f
 
 From: "Luis R. Rodriguez" <mcgrof@kernel.org>
 
-Start off with just __ref -- we enalbe you to override, if you do
-that then you can define your own. The way you'd use this, if you
-do override, is define your own __ref and then use include_next.
+This adds __used, to be used later in the userspace linker-tables
+sandbox. If any userspace applicaiton wants to override they can
+add their own definition and then use include_next.
+
+This definition should probably suffice for most uses cases though.
 
 Signed-off-by: Luis R. Rodriguez <mcgrof@kernel.org>
 ---
- tools/include/linux/init.h | 9 +++++++++
- 1 file changed, 9 insertions(+)
- create mode 100644 tools/include/linux/init.h
+ tools/include/linux/compiler.h | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/tools/include/linux/init.h b/tools/include/linux/init.h
-new file mode 100644
-index 000000000000..6d970a360a05
---- /dev/null
-+++ b/tools/include/linux/init.h
-@@ -0,0 +1,9 @@
-+#ifndef _TOOLS_LINUX_INIT_H
-+#define _TOOLS_LINUX_INIT_H
+diff --git a/tools/include/linux/compiler.h b/tools/include/linux/compiler.h
+index e33fc1df3935..556c991de212 100644
+--- a/tools/include/linux/compiler.h
++++ b/tools/include/linux/compiler.h
+@@ -5,6 +5,12 @@
+ /* The "volatile" is due to gcc bugs */
+ #define barrier() __asm__ __volatile__("": : :"memory")
+ 
 +
-+/* this means you can add your own to fit you own userspace needs */
-+#ifndef __ref
-+#define __ref
++/* You can override as you see fit on your userspace tool */
++#ifndef __used
++#define __used          __attribute__((__used__))
 +#endif
 +
-+#endif /* _TOOLS_LINUX_INIT_H */
+ #ifndef __always_inline
+ # define __always_inline	inline __attribute__((always_inline))
+ #endif
 -- 
 2.9.2
 
