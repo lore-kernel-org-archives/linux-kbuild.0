@@ -1,12 +1,12 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.136]:43306 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.136]:43464 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1755486AbcHSVla (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 19 Aug 2016 17:41:30 -0400
+        id S1755664AbcHSVlc (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 19 Aug 2016 17:41:32 -0400
 From: mcgrof@kernel.org
-Subject: [PATCH v1 2/7] tools: add a basic tools printk.h
-Date: Fri, 19 Aug 2016 14:41:10 -0700
-Message-Id: <1471642875-5957-3-git-send-email-mcgrof@kernel.org>
+Subject: [PATCH v1 3/7] tools: add init.h for tools
+Date: Fri, 19 Aug 2016 14:41:11 -0700
+Message-Id: <1471642875-5957-4-git-send-email-mcgrof@kernel.org>
 In-Reply-To: <1471642875-5957-1-git-send-email-mcgrof@kernel.org>
 References: <1471642454-5679-1-git-send-email-mcgrof@kernel.org>
  <1471642875-5957-1-git-send-email-mcgrof@kernel.org>
@@ -17,49 +17,31 @@ Cc: x86@kernel.org, luto@amacapital.net, keescook@chromium.org, torvalds@linux-f
 
 From: "Luis R. Rodriguez" <mcgrof@kernel.org>
 
-This will be used later by the userspace linker-tables sandbox.
-Since upstream kernel.h includes printk.h mimic this so we can
-match and replicate C code as-is on userspace sandbox tools.
+Start off with just __ref -- we enalbe you to override, if you do
+that then you can define your own. The way you'd use this, if you
+do override, is define your own __ref and then use include_next.
 
 Signed-off-by: Luis R. Rodriguez <mcgrof@kernel.org>
 ---
- tools/include/linux/kernel.h |  1 +
- tools/include/linux/printk.h | 14 ++++++++++++++
- 2 files changed, 15 insertions(+)
- create mode 100644 tools/include/linux/printk.h
+ tools/include/linux/init.h | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+ create mode 100644 tools/include/linux/init.h
 
-diff --git a/tools/include/linux/kernel.h b/tools/include/linux/kernel.h
-index 3d385a6d4fc1..afdf760bf35c 100644
---- a/tools/include/linux/kernel.h
-+++ b/tools/include/linux/kernel.h
-@@ -6,6 +6,7 @@
- #include <assert.h>
- 
- #include <linux/bug.h>
-+#include <linux/printk.h>
- 
- #define DIV_ROUND_UP(n,d) (((n) + (d) - 1) / (d))
- 
-diff --git a/tools/include/linux/printk.h b/tools/include/linux/printk.h
+diff --git a/tools/include/linux/init.h b/tools/include/linux/init.h
 new file mode 100644
-index 000000000000..7e34e9c817e8
+index 000000000000..6d970a360a05
 --- /dev/null
-+++ b/tools/include/linux/printk.h
-@@ -0,0 +1,14 @@
-+#ifndef __TOOLS_KERNEL_PRINTK__
-+#define __TOOLS_KERNEL_PRINTK__
++++ b/tools/include/linux/init.h
+@@ -0,0 +1,9 @@
++#ifndef _TOOLS_LINUX_INIT_H
++#define _TOOLS_LINUX_INIT_H
 +
-+#include <stdio.h>
-+
-+#ifndef pr_fmt
-+#define pr_fmt(fmt)	fmt
++/* this means you can add your own to fit you own userspace needs */
++#ifndef __ref
++#define __ref
 +#endif
 +
-+#define pr_info(fmt, ...)	printf(pr_fmt(fmt), ##__VA_ARGS__)
-+#define pr_err(fmt, ...)	printf(pr_fmt(fmt), ##__VA_ARGS__)
-+#define pr_debug(fmt, ...)	printf(pr_fmt(fmt), ##__VA_ARGS__)
-+
-+#endif /* __TOOLS_KERNEL_PRINTK__ */
++#endif /* _TOOLS_LINUX_INIT_H */
 -- 
 2.9.2
 
