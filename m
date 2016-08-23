@@ -1,222 +1,148 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:42630 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753311AbcHWRdJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 23 Aug 2016 13:33:09 -0400
-Date: Tue, 23 Aug 2016 19:33:06 +0200
-From: "Luis R. Rodriguez" <mcgrof@kernel.org>
-Subject: Re: [PATCH v4 04/16] generic-sections: add section core helpers
-Message-ID: <20160823173306.GA3296@wotan.suse.de>
-References: <1471642454-5679-1-git-send-email-mcgrof@kernel.org>
- <1471642454-5679-5-git-send-email-mcgrof@kernel.org>
- <20160823112633.7d482e62@roar.ozlabs.ibm.com>
+Received: from mail-lf0-f67.google.com ([209.85.215.67]:35608 "EHLO
+        mail-lf0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754591AbcHWS7W (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 23 Aug 2016 14:59:22 -0400
+Received: by mail-lf0-f67.google.com with SMTP id l89so8208278lfi.2
+        for <linux-kbuild@vger.kernel.org>; Tue, 23 Aug 2016 11:59:21 -0700 (PDT)
+Date: Tue, 23 Aug 2016 21:47:24 +0300
+From: Alexey Dobriyan <adobriyan@gmail.com>
+Subject: [PATCH] fixdep: faster CONFIG_ search
+Message-ID: <20160823184724.GA11707@p183.telecom.by>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20160823112633.7d482e62@roar.ozlabs.ibm.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicholas Piggin <npiggin@gmail.com>
-Cc: mcgrof@kernel.org, hpa@zytor.com, tglx@linutronix.de, mingo@redhat.com, jpoimboe@redhat.com, bp@alien8.de, linux@arm.linux.org.uk, mhiramat@kernel.org, masami.hiramatsu.pt@hitachi.com, jbaron@akamai.com, heiko.carstens@de.ibm.com, ananth@linux.vnet.ibm.com, anil.s.keshavamurthy@intel.com, davem@davemloft.net, realmz6@gmail.com, x86@kernel.org, luto@amacapital.net, keescook@chromium.org, torvalds@linux-foundation.org, gregkh@linuxfoundation.org, rusty@rustcorp.com.au, gnomes@lxorguk.ukuu.org.uk, alan@linux.intel.com, dwmw2@infradead.org, arnd@arndb.de, ming.lei@canonical.com, linux-arch@vger.kernel.org, benh@kernel.crashing.org, ananth@in.ibm.com, pebolle@tiscali.nl, fontana@sharpeleven.org, david.vrabel@citrix.com, konrad.wilk@oracle.com, mcb30@ipxe.org, jgross@suse.com, andrew.cooper3@citrix.com, andriy.shevchenko@linux.intel.com, paul.gortmaker@windriver.com, xen-devel@lists.xensource.com, ak@linux.intel.com, pali.rohar@gmail.com, dvhart@infradead.org, platform-driver-x86@vger.kernel.org, mmarek@suse.com, linux@rasmusvillemoes.dk, jkosina@suse.cz, korea.drzix@gmail.com, linux-kbuild@vger.kernel.org, tony.luck@intel.com, akpm@linux-foundation.org, linux-ia64@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sh@vger.kernel.org, sparclinux@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com, rostedt@goodmis.org, jani.nikula@intel.com, mchehab@osg.samsung.com, markus.heiser@darmarit.de, acme@redhat.com, jolsa@kernel.org, msalter@redhat.com, chris@zankel.net, jcmvbkbc@gmail.com, linux-xtensa@linux-xtensa.org, paulus@samba.org, mpe@ellerman.id.au, James.Bottomley@HansenPartnership.com
+To: mmarek@suse.com
+Cc: akpm@linux-foundation.org, linux-kbuild@vger.kernel.org
 
-On Tue, Aug 23, 2016 at 11:26:33AM +1000, Nicholas Piggin wrote:
-> On Fri, 19 Aug 2016 14:34:02 -0700
-> mcgrof@kernel.org wrote:
-> > +/**
-> > + * DOC: Standard ELF section use in Linux
-> > + *
-> > + * Linux makes use of the standard ELF sections, this sections documents
-> > + * these.
-> > + */
-> > +
-> > +/**
-> > + * DOC: SECTION_RODATA
-> > + *
-> > + * Macro name for code which must be protected from write access, read only
-> > + * data.
-> > + */
-> > +#define SECTION_RODATA			.rodata
-> 
-> These, for example. The exact name of the section is important in linker
-> scripts and asm, so I can't see the benefit of hiding it. I could be
-> missing the bigger picture.
+Do you think kernel build is 100% dominated by gcc? You are wrong!
+One small utility called "fixdep" consistently manages to sneak into
+profile's first page (unless you have small monitor of course).
 
-There's two goals by using a macro for these core names. One is to allow us
-to easily aggregate documentation in central place for each, the second is
-to then provide more easily grep'able helpers so we can use them when devising
-extensions or using them in extensions which further customize the sections
-in the kernel.
+The choke point is this clever code:
 
-> > +/**
-> > + * DOC: SECTION_TEXT
-> > + *
-> > + * Macro name used to annotate code (functions) used during regular
-> > + * kernel run time. This is combined with `SECTION_RODATA`, only this
-> > + * section also allows for execution.
-> > + *
-> > + */
-> > +#define SECTION_TEXT			.text
-> 
-> I can't see how these comments are right. .rodata doesn't seem like it
-> should be combined with .text, and is not currently on powerpc. I think
-> it's for data, not code.
+	for (; m < end; m++) {
+		if (*m == INT_CONF) { p = (char *) m  ; goto conf; }
+		if (*m == INT_ONFI) { p = (char *) m-1; goto conf; }
+		if (*m == INT_NFIG) { p = (char *) m-2; goto conf; }
+		if (*m == INT_FIG_) { p = (char *) m-3; goto conf; }
 
-On x86 and powerpc .rodata follows .text. On power currently the comment
-above in .rodata is:
+4 branches per 4 characters is not fast.
 
-/* Text, read only data and other permanent read-only sections */
+Use strstr(3), so that SSE2 etc can be used.
 
-When this was introduced however read commit 14cf11af6cf60 ("powerpc: Merge
-enough to start building in arch/powerpc.")
+With this patch, fixdep is so deep at the bottom, it is hard to find it.
 
-/* Read-only sections, merged into text segment: */
+Signed-off-by: Alexey Dobriyan <adobriyan@gmail.com>
+---
 
-The format and style of putting rodata after text is kept from the older
-commits.
+ scripts/basic/fixdep.c |   67 ++++++++++++++++++++-----------------------------
+ 1 file changed, 28 insertions(+), 39 deletions(-)
 
-This begs the question. What the hell is this thing talking about?
-
-On Linux this is done via mark_rodata_ro() on init/main.c when CONFIG_DEBUG_RODATA
-on architectures that support it. Architectures that implement this typically use
-issues set_memory_ro() -- on x86 a start address used is PFN_ALIGN(_text) with
-an end address of &__end_rodata_hpage_align.
-
-When architectures do not have CONFIG_DEBUG_RODATA() you end up with:
-
-static inline void mark_readonly(void)                                          
-{                                                                               
-        pr_warn("This architecture does not have kernel memory protection.\n"); 
-}
-
-So -- I should I clarify then in Linux we strive to have helpers adjust text and
-rodata set to ro with memory protection implemented via mark_readonly(). Architectures
-that do not support memory protection will lack a mark_readonly() implementation.
-
-For now I figured a less controversial introduction to the documentation as
-bland as it was above in my original patch would suffice, we can then expand on
-it with something like the above. Thoughts?
-
-> > +/*
-> > + * These section _ALL() helpers are for use on linker scripts and helpers
-> > + */
-> > +#define SECTION_ALL(__section)						\
-> > +	__section##.*
-> 
-> This is another example. We know what .text.* does in the linker scripts
-> -- it's self documenting. But SECTION_ALL(.text)? I'm not sure that's an
-> improvement. Actually I saw it in the linker script changes and had to
-> come find the definition because I was a bit mislead:
-> 
-> SECTION_ALL(.text)
-> 
-> Initially I would expect this to be
-> 
-> .text*
-> 
-> Not
-> 
-> .text.*
-> 
-> The latter does not grab the .text section!
-
-Its not intended to grab .text but rather its for helpers that provide customizations
-based on a core section as base, in this case given your example it would be used by
-section ranges and linker tables for .text. Both section ranges and linker tables
-use postfix .something for their customizations. The SECTION_ALL() macro then is
-a helper for customizations on a core section.
-
-If the name is misleading would SECTION_CORE_ALL() be better with some documentation
-explaining this and the above goal ?
-
-> > +/*
-> > + * As per gcc's documentation a common asm separator is a new line followed
-> > + * by tab [0], it however seems possible to also just use a newline as its
-> > + * the most commonly empirically observed semantic and folks seem to agree
-> > + * this even works on S390. In case your architecture disagrees you may
-> > + * override this and define your own and keep the rest of the macros.
-> > + *
-> > + * [0] https://gcc.gnu.org/onlinedocs/gcc/Basic-Asm.html#Basic-Asm
-> > + */
-> > +# ifndef ASM_CMD_SEP
-> > +#  define ASM_CMD_SEP	"\n"
-> > +# endif
-> 
-> This does not seem like it belongs here. The name is fairly ugly too.
-
-Help me bikeshed, any name suggestions?
-
-> I guess something might be needed like this when dealing with generic
-> as directives common to all architectures, though.
-
-Indeed, it actually seems we don't have much in this area, so this is small
-baby step in that direction.
-
-> I would say include/asm-generic/asm.h should be a better place.
-
-I thought about this -- I'd be adding a new asm-generic/asm.h -- are folks OK
-with that right now? Or should we do that as a secondary step ? I preferred to
-do this as a secondary step as this series is long enough already and there is
-quite a bit that can be dumped in a common asm-generic/asm.h, a few thoughts
-on this already:
-
- o x86's asm/asm.h's use of __ASM_FORM() and include/linux/stringify.h share
-   some traits which deserve possible consideration / rebranding.
- o Since C asm() just wrap things in strings defining a core set of
-   helpers for a task seems justifiable, so for example we have
-   __set_section_core_type(). Raw asm code then would use __set_section_core_type()
-   directly and C asm() would just __stringify() it.
-
-I figured a bit of bikeshedding would be possible here, so I decided to leave
-this for a later set of patches. But indeed, I agree with you. If we want
-this meshed out now.. let me know and lets bikeshed away...
-
-> > diff --git a/include/linux/sections.h b/include/linux/sections.h
-> > new file mode 100644
-> > index 000000000000..f21c6ee88ded
-> > --- /dev/null
-> > +++ b/include/linux/sections.h
-> > @@ -0,0 +1,111 @@
-> > +#ifndef _LINUX_SECTIONS_H
-> > +#define _LINUX_SECTIONS_H
-> > +/*
-> > + * Linux de-facto sections
-> > + *
-> > + * Copyright (C) 2016 Luis R. Rodriguez <mcgrof@kernel.org>
-> > + *
-> > + * This program is free software; you can redistribute it and/or modify it
-> > + * under the terms of copyleft-next (version 0.3.1 or later) as published
-> > + * at http://copyleft-next.org/.
-> > + */
-> > +
-> > +#include <asm/section-core.h>
-> > +#include <linux/export.h>
-> > +
-> > +#ifndef __ASSEMBLY__
-> > +
-> > +/**
-> > + * DOC: Introduction
-> > + *
-> > + * Linux defines a set of common helpers which can be used to against its use
-> > + * of standard or custom Linux sections, this section is dedicated to these
-> > + * helpers.
-> 
-> I'm still not quite sure what a Linux de-facto/standard/common section is
-> after this. Are they output sections?
-
-We have ELF standard sections, and we have then sections which Linux has introduced
-over the years which are now just known to be expected part of Linux, such as init
-stuff which we free after boot. The combination of the ELF standard sections and
-series of expected sections in Linux across all architectures is what this refers
-to as Linux de-facto/standard/common sections. The header file is intended to
-document these, step by step, and also provide helpers which allow further
-customizations based on these sections.
-
-> 
-> I think it would be reasonable to drop the LINUX_ prefix and references to
-> Linux.
-
-I'm not so sure about this for section stuff -- are we certain we won't ever
-clash with some built in compiler things? I'm fine to drop the prefix --
-bikeshedding -- will drop it for the next series unless I hear otherwise...
-
-  Luis
+--- a/scripts/basic/fixdep.c
++++ b/scripts/basic/fixdep.c
+@@ -82,8 +82,7 @@
+  * to date before even starting the recursive build, so it's too late
+  * at this point anyway.
+  *
+- * The algorithm to grep for "CONFIG_..." is bit unusual, but should
+- * be fast ;-) We don't even try to really parse the header files, but
++ * We don't even try to really parse the header files, but
+  * merely grep, i.e. if CONFIG_FOO is mentioned in a comment, it will
+  * be picked up as well. It's not a problem with respect to
+  * correctness, since that can only give too many dependencies, thus
+@@ -241,37 +240,22 @@ static void use_config(const char *m, int slen)
+ 	print_config(m, slen);
+ }
+ 
+-static void parse_config_file(const char *map, size_t len)
++static void parse_config_file(const char *p)
+ {
+-	const int *end = (const int *) (map + len);
+-	/* start at +1, so that p can never be < map */
+-	const int *m   = (const int *) map + 1;
+-	const char *p, *q;
+-
+-	for (; m < end; m++) {
+-		if (*m == INT_CONF) { p = (char *) m  ; goto conf; }
+-		if (*m == INT_ONFI) { p = (char *) m-1; goto conf; }
+-		if (*m == INT_NFIG) { p = (char *) m-2; goto conf; }
+-		if (*m == INT_FIG_) { p = (char *) m-3; goto conf; }
+-		continue;
+-	conf:
+-		if (p > map + len - 7)
+-			continue;
+-		if (memcmp(p, "CONFIG_", 7))
+-			continue;
++	const char *q, *r;
++
++	while ((p = strstr(p, "CONFIG_"))) {
+ 		p += 7;
+-		for (q = p; q < map + len; q++) {
+-			if (!(isalnum(*q) || *q == '_'))
+-				goto found;
+-		}
+-		continue;
+-
+-	found:
+-		if (!memcmp(q - 7, "_MODULE", 7))
+-			q -= 7;
+-		if (q - p < 0)
+-			continue;
+-		use_config(p, q - p);
++		q = p;
++		while (*q && (isalnum(*q) || *q == '_'))
++			q++;
++		if (memcmp(q - 7, "_MODULE", 7) == 0)
++			r = q - 7;
++		else
++			r = q;
++		if (r > p)
++			use_config(p, r - p);
++		p = q;
+ 	}
+ }
+ 
+@@ -291,7 +275,7 @@ static void do_config_file(const char *filename)
+ {
+ 	struct stat st;
+ 	int fd;
+-	void *map;
++	char *map;
+ 
+ 	fd = open(filename, O_RDONLY);
+ 	if (fd < 0) {
+@@ -308,18 +292,23 @@ static void do_config_file(const char *filename)
+ 		close(fd);
+ 		return;
+ 	}
+-	map = mmap(NULL, st.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
+-	if ((long) map == -1) {
+-		perror("fixdep: mmap");
++	map = malloc(st.st_size + 1);
++	if (!map) {
++		perror("fixdep: malloc");
+ 		close(fd);
+ 		return;
+ 	}
++	if (read(fd, map, st.st_size) != st.st_size) {
++		perror("fixdep: read");
++		close(fd);
++		return;
++	}
++	map[st.st_size] = '\0';
++	close(fd);
+ 
+-	parse_config_file(map, st.st_size);
+-
+-	munmap(map, st.st_size);
++	parse_config_file(map);
+ 
+-	close(fd);
++	free(map);
+ }
+ 
+ /*
