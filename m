@@ -1,34 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qk0-f172.google.com ([209.85.220.172]:33675 "EHLO
-        mail-qk0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932657AbcHXP3K (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 24 Aug 2016 11:29:10 -0400
-Received: by mail-qk0-f172.google.com with SMTP id z190so18312122qkc.0
-        for <linux-kbuild@vger.kernel.org>; Wed, 24 Aug 2016 08:29:07 -0700 (PDT)
-Date: Wed, 24 Aug 2016 11:21:33 -0400 (EDT)
-From: Nicolas Pitre <nicolas.pitre@linaro.org>
-Subject: Re: [PATCH 0/3 v3] kbuild changes, thin archives, --gc-sections
-In-Reply-To: <12110.1472048481@warthog.procyon.org.uk>
-Message-ID: <alpine.LFD.2.20.1608241114430.17623@knanqh.ubzr>
-References: <1472041761-14414-1-git-send-email-npiggin@gmail.com> <12110.1472048481@warthog.procyon.org.uk>
+Received: from smtp02.citrix.com ([66.165.176.63]:3502 "EHLO SMTP02.CITRIX.COM"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750969AbcHXRTT (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 24 Aug 2016 13:19:19 -0400
+Subject: Re: [Xen-devel] [PATCH] Xen: remove -fshort-wchar gcc flag
+References: <1470910580-18458-1-git-send-email-npiggin@gmail.com>
+ <16541778.WMH6K24aDt@wuerfel>
+From: David Vrabel <david.vrabel@citrix.com>
+Message-ID: <57BDD6EA.70204@citrix.com>
+Date: Wed, 24 Aug 2016 18:18:34 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <16541778.WMH6K24aDt@wuerfel>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: Nicholas Piggin <npiggin@gmail.com>, Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, Stephen Rothwell <sfr@canb.auug.org.au>, Arnd Bergmann <arnd@arndb.de>, Segher Boessenkool <segher@kernel.crashing.org>, Alan Modra <amodra@gmail.com>
+To: Arnd Bergmann <arnd@arndb.de>, Nicholas Piggin <npiggin@gmail.com>
+Cc: linux-arch@vger.kernel.org, Stephen Rothwell <sfr@canb.auug.org.au>, Juergen Gross <jgross@suse.com>, Segher Boessenkool <segher@kernel.crashing.org>, Nicolas Pitre <nico@linaro.org>, linux-kbuild@vger.kernel.org, Alan Modra <amodra@gmail.com>, Michal Marek <mmarek@suse.com>, David Vrabel <david.vrabel@citrix.com>, xen-devel@lists.xenproject.org, Boris Ostrovsky <boris.ostrovsky@oracle.com>, Sam Ravnborg <sam@ravnborg.org>
 
-On Wed, 24 Aug 2016, David Howells wrote:
+On 11/08/16 13:39, Arnd Bergmann wrote:
+> A previous patch added the --no-wchar-size-warning to the Makefile to
+> avoid this harmless warning:
+> 
+> arm-linux-gnueabi-ld: warning: drivers/xen/efi.o uses 2-byte wchar_t yet the output is to use 4-byte wchar_t; use of wchar_t values across objects may fail
+> 
+> Changing kbuild to use thin archives instead of recursive linking
+> unfortunately brings the same warning back during the final link.
+> 
+> This time, we remove the -fshort-wchar flag that originally caused
+> the warning, hopefully fixing the problem for good. I don't see
+> any reason for having the flag in the first place, as the Xen code
+> does not use wchar_t at all.
+> 
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> Fixes: 971a69db7dc0 ("Xen: don't warn about 2-byte wchar_t in efi")
 
-> Out of interest, does using LTO also fix the problem?
+Acked-by: David Vrabel <david.vrabel@citrix.com>
 
-With those patches in place, that would be the next thing to try.
-Reducing our reliance on 'ld -r' will greatly help promoting LTO for the
-kernel.
-
-Personally I'd like to have the choice between LTO and -gc-sections at 
-configure time.  They both have advantages of their own.
-
-
-Nicolas
+David
