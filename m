@@ -1,40 +1,183 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp02.citrix.com ([66.165.176.63]:3502 "EHLO SMTP02.CITRIX.COM"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750969AbcHXRTT (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 24 Aug 2016 13:19:19 -0400
-Subject: Re: [Xen-devel] [PATCH] Xen: remove -fshort-wchar gcc flag
-References: <1470910580-18458-1-git-send-email-npiggin@gmail.com>
- <16541778.WMH6K24aDt@wuerfel>
-From: David Vrabel <david.vrabel@citrix.com>
-Message-ID: <57BDD6EA.70204@citrix.com>
-Date: Wed, 24 Aug 2016 18:18:34 +0100
+Received: from mail-lf0-f66.google.com ([209.85.215.66]:34522 "EHLO
+        mail-lf0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755286AbcHXS7R (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 24 Aug 2016 14:59:17 -0400
+Received: by mail-lf0-f66.google.com with SMTP id k135so1311924lfb.1
+        for <linux-kbuild@vger.kernel.org>; Wed, 24 Aug 2016 11:59:01 -0700 (PDT)
+Date: Wed, 24 Aug 2016 21:03:05 +0300
+From: Alexey Dobriyan <adobriyan@gmail.com>
+Subject: [PATCH v2] fixdep: faster CONFIG_ search
+Message-ID: <20160824180305.GA22266@p183.telecom.by>
 MIME-Version: 1.0
-In-Reply-To: <16541778.WMH6K24aDt@wuerfel>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>, Nicholas Piggin <npiggin@gmail.com>
-Cc: linux-arch@vger.kernel.org, Stephen Rothwell <sfr@canb.auug.org.au>, Juergen Gross <jgross@suse.com>, Segher Boessenkool <segher@kernel.crashing.org>, Nicolas Pitre <nico@linaro.org>, linux-kbuild@vger.kernel.org, Alan Modra <amodra@gmail.com>, Michal Marek <mmarek@suse.com>, David Vrabel <david.vrabel@citrix.com>, xen-devel@lists.xenproject.org, Boris Ostrovsky <boris.ostrovsky@oracle.com>, Sam Ravnborg <sam@ravnborg.org>
+To: mmarek@suse.com
+Cc: akpm@linux-foundation.org, linux-kbuild@vger.kernel.org
 
-On 11/08/16 13:39, Arnd Bergmann wrote:
-> A previous patch added the --no-wchar-size-warning to the Makefile to
-> avoid this harmless warning:
-> 
-> arm-linux-gnueabi-ld: warning: drivers/xen/efi.o uses 2-byte wchar_t yet the output is to use 4-byte wchar_t; use of wchar_t values across objects may fail
-> 
-> Changing kbuild to use thin archives instead of recursive linking
-> unfortunately brings the same warning back during the final link.
-> 
-> This time, we remove the -fshort-wchar flag that originally caused
-> the warning, hopefully fixing the problem for good. I don't see
-> any reason for having the flag in the first place, as the Xen code
-> does not use wchar_t at all.
-> 
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> Fixes: 971a69db7dc0 ("Xen: don't warn about 2-byte wchar_t in efi")
+Do you think kernel build is 100% dominated by gcc? You are wrong!
+One small utility called "fixdep" consistently manages to sneak into
+profile's first page (unless you have small monitor of course).
 
-Acked-by: David Vrabel <david.vrabel@citrix.com>
+The choke point is this clever code:
 
-David
+	for (; m < end; m++) {
+		if (*m == INT_CONF) { p = (char *) m  ; goto conf; }
+		if (*m == INT_ONFI) { p = (char *) m-1; goto conf; }
+		if (*m == INT_NFIG) { p = (char *) m-2; goto conf; }
+		if (*m == INT_FIG_) { p = (char *) m-3; goto conf; }
+
+4 branches per 4 characters is not fast.
+
+Use strstr(3), so that SSE2 etc can be used.
+
+With this patch, fixdep is so deep at the bottom, it is hard to find it.
+
+Signed-off-by: Alexey Dobriyan <adobriyan@gmail.com>
+---
+
+ scripts/basic/fixdep.c |   86 +++++++++++++++----------------------------------
+ 1 file changed, 28 insertions(+), 58 deletions(-)
+
+--- a/scripts/basic/fixdep.c
++++ b/scripts/basic/fixdep.c
+@@ -82,8 +82,7 @@
+  * to date before even starting the recursive build, so it's too late
+  * at this point anyway.
+  *
+- * The algorithm to grep for "CONFIG_..." is bit unusual, but should
+- * be fast ;-) We don't even try to really parse the header files, but
++ * We don't even try to really parse the header files, but
+  * merely grep, i.e. if CONFIG_FOO is mentioned in a comment, it will
+  * be picked up as well. It's not a problem with respect to
+  * correctness, since that can only give too many dependencies, thus
+@@ -115,11 +114,6 @@
+ #include <ctype.h>
+ #include <arpa/inet.h>
+ 
+-#define INT_CONF ntohl(0x434f4e46)
+-#define INT_ONFI ntohl(0x4f4e4649)
+-#define INT_NFIG ntohl(0x4e464947)
+-#define INT_FIG_ ntohl(0x4649475f)
+-
+ int insert_extra_deps;
+ char *target;
+ char *depfile;
+@@ -241,37 +235,22 @@ static void use_config(const char *m, int slen)
+ 	print_config(m, slen);
+ }
+ 
+-static void parse_config_file(const char *map, size_t len)
++static void parse_config_file(const char *p)
+ {
+-	const int *end = (const int *) (map + len);
+-	/* start at +1, so that p can never be < map */
+-	const int *m   = (const int *) map + 1;
+-	const char *p, *q;
+-
+-	for (; m < end; m++) {
+-		if (*m == INT_CONF) { p = (char *) m  ; goto conf; }
+-		if (*m == INT_ONFI) { p = (char *) m-1; goto conf; }
+-		if (*m == INT_NFIG) { p = (char *) m-2; goto conf; }
+-		if (*m == INT_FIG_) { p = (char *) m-3; goto conf; }
+-		continue;
+-	conf:
+-		if (p > map + len - 7)
+-			continue;
+-		if (memcmp(p, "CONFIG_", 7))
+-			continue;
++	const char *q, *r;
++
++	while ((p = strstr(p, "CONFIG_"))) {
+ 		p += 7;
+-		for (q = p; q < map + len; q++) {
+-			if (!(isalnum(*q) || *q == '_'))
+-				goto found;
+-		}
+-		continue;
+-
+-	found:
+-		if (!memcmp(q - 7, "_MODULE", 7))
+-			q -= 7;
+-		if (q - p < 0)
+-			continue;
+-		use_config(p, q - p);
++		q = p;
++		while (*q && (isalnum(*q) || *q == '_'))
++			q++;
++		if (memcmp(q - 7, "_MODULE", 7) == 0)
++			r = q - 7;
++		else
++			r = q;
++		if (r > p)
++			use_config(p, r - p);
++		p = q;
+ 	}
+ }
+ 
+@@ -291,7 +270,7 @@ static void do_config_file(const char *filename)
+ {
+ 	struct stat st;
+ 	int fd;
+-	void *map;
++	char *map;
+ 
+ 	fd = open(filename, O_RDONLY);
+ 	if (fd < 0) {
+@@ -308,18 +287,23 @@ static void do_config_file(const char *filename)
+ 		close(fd);
+ 		return;
+ 	}
+-	map = mmap(NULL, st.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
+-	if ((long) map == -1) {
+-		perror("fixdep: mmap");
++	map = malloc(st.st_size + 1);
++	if (!map) {
++		perror("fixdep: malloc");
+ 		close(fd);
+ 		return;
+ 	}
++	if (read(fd, map, st.st_size) != st.st_size) {
++		perror("fixdep: read");
++		close(fd);
++		return;
++	}
++	map[st.st_size] = '\0';
++	close(fd);
+ 
+-	parse_config_file(map, st.st_size);
+-
+-	munmap(map, st.st_size);
++	parse_config_file(map);
+ 
+-	close(fd);
++	free(map);
+ }
+ 
+ /*
+@@ -446,22 +430,8 @@ static void print_deps(void)
+ 	close(fd);
+ }
+ 
+-static void traps(void)
+-{
+-	static char test[] __attribute__((aligned(sizeof(int)))) = "CONF";
+-	int *p = (int *)test;
+-
+-	if (*p != INT_CONF) {
+-		fprintf(stderr, "fixdep: sizeof(int) != 4 or wrong endianness? %#x\n",
+-			*p);
+-		exit(2);
+-	}
+-}
+-
+ int main(int argc, char *argv[])
+ {
+-	traps();
+-
+ 	if (argc == 5 && !strcmp(argv[1], "-e")) {
+ 		insert_extra_deps = 1;
+ 		argv++;
