@@ -1,96 +1,153 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pa0-f68.google.com ([209.85.220.68]:36632 "EHLO
-        mail-pa0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751425AbcHXEA7 (ORCPT
+Received: from asavdk3.altibox.net ([109.247.116.14]:45765 "EHLO
+        asavdk3.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752978AbcHXFKe (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 24 Aug 2016 00:00:59 -0400
-Date: Wed, 24 Aug 2016 14:00:44 +1000
-From: Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH] arm: add an option for erratum 657417
-Message-ID: <20160824140044.266d045d@roar.ozlabs.ibm.com>
-In-Reply-To: <2466265.8og15RQ8jv@wuerfel>
-References: <1470989957-23671-1-git-send-email-npiggin@gmail.com>
-        <2466265.8og15RQ8jv@wuerfel>
+        Wed, 24 Aug 2016 01:10:34 -0400
+Date: Wed, 24 Aug 2016 07:01:08 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH] fixdep: faster CONFIG_ search
+Message-ID: <20160824050108.GA19050@ravnborg.org>
+References: <20160823184724.GA11707@p183.telecom.by>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20160823184724.GA11707@p183.telecom.by>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: linux-arm-kernel@lists.infradead.org, Russell King <linux@armlinux.org.uk>, linux-kbuild@vger.kernel.org, Nicolas Pitre <nicolas.pitre@linaro.org>, Julian Brown <julian@codesourcery.com>, Alan Modra <amodra@gmail.com>, Segher Boessenkool <segher@kernel.crashing.org>, linux-arch@vger.kernel.org, Michal Marek <mmarek@suse.com>, Sam Ravnborg <sam@ravnborg.org>, Stephen Rothwell <sfr@canb.auug.org.au>
+To: Alexey Dobriyan <adobriyan@gmail.com>
+Cc: mmarek@suse.com, akpm@linux-foundation.org, linux-kbuild@vger.kernel.org
 
-On Tue, 23 Aug 2016 14:01:29 +0200
-Arnd Bergmann <arnd@arndb.de> wrote:
-
-> On Friday, August 12, 2016 6:19:17 PM CEST Nicholas Piggin wrote:
-> > Erratum 657417 is worked around by the linker by inserting additional
-> > branch trampolines to avoid problematic branch target locations. This
-> > results in much higher linking time and presumably slower and larger
-> > generated code. The workaround also seems to only be required when
-> > linking thumb2 code, but the linker applies it for non-thumb2 code as
-> > well.
-> > 
-> > The workaround today is left to the linker to apply, which is overly
-> > conservative.
-> > 
-> > https://sourceware.org/ml/binutils/2009-05/msg00297.html
-> > 
-> > This patch adds an option which defaults to "y" in cases where we
-> > could possibly be running Cortex A8 and using Thumb2 instructions.
-> > In reality the workaround might not be required at all for the kernel
-> > if virtual instruction memory is linear in physical memory. However it
-> > is more conservative to keep the workaround, and it may be the case
-> > that the TLB lookup would be required in order to catch branches to
-> > unmapped or no-execute pages.
-> > 
-> > In an allyesconfig build, this workaround causes a large load on
-> > the linker's branch stub hash and slows down the final link by a
-> > factor of 5.
-> > 
-> > Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-> >   
+On Tue, Aug 23, 2016 at 09:47:24PM +0300, Alexey Dobriyan wrote:
+> Do you think kernel build is 100% dominated by gcc? You are wrong!
+> One small utility called "fixdep" consistently manages to sneak into
+> profile's first page (unless you have small monitor of course).
 > 
-> Thanks a lot for finding this issue. I can confirm that your patch
-> helps noticeably in all configurations, reducing time for a relink
-> from 18 minutes to 9 minutes on my machine in the best case, but
-> the factor 10 slowdown of the final link with your thin archives
-> and gc-sections patches remains.
+> The choke point is this clever code:
 > 
-> I suspect there is still something else going on besides the 657417
-> slowing things down, but it's also possible that I'm doing something
-> wrong here.
-
-Okay, I was only testing thin archives. gc-sections I didn't look at.
-With thin archives, one final arm allyesconfig link with this patch is
-not showing a regression. gc-sections must be causing something else
-ARM specific, because powerpc seems to link fast with gc-sections.
-
-Can you send your latest ARM patch to enable this and I'll have a look
-at it?
-
-
-> Aside from that, I notice that for the purpose of speeding up
-> "allyesconfig", we don't actually need to make this user
-> configurable, it's sufficient to disable the workaround when
-> CONFIG_THUMB2_KERNEL is disabled, which is what allyesconfig
-> and all the defconfig files (but not randconfig) use. I also found
-> that using THUMB2_KERNEL itself causes a 50% slowdown. I have
-> patches on my "randconfig" test tree that have the side-effect
-> of enabling THUMB2_KERNEL for allyesconfig, which is one reason
-> I have been getting worse results than others.
+> 	for (; m < end; m++) {
+> 		if (*m == INT_CONF) { p = (char *) m  ; goto conf; }
+> 		if (*m == INT_ONFI) { p = (char *) m-1; goto conf; }
+> 		if (*m == INT_NFIG) { p = (char *) m-2; goto conf; }
+> 		if (*m == INT_FIG_) { p = (char *) m-3; goto conf; }
 > 
-> I could also try to revive an older patch I started, to annotate
-> the specific CPU core on each ARMv7 platform. I think I have all the
-> information we need for that, and there are other advantages in
-> doing it: we could be more selective with all the ARMv7 errata,
-> and automatically determine whether some optional CPU features
-> (LPAE, virtualization, integer divide) are available on all
-> of the selected CPU cores.
+> 4 branches per 4 characters is not fast.
+> 
+> Use strstr(3), so that SSE2 etc can be used.
+> 
+> With this patch, fixdep is so deep at the bottom, it is hard to find it.
+> 
+> Signed-off-by: Alexey Dobriyan <adobriyan@gmail.com>
+> ---
+> 
+>  scripts/basic/fixdep.c |   67 ++++++++++++++++++++-----------------------------
+>  1 file changed, 28 insertions(+), 39 deletions(-)
+> 
+> --- a/scripts/basic/fixdep.c
+> +++ b/scripts/basic/fixdep.c
+> @@ -82,8 +82,7 @@
+>   * to date before even starting the recursive build, so it's too late
+>   * at this point anyway.
+>   *
+> - * The algorithm to grep for "CONFIG_..." is bit unusual, but should
+> - * be fast ;-) We don't even try to really parse the header files, but
+> + * We don't even try to really parse the header files, but
+>   * merely grep, i.e. if CONFIG_FOO is mentioned in a comment, it will
+>   * be picked up as well. It's not a problem with respect to
+>   * correctness, since that can only give too many dependencies, thus
+> @@ -241,37 +240,22 @@ static void use_config(const char *m, int slen)
+>  	print_config(m, slen);
+>  }
+>  
+> -static void parse_config_file(const char *map, size_t len)
+> +static void parse_config_file(const char *p)
+>  {
+> -	const int *end = (const int *) (map + len);
+> -	/* start at +1, so that p can never be < map */
+> -	const int *m   = (const int *) map + 1;
+> -	const char *p, *q;
+> -
+> -	for (; m < end; m++) {
+> -		if (*m == INT_CONF) { p = (char *) m  ; goto conf; }
+> -		if (*m == INT_ONFI) { p = (char *) m-1; goto conf; }
+> -		if (*m == INT_NFIG) { p = (char *) m-2; goto conf; }
+> -		if (*m == INT_FIG_) { p = (char *) m-3; goto conf; }
+> -		continue;
+> -	conf:
+> -		if (p > map + len - 7)
+> -			continue;
+> -		if (memcmp(p, "CONFIG_", 7))
+> -			continue;
+> +	const char *q, *r;
+> +
+> +	while ((p = strstr(p, "CONFIG_"))) {
+>  		p += 7;
+> -		for (q = p; q < map + len; q++) {
+> -			if (!(isalnum(*q) || *q == '_'))
+> -				goto found;
+> -		}
+> -		continue;
+> -
+> -	found:
+> -		if (!memcmp(q - 7, "_MODULE", 7))
+> -			q -= 7;
+> -		if (q - p < 0)
+> -			continue;
+> -		use_config(p, q - p);
+> +		q = p;
+> +		while (*q && (isalnum(*q) || *q == '_'))
+> +			q++;
+> +		if (memcmp(q - 7, "_MODULE", 7) == 0)
+> +			r = q - 7;
+> +		else
+> +			r = q;
+> +		if (r > p)
+> +			use_config(p, r - p);
+> +		p = q;
+>  	}
+>  }
+Faster and simpler - good.
 
-Yeah I was just trying to follow existing pattern and be conservative
-with the workaround. From my brief look, it does seem like there is
-room to optimize build options by having more fine grained selection
-of target CPU/platform.
+>  
+> @@ -291,7 +275,7 @@ static void do_config_file(const char *filename)
+>  {
+>  	struct stat st;
+>  	int fd;
+> -	void *map;
+> +	char *map;
+>  
+>  	fd = open(filename, O_RDONLY);
+>  	if (fd < 0) {
+> @@ -308,18 +292,23 @@ static void do_config_file(const char *filename)
+>  		close(fd);
+>  		return;
+>  	}
+> -	map = mmap(NULL, st.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
+> -	if ((long) map == -1) {
+> -		perror("fixdep: mmap");
+> +	map = malloc(st.st_size + 1);
+> +	if (!map) {
+> +		perror("fixdep: malloc");
+>  		close(fd);
+>  		return;
+>  	}
+> +	if (read(fd, map, st.st_size) != st.st_size) {
+> +		perror("fixdep: read");
+> +		close(fd);
+> +		return;
+> +	}
+> +	map[st.st_size] = '\0';
+> +	close(fd);
+>  
+> -	parse_config_file(map, st.st_size);
+> -
+> -	munmap(map, st.st_size);
+> +	parse_config_file(map);
+>  
+> -	close(fd);
+> +	free(map);
+>  }
+This change is not described in the changelog..
+What is the rationale?
 
-Thanks,
-Nick
+	Sam
