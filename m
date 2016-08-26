@@ -1,94 +1,126 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pa0-f65.google.com ([209.85.220.65]:34017 "EHLO
-        mail-pa0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755325AbcHZDGg (ORCPT
+Received: from mail-pa0-f68.google.com ([209.85.220.68]:35216 "EHLO
+        mail-pa0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754449AbcHZD7A (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 25 Aug 2016 23:06:36 -0400
-Date: Fri, 26 Aug 2016 13:00:24 +1000
+        Thu, 25 Aug 2016 23:59:00 -0400
+Date: Fri, 26 Aug 2016 13:58:03 +1000
 From: Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH v4 04/16] generic-sections: add section core helpers
-Message-ID: <20160826130024.0ad51d33@roar.ozlabs.ibm.com>
-In-Reply-To: <20160825175239.GB3296@wotan.suse.de>
-References: <1471642454-5679-1-git-send-email-mcgrof@kernel.org>
-        <1471642454-5679-5-git-send-email-mcgrof@kernel.org>
-        <20160823112633.7d482e62@roar.ozlabs.ibm.com>
-        <20160823173306.GA3296@wotan.suse.de>
-        <20160824135141.2c8f06ec@roar.ozlabs.ibm.com>
-        <20160824201253.GS3296@wotan.suse.de>
-        <20160825120633.057b2f6f@roar.ozlabs.ibm.com>
-        <20160825060540.GX3296@wotan.suse.de>
-        <20160825165121.45d26fb0@roar.ozlabs.ibm.com>
-        <20160825175239.GB3296@wotan.suse.de>
+Subject: Re: linux-next: build warnings after merge of the kbuild tree
+Message-ID: <20160826135803.0c5ffb42@roar.ozlabs.ibm.com>
+In-Reply-To: <20160822204758.5b2cff63@roar.ozlabs.ibm.com>
+References: <20160817114443.67675413@canb.auug.org.au>
+        <e6fbe17c-1981-1579-433d-88462d2efb58@suse.cz>
+        <20160818110948.52f1322d@roar.ozlabs.ibm.com>
+        <20160819133854.17a7b1ca@canb.auug.org.au>
+        <20160819150914.36106b5b@canb.auug.org.au>
+        <5babe9ef-0e3d-6975-9ba4-9a29a700b24d@suse.cz>
+        <20160819204455.6351ffb8@roar.ozlabs.ibm.com>
+        <20160822204758.5b2cff63@roar.ozlabs.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Luis R. Rodriguez" <mcgrof@kernel.org>
-Cc: hpa@zytor.com, tglx@linutronix.de, mingo@redhat.com, jpoimboe@redhat.com, bp@alien8.de, linux@arm.linux.org.uk, mhiramat@kernel.org, masami.hiramatsu.pt@hitachi.com, jbaron@akamai.com, heiko.carstens@de.ibm.com, ananth@linux.vnet.ibm.com, anil.s.keshavamurthy@intel.com, davem@davemloft.net, realmz6@gmail.com, x86@kernel.org, luto@amacapital.net, keescook@chromium.org, torvalds@linux-foundation.org, gregkh@linuxfoundation.org, rusty@rustcorp.com.au, gnomes@lxorguk.ukuu.org.uk, alan@linux.intel.com, dwmw2@infradead.org, arnd@arndb.de, ming.lei@canonical.com, linux-arch@vger.kernel.org, benh@kernel.crashing.org, ananth@in.ibm.com, pebolle@tiscali.nl, fontana@sharpeleven.org, david.vrabel@citrix.com, konrad.wilk@oracle.com, mcb30@ipxe.org, jgross@suse.com, andrew.cooper3@citrix.com, andriy.shevchenko@linux.intel.com, paul.gortmaker@windriver.com, xen-devel@lists.xensource.com, ak@linux.intel.com, pali.rohar@gmail.com, dvhart@infradead.org, platform-driver-x86@vger.kernel.org, mmarek@suse.com, linux@rasmusvillemoes.dk, jkosina@suse.cz, korea.drzix@gmail.com, linux-kbuild@vger.kernel.org, tony.luck@intel.com, akpm@linux-foundation.org, linux-ia64@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sh@vger.kernel.org, sparclinux@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com, rostedt@goodmis.org, jani.nikula@intel.com, mchehab@osg.samsung.com, markus.heiser@darmarit.de, acme@redhat.com, jolsa@kernel.org, msalter@redhat.com, chris@zankel.net, jcmvbkbc@gmail.com, linux-xtensa@linux-xtensa.org, paulus@samba.org, mpe@ellerman.id.au, James.Bottomley@HansenPartnership.com
+To: Michal Marek <mmarek@suse.cz>
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>, linux-next@vger.kernel.org, PowerPC <linuxppc-dev@lists.ozlabs.org>, linux-kernel@vger.kernel.org, Al Viro <viro@zeniv.linux.org.uk>, linux-kbuild@vger.kernel.org
 
-On Thu, 25 Aug 2016 19:52:39 +0200
-"Luis R. Rodriguez" <mcgrof@kernel.org> wrote:
+On Mon, 22 Aug 2016 20:47:58 +1000
+Nicholas Piggin <npiggin@gmail.com> wrote:
 
-> On Thu, Aug 25, 2016 at 04:51:21PM +1000, Nicholas Piggin wrote:
-> > On Thu, 25 Aug 2016 08:05:40 +0200
-> > "Luis R. Rodriguez" <mcgrof@kernel.org> wrote:  
-> > > > Oh, that makes more sense. The SECTION stuff and custom sections was
-> > > > confusing me. I would prefer just to drop all the LINUX_SECTION naming
-> > > > and make it match the functionality you're using. For example:
+> On Fri, 19 Aug 2016 20:44:55 +1000
+> Nicholas Piggin <npiggin@gmail.com> wrote:
+> 
+> > On Fri, 19 Aug 2016 10:37:00 +0200
+> > Michal Marek <mmarek@suse.cz> wrote:
+> >   
+> > > On 2016-08-19 07:09, Stephen Rothwell wrote:    
+> 
+> [snip]
+> 
 > > > > 
-> > > > +DEFINE_LINKTABLE(struct jump_entry, __jump_table);
-> > > > +
-> > > >  /* mutex to protect coming/going of the the jump_label table */
-> > > >  static DEFINE_MUTEX(jump_label_mutex);
-> > > >  
-> > > > @@ -274,8 +277,6 @@ static void __jump_label_update(struct static_key *key,
-> > > >  
-> > > >  void __init jump_label_init(void)
-> > > >  {
-> > > > -	struct jump_entry *iter_start = __start___jump_table;
-> > > > -	struct jump_entry *iter_stop = __stop___jump_table;
-> > > >  	struct static_key *key = NULL;
-> > > >  	struct jump_entry *iter;
-> > > >  
-> > > > @@ -292,9 +293,10 @@ void __init jump_label_init(void)
-> > > >  		return;
-> > > >  
-> > > >  	jump_label_lock();
-> > > > -	jump_label_sort_entries(iter_start, iter_stop);
-> > > > +	jump_label_sort_entries(LINUX_SECTION_START(__jump_table),
-> > > > +				LINUX_SECTION_END(__jump_table));
-> > > > 
-> > > > Now I think this is a fine abstraction to have.    
+> > > > I may be missing something, but genksyms generates the crc's off the
+> > > > preprocessed C source code and we don't have any for the asm files ...      
 > > > 
-> > > OK will keep this one.
-> > >   
-> > > > I think it would look
-> > > > even cleaner if you had:
-> > > > 
-> > > > LINKTABLE_START(__jump_table)
-> > > > LINKTABLE_END(__jump_table)
-> > > >
-> > > > Then do we need to even have the LINUX_SECTION middle man at all?    
-> > > 
-> > > Ah, thing is we use this for both linktables and section ranges.
-> > > Or do we want macros for both that do the same thing ?  
+> > > Of course you are right. Which means that we are losing type information
+> > > for these exports for CONFIG_MODVERSIONS purposes. I guess it's
+> > > acceptable, since the asm functions are pretty basic and their
+> > > signatures do not change.    
 > > 
-> > I think it would make the code using it more readable.  
+> > I don't completely agree. It would be nice to have the functionality
+> > still there.
+> > 
+> > What happens if you just run cmd_modversions on the as rule? It relies on
+> > !defined(__ASSEMBLY__), but we're feeding the result to genksyms, not as.
+> > It would require the header be included in the .S file and be protected for
+> > asm builds.  
 > 
-> Alrighty... so:
 > 
-> LINKTABLE_START()
-> LINKTABLE_END()
+> This seems like it *could* be made to work, but there's a few problems.
 > 
-> SECTION_RANGE_START()
-> SECTION_RANGE_END()
+> - .h files are not made for C consumption. Matter of manually adding the
+> ifdef guards, which isn't terrible.
 > 
-> And these macros do the exact same thing. Ie, nothing shared. Right?
+> - .S files do not all include their .h where the C declaration is. Also
+> will cause some churn but doable and maybe not completely unreasonable.
+> 
+> - genksyms parser barfs when it hits the assembly of the .S file. Best
+> way to fix that seems just send the #include and EXPORT_SYMBOL lines
+> from the .S to the preprocessor. That's a bit of a rabbit hole too, with
+> some .S files being included, etc.
+> 
+> I'm not sure what to do here. If nobody cares and we lose CRCs for .S
+> exports, then okay we can whitelist those relocs easily. If we don't want
+> to lose the functionality, the above might work but it's a bit intrusive
+> an is going to require another cycle of prep patches to go through arch
+> code first.
+> 
+> Or suggestions for alternative approach?
 
-Yeah I think so. Internally they would probably be aliased to the
-same common definition (unless you had some type check or something),
-but user would know about such details.
+Here is a quick patch that I think should catch missing CRCs in
+architecture independent way. If we merge something like this, we
+can whitelist the symbols in arch/powerpc so people get steered to
+the right place.
+
+Powerpc seems to be the only one really catching this, and it's
+only as a side effect of a test run for CONFIG_RELOCATABLE kernels,
+which means version failures probably slipped through other archs.
+
+I'll clean it up, do some more testing, and submit it unless
+anybody dislikes it or has a better way to do it.
 
 Thanks,
 Nick
+
+
+diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
+index 4b8ffd3..1efc454 100644
+--- a/scripts/mod/modpost.c
++++ b/scripts/mod/modpost.c
+@@ -609,6 +609,7 @@ static void handle_modversions(struct module *mod, struct elf_info *info,
+ {
+ 	unsigned int crc;
+ 	enum export export;
++	int is_crc = 0;
+ 
+ 	if ((!is_vmlinux(mod->name) || mod->is_dot_o) &&
+ 	    strncmp(symname, "__ksymtab", 9) == 0)
+@@ -618,6 +619,7 @@ static void handle_modversions(struct module *mod, struct elf_info *info,
+ 
+ 	/* CRC'd symbol */
+ 	if (strncmp(symname, CRC_PFX, strlen(CRC_PFX)) == 0) {
++		is_crc = 1;
+ 		crc = (unsigned int) sym->st_value;
+ 		sym_update_crc(symname + strlen(CRC_PFX), mod, crc,
+ 				export);
+@@ -663,6 +665,10 @@ static void handle_modversions(struct module *mod, struct elf_info *info,
+ 		else
+ 			symname++;
+ #endif
++		if (is_crc && !mod->is_dot_o) {
++			const char *e = is_vmlinux(mod->name) ?"":".ko";
++			warn("EXPORT symbol \"%s\" [%s%s] version generation failed, symbol will not be versioned.\n", symname + strlen(CRC_PFX), mod->name, e);
++		}
+ 		mod->unres = alloc_symbol(symname,
+ 					  ELF_ST_BIND(sym->st_info) == STB_WEAK,
+ 					  mod->unres);
