@@ -1,181 +1,100 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40927 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1751569AbcHZKdI (ORCPT
+Received: from mail-pf0-f194.google.com ([209.85.192.194]:35906 "EHLO
+        mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752921AbcHZLUQ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 26 Aug 2016 06:33:08 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.11/8.16.0.11) with SMTP id u7Q89SqO089795
-        for <linux-kbuild@vger.kernel.org>; Fri, 26 Aug 2016 04:18:11 -0400
-Received: from e23smtp08.au.ibm.com (e23smtp08.au.ibm.com [202.81.31.141])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 25231st909-1
-        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-        for <linux-kbuild@vger.kernel.org>; Fri, 26 Aug 2016 04:18:10 -0400
-Received: from localhost
-        by e23smtp08.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-kbuild@vger.kernel.org> from <andrew.donnellan@au1.ibm.com>;
-        Fri, 26 Aug 2016 18:18:08 +1000
-From: Andrew Donnellan <andrew.donnellan@au1.ibm.com>
-Subject: [PATCH 2/2] builddeb: allow building without headers/firmware packages
-Date: Fri, 26 Aug 2016 18:17:16 +1000
-In-Reply-To: <20160826081716.9435-1-andrew.donnellan@au1.ibm.com>
-References: <20160826081716.9435-1-andrew.donnellan@au1.ibm.com>
-Message-Id: <20160826081716.9435-2-andrew.donnellan@au1.ibm.com>
+        Fri, 26 Aug 2016 07:20:16 -0400
+Date: Fri, 26 Aug 2016 21:17:29 +1000
+From: Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH] arm: add an option for erratum 657417
+Message-ID: <20160826211729.592ff5cd@roar.ozlabs.ibm.com>
+In-Reply-To: <2147968.tzghefjZMo@wuerfel>
+References: <1470989957-23671-1-git-send-email-npiggin@gmail.com>
+        <20160824190530.5b67b356@roar.ozlabs.ibm.com>
+        <20160824205646.4d6170e1@roar.ozlabs.ibm.com>
+        <2147968.tzghefjZMo@wuerfel>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mmarek@suse.com, linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: linux-arm-kernel@lists.infradead.org, Russell King <linux@armlinux.org.uk>, linux-kbuild@vger.kernel.org, Nicolas Pitre <nicolas.pitre@linaro.org>, Julian Brown <julian@codesourcery.com>, Alan Modra <amodra@gmail.com>, Segher Boessenkool <segher@kernel.crashing.org>, linux-arch@vger.kernel.org, Michal Marek <mmarek@suse.com>, Sam Ravnborg <sam@ravnborg.org>, Stephen Rothwell <sfr@canb.auug.org.au>
 
-Currently, the deb-pkg and bindeb-pkg targets create multiple packages for
-the kernel binaries, headers, userspace headers and firmware.
+On Wed, 24 Aug 2016 17:01:30 +0200
+Arnd Bergmann <arnd@arndb.de> wrote:
 
-For developers who generate Debian packages as part of their development
-workflows, it's often not necessary to generate all these packages.
+> On Wednesday, August 24, 2016 8:56:46 PM CEST Nicholas Piggin wrote:
+> > On Wed, 24 Aug 2016 19:05:30 +1000
+> > Nicholas Piggin <npiggin@gmail.com> wrote:  
+> > > Thanks, I'll take a look.  
+> > 
+> > Okay, I can't reproduce your bad linking times even with gc-sections. It's
+> > possible I'm doing something wrong, but with my patches + your patch and
+> > standard arm allyesconfig:
+> > 
+> >   20:33:56  AR      built-in.o
+> >   20:33:57  LD      vmlinux.o
+> >   MODPOST vmlinux.o
+> >   20:34:12  GEN     .version
+> >   CHK     include/generated/compile.h
+> >   UPD     include/generated/compile.h
+> >   CC      init/version.o
+> >   AR      init/built-in.o
+> >   20:34:24  KSYM    .tmp_kallsyms1.o
+> >   20:34:45  KSYM    .tmp_kallsyms2.o
+> >   20:34:54  LD      vmlinux
+> >   20:35:07  SORTEX  vmlinux
+> >   20:35:07  SYSMAP  System.map
+> > 
+> > I have about 71 seconds for the final link phase.  
+> 
+> 
+> I've tracked down my remaining build time regression to
+> a bad binutils snapshot (2.26.51) I had been using, and upgraded
+> to the 2.27 release now, which is roughly the same as what
+> you have:
+> 
+> 14:45:41   LINK    vmlinux
+> 14:45:41  AR      built-in.o
+> 14:45:42  LD      vmlinux.o
+> 14:51:49   MODPOST vmlinux.o
+> 14:51:51  GEN     .version
+> 14:51:51   CHK     include/generated/compile.h
+>   UPD     include/generated/compile.h
+> 14:51:51   CC      init/version.o
+> 14:51:52   AR      init/built-in.o
+> 14:52:04  KSYM    .tmp_kallsyms1.o
+> 14:52:31  KSYM    .tmp_kallsyms2.o
+> 14:52:43  LD      vmlinux
+> 14:52:55  SORTEX  vmlinux
+> 14:52:55  SYSMAP  System.map
+> 14:52:56   OBJCOPY arch/arm/boot/Image
+> 
+> The long minutes that were spent in "arm-linux-gnueabi-ld 
+> -r -o vmlinux.o --whole-archive built-in.o" are all gone now.
 
-Allow the creation of the linux-headers, linux-libc-dev and linux-firmware
-packages to be disabled if the environment variables KDEB_NO_HEADERS,
-KDEB_NO_LIBC_HEADERS or KDEB_NO_FIRMWARE are non-empty.
+Thanks for tracking it down, that's good to hear.
 
-Signed-off-by: Andrew Donnellan <andrew.donnellan@au1.ibm.com>
 
----
+> I still see a problem with big-endian builds failing with
+> thinarc/gc-sections, I'll investigate that some other day,
+> or you could have a look at that if you want to make sure
+> it's an ARM specific problem, not something with your
+> patches in general.
+> 
+> The patch that I sent for enabling the two on ARM blocks
+> out CONFIG_CPU_BIG_ENDIAN, so just revert that hunk to see
+> the problem. It's possible that it only breaks when doing
+> a big-endian build after a little-endian build without
+> a "make clean" inbetween.
 
-On top of d3e2773c4ede5c62d2a92dae20e3a09b1ca55b6e in kbuild#rc-fixes
----
- Documentation/kbuild/kbuild.txt |  7 +++++
- scripts/package/builddeb        | 67 ++++++++++++++++++++++++-----------------
- 2 files changed, 46 insertions(+), 28 deletions(-)
+I'm able to build big endian ARM allyesconfig with thin
+archives and gc-sections, worked fine.
 
-diff --git a/Documentation/kbuild/kbuild.txt b/Documentation/kbuild/kbuild.txt
-index 0ff6a46..cef4f7f 100644
---- a/Documentation/kbuild/kbuild.txt
-+++ b/Documentation/kbuild/kbuild.txt
-@@ -238,3 +238,10 @@ KBUILD_VMLINUX_MAIN
- All object files for the main part of vmlinux.
- KBUILD_VMLINUX_INIT and KBUILD_VMLINUX_MAIN together specify
- all the object files used to link vmlinux.
-+
-+KDEB_NO_HEADERS, KDEB_NO_LIBC_HEADERS, KDEB_NO_FIRMWARE
-+-------------------------------------------------------
-+If these variables are set, the deb-pkg and bindeb-pkg targets won't create
-+linux-headers, linux-libc-dev and linux-firmware packages respectively. This
-+may be useful for developers who use the deb-pkg targets in their workflow
-+but don't need the full set of packages.
-diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index d600fd0..da595da 100755
---- a/scripts/package/builddeb
-+++ b/scripts/package/builddeb
-@@ -187,7 +187,9 @@ fi
- 
- if [ "$ARCH" != "um" ]; then
- 	$MAKE headers_check KBUILD_SRC=
--	$MAKE headers_install KBUILD_SRC= INSTALL_HDR_PATH="$libc_headers_dir/usr"
-+	if [ -z "$KDEB_NO_LIBC_HEADERS" ]; then
-+		$MAKE headers_install KBUILD_SRC= INSTALL_HDR_PATH="$libc_headers_dir/usr"
-+	fi
- fi
- 
- # Install the maintainer scripts
-@@ -324,26 +326,27 @@ EOF
- fi
- 
- # Build kernel header package
--(cd $srctree; find . -name Makefile\* -o -name Kconfig\* -o -name \*.pl) > "$objtree/debian/hdrsrcfiles"
--(cd $srctree; find arch/*/include include scripts -type f) >> "$objtree/debian/hdrsrcfiles"
--(cd $srctree; find arch/$SRCARCH -name module.lds -o -name Kbuild.platforms -o -name Platform) >> "$objtree/debian/hdrsrcfiles"
--(cd $srctree; find $(find arch/$SRCARCH -name include -o -name scripts -type d) -type f) >> "$objtree/debian/hdrsrcfiles"
--if grep -q '^CONFIG_STACK_VALIDATION=y' $KCONFIG_CONFIG ; then
--	(cd $objtree; find tools/objtool -type f -executable) >> "$objtree/debian/hdrobjfiles"
--fi
--(cd $objtree; find arch/$SRCARCH/include Module.symvers include scripts -type f) >> "$objtree/debian/hdrobjfiles"
--if grep -q '^CONFIG_GCC_PLUGINS=y' $KCONFIG_CONFIG ; then
--	(cd $objtree; find scripts/gcc-plugins -name \*.so -o -name gcc-common.h) >> "$objtree/debian/hdrobjfiles"
--fi
--destdir=$kernel_headers_dir/usr/src/linux-headers-$version
--mkdir -p "$destdir"
--(cd $srctree; tar -c -f - -T -) < "$objtree/debian/hdrsrcfiles" | (cd $destdir; tar -xf -)
--(cd $objtree; tar -c -f - -T -) < "$objtree/debian/hdrobjfiles" | (cd $destdir; tar -xf -)
--(cd $objtree; cp $KCONFIG_CONFIG $destdir/.config) # copy .config manually to be where it's expected to be
--ln -sf "/usr/src/linux-headers-$version" "$kernel_headers_dir/lib/modules/$version/build"
--rm -f "$objtree/debian/hdrsrcfiles" "$objtree/debian/hdrobjfiles"
-+if [ -z "$KDEB_NO_HEADERS" ]; then
-+	(cd $srctree; find . -name Makefile\* -o -name Kconfig\* -o -name \*.pl) > "$objtree/debian/hdrsrcfiles"
-+	(cd $srctree; find arch/*/include include scripts -type f) >> "$objtree/debian/hdrsrcfiles"
-+	(cd $srctree; find arch/$SRCARCH -name module.lds -o -name Kbuild.platforms -o -name Platform) >> "$objtree/debian/hdrsrcfiles"
-+	(cd $srctree; find $(find arch/$SRCARCH -name include -o -name scripts -type d) -type f) >> "$objtree/debian/hdrsrcfiles"
-+	if grep -q '^CONFIG_STACK_VALIDATION=y' $KCONFIG_CONFIG ; then
-+		(cd $objtree; find tools/objtool -type f -executable) >> "$objtree/debian/hdrobjfiles"
-+	fi
-+	(cd $objtree; find arch/$SRCARCH/include Module.symvers include scripts -type f) >> "$objtree/debian/hdrobjfiles"
-+	if grep -q '^CONFIG_GCC_PLUGINS=y' $KCONFIG_CONFIG ; then
-+		(cd $objtree; find scripts/gcc-plugins -name \*.so -o -name gcc-common.h) >> "$objtree/debian/hdrobjfiles"
-+	fi
-+	destdir=$kernel_headers_dir/usr/src/linux-headers-$version
-+	mkdir -p "$destdir"
-+	(cd $srctree; tar -c -f - -T -) < "$objtree/debian/hdrsrcfiles" | (cd $destdir; tar -xf -)
-+	(cd $objtree; tar -c -f - -T -) < "$objtree/debian/hdrobjfiles" | (cd $destdir; tar -xf -)
-+	(cd $objtree; cp $KCONFIG_CONFIG $destdir/.config) # copy .config manually to be where it's expected to be
-+	ln -sf "/usr/src/linux-headers-$version" "$kernel_headers_dir/lib/modules/$version/build"
-+	rm -f "$objtree/debian/hdrsrcfiles" "$objtree/debian/hdrobjfiles"
- 
--cat <<EOF >> debian/control
-+	cat <<EOF >> debian/control
- 
- Package: $kernel_headers_packagename
- Provides: linux-headers, linux-headers-2.6
-@@ -353,13 +356,13 @@ Description: Linux kernel headers for $KERNELRELEASE on \${kernel:debarch}
-  .
-  This is useful for people who need to build external modules
- EOF
-+fi
- 
- # Do we have firmware? Move it out of the way and build it into a package.
- if [ -e "$tmpdir/lib/firmware" ]; then
--	mv "$tmpdir/lib/firmware"/* "$fwdir/lib/firmware/$version/"
--	rmdir "$tmpdir/lib/firmware"
--
--	cat <<EOF >> debian/control
-+	if [ -z "$KDEB_NO_FIRMWARE" ]; then
-+		mv "$tmpdir/lib/firmware"/* "$fwdir/lib/firmware/$version/"
-+		cat <<EOF >> debian/control
- 
- Package: $fwpackagename
- Architecture: all
-@@ -367,10 +370,13 @@ Description: Linux kernel firmware, version $version
-  This package contains firmware from the Linux kernel, version $version.
- EOF
- 
--	create_package "$fwpackagename" "$fwdir"
-+		create_package "$fwpackagename" "$fwdir"
-+	fi
-+	rm -r "$tmpdir/lib/firmware"
- fi
- 
--cat <<EOF >> debian/control
-+if [ -z "$KDEB_NO_LIBC_HEADERS" ]; then
-+	cat <<EOF >> debian/control
- 
- Package: $libc_headers_packagename
- Section: devel
-@@ -380,10 +386,15 @@ Description: Linux support headers for userspace development
-  This package provides userspaces headers from the Linux kernel.  These headers
-  are used by the installed headers for GNU glibc and other system libraries.
- EOF
-+fi
- 
- if [ "$ARCH" != "um" ]; then
--	create_package "$kernel_headers_packagename" "$kernel_headers_dir"
--	create_package "$libc_headers_packagename" "$libc_headers_dir"
-+	if [ -z "$KDEB_NO_HEADERS" ]; then
-+		create_package "$kernel_headers_packagename" "$kernel_headers_dir"
-+	fi
-+	if [ -z "$KDEB_NO_LIBC_HEADERS" ]; then
-+		create_package "$libc_headers_packagename" "$libc_headers_dir"
-+	fi
- fi
- 
- create_package "$packagename" "$tmpdir"
--- 
-Andrew Donnellan              OzLabs, ADL Canberra
-andrew.donnellan@au1.ibm.com  IBM Australia Limited
+There have been a few bugs in powerpc when failing to notice
+the change when endian of builds was swapped, so maybe you
+got bitten by something similar.
 
+Thanks,
+Nick
