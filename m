@@ -1,72 +1,181 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf0-f195.google.com ([209.85.192.195]:33722 "EHLO
-        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752098AbcHZKHl (ORCPT
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:40927 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1751569AbcHZKdI (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 26 Aug 2016 06:07:41 -0400
-Received: by mail-pf0-f195.google.com with SMTP id i6so4671037pfe.0
-        for <linux-kbuild@vger.kernel.org>; Fri, 26 Aug 2016 03:07:40 -0700 (PDT)
-From: Nicholas Piggin <npiggin@gmail.com>
-Subject: [RFC][PATCH] kbuild: modpost warn if export version crc is missing
-Date: Fri, 26 Aug 2016 20:07:19 +1000
-Message-Id: <20160826100719.16593-1-npiggin@gmail.com>
+        Fri, 26 Aug 2016 06:33:08 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.11/8.16.0.11) with SMTP id u7Q89SqO089795
+        for <linux-kbuild@vger.kernel.org>; Fri, 26 Aug 2016 04:18:11 -0400
+Received: from e23smtp08.au.ibm.com (e23smtp08.au.ibm.com [202.81.31.141])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 25231st909-1
+        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+        for <linux-kbuild@vger.kernel.org>; Fri, 26 Aug 2016 04:18:10 -0400
+Received: from localhost
+        by e23smtp08.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-kbuild@vger.kernel.org> from <andrew.donnellan@au1.ibm.com>;
+        Fri, 26 Aug 2016 18:18:08 +1000
+From: Andrew Donnellan <andrew.donnellan@au1.ibm.com>
+Subject: [PATCH 2/2] builddeb: allow building without headers/firmware packages
+Date: Fri, 26 Aug 2016 18:17:16 +1000
+In-Reply-To: <20160826081716.9435-1-andrew.donnellan@au1.ibm.com>
+References: <20160826081716.9435-1-andrew.donnellan@au1.ibm.com>
+Message-Id: <20160826081716.9435-2-andrew.donnellan@au1.ibm.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Nicholas Piggin <npiggin@gmail.com>
+To: mmarek@suse.com, linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
 
-This catches the failing ceph CRC on with:
+Currently, the deb-pkg and bindeb-pkg targets create multiple packages for
+the kernel binaries, headers, userspace headers and firmware.
 
-    LD      vmlinux.o
-    MODPOST vmlinux.o
-  WARNING: EXPORT symbol "ceph_monc_do_statfs" [vmlinux] version
-  generation failed, symbol will not be versioned.
+For developers who generate Debian packages as part of their development
+workflows, it's often not necessary to generate all these packages.
 
-When the modules referring to exported symbols are built, there is an
-existing warning for missing CRC, but it's not always the case such
-any such module will be built, and in any case it is useful to get a
-warning at the source.
+Allow the creation of the linux-headers, linux-libc-dev and linux-firmware
+packages to be disabled if the environment variables KDEB_NO_HEADERS,
+KDEB_NO_LIBC_HEADERS or KDEB_NO_FIRMWARE are non-empty.
 
-This gets a little verbose with CONFIG_DEBUG_SECTION_MISMATCH,
-producing a warning with each object linked, but I didn't think
-that warranted extra complexity to avoid.
+Signed-off-by: Andrew Donnellan <andrew.donnellan@au1.ibm.com>
 
-Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- scripts/mod/modpost.c | 6 ++++++
- 1 file changed, 6 insertions(+)
 
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index 4b8ffd3..ea87cb3 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -609,6 +609,7 @@ static void handle_modversions(struct module *mod, struct elf_info *info,
- {
- 	unsigned int crc;
- 	enum export export;
-+	bool is_crc = false;
+On top of d3e2773c4ede5c62d2a92dae20e3a09b1ca55b6e in kbuild#rc-fixes
+---
+ Documentation/kbuild/kbuild.txt |  7 +++++
+ scripts/package/builddeb        | 67 ++++++++++++++++++++++++-----------------
+ 2 files changed, 46 insertions(+), 28 deletions(-)
+
+diff --git a/Documentation/kbuild/kbuild.txt b/Documentation/kbuild/kbuild.txt
+index 0ff6a46..cef4f7f 100644
+--- a/Documentation/kbuild/kbuild.txt
++++ b/Documentation/kbuild/kbuild.txt
+@@ -238,3 +238,10 @@ KBUILD_VMLINUX_MAIN
+ All object files for the main part of vmlinux.
+ KBUILD_VMLINUX_INIT and KBUILD_VMLINUX_MAIN together specify
+ all the object files used to link vmlinux.
++
++KDEB_NO_HEADERS, KDEB_NO_LIBC_HEADERS, KDEB_NO_FIRMWARE
++-------------------------------------------------------
++If these variables are set, the deb-pkg and bindeb-pkg targets won't create
++linux-headers, linux-libc-dev and linux-firmware packages respectively. This
++may be useful for developers who use the deb-pkg targets in their workflow
++but don't need the full set of packages.
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index d600fd0..da595da 100755
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -187,7 +187,9 @@ fi
  
- 	if ((!is_vmlinux(mod->name) || mod->is_dot_o) &&
- 	    strncmp(symname, "__ksymtab", 9) == 0)
-@@ -618,6 +619,7 @@ static void handle_modversions(struct module *mod, struct elf_info *info,
+ if [ "$ARCH" != "um" ]; then
+ 	$MAKE headers_check KBUILD_SRC=
+-	$MAKE headers_install KBUILD_SRC= INSTALL_HDR_PATH="$libc_headers_dir/usr"
++	if [ -z "$KDEB_NO_LIBC_HEADERS" ]; then
++		$MAKE headers_install KBUILD_SRC= INSTALL_HDR_PATH="$libc_headers_dir/usr"
++	fi
+ fi
  
- 	/* CRC'd symbol */
- 	if (strncmp(symname, CRC_PFX, strlen(CRC_PFX)) == 0) {
-+		is_crc = true;
- 		crc = (unsigned int) sym->st_value;
- 		sym_update_crc(symname + strlen(CRC_PFX), mod, crc,
- 				export);
-@@ -663,6 +665,10 @@ static void handle_modversions(struct module *mod, struct elf_info *info,
- 		else
- 			symname++;
- #endif
-+		if (is_crc) {
-+			const char *e = is_vmlinux(mod->name) ?"":".ko";
-+			warn("EXPORT symbol \"%s\" [%s%s] version generation failed, symbol will not be versioned.\n", symname + strlen(CRC_PFX), mod->name, e);
-+		}
- 		mod->unres = alloc_symbol(symname,
- 					  ELF_ST_BIND(sym->st_info) == STB_WEAK,
- 					  mod->unres);
+ # Install the maintainer scripts
+@@ -324,26 +326,27 @@ EOF
+ fi
+ 
+ # Build kernel header package
+-(cd $srctree; find . -name Makefile\* -o -name Kconfig\* -o -name \*.pl) > "$objtree/debian/hdrsrcfiles"
+-(cd $srctree; find arch/*/include include scripts -type f) >> "$objtree/debian/hdrsrcfiles"
+-(cd $srctree; find arch/$SRCARCH -name module.lds -o -name Kbuild.platforms -o -name Platform) >> "$objtree/debian/hdrsrcfiles"
+-(cd $srctree; find $(find arch/$SRCARCH -name include -o -name scripts -type d) -type f) >> "$objtree/debian/hdrsrcfiles"
+-if grep -q '^CONFIG_STACK_VALIDATION=y' $KCONFIG_CONFIG ; then
+-	(cd $objtree; find tools/objtool -type f -executable) >> "$objtree/debian/hdrobjfiles"
+-fi
+-(cd $objtree; find arch/$SRCARCH/include Module.symvers include scripts -type f) >> "$objtree/debian/hdrobjfiles"
+-if grep -q '^CONFIG_GCC_PLUGINS=y' $KCONFIG_CONFIG ; then
+-	(cd $objtree; find scripts/gcc-plugins -name \*.so -o -name gcc-common.h) >> "$objtree/debian/hdrobjfiles"
+-fi
+-destdir=$kernel_headers_dir/usr/src/linux-headers-$version
+-mkdir -p "$destdir"
+-(cd $srctree; tar -c -f - -T -) < "$objtree/debian/hdrsrcfiles" | (cd $destdir; tar -xf -)
+-(cd $objtree; tar -c -f - -T -) < "$objtree/debian/hdrobjfiles" | (cd $destdir; tar -xf -)
+-(cd $objtree; cp $KCONFIG_CONFIG $destdir/.config) # copy .config manually to be where it's expected to be
+-ln -sf "/usr/src/linux-headers-$version" "$kernel_headers_dir/lib/modules/$version/build"
+-rm -f "$objtree/debian/hdrsrcfiles" "$objtree/debian/hdrobjfiles"
++if [ -z "$KDEB_NO_HEADERS" ]; then
++	(cd $srctree; find . -name Makefile\* -o -name Kconfig\* -o -name \*.pl) > "$objtree/debian/hdrsrcfiles"
++	(cd $srctree; find arch/*/include include scripts -type f) >> "$objtree/debian/hdrsrcfiles"
++	(cd $srctree; find arch/$SRCARCH -name module.lds -o -name Kbuild.platforms -o -name Platform) >> "$objtree/debian/hdrsrcfiles"
++	(cd $srctree; find $(find arch/$SRCARCH -name include -o -name scripts -type d) -type f) >> "$objtree/debian/hdrsrcfiles"
++	if grep -q '^CONFIG_STACK_VALIDATION=y' $KCONFIG_CONFIG ; then
++		(cd $objtree; find tools/objtool -type f -executable) >> "$objtree/debian/hdrobjfiles"
++	fi
++	(cd $objtree; find arch/$SRCARCH/include Module.symvers include scripts -type f) >> "$objtree/debian/hdrobjfiles"
++	if grep -q '^CONFIG_GCC_PLUGINS=y' $KCONFIG_CONFIG ; then
++		(cd $objtree; find scripts/gcc-plugins -name \*.so -o -name gcc-common.h) >> "$objtree/debian/hdrobjfiles"
++	fi
++	destdir=$kernel_headers_dir/usr/src/linux-headers-$version
++	mkdir -p "$destdir"
++	(cd $srctree; tar -c -f - -T -) < "$objtree/debian/hdrsrcfiles" | (cd $destdir; tar -xf -)
++	(cd $objtree; tar -c -f - -T -) < "$objtree/debian/hdrobjfiles" | (cd $destdir; tar -xf -)
++	(cd $objtree; cp $KCONFIG_CONFIG $destdir/.config) # copy .config manually to be where it's expected to be
++	ln -sf "/usr/src/linux-headers-$version" "$kernel_headers_dir/lib/modules/$version/build"
++	rm -f "$objtree/debian/hdrsrcfiles" "$objtree/debian/hdrobjfiles"
+ 
+-cat <<EOF >> debian/control
++	cat <<EOF >> debian/control
+ 
+ Package: $kernel_headers_packagename
+ Provides: linux-headers, linux-headers-2.6
+@@ -353,13 +356,13 @@ Description: Linux kernel headers for $KERNELRELEASE on \${kernel:debarch}
+  .
+  This is useful for people who need to build external modules
+ EOF
++fi
+ 
+ # Do we have firmware? Move it out of the way and build it into a package.
+ if [ -e "$tmpdir/lib/firmware" ]; then
+-	mv "$tmpdir/lib/firmware"/* "$fwdir/lib/firmware/$version/"
+-	rmdir "$tmpdir/lib/firmware"
+-
+-	cat <<EOF >> debian/control
++	if [ -z "$KDEB_NO_FIRMWARE" ]; then
++		mv "$tmpdir/lib/firmware"/* "$fwdir/lib/firmware/$version/"
++		cat <<EOF >> debian/control
+ 
+ Package: $fwpackagename
+ Architecture: all
+@@ -367,10 +370,13 @@ Description: Linux kernel firmware, version $version
+  This package contains firmware from the Linux kernel, version $version.
+ EOF
+ 
+-	create_package "$fwpackagename" "$fwdir"
++		create_package "$fwpackagename" "$fwdir"
++	fi
++	rm -r "$tmpdir/lib/firmware"
+ fi
+ 
+-cat <<EOF >> debian/control
++if [ -z "$KDEB_NO_LIBC_HEADERS" ]; then
++	cat <<EOF >> debian/control
+ 
+ Package: $libc_headers_packagename
+ Section: devel
+@@ -380,10 +386,15 @@ Description: Linux support headers for userspace development
+  This package provides userspaces headers from the Linux kernel.  These headers
+  are used by the installed headers for GNU glibc and other system libraries.
+ EOF
++fi
+ 
+ if [ "$ARCH" != "um" ]; then
+-	create_package "$kernel_headers_packagename" "$kernel_headers_dir"
+-	create_package "$libc_headers_packagename" "$libc_headers_dir"
++	if [ -z "$KDEB_NO_HEADERS" ]; then
++		create_package "$kernel_headers_packagename" "$kernel_headers_dir"
++	fi
++	if [ -z "$KDEB_NO_LIBC_HEADERS" ]; then
++		create_package "$libc_headers_packagename" "$libc_headers_dir"
++	fi
+ fi
+ 
+ create_package "$packagename" "$tmpdir"
 -- 
-2.9.3
+Andrew Donnellan              OzLabs, ADL Canberra
+andrew.donnellan@au1.ibm.com  IBM Australia Limited
 
