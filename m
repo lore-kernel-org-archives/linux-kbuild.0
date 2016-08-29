@@ -1,53 +1,83 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.17.10]:52165 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751449AbcHZOJf (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 26 Aug 2016 10:09:35 -0400
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCH] arm: add an option for erratum 657417
-Date: Fri, 26 Aug 2016 16:07:49 +0200
-References: <1470989957-23671-1-git-send-email-npiggin@gmail.com> <2147968.tzghefjZMo@wuerfel> <20160826211729.592ff5cd@roar.ozlabs.ibm.com>
-In-Reply-To: <20160826211729.592ff5cd@roar.ozlabs.ibm.com>
-MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="iso-8859-1"
+Received: from mail.kernel.org ([198.145.29.136]:35902 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S932816AbcH2OEh (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 29 Aug 2016 10:04:37 -0400
+Date: Mon, 29 Aug 2016 23:04:18 +0900
+From: Masami Hiramatsu <mhiramat@kernel.org>
+Subject: Re: [PATCH v4 14/16] kprobes: move kprobe declarations to
+ asm-generic/kprobes.h
+Message-Id: <20160829230418.0d1d69ea76810db5148316e5@kernel.org>
+In-Reply-To: <20160823163104.GZ3296@wotan.suse.de>
+References: <1471642454-5679-1-git-send-email-mcgrof@kernel.org>
+        <1471642454-5679-15-git-send-email-mcgrof@kernel.org>
+        <20160823001140.8f7293408d2094a14c7725a1@kernel.org>
+        <20160823163104.GZ3296@wotan.suse.de>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <201608261607.49610.arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-arm-kernel@lists.infradead.org
-Cc: Nicholas Piggin <npiggin@gmail.com>, Nicolas Pitre <nicolas.pitre@linaro.org>, linux-arch@vger.kernel.org, Segher Boessenkool <segher@kernel.crashing.org>, Alan Modra <amodra@gmail.com>, linux-kbuild@vger.kernel.org, Russell King <linux@armlinux.org.uk>, Julian Brown <julian@codesourcery.com>, Michal Marek <mmarek@suse.com>, Stephen Rothwell <sfr@canb.auug.org.au>, Sam Ravnborg <sam@ravnborg.org>
+To: "Luis R. Rodriguez" <mcgrof@kernel.org>
+Cc: hpa@zytor.com, tglx@linutronix.de, mingo@redhat.com, jpoimboe@redhat.com, bp@alien8.de, linux@arm.linux.org.uk, masami.hiramatsu.pt@hitachi.com, jbaron@akamai.com, heiko.carstens@de.ibm.com, ananth@linux.vnet.ibm.com, anil.s.keshavamurthy@intel.com, davem@davemloft.net, realmz6@gmail.com, x86@kernel.org, luto@amacapital.net, keescook@chromium.org, torvalds@linux-foundation.org, gregkh@linuxfoundation.org, rusty@rustcorp.com.au, gnomes@lxorguk.ukuu.org.uk, alan@linux.intel.com, dwmw2@infradead.org, arnd@arndb.de, ming.lei@canonical.com, linux-arch@vger.kernel.org, benh@kernel.crashing.org, ananth@in.ibm.com, pebolle@tiscali.nl, fontana@sharpeleven.org, david.vrabel@citrix.com, konrad.wilk@oracle.com, mcb30@ipxe.org, jgross@suse.com, andrew.cooper3@citrix.com, andriy.shevchenko@linux.intel.com, paul.gortmaker@windriver.com, xen-devel@lists.xensource.com, ak@linux.intel.com, pali.rohar@gmail.com, dvhart@infradead.org, platform-driver-x86@vger.kernel.org, mmarek@suse.com, linux@rasmusvillemoes.dk, jkosina@suse.cz, korea.drzix@gmail.com, linux-kbuild@vger.kernel.org, tony.luck@intel.com, akpm@linux-foundation.org, linux-ia64@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sh@vger.kernel.org, sparclinux@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com, rostedt@goodmis.org, jani.nikula@intel.com, mchehab@osg.samsung.com, markus.heiser@darmarit.de, acme@redhat.com, jolsa@kernel.org, msalter@redhat.com, chris@zankel.net, jcmvbkbc@gmail.com, linux-xtensa@linux-xtensa.org, paulus@samba.org, mpe@ellerman.id.au, James.Bottomley@HansenPartnership.com
 
-On Friday 26 August 2016, Nicholas Piggin wrote:
-> > I still see a problem with big-endian builds failing with
-> > thinarc/gc-sections, I'll investigate that some other day,
-> > or you could have a look at that if you want to make sure
-> > it's an ARM specific problem, not something with your
-> > patches in general.
+On Tue, 23 Aug 2016 18:31:05 +0200
+"Luis R. Rodriguez" <mcgrof@kernel.org> wrote:
+
+> On Tue, Aug 23, 2016 at 12:11:40AM +0900, Masami Hiramatsu wrote:
+> > On Fri, 19 Aug 2016 14:34:12 -0700
+> > mcgrof@kernel.org wrote:
 > > 
-> > The patch that I sent for enabling the two on ARM blocks
-> > out CONFIG_CPU_BIG_ENDIAN, so just revert that hunk to see
-> > the problem. It's possible that it only breaks when doing
-> > a big-endian build after a little-endian build without
-> > a "make clean" inbetween.
+> > > From: "Luis R. Rodriguez" <mcgrof@kernel.org>
+> > > 
+> > > Often all is needed is these small helpers, instead of compiler.h
+> > > or a full kprobes.h. This is important for asm helpers, in fact even
+> > > some asm/kprobes.h make use of these helpers... instead just keep a
+> > > generic asm file with helpers useful for asm code with the least amount
+> > > of clutter as possible.
+> > > 
+> > > Likewise we need now to also address what to do about this file for both
+> > > when architectures have CONFIG_HAVE_KPROBES, and when they do not. Then
+> > > for when architectures have CONFIG_HAVE_KPROBES but have disabled
+> > > CONFIG_KPROBES.
+> > > 
+> > > Right now most asm/kprobes.h do not have guards against CONFIG_KPROBES,
+> > > this means most architecture code cannot include asm/kprobes.h safely.
+> > > Correct this and add guards for architectures missing them. Additionally
+> > > provide architectures that not have kprobes support with the default
+> > > asm-generic solution. This lets us force asm/kprobes.h on the header
+> > > include/linux/kprobes.h always, but most importantly we can now safely
+> > > include just asm/kprobes.h on architecture code without bringing
+> > > the full kitchen sink of header files.
+> > > 
+> > > Two architectures already provided a guard against CONFIG_KPROBES on
+> > > its kprobes.h: sh, arch. The rest of the architectures needed gaurds
+> > > added. We avoid including any not-needed headers on asm/kprobes.h
+> > > unless kprobes have been enabled.
+> > > 
+> > > In a subsequent atomic change we can try now to remove compiler.h from
+> > > include/linux/kprobes.h.
+> > 
+> > Hmm, this looks a bit overkill... I rather like move it into linux/table.h.
 > 
-> I'm able to build big endian ARM allyesconfig with thin
-> archives and gc-sections, worked fine.
+> That's the thing, we can't reasonably expect every table to add an entry into
+> table.h, this should be up to each user. Moving it to tables.h just prolongs
+> what needs to be done. In this case the change is justifiable given kprobe
+> annotations are required for some architectures early in architecture code, and
+> including compiler.h on early architecture code blows up. There is no easy fix
+> to this, and this this was *actually* the cleanest solution I could devise
+> without much changes.
+
+Aah, I misread your patch, it is asm-generic/kprobes.h, not asm/kprobes.h.
+I think it is OK now.
+
+Acked-by: Masami Hiramatsu <mhiramat@kernel.org>
+
+Thanks!
+
 > 
-> There have been a few bugs in powerpc when failing to notice
-> the change when endian of builds was swapped, so maybe you
-> got bitten by something similar.
+>   Luis
 
-I tracked this down as well now, and it's also a problem on my
-local machine, your patches are fine. In order to debug
-the other problem, I was building with
-"make LD=/home/arnd/..../ld" to try out different
-versions of the linker, and that caused the "LD += -EB"
-line from arch/arm/Makefile to be ignored.
 
-We should probably override LDFLAGS rather than LD
-(and AFLAGS instead of AS) for big-endian builds, but
-that is unrelated to your work.
-
-	Arnd
+-- 
+Masami Hiramatsu <mhiramat@kernel.org>
