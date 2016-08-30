@@ -1,59 +1,82 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from skprod2.natinst.com ([130.164.80.23]:55531 "EHLO ni.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1757533AbcH3J5u (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 30 Aug 2016 05:57:50 -0400
-From: Ioan-Adrian Ratiu <adrian.ratiu@ni.com>
-Subject: [PATCH] merge_config.sh: fail loudly if make also fails
-Date: Tue, 30 Aug 2016 12:56:22 +0300
-Message-Id: <20160830095622.26600-1-adrian.ratiu@ni.com>
+Received: from mx2.suse.de ([195.135.220.15]:57293 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750742AbcH3UHz (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 30 Aug 2016 16:07:55 -0400
+Date: Tue, 30 Aug 2016 22:07:49 +0200
+From: "Luis R. Rodriguez" <mcgrof@kernel.org>
+Subject: Re: [PATCH v4 14/16] kprobes: move kprobe declarations to
+ asm-generic/kprobes.h
+Message-ID: <20160830200749.GW3296@wotan.suse.de>
+References: <1471642454-5679-1-git-send-email-mcgrof@kernel.org>
+ <1471642454-5679-15-git-send-email-mcgrof@kernel.org>
+ <20160823001140.8f7293408d2094a14c7725a1@kernel.org>
+ <20160823163104.GZ3296@wotan.suse.de>
+ <20160829230418.0d1d69ea76810db5148316e5@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20160829230418.0d1d69ea76810db5148316e5@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: yann.morin.1998@free.fr
-Cc: brad.mouring@ni.com, bruce.ashfield@gmail.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Masami Hiramatsu <mhiramat@kernel.org>
+Cc: "Luis R. Rodriguez" <mcgrof@kernel.org>, hpa@zytor.com, tglx@linutronix.de, mingo@redhat.com, jpoimboe@redhat.com, bp@alien8.de, linux@arm.linux.org.uk, masami.hiramatsu.pt@hitachi.com, jbaron@akamai.com, heiko.carstens@de.ibm.com, ananth@linux.vnet.ibm.com, anil.s.keshavamurthy@intel.com, davem@davemloft.net, realmz6@gmail.com, x86@kernel.org, luto@amacapital.net, keescook@chromium.org, torvalds@linux-foundation.org, gregkh@linuxfoundation.org, rusty@rustcorp.com.au, gnomes@lxorguk.ukuu.org.uk, alan@linux.intel.com, dwmw2@infradead.org, arnd@arndb.de, ming.lei@canonical.com, linux-arch@vger.kernel.org, benh@kernel.crashing.org, ananth@in.ibm.com, pebolle@tiscali.nl, fontana@sharpeleven.org, david.vrabel@citrix.com, konrad.wilk@oracle.com, mcb30@ipxe.org, jgross@suse.com, andrew.cooper3@citrix.com, andriy.shevchenko@linux.intel.com, paul.gortmaker@windriver.com, xen-devel@lists.xensource.com, ak@linux.intel.com, pali.rohar@gmail.com, dvhart@infradead.org, platform-driver-x86@vger.kernel.org, mmarek@suse.com, linux@rasmusvillemoes.dk, jkosina@suse.cz, korea.drzix@gmail.com, linux-kbuild@vger.kernel.org, tony.luck@intel.com, akpm@linux-foundation.org, linux-ia64@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sh@vger.kernel.org, sparclinux@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com, rostedt@goodmis.org, jani.nikula@intel.com, mchehab@osg.samsung.com, markus.heiser@darmarit.de, acme@redhat.com, jolsa@kernel.org, msalter@redhat.com, chris@zankel.net, jcmvbkbc@gmail.com, linux-xtensa@linux-xtensa.org, paulus@samba.org, mpe@ellerman.id.au, James.Bottomley@HansenPartnership.com
 
-There are cases in which the make call to fill missing symbols can fail.
-I encountered one such case while building an Yocto/OpenEmbedded based
-custom Linux kernel because by default after late 2014 OE poisons the
-default compiler sysroot path [1], making it point to a bogus location
-like /does/not/exist. This means the "--sysroot" compiler arg needs to
-be passed everywhere explicitly.
+On Mon, Aug 29, 2016 at 11:04:18PM +0900, Masami Hiramatsu wrote:
+> On Tue, 23 Aug 2016 18:31:05 +0200
+> "Luis R. Rodriguez" <mcgrof@kernel.org> wrote:
+> 
+> > On Tue, Aug 23, 2016 at 12:11:40AM +0900, Masami Hiramatsu wrote:
+> > > On Fri, 19 Aug 2016 14:34:12 -0700
+> > > mcgrof@kernel.org wrote:
+> > > 
+> > > > From: "Luis R. Rodriguez" <mcgrof@kernel.org>
+> > > > 
+> > > > Often all is needed is these small helpers, instead of compiler.h
+> > > > or a full kprobes.h. This is important for asm helpers, in fact even
+> > > > some asm/kprobes.h make use of these helpers... instead just keep a
+> > > > generic asm file with helpers useful for asm code with the least amount
+> > > > of clutter as possible.
+> > > > 
+> > > > Likewise we need now to also address what to do about this file for both
+> > > > when architectures have CONFIG_HAVE_KPROBES, and when they do not. Then
+> > > > for when architectures have CONFIG_HAVE_KPROBES but have disabled
+> > > > CONFIG_KPROBES.
+> > > > 
+> > > > Right now most asm/kprobes.h do not have guards against CONFIG_KPROBES,
+> > > > this means most architecture code cannot include asm/kprobes.h safely.
+> > > > Correct this and add guards for architectures missing them. Additionally
+> > > > provide architectures that not have kprobes support with the default
+> > > > asm-generic solution. This lets us force asm/kprobes.h on the header
+> > > > include/linux/kprobes.h always, but most importantly we can now safely
+> > > > include just asm/kprobes.h on architecture code without bringing
+> > > > the full kitchen sink of header files.
+> > > > 
+> > > > Two architectures already provided a guard against CONFIG_KPROBES on
+> > > > its kprobes.h: sh, arch. The rest of the architectures needed gaurds
+> > > > added. We avoid including any not-needed headers on asm/kprobes.h
+> > > > unless kprobes have been enabled.
+> > > > 
+> > > > In a subsequent atomic change we can try now to remove compiler.h from
+> > > > include/linux/kprobes.h.
+> > > 
+> > > Hmm, this looks a bit overkill... I rather like move it into linux/table.h.
+> > 
+> > That's the thing, we can't reasonably expect every table to add an entry into
+> > table.h, this should be up to each user. Moving it to tables.h just prolongs
+> > what needs to be done. In this case the change is justifiable given kprobe
+> > annotations are required for some architectures early in architecture code, and
+> > including compiler.h on early architecture code blows up. There is no easy fix
+> > to this, and this this was *actually* the cleanest solution I could devise
+> > without much changes.
+> 
+> Aah, I misread your patch, it is asm-generic/kprobes.h, not asm/kprobes.h.
+> I think it is OK now.
+> 
+> Acked-by: Masami Hiramatsu <mhiramat@kernel.org>
 
-If the sysroot is poisoned and no sane sysroot is passed to the make
-call inside merge_config.sh it can fail silently and the continuing
-build process using the borked config which does not know can generate a
-kernel which will not boot (this is what happens in Yocto/OE). This was
-fixed in OE by passing --sysroot (contained in $TOOLCHAIN_OPTIONS) [2].
+Thanks! Can you also review: patch 15:
 
-Nevertheless, even though OE was fixed to pass a correct --sysroot and
-avoid the error, this make call shouldn't fail silently and lead to
-unbootable kernels. Make it fail loudly so that other build systems like
-OE can pick up the error from merge_config.sh and act accordingly.
+kprobes: port .kprobes.text to section range
 
-[1] http://git.openembedded.org/openembedded-core/commit/?id=04b725511a505c582a3abdf63d096967f0320779
-[2] http://git.yoctoproject.org/cgit/cgit.cgi/poky-contrib/commit/?h=zedd/kernel&id=87a9f321035428d9f4f8859ff99bb9acb70bd60c
-
-Signed-off-by: Ioan-Adrian Ratiu <adrian.ratiu@ni.com>
----
- scripts/kconfig/merge_config.sh | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/scripts/kconfig/merge_config.sh b/scripts/kconfig/merge_config.sh
-index 67d1314..5212f37 100755
---- a/scripts/kconfig/merge_config.sh
-+++ b/scripts/kconfig/merge_config.sh
-@@ -152,7 +152,10 @@ fi
- # alldefconfig: Fills in any missing symbols with Kconfig default
- # allnoconfig: Fills in any missing symbols with # CONFIG_* is not set
- make KCONFIG_ALLCONFIG=$TMP_FILE $OUTPUT_ARG $ALLTARGET
--
-+if [ "$?" -ne 0 ]; then
-+    echo "Make failed to fill missing config symbols. Exit." >&2
-+    exit 1
-+fi
- 
- # Check all specified config values took (might have missed-dependency issues)
- for CFG in $(sed -n "$SED_CONFIG_EXP" $TMP_FILE); do
--- 
-2.9.3
-
+  Luis
