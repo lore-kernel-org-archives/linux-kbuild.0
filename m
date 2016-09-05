@@ -1,43 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:41873 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:41890 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752686AbcIEGhg (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 5 Sep 2016 02:37:36 -0400
-Date: Mon, 5 Sep 2016 08:37:33 +0200
+        id S1754115AbcIEGi1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 5 Sep 2016 02:38:27 -0400
+Subject: Re: [PATCH] kbuild/builddeb: Fix !CONFIG_GCC_PLUGINS build
+References: <1472932730-1098-1-git-send-email-bp@alien8.de>
 From: Michal Marek <mmarek@suse.com>
-Subject: [GIT PULL] make deb-pkg fix
-Message-ID: <20160905063733.GA18263@sepie.suse.cz>
+Message-ID: <57CD12D5.8040305@suse.com>
+Date: Mon, 5 Sep 2016 08:38:13 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+In-Reply-To: <1472932730-1098-1-git-send-email-bp@alien8.de>
+Content-Type: text/plain; charset=iso-8859-2
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: keescook@chromium.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, bp@alien8.de
+To: Borislav Petkov <bp@alien8.de>
+Cc: LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, Emese Revfy <re.emese@gmail.com>
 
-Hi Linus,
+Dne 3.9.2016 v 21:58 Borislav Petkov napsal(a):
+> From: Borislav Petkov <bp@suse.de>
+> 
+> When building a bindeb-pkg target into an object output dir, i.e., O=, I
+> get:
+> 
+>   find: `scripts/gcc-plugins': No such file or directory
+>   /mnt/kernel/kernel/linux-2.6/scripts/package/Makefile:97: recipe for target 'bindeb-pkg' failed
+>   make[3]: *** [bindeb-pkg] Error 1
+>   /mnt/kernel/kernel/linux-2.6/Makefile:1310: recipe for target 'bindeb-pkg' failed
+>   ...
+> 
+> Check whether CONFIG_GCC_PLUGINS is enabled before collecting .so plugin
+> names.
 
-Please pull this fix from make deb-pkg. The bug got introduced in
-v4.8-rc1.
+A fix has already been submitted by Kees Cook. I took your patch as a
+reminder to submit my rc-fixes branch to Linus :).
 
 Thanks,
 Michal
 
-The following changes since commit 29b4817d4018df78086157ea3a55c1d9424a7cfc:
-
-  Linux 4.8-rc1 (2016-08-07 18:18:00 -0700)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git rc-fixes
-
-for you to fetch changes up to d3e2773c4ede5c62d2a92dae20e3a09b1ca55b6e:
-
-  builddeb: Skip gcc-plugins when not configured (2016-08-16 10:16:38 +0200)
-
-----------------------------------------------------------------
-Kees Cook (1):
-      builddeb: Skip gcc-plugins when not configured
-
- scripts/package/builddeb | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
