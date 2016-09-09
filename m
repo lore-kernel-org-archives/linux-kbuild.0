@@ -1,31 +1,35 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.skyhub.de ([78.46.96.112]:56629 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1754010AbcIEHxg (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 5 Sep 2016 03:53:36 -0400
-Date: Mon, 5 Sep 2016 09:45:24 +0200
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH] kbuild/builddeb: Fix !CONFIG_GCC_PLUGINS build
-Message-ID: <20160905074524.GA18856@pd.tnic>
-References: <1472932730-1098-1-git-send-email-bp@alien8.de>
- <57CD12D5.8040305@suse.com>
+Received: from mail-qk0-f176.google.com ([209.85.220.176]:33684 "EHLO
+        mail-qk0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750750AbcIIAX2 (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 8 Sep 2016 20:23:28 -0400
+Received: by mail-qk0-f176.google.com with SMTP id w204so62724278qka.0
+        for <linux-kbuild@vger.kernel.org>; Thu, 08 Sep 2016 17:23:27 -0700 (PDT)
+Date: Thu, 8 Sep 2016 20:23:24 -0400 (EDT)
+From: Nicolas Pitre <nicolas.pitre@linaro.org>
+Subject: Re: [PATCH 0/3 v3] kbuild changes, thin archives, --gc-sections
+In-Reply-To: <1472041761-14414-1-git-send-email-npiggin@gmail.com>
+Message-ID: <alpine.LFD.2.20.1609082016180.14769@knanqh.ubzr>
+References: <1472041761-14414-1-git-send-email-npiggin@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <57CD12D5.8040305@suse.com>
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>
-Cc: LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, Emese Revfy <re.emese@gmail.com>
+To: Nicholas Piggin <npiggin@gmail.com>
+Cc: Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org, Sam Ravnborg <sam@ravnborg.org>, Stephen Rothwell <sfr@canb.auug.org.au>, Arnd Bergmann <arnd@arndb.de>, Segher Boessenkool <segher@kernel.crashing.org>, Alan Modra <amodra@gmail.com>
 
-On Mon, Sep 05, 2016 at 08:38:13AM +0200, Michal Marek wrote:
-> A fix has already been submitted by Kees Cook. I took your patch as a
-> reminder to submit my rc-fixes branch to Linus :).
+On Wed, 24 Aug 2016, Nicholas Piggin wrote:
 
-So it wasn't for nothing after all :-)
+> Hi Michal,
+> 
+> I ended up deciding to do a v3, because I had several changes
+> accumulated, as described in patches.
 
--- 
-Regards/Gruss,
-    Boris.
+What is the prospect of those patches going upstream?
 
-ECO tip #101: Trim your mails when you reply.
+I ask because I didn't see them in the kbuild repo yet, nor in next for 
+that matter.
+
+
+Nicolas
