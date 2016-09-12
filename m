@@ -1,54 +1,119 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44862 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1758713AbcILMiB (ORCPT
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38086 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1758706AbcILMh7 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 12 Sep 2016 08:38:01 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id u8CCWTTe105799
-        for <linux-kbuild@vger.kernel.org>; Mon, 12 Sep 2016 08:37:55 -0400
-Received: from e06smtp11.uk.ibm.com (e06smtp11.uk.ibm.com [195.75.94.107])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 25cb2hsw27-1
+        Mon, 12 Sep 2016 08:37:59 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id u8CCWTYd013571
+        for <linux-kbuild@vger.kernel.org>; Mon, 12 Sep 2016 08:37:58 -0400
+Received: from e06smtp09.uk.ibm.com (e06smtp09.uk.ibm.com [195.75.94.105])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 25ccatyt9y-1
         (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-        for <linux-kbuild@vger.kernel.org>; Mon, 12 Sep 2016 08:37:55 -0400
+        for <linux-kbuild@vger.kernel.org>; Mon, 12 Sep 2016 08:37:58 -0400
 Received: from localhost
-        by e06smtp11.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e06smtp09.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <linux-kbuild@vger.kernel.org> from <borntraeger@de.ibm.com>;
-        Mon, 12 Sep 2016 13:37:53 +0100
+        Mon, 12 Sep 2016 13:37:56 +0100
 From: Christian Borntraeger <borntraeger@de.ibm.com>
-Subject: [PATCH 0/2] ubsan for s390
-Date: Mon, 12 Sep 2016 14:37:18 +0200
-Message-Id: <1473683840-8700-1-git-send-email-borntraeger@de.ibm.com>
+Subject: [PATCH 2/2] s390/ubsan: enable UBSAN for s390
+Date: Mon, 12 Sep 2016 14:37:20 +0200
+In-Reply-To: <1473683840-8700-1-git-send-email-borntraeger@de.ibm.com>
+References: <1473683840-8700-1-git-send-email-borntraeger@de.ibm.com>
+Message-Id: <1473683840-8700-3-git-send-email-borntraeger@de.ibm.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 Cc: Heiko Carstens <heiko.carstens@de.ibm.com>, Martin Schwidefsky <schwidefsky@de.ibm.com>, Michal Marek <mmarek@suse.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Yang Shi <yang.shi@linaro.org>, Andrew Morton <akpm@linux-foundation.org>, Christian Borntraeger <borntraeger@de.ibm.com>
 
-This patch set enables ubsan for s390.
+This enables UBSAN for s390. We have to disable the null sanitizer
+as s390 code does access memory via a null pointer (the prefix page).
 
-We have to fence some files and can then enable
-ARCH_HAS_UBSAN_SANITIZE_ALL. (patch 2)
+Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+---
+ arch/s390/Kconfig                  | 2 ++
+ arch/s390/boot/compressed/Makefile | 1 +
+ arch/s390/kernel/Makefile          | 3 +++
+ arch/s390/kernel/vdso32/Makefile   | 3 ++-
+ arch/s390/kernel/vdso64/Makefile   | 3 ++-
+ 5 files changed, 10 insertions(+), 2 deletions(-)
 
-We have to disable the null pointer sanitizer as
-we use the S390_lowcore macro to access several 
-memory location after address 0  (patch 1)
-
-If patch 1 is ok, is the s390 tree the right place
-also for patch1?
-
-Christian Borntraeger (2):
-  ubsan: allow to disable the null sanitizer
-  s390/ubsan: enable UBSAN for s390
-
- arch/s390/Kconfig                  |  2 ++
- arch/s390/boot/compressed/Makefile |  1 +
- arch/s390/kernel/Makefile          |  3 +++
- arch/s390/kernel/vdso32/Makefile   |  3 ++-
- arch/s390/kernel/vdso64/Makefile   |  3 ++-
- lib/Kconfig.ubsan                  | 11 +++++++++++
- scripts/Makefile.ubsan             |  5 ++++-
- 7 files changed, 25 insertions(+), 3 deletions(-)
-
+diff --git a/arch/s390/Kconfig b/arch/s390/Kconfig
+index e49ca114..5862a93 100644
+--- a/arch/s390/Kconfig
++++ b/arch/s390/Kconfig
+@@ -74,6 +74,7 @@ config S390
+ 	select ARCH_HAS_GCOV_PROFILE_ALL
+ 	select ARCH_HAS_KCOV
+ 	select ARCH_HAS_SG_CHAIN
++	select ARCH_HAS_UBSAN_SANITIZE_ALL
+ 	select ARCH_HAVE_NMI_SAFE_CMPXCHG
+ 	select ARCH_INLINE_READ_LOCK
+ 	select ARCH_INLINE_READ_LOCK_BH
+@@ -110,6 +111,7 @@ config S390
+ 	select ARCH_USE_CMPXCHG_LOCKREF
+ 	select ARCH_WANTS_DYNAMIC_TASK_STRUCT
+ 	select ARCH_WANTS_PROT_NUMA_PROT_NONE
++	select ARCH_WANTS_UBSAN_NO_NULL
+ 	select ARCH_WANT_IPC_PARSE_VERSION
+ 	select BUILDTIME_EXTABLE_SORT
+ 	select CLONE_BACKWARDS2
+diff --git a/arch/s390/boot/compressed/Makefile b/arch/s390/boot/compressed/Makefile
+index 13723c3..66f42bb 100644
+--- a/arch/s390/boot/compressed/Makefile
++++ b/arch/s390/boot/compressed/Makefile
+@@ -17,6 +17,7 @@ KBUILD_CFLAGS += $(call cc-option,-mpacked-stack)
+ KBUILD_CFLAGS += $(call cc-option,-ffreestanding)
+ 
+ GCOV_PROFILE := n
++UBSAN_SANITIZE := n
+ 
+ OBJECTS := $(addprefix $(objtree)/arch/s390/kernel/, head.o sclp.o ebcdic.o als.o)
+ OBJECTS += $(obj)/head.o $(obj)/misc.o $(obj)/piggy.o
+diff --git a/arch/s390/kernel/Makefile b/arch/s390/kernel/Makefile
+index 8bc18eb..30407e6 100644
+--- a/arch/s390/kernel/Makefile
++++ b/arch/s390/kernel/Makefile
+@@ -48,6 +48,9 @@ AFLAGS_head.o		+= -march=z900
+ endif
+ GCOV_PROFILE_sclp.o := n
+ GCOV_PROFILE_als.o := n
++UBSAN_SANITIZE_als.o := n
++UBSAN_SANITIZE_early.o := n
++UBSAN_SANITIZE_sclp.o := n
+ 
+ obj-y	:= traps.o time.o process.o base.o early.o setup.o idle.o vtime.o
+ obj-y	+= processor.o sys_s390.o ptrace.o signal.o cpcmd.o ebcdic.o nmi.o
+diff --git a/arch/s390/kernel/vdso32/Makefile b/arch/s390/kernel/vdso32/Makefile
+index 6814545..6cc9478 100644
+--- a/arch/s390/kernel/vdso32/Makefile
++++ b/arch/s390/kernel/vdso32/Makefile
+@@ -24,8 +24,9 @@ obj-y += vdso32_wrapper.o
+ extra-y += vdso32.lds
+ CPPFLAGS_vdso32.lds += -P -C -U$(ARCH)
+ 
+-# Disable gcov profiling for VDSO code
++# Disable gcov profiling and ubsan for VDSO code
+ GCOV_PROFILE := n
++UBSAN_SANITIZE := n
+ 
+ # Force dependency (incbin is bad)
+ $(obj)/vdso32_wrapper.o : $(obj)/vdso32.so
+diff --git a/arch/s390/kernel/vdso64/Makefile b/arch/s390/kernel/vdso64/Makefile
+index 0b0fd22..2d54c18 100644
+--- a/arch/s390/kernel/vdso64/Makefile
++++ b/arch/s390/kernel/vdso64/Makefile
+@@ -24,8 +24,9 @@ obj-y += vdso64_wrapper.o
+ extra-y += vdso64.lds
+ CPPFLAGS_vdso64.lds += -P -C -U$(ARCH)
+ 
+-# Disable gcov profiling for VDSO code
++# Disable gcov profiling and ubsan for VDSO code
+ GCOV_PROFILE := n
++UBSAN_SANITIZE := n
+ 
+ # Force dependency (incbin is bad)
+ $(obj)/vdso64_wrapper.o : $(obj)/vdso64.so
 -- 
 2.5.5
 
