@@ -1,59 +1,89 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([103.22.144.67]:48009 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1755261AbcIOGIn (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 15 Sep 2016 02:08:43 -0400
-Date: Thu, 15 Sep 2016 16:08:39 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-Subject: linux-next: build failure after merge of the kbuild tree
-Message-ID: <20160915160839.037798db@canb.auug.org.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Received: from mail-lf0-f42.google.com ([209.85.215.42]:33042 "EHLO
+        mail-lf0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751627AbcIOTZe (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 15 Sep 2016 15:25:34 -0400
+Received: by mail-lf0-f42.google.com with SMTP id h127so51330103lfh.0
+        for <linux-kbuild@vger.kernel.org>; Thu, 15 Sep 2016 12:25:34 -0700 (PDT)
+From: riku.voipio@linaro.org
+Subject: [PATCH v2] builddeb: Update a few outdated and hardcoded strings
+Date: Thu, 15 Sep 2016 22:25:28 +0300
+Message-Id: <1473967528-1844-1-git-send-email-riku.voipio@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.cz>
-Cc: linux-next@vger.kernel.org, linux-kernel@vger.kernel.org, Al Viro <viro@zeniv.linux.org.uk>, Nicholas Piggin <npiggin@gmail.com>, Michael Ellerman <mpe@ellerman.id.au>, linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org, mmarek@suse.cz
+Cc: Riku Voipio <riku.voipio@linaro.org>, Timo Sigurdsson <public_timo.s@silentcreek.de>
 
-Hi all,
+From: Riku Voipio <riku.voipio@linaro.org>
 
-After merging the dax-misc tree, today's linux-next build (powerpc
-ppc44x_defconfig) failed like this:
+The builddeb script has some hardcoded references to Linux version 2.6
+which is ancient. Drop Provides as the virtual packages provided are not
+useful anymore. Leave the Provides for linux-kernel-headers, as someone
+might still be referring to it.
 
-arch/powerpc/kernel/built-in.o: In function `__ksymtab_clear_pages':
-(___ksymtab+clear_pages+0x0): undefined reference to `clear_pages'
+While at it, updated copyright date and standards version.
 
-Caused by commit
-
-  9445aa1a3062 ("ppc: move exports to definitions")
-
-I applied the following fix patch:
-
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-Date: Thu, 15 Sep 2016 16:04:12 +1000
-Subject: [PATCH] ppc: there is no clear_pages to export
-
-Fixes: 9445aa1a3062 ("ppc: move exports to definitions")
-Signed-off-by: Stephen Rothwell <sfr@canb.auug.org.au>
+Cc: Timo Sigurdsson <public_timo.s@silentcreek.de>
+Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
 ---
- arch/powerpc/kernel/misc_32.S | 1 -
- 1 file changed, 1 deletion(-)
+ scripts/package/builddeb | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
 
-diff --git a/arch/powerpc/kernel/misc_32.S b/arch/powerpc/kernel/misc_32.S
-index ea26a9181586..f5156105c5f3 100644
---- a/arch/powerpc/kernel/misc_32.S
-+++ b/arch/powerpc/kernel/misc_32.S
-@@ -453,7 +453,6 @@ END_FTR_SECTION_IFSET(CPU_FTR_COHERENT_ICACHE)
- 	stw	r7,8(r3);	\
- 	stw	r8,12(r3);	\
- 	stwu	r9,16(r3)
--EXPORT_SYMBOL(clear_pages)
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index 8ea9fd2..a7f8b99 100755
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -265,7 +265,7 @@ This is a packacked upstream version of the Linux kernel.
+ The sources may be found at most Linux ftp sites, including:
+ ftp://ftp.kernel.org/pub/linux/kernel
  
- _GLOBAL(copy_page)
- 	addi	r3,r3,-4
+-Copyright: 1991 - 2015 Linus Torvalds and others.
++Copyright: 1991 - 2016 Linus Torvalds and others.
+ 
+ The git repository for mainline kernel development is at:
+ git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+@@ -288,7 +288,7 @@ Section: kernel
+ Priority: optional
+ Maintainer: $maintainer
+ Build-Depends: $build_depends
+-Standards-Version: 3.8.4
++Standards-Version: 3.9.8
+ Homepage: http://www.kernel.org/
+ EOF
+ 
+@@ -296,7 +296,6 @@ if [ "$ARCH" = "um" ]; then
+ 	cat <<EOF >> debian/control
+ 
+ Package: $packagename
+-Provides: linux-image, linux-image-2.6, linux-modules-$version
+ Architecture: any
+ Description: User Mode Linux kernel, version $version
+  User-mode Linux is a port of the Linux kernel to its own system call
+@@ -313,7 +312,6 @@ else
+ 	cat <<EOF >> debian/control
+ 
+ Package: $packagename
+-Provides: linux-image, linux-image-2.6, linux-modules-$version
+ Suggests: $fwpackagename
+ Architecture: any
+ Description: Linux kernel, version $version
+@@ -346,7 +344,6 @@ rm -f "$objtree/debian/hdrsrcfiles" "$objtree/debian/hdrobjfiles"
+ cat <<EOF >> debian/control
+ 
+ Package: $kernel_headers_packagename
+-Provides: linux-headers, linux-headers-2.6
+ Architecture: any
+ Description: Linux kernel headers for $KERNELRELEASE on \${kernel:debarch}
+  This package provides kernel header files for $KERNELRELEASE on \${kernel:debarch}
+@@ -404,7 +401,6 @@ if [ -n "$BUILD_DEBUG" ] ; then
+ 
+ Package: $dbg_packagename
+ Section: debug
+-Provides: linux-debug, linux-debug-$version
+ Architecture: any
+ Description: Linux kernel debugging symbols for $version
+  This package will come in handy if you need to debug the kernel. It provides
 -- 
-2.8.1
+2.1.4
 
--- 
-Cheers,
-Stephen Rothwell
