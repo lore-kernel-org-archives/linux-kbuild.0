@@ -1,55 +1,71 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:45914 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751465AbcJAUrH (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 1 Oct 2016 16:47:07 -0400
-Subject: Re: [PATCH 0/2] Moving runnable code from Documentation (last 2
- patches)
-References: <cover.1474912582.git.shuahkh@osg.samsung.com>
- <0f5557aa-23ad-c37c-6d97-13789c0b5726@osg.samsung.com>
- <20161001011044.70aefa33@lwn.net>
-From: Michal Marek <mmarek@suse.com>
-Message-ID: <57F020B5.4060704@suse.com>
-Date: Sat, 1 Oct 2016 22:46:45 +0200
-MIME-Version: 1.0
-In-Reply-To: <20161001011044.70aefa33@lwn.net>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Received: from resqmta-po-12v.sys.comcast.net ([96.114.154.171]:54215 "EHLO
+        resqmta-po-12v.sys.comcast.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S936005AbcJFXt5 (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 6 Oct 2016 19:49:57 -0400
+From: Shuah Khan <shuahkh@osg.samsung.com>
+Subject: [PATCH v2 0/2] Moving runnable code from Documentation (last 2 patches)
+Date: Thu,  6 Oct 2016 17:48:50 -0600
+Message-Id: <cover.1475792538.git.shuahkh@osg.samsung.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuahkh@osg.samsung.com>
-Cc: akpm@linux-foundation.org, keescook@chromium.org, dan.j.williams@intel.com, mingo@kernel.org, paulmck@linux.vnet.ibm.com, jpoimboe@redhat.com, tj@kernel.org, aryabinin@virtuozzo.com, nikolay@cumulusnetworks.com, dvyukov@google.com, rostedt@goodmis.org, olof@lixom.net, arnd@arndb.de, hans.verkuil@cisco.com, nab@linux-iscsi.org, mchehab@kernel.org, broonie@kernel.org, tglx@linutronix.de, ecree@solarflare.com, davem@davemloft.net, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-spi@vger.kernel.org
+To: corbet@lwn.net, broonie@kernel.org, tglx@linutronix.de, mmarek@suse.com, mchehab@kernel.org, davem@davemloft.net, ecree@solarflare.com, arnd@arndb.de, j.anaszewski@samsung.com, akpm@linux-foundation.org, keescook@chromium.org, mingo@kernel.org, paulmck@linux.vnet.ibm.com, dan.j.williams@intel.com, aryabinin@virtuozzo.com, tj@kernel.org, jpoimboe@redhat.com, nikolay@cumulusnetworks.com, dvyukov@google.com, olof@lixom.net, nab@linux-iscsi.org, rostedt@goodmis.org, hans.verkuil@cisco.com, valentinrothberg@gmail.com, paul.gortmaker@windriver.com
+Cc: Shuah Khan <shuahkh@osg.samsung.com>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-spi@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-media@vger.kernel.org
 
-Dne 1.10.2016 v 09:10 Jonathan Corbet napsal(a):
-> On Fri, 30 Sep 2016 07:57:51 -0600
-> Shuah Khan <shuahkh@osg.samsung.com> wrote:
-> 
->>> This patch series contains the last 2 patches to complete moving runnable
->>> code from Documentation to selftests, samples, and tools.
->>>
->>> The first patch moves blackfin gptimers-example to samples and removes
->>> CONFIG_BUILD_DOCSRC.
->>>
->>> The second one updates 00-INDEX files under Documentation to reflect the
->>> move of runnable code from Documentation.
->>>
->>> Shuah Khan (2):
->>>   samples: move blackfin gptimers-example from Documentation
->>>   Doc: update 00-INDEX files to reflect the runnable code move
->>>   
->>
->> Hi Jon and Michal,
->>
->> Do these patches look good to you? I can get these into 4.9-rc1
->> with your Ack.
-> 
-> Seems good to me.
-> 
-> Acked-by: Jonathan Corbet <corbet@lwn.net>
+This patch series contains the last 2 patches to complete moving runnable
+code from Documentation to selftests, samples, and tools.
 
-Likewise,
+The first patch moves blackfin gptimers-example to samples, removes
+BUILD_DOCSRC and updates BUILD_DOCSRC dependencies.
 
-Acked-by: Michal Marek <mmarek@suse.com>
+The second one updates 00-INDEX files under Documentation to reflect the
+move of runnable code from Documentation.
 
-Michal
+Patch 0001 Changes since v1:
+- Fixed make htmldocs and make distclean failures. Documentation/Makefile
+  is not deleted to avoid these failures. Makefile.sphinx could be renamed
+  to be the Documentation Makefile in a future patch.
+- Fixed samples/Kconfig error in v1 that preserved the 'CONFIG_'
+  prefix (i.e., depends on CONFIG_BLACKFIN && CONFIG_BFIN_GPTIMERS...),
+  rendering SAMPLE_BLACKFIN_GPTIMERS to be dead.
+- Updated rivers/media/v4l2-core/Kconfig (VIDEO_PCI_SKELETON) dependency
+  on BUILD_DOCSRC.
+- Added Acks from Jon Corbet, Michal Marek, and reviewed by from Kees Cook
+- Added Reported-by from Valentin Rothberg, and Paul Gortmaker.
+
+Patch 0002 Changes since v1:
+- Updated Documentation/timers/00-INDEX to remove hpet_example.c. I missed
+  this change in v1.
+- Added Acks from Jon Corbet, Michal Marek, and reviewed by from Kees Cook
+
+Shuah Khan (2):
+  samples: move blackfin gptimers-example from Documentation
+  Doc: update 00-INDEX files to reflect the runnable code move
+
+ Documentation/00-INDEX                    |  3 +-
+ Documentation/Makefile                    |  2 +-
+ Documentation/arm/00-INDEX                |  2 -
+ Documentation/blackfin/00-INDEX           |  4 --
+ Documentation/blackfin/Makefile           |  5 --
+ Documentation/blackfin/gptimers-example.c | 91 -------------------------------
+ Documentation/filesystems/00-INDEX        |  2 -
+ Documentation/networking/00-INDEX         |  2 -
+ Documentation/spi/00-INDEX                |  2 -
+ Documentation/timers/00-INDEX             |  4 --
+ Makefile                                  |  3 -
+ drivers/media/v4l2-core/Kconfig           |  2 +-
+ lib/Kconfig.debug                         |  9 ---
+ samples/Kconfig                           |  6 ++
+ samples/Makefile                          |  2 +-
+ samples/blackfin/Makefile                 |  1 +
+ samples/blackfin/gptimers-example.c       | 91 +++++++++++++++++++++++++++++++
+ 17 files changed, 103 insertions(+), 128 deletions(-)
+ delete mode 100644 Documentation/blackfin/Makefile
+ delete mode 100644 Documentation/blackfin/gptimers-example.c
+ create mode 100644 samples/blackfin/Makefile
+ create mode 100644 samples/blackfin/gptimers-example.c
+
+-- 
+2.7.4
 
