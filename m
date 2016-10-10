@@ -1,120 +1,115 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from resqmta-po-05v.sys.comcast.net ([96.114.154.164]:43524 "EHLO
-        resqmta-po-05v.sys.comcast.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S936217AbcJFXt6 (ORCPT
+Received: from mout.kundenserver.de ([212.227.126.133]:57031 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751917AbcJJMpO (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 6 Oct 2016 19:49:58 -0400
-From: Shuah Khan <shuahkh@osg.samsung.com>
-Subject: [PATCH v2 2/2] Doc: update 00-INDEX files to reflect the runnable code move
-Date: Thu,  6 Oct 2016 17:48:52 -0600
-Message-Id: <1f6bf489083cdf1173ab165efa921878f6038d8e.1475792539.git.shuahkh@osg.samsung.com>
-In-Reply-To: <cover.1475792538.git.shuahkh@osg.samsung.com>
-References: <cover.1475792538.git.shuahkh@osg.samsung.com>
-In-Reply-To: <cover.1475792538.git.shuahkh@osg.samsung.com>
-References: <cover.1475792538.git.shuahkh@osg.samsung.com>
+        Mon, 10 Oct 2016 08:45:14 -0400
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH] kbuild: honor '-s' option for tools/*
+Date: Mon, 10 Oct 2016 14:36:37 +0200
+Message-Id: <20161010123812.1425903-1-arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: corbet@lwn.net, broonie@kernel.org, tglx@linutronix.de, mmarek@suse.com, mchehab@kernel.org, davem@davemloft.net, ecree@solarflare.com, arnd@arndb.de, j.anaszewski@samsung.com, akpm@linux-foundation.org, keescook@chromium.org, mingo@kernel.org, paulmck@linux.vnet.ibm.com, dan.j.williams@intel.com, aryabinin@virtuozzo.com, tj@kernel.org, jpoimboe@redhat.com, nikolay@cumulusnetworks.com, dvyukov@google.com, olof@lixom.net, nab@linux-iscsi.org, rostedt@goodmis.org, hans.verkuil@cisco.com, valentinrothberg@gmail.com, paul.gortmaker@windriver.com
-Cc: Shuah Khan <shuahkh@osg.samsung.com>, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-spi@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-media@vger.kernel.org
+To: Michal Marek <mmarek@suse.com>
+Cc: Josh Poimboeuf <jpoimboe@redhat.com>, Arnd Bergmann <arnd@arndb.de>, Arnaldo Carvalho de Melo <acme@redhat.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Jiri Olsa <jolsa@redhat.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Update 00-INDEX files with the current file list to reflect the runnable
-code move.
+When building with 'make -s' on x86, we always see the output for descending into
+the tools/objtool directory when CONFIG_STACK_VALIDATION is set, but we should not
+see any output. There are three related problems causing this:
 
-Acked-by: Michal Marek <mmarek@suse.com>
-Acked-by: Jonathan Corbet <corbet@lwn.net>
-Reviewed-by: Kees Cook <keescook@chromium.org>
-Signed-off-by: Shuah Khan <shuahkh@osg.samsung.com>
+* we override the MAKEFLAGS variable when entering tools, keeping only
+  the -j and --j% options around when we should also propagate the -s
+  flag (for some make versions) as well as the 's' character in the first
+  word of the variable.
+
+* The build system in tools/build/Makefile.build that is used for some
+  parts of the build process of objtool implements the same
+  logic as the normal kbuild, using 'quiet_$(cmd)' to indicate the
+  string that should be printed, but lacks the logic to skip that
+  when building with 'make -s'.
+
+* The /other/ build system in tools/scripts/Makefile.include that is also
+  used for building objtool checks for the 's' flag in the beginning of
+  the first word of Makeflags, which works for GNU make 3.x, but not for
+  GNU make 4.x, which has it in the end of that word.
+
+This changes all three of the above to behave just like Kbuild does,
+and print no output with 'make -s' regardless of the version of that
+tool, but otherwise behaves as before. In case of
+tools/scripts/Makefile.include, I decided to use an identical
+conditional block to set the $(quiet) variable for consistency,
+even though it is not used in the same way.
+
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- Documentation/00-INDEX             | 3 ++-
- Documentation/arm/00-INDEX         | 2 --
- Documentation/filesystems/00-INDEX | 2 --
- Documentation/networking/00-INDEX  | 2 --
- Documentation/spi/00-INDEX         | 2 --
- Documentation/timers/00-INDEX      | 4 ----
- 6 files changed, 2 insertions(+), 13 deletions(-)
+ Makefile                       |  5 +++--
+ tools/build/Makefile.build     | 10 ++++++++++
+ tools/scripts/Makefile.include | 12 +++++++++++-
+ 3 files changed, 24 insertions(+), 3 deletions(-)
 
-diff --git a/Documentation/00-INDEX b/Documentation/00-INDEX
-index cb9a6c6..3acc4f1 100644
---- a/Documentation/00-INDEX
-+++ b/Documentation/00-INDEX
-@@ -46,7 +46,8 @@ IRQ.txt
- Intel-IOMMU.txt
- 	- basic info on the Intel IOMMU virtualization support.
- Makefile
--	- some files in Documentation dir are actually sample code to build
-+	- This file does nothing. Removing it breaks make htmldocs and
-+	  make distclean.
- ManagementStyle
- 	- how to (attempt to) manage kernel hackers.
- RCU/
-diff --git a/Documentation/arm/00-INDEX b/Documentation/arm/00-INDEX
-index dea011c..b6e69fd 100644
---- a/Documentation/arm/00-INDEX
-+++ b/Documentation/arm/00-INDEX
-@@ -8,8 +8,6 @@ Interrupts
- 	- ARM Interrupt subsystem documentation
- IXP4xx
- 	- Intel IXP4xx Network processor.
--Makefile
--	- Build sourcefiles as part of the Documentation-build for arm
- Netwinder
- 	- Netwinder specific documentation
- Porting
-diff --git a/Documentation/filesystems/00-INDEX b/Documentation/filesystems/00-INDEX
-index 9922939..f66e748 100644
---- a/Documentation/filesystems/00-INDEX
-+++ b/Documentation/filesystems/00-INDEX
-@@ -2,8 +2,6 @@
- 	- this file (info on some of the filesystems supported by linux).
- Locking
- 	- info on locking rules as they pertain to Linux VFS.
--Makefile
--	- Makefile for building the filsystems-part of DocBook.
- 9p.txt
- 	- 9p (v9fs) is an implementation of the Plan 9 remote fs protocol.
- adfs.txt
-diff --git a/Documentation/networking/00-INDEX b/Documentation/networking/00-INDEX
-index 415154a..98f3d4b 100644
---- a/Documentation/networking/00-INDEX
-+++ b/Documentation/networking/00-INDEX
-@@ -10,8 +10,6 @@ LICENSE.qlge
- 	- GPLv2 for QLogic Linux qlge NIC Driver
- LICENSE.qlcnic
- 	- GPLv2 for QLogic Linux qlcnic NIC Driver
--Makefile
--	- Makefile for docsrc.
- PLIP.txt
- 	- PLIP: The Parallel Line Internet Protocol device driver
- README.ipw2100
-diff --git a/Documentation/spi/00-INDEX b/Documentation/spi/00-INDEX
-index 4644bf0..8e4bb17 100644
---- a/Documentation/spi/00-INDEX
-+++ b/Documentation/spi/00-INDEX
-@@ -1,7 +1,5 @@
- 00-INDEX
- 	- this file.
--Makefile
--	- Makefile for the example sourcefiles.
- butterfly
- 	- AVR Butterfly SPI driver overview and pin configuration.
- ep93xx_spi
-diff --git a/Documentation/timers/00-INDEX b/Documentation/timers/00-INDEX
-index ee212a2..3be05fe 100644
---- a/Documentation/timers/00-INDEX
-+++ b/Documentation/timers/00-INDEX
-@@ -4,12 +4,8 @@ highres.txt
- 	- High resolution timers and dynamic ticks design notes
- hpet.txt
- 	- High Precision Event Timer Driver for Linux
--hpet_example.c
--	- sample hpet timer test program
- hrtimers.txt
- 	- subsystem for high-resolution kernel timers
--Makefile
--	- Build and link hpet_example
- NO_HZ.txt
- 	- Summary of the different methods for the scheduler clock-interrupts management.
- timekeeping.txt
+diff --git a/Makefile b/Makefile
+index d5289117360b..3638bb27ba2c 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1612,11 +1612,12 @@ image_name:
+ # Clear a bunch of variables before executing the submake
+ tools/: FORCE
+ 	$(Q)mkdir -p $(objtree)/tools
+-	$(Q)$(MAKE) LDFLAGS= MAKEFLAGS="$(filter --j% -j,$(MAKEFLAGS))" O=$(shell cd $(objtree) && /bin/pwd) subdir=tools -C $(src)/tools/
++	echo MAKEFLAGS=\""$(MAKEFLAGS)"\"
++	$(Q)$(MAKE) LDFLAGS= MAKEFLAGS="$(findstring s,$(firstword -$(MAKEFLAGS))) $(filter --j% -j -s,$(MAKEFLAGS))" O=$(shell cd $(objtree) && /bin/pwd) subdir=tools -C $(src)/tools/
+ 
+ tools/%: FORCE
+ 	$(Q)mkdir -p $(objtree)/tools
+-	$(Q)$(MAKE) LDFLAGS= MAKEFLAGS="$(filter --j% -j,$(MAKEFLAGS))" O=$(shell cd $(objtree) && /bin/pwd) subdir=tools -C $(src)/tools/ $*
++	$(Q)$(MAKE) LDFLAGS= MAKEFLAGS="$(findstring s,$(firstword -$(MAKEFLAGS))) $(filter --j% -j -s,$(MAKEFLAGS))" O=$(shell cd $(objtree) && /bin/pwd) subdir=tools -C $(src)/tools/ $*
+ 
+ # Single targets
+ # ---------------------------------------------------------------------------
+diff --git a/tools/build/Makefile.build b/tools/build/Makefile.build
+index 99c0ccd2f176..e279a71c650d 100644
+--- a/tools/build/Makefile.build
++++ b/tools/build/Makefile.build
+@@ -19,6 +19,16 @@ else
+   Q=@
+ endif
+ 
++ifneq ($(filter 4.%,$(MAKE_VERSION)),)	# make-4
++ifneq ($(filter %s ,$(firstword x$(MAKEFLAGS))),)
++  quiet=silent_
++endif
++else					# make-3.8x
++ifneq ($(filter s% -s%,$(MAKEFLAGS)),)
++  quiet=silent_
++endif
++endif
++
+ build-dir := $(srctree)/tools/build
+ 
+ # Define $(fixdep) for dep-cmd function
+diff --git a/tools/scripts/Makefile.include b/tools/scripts/Makefile.include
+index 8abbef164b4e..aa6c3c9261e4 100644
+--- a/tools/scripts/Makefile.include
++++ b/tools/scripts/Makefile.include
+@@ -58,7 +58,17 @@ descend = \
+ QUIET_SUBDIR0  = +$(MAKE) $(COMMAND_O) -C # space to separate -C and subdir
+ QUIET_SUBDIR1  =
+ 
+-ifneq ($(findstring $(MAKEFLAGS),s),s)
++ifneq ($(filter 4.%,$(MAKE_VERSION)),) # make-4
++ifneq ($(filter %s ,$(firstword x$(MAKEFLAGS))),)
++  quiet=silent_
++endif
++else                                   # make-3.8x
++ifneq ($(filter s% -s%,$(MAKEFLAGS)),)
++  quiet=silent_
++endif
++endif
++
++ifneq ($(quiet),silent_)
+   ifneq ($(V),1)
+ 	QUIET_CC       = @echo '  CC       '$@;
+ 	QUIET_CC_FPIC  = @echo '  CC FPIC  '$@;
 -- 
-2.7.4
+2.9.0
 
