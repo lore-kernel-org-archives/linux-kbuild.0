@@ -1,192 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf0-f195.google.com ([209.85.192.195]:34936 "EHLO
+Received: from mail-pf0-f195.google.com ([209.85.192.195]:35522 "EHLO
         mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754005AbcJQD5U (ORCPT
+        with ESMTP id S1750752AbcJQGNA (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 16 Oct 2016 23:57:20 -0400
-Date: Mon, 17 Oct 2016 14:57:09 +1100
+        Mon, 17 Oct 2016 02:13:00 -0400
+Received: by mail-pf0-f195.google.com with SMTP id s8so12079999pfj.2
+        for <linux-kbuild@vger.kernel.org>; Sun, 16 Oct 2016 23:13:00 -0700 (PDT)
 From: Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [GIT PULL] kbuild changes for v4.9-rc1
-Message-ID: <20161017145709.2882f33f@roar.ozlabs.ibm.com>
-In-Reply-To: <20161016002205.GA9686@vader>
-References: <20161014201246.GA28782@sepie.suse.cz>
-        <20161016002205.GA9686@vader>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Subject: [PATCH] genksyms: handle va_list type
+Date: Mon, 17 Oct 2016 17:12:48 +1100
+Message-Id: <20161017061248.22722-1-npiggin@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Omar Sandoval <osandov@osandov.com>
-Cc: Michal Marek <mmarek@suse.com>, Linus Torvalds <torvalds@linux-foundation.org>, adobriyan@gmail.com, sfr@canb.auug.org.au, viro@zeniv.linux.org.uk, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Michal Marek <mmarek@suse.com>
+Cc: Nicholas Piggin <npiggin@gmail.com>, linux-kbuild@vger.kernel.org
 
-On Sat, 15 Oct 2016 17:22:05 -0700
-Omar Sandoval <osandov@osandov.com> wrote:
+genksyms currently does not handle va_list (treated as syntax
+error). Add the __builtin_va_list keyword as a type.
 
-> On Fri, Oct 14, 2016 at 10:12:46PM +0200, Michal Marek wrote:
-> > Hi Linus,
-> > 
-> > please pull these kbuild changes for v4.9-rc1:
-> > 
-> > - EXPORT_SYMBOL for asm source by Al Viro. This does bring a regression,
-> >   because genksyms no longer generates checksums for these symbols
-> >   (CONFIG_MODVERSIONS). Nick Piggin is working on a patch to fix this.
-> >   Plus, we are talking about functions like strcpy(), which rarely
-> >   change prototypes.  
-> 
-> So this has broken all module loading for me. I get the following dmesg
-> spew:
-> 
-> ...
-> [    4.586914] scsi_mod: no symbol version for memset
-> [    4.587920] scsi_mod: Unknown symbol memset (err -22)
-> [    4.588443] scsi_mod: no symbol version for ___preempt_schedule
-> [    4.589026] scsi_mod: Unknown symbol ___preempt_schedule (err -22)
-> ...
-> 
-> Reverting 784d5699eddc ("x86: move exports to actual definitions") fixes
-> it for me. This is with GCC 6.2.1, binutils 2.27, attached config.
-> 
-
-Thanks for the report. Could you try this patch and see if it helps?
-
-
-Allow architectures to create asm/asm-prototypes.h file that
-provides C prototypes for exported asm functions, which enables
-proper CRC versions to be generated for them.
-
-It's done by creating a trivial C program that includes that file
-and the EXPORT_SYMBOL()s from the .S file, and preprocesses that
-then sends the result to genksyms.
+Note: this patch does not regenerate generated parser files.
 
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- scripts/Makefile.build | 71 +++++++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 65 insertions(+), 6 deletions(-)
+ scripts/genksyms/keywords.gperf | 1 +
+ scripts/genksyms/parse.y        | 2 ++
+ 2 files changed, 3 insertions(+)
 
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index de46ab0..edcf876 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -159,7 +159,8 @@ cmd_cpp_i_c       = $(CPP) $(c_flags) -o $@ $<
- $(obj)/%.i: $(src)/%.c FORCE
- 	$(call if_changed_dep,cpp_i_c)
+diff --git a/scripts/genksyms/keywords.gperf b/scripts/genksyms/keywords.gperf
+index a9096d9..bd4c4b2 100644
+--- a/scripts/genksyms/keywords.gperf
++++ b/scripts/genksyms/keywords.gperf
+@@ -27,6 +27,7 @@ __typeof, TYPEOF_KEYW
+ __typeof__, TYPEOF_KEYW
+ __volatile, VOLATILE_KEYW
+ __volatile__, VOLATILE_KEYW
++__builtin_va_list, VA_LIST_KEYW
+ # According to rth, c99 defines _Bool, __restrict, __restrict__, restrict.  KAO
+ _Bool, BOOL_KEYW
+ _restrict, RESTRICT_KEYW
+diff --git a/scripts/genksyms/parse.y b/scripts/genksyms/parse.y
+index 723ab30..4fba255 100644
+--- a/scripts/genksyms/parse.y
++++ b/scripts/genksyms/parse.y
+@@ -98,6 +98,7 @@ static void record_compound(struct string_list **keyw,
+ %token VOID_KEYW
+ %token VOLATILE_KEYW
+ %token TYPEOF_KEYW
++%token VA_LIST_KEYW
  
--cmd_gensymtypes =                                                           \
-+# These mirror gensymtypes_S and co below, keep them in synch.
-+cmd_gensymtypes_c =                                                         \
-     $(CPP) -D__GENKSYMS__ $(c_flags) $< |                                   \
-     $(GENKSYMS) $(if $(1), -T $(2))                                         \
-      $(patsubst y,-s _,$(CONFIG_HAVE_UNDERSCORE_SYMBOL_PREFIX))             \
-@@ -169,7 +170,7 @@ cmd_gensymtypes =                                                           \
- quiet_cmd_cc_symtypes_c = SYM $(quiet_modtag) $@
- cmd_cc_symtypes_c =                                                         \
-     set -e;                                                                 \
--    $(call cmd_gensymtypes,true,$@) >/dev/null;                             \
-+    $(call cmd_gensymtypes_c,true,$@) >/dev/null;                           \
-     test -s $@ || rm -f $@
+ %token EXPORT_SYMBOL_KEYW
  
- $(obj)/%.symtypes : $(src)/%.c FORCE
-@@ -198,9 +199,10 @@ else
- #   the actual value of the checksum generated by genksyms
+@@ -261,6 +262,7 @@ simple_type_specifier:
+ 	| DOUBLE_KEYW
+ 	| VOID_KEYW
+ 	| BOOL_KEYW
++	| VA_LIST_KEYW
+ 	| TYPE			{ (*$1)->tag = SYM_TYPEDEF; $$ = $1; }
+ 	;
  
- cmd_cc_o_c = $(CC) $(c_flags) -c -o $(@D)/.tmp_$(@F) $<
--cmd_modversions =								\
-+
-+cmd_modversions_c =								\
- 	if $(OBJDUMP) -h $(@D)/.tmp_$(@F) | grep -q __ksymtab; then		\
--		$(call cmd_gensymtypes,$(KBUILD_SYMTYPES),$(@:.o=.symtypes))	\
-+		$(call cmd_gensymtypes_c,$(KBUILD_SYMTYPES),$(@:.o=.symtypes))	\
- 		    > $(@D)/.tmp_$(@F:.o=.ver);					\
- 										\
- 		$(LD) $(LDFLAGS) -r -o $@ $(@D)/.tmp_$(@F) 			\
-@@ -268,13 +270,14 @@ endif # CONFIG_STACK_VALIDATION
- define rule_cc_o_c
- 	$(call echo-cmd,checksrc) $(cmd_checksrc)			  \
- 	$(call cmd_and_fixdep,cc_o_c)					  \
--	$(cmd_modversions)						  \
-+	$(cmd_modversions_c)						  \
- 	$(cmd_objtool)						          \
- 	$(call echo-cmd,record_mcount) $(cmd_record_mcount)
- endef
- 
- define rule_as_o_S
- 	$(call cmd_and_fixdep,as_o_S)					  \
-+	$(cmd_modversions_S)						  \
- 	$(cmd_objtool)
- endef
- 
-@@ -314,6 +317,32 @@ modkern_aflags := $(KBUILD_AFLAGS_KERNEL) $(AFLAGS_KERNEL)
- $(real-objs-m)      : modkern_aflags := $(KBUILD_AFLAGS_MODULE) $(AFLAGS_MODULE)
- $(real-objs-m:.o=.s): modkern_aflags := $(KBUILD_AFLAGS_MODULE) $(AFLAGS_MODULE)
- 
-+# .S file exports must have their C prototypes defined in asm/asm-prototypes.h
-+# or a file that it includes, in order to get versioned symbols. We build a
-+# dummy C file that includes asm-prototypes and the EXPORT_SYMBOL lines from
-+# the .S file (with trailing ';'), and run genksyms on that, to extract vers.
-+#
-+# These mirror gensymtypes_c and co above, keep them in synch.
-+cmd_gensymtypes_S =                                                         \
-+    (echo "\#include <linux/kernel.h>" ;                                    \
-+     echo "\#include <asm/asm-prototypes.h>" ;                              \
-+     grep EXPORT_SYMBOL $< | sed 's/$$/;/' ) |                              \
-+    $(CPP) -D__GENKSYMS__ $(c_flags) -xc - |                                \
-+    $(GENKSYMS) $(if $(1), -T $(2))                                         \
-+     $(patsubst y,-s _,$(CONFIG_HAVE_UNDERSCORE_SYMBOL_PREFIX))             \
-+     $(if $(KBUILD_PRESERVE),-p)                                            \
-+     -r $(firstword $(wildcard $(2:.symtypes=.symref) /dev/null))
-+
-+quiet_cmd_cc_symtypes_S = SYM $(quiet_modtag) $@
-+cmd_cc_symtypes_S =                                                         \
-+    set -e;                                                                 \
-+    $(call cmd_gensymtypes_S,true,$@) >/dev/null;                           \
-+    test -s $@ || rm -f $@
-+
-+$(obj)/%.symtypes : $(src)/%.S FORCE
-+	$(call cmd,cc_symtypes_S)
-+
-+
- quiet_cmd_cpp_s_S = CPP $(quiet_modtag) $@
- cmd_cpp_s_S       = $(CPP) $(a_flags) -o $@ $<
- 
-@@ -321,7 +350,37 @@ $(obj)/%.s: $(src)/%.S FORCE
- 	$(call if_changed_dep,cpp_s_S)
- 
- quiet_cmd_as_o_S = AS $(quiet_modtag)  $@
--cmd_as_o_S       = $(CC) $(a_flags) -c -o $@ $<
-+
-+ifndef CONFIG_MODVERSIONS
-+cmd_as_o_S = $(CC) $(a_flags) -c -o $@ $<
-+
-+else
-+
-+ASM_PROTOTYPES := $(wildcard $(srctree)/arch/$(SRCARCH)/include/asm/asm-prototypes.h)
-+
-+ifeq ($(ASM_PROTOTYPES),)
-+cmd_as_o_S = $(CC) $(a_flags) -c -o $@ $<
-+
-+else
-+
-+# versioning matches the C process described above, with difference that
-+# we parse asm-prototypes.h C header to get function definitions.
-+
-+cmd_as_o_S = $(CC) $(a_flags) -c -o $(@D)/.tmp_$(@F) $<
-+
-+cmd_modversions_S =								\
-+	if $(OBJDUMP) -h $(@D)/.tmp_$(@F) | grep -q __ksymtab; then		\
-+		$(call cmd_gensymtypes_S,$(KBUILD_SYMTYPES),$(@:.o=.symtypes))	\
-+		    > $(@D)/.tmp_$(@F:.o=.ver);					\
-+										\
-+		$(LD) $(LDFLAGS) -r -o $@ $(@D)/.tmp_$(@F) 			\
-+			-T $(@D)/.tmp_$(@F:.o=.ver);				\
-+		rm -f $(@D)/.tmp_$(@F) $(@D)/.tmp_$(@F:.o=.ver);		\
-+	else									\
-+		mv -f $(@D)/.tmp_$(@F) $@;					\
-+	fi;
-+endif
-+endif
- 
- $(obj)/%.o: $(src)/%.S $(objtool_obj) FORCE
- 	$(call if_changed_rule,as_o_S)
 -- 
 2.9.3
 
