@@ -1,58 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-io0-f173.google.com ([209.85.223.173]:35795 "EHLO
-        mail-io0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753537AbcJRQui (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 18 Oct 2016 12:50:38 -0400
-MIME-Version: 1.0
-In-Reply-To: <1238ba8e-a297-6de5-2e6a-50e6e72e77d3@users.sourceforge.net>
-References: <4f2251fc-94ee-41d3-cc03-a39cee5a084c@users.sourceforge.net>
- <CA+r1ZhjmaXi+Nf8vNsMwzfuSkYOByC6D_F=GkehneqfnSO7iCQ@mail.gmail.com> <1238ba8e-a297-6de5-2e6a-50e6e72e77d3@users.sourceforge.net>
-From: Jim Davis <jim.epost@gmail.com>
-Date: Tue, 18 Oct 2016 09:50:36 -0700
-Message-ID: <CA+r1ZhhqEBvV0ivz=MvaHhRquhFS2mxddJ-GOx81ZeSerKsD3g@mail.gmail.com>
+Received: from mout.web.de ([212.227.17.11]:59276 "EHLO mout.web.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752675AbcJRR0I (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 18 Oct 2016 13:26:08 -0400
 Subject: Re: Difficulties around "fixdep" for the usage of a kernel build
  output directory
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+References: <4f2251fc-94ee-41d3-cc03-a39cee5a084c@users.sourceforge.net>
+ <CA+r1ZhjmaXi+Nf8vNsMwzfuSkYOByC6D_F=GkehneqfnSO7iCQ@mail.gmail.com>
+ <1238ba8e-a297-6de5-2e6a-50e6e72e77d3@users.sourceforge.net>
+ <CA+r1ZhhqEBvV0ivz=MvaHhRquhFS2mxddJ-GOx81ZeSerKsD3g@mail.gmail.com>
+From: SF Markus Elfring <elfring@users.sourceforge.net>
+Message-ID: <ec3a7283-3c41-9879-49ae-8924b8daf65f@users.sourceforge.net>
+Date: Tue, 18 Oct 2016 19:25:59 +0200
+MIME-Version: 1.0
+In-Reply-To: <CA+r1ZhhqEBvV0ivz=MvaHhRquhFS2mxddJ-GOx81ZeSerKsD3g@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: SF Markus Elfring <elfring@users.sourceforge.net>
+To: Jim Davis <jim.epost@gmail.com>
 Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.com>, linux-kernel <linux-kernel@vger.kernel.org>
 
-On Tue, Oct 18, 2016 at 9:38 AM, SF Markus Elfring
-<elfring@users.sourceforge.net> wrote:
->>> elfring@Sonne:~/Projekte/Linux/next-patched> my_off=3D-O0 && for X in o=
-ff; do my_output_dir=3D${my_build_dir}unchanged/optimisation/${X} && my_var=
-=3D"my_${X}" && my_parameters=3D"-Wall -std=3Dgnu89 -fomit-frame-pointer ${=
-!my_var}" && LANG=3DC make V=3D2 O=3D"${my_output_dir}" HOSTCC=3D'/usr/bin/=
-gcc-6' HOSTCFLAGS=3D"-S ${my_parameters}" drivers/md/; done
-> =E2=80=A6
->> That's a very complicated command line.
->
-> I find it "advanced".
->
-> It shows a few of my imaginations around a specific software development =
-task.
->
->
->> Does something basic, like
->>
->> make O=3D/tmp/$$ allmodconfig
->> make O=3D/tmp/$$
->>
->> work for you?
->
-> Not really. - I would like to achieve the automatic selection of a few
-> compilation settings by a for loop which I reduced in the shown example
-> to one element.
+> Fine, but my point was to check that the basic things worked before
+> trying the complicated, or "advanced" stuff.
 
-Fine, but my point was to check that the basic things worked before
-trying the complicated, or "advanced" stuff.  If, somehow, fixdep
-didn't work in a basic setup then you'd know it wasn't one of your
-advanced features that was causing the problem.
+Your suggestion is fine in this sense. I can observe that the following command variant
+works as expected here.
 
-And if fixdep did work with a basic setup , then that would suggest
-something wrong with your advanced command line.
---=20
-Jim
+my_build_dir=/tmp/fixdep-check-20161018-1 && mkdir "${my_build_dir}" && my_cc=/usr/bin/gcc-6 && make O="${my_build_dir}" HOSTCC="${my_cc}" allmodconfig && make -j6 O="${my_build_dir}" HOSTCC="${my_cc}" drivers/md/
+
+
+> If, somehow, fixdep didn't work in a basic setup then you'd know it wasn't one of your
+> advanced features that was causing the problem.
+
+The command example above is an approximation for the configuration approach
+which I would really want instead.
+
+
+> And if fixdep did work with a basic setup , then that would suggest
+> something wrong with your advanced command line.
+
+How do you think about to clarify further which implementation detail could trigger
+the shown software build difficulty?
+
+Can it be that the passing of the adjusted parameter "HOSTCFLAGS" has got a significant
+influence (with unwanted side effects) in this use case?
+
+Regards,
+Markus
