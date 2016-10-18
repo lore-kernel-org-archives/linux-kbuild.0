@@ -1,74 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-io0-f181.google.com ([209.85.223.181]:35135 "EHLO
-        mail-io0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754618AbcJRPM4 (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 18 Oct 2016 11:12:56 -0400
-MIME-Version: 1.0
-In-Reply-To: <4f2251fc-94ee-41d3-cc03-a39cee5a084c@users.sourceforge.net>
-References: <4f2251fc-94ee-41d3-cc03-a39cee5a084c@users.sourceforge.net>
-From: Jim Davis <jim.epost@gmail.com>
-Date: Tue, 18 Oct 2016 08:12:55 -0700
-Message-ID: <CA+r1ZhjmaXi+Nf8vNsMwzfuSkYOByC6D_F=GkehneqfnSO7iCQ@mail.gmail.com>
+Received: from mout.web.de ([212.227.17.11]:57476 "EHLO mout.web.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S938478AbcJRQis (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 18 Oct 2016 12:38:48 -0400
 Subject: Re: Difficulties around "fixdep" for the usage of a kernel build
  output directory
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+References: <4f2251fc-94ee-41d3-cc03-a39cee5a084c@users.sourceforge.net>
+ <CA+r1ZhjmaXi+Nf8vNsMwzfuSkYOByC6D_F=GkehneqfnSO7iCQ@mail.gmail.com>
+From: SF Markus Elfring <elfring@users.sourceforge.net>
+Message-ID: <1238ba8e-a297-6de5-2e6a-50e6e72e77d3@users.sourceforge.net>
+Date: Tue, 18 Oct 2016 18:38:22 +0200
+MIME-Version: 1.0
+In-Reply-To: <CA+r1ZhjmaXi+Nf8vNsMwzfuSkYOByC6D_F=GkehneqfnSO7iCQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: SF Markus Elfring <elfring@users.sourceforge.net>
+To: Jim Davis <jim.epost@gmail.com>
 Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.com>, linux-kernel <linux-kernel@vger.kernel.org>
 
-On Tue, Oct 18, 2016 at 6:54 AM, SF Markus Elfring
-<elfring@users.sourceforge.net> wrote:
-> Hello,
->
-> The file "README" contains a section "BUILD directory for the kernel".
-> I would like to use the functionality which is described there.
->
-> One of my commands for such a build try is working as desired.
->
->
-> elfring@Sonne:~/Projekte/Linux/next-patched> git checkout next-20161014 &=
-& my_off=3D-O0 && for X in off; do my_output_dir=3D${my_build_dir}unchanged=
-/optimisation/${X} && my_var=3D"my_${X}" && my_parameters=3D"-Wall -std=3Dg=
-nu89 -fomit-frame-pointer ${!my_var}" && make O=3D"${my_output_dir}" HOSTCC=
-=3D'/usr/bin/gcc-6' HOSTCFLAGS=3D"${my_parameters}" allmodconfig; done
-> =E2=80=A6
-> #
-> # configuration written to .config
-> #
->
->
-> I stumble on the following messages for another build command.
->
->
-> elfring@Sonne:~/Projekte/Linux/next-patched> my_off=3D-O0 && for X in off=
-; do my_output_dir=3D${my_build_dir}unchanged/optimisation/${X} && my_var=
-=3D"my_${X}" && my_parameters=3D"-Wall -std=3Dgnu89 -fomit-frame-pointer ${=
-!my_var}" && LANG=3DC make V=3D2 O=3D"${my_output_dir}" HOSTCC=3D'/usr/bin/=
-gcc-6' HOSTCFLAGS=3D"-S ${my_parameters}" drivers/md/; done
-> make[1]: Entering directory =E2=80=A6
->   HOSTCC  scripts/basic/fixdep - due to command line change
-> scripts/basic/fixdep: line 1: .file: command not found
-> scripts/basic/fixdep: line 2: .comm: command not found
-> =E2=80=A6
-> scripts/basic/fixdep: line 6: .section: command not found
-> scripts/basic/fixdep: line 7: .align: command not found
-> scripts/basic/fixdep: line 8: .LC0:: command not found
-> scripts/basic/fixdep: line 9: .string: command not found
-> =E2=80=A6
->
->
-> I wonder why this approach does not work so far.
-> I would appreciate your advices.
+>> elfring@Sonne:~/Projekte/Linux/next-patched> my_off=-O0 && for X in off; do my_output_dir=${my_build_dir}unchanged/optimisation/${X} && my_var="my_${X}" && my_parameters="-Wall -std=gnu89 -fomit-frame-pointer ${!my_var}" && LANG=C make V=2 O="${my_output_dir}" HOSTCC='/usr/bin/gcc-6' HOSTCFLAGS="-S ${my_parameters}" drivers/md/; done
+…
+> That's a very complicated command line.
 
-That's a very complicated command line.  Does something basic, like
+I find it "advanced".
 
-make O=3D/tmp/$$ allmodconfig
-make O=3D/tmp/$$
+It shows a few of my imaginations around a specific software development task.
 
-work for you?
 
---=20
-Jim
+> Does something basic, like
+> 
+> make O=/tmp/$$ allmodconfig
+> make O=/tmp/$$
+> 
+> work for you?
+
+Not really. - I would like to achieve the automatic selection of a few
+compilation settings by a for loop which I reduced in the shown example
+to one element.
+
+I am looking for a "convenient" way to get assembler source files from
+the preferrred C compiler for some software build configurations.
+I hope that I can avoid the switching of compilation results in the source
+file directory hierarchy so that an occasional disassembly by a tool
+like "objdump" could be compared.
+
+Regards,
+Markus
