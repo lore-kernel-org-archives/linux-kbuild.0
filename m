@@ -1,68 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f52.google.com ([209.85.215.52]:32914 "EHLO
-        mail-lf0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S934300AbcJQXgi (ORCPT
+Received: from tartarus.angband.pl ([89.206.35.136]:39887 "EHLO
+        tartarus.angband.pl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933002AbcJRAQl (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 17 Oct 2016 19:36:38 -0400
-Received: by mail-lf0-f52.google.com with SMTP id x79so321105304lff.0
-        for <linux-kbuild@vger.kernel.org>; Mon, 17 Oct 2016 16:36:37 -0700 (PDT)
+        Mon, 17 Oct 2016 20:16:41 -0400
+Date: Tue, 18 Oct 2016 02:16:26 +0200
+From: Adam Borowski <kilobyte@angband.pl>
+Subject: Re: [GIT PULL] kbuild changes for v4.9-rc1
+Message-ID: <20161018001626.GA5976@angband.pl>
+References: <20161017100130.GA16013@angband.pl>
+ <871szfb1x1.fsf@gmail.com>
 MIME-Version: 1.0
-From: Mike Lothian <mike@fireburn.co.uk>
-Date: Tue, 18 Oct 2016 00:36:15 +0100
-Message-ID: <CAHbf0-GUwQ4wneBW=G0MGr8RosQ=zqrXumYxG2kXWAdJC4Nczg@mail.gmail.com>
-Subject: Kbuild Regression
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <871szfb1x1.fsf@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: viro@zeniv.linux.org.uk, mmarek@suse.cz, mmarek@suse.com, linux-kbuild@vger.kernel.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Mathieu OTHACEHE <m.othacehe@gmail.com>
+Cc: Nicholas Piggin <npiggin@gmail.com>, Omar Sandoval <osandov@osandov.com>, Michal Marek <mmarek@suse.com>, Linus Torvalds <torvalds@linux-foundation.org>, adobriyan@gmail.com, sfr@canb.auug.org.au, viro@zeniv.linux.org.uk, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org
 
-Hi
+On Mon, Oct 17, 2016 at 02:22:34PM +0200, Mathieu OTHACEHE wrote:
+> > +#include <asm/uaccess.h>
+> > +#include <asm/uaccess.h>
+> 
+> Included twice.
 
-I've raised https://bugzilla.kernel.org/show_bug.cgi?id=177741
+D'oh!
 
-Unfortunately I wasn't sure which component to file this under and I
-was unable to CC any of your emails directly to the bug
+> > +#include <asm/string.h>
+> > +#include <asm/page.h>
+> > +#include <asm/checksum.h>
+> > +
+> > +#include <asm-generic/asm-prototypes.h>
+> > +
+> > +#include <asm/page.h>
+> > +#include <asm/pgtable.h>
+> > +#include <asm/special_insns.h>
+> > +#include <asm/preempt.h>
+> 
+> No <asm/arch_hweight.h> for __sw_hweight32 and __sw_hweight64 ? 
 
-I can't currently build the kernel with ld.gold I've bisected this back to:
+diff --git a/include/asm-generic/asm-prototypes.h b/include/asm-generic/asm-prototypes.h
+new file mode 100644
+index 0000000..df13637
+--- /dev/null
++++ b/include/asm-generic/asm-prototypes.h
+@@ -0,0 +1,7 @@
++#include <linux/bitops.h>
 
-commit 7f2084fa55e6cb61f61b4224d4a8bafaeee55f9f
-Author: Al Viro <viro@zeniv.linux.org.uk>
-Date:   Fri Jan 15 14:01:22 2016 -0500
+... which has these.
 
-   [kbuild] handle exports in lib-y objects reliably
+Alexey Dobriyan <adobriyan@gmail.com> wrote:
+} bitops.h is wrong header as well.
+} Why do you need bitops for bunch of function prototypes?
 
-   Collect the symbols exported by anything that goes into lib.a and
-   add an empty object (lib-exports.o) with explicit undefs for each
-   of those to obj-y.
+Unless you guys prefer using low-level headers only, that is.
 
-   That allows to relax the rules regarding the use of exports in
-   lib-* objects - right now an object with export can be in lib-*
-   only if we are guaranteed that there always will be users in
-   built-in parts of the tree, otherwise it needs to be in obj-*.
-   As the result, we have an unholy mix of lib- and obj- in lib/Makefile
-   and (especially) in arch/*/lib/Makefile.  Moreover, a change in
-   generic part of the kernel can lead to mysteriously missing exports
-   on some configs.  With this change we don't have to worry about
-   that anymore.
 
-   One side effect is that built-in.o now pulls everything with exports
-   from the corresponding lib.a (if such exists).  That's exactly what
-   we want for linking vmlinux and fortunately it's almost the only thing
-   built-in.o is used in.  arch/ia64/hp/sim/boot/bootloader is the only
-   exception and it's easy to get rid of now - just turn everything in
-   arch/ia64/lib into lib-* and don't bother with arch/ia64/lib/built-in.o
-   anymore.
-
-   [AV: stylistic fix from Michal folded in]
-
-   Acked-by: Michal Marek <mmarek@suse.cz>
-   Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
-
-Reverting this commit allows the kernel to build again
-
-I'm not subscribed to either mailing list to please can you make sure
-I'm CC'd in any followups
-
-Thanks
-
-Mike
+Meow!
+-- 
+A MAP07 (Dead Simple) raspberry tincture recipe: 0.5l 95% alcohol, 1kg
+raspberries, 0.4kg sugar; put into a big jar for 1 month.  Filter out and
+throw away the fruits (can dump them into a cake, etc), let the drink age
+at least 3-6 months.
