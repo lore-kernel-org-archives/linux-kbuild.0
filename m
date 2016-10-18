@@ -1,80 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pa0-f66.google.com ([209.85.220.66]:35352 "EHLO
-        mail-pa0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1758644AbcJRBe2 (ORCPT
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35811 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1753362AbcJRCMT (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 17 Oct 2016 21:34:28 -0400
-Date: Tue, 18 Oct 2016 12:34:18 +1100
-From: Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [GIT PULL] kbuild changes for v4.9-rc1
-Message-ID: <20161018123418.6121175b@roar.ozlabs.ibm.com>
-In-Reply-To: <20161018001626.GA5976@angband.pl>
-References: <20161017100130.GA16013@angband.pl>
-        <871szfb1x1.fsf@gmail.com>
-        <20161018001626.GA5976@angband.pl>
+        Mon, 17 Oct 2016 22:12:19 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id u9I29GCm113606
+        for <linux-kbuild@vger.kernel.org>; Mon, 17 Oct 2016 22:12:18 -0400
+Received: from e23smtp09.au.ibm.com (e23smtp09.au.ibm.com [202.81.31.142])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 264xabt2x7-1
+        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+        for <linux-kbuild@vger.kernel.org>; Mon, 17 Oct 2016 22:12:18 -0400
+Received: from localhost
+        by e23smtp09.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-kbuild@vger.kernel.org> from <andrew.donnellan@au1.ibm.com>;
+        Tue, 18 Oct 2016 12:12:15 +1000
+Subject: Re: [PATCH 2/2] builddeb: allow building without headers/firmware
+ packages
+References: <20160826081716.9435-1-andrew.donnellan@au1.ibm.com>
+ <20160826081716.9435-2-andrew.donnellan@au1.ibm.com>
+From: Andrew Donnellan <andrew.donnellan@au1.ibm.com>
+Date: Tue, 18 Oct 2016 13:12:11 +1100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20160826081716.9435-2-andrew.donnellan@au1.ibm.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Content-Transfer-Encoding: 7bit
+Message-Id: <3149e502-1a4c-0413-b874-d40ed5bf4a42@au1.ibm.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Adam Borowski <kilobyte@angband.pl>
-Cc: Mathieu OTHACEHE <m.othacehe@gmail.com>, Omar Sandoval <osandov@osandov.com>, Michal Marek <mmarek@suse.com>, Linus Torvalds <torvalds@linux-foundation.org>, adobriyan@gmail.com, sfr@canb.auug.org.au, viro@zeniv.linux.org.uk, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org
+To: mmarek@suse.com, linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
 
-Hi Adam,
+On 26/08/16 18:17, Andrew Donnellan wrote:
+> Currently, the deb-pkg and bindeb-pkg targets create multiple packages for
+> the kernel binaries, headers, userspace headers and firmware.
+>
+> For developers who generate Debian packages as part of their development
+> workflows, it's often not necessary to generate all these packages.
+>
+> Allow the creation of the linux-headers, linux-libc-dev and linux-firmware
+> packages to be disabled if the environment variables KDEB_NO_HEADERS,
+> KDEB_NO_LIBC_HEADERS or KDEB_NO_FIRMWARE are non-empty.
+>
+> Signed-off-by: Andrew Donnellan <andrew.donnellan@au1.ibm.com>
 
-Thanks, this is looking good. powerpc will be able to use the generic
-header.
+Ping :)
 
-On Tue, 18 Oct 2016 02:16:26 +0200
-Adam Borowski <kilobyte@angband.pl> wrote:
+> On top of d3e2773c4ede5c62d2a92dae20e3a09b1ca55b6e in kbuild#rc-fixes
 
-> On Mon, Oct 17, 2016 at 02:22:34PM +0200, Mathieu OTHACEHE wrote:
-> > > +#include <asm/uaccess.h>
-> > > +#include <asm/uaccess.h>  
-> > 
-> > Included twice.  
-> 
-> D'oh!
-> 
-> > > +#include <asm/string.h>
-> > > +#include <asm/page.h>
-> > > +#include <asm/checksum.h>
-> > > +
-> > > +#include <asm-generic/asm-prototypes.h>
-> > > +
-> > > +#include <asm/page.h>
-> > > +#include <asm/pgtable.h>
-> > > +#include <asm/special_insns.h>
-> > > +#include <asm/preempt.h>  
-> > 
-> > No <asm/arch_hweight.h> for __sw_hweight32 and __sw_hweight64 ?   
-> 
-> diff --git a/include/asm-generic/asm-prototypes.h b/include/asm-generic/asm-prototypes.h
-> new file mode 100644
-> index 0000000..df13637
-> --- /dev/null
-> +++ b/include/asm-generic/asm-prototypes.h
-> @@ -0,0 +1,7 @@
-> +#include <linux/bitops.h>
-> 
-> ... which has these.
-> 
-> Alexey Dobriyan <adobriyan@gmail.com> wrote:
-> } bitops.h is wrong header as well.
-> } Why do you need bitops for bunch of function prototypes?
-> 
-> Unless you guys prefer using low-level headers only, that is.
+This of course is now in mainline.
 
-Well you can't use asm/arch_hweight.h in a generic header of course.
-I would suggest just including linux/ variants where practical for
-the asm-generic/asm-prototypes.h header.
+-- 
+Andrew Donnellan              OzLabs, ADL Canberra
+andrew.donnellan@au1.ibm.com  IBM Australia Limited
 
-We should probably just bring all these arch patches through the
-kbuild tree.
-
-I'm sorry for the breakage: I didn't realize it broke the build with
-some configs, otherwise I would have given Michal a heads up before
-his pull request, and worked to get this stuff in first.
-
-Thanks,
-Nick
