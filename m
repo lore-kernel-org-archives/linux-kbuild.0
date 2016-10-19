@@ -1,63 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-it0-f42.google.com ([209.85.214.42]:38627 "EHLO
-        mail-it0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S965189AbcJRUow (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 18 Oct 2016 16:44:52 -0400
+Received: from mx2.suse.de ([195.135.220.15]:42317 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S932591AbcJSOiY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 19 Oct 2016 10:38:24 -0400
+Subject: Re: [GIT PULL] kbuild changes for v4.9-rc1
+References: <20161017100130.GA16013@angband.pl> <871szfb1x1.fsf@gmail.com>
+ <20161018001626.GA5976@angband.pl>
+ <20161018123418.6121175b@roar.ozlabs.ibm.com>
+From: Michal Marek <mmarek@suse.com>
+Message-ID: <70c4e6bf-1667-326b-8a4d-b0960b55a5e7@suse.com>
+Date: Wed, 19 Oct 2016 16:38:14 +0200
 MIME-Version: 1.0
-In-Reply-To: <ec3a7283-3c41-9879-49ae-8924b8daf65f@users.sourceforge.net>
-References: <4f2251fc-94ee-41d3-cc03-a39cee5a084c@users.sourceforge.net>
- <CA+r1ZhjmaXi+Nf8vNsMwzfuSkYOByC6D_F=GkehneqfnSO7iCQ@mail.gmail.com>
- <1238ba8e-a297-6de5-2e6a-50e6e72e77d3@users.sourceforge.net>
- <CA+r1ZhhqEBvV0ivz=MvaHhRquhFS2mxddJ-GOx81ZeSerKsD3g@mail.gmail.com> <ec3a7283-3c41-9879-49ae-8924b8daf65f@users.sourceforge.net>
-From: Jim Davis <jim.epost@gmail.com>
-Date: Tue, 18 Oct 2016 13:44:50 -0700
-Message-ID: <CA+r1Zhj3AQAbL_Hu4w=gX8kaR0zKoYhTmAYyVcvBMPLXpfZ3gA@mail.gmail.com>
-Subject: Re: Difficulties around "fixdep" for the usage of a kernel build
- output directory
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20161018123418.6121175b@roar.ozlabs.ibm.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: SF Markus Elfring <elfring@users.sourceforge.net>
-Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.com>, linux-kernel <linux-kernel@vger.kernel.org>
+To: Nicholas Piggin <npiggin@gmail.com>, Adam Borowski <kilobyte@angband.pl>
+Cc: Mathieu OTHACEHE <m.othacehe@gmail.com>, Omar Sandoval <osandov@osandov.com>, Linus Torvalds <torvalds@linux-foundation.org>, adobriyan@gmail.com, sfr@canb.auug.org.au, viro@zeniv.linux.org.uk, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org
 
-On Tue, Oct 18, 2016 at 10:25 AM, SF Markus Elfring
-<elfring@users.sourceforge.net> wrote:
+Dne 18.10.2016 v 03:34 Nicholas Piggin napsal(a):
+> We should probably just bring all these arch patches through the
+> kbuild tree.
+> 
+> I'm sorry for the breakage: I didn't realize it broke the build with
+> some configs, otherwise I would have given Michal a heads up before
+> his pull request, and worked to get this stuff in first.
 
-> Can it be that the passing of the adjusted parameter "HOSTCFLAGS" has got a significant
-> influence (with unwanted side effects) in this use case?
+It breaks with some binutils versions only (and only with
+CONFIG_MODVERSIONS=y, of course).
 
-That's probably it.  If I strip down your advanced original example to just
+Michal
 
-make defconfig
-make HOSTCFLAGS=-S
-
-then I get a similar error:
-
-  HOSTCC  scripts/basic/fixdep
-scripts/basic/fixdep: 1: scripts/basic/fixdep: .file: not found
-scripts/basic/fixdep: 2: scripts/basic/fixdep: .comm: not found
-scripts/basic/fixdep: 3: scripts/basic/fixdep: .comm: not found
-scripts/basic/fixdep: 4: scripts/basic/fixdep: .comm: not found
-scripts/basic/fixdep: 5: scripts/basic/fixdep: .comm: not found
-scripts/basic/fixdep: 6: scripts/basic/fixdep: .section: not found
-
-and so forth.  The problem is that, with -S, fixdep isn't build as an
-executable:
-
-jim@krebstar:~/linux-next/scripts/basic$ file fixdep
-fixdep: assembler source, ASCII text
-jim@krebstar:~/linux-next/scripts/basic$ more fixdep
-    .file    "fixdep.c"
-    .comm    insert_extra_deps,4,4
-    .comm    target,8,8
-    .comm    depfile,8,8
-    .comm    cmdline,8,8
-    .section    .rodata
-
-I'm guessing that in your original example you wanted to look at the
-assembly output gcc produced; you'd probably have better luck using
-objdump for that.
-
--- 
-Jim
