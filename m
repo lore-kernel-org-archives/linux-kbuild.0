@@ -1,44 +1,342 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from gate.crashing.org ([63.228.1.57]:60824 "EHLO gate.crashing.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752418AbcJSWEh (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 19 Oct 2016 18:04:37 -0400
-Date: Wed, 19 Oct 2016 17:03:47 -0500
-From: Segher Boessenkool <segher@kernel.crashing.org>
-Subject: Re: Challenges around the usage of different "HOSTCFLAGS" for kernel build configuration and module generation
-Message-ID: <20161019220346.GA20054@gate.crashing.org>
-References: <4f2251fc-94ee-41d3-cc03-a39cee5a084c@users.sourceforge.net> <CA+r1ZhjmaXi+Nf8vNsMwzfuSkYOByC6D_F=GkehneqfnSO7iCQ@mail.gmail.com> <1238ba8e-a297-6de5-2e6a-50e6e72e77d3@users.sourceforge.net> <CA+r1ZhhqEBvV0ivz=MvaHhRquhFS2mxddJ-GOx81ZeSerKsD3g@mail.gmail.com> <ec3a7283-3c41-9879-49ae-8924b8daf65f@users.sourceforge.net> <CA+r1Zhj3AQAbL_Hu4w=gX8kaR0zKoYhTmAYyVcvBMPLXpfZ3gA@mail.gmail.com> <4fe8b518-6145-5322-a852-beeb61abd559@users.sourceforge.net> <CA+r1Zhiat4d8FqFcD1BBCxe5jyWOtSDZp99_CLV0qE1D3REquw@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CA+r1Zhiat4d8FqFcD1BBCxe5jyWOtSDZp99_CLV0qE1D3REquw@mail.gmail.com>
+Received: from alt42.smtp-out.videotron.ca ([23.233.128.29]:52352 "EHLO
+        alt42.smtp-out.videotron.ca" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1754845AbcJSXnN (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 19 Oct 2016 19:43:13 -0400
+From: Nicolas Pitre <nicolas.pitre@linaro.org>
+Subject: [PATCH 4/4] posix-timers: make it configurable
+Date: Wed, 19 Oct 2016 19:42:53 -0400
+Message-Id: <1476920573-14384-5-git-send-email-nicolas.pitre@linaro.org>
+In-Reply-To: <1476920573-14384-1-git-send-email-nicolas.pitre@linaro.org>
+References: <1476920573-14384-1-git-send-email-nicolas.pitre@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jim Davis <jim.epost@gmail.com>
-Cc: SF Markus Elfring <elfring@users.sourceforge.net>, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.com>, linux-kernel <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org
+To: John Stultz <john.stultz@linaro.org>, Richard Cochran <richardcochran@gmail.com>, Yann E MORIN <yann.morin.1998@free.fr>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Josh Triplett <josh@joshtriplett.org>, netdev@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Wed, Oct 19, 2016 at 12:51:44PM -0700, Jim Davis wrote:
-> On Wed, Oct 19, 2016 at 12:25 AM, SF Markus Elfring
-> <elfring@users.sourceforge.net> wrote:
-> >
-> > Are you interested that a software generation parameter like "-S"
-> > (for output of assembler source files) could be directly supported
-> > for a special build variant?
-> 
-> No, if you want to see the assembly code then something like
-> 
-> make defconfig; make EXTRA_CFLAGS="-g" drivers/md/; objdump -S
-> drivers/md/whatever.o
-> 
-> seems easy enough.  You could write a little shell wrapper to save
-> some keystrokes if you find you're running those commands frequently.
+Many embedded systems typically don't need them.  This removes about
+22KB from the kernel binary size when configured out.
 
-Don't forget -r when running objdump on an object file.  But, you
-want to use  make drivers/md/whatever.s  if you want to see the
-assembler code.
+Corresponding syscalls are routed to a stub logging the attempt to
+use those syscalls which should be enough of a clue if they were
+disabled without proper consideration. They are: timer_create,
+timer_gettime: timer_getoverrun, timer_settime, timer_delete,
+clock_adjtime.
 
-And that doesn't work for build-time tools, which I think is what
-the original discussion was about.
+The clock_settime, clock_gettime, clock_getres and clock_nanosleep syscalls
+are replaced by simple wrappers compatible with CLOCK_REALTIME,
+CLOCK_MONOTONIC and CLOCK_BOOTTIME only.
 
+Signed-off-by: Nicolas Pitre <nico@linaro.org>
+---
+ drivers/ptp/Kconfig          |   2 +-
+ include/linux/posix-timers.h |  28 +++++++++-
+ include/linux/sched.h        |  10 ++++
+ init/Kconfig                 |  17 +++++++
+ kernel/signal.c              |   4 ++
+ kernel/time/Makefile         |  10 +++-
+ kernel/time/posix-stubs.c    | 118 +++++++++++++++++++++++++++++++++++++++++++
+ 7 files changed, 184 insertions(+), 5 deletions(-)
+ create mode 100644 kernel/time/posix-stubs.c
 
-Segher
+diff --git a/drivers/ptp/Kconfig b/drivers/ptp/Kconfig
+index 0f7492f8ea..bdce332911 100644
+--- a/drivers/ptp/Kconfig
++++ b/drivers/ptp/Kconfig
+@@ -6,7 +6,7 @@ menu "PTP clock support"
+ 
+ config PTP_1588_CLOCK
+ 	tristate "PTP clock support"
+-	depends on NET
++	depends on NET && POSIX_TIMERS
+ 	select PPS
+ 	select NET_PTP_CLASSIFY
+ 	help
+diff --git a/include/linux/posix-timers.h b/include/linux/posix-timers.h
+index 62d44c1760..2288c5c557 100644
+--- a/include/linux/posix-timers.h
++++ b/include/linux/posix-timers.h
+@@ -118,6 +118,8 @@ struct k_clock {
+ extern struct k_clock clock_posix_cpu;
+ extern struct k_clock clock_posix_dynamic;
+ 
++#ifdef CONFIG_POSIX_TIMERS
++
+ void posix_timers_register_clock(const clockid_t clock_id, struct k_clock *new_clock);
+ 
+ /* function to call to trigger timer event */
+@@ -131,8 +133,30 @@ void posix_cpu_timers_exit_group(struct task_struct *task);
+ void set_process_cpu_timer(struct task_struct *task, unsigned int clock_idx,
+ 			   cputime_t *newval, cputime_t *oldval);
+ 
+-long clock_nanosleep_restart(struct restart_block *restart_block);
+-
+ void update_rlimit_cpu(struct task_struct *task, unsigned long rlim_new);
+ 
++#else
++
++#include <linux/random.h>
++
++static inline void posix_timers_register_clock(const clockid_t clock_id,
++					       struct k_clock *new_clock) {}
++static inline int posix_timer_event(struct k_itimer *timr, int si_private)
++{ return 0; }
++static inline void run_posix_cpu_timers(struct task_struct *task) {}
++static inline void posix_cpu_timers_exit(struct task_struct *task)
++{
++	add_device_randomness((const void*) &task->se.sum_exec_runtime,
++			      sizeof(unsigned long long));
++}
++static inline void posix_cpu_timers_exit_group(struct task_struct *task) {}
++static inline void set_process_cpu_timer(struct task_struct *task,
++		unsigned int clock_idx, cputime_t *newval, cputime_t *oldval) {}
++static inline void update_rlimit_cpu(struct task_struct *task,
++				     unsigned long rlim_new) {}
++
++#endif
++
++long clock_nanosleep_restart(struct restart_block *restart_block);
++
+ #endif
+diff --git a/include/linux/sched.h b/include/linux/sched.h
+index 348f51b0ec..ad716d5559 100644
+--- a/include/linux/sched.h
++++ b/include/linux/sched.h
+@@ -2946,8 +2946,13 @@ static inline void exit_thread(struct task_struct *tsk)
+ extern void exit_files(struct task_struct *);
+ extern void __cleanup_sighand(struct sighand_struct *);
+ 
++#ifdef CONFIG_POSIX_TIMERS
+ extern void exit_itimers(struct signal_struct *);
+ extern void flush_itimer_signals(void);
++#else
++static inline void exit_itimers(struct signal_struct *s) {}
++static inline void flush_itimer_signals(void) {}
++#endif
+ 
+ extern void do_group_exit(int);
+ 
+@@ -3450,7 +3455,12 @@ static __always_inline bool need_resched(void)
+  * Thread group CPU time accounting.
+  */
+ void thread_group_cputime(struct task_struct *tsk, struct task_cputime *times);
++#ifdef CONFIG_POSIX_TIMERS
+ void thread_group_cputimer(struct task_struct *tsk, struct task_cputime *times);
++#else
++static inline void thread_group_cputimer(struct task_struct *tsk,
++					 struct task_cputime *times) {}
++#endif
+ 
+ /*
+  * Reevaluate whether the task has signals pending delivery.
+diff --git a/init/Kconfig b/init/Kconfig
+index 34407f15e6..351d422252 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -1445,6 +1445,23 @@ config SYSCTL_SYSCALL
+ 
+ 	  If unsure say N here.
+ 
++config POSIX_TIMERS
++	bool "Posix Clocks & timers" if EXPERT
++	default y
++	help
++	  This includes native support for POSIX timers to the kernel.
++	  Most embedded systems may have no use for them and therefore they
++	  can be configured out to reduce the size of the kernel image.
++
++	  When this option is disabled, the following syscalls won't be
++	  available: timer_create, timer_gettime: timer_getoverrun,
++	  timer_settime, timer_delete, clock_adjtime. Furthermore, the
++	  clock_settime, clock_gettime, clock_getres and clock_nanosleep
++	  syscalls will be limited to CLOCK_REALTIME and CLOCK_MONOTONIC
++	  only.
++
++	  If unsure say y.
++
+ config KALLSYMS
+ 	 bool "Load all symbols for debugging/ksymoops" if EXPERT
+ 	 default y
+diff --git a/kernel/signal.c b/kernel/signal.c
+index 75761acc77..0a38c9d646 100644
+--- a/kernel/signal.c
++++ b/kernel/signal.c
+@@ -427,6 +427,7 @@ void flush_signals(struct task_struct *t)
+ 	spin_unlock_irqrestore(&t->sighand->siglock, flags);
+ }
+ 
++#ifdef CONFIG_POSIX_TIMERS
+ static void __flush_itimer_signals(struct sigpending *pending)
+ {
+ 	sigset_t signal, retain;
+@@ -460,6 +461,7 @@ void flush_itimer_signals(void)
+ 	__flush_itimer_signals(&tsk->signal->shared_pending);
+ 	spin_unlock_irqrestore(&tsk->sighand->siglock, flags);
+ }
++#endif
+ 
+ void ignore_signals(struct task_struct *t)
+ {
+@@ -611,6 +613,7 @@ int dequeue_signal(struct task_struct *tsk, sigset_t *mask, siginfo_t *info)
+ 		 */
+ 		current->jobctl |= JOBCTL_STOP_DEQUEUED;
+ 	}
++#ifdef CONFIG_POSIX_TIMERS
+ 	if ((info->si_code & __SI_MASK) == __SI_TIMER && info->si_sys_private) {
+ 		/*
+ 		 * Release the siglock to ensure proper locking order
+@@ -622,6 +625,7 @@ int dequeue_signal(struct task_struct *tsk, sigset_t *mask, siginfo_t *info)
+ 		do_schedule_next_timer(info);
+ 		spin_lock(&tsk->sighand->siglock);
+ 	}
++#endif
+ 	return signr;
+ }
+ 
+diff --git a/kernel/time/Makefile b/kernel/time/Makefile
+index 49eca0beed..fc26c308f5 100644
+--- a/kernel/time/Makefile
++++ b/kernel/time/Makefile
+@@ -1,6 +1,12 @@
+-obj-y += time.o timer.o hrtimer.o itimer.o posix-timers.o posix-cpu-timers.o
++obj-y += time.o timer.o hrtimer.o itimer.o
+ obj-y += timekeeping.o ntp.o clocksource.o jiffies.o timer_list.o
+-obj-y += timeconv.o timecounter.o posix-clock.o alarmtimer.o
++obj-y += timeconv.o timecounter.o alarmtimer.o
++
++ifeq ($(CONFIG_POSIX_TIMERS),y)
++ obj-y += posix-timers.o posix-cpu-timers.o posix-clock.o
++else
++ obj-y += posix-stubs.o
++endif
+ 
+ obj-$(CONFIG_GENERIC_CLOCKEVENTS)		+= clockevents.o tick-common.o
+ ifeq ($(CONFIG_GENERIC_CLOCKEVENTS_BROADCAST),y)
+diff --git a/kernel/time/posix-stubs.c b/kernel/time/posix-stubs.c
+new file mode 100644
+index 0000000000..fe857bd4a0
+--- /dev/null
++++ b/kernel/time/posix-stubs.c
+@@ -0,0 +1,118 @@
++/*
++ * Dummy stubs used when CONFIG_POSIX_TIMERS=n
++ *
++ * Created by:  Nicolas Pitre, July 2016
++ * Copyright:   (C) 2016 Linaro Limited
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ */
++
++#include <linux/linkage.h>
++#include <linux/kernel.h>
++#include <linux/sched.h>
++#include <linux/errno.h>
++#include <linux/syscalls.h>
++#include <linux/ktime.h>
++#include <linux/timekeeping.h>
++#include <linux/posix-timers.h>
++
++asmlinkage long sys_ni_posix_timers(void)
++{
++	pr_err_once("process %d (%s) attempted a POSIX timer syscall "
++		    "while CONFIG_POSIX_TIMERS is not set\n",
++		    current->pid, current->comm);
++	return -ENOSYS;
++}
++
++#define SYS_NI(name)  SYSCALL_ALIAS(sys_##name, sys_ni_posix_timers)
++
++SYS_NI(timer_create);
++SYS_NI(timer_gettime);
++SYS_NI(timer_getoverrun);
++SYS_NI(timer_settime);
++SYS_NI(timer_delete);
++SYS_NI(clock_adjtime);
++
++/*
++ * We preserve minimal support for CLOCK_REALTIME and CLOCK_MONOTONIC
++ * as it is easy to remain compatible with little code. CLOCK_BOOTTIME
++ * is also included for convenience as at least systemd uses it.
++ */
++
++SYSCALL_DEFINE2(clock_settime, const clockid_t, which_clock,
++		const struct timespec __user *, tp)
++{
++	struct timespec new_tp;
++
++	if (which_clock != CLOCK_REALTIME)
++		return -EINVAL;
++	if (copy_from_user(&new_tp, tp, sizeof (*tp)))
++		return -EFAULT;
++	return do_sys_settimeofday(&new_tp, NULL);
++}
++
++SYSCALL_DEFINE2(clock_gettime, const clockid_t, which_clock,
++		struct timespec __user *,tp)
++{
++	struct timespec kernel_tp;
++
++	switch (which_clock) {
++	case CLOCK_REALTIME: ktime_get_real_ts(&kernel_tp); break;
++	case CLOCK_MONOTONIC: ktime_get_ts(&kernel_tp); break;
++	case CLOCK_BOOTTIME: get_monotonic_boottime(&kernel_tp); break;
++	default: return -EINVAL;
++	}
++	if (copy_to_user(tp, &kernel_tp, sizeof (kernel_tp)))
++		return -EFAULT;
++	return 0;
++}
++
++SYSCALL_DEFINE2(clock_getres, const clockid_t, which_clock, struct timespec __user *, tp)
++{
++	struct timespec rtn_tp = {
++		.tv_sec = 0,
++		.tv_nsec = hrtimer_resolution,
++	};
++
++	switch (which_clock) {
++	case CLOCK_REALTIME:
++	case CLOCK_MONOTONIC:
++	case CLOCK_BOOTTIME:
++		if (copy_to_user(tp, &rtn_tp, sizeof(rtn_tp)))
++			return -EFAULT;
++		return 0;
++	default:
++		return -EINVAL;
++	}
++}
++
++SYSCALL_DEFINE4(clock_nanosleep, const clockid_t, which_clock, int, flags,
++		const struct timespec __user *, rqtp,
++		struct timespec __user *, rmtp)
++{
++	struct timespec t;
++
++	switch (which_clock) {
++	case CLOCK_REALTIME:
++	case CLOCK_MONOTONIC:
++	case CLOCK_BOOTTIME:
++		if (copy_from_user(&t, rqtp, sizeof (struct timespec)))
++			return -EFAULT;
++		if (!timespec_valid(&t))
++			return -EINVAL;
++		return hrtimer_nanosleep(&t, rmtp, flags & TIMER_ABSTIME ?
++					 HRTIMER_MODE_ABS : HRTIMER_MODE_REL,
++					 which_clock);
++	default:
++		return -EINVAL;
++	}
++}
++
++#ifdef CONFIG_COMPAT
++long clock_nanosleep_restart(struct restart_block *restart_block)
++{
++	return hrtimer_nanosleep_restart(restart_block);
++}
++#endif
+-- 
+2.7.4
+
