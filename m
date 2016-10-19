@@ -1,34 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:42317 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:43753 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932591AbcJSOiY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 19 Oct 2016 10:38:24 -0400
-Subject: Re: [GIT PULL] kbuild changes for v4.9-rc1
-References: <20161017100130.GA16013@angband.pl> <871szfb1x1.fsf@gmail.com>
- <20161018001626.GA5976@angband.pl>
- <20161018123418.6121175b@roar.ozlabs.ibm.com>
+        id S942319AbcJSOu3 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 19 Oct 2016 10:50:29 -0400
+Subject: Re: [PATCH 2/2] kbuild: modversions for exported asm symbols
+References: <20161015124352.10795-1-npiggin@gmail.com>
+ <20161015124352.10795-3-npiggin@gmail.com>
 From: Michal Marek <mmarek@suse.com>
-Message-ID: <70c4e6bf-1667-326b-8a4d-b0960b55a5e7@suse.com>
-Date: Wed, 19 Oct 2016 16:38:14 +0200
+Message-ID: <24ebaba8-d20c-bc2e-8430-599cab2dbb33@suse.com>
+Date: Wed, 19 Oct 2016 16:50:26 +0200
 MIME-Version: 1.0
-In-Reply-To: <20161018123418.6121175b@roar.ozlabs.ibm.com>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <20161015124352.10795-3-npiggin@gmail.com>
+Content-Type: text/plain; charset=iso-8859-2
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicholas Piggin <npiggin@gmail.com>, Adam Borowski <kilobyte@angband.pl>
-Cc: Mathieu OTHACEHE <m.othacehe@gmail.com>, Omar Sandoval <osandov@osandov.com>, Linus Torvalds <torvalds@linux-foundation.org>, adobriyan@gmail.com, sfr@canb.auug.org.au, viro@zeniv.linux.org.uk, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org
+To: Nicholas Piggin <npiggin@gmail.com>
+Cc: linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org, Al Viro <viro@zeniv.linux.org.uk>, Arnd Bergmann <arnd@arndb.de>
 
-Dne 18.10.2016 v 03:34 Nicholas Piggin napsal(a):
-> We should probably just bring all these arch patches through the
-> kbuild tree.
-> 
-> I'm sorry for the breakage: I didn't realize it broke the build with
-> some configs, otherwise I would have given Michal a heads up before
-> his pull request, and worked to get this stuff in first.
+Hi Nick,
 
-It breaks with some binutils versions only (and only with
-CONFIG_MODVERSIONS=y, of course).
+sorry for the late feedback.
+
+Dne 15.10.2016 v 14:43 Nicholas Piggin napsal(a):
+> +# .S file exports must have their C prototypes defined in asm/asm-prototypes.h
+> +# or a file that it includes, in order to get versioned symbols. We build a
+> +# dummy C file that includes asm-prototypes and the EXPORT_SYMBOL lines from
+> +# the .S file (with trailing ';'), and run genksyms on that, to extract vers.
+> +#
+> +# These mirror gensymtypes_c and co above, keep them in synch.
+> +cmd_gensymtypes_S =                                                         \
+> +    (echo "\#include <linux/kernel.h>" ;                                    \
+> +     echo "\#include <asm/asm-prototypes.h>" ;                              \
+> +     grep EXPORT_SYMBOL $< | sed 's/$$/;/' ) |                              \
+> +    $(CPP) -D__GENKSYMS__ $(c_flags) -xc - |                                \
+> +    $(GENKSYMS) $(if $(1), -T $(2))                                         \
+> +     $(patsubst y,-s _,$(CONFIG_HAVE_UNDERSCORE_SYMBOL_PREFIX))             \
+> +     $(if $(KBUILD_PRESERVE),-p)                                            \
+> +     -r $(firstword $(wildcard $(2:.symtypes=.symref) /dev/null))
+
+I think it would be cleaner to add the #include to the .S files
+themselves and grep for both EXPORT_SYMBOL and #include here. The reason
+is that some files might need additional #includes to allow genksyms to
+properly expand some function prototypes.
 
 Michal
-
