@@ -1,38 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qt0-f176.google.com ([209.85.216.176]:36774 "EHLO
-        mail-qt0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751039AbcJTSgB (ORCPT
+Received: from relay4-d.mail.gandi.net ([217.70.183.196]:36694 "EHLO
+        relay4-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933863AbcJTSvc (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 20 Oct 2016 14:36:01 -0400
-Received: by mail-qt0-f176.google.com with SMTP id m5so65805572qtb.3
-        for <linux-kbuild@vger.kernel.org>; Thu, 20 Oct 2016 11:36:01 -0700 (PDT)
-Date: Thu, 20 Oct 2016 14:35:59 -0400 (EDT)
-From: Nicolas Pitre <nicolas.pitre@linaro.org>
+        Thu, 20 Oct 2016 14:51:32 -0400
+Date: Thu, 20 Oct 2016 11:51:22 -0700
+From: Josh Triplett <josh@joshtriplett.org>
 Subject: Re: [PATCH 0/4] make POSIX timers optional with some Kconfig help
-In-Reply-To: <alpine.DEB.2.20.1610201145310.5073@nanos>
-Message-ID: <alpine.LFD.2.20.1610201433250.25105@knanqh.ubzr>
-References: <1476920573-14384-1-git-send-email-nicolas.pitre@linaro.org> <alpine.DEB.2.20.1610201145310.5073@nanos>
+Message-ID: <20161020185122.ymwvqiqslf32eife@x>
+References: <1476920573-14384-1-git-send-email-nicolas.pitre@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1476920573-14384-1-git-send-email-nicolas.pitre@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Thomas Gleixner <tglx@linutronix.de>
-Cc: John Stultz <john.stultz@linaro.org>, Richard Cochran <richardcochran@gmail.com>, Yann E MORIN <yann.morin.1998@free.fr>, Josh Triplett <josh@joshtriplett.org>, netdev@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Nicolas Pitre <nicolas.pitre@linaro.org>
+Cc: John Stultz <john.stultz@linaro.org>, Richard Cochran <richardcochran@gmail.com>, Yann E MORIN <yann.morin.1998@free.fr>, Thomas Gleixner <tglx@linutronix.de>, netdev@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Thu, 20 Oct 2016, Thomas Gleixner wrote:
-
-> On Wed, 19 Oct 2016, Nicolas Pitre wrote:
-> > Therefore this series also includes kconfig changes to implement a new
-> > keyword to express some reverse dependencies like "select" does, named
-> > "imply", and still allowing for the target config symbol to be disabled
-> > if the user or a direct dependency says so.
+On Wed, Oct 19, 2016 at 07:42:49PM -0400, Nicolas Pitre wrote:
+> Many embedded systems don't need the full POSIX timer support.
+> Configuring them out provides a nice kernel image size reduction.
 > 
-> That's really nice work! Thanks for doing that. It makes the whole thing
-> more palatable.
+> When POSIX timers are configured out, the PTP clock subsystem should be
+> left out as well. However a bunch of ethernet drivers currently *select*
+> the later in their Kconfig entries. Therefore some more work was needed
+> to break that hard dependency from those drivers without preventing their
+> usage altogether.
+> 
+> Therefore this series also includes kconfig changes to implement a new
+> keyword to express some reverse dependencies like "select" does, named
+> "imply", and still allowing for the target config symbol to be disabled
+> if the user or a direct dependency says so.
+> 
+> How to deal with the dependencies across three subsystems for potential
+> upstream merging needs to be figured out.
 
-Thanks.
+This looks good to me, and I like the new "imply" approach.
 
-Now I'd need some review tags...  ;-)
+I'd still like to see a more general solution for reporting the use of
+compiled-out syscalls, but I don't think that needs to block this patch
+series.
 
-
-Nicolas
+Reviewed-by: Josh Triplett <josh@joshtriplett.org>
