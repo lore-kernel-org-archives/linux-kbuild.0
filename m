@@ -1,44 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.web.de ([217.72.192.78]:55590 "EHLO mout.web.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1755590AbcJTGdY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 20 Oct 2016 02:33:24 -0400
-Subject: Re: Challenges around the usage of different "HOSTCFLAGS" for kernel
- build configuration and module generation
-References: <4f2251fc-94ee-41d3-cc03-a39cee5a084c@users.sourceforge.net>
- <CA+r1ZhjmaXi+Nf8vNsMwzfuSkYOByC6D_F=GkehneqfnSO7iCQ@mail.gmail.com>
- <1238ba8e-a297-6de5-2e6a-50e6e72e77d3@users.sourceforge.net>
- <CA+r1ZhhqEBvV0ivz=MvaHhRquhFS2mxddJ-GOx81ZeSerKsD3g@mail.gmail.com>
- <ec3a7283-3c41-9879-49ae-8924b8daf65f@users.sourceforge.net>
- <CA+r1Zhj3AQAbL_Hu4w=gX8kaR0zKoYhTmAYyVcvBMPLXpfZ3gA@mail.gmail.com>
- <4fe8b518-6145-5322-a852-beeb61abd559@users.sourceforge.net>
- <CA+r1Zhiat4d8FqFcD1BBCxe5jyWOtSDZp99_CLV0qE1D3REquw@mail.gmail.com>
-From: SF Markus Elfring <elfring@users.sourceforge.net>
-Message-ID: <2ff4dbf5-f9e5-9aa1-a93a-2e2bd81b43f7@users.sourceforge.net>
-Date: Thu, 20 Oct 2016 08:33:00 +0200
+Received: from condef008-v.nifty.com ([210.131.4.245]:44549 "EHLO
+        condef008-v.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750951AbcJTHAs (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 20 Oct 2016 03:00:48 -0400
 MIME-Version: 1.0
-In-Reply-To: <CA+r1Zhiat4d8FqFcD1BBCxe5jyWOtSDZp99_CLV0qE1D3REquw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <1476920573-14384-2-git-send-email-nicolas.pitre@linaro.org>
+References: <1476920573-14384-1-git-send-email-nicolas.pitre@linaro.org> <1476920573-14384-2-git-send-email-nicolas.pitre@linaro.org>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Thu, 20 Oct 2016 15:53:28 +0900
+Message-ID: <CAK7LNAQ3UCFXOsCU6t_RJfe4Suxz3BmJGaBw7fMTy=z8JoJ2Bw@mail.gmail.com>
+Subject: Re: [PATCH 1/4] kconfig: introduce the "imply" keyword
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jim Davis <jim.epost@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.com>, linux-kernel <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org
+To: Nicolas Pitre <nicolas.pitre@linaro.org>
+Cc: John Stultz <john.stultz@linaro.org>, Richard Cochran <richardcochran@gmail.com>, Yann E MORIN <yann.morin.1998@free.fr>, Thomas Gleixner <tglx@linutronix.de>, Josh Triplett <josh@joshtriplett.org>, netdev@vger.kernel.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-> make defconfig; make EXTRA_CFLAGS="-g" drivers/md/; objdump -S drivers/md/whatever.o
+2016-10-20 8:42 GMT+09:00 Nicolas Pitre <nicolas.pitre@linaro.org>:
+> diff --git a/Documentation/kbuild/kconfig-language.txt b/Documentation/kbuild/kconfig-language.txt
+> index 069fcb3eef..c96127f648 100644
+> --- a/Documentation/kbuild/kconfig-language.txt
+> +++ b/Documentation/kbuild/kconfig-language.txt
+> @@ -113,6 +113,33 @@ applicable everywhere (see syntax).
+>         That will limit the usefulness but on the other hand avoid
+>         the illegal configurations all over.
+>
+> +- weak reverse dependencies: "imply" <symbol> ["if" <expr>]
+> +  This is similar to "select" as it enforces a lower limit on another
+> +  symbol except that the "implied" config symbol's value may still be
+> +  set to n from a direct dependency or with a visible prompt.
+> +  Given the following example:
+> +
+> +  config FOO
+> +       tristate
+> +       imply BAZ
+> +
+> +  config BAZ
+> +       tristate
+> +       depends on BAr
 
-Such a command looks promising.
 
-* I find it safer when double ampersand will be used as control operator
-  instead of semicolon there.
-
-* I get the impression from an other command like "find . -name '?akefile' -exec ack --with-filename EXTRA_CFLAGS '{}' \;"
-  that the suggested parameter "EXTRA_CFLAGS" will not achieve an effect
-  at places where I am interested in at the moment.
+s/BAr/BAR/  ?
 
 
-It seems that further fine-tuning can become interesting and challenging
-for involved make variables.
 
-Regards,
-Markus
+
+
+-- 
+Best Regards
+Masahiro Yamada
