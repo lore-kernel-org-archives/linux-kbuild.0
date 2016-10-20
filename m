@@ -1,53 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-it0-f66.google.com ([209.85.214.66]:33004 "EHLO
-        mail-it0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932622AbcJTHhb (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 20 Oct 2016 03:37:31 -0400
+Received: from mout.web.de ([212.227.17.12]:61595 "EHLO mout.web.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1755850AbcJTHiY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 20 Oct 2016 03:38:24 -0400
+Subject: Re: Challenges around the usage of different "HOSTCFLAGS" for kernel
+ build configuration and module generation
+References: <4f2251fc-94ee-41d3-cc03-a39cee5a084c@users.sourceforge.net>
+ <CA+r1ZhjmaXi+Nf8vNsMwzfuSkYOByC6D_F=GkehneqfnSO7iCQ@mail.gmail.com>
+ <1238ba8e-a297-6de5-2e6a-50e6e72e77d3@users.sourceforge.net>
+ <CA+r1ZhhqEBvV0ivz=MvaHhRquhFS2mxddJ-GOx81ZeSerKsD3g@mail.gmail.com>
+ <ec3a7283-3c41-9879-49ae-8924b8daf65f@users.sourceforge.net>
+ <CA+r1Zhj3AQAbL_Hu4w=gX8kaR0zKoYhTmAYyVcvBMPLXpfZ3gA@mail.gmail.com>
+ <4fe8b518-6145-5322-a852-beeb61abd559@users.sourceforge.net>
+ <CA+r1Zhiat4d8FqFcD1BBCxe5jyWOtSDZp99_CLV0qE1D3REquw@mail.gmail.com>
+ <20161019220346.GA20054@gate.crashing.org>
+From: SF Markus Elfring <elfring@users.sourceforge.net>
+Message-ID: <80d31faa-b328-b8eb-4d19-d96aef1cc16a@users.sourceforge.net>
+Date: Thu, 20 Oct 2016 09:37:34 +0200
 MIME-Version: 1.0
-In-Reply-To: <20161019153159.GQ1041@n2100.armlinux.org.uk>
-References: <20161017065131.GA27863@angband.pl> <6556201.qTG4Pa4aHk@wuerfel>
- <fafba13a-c64c-2578-534c-c344f18d0fc5@suse.com> <3114442.xCAy34UQCk@wuerfel> <20161019153159.GQ1041@n2100.armlinux.org.uk>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Thu, 20 Oct 2016 09:37:30 +0200
-Message-ID: <CAMuHMdXUJ2QcspSQrnWuCzQG7oJ6sCuAuHV0+ftB0oVTL3zeQA@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: provide include/asm/asm-prototypes.h for ARM
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20161019220346.GA20054@gate.crashing.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Russell King - ARM Linux <linux@armlinux.org.uk>
-Cc: Arnd Bergmann <arnd@arndb.de>, Michal Marek <mmarek@suse.com>, Nicholas Piggin <npiggin@gmail.com>, Adam Borowski <kilobyte@angband.pl>, Omar Sandoval <osandov@osandov.com>, Linus Torvalds <torvalds@linux-foundation.org>, Alexey Dobriyan <adobriyan@gmail.com>, Stephen Rothwell <sfr@canb.auug.org.au>, Al Viro <viro@zeniv.linux.org.uk>, linux-kbuild <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Linux-Arch <linux-arch@vger.kernel.org>
+To: Segher Boessenkool <segher@kernel.crashing.org>
+Cc: Jim Davis <jim.epost@gmail.com>, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.com>, linux-kernel <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org
 
-On Wed, Oct 19, 2016 at 5:32 PM, Russell King - ARM Linux
-<linux@armlinux.org.uk> wrote:
-> I'm not in favour of this.
->
->    +extern void mmioset(void *, unsigned int, size_t);
->    +extern void mmiocpy(void *, const void *, size_t);
->    +
->     #ifndef __ARMBE__
->     static inline void memset_io(volatile void __iomem *dst, unsigned c,
->            size_t count)
->     {
->    -       extern void mmioset(void *, unsigned int, size_t);
->            mmioset((void __force *)dst, c, count);
->     }
->
-> The reason they're declared _within_ memset_io() is to prevent people
-> from using them by hiding their declaration.  Moving them outside is
-> an open invitation to stupid people starting to use them as an "oh it
-> must be an official API".
+> Don't forget -r when running objdump on an object file.
 
-If they're not intended for public use, they should (also) be prefixed
-with "__" or even "____" to make this clear.
+Thanks for your reminder.
 
-Gr{oetje,eeting}s,
 
-                        Geert
+> But, you want to use  make drivers/md/whatever.s  if you want to see
+> the assembler code.
 
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+Thanks for your advice!
 
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+This is one kind of "generation convenience" I was looking for.
+
+Was my software development attention too limited for another moment
+so that I did not directly pick an opportunity up from the description
+like "dir/file.[ois]  - Build specified target only"
+(by the command "make help") that I can get assembler source files
+for Linux modules so easy on demand?
+
+Would you like to point any places out in the make scripts which
+show relevant commands for such build targets?
+
+
+> And that doesn't work for build-time tools,
+
+I got the impression that they can trigger further software development challenges.
+Should their source files (and corresponding make parameters) be improved anyhow?
+
+
+> which I think is what the original discussion was about.
+
+I see a few change possibilities there. Will it be useful to reconsider
+the generation parameters for build-time tools in comparison to components
+from other Linux software areas?
+
+Will a variable like "EXTRA_CFLAGS" achieve a desired effect at more places?
+
+Regards,
+Markus
