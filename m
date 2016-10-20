@@ -1,87 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qt0-f174.google.com ([209.85.216.174]:36084 "EHLO
-        mail-qt0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752106AbcJTREL (ORCPT
+Received: from nbfkord-smmo04.seg.att.com ([209.65.160.86]:42049 "EHLO
+        nbfkord-smmo04.seg.att.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1755423AbcJTRlO (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 20 Oct 2016 13:04:11 -0400
-Received: by mail-qt0-f174.google.com with SMTP id m5so62602072qtb.3
-        for <linux-kbuild@vger.kernel.org>; Thu, 20 Oct 2016 10:04:10 -0700 (PDT)
-Date: Thu, 20 Oct 2016 13:04:08 -0400 (EDT)
-From: Nicolas Pitre <nicolas.pitre@linaro.org>
+        Thu, 20 Oct 2016 13:41:14 -0400
 Subject: Re: [PATCH 1/4] kconfig: introduce the "imply" keyword
-In-Reply-To: <44f95579-6c35-7592-08e3-d8dbb13026b2@solarflare.com>
-Message-ID: <alpine.LFD.2.20.1610201245230.25105@knanqh.ubzr>
-References: <1476920573-14384-1-git-send-email-nicolas.pitre@linaro.org> <1476920573-14384-2-git-send-email-nicolas.pitre@linaro.org> <44f95579-6c35-7592-08e3-d8dbb13026b2@solarflare.com>
+References: <1476920573-14384-1-git-send-email-nicolas.pitre@linaro.org>
+ <1476920573-14384-2-git-send-email-nicolas.pitre@linaro.org>
+ <44f95579-6c35-7592-08e3-d8dbb13026b2@solarflare.com>
+ <alpine.LFD.2.20.1610201245230.25105@knanqh.ubzr>
+From: Edward Cree <ecree@solarflare.com>
+Message-ID: <fea29738-142d-0cb8-da85-cf376d1158e7@solarflare.com>
+Date: Thu, 20 Oct 2016 18:41:02 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <alpine.LFD.2.20.1610201245230.25105@knanqh.ubzr>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Edward Cree <ecree@solarflare.com>
+To: Nicolas Pitre <nicolas.pitre@linaro.org>
 Cc: John Stultz <john.stultz@linaro.org>, Richard Cochran <richardcochran@gmail.com>, Yann E MORIN <yann.morin.1998@free.fr>, Thomas Gleixner <tglx@linutronix.de>, Josh Triplett <josh@joshtriplett.org>, netdev@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Thu, 20 Oct 2016, Edward Cree wrote:
+On 20/10/16 18:04, Nicolas Pitre wrote:
+> On Thu, 20 Oct 2016, Edward Cree wrote:
+>> Also, I don't think having any FOO=y should preclude BAZ=m.  Suppose both
+>> FOO and FOO2 imply BAZ, FOO=y and FOO2=m.
+> Some people didn't like the fact that you could turn a driver from m to
+> y and silently lose some features if they were provided by a subsystem
+> that also used to be m, which arguably is not the same as being
+> explicitly disabled.  With "select" this is not a problem as the target
+> symbol is also promoted to y in that case, so I wanted to preserve that
+> property.
+Right, but that's an argument for pushing the subsystem's default to y,
+not for preventing changing the subsystem back to m afterwards.
+>> Then if BAZ-features are only
+>> desired for driver FOO2, BAz=m makes sense.
+> In that case it would make more sense to add a config option related to
+> FOO asking if BAZ features are desired for that driver (there is already
+> one occurrence of that with PTP).  Or you could simply drop the "imply"
+> statement from the FOO config entry.
+But the desire is a property of the user, not of the driver.  If you're
+willing to add CONFIG_FOO_BAZ to every combination of (driver, subsystem)
+then "imply" becomes unnecessary, doesn't it?  Conversely, if you *don't*
+want to have to do that, then "imply" needs to only ever deal in defaults,
+not in limitations.
+>> There is also the case of drivers with the ability to detect at runtime
+>> whether BAZ is present, rather than making the decision at build time, but
+>> I'm not sure how common that is.
+> Right now that's how PTP support is done.  Drivers can optimize things
+> at build time, but most of them simply cope with a NULL return from
+> ptp_clock_register().  Hence the imply statement becomes a big
+> configuration hint rather than some hard build dependency.
+Right, so those drivers can use PTP if they're y and PTP is m, as long as
+the PTP module is loaded when they probe.  But current "imply" semantics
+won't allow that...
 
-> On 20/10/16 00:42, Nicolas Pitre wrote:
-> > diff --git a/Documentation/kbuild/kconfig-language.txt b/Documentation/kbuild/kconfig-language.txt
-> > index 069fcb3eef..c96127f648 100644
-> > --- a/Documentation/kbuild/kconfig-language.txt
-> > +++ b/Documentation/kbuild/kconfig-language.txt
-> > @@ -113,6 +113,33 @@ applicable everywhere (see syntax).
-> >       That will limit the usefulness but on the other hand avoid
-> >       the illegal configurations all over.
-> >
-> > +- weak reverse dependencies: "imply" <symbol> ["if" <expr>]
-> > +  This is similar to "select" as it enforces a lower limit on another
-> > +  symbol except that the "implied" config symbol's value may still be
-> > +  set to n from a direct dependency or with a visible prompt.
-> > +  Given the following example:
-> > +
-> > +  config FOO
-> > +     tristate
-> > +     imply BAZ
-> > +
-> > +  config BAZ
-> > +     tristate
-> > +     depends on BAr
-> > +
-> > +  The following values are possible:
-> > +
-> > +     FOO             BAR             BAR's default   choice for BAZ
-> Should the third column not be "BAZ's default"?
+I think that Josh's suggestion (have the UI warn you if you set BAZ to m
+while FOO=y) is the right approach, but I also think it should be done
+now rather than at some unspecified future time.  Otherwise you forbid
+potentially valid configs.
 
-Indeed.  Good catch.
-
-> > +     --------------- --------------- --------------- --------------
-> > +     n               y               n               N/m/y
-> > +     m               y               m               M/y/n
-> > +     y               y               y               Y/n
-> > +     y               n               *               N
-> Also, I don't think having any FOO=y should preclude BAZ=m.  Suppose both
-> FOO and FOO2 imply BAZ, FOO=y and FOO2=m.
-
-Some people didn't like the fact that you could turn a driver from m to 
-y and silently lose some features if they were provided by a subsystem 
-that also used to be m, which arguably is not the same as being 
-explicitly disabled.  With "select" this is not a problem as the target 
-symbol is also promoted to y in that case, so I wanted to preserve that 
-property.
-
-> Then if BAZ-features are only
-> desired for driver FOO2, BAz=m makes sense.
-
-In that case it would make more sense to add a config option related to 
-FOO asking if BAZ features are desired for that driver (there is already 
-one occurrence of that with PTP).  Or you could simply drop the "imply" 
-statement from the FOO config entry.
-
-> There is also the case of drivers with the ability to detect at runtime
-> whether BAZ is present, rather than making the decision at build time, but
-> I'm not sure how common that is.
-
-Right now that's how PTP support is done.  Drivers can optimize things 
-at build time, but most of them simply cope with a NULL return from 
-ptp_clock_register().  Hence the imply statement becomes a big 
-configuration hint rather than some hard build dependency.
-
-
-Nicolas
+-Ed
+The information contained in this message is confidential and is intended for the addressee(s) only. If you have received this message in error, please notify the sender immediately and delete the message. Unless you are an addressee (or authorized to receive for an addressee), you may not use, copy or disclose to anyone this message or any information contained in this message. The unauthorized use, disclosure, copying or alteration of this message is strictly prohibited.
