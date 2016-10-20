@@ -1,52 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from condef008-v.nifty.com ([210.131.4.245]:44549 "EHLO
-        condef008-v.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750951AbcJTHAs (ORCPT
+Received: from mail-it0-f66.google.com ([209.85.214.66]:33004 "EHLO
+        mail-it0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932622AbcJTHhb (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 20 Oct 2016 03:00:48 -0400
+        Thu, 20 Oct 2016 03:37:31 -0400
 MIME-Version: 1.0
-In-Reply-To: <1476920573-14384-2-git-send-email-nicolas.pitre@linaro.org>
-References: <1476920573-14384-1-git-send-email-nicolas.pitre@linaro.org> <1476920573-14384-2-git-send-email-nicolas.pitre@linaro.org>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 20 Oct 2016 15:53:28 +0900
-Message-ID: <CAK7LNAQ3UCFXOsCU6t_RJfe4Suxz3BmJGaBw7fMTy=z8JoJ2Bw@mail.gmail.com>
-Subject: Re: [PATCH 1/4] kconfig: introduce the "imply" keyword
+In-Reply-To: <20161019153159.GQ1041@n2100.armlinux.org.uk>
+References: <20161017065131.GA27863@angband.pl> <6556201.qTG4Pa4aHk@wuerfel>
+ <fafba13a-c64c-2578-534c-c344f18d0fc5@suse.com> <3114442.xCAy34UQCk@wuerfel> <20161019153159.GQ1041@n2100.armlinux.org.uk>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Thu, 20 Oct 2016 09:37:30 +0200
+Message-ID: <CAMuHMdXUJ2QcspSQrnWuCzQG7oJ6sCuAuHV0+ftB0oVTL3zeQA@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: provide include/asm/asm-prototypes.h for ARM
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicolas Pitre <nicolas.pitre@linaro.org>
-Cc: John Stultz <john.stultz@linaro.org>, Richard Cochran <richardcochran@gmail.com>, Yann E MORIN <yann.morin.1998@free.fr>, Thomas Gleixner <tglx@linutronix.de>, Josh Triplett <josh@joshtriplett.org>, netdev@vger.kernel.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Russell King - ARM Linux <linux@armlinux.org.uk>
+Cc: Arnd Bergmann <arnd@arndb.de>, Michal Marek <mmarek@suse.com>, Nicholas Piggin <npiggin@gmail.com>, Adam Borowski <kilobyte@angband.pl>, Omar Sandoval <osandov@osandov.com>, Linus Torvalds <torvalds@linux-foundation.org>, Alexey Dobriyan <adobriyan@gmail.com>, Stephen Rothwell <sfr@canb.auug.org.au>, Al Viro <viro@zeniv.linux.org.uk>, linux-kbuild <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Linux-Arch <linux-arch@vger.kernel.org>
 
-2016-10-20 8:42 GMT+09:00 Nicolas Pitre <nicolas.pitre@linaro.org>:
-> diff --git a/Documentation/kbuild/kconfig-language.txt b/Documentation/kbuild/kconfig-language.txt
-> index 069fcb3eef..c96127f648 100644
-> --- a/Documentation/kbuild/kconfig-language.txt
-> +++ b/Documentation/kbuild/kconfig-language.txt
-> @@ -113,6 +113,33 @@ applicable everywhere (see syntax).
->         That will limit the usefulness but on the other hand avoid
->         the illegal configurations all over.
+On Wed, Oct 19, 2016 at 5:32 PM, Russell King - ARM Linux
+<linux@armlinux.org.uk> wrote:
+> I'm not in favour of this.
 >
-> +- weak reverse dependencies: "imply" <symbol> ["if" <expr>]
-> +  This is similar to "select" as it enforces a lower limit on another
-> +  symbol except that the "implied" config symbol's value may still be
-> +  set to n from a direct dependency or with a visible prompt.
-> +  Given the following example:
-> +
-> +  config FOO
-> +       tristate
-> +       imply BAZ
-> +
-> +  config BAZ
-> +       tristate
-> +       depends on BAr
+>    +extern void mmioset(void *, unsigned int, size_t);
+>    +extern void mmiocpy(void *, const void *, size_t);
+>    +
+>     #ifndef __ARMBE__
+>     static inline void memset_io(volatile void __iomem *dst, unsigned c,
+>            size_t count)
+>     {
+>    -       extern void mmioset(void *, unsigned int, size_t);
+>            mmioset((void __force *)dst, c, count);
+>     }
+>
+> The reason they're declared _within_ memset_io() is to prevent people
+> from using them by hiding their declaration.  Moving them outside is
+> an open invitation to stupid people starting to use them as an "oh it
+> must be an official API".
 
+If they're not intended for public use, they should (also) be prefixed
+with "__" or even "____" to make this clear.
 
-s/BAr/BAR/  ?
+Gr{oetje,eeting}s,
 
+                        Geert
 
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
-
-
--- 
-Best Regards
-Masahiro Yamada
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
