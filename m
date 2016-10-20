@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from Galois.linutronix.de ([146.0.238.70]:47645 "EHLO
+Received: from Galois.linutronix.de ([146.0.238.70]:47657 "EHLO
         Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752444AbcJTJt1 (ORCPT
+        with ESMTP id S933668AbcJTJwl (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 20 Oct 2016 05:49:27 -0400
-Date: Thu, 20 Oct 2016 11:46:57 +0200 (CEST)
+        Thu, 20 Oct 2016 05:52:41 -0400
+Date: Thu, 20 Oct 2016 11:50:12 +0200 (CEST)
 From: Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [PATCH 0/4] make POSIX timers optional with some Kconfig help
-In-Reply-To: <1476920573-14384-1-git-send-email-nicolas.pitre@linaro.org>
-Message-ID: <alpine.DEB.2.20.1610201145310.5073@nanos>
-References: <1476920573-14384-1-git-send-email-nicolas.pitre@linaro.org>
+Subject: Re: [PATCH 3/4] ptp_clock: allow for it to be optional
+In-Reply-To: <1476920573-14384-4-git-send-email-nicolas.pitre@linaro.org>
+Message-ID: <alpine.DEB.2.20.1610201149190.5073@nanos>
+References: <1476920573-14384-1-git-send-email-nicolas.pitre@linaro.org> <1476920573-14384-4-git-send-email-nicolas.pitre@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -18,14 +18,12 @@ To: Nicolas Pitre <nicolas.pitre@linaro.org>
 Cc: John Stultz <john.stultz@linaro.org>, Richard Cochran <richardcochran@gmail.com>, Yann E MORIN <yann.morin.1998@free.fr>, Josh Triplett <josh@joshtriplett.org>, netdev@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
 On Wed, 19 Oct 2016, Nicolas Pitre wrote:
-> Therefore this series also includes kconfig changes to implement a new
-> keyword to express some reverse dependencies like "select" does, named
-> "imply", and still allowing for the target config symbol to be disabled
-> if the user or a direct dependency says so.
+> The pch_gbe driver is a bit special as it relies on extra code in
+> drivers/ptp/ptp_pch.c. Therefore we let the make process descend into
+> drivers/ptp/ even if PTP_1588_CLOCK is unselected.
 
-That's really nice work! Thanks for doing that. It makes the whole thing
-more palatable.
-
+The above paragraph looks like a leftover of the previous patch set.
+ 
 Thanks,
 
 	tglx
