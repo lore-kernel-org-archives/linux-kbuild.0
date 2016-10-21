@@ -1,241 +1,321 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qk0-f180.google.com ([209.85.220.180]:32981 "EHLO
-        mail-qk0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753210AbcJUDYE (ORCPT
+Received: from mail-pf0-f195.google.com ([209.85.192.195]:36395 "EHLO
+        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754342AbcJUGfa (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 20 Oct 2016 23:24:04 -0400
-Received: by mail-qk0-f180.google.com with SMTP id n189so128772636qke.0
-        for <linux-kbuild@vger.kernel.org>; Thu, 20 Oct 2016 20:24:03 -0700 (PDT)
-Date: Thu, 20 Oct 2016 23:24:01 -0400 (EDT)
-From: Nicolas Pitre <nicolas.pitre@linaro.org>
-Subject: Re: [PATCH 1/4] kconfig: introduce the "imply" keyword
-In-Reply-To: <alpine.LFD.2.20.1610201539100.25105@knanqh.ubzr>
-Message-ID: <alpine.LFD.2.20.1610202319110.25105@knanqh.ubzr>
-References: <1476920573-14384-1-git-send-email-nicolas.pitre@linaro.org> <1476920573-14384-2-git-send-email-nicolas.pitre@linaro.org> <44f95579-6c35-7592-08e3-d8dbb13026b2@solarflare.com> <alpine.LFD.2.20.1610201245230.25105@knanqh.ubzr>
- <fea29738-142d-0cb8-da85-cf376d1158e7@solarflare.com> <alpine.LFD.2.20.1610201349070.25105@knanqh.ubzr> <3c91236f-6795-fdcc-c8a2-6e7b2fd7da66@solarflare.com> <alpine.LFD.2.20.1610201539100.25105@knanqh.ubzr>
+        Fri, 21 Oct 2016 02:35:30 -0400
+Received: by mail-pf0-f195.google.com with SMTP id r16so7711604pfg.3
+        for <linux-kbuild@vger.kernel.org>; Thu, 20 Oct 2016 23:35:30 -0700 (PDT)
+Date: Fri, 21 Oct 2016 17:35:17 +1100
+From: Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH 0/7] build updates (and RFC on one-pass kallsyms
+ generation)
+Message-ID: <20161021173517.1f715fda@roar.ozlabs.ibm.com>
+In-Reply-To: <20161019184422.50f4d08b@roar.ozlabs.ibm.com>
+References: <20161019031600.17933-1-npiggin@gmail.com>
+        <20161019184422.50f4d08b@roar.ozlabs.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Edward Cree <ecree@solarflare.com>
-Cc: John Stultz <john.stultz@linaro.org>, Richard Cochran <richardcochran@gmail.com>, Yann E MORIN <yann.morin.1998@free.fr>, Thomas Gleixner <tglx@linutronix.de>, Josh Triplett <josh@joshtriplett.org>, netdev@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linuxppc-dev@lists.ozlabs.org
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>, linux-kbuild@vger.kernel.org
 
-On Thu, 20 Oct 2016, Nicolas Pitre wrote:
+On Wed, 19 Oct 2016 18:44:22 +1100
+Nicholas Piggin <npiggin@gmail.com> wrote:
 
-> On Thu, 20 Oct 2016, Edward Cree wrote:
+> On Wed, 19 Oct 2016 14:15:53 +1100
+> Nicholas Piggin <npiggin@gmail.com> wrote:
 > 
-> > I'm interpreting "imply" as being more a way of saying "if you want FOO you
-> > probably want BAZ as well".  But maybe that should be yet another new
-> > keyword if it's so different from what you want "imply" to be.  "suggests",
-> > perhaps.
+> > [*] Building allyesconfig still requires KALLSYMS_EXTRA_PASS=1, which
+> >     I'm yet to look into.  
 > 
-> Indeed. That's exactly the keyword that came to my mind after I sent my 
-> previous reply.
+> Oh, it's because the kallsyms payload increases kernel image size and that
+> causes more linker stubs to be generated, which have symbols, which go into
+> kallsyms... What a nightmare.
+> 
+> We can use --no-emit-stub-syms, but it's kind of nice to have names for
+> things.
 
-So what about the following on top of my previous series:
+This is a real quick hack at a way to improve it.
 
-From: Nicolas Pitre <nicolas.pitre@linaro.org>
-Date: Thu, 20 Oct 2016 23:04:46 -0400
-Subject: [PATCH] kconfig: introduce the "suggest" keyword
+Even if we don't go with the kbuild change (which causes a slight
+regression in a handful of symbols), I'll pursue the .kallsyms section
+and powerpc change to move it toward the end: that should be enough to
+avoid the build failures, and it moves a huge blob of cold data from the
+middle of the image.
 
-Similar to "imply" but with no added value restrictions on the target
-symbol. Useful for providing a default value to another symbol.
+    kbuild: put kallsyms into its own section
+    
+    With example linker script implementation for powerpc. This allows
+    us to put the kallsyms section at the end of the image rather than
+    in the middle, which doesn't jumble all our offsets when linking it
+    in, or causing liker to add more stubs. Which means we can do kallsyms
+    generation in one pass. A few values (_end, and some kallsyms_ variables)
+    do move, so they don't get correct symbols.
 
-Signed-off-by: Nicolas Pitre <nico@linaro.org>
-
-diff --git a/Documentation/kbuild/kconfig-language.txt b/Documentation/kbuild/kconfig-language.txt
-index 5ee0dd3c85..b7f4f0ca1d 100644
---- a/Documentation/kbuild/kconfig-language.txt
-+++ b/Documentation/kbuild/kconfig-language.txt
-@@ -140,6 +140,12 @@ applicable everywhere (see syntax).
-   ability to hook into a given subsystem while still being able to
-   configure that subsystem out and keep those drivers selected.
+diff --git a/arch/powerpc/kernel/vmlinux.lds.S b/arch/powerpc/kernel/vmlinux.lds.S
+index 115a44e..9ebe1df 100644
+--- a/arch/powerpc/kernel/vmlinux.lds.S
++++ b/arch/powerpc/kernel/vmlinux.lds.S
+@@ -294,6 +294,10 @@ SECTIONS
  
-+- even weaker reverse dependencies: "suggest" <symbol> ["if" <expr>]
-+  This is similar to "imply" except that this doesn't add any restrictions
-+  on the value the suggested symbol may use. In other words this only
-+  provides a default for the specified symbol based on the value for the
-+  config entry where this is used.
-+
- - limiting menu display: "visible if" <expr>
-   This attribute is only applicable to menu blocks, if the condition is
-   false, the menu block is not displayed to the user (the symbols
-diff --git a/scripts/kconfig/expr.h b/scripts/kconfig/expr.h
-index a73f762c48..eea3aa3c7a 100644
---- a/scripts/kconfig/expr.h
-+++ b/scripts/kconfig/expr.h
-@@ -86,6 +86,7 @@ struct symbol {
- 	struct expr_value dir_dep;
- 	struct expr_value rev_dep;
- 	struct expr_value implied;
-+	struct expr_value suggested;
- };
+ 	BSS_SECTION(0, 0, 0)
  
- #define for_all_symbols(i, sym) for (i = 0; i < SYMBOL_HASHSIZE; i++) for (sym = symbol_hash[i]; sym; sym = sym->next) if (sym->type != S_OTHER)
-@@ -138,6 +139,7 @@ enum prop_type {
- 	P_CHOICE,   /* choice value */
- 	P_SELECT,   /* select BAR */
- 	P_IMPLY,    /* imply BAR */
-+	P_SUGGEST,  /* suggest BAR */
- 	P_RANGE,    /* range 7..100 (for a symbol) */
- 	P_ENV,      /* value from environment variable */
- 	P_SYMBOL,   /* where a symbol is defined */
-diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
-index e9357931b4..3abc5c85ac 100644
---- a/scripts/kconfig/menu.c
-+++ b/scripts/kconfig/menu.c
-@@ -255,7 +255,9 @@ static void sym_check_prop(struct symbol *sym)
- 			break;
- 		case P_SELECT:
- 		case P_IMPLY:
--			use = prop->type == P_SELECT ? "select" : "imply";
-+		case P_SUGGEST:
-+			use = prop->type == P_SELECT ? "select" :
-+			      prop->type == P_IMPLY ? "imply" : "suggest";
- 			sym2 = prop_get_symbol(prop);
- 			if (sym->type != S_BOOLEAN && sym->type != S_TRISTATE)
- 				prop_warn(prop,
-@@ -341,6 +343,10 @@ void menu_finalize(struct menu *parent)
- 					struct symbol *es = prop_get_symbol(prop);
- 					es->implied.expr = expr_alloc_or(es->implied.expr,
- 							expr_alloc_and(expr_alloc_symbol(menu->sym), expr_copy(dep)));
-+				} else if (prop->type == P_SUGGEST) {
-+					struct symbol *es = prop_get_symbol(prop);
-+					es->suggested.expr = expr_alloc_or(es->suggested.expr,
-+							expr_alloc_and(expr_alloc_symbol(menu->sym), expr_copy(dep)));
- 				}
- 			}
- 		}
-@@ -687,6 +693,13 @@ static void get_symbol_str(struct gstr *r, struct symbol *sym,
- 		str_append(r, "\n");
- 	}
- 
-+	get_symbol_props_str(r, sym, P_SUGGEST, _("  Suggests: "));
-+	if (sym->suggested.expr) {
-+		str_append(r, _("  Suggested by: "));
-+		expr_gstr_print(sym->suggested.expr, r);
-+		str_append(r, "\n");
++	.kallsyms : AT(ADDR(.kallsyms) - LOAD_OFFSET) {
++		KEEP(*(.kallsyms))
 +	}
 +
- 	str_append(r, "\n\n");
- }
- 
-diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
-index 074fb66d9a..235f11e3f9 100644
---- a/scripts/kconfig/symbol.c
-+++ b/scripts/kconfig/symbol.c
-@@ -267,6 +267,16 @@ static void sym_calc_visibility(struct symbol *sym)
- 		sym->implied.tri = tri;
- 		sym_set_changed(sym);
- 	}
-+	tri = no;
-+	if (sym->suggested.expr)
-+		tri = expr_calc_value(sym->suggested.expr);
-+	tri = EXPR_AND(tri, sym->visible);
-+	if (tri == mod && sym_get_type(sym) == S_BOOLEAN)
-+		tri = yes;
-+	if (sym->suggested.tri != tri) {
-+		sym->suggested.tri = tri;
-+		sym_set_changed(sym);
-+	}
- }
+ 	. = ALIGN(PAGE_SIZE);
+ 	_end = . ;
+ 	PROVIDE32 (end = .);
+diff --git a/kernel/kallsyms.c b/kernel/kallsyms.c
+index fafd1a3..311fe07 100644
+--- a/kernel/kallsyms.c
++++ b/kernel/kallsyms.c
+@@ -37,24 +37,30 @@
+  * These will be re-linked against their real values
+  * during the second link stage.
+  */
+-extern const unsigned long kallsyms_addresses[] __weak;
+-extern const int kallsyms_offsets[] __weak;
+-extern const u8 kallsyms_names[] __weak;
++extern const unsigned long kallsyms_addresses[]
++__attribute__((weak, section(".kallsyms")));
++extern const int kallsyms_offsets[]
++__attribute__((weak, section(".kallsyms")));
++extern const u8 kallsyms_names[]
++__attribute__((weak, section(".kallsyms")));
  
  /*
-@@ -406,6 +416,10 @@ void sym_calc_value(struct symbol *sym)
- 					newval.tri = EXPR_AND(expr_calc_value(prop->expr),
- 							      prop->visible.tri);
- 				}
-+				if (sym->suggested.tri != no) {
-+					sym->flags |= SYMBOL_WRITE;
-+					newval.tri = EXPR_OR(newval.tri, sym->suggested.tri);
-+				}
- 				if (sym->dir_dep.tri != no &&
- 				    sym->implied.tri != no) {
- 					/* implied symbols have implied defaults */
-@@ -768,7 +782,9 @@ const char *sym_get_string_default(struct symbol *sym)
- 	if (sym->type == S_BOOLEAN && val == mod)
- 		val = yes;
+  * Tell the compiler that the count isn't in the small data section if the arch
+  * has one (eg: FRV).
+  */
+ extern const unsigned long kallsyms_num_syms
+-__attribute__((weak, section(".rodata")));
++__attribute__((weak, section(".kallsyms")));
  
--	/* adjust the default value if this symbol is implied by another */
-+	/* adjust the default value if this symbol is suggested/implied */
-+	if (val < sym->suggested.tri)
-+		val = sym->suggested.tri;
- 	if (val < sym->implied.tri)
- 		val = sym->implied.tri;
+ extern const unsigned long kallsyms_relative_base
+-__attribute__((weak, section(".rodata")));
++__attribute__((weak, section(".kallsyms")));
  
-@@ -1376,6 +1392,8 @@ const char *prop_get_type_name(enum prop_type type)
- 		return "select";
- 	case P_IMPLY:
- 		return "imply";
-+	case P_SUGGEST:
-+		return "suggest";
- 	case P_RANGE:
- 		return "range";
- 	case P_SYMBOL:
-diff --git a/scripts/kconfig/zconf.gperf b/scripts/kconfig/zconf.gperf
-index ead02edec9..0c244a8e95 100644
---- a/scripts/kconfig/zconf.gperf
-+++ b/scripts/kconfig/zconf.gperf
-@@ -39,6 +39,7 @@ hex,		T_TYPE,		TF_COMMAND, S_HEX
- string,		T_TYPE,		TF_COMMAND, S_STRING
- select,		T_SELECT,	TF_COMMAND
- imply,		T_IMPLY,	TF_COMMAND
-+suggest,	T_SUGGEST,	TF_COMMAND
- range,		T_RANGE,	TF_COMMAND
- visible,	T_VISIBLE,	TF_COMMAND
- option,		T_OPTION,	TF_COMMAND
-diff --git a/scripts/kconfig/zconf.y b/scripts/kconfig/zconf.y
-index 001305fa08..277415540a 100644
---- a/scripts/kconfig/zconf.y
-+++ b/scripts/kconfig/zconf.y
-@@ -31,7 +31,7 @@ struct symbol *symbol_hash[SYMBOL_HASHSIZE];
- static struct menu *current_menu, *current_entry;
+-extern const u8 kallsyms_token_table[] __weak;
+-extern const u16 kallsyms_token_index[] __weak;
++extern const u8 kallsyms_token_table[]
++__attribute__((weak, section(".kallsyms")));
++extern const u16 kallsyms_token_index[]
++__attribute__((weak, section(".kallsyms")));
  
- %}
--%expect 32
-+%expect 34
+-extern const unsigned long kallsyms_markers[] __weak;
++extern const unsigned long kallsyms_markers[]
++__attribute__((weak, section(".kallsyms")));
  
- %union
+ static inline int is_kernel_inittext(unsigned long addr)
  {
-@@ -63,6 +63,7 @@ static struct menu *current_menu, *current_entry;
- %token <id>T_DEFAULT
- %token <id>T_SELECT
- %token <id>T_IMPLY
-+%token <id>T_SUGGEST
- %token <id>T_RANGE
- %token <id>T_VISIBLE
- %token <id>T_OPTION
-@@ -125,7 +126,7 @@ stmt_list:
- ;
+diff --git a/scripts/kallsyms.c b/scripts/kallsyms.c
+index 1f22a18..4327d80 100644
+--- a/scripts/kallsyms.c
++++ b/scripts/kallsyms.c
+@@ -349,7 +349,7 @@ static void write_src(void)
+ 	printf("#define ALGN .align 4\n");
+ 	printf("#endif\n");
  
- option_name:
--	T_DEPENDS | T_PROMPT | T_TYPE | T_SELECT | T_IMPLY | T_OPTIONAL | T_RANGE | T_DEFAULT | T_VISIBLE
-+	T_DEPENDS | T_PROMPT | T_TYPE | T_SELECT | T_IMPLY | T_SUGGEST | T_OPTIONAL | T_RANGE | T_DEFAULT | T_VISIBLE
- ;
+-	printf("\t.section .rodata, \"a\"\n");
++	printf("\t.section .kallsyms, \"a\"\n");
  
- common_stmt:
-@@ -223,6 +224,12 @@ config_option: T_IMPLY T_WORD if_expr T_EOL
- 	printd(DEBUG_PARSE, "%s:%d:imply\n", zconf_curname(), zconf_lineno());
- };
+ 	/* Provide proper symbols relocatability by their relativeness
+ 	 * to a fixed anchor point in the runtime image, either '_text'
+commit 61502b241e9b597a60d6032a5f5a4c1dfbcafece
+Author: Nicholas Piggin <npiggin@gmail.com>
+Date:   Wed Oct 19 19:56:26 2016 +1100
+
+    kbuild: one-pass kallsyms generation
+    
+    With kallsyms at the end of the image, linking kallsyms doesn't
+    change around all offsets or cause linker stubs to be added. This
+    means kallsyms generation can be done in just one pass, and it
+    won't fail due to linker stubs.
+
+diff --git a/arch/powerpc/kernel/vmlinux.lds.S b/arch/powerpc/kernel/vmlinux.lds.S
+index 9ebe1df..534c8df 100644
+--- a/arch/powerpc/kernel/vmlinux.lds.S
++++ b/arch/powerpc/kernel/vmlinux.lds.S
+@@ -190,29 +190,6 @@ SECTIONS
+ 		*(.machine.desc)
+ 		__machine_desc_end = . ;
+ 	}
+-#ifdef CONFIG_RELOCATABLE
+-	. = ALIGN(8);
+-	.dynsym : AT(ADDR(.dynsym) - LOAD_OFFSET)
+-	{
+-#ifdef CONFIG_PPC32
+-		__dynamic_symtab = .;
+-#endif
+-		*(.dynsym)
+-	}
+-	.dynstr : AT(ADDR(.dynstr) - LOAD_OFFSET) { *(.dynstr) }
+-	.dynamic : AT(ADDR(.dynamic) - LOAD_OFFSET)
+-	{
+-		__dynamic_start = .;
+-		*(.dynamic)
+-	}
+-	.hash : AT(ADDR(.hash) - LOAD_OFFSET) { *(.hash) }
+-	.interp : AT(ADDR(.interp) - LOAD_OFFSET) { *(.interp) }
+-	.rela.dyn : AT(ADDR(.rela.dyn) - LOAD_OFFSET)
+-	{
+-		__rela_dyn_start = .;
+-		*(.rela*)
+-	}
+-#endif
+ 	/* .exit.data is discarded at runtime, not link time,
+ 	 * to deal with references from .exit.text
+ 	 */
+@@ -294,9 +271,35 @@ SECTIONS
  
-+config_option: T_SUGGEST T_WORD if_expr T_EOL
-+{
-+	menu_add_symbol(P_SUGGEST, sym_lookup($2, 0), $3);
-+	printd(DEBUG_PARSE, "%s:%d:suggest\n", zconf_curname(), zconf_lineno());
-+};
+ 	BSS_SECTION(0, 0, 0)
+ 
++#ifdef CONFIG_RELOCATABLE
++	. = ALIGN(8);
++	.dynsym : AT(ADDR(.dynsym) - LOAD_OFFSET)
++	{
++#ifdef CONFIG_PPC32
++		__dynamic_symtab = .;
++#endif
++		*(.dynsym)
++	}
++	.dynstr : AT(ADDR(.dynstr) - LOAD_OFFSET) { *(.dynstr) }
++	.dynamic : AT(ADDR(.dynamic) - LOAD_OFFSET)
++	{
++		__dynamic_start = .;
++		*(.dynamic)
++	}
++	.hash : AT(ADDR(.hash) - LOAD_OFFSET) { *(.hash) }
++	.interp : AT(ADDR(.interp) - LOAD_OFFSET) { *(.interp) }
++	.rela.dyn : AT(ADDR(.rela.dyn) - LOAD_OFFSET)
++	{
++		__rela_dyn_start = .;
++		*(.rela*)
++	}
++#endif
 +
- config_option: T_RANGE symbol symbol if_expr T_EOL
- {
- 	menu_add_expr(P_RANGE, expr_alloc_comp(E_RANGE,$2, $3), $4);
-@@ -676,6 +683,11 @@ static void print_symbol(FILE *out, struct menu *menu)
- 			expr_fprint(prop->expr, out);
- 			fputc('\n', out);
- 			break;
-+		case P_SUGGEST:
-+			fputs( "  suggest ", out);
-+			expr_fprint(prop->expr, out);
-+			fputc('\n', out);
-+			break;
- 		case P_RANGE:
- 			fputs( "  range ", out);
- 			expr_fprint(prop->expr, out);
++#ifdef CONFIG_KALLSYMS
+ 	.kallsyms : AT(ADDR(.kallsyms) - LOAD_OFFSET) {
+ 		KEEP(*(.kallsyms))
+ 	}
++#endif
+ 
+ 	. = ALIGN(PAGE_SIZE);
+ 	_end = . ;
+@@ -313,5 +316,6 @@ SECTIONS
+ 		*(.gnu.version*)
+ 		*(.gnu.attributes)
+ 		*(.eh_frame)
++		*(.kallsyms)
+ 	}
+ }
+diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
+index f742c65..b37a62b 100755
+--- a/scripts/link-vmlinux.sh
++++ b/scripts/link-vmlinux.sh
+@@ -209,15 +209,6 @@ case "${KCONFIG_CONFIG}" in
+ 	. "./${KCONFIG_CONFIG}"
+ esac
+ 
+-archive_builtin
+-
+-#link vmlinux.o
+-info LD vmlinux.o
+-modpost_link vmlinux.o
+-
+-# modpost vmlinux.o to check for section mismatches
+-${MAKE} -f "${srctree}/scripts/Makefile.modpost" vmlinux.o
+-
+ # Update version
+ info GEN .version
+ if [ ! -r .version ]; then
+@@ -231,54 +222,26 @@ fi;
+ # final build of init/
+ ${MAKE} -f "${srctree}/scripts/Makefile.build" obj=init GCC_PLUGINS_CFLAGS="${GCC_PLUGINS_CFLAGS}"
+ 
++archive_builtin
++
++# link vmlinux.o
++info LD vmlinux.o
++modpost_link vmlinux.o
++
++# modpost vmlinux.o to check for section mismatches
++${MAKE} -f "${srctree}/scripts/Makefile.modpost" vmlinux.o
++
+ kallsymso=""
+-kallsyms_vmlinux=""
+ if [ -n "${CONFIG_KALLSYMS}" ]; then
+-
+-	# kallsyms support
+-	# Generate section listing all symbols and add it into vmlinux
+-	# It's a three step process:
+-	# 1)  Link .tmp_vmlinux1 so it has all symbols and sections,
+-	#     but __kallsyms is empty.
+-	#     Running kallsyms on that gives us .tmp_kallsyms1.o with
+-	#     the right size
+-	# 2)  Link .tmp_vmlinux2 so it now has a __kallsyms section of
+-	#     the right size, but due to the added section, some
+-	#     addresses have shifted.
+-	#     From here, we generate a correct .tmp_kallsyms2.o
+-	# 2a) We may use an extra pass as this has been necessary to
+-	#     woraround some alignment related bugs.
+-	#     KALLSYMS_EXTRA_PASS=1 is used to trigger this.
+-	# 3)  The correct ${kallsymso} is linked into the final vmlinux.
+-	#
+-	# a)  Verify that the System.map from vmlinux matches the map from
+-	#     ${kallsymso}.
+-
+-	kallsymso=.tmp_kallsyms2.o
+-	kallsyms_vmlinux=.tmp_vmlinux2
+-
+-	# step 1
+-	vmlinux_link "" .tmp_vmlinux1
+-	kallsyms .tmp_vmlinux1 .tmp_kallsyms1.o
+-
+-	# step 2
+-	vmlinux_link .tmp_kallsyms1.o .tmp_vmlinux2
+-	kallsyms .tmp_vmlinux2 .tmp_kallsyms2.o
+-
+-	# step 2a
+-	if [ -n "${KALLSYMS_EXTRA_PASS}" ]; then
+-		kallsymso=.tmp_kallsyms3.o
+-		kallsyms_vmlinux=.tmp_vmlinux3
+-
+-		vmlinux_link .tmp_kallsyms2.o .tmp_vmlinux3
+-
+-		kallsyms .tmp_vmlinux3 .tmp_kallsyms3.o
+-	fi
++        vmlinux_link "${kallsymso}" .tmp_vmlinux
++	kallsyms .tmp_vmlinux kallsyms.o
++	kallsymso="kallsyms.o"
+ fi
+ 
+ info LD vmlinux
+ vmlinux_link "${kallsymso}" vmlinux
+ 
++
+ if [ -n "${CONFIG_BUILDTIME_EXTABLE_SORT}" ]; then
+ 	info SORTEX vmlinux
+ 	sortextable vmlinux
+@@ -287,16 +250,5 @@ fi
+ info SYSMAP System.map
+ mksysmap vmlinux System.map
+ 
+-# step a (see comment above)
+-if [ -n "${CONFIG_KALLSYMS}" ]; then
+-	mksysmap ${kallsyms_vmlinux} .tmp_System.map
+-
+-	if ! cmp -s System.map .tmp_System.map; then
+-		echo >&2 Inconsistent kallsyms data
+-		echo >&2 Try "make KALLSYMS_EXTRA_PASS=1" as a workaround
+-		exit 1
+-	fi
+-fi
+-
+ # We made a new kernel - delete old version file
+ rm -f .old_version
