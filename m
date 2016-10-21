@@ -1,18 +1,18 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qk0-f172.google.com ([209.85.220.172]:34072 "EHLO
-        mail-qk0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753259AbcJTUKq (ORCPT
+Received: from mail-qk0-f180.google.com ([209.85.220.180]:32981 "EHLO
+        mail-qk0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753210AbcJUDYE (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 20 Oct 2016 16:10:46 -0400
-Received: by mail-qk0-f172.google.com with SMTP id f128so111234146qkb.1
-        for <linux-kbuild@vger.kernel.org>; Thu, 20 Oct 2016 13:10:45 -0700 (PDT)
-Date: Thu, 20 Oct 2016 16:10:43 -0400 (EDT)
+        Thu, 20 Oct 2016 23:24:04 -0400
+Received: by mail-qk0-f180.google.com with SMTP id n189so128772636qke.0
+        for <linux-kbuild@vger.kernel.org>; Thu, 20 Oct 2016 20:24:03 -0700 (PDT)
+Date: Thu, 20 Oct 2016 23:24:01 -0400 (EDT)
 From: Nicolas Pitre <nicolas.pitre@linaro.org>
 Subject: Re: [PATCH 1/4] kconfig: introduce the "imply" keyword
-In-Reply-To: <3c91236f-6795-fdcc-c8a2-6e7b2fd7da66@solarflare.com>
-Message-ID: <alpine.LFD.2.20.1610201539100.25105@knanqh.ubzr>
+In-Reply-To: <alpine.LFD.2.20.1610201539100.25105@knanqh.ubzr>
+Message-ID: <alpine.LFD.2.20.1610202319110.25105@knanqh.ubzr>
 References: <1476920573-14384-1-git-send-email-nicolas.pitre@linaro.org> <1476920573-14384-2-git-send-email-nicolas.pitre@linaro.org> <44f95579-6c35-7592-08e3-d8dbb13026b2@solarflare.com> <alpine.LFD.2.20.1610201245230.25105@knanqh.ubzr>
- <fea29738-142d-0cb8-da85-cf376d1158e7@solarflare.com> <alpine.LFD.2.20.1610201349070.25105@knanqh.ubzr> <3c91236f-6795-fdcc-c8a2-6e7b2fd7da66@solarflare.com>
+ <fea29738-142d-0cb8-da85-cf376d1158e7@solarflare.com> <alpine.LFD.2.20.1610201349070.25105@knanqh.ubzr> <3c91236f-6795-fdcc-c8a2-6e7b2fd7da66@solarflare.com> <alpine.LFD.2.20.1610201539100.25105@knanqh.ubzr>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -20,104 +20,222 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Edward Cree <ecree@solarflare.com>
 Cc: John Stultz <john.stultz@linaro.org>, Richard Cochran <richardcochran@gmail.com>, Yann E MORIN <yann.morin.1998@free.fr>, Thomas Gleixner <tglx@linutronix.de>, Josh Triplett <josh@joshtriplett.org>, netdev@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Thu, 20 Oct 2016, Edward Cree wrote:
+On Thu, 20 Oct 2016, Nicolas Pitre wrote:
 
-> On 20/10/16 19:29, Nicolas Pitre wrote:
-> > On Thu, 20 Oct 2016, Edward Cree wrote:
-> >> But the desire is a property of the user, not of the driver.  If you're
-> >> willing to add CONFIG_FOO_BAZ to every combination of (driver, subsystem)
-> >> then "imply" becomes unnecessary, doesn't it?
-> > Absolutely.  And if that's something that inspires you please be my
-> > guest.  So far, though, this apparently didn't inspire the majority of
-> > driver authors who preferred to have a smaller set of config options and
-> > forcefully pull in the BAZ features with a "select".  But "select" comes
-> > with its set of evils which "imply" is meant to overcome.
-> It really doesn't inspire me either ;)
-> I was using it as a way to set up the converse, rather than as any kind of
-> serious suggestion.
-> And I agree that "imply", as it stands, is an improvement over "select" for
-> these kinds of cases.  I just think it could be further improved.
-> >> Conversely, if you *don't*
-> >> want to have to do that, then "imply" needs to only ever deal in defaults,
-> >> not in limitations.
-> > As I explained, It still has to prevent BAZ=m if FOO moves from m to y
-> > otherwise this would effectively have the same result as BAZ=n in
-> > practice and that is not what people expect if BAZ actually isn't n in
-> > your .config file.  That's why "select" also has that particular
-> > semantic.
-> If FOO "moves from" m to y (by which I'm assuming you mean a call to
-> sym_set_tristate_value()), then by all means set BAZ=y.  But the user
-> should then still be allowed to move BAZ from y to m without having to
-> change FOO (though hopefully they will get warned about it somehow).
+> On Thu, 20 Oct 2016, Edward Cree wrote:
+> 
+> > I'm interpreting "imply" as being more a way of saying "if you want FOO you
+> > probably want BAZ as well".  But maybe that should be yet another new
+> > keyword if it's so different from what you want "imply" to be.  "suggests",
+> > perhaps.
+> 
+> Indeed. That's exactly the keyword that came to my mind after I sent my 
+> previous reply.
 
-The case I'm most worried about is:
+So what about the following on top of my previous series:
 
-- open .config in $EDITOR
-- change "CONFIG_FOO=m" to "CONFIG_FOO=y"
-- save and exit
-- make
+From: Nicolas Pitre <nicolas.pitre@linaro.org>
+Date: Thu, 20 Oct 2016 23:04:46 -0400
+Subject: [PATCH] kconfig: introduce the "suggest" keyword
 
-The warning is most likely to be missed in that case, and if .config 
-doesn't list CONFIG_BAZ as unset then this is likely to confuse people.
+Similar to "imply" but with no added value restrictions on the target
+symbol. Useful for providing a default value to another symbol.
 
-> > Here "imply" is meant to be a weaker form of "select".  If you prefer
-> > not to have that limitation imposed by either "select" and "imply" then
-> > simply don't use them at all.  Nothing forces you to use any of them if
-> > your code can cope with any config combination.
-> I'm interpreting "imply" as being more a way of saying "if you want FOO you
-> probably want BAZ as well".  But maybe that should be yet another new
-> keyword if it's so different from what you want "imply" to be.  "suggests",
-> perhaps.
+Signed-off-by: Nicolas Pitre <nico@linaro.org>
 
-Indeed. That's exactly the keyword that came to my mind after I sent my 
-previous reply.
-
-> >> Right, so those drivers can use PTP if they're y and PTP is m, as long
-> >> as the PTP module is loaded when they probe.
-> > Not at the moment. There is no way for PTP to dynamically signal to
-> > interested drivers its presence at run time.  And drivers, when
-> > built-in, typically probe their hardware during the boot process even
-> > before you have the chance to load any module. If that ever changes,
-> > then the imply or select statement could simply be dropped.
-> At least for PCIe devices, the driver can be un- and re-bound (despite
-> being built-in) through sysfs.  So you (already) can re-probe them after
-> loading PTP.  So driver=y && PTP=m is valid, today.
-
-I agree with the principle, but the implementation just doesn't allow it 
-at the moment. In a simplified form, what's there now in ptp.h is:
-
-#if IS_REACHABLE(CONFIG_PTP)
-extern struct ptp_clock *ptp_clock_register(...);
-#else
-static inline struct ptp_clock *ptp_clock_register(...) { return NULL; }
-#endif
-
-i.e. drivers may cope at runtime with PTP being absent, but there is no 
-support for PTP to be loaded after drivers referring to it. Hence the 
-use of "select" that I simply converted to "imply".
-
-> >> I think that Josh's suggestion (have the UI warn you if you set BAZ to m
-> >> while FOO=y) is the right approach, but I also think it should be done
-> >> now rather than at some unspecified future time.
-> > Please advocate this with kconfig UI authors.  My recursion stack is
-> > already quite deep.
-> If I'm reading your patch correctly, your symbol.c additions enforce this
-> restriction, and AFAIK the UI can't override that by saying "Yeah I warned
-> the user and he said it was fine".
-> The kconfig UI API would need to change; sym_set_tristate_value() could
-> grow an 'override-imply' flag, for instance.
-
-The UI may tell the user about the restriction and suggest a way to 
-overcome it by also changing the "impliers" to m.
-
-Otherwise I much prefer to have a kconfig keyword that expresses the 
-fact that it is actually OK to override it, like this "suggests" idea 
-could do.
-
-Sidenote: the kconfig language isn't coherent wrt english grammar as 
-there is "depends on" but "select" rather than "selects". I interpreted 
-"select" as using the imperative mood, hence the addition of "imply" 
-rather than "implies".
-
-
-Nicolas
+diff --git a/Documentation/kbuild/kconfig-language.txt b/Documentation/kbuild/kconfig-language.txt
+index 5ee0dd3c85..b7f4f0ca1d 100644
+--- a/Documentation/kbuild/kconfig-language.txt
++++ b/Documentation/kbuild/kconfig-language.txt
+@@ -140,6 +140,12 @@ applicable everywhere (see syntax).
+   ability to hook into a given subsystem while still being able to
+   configure that subsystem out and keep those drivers selected.
+ 
++- even weaker reverse dependencies: "suggest" <symbol> ["if" <expr>]
++  This is similar to "imply" except that this doesn't add any restrictions
++  on the value the suggested symbol may use. In other words this only
++  provides a default for the specified symbol based on the value for the
++  config entry where this is used.
++
+ - limiting menu display: "visible if" <expr>
+   This attribute is only applicable to menu blocks, if the condition is
+   false, the menu block is not displayed to the user (the symbols
+diff --git a/scripts/kconfig/expr.h b/scripts/kconfig/expr.h
+index a73f762c48..eea3aa3c7a 100644
+--- a/scripts/kconfig/expr.h
++++ b/scripts/kconfig/expr.h
+@@ -86,6 +86,7 @@ struct symbol {
+ 	struct expr_value dir_dep;
+ 	struct expr_value rev_dep;
+ 	struct expr_value implied;
++	struct expr_value suggested;
+ };
+ 
+ #define for_all_symbols(i, sym) for (i = 0; i < SYMBOL_HASHSIZE; i++) for (sym = symbol_hash[i]; sym; sym = sym->next) if (sym->type != S_OTHER)
+@@ -138,6 +139,7 @@ enum prop_type {
+ 	P_CHOICE,   /* choice value */
+ 	P_SELECT,   /* select BAR */
+ 	P_IMPLY,    /* imply BAR */
++	P_SUGGEST,  /* suggest BAR */
+ 	P_RANGE,    /* range 7..100 (for a symbol) */
+ 	P_ENV,      /* value from environment variable */
+ 	P_SYMBOL,   /* where a symbol is defined */
+diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+index e9357931b4..3abc5c85ac 100644
+--- a/scripts/kconfig/menu.c
++++ b/scripts/kconfig/menu.c
+@@ -255,7 +255,9 @@ static void sym_check_prop(struct symbol *sym)
+ 			break;
+ 		case P_SELECT:
+ 		case P_IMPLY:
+-			use = prop->type == P_SELECT ? "select" : "imply";
++		case P_SUGGEST:
++			use = prop->type == P_SELECT ? "select" :
++			      prop->type == P_IMPLY ? "imply" : "suggest";
+ 			sym2 = prop_get_symbol(prop);
+ 			if (sym->type != S_BOOLEAN && sym->type != S_TRISTATE)
+ 				prop_warn(prop,
+@@ -341,6 +343,10 @@ void menu_finalize(struct menu *parent)
+ 					struct symbol *es = prop_get_symbol(prop);
+ 					es->implied.expr = expr_alloc_or(es->implied.expr,
+ 							expr_alloc_and(expr_alloc_symbol(menu->sym), expr_copy(dep)));
++				} else if (prop->type == P_SUGGEST) {
++					struct symbol *es = prop_get_symbol(prop);
++					es->suggested.expr = expr_alloc_or(es->suggested.expr,
++							expr_alloc_and(expr_alloc_symbol(menu->sym), expr_copy(dep)));
+ 				}
+ 			}
+ 		}
+@@ -687,6 +693,13 @@ static void get_symbol_str(struct gstr *r, struct symbol *sym,
+ 		str_append(r, "\n");
+ 	}
+ 
++	get_symbol_props_str(r, sym, P_SUGGEST, _("  Suggests: "));
++	if (sym->suggested.expr) {
++		str_append(r, _("  Suggested by: "));
++		expr_gstr_print(sym->suggested.expr, r);
++		str_append(r, "\n");
++	}
++
+ 	str_append(r, "\n\n");
+ }
+ 
+diff --git a/scripts/kconfig/symbol.c b/scripts/kconfig/symbol.c
+index 074fb66d9a..235f11e3f9 100644
+--- a/scripts/kconfig/symbol.c
++++ b/scripts/kconfig/symbol.c
+@@ -267,6 +267,16 @@ static void sym_calc_visibility(struct symbol *sym)
+ 		sym->implied.tri = tri;
+ 		sym_set_changed(sym);
+ 	}
++	tri = no;
++	if (sym->suggested.expr)
++		tri = expr_calc_value(sym->suggested.expr);
++	tri = EXPR_AND(tri, sym->visible);
++	if (tri == mod && sym_get_type(sym) == S_BOOLEAN)
++		tri = yes;
++	if (sym->suggested.tri != tri) {
++		sym->suggested.tri = tri;
++		sym_set_changed(sym);
++	}
+ }
+ 
+ /*
+@@ -406,6 +416,10 @@ void sym_calc_value(struct symbol *sym)
+ 					newval.tri = EXPR_AND(expr_calc_value(prop->expr),
+ 							      prop->visible.tri);
+ 				}
++				if (sym->suggested.tri != no) {
++					sym->flags |= SYMBOL_WRITE;
++					newval.tri = EXPR_OR(newval.tri, sym->suggested.tri);
++				}
+ 				if (sym->dir_dep.tri != no &&
+ 				    sym->implied.tri != no) {
+ 					/* implied symbols have implied defaults */
+@@ -768,7 +782,9 @@ const char *sym_get_string_default(struct symbol *sym)
+ 	if (sym->type == S_BOOLEAN && val == mod)
+ 		val = yes;
+ 
+-	/* adjust the default value if this symbol is implied by another */
++	/* adjust the default value if this symbol is suggested/implied */
++	if (val < sym->suggested.tri)
++		val = sym->suggested.tri;
+ 	if (val < sym->implied.tri)
+ 		val = sym->implied.tri;
+ 
+@@ -1376,6 +1392,8 @@ const char *prop_get_type_name(enum prop_type type)
+ 		return "select";
+ 	case P_IMPLY:
+ 		return "imply";
++	case P_SUGGEST:
++		return "suggest";
+ 	case P_RANGE:
+ 		return "range";
+ 	case P_SYMBOL:
+diff --git a/scripts/kconfig/zconf.gperf b/scripts/kconfig/zconf.gperf
+index ead02edec9..0c244a8e95 100644
+--- a/scripts/kconfig/zconf.gperf
++++ b/scripts/kconfig/zconf.gperf
+@@ -39,6 +39,7 @@ hex,		T_TYPE,		TF_COMMAND, S_HEX
+ string,		T_TYPE,		TF_COMMAND, S_STRING
+ select,		T_SELECT,	TF_COMMAND
+ imply,		T_IMPLY,	TF_COMMAND
++suggest,	T_SUGGEST,	TF_COMMAND
+ range,		T_RANGE,	TF_COMMAND
+ visible,	T_VISIBLE,	TF_COMMAND
+ option,		T_OPTION,	TF_COMMAND
+diff --git a/scripts/kconfig/zconf.y b/scripts/kconfig/zconf.y
+index 001305fa08..277415540a 100644
+--- a/scripts/kconfig/zconf.y
++++ b/scripts/kconfig/zconf.y
+@@ -31,7 +31,7 @@ struct symbol *symbol_hash[SYMBOL_HASHSIZE];
+ static struct menu *current_menu, *current_entry;
+ 
+ %}
+-%expect 32
++%expect 34
+ 
+ %union
+ {
+@@ -63,6 +63,7 @@ static struct menu *current_menu, *current_entry;
+ %token <id>T_DEFAULT
+ %token <id>T_SELECT
+ %token <id>T_IMPLY
++%token <id>T_SUGGEST
+ %token <id>T_RANGE
+ %token <id>T_VISIBLE
+ %token <id>T_OPTION
+@@ -125,7 +126,7 @@ stmt_list:
+ ;
+ 
+ option_name:
+-	T_DEPENDS | T_PROMPT | T_TYPE | T_SELECT | T_IMPLY | T_OPTIONAL | T_RANGE | T_DEFAULT | T_VISIBLE
++	T_DEPENDS | T_PROMPT | T_TYPE | T_SELECT | T_IMPLY | T_SUGGEST | T_OPTIONAL | T_RANGE | T_DEFAULT | T_VISIBLE
+ ;
+ 
+ common_stmt:
+@@ -223,6 +224,12 @@ config_option: T_IMPLY T_WORD if_expr T_EOL
+ 	printd(DEBUG_PARSE, "%s:%d:imply\n", zconf_curname(), zconf_lineno());
+ };
+ 
++config_option: T_SUGGEST T_WORD if_expr T_EOL
++{
++	menu_add_symbol(P_SUGGEST, sym_lookup($2, 0), $3);
++	printd(DEBUG_PARSE, "%s:%d:suggest\n", zconf_curname(), zconf_lineno());
++};
++
+ config_option: T_RANGE symbol symbol if_expr T_EOL
+ {
+ 	menu_add_expr(P_RANGE, expr_alloc_comp(E_RANGE,$2, $3), $4);
+@@ -676,6 +683,11 @@ static void print_symbol(FILE *out, struct menu *menu)
+ 			expr_fprint(prop->expr, out);
+ 			fputc('\n', out);
+ 			break;
++		case P_SUGGEST:
++			fputs( "  suggest ", out);
++			expr_fprint(prop->expr, out);
++			fputc('\n', out);
++			break;
+ 		case P_RANGE:
+ 			fputs( "  range ", out);
+ 			expr_fprint(prop->expr, out);
