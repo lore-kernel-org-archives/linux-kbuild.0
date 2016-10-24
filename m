@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.126.131]:61579 "EHLO
+Received: from mout.kundenserver.de ([212.227.126.187]:64621 "EHLO
         mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S938729AbcJXPG6 (ORCPT
+        with ESMTP id S941052AbcJXPHf (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 24 Oct 2016 11:06:58 -0400
+        Mon, 24 Oct 2016 11:07:35 -0400
 From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH 2/2, variant B] ARM: move mmiocpy/mmioset exports to io.c
-Date: Mon, 24 Oct 2016 17:06:45 +0200
-Message-ID: <14981419.nRUFpzhctm@wuerfel>
+Subject: [PATCH 2/2, variant A] ARM: add hidden mmioset/mmiocpy prototypes
+Date: Mon, 24 Oct 2016 17:06:20 +0200
+Message-ID: <3518814.5oq8zhvvpL@wuerfel>
 In-Reply-To: <3446653.W8FbGAKSeQ@wuerfel>
 References: <20161017065131.GA27863@angband.pl> <20161020150814.42951f61@roar.ozlabs.ibm.com> <3446653.W8FbGAKSeQ@wuerfel>
 MIME-Version: 1.0
@@ -22,43 +22,24 @@ The prototypes for mmioset/mmiocpy are intentionally hidden
 inside of inline functions, which breaks the EXPORT_SYMBOL
 statements when symbol versioning is enabled.
 
-This moves the two exports from the files that implement the
-code into the kernel/io.c file, adding another local declaration
-there.
+This adds a prototype to asm/asm-prototypes.h but hides it
+in an #ifdef so normal drivers don't see it and won't be
+able to abuse the interface.
 
+Suggested-by: Nicholas Piggin <npiggin@gmail.com>
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
-diff --git a/arch/arm/kernel/io.c b/arch/arm/kernel/io.c
-index eedefe050022..c74746997626 100644
---- a/arch/arm/kernel/io.c
-+++ b/arch/arm/kernel/io.c
-@@ -82,3 +82,10 @@ void _memset_io(volatile void __iomem *dst, int c, size_t count)
- 	}
- }
- EXPORT_SYMBOL(_memset_io);
+diff --git a/arch/arm/include/asm/asm-prototypes.h b/arch/arm/include/asm/asm-prototypes.h
+index 04e5616a7b15..e46b09536b14 100644
+--- a/arch/arm/include/asm/asm-prototypes.h
++++ b/arch/arm/include/asm/asm-prototypes.h
+@@ -32,3 +32,8 @@ extern void __muldi3(void);
+ extern void __ucmpdi2(void);
+ extern void __udivsi3(void);
+ extern void __umodsi3(void);
 +
-+/* can't export them from memcpy.S/memset.S because of hidden declaration */
-+void mmioset(void __iomem *addr, unsigned int c, size_t n);
-+EXPORT_SYMBOL(mmioset);
-+
-+void mmiocpy(void *dest, const void __iomem *src, size_t n);
-+EXPORT_SYMBOL(mmiocpy);
-diff --git a/arch/arm/lib/memcpy.S b/arch/arm/lib/memcpy.S
-index 1be5b6ddf37c..1f822fc52400 100644
---- a/arch/arm/lib/memcpy.S
-+++ b/arch/arm/lib/memcpy.S
-@@ -70,4 +70,3 @@ ENTRY(memcpy)
- ENDPROC(memcpy)
- ENDPROC(mmiocpy)
- EXPORT_SYMBOL(memcpy)
--EXPORT_SYMBOL(mmiocpy)
-diff --git a/arch/arm/lib/memset.S b/arch/arm/lib/memset.S
-index 7b72044cba62..6f075ca09abc 100644
---- a/arch/arm/lib/memset.S
-+++ b/arch/arm/lib/memset.S
-@@ -137,4 +137,3 @@ UNWIND( .fnend   )
- ENDPROC(memset)
- ENDPROC(mmioset)
- EXPORT_SYMBOL(memset)
--EXPORT_SYMBOL(mmioset)
++#ifdef __GENKSYMS__
++extern void mmioset(void *, unsigned int, size_t);
++extern void mmiocpy(void *, const void *, size_t);
++#endif
 
