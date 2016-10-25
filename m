@@ -1,45 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from Galois.linutronix.de ([146.0.238.70]:60395 "EHLO
-        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754653AbcJYHaP (ORCPT
+Received: from mail-pf0-f194.google.com ([209.85.192.194]:36335 "EHLO
+        mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1758355AbcJYIcN (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 25 Oct 2016 03:30:15 -0400
-Date: Tue, 25 Oct 2016 09:30:02 +0200
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Subject: Re: [RFC PATCH] kbuild: add -fno-PIE
-Message-ID: <20161025073002.czwx2hysib77i7d5@linutronix.de>
-References: <20161021111600.9417-1-bigeasy@linutronix.de>
- <20161021212127.GA32611@angband.pl>
- <87eg37niky.fsf@turtle.gmx.de>
- <1477250598.3561.4.camel@perches.com>
- <8760oinqly.fsf@turtle.gmx.de>
- <20161024074332.uomcxyhqo6aq7vxk@linutronix.de>
- <874m41mz4h.fsf@turtle.gmx.de>
+        Tue, 25 Oct 2016 04:32:13 -0400
+Date: Tue, 25 Oct 2016 19:32:00 +1100
+From: Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH 1/2] kbuild: provide include/asm/asm-prototypes.h for
+ ARM
+Message-ID: <20161025193200.1f4d9e24@roar.ozlabs.ibm.com>
+In-Reply-To: <14534456.e6dv16VA3R@wuerfel>
+References: <20161017065131.GA27863@angband.pl>
+        <20161020150814.42951f61@roar.ozlabs.ibm.com>
+        <3446653.W8FbGAKSeQ@wuerfel>
+        <14534456.e6dv16VA3R@wuerfel>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <874m41mz4h.fsf@turtle.gmx.de>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sven Joachim <svenjoac@gmx.de>
-Cc: Joe Perches <joe@perches.com>, Adam Borowski <kilobyte@angband.pl>, Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, ben@decadent.org.uk
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Russell King - ARM Linux <linux@armlinux.org.uk>, Michal Marek <mmarek@suse.com>, Adam Borowski <kilobyte@angband.pl>, Omar Sandoval <osandov@osandov.com>, Linus Torvalds <torvalds@linux-foundation.org>, adobriyan@gmail.com, sfr@canb.auug.org.au, viro@zeniv.linux.org.uk, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org
 
-On 2016-10-24 19:32:30 [+0200], Sven Joachim wrote:
-> On 2016-10-24 09:43 +0200, Sebastian Andrzej Siewior wrote:
+On Mon, 24 Oct 2016 17:05:26 +0200
+Arnd Bergmann <arnd@arndb.de> wrote:
+
+> This adds an asm/asm-prototypes.h header for ARM to fix the
+> broken symbol versioning for symbols exported from assembler
+> files.
 > 
-> > On 2016-10-24 09:38:49 [+0200], Sven Joachim wrote:
-> >> 
-> >> But make still fails with it. :-(
-> >
-> > try setting CONFIG_CC_STACKPROTECTOR_NONE=y and please let me know if
-> > the resulting kernel built with v3.2 gcc boots & works.
+> In addition to the header, we have to do these other small
+> changes:
 > 
-> Sorry, I don't have gcc 3.2 around, and my gcc 3.3 environment produces
-> assembler errors in arch/x86/entry/entry_32.S.  Maybe binutils 2.15 is
-> not recent enough anymore?
+> - move the exports from bitops.h to {change,clear,set,...}bit.S
+> - move the exports from csumpartialgeneric.S into the files
+>   including it
+> 
+> I couldn't find the correct prototypes for the compiler builtins,
+> so I went with the fake 'void f(void)' prototypes that we had
+> before.
+> 
+> This leaves the mmioset/mmiocpy function for now, as it's not
+> obvious how to best handle them.
 
-so we use stone age gcc but take latest binutils and kernel? What about
-lifting the limit of gcc 3.2? Is there any use case in 2016 to use gcc
-3.2 on a recent kernel except whether it still compiles or not?
 
-Sebastian
+This looks nicer. I like variant B because it keeps the GENKSYMS cruft to
+a single location, but either one isn't too bad.
+
+I'd like to get moving on this, so let's at least get the generic kbuild
+change merged. In the end, the kbuild code does not prevent a maintainer
+from putting their EXPORT_SYMBOL in whatever location they like, so there
+is no reason not to merge it (certainly there will be archs that do use
+it).
+
+Michal, what's your thoughts? If you merge my patch 2/2 and skip 1/2, it
+should not give any new build warnings or errors, so then arch patches can
+go via arch trees. 1/2 could go in after everyone is up to date.
+
+Thanks,
+Nick
