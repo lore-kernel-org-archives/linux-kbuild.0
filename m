@@ -1,68 +1,72 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qt0-f180.google.com ([209.85.216.180]:36862 "EHLO
-        mail-qt0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753369AbcJZN4l (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 26 Oct 2016 09:56:41 -0400
-Received: by mail-qt0-f180.google.com with SMTP id 12so3852444qtm.3
-        for <linux-kbuild@vger.kernel.org>; Wed, 26 Oct 2016 06:56:15 -0700 (PDT)
-Date: Wed, 26 Oct 2016 09:56:13 -0400 (EDT)
-From: Nicolas Pitre <nicolas.pitre@linaro.org>
-Subject: Re: [PATCH v2 5/5] posix-timers: make it configurable
-In-Reply-To: <20161026085102.GC11974@localhost.localdomain>
-Message-ID: <alpine.LFD.2.20.1610260941520.14694@knanqh.ubzr>
-References: <1477448931-29051-1-git-send-email-nicolas.pitre@linaro.org> <1477448931-29051-6-git-send-email-nicolas.pitre@linaro.org> <20161026085102.GC11974@localhost.localdomain>
+Received: from mout.gmx.net ([212.227.17.21]:54634 "EHLO mout.gmx.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752618AbcJZRwI (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 26 Oct 2016 13:52:08 -0400
+From: Sven Joachim <svenjoac@gmx.de>
+Subject: Re: [RFC PATCH] kbuild: add -fno-PIE
+References: <20161021111600.9417-1-bigeasy@linutronix.de>
+        <20161021212127.GA32611@angband.pl> <87eg37niky.fsf@turtle.gmx.de>
+        <1477250598.3561.4.camel@perches.com> <8760oinqly.fsf@turtle.gmx.de>
+        <20161024074332.uomcxyhqo6aq7vxk@linutronix.de>
+        <874m41mz4h.fsf@turtle.gmx.de>
+        <20161025073002.czwx2hysib77i7d5@linutronix.de>
+Date: Wed, 26 Oct 2016 19:51:03 +0200
+In-Reply-To: <20161025073002.czwx2hysib77i7d5@linutronix.de> (Sebastian
+        Andrzej Siewior's message of "Tue, 25 Oct 2016 09:30:02 +0200")
+Message-ID: <87eg33kni0.fsf@turtle.gmx.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Richard Cochran <richardcochran@gmail.com>
-Cc: John Stultz <john.stultz@linaro.org>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Michal Marek <mmarek@suse.com>, Thomas Gleixner <tglx@linutronix.de>, Josh Triplett <josh@joshtriplett.org>, Edward Cree <ecree@solarflare.com>, netdev@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: Joe Perches <joe@perches.com>, Adam Borowski <kilobyte@angband.pl>, Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, ben@decadent.org.uk
 
-On Wed, 26 Oct 2016, Richard Cochran wrote:
+On 2016-10-25 09:30 +0200, Sebastian Andrzej Siewior wrote:
 
-> On Tue, Oct 25, 2016 at 10:28:51PM -0400, Nicolas Pitre wrote:
-> > +config POSIX_TIMERS
-> > +	bool "Posix Clocks & timers" if EXPERT
-> > +	default y
-> > +	help
-> > +	  This includes native support for POSIX timers to the kernel.
-> > +	  Most embedded systems may have no use for them and therefore they
-> > +	  can be configured out to reduce the size of the kernel image.
-> 
-> Can you please fix this sentence?  It doesn't make any sense.  "Most"
-> is making a definite statement of fact, while "may have no use" is
-> not.
+> On 2016-10-24 19:32:30 [+0200], Sven Joachim wrote:
+>> On 2016-10-24 09:43 +0200, Sebastian Andrzej Siewior wrote:
+>> 
+>> > On 2016-10-24 09:38:49 [+0200], Sven Joachim wrote:
+>> >> 
+>> >> But make still fails with it. :-(
+>> >
+>> > try setting CONFIG_CC_STACKPROTECTOR_NONE=y and please let me know if
+>> > the resulting kernel built with v3.2 gcc boots & works.
+>> 
+>> Sorry, I don't have gcc 3.2 around, and my gcc 3.3 environment produces
+>> assembler errors in arch/x86/entry/entry_32.S.  Maybe binutils 2.15 is
+>> not recent enough anymore?
 
-I'm not a native speaker. I'm afraid I just don't appreciate such 
-nuances.
+I have done a few more tests, and I can confirm that binutils 2.17 is
+the oldest version that works.  Also, I have succeeded installing gcc
+3.2 in a Debian 4.0 chroot now.
 
-> Either you mean:
-> 
->   1. Most embedded systems have no use for them.
-> 
->   2. Embedded systems may have no use for them.
-> 
-> or expressing #2 in other words:
-> 
->   3. Many embedded systems have no use for them.
-> 
->   4. Some embedded systems have no use for them.
-> 
-> Take your pick.  (But I doubt #1 is really true, and so I would like
-> to see some numbers to back up that claim.)
+> so we use stone age gcc but take latest binutils and kernel? What about
+> lifting the limit of gcc 3.2?
 
-I used 4 to match the commit message, which incidentally is the result 
-of a prior suggestion from you. Sorry for not being consistent then.
+Would probably make sense, since gcc 3.2 cannot compile kernel/bounds.c,
+at least not on x86.
 
-As for numbers... I don't have any, but I probably mentioned already 
-that I can run a copy of Fedora on top of a kernel with POSIX timers 
-disabled and none of the warnings about those disabled syscalls are 
-triggered. So if my Fedora usage doesn't need them, we can infer that 
-the number of embedded systems also not needing them might tend towards 
-a high percentage. But let's be conservative and say "some".
+,----
+|   CC      kernel/bounds.s
+| In file included from /tmp/linux/arch/x86/include/asm/bitops.h:512,
+|                  from include/linux/bitops.h:22,
+|                  from include/linux/kernel.h:10,
+|                  from include/asm-generic/bug.h:13,
+|                  from /tmp/linux/arch/x86/include/asm/bug.h:38,
+|                  from include/linux/bug.h:4,
+|                  from include/linux/page-flags.h:9,
+|                  from kernel/bounds.c:9:
+| /tmp/linux/arch/x86/include/asm/arch_hweight.h: In function `__arch_hweight32':
+| /tmp/linux/arch/x86/include/asm/arch_hweight.h:29: syntax error before string constant
+| make[1]: *** [kernel/bounds.s] Error 1
+`----
 
-Thanks for your review.
+Building with gcc 3.3 is apparently still possible, although it produces
+tons of warnings and a modpost section mismatch.  Still, requiring gcc
+4.1 or newer would not be unreasonable, I think (still released a few
+months earlier than binutils 2.17).
 
-
-Nicolas
+Cheers,
+       Sven
