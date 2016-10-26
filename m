@@ -1,55 +1,68 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f66.google.com ([74.125.82.66]:39651 "EHLO
-        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753103AbcJZIvI (ORCPT
+Received: from mail-qt0-f180.google.com ([209.85.216.180]:36862 "EHLO
+        mail-qt0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753369AbcJZN4l (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 26 Oct 2016 04:51:08 -0400
-Date: Wed, 26 Oct 2016 10:51:02 +0200
-From: Richard Cochran <richardcochran@gmail.com>
+        Wed, 26 Oct 2016 09:56:41 -0400
+Received: by mail-qt0-f180.google.com with SMTP id 12so3852444qtm.3
+        for <linux-kbuild@vger.kernel.org>; Wed, 26 Oct 2016 06:56:15 -0700 (PDT)
+Date: Wed, 26 Oct 2016 09:56:13 -0400 (EDT)
+From: Nicolas Pitre <nicolas.pitre@linaro.org>
 Subject: Re: [PATCH v2 5/5] posix-timers: make it configurable
-Message-ID: <20161026085102.GC11974@localhost.localdomain>
-References: <1477448931-29051-1-git-send-email-nicolas.pitre@linaro.org>
- <1477448931-29051-6-git-send-email-nicolas.pitre@linaro.org>
+In-Reply-To: <20161026085102.GC11974@localhost.localdomain>
+Message-ID: <alpine.LFD.2.20.1610260941520.14694@knanqh.ubzr>
+References: <1477448931-29051-1-git-send-email-nicolas.pitre@linaro.org> <1477448931-29051-6-git-send-email-nicolas.pitre@linaro.org> <20161026085102.GC11974@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1477448931-29051-6-git-send-email-nicolas.pitre@linaro.org>
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicolas Pitre <nicolas.pitre@linaro.org>
+To: Richard Cochran <richardcochran@gmail.com>
 Cc: John Stultz <john.stultz@linaro.org>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Michal Marek <mmarek@suse.com>, Thomas Gleixner <tglx@linutronix.de>, Josh Triplett <josh@joshtriplett.org>, Edward Cree <ecree@solarflare.com>, netdev@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Tue, Oct 25, 2016 at 10:28:51PM -0400, Nicolas Pitre wrote:
-> +config POSIX_TIMERS
-> +	bool "Posix Clocks & timers" if EXPERT
-> +	default y
-> +	help
-> +	  This includes native support for POSIX timers to the kernel.
-> +	  Most embedded systems may have no use for them and therefore they
-> +	  can be configured out to reduce the size of the kernel image.
+On Wed, 26 Oct 2016, Richard Cochran wrote:
 
-Can you please fix this sentence?  It doesn't make any sense.  "Most"
-is making a definite statement of fact, while "may have no use" is
-not.
+> On Tue, Oct 25, 2016 at 10:28:51PM -0400, Nicolas Pitre wrote:
+> > +config POSIX_TIMERS
+> > +	bool "Posix Clocks & timers" if EXPERT
+> > +	default y
+> > +	help
+> > +	  This includes native support for POSIX timers to the kernel.
+> > +	  Most embedded systems may have no use for them and therefore they
+> > +	  can be configured out to reduce the size of the kernel image.
+> 
+> Can you please fix this sentence?  It doesn't make any sense.  "Most"
+> is making a definite statement of fact, while "may have no use" is
+> not.
 
-Either you mean:
+I'm not a native speaker. I'm afraid I just don't appreciate such 
+nuances.
 
-  1. Most embedded systems have no use for them.
+> Either you mean:
+> 
+>   1. Most embedded systems have no use for them.
+> 
+>   2. Embedded systems may have no use for them.
+> 
+> or expressing #2 in other words:
+> 
+>   3. Many embedded systems have no use for them.
+> 
+>   4. Some embedded systems have no use for them.
+> 
+> Take your pick.  (But I doubt #1 is really true, and so I would like
+> to see some numbers to back up that claim.)
 
-  2. Embedded systems may have no use for them.
+I used 4 to match the commit message, which incidentally is the result 
+of a prior suggestion from you. Sorry for not being consistent then.
 
-or expressing #2 in other words:
+As for numbers... I don't have any, but I probably mentioned already 
+that I can run a copy of Fedora on top of a kernel with POSIX timers 
+disabled and none of the warnings about those disabled syscalls are 
+triggered. So if my Fedora usage doesn't need them, we can infer that 
+the number of embedded systems also not needing them might tend towards 
+a high percentage. But let's be conservative and say "some".
 
-  3. Many embedded systems have no use for them.
-
-  4. Some embedded systems have no use for them.
-
-Take your pick.  (But I doubt #1 is really true, and so I would like
-to see some numbers to back up that claim.)
-
-Thanks,
-Richard
+Thanks for your review.
 
 
-
-
+Nicolas
