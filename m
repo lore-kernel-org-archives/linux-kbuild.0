@@ -1,72 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.gmx.net ([212.227.17.21]:54634 "EHLO mout.gmx.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752618AbcJZRwI (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 26 Oct 2016 13:52:08 -0400
-From: Sven Joachim <svenjoac@gmx.de>
-Subject: Re: [RFC PATCH] kbuild: add -fno-PIE
-References: <20161021111600.9417-1-bigeasy@linutronix.de>
-        <20161021212127.GA32611@angband.pl> <87eg37niky.fsf@turtle.gmx.de>
-        <1477250598.3561.4.camel@perches.com> <8760oinqly.fsf@turtle.gmx.de>
-        <20161024074332.uomcxyhqo6aq7vxk@linutronix.de>
-        <874m41mz4h.fsf@turtle.gmx.de>
-        <20161025073002.czwx2hysib77i7d5@linutronix.de>
-Date: Wed, 26 Oct 2016 19:51:03 +0200
-In-Reply-To: <20161025073002.czwx2hysib77i7d5@linutronix.de> (Sebastian
-        Andrzej Siewior's message of "Tue, 25 Oct 2016 09:30:02 +0200")
-Message-ID: <87eg33kni0.fsf@turtle.gmx.de>
+Received: from mail-wm0-f66.google.com ([74.125.82.66]:36131 "EHLO
+        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933805AbcJZUSe (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 26 Oct 2016 16:18:34 -0400
+Date: Wed, 26 Oct 2016 22:18:28 +0200
+From: Richard Cochran <richardcochran@gmail.com>
+Subject: Re: [PATCH v2 5/5] posix-timers: make it configurable
+Message-ID: <20161026201828.GA25143@localhost.localdomain>
+References: <1477448931-29051-1-git-send-email-nicolas.pitre@linaro.org>
+ <1477448931-29051-6-git-send-email-nicolas.pitre@linaro.org>
+ <20161026085102.GC11974@localhost.localdomain>
+ <alpine.LFD.2.20.1610260941520.14694@knanqh.ubzr>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <alpine.LFD.2.20.1610260941520.14694@knanqh.ubzr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: Joe Perches <joe@perches.com>, Adam Borowski <kilobyte@angband.pl>, Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, ben@decadent.org.uk
+To: Nicolas Pitre <nicolas.pitre@linaro.org>
+Cc: John Stultz <john.stultz@linaro.org>, "Yann E. MORIN" <yann.morin.1998@free.fr>, Michal Marek <mmarek@suse.com>, Thomas Gleixner <tglx@linutronix.de>, Josh Triplett <josh@joshtriplett.org>, Edward Cree <ecree@solarflare.com>, netdev@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 2016-10-25 09:30 +0200, Sebastian Andrzej Siewior wrote:
+On Wed, Oct 26, 2016 at 09:56:13AM -0400, Nicolas Pitre wrote:
+> So if my Fedora usage doesn't need them, we can infer that 
+> the number of embedded systems also not needing them might tend towards 
+> a high percentage.
 
-> On 2016-10-24 19:32:30 [+0200], Sven Joachim wrote:
->> On 2016-10-24 09:43 +0200, Sebastian Andrzej Siewior wrote:
->> 
->> > On 2016-10-24 09:38:49 [+0200], Sven Joachim wrote:
->> >> 
->> >> But make still fails with it. :-(
->> >
->> > try setting CONFIG_CC_STACKPROTECTOR_NONE=y and please let me know if
->> > the resulting kernel built with v3.2 gcc boots & works.
->> 
->> Sorry, I don't have gcc 3.2 around, and my gcc 3.3 environment produces
->> assembler errors in arch/x86/entry/entry_32.S.  Maybe binutils 2.15 is
->> not recent enough anymore?
+(I wouldn't call Fedora an embedded distro, but heh...)
 
-I have done a few more tests, and I can confirm that binutils 2.17 is
-the oldest version that works.  Also, I have succeeded installing gcc
-3.2 in a Debian 4.0 chroot now.
+> But let's be conservative and say "some".
 
-> so we use stone age gcc but take latest binutils and kernel? What about
-> lifting the limit of gcc 3.2?
+Sounds good to me.
 
-Would probably make sense, since gcc 3.2 cannot compile kernel/bounds.c,
-at least not on x86.
-
-,----
-|   CC      kernel/bounds.s
-| In file included from /tmp/linux/arch/x86/include/asm/bitops.h:512,
-|                  from include/linux/bitops.h:22,
-|                  from include/linux/kernel.h:10,
-|                  from include/asm-generic/bug.h:13,
-|                  from /tmp/linux/arch/x86/include/asm/bug.h:38,
-|                  from include/linux/bug.h:4,
-|                  from include/linux/page-flags.h:9,
-|                  from kernel/bounds.c:9:
-| /tmp/linux/arch/x86/include/asm/arch_hweight.h: In function `__arch_hweight32':
-| /tmp/linux/arch/x86/include/asm/arch_hweight.h:29: syntax error before string constant
-| make[1]: *** [kernel/bounds.s] Error 1
-`----
-
-Building with gcc 3.3 is apparently still possible, although it produces
-tons of warnings and a modpost section mismatch.  Still, requiring gcc
-4.1 or newer would not be unreasonable, I think (still released a few
-months earlier than binutils 2.17).
-
-Cheers,
-       Sven
+Thanks,
+Richard
