@@ -1,107 +1,80 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lekensteyn.nl ([178.21.112.251]:43675 "EHLO lekensteyn.nl"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S934208AbcJ0RDO (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 27 Oct 2016 13:03:14 -0400
-Date: Thu, 27 Oct 2016 17:42:02 +0200
-From: Peter Wu <peter@lekensteyn.nl>
-Subject: Re: 'kbuild' merge before 4.9-rc1 breaks build and boot
-Message-ID: <20161027154202.GE27017@al>
-References: <4c04b846-3da8-dc42-4fa6-30f72a5c2437@hartkopp.net>
+Received: from mail-oi0-f65.google.com ([209.85.218.65]:35569 "EHLO
+        mail-oi0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933194AbcJ0RJI (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 27 Oct 2016 13:09:08 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4c04b846-3da8-dc42-4fa6-30f72a5c2437@hartkopp.net>
+In-Reply-To: <20161021111600.9417-1-bigeasy@linutronix.de>
+References: <20161021111600.9417-1-bigeasy@linutronix.de>
+From: Shuah Khan <shuahkhan@gmail.com>
+Date: Thu, 27 Oct 2016 11:09:06 -0600
+Message-ID: <CAKocOONAiGTfPXDSLC3gb6gvj7-DCbeYbUR1atBJmCQ7Cq-sAw@mail.gmail.com>
+Subject: Re: [RFC PATCH] kbuild: add -fno-PIE
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>, Al Viro <viro@zeniv.linux.org.uk>
-Cc: Oliver Hartkopp <socketcan@hartkopp.net>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, Ben Hutchings <ben@decadent.org.uk>
 
-Hey Al, Michal,
+On Fri, Oct 21, 2016 at 5:16 AM, Sebastian Andrzej Siewior
+<bigeasy@linutronix.de> wrote:
+> Debian started to build the gcc with --enable-default-pie by default so the
+> kernel build ends before it starts properly with:
+> |kernel/bounds.c:1:0: error: code model kernel does not support PIC mode
+>
+> Is this okay or do we want some kind of check to see if -fno-PIE is supported?
+> It is mentioned in the 4.4.7 gcc manpage is it is not *that* new :)
+>
+> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> ---
+>  Makefile | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/Makefile b/Makefile
+> index bf6e44a421df..97296d66b586 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -398,7 +398,7 @@ KBUILD_CPPFLAGS := -D__KERNEL__
+>  KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
+>                    -fno-strict-aliasing -fno-common \
+>                    -Werror-implicit-function-declaration \
+> -                  -Wno-format-security \
+> +                  -Wno-format-security -fno-PIE \
+>                    -std=gnu89
+>
+>  KBUILD_AFLAGS_KERNEL :=
+> --
+> 2.9.3
+>
 
-I can confirm Olivers issue, the current mainline kernel fails to boot
-on kernels with CONFIG_MODVERSIONS=y. Bisection points to:
+Hi,
 
-    commit 784d5699eddc55878627da20d3fe0c8542e2f1a2
-    Author: Al Viro <viro@zeniv.linux.org.uk>
-    Date:   Mon Jan 11 11:04:34 2016 -0500
+I ran into this when I upgraded to Ubuntu 16.10. Ubuntu kernel team
+has a patch posted for Ubuntu kernels. The patch talks about needing
+have this work for other architectures. I applied part of the change
+from the original Ubuntu patch -
+https://patchwork.ozlabs.org/patch/616621/
 
-        x86: move exports to actual definitions
+Anyway, the following worked for me on x86-64 - both 4.8.4 and 4.9
 
-        Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
 
-Good builds have a non-zero address in Module.symvers:
+diff --git a/Makefile b/Makefile
+index 82a36ab..0a01ad1 100644
+--- a/Makefile
++++ b/Makefile
+@@ -651,6 +651,11 @@ ifneq ($(CONFIG_FRAME_WARN),0)
+ KBUILD_CFLAGS += $(call cc-option,-Wframe-larger-than=${CONFIG_FRAME_WARN})
+ endif
 
-    0x69acdf38      memcpy  vmlinux EXPORT_SYMBOL
++# force no-pie for distro compilers that enable pie by default
++KBUILD_CFLAGS += $(call cc-option, -fno-pie)
++KBUILD_CFLAGS += $(call cc-option, -no-pie)
++KBUILD_AFLAGS += $(call cc-option, -fno-pie)
++
+ # This selects the stack protector compiler flag. Testing it is delayed
+ # until after .config has been reprocessed, in the prepare-compiler-check
+ # target.
 
-Bad builds have a zero address here:
-
-    0x00000000      memcpy  vmlinux EXPORT_SYMBOL
-
-This was encountered on Arch Linux with GCC 6.2.1 and
-Linux v4.9-rc2-40-g9fe68ca. Note that the identified commit above cannot
-be reverted cleanly on master.
-
-Kind regards,
-Peter
-
-On Fri, Oct 21, 2016 at 06:23:57PM +0200, Oliver Hartkopp wrote:
-> Hello Michal,
-> 
-> I waited some days for a fix - but obviously no one else has this problem so
-> far ...
-> 
-> This merge
-> 
-> "Merge branch 'kbuild' of
-> git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild"
-> 
-> https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/?id=84d69848c97faab0c25aa2667b273404d2e2a64a
-> 
-> creates a bunch of warnings on my system and the built kernel does not boot
-> (it complains about a missing root fs).
-> 
-> In the build process some .ko files are built fine and some don't:
-> 
-> (..)
->   MODPOST 176 modules
->   AS      arch/x86/boot/compressed/efi_thunk_64.o
->   GZIP    arch/x86/boot/compressed/vmlinux.bin.gz
->   CC      arch/x86/boot/compressed/misc.o
-> WARNING: "memset" [sound/usb/snd-usbmidi-lib.ko] has no CRC!
-> WARNING: "__fentry__" [sound/usb/snd-usbmidi-lib.ko] has no CRC!
-> WARNING: "memcpy" [sound/usb/snd-usbmidi-lib.ko] has no CRC!
-> WARNING: "__sw_hweight32" [sound/usb/snd-usbmidi-lib.ko] has no CRC!
-> WARNING: "_copy_to_user" [sound/usb/snd-usb-audio.ko] has no CRC!
-> WARNING: "memset" [sound/usb/snd-usb-audio.ko] has no CRC!
-> WARNING: "__put_user_1" [sound/usb/snd-usb-audio.ko] has no CRC!
-> WARNING: "__put_user_4" [sound/usb/snd-usb-audio.ko] has no CRC!
-> WARNING: "__fentry__" [sound/usb/snd-usb-audio.ko] has no CRC!
-> WARNING: "memcpy" [sound/usb/snd-usb-audio.ko] has no CRC!
-> WARNING: "__fentry__" [sound/soundcore.ko] has no CRC!
-> (..)
-> WARNING: "__fentry__" [arch/x86/crypto/crc32c-intel.ko] has no CRC!
-> WARNING: "__fentry__" [arch/x86/crypto/crc32-pclmul.ko] has no CRC!
-> WARNING: "__fentry__" [arch/x86/crypto/aesni-intel.ko] has no CRC!
-> WARNING: "__fentry__" [arch/x86/crypto/aes-x86_64.ko] has no CRC!
->   CC      arch/x86/crypto/aes-x86_64.mod.o
->   CC      arch/x86/crypto/aesni-intel.mod.o
->   CC      arch/x86/crypto/crc32-pclmul.mod.o
->   CC      arch/x86/crypto/crc32c-intel.mod.o
-> (..)
-> 
-> When reverting the entire pull with
-> 
-> git diff 84d69848c97faab0c25aa2667b273404d2e2a64a
-> d4d24d2d0a7ea3b62efd7336bfc2344e29b36bc5 | patch -p1
-> 
-> everything is ok again.
-> 
-> My system is a Debian Stretch.
-> gcc version 6.2.0 20161010 (Debian 6.2.0-6)
-> 
-> ..config is attached - in the case I have an unusual one from your
-> perspective.
-> 
-> Regards,
-> Oliver
+thanks,
+-- Shuah
