@@ -1,85 +1,81 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from Galois.linutronix.de ([146.0.238.70]:42768 "EHLO
-        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S934642AbcJ0H2l (ORCPT
+Received: from smtp.codeaurora.org ([198.145.29.96]:44024 "EHLO
+        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S965934AbcJ0OJd (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 27 Oct 2016 03:28:41 -0400
-Date: Thu, 27 Oct 2016 09:28:24 +0200
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Subject: Re: [RFC PATCH] kbuild: add -fno-PIE
-Message-ID: <20161027072824.rt3d6wngz7lrfb7u@linutronix.de>
-References: <20161021111600.9417-1-bigeasy@linutronix.de>
- <20161021212127.GA32611@angband.pl>
- <87eg37niky.fsf@turtle.gmx.de>
- <1477250598.3561.4.camel@perches.com>
- <8760oinqly.fsf@turtle.gmx.de>
- <20161024074332.uomcxyhqo6aq7vxk@linutronix.de>
- <874m41mz4h.fsf@turtle.gmx.de>
- <20161025073002.czwx2hysib77i7d5@linutronix.de>
- <87eg33kni0.fsf@turtle.gmx.de>
+        Thu, 27 Oct 2016 10:09:33 -0400
+From: Kalle Valo <kvalo@codeaurora.org>
+Subject: Re: [GIT PULL] kbuild changes for v4.9-rc1
+References: <20161017100130.GA16013@angband.pl> <871szfb1x1.fsf@gmail.com>
+        <20161018001626.GA5976@angband.pl>
+        <20161018123418.6121175b@roar.ozlabs.ibm.com>
+        <70c4e6bf-1667-326b-8a4d-b0960b55a5e7@suse.com>
+        <20161020145204.77b37e6b@roar.ozlabs.ibm.com>
+Date: Thu, 27 Oct 2016 11:10:03 +0300
+In-Reply-To: <20161020145204.77b37e6b@roar.ozlabs.ibm.com> (Nicholas Piggin's
+        message of "Thu, 20 Oct 2016 14:52:04 +1100")
+Message-ID: <87h97yus9w.fsf@purkki.adurom.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <87eg33kni0.fsf@turtle.gmx.de>
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Joe Perches <joe@perches.com>, Adam Borowski <kilobyte@angband.pl>, Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, ben@decadent.org.uk, Sven Joachim <svenjoac@gmx.de>
+To: Nicholas Piggin <npiggin@gmail.com>
+Cc: Michal Marek <mmarek@suse.com>, Adam Borowski <kilobyte@angband.pl>, Mathieu OTHACEHE <m.othacehe@gmail.com>, Omar Sandoval <osandov@osandov.com>, Linus Torvalds <torvalds@linux-foundation.org>, adobriyan@gmail.com, sfr@canb.auug.org.au, viro@zeniv.linux.org.uk, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, Thorsten Leemhuis <regressions@leemhuis.info>, Steven Rostedt <rostedt@goodmis.org>
 
-Hi Andrew,
+(Adding Thorsten because of a serious regression and Steven because he
+tried to fix something in the same commit)
 
-On 2016-10-26 19:51:03 [+0200], Sven Joachim wrote:
-> On 2016-10-25 09:30 +0200, Sebastian Andrzej Siewior wrote:
-> 
-> > On 2016-10-24 19:32:30 [+0200], Sven Joachim wrote:
-> >> On 2016-10-24 09:43 +0200, Sebastian Andrzej Siewior wrote:
-> >> 
-> >> > On 2016-10-24 09:38:49 [+0200], Sven Joachim wrote:
-> >> >> 
-> >> >> But make still fails with it. :-(
-> >> >
-> >> > try setting CONFIG_CC_STACKPROTECTOR_NONE=y and please let me know if
-> >> > the resulting kernel built with v3.2 gcc boots & works.
-> >> 
-> >> Sorry, I don't have gcc 3.2 around, and my gcc 3.3 environment produces
-> >> assembler errors in arch/x86/entry/entry_32.S.  Maybe binutils 2.15 is
-> >> not recent enough anymore?
-> 
-> I have done a few more tests, and I can confirm that binutils 2.17 is
-> the oldest version that works.  Also, I have succeeded installing gcc
-> 3.2 in a Debian 4.0 chroot now.
-> 
-> > so we use stone age gcc but take latest binutils and kernel? What about
-> > lifting the limit of gcc 3.2?
-> 
-> Would probably make sense, since gcc 3.2 cannot compile kernel/bounds.c,
-> at least not on x86.
-> 
-> ,----
-> |   CC      kernel/bounds.s
-> | In file included from /tmp/linux/arch/x86/include/asm/bitops.h:512,
-> |                  from include/linux/bitops.h:22,
-> |                  from include/linux/kernel.h:10,
-> |                  from include/asm-generic/bug.h:13,
-> |                  from /tmp/linux/arch/x86/include/asm/bug.h:38,
-> |                  from include/linux/bug.h:4,
-> |                  from include/linux/page-flags.h:9,
-> |                  from kernel/bounds.c:9:
-> | /tmp/linux/arch/x86/include/asm/arch_hweight.h: In function `__arch_hweight32':
-> | /tmp/linux/arch/x86/include/asm/arch_hweight.h:29: syntax error before string constant
-> | make[1]: *** [kernel/bounds.s] Error 1
-> `----
-> 
-> Building with gcc 3.3 is apparently still possible, although it produces
-> tons of warnings and a modpost section mismatch.  Still, requiring gcc
-> 4.1 or newer would not be unreasonable, I think (still released a few
-> months earlier than binutils 2.17).
+Nicholas Piggin <npiggin@gmail.com> writes:
 
-I remember you had once a server box running some enterprise distro
-which had an old gcc. Do you see any reason for not lifting the minimum
-gcc version to v4.1 ?
+> On Wed, 19 Oct 2016 16:38:14 +0200
+> Michal Marek <mmarek@suse.com> wrote:
+>
+>> Dne 18.10.2016 v 03:34 Nicholas Piggin napsal(a):
+>> > We should probably just bring all these arch patches through the
+>> > kbuild tree.
+>> > 
+>> > I'm sorry for the breakage: I didn't realize it broke the build with
+>> > some configs, otherwise I would have given Michal a heads up before
+>> > his pull request, and worked to get this stuff in first.  
+>> 
+>> It breaks with some binutils versions only (and only with
+>> CONFIG_MODVERSIONS=y, of course).
+>
+> Yeah this seems to be the issue, it apparently slipped past all the
+> automated builds. It seems like the existing CRC warnings in the tree
+> only trigger in rare circumstances too, so something could be a bit
+> fragile there.
 
-> Cheers,
->        Sven
+I upgraded from 4.8 to 4.9-rc2 and noticed that kernel modules fail to
+load (log below). After investigating for some time I found this thread
+and apparently this is not still fixed, at least not in Linus' tree.
 
-Sebastian
+Reverting 784d5699eddc5 fixed the issue for me. As I don't see any fix
+available (please correct me if I'm wrong) we should just revert that
+commit until it's properly fixed.
+
+Also note that there's a related fix from Steven:
+
+[PATCH] x86: Fix export for mcount and __fentry__
+https://marc.info/?l=linux-kernel&m=147733572502413
+
+For compiling the kernel I'm using Ubuntu 12.04:
+
+ii  binutils             2.22-6ubuntu1.4      GNU assembler, linker and binary utilities
+ii  gcc                  4:4.6.3-1ubuntu5     GNU C compiler
+
+The kernel is running on a separate machine with Ubuntu 14.04.
+
+[  110.703414] bluetooth: disagrees about version of symbol __get_user_2
+[  110.703416] bluetooth: Unknown symbol __get_user_2 (err -22)
+[  110.703429] bluetooth: disagrees about version of symbol __put_user_2
+[  110.703430] bluetooth: Unknown symbol __put_user_2 (err -22)
+[  110.703579] bluetooth: disagrees about version of symbol __put_user_4
+[  110.703580] bluetooth: Unknown symbol __put_user_4 (err -22)
+[  110.703669] bluetooth: disagrees about version of symbol __put_user_1
+[  110.703670] bluetooth: Unknown symbol __put_user_1 (err -22)
+[  110.703688] bluetooth: disagrees about version of symbol mcount
+[  110.703689] bluetooth: Unknown symbol mcount (err -22)
+
+-- 
+Kalle Valo
