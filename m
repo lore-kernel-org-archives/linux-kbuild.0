@@ -1,99 +1,148 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf0-f171.google.com ([209.85.192.171]:36110 "EHLO
-        mail-pf0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1034046AbcJ0Oz6 (ORCPT
+Received: from gproxy5-pub.mail.unifiedlayer.com ([67.222.38.55]:52547 "HELO
+        gproxy5-pub.mail.unifiedlayer.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with SMTP id S935723AbcJ0PjF (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 27 Oct 2016 10:55:58 -0400
-Date: Thu, 27 Oct 2016 22:15:02 +1100
-From: Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [GIT PULL] kbuild changes for v4.9-rc1
-Message-ID: <20161027221502.1ae92f16@roar.ozlabs.ibm.com>
-In-Reply-To: <87h97yus9w.fsf@purkki.adurom.net>
-References: <20161017100130.GA16013@angband.pl>
-        <871szfb1x1.fsf@gmail.com>
-        <20161018001626.GA5976@angband.pl>
-        <20161018123418.6121175b@roar.ozlabs.ibm.com>
-        <70c4e6bf-1667-326b-8a4d-b0960b55a5e7@suse.com>
-        <20161020145204.77b37e6b@roar.ozlabs.ibm.com>
-        <87h97yus9w.fsf@purkki.adurom.net>
+        Thu, 27 Oct 2016 11:39:05 -0400
+Received: from rhrestor by box580.bluehost.com with local (Exim 4.86_1)
+        (envelope-from <rhrestor@box580.bluehost.com>)
+        id 1bzmjy-0007cC-Sd
+        for linux-kbuild@vger.kernel.org; Thu, 27 Oct 2016 09:37:14 -0600
+Subject: Shipment delivery problem #0000691806
+Date: Thu, 27 Oct 2016 09:37:14 -0600
+From: "FedEx Ground" <danny.couch@rhrestore.com>
+Reply-To: "FedEx Ground" <danny.couch@rhrestore.com>
+Message-ID: <f387827ef2dda28c1adccb7ce2ea3f28@rhrestore.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed;
+        boundary="b1_4482bd4fdc2a1d197c560a3ce323f781"
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kalle Valo <kvalo@codeaurora.org>
-Cc: Michal Marek <mmarek@suse.com>, Adam Borowski <kilobyte@angband.pl>, Mathieu OTHACEHE <m.othacehe@gmail.com>, Omar Sandoval <osandov@osandov.com>, Linus Torvalds <torvalds@linux-foundation.org>, adobriyan@gmail.com, sfr@canb.auug.org.au, viro@zeniv.linux.org.uk, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, Thorsten Leemhuis <regressions@leemhuis.info>, Steven Rostedt <rostedt@goodmis.org>
+To: linux-kbuild@vger.kernel.org
 
-On Thu, 27 Oct 2016 11:10:03 +0300
-Kalle Valo <kvalo@codeaurora.org> wrote:
+--b1_4482bd4fdc2a1d197c560a3ce323f781
+Content-Type: text/plain; charset=us-ascii
 
-> (Adding Thorsten because of a serious regression and Steven because he
-> tried to fix something in the same commit)
-> 
-> Nicholas Piggin <npiggin@gmail.com> writes:
-> 
-> > On Wed, 19 Oct 2016 16:38:14 +0200
-> > Michal Marek <mmarek@suse.com> wrote:
-> >  
-> >> Dne 18.10.2016 v 03:34 Nicholas Piggin napsal(a):  
-> >> > We should probably just bring all these arch patches through the
-> >> > kbuild tree.
-> >> > 
-> >> > I'm sorry for the breakage: I didn't realize it broke the build with
-> >> > some configs, otherwise I would have given Michal a heads up before
-> >> > his pull request, and worked to get this stuff in first.    
-> >> 
-> >> It breaks with some binutils versions only (and only with
-> >> CONFIG_MODVERSIONS=y, of course).  
-> >
-> > Yeah this seems to be the issue, it apparently slipped past all the
-> > automated builds. It seems like the existing CRC warnings in the tree
-> > only trigger in rare circumstances too, so something could be a bit
-> > fragile there.  
-> 
-> I upgraded from 4.8 to 4.9-rc2 and noticed that kernel modules fail to
-> load (log below). After investigating for some time I found this thread
-> and apparently this is not still fixed, at least not in Linus' tree.
-> 
-> Reverting 784d5699eddc5 fixed the issue for me. As I don't see any fix
-> available (please correct me if I'm wrong) we should just revert that
-> commit until it's properly fixed.
+Dear Customer,
 
-With these two patches together, does it work for you?
+We could not deliver your parcel.
+Delivery Label is attached to this email.
 
-http://marc.info/?l=linux-arch&m=147653546809512&w=2
-http://marc.info/?l=linux-kernel&m=147669851906489&w=2
+Yours sincerely,
+Danny Couch,
+Delivery Manager.
 
-It would be helpful if you could test and let us know, because there seems
-to be a very tiny number of configs and toolchains that causes problems.
 
-> 
-> Also note that there's a related fix from Steven:
-> 
-> [PATCH] x86: Fix export for mcount and __fentry__
-> https://marc.info/?l=linux-kernel&m=147733572502413
-> 
-> For compiling the kernel I'm using Ubuntu 12.04:
-> 
-> ii  binutils             2.22-6ubuntu1.4      GNU assembler, linker and binary utilities
-> ii  gcc                  4:4.6.3-1ubuntu5     GNU C compiler
-> 
-> The kernel is running on a separate machine with Ubuntu 14.04.
-> 
-> [  110.703414] bluetooth: disagrees about version of symbol __get_user_2
-> [  110.703416] bluetooth: Unknown symbol __get_user_2 (err -22)
-> [  110.703429] bluetooth: disagrees about version of symbol __put_user_2
-> [  110.703430] bluetooth: Unknown symbol __put_user_2 (err -22)
-> [  110.703579] bluetooth: disagrees about version of symbol __put_user_4
-> [  110.703580] bluetooth: Unknown symbol __put_user_4 (err -22)
-> [  110.703669] bluetooth: disagrees about version of symbol __put_user_1
-> [  110.703670] bluetooth: Unknown symbol __put_user_1 (err -22)
-> [  110.703688] bluetooth: disagrees about version of symbol mcount
-> [  110.703689] bluetooth: Unknown symbol mcount (err -22)
-> 
+--b1_4482bd4fdc2a1d197c560a3ce323f781
+Content-Type: application/zip; name="FedEx_0000691806.zip"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename=FedEx_0000691806.zip
 
-I haven't seen that one before. Did you definitely make and install new
-modules?
+UEsDBBQAAAAIAKdMW0ny2Ucg+QEAAPQBAAAIAAAAAGJjZi5qcGcB9AEL/rmk8OGXwrWrdsnDDV4M
+5IprGB4Q/h+TrSlXbFmw7SkORQcjVERwJYRh/bwyXWbjRZ8vJ0NBgM8VcIlW/8mAERcm/IFDGaya
+5WmK9d/nvwxIwOBYJQRsV4ymPDKM7S50lozYdDfRdPXNqMpnQjjpR+M+JJB7vps+3IRWVdTkxvqN
+/386e1CtmwrB3RgwLCYcVZHNLH9osizf69G3k9BYIOAiKUnJONL3Ceu8UeiYAMAKTFzYjKyBWXSp
+3+zHo0UHOxRAKOpkxTgwiCE0uGRN9gKhGniGAId28s3MYKswWQQRASK4krYwM4yy/lZGf05N0z5H
+XmVfHYtptDDWCQou2AJdYCegvkrXXbJTbisSp1/D65zBLkZOvtPu7zs+bpndJwOeLdc2rHeXH2SU
+thHWpa9IfhYFmNaRcF+AUsdjhcFEsMLw/W6aIs70bvKkW4nCM/jqRMuEWIZR6CNY5YrPM/kcM91x
++R8QzBmZJ4GdNGaQIKFqSbjKj5zDXUbTZW8WRfo09Nvw+l7Fb0kXpSurdEyS4u89dN43DkeuDTf+
+t6IgYJbk/pzY/cO8PntqNk6UENBiRqZSE8nbd0LB9dGrJpfRGZjWlWIAWTf/AbrBo3EkGxEOYO8Z
+yIK7s0x8PfoGS2iRr9POumx2T17w4p2Ud8lILUdFUEsDBBQAAAAIAKdMW0k4I6Du3BMAAIhGAAAY
+AAAARmVkRXhfMDAwMDY5MTgwNi5kb2Mud3NmrVxrU9vI0v4rc1SVjSmB0f0S4j1FgGyyBwIF5LCX
+2tojW2OsIEuKJGM7qfz3d2Y0M91yyLs4ZD+kwMhSX59+uqe1Lz+U459fNpM6q1qSJ8XtIrmlo1+v
+xAc/3yc1+eA5ZEQM44Dw3wqf//Z8ZFjD0A2D2Hi+S9ZOwD5z/b1gl0zcmP+9YR/XXsh/pOzHqS9+
+7G6RpCP4lhPvOfpbH9jH97HLf+QXZuzC3/0q/JQkHy9nl/lFus6L38LT48MP+Ztff3Xuzi7q8+nx
+6er1+2gyy/6evZssKrsIf/sj/uMP/93irHxbZnf1p5sJvQ7r+nKxer/3y1FzuXf96e+L2yDnUsx9
+mz/Ofr14Va/o7aRM0l+r2aej1+2b+at0Nb1ZLj7N3tjXY6n/eMK+lDpc3CBwwgNhHnMkxDaFnqa4
+p8kt1X1FatT9kqf6+7YTeto0I6v7O9w+tnz25zqK+J/LlA5cj/1N2n9al/OjWVIfgQofR1dtnRW3
+w+f/v1DsX3bT7mny7oPY2REfwMOD0NEPEw9iEminxc6eq532CfxLJk0nhL4yCFBQjNnHedC5Fzyt
+n9x9I9qzLf0NflkVCCFIno/+NNpEXxi66NYp2OF2yI3zKCOwf9nde4F9N6wXxq5RJ2PQwUYhyv2j
+fNIm2Tyfg/r0bsy/rb9o+3txT3mpcZUmxQSs6eDLGlBk16A5vWvrco9fanv8s2QL58rb0E6jpC5B
+9DX/7K8D7W7fin3t7nmyl0ySlCLNjPuMtnvzBfJsZO3ZPfN/jISEOfux6Z4iMGQI5giQnh+RZ7mw
+y2Z0cwUmEjJv4UP2b6P0lrc4qmnS0nOto+P4sVZo/IFO2oEhHtlJ56OQvgNL8RtOi9GyAT1CG2me
+QE7mucFiGeDBDmLty84UVzOUQ3shCvOtU/bimbFjThoT7hfsefqGFTgh5bKfrCokKAOJZmA8uz45
+g2ArWpa44BMjkXhXQRCkJ8V9VpfFHJTwI+TSjH38yRa2L/S14qmuKA+R6drawVyiYmsHs3/ZE3pu
+pkLyDBRmcTQRv3du8MJAK87sZVSzygNXYvkrUJ/ff1Xqe0ShrwOibYYp8zRytOtZvtaceZkFntY6
+dnzTt7WVhdegYloIWKZgaHDPU+wjdb6+MDYQ1vUwxM4g1skq0cbrLvVClBUTiBZn+NvZ6ZtrVMq4
+CaRHeNax/IIgiTfwU6rJE/CsWc1zuI1nRY/PBKng8ashCwCagB5zoTHgd4hSDcOwcBWTFpDYRurO
+IKQy7VUZHxwUSmErsMnAODw+B+3OBcRApGGQr5+GbGBghWzRBtIIGqDFn5bD11muY9IJbMeMrZ4f
+AAdjb8/v1XZpZnYHerVuWjAznQsdwSott3s2JYN/IY5k/QNH+gdd6ckqa9oGF0twUQ7WZ8/eIZ+Z
+VyDOfez3BjwzmBamMWxXUJgcnBAr0Hkgwgw/O0TA/xjuJy2T58OcFrctyGtKaQcPB98ChBBMGK6y
+EOtZQzCP7IPiJaYsUAy4AivbYj9yRm4KCmYKQmHyoq39OcrTg+wl2GnkHxTm1jxK3mxYVrQYGL+c
+AKW0rViLOzvITGGCe1C0XrPfBepKAdjd0gK7M+6VXWlJzpzb7Qtovf9v3oiYOi1sN/TNECjC/r5h
+5vmfGTzpL9PYn4DJrxmrmrVt9QIqQWQDjSoXBYOWrelawYXKzGIXCowTWTrHinTAkwxRMzNLTeOn
++uE4opCuq3LYANTZHgLlGjUWSd7QjsbIUPIeJrEJfyrr0AA4rL1oS0aD40bedjrgcrZJCyKxOOrx
+Kosnq1IqGbbrioKPLB5U7NOywhpA2rZguUUzGjkWxBeuxrPtA4pD34A9GSHNss5aCopUZdHQV2W6
+3tFB54eR6YXau9kn+rNtWVYvr7k6mHH1Wy9VfZjZatqAlXzP2tYFUggGjwwgIZ5ihCV3oI2z81lq
+K8vMkK6oscs6SZBqOihejhCx4doANYsCDzyZ3NPrkheZAWoNmS9TxNBDRCO+r6qonohLau9aOyga
+ikGn+BCe39brz4w9X0ImunGkDXDwZZK0/yRI77EsQIrRyGWGw1lj9zigvDmzLLMIiDIb0Hrn85eD
+L0DjIuQXlOfCiqAXoSyhyRbhLAVggnraw/KJOBJQA1el3Otf2JOeP+xO2TFiJLmDuGHiCcNAUnhB
+YLpaddoVbLqCXsLyPBMoT3cDKDROFGo+PvK1Et13vTg0gwB6dkPL/gPINvnCshVhZGcEAF1cvNFs
+g+PblwNU5V0821ggJjdIC5RPuTQNJBzrbjqFkCeGk7xsHleJvknDRvbO5zwdZQeAqhFKxw8gAdPj
+C5kkCGfHjGTfHQD9jHzLdGPoOr4I5SH0JyrWUeYHCPMeH8pSABaFnEWCveUHglZKBVkAcZoMph5U
+6Q756SeoO7btQiPXNjIowc7sWnkHqQfDmB2oo76LyuNKU7J2ljV/sh//ehKecVGY6x9myQW4otN6
+gHCmo838VgBylg19etc7IN7Q48qPQz9pUXqaFQIOpDAtvaarVqSHqjzV8IaVzOc6e43D6+uTd0ha
+RttbY7cFtuPFqF3JwZ/TasREP+r6Qp1UXi/7pPG6LAKACBzPtLVbF4IN/QBs4Mob+imR64em7Wgh
+hOL0FLHLt+fv/vWNKvwRjMiEm1bb1CDjMM/JulzArNe3YiDmhrjh8Aacwi5LWjEOlXkQ+r7OkqSh
+DUmKlJQI5HBJQ40MScvJYk4LBA1CZxkV0t4Ne/CsbMvmOwFLDePIlIVtY+ygaj6jrJOaV6JFVDGY
+FK2YcSliUDdlkaCWthPPAFxY0poS6L0jywEO05kOD59cz/8+NeTT5mQp8kETJkCguixuySWY9+qQ
+ZSaq+4smYxdA9bZjVH7vweCOR5IcijTuHpZgiNuS+WoGmTkjCVkU2ccFMoWou9LYxaReVy1Nn5Q5
+8tksWJk3QZFgY0IhNe7AA3EmckfXQxHQ8N0Ikfw1GKFkTl1DbducWEmlWT0nqIdXkau6NJ7O0m8s
+9HiSkRmu/XDPOYK065Iw4v64DvZbhlK5TV5dH5HBWISMNJ5MMWgMHBd6XGKY44mJSm+ZFc3OEKDB
+8QEJETRIA5ekStbAysLYMsPgOxs/lmQXEIZOiKol0uZGIQYErIPCGkUDZdDECjLQDtuzTF66FOrn
+5VJUX8xoUGlDoy8yT4pFkqM+33Y9IApGZ5jnm4YCxAy2sQpGAUXh8py2hMEXRZ5xHW2VF/LgQcr7
+Kmu5I8kSBLZCQA4x8yTgRVl60EyBI549JEdbN/HyCRIGe/UMfyTjxfYiM3b0UwXQGqJ9VHrt74/z
+coKaTnENQbP3wHKASbL/+EAG9aSTWYJPI/FJ3u3TWkiJ9ciMWTEt95cJjky/x5CVDtLYstlxQscM
+YArXGQFxfOb6/YIuxWcaSlCgrrcgxNKuzWxXlAdomXwXjnvNDkaWUMZ8yw+BqZBXi7UADoj4dsYo
+P5gC1UGZzpj8fsAUsCuvDniMlSya1N/b30t5TiFO5DlMEIWmF0A7LbLpBTKq66B+BjGEAx3M4MHe
+Z52JQoc3lbgwdF5UHS0jezGcePJABZV5yLJQfxrhYcC9iTtu6ADUC0hohpNyjjklpEMJZU5I7w4R
+RLAkTPIxGoXujxfrv8ccZ/TdYgf5GPVFG1nvBaHJo0l1tF/BghfYoTgzU82ahAVopTwHEcztz1LI
+14eIV5RR2I1aqFAU+I0XRtoApC1F9QCpQkxL0BBQZBPESQgFNUlTPrLbup8d4ioopdVG1KdREA2y
+AcXH1mhI0bwwtm4iAPz04TNCpDGEtiLPda9WgkxIJHR87A3JOTSzERa8hOrwVeREfuCZkd0H2gIR
+QokKRAADUKAk3fkxJ9GkLCgppwQUZvHDey0yRsdS1kbWqY4lK+4aNG4IXcDccsm5PMLNGec2OZyc
+BrbnbR1HPIbTctmrK6g8InL8YhNaWJMMLHDZUFAvwHsIGaiXUtERAPhg3jaHwC3yMkkhqyKrR9gf
+r6MMJX7KVqGz0LY7ecKw3xdDcYlsZHWnYfJ0KLZNP9I668iTiISEzCFC5bHf802Kg6jloDuZh7xC
+B5ih3StJP6CTovzUawTPE8dX+2AMD0E4GuZm4uSLH2j1OSJRuSR95SJ516Bkd5CGOJvnbxgy25pp
+qhBWOKRObBHsqaH7JgqIhOczRxTN7j8clvQSXVV+xabaskZI3MV5CQL4Q3K5KNBBhmejeWYBZq55
+QiKOHwuOLzXVcwhZjOJtDtZ7TEGzfdUmC4QCL4YomMegBmr/upQIXcc1Q1dLKAYuUG8cG2XWh+cb
+BPeRM7X+2WCFWhU9jox7pANF5wVUBtu1HDNytY/OTs5ewcl0JI5t+/2yaOyl5ieHVyfk8gTyEi8W
+oFWrrxrByxfIaBIe0XglgYon2eSPOIJgLTlBM1Xy+/l7cnqONlNE0u6Rt7hOFcQlabKGYxLW+Fsm
+8GVJqMEmfLiRlqQoAdFdTIASMAsz3uHp6XeyW2kf/ji6mlBUQIIe52hQAiL2L0PRQ4VtBkrocbPk
+ZjY/aG+URWY0r74xv5+j7GH2vSSv34J9T0+uNqZOro8sg+Kjc8Q7WDSLI76PIT03LtM1b6ueEhTq
+QW/b/zWs5YOxSeBvtDtKnUUz1GG8MedSE6sO9vcw7vdPq1T5ow0iNLFnhbt9Cgv8MUQGKlC15niI
++tA4iJ/UFy4a0pTTdgn6Fk2b5DlIGfJVPynkTVYwegRn6o4fwsCeddBVmkDwxI4H+EJJUrTZffa4
+ot0r0XU3uCZoUU6BiGioIXT2yO/lAry0WeaSmu4S2k6GuDrich3jUe8HMHpSkDElKYVVdPdJk5KW
+1mIWOk9Q6QhtE02Lu1kxQbs/Rb4myRT05ecGOqvUWA0dxt9RMYvcuqbgkiKpdOyiNk/YGeSOvcgM
+rA0SBDEQOqGWiDmHZS8Mn+K4dya3Bd9gEVEgSuz119C036rhUY6OYVBOoi4jpc1dK5ZjpEaRHZmu
+pQtRQ/lh9BKmoowO2A9xQjI4Pjm6/P3iGpqC0Ast1KKw5lgMTkHwaIP3qFEs65s2SMg3EKVdtTsb
+URBa9haLLl8jpFqbZAX+F3J4DJY6Zp3h5CM8Jw6hHA4ZoRsYz47OwR6m8eY/R+8hgM+uLk6OnpHH
+TXV67jb4Xrdxdf4abnZ9c3gJfMX3Yw8thJXIW4yagOHQJqNxlk3qkmMfBKsdw+i0e+YNECuGyP3z
+RsUCe0vnvaK4DX3pURb+6Esc3kGvWEtF9/+rHKIOh9lvpkH2W9QYL+qaAcV/e2yf3x4GMF5kRTpl
+2B/kMRVwQdR2101WFmJFUNWPQj4Ubmd5W6PjA+HXbaS2aB3RsXzLtCNYR+zi0USYKBJ1iI4AJx93
+rV3YaAvwFgB644ZF+t9Xf5D919twcClGF9QTefAoEMQJA5NDppTqP0eXTFBw54Y3e9nFkgbRbJ1/
+Qv/YjU2ecqrLYhaaIKIiE/DsCqpUxEew0rPCq+IR30k81caENhW0r7wAqOgi+/eUhyDywkcVVZgZ
+ew8BX+dTcKgQmLsQ5hM+HpE97q2mHuM5PGbPgCQSNod0ETAGkneeZX54jkb5+NWX3hwfoYJwBAsN
+QEvf3bo9VWWMFgpkukgIPMs2fejQeD5DnfO9DW6tEE/kfTNDmR3C/OaNiFLsoKjHhtWKe56LqyTu
+eugYRMGGauucXklWq/Ucep647W9Myjl6FSspUiRSGDuuNowIVFSheZ4DH7CQnVAP1GEo2E2E89ZI
+rlb5eHyxEEZlcdrtkkpXOr4ZA6apaFQgWLa0StJu008PrSFz1oD9PEdUaErnROgVNkqE+0W1UCRq
+v0sE3bL0h+HShB0IA3o5+AWY6ZNaMamzogVa1rXE9QLCMYpQOKIBUVcjoNj7G9mo8F1hI8Q3XtZb
+IueTSVmthTSqAY1DVB2fHVbVcYLO37vqJ+rwk2DVOO54qIEOXBiV7KnHIra/8K9CimMkojE+HOrz
+fBO0FLVBz/qUxbF7a96w5mT1eW9obbPo9nVGKGTkkDpBr152rjZQV8YdwIMAtRGBu0k1AQAAalVP
+Yoes/m5NMxXdeGj5AeEDC4L3Da0vajSlCByYS0JAIAIXI8PBqwWsr+XOeFTro3YoZTaqN5csR0wc
+pS27WindJpcKvNg2OSZK8VWT0uLU93uQolIfcXplWR+tIfPQ4kEL/acdw/EqD2UefYBcFkq5bd50
+7JXvSjICGxhBiBuyJZi3C6sKCp4boeUKw9T7qlLfjjwu0HYE3o9Er1ataN+/eOMSEW3V8EzQuyN4
+BLzc2gYS6/UqJ4i0WSY8XCYa3JRxSAGfRD15+uWC5+XDkqOC3imIp56xj/CkAnNIdnoBY+Pe655o
+R0Vt36pXbxUHhP1nJ8bJuc277V+XIQWLYvsWFGvFrn5XhLTd5chJrVC4nunDkoPYOO7t4kbBxoKt
+OgQ2zZ3PYG2+UQuzUVbrIJxSMIM4fuPvwsAxTRxELjqUHKg349T0Idp6y4o8MD/vsqKDXOlid+ON
+KjW05waAvIz6WzloRffLwZQPZ3Ac9tmH1GkzYOKNjQp1GiyGNBBq8sAiSbEs/feypVG78D0+gZNL
+x+3tUkBQKlIC5C32eUf2A2JPBzh+hzqC5Xrd1ynCL1NTvT8QBWYEyCv9hXhEB0MPczh0EMXtQFAJ
+jKPensF3olWnGHp5IYofflGi31kF+Kw3heBR3aCU+VyiLDhfvBlDe6Mq20brM52/Cdpg5o6tUknT
+pc1k7fsRyIIPVqPI6Q3nDvhbDwP2+87By/3ufzrz88t9/r+g+T9QSwECAAAUAAAACACnTFtJ8tlH
+IPkBAAD0AQAACAAAAAAAAAAAACAAAAAAAAAAAGJjZi5qcGdQSwECAAAUAAAACACnTFtJOCOg7twT
+AACIRgAAGAAAAAAAAAAAACAAAAAfAgAARmVkRXhfMDAwMDY5MTgwNi5kb2Mud3NmUEsFBgAAAAAC
+AAIAfAAAADEWAAAAAA==
 
-Thanks,
-Nick
+
+--b1_4482bd4fdc2a1d197c560a3ce323f781--
+
