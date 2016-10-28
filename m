@@ -1,14 +1,14 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.web.de ([212.227.15.4]:60411 "EHLO mout.web.de"
+Received: from mout.web.de ([212.227.15.3]:64760 "EHLO mout.web.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S964792AbcJ1Ieg (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 28 Oct 2016 04:34:36 -0400
-Subject: [PATCH 04/10] scripts/basic/fixdep: Fix error log output in
- print_deps()
+        id S934755AbcJ1IgM (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 28 Oct 2016 04:36:12 -0400
+Subject: [PATCH 05/10] scripts/basic/fixdep: Complete error handling in
+ parse_dep_file()
 References: <72e07814-56e9-505a-d660-91ff20b6efea@users.sourceforge.net>
 From: SF Markus Elfring <elfring@users.sourceforge.net>
-Message-ID: <afce4a5b-0bd1-c887-9fcf-046dac0d3927@users.sourceforge.net>
-Date: Fri, 28 Oct 2016 10:34:28 +0200
+Message-ID: <199fadd4-8066-995a-7558-66b3938b6f73@users.sourceforge.net>
+Date: Fri, 28 Oct 2016 10:35:34 +0200
 MIME-Version: 1.0
 In-Reply-To: <72e07814-56e9-505a-d660-91ff20b6efea@users.sourceforge.net>
 Content-Type: text/plain; charset=utf-8
@@ -19,47 +19,74 @@ To: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.com>
 Cc: LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org
 
 From: Markus Elfring <elfring@users.sourceforge.net>
-Date: Thu, 27 Oct 2016 19:04:01 +0200
+Date: Thu, 27 Oct 2016 19:43:43 +0200
 
-The function "perror" was called after a call of the function "fprintf"
-in two if branches. So it could happen that an error message was displayed
-for a failed print operation instead of the failure according to the call
-of the function "fstat" or "open" here.
+Return values were not checked from five calls of the function "printf".
 
-* Pass the relevant error data in the logging calls directly.
+This issue was detected also by using the Coccinelle software.
 
-* Express that the corresponding return values are intentionally unused
-  by casts to void.
+
+* Add a bit of exception handling there.
+
+* Combine these calls into three.
 
 Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
 ---
- scripts/basic/fixdep.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ scripts/basic/fixdep.c | 32 ++++++++++++++++++++++++--------
+ 1 file changed, 24 insertions(+), 8 deletions(-)
 
 diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
-index 0dcec29..9a2ff68 100644
+index 9a2ff68..5f6a4f4 100644
 --- a/scripts/basic/fixdep.c
 +++ b/scripts/basic/fixdep.c
-@@ -403,13 +403,15 @@ static void print_deps(void)
+@@ -366,14 +366,25 @@ static void parse_dep_file(void *map, size_t len)
+ 					 */
+ 					if (!saw_any_target) {
+ 						saw_any_target = 1;
+-						printf("source_%s := %s\n\n",
+-							target, s);
+-						printf("deps_%s := \\\n",
+-							target);
++						if (printf("source_%s := %s\n\n"
++							   "deps_%s := \\\n",
++							   target, s, target)
++						   < 24) {
++							int code = errno;
++
++							perror("fixdep: printf");
++							exit(code);
++						}
+ 					}
+ 					is_first_dep = 0;
+-				} else
+-					printf("  %s \\\n", s);
++				} else {
++					if (printf("  %s \\\n", s) < 5) {
++						int code = errno;
++
++						perror("fixdep: printf");
++						exit(code);
++					}
++				}
+ 				do_config_file(s);
+ 			}
+ 		}
+@@ -391,8 +402,13 @@ static void parse_dep_file(void *map, size_t len)
  
- 	fd = open(depfile, O_RDONLY);
- 	if (fd < 0) {
--		fprintf(stderr, "fixdep: error opening depfile: ");
--		perror(depfile);
-+		(void) fprintf(stderr,
-+			       "fixdep: error opening depfile: %s: %s\n",
-+			       depfile, strerror(errno));
- 		exit(2);
- 	}
- 	if (fstat(fd, &st) < 0) {
--		fprintf(stderr, "fixdep: error fstat'ing depfile: ");
--		perror(depfile);
-+		(void) fprintf(stderr,
-+			       "fixdep: error fstat'ing depfile: %s: %s\n",
-+			       depfile, strerror(errno));
- 		exit(2);
- 	}
- 	if (st.st_size == 0) {
+ 	do_extra_deps();
+ 
+-	printf("\n%s: $(deps_%s)\n\n", target, target);
+-	printf("$(deps_%s):\n", target);
++	if (printf("\n%s: $(deps_%s)\n\n"
++		   "$(deps_%s):\n", target, target, target) < 27) {
++		int code = errno;
++
++		perror("fixdep: printf");
++		exit(code);
++	}
+ }
+ 
+ static void print_deps(void)
 -- 
 2.10.1
 
