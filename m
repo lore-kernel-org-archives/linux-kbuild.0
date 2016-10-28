@@ -1,53 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.web.de ([212.227.15.4]:64245 "EHLO mout.web.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1755836AbcJ1ImQ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 28 Oct 2016 04:42:16 -0400
-Subject: [PATCH 10/10] scripts/basic/fixdep: Combine two fprintf() calls into
- one fputs() call in usage()
-References: <72e07814-56e9-505a-d660-91ff20b6efea@users.sourceforge.net>
-From: SF Markus Elfring <elfring@users.sourceforge.net>
-Message-ID: <e4ad7dc2-eeba-1389-369d-ae4ded67688e@users.sourceforge.net>
-Date: Fri, 28 Oct 2016 10:41:39 +0200
-MIME-Version: 1.0
-In-Reply-To: <72e07814-56e9-505a-d660-91ff20b6efea@users.sourceforge.net>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Received: from lb3-smtp-cloud6.xs4all.net ([194.109.24.31]:48353 "EHLO
+        lb3-smtp-cloud6.xs4all.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S942614AbcJ1V1A (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 28 Oct 2016 17:27:00 -0400
+Message-ID: <1477690012.2167.21.camel@tiscali.nl>
+Subject: Re: [PATCH v2 1/5] kconfig: introduce the "imply" keyword
+From: Paul Bolle <pebolle@tiscali.nl>
+Date: Fri, 28 Oct 2016 23:26:52 +0200
+In-Reply-To: <alpine.LFD.2.20.1610272156050.14694@knanqh.ubzr>
+References: <1477448931-29051-1-git-send-email-nicolas.pitre@linaro.org>
+         <1477448931-29051-2-git-send-email-nicolas.pitre@linaro.org>
+         <1477613871.2121.92.camel@tiscali.nl>
+         <alpine.LFD.2.20.1610272156050.14694@knanqh.ubzr>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.com>
-Cc: LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org
+To: Nicolas Pitre <nicolas.pitre@linaro.org>
+Cc: John Stultz <john.stultz@linaro.org>, Richard Cochran <richardcochran@gmail.com>, Michal Marek <mmarek@suse.com>, Thomas Gleixner <tglx@linutronix.de>, Josh Triplett <josh@joshtriplett.org>, Edward Cree <ecree@solarflare.com>, netdev@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-From: Markus Elfring <elfring@users.sourceforge.net>
-Date: Fri, 28 Oct 2016 09:45:30 +0200
+On Thu, 2016-10-27 at 23:10 -0400, Nicolas Pitre wrote:
+> On Fri, 28 Oct 2016, Paul Bolle wrote:
+> > You probably got "["if" <expr>]" for free by copying what's there for
+> > select. But this series doesn't use it, so perhaps it would be better
+> > to not document it yet. But that is rather sneaky. Dunno.
+> 
+> If it is not documented then the chance that someone uses it are slim. 
+> And since it comes "for free" I don't see the point of making the tool 
+> less flexible. And not having this flexibility could make some 
+> transitions from "select" to "imply" needlessly difficult.
 
-Some data were printed by two separate function calls.
-Print the same data by a single call of the function "fputs" instead.
+My point is moot. I somehow missed that this series adds
+    imply PTP_1588_CLOCK if TILEGX
 
-This issue was detected also by using the Coccinelle software.
+So you are quite right in documenting this.
 
-Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
----
- scripts/basic/fixdep.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
-index 911347a..bdd031f 100644
---- a/scripts/basic/fixdep.c
-+++ b/scripts/basic/fixdep.c
-@@ -122,8 +122,10 @@ char *cmdline;
- 
- static void usage(void)
- {
--	fprintf(stderr, "Usage: fixdep [-e] <depfile> <target> <cmdline>\n");
--	fprintf(stderr, " -e  insert extra dependencies given on stdin\n");
-+	if (fputs("Usage: fixdep [-e] <depfile> <target> <cmdline>\n"
-+		  " -e  insert extra dependencies given on stdin\n", stderr)
-+	   < 0)
-+		perror("fixdep: usage");
- 	exit(1);
- }
- 
--- 
-2.10.1
-
+Paul Bolle
