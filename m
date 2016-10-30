@@ -1,66 +1,94 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.gmx.net ([212.227.17.21]:53080 "EHLO mout.gmx.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752440AbcJ2VTP (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 29 Oct 2016 17:19:15 -0400
-From: Sven Joachim <svenjoac@gmx.de>
-Subject: Re: [RFC PATCH] kbuild: add -fno-PIE
-References: <20161021111600.9417-1-bigeasy@linutronix.de>
-        <20161021212127.GA32611@angband.pl> <87eg37niky.fsf@turtle.gmx.de>
-        <1477250598.3561.4.camel@perches.com> <8760oinqly.fsf@turtle.gmx.de>
-        <20161024074332.uomcxyhqo6aq7vxk@linutronix.de>
-        <874m41mz4h.fsf@turtle.gmx.de>
-        <20161029101007.zwqv3lslbzd4urco@nomi.cz>
-        <87insbnl3x.fsf@turtle.gmx.de>
-        <20161029192150.wcl6a2jk3w6abwb4@nomi.cz>
-Date: Sat, 29 Oct 2016 23:18:51 +0200
-In-Reply-To: <20161029192150.wcl6a2jk3w6abwb4@nomi.cz> (Tomas Janousek's
-        message of "Sat, 29 Oct 2016 21:21:50 +0200")
-Message-ID: <8737jeonus.fsf@turtle.gmx.de>
+Received: from basicbox7.server-home.net ([195.137.212.29]:40412 "EHLO
+        basicbox7.server-home.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753132AbcJ3KvI (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Sun, 30 Oct 2016 06:51:08 -0400
+Subject: Re: [GIT PULL] kbuild changes for v4.9-rc1
+References: <20161017100130.GA16013@angband.pl> <871szfb1x1.fsf@gmail.com>
+ <20161018001626.GA5976@angband.pl>
+ <20161018123418.6121175b@roar.ozlabs.ibm.com>
+ <70c4e6bf-1667-326b-8a4d-b0960b55a5e7@suse.com>
+ <20161020145204.77b37e6b@roar.ozlabs.ibm.com>
+ <87h97yus9w.fsf@purkki.adurom.net>
+From: Thorsten Leemhuis <regressions@leemhuis.info>
+Message-ID: <694a2919-6445-7632-a295-1baa01c82d0d@leemhuis.info>
+Date: Sun, 30 Oct 2016 11:51:02 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <87h97yus9w.fsf@purkki.adurom.net>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Tomas Janousek <tomi@nomi.cz>
-Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Joe Perches <joe@perches.com>, Adam Borowski <kilobyte@angband.pl>, Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, ben@decadent.org.uk
+To: Kalle Valo <kvalo@codeaurora.org>, Nicholas Piggin <npiggin@gmail.com>
+Cc: Michal Marek <mmarek@suse.com>, Adam Borowski <kilobyte@angband.pl>, Mathieu OTHACEHE <m.othacehe@gmail.com>, Omar Sandoval <osandov@osandov.com>, Linus Torvalds <torvalds@linux-foundation.org>, adobriyan@gmail.com, sfr@canb.auug.org.au, viro@zeniv.linux.org.uk, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, Steven Rostedt <rostedt@goodmis.org>
 
-On 2016-10-29 21:21 +0200, Tomas Janousek wrote:
+On 27.10.2016 10:10, Kalle Valo wrote:
+> (Adding Thorsten because of a serious regression and Steven because he
+> tried to fix something in the same commit)
 
-> On Sat, Oct 29, 2016 at 07:03:30PM +0200, Sven Joachim wrote:
->> I cannot reproduce that, FWIW.  Also, arch/x86/entry/vdso/Makefile seems
->> to explicitly filter out -mfentry from the compiler flags, but maybe I
->> misunderstand something.
->
-> Compiler flags, yes; assembler flags, no. Perhaps adding
->
->     KBUILD_AFLAGS_32 := $(filter-out -mfentry,$(KBUILD_AFLAGS_32))
->
-> to arch/x86/entry/vdso/Makefile would fix the build as well. I have honestly
-> no idea which solution is better. :-)
->
->> Could you please show the exact command that's failing with "make V=1"?
->
-> gcc -Wp,-MD,arch/x86/entry/vdso/vdso32/.note.o.d -nostdinc -isystem
-> /usr/lib/gcc/i686-linux-gnu/6/include -I./arch/x86/include
-> -I./arch/x86/include/generated/uapi -I./arch/x86/include/generated
-> -I./include -I./arch/x86/include/uapi -I./include/uapi
-> -I./include/generated/uapi -include ./include/linux/kconfig.h
-> -D__KERNEL__ -D__ASSEMBLY__ -DCONFIG_X86_X32_ABI -DCONFIG_AS_CFI=1
-> -DCONFIG_AS_CFI_SIGNAL_FRAME=1 -DCONFIG_AS_CFI_SECTIONS=1
-> -DCONFIG_AS_FXSAVEQ=1 -DCONFIG_AS_SSSE3=1 -DCONFIG_AS_CRC32=1
-> -DCONFIG_AS_AVX=1 -DCONFIG_AS_AVX2=1 -DCONFIG_AS_SHA1_NI=1
-> -DCONFIG_AS_SHA256_NI=1 -Wa,-gdwarf-2 -mfentry -DCC_USING_FENTRY
-> -DCC_HAVE_ASM_GOTO -DBUILD_VDSO -m32 -c -o
-> arch/x86/entry/vdso/vdso32/note.o arch/x86/entry/vdso/vdso32/note.S
->
-> Is this file being built with your .config?
+Many thx.
 
-Yes, and "-mfentry -DCC_USING_FENTRY" is missing from the gcc
-commandline there.  And not only there, although I have
-CONFIG_FUNCTION_TRACER=y and CONFIG_HAVE_FENTRY=y, which should cause it
-to be added to KBUILD_CFLAGS and KBUILD_AFLAGS.
+I added this report to the list of regressions for Linux 4.9. I'll
+watch this thread for further updates on this issue to document progress
+in my weekly reports. Please let me know via regressions@leemhuis.info
+in case the discussion moves to a different place (bugzilla or another
+mail thread for example).
 
-I don't understand that, but it's late in the evening here.
+Current status (afaics): Fix available, waiting for Michal to get back
+from vacation.
 
-Cheers,
-       Sven
+tia! Ciao, Thorsten
+
+> Nicholas Piggin <npiggin@gmail.com> writes:
+> 
+>> On Wed, 19 Oct 2016 16:38:14 +0200
+>> Michal Marek <mmarek@suse.com> wrote:
+>>
+>>> Dne 18.10.2016 v 03:34 Nicholas Piggin napsal(a):
+>>>> We should probably just bring all these arch patches through the
+>>>> kbuild tree.
+>>>>
+>>>> I'm sorry for the breakage: I didn't realize it broke the build with
+>>>> some configs, otherwise I would have given Michal a heads up before
+>>>> his pull request, and worked to get this stuff in first.  
+>>>
+>>> It breaks with some binutils versions only (and only with
+>>> CONFIG_MODVERSIONS=y, of course).
+>>
+>> Yeah this seems to be the issue, it apparently slipped past all the
+>> automated builds. It seems like the existing CRC warnings in the tree
+>> only trigger in rare circumstances too, so something could be a bit
+>> fragile there.
+> 
+> I upgraded from 4.8 to 4.9-rc2 and noticed that kernel modules fail to
+> load (log below). After investigating for some time I found this thread
+> and apparently this is not still fixed, at least not in Linus' tree.
+> 
+> Reverting 784d5699eddc5 fixed the issue for me. As I don't see any fix
+> available (please correct me if I'm wrong) we should just revert that
+> commit until it's properly fixed.
+> 
+> Also note that there's a related fix from Steven:
+> 
+> [PATCH] x86: Fix export for mcount and __fentry__
+> https://marc.info/?l=linux-kernel&m=147733572502413
+> 
+> For compiling the kernel I'm using Ubuntu 12.04:
+> 
+> ii  binutils             2.22-6ubuntu1.4      GNU assembler, linker and binary utilities
+> ii  gcc                  4:4.6.3-1ubuntu5     GNU C compiler
+> 
+> The kernel is running on a separate machine with Ubuntu 14.04.
+> 
+> [  110.703414] bluetooth: disagrees about version of symbol __get_user_2
+> [  110.703416] bluetooth: Unknown symbol __get_user_2 (err -22)
+> [  110.703429] bluetooth: disagrees about version of symbol __put_user_2
+> [  110.703430] bluetooth: Unknown symbol __put_user_2 (err -22)
+> [  110.703579] bluetooth: disagrees about version of symbol __put_user_4
+> [  110.703580] bluetooth: Unknown symbol __put_user_4 (err -22)
+> [  110.703669] bluetooth: disagrees about version of symbol __put_user_1
+> [  110.703670] bluetooth: Unknown symbol __put_user_1 (err -22)
+> [  110.703688] bluetooth: disagrees about version of symbol mcount
+> [  110.703689] bluetooth: Unknown symbol mcount (err -22)
+> 
