@@ -1,72 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:44210 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1756196AbcKBS1U (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:62755 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1756196AbcKBSaM (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 2 Nov 2016 14:27:20 -0400
+        Wed, 2 Nov 2016 14:30:12 -0400
 MIME-Version: 1.0
-In-Reply-To: <0fcf5fb3-ff4a-a003-7814-51a6ab5ad988@users.sourceforge.net>
+In-Reply-To: <3e08ed31-b8bf-cba0-67f8-0a66d0cdeeb4@users.sourceforge.net>
 References: <72e07814-56e9-505a-d660-91ff20b6efea@users.sourceforge.net>
- <44402655-ef0d-1e2f-0587-f17295a08aa3@users.sourceforge.net>
- <CAK7LNATU4VrN6wCo8vzETMJu6aX+SK+0un03ryzCg7-BW_LxqA@mail.gmail.com> <0fcf5fb3-ff4a-a003-7814-51a6ab5ad988@users.sourceforge.net>
+ <d4bd9a09-d413-a073-c2d5-67933d425b87@users.sourceforge.net>
+ <CA+r1ZhhoPy4mNwEtLVMqpXqotKuWmUf-D50=XWpWghzdtzTfEQ@mail.gmail.com>
+ <CAK7LNASYQCokO7bL72gs6zLrMNx_Sos1So87=bGMCTX_4gowGw@mail.gmail.com> <3e08ed31-b8bf-cba0-67f8-0a66d0cdeeb4@users.sourceforge.net>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 3 Nov 2016 03:26:56 +0900
-Message-ID: <CAK7LNASJiV0T-ruC6mLMzaHKzUDo2rFp0h1H1dQXjGk+wUzc5Q@mail.gmail.com>
-Subject: Re: scripts/basic/bin2c: Complete error handling in main()
+Date: Thu, 3 Nov 2016 03:30:03 +0900
+Message-ID: <CAK7LNARfBrH2ve9J8D=iq1mdk1j-G_kOXT7CL017uqBOYPRL=Q@mail.gmail.com>
+Subject: Re: scripts/basic/fixdep: Complete error handling in print_cmdline()
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: SF Markus Elfring <elfring@users.sourceforge.net>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.com>, LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org
+Cc: Jim Davis <jim.epost@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.com>, LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org
 
-2016-11-03 2:48 GMT+09:00 SF Markus Elfring <elfring@users.sourceforge.net>=
-:
->> Is replacing printf("\"\n") with puts("\"") optimization?
+2016-11-03 2:38 GMT+09:00 SF Markus Elfring <elfring@users.sourceforge.net>:
+>>>> +       if (printf("cmd_%s := %s\n\n", target, cmdline) < 10) {
+>>>
+>>> Rather than scatter fragile magic numbers, like 10, throughout the
+>>> code, if you're hell-bent on checking for printf errors you could
+>>> write a little wrapper function that hid the magic number and bundled
+>>> up the errno stuff.
+>>
+>>
+>> BTW, how the magic number "10" was calculated?
 >
-> Is the difference relevant if an =E2=80=9Cordinary=E2=80=9D string is pas=
-sed instead of
-> a format string?
+> Does the passed format string indicate how many characters should be
+> printed at least?
 
-I think GCC does the replacement automatically
-unless -ffreestanding option is given.
-
-
-With a quick test, I got the following disassembly
-
-0000000000400440 <main>:
-  400440: 48 83 ec 08           sub    $0x8,%rsp
-  400444: bf c4 05 40 00       mov    $0x4005c4,%edi
-  400449: e8 c2 ff ff ff       callq  400410 <puts@plt>
-  40044e: 31 c0                 xor    %eax,%eax
-  400450: 48 83 c4 08           add    $0x8,%rsp
-  400454: c3                   retq
-
-from the following program:
-
-int main(void)
-{
-    printf("hello, world\n");
-    return 0;
-}
+So, the check is a bit compromised.
+The printf() should print at lease 10 characters.
+If "target" or "cmdline" is not NULL, it should print more.
 
 
 
 
->
->> Frankly, the result of this patch seems extremely unreadable code.
->
-> Do you care for more complete error detection and corresponding exception=
- handling
-> in this source file?
-
-
-I like the code as is.
-
-Such error checks and magic numbers are messy.
-
-
-
---=20
+-- 
 Best Regards
 Masahiro Yamada
