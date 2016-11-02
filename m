@@ -1,37 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.web.de ([217.72.192.78]:61722 "EHLO mout.web.de"
+Received: from mout.web.de ([212.227.15.3]:49233 "EHLO mout.web.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1755952AbcKBRjC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 2 Nov 2016 13:39:02 -0400
-Subject: Re: scripts/basic/fixdep: Complete error handling in print_cmdline()
+        id S1756600AbcKBRsO (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 2 Nov 2016 13:48:14 -0400
+Subject: Re: scripts/basic/bin2c: Complete error handling in main()
 References: <72e07814-56e9-505a-d660-91ff20b6efea@users.sourceforge.net>
- <d4bd9a09-d413-a073-c2d5-67933d425b87@users.sourceforge.net>
- <CA+r1ZhhoPy4mNwEtLVMqpXqotKuWmUf-D50=XWpWghzdtzTfEQ@mail.gmail.com>
- <CAK7LNASYQCokO7bL72gs6zLrMNx_Sos1So87=bGMCTX_4gowGw@mail.gmail.com>
+ <44402655-ef0d-1e2f-0587-f17295a08aa3@users.sourceforge.net>
+ <CAK7LNATU4VrN6wCo8vzETMJu6aX+SK+0un03ryzCg7-BW_LxqA@mail.gmail.com>
 From: SF Markus Elfring <elfring@users.sourceforge.net>
-Message-ID: <3e08ed31-b8bf-cba0-67f8-0a66d0cdeeb4@users.sourceforge.net>
-Date: Wed, 2 Nov 2016 18:38:33 +0100
+Message-ID: <0fcf5fb3-ff4a-a003-7814-51a6ab5ad988@users.sourceforge.net>
+Date: Wed, 2 Nov 2016 18:48:03 +0100
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNASYQCokO7bL72gs6zLrMNx_Sos1So87=bGMCTX_4gowGw@mail.gmail.com>
+In-Reply-To: <CAK7LNATU4VrN6wCo8vzETMJu6aX+SK+0un03ryzCg7-BW_LxqA@mail.gmail.com>
 Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Jim Davis <jim.epost@gmail.com>, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.com>, LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.com>, LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org
 
->>> +       if (printf("cmd_%s := %s\n\n", target, cmdline) < 10) {
->>
->> Rather than scatter fragile magic numbers, like 10, throughout the
->> code, if you're hell-bent on checking for printf errors you could
->> write a little wrapper function that hid the magic number and bundled
->> up the errno stuff.
-> 
-> 
-> BTW, how the magic number "10" was calculated?
+> Is replacing printf("\"\n") with puts("\"") optimization?
 
-Does the passed format string indicate how many characters should be
-printed at least?
+Is the difference relevant if an “ordinary” string is passed instead of
+a format string?
+
+
+> Frankly, the result of this patch seems extremely unreadable code.
+
+Do you care for more complete error detection and corresponding exception handling
+in this source file?
 
 Regards,
 Markus
