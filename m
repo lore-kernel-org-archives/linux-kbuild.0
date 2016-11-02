@@ -1,90 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:52615 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755338AbcKBPmB (ORCPT
+Received: from condef005-v.nifty.com ([210.131.4.242]:50305 "EHLO
+        condef005-v.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754875AbcKBPmg (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 2 Nov 2016 11:42:01 -0400
+        Wed, 2 Nov 2016 11:42:36 -0400
 MIME-Version: 1.0
-In-Reply-To: <44402655-ef0d-1e2f-0587-f17295a08aa3@users.sourceforge.net>
-References: <72e07814-56e9-505a-d660-91ff20b6efea@users.sourceforge.net> <44402655-ef0d-1e2f-0587-f17295a08aa3@users.sourceforge.net>
+In-Reply-To: <CA+r1ZhhoPy4mNwEtLVMqpXqotKuWmUf-D50=XWpWghzdtzTfEQ@mail.gmail.com>
+References: <72e07814-56e9-505a-d660-91ff20b6efea@users.sourceforge.net>
+ <d4bd9a09-d413-a073-c2d5-67933d425b87@users.sourceforge.net> <CA+r1ZhhoPy4mNwEtLVMqpXqotKuWmUf-D50=XWpWghzdtzTfEQ@mail.gmail.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 3 Nov 2016 00:41:49 +0900
-Message-ID: <CAK7LNATU4VrN6wCo8vzETMJu6aX+SK+0un03ryzCg7-BW_LxqA@mail.gmail.com>
-Subject: Re: [PATCH 01/10] scripts/basic/bin2c: Complete error handling in main()
+Date: Thu, 3 Nov 2016 00:35:32 +0900
+Message-ID: <CAK7LNASYQCokO7bL72gs6zLrMNx_Sos1So87=bGMCTX_4gowGw@mail.gmail.com>
+Subject: Re: [PATCH 09/10] scripts/basic/fixdep: Complete error handling in print_cmdline()
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: SF Markus Elfring <elfring@users.sourceforge.net>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.com>, LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org
+To: Jim Davis <jim.epost@gmail.com>
+Cc: SF Markus Elfring <elfring@users.sourceforge.net>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.com>, LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org
 
-2016-10-28 17:31 GMT+09:00 SF Markus Elfring <elfring@users.sourceforge.net>:
-> From: Markus Elfring <elfring@users.sourceforge.net>
-> Date: Thu, 27 Oct 2016 16:15:04 +0200
+2016-10-29 8:42 GMT+09:00 Jim Davis <jim.epost@gmail.com>:
+> On Fri, Oct 28, 2016 at 1:40 AM, SF Markus Elfring
+> <elfring@users.sourceforge.net> wrote:
 >
-> Return values were not checked from five calls of the function "printf".
+>> +       if (printf("cmd_%s := %s\n\n", target, cmdline) < 10) {
 >
-> This issue was detected also by using the Coccinelle software.
->
->
-> * Add a bit of exception handling there.
->
-> * Optimise this function implementation a bit.
->
->   - Replace two output calls with the functions "fputs" and "puts".
->
->   - Use the preincrement operator for the variable "total".
->
-> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
-> ---
->  scripts/basic/bin2c.c | 26 ++++++++++++++++----------
->  1 file changed, 16 insertions(+), 10 deletions(-)
->
-> diff --git a/scripts/basic/bin2c.c b/scripts/basic/bin2c.c
-> index c3d7eef..c6c8860 100644
-> --- a/scripts/basic/bin2c.c
-> +++ b/scripts/basic/bin2c.c
-> @@ -8,29 +8,35 @@
->   */
->
->  #include <stdio.h>
-> +#include <errno.h>
->
->  int main(int argc, char *argv[])
->  {
->         int ch, total = 0;
->
->         if (argc > 1)
-> -               printf("const char %s[] %s=\n",
-> -                       argv[1], argc > 2 ? argv[2] : "");
-> +               if (printf("const char %s[] %s=\n",
-> +                          argv[1], argc > 2 ? argv[2] : "") < 16)
-> +                       return errno;
->
->         do {
-> -               printf("\t\"");
-> +               if (fputs("\t\"", stdout) < 0)
-> +                       return errno;
-> +
->                 while ((ch = getchar()) != EOF) {
-> -                       total++;
-> -                       printf("\\x%02x", ch);
-> -                       if (total % 16 == 0)
-> +                       if (printf("\\x%02x", ch) < 4)
-> +                               return errno;
-> +                       if (++total % 16 == 0)
->                                 break;
->                 }
-> -               printf("\"\n");
-> +
-> +               if (puts("\"") < 0)
-> +                       return errno;
+> Rather than scatter fragile magic numbers, like 10, throughout the
+> code, if you're hell-bent on checking for printf errors you could
+> write a little wrapper function that hid the magic number and bundled
+> up the errno stuff.
 
 
-Is replacing printf("\"\n") with puts("\"") optimization?
+BTW, how the magic number "10" was calculated?
 
 
-Frankly, the result of this patch
-seems extremely unreadable code.
 
 
 -- 
