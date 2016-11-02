@@ -1,46 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:62755 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1756196AbcKBSaM (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 2 Nov 2016 14:30:12 -0400
-MIME-Version: 1.0
-In-Reply-To: <3e08ed31-b8bf-cba0-67f8-0a66d0cdeeb4@users.sourceforge.net>
+Received: from mout.web.de ([212.227.17.12]:49493 "EHLO mout.web.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1757281AbcKBSqy (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 2 Nov 2016 14:46:54 -0400
+Subject: Re: scripts/basic/bin2c: Complete error handling in main()
 References: <72e07814-56e9-505a-d660-91ff20b6efea@users.sourceforge.net>
- <d4bd9a09-d413-a073-c2d5-67933d425b87@users.sourceforge.net>
- <CA+r1ZhhoPy4mNwEtLVMqpXqotKuWmUf-D50=XWpWghzdtzTfEQ@mail.gmail.com>
- <CAK7LNASYQCokO7bL72gs6zLrMNx_Sos1So87=bGMCTX_4gowGw@mail.gmail.com> <3e08ed31-b8bf-cba0-67f8-0a66d0cdeeb4@users.sourceforge.net>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 3 Nov 2016 03:30:03 +0900
-Message-ID: <CAK7LNARfBrH2ve9J8D=iq1mdk1j-G_kOXT7CL017uqBOYPRL=Q@mail.gmail.com>
-Subject: Re: scripts/basic/fixdep: Complete error handling in print_cmdline()
-Content-Type: text/plain; charset=UTF-8
+ <44402655-ef0d-1e2f-0587-f17295a08aa3@users.sourceforge.net>
+ <CAK7LNATU4VrN6wCo8vzETMJu6aX+SK+0un03ryzCg7-BW_LxqA@mail.gmail.com>
+ <0fcf5fb3-ff4a-a003-7814-51a6ab5ad988@users.sourceforge.net>
+ <CAK7LNASJiV0T-ruC6mLMzaHKzUDo2rFp0h1H1dQXjGk+wUzc5Q@mail.gmail.com>
+From: SF Markus Elfring <elfring@users.sourceforge.net>
+Message-ID: <f6b51b63-909a-24ab-f891-7416860bf552@users.sourceforge.net>
+Date: Wed, 2 Nov 2016 19:46:39 +0100
+MIME-Version: 1.0
+In-Reply-To: <CAK7LNASJiV0T-ruC6mLMzaHKzUDo2rFp0h1H1dQXjGk+wUzc5Q@mail.gmail.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: SF Markus Elfring <elfring@users.sourceforge.net>
-Cc: Jim Davis <jim.epost@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.com>, LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.com>, LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org
 
-2016-11-03 2:38 GMT+09:00 SF Markus Elfring <elfring@users.sourceforge.net>:
->>>> +       if (printf("cmd_%s := %s\n\n", target, cmdline) < 10) {
->>>
->>> Rather than scatter fragile magic numbers, like 10, throughout the
->>> code, if you're hell-bent on checking for printf errors you could
->>> write a little wrapper function that hid the magic number and bundled
->>> up the errno stuff.
->>
->>
->> BTW, how the magic number "10" was calculated?
->
-> Does the passed format string indicate how many characters should be
-> printed at least?
+> I like the code as is.
 
-So, the check is a bit compromised.
-The printf() should print at lease 10 characters.
-If "target" or "cmdline" is not NULL, it should print more.
+Do you really prefer to ignore important return values in the discussed function?
 
 
+> Such error checks and magic numbers are messy.
 
+Is it safer to detect exceptional situations as early as possible here?
 
--- 
-Best Regards
-Masahiro Yamada
+Regards,
+Markus
