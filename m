@@ -1,63 +1,33 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.skyhub.de ([78.46.96.112]:50398 "EHLO mail.skyhub.de"
+Received: from mx2.suse.de ([195.135.220.15]:44242 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753174AbcKBTzg (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 2 Nov 2016 15:55:36 -0400
-Date: Wed, 2 Nov 2016 20:55:32 +0100
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH 1/2] Documentation/HOWTO: Use a more recent gcc + binutils
-Message-ID: <20161102195531.26534fn2at36hdy6@pd.tnic>
-References: <20161102172058.13641-1-bigeasy@linutronix.de>
+        id S1751691AbcKCPm1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 3 Nov 2016 11:42:27 -0400
+Subject: Re: scripts/basic/bin2c: Complete error handling in main()
+References: <72e07814-56e9-505a-d660-91ff20b6efea@users.sourceforge.net>
+ <44402655-ef0d-1e2f-0587-f17295a08aa3@users.sourceforge.net>
+ <CAK7LNATU4VrN6wCo8vzETMJu6aX+SK+0un03ryzCg7-BW_LxqA@mail.gmail.com>
+ <0fcf5fb3-ff4a-a003-7814-51a6ab5ad988@users.sourceforge.net>
+ <CAK7LNASJiV0T-ruC6mLMzaHKzUDo2rFp0h1H1dQXjGk+wUzc5Q@mail.gmail.com>
+ <f6b51b63-909a-24ab-f891-7416860bf552@users.sourceforge.net>
+From: Michal Marek <mmarek@suse.com>
+Message-ID: <b9ecd83c-81ad-d1ce-c619-1940c06d42eb@suse.com>
+Date: Thu, 3 Nov 2016 16:42:22 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20161102172058.13641-1-bigeasy@linutronix.de>
+In-Reply-To: <f6b51b63-909a-24ab-f891-7416860bf552@users.sourceforge.net>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: linux-kernel@vger.kernel.org, Sven Joachim <svenjoac@gmx.de>, Tomas Janousek <tomi@nomi.cz>, Joe Perches <joe@perches.com>, Adam Borowski <kilobyte@angband.pl>, Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, ben@decadent.org.uk, Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, "H. Peter Anvin" <hpa@zytor.com>
+To: SF Markus Elfring <elfring@users.sourceforge.net>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
+Cc: LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org
 
-On Wed, Nov 02, 2016 at 06:20:57PM +0100, Sebastian Andrzej Siewior wrote:
-> Etch (with gcc v4.1.2) gets to compile the kernel without plenty of
-> warnings and it also chokes on Wno-override-init but that one could be
-> easily fixed if we want to keep v4.1 as the minimum.
-> So I think raising the bar to gcc v4.1 isn't that bad given that the
-> last release of gcc 4.1 was on February 13, 2007.
-
-You'd need to adjust
-
-#if GCC_VERSION < 30200
-
-in include/linux/compiler-gcc.h.
-
+Dne 2.11.2016 v 19:46 SF Markus Elfring napsal(a):
+>> I like the code as is.
 > 
-> Cc: Jonathan Corbet <corbet@lwn.net>
-> Cc: linux-doc@vger.kernel.org
-> Cc: Andrew Morton <akpm@linux-foundation.org>
-> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-> ---
->  Documentation/Changes | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/Documentation/Changes b/Documentation/Changes
-> index 22797a15dc24..14e65b445707 100644
-> --- a/Documentation/Changes
-> +++ b/Documentation/Changes
-> @@ -29,9 +29,9 @@ you probably needn't concern yourself with isdn4k-utils.
->  ====================== ===============  ========================================
->          Program        Minimal version       Command to check the version
->  ====================== ===============  ========================================
-> -GNU C                  3.2              gcc --version
-> +GNU C                  4.1              gcc --version
->  GNU make               3.80             make --version
-> -binutils               2.12             ld -v
-> +binutils               2.17             ld -v
+> Do you really prefer to ignore important return values in the discussed function?
 
-That probably would be a good thing as 2.16 is the Binutils Version from
-Hell.
+You could define an xprintf() macro that checks if the return value is <
+0 and simply calls perror() and exit(1) in such case.
 
--- 
-Regards/Gruss,
-    Boris.
-
-ECO tip #101: Trim your mails when you reply.
+Michal
