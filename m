@@ -1,55 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from tartarus.angband.pl ([89.206.35.136]:40372 "EHLO
-        tartarus.angband.pl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1756698AbcKDQZv (ORCPT
+Received: from Galois.linutronix.de ([146.0.238.70]:42139 "EHLO
+        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S964907AbcKDSju (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 4 Nov 2016 12:25:51 -0400
-Date: Fri, 4 Nov 2016 17:25:04 +0100
-From: Adam Borowski <kilobyte@angband.pl>
-Subject: Re: [PATCH 2/2] kbuild: add -fno-PIE
-Message-ID: <20161104162504.GA7375@angband.pl>
-References: <20161102172058.13641-1-bigeasy@linutronix.de>
- <20161102172058.13641-2-bigeasy@linutronix.de>
- <1478213455.29107.13.camel@decadent.org.uk>
- <20161104010811.GD19539@ZenIV.linux.org.uk>
- <adb64e4e-0745-c23c-2b8f-a67372b1d28f@gmail.com>
- <20161104142424.jy6ble3pge3beowh@linutronix.de>
- <20161104151811.GE19539@ZenIV.linux.org.uk>
- <20161104152223.GA1052@infradead.org>
- <20161104155427.GF19539@ZenIV.linux.org.uk>
- <20161104155855.diyclit55eay6gxk@linutronix.de>
+        Fri, 4 Nov 2016 14:39:50 -0400
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Subject: [PATCH 2/3] scripts/has-stack-protector: add -fno-PIE
+Date: Fri,  4 Nov 2016 19:39:39 +0100
+Message-Id: <20161104183940.30692-3-bigeasy@linutronix.de>
+In-Reply-To: <20161104183940.30692-1-bigeasy@linutronix.de>
+References: <20161104183940.30692-1-bigeasy@linutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20161104155855.diyclit55eay6gxk@linutronix.de>
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: Al Viro <viro@ZenIV.linux.org.uk>, Christoph Hellwig <hch@infradead.org>, "Austin S. Hemmelgarn" <ahferroin7@gmail.com>, Ben Hutchings <ben@decadent.org.uk>, linux-kernel@vger.kernel.org, Sven Joachim <svenjoac@gmx.de>, Tomas Janousek <tomi@nomi.cz>, Joe Perches <joe@perches.com>, Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, doko@debian.org
+To: linux-kernel@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, x86@kernel.org, Al Viro <viro@ZenIV.linux.org.uk>, Ben Hutchings <ben@decadent.org.uk>, Sven Joachim <svenjoac@gmx.de>, "Austin S. Hemmelgarn" <ahferroin7@gmail.com>, Borislav Petkov <bp@alien8.de>
 
-On Fri, Nov 04, 2016 at 04:58:55PM +0100, Sebastian Andrzej Siewior wrote:
-> On 2016-11-04 15:54:27 [+0000], Al Viro wrote:
-> > Christoph, would you mind rereading what I posted upthread?  I *am* aware of
-> > that clusterfuck, including the Balint's charming games with the reassignments,
-> > etc.  Directly affected by the whole mess, actually.
-> 
-> Al, I am re-doing the patch with a runtime check for -fno-PIE and
-> tagging it stable and looking after Ben's fstack protector thingy.
-> This should allow you to compile maintained stable kernels but it won't
-> allow you to bisect to prior versions.
-> I don't see any other way around it.
+Adding -no-PIE to the fstack protector check. -no-PIE was introduced
+before -fstack-protector so there is no need for a runtime check.
 
-As you guys don't want Gentooish attempts to check if gcc is compiling the
-kernel, what about making/requesting a wrapper that calls gcc with the
-appropriate options (-fno-PIE and whatever is needed for fstack protector)?
+Without it the build stops:
+|Cannot use CONFIG_CC_STACKPROTECTOR_STRONG: -fstack-protector-strong avail=
+able but compiler is broken
 
-This would require manually appending CC=the-wrapper to make but would allow
-bisects.  And come on, any solution with no bisects is rather ridiculous.
+due to -mcmodel=3Dkernel + -fPIE if -fPIE is enabled by default.
 
+Tagging it stable so it is possible to compile recent stable kernels as
+well.
 
-Meow!
--- 
-A MAP07 (Dead Simple) raspberry tincture recipe: 0.5l 95% alcohol, 1kg
-raspberries, 0.4kg sugar; put into a big jar for 1 month.  Filter out and
-throw away the fruits (can dump them into a cake, etc), let the drink age
-at least 3-6 months.
+Cc: stable@vger.kernel.org
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+---
+ scripts/gcc-x86_64-has-stack-protector.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/gcc-x86_64-has-stack-protector.sh b/scripts/gcc-x86_64=
+-has-stack-protector.sh
+index 973e8c141567..17867e723a51 100755
+--- a/scripts/gcc-x86_64-has-stack-protector.sh
++++ b/scripts/gcc-x86_64-has-stack-protector.sh
+@@ -1,6 +1,6 @@
+ #!/bin/sh
+=20
+-echo "int foo(void) { char X[200]; return 3; }" | $* -S -x c -c -O0 -mcmod=
+el=3Dkernel -fstack-protector - -o - 2> /dev/null | grep -q "%gs"
++echo "int foo(void) { char X[200]; return 3; }" | $* -S -x c -c -O0 -mcmod=
+el=3Dkernel -fno-PIE -fstack-protector - -o - 2> /dev/null | grep -q "%gs"
+ if [ "$?" -eq "0" ] ; then
+ 	echo y
+ else
+--=20
+2.10.2
+
