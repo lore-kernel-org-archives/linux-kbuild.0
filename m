@@ -1,39 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.web.de ([217.72.192.78]:63807 "EHLO mout.web.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S934855AbcKDNto (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 4 Nov 2016 09:49:44 -0400
-Subject: Re: scripts/basic/bin2c: Complete error handling in main()
-References: <72e07814-56e9-505a-d660-91ff20b6efea@users.sourceforge.net>
- <44402655-ef0d-1e2f-0587-f17295a08aa3@users.sourceforge.net>
- <CAK7LNATU4VrN6wCo8vzETMJu6aX+SK+0un03ryzCg7-BW_LxqA@mail.gmail.com>
- <0fcf5fb3-ff4a-a003-7814-51a6ab5ad988@users.sourceforge.net>
- <CAK7LNASJiV0T-ruC6mLMzaHKzUDo2rFp0h1H1dQXjGk+wUzc5Q@mail.gmail.com>
- <f6b51b63-909a-24ab-f891-7416860bf552@users.sourceforge.net>
- <b9ecd83c-81ad-d1ce-c619-1940c06d42eb@suse.com>
- <359604cc-ec1a-84eb-4cf1-88e72641f724@users.sourceforge.net>
- <c2024819-f054-9b70-2b2c-582d4a9db061@suse.com>
-From: SF Markus Elfring <elfring@users.sourceforge.net>
-Message-ID: <917e7b99-bb75-80b2-a356-918d6128705a@users.sourceforge.net>
-Date: Fri, 4 Nov 2016 13:48:51 +0100
+Received: from Galois.linutronix.de ([146.0.238.70]:41263 "EHLO
+        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755815AbcKDOYo (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 4 Nov 2016 10:24:44 -0400
+Date: Fri, 4 Nov 2016 15:24:24 +0100
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Subject: Re: [PATCH 2/2] kbuild: add -fno-PIE
+Message-ID: <20161104142424.jy6ble3pge3beowh@linutronix.de>
+References: <20161102172058.13641-1-bigeasy@linutronix.de>
+ <20161102172058.13641-2-bigeasy@linutronix.de>
+ <1478213455.29107.13.camel@decadent.org.uk>
+ <20161104010811.GD19539@ZenIV.linux.org.uk>
+ <adb64e4e-0745-c23c-2b8f-a67372b1d28f@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <c2024819-f054-9b70-2b2c-582d4a9db061@suse.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <adb64e4e-0745-c23c-2b8f-a67372b1d28f@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, LKML <linux-kernel@vger.kernel.org>, kernel-janitors@vger.kernel.org
+To: "Austin S. Hemmelgarn" <ahferroin7@gmail.com>, Al Viro <viro@ZenIV.linux.org.uk>
+Cc: Ben Hutchings <ben@decadent.org.uk>, linux-kernel@vger.kernel.org, Sven Joachim <svenjoac@gmx.de>, Tomas Janousek <tomi@nomi.cz>, Joe Perches <joe@perches.com>, Adam Borowski <kilobyte@angband.pl>, Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, doko@debian.org
 
->>> You could define an xprintf() macro that checks if the return value
->>> is < 0 and simply calls perror() and exit(1) in such case.
->> Does such a macro belong to any general header file from the Linux
->> software library?
-> No.
+On 2016-11-04 07:37:02 [-0400], Austin S. Hemmelgarn wrote:
+> > clued enough to have known better.  Reassigning bug reports in question
+> > from gcc-6 to linux is beyond stupid; Balint is either being deliberately
+> > obtuse, or geniunely unable to imagine that somebody might be using the
+> > compiler _not_ for debian package builds.
+> > 
+> If it helps, you could point out that Gentoo's hardened profile's GCC builds
+> use PIE by default and have absolutely zero issues building the Linux kernel
+> without any special kernel patches to turn it off (and has been doing so for
+> years).
 
-Would you like to add it?
+Interesting. So I took a look at Gentoo. They ship gcc 4.9.3 by default.
+They have their own PIE patch since it is not yet supported by gcc. And
+let me quote why that works for them:
 
-How do you think about to reuse it in more source files?
+| This file will add -fstack-protector-all, -fstack-check, -fPIE, -pie and -z now 
+| as default if the defines and the spec allow it.
+| Added a hack for gcc-specs-* in toolchain-funcs.eclass and _filter-hardened in flag-o-matic.eclass
+| to support older hardened GCC patches and we don't need to change the code on gcc-specs-* and _filter-hardened.
+| This will add some unsupported upstream commands options as -nopie and -nonow.
+| -D__KERNEL__ is added so we don't have -fPIE, -pie and -fstack-protector-all and -fstack-check when building kernels.
+| ESP_CC1_SPEC is added to CC1_SPEC.
+| ESP_CC1_STRICT_OVERFLOW_SPEC is added so we don't disable the strict-overflow check.
+| ESP_LINK_PIE_CHECK_SPEC check for -pie, -p, -pg, -profile and -static.
+| ENABLE_CRTBEGINP add support for crtbeginP.o, build -static with -fPIE or -fpie.
 
-Regards,
-Markus
+I was thinking about asking doko for something similar but no. Looking at
+portage they have a few patches where they add -fno-PIE to some packages.
+Also disabling PIE based on __KERNEL__ does not look right. So no, Gentoo
+did not better.
+And according to Google, there are also people in the ARCH Linux camp
+with the same problem. Gentoo's 6 gcc is completely masked and it does
+not reference the patch I quote above so Gentoo will run into this
+problem once they enable gcc 6 and don't add the -D__KERNEL__ hack.
+Eventually Fedora and SUSE will migrate to PIE by default and by then we
+should cover all major distros so even Al should be affected unless he
+decides not to update or is using something else.
+
+Sebastian
