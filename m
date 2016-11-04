@@ -1,14 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from Galois.linutronix.de ([146.0.238.70]:41788 "EHLO
-        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S936176AbcKDQRq (ORCPT
+Received: from tartarus.angband.pl ([89.206.35.136]:40372 "EHLO
+        tartarus.angband.pl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1756698AbcKDQZv (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 4 Nov 2016 12:17:46 -0400
-Date: Fri, 4 Nov 2016 17:17:12 +0100
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+        Fri, 4 Nov 2016 12:25:51 -0400
+Date: Fri, 4 Nov 2016 17:25:04 +0100
+From: Adam Borowski <kilobyte@angband.pl>
 Subject: Re: [PATCH 2/2] kbuild: add -fno-PIE
-Message-ID: <20161104161712.m3r6ph5e5rrbd3jq@linutronix.de>
-References: <20161102172058.13641-2-bigeasy@linutronix.de>
+Message-ID: <20161104162504.GA7375@angband.pl>
+References: <20161102172058.13641-1-bigeasy@linutronix.de>
+ <20161102172058.13641-2-bigeasy@linutronix.de>
  <1478213455.29107.13.camel@decadent.org.uk>
  <20161104010811.GD19539@ZenIV.linux.org.uk>
  <adb64e4e-0745-c23c-2b8f-a67372b1d28f@gmail.com>
@@ -17,24 +18,38 @@ References: <20161102172058.13641-2-bigeasy@linutronix.de>
  <20161104152223.GA1052@infradead.org>
  <20161104155427.GF19539@ZenIV.linux.org.uk>
  <20161104155855.diyclit55eay6gxk@linutronix.de>
- <20161104161048.GG19539@ZenIV.linux.org.uk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20161104161048.GG19539@ZenIV.linux.org.uk>
+In-Reply-To: <20161104155855.diyclit55eay6gxk@linutronix.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Al Viro <viro@ZenIV.linux.org.uk>
-Cc: Christoph Hellwig <hch@infradead.org>, "Austin S. Hemmelgarn" <ahferroin7@gmail.com>, Ben Hutchings <ben@decadent.org.uk>, linux-kernel@vger.kernel.org, Sven Joachim <svenjoac@gmx.de>, Tomas Janousek <tomi@nomi.cz>, Joe Perches <joe@perches.com>, Adam Borowski <kilobyte@angband.pl>, Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, doko@debian.org
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: Al Viro <viro@ZenIV.linux.org.uk>, Christoph Hellwig <hch@infradead.org>, "Austin S. Hemmelgarn" <ahferroin7@gmail.com>, Ben Hutchings <ben@decadent.org.uk>, linux-kernel@vger.kernel.org, Sven Joachim <svenjoac@gmx.de>, Tomas Janousek <tomi@nomi.cz>, Joe Perches <joe@perches.com>, Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, doko@debian.org
 
-On 2016-11-04 16:10:48 [+0000], Al Viro wrote:
-> And I don't see any way around severity:important against gcc-6.  Unless the
-> policy has changed, "has a major effect on the usability of a package, without
-> rendering it completely unusable to everyone" still warrants that.  And
-> kernel development (including bisects) has, until now, been consdered
-> a normal use of gcc.
+On Fri, Nov 04, 2016 at 04:58:55PM +0100, Sebastian Andrzej Siewior wrote:
+> On 2016-11-04 15:54:27 [+0000], Al Viro wrote:
+> > Christoph, would you mind rereading what I posted upthread?  I *am* aware of
+> > that clusterfuck, including the Balint's charming games with the reassignments,
+> > etc.  Directly affected by the whole mess, actually.
+> 
+> Al, I am re-doing the patch with a runtime check for -fno-PIE and
+> tagging it stable and looking after Ben's fstack protector thingy.
+> This should allow you to compile maintained stable kernels but it won't
+> allow you to bisect to prior versions.
+> I don't see any other way around it.
 
-point. Granted. We had the same thing a while back when `GNU make' update
-led to an build error due a rule in kernel's Makefile.
+As you guys don't want Gentooish attempts to check if gcc is compiling the
+kernel, what about making/requesting a wrapper that calls gcc with the
+appropriate options (-fno-PIE and whatever is needed for fstack protector)?
 
-Sebastian
+This would require manually appending CC=the-wrapper to make but would allow
+bisects.  And come on, any solution with no bisects is rather ridiculous.
+
+
+Meow!
+-- 
+A MAP07 (Dead Simple) raspberry tincture recipe: 0.5l 95% alcohol, 1kg
+raspberries, 0.4kg sugar; put into a big jar for 1 month.  Filter out and
+throw away the fruits (can dump them into a cake, etc), let the drink age
+at least 3-6 months.
