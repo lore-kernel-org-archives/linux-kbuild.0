@@ -1,31 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from Galois.linutronix.de ([146.0.238.70]:42143 "EHLO
-        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S965403AbcKDSjv (ORCPT
+Received: from mail-pf0-f193.google.com ([209.85.192.193]:35911 "EHLO
+        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750975AbcKFWeB (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 4 Nov 2016 14:39:51 -0400
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Subject: -fno-PIE, take #3
-Date: Fri,  4 Nov 2016 19:39:37 +0100
-Message-Id: <20161104183940.30692-1-bigeasy@linutronix.de>
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+        Sun, 6 Nov 2016 17:34:01 -0500
+From: Wei Yang <richard.weiyang@gmail.com>
+Subject: [PATCH V2] kbuild: add %/built-in.o target in top Makefile
+Date: Sun,  6 Nov 2016 22:18:32 +0000
+Message-Id: <1478470712-9872-1-git-send-email-richard.weiyang@gmail.com>
+In-Reply-To: <1477313111-25205-1-git-send-email-richard.weiyang@gmail.com>
+References: <1477313111-25205-1-git-send-email-richard.weiyang@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, x86@kernel.org, Al Viro <viro@ZenIV.linux.org.uk>, Ben Hutchings <ben@decadent.org.uk>, Sven Joachim <svenjoac@gmx.de>, "Austin S. Hemmelgarn" <ahferroin7@gmail.com>, Borislav Petkov <bp@alien8.de>
+To: mmarek@suse.com
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Wei Yang <richard.weiyang@gmail.com>
 
-Debian gcc's is nowdays compiled with --enable-default-pie which means it d=
-oes
--fPIE by default. This breaks atleast x86-64 compiles.
-This is the third attempt to fix it, this time by using runtime detection of
-the -fno-PIE compiler switch (it was introduced in gcc 3.4, min required gc=
-c is
-currently 3.2) so it can be backported to the stable kernels.
-As noted by Al this won't fix `git bisect' of stable kernels prio this comm=
-it.
-However using always a wrapper around gcc which adds -fno-PIE is not sollut=
-ion
-I want to rely in future.
+Current kbuild just supports building built-in.o in second directory level
+individually. There is no rule to build those built-in.o targets below
+third directory level.
 
-Sebastian
+Even current kbuild system could achieve this with rule "%/", while this
+not only builds built-in targes but also lib target, extra target and
+module objects.
+
+This patch adds the "%/built-in.o" rule so that each built-in.o in the
+kernel tree could be the build target, which looks more consistent for the
+kbuild system.
+
+Signed-off-by: Wei Yang <richard.weiyang@gmail.com>
+
+---
+v2
+    . add FORCE in prerequest
+
+---
+ Makefile | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/Makefile b/Makefile
+index f97f786..9c65498 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1638,6 +1638,8 @@ endif
+ 	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+ %.symtypes: %.c prepare scripts FORCE
+ 	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
++%/built-in.o: prepare scripts FORCE
++	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+ 
+ # Modules
+ /: prepare scripts FORCE
+-- 
+2.5.0
+
