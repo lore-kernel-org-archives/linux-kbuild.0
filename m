@@ -1,42 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-it0-f68.google.com ([209.85.214.68]:32868 "EHLO
-        mail-it0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933059AbcKGTKQ (ORCPT
+Received: from bombadil.infradead.org ([198.137.202.9]:56129 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932817AbcKGTLT (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 7 Nov 2016 14:10:16 -0500
-Received: by mail-it0-f68.google.com with SMTP id e187so11120626itc.0
-        for <linux-kbuild@vger.kernel.org>; Mon, 07 Nov 2016 11:10:16 -0800 (PST)
-From: Vince Weaver <vincent.weaver@maine.edu>
-Date: Mon, 7 Nov 2016 14:10:12 -0500 (EST)
-Subject: Re: 'kbuild' merge before 4.9-rc1 breaks build and boot
-In-Reply-To: <20161027154202.GE27017@al>
-Message-ID: <alpine.DEB.2.20.1611071408040.24418@macbook-air>
-References: <4c04b846-3da8-dc42-4fa6-30f72a5c2437@hartkopp.net> <20161027154202.GE27017@al>
+        Mon, 7 Nov 2016 14:11:19 -0500
+Subject: Re: Makefile race in 4.9-rc3 (generated/autoksyms.h: No such file or
+ directory)
+References: <CANVEwpYybigr3NcLA2TyoLZ4OkY1-7AcbL5t4vFyNpF488kFvQ@mail.gmail.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <fd47c2bf-dd14-d678-8e4a-9794499a7434@infradead.org>
+Date: Mon, 7 Nov 2016 11:11:18 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <CANVEwpYybigr3NcLA2TyoLZ4OkY1-7AcbL5t4vFyNpF488kFvQ@mail.gmail.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Peter Wu <peter@lekensteyn.nl>
-Cc: Michal Marek <mmarek@suse.com>, Al Viro <viro@zeniv.linux.org.uk>, Oliver Hartkopp <socketcan@hartkopp.net>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Ken Moffat <zarniwhoop73@googlemail.com>, linux-kernel@vger.kernel.org, linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.cz>
 
-On Thu, 27 Oct 2016, Peter Wu wrote:
+[adding linux-kbuild and Michal]
+[trying again]
 
-> I can confirm Olivers issue, the current mainline kernel fails to boot
-> on kernels with CONFIG_MODVERSIONS=y. Bisection points to:
+On 10/31/16 13:46, Ken Moffat wrote:
+> I just tried to build 4.9 (rc3) for the first time (x86_64, i7 haswell)
+>  After making my choices in make oldconfig, make -j8 failed in
+> less than 2 sec.
 > 
->     commit 784d5699eddc55878627da20d3fe0c8542e2f1a2
->     Author: Al Viro <viro@zeniv.linux.org.uk>
->     Date:   Mon Jan 11 11:04:34 2016 -0500
-> > WARNING: "memset" [sound/usb/snd-usbmidi-lib.ko] has no CRC!
-> > WARNING: "__fentry__" [sound/usb/snd-usbmidi-lib.ko] has no CRC!
-> > WARNING: "memcpy" [sound/usb/snd-usbmidi-lib.ko] has no CRC!
-> > WARNING: "__sw_hweight32" [sound/usb/snd-usbmidi-lib.ko] has no CRC!
+>    CC      scripts/mod/empty.o
+>   HOSTCC  scripts/mod/mk_elfconfig
+>   HOSTCC  scripts/sortextable
+>   CC      scripts/mod/devicetable-offsets.s
+> In file included from ./include/linux/linkage.h:6:0,
+>                  from ./include/linux/kernel.h:6,
+>                  from ./include/asm-generic/bug.h:13,
+>                  from ./arch/x86/include/asm/bug.h:35,
+>                  from ./include/linux/bug.h:4,
+>                  from ./include/linux/jump_label.h:170,
+>                  from ./arch/x86/include/asm/string_64.h:5,
+>                  from ./arch/x86/include/asm/string.h:4,
+>                  from ./include/linux/string.h:18,
+>                  from ./include/uapi/linux/uuid.h:21,
+>                  from ./include/linux/uuid.h:19,
+>                  from ./include/linux/mod_devicetable.h:12,
+>                  from scripts/mod/devicetable-offsets.c:2:
+> ./include/linux/export.h:81:33: fatal error: generated/autoksyms.h: No
+> such file or directory
+>  #include <generated/autoksyms.h>
+>                                  ^
+> compilation terminated.
+> make[2]: *** [scripts/Makefile.build:154:
+> scripts/mod/devicetable-offsets.s] Error 1
+> make[1]: *** [scripts/Makefile.build:475: scripts/mod] Error 2
+> make[1]: *** Waiting for unfinished jobs....
+> make: *** [Makefile:559: scripts] Error 2
+> make: *** Waiting for unfinished jobs....
+> 
+> I then ran make clean and gave it another try, again using -j8.
+> This time i t worked, so I guess there is a race in a Makefile.
 
-Has any progress been made with this problem?
 
-I'm also encountering it on my debian-unstable box on any kernel more 
-recent than 4.9-rc1 (up to and including 4.9-rc4).  I am glad someone 
-managed to isolate it as I was unable to get a clean bisect.
-
-Vince
-
+-- 
+~Randy
