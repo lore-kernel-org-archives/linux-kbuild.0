@@ -1,55 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf0-f193.google.com ([209.85.192.193]:35911 "EHLO
-        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750975AbcKFWeB (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 6 Nov 2016 17:34:01 -0500
-From: Wei Yang <richard.weiyang@gmail.com>
-Subject: [PATCH V2] kbuild: add %/built-in.o target in top Makefile
-Date: Sun,  6 Nov 2016 22:18:32 +0000
-Message-Id: <1478470712-9872-1-git-send-email-richard.weiyang@gmail.com>
-In-Reply-To: <1477313111-25205-1-git-send-email-richard.weiyang@gmail.com>
-References: <1477313111-25205-1-git-send-email-richard.weiyang@gmail.com>
+Received: from imap.thunk.org ([74.207.234.97]:54510 "EHLO imap.thunk.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750946AbcKGGaw (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 7 Nov 2016 01:30:52 -0500
+Date: Mon, 7 Nov 2016 01:30:15 -0500
+From: Theodore Ts'o <tytso@mit.edu>
+Subject: Re: -fno-PIE, take #3
+Message-ID: <20161107063015.s7j6wpimj5himjp2@thunk.org>
+References: <20161104183940.30692-1-bigeasy@linutronix.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20161104183940.30692-1-bigeasy@linutronix.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mmarek@suse.com
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Wei Yang <richard.weiyang@gmail.com>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, x86@kernel.org, Al Viro <viro@ZenIV.linux.org.uk>, Ben Hutchings <ben@decadent.org.uk>, Sven Joachim <svenjoac@gmx.de>, "Austin S. Hemmelgarn" <ahferroin7@gmail.com>, Borislav Petkov <bp@alien8.de>
 
-Current kbuild just supports building built-in.o in second directory level
-individually. There is no rule to build those built-in.o targets below
-third directory level.
+On Fri, Nov 04, 2016 at 07:39:37PM +0100, Sebastian Andrzej Siewior wrote:
+> Debian gcc's is nowdays compiled with --enable-default-pie which means it does
+> -fPIE by default. This breaks atleast x86-64 compiles.
+> This is the third attempt to fix it, this time by using runtime detection of
+> the -fno-PIE compiler switch (it was introduced in gcc 3.4, min required gcc is
+> currently 3.2) so it can be backported to the stable kernels.
+> As noted by Al this won't fix `git bisect' of stable kernels prio this commit.
+> However using always a wrapper around gcc which adds -fno-PIE is not sollution
+> I want to rely in future.
 
-Even current kbuild system could achieve this with rule "%/", while this
-not only builds built-in targes but also lib target, extra target and
-module objects.
+A wrapper around gcc which adds -fno-PIE doesn't work for the HOSTCC
+builds, anyway:
 
-This patch adds the "%/built-in.o" rule so that each built-in.o in the
-kernel tree could be the build target, which looks more consistent for the
-kbuild system.
+% gcc -fno-PIE -o /tmp/hello /tmp/hello.c
+/usr/bin/ld: /tmp/cckzDf9X.o: relocation R_X86_64_32 against `.rodata' can not be used when making a shared object; recompile with -fPIC
+/usr/bin/ld: final link failed: Nonrepresentable section on output
+collect2: error: ld returned 1 exit status
 
-Signed-off-by: Wei Yang <richard.weiyang@gmail.com>
+Alas, the only workaround I've found which doesn't involve bisecting
+the kernel is to add "CC=gcc-5" to the Makefile invocation (assuming
+gcc-5 is installed of course).
 
----
-v2
-    . add FORCE in prerequest
-
----
- Makefile | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/Makefile b/Makefile
-index f97f786..9c65498 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1638,6 +1638,8 @@ endif
- 	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
- %.symtypes: %.c prepare scripts FORCE
- 	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
-+%/built-in.o: prepare scripts FORCE
-+	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
- 
- # Modules
- /: prepare scripts FORCE
--- 
-2.5.0
+					- Ted
+					
 
