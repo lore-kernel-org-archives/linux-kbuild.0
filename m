@@ -1,36 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from terminus.zytor.com ([198.137.202.10]:33276 "EHLO mail.zytor.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752512AbcKGWcQ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 7 Nov 2016 17:32:16 -0500
-Subject: Re: -fno-PIE, take #3
-References: <20161104183940.30692-1-bigeasy@linutronix.de>
-From: "H. Peter Anvin" <hpa@zytor.com>
-Message-ID: <63c356a8-58a3-bc7e-88db-5c8071db15e1@zytor.com>
-Date: Mon, 7 Nov 2016 14:31:30 -0800
+Received: from mail-qk0-f181.google.com ([209.85.220.181]:33639 "EHLO
+        mail-qk0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752044AbcKGWll (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 7 Nov 2016 17:41:41 -0500
+Received: by mail-qk0-f181.google.com with SMTP id x190so194236583qkb.0
+        for <linux-kbuild@vger.kernel.org>; Mon, 07 Nov 2016 14:41:40 -0800 (PST)
+Date: Mon, 7 Nov 2016 17:41:38 -0500 (EST)
+From: Nicolas Pitre <nicolas.pitre@linaro.org>
+Subject: Re: [PATCH v3 2/4] kconfig: regenerate *.c_shipped files after
+ previous changes
+In-Reply-To: <20161107223149.pgs5dqtbw5aprow7@jtriplet-mobl2.jf.intel.com>
+Message-ID: <alpine.LFD.2.20.1611071733010.14694@knanqh.ubzr>
+References: <1478556899-2951-1-git-send-email-nicolas.pitre@linaro.org> <1478556899-2951-3-git-send-email-nicolas.pitre@linaro.org> <20161107223149.pgs5dqtbw5aprow7@jtriplet-mobl2.jf.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20161104183940.30692-1-bigeasy@linutronix.de>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, linux-kernel@vger.kernel.org
-Cc: Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, x86@kernel.org, Al Viro <viro@ZenIV.linux.org.uk>, Ben Hutchings <ben@decadent.org.uk>, Sven Joachim <svenjoac@gmx.de>, "Austin S. Hemmelgarn" <ahferroin7@gmail.com>, Borislav Petkov <bp@alien8.de>
+To: Josh Triplett <josh@joshtriplett.org>
+Cc: John Stultz <john.stultz@linaro.org>, Michal Marek <mmarek@suse.com>, Richard Cochran <richardcochran@gmail.com>, Paul Bolle <pebolle@tiscali.nl>, Thomas Gleixner <tglx@linutronix.de>, Edward Cree <ecree@solarflare.com>, netdev@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 11/04/16 11:39, Sebastian Andrzej Siewior wrote:
-> Debian gcc's is nowdays compiled with --enable-default-pie which means it does
-> -fPIE by default. This breaks atleast x86-64 compiles.
-> This is the third attempt to fix it, this time by using runtime detection of
-> the -fno-PIE compiler switch (it was introduced in gcc 3.4, min required gcc is
-> currently 3.2) so it can be backported to the stable kernels.
-> As noted by Al this won't fix `git bisect' of stable kernels prio this commit.
-> However using always a wrapper around gcc which adds -fno-PIE is not sollution
-> I want to rely in future.
+On Mon, 7 Nov 2016, Josh Triplett wrote:
+
+> [snipping large patch]
 > 
-> Sebastian
-> 
+> One suggestion that might make this patch easier to review: you might
+> consider first regenerating the unchanged parser with Bison 3.0.4, then
+> regenerating it again after the "imply" change.  I think that'd
+> eliminate quite a lot of noise in this patch.
 
-We don't support gcc < 3.4 on x86 platforms; I'm pretty sure it is broken.
+I tried that. This made two large patches instead of just one, both 
+equally obscure.
 
-	-hpa
+So this patch stands on its own, containing changes that are 
+mechanically generated and therefore shouldn't require manual review.
 
+
+Nicolas
