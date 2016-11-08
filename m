@@ -1,58 +1,96 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:51336 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750789AbcKHWOk (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 8 Nov 2016 17:14:40 -0500
-Date: Tue, 8 Nov 2016 23:14:37 +0100
-From: Michal Marek <mmarek@suse.com>
-Subject: Re: [PATCH 1/3] kbuild: add -fno-PIE
-Message-ID: <20161108221437.GA9197@sepie.suse.cz>
+Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:38145 "EHLO
+        shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1752681AbcKHWvr (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 8 Nov 2016 17:51:47 -0500
+Message-ID: <1478645477.1727.18.camel@decadent.org.uk>
+Subject: Re: -fno-PIE, take #3
+From: Ben Hutchings <ben@decadent.org.uk>
+Date: Tue, 08 Nov 2016 22:51:17 +0000
+In-Reply-To: <20161104183940.30692-1-bigeasy@linutronix.de>
 References: <20161104183940.30692-1-bigeasy@linutronix.de>
- <20161104183940.30692-2-bigeasy@linutronix.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20161104183940.30692-2-bigeasy@linutronix.de>
+Content-Type: multipart/signed; micalg="pgp-sha512";
+        protocol="application/pgp-signature"; boundary="=-ZrIT7uo4TnVdsE63FVs/"
+Mime-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org, Al Viro <viro@ZenIV.linux.org.uk>, Ben Hutchings <ben@decadent.org.uk>, Sven Joachim <svenjoac@gmx.de>, "Austin S. Hemmelgarn" <ahferroin7@gmail.com>, Borislav Petkov <bp@alien8.de>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, linux-kernel@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, x86@kernel.org, Al Viro <viro@ZenIV.linux.org.uk>, Sven Joachim <svenjoac@gmx.de>, "Austin S. Hemmelgarn" <ahferroin7@gmail.com>, Borislav Petkov <bp@alien8.de>
 
-On Fri, Nov 04, 2016 at 07:39:38PM +0100, Sebastian Andrzej Siewior wrote:
-> Debian started to build the gcc with -fPIE by default so the kernel
-> build ends before it starts properly with:
-> |kernel/bounds.c:1:0: error: code model kernel does not support PIC mode
-> 
-> Also add to KBUILD_AFLAGS due to:
-> 
-> |gcc -Wp,-MD,arch/x86/entry/vdso/vdso32/.note.o.d … -mfentry -DCC_USING_FENTRY … vdso/vdso32/note.S
-> |arch/x86/entry/vdso/vdso32/note.S:1:0: sorry, unimplemented: -mfentry isn’t supported for 32-bit in combination with -fpic
-> 
-> Tagging it stable so it is possible to compile recent stable kernels as
-> well.
-> 
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-> ---
->  Makefile | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/Makefile b/Makefile
-> index a2650f9c6a25..d61145ebf498 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -622,6 +622,8 @@ include arch/$(SRCARCH)/Makefile
->  KBUILD_CFLAGS	+= $(call cc-option,-fno-delete-null-pointer-checks,)
->  KBUILD_CFLAGS	+= $(call cc-disable-warning,maybe-uninitialized,)
->  KBUILD_CFLAGS	+= $(call cc-disable-warning,frame-address,)
-> +KBUILD_CFLAGS	+= $(call cc-option,-fno-PIE)
-> +KBUILD_AFLAGS	+= $(call cc-option,-fno-PIE)
 
-Bad compiler. No pie for you.
+--=-ZrIT7uo4TnVdsE63FVs/
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-I applied this one to kbuild.git. How about 2/3 and 3/3. Will these be
-merged via tip.git or shall I apply them as well?
+On Fri, 2016-11-04 at 19:39 +0100, Sebastian Andrzej Siewior wrote:
+> Debian gcc's is nowdays compiled with --enable-default-pie which means it=
+ does
+> -fPIE by default. This breaks atleast x86-64 compiles.
+> This is the third attempt to fix it, this time by using runtime detection=
+ of
+> the -fno-PIE compiler switch (it was introduced in gcc 3.4, min required =
+gcc is
+> currently 3.2) so it can be backported to the stable kernels.
+> As noted by Al this won't fix `git bisect' of stable kernels prio this co=
+mmit.
+> However using always a wrapper around gcc which adds -fno-PIE is not soll=
+ution
+> I want to rely in future.
 
-Thanks,
-Michal
+I applied the previous=C2=A0version of "kbuild: add -fno-PIE" plus
+"scripts/has-stack-protector: add -fno-PIE" to the Debian kernel
+package of v4.9-rc3 and built with gcc-6, and the results of auto-
+building so far are (from
+<https://buildd.debian.org/status/package.php?p=3Dlinux&suite=3Dexperimenta=
+l>):
+
+Debian    Description                  Result
+name
+----------------------------------------------
+amd64     x86_64                       OK
+arm64     ARMv8                        OK
+armel     ARMv5                        pending
+armhf     ARMv7                        pending
+i386      i686                         OK
+mips      MIPS{32,64}r2 big-endian     OK
+mipsel    MIPS{32,64}r2 little-endian  pending
+mips64el  MIPS64r2, little-endian      pending
+ppc64el   POWER8, little-endian        OK
+s390x     s390x                        OK
+
+PIE has not been enabled by default on other Debian architectures.  The
+build failures on hppa and sparc64 are unrelated.
+
+We do enable CONFIG_KEXEC_FILE on amd64 so I don't know how why that
+build succeeded without "x86/kexec: add -fno-PIE".
+
+Ben.
+
+--=20
+Ben Hutchings
+For every complex problem
+there is a solution that is simple, neat, and wrong.
+
+--=-ZrIT7uo4TnVdsE63FVs/
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAABCgAGBQJYIlblAAoJEOe/yOyVhhEJcWUP/1BBQuKy639Cavq2sjxs0RES
+2uluWKBeRdaRHe69xM5M3rxivkzSCDgGJKX8e7jTOY29TRkBqVs1/nQWGWJ8DF4M
+tAJi79wogpMM8v/ewk64w5D9Wl83yb6YZtyOkK42KyXJPYwxoSN8aYkvAWbX58bF
+o10TxMnIBmB6JOXD+wYPindkx2ro1PU1s2picnrmFeb53xuF3h3Fd4Sa3nyyCabx
+D92At0V00mqUmHAMfoyzZI6agT4afOzfDPnaRHKpjDizHpU5VOFoJGNwY0QljwZg
+QBD0+HQHNbk9bmDtvVF7AWGm80US3YeA3dAfnGzbMpFzX8VbwQuxdy7O7DyE420v
+wsUc0G/wgHLf432gEr3D7dCc4HrZyAdrVmU9qxmqJODEWkSmBl0fTr5vvPfFH5/b
+JB3LPky8/lwsBl3FFaCLdGdr9FXMY2n8356ulqShEsGjsM85CWjYl6PKzCMZH3zI
+YUPO2c4N774oRXxCCLmUJj6oCIXqGdjjY/VpU38H6NWv/iDbJwqDfDtyKKYbEO5h
+S4l6VYr5wy5XOx2a7KZKnj2+iwBLYgszSrYQTvXG9pPEdXReplxlVauBWNmZBLVp
+d4k+WDfwIa7l5arzztejGJehmfWnmfUBNv/M2x/DMSftTqxJo/jOz5Sqc7T5WLF3
+ZrzVz5SHdyXDtwmv96Wi
+=N5Zh
+-----END PGP SIGNATURE-----
+
+--=-ZrIT7uo4TnVdsE63FVs/--
