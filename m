@@ -1,42 +1,90 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from relay5-d.mail.gandi.net ([217.70.183.197]:43789 "EHLO
-        relay5-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751469AbcKGXMp (ORCPT
+Received: from mail-pf0-f195.google.com ([209.85.192.195]:35826 "EHLO
+        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751454AbcKHBu1 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 7 Nov 2016 18:12:45 -0500
-Date: Mon, 7 Nov 2016 15:12:36 -0800
-From: Josh Triplett <josh@joshtriplett.org>
-Subject: Re: [PATCH v3 2/4] kconfig: regenerate *.c_shipped files after
- previous changes
-Message-ID: <20161107231236.c7p7fqefckwxcsvv@jtriplet-mobl2.jf.intel.com>
-References: <1478556899-2951-1-git-send-email-nicolas.pitre@linaro.org>
- <1478556899-2951-3-git-send-email-nicolas.pitre@linaro.org>
- <20161107223149.pgs5dqtbw5aprow7@jtriplet-mobl2.jf.intel.com>
- <alpine.LFD.2.20.1611071733010.14694@knanqh.ubzr>
+        Mon, 7 Nov 2016 20:50:27 -0500
+Date: Tue, 8 Nov 2016 12:33:34 +1100
+From: Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: 'kbuild' merge before 4.9-rc1 breaks build and boot
+Message-ID: <20161108123334.3df2dcc9@roar.ozlabs.ibm.com>
+In-Reply-To: <20161107213907.GB18092@al>
+References: <4c04b846-3da8-dc42-4fa6-30f72a5c2437@hartkopp.net>
+        <20161027154202.GE27017@al>
+        <alpine.DEB.2.20.1611071408040.24418@macbook-air>
+        <20161107213907.GB18092@al>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <alpine.LFD.2.20.1611071733010.14694@knanqh.ubzr>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicolas Pitre <nicolas.pitre@linaro.org>
-Cc: John Stultz <john.stultz@linaro.org>, Michal Marek <mmarek@suse.com>, Richard Cochran <richardcochran@gmail.com>, Paul Bolle <pebolle@tiscali.nl>, Thomas Gleixner <tglx@linutronix.de>, Edward Cree <ecree@solarflare.com>, netdev@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Peter Wu <peter@lekensteyn.nl>
+Cc: Vince Weaver <vincent.weaver@maine.edu>, Michal Marek <mmarek@suse.com>, Al Viro <viro@zeniv.linux.org.uk>, Oliver Hartkopp <socketcan@hartkopp.net>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org
 
-On Mon, Nov 07, 2016 at 05:41:38PM -0500, Nicolas Pitre wrote:
-> On Mon, 7 Nov 2016, Josh Triplett wrote:
-> 
-> > [snipping large patch]
+On Mon, 7 Nov 2016 22:39:07 +0100
+Peter Wu <peter@lekensteyn.nl> wrote:
+
+> On Mon, Nov 07, 2016 at 02:10:12PM -0500, Vince Weaver wrote:
+> > On Thu, 27 Oct 2016, Peter Wu wrote:
+> >   
+> > > I can confirm Olivers issue, the current mainline kernel fails to boot
+> > > on kernels with CONFIG_MODVERSIONS=y. Bisection points to:
+> > > 
+> > >     commit 784d5699eddc55878627da20d3fe0c8542e2f1a2
+> > >     Author: Al Viro <viro@zeniv.linux.org.uk>
+> > >     Date:   Mon Jan 11 11:04:34 2016 -0500  
+> > > > WARNING: "memset" [sound/usb/snd-usbmidi-lib.ko] has no CRC!
+> > > > WARNING: "__fentry__" [sound/usb/snd-usbmidi-lib.ko] has no CRC!
+> > > > WARNING: "memcpy" [sound/usb/snd-usbmidi-lib.ko] has no CRC!
+> > > > WARNING: "__sw_hweight32" [sound/usb/snd-usbmidi-lib.ko] has no CRC!  
 > > 
-> > One suggestion that might make this patch easier to review: you might
-> > consider first regenerating the unchanged parser with Bison 3.0.4, then
-> > regenerating it again after the "imply" change.  I think that'd
-> > eliminate quite a lot of noise in this patch.
+> > Has any progress been made with this problem?
+> > 
+> > I'm also encountering it on my debian-unstable box on any kernel more 
+> > recent than 4.9-rc1 (up to and including 4.9-rc4).  I am glad someone 
+> > managed to isolate it as I was unable to get a clean bisect.
+> > 
+> > Vince  
 > 
-> I tried that. This made two large patches instead of just one, both 
-> equally obscure.
+> The original kbuild issue went in via
+> merge commit 84d69848c97faab0c25aa2667b273404d2e2a64a which notes:
 > 
-> So this patch stands on its own, containing changes that are 
-> mechanically generated and therefore shouldn't require manual review.
+>  - EXPORT_SYMBOL for asm source by Al Viro.
+> 
+>    This does bring a regression, because genksyms no longer generates
+>    checksums for these symbols (CONFIG_MODVERSIONS). Nick Piggin is
+>    working on a patch to fix this.
+> 
+>    Plus, we are talking about functions like strcpy(), which rarely
+>    change prototypes.
+> 
+> Adding Nicholas in the cc, hopefully he can give a status update.
 
-Fair enough. I hadn't expected that the changes from "imply" would still
-be huge.
+I think Michal has everything needed now for the kbuild bits. The arch
+specific patches can go via arch trees quite easily (there is no hard
+dependency either way). This is the kbuild bit:
+
+https://git.kernel.org/cgit/linux/kernel/git/mmarek/kbuild.git/commit/?h=rc-fixes&id=4efca4ed05cbdfd13ec3e8cb623fb77d6e4ab187
+
+And it also needs this incremental bit not in Michal's tree yet:
+
+---
+ scripts/Makefile.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index 3e223c2..05c6bb4 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -332,7 +332,7 @@ cmd_gensymtypes_S =                                                         \
+     (echo "\#include <linux/kernel.h>" ;                                    \
+      echo "\#include <asm/asm-prototypes.h>" ;                              \
+     $(CPP) $(a_flags) $< |                                                  \
+-     grep ^___EXPORT_SYMBOL |                                               \
++     grep ___EXPORT_SYMBOL |                                                \
+      sed 's/___EXPORT_SYMBOL \([a-zA-Z0-9_]*\),.*/EXPORT_SYMBOL(\1);/' ) |  \
+     $(CPP) -D__GENKSYMS__ $(c_flags) -xc - |                                \
+     $(GENKSYMS) $(if $(1), -T $(2))                                         \
+-- 
+2.9.3
+
