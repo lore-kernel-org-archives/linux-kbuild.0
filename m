@@ -1,90 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf0-f195.google.com ([209.85.192.195]:35826 "EHLO
-        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751454AbcKHBu1 (ORCPT
+Received: from nbfkord-smmo03.seg.att.com ([209.65.160.84]:58112 "EHLO
+        nbfkord-smmo03.seg.att.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1752677AbcKHNKn (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 7 Nov 2016 20:50:27 -0500
-Date: Tue, 8 Nov 2016 12:33:34 +1100
-From: Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: 'kbuild' merge before 4.9-rc1 breaks build and boot
-Message-ID: <20161108123334.3df2dcc9@roar.ozlabs.ibm.com>
-In-Reply-To: <20161107213907.GB18092@al>
-References: <4c04b846-3da8-dc42-4fa6-30f72a5c2437@hartkopp.net>
-        <20161027154202.GE27017@al>
-        <alpine.DEB.2.20.1611071408040.24418@macbook-air>
-        <20161107213907.GB18092@al>
+        Tue, 8 Nov 2016 08:10:43 -0500
+Subject: Re: [PATCH v3 3/4] ptp_clock: allow for it to be optional
+References: <1478556899-2951-1-git-send-email-nicolas.pitre@linaro.org>
+ <1478556899-2951-4-git-send-email-nicolas.pitre@linaro.org>
+From: Edward Cree <ecree@solarflare.com>
+Message-ID: <cc41f1f3-1bc8-1835-1bf1-2d342768e49d@solarflare.com>
+Date: Tue, 8 Nov 2016 13:10:26 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <1478556899-2951-4-git-send-email-nicolas.pitre@linaro.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Peter Wu <peter@lekensteyn.nl>
-Cc: Vince Weaver <vincent.weaver@maine.edu>, Michal Marek <mmarek@suse.com>, Al Viro <viro@zeniv.linux.org.uk>, Oliver Hartkopp <socketcan@hartkopp.net>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org
+To: Nicolas Pitre <nicolas.pitre@linaro.org>, John Stultz <john.stultz@linaro.org>, Michal Marek <mmarek@suse.com>
+Cc: Richard Cochran <richardcochran@gmail.com>, Paul Bolle <pebolle@tiscali.nl>, Thomas Gleixner <tglx@linutronix.de>, Josh Triplett <josh@joshtriplett.org>, netdev@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Mon, 7 Nov 2016 22:39:07 +0100
-Peter Wu <peter@lekensteyn.nl> wrote:
+On 07/11/16 22:14, Nicolas Pitre wrote:
+> In order to break the hard dependency between the PTP clock subsystem and
+> ethernet drivers capable of being clock providers, this patch provides
+> simple PTP stub functions to allow linkage of those drivers into the
+> kernel even when the PTP subsystem is configured out. Drivers must be
+> ready to accept NULL from ptp_clock_register() in that case.
+>
+> And to make it possible for PTP to be configured out, the select statement
+> in those driver's Kconfig menu entries is converted to the new "imply"
+> statement. This way the PTP subsystem may have Kconfig dependencies of
+> its own, such as POSIX_TIMERS, without having to make those ethernet
+> drivers unavailable if POSIX timers are cconfigured out. And when support
+> for POSIX timers is selected again then the default config option for PTP
+> clock support will automatically be adjusted accordingly.
+>
+> The pch_gbe driver is a bit special as it relies on extra code in
+> drivers/ptp/ptp_pch.c. Therefore we let the make process descend into
+> drivers/ptp/ even if PTP_1588_CLOCK is unselected.
+>
+> Signed-off-by: Nicolas Pitre <nico@linaro.org>
+> Reviewed-by: Josh Triplett <josh@joshtriplett.org>
+> Acked-by: Richard Cochran <richardcochran@gmail.com>
+For the sfc change:
+Acked-by: Edward Cree <ecree@solarflare.com>
 
-> On Mon, Nov 07, 2016 at 02:10:12PM -0500, Vince Weaver wrote:
-> > On Thu, 27 Oct 2016, Peter Wu wrote:
-> >   
-> > > I can confirm Olivers issue, the current mainline kernel fails to boot
-> > > on kernels with CONFIG_MODVERSIONS=y. Bisection points to:
-> > > 
-> > >     commit 784d5699eddc55878627da20d3fe0c8542e2f1a2
-> > >     Author: Al Viro <viro@zeniv.linux.org.uk>
-> > >     Date:   Mon Jan 11 11:04:34 2016 -0500  
-> > > > WARNING: "memset" [sound/usb/snd-usbmidi-lib.ko] has no CRC!
-> > > > WARNING: "__fentry__" [sound/usb/snd-usbmidi-lib.ko] has no CRC!
-> > > > WARNING: "memcpy" [sound/usb/snd-usbmidi-lib.ko] has no CRC!
-> > > > WARNING: "__sw_hweight32" [sound/usb/snd-usbmidi-lib.ko] has no CRC!  
-> > 
-> > Has any progress been made with this problem?
-> > 
-> > I'm also encountering it on my debian-unstable box on any kernel more 
-> > recent than 4.9-rc1 (up to and including 4.9-rc4).  I am glad someone 
-> > managed to isolate it as I was unable to get a clean bisect.
-> > 
-> > Vince  
-> 
-> The original kbuild issue went in via
-> merge commit 84d69848c97faab0c25aa2667b273404d2e2a64a which notes:
-> 
->  - EXPORT_SYMBOL for asm source by Al Viro.
-> 
->    This does bring a regression, because genksyms no longer generates
->    checksums for these symbols (CONFIG_MODVERSIONS). Nick Piggin is
->    working on a patch to fix this.
-> 
->    Plus, we are talking about functions like strcpy(), which rarely
->    change prototypes.
-> 
-> Adding Nicholas in the cc, hopefully he can give a status update.
-
-I think Michal has everything needed now for the kbuild bits. The arch
-specific patches can go via arch trees quite easily (there is no hard
-dependency either way). This is the kbuild bit:
-
-https://git.kernel.org/cgit/linux/kernel/git/mmarek/kbuild.git/commit/?h=rc-fixes&id=4efca4ed05cbdfd13ec3e8cb623fb77d6e4ab187
-
-And it also needs this incremental bit not in Michal's tree yet:
-
----
- scripts/Makefile.build | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 3e223c2..05c6bb4 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -332,7 +332,7 @@ cmd_gensymtypes_S =                                                         \
-     (echo "\#include <linux/kernel.h>" ;                                    \
-      echo "\#include <asm/asm-prototypes.h>" ;                              \
-     $(CPP) $(a_flags) $< |                                                  \
--     grep ^___EXPORT_SYMBOL |                                               \
-+     grep ___EXPORT_SYMBOL |                                                \
-      sed 's/___EXPORT_SYMBOL \([a-zA-Z0-9_]*\),.*/EXPORT_SYMBOL(\1);/' ) |  \
-     $(CPP) -D__GENKSYMS__ $(c_flags) -xc - |                                \
-     $(GENKSYMS) $(if $(1), -T $(2))                                         \
--- 
-2.9.3
-
+And I accept that "suggests" isn't needed and the current "imply" semantics
+are probably fine.  If not we can always change it or resurrect "suggests".
+The information contained in this message is confidential and is intended for the addressee(s) only. If you have received this message in error, please notify the sender immediately and delete the message. Unless you are an addressee (or authorized to receive for an addressee), you may not use, copy or disclose to anyone this message or any information contained in this message. The unauthorized use, disclosure, copying or alteration of this message is strictly prohibited.
