@@ -1,44 +1,93 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from Galois.linutronix.de ([146.0.238.70]:55474 "EHLO
-        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932301AbcKHQug (ORCPT
+Received: from mail-yw0-f169.google.com ([209.85.161.169]:36579 "EHLO
+        mail-yw0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754016AbcKHRm4 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 8 Nov 2016 11:50:36 -0500
-Date: Tue, 8 Nov 2016 17:47:53 +0100 (CET)
-From: Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [PATCH v3 0/4] make POSIX timers optional with some Kconfig
- help
-In-Reply-To: <1478556899-2951-1-git-send-email-nicolas.pitre@linaro.org>
-Message-ID: <alpine.DEB.2.20.1611081747330.3501@nanos>
-References: <1478556899-2951-1-git-send-email-nicolas.pitre@linaro.org>
+        Tue, 8 Nov 2016 12:42:56 -0500
+Received: by mail-yw0-f169.google.com with SMTP id l124so184426066ywb.3
+        for <linux-kbuild@vger.kernel.org>; Tue, 08 Nov 2016 09:42:56 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <1478556899-2951-5-git-send-email-nicolas.pitre@linaro.org>
+References: <1478556899-2951-1-git-send-email-nicolas.pitre@linaro.org> <1478556899-2951-5-git-send-email-nicolas.pitre@linaro.org>
+From: John Stultz <john.stultz@linaro.org>
+Date: Tue, 8 Nov 2016 09:42:54 -0800
+Message-ID: <CALAqxLVrGRW3ODzZk=4-8FSLe5wBwHJSOEAW=+kMFjTRoe1HzQ@mail.gmail.com>
+Subject: Re: [PATCH v3 4/4] posix-timers: make it configurable
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Nicolas Pitre <nicolas.pitre@linaro.org>
-Cc: John Stultz <john.stultz@linaro.org>, Michal Marek <mmarek@suse.com>, Richard Cochran <richardcochran@gmail.com>, Paul Bolle <pebolle@tiscali.nl>, Josh Triplett <josh@joshtriplett.org>, Edward Cree <ecree@solarflare.com>, netdev@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.com>, Richard Cochran <richardcochran@gmail.com>, Paul Bolle <pebolle@tiscali.nl>, Thomas Gleixner <tglx@linutronix.de>, Josh Triplett <josh@joshtriplett.org>, Edward Cree <ecree@solarflare.com>, netdev@vger.kernel.org, linux-kbuild@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>
 
-On Mon, 7 Nov 2016, Nicolas Pitre wrote:
+On Mon, Nov 7, 2016 at 2:14 PM, Nicolas Pitre <nicolas.pitre@linaro.org> wrote:
+> Some embedded systems have no use for them.  This removes about
+> 22KB from the kernel binary size when configured out.
+>
+> Corresponding syscalls are routed to a stub logging the attempt to
+> use those syscalls which should be enough of a clue if they were
+> disabled without proper consideration. They are: timer_create,
+> timer_gettime: timer_getoverrun, timer_settime, timer_delete,
+> clock_adjtime.
+>
+> The clock_settime, clock_gettime, clock_getres and clock_nanosleep
+> syscalls are replaced by simple wrappers compatible with CLOCK_REALTIME,
+> CLOCK_MONOTONIC and CLOCK_BOOTTIME only which should cover the vast
+> majority of use cases with very little code.
+>
+> Signed-off-by: Nicolas Pitre <nico@linaro.org>
+> Reviewed-by: Josh Triplett <josh@joshtriplett.org>
+> Acked-by: Richard Cochran <richardcochran@gmail.com>
 
-> Many embedded systems don't need the full POSIX timer support.
-> Configuring them out provides a nice kernel image size reduction.
-> 
-> When POSIX timers are configured out, the PTP clock subsystem should be
-> left out as well. However a bunch of ethernet drivers currently *select*
-> the later in their Kconfig entries. Therefore some more work was needed
-> to break that hard dependency from those drivers without preventing their
-> usage altogether.
-> 
-> Therefore this series also includes kconfig changes to implement a new
-> keyword to express some reverse dependencies like "select" does, named
-> "imply", and still allowing for the target config symbol to be disabled
-> if the user or a direct dependency says so.
-> 
-> At this point I'd like to gather ACKs especially from people in the "To"
-> field. Ideally this would need to go upstream as a single series to avoid
-> cross subsystem dependency issues.  So far it was suggested that this should go
-> via the kbuild tree.
+So I have no design objections to the patch overall.
 
-For the whole series:
+I ran this through my timekeeping tests last night and it passed a
+fair number of the tests, considering.
 
-Acked-by: Thomas Gleixner <tglx@linutronix.de>
+I of course see a lot of failures around timer_creates failing
+(set-timer-lat), and cases where clockids aren't supported.
+So I'll need to see about updating the tests to fail more gracefully
+with this change.
+
+One spot of concern is that the
+tools/testing/selftests/timers/posix_timers.c test hangs testing
+virtual itimers. Looking through the code I'm not seeing where an
+error case is missed.
+
+The strace looks like:
+...
+write(1, "Testing posix timers. False nega"..., 66Testing posix
+timers. False negative may happen on CPU execution
+) = 66
+write(1, "based timers if other threads ru"..., 48based timers if
+other threads run on the CPU...
+) = 48
+write(1, "Check itimer virtual... ", 24Check itimer virtual... ) = 24
+rt_sigaction(SIGVTALRM, {0x400a80, [VTALRM], SA_RESTORER|SA_RESTART,
+0x7fb73306ccb0}, {SIG_DFL, [], 0}, 8) = 0
+gettimeofday({1478710402, 937476}, NULL) = 0
+setitimer(ITIMER_VIRTUAL, {it_interval={0, 0}, it_value={2, 0}}, NULL) = 0
+<Hang>
+
+
+Where as with posix timers enabled:
+...
+write(1, "Testing posix timers. False nega"..., 138Testing posix
+timers. False negative may happen on CPU execution
+based timers if other threads run on the CPU...
+Check itimer virtual... ) = 138
+rt_sigaction(SIGVTALRM, {0x400a80, [VTALRM], SA_RESTORER|SA_RESTART,
+0x7f231ba8ccb0}, {SIG_DFL, [], 0}, 8) = 0
+gettimeofday({1478626751, 904856}, NULL) = 0
+setitimer(ITIMER_VIRTUAL, {it_interval={0, 0}, it_value={2, 0}}, NULL) = 0
+--- SIGVTALRM {si_signo=SIGVTALRM, si_code=SI_KERNEL} ---
+rt_sigreturn()                          = 0
+gettimeofday({1478626753, 906137}, NULL) = 0
+write(1, "[OK]\nCheck itimer prof... ", 26[OK]
+...
+
+So I suspect you were a little too aggressive with the #ifdefs around
+the itimers/signal code, or we need to make sure we return an error on
+the setitimer ITIMER_VIRTUAL case as well.
+
+thanks
+-john
