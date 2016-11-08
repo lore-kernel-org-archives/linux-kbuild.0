@@ -1,83 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-it0-f42.google.com ([209.85.214.42]:37587 "EHLO
-        mail-it0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752941AbcKHSsI (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 8 Nov 2016 13:48:08 -0500
-Received: by mail-it0-f42.google.com with SMTP id u205so225968142itc.0
-        for <linux-kbuild@vger.kernel.org>; Tue, 08 Nov 2016 10:48:07 -0800 (PST)
+Received: from mx2.suse.de ([195.135.220.15]:51336 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750789AbcKHWOk (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 8 Nov 2016 17:14:40 -0500
+Date: Tue, 8 Nov 2016 23:14:37 +0100
+From: Michal Marek <mmarek@suse.com>
+Subject: Re: [PATCH 1/3] kbuild: add -fno-PIE
+Message-ID: <20161108221437.GA9197@sepie.suse.cz>
+References: <20161104183940.30692-1-bigeasy@linutronix.de>
+ <20161104183940.30692-2-bigeasy@linutronix.de>
 MIME-Version: 1.0
-In-Reply-To: <alpine.LFD.2.20.1611081311420.11818@knanqh.ubzr>
-References: <1478556899-2951-1-git-send-email-nicolas.pitre@linaro.org>
- <1478556899-2951-5-git-send-email-nicolas.pitre@linaro.org>
- <CALAqxLVrGRW3ODzZk=4-8FSLe5wBwHJSOEAW=+kMFjTRoe1HzQ@mail.gmail.com> <alpine.LFD.2.20.1611081311420.11818@knanqh.ubzr>
-From: John Stultz <john.stultz@linaro.org>
-Date: Tue, 8 Nov 2016 10:48:06 -0800
-Message-ID: <CALAqxLVL-YLBYynW1c+vUV8y=HFQc7o5QbO47kKog0J-xpgSWw@mail.gmail.com>
-Subject: Re: [PATCH v3 4/4] posix-timers: make it configurable
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20161104183940.30692-2-bigeasy@linutronix.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicolas Pitre <nicolas.pitre@linaro.org>
-Cc: Michal Marek <mmarek@suse.com>, Richard Cochran <richardcochran@gmail.com>, Paul Bolle <pebolle@tiscali.nl>, Thomas Gleixner <tglx@linutronix.de>, Josh Triplett <josh@joshtriplett.org>, Edward Cree <ecree@solarflare.com>, netdev@vger.kernel.org, linux-kbuild@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org, Al Viro <viro@ZenIV.linux.org.uk>, Ben Hutchings <ben@decadent.org.uk>, Sven Joachim <svenjoac@gmx.de>, "Austin S. Hemmelgarn" <ahferroin7@gmail.com>, Borislav Petkov <bp@alien8.de>
 
-On Tue, Nov 8, 2016 at 10:19 AM, Nicolas Pitre <nicolas.pitre@linaro.org> wrote:
-> On Tue, 8 Nov 2016, John Stultz wrote:
->
->> One spot of concern is that the
->> tools/testing/selftests/timers/posix_timers.c test hangs testing
->> virtual itimers. Looking through the code I'm not seeing where an
->> error case is missed.
->>
->> The strace looks like:
->> ...
->> write(1, "Testing posix timers. False nega"..., 66Testing posix
->> timers. False negative may happen on CPU execution
->> ) = 66
->> write(1, "based timers if other threads ru"..., 48based timers if
->> other threads run on the CPU...
->> ) = 48
->> write(1, "Check itimer virtual... ", 24Check itimer virtual... ) = 24
->> rt_sigaction(SIGVTALRM, {0x400a80, [VTALRM], SA_RESTORER|SA_RESTART,
->> 0x7fb73306ccb0}, {SIG_DFL, [], 0}, 8) = 0
->> gettimeofday({1478710402, 937476}, NULL) = 0
->> setitimer(ITIMER_VIRTUAL, {it_interval={0, 0}, it_value={2, 0}}, NULL) = 0
->> <Hang>
->>
->>
->> Where as with posix timers enabled:
->> ...
->> write(1, "Testing posix timers. False nega"..., 138Testing posix
->> timers. False negative may happen on CPU execution
->> based timers if other threads run on the CPU...
->> Check itimer virtual... ) = 138
->> rt_sigaction(SIGVTALRM, {0x400a80, [VTALRM], SA_RESTORER|SA_RESTART,
->> 0x7f231ba8ccb0}, {SIG_DFL, [], 0}, 8) = 0
->> gettimeofday({1478626751, 904856}, NULL) = 0
->> setitimer(ITIMER_VIRTUAL, {it_interval={0, 0}, it_value={2, 0}}, NULL) = 0
->> --- SIGVTALRM {si_signo=SIGVTALRM, si_code=SI_KERNEL} ---
->> rt_sigreturn()                          = 0
->
-> I'll have a look.
->
->> So I suspect you were a little too aggressive with the #ifdefs around
->> the itimers/signal code, or we need to make sure we return an error on
->> the setitimer ITIMER_VIRTUAL case as well.
->
-> Well, it seemed to me that with POSIX_TIMERS=n, all the code that would
-> set up that signal is gone, so there was no point keeping the code to
-> deliver it.
->
-> Now... would it make more sense to remove itimer support as well when
-> POSIX_TIMERS=n?  The same reasoning would apply.
+On Fri, Nov 04, 2016 at 07:39:38PM +0100, Sebastian Andrzej Siewior wrote:
+> Debian started to build the gcc with -fPIE by default so the kernel
+> build ends before it starts properly with:
+> |kernel/bounds.c:1:0: error: code model kernel does not support PIC mode
+> 
+> Also add to KBUILD_AFLAGS due to:
+> 
+> |gcc -Wp,-MD,arch/x86/entry/vdso/vdso32/.note.o.d … -mfentry -DCC_USING_FENTRY … vdso/vdso32/note.S
+> |arch/x86/entry/vdso/vdso32/note.S:1:0: sorry, unimplemented: -mfentry isn’t supported for 32-bit in combination with -fpic
+> 
+> Tagging it stable so it is possible to compile recent stable kernels as
+> well.
+> 
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> ---
+>  Makefile | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/Makefile b/Makefile
+> index a2650f9c6a25..d61145ebf498 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -622,6 +622,8 @@ include arch/$(SRCARCH)/Makefile
+>  KBUILD_CFLAGS	+= $(call cc-option,-fno-delete-null-pointer-checks,)
+>  KBUILD_CFLAGS	+= $(call cc-disable-warning,maybe-uninitialized,)
+>  KBUILD_CFLAGS	+= $(call cc-disable-warning,frame-address,)
+> +KBUILD_CFLAGS	+= $(call cc-option,-fno-PIE)
+> +KBUILD_AFLAGS	+= $(call cc-option,-fno-PIE)
 
-Yes, returning an error with itimers seems needed if the signal bits
-are missing.
+Bad compiler. No pie for you.
 
-Though I do worry that since getitimer/setitimer are older obsolete
-interfaces which the posix timers api is supposed to replace, folks
-might be surprised to see it removed when setting POSIX_TIMERS=n. So
-some additional notes in the kconfig description may be needed.
+I applied this one to kbuild.git. How about 2/3 and 3/3. Will these be
+merged via tip.git or shall I apply them as well?
 
-thanks
--john
+Thanks,
+Michal
