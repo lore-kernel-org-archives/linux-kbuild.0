@@ -1,48 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f46.google.com ([74.125.82.46]:36180 "EHLO
-        mail-wm0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751382AbcKIAQy (ORCPT
+Received: from mail-pf0-f193.google.com ([209.85.192.193]:36681 "EHLO
+        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751783AbcKIEeT (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 8 Nov 2016 19:16:54 -0500
-Received: by mail-wm0-f46.google.com with SMTP id p190so278077745wmp.1
-        for <linux-kbuild@vger.kernel.org>; Tue, 08 Nov 2016 16:16:53 -0800 (PST)
+        Tue, 8 Nov 2016 23:34:19 -0500
+Received: by mail-pf0-f193.google.com with SMTP id n85so22014517pfi.3
+        for <linux-kbuild@vger.kernel.org>; Tue, 08 Nov 2016 20:34:19 -0800 (PST)
+From: Nicholas Piggin <npiggin@gmail.com>
+Subject: [PATCH] kbuild: be more careful about matching preprocessed asm ___EXPORT_SYMBOL
+Date: Wed,  9 Nov 2016 15:34:05 +1100
+Message-Id: <20161109043405.16344-1-npiggin@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20161102065241.985-1-andrew.donnellan@au1.ibm.com>
-References: <20161102065241.985-1-andrew.donnellan@au1.ibm.com>
-From: Kees Cook <keescook@chromium.org>
-Date: Tue, 8 Nov 2016 16:16:51 -0800
-Message-ID: <CAGXu5jJK37NEW0nR_JTs77pXdUbszuKo+mG+DyTCKftiZEKBTA@mail.gmail.com>
-Subject: Re: [PATCH] MAINTAINERS: add GCC plugins Makefile
 Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrew Donnellan <andrew.donnellan@au1.ibm.com>
-Cc: "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, Emese Revfy <re.emese@gmail.com>, Michal Marek <mmarek@suse.com>, LKML <linux-kernel@vger.kernel.org>
+To: Michal Marek <mmarek@suse.com>
+Cc: Nicholas Piggin <npiggin@gmail.com>, =?UTF-8?q?Philip=20M=C3=BCller?= <philm@manjaro.org>, Adam Borowski <kilobyte@angband.pl>, linux-kbuild@vger.kernel.org
 
-On Tue, Nov 1, 2016 at 11:52 PM, Andrew Donnellan
-<andrew.donnellan@au1.ibm.com> wrote:
-> Signed-off-by: Andrew Donnellan <andrew.donnellan@au1.ibm.com>
-> ---
->  MAINTAINERS | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 4012c2f..76049e0 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -5202,6 +5202,7 @@ L:        kernel-hardening@lists.openwall.com
->  S:     Maintained
->  F:     scripts/gcc-plugins/
->  F:     scripts/gcc-plugin.sh
-> +F:     scripts/Makefile.gcc-plugins
->  F:     Documentation/gcc-plugins.txt
->
->  GCOV BASED KERNEL PROFILING
+The CRC code for asm exports grabs the preprocessed asm, finds the
+___EXPORT_SYMBOL and turns those into EXPORT_SYMBOL in a C program
+that can be preprocessed and parsed to create the CRC signatures from
+the type.
 
-Ah, good call. I've added this for -next now. Thanks!
+The existing regex matching and replacement is too strict, and doesn't
+deal well with whitespace among other things. The line
+" EXPORT_SYMBOL(sym)" in a .S file would not match due to initial
+whitespace, for example, which resulted in x86's ___preempt_schedule
+failing to get CRCs.
 
--Kees
+Reported-by: Philip Müller <philm@manjaro.org>
+Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+---
+ scripts/Makefile.build | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index 3e223c2..7675d11 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -332,8 +332,8 @@ cmd_gensymtypes_S =                                                         \
+     (echo "\#include <linux/kernel.h>" ;                                    \
+      echo "\#include <asm/asm-prototypes.h>" ;                              \
+     $(CPP) $(a_flags) $< |                                                  \
+-     grep ^___EXPORT_SYMBOL |                                               \
+-     sed 's/___EXPORT_SYMBOL \([a-zA-Z0-9_]*\),.*/EXPORT_SYMBOL(\1);/' ) |  \
++     grep "\<___EXPORT_SYMBOL\>" |                                          \
++     sed 's/.*___EXPORT_SYMBOL[[:space:]]*\([a-zA-Z0-9_]*\)[[:space:]]*,.*/EXPORT_SYMBOL(\1);/' ) | \
+     $(CPP) -D__GENKSYMS__ $(c_flags) -xc - |                                \
+     $(GENKSYMS) $(if $(1), -T $(2))                                         \
+      $(patsubst y,-s _,$(CONFIG_HAVE_UNDERSCORE_SYMBOL_PREFIX))             \
 -- 
-Kees Cook
-Nexus Security
+2.10.2
+
