@@ -1,76 +1,165 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f48.google.com ([209.85.215.48]:34255 "EHLO
-        mail-lf0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755282AbcKJMR6 (ORCPT
+Received: from mout.kundenserver.de ([212.227.126.131]:53337 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S935157AbcKJQrF (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 10 Nov 2016 07:17:58 -0500
-Received: by mail-lf0-f48.google.com with SMTP id o141so115918038lff.1
-        for <linux-kbuild@vger.kernel.org>; Thu, 10 Nov 2016 04:17:57 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <4ea0912a-f024-266f-12b6-3945e8c751c6@suse.com>
-References: <20161104161407.10354-1-kilobyte@angband.pl> <CAAqcGH=zgWkO4LiF5U22v-mpaaY6ZdabkKrkSDtsrkctp2at=Q@mail.gmail.com>
- <CAAqcGHkn2TbyS1e7Aa_wMZEaJ9AYUNnVsM23ZEbogNHyY0cu0Q@mail.gmail.com> <4ea0912a-f024-266f-12b6-3945e8c751c6@suse.com>
-From: Riku Voipio <riku.voipio@linaro.org>
-Date: Thu, 10 Nov 2016 14:17:55 +0200
-Message-ID: <CAAqcGHmx-CNLqwDDBS31rB1GC2TikW101sNbfAseNzV5CcxLQQ@mail.gmail.com>
-Subject: Re: [PATCH] builddeb: fix cross-building to arm64 producing host-arch debs
-Content-Type: text/plain; charset=UTF-8
+        Thu, 10 Nov 2016 11:47:05 -0500
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH v2 01/11] Kbuild: enable -Wmaybe-uninitialized warning for "make W=1"
+Date: Thu, 10 Nov 2016 17:44:44 +0100
+Message-Id: <20161110164454.293477-2-arnd@arndb.de>
+In-Reply-To: <20161110164454.293477-1-arnd@arndb.de>
+References: <20161110164454.293477-1-arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>
-Cc: Adam Borowski <kilobyte@angband.pl>, linux-kbuild <linux-kbuild@vger.kernel.org>, regressions@leemhuis.info
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Arnd Bergmann <arnd@arndb.de>, Anna Schumaker <anna.schumaker@netapp.com>, "David S. Miller" <davem@davemloft.net>, Herbert Xu <herbert@gondor.apana.org.au>, Ilya Dryomov <idryomov@gmail.com>, Javier Martinez Canillas <javier@osg.samsung.com>, Jiri Kosina <jikos@kernel.org>, Jonathan Cameron <jic23@kernel.org>, Ley Foon Tan <lftan@altera.com>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Martin Schwidefsky <schwidefsky@de.ibm.com>, Mauro Carvalho Chehab <mchehab@kernel.org>, Michal Marek <mmarek@suse.com>, Russell King <linux@armlinux.org.uk>, Sean Young <sean@mess.org>, Sebastian Ott <sebott@linux.vnet.ibm.com>, Trond Myklebust <trond.myklebust@primarydata.com>, x86@kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-snps-arc@lists.infradead.org, nios2-dev@lists.rocketboards.org, linux-s390@vger.kernel.org, linux-crypto@vger.kernel.org, linux-media@vger.kernel.org, linux-nfs@vger.kernel.org
 
-On 10 November 2016 at 13:04, Michal Marek <mmarek@suse.com> wrote:
-> On 2016-11-10 09:47, Riku Voipio wrote:
->> On 10 November 2016 at 10:24, Riku Voipio <riku.voipio@linaro.org> wrote:
->>> On 4 November 2016 at 18:14, Adam Borowski <kilobyte@angband.pl> wrote:
->>>> Both Debian and kernel archs are "arm64" but UTS_MACHINE and gcc say
->>>> "aarch64".
->>>
->>> I cross-compile arm64 kernels all the time and they come out as arm64.deb.
->>> What exact command are you using to build your kernel to see host arch.deb?
->>
->> OK, I see. UTS_MACHINE use to incorrect, now it has been fixed:
->>
->> commit cfa88c79462d15098db29edebe623428c3620a4b
->> Author: Michal Marek <mmarek@suse.com>
->> Date:   Tue Aug 30 10:31:35 2016 +0200
->>
->>     arm64: Set UTS_MACHINE in the Makefile
->>
->> But that commit caused regression to builddeb since it wasn't updated
->> at the same time.
->
-> Sorry about that.
->
->
->> The patch below is correct fix,
->>
->> Acked-by: Riku Voipio <riku.voipio@linaro.org>
->>
->>>> ---
->>>>  scripts/package/builddeb | 2 +-
->>>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>>
->>>> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
->>>> index 8ea9fd2..3c575cd0 100755
->>>> --- a/scripts/package/builddeb
->>>> +++ b/scripts/package/builddeb
->>>> @@ -51,7 +51,7 @@ set_debarch() {
->>>>                 debarch=hppa ;;
->>>>         mips*)
->>>>                 debarch=mips$(grep -q CPU_LITTLE_ENDIAN=y $KCONFIG_CONFIG && echo el || true) ;;
->>>> -       arm64)
->>>> +       aarch64|arm64)
->>>>                 debarch=arm64 ;;
->
-> UTS_MACHINE is now always aarch64 on this architecture, so maybe stop
-> matching "arm64" to avoid confusion?
+Traditionally, we have always had warnings about uninitialized variables
+enabled, as this is part of -Wall, and generally a good idea [1], but it
+also always produced false positives, mainly because this is a variation
+of the halting problem and provably impossible to get right in all cases
+[2].
 
-I was wondering if it might makes sense to keep the arm64 around for a
-while, for example if someone reverts the UTS_MACHINE setting patch
-from arch/arm64 for unrelated reasons and still tries to build a deb.
-But I guess that's a corner case, and it's indeed cleaner without the
-arm64 bit. So either way works for me.
+Various people have identified cases that are particularly bad for false
+positives, and in commit e74fc973b6e5 ("Turn off -Wmaybe-uninitialized
+when building with -Os"), I turned off the warning for any build that
+was done with CC_OPTIMIZE_FOR_SIZE.  This drastically reduced the number
+of false positive warnings in the default build but unfortunately had
+the side effect of turning the warning off completely in 'allmodconfig'
+builds, which in turn led to a lot of warnings (both actual bugs, and
+remaining false positives) to go in unnoticed.
 
-Riku
+With commit 877417e6ffb9 ("Kbuild: change CC_OPTIMIZE_FOR_SIZE
+definition") enabled the warning again for allmodconfig builds in v4.7
+and in v4.8-rc1, I had finally managed to address all warnings I get in
+an ARM allmodconfig build and most other maybe-uninitialized warnings
+for ARM randconfig builds.
+
+However, commit 6e8d666e9253 ("Disable "maybe-uninitialized" warning
+globally") was merged at the same time and disabled it completely for
+all configurations, because of false-positive warnings on x86 that I had
+not addressed until then. This caused a lot of actual bugs to get merged
+into mainline, and I sent several dozen patches for these during the v4.9
+development cycle. Most of these are actual bugs, some are for correct
+code that is safe because it is only called under external constraints
+that make it impossible to run into the case that gcc sees, and in a
+few cases gcc is just stupid and finds something that can obviously
+never happen.
+
+I have now done a few thousand randconfig builds on x86 and collected all
+patches that I needed to address every single warning I got (I can provide
+the combined patch for the other warnings if anyone is interested),
+so I hope we can get the warning back and let people catch the actual
+bugs earlier.
+
+This reverts the change to disable the warning completely and for
+now brings it back at the "make W=1" level, so we can get it merged
+into mainline without introducing false positives. A follow-up
+patch enables it on all levels unless some configuration option
+turns it off because of false-positives.
+
+Link: https://rusty.ozlabs.org/?p=232 [1]
+Link: https://gcc.gnu.org/wiki/Better_Uninitialized_Warnings [2]
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ Makefile                   | 10 ++++++----
+ arch/arc/Makefile          |  4 +++-
+ scripts/Makefile.extrawarn |  3 +++
+ scripts/Makefile.ubsan     |  4 ++++
+ 4 files changed, 16 insertions(+), 5 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index f97f786..06e2b73 100644
+--- a/Makefile
++++ b/Makefile
+@@ -370,7 +370,7 @@ LDFLAGS_MODULE  =
+ CFLAGS_KERNEL	=
+ AFLAGS_KERNEL	=
+ LDFLAGS_vmlinux =
+-CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage -fno-tree-loop-im
++CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage -fno-tree-loop-im -Wno-maybe-uninitialized
+ CFLAGS_KCOV	:= $(call cc-option,-fsanitize-coverage=trace-pc,)
+ 
+ 
+@@ -620,7 +620,6 @@ ARCH_CFLAGS :=
+ include arch/$(SRCARCH)/Makefile
+ 
+ KBUILD_CFLAGS	+= $(call cc-option,-fno-delete-null-pointer-checks,)
+-KBUILD_CFLAGS	+= $(call cc-disable-warning,maybe-uninitialized,)
+ KBUILD_CFLAGS	+= $(call cc-disable-warning,frame-address,)
+ 
+ ifdef CONFIG_LD_DEAD_CODE_DATA_ELIMINATION
+@@ -629,15 +628,18 @@ KBUILD_CFLAGS	+= $(call cc-option,-fdata-sections,)
+ endif
+ 
+ ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
+-KBUILD_CFLAGS	+= -Os
++KBUILD_CFLAGS	+= -Os $(call cc-disable-warning,maybe-uninitialized,)
+ else
+ ifdef CONFIG_PROFILE_ALL_BRANCHES
+-KBUILD_CFLAGS	+= -O2
++KBUILD_CFLAGS	+= -O2 $(call cc-disable-warning,maybe-uninitialized,)
+ else
+ KBUILD_CFLAGS   += -O2
+ endif
+ endif
+ 
++KBUILD_CFLAGS += $(call cc-ifversion, -lt, 0409, \
++			$(call cc-disable-warning,maybe-uninitialized,))
++
+ # Tell gcc to never replace conditional load with a non-conditional one
+ KBUILD_CFLAGS	+= $(call cc-option,--param=allow-store-data-races=0)
+ 
+diff --git a/arch/arc/Makefile b/arch/arc/Makefile
+index 864adad..25f81a1 100644
+--- a/arch/arc/Makefile
++++ b/arch/arc/Makefile
+@@ -68,7 +68,9 @@ cflags-$(CONFIG_ARC_DW2_UNWIND)		+= -fasynchronous-unwind-tables $(cfi)
+ ifndef CONFIG_CC_OPTIMIZE_FOR_SIZE
+ # Generic build system uses -O2, we want -O3
+ # Note: No need to add to cflags-y as that happens anyways
+-ARCH_CFLAGS += -O3
++#
++# Disable the false maybe-uninitialized warings gcc spits out at -O3
++ARCH_CFLAGS += -O3 $(call cc-disable-warning,maybe-uninitialized,)
+ endif
+ 
+ # small data is default for elf32 tool-chain. If not usable, disable it
+diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
+index 53449a6..7fc2c5a 100644
+--- a/scripts/Makefile.extrawarn
++++ b/scripts/Makefile.extrawarn
+@@ -36,6 +36,7 @@ warning-2 += -Wshadow
+ warning-2 += $(call cc-option, -Wlogical-op)
+ warning-2 += $(call cc-option, -Wmissing-field-initializers)
+ warning-2 += $(call cc-option, -Wsign-compare)
++warning-2 += $(call cc-option, -Wmaybe-uninitialized)
+ 
+ warning-3 := -Wbad-function-cast
+ warning-3 += -Wcast-qual
+@@ -59,6 +60,8 @@ endif
+ KBUILD_CFLAGS += $(warning)
+ else
+ 
++KBUILD_CFLAGS += $(call cc-disable-warning, maybe-uninitialized)
++
+ ifeq ($(cc-name),clang)
+ KBUILD_CFLAGS += $(call cc-disable-warning, initializer-overrides)
+ KBUILD_CFLAGS += $(call cc-disable-warning, unused-value)
+diff --git a/scripts/Makefile.ubsan b/scripts/Makefile.ubsan
+index dd779c4..3b1b138 100644
+--- a/scripts/Makefile.ubsan
++++ b/scripts/Makefile.ubsan
+@@ -17,4 +17,8 @@ endif
+ ifdef CONFIG_UBSAN_NULL
+       CFLAGS_UBSAN += $(call cc-option, -fsanitize=null)
+ endif
++
++      # -fsanitize=* options makes GCC less smart than usual and
++      # increase number of 'maybe-uninitialized false-positives
++      CFLAGS_UBSAN += $(call cc-option, -Wno-maybe-uninitialized)
+ endif
+-- 
+2.9.0
+
