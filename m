@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.126.135]:50439 "EHLO
+Received: from mout.kundenserver.de ([212.227.126.187]:51312 "EHLO
         mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S935138AbcKJQrZ (ORCPT
+        with ESMTP id S935157AbcKJQqr (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 10 Nov 2016 11:47:25 -0500
+        Thu, 10 Nov 2016 11:46:47 -0500
 From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH v2 08/11] crypto: aesni: shut up -Wmaybe-uninitialized warning
-Date: Thu, 10 Nov 2016 17:44:51 +0100
-Message-Id: <20161110164454.293477-9-arnd@arndb.de>
+Subject: [PATCH v2 06/11] [media] dib0700: fix nec repeat handling
+Date: Thu, 10 Nov 2016 17:44:49 +0100
+Message-Id: <20161110164454.293477-7-arnd@arndb.de>
 In-Reply-To: <20161110164454.293477-1-arnd@arndb.de>
 References: <20161110164454.293477-1-arnd@arndb.de>
 MIME-Version: 1.0
@@ -16,52 +16,52 @@ Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Arnd Bergmann <arnd@arndb.de>, Anna Schumaker <anna.schumaker@netapp.com>, "David S. Miller" <davem@davemloft.net>, Herbert Xu <herbert@gondor.apana.org.au>, Ilya Dryomov <idryomov@gmail.com>, Javier Martinez Canillas <javier@osg.samsung.com>, Jiri Kosina <jikos@kernel.org>, Jonathan Cameron <jic23@kernel.org>, Ley Foon Tan <lftan@altera.com>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Martin Schwidefsky <schwidefsky@de.ibm.com>, Mauro Carvalho Chehab <mchehab@kernel.org>, Michal Marek <mmarek@suse.com>, Russell King <linux@armlinux.org.uk>, Sean Young <sean@mess.org>, Sebastian Ott <sebott@linux.vnet.ibm.com>, Trond Myklebust <trond.myklebust@primarydata.com>, x86@kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-snps-arc@lists.infradead.org, nios2-dev@lists.rocketboards.org, linux-s390@vger.kernel.org, linux-crypto@vger.kernel.org, linux-media@vger.kernel.org, linux-nfs@vger.kernel.org
+Cc: Andrew Morton <akpm@linux-foundation.org>, Arnd Bergmann <arnd@arndb.de>, Anna Schumaker <anna.schumaker@netapp.com>, "David S. Miller" <davem@davemloft.net>, Herbert Xu <herbert@gondor.apana.org.au>, Ilya Dryomov <idryomov@gmail.com>, Javier Martinez Canillas <javier@osg.samsung.com>, Jiri Kosina <jikos@kernel.org>, Jonathan Cameron <jic23@kernel.org>, Ley Foon Tan <lftan@altera.com>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Martin Schwidefsky <schwidefsky@de.ibm.com>, Mauro Carvalho Chehab <mchehab@kernel.org>, Michal Marek <mmarek@suse.com>, Russell King <linux@armlinux.org.uk>, Sean Young <sean@mess.org>, Sebastian Ott <sebott@linux.vnet.ibm.com>, Trond Myklebust <trond.myklebust@primarydata.com>, x86@kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-snps-arc@lists.infradead.org, nios2-dev@lists.rocketboards.org, linux-s390@vger.kernel.org, linux-crypto@vger.kernel.org, linux-media@vger.kernel.org, linux-nfs@vger.kernel.org, stable@vger.kernel.org
 
-The rfc4106 encrypy/decrypt helper functions cause an annoying
-false-positive warning in allmodconfig if we turn on
--Wmaybe-uninitialized warnings again:
+From: Sean Young <sean@mess.org>
 
-arch/x86/crypto/aesni-intel_glue.c: In function ‘helper_rfc4106_decrypt’:
-include/linux/scatterlist.h:67:31: warning: ‘dst_sg_walk.sg’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+When receiving a nec repeat, ensure the correct scancode is repeated
+rather than a random value from the stack. This removes the need
+for the bogus uninitialized_var() and also fixes the warnings:
 
-The problem seems to be that the compiler doesn't track the state of the
-'one_entry_in_sg' variable across the kernel_fpu_begin/kernel_fpu_end
-section.
+    drivers/media/usb/dvb-usb/dib0700_core.c: In function ‘dib0700_rc_urb_completion’:
+    drivers/media/usb/dvb-usb/dib0700_core.c:679: warning: ‘protocol’ may be used uninitialized in this function
 
-This takes the easy way out by adding a bogus initialization, which
-should be harmless enough to get the patch into v4.9 so we can turn
-on this warning again by default without producing useless output.
-A follow-up patch for v4.10 rearranges the code to make the warning
-go away.
+[sean addon: So after writing the patch and submitting it, I've bought the
+             hardware on ebay. Without this patch you get random scancodes
+             on nec repeats, which the patch indeed fixes.]
 
+Signed-off-by: Sean Young <sean@mess.org>
+Tested-by: Sean Young <sean@mess.org>
+Cc: stable@vger.kernel.org
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- arch/x86/crypto/aesni-intel_glue.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/media/usb/dvb-usb/dib0700_core.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
-index 0ab5ee1..aa8b067 100644
---- a/arch/x86/crypto/aesni-intel_glue.c
-+++ b/arch/x86/crypto/aesni-intel_glue.c
-@@ -888,7 +888,7 @@ static int helper_rfc4106_encrypt(struct aead_request *req)
- 	unsigned long auth_tag_len = crypto_aead_authsize(tfm);
- 	u8 iv[16] __attribute__ ((__aligned__(AESNI_ALIGN)));
- 	struct scatter_walk src_sg_walk;
--	struct scatter_walk dst_sg_walk;
-+	struct scatter_walk dst_sg_walk = {};
- 	unsigned int i;
+diff --git a/drivers/media/usb/dvb-usb/dib0700_core.c b/drivers/media/usb/dvb-usb/dib0700_core.c
+index 92d5408..47ce9d5 100644
+--- a/drivers/media/usb/dvb-usb/dib0700_core.c
++++ b/drivers/media/usb/dvb-usb/dib0700_core.c
+@@ -704,7 +704,7 @@ static void dib0700_rc_urb_completion(struct urb *purb)
+ 	struct dvb_usb_device *d = purb->context;
+ 	struct dib0700_rc_response *poll_reply;
+ 	enum rc_type protocol;
+-	u32 uninitialized_var(keycode);
++	u32 keycode;
+ 	u8 toggle;
  
- 	/* Assuming we are supporting rfc4106 64-bit extended */
-@@ -968,7 +968,7 @@ static int helper_rfc4106_decrypt(struct aead_request *req)
- 	u8 iv[16] __attribute__ ((__aligned__(AESNI_ALIGN)));
- 	u8 authTag[16];
- 	struct scatter_walk src_sg_walk;
--	struct scatter_walk dst_sg_walk;
-+	struct scatter_walk dst_sg_walk = {};
- 	unsigned int i;
+ 	deb_info("%s()\n", __func__);
+@@ -745,7 +745,8 @@ static void dib0700_rc_urb_completion(struct urb *purb)
+ 		    poll_reply->nec.data       == 0x00 &&
+ 		    poll_reply->nec.not_data   == 0xff) {
+ 			poll_reply->data_state = 2;
+-			break;
++			rc_repeat(d->rc_dev);
++			goto resubmit;
+ 		}
  
- 	if (unlikely(req->assoclen != 16 && req->assoclen != 20))
+ 		if ((poll_reply->nec.data ^ poll_reply->nec.not_data) != 0xff) {
 -- 
 2.9.0
 
