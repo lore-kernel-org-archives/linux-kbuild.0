@@ -1,68 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f54.google.com ([209.85.215.54]:34311 "EHLO
-        mail-lf0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751664AbcKJIrk (ORCPT
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:33379 "EHLO
+        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754876AbcKJJZE (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 10 Nov 2016 03:47:40 -0500
-Received: by mail-lf0-f54.google.com with SMTP id o141so111783976lff.1
-        for <linux-kbuild@vger.kernel.org>; Thu, 10 Nov 2016 00:47:40 -0800 (PST)
+        Thu, 10 Nov 2016 04:25:04 -0500
+Date: Thu, 10 Nov 2016 10:25:00 +0100
+From: Ingo Molnar <mingo@kernel.org>
+Subject: Re: [PATCH 1/3] kbuild: add -fno-PIE
+Message-ID: <20161110092500.GA24541@gmail.com>
+References: <20161104183940.30692-1-bigeasy@linutronix.de>
+ <20161104183940.30692-2-bigeasy@linutronix.de>
+ <20161108221437.GA9197@sepie.suse.cz>
+ <20161109061041.GA19246@gmail.com>
+ <3cfab3f0-aef9-08a5-894c-06ea381f287b@suse.com>
 MIME-Version: 1.0
-In-Reply-To: <CAAqcGH=zgWkO4LiF5U22v-mpaaY6ZdabkKrkSDtsrkctp2at=Q@mail.gmail.com>
-References: <20161104161407.10354-1-kilobyte@angband.pl> <CAAqcGH=zgWkO4LiF5U22v-mpaaY6ZdabkKrkSDtsrkctp2at=Q@mail.gmail.com>
-From: Riku Voipio <riku.voipio@linaro.org>
-Date: Thu, 10 Nov 2016 10:47:38 +0200
-Message-ID: <CAAqcGHkn2TbyS1e7Aa_wMZEaJ9AYUNnVsM23ZEbogNHyY0cu0Q@mail.gmail.com>
-Subject: Re: [PATCH] builddeb: fix cross-building to arm64 producing host-arch debs
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3cfab3f0-aef9-08a5-894c-06ea381f287b@suse.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Adam Borowski <kilobyte@angband.pl>
-Cc: Michal Marek <mmarek@suse.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, regressions@leemhuis.info
+To: Michal Marek <mmarek@suse.com>
+Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, x86@kernel.org, Al Viro <viro@ZenIV.linux.org.uk>, Ben Hutchings <ben@decadent.org.uk>, Sven Joachim <svenjoac@gmx.de>, "Austin S. Hemmelgarn" <ahferroin7@gmail.com>, Borislav Petkov <bp@alien8.de>
 
-On 10 November 2016 at 10:24, Riku Voipio <riku.voipio@linaro.org> wrote:
-> On 4 November 2016 at 18:14, Adam Borowski <kilobyte@angband.pl> wrote:
->> Both Debian and kernel archs are "arm64" but UTS_MACHINE and gcc say
->> "aarch64".
->
-> I cross-compile arm64 kernels all the time and they come out as arm64.deb.
-> What exact command are you using to build your kernel to see host arch.deb?
 
-OK, I see. UTS_MACHINE use to incorrect, now it has been fixed:
+* Michal Marek <mmarek@suse.com> wrote:
 
-commit cfa88c79462d15098db29edebe623428c3620a4b
-Author: Michal Marek <mmarek@suse.com>
-Date:   Tue Aug 30 10:31:35 2016 +0200
+> >>> +++ b/Makefile
+> >>> @@ -622,6 +622,8 @@ include arch/$(SRCARCH)/Makefile
+> >>>  KBUILD_CFLAGS	+= $(call cc-option,-fno-delete-null-pointer-checks,)
+> >>>  KBUILD_CFLAGS	+= $(call cc-disable-warning,maybe-uninitialized,)
+> >>>  KBUILD_CFLAGS	+= $(call cc-disable-warning,frame-address,)
+> >>> +KBUILD_CFLAGS	+= $(call cc-option,-fno-PIE)
+> >>> +KBUILD_AFLAGS	+= $(call cc-option,-fno-PIE)
+> >>
+> >> Bad compiler. No pie for you.
+> >>
+> >> I applied this one to kbuild.git. How about 2/3 and 3/3. Will these be
+> >> merged via tip.git or shall I apply them as well?
+> > 
+> > I'd suggest applying them to the kbuild tree, as they are related.
+> 
+> OK, done.
 
-    arm64: Set UTS_MACHINE in the Makefile
+Thanks!
 
-But that commit caused regression to builddeb since it wasn't updated
-at the same time.
-
-The patch below is correct fix,
-
-Acked-by: Riku Voipio <riku.voipio@linaro.org>
-
->> ---
->>  scripts/package/builddeb | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
->> index 8ea9fd2..3c575cd0 100755
->> --- a/scripts/package/builddeb
->> +++ b/scripts/package/builddeb
->> @@ -51,7 +51,7 @@ set_debarch() {
->>                 debarch=hppa ;;
->>         mips*)
->>                 debarch=mips$(grep -q CPU_LITTLE_ENDIAN=y $KCONFIG_CONFIG && echo el || true) ;;
->> -       arm64)
->> +       aarch64|arm64)
->>                 debarch=arm64 ;;
->>         arm*)
->>                 if grep -q CONFIG_AEABI=y $KCONFIG_CONFIG; then
->> --
->> 2.10.2
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+	Ingo
