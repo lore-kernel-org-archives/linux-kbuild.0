@@ -1,36 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f43.google.com ([74.125.82.43]:36191 "EHLO
-        mail-wm0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933443AbcKKRI1 (ORCPT
+Received: from mail-yw0-f193.google.com ([209.85.161.193]:33776 "EHLO
+        mail-yw0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S934529AbcKKRNC (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 11 Nov 2016 12:08:27 -0500
-Subject: Re: Kbuild: CC= handling broken for tools/
-References: <2ef7ef23-5b11-a2cf-6205-4313aedddea8@suse.cz>
- <20161111140047.GA13610@krava> <f4fc1e89-bd82-917e-a986-c02b24c6b8d8@suse.cz>
- <20161111151427.GA27779@krava> <20161111153040.o6guxey27qkfzlxs@treble>
-From: Jiri Slaby <jslaby@suse.cz>
-Message-ID: <fb1c54e7-be4d-ba9b-cb2a-1b80c9ce1377@suse.cz>
-Date: Fri, 11 Nov 2016 18:08:24 +0100
+        Fri, 11 Nov 2016 12:13:02 -0500
 MIME-Version: 1.0
-In-Reply-To: <20161111153040.o6guxey27qkfzlxs@treble>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20161110164454.293477-1-arnd@arndb.de>
+References: <20161110164454.293477-1-arnd@arndb.de>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Fri, 11 Nov 2016 09:13:00 -0800
+Message-ID: <CA+55aFx_scFVFKU__TBmoffw_iHvrdAU2dj5u1WKfWJXAkS4QA@mail.gmail.com>
+Subject: Re: [PATCH v2 00/11] getting back -Wmaybe-uninitialized
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Josh Poimboeuf <jpoimboe@redhat.com>, Jiri Olsa <jolsa@redhat.com>
-Cc: Michal Marek <MMarek@suse.com>, linux-kbuild@vger.kernel.org, Linux kernel mailing list <linux-kernel@vger.kernel.org>
+To: Arnd Bergmann <arnd@arndb.de>, Srinivas Kandagatla <srinivas.kandagatla@linaro.org>, sayli karnik <karniksayli1995@gmail.com>, Jonathan Cameron <jic23@kernel.org>, Mark Brown <broonie@kernel.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Anna Schumaker <anna.schumaker@netapp.com>, "David S. Miller" <davem@davemloft.net>, Herbert Xu <herbert@gondor.apana.org.au>, Ilya Dryomov <idryomov@gmail.com>, Javier Martinez Canillas <javier@osg.samsung.com>, Jiri Kosina <jikos@kernel.org>, Ley Foon Tan <lftan@altera.com>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Martin Schwidefsky <schwidefsky@de.ibm.com>, Mauro Carvalho Chehab <mchehab@kernel.org>, Michal Marek <mmarek@suse.com>, Russell King <linux@armlinux.org.uk>, Sean Young <sean@mess.org>, Sebastian Ott <sebott@linux.vnet.ibm.com>, Trond Myklebust <trond.myklebust@primarydata.com>, the arch/x86 maintainers <x86@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, arcml <linux-snps-arc@lists.infradead.org>, nios2-dev@lists.rocketboards.org, linux-s390 <linux-s390@vger.kernel.org>, Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, Linux Media Mailing List <linux-media@vger.kernel.org>, Linux NFS Mailing List <linux-nfs@vger.kernel.org>
 
-On 11/11/2016, 04:30 PM, Josh Poimboeuf wrote:
-> Does it work if you use KCFLAGS instead of EXTRA_CFLAGS?
+On Thu, Nov 10, 2016 at 8:44 AM, Arnd Bergmann <arnd@arndb.de> wrote:
+>
+> Please merge these directly if you are happy with the result.
 
-Yes, the kernel builds with the flags now.
+I will take this.
 
-But objtool is unexpectedly still built by a different compiler.
+I do see two warnings, but they both seem to be valid and recent,
+though, so I have no issues with the spurious cases.
 
-I would also prefer the flags (like the warning above) to be passed even
-when building host commands.
+Warning #1:
 
-thanks,
--- 
-js
-suse labs
+  sound/soc/qcom/lpass-platform.c: In function =E2=80=98lpass_platform_pcmo=
+ps_open=E2=80=99:
+  sound/soc/qcom/lpass-platform.c:83:29: warning: =E2=80=98dma_ch=E2=80=99 =
+may be used
+uninitialized in this function [-Wmaybe-uninitialized]
+    drvdata->substream[dma_ch] =3D substream;
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~
+
+and 'dma_ch' usage there really is crazy and wrong. Broken by
+022d00ee0b55 ("ASoC: lpass-platform: Fix broken pcm data usage")
+
+Warning #2 is not a real bug, but it's reasonable that gcc doesn't
+know that storage_bytes (chip->read_size) has to be 2/4. Again,
+introduced recently by commit 231147ee77f3 ("iio: maxim_thermocouple:
+Align 16 bit big endian value of raw reads"), so you didn't see it.
+
+  drivers/iio/temperature/maxim_thermocouple.c: In function
+=E2=80=98maxim_thermocouple_read_raw=E2=80=99:
+  drivers/iio/temperature/maxim_thermocouple.c:141:5: warning: =E2=80=98ret=
+=E2=80=99
+may be used uninitialized in this function [-Wmaybe-uninitialized]
+    if (ret)
+       ^
+  drivers/iio/temperature/maxim_thermocouple.c:128:6: note: =E2=80=98ret=E2=
+=80=99 was
+declared here
+    int ret;
+        ^~~
+
+and I guess that code can just initialize 'ret' to '-EINVAL' or
+something to just make the theoretical "somehow we had a wrong
+chip->read_size" case error out cleanly.
+
+                Linus
