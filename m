@@ -1,47 +1,108 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.126.130]:54772 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S935010AbcKJQqj (ORCPT
+Received: from alt13.smtp-out.videotron.ca ([135.19.0.26]:23679 "EHLO
+        alt12.smtp-out.videotron.ca" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1751308AbcKKFKc (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 10 Nov 2016 11:46:39 -0500
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH v2 10/11] pcmcia: fix return value of soc_pcmcia_regulator_set
-Date: Thu, 10 Nov 2016 17:44:53 +0100
-Message-Id: <20161110164454.293477-11-arnd@arndb.de>
-In-Reply-To: <20161110164454.293477-1-arnd@arndb.de>
-References: <20161110164454.293477-1-arnd@arndb.de>
+        Fri, 11 Nov 2016 00:10:32 -0500
+From: Nicolas Pitre <nicolas.pitre@linaro.org>
+Subject: [PATCH v4 4/6] timer: move sys_alarm from timer.c to itimer.c
+Date: Fri, 11 Nov 2016 00:10:08 -0500
+Message-Id: <1478841010-28605-5-git-send-email-nicolas.pitre@linaro.org>
+In-Reply-To: <1478841010-28605-1-git-send-email-nicolas.pitre@linaro.org>
+References: <1478841010-28605-1-git-send-email-nicolas.pitre@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Arnd Bergmann <arnd@arndb.de>, Anna Schumaker <anna.schumaker@netapp.com>, "David S. Miller" <davem@davemloft.net>, Herbert Xu <herbert@gondor.apana.org.au>, Ilya Dryomov <idryomov@gmail.com>, Javier Martinez Canillas <javier@osg.samsung.com>, Jiri Kosina <jikos@kernel.org>, Jonathan Cameron <jic23@kernel.org>, Ley Foon Tan <lftan@altera.com>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Martin Schwidefsky <schwidefsky@de.ibm.com>, Mauro Carvalho Chehab <mchehab@kernel.org>, Michal Marek <mmarek@suse.com>, Russell King <linux@armlinux.org.uk>, Sean Young <sean@mess.org>, Sebastian Ott <sebott@linux.vnet.ibm.com>, Trond Myklebust <trond.myklebust@primarydata.com>, x86@kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-snps-arc@lists.infradead.org, nios2-dev@lists.rocketboards.org, linux-s390@vger.kernel.org, linux-crypto@vger.kernel.org, linux-media@vger.kernel.org, linux-nfs@vger.kernel.org
+To: John Stultz <john.stultz@linaro.org>, Michal Marek <mmarek@suse.com>
+Cc: Richard Cochran <richardcochran@gmail.com>, Paul Bolle <pebolle@tiscali.nl>, Thomas Gleixner <tglx@linutronix.de>, Josh Triplett <josh@joshtriplett.org>, Edward Cree <ecree@solarflare.com>, netdev@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-The newly introduced soc_pcmcia_regulator_set() function sometimes returns
-without setting its return code, as shown by this warning:
+Move the only user of alarm_setitimer to itimer.c where it is defined.
+This allows for making alarm_setitimer static, and dropping it from the
+build when __ARCH_WANT_SYS_ALARM is not defined.
 
-drivers/pcmcia/soc_common.c: In function 'soc_pcmcia_regulator_set':
-drivers/pcmcia/soc_common.c:112:5: error: 'ret' may be used uninitialized in this function [-Werror=maybe-uninitialized]
-
-This changes it to propagate the regulator_disable() result instead.
-
-Fixes: ac61b6001a63 ("pcmcia: soc_common: add support for Vcc and Vpp regulators")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Signed-off-by: Nicolas Pitre <nico@linaro.org>
 ---
- drivers/pcmcia/soc_common.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/linux/time.h |  2 --
+ kernel/time/itimer.c | 15 ++++++++++++++-
+ kernel/time/timer.c  | 13 -------------
+ 3 files changed, 14 insertions(+), 16 deletions(-)
 
-diff --git a/drivers/pcmcia/soc_common.c b/drivers/pcmcia/soc_common.c
-index 153f312..b6b316d 100644
---- a/drivers/pcmcia/soc_common.c
-+++ b/drivers/pcmcia/soc_common.c
-@@ -107,7 +107,7 @@ int soc_pcmcia_regulator_set(struct soc_pcmcia_socket *skt,
+diff --git a/include/linux/time.h b/include/linux/time.h
+index 4cea09d942..23f0f5ce30 100644
+--- a/include/linux/time.h
++++ b/include/linux/time.h
+@@ -172,8 +172,6 @@ extern int do_setitimer(int which, struct itimerval *value,
+ 			struct itimerval *ovalue);
+ extern int do_getitimer(int which, struct itimerval *value);
  
- 		ret = regulator_enable(r->reg);
- 	} else {
--		regulator_disable(r->reg);
-+		ret = regulator_disable(r->reg);
- 	}
- 	if (ret == 0)
- 		r->on = on;
+-extern unsigned int alarm_setitimer(unsigned int seconds);
+-
+ extern long do_utimes(int dfd, const char __user *filename, struct timespec *times, int flags);
+ 
+ struct tms;
+diff --git a/kernel/time/itimer.c b/kernel/time/itimer.c
+index 1d5c7204dd..2b9f45bc95 100644
+--- a/kernel/time/itimer.c
++++ b/kernel/time/itimer.c
+@@ -238,6 +238,8 @@ int do_setitimer(int which, struct itimerval *value, struct itimerval *ovalue)
+ 	return 0;
+ }
+ 
++#ifdef __ARCH_WANT_SYS_ALARM
++
+ /**
+  * alarm_setitimer - set alarm in seconds
+  *
+@@ -250,7 +252,7 @@ int do_setitimer(int which, struct itimerval *value, struct itimerval *ovalue)
+  * On 32 bit machines the seconds value is limited to (INT_MAX/2) to avoid
+  * negative timeval settings which would cause immediate expiry.
+  */
+-unsigned int alarm_setitimer(unsigned int seconds)
++static unsigned int alarm_setitimer(unsigned int seconds)
+ {
+ 	struct itimerval it_new, it_old;
+ 
+@@ -275,6 +277,17 @@ unsigned int alarm_setitimer(unsigned int seconds)
+ 	return it_old.it_value.tv_sec;
+ }
+ 
++/*
++ * For backwards compatibility?  This can be done in libc so Alpha
++ * and all newer ports shouldn't need it.
++ */
++SYSCALL_DEFINE1(alarm, unsigned int, seconds)
++{
++	return alarm_setitimer(seconds);
++}
++
++#endif
++
+ SYSCALL_DEFINE3(setitimer, int, which, struct itimerval __user *, value,
+ 		struct itimerval __user *, ovalue)
+ {
+diff --git a/kernel/time/timer.c b/kernel/time/timer.c
+index 2d47980a1b..3ed6c67e17 100644
+--- a/kernel/time/timer.c
++++ b/kernel/time/timer.c
+@@ -1662,19 +1662,6 @@ void run_local_timers(void)
+ 	raise_softirq(TIMER_SOFTIRQ);
+ }
+ 
+-#ifdef __ARCH_WANT_SYS_ALARM
+-
+-/*
+- * For backwards compatibility?  This can be done in libc so Alpha
+- * and all newer ports shouldn't need it.
+- */
+-SYSCALL_DEFINE1(alarm, unsigned int, seconds)
+-{
+-	return alarm_setitimer(seconds);
+-}
+-
+-#endif
+-
+ static void process_timeout(unsigned long __data)
+ {
+ 	wake_up_process((struct task_struct *)__data);
 -- 
-2.9.0
+2.7.4
 
