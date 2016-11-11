@@ -1,65 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-yw0-f193.google.com ([209.85.161.193]:33776 "EHLO
-        mail-yw0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S934529AbcKKRNC (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 11 Nov 2016 12:13:02 -0500
+Received: from mx1.redhat.com ([209.132.183.28]:60416 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S934861AbcKKRVS (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 11 Nov 2016 12:21:18 -0500
+Date: Fri, 11 Nov 2016 11:21:16 -0600
+From: Josh Poimboeuf <jpoimboe@redhat.com>
+Subject: Re: Kbuild: CC= handling broken for tools/
+Message-ID: <20161111172116.2kti4pdkqu6bjpvy@treble>
+References: <2ef7ef23-5b11-a2cf-6205-4313aedddea8@suse.cz>
+ <20161111140047.GA13610@krava>
+ <f4fc1e89-bd82-917e-a986-c02b24c6b8d8@suse.cz>
+ <20161111151427.GA27779@krava>
+ <20161111153040.o6guxey27qkfzlxs@treble>
+ <fb1c54e7-be4d-ba9b-cb2a-1b80c9ce1377@suse.cz>
 MIME-Version: 1.0
-In-Reply-To: <20161110164454.293477-1-arnd@arndb.de>
-References: <20161110164454.293477-1-arnd@arndb.de>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Fri, 11 Nov 2016 09:13:00 -0800
-Message-ID: <CA+55aFx_scFVFKU__TBmoffw_iHvrdAU2dj5u1WKfWJXAkS4QA@mail.gmail.com>
-Subject: Re: [PATCH v2 00/11] getting back -Wmaybe-uninitialized
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <fb1c54e7-be4d-ba9b-cb2a-1b80c9ce1377@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>, Srinivas Kandagatla <srinivas.kandagatla@linaro.org>, sayli karnik <karniksayli1995@gmail.com>, Jonathan Cameron <jic23@kernel.org>, Mark Brown <broonie@kernel.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Anna Schumaker <anna.schumaker@netapp.com>, "David S. Miller" <davem@davemloft.net>, Herbert Xu <herbert@gondor.apana.org.au>, Ilya Dryomov <idryomov@gmail.com>, Javier Martinez Canillas <javier@osg.samsung.com>, Jiri Kosina <jikos@kernel.org>, Ley Foon Tan <lftan@altera.com>, "Luis R . Rodriguez" <mcgrof@kernel.org>, Martin Schwidefsky <schwidefsky@de.ibm.com>, Mauro Carvalho Chehab <mchehab@kernel.org>, Michal Marek <mmarek@suse.com>, Russell King <linux@armlinux.org.uk>, Sean Young <sean@mess.org>, Sebastian Ott <sebott@linux.vnet.ibm.com>, Trond Myklebust <trond.myklebust@primarydata.com>, the arch/x86 maintainers <x86@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, arcml <linux-snps-arc@lists.infradead.org>, nios2-dev@lists.rocketboards.org, linux-s390 <linux-s390@vger.kernel.org>, Linux Crypto Mailing List <linux-crypto@vger.kernel.org>, Linux Media Mailing List <linux-media@vger.kernel.org>, Linux NFS Mailing List <linux-nfs@vger.kernel.org>
+To: Jiri Slaby <jslaby@suse.cz>
+Cc: Jiri Olsa <jolsa@redhat.com>, Michal Marek <MMarek@suse.com>, linux-kbuild@vger.kernel.org, Linux kernel mailing list <linux-kernel@vger.kernel.org>
 
-On Thu, Nov 10, 2016 at 8:44 AM, Arnd Bergmann <arnd@arndb.de> wrote:
->
-> Please merge these directly if you are happy with the result.
+On Fri, Nov 11, 2016 at 06:08:24PM +0100, Jiri Slaby wrote:
+> On 11/11/2016, 04:30 PM, Josh Poimboeuf wrote:
+> > Does it work if you use KCFLAGS instead of EXTRA_CFLAGS?
+> 
+> Yes, the kernel builds with the flags now.
+> 
+> But objtool is unexpectedly still built by a different compiler.
+> 
+> I would also prefer the flags (like the warning above) to be passed even
+> when building host commands.
 
-I will take this.
+In that case, if you want to build *everything* in tools and kernel with
+the new compiler and new flags, I think you'll need to set HOSTCC,
+HOSTCFLAGS, and CFLAGS, in addition to CC and KCFLAGS.
 
-I do see two warnings, but they both seem to be valid and recent,
-though, so I have no issues with the spurious cases.
+objtool uses the host compiler, but it doesn't support setting HOSTCC or
+HOSTCFLAGS yet.  It always just uses 'gcc'.  I'll add HOSTCC/HOSTCFLAGS
+to the TODO list, though feel free to work up a patch.
 
-Warning #1:
-
-  sound/soc/qcom/lpass-platform.c: In function =E2=80=98lpass_platform_pcmo=
-ps_open=E2=80=99:
-  sound/soc/qcom/lpass-platform.c:83:29: warning: =E2=80=98dma_ch=E2=80=99 =
-may be used
-uninitialized in this function [-Wmaybe-uninitialized]
-    drvdata->substream[dma_ch] =3D substream;
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~
-
-and 'dma_ch' usage there really is crazy and wrong. Broken by
-022d00ee0b55 ("ASoC: lpass-platform: Fix broken pcm data usage")
-
-Warning #2 is not a real bug, but it's reasonable that gcc doesn't
-know that storage_bytes (chip->read_size) has to be 2/4. Again,
-introduced recently by commit 231147ee77f3 ("iio: maxim_thermocouple:
-Align 16 bit big endian value of raw reads"), so you didn't see it.
-
-  drivers/iio/temperature/maxim_thermocouple.c: In function
-=E2=80=98maxim_thermocouple_read_raw=E2=80=99:
-  drivers/iio/temperature/maxim_thermocouple.c:141:5: warning: =E2=80=98ret=
-=E2=80=99
-may be used uninitialized in this function [-Wmaybe-uninitialized]
-    if (ret)
-       ^
-  drivers/iio/temperature/maxim_thermocouple.c:128:6: note: =E2=80=98ret=E2=
-=80=99 was
-declared here
-    int ret;
-        ^~~
-
-and I guess that code can just initialize 'ret' to '-EINVAL' or
-something to just make the theoretical "somehow we had a wrong
-chip->read_size" case error out cleanly.
-
-                Linus
+-- 
+Josh
