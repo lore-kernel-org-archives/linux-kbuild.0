@@ -1,44 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:56372 "EHLO mx2.suse.de"
+Received: from mx1.redhat.com ([209.132.183.28]:48140 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1754107AbcKKMiC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 11 Nov 2016 07:38:02 -0500
+        id S1756324AbcKKOAv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 11 Nov 2016 09:00:51 -0500
+Date: Fri, 11 Nov 2016 15:00:47 +0100
+From: Jiri Olsa <jolsa@redhat.com>
 Subject: Re: Kbuild: CC= handling broken for tools/
+Message-ID: <20161111140047.GA13610@krava>
 References: <2ef7ef23-5b11-a2cf-6205-4313aedddea8@suse.cz>
-From: Michal Marek <mmarek@suse.com>
-Message-ID: <5c27c380-d6c7-ac55-d081-057023a85071@suse.com>
-Date: Fri, 11 Nov 2016 13:38:00 +0100
 MIME-Version: 1.0
-In-Reply-To: <2ef7ef23-5b11-a2cf-6205-4313aedddea8@suse.cz>
 Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <2ef7ef23-5b11-a2cf-6205-4313aedddea8@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Jiri Slaby <jslaby@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, Linux kernel mailing list <linux-kernel@vger.kernel.org>, Jiri Olsa <jolsa@redhat.com>
+Cc: Michal Marek <MMarek@suse.com>, linux-kbuild@vger.kernel.org, Linux kernel mailing list <linux-kernel@vger.kernel.org>
 
-On 2016-11-11 12:23, Jiri Slaby wrote:
+On Fri, Nov 11, 2016 at 12:23:25PM +0100, Jiri Slaby wrote:
 > Hi,
 > 
 > I am trying a new gcc with new warnings enabled:
 > 
 > make O=../a/gcc7/ CC='gcc-7' V=1 kernel/exit.o
 > EXTRA_CFLAGS='-Wimplicit-fallthrough=3'
-
-Note that EXTRA_CFLAGS is a makefile variable read by both kbuild and
-tools/build apparently.
-
 > 
 > But the build fails when building under tools/:
-[...]
+> ...
+> make -f /home/latest/linux/tools/build/Makefile.build dir=. obj=fixdep
+>   gcc
+> -Wp,-MD,/home/latest/a/gcc7/tools/objtool/.exec-cmd.o.d,-MT,/home/latest/a/gcc7/tools/objtool/exec-cmd.o
+> -Wbad-function-cast -Wdeclaration-after-statement -Wformat-security
+> -Wformat-y2k -Winit-self -Wmissing-declarations -Wmissing-prototypes
+> -Wnested-externs -Wno-system-headers -Wold-style-definition -Wpacked
+> -Wredundant-decls -Wshadow -Wstrict-aliasing=3 -Wstrict-prototypes
+> -Wswitch-default -Wswitch-enum -Wundef -Wwrite-strings -Wformat
+> -Wimplicit-fallthrough=3 -ggdb3 -Wall -Wextra -std=gnu99 -O6
+> -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2 -fPIC -Werror
+> -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE
+> -I/home/latest/linux/tools/include/ -I/home/latest/linux/include/uapi
+> -I/home/latest/linux/include -D"BUILD_STR(s)=#s"   -c -o
+> /home/latest/a/gcc7/tools/objtool/exec-cmd.o exec-cmd.c
 > gcc: error: unrecognized command line option ‘-Wimplicit-fallthrough=3’;
 > did you mean ‘-Wno-fallthrough’?
 > 
 > 
 > Apparently, CC is not respected for tools/ dir.
+> 
+> Well, it is used (tools/build/Makefile.build):
+> # Compile command
+> quiet_cmd_cc_o_c = CC       $@
+>       cmd_cc_o_c = $(CC) $(c_flags) -c -o $@ $<
+> 
+> 
+> But I don't know why CFLAGS propagate from Makefile to tools/, but CC
+> doesn't (both are exported)? Any ideas?
 
-Jiri can better explain the behavior of the tools/ Makefiles, but if you
-want to use extra flags for kernel compilation, you should be using the
-KCFLAGS variable (see Documentation/kbuild/kbuild.txt).
+so the root Makefile assign CC directly:
+  CC              = $(CROSS_COMPILE)gcc
 
-Michal
+we are trying to be a little bit smarter in perf
+and set it only if it's not set by user
+
+# Allow setting CC and AR and LD, or setting CROSS_COMPILE as a prefix.
+$(call allow-override,CC,$(CROSS_COMPILE)gcc)
+$(call allow-override,AR,$(CROSS_COMPILE)ar)
+$(call allow-override,LD,$(CROSS_COMPILE)ld)
+
+I did not check the other tools..
+
+thanks,
+jirka
