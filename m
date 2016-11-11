@@ -1,64 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from tartarus.angband.pl ([89.206.35.136]:39324 "EHLO
-        tartarus.angband.pl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755879AbcKKI60 (ORCPT
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:36551 "EHLO
+        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753256AbcKKLX2 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 11 Nov 2016 03:58:26 -0500
-From: Adam Borowski <kilobyte@angband.pl>
-Date: Fri, 11 Nov 2016 09:55:57 +0100
-Message-Id: <20161111085557.13424-1-kilobyte@angband.pl>
-In-Reply-To: <CAAqcGHmx-CNLqwDDBS31rB1GC2TikW101sNbfAseNzV5CcxLQQ@mail.gmail.com>
-References: <CAAqcGHmx-CNLqwDDBS31rB1GC2TikW101sNbfAseNzV5CcxLQQ@mail.gmail.com>
-Subject: [PATCH reworded] builddeb: fix cross-building to arm64 producing host-arch debs
+        Fri, 11 Nov 2016 06:23:28 -0500
+From: Jiri Slaby <jslaby@suse.cz>
+Subject: Kbuild: CC= handling broken for tools/
+Message-ID: <2ef7ef23-5b11-a2cf-6205-4313aedddea8@suse.cz>
+Date: Fri, 11 Nov 2016 12:23:25 +0100
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, Riku Voipio <riku.voipio@linaro.org>
-Cc: Adam Borowski <kilobyte@angband.pl>
+To: Michal Marek <MMarek@suse.com>, linux-kbuild@vger.kernel.org, Linux kernel mailing list <linux-kernel@vger.kernel.org>
 
-Both Debian and kernel archs are "arm64" but UTS_MACHINE and gcc say
-"aarch64".  Recognizing just the latter should be enough but let's
-accept both in case something regresses again or an user sets
-UTS_MACHINE=arm64.
+Hi,
 
-Regressed in cfa88c7: arm64: Set UTS_MACHINE in the Makefile.
+I am trying a new gcc with new warnings enabled:
 
-Signed-off-by: Adam Borowski <kilobyte@angband.pl>
-Acked-by: Riku Voipio <riku.voipio@linaro.org>
----
- scripts/package/builddeb | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+make O=../a/gcc7/ CC='gcc-7' V=1 kernel/exit.o
+EXTRA_CFLAGS='-Wimplicit-fallthrough=3'
 
-diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index 8ea9fd2..3c575cd0 100755
---- a/scripts/package/builddeb
-+++ b/scripts/package/builddeb
-@@ -51,7 +51,7 @@ set_debarch() {
- 		debarch=hppa ;;
- 	mips*)
- 		debarch=mips$(grep -q CPU_LITTLE_ENDIAN=y $KCONFIG_CONFIG && echo el || true) ;;
--	arm64)
-+	aarch64|arm64)
- 		debarch=arm64 ;;
- 	arm*)
- 		if grep -q CONFIG_AEABI=y $KCONFIG_CONFIG; then
+But the build fails when building under tools/:
+...
+make -f /home/latest/linux/tools/build/Makefile.build dir=. obj=fixdep
+  gcc
+-Wp,-MD,/home/latest/a/gcc7/tools/objtool/.exec-cmd.o.d,-MT,/home/latest/a/gcc7/tools/objtool/exec-cmd.o
+-Wbad-function-cast -Wdeclaration-after-statement -Wformat-security
+-Wformat-y2k -Winit-self -Wmissing-declarations -Wmissing-prototypes
+-Wnested-externs -Wno-system-headers -Wold-style-definition -Wpacked
+-Wredundant-decls -Wshadow -Wstrict-aliasing=3 -Wstrict-prototypes
+-Wswitch-default -Wswitch-enum -Wundef -Wwrite-strings -Wformat
+-Wimplicit-fallthrough=3 -ggdb3 -Wall -Wextra -std=gnu99 -O6
+-U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2 -fPIC -Werror
+-D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=64 -D_GNU_SOURCE
+-I/home/latest/linux/tools/include/ -I/home/latest/linux/include/uapi
+-I/home/latest/linux/include -D"BUILD_STR(s)=#s"   -c -o
+/home/latest/a/gcc7/tools/objtool/exec-cmd.o exec-cmd.c
+gcc: error: unrecognized command line option ‘-Wimplicit-fallthrough=3’;
+did you mean ‘-Wno-fallthrough’?
+
+
+Apparently, CC is not respected for tools/ dir.
+
+Well, it is used (tools/build/Makefile.build):
+# Compile command
+quiet_cmd_cc_o_c = CC       $@
+      cmd_cc_o_c = $(CC) $(c_flags) -c -o $@ $<
+
+
+But I don't know why CFLAGS propagate from Makefile to tools/, but CC
+doesn't (both are exported)? Any ideas?
+
+thanks,
 -- 
-2.10.2
-
-Riku Voipio wrote:
-> On 10 November 2016 at 13:04, Michal Marek <mmarek@suse.com> wrote:
-> >
-> > UTS_MACHINE is now always aarch64 on this architecture, so maybe stop
-> matching "arm64" to avoid confusion?
->
-> I was wondering if it might makes sense to keep the arm64 around for a
-> while, for example if someone reverts the UTS_MACHINE setting patch
-> from arch/arm64 for unrelated reasons and still tries to build a deb.
-> But I guess that's a corner case, and it's indeed cleaner without the
-> arm64 bit. So either way works for me.
-
-I think that it's better to be liberal in what you accept, especially for
-something an user might want to override.  It's up to you guys to decide,
-though.
-
-Here's a version with no changes but the commit message extended to mention
-cfa88c7 and "aarch64" being sufficient.
+js
+suse labs
