@@ -1,57 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:34497 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750776AbcKOQIN (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 15 Nov 2016 11:08:13 -0500
-Date: Tue, 15 Nov 2016 17:08:09 +0100
-From: Michal Marek <mmarek@suse.com>
-Subject: Re: [PATCH -v1.1] kbuild: Steal gcc's pie from the very beginning
-Message-ID: <20161115160809.GA18830@sepie.suse.cz>
-References: <20161114185130.30641-1-bp@alien8.de>
- <20161114201457.qsevfvn465otwfvz@linutronix.de>
- <20161114204529.sqn6z2bockmhxpfz@pd.tnic>
+Received: from mail-wm0-f45.google.com ([74.125.82.45]:36991 "EHLO
+        mail-wm0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752194AbcKOWlk (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 15 Nov 2016 17:41:40 -0500
+Received: by mail-wm0-f45.google.com with SMTP id t79so31661633wmt.0
+        for <linux-kbuild@vger.kernel.org>; Tue, 15 Nov 2016 14:41:40 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20161114204529.sqn6z2bockmhxpfz@pd.tnic>
+In-Reply-To: <70eb7a4c-be31-3fdd-a5b4-8075b29b3b38@au1.ibm.com>
+References: <20160626173451.c8406cd0c7a87cc3f94d9753@gmail.com> <70eb7a4c-be31-3fdd-a5b4-8075b29b3b38@au1.ibm.com>
+From: Kees Cook <keescook@chromium.org>
+Date: Tue, 15 Nov 2016 14:41:38 -0800
+Message-ID: <CAGXu5j+8=3Vxm52Y2QbkDiCPx5X6DWemPO7B=2kj2EdVQpLHpA@mail.gmail.com>
+Subject: Re: [kernel-hardening] [PATCH] powerpc/kernel: Disable the latent
+ entropy plugin unconditionally
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Borislav Petkov <bp@alien8.de>
-Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, linux-kbuild@vger.kernel.org, Ben Hutchings <ben@decadent.org.uk>, x86-ml <x86@kernel.org>, lkml <linux-kernel@vger.kernel.org>, +@pd.tnic
+To: Andrew Donnellan <andrew.donnellan@au1.ibm.com>
+Cc: "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, Michal Marek <mmarek@suse.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, PaX Team <pageexec@freemail.hu>, linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, Michael Ellerman <mpe@ellerman.id.au>
 
-On Mon, Nov 14, 2016 at 09:45:29PM +0100, Borislav Petkov wrote:
-> From: Borislav Petkov <bp@suse.de>
-> Date: Mon, 14 Nov 2016 19:41:31 +0100
-> Subject: [PATCH] kbuild: Steal gcc's pie from the very beginning
-> 
-> So Sebastian turned off the PIE for kernel builds but that was too late
-> - Kbuild.include already uses KBUILD_CFLAGS and trying to disable gcc
-> options with, say cc-disable-warning, fails:
-> 
->   gcc -D__KERNEL__ -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs
->   ...
->   -Wno-sign-compare -fno-asynchronous-unwind-tables -Wframe-address -c -x c /dev/null -o .31392.tmp
->   /dev/null:1:0: error: code model kernel does not support PIC mode
-> 
-> because that returns an error and we can't disable the warning. For
-> example in this case:
-> 
-> KBUILD_CFLAGS   += $(call cc-disable-warning,frame-address,)
-> 
-> which leads to gcc issuing all those warnings again.
-> 
-> So let's turn off PIE/PIC at the earliest possible moment, when we
-> declare KBUILD_CFLAGS so that cc-disable-warning picks it up too.
-> 
-> Also, we need the $(call cc-option ...) because -fno-PIE is supported
-> since gcc v3.4 and our lowest supported gcc version is 3.2 right now.
-> 
-> Signed-off-by: Borislav Petkov <bp@suse.de>
-> Cc: stable@vger.kernel.org
-> Cc: Ben Hutchings <ben@decadent.org.uk>
-> Cc: Michal Marek <mmarek@suse.com>
-> Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+On Tue, Nov 1, 2016 at 10:06 PM, Andrew Donnellan
+<andrew.donnellan@au1.ibm.com> wrote:
+> On 27/06/16 01:34, Emese Revfy wrote:
+>>
+>>
+>> Reported-by: PaX Team <pageexec@freemail.hu>
+>> Signed-off-by: Emese Revfy <re.emese@gmail.com>
+>> ---
+>>  arch/powerpc/kernel/Makefile | 3 ++-
+>>  1 file changed, 2 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/arch/powerpc/kernel/Makefile b/arch/powerpc/kernel/Makefile
+>> index 01935b8..e9ef44f 100644
+>> --- a/arch/powerpc/kernel/Makefile
+>> +++ b/arch/powerpc/kernel/Makefile
+>> @@ -14,11 +14,12 @@ CFLAGS_prom_init.o      += -fPIC
+>>  CFLAGS_btext.o         += -fPIC
+>>  endif
+>>
+>> -ifdef CONFIG_FUNCTION_TRACER
+>>  CFLAGS_cputable.o += $(DISABLE_LATENT_ENTROPY_PLUGIN)
+>>  CFLAGS_init.o += $(DISABLE_LATENT_ENTROPY_PLUGIN)
+>
+>
+> I think you meant prom_init.o...
+>
+> Additionally, DISABLE_LATENT_ENTROPY_PLUGIN is conditioned on
+> CONFIG_PAX_LATENT_ENTROPY rather than CONFIG_GCC_PLUGIN_LATENT_ENTROPY, so
+> it doesn't get exported correctly.
+>
+> Will submit fixes along with patches to enable plugins on powerpc once I get
+> that sorted.
+>
+> (In future please remember to cc linuxppc-dev.)
 
-Thanks, applied to kbuild.git#rc-fixes.
+Just checking in: did these patches materialize? I'd love to see
+plugins working on v4.10 for ppc.
 
-Michal
+-Kees
+
+-- 
+Kees Cook
+Nexus Security
