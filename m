@@ -1,47 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from prv-mh.provo.novell.com ([137.65.248.74]:58797 "EHLO
-        prv-mh.provo.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755689AbcKOPqA (ORCPT
-        <rfc822;groupwise-linux-kbuild@vger.kernel.org:2:1>);
-        Tue, 15 Nov 2016 10:46:00 -0500
-Message-Id: <582B3BC5020000780011EF53@prv-mh.provo.novell.com>
-Date: Tue, 15 Nov 2016 08:45:57 -0700
-From: "Jan Beulich" <JBeulich@suse.com>
-Subject: [PATCH] modpost: treat undefined CRC symbols as absent
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8BIT
+Received: from mx2.suse.de ([195.135.220.15]:34497 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750776AbcKOQIN (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 15 Nov 2016 11:08:13 -0500
+Date: Tue, 15 Nov 2016 17:08:09 +0100
+From: Michal Marek <mmarek@suse.com>
+Subject: Re: [PATCH -v1.1] kbuild: Steal gcc's pie from the very beginning
+Message-ID: <20161115160809.GA18830@sepie.suse.cz>
+References: <20161114185130.30641-1-bp@alien8.de>
+ <20161114201457.qsevfvn465otwfvz@linutronix.de>
+ <20161114204529.sqn6z2bockmhxpfz@pd.tnic>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20161114204529.sqn6z2bockmhxpfz@pd.tnic>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.de>
-Cc: linux-kbuild@vger.kernel.org
+To: Borislav Petkov <bp@alien8.de>
+Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, linux-kbuild@vger.kernel.org, Ben Hutchings <ben@decadent.org.uk>, x86-ml <x86@kernel.org>, lkml <linux-kernel@vger.kernel.org>, +@pd.tnic
 
-Apparently dependent on binutils version, undefined CRC symbols may or
-may not make it into the final binary's symbol table. Treat undefined
-ones as absent instead of as having value zero.
+On Mon, Nov 14, 2016 at 09:45:29PM +0100, Borislav Petkov wrote:
+> From: Borislav Petkov <bp@suse.de>
+> Date: Mon, 14 Nov 2016 19:41:31 +0100
+> Subject: [PATCH] kbuild: Steal gcc's pie from the very beginning
+> 
+> So Sebastian turned off the PIE for kernel builds but that was too late
+> - Kbuild.include already uses KBUILD_CFLAGS and trying to disable gcc
+> options with, say cc-disable-warning, fails:
+> 
+>   gcc -D__KERNEL__ -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs
+>   ...
+>   -Wno-sign-compare -fno-asynchronous-unwind-tables -Wframe-address -c -x c /dev/null -o .31392.tmp
+>   /dev/null:1:0: error: code model kernel does not support PIC mode
+> 
+> because that returns an error and we can't disable the warning. For
+> example in this case:
+> 
+> KBUILD_CFLAGS   += $(call cc-disable-warning,frame-address,)
+> 
+> which leads to gcc issuing all those warnings again.
+> 
+> So let's turn off PIE/PIC at the earliest possible moment, when we
+> declare KBUILD_CFLAGS so that cc-disable-warning picks it up too.
+> 
+> Also, we need the $(call cc-option ...) because -fno-PIE is supported
+> since gcc v3.4 and our lowest supported gcc version is 3.2 right now.
+> 
+> Signed-off-by: Borislav Petkov <bp@suse.de>
+> Cc: stable@vger.kernel.org
+> Cc: Ben Hutchings <ben@decadent.org.uk>
+> Cc: Michal Marek <mmarek@suse.com>
+> Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 
-Signed-off-by: Jan Beulich <jbeulich@suse.com>
----
-I've only noticed this with the recent switch to exporting symbols
-defined in assembly files from their source files, as that has caused
-a number of such symbols to appear.
----
- scripts/mod/modpost.c |    3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Thanks, applied to kbuild.git#rc-fixes.
 
---- 4.9-rc5/scripts/mod/modpost.c
-+++ 4.9-rc5-ignore-undef-CRC/scripts/mod/modpost.c
-@@ -617,7 +617,8 @@ static void handle_modversions(struct mo
- 		export = export_from_sec(info, get_secindex(info, sym));
- 
- 	/* CRC'd symbol */
--	if (strncmp(symname, CRC_PFX, strlen(CRC_PFX)) == 0) {
-+	if (sym->st_shndx != SHN_UNDEF &&
-+	    strncmp(symname, CRC_PFX, strlen(CRC_PFX)) == 0) {
- 		crc = (unsigned int) sym->st_value;
- 		sym_update_crc(symname + strlen(CRC_PFX), mod, crc,
- 				export);
-
-
-
+Michal
