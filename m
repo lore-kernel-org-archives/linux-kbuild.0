@@ -1,63 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:38469 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932297AbcKNUpp (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 14 Nov 2016 15:45:45 -0500
-Subject: Re: [PATCH] kbuild: Steal gcc's pie from the very beginning
-References: <20161114185130.30641-1-bp@alien8.de>
-From: Michal Marek <mmarek@suse.com>
-Message-ID: <40122b67-52d7-e133-c119-172c2e1f43b0@suse.com>
-Date: Mon, 14 Nov 2016 21:45:42 +0100
-MIME-Version: 1.0
-In-Reply-To: <20161114185130.30641-1-bp@alien8.de>
-Content-Type: text/plain; charset=iso-8859-2
-Content-Transfer-Encoding: 7bit
+Received: from prv-mh.provo.novell.com ([137.65.248.74]:58797 "EHLO
+        prv-mh.provo.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755689AbcKOPqA (ORCPT
+        <rfc822;groupwise-linux-kbuild@vger.kernel.org:2:1>);
+        Tue, 15 Nov 2016 10:46:00 -0500
+Message-Id: <582B3BC5020000780011EF53@prv-mh.provo.novell.com>
+Date: Tue, 15 Nov 2016 08:45:57 -0700
+From: "Jan Beulich" <JBeulich@suse.com>
+Subject: [PATCH] modpost: treat undefined CRC symbols as absent
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8BIT
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Borislav Petkov <bp@alien8.de>, linux-kbuild@vger.kernel.org
-Cc: Ben Hutchings <ben@decadent.org.uk>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Michal Marek <mmarek@suse.de>
+Cc: linux-kbuild@vger.kernel.org
 
-Dne 14.11.2016 v 19:51 Borislav Petkov napsal(a):
-> From: Borislav Petkov <bp@suse.de>
-> 
-> So Sebastian turned off the PIE for kernel builds but that was too late
-> - Kbuild.include already uses KBUILD_CFLAGS and trying to disable gcc
-> options with, say cc-disable-warning, fails:
-> 
->   gcc -D__KERNEL__ -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs
->   ...
->   -Wno-sign-compare -fno-asynchronous-unwind-tables -Wframe-address -c -x c /dev/null -o .31392.tmp
->   /dev/null:1:0: error: code model kernel does not support PIC mode
-> 
-> because that returns an error and we can't disable the warning. For
-> example in this case:
-> 
-> KBUILD_CFLAGS   += $(call cc-disable-warning,frame-address,)
-> 
-> which leads to gcc issuing all those warnings again.
-> 
-> So let's turn off PIE/PIC at the earliest possible moment, when we
-> declare KBUILD_CFLAGS so that cc-disable-warning picks it up too.
-> 
-> Signed-off-by: Borislav Petkov <bp@suse.de>
-> Cc: Ben Hutchings <ben@decadent.org.uk>
-> Cc: Michal Marek <mmarek@suse.com>
-> Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-> ---
->  Makefile | 7 +++----
->  1 file changed, 3 insertions(+), 4 deletions(-)
-> 
-> diff --git a/Makefile b/Makefile
-> index 3ff1fb26d8b2..5558cc5b1505 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -399,11 +399,12 @@ KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
->  		   -fno-strict-aliasing -fno-common \
->  		   -Werror-implicit-function-declaration \
->  		   -Wno-format-security \
-> -		   -std=gnu89
-> +		   -std=gnu89 -fno-PIE
+Apparently dependent on binutils version, undefined CRC symbols may or
+may not make it into the final binary's symbol table. Treat undefined
+ones as absent instead of as having value zero.
 
-Please use the cc-option variant, otherwise good catch.
+Signed-off-by: Jan Beulich <jbeulich@suse.com>
+---
+I've only noticed this with the recent switch to exporting symbols
+defined in assembly files from their source files, as that has caused
+a number of such symbols to appear.
+---
+ scripts/mod/modpost.c |    3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Michal
+--- 4.9-rc5/scripts/mod/modpost.c
++++ 4.9-rc5-ignore-undef-CRC/scripts/mod/modpost.c
+@@ -617,7 +617,8 @@ static void handle_modversions(struct mo
+ 		export = export_from_sec(info, get_secindex(info, sym));
+ 
+ 	/* CRC'd symbol */
+-	if (strncmp(symname, CRC_PFX, strlen(CRC_PFX)) == 0) {
++	if (sym->st_shndx != SHN_UNDEF &&
++	    strncmp(symname, CRC_PFX, strlen(CRC_PFX)) == 0) {
+ 		crc = (unsigned int) sym->st_value;
+ 		sym_update_crc(symname + strlen(CRC_PFX), mod, crc,
+ 				export);
+
+
+
