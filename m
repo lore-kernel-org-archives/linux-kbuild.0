@@ -1,47 +1,182 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi0-f48.google.com ([209.85.218.48]:33063 "EHLO
-        mail-oi0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751951AbcKPAsS (ORCPT
+Received: from mail-it0-f67.google.com ([209.85.214.67]:34648 "EHLO
+        mail-it0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752097AbcKPQbm (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 15 Nov 2016 19:48:18 -0500
-Received: by mail-oi0-f48.google.com with SMTP id 128so44738218oih.0
-        for <linux-kbuild@vger.kernel.org>; Tue, 15 Nov 2016 16:48:18 -0800 (PST)
+        Wed, 16 Nov 2016 11:31:42 -0500
 MIME-Version: 1.0
-In-Reply-To: <1478841010-28605-7-git-send-email-nicolas.pitre@linaro.org>
-References: <1478841010-28605-1-git-send-email-nicolas.pitre@linaro.org> <1478841010-28605-7-git-send-email-nicolas.pitre@linaro.org>
-From: John Stultz <john.stultz@linaro.org>
-Date: Tue, 15 Nov 2016 16:48:17 -0800
-Message-ID: <CALAqxLW2KE8FwTzPJDhTA3x1gKTfoaCH5Vw=ZPr8tp3Y1VsD4A@mail.gmail.com>
-Subject: Re: [PATCH v4 6/6] posix-timers: make it configurable
+In-Reply-To: <20161114024749.25488-2-andrew.donnellan@au1.ibm.com>
+References: <20161114024749.25488-1-andrew.donnellan@au1.ibm.com> <20161114024749.25488-2-andrew.donnellan@au1.ibm.com>
+From: Jim Davis <jim.epost@gmail.com>
+Date: Wed, 16 Nov 2016 09:31:41 -0700
+Message-ID: <CA+r1ZhhB+vThR0io8NMGvB42Gyu+fp7QjwhR=una__C8hZ=bnA@mail.gmail.com>
+Subject: Re: [PATCH RESEND 2/2] builddeb: allow building without
+ headers/firmware packages
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicolas Pitre <nicolas.pitre@linaro.org>
-Cc: Michal Marek <mmarek@suse.com>, Richard Cochran <richardcochran@gmail.com>, Paul Bolle <pebolle@tiscali.nl>, Thomas Gleixner <tglx@linutronix.de>, Josh Triplett <josh@joshtriplett.org>, Edward Cree <ecree@solarflare.com>, netdev@vger.kernel.org, linux-kbuild@vger.kernel.org, lkml <linux-kernel@vger.kernel.org>
+To: Andrew Donnellan <andrew.donnellan@au1.ibm.com>
+Cc: Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, linux-kernel <linux-kernel@vger.kernel.org>
 
-On Thu, Nov 10, 2016 at 9:10 PM, Nicolas Pitre <nicolas.pitre@linaro.org> wrote:
-> Some embedded systems have no use for them.  This removes about
-> 25KB from the kernel binary size when configured out.
+On Sun, Nov 13, 2016 at 7:47 PM, Andrew Donnellan
+<andrew.donnellan@au1.ibm.com> wrote:
+> Currently, the deb-pkg and bindeb-pkg targets create multiple packages for
+> the kernel binaries, headers, userspace headers and firmware.
 >
-> Corresponding syscalls are routed to a stub logging the attempt to
-> use those syscalls which should be enough of a clue if they were
-> disabled without proper consideration. They are: timer_create,
-> timer_gettime: timer_getoverrun, timer_settime, timer_delete,
-> clock_adjtime, setitimer, getitimer, alarm.
+> For developers who generate Debian packages as part of their development
+> workflows, it's often not necessary to generate all these packages.
 >
-> The clock_settime, clock_gettime, clock_getres and clock_nanosleep
-> syscalls are replaced by simple wrappers compatible with CLOCK_REALTIME,
-> CLOCK_MONOTONIC and CLOCK_BOOTTIME only which should cover the vast
-> majority of use cases with very little code.
+> Allow the creation of the linux-headers, linux-libc-dev and linux-firmware
+> packages to be disabled if the environment variables KDEB_NO_HEADERS,
+> KDEB_NO_LIBC_HEADERS or KDEB_NO_FIRMWARE are non-empty.
 >
-> Signed-off-by: Nicolas Pitre <nico@linaro.org>
-> Reviewed-by: Josh Triplett <josh@joshtriplett.org>
-> Acked-by: Richard Cochran <richardcochran@gmail.com>
-> Acked-by: Thomas Gleixner <tglx@linutronix.de>
+> Signed-off-by: Andrew Donnellan <andrew.donnellan@au1.ibm.com>
+> ---
+>  Documentation/kbuild/kbuild.txt |  7 +++++
+>  scripts/package/builddeb        | 67 ++++++++++++++++++++++++-----------------
+>  2 files changed, 46 insertions(+), 28 deletions(-)
+>
+> diff --git a/Documentation/kbuild/kbuild.txt b/Documentation/kbuild/kbuild.txt
+> index 0ff6a46..cef4f7f 100644
+> --- a/Documentation/kbuild/kbuild.txt
+> +++ b/Documentation/kbuild/kbuild.txt
+> @@ -238,3 +238,10 @@ KBUILD_VMLINUX_MAIN
+>  All object files for the main part of vmlinux.
+>  KBUILD_VMLINUX_INIT and KBUILD_VMLINUX_MAIN together specify
+>  all the object files used to link vmlinux.
+> +
+> +KDEB_NO_HEADERS, KDEB_NO_LIBC_HEADERS, KDEB_NO_FIRMWARE
+> +-------------------------------------------------------
+> +If these variables are set, the deb-pkg and bindeb-pkg targets won't create
+> +linux-headers, linux-libc-dev and linux-firmware packages respectively. This
+> +may be useful for developers who use the deb-pkg targets in their workflow
+> +but don't need the full set of packages.
+> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+> index d600fd0..da595da 100755
+> --- a/scripts/package/builddeb
+> +++ b/scripts/package/builddeb
+> @@ -187,7 +187,9 @@ fi
+>
+>  if [ "$ARCH" != "um" ]; then
+>         $MAKE headers_check KBUILD_SRC=
+> -       $MAKE headers_install KBUILD_SRC= INSTALL_HDR_PATH="$libc_headers_dir/usr"
+> +       if [ -z "$KDEB_NO_LIBC_HEADERS" ]; then
+> +               $MAKE headers_install KBUILD_SRC= INSTALL_HDR_PATH="$libc_headers_dir/usr"
+> +       fi
+>  fi
+>
+>  # Install the maintainer scripts
+> @@ -324,26 +326,27 @@ EOF
+>  fi
+>
+>  # Build kernel header package
+> -(cd $srctree; find . -name Makefile\* -o -name Kconfig\* -o -name \*.pl) > "$objtree/debian/hdrsrcfiles"
+> -(cd $srctree; find arch/*/include include scripts -type f) >> "$objtree/debian/hdrsrcfiles"
+> -(cd $srctree; find arch/$SRCARCH -name module.lds -o -name Kbuild.platforms -o -name Platform) >> "$objtree/debian/hdrsrcfiles"
+> -(cd $srctree; find $(find arch/$SRCARCH -name include -o -name scripts -type d) -type f) >> "$objtree/debian/hdrsrcfiles"
+> -if grep -q '^CONFIG_STACK_VALIDATION=y' $KCONFIG_CONFIG ; then
+> -       (cd $objtree; find tools/objtool -type f -executable) >> "$objtree/debian/hdrobjfiles"
+> -fi
+> -(cd $objtree; find arch/$SRCARCH/include Module.symvers include scripts -type f) >> "$objtree/debian/hdrobjfiles"
+> -if grep -q '^CONFIG_GCC_PLUGINS=y' $KCONFIG_CONFIG ; then
+> -       (cd $objtree; find scripts/gcc-plugins -name \*.so -o -name gcc-common.h) >> "$objtree/debian/hdrobjfiles"
+> -fi
+> -destdir=$kernel_headers_dir/usr/src/linux-headers-$version
+> -mkdir -p "$destdir"
+> -(cd $srctree; tar -c -f - -T -) < "$objtree/debian/hdrsrcfiles" | (cd $destdir; tar -xf -)
+> -(cd $objtree; tar -c -f - -T -) < "$objtree/debian/hdrobjfiles" | (cd $destdir; tar -xf -)
+> -(cd $objtree; cp $KCONFIG_CONFIG $destdir/.config) # copy .config manually to be where it's expected to be
+> -ln -sf "/usr/src/linux-headers-$version" "$kernel_headers_dir/lib/modules/$version/build"
+> -rm -f "$objtree/debian/hdrsrcfiles" "$objtree/debian/hdrobjfiles"
+> +if [ -z "$KDEB_NO_HEADERS" ]; then
+> +       (cd $srctree; find . -name Makefile\* -o -name Kconfig\* -o -name \*.pl) > "$objtree/debian/hdrsrcfiles"
+> +       (cd $srctree; find arch/*/include include scripts -type f) >> "$objtree/debian/hdrsrcfiles"
+> +       (cd $srctree; find arch/$SRCARCH -name module.lds -o -name Kbuild.platforms -o -name Platform) >> "$objtree/debian/hdrsrcfiles"
+> +       (cd $srctree; find $(find arch/$SRCARCH -name include -o -name scripts -type d) -type f) >> "$objtree/debian/hdrsrcfiles"
+> +       if grep -q '^CONFIG_STACK_VALIDATION=y' $KCONFIG_CONFIG ; then
+> +               (cd $objtree; find tools/objtool -type f -executable) >> "$objtree/debian/hdrobjfiles"
+> +       fi
+> +       (cd $objtree; find arch/$SRCARCH/include Module.symvers include scripts -type f) >> "$objtree/debian/hdrobjfiles"
+> +       if grep -q '^CONFIG_GCC_PLUGINS=y' $KCONFIG_CONFIG ; then
+> +               (cd $objtree; find scripts/gcc-plugins -name \*.so -o -name gcc-common.h) >> "$objtree/debian/hdrobjfiles"
+> +       fi
+> +       destdir=$kernel_headers_dir/usr/src/linux-headers-$version
+> +       mkdir -p "$destdir"
+> +       (cd $srctree; tar -c -f - -T -) < "$objtree/debian/hdrsrcfiles" | (cd $destdir; tar -xf -)
+> +       (cd $objtree; tar -c -f - -T -) < "$objtree/debian/hdrobjfiles" | (cd $destdir; tar -xf -)
+> +       (cd $objtree; cp $KCONFIG_CONFIG $destdir/.config) # copy .config manually to be where it's expected to be
+> +       ln -sf "/usr/src/linux-headers-$version" "$kernel_headers_dir/lib/modules/$version/build"
+> +       rm -f "$objtree/debian/hdrsrcfiles" "$objtree/debian/hdrobjfiles"
+>
+> -cat <<EOF >> debian/control
+> +       cat <<EOF >> debian/control
+>
+>  Package: $kernel_headers_packagename
+>  Provides: linux-headers, linux-headers-2.6
+> @@ -353,13 +356,13 @@ Description: Linux kernel headers for $KERNELRELEASE on \${kernel:debarch}
+>   .
+>   This is useful for people who need to build external modules
+>  EOF
+> +fi
+>
+>  # Do we have firmware? Move it out of the way and build it into a package.
+>  if [ -e "$tmpdir/lib/firmware" ]; then
+> -       mv "$tmpdir/lib/firmware"/* "$fwdir/lib/firmware/$version/"
+> -       rmdir "$tmpdir/lib/firmware"
+> -
+> -       cat <<EOF >> debian/control
+> +       if [ -z "$KDEB_NO_FIRMWARE" ]; then
+> +               mv "$tmpdir/lib/firmware"/* "$fwdir/lib/firmware/$version/"
+> +               cat <<EOF >> debian/control
+>
+>  Package: $fwpackagename
+>  Architecture: all
+> @@ -367,10 +370,13 @@ Description: Linux kernel firmware, version $version
+>   This package contains firmware from the Linux kernel, version $version.
+>  EOF
+>
+> -       create_package "$fwpackagename" "$fwdir"
+> +               create_package "$fwpackagename" "$fwdir"
+> +       fi
+> +       rm -r "$tmpdir/lib/firmware"
+>  fi
+>
+> -cat <<EOF >> debian/control
+> +if [ -z "$KDEB_NO_LIBC_HEADERS" ]; then
+> +       cat <<EOF >> debian/control
+>
+>  Package: $libc_headers_packagename
+>  Section: devel
+> @@ -380,10 +386,15 @@ Description: Linux support headers for userspace development
+>   This package provides userspaces headers from the Linux kernel.  These headers
+>   are used by the installed headers for GNU glibc and other system libraries.
+>  EOF
+> +fi
+>
+>  if [ "$ARCH" != "um" ]; then
+> -       create_package "$kernel_headers_packagename" "$kernel_headers_dir"
+> -       create_package "$libc_headers_packagename" "$libc_headers_dir"
+> +       if [ -z "$KDEB_NO_HEADERS" ]; then
+> +               create_package "$kernel_headers_packagename" "$kernel_headers_dir"
+> +       fi
+> +       if [ -z "$KDEB_NO_LIBC_HEADERS" ]; then
+> +               create_package "$libc_headers_packagename" "$libc_headers_dir"
+> +       fi
+>  fi
+>
+>  create_package "$packagename" "$tmpdir"
+> --
+> Andrew Donnellan              OzLabs, ADL Canberra
+> andrew.donnellan@au1.ibm.com  IBM Australia Limited
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Ok.. ran the series through the kselftest/timers series and the results look ok.
+Worked fine with Ubuntu 16.04, and it's nice speedup.
 
-Acked-by: John Stultz <john.stultz@linaro.org>
+Tested-by: Jim Davis <jim.epost@gmail.com>
 
-thanks
--john
+-- 
+Jim
