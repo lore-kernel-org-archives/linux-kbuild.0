@@ -1,79 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pandora.armlinux.org.uk ([78.32.30.218]:43066 "EHLO
-        pandora.armlinux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752857AbcKTTNN (ORCPT
+Received: from mail-pg0-f67.google.com ([74.125.83.67]:36125 "EHLO
+        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750744AbcKUFt7 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 20 Nov 2016 14:13:13 -0500
-Date: Sun, 20 Nov 2016 19:12:57 +0000
-From: Russell King - ARM Linux <linux@armlinux.org.uk>
-Subject: Re: [PATCH 1/2] kbuild: provide include/asm/asm-prototypes.h for ARM
-Message-ID: <20161120191257.GX1041@n2100.armlinux.org.uk>
-References: <20161017065131.GA27863@angband.pl>
- <20161020150814.42951f61@roar.ozlabs.ibm.com>
- <3446653.W8FbGAKSeQ@wuerfel>
- <14534456.e6dv16VA3R@wuerfel>
- <20161025193200.1f4d9e24@roar.ozlabs.ibm.com>
- <20161120132127.GU1041@n2100.armlinux.org.uk>
- <CA+55aFxh=F77vDAG0Ta9p7Fxf8-b4nCSv1ewfY6ikx3X42zwkA@mail.gmail.com>
+        Mon, 21 Nov 2016 00:49:59 -0500
+Date: Mon, 21 Nov 2016 16:49:40 +1100
+From: Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: 'kbuild' merge before 4.9-rc1 breaks build and boot
+Message-ID: <20161121164940.33b555ea@roar.ozlabs.ibm.com>
+In-Reply-To: <20161120182623.GA1988@al>
+References: <4c04b846-3da8-dc42-4fa6-30f72a5c2437@hartkopp.net>
+        <20161027154202.GE27017@al>
+        <alpine.DEB.2.20.1611071408040.24418@macbook-air>
+        <20161107213907.GB18092@al>
+        <20161108123334.3df2dcc9@roar.ozlabs.ibm.com>
+        <20161120182623.GA1988@al>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CA+55aFxh=F77vDAG0Ta9p7Fxf8-b4nCSv1ewfY6ikx3X42zwkA@mail.gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Nicholas Piggin <npiggin@gmail.com>, Arnd Bergmann <arnd@arndb.de>, Michal Marek <mmarek@suse.com>, Adam Borowski <kilobyte@angband.pl>, Omar Sandoval <osandov@osandov.com>, Alexey Dobriyan <adobriyan@gmail.com>, Stephen Rothwell <sfr@canb.auug.org.au>, Al Viro <viro@zeniv.linux.org.uk>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>
+To: Peter Wu <peter@lekensteyn.nl>
+Cc: Vince Weaver <vincent.weaver@maine.edu>, Michal Marek <mmarek@suse.com>, Al Viro <viro@zeniv.linux.org.uk>, Oliver Hartkopp <socketcan@hartkopp.net>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org, regressions@leemhuis.info, Adam Borowski <kilobyte@angband.pl>
 
-On Sun, Nov 20, 2016 at 10:32:50AM -0800, Linus Torvalds wrote:
-> On Sun, Nov 20, 2016 at 5:21 AM, Russell King - ARM Linux
-> <linux@armlinux.org.uk> wrote:
-> > On Tue, Oct 25, 2016 at 07:32:00PM +1100, Nicholas Piggin wrote:
-> >>
-> >> Michal, what's your thoughts? If you merge my patch 2/2 and skip 1/2, it
-> >> should not give any new build warnings or errors, so then arch patches can
-> >> go via arch trees. 1/2 could go in after everyone is up to date.
-> >
-> > So what's the conclusion on this?  I've just had a failure due to
-> > CONFIG_TRIM_UNUSED_KSYMS reported on ARM, and it looks like (at
-> > least some of) patch 1 could resolve it.
+On Sun, 20 Nov 2016 19:26:23 +0100
+Peter Wu <peter@lekensteyn.nl> wrote:
+
+> Hi Nicholas,
 > 
-> Hmm. I've got
+> Current git master (v4.9-rc5-364-g77079b1) with the latest kbuild fixes
+> is still failing to load modules when built with CONFIG_MODVERSIONS=y on
+> x86_64 using GCC 6.2.1.
 > 
->   cc6acc11cad1 kbuild: be more careful about matching preprocessed asm
-> ___EXPORT_SYMBOL
->   4efca4ed05cb kbuild: modversions for EXPORT_SYMBOL() for asm
+> It can still be reproduced with make defconfig, then enabling
+> CONFIG_MODVERSIONS=y. The build output contains:
 > 
-> in my tree. Is that sufficient, or do we still have issues?
+>     WARNING: "memcpy" [net/netfilter/nf_nat.ko] has no CRC!
+>     WARNING: "memmove" [net/netfilter/nf_nat.ko] has no CRC!
+>     WARNING: "_copy_to_user" [fs/efivarfs/efivarfs.ko] has no CRC!
+>     WARNING: "memcpy" [fs/efivarfs/efivarfs.ko] has no CRC!
+>     WARNING: "_copy_from_user" [fs/efivarfs/efivarfs.ko] has no CRC!
 
-Hmm, those seem to have gone in during the last week, so I haven't
-tested it yet (build running, but it'll take a while).  However, I
-don't think they'll solve _this_ problem.
+Hi Peter,
 
-Some of the issue here is that we use a mixture of assembly macros
-and preprocessor for the ARM bitops - the ARM bitops are created
-with an assembly macro which contains some pre-processor expanded
-macros (eg, EXPORT_SYMBOL()).
+Sorry it's taken some time, bear with us. The arch specific patches need
+to be merged now. Adam, what is the status of your patch? Please submit
+to x86 maintainers if you haven't already.
 
-This means that the actual symbol being exported is not known to
-the preprocessor, so doing the "__is_defined(__KSYM_##sym)" inside
-"EXPORT_SYMBOL(\name)" becomes "__is_defined(__KSYM_\name)" to the
-preprocessor.  As "__KSYM_\name" is never defined, it always comes
-out as zero, hence we always use __cond_export_sym_0, which omits
-the symbol export from the assembly macro definition:
-
- .macro bitop, name, instr
-.globl \name ; .align 0 ; \name:
-
-...
-
-.type \name, %function; .size \name, .-\name
-
- .endm
-
-In other words, using preprocessor macros inside an assembly macro
-may not work as expected, and now leads to config-specific failures.
-
--- 
-RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
-FTTC broadband for 0.8mile line: currently at 9.6Mbps down 400kbps up
-according to speedtest.net.
+Thanks,
+Nick
