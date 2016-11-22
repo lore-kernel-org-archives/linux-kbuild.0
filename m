@@ -1,45 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:44153 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:44375 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1755528AbcKVVfj (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 22 Nov 2016 16:35:39 -0500
+        id S934321AbcKVVfl (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 22 Nov 2016 16:35:41 -0500
 From: Michal Marek <mmarek@suse.com>
-Subject: [PATCH 6/6] deb-pkg: Remove the KBUILD_IMAGE workaround
-Date: Tue, 22 Nov 2016 22:34:34 +0100
-Message-Id: <20161122213434.14788-6-mmarek@suse.com>
+Subject: [PATCH 5/6] unicore32: Use full path in KBUILD_IMAGE definition
+Date: Tue, 22 Nov 2016 22:34:33 +0100
+Message-Id: <20161122213434.14788-5-mmarek@suse.com>
 In-Reply-To: <20161122213434.14788-1-mmarek@suse.com>
 References: <20161122213434.14788-1-mmarek@suse.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Guan Xuetao <gxt@mprc.pku.edu.cn>
 
-The arch Makefile are fixed to set KBUILD_IMAGE to the full patch, so
-the workaround is no longer needed.
+The KBUILD_IMAGE variable is used by the rpm and deb-pkg targets, which
+expect it to point to the image file in the build directory. The
+builddeb script has a workaround for architectures which only provide
+the basename, but let's provide a clean interface for packaging tools.
 
+Cc: Guan Xuetao <gxt@mprc.pku.edu.cn>
 Signed-off-by: Michal Marek <mmarek@suse.com>
 ---
- scripts/package/builddeb | 7 +------
- 1 file changed, 1 insertion(+), 6 deletions(-)
+ arch/unicore32/Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index 8ea9fd2b6573..dab997343f1a 100755
---- a/scripts/package/builddeb
-+++ b/scripts/package/builddeb
-@@ -143,12 +143,7 @@ else
- 	cp System.map "$tmpdir/boot/System.map-$version"
- 	cp $KCONFIG_CONFIG "$tmpdir/boot/config-$version"
- fi
--# Not all arches include the boot path in KBUILD_IMAGE
--if [ -e $KBUILD_IMAGE ]; then
--	cp $KBUILD_IMAGE "$tmpdir/$installed_image_path"
--else
--	cp arch/$ARCH/boot/$KBUILD_IMAGE "$tmpdir/$installed_image_path"
--fi
-+cp "$($MAKE -s image_name)" "$tmpdir/$installed_image_path"
+diff --git a/arch/unicore32/Makefile b/arch/unicore32/Makefile
+index b6f5c4c1eaf9..98a5ca43ae87 100644
+--- a/arch/unicore32/Makefile
++++ b/arch/unicore32/Makefile
+@@ -43,9 +43,9 @@ boot			:= arch/unicore32/boot
  
- if grep -q "^CONFIG_OF=y" $KCONFIG_CONFIG ; then
- 	# Only some architectures with OF support have this target
+ # Default defconfig and target when executing plain make
+ KBUILD_DEFCONFIG	:= $(ARCH)_defconfig
+-KBUILD_IMAGE		:= zImage
++KBUILD_IMAGE		:= $(boot)/zImage
+ 
+-all:	$(KBUILD_IMAGE)
++all:	zImage
+ 
+ zImage Image uImage: vmlinux
+ 	$(Q)$(MAKE) $(build)=$(boot) $(boot)/$@
 -- 
 2.10.0
 
