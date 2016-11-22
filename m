@@ -1,256 +1,98 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:54283 "EHLO
-        metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1755513AbcKVIac (ORCPT
+Received: from mout.kundenserver.de ([212.227.17.10]:55592 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752526AbcKVLGm (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 22 Nov 2016 03:30:32 -0500
-From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <uwe@kleine-koenig.org>
-Subject: [PATCH] make use of make variable CURDIR instead of calling pwd
-Date: Tue, 22 Nov 2016 09:30:26 +0100
-Message-Id: <20161122083026.6345-1-uwe@kleine-koenig.org>
+        Tue, 22 Nov 2016 06:06:42 -0500
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH 1/2] kbuild: provide include/asm/asm-prototypes.h for ARM
+Date: Tue, 22 Nov 2016 12:05:40 +0100
+Message-Id: <20161122110557.1533467-1-arnd@arndb.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>
-Cc: kernel@pengutronix.de, linux-kbuild@vger.kernel.org, =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
+To: Russell King <linux@armlinux.org.uk>
+Cc: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <uwe@kleine-koenig.org>, Nicolas Pitre <nico@linaro.org>, linux-arm-kernel@lists.infradead.org, Nicholas Piggin <npiggin@gmail.com>, viro@zeniv.linux.org.uk, linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org, regressions@leemhuis.info, Arnd Bergmann <arnd@arndb.de>, linux-kernel@vger.kernel.org
 
-From: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+This adds an asm/asm-prototypes.h header for ARM to fix the broken symbol
+versioning for symbols exported from assembler files.
 
-make already provides the current working directory in a variable, so make
-use of it instead of forking a shell. Also replace usage of PWD by
-CURDIR. PWD is provided by most shells, but not all, so this makes the
-build system more robust.
+I couldn't find the correct prototypes for the compiler builtins,
+so I went with the fake 'void f(void)' prototypes that we had
+before, restoring the state before they were moved.
 
-Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+Originally I assumed that the problem was just a harmless warning
+in unusual configurations, but as Uwe found, we actually need this
+to load most modules when symbol versioning is enabled, as it is
+in many distro kernels.
+
+Cc: Uwe Kleine-König <uwe@kleine-koenig.org>
+Fixes: 4dd1837d7589 ("arm: move exports to definitions")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
-Hello,
+Compared to the earlier version, I dropped the changes to the
+csumpartial files, which now get handled correctly by Kbuild
+even when the export comes from a macro, and I also dropped the
+changes to the bitops files, which were already fixed in a
+patch from Nico.
 
-BTW, the comment "set up PWD so that older versions of make will work
-with our build." in tools/power/cpupower/Makefile is wrong. PWD is a
-variable provided by most modern shells, so it has nothing to do with
-old make.
+The patch applies cleanly on top of the rmk/fixes tree but has
+no effect there, as it also needs 4efca4ed05cb ("kbuild: modversions
+for EXPORT_SYMBOL() for asm") and cc6acc11cad1 ("kbuild: be more
+careful about matching preprocessed asm ___EXPORT_SYMBOL").
 
-I don't know where to send this patch, so I picked the kbuild entry from
-MAINTAINERS as best match. If you think there is a better alternative or
-this patch needs splitting, please tell me.
-
-Best regards
-Uwe
+With the combination of rmk/fixes, torvalds/master and these two
+patches, symbol versioning works again on ARM. As it is still
+broken on almost all other architectures (powerpc is fixed,
+x86 has a patch), I wonder if we should make CONFIG_MODVERSIONS
+as broken for everything else.
 ---
- samples/bpf/Makefile                       | 4 ++--
- samples/connector/Makefile                 | 2 +-
- tools/build/Makefile                       | 2 +-
- tools/gpio/Makefile                        | 2 +-
- tools/lib/api/Makefile                     | 2 +-
- tools/lib/bpf/Makefile                     | 2 +-
- tools/lib/lockdep/Makefile                 | 2 +-
- tools/lib/subcmd/Makefile                  | 2 +-
- tools/lib/traceevent/Makefile              | 2 +-
- tools/objtool/Makefile                     | 4 ++--
- tools/perf/Makefile.perf                   | 2 +-
- tools/perf/tests/make                      | 2 +-
- tools/power/cpupower/Makefile              | 3 ---
- tools/power/cpupower/debug/kernel/Makefile | 3 +--
- 14 files changed, 15 insertions(+), 19 deletions(-)
+ arch/arm/include/asm/asm-prototypes.h | 34 ++++++++++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
+ create mode 100644 arch/arm/include/asm/asm-prototypes.h
 
-diff --git a/samples/bpf/Makefile b/samples/bpf/Makefile
-index 12b7304d55dc..b1e322860a7f 100644
---- a/samples/bpf/Makefile
-+++ b/samples/bpf/Makefile
-@@ -119,10 +119,10 @@ CLANG ?= clang
- 
- # Trick to allow make to be run from this directory
- all:
--	$(MAKE) -C ../../ $$PWD/
-+	$(MAKE) -C ../../ $(CURDIR)/
- 
- clean:
--	$(MAKE) -C ../../ M=$$PWD clean
-+	$(MAKE) -C ../../ M=$(CURDIR) clean
- 	@rm -f *~
- 
- # Verify LLVM compiler tools are available and bpf target is supported by llc
-diff --git a/samples/connector/Makefile b/samples/connector/Makefile
-index 04b9622b6f51..91762d946a53 100644
---- a/samples/connector/Makefile
-+++ b/samples/connector/Makefile
-@@ -13,4 +13,4 @@ HOSTCFLAGS_ucon.o += -I$(objtree)/usr/include
- all: modules
- 
- modules clean:
--	$(MAKE) -C ../.. SUBDIRS=$(PWD) $@
-+	$(MAKE) -C ../.. SUBDIRS=$(CURDIR) $@
-diff --git a/tools/build/Makefile b/tools/build/Makefile
-index 8332959fbca4..aaf7ed329a45 100644
---- a/tools/build/Makefile
-+++ b/tools/build/Makefile
-@@ -1,5 +1,5 @@
- ifeq ($(srctree),)
--srctree := $(patsubst %/,%,$(dir $(shell pwd)))
-+srctree := $(patsubst %/,%,$(dir $(CURDIR)))
- srctree := $(patsubst %/,%,$(dir $(srctree)))
- endif
- 
-diff --git a/tools/gpio/Makefile b/tools/gpio/Makefile
-index 250a891e6ef0..b4401536cfa9 100644
---- a/tools/gpio/Makefile
-+++ b/tools/gpio/Makefile
-@@ -3,7 +3,7 @@ include ../scripts/Makefile.include
- bindir ?= /usr/bin
- 
- ifeq ($(srctree),)
--srctree := $(patsubst %/,%,$(dir $(shell pwd)))
-+srctree := $(patsubst %/,%,$(dir $(CURDIR)))
- srctree := $(patsubst %/,%,$(dir $(srctree)))
- endif
- 
-diff --git a/tools/lib/api/Makefile b/tools/lib/api/Makefile
-index 0a6fda9837f7..adba83b325d5 100644
---- a/tools/lib/api/Makefile
-+++ b/tools/lib/api/Makefile
-@@ -2,7 +2,7 @@ include ../../scripts/Makefile.include
- include ../../scripts/utilities.mak		# QUIET_CLEAN
- 
- ifeq ($(srctree),)
--srctree := $(patsubst %/,%,$(dir $(shell pwd)))
-+srctree := $(patsubst %/,%,$(dir $(CURDIR)))
- srctree := $(patsubst %/,%,$(dir $(srctree)))
- srctree := $(patsubst %/,%,$(dir $(srctree)))
- #$(info Determined 'srctree' to be $(srctree))
-diff --git a/tools/lib/bpf/Makefile b/tools/lib/bpf/Makefile
-index 62d89d50fcbd..e2efddf10231 100644
---- a/tools/lib/bpf/Makefile
-+++ b/tools/lib/bpf/Makefile
-@@ -7,7 +7,7 @@ BPF_EXTRAVERSION = 1
- MAKEFLAGS += --no-print-directory
- 
- ifeq ($(srctree),)
--srctree := $(patsubst %/,%,$(dir $(shell pwd)))
-+srctree := $(patsubst %/,%,$(dir $(CURDIR)))
- srctree := $(patsubst %/,%,$(dir $(srctree)))
- srctree := $(patsubst %/,%,$(dir $(srctree)))
- #$(info Determined 'srctree' to be $(srctree))
-diff --git a/tools/lib/lockdep/Makefile b/tools/lib/lockdep/Makefile
-index 1d57af56814b..3bc0ef9f8923 100644
---- a/tools/lib/lockdep/Makefile
-+++ b/tools/lib/lockdep/Makefile
-@@ -50,7 +50,7 @@ ifndef VERBOSE
- endif
- 
- ifeq ($(srctree),)
--srctree := $(patsubst %/,%,$(dir $(shell pwd)))
-+srctree := $(patsubst %/,%,$(dir $(CURDIR)))
- srctree := $(patsubst %/,%,$(dir $(srctree)))
- srctree := $(patsubst %/,%,$(dir $(srctree)))
- #$(info Determined 'srctree' to be $(srctree))
-diff --git a/tools/lib/subcmd/Makefile b/tools/lib/subcmd/Makefile
-index ce4b7e527566..3f8cc44a0dbd 100644
---- a/tools/lib/subcmd/Makefile
-+++ b/tools/lib/subcmd/Makefile
-@@ -2,7 +2,7 @@ include ../../scripts/Makefile.include
- include ../../scripts/utilities.mak		# QUIET_CLEAN
- 
- ifeq ($(srctree),)
--srctree := $(patsubst %/,%,$(dir $(shell pwd)))
-+srctree := $(patsubst %/,%,$(dir $(CURDIR)))
- srctree := $(patsubst %/,%,$(dir $(srctree)))
- srctree := $(patsubst %/,%,$(dir $(srctree)))
- #$(info Determined 'srctree' to be $(srctree))
-diff --git a/tools/lib/traceevent/Makefile b/tools/lib/traceevent/Makefile
-index 7851df1490e0..938f73cec20d 100644
---- a/tools/lib/traceevent/Makefile
-+++ b/tools/lib/traceevent/Makefile
-@@ -86,7 +86,7 @@ ifndef VERBOSE
- endif
- 
- ifeq ($(srctree),)
--srctree := $(patsubst %/,%,$(dir $(shell pwd)))
-+srctree := $(patsubst %/,%,$(dir $(CURDIR)))
- srctree := $(patsubst %/,%,$(dir $(srctree)))
- srctree := $(patsubst %/,%,$(dir $(srctree)))
- #$(info Determined 'srctree' to be $(srctree))
-diff --git a/tools/objtool/Makefile b/tools/objtool/Makefile
-index 041b493ad3ab..27e019c09bd2 100644
---- a/tools/objtool/Makefile
-+++ b/tools/objtool/Makefile
-@@ -11,12 +11,12 @@ LD = ld
- AR = ar
- 
- ifeq ($(srctree),)
--srctree := $(patsubst %/,%,$(dir $(shell pwd)))
-+srctree := $(patsubst %/,%,$(dir $(CURDIR)))
- srctree := $(patsubst %/,%,$(dir $(srctree)))
- endif
- 
- SUBCMD_SRCDIR		= $(srctree)/tools/lib/subcmd/
--LIBSUBCMD_OUTPUT	= $(if $(OUTPUT),$(OUTPUT),$(PWD)/)
-+LIBSUBCMD_OUTPUT	= $(if $(OUTPUT),$(OUTPUT),$(CURDIR)/)
- LIBSUBCMD		= $(LIBSUBCMD_OUTPUT)libsubcmd.a
- 
- OBJTOOL    := $(OUTPUT)objtool
-diff --git a/tools/perf/Makefile.perf b/tools/perf/Makefile.perf
-index 982d6439bb07..5bdef736a662 100644
---- a/tools/perf/Makefile.perf
-+++ b/tools/perf/Makefile.perf
-@@ -94,7 +94,7 @@ LC_NUMERIC=C
- export LC_COLLATE LC_NUMERIC
- 
- ifeq ($(srctree),)
--srctree := $(patsubst %/,%,$(dir $(shell pwd)))
-+srctree := $(patsubst %/,%,$(dir $(CURDIR)))
- srctree := $(patsubst %/,%,$(dir $(srctree)))
- #$(info Determined 'srctree' to be $(srctree))
- endif
-diff --git a/tools/perf/tests/make b/tools/perf/tests/make
-index 143f4d549769..3482e9f67326 100644
---- a/tools/perf/tests/make
-+++ b/tools/perf/tests/make
-@@ -42,7 +42,7 @@ LC_NUMERIC=C
- export LC_COLLATE LC_NUMERIC
- 
- ifeq ($(srctree),)
--srctree := $(patsubst %/,%,$(dir $(shell pwd)))
-+srctree := $(patsubst %/,%,$(dir $(CURDIR)))
- srctree := $(patsubst %/,%,$(dir $(srctree)))
- #$(info Determined 'srctree' to be $(srctree))
- endif
-diff --git a/tools/power/cpupower/Makefile b/tools/power/cpupower/Makefile
-index 8358863259c5..d6e1c02ddcfe 100644
---- a/tools/power/cpupower/Makefile
-+++ b/tools/power/cpupower/Makefile
-@@ -108,9 +108,6 @@ MKDIR = mkdir
- # Now we set up the build system
- #
- 
--# set up PWD so that older versions of make will work with our build.
--PWD = $(shell pwd)
--
- GMO_FILES = ${shell for HLANG in ${LANGUAGES}; do echo $(OUTPUT)po/$$HLANG.gmo; done;}
- 
- export CROSS CC AR STRIP RANLIB CFLAGS LDFLAGS LIB_OBJS
-diff --git a/tools/power/cpupower/debug/kernel/Makefile b/tools/power/cpupower/debug/kernel/Makefile
-index 96b146fe6f8d..a8a6f8eec5c2 100644
---- a/tools/power/cpupower/debug/kernel/Makefile
-+++ b/tools/power/cpupower/debug/kernel/Makefile
-@@ -1,7 +1,6 @@
- obj-m	:=
- 
- KDIR	:= /lib/modules/$(shell uname -r)/build
--PWD		:= $(shell pwd)
- KMISC   := /lib/modules/$(shell uname -r)/cpufrequtils/
- 
- ifeq ("$(CONFIG_X86_TSC)", "y")
-@@ -9,7 +8,7 @@ ifeq ("$(CONFIG_X86_TSC)", "y")
- endif
- 
- default:
--	$(MAKE) -C $(KDIR) M=$(PWD)
-+	$(MAKE) -C $(KDIR) M=$(CURDIR)
- 
- clean:
- 	- rm -rf *.o *.ko .tmp-versions .*.cmd .*.mod.* *.mod.c
+diff --git a/arch/arm/include/asm/asm-prototypes.h b/arch/arm/include/asm/asm-prototypes.h
+new file mode 100644
+index 000000000000..04e5616a7b15
+--- /dev/null
++++ b/arch/arm/include/asm/asm-prototypes.h
+@@ -0,0 +1,34 @@
++#include <linux/arm-smccc.h>
++#include <linux/bitops.h>
++#include <linux/ftrace.h>
++#include <linux/io.h>
++#include <linux/platform_data/asoc-imx-ssi.h>
++#include <linux/string.h>
++#include <linux/uaccess.h>
++
++#include <asm/checksum.h>
++#include <asm/div64.h>
++#include <asm/memory.h>
++
++extern void __aeabi_idivmod(void);
++extern void __aeabi_idiv(void);
++extern void __aeabi_lasr(void);
++extern void __aeabi_llsl(void);
++extern void __aeabi_llsr(void);
++extern void __aeabi_lmul(void);
++extern void __aeabi_uidivmod(void);
++extern void __aeabi_uidiv(void);
++extern void __aeabi_ulcmp(void);
++
++extern void __ashldi3(void);
++extern void __ashrdi3(void);
++extern void __bswapdi2(void);
++extern void __bswapsi2(void);
++extern void __divsi3(void);
++extern void __do_div64(void);
++extern void __lshrdi3(void);
++extern void __modsi3(void);
++extern void __muldi3(void);
++extern void __ucmpdi2(void);
++extern void __udivsi3(void);
++extern void __umodsi3(void);
 -- 
-2.10.2
+2.9.0
 
