@@ -1,64 +1,69 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:44164 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1755539AbcKVVfj (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 22 Nov 2016 16:35:39 -0500
-From: Michal Marek <mmarek@suse.com>
-Subject: [PATCH 4/6] sh: Use full path in KBUILD_IMAGE definition
-Date: Tue, 22 Nov 2016 22:34:32 +0100
-Message-Id: <20161122213434.14788-4-mmarek@suse.com>
-In-Reply-To: <20161122213434.14788-1-mmarek@suse.com>
-References: <20161122213434.14788-1-mmarek@suse.com>
+Received: from mout.kundenserver.de ([212.227.17.13]:65259 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933931AbcKVWzJ (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 22 Nov 2016 17:55:09 -0500
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH] kasan: turn off -fsanitize-address-use-after-scope for now
+Date: Tue, 22 Nov 2016 23:54:06 +0100
+Message-Id: <20161122225424.3739294-1-arnd@arndb.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Yoshinori Sato <ysato@users.sourceforge.jp>, Rich Felker <dalias@libc.org>, linux-sh@vger.kernel.org
+To: Andrey Ryabinin <aryabinin@virtuozzo.com>
+Cc: Arnd Bergmann <arnd@arndb.de>, =?UTF-8?q?Martin=20Li=C5=A1ka?= <marxin@gcc.gnu.org>, Andrey Ryabinin <a.ryabinin@samsung.com>, stable@vger.kernel.org, Michal Marek <mmarek@suse.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, linux-kbuild@vger.kernel.org, kasan-dev@googlegroups.com, linux-kernel@vger.kernel.org
 
-The KBUILD_IMAGE variable is used by the rpm and deb-pkg targets, which
-expect it to point to the image file in the build directory. The
-builddeb script has a workaround for architectures which only provide
-the basename, but let's provide a clean interface for packaging tools.
+In the upcoming gcc-7 release, the -fsanitize=kernel-address option
+implies -fsanitize-address-use-after-scope, which relies on the
+definition of two global functions, causing many link errors if they
+are not defined, e.g:
 
-Cc: Yoshinori Sato <ysato@users.sourceforge.jp>
-Cc: Rich Felker <dalias@libc.org>
-Cc: linux-sh@vger.kernel.org
-Signed-off-by: Michal Marek <mmarek@suse.com>
+arch/x86/built-in.o: In function `x86_pmu_handle_irq':
+(.text+0x88e6): undefined reference to `__asan_unpoison_stack_memory'
+arch/x86/built-in.o: In function `x86_pmu_handle_irq':
+(.text+0x8ad7): undefined reference to `__asan_poison_stack_memory'
+kernel/built-in.o: In function `perf_tp_event':
+(.text+0x225472): undefined reference to `__asan_unpoison_stack_memory'
+kernel/built-in.o: In function `perf_tp_event':
+(.text+0x22583a): undefined reference to `__asan_unpoison_stack_memory'
+kernel/built-in.o: In function `perf_tp_event':
+(.text+0x2258ae): undefined reference to `__asan_poison_stack_memory'
+kernel/built-in.o: In function `perf_event_aux_event':
+
+I think we really want to define those two functions so we can make
+use of a helpful feature, but as I have no idea what they are supposed
+to do, I'd suggest to turn the option off on existing kernels to allow
+building with gcc-7 and kasan.
+
+For some reason, the problem showed up in only a few randconfig builds,
+but it is easy to reproduce using an x86-64 tinyconfig build with
+CONFIG_KASAN=y.
+
+If we decide to take this approach, we probably want to do the same
+change on all stable kernels that support KASAN, i.e. v4.0 or higher.
+
+Link: https://gcc.gnu.org/viewcvs/gcc?limit_changes=0&view=revision&revision=241896
+Cc: Martin Liška <marxin@gcc.gnu.org>
+Cc: Andrey Ryabinin <a.ryabinin@samsung.com>
+Cc: stable@vger.kernel.org
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- arch/sh/Makefile | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ scripts/Makefile.kasan | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/arch/sh/Makefile b/arch/sh/Makefile
-index 336f33a419d9..280bbff12102 100644
---- a/arch/sh/Makefile
-+++ b/arch/sh/Makefile
-@@ -94,7 +94,8 @@ defaultimage-$(CONFIG_SH_7206_SOLUTION_ENGINE)	:= vmlinux
- defaultimage-$(CONFIG_SH_7619_SOLUTION_ENGINE)	:= vmlinux
- 
- # Set some sensible Kbuild defaults
--KBUILD_IMAGE		:= $(defaultimage-y)
-+boot := arch/sh/boot
-+KBUILD_IMAGE		:= $(boot)/$(defaultimage-y)
- 
- #
- # Choosing incompatible machines durings configuration will result in
-@@ -186,8 +187,6 @@ cpuincdir-y			+= cpu-common	# Must be last
- drivers-y			+= arch/sh/drivers/
- drivers-$(CONFIG_OPROFILE)	+= arch/sh/oprofile/
- 
--boot := arch/sh/boot
--
- cflags-y	+= $(foreach d, $(cpuincdir-y), -Iarch/sh/include/$(d)) \
- 		   $(foreach d, $(machdir-y), -Iarch/sh/include/$(d))
- 
-@@ -211,7 +210,7 @@ BOOT_TARGETS = uImage uImage.bz2 uImage.gz uImage.lzma uImage.xz uImage.lzo \
- 	       romImage
- PHONY += $(BOOT_TARGETS)
- 
--all: $(KBUILD_IMAGE)
-+all: $(notdir $(KBUILD_IMAGE))
- 
- $(BOOT_TARGETS): vmlinux
- 	$(Q)$(MAKE) $(build)=$(boot) $(boot)/$@
+diff --git a/scripts/Makefile.kasan b/scripts/Makefile.kasan
+index 37323b0df374..0e68fef09f76 100644
+--- a/scripts/Makefile.kasan
++++ b/scripts/Makefile.kasan
+@@ -29,3 +29,5 @@ else
+     endif
+ endif
+ endif
++
++CFLAGS_KASAN += $(call cc-option, -fno-sanitize-address-use-after-scope)
 -- 
-2.10.0
+2.9.0
 
