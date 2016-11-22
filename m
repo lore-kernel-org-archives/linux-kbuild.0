@@ -1,50 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:44152 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:44153 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1754243AbcKVVfj (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        id S1755528AbcKVVfj (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
         Tue, 22 Nov 2016 16:35:39 -0500
 From: Michal Marek <mmarek@suse.com>
-Subject: [PATCH 1/6] arm64: Use full path in KBUILD_IMAGE definition
-Date: Tue, 22 Nov 2016 22:34:29 +0100
-Message-Id: <20161122213434.14788-1-mmarek@suse.com>
+Subject: [PATCH 6/6] deb-pkg: Remove the KBUILD_IMAGE workaround
+Date: Tue, 22 Nov 2016 22:34:34 +0100
+Message-Id: <20161122213434.14788-6-mmarek@suse.com>
+In-Reply-To: <20161122213434.14788-1-mmarek@suse.com>
+References: <20161122213434.14788-1-mmarek@suse.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>, linux-arm-kernel@lists.infradead.org
+Cc: linux-kernel@vger.kernel.org
 
-The KBUILD_IMAGE variable is used by the rpm and deb-pkg targets, which
-expect it to point to the image file in the build directory. The
-builddeb script has a workaround for architectures which only provide
-the basename, but let's provide a clean interface for packaging tools.
+The arch Makefile are fixed to set KBUILD_IMAGE to the full patch, so
+the workaround is no longer needed.
 
-Cc: Catalin Marinas <catalin.marinas@arm.com>
-Cc: Will Deacon <will.deacon@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org
 Signed-off-by: Michal Marek <mmarek@suse.com>
 ---
- arch/arm64/Makefile | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ scripts/package/builddeb | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
 
-diff --git a/arch/arm64/Makefile b/arch/arm64/Makefile
-index 3635b8662724..80b6866bcacb 100644
---- a/arch/arm64/Makefile
-+++ b/arch/arm64/Makefile
-@@ -94,12 +94,12 @@ libs-y		:= arch/arm64/lib/ $(libs-y)
- core-$(CONFIG_EFI_STUB) += $(objtree)/drivers/firmware/efi/libstub/lib.a
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index 8ea9fd2b6573..dab997343f1a 100755
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -143,12 +143,7 @@ else
+ 	cp System.map "$tmpdir/boot/System.map-$version"
+ 	cp $KCONFIG_CONFIG "$tmpdir/boot/config-$version"
+ fi
+-# Not all arches include the boot path in KBUILD_IMAGE
+-if [ -e $KBUILD_IMAGE ]; then
+-	cp $KBUILD_IMAGE "$tmpdir/$installed_image_path"
+-else
+-	cp arch/$ARCH/boot/$KBUILD_IMAGE "$tmpdir/$installed_image_path"
+-fi
++cp "$($MAKE -s image_name)" "$tmpdir/$installed_image_path"
  
- # Default target when executing plain make
--KBUILD_IMAGE	:= Image.gz
-+boot		:= arch/arm64/boot
-+KBUILD_IMAGE	:= $(boot)/Image.gz
- KBUILD_DTBS	:= dtbs
- 
--all:	$(KBUILD_IMAGE) $(KBUILD_DTBS)
-+all:	Image.gz $(KBUILD_DTBS)
- 
--boot := arch/arm64/boot
- 
- Image: vmlinux
- 	$(Q)$(MAKE) $(build)=$(boot) $(boot)/$@
+ if grep -q "^CONFIG_OF=y" $KCONFIG_CONFIG ; then
+ 	# Only some architectures with OF support have this target
 -- 
 2.10.0
 
