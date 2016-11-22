@@ -1,68 +1,80 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.17.10]:65346 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932771AbcKVLHM (ORCPT
+Received: from mail-qt0-f179.google.com ([209.85.216.179]:36250 "EHLO
+        mail-qt0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755365AbcKVQok (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 22 Nov 2016 06:07:12 -0500
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH 2/2] ARM: move mmiocpy/mmioset exports to io.c
-Date: Tue, 22 Nov 2016 12:05:41 +0100
-Message-Id: <20161122110557.1533467-2-arnd@arndb.de>
+        Tue, 22 Nov 2016 11:44:40 -0500
+Received: by mail-qt0-f179.google.com with SMTP id w33so15564494qtc.3
+        for <linux-kbuild@vger.kernel.org>; Tue, 22 Nov 2016 08:43:53 -0800 (PST)
+Date: Tue, 22 Nov 2016 11:34:48 -0500 (EST)
+From: Nicolas Pitre <nicolas.pitre@linaro.org>
+Subject: Re: [PATCH 1/2] kbuild: provide include/asm/asm-prototypes.h for
+ ARM
 In-Reply-To: <20161122110557.1533467-1-arnd@arndb.de>
+Message-ID: <alpine.LFD.2.20.1611221106410.1814@knanqh.ubzr>
 References: <20161122110557.1533467-1-arnd@arndb.de>
+MIME-Version: 1.0
+Content-Type: multipart/mixed; BOUNDARY="8323328-1586173819-1479832489=:1814"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Russell King <linux@armlinux.org.uk>
-Cc: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <uwe@kleine-koenig.org>, Nicolas Pitre <nico@linaro.org>, linux-arm-kernel@lists.infradead.org, Nicholas Piggin <npiggin@gmail.com>, viro@zeniv.linux.org.uk, linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org, regressions@leemhuis.info, Arnd Bergmann <arnd@arndb.de>, linux-kernel@vger.kernel.org
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Russell King <linux@armlinux.org.uk>, =?ISO-8859-15?Q?Uwe_Kleine-K=F6nig?= <uwe@kleine-koenig.org>, linux-arm-kernel@lists.infradead.org, Nicholas Piggin <npiggin@gmail.com>, viro@zeniv.linux.org.uk, linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org, regressions@leemhuis.info, linux-kernel@vger.kernel.org
 
-The prototypes for mmioset/mmiocpy are intentionally hidden
-inside of inline functions, which breaks the EXPORT_SYMBOL
-statements when symbol versioning is enabled.
+--8323328-1586173819-1479832489=:1814
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 
-This moves the two exports from the files that implement the
-code into the kernel/io.c file, adding another local declaration
-there.
+On Tue, 22 Nov 2016, Arnd Bergmann wrote:
 
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- arch/arm/kernel/io.c  | 7 +++++++
- arch/arm/lib/memcpy.S | 1 -
- arch/arm/lib/memset.S | 1 -
- 3 files changed, 7 insertions(+), 2 deletions(-)
+> This adds an asm/asm-prototypes.h header for ARM to fix the broken symbol
+> versioning for symbols exported from assembler files.
+> 
+> I couldn't find the correct prototypes for the compiler builtins,
+> so I went with the fake 'void f(void)' prototypes that we had
+> before, restoring the state before they were moved.
+> 
+> Originally I assumed that the problem was just a harmless warning
+> in unusual configurations, but as Uwe found, we actually need this
+> to load most modules when symbol versioning is enabled, as it is
+> in many distro kernels.
+> 
+> Cc: Uwe Kleine-König <uwe@kleine-koenig.org>
+> Fixes: 4dd1837d7589 ("arm: move exports to definitions")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+> Compared to the earlier version, I dropped the changes to the
+> csumpartial files, which now get handled correctly by Kbuild
+> even when the export comes from a macro, and I also dropped the
+> changes to the bitops files, which were already fixed in a
+> patch from Nico.
+> 
+> The patch applies cleanly on top of the rmk/fixes tree but has
+> no effect there, as it also needs 4efca4ed05cb ("kbuild: modversions
+> for EXPORT_SYMBOL() for asm") and cc6acc11cad1 ("kbuild: be more
+> careful about matching preprocessed asm ___EXPORT_SYMBOL").
+> 
+> With the combination of rmk/fixes, torvalds/master and these two
+> patches, symbol versioning works again on ARM. As it is still
+> broken on almost all other architectures (powerpc is fixed,
+> x86 has a patch), I wonder if we should make CONFIG_MODVERSIONS
+> as broken for everything else.
 
-diff --git a/arch/arm/kernel/io.c b/arch/arm/kernel/io.c
-index eedefe050022..c74746997626 100644
---- a/arch/arm/kernel/io.c
-+++ b/arch/arm/kernel/io.c
-@@ -82,3 +82,10 @@ void _memset_io(volatile void __iomem *dst, int c, size_t count)
- 	}
- }
- EXPORT_SYMBOL(_memset_io);
-+
-+/* can't export them from memcpy.S/memset.S because of hidden declaration */
-+void mmioset(void __iomem *addr, unsigned int c, size_t n);
-+EXPORT_SYMBOL(mmioset);
-+
-+void mmiocpy(void *dest, const void __iomem *src, size_t n);
-+EXPORT_SYMBOL(mmiocpy);
-diff --git a/arch/arm/lib/memcpy.S b/arch/arm/lib/memcpy.S
-index 1be5b6ddf37c..1f822fc52400 100644
---- a/arch/arm/lib/memcpy.S
-+++ b/arch/arm/lib/memcpy.S
-@@ -70,4 +70,3 @@ ENTRY(memcpy)
- ENDPROC(memcpy)
- ENDPROC(mmiocpy)
- EXPORT_SYMBOL(memcpy)
--EXPORT_SYMBOL(mmiocpy)
-diff --git a/arch/arm/lib/memset.S b/arch/arm/lib/memset.S
-index 7b72044cba62..6f075ca09abc 100644
---- a/arch/arm/lib/memset.S
-+++ b/arch/arm/lib/memset.S
-@@ -137,4 +137,3 @@ UNWIND( .fnend   )
- ENDPROC(memset)
- ENDPROC(mmioset)
- EXPORT_SYMBOL(memset)
--EXPORT_SYMBOL(mmioset)
--- 
-2.9.0
+I'm not sure I like this at all.
 
+The goal for moving EXPORT_SYMBOL() to assembly code where symbols were 
+defined is to make things close together and avoid those centralized 
+list of symbols that you can easily miss when modifying the actual code.
+
+This series is therefore bringing back a centralized list of symbols in 
+a slightly different form, nullifying the advantages from having moved 
+EXPORT_SYMBOL() to asm code.  To me this looks like a big step backward.
+
+Why not simply extending the original idea of keeping exports close to 
+the actual code by _also_ having a macro that provides the function 
+prototype alongside the EXPORT_SYMBOL() instance?  That could even be 
+expressed with some EXPORT_SYMBOL_PROTO(ret, sym, arg...) macro that 
+does it all.
+
+
+Nicolas
+--8323328-1586173819-1479832489=:1814--
