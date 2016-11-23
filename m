@@ -1,41 +1,133 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qk0-f172.google.com ([209.85.220.172]:33821 "EHLO
-        mail-qk0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1756456AbcKWJe1 (ORCPT
+Received: from pandora.armlinux.org.uk ([78.32.30.218]:56348 "EHLO
+        pandora.armlinux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1756407AbcKWJe2 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 23 Nov 2016 04:34:27 -0500
-Received: by mail-qk0-f172.google.com with SMTP id q130so8321522qke.1
-        for <linux-kbuild@vger.kernel.org>; Wed, 23 Nov 2016 01:34:07 -0800 (PST)
+        Wed, 23 Nov 2016 04:34:28 -0500
+Date: Wed, 23 Nov 2016 09:33:32 +0000
+From: Russell King - ARM Linux <linux@armlinux.org.uk>
+Subject: Re: [PATCH 1/2] kbuild: provide include/asm/asm-prototypes.h for ARM
+Message-ID: <20161123093332.GB14217@n2100.armlinux.org.uk>
+References: <20161122110557.1533467-1-arnd@arndb.de>
+ <alpine.LFD.2.20.1611221106410.1814@knanqh.ubzr>
+ <20161123120436.18dc21e7@roar.ozlabs.ibm.com>
+ <alpine.LFD.2.20.1611222030050.1814@knanqh.ubzr>
 MIME-Version: 1.0
-In-Reply-To: <3117683.gtMMlH1SLc@wuerfel>
-References: <20161122225424.3739294-1-arnd@arndb.de> <e8b2d3b5-31c4-80ad-df2b-38c72dc0fa10@virtuozzo.com>
- <3117683.gtMMlH1SLc@wuerfel>
-From: Dmitry Vyukov <dvyukov@google.com>
-Date: Wed, 23 Nov 2016 10:33:41 +0100
-Message-ID: <CACT4Y+byCnW6kWUTUn+YhdJKtadhHuYn+AvvyAZ+AuToJWNufg@mail.gmail.com>
-Subject: Re: [PATCH] kasan: turn off -fsanitize-address-use-after-scope for now
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <alpine.LFD.2.20.1611222030050.1814@knanqh.ubzr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, =?UTF-8?Q?Martin_Li=C5=A1ka?= <marxin@gcc.gnu.org>, stable <stable@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Alexander Potapenko <glider@google.com>, "open list:KERNEL BUILD + fi..." <linux-kbuild@vger.kernel.org>, kasan-dev <kasan-dev@googlegroups.com>, LKML <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>
+To: Nicolas Pitre <nicolas.pitre@linaro.org>
+Cc: Nicholas Piggin <npiggin@gmail.com>, Arnd Bergmann <arnd@arndb.de>, Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <uwe@kleine-koenig.org>, linux-arm-kernel@lists.infradead.org, viro@zeniv.linux.org.uk, linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org, regressions@leemhuis.info, linux-kernel@vger.kernel.org
 
-On Wed, Nov 23, 2016 at 9:46 AM, Arnd Bergmann <arnd@arndb.de> wrote:
-> On Wednesday, November 23, 2016 11:25:49 AM CET Andrey Ryabinin wrote:
->>
->> We have implementation for this feature:
->>         "[PATCH] kasan: support use-after-scope detection" - http://lkml.kernel.org/r/<1479226045-145148-1-git-send-email-dvyukov@google.com>
->> and given how simple it is I'd suggest to just backport implementation.
->>
->> BTW, we also need "[PATCH] kasan: update kasan_global for gcc 7" - http://lkml.kernel.org/r/<1479219743-28682-1-git-send-email-dvyukov@google.com>
->> in v4.0+ stable.
->
-> Ah, good. What's the plan for this patch? Would you still expect to
-> see that merged into v4.9, or get backported later once it's part of v4.10?
->
-> Either way, you proabably want a Cc:stable tag on it to trigger the
-> backport to older kernels.
+On Tue, Nov 22, 2016 at 08:35:48PM -0500, Nicolas Pitre wrote:
+> On Wed, 23 Nov 2016, Nicholas Piggin wrote:
+> 
+> > On Tue, 22 Nov 2016 11:34:48 -0500 (EST)
+> > Nicolas Pitre <nicolas.pitre@linaro.org> wrote:
+> > 
+> > > On Tue, 22 Nov 2016, Arnd Bergmann wrote:
+> > > 
+> > > > This adds an asm/asm-prototypes.h header for ARM to fix the broken symbol
+> > > > versioning for symbols exported from assembler files.
+> > > > 
+> > > > I couldn't find the correct prototypes for the compiler builtins,
+> > > > so I went with the fake 'void f(void)' prototypes that we had
+> > > > before, restoring the state before they were moved.
+> > > > 
+> > > > Originally I assumed that the problem was just a harmless warning
+> > > > in unusual configurations, but as Uwe found, we actually need this
+> > > > to load most modules when symbol versioning is enabled, as it is
+> > > > in many distro kernels.
+> > > > 
+> > > > Cc: Uwe Kleine-König <uwe@kleine-koenig.org>
+> > > > Fixes: 4dd1837d7589 ("arm: move exports to definitions")
+> > > > Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> > > > ---
+> > > > Compared to the earlier version, I dropped the changes to the
+> > > > csumpartial files, which now get handled correctly by Kbuild
+> > > > even when the export comes from a macro, and I also dropped the
+> > > > changes to the bitops files, which were already fixed in a
+> > > > patch from Nico.
+> > > > 
+> > > > The patch applies cleanly on top of the rmk/fixes tree but has
+> > > > no effect there, as it also needs 4efca4ed05cb ("kbuild: modversions
+> > > > for EXPORT_SYMBOL() for asm") and cc6acc11cad1 ("kbuild: be more
+> > > > careful about matching preprocessed asm ___EXPORT_SYMBOL").
+> > > > 
+> > > > With the combination of rmk/fixes, torvalds/master and these two
+> > > > patches, symbol versioning works again on ARM. As it is still
+> > > > broken on almost all other architectures (powerpc is fixed,
+> > > > x86 has a patch), I wonder if we should make CONFIG_MODVERSIONS
+> > > > as broken for everything else.  
+> > > 
+> > > I'm not sure I like this at all.
+> > > 
+> > > The goal for moving EXPORT_SYMBOL() to assembly code where symbols were 
+> > > defined is to make things close together and avoid those centralized 
+> > > list of symbols that you can easily miss when modifying the actual code.
+> > 
+> > Right.
+> > 
+> > > 
+> > > This series is therefore bringing back a centralized list of symbols in 
+> > > a slightly different form, nullifying the advantages from having moved 
+> > > EXPORT_SYMBOL() to asm code.  To me this looks like a big step backward.
+> > 
+> > Exported symbols have C declarations in headers already. For the most
+> > part, anyway -- these ones Arnd adds are for compiler runtime which is
+> > why some architectures haven't had the prototypes.
+> 
+> Hmmm. That's right.  That makes it much more justifiable.
+> My main objection is withdrawn.
 
-+Andrew, what is the plan for the "[PATCH] kasan: update kasan_global
-for gcc 7" patch?
-Do I need to remail to include Cc:stable?
+I don't see it makes any difference - the armksyms.c originally had
+the same:
+
+-#include <linux/export.h>
+-#include <linux/sched.h>
+-#include <linux/string.h>
+-#include <linux/cryptohash.h>
+-#include <linux/delay.h>
+-#include <linux/in6.h>
+-#include <linux/syscalls.h>
+-#include <linux/uaccess.h>
+-#include <linux/io.h>
+-#include <linux/arm-smccc.h>
+-
+-#include <asm/checksum.h>
+-#include <asm/ftrace.h>
+
+followed by prototypes for the GCC internal functions, and:
+
+-extern void fpundefinstr(void);
+-
+-void mmioset(void *, unsigned int, size_t);
+-void mmiocpy(void *, const void *, size_t);
+
+So, the asm-prototypes.h approach is just the same, only that we now
+have a bunch of prototypes in a header file, and the EXPORT_SYMBOL()s
+in the assembly files.
+
+As the C prototypes are remote from the definitions, it means that
+the C prototypes are going to get forgotten about in exactly the same
+way that armksyms.c would've been forgotten about too.
+
+It _is_ worse than that though - with the armksyms.c approach, if the
+assembly code for it is removed, you get a build error reminding you
+to remove the export (and prototype).  With this approach, you get no
+reminder to touch asm-prototypes.h.
+
+It's also error prone for another reason - adding a new assembly level
+export, if you forget to add it to asm-prototypes.h, we're back into
+the problem we have right now with MODVERSIONS breaking.
+
+So, I still think the whole approach is wrong - it's added extra
+fragility that wasn't there with the armksyms.c approach.
+
+-- 
+RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
+FTTC broadband for 0.8mile line: currently at 9.6Mbps down 400kbps up
+according to speedtest.net.
