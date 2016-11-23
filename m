@@ -1,51 +1,62 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.linuxfoundation.org ([140.211.169.12]:59356 "EHLO
-        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932814AbcKWStj (ORCPT
+Received: from smtprelay4.synopsys.com ([198.182.47.9]:42948 "EHLO
+        smtprelay.synopsys.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933908AbcKWTrS (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 23 Nov 2016 13:49:39 -0500
-Date: Wed, 23 Nov 2016 10:49:39 -0800
-From: Andrew Morton <akpm@linux-foundation.org>
-Subject: Re: [PATCH] kasan: turn off -fsanitize-address-use-after-scope for
- now
-Message-Id: <20161123104939.78f7361150020bff2bc88d2f@linux-foundation.org>
-In-Reply-To: <CACT4Y+byCnW6kWUTUn+YhdJKtadhHuYn+AvvyAZ+AuToJWNufg@mail.gmail.com>
-References: <20161122225424.3739294-1-arnd@arndb.de>
-        <e8b2d3b5-31c4-80ad-df2b-38c72dc0fa10@virtuozzo.com>
-        <3117683.gtMMlH1SLc@wuerfel>
-        <CACT4Y+byCnW6kWUTUn+YhdJKtadhHuYn+AvvyAZ+AuToJWNufg@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+        Wed, 23 Nov 2016 14:47:18 -0500
+From: Alexey Brodkin <Alexey.Brodkin@synopsys.com>
+Subject: Re: [PATCH 3/6] arc: Use full path in KBUILD_IMAGE definition
+Date: Wed, 23 Nov 2016 19:40:15 +0000
+Message-ID: <1479929955.3931.28.camel@synopsys.com>
+References: <20161122213434.14788-1-mmarek@suse.com>
+         <20161122213434.14788-3-mmarek@suse.com>
+In-Reply-To: <20161122213434.14788-3-mmarek@suse.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <20E8BE15EBBEAD4EA13E6FD9256F2B04@internal.synopsys.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dmitry Vyukov <dvyukov@google.com>
-Cc: Arnd Bergmann <arnd@arndb.de>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Martin =?UTF-8?Q?Li=C5=A1ka?= <marxin@gcc.gnu.org>, stable <stable@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Alexander Potapenko <glider@google.com>, "open list:KERNEL BUILD + fi..." <linux-kbuild@vger.kernel.org>, kasan-dev <kasan-dev@googlegroups.com>, LKML <linux-kernel@vger.kernel.org>
+To: "mmarek@suse.com" <mmarek@suse.com>
+Cc: "Vineet.Gupta1@synopsys.com" <Vineet.Gupta1@synopsys.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-snps-arc@lists.infradead.org" <linux-snps-arc@lists.infradead.org>
 
-On Wed, 23 Nov 2016 10:33:41 +0100 Dmitry Vyukov <dvyukov@google.com> wrote:
-
-> On Wed, Nov 23, 2016 at 9:46 AM, Arnd Bergmann <arnd@arndb.de> wrote:
-> > On Wednesday, November 23, 2016 11:25:49 AM CET Andrey Ryabinin wrote:
-> >>
-> >> We have implementation for this feature:
-> >>         "[PATCH] kasan: support use-after-scope detection" - http://lkml.kernel.org/r/<1479226045-145148-1-git-send-email-dvyukov@google.com>
-> >> and given how simple it is I'd suggest to just backport implementation.
-> >>
-> >> BTW, we also need "[PATCH] kasan: update kasan_global for gcc 7" - http://lkml.kernel.org/r/<1479219743-28682-1-git-send-email-dvyukov@google.com>
-> >> in v4.0+ stable.
-> >
-> > Ah, good. What's the plan for this patch? Would you still expect to
-> > see that merged into v4.9, or get backported later once it's part of v4.10?
-> >
-> > Either way, you proabably want a Cc:stable tag on it to trigger the
-> > backport to older kernels.
-> 
-> +Andrew, what is the plan for the "[PATCH] kasan: update kasan_global
-> for gcc 7" patch?
-> Do I need to remail to include Cc:stable?
-
-I'm planning on merging it into 4.10-rc1.  There's nothing in the
-changelog to indicate that it is more urgent than that.
-
-Please send out a new changelog which can be used to justify a merge
-into 4.9 and -stable.
+SGkgTWljaGFsLA0KDQpPbiBUdWUsIDIwMTYtMTEtMjIgYXQgMjI6MzQgKzAxMDAsIE1pY2hhbCBN
+YXJlayB3cm90ZToNCj4gVGhlIEtCVUlMRF9JTUFHRSB2YXJpYWJsZSBpcyB1c2VkIGJ5IHRoZSBy
+cG0gYW5kIGRlYi1wa2cgdGFyZ2V0cywgd2hpY2gNCj4gZXhwZWN0IGl0IHRvIHBvaW50IHRvIHRo
+ZSBpbWFnZSBmaWxlIGluIHRoZSBidWlsZCBkaXJlY3RvcnkuIFRoZQ0KPiBidWlsZGRlYiBzY3Jp
+cHQgaGFzIGEgd29ya2Fyb3VuZCBmb3IgYXJjaGl0ZWN0dXJlcyB3aGljaCBvbmx5IHByb3ZpZGUN
+Cj4gdGhlIGJhc2VuYW1lLCBidXQgbGV0J3MgcHJvdmlkZSBhIGNsZWFuIGludGVyZmFjZSBmb3Ig
+cGFja2FnaW5nIHRvb2xzLg0KPiANCj4gQ2M6IFZpbmVldCBHdXB0YSA8dmd1cHRhQHN5bm9wc3lz
+LmNvbT4NCj4gQ2M6IGxpbnV4LXNucHMtYXJjQGxpc3RzLmluZnJhZGVhZC5vcmcNCj4gU2lnbmVk
+LW9mZi1ieTogTWljaGFsIE1hcmVrIDxtbWFyZWtAc3VzZS5jb20+DQo+IC0tLQ0KPiDCoGFyY2gv
+YXJjL01ha2VmaWxlIHwgNCArKy0tDQo+IMKgMSBmaWxlIGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygr
+KSwgMiBkZWxldGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9hcmNoL2FyYy9NYWtlZmlsZSBi
+L2FyY2gvYXJjL01ha2VmaWxlDQo+IGluZGV4IDE5Y2NlMjI2ZDFhOC4uNDRlZjM1ZDMzOTU2IDEw
+MDY0NA0KPiAtLS0gYS9hcmNoL2FyYy9NYWtlZmlsZQ0KPiArKysgYi9hcmNoL2FyYy9NYWtlZmls
+ZQ0KPiBAQCAtMTIzLDkgKzEyMyw5IEBAIGxpYnMteQkJKz0gYXJjaC9hcmMvbGliLyAkKExJQkdD
+QykNCj4gwqBib290CQk6PSBhcmNoL2FyYy9ib290DQo+IMKgDQo+IMKgI2RlZmF1bHQgdGFyZ2V0
+IGZvciBtYWtlIHdpdGhvdXQgYW55IGFyZ3VtZW50cy4NCj4gLUtCVUlMRF9JTUFHRQk6PSBib290
+cEltYWdlDQo+ICtLQlVJTERfSU1BR0UJOj0gJChib290KS9ib290cEltYWdlDQo+IMKgDQo+IC1h
+bGw6CSQoS0JVSUxEX0lNQUdFKQ0KPiArYWxsOglib290cEltYWdlDQo+IMKgYm9vdHBJbWFnZTog
+dm1saW51eA0KPiDCoA0KPiDCoGJvb3RfdGFyZ2V0cyArPSB1SW1hZ2UgdUltYWdlLmJpbiB1SW1h
+Z2UuZ3oNCg0KSSB0cmllZCB0byBmaW5kIGFueSBleGFtcGxlcyBvbiBob3cgdGhhdMKgS0JVSUxE
+X0lNQUdFIHRoaW5neSBpcyB1c2VkDQpidXQgdG8gbm8gYXZhaWwuIEl0IGxvb2tzIGxpa2UgZm9y
+IEFSQyAiYm9vdHBJbWFnZSIgbWFrZXMgbm90IG11Y2gNCnNlbnNlIGFuZCBpZiB5b3UgcmVhbGx5
+IHdhbnQgdG8gZ2V0IHNvbWV0aGluZyB1c2VmdWwgaW4gLmRlYi8ucnBtDQptb3N0IHByb2JhYmx5
+IHNvbWV0aGluZyBsaWtlIGJlbG93IG1heSB3b3JrIG11Y2ggYmV0dGVyOg0KLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tPjgtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KS0JVSUxEX0lNQUdFCTo9
+ICQoYm9vdCkvdUltYWdlDQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0+OC0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tDQoNCkFuZCBJIGRvbid0IGtub3cgY29udGV4dCBvZiBLQlVJTERfSU1BR0Ug
+dXNhZ2UgYnV0IGluDQpjYXNlIG9mIEFSQyBvdXIgZGVmYXVsdCB0YXJnZXQgaXMgInZtbGludXgi
+IHNvIEknbSBub3Qgc3VyZSB0aGVuIGlmDQpLQlVJTERfSU1BR0UgbWF5IHBvaW50IHRvIG5vbi1k
+ZWZhdWx0IHRhcmdldC4NCg0KRm9yIGV4YW1wbGUgaW4gImFyY2gvYXZyMzIvTWFrZWZpbGUiIEkg
+c2VlIG1vcmUgY29tcGxpY2F0ZWQgY29uc3RydWN0aW9uOg0KLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tPjgtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KwqAgwqAgwqAgwqAgwqAgwqAgwqBLQlVJ
+TERfSU1BR0UgOj0gJChib290KS91SW1hZ2UNCnZtbGludXguZWxmOiBLQlVJTERfSU1BR0UgOj0g
+JChib290KS92bWxpbnV4LmVsZg0Kdm1saW51eC5jc286IEtCVUlMRF9JTUFHRSA6PSAkKGJvb3Qp
+L3ZtbGludXguY3NvDQp1SW1hZ2Uuc3JlYzogS0JVSUxEX0lNQUdFIDo9ICQoYm9vdCkvdUltYWdl
+LnNyZWMNCnVJbWFnZTrCoMKgwqDCoMKgwqBLQlVJTERfSU1BR0UgOj0gJChib290KS91SW1hZ2UN
+Ci0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLT44LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCmFu
+ZCBtYXkgaW1hZ2luZSB0aGF0IHdlIG5lZWQgc29tZXRoaW5nIHNpbWlsYXIgZm9yIEFSQyBvYnZp
+b3VzbHkgd2l0aA0KZGVmYXVsdCBiZWluZyAiJChib290KS92bWxpbnV4Ii4NCg0KLUFsZXhleQ==
