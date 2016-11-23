@@ -1,74 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg0-f68.google.com ([74.125.83.68]:35184 "EHLO
-        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S934451AbcKWQmU (ORCPT
+Received: from mail.linuxfoundation.org ([140.211.169.12]:59356 "EHLO
+        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932814AbcKWStj (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 23 Nov 2016 11:42:20 -0500
-Received: by mail-pg0-f68.google.com with SMTP id p66so1430825pga.2
-        for <linux-kbuild@vger.kernel.org>; Wed, 23 Nov 2016 08:42:19 -0800 (PST)
-From: Nicholas Piggin <npiggin@gmail.com>
-Subject: [PATCH 6/7] kbuild: modpost warn if export version crc is missing
-Date: Thu, 24 Nov 2016 03:41:42 +1100
-Message-Id: <20161123164143.16839-7-npiggin@gmail.com>
-In-Reply-To: <20161123164143.16839-1-npiggin@gmail.com>
-References: <20161123164143.16839-1-npiggin@gmail.com>
+        Wed, 23 Nov 2016 13:49:39 -0500
+Date: Wed, 23 Nov 2016 10:49:39 -0800
+From: Andrew Morton <akpm@linux-foundation.org>
+Subject: Re: [PATCH] kasan: turn off -fsanitize-address-use-after-scope for
+ now
+Message-Id: <20161123104939.78f7361150020bff2bc88d2f@linux-foundation.org>
+In-Reply-To: <CACT4Y+byCnW6kWUTUn+YhdJKtadhHuYn+AvvyAZ+AuToJWNufg@mail.gmail.com>
+References: <20161122225424.3739294-1-arnd@arndb.de>
+        <e8b2d3b5-31c4-80ad-df2b-38c72dc0fa10@virtuozzo.com>
+        <3117683.gtMMlH1SLc@wuerfel>
+        <CACT4Y+byCnW6kWUTUn+YhdJKtadhHuYn+AvvyAZ+AuToJWNufg@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>
-Cc: Nicholas Piggin <npiggin@gmail.com>, linux-kbuild@vger.kernel.org
+To: Dmitry Vyukov <dvyukov@google.com>
+Cc: Arnd Bergmann <arnd@arndb.de>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Martin =?UTF-8?Q?Li=C5=A1ka?= <marxin@gcc.gnu.org>, stable <stable@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Alexander Potapenko <glider@google.com>, "open list:KERNEL BUILD + fi..." <linux-kbuild@vger.kernel.org>, kasan-dev <kasan-dev@googlegroups.com>, LKML <linux-kernel@vger.kernel.org>
 
-This catches the failing ceph CRC on with:
+On Wed, 23 Nov 2016 10:33:41 +0100 Dmitry Vyukov <dvyukov@google.com> wrote:
 
-    LD      vmlinux.o
-    MODPOST vmlinux.o
-  WARNING: EXPORT symbol "ceph_monc_do_statfs" [vmlinux] version
-  generation failed, symbol will not be versioned.
+> On Wed, Nov 23, 2016 at 9:46 AM, Arnd Bergmann <arnd@arndb.de> wrote:
+> > On Wednesday, November 23, 2016 11:25:49 AM CET Andrey Ryabinin wrote:
+> >>
+> >> We have implementation for this feature:
+> >>         "[PATCH] kasan: support use-after-scope detection" - http://lkml.kernel.org/r/<1479226045-145148-1-git-send-email-dvyukov@google.com>
+> >> and given how simple it is I'd suggest to just backport implementation.
+> >>
+> >> BTW, we also need "[PATCH] kasan: update kasan_global for gcc 7" - http://lkml.kernel.org/r/<1479219743-28682-1-git-send-email-dvyukov@google.com>
+> >> in v4.0+ stable.
+> >
+> > Ah, good. What's the plan for this patch? Would you still expect to
+> > see that merged into v4.9, or get backported later once it's part of v4.10?
+> >
+> > Either way, you proabably want a Cc:stable tag on it to trigger the
+> > backport to older kernels.
+> 
+> +Andrew, what is the plan for the "[PATCH] kasan: update kasan_global
+> for gcc 7" patch?
+> Do I need to remail to include Cc:stable?
 
-When the modules referring to exported symbols are built, there is an
-existing warning for missing CRC, but it's not always the case such
-any such module will be built, and in any case it is useful to get a
-warning at the source.
+I'm planning on merging it into 4.10-rc1.  There's nothing in the
+changelog to indicate that it is more urgent than that.
 
-This gets a little verbose with CONFIG_DEBUG_SECTION_MISMATCH,
-producing a warning with each object linked, but I didn't think
-that warranted extra complexity to avoid.
-
-Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
----
- scripts/mod/modpost.c | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-index bd83497..08f62a1 100644
---- a/scripts/mod/modpost.c
-+++ b/scripts/mod/modpost.c
-@@ -609,6 +609,7 @@ static void handle_modversions(struct module *mod, struct elf_info *info,
- {
- 	unsigned int crc;
- 	enum export export;
-+	bool is_crc = false;
- 
- 	if ((!is_vmlinux(mod->name) || mod->is_dot_o) &&
- 	    strncmp(symname, "__ksymtab", 9) == 0)
-@@ -618,6 +619,7 @@ static void handle_modversions(struct module *mod, struct elf_info *info,
- 
- 	/* CRC'd symbol */
- 	if (strncmp(symname, CRC_PFX, strlen(CRC_PFX)) == 0) {
-+		is_crc = true;
- 		crc = (unsigned int) sym->st_value;
- 		sym_update_crc(symname + strlen(CRC_PFX), mod, crc,
- 				export);
-@@ -663,6 +665,10 @@ static void handle_modversions(struct module *mod, struct elf_info *info,
- 		else
- 			symname++;
- #endif
-+		if (is_crc) {
-+			const char *e = is_vmlinux(mod->name) ?"":".ko";
-+			warn("EXPORT symbol \"%s\" [%s%s] version generation failed, symbol will not be versioned.\n", symname + strlen(CRC_PFX), mod->name, e);
-+		}
- 		mod->unres = alloc_symbol(symname,
- 					  ELF_ST_BIND(sym->st_info) == STB_WEAK,
- 					  mod->unres);
--- 
-2.10.2
-
+Please send out a new changelog which can be used to justify a merge
+into 4.9 and -stable.
