@@ -1,61 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from static.vnpt.vn ([14.160.52.118]:40654 "HELO vnpt.vn"
-        rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with SMTP
-        id S935112AbcKXMw4 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 24 Nov 2016 07:52:56 -0500
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment
-From: <mpinon@uach.mx>
+Received: from mail-lf0-f47.google.com ([209.85.215.47]:34299 "EHLO
+        mail-lf0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S936254AbcKXOlH (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 24 Nov 2016 09:41:07 -0500
+Received: by mail-lf0-f47.google.com with SMTP id o141so30266200lff.1
+        for <linux-kbuild@vger.kernel.org>; Thu, 24 Nov 2016 06:40:22 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: application/zip; name="INFO_18766484503592_linux-kbuild.zip"
-Message-ID: <147999197033.12681.725958835422615962@vnpt.vn>
-Subject: 7630 linux-kbuild
-Date: Thu, 24 Nov 2016 12:52:50 -0000
+In-Reply-To: <20161123104939.78f7361150020bff2bc88d2f@linux-foundation.org>
+References: <20161122225424.3739294-1-arnd@arndb.de> <e8b2d3b5-31c4-80ad-df2b-38c72dc0fa10@virtuozzo.com>
+ <3117683.gtMMlH1SLc@wuerfel> <CACT4Y+byCnW6kWUTUn+YhdJKtadhHuYn+AvvyAZ+AuToJWNufg@mail.gmail.com>
+ <20161123104939.78f7361150020bff2bc88d2f@linux-foundation.org>
+From: Dmitry Vyukov <dvyukov@google.com>
+Date: Thu, 24 Nov 2016 15:40:00 +0100
+Message-ID: <CACT4Y+YXQC7fHn_P-nPC1rj4toKoZCziPz2s_KkMmEPzgxjz4w@mail.gmail.com>
+Subject: Re: [PATCH] kasan: turn off -fsanitize-address-use-after-scope for now
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Arnd Bergmann <arnd@arndb.de>, Andrey Ryabinin <aryabinin@virtuozzo.com>, =?UTF-8?Q?Martin_Li=C5=A1ka?= <marxin@gcc.gnu.org>, stable <stable@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Alexander Potapenko <glider@google.com>, "open list:KERNEL BUILD + fi..." <linux-kbuild@vger.kernel.org>, kasan-dev <kasan-dev@googlegroups.com>, LKML <linux-kernel@vger.kernel.org>
 
-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
+On Wed, Nov 23, 2016 at 7:49 PM, Andrew Morton
+<akpm@linux-foundation.org> wrote:
+> On Wed, 23 Nov 2016 10:33:41 +0100 Dmitry Vyukov <dvyukov@google.com> wrote:
+>
+>> On Wed, Nov 23, 2016 at 9:46 AM, Arnd Bergmann <arnd@arndb.de> wrote:
+>> > On Wednesday, November 23, 2016 11:25:49 AM CET Andrey Ryabinin wrote:
+>> >>
+>> >> We have implementation for this feature:
+>> >>         "[PATCH] kasan: support use-after-scope detection" - http://lkml.kernel.org/r/<1479226045-145148-1-git-send-email-dvyukov@google.com>
+>> >> and given how simple it is I'd suggest to just backport implementation.
+>> >>
+>> >> BTW, we also need "[PATCH] kasan: update kasan_global for gcc 7" - http://lkml.kernel.org/r/<1479219743-28682-1-git-send-email-dvyukov@google.com>
+>> >> in v4.0+ stable.
+>> >
+>> > Ah, good. What's the plan for this patch? Would you still expect to
+>> > see that merged into v4.9, or get backported later once it's part of v4.10?
+>> >
+>> > Either way, you proabably want a Cc:stable tag on it to trigger the
+>> > backport to older kernels.
+>>
+>> +Andrew, what is the plan for the "[PATCH] kasan: update kasan_global
+>> for gcc 7" patch?
+>> Do I need to remail to include Cc:stable?
+>
+> I'm planning on merging it into 4.10-rc1.  There's nothing in the
+> changelog to indicate that it is more urgent than that.
+>
+> Please send out a new changelog which can be used to justify a merge
+> into 4.9 and -stable.
+
+Remailed the patches with Cc: stable@vger.kernel.org # 4.0+
+and with a note that without these patches KASAN is broken with gcc 7.
