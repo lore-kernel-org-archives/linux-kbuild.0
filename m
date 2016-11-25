@@ -1,36 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:38254 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:41710 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753947AbcKYOWZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 25 Nov 2016 09:22:25 -0500
-Subject: Re: [PATCH 6/6] deb-pkg: Remove the KBUILD_IMAGE workaround
-References: <20161122213434.14788-1-mmarek@suse.com>
- <20161122213434.14788-6-mmarek@suse.com>
- <CAAqcGHmnGFgCjmsjerecy2Jf0YaCThGp5TxS1yNXqGzZnsXLBQ@mail.gmail.com>
+        id S1754307AbcKYOpR (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 25 Nov 2016 09:45:17 -0500
+Date: Fri, 25 Nov 2016 15:44:40 +0100
 From: Michal Marek <mmarek@suse.com>
-Message-ID: <5dd95503-9782-6c9a-a6ac-6067eed1935e@suse.com>
-Date: Fri, 25 Nov 2016 15:22:22 +0100
+Subject: Re: [PATCH ping] builddeb: fix cross-building to arm64 producing
+ host-arch debs
+Message-ID: <20161125144440.GA2826@sepie.suse.cz>
+References: <20161124012703.15704-1-kilobyte@angband.pl>
+ <CAAqcGH=BMxduGp=sVwptTTONGuH-uo6vog=4u0HJDSDNekCShQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAAqcGHmnGFgCjmsjerecy2Jf0YaCThGp5TxS1yNXqGzZnsXLBQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAAqcGH=BMxduGp=sVwptTTONGuH-uo6vog=4u0HJDSDNekCShQ@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Riku Voipio <riku.voipio@linaro.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Cc: Adam Borowski <kilobyte@angband.pl>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-Dne 25.11.2016 v 13:12 Riku Voipio napsal(a):
-> On 22 November 2016 at 23:34, Michal Marek <mmarek@suse.com> wrote:
->> The arch Makefile are fixed to set KBUILD_IMAGE to the full patch, so
->> the workaround is no longer needed.
->>
->> Signed-off-by: Michal Marek <mmarek@suse.com>
->> ---
-> Thanks for cleaning this up.
+On Fri, Nov 25, 2016 at 01:36:21PM +0200, Riku Voipio wrote:
+> On 24 November 2016 at 03:27, Adam Borowski <kilobyte@angband.pl> wrote:
+> > Both Debian and kernel archs are "arm64" but UTS_MACHINE and gcc say
+> > "aarch64".  Recognizing just the latter should be enough but let's
+> > accept both in case something regresses again or an user sets
+> > UTS_MACHINE=arm64.
+> >
+> > Regressed in cfa88c7: arm64: Set UTS_MACHINE in the Makefile.
+> >
+> > Signed-off-by: Adam Borowski <kilobyte@angband.pl>
+> > Acked-by: Riku Voipio <riku.voipio@linaro.org>
+> > ---
+> > As 4.9 is not only a LTS, but also the kernel Debian stretch will use,
+> > fixing this regression would be really nice.
 > 
-> Reviewed-by: Riku Voipio <riku.voipio@linaro.org>
+> Yes, this would be really appreciated.
 
-Note that this will only be merged once the individual arch patches have
-been picked up.
+This is in kbuild.git#rc-fixes now.
 
+Thanks,
 Michal
