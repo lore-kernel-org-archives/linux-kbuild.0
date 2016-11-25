@@ -1,61 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f48.google.com ([209.85.215.48]:32864 "EHLO
-        mail-lf0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751041AbcKYLgY (ORCPT
+Received: from mail-lf0-f43.google.com ([209.85.215.43]:35195 "EHLO
+        mail-lf0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752955AbcKYMMO (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 25 Nov 2016 06:36:24 -0500
-Received: by mail-lf0-f48.google.com with SMTP id c13so48495811lfg.0
-        for <linux-kbuild@vger.kernel.org>; Fri, 25 Nov 2016 03:36:23 -0800 (PST)
+        Fri, 25 Nov 2016 07:12:14 -0500
+Received: by mail-lf0-f43.google.com with SMTP id b14so49262252lfg.2
+        for <linux-kbuild@vger.kernel.org>; Fri, 25 Nov 2016 04:12:13 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20161124012703.15704-1-kilobyte@angband.pl>
-References: <20161124012703.15704-1-kilobyte@angband.pl>
+In-Reply-To: <20161122213434.14788-6-mmarek@suse.com>
+References: <20161122213434.14788-1-mmarek@suse.com> <20161122213434.14788-6-mmarek@suse.com>
 From: Riku Voipio <riku.voipio@linaro.org>
-Date: Fri, 25 Nov 2016 13:36:21 +0200
-Message-ID: <CAAqcGH=BMxduGp=sVwptTTONGuH-uo6vog=4u0HJDSDNekCShQ@mail.gmail.com>
-Subject: Re: [PATCH ping] builddeb: fix cross-building to arm64 producing
- host-arch debs
+Date: Fri, 25 Nov 2016 14:12:11 +0200
+Message-ID: <CAAqcGHmnGFgCjmsjerecy2Jf0YaCThGp5TxS1yNXqGzZnsXLBQ@mail.gmail.com>
+Subject: Re: [PATCH 6/6] deb-pkg: Remove the KBUILD_IMAGE workaround
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Adam Borowski <kilobyte@angband.pl>
-Cc: Michal Marek <mmarek@suse.com>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Michal Marek <mmarek@suse.com>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
 
-On 24 November 2016 at 03:27, Adam Borowski <kilobyte@angband.pl> wrote:
-> Both Debian and kernel archs are "arm64" but UTS_MACHINE and gcc say
-> "aarch64".  Recognizing just the latter should be enough but let's
-> accept both in case something regresses again or an user sets
-> UTS_MACHINE=arm64.
+On 22 November 2016 at 23:34, Michal Marek <mmarek@suse.com> wrote:
+> The arch Makefile are fixed to set KBUILD_IMAGE to the full patch, so
+> the workaround is no longer needed.
 >
-> Regressed in cfa88c7: arm64: Set UTS_MACHINE in the Makefile.
->
-> Signed-off-by: Adam Borowski <kilobyte@angband.pl>
-> Acked-by: Riku Voipio <riku.voipio@linaro.org>
+> Signed-off-by: Michal Marek <mmarek@suse.com>
 > ---
-> As 4.9 is not only a LTS, but also the kernel Debian stretch will use,
-> fixing this regression would be really nice.
+Thanks for cleaning this up.
 
-Yes, this would be really appreciated.
+Reviewed-by: Riku Voipio <riku.voipio@linaro.org>
 
-Riku
-
->  scripts/package/builddeb | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  scripts/package/builddeb | 7 +------
+>  1 file changed, 1 insertion(+), 6 deletions(-)
 >
 > diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-> index 8ea9fd2..3c575cd0 100755
+> index 8ea9fd2b6573..dab997343f1a 100755
 > --- a/scripts/package/builddeb
 > +++ b/scripts/package/builddeb
-> @@ -51,7 +51,7 @@ set_debarch() {
->                 debarch=hppa ;;
->         mips*)
->                 debarch=mips$(grep -q CPU_LITTLE_ENDIAN=y $KCONFIG_CONFIG && echo el || true) ;;
-> -       arm64)
-> +       aarch64|arm64)
->                 debarch=arm64 ;;
->         arm*)
->                 if grep -q CONFIG_AEABI=y $KCONFIG_CONFIG; then
+> @@ -143,12 +143,7 @@ else
+>         cp System.map "$tmpdir/boot/System.map-$version"
+>         cp $KCONFIG_CONFIG "$tmpdir/boot/config-$version"
+>  fi
+> -# Not all arches include the boot path in KBUILD_IMAGE
+> -if [ -e $KBUILD_IMAGE ]; then
+> -       cp $KBUILD_IMAGE "$tmpdir/$installed_image_path"
+> -else
+> -       cp arch/$ARCH/boot/$KBUILD_IMAGE "$tmpdir/$installed_image_path"
+> -fi
+> +cp "$($MAKE -s image_name)" "$tmpdir/$installed_image_path"
+>
+>  if grep -q "^CONFIG_OF=y" $KCONFIG_CONFIG ; then
+>         # Only some architectures with OF support have this target
 > --
-> 2.10.2
+> 2.10.0
 >
 > --
 > To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
