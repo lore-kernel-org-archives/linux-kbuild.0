@@ -1,81 +1,85 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg0-f68.google.com ([74.125.83.68]:33646 "EHLO
-        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751271AbcKZA40 (ORCPT
+Received: from mail-qk0-f173.google.com ([209.85.220.173]:33861 "EHLO
+        mail-qk0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750698AbcKZEeg (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 25 Nov 2016 19:56:26 -0500
-Date: Sat, 26 Nov 2016 11:37:07 +1100
-From: Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH] x86/kbuild: enable modversions for symbols exported
- from asm
-Message-ID: <20161126113707.67568704@roar.ozlabs.ibm.com>
-In-Reply-To: <CA+55aFwXqv6uYmW0kC=c+yyumO_T0CJrz6m+MQCQX6bR5gRBQw@mail.gmail.com>
-References: <20161123205338.GA12050@angband.pl>
-        <20161123210256.31501-1-kilobyte@angband.pl>
-        <20161124044028.GA12704@gmail.com>
-        <20161124162051.5e336127@roar.ozlabs.ibm.com>
-        <20161124060050.GA788@gmail.com>
-        <20161124182026.34e6570b@roar.ozlabs.ibm.com>
-        <20161124073639.GA12728@kroah.com>
-        <20161124185322.1e2a492c@roar.ozlabs.ibm.com>
-        <20161124095622.GA14390@kroah.com>
-        <20161124213152.30d8d27a@roar.ozlabs.ibm.com>
-        <20161124152410.GC30905@kroah.com>
-        <20161125114018.12421474@roar.ozlabs.ibm.com>
-        <CA+55aFwXqv6uYmW0kC=c+yyumO_T0CJrz6m+MQCQX6bR5gRBQw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+        Fri, 25 Nov 2016 23:34:36 -0500
+Received: by mail-qk0-f173.google.com with SMTP id q130so94543843qke.1
+        for <linux-kbuild@vger.kernel.org>; Fri, 25 Nov 2016 20:34:35 -0800 (PST)
+From: Peter Foley <pefoley2@pefoley.com>
+Subject: [PATCH] Fixes for compiling with clang
+Date: Fri, 25 Nov 2016 23:27:24 -0500
+Message-Id: <20161126042724.15461-1-pefoley2@pefoley.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Ingo Molnar <mingo@kernel.org>, Al Viro <viro@zeniv.linux.org.uk>, Adam Borowski <kilobyte@angband.pl>, Michal Marek <mmarek@suse.com>, Philip Muller <philm@manjaro.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Andrew Morton <akpm@linux-foundation.org>, Peter Zijlstra <a.p.zijlstra@chello.nl>, linux-arch <linux-arch@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: linux-kernel@vger.kernel.org, mmarek@suse.com, linux-kbuild@vger.kernel.org
+Cc: Peter Foley <pefoley2@pefoley.com>
 
-On Fri, 25 Nov 2016 10:00:46 -0800
-Linus Torvalds <torvalds@linux-foundation.org> wrote:
+Move definition of HOSTCC to allow use of cc-name.
+Suppress warnings about unsupported optimization options.
+Disable clang's integrated assembler which is incompatible with kernel
+asm constructs.
 
-> On Thu, Nov 24, 2016 at 4:40 PM, Nicholas Piggin <npiggin@gmail.com> wrote:
-> >>
-> >> Yes, manual "marking" is never going to be a viable solution.  
-> >
-> > I guess it really depends on how exactly you want to use it. For distros
-> > that do stable ABI but rarely may have to break something for security
-> > reasons, it should work and give exact control.  
-> 
-> No. Because nobody else will care, so unless it's like a single symbol
-> or something, it will just be a maintenance nightmare.
+Signed-off-by: Peter Foley <pefoley2@pefoley.com>
+---
+ Makefile | 23 +++++++++++++----------
+ 1 file changed, 13 insertions(+), 10 deletions(-)
 
-Yeah that's true, and as I realized a distro can rename a symbol if they
-make incompatible changes which happens very rarely. Avoids having to
-carry some whole infrastructure upstream for it.
+diff --git a/Makefile b/Makefile
+index 0ede48ba5aaf..b69ad7e4a6d2 100644
+--- a/Makefile
++++ b/Makefile
+@@ -299,16 +299,6 @@ CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
+ 	  else if [ -x /bin/bash ]; then echo /bin/bash; \
+ 	  else echo sh; fi ; fi)
+ 
+-HOSTCC       = gcc
+-HOSTCXX      = g++
+-HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89
+-HOSTCXXFLAGS = -O2
+-
+-ifeq ($(shell $(HOSTCC) -v 2>&1 | grep -c "clang version"), 1)
+-HOSTCFLAGS  += -Wno-unused-value -Wno-unused-parameter \
+-		-Wno-missing-field-initializers -fno-delete-null-pointer-checks
+-endif
+-
+ # Decide whether to build built-in, modular, or both.
+ # Normally, just do built-in.
+ 
+@@ -343,6 +333,16 @@ export KBUILD_CHECKSRC KBUILD_SRC KBUILD_EXTMOD
+ scripts/Kbuild.include: ;
+ include scripts/Kbuild.include
+ 
++HOSTCC       = gcc
++HOSTCXX      = g++
++HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89 \
++               -Wno-unused-value -Wno-unused-parameter -Wno-missing-field-initializers
++HOSTCXXFLAGS = -O2
++
++ifneq ($(cc-name),clang)
++HOSTCFLAGS +=  -fno-delete-null-pointer-checks
++endif
++
+ # Make variables (CC, etc...)
+ AS		= $(CROSS_COMPILE)as
+ LD		= $(CROSS_COMPILE)ld
+@@ -685,6 +685,7 @@ KBUILD_CFLAGS += $(stackp-flag)
+ ifeq ($(cc-name),clang)
+ KBUILD_CPPFLAGS += $(call cc-option,-Qunused-arguments,)
+ KBUILD_CPPFLAGS += $(call cc-option,-Wno-unknown-warning-option,)
++KBUILD_CFLAGS += $(call cc-disable-warning, ignored-optimization-argument)
+ KBUILD_CFLAGS += $(call cc-disable-warning, unused-variable)
+ KBUILD_CFLAGS += $(call cc-disable-warning, format-invalid-specifier)
+ KBUILD_CFLAGS += $(call cc-disable-warning, gnu)
+@@ -695,6 +696,8 @@ KBUILD_CFLAGS += $(call cc-disable-warning, tautological-compare)
+ # See modpost pattern 2
+ KBUILD_CFLAGS += $(call cc-option, -mno-global-merge,)
+ KBUILD_CFLAGS += $(call cc-option, -fcatch-undefined-behavior)
++KBUILD_CFLAGS += $(call cc-option, -fno-integrated-as)
++KBUILD_AFLAGS += $(call cc-option, -fno-integrated-as)
+ else
+ 
+ # These warnings generated too much noise in a regular build.
+-- 
+2.11.0.rc2
 
-> 
-> > What else do people *actually* use it for? Preventing mismatched modules
-> > when .git version is not attached and release version of the kernel has
-> > not been bumped. Is that it?  
-> 
-> It used to be very useful for avoiding loading stale modules and then
-> wasting days on debugging something that wasn't the case when you had
-> forgotten to do "make modules_install". Change some subtle internal
-> ABI issue (add/remove a parameter, whatever) and it would really help.
-> 
-> These days, for me, LOCALVERSION_AUTO and module signing are what I
-> personally tend to use.
-> 
-> The modversions stuff may just be too painful to bother with. Very few
-> people probably use it, and the ones that do likely don't have any
-> overriding reason why.
-> 
-> So I'd personally be ok with just saying "let's disable it for now",
-> and see if anybody even notices and cares, and then has a good enough
-> explanation of why. It's entirely possible that most users are "I
-> enabled it ten years ago, I didn't even realize it was still in my
-> defconfig".
-
-That sounds good. Should we try to get 4.9 working (which we could
-do relatively easily with a few arch reverts), and then disable
-modversions for 4.10? (at which point we can un-revert Al's arch
-patches)
-
-Thanks,
-Nick
