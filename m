@@ -1,17 +1,17 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qt0-f172.google.com ([209.85.216.172]:35234 "EHLO
-        mail-qt0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752989AbcKZSCl (ORCPT
+Received: from mail-qt0-f176.google.com ([209.85.216.176]:33485 "EHLO
+        mail-qt0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753038AbcKZSUK (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 26 Nov 2016 13:02:41 -0500
-Received: by mail-qt0-f172.google.com with SMTP id c47so89686300qtc.2
-        for <linux-kbuild@vger.kernel.org>; Sat, 26 Nov 2016 10:02:40 -0800 (PST)
+        Sat, 26 Nov 2016 13:20:10 -0500
+Received: by mail-qt0-f176.google.com with SMTP id p16so89652981qta.0
+        for <linux-kbuild@vger.kernel.org>; Sat, 26 Nov 2016 10:20:10 -0800 (PST)
 From: Peter Foley <pefoley2@pefoley.com>
-Subject: [PATCH v2] Fixes for compiling with clang
-Date: Sat, 26 Nov 2016 13:02:24 -0500
-Message-Id: <20161126180224.29783-1-pefoley2@pefoley.com>
-In-Reply-To: <20161126042724.15461-1-pefoley2@pefoley.com>
-References: <20161126042724.15461-1-pefoley2@pefoley.com>
+Subject: [PATCH v3] Fixes for compiling with clang
+Date: Sat, 26 Nov 2016 13:20:06 -0500
+Message-Id: <20161126182006.24815-1-pefoley2@pefoley.com>
+In-Reply-To: <20161126180224.29783-1-pefoley2@pefoley.com>
+References: <20161126180224.29783-1-pefoley2@pefoley.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kernel@vger.kernel.org, mmarek@suse.com, linux-kbuild@vger.kernel.org
@@ -24,14 +24,16 @@ asm constructs.
 
 Changes from v1:
 * Move the $(cc-name) conditional below the definition of $(CC)
+Changes from v2:
+* Actually commit the changes in v2.
 
 Signed-off-by: Peter Foley <pefoley2@pefoley.com>
 ---
- Makefile | 23 +++++++++++++----------
- 1 file changed, 13 insertions(+), 10 deletions(-)
+ Makefile | 22 ++++++++++++----------
+ 1 file changed, 12 insertions(+), 10 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index 0ede48ba5aaf..b69ad7e4a6d2 100644
+index 0ede48ba5aaf..94402cef6622 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -299,16 +299,6 @@ CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
@@ -51,9 +53,9 @@ index 0ede48ba5aaf..b69ad7e4a6d2 100644
  # Decide whether to build built-in, modular, or both.
  # Normally, just do built-in.
  
-@@ -343,6 +333,16 @@ export KBUILD_CHECKSRC KBUILD_SRC KBUILD_EXTMOD
- scripts/Kbuild.include: ;
- include scripts/Kbuild.include
+@@ -373,6 +363,15 @@ LDFLAGS_vmlinux =
+ CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage -fno-tree-loop-im -Wno-maybe-uninitialized
+ CFLAGS_KCOV	:= $(call cc-option,-fsanitize-coverage=trace-pc,)
  
 +HOSTCC       = gcc
 +HOSTCXX      = g++
@@ -64,11 +66,10 @@ index 0ede48ba5aaf..b69ad7e4a6d2 100644
 +ifneq ($(cc-name),clang)
 +HOSTCFLAGS +=  -fno-delete-null-pointer-checks
 +endif
-+
- # Make variables (CC, etc...)
- AS		= $(CROSS_COMPILE)as
- LD		= $(CROSS_COMPILE)ld
-@@ -685,6 +685,7 @@ KBUILD_CFLAGS += $(stackp-flag)
+ 
+ # Use USERINCLUDE when you must reference the UAPI directories only.
+ USERINCLUDE    := \
+@@ -685,6 +684,7 @@ KBUILD_CFLAGS += $(stackp-flag)
  ifeq ($(cc-name),clang)
  KBUILD_CPPFLAGS += $(call cc-option,-Qunused-arguments,)
  KBUILD_CPPFLAGS += $(call cc-option,-Wno-unknown-warning-option,)
@@ -76,7 +77,7 @@ index 0ede48ba5aaf..b69ad7e4a6d2 100644
  KBUILD_CFLAGS += $(call cc-disable-warning, unused-variable)
  KBUILD_CFLAGS += $(call cc-disable-warning, format-invalid-specifier)
  KBUILD_CFLAGS += $(call cc-disable-warning, gnu)
-@@ -695,6 +696,8 @@ KBUILD_CFLAGS += $(call cc-disable-warning, tautological-compare)
+@@ -695,6 +695,8 @@ KBUILD_CFLAGS += $(call cc-disable-warning, tautological-compare)
  # See modpost pattern 2
  KBUILD_CFLAGS += $(call cc-option, -mno-global-merge,)
  KBUILD_CFLAGS += $(call cc-option, -fcatch-undefined-behavior)
