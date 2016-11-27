@@ -1,91 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qt0-f176.google.com ([209.85.216.176]:33485 "EHLO
-        mail-qt0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753038AbcKZSUK (ORCPT
+Received: from mail-qt0-f169.google.com ([209.85.216.169]:36048 "EHLO
+        mail-qt0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753091AbcK0Cdu (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 26 Nov 2016 13:20:10 -0500
-Received: by mail-qt0-f176.google.com with SMTP id p16so89652981qta.0
-        for <linux-kbuild@vger.kernel.org>; Sat, 26 Nov 2016 10:20:10 -0800 (PST)
-From: Peter Foley <pefoley2@pefoley.com>
-Subject: [PATCH v3] Fixes for compiling with clang
-Date: Sat, 26 Nov 2016 13:20:06 -0500
-Message-Id: <20161126182006.24815-1-pefoley2@pefoley.com>
-In-Reply-To: <20161126180224.29783-1-pefoley2@pefoley.com>
-References: <20161126180224.29783-1-pefoley2@pefoley.com>
+        Sat, 26 Nov 2016 21:33:50 -0500
+Received: by mail-qt0-f169.google.com with SMTP id w33so94867720qtc.3
+        for <linux-kbuild@vger.kernel.org>; Sat, 26 Nov 2016 18:33:49 -0800 (PST)
+Date: Sat, 26 Nov 2016 21:33:47 -0500 (EST)
+From: Nicolas Pitre <nicolas.pitre@linaro.org>
+Subject: Re: [PATCH 1/2] kbuild: provide include/asm/asm-prototypes.h for
+ ARM
+In-Reply-To: <20161123103640.GC14217@n2100.armlinux.org.uk>
+Message-ID: <alpine.LFD.2.20.1611262124040.1715@knanqh.ubzr>
+References: <20161122110557.1533467-1-arnd@arndb.de> <alpine.LFD.2.20.1611221106410.1814@knanqh.ubzr> <20161123120436.18dc21e7@roar.ozlabs.ibm.com> <alpine.LFD.2.20.1611222030050.1814@knanqh.ubzr> <20161123093332.GB14217@n2100.armlinux.org.uk>
+ <20161123103640.GC14217@n2100.armlinux.org.uk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org, mmarek@suse.com, linux-kbuild@vger.kernel.org
-Cc: Peter Foley <pefoley2@pefoley.com>
+To: Russell King - ARM Linux <linux@armlinux.org.uk>
+Cc: linux-arch@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>, =?ISO-8859-15?Q?Uwe_Kleine-K=F6nig?= <uwe@kleine-koenig.org>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Nicholas Piggin <npiggin@gmail.com>, regressions@leemhuis.info, viro@zeniv.linux.org.uk, linux-arm-kernel@lists.infradead.org
 
-Move definition of HOSTCC to allow use of cc-name.
-Suppress warnings about unsupported optimization options.
-Disable clang's integrated assembler which is incompatible with kernel
-asm constructs.
+On Wed, 23 Nov 2016, Russell King - ARM Linux wrote:
 
-Changes from v1:
-* Move the $(cc-name) conditional below the definition of $(CC)
-Changes from v2:
-* Actually commit the changes in v2.
+> On Wed, Nov 23, 2016 at 09:33:32AM +0000, Russell King - ARM Linux wrote:
+> > So, I still think the whole approach is wrong - it's added extra
+> > fragility that wasn't there with the armksyms.c approach.
+> 
+> Here's what the diffstat and patch looks like when you combine the
+> original commit and the three fixes.  The LoC delta of 25 lines can
+> be accounted for as deleted commentry.  So, I think (as I've detailed
+> above) that the _technical_ benefit of the approach is very low.
+> 
+> If we want to move the exports into assembly files, I've no problem
+> with that, provided we can do it better than this - and by better I
+> mean not creating the fragile asm-prototypes.h which divorses the
+> prototypes from everything else.
 
-Signed-off-by: Peter Foley <pefoley2@pefoley.com>
----
- Makefile | 22 ++++++++++++----------
- 1 file changed, 12 insertions(+), 10 deletions(-)
+I think we agree on that.
 
-diff --git a/Makefile b/Makefile
-index 0ede48ba5aaf..94402cef6622 100644
---- a/Makefile
-+++ b/Makefile
-@@ -299,16 +299,6 @@ CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
- 	  else if [ -x /bin/bash ]; then echo /bin/bash; \
- 	  else echo sh; fi ; fi)
- 
--HOSTCC       = gcc
--HOSTCXX      = g++
--HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89
--HOSTCXXFLAGS = -O2
--
--ifeq ($(shell $(HOSTCC) -v 2>&1 | grep -c "clang version"), 1)
--HOSTCFLAGS  += -Wno-unused-value -Wno-unused-parameter \
--		-Wno-missing-field-initializers -fno-delete-null-pointer-checks
--endif
--
- # Decide whether to build built-in, modular, or both.
- # Normally, just do built-in.
- 
-@@ -373,6 +363,15 @@ LDFLAGS_vmlinux =
- CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage -fno-tree-loop-im -Wno-maybe-uninitialized
- CFLAGS_KCOV	:= $(call cc-option,-fsanitize-coverage=trace-pc,)
- 
-+HOSTCC       = gcc
-+HOSTCXX      = g++
-+HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89 \
-+               -Wno-unused-value -Wno-unused-parameter -Wno-missing-field-initializers
-+HOSTCXXFLAGS = -O2
-+
-+ifneq ($(cc-name),clang)
-+HOSTCFLAGS +=  -fno-delete-null-pointer-checks
-+endif
- 
- # Use USERINCLUDE when you must reference the UAPI directories only.
- USERINCLUDE    := \
-@@ -685,6 +684,7 @@ KBUILD_CFLAGS += $(stackp-flag)
- ifeq ($(cc-name),clang)
- KBUILD_CPPFLAGS += $(call cc-option,-Qunused-arguments,)
- KBUILD_CPPFLAGS += $(call cc-option,-Wno-unknown-warning-option,)
-+KBUILD_CFLAGS += $(call cc-disable-warning, ignored-optimization-argument)
- KBUILD_CFLAGS += $(call cc-disable-warning, unused-variable)
- KBUILD_CFLAGS += $(call cc-disable-warning, format-invalid-specifier)
- KBUILD_CFLAGS += $(call cc-disable-warning, gnu)
-@@ -695,6 +695,8 @@ KBUILD_CFLAGS += $(call cc-disable-warning, tautological-compare)
- # See modpost pattern 2
- KBUILD_CFLAGS += $(call cc-option, -mno-global-merge,)
- KBUILD_CFLAGS += $(call cc-option, -fcatch-undefined-behavior)
-+KBUILD_CFLAGS += $(call cc-option, -fno-integrated-as)
-+KBUILD_AFLAGS += $(call cc-option, -fno-integrated-as)
- else
- 
- # These warnings generated too much noise in a regular build.
--- 
-2.11.0.rc2
+I see that the revert made it to Linus' tree.  That's probably the best 
+outcome for now.
 
+I was working on that better solution I alluded to previously. And it 
+isn't really complicated either, with much fewer lines of code.  But 
+this can wait for the next merge window.
+
+
+Nicolas
