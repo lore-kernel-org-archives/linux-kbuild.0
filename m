@@ -1,105 +1,81 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from merlin.infradead.org ([205.233.59.134]:32828 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750797AbcK1ATd (ORCPT
+Received: from mail-qk0-f175.google.com ([209.85.220.175]:34738 "EHLO
+        mail-qk0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754393AbcK1GpC (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 27 Nov 2016 19:19:33 -0500
-From: Randy Dunlap <rdunlap@infradead.org>
-Subject: xconfig patches to be merged
-Message-ID: <870ad06b-d43f-e627-118b-8b5c2eddb677@infradead.org>
-Date: Sun, 27 Nov 2016 16:19:29 -0800
-MIME-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="------------8CEFE14899413C464B8D4960"
+        Mon, 28 Nov 2016 01:45:02 -0500
+Received: by mail-qk0-f175.google.com with SMTP id q130so130534678qke.1
+        for <linux-kbuild@vger.kernel.org>; Sun, 27 Nov 2016 22:45:01 -0800 (PST)
+From: Peter Foley <pefoley2@pefoley.com>
+Subject: [PATCH v4] Fixes for compiling with clang
+Date: Mon, 28 Nov 2016 01:44:46 -0500
+Message-Id: <20161128064446.4892-1-pefoley2@pefoley.com>
+In-Reply-To: <20161126182006.24815-1-pefoley2@pefoley.com>
+References: <20161126182006.24815-1-pefoley2@pefoley.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Boris Barbulovski <bbarbulovski@gmail.com>, Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>
+To: linux-kernel@vger.kernel.org, mmarek@suse.com, linux-kbuild@vger.kernel.org
+Cc: Peter Foley <pefoley2@pefoley.com>
 
-This is a multi-part message in MIME format.
---------------8CEFE14899413C464B8D4960
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Fix reversed conditional checking if HOSTCC is clang.
+Suppress warnings about unsupported optimization options.
+Suppress warnings about unused functions, as they are generated for
+every module and are therefore far too spammy.
+Disable clang's integrated assembler which is incompatible with kernel
+asm constructs.
 
-Hi Boris,
+Changes from v1:
+* Move the $(cc-name) conditional below the definition of $(CC)
+Changes from v2:
+* Actually commit the changes in v2.
+Changes from v3:
+* HOSTCC is not guaranteed to be the same as CC, adjust accordingly.
 
-[one of my mail "folders" is mucked up; it happens to contain linux-kbuild
-emails, so I cannot reply to them directly]
-
-
-Please resend 2 (or 3; see below) xconfig patches to Michal and the
-linux-kbuild mailing list.  Also please add my
-Tested-by: Randy Dunlap <rdunlap@infradead.org>
-to both of them.
-
-1. your xconfig - Fix 'Show Debug' functionality
-patch.
-
-Same as https://patchwork.kernel.org/patch/9407305/
-
-2. your qconfig initial slider sizes fix
-https://patchwork.kernel.org/patch/9380811/
-
-However, I don't have a record that this patch was needed or used
-in my testing.
-
-3. your QSlider sizes issues patch
-which I cannot find in email archives, so I am attaching it below.
-
-
-Thanks.
--- 
-~Randy
-
---------------8CEFE14899413C464B8D4960
-Content-Type: text/x-patch;
- name="QSlider_sizes_issues.patch"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
- filename="QSlider_sizes_issues.patch"
-
-From f7e1fcd11f88e0f7bc256c758c6f70c1e621fd1d Mon Sep 17 00:00:00 2001
-From: Boris Barbulovski <bbarbulovski@gmail.com>
-Date: Mon, 17 Oct 2016 20:33:10 +0200
-Subject: [PATCH] qconfig initial slider sizes fix.
-
-On first `make xconfig`, suboption and help panels were hidden.
-
-Now we properly detect the first run, and show those panels.
+Signed-off-by: Peter Foley <pefoley2@pefoley.com>
 ---
- scripts/kconfig/qconf.cc |   11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+ Makefile | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
---- lnx-48.orig/scripts/kconfig/qconf.cc
-+++ lnx-48/scripts/kconfig/qconf.cc
-@@ -1291,6 +1291,8 @@ ConfigSearchWindow::ConfigSearchWindow(C
- 		QList<int> sizes = configSettings->readSizes("/split", &ok);
- 		if (ok)
- 			split->setSizes(sizes);
-+		else
-+			split->setSizes(QList<int>() << 1 << 1);
- 		configSettings->endGroup();
- 		connect(configApp, SIGNAL(aboutToQuit()), SLOT(saveSettings()));
- 	}
-@@ -1511,12 +1513,17 @@ ConfigMainWindow::ConfigMainWindow(void)
+diff --git a/Makefile b/Makefile
+index 694111b43cf8..9c4803a74117 100644
+--- a/Makefile
++++ b/Makefile
+@@ -301,12 +301,12 @@ CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
  
- 	// UI setup done, restore splitter positions
- 	QList<int> sizes = configSettings->readSizes("/split1", &ok);
--	if (ok)
-+	if ((ok)&&(sizes.length() == 2))
- 		split1->setSizes(sizes);
-+	else
-+		split1->setSizes(QList<int>() << 1 << 1);
-+
+ HOSTCC       = gcc
+ HOSTCXX      = g++
+-HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89
++HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89 \
++               -Wno-unused-value -Wno-unused-parameter -Wno-missing-field-initializers
+ HOSTCXXFLAGS = -O2
  
- 	sizes = configSettings->readSizes("/split2", &ok);
--	if (ok)
-+	if ((ok)&&(sizes.length() == 2))
- 		split2->setSizes(sizes);
-+	else
-+		split2->setSizes(QList<int>() << 1 << 1);
- }
+-ifeq ($(shell $(HOSTCC) -v 2>&1 | grep -c "clang version"), 1)
+-HOSTCFLAGS  += -Wno-unused-value -Wno-unused-parameter \
+-		-Wno-missing-field-initializers -fno-delete-null-pointer-checks
++ifneq ($(shell $(HOSTCC) -v 2>&1 | grep -c "clang version"), 1)
++HOSTCFLAGS +=  -fno-delete-null-pointer-checks
+ endif
  
- void ConfigMainWindow::loadConfig(void)
+ # Decide whether to build built-in, modular, or both.
+@@ -685,7 +685,9 @@ KBUILD_CFLAGS += $(stackp-flag)
+ ifeq ($(cc-name),clang)
+ KBUILD_CPPFLAGS += $(call cc-option,-Qunused-arguments,)
+ KBUILD_CPPFLAGS += $(call cc-option,-Wno-unknown-warning-option,)
++KBUILD_CFLAGS += $(call cc-disable-warning, ignored-optimization-argument)
+ KBUILD_CFLAGS += $(call cc-disable-warning, unused-variable)
++KBUILD_CFLAGS += $(call cc-disable-warning, unused-function)
+ KBUILD_CFLAGS += $(call cc-disable-warning, format-invalid-specifier)
+ KBUILD_CFLAGS += $(call cc-disable-warning, gnu)
+ # Quiet clang warning: comparison of unsigned expression < 0 is always false
+@@ -695,6 +697,8 @@ KBUILD_CFLAGS += $(call cc-disable-warning, tautological-compare)
+ # See modpost pattern 2
+ KBUILD_CFLAGS += $(call cc-option, -mno-global-merge,)
+ KBUILD_CFLAGS += $(call cc-option, -fcatch-undefined-behavior)
++KBUILD_CFLAGS += $(call cc-option, -fno-integrated-as)
++KBUILD_AFLAGS += $(call cc-option, -fno-integrated-as)
+ else
+ 
+ # These warnings generated too much noise in a regular build.
+-- 
+2.11.0.rc2
 
---------------8CEFE14899413C464B8D4960--
