@@ -1,81 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qk0-f175.google.com ([209.85.220.175]:34738 "EHLO
-        mail-qk0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754393AbcK1GpC (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 28 Nov 2016 01:45:02 -0500
-Received: by mail-qk0-f175.google.com with SMTP id q130so130534678qke.1
-        for <linux-kbuild@vger.kernel.org>; Sun, 27 Nov 2016 22:45:01 -0800 (PST)
-From: Peter Foley <pefoley2@pefoley.com>
-Subject: [PATCH v4] Fixes for compiling with clang
-Date: Mon, 28 Nov 2016 01:44:46 -0500
-Message-Id: <20161128064446.4892-1-pefoley2@pefoley.com>
-In-Reply-To: <20161126182006.24815-1-pefoley2@pefoley.com>
-References: <20161126182006.24815-1-pefoley2@pefoley.com>
+Received: from mx2.suse.de ([195.135.220.15]:38648 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1754403AbcK1KjE (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 28 Nov 2016 05:39:04 -0500
+Subject: Re: [PATCH] Scripts: kconfig: nconf: fix _GNU_SOURCE redefined
+ warning
+References: <1480264106-29881-1-git-send-email-thrust73@gmail.com>
+From: Michal Marek <mmarek@suse.cz>
+Message-ID: <5d8cb4b1-fe87-5daf-432b-d6612196a9fc@suse.cz>
+Date: Mon, 28 Nov 2016 11:39:01 +0100
+MIME-Version: 1.0
+In-Reply-To: <1480264106-29881-1-git-send-email-thrust73@gmail.com>
+Content-Type: text/plain; charset=iso-8859-2
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org, mmarek@suse.com, linux-kbuild@vger.kernel.org
-Cc: Peter Foley <pefoley2@pefoley.com>
+To: Cheah Kok Cheong <thrust73@gmail.com>
+Cc: yann.morin.1998@free.fr, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Fix reversed conditional checking if HOSTCC is clang.
-Suppress warnings about unsupported optimization options.
-Suppress warnings about unused functions, as they are generated for
-every module and are therefore far too spammy.
-Disable clang's integrated assembler which is incompatible with kernel
-asm constructs.
+Dne 27.11.2016 v 17:28 Cheah Kok Cheong napsal(a):
+> Fix below warning when make nconfig is run initially
+> or after make clean.
+> 
+>   HOSTCC  scripts/kconfig/nconf.o
+> scripts/kconfig/nconf.c:8:0: warning: "_GNU_SOURCE" redefined
+>  #define _GNU_SOURCE
+>  ^
+> <command-line>:0:0: note: this is the location of the previous definition
 
-Changes from v1:
-* Move the $(cc-name) conditional below the definition of $(CC)
-Changes from v2:
-* Actually commit the changes in v2.
-Changes from v3:
-* HOSTCC is not guaranteed to be the same as CC, adjust accordingly.
+The Makefile does not specify -D_GNU_SOURCE. Are you adding it manually?
 
-Signed-off-by: Peter Foley <pefoley2@pefoley.com>
----
- Makefile | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index 694111b43cf8..9c4803a74117 100644
---- a/Makefile
-+++ b/Makefile
-@@ -301,12 +301,12 @@ CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
- 
- HOSTCC       = gcc
- HOSTCXX      = g++
--HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89
-+HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89 \
-+               -Wno-unused-value -Wno-unused-parameter -Wno-missing-field-initializers
- HOSTCXXFLAGS = -O2
- 
--ifeq ($(shell $(HOSTCC) -v 2>&1 | grep -c "clang version"), 1)
--HOSTCFLAGS  += -Wno-unused-value -Wno-unused-parameter \
--		-Wno-missing-field-initializers -fno-delete-null-pointer-checks
-+ifneq ($(shell $(HOSTCC) -v 2>&1 | grep -c "clang version"), 1)
-+HOSTCFLAGS +=  -fno-delete-null-pointer-checks
- endif
- 
- # Decide whether to build built-in, modular, or both.
-@@ -685,7 +685,9 @@ KBUILD_CFLAGS += $(stackp-flag)
- ifeq ($(cc-name),clang)
- KBUILD_CPPFLAGS += $(call cc-option,-Qunused-arguments,)
- KBUILD_CPPFLAGS += $(call cc-option,-Wno-unknown-warning-option,)
-+KBUILD_CFLAGS += $(call cc-disable-warning, ignored-optimization-argument)
- KBUILD_CFLAGS += $(call cc-disable-warning, unused-variable)
-+KBUILD_CFLAGS += $(call cc-disable-warning, unused-function)
- KBUILD_CFLAGS += $(call cc-disable-warning, format-invalid-specifier)
- KBUILD_CFLAGS += $(call cc-disable-warning, gnu)
- # Quiet clang warning: comparison of unsigned expression < 0 is always false
-@@ -695,6 +697,8 @@ KBUILD_CFLAGS += $(call cc-disable-warning, tautological-compare)
- # See modpost pattern 2
- KBUILD_CFLAGS += $(call cc-option, -mno-global-merge,)
- KBUILD_CFLAGS += $(call cc-option, -fcatch-undefined-behavior)
-+KBUILD_CFLAGS += $(call cc-option, -fno-integrated-as)
-+KBUILD_AFLAGS += $(call cc-option, -fno-integrated-as)
- else
- 
- # These warnings generated too much noise in a regular build.
--- 
-2.11.0.rc2
-
+Thanks,
+Michal
