@@ -1,50 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from lb2-smtp-cloud6.xs4all.net ([194.109.24.28]:49383 "EHLO
-        lb2-smtp-cloud6.xs4all.net" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1751635AbcK1U32 (ORCPT
+Received: from mail-pg0-f65.google.com ([74.125.83.65]:33261 "EHLO
+        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754109AbcK1WGa (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 28 Nov 2016 15:29:28 -0500
-Message-ID: <1480364961.1959.9.camel@tiscali.nl>
-Subject: Re: [PATCH] Scripts: kconfig: nconf: fix _GNU_SOURCE redefined
- warning
-From: Paul Bolle <pebolle@tiscali.nl>
-Date: Mon, 28 Nov 2016 21:29:21 +0100
-In-Reply-To: <20161128184639.GB16562@linux-Precision-WorkStation-T5500>
-References: <1480264106-29881-1-git-send-email-thrust73@gmail.com>
-         <5d8cb4b1-fe87-5daf-432b-d6612196a9fc@suse.cz>
-         <20161128184639.GB16562@linux-Precision-WorkStation-T5500>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Mon, 28 Nov 2016 17:06:30 -0500
+Date: Mon, 28 Nov 2016 22:06:26 +0000
+From: Wei Yang <richard.weiyang@gmail.com>
+Subject: Re: [PATCH V2] kbuild: add %/built-in.o target in top Makefile
+Message-ID: <20161128220626.GA16745@vultr.guest>
+Reply-To: Wei Yang <richard.weiyang@gmail.com>
+References: <1477313111-25205-1-git-send-email-richard.weiyang@gmail.com>
+ <1478470712-9872-1-git-send-email-richard.weiyang@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1478470712-9872-1-git-send-email-richard.weiyang@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Cheah Kok Cheong <thrust73@gmail.com>, Michal Marek <mmarek@suse.cz>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Wei Yang <richard.weiyang@gmail.com>
+Cc: mmarek@suse.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-[Dropped Yann.]
+Hi ~
 
-On Tue, 2016-11-29 at 02:46 +0800, Cheah Kok Cheong wrote:
-> On Mon, Nov 28, 2016 at 11:39:01AM +0100, Michal Marek wrote:
-> > The Makefile does not specify -D_GNU_SOURCE. Are you adding it manually?
+On Sun, Nov 06, 2016 at 10:18:32PM +0000, Wei Yang wrote:
+>Current kbuild just supports building built-in.o in second directory level
+>individually. There is no rule to build those built-in.o targets below
+>third directory level.
+>
+>Even current kbuild system could achieve this with rule "%/", while this
+>not only builds built-in targes but also lib target, extra target and
+>module objects.
+>
+>This patch adds the "%/built-in.o" rule so that each built-in.o in the
+>kernel tree could be the build target, which looks more consistent for the
+>kbuild system.
+>
+>Signed-off-by: Wei Yang <richard.weiyang@gmail.com>
+>
+>---
+>v2
+>    . add FORCE in prerequest
+>
+>---
+> Makefile | 2 ++
+> 1 file changed, 2 insertions(+)
+>
+>diff --git a/Makefile b/Makefile
+>index f97f786..9c65498 100644
+>--- a/Makefile
+>+++ b/Makefile
+>@@ -1638,6 +1638,8 @@ endif
+> 	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+> %.symtypes: %.c prepare scripts FORCE
+> 	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+>+%/built-in.o: prepare scripts FORCE
+>+	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+> 
+> # Modules
+> /: prepare scripts FORCE
+>-- 
+>2.5.0
 
-On Fedora 24 I'm able to trigger this too:
-    $ [...]
-    make -f ./scripts/Makefile.build obj=scripts/kconfig nconfig
-      gcc -Wp,-MD,scripts/kconfig/.nconf.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -D_GNU_SOURCE -DCURSES_LOC="<ncurses.h>" -DNCURSES_WIDECHAR=1 -DLOCALE   -c -o scripts/kconfig/nconf.o scripts/kconfig/nconf.c
-    scripts/kconfig/nconf.c:8:0: warning: "_GNU_SOURCE" redefined
-     #define _GNU_SOURCE
-     
-    <command-line>:0:0: note: this is the location of the previous definition
-
-It's probably added by pkg-config:
-    $ pkg-config --cflags ncursesw
-    -D_GNU_SOURCE
-
-And apparently we call pkg-config in scripts/kconfig/Makefile. Or in
-scripts/kconfig/lxdialog/check-lxdialog.sh. Not sure, I didn't yet dive deeper
-into this.
-
-Hope this helps,
-
-
-Paul Bolle
+-- 
+Wei Yang
+Help you, Help me
