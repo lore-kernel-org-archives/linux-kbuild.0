@@ -1,35 +1,71 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-io0-f196.google.com ([209.85.223.196]:35323 "EHLO
-        mail-io0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753347AbcK2ROr (ORCPT
+Received: from tartarus.angband.pl ([89.206.35.136]:50567 "EHLO
+        tartarus.angband.pl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752844AbcK2RiN (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 29 Nov 2016 12:14:47 -0500
-MIME-Version: 1.0
-In-Reply-To: <CA+55aFxCKgTrh1gS-cMyhBa0QoLW2DL2+DYxOAcA-Bd15H15vg@mail.gmail.com>
-References: <20161129131922.GA31466@angband.pl> <20161129135118.24696-1-kilobyte@angband.pl>
+        Tue, 29 Nov 2016 12:38:13 -0500
+Date: Tue, 29 Nov 2016 18:05:22 +0100
+From: Adam Borowski <kilobyte@angband.pl>
+Subject: Re: [PATCH] x86/kbuild: enable modversions for symbols exported from
+ asm
+Message-ID: <20161129170522.GA3441@angband.pl>
+References: <20161129131922.GA31466@angband.pl>
+ <20161129135118.24696-1-kilobyte@angband.pl>
  <CA+55aFyZiB4YkwvqzrXO=HD8bcnc2xHkAYrek2QHVnhVvAi3Fw@mail.gmail.com>
- <20161129170522.GA3441@angband.pl> <CA+55aFxCKgTrh1gS-cMyhBa0QoLW2DL2+DYxOAcA-Bd15H15vg@mail.gmail.com>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Tue, 29 Nov 2016 09:14:46 -0800
-Message-ID: <CA+55aFw7G1QJ0dwMXJKJqFVhVsWGsAdxZTOsmcCD7POUde2+dA@mail.gmail.com>
-Subject: Re: [PATCH] x86/kbuild: enable modversions for symbols exported from asm
-Content-Type: text/plain; charset=UTF-8
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CA+55aFyZiB4YkwvqzrXO=HD8bcnc2xHkAYrek2QHVnhVvAi3Fw@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Adam Borowski <kilobyte@angband.pl>
+To: Linus Torvalds <torvalds@linux-foundation.org>
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Ben Hutchings <ben@decadent.org.uk>, Debian kernel maintainers <debian-kernel@lists.debian.org>, "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Ingo Molnar <mingo@kernel.org>, Nicholas Piggin <npiggin@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Tue, Nov 29, 2016 at 9:10 AM, Linus Torvalds
-<torvalds@linux-foundation.org> wrote:
->
-> So quite frankly, I don't want to make our kernel sources worse due to
-> broken shit tools getting something wrong that we shouldn't even care
-> about.
+On Tue, Nov 29, 2016 at 07:27:12AM -0800, Linus Torvalds wrote:
+> On Nov 29, 2016 5:51 AM, "Adam Borowski" <kilobyte@angband.pl> wrote:
+> > >
+> > >  (a) tested
+> >
+> > By many people.
+> 
+> No.
+> 
+> I've tested the build *without* this, and it works fine.
 
-And yes, I'm on binutils 2.26 (with no issues), so it could be that
-it's 2.27 that triggers this.
+Michal mentioned "why", let's try "where".
 
-We could make the pr_warn_once() mention "broken binutils?" so that
-people know why the warning happens.
+I have no idea what setup is required to trigger the problem, but here's a
+simple sufficient one:
 
-           Linus
+Current Debian unstable, amd64.
+git reset --hard v4.9-rc7
+git revert cd3caefb
+make defconfig
+CONFIG_MODVERSIONS=y
+(in my case) CONFIG_BTRFS_FS=y (so I can boot)
+enable a module for testing, I used CONFIG_EXT4_FS=m
+make bindeb-pkg
+dpkg -i linux-image_XXXXX.deb
+
+modprobe ext4
+[   63.779490] jbd2: no symbol version for memcpy
+[   63.779492] jbd2: Unknown symbol memcpy (err -22)
+[   63.779550] jbd2: no symbol version for phys_base
+[   63.779551] jbd2: Unknown symbol phys_base (err -22)
+[   63.779561] jbd2: no symbol version for memset
+[   63.779562] jbd2: Unknown symbol memset (err -22)
+
+Not sure which piece of toolchain matters here, someone said binutils.
+In that case, Fedora ships 2.26.1-1.fc25, they were frozen so couldn't
+update.  Debian is at 2.27.51.20161127-1, Gentoo at 2.27, same for Arch,
+OpenSUSE; Ubuntu at 2.27.51.20161124-1.
+
+Thus, if it's indeed binutils, you'll see the breakage as soon as Fedora
+recovers from the freeze.
+
+
+Meow!
+-- 
+The bill declaring Jesus as the King of Poland fails to specify whether
+the addition is at the top or end of the list of kings.  What should the
+historians do?
