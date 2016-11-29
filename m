@@ -1,120 +1,190 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg0-f67.google.com ([74.125.83.67]:33672 "EHLO
-        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752551AbcK2Cbt (ORCPT
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49360 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1753204AbcK2Cpk (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 28 Nov 2016 21:31:49 -0500
-Date: Tue, 29 Nov 2016 13:31:30 +1100
-From: Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH] x86/kbuild: enable modversions for symbols exported
- from asm
-Message-ID: <20161129133130.164b4e2d@roar.ozlabs.ibm.com>
-In-Reply-To: <1480382148.16599.61.camel@decadent.org.uk>
-References: <CA+55aFwXqv6uYmW0kC=c+yyumO_T0CJrz6m+MQCQX6bR5gRBQw@mail.gmail.com>
-        <1480382148.16599.61.camel@decadent.org.uk>
+        Mon, 28 Nov 2016 21:45:40 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id uAT2iLM3074769
+        for <linux-kbuild@vger.kernel.org>; Mon, 28 Nov 2016 21:45:39 -0500
+Received: from e23smtp08.au.ibm.com (e23smtp08.au.ibm.com [202.81.31.141])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 270tb0xqgv-1
+        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+        for <linux-kbuild@vger.kernel.org>; Mon, 28 Nov 2016 21:45:39 -0500
+Received: from localhost
+        by e23smtp08.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-kbuild@vger.kernel.org> from <andrew.donnellan@au1.ibm.com>;
+        Tue, 29 Nov 2016 12:45:36 +1000
+Received: from d23relay06.au.ibm.com (d23relay06.au.ibm.com [9.185.63.219])
+        by d23dlp01.au.ibm.com (Postfix) with ESMTP id A261F2CE8056
+        for <linux-kbuild@vger.kernel.org>; Tue, 29 Nov 2016 13:45:32 +1100 (EST)
+Received: from d23av04.au.ibm.com (d23av04.au.ibm.com [9.190.235.139])
+        by d23relay06.au.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id uAT2jW3o50331784
+        for <linux-kbuild@vger.kernel.org>; Tue, 29 Nov 2016 13:45:32 +1100
+Received: from d23av04.au.ibm.com (localhost [127.0.0.1])
+        by d23av04.au.ibm.com (8.14.4/8.14.4/NCO v10.0 AVout) with ESMTP id uAT2jVVX031587
+        for <linux-kbuild@vger.kernel.org>; Tue, 29 Nov 2016 13:45:32 +1100
+Subject: Re: [PATCH] builddeb: add make fastdeb-pkg target
+References: <20161125141506.30094-1-riku.voipio@linaro.org>
+From: Andrew Donnellan <andrew.donnellan@au1.ibm.com>
+Date: Tue, 29 Nov 2016 13:45:31 +1100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20161125141506.30094-1-riku.voipio@linaro.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Message-Id: <d059ce23-744b-3fc7-9a86-48a05f1b6fb3@au1.ibm.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ben Hutchings <ben@decadent.org.uk>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Michal Marek <mmarek@suse.com>, Arnd Bergmann <arnd@arndb.de>, Ingo Molnar <mingo@kernel.org>, Adam Borowski <kilobyte@angband.pl>, Debian kernel maintainers <debian-kernel@lists.debian.org>
+To: riku.voipio@linaro.org, linux-kbuild@vger.kernel.org, mmarek@suse.cz
+Cc: debian-kernel@lists.debian.org, Jim Davis <jim.epost@gmail.com>
 
-On Tue, 29 Nov 2016 01:15:48 +0000
-Ben Hutchings <ben@decadent.org.uk> wrote:
+On 26/11/16 01:15, riku.voipio@linaro.org wrote:
+> From: Riku Voipio <riku.voipio@linaro.org>
+>
+> Currently, the deb-pkg and bindeb-pkg targets create multiple packages
+> for the kernel binaries, headers, userspace headers and firmware.
+>
+> For developers who generate Debian packages as part of their development
+> workflows, it's often not necessary to generate all these packages.
+>
+> Introduce new target, fastdeb-pkg, which only generates kernel packages.
+> Re-order package build order so that kernel binary package is created
+> first and we can exit cleanly unless generating rest packages with the
+> old bindeb-pkg and deb-pkg targets.
+>
+> Cc: Jim Davis <jim.epost@gmail.com>
+> Cc: Andrew Donnellan <andrew.donnellan@au1.ibm.com>
+> Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
 
-> [I've had to guess at the cc list for this, because we no longer have
-> mail archives that preserve them.]
+Some comments below. With those addressed:
 
-You got it about right.
+Reviewed-by: Andrew Donnellan <andrew.donnellan@au1.ibm.com>
 
-> On Fri, 2016-11-25 at 10:01 -0800, Linus Torvalds wrote:
-> > On Thu, Nov 24, 2016 at 4:40 PM, Nicholas Piggin <npiggin@gmail.com> wrote:  
-> > > > 
-> > > > Yes, manual "marking" is never going to be a viable solution.  
-> > > 
-> > > I guess it really depends on how exactly you want to use it. For distros
-> > > that do stable ABI but rarely may have to break something for security
-> > > reasons, it should work and give exact control.  
-> 
-> This is roughly how Debian handles the kernel module ABI during a
-> stable release.
-> 
-> > No. Because nobody else will care, so unless it's like a single symbol
-> > or something, it will just be a maintenance nightmare.  
-> 
-> I agree with this.  We can explicitly "version" individual symbols
-> anyway by doing something like:
-> 
-> -int foo(void);
-> +#define foo foo_2
-> +int foo_2(int);
+> ---
+>  scripts/package/Makefile |  7 ++++++-
+>  scripts/package/builddeb | 49 +++++++++++++++++++++++++-----------------------
+>  2 files changed, 32 insertions(+), 24 deletions(-)
+>
+> diff --git a/scripts/package/Makefile b/scripts/package/Makefile
+> index 71b4a8a..c858366 100644
+> --- a/scripts/package/Makefile
+> +++ b/scripts/package/Makefile
+> @@ -97,6 +97,10 @@ bindeb-pkg: FORCE
+>  	$(MAKE) KBUILD_SRC=
+>  	+$(call cmd,builddeb)
+>
+> +fastdeb-pkg: FORCE
+> +	$(MAKE) KBUILD_SRC=
+> +	+$(call cmd,builddeb)
+> +
+>  clean-dirs += $(objtree)/debian/
+>
+>
+> @@ -142,7 +146,8 @@ help: FORCE
+>  	@echo '  rpm-pkg             - Build both source and binary RPM kernel packages'
+>  	@echo '  binrpm-pkg          - Build only the binary kernel RPM package'
+>  	@echo '  deb-pkg             - Build both source and binary deb kernel packages'
+> -	@echo '  bindeb-pkg          - Build only the binary kernel deb package'
+> +	@echo '  bindeb-pkg          - Build all binary kernel deb packages'
+> +	@echo '  fastdeb-pkg         - Build only the binary kernel deb package'
 
-Yeah... Benefit being it's very simple and everybody can see exactly
-what it does and knows how it will work.
+Perhaps "kernel image deb package" to be more specific?
 
-> 
-> > > What else do people *actually* use it for? Preventing mismatched modules
-> > > when .git version is not attached and release version of the kernel has
-> > > not been bumped. Is that it?  
-> > 
-> > It used to be very useful for avoiding loading stale modules and then
-> > wasting days on debugging something that wasn't the case when you had
-> > forgotten to do "make modules_install". Change some subtle internal
-> > ABI issue (add/remove a parameter, whatever) and it would really help.
-> > 
-> > These days, for me, LOCALVERSION_AUTO and module signing are what I
-> > personally tend to use.
-> >
-> > The modversions stuff may just be too painful to bother with. Very few
-> > people probably use it, and the ones that do likely don't have any
-> > overriding reason why.  
-> [...]
-> 
-> Debian has some strong reasons:
-> 
-> 1. Changing the release string requires any out-of-tree modules to be
-> upgraded (at least rebuilt) on end-user systems.  So we try to avoid
-> doing that during the lifetime of a stable release, i.e. we don't let
-> the release string change.  Also, the release string is reflected in
-> package names (e.g. linux-image-4.8.0-1-amd64), and introducing new
-> package names requires manual approval by the Debian archive team.
+>  	@echo '  tar-pkg             - Build the kernel as an uncompressed tarball'
+>  	@echo '  targz-pkg           - Build the kernel as a gzip compressed tarball'
+>  	@echo '  tarbz2-pkg          - Build the kernel as a bzip2 compressed tarball'
+> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+> index 8ea9fd2..5035f57 100755
+> --- a/scripts/package/builddeb
+> +++ b/scripts/package/builddeb
+> @@ -185,11 +185,6 @@ if grep -q '^CONFIG_MODULES=y' $KCONFIG_CONFIG ; then
+>  	fi
+>  fi
+>
+> -if [ "$ARCH" != "um" ]; then
+> -	$MAKE headers_check KBUILD_SRC=
+> -	$MAKE headers_install KBUILD_SRC= INSTALL_HDR_PATH="$libc_headers_dir/usr"
+> -fi
+> -
+>  # Install the maintainer scripts
+>  # Note: hook scripts under /etc/kernel are also executed by official Debian
+>  # kernel packages, as well as kernel packages built using make-kpkg.
+> @@ -323,6 +318,32 @@ EOF
+>
+>  fi
+>
+> +# Do we have firmware? Move it out of the way and build it into a package.
 
-This is something I've noticed. Would it be better if the module loader
-ignores the kernel version and instead used some internal ABI version
-string to check against? Otherwise (AFAICT) you always have 4.8.0 versions
-despite being 4.8.7 kernel, and you can't upgrade a point release without
-overwriting your old kernel and modules.
+This comment is no longer accurate as we split the move and the build.
 
-That is something we could potentially replace modversions with. It would
-be a far more reasonable complexity to carry for downstream distros than
-modversions. Though not something we can add for 4.9.
+> +if [ -e "$tmpdir/lib/firmware" ]; then
+> +	mv "$tmpdir/lib/firmware"/* "$fwdir/lib/firmware/$version/"
+> +	rmdir "$tmpdir/lib/firmware"
+> +fi
+> +
+> +create_package "$packagename" "$tmpdir"
+> +[ "x$1" = "xfastdeb-pkg" ] && exit 0
 
-> 2. We want to allow ABI breaks for "internal" symbols used only by in-
-> tree modules, as those breaks will be resolved by rebooting to complete
-> the upgrade.  But we need a run-time check to prevent loading an
-> incompatible module before the reboot.
-> 
-> 3. So far as I can see, module signing doesn't work for a distribution
-> kernel with out-of-tree modules as there has to be a trust path from a
-> built-in certificate to the module signing certificate.  So signature
-> enforcement will have to be disabled on systems that use out-of-tree
-> modules, thus it's not a substitute for modversions.
-> 
-> We expect Linux 4.9 to be the basis for a longterm stable branch and on
-> that basis intend to include it in the next Debian stable release. 
-> Even if the decision is to get rid of modversions, it would be very
-> helpful if they could be revived for 4.9 so that we have some time to
-> adapt our packaging practices to work without them in future.
+How idiomatic is [ condition ] && command vs if [ condition ]; then 
+command; fi? Perhaps it's just my lack of bash-fu but this took me a 
+moment to parse.
 
-It would be nice to get upstream to the point where 4.9 modversions
-works if you just patch out depends BROKEN. That would require reverting
-a few more of Al's arch patches.
+> +
+> +if [ -e "$fwdir/lib/firmware/$version" ]; then
+> +	cat <<EOF >> debian/control
+> +
+> +Package: $fwpackagename
+> +Architecture: all
+> +Description: Linux kernel firmware, version $version
+> + This package contains firmware from the Linux kernel, version $version.
+> +EOF
+> +
+> +	create_package "$fwpackagename" "$fwdir"
+> +fi
+> +
+> +if [ "$ARCH" != "um" ]; then
+> +	$MAKE headers_check KBUILD_SRC=
+> +	$MAKE headers_install KBUILD_SRC= INSTALL_HDR_PATH="$libc_headers_dir/usr"
+> +fi
+> +
+>  # Build kernel header package
+>  (cd $srctree; find . -name Makefile\* -o -name Kconfig\* -o -name \*.pl) > "$objtree/debian/hdrsrcfiles"
+>  (cd $srctree; find arch/*/include include scripts -type f) >> "$objtree/debian/hdrsrcfiles"
+> @@ -354,22 +375,6 @@ Description: Linux kernel headers for $KERNELRELEASE on \${kernel:debarch}
+>   This is useful for people who need to build external modules
+>  EOF
+>
+> -# Do we have firmware? Move it out of the way and build it into a package.
+> -if [ -e "$tmpdir/lib/firmware" ]; then
+> -	mv "$tmpdir/lib/firmware"/* "$fwdir/lib/firmware/$version/"
+> -	rmdir "$tmpdir/lib/firmware"
+> -
+> -	cat <<EOF >> debian/control
+> -
+> -Package: $fwpackagename
+> -Architecture: all
+> -Description: Linux kernel firmware, version $version
+> - This package contains firmware from the Linux kernel, version $version.
+> -EOF
+> -
+> -	create_package "$fwpackagename" "$fwdir"
+> -fi
+> -
+>  cat <<EOF >> debian/control
+>
+>  Package: $libc_headers_packagename
+> @@ -386,8 +391,6 @@ if [ "$ARCH" != "um" ]; then
+>  	create_package "$libc_headers_packagename" "$libc_headers_dir"
+>  fi
+>
+> -create_package "$packagename" "$tmpdir"
+> -
+>  if [ -n "$BUILD_DEBUG" ] ; then
+>  	# Build debug package
+>  	# Different tools want the image in different locations
+>
 
-Then in 4.10 we can re-add all those arch patches (which are less
-controversial without the asm-prototypes.h workaround), and implement a
-simple stable ABI version string check, and then in 4.11 we can remove
-modversions.
+-- 
+Andrew Donnellan              OzLabs, ADL Canberra
+andrew.donnellan@au1.ibm.com  IBM Australia Limited
 
-Thanks,
-Nick
