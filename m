@@ -1,119 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:48439 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:45720 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1756486AbcK2JOR (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 29 Nov 2016 04:14:17 -0500
-Subject: Re: [PATCH] x86/kbuild: enable modversions for symbols exported from
- asm
-References: <CA+55aFwXqv6uYmW0kC=c+yyumO_T0CJrz6m+MQCQX6bR5gRBQw@mail.gmail.com>
- <1480382148.16599.61.camel@decadent.org.uk>
- <20161129133130.164b4e2d@roar.ozlabs.ibm.com>
+        id S1757248AbcK2NFS (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 29 Nov 2016 08:05:18 -0500
+Date: Tue, 29 Nov 2016 14:05:08 +0100
 From: Michal Marek <mmarek@suse.com>
-Message-ID: <89fa3c90-dad3-b4f4-a343-6264f2d7b220@suse.com>
-Date: Tue, 29 Nov 2016 10:14:08 +0100
+Subject: Re: [PATCH] Scripts: kconfig: nconf: fix _GNU_SOURCE redefined
+ warning
+Message-ID: <20161129130508.GA16422@sepie.suse.cz>
+References: <1480264106-29881-1-git-send-email-thrust73@gmail.com>
+ <5d8cb4b1-fe87-5daf-432b-d6612196a9fc@suse.cz>
+ <20161128184639.GB16562@linux-Precision-WorkStation-T5500>
+ <1480364961.1959.9.camel@tiscali.nl>
 MIME-Version: 1.0
-In-Reply-To: <20161129133130.164b4e2d@roar.ozlabs.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1480364961.1959.9.camel@tiscali.nl>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicholas Piggin <npiggin@gmail.com>, Ben Hutchings <ben@decadent.org.uk>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, Ingo Molnar <mingo@kernel.org>, Adam Borowski <kilobyte@angband.pl>, Debian kernel maintainers <debian-kernel@lists.debian.org>
+To: Paul Bolle <pebolle@tiscali.nl>
+Cc: Cheah Kok Cheong <thrust73@gmail.com>, Michal Marek <mmarek@suse.cz>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Dne 29.11.2016 v 03:31 Nicholas Piggin napsal(a):
-> On Tue, 29 Nov 2016 01:15:48 +0000
-> Ben Hutchings <ben@decadent.org.uk> wrote:
+On Mon, Nov 28, 2016 at 09:29:21PM +0100, Paul Bolle wrote:
+> [Dropped Yann.]
 > 
->> [I've had to guess at the cc list for this, because we no longer have
->> mail archives that preserve them.]
+> On Tue, 2016-11-29 at 02:46 +0800, Cheah Kok Cheong wrote:
+> > On Mon, Nov 28, 2016 at 11:39:01AM +0100, Michal Marek wrote:
+> > > The Makefile does not specify -D_GNU_SOURCE. Are you adding it manually?
 > 
-> You got it about right.
+> On Fedora 24 I'm able to trigger this too:
+>     $ [...]
+>     make -f ./scripts/Makefile.build obj=scripts/kconfig nconfig
+>       gcc -Wp,-MD,scripts/kconfig/.nconf.o.d -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89   -D_GNU_SOURCE -DCURSES_LOC="<ncurses.h>" -DNCURSES_WIDECHAR=1 -DLOCALE   -c -o scripts/kconfig/nconf.o scripts/kconfig/nconf.c
+>     scripts/kconfig/nconf.c:8:0: warning: "_GNU_SOURCE" redefined
+>      #define _GNU_SOURCE
+>      
+>     <command-line>:0:0: note: this is the location of the previous definition
 > 
->> On Fri, 2016-11-25 at 10:01 -0800, Linus Torvalds wrote:
->>> On Thu, Nov 24, 2016 at 4:40 PM, Nicholas Piggin <npiggin@gmail.com> wrote:  
->>>>>
->>>>> Yes, manual "marking" is never going to be a viable solution.  
->>>>
->>>> I guess it really depends on how exactly you want to use it. For distros
->>>> that do stable ABI but rarely may have to break something for security
->>>> reasons, it should work and give exact control.  
->>
->> This is roughly how Debian handles the kernel module ABI during a
->> stable release.
->>
->>> No. Because nobody else will care, so unless it's like a single symbol
->>> or something, it will just be a maintenance nightmare.  
->>
->> I agree with this.  We can explicitly "version" individual symbols
->> anyway by doing something like:
->>
->> -int foo(void);
->> +#define foo foo_2
->> +int foo_2(int);
-> 
-> Yeah... Benefit being it's very simple and everybody can see exactly
-> what it does and knows how it will work.
-> 
->>
->>>> What else do people *actually* use it for? Preventing mismatched modules
->>>> when .git version is not attached and release version of the kernel has
->>>> not been bumped. Is that it?  
->>>
->>> It used to be very useful for avoiding loading stale modules and then
->>> wasting days on debugging something that wasn't the case when you had
->>> forgotten to do "make modules_install". Change some subtle internal
->>> ABI issue (add/remove a parameter, whatever) and it would really help.
->>>
->>> These days, for me, LOCALVERSION_AUTO and module signing are what I
->>> personally tend to use.
->>>
->>> The modversions stuff may just be too painful to bother with. Very few
->>> people probably use it, and the ones that do likely don't have any
->>> overriding reason why.  
->> [...]
->>
->> Debian has some strong reasons:
+> It's probably added by pkg-config:
+>     $ pkg-config --cflags ncursesw
+>     -D_GNU_SOURCE
 
-I guess many distros have similar reasons.
-
-
->> 1. Changing the release string requires any out-of-tree modules to be
->> upgraded (at least rebuilt) on end-user systems.  So we try to avoid
->> doing that during the lifetime of a stable release, i.e. we don't let
->> the release string change.  Also, the release string is reflected in
->> package names (e.g. linux-image-4.8.0-1-amd64), and introducing new
->> package names requires manual approval by the Debian archive team.
-> 
-> This is something I've noticed. Would it be better if the module loader
-> ignores the kernel version and instead used some internal ABI version
-> string to check against? Otherwise (AFAICT) you always have 4.8.0 versions
-> despite being 4.8.7 kernel, and you can't upgrade a point release without
-> overwriting your old kernel and modules.
-
-The thing is - to maintain an ABI version string, you need some level of
-certainty that two given ABIs are really interchangeable. Which means
-you need to check whether the symbols _and_ types exposed are unchanged.
-Which is a thing that genksyms, the tool behind CONFIG_MODVERSIONS, does
-quite well. So yes, you could do a testbuild with CONFIG_MODVERSIONS=y
-and a production build with some global ABI string, but what's the point
-then.
-
-
-> It would be nice to get upstream to the point where 4.9 modversions
-> works if you just patch out depends BROKEN. That would require reverting
-> a few more of Al's arch patches.
-> 
-> Then in 4.10 we can re-add all those arch patches (which are less
-> controversial without the asm-prototypes.h workaround), and implement a
-> simple stable ABI version string check, and then in 4.11 we can remove
-> modversions.
-
-I'd rather change the kconfig to
-
-depends on BROKEN || <archs that have asm/asm-prototypes.h>
-
-and eventuallly remove the dependency again. PPC has the header already,
-so it can be added right away. I do not know why the x86 patch has not
-been merged yet.
+I see. That's not nice of the pkconfig file to set such macro, but oh
+well. I applied the patch to kbuild.git#kconfig now, thanks Cheah.
 
 Michal
