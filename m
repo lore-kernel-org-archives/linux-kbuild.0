@@ -1,83 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from tartarus.angband.pl ([89.206.35.136]:47919 "EHLO
-        tartarus.angband.pl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754373AbcK2OYR (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 29 Nov 2016 09:24:17 -0500
-Date: Tue, 29 Nov 2016 15:24:08 +0100
-From: Adam Borowski <kilobyte@angband.pl>
+Received: from mx2.suse.de ([195.135.220.15]:48569 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1757697AbcK2QDK (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 29 Nov 2016 11:03:10 -0500
 Subject: Re: [PATCH] x86/kbuild: enable modversions for symbols exported from
  asm
-Message-ID: <20161129142408.GA8105@angband.pl>
-References: <CA+55aFwXqv6uYmW0kC=c+yyumO_T0CJrz6m+MQCQX6bR5gRBQw@mail.gmail.com>
- <1480382148.16599.61.camel@decadent.org.uk>
- <CA+55aFwDJ8=LQ6jKYuFGZHqbbRoX+Odvnm5BXobNVojqesF1gw@mail.gmail.com>
- <20161129131922.GA31466@angband.pl>
- <20161129132953.GB24321@gmail.com>
+References: <20161129131922.GA31466@angband.pl>
+ <20161129135118.24696-1-kilobyte@angband.pl>
+ <CA+55aFyZiB4YkwvqzrXO=HD8bcnc2xHkAYrek2QHVnhVvAi3Fw@mail.gmail.com>
+From: Michal Marek <mmarek@suse.com>
+Message-ID: <30bb2db4-47bd-0c35-8328-ef032b551f06@suse.com>
+Date: Tue, 29 Nov 2016 17:03:01 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20161129132953.GB24321@gmail.com>
+In-Reply-To: <CA+55aFyZiB4YkwvqzrXO=HD8bcnc2xHkAYrek2QHVnhVvAi3Fw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ingo Molnar <mingo@kernel.org>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, Ben Hutchings <ben@decadent.org.uk>, Nicholas Piggin <npiggin@gmail.com>, "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Michal Marek <mmarek@suse.com>, Arnd Bergmann <arnd@arndb.de>, Debian kernel maintainers <debian-kernel@lists.debian.org>, Al Viro <viro@zeniv.linux.org.uk>
+To: Linus Torvalds <torvalds@linux-foundation.org>, Adam Borowski <kilobyte@angband.pl>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Ben Hutchings <ben@decadent.org.uk>, Debian kernel maintainers <debian-kernel@lists.debian.org>, "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Ingo Molnar <mingo@kernel.org>, Nicholas Piggin <npiggin@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Tue, Nov 29, 2016 at 02:29:54PM +0100, Ingo Molnar wrote:
-> * Adam Borowski <kilobyte@angband.pl> wrote:
+Dne 29.11.2016 v 16:27 Linus Torvalds napsal(a):
+> On Nov 29, 2016 5:51 AM, "Adam Borowski" <kilobyte@angband.pl
+> <mailto:kilobyte@angband.pl>> wrote:
+>>
 > 
-> > Here's some history:
-> > The day of -rc1, multiple people immediately reported the breakage; it was
-> > quickly found out that reverting 784d5699eddc fixes it.  A "going forward"
-> > patch has been posted but was insufficient; when the real devs went to bed
-[...]
-> > For some reason the per-arch pieces were excluded; I was instructed
-> > to send my part to x86 maintainers.
-> > 
-> > I did so; the patch later got a better description by Nick and a bunch of
-> > Tested-by -- but alas, nary a comment or action from x86 guys, despite
-> > pings/resends (last one: https://lkml.org/lkml/2016/11/23/706).  I guess I'm
-> > lacking the secret handshake or something -- thus, it looks like it's my
-> > fault, the rest of you can be blamed mostly for letting a
-> > not-a-real-kernel-dev unsupervised.
+>> >
+>> >  (a) tested
+>>
+>> By many people.
 > 
-> My part of the story is easy to explain: the reason I skipped the 11/23 patch was 
-> because it was tagged 'kbuild' and because the commit that broke it was never 
-> acked by (or was upstreamed via) the x86 maintainers - we never upstreamed any 
-> modversions changes in the past AFAIR - so I assumed it would be handled via 
-> whatever path got the breakage upstream (turns out it was via the VFS tree?),
-> or via the kbuild tree.
-
-The problematic merge was 84d6984 (it brought in 22823ab4^..590abbdd).
-Interesting commits have "$ARCH: move exports to definitions" in their
-subjects, they indeed did not go through arch trees.
-
-> > On Nov 24 finally Ingo responded, the discussion ended with you marking 
-> > modversions as BROKEN.
+> No.
 > 
-> Yeah, that was when my internal timer ran out: modversions breakage was reported 
-> against -rc1 already and it still wasn't working (a seemingly working kernel build 
-> resulted in an unbootable system) - due to the timeline and confusion you 
-> explained.
+> I've tested the build *without* this, and it works fine.
 > 
-> I totally agree with marking it BROKEN: it was the simplest, most robust way to 
-> fix it and nobody seemed to be owning the modversions feature.
+>> >  (b) explains it
+>>
+>> The actual logic is in 4efca4ed0.  It wants C prototypes defined in
+>> asm/asm-prototypes.h that lists symbols defined in assembly -- genksyms
+>> knows only how to read C code.
+> 
+> See above. I'm not taking more random patches that "fix" this when it's
+> not broken for me. Not without very explicit explanations of why that
+> patch is still needed for others.
 
-Per Ben Hutchings' objection, it doesn't look like BROKEN is an option at
-least for 4.9 -- even if mainline leaves it as is, distro maintainers would
-need to do the work themselves.
+The original and easily observable bug is that were are not generating
+symbol checksums for the asm-exported symbols, so they default to 0.
+This can be seen e.g. in the Module.symvers file. This seemed like a
+minor issue, because with the functions written in asm, the type
+checking is rather weak (this has been the case even before Al's
+patches). However, there is another bug that with _some_ toolchains /
+architectures, the checksums do not default to 0, but they are simply
+missing in the ___kcrctab* sections and the module loader complains. We
+can of course research into the details of the second bug, but we
+already know that we are not generating the checksums while we should be.
 
-Architectures that look like they could be affected:
-    x86 alpha m68k s390 arm ppc sparc ia64
-(this list might be incomplete!).
-
-Of these, ppc and arm are already fixed, x86 is in this thread,
-arm64 is not on the list which explains why it works for me.  No idea about
-the rest.
-
-
-Meow!
--- 
-The bill declaring Jesus as the King of Poland fails to specify whether
-the addition is at the top or end of the list of kings.  What should the
-historians do?
+Michal
