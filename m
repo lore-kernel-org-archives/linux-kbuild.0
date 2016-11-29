@@ -1,96 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from tartarus.angband.pl ([89.206.35.136]:47565 "EHLO
-        tartarus.angband.pl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755083AbcK2Nvb (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 29 Nov 2016 08:51:31 -0500
-From: Adam Borowski <kilobyte@angband.pl>
-Date: Tue, 29 Nov 2016 14:51:17 +0100
-Message-Id: <20161129135118.24696-1-kilobyte@angband.pl>
-In-Reply-To: <20161129131922.GA31466@angband.pl>
-References: <20161129131922.GA31466@angband.pl>
-Subject: [PATCH] x86/kbuild: enable modversions for symbols exported from asm
+Received: from mx2.suse.de ([195.135.220.15]:57764 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1755401AbcK2OXC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 29 Nov 2016 09:23:02 -0500
+Subject: Re: [PATCH v4] Fixes for compiling with clang
+References: <20161126182006.24815-1-pefoley2@pefoley.com>
+ <20161128064446.4892-1-pefoley2@pefoley.com>
+From: Michal Marek <mmarek@suse.com>
+Message-ID: <b4a882d3-6125-e7b7-6c60-901fabfc23d9@suse.com>
+Date: Tue, 29 Nov 2016 15:22:53 +0100
+MIME-Version: 1.0
+In-Reply-To: <20161128064446.4892-1-pefoley2@pefoley.com>
+Content-Type: text/plain; charset=iso-8859-2
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>, Ben Hutchings <ben@decadent.org.uk>, Nicholas Piggin <npiggin@gmail.com>, "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Michal Marek <mmarek@suse.com>, Arnd Bergmann <arnd@arndb.de>, Ingo Molnar <mingo@kernel.org>, Debian kernel maintainers <debian-kernel@lists.debian.org>
-Cc: Adam Borowski <kilobyte@angband.pl>
+To: Peter Foley <pefoley2@pefoley.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-Commit 4efca4ed ("kbuild: modversions for EXPORT_SYMBOL() for asm") adds
-modversion support for symbols exported from asm files. Architectures
-must include C-style declarations for those symbols in asm/asm-prototypes.h
-in order for them to be versioned.
+Dne 28.11.2016 v 07:44 Peter Foley napsal(a):
+> Fix reversed conditional checking if HOSTCC is clang.
+> Suppress warnings about unsupported optimization options.
+> Suppress warnings about unused functions, as they are generated for
+> every module and are therefore far too spammy.
+> Disable clang's integrated assembler which is incompatible with kernel
+> asm constructs.
+> 
+> Changes from v1:
+> * Move the $(cc-name) conditional below the definition of $(CC)
+> Changes from v2:
+> * Actually commit the changes in v2.
+> Changes from v3:
+> * HOSTCC is not guaranteed to be the same as CC, adjust accordingly.
+> 
+> Signed-off-by: Peter Foley <pefoley2@pefoley.com>
+> ---
+>  Makefile | 12 ++++++++----
+>  1 file changed, 8 insertions(+), 4 deletions(-)
+> 
+> diff --git a/Makefile b/Makefile
+> index 694111b43cf8..9c4803a74117 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -301,12 +301,12 @@ CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
+>  
+>  HOSTCC       = gcc
+>  HOSTCXX      = g++
+> -HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89
+> +HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89 \
+> +               -Wno-unused-value -Wno-unused-parameter -Wno-missing-field-initializers
+>  HOSTCXXFLAGS = -O2
 
-Add these declarations for x86, and an architecture-independent file that
-can be used for common symbols.
+This adds new -Wno-* options also for the gcc case, is there a reason
+for this? Also, the -Wno-missing-field-initializers option is not
+available in some old gccs, so we would need a HOSTCC equivalent of
+cc-disable-warning.
 
-User impact: kernels may fail to load modules at all when
-CONFIG_MODVERSIONS=y.
-
-Signed-off-by: Adam Borowski <kilobyte@angband.pl>
-Tested-by: Kalle Valo <kvalo@codeaurora.org>
-Acked-by: Nicholas Piggin <npiggin@gmail.com>
-Tested-by: Peter Wu <peter@lekensteyn.nl>
-Tested-by: Oliver Hartkopp <socketcan@hartkopp.net>
----
-
-> So somebody send me a minimal patch that is
->
->  (a) tested
-
-By many people.
-
->  (b) explains it
-
-The actual logic is in 4efca4ed0.  It wants C prototypes defined in
-asm/asm-prototypes.h that lists symbols defined in assembly -- genksyms
-knows only how to read C code.
-
->  (c) obvious
-
-To be honest I don't quite understand what's the real gain over code that
-was removed by 784d5699eddc, this mostly brings the symbols back.  But
-that's for people wiser than me to explain.
-
-> and I'll happily re-enable modversions.
-
-
-The powerpc counterpart to this patch is in mainline as 9e5f688, although a
-file by that name already existed.
-
-As for arm, it looks like it was handled the other way by 8478132.
-
-
-diff --git a/arch/x86/include/asm/asm-prototypes.h b/arch/x86/include/asm/asm-prototypes.h
-new file mode 100644
-index 0000000..ae87224
---- /dev/null
-+++ b/arch/x86/include/asm/asm-prototypes.h
-@@ -0,0 +1,12 @@
-+#include <asm/ftrace.h>
-+#include <asm/uaccess.h>
-+#include <asm/string.h>
-+#include <asm/page.h>
-+#include <asm/checksum.h>
-+
-+#include <asm-generic/asm-prototypes.h>
-+
-+#include <asm/page.h>
-+#include <asm/pgtable.h>
-+#include <asm/special_insns.h>
-+#include <asm/preempt.h>
-diff --git a/include/asm-generic/asm-prototypes.h b/include/asm-generic/asm-prototypes.h
-new file mode 100644
-index 0000000..df13637
---- /dev/null
-+++ b/include/asm-generic/asm-prototypes.h
-@@ -0,0 +1,7 @@
-+#include <linux/bitops.h>
-+extern void *__memset(void *, int, __kernel_size_t);
-+extern void *__memcpy(void *, const void *, __kernel_size_t);
-+extern void *__memmove(void *, const void *, __kernel_size_t);
-+extern void *memset(void *, int, __kernel_size_t);
-+extern void *memcpy(void *, const void *, __kernel_size_t);
-+extern void *memmove(void *, const void *, __kernel_size_t);
--- 
-2.10.2
-
+Michal
