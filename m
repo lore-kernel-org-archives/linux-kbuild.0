@@ -1,58 +1,83 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:57764 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1755401AbcK2OXC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 29 Nov 2016 09:23:02 -0500
-Subject: Re: [PATCH v4] Fixes for compiling with clang
-References: <20161126182006.24815-1-pefoley2@pefoley.com>
- <20161128064446.4892-1-pefoley2@pefoley.com>
-From: Michal Marek <mmarek@suse.com>
-Message-ID: <b4a882d3-6125-e7b7-6c60-901fabfc23d9@suse.com>
-Date: Tue, 29 Nov 2016 15:22:53 +0100
+Received: from tartarus.angband.pl ([89.206.35.136]:47919 "EHLO
+        tartarus.angband.pl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754373AbcK2OYR (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 29 Nov 2016 09:24:17 -0500
+Date: Tue, 29 Nov 2016 15:24:08 +0100
+From: Adam Borowski <kilobyte@angband.pl>
+Subject: Re: [PATCH] x86/kbuild: enable modversions for symbols exported from
+ asm
+Message-ID: <20161129142408.GA8105@angband.pl>
+References: <CA+55aFwXqv6uYmW0kC=c+yyumO_T0CJrz6m+MQCQX6bR5gRBQw@mail.gmail.com>
+ <1480382148.16599.61.camel@decadent.org.uk>
+ <CA+55aFwDJ8=LQ6jKYuFGZHqbbRoX+Odvnm5BXobNVojqesF1gw@mail.gmail.com>
+ <20161129131922.GA31466@angband.pl>
+ <20161129132953.GB24321@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20161128064446.4892-1-pefoley2@pefoley.com>
-Content-Type: text/plain; charset=iso-8859-2
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20161129132953.GB24321@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Peter Foley <pefoley2@pefoley.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Ingo Molnar <mingo@kernel.org>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, Ben Hutchings <ben@decadent.org.uk>, Nicholas Piggin <npiggin@gmail.com>, "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Michal Marek <mmarek@suse.com>, Arnd Bergmann <arnd@arndb.de>, Debian kernel maintainers <debian-kernel@lists.debian.org>, Al Viro <viro@zeniv.linux.org.uk>
 
-Dne 28.11.2016 v 07:44 Peter Foley napsal(a):
-> Fix reversed conditional checking if HOSTCC is clang.
-> Suppress warnings about unsupported optimization options.
-> Suppress warnings about unused functions, as they are generated for
-> every module and are therefore far too spammy.
-> Disable clang's integrated assembler which is incompatible with kernel
-> asm constructs.
+On Tue, Nov 29, 2016 at 02:29:54PM +0100, Ingo Molnar wrote:
+> * Adam Borowski <kilobyte@angband.pl> wrote:
 > 
-> Changes from v1:
-> * Move the $(cc-name) conditional below the definition of $(CC)
-> Changes from v2:
-> * Actually commit the changes in v2.
-> Changes from v3:
-> * HOSTCC is not guaranteed to be the same as CC, adjust accordingly.
+> > Here's some history:
+> > The day of -rc1, multiple people immediately reported the breakage; it was
+> > quickly found out that reverting 784d5699eddc fixes it.  A "going forward"
+> > patch has been posted but was insufficient; when the real devs went to bed
+[...]
+> > For some reason the per-arch pieces were excluded; I was instructed
+> > to send my part to x86 maintainers.
+> > 
+> > I did so; the patch later got a better description by Nick and a bunch of
+> > Tested-by -- but alas, nary a comment or action from x86 guys, despite
+> > pings/resends (last one: https://lkml.org/lkml/2016/11/23/706).  I guess I'm
+> > lacking the secret handshake or something -- thus, it looks like it's my
+> > fault, the rest of you can be blamed mostly for letting a
+> > not-a-real-kernel-dev unsupervised.
 > 
-> Signed-off-by: Peter Foley <pefoley2@pefoley.com>
-> ---
->  Makefile | 12 ++++++++----
->  1 file changed, 8 insertions(+), 4 deletions(-)
-> 
-> diff --git a/Makefile b/Makefile
-> index 694111b43cf8..9c4803a74117 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -301,12 +301,12 @@ CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
->  
->  HOSTCC       = gcc
->  HOSTCXX      = g++
-> -HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89
-> +HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89 \
-> +               -Wno-unused-value -Wno-unused-parameter -Wno-missing-field-initializers
->  HOSTCXXFLAGS = -O2
+> My part of the story is easy to explain: the reason I skipped the 11/23 patch was 
+> because it was tagged 'kbuild' and because the commit that broke it was never 
+> acked by (or was upstreamed via) the x86 maintainers - we never upstreamed any 
+> modversions changes in the past AFAIR - so I assumed it would be handled via 
+> whatever path got the breakage upstream (turns out it was via the VFS tree?),
+> or via the kbuild tree.
 
-This adds new -Wno-* options also for the gcc case, is there a reason
-for this? Also, the -Wno-missing-field-initializers option is not
-available in some old gccs, so we would need a HOSTCC equivalent of
-cc-disable-warning.
+The problematic merge was 84d6984 (it brought in 22823ab4^..590abbdd).
+Interesting commits have "$ARCH: move exports to definitions" in their
+subjects, they indeed did not go through arch trees.
 
-Michal
+> > On Nov 24 finally Ingo responded, the discussion ended with you marking 
+> > modversions as BROKEN.
+> 
+> Yeah, that was when my internal timer ran out: modversions breakage was reported 
+> against -rc1 already and it still wasn't working (a seemingly working kernel build 
+> resulted in an unbootable system) - due to the timeline and confusion you 
+> explained.
+> 
+> I totally agree with marking it BROKEN: it was the simplest, most robust way to 
+> fix it and nobody seemed to be owning the modversions feature.
+
+Per Ben Hutchings' objection, it doesn't look like BROKEN is an option at
+least for 4.9 -- even if mainline leaves it as is, distro maintainers would
+need to do the work themselves.
+
+Architectures that look like they could be affected:
+    x86 alpha m68k s390 arm ppc sparc ia64
+(this list might be incomplete!).
+
+Of these, ppc and arm are already fixed, x86 is in this thread,
+arm64 is not on the list which explains why it works for me.  No idea about
+the rest.
+
+
+Meow!
+-- 
+The bill declaring Jesus as the King of Poland fails to specify whether
+the addition is at the top or end of the list of kings.  What should the
+historians do?
