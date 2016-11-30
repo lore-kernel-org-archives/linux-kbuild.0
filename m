@@ -1,34 +1,107 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:45105 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1755004AbcK2VZ0 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 29 Nov 2016 16:25:26 -0500
-Subject: Re: [PATCH 0/7] kbuild patches for 4.10
-References: <20161123164143.16839-1-npiggin@gmail.com>
-From: Michal Marek <mmarek@suse.com>
-Message-ID: <0c054c98-eec3-9e95-68ae-5c97c78e0753@suse.com>
-Date: Tue, 29 Nov 2016 22:25:23 +0100
-MIME-Version: 1.0
-In-Reply-To: <20161123164143.16839-1-npiggin@gmail.com>
-Content-Type: text/plain; charset=iso-8859-2
-Content-Transfer-Encoding: 7bit
+Received: from alt32.smtp-out.videotron.ca ([24.53.0.21]:53475 "EHLO
+        alt32.smtp-out.videotron.ca" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1757293AbcK3Iuc (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 30 Nov 2016 03:50:32 -0500
+From: Nicolas Pitre <nicolas.pitre@linaro.org>
+Subject: [PATCH 2/3] kbuild: make modversion for exported asm symbols more convivial
+Date: Wed, 30 Nov 2016 03:50:23 -0500
+Message-Id: <1480495824-4151-3-git-send-email-nicolas.pitre@linaro.org>
+In-Reply-To: <1480495824-4151-1-git-send-email-nicolas.pitre@linaro.org>
+References: <1480495824-4151-1-git-send-email-nicolas.pitre@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicholas Piggin <npiggin@gmail.com>
-Cc: linux-kbuild@vger.kernel.org
+To: Russell King - ARM Linux <linux@armlinux.org.uk>, Nicholas Piggin <npiggin@gmail.com>, Michal Marek <mmarek@suse.com>
+Cc: Arnd Bergmann <arnd@arndb.de>, viro@zeniv.linux.org.uk, linux-arm-kernel@lists.infradead.org, linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Dne 23.11.2016 v 17:41 Nicholas Piggin napsal(a):
-> Hi,
-> 
-> I have a few various kbuild patches for review and  consideration
-> for 4.10 branch that did not make 4.9. All of these except the first
-> one have been posted before without big changes. The first, I posted
-> an RFC for moving kallsyms data section but this approach is simpler.
-> 
-> All patches are independent, so any can be taken in any order. I'm
-> posting as a group just for convenience but if that is wrong then I
-> will submit individual patches in future.
+Rather than having an asm-prototypes.h file where C prototypes for exported
+asm symbols are centralized, let's have some macros that can be used
+directly in the code where those symbols are exported for genksyms
+consumption.  Either the prototype is provided directly if no include
+files has it, or the include file containing it is specified.
 
-Thanks, I applied them to kbuild.git#kbuild now.
+Signed-off-by: Nicolas Pitre <nico@linaro.org>
+---
+ include/asm-generic/export.h | 15 +++++++++++++++
+ scripts/Makefile.build       | 22 +++++++++++++++-------
+ 2 files changed, 30 insertions(+), 7 deletions(-)
 
-Michal
+diff --git a/include/asm-generic/export.h b/include/asm-generic/export.h
+index 39a19dc366..83dda5f840 100644
+--- a/include/asm-generic/export.h
++++ b/include/asm-generic/export.h
+@@ -84,11 +84,26 @@ KSYM(__kcrctab_\name):
+ #define __EXPORT_SYMBOL(sym, val, sec) ___EXPORT_SYMBOL sym, val, sec
+ #endif
+ 
++/* in the non genksyms case those are no-ops */
++#define SYMBOL_CPROTO(expr)
++#define SYMBOL_CPROTO_INCLUDE(file)
++
+ #else /* __GENKSYMS__ */
+ 
+ /* create a preprocessor output suitable for cmd_gensymtypes_S */
+ #define __EXPORT_SYMBOL(sym, val, sec) EXPORT_SYMBOL(sym)
+ 
++/*
++ * The cmd_gensymtypes_S kbuild command recognizes the following:
++ *
++ * Provide a C prototype for genksyms: SYMBOL_CPROTO(expr)
++ * example: SYMBOL_CPROTO(void foobar(int x, int y))
++ *
++ * Specify an include file that contains C prototypes for genksyms:
++ * SYMBOL_CPROTO_INCLUDE(quoted_filename)
++ * example: SYMBOL_CPROTO_INCLUDE(<linux/string.h>)
++ */
++
+ #endif /* __GENKSYMS__ */
+ 
+ #define EXPORT_SYMBOL(name)					\
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index ebf6e08ae4..58ebc4b15d 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -317,24 +317,32 @@ modkern_aflags := $(KBUILD_AFLAGS_KERNEL) $(AFLAGS_KERNEL)
+ $(real-objs-m)      : modkern_aflags := $(KBUILD_AFLAGS_MODULE) $(AFLAGS_MODULE)
+ $(real-objs-m:.o=.s): modkern_aflags := $(KBUILD_AFLAGS_MODULE) $(AFLAGS_MODULE)
+ 
+-# .S file exports must have their C prototypes defined in asm/asm-prototypes.h
+-# or a file that it includes, in order to get versioned symbols. We build a
+-# dummy C file that includes asm-prototypes and the EXPORT_SYMBOL lines from
+-# the .S file (with trailing ';'), and run genksyms on that, to extract vers.
++# In order to get versioned symbols, .S file exports must have their C prototypes:
++# - defined in asm/asm-prototypes.h or a file that it includes, or
++# - provided in a file specified by SYMBOL_CPROTO_INCLUDE(), or
++# - specified directly by SYMBOL_CPROTO().
++# We build a dummy C file that includes asm-prototypes and the EXPORT_SYMBOL
++# lines from the .S file (with trailing ';'), and run genksyms on that, to
++# extract vers.
+ #
+ # This is convoluted. The .S file must first be preprocessed to run guards and
+ # expand names, then the resulting exports must be constructed into plain
+ # EXPORT_SYMBOL(symbol); to build our dummy C file, and that gets preprocessed
+ # to make the genksyms input. See also include/asm-generic/export.h.
+ #
++# The -Ulinux is necessary otherwise SYMBOL_CPROTO_INCLUDE(<linux/bitops.h>)
++# is turned into #include <1/bitops.h> due to "linux" being defined to 1.
++#
+ # These mirror gensymtypes_c and co above, keep them in synch.
+ cmd_gensymtypes_S =                                                         \
+     ( echo "\#include <linux/kernel.h>" ;                                   \
+       if [ -e $(srctree)/arch/$(SRCARCH)/include/asm/asm-prototypes.h ];    \
+       then echo "\#include <asm/asm-prototypes.h>"; fi;                     \
+-      $(CPP) -D__GENKSYMS__ $(a_flags) $< | tr ";" "\n" |                   \
+-      sed -n -e '/EXPORT_SYMBOL(/s/$$/;/p' ) |                              \
+-    $(CPP) -D__GENKSYMS__ $(c_flags) -xc - |                                \
++      $(CPP) -D__GENKSYMS__ $(a_flags) -Ulinux $< | tr ";" "\n" |           \
++      sed -n -e '/EXPORT_SYMBOL(/s/$$/;/p'                                  \
++             -e 's/SYMBOL_CPROTO(\(.*\))/\1;/p'                             \
++             -e 's/SYMBOL_CPROTO_INCLUDE(\(.*\))/\#include \1/p' ) |        \
++    $(CPP) -D__GENKSYMS__ -I$(@D) $(c_flags) -xc - |                        \
+     $(GENKSYMS) $(if $(1), -T $(2))                                         \
+      $(patsubst y,-s _,$(CONFIG_HAVE_UNDERSCORE_SYMBOL_PREFIX))             \
+      $(if $(KBUILD_PRESERVE),-p)                                            \
+-- 
+2.7.4
+
