@@ -1,62 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from merlin.infradead.org ([205.233.59.134]:46386 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755154AbcK3W56 (ORCPT
+Received: from alt13.smtp-out.videotron.ca ([135.19.0.26]:33465 "EHLO
+        alt12.smtp-out.videotron.ca" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1754505AbcK3XLc (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 30 Nov 2016 17:57:58 -0500
-Subject: [PATCH 2/2] xconfig: fix missing suboption and help panels on first
- run
-From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <83475b00-45f0-0140-d024-b946b4999087@infradead.org>
-Date: Wed, 30 Nov 2016 14:57:55 -0800
+        Wed, 30 Nov 2016 18:11:32 -0500
+Date: Wed, 30 Nov 2016 17:54:26 -0500 (EST)
+From: Nicolas Pitre <nico@fluxnic.net>
+Subject: Re: Odd build breakage in 4.9-rc7
+In-Reply-To: <583F1F6A.5010307@redhat.com>
+Message-ID: <alpine.LFD.2.20.1611301748080.1715@knanqh.ubzr>
+References: <20161130172435.GG8563@redhat.com> <CA+55aFz0f6ykvWt+f0ALD62mngJuTrjNY8CQLK3qNAuYUzMeDw@mail.gmail.com> <583F1A5A.7040708@redhat.com> <CA+55aFyPhpYQR-a+PNcDSNBTaRk5CeWAwynSp2QUcStfWazTZA@mail.gmail.com> <583F1F6A.5010307@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.cz>
-Cc: Jason Vas Dias <jason.vas.dias@gmail.com>, Boris Barbulovski <bbarbulovski@gmail.com>
+To: Prarit Bhargava <prarit@redhat.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, Jarod Wilson <jarod@redhat.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Tony Luck <tony.luck@intel.com>, zarniwhoop73@googlemail.com, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-From: Boris Barbulovski <bbarbulovski@gmail.com>
+On Wed, 30 Nov 2016, Prarit Bhargava wrote:
 
-qconfig initial slider sizes fix.
+> 
+> 
+> On 11/30/2016 01:36 PM, Linus Torvalds wrote:
+> > On Wed, Nov 30, 2016 at 10:28 AM, Prarit Bhargava <prarit@redhat.com> wrote:
+> > ]>
+> >> In my case I tracked this to commit 3637efb00864 ("x86/mce: Add PCI quirks to
+> >> identify Xeons with machine check recovery") which adds the include for
+> >> generated/autoksyms.h.
+> > 
+> > Ok, that at least makes some sense. The other blamed commit did not
+> > seem to possibly make a difference.
+> > 
+> >> Searching LKML and I came across a report from Ken Moffat from a month ago:
+> >>
+> >> http://marc.info/?l=linux-kernel&m=147794681124332&w=2
+> > 
+> > Does a "make clean" get rid of it forever? Or does it come back?
+> 
+> It comes back.  The steps to reproduce this are:
+> 
+> 1.  checkout latest linux.git
+> 2.  make -j112
+> 
+> (IOW, it occurs 100% of the time for me on a clean tree.)
+> 
+> To work around the bug I have to do
+> 
+> 1.  checkout latest linux.git
+> 2.  comment out the include for generated/autoksyms.h at include/linux/export.h:81
+> 3.  compile with -j112
+> 
+> This fails loudly, but then I do
+> 
+> 4.  uncomment the include for generated/autoksyms.h at include/linux/export.h:81
 
-On first `make xconfig`, suboption and help panels were hidden.
-Now we properly detect the first run, and show those panels.
+A simpler workaround is simply:
 
-Reported-by: Jason Vas Dias <jason.vas.dias@gmail.com>
-Signed-off-by: Boris Barbulovski <bbarbulovski@gmail.com>
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-Tested-by: Randy Dunlap <rdunlap@infradead.org>
----
- scripts/kconfig/qconf.cc |   16 ++++++++++++----
- 1 file changed, 12 insertions(+), 4 deletions(-)
+	touch include/generated/autoksyms.h
 
-Boris asked me to push these 2 patches.
+But hopefully the patch I just sent would fix it for good.
 
---- lnx-49-rc7.orig/scripts/kconfig/qconf.cc
-+++ lnx-49-rc7/scripts/kconfig/qconf.cc
-@@ -65,11 +65,19 @@ ConfigSettings::ConfigSettings()
- QList<int> ConfigSettings::readSizes(const QString& key, bool *ok)
- {
- 	QList<int> result;
--	QStringList entryList = value(key).toStringList();
--	QStringList::Iterator it;
- 
--	for (it = entryList.begin(); it != entryList.end(); ++it)
--		result.push_back((*it).toInt());
-+	if (contains(key))
-+	{
-+		QStringList entryList = value(key).toStringList();
-+		QStringList::Iterator it;
-+
-+		for (it = entryList.begin(); it != entryList.end(); ++it)
-+			result.push_back((*it).toInt());
-+
-+		*ok = true;
-+	}
-+	else
-+		*ok = false;
- 
- 	return result;
- }
+
+Nicolas
