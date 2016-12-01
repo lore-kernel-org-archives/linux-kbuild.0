@@ -1,97 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from [195.159.176.226] ([195.159.176.226]:45536 "EHLO
-        blaine.gmane.org" rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org
-        with ESMTP id S1753463AbcLAPpK (ORCPT
+Received: from mail.linuxfoundation.org ([140.211.169.12]:55516 "EHLO
+        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1760444AbcLAQGD (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 1 Dec 2016 10:45:10 -0500
-Received: from list by blaine.gmane.org with local (Exim 4.84_2)
-        (envelope-from <glkd-linux-kbuild@m.gmane.org>)
-        id 1cCTXk-0003Zn-Fx
-        for linux-kbuild@vger.kernel.org; Thu, 01 Dec 2016 16:45:04 +0100
-From: Dodji Seketeli <dodji@seketeli.org>
-Subject: Re: [PATCH] x86/kbuild: enable modversions for symbols exported from asm
-Date: Thu, 01 Dec 2016 16:19:23 +0100
-Message-ID: <86k2bjk77o.fsf@seketeli.org>
-References: <20161129131922.GA31466@angband.pl>
-        <20161129135118.24696-1-kilobyte@angband.pl>
-        <CA+55aFyZiB4YkwvqzrXO=HD8bcnc2xHkAYrek2QHVnhVvAi3Fw@mail.gmail.com>
-        <30bb2db4-47bd-0c35-8328-ef032b551f06@suse.com>
-        <CA+55aFxOGw57Gm-QiNs13kfy5k=aRrn3+98415V0g73eGc66mg@mail.gmail.com>
-        <20161129195721.GI2697@decadent.org.uk>
-        <CA+55aFyQko0t8oMZjhnwhWHrmBUyWjGhsnT=oUOU-W7_04xdzw@mail.gmail.com>
-        <20161201051852.28dc335f@roar.ozlabs.ibm.com>
-        <CA+55aFzMTrLMrr69ipdaKhz+RJhUu3BxB+kg0689qq_470qEcw@mail.gmail.com>
-        <20161201041325.GX35881@redhat.com>
-        <830d2864-ab52-27c8-8178-ec86f3267079@redhat.com>
-        <20161201220907.60375b4f@roar.ozlabs.ibm.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+        Thu, 1 Dec 2016 11:06:03 -0500
+Date: Thu, 1 Dec 2016 17:06:11 +0100
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: Re: [PATCH] x86/kbuild: enable modversions for symbols exported from
+ asm
+Message-ID: <20161201160611.GA30910@kroah.com>
+References: <CA+55aFxOGw57Gm-QiNs13kfy5k=aRrn3+98415V0g73eGc66mg@mail.gmail.com>
+ <20161129195721.GI2697@decadent.org.uk>
+ <CA+55aFyQko0t8oMZjhnwhWHrmBUyWjGhsnT=oUOU-W7_04xdzw@mail.gmail.com>
+ <20161201051852.28dc335f@roar.ozlabs.ibm.com>
+ <CA+55aFzMTrLMrr69ipdaKhz+RJhUu3BxB+kg0689qq_470qEcw@mail.gmail.com>
+ <20161201041325.GX35881@redhat.com>
+ <20161201153215.43b6cec7@roar.ozlabs.ibm.com>
+ <20161201152039.GB35881@redhat.com>
+ <20161201152609.GA21862@infradead.org>
+ <20161201154059.GC35881@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20161201154059.GC35881@redhat.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: debian-kernel@lists.debian.org, linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Don Zickus <dzickus@redhat.com>
+Cc: Christoph Hellwig <hch@infradead.org>, Nicholas Piggin <npiggin@gmail.com>, Linus Torvalds <torvalds@linux-foundation.org>, skozina@redhat.com, Ben Hutchings <ben@decadent.org.uk>, Michal Marek <mmarek@suse.com>, Adam Borowski <kilobyte@angband.pl>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Debian kernel maintainers <debian-kernel@lists.debian.org>, "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Ingo Molnar <mingo@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-Nicholas Piggin <npiggin@gmail.com> a écrit:
+On Thu, Dec 01, 2016 at 10:40:59AM -0500, Don Zickus wrote:
+> Unfortunately, there are various drivers that will never go upstream
+> 
+> - paid storage drivers that provide bells and whistles on top of inbox
+>   driver
 
-[...]
+That's because the developer doesn't want them upstream, that's their
+fault, nothing we can do about them.
 
-> On Thu, 1 Dec 2016 11:48:09 +0100
-> Stanislav Kozina <skozina@redhat.com> wrote:
->
->> On 12/01/2016 05:13 AM, Don Zickus wrote:
->> 
->> ...
->> 
->> > I think GregKH pointed to one such tool, libabigail?  We are working on
->> > others too.  
->> 
->> I should mention one of the others here:
->> https://github.com/skozina/kabi-dw
+> - old drivers/fs that application has been relying on for a long time but
+>   company doesn't have resources to migrate to current technology.
 
-[...]
+That's what drivers/staging/ is for, I'll take anything that builds (and
+sometimes stuff that doesn't build) as long as people are actually using
+it.  So send the stuff that is in this category on to me and that will
+reduce your burden a _lot_.
 
-> Now this seems much better for distro ABI checking.
+thanks,
 
-Right, Incidentally, Fedora does distro-wide ABI verfication for
-userspace libraries updates in a given stable distribution.  You can
-look at an example of output of the libabigail-based tool that compares
-a new version of an ELF library to it's latest stable version:
-
-https://taskotron.fedoraproject.org/artifacts/all/a55cbac8-ab64-11e6-94e0-525400120b80/task_output/curl-7.51.0-2.fc25.log
-
-The results of those ABI comparison can browsed at https://taskotron.fedoraproject.org/resultsdb/results?testcase_name=dist.abicheck.
-
-Of course, you can run the comparison yourself by using a
-libabigail-based tool like
-https://sourceware.org/libabigail/manual/abipkgdiff.html which takes
-.deb and .rpm packages.
-
-We are currently working on making libabigail-based tools understand
-Linux kernel specifities so that we can run that kind of analysis on
-Kernel updates too.  Ideally, when this is done, you should be able to
-just use abipkgdiff on two Linux Kernel packages and get the same kind
-of output.
-
-> The next question is, do they need any kernel support for rare cases
-> where they do have to break the ABI of an export? Simple rename of the
-> function with a _v2 postfix might be enough. We could retain some per
-> symbol versioning in the kernel if needed, but how much would it
-> actually help?
-
-As a reviewer of the ABI change report emitted by the tool, if what you
-want is to say "I reviewed that ABI change and it's OK, so please do not
-show it to me next time", then you can feed the tool with a "suppression
-specification".  It's a text file in the INI syntax in which you can
-specify the kind of change you want the tool to suppress from its
-output: https://sourceware.org/libabigail/manual/libabigail-concepts.html.
-
-So I don't think you need to do anything to the source code of the
-Kernel in the cases where you need to change the ABI.  Just tell the
-tool about that change.
-
-Cheers,
-
--- 
-		Dodji
-
+greg k-h
