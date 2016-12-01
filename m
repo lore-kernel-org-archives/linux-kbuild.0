@@ -1,89 +1,57 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf0-f194.google.com ([209.85.192.194]:34442 "EHLO
-        mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1758451AbcLAMj7 (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 1 Dec 2016 07:39:59 -0500
-Date: Thu, 1 Dec 2016 23:39:42 +1100
-From: Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH] x86/kbuild: enable modversions for symbols exported
- from asm
-Message-ID: <20161201233942.0453b759@roar.ozlabs.ibm.com>
-In-Reply-To: <e91d972c-bf6d-8465-50b0-13db4645eed5@redhat.com>
-References: <20161129131922.GA31466@angband.pl>
-        <20161129135118.24696-1-kilobyte@angband.pl>
-        <CA+55aFyZiB4YkwvqzrXO=HD8bcnc2xHkAYrek2QHVnhVvAi3Fw@mail.gmail.com>
-        <30bb2db4-47bd-0c35-8328-ef032b551f06@suse.com>
-        <CA+55aFxOGw57Gm-QiNs13kfy5k=aRrn3+98415V0g73eGc66mg@mail.gmail.com>
-        <20161129195721.GI2697@decadent.org.uk>
-        <CA+55aFyQko0t8oMZjhnwhWHrmBUyWjGhsnT=oUOU-W7_04xdzw@mail.gmail.com>
-        <20161201051852.28dc335f@roar.ozlabs.ibm.com>
-        <CA+55aFzMTrLMrr69ipdaKhz+RJhUu3BxB+kg0689qq_470qEcw@mail.gmail.com>
-        <20161201041325.GX35881@redhat.com>
-        <830d2864-ab52-27c8-8178-ec86f3267079@redhat.com>
-        <20161201220907.60375b4f@roar.ozlabs.ibm.com>
-        <e91d972c-bf6d-8465-50b0-13db4645eed5@redhat.com>
+Received: from mx1.redhat.com ([209.132.183.28]:39888 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751255AbcLAMrw (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 1 Dec 2016 07:47:52 -0500
+Message-ID: <58401BF6.4040405@redhat.com>
+Date: Thu, 01 Dec 2016 07:47:50 -0500
+From: Prarit Bhargava <prarit@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Subject: Re: Odd build breakage in 4.9-rc7
+References: <20161130172435.GG8563@redhat.com> <CA+55aFz0f6ykvWt+f0ALD62mngJuTrjNY8CQLK3qNAuYUzMeDw@mail.gmail.com> <583F1A5A.7040708@redhat.com> <CA+55aFyPhpYQR-a+PNcDSNBTaRk5CeWAwynSp2QUcStfWazTZA@mail.gmail.com> <583F1F6A.5010307@redhat.com> <CA+55aFyvvVG2-fZbefGXV_dznz16jfKRFukX1u4hWEtG5DfJMw@mail.gmail.com> <alpine.LFD.2.20.1611301726240.1715@knanqh.ubzr>
+In-Reply-To: <alpine.LFD.2.20.1611301726240.1715@knanqh.ubzr>
+Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Stanislav Kozina <skozina@redhat.com>
-Cc: Don Zickus <dzickus@redhat.com>, Linus Torvalds <torvalds@linux-foundation.org>, Ben Hutchings <ben@decadent.org.uk>, Michal Marek <mmarek@suse.com>, Adam Borowski <kilobyte@angband.pl>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Debian kernel maintainers <debian-kernel@lists.debian.org>, "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Ingo Molnar <mingo@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Nicolas Pitre <nicolas.pitre@linaro.org>, Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Jarod Wilson <jarod@redhat.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Tony Luck <tony.luck@intel.com>, zarniwhoop73@googlemail.com, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Thu, 1 Dec 2016 12:33:02 +0100
-Stanislav Kozina <skozina@redhat.com> wrote:
 
-> On 12/01/2016 12:09 PM, Nicholas Piggin wrote:
-> > On Thu, 1 Dec 2016 11:48:09 +0100
-> > Stanislav Kozina <skozina@redhat.com> wrote:
-> >  
-> >> On 12/01/2016 05:13 AM, Don Zickus wrote:
-> >>
-> >> ...
-> >>  
-> >>> I think GregKH pointed to one such tool, libabigail?  We are working on
-> >>> others too.  
-> >> I should mention one of the others here:
-> >> https://github.com/skozina/kabi-dw
-> >>
-> >> It's quite comparable to libabigail in the way it works, the main
-> >> differences are:
-> >>    - written in pure C
-> >>    - depends only on elf-utils and flex/yacc
-> >>    - it's much simpler (4k LOC)
-> >>    - stores the type information in the text files and compares those
-> >> instead of directly comparing two sets of DWARF data  
-> > Now this seems much better for distro ABI checking.
-> >
-> > The next question is, do they need any kernel support for rare cases
-> > where they do have to break the ABI of an export? Simple rename of the
-> > function with a _v2 postfix might be enough. We could retain some per
-> > symbol versioning in the kernel if needed, but how much would it
-> > actually help?  
+
+On 11/30/2016 05:41 PM, Nicolas Pitre wrote:
+> On Wed, 30 Nov 2016, Linus Torvalds wrote:
 > 
-> The biggest pain point AFAICT is to identify what types (functions, 
-> structs, enums, ...) should be considered a part of the stable ABI.
+>> On Wed, Nov 30, 2016 at 10:50 AM, Prarit Bhargava <prarit@redhat.com> wrote:
+>>>
+>>> It comes back.  The steps to reproduce this are:
+>>>
+>>> 1.  checkout latest linux.git
+>>> 2.  make -j112
+>>>
+>>> (IOW, it occurs 100% of the time for me on a clean tree.)
+> 
+> I don't have access to such hardware where -j112 could ever make sense.  :-)
 
-Sure. This is something an automated checker can't solve completely.
-Any changes would have to be considered in terms of their impact to
-the ABI. It's not just data but also instruction changes involved.
+:)  I could push the builds onto the -j256 but I'm doing other stuff over there. :)
 
-This is policy that should not be mandated by the kernel. Which is
-why I'm in favor of using tools like this and just providing mechanism
-so distros can implement their own polices.
+> In other words, I can't reproduce regardless of the -j value I try.
+> 
+>> I suspect it's not new, it's just that you are able to hit the timing
+>> just right (and the new include presumable makes that just be much
+>> easier).
+> 
+> Here's the best fix I can think of. I can't convince myself any other 
+> location would be 100% safe.  Obviously I can't confirm if this actually 
+> fixes anything.
+> 
+> ----- >8
+> Subject: kbuild: make sure autoksyms.h exists early
+> 
 
-> And 
-> the problem with modversions is that it pulls in just everything which 
-> gets (accidentally?) #included in the source file.
+I'm building with this patch on top of latest now.  I will put it in a tight
+loop and clear the drop_caches between builds to see if I can make it fail.
 
-I think that's SRCVERSION which is something else. But modversions
-has problems too.
+Thanks Nicolas -- your help is very much appreciated.
 
-> The actual ABI maintenance is a different problem, but there are many 
-> possible approaches, the _v2 suffix being one of them.
-
-Would be good to get a consensus on that too.
-
-Thanks,
-Nick
+P.
