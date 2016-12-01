@@ -1,128 +1,107 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:55108 "EHLO mx1.redhat.com"
+Received: from mx1.redhat.com ([209.132.183.28]:49040 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1759172AbcLAPUy (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 1 Dec 2016 10:20:54 -0500
-Date: Thu, 1 Dec 2016 10:20:39 -0500
-From: Don Zickus <dzickus@redhat.com>
-Subject: Re: [PATCH] x86/kbuild: enable modversions for symbols exported from
- asm
-Message-ID: <20161201152039.GB35881@redhat.com>
-References: <20161129135118.24696-1-kilobyte@angband.pl>
- <CA+55aFyZiB4YkwvqzrXO=HD8bcnc2xHkAYrek2QHVnhVvAi3Fw@mail.gmail.com>
- <30bb2db4-47bd-0c35-8328-ef032b551f06@suse.com>
- <CA+55aFxOGw57Gm-QiNs13kfy5k=aRrn3+98415V0g73eGc66mg@mail.gmail.com>
- <20161129195721.GI2697@decadent.org.uk>
- <CA+55aFyQko0t8oMZjhnwhWHrmBUyWjGhsnT=oUOU-W7_04xdzw@mail.gmail.com>
- <20161201051852.28dc335f@roar.ozlabs.ibm.com>
- <CA+55aFzMTrLMrr69ipdaKhz+RJhUu3BxB+kg0689qq_470qEcw@mail.gmail.com>
- <20161201041325.GX35881@redhat.com>
- <20161201153215.43b6cec7@roar.ozlabs.ibm.com>
+        id S1753591AbcLAPW5 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 1 Dec 2016 10:22:57 -0500
+Subject: Re: Odd build breakage in 4.9-rc7
+References: <20161130172435.GG8563@redhat.com>
+ <CA+55aFz0f6ykvWt+f0ALD62mngJuTrjNY8CQLK3qNAuYUzMeDw@mail.gmail.com>
+ <583F1A5A.7040708@redhat.com>
+ <CA+55aFyPhpYQR-a+PNcDSNBTaRk5CeWAwynSp2QUcStfWazTZA@mail.gmail.com>
+ <583F1F6A.5010307@redhat.com>
+ <CA+55aFyvvVG2-fZbefGXV_dznz16jfKRFukX1u4hWEtG5DfJMw@mail.gmail.com>
+ <alpine.LFD.2.20.1611301726240.1715@knanqh.ubzr>
+ <58402D96.9020101@redhat.com>
+From: Jarod Wilson <jarod@redhat.com>
+Message-ID: <a8e3cb76-f8bc-3ed9-4e15-011a35037cd4@redhat.com>
+Date: Thu, 1 Dec 2016 10:22:55 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20161201153215.43b6cec7@roar.ozlabs.ibm.com>
+In-Reply-To: <58402D96.9020101@redhat.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicholas Piggin <npiggin@gmail.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, skozina@redhat.com, Ben Hutchings <ben@decadent.org.uk>, Michal Marek <mmarek@suse.com>, Adam Borowski <kilobyte@angband.pl>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Debian kernel maintainers <debian-kernel@lists.debian.org>, "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Ingo Molnar <mingo@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Prarit Bhargava <prarit@redhat.com>, Nicolas Pitre <nicolas.pitre@linaro.org>, Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Tony Luck <tony.luck@intel.com>, zarniwhoop73@googlemail.com, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Thu, Dec 01, 2016 at 03:32:15PM +1100, Nicholas Piggin wrote:
-> > Anyway, MODVERSIONS is our way of protecting our kabi for the last 10 years.
-> > It isn't perfect and we have fixed the genksyms tool over the years, but so
-> > far it mostly works fine.
-> 
-> Okay. It would be good to get all the distros in on this.
-> 
-> What I want to do is work out exactly what it is that modversions is
-> giving you.
-> 
-> We know it's fairly nasty code to maintain and it does not detect ABI
-> changes very well. But it's not such a burden that we can't maintain
-> it if there are good reasons to keep it.
+On 2016-12-01 9:03 AM, Prarit Bhargava wrote:
+>
+>
+> On 11/30/2016 05:41 PM, Nicolas Pitre wrote:
+>> On Wed, 30 Nov 2016, Linus Torvalds wrote:
+>>
+>>> On Wed, Nov 30, 2016 at 10:50 AM, Prarit Bhargava <prarit@redhat.com> wrote:
+>>>>
+>>>> It comes back.  The steps to reproduce this are:
+>>>>
+>>>> 1.  checkout latest linux.git
+>>>> 2.  make -j112
+>>>>
+>>>> (IOW, it occurs 100% of the time for me on a clean tree.)
+>>
+>> I don't have access to such hardware where -j112 could ever make sense.  :-)
+>> In other words, I can't reproduce regardless of the -j value I try.
+>>
+>>> I suspect it's not new, it's just that you are able to hit the timing
+>>> just right (and the new include presumable makes that just be much
+>>> easier).
+>>
+>> Here's the best fix I can think of. I can't convince myself any other
+>> location would be 100% safe.  Obviously I can't confirm if this actually
+>> fixes anything.
+>>
+>> ----- >8
+>> Subject: kbuild: make sure autoksyms.h exists early
+>>
+>> Some people are able to trigger a race where autoksyms.h is used before
+>> its empty version is even created. Let's create it at the same time as
+>> the directory holding it is created.
+>>
+>> Signed-off-by: Nicolas Pitre <nico@linaro.org>
+>>
+>> diff --git a/Makefile b/Makefile
+>> index 694111b43c..9f9c3b577c 100644
+>> --- a/Makefile
+>> +++ b/Makefile
+>> @@ -1019,8 +1019,6 @@ prepare2: prepare3 prepare-compiler-check outputmakefile asm-generic
+>>  prepare1: prepare2 $(version_h) include/generated/utsrelease.h \
+>>                     include/config/auto.conf
+>>  	$(cmd_crmodverdir)
+>> -	$(Q)test -e include/generated/autoksyms.h || \
+>> -	    touch   include/generated/autoksyms.h
+>>
+>>  archprepare: archheaders archscripts prepare1 scripts_basic
+>>
+>> diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
+>> index ebced77deb..90a091b6ae 100644
+>> --- a/scripts/kconfig/Makefile
+>> +++ b/scripts/kconfig/Makefile
+>> @@ -35,6 +35,8 @@ nconfig: $(obj)/nconf
+>>
+>>  silentoldconfig: $(obj)/conf
+>>  	$(Q)mkdir -p include/config include/generated
+>> +	$(Q)test -e include/generated/autoksyms.h || \
+>> +	    touch   include/generated/autoksyms.h
+>>  	$< $(silent) --$@ $(Kconfig)
+>>
+>>  localyesconfig localmodconfig: $(obj)/streamline_config.pl $(obj)/conf
+>>
+>
+> The testing was successful.
+>
+> After testing an hour of builds with different -j values, I'm no longer seeing
+> any compile issues when this patch is applied.  When I remove the patch the
+> compile error returns so I'm going to say that this patch fixed it.
+>
+> Thanks again Nicolas.
+>
+> Tested-by: Prarit Bhargava <prarit@redhat.com>
 
-Hi Nick,
+Looks good here as well, can do parallel make w/o reverting Tony's 
+patches again.
 
-I won't disagree with you there. :-)
+Tested-by: Jarod Wilson <jarod@redhat.com>
 
-modversions is a pretty heavy handed approach that basically says if all the
-symbols and types haven't changed for a given EXPORT_SYMBOL (recursively
-checked), then there is a high degree of confidence the OOT driver will not
-only load, but run correctly.
-
-The question is how to provide a similar guarantee if a different way?
-
-We have plenty of customers with 10 year old drivers, where the expertise
-has long left the company.  The engineers still around, recompile and make
-tweaks to get things working on the latest RHEL.  Verify it passes testing
-and release it.  Then they hope to not touch it again for a few years until
-the next RHEL comes along.
-
-Scary, huh? :-)
-
-Common examples, filesystems and storage drivers.
-
-
-There is no way that I see to provide a 100% guarantee, but if we do enough
-checks, we should be able to have a high degree of confidence the driver
-won't blow up.
-
-On the flip side, easy things in the kernel to do is:
-
-- provide the memory allocation (instead of having the driver staticly
-  allocate)
-- provide functions to retrieve various internal data (instead of having the
-  driver do direct referencing to deep internal elements)
-- cut down on some static inlines (and use accessory functions instead),
-  etc.
-
-Those types of changes allow the OOT driver to be more ignorant of kernel
-changes and struct modifications.
-
-
-Look to Stanislav's responses for his ideas on new tooling.
-
-Thanks for helping!
-
-Cheers,
-Don
-
-
-> 
-> > I am not sure what 'control vermagic' is, but it sounds like a string check,
-> > which won't protect against the boatload of backports we do to structs,
-> > enums, and functions.
-> 
-> Basically vermagic is the string all modules and the kernel get, which
-> must match in order to load modules. If you have modversions disabled,
-> then vermagic includes the kernel version. If modversions is enabled,
-> then vermagic does not include the kernel version but the CRCs have to
-> also match.
-> 
-> Controlling it explicitly is just a couple of lines where a distro can
-> control it (so they can update their kernel version without breaking).
-> It's not meant to solve everything, just the first one.
->  
-> > Currently we are exploring various ways to get smarter here.  The genksyms
-> > tool has its limitations and handling kabi hacks in RHEL is getting
-> > tiresome.
-> > 
-> > I think GregKH pointed to one such tool, libabigail?  We are working on
-> > others too.
-> > 
-> > 
-> > Circling back to enabling MODVERSIONS in Fedora, that was to start the
-> > process of syncing Fedora with RHEL stuff in preparation for smarter tools.
-> > 
-> > 
-> > If you take away MODVERSIONS, that would put a damper in our work, but
-> > easily carried privately (much like MODSIGNING for 8 years until it went
-> > upstream :-) ).
-> 
-> I don't think that's necessary. A feature requirement for a distro is just
-> as valid as any other user of upstream. I don't want to hinder any distro,
-> I'm just still not quite seeing the big picture of exactly what functionality
-> you need from the kernel.
-> 
-> Thanks,
-> Nick
+-- 
+Jarod Wilson
+jarod@redhat.com
