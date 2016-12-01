@@ -1,42 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vk0-f42.google.com ([209.85.213.42]:34116 "EHLO
-        mail-vk0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751993AbcLASNv (ORCPT
+Received: from mail-io0-f195.google.com ([209.85.223.195]:33929 "EHLO
+        mail-io0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1756656AbcLAS0J (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 1 Dec 2016 13:13:51 -0500
-Received: by mail-vk0-f42.google.com with SMTP id x186so133020214vkd.1
-        for <linux-kbuild@vger.kernel.org>; Thu, 01 Dec 2016 10:13:51 -0800 (PST)
+        Thu, 1 Dec 2016 13:26:09 -0500
 MIME-Version: 1.0
-In-Reply-To: <b4a882d3-6125-e7b7-6c60-901fabfc23d9@suse.com>
-References: <20161126182006.24815-1-pefoley2@pefoley.com> <20161128064446.4892-1-pefoley2@pefoley.com>
- <b4a882d3-6125-e7b7-6c60-901fabfc23d9@suse.com>
-From: Peter Foley <pefoley2@pefoley.com>
-Date: Thu, 1 Dec 2016 10:13:30 -0800
-Message-ID: <CAOFdcFMTQbkE4ODTmrxq2dkzkNV8PXcMD0V3UhXyL62xvhgTGA@mail.gmail.com>
-Subject: Re: [PATCH v4] Fixes for compiling with clang
+In-Reply-To: <2899250.iZaPagXLk8@wuerfel>
+References: <20161129131922.GA31466@angband.pl> <CA+55aFxCKgTrh1gS-cMyhBa0QoLW2DL2+DYxOAcA-Bd15H15vg@mail.gmail.com>
+ <CA+55aFw7G1QJ0dwMXJKJqFVhVsWGsAdxZTOsmcCD7POUde2+dA@mail.gmail.com> <2899250.iZaPagXLk8@wuerfel>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Thu, 1 Dec 2016 10:26:07 -0800
+Message-ID: <CA+55aFxg_s8k1LBmsXjpVYw=BKh8sNEuL3n6MhzZGTuUPKMOwg@mail.gmail.com>
+Subject: Re: [PATCH] x86/kbuild: enable modversions for symbols exported from asm
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>
-Cc: LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Adam Borowski <kilobyte@angband.pl>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Ben Hutchings <ben@decadent.org.uk>, Debian kernel maintainers <debian-kernel@lists.debian.org>, "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, Ingo Molnar <mingo@kernel.org>, Nicholas Piggin <npiggin@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Tue, Nov 29, 2016 at 6:22 AM, Michal Marek <mmarek@suse.com> wrote:
-> Dne 28.11.2016 v 07:44 Peter Foley napsal(a):
-> This adds new -Wno-* options also for the gcc case, is there a reason
-> for this? Also, the -Wno-missing-field-initializers option is not
-> available in some old gccs, so we would need a HOSTCC equivalent of
-> cc-disable-warning.
+On Thu, Dec 1, 2016 at 5:58 AM, Arnd Bergmann <arnd@arndb.de> wrote:
 >
-> Michal
+> WARNING: EXPORT symbol "mcount" [arch/x86/entry/built-in.ko] version generation failed, symbol will not be versioned.
+> WARNING: EXPORT symbol "mcount" [arch/x86/built-in.ko] version generation failed, symbol will not be versioned.
+> WARNING: EXPORT symbol "cmpxchg8b_emu" [vmlinux] version generation failed, symbol will not be versioned.
+> WARNING: EXPORT symbol "empty_zero_page" [vmlinux] version generation failed, symbol will not be versioned.
+> WARNING: EXPORT symbol "mcount" [vmlinux] version generation failed, symbol will not be versioned.
+> WARNING: EXPORT symbol "cmpxchg8b_emu" [vmlinux] version generation failed, symbol will not be versioned.
+> WARNING: EXPORT symbol "empty_zero_page" [vmlinux] version generation failed, symbol will not be versioned.
+> WARNING: EXPORT symbol "mcount" [vmlinux] version generation failed, symbol will not be versioned.
+>
+> Out of 12 randconfig builds that had CONFIG_MODVERSIONS enabled, all 12
+> had this problem, though not always with all the symbols.
 
-It appeared that the conditional was simply reversed, as
--fno-delete-null-pointer-checks is only supported by gcc, and
-explicitly not supported by clang.
-(see https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/Makefile?id=61163efae02040f66a95c8ed17f4407951ba58fa)
-It could be that the fno-delete-null-pointer-checks option was simply
-misplaced, and the Wno-options should still be guarded by if(clang),
-would that be a better approach?
+Well, the good news is that pretty fundamentally, if it's just the asm
+symbls, those really don't have ABI's that change (or if they change,
+it's such a fundamental change that everything else will likely have
+changed too and we don't need to worry about one asm symbol crc - the
+change will be caught by other symbols).
 
-Thanks,
+So I think the whole "we don't really care" approach should work fine.
+The "let's make every symbol always be versioned" may just be too much
+pain for no real gain.
 
-Peter
+            Linus
