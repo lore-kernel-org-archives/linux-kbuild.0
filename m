@@ -1,62 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from tartarus.angband.pl ([89.206.35.136]:33388 "EHLO
-        tartarus.angband.pl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755597AbcLBPgB (ORCPT
+Received: from mail-io0-f196.google.com ([209.85.223.196]:32936 "EHLO
+        mail-io0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751845AbcLBRXK (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 2 Dec 2016 10:36:01 -0500
-Date: Fri, 2 Dec 2016 16:35:35 +0100
-From: Adam Borowski <kilobyte@angband.pl>
-Subject: Re: [RFC, PATCH, v3.9] default exported asm symbols to zero
-Message-ID: <20161202153535.GB16491@angband.pl>
-References: <20161129131922.GA31466@angband.pl>
- <CA+55aFxg_s8k1LBmsXjpVYw=BKh8sNEuL3n6MhzZGTuUPKMOwg@mail.gmail.com>
- <14455987.OWjnZpEEup@wuerfel>
- <8452191.39CeLIHTBT@wuerfel>
+        Fri, 2 Dec 2016 12:23:10 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8452191.39CeLIHTBT@wuerfel>
+In-Reply-To: <14455987.OWjnZpEEup@wuerfel>
+References: <20161129131922.GA31466@angband.pl> <2899250.iZaPagXLk8@wuerfel>
+ <CA+55aFxg_s8k1LBmsXjpVYw=BKh8sNEuL3n6MhzZGTuUPKMOwg@mail.gmail.com> <14455987.OWjnZpEEup@wuerfel>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Fri, 2 Dec 2016 09:04:28 -0800
+Message-ID: <CA+55aFxYYKRsimcZsj7fz4paPag6Uqf1M5_v=W2Yv9sSPeLdig@mail.gmail.com>
+Subject: Re: [PATCH] x86/kbuild: enable modversions for symbols exported from asm
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Arnd Bergmann <arnd@arndb.de>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Ben Hutchings <ben@decadent.org.uk>, Debian kernel maintainers <debian-kernel@lists.debian.org>, "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, Ingo Molnar <mingo@kernel.org>, Nicholas Piggin <npiggin@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Alan Modra <amodra@gmail.com>
+Cc: Adam Borowski <kilobyte@angband.pl>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Ben Hutchings <ben@decadent.org.uk>, Debian kernel maintainers <debian-kernel@lists.debian.org>, "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, Ingo Molnar <mingo@kernel.org>, Nicholas Piggin <npiggin@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Alan Modra <amodra@gmail.com>
 
-On Fri, Dec 02, 2016 at 01:40:27PM +0100, Arnd Bergmann wrote:
-> With binutils-2.16 and before, a weak missing symbol was kept during the
-> final link, and a missing CRC for an export would lead to that CRC
-> being treated as zero implicitly. With binutils-2.17, the crc
-> symbol gets dropped, and any module trying to use it will fail to
-> load.
-> 
-> This sets the weak CRC symbol to zero explicitly, making it defined
-> in vmlinux, which in turn lets us load the modules referring to
-> that CRC.
-> 
-> The comment above the __CRC_SYMBOL macro suggests that this was
-> always the intention, although it also seems that all symbols
-> defined in C have a correct CRC these days, and only the exports
-> that are now done in assembly need this.
-> 
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
+On Fri, Dec 2, 2016 at 2:55 AM, Arnd Bergmann <arnd@arndb.de> wrote:
+>
+> Yes, it's always been just the assembly symbols that broke, these were
+> the ones that Al's original patch changed and that ended up with
+> no version information.
 
-Looks good, works for me, and, unlike faaae2a5, doesn't produce a nasty
-user-scaring warning in normal operation.
+Ok, and the reason is because even if we have a weak symbol from C, it
+would always have a value.
 
-> diff --git a/include/asm-generic/export.h b/include/asm-generic/export.h
-> index 63554e9..59a3b2f 100644
-> --- a/include/asm-generic/export.h
-> +++ b/include/asm-generic/export.h
-> @@ -54,6 +54,7 @@ KSYM(__kstrtab_\name):
->  KSYM(__kcrctab_\name):
->  	__put KSYM(__crc_\name)
->  	.weak KSYM(__crc_\name)
-> +	.set KSYM(__crc_\name), 0
->  	.previous
->  #endif
->  #endif
+Good to know what the heck the problem was.
 
--- 
-The bill declaring Jesus as the King of Poland fails to specify whether
-the addition is at the top or end of the list of kings.  What should the
-historians do?
+> I have managed to bisect the link failure to a specific binutils
+> commit by Alan Modra now:
+
+Thanks. And I committed your "set to zero" patch, so we can hopefully
+leave this all behind us.
+
+I marked it for stable (not because older kernels need it, but because
+it's the right thing to do and if we ever backport anything that
+causes this we don't want to forget this).
+
+And I'll keep the workaround in kernel/module.c just because it's
+really late in the rc series, and I'd rather have both belt and
+suspenders for this all right now.
+
+               Linus
