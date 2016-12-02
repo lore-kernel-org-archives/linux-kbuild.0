@@ -1,46 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:35664 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1759022AbcLBMdm (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 2 Dec 2016 07:33:42 -0500
-Subject: Re: [PATCH v4] Fixes for compiling with clang
-References: <20161126182006.24815-1-pefoley2@pefoley.com>
- <20161128064446.4892-1-pefoley2@pefoley.com>
- <b4a882d3-6125-e7b7-6c60-901fabfc23d9@suse.com>
- <CAOFdcFMTQbkE4ODTmrxq2dkzkNV8PXcMD0V3UhXyL62xvhgTGA@mail.gmail.com>
-From: Michal Marek <mmarek@suse.com>
-Message-ID: <d419e823-8321-94d2-6f14-eac68e007eba@suse.com>
-Date: Fri, 2 Dec 2016 13:33:39 +0100
+Received: from mout.kundenserver.de ([212.227.17.13]:64259 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1760445AbcLBMlr (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 2 Dec 2016 07:41:47 -0500
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: [RFC, PATCH, v3.9] default exported asm symbols to zero
+Date: Fri, 02 Dec 2016 13:40:27 +0100
+Message-ID: <8452191.39CeLIHTBT@wuerfel>
+In-Reply-To: <14455987.OWjnZpEEup@wuerfel>
+References: <20161129131922.GA31466@angband.pl> <CA+55aFxg_s8k1LBmsXjpVYw=BKh8sNEuL3n6MhzZGTuUPKMOwg@mail.gmail.com> <14455987.OWjnZpEEup@wuerfel>
 MIME-Version: 1.0
-In-Reply-To: <CAOFdcFMTQbkE4ODTmrxq2dkzkNV8PXcMD0V3UhXyL62xvhgTGA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Peter Foley <pefoley2@pefoley.com>
-Cc: LKML <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, Behan Webster <behanw@converseincode.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Adam Borowski <kilobyte@angband.pl>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Ben Hutchings <ben@decadent.org.uk>, Debian kernel maintainers <debian-kernel@lists.debian.org>, "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, Ingo Molnar <mingo@kernel.org>, Nicholas Piggin <npiggin@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Alan Modra <amodra@gmail.com>
 
-On 2016-12-01 19:13, Peter Foley wrote:
-> On Tue, Nov 29, 2016 at 6:22 AM, Michal Marek <mmarek@suse.com> wrote:
->> Dne 28.11.2016 v 07:44 Peter Foley napsal(a):
->> This adds new -Wno-* options also for the gcc case, is there a reason
->> for this? Also, the -Wno-missing-field-initializers option is not
->> available in some old gccs, so we would need a HOSTCC equivalent of
->> cc-disable-warning.
->>
->> Michal
-> 
-> It appeared that the conditional was simply reversed, as
-> -fno-delete-null-pointer-checks is only supported by gcc, and
-> explicitly not supported by clang.
-> (see https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/commit/Makefile?id=61163efae02040f66a95c8ed17f4407951ba58fa)
-> It could be that the fno-delete-null-pointer-checks option was simply
-> misplaced, and the Wno-options should still be guarded by if(clang),
-> would that be a better approach?
+With binutils-2.16 and before, a weak missing symbol was kept during the
+final link, and a missing CRC for an export would lead to that CRC
+being treated as zero implicitly. With binutils-2.17, the crc
+symbol gets dropped, and any module trying to use it will fail to
+load.
 
-I think so. The -Wno-* options had not been present before clang support
-was added. It really looks like the -fno-delete-null-pointer-checks
-should not be there. Added Behan to CC.
+This sets the weak CRC symbol to zero explicitly, making it defined
+in vmlinux, which in turn lets us load the modules referring to
+that CRC.
 
-Michal
+The comment above the __CRC_SYMBOL macro suggests that this was
+always the intention, although it also seems that all symbols
+defined in C have a correct CRC these days, and only the exports
+that are now done in assembly need this.
+
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+Not sure if this is the correct way of doing it, but this seems trivial
+enough and lets me build the kernel with missing CRCs with any binutils
+version.
+
+diff --git a/include/asm-generic/export.h b/include/asm-generic/export.h
+index 63554e9..59a3b2f 100644
+--- a/include/asm-generic/export.h
++++ b/include/asm-generic/export.h
+@@ -54,6 +54,7 @@ KSYM(__kstrtab_\name):
+ KSYM(__kcrctab_\name):
+ 	__put KSYM(__crc_\name)
+ 	.weak KSYM(__crc_\name)
++	.set KSYM(__crc_\name), 0
+ 	.previous
+ #endif
+ #endif
 
