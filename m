@@ -1,62 +1,102 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.136]:33048 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751443AbcLFPke (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 6 Dec 2016 10:40:34 -0500
-Date: Tue, 6 Dec 2016 17:40:28 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: [PATCH 00/10] virtio: sparse fixes
-Message-ID: <1481038106-24899-1-git-send-email-mst@redhat.com>
+Received: from mail-io0-f180.google.com ([209.85.223.180]:35528 "EHLO
+        mail-io0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751613AbcLFUkw (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 6 Dec 2016 15:40:52 -0500
+Received: by mail-io0-f180.google.com with SMTP id a124so674940868ioe.2
+        for <linux-kbuild@vger.kernel.org>; Tue, 06 Dec 2016 12:40:52 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+In-Reply-To: <20161206062800.21800-3-andrew.donnellan@au1.ibm.com>
+References: <20161206062800.21800-1-andrew.donnellan@au1.ibm.com> <20161206062800.21800-3-andrew.donnellan@au1.ibm.com>
+From: Kees Cook <keescook@chromium.org>
+Date: Tue, 6 Dec 2016 12:40:50 -0800
+Message-ID: <CAGXu5jKQf4ReBkGC85+r_j1rVUFTZoeWk9A_mjhjnFHq1PAr8Q@mail.gmail.com>
+Subject: Re: [PATCH 3/3] powerpc: enable support for GCC plugins
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org
-Cc: Jason Wang <jasowang@redhat.com>, linux-crypto@vger.kernel.org, virtualization@lists.linux-foundation.org, dri-devel@lists.freedesktop.org, netdev@vger.kernel.org, linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org, kvm@vger.kernel.org, linux-scsi@vger.kernel.org, v9fs-developer@lists.sourceforge.net, Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org
+To: Andrew Donnellan <andrew.donnellan@au1.ibm.com>
+Cc: "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>, "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, Emese Revfy <re.emese@gmail.com>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, PaX Team <pageexec@freemail.hu>, Brad Spengler <spender@grsecurity.net>, Michal Marek <mmarek@suse.com>
 
-I run latest sparse from git on virtio drivers
-(turns out the version I had was rather outdated).
-This patchset fixes a couple of bugs this uncovered,
-and adds some annotations to make it sparse-clean.
-In particular, endian-ness is often tricky,
-so this patchset enabled endian-ness checks for sparse
-builds.
+On Mon, Dec 5, 2016 at 10:28 PM, Andrew Donnellan
+<andrew.donnellan@au1.ibm.com> wrote:
+> Enable support for GCC plugins on powerpc.
+>
+> Add an additional version check in gcc-plugins-check to advise users to
+> upgrade to gcc 5.2+ on powerpc to avoid issues with header files (gcc <=
+> 4.6) or missing copies of rs6000-cpus.def (4.8 to 5.1 on 64-bit targets).
+>
+> Signed-off-by: Andrew Donnellan <andrew.donnellan@au1.ibm.com>
+>
+> ---
+>
+> Open to bikeshedding on the gcc version check.
 
-Michael S. Tsirkin (10):
-  virtio_console: drop unused config fields
-  drm/virtio: fix endianness in primary_plane_update
-  drm/virtio: fix lock context imbalance
-  drm/virtio: annotate virtio_gpu_queue_ctrl_buffer_locked
-  vhost: make interval tree static inline
-  vhost: add missing __user annotations
-  vsock/virtio: add a missing __le annotation
-  vsock/virtio: mark an internal function static
-  vsock/virtio: fix src/dst cid format
-  virtio: enable endian checks for sparse builds
+I think this looks fine. Anyone wanting to use gcc plugins on ppc with
+an earlier gcc can send patches if they find a sane way to make it
+work. :)
 
- drivers/char/virtio_console.c           | 14 +++++++-------
- drivers/gpu/drm/virtio/virtgpu_plane.c  |  4 ++--
- drivers/gpu/drm/virtio/virtgpu_vq.c     |  6 +++++-
- drivers/vhost/vhost.c                   | 12 ++++++------
- net/vmw_vsock/virtio_transport.c        |  2 +-
- net/vmw_vsock/virtio_transport_common.c | 16 ++++++++--------
- drivers/block/Makefile                  |  1 +
- drivers/char/Makefile                   |  1 +
- drivers/char/hw_random/Makefile         |  2 ++
- drivers/gpu/drm/virtio/Makefile         |  1 +
- drivers/net/Makefile                    |  3 +++
- drivers/net/caif/Makefile               |  1 +
- drivers/rpmsg/Makefile                  |  1 +
- drivers/s390/virtio/Makefile            |  2 ++
- drivers/scsi/Makefile                   |  1 +
- drivers/vhost/Makefile                  |  1 +
- drivers/virtio/Makefile                 |  3 +++
- net/9p/Makefile                         |  1 +
- net/packet/Makefile                     |  1 +
- net/vmw_vsock/Makefile                  |  2 ++
- 20 files changed, 50 insertions(+), 25 deletions(-)
+> Compile tested with all plugins enabled on gcc 4.6-6.2,
+> x86->ppc{32,64,64le} and 4.8-6.2 ppc64le->ppc{32,64,64le}. Thanks to
+> Chris Smart for help with this.
+
+I assume also tested on 5.2? :)
+
+> I think it's best to take this through powerpc#next with an ACK from
+> Kees/Emese?
+
+That would be fine by me. Please consider the whole series:
+
+Acked-by: Kees Cook <keescook@chromium.org>
+
+Thanks!
+
+-Kees
+
+> ---
+>  arch/powerpc/Kconfig         | 1 +
+>  scripts/Makefile.gcc-plugins | 8 ++++++++
+>  2 files changed, 9 insertions(+)
+>
+> diff --git a/arch/powerpc/Kconfig b/arch/powerpc/Kconfig
+> index 65fba4c..6efbc08 100644
+> --- a/arch/powerpc/Kconfig
+> +++ b/arch/powerpc/Kconfig
+> @@ -92,6 +92,7 @@ config PPC
+>         select HAVE_DYNAMIC_FTRACE_WITH_REGS if MPROFILE_KERNEL
+>         select HAVE_FUNCTION_TRACER
+>         select HAVE_FUNCTION_GRAPH_TRACER
+> +       select HAVE_GCC_PLUGINS
+>         select SYSCTL_EXCEPTION_TRACE
+>         select VIRT_TO_BUS if !PPC64
+>         select HAVE_IDE
+> diff --git a/scripts/Makefile.gcc-plugins b/scripts/Makefile.gcc-plugins
+> index 26c67b7..9835a75 100644
+> --- a/scripts/Makefile.gcc-plugins
+> +++ b/scripts/Makefile.gcc-plugins
+> @@ -47,6 +47,14 @@ gcc-plugins-check: FORCE
+>  ifdef CONFIG_GCC_PLUGINS
+>    ifeq ($(PLUGINCC),)
+>      ifneq ($(GCC_PLUGINS_CFLAGS),)
+> +      # Various gccs between 4.5 and 5.1 have bugs on powerpc due to missing
+> +      # header files. gcc <= 4.6 doesn't work at all, gccs from 4.8 to 5.1 have
+> +      # issues with 64-bit targets.
+> +      ifeq ($(ARCH),powerpc)
+> +        ifeq ($(call cc-ifversion, -le, 0501, y), y)
+> +         @echo "Cannot use CONFIG_GCC_PLUGINS: plugin support on gcc <= 5.1 is buggy on powerpc, please upgrade to gcc 5.2 or newer" >&2 && exit 1
+> +        endif
+> +      endif
+>        ifeq ($(call cc-ifversion, -ge, 0405, y), y)
+>         $(Q)$(srctree)/scripts/gcc-plugin.sh --show-error "$(__PLUGINCC)" "$(HOSTCXX)" "$(CC)" || true
+>         @echo "Cannot use CONFIG_GCC_PLUGINS: your gcc installation does not support plugins, perhaps the necessary headers are missing?" >&2 && exit 1
+> --
+> Andrew Donnellan              OzLabs, ADL Canberra
+> andrew.donnellan@au1.ibm.com  IBM Australia Limited
+>
+
+
 
 -- 
-MST
-
+Kees Cook
+Nexus Security
