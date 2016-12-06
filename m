@@ -1,53 +1,85 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53614 "EHLO
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53942 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1751335AbcLFG2c (ORCPT
+        by vger.kernel.org with ESMTP id S1751335AbcLFG2p (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 6 Dec 2016 01:28:32 -0500
+        Tue, 6 Dec 2016 01:28:45 -0500
 Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id uB66P2B9001374
-        for <linux-kbuild@vger.kernel.org>; Tue, 6 Dec 2016 01:28:31 -0500
-Received: from e23smtp01.au.ibm.com (e23smtp01.au.ibm.com [202.81.31.143])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 275pymc61c-1
+        by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id uB66P5Ap001513
+        for <linux-kbuild@vger.kernel.org>; Tue, 6 Dec 2016 01:28:44 -0500
+Received: from e23smtp02.au.ibm.com (e23smtp02.au.ibm.com [202.81.31.144])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 275pymc6ba-1
         (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-        for <linux-kbuild@vger.kernel.org>; Tue, 06 Dec 2016 01:28:30 -0500
+        for <linux-kbuild@vger.kernel.org>; Tue, 06 Dec 2016 01:28:44 -0500
 Received: from localhost
-        by e23smtp01.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e23smtp02.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <linux-kbuild@vger.kernel.org> from <andrew.donnellan@au1.ibm.com>;
-        Tue, 6 Dec 2016 16:28:28 +1000
+        Tue, 6 Dec 2016 16:28:38 +1000
 From: Andrew Donnellan <andrew.donnellan@au1.ibm.com>
-Subject: [PATCH 1/3] gcc-plugins: fix definition of DISABLE_LATENT_ENTROPY_PLUGIN
-Date: Tue,  6 Dec 2016 17:27:58 +1100
-Message-Id: <20161206062800.21800-1-andrew.donnellan@au1.ibm.com>
+Subject: [PATCH 3/3] powerpc: enable support for GCC plugins
+Date: Tue,  6 Dec 2016 17:28:00 +1100
+In-Reply-To: <20161206062800.21800-1-andrew.donnellan@au1.ibm.com>
+References: <20161206062800.21800-1-andrew.donnellan@au1.ibm.com>
+Message-Id: <20161206062800.21800-3-andrew.donnellan@au1.ibm.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linuxppc-dev@lists.ozlabs.org, kernel-hardening@lists.openwall.com, keescook@chromium.org, re.emese@gmail.com
 Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, pageexec@freemail.hu, spender@grsecurity.net, mmarek@suse.com
 
-The variable DISABLE_LATENT_ENTROPY_PLUGIN is defined when
-CONFIG_PAX_LATENT_ENTROPY is set. This is leftover from the original PaX
-version of the plugin code and doesn't actually exist. Change the condition
-to depend on CONFIG_GCC_PLUGIN_LATENT_ENTROPY instead.
+Enable support for GCC plugins on powerpc.
 
-Fixes: 38addce8b600 ("gcc-plugins: Add latent_entropy plugin")
+Add an additional version check in gcc-plugins-check to advise users to
+upgrade to gcc 5.2+ on powerpc to avoid issues with header files (gcc <=
+4.6) or missing copies of rs6000-cpus.def (4.8 to 5.1 on 64-bit targets).
+
 Signed-off-by: Andrew Donnellan <andrew.donnellan@au1.ibm.com>
----
- scripts/Makefile.gcc-plugins | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
+---
+
+Open to bikeshedding on the gcc version check.
+
+Compile tested with all plugins enabled on gcc 4.6-6.2,
+x86->ppc{32,64,64le} and 4.8-6.2 ppc64le->ppc{32,64,64le}. Thanks to
+Chris Smart for help with this.
+
+I think it's best to take this through powerpc#next with an ACK from
+Kees/Emese?
+---
+ arch/powerpc/Kconfig         | 1 +
+ scripts/Makefile.gcc-plugins | 8 ++++++++
+ 2 files changed, 9 insertions(+)
+
+diff --git a/arch/powerpc/Kconfig b/arch/powerpc/Kconfig
+index 65fba4c..6efbc08 100644
+--- a/arch/powerpc/Kconfig
++++ b/arch/powerpc/Kconfig
+@@ -92,6 +92,7 @@ config PPC
+ 	select HAVE_DYNAMIC_FTRACE_WITH_REGS if MPROFILE_KERNEL
+ 	select HAVE_FUNCTION_TRACER
+ 	select HAVE_FUNCTION_GRAPH_TRACER
++	select HAVE_GCC_PLUGINS
+ 	select SYSCTL_EXCEPTION_TRACE
+ 	select VIRT_TO_BUS if !PPC64
+ 	select HAVE_IDE
 diff --git a/scripts/Makefile.gcc-plugins b/scripts/Makefile.gcc-plugins
-index 060d2cb..26c67b7 100644
+index 26c67b7..9835a75 100644
 --- a/scripts/Makefile.gcc-plugins
 +++ b/scripts/Makefile.gcc-plugins
-@@ -8,7 +8,7 @@ ifdef CONFIG_GCC_PLUGINS
- 
-   gcc-plugin-$(CONFIG_GCC_PLUGIN_LATENT_ENTROPY)	+= latent_entropy_plugin.so
-   gcc-plugin-cflags-$(CONFIG_GCC_PLUGIN_LATENT_ENTROPY)	+= -DLATENT_ENTROPY_PLUGIN
--  ifdef CONFIG_PAX_LATENT_ENTROPY
-+  ifdef CONFIG_GCC_PLUGIN_LATENT_ENTROPY
-     DISABLE_LATENT_ENTROPY_PLUGIN			+= -fplugin-arg-latent_entropy_plugin-disable
-   endif
- 
+@@ -47,6 +47,14 @@ gcc-plugins-check: FORCE
+ ifdef CONFIG_GCC_PLUGINS
+   ifeq ($(PLUGINCC),)
+     ifneq ($(GCC_PLUGINS_CFLAGS),)
++      # Various gccs between 4.5 and 5.1 have bugs on powerpc due to missing
++      # header files. gcc <= 4.6 doesn't work at all, gccs from 4.8 to 5.1 have
++      # issues with 64-bit targets.
++      ifeq ($(ARCH),powerpc)
++        ifeq ($(call cc-ifversion, -le, 0501, y), y)
++	  @echo "Cannot use CONFIG_GCC_PLUGINS: plugin support on gcc <= 5.1 is buggy on powerpc, please upgrade to gcc 5.2 or newer" >&2 && exit 1
++        endif
++      endif
+       ifeq ($(call cc-ifversion, -ge, 0405, y), y)
+ 	$(Q)$(srctree)/scripts/gcc-plugin.sh --show-error "$(__PLUGINCC)" "$(HOSTCXX)" "$(CC)" || true
+ 	@echo "Cannot use CONFIG_GCC_PLUGINS: your gcc installation does not support plugins, perhaps the necessary headers are missing?" >&2 && exit 1
 -- 
 Andrew Donnellan              OzLabs, ADL Canberra
 andrew.donnellan@au1.ibm.com  IBM Australia Limited
