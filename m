@@ -1,85 +1,60 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:53942 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1751335AbcLFG2p (ORCPT
+Received: from 001b2d01.pphosted.com ([148.163.156.1]:59357 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1752079AbcLFG2q (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 6 Dec 2016 01:28:45 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id uB66P5Ap001513
-        for <linux-kbuild@vger.kernel.org>; Tue, 6 Dec 2016 01:28:44 -0500
-Received: from e23smtp02.au.ibm.com (e23smtp02.au.ibm.com [202.81.31.144])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 275pymc6ba-1
+        Tue, 6 Dec 2016 01:28:46 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id uB66O97M087882
+        for <linux-kbuild@vger.kernel.org>; Tue, 6 Dec 2016 01:28:40 -0500
+Received: from e23smtp09.au.ibm.com (e23smtp09.au.ibm.com [202.81.31.142])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 275q313yha-1
         (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-        for <linux-kbuild@vger.kernel.org>; Tue, 06 Dec 2016 01:28:44 -0500
+        for <linux-kbuild@vger.kernel.org>; Tue, 06 Dec 2016 01:28:40 -0500
 Received: from localhost
-        by e23smtp02.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e23smtp09.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <linux-kbuild@vger.kernel.org> from <andrew.donnellan@au1.ibm.com>;
         Tue, 6 Dec 2016 16:28:38 +1000
 From: Andrew Donnellan <andrew.donnellan@au1.ibm.com>
-Subject: [PATCH 3/3] powerpc: enable support for GCC plugins
-Date: Tue,  6 Dec 2016 17:28:00 +1100
+Subject: [PATCH 2/3] powerpc: correctly disable latent entropy GCC plugin on prom_init.o
+Date: Tue,  6 Dec 2016 17:27:59 +1100
 In-Reply-To: <20161206062800.21800-1-andrew.donnellan@au1.ibm.com>
 References: <20161206062800.21800-1-andrew.donnellan@au1.ibm.com>
-Message-Id: <20161206062800.21800-3-andrew.donnellan@au1.ibm.com>
+Message-Id: <20161206062800.21800-2-andrew.donnellan@au1.ibm.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linuxppc-dev@lists.ozlabs.org, kernel-hardening@lists.openwall.com, keescook@chromium.org, re.emese@gmail.com
 Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, pageexec@freemail.hu, spender@grsecurity.net, mmarek@suse.com
 
-Enable support for GCC plugins on powerpc.
+Commit 38addce8b600 ("gcc-plugins: Add latent_entropy plugin") excludes
+certain powerpc early boot code from the latent entropy plugin by adding
+appropriate CFLAGS. It looks like this was supposed to cover prom_init.o,
+but ended up saying init.o (which doesn't exist) instead. Fix the typo.
 
-Add an additional version check in gcc-plugins-check to advise users to
-upgrade to gcc 5.2+ on powerpc to avoid issues with header files (gcc <=
-4.6) or missing copies of rs6000-cpus.def (4.8 to 5.1 on 64-bit targets).
-
+Fixes: 38addce8b600 ("gcc-plugins: Add latent_entropy plugin")
 Signed-off-by: Andrew Donnellan <andrew.donnellan@au1.ibm.com>
 
 ---
 
-Open to bikeshedding on the gcc version check.
-
-Compile tested with all plugins enabled on gcc 4.6-6.2,
-x86->ppc{32,64,64le} and 4.8-6.2 ppc64le->ppc{32,64,64le}. Thanks to
-Chris Smart for help with this.
-
-I think it's best to take this through powerpc#next with an ACK from
-Kees/Emese?
+I think that we potentially could get rid of some of these disables, but
+it's safer to leave it for now.
 ---
- arch/powerpc/Kconfig         | 1 +
- scripts/Makefile.gcc-plugins | 8 ++++++++
- 2 files changed, 9 insertions(+)
+ arch/powerpc/kernel/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/powerpc/Kconfig b/arch/powerpc/Kconfig
-index 65fba4c..6efbc08 100644
---- a/arch/powerpc/Kconfig
-+++ b/arch/powerpc/Kconfig
-@@ -92,6 +92,7 @@ config PPC
- 	select HAVE_DYNAMIC_FTRACE_WITH_REGS if MPROFILE_KERNEL
- 	select HAVE_FUNCTION_TRACER
- 	select HAVE_FUNCTION_GRAPH_TRACER
-+	select HAVE_GCC_PLUGINS
- 	select SYSCTL_EXCEPTION_TRACE
- 	select VIRT_TO_BUS if !PPC64
- 	select HAVE_IDE
-diff --git a/scripts/Makefile.gcc-plugins b/scripts/Makefile.gcc-plugins
-index 26c67b7..9835a75 100644
---- a/scripts/Makefile.gcc-plugins
-+++ b/scripts/Makefile.gcc-plugins
-@@ -47,6 +47,14 @@ gcc-plugins-check: FORCE
- ifdef CONFIG_GCC_PLUGINS
-   ifeq ($(PLUGINCC),)
-     ifneq ($(GCC_PLUGINS_CFLAGS),)
-+      # Various gccs between 4.5 and 5.1 have bugs on powerpc due to missing
-+      # header files. gcc <= 4.6 doesn't work at all, gccs from 4.8 to 5.1 have
-+      # issues with 64-bit targets.
-+      ifeq ($(ARCH),powerpc)
-+        ifeq ($(call cc-ifversion, -le, 0501, y), y)
-+	  @echo "Cannot use CONFIG_GCC_PLUGINS: plugin support on gcc <= 5.1 is buggy on powerpc, please upgrade to gcc 5.2 or newer" >&2 && exit 1
-+        endif
-+      endif
-       ifeq ($(call cc-ifversion, -ge, 0405, y), y)
- 	$(Q)$(srctree)/scripts/gcc-plugin.sh --show-error "$(__PLUGINCC)" "$(HOSTCXX)" "$(CC)" || true
- 	@echo "Cannot use CONFIG_GCC_PLUGINS: your gcc installation does not support plugins, perhaps the necessary headers are missing?" >&2 && exit 1
+diff --git a/arch/powerpc/kernel/Makefile b/arch/powerpc/kernel/Makefile
+index 1925341..adb52d1 100644
+--- a/arch/powerpc/kernel/Makefile
++++ b/arch/powerpc/kernel/Makefile
+@@ -15,7 +15,7 @@ CFLAGS_btext.o		+= -fPIC
+ endif
+ 
+ CFLAGS_cputable.o += $(DISABLE_LATENT_ENTROPY_PLUGIN)
+-CFLAGS_init.o += $(DISABLE_LATENT_ENTROPY_PLUGIN)
++CFLAGS_prom_init.o += $(DISABLE_LATENT_ENTROPY_PLUGIN)
+ CFLAGS_btext.o += $(DISABLE_LATENT_ENTROPY_PLUGIN)
+ CFLAGS_prom.o += $(DISABLE_LATENT_ENTROPY_PLUGIN)
+ 
 -- 
 Andrew Donnellan              OzLabs, ADL Canberra
 andrew.donnellan@au1.ibm.com  IBM Australia Limited
