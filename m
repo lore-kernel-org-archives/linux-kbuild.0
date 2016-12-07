@@ -1,67 +1,33 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59172 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1751799AbcLGGyj (ORCPT
+Received: from bombadil.infradead.org ([198.137.202.9]:60368 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751254AbcLGHaY (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 7 Dec 2016 01:54:39 -0500
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id uB75mdiv051255
-        for <linux-kbuild@vger.kernel.org>; Wed, 7 Dec 2016 00:49:49 -0500
-Received: from e23smtp06.au.ibm.com (e23smtp06.au.ibm.com [202.81.31.148])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2764ggv58b-1
-        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-        for <linux-kbuild@vger.kernel.org>; Wed, 07 Dec 2016 00:49:49 -0500
-Received: from localhost
-        by e23smtp06.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-kbuild@vger.kernel.org> from <andrew.donnellan@au1.ibm.com>;
-        Wed, 7 Dec 2016 15:49:46 +1000
-Subject: Re: [PATCH 3/3] powerpc: enable support for GCC plugins
-References: <20161206062800.21800-1-andrew.donnellan@au1.ibm.com>
- <20161206062800.21800-3-andrew.donnellan@au1.ibm.com>
- <20161206222520.7fb37896488eff1b299eb3db@gmail.com>
-From: Andrew Donnellan <andrew.donnellan@au1.ibm.com>
-Date: Wed, 7 Dec 2016 16:49:41 +1100
+        Wed, 7 Dec 2016 02:30:24 -0500
+Date: Tue, 6 Dec 2016 23:30:21 -0800
+From: Christoph Hellwig <hch@infradead.org>
+Subject: Re: [PATCH 10/10] virtio: enable endian checks for sparse builds
+Message-ID: <20161207073021.GA26970@infradead.org>
+References: <1481038106-24899-1-git-send-email-mst@redhat.com>
+ <1481038106-24899-11-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20161206222520.7fb37896488eff1b299eb3db@gmail.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Message-Id: <f32f62b8-dc38-6f0b-e7b7-1f85e504df5d@au1.ibm.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1481038106-24899-11-git-send-email-mst@redhat.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Emese Revfy <re.emese@gmail.com>
-Cc: spender@grsecurity.net, keescook@chromium.org, linux-kbuild@vger.kernel.org, kernel-hardening@lists.openwall.com, linux-kernel@vger.kernel.org, mmarek@suse.com, pageexec@freemail.hu, linuxppc-dev@lists.ozlabs.org
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: linux-kernel@vger.kernel.org, Jason Wang <jasowang@redhat.com>, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.com>, Arnd Bergmann <arnd@arndb.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Matt Mackall <mpm@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>, David Airlie <airlied@linux.ie>, Gerd Hoffmann <kraxel@redhat.com>, Ohad Ben-Cohen <ohad@wizery.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>, "David S. Miller" <davem@davemloft.net>, Jens Axboe <axboe@fb.com>, Neil Armstrong <narmstrong@baylibre.com>, Stefan Hajnoczi <stefanha@redhat.com>, Asias He <asias@redhat.com>, linux-crypto@vger.kernel.org, dri-devel@lists.freedesktop.org, virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org, kvm@vger.kernel.org, linux-scsi@vger.kernel.org, v9fs-developer@lists.sourceforge.net
 
-On 07/12/16 08:25, Emese Revfy wrote:
-> What are these missing headers? Because if they aren't necessary then they can
-> be removed from gcc-common.h. There were missing headers on arm/arm64 and these
-> archs are supported. I think this version check is unnecessary because
-> gcc-plugin.sh also checks the missing headers.
+On Tue, Dec 06, 2016 at 05:41:05PM +0200, Michael S. Tsirkin wrote:
+> __CHECK_ENDIAN__ isn't on by default presumably because
+> it triggers too many sparse warnings for correct code.
+> But virtio is now clean of these warnings, and
+> we want to keep it this way - enable this for
+> sparse builds.
+> 
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 
-rs6000-cpus.def, included via tm.h - see 
-https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66840
-
-I realise gcc-plugin.sh does detect this, but the point of the 
-additional version check is to provide somewhat more helpful advice to 
-the user.
-
-> What is the problem on gcc-4.5/gcc-4.6?
-
-On 4.6.4, c-family/c-common.h:
-
-/scratch/ajd/gcc-test-v2/kernel/scripts/gcc-plugins/gcc-common.h:60:31: 
-fatal error: c-family/c-common.h: No such file or directory
-
-ajd@ka1:/scratch/ajd/tmp/cross/gcc-4.6.4-nolibc/powerpc64-linux$ find 
--name c-common.*
-./lib/gcc/powerpc64-linux/4.6.4/plugin/include/c-common.h
-./lib/gcc/powerpc64-linux/4.6.4/plugin/include/c-family/c-common.def
-
-Are we sure the version check in gcc-common.h:59 is correct, or is this 
-just a peculiarity of my particular toolchain?
-
-I need to build another 4.5 toolchain, I'll try to do that this week.
-
--- 
-Andrew Donnellan              OzLabs, ADL Canberra
-andrew.donnellan@au1.ibm.com  IBM Australia Limited
-
+Nah.  Please just enable it globally when using sparse.  I actually
+had a chat with Linus about that a while ago and he seemed generally
+fine with it, I just didn't manage to actually do it..
