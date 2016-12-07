@@ -1,72 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from s3.sipsolutions.net ([5.9.151.49]:33268 "EHLO sipsolutions.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751225AbcLGG0i (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 7 Dec 2016 01:26:38 -0500
-Message-ID: <1481091951.4092.12.camel@sipsolutions.net>
-Subject: Re: [PATCH 10/10] virtio: enable endian checks for sparse builds
-From: Johannes Berg <johannes@sipsolutions.net>
-Date: Wed, 07 Dec 2016 07:25:51 +0100
-In-Reply-To: <1481038106-24899-11-git-send-email-mst@redhat.com> (sfid-20161206_164156_647850_329465D7)
-References: <1481038106-24899-1-git-send-email-mst@redhat.com>
-         <1481038106-24899-11-git-send-email-mst@redhat.com>
-         (sfid-20161206_164156_647850_329465D7)
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59172 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1751799AbcLGGyj (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 7 Dec 2016 01:54:39 -0500
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id uB75mdiv051255
+        for <linux-kbuild@vger.kernel.org>; Wed, 7 Dec 2016 00:49:49 -0500
+Received: from e23smtp06.au.ibm.com (e23smtp06.au.ibm.com [202.81.31.148])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2764ggv58b-1
+        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+        for <linux-kbuild@vger.kernel.org>; Wed, 07 Dec 2016 00:49:49 -0500
+Received: from localhost
+        by e23smtp06.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-kbuild@vger.kernel.org> from <andrew.donnellan@au1.ibm.com>;
+        Wed, 7 Dec 2016 15:49:46 +1000
+Subject: Re: [PATCH 3/3] powerpc: enable support for GCC plugins
+References: <20161206062800.21800-1-andrew.donnellan@au1.ibm.com>
+ <20161206062800.21800-3-andrew.donnellan@au1.ibm.com>
+ <20161206222520.7fb37896488eff1b299eb3db@gmail.com>
+From: Andrew Donnellan <andrew.donnellan@au1.ibm.com>
+Date: Wed, 7 Dec 2016 16:49:41 +1100
+MIME-Version: 1.0
+In-Reply-To: <20161206222520.7fb37896488eff1b299eb3db@gmail.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Message-Id: <f32f62b8-dc38-6f0b-e7b7-1f85e504df5d@au1.ibm.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Michael S. Tsirkin" <mst@redhat.com>, linux-kernel@vger.kernel.org
-Cc: Jason Wang <jasowang@redhat.com>, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.com>, Arnd Bergmann <arnd@arndb.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Matt Mackall <mpm@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>, David Airlie <airlied@linux.ie>, Gerd Hoffmann <kraxel@redhat.com>, Ohad Ben-Cohen <ohad@wizery.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>, "David S. Miller" <davem@davemloft.net>, Jens Axboe <axboe@fb.com>, Neil Armstrong <narmstrong@baylibre.com>, Stefan Hajnoczi <stefanha@redhat.com>, Asias He <asias@redhat.com>, linux-crypto@vger.kernel.org, dri-devel@lists.freedesktop.org, virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org, kvm@vger.kernel.org, linux-scsi@vger.kernel.org, v9fs-developer@lists.sourceforge.net
+To: Emese Revfy <re.emese@gmail.com>
+Cc: spender@grsecurity.net, keescook@chromium.org, linux-kbuild@vger.kernel.org, kernel-hardening@lists.openwall.com, linux-kernel@vger.kernel.org, mmarek@suse.com, pageexec@freemail.hu, linuxppc-dev@lists.ozlabs.org
 
-On Tue, 2016-12-06 at 17:41 +0200, Michael S. Tsirkin wrote:
+On 07/12/16 08:25, Emese Revfy wrote:
+> What are these missing headers? Because if they aren't necessary then they can
+> be removed from gcc-common.h. There were missing headers on arm/arm64 and these
+> archs are supported. I think this version check is unnecessary because
+> gcc-plugin.sh also checks the missing headers.
 
-> It seems that there should be a better way to do it,
-> but this works too.
+rs6000-cpus.def, included via tm.h - see 
+https://gcc.gnu.org/bugzilla/show_bug.cgi?id=66840
 
-In some cases there might be:
+I realise gcc-plugin.sh does detect this, but the point of the 
+additional version check is to provide somewhat more helpful advice to 
+the user.
 
-> --- a/drivers/s390/virtio/Makefile
-> +++ b/drivers/s390/virtio/Makefile
-> @@ -6,6 +6,8 @@
->  # it under the terms of the GNU General Public License (version 2
-> only)
->  # as published by the Free Software Foundation.
->  
-> +CFLAGS_virtio_ccw.o += -D__CHECK_ENDIAN__
-> +CFLAGS_kvm_virtio.o += -D__CHECK_ENDIAN__
->  s390-virtio-objs := virtio_ccw.o
->  ifdef CONFIG_S390_GUEST_OLD_TRANSPORT
->  s390-virtio-objs += kvm_virtio.o
+> What is the problem on gcc-4.5/gcc-4.6?
 
-Here you could use
+On 4.6.4, c-family/c-common.h:
 
-ccflags-y += -D__CHECK_ENDIAN__
+/scratch/ajd/gcc-test-v2/kernel/scripts/gcc-plugins/gcc-common.h:60:31: 
+fatal error: c-family/c-common.h: No such file or directory
 
-for example, or even
+ajd@ka1:/scratch/ajd/tmp/cross/gcc-4.6.4-nolibc/powerpc64-linux$ find 
+-name c-common.*
+./lib/gcc/powerpc64-linux/4.6.4/plugin/include/c-common.h
+./lib/gcc/powerpc64-linux/4.6.4/plugin/include/c-family/c-common.def
 
-subdir-ccflags-y += -D__CHECK_ENDIAN__
+Are we sure the version check in gcc-common.h:59 is correct, or is this 
+just a peculiarity of my particular toolchain?
 
-(in case any subdirs ever get added here)
+I need to build another 4.5 toolchain, I'll try to do that this week.
 
-> --- a/drivers/vhost/Makefile
-> +++ b/drivers/vhost/Makefile
-> @@ -1,3 +1,4 @@
-> +ccflags-y := -D__CHECK_ENDIAN__
-
-Looks like you did that here and in some other places though - so
-perhaps the s390 one was intentionally different?
-
-> --- a/net/packet/Makefile
-> +++ b/net/packet/Makefile
-> @@ -2,6 +2,7 @@
->  # Makefile for the packet AF.
->  #
->  
-> +ccflags-y := -D__CHECK_ENDIAN__
-
-Technically this is slightly more than advertised, but I guess that
-still makes sense if it's clean now.
-
-johannes
+-- 
+Andrew Donnellan              OzLabs, ADL Canberra
+andrew.donnellan@au1.ibm.com  IBM Australia Limited
 
