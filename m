@@ -1,57 +1,110 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.136]:42746 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932759AbcLHC3p (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 7 Dec 2016 21:29:45 -0500
-Date: Thu, 8 Dec 2016 04:29:39 +0200
-From: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: [PATCH] linux/types.h: enable endian checks for all sparse builds
-Message-ID: <1481164052-28036-1-git-send-email-mst@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Received: from alt42.smtp-out.videotron.ca ([23.233.128.29]:23058 "EHLO
+        alt42.smtp-out.videotron.ca" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1752253AbcLHEYP (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 7 Dec 2016 23:24:15 -0500
+From: Nicolas Pitre <nicolas.pitre@linaro.org>
+Subject: [PATCH 1/2] kbuild: improve EXPORT_SYMBOL() parsing from asm code
+Date: Wed,  7 Dec 2016 23:24:06 -0500
+Message-Id: <1481171047-333-2-git-send-email-nicolas.pitre@linaro.org>
+In-Reply-To: <1481171047-333-1-git-send-email-nicolas.pitre@linaro.org>
+References: <1481171047-333-1-git-send-email-nicolas.pitre@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>, Christoph Hellwig <hch@infradead.org>
-Cc: Jason Wang <jasowang@redhat.com>, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.com>, Arnd Bergmann <arnd@arndb.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Matt Mackall <mpm@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>, David Airlie <airlied@linux.ie>, Gerd Hoffmann <kraxel@redhat.com>, Ohad Ben-Cohen <ohad@wizery.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>, "David S. Miller" <davem@davemloft.net>, Jens Axboe <axboe@fb.com>, Neil Armstrong <narmstrong@baylibre.com>, Stefan Hajnoczi <stefanha@redhat.com>, Asias He <asias@redhat.com>, linux-crypto@vger.kernel.org, dri-devel@lists.freedesktop.org, virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org, kvm@vger.kernel.org, linux-scsi@vger.kernel.org, v9fs-developer@lists.sourceforge.net
+To: Michal Marek <mmarek@suse.com>, Nicholas Piggin <npiggin@gmail.com>
+Cc: Arnd Bergmann <arnd@arndb.de>, viro@zeniv.linux.org.uk, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-By now, linux is mostly endian-clean. Enabling endian-ness
-checks for everyone produces about 200 new sparse warnings for me -
-less than 10% over the 2000 sparse warnings already there.
+First, make the asm-prototypes.h presence optional.  The next patch will
+make it unneeded for modversion support.
 
-Not a big deal, OTOH enabling this helps people notice
-they are introducing new bugs.
+Use the -D__GENKSYMS__ like we do for .c files but to expand the
+EXPORT_SYMBOL macro using the preprocessor instead of a sed script.
+The preprocessor output parsing is then limited to a simpler filtering
+and made more robust against multiple assembly statements on a single
+line.
 
-So let's just drop __CHECK_ENDIAN__. Follow-up patches
-can drop distinction between __bitwise and __bitwise__.
-
-Cc: Linus Torvalds <torvalds@linux-foundation.org>
-Suggested-by: Christoph Hellwig <hch@infradead.org>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Nicolas Pitre <nico@linaro.org>
 ---
+ include/asm-generic/export.h |  9 +++++++++
+ scripts/Makefile.build       | 20 ++++++--------------
+ 2 files changed, 15 insertions(+), 14 deletions(-)
 
-Linus, could you ack this for upstream? If yes I'll
-merge through my tree as a replacement for enabling
-this just for virtio.
-
- include/uapi/linux/types.h | 4 ----
- 1 file changed, 4 deletions(-)
-
-diff --git a/include/uapi/linux/types.h b/include/uapi/linux/types.h
-index acf0979..41e5914 100644
---- a/include/uapi/linux/types.h
-+++ b/include/uapi/linux/types.h
-@@ -23,11 +23,7 @@
- #else
- #define __bitwise__
+diff --git a/include/asm-generic/export.h b/include/asm-generic/export.h
+index 63554e9f6e..39a19dc366 100644
+--- a/include/asm-generic/export.h
++++ b/include/asm-generic/export.h
+@@ -28,6 +28,8 @@
+ #define KSYM(name) name
  #endif
--#ifdef __CHECK_ENDIAN__
- #define __bitwise __bitwise__
--#else
--#define __bitwise
--#endif
  
- typedef __u16 __bitwise __le16;
- typedef __u16 __bitwise __be16;
++#if defined(__KERNEL__) && !defined(__GENKSYMS__)
++
+ /*
+  * note on .section use: @progbits vs %progbits nastiness doesn't matter,
+  * since we immediately emit into those sections anyway.
+@@ -82,6 +84,13 @@ KSYM(__kcrctab_\name):
+ #define __EXPORT_SYMBOL(sym, val, sec) ___EXPORT_SYMBOL sym, val, sec
+ #endif
+ 
++#else /* __GENKSYMS__ */
++
++/* create a preprocessor output suitable for cmd_gensymtypes_S */
++#define __EXPORT_SYMBOL(sym, val, sec) EXPORT_SYMBOL(sym)
++
++#endif /* __GENKSYMS__ */
++
+ #define EXPORT_SYMBOL(name)					\
+ 	__EXPORT_SYMBOL(name, KSYM_FUNC(KSYM(name)),)
+ #define EXPORT_SYMBOL_GPL(name) 				\
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index 7675d11ee6..ebf6e08ae4 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -325,15 +325,15 @@ $(real-objs-m:.o=.s): modkern_aflags := $(KBUILD_AFLAGS_MODULE) $(AFLAGS_MODULE)
+ # This is convoluted. The .S file must first be preprocessed to run guards and
+ # expand names, then the resulting exports must be constructed into plain
+ # EXPORT_SYMBOL(symbol); to build our dummy C file, and that gets preprocessed
+-# to make the genksyms input.
++# to make the genksyms input. See also include/asm-generic/export.h.
+ #
+ # These mirror gensymtypes_c and co above, keep them in synch.
+ cmd_gensymtypes_S =                                                         \
+-    (echo "\#include <linux/kernel.h>" ;                                    \
+-     echo "\#include <asm/asm-prototypes.h>" ;                              \
+-    $(CPP) $(a_flags) $< |                                                  \
+-     grep "\<___EXPORT_SYMBOL\>" |                                          \
+-     sed 's/.*___EXPORT_SYMBOL[[:space:]]*\([a-zA-Z0-9_]*\)[[:space:]]*,.*/EXPORT_SYMBOL(\1);/' ) | \
++    ( echo "\#include <linux/kernel.h>" ;                                   \
++      if [ -e $(srctree)/arch/$(SRCARCH)/include/asm/asm-prototypes.h ];    \
++      then echo "\#include <asm/asm-prototypes.h>"; fi;                     \
++      $(CPP) -D__GENKSYMS__ $(a_flags) $< | tr ";" "\n" |                   \
++      sed -n -e '/EXPORT_SYMBOL(/s/$$/;/p' ) |                              \
+     $(CPP) -D__GENKSYMS__ $(c_flags) -xc - |                                \
+     $(GENKSYMS) $(if $(1), -T $(2))                                         \
+      $(patsubst y,-s _,$(CONFIG_HAVE_UNDERSCORE_SYMBOL_PREFIX))             \
+@@ -363,13 +363,6 @@ cmd_as_o_S = $(CC) $(a_flags) -c -o $@ $<
+ 
+ else
+ 
+-ASM_PROTOTYPES := $(wildcard $(srctree)/arch/$(SRCARCH)/include/asm/asm-prototypes.h)
+-
+-ifeq ($(ASM_PROTOTYPES),)
+-cmd_as_o_S = $(CC) $(a_flags) -c -o $@ $<
+-
+-else
+-
+ # versioning matches the C process described above, with difference that
+ # we parse asm-prototypes.h C header to get function definitions.
+ 
+@@ -387,7 +380,6 @@ cmd_modversions_S =								\
+ 		mv -f $(@D)/.tmp_$(@F) $@;					\
+ 	fi;
+ endif
+-endif
+ 
+ $(obj)/%.o: $(src)/%.S $(objtool_obj) FORCE
+ 	$(call if_changed_rule,as_o_S)
 -- 
-MST
+2.7.4
+
