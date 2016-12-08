@@ -1,13 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mailapp01.imgtec.com ([195.59.15.196]:54426 "EHLO
+Received: from mailapp01.imgtec.com ([195.59.15.196]:47940 "EHLO
         mailapp01.imgtec.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752295AbcLHLzM (ORCPT
+        with ESMTP id S1752826AbcLHLzN (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 8 Dec 2016 06:55:12 -0500
+        Thu, 8 Dec 2016 06:55:13 -0500
 From: Marcin Nowakowski <marcin.nowakowski@imgtec.com>
-Subject: [PATCH 0/2] kbuild: dead code elimination: ftrace fixes
-Date: Thu, 8 Dec 2016 12:55:05 +0100
-Message-ID: <1481198107-17019-1-git-send-email-marcin.nowakowski@imgtec.com>
+Subject: [PATCH 1/2] kbuild: keep __mcount_loc table through dead code elimination
+Date: Thu, 8 Dec 2016 12:55:06 +0100
+Message-ID: <1481198107-17019-2-git-send-email-marcin.nowakowski@imgtec.com>
+In-Reply-To: <1481198107-17019-1-git-send-email-marcin.nowakowski@imgtec.com>
+References: <1481198107-17019-1-git-send-email-marcin.nowakowski@imgtec.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,25 +17,30 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Nicholas Piggin <npiggin@gmail.com>, Michal Marek <mmarek@suse.com>
 Cc: Paul Burton <paul.burton@imgtec.com>, linux-kbuild@vger.kernel.org
 
-Enabling dead code & data elimination currently breaks ftrace operation,
-as the __mcount_loc section is removed (as it is not referenced directly
-anywhere in the code).
-Moreover, there are a lot of entries missing in the __mcount_loc section
-as the recordmcount tool doesn't currently properly handle the section
-names as created by the use of -ffunction-sections.
+When CONFIG_LD_DEAD_CODE_DATA_ELIMINATION is enabled we must ensure
+__mcount_loc is preserved, as otherwise there are no valid entries for
+ftrace to work with.
 
-The following 2 patches fix that behaviour.
-They are based on next-20161208.
+Fixes: 4b89b7f7aad5 ('kbuild: keep data tables through dead code elimination')
 
-Marcin Nowakowski (2):
-  kbuild: keep __mcount_loc table through dead code elimination
-  recordmcount: fix mcount recording with -ffunction-sections
+Signed-off-by: Marcin Nowakowski <marcin.nowakowski@imgtec.com>
+---
+ include/asm-generic/vmlinux.lds.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
- include/asm-generic/vmlinux.lds.h |  2 +-
- scripts/Makefile                  |  5 +++++
- scripts/recordmcount.c            | 26 +++++++++++++++++++++++++-
- 3 files changed, 31 insertions(+), 2 deletions(-)
-
+diff --git a/include/asm-generic/vmlinux.lds.h b/include/asm-generic/vmlinux.lds.h
+index 0968d13..f492aa4 100644
+--- a/include/asm-generic/vmlinux.lds.h
++++ b/include/asm-generic/vmlinux.lds.h
+@@ -89,7 +89,7 @@
+ #ifdef CONFIG_FTRACE_MCOUNT_RECORD
+ #define MCOUNT_REC()	. = ALIGN(8);				\
+ 			VMLINUX_SYMBOL(__start_mcount_loc) = .; \
+-			*(__mcount_loc)				\
++			KEEP(*(__mcount_loc))			\
+ 			VMLINUX_SYMBOL(__stop_mcount_loc) = .;
+ #else
+ #define MCOUNT_REC()
 -- 
 2.7.4
 
