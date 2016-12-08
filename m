@@ -1,109 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mailapp01.imgtec.com ([195.59.15.196]:65114 "EHLO
-        mailapp01.imgtec.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751693AbcLHLzO (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 8 Dec 2016 06:55:14 -0500
-From: Marcin Nowakowski <marcin.nowakowski@imgtec.com>
-Subject: [PATCH 2/2] recordmcount: fix mcount recording with -ffunction-sections
-Date: Thu, 8 Dec 2016 12:55:07 +0100
-Message-ID: <1481198107-17019-3-git-send-email-marcin.nowakowski@imgtec.com>
-In-Reply-To: <1481198107-17019-1-git-send-email-marcin.nowakowski@imgtec.com>
-References: <1481198107-17019-1-git-send-email-marcin.nowakowski@imgtec.com>
+Received: from r00tworld.com ([212.85.137.150]:38335 "EHLO r00tworld.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S932389AbcLHPgo (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 8 Dec 2016 10:36:44 -0500
+From: "PaX Team" <pageexec@freemail.hu>
+Date: Thu, 08 Dec 2016 15:42:50 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
+Subject: Re: [PATCH 3/3] powerpc: enable support for GCC plugins
+Reply-to: pageexec@freemail.hu
+Message-ID: <5849716A.32374.136DAAC@pageexec.freemail.hu>
+In-reply-to: <20161206062800.21800-3-andrew.donnellan@au1.ibm.com>
+References: <20161206062800.21800-1-andrew.donnellan@au1.ibm.com>, <20161206062800.21800-3-andrew.donnellan@au1.ibm.com>
+Content-type: text/plain; charset=US-ASCII
+Content-transfer-encoding: 7BIT
+Content-description: Mail message body
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicholas Piggin <npiggin@gmail.com>, Michal Marek <mmarek@suse.com>
-Cc: Paul Burton <paul.burton@imgtec.com>, linux-kbuild@vger.kernel.org
+To: linuxppc-dev@lists.ozlabs.org, kernel-hardening@lists.openwall.com, keescook@chromium.org, re.emese@gmail.com, Andrew Donnellan <andrew.donnellan@au1.ibm.com>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, spender@grsecurity.net, mmarek@suse.com
 
-When CONFIG_LD_DEAD_CODE_DATA_ELIMINATION is enabled, each function is
-added to its own new section called .text.functionname.
-As described in vmlinux.lds.h, "those enabling
-LD_DEAD_CODE_DATA_ELIMINATION must ensure they don't have conflicting
-section names, and must pull in .text.[0-9a-zA-Z_]*", add a similar
-pattern matching to recordmcount script for section detection.
+On 6 Dec 2016 at 17:28, Andrew Donnellan wrote:
 
-To simplify the basic C implementation, replace the regex with a string
-match on the prefix and a single character match following the '.text.'
-prefix.
+> Enable support for GCC plugins on powerpc.
+> 
+> Add an additional version check in gcc-plugins-check to advise users to
+> upgrade to gcc 5.2+ on powerpc to avoid issues with header files (gcc <=
+> 4.6) or missing copies of rs6000-cpus.def (4.8 to 5.1 on 64-bit targets).
 
-Signed-off-by: Marcin Nowakowski <marcin.nowakowski@imgtec.com>
----
- scripts/Makefile       |  5 +++++
- scripts/recordmcount.c | 26 +++++++++++++++++++++++++-
- 2 files changed, 30 insertions(+), 1 deletion(-)
+i don't think that this is the right approach. there's a general and a special
+issue here, both of which need different handling.
 
-diff --git a/scripts/Makefile b/scripts/Makefile
-index 1d80897..9b88250 100644
---- a/scripts/Makefile
-+++ b/scripts/Makefile
-@@ -23,6 +23,11 @@ hostprogs-$(CONFIG_SYSTEM_EXTRA_CERTIFICATE) += insert-sys-cert
- 
- HOSTCFLAGS_sortextable.o = -I$(srctree)/tools/include
- HOSTCFLAGS_asn1_compiler.o = -I$(srctree)/include
-+
-+ifdef CONFIG_LD_DEAD_CODE_DATA_ELIMINATION
-+HOSTCFLAGS_recordmcount.o = -DMCOUNT_INCLUDE_FUNCTION_SECTIONS
-+endif
-+
- HOSTLOADLIBES_sign-file = -lcrypto
- HOSTLOADLIBES_extract-cert = -lcrypto
- 
-diff --git a/scripts/recordmcount.c b/scripts/recordmcount.c
-index aeb3422..bb517ef 100644
---- a/scripts/recordmcount.c
-+++ b/scripts/recordmcount.c
-@@ -32,6 +32,7 @@
- #include <stdlib.h>
- #include <string.h>
- #include <unistd.h>
-+#include <ctype.h>
- 
- /*
-  * glibc synced up and added the metag number but didn't add the relocations.
-@@ -408,9 +409,31 @@ static uint32_t (*w)(uint32_t);
- static uint32_t (*w2)(uint16_t);
- 
- /* Names of the sections that could contain calls to mcount. */
-+#ifdef MCOUNT_INCLUDE_FUNCTION_SECTIONS
-+static int
-+is_mcounted_function_section_name(char const *const txtname)
-+{
-+	const size_t len = strlen(".text.");
-+
-+	return	strncmp(".text.", txtname, len) == 0 &&
-+		strlen(txtname) > len &&
-+		(isalnum(txtname[len]) || txtname[len] == '_');
-+}
-+#else
-+static int
-+is_mcounted_function_section_name(char const *const txtname)
-+{
-+	return 0;
-+}
-+#endif
-+
-+
- static int
- is_mcounted_section_name(char const *const txtname)
- {
-+	int ffunc_section =
-+		is_mcounted_function_section_name(txtname);
-+
- 	return strcmp(".text",           txtname) == 0 ||
- 		strcmp(".ref.text",      txtname) == 0 ||
- 		strcmp(".sched.text",    txtname) == 0 ||
-@@ -419,7 +442,8 @@ is_mcounted_section_name(char const *const txtname)
- 		strcmp(".softirqentry.text", txtname) == 0 ||
- 		strcmp(".kprobes.text", txtname) == 0 ||
- 		strcmp(".cpuidle.text", txtname) == 0 ||
--		strcmp(".text.unlikely", txtname) == 0;
-+		strcmp(".text.unlikely", txtname) == 0 ||
-+		ffunc_section;
- }
- 
- /* 32 bit and 64 bit are very similar */
--- 
-2.7.4
+the general problem is to detect problems related to gcc plugin headers and
+notify the users about solutions. emitting various messages from a Makefile
+is certainly not a scalable approach, just imagine how it will look when the
+other 30+ archs begin to add their own special cases... if anything, they
+should be documented in Documentation/gcc-plugins.txt (or a new doc if it
+grows too big) and the Makefile message should just point at it.
+
+as for the solutions, the general advice should enable the use of otherwise
+failing gcc versions instead of forcing updating to new ones (though the
+latter is advisable for other reasons but not everyone's in the position to
+do so easily). in my experience all one needs to do is manually install the
+missing files from the gcc sources (ideally distros would take care of it).
+
+the specific problem addressed here can (and IMHO should) be solved in
+another way: remove the inclusion of the offending headers in gcc-common.h
+as neither tm.h nor c-common.h are needed by existing plugins. for background,
+i created gcc-common.h to simplify plugin development across all supportable
+gcc versions i came across over the years, so it follows the 'everything but
+the kitchen sink' approach. that isn't necessarily what the kernel and other
+projects need so they should just use my version as a basis and fork/simplify
+it (even i maintain private forks of the public version).
+
+as for the location of c-common.h, upstream gcc moved it under c-family in
+2010 after the release of 4.5, so it should be where gcc-common.h expects
+it and i'm not sure how it ended up at its old location for you.
+
+cheers,
+ PaX Team
 
