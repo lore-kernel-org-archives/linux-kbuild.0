@@ -1,55 +1,114 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf0-f195.google.com ([209.85.192.195]:35324 "EHLO
-        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932645AbcLIIPR (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 9 Dec 2016 03:15:17 -0500
-Date: Fri, 9 Dec 2016 18:14:59 +1000
-From: Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH] x86/kbuild: enable modversions for symbols exported
- from asm
-Message-ID: <20161209181459.1f0a4fed@roar.ozlabs.ibm.com>
-In-Reply-To: <0937c184-1946-c494-56b6-c38fd0b632c2@redhat.com>
-References: <20161129135118.24696-1-kilobyte@angband.pl>
-        <CA+55aFyZiB4YkwvqzrXO=HD8bcnc2xHkAYrek2QHVnhVvAi3Fw@mail.gmail.com>
-        <30bb2db4-47bd-0c35-8328-ef032b551f06@suse.com>
-        <CA+55aFxOGw57Gm-QiNs13kfy5k=aRrn3+98415V0g73eGc66mg@mail.gmail.com>
-        <20161129195721.GI2697@decadent.org.uk>
-        <CA+55aFyQko0t8oMZjhnwhWHrmBUyWjGhsnT=oUOU-W7_04xdzw@mail.gmail.com>
-        <20161201051852.28dc335f@roar.ozlabs.ibm.com>
-        <CA+55aFzMTrLMrr69ipdaKhz+RJhUu3BxB+kg0689qq_470qEcw@mail.gmail.com>
-        <20161201041325.GX35881@redhat.com>
-        <20161201153215.43b6cec7@roar.ozlabs.ibm.com>
-        <20161201152039.GB35881@redhat.com>
-        <20161209135041.5ff12770@roar.ozlabs.ibm.com>
-        <0937c184-1946-c494-56b6-c38fd0b632c2@redhat.com>
+Received: from mail-bl2nam02on0046.outbound.protection.outlook.com ([104.47.38.46]:58476
+        "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1752823AbcLIIOr (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 9 Dec 2016 03:14:47 -0500
+From: "Madhani, Himanshu" <Himanshu.Madhani@cavium.com>
+Subject: Re: [PATCH] linux/types.h: enable endian checks for all sparse builds
+Date: Fri, 9 Dec 2016 06:40:53 +0000
+Message-ID: <6199215E-2AA4-4705-9552-5D61FE03F866@cavium.com>
+References: <1481164052-28036-1-git-send-email-mst@redhat.com>
+ <BLUPR02MB168374E98A6C86E43DF0BCFE81840@BLUPR02MB1683.namprd02.prod.outlook.com>
+ <20161208075152-mutt-send-email-mst@kernel.org>
+ <BLUPR02MB168304F8FBA50C916A6A4E6081840@BLUPR02MB1683.namprd02.prod.outlook.com>
+ <20161208163658-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20161208163658-mutt-send-email-mst@kernel.org>
+Content-Language: en-US
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <CC052759A2A98246AAADC005BD2ECE5C@namprd07.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Stanislav Kozina <skozina@redhat.com>
-Cc: Don Zickus <dzickus@redhat.com>, Linus Torvalds <torvalds@linux-foundation.org>, Ben Hutchings <ben@decadent.org.uk>, Michal Marek <mmarek@suse.com>, Adam Borowski <kilobyte@angband.pl>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Debian kernel maintainers <debian-kernel@lists.debian.org>, "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Ingo Molnar <mingo@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>, Bart Van Assche <Bart.VanAssche@sandisk.com>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Neil Armstrong <narmstrong@baylibre.com>, David Airlie <airlied@linux.ie>, "linux-remoteproc@vger.kernel.org" <linux-remoteproc@vger.kernel.org>, "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>, "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>, Herbert Xu <herbert@gondor.apana.org.au>, "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>, Christoph Hellwig <hch@infradead.org>, "v9fs-developer@lists.sourceforge.net" <v9fs-developer@lists.sourceforge.net>, Asias He <asias@redhat.com>, Arnd Bergmann <arnd@arndb.de>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, Jens Axboe <axboe@fb.com>, Michal Marek <mmarek@suse.com>, Stefan Hajnoczi <stefanha@redhat.com>, Matt Mackall <mpm@selenic.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>
 
-On Fri, 9 Dec 2016 08:55:51 +0100
-Stanislav Kozina <skozina@redhat.com> wrote:
-
-> >> The question is how to provide a similar guarantee if a different way?  
-> > As a tool to aid distro reviewers, modversions has some value, but the
-> > debug info parsing tools that have been mentioned in this thread seem
-> > superior (not that I've tested them).  
-> 
-> On the other hand the big advantage of modversions is that it also 
-> verifies the checksum during runtime (module loading). In other words, I 
-> believe that any other solution should still generate some form of 
-> checksum/watermark which can be easily checked for compatibility on 
-> module load.
-> It should not be hard to add to the DWARF based tools though. We'd just 
-> parse DWARF data instead of the C code.
-
-A runtime check is still done, with per-module vermagic which distros
-can change when they bump the ABI version. Is it really necessary to
-have more than that (i.e., per-symbol versioning)?
-
-Thanks,
-Nick
+SGkgTWlrZS9CYXJ0LCANCg0KDQoNCg0KDQoNCg0KT24gMTIvOC8xNiwgODoxNyBBTSwgInZpcnR1
+YWxpemF0aW9uLWJvdW5jZXNAbGlzdHMubGludXgtZm91bmRhdGlvbi5vcmcgb24gYmVoYWxmIG9m
+IE1pY2hhZWwgUy4gVHNpcmtpbiIgPHZpcnR1YWxpemF0aW9uLWJvdW5jZXNAbGlzdHMubGludXgt
+Zm91bmRhdGlvbi5vcmcgb24gYmVoYWxmIG9mIG1zdEByZWRoYXQuY29tPiB3cm90ZToNCg0KPk9u
+IFRodSwgRGVjIDA4LCAyMDE2IGF0IDA2OjM4OjExQU0gKzAwMDAsIEJhcnQgVmFuIEFzc2NoZSB3
+cm90ZToNCj4+IE9uIDEyLzA3LzE2IDIxOjU0LCBNaWNoYWVsIFMuIFRzaXJraW4gd3JvdGU6DQo+
+PiA+IE9uIFRodSwgRGVjIDA4LCAyMDE2IGF0IDA1OjIxOjQ3QU0gKzAwMDAsIEJhcnQgVmFuIEFz
+c2NoZSB3cm90ZToNCj4+ID4+IEFkZGl0aW9uYWxseSwgdGhlcmUgYXJlIG5vdGFibGUgZXhjZXB0
+aW9ucyB0byB0aGUgcnVsZSB0aGF0IG1vc3QgZHJpdmVycw0KPj4gPj4gYXJlIGVuZGlhbi1jbGVh
+biwgZS5nLiBkcml2ZXJzL3Njc2kvcWxhMnh4eC4gSSB3b3VsZCBhcHByZWNpYXRlIGl0IGlmIGl0
+DQo+PiA+PiB3b3VsZCByZW1haW4gcG9zc2libGUgdG8gY2hlY2sgc3VjaCBkcml2ZXJzIHdpdGgg
+c3BhcnNlIHdpdGhvdXQgZW5hYmxpbmcNCj4+ID4+IGVuZGlhbm5lc3MgY2hlY2tzLiBIYXZlIHlv
+dSBjb25zaWRlcmVkIHRvIGNoYW5nZSAjaWZkZWYgX19DSEVDS19FTkRJQU5fXw0KPj4gPj4gaW50
+byBlLmcuICNpZm5kZWYgX19ET05UX0NIRUNLX0VORElBTl9fPw0KPj4gPg0KPj4gPiBUaGUgcmln
+aHQgdGhpbmcgaXMgcHJvYmFibHkganVzdCB0byBmaXggdGhlc2UsIGlzbid0IGl0Pw0KPj4gPiBV
+bnRpbCB0aGVuLCB3aHkgbm90IGp1c3QgaWdub3JlIHRoZSB3YXJuaW5ncz8NCj4+IA0KPj4gTmVp
+dGhlciBvcHRpb24gaXMgcmVhbGlzdGljLiBXaXRoIGVuZGlhbi1jaGVja2luZyBlbmFibGVkIHRo
+ZSBxbGEyeHh4IA0KPj4gZHJpdmVyIHRyaWdnZXJzIHNvIG1hbnkgd2FybmluZ3MgdGhhdCBpdCBi
+ZWNvbWVzIGEgcmVhbCBjaGFsbGVuZ2UgdG8gDQo+PiBmaWx0ZXIgdGhlIG5vbi1lbmRpYW4gd2Fy
+bmluZ3Mgb3V0IG1hbnVhbGx5Og0KPj4gDQo+PiAkIGZvciBmIGluICIiIENGPS1EX19DSEVDS19F
+TkRJQU5fXzsgZG8gbWFrZSBNPWRyaXZlcnMvc2NzaS9xbGEyeHh4IEM9MlwNCj4+ICAgICAgJGYg
+fCAmZ3JlcCAtYyAnOiB3YXJuaW5nOic7IGRvbmUNCj4+IDQNCj4+IDc1Mg0KPg0KPllvdSBjYW4g
+YWx3YXlzIHJldmVydCB0aGlzIHBhdGNoIGluIHlvdXIgdHJlZSwgb3Igd2hhdGV2ZXIuICBJdCBk
+b2VzIG5vdA0KPmxvb2sgbGlrZSB0aGlzIHdpbGwgZ2V0IGZpeGVkIG90aGVyd2lzZS4NCj4NCj4+
+IElmIHlvdSB0aGluayBpdCB3b3VsZCBiZSBlYXN5IHRvIGZpeCB0aGUgZW5kaWFuIHdhcm5pbmdz
+IHRyaWdnZXJlZCBieSANCj4+IHRoZSBxbGEyeHh4IGRyaXZlciwgeW91IGFyZSB3ZWxjb21lIHRv
+IHRyeSB0byBmaXggdGhlc2UuDQo+PiANCj4+IEJhcnQuDQo+DQo+WWVhLCB0aGlzIGhhcmR3YXJl
+IHdhcyBkZXNpZ25lZCBieSBzb21lb25lIHdobyB0aG91Z2h0IG1peGluZw0KPkxFIGFuZCBCRSBh
+bGwgb3ZlciB0aGUgcGxhY2UgaXMgYSBnb29kIGlkZWEuDQo+QnV0IHdobyBzYWlkIGl0IHNob3Vs
+ZCBiZSBlYXN5Pw0KPg0KPk1heWJlIHRoaXMgY2hhbmdlIHdpbGwgYmUgZW5vdWdoIHRvIG1vdGl2
+YXRlIHRoZSBtYWludGFpbmVycy4NCj4NCj5IZXJlJ3MgYSBtaW5vciBidWdsZXQgZm9yIHlvdSBh
+cyBhIG1vdGl2YXRvcjoNCj4NCj4gICAgICAgICAgICAgICAgICAgICAgICBpZiAoY3RfcnNwLT5o
+ZWFkZXIucmVzcG9uc2UgIT0NCj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgY3B1X3RvX2Jl
+MTYoQ1RfQUNDRVBUX1JFU1BPTlNFKSkgew0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgcWxfZGJnKHFsX2RiZ19kaXNjICsgcWxfZGJnX2J1ZmZlciwgdmhhLCAweDIwNzcsDQo+ICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIiVzIGZhaWxlZCByZWplY3RlZCByZXF1
+ZXN0IG9uIHBvcnRfaWQ6ICUwMnglMDJ4JTAyeCBDb21wZWx0aW9uIHN0YXR1cyAweCV4LCByZXNw
+b25zZSAweCV4XG4iLA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHJvdXRp
+bmUsIHZoYS0+ZF9pZC5iLmRvbWFpbiwNCj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICB2aGEtPmRfaWQuYi5hcmVhLCB2aGEtPmRfaWQuYi5hbF9wYSwgY29tcF9zdGF0dXMsIGN0
+X3JzcC0+aGVhZGVyLnJlc3BvbnNlKTsNCj4NCj4NCj5yZXNwb25zZSBpcyBCRSBhbmQgaXNuJ3Qg
+cHJpbnRlZCBjb3JyZWN0bHkuDQo+DQo+YW5vdGhlcjoNCj4NCj4gICAgICAgIGVpdGVyLT5hLm1h
+eF9mcmFtZV9zaXplID0gY3B1X3RvX2JlMzIoZWl0ZXItPmEubWF4X2ZyYW1lX3NpemUpOw0KPiAg
+ICAgICAgc2l6ZSArPSA0ICsgNDsNCj4NCj4gICAgICAgIHFsX2RiZyhxbF9kYmdfZGlzYywgdmhh
+LCAweDIwYmMsDQo+ICAgICAgICAgICAgIk1heF9GcmFtZV9TaXplID0gJXguXG4iLCBlaXRlci0+
+YS5tYXhfZnJhbWVfc2l6ZSk7DQo+DQo+cHJpbnRlZCB0b28gbGF0ZSwgaXQncyBiZSBieSB0aGF0
+IHRpbWUuDQo+DQo+SGVyZSdzIGFub3RoZXIgc3VzcGljaW91cyBsaW5lDQo+DQo+ICAgICAgICBj
+dGlvMjQtPnUuc3RhdHVzMS5mbGFncyA9IChhdGlvLT51LmlzcDI0LmF0dHIgPDwgOSkgfA0KPiAg
+ICAgICAgICAgIGNwdV90b19sZTE2KENUSU83X0ZMQUdTX1NUQVRVU19NT0RFXzEgfA0KPiAgICAg
+ICAgICAgICAgICBDVElPN19GTEFHU19URVJNSU5BVEUpOw0KPg0KPnNoaWZ0aW5nIGF0dHIgYnkg
+OSBiaXRzIGdpdmVzIGRpZmZlcmVudCByZXN1bHRzIG9uIEJFIGFuZCBMRSwNCj5taXhpbmcgaXQg
+d2l0aCBsZTE2IGxvb2tzIHJhdGhlciBzdHJhbmdlLg0KPg0KPkFub3RoZXI6DQo+DQo+ICAgICAg
+ICAgICAgICAgIGhhLT5mbGFncy5kcG9ydF9lbmFibGVkID0NCj4gICAgICAgICAgICAgICAgICAg
+IChtaWRfaW5pdF9jYi0+aW5pdF9jYi5maXJtd2FyZV9vcHRpb25zXzEgJiBCSVRfNykgIT0gMDsN
+Cj4NCj5CSVRfNyBpcyBuYXRpdmUgZW5kaWFuLCBmaXJtd2FyZV9vcHRpb25zXzEgaXMgTEUgSSB0
+aGluay4NCj4NCj4NCj4NCj5Mb29rIGF0IHFsYTI3eHhfZmluZF92YWxpZF9pbWFnZSBhcyB3ZWxs
+Lg0KPg0KPiAgICAgICAgaWYgKHByaV9pbWFnZV9zdGF0dXMuc2lnbmF0dXJlICE9IFFMQTI3WFhf
+SU1HX1NUQVRVU19TSUdOKQ0KPg0KPnFsYTI3eHhfaW1hZ2Vfc3RhdHVzIHNlZW1zIHRvIGJlIGRh
+dGEgY29taW5nIGZyb20gZmxhc2gsIGJ1dCBpcw0KPnNvbWVob3cgbmF0aXZlLWVuZGlhbj8gTWF5
+YmUgLi4uDQo+DQo+DQo+ICAgICAgICBsdW4gPSBhLT51LmlzcDI0LmZjcF9jbW5kLmx1bjsNCj4N
+Cj5JIHRoaW5rIGx1biBoZXJlIGlzIGluIGhhcmR3YXJlIGZvcm1hdCAobGU/KSwgY29kZSB0cmVh
+dHMgaXQNCj5hcyBuYXRpdmUuDQo+DQo+DQo+Tm90IHRvIHNwZWFrIGFib3V0IGludGVyZmFjZSBh
+YnVzZSBhbGwgb3ZlciB0aGUgcGxhY2UuDQo+SG93IGFib3V0IHRoaXM6DQo+DQo+dWludDMyX3Qg
+Kg0KPnFsYTI0eHhfcmVhZF9mbGFzaF9kYXRhKHNjc2lfcWxhX2hvc3RfdCAqdmhhLCB1aW50MzJf
+dCAqZHdwdHIsIHVpbnQzMl90DQo+ZmFkZHIsDQo+ICAgIHVpbnQzMl90IGR3b3JkcykgICAgICAg
+ICAgICAgICAgICAgICANCj57DQo+ICAgICAgICB1aW50MzJfdCBpOyAgICAgICAgICAgICAgICAg
+ICAgIA0KPiAgICAgICAgc3RydWN0IHFsYV9od19kYXRhICpoYSA9IHZoYS0+aHc7DQo+ICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIA0KPiAgICAgICAgLyogRHdvcmQgcmVh
+ZHMgdG8gZmxhc2guICovDQo+ICAgICAgICBmb3IgKGkgPSAwOyBpIDwgZHdvcmRzOyBpKyssIGZh
+ZGRyKyspDQo+ICAgICAgICAgICAgICAgIGR3cHRyW2ldID0gY3B1X3RvX2xlMzIocWxhMjR4eF9y
+ZWFkX2ZsYXNoX2R3b3JkKGhhLA0KPiAgICAgICAgICAgICAgICAgICAgZmxhc2hfZGF0YV9hZGRy
+KGhhLCBmYWRkcikpKTsNCj4NCj4gICAgICAgIHJldHVybiBkd3B0cjsgICAgICAgICAgICAgICAg
+ICAgDQo+fQ0KPg0KPk9LIHNvIHdlIGNvbnZlcnQgdG8gTEUgLi4uDQo+DQo+ICAgICAgICAgICAg
+ICAgIHFsYTI0eHhfcmVhZF9mbGFzaF9kYXRhKHZoYSwgZGNvZGUsIGZhZGRyLCA0KTsgDQo+ICAg
+IA0KPiAgICAgICAgICAgICAgICByaXNjX2FkZHIgPSBiZTMyX3RvX2NwdShkY29kZVsyXSk7DQo+
+ICAgICAgICAgICAgICAgICpzcmlzY19hZGRyID0gKnNyaXNjX2FkZHIgPT0gMCA/IHJpc2NfYWRk
+ciA6ICpzcmlzY19hZGRyOw0KPiAgICAgICAgICAgICAgICByaXNjX3NpemUgPSBiZTMyX3RvX2Nw
+dShkY29kZVszXSk7DQo+DQo+dGhlbiBoYXBwaWx5IGFzc3VtZSBpdCdzIEJFLg0KPg0KPkFuZCBh
+Z2FpbiwgY29taW5nIGZyb20gZmxhc2gsIGl0J3MgdW5saWtlbHkgdG8gYWN0dWFsbHkgYmUgaW4g
+dGhlIG5hdGl2ZQ0KPmVuZGlhbi1uZXNzIGFzIGNhbGxlcnMgc2VlbSB0byBhc3N1bWUuIEknbSBn
+dWVzc2luZyBpdCdzIGFsbCBCRS4NCj4NCj5JIHBva2VkIGF0IGl0IGEgYml0IGFuZCB3YXMgYWJs
+ZSB0byBjdXQgZG93biAjIG9mIHdhcm5pbmdzDQo+ZnJvbSAxNzAwIHRvIDE0MDAgaW4gYW4gaG91
+ci4gU29tZW9uZSBmYW1pbGlhciB3aXRoIHRoZSBjb2RlDQo+c2hvdWxkIGxvb2sgYXQgaXQuDQoN
+Cldl4oCZbGwgdGFrZSBhIGxvb2sgYW5kIHNlbmQgcGF0Y2hlcyB0byByZXNvbHZlIHRoZXNlIHdh
+cm5pbmdzLiANCg0KPg0KPi0tIA0KPk1TVA0KPl9fX19fX19fX19fX19fX19fX19fX19fX19fX19f
+X19fX19fX19fX19fX19fX19fDQo+VmlydHVhbGl6YXRpb24gbWFpbGluZyBsaXN0DQo+VmlydHVh
+bGl6YXRpb25AbGlzdHMubGludXgtZm91bmRhdGlvbi5vcmcNCj5odHRwczovL2xpc3RzLmxpbnV4
+Zm91bmRhdGlvbi5vcmcvbWFpbG1hbi9saXN0aW5mby92aXJ0dWFsaXphdGlvbg0K
