@@ -1,79 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from r00tworld.com ([212.85.137.150]:35107 "EHLO r00tworld.com"
+Received: from mx1.redhat.com ([209.132.183.28]:46262 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932245AbcLILBY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 9 Dec 2016 06:01:24 -0500
-From: "PaX Team" <pageexec@freemail.hu>
-Date: Fri, 09 Dec 2016 11:59:42 +0100
+        id S932594AbcLIOgK (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 9 Dec 2016 09:36:10 -0500
+Subject: Re: [PATCH] x86/kbuild: enable modversions for symbols exported from
+ asm
+References: <20161129135118.24696-1-kilobyte@angband.pl>
+ <CA+55aFyZiB4YkwvqzrXO=HD8bcnc2xHkAYrek2QHVnhVvAi3Fw@mail.gmail.com>
+ <30bb2db4-47bd-0c35-8328-ef032b551f06@suse.com>
+ <CA+55aFxOGw57Gm-QiNs13kfy5k=aRrn3+98415V0g73eGc66mg@mail.gmail.com>
+ <20161129195721.GI2697@decadent.org.uk>
+ <CA+55aFyQko0t8oMZjhnwhWHrmBUyWjGhsnT=oUOU-W7_04xdzw@mail.gmail.com>
+ <20161201051852.28dc335f@roar.ozlabs.ibm.com>
+ <CA+55aFzMTrLMrr69ipdaKhz+RJhUu3BxB+kg0689qq_470qEcw@mail.gmail.com>
+ <20161201041325.GX35881@redhat.com>
+ <20161201153215.43b6cec7@roar.ozlabs.ibm.com>
+ <20161201152039.GB35881@redhat.com>
+ <20161209135041.5ff12770@roar.ozlabs.ibm.com>
+ <0937c184-1946-c494-56b6-c38fd0b632c2@redhat.com>
+ <20161209181459.1f0a4fed@roar.ozlabs.ibm.com>
+From: Stanislav Kozina <skozina@redhat.com>
+Message-ID: <249321c0-bcb1-f9d8-50f4-c083b656d02e@redhat.com>
+Date: Fri, 9 Dec 2016 15:36:04 +0100
 MIME-Version: 1.0
-Subject: Re: [PATCH 3/3] powerpc: enable support for GCC plugins
-Reply-to: pageexec@freemail.hu
-Message-ID: <584A8E9E.22035.590FC72@pageexec.freemail.hu>
-In-reply-to: <f5ea8825-532c-93bd-d51d-6ec1e541fae6@au1.ibm.com>
-References: <20161206062800.21800-1-andrew.donnellan@au1.ibm.com>, <CAGXu5jKrU5GR3KDb9M-vtSpY+aRm2B0vGpahVYLtFTWs=g7Big@mail.gmail.com>, <f5ea8825-532c-93bd-d51d-6ec1e541fae6@au1.ibm.com>
-Content-type: text/plain; charset=US-ASCII
-Content-transfer-encoding: 7BIT
-Content-description: Mail message body
+In-Reply-To: <20161209181459.1f0a4fed@roar.ozlabs.ibm.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kees Cook <keescook@chromium.org>, Andrew Donnellan <andrew.donnellan@au1.ibm.com>
-Cc: "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>, "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, Emese Revfy <re.emese@gmail.com>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Brad Spengler <spender@grsecurity.net>, Michal Marek <mmarek@suse.com>
+To: Nicholas Piggin <npiggin@gmail.com>
+Cc: Don Zickus <dzickus@redhat.com>, Linus Torvalds <torvalds@linux-foundation.org>, Ben Hutchings <ben@decadent.org.uk>, Michal Marek <mmarek@suse.com>, Adam Borowski <kilobyte@angband.pl>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Debian kernel maintainers <debian-kernel@lists.debian.org>, "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Ingo Molnar <mingo@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On 9 Dec 2016 at 13:48, Andrew Donnellan wrote:
+>>>> The question is how to provide a similar guarantee if a different way?
+>>> As a tool to aid distro reviewers, modversions has some value, but the
+>>> debug info parsing tools that have been mentioned in this thread seem
+>>> superior (not that I've tested them).
+>> On the other hand the big advantage of modversions is that it also
+>> verifies the checksum during runtime (module loading). In other words, I
+>> believe that any other solution should still generate some form of
+>> checksum/watermark which can be easily checked for compatibility on
+>> module load.
+>> It should not be hard to add to the DWARF based tools though. We'd just
+>> parse DWARF data instead of the C code.
+> A runtime check is still done, with per-module vermagic which distros
+> can change when they bump the ABI version. Is it really necessary to
+> have more than that (i.e., per-symbol versioning)?
 
-> >> as for the solutions, the general advice should enable the use of otherwise
-> >> failing gcc versions instead of forcing updating to new ones (though the
-> >> latter is advisable for other reasons but not everyone's in the position to
-> >> do so easily). in my experience all one needs to do is manually install the
-> >> missing files from the gcc sources (ideally distros would take care of it).
-> 
-> If someone else is willing to write up that advice, then great.
-> 
-> >> the specific problem addressed here can (and IMHO should) be solved in
-> >> another way: remove the inclusion of the offending headers in gcc-common.h
-> >> as neither tm.h nor c-common.h are needed by existing plugins. for background,
-> 
-> We can't build without tm.h: http://pastebin.com/W0azfCr0
+ From my point of view, it is. We need to allow changing ABI for some 
+modules while maintaining it for others.
+In fact I think that there should be version not only for every exported 
+symbol (in the EXPORT_SYMBOL() sense), but also for every public type 
+(in the sense of eg. structure defined in the public header file).
 
-you'll need to repeat the removal of dependent headers. based on a quick
-test here across gcc 4.5-6.2, if you remove rtl.h, tm_p.h, hard-reg-set.h
-and emit-rtl.h in addition to tm.h, the plugins should build fine.
-
-> And we get warnings without c-common.h: http://pastebin.com/Aw8CAj10
-
-that's not due to c-common.h. gcc versions 4.5-4.6 are compiled as a C program
-and gcc 4.7 can be compiled both as a C and a C++ program (IIRC, distros opted
-for the latter, i forget what manually built versions default to but i guess you
-went with the C compilation for your gcc anyway). couple that with -Wmissing-prototypes
-and you get that warning regardless of c-common.h being included. something like
-this should fix it:
-
---- a/scripts/gcc-plugins/gcc-generate-gimple-pass.h 2016-12-06 01:01:54.521724573 +0100
-+++ b/scripts/gcc-plugins/gcc-generate-gimple-pass.h      2016-12-09 11:43:32.225226164 +0100
-@@ -136,6 +136,7 @@
-        return new _PASS_NAME_PASS();
- }
- #else
-+struct opt_pass *_MAKE_PASS_NAME_PASS(void);
- struct opt_pass *_MAKE_PASS_NAME_PASS(void)
- {
-        return &_PASS_NAME_PASS.pass;
-
-> These were all manually built using a script running on a Debian box. 
-> Installing precompiled distro versions of rather old gccs would have 
-> been somewhat challenging. I've just rebuilt 4.6.4 to double check that 
-> I wasn't just seeing things, but it seems that it definitely is still 
-> putting c-common.h in the old location.
-
-for reference, this is the git commit that did the move:
-
-commit 7bedc3a05d34cd81e4835a2d3ff8c0ec7108eeb5
-Author: steven <steven@138bc75d-0d04-0410-961f-82ee72b054a4>
-Date:   Sat Jun 5 20:33:22 2010 +0000
-
-    gcc/ChangeLog:
-            * c-common.c: Move to c-family/.
-            * c-common.def: Likewise.
-            * c-common.h: Likewise.
-
-
+Thanks,
+-Stanislav
