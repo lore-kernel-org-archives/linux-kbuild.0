@@ -1,114 +1,79 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-bl2nam02on0046.outbound.protection.outlook.com ([104.47.38.46]:58476
-        "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752823AbcLIIOr (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 9 Dec 2016 03:14:47 -0500
-From: "Madhani, Himanshu" <Himanshu.Madhani@cavium.com>
-Subject: Re: [PATCH] linux/types.h: enable endian checks for all sparse builds
-Date: Fri, 9 Dec 2016 06:40:53 +0000
-Message-ID: <6199215E-2AA4-4705-9552-5D61FE03F866@cavium.com>
-References: <1481164052-28036-1-git-send-email-mst@redhat.com>
- <BLUPR02MB168374E98A6C86E43DF0BCFE81840@BLUPR02MB1683.namprd02.prod.outlook.com>
- <20161208075152-mutt-send-email-mst@kernel.org>
- <BLUPR02MB168304F8FBA50C916A6A4E6081840@BLUPR02MB1683.namprd02.prod.outlook.com>
- <20161208163658-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20161208163658-mutt-send-email-mst@kernel.org>
-Content-Language: en-US
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <CC052759A2A98246AAADC005BD2ECE5C@namprd07.prod.outlook.com>
-Content-Transfer-Encoding: base64
+Received: from r00tworld.com ([212.85.137.150]:35107 "EHLO r00tworld.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S932245AbcLILBY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 9 Dec 2016 06:01:24 -0500
+From: "PaX Team" <pageexec@freemail.hu>
+Date: Fri, 09 Dec 2016 11:59:42 +0100
 MIME-Version: 1.0
+Subject: Re: [PATCH 3/3] powerpc: enable support for GCC plugins
+Reply-to: pageexec@freemail.hu
+Message-ID: <584A8E9E.22035.590FC72@pageexec.freemail.hu>
+In-reply-to: <f5ea8825-532c-93bd-d51d-6ec1e541fae6@au1.ibm.com>
+References: <20161206062800.21800-1-andrew.donnellan@au1.ibm.com>, <CAGXu5jKrU5GR3KDb9M-vtSpY+aRm2B0vGpahVYLtFTWs=g7Big@mail.gmail.com>, <f5ea8825-532c-93bd-d51d-6ec1e541fae6@au1.ibm.com>
+Content-type: text/plain; charset=US-ASCII
+Content-transfer-encoding: 7BIT
+Content-description: Mail message body
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Michael S. Tsirkin" <mst@redhat.com>, Bart Van Assche <Bart.VanAssche@sandisk.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, Neil Armstrong <narmstrong@baylibre.com>, David Airlie <airlied@linux.ie>, "linux-remoteproc@vger.kernel.org" <linux-remoteproc@vger.kernel.org>, "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>, "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>, "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>, Herbert Xu <herbert@gondor.apana.org.au>, "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>, Christoph Hellwig <hch@infradead.org>, "v9fs-developer@lists.sourceforge.net" <v9fs-developer@lists.sourceforge.net>, Asias He <asias@redhat.com>, Arnd Bergmann <arnd@arndb.de>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, Jens Axboe <axboe@fb.com>, Michal Marek <mmarek@suse.com>, Stefan Hajnoczi <stefanha@redhat.com>, Matt Mackall <mpm@selenic.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>
+To: Kees Cook <keescook@chromium.org>, Andrew Donnellan <andrew.donnellan@au1.ibm.com>
+Cc: "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>, "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, Emese Revfy <re.emese@gmail.com>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Brad Spengler <spender@grsecurity.net>, Michal Marek <mmarek@suse.com>
 
-SGkgTWlrZS9CYXJ0LCANCg0KDQoNCg0KDQoNCg0KT24gMTIvOC8xNiwgODoxNyBBTSwgInZpcnR1
-YWxpemF0aW9uLWJvdW5jZXNAbGlzdHMubGludXgtZm91bmRhdGlvbi5vcmcgb24gYmVoYWxmIG9m
-IE1pY2hhZWwgUy4gVHNpcmtpbiIgPHZpcnR1YWxpemF0aW9uLWJvdW5jZXNAbGlzdHMubGludXgt
-Zm91bmRhdGlvbi5vcmcgb24gYmVoYWxmIG9mIG1zdEByZWRoYXQuY29tPiB3cm90ZToNCg0KPk9u
-IFRodSwgRGVjIDA4LCAyMDE2IGF0IDA2OjM4OjExQU0gKzAwMDAsIEJhcnQgVmFuIEFzc2NoZSB3
-cm90ZToNCj4+IE9uIDEyLzA3LzE2IDIxOjU0LCBNaWNoYWVsIFMuIFRzaXJraW4gd3JvdGU6DQo+
-PiA+IE9uIFRodSwgRGVjIDA4LCAyMDE2IGF0IDA1OjIxOjQ3QU0gKzAwMDAsIEJhcnQgVmFuIEFz
-c2NoZSB3cm90ZToNCj4+ID4+IEFkZGl0aW9uYWxseSwgdGhlcmUgYXJlIG5vdGFibGUgZXhjZXB0
-aW9ucyB0byB0aGUgcnVsZSB0aGF0IG1vc3QgZHJpdmVycw0KPj4gPj4gYXJlIGVuZGlhbi1jbGVh
-biwgZS5nLiBkcml2ZXJzL3Njc2kvcWxhMnh4eC4gSSB3b3VsZCBhcHByZWNpYXRlIGl0IGlmIGl0
-DQo+PiA+PiB3b3VsZCByZW1haW4gcG9zc2libGUgdG8gY2hlY2sgc3VjaCBkcml2ZXJzIHdpdGgg
-c3BhcnNlIHdpdGhvdXQgZW5hYmxpbmcNCj4+ID4+IGVuZGlhbm5lc3MgY2hlY2tzLiBIYXZlIHlv
-dSBjb25zaWRlcmVkIHRvIGNoYW5nZSAjaWZkZWYgX19DSEVDS19FTkRJQU5fXw0KPj4gPj4gaW50
-byBlLmcuICNpZm5kZWYgX19ET05UX0NIRUNLX0VORElBTl9fPw0KPj4gPg0KPj4gPiBUaGUgcmln
-aHQgdGhpbmcgaXMgcHJvYmFibHkganVzdCB0byBmaXggdGhlc2UsIGlzbid0IGl0Pw0KPj4gPiBV
-bnRpbCB0aGVuLCB3aHkgbm90IGp1c3QgaWdub3JlIHRoZSB3YXJuaW5ncz8NCj4+IA0KPj4gTmVp
-dGhlciBvcHRpb24gaXMgcmVhbGlzdGljLiBXaXRoIGVuZGlhbi1jaGVja2luZyBlbmFibGVkIHRo
-ZSBxbGEyeHh4IA0KPj4gZHJpdmVyIHRyaWdnZXJzIHNvIG1hbnkgd2FybmluZ3MgdGhhdCBpdCBi
-ZWNvbWVzIGEgcmVhbCBjaGFsbGVuZ2UgdG8gDQo+PiBmaWx0ZXIgdGhlIG5vbi1lbmRpYW4gd2Fy
-bmluZ3Mgb3V0IG1hbnVhbGx5Og0KPj4gDQo+PiAkIGZvciBmIGluICIiIENGPS1EX19DSEVDS19F
-TkRJQU5fXzsgZG8gbWFrZSBNPWRyaXZlcnMvc2NzaS9xbGEyeHh4IEM9MlwNCj4+ICAgICAgJGYg
-fCAmZ3JlcCAtYyAnOiB3YXJuaW5nOic7IGRvbmUNCj4+IDQNCj4+IDc1Mg0KPg0KPllvdSBjYW4g
-YWx3YXlzIHJldmVydCB0aGlzIHBhdGNoIGluIHlvdXIgdHJlZSwgb3Igd2hhdGV2ZXIuICBJdCBk
-b2VzIG5vdA0KPmxvb2sgbGlrZSB0aGlzIHdpbGwgZ2V0IGZpeGVkIG90aGVyd2lzZS4NCj4NCj4+
-IElmIHlvdSB0aGluayBpdCB3b3VsZCBiZSBlYXN5IHRvIGZpeCB0aGUgZW5kaWFuIHdhcm5pbmdz
-IHRyaWdnZXJlZCBieSANCj4+IHRoZSBxbGEyeHh4IGRyaXZlciwgeW91IGFyZSB3ZWxjb21lIHRv
-IHRyeSB0byBmaXggdGhlc2UuDQo+PiANCj4+IEJhcnQuDQo+DQo+WWVhLCB0aGlzIGhhcmR3YXJl
-IHdhcyBkZXNpZ25lZCBieSBzb21lb25lIHdobyB0aG91Z2h0IG1peGluZw0KPkxFIGFuZCBCRSBh
-bGwgb3ZlciB0aGUgcGxhY2UgaXMgYSBnb29kIGlkZWEuDQo+QnV0IHdobyBzYWlkIGl0IHNob3Vs
-ZCBiZSBlYXN5Pw0KPg0KPk1heWJlIHRoaXMgY2hhbmdlIHdpbGwgYmUgZW5vdWdoIHRvIG1vdGl2
-YXRlIHRoZSBtYWludGFpbmVycy4NCj4NCj5IZXJlJ3MgYSBtaW5vciBidWdsZXQgZm9yIHlvdSBh
-cyBhIG1vdGl2YXRvcjoNCj4NCj4gICAgICAgICAgICAgICAgICAgICAgICBpZiAoY3RfcnNwLT5o
-ZWFkZXIucmVzcG9uc2UgIT0NCj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgY3B1X3RvX2Jl
-MTYoQ1RfQUNDRVBUX1JFU1BPTlNFKSkgew0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgcWxfZGJnKHFsX2RiZ19kaXNjICsgcWxfZGJnX2J1ZmZlciwgdmhhLCAweDIwNzcsDQo+ICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIiVzIGZhaWxlZCByZWplY3RlZCByZXF1
-ZXN0IG9uIHBvcnRfaWQ6ICUwMnglMDJ4JTAyeCBDb21wZWx0aW9uIHN0YXR1cyAweCV4LCByZXNw
-b25zZSAweCV4XG4iLA0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHJvdXRp
-bmUsIHZoYS0+ZF9pZC5iLmRvbWFpbiwNCj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICB2aGEtPmRfaWQuYi5hcmVhLCB2aGEtPmRfaWQuYi5hbF9wYSwgY29tcF9zdGF0dXMsIGN0
-X3JzcC0+aGVhZGVyLnJlc3BvbnNlKTsNCj4NCj4NCj5yZXNwb25zZSBpcyBCRSBhbmQgaXNuJ3Qg
-cHJpbnRlZCBjb3JyZWN0bHkuDQo+DQo+YW5vdGhlcjoNCj4NCj4gICAgICAgIGVpdGVyLT5hLm1h
-eF9mcmFtZV9zaXplID0gY3B1X3RvX2JlMzIoZWl0ZXItPmEubWF4X2ZyYW1lX3NpemUpOw0KPiAg
-ICAgICAgc2l6ZSArPSA0ICsgNDsNCj4NCj4gICAgICAgIHFsX2RiZyhxbF9kYmdfZGlzYywgdmhh
-LCAweDIwYmMsDQo+ICAgICAgICAgICAgIk1heF9GcmFtZV9TaXplID0gJXguXG4iLCBlaXRlci0+
-YS5tYXhfZnJhbWVfc2l6ZSk7DQo+DQo+cHJpbnRlZCB0b28gbGF0ZSwgaXQncyBiZSBieSB0aGF0
-IHRpbWUuDQo+DQo+SGVyZSdzIGFub3RoZXIgc3VzcGljaW91cyBsaW5lDQo+DQo+ICAgICAgICBj
-dGlvMjQtPnUuc3RhdHVzMS5mbGFncyA9IChhdGlvLT51LmlzcDI0LmF0dHIgPDwgOSkgfA0KPiAg
-ICAgICAgICAgIGNwdV90b19sZTE2KENUSU83X0ZMQUdTX1NUQVRVU19NT0RFXzEgfA0KPiAgICAg
-ICAgICAgICAgICBDVElPN19GTEFHU19URVJNSU5BVEUpOw0KPg0KPnNoaWZ0aW5nIGF0dHIgYnkg
-OSBiaXRzIGdpdmVzIGRpZmZlcmVudCByZXN1bHRzIG9uIEJFIGFuZCBMRSwNCj5taXhpbmcgaXQg
-d2l0aCBsZTE2IGxvb2tzIHJhdGhlciBzdHJhbmdlLg0KPg0KPkFub3RoZXI6DQo+DQo+ICAgICAg
-ICAgICAgICAgIGhhLT5mbGFncy5kcG9ydF9lbmFibGVkID0NCj4gICAgICAgICAgICAgICAgICAg
-IChtaWRfaW5pdF9jYi0+aW5pdF9jYi5maXJtd2FyZV9vcHRpb25zXzEgJiBCSVRfNykgIT0gMDsN
-Cj4NCj5CSVRfNyBpcyBuYXRpdmUgZW5kaWFuLCBmaXJtd2FyZV9vcHRpb25zXzEgaXMgTEUgSSB0
-aGluay4NCj4NCj4NCj4NCj5Mb29rIGF0IHFsYTI3eHhfZmluZF92YWxpZF9pbWFnZSBhcyB3ZWxs
-Lg0KPg0KPiAgICAgICAgaWYgKHByaV9pbWFnZV9zdGF0dXMuc2lnbmF0dXJlICE9IFFMQTI3WFhf
-SU1HX1NUQVRVU19TSUdOKQ0KPg0KPnFsYTI3eHhfaW1hZ2Vfc3RhdHVzIHNlZW1zIHRvIGJlIGRh
-dGEgY29taW5nIGZyb20gZmxhc2gsIGJ1dCBpcw0KPnNvbWVob3cgbmF0aXZlLWVuZGlhbj8gTWF5
-YmUgLi4uDQo+DQo+DQo+ICAgICAgICBsdW4gPSBhLT51LmlzcDI0LmZjcF9jbW5kLmx1bjsNCj4N
-Cj5JIHRoaW5rIGx1biBoZXJlIGlzIGluIGhhcmR3YXJlIGZvcm1hdCAobGU/KSwgY29kZSB0cmVh
-dHMgaXQNCj5hcyBuYXRpdmUuDQo+DQo+DQo+Tm90IHRvIHNwZWFrIGFib3V0IGludGVyZmFjZSBh
-YnVzZSBhbGwgb3ZlciB0aGUgcGxhY2UuDQo+SG93IGFib3V0IHRoaXM6DQo+DQo+dWludDMyX3Qg
-Kg0KPnFsYTI0eHhfcmVhZF9mbGFzaF9kYXRhKHNjc2lfcWxhX2hvc3RfdCAqdmhhLCB1aW50MzJf
-dCAqZHdwdHIsIHVpbnQzMl90DQo+ZmFkZHIsDQo+ICAgIHVpbnQzMl90IGR3b3JkcykgICAgICAg
-ICAgICAgICAgICAgICANCj57DQo+ICAgICAgICB1aW50MzJfdCBpOyAgICAgICAgICAgICAgICAg
-ICAgIA0KPiAgICAgICAgc3RydWN0IHFsYV9od19kYXRhICpoYSA9IHZoYS0+aHc7DQo+ICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIA0KPiAgICAgICAgLyogRHdvcmQgcmVh
-ZHMgdG8gZmxhc2guICovDQo+ICAgICAgICBmb3IgKGkgPSAwOyBpIDwgZHdvcmRzOyBpKyssIGZh
-ZGRyKyspDQo+ICAgICAgICAgICAgICAgIGR3cHRyW2ldID0gY3B1X3RvX2xlMzIocWxhMjR4eF9y
-ZWFkX2ZsYXNoX2R3b3JkKGhhLA0KPiAgICAgICAgICAgICAgICAgICAgZmxhc2hfZGF0YV9hZGRy
-KGhhLCBmYWRkcikpKTsNCj4NCj4gICAgICAgIHJldHVybiBkd3B0cjsgICAgICAgICAgICAgICAg
-ICAgDQo+fQ0KPg0KPk9LIHNvIHdlIGNvbnZlcnQgdG8gTEUgLi4uDQo+DQo+ICAgICAgICAgICAg
-ICAgIHFsYTI0eHhfcmVhZF9mbGFzaF9kYXRhKHZoYSwgZGNvZGUsIGZhZGRyLCA0KTsgDQo+ICAg
-IA0KPiAgICAgICAgICAgICAgICByaXNjX2FkZHIgPSBiZTMyX3RvX2NwdShkY29kZVsyXSk7DQo+
-ICAgICAgICAgICAgICAgICpzcmlzY19hZGRyID0gKnNyaXNjX2FkZHIgPT0gMCA/IHJpc2NfYWRk
-ciA6ICpzcmlzY19hZGRyOw0KPiAgICAgICAgICAgICAgICByaXNjX3NpemUgPSBiZTMyX3RvX2Nw
-dShkY29kZVszXSk7DQo+DQo+dGhlbiBoYXBwaWx5IGFzc3VtZSBpdCdzIEJFLg0KPg0KPkFuZCBh
-Z2FpbiwgY29taW5nIGZyb20gZmxhc2gsIGl0J3MgdW5saWtlbHkgdG8gYWN0dWFsbHkgYmUgaW4g
-dGhlIG5hdGl2ZQ0KPmVuZGlhbi1uZXNzIGFzIGNhbGxlcnMgc2VlbSB0byBhc3N1bWUuIEknbSBn
-dWVzc2luZyBpdCdzIGFsbCBCRS4NCj4NCj5JIHBva2VkIGF0IGl0IGEgYml0IGFuZCB3YXMgYWJs
-ZSB0byBjdXQgZG93biAjIG9mIHdhcm5pbmdzDQo+ZnJvbSAxNzAwIHRvIDE0MDAgaW4gYW4gaG91
-ci4gU29tZW9uZSBmYW1pbGlhciB3aXRoIHRoZSBjb2RlDQo+c2hvdWxkIGxvb2sgYXQgaXQuDQoN
-Cldl4oCZbGwgdGFrZSBhIGxvb2sgYW5kIHNlbmQgcGF0Y2hlcyB0byByZXNvbHZlIHRoZXNlIHdh
-cm5pbmdzLiANCg0KPg0KPi0tIA0KPk1TVA0KPl9fX19fX19fX19fX19fX19fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fDQo+VmlydHVhbGl6YXRpb24gbWFpbGluZyBsaXN0DQo+VmlydHVh
-bGl6YXRpb25AbGlzdHMubGludXgtZm91bmRhdGlvbi5vcmcNCj5odHRwczovL2xpc3RzLmxpbnV4
-Zm91bmRhdGlvbi5vcmcvbWFpbG1hbi9saXN0aW5mby92aXJ0dWFsaXphdGlvbg0K
+On 9 Dec 2016 at 13:48, Andrew Donnellan wrote:
+
+> >> as for the solutions, the general advice should enable the use of otherwise
+> >> failing gcc versions instead of forcing updating to new ones (though the
+> >> latter is advisable for other reasons but not everyone's in the position to
+> >> do so easily). in my experience all one needs to do is manually install the
+> >> missing files from the gcc sources (ideally distros would take care of it).
+> 
+> If someone else is willing to write up that advice, then great.
+> 
+> >> the specific problem addressed here can (and IMHO should) be solved in
+> >> another way: remove the inclusion of the offending headers in gcc-common.h
+> >> as neither tm.h nor c-common.h are needed by existing plugins. for background,
+> 
+> We can't build without tm.h: http://pastebin.com/W0azfCr0
+
+you'll need to repeat the removal of dependent headers. based on a quick
+test here across gcc 4.5-6.2, if you remove rtl.h, tm_p.h, hard-reg-set.h
+and emit-rtl.h in addition to tm.h, the plugins should build fine.
+
+> And we get warnings without c-common.h: http://pastebin.com/Aw8CAj10
+
+that's not due to c-common.h. gcc versions 4.5-4.6 are compiled as a C program
+and gcc 4.7 can be compiled both as a C and a C++ program (IIRC, distros opted
+for the latter, i forget what manually built versions default to but i guess you
+went with the C compilation for your gcc anyway). couple that with -Wmissing-prototypes
+and you get that warning regardless of c-common.h being included. something like
+this should fix it:
+
+--- a/scripts/gcc-plugins/gcc-generate-gimple-pass.h 2016-12-06 01:01:54.521724573 +0100
++++ b/scripts/gcc-plugins/gcc-generate-gimple-pass.h      2016-12-09 11:43:32.225226164 +0100
+@@ -136,6 +136,7 @@
+        return new _PASS_NAME_PASS();
+ }
+ #else
++struct opt_pass *_MAKE_PASS_NAME_PASS(void);
+ struct opt_pass *_MAKE_PASS_NAME_PASS(void)
+ {
+        return &_PASS_NAME_PASS.pass;
+
+> These were all manually built using a script running on a Debian box. 
+> Installing precompiled distro versions of rather old gccs would have 
+> been somewhat challenging. I've just rebuilt 4.6.4 to double check that 
+> I wasn't just seeing things, but it seems that it definitely is still 
+> putting c-common.h in the old location.
+
+for reference, this is the git commit that did the move:
+
+commit 7bedc3a05d34cd81e4835a2d3ff8c0ec7108eeb5
+Author: steven <steven@138bc75d-0d04-0410-961f-82ee72b054a4>
+Date:   Sat Jun 5 20:33:22 2010 +0000
+
+    gcc/ChangeLog:
+            * c-common.c: Move to c-family/.
+            * c-common.def: Likewise.
+            * c-common.h: Likewise.
+
+
