@@ -1,51 +1,90 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-io0-f169.google.com ([209.85.223.169]:35055 "EHLO
-        mail-io0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932224AbcLIDkX (ORCPT
+Received: from mail-pg0-f68.google.com ([74.125.83.68]:35969 "EHLO
+        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752704AbcLIDu7 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 8 Dec 2016 22:40:23 -0500
-Received: by mail-io0-f169.google.com with SMTP id h30so36502292iod.2
-        for <linux-kbuild@vger.kernel.org>; Thu, 08 Dec 2016 19:40:23 -0800 (PST)
-Date: Thu, 8 Dec 2016 22:40:21 -0500 (EST)
-From: Nicolas Pitre <nicolas.pitre@linaro.org>
-Subject: Re: [regression ?] kbuild: fix building bzImage with CONFIG_TRIM_UNUSED_KSYMS
- enabled
-In-Reply-To: <20161209025637.GC4661@jagdpanzerIV.localdomain>
-Message-ID: <alpine.LFD.2.20.1612082235510.1657@knanqh.ubzr>
-References: <20161209024357.GB4661@jagdpanzerIV.localdomain> <20161209025637.GC4661@jagdpanzerIV.localdomain>
+        Thu, 8 Dec 2016 22:50:59 -0500
+Date: Fri, 9 Dec 2016 13:50:41 +1000
+From: Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH] x86/kbuild: enable modversions for symbols exported
+ from asm
+Message-ID: <20161209135041.5ff12770@roar.ozlabs.ibm.com>
+In-Reply-To: <20161201152039.GB35881@redhat.com>
+References: <20161129135118.24696-1-kilobyte@angband.pl>
+        <CA+55aFyZiB4YkwvqzrXO=HD8bcnc2xHkAYrek2QHVnhVvAi3Fw@mail.gmail.com>
+        <30bb2db4-47bd-0c35-8328-ef032b551f06@suse.com>
+        <CA+55aFxOGw57Gm-QiNs13kfy5k=aRrn3+98415V0g73eGc66mg@mail.gmail.com>
+        <20161129195721.GI2697@decadent.org.uk>
+        <CA+55aFyQko0t8oMZjhnwhWHrmBUyWjGhsnT=oUOU-W7_04xdzw@mail.gmail.com>
+        <20161201051852.28dc335f@roar.ozlabs.ibm.com>
+        <CA+55aFzMTrLMrr69ipdaKhz+RJhUu3BxB+kg0689qq_470qEcw@mail.gmail.com>
+        <20161201041325.GX35881@redhat.com>
+        <20161201153215.43b6cec7@roar.ozlabs.ibm.com>
+        <20161201152039.GB35881@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>
-Cc: Jarod Wilson <jarod@redhat.com>, Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Don Zickus <dzickus@redhat.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, skozina@redhat.com, Ben Hutchings <ben@decadent.org.uk>, Michal Marek <mmarek@suse.com>, Adam Borowski <kilobyte@angband.pl>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Debian kernel maintainers <debian-kernel@lists.debian.org>, "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Ingo Molnar <mingo@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Fri, 9 Dec 2016, Sergey Senozhatsky wrote:
+On Thu, 1 Dec 2016 10:20:39 -0500
+Don Zickus <dzickus@redhat.com> wrote:
 
-> On (12/09/16 11:43), Sergey Senozhatsky wrote:
+> On Thu, Dec 01, 2016 at 03:32:15PM +1100, Nicholas Piggin wrote:
+> > > Anyway, MODVERSIONS is our way of protecting our kabi for the last 10 years.
+> > > It isn't perfect and we have fixed the genksyms tool over the years, but so
+> > > far it mostly works fine.  
 > > 
-> > after 53924022d8a ("kbuild: fix building bzImage withCONFIG_TRIM_UNUSED_KSYMS
-> > enabled") all of my build scripts build the kernel without the modules.
+> > Okay. It would be good to get all the distros in on this.
+> > 
+> > What I want to do is work out exactly what it is that modversions is
+> > giving you.
+> > 
+> > We know it's fairly nasty code to maintain and it does not detect ABI
+> > changes very well. But it's not such a burden that we can't maintain
+> > it if there are good reasons to keep it.  
 > 
-> [..]
-> > +# For the kernel to actually contain only the needed exported symbols,
-> > +# we have to build modules as well to determine what those symbols are.
-> > +# (this can be evaluated only once include/config/auto.conf has been included)
-> 					^^^^^
+> Hi Nick,
 > 
-> ah, the config. so the patch is wrong.
+> I won't disagree with you there. :-)
 
-Furthermore, the export statement exports the variable not its value. 
-Even if the value is changed afterwards, referencing the exported 
-variable will see the new value.
+Sorry for the late reply, I was moving house and got side tracked.
 
-You can try out this little Makefile to prove it:
+> modversions is a pretty heavy handed approach that basically says if all the
+> symbols and types haven't changed for a given EXPORT_SYMBOL (recursively
+> checked), then there is a high degree of confidence the OOT driver will not
+> only load, but run correctly.
 
-FOOBAR := 0
-export FOOBAR
-FOOBAR := 1
-all:
-	echo FOOBAR is $$FOOBAR
+It's heavy handed in that it is quite complex in the kernel build system,
+but it is also light handed in that it does not do a very good job.
 
+I would say the degree of confidence is not very high. People have told
+me modversions follows pointers to objects in its calculation, but I have
+not seen that to be the case. Even if you did have that, it can not replace
+a code review for semantics of data and code.
 
-Nicolas
+> The question is how to provide a similar guarantee if a different way?
+
+As a tool to aid distro reviewers, modversions has some value, but the
+debug info parsing tools that have been mentioned in this thread seem
+superior (not that I've tested them).
+
+> 
+> We have plenty of customers with 10 year old drivers, where the expertise
+> has long left the company.  The engineers still around, recompile and make
+> tweaks to get things working on the latest RHEL.  Verify it passes testing
+> and release it.  Then they hope to not touch it again for a few years until
+> the next RHEL comes along.
+> 
+> Scary, huh? :-)
+
+Oh yeah my aim here is not to make distro or out of tree module vendors
+life harder, actually the opposite. If it turns out modversions really is
+the best approach, I'm not in a position to complain about its complexity
+because we have Suse and Redhat people maintaining the build and module
+systems :) I just want to see if we can do things better.
+
+Thanks,
+Nick
