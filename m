@@ -1,53 +1,85 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:60680 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S933449AbcLIQRG (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 9 Dec 2016 11:17:06 -0500
-Date: Fri, 9 Dec 2016 11:16:51 -0500
-From: Don Zickus <dzickus@redhat.com>
-Subject: Re: [PATCH] x86/kbuild: enable modversions for symbols exported from
- asm
-Message-ID: <20161209161651.GB35881@redhat.com>
-References: <30bb2db4-47bd-0c35-8328-ef032b551f06@suse.com>
- <CA+55aFxOGw57Gm-QiNs13kfy5k=aRrn3+98415V0g73eGc66mg@mail.gmail.com>
- <20161129195721.GI2697@decadent.org.uk>
- <CA+55aFyQko0t8oMZjhnwhWHrmBUyWjGhsnT=oUOU-W7_04xdzw@mail.gmail.com>
- <20161201051852.28dc335f@roar.ozlabs.ibm.com>
- <CA+55aFzMTrLMrr69ipdaKhz+RJhUu3BxB+kg0689qq_470qEcw@mail.gmail.com>
- <20161201041325.GX35881@redhat.com>
- <20161201153215.43b6cec7@roar.ozlabs.ibm.com>
- <20161201152039.GB35881@redhat.com>
- <20161209135041.5ff12770@roar.ozlabs.ibm.com>
+Received: from mail-io0-f180.google.com ([209.85.223.180]:33598 "EHLO
+        mail-io0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751593AbcLISIB (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 9 Dec 2016 13:08:01 -0500
+Received: by mail-io0-f180.google.com with SMTP id d9so69258071ioe.0
+        for <linux-kbuild@vger.kernel.org>; Fri, 09 Dec 2016 10:08:01 -0800 (PST)
+Date: Fri, 9 Dec 2016 13:07:59 -0500 (EST)
+From: Nicolas Pitre <nicolas.pitre@linaro.org>
+Subject: Re: [regression ?] kbuild: fix building bzImage with CONFIG_TRIM_UNUSED_KSYMS
+ enabled
+In-Reply-To: <20161209045857.GD4661@jagdpanzerIV.localdomain>
+Message-ID: <alpine.LFD.2.20.1612091302540.1657@knanqh.ubzr>
+References: <20161209024357.GB4661@jagdpanzerIV.localdomain> <20161209025637.GC4661@jagdpanzerIV.localdomain> <alpine.LFD.2.20.1612082235510.1657@knanqh.ubzr> <20161209045857.GD4661@jagdpanzerIV.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20161209135041.5ff12770@roar.ozlabs.ibm.com>
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicholas Piggin <npiggin@gmail.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, skozina@redhat.com, Ben Hutchings <ben@decadent.org.uk>, Michal Marek <mmarek@suse.com>, Adam Borowski <kilobyte@angband.pl>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Debian kernel maintainers <debian-kernel@lists.debian.org>, "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Ingo Molnar <mingo@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>
+Cc: Jarod Wilson <jarod@redhat.com>, Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Fri, Dec 09, 2016 at 01:50:41PM +1000, Nicholas Piggin wrote:
+On Fri, 9 Dec 2016, Sergey Senozhatsky wrote:
+
+> On (12/08/16 22:40), Nicolas Pitre wrote:
+> > > > after 53924022d8a ("kbuild: fix building bzImage withCONFIG_TRIM_UNUSED_KSYMS
+> > > > enabled") all of my build scripts build the kernel without the modules.
+> > > 
+> > > [..]
+> > > > +# For the kernel to actually contain only the needed exported symbols,
+> > > > +# we have to build modules as well to determine what those symbols are.
+> > > > +# (this can be evaluated only once include/config/auto.conf has been included)
+> > > 					^^^^^
+> > > 
+> > > ah, the config. so the patch is wrong.
 > > 
-> > We have plenty of customers with 10 year old drivers, where the expertise
-> > has long left the company.  The engineers still around, recompile and make
-> > tweaks to get things working on the latest RHEL.  Verify it passes testing
-> > and release it.  Then they hope to not touch it again for a few years until
-> > the next RHEL comes along.
-> > 
-> > Scary, huh? :-)
+> > Furthermore, the export statement exports the variable not its value. 
+> > Even if the value is changed afterwards, referencing the exported 
+> > variable will see the new value.
 > 
-> Oh yeah my aim here is not to make distro or out of tree module vendors
-> life harder, actually the opposite. If it turns out modversions really is
-> the best approach, I'm not in a position to complain about its complexity
-> because we have Suse and Redhat people maintaining the build and module
-> systems :) I just want to see if we can do things better.
+> yeah, need to investigate more. for some, unknown, reason
+> modules_install gives me empty lib/modules.
+> 
+> the build script (archlinux) builds it in 2 steps: build() and package().
+> basically:
+> 
+> build:
+> make -j4 > build_log 2>&1
+> 
+> package:
+> make -j4 INSTALL_MOD_PATH="${pkgdir}" modules_install >> build_log 2>&1
+> 
 
-Hi Nick,
+Weird. I basically did that and I can't reproduce your problem.
 
-I think we are in pretty good agreement here.  We can do better than
-modversions.  On the flip side, I would hate to see modversions ripped out
-until we have an alternate path forward as it does get us by for now. :-)
+> makepkg
+> ls -la
+> pkg/kernel-4.9.0-rc8-dbg-00085-ga37102d-dirty/lib/modules/4.9.0-rc8-dbg-00085-ga37102d-dirty/kernel/
+> drwxr-xr-x 2 ss ss 4096 Dec  9 13:51 .
+> drwxr-xr-x 3 ss ss 4096 Dec  9 13:51 ..
+> 
+> 
+> git revert 865563924022d8
+> makepkg
+> ls -la pkg/kernel-4.9.0-rc8-dbg-00086-g7ea3980-dirty/lib/modules/4.9.0-rc8-dbg-00086-g7ea3980-dirty/kernel/
+> drwxr-xr-x 10 ss ss 4096 Dec  9 13:55 .
+> drwxr-xr-x  3 ss ss 4096 Dec  9 13:55 ..
+> drwxr-xr-x  3 ss ss 4096 Dec  9 13:55 arch
+> drwxr-xr-x  2 ss ss 4096 Dec  9 13:55 crypto
+> drwxr-xr-x 14 ss ss 4096 Dec  9 13:55 drivers
+> drwxr-xr-x  4 ss ss 4096 Dec  9 13:55 fs
+> drwxr-xr-x  4 ss ss 4096 Dec  9 13:55 lib
+> drwxr-xr-x  2 ss ss 4096 Dec  9 13:55 mm
+> drwxr-xr-x  3 ss ss 4096 Dec  9 13:55 net
+> drwxr-xr-x  5 ss ss 4096 Dec  9 13:55 sound
 
-Cheers,
-Don
+You must have CONFIG_TRIM_UNUSED_KSYMS=y in your .config, right?
+
+What if you set it to n instead without reverting 865563924022d8. Do you 
+still have the same issue?
+
+In any case, could you give me your .config to help me reproduce?
+
+
+Nicolas
