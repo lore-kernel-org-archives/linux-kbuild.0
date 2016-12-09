@@ -1,76 +1,81 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf0-f193.google.com ([209.85.192.193]:35227 "EHLO
-        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752704AbcLICnv (ORCPT
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:47708 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S932490AbcLICsf (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 8 Dec 2016 21:43:51 -0500
-Date: Fri, 9 Dec 2016 11:43:57 +0900
-From: Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>
-Subject: [regression ?] kbuild: fix building bzImage with
- CONFIG_TRIM_UNUSED_KSYMS enabled
-Message-ID: <20161209024357.GB4661@jagdpanzerIV.localdomain>
+        Thu, 8 Dec 2016 21:48:35 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.17/8.16.0.17) with SMTP id uB92hjnk059427
+        for <linux-kbuild@vger.kernel.org>; Thu, 8 Dec 2016 21:48:33 -0500
+Received: from e23smtp02.au.ibm.com (e23smtp02.au.ibm.com [202.81.31.144])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 277gu5txh6-1
+        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+        for <linux-kbuild@vger.kernel.org>; Thu, 08 Dec 2016 21:48:33 -0500
+Received: from localhost
+        by e23smtp02.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-kbuild@vger.kernel.org> from <andrew.donnellan@au1.ibm.com>;
+        Fri, 9 Dec 2016 12:48:30 +1000
+Subject: Re: [PATCH 3/3] powerpc: enable support for GCC plugins
+References: <20161206062800.21800-1-andrew.donnellan@au1.ibm.com>
+ <20161206062800.21800-3-andrew.donnellan@au1.ibm.com>
+ <5849716A.32374.136DAAC@pageexec.freemail.hu>
+ <CAGXu5jKrU5GR3KDb9M-vtSpY+aRm2B0vGpahVYLtFTWs=g7Big@mail.gmail.com>
+From: Andrew Donnellan <andrew.donnellan@au1.ibm.com>
+Date: Fri, 9 Dec 2016 13:48:26 +1100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+In-Reply-To: <CAGXu5jKrU5GR3KDb9M-vtSpY+aRm2B0vGpahVYLtFTWs=g7Big@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Message-Id: <f5ea8825-532c-93bd-d51d-6ec1e541fae6@au1.ibm.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicolas Pitre <nico@linaro.org>
-Cc: Jarod Wilson <jarod@redhat.com>, Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Kees Cook <keescook@chromium.org>, PaX Team <pageexec@freemail.hu>
+Cc: "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>, "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, Emese Revfy <re.emese@gmail.com>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Brad Spengler <spender@grsecurity.net>, Michal Marek <mmarek@suse.com>
 
-Hello,
+On 09/12/16 05:06, Kees Cook wrote:
+>> i don't think that this is the right approach. there's a general and a special
+>> issue here, both of which need different handling.
+>>
+>> the general problem is to detect problems related to gcc plugin headers and
+>> notify the users about solutions. emitting various messages from a Makefile
+>> is certainly not a scalable approach, just imagine how it will look when the
+>> other 30+ archs begin to add their own special cases... if anything, they
+>> should be documented in Documentation/gcc-plugins.txt (or a new doc if it
+>> grows too big) and the Makefile message should just point at it.
 
-after 53924022d8a ("kbuild: fix building bzImage withCONFIG_TRIM_UNUSED_KSYMS
-enabled") all of my build scripts build the kernel without the modules.
+I think I agree in principle - Makefiles are already unreadable enough 
+without a million special cases.
 
-shouldn't that 'KBUILD_MODULES := 1' happen before we `export KBUILD_MODULES'?
+>> as for the solutions, the general advice should enable the use of otherwise
+>> failing gcc versions instead of forcing updating to new ones (though the
+>> latter is advisable for other reasons but not everyone's in the position to
+>> do so easily). in my experience all one needs to do is manually install the
+>> missing files from the gcc sources (ideally distros would take care of it).
 
+If someone else is willing to write up that advice, then great.
 
-this silly patch fixes the build for me:
-======================================================================
+>> the specific problem addressed here can (and IMHO should) be solved in
+>> another way: remove the inclusion of the offending headers in gcc-common.h
+>> as neither tm.h nor c-common.h are needed by existing plugins. for background,
 
-From: Sergey Senozhatsky <sergey.senozhatsky@gmail.com>
-Subject: [PATCH] Kbuild: set KBUILD_MODULES before we export it
+We can't build without tm.h: http://pastebin.com/W0azfCr0
 
-Tweak the KBUILD_MODULES flag for TRIM_UNUSED_KSYMS configs
-before we `export' it.
+And we get warnings without c-common.h: http://pastebin.com/Aw8CAj10
 
-Signed-off-by: Sergey Senozhatsky <sergey.senozhatsky@gmail.com>
----
- Makefile | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+>> as for the location of c-common.h, upstream gcc moved it under c-family in
+>> 2010 after the release of 4.5, so it should be where gcc-common.h expects
+>> it and i'm not sure how it ended up at its old location for you.
+>
+> That is rather odd. What distro was the PPC test done on? (Or were
+> these manually built gcc versions?)
 
-diff --git a/Makefile b/Makefile
-index 369099d..035206e 100644
---- a/Makefile
-+++ b/Makefile
-@@ -336,6 +336,13 @@ ifeq ($(MAKECMDGOALS),)
-   KBUILD_MODULES := 1
- endif
- 
-+# For the kernel to actually contain only the needed exported symbols,
-+# we have to build modules as well to determine what those symbols are.
-+# (this can be evaluated only once include/config/auto.conf has been included)
-+ifdef CONFIG_TRIM_UNUSED_KSYMS
-+  KBUILD_MODULES := 1
-+endif
-+
- export KBUILD_MODULES KBUILD_BUILTIN
- export KBUILD_CHECKSRC KBUILD_SRC KBUILD_EXTMOD
- 
-@@ -607,13 +614,6 @@ else
- include/config/auto.conf: ;
- endif # $(dot-config)
- 
--# For the kernel to actually contain only the needed exported symbols,
--# we have to build modules as well to determine what those symbols are.
--# (this can be evaluated only once include/config/auto.conf has been included)
--ifdef CONFIG_TRIM_UNUSED_KSYMS
--  KBUILD_MODULES := 1
--endif
--
- # The all: target is the default when no target is given on the
- # command line.
- # This allow a user to issue only 'make' to build a kernel including modules
+These were all manually built using a script running on a Debian box. 
+Installing precompiled distro versions of rather old gccs would have 
+been somewhat challenging. I've just rebuilt 4.6.4 to double check that 
+I wasn't just seeing things, but it seems that it definitely is still 
+putting c-common.h in the old location.
+
 -- 
-2.10.2
+Andrew Donnellan              OzLabs, ADL Canberra
+andrew.donnellan@au1.ibm.com  IBM Australia Limited
 
