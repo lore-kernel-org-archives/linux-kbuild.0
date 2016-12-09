@@ -1,91 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg0-f67.google.com ([74.125.83.67]:34745 "EHLO
-        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752850AbcLIE6w (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 8 Dec 2016 23:58:52 -0500
-Date: Fri, 9 Dec 2016 13:58:57 +0900
-From: Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>
-Subject: Re: [regression ?] kbuild: fix building bzImage with
- CONFIG_TRIM_UNUSED_KSYMS enabled
-Message-ID: <20161209045857.GD4661@jagdpanzerIV.localdomain>
-References: <20161209024357.GB4661@jagdpanzerIV.localdomain>
- <20161209025637.GC4661@jagdpanzerIV.localdomain>
- <alpine.LFD.2.20.1612082235510.1657@knanqh.ubzr>
+Received: from mx1.redhat.com ([209.132.183.28]:48026 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S932146AbcLIHz5 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 9 Dec 2016 02:55:57 -0500
+Subject: Re: [PATCH] x86/kbuild: enable modversions for symbols exported from
+ asm
+References: <20161129135118.24696-1-kilobyte@angband.pl>
+ <CA+55aFyZiB4YkwvqzrXO=HD8bcnc2xHkAYrek2QHVnhVvAi3Fw@mail.gmail.com>
+ <30bb2db4-47bd-0c35-8328-ef032b551f06@suse.com>
+ <CA+55aFxOGw57Gm-QiNs13kfy5k=aRrn3+98415V0g73eGc66mg@mail.gmail.com>
+ <20161129195721.GI2697@decadent.org.uk>
+ <CA+55aFyQko0t8oMZjhnwhWHrmBUyWjGhsnT=oUOU-W7_04xdzw@mail.gmail.com>
+ <20161201051852.28dc335f@roar.ozlabs.ibm.com>
+ <CA+55aFzMTrLMrr69ipdaKhz+RJhUu3BxB+kg0689qq_470qEcw@mail.gmail.com>
+ <20161201041325.GX35881@redhat.com>
+ <20161201153215.43b6cec7@roar.ozlabs.ibm.com>
+ <20161201152039.GB35881@redhat.com>
+ <20161209135041.5ff12770@roar.ozlabs.ibm.com>
+From: Stanislav Kozina <skozina@redhat.com>
+Message-ID: <0937c184-1946-c494-56b6-c38fd0b632c2@redhat.com>
+Date: Fri, 9 Dec 2016 08:55:51 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <alpine.LFD.2.20.1612082235510.1657@knanqh.ubzr>
+In-Reply-To: <20161209135041.5ff12770@roar.ozlabs.ibm.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicolas Pitre <nicolas.pitre@linaro.org>
-Cc: Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>, Jarod Wilson <jarod@redhat.com>, Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Nicholas Piggin <npiggin@gmail.com>, Don Zickus <dzickus@redhat.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, Ben Hutchings <ben@decadent.org.uk>, Michal Marek <mmarek@suse.com>, Adam Borowski <kilobyte@angband.pl>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Debian kernel maintainers <debian-kernel@lists.debian.org>, "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Ingo Molnar <mingo@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On (12/08/16 22:40), Nicolas Pitre wrote:
-> > > after 53924022d8a ("kbuild: fix building bzImage withCONFIG_TRIM_UNUSED_KSYMS
-> > > enabled") all of my build scripts build the kernel without the modules.
-> > 
-> > [..]
-> > > +# For the kernel to actually contain only the needed exported symbols,
-> > > +# we have to build modules as well to determine what those symbols are.
-> > > +# (this can be evaluated only once include/config/auto.conf has been included)
-> > 					^^^^^
-> > 
-> > ah, the config. so the patch is wrong.
-> 
-> Furthermore, the export statement exports the variable not its value. 
-> Even if the value is changed afterwards, referencing the exported 
-> variable will see the new value.
+>> The question is how to provide a similar guarantee if a different way?
+> As a tool to aid distro reviewers, modversions has some value, but the
+> debug info parsing tools that have been mentioned in this thread seem
+> superior (not that I've tested them).
 
-yeah, need to investigate more. for some, unknown, reason
-modules_install gives me empty lib/modules.
+On the other hand the big advantage of modversions is that it also 
+verifies the checksum during runtime (module loading). In other words, I 
+believe that any other solution should still generate some form of 
+checksum/watermark which can be easily checked for compatibility on 
+module load.
+It should not be hard to add to the DWARF based tools though. We'd just 
+parse DWARF data instead of the C code.
 
-the build script (archlinux) builds it in 2 steps: build() and package().
-basically:
-
-build:
-make -j4 > build_log 2>&1
-
-package:
-make -j4 INSTALL_MOD_PATH="${pkgdir}" modules_install >> build_log 2>&1
-
-
-
-makepkg
-ls -la
-pkg/kernel-4.9.0-rc8-dbg-00085-ga37102d-dirty/lib/modules/4.9.0-rc8-dbg-00085-ga37102d-dirty/kernel/
-drwxr-xr-x 2 ss ss 4096 Dec  9 13:51 .
-drwxr-xr-x 3 ss ss 4096 Dec  9 13:51 ..
-
-
-git revert 865563924022d8
-makepkg
-ls -la pkg/kernel-4.9.0-rc8-dbg-00086-g7ea3980-dirty/lib/modules/4.9.0-rc8-dbg-00086-g7ea3980-dirty/kernel/
-drwxr-xr-x 10 ss ss 4096 Dec  9 13:55 .
-drwxr-xr-x  3 ss ss 4096 Dec  9 13:55 ..
-drwxr-xr-x  3 ss ss 4096 Dec  9 13:55 arch
-drwxr-xr-x  2 ss ss 4096 Dec  9 13:55 crypto
-drwxr-xr-x 14 ss ss 4096 Dec  9 13:55 drivers
-drwxr-xr-x  4 ss ss 4096 Dec  9 13:55 fs
-drwxr-xr-x  4 ss ss 4096 Dec  9 13:55 lib
-drwxr-xr-x  2 ss ss 4096 Dec  9 13:55 mm
-drwxr-xr-x  3 ss ss 4096 Dec  9 13:55 net
-drwxr-xr-x  5 ss ss 4096 Dec  9 13:55 sound
-
-
-revert-the-revert
-
-git revert 7ea39801035a23
-[master 7b90890] Revert "Revert "kbuild: fix building bzImage with CONFIG_TRIM_UNUSED_KSYMS enabled""
-
-
-makepkg
-ls -la
-pkg/kernel-4.9.0-rc8-dbg-00087-g7b90890-dirty/lib/modules/4.9.0-rc8-dbg-00087-g7b90890-dirty/kernel/
-drwxr-xr-x 2 ss ss 4096 Dec  9 13:56 .
-drwxr-xr-x 3 ss ss 4096 Dec  9 13:56 ..
-
-
-not sure I see why...
-
-	-ss
+Regards,
+-Stanislav
