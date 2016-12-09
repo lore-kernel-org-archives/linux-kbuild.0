@@ -1,95 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg0-f67.google.com ([74.125.83.67]:36421 "EHLO
-        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752136AbcLIDdY (ORCPT
+Received: from mail-io0-f169.google.com ([209.85.223.169]:35055 "EHLO
+        mail-io0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932224AbcLIDkX (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 8 Dec 2016 22:33:24 -0500
-Date: Fri, 9 Dec 2016 13:33:08 +1000
-From: Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH] x86/kbuild: enable modversions for symbols exported
- from asm
-Message-ID: <20161209133308.0acbb57a@roar.ozlabs.ibm.com>
-In-Reply-To: <6e8cf20b-2d2f-ba1f-e02c-c757d5a25db7@suse.com>
-References: <20161129131922.GA31466@angband.pl>
-        <20161129135118.24696-1-kilobyte@angband.pl>
-        <CA+55aFyZiB4YkwvqzrXO=HD8bcnc2xHkAYrek2QHVnhVvAi3Fw@mail.gmail.com>
-        <30bb2db4-47bd-0c35-8328-ef032b551f06@suse.com>
-        <CA+55aFxOGw57Gm-QiNs13kfy5k=aRrn3+98415V0g73eGc66mg@mail.gmail.com>
-        <20161129195721.GI2697@decadent.org.uk>
-        <CA+55aFyQko0t8oMZjhnwhWHrmBUyWjGhsnT=oUOU-W7_04xdzw@mail.gmail.com>
-        <20161201051852.28dc335f@roar.ozlabs.ibm.com>
-        <CA+55aFzMTrLMrr69ipdaKhz+RJhUu3BxB+kg0689qq_470qEcw@mail.gmail.com>
-        <1480541581.16599.78.camel@decadent.org.uk>
-        <20161201125545.406d092c@roar.ozlabs.ibm.com>
-        <1480559754.16599.92.camel@decadent.org.uk>
-        <20161201143928.07a08348@roar.ozlabs.ibm.com>
-        <6e8cf20b-2d2f-ba1f-e02c-c757d5a25db7@suse.com>
+        Thu, 8 Dec 2016 22:40:23 -0500
+Received: by mail-io0-f169.google.com with SMTP id h30so36502292iod.2
+        for <linux-kbuild@vger.kernel.org>; Thu, 08 Dec 2016 19:40:23 -0800 (PST)
+Date: Thu, 8 Dec 2016 22:40:21 -0500 (EST)
+From: Nicolas Pitre <nicolas.pitre@linaro.org>
+Subject: Re: [regression ?] kbuild: fix building bzImage with CONFIG_TRIM_UNUSED_KSYMS
+ enabled
+In-Reply-To: <20161209025637.GC4661@jagdpanzerIV.localdomain>
+Message-ID: <alpine.LFD.2.20.1612082235510.1657@knanqh.ubzr>
+References: <20161209024357.GB4661@jagdpanzerIV.localdomain> <20161209025637.GC4661@jagdpanzerIV.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>
-Cc: Ben Hutchings <ben@decadent.org.uk>, Linus Torvalds <torvalds@linux-foundation.org>, Adam Borowski <kilobyte@angband.pl>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Debian kernel maintainers <debian-kernel@lists.debian.org>, "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Ingo Molnar <mingo@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Dodji Seketeli <dodji@seketeli.org>
+To: Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>
+Cc: Jarod Wilson <jarod@redhat.com>, Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Thu, 1 Dec 2016 17:12:41 +0100
-Michal Marek <mmarek@suse.com> wrote:
+On Fri, 9 Dec 2016, Sergey Senozhatsky wrote:
 
-> On 2016-12-01 04:39, Nicholas Piggin wrote:
-> > On Thu, 01 Dec 2016 02:35:54 +0000
-> > Ben Hutchings <ben@decadent.org.uk> wrote:  
-> >> As I understand it, genksyms incorporates the definitions of a
-> >> function's parameter and return types - not just their names - and all
-> >> the types they refer to, recursively.  So a structure size change
-> >> should change the version of all functions where the function and its
-> >> caller pass that structure between them, however indirectly.  It finds
-> >> such indirect ABI breakage for me fairly regularly, though of course I
-> >> don't know that it finds everything.  
+> On (12/09/16 11:43), Sergey Senozhatsky wrote:
 > > 
-> > It is only the type name.
-> > 
-> > Not only that but even if you did extend it further to structure type
-> > arrangement then you still have to deal with other structures followed
-> > via pointers. Or (rarer but not unheard of):
-> > 
-> > - changes to structures without changes of the types of their members
-> > - changes to arguments without changes of their type  
+> > after 53924022d8a ("kbuild: fix building bzImage withCONFIG_TRIM_UNUSED_KSYMS
+> > enabled") all of my build scripts build the kernel without the modules.
 > 
-> This is already covered by genksyms. Try make V=1 with
-> CONFIG_MODVERSIONS=y and add the -D option to one of the genksyms
-> command. I wanted to paste the expanded signature for
-> register_filesystem() as an example, but vger would probably drop the
-> mail for being too big :).
+> [..]
+> > +# For the kernel to actually contain only the needed exported symbols,
+> > +# we have to build modules as well to determine what those symbols are.
+> > +# (this can be evaluated only once include/config/auto.conf has been included)
+> 					^^^^^
+> 
+> ah, the config. so the patch is wrong.
 
-Well I simply tested the outcome. If you have:
+Furthermore, the export statement exports the variable not its value. 
+Even if the value is changed afterwards, referencing the exported 
+variable will see the new value.
 
-struct blah {
-  int x;
-};
-int foo(struct blah *blah)
-{
-  return blah->x;
-}
-EXPORT(foo);
+You can try out this little Makefile to prove it:
 
-$ nm vmlinux | grep __crc_foo
-00000000a0cf13a0 A __crc_foo
+FOOBAR := 0
+export FOOBAR
+FOOBAR := 1
+all:
+	echo FOOBAR is $$FOOBAR
 
-Now change to
 
-struct blah {
-  int y;
-  int x;
-};
-
-$ nm vmlinux | grep __crc_foo
-00000000a0cf13a0 A __crc_foo
-
-It just doesn't catch these things. Honestly, stable ABI distros *have*
-to review all patches to ensure the ABI is unchanged. Some tools could
-help significantly, but for that, the debug info ABI checking tools that
-have been mentioned in this thread are far better tool for this job than
-modversions.
-
-Thanks,
-Nick
+Nicolas
