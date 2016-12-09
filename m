@@ -1,90 +1,91 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg0-f68.google.com ([74.125.83.68]:35969 "EHLO
-        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752704AbcLIDu7 (ORCPT
+Received: from mail-pg0-f67.google.com ([74.125.83.67]:34745 "EHLO
+        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752850AbcLIE6w (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 8 Dec 2016 22:50:59 -0500
-Date: Fri, 9 Dec 2016 13:50:41 +1000
-From: Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH] x86/kbuild: enable modversions for symbols exported
- from asm
-Message-ID: <20161209135041.5ff12770@roar.ozlabs.ibm.com>
-In-Reply-To: <20161201152039.GB35881@redhat.com>
-References: <20161129135118.24696-1-kilobyte@angband.pl>
-        <CA+55aFyZiB4YkwvqzrXO=HD8bcnc2xHkAYrek2QHVnhVvAi3Fw@mail.gmail.com>
-        <30bb2db4-47bd-0c35-8328-ef032b551f06@suse.com>
-        <CA+55aFxOGw57Gm-QiNs13kfy5k=aRrn3+98415V0g73eGc66mg@mail.gmail.com>
-        <20161129195721.GI2697@decadent.org.uk>
-        <CA+55aFyQko0t8oMZjhnwhWHrmBUyWjGhsnT=oUOU-W7_04xdzw@mail.gmail.com>
-        <20161201051852.28dc335f@roar.ozlabs.ibm.com>
-        <CA+55aFzMTrLMrr69ipdaKhz+RJhUu3BxB+kg0689qq_470qEcw@mail.gmail.com>
-        <20161201041325.GX35881@redhat.com>
-        <20161201153215.43b6cec7@roar.ozlabs.ibm.com>
-        <20161201152039.GB35881@redhat.com>
+        Thu, 8 Dec 2016 23:58:52 -0500
+Date: Fri, 9 Dec 2016 13:58:57 +0900
+From: Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>
+Subject: Re: [regression ?] kbuild: fix building bzImage with
+ CONFIG_TRIM_UNUSED_KSYMS enabled
+Message-ID: <20161209045857.GD4661@jagdpanzerIV.localdomain>
+References: <20161209024357.GB4661@jagdpanzerIV.localdomain>
+ <20161209025637.GC4661@jagdpanzerIV.localdomain>
+ <alpine.LFD.2.20.1612082235510.1657@knanqh.ubzr>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <alpine.LFD.2.20.1612082235510.1657@knanqh.ubzr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Don Zickus <dzickus@redhat.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, skozina@redhat.com, Ben Hutchings <ben@decadent.org.uk>, Michal Marek <mmarek@suse.com>, Adam Borowski <kilobyte@angband.pl>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Debian kernel maintainers <debian-kernel@lists.debian.org>, "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Ingo Molnar <mingo@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Nicolas Pitre <nicolas.pitre@linaro.org>
+Cc: Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>, Jarod Wilson <jarod@redhat.com>, Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Thu, 1 Dec 2016 10:20:39 -0500
-Don Zickus <dzickus@redhat.com> wrote:
-
-> On Thu, Dec 01, 2016 at 03:32:15PM +1100, Nicholas Piggin wrote:
-> > > Anyway, MODVERSIONS is our way of protecting our kabi for the last 10 years.
-> > > It isn't perfect and we have fixed the genksyms tool over the years, but so
-> > > far it mostly works fine.  
+On (12/08/16 22:40), Nicolas Pitre wrote:
+> > > after 53924022d8a ("kbuild: fix building bzImage withCONFIG_TRIM_UNUSED_KSYMS
+> > > enabled") all of my build scripts build the kernel without the modules.
 > > 
-> > Okay. It would be good to get all the distros in on this.
+> > [..]
+> > > +# For the kernel to actually contain only the needed exported symbols,
+> > > +# we have to build modules as well to determine what those symbols are.
+> > > +# (this can be evaluated only once include/config/auto.conf has been included)
+> > 					^^^^^
 > > 
-> > What I want to do is work out exactly what it is that modversions is
-> > giving you.
-> > 
-> > We know it's fairly nasty code to maintain and it does not detect ABI
-> > changes very well. But it's not such a burden that we can't maintain
-> > it if there are good reasons to keep it.  
+> > ah, the config. so the patch is wrong.
 > 
-> Hi Nick,
-> 
-> I won't disagree with you there. :-)
+> Furthermore, the export statement exports the variable not its value. 
+> Even if the value is changed afterwards, referencing the exported 
+> variable will see the new value.
 
-Sorry for the late reply, I was moving house and got side tracked.
+yeah, need to investigate more. for some, unknown, reason
+modules_install gives me empty lib/modules.
 
-> modversions is a pretty heavy handed approach that basically says if all the
-> symbols and types haven't changed for a given EXPORT_SYMBOL (recursively
-> checked), then there is a high degree of confidence the OOT driver will not
-> only load, but run correctly.
+the build script (archlinux) builds it in 2 steps: build() and package().
+basically:
 
-It's heavy handed in that it is quite complex in the kernel build system,
-but it is also light handed in that it does not do a very good job.
+build:
+make -j4 > build_log 2>&1
 
-I would say the degree of confidence is not very high. People have told
-me modversions follows pointers to objects in its calculation, but I have
-not seen that to be the case. Even if you did have that, it can not replace
-a code review for semantics of data and code.
+package:
+make -j4 INSTALL_MOD_PATH="${pkgdir}" modules_install >> build_log 2>&1
 
-> The question is how to provide a similar guarantee if a different way?
 
-As a tool to aid distro reviewers, modversions has some value, but the
-debug info parsing tools that have been mentioned in this thread seem
-superior (not that I've tested them).
 
-> 
-> We have plenty of customers with 10 year old drivers, where the expertise
-> has long left the company.  The engineers still around, recompile and make
-> tweaks to get things working on the latest RHEL.  Verify it passes testing
-> and release it.  Then they hope to not touch it again for a few years until
-> the next RHEL comes along.
-> 
-> Scary, huh? :-)
+makepkg
+ls -la
+pkg/kernel-4.9.0-rc8-dbg-00085-ga37102d-dirty/lib/modules/4.9.0-rc8-dbg-00085-ga37102d-dirty/kernel/
+drwxr-xr-x 2 ss ss 4096 Dec  9 13:51 .
+drwxr-xr-x 3 ss ss 4096 Dec  9 13:51 ..
 
-Oh yeah my aim here is not to make distro or out of tree module vendors
-life harder, actually the opposite. If it turns out modversions really is
-the best approach, I'm not in a position to complain about its complexity
-because we have Suse and Redhat people maintaining the build and module
-systems :) I just want to see if we can do things better.
 
-Thanks,
-Nick
+git revert 865563924022d8
+makepkg
+ls -la pkg/kernel-4.9.0-rc8-dbg-00086-g7ea3980-dirty/lib/modules/4.9.0-rc8-dbg-00086-g7ea3980-dirty/kernel/
+drwxr-xr-x 10 ss ss 4096 Dec  9 13:55 .
+drwxr-xr-x  3 ss ss 4096 Dec  9 13:55 ..
+drwxr-xr-x  3 ss ss 4096 Dec  9 13:55 arch
+drwxr-xr-x  2 ss ss 4096 Dec  9 13:55 crypto
+drwxr-xr-x 14 ss ss 4096 Dec  9 13:55 drivers
+drwxr-xr-x  4 ss ss 4096 Dec  9 13:55 fs
+drwxr-xr-x  4 ss ss 4096 Dec  9 13:55 lib
+drwxr-xr-x  2 ss ss 4096 Dec  9 13:55 mm
+drwxr-xr-x  3 ss ss 4096 Dec  9 13:55 net
+drwxr-xr-x  5 ss ss 4096 Dec  9 13:55 sound
+
+
+revert-the-revert
+
+git revert 7ea39801035a23
+[master 7b90890] Revert "Revert "kbuild: fix building bzImage with CONFIG_TRIM_UNUSED_KSYMS enabled""
+
+
+makepkg
+ls -la
+pkg/kernel-4.9.0-rc8-dbg-00087-g7b90890-dirty/lib/modules/4.9.0-rc8-dbg-00087-g7b90890-dirty/kernel/
+drwxr-xr-x 2 ss ss 4096 Dec  9 13:56 .
+drwxr-xr-x 3 ss ss 4096 Dec  9 13:56 ..
+
+
+not sure I see why...
+
+	-ss
