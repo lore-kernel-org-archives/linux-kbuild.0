@@ -1,45 +1,83 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg0-f53.google.com ([74.125.83.53]:33898 "EHLO
-        mail-pg0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751121AbcLJAqp (ORCPT
+Received: from mail-pf0-f195.google.com ([209.85.192.195]:32991 "EHLO
+        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751359AbcLJHXA (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 9 Dec 2016 19:46:45 -0500
-Received: by mail-pg0-f53.google.com with SMTP id x23so13056175pgx.1
-        for <linux-kbuild@vger.kernel.org>; Fri, 09 Dec 2016 16:46:45 -0800 (PST)
-From: David Lin <dtwlin@google.com>
-Subject: [PATCH] jump label: pass kbuild_cflags when checking for asm goto support
-Date: Fri,  9 Dec 2016 16:46:38 -0800
-Message-Id: <20161210004638.23417-1-dtwlin@google.com>
+        Sat, 10 Dec 2016 02:23:00 -0500
+Date: Sat, 10 Dec 2016 16:23:05 +0900
+From: Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>
+Subject: Re: [regression ?] kbuild: fix building bzImage with
+ CONFIG_TRIM_UNUSED_KSYMS enabled
+Message-ID: <20161210072305.GA6394@jagdpanzerIV.localdomain>
+References: <20161209024357.GB4661@jagdpanzerIV.localdomain>
+ <20161209025637.GC4661@jagdpanzerIV.localdomain>
+ <alpine.LFD.2.20.1612082235510.1657@knanqh.ubzr>
+ <20161209045857.GD4661@jagdpanzerIV.localdomain>
+ <alpine.LFD.2.20.1612091302540.1657@knanqh.ubzr>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <alpine.LFD.2.20.1612091302540.1657@knanqh.ubzr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mmarek@suse.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, jbaron@akamai.com
-Cc: David Lin <dtwlin@google.com>
+To: Nicolas Pitre <nicolas.pitre@linaro.org>
+Cc: Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>, Jarod Wilson <jarod@redhat.com>, Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Sergey Senozhatsky <sergey.senozhatsky@gmail.com>
 
-Some versions of ARM GCC compiler such as Android toolchain throws in a
-'-fpic' flag by default. This causes the gcc-goto check script to fail
-although some config would have '-fno-pic' flag in the KBUILD_CFLAGS.
+On (12/09/16 13:07), Nicolas Pitre wrote:
+[..]
+> > build:
+> > make -j4 > build_log 2>&1
+> > 
+> > package:
+> > make -j4 INSTALL_MOD_PATH="${pkgdir}" modules_install >> build_log 2>&1
+> 
+> Weird.
 
-This patch passes the KBUILD_CFLAGS to the check script so that the
-script does not rely on the default config from different compilers.
+it is. sorry for long reply, it took me some time to track it down.
+turned out, the script also does `prepare' and `kernelrelease'. so
+the sequence of commands in my build script is
 
-Signed-off-by: David Lin <dtwlin@google.com>
----
- Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+	make prepare
+	make kernelrelease
+# functon build
+	make -j4
+# finction package
+	make -j4 INSTALL_MOD_PATH=XXXX modules_install
 
-diff --git a/Makefile b/Makefile
-index 694111b..f667daa 100644
---- a/Makefile
-+++ b/Makefile
-@@ -790,7 +790,7 @@ KBUILD_CFLAGS   += $(call cc-option,-Werror=incompatible-pointer-types)
- KBUILD_ARFLAGS := $(call ar-option,D)
- 
- # check for 'asm goto'
--ifeq ($(shell $(CONFIG_SHELL) $(srctree)/scripts/gcc-goto.sh $(CC)), y)
-+ifeq ($(shell $(CONFIG_SHELL) $(srctree)/scripts/gcc-goto.sh $(CC) $(KBUILD_CFLAGS)), y)
- 	KBUILD_CFLAGS += -DCC_HAVE_ASM_GOTO
- 	KBUILD_AFLAGS += -DCC_HAVE_ASM_GOTO
- endif
--- 
-2.10.2
 
+now. the problem here is that, apparently, and I didn't know that,
+"make prepare" and "make kernelrelease" are executed twice.
+
+- first time when I build the kernel
+ make prepare
+ make kernelrelease
+ make -j4
+
+- second time when I install the modules
+ make prepare
+ make kernelrelease
+ make -j4 INSTALL_MOD_PATH=XXXX modules_install
+
+
+so this will not install modules:
+ make prepare; make kernelrelease; make -j4; make prepare; make kernelrelease; make -j4 INSTALL_MOD_PATH=/tmp/MODULES modules_install
+
+and this will:
+ make prepare; make kernelrelease; make -j4; make kernelrelease; make -j4 INSTALL_MOD_PATH=/tmp/MODULES modules_install
+
+
+> You must have CONFIG_TRIM_UNUSED_KSYMS=y in your .config, right?
+
+yes.
+
+> What if you set it to n instead without reverting 865563924022d8. Do you 
+> still have the same issue?
+
+!CONFIG_TRIM_UNUSED_KSYMS or !865563924022d8 builds just fine with extra
+`make prepare'.
+no `extra make prepare' builds ok regardless the state of Makefile/config
+files.
+
+I guess you don't need my .config any more.
+
+	-ss
