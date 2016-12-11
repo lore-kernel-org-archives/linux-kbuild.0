@@ -1,78 +1,83 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from tartarus.angband.pl ([89.206.35.136]:35729 "EHLO
-        tartarus.angband.pl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751639AbcLKBJt (ORCPT
+Received: from mail-pg0-f66.google.com ([74.125.83.66]:36287 "EHLO
+        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752316AbcLKCT0 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 10 Dec 2016 20:09:49 -0500
-From: Adam Borowski <kilobyte@angband.pl>
-Date: Sun, 11 Dec 2016 02:09:18 +0100
-Message-Id: <20161211010918.16050-1-kilobyte@angband.pl>
-In-Reply-To: <20161211005211.GA11607@angband.pl>
-References: <20161211005211.GA11607@angband.pl>
-Subject: [PATCH v3 1/1] x86/kbuild: enable modversions for symbols exported from asm
+        Sat, 10 Dec 2016 21:19:26 -0500
+Date: Sun, 11 Dec 2016 11:19:18 +0900
+From: Sergey Senozhatsky <sergey.senozhatsky@gmail.com>
+Subject: Re: [regression ?] kbuild: fix building bzImage with
+ CONFIG_TRIM_UNUSED_KSYMS enabled
+Message-ID: <20161211021918.GA454@tigerII.localdomain>
+References: <20161209024357.GB4661@jagdpanzerIV.localdomain>
+ <20161209025637.GC4661@jagdpanzerIV.localdomain>
+ <alpine.LFD.2.20.1612082235510.1657@knanqh.ubzr>
+ <20161209045857.GD4661@jagdpanzerIV.localdomain>
+ <alpine.LFD.2.20.1612091302540.1657@knanqh.ubzr>
+ <20161210072305.GA6394@jagdpanzerIV.localdomain>
+ <alpine.LFD.2.20.1612101506520.1657@knanqh.ubzr>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <alpine.LFD.2.20.1612101506520.1657@knanqh.ubzr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann <arnd@arndb.de>, Ingo Molnar <mingo@kernel.org>, Nicholas Piggin <npiggin@gmail.com>
-Cc: Adam Borowski <kilobyte@angband.pl>
+To: Nicolas Pitre <nicolas.pitre@linaro.org>
+Cc: Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>, Jarod Wilson <jarod@redhat.com>, Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Sergey Senozhatsky <sergey.senozhatsky@gmail.com>
 
-Commit 4efca4ed ("kbuild: modversions for EXPORT_SYMBOL() for asm") adds
-modversion support for symbols exported from asm files. Architectures
-must include C-style declarations for those symbols in asm/asm-prototypes.h
-in order for them to be versioned.
+On (12/10/16 16:04), Nicolas Pitre wrote:
+> On Sat, 10 Dec 2016, Sergey Senozhatsky wrote:
+[..]
+> > so this will not install modules:
+> >  make prepare; make kernelrelease; make -j4; make prepare; make kernelrelease; make -j4 INSTALL_MOD_PATH=/tmp/MODULES modules_install
+> > 
+> > and this will:
+> >  make prepare; make kernelrelease; make -j4; make kernelrelease; make -j4 INSTALL_MOD_PATH=/tmp/MODULES modules_install
+> 
+> Right. And this is because of this in the main Makefile:
+> 
+> # Create temporary dir for module support files
+> # clean it up only when building all modules
+> cmd_crmodverdir = $(Q)mkdir -p $(MODVERDIR) \
+>                   $(if $(KBUILD_MODULES),; rm -f $(MODVERDIR)/*)
+> 
+> The list of modules to install is created from files found in 
+> $(MODVERDIR)/. This is cleared when KBUILD_MODULES is set.  Oddly 
+> enough, KBUILD_MODULES is _not_ globally set when building individual 
+> modules probably not to clear MODVERDIR. This requires explicit override 
+> like in this rule:
+> 
+> %.ko: prepare scripts FORCE
+> 	$(cmd_crmodverdir)
+> 	$(Q)$(MAKE) KBUILD_MODULES=$(if $(CONFIG_MODULES),1)  \
+> 	  $(build)=$(build-dir) $(@:.ko=.o)
+> 
+> One could wonder why $(cmd_crmodverdir) is executed again here given 
+> that it is already part of the "prepare" target, but that's an 
+> orthogonal issue.
+> 
+> Another question is whether or not KBUILD_MODULES is the right criteria 
+> for clearing MODVERDIR. My first reaction is to say it is not, but I 
+> can't come up with anything better at the moment.
+> 
+> And KBUILD_MODULES must be set for any target that results in 
+> vmlinux being built (and there are many of them including arch specific) 
+> whenever CONFIG_TRIM_UNUSED_KSYMS=y. Can this be enforced elsewhere in 
+> the Makefile, like in the recipe for $(vmlinux-dirs)? I don't know. IMHO 
+> this will only make things even less pretty than they are now.
+> 
+> In the mean time, though, I'm wondering why you have to do "make 
+> prepare" twice, or even at all.
 
-Add these declarations for x86, and an architecture-independent file that
-can be used for common symbols.
+well, not that I really wanted to execute it twice, it just was at
+the beginning of the build/packaging script that I touched some 6-7
+years ago.
 
-With f27c2f6 reverting 8ab2ae6 ("default exported asm symbols to zero") we
-produce a scary warning on x86, this commit fixes that.
+> So, given all the above considerations, would it be possible for you to 
+> "fix" your build script instead?
 
-Signed-off-by: Adam Borowski <kilobyte@angband.pl>
-Tested-by: Kalle Valo <kvalo@codeaurora.org>
-Acked-by: Nicholas Piggin <npiggin@gmail.com>
-Tested-by: Peter Wu <peter@lekensteyn.nl>
-Tested-by: Oliver Hartkopp <socketcan@hartkopp.net>
----
- arch/x86/include/asm/asm-prototypes.h | 16 ++++++++++++++++
- include/asm-generic/asm-prototypes.h  |  7 +++++++
- 2 files changed, 23 insertions(+)
- create mode 100644 arch/x86/include/asm/asm-prototypes.h
- create mode 100644 include/asm-generic/asm-prototypes.h
+sure.
 
-diff --git a/arch/x86/include/asm/asm-prototypes.h b/arch/x86/include/asm/asm-prototypes.h
-new file mode 100644
-index 000000000000..44b8762fa0c7
---- /dev/null
-+++ b/arch/x86/include/asm/asm-prototypes.h
-@@ -0,0 +1,16 @@
-+#include <asm/ftrace.h>
-+#include <asm/uaccess.h>
-+#include <asm/string.h>
-+#include <asm/page.h>
-+#include <asm/checksum.h>
-+
-+#include <asm-generic/asm-prototypes.h>
-+
-+#include <asm/page.h>
-+#include <asm/pgtable.h>
-+#include <asm/special_insns.h>
-+#include <asm/preempt.h>
-+
-+#ifndef CONFIG_X86_CMPXCHG64
-+extern void cmpxchg8b_emu(void);
-+#endif
-diff --git a/include/asm-generic/asm-prototypes.h b/include/asm-generic/asm-prototypes.h
-new file mode 100644
-index 000000000000..df13637e4017
---- /dev/null
-+++ b/include/asm-generic/asm-prototypes.h
-@@ -0,0 +1,7 @@
-+#include <linux/bitops.h>
-+extern void *__memset(void *, int, __kernel_size_t);
-+extern void *__memcpy(void *, const void *, __kernel_size_t);
-+extern void *__memmove(void *, const void *, __kernel_size_t);
-+extern void *memset(void *, int, __kernel_size_t);
-+extern void *memcpy(void *, const void *, __kernel_size_t);
-+extern void *memmove(void *, const void *, __kernel_size_t);
--- 
-2.11.0
+thanks.
 
+	-ss
