@@ -1,40 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:40681 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:36453 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752089AbcLKLcZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 11 Dec 2016 06:32:25 -0500
-Date: Sun, 11 Dec 2016 12:32:22 +0100
+        id S1753620AbcLKUmU (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Sun, 11 Dec 2016 15:42:20 -0500
+Date: Sun, 11 Dec 2016 21:42:16 +0100
 From: Michal Marek <mmarek@suse.com>
-Subject: Re: [PATCH] kconfig/nconf: Fix hang when editing symbol with a long
- prompt
-Message-ID: <20161211113222.GE30135@sepie.suse.cz>
-References: <1480025423.1860.87.camel@codethink.co.uk>
+Subject: Re: [PATCH 1/2] xconfig: fix 'Show Debug' functionality
+Message-ID: <20161211204216.GA3812@sepie.suse.cz>
+References: <fb990a5d-c9c5-5b37-0e59-d5df19f64c67@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1480025423.1860.87.camel@codethink.co.uk>
+In-Reply-To: <fb990a5d-c9c5-5b37-0e59-d5df19f64c67@infradead.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ben Hutchings <ben.hutchings@codethink.co.uk>
-Cc: "Yann E. MORIN" <yann.morin.1998@free.fr>, linux-kbuild@vger.kernel.org
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.cz>, Jason Vas Dias <jason.vas.dias@gmail.com>, Boris Barbulovski <bbarbulovski@gmail.com>
 
-On Thu, Nov 24, 2016 at 10:10:23PM +0000, Ben Hutchings wrote:
-> Currently it is impossible to edit the value of a config symbol with a
-> prompt longer than (terminal width - 2) characters.  dialog_inputbox()
-> calculates a negative x-offset for the input window and newwin() fails
-> as this is invalid.  It also doesn't check for this failure, so it
-> busy-loops calling wgetch(NULL) which immediately returns -1.
+On Wed, Nov 30, 2016 at 02:57:52PM -0800, Randy Dunlap wrote:
+> From: Boris Barbulovski <bbarbulovski@gmail.com>
 > 
-> The additions in the offset calculations also don't match the intended
-> size of the window.
+> xconfig - Fix missing 'Show Debug' functionality.
 > 
-> Limit the window size and calculate the offset similarly to
-> show_scroll_win().
+> xconfig Help mentions 'Show Debug Info' but it was missing from any
+> menu.
 > 
-> Cc: stable <stable@vger.kernel.org>
-> Fixes: 692d97c380c6 ("kconfig: new configuration interface (nconfig)")
-> Signed-off-by: Ben Hutchings <ben.hutchings@codethink.co.uk>
+> * Add 'Show debug' menu to the main menu.
+> * Properly load showDebug settings.
+> 
+> Reported-by: Jason Vas Dias <jason.vas.dias@gmail.com>
+> Signed-off-by: Boris Barbulovski <bbarbulovski@gmail.com>
+> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+> Tested-by: Randy Dunlap <rdunlap@infradead.org>
 
-Applied to kbuild.git#kconfig, thanks.
+Applied to kbuild.git#kconfig.
 
 Michal
