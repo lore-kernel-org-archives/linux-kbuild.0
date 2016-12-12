@@ -1,42 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from benson.default.arb33.uk0.bigv.io ([46.43.0.16]:37273 "EHLO
-        benson.default.arb33.uk0.bigv.io" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1751266AbcLLJIu (ORCPT
+Received: from mailout1.samsung.com ([203.254.224.24]:37727 "EHLO
+        mailout1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754103AbcLLJiC (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 12 Dec 2016 04:08:50 -0500
-Message-ID: <1481533697.3883.24.camel@hellion.org.uk>
-Subject: Re: [PATCH] x86/kbuild: enable modversions for symbols exported
- from asm
-From: Ian Campbell <ijc@hellion.org.uk>
-Date: Mon, 12 Dec 2016 09:08:17 +0000
-In-Reply-To: <20161210124103.GD21421@kroah.com>
-References: <CA+55aFzMTrLMrr69ipdaKhz+RJhUu3BxB+kg0689qq_470qEcw@mail.gmail.com>
-         <1480541581.16599.78.camel@decadent.org.uk>
-         <20161201125545.406d092c@roar.ozlabs.ibm.com>
-         <1480559754.16599.92.camel@decadent.org.uk>
-         <20161201143928.07a08348@roar.ozlabs.ibm.com>
-         <6e8cf20b-2d2f-ba1f-e02c-c757d5a25db7@suse.com>
-         <20161209133308.0acbb57a@roar.ozlabs.ibm.com>
-         <1481296893.4509.135.camel@hellion.org.uk>
-         <20161210021529.4a6e684f@roar.ozlabs.ibm.com> <86vaus3eld.fsf@seketeli.org>
-         <20161210124103.GD21421@kroah.com>
-Content-Type: text/plain; charset="ISO-8859-1"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        Mon, 12 Dec 2016 04:38:02 -0500
+From: Maninder Singh <maninder1.s@samsung.com>
+Subject: [PATCH 1/1] kasan: Support for r/w instrumentation control
+Date: Mon, 12 Dec 2016 15:02:37 +0530
+Message-id: <1481535157-24628-1-git-send-email-maninder1.s@samsung.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Dodji Seketeli <dodji@seketeli.org>
-Cc: Nicholas Piggin <npiggin@gmail.com>, Michal Marek <mmarek@suse.com>, Ben Hutchings <ben@decadent.org.uk>, Linus Torvalds <torvalds@linux-foundation.org>, Adam Borowski <kilobyte@angband.pl>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Debian kernel maintainers <debian-kernel@lists.debian.org>, "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Ingo Molnar <mingo@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: mmarek@suse.com, aryabinin@virtuozzo.com, glider@google.com, dvyukov@google.com, akpm@linux-foundation.org
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, kasan-dev@googlegroups.com, pankaj.m@samsung.com, ajeet.y@samsung.com, Maninder Singh <maninder1.s@samsung.com>, Vaneet narang <v.narang@samsung.com>
 
-On Sat, 2016-12-10 at 13:41 +0100, Greg Kroah-Hartman wrote:
-> Now I don't work on a distro anymore, but I would think that something
-> like this would be really useful, pointing out exactly what changed is
-> very important for distro maintainers to determine what they want to do
+This provide option to control sanity of read and write operations
+Both read and write instrumentation increase size of uImage, So using
+this option read or write instrumentation can be avoided if not required.
+Useful in case of module sanity, using this uImage sanity can be avoided.
 
-The .symvers produced by the current scheme aren't completely useless
-from this PoV, although they aren't ideal since you need both before an
-d after trees and if the changes are large or far reaching the diff can
-get a bit unwieldy, so better tooling which points directly to the
-actual relevant change would be no bad thing.
+Also user space ASAN provides this support for read/write instrumentation
+control.
 
-Ian.
+Signed-off-by: Vaneet narang <v.narang@samsung.com>
+Signed-off-by: Maninder Singh <maninder1.s@samsung.com>
+Reviewed-by: Ajeet Yadav <ajeet.y@samsung.com>
+---
+ lib/Kconfig.kasan      | 16 ++++++++++++++++
+ scripts/Makefile.kasan |  4 ++++
+ 2 files changed, 20 insertions(+)
+
+diff --git a/lib/Kconfig.kasan b/lib/Kconfig.kasan
+index bd38aab..6f0f774 100644
+--- a/lib/Kconfig.kasan
++++ b/lib/Kconfig.kasan
+@@ -45,6 +45,22 @@ config KASAN_INLINE
+ 
+ endchoice
+ 
++config KASAN_READS
++		prompt "Read instrumentation"
++		bool
++		default y
++		depends on KASAN
++		help
++			This configuration controls the sanity of  memory read.
++
++config KASAN_WRITES
++		prompt "Write instrumentation"
++		bool
++		default y
++		depends on KASAN
++		help
++			This configuration controls the sanity of memory write.
++
+ config TEST_KASAN
+ 	tristate "Module for testing kasan for bug detection"
+ 	depends on m && KASAN
+diff --git a/scripts/Makefile.kasan b/scripts/Makefile.kasan
+index 37323b0..a61b18e 100644
+--- a/scripts/Makefile.kasan
++++ b/scripts/Makefile.kasan
+@@ -29,3 +29,7 @@ else
+     endif
+ endif
+ endif
++
++CFLAGS_KASAN += $(call cc-option, \
++		$(if $(CONFIG_KASAN_READS),, --param asan-instrument-reads=0) \
++		$(if $(CONFIG_KASAN_WRITES),, --param asan-instrument-writes=0))
+-- 
+1.9.1
+
