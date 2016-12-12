@@ -1,96 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f42.google.com ([74.125.82.42]:38183 "EHLO
-        mail-wm0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753901AbcLLKF7 (ORCPT
+Received: from mailout4.samsung.com ([203.254.224.34]:56030 "EHLO
+        mailout4.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754143AbcLLK3U (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 12 Dec 2016 05:05:59 -0500
-Received: by mail-wm0-f42.google.com with SMTP id f82so59319351wmf.1
-        for <linux-kbuild@vger.kernel.org>; Mon, 12 Dec 2016 02:05:58 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <1481535157-24628-1-git-send-email-maninder1.s@samsung.com>
+        Mon, 12 Dec 2016 05:29:20 -0500
+Received: from epcas2p2.samsung.com (unknown [182.195.41.54])
+ by mailout4.samsung.com
+ (Oracle Communications Messaging Server 7.0.5.31.0 64bit (built May  5 2014))
+ with ESMTP id <0OI201E1DIGUBG90@mailout4.samsung.com> for
+ linux-kbuild@vger.kernel.org; Mon, 12 Dec 2016 19:29:18 +0900 (KST)
+MIME-version: 1.0
+Subject: =?UTF-8?B?UkU6IFJlOiBbUEFUQ0ggMS8xXSBrYXNhbjogU3VwcG9ydCBm?=
+ =?UTF-8?B?b3Igci93IGluc3RydW1lbnRhdGlvbiBjb250cm9s?=
+Reply-to: v.narang@samsung.com
+From: =?UTF-8?B?VmFuZWV0IE5hcmFuZw==?= <v.narang@samsung.com>
+Message-id: <20161212102905epcms5p4ae1ddc2405b942e2d65e5cda4bc4abd4@epcms5p4>
+Date: Mon, 12 Dec 2016 10:29:05 +0000
+Content-type: multipart/related;
+ boundary="----=_Part_550024_1693315363.1481538545539"
 References: <1481535157-24628-1-git-send-email-maninder1.s@samsung.com>
-From: Dmitry Vyukov <dvyukov@google.com>
-Date: Mon, 12 Dec 2016 11:05:37 +0100
-Message-ID: <CACT4Y+aXgQHrLWHmNdHKPef5VBVHE2zBULyi0GNk3z_nvy67ow@mail.gmail.com>
-Subject: Re: [PATCH 1/1] kasan: Support for r/w instrumentation control
-Content-Type: text/plain; charset=UTF-8
+ <CGME20161212100600epcas4p2417928d125eb8b25589023cf0fdb733f@epcas4p2.samsung.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Maninder Singh <maninder1.s@samsung.com>
-Cc: Michal Marek <mmarek@suse.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Andrew Morton <akpm@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, "open list:KERNEL BUILD + fi..." <linux-kbuild@vger.kernel.org>, kasan-dev <kasan-dev@googlegroups.com>, pankaj.m@samsung.com, ajeet.y@samsung.com, Vaneet narang <v.narang@samsung.com>
+To: =?UTF-8?B?RG1pdHJ5IFZ5dWtvdg==?= <dvyukov@google.com>, =?UTF-8?B?TWFuaW5kZXIgU2luZ2g=?= <maninder1.s@samsung.com>
+Cc: =?UTF-8?B?TWljaGFsIE1hcmVr?= <mmarek@suse.com>, =?UTF-8?B?QW5kcmV5IFJ5YWJpbmlu?= <aryabinin@virtuozzo.com>, =?UTF-8?B?QWxleGFuZGVyIFBvdGFwZW5rbw==?= <glider@google.com>, =?UTF-8?B?QW5kcmV3IE1vcnRvbg==?= <akpm@linux-foundation.org>, =?UTF-8?B?TEtNTA==?= <linux-kernel@vger.kernel.org>, =?UTF-8?B?b3BlbiBsaXN0OktFUk5FTCBCVUlMRCArIGZpLi4u?= <linux-kbuild@vger.kernel.org>, =?UTF-8?B?a2FzYW4tZGV2?= <kasan-dev@googlegroups.com>, =?UTF-8?B?UEFOS0FKIE1JU0hSQQ==?= <pankaj.m@samsung.com>, =?UTF-8?B?QWplZXQgS3VtYXIgWWFkYXY=?= <ajeet.y@samsung.com>
 
-On Mon, Dec 12, 2016 at 10:32 AM, Maninder Singh
-<maninder1.s@samsung.com> wrote:
-> This provide option to control sanity of read and write operations
-> Both read and write instrumentation increase size of uImage, So using
-> this option read or write instrumentation can be avoided if not required.
-> Useful in case of module sanity, using this uImage sanity can be avoided.
->
-> Also user space ASAN provides this support for read/write instrumentation
-> control.
+------=_Part_550024_1693315363.1481538545539
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="utf-8"
 
-Hi,
-
-Do you actually hit an issue with image size? In what context?
-Do you use inline/outline instrumentation? Does switching to the other
-option help?
-Does it make sense to ever disable writes? I assume that you are
-disabling reads, right?
-Disabling both certainly does not make sense.
-
-
-> Signed-off-by: Vaneet narang <v.narang@samsung.com>
-> Signed-off-by: Maninder Singh <maninder1.s@samsung.com>
-> Reviewed-by: Ajeet Yadav <ajeet.y@samsung.com>
-> ---
->  lib/Kconfig.kasan      | 16 ++++++++++++++++
->  scripts/Makefile.kasan |  4 ++++
->  2 files changed, 20 insertions(+)
->
-> diff --git a/lib/Kconfig.kasan b/lib/Kconfig.kasan
-> index bd38aab..6f0f774 100644
-> --- a/lib/Kconfig.kasan
-> +++ b/lib/Kconfig.kasan
-> @@ -45,6 +45,22 @@ config KASAN_INLINE
->
->  endchoice
->
-> +config KASAN_READS
-> +               prompt "Read instrumentation"
-> +               bool
-> +               default y
-> +               depends on KASAN
-> +               help
-> +                       This configuration controls the sanity of  memory read.
-
-/\/\/\
-
-double space in "of  memory"
-
-> +
-> +config KASAN_WRITES
-> +               prompt "Write instrumentation"
-> +               bool
-> +               default y
-> +               depends on KASAN
-> +               help
-> +                       This configuration controls the sanity of memory write.
-> +
->  config TEST_KASAN
->         tristate "Module for testing kasan for bug detection"
->         depends on m && KASAN
-> diff --git a/scripts/Makefile.kasan b/scripts/Makefile.kasan
-> index 37323b0..a61b18e 100644
-> --- a/scripts/Makefile.kasan
-> +++ b/scripts/Makefile.kasan
-> @@ -29,3 +29,7 @@ else
->      endif
->  endif
->  endif
-> +
-> +CFLAGS_KASAN += $(call cc-option, \
-> +               $(if $(CONFIG_KASAN_READS),, --param asan-instrument-reads=0) \
-> +               $(if $(CONFIG_KASAN_WRITES),, --param asan-instrument-writes=0))
-> --
-> 1.9.1
->
+wqBIaSwNCg0KPiBEbyB5b3UgYWN0dWFsbHkgaGl0IGFuIGlzc3VlIHdpdGggaW1hZ2Ugc2l6ZT8g
+SW4gd2hhdCBjb250ZXh0Pw0KPiBEbyB5b3UgdXNlIGlubGluZS9vdXRsaW5lIGluc3RydW1lbnRh
+dGlvbj8gRG9lcyBzd2l0Y2hpbmcgdG8gdGhlIG90aGVyDQo+IG9wdGlvbiBoZWxwPw0KDQpNZW1v
+cnkgYWNjZXNzIHdpdGggS0FTQU4gZW5hYmxlZCBJbWFnZSBoYXMgb3ZlcmhlYWQgaW4gdGVybXMg
+b2YgY3B1IGV4ZWN1dGlvbi4NClNvbWV0aW1lcyB3ZSBhcmUgbm90IGFibGUgdG8gcmVwcm9kdWNl
+IHJhY2UgY29uZGl0aW9uIGlzc3VlcyB3aXRoIHRoZXNlIG92ZXJoZWFkIGluDQpwbGFjZS4gU28g
+dXNlciBzaG91bGQgaGF2ZSBjb250cm9sIGF0bGVhc3Qgb3ZlciByZWFkIGluc3RydW1lbnRhdGlv
+bi4NCg0KPiBEb2VzIGl0IG1ha2Ugc2Vuc2UgdG8gZXZlciBkaXNhYmxlIHdyaXRlcz8gSSBhc3N1
+bWUgdGhhdCB5b3UgYXJlDQoNCldyaXRlIGluc3RydW1lbnRhdGlvbiBjb250cm9sIGlzIG1ham9y
+bHkga2VwdCB0byBiZSBpbmxpbmUgd2l0aCBBU0FOIGZvciB1c2VyIHNwYWNlIA0KYXBwbGljYXRp
+b25zLiANCkFsc28gd3JpdGUgaXMgc29tZXRpbWVzIHVzZWZ1bCB3aGVuIHVJbWFnZSBpcyBhbHJl
+YWR5IHNhbml0aXplZCBhbmQgc29tZSBjb3JydXB0aW9uDQppcyBkb25lIGJ5IGtlcm5lbCBtb2R1
+bGVzIGJ5IGRvaW5nIHNvbWUgZGlyZWN0IG1lbW9yeSBhY2Nlc3MgdGhlbiBib3RoIHJlYWQgLyB3
+cml0ZSBzYW5pdHkgb2YgdUltYWdlIA0KY2FuIGJlIGF2b2lkZWQuDQoNCj4gZGlzYWJsaW5nIHJl
+YWRzLCByaWdodD8NCj4gRGlzYWJsaW5nIGJvdGggY2VydGFpbmx5IGRvZXMgbm90IG1ha2Ugc2Vu
+c2UuDQoNClJlZ2FyZHMsDQpWYW5lZXQgTmFyYW5nDQo=
+------=_Part_550024_1693315363.1481538545539--
