@@ -1,60 +1,96 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:34878 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S932313AbcLLJsy (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 12 Dec 2016 04:48:54 -0500
-Subject: Re: [PATCH] x86/kbuild: enable modversions for symbols exported from
- asm
-References: <20161201051852.28dc335f@roar.ozlabs.ibm.com>
- <CA+55aFzMTrLMrr69ipdaKhz+RJhUu3BxB+kg0689qq_470qEcw@mail.gmail.com>
- <20161201041325.GX35881@redhat.com>
- <20161201153215.43b6cec7@roar.ozlabs.ibm.com>
- <20161201152039.GB35881@redhat.com>
- <20161209135041.5ff12770@roar.ozlabs.ibm.com>
- <0937c184-1946-c494-56b6-c38fd0b632c2@redhat.com>
- <20161209181459.1f0a4fed@roar.ozlabs.ibm.com>
- <249321c0-bcb1-f9d8-50f4-c083b656d02e@redhat.com>
- <20161210015653.5b0dc872@roar.ozlabs.ibm.com>
- <20161209160337.GA3061@kroah.com>
-From: Stanislav Kozina <skozina@redhat.com>
-Message-ID: <6c3ba78e-a858-2529-5428-e7750f2d2d97@redhat.com>
-Date: Mon, 12 Dec 2016 10:48:47 +0100
+Received: from mail-wm0-f42.google.com ([74.125.82.42]:38183 "EHLO
+        mail-wm0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753901AbcLLKF7 (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 12 Dec 2016 05:05:59 -0500
+Received: by mail-wm0-f42.google.com with SMTP id f82so59319351wmf.1
+        for <linux-kbuild@vger.kernel.org>; Mon, 12 Dec 2016 02:05:58 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20161209160337.GA3061@kroah.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <1481535157-24628-1-git-send-email-maninder1.s@samsung.com>
+References: <1481535157-24628-1-git-send-email-maninder1.s@samsung.com>
+From: Dmitry Vyukov <dvyukov@google.com>
+Date: Mon, 12 Dec 2016 11:05:37 +0100
+Message-ID: <CACT4Y+aXgQHrLWHmNdHKPef5VBVHE2zBULyi0GNk3z_nvy67ow@mail.gmail.com>
+Subject: Re: [PATCH 1/1] kasan: Support for r/w instrumentation control
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Nicholas Piggin <npiggin@gmail.com>
-Cc: Don Zickus <dzickus@redhat.com>, Linus Torvalds <torvalds@linux-foundation.org>, Ben Hutchings <ben@decadent.org.uk>, Michal Marek <mmarek@suse.com>, Adam Borowski <kilobyte@angband.pl>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Debian kernel maintainers <debian-kernel@lists.debian.org>, "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Ingo Molnar <mingo@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Maninder Singh <maninder1.s@samsung.com>
+Cc: Michal Marek <mmarek@suse.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Andrew Morton <akpm@linux-foundation.org>, LKML <linux-kernel@vger.kernel.org>, "open list:KERNEL BUILD + fi..." <linux-kbuild@vger.kernel.org>, kasan-dev <kasan-dev@googlegroups.com>, pankaj.m@samsung.com, ajeet.y@samsung.com, Vaneet narang <v.narang@samsung.com>
 
->>>> A runtime check is still done, with per-module vermagic which distros
->>>> can change when they bump the ABI version. Is it really necessary to
->>>> have more than that (i.e., per-symbol versioning)?
->>>   From my point of view, it is. We need to allow changing ABI for some
->>> modules while maintaining it for others.
->>> In fact I think that there should be version not only for every exported
->>> symbol (in the EXPORT_SYMBOL() sense), but also for every public type
->>> (in the sense of eg. structure defined in the public header file).
->> Well the distro can just append _v2, _v3 to the name of the function
->> or type if it has to break compat for some reason. Would that be enough?
-> There are other ways that distros can work around when upstream "breaks"
-> the ABI, sometimes they can rename functions, and others they can
-> "preload" structures with padding in anticipation for when/if fields get
-> added to them.  But that's all up to the distros, no need for us to
-> worry about that at all :)
+On Mon, Dec 12, 2016 at 10:32 AM, Maninder Singh
+<maninder1.s@samsung.com> wrote:
+> This provide option to control sanity of read and write operations
+> Both read and write instrumentation increase size of uImage, So using
+> this option read or write instrumentation can be avoided if not required.
+> Useful in case of module sanity, using this uImage sanity can be avoided.
+>
+> Also user space ASAN provides this support for read/write instrumentation
+> control.
 
-Currently, the ABI version (checksum) is stored outside of the actual 
-code in the __ksymtab section. That means that the distributions can 
-still apply upstream patches cleanly and only update the version 
-checksum if these break ABI.
+Hi,
 
-With the _v2, _v3 suffixes (or similar solutions) we'd be effectively 
-storing the ABI versions directly in the code and that would cause 
-conflicts when pulling further patches from upstream.
+Do you actually hit an issue with image size? In what context?
+Do you use inline/outline instrumentation? Does switching to the other
+option help?
+Does it make sense to ever disable writes? I assume that you are
+disabling reads, right?
+Disabling both certainly does not make sense.
 
-My view is that it would be than easier to maintain out-of-tree 
-modversions (or similar tool) rather than to solve all these conflicts.
 
-Warm Regards,
--Stanislav
+> Signed-off-by: Vaneet narang <v.narang@samsung.com>
+> Signed-off-by: Maninder Singh <maninder1.s@samsung.com>
+> Reviewed-by: Ajeet Yadav <ajeet.y@samsung.com>
+> ---
+>  lib/Kconfig.kasan      | 16 ++++++++++++++++
+>  scripts/Makefile.kasan |  4 ++++
+>  2 files changed, 20 insertions(+)
+>
+> diff --git a/lib/Kconfig.kasan b/lib/Kconfig.kasan
+> index bd38aab..6f0f774 100644
+> --- a/lib/Kconfig.kasan
+> +++ b/lib/Kconfig.kasan
+> @@ -45,6 +45,22 @@ config KASAN_INLINE
+>
+>  endchoice
+>
+> +config KASAN_READS
+> +               prompt "Read instrumentation"
+> +               bool
+> +               default y
+> +               depends on KASAN
+> +               help
+> +                       This configuration controls the sanity of  memory read.
+
+/\/\/\
+
+double space in "of  memory"
+
+> +
+> +config KASAN_WRITES
+> +               prompt "Write instrumentation"
+> +               bool
+> +               default y
+> +               depends on KASAN
+> +               help
+> +                       This configuration controls the sanity of memory write.
+> +
+>  config TEST_KASAN
+>         tristate "Module for testing kasan for bug detection"
+>         depends on m && KASAN
+> diff --git a/scripts/Makefile.kasan b/scripts/Makefile.kasan
+> index 37323b0..a61b18e 100644
+> --- a/scripts/Makefile.kasan
+> +++ b/scripts/Makefile.kasan
+> @@ -29,3 +29,7 @@ else
+>      endif
+>  endif
+>  endif
+> +
+> +CFLAGS_KASAN += $(call cc-option, \
+> +               $(if $(CONFIG_KASAN_READS),, --param asan-instrument-reads=0) \
+> +               $(if $(CONFIG_KASAN_WRITES),, --param asan-instrument-writes=0))
+> --
+> 1.9.1
+>
