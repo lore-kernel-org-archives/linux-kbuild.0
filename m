@@ -1,91 +1,78 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-db5eur01on0115.outbound.protection.outlook.com ([104.47.2.115]:20043
-        "EHLO EUR01-DB5-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S932277AbcLMPbq (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 13 Dec 2016 10:31:46 -0500
-Subject: Re: [PATCH v2] kasan: Support for r/w instrumentation control
-References: <1481608665-26941-1-git-send-email-maninder1.s@samsung.com>
- <CACT4Y+bQLjn23Vdsyq-gZY55RA+=tRYpq3DwHdu5vQLKbNBykA@mail.gmail.com>
- <6cc0eadc-5204-ce36-f5e8-88ba76bb6826@virtuozzo.com>
- <CACT4Y+Zu9QAYNh3=nnwiRNd6C5sxS1WGR=93ovmZs0hWkucPow@mail.gmail.com>
- <e08cfce3-ef28-3c34-4cef-9ebca8769050@virtuozzo.com>
- <CACT4Y+atLpDCfNHP-WcVb3RqsyMyOij+6M4rg09bw_VooranOg@mail.gmail.com>
-From: Andrey Ryabinin <aryabinin@virtuozzo.com>
-Message-ID: <0889b8c5-0e26-2002-b015-497294fa171b@virtuozzo.com>
-Date: Tue, 13 Dec 2016 18:29:28 +0300
+Received: from mx2.suse.de ([195.135.220.15]:40011 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751742AbcLMWvH (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 13 Dec 2016 17:51:07 -0500
+Subject: Re: [PATCH] x86/kbuild: enable modversions for symbols exported from
+ asm
+References: <20161129131922.GA31466@angband.pl>
+ <20161129135118.24696-1-kilobyte@angband.pl>
+ <CA+55aFyZiB4YkwvqzrXO=HD8bcnc2xHkAYrek2QHVnhVvAi3Fw@mail.gmail.com>
+ <30bb2db4-47bd-0c35-8328-ef032b551f06@suse.com>
+ <CA+55aFxOGw57Gm-QiNs13kfy5k=aRrn3+98415V0g73eGc66mg@mail.gmail.com>
+ <20161129195721.GI2697@decadent.org.uk>
+ <CA+55aFyQko0t8oMZjhnwhWHrmBUyWjGhsnT=oUOU-W7_04xdzw@mail.gmail.com>
+ <20161201051852.28dc335f@roar.ozlabs.ibm.com>
+ <CA+55aFzMTrLMrr69ipdaKhz+RJhUu3BxB+kg0689qq_470qEcw@mail.gmail.com>
+ <1480541581.16599.78.camel@decadent.org.uk>
+ <20161201125545.406d092c@roar.ozlabs.ibm.com>
+ <1480559754.16599.92.camel@decadent.org.uk>
+ <20161201143928.07a08348@roar.ozlabs.ibm.com>
+ <6e8cf20b-2d2f-ba1f-e02c-c757d5a25db7@suse.com>
+ <20161209133308.0acbb57a@roar.ozlabs.ibm.com>
+ <1481296893.4509.135.camel@hellion.org.uk>
+ <20161210021529.4a6e684f@roar.ozlabs.ibm.com> <86vaus3eld.fsf@seketeli.org>
+From: Michal Marek <mmarek@suse.com>
+Message-ID: <f7c5d50d-8930-7ab1-62bb-8a5d0aead988@suse.com>
+Date: Tue, 13 Dec 2016 23:51:00 +0100
 MIME-Version: 1.0
-In-Reply-To: <CACT4Y+atLpDCfNHP-WcVb3RqsyMyOij+6M4rg09bw_VooranOg@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <86vaus3eld.fsf@seketeli.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dmitry Vyukov <dvyukov@google.com>
-Cc: Maninder Singh <maninder1.s@samsung.com>, Alexander Potapenko <glider@google.com>, Jonathan Corbet <corbet@lwn.net>, Michal Marek <mmarek@suse.com>, Andrew Morton <akpm@linux-foundation.org>, kasan-dev <kasan-dev@googlegroups.com>, linux-doc@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, "open list:KERNEL BUILD + fi..." <linux-kbuild@vger.kernel.org>, PANKAJ MISHRA <pankaj.m@samsung.com>, Ajeet Kumar Yadav <ajeet.y@samsung.com>, Vaneet narang <v.narang@samsung.com>
+To: Dodji Seketeli <dodji@seketeli.org>, Nicholas Piggin <npiggin@gmail.com>
+Cc: Ian Campbell <ijc@hellion.org.uk>, Ben Hutchings <ben@decadent.org.uk>, Linus Torvalds <torvalds@linux-foundation.org>, Adam Borowski <kilobyte@angband.pl>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Debian kernel maintainers <debian-kernel@lists.debian.org>, "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Ingo Molnar <mingo@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-
-
-On 12/13/2016 05:13 PM, Dmitry Vyukov wrote:
-> On Tue, Dec 13, 2016 at 2:59 PM, Andrey Ryabinin
-> <aryabinin@virtuozzo.com> wrote:
->> On 12/13/2016 12:38 PM, Dmitry Vyukov wrote:
->>> On Tue, Dec 13, 2016 at 10:20 AM, Andrey Ryabinin
->>> <aryabinin@virtuozzo.com> wrote:
->>>>
->>>>
->>>> On 12/13/2016 11:58 AM, Dmitry Vyukov wrote:
->>>>
->>>>> --- a/Documentation/dev-tools/kasan.rst
->>>>> +++ b/Documentation/dev-tools/kasan.rst
->>>>> @@ -40,6 +40,14 @@ similar to the following to the respective kernel Makefile:
->>>>>
->>>>>      KASAN_SANITIZE := n
->>>>>
->>>>> +Sometimes it may be useful to disable instrumentation of reads, or writes
->>>>> +or both for the entire kernel. For example, if binary size is a concern,
->>>>> +it may be useful to disable instrumentation of reads to reduce binary size but
->>>>> +still catch more harmful bugs on writes. Or, if one is interested only in
->>>>> +sanitization of a particular module and performance is a concern, she can
->>>>> +disable instrumentation of both reads and writes for kernel code.
->>>>> +Instrumentation can be disabled with CONFIG_KASAN_READS and
->>>>> CONFIG_KASAN_WRITES.
->>>>> +
->>>>
->>>> I don't understand this. How this can be related to modules? Configs are global.
->>>> You can't just disable/enable config per module.
->>>
->>>
->>> Build everything without instrumentation. Then enable instrumentation
->>> and do "make lib/test_kasan.ko".
->>> Or build everything, copy out bzImage, change config, build everything again.
->>
->> Yeah, this is soooooo convenient...
->>
->> Seriously speaking, per-file instrumentation is absolutely irrelevant to this patch and should have been
->> addressed from a different angle. E.g. see how UBSAN/GCOV/KCOV do that.
+Dne 9.12.2016 v 23:46 Dodji Seketeli napsal(a):
+> Hello,
 > 
+> Nicholas Piggin <npiggin@gmail.com> a écrit:
 > 
-> KASAN already has that functionality (i.e. KASAN_SANITIZE_main.o :=
-> n). But that functionality is intended for cases when we want to
-> persistently disable instrumentation of some files (e.g. if they cause
-> crashes of false positives). CONFIG_KASAN_READS/WRITES is intended for
-> situations when one wants to disable instrumentation wholesale.
+> [...]
 > 
-
-I'm talking about UBSAN_SANITIZE_ALL/KCOV_INSTRUMENT_ALL/GCOV_PROFILE_ALL
-KASAN doesn't have something similar. I didn't add this because IMO it's not very useful for KASAN.
-One may have a bug in instrumented code, but it can be easily missed if access is done in generic
-code. Very simple example is passing invalid pointer in strcpy()
-
-
+>> That said, a dwarf based checker tool should be able to do as good a job
+>> (maybe a bit better because report is very informative and it may pick up
+>> compiler alignments or padding options).
 > 
->> As for this patch, I'd say only one option would be enough - KASAN_DONT_SANITIZE_READS.
->> Nobody wants to sanitize only reads without writes, right? Writes are fewer and more dangerous.
+> So, Nicholas was kind enough to send me the two Linux Kernel binaries
+> that he built with the tiny little interface change that we were
+> discussing earlier.  Here is what the abidiff[1] tools says about that
+> interface change:
 > 
-> I've asked this question in v1. See the case related to modules -- one
-> can use completely uninstrumented kernel, but load an instrumented
-> modules.
+>     $ time ~/git/libabigail/kabidiff/build/tools/abidiff vmlinux.abi1.abi vmlinux.abi2.abi
+>     Functions changes summary: 0 Removed, 1 Changed, 0 Added function
+>     Variables changes summary: 0 Removed, 0 Changed, 0 Added variable
 > 
-I get it, but again, it's not the right way to address this problem.
+>     1 function with some indirect sub-type change:
+> 
+>       [C]'function int foo(blah*)' at memory.c:82:1 has some indirect sub-type changes:
+>         parameter 1 of type 'blah*' has sub-type changes:
+>           in pointed to type 'struct blah' at memory.c:78:1:
+>             type size changed from 32 to 64 bits
+>             1 data member insertion:
+>               'int blah::y', at offset 0 (in bits) at memory.c:79:1
+>             1 data member change:
+>              'int blah::x' offset changed from 0 to 32 (in bits) (by +32 bits)
 
+For completeness, with a foo.symref file in the tree, genksyms would print
 
+foo.c: warning: foo: modversion changed because of changes in struct blah
+
+So there is some sort of diagnostics already. Does the abidiff tool
+handle the case when an exported symbol is moved between .c files? This
+is always a mess with genksyms, because the two .c files have different
+includes and thus the type expansion stops at different points. So
+typically the move needs to be reverted as a workaround.
+
+Michal
