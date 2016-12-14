@@ -1,72 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qk0-f181.google.com ([209.85.220.181]:35485 "EHLO
-        mail-qk0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752127AbcLNA42 (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 13 Dec 2016 19:56:28 -0500
-Received: by mail-qk0-f181.google.com with SMTP id n204so4266209qke.2
-        for <linux-kbuild@vger.kernel.org>; Tue, 13 Dec 2016 16:56:16 -0800 (PST)
-Date: Tue, 13 Dec 2016 19:56:14 -0500 (EST)
-From: Nicolas Pitre <nicolas.pitre@linaro.org>
-Subject: Re: [PATCH 2/2] kbuild: make modversion for exported asm symbols
- more convivial
-In-Reply-To: <9b2f99ca-0ac6-12b0-e753-5ce6feec96e8@suse.com>
-Message-ID: <alpine.LFD.2.20.1612131935110.1657@knanqh.ubzr>
-References: <1481171047-333-1-git-send-email-nicolas.pitre@linaro.org> <1481171047-333-3-git-send-email-nicolas.pitre@linaro.org> <9b2f99ca-0ac6-12b0-e753-5ce6feec96e8@suse.com>
+Received: from seketeli.net ([94.23.218.202]:45606 "EHLO ms.seketeli.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753184AbcLNI73 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 14 Dec 2016 03:59:29 -0500
+From: Dodji Seketeli <dodji@seketeli.org>
+Subject: Re: [PATCH] x86/kbuild: enable modversions for symbols exported from asm
+References: <20161129131922.GA31466@angband.pl>
+        <20161129135118.24696-1-kilobyte@angband.pl>
+        <CA+55aFyZiB4YkwvqzrXO=HD8bcnc2xHkAYrek2QHVnhVvAi3Fw@mail.gmail.com>
+        <30bb2db4-47bd-0c35-8328-ef032b551f06@suse.com>
+        <CA+55aFxOGw57Gm-QiNs13kfy5k=aRrn3+98415V0g73eGc66mg@mail.gmail.com>
+        <20161129195721.GI2697@decadent.org.uk>
+        <CA+55aFyQko0t8oMZjhnwhWHrmBUyWjGhsnT=oUOU-W7_04xdzw@mail.gmail.com>
+        <20161201051852.28dc335f@roar.ozlabs.ibm.com>
+        <CA+55aFzMTrLMrr69ipdaKhz+RJhUu3BxB+kg0689qq_470qEcw@mail.gmail.com>
+        <1480541581.16599.78.camel@decadent.org.uk>
+        <20161201125545.406d092c@roar.ozlabs.ibm.com>
+        <1480559754.16599.92.camel@decadent.org.uk>
+        <20161201143928.07a08348@roar.ozlabs.ibm.com>
+        <6e8cf20b-2d2f-ba1f-e02c-c757d5a25db7@suse.com>
+        <20161209133308.0acbb57a@roar.ozlabs.ibm.com>
+        <1481296893.4509.135.camel@hellion.org.uk>
+        <20161210021529.4a6e684f@roar.ozlabs.ibm.com>
+        <86vaus3eld.fsf@seketeli.org>
+        <f7c5d50d-8930-7ab1-62bb-8a5d0aead988@suse.com>
+Date: Wed, 14 Dec 2016 09:58:03 +0100
+In-Reply-To: <f7c5d50d-8930-7ab1-62bb-8a5d0aead988@suse.com> (Michal Marek's
+        message of "Tue, 13 Dec 2016 23:51:00 +0100")
+Message-ID: <867f72vqec.fsf@seketeli.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.com>
-Cc: Nicholas Piggin <npiggin@gmail.com>, Arnd Bergmann <arnd@arndb.de>, viro@zeniv.linux.org.uk, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Nicholas Piggin <npiggin@gmail.com>, Ian Campbell <ijc@hellion.org.uk>, Ben Hutchings <ben@decadent.org.uk>, Linus Torvalds <torvalds@linux-foundation.org>, Adam Borowski <kilobyte@angband.pl>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Debian kernel maintainers <debian-kernel@lists.debian.org>, "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Ingo Molnar <mingo@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Wed, 14 Dec 2016, Michal Marek wrote:
+Michal Marek <mmarek@suse.com> a écrit:
 
-> Dne 8.12.2016 v 05:24 Nicolas Pitre napsal(a):
-> > Rather than having an asm-prototypes.h file where C prototypes for exported
-> > asm symbols are centralized, let's have some macros that can be used
-> > directly in the code where those symbols are exported for genksyms
-> > consumption.  Either the prototype is provided directly if no include
-> > files has it, or the include file containing it is specified.
-> > 
-> > Signed-off-by: Nicolas Pitre <nico@linaro.org>
-> > ---
-> >  include/asm-generic/export.h | 15 +++++++++++++++
-> >  scripts/Makefile.build       | 22 +++++++++++++++-------
-> >  2 files changed, 30 insertions(+), 7 deletions(-)
-> > 
-> > diff --git a/include/asm-generic/export.h b/include/asm-generic/export.h
-> > index 39a19dc366..83dda5f840 100644
-> > --- a/include/asm-generic/export.h
-> > +++ b/include/asm-generic/export.h
-> > @@ -84,11 +84,26 @@ KSYM(__kcrctab_\name):
-> >  #define __EXPORT_SYMBOL(sym, val, sec) ___EXPORT_SYMBOL sym, val, sec
-> >  #endif
-> >  
-> > +/* in the non genksyms case those are no-ops */
-> > +#define SYMBOL_CPROTO(expr)
-> > +#define SYMBOL_CPROTO_INCLUDE(file)
-> 
-> Do we really _need_ the SYMBOL_CPROTO macro? The exported functions are
-> called from C files presumably, so there ought to be headers with the
-> declarations. If these headers can't be included easily, we should fix
-> them, but having copies of the declarations in the asm files is no big
-> improvement over the asm-prototypes.h approach, IMO.
+[...]
 
-On ARM there are a few symbols that are part of the gcc support library 
-such as division routines and so on.  Those are never called directly 
-from C code. It is the compiler that implicitly creates references to 
-them.  However, in order to be able to export those symbols, dummy C 
-prototypes were used before it was possible to export symbols from asm 
-code but those prototypes make no sense otherwise.  So the SYMBOL_CPROTO 
-macro is there mainly to maintain backward compatibility with the 
-traditional symbol version signature for those symbols.
+> Does the abidiff tool handle the case when an exported symbol is moved
+> between .c files? This is always a mess with genksyms, because the two
+> .c files have different includes and thus the type expansion stops at
+> different points. So typically the move needs to be reverted as a
+> workaround.
 
-The SYMBOL_CPROTO macro, being close to the actual code, could mark the 
-intended definition for symbols in assembly code and allow for a tool to 
-ensure there is no mismatch with the actual declaration located 
-elsewhere. That could be useful for all global symbols, not just 
-exported ones.  But that's not the primary reason why I created it.
+Let's consider the function:
 
+  'void foo(struct S*);'
 
-Nicolas
+If two ELF binaries contain a definition of that function foo which ELF
+symbol is exported, if the type struct S hasn't changed, and if the only
+difference between the ELF binaries is that foo was defined in the
+translation unit a.c in the first binary and in b.c in the second
+binary, then the comparison engine of libabigail (which is the library
+that abidiff uses) will consider the declarations of the two foo
+functions as being equal -- no matter what include file comes before the
+definition point of foo in a.c and b.c.  If it does not, then it's a bug
+that ought to be fixed.
+
+If you feel that I haven't understood your question, then I guess a
+minimal standalone example (in the form of C source code) that
+illustrates your use case could be helpful to me.
+
+Thanks.
+
+-- 
+		Dodji
