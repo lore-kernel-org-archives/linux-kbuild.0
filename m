@@ -1,54 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp07.smtpout.orange.fr ([80.12.242.129]:55682 "EHLO
-        smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752715AbcLOQoX (ORCPT
+Received: from mail-wm0-f65.google.com ([74.125.82.65]:33474 "EHLO
+        mail-wm0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753378AbcLOSKA (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 15 Dec 2016 11:44:23 -0500
-From: Robert Jarzmik <robert.jarzmik@free.fr>
-Subject: [PATCH v2] tags: honor COMPILED_SOURCE with apart output directory
-Date: Thu, 15 Dec 2016 17:35:33 +0100
-Message-Id: <1481819733-3002-1-git-send-email-robert.jarzmik@free.fr>
+        Thu, 15 Dec 2016 13:10:00 -0500
+From: Nikolay Borisov <n.borisov.lkml@gmail.com>
+Subject: default 0 if KASAN expression not working in kbuild
+Message-ID: <e8e7205e-17f4-1d2c-f6d1-bd741b65e032@gmail.com>
+Date: Thu, 15 Dec 2016 20:09:27 +0200
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Robert Jarzmik <robert.jarzmik@free.fr>
+To: linux-kbuild@vger.kernel.org
+Cc: LKML <linux-kernel@vger.kernel.org>, yann.morin.1998@free.fr, mmarek@suse.com
 
-When the kernel is compiled with an "O=" argument, the object files are
-not necessarily in the source tree, and more probably in another tree.
+Hello,
 
-In this situation, the current used check doesn't work, and
-COMPILED_SOURCE tags is broken with O= builds.
+I was doing some kasan-related debugging and when I enabled it I started
+getting warnings for large stackframes. So CONFIG_FRAME_WARN has :
 
-This patch fixes it by looking for object files both in source tree and
-potential destination tree.
+int "Warn for stack frames larger than (needs gcc 4.4)"
+    range 0 8192
+    default 0 if KASAN
+    default 2048 if GCC_PLUGIN_LATENT_ENTROPY
+    default 1024 if !64BIT
+    default 2048 if 64BIT
 
-It was verified that in the case of O= usage, the current directory is
-the build tree, ie. the tree referenced by O=xxx, and j is the source
-tree path concatenated with relative path of the object to the source
-tree root, hence the simple expression to compute "k" as the built
-object.
+This means that frame_warns should effectively be disabled when kasan is
+enabled. However in my case this is not the situation.
+http://sprunge.us/FiGf here is the config file. It does have
+CONFIG_KASAN=y and CONFIG_FRAME_WARN=1024 . And even this is erroneous
+since it's a 64bit kernel, so it should be 2k. I haven't manually set
+the limit to 1k either.
 
-Signed-off-by: Robert Jarzmik <robert.jarzmik@free.fr>
----
-Since v1: amended k expression, Marek's comments
----
- scripts/tags.sh | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/scripts/tags.sh b/scripts/tags.sh
-index a2ff3388e5ea..35cb64d5211c 100755
---- a/scripts/tags.sh
-+++ b/scripts/tags.sh
-@@ -106,7 +106,8 @@ all_compiled_sources()
- 		case "$i" in
- 			*.[cS])
- 				j=${i/\.[cS]/\.o}
--				if [ -e $j ]; then
-+				k="${j#$tree}"
-+				if [ -e $j -o -e "$k" ]; then
- 					echo $i
- 				fi
- 				;;
--- 
-2.1.4
-
+Regards,
+Nikolay
