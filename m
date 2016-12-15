@@ -1,95 +1,93 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf0-f194.google.com ([209.85.192.194]:36099 "EHLO
-        mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752366AbcLOCGn (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 14 Dec 2016 21:06:43 -0500
-Date: Thu, 15 Dec 2016 12:06:15 +1000
-From: Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH] x86/kbuild: enable modversions for symbols exported
- from asm
-Message-ID: <20161215120615.34fd0f22@roar.ozlabs.ibm.com>
-In-Reply-To: <27aafb3b-adb2-47b8-7964-6e36fcb57676@redhat.com>
-References: <20161201051852.28dc335f@roar.ozlabs.ibm.com>
-        <CA+55aFzMTrLMrr69ipdaKhz+RJhUu3BxB+kg0689qq_470qEcw@mail.gmail.com>
-        <20161201041325.GX35881@redhat.com>
-        <20161201153215.43b6cec7@roar.ozlabs.ibm.com>
-        <20161201152039.GB35881@redhat.com>
-        <20161209135041.5ff12770@roar.ozlabs.ibm.com>
-        <0937c184-1946-c494-56b6-c38fd0b632c2@redhat.com>
-        <20161209181459.1f0a4fed@roar.ozlabs.ibm.com>
-        <249321c0-bcb1-f9d8-50f4-c083b656d02e@redhat.com>
-        <20161210015653.5b0dc872@roar.ozlabs.ibm.com>
-        <20161209160337.GA3061@kroah.com>
-        <27aafb3b-adb2-47b8-7964-6e36fcb57676@redhat.com>
+Received: from mail.kernel.org ([198.145.29.136]:34168 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751135AbcLOFPN (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 15 Dec 2016 00:15:13 -0500
+Date: Thu, 15 Dec 2016 07:15:06 +0200
+From: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: [PATCH 0/8] enable endian checks for all sparse builds
+Message-ID: <1481778865-27667-1-git-send-email-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Hannes Frederic Sowa <hannes@redhat.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Stanislav Kozina <skozina@redhat.com>, Don Zickus <dzickus@redhat.com>, Linus Torvalds <torvalds@linux-foundation.org>, Ben Hutchings <ben@decadent.org.uk>, Michal Marek <mmarek@suse.com>, Adam Borowski <kilobyte@angband.pl>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Debian kernel maintainers <debian-kernel@lists.debian.org>, "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Ingo Molnar <mingo@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: linux-kernel@vger.kernel.org
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, Christoph Hellwig <hch@infradead.org>, Jason Wang <jasowang@redhat.com>, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.com>, Arnd Bergmann <arnd@arndb.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Matt Mackall <mpm@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>, David Airlie <airlied@linux.ie>, Gerd Hoffmann <kraxel@redhat.com>, Ohad Ben-Cohen <ohad@wizery.com>, Christian Borntraeger <borntraeger@de.ibm.com>, Cornelia Huck <cornelia.huck@de.ibm.com>, "James E.J. Bottomley" <jejb@linux.vnet.ibm.com>, "David S. Miller" <davem@davemloft.net>, Jens Axboe <axboe@fb.com>, Neil Armstrong <narmstrong@baylibre.com>, Stefan Hajnoczi <stefanha@redhat.com>, Asias He <asias@redhat.com>, linux-crypto@vger.kernel.org, dri-devel@lists.freedesktop.org, virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org, kvm@vger.kernel.org, linux-scsi@vger.kernel.org, v9fs-developer@lists.sourceforge.net, Matthias Brugger <matthias.bgg@gmail.com>, linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
 
-On Wed, 14 Dec 2016 15:04:36 +0100
-Hannes Frederic Sowa <hannes@redhat.com> wrote:
+This is just a reposting of the patch that enables endian checks, with addition
+of trivial patches that drop __bitwise__ and __CHECK_ENDIAN__ everywhere.
 
-> On 09.12.2016 17:03, Greg Kroah-Hartman wrote:
-> > On Sat, Dec 10, 2016 at 01:56:53AM +1000, Nicholas Piggin wrote:  
-> >> On Fri, 9 Dec 2016 15:36:04 +0100
-> >> Stanislav Kozina <skozina@redhat.com> wrote:
-> >>  
-> >>>>>>> The question is how to provide a similar guarantee if a different way?    
-> >>>>>> As a tool to aid distro reviewers, modversions has some value, but the
-> >>>>>> debug info parsing tools that have been mentioned in this thread seem
-> >>>>>> superior (not that I've tested them).    
-> >>>>> On the other hand the big advantage of modversions is that it also
-> >>>>> verifies the checksum during runtime (module loading). In other words, I
-> >>>>> believe that any other solution should still generate some form of
-> >>>>> checksum/watermark which can be easily checked for compatibility on
-> >>>>> module load.
-> >>>>> It should not be hard to add to the DWARF based tools though. We'd just
-> >>>>> parse DWARF data instead of the C code.    
-> >>>> A runtime check is still done, with per-module vermagic which distros
-> >>>> can change when they bump the ABI version. Is it really necessary to
-> >>>> have more than that (i.e., per-symbol versioning)?    
-> >>>
-> >>>  From my point of view, it is. We need to allow changing ABI for some 
-> >>> modules while maintaining it for others.
-> >>> In fact I think that there should be version not only for every exported 
-> >>> symbol (in the EXPORT_SYMBOL() sense), but also for every public type 
-> >>> (in the sense of eg. structure defined in the public header file).  
-> >>
-> >> Well the distro can just append _v2, _v3 to the name of the function
-> >> or type if it has to break compat for some reason. Would that be enough?  
-> > 
-> > There are other ways that distros can work around when upstream "breaks"
-> > the ABI, sometimes they can rename functions, and others they can
-> > "preload" structures with padding in anticipation for when/if fields get
-> > added to them.  But that's all up to the distros, no need for us to
-> > worry about that at all :)  
-> 
-> The _v2 and _v3 functions are probably the ones that also get used by
-> future backports in the distro kernel itself and are probably the reason
-> for the ABI change in the first place. Thus going down this route will
-> basically require distros to touch every future backport patch and will
-> in general generate a big mess internally.
+I plan to include this in my pull request unless I hear otherwise.
 
-What kind of big mess? You have to check the logic of each backport even
-if it does apply cleanly, so the added overhead of the name change should
-be relatively tiny, no?
+Michael S. Tsirkin (8):
+  linux/types.h: enable endian checks for all sparse builds
+  tools: enable endian checks for all sparse builds
+  Documentation/sparse: drop __bitwise__
+  checkpatch: replace __bitwise__ with __bitwise
+  linux: drop __bitwise__ everywhere
+  Documentation/sparse: drop __CHECK_ENDIAN__
+  fs/logfs: drop __CHECK_ENDIAN__
+  Makefile: drop -D__CHECK_ENDIAN__ from cflags
 
-> 
-> I think it is important to keep versioning information outside of the
-> source code. Some kind of modversions will still be required, but
-> distros should be able to decide if they put in some kind of checksum or
-> a string, what suites them most.
+ Documentation/translations/zh_CN/sparse.txt               |  7 +------
+ arch/arm/plat-samsung/include/plat/gpio-cfg.h             |  2 +-
+ drivers/md/dm-cache-block-types.h                         |  6 +++---
+ drivers/net/ethernet/sun/sunhme.h                         |  2 +-
+ drivers/net/wireless/intel/iwlwifi/iwl-fw-file.h          |  4 ++--
+ fs/logfs/logfs.h                                          |  4 +---
+ include/linux/mmzone.h                                    |  2 +-
+ include/linux/serial_core.h                               |  4 ++--
+ include/linux/types.h                                     |  4 ++--
+ include/scsi/iscsi_proto.h                                |  2 +-
+ include/target/target_core_base.h                         |  2 +-
+ include/uapi/linux/types.h                                |  4 ----
+ include/uapi/linux/virtio_types.h                         |  6 +++---
+ net/ieee802154/6lowpan/6lowpan_i.h                        |  2 +-
+ net/mac80211/ieee80211_i.h                                |  4 ++--
+ tools/include/linux/types.h                               |  4 ----
+ Documentation/dev-tools/sparse.rst                        | 14 +-------------
+ drivers/bluetooth/Makefile                                |  2 --
+ drivers/net/can/Makefile                                  |  1 -
+ drivers/net/ethernet/altera/Makefile                      |  1 -
+ drivers/net/ethernet/atheros/alx/Makefile                 |  1 -
+ drivers/net/ethernet/freescale/Makefile                   |  2 --
+ drivers/net/wireless/ath/Makefile                         |  2 --
+ drivers/net/wireless/ath/wil6210/Makefile                 |  2 --
+ drivers/net/wireless/broadcom/brcm80211/brcmfmac/Makefile |  2 --
+ drivers/net/wireless/broadcom/brcm80211/brcmsmac/Makefile |  1 -
+ drivers/net/wireless/intel/iwlegacy/Makefile              |  2 --
+ drivers/net/wireless/intel/iwlwifi/Makefile               |  2 +-
+ drivers/net/wireless/intel/iwlwifi/dvm/Makefile           |  2 +-
+ drivers/net/wireless/intel/iwlwifi/mvm/Makefile           |  2 +-
+ drivers/net/wireless/intersil/orinoco/Makefile            |  3 ---
+ drivers/net/wireless/mediatek/mt7601u/Makefile            |  2 --
+ drivers/net/wireless/realtek/rtlwifi/Makefile             |  2 --
+ drivers/net/wireless/realtek/rtlwifi/btcoexist/Makefile   |  2 --
+ drivers/net/wireless/realtek/rtlwifi/rtl8188ee/Makefile   |  2 --
+ drivers/net/wireless/realtek/rtlwifi/rtl8192c/Makefile    |  2 --
+ drivers/net/wireless/realtek/rtlwifi/rtl8192ce/Makefile   |  2 --
+ drivers/net/wireless/realtek/rtlwifi/rtl8192cu/Makefile   |  2 --
+ drivers/net/wireless/realtek/rtlwifi/rtl8192de/Makefile   |  2 --
+ drivers/net/wireless/realtek/rtlwifi/rtl8192ee/Makefile   |  2 --
+ drivers/net/wireless/realtek/rtlwifi/rtl8192se/Makefile   |  2 --
+ drivers/net/wireless/realtek/rtlwifi/rtl8723ae/Makefile   |  2 --
+ drivers/net/wireless/realtek/rtlwifi/rtl8723be/Makefile   |  2 --
+ drivers/net/wireless/realtek/rtlwifi/rtl8723com/Makefile  |  2 --
+ drivers/net/wireless/realtek/rtlwifi/rtl8821ae/Makefile   |  2 --
+ drivers/net/wireless/ti/wl1251/Makefile                   |  2 --
+ drivers/net/wireless/ti/wlcore/Makefile                   |  2 --
+ drivers/staging/rtl8188eu/Makefile                        |  2 +-
+ drivers/staging/rtl8192e/Makefile                         |  2 --
+ drivers/staging/rtl8192e/rtl8192e/Makefile                |  2 --
+ net/bluetooth/Makefile                                    |  2 --
+ net/ieee802154/Makefile                                   |  2 --
+ net/mac80211/Makefile                                     |  2 +-
+ net/mac802154/Makefile                                    |  2 --
+ net/wireless/Makefile                                     |  2 --
+ scripts/checkpatch.pl                                     |  4 ++--
+ 56 files changed, 30 insertions(+), 120 deletions(-)
 
-The module crc symbols are just an integer that requires a match, so it
-could easily be populated by a list that the distro keeps, rather than
-by genksyms. Most of the complexity is on the build side, so that would
-still be an improvement for the kernel. So we *could* do this if the
-distros need it.
-
-Thanks,
-Nick
+-- 
+MST
 
