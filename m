@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.17.10]:55340 "EHLO
+Received: from mout.kundenserver.de ([217.72.192.73]:55252 "EHLO
         mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1760765AbcLPK5G (ORCPT
+        with ESMTP id S1760762AbcLPK5G (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Fri, 16 Dec 2016 05:57:06 -0500
 From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH 12/13] KVM: arm: avoid binary number literals for gcc-4.2
-Date: Fri, 16 Dec 2016 11:56:33 +0100
-Message-Id: <20161216105634.235457-13-arnd@arndb.de>
+Subject: [PATCH 11/13] fs: fix unsigned enum warning with gcc-4.2
+Date: Fri, 16 Dec 2016 11:56:32 +0100
+Message-Id: <20161216105634.235457-12-arnd@arndb.de>
 In-Reply-To: <20161216105634.235457-1-arnd@arndb.de>
 References: <20161216105634.235457-1-arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,31 +15,32 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-arch@vger.kernel.org
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@vger.kernel.org, Russell King <rmk+kernel@armlinux.org.uk>, Andrew Morton <akpm@linux-foundation.org>, kernel-build-reports@lists.linaro.org, kvmarm@lists.cs.columbia.edu, Arnd Bergmann <arnd@arndb.de>
 
-Old gcc versions prior to 4.3 don't understand the 0b... syntax for
-numbers, and this seems to be the only instance in the kernel, so better
-use hexadecimal instead.
+With arm-linux-gcc-4.2, almost every file we build in the kernel ends
+up with this warning:
 
-arch/arm/include/asm/kvm_mmu.h:127:38: error: invalid suffix "b101" on integer constant
+include/linux/fs.h:2648: warning: comparison of unsigned expression < 0 is always false
 
-Fixes: 159793001d7d ("ARM: KVM: force cache clean on page fault when caches are off")
+Later versions don't have this problem, but it's easy enough to
+work around.
+
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- arch/arm/include/asm/kvm_mmu.h | 2 +-
+ include/linux/fs.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/arm/include/asm/kvm_mmu.h b/arch/arm/include/asm/kvm_mmu.h
-index 74a44727f8e1..61121300174f 100644
---- a/arch/arm/include/asm/kvm_mmu.h
-+++ b/arch/arm/include/asm/kvm_mmu.h
-@@ -124,7 +124,7 @@ struct kvm;
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 398cf20a706d..782c2a292fd7 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -2645,7 +2645,7 @@ static const char * const kernel_read_file_str[] = {
  
- static inline bool vcpu_has_cache_enabled(struct kvm_vcpu *vcpu)
+ static inline const char *kernel_read_file_id_str(enum kernel_read_file_id id)
  {
--	return (vcpu_cp15(vcpu, c1_SCTLR) & 0b101) == 0b101;
-+	return (vcpu_cp15(vcpu, c1_SCTLR) & 0x5) == 0x5;
- }
+-	if (id < 0 || id >= READING_MAX_ID)
++	if ((unsigned)id >= READING_MAX_ID)
+ 		return kernel_read_file_str[READING_UNKNOWN];
  
- static inline void __coherent_cache_guest_page(struct kvm_vcpu *vcpu,
+ 	return kernel_read_file_str[id];
 -- 
 2.9.0
 
