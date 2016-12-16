@@ -1,31 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-it0-f65.google.com ([209.85.214.65]:33438 "EHLO
-        mail-it0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753265AbcLPT5D (ORCPT
+Received: from mout.kundenserver.de ([212.227.17.13]:59816 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1761577AbcLPT6S (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 16 Dec 2016 14:57:03 -0500
+        Fri, 16 Dec 2016 14:58:18 -0500
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [RFC] minimum gcc version for kernel: raise to gcc-4.3 or 4.6?
+Date: Fri, 16 Dec 2016 20:58:08 +0100
+Message-ID: <3679707.TKdvBNIRe2@wuerfel>
+In-Reply-To: <CAMuHMdUa4j8nxrW=fSJQZok3=mW-FWZWHR=cYS2R0gQUeGHgmQ@mail.gmail.com>
+References: <20161216105634.235457-1-arnd@arndb.de> <CAMuHMdUa4j8nxrW=fSJQZok3=mW-FWZWHR=cYS2R0gQUeGHgmQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <7212667f-f508-2b41-a380-8f736814d8cc@suse.cz>
-References: <20161017065131.GA27863@angband.pl> <20161017175951.31d8f4b7@roar.ozlabs.ibm.com>
- <20161017100130.GA16013@angband.pl> <7212667f-f508-2b41-a380-8f736814d8cc@suse.cz>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Fri, 16 Dec 2016 11:57:02 -0800
-Message-ID: <CA+55aFxjJbAXRq2HSxhfn2gWsGiLPTcqoRrrDLJrLd2vFLu9YQ@mail.gmail.com>
-Subject: Re: [GIT PULL] kbuild changes for v4.9-rc1
-Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jiri Slaby <jslaby@suse.cz>
-Cc: Adam Borowski <kilobyte@angband.pl>, Nicholas Piggin <npiggin@gmail.com>, Omar Sandoval <osandov@osandov.com>, Michal Marek <mmarek@suse.com>, Alexey Dobriyan <adobriyan@gmail.com>, Stephen Rothwell <sfr@canb.auug.org.au>, Al Viro <viro@zeniv.linux.org.uk>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: Linux-Arch <linux-arch@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, linux-arm-kernel@vger.kernel.org, Russell King <rmk+kernel@armlinux.org.uk>, Andrew Morton <akpm@linux-foundation.org>, kernel-build-reports@lists.linaro.org, kvmarm@lists.cs.columbia.edu
 
-On Fri, Dec 16, 2016 at 11:55 AM, Jiri Slaby <jslaby@suse.cz> wrote:
->
-> what happened to this? I had to apply this to fix 4.9-pae kernel here.
+On Friday, December 16, 2016 4:54:33 PM CET Geert Uytterhoeven wrote:
+> Hi Arnd,
+> 
+> On Fri, Dec 16, 2016 at 11:56 AM, Arnd Bergmann <arnd@arndb.de> wrote:
+> > Specifically on ARM, going further makes things rather useless especially
+> > for build testing: with gcc-4.2, we lose support for ARMv7, EABI, and
+> > effectively ARMv6 (as it relies on EABI for building reliably). Also,
+> > the number of false-positive build warnings is so high that it is useless
+> > for finding actual bugs from the warnings.
+> 
+> If you start with that activity now, there's indeed a massive amount of
+> warnings to look into.
+> However, I've been build testing various configs with m68k-linux-gnu-gcc-4.1.2
+> and looking at the compiler warnings for years, so I only have to look
+> at new warnings.
 
-Did you actually have to do that?
+What's the reason for sticking with gcc-4.1? Does this actually work better
+for you than a more recent version, or is it just whatever you installed
+when you started the build testing?
 
-Because a missing CRC shouldn't be fatal in 4.9.
-
-What was the failure mode?
-
-                Linus
+	Arnd
