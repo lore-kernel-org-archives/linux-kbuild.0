@@ -1,116 +1,283 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.17.10]:53339 "EHLO
+Received: from mout.kundenserver.de ([217.72.192.74]:52019 "EHLO
         mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1760277AbcLPK5G (ORCPT
+        with ESMTP id S1760723AbcLPK5G (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Fri, 16 Dec 2016 05:57:06 -0500
 From: Arnd Bergmann <arnd@arndb.de>
-Subject: [RFC] minimum gcc version for kernel: raise to gcc-4.3 or 4.6?
-Date: Fri, 16 Dec 2016 11:56:21 +0100
-Message-Id: <20161216105634.235457-1-arnd@arndb.de>
+Subject: [PATCH 01/13] [HACK] gcc-4.5: avoid  link errors for unused function pointers
+Date: Fri, 16 Dec 2016 11:56:22 +0100
+Message-Id: <20161216105634.235457-2-arnd@arndb.de>
+In-Reply-To: <20161216105634.235457-1-arnd@arndb.de>
+References: <20161216105634.235457-1-arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-arch@vger.kernel.org
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@vger.kernel.org, Russell King <rmk+kernel@armlinux.org.uk>, Andrew Morton <akpm@linux-foundation.org>, kernel-build-reports@lists.linaro.org, kvmarm@lists.cs.columbia.edu, Arnd Bergmann <arnd@arndb.de>
 
-I had some fun doing build testing with older gcc versions, building
-every release from 4.0 through 7.0 and running that on my randconfig
-setup to see what comes out.
+gcc versions before 4.6 cannot do dead code elimination across
+function pointers, e.g. with a construct like
 
-First of all, gcc-4.9 and higher is basically warning-free everywhere,
-although gcc-7 introduces some interesting new warnings (I have started
-doing patches for those as well). gcc-4.8 is probably good, too, and
-gcc-4.6 and 4.7 at least don't produce build failures in general, though
-the level of false-positive warnings increases (we could decide to turn
-those off for older compilers for build test purposes).
+static int f(void)
+{
+	return declared_extern_but_undefined_function();
+}
 
-In gcc-4.5 and below, dead code elimination is not as good as later,
-causing a couple of link errors, and some of them have no good workaround
-(see patch 1). It would be nice to declare that version too old, but
-several older distros that are still in wide use ship with compilers
-earlier than 4.6:
+static int g(void)
+{
+	if (0)
+		reference_function(&f);
+}
 
- RHEL6:		gcc-4.4
- Debian 6:	gcc-4.4
- Ubuntu 10.04:	gcc-4.4
- SLES11:	gcc-4.3
+which we rely on in lots of places when registering functions,
+it results in a link error for
+declared_extern_but_undefined_function.
 
-With gcc-4.3, we need a couple of workaround patches beyond the problem
-mentioned above, more configuration options are unavailable and we get
-a significant number of false-positive warnings, but it's not much worse
-than gcc-4.5 otherwise.
+This patch is incomplete and introduces a few other problems
+(at least warnings about unused functions), but it shows what
+we would have to do in order to address this in the kernel.
 
-These are the options I had to disable to get gcc-4.3 randconfig builds
-working:
+The three options forward I see are:
 
- CONFIG_HAVE_GCC_PLUGINS
- CONFIG_CC_STACKPROTECTOR_STRONG
- CONFIG_ARM_SINGLE_ARMV7M
- CONFIG_THUMB2_KERNEL
- CONFIG_KERNEL_MODE_NEON
- CONFIG_VDSO
- CONFIG_FUNCTION_TRACER (with CONFIG_FRAME_POINTER=n)
+- Declare gcc-4.5 (and prior version) fully supported and
+  do proper fixes for the bugs we find.
 
-I have not checked in detail which version is required for
-each of the above.
+- Officially declare gcc-4.6 the minimum required version
+  for the kernel and remove all existing hacks we have for
+  older versions.
 
-Specifically on ARM, going further makes things rather useless especially
-for build testing: with gcc-4.2, we lose support for ARMv7, EABI, and
-effectively ARMv6 (as it relies on EABI for building reliably). Also,
-the number of false-positive build warnings is so high that it is useless
-for finding actual bugs from the warnings.
+- Do nothing: if you use an older gcc version and you run into
+  this, you are on your own and can submit a patch for the
+  specific problem you find.
 
-See the replies to this mail for 13 patches I needed to work around
-issues for each of the releases before 4.6. I have also submitted
-some separate patches for issues that I considered actual bugs
-uncovered by the older compilers and that should be applied regardless.
+At the moment, gcc-3.2 is in theory still supported, but I
+found that even gcc-4.2 is almost completely useless these
+days at least on ARM.
 
-The original gcc-4.3 release was in early 2008. If we decide to still
-support that, we probably want the first 10 quirks in this series,
-while gcc-4.6 (released in 2011) requires none of them.
+If we want to keep gcc-4.5 supported, then we can probably
+have 4.3 as the minimum version without too many other
+workarounds.
 
-	Arnd
+Do not apply but feel free to pick out parts of this
+patch and submit them if you use old gcc versions and
+run into the problems.
 
-Arnd Bergmann (13):
-  [HACK] gcc-4.5: avoid  link errors for unused function pointers
-  KVM: arm: fix gcc-4.5 build
-  ARM: div64: fix building with gcc-4.5 and lower
-  vfio-pci: use 32-bit comparisons for register address for gcc-4.5
-  clk: pxa: fix gcc-4.4 build
-  ARM: atomic: fix gcc-4.4 build
-  watchdog: kempld: fix gcc-4.3 build
-  arm/arm64: xen: avoid gcc-4.4 warning
-  ARM: mark cmpxchg and xchg __always_inline for gcc-4.3
-  asm-generic: mark cmpxchg as __always_inline for gcc-4.3
-  fs: fix unsigned enum warning with gcc-4.2
-  KVM: arm: avoid binary number literals for gcc-4.2
-  ARM: avoid 'Q' asm constraint for gcc-4.1 and earlier
-
- arch/arm/include/asm/atomic.h        | 10 ++++++++--
- arch/arm/include/asm/cmpxchg.h       | 12 ++++++------
- arch/arm/include/asm/div64.h         | 17 +++--------------
- arch/arm/include/asm/io.h            |  8 ++++++++
- arch/arm/include/asm/kvm_mmu.h       |  2 +-
- arch/arm/include/asm/percpu.h        |  5 ++++-
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
  arch/arm/mach-imx/pm-imx5.c          | 20 ++++++++++++++++----
  arch/arm/mach-sa1100/pm.c            |  2 ++
  arch/arm/plat-samsung/pm.c           |  4 ++++
- drivers/clk/pxa/clk-pxa.c            |  3 +--
  drivers/dma/ti-dma-crossbar.c        |  4 ++++
  drivers/firmware/psci_checker.c      |  3 +++
  drivers/iio/adc/exynos_adc.c         |  3 +++
  drivers/net/ethernet/via/via-rhine.c |  6 ++++++
- drivers/vfio/pci/vfio_pci_rdwr.c     |  5 ++++-
- drivers/watchdog/kempld_wdt.c        |  9 ++++++++-
- include/asm-generic/cmpxchg-local.h  |  7 ++++---
- include/linux/fs.h                   |  2 +-
- include/xen/arm/page.h               |  1 +
- virt/kvm/arm/vgic/vgic-its.c         |  4 ++--
- virt/kvm/arm/vgic/vgic-mmio-v3.c     |  8 ++++----
- virt/kvm/arm/vgic/vgic-mmio.c        | 16 ++++++++--------
- virt/kvm/arm/vgic/vgic-mmio.h        | 12 ++++++------
- 23 files changed, 107 insertions(+), 56 deletions(-)
+ 7 files changed, 38 insertions(+), 4 deletions(-)
 
+diff --git a/arch/arm/mach-imx/pm-imx5.c b/arch/arm/mach-imx/pm-imx5.c
+index 9424e7f808c7..de912b0a6451 100644
+--- a/arch/arm/mach-imx/pm-imx5.c
++++ b/arch/arm/mach-imx/pm-imx5.c
+@@ -78,6 +78,7 @@ struct imx5_pm_suspend_data {
+ 	int suspend_io_count;
+ };
+ 
++#ifdef CONFIG_SOC_IMX53
+ static const struct imx5_suspend_io_state imx53_suspend_io_config[] = {
+ #define MX53_DSE_HIGHZ_MASK (0x7 << 19)
+ 	{.offset = 0x584, .clear = MX53_DSE_HIGHZ_MASK}, /* DQM0 */
+@@ -104,13 +105,17 @@ static const struct imx5_suspend_io_state imx53_suspend_io_config[] = {
+ 	/* Controls the CKE signal which is required to leave self refresh */
+ 	{.offset = 0x720, .clear = MX53_DSE_HIGHZ_MASK, .set = 1 << 19}, /* CTLDS */
+ };
++#endif
+ 
++#ifdef CONFIG_SOC_IMX51
+ static const struct imx5_pm_data imx51_pm_data __initconst = {
+ 	.ccm_addr = 0x73fd4000,
+ 	.cortex_addr = 0x83fa0000,
+ 	.gpc_addr = 0x73fd8000,
+ };
++#endif
+ 
++#if defined(CONFIG_SOC_IMX53) && defined(CONFIG_SUSPEND)
+ static const struct imx5_pm_data imx53_pm_data __initconst = {
+ 	.ccm_addr = 0x53fd4000,
+ 	.cortex_addr = 0x63fa0000,
+@@ -127,6 +132,9 @@ static const struct imx5_pm_suspend_data imx53_pm_suspend_data __initconst = {
+ };
+ 
+ #define MX5_MAX_SUSPEND_IOSTATE ARRAY_SIZE(imx53_suspend_io_config)
++#else
++#define MX5_MAX_SUSPEND_IOSTATE 0
++#endif
+ 
+ /*
+  * This structure is for passing necessary data for low level ocram
+@@ -383,6 +391,7 @@ static int __init imx5_suspend_init(const struct imx5_pm_suspend_data *soc_data)
+ 	return ret;
+ }
+ 
++#if defined(CONFIG_SUSPEND)
+ static int __init imx5_pm_common_init(const struct imx5_pm_data *data,
+ 				      const struct imx5_pm_suspend_data *sdata)
+ {
+@@ -420,15 +429,18 @@ static int __init imx5_pm_common_init(const struct imx5_pm_data *data,
+ 
+ 	return 0;
+ }
++#endif
+ 
+ void __init imx51_pm_init(void)
+ {
+-	if (IS_ENABLED(CONFIG_SOC_IMX51))
+-		imx5_pm_common_init(&imx51_pm_data, NULL);
++#if defined(CONFIG_SOC_IMX51) && defined(CONFIG_SUSPEND)
++	imx5_pm_common_init(&imx51_pm_data, NULL);
++#endif
+ }
+ 
+ void __init imx53_pm_init(void)
+ {
+-	if (IS_ENABLED(CONFIG_SOC_IMX53))
+-		imx5_pm_common_init(&imx53_pm_data, &imx53_pm_suspend_data);
++#if defined(CONFIG_SOC_IMX53) && defined(CONFIG_SUSPEND)
++	imx5_pm_common_init(&imx53_pm_data, &imx53_pm_suspend_data);
++#endif
+ }
+diff --git a/arch/arm/mach-sa1100/pm.c b/arch/arm/mach-sa1100/pm.c
+index 34853d5dfda2..cb896dc97030 100644
+--- a/arch/arm/mach-sa1100/pm.c
++++ b/arch/arm/mach-sa1100/pm.c
+@@ -121,6 +121,8 @@ static const struct platform_suspend_ops sa11x0_pm_ops = {
+ 
+ int __init sa11x0_pm_init(void)
+ {
++#ifdef CONFIG_SUSPEND
+ 	suspend_set_ops(&sa11x0_pm_ops);
++#endif
+ 	return 0;
+ }
+diff --git a/arch/arm/plat-samsung/pm.c b/arch/arm/plat-samsung/pm.c
+index d7803b434732..264c538a3ab8 100644
+--- a/arch/arm/plat-samsung/pm.c
++++ b/arch/arm/plat-samsung/pm.c
+@@ -71,6 +71,7 @@ int (*pm_cpu_sleep)(unsigned long);
+  * central control for sleep/resume process
+ */
+ 
++#ifdef CONFIG_SUSPEND
+ static int s3c_pm_enter(suspend_state_t state)
+ {
+ 	int ret;
+@@ -194,11 +195,14 @@ static const struct platform_suspend_ops s3c_pm_ops = {
+  * from the board specific initialisation if the board supports
+  * it.
+ */
++#endif
+ 
+ int __init s3c_pm_init(void)
+ {
++#ifdef CONFIG_SUSPEND
+ 	printk("S3C Power Management, Copyright 2004 Simtec Electronics\n");
+ 
+ 	suspend_set_ops(&s3c_pm_ops);
++#endif
+ 	return 0;
+ }
+diff --git a/drivers/dma/ti-dma-crossbar.c b/drivers/dma/ti-dma-crossbar.c
+index 3f24aeb48c0e..e9f0543cb30a 100644
+--- a/drivers/dma/ti-dma-crossbar.c
++++ b/drivers/dma/ti-dma-crossbar.c
+@@ -184,8 +184,10 @@ static int ti_am335x_xbar_probe(struct platform_device *pdev)
+ 	for (i = 0; i < xbar->dma_requests; i++)
+ 		ti_am335x_xbar_write(xbar->iomem, i, 0);
+ 
++#ifdef CONFIG_DMA_OF
+ 	ret = of_dma_router_register(node, ti_am335x_xbar_route_allocate,
+ 				     &xbar->dmarouter);
++#endif
+ 
+ 	return ret;
+ }
+@@ -414,8 +416,10 @@ static int ti_dra7_xbar_probe(struct platform_device *pdev)
+ 			ti_dra7_xbar_write(xbar->iomem, i, xbar->safe_val);
+ 	}
+ 
++#ifdef CONFIG_DMA_OF
+ 	ret = of_dma_router_register(node, ti_dra7_xbar_route_allocate,
+ 				     &xbar->dmarouter);
++#endif
+ 	if (ret) {
+ 		/* Restore the defaults for the crossbar */
+ 		for (i = 0; i < xbar->dma_requests; i++) {
+diff --git a/drivers/firmware/psci_checker.c b/drivers/firmware/psci_checker.c
+index 44bdb78f837b..37c5c873c5ec 100644
+--- a/drivers/firmware/psci_checker.c
++++ b/drivers/firmware/psci_checker.c
+@@ -273,6 +273,9 @@ static int suspend_test_thread(void *arg)
+ 	struct timer_list wakeup_timer =
+ 		TIMER_INITIALIZER(dummy_callback, 0, 0);
+ 
++	if (!IS_ENABLED(CONFIG_CPU_IDLE))
++		return -ENXIO;
++
+ 	/* Wait for the main thread to give the start signal. */
+ 	wait_for_completion(&suspend_threads_started);
+ 
+diff --git a/drivers/iio/adc/exynos_adc.c b/drivers/iio/adc/exynos_adc.c
+index c15756d7bf7f..b2a658aa9a83 100644
+--- a/drivers/iio/adc/exynos_adc.c
++++ b/drivers/iio/adc/exynos_adc.c
+@@ -615,6 +615,9 @@ static irqreturn_t exynos_ts_isr(int irq, void *dev_id)
+ 	bool pressed;
+ 	int ret;
+ 
++	if (!IS_REACHABLE(CONFIG_INPUT))
++		return IRQ_HANDLED;
++
+ 	while (info->input->users) {
+ 		ret = exynos_read_s3c64xx_ts(dev, &x, &y);
+ 		if (ret == -ETIMEDOUT)
+diff --git a/drivers/net/ethernet/via/via-rhine.c b/drivers/net/ethernet/via/via-rhine.c
+index ba5c54249055..6b45401ff149 100644
+--- a/drivers/net/ethernet/via/via-rhine.c
++++ b/drivers/net/ethernet/via/via-rhine.c
+@@ -2580,6 +2580,7 @@ static SIMPLE_DEV_PM_OPS(rhine_pm_ops, rhine_suspend, rhine_resume);
+ 
+ #endif /* !CONFIG_PM_SLEEP */
+ 
++#ifdef CONFIG_PCI
+ static struct pci_driver rhine_driver_pci = {
+ 	.name		= DRV_NAME,
+ 	.id_table	= rhine_pci_tbl,
+@@ -2588,6 +2589,7 @@ static struct pci_driver rhine_driver_pci = {
+ 	.shutdown	= rhine_shutdown_pci,
+ 	.driver.pm	= RHINE_PM_OPS,
+ };
++#endif
+ 
+ static struct platform_driver rhine_driver_platform = {
+ 	.probe		= rhine_init_one_platform,
+@@ -2633,7 +2635,9 @@ static int __init rhine_init(void)
+ 	else if (avoid_D3)
+ 		pr_info("avoid_D3 set\n");
+ 
++#ifdef CONFIG_PCI
+ 	ret_pci = pci_register_driver(&rhine_driver_pci);
++#endif
+ 	ret_platform = platform_driver_register(&rhine_driver_platform);
+ 	if ((ret_pci < 0) && (ret_platform < 0))
+ 		return ret_pci;
+@@ -2645,7 +2649,9 @@ static int __init rhine_init(void)
+ static void __exit rhine_cleanup(void)
+ {
+ 	platform_driver_unregister(&rhine_driver_platform);
++#ifdef CONFIG_PCI
+ 	pci_unregister_driver(&rhine_driver_pci);
++#endif
+ }
+ 
+ 
 -- 
 2.9.0
 
