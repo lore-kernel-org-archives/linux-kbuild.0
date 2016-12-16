@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.17.10]:50357 "EHLO
+Received: from mout.kundenserver.de ([212.227.17.24]:64880 "EHLO
         mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1760265AbcLPK5G (ORCPT
+        with ESMTP id S1760770AbcLPK5G (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Fri, 16 Dec 2016 05:57:06 -0500
 From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH 02/13] KVM: arm: fix gcc-4.5 build
-Date: Fri, 16 Dec 2016 11:56:23 +0100
-Message-Id: <20161216105634.235457-3-arnd@arndb.de>
+Subject: [PATCH 13/13] ARM: avoid 'Q' asm constraint for gcc-4.1 and earlier
+Date: Fri, 16 Dec 2016 11:56:34 +0100
+Message-Id: <20161216105634.235457-14-arnd@arndb.de>
 In-Reply-To: <20161216105634.235457-1-arnd@arndb.de>
 References: <20161216105634.235457-1-arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,154 +15,71 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-arch@vger.kernel.org
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@vger.kernel.org, Russell King <rmk+kernel@armlinux.org.uk>, Andrew Morton <akpm@linux-foundation.org>, kernel-build-reports@lists.linaro.org, kvmarm@lists.cs.columbia.edu, Arnd Bergmann <arnd@arndb.de>
 
-Old gcc versions cannot used named initializers for anonymous
-unions, leading to a build failure here. This replaces the anonymous
-union with a named one, which allows us to build with at least gcc-4.3
-through 4.5. Versions 4.6 and higher are fine without this.
+Building with ancient gcc versions results in a stream of build errors
+like:
 
-virt/kvm/arm/vgic/vgic-mmio-v2.c:295: error: unknown field 'read' specified in initializer
-virt/kvm/arm/vgic/vgic-mmio-v2.c:295: warning: missing braces around initializer
-virt/kvm/arm/vgic/vgic-mmio-v2.c:295: warning: (near initialization for 'vgic_v2_dist_registers[0].<anonymous>')
-virt/kvm/arm/vgic/vgic-mmio-v2.c:295: error: unknown field 'write' specified in initializer
-virt/kvm/arm/vgic/vgic-mmio-v2.c:298: error: unknown field 'read' specified in initializer
+arch/arm/include/asm/io.h:100: error: impossible constraint in 'asm'
+arch/arm/include/asm/io.h:118: error: impossible constraint in 'asm'
 
-Fixes: 59c5ab40989a ("KVM: arm64: vgic-its: Introduce ITS emulation file with MMIO framework")
+This reverts to an older version of __raw_readl, __raw_writel
+and __my_cpu_offset, which seem to be the only functions affected
+by this.
+
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- virt/kvm/arm/vgic/vgic-its.c     |  4 ++--
- virt/kvm/arm/vgic/vgic-mmio-v3.c |  8 ++++----
- virt/kvm/arm/vgic/vgic-mmio.c    | 16 ++++++++--------
- virt/kvm/arm/vgic/vgic-mmio.h    | 12 ++++++------
- 4 files changed, 20 insertions(+), 20 deletions(-)
+ arch/arm/include/asm/io.h     | 8 ++++++++
+ arch/arm/include/asm/percpu.h | 5 ++++-
+ 2 files changed, 12 insertions(+), 1 deletion(-)
 
-diff --git a/virt/kvm/arm/vgic/vgic-its.c b/virt/kvm/arm/vgic/vgic-its.c
-index 8c2b3cdcb2c5..922d820e2646 100644
---- a/virt/kvm/arm/vgic/vgic-its.c
-+++ b/virt/kvm/arm/vgic/vgic-its.c
-@@ -1292,8 +1292,8 @@ static void vgic_mmio_write_its_baser(struct kvm *kvm,
- 	.reg_offset = off,					\
- 	.len = length,						\
- 	.access_flags = acc,					\
--	.its_read = rd,						\
--	.its_write = wr,					\
-+	.r.its_read = rd,						\
-+	.w.its_write = wr,					\
+diff --git a/arch/arm/include/asm/io.h b/arch/arm/include/asm/io.h
+index 6f89a4d9fc85..d0f89c4cb8e2 100644
+--- a/arch/arm/include/asm/io.h
++++ b/arch/arm/include/asm/io.h
+@@ -97,8 +97,12 @@ static inline void __raw_writeb(u8 val, volatile void __iomem *addr)
+ #define __raw_writel __raw_writel
+ static inline void __raw_writel(u32 val, volatile void __iomem *addr)
+ {
++#if GCC_VERSION < 40200
++	*(volatile u32 __force *)addr = val;
++#else
+ 	asm volatile("str %1, %0"
+ 		     : : "Qo" (*(volatile u32 __force *)addr), "r" (val));
++#endif
  }
  
- static void its_mmio_write_wi(struct kvm *kvm, struct vgic_its *its,
-diff --git a/virt/kvm/arm/vgic/vgic-mmio-v3.c b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-index 50f42f0f8c4f..aa31110e4ebd 100644
---- a/virt/kvm/arm/vgic/vgic-mmio-v3.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio-v3.c
-@@ -362,15 +362,15 @@ static void vgic_mmio_write_pendbase(struct kvm_vcpu *vcpu,
- 		.bits_per_irq = bpi,					\
- 		.len = (bpi * VGIC_NR_PRIVATE_IRQS) / 8,		\
- 		.access_flags = acc,					\
--		.read = vgic_mmio_read_raz,				\
--		.write = vgic_mmio_write_wi,				\
-+		.r.read = vgic_mmio_read_raz,				\
-+		.w.write = vgic_mmio_write_wi,				\
- 	}, {								\
- 		.reg_offset = off + (bpi * VGIC_NR_PRIVATE_IRQS) / 8,	\
- 		.bits_per_irq = bpi,					\
- 		.len = (bpi * (1024 - VGIC_NR_PRIVATE_IRQS)) / 8,	\
- 		.access_flags = acc,					\
--		.read = rd,						\
--		.write = wr,						\
-+		.r.read = rd,						\
-+		.w.write = wr,						\
- 	}
+ #define __raw_readb __raw_readb
+@@ -115,9 +119,13 @@ static inline u8 __raw_readb(const volatile void __iomem *addr)
+ static inline u32 __raw_readl(const volatile void __iomem *addr)
+ {
+ 	u32 val;
++#if GCC_VERSION < 40200
++	val = *(volatile u32 __force *)addr;
++#else
+ 	asm volatile("ldr %0, %1"
+ 		     : "=r" (val)
+ 		     : "Qo" (*(volatile u32 __force *)addr));
++#endif
+ 	return val;
+ }
  
- static const struct vgic_register_region vgic_v3_dist_registers[] = {
-diff --git a/virt/kvm/arm/vgic/vgic-mmio.c b/virt/kvm/arm/vgic/vgic-mmio.c
-index ebe1b9fa3c4d..6690922bc6b0 100644
---- a/virt/kvm/arm/vgic/vgic-mmio.c
-+++ b/virt/kvm/arm/vgic/vgic-mmio.c
-@@ -500,16 +500,16 @@ static int dispatch_mmio_read(struct kvm_vcpu *vcpu, struct kvm_io_device *dev,
- 
- 	switch (iodev->iodev_type) {
- 	case IODEV_CPUIF:
--		data = region->read(vcpu, addr, len);
-+		data = region->r.read(vcpu, addr, len);
- 		break;
- 	case IODEV_DIST:
--		data = region->read(vcpu, addr, len);
-+		data = region->r.read(vcpu, addr, len);
- 		break;
- 	case IODEV_REDIST:
--		data = region->read(iodev->redist_vcpu, addr, len);
-+		data = region->r.read(iodev->redist_vcpu, addr, len);
- 		break;
- 	case IODEV_ITS:
--		data = region->its_read(vcpu->kvm, iodev->its, addr, len);
-+		data = region->r.its_read(vcpu->kvm, iodev->its, addr, len);
- 		break;
- 	}
- 
-@@ -531,16 +531,16 @@ static int dispatch_mmio_write(struct kvm_vcpu *vcpu, struct kvm_io_device *dev,
- 
- 	switch (iodev->iodev_type) {
- 	case IODEV_CPUIF:
--		region->write(vcpu, addr, len, data);
-+		region->w.write(vcpu, addr, len, data);
- 		break;
- 	case IODEV_DIST:
--		region->write(vcpu, addr, len, data);
-+		region->w.write(vcpu, addr, len, data);
- 		break;
- 	case IODEV_REDIST:
--		region->write(iodev->redist_vcpu, addr, len, data);
-+		region->w.write(iodev->redist_vcpu, addr, len, data);
- 		break;
- 	case IODEV_ITS:
--		region->its_write(vcpu->kvm, iodev->its, addr, len, data);
-+		region->w.its_write(vcpu->kvm, iodev->its, addr, len, data);
- 		break;
- 	}
- 
-diff --git a/virt/kvm/arm/vgic/vgic-mmio.h b/virt/kvm/arm/vgic/vgic-mmio.h
-index 84961b4e4422..7f7da7239612 100644
---- a/virt/kvm/arm/vgic/vgic-mmio.h
-+++ b/virt/kvm/arm/vgic/vgic-mmio.h
-@@ -26,14 +26,14 @@ struct vgic_register_region {
- 				      unsigned int len);
- 		unsigned long (*its_read)(struct kvm *kvm, struct vgic_its *its,
- 					  gpa_t addr, unsigned int len);
--	};
-+	} r;
- 	union {
- 		void (*write)(struct kvm_vcpu *vcpu, gpa_t addr,
- 			      unsigned int len, unsigned long val);
- 		void (*its_write)(struct kvm *kvm, struct vgic_its *its,
- 				  gpa_t addr, unsigned int len,
- 				  unsigned long val);
--	};
-+	} w;
- };
- 
- extern struct kvm_io_device_ops kvm_io_gic_ops;
-@@ -72,8 +72,8 @@ extern struct kvm_io_device_ops kvm_io_gic_ops;
- 		.bits_per_irq = bpi,					\
- 		.len = bpi * 1024 / 8,					\
- 		.access_flags = acc,					\
--		.read = rd,						\
--		.write = wr,						\
-+		.r.read = rd,						\
-+		.w.write = wr,						\
- 	}
- 
- #define REGISTER_DESC_WITH_LENGTH(off, rd, wr, length, acc)		\
-@@ -82,8 +82,8 @@ extern struct kvm_io_device_ops kvm_io_gic_ops;
- 		.bits_per_irq = 0,					\
- 		.len = length,						\
- 		.access_flags = acc,					\
--		.read = rd,						\
--		.write = wr,						\
-+		.r.read = rd,						\
-+		.w.write = wr,						\
- 	}
- 
- int kvm_vgic_register_mmio_region(struct kvm *kvm, struct kvm_vcpu *vcpu,
+diff --git a/arch/arm/include/asm/percpu.h b/arch/arm/include/asm/percpu.h
+index a89b4076cde4..dee4c89b4458 100644
+--- a/arch/arm/include/asm/percpu.h
++++ b/arch/arm/include/asm/percpu.h
+@@ -36,9 +36,12 @@ static inline unsigned long __my_cpu_offset(void)
+ 	 * We want to allow caching the value, so avoid using volatile and
+ 	 * instead use a fake stack read to hazard against barrier().
+ 	 */
++#if GCC_VERSION < 40200
++	asm("mrc p15, 0, %0, c13, c0, 4" : "=r" (off) : : "memory");
++#else
+ 	asm("mrc p15, 0, %0, c13, c0, 4" : "=r" (off)
+ 		: "Q" (*(const unsigned long *)current_stack_pointer));
+-
++#endif
+ 	return off;
+ }
+ #define __my_cpu_offset __my_cpu_offset()
 -- 
 2.9.0
 
