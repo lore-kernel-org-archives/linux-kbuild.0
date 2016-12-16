@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([217.72.192.73]:55252 "EHLO
+Received: from mout.kundenserver.de ([217.72.192.73]:57473 "EHLO
         mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1760762AbcLPK5G (ORCPT
+        with ESMTP id S1760751AbcLPK5G (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Fri, 16 Dec 2016 05:57:06 -0500
 From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH 11/13] fs: fix unsigned enum warning with gcc-4.2
-Date: Fri, 16 Dec 2016 11:56:32 +0100
-Message-Id: <20161216105634.235457-12-arnd@arndb.de>
+Subject: [PATCH 09/13] ARM: mark cmpxchg and xchg __always_inline for gcc-4.3
+Date: Fri, 16 Dec 2016 11:56:30 +0100
+Message-Id: <20161216105634.235457-10-arnd@arndb.de>
 In-Reply-To: <20161216105634.235457-1-arnd@arndb.de>
 References: <20161216105634.235457-1-arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,32 +15,59 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-arch@vger.kernel.org
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@vger.kernel.org, Russell King <rmk+kernel@armlinux.org.uk>, Andrew Morton <akpm@linux-foundation.org>, kernel-build-reports@lists.linaro.org, kvmarm@lists.cs.columbia.edu, Arnd Bergmann <arnd@arndb.de>
 
-With arm-linux-gcc-4.2, almost every file we build in the kernel ends
-up with this warning:
+With older compiler versions like gcc-4.3 and CONFIG_OPTIMIZE_INLINING,
+I run into link errors:
 
-include/linux/fs.h:2648: warning: comparison of unsigned expression < 0 is always false
+kernel/task_work.o: In function `__cmpxchg':
+task_work.c:(.text+0x8c): undefined reference to `__bad_cmpxchg'
+kernel/kthread.o: In function `__xchg':
+kthread.c:(.text+0x7bc): undefined reference to `__bad_xchg'
 
-Later versions don't have this problem, but it's easy enough to
-work around.
+This marks the functions in question as __always_inline to force
+inlining.
 
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- include/linux/fs.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/arm/include/asm/cmpxchg.h | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 398cf20a706d..782c2a292fd7 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -2645,7 +2645,7 @@ static const char * const kernel_read_file_str[] = {
+diff --git a/arch/arm/include/asm/cmpxchg.h b/arch/arm/include/asm/cmpxchg.h
+index 12215515ba02..218ba0ae90cd 100644
+--- a/arch/arm/include/asm/cmpxchg.h
++++ b/arch/arm/include/asm/cmpxchg.h
+@@ -24,7 +24,8 @@
+ #define swp_is_buggy
+ #endif
  
- static inline const char *kernel_read_file_id_str(enum kernel_read_file_id id)
+-static inline unsigned long __xchg(unsigned long x, volatile void *ptr, int size)
++static __always_inline unsigned long
++__xchg(unsigned long x, volatile void *ptr, int size)
  {
--	if (id < 0 || id >= READING_MAX_ID)
-+	if ((unsigned)id >= READING_MAX_ID)
- 		return kernel_read_file_str[READING_UNKNOWN];
+ 	extern void __bad_xchg(volatile void *, int);
+ 	unsigned long ret;
+@@ -152,8 +153,8 @@ extern void __bad_cmpxchg(volatile void *ptr, int size);
+  * cmpxchg only support 32-bits operands on ARMv6.
+  */
  
- 	return kernel_read_file_str[id];
+-static inline unsigned long __cmpxchg(volatile void *ptr, unsigned long old,
+-				      unsigned long new, int size)
++static __always_inline unsigned long
++__cmpxchg(volatile void *ptr, unsigned long old, unsigned long new, int size)
+ {
+ 	unsigned long oldval, res;
+ 
+@@ -213,9 +214,8 @@ static inline unsigned long __cmpxchg(volatile void *ptr, unsigned long old,
+ 				      sizeof(*(ptr)));			\
+ })
+ 
+-static inline unsigned long __cmpxchg_local(volatile void *ptr,
+-					    unsigned long old,
+-					    unsigned long new, int size)
++static __always_inline unsigned long
++__cmpxchg_local(volatile void *ptr, unsigned long old, unsigned long new, int size)
+ {
+ 	unsigned long ret;
+ 
 -- 
 2.9.0
 
