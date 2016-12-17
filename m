@@ -1,59 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from Chamillionaire.breakpoint.cc ([146.0.238.67]:57760 "EHLO
-        Chamillionaire.breakpoint.cc" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1753525AbcLQL36 (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 17 Dec 2016 06:29:58 -0500
-Date: Sat, 17 Dec 2016 12:29:50 +0100
-From: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
-Subject: Re: [RFC] minimum gcc version for kernel: raise to gcc-4.3 or 4.6?
-Message-ID: <20161217112949.pghxlhdlxjzdumuo@mikejones.breakpoint.cc>
-References: <20161216105634.235457-1-arnd@arndb.de>
- <20161216170043.taaanbg5objnxjlh@breakpoint.cc>
- <2778134.jZdhGefl4B@wuerfel>
+Received: from prg-ext-pat.suse.com ([213.151.95.130]:33998 "EHLO linux.suse"
+        rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1752695AbcLQWGO (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Sat, 17 Dec 2016 17:06:14 -0500
+Date: Sat, 17 Dec 2016 23:06:12 +0100
+From: Michal Marek <mmarek@suse.com>
+Subject: [GIT PULL] kbuild misc updates for v4.10-rc1
+Message-ID: <20161217220612.GA9077@pobox.suse.cz>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <2778134.jZdhGefl4B@wuerfel>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@vger.kernel.org, Russell King <rmk+kernel@armlinux.org.uk>, Andrew Morton <akpm@linux-foundation.org>, kernel-build-reports@lists.linaro.org, kvmarm@lists.cs.columbia.edu, Geert Uytterhoeven <geert@linux-m68k.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: afd@ti.com, anton.tikhomirov@cdnetworks.com, kilobyte@angband.pl, mmarek@suse.com, vaishali.thakkar@oracle.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 2016-12-16 23:00:27 [+0100], Arnd Bergmann wrote:
-> On Friday, December 16, 2016 6:00:43 PM CET Sebastian Andrzej Siewior wrote:
-> > On 2016-12-16 11:56:21 [+0100], Arnd Bergmann wrote:
-> > > The original gcc-4.3 release was in early 2008. If we decide to still
-> > > support that, we probably want the first 10 quirks in this series,
-> > > while gcc-4.6 (released in 2011) requires none of them.
-> > 
-> > It this min gcc thingy ARM only?
-> 
-> This is part of the question that I'm trying to figure out myself.
-> 
-> Clearly having the same minimum version across all architectures simplifies
-> things a lot, because many of the bugs in old versions are architecture
-> independent. 
+Hi Linus,
 
-agreed.
+please pull these non-core kbuild bits for v4.10-rc1:
+- One new coccinelle check and improvements to irqf_oneshot.cocci
+- make rpm POSIX compatibility fix
+- make deb-pkg arm64 cross-compiling fix. I forgot to send this one
+  during the v4.9 rc-phase, therefor the pull request is based on -rc6
+  and not -rc1
 
-> Then again, some architectures implicitly require a new version
-> because an old one never existed (e.g. arm64 or risc-v), while some other
-> architectures may require an old version.
+Thanks,
+Michal
 
-A new version is understandable. But why is an old version required?
-One thing is an enterprise distro that is "current" or "supported" and still
-stuck with gcc 4.1 because that is the version they decided to include in
-their release. This is sad. But you might want to ask yourself why you want
-the latest kernel but an old gcc / binutils.
+The following changes since commit c6a385539175ebc603da53aafb7753d39089f32e:
 
-If you have an architecture that compiles with gcc v4.1 and not with gcc
-latest stable / trunk then it is a sign that this port is not supported
-properly / not heatly. One thing is something like avr32 which is not part of
-upstream gcc due to some legal reason (that was my understanding a few years
-ago). It might get to a problem for them once large parts of userland switch
-to a later C++ standard which is gcc-5+.
+  kbuild: Steal gcc's pie from the very beginning (2016-11-15 17:08:14 +0100)
 
-> 	Arnd
+are available in the git repository at:
 
-Sebastian
+  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git misc
+
+for you to fetch changes up to ff5b1ce6b22080379fd1ae9076ff2f5ca6519861:
+
+  Merge branch 'kbuild/rc-fixes' into kbuild/misc (2016-12-11 21:20:34 +0100)
+
+----------------------------------------------------------------
+Adam Borowski (1):
+      builddeb: fix cross-building to arm64 producing host-arch debs
+
+Andrew F. Davis (1):
+      Coccinelle: Add misc/boolconv.cocci
+
+Anton Tikhomirov (1):
+      kbuild/mkspec: avoid using brace expansion
+
+Michal Marek (1):
+      Merge branch 'kbuild/rc-fixes' into kbuild/misc
+
+Vaishali Thakkar (3):
+      Coccinelle: misc: Improve the matching of rules
+      Coccinelle: misc: Improve the result given by context mode
+      Coccinelle: misc: Add support for devm variant in all modes
+
+ scripts/coccinelle/misc/boolconv.cocci     | 90 ++++++++++++++++++++++++++++++
+ scripts/coccinelle/misc/irqf_oneshot.cocci | 52 +++++++++++------
+ scripts/package/builddeb                   |  2 +-
+ scripts/package/mkspec                     |  3 +-
+ 4 files changed, 129 insertions(+), 18 deletions(-)
+ create mode 100644 scripts/coccinelle/misc/boolconv.cocci
