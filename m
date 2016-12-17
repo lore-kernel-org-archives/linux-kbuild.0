@@ -1,53 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from prg-ext-pat.suse.com ([213.151.95.130]:34052 "EHLO linux.suse"
-        rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1753254AbcLQWIH (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 17 Dec 2016 17:08:07 -0500
-Date: Sat, 17 Dec 2016 23:00:53 +0100
-From: Michal Marek <mmarek@suse.com>
-Subject: [GIT PULL] kconfig update for v4.10-rc1
-Message-ID: <20161217220053.GA8899@pobox.suse.cz>
+Received: from mail-io0-f196.google.com ([209.85.223.196]:33607 "EHLO
+        mail-io0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752357AbcLQX7i (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Sat, 17 Dec 2016 18:59:38 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+In-Reply-To: <5ee08a93-6b17-d1c2-af1c-ab9aa218903c@suse.cz>
+References: <20161017065131.GA27863@angband.pl> <20161017175951.31d8f4b7@roar.ozlabs.ibm.com>
+ <20161017100130.GA16013@angband.pl> <7212667f-f508-2b41-a380-8f736814d8cc@suse.cz>
+ <CA+55aFxjJbAXRq2HSxhfn2gWsGiLPTcqoRrrDLJrLd2vFLu9YQ@mail.gmail.com> <5ee08a93-6b17-d1c2-af1c-ab9aa218903c@suse.cz>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Sat, 17 Dec 2016 15:59:36 -0800
+Message-ID: <CA+55aFzRqCYxkqpHioWz-o4WPTDbFmmbHNWFm2oGkYObNOQX=w@mail.gmail.com>
+Subject: Re: [GIT PULL] kbuild changes for v4.9-rc1
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: bbarbulovski@gmail.com, ben.hutchings@codethink.co.uk, thrust73@gmail.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Jiri Slaby <jslaby@suse.cz>
+Cc: Adam Borowski <kilobyte@angband.pl>, Nicholas Piggin <npiggin@gmail.com>, Omar Sandoval <osandov@osandov.com>, Michal Marek <mmarek@suse.com>, Alexey Dobriyan <adobriyan@gmail.com>, Stephen Rothwell <sfr@canb.auug.org.au>, Al Viro <viro@zeniv.linux.org.uk>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>
 
-Hi Linus,
+On Sat, Dec 17, 2016 at 12:57 AM, Jiri Slaby <jslaby@suse.cz> wrote:
+>
+> Yes, disk drivers won't load:
+> [    2.141973] virtio_pci: disagrees about version of symbol mcount
+> [    2.144415] virtio_pci: Unknown symbol mcount (err -22)
 
-please pull these kconfig bits for v4.10-rc1:
-- make xconfig gui fixes
-- make nconfig fix for options with long prompts
-- fix make nconfig warning when pkg-config forces -D_GNU_SOURCE
+This makes no sense.
 
-Michal
+mcount isn't even one of the symbols that the patch by Adam is touching.
 
-The following changes since commit 1001354ca34179f3db924eb66672442a173147dc:
+There's something else screwed up here. Not to mention that others
+don't have your issue.
 
-  Linux 4.9-rc1 (2016-10-15 12:17:50 -0700)
+Do you have some other hacks in this area? Are you testing actual
+plain 4.9, or do you (for example) still carry Arnd's patch around
+that turned out to not work (reverted by f27c2f69cc8e in my tree)?
 
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git kconfig
-
-for you to fetch changes up to 83c3a1bad224189f22ca2c1955337c3478bd3ab2:
-
-  xconfig: fix missing suboption and help panels on first run (2016-12-11 21:40:54 +0100)
-
-----------------------------------------------------------------
-Ben Hutchings (1):
-      kconfig/nconf: Fix hang when editing symbol with a long prompt
-
-Boris Barbulovski (2):
-      xconfig: fix 'Show Debug' functionality
-      xconfig: fix missing suboption and help panels on first run
-
-Cheah Kok Cheong (1):
-      Scripts: kconfig: nconf: fix _GNU_SOURCE redefined warning
-
- scripts/kconfig/nconf.c     |  2 ++
- scripts/kconfig/nconf.gui.c | 15 +++++++++++----
- scripts/kconfig/qconf.cc    | 19 ++++++++++++++-----
- 3 files changed, 27 insertions(+), 9 deletions(-)
+           Linus
