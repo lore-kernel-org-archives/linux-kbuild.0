@@ -1,39 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-io0-f196.google.com ([209.85.223.196]:33607 "EHLO
-        mail-io0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752357AbcLQX7i (ORCPT
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:35570 "EHLO
+        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1757440AbcLRKtd (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 17 Dec 2016 18:59:38 -0500
-MIME-Version: 1.0
-In-Reply-To: <5ee08a93-6b17-d1c2-af1c-ab9aa218903c@suse.cz>
-References: <20161017065131.GA27863@angband.pl> <20161017175951.31d8f4b7@roar.ozlabs.ibm.com>
- <20161017100130.GA16013@angband.pl> <7212667f-f508-2b41-a380-8f736814d8cc@suse.cz>
- <CA+55aFxjJbAXRq2HSxhfn2gWsGiLPTcqoRrrDLJrLd2vFLu9YQ@mail.gmail.com> <5ee08a93-6b17-d1c2-af1c-ab9aa218903c@suse.cz>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Sat, 17 Dec 2016 15:59:36 -0800
-Message-ID: <CA+55aFzRqCYxkqpHioWz-o4WPTDbFmmbHNWFm2oGkYObNOQX=w@mail.gmail.com>
+        Sun, 18 Dec 2016 05:49:33 -0500
 Subject: Re: [GIT PULL] kbuild changes for v4.9-rc1
-Content-Type: text/plain; charset=UTF-8
+References: <20161017065131.GA27863@angband.pl>
+ <20161017175951.31d8f4b7@roar.ozlabs.ibm.com>
+ <20161017100130.GA16013@angband.pl>
+ <7212667f-f508-2b41-a380-8f736814d8cc@suse.cz>
+ <CA+55aFxjJbAXRq2HSxhfn2gWsGiLPTcqoRrrDLJrLd2vFLu9YQ@mail.gmail.com>
+ <5ee08a93-6b17-d1c2-af1c-ab9aa218903c@suse.cz>
+ <CA+55aFzRqCYxkqpHioWz-o4WPTDbFmmbHNWFm2oGkYObNOQX=w@mail.gmail.com>
+From: Jiri Slaby <jslaby@suse.cz>
+Message-ID: <9dec52ac-dc82-73c5-6b36-b5eb7cc052fa@suse.cz>
+Date: Sun, 18 Dec 2016 11:49:29 +0100
+MIME-Version: 1.0
+In-Reply-To: <CA+55aFzRqCYxkqpHioWz-o4WPTDbFmmbHNWFm2oGkYObNOQX=w@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jiri Slaby <jslaby@suse.cz>
+To: Linus Torvalds <torvalds@linux-foundation.org>
 Cc: Adam Borowski <kilobyte@angband.pl>, Nicholas Piggin <npiggin@gmail.com>, Omar Sandoval <osandov@osandov.com>, Michal Marek <mmarek@suse.com>, Alexey Dobriyan <adobriyan@gmail.com>, Stephen Rothwell <sfr@canb.auug.org.au>, Al Viro <viro@zeniv.linux.org.uk>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>
 
-On Sat, Dec 17, 2016 at 12:57 AM, Jiri Slaby <jslaby@suse.cz> wrote:
->
-> Yes, disk drivers won't load:
-> [    2.141973] virtio_pci: disagrees about version of symbol mcount
-> [    2.144415] virtio_pci: Unknown symbol mcount (err -22)
+On 12/18/2016, 12:59 AM, Linus Torvalds wrote:
+> On Sat, Dec 17, 2016 at 12:57 AM, Jiri Slaby <jslaby@suse.cz> wrote:
+>>
+>> Yes, disk drivers won't load:
+>> [    2.141973] virtio_pci: disagrees about version of symbol mcount
+>> [    2.144415] virtio_pci: Unknown symbol mcount (err -22)
+> 
+> This makes no sense.
+> 
+> mcount isn't even one of the symbols that the patch by Adam is touching.
 
-This makes no sense.
+asm-prototypes.h in his patch includes asm/ftrace.h, where the function
+is declared. That should be enough IIUC scripts/Makefile.build.
 
-mcount isn't even one of the symbols that the patch by Adam is touching.
+> There's something else screwed up here. Not to mention that others
+> don't have your issue.
 
-There's something else screwed up here. Not to mention that others
-don't have your issue.
+I suppose people don't run i386 kernels or have different config.
 
-Do you have some other hacks in this area? Are you testing actual
-plain 4.9, or do you (for example) still carry Arnd's patch around
-that turned out to not work (reverted by f27c2f69cc8e in my tree)?
+> Do you have some other hacks in this area? Are you testing actual
+> plain 4.9, or do you (for example) still carry Arnd's patch around
+> that turned out to not work (reverted by f27c2f69cc8e in my tree)?
 
-           Linus
+Not at all. This was plain 4.9 packaged by suse -- only rpm-related
+fixes. I tried plain 4.9 without rpm right now with the same output:
+# insmod soundcore.ko
+[   31.582326] soundcore: disagrees about version of symbol mcount
+[   31.586183] soundcore: Unknown symbol mcount (err -22)
+insmod: ERROR: could not insert module soundcore.ko: Invalid parameters
+
+
+$ git describe @
+v4.9
+$ git status
+HEAD detached at v4.9
+
+
+thanks,
+-- 
+js
+suse labs
