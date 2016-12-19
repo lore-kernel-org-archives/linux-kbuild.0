@@ -1,45 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:50028 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1761994AbcLSK5b (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 19 Dec 2016 05:57:31 -0500
-Subject: Re: default 0 if KASAN expression not working in kbuild
-References: <e8e7205e-17f4-1d2c-f6d1-bd741b65e032@gmail.com>
-From: Michal Marek <mmarek@suse.com>
-Message-ID: <8c63bae0-79fb-4594-125a-7e5d76e0c603@suse.com>
-Date: Mon, 19 Dec 2016 11:57:23 +0100
-MIME-Version: 1.0
-In-Reply-To: <e8e7205e-17f4-1d2c-f6d1-bd741b65e032@gmail.com>
-Content-Type: text/plain; charset=utf-8
+Received: from mail-wj0-f193.google.com ([209.85.210.193]:34767 "EHLO
+        mail-wj0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932982AbcLSLL5 (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 19 Dec 2016 06:11:57 -0500
+Date: Mon, 19 Dec 2016 12:10:46 +0100
+From: Emese Revfy <re.emese@gmail.com>
+Subject: Re: [PATCH v4 0/4] Introduce the initify gcc plugin
+Message-Id: <20161219121046.646e5ef425178fce8c2cb555@gmail.com>
+In-Reply-To: <CAGXu5jKfwBqEot+30z6Wh6Cow2gv25ojKxmoTS1Vb_LhwFiSnA@mail.gmail.com>
+References: <1481925984-98605-1-git-send-email-keescook@chromium.org>
+        <CAGXu5jKfwBqEot+30z6Wh6Cow2gv25ojKxmoTS1Vb_LhwFiSnA@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nikolay Borisov <n.borisov.lkml@gmail.com>, linux-kbuild@vger.kernel.org
-Cc: LKML <linux-kernel@vger.kernel.org>, yann.morin.1998@free.fr
+To: Kees Cook <keescook@chromium.org>
+Cc: "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, LKML <linux-kernel@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Josh Triplett <josh@joshtriplett.org>, PaX Team <pageexec@freemail.hu>, Brad Spengler <spender@grsecurity.net>, Michal Marek <mmarek@suse.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, minipli@ld-linux.so, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, David Brown <david.brown@linaro.org>, "benh@kernel.crashing.org" <benh@kernel.crashing.org>, Thomas Gleixner <tglx@linutronix.de>, Andrew Morton <akpm@linux-foundation.org>, Jeff Layton <jlayton@poochiereds.net>, Sam Ravnborg <sam@ravnborg.org>
 
-On 2016-12-15 19:09, Nikolay Borisov wrote:
-> Hello,
+On Fri, 16 Dec 2016 14:19:10 -0800
+Kees Cook <keescook@chromium.org> wrote:
+ 
+> FWIW, it still seems to me that these aren't false positives:
 > 
-> I was doing some kasan-related debugging and when I enabled it I started
-> getting warnings for large stackframes. So CONFIG_FRAME_WARN has :
-> 
-> int "Warn for stack frames larger than (needs gcc 4.4)"
->     range 0 8192
->     default 0 if KASAN
->     default 2048 if GCC_PLUGIN_LATENT_ENTROPY
->     default 1024 if !64BIT
->     default 2048 if 64BIT
-> 
-> This means that frame_warns should effectively be disabled when kasan is
-> enabled. However in my case this is not the situation.
-> http://sprunge.us/FiGf here is the config file. It does have
-> CONFIG_KASAN=y and CONFIG_FRAME_WARN=1024 . And even this is erroneous
-> since it's a 64bit kernel, so it should be 2k. I haven't manually set
-> the limit to 1k either.
+> WARNING: vmlinux.o(.text.unlikely+0x1b1): Section mismatch in
+> reference from the function uncore_pci_exit.part.22() to the function
+> .init.text:uncore_free_pcibus_map()
+> The function uncore_pci_exit.part.22() references
+> the function __init uncore_free_pcibus_map().
+> This is often because uncore_pci_exit.part.22 lacks a __init
+> annotation or the annotation of uncore_free_pcibus_map is wrong.
 
-I guess the problem is that it's an option with a propt, so deviating
-from the default value is legitimate. And most likely the
-value is computed during menuconfig startup and a subsequent change of
-CONFIG_KASAN does not change it (because 2048 or 1048 are also valid).
+Hi,
 
-Michal
+I can't reproduce this section mismatch. Could you please send me your .config?
+Which gcc version did you use?
+I used this tree: git://git.kernel.org/pub/scm/linux/kernel/git/kees/linux.git initify-v4
+
+Thanks
+-- 
+Emese
