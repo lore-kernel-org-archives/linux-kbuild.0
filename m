@@ -1,73 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f67.google.com ([74.125.82.67]:35426 "EHLO
-        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753568AbcLRPIO (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 18 Dec 2016 10:08:14 -0500
-Subject: Re: [GIT PULL] kbuild changes for v4.9-rc1
-References: <20161017065131.GA27863@angband.pl>
- <20161017175951.31d8f4b7@roar.ozlabs.ibm.com>
- <20161017100130.GA16013@angband.pl>
- <7212667f-f508-2b41-a380-8f736814d8cc@suse.cz>
- <CA+55aFxjJbAXRq2HSxhfn2gWsGiLPTcqoRrrDLJrLd2vFLu9YQ@mail.gmail.com>
- <5ee08a93-6b17-d1c2-af1c-ab9aa218903c@suse.cz>
- <CA+55aFzRqCYxkqpHioWz-o4WPTDbFmmbHNWFm2oGkYObNOQX=w@mail.gmail.com>
- <9dec52ac-dc82-73c5-6b36-b5eb7cc052fa@suse.cz>
- <8311f14c-3d1e-6354-323a-87701cabaa97@broadcom.com>
- <0fca8045-30c0-590d-07b8-d7d7d9791759@gmail.com>
- <9aa0d77b-5cb4-f67f-4a09-2c6336b32db6@suse.cz>
- <eff67256-ea61-ef88-251b-b67fcf6a9538@gmail.com>
-From: Jiri Slaby <jslaby@suse.cz>
-Message-ID: <7e93909c-d2ab-a07a-c2ed-cdb1c44937d0@suse.cz>
-Date: Sun, 18 Dec 2016 16:08:10 +0100
+Received: from mx2.suse.de ([195.135.220.15]:50028 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1761994AbcLSK5b (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 19 Dec 2016 05:57:31 -0500
+Subject: Re: default 0 if KASAN expression not working in kbuild
+References: <e8e7205e-17f4-1d2c-f6d1-bd741b65e032@gmail.com>
+From: Michal Marek <mmarek@suse.com>
+Message-ID: <8c63bae0-79fb-4594-125a-7e5d76e0c603@suse.com>
+Date: Mon, 19 Dec 2016 11:57:23 +0100
 MIME-Version: 1.0
-In-Reply-To: <eff67256-ea61-ef88-251b-b67fcf6a9538@gmail.com>
+In-Reply-To: <e8e7205e-17f4-1d2c-f6d1-bd741b65e032@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nikolay Borisov <n.borisov.lkml@gmail.com>, Arend Van Spriel <arend.vanspriel@broadcom.com>, Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Adam Borowski <kilobyte@angband.pl>, Nicholas Piggin <npiggin@gmail.com>, Omar Sandoval <osandov@osandov.com>, Michal Marek <mmarek@suse.com>, Alexey Dobriyan <adobriyan@gmail.com>, Stephen Rothwell <sfr@canb.auug.org.au>, Al Viro <viro@zeniv.linux.org.uk>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>
+To: Nikolay Borisov <n.borisov.lkml@gmail.com>, linux-kbuild@vger.kernel.org
+Cc: LKML <linux-kernel@vger.kernel.org>, yann.morin.1998@free.fr
 
-On 12/18/2016, 03:54 PM, Nikolay Borisov wrote:
+On 2016-12-15 19:09, Nikolay Borisov wrote:
+> Hello,
 > 
+> I was doing some kasan-related debugging and when I enabled it I started
+> getting warnings for large stackframes. So CONFIG_FRAME_WARN has :
 > 
-> On 18.12.2016 16:45, Jiri Slaby wrote:
->> Moreover, with some modules, __put_user_1 and others are reported
->> instead of mcount.
+> int "Warn for stack frames larger than (needs gcc 4.4)"
+>     range 0 8192
+>     default 0 if KASAN
+>     default 2048 if GCC_PLUGIN_LATENT_ENTROPY
+>     default 1024 if !64BIT
+>     default 2048 if 64BIT
 > 
-> 
-> nm vmlinux | grep __fentry__
-> nm vmlinux | grep mcount
-> 
-> What do these report ? I bet you that in your vmlinux the first one
-> would return something like :
-> 
-> ffffffff822f1810 T __fentry__
-> ffffffff827fdc20 r __kcrctab___fentry__
-> ffffffff82809461 r __kstrtab___fentry__
-> ffffffff827e6c20 R __ksymtab___fentry__
->  and nothing for the second. Whereas doing nm on the module in question
-> would give nothing for __fentry__ and something like: U mcount
+> This means that frame_warns should effectively be disabled when kasan is
+> enabled. However in my case this is not the situation.
+> http://sprunge.us/FiGf here is the config file. It does have
+> CONFIG_KASAN=y and CONFIG_FRAME_WARN=1024 . And even this is erroneous
+> since it's a 64bit kernel, so it should be 2k. I haven't manually set
+> the limit to 1k either.
 
-Well, I have just won a beer:
-$ nm vmlinux | grep mcount
-         w __crc_mcount
-c0b3bd34 r __kcrctab_mcount
-c0b41692 r __kstrtab_mcount
-c0b2dd04 R __ksymtab_mcount
-c0896130 T mcount
-c0c9ee20 T __start_mcount_loc
-c0cba89c T __stop_mcount_loc
-$ nm vmlinux | grep __fentry__
-$ nm sound/soundcore.ko | grep mcount
-         U mcount
+I guess the problem is that it's an option with a propt, so deviating
+from the default value is legitimate. And most likely the
+value is computed during menuconfig startup and a subsequent change of
+CONFIG_KASAN does not change it (because 2048 or 1048 are also valid).
 
-No, I am really not stupid. We compile the kernels like this for over a
-decade and it really broke with 4.9. Applying the patch fixes the
-problem. Reverting it, makes it recur.
-
-regards,
--- 
-js
-suse labs
+Michal
