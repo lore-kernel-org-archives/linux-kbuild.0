@@ -1,81 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf0-f196.google.com ([209.85.192.196]:36463 "EHLO
-        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S941136AbcLWDPX (ORCPT
+Received: from mo4-p04-ob.smtp.rzone.de ([81.169.146.178]:20622 "EHLO
+        mo4-p04-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754578AbcL0TI4 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 22 Dec 2016 22:15:23 -0500
-Received: by mail-pf0-f196.google.com with SMTP id c4so13192298pfb.3
-        for <linux-kbuild@vger.kernel.org>; Thu, 22 Dec 2016 19:15:23 -0800 (PST)
-From: Nicholas Piggin <npiggin@gmail.com>
-Subject: [PATCH] kbuild: Fix dependency checking for initramfs build
-Date: Fri, 23 Dec 2016 13:15:08 +1000
-Message-Id: <20161223031508.30532-1-npiggin@gmail.com>
+        Tue, 27 Dec 2016 14:08:56 -0500
+Content-Type: text/plain; charset=windows-1252
+Mime-Version: 1.0 (Mac OS X Mail 9.3 \(3124\))
+Subject: Re: [PATCH v8 3/8] drivers:input:tsc2007: add iio interface to read external ADC input and temperature
+From: "H. Nikolaus Schaller" <hns@goldelico.com>
+In-Reply-To: <E4E31180-A686-4631-9713-519987C55F06@goldelico.com>
+Date: Tue, 27 Dec 2016 20:08:16 +0100
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <AAA89A9C-C9C2-4B90-9D1C-3E8B5D2412A1@goldelico.com>
+References: <cover.1479823354.git.hns@goldelico.com> <cover.1479823354.git.hns@goldelico.com> <99f236df48b03b3188e12f94a20097f8440db7a5.1479823354.git.hns@goldelico.com> <E42B1EF7-222E-46D6-878B-30C789CFBBC5@jic23.retrosnub.co.uk> <811B6F6A-2E3D-45B4-A984-74ABE0E37192@goldelico.com> <8d3fc752-e69c-f568-4f71-4f1768a3fffe@kernel.org> <AC7B3C1C-C05B-45B5-8426-5225F151DC26@goldelico.com> <E4E31180-A686-4631-9713-519987C55F06@goldelico.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>
-Cc: Nicholas Piggin <npiggin@gmail.com>, linux-kbuild@vger.kernel.org, Francisco Blas Izquierdo Riera <klondike@klondike.es>, Andrew Morton <akpm@linux-foundation.org>
+To: Jonathan Cameron <jic23@kernel.org>, Dmitry Torokhov <dmitry.torokhov@gmail.com>
+Cc: Jonathan Cameron <jic23@jic23.retrosnub.co.uk>, Mark Rutland <mark.rutland@arm.com>, =?windows-1252?Q?Beno=EEt_Cousson?= <bcousson@baylibre.com>, Tony Lindgren <tony@atomide.com>, Russell King <linux@armlinux.org.uk>, Arnd Bergmann <arnd@arndb.de>, Michael Welling <mwelling@ieee.org>, =?windows-1252?Q?Mika_Penttil=E4?= <mika.penttila@nextfour.com>, Javier Martinez Canillas <javier@osg.samsung.com>, Igor Grinberg <grinberg@compulab.co.il>, "Andrew F. Davis" <afd@ti.com>, Mark Brown <broonie@kernel.org>, Rob Herring <robh+dt@kernel.org>, Alexander Stein <alexander.stein@systec-electronic.com>, Eric Engestrom <eric@engestrom.ch>, Hans de Goede <hdegoede@redhat.com>, Benjamin Tissoires <benjamin.tissoires@redhat.com>, Denis Carikli <denis@eukrea.com>, Petr Cvek <petr.cvek@tul.cz>, linux-input@vger.kernel.org, devicetree <devicetree@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, linux-omap <linux-omap@vger.kernel.org>, Discussions about the Letux Kernel <letux-kernel@openphoenux.org>, linux-iio@vger.kernel.org, kernel@pyra-handheld.com, "Yann E. MORIN" <yann.morin.1998@free.fr>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Sebastian Reichel <sre@kernel.org>
 
-When using initramfs compression, the data file gets quotes pulled
-in from Kconfig, e.g., initramfs_data.cpio".gz" which make does not
-match a target and causes rebuild.
+ping.
 
-Fix this by filtering out quotes from the Kconfig string.
+> Am 12.12.2016 um 22:21 schrieb H. Nikolaus Schaller =
+<hns@goldelico.com>:
+>=20
+> Hi,
+>=20
+>=20
+>> Am 27.11.2016 um 16:47 schrieb H. Nikolaus Schaller =
+<hns@goldelico.com>:
+>>=20
+>> Hi Jonathan,
+>>=20
+>>> Am 27.11.2016 um 12:02 schrieb Jonathan Cameron <jic23@kernel.org>:
+>>>=20
+>>> On 24/11/16 18:05, H. Nikolaus Schaller wrote:
+>>>>=20
+>>>>> Am 24.11.2016 um 18:38 schrieb Jonathan Cameron =
+<jic23@jic23.retrosnub.co.uk>:
+>>>>>=20
+>>>>>=20
+>>>>>=20
+>>>>> On 22 November 2016 14:02:30 GMT+00:00, "H. Nikolaus Schaller" =
+<hns@goldelico.com> wrote:
+>=20
+>>=20
+>>> - hence cc'd Yann and the Kbuild list
+>>> to see if they can offer some advices.
+>=20
+> no response / advice so far.
+>=20
+>>=20
+>> Thanks!
+>>=20
+>> BTW, the other tsc2007 and ads7846 patches could already be merged =
+(if there
+>> are no more changes needed) since this one only depends on the result =
+of applying
+>> all others before.
+>=20
+> I wonder if input maintainers can already merge the other patches of =
+this patch series?
 
-While we're here, set the target explicitly so the Makefile does not
-have to know about all the suffixes.
-
-Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
----
- usr/Makefile | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
-
-diff --git a/usr/Makefile b/usr/Makefile
-index 17a513268325..3116b23d44f8 100644
---- a/usr/Makefile
-+++ b/usr/Makefile
-@@ -5,8 +5,10 @@
- klibcdirs:;
- PHONY += klibcdirs
- 
--suffix_y = $(CONFIG_INITRAMFS_COMPRESSION)
--AFLAGS_initramfs_data.o += -DINITRAMFS_IMAGE="usr/initramfs_data.cpio$(suffix_y)"
-+suffix_y = $(subst $\",,$(CONFIG_INITRAMFS_COMPRESSION))
-+datafile_y = initramfs_data.cpio$(suffix_y)
-+AFLAGS_initramfs_data.o += -DINITRAMFS_IMAGE=usr/$(datafile_y)
-+
- 
- # Generate builtin.o based on initramfs_data.o
- obj-$(CONFIG_BLK_DEV_INITRD) := initramfs_data.o
-@@ -14,7 +16,7 @@ obj-$(CONFIG_BLK_DEV_INITRD) := initramfs_data.o
- # initramfs_data.o contains the compressed initramfs_data.cpio image.
- # The image is included using .incbin, a dependency which is not
- # tracked automatically.
--$(obj)/initramfs_data.o: $(obj)/initramfs_data.cpio$(suffix_y) FORCE
-+$(obj)/initramfs_data.o: $(obj)/$(datafile_y) FORCE
- 
- #####
- # Generate the initramfs cpio archive
-@@ -38,10 +40,8 @@ endif
- quiet_cmd_initfs = GEN     $@
-       cmd_initfs = $(initramfs) -o $@ $(ramfs-args) $(ramfs-input)
- 
--targets := initramfs_data.cpio.gz initramfs_data.cpio.bz2 \
--	initramfs_data.cpio.lzma initramfs_data.cpio.xz \
--	initramfs_data.cpio.lzo initramfs_data.cpio.lz4 \
--	initramfs_data.cpio
-+targets := $(datafile_y)
-+
- # do not try to update files included in initramfs
- $(deps_initramfs): ;
- 
-@@ -51,6 +51,6 @@ $(deps_initramfs): klibcdirs
- # 2) There are changes in which files are included (added or deleted)
- # 3) If gen_init_cpio are newer than initramfs_data.cpio
- # 4) arguments to gen_initramfs.sh changes
--$(obj)/initramfs_data.cpio$(suffix_y): $(obj)/gen_init_cpio $(deps_initramfs) klibcdirs
-+$(obj)/$(datafile_y): $(obj)/gen_init_cpio $(deps_initramfs) klibcdirs
- 	$(Q)$(initramfs) -l $(ramfs-input) > $(obj)/.initramfs_data.cpio.d
- 	$(call if_changed,initfs)
--- 
-2.11.0
+series: https://lkml.org/lkml/2016/11/22/309
 
