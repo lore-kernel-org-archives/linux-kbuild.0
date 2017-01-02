@@ -1,59 +1,22 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pandora.armlinux.org.uk ([78.32.30.218]:35212 "EHLO
-        pandora.armlinux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751364AbdABMX6 (ORCPT
+Received: from mbkd0234.ocn.ad.jp ([153.149.233.35]:39732 "EHLO
+        mbkd0234.ocn.ad.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932719AbdABRwU (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 2 Jan 2017 07:23:58 -0500
-Date: Mon, 2 Jan 2017 12:23:47 +0000
-From: Russell King - ARM Linux <linux@armlinux.org.uk>
-Subject: Re: [RFC] minimum gcc version for kernel: raise to gcc-4.3 or 4.6?
-Message-ID: <20170102122347.GB14217@n2100.armlinux.org.uk>
-References: <20161216105634.235457-1-arnd@arndb.de>
- <20161216170043.taaanbg5objnxjlh@breakpoint.cc>
- <2778134.jZdhGefl4B@wuerfel>
- <20161217112949.pghxlhdlxjzdumuo@mikejones.breakpoint.cc>
+        Mon, 2 Jan 2017 12:52:20 -0500
+Date: Tue, 3 Jan 2017 02:34:38 +0900 (JST)
+From: "Dr. David White" <"wd."@eagle.ocn.ne.jp>
+Reply-To: "Dr. David White" <david_white34@mynet.com>
+Message-ID: <603429211.116392312.1483378478267.JavaMail.root@eagle.ocn.ne.jp>
+Subject: Urgent Please;;
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20161217112949.pghxlhdlxjzdumuo@mikejones.breakpoint.cc>
+Content-Type: text/plain; charset=ISO-2022-JP
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sebastian Andrzej Siewior <sebastian@breakpoint.cc>
-Cc: Arnd Bergmann <arnd@arndb.de>, linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, kernel-build-reports@lists.linaro.org, linux-kernel@vger.kernel.org, Geert Uytterhoeven <geert@linux-m68k.org>, Andrew Morton <akpm@linux-foundation.org>, kvmarm@lists.cs.columbia.edu, linux-arm-kernel@vger.kernel.org
 
-On Sat, Dec 17, 2016 at 12:29:50PM +0100, Sebastian Andrzej Siewior wrote:
-> A new version is understandable. But why is an old version required?
-> One thing is an enterprise distro that is "current" or "supported" and still
-> stuck with gcc 4.1 because that is the version they decided to include in
-> their release. This is sad. But you might want to ask yourself why you want
-> the latest kernel but an old gcc / binutils.
+Dear,
+With due respect to your person and much sincerity of purpose. I have a business proposal which I will like to handle with you and $14.5 Million USD is involve. But be rest assured that everything is legal and risk free as I have concluded all the arrangements and the legal papers that will back the transaction up. Kindly indicate your interest as to enable me tell you more detail of the proposal. Waiting for your urgent response.
 
-To help isolate changes.
-
-If you constantly upgrade everything, how do you bug hunt for a breakage?
-How do you know whether it's created by the kernel, or by (eg) a later
-version of gcc miscompiling the kernel.  You have a large amount of code
-to start bug hunting through.
-
-Sticking with particular tool versions long-term means that you build up
-confidence in it - yes, sure, latent bugs exist, but it's easier to
-bug hunt if you aren't constantly suspecting that your tools might be
-broken.
-
-For example, I build kernels with:
-
-		gcc		binutils		built on
-32-bit ARM	4.7.4		2.25			April/May 2015
-64-bit ARM	4.9.2		2.25.51.20150219	Feb/April 2015
-
-I'm not anticipating upgrading them for some time yet - the only one
-which may get upgraded is the 64-bit binutils since later kernels now
-complain about a missing errata workaround in that toolchain version.
-
-I do still have some older toolchains around on some of my ARM boxes
-though, even a GCC 3 version with ARM TLS support for faster builds!
-
--- 
-RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
-FTTC broadband for 0.8mile line: currently at 9.6Mbps down 400kbps up
-according to speedtest.net.
+Yours Faithfully,
+Dr. David White
