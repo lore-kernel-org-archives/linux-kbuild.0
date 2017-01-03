@@ -1,51 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:44625 "EHLO mx2.suse.de"
+Received: from mx2.suse.de ([195.135.220.15]:57121 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750879AbdACKgJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 3 Jan 2017 05:36:09 -0500
-Subject: Re: Ambiguity in Documentation/kbuild/modules.txt
-References: <40236E75-937E-4368-B694-BA5E80647251@redfish-solutions.com>
+        id S1757698AbdACOP2 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 3 Jan 2017 09:15:28 -0500
 From: Michal Marek <mmarek@suse.com>
-Message-ID: <035a4e49-ad6d-7bd7-4eff-632e78f25b10@suse.com>
-Date: Tue, 3 Jan 2017 11:36:06 +0100
-MIME-Version: 1.0
-In-Reply-To: <40236E75-937E-4368-B694-BA5E80647251@redfish-solutions.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Subject: [PATCH 2/3] genksyms: Fix segfault with invalid declarations
+Date: Tue,  3 Jan 2017 15:14:55 +0100
+Message-Id: <20170103141456.12743-2-mmarek@suse.com>
+In-Reply-To: <20170103141456.12743-1-mmarek@suse.com>
+References: <20170103141456.12743-1-mmarek@suse.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Philip Prindeville <philipp@redfish-solutions.com>
-Cc: mfm@muteddisk.com, pjday@mindspring.com, sam@ravnborg.org, linux-kbuild@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Borislav Petkov <bp@alien8.de>
 
-On 2016-12-22 20:32, Philip Prindeville wrote:
-> but what if we were dealing with someone who had written a 2.4 Makefile, and had named the files:
-> 
-> 	8123.c                  <= problematic name
-> 	8123_if.c
-> 	8123_if.h
-> 	8123_pci.c
-> 	8123_bin.o_shipped
-> 
-> instead?
-> 
-> It seems to me that the line:
-> 
-> 8123-y := 8123.o 8123_if.o 8123_pci.o 8123_bin.o
-> 
-> would be problematic (i.e. a circular dependency). Yes, the person
-> who
-> developed the software I’m trying to Build should probably have named
-> 8123.c as “8123_main.c” instead, but he didn’t... though arguably it’s
-> an unnecessary restriction to not have a source file called
-> $(module_name).c in the list of sources for $(module_name).ko ...
-> 
-> So how does one work around this issue? A possible fix to the Kbuild
-> machinery itself would involve linking the $(8123-y) object files into
-> 8123_.o instead, and then using that to derive 8123.ko ...
+Do not try to recover too early and segfault when parsing invalid
+declarations such as
 
-Hi Philip,
+echo 'int (int);' | scripts/genksyms/genksyms
+echo 'int a, (int);' | scripts/genksyms/genksyms
+echo 'extern void *__inline_memcpy((void *), (const void *), (__kernel_size_t));' | scripts/genksyms/genksyms
 
-scripts/Makefile.build is quite complex already, so I suggest to work
-around this by renaming the source file.
+The last one was a real-life bug with
+include/asm-generic/asm-prototypes.h on x86_64.
 
-Michal
+Reported-by: Borislav Petkov <bp@alien8.de>
+Signed-off-by: Michal Marek <mmarek@suse.com>
+---
+ scripts/genksyms/parse.y | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/scripts/genksyms/parse.y b/scripts/genksyms/parse.y
+index 4fba255e54ae..00a6d7e54971 100644
+--- a/scripts/genksyms/parse.y
++++ b/scripts/genksyms/parse.y
+@@ -322,8 +322,6 @@ direct_declarator:
+ 		{ $$ = $2; }
+ 	| '(' declarator ')'
+ 		{ $$ = $3; }
+-	| '(' error ')'
+-		{ $$ = $3; }
+ 	;
+ 
+ /* Nested declarators differ from regular declarators in that they do
+-- 
+2.10.2
+
