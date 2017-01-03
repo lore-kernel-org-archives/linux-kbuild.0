@@ -1,68 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtprelay0068.hostedemail.com ([216.40.44.68]:33039 "EHLO
-        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1755969AbdABS7n (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 2 Jan 2017 13:59:43 -0500
-Received: from smtprelay.hostedemail.com (10.5.19.251.rfc1918.com [10.5.19.251])
-        by smtpgrave04.hostedemail.com (Postfix) with ESMTP id CCB11B1178
-        for <linux-kbuild@vger.kernel.org>; Mon,  2 Jan 2017 18:51:14 +0000 (UTC)
-Date: Mon, 2 Jan 2017 13:51:11 -0500
-From: Steven Rostedt <rostedt@goodmis.org>
-Subject: Re: [PATCH] jump label: pass kbuild_cflags when checking for asm
- goto support
-Message-ID: <20170102135111.26d5f5bd@grimm.local.home>
-In-Reply-To: <CAPzFB+Wwn+qMh8esnoJ+E4Zym1V7JQZoztz70bPH0HqZSNpGjg@mail.gmail.com>
-References: <20161210004638.23417-1-dtwlin@google.com>
-        <CAPzFB+Wwn+qMh8esnoJ+E4Zym1V7JQZoztz70bPH0HqZSNpGjg@mail.gmail.com>
+Received: from mx2.suse.de ([195.135.220.15]:44625 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750879AbdACKgJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 3 Jan 2017 05:36:09 -0500
+Subject: Re: Ambiguity in Documentation/kbuild/modules.txt
+References: <40236E75-937E-4368-B694-BA5E80647251@redfish-solutions.com>
+From: Michal Marek <mmarek@suse.com>
+Message-ID: <035a4e49-ad6d-7bd7-4eff-632e78f25b10@suse.com>
+Date: Tue, 3 Jan 2017 11:36:06 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <40236E75-937E-4368-B694-BA5E80647251@redfish-solutions.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: David Lin <dtwlin@google.com>
-Cc: mmarek@suse.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, jbaron@akamai.com, will.deacon@arm.com
+To: Philip Prindeville <philipp@redfish-solutions.com>
+Cc: mfm@muteddisk.com, pjday@mindspring.com, sam@ravnborg.org, linux-kbuild@vger.kernel.org
 
-On Sun, 1 Jan 2017 15:05:45 -0800
-David Lin <dtwlin@google.com> wrote:
-
-> +Cc: Steven Rostedt <rostedt@goodmis.org>
-> +Cc: Will Deacon <will.deacon@arm.com>
+On 2016-12-22 20:32, Philip Prindeville wrote:
+> but what if we were dealing with someone who had written a 2.4 Makefile, and had named the files:
 > 
-> On Fri, Dec 9, 2016 at 4:46 PM, David Lin <dtwlin@google.com> wrote:
-> > Some versions of ARM GCC compiler such as Android toolchain throws
-> > in a '-fpic' flag by default. This causes the gcc-goto check script
-> > to fail although some config would have '-fno-pic' flag in the
-> > KBUILD_CFLAGS.
-> >
-> > This patch passes the KBUILD_CFLAGS to the check script so that the
-> > script does not rely on the default config from different compilers.
-> >
-> > Signed-off-by: David Lin <dtwlin@google.com>
+> 	8123.c                  <= problematic name
+> 	8123_if.c
+> 	8123_if.h
+> 	8123_pci.c
+> 	8123_bin.o_shipped
+> 
+> instead?
+> 
+> It seems to me that the line:
+> 
+> 8123-y := 8123.o 8123_if.o 8123_pci.o 8123_bin.o
+> 
+> would be problematic (i.e. a circular dependency). Yes, the person
+> who
+> developed the software I’m trying to Build should probably have named
+> 8123.c as “8123_main.c” instead, but he didn’t... though arguably it’s
+> an unnecessary restriction to not have a source file called
+> $(module_name).c in the list of sources for $(module_name).ko ...
+> 
+> So how does one work around this issue? A possible fix to the Kbuild
+> machinery itself would involve linking the $(8123-y) object files into
+> 8123_.o instead, and then using that to derive 8123.ko ...
 
-Acked-by: Steven Rostedt <rostedt@goodmis.org.
+Hi Philip,
 
--- Steve
+scripts/Makefile.build is quite complex already, so I suggest to work
+around this by renaming the source file.
 
-> > ---
-> >  Makefile | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> > diff --git a/Makefile b/Makefile
-> > index 694111b..f667daa 100644
-> > --- a/Makefile
-> > +++ b/Makefile
-> > @@ -790,7 +790,7 @@ KBUILD_CFLAGS   += $(call
-> > cc-option,-Werror=incompatible-pointer-types) KBUILD_ARFLAGS :=
-> > $(call ar-option,D)
-> >
-> >  # check for 'asm goto'
-> > -ifeq ($(shell $(CONFIG_SHELL) $(srctree)/scripts/gcc-goto.sh
-> > $(CC)), y) +ifeq ($(shell $(CONFIG_SHELL)
-> > $(srctree)/scripts/gcc-goto.sh $(CC) $(KBUILD_CFLAGS)), y)
-> > KBUILD_CFLAGS += -DCC_HAVE_ASM_GOTO KBUILD_AFLAGS +=
-> > -DCC_HAVE_ASM_GOTO endif
-> > --
-> > 2.10.2
-> >  
-
+Michal
