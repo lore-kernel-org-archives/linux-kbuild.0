@@ -1,33 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg0-f66.google.com ([74.125.83.66]:35934 "EHLO
-        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S937973AbdAETQ4 (ORCPT
+Received: from host.76.145.23.62.rev.coltfrance.com ([62.23.145.76]:42204 "EHLO
+        proxy.6wind.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S939870AbdAFJwS (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 5 Jan 2017 14:16:56 -0500
-Received: by mail-pg0-f66.google.com with SMTP id 75so3298302pgf.3
-        for <linux-kbuild@vger.kernel.org>; Thu, 05 Jan 2017 11:16:26 -0800 (PST)
-Subject: Re: [PATCH 2/2] kbuild: initramfs cleanup, set target from Kconfig
-References: <20170105102936.5673-1-npiggin@gmail.com>
- <20170105102936.5673-2-npiggin@gmail.com>
-From: Florian Fainelli <f.fainelli@gmail.com>
-Message-ID: <09fcfeb5-926b-7a72-c518-c30518471e55@gmail.com>
-Date: Thu, 5 Jan 2017 11:07:27 -0800
-MIME-Version: 1.0
-In-Reply-To: <20170105102936.5673-2-npiggin@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+        Fri, 6 Jan 2017 04:52:18 -0500
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Subject: [PATCH v2 3/7] nios2: put setup.h in uapi
+Date: Fri,  6 Jan 2017 10:43:55 +0100
+Message-Id: <1483695839-18660-4-git-send-email-nicolas.dichtel@6wind.com>
+In-Reply-To: <1483695839-18660-1-git-send-email-nicolas.dichtel@6wind.com>
+References: <bf83da6b-01ef-bf44-b3e1-ca6fc5636818@6wind.com>
+ <1483695839-18660-1-git-send-email-nicolas.dichtel@6wind.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicholas Piggin <npiggin@gmail.com>, Michal Marek <mmarek@suse.com>
-Cc: linux-kbuild@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>, torvalds@linux-foundation.org, pebolle@tiscali.nl, ppandit@redhat.com
+To: arnd@arndb.de
+Cc: mmarek@suse.com, linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-alpha@vger.kernel.org, linux-snps-arc@lists.infradead.org, linux-arm-kernel@lists.infradead.org, adi-buildroot-devel@lists.sourceforge.net, linux-c6x-dev@linux-c6x.org, linux-cris-kernel@axis.com, uclinux-h8-devel@lists.sourceforge.jp, linux-hexagon@vger.kernel.org, linux-ia64@vger.kernel.org, linux-m68k@lists.linux-m68k.org, linux-metag@vger.kernel.org, linux-mips@linux-mips.org, linux-am33-list@redhat.com, nios2-dev@lists.rocketboards.org, openrisc@lists.librecores.org, linux-parisc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org, linux-sh@vger.kernel.org, sparclinux@vger.kernel.org, linux-xtensa@linux-xtensa.org, linux-arch@vger.kernel.org, dri-devel@lists.freedesktop.org, netdev@vger.kernel.org, linux-media@vger.kernel.org, linux-mmc@vger.kernel.org, netfilter-devel@vger.kernel.org, coreteam@netfilter.org, linux-nfs@vger.kernel.org, linux-raid@vger.kernel.org, linux-spi@vger.kernel.org, linux-mtd@lists.infradead.org, linux-rdma@vger.kernel.org, fcoe-devel@open-fcoe.org, alsa-devel@alsa-project.org, linux-fbdev@vger.kernel.org, xen-devel@lists.xenproject.org, airlied@linux.ie, davem@davemloft.net, Nicolas Dichtel <nicolas.dichtel@6wind.com>
 
-On 01/05/2017 02:29 AM, Nicholas Piggin wrote:
-> Rather than keep a list of all possible compression types in the
-> Makefile, set the target explicitly from Kconfig.
-> 
-> Reviewed-by: Francisco Blas Izquierdo Riera (klondike) <klondike@klondike.es>
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+This header file is exported, thus move it to uapi.
 
-Reviewed-by: Florian Fainelli <f.fainelli@gmail.com>
+Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+---
+ arch/nios2/include/asm/setup.h      | 2 +-
+ arch/nios2/include/uapi/asm/setup.h | 6 ++++++
+ 2 files changed, 7 insertions(+), 1 deletion(-)
+ create mode 100644 arch/nios2/include/uapi/asm/setup.h
+
+diff --git a/arch/nios2/include/asm/setup.h b/arch/nios2/include/asm/setup.h
+index dcbf8cf1a344..d49e9e91bf55 100644
+--- a/arch/nios2/include/asm/setup.h
++++ b/arch/nios2/include/asm/setup.h
+@@ -19,7 +19,7 @@
+ #ifndef _ASM_NIOS2_SETUP_H
+ #define _ASM_NIOS2_SETUP_H
+ 
+-#include <asm-generic/setup.h>
++#include <uapi/asm/setup.h>
+ 
+ #ifndef __ASSEMBLY__
+ #ifdef __KERNEL__
+diff --git a/arch/nios2/include/uapi/asm/setup.h b/arch/nios2/include/uapi/asm/setup.h
+new file mode 100644
+index 000000000000..8d8285997ba8
+--- /dev/null
++++ b/arch/nios2/include/uapi/asm/setup.h
+@@ -0,0 +1,6 @@
++#ifndef _UAPI_ASM_NIOS2_SETUP_H
++#define _UAPI_ASM_NIOS2_SETUP_H
++
++#include <asm-generic/setup.h>
++
++#endif /* _UAPI_ASM_NIOS2_SETUP_H */
 -- 
-Florian
+2.8.1
+
