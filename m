@@ -1,53 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pandora.armlinux.org.uk ([78.32.30.218]:34800 "EHLO
-        pandora.armlinux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S936099AbdAIMAn (ORCPT
+Received: from bombadil.infradead.org ([198.137.202.9]:43656 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932366AbdAIM4t (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 9 Jan 2017 07:00:43 -0500
-Date: Mon, 9 Jan 2017 12:00:04 +0000
-From: Russell King - ARM Linux <linux@armlinux.org.uk>
-Subject: Re: [PATCH v2 1/7] arm: put types.h in uapi
-Message-ID: <20170109120004.GV14217@n2100.armlinux.org.uk>
+        Mon, 9 Jan 2017 07:56:49 -0500
+Date: Mon, 9 Jan 2017 04:56:38 -0800
+From: Christoph Hellwig <hch@infradead.org>
+Subject: Re: [PATCH v2 7/7] uapi: export all headers under uapi directories
+Message-ID: <20170109125638.GA15506@infradead.org>
 References: <bf83da6b-01ef-bf44-b3e1-ca6fc5636818@6wind.com>
  <1483695839-18660-1-git-send-email-nicolas.dichtel@6wind.com>
- <1483695839-18660-2-git-send-email-nicolas.dichtel@6wind.com>
- <1990589.0aJHWbJK4F@wuerfel>
+ <1483695839-18660-8-git-send-email-nicolas.dichtel@6wind.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1990589.0aJHWbJK4F@wuerfel>
+In-Reply-To: <1483695839-18660-8-git-send-email-nicolas.dichtel@6wind.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: linuxppc-dev@lists.ozlabs.org, linux-kbuild@vger.kernel.org, linux-mips@linux-mips.org, alsa-devel@alsa-project.org, linux-ia64@vger.kernel.org, linux-doc@vger.kernel.org, airlied@linux.ie, linux-fbdev@vger.kernel.org, dri-devel@lists.freedesktop.org, linux-mtd@lists.infradead.org, sparclinux@vger.kernel.org, linux-arch@vger.kernel.org, linux-s390@vger.kernel.org, linux-am33-list@redhat.com, linux-c6x-dev@linux-c6x.org, linux-rdma@vger.kernel.org, linux-hexagon@vger.kernel.org, linux-sh@vger.kernel.org, coreteam@netfilter.org, fcoe-devel@open-fcoe.org, xen-devel@lists.xenproject.org, linux-snps-arc@lists.infradead.org, linux-media@vger.kernel.org, uclinux-h8-devel@lists.sourceforge.jp, adi-buildroot-devel@lists.sourceforge.net, linux-raid@vger.kernel.org, linux-m68k@lists.linux-m68k.org, openrisc@lists.librecores.org, Nicolas Dichtel <nicolas.dichtel@6wind.com>, linux-metag@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-nfs@vger.kernel.org, linux-cris-kernel@axis.com, linux-parisc@vger.kernel.org, netdev@vger.kernel.org, linux-mmc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-spi@vger.kernel.org, mmarek@suse.com, netfilter-devel@vger.kernel.org, linux-alpha@vger.kernel.org, nios2-dev@lists.rocketboards.org, davem@davemloft.net
+To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Cc: arnd@arndb.de, mmarek@suse.com, linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-alpha@vger.kernel.org, linux-snps-arc@lists.infradead.org, linux-arm-kernel@lists.infradead.org, adi-buildroot-devel@lists.sourceforge.net, linux-c6x-dev@linux-c6x.org, linux-cris-kernel@axis.com, uclinux-h8-devel@lists.sourceforge.jp, linux-hexagon@vger.kernel.org, linux-ia64@vger.kernel.org, linux-m68k@lists.linux-m68k.org, linux-metag@vger.kernel.org, linux-mips@linux-mips.org, linux-am33-list@redhat.com, nios2-dev@lists.rocketboards.org, openrisc@lists.librecores.org, linux-parisc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org, linux-sh@vger.kernel.org, sparclinux@vger.kernel.org, linux-xtensa@linux-xtensa.org, linux-arch@vger.kernel.org, dri-devel@lists.freedesktop.org, netdev@vger.kernel.org, linux-media@vger.kernel.org, linux-mmc@vger.kernel.org, netfilter-devel@vger.kernel.org, coreteam@netfilter.org, linux-nfs@vger.kernel.org, linux-raid@vger.kernel.org, linux-spi@vger.kernel.org, linux-mtd@lists.infradead.org, linux-rdma@vger.kernel.org, fcoe-devel@open-fcoe.org, alsa-devel@alsa-project.org, linux-fbdev@vger.kernel.org, xen-devel@lists.xenproject.org, airlied@linux.ie, davem@davemloft.net
 
-On Mon, Jan 09, 2017 at 12:33:02PM +0100, Arnd Bergmann wrote:
-> On Friday, January 6, 2017 10:43:53 AM CET Nicolas Dichtel wrote:
-> > 
-> > diff --git a/arch/arm/include/asm/types.h b/arch/arm/include/asm/types.h
-> > index a53cdb8f068c..c48fee3d7b3b 100644
-> > --- a/arch/arm/include/asm/types.h
-> > +++ b/arch/arm/include/asm/types.h
-> > @@ -1,40 +1,6 @@
-> >  #ifndef _ASM_TYPES_H
-> >  #define _ASM_TYPES_H
-> >  
-> > -#include <asm-generic/int-ll64.h>
-> ...
-> > -#define __UINTPTR_TYPE__       unsigned long
-> > -#endif
-> > +#include <uapi/asm/types.h>
-> >  
-> >  #endif /* _ASM_TYPES_H */
-> > 
+On Fri, Jan 06, 2017 at 10:43:59AM +0100, Nicolas Dichtel wrote:
+> Regularly, when a new header is created in include/uapi/, the developer
+> forgets to add it in the corresponding Kbuild file. This error is usually
+> detected after the release is out.
 > 
-> Moving the file is correct as far as I can tell, but the extra
-> #include is not necessary here, as the kernel will automatically
-> search both arch/arm/include/ and arch/arm/include/uapi/.
+> In fact, all headers under uapi directories should be exported, thus it's
+> useless to have an exhaustive list.
+> 
+> After this patch, the following files, which were not exported, are now
+> exported (with make headers_install_all):
 
-Indeed, I'd like to see the include/asm file gone.
+... snip ...
 
--- 
-RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
-FTTC broadband for 0.8mile line: currently at 9.6Mbps down 400kbps up
-according to speedtest.net.
+> linux/genwqe/.install
+> linux/genwqe/..install.cmd
+> linux/cifs/.install
+> linux/cifs/..install.cmd
+
+I'm pretty sure these should not be exported!
