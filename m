@@ -1,80 +1,100 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-it0-f46.google.com ([209.85.214.46]:35440 "EHLO
-        mail-it0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753429AbdAKBJc (ORCPT
+Received: from bastet.se.axis.com ([195.60.68.11]:40599 "EHLO
+        bastet.se.axis.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S966065AbdAKMmM (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 10 Jan 2017 20:09:32 -0500
-Received: by mail-it0-f46.google.com with SMTP id c20so86999826itb.0
-        for <linux-kbuild@vger.kernel.org>; Tue, 10 Jan 2017 17:09:32 -0800 (PST)
+        Wed, 11 Jan 2017 07:42:12 -0500
+Date: Wed, 11 Jan 2017 13:42:02 +0100
+From: Jesper Nilsson <jesper.nilsson@axis.com>
+Subject: Re: [PATCH v2 0/7] uapi: export all headers under uapi directories
+Message-ID: <20170111124202.GD7275@axis.com>
+References: <bf83da6b-01ef-bf44-b3e1-ca6fc5636818@6wind.com>
+ <1483695839-18660-1-git-send-email-nicolas.dichtel@6wind.com>
+ <3131144.4Ej3KFWRbz@wuerfel>
 MIME-Version: 1.0
-In-Reply-To: <20170111012459.c0a0c615c99a389e4d89c8b5@gmail.com>
-References: <1481925984-98605-1-git-send-email-keescook@chromium.org>
- <CAGXu5jKfwBqEot+30z6Wh6Cow2gv25ojKxmoTS1Vb_LhwFiSnA@mail.gmail.com>
- <20161219121046.646e5ef425178fce8c2cb555@gmail.com> <CAGXu5jKiDUsncxEOCta3fEgh0OQ0oqpi3gzkPWvpu2oPLq2g4g@mail.gmail.com>
- <20170111012459.c0a0c615c99a389e4d89c8b5@gmail.com>
-From: Kees Cook <keescook@chromium.org>
-Date: Tue, 10 Jan 2017 17:09:31 -0800
-Message-ID: <CAGXu5jJRNuLR+Ekt26fxkg5wCkEv5fv-4B7=rt78OfRHN_w1Jw@mail.gmail.com>
-Subject: Re: [PATCH v4 0/4] Introduce the initify gcc plugin
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3131144.4Ej3KFWRbz@wuerfel>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Emese Revfy <re.emese@gmail.com>
-Cc: "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, LKML <linux-kernel@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Josh Triplett <josh@joshtriplett.org>, PaX Team <pageexec@freemail.hu>, Brad Spengler <spender@grsecurity.net>, Michal Marek <mmarek@suse.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, minipli@ld-linux.so, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, David Brown <david.brown@linaro.org>, "benh@kernel.crashing.org" <benh@kernel.crashing.org>, Thomas Gleixner <tglx@linutronix.de>, Andrew Morton <akpm@linux-foundation.org>, Jeff Layton <jlayton@poochiereds.net>, Sam Ravnborg <sam@ravnborg.org>
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: linuxppc-dev@lists.ozlabs.org, linux-kbuild@vger.kernel.org, Nicolas Dichtel <nicolas.dichtel@6wind.com>, linux-mips@linux-mips.org, alsa-devel@alsa-project.org, linux-ia64@vger.kernel.org, linux-doc@vger.kernel.org, airlied@linux.ie, linux-fbdev@vger.kernel.org, dri-devel@lists.freedesktop.org, linux-mtd@lists.infradead.org, sparclinux@vger.kernel.org, linux-arch@vger.kernel.org, linux-s390@vger.kernel.org, linux-am33-list@redhat.com, linux-c6x-dev@linux-c6x.org, linux-rdma@vger.kernel.org, linux-hexagon@vger.kernel.org, linux-sh@vger.kernel.org, coreteam@netfilter.org, fcoe-devel@open-fcoe.org, xen-devel@lists.xenproject.org, linux-snps-arc@lists.infradead.org, linux-media@vger.kernel.org, uclinux-h8-devel@lists.sourceforge.jp, adi-buildroot-devel@lists.sourceforge.net, linux-raid@vger.kernel.org, linux-m68k@lists.linux-m68k.org, openrisc@lists.librecores.org, linux-metag@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-nfs@vger.kernel.org, linux-parisc@vger.kernel.org, linux-cris-kernel@axis.com, netdev@vger.kernel.org, linux-mmc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-spi@vger.kernel.org, mmarek@suse.com, netfilter-devel@vger.kernel.org, linux-alpha@vger.kernel.org, nios2-dev@lists.rocketboards.org, davem@davemloft.net
 
-On Tue, Jan 10, 2017 at 4:24 PM, Emese Revfy <re.emese@gmail.com> wrote:
-> On Tue, 3 Jan 2017 16:23:03 -0800
-> Kees Cook <keescook@chromium.org> wrote:
->
->> On Mon, Dec 19, 2016 at 3:10 AM, Emese Revfy <re.emese@gmail.com> wrote:
->> > On Fri, 16 Dec 2016 14:19:10 -0800
->> > Kees Cook <keescook@chromium.org> wrote:
->> >
->> >> FWIW, it still seems to me that these aren't false positives:
->> >>
->> >> WARNING: vmlinux.o(.text.unlikely+0x1b1): Section mismatch in
->> >> reference from the function uncore_pci_exit.part.22() to the function
->> >> .init.text:uncore_free_pcibus_map()
->> >> The function uncore_pci_exit.part.22() references
->> >> the function __init uncore_free_pcibus_map().
->> >> This is often because uncore_pci_exit.part.22 lacks a __init
->> >> annotation or the annotation of uncore_free_pcibus_map is wrong.
->
-> Thanks for the report, you can find the fix here:
-> https://github.com/ephox-gcc-plugins/initify/commit/5d93a54badd9751b79ef67ce8a8b4081fea37547
+On Mon, Jan 09, 2017 at 12:33:58PM +0100, Arnd Bergmann wrote:
+> On Friday, January 6, 2017 10:43:52 AM CET Nicolas Dichtel wrote:
+> > Here is the v2 of this series. The first 5 patches are just cleanup: some
+> > exported headers were still under a non-uapi directory.
+> 
+> Since this is meant as a cleanup, I commented on this to point out a cleaner
+> way to do the same.
+> 
+> > The patch 6 was spotted by code review: there is no in-tree user of this
+> > functionality.
+> > The last patch remove the use of header-y. Now all files under an uapi
+> > directory are exported.
+> 
+> Very nice!
+> 
+> > asm is a bit special, most of architectures export asm/<arch>/include/uapi/asm
+> > only, but there is two exceptions:
+> >  - cris which exports arch/cris/include/uapi/arch-v[10|32];
+> 
+> This is interesting, though not your problem. Maybe someone who understands
+> cris better can comment on this: How is the decision made about which of
+> the arch/user.h headers gets used? I couldn't find that in the sources,
+> but it appears to be based on kernel compile-time settings, which is
+> wrong for user space header files that should be independent of the kernel
+> config.
 
-Awesome! Thanks, that eliminated almost all of the warnings. I'm still
-seeing this:
+I believe it's since the CRISv10 and CRISv32 are very different beasts,
+and that is selected via kernel config...
 
-WARNING: vmlinux.o(.text+0x1087e7): Section mismatch in reference from
-the function rebind_subsystems() to the variable
-.init.rodata.str:__func__.4400
-The function rebind_subsystems() references
-the variable __initconst __func__.4400.
-This is often because rebind_subsystems lacks a __initconst
-annotation or the annotation of __func__.4400 is wrong.
+This part of the CRIS port has been transformed a couple of times from
+the original layout without uapi, and there's still some legacy silliness,
+where some files might have been exported but never used from userspace
+except for some corner cases.
 
-WARNING: vmlinux.o(.text+0x13789d): Section mismatch in reference from
-the function register_ftrace_export() to the variable
-.init.rodata.str:__func__.4251
-The function register_ftrace_export() references
-the variable __initconst __func__.4251.
-This is often because register_ftrace_export lacks a __initconst
-annotation or the annotation of __func__.4251 is wrong.
+> >  - tile which exports arch/tile/include/uapi/arch.
+> > Because I don't know if the output of 'make headers_install_all' can be changed,
+> > I introduce subdir-y in Kbuild file. The headers_install_all target copies all
+> > asm/<arch>/include/uapi/asm to usr/include/asm-<arch> but
+> > arch/cris/include/uapi/arch-v[10|32] and arch/tile/include/uapi/arch are not
+> > prefixed (they are put asis in usr/include/). If it's acceptable to modify the
+> > output of 'make headers_install_all' to export asm headers in
+> > usr/include/asm-<arch>/asm, then I could remove this new subdir-y and exports
+> > everything under arch/<arch>/include/uapi/.
+> 
+> I don't know if anyone still uses "make headers_install_all", I suspect
+> distros these days all use "make headers_install", so it probably
+> doesn't matter much.
+> 
+> In case of cris, it should be easy enough to move all the contents of the
+> uapi/arch-*/*.h headers into the respective uapi/asm/*.h headers, they
+> only seem to be referenced from there.
 
-WARNING: vmlinux.o(.text+0x139d24): Section mismatch in reference from
-the function tracepoint_printk_sysctl() to the variable
-.init.rodata.str:__func__.4251
-The function tracepoint_printk_sysctl() references
-the variable __initconst __func__.4251.
-This is often because tracepoint_printk_sysctl lacks a __initconst
-annotation or the annotation of __func__.4251 is wrong.
+This would seem to be a reasonable change.
 
-I haven't taken a close look yet, but I assume these are from the
-const strings in these functions?
+> For tile, I suspect that would not work as the arch/*.h headers are
+> apparently defined as interfaces for both user space and kernel.
+> 
+> > Note also that exported files for asm are a mix of files listed by:
+> >  - include/uapi/asm-generic/Kbuild.asm;
+> >  - arch/x86/include/uapi/asm/Kbuild;
+> >  - arch/x86/include/asm/Kbuild.
+> > This complicates a lot the processing (arch/x86/include/asm/Kbuild is also
+> > used by scripts/Makefile.asm-generic).
+> > 
+> > This series has been tested with a 'make headers_install' on x86 and a
+> > 'make headers_install_all'. I've checked the result of both commands.
+> > 
+> > This patch is built against linus tree. I don't know if it should be
+> > made against antoher tree.
+> 
+> The series should probably get merged through the kbuild tree, but testing
+> it on mainline is fine here.
+> 
+> 	Arnd
 
--Kees
-
+/^JN - Jesper Nilsson
 -- 
-Kees Cook
-Nexus Security
+               Jesper Nilsson -- jesper.nilsson@axis.com
