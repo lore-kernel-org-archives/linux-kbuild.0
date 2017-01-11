@@ -1,86 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga14.intel.com ([192.55.52.115]:55951 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1163479AbdAIS3m (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 9 Jan 2017 13:29:42 -0500
-Message-ID: <1483986555.26691.46.camel@linux.intel.com>
-Subject: Re: [PATCH v6 00/14] linux: generalize sections, ranges and linker
- tables
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Date: Mon, 09 Jan 2017 20:29:15 +0200
-In-Reply-To: <1483981946.26691.44.camel@intel.com>
-References: <20161222023811.21246-1-mcgrof@kernel.org>
-         <20170109145833.11502-1-mcgrof@kernel.org>
-         <1483979228.26691.40.camel@linux.intel.com>
-         <1483981946.26691.44.camel@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:34321 "EHLO
+        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1756837AbdAKA0Z (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 10 Jan 2017 19:26:25 -0500
+Date: Wed, 11 Jan 2017 01:24:59 +0100
+From: Emese Revfy <re.emese@gmail.com>
+Subject: Re: [PATCH v4 0/4] Introduce the initify gcc plugin
+Message-Id: <20170111012459.c0a0c615c99a389e4d89c8b5@gmail.com>
+In-Reply-To: <CAGXu5jKiDUsncxEOCta3fEgh0OQ0oqpi3gzkPWvpu2oPLq2g4g@mail.gmail.com>
+References: <1481925984-98605-1-git-send-email-keescook@chromium.org>
+        <CAGXu5jKfwBqEot+30z6Wh6Cow2gv25ojKxmoTS1Vb_LhwFiSnA@mail.gmail.com>
+        <20161219121046.646e5ef425178fce8c2cb555@gmail.com>
+        <CAGXu5jKiDUsncxEOCta3fEgh0OQ0oqpi3gzkPWvpu2oPLq2g4g@mail.gmail.com>
 Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Luis R. Rodriguez" <mcgrof@kernel.org>, hpa@zytor.com, acme@redhat.com, tglx@linutronix.de, mingo@redhat.com, jpoimboe@redhat.com, bp@alien8.de, npiggin@gmail.com, mhiramat@kernel.org, masami.hiramatsu.pt@hitachi.com, jbaron@akamai.com, heiko.carstens@de.ibm.com, ananth@linux.vnet.ibm.com, anil.s.keshavamurthy@intel.com, davem@davemloft.net, realmz6@gmail.com, dalias@libc.org, linux@arm.linux.org.uk
-Cc: x86@kernel.org, luto@amacapital.net, keescook@chromium.org, linux@roeck-us.net, torvalds@linux-foundation.org, gregkh@linuxfoundation.org, rusty@rustcorp.com.au, gnomes@lxorguk.ukuu.org.uk, alan@linux.intel.com, dwmw2@infradead.org, arnd@arndb.de, ming.lei@canonical.com, linux-arch@vger.kernel.org, benh@kernel.crashing.org, pebolle@tiscali.nl, fontana@sharpeleven.org, david.vrabel@citrix.com, konrad.wilk@oracle.com, mcb30@ipxe.org, jgross@suse.com, andrew.cooper3@citrix.com, paul.gortmaker@windriver.com, xen-devel@lists.xensource.com, ak@linux.intel.com, pali.rohar@gmail.com, dvhart@infradead.org, platform-driver-x86@vger.kernel.org, mmarek@suse.com, linux@rasmusvillemoes.dk, jkosina@suse.cz, korea.drzix@gmail.com, linux-kbuild@vger.kernel.org, tony.luck@intel.com, akpm@linux-foundation.org, linux-ia64@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sh@vger.kernel.org, sparclinux@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com, rostedt@goodmis.org, jani.nikula@intel.com, mchehab@osg.samsung.com, markus.heiser@darmarit.de, jolsa@kernel.org, msalter@redhat.com, chris@zankel.net, jcmvbkbc@gmail.com, linux-xtensa@linux-xtensa.org, adrian.hunter@intel.com, dsahern@gmail.com, namhyung@kernel.org, wangnan0@huawei.com, dmitry.torokhov@gmail.com, joro@8bytes.org, paulus@samba.org, mpe@ellerman.id.au, James.Bottomley@HansenPartnership.com
+To: Kees Cook <keescook@chromium.org>
+Cc: "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, LKML <linux-kernel@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Josh Triplett <josh@joshtriplett.org>, PaX Team <pageexec@freemail.hu>, Brad Spengler <spender@grsecurity.net>, Michal Marek <mmarek@suse.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, minipli@ld-linux.so, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, David Brown <david.brown@linaro.org>, "benh@kernel.crashing.org" <benh@kernel.crashing.org>, Thomas Gleixner <tglx@linutronix.de>, Andrew Morton <akpm@linux-foundation.org>, Jeff Layton <jlayton@poochiereds.net>, Sam Ravnborg <sam@ravnborg.org>
 
-On Mon, 2017-01-09 at 19:12 +0200, Andy Shevchenko wrote:
-> On Mon, 2017-01-09 at 18:27 +0200, Andy Shevchenko wrote:
-> > On Mon, 2017-01-09 at 06:58 -0800, Luis R. Rodriguez wrote:
-> > > The only architecture that was not tested was avr32 and that is
-> > > because
-> > > linux-next fails to compile on it. I'd like to greatly thank
-> > > Guenter
-> > > Roeck for
-> > > his help with testing.
-> > 
-> > We have a real board here. I would try to check if you provide a git
-> > url
-> > to your stuff.
-> > 
-> > I can confirm that breakage happened like in last couple of month.
-> > v4.10-rc3 can't be compiled either.
-> 
-> The culprit commit is
-> 
-> commit 3a0af8fd61f90920f6fa04e4f1e9a6a73c1b4fd2
-> Author: Thomas Graf <tgraf@suug.ch>
-> Date:   Wed Nov 30 17:10:10 2016 +0100
-> 
->     bpf: BPF for lightweight tunnel infrastructure
-> 
+On Tue, 3 Jan 2017 16:23:03 -0800
+Kees Cook <keescook@chromium.org> wrote:
 
-This makes modules closer to each other, so,
-net/socket.c:348: relocation truncated to fit: R_AVR32_11H_PCREL against
-`.text'+2930
+> On Mon, Dec 19, 2016 at 3:10 AM, Emese Revfy <re.emese@gmail.com> wrote:
+> > On Fri, 16 Dec 2016 14:19:10 -0800
+> > Kees Cook <keescook@chromium.org> wrote:
+> >
+> >> FWIW, it still seems to me that these aren't false positives:
+> >>
+> >> WARNING: vmlinux.o(.text.unlikely+0x1b1): Section mismatch in
+> >> reference from the function uncore_pci_exit.part.22() to the function
+> >> .init.text:uncore_free_pcibus_map()
+> >> The function uncore_pci_exit.part.22() references
+> >> the function __init uncore_free_pcibus_map().
+> >> This is often because uncore_pci_exit.part.22 lacks a __init
+> >> annotation or the annotation of uncore_free_pcibus_map is wrong.
 
-But still the module is too big for AVR to do some jumps.
+Thanks for the report, you can find the fix here:
+https://github.com/ephox-gcc-plugins/initify/commit/5d93a54badd9751b79ef67ce8a8b4081fea37547
 
-Here I stop investigating it. I had been proposed to get rid of avr32
-completely, burden to support is just increasing (no Buildroot support,
-no Gcc support, what else do we need?) for no value.
-
-diff --git a/net/core/Makefile b/net/core/Makefile
-index f6761b6e3b29..91b7d27bf2c6 100644
---- a/net/core/Makefile
-+++ b/net/core/Makefile
-@@ -2,13 +2,13 @@
- # Makefile for the Linux networking core.
- #
- 
--obj-y := sock.o request_sock.o skbuff.o datagram.o stream.o scm.o \
-+obj-y := filter.o sock.o request_sock.o skbuff.o datagram.o stream.o
-scm.o \
-         gen_stats.o gen_estimator.o net_namespace.o secure_seq.o
-flow_dissector.o
- 
- obj-$(CONFIG_SYSCTL) += sysctl_net_core.o
- 
- obj-y               += dev.o ethtool.o dev_addr_lists.o dst.o
-netevent.o \
--                       neighbour.o rtnetlink.o utils.o link_watch.o
-filter.o \
-+                       neighbour.o rtnetlink.o utils.o link_watch.o \
-                        sock_diag.o dev_ioctl.o tso.o sock_reuseport.o
- 
- obj-$(CONFIG_XFRM) += flow.o
 -- 
-Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Intel Finland Oy
+Emese
