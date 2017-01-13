@@ -1,46 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:59602 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752238AbdAMPg6 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 13 Jan 2017 10:36:58 -0500
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <1484304406-10820-2-git-send-email-nicolas.dichtel@6wind.com>
-References: <1484304406-10820-2-git-send-email-nicolas.dichtel@6wind.com> <3131144.4Ej3KFWRbz@wuerfel> <1484304406-10820-1-git-send-email-nicolas.dichtel@6wind.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <25062.1484321803.1@warthog.procyon.org.uk>
-Date: Fri, 13 Jan 2017 15:36:43 +0000
-Message-ID: <25063.1484321803@warthog.procyon.org.uk>
+Received: from mout.kundenserver.de ([212.227.126.133]:60786 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751910AbdAMPkf (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 13 Jan 2017 10:40:35 -0500
+From: Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH] Kbuild: use cc-disable-warning consistently for maybe-uninitialized
+Date: Fri, 13 Jan 2017 16:40:01 +0100
+Message-Id: <20170113154010.2718601-1-arnd@arndb.de>
+In-Reply-To: <201701131834.BsUjtXaC%fengguang.wu@intel.com>
+References: <201701131834.BsUjtXaC%fengguang.wu@intel.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Cc: dhowells@redhat.com, arnd@arndb.de, linux-mips@linux-mips.org, linux-m68k@vger.kernel.org, linux-ia64@vger.kernel.org, linux-doc@vger.kernel.org, alsa-devel@alsa-project.org, dri-devel@lists.freedesktop.org, linux-mtd@lists.infradead.org, sparclinux@vger.kernel.org, linux-arch@vger.kernel.org, linux-s390@vger.kernel.org, linux-am33-list@redhat.com, linux-c6x-dev@linux-c6x.org, linux-rdma@vger.kernel.org, linux-hexagon@vger.kernel.org, linux-sh@vger.kernel.org, linux@armlinux.org.uk, coreteam@netfilter.org, fcoe-devel@open-fcoe.org, xen-devel@lists.xenproject.org, linux-snps-arc@lists.infradead.org, linux-media@vger.kernel.org, uclinux-h8-devel@lists.sourceforge.jp, linux-xtensa@linux-xtensa.org, linux-kbuild@vger.kernel.org, adi-buildroot-devel@lists.sourceforge.net, linux-raid@vger.kernel.org, openrisc@lists.librecores.org, linux-fbdev@vger.kernel.org, linux-metag@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-nfs@vger.kernel.org, linux-parisc@vger.kernel.org, linux-cris-kernel@axis.com, linux-mmc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-spi@vger.kernel.org, netfilter-devel@vger.kernel.org, linux-alpha@vger.kernel.org, nio2-dev@lists.rocketboards.org, linuxppc-dev@lists.ozlabs.org
+To: Michal Marek <mmarek@suse.com>
+Cc: linux-kbuild@vger.kernel.org, fengguang.wu@intel.com, kbuild-all@01.org, Arnd Bergmann <arnd@arndb.de>, stable@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Nicolas Dichtel <nicolas.dichtel@6wind.com> wrote:
+In commit a76bcf557ef4 ("Kbuild: enable -Wmaybe-uninitialized warning
+for "make W=1""), I reverted another change that happened to fix a problem
+with old compilers, and now we get this report again with old compilers
+(prior to gcc-4.8) and GCOV enabled:
 
-> This header file is exported, thus move it to uapi.
+   cc1: warnings being treated as errors
+   drivers/gpu/drm/i915/intel_ringbuffer.c: In function 'intel_ring_setup_status_page':
+   drivers/gpu/drm/i915/intel_ringbuffer.c:438: error: 'mmio.reg' may be used uninitialized in this function
+   At top level:
+>> cc1: error: unrecognized command line option "-Wno-maybe-uninitialized"
 
-Exported how?
+The problem is that we turn off the warning conditionally in a number
+of places as we should, but one of them does it unconditionally.
+Instead, change it to call cc-disable-warning as we do elsewhere.
 
-> +#ifdef __INT32_TYPE__
-> +#undef __INT32_TYPE__
-> +#define __INT32_TYPE__		int
-> +#endif
-> +
-> +#ifdef __UINT32_TYPE__
-> +#undef __UINT32_TYPE__
-> +#define __UINT32_TYPE__	unsigned int
-> +#endif
-> +
-> +#ifdef __UINTPTR_TYPE__
-> +#undef __UINTPTR_TYPE__
-> +#define __UINTPTR_TYPE__	unsigned long
-> +#endif
+The original patch that caused it was merged into linux-4.7, then
+4.8 removed the change and 4.9 brought it back, so we probably want
+a backport to 4.9 once this is merged.
 
-These weren't defined by the kernel before, so why do we need to define them
-now?
+Cc: stable@vger.kernel.org
+Fixes: a76bcf557ef4 ("Kbuild: enable -Wmaybe-uninitialized warning for "make W=1"")
+Fixes: e72e2dfe7c16 ("gcov: disable -Wmaybe-uninitialized warning")
+Reported-by: kbuild test robot <fengguang.wu@intel.com>
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Will defining __UINTPTR_TYPE__ cause problems in compiling libboost by
-changing the signature on C++ functions that use uintptr_t?
+diff --git a/Makefile b/Makefile
+index 4fcc0f2dd93c..dbe9ce5d0e96 100644
+--- a/Makefile
++++ b/Makefile
+@@ -370,7 +370,7 @@ LDFLAGS_MODULE  =
+ CFLAGS_KERNEL	=
+ AFLAGS_KERNEL	=
+ LDFLAGS_vmlinux =
+-CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage -fno-tree-loop-im -Wno-maybe-uninitialized
++CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage -fno-tree-loop-im $(call cc-disable-warning,maybe-uninitialized,)
+ CFLAGS_KCOV	:= $(call cc-option,-fsanitize-coverage=trace-pc,)
+ 
+ 
+-- 
+2.9.0
 
-David
