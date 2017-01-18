@@ -1,50 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f66.google.com ([74.125.82.66]:32917 "EHLO
-        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751201AbdAQUdQ (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 17 Jan 2017 15:33:16 -0500
-Date: Tue, 17 Jan 2017 21:31:43 +0100
-From: Emese Revfy <re.emese@gmail.com>
-Subject: Re: [PATCH v4 0/4] Introduce the initify gcc plugin
-Message-Id: <20170117213143.5bf385546454ac0424238686@gmail.com>
-In-Reply-To: <CAGXu5jJ_9Gbre2J1HYrY-gwnsStL8P+MKmKQwCBtY4-7m53RLA@mail.gmail.com>
-References: <1481925984-98605-1-git-send-email-keescook@chromium.org>
-        <CAGXu5jKfwBqEot+30z6Wh6Cow2gv25ojKxmoTS1Vb_LhwFiSnA@mail.gmail.com>
-        <20161219121046.646e5ef425178fce8c2cb555@gmail.com>
-        <CAGXu5jKiDUsncxEOCta3fEgh0OQ0oqpi3gzkPWvpu2oPLq2g4g@mail.gmail.com>
-        <20170111012459.c0a0c615c99a389e4d89c8b5@gmail.com>
-        <CAGXu5jJRNuLR+Ekt26fxkg5wCkEv5fv-4B7=rt78OfRHN_w1Jw@mail.gmail.com>
-        <20170112224116.680debbf6f5c288ba51a46c0@gmail.com>
-        <CAGXu5jLB_ZxPcJDsBK0h-HTfb8G-GdC+BnD-1rTL5ePUvcwuzA@mail.gmail.com>
-        <CAGXu5jJ_9Gbre2J1HYrY-gwnsStL8P+MKmKQwCBtY4-7m53RLA@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Received: from mx2.suse.de ([195.135.220.15]:55080 "EHLO mx2.suse.de"
+        rhost-flags-OK-FAIL-OK-OK) by vger.kernel.org with ESMTP
+        id S1752940AbdARLo1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 18 Jan 2017 06:44:27 -0500
+Date: Wed, 18 Jan 2017 12:29:51 +0100
+From: Borislav Petkov <bp@suse.de>
+Subject: Re: [PATCH v7 02/14] xtensa: skip adding literal when SORT() is used
+Message-ID: <20170118112951.62drjsk264rhe5lj@pd.tnic>
+References: <20170109145833.11502-1-mcgrof@kernel.org>
+ <20170115211057.17167-1-mcgrof@kernel.org>
+ <20170115211057.17167-3-mcgrof@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20170115211057.17167-3-mcgrof@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kees Cook <keescook@chromium.org>
-Cc: "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, LKML <linux-kernel@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Josh Triplett <josh@joshtriplett.org>, PaX Team <pageexec@freemail.hu>, Brad Spengler <spender@grsecurity.net>, Michal Marek <mmarek@suse.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, minipli@ld-linux.so, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, David Brown <david.brown@linaro.org>, "benh@kernel.crashing.org" <benh@kernel.crashing.org>, Thomas Gleixner <tglx@linutronix.de>, Andrew Morton <akpm@linux-foundation.org>, Jeff Layton <jlayton@poochiereds.net>, Sam Ravnborg <sam@ravnborg.org>
+To: "Luis R. Rodriguez" <mcgrof@kernel.org>
+Cc: hpa@zytor.com, acme@redhat.com, tglx@linutronix.de, mingo@redhat.com, jpoimboe@redhat.com, npiggin@gmail.com, mhiramat@kernel.org, masami.hiramatsu.pt@hitachi.com, jbaron@akamai.com, heiko.carstens@de.ibm.com, ananth@linux.vnet.ibm.com, anil.s.keshavamurthy@intel.com, davem@davemloft.net, realmz6@gmail.com, dalias@libc.org, linux@arm.linux.org.uk, x86@kernel.org, luto@amacapital.net, keescook@chromium.org, linux@roeck-us.net, torvalds@linux-foundation.org, gregkh@linuxfoundation.org, rusty@rustcorp.com.au, gnomes@lxorguk.ukuu.org.uk, alan@linux.intel.com, dwmw2@infradead.org, arnd@arndb.de, ming.lei@canonical.com, linux-arch@vger.kernel.org, benh@kernel.crashing.org, pebolle@tiscali.nl, fontana@sharpeleven.org, david.vrabel@citrix.com, konrad.wilk@oracle.com, mcb30@ipxe.org, jgross@suse.com, andrew.cooper3@citrix.com, andriy.shevchenko@linux.intel.com, paul.gortmaker@windriver.com, xen-devel@lists.xensource.com, ak@linux.intel.com, pali.rohar@gmail.com, dvhart@infradead.org, platform-driver-x86@vger.kernel.org, mmarek@suse.com, linux@rasmusvillemoes.dk, jkosina@suse.cz, korea.drzix@gmail.com, linux-kbuild@vger.kernel.org, tony.luck@intel.com, akpm@linux-foundation.org, linux-ia64@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-sh@vger.kernel.org, sparclinux@vger.kernel.org, catalin.marinas@arm.com, will.deacon@arm.com, rostedt@goodmis.org, jani.nikula@intel.com, mchehab@osg.samsung.com, markus.heiser@darmarit.de, jolsa@kernel.org, msalter@redhat.com, chris@zankel.net, jcmvbkbc@gmail.com, linux-xtensa@linux-xtensa.org, adrian.hunter@intel.com, dsahern@gmail.com, namhyung@kernel.org, wangnan0@huawei.com, dmitry.torokhov@gmail.com, joro@8bytes.org, paulus@samba.org, mpe@ellerman.id.au, James.Bottomley@HansenPartnership.com
 
-On Thu, 12 Jan 2017 15:40:41 -0800
-Kees Cook <keescook@chromium.org> wrote:
+On Sun, Jan 15, 2017 at 01:10:45PM -0800, Luis R. Rodriguez wrote:
+> When SORT(foo.*) is used the current sed replacements add
+> SORT(foo.literal foo.*), this breaks linking. Avoid adding
+> literals for SORT globs, if needed, these need to be added
+> manually.
 
-> WARNING: drivers/clk/bcm/built-in.o(.text+0xec2): Section mismatch in
-> reference from the function clk_gate() to the variable
-> .init.rodata.str:__func__.29708
-> The function clk_gate() references
-> the variable __initconst __func__.29708.
-> This is often because clk_gate lacks a __initconst
-> annotation or the annotation of __func__.29708 is wrong.
->
-> I used my initify v5 development tree, with the following patch, with
-> "make allyesconfig":
-> 
-> http://git.kernel.org/cgit/linux/kernel/git/kees/linux.git/log/?h=for-next/gcc-plugin/initify
+Please rewrite this commit message by breaking into separate sentences,
+adding punctuation, etc.
 
-Hi,
-
-I can't reproduce this mismatch with allyesconfig. Could you please send me your .config?
+Also, "the current sed replacements add" sounds really strange and makes
+me wonder what do you mean. What are "sed replacements"? I think you
+mean the "sed regex adds" from looking at the diff.
 
 -- 
-Emese
+Regards/Gruss,
+    Boris.
+
+SUSE Linux GmbH, GF: Felix Imendörffer, Jane Smithard, Graham Norton, HRB 21284 (AG Nürnberg)
+-- 
