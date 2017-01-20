@@ -1,45 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-cys01nam02on0055.outbound.protection.outlook.com ([104.47.37.55]:60746
-        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752124AbdATONe (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 20 Jan 2017 09:13:34 -0500
-From: Vadim Lomovtsev <Vadim.Lomovtsev@caviumnetworks.com>
-Subject: [PATCH] scripts: rpm: build: add INSTALL_MOD_STRIP=1 to install modules
-Date: Fri, 20 Jan 2017 06:12:38 -0800
-Message-ID: <1484921558-26181-1-git-send-email-Vadim.Lomovtsev@caviumnetworks.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Received: from m50-132.163.com ([123.125.50.132]:49033 "EHLO m50-132.163.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752058AbdATXYT (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 20 Jan 2017 18:24:19 -0500
+Message-ID: <1484954637.5246.4.camel@163.com>
+Subject: [PATCH] setlocalversion: fix error detectition of kernel git
+ repository
+From: xufeng <xufwang@163.com>
+Date: Sat, 21 Jan 2017 07:23:57 +0800
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.com>, linux-kernel@vger.kernel.org, Vadim Lomovtsev <Vadim.Lomovtsev@caviumnetworks.com>
+To: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, nico-linuxsetlocalversion@schottelius.org, wsa@the-dreams.de
 
-Having kernel modules with debug sections consumes a lot of
-hdd space, increases size of kernel rpm, initrd image grows
-and in some cases kernel even can't be installed due to
-insufficinet hdd space for modules.
+This patch fixed the error using 'git rev-parse --show-cdup' to check
+that git is used as SCM to track the current directory. The return
+value of this command is not null string when the .git directory is
+not in kernel topdir.
 
-Set INSTALL_MOD_STRIP=1 to enable debug info strip at rpm modules
-install phase.
-
-Signed-off-by: Vadim Lomovtsev <Vadim.Lomovtsev@caviumnetworks.com>
+Signed-off-by: Xufeng Wang <xufwang@163.com>
 ---
- scripts/package/mkspec | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ scripts/setlocalversion | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/scripts/package/mkspec b/scripts/package/mkspec
-index bb43f15..176d8dd 100755
---- a/scripts/package/mkspec
-+++ b/scripts/package/mkspec
-@@ -90,7 +90,7 @@ echo 'mkdir -p $RPM_BUILD_ROOT/boot $RPM_BUILD_ROOT/lib/modules'
- echo "%endif"
- echo 'mkdir -p $RPM_BUILD_ROOT'"/lib/firmware/$KERNELRELEASE"
- 
--echo 'INSTALL_MOD_PATH=$RPM_BUILD_ROOT make %{?_smp_mflags} KBUILD_SRC= mod-fw= modules_install'
-+echo 'INSTALL_MOD_PATH=$RPM_BUILD_ROOT make %{?_smp_mflags} INSTALL_MOD_STRIP=1 BUILD_SRC= mod-fw= modules_install'
- echo 'INSTALL_FW_PATH=$RPM_BUILD_ROOT'"/lib/firmware/$KERNELRELEASE"
- echo 'make INSTALL_FW_PATH=$INSTALL_FW_PATH' firmware_install
- echo "%ifarch ia64"
--- 
-2.5.5
+diff --git a/scripts/setlocalversion b/scripts/setlocalversion
+index 966dd39..7966e39 100755
+--- a/scripts/setlocalversion
++++ b/scripts/setlocalversion
+@@ -43,7 +43,7 @@ scm_version()
+     fi
+ 
+     # Check for git and a git repo.
+-    if test -z "$(git rev-parse --show-cdup 2>/dev/null)" &&
++    if test -z "$(git rev-parse --show-cdup &>/dev/null)" &&
+        head=`git rev-parse --verify --short HEAD 2>/dev/null`; then
+ 
+         # If we are at a tagged commit (like "v2.6.30-rc6"), we ignore
+-- 
+2.9.3
 
