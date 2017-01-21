@@ -1,46 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf0-f169.google.com ([209.85.192.169]:36238 "EHLO
-        mail-pf0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752125AbdATXoN (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 20 Jan 2017 18:44:13 -0500
-Received: by mail-pf0-f169.google.com with SMTP id 189so25826847pfu.3
-        for <linux-kbuild@vger.kernel.org>; Fri, 20 Jan 2017 15:44:13 -0800 (PST)
-From: David Lin <dtwlin@google.com>
-Subject: [PATCH RESEND] jump label: pass kbuild_cflags when checking for asm goto support
-Date: Fri, 20 Jan 2017 15:43:29 -0800
-Message-Id: <20170120234329.78868-1-dtwlin@google.com>
+Received: from vm185-cluster3.place4.ungleich.ch ([136.243.197.185]:43936 "EHLO
+        mx.ungleich.ch" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750741AbdAUVLE (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Sat, 21 Jan 2017 16:11:04 -0500
+References: <1484954637.5246.4.camel@163.com>
+From: Nico Schottelius <nico-linuxsetlocalversion@schottelius.org>
+Subject: Re: [PATCH] setlocalversion: fix error detectition of kernel git repository
+In-reply-to: <1484954637.5246.4.camel@163.com>
+Date: Sat, 21 Jan 2017 21:54:54 +0100
+Message-ID: <87a8ak876p.fsf@ungleich.ch>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, jbaron@akamai.com, will.deacon@arm.com, rostedt@goodmis.org, gregkh@linuxfoundation.org, joelaf@google.com, David Lin <dtwlin@google.com>
+To: xufeng <xufwang@163.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, nico-linuxsetlocalversion@schottelius.org, wsa@the-dreams.de
 
-Some versions of ARM GCC compiler such as Android toolchain throws in a
-'-fpic' flag by default. This causes the gcc-goto check script to fail
-although some config would have '-fno-pic' flag in the KBUILD_CFLAGS.
 
-This patch passes the KBUILD_CFLAGS to the check script so that the
-script does not rely on the default config from different compilers.
+Hello Xufeng,
 
-Signed-off-by: David Lin <dtwlin@google.com>
-Acked-by: Steven Rostedt <rostedt@goodmis.org>
----
- Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+why do you think redirecting *all* output to /dev/null is the right
+thing todo?
 
-diff --git a/Makefile b/Makefile
-index 5f1a84735ff6..c5dec246b4ab 100644
---- a/Makefile
-+++ b/Makefile
-@@ -797,7 +797,7 @@ KBUILD_CFLAGS   += $(call cc-option,-Werror=incompatible-pointer-types)
- KBUILD_ARFLAGS := $(call ar-option,D)
- 
- # check for 'asm goto'
--ifeq ($(shell $(CONFIG_SHELL) $(srctree)/scripts/gcc-goto.sh $(CC)), y)
-+ifeq ($(shell $(CONFIG_SHELL) $(srctree)/scripts/gcc-goto.sh $(CC) $(KBUILD_CFLAGS)), y)
- 	KBUILD_CFLAGS += -DCC_HAVE_ASM_GOTO
- 	KBUILD_AFLAGS += -DCC_HAVE_ASM_GOTO
- endif
--- 
-2.11.0.483.g087da7b7c-goog
+And which problem does it exactly fix?
 
+Do you see that there is a difference between a "return value"
+(i.e. exit code) and the output (in this case stdout) of a program?
+
+Best,
+
+Nico
+
+xufeng <xufwang@163.com> writes:
+
+> This patch fixed the error using 'git rev-parse --show-cdup' to check
+> that git is used as SCM to track the current directory. The return
+> value of this command is not null string when the .git directory is
+> not in kernel topdir.
+>
+> Signed-off-by: Xufeng Wang <xufwang@163.com>
+> ---
+> scripts/setlocalversion | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/scripts/setlocalversion b/scripts/setlocalversion
+> index 966dd39..7966e39 100755
+> --- a/scripts/setlocalversion
+> +++ b/scripts/setlocalversion
+> @@ -43,7 +43,7 @@ scm_version()
+> fi
+>
+> # Check for git and a git repo.
+> -if test -z "$(git rev-parse --show-cdup 2>/dev/null)" &&
+> +if test -z "$(git rev-parse --show-cdup &>/dev/null)" &&
+> head=`git rev-parse --verify --short HEAD 2>/dev/null`; then
+>
+> # If we are at a tagged commit (like "v2.6.30-rc6"), we ignore
+
+
+--
+Werde Teil des modernen Arbeitens im Glarnerland auf www.digitalglarus.ch!
+Lese Neuigkeiten auf Twitter: www.twitter.com/DigitalGlarus
+Diskutiere mit auf Facebook:  www.facebook.com/digitalglarus
