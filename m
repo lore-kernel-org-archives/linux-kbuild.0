@@ -1,50 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from m13-94.163.com ([220.181.13.94]:8831 "EHLO m13-94.163.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751404AbdAVC0z (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 21 Jan 2017 21:26:55 -0500
-Date: Sun, 22 Jan 2017 10:10:57 +0800 (CST)
-From: xufeng <xufwang@163.com>
-Subject: Re:Re: [PATCH] setlocalversion: fix error detectition of kernel git
- repository
-In-Reply-To: <87a8ak876p.fsf@ungleich.ch>
-References: <1484954637.5246.4.camel@163.com> <87a8ak876p.fsf@ungleich.ch>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=GBK
-MIME-Version: 1.0
-Message-ID: <72db5a75.262c.159c3f0d601.Coremail.xufwang@163.com>
+Received: from condef006-v.nifty.com ([210.131.4.243]:36496 "EHLO
+        condef006-v.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750735AbdAVOLn (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Sun, 22 Jan 2017 09:11:43 -0500
+Received: from conuserg-07.nifty.com ([10.26.8.70])by condef006-v.nifty.com with ESMTP id v0ME2wxZ000429
+        for <linux-kbuild@vger.kernel.org>; Sun, 22 Jan 2017 23:02:58 +0900
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH] kbuild: drop unneeded patterns '.*.orig' and '.*.rej' from distclean
+Date: Sun, 22 Jan 2017 23:02:32 +0900
+Message-Id: <1485093752-16470-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nico Schottelius <nico-linuxsetlocalversion@schottelius.org>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, wsa@the-dreams.de
+To: linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, linux-kernel@vger.kernel.org
 
-CkknbSBzb3JyeS4gTXkgcGF0Y2ggaXMgZXJyb3IuCkJ1dCBJIGp1c3Qgd2FudCB0byBnZXQgdGhl
-IGdpdCB2ZXJzaW9uICB3aGVuIHdlIHVzZSBnaXQgYXMgU0NNLiBObyBtYXR0ZXIgd2hhdCAuZ2l0
-IGRpcmVjdG9yeSB3aGVyZS4KVGhhbmtzLgoKCkF0IDIwMTctMDEtMjIgMDQ6NTQ6NTQsICJOaWNv
-IFNjaG90dGVsaXVzIiA8bmljby1saW51eHNldGxvY2FsdmVyc2lvbkBzY2hvdHRlbGl1cy5vcmc+
-IHdyb3RlOgo+Cj5IZWxsbyBYdWZlbmcsCj4KPndoeSBkbyB5b3UgdGhpbmsgcmVkaXJlY3Rpbmcg
-KmFsbCogb3V0cHV0IHRvIC9kZXYvbnVsbCBpcyB0aGUgcmlnaHQKPnRoaW5nIHRvZG8/Cj4KPkFu
-ZCB3aGljaCBwcm9ibGVtIGRvZXMgaXQgZXhhY3RseSBmaXg/Cj4KPkRvIHlvdSBzZWUgdGhhdCB0
-aGVyZSBpcyBhIGRpZmZlcmVuY2UgYmV0d2VlbiBhICJyZXR1cm4gdmFsdWUiCj4oaS5lLiBleGl0
-IGNvZGUpIGFuZCB0aGUgb3V0cHV0IChpbiB0aGlzIGNhc2Ugc3Rkb3V0KSBvZiBhIHByb2dyYW0/
-Cj4KPkJlc3QsCj4KPk5pY28KPgo+eHVmZW5nIDx4dWZ3YW5nQDE2My5jb20+IHdyaXRlczoKPgo+
-PiBUaGlzIHBhdGNoIGZpeGVkIHRoZSBlcnJvciB1c2luZyAnZ2l0IHJldi1wYXJzZSAtLXNob3ct
-Y2R1cCcgdG8gY2hlY2sKPj4gdGhhdCBnaXQgaXMgdXNlZCBhcyBTQ00gdG8gdHJhY2sgdGhlIGN1
-cnJlbnQgZGlyZWN0b3J5LiBUaGUgcmV0dXJuCj4+IHZhbHVlIG9mIHRoaXMgY29tbWFuZCBpcyBu
-b3QgbnVsbCBzdHJpbmcgd2hlbiB0aGUgLmdpdCBkaXJlY3RvcnkgaXMKPj4gbm90IGluIGtlcm5l
-bCB0b3BkaXIuCj4+Cj4+IFNpZ25lZC1vZmYtYnk6IFh1ZmVuZyBXYW5nIDx4dWZ3YW5nQDE2My5j
-b20+Cj4+IC0tLQo+PiBzY3JpcHRzL3NldGxvY2FsdmVyc2lvbiB8IDIgKy0KPj4gMSBmaWxlIGNo
-YW5nZWQsIDEgaW5zZXJ0aW9uKCspLCAxIGRlbGV0aW9uKC0pCj4+Cj4+IGRpZmYgLS1naXQgYS9z
-Y3JpcHRzL3NldGxvY2FsdmVyc2lvbiBiL3NjcmlwdHMvc2V0bG9jYWx2ZXJzaW9uCj4+IGluZGV4
-IDk2NmRkMzkuLjc5NjZlMzkgMTAwNzU1Cj4+IC0tLSBhL3NjcmlwdHMvc2V0bG9jYWx2ZXJzaW9u
-Cj4+ICsrKyBiL3NjcmlwdHMvc2V0bG9jYWx2ZXJzaW9uCj4+IEBAIC00Myw3ICs0Myw3IEBAIHNj
-bV92ZXJzaW9uKCkKPj4gZmkKPj4KPj4gIyBDaGVjayBmb3IgZ2l0IGFuZCBhIGdpdCByZXBvLgo+
-PiAtaWYgdGVzdCAteiAiJChnaXQgcmV2LXBhcnNlIC0tc2hvdy1jZHVwIDI+L2Rldi9udWxsKSIg
-JiYKPj4gK2lmIHRlc3QgLXogIiQoZ2l0IHJldi1wYXJzZSAtLXNob3ctY2R1cCAmPi9kZXYvbnVs
-bCkiICYmCj4+IGhlYWQ9YGdpdCByZXYtcGFyc2UgLS12ZXJpZnkgLS1zaG9ydCBIRUFEIDI+L2Rl
-di9udWxsYDsgdGhlbgo+Pgo+PiAjIElmIHdlIGFyZSBhdCBhIHRhZ2dlZCBjb21taXQgKGxpa2Ug
-InYyLjYuMzAtcmM2IiksIHdlIGlnbm9yZQo+Cj4KPi0tCj5XZXJkZSBUZWlsIGRlcyBtb2Rlcm5l
-biBBcmJlaXRlbnMgaW0gR2xhcm5lcmxhbmQgYXVmIHd3dy5kaWdpdGFsZ2xhcnVzLmNoIQo+TGVz
-ZSBOZXVpZ2tlaXRlbiBhdWYgVHdpdHRlcjogd3d3LnR3aXR0ZXIuY29tL0RpZ2l0YWxHbGFydXMK
-PkRpc2t1dGllcmUgbWl0IGF1ZiBGYWNlYm9vazogIHd3dy5mYWNlYm9vay5jb20vZGlnaXRhbGds
-YXJ1cwo=
+The patterns '.*.orig' and '.*.rej' are cleaned away by '*.orig' and
+'*.rej' seen two lines above.
+
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
+
+ Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Makefile b/Makefile
+index 96e2352..303ada8 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1313,8 +1313,8 @@ PHONY += distclean
+ distclean: mrproper
+ 	@find $(srctree) $(RCS_FIND_IGNORE) \
+ 		\( -name '*.orig' -o -name '*.rej' -o -name '*~' \
+-		-o -name '*.bak' -o -name '#*#' -o -name '.*.orig' \
+-		-o -name '.*.rej' -o -name '*%'  -o -name 'core' \) \
++		-o -name '*.bak' -o -name '#*#' -o -name '*%' \
++		-o -name 'core' \) \
+ 		-type f -print | xargs rm -f
+ 
+ 
+-- 
+2.7.4
+
