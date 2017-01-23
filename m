@@ -1,151 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f41.google.com ([209.85.215.41]:35505 "EHLO
-        mail-lf0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750703AbdAWLk1 (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 23 Jan 2017 06:40:27 -0500
-Received: by mail-lf0-f41.google.com with SMTP id n124so91658171lfd.2
-        for <linux-kbuild@vger.kernel.org>; Mon, 23 Jan 2017 03:40:26 -0800 (PST)
-From: riku.voipio@linaro.org
-Subject: [PATCH v2 3/3] builddeb: add make fastdeb-pkg target
-Date: Mon, 23 Jan 2017 13:40:11 +0200
-Message-Id: <20170123114011.4189-4-riku.voipio@linaro.org>
-In-Reply-To: <20170123114011.4189-1-riku.voipio@linaro.org>
-References: <20170123114011.4189-1-riku.voipio@linaro.org>
+Received: from mail-sn1nam01on0062.outbound.protection.outlook.com ([104.47.32.62]:20992
+        "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1750761AbdAWORQ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 23 Jan 2017 09:17:16 -0500
+Date: Mon, 23 Jan 2017 06:17:09 -0800
+From: Vadim Lomovtsev <Vadim.Lomovtsev@caviumnetworks.com>
+Subject: Re: [PATCH] scripts: rpm: build: add INSTALL_MOD_STRIP=1 to install
+ modules
+Message-ID: <20170123141709.GA31673@localhost.localdomain>
+References: <1484921558-26181-1-git-send-email-Vadim.Lomovtsev@caviumnetworks.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <1484921558-26181-1-git-send-email-Vadim.Lomovtsev@caviumnetworks.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org, mmarek@suse.cz
-Cc: debian-kernel@lists.debian.org, Riku Voipio <riku.voipio@linaro.org>, Jim Davis <jim.epost@gmail.com>
+To: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.com>, linux-kernel@vger.kernel.org
 
-From: Riku Voipio <riku.voipio@linaro.org>
+On Fri, Jan 20, 2017 at 06:12:38AM -0800, Vadim Lomovtsev wrote:
+Please ignore this accordingly to mysypo
+> Having kernel modules with debug sections consumes a lot of
+> hdd space, increases size of kernel rpm, initrd image grows
+> and in some cases kernel even can't be installed due to
+> insufficinet hdd space for modules.
+first one 'insifficinet'
+> 
+> Set INSTALL_MOD_STRIP=1 to enable debug info strip at rpm modules
+> install phase.
+> 
+> Signed-off-by: Vadim Lomovtsev <Vadim.Lomovtsev@caviumnetworks.com>
+> ---
+>  scripts/package/mkspec | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/scripts/package/mkspec b/scripts/package/mkspec
+> index bb43f15..176d8dd 100755
+> --- a/scripts/package/mkspec
+> +++ b/scripts/package/mkspec
+> @@ -90,7 +90,7 @@ echo 'mkdir -p $RPM_BUILD_ROOT/boot $RPM_BUILD_ROOT/lib/modules'
+>  echo "%endif"
+>  echo 'mkdir -p $RPM_BUILD_ROOT'"/lib/firmware/$KERNELRELEASE"
+>  
+> -echo 'INSTALL_MOD_PATH=$RPM_BUILD_ROOT make %{?_smp_mflags} KBUILD_SRC= mod-fw= modules_install'
+> +echo 'INSTALL_MOD_PATH=$RPM_BUILD_ROOT make %{?_smp_mflags} INSTALL_MOD_STRIP=1 BUILD_SRC= mod-fw= modules_install'
+occasionally remove 'K' from KBUILD_SRC
+>  echo 'INSTALL_FW_PATH=$RPM_BUILD_ROOT'"/lib/firmware/$KERNELRELEASE"
+>  echo 'make INSTALL_FW_PATH=$INSTALL_FW_PATH' firmware_install
+>  echo "%ifarch ia64"
+> -- 
+> 2.5.5
+> 
 
-Currently, the deb-pkg and bindeb-pkg targets create multiple packages
-for the kernel binaries, headers, userspace headers and firmware.
-
-For developers who generate Debian packages as part of their development
-workflows, it's often not necessary to generate all these packages.
-
-Introduce new target, fastdeb-pkg, which only generates kernel packages.
-Re-order package build order so that kernel binary package is created
-first and we can exit cleanly unless generating rest packages with the
-old bindeb-pkg and deb-pkg targets.
-
-Cc: Jim Davis <jim.epost@gmail.com>
-Reviewed-by: Andrew Donnellan <andrew.donnellan@au1.ibm.com>
-Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
----
-v2: Update comments as suggested by Andrew
----
- scripts/package/Makefile |  7 ++++++-
- scripts/package/builddeb | 49 +++++++++++++++++++++++++-----------------------
- 2 files changed, 32 insertions(+), 24 deletions(-)
-
-diff --git a/scripts/package/Makefile b/scripts/package/Makefile
-index 71b4a8af9d4d..fc86cc3ae222 100644
---- a/scripts/package/Makefile
-+++ b/scripts/package/Makefile
-@@ -97,6 +97,10 @@ bindeb-pkg: FORCE
- 	$(MAKE) KBUILD_SRC=
- 	+$(call cmd,builddeb)
- 
-+fastdeb-pkg: FORCE
-+	$(MAKE) KBUILD_SRC=
-+	+$(call cmd,builddeb)
-+
- clean-dirs += $(objtree)/debian/
- 
- 
-@@ -142,7 +146,8 @@ help: FORCE
- 	@echo '  rpm-pkg             - Build both source and binary RPM kernel packages'
- 	@echo '  binrpm-pkg          - Build only the binary kernel RPM package'
- 	@echo '  deb-pkg             - Build both source and binary deb kernel packages'
--	@echo '  bindeb-pkg          - Build only the binary kernel deb package'
-+	@echo '  bindeb-pkg          - Build all binary kernel deb packages'
-+	@echo '  fastdeb-pkg         - Build only the binary kernel image deb package'
- 	@echo '  tar-pkg             - Build the kernel as an uncompressed tarball'
- 	@echo '  targz-pkg           - Build the kernel as a gzip compressed tarball'
- 	@echo '  tarbz2-pkg          - Build the kernel as a bzip2 compressed tarball'
-diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index 15e69e45cada..c5dc455272ee 100755
---- a/scripts/package/builddeb
-+++ b/scripts/package/builddeb
-@@ -185,11 +185,6 @@ if grep -q '^CONFIG_MODULES=y' $KCONFIG_CONFIG ; then
- 	fi
- fi
- 
--if [ "$ARCH" != "um" ]; then
--	$MAKE headers_check KBUILD_SRC=
--	$MAKE headers_install KBUILD_SRC= INSTALL_HDR_PATH="$libc_headers_dir/usr"
--fi
--
- # Install the maintainer scripts
- # Note: hook scripts under /etc/kernel are also executed by official Debian
- # kernel packages, as well as kernel packages built using make-kpkg.
-@@ -321,6 +316,32 @@ EOF
- 
- fi
- 
-+# Move firmware out of kernel image package.
-+if [ -e "$tmpdir/lib/firmware" ]; then
-+	mv "$tmpdir/lib/firmware"/* "$fwdir/lib/firmware/$version/"
-+	rmdir "$tmpdir/lib/firmware"
-+fi
-+
-+create_package "$packagename" "$tmpdir"
-+[ "x$1" = "xfastdeb-pkg" ] && exit 0
-+
-+if [ -e "$fwdir/lib/firmware/$version" ]; then
-+	cat <<EOF >> debian/control
-+
-+Package: $fwpackagename
-+Architecture: all
-+Description: Linux kernel firmware, version $version
-+ This package contains firmware from the Linux kernel, version $version.
-+EOF
-+
-+	create_package "$fwpackagename" "$fwdir"
-+fi
-+
-+if [ "$ARCH" != "um" ]; then
-+	$MAKE headers_check KBUILD_SRC=
-+	$MAKE headers_install KBUILD_SRC= INSTALL_HDR_PATH="$libc_headers_dir/usr"
-+fi
-+
- # Build kernel header package
- (cd $srctree; find . -name Makefile\* -o -name Kconfig\* -o -name \*.pl) > "$objtree/debian/hdrsrcfiles"
- (cd $srctree; find arch/*/include include scripts -type f) >> "$objtree/debian/hdrsrcfiles"
-@@ -351,22 +372,6 @@ Description: Linux kernel headers for $KERNELRELEASE on \${kernel:debarch}
-  This is useful for people who need to build external modules
- EOF
- 
--# Do we have firmware? Move it out of the way and build it into a package.
--if [ -e "$tmpdir/lib/firmware" ]; then
--	mv "$tmpdir/lib/firmware"/* "$fwdir/lib/firmware/$version/"
--	rmdir "$tmpdir/lib/firmware"
--
--	cat <<EOF >> debian/control
--
--Package: $fwpackagename
--Architecture: all
--Description: Linux kernel firmware, version $version
-- This package contains firmware from the Linux kernel, version $version.
--EOF
--
--	create_package "$fwpackagename" "$fwdir"
--fi
--
- cat <<EOF >> debian/control
- 
- Package: $libc_headers_packagename
-@@ -383,8 +388,6 @@ if [ "$ARCH" != "um" ]; then
- 	create_package "$libc_headers_packagename" "$libc_headers_dir"
- fi
- 
--create_package "$packagename" "$tmpdir"
--
- if [ -n "$BUILD_DEBUG" ] ; then
- 	# Build debug package
- 	# Different tools want the image in different locations
--- 
-2.11.0
-
+Vadim
