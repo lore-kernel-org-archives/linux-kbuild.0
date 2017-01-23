@@ -1,40 +1,89 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.kernel.org ([198.145.29.136]:53916 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750835AbdAWPFW (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 23 Jan 2017 10:05:22 -0500
-MIME-Version: 1.0
-In-Reply-To: <20170123150235.GA26884@kroah.com>
-References: <20170118173156.16060-1-mcgrof@kernel.org> <20170119101507.GA18592@kroah.com>
- <20170123145952.GM13946@wotan.suse.de> <20170123150235.GA26884@kroah.com>
-From: "Luis R. Rodriguez" <mcgrof@kernel.org>
-Date: Mon, 23 Jan 2017 09:04:44 -0600
-Message-ID: <CAB=NE6WFRqFnCsY=EnfzBAKDeUDqfUgUNxZsVB-VBxy-QL5C9Q@mail.gmail.com>
-Subject: Re: [PATCH] firmware/Makefile: force recompilation if makefile changes
-Content-Type: text/plain; charset=UTF-8
+Received: from host.76.145.23.62.rev.coltfrance.com ([62.23.145.76]:58335 "EHLO
+        proxy.6wind.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751351AbdAWPG4 (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 23 Jan 2017 10:06:56 -0500
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Subject: [PATCH v4 4/7] Makefile.headersinst: cleanup input files
+Date: Mon, 23 Jan 2017 15:58:38 +0100
+Message-Id: <1485183521-13002-5-git-send-email-nicolas.dichtel@6wind.com>
+In-Reply-To: <1485183521-13002-1-git-send-email-nicolas.dichtel@6wind.com>
+References: <1484304406-10820-1-git-send-email-nicolas.dichtel@6wind.com>
+ <1485183521-13002-1-git-send-email-nicolas.dichtel@6wind.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Greg KH <gregkh@linuxfoundation.org>
-Cc: Ming Lei <ming.lei@canonical.com>, Daniel Wagner <wagi@monom.org>, David Woodhouse <dwmw2@infradead.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org
+To: arnd@arndb.de
+Cc: mmarek@suse.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, airlied@linux.ie, davem@davemloft.net, linux@armlinux.org.uk, bp@alien8.de, slash.tmp@free.fr, daniel.vetter@ffwll.ch, rmk+kernel@armlinux.org.uk, msalter@redhat.com, jengelh@inai.de, hch@infradead.org, tklauser@distanz.ch, mpe@ellerman.id.au, Nicolas Dichtel <nicolas.dichtel@6wind.com>
 
-On Mon, Jan 23, 2017 at 9:02 AM, Greg KH <gregkh@linuxfoundation.org> wrote:
-> On Mon, Jan 23, 2017 at 03:59:52PM +0100, Luis R. Rodriguez wrote:
->> On Thu, Jan 19, 2017 at 11:15:07AM +0100, Greg KH wrote:
->> > On Wed, Jan 18, 2017 at 09:31:56AM -0800, Luis R. Rodriguez wrote:
->> > > If you modify the target asm we currently do not force the
->> > > recompilation of the firmware files. The target asm is in
->> > > the firmware/Makefile, peg this file as a dependency to
->> > > require re-compilation of firmware targets when the asm
->> > > changes.
->> >
->> > Why would changing the Makefile require the asm to change?
->>
->> The Makefile is the file that provides the assembly logic, so
->> changing the asm should affect recreating the binary.
->
-> Ah, I see it now, that's horrid, echoing asm from the Makefile itself :)
+After the last four patches, all exported headers are under uapi/, thus
+input-files2 are not needed anymore.
+The side effect is that input-files1-name is exactly header-y.
 
-Yeah, I can change the way that works but I think I would much prefer
-to make that a separate atomic functional change.
+Note also that input-files3-name is genhdr-y.
 
-  Luis
+Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+---
+ scripts/Makefile.headersinst | 34 +++++++++++-----------------------
+ 1 file changed, 11 insertions(+), 23 deletions(-)
+
+diff --git a/scripts/Makefile.headersinst b/scripts/Makefile.headersinst
+index 1106d6ca3a38..3e20d03432d2 100644
+--- a/scripts/Makefile.headersinst
++++ b/scripts/Makefile.headersinst
+@@ -40,31 +40,20 @@ wrapper-files := $(filter $(header-y), $(generic-y))
+ srcdir        := $(srctree)/$(obj)
+ gendir        := $(objtree)/$(gen)
+ 
+-oldsrcdir     := $(srctree)/$(subst /uapi,,$(obj))
+-
+ # all headers files for this dir
+ header-y      := $(filter-out $(generic-y), $(header-y))
+ all-files     := $(header-y) $(genhdr-y) $(wrapper-files)
+ output-files  := $(addprefix $(installdir)/, $(all-files))
+ 
+-input-files1  := $(foreach hdr, $(header-y), \
+-		   $(if $(wildcard $(srcdir)/$(hdr)), \
+-			$(wildcard $(srcdir)/$(hdr))) \
+-		   )
+-input-files1-name := $(notdir $(input-files1))
+-input-files2  := $(foreach hdr, $(header-y), \
+-		   $(if  $(wildcard $(srcdir)/$(hdr)),, \
+-			$(if $(wildcard $(oldsrcdir)/$(hdr)), \
+-				$(wildcard $(oldsrcdir)/$(hdr)), \
+-				$(error Missing UAPI file $(srcdir)/$(hdr))) \
+-		   ))
+-input-files2-name := $(notdir $(input-files2))
+-input-files3  := $(foreach hdr, $(genhdr-y), \
+-		   $(if	$(wildcard $(gendir)/$(hdr)), \
+-			$(wildcard $(gendir)/$(hdr)), \
+-			$(error Missing generated UAPI file $(gendir)/$(hdr)) \
+-		   ))
+-input-files3-name := $(notdir $(input-files3))
++# Check that all expected files exist
++$(foreach hdr, $(header-y), \
++  $(if $(wildcard $(srcdir)/$(hdr)),, \
++       $(error Missing UAPI file $(srcdir)/$(hdr)) \
++   ))
++$(foreach hdr, $(genhdr-y), \
++  $(if	$(wildcard $(gendir)/$(hdr)),, \
++       $(error Missing generated UAPI file $(gendir)/$(hdr)) \
++  ))
+ 
+ # Work out what needs to be removed
+ oldheaders    := $(patsubst $(installdir)/%,%,$(wildcard $(installdir)/*.h))
+@@ -78,9 +67,8 @@ printdir = $(patsubst $(INSTALL_HDR_PATH)/%/,%,$(dir $@))
+ quiet_cmd_install = INSTALL $(printdir) ($(words $(all-files))\
+                             file$(if $(word 2, $(all-files)),s))
+       cmd_install = \
+-        $(CONFIG_SHELL) $< $(installdir) $(srcdir) $(input-files1-name); \
+-        $(CONFIG_SHELL) $< $(installdir) $(oldsrcdir) $(input-files2-name); \
+-        $(CONFIG_SHELL) $< $(installdir) $(gendir) $(input-files3-name); \
++        $(CONFIG_SHELL) $< $(installdir) $(srcdir) $(header-y); \
++        $(CONFIG_SHELL) $< $(installdir) $(gendir) $(genhdr-y); \
+         for F in $(wrapper-files); do                                   \
+                 echo "\#include <asm-generic/$$F>" > $(installdir)/$$F;    \
+         done;                                                           \
+-- 
+2.8.1
+
