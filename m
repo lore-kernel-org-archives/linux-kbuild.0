@@ -1,40 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from host.76.145.23.62.rev.coltfrance.com ([62.23.145.76]:58315 "EHLO
-        proxy.6wind.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751351AbdAWPHA (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 23 Jan 2017 10:07:00 -0500
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Subject: [PATCH v4 2/7] nios2: put setup.h in uapi
-Date: Mon, 23 Jan 2017 15:58:36 +0100
-Message-Id: <1485183521-13002-3-git-send-email-nicolas.dichtel@6wind.com>
-In-Reply-To: <1485183521-13002-1-git-send-email-nicolas.dichtel@6wind.com>
-References: <1484304406-10820-1-git-send-email-nicolas.dichtel@6wind.com>
- <1485183521-13002-1-git-send-email-nicolas.dichtel@6wind.com>
+Received: from mail.kernel.org ([198.145.29.136]:53916 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750835AbdAWPFW (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 23 Jan 2017 10:05:22 -0500
+MIME-Version: 1.0
+In-Reply-To: <20170123150235.GA26884@kroah.com>
+References: <20170118173156.16060-1-mcgrof@kernel.org> <20170119101507.GA18592@kroah.com>
+ <20170123145952.GM13946@wotan.suse.de> <20170123150235.GA26884@kroah.com>
+From: "Luis R. Rodriguez" <mcgrof@kernel.org>
+Date: Mon, 23 Jan 2017 09:04:44 -0600
+Message-ID: <CAB=NE6WFRqFnCsY=EnfzBAKDeUDqfUgUNxZsVB-VBxy-QL5C9Q@mail.gmail.com>
+Subject: Re: [PATCH] firmware/Makefile: force recompilation if makefile changes
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: arnd@arndb.de
-Cc: mmarek@suse.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, airlied@linux.ie, davem@davemloft.net, linux@armlinux.org.uk, bp@alien8.de, slash.tmp@free.fr, daniel.vetter@ffwll.ch, rmk+kernel@armlinux.org.uk, msalter@redhat.com, jengelh@inai.de, hch@infradead.org, tklauser@distanz.ch, mpe@ellerman.id.au, Nicolas Dichtel <nicolas.dichtel@6wind.com>
+To: Greg KH <gregkh@linuxfoundation.org>
+Cc: Ming Lei <ming.lei@canonical.com>, Daniel Wagner <wagi@monom.org>, David Woodhouse <dwmw2@infradead.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org
 
-This header file is exported, but from a userland pov, it's just a wrapper
-to asm-generic/setup.h.
+On Mon, Jan 23, 2017 at 9:02 AM, Greg KH <gregkh@linuxfoundation.org> wrote:
+> On Mon, Jan 23, 2017 at 03:59:52PM +0100, Luis R. Rodriguez wrote:
+>> On Thu, Jan 19, 2017 at 11:15:07AM +0100, Greg KH wrote:
+>> > On Wed, Jan 18, 2017 at 09:31:56AM -0800, Luis R. Rodriguez wrote:
+>> > > If you modify the target asm we currently do not force the
+>> > > recompilation of the firmware files. The target asm is in
+>> > > the firmware/Makefile, peg this file as a dependency to
+>> > > require re-compilation of firmware targets when the asm
+>> > > changes.
+>> >
+>> > Why would changing the Makefile require the asm to change?
+>>
+>> The Makefile is the file that provides the assembly logic, so
+>> changing the asm should affect recreating the binary.
+>
+> Ah, I see it now, that's horrid, echoing asm from the Makefile itself :)
 
-Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Reviewed-by: Tobias Klauser <tklauser@distanz.ch>
----
- arch/nios2/include/uapi/asm/Kbuild | 1 +
- 1 file changed, 1 insertion(+)
+Yeah, I can change the way that works but I think I would much prefer
+to make that a separate atomic functional change.
 
-diff --git a/arch/nios2/include/uapi/asm/Kbuild b/arch/nios2/include/uapi/asm/Kbuild
-index e0bb972a50d7..69c965304146 100644
---- a/arch/nios2/include/uapi/asm/Kbuild
-+++ b/arch/nios2/include/uapi/asm/Kbuild
-@@ -2,4 +2,5 @@ include include/uapi/asm-generic/Kbuild.asm
- 
- header-y += elf.h
- 
-+generic-y += setup.h
- generic-y += ucontext.h
--- 
-2.8.1
-
+  Luis
