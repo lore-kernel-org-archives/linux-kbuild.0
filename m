@@ -1,55 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-sn1nam01on0062.outbound.protection.outlook.com ([104.47.32.62]:20992
-        "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1750761AbdAWORQ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 23 Jan 2017 09:17:16 -0500
-Date: Mon, 23 Jan 2017 06:17:09 -0800
-From: Vadim Lomovtsev <Vadim.Lomovtsev@caviumnetworks.com>
-Subject: Re: [PATCH] scripts: rpm: build: add INSTALL_MOD_STRIP=1 to install
- modules
-Message-ID: <20170123141709.GA31673@localhost.localdomain>
-References: <1484921558-26181-1-git-send-email-Vadim.Lomovtsev@caviumnetworks.com>
+Received: from mbkd0331.ocn.ad.jp ([153.149.236.32]:32863 "EHLO
+        mbkd0331.ocn.ad.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751220AbdAWOUz (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 23 Jan 2017 09:20:55 -0500
+Date: Mon, 23 Jan 2017 23:07:49 +0900 (JST)
+From: Joyes Dadi <"YD."@biscuit.ocn.ne.jp>
+Reply-To: Joyes Dadi <joyesdadi767@citromail.hu>
+Message-ID: <1028184183.25784289.1485180469689.JavaMail.root@biscuit.ocn.ne.jp>
+Subject: Urgent Please,,
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <1484921558-26181-1-git-send-email-Vadim.Lomovtsev@caviumnetworks.com>
+Content-Type: text/plain; charset=ISO-2022-JP
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.com>, linux-kernel@vger.kernel.org
 
-On Fri, Jan 20, 2017 at 06:12:38AM -0800, Vadim Lomovtsev wrote:
-Please ignore this accordingly to mysypo
-> Having kernel modules with debug sections consumes a lot of
-> hdd space, increases size of kernel rpm, initrd image grows
-> and in some cases kernel even can't be installed due to
-> insufficinet hdd space for modules.
-first one 'insifficinet'
-> 
-> Set INSTALL_MOD_STRIP=1 to enable debug info strip at rpm modules
-> install phase.
-> 
-> Signed-off-by: Vadim Lomovtsev <Vadim.Lomovtsev@caviumnetworks.com>
-> ---
->  scripts/package/mkspec | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/scripts/package/mkspec b/scripts/package/mkspec
-> index bb43f15..176d8dd 100755
-> --- a/scripts/package/mkspec
-> +++ b/scripts/package/mkspec
-> @@ -90,7 +90,7 @@ echo 'mkdir -p $RPM_BUILD_ROOT/boot $RPM_BUILD_ROOT/lib/modules'
->  echo "%endif"
->  echo 'mkdir -p $RPM_BUILD_ROOT'"/lib/firmware/$KERNELRELEASE"
->  
-> -echo 'INSTALL_MOD_PATH=$RPM_BUILD_ROOT make %{?_smp_mflags} KBUILD_SRC= mod-fw= modules_install'
-> +echo 'INSTALL_MOD_PATH=$RPM_BUILD_ROOT make %{?_smp_mflags} INSTALL_MOD_STRIP=1 BUILD_SRC= mod-fw= modules_install'
-occasionally remove 'K' from KBUILD_SRC
->  echo 'INSTALL_FW_PATH=$RPM_BUILD_ROOT'"/lib/firmware/$KERNELRELEASE"
->  echo 'make INSTALL_FW_PATH=$INSTALL_FW_PATH' firmware_install
->  echo "%ifarch ia64"
-> -- 
-> 2.5.5
-> 
+Good Day Dear,
 
-Vadim
+My name is Ms. Joyes Dadi, I am glad you are reading this letter and I hope
+we will start our communication and I know that this message will look strange,
+surprising and probably unbelievable to you, but it is the reality. I want to
+make a donation of money to you.
+
+I contact you by the will of God. I am a firm German woman specialized in
+mining gold and diamonds in Africa. But now, I'm very sick of a cancer. My
+husband died in an accident two years ago with our two children and now I have
+cancer of the esophagus that damaged almost all the cells in my system/agencies
+and I'll die soon according to my doctor.
+
+My most concern now is, we grew up in the orphanage and were married in
+orphanage. If I die this deposited fund will soon be left alone in the hand of
+the bank, and I do want to it that  way. Please, if you can be reliable and
+sincere to accept my humble proposal; I have (10.5Millions Euro) in a fixed
+deposit account; I will order the Bank to transfer the money into your account
+in your country immediately, and then you will take the fund to  your country
+and invest it to the orphanage homes Please, answer as quickly as possible.
+
+God bless you.
+Ms. Joyes Dadi
+Email: joyesdadi767@citromail.hu
