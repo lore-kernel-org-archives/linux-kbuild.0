@@ -1,71 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from host.76.145.23.62.rev.coltfrance.com ([62.23.145.76]:58305 "EHLO
-        proxy.6wind.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751440AbdAWPHJ (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 23 Jan 2017 10:07:09 -0500
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Subject: [PATCH v4 1/7] h8300: put bitsperlong.h in uapi
-Date: Mon, 23 Jan 2017 15:58:35 +0100
-Message-Id: <1485183521-13002-2-git-send-email-nicolas.dichtel@6wind.com>
-In-Reply-To: <1485183521-13002-1-git-send-email-nicolas.dichtel@6wind.com>
-References: <1484304406-10820-1-git-send-email-nicolas.dichtel@6wind.com>
- <1485183521-13002-1-git-send-email-nicolas.dichtel@6wind.com>
+Received: from mail.kernel.org ([198.145.29.136]:54626 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751305AbdAWPHb (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 23 Jan 2017 10:07:31 -0500
+From: "Luis R. Rodriguez" <mcgrof@kernel.org>
+Subject: [PATCH v2] firmware/Makefile: force recompilation if makefile changes
+Date: Mon, 23 Jan 2017 07:07:27 -0800
+Message-Id: <20170123150727.4883-1-mcgrof@kernel.org>
+In-Reply-To: <20170118173156.16060-1-mcgrof@kernel.org>
+References: <20170118173156.16060-1-mcgrof@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: arnd@arndb.de
-Cc: mmarek@suse.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, airlied@linux.ie, davem@davemloft.net, linux@armlinux.org.uk, bp@alien8.de, slash.tmp@free.fr, daniel.vetter@ffwll.ch, rmk+kernel@armlinux.org.uk, msalter@redhat.com, jengelh@inai.de, hch@infradead.org, tklauser@distanz.ch, mpe@ellerman.id.au, Nicolas Dichtel <nicolas.dichtel@6wind.com>
+To: mmarek@suse.com
+Cc: linux-kbuild@vger.kernel.org, ming.lei@canonical.com, gregkh@linuxfoundation.org, teg@jklm.no, linux-kernel@vger.kernel.org, dwmw2@infradead.org, "Luis R. Rodriguez" <mcgrof@kernel.org>
 
-This header file is exported, thus move it to uapi.
+If you modify the target asm we currently do not force the
+recompilation of the firmware files. The target asm is in
+the firmware/Makefile, peg this file as a dependency to
+require re-compilation of firmware targets when the asm
+changes.
 
-Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Signed-off-by: Luis R. Rodriguez <mcgrof@kernel.org>
 ---
- arch/h8300/include/asm/bitsperlong.h      | 14 --------------
- arch/h8300/include/uapi/asm/bitsperlong.h | 14 ++++++++++++++
- 2 files changed, 14 insertions(+), 14 deletions(-)
- delete mode 100644 arch/h8300/include/asm/bitsperlong.h
- create mode 100644 arch/h8300/include/uapi/asm/bitsperlong.h
 
-diff --git a/arch/h8300/include/asm/bitsperlong.h b/arch/h8300/include/asm/bitsperlong.h
-deleted file mode 100644
-index e140e46729ac..000000000000
---- a/arch/h8300/include/asm/bitsperlong.h
-+++ /dev/null
-@@ -1,14 +0,0 @@
--#ifndef __ASM_H8300_BITS_PER_LONG
--#define __ASM_H8300_BITS_PER_LONG
--
--#include <asm-generic/bitsperlong.h>
--
--#if !defined(__ASSEMBLY__)
--/* h8300-unknown-linux required long */
--#define __kernel_size_t __kernel_size_t
--typedef unsigned long	__kernel_size_t;
--typedef long		__kernel_ssize_t;
--typedef long		__kernel_ptrdiff_t;
--#endif
--
--#endif /* __ASM_H8300_BITS_PER_LONG */
-diff --git a/arch/h8300/include/uapi/asm/bitsperlong.h b/arch/h8300/include/uapi/asm/bitsperlong.h
-new file mode 100644
-index 000000000000..e56cf72369b6
---- /dev/null
-+++ b/arch/h8300/include/uapi/asm/bitsperlong.h
-@@ -0,0 +1,14 @@
-+#ifndef _UAPI_ASM_H8300_BITS_PER_LONG
-+#define _UAPI_ASM_H8300_BITS_PER_LONG
-+
-+#include <asm-generic/bitsperlong.h>
-+
-+#if !defined(__ASSEMBLY__)
-+/* h8300-unknown-linux required long */
-+#define __kernel_size_t __kernel_size_t
-+typedef unsigned long	__kernel_size_t;
-+typedef long		__kernel_ssize_t;
-+typedef long		__kernel_ptrdiff_t;
-+#endif
-+
-+#endif /* _UAPI_ASM_H8300_BITS_PER_LONG */
+Michal,
+
+I had this patch as part of my linker table series [0] but have split it
+off as its a small atomic separate change and can go in separately. Greg
+prefers this be reviewed by the kbuild tree so sending it your way.
+This v2 has no modifications, just resending it to the kbuild tree.
+
+[0] https://lkml.kernel.org/r/20170115211057.17167-1-mcgrof@kernel.org
+
+ firmware/Makefile | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/firmware/Makefile b/firmware/Makefile
+index e297e1b52636..fa3e81c2a97b 100644
+--- a/firmware/Makefile
++++ b/firmware/Makefile
+@@ -176,7 +176,8 @@ quiet_cmd_fwbin = MK_FW   $@
+ wordsize_deps := $(wildcard include/config/64bit.h include/config/32bit.h \
+ 		include/config/ppc32.h include/config/ppc64.h \
+ 		include/config/superh32.h include/config/superh64.h \
+-		include/config/x86_32.h include/config/x86_64.h)
++		include/config/x86_32.h include/config/x86_64.h \
++		firmware/Makefile)
+ 
+ $(patsubst %,$(obj)/%.gen.S, $(fw-shipped-y)): %: $(wordsize_deps)
+ 	$(call cmd,fwbin,$(patsubst %.gen.S,%,$@))
 -- 
-2.8.1
+2.11.0
 
