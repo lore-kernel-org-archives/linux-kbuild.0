@@ -1,41 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mbkd0331.ocn.ad.jp ([153.149.236.32]:32863 "EHLO
-        mbkd0331.ocn.ad.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751220AbdAWOUz (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 23 Jan 2017 09:20:55 -0500
-Date: Mon, 23 Jan 2017 23:07:49 +0900 (JST)
-From: Joyes Dadi <"YD."@biscuit.ocn.ne.jp>
-Reply-To: Joyes Dadi <joyesdadi767@citromail.hu>
-Message-ID: <1028184183.25784289.1485180469689.JavaMail.root@biscuit.ocn.ne.jp>
-Subject: Urgent Please,,
+Received: from mail-by2nam01on0055.outbound.protection.outlook.com ([104.47.34.55]:51705
+        "EHLO NAM01-BY2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1750723AbdAWOcl (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 23 Jan 2017 09:32:41 -0500
+From: Vadim Lomovtsev <Vadim.Lomovtsev@caviumnetworks.com>
+Subject: [PATCH v2] scripts: rpm: build: add INSTALL_MOD_STRIP=1 to rpm mkspec
+Date: Mon, 23 Jan 2017 06:32:24 -0800
+Message-ID: <1485181944-31882-1-git-send-email-Vadim.Lomovtsev@caviumnetworks.com>
+In-Reply-To: <1484921558-26181-1-git-send-email-Vadim.Lomovtsev@caviumnetworks.com>
+References: <1484921558-26181-1-git-send-email-Vadim.Lomovtsev@caviumnetworks.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-2022-JP
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Michal Marek <mmarek@suse.com>, Vadim.Lomovtsev@caviumnetworks.com
 
-Good Day Dear,
+Having kernel modules with debug sections consumes a lot of
+hdd space, increases size of kernel rpm, initrd image grows
+and in some cases kernel even can't be installed due to
+insufficient hdd space for modules.
 
-My name is Ms. Joyes Dadi, I am glad you are reading this letter and I hope
-we will start our communication and I know that this message will look strange,
-surprising and probably unbelievable to you, but it is the reality. I want to
-make a donation of money to you.
+Set INSTALL_MOD_STRIP=1 to enable debug info strip at rpm modules
+install phase.
 
-I contact you by the will of God. I am a firm German woman specialized in
-mining gold and diamonds in Africa. But now, I'm very sick of a cancer. My
-husband died in an accident two years ago with our two children and now I have
-cancer of the esophagus that damaged almost all the cells in my system/agencies
-and I'll die soon according to my doctor.
+Signed-off-by: Vadim Lomovtsev <Vadim.Lomovtsev@caviumnetworks.com>
+---
+ scripts/package/mkspec | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-My most concern now is, we grew up in the orphanage and were married in
-orphanage. If I die this deposited fund will soon be left alone in the hand of
-the bank, and I do want to it that  way. Please, if you can be reliable and
-sincere to accept my humble proposal; I have (10.5Millions Euro) in a fixed
-deposit account; I will order the Bank to transfer the money into your account
-in your country immediately, and then you will take the fund to  your country
-and invest it to the orphanage homes Please, answer as quickly as possible.
+diff --git a/scripts/package/mkspec b/scripts/package/mkspec
+index bb43f15..252d74c 100755
+--- a/scripts/package/mkspec
++++ b/scripts/package/mkspec
+@@ -90,7 +90,7 @@ echo 'mkdir -p $RPM_BUILD_ROOT/boot $RPM_BUILD_ROOT/lib/modules'
+ echo "%endif"
+ echo 'mkdir -p $RPM_BUILD_ROOT'"/lib/firmware/$KERNELRELEASE"
+ 
+-echo 'INSTALL_MOD_PATH=$RPM_BUILD_ROOT make %{?_smp_mflags} KBUILD_SRC= mod-fw= modules_install'
++echo 'INSTALL_MOD_PATH=$RPM_BUILD_ROOT make %{?_smp_mflags} INSTALL_MOD_STRIP=1 KBUILD_SRC= mod-fw= modules_install'
+ echo 'INSTALL_FW_PATH=$RPM_BUILD_ROOT'"/lib/firmware/$KERNELRELEASE"
+ echo 'make INSTALL_FW_PATH=$INSTALL_FW_PATH' firmware_install
+ echo "%ifarch ia64"
+-- 
+2.4.11
 
-God bless you.
-Ms. Joyes Dadi
-Email: joyesdadi767@citromail.hu
