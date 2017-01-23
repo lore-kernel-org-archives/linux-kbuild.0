@@ -1,67 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp10.smtpout.orange.fr ([80.12.242.132]:54586 "EHLO
-        smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750708AbdAWGY1 (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 23 Jan 2017 01:24:27 -0500
-From: Robert Jarzmik <robert.jarzmik@free.fr>
-Subject: Re: [PATCH v2] tags: honor COMPILED_SOURCE with apart output directory
-References: <1481819733-3002-1-git-send-email-robert.jarzmik@free.fr>
-Date: Mon, 23 Jan 2017 07:22:54 +0100
-In-Reply-To: <1481819733-3002-1-git-send-email-robert.jarzmik@free.fr> (Robert
-        Jarzmik's message of "Thu, 15 Dec 2016 17:35:33 +0100")
-Message-ID: <87lgu2cn29.fsf@belgarion.home>
+Received: from ozlabs.org ([103.22.144.67]:41221 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750703AbdAWJAX (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 23 Jan 2017 04:00:23 -0500
+From: Michael Ellerman <mpe@ellerman.id.au>
+Subject: Re: [PATCH v3 7/8] uapi: export all headers under uapi directories
+In-Reply-To: <1484304406-10820-8-git-send-email-nicolas.dichtel@6wind.com>
+References: <3131144.4Ej3KFWRbz@wuerfel> <1484304406-10820-1-git-send-email-nicolas.dichtel@6wind.com> <1484304406-10820-8-git-send-email-nicolas.dichtel@6wind.com>
+Date: Mon, 23 Jan 2017 20:00:19 +1100
+Message-ID: <878tq2b17g.fsf@concordia.ellerman.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Cc: linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
 
-Robert Jarzmik <robert.jarzmik@free.fr> writes:
+Nicolas Dichtel <nicolas.dichtel@6wind.com> writes:
 
-> When the kernel is compiled with an "O=" argument, the object files are
-> not necessarily in the source tree, and more probably in another tree.
+> Regularly, when a new header is created in include/uapi/, the developer
+> forgets to add it in the corresponding Kbuild file. This error is usually
+> detected after the release is out.
 >
-> In this situation, the current used check doesn't work, and
-> COMPILED_SOURCE tags is broken with O= builds.
+> In fact, all headers under uapi directories should be exported, thus it's
+> useless to have an exhaustive list.
 >
-> This patch fixes it by looking for object files both in source tree and
-> potential destination tree.
->
-> It was verified that in the case of O= usage, the current directory is
-> the build tree, ie. the tree referenced by O=xxx, and j is the source
-> tree path concatenated with relative path of the object to the source
-> tree root, hence the simple expression to compute "k" as the built
-> object.
->
-> Signed-off-by: Robert Jarzmik <robert.jarzmik@free.fr>
-> ---
-> Since v1: amended k expression, Marek's comments
-Hi Marek,
+> After this patch, the following files, which were not exported, are now
+> exported (with make headers_install_all):
+...
+> asm-powerpc/perf_regs.h
+...
+>  arch/powerpc/include/uapi/asm/Kbuild        |  45 ---
 
-Is this version good for you ?
+Thanks for cleaning it up.
 
-> ---
->  scripts/tags.sh | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/scripts/tags.sh b/scripts/tags.sh
-> index a2ff3388e5ea..35cb64d5211c 100755
-> --- a/scripts/tags.sh
-> +++ b/scripts/tags.sh
-> @@ -106,7 +106,8 @@ all_compiled_sources()
->  		case "$i" in
->  			*.[cS])
->  				j=${i/\.[cS]/\.o}
-> -				if [ -e $j ]; then
-> +				k="${j#$tree}"
-> +				if [ -e $j -o -e "$k" ]; then
->  					echo $i
->  				fi
->  				;;
+Acked-by: Michael Ellerman <mpe@ellerman.id.au> (powerpc)
 
-Cheers.
 
--- 
-Robert
+cheers
