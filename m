@@ -1,40 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([103.22.144.67]:41221 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750703AbdAWJAX (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 23 Jan 2017 04:00:23 -0500
-From: Michael Ellerman <mpe@ellerman.id.au>
-Subject: Re: [PATCH v3 7/8] uapi: export all headers under uapi directories
-In-Reply-To: <1484304406-10820-8-git-send-email-nicolas.dichtel@6wind.com>
-References: <3131144.4Ej3KFWRbz@wuerfel> <1484304406-10820-1-git-send-email-nicolas.dichtel@6wind.com> <1484304406-10820-8-git-send-email-nicolas.dichtel@6wind.com>
-Date: Mon, 23 Jan 2017 20:00:19 +1100
-Message-ID: <878tq2b17g.fsf@concordia.ellerman.id.au>
-MIME-Version: 1.0
-Content-Type: text/plain
+Received: from mail-lf0-f51.google.com ([209.85.215.51]:35988 "EHLO
+        mail-lf0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750703AbdAWLkU (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 23 Jan 2017 06:40:20 -0500
+Received: by mail-lf0-f51.google.com with SMTP id z134so91849437lff.3
+        for <linux-kbuild@vger.kernel.org>; Mon, 23 Jan 2017 03:40:19 -0800 (PST)
+From: riku.voipio@linaro.org
+Subject: [PATCH 0/3] builddeb updates for 4.11
+Date: Mon, 23 Jan 2017 13:40:08 +0200
+Message-Id: <20170123114011.4189-1-riku.voipio@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Cc: linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+To: linux-kbuild@vger.kernel.org, mmarek@suse.cz
+Cc: debian-kernel@lists.debian.org, Riku Voipio <riku.voipio@linaro.org>
 
-Nicolas Dichtel <nicolas.dichtel@6wind.com> writes:
+From: Riku Voipio <riku.voipio@linaro.org>
 
-> Regularly, when a new header is created in include/uapi/, the developer
-> forgets to add it in the corresponding Kbuild file. This error is usually
-> detected after the release is out.
->
-> In fact, all headers under uapi directories should be exported, thus it's
-> useless to have an exhaustive list.
->
-> After this patch, the following files, which were not exported, are now
-> exported (with make headers_install_all):
-...
-> asm-powerpc/perf_regs.h
-...
->  arch/powerpc/include/uapi/asm/Kbuild        |  45 ---
+The listed patches already missed one merge window, so it would
+be nice if they can be considered for 4.11
 
-Thanks for cleaning it up.
+Andrew Donnellan (1):
+  builddeb: fix typo
 
-Acked-by: Michael Ellerman <mpe@ellerman.id.au> (powerpc)
+Riku Voipio (2):
+  builddeb: Update a few outdated and hardcoded strings
+  builddeb: add make fastdeb-pkg target
 
+ scripts/package/Makefile |  7 +++++-
+ scripts/package/builddeb | 59 ++++++++++++++++++++++++------------------------
+ 2 files changed, 35 insertions(+), 31 deletions(-)
 
-cheers
+-- 
+2.11.0
+
