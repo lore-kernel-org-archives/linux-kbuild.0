@@ -1,42 +1,91 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.skyhub.de ([78.46.96.112]:33770 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751888AbdAWWvR (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 23 Jan 2017 17:51:17 -0500
-Date: Mon, 23 Jan 2017 23:51:07 +0100
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH v4 3/7] x86: put msr-index.h in uapi
-Message-ID: <20170123225107.f4yqjtgvz7kx7s5k@pd.tnic>
-References: <1484304406-10820-1-git-send-email-nicolas.dichtel@6wind.com>
- <1485183521-13002-1-git-send-email-nicolas.dichtel@6wind.com>
- <1485183521-13002-4-git-send-email-nicolas.dichtel@6wind.com>
- <20170123165245.7zy7nf3cx5o4vvh3@pd.tnic>
- <d105332c-d8dd-938a-aaa5-ceb42fca4507@6wind.com>
- <20170123171732.i3qfbcsqzznppe5m@pd.tnic>
- <20170123172103.GB28446@infradead.org>
- <20170123172627.32zcbntwo7nmd5rf@pd.tnic>
- <alpine.LSU.2.20.1701232316180.19605@erq.vanv.qr>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <alpine.LSU.2.20.1701232316180.19605@erq.vanv.qr>
+Received: from mail-lf0-f48.google.com ([209.85.215.48]:35626 "EHLO
+        mail-lf0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750733AbdAXJpv (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 24 Jan 2017 04:45:51 -0500
+Received: by mail-lf0-f48.google.com with SMTP id n124so107456362lfd.2
+        for <linux-kbuild@vger.kernel.org>; Tue, 24 Jan 2017 01:45:50 -0800 (PST)
+From: riku.voipio@linaro.org
+Subject: [PATCH v3 1/3] builddeb: Update a few outdated and hardcoded strings
+Date: Tue, 24 Jan 2017 11:45:41 +0200
+Message-Id: <20170124094541.28361-1-riku.voipio@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jan Engelhardt <jengelh@inai.de>
-Cc: Christoph Hellwig <hch@infradead.org>, Nicolas Dichtel <nicolas.dichtel@6wind.com>, arnd@arndb.de, mmarek@suse.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, airlied@linux.ie, davem@davemloft.net, linux@armlinux.org.uk, slash.tmp@free.fr, daniel.vetter@ffwll.ch, rmk+kernel@armlinux.org.uk, msalter@redhat.com, tklauser@distanz.ch, mpe@ellerman.id.au, mingo@kernel.org, hpa@zytor.com
+To: linux-kbuild@vger.kernel.org, mmarek@suse.cz
+Cc: debian-kernel@lists.debian.org, Riku Voipio <riku.voipio@linaro.org>, Timo Sigurdsson <public_timo.s@silentcreek.de>, Ben Hutchings <ben@decadent.org.uk>
 
-On Mon, Jan 23, 2017 at 11:24:02PM +0100, Jan Engelhardt wrote:
-> So if some userspace component depends on that particular msr header
-> (which, unlike ipt_SAME, was not intended for export), is it not
-> reasonable to expect them to make a copy if and when they need it?
+From: Riku Voipio <riku.voipio@linaro.org>
 
-Yeah, either copy the whole header or better yet use own defines.
-Especially in this particular case, where we have a bunch of MSRs which
-are in the processor manuals. Exporting the defines is pretty pointless
-and even disadvantageous for the kernel.
+The builddeb script has some hardcoded references to Linux version 2.6
+which is ancient. Drop Provides as the virtual packages provided are not
+useful anymore. Leave the Provides for linux-kernel-headers, as someone
+might still be referring to it.
 
+While at it, updated copyright date and drop Standards-Version field.
+
+Cc: Timo Sigurdsson <public_timo.s@silentcreek.de>
+Cc: Ben Hutchings <ben@decadent.org.uk> 
+Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
+---
+v3: Drop Standards-Version instead of updating it.
+---
+ scripts/package/builddeb | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
+
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index 3c575cd07888..6075392616de 100755
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -265,7 +265,7 @@ This is a packacked upstream version of the Linux kernel.
+ The sources may be found at most Linux ftp sites, including:
+ ftp://ftp.kernel.org/pub/linux/kernel
+ 
+-Copyright: 1991 - 2015 Linus Torvalds and others.
++Copyright: 1991 - 2017 Linus Torvalds and others.
+ 
+ The git repository for mainline kernel development is at:
+ git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+@@ -288,7 +288,6 @@ Section: kernel
+ Priority: optional
+ Maintainer: $maintainer
+ Build-Depends: $build_depends
+-Standards-Version: 3.8.4
+ Homepage: http://www.kernel.org/
+ EOF
+ 
+@@ -296,7 +295,6 @@ if [ "$ARCH" = "um" ]; then
+ 	cat <<EOF >> debian/control
+ 
+ Package: $packagename
+-Provides: linux-image, linux-image-2.6, linux-modules-$version
+ Architecture: any
+ Description: User Mode Linux kernel, version $version
+  User-mode Linux is a port of the Linux kernel to its own system call
+@@ -313,7 +311,6 @@ else
+ 	cat <<EOF >> debian/control
+ 
+ Package: $packagename
+-Provides: linux-image, linux-image-2.6, linux-modules-$version
+ Suggests: $fwpackagename
+ Architecture: any
+ Description: Linux kernel, version $version
+@@ -346,7 +343,6 @@ rm -f "$objtree/debian/hdrsrcfiles" "$objtree/debian/hdrobjfiles"
+ cat <<EOF >> debian/control
+ 
+ Package: $kernel_headers_packagename
+-Provides: linux-headers, linux-headers-2.6
+ Architecture: any
+ Description: Linux kernel headers for $KERNELRELEASE on \${kernel:debarch}
+  This package provides kernel header files for $KERNELRELEASE on \${kernel:debarch}
+@@ -404,7 +400,6 @@ if [ -n "$BUILD_DEBUG" ] ; then
+ 
+ Package: $dbg_packagename
+ Section: debug
+-Provides: linux-debug, linux-debug-$version
+ Architecture: any
+ Description: Linux kernel debugging symbols for $version
+  This package will come in handy if you need to debug the kernel. It provides
 -- 
-Regards/Gruss,
-    Boris.
+2.11.0
 
-Good mailing practices for 400: avoid top-posting and trim the reply.
