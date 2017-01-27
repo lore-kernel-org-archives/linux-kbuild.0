@@ -1,54 +1,71 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:58360 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1754002AbdA0HTz (ORCPT
+Received: from mail-ot0-f195.google.com ([74.125.82.195]:35054 "EHLO
+        mail-ot0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932198AbdA0QG7 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 27 Jan 2017 02:19:55 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id v0R5s1HP060944
-        for <linux-kbuild@vger.kernel.org>; Fri, 27 Jan 2017 00:54:01 -0500
-Received: from e23smtp03.au.ibm.com (e23smtp03.au.ibm.com [202.81.31.145])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 287vaa79wk-1
-        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
-        for <linux-kbuild@vger.kernel.org>; Fri, 27 Jan 2017 00:54:01 -0500
-Received: from localhost
-        by e23smtp03.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-kbuild@vger.kernel.org> from <andrew.donnellan@au1.ibm.com>;
-        Fri, 27 Jan 2017 15:53:54 +1000
-Subject: Re: [PATCH 3/3] powerpc: enable support for GCC plugins
-References: <20161206062800.21800-1-andrew.donnellan@au1.ibm.com>
- <CAGXu5jKrU5GR3KDb9M-vtSpY+aRm2B0vGpahVYLtFTWs=g7Big@mail.gmail.com>
- <f5ea8825-532c-93bd-d51d-6ec1e541fae6@au1.ibm.com>
- <584A8E9E.22035.590FC72@pageexec.freemail.hu>
-From: Andrew Donnellan <andrew.donnellan@au1.ibm.com>
-Date: Fri, 27 Jan 2017 16:52:54 +1100
+        Fri, 27 Jan 2017 11:06:59 -0500
 MIME-Version: 1.0
-In-Reply-To: <584A8E9E.22035.590FC72@pageexec.freemail.hu>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Transfer-Encoding: 7bit
-Message-Id: <25e3a510-1652-5be9-cc26-24d35f9ac95e@au1.ibm.com>
+In-Reply-To: <20170113154010.2718601-1-arnd@arndb.de>
+References: <201701131834.BsUjtXaC%fengguang.wu@intel.com> <20170113154010.2718601-1-arnd@arndb.de>
+From: Arnd Bergmann <arnd@arndb.de>
+Date: Fri, 27 Jan 2017 17:03:45 +0100
+Message-ID: <CAK8P3a2z8MqRAnSo8A4VEx5=RmoF=FY6vV-9RXVb=2W_asFjgg@mail.gmail.com>
+Subject: Re: [PATCH] Kbuild: use cc-disable-warning consistently for maybe-uninitialized
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: pageexec@freemail.hu, Kees Cook <keescook@chromium.org>
-Cc: "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>, "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, Emese Revfy <re.emese@gmail.com>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Brad Spengler <spender@grsecurity.net>, Michal Marek <mmarek@suse.com>
+To: Michal Marek <mmarek@suse.com>
+Cc: linux-kbuild@vger.kernel.org, fengguang.wu@intel.com, kbuild-all@01.org, Arnd Bergmann <arnd@arndb.de>, stable@vger.kernel.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>
 
-On 09/12/16 21:59, PaX Team wrote:
->>>> the specific problem addressed here can (and IMHO should) be solved in
->>>> another way: remove the inclusion of the offending headers in gcc-common.h
->>>> as neither tm.h nor c-common.h are needed by existing plugins. for background,
->>
->> We can't build without tm.h: http://pastebin.com/W0azfCr0
+On Fri, Jan 13, 2017 at 4:40 PM, Arnd Bergmann <arnd@arndb.de> wrote:
+> In commit a76bcf557ef4 ("Kbuild: enable -Wmaybe-uninitialized warning
+> for "make W=1""), I reverted another change that happened to fix a problem
+> with old compilers, and now we get this report again with old compilers
+> (prior to gcc-4.8) and GCOV enabled:
 >
-> you'll need to repeat the removal of dependent headers. based on a quick
-> test here across gcc 4.5-6.2, if you remove rtl.h, tm_p.h, hard-reg-set.h
-> and emit-rtl.h in addition to tm.h, the plugins should build fine.
+>    cc1: warnings being treated as errors
+>    drivers/gpu/drm/i915/intel_ringbuffer.c: In function 'intel_ring_setup_status_page':
+>    drivers/gpu/drm/i915/intel_ringbuffer.c:438: error: 'mmio.reg' may be used uninitialized in this function
+>    At top level:
+>>> cc1: error: unrecognized command line option "-Wno-maybe-uninitialized"
+>
+> The problem is that we turn off the warning conditionally in a number
+> of places as we should, but one of them does it unconditionally.
+> Instead, change it to call cc-disable-warning as we do elsewhere.
+>
+> The original patch that caused it was merged into linux-4.7, then
+> 4.8 removed the change and 4.9 brought it back, so we probably want
+> a backport to 4.9 once this is merged.
+>
+> Cc: stable@vger.kernel.org
+> Fixes: a76bcf557ef4 ("Kbuild: enable -Wmaybe-uninitialized warning for "make W=1"")
+> Fixes: e72e2dfe7c16 ("gcov: disable -Wmaybe-uninitialized warning")
+> Reported-by: kbuild test robot <fengguang.wu@intel.com>
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
 
-OK, I finally have a chance to look at this series again.
+Hi Michal,
 
-basic-block.h includes tm.h, and I don't believe we can remove that. I'm 
-not convinced there's a way around this.
+any plans to pick this up for v4.10?
 
--- 
-Andrew Donnellan              OzLabs, ADL Canberra
-andrew.donnellan@au1.ibm.com  IBM Australia Limited
+   Arnd
 
+>  Makefile | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/Makefile b/Makefile
+> index 4fcc0f2dd93c..dbe9ce5d0e96 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -370,7 +370,7 @@ LDFLAGS_MODULE  =
+>  CFLAGS_KERNEL  =
+>  AFLAGS_KERNEL  =
+>  LDFLAGS_vmlinux =
+> -CFLAGS_GCOV    = -fprofile-arcs -ftest-coverage -fno-tree-loop-im -Wno-maybe-uninitialized
+> +CFLAGS_GCOV    = -fprofile-arcs -ftest-coverage -fno-tree-loop-im $(call cc-disable-warning,maybe-uninitialized,)
+>  CFLAGS_KCOV    := $(call cc-option,-fsanitize-coverage=trace-pc,)
+>
+>
+> --
+> 2.9.0
+>
