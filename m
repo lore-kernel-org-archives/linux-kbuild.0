@@ -1,33 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.skyhub.de ([78.46.96.112]:41536 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752241AbdAZTaJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 26 Jan 2017 14:30:09 -0500
-Date: Thu, 26 Jan 2017 20:29:50 +0100
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH v4 3/7] x86: put msr-index.h in uapi
-Message-ID: <20170126192950.eeinndcreybf5jpb@pd.tnic>
-References: <1484304406-10820-1-git-send-email-nicolas.dichtel@6wind.com>
- <1485183521-13002-1-git-send-email-nicolas.dichtel@6wind.com>
- <1485183521-13002-4-git-send-email-nicolas.dichtel@6wind.com>
- <20170126190452.GA6326@gmail.com>
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:43553 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1753870AbdA0F4o (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 27 Jan 2017 00:56:44 -0500
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.20/8.16.0.20) with SMTP id v0R5sHYj061300
+        for <linux-kbuild@vger.kernel.org>; Fri, 27 Jan 2017 00:56:43 -0500
+Received: from e23smtp07.au.ibm.com (e23smtp07.au.ibm.com [202.81.31.140])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 287vaa7c2f-1
+        (version=TLSv1.2 cipher=AES256-SHA bits=256 verify=NOT)
+        for <linux-kbuild@vger.kernel.org>; Fri, 27 Jan 2017 00:56:43 -0500
+Received: from localhost
+        by e23smtp07.au.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-kbuild@vger.kernel.org> from <andrew.donnellan@au1.ibm.com>;
+        Fri, 27 Jan 2017 15:56:39 +1000
+Subject: Re: [PATCH 3/3] powerpc: enable support for GCC plugins
+References: <20161206062800.21800-1-andrew.donnellan@au1.ibm.com>
+ <CAGXu5jKrU5GR3KDb9M-vtSpY+aRm2B0vGpahVYLtFTWs=g7Big@mail.gmail.com>
+ <f5ea8825-532c-93bd-d51d-6ec1e541fae6@au1.ibm.com>
+ <584A8E9E.22035.590FC72@pageexec.freemail.hu>
+ <25e3a510-1652-5be9-cc26-24d35f9ac95e@au1.ibm.com>
+From: Andrew Donnellan <andrew.donnellan@au1.ibm.com>
+Date: Fri, 27 Jan 2017 16:55:37 +1100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170126190452.GA6326@gmail.com>
+In-Reply-To: <25e3a510-1652-5be9-cc26-24d35f9ac95e@au1.ibm.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Transfer-Encoding: 7bit
+Message-Id: <abbe5484-b546-6987-de5f-c0070657efba@au1.ibm.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ingo Molnar <mingo@kernel.org>
-Cc: Nicolas Dichtel <nicolas.dichtel@6wind.com>, arnd@arndb.de, mmarek@suse.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, airlied@linux.ie, davem@davemloft.net, linux@armlinux.org.uk, slash.tmp@free.fr, daniel.vetter@ffwll.ch, rmk+kernel@armlinux.org.uk, msalter@redhat.com, jengelh@inai.de, hch@infradead.org, tklauser@distanz.ch, mpe@ellerman.id.au
+To: pageexec@freemail.hu, Kees Cook <keescook@chromium.org>
+Cc: "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>, "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, Emese Revfy <re.emese@gmail.com>, LKML <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, Brad Spengler <spender@grsecurity.net>, Michal Marek <mmarek@suse.com>
 
-On Thu, Jan 26, 2017 at 08:04:52PM +0100, Ingo Molnar wrote:
-> Please remove this patch from linux-next as well, until you get an
-> Acked-by from an x86 maintainer.
+On 27/01/17 16:52, Andrew Donnellan wrote:
+> basic-block.h includes tm.h, and I don't believe we can remove that. I'm
+> not convinced there's a way around this.
 
-... and the header export from arch/x86/include/uapi/asm/Kbuild too pls.
+Includes via function.h, I should say.
 
 -- 
-Regards/Gruss,
-    Boris.
+Andrew Donnellan              OzLabs, ADL Canberra
+andrew.donnellan@au1.ibm.com  IBM Australia Limited
 
-Good mailing practices for 400: avoid top-posting and trim the reply.
