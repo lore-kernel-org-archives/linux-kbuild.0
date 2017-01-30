@@ -1,71 +1,66 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ot0-f195.google.com ([74.125.82.195]:35054 "EHLO
-        mail-ot0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932198AbdA0QG7 (ORCPT
+Received: from pandora.armlinux.org.uk ([78.32.30.218]:39982 "EHLO
+        pandora.armlinux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932296AbdA3PAK (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 27 Jan 2017 11:06:59 -0500
+        Mon, 30 Jan 2017 10:00:10 -0500
+Date: Mon, 30 Jan 2017 14:51:51 +0000
+From: Russell King - ARM Linux <linux@armlinux.org.uk>
+Subject: Re: [PATCH v4 3/7] x86: put msr-index.h in uapi
+Message-ID: <20170130145151.GW27312@n2100.armlinux.org.uk>
+References: <1484304406-10820-1-git-send-email-nicolas.dichtel@6wind.com>
+ <1485183521-13002-1-git-send-email-nicolas.dichtel@6wind.com>
+ <1485183521-13002-4-git-send-email-nicolas.dichtel@6wind.com>
+ <20170123165245.7zy7nf3cx5o4vvh3@pd.tnic>
 MIME-Version: 1.0
-In-Reply-To: <20170113154010.2718601-1-arnd@arndb.de>
-References: <201701131834.BsUjtXaC%fengguang.wu@intel.com> <20170113154010.2718601-1-arnd@arndb.de>
-From: Arnd Bergmann <arnd@arndb.de>
-Date: Fri, 27 Jan 2017 17:03:45 +0100
-Message-ID: <CAK8P3a2z8MqRAnSo8A4VEx5=RmoF=FY6vV-9RXVb=2W_asFjgg@mail.gmail.com>
-Subject: Re: [PATCH] Kbuild: use cc-disable-warning consistently for maybe-uninitialized
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170123165245.7zy7nf3cx5o4vvh3@pd.tnic>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>
-Cc: linux-kbuild@vger.kernel.org, fengguang.wu@intel.com, kbuild-all@01.org, Arnd Bergmann <arnd@arndb.de>, stable@vger.kernel.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>
+To: Borislav Petkov <bp@alien8.de>
+Cc: Nicolas Dichtel <nicolas.dichtel@6wind.com>, arnd@arndb.de, mmarek@suse.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, airlied@linux.ie, davem@davemloft.net, slash.tmp@free.fr, daniel.vetter@ffwll.ch, msalter@redhat.com, jengelh@inai.de, hch@infradead.org, tklauser@distanz.ch, mpe@ellerman.id.au
 
-On Fri, Jan 13, 2017 at 4:40 PM, Arnd Bergmann <arnd@arndb.de> wrote:
-> In commit a76bcf557ef4 ("Kbuild: enable -Wmaybe-uninitialized warning
-> for "make W=1""), I reverted another change that happened to fix a problem
-> with old compilers, and now we get this report again with old compilers
-> (prior to gcc-4.8) and GCOV enabled:
->
->    cc1: warnings being treated as errors
->    drivers/gpu/drm/i915/intel_ringbuffer.c: In function 'intel_ring_setup_status_page':
->    drivers/gpu/drm/i915/intel_ringbuffer.c:438: error: 'mmio.reg' may be used uninitialized in this function
->    At top level:
->>> cc1: error: unrecognized command line option "-Wno-maybe-uninitialized"
->
-> The problem is that we turn off the warning conditionally in a number
-> of places as we should, but one of them does it unconditionally.
-> Instead, change it to call cc-disable-warning as we do elsewhere.
->
-> The original patch that caused it was merged into linux-4.7, then
-> 4.8 removed the change and 4.9 brought it back, so we probably want
-> a backport to 4.9 once this is merged.
->
-> Cc: stable@vger.kernel.org
-> Fixes: a76bcf557ef4 ("Kbuild: enable -Wmaybe-uninitialized warning for "make W=1"")
-> Fixes: e72e2dfe7c16 ("gcov: disable -Wmaybe-uninitialized warning")
-> Reported-by: kbuild test robot <fengguang.wu@intel.com>
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
+On Mon, Jan 23, 2017 at 05:52:45PM +0100, Borislav Petkov wrote:
+> On Mon, Jan 23, 2017 at 03:58:37PM +0100, Nicolas Dichtel wrote:
+> > This header file is exported, thus move it to uapi.
+> 
+> Why? Why is this damn thing exported in the first place?
+> 
+> The moment we decide to change an MSR name or even remove it from that
+> file, we break userspace. And what for, because userspace is using some
+> arbitrary header file which was meant to be for the kernel solely.
+> 
+> NAKed-by: Borislav Petkov <bp@suse.de>
 
-Hi Michal,
+Here on my Fedora system:
 
-any plans to pick this up for v4.10?
+$ less /usr/include/asm/msr-index.h
+#ifndef _ASM_X86_MSR_INDEX_H
+#define _ASM_X86_MSR_INDEX_H
 
-   Arnd
+/* CPU model specific register (MSR) numbers */
 
->  Makefile | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/Makefile b/Makefile
-> index 4fcc0f2dd93c..dbe9ce5d0e96 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -370,7 +370,7 @@ LDFLAGS_MODULE  =
->  CFLAGS_KERNEL  =
->  AFLAGS_KERNEL  =
->  LDFLAGS_vmlinux =
-> -CFLAGS_GCOV    = -fprofile-arcs -ftest-coverage -fno-tree-loop-im -Wno-maybe-uninitialized
-> +CFLAGS_GCOV    = -fprofile-arcs -ftest-coverage -fno-tree-loop-im $(call cc-disable-warning,maybe-uninitialized,)
->  CFLAGS_KCOV    := $(call cc-option,-fsanitize-coverage=trace-pc,)
->
->
-> --
-> 2.9.0
->
+/* x86-64 specific MSRs */
+#define MSR_EFER                0xc0000080 /* extended feature register */
+#define MSR_STAR                0xc0000081 /* legacy mode SYSCALL target */
+#define MSR_LSTAR               0xc0000082 /* long mode SYSCALL target */
+...
+
+Like it or not, it is _already_ exported to userspace, so it forms
+part of the user ABI.  You can try to remove it from userspace view,
+but if anyone has already started to use it, removing it will already
+cause a userspace regression.
+
+So, I don't think we have any grounds to NAK these patches on the
+basis of "we don't want this to be visible to userspace because it
+may cause a userspace regression."  Removing it from userspace view
+is likely to cause a userspace regression.
+
+This patch just makes sure that such a regression doesn't happen when
+kbuild stops exporting files in _non_-uapi directories.
+
+-- 
+RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
+FTTC broadband for 0.8mile line: currently at 9.6Mbps down 400kbps up
+according to speedtest.net.
