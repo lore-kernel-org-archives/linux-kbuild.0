@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from host.76.145.23.62.rev.coltfrance.com ([62.23.145.76]:36198 "EHLO
+Received: from host.76.145.23.62.rev.coltfrance.com ([62.23.145.76]:36149 "EHLO
         proxy.6wind.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751507AbdBBNZ0 (ORCPT
+        with ESMTP id S1750873AbdBBNZY (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 2 Feb 2017 08:25:26 -0500
+        Thu, 2 Feb 2017 08:25:24 -0500
 From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Subject: [PATCH v5 5/8] Makefile.headersinst: remove destination-y option
-Date: Thu,  2 Feb 2017 14:25:07 +0100
-Message-Id: <1486041910-2665-6-git-send-email-nicolas.dichtel@6wind.com>
+Subject: [PATCH v5 2/8] nios2: put setup.h in uapi
+Date: Thu,  2 Feb 2017 14:25:04 +0100
+Message-Id: <1486041910-2665-3-git-send-email-nicolas.dichtel@6wind.com>
 In-Reply-To: <1486041910-2665-1-git-send-email-nicolas.dichtel@6wind.com>
 References: <20170131162133.GA8258@gmail.com>
  <1486041910-2665-1-git-send-email-nicolas.dichtel@6wind.com>
@@ -16,76 +16,25 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: arnd@arndb.de
 Cc: mmarek@suse.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, airlied@linux.ie, davem@davemloft.net, linux@armlinux.org.uk, bp@alien8.de, slash.tmp@free.fr, daniel.vetter@ffwll.ch, rmk+kernel@armlinux.org.uk, msalter@redhat.com, jengelh@inai.de, hch@infradead.org, tklauser@distanz.ch, mpe@ellerman.id.au, mingo@kernel.org, Nicolas Dichtel <nicolas.dichtel@6wind.com>
 
-This option was added in commit c7bb349e7c25 ("kbuild: introduce destination-y
-for exported headers") but never used in-tree.
+This header file is exported, but from a userland pov, it's just a wrapper
+to asm-generic/setup.h.
 
 Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Reviewed-by: Tobias Klauser <tklauser@distanz.ch>
 ---
- Documentation/kbuild/makefiles.txt | 23 ++++-------------------
- scripts/Makefile.headersinst       |  2 +-
- 2 files changed, 5 insertions(+), 20 deletions(-)
+ arch/nios2/include/uapi/asm/Kbuild | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/Documentation/kbuild/makefiles.txt b/Documentation/kbuild/makefiles.txt
-index 9b9c4797fc55..37b525d329ae 100644
---- a/Documentation/kbuild/makefiles.txt
-+++ b/Documentation/kbuild/makefiles.txt
-@@ -46,9 +46,8 @@ This document describes the Linux kernel Makefiles.
- 	=== 7 Kbuild syntax for exported headers
- 		--- 7.1 header-y
- 		--- 7.2 genhdr-y
--		--- 7.3 destination-y
--		--- 7.4 generic-y
--		--- 7.5 generated-y
-+		--- 7.3 generic-y
-+		--- 7.4 generated-y
+diff --git a/arch/nios2/include/uapi/asm/Kbuild b/arch/nios2/include/uapi/asm/Kbuild
+index e0bb972a50d7..69c965304146 100644
+--- a/arch/nios2/include/uapi/asm/Kbuild
++++ b/arch/nios2/include/uapi/asm/Kbuild
+@@ -2,4 +2,5 @@ include include/uapi/asm-generic/Kbuild.asm
  
- 	=== 8 Kbuild Variables
- 	=== 9 Makefile language
-@@ -1295,21 +1294,7 @@ See subsequent chapter for the syntax of the Kbuild file.
- 			#include/linux/Kbuild
- 			genhdr-y += version.h
+ header-y += elf.h
  
--	--- 7.3 destination-y
--
--	When an architecture has a set of exported headers that needs to be
--	exported to a different directory destination-y is used.
--	destination-y specifies the destination directory for all exported
--	headers in the file where it is present.
--
--		Example:
--			#arch/xtensa/platforms/s6105/include/platform/Kbuild
--			destination-y := include/linux
--
--	In the example above all exported headers in the Kbuild file
--	will be located in the directory "include/linux" when exported.
--
--	--- 7.4 generic-y
-+	--- 7.3 generic-y
- 
- 	If an architecture uses a verbatim copy of a header from
- 	include/asm-generic then this is listed in the file
-@@ -1336,7 +1321,7 @@ See subsequent chapter for the syntax of the Kbuild file.
- 		Example: termios.h
- 			#include <asm-generic/termios.h>
- 
--	--- 7.5 generated-y
-+	--- 7.4 generated-y
- 
- 	If an architecture generates other header files alongside generic-y
- 	wrappers, and not included in genhdr-y, then generated-y specifies
-diff --git a/scripts/Makefile.headersinst b/scripts/Makefile.headersinst
-index 3e20d03432d2..876b42cfede4 100644
---- a/scripts/Makefile.headersinst
-+++ b/scripts/Makefile.headersinst
-@@ -14,7 +14,7 @@ kbuild-file := $(srctree)/$(obj)/Kbuild
- include $(kbuild-file)
- 
- # called may set destination dir (when installing to asm/)
--_dst := $(if $(destination-y),$(destination-y),$(if $(dst),$(dst),$(obj)))
-+_dst := $(if $(dst),$(dst),$(obj))
- 
- old-kbuild-file := $(srctree)/$(subst uapi/,,$(obj))/Kbuild
- ifneq ($(wildcard $(old-kbuild-file)),)
++generic-y += setup.h
+ generic-y += ucontext.h
 -- 
 2.8.1
 
