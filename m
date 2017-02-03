@@ -1,73 +1,31 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f54.google.com ([74.125.82.54]:36797 "EHLO
-        mail-wm0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753113AbdBCJy3 (ORCPT
+Received: from mail-oi0-f68.google.com ([209.85.218.68]:35541 "EHLO
+        mail-oi0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750984AbdBCQaL (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 3 Feb 2017 04:54:29 -0500
-Received: by mail-wm0-f54.google.com with SMTP id c85so20211220wmi.1
-        for <linux-kbuild@vger.kernel.org>; Fri, 03 Feb 2017 01:54:28 -0800 (PST)
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v5 0/3] modversions: redefine kcrctab entries as 32-bit values
-Date: Fri,  3 Feb 2017 09:54:04 +0000
-Message-Id: <1486115647-27680-1-git-send-email-ard.biesheuvel@linaro.org>
+        Fri, 3 Feb 2017 11:30:11 -0500
+MIME-Version: 1.0
+In-Reply-To: <1486115647-27680-1-git-send-email-ard.biesheuvel@linaro.org>
+References: <1486115647-27680-1-git-send-email-ard.biesheuvel@linaro.org>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Fri, 3 Feb 2017 08:30:09 -0800
+Message-ID: <CA+55aFz8faoGYBqkHuGPy4yp+SU5brCbkOCdZNTgfdDzkN8hOw@mail.gmail.com>
+Subject: Re: [PATCH v5 0/3] modversions: redefine kcrctab entries as 32-bit values
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, jeyu@redhat.com, rusty@rustcorp.com.au, mmarek@suse.com, mpe@ellerman.id.au
-Cc: torvalds@linux-foundation.org, arnd@arndb.de, viro@zeniv.linux.org.uk, linux-arm-kernel@lists.infradead.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, ppc-dev <linuxppc-dev@lists.ozlabs.org>, Jessica Yu <jeyu@redhat.com>, Rusty Russell <rusty@rustcorp.com.au>, Michal Marek <mmarek@suse.com>, Michael Ellerman <mpe@ellerman.id.au>, Arnd Bergmann <arnd@arndb.de>, Al Viro <viro@zeniv.linux.org.uk>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
 
-This v4 is a followup to [0] 'modversions: redefine kcrctab entries as
-relative CRC pointers', but since relative CRC pointers do not work in
-modules, and are actually only needed by powerpc with CONFIG_RELOCATABLE=y,
-I have made it a Kconfig selectable feature instead.
+On Fri, Feb 3, 2017 at 1:54 AM, Ard Biesheuvel
+<ard.biesheuvel@linaro.org> wrote:
+> This v4 is a followup to [0] 'modversions: redefine kcrctab entries as
+> relative CRC pointers' [...]
 
-Patch #1 introduces the MODULE_REL_CRCS Kconfig symbol, and adds the kbuild
-handling of it, i.e., modpost, genksyms and kallsyms.
+ok, I have this in a local branch now, assuming it passes my
+(admittedly fairly superficial) testing I'll merge it so that we can
+put this whole sorry saga behind us.
 
-Patch #2 switches all architectures to 32-bit CRC entries in kcrctab, where
-all architectures except powerpc with CONFIG_RELOCATABLE=y use absolute ELF
-symbol references as before.
+Thanks,
 
-v5: make MODULE_REL_CRCS apply to both vmlinux and modules when selected
-    reinstate Rusty's ack on #2, given that it is now mostly identical again
-    to the patch he acked 3 months ago
-
-v4: make relative CRCs kconfig selectable
-    use absolute CRC symbols in modules regardless of kconfig selection
-    split into two patches
-
-v3: emit CRCs into .rodata rather than .rodata.modver, given that the latter
-    will be emitted with read-write permissions, making the CRCs end up in a
-    writable module segment.
-
-    fold the modpost fix to ensure that the section address is only substracted
-    from the symbol address when the ELF object in question is fully linked
-    (i.e., ET_DYN or ET_EXEC, and not ET_REL)
-
-v2: update modpost as well, so that genksyms no longer has to emit symbols
-    for both the actual CRC value and the reference to where it is stored
-    in the image
-
-[0] http://marc.info/?l=linux-arch&m=148493613415294&w=2
-
-Ard Biesheuvel (3):
-  kbuild: modversions: add infrastructure for emitting relative CRCs
-  modversions: treat symbol CRCs as 32 bit quantities
-  module: unify absolute krctab definitions for 32-bit and 64-bit
-
- arch/powerpc/Kconfig              |  1 +
- arch/powerpc/include/asm/module.h |  4 --
- arch/powerpc/kernel/module_64.c   |  8 ---
- include/asm-generic/export.h      | 11 ++--
- include/linux/export.h            | 17 +++++--
- include/linux/module.h            | 14 +++---
- init/Kconfig                      |  4 ++
- kernel/module.c                   | 53 +++++++++-----------
- scripts/Makefile.build            |  2 +
- scripts/genksyms/genksyms.c       | 19 +++++--
- scripts/kallsyms.c                | 12 +++++
- scripts/mod/modpost.c             | 10 ++++
- 12 files changed, 93 insertions(+), 62 deletions(-)
-
--- 
-2.7.4
-
+             Linus
