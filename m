@@ -1,51 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f50.google.com ([74.125.82.50]:36436 "EHLO
-        mail-wm0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751638AbdBBPm1 (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 2 Feb 2017 10:42:27 -0500
-Received: by mail-wm0-f50.google.com with SMTP id c85so96024529wmi.1
-        for <linux-kbuild@vger.kernel.org>; Thu, 02 Feb 2017 07:42:26 -0800 (PST)
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [PATCH v5 7/8] uapi: export all headers under uapi directories
-References: <201702022242.toNVsxyq%fengguang.wu@intel.com>
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Message-ID: <a1b90223-6178-50e6-27ee-9e9a610c09e5@6wind.com>
-Date: Thu, 2 Feb 2017 16:42:22 +0100
-MIME-Version: 1.0
-In-Reply-To: <201702022242.toNVsxyq%fengguang.wu@intel.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 8bit
+Received: from prv-mh.provo.novell.com ([137.65.248.74]:47798 "EHLO
+        prv-mh.provo.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751878AbdBCIzL (ORCPT
+        <rfc822;groupwise-linux-kbuild@vger.kernel.org:2:1>);
+        Fri, 3 Feb 2017 03:55:11 -0500
+Message-Id: <5894537A02000078001366B3@prv-mh.provo.novell.com>
+Date: Fri, 03 Feb 2017 01:55:06 -0700
+From: "Jan Beulich" <JBeulich@suse.com>
+Subject: [PATCH v2] modpost: treat undefined CRC symbols as absent
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8BIT
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: kbuild test robot <lkp@intel.com>
-Cc: kbuild-all@01.org, arnd@arndb.de, mmarek@suse.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, airlied@linux.ie, davem@davemloft.net, linux@armlinux.org.uk, bp@alien8.de, slash.tmp@free.fr, daniel.vetter@ffwll.ch, rmk+kernel@armlinux.org.uk, msalter@redhat.com, jengelh@inai.de, hch@infradead.org, tklauser@distanz.ch, mpe@ellerman.id.au, mingo@kernel.org
+To: Michal Marek <mmarek@suse.de>
+Cc: linux-kbuild@vger.kernel.org
 
-Le 02/02/2017 à 15:47, kbuild test robot a écrit :
-> Hi Nicolas,
-> 
-> [auto build test ERROR on linus/master]
-> [also build test ERROR on v4.10-rc6]
-> [cannot apply to next-20170202]
-> [if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
-> 
-> url:    https://github.com/0day-ci/linux/commits/Nicolas-Dichtel/uapi-export-all-headers-under-uapi-directories/20170202-213944
-> config: i386-tinyconfig (attached as .config)
-> compiler: gcc-6 (Debian 6.2.0-3) 6.2.0 20160901
-> reproduce:
->         # save the attached .config to linux build tree
->         make ARCH=i386 
-> 
-> Note: the linux-review/Nicolas-Dichtel/uapi-export-all-headers-under-uapi-directories/20170202-213944 HEAD fec8d2b493885de70b229c7ce5bf917dc92ddb9f builds fine.
->       It only hurts bisectibility.
-> 
-> All errors (new ones prefixed by >>):
-> 
->>> ./usr/include/asm/unistd.h:8: included file 'asm-x86/unistd_32.h' is not exported
->>> ./usr/include/asm/unistd.h:10: included file 'asm-x86/unistd_x32.h' is not exported
->>> ./usr/include/asm/unistd.h:12: included file 'asm-x86/unistd_64.h' is not exported
-I don't reproduce this error, it compiles on my target (gcc 4.9.2).
+Apparently dependent on binutils version, undefined CRC symbols may or
+may not make it into the final binary's symbol table. Treat undefined
+ones as absent instead of as having value zero.
+
+Signed-off-by: Jan Beulich <jbeulich@suse.com>
+---
+v2: Re-base.
+---
+ scripts/mod/modpost.c |    3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+--- 4.10-rc6/scripts/mod/modpost.c
++++ 4.10-rc6-ignore-undef-CRC/scripts/mod/modpost.c
+@@ -618,7 +618,8 @@ static void handle_modversions(struct mo
+ 		export = export_from_sec(info, get_secindex(info, sym));
+ 
+ 	/* CRC'd symbol */
+-	if (strncmp(symname, CRC_PFX, strlen(CRC_PFX)) == 0) {
++	if (sym->st_shndx != SHN_UNDEF &&
++	    strncmp(symname, CRC_PFX, strlen(CRC_PFX)) == 0) {
+ 		is_crc = true;
+ 		crc = (unsigned int) sym->st_value;
+ 		sym_update_crc(symname + strlen(CRC_PFX), mod, crc,
 
 
-Regards,
-Nicolas
+
