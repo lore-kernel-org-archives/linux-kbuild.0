@@ -1,41 +1,31 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f42.google.com ([209.85.215.42]:35711 "EHLO
-        mail-lf0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751241AbdBFG6A (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 6 Feb 2017 01:58:00 -0500
-Received: by mail-lf0-f42.google.com with SMTP id n124so39292573lfd.2
-        for <linux-kbuild@vger.kernel.org>; Sun, 05 Feb 2017 22:57:54 -0800 (PST)
-From: Matti Aaltonen <matti.aaltonen@unikie.com>
-Subject: [PATCH] kbuild: Add the source tree path to the Makefile.gcc-plugins path
-Date: Mon,  6 Feb 2017 08:57:24 +0200
-Message-Id: <20170206065724.3937-1-matti.aaltonen@darkmatter.ae>
+Received: from mga03.intel.com ([134.134.136.65]:16728 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750924AbdBFHsw (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 6 Feb 2017 02:48:52 -0500
+From: changbin.du@intel.com
+Subject: [PATCH 0/2] kconfig/mconf: propagate jumping function in search result view
+Date: Mon,  6 Feb 2017 15:46:46 +0800
+Message-Id: <20170206074648.23896-1-changbin.du@intel.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: mmarek@suse.com, Matti Aaltonen <matti.aaltonen@darkmatter.ae>
+To: mmarek@suse.com, corbet@lwn.net
+Cc: yann.morin.1998@free.fr, linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, Changbin Du <changbin.du@intel.com>
 
-Make sure that the Makefile.gcc-plugins is found also when
-the build is not started from the kernel root directory.
+From: Changbin Du <changbin.du@intel.com>
 
-Signed-off-by: Matti Aaltonen <matti.aaltonen@darkmatter.ae>
----
- Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+While I am searching something in menuconfig, I hope if I can jump to interested
+items directly. I even try to add this feature. When I check the code just found 
+it has already been there but not documented. So why let more developers know it?
 
-diff --git a/Makefile b/Makefile
-index 96b27a8..d085504 100644
---- a/Makefile
-+++ b/Makefile
-@@ -651,7 +651,7 @@ KBUILD_CFLAGS += $(call cc-ifversion, -lt, 0409, \
- # Tell gcc to never replace conditional load with a non-conditional one
- KBUILD_CFLAGS	+= $(call cc-option,--param=allow-store-data-races=0)
- 
--include scripts/Makefile.gcc-plugins
-+include $(srctree)/scripts/Makefile.gcc-plugins
- 
- ifdef CONFIG_READABLE_ASM
- # Disable optimizations that make assembler listings hard to read.
+Changbin Du (2):
+  kconfig/mconf: add jumping tip in title of search result textbox
+  Documentation/kconfig: add search jump feature description
+
+ Documentation/kbuild/kconfig.txt | 4 ++++
+ scripts/kconfig/mconf.c          | 8 ++++----
+ 2 files changed, 8 insertions(+), 4 deletions(-)
+
 -- 
-2.9.3
+2.7.4
 
