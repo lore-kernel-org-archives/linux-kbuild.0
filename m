@@ -1,29 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ozlabs.org ([103.22.144.67]:48567 "EHLO ozlabs.org"
+Received: from mx2.suse.de ([195.135.220.15]:46844 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751164AbdBFUhH (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 6 Feb 2017 15:37:07 -0500
-In-Reply-To: <20161206062800.21800-1-andrew.donnellan@au1.ibm.com>
-From: Michael Ellerman <patch-notifications@ellerman.id.au>
-Subject: Re: [1/3] gcc-plugins: fix definition of DISABLE_LATENT_ENTROPY_PLUGIN
-Message-Id: <3vHK5Y5hnJz9s7G@ozlabs.org>
-Date: Tue,  7 Feb 2017 07:37:05 +1100 (AEDT)
+        id S1751418AbdBFWDy (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 6 Feb 2017 17:03:54 -0500
+Date: Mon, 6 Feb 2017 23:03:52 +0100
+From: "Luis R. Rodriguez" <mcgrof@kernel.org>
+Subject: Re: [PATCH v2] firmware/Makefile: force recompilation if makefile
+ changes
+Message-ID: <20170206220352.GB24047@wotan.suse.de>
+References: <20170118173156.16060-1-mcgrof@kernel.org>
+ <20170123150727.4883-1-mcgrof@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170123150727.4883-1-mcgrof@kernel.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrew Donnellan <andrew.donnellan@au1.ibm.com>, linuxppc-dev@lists.ozlabs.org, kernel-hardening@lists.openwall.com, keescook@chromium.org, re.emese@gmail.com
-Cc: pageexec@freemail.hu, spender@grsecurity.net, linux-kernel@vger.kernel.org, mmarek@suse.com, linux-kbuild@vger.kernel.org
+To: "Luis R. Rodriguez" <mcgrof@kernel.org>
+Cc: mmarek@suse.com, linux-kbuild@vger.kernel.org, ming.lei@canonical.com, gregkh@linuxfoundation.org, teg@jklm.no, linux-kernel@vger.kernel.org, dwmw2@infradead.org
 
-On Tue, 2016-12-06 at 06:27:58 UTC, Andrew Donnellan wrote:
-> The variable DISABLE_LATENT_ENTROPY_PLUGIN is defined when
-> CONFIG_PAX_LATENT_ENTROPY is set. This is leftover from the original PaX
-> version of the plugin code and doesn't actually exist. Change the condition
-> to depend on CONFIG_GCC_PLUGIN_LATENT_ENTROPY instead.
+On Mon, Jan 23, 2017 at 07:07:27AM -0800, Luis R. Rodriguez wrote:
+> If you modify the target asm we currently do not force the
+> recompilation of the firmware files. The target asm is in
+> the firmware/Makefile, peg this file as a dependency to
+> require re-compilation of firmware targets when the asm
+> changes.
 > 
-> Fixes: 38addce8b600 ("gcc-plugins: Add latent_entropy plugin")
-> Signed-off-by: Andrew Donnellan <andrew.donnellan@au1.ibm.com>
+> Signed-off-by: Luis R. Rodriguez <mcgrof@kernel.org>
+> ---
+> 
+> Michal,
+> 
+> I had this patch as part of my linker table series [0] but have split it
+> off as its a small atomic separate change and can go in separately. Greg
+> prefers this be reviewed by the kbuild tree so sending it your way.
+> This v2 has no modifications, just resending it to the kbuild tree.
+> 
+> [0] https://lkml.kernel.org/r/20170115211057.17167-1-mcgrof@kernel.org
 
-Series applied to powerpc next, thanks.
+*Poke*
 
-https://git.kernel.org/powerpc/c/7b4010edff09929c253e6626ab19ca
-
-cheers
+  Luis
