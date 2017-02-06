@@ -1,47 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga03.intel.com ([134.134.136.65]:16728 "EHLO mga03.intel.com"
+Received: from nbd.name ([46.4.11.11]:36353 "EHLO nbd.name"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751164AbdBFHsy (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 6 Feb 2017 02:48:54 -0500
-From: changbin.du@intel.com
-Subject: [PATCH 1/2] kconfig/mconf: add jumping tip in title of search result textbox
-Date: Mon,  6 Feb 2017 15:46:47 +0800
-Message-Id: <20170206074648.23896-2-changbin.du@intel.com>
-In-Reply-To: <20170206074648.23896-1-changbin.du@intel.com>
-References: <20170206074648.23896-1-changbin.du@intel.com>
+        id S1750942AbdBFJbr (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 6 Feb 2017 04:31:47 -0500
+From: Felix Fietkau <nbd@nbd.name>
+Subject: [PATCH] kbuild: export SUBARCH
+Date: Mon,  6 Feb 2017 10:31:42 +0100
+Message-Id: <20170206093142.64537-1-nbd@nbd.name>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mmarek@suse.com, corbet@lwn.net
-Cc: yann.morin.1998@free.fr, linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, Changbin Du <changbin.du@intel.com>
+To: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+Cc: sfr@canb.auug.org.au
 
-From: Changbin Du <changbin.du@intel.com>
+Fixes the following build error on x86:
 
-Prompt user how to quickly jump to the item he/she is interested in.
+  gcc -Wp,-MD,arch/x86/entry/vdso/.vdso2c.d -O2 -I/Users/nbd/lede/staging_dir/host/include -I/Users/nbd/lede/staging_dir/host/usr/include  -Wall -Wmissing-prototypes -Wstrict-prototypes   -I/Users/nbd/lede/staging_dir/host/include -I./tools/include -I./include/uapi -I./arch//include/uapi  -o arch/x86/entry/vdso/vdso2c arch/x86/entry/vdso/vdso2c.c -L/Users/nbd/lede/staging_dir/host/lib
+  In file included from arch/x86/entry/vdso/vdso2c.c:66:
+  In file included from ./include/uapi/linux/elf.h:4:
+  ./tools/include/linux/types.h:9:10: fatal error: 'asm/types.h' file not found
+  #include <asm/types.h>
 
-Signed-off-by: Changbin Du <changbin.du@intel.com>
+Fixes: d51306f1a3bc ("x86: Make the vdso2c compiler use the host architecture headers")
+Signed-off-by: Felix Fietkau <nbd@nbd.name>
 ---
- scripts/kconfig/mconf.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ Makefile | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
-index 315ce2c..23d5681 100644
---- a/scripts/kconfig/mconf.c
-+++ b/scripts/kconfig/mconf.c
-@@ -443,10 +443,10 @@ static void search_conf(void)
+diff --git a/Makefile b/Makefile
+index 96b27a888285..492143bad81e 100644
+--- a/Makefile
++++ b/Makefile
+@@ -414,8 +414,8 @@ KERNELRELEASE = $(shell cat include/config/kernel.release 2> /dev/null)
+ KERNELVERSION = $(VERSION)$(if $(PATCHLEVEL),.$(PATCHLEVEL)$(if $(SUBLEVEL),.$(SUBLEVEL)))$(EXTRAVERSION)
  
- 		res = get_relations_str(sym_arr, &head);
- 		set_subtitle();
--		dres = show_textbox_ext(_("Search Results"), (char *)
--					str_get(&res), 0, 0, keys, &vscroll,
--					&hscroll, &update_text, (void *)
--					&data);
-+		dres = show_textbox_ext(
-+				_("Search Results (type the number to jump)"),
-+				(char *)str_get(&res), 0, 0, keys, &vscroll,
-+				&hscroll, &update_text, (void *)&data);
- 		again = false;
- 		for (i = 0; i < JUMP_NB && keys[i]; i++)
- 			if (dres == keys[i]) {
+ export VERSION PATCHLEVEL SUBLEVEL KERNELRELEASE KERNELVERSION
+-export ARCH SRCARCH CONFIG_SHELL HOSTCC HOSTCFLAGS CROSS_COMPILE AS LD CC
+-export CPP AR NM STRIP OBJCOPY OBJDUMP
++export ARCH SRCARCH SUBARCH CONFIG_SHELL HOSTCC HOSTCFLAGS CROSS_COMPILE AS LD
++export CC CPP AR NM STRIP OBJCOPY OBJDUMP
+ export MAKE AWK GENKSYMS INSTALLKERNEL PERL PYTHON UTS_MACHINE
+ export HOSTCXX HOSTCXXFLAGS LDFLAGS_MODULE CHECK CHECKFLAGS
+ 
 -- 
-2.7.4
+2.11.0
 
