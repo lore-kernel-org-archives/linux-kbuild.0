@@ -1,46 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from nbd.name ([46.4.11.11]:36353 "EHLO nbd.name"
+Received: from mga03.intel.com ([134.134.136.65]:60660 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750942AbdBFJbr (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 6 Feb 2017 04:31:47 -0500
-From: Felix Fietkau <nbd@nbd.name>
-Subject: [PATCH] kbuild: export SUBARCH
-Date: Mon,  6 Feb 2017 10:31:42 +0100
-Message-Id: <20170206093142.64537-1-nbd@nbd.name>
+        id S1751093AbdBFMBJ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 6 Feb 2017 07:01:09 -0500
+From: Jani Nikula <jani.nikula@linux.intel.com>
+Subject: Re: [PATCH 1/2] kconfig/mconf: add jumping tip in title of search result textbox
+In-Reply-To: <20170206074648.23896-2-changbin.du@intel.com>
+References: <20170206074648.23896-1-changbin.du@intel.com> <20170206074648.23896-2-changbin.du@intel.com>
+Date: Mon, 06 Feb 2017 14:00:51 +0200
+Message-ID: <87a89zbkb0.fsf@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
-Cc: sfr@canb.auug.org.au
+To: changbin.du@intel.com, mmarek@suse.com, corbet@lwn.net
+Cc: yann.morin.1998@free.fr, linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Fixes the following build error on x86:
+On Mon, 06 Feb 2017, changbin.du@intel.com wrote:
+> From: Changbin Du <changbin.du@intel.com>
+>
+> Prompt user how to quickly jump to the item he/she is interested in.
 
-  gcc -Wp,-MD,arch/x86/entry/vdso/.vdso2c.d -O2 -I/Users/nbd/lede/staging_dir/host/include -I/Users/nbd/lede/staging_dir/host/usr/include  -Wall -Wmissing-prototypes -Wstrict-prototypes   -I/Users/nbd/lede/staging_dir/host/include -I./tools/include -I./include/uapi -I./arch//include/uapi  -o arch/x86/entry/vdso/vdso2c arch/x86/entry/vdso/vdso2c.c -L/Users/nbd/lede/staging_dir/host/lib
-  In file included from arch/x86/entry/vdso/vdso2c.c:66:
-  In file included from ./include/uapi/linux/elf.h:4:
-  ./tools/include/linux/types.h:9:10: fatal error: 'asm/types.h' file not found
-  #include <asm/types.h>
+:o
 
-Fixes: d51306f1a3bc ("x86: Make the vdso2c compiler use the host architecture headers")
-Signed-off-by: Felix Fietkau <nbd@nbd.name>
----
- Makefile | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+All these years. I... I didn't know. Thanks!
 
-diff --git a/Makefile b/Makefile
-index 96b27a888285..492143bad81e 100644
---- a/Makefile
-+++ b/Makefile
-@@ -414,8 +414,8 @@ KERNELRELEASE = $(shell cat include/config/kernel.release 2> /dev/null)
- KERNELVERSION = $(VERSION)$(if $(PATCHLEVEL),.$(PATCHLEVEL)$(if $(SUBLEVEL),.$(SUBLEVEL)))$(EXTRAVERSION)
- 
- export VERSION PATCHLEVEL SUBLEVEL KERNELRELEASE KERNELVERSION
--export ARCH SRCARCH CONFIG_SHELL HOSTCC HOSTCFLAGS CROSS_COMPILE AS LD CC
--export CPP AR NM STRIP OBJCOPY OBJDUMP
-+export ARCH SRCARCH SUBARCH CONFIG_SHELL HOSTCC HOSTCFLAGS CROSS_COMPILE AS LD
-+export CC CPP AR NM STRIP OBJCOPY OBJDUMP
- export MAKE AWK GENKSYMS INSTALLKERNEL PERL PYTHON UTS_MACHINE
- export HOSTCXX HOSTCXXFLAGS LDFLAGS_MODULE CHECK CHECKFLAGS
- 
+> Signed-off-by: Changbin Du <changbin.du@intel.com>
+> ---
+>  scripts/kconfig/mconf.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+>
+> diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
+> index 315ce2c..23d5681 100644
+> --- a/scripts/kconfig/mconf.c
+> +++ b/scripts/kconfig/mconf.c
+> @@ -443,10 +443,10 @@ static void search_conf(void)
+>  
+>  		res = get_relations_str(sym_arr, &head);
+>  		set_subtitle();
+> -		dres = show_textbox_ext(_("Search Results"), (char *)
+> -					str_get(&res), 0, 0, keys, &vscroll,
+> -					&hscroll, &update_text, (void *)
+> -					&data);
+> +		dres = show_textbox_ext(
+> +				_("Search Results (type the number to jump)"),
+> +				(char *)str_get(&res), 0, 0, keys, &vscroll,
+> +				&hscroll, &update_text, (void *)&data);
+
+It would be even better and discoverable if this could be turned into a
+dialog menu, so that you could navigate the search results using arrow
+keys and hit enter to choose. But this is already an improvement.
+
+>  		again = false;
+>  		for (i = 0; i < JUMP_NB && keys[i]; i++)
+>  			if (dres == keys[i]) {
+
 -- 
-2.11.0
-
+Jani Nikula, Intel Open Source Technology Center
