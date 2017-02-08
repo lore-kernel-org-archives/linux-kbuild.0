@@ -1,51 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:31817 "EHLO mga01.intel.com"
+Received: from mga14.intel.com ([192.55.52.115]:45496 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752142AbdBHDMi (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 7 Feb 2017 22:12:38 -0500
-From: changbin.du@intel.com
-Subject: [PATCH v2 2/2] Documentation/kconfig: add search jump feature description
-Date: Wed,  8 Feb 2017 11:09:39 +0800
-Message-Id: <20170208030939.10146-3-changbin.du@intel.com>
-In-Reply-To: <20170208030939.10146-1-changbin.du@intel.com>
-References: <20170208030939.10146-1-changbin.du@intel.com>
-In-Reply-To: <20170206074648.23896-1-changbin.du@intel.com>
-References: <20170206074648.23896-1-changbin.du@intel.com>
+        id S1752061AbdBHIIB (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 8 Feb 2017 03:08:01 -0500
+From: Jani Nikula <jani.nikula@linux.intel.com>
+Subject: Re: [PATCH v2 1/2] kconfig/mconf: add jumping tip in title of search result textbox
+In-Reply-To: <20170208030939.10146-2-changbin.du@intel.com>
+References: <20170208030939.10146-1-changbin.du@intel.com> <20170208030939.10146-2-changbin.du@intel.com>
+Date: Wed, 08 Feb 2017 10:07:58 +0200
+Message-ID: <87d1etumu9.fsf@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mmarek@suse.com, corbet@lwn.net
-Cc: yann.morin.1998@free.fr, linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, jim.epost@gmail.com, jani.nikula@linux.intel.com, Changbin Du <changbin.du@intel.com>
+To: changbin.du@intel.com, mmarek@suse.com, corbet@lwn.net
+Cc: yann.morin.1998@free.fr, linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, jim.epost@gmail.com
 
-From: Changbin Du <changbin.du@intel.com>
+On Wed, 08 Feb 2017, changbin.du@intel.com wrote:
+> From: Changbin Du <changbin.du@intel.com>
+>
+> Prompt user how to quickly jump to the item he/she is interested in.
+>
+> Signed-off-by: Changbin Du <changbin.du@intel.com>
+> Reviewed-by: Jani Nikula <jani.nikula@linux.intel.com>
 
-Kernel menuconfig support direct jumping function from the search
-result. This is a very convenient feature but not documented. So
-add a short description to the kconfig documentation to let more
-developers know it.
+This is assuming too much... but I looked at it now, and it looks good
+to me.
 
-v2: correct spell (Jim)
+Thanks,
+Jani.
 
-Signed-off-by: Changbin Du <changbin.du@intel.com>
-Reviewed-by: Jim Davis <jim.epost@gmail.com>
----
- Documentation/kbuild/kconfig.txt | 4 ++++
- 1 file changed, 4 insertions(+)
+> ---
+>  scripts/kconfig/mconf.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+>
+> diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
+> index 315ce2c..23d5681 100644
+> --- a/scripts/kconfig/mconf.c
+> +++ b/scripts/kconfig/mconf.c
+> @@ -443,10 +443,10 @@ static void search_conf(void)
+>  
+>  		res = get_relations_str(sym_arr, &head);
+>  		set_subtitle();
+> -		dres = show_textbox_ext(_("Search Results"), (char *)
+> -					str_get(&res), 0, 0, keys, &vscroll,
+> -					&hscroll, &update_text, (void *)
+> -					&data);
+> +		dres = show_textbox_ext(
+> +				_("Search Results (type the number to jump)"),
+> +				(char *)str_get(&res), 0, 0, keys, &vscroll,
+> +				&hscroll, &update_text, (void *)&data);
+>  		again = false;
+>  		for (i = 0; i < JUMP_NB && keys[i]; i++)
+>  			if (dres == keys[i]) {
 
-diff --git a/Documentation/kbuild/kconfig.txt b/Documentation/kbuild/kconfig.txt
-index bbc99c0..fdac2cd 100644
---- a/Documentation/kbuild/kconfig.txt
-+++ b/Documentation/kbuild/kconfig.txt
-@@ -178,6 +178,10 @@ Searching in menuconfig:
- 	first (and in alphabetical order), then come all other symbols,
- 	sorted in alphabetical order.
- 
-+	In the search result textbox, each symbol has a jump number on
-+	left side if the symbol is visible. You can type the number
-+	to jump to target menu to configure that symbol.
-+
- ______________________________________________________________________
- User interface options for 'menuconfig'
- 
 -- 
-2.7.4
-
+Jani Nikula, Intel Open Source Technology Center
