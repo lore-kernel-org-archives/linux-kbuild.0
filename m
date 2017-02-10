@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from host.76.145.23.62.rev.coltfrance.com ([62.23.145.76]:46561 "EHLO
+Received: from host.76.145.23.62.rev.coltfrance.com ([62.23.145.76]:46474 "EHLO
         proxy.6wind.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752232AbdBJLAZ (ORCPT
+        with ESMTP id S1751652AbdBJLAO (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 10 Feb 2017 06:00:25 -0500
+        Fri, 10 Feb 2017 06:00:14 -0500
 From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Subject: [PATCH v6 6/8] uapi: includes linux/types.h before exporting files
-Date: Fri, 10 Feb 2017 11:58:56 +0100
-Message-Id: <1486724338-5389-7-git-send-email-nicolas.dichtel@6wind.com>
+Subject: [PATCH v6 2/8] nios2: put setup.h in uapi
+Date: Fri, 10 Feb 2017 11:58:52 +0100
+Message-Id: <1486724338-5389-3-git-send-email-nicolas.dichtel@6wind.com>
 In-Reply-To: <1486724338-5389-1-git-send-email-nicolas.dichtel@6wind.com>
 References: <201702022242.toNVsxyq%fengguang.wu@intel.com>
  <1486724338-5389-1-git-send-email-nicolas.dichtel@6wind.com>
@@ -16,104 +16,25 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: arnd@arndb.de
 Cc: mmarek@suse.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, airlied@linux.ie, davem@davemloft.net, linux@armlinux.org.uk, bp@alien8.de, slash.tmp@free.fr, daniel.vetter@ffwll.ch, rmk+kernel@armlinux.org.uk, msalter@redhat.com, jengelh@inai.de, hch@infradead.org, tklauser@distanz.ch, mpe@ellerman.id.au, mingo@kernel.org, Nicolas Dichtel <nicolas.dichtel@6wind.com>
 
-Some files will be exported after the next patch. 0-day tests report the
-following warning/error:
-./usr/include/linux/bcache.h:8: include of <linux/types.h> is preferred over <asm/types.h>
-./usr/include/linux/bcache.h:11: found __[us]{8,16,32,64} type without #include <linux/types.h>
-./usr/include/linux/qrtr.h:8: found __[us]{8,16,32,64} type without #include <linux/types.h>
-./usr/include/linux/cryptouser.h:39: found __[us]{8,16,32,64} type without #include <linux/types.h>
-./usr/include/linux/pr.h:14: found __[us]{8,16,32,64} type without #include <linux/types.h>
-./usr/include/linux/btrfs_tree.h:337: found __[us]{8,16,32,64} type without #include <linux/types.h>
-./usr/include/linux/seg6.h:21: found __[us]{8,16,32,64} type without #include <linux/types.h>
-./usr/include/linux/seg6_hmac.h:11: found __[us]{8,16,32,64} type without #include <linux/types.h>
+This header file is exported, but from a userland pov, it's just a wrapper
+to asm-generic/setup.h.
 
 Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Reviewed-by: Tobias Klauser <tklauser@distanz.ch>
 ---
- include/uapi/linux/bcache.h     | 2 +-
- include/uapi/linux/btrfs_tree.h | 2 ++
- include/uapi/linux/cryptouser.h | 2 ++
- include/uapi/linux/pr.h         | 2 ++
- include/uapi/linux/qrtr.h       | 1 +
- include/uapi/linux/seg6.h       | 2 ++
- 6 files changed, 10 insertions(+), 1 deletion(-)
+ arch/nios2/include/uapi/asm/Kbuild | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/include/uapi/linux/bcache.h b/include/uapi/linux/bcache.h
-index 22b6ad31c706..e3bb0635e94a 100644
---- a/include/uapi/linux/bcache.h
-+++ b/include/uapi/linux/bcache.h
-@@ -5,7 +5,7 @@
-  * Bcache on disk data structures
-  */
+diff --git a/arch/nios2/include/uapi/asm/Kbuild b/arch/nios2/include/uapi/asm/Kbuild
+index e0bb972a50d7..69c965304146 100644
+--- a/arch/nios2/include/uapi/asm/Kbuild
++++ b/arch/nios2/include/uapi/asm/Kbuild
+@@ -2,4 +2,5 @@ include include/uapi/asm-generic/Kbuild.asm
  
--#include <asm/types.h>
-+#include <linux/types.h>
+ header-y += elf.h
  
- #define BITMASK(name, type, field, offset, size)		\
- static inline __u64 name(const type *k)				\
-diff --git a/include/uapi/linux/btrfs_tree.h b/include/uapi/linux/btrfs_tree.h
-index d5ad15a106a7..6a261cb52d95 100644
---- a/include/uapi/linux/btrfs_tree.h
-+++ b/include/uapi/linux/btrfs_tree.h
-@@ -1,6 +1,8 @@
- #ifndef _BTRFS_CTREE_H_
- #define _BTRFS_CTREE_H_
- 
-+#include <linux/types.h>
-+
- /*
-  * This header contains the structure definitions and constants used
-  * by file system objects that can be retrieved using
-diff --git a/include/uapi/linux/cryptouser.h b/include/uapi/linux/cryptouser.h
-index 11d21fce14d6..c6a09c5261e7 100644
---- a/include/uapi/linux/cryptouser.h
-+++ b/include/uapi/linux/cryptouser.h
-@@ -18,6 +18,8 @@
-  * 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
-  */
- 
-+#include <linux/types.h>
-+
- /* Netlink configuration messages.  */
- enum {
- 	CRYPTO_MSG_BASE = 0x10,
-diff --git a/include/uapi/linux/pr.h b/include/uapi/linux/pr.h
-index 57d7c0f916b6..645ef3cf3dd0 100644
---- a/include/uapi/linux/pr.h
-+++ b/include/uapi/linux/pr.h
-@@ -1,6 +1,8 @@
- #ifndef _UAPI_PR_H
- #define _UAPI_PR_H
- 
-+#include <linux/types.h>
-+
- enum pr_type {
- 	PR_WRITE_EXCLUSIVE		= 1,
- 	PR_EXCLUSIVE_ACCESS		= 2,
-diff --git a/include/uapi/linux/qrtr.h b/include/uapi/linux/qrtr.h
-index 66c0748d26e2..b14ee91ec387 100644
---- a/include/uapi/linux/qrtr.h
-+++ b/include/uapi/linux/qrtr.h
-@@ -1,6 +1,7 @@
- #ifndef _LINUX_QRTR_H
- #define _LINUX_QRTR_H
- 
-+#include <linux/types.h>
- #include <linux/socket.h>
- 
- struct sockaddr_qrtr {
-diff --git a/include/uapi/linux/seg6.h b/include/uapi/linux/seg6.h
-index 052799e4d751..61df8d392f41 100644
---- a/include/uapi/linux/seg6.h
-+++ b/include/uapi/linux/seg6.h
-@@ -14,6 +14,8 @@
- #ifndef _UAPI_LINUX_SEG6_H
- #define _UAPI_LINUX_SEG6_H
- 
-+#include <linux/types.h>
-+
- /*
-  * SRH
-  */
++generic-y += setup.h
+ generic-y += ucontext.h
 -- 
 2.8.1
 
