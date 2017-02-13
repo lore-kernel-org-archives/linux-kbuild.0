@@ -1,34 +1,27 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.gmx.net ([212.227.15.18]:52322 "EHLO mout.gmx.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751468AbdBLWKj (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 12 Feb 2017 17:10:39 -0500
-From: Sven Joachim <svenjoac@gmx.de>
-Subject: Re: deb-pkg target invokes clean
-References: <CAEPqvoxvQHL=9bfTxE+GtOY225rYaeP5p3_7bNQoj4YG_kL=cQ@mail.gmail.com>
-Date: Sun, 12 Feb 2017 23:10:34 +0100
-In-Reply-To: <CAEPqvoxvQHL=9bfTxE+GtOY225rYaeP5p3_7bNQoj4YG_kL=cQ@mail.gmail.com>
-        (Juraj's message of "Sun, 12 Feb 2017 22:11:37 +0100")
-Message-ID: <87mvdrys9x.fsf@turtle.gmx.de>
+Received: from bombadil.infradead.org ([65.50.211.133]:37925 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751858AbdBMHtm (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 13 Feb 2017 02:49:42 -0500
+Date: Sun, 12 Feb 2017 23:49:31 -0800
+From: Christoph Hellwig <hch@infradead.org>
+Subject: Re: [PATCH v6 7/8] uapi: export all headers under uapi directories
+Message-ID: <20170213074931.GA19927@infradead.org>
+References: <201702022242.toNVsxyq%fengguang.wu@intel.com>
+ <1486724338-5389-1-git-send-email-nicolas.dichtel@6wind.com>
+ <1486724338-5389-8-git-send-email-nicolas.dichtel@6wind.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1486724338-5389-8-git-send-email-nicolas.dichtel@6wind.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Juraj <juraj.orsulic@fer.hr>
-Cc: linux-kbuild@vger.kernel.org
+To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Cc: arnd@arndb.de, mmarek@suse.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, airlied@linux.ie, davem@davemloft.net, linux@armlinux.org.uk, bp@alien8.de, slash.tmp@free.fr, daniel.vetter@ffwll.ch, rmk+kernel@armlinux.org.uk, msalter@redhat.com, jengelh@inai.de, hch@infradead.org, tklauser@distanz.ch, mpe@ellerman.id.au, mingo@kernel.org
 
-On 2017-02-12 22:11 +0100, Juraj wrote:
+> linux/genwqe/..install.cmd
+> linux/genwqe/.install
 
-> I noticed that the deb-pkg target in scripts/package/Makefile invokes
-> make clean. Is this really necessary?
+Third time:  NAK on exporting internal kbuild metadata.
 
-Yes, because (since Linux 4.3) "make deb-pkg" also generates a source
-tarball, and you don't want spurious object files in that tarball.
-
-> I disabled it so I could rebuild
-> .deb packages faster after making small changes to the kernel source.
-
-There's the bindeb-pkg target for that already. :-)
-
-Cheers,
-       Sven
