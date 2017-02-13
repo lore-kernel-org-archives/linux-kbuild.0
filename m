@@ -1,27 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:37925 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751858AbdBMHtm (ORCPT
+Received: from mail-lf0-f46.google.com ([209.85.215.46]:33967 "EHLO
+        mail-lf0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752041AbdBMOBd (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 13 Feb 2017 02:49:42 -0500
-Date: Sun, 12 Feb 2017 23:49:31 -0800
-From: Christoph Hellwig <hch@infradead.org>
-Subject: Re: [PATCH v6 7/8] uapi: export all headers under uapi directories
-Message-ID: <20170213074931.GA19927@infradead.org>
-References: <201702022242.toNVsxyq%fengguang.wu@intel.com>
- <1486724338-5389-1-git-send-email-nicolas.dichtel@6wind.com>
- <1486724338-5389-8-git-send-email-nicolas.dichtel@6wind.com>
+        Mon, 13 Feb 2017 09:01:33 -0500
+Received: by mail-lf0-f46.google.com with SMTP id v186so50703132lfa.1
+        for <linux-kbuild@vger.kernel.org>; Mon, 13 Feb 2017 06:01:32 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1486724338-5389-8-git-send-email-nicolas.dichtel@6wind.com>
+In-Reply-To: <87mvdrys9x.fsf@turtle.gmx.de>
+References: <CAEPqvoxvQHL=9bfTxE+GtOY225rYaeP5p3_7bNQoj4YG_kL=cQ@mail.gmail.com>
+ <87mvdrys9x.fsf@turtle.gmx.de>
+From: Riku Voipio <riku.voipio@linaro.org>
+Date: Mon, 13 Feb 2017 16:01:25 +0200
+Message-ID: <CAAqcGHmFsSw88px_0r4KCWxWcwahApwotUvOfi-QkuiHsAO8oA@mail.gmail.com>
+Subject: Re: deb-pkg target invokes clean
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Cc: arnd@arndb.de, mmarek@suse.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, airlied@linux.ie, davem@davemloft.net, linux@armlinux.org.uk, bp@alien8.de, slash.tmp@free.fr, daniel.vetter@ffwll.ch, rmk+kernel@armlinux.org.uk, msalter@redhat.com, jengelh@inai.de, hch@infradead.org, tklauser@distanz.ch, mpe@ellerman.id.au, mingo@kernel.org
+To: Sven Joachim <svenjoac@gmx.de>, Michal Marek <mmarek@suse.com>
+Cc: Juraj <juraj.orsulic@fer.hr>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-> linux/genwqe/..install.cmd
-> linux/genwqe/.install
+On 13 February 2017 at 00:10, Sven Joachim <svenjoac@gmx.de> wrote:
+> On 2017-02-12 22:11 +0100, Juraj wrote:
+>
+>> I noticed that the deb-pkg target in scripts/package/Makefile invokes
+>> make clean. Is this really necessary?
+>
+> Yes, because (since Linux 4.3) "make deb-pkg" also generates a source
+> tarball, and you don't want spurious object files in that tarball.
+>
+>> I disabled it so I could rebuild
+>> .deb packages faster after making small changes to the kernel source.
+>
+> There's the bindeb-pkg target for that already. :-)
 
-Third time:  NAK on exporting internal kbuild metadata.
+I've submitted a even faster target specifically to improve turnaround times:
 
+https://patchwork.kernel.org/patch/9532279/
+
+I don't know if it's going to be accepted for 4.11 or not.
+
+Riku
