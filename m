@@ -1,47 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:39978 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751893AbdBNTeS (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 14 Feb 2017 14:34:18 -0500
-Date: Tue, 14 Feb 2017 20:34:15 +0100
-From: "Luis R. Rodriguez" <mcgrof@kernel.org>
-Subject: Re: [PATCH v2] firmware/Makefile: force recompilation if makefile
- changes
-Message-ID: <20170214193415.GY24047@wotan.suse.de>
-References: <20170118173156.16060-1-mcgrof@kernel.org>
- <20170123150727.4883-1-mcgrof@kernel.org>
- <20170206220352.GB24047@wotan.suse.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170206220352.GB24047@wotan.suse.de>
+Received: from mail-wm0-f67.google.com ([74.125.82.67]:35445 "EHLO
+        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750812AbdBOAXr (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 14 Feb 2017 19:23:47 -0500
+Date: Wed, 15 Feb 2017 01:23:19 +0100
+From: Emese Revfy <re.emese@gmail.com>
+Subject: Re: [PATCH v4 0/4] Introduce the initify gcc plugin
+Message-Id: <20170215012319.c7720609f415b2abf725e88f@gmail.com>
+In-Reply-To: <CAGXu5jJ_9Gbre2J1HYrY-gwnsStL8P+MKmKQwCBtY4-7m53RLA@mail.gmail.com>
+References: <1481925984-98605-1-git-send-email-keescook@chromium.org>
+        <CAGXu5jKfwBqEot+30z6Wh6Cow2gv25ojKxmoTS1Vb_LhwFiSnA@mail.gmail.com>
+        <20161219121046.646e5ef425178fce8c2cb555@gmail.com>
+        <CAGXu5jKiDUsncxEOCta3fEgh0OQ0oqpi3gzkPWvpu2oPLq2g4g@mail.gmail.com>
+        <20170111012459.c0a0c615c99a389e4d89c8b5@gmail.com>
+        <CAGXu5jJRNuLR+Ekt26fxkg5wCkEv5fv-4B7=rt78OfRHN_w1Jw@mail.gmail.com>
+        <20170112224116.680debbf6f5c288ba51a46c0@gmail.com>
+        <CAGXu5jLB_ZxPcJDsBK0h-HTfb8G-GdC+BnD-1rTL5ePUvcwuzA@mail.gmail.com>
+        <CAGXu5jJ_9Gbre2J1HYrY-gwnsStL8P+MKmKQwCBtY4-7m53RLA@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Luis R. Rodriguez" <mcgrof@kernel.org>
-Cc: mmarek@suse.com, linux-kbuild@vger.kernel.org, ming.lei@canonical.com, gregkh@linuxfoundation.org, teg@jklm.no, linux-kernel@vger.kernel.org, dwmw2@infradead.org
+To: Kees Cook <keescook@chromium.org>
+Cc: "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, LKML <linux-kernel@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Josh Triplett <josh@joshtriplett.org>, PaX Team <pageexec@freemail.hu>, Brad Spengler <spender@grsecurity.net>, Michal Marek <mmarek@suse.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, minipli@ld-linux.so, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, David Brown <david.brown@linaro.org>, "benh@kernel.crashing.org" <benh@kernel.crashing.org>, Thomas Gleixner <tglx@linutronix.de>, Andrew Morton <akpm@linux-foundation.org>, Jeff Layton <jlayton@poochiereds.net>, Sam Ravnborg <sam@ravnborg.org>
 
-On Mon, Feb 06, 2017 at 11:03:52PM +0100, Luis R. Rodriguez wrote:
-> On Mon, Jan 23, 2017 at 07:07:27AM -0800, Luis R. Rodriguez wrote:
-> > If you modify the target asm we currently do not force the
-> > recompilation of the firmware files. The target asm is in
-> > the firmware/Makefile, peg this file as a dependency to
-> > require re-compilation of firmware targets when the asm
-> > changes.
-> > 
-> > Signed-off-by: Luis R. Rodriguez <mcgrof@kernel.org>
-> > ---
-> > 
-> > Michal,
-> > 
-> > I had this patch as part of my linker table series [0] but have split it
-> > off as its a small atomic separate change and can go in separately. Greg
-> > prefers this be reviewed by the kbuild tree so sending it your way.
-> > This v2 has no modifications, just resending it to the kbuild tree.
-> > 
-> > [0] https://lkml.kernel.org/r/20170115211057.17167-1-mcgrof@kernel.org
-> 
-> *Poke*
+On Thu, 12 Jan 2017 15:40:41 -0800
+Kees Cook <keescook@chromium.org> wrote:
 
-*Re-poke*
+> WARNING: drivers/clk/bcm/built-in.o(.text+0xec2): Section mismatch in
+> reference from the function clk_gate() to the variable
+> .init.rodata.str:__func__.29708
+> The function clk_gate() references
+> the variable __initconst __func__.29708.
+> This is often because clk_gate lacks a __initconst
+> annotation or the annotation of __func__.29708 is wrong.
 
- Luis
+Thanks for the report, it will be fixed in the next grsec patch.
+
+-- 
+Emese
