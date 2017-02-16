@@ -1,47 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-it0-f54.google.com ([209.85.214.54]:37321 "EHLO
-        mail-it0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750905AbdBOT1H (ORCPT
+Received: from mail-pf0-f181.google.com ([209.85.192.181]:32944 "EHLO
+        mail-pf0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933171AbdBPVSX (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 15 Feb 2017 14:27:07 -0500
-Received: by mail-it0-f54.google.com with SMTP id x75so72676410itb.0
-        for <linux-kbuild@vger.kernel.org>; Wed, 15 Feb 2017 11:27:07 -0800 (PST)
-MIME-Version: 1.0
-In-Reply-To: <20170215012319.c7720609f415b2abf725e88f@gmail.com>
-References: <1481925984-98605-1-git-send-email-keescook@chromium.org>
- <CAGXu5jKfwBqEot+30z6Wh6Cow2gv25ojKxmoTS1Vb_LhwFiSnA@mail.gmail.com>
- <20161219121046.646e5ef425178fce8c2cb555@gmail.com> <CAGXu5jKiDUsncxEOCta3fEgh0OQ0oqpi3gzkPWvpu2oPLq2g4g@mail.gmail.com>
- <20170111012459.c0a0c615c99a389e4d89c8b5@gmail.com> <CAGXu5jJRNuLR+Ekt26fxkg5wCkEv5fv-4B7=rt78OfRHN_w1Jw@mail.gmail.com>
- <20170112224116.680debbf6f5c288ba51a46c0@gmail.com> <CAGXu5jLB_ZxPcJDsBK0h-HTfb8G-GdC+BnD-1rTL5ePUvcwuzA@mail.gmail.com>
- <CAGXu5jJ_9Gbre2J1HYrY-gwnsStL8P+MKmKQwCBtY4-7m53RLA@mail.gmail.com> <20170215012319.c7720609f415b2abf725e88f@gmail.com>
-From: Kees Cook <keescook@chromium.org>
-Date: Wed, 15 Feb 2017 11:27:06 -0800
-Message-ID: <CAGXu5jKWGANHjA5opm4V9AzCVA27_iZqmypPvBLfzJ0MKNZDvg@mail.gmail.com>
-Subject: Re: [PATCH v4 0/4] Introduce the initify gcc plugin
-Content-Type: text/plain; charset=UTF-8
+        Thu, 16 Feb 2017 16:18:23 -0500
+Received: by mail-pf0-f181.google.com with SMTP id c73so8137403pfb.0
+        for <linux-kbuild@vger.kernel.org>; Thu, 16 Feb 2017 13:18:23 -0800 (PST)
+From: Stephen Boyd <stephen.boyd@linaro.org>
+Subject: [PATCH] scripts: objdiff: Ignore debug info when comparing
+Date: Thu, 16 Feb 2017 13:18:20 -0800
+Message-Id: <20170216211820.4337-1-stephen.boyd@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Emese Revfy <re.emese@gmail.com>
-Cc: "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, LKML <linux-kernel@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Josh Triplett <josh@joshtriplett.org>, PaX Team <pageexec@freemail.hu>, Brad Spengler <spender@grsecurity.net>, Michal Marek <mmarek@suse.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, minipli@ld-linux.so, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, David Brown <david.brown@linaro.org>, "benh@kernel.crashing.org" <benh@kernel.crashing.org>, Thomas Gleixner <tglx@linutronix.de>, Andrew Morton <akpm@linux-foundation.org>, Jeff Layton <jlayton@poochiereds.net>, Sam Ravnborg <sam@ravnborg.org>
+To: Michal Marek <mmarek@suse.cz>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.m@jp.panasonic.com>, Jason Cooper <jason@lakedaemon.net>
 
-On Tue, Feb 14, 2017 at 4:23 PM, Emese Revfy <re.emese@gmail.com> wrote:
-> On Thu, 12 Jan 2017 15:40:41 -0800
-> Kees Cook <keescook@chromium.org> wrote:
->
->> WARNING: drivers/clk/bcm/built-in.o(.text+0xec2): Section mismatch in
->> reference from the function clk_gate() to the variable
->> .init.rodata.str:__func__.29708
->> The function clk_gate() references
->> the variable __initconst __func__.29708.
->> This is often because clk_gate lacks a __initconst
->> annotation or the annotation of __func__.29708 is wrong.
->
-> Thanks for the report, it will be fixed in the next grsec patch.
+If the kernel is configured to be built with debug symbols, or
+has bug tables, comparing files may not work if line numbers
+change. This makes comparing object files with these options
+harder to do. Let's strip out the debug info and drop the
+__bug_table here so that we don't see false positives. There may
+be other things to drop later, and it may be architecture
+specific, but this works for me with my ARM64 build.
 
-Very cool, thanks! What did the problem turn out to be?
+Cc: Masahiro Yamada <yamada.m@jp.panasonic.com>
+Cc: Jason Cooper <jason@lakedaemon.net>
+Signed-off-by: Stephen Boyd <stephen.boyd@linaro.org>
+---
+ scripts/objdiff | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
--Kees
-
+diff --git a/scripts/objdiff b/scripts/objdiff
+index 62e51dae2138..4fb5d6796893 100755
+--- a/scripts/objdiff
++++ b/scripts/objdiff
+@@ -57,13 +57,15 @@ get_output_dir() {
+ do_objdump() {
+ 	dir=$(get_output_dir $1)
+ 	base=${1##*/}
++	stripped=$dir/${base%.o}.stripped
+ 	dis=$dir/${base%.o}.dis
+ 
+ 	[ ! -d "$dir" ] && mkdir -p $dir
+ 
+ 	# remove addresses for a cleaner diff
+ 	# http://dummdida.tumblr.com/post/60924060451/binary-diff-between-libc-from-scientificlinux-and
+-	$OBJDUMP -D $1 | sed "s/^[[:space:]]\+[0-9a-f]\+//" > $dis
++	$STRIP -g $1 -R __bug_table -R .note -R .comment -o $stripped
++	$OBJDUMP -D $stripped | sed -e "s/^[[:space:]]\+[0-9a-f]\+//" -e "s:^$stripped:$1:" > $dis
+ }
+ 
+ dorecord() {
+@@ -73,6 +75,7 @@ dorecord() {
+ 
+ 	CMT="`git rev-parse --short HEAD`"
+ 
++	STRIP="${CROSS_COMPILE}strip"
+ 	OBJDUMP="${CROSS_COMPILE}objdump"
+ 
+ 	for d in $FILES; do
 -- 
-Kees Cook
-Pixel Security
+2.10.0.297.gf6727b0
+
