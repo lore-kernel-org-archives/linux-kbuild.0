@@ -1,64 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wr0-f172.google.com ([209.85.128.172]:36283 "EHLO
-        mail-wr0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753255AbdBTM60 (ORCPT
+Received: from mail-wr0-f193.google.com ([209.85.128.193]:34966 "EHLO
+        mail-wr0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750893AbdBTVm4 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 20 Feb 2017 07:58:26 -0500
-Received: by mail-wr0-f172.google.com with SMTP id 89so59019623wrr.3
-        for <linux-kbuild@vger.kernel.org>; Mon, 20 Feb 2017 04:58:20 -0800 (PST)
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [PATCH v6 7/8] uapi: export all headers under uapi directories
-References: <201702022242.toNVsxyq%fengguang.wu@intel.com>
- <1486724338-5389-1-git-send-email-nicolas.dichtel@6wind.com>
- <1486724338-5389-8-git-send-email-nicolas.dichtel@6wind.com>
- <20170213074931.GA19927@infradead.org>
- <fc363060-f00d-e9e6-c548-6bfe73665e93@6wind.com>
- <CAK8P3a3mrqWQnpOjUA8kRO4ksjH7yB6Q5XiHmt1fukJMwD_yUw@mail.gmail.com>
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Message-ID: <3539c228-2a1e-f9c3-953d-a755b7c35830@6wind.com>
-Date: Mon, 20 Feb 2017 13:58:17 +0100
-MIME-Version: 1.0
-In-Reply-To: <CAK8P3a3mrqWQnpOjUA8kRO4ksjH7yB6Q5XiHmt1fukJMwD_yUw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+        Mon, 20 Feb 2017 16:42:56 -0500
+Date: Mon, 20 Feb 2017 22:42:17 +0100
+From: Emese Revfy <re.emese@gmail.com>
+Subject: Re: [PATCH v4 0/4] Introduce the initify gcc plugin
+Message-Id: <20170220224217.f5bfec20447978b28e3b4ef7@gmail.com>
+In-Reply-To: <CAGXu5jKWGANHjA5opm4V9AzCVA27_iZqmypPvBLfzJ0MKNZDvg@mail.gmail.com>
+References: <1481925984-98605-1-git-send-email-keescook@chromium.org>
+        <CAGXu5jKfwBqEot+30z6Wh6Cow2gv25ojKxmoTS1Vb_LhwFiSnA@mail.gmail.com>
+        <20161219121046.646e5ef425178fce8c2cb555@gmail.com>
+        <CAGXu5jKiDUsncxEOCta3fEgh0OQ0oqpi3gzkPWvpu2oPLq2g4g@mail.gmail.com>
+        <20170111012459.c0a0c615c99a389e4d89c8b5@gmail.com>
+        <CAGXu5jJRNuLR+Ekt26fxkg5wCkEv5fv-4B7=rt78OfRHN_w1Jw@mail.gmail.com>
+        <20170112224116.680debbf6f5c288ba51a46c0@gmail.com>
+        <CAGXu5jLB_ZxPcJDsBK0h-HTfb8G-GdC+BnD-1rTL5ePUvcwuzA@mail.gmail.com>
+        <CAGXu5jJ_9Gbre2J1HYrY-gwnsStL8P+MKmKQwCBtY4-7m53RLA@mail.gmail.com>
+        <20170215012319.c7720609f415b2abf725e88f@gmail.com>
+        <CAGXu5jKWGANHjA5opm4V9AzCVA27_iZqmypPvBLfzJ0MKNZDvg@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Christoph Hellwig <hch@infradead.org>, Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-arch <linux-arch@vger.kernel.org>, David Airlie <airlied@linux.ie>, David Miller <davem@davemloft.net>, Russell King - ARM Linux <linux@armlinux.org.uk>, bp@alien8.de, Mason <slash.tmp@free.fr>, daniel.vetter@ffwll.ch, rmk+kernel@armlinux.org.uk, msalter@redhat.com, jengelh@inai.de, tklauser@distanz.ch, Michael Ellerman <mpe@ellerman.id.au>, mingo@kernel.org
+To: Kees Cook <keescook@chromium.org>
+Cc: "kernel-hardening@lists.openwall.com" <kernel-hardening@lists.openwall.com>, LKML <linux-kernel@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Josh Triplett <josh@joshtriplett.org>, PaX Team <pageexec@freemail.hu>, Brad Spengler <spender@grsecurity.net>, Michal Marek <mmarek@suse.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, minipli@ld-linux.so, Russell King <linux@armlinux.org.uk>, Catalin Marinas <catalin.marinas@arm.com>, Rasmus Villemoes <linux@rasmusvillemoes.dk>, David Brown <david.brown@linaro.org>, "benh@kernel.crashing.org" <benh@kernel.crashing.org>, Thomas Gleixner <tglx@linutronix.de>, Andrew Morton <akpm@linux-foundation.org>, Jeff Layton <jlayton@poochiereds.net>, Sam Ravnborg <sam@ravnborg.org>
 
-Le 20/02/2017 à 11:14, Arnd Bergmann a écrit :
-> On Mon, Feb 20, 2017 at 10:32 AM, Nicolas Dichtel
-> <nicolas.dichtel@6wind.com> wrote:
->> Le 13/02/2017 à 08:49, Christoph Hellwig a écrit :
->>>> linux/genwqe/..install.cmd
->>>> linux/genwqe/.install
->>>
->>> Third time:  NAK on exporting internal kbuild metadata.
->>>
->> And for the third time: this is not related to this series. Those files are
->> there before my series and the goal of the series has nothing to do with that.
->>
->> Feel free to send a patch.
+On Wed, 15 Feb 2017 11:27:06 -0800
+Kees Cook <keescook@chromium.org> wrote:
+
+> On Tue, Feb 14, 2017 at 4:23 PM, Emese Revfy <re.emese@gmail.com> wrote:
+> > On Thu, 12 Jan 2017 15:40:41 -0800
+> > Kees Cook <keescook@chromium.org> wrote:
+> >
+> >> WARNING: drivers/clk/bcm/built-in.o(.text+0xec2): Section mismatch in
+> >> reference from the function clk_gate() to the variable
+> >> .init.rodata.str:__func__.29708
+> >> The function clk_gate() references
+> >> the variable __initconst __func__.29708.
+> >> This is often because clk_gate lacks a __initconst
+> >> annotation or the annotation of __func__.29708 is wrong.
+> >
+> > Thanks for the report, it will be fixed in the next grsec patch.
 > 
-> Your description literally says "After this patch, the following files, which
-> were not exported, are now exported (with make headers_install_all)"
-> for the files that Christoph quoted. It that is not true, then you need to
-> update the patch description to say what your patch actually does.
-That is true. But as I explained when the comment was done the first time (and I
-never got any answer), these files are generated in every exported directory.
-Because the genwqe directory is now exported, the corresponding '..install.cmd'
-and '.install' are generated.
-See
-http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/scripts/Makefile.headersinst#n32
-and
-http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/scripts/Makefile.headersinst#n130
-for more details.
+> Very cool, thanks! What did the problem turn out to be?
 
-In other words, these files are there because some new directories are exported.
-If those directories were added to the 'header-y' variable, the result would be
-the same.
+You can find it here:
+https://github.com/ephox-gcc-plugins/initify/commit/73e857aa47bde7cc78ed865a008d1519893c0f54
 
-Regards,
-Nicolas
-
-
+-- 
+Emese
