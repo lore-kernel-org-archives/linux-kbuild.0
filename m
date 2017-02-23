@@ -1,54 +1,107 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg0-f68.google.com ([74.125.83.68]:33118 "EHLO
-        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932684AbdBVPI4 (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 22 Feb 2017 10:08:56 -0500
-From: Wei Yang <richard.weiyang@gmail.com>
-Subject: [PATCH] kbuild: strip the last slash in KBUILD_EXTMOD
-Date: Wed, 22 Feb 2017 23:08:33 +0800
-Message-Id: <20170222150833.83149-1-richard.weiyang@gmail.com>
+Received: from mx2.suse.de ([195.135.220.15]:44947 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751049AbdBWNXw (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 23 Feb 2017 08:23:52 -0500
+From: Petr Vorel <pvorel@suse.cz>
+Subject: [PATCH v3 1/1] kconfig: menuconfig make "selected by:" readable
+Date: Thu, 23 Feb 2017 14:10:08 +0100
+Message-Id: <20170223131008.13705-1-pvorel@suse.cz>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mmarek@suse.com
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Wei Yang <richard.weiyang@gmail.com>
+To: linux-kbuild@vger.kernel.org
+Cc: Petr Vorel <pvorel@suse.cz>, pebolle@tiscali.nl
 
-Current kbuild will build the target again if we run "make M=dir" and "make
-M=dir/" by turns, since if_changed will see the prerequisite is changed.
-The behavior may confuse the user a little, since actually we are building
-the same target and no difference.
+rev_dep expressions can get rather unwieldy, especially if a symbol is
+selected by more than a handful of other symbols. Ie, it's possible to
+have near endless expressions like:
+   A && B && !C || D || F && (G || H) || [...]
 
-According to current implementation in scripts/Makefile.build, the obj
-passed to next level is a directory name with last slash stripped. This
-patch strips the last slash in KBUILD_EXTMOD which is assigned from "M=".
+Chop these expressions into actually readable chunks:
+   - A && B && !C
+   - D
+   - F && (G || H)
+   - [...]
 
-Signed-off-by: Wei Yang <richard.weiyang@gmail.com>
+Ie, transform the top level "||" tokens into newlines and prepend each
+line with a minus. This makes the "Selected by:" blurb much easier to
+read.
+
+This also prevents trimming too long lines.
+
+Based on patch from Paul Bolle.
+
+Reported-by: Paul Bolle <pebolle@tiscali.nl>
+Cc: Paul Bolle <pebolle@tiscali.nl>
+Signed-off-by: Petr Vorel <pvorel@suse.cz>
 ---
- Makefile | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ scripts/kconfig/expr.c | 16 +++++++++++++---
+ scripts/kconfig/menu.c |  2 +-
+ 2 files changed, 14 insertions(+), 4 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index b1037774e8e8..db6ed60928ab 100644
---- a/Makefile
-+++ b/Makefile
-@@ -184,13 +184,15 @@ endif
- # Old syntax make ... SUBDIRS=$PWD is still supported
- # Setting the environment variable KBUILD_EXTMOD take precedence
- ifdef SUBDIRS
--  KBUILD_EXTMOD ?= $(SUBDIRS)
-+  __KBUILD_EXTMOD ?= $(SUBDIRS)
- endif
+diff --git a/scripts/kconfig/expr.c b/scripts/kconfig/expr.c
+index cbf4996dd9c1..4b4309b59349 100644
+--- a/scripts/kconfig/expr.c
++++ b/scripts/kconfig/expr.c
+@@ -1070,6 +1070,8 @@ struct expr *expr_simplify_unmet_dep(struct expr *e1, struct expr *e2)
+ 	return expr_get_leftmost_symbol(ret);
+ }
  
- ifeq ("$(origin M)", "command line")
--  KBUILD_EXTMOD := $(M)
-+  __KBUILD_EXTMOD := $(M)
- endif
- 
-+KBUILD_EXTMOD = $(patsubst %/,%,$(__KBUILD_EXTMOD))
++static int print_level = 0;
 +
- # If building an external module we do not care about the all: rule
- # but instead _all depend on modules
- PHONY += all
+ void expr_print(struct expr *e, void (*fn)(void *, struct symbol *, const char *), void *data, int prevtoken)
+ {
+ 	if (!e) {
+@@ -1077,8 +1079,11 @@ void expr_print(struct expr *e, void (*fn)(void *, struct symbol *, const char *
+ 		return;
+ 	}
+ 
+-	if (expr_compare_type(prevtoken, e->type) > 0)
++	if (expr_compare_type(prevtoken, e->type) > 0) {
++		print_level++;
+ 		fn(data, NULL, "(");
++	}
++
+ 	switch (e->type) {
+ 	case E_SYMBOL:
+ 		if (e->left.sym->name)
+@@ -1126,7 +1131,10 @@ void expr_print(struct expr *e, void (*fn)(void *, struct symbol *, const char *
+ 		break;
+ 	case E_OR:
+ 		expr_print(e->left.expr, fn, data, E_OR);
+-		fn(data, NULL, " || ");
++		if (print_level == 0)
++			fn(data, NULL, "\n  - ");
++		else
++			fn(data, NULL, " || ");
+ 		expr_print(e->right.expr, fn, data, E_OR);
+ 		break;
+ 	case E_AND:
+@@ -1156,8 +1164,10 @@ void expr_print(struct expr *e, void (*fn)(void *, struct symbol *, const char *
+ 		break;
+ 	  }
+ 	}
+-	if (expr_compare_type(prevtoken, e->type) > 0)
++	if (expr_compare_type(prevtoken, e->type) > 0) {
++		print_level--;
+ 		fn(data, NULL, ")");
++	}
+ }
+ 
+ static void expr_print_file_helper(void *data, struct symbol *sym, const char *str)
+diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+index e9357931b47d..3daf7b81637f 100644
+--- a/scripts/kconfig/menu.c
++++ b/scripts/kconfig/menu.c
+@@ -675,7 +675,7 @@ static void get_symbol_str(struct gstr *r, struct symbol *sym,
+ 
+ 	get_symbol_props_str(r, sym, P_SELECT, _("  Selects: "));
+ 	if (sym->rev_dep.expr) {
+-		str_append(r, _("  Selected by: "));
++		str_append(r, _("  Selected by: \n  - "));
+ 		expr_gstr_print(sym->rev_dep.expr, r);
+ 		str_append(r, "\n");
+ 	}
 -- 
 2.11.0
 
