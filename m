@@ -1,28 +1,71 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.aknet.kz ([88.151.176.20]:50085 "EHLO aknet.kz"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751352AbdBWSKq (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 23 Feb 2017 13:10:46 -0500
-Subject: RE:
-Date: Thu, 23 Feb 2017 20:09:29 +0500
-From: Qin's Yanjun <Qin.Yanjun@null.net>
-Reply-to: Qin's Yanjun <Qin.Yanjun@null.net>
-Message-ID: <cf3faff95fb3db02602e6f37c5cd928f@mail.aknet.kz>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type: text/plain; charset=US-ASCII
+Received: from host.76.145.23.62.rev.coltfrance.com ([62.23.145.76]:59033 "EHLO
+        proxy.6wind.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751273AbdBXQtb (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 24 Feb 2017 11:49:31 -0500
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Subject: [PATCH v7 1/8] h8300: put bitsperlong.h in uapi
+Date: Fri, 24 Feb 2017 17:49:09 +0100
+Message-Id: <1487954956-23318-2-git-send-email-nicolas.dichtel@6wind.com>
+In-Reply-To: <1487954956-23318-1-git-send-email-nicolas.dichtel@6wind.com>
+References: <CAK8P3a3mrqWQnpOjUA8kRO4ksjH7yB6Q5XiHmt1fukJMwD_yUw@mail.gmail.com>
+ <1487954956-23318-1-git-send-email-nicolas.dichtel@6wind.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: arnd@arndb.de
+Cc: mmarek@suse.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, airlied@linux.ie, davem@davemloft.net, linux@armlinux.org.uk, bp@alien8.de, slash.tmp@free.fr, daniel.vetter@ffwll.ch, rmk+kernel@armlinux.org.uk, msalter@redhat.com, jengelh@inai.de, hch@infradead.org, tklauser@distanz.ch, mpe@ellerman.id.au, mingo@kernel.org, tglx@linutronix.de, Nicolas Dichtel <nicolas.dichtel@6wind.com>
 
+This header file is exported, thus move it to uapi.
 
-How are you today and your family? I require your attention and honest
-co-operation about some issues which i will really want to discuss with you
-which.  Looking forward to read from you soon.  
+Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+---
+ arch/h8300/include/asm/bitsperlong.h      | 14 --------------
+ arch/h8300/include/uapi/asm/bitsperlong.h | 14 ++++++++++++++
+ 2 files changed, 14 insertions(+), 14 deletions(-)
+ delete mode 100644 arch/h8300/include/asm/bitsperlong.h
+ create mode 100644 arch/h8300/include/uapi/asm/bitsperlong.h
 
-Qin's
-
-
-______________________________
-
-Sky Silk, http://aknet.kz
+diff --git a/arch/h8300/include/asm/bitsperlong.h b/arch/h8300/include/asm/bitsperlong.h
+deleted file mode 100644
+index e140e46729ac..000000000000
+--- a/arch/h8300/include/asm/bitsperlong.h
++++ /dev/null
+@@ -1,14 +0,0 @@
+-#ifndef __ASM_H8300_BITS_PER_LONG
+-#define __ASM_H8300_BITS_PER_LONG
+-
+-#include <asm-generic/bitsperlong.h>
+-
+-#if !defined(__ASSEMBLY__)
+-/* h8300-unknown-linux required long */
+-#define __kernel_size_t __kernel_size_t
+-typedef unsigned long	__kernel_size_t;
+-typedef long		__kernel_ssize_t;
+-typedef long		__kernel_ptrdiff_t;
+-#endif
+-
+-#endif /* __ASM_H8300_BITS_PER_LONG */
+diff --git a/arch/h8300/include/uapi/asm/bitsperlong.h b/arch/h8300/include/uapi/asm/bitsperlong.h
+new file mode 100644
+index 000000000000..e56cf72369b6
+--- /dev/null
++++ b/arch/h8300/include/uapi/asm/bitsperlong.h
+@@ -0,0 +1,14 @@
++#ifndef _UAPI_ASM_H8300_BITS_PER_LONG
++#define _UAPI_ASM_H8300_BITS_PER_LONG
++
++#include <asm-generic/bitsperlong.h>
++
++#if !defined(__ASSEMBLY__)
++/* h8300-unknown-linux required long */
++#define __kernel_size_t __kernel_size_t
++typedef unsigned long	__kernel_size_t;
++typedef long		__kernel_ssize_t;
++typedef long		__kernel_ptrdiff_t;
++#endif
++
++#endif /* _UAPI_ASM_H8300_BITS_PER_LONG */
+-- 
+2.8.1
 
