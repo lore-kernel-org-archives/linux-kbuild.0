@@ -1,89 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from host.76.145.23.62.rev.coltfrance.com ([62.23.145.76]:59082 "EHLO
-        proxy.6wind.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751315AbdBXQtd (ORCPT
+Received: from condef-06.nifty.com ([202.248.20.71]:22049 "EHLO
+        condef-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752145AbdBZGYk (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 24 Feb 2017 11:49:33 -0500
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Subject: [PATCH v7 4/8] Makefile.headersinst: cleanup input files
-Date: Fri, 24 Feb 2017 17:49:12 +0100
-Message-Id: <1487954956-23318-5-git-send-email-nicolas.dichtel@6wind.com>
-In-Reply-To: <1487954956-23318-1-git-send-email-nicolas.dichtel@6wind.com>
-References: <CAK8P3a3mrqWQnpOjUA8kRO4ksjH7yB6Q5XiHmt1fukJMwD_yUw@mail.gmail.com>
- <1487954956-23318-1-git-send-email-nicolas.dichtel@6wind.com>
+        Sun, 26 Feb 2017 01:24:40 -0500
+MIME-Version: 1.0
+In-Reply-To: <20170216211820.4337-1-stephen.boyd@linaro.org>
+References: <20170216211820.4337-1-stephen.boyd@linaro.org>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Sun, 26 Feb 2017 15:12:03 +0900
+Message-ID: <CAK7LNASCEdHdBxXgEqioTpR3+=oF_xUE_fu1uVYXMfXX4KYHHQ@mail.gmail.com>
+Subject: Re: [PATCH] scripts: objdiff: Ignore debug info when comparing
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: arnd@arndb.de
-Cc: mmarek@suse.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, airlied@linux.ie, davem@davemloft.net, linux@armlinux.org.uk, bp@alien8.de, slash.tmp@free.fr, daniel.vetter@ffwll.ch, rmk+kernel@armlinux.org.uk, msalter@redhat.com, jengelh@inai.de, hch@infradead.org, tklauser@distanz.ch, mpe@ellerman.id.au, mingo@kernel.org, tglx@linutronix.de, Nicolas Dichtel <nicolas.dichtel@6wind.com>
+To: Stephen Boyd <stephen.boyd@linaro.org>, Michal Marek <mmarek@suse.cz>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Jason Cooper <jason@lakedaemon.net>
 
-After the last four patches, all exported headers are under uapi/, thus
-input-files2 are not needed anymore.
-The side effect is that input-files1-name is exactly header-y.
+Hi.
 
-Note also that input-files3-name is genhdr-y.
+2017-02-17 6:18 GMT+09:00 Stephen Boyd <stephen.boyd@linaro.org>:
+> If the kernel is configured to be built with debug symbols, or
+> has bug tables, comparing files may not work if line numbers
+> change. This makes comparing object files with these options
+> harder to do. Let's strip out the debug info and drop the
+> __bug_table here so that we don't see false positives. There may
+> be other things to drop later, and it may be architecture
+> specific, but this works for me with my ARM64 build.
+>
+> Cc: Masahiro Yamada <yamada.m@jp.panasonic.com>
+> Cc: Jason Cooper <jason@lakedaemon.net>
+> Signed-off-by: Stephen Boyd <stephen.boyd@linaro.org>
 
-Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
----
- scripts/Makefile.headersinst | 34 +++++++++++-----------------------
- 1 file changed, 11 insertions(+), 23 deletions(-)
 
-diff --git a/scripts/Makefile.headersinst b/scripts/Makefile.headersinst
-index 1106d6ca3a38..3e20d03432d2 100644
---- a/scripts/Makefile.headersinst
-+++ b/scripts/Makefile.headersinst
-@@ -40,31 +40,20 @@ wrapper-files := $(filter $(header-y), $(generic-y))
- srcdir        := $(srctree)/$(obj)
- gendir        := $(objtree)/$(gen)
- 
--oldsrcdir     := $(srctree)/$(subst /uapi,,$(obj))
--
- # all headers files for this dir
- header-y      := $(filter-out $(generic-y), $(header-y))
- all-files     := $(header-y) $(genhdr-y) $(wrapper-files)
- output-files  := $(addprefix $(installdir)/, $(all-files))
- 
--input-files1  := $(foreach hdr, $(header-y), \
--		   $(if $(wildcard $(srcdir)/$(hdr)), \
--			$(wildcard $(srcdir)/$(hdr))) \
--		   )
--input-files1-name := $(notdir $(input-files1))
--input-files2  := $(foreach hdr, $(header-y), \
--		   $(if  $(wildcard $(srcdir)/$(hdr)),, \
--			$(if $(wildcard $(oldsrcdir)/$(hdr)), \
--				$(wildcard $(oldsrcdir)/$(hdr)), \
--				$(error Missing UAPI file $(srcdir)/$(hdr))) \
--		   ))
--input-files2-name := $(notdir $(input-files2))
--input-files3  := $(foreach hdr, $(genhdr-y), \
--		   $(if	$(wildcard $(gendir)/$(hdr)), \
--			$(wildcard $(gendir)/$(hdr)), \
--			$(error Missing generated UAPI file $(gendir)/$(hdr)) \
--		   ))
--input-files3-name := $(notdir $(input-files3))
-+# Check that all expected files exist
-+$(foreach hdr, $(header-y), \
-+  $(if $(wildcard $(srcdir)/$(hdr)),, \
-+       $(error Missing UAPI file $(srcdir)/$(hdr)) \
-+   ))
-+$(foreach hdr, $(genhdr-y), \
-+  $(if	$(wildcard $(gendir)/$(hdr)),, \
-+       $(error Missing generated UAPI file $(gendir)/$(hdr)) \
-+  ))
- 
- # Work out what needs to be removed
- oldheaders    := $(patsubst $(installdir)/%,%,$(wildcard $(installdir)/*.h))
-@@ -78,9 +67,8 @@ printdir = $(patsubst $(INSTALL_HDR_PATH)/%/,%,$(dir $@))
- quiet_cmd_install = INSTALL $(printdir) ($(words $(all-files))\
-                             file$(if $(word 2, $(all-files)),s))
-       cmd_install = \
--        $(CONFIG_SHELL) $< $(installdir) $(srcdir) $(input-files1-name); \
--        $(CONFIG_SHELL) $< $(installdir) $(oldsrcdir) $(input-files2-name); \
--        $(CONFIG_SHELL) $< $(installdir) $(gendir) $(input-files3-name); \
-+        $(CONFIG_SHELL) $< $(installdir) $(srcdir) $(header-y); \
-+        $(CONFIG_SHELL) $< $(installdir) $(gendir) $(genhdr-y); \
-         for F in $(wrapper-files); do                                   \
-                 echo "\#include <asm-generic/$$F>" > $(installdir)/$$F;    \
-         done;                                                           \
+Great!
+
+Reviewed-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+
+
+BTW, I left Panasonic two years ago,
+so the old address yamada.m@jp.panasonic.com
+is not working any more.
+
+Please drop the "Cc: Masahiro Yamada <yamada.m@jp.panasonic.com>"
+when this patch is applied.
+
+
+Thanks!
+
+
+
 -- 
-2.8.1
-
+Best Regards
+Masahiro Yamada
