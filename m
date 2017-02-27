@@ -1,96 +1,121 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:50457 "EHLO
-        shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1751039AbdB0OIu (ORCPT
+Received: from mail-wr0-f180.google.com ([209.85.128.180]:33823 "EHLO
+        mail-wr0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751668AbdB0QJa (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 27 Feb 2017 09:08:50 -0500
-Message-ID: <1488204416.2819.9.camel@decadent.org.uk>
-Subject: Re: [PATCH] kbuild: avoid unrecognized option error for external DTC
-From: Ben Hutchings <ben@decadent.org.uk>
-Date: Mon, 27 Feb 2017 14:06:56 +0000
-In-Reply-To: <1488174052-2530-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1488174052-2530-1-git-send-email-yamada.masahiro@socionext.com>
-Content-Type: multipart/signed; micalg="pgp-sha512";
-        protocol="application/pgp-signature"; boundary="=-34dSXzycV0LBKz+SA5yC"
-Mime-Version: 1.0
+        Mon, 27 Feb 2017 11:09:30 -0500
+Received: by mail-wr0-f180.google.com with SMTP id l37so11468392wrc.1
+        for <linux-kbuild@vger.kernel.org>; Mon, 27 Feb 2017 08:09:29 -0800 (PST)
+Reply-To: nicolas.dichtel@6wind.com
+Subject: Re: [PATCH v7 7/8] uapi: export all headers under uapi directories
+References: <CAK8P3a3mrqWQnpOjUA8kRO4ksjH7yB6Q5XiHmt1fukJMwD_yUw@mail.gmail.com>
+ <1487954956-23318-1-git-send-email-nicolas.dichtel@6wind.com>
+ <1487954956-23318-8-git-send-email-nicolas.dichtel@6wind.com>
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Message-ID: <56b1003e-1ac9-9ed3-f204-01e609427b98@6wind.com>
+Date: Mon, 27 Feb 2017 17:01:55 +0100
+MIME-Version: 1.0
+In-Reply-To: <1487954956-23318-8-git-send-email-nicolas.dichtel@6wind.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
-Cc: Alessio Igor Bogani <alessio.bogani@elettra.eu>, Arnd Bergmann <arnd@arndb.de>, Rob Herring <robh+dt@kernel.org>, linux-c6x-dev@linux-c6x.org, Michal Simek <monstr@monstr.eu>, Nicolas Pitre <nicolas.pitre@linaro.org>, Marcin Nowakowski <marcin.nowakowski@imgtec.com>, devicetree@vger.kernel.org, Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>, Michal Marek <mmarek@suse.com>, Scott Wood <oss@buserror.net>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, linuxppc-dev@lists.ozlabs.org, Paul Mackerras <paulus@samba.org>, openrisc@lists.librecores.org, Mark Salter <msalter@redhat.com>, Stafford Horne <shorne@gmail.com>, Aurelien Jacquiot <a-jacquiot@ti.com>, Jonas Bonn <jonas@southpole.se>, Michael Ellerman <mpe@ellerman.id.au>, linux-kernel@vger.kernel.org, Oliver O'Halloran <oohall@gmail.com>, Mark Rutland <mark.rutland@arm.com>, Emese Revfy <re.emese@gmail.com>
+To: arnd@arndb.de, mmarek@suse.com, linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, airlied@linux.ie, davem@davemloft.net, linux@armlinux.org.uk, bp@alien8.de, slash.tmp@free.fr, daniel.vetter@ffwll.ch, rmk+kernel@armlinux.org.uk, msalter@redhat.com, jengelh@inai.de, hch@infradead.org, tklauser@distanz.ch, mpe@ellerman.id.au, mingo@kernel.org, tglx@linutronix.de
+
+Le 24/02/2017 à 17:49, Nicolas Dichtel a écrit :
+> Regularly, when a new header is created in include/uapi/, the developer
+> forgets to add it in the corresponding Kbuild file. This error is usually
+> detected after the release is out.
+> 
+> In fact, all headers under uapi directories should be exported, thus it's
+> useless to have an exhaustive list.
+> 
+> After this patch, the following files, which were not exported, are now
+> exported (with make headers_install_all):
+> asm-arc/kvm_para.h
+> asm-arc/ucontext.h
+> asm-avr32/kvm_para.h
+> asm-blackfin/shmparam.h
+> asm-blackfin/ucontext.h
+> asm-c6x/shmparam.h
+> asm-c6x/ucontext.h
+> asm-cris/kvm_para.h
+> asm-h8300/shmparam.h
+> asm-h8300/ucontext.h
+> asm-hexagon/shmparam.h
+> asm-m32r/kvm_para.h
+> asm-m68k/kvm_para.h
+> asm-m68k/shmparam.h
+> asm-metag/kvm_para.h
+> asm-metag/shmparam.h
+> asm-metag/ucontext.h
+> asm-mips/hwcap.h
+> asm-mips/reg.h
+> asm-mips/ucontext.h
+> asm-nios2/kvm_para.h
+> asm-nios2/ucontext.h
+> asm-openrisc/shmparam.h
+> asm-parisc/kvm_para.h
+> asm-powerpc/perf_regs.h
+> asm-sh/kvm_para.h
+> asm-sh/ucontext.h
+> asm-tile/shmparam.h
+> asm-unicore32/shmparam.h
+> asm-unicore32/ucontext.h
+> asm-x86/hwcap2.h
+> asm-xtensa/kvm_para.h
+> drm/armada_drm.h
+> drm/etnaviv_drm.h
+> drm/vgem_drm.h
+> linux/auto_dev-ioctl.h
+> linux/bcache.h
+> linux/btrfs_tree.h
+> linux/cifs
+> linux/cifs/cifs_mount.h
+> linux/coresight-stm.h
+> linux/cryptouser.h
+> linux/genwqe
+> linux/genwqe/genwqe_card.h
+> linux/hash_info.h
+> linux/kcm.h
+> linux/kcov.h
+> linux/kfd_ioctl.h
+> linux/lightnvm.h
+> linux/module.h
+> linux/nilfs2_api.h
+> linux/nilfs2_ondisk.h
+> linux/nsfs.h
+> linux/pr.h
+> linux/qrtr.h
+> linux/rpmsg.h
+> linux/sed-opal.h
+> linux/smc.h
+> linux/smc_diag.h
+> linux/stm.h
+> linux/userio.h
+> linux/wil6210_uapi.h
+> rdma/bnxt_re-abi.h
+> 
+> Note that I have removed from this list the files which are generated in every
+> exported directories (like .install or .install.cmd).
+> 
+> Thanks to Julien Floret <julien.floret@6wind.com> for the tip to get all
+> subdirs with a pure makefile command.
+> 
+> For the record, note that exported files for asm directories are a mix of
+> files listed by:
+>  - include/uapi/asm-generic/Kbuild.asm;
+>  - arch/<arch>/include/uapi/asm/Kbuild;
+>  - arch/<arch>/include/asm/Kbuild.
+> 
+> Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+> Acked-by: Daniel Vetter <daniel.vetter@ffwll.ch>
+> Acked-by: Russell King <rmk+kernel@armlinux.org.uk>
+> Acked-by: Mark Salter <msalter@redhat.com>
+> Acked-by: Michael Ellerman <mpe@ellerman.id.au> (powerpc)
+Is there any chance to get this series in before the rc1?
 
 
---=-34dSXzycV0LBKz+SA5yC
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, 2017-02-27 at 14:40 +0900, Masahiro Yamada wrote:
-> Since commit 6b22b3d1614a ("kbuild: Allow using host dtc instead of
-> kernel's copy"), it is possible to use an external dtc.=C2=A0=C2=A0In thi=
-s
-> case, we do not know which options are supported on it.
->=20
-> Commit bc553986a2f7 ("dtc: turn off dtc unit address warnings by
-> default") gives -Wno-unit_address_vs_reg, but this options is only
-> recognized by v1.4.2 or later.
->=20
-> If an older version is specified, the build fails:
-
-But the option to use an external dtc was intended to allow testing of
-newer versions.  If there's no reason to use this option to run an
-older version, why bother trying to support that?
-
-[...]
-> --- a/scripts/Kbuild.include
-> +++ b/scripts/Kbuild.include
-> @@ -171,6 +171,20 @@ ld-version =3D $(shell $(LD) --version | $(srctree)/=
-scripts/ld-version.sh)
-> =C2=A0# Usage:=C2=A0=C2=A0$(call ld-ifversion, -ge, 22252, y)
-> =C2=A0ld-ifversion =3D $(shell [ $(ld-version) $(1) $(2) ] && echo $(3) |=
-| echo $(4))
-> =C2=A0
-> +# dtc-option
-> +# Usage:=C2=A0=C2=A0DTC_FLAGS +=3D $(call dtc-option,-Wno-unit_address_v=
-s_reg)
-> +#
-> +# When we use the external dtc, check if the desired options are support=
-ed.
-> +# When we use the kernel's copy (scripts/dtc/dtc), just use the fixed op=
-tion.
-> +# Until Kbuild descends into the scripts/dtc/ directory, scripts/dtc/dtc=
- may
-> +# not exist, i.e. $(call try-run,...) may not work.
-> +ifeq ("$(origin DTC)", "command line")
-[...]
-
-It could also be specified as an environment variable (assignment with
-"?=3D" doesn't override them, but "=3D" does).
-
-Ben.
-
---=20
-Ben Hutchings
-This sentence contradicts itself - no actually it doesn't.
-
-
---=-34dSXzycV0LBKz+SA5yC
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEErCspvTSmr92z9o8157/I7JWGEQkFAli0MoAACgkQ57/I7JWG
-EQnf9xAAsrFofDAMb/8Y7FdR1SB9TyigTo5kslryzW1w9ge3wdkEst3DCrXIuAJg
-rYlVL4Rlu+kvW8tQExD345wZKNbVZ1vkaviJfr7mqHP+EHRlyJR3qVlpZMsnSuZm
-ZwhaB+J3Nl6jMo7G9nj4+YGa8smPWANwj3svFuuZv+VHSXipsIzYDKjWsjE9F2xs
-cX3T2ESaUV7yGKGiMiGyQN7LOMyPawNuKYGxq3g9B8rfS/twEd3CD/uA+99rftsZ
-ycwwSIzlulBUKbie9bv/5tZ/Jkt9x8/iF3iun87AJYUSaiwv9S+iUbhQJDx2cpm4
-LAC4DXBsQllfEjKQCFaZZ8NnkRM5VYGinNvVy69gv/Q/iXQWaqVFqcrnFw+pW5u9
-EUzdz2H4ebhXJM0pi+pUowJKH6e8ySrLAbkY1CqcCJno5IvpUR2YhLJp3Gq/CElZ
-D8rlWNaY7NTPddckwLNh1AYZpVF31AIkFDFxSG9A5xTudyPmP1j8gA/MS1DLiH7b
-xe5i7qdYeR5noHgc5CqM7SPCqUHSv2rbaCDbdC8oAfSxVK2mGPMcurOcz6rhrf07
-Mot8XYtGglXs+VnQFxSX0I+brqw5TDEHPAaa89VuwoFbxaABpGWkRwOpED1mTCSM
-sWEe1LEReCMYKF/oQygec5jhf2QhWKMKgXZjo7CVDV+ljYzHm1o=
-=UfrQ
------END PGP SIGNATURE-----
-
---=-34dSXzycV0LBKz+SA5yC--
+Regards,
+Nicolas
