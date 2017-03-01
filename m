@@ -1,56 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f67.google.com ([74.125.82.67]:34841 "EHLO
-        mail-wm0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751452AbdB1V6l (ORCPT
+Received: from helcar.hengli.com.au ([209.40.204.226]:41925 "EHLO
+        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1750778AbdCAF5i (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 28 Feb 2017 16:58:41 -0500
+        Wed, 1 Mar 2017 00:57:38 -0500
+Date: Wed, 1 Mar 2017 12:52:41 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v8 08/11] cryptouser.h: fix include from userland
+Message-ID: <20170301045241.GB9156@gondor.apana.org.au>
+References: <20170228024844.GA28691@altlinux.org>
+ <1488314857-28327-1-git-send-email-nicolas.dichtel@6wind.com>
+ <1488314857-28327-9-git-send-email-nicolas.dichtel@6wind.com>
 MIME-Version: 1.0
-In-Reply-To: <CAE40pdenVkk-JerdB905nyupoDDPiQk9qv4p1Jv62kcj3-dKhQ@mail.gmail.com>
-References: <20161216105634.235457-1-arnd@arndb.de> <20161216105634.235457-12-arnd@arndb.de>
- <CAE40pdenVkk-JerdB905nyupoDDPiQk9qv4p1Jv62kcj3-dKhQ@mail.gmail.com>
-From: Brendan Gregg <brendan.d.gregg@gmail.com>
-Date: Tue, 28 Feb 2017 13:53:10 -0800
-Message-ID: <CAE40pde6EcxiJtD627FVxRzjPADWXv2L7v8K2uUPvzmhC4JPYg@mail.gmail.com>
-Subject: Re: [PATCH 11/13] fs: fix unsigned enum warning with gcc-4.2
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1488314857-28327-9-git-send-email-nicolas.dichtel@6wind.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, linux-arm-kernel@vger.kernel.org, Russell King <rmk+kernel@armlinux.org.uk>, Andrew Morton <akpm@linux-foundation.org>, kernel-build-reports@lists.linaro.org, kvmarm@lists.cs.columbia.edu
+To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Cc: arnd@arndb.de, mmarek@suse.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, airlied@linux.ie, davem@davemloft.net, linux@armlinux.org.uk, bp@alien8.de, slash.tmp@free.fr, daniel.vetter@ffwll.ch, rmk+kernel@armlinux.org.uk, msalter@redhat.com, jengelh@inai.de, hch@infradead.org, tklauser@distanz.ch, mpe@ellerman.id.au, mingo@kernel.org, tglx@linutronix.de, ldv@altlinux.org, linux-rdma@vger.kernel.org
 
-On Tue, Jan 3, 2017 at 2:47 PM, Brendan Gregg <brendan.d.gregg@gmail.com> wrote:
->
-> On Fri, Dec 16, 2016 at 2:56 AM, Arnd Bergmann <arnd@arndb.de> wrote:
-> >
-> > With arm-linux-gcc-4.2, almost every file we build in the kernel ends
-> > up with this warning:
-> >
-> > include/linux/fs.h:2648: warning: comparison of unsigned expression < 0 is always false
-> >
->
-> Thanks, I'd like to see this fixed as a similar warning gets printed
-> whenever running many of the bcc/BPF tools, which gets annoying and is
-> user-visible. eg:
->
-> # /usr/share/bcc/tools/xfsslower 1
-> In file included from /virtual/main.c:3:
-> /lib/modules/4.8.6-300.fc25.x86_64/build/include/linux/fs.h:2677:9:
-> warning: comparison of unsigned enum expression < 0 is always false
-> [-Wtautological-compare]
->         if (id < 0 || id >= READING_MAX_ID)
->             ~~ ^ ~
-> 1 warning generated.
-> Tracing XFS operations slower than 1 ms
-> TIME     COMM           PID    T BYTES   OFF_KB   LAT(ms) FILENAME
-> 14:44:27 cksum          4414   R 65536   0           1.02 chcon
-> 14:44:27 cksum          4414   R 65536   0           1.20 cpio
-> 14:44:27 cksum          4414   R 65536   0           1.01 diff
-> 14:44:27 cksum          4414   R 65536   0           1.15 dir
-> [...]
->
-> This patch fixes the warning.
->
+On Tue, Feb 28, 2017 at 09:47:34PM +0100, Nicolas Dichtel wrote:
+> This patch prepares the uapi export by fixing the following error:
+> 
+> .../linux/cryptouser.h:58:16: error: ‘CRYPTO_MAX_ALG_NAME’ undeclared here (not in a function)
+>   char cru_name[CRYPTO_MAX_ALG_NAME];
+> 
+> Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+> ---
+>  include/linux/crypto.h          | 2 +-
+>  include/uapi/linux/cryptouser.h | 7 +++++++
+>  2 files changed, 8 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+> index c0b0cf3d2d2f..4cf29a35bb4b 100644
+> --- a/include/linux/crypto.h
+> +++ b/include/linux/crypto.h
+> @@ -24,6 +24,7 @@
+>  #include <linux/slab.h>
+>  #include <linux/string.h>
+>  #include <linux/uaccess.h>
+> +#include <uapi/linux/cryptouser.h>
 
-What's the status of this patch? I still get these warnings on latest. Thanks,
+Nack.  cryptouser is just one interface in the crypto API.  It
+should not be included by every single crypto user in the kernel.
 
-Brendan
+You could perhaps introduce a new file under uapi just for this.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
