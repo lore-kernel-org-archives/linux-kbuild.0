@@ -1,55 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:41925 "EHLO
-        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1750778AbdCAF5i (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 1 Mar 2017 00:57:38 -0500
-Date: Wed, 1 Mar 2017 12:52:41 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v8 08/11] cryptouser.h: fix include from userland
-Message-ID: <20170301045241.GB9156@gondor.apana.org.au>
-References: <20170228024844.GA28691@altlinux.org>
- <1488314857-28327-1-git-send-email-nicolas.dichtel@6wind.com>
- <1488314857-28327-9-git-send-email-nicolas.dichtel@6wind.com>
+Received: from foss.arm.com ([217.140.101.70]:55130 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752661AbdCBEOv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 1 Mar 2017 23:14:51 -0500
+Date: Thu, 2 Mar 2017 04:05:40 +0000
+From: Will Deacon <will.deacon@arm.com>
+Subject: Re: [PATCH v2] staging: mkspec: added aarch64 ifarch case.
+Message-ID: <20170302040539.GB15590@arm.com>
+References: <20170301172414.GA29242@mtbu-fae-softiron1.internal.tilera.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1488314857-28327-9-git-send-email-nicolas.dichtel@6wind.com>
+In-Reply-To: <20170301172414.GA29242@mtbu-fae-softiron1.internal.tilera.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Cc: arnd@arndb.de, mmarek@suse.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, airlied@linux.ie, davem@davemloft.net, linux@armlinux.org.uk, bp@alien8.de, slash.tmp@free.fr, daniel.vetter@ffwll.ch, rmk+kernel@armlinux.org.uk, msalter@redhat.com, jengelh@inai.de, hch@infradead.org, tklauser@distanz.ch, mpe@ellerman.id.au, mingo@kernel.org, tglx@linutronix.de, ldv@altlinux.org, linux-rdma@vger.kernel.org
+To: James Tau <jtau@mellanox.com>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, mmarek@suse.com, catalin.marinas@arm.com, cmetcalf@mellanox.com
 
-On Tue, Feb 28, 2017 at 09:47:34PM +0100, Nicolas Dichtel wrote:
-> This patch prepares the uapi export by fixing the following error:
+On Wed, Mar 01, 2017 at 09:24:14AM -0800, James Tau wrote:
+> Patch attempting to fix native 'make rpm' build on ARM64 machines by adding an
+> "ifarch aarch64" case.  Without it, build fails because the 'cp ...' in the
+> default case can't find the built image.
 > 
-> .../linux/cryptouser.h:58:16: error: ‘CRYPTO_MAX_ALG_NAME’ undeclared here (not in a function)
->   char cru_name[CRYPTO_MAX_ALG_NAME];
-> 
-> Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+> Signed-off-by: James Tau <jtau@mellanox.com>
 > ---
->  include/linux/crypto.h          | 2 +-
->  include/uapi/linux/cryptouser.h | 7 +++++++
->  2 files changed, 8 insertions(+), 1 deletion(-)
-> 
-> diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-> index c0b0cf3d2d2f..4cf29a35bb4b 100644
-> --- a/include/linux/crypto.h
-> +++ b/include/linux/crypto.h
-> @@ -24,6 +24,7 @@
->  #include <linux/slab.h>
->  #include <linux/string.h>
->  #include <linux/uaccess.h>
-> +#include <uapi/linux/cryptouser.h>
+>  scripts/package/mkspec | 4 ++++
+>  1 file changed, 4 insertions(+)
 
-Nack.  cryptouser is just one interface in the crypto API.  It
-should not be included by every single crypto user in the kernel.
+Is this the same issue that was fixed by:
 
-You could perhaps introduce a new file under uapi just for this.
+http://lkml.kernel.org/r/20161122213434.14788-1-mmarek@suse.com
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+?
+
+I was assuming that Michael was going to queue those, but I could be wrong.
+
+Will
