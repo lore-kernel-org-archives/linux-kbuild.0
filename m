@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from host.76.145.23.62.rev.coltfrance.com ([62.23.145.76]:37063 "EHLO
+Received: from host.76.145.23.62.rev.coltfrance.com ([62.23.145.76]:37074 "EHLO
         proxy.6wind.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752631AbdCBR0O (ORCPT
+        with ESMTP id S1752674AbdCBRz2 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 2 Mar 2017 12:26:14 -0500
+        Thu, 2 Mar 2017 12:55:28 -0500
 From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Subject: [PATCH v9 04/11] Makefile.headersinst: cleanup input files
-Date: Thu,  2 Mar 2017 17:56:35 +0100
-Message-Id: <1488473802-13354-5-git-send-email-nicolas.dichtel@6wind.com>
+Subject: [PATCH v9 09/11] smc_diag.h: fix include from userland
+Date: Thu,  2 Mar 2017 17:56:40 +0100
+Message-Id: <1488473802-13354-10-git-send-email-nicolas.dichtel@6wind.com>
 In-Reply-To: <1488473802-13354-1-git-send-email-nicolas.dichtel@6wind.com>
 References: <20170301045241.GB9156@gondor.apana.org.au>
  <1488473802-13354-1-git-send-email-nicolas.dichtel@6wind.com>
@@ -16,74 +16,63 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: arnd@arndb.de, mmarek@suse.com
 Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, airlied@linux.ie, davem@davemloft.net, linux@armlinux.org.uk, bp@alien8.de, slash.tmp@free.fr, daniel.vetter@ffwll.ch, rmk+kernel@armlinux.org.uk, msalter@redhat.com, jengelh@inai.de, hch@infradead.org, tklauser@distanz.ch, mpe@ellerman.id.au, mingo@kernel.org, tglx@linutronix.de, ldv@altlinux.org, nicolas.dichtel@6wind.com, herbert@gondor.apana.org.au, linux-rdma@vger.kernel.org
 
-After the last four patches, all exported headers are under uapi/, thus
-input-files2 are not needed anymore.
-The side effect is that input-files1-name is exactly header-y.
+This patch prepares the uapi export by fixing the following error:
 
-Note also that input-files3-name is genhdr-y.
+.../linux/smc_diag.h:6:27: fatal error: rdma/ib_verbs.h: No such file or directory
+ #include <rdma/ib_verbs.h>
 
 Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
 ---
- scripts/Makefile.headersinst | 34 +++++++++++-----------------------
- 1 file changed, 11 insertions(+), 23 deletions(-)
+ include/rdma/ib_verbs.h           | 3 +--
+ include/uapi/linux/smc_diag.h     | 2 +-
+ include/uapi/rdma/ib_user_verbs.h | 2 ++
+ 3 files changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/scripts/Makefile.headersinst b/scripts/Makefile.headersinst
-index 1106d6ca3a38..3e20d03432d2 100644
---- a/scripts/Makefile.headersinst
-+++ b/scripts/Makefile.headersinst
-@@ -40,31 +40,20 @@ wrapper-files := $(filter $(header-y), $(generic-y))
- srcdir        := $(srctree)/$(obj)
- gendir        := $(objtree)/$(gen)
+diff --git a/include/rdma/ib_verbs.h b/include/rdma/ib_verbs.h
+index 0f1813c13687..50f276a4afdc 100644
+--- a/include/rdma/ib_verbs.h
++++ b/include/rdma/ib_verbs.h
+@@ -61,6 +61,7 @@
+ #include <linux/mmu_notifier.h>
+ #include <linux/uaccess.h>
+ #include <linux/cgroup_rdma.h>
++#include <uapi/rdma/ib_user_verbs.h>
  
--oldsrcdir     := $(srctree)/$(subst /uapi,,$(obj))
+ extern struct workqueue_struct *ib_wq;
+ extern struct workqueue_struct *ib_comp_wq;
+@@ -1838,8 +1839,6 @@ enum ib_mad_result {
+ 	IB_MAD_RESULT_CONSUMED = 1 << 2  /* Packet consumed: stop processing */
+ };
+ 
+-#define IB_DEVICE_NAME_MAX 64
 -
- # all headers files for this dir
- header-y      := $(filter-out $(generic-y), $(header-y))
- all-files     := $(header-y) $(genhdr-y) $(wrapper-files)
- output-files  := $(addprefix $(installdir)/, $(all-files))
+ struct ib_port_cache {
+ 	struct ib_pkey_cache  *pkey;
+ 	struct ib_gid_table   *gid;
+diff --git a/include/uapi/linux/smc_diag.h b/include/uapi/linux/smc_diag.h
+index 0063919fea34..87712bfaa9dd 100644
+--- a/include/uapi/linux/smc_diag.h
++++ b/include/uapi/linux/smc_diag.h
+@@ -3,7 +3,7 @@
  
--input-files1  := $(foreach hdr, $(header-y), \
--		   $(if $(wildcard $(srcdir)/$(hdr)), \
--			$(wildcard $(srcdir)/$(hdr))) \
--		   )
--input-files1-name := $(notdir $(input-files1))
--input-files2  := $(foreach hdr, $(header-y), \
--		   $(if  $(wildcard $(srcdir)/$(hdr)),, \
--			$(if $(wildcard $(oldsrcdir)/$(hdr)), \
--				$(wildcard $(oldsrcdir)/$(hdr)), \
--				$(error Missing UAPI file $(srcdir)/$(hdr))) \
--		   ))
--input-files2-name := $(notdir $(input-files2))
--input-files3  := $(foreach hdr, $(genhdr-y), \
--		   $(if	$(wildcard $(gendir)/$(hdr)), \
--			$(wildcard $(gendir)/$(hdr)), \
--			$(error Missing generated UAPI file $(gendir)/$(hdr)) \
--		   ))
--input-files3-name := $(notdir $(input-files3))
-+# Check that all expected files exist
-+$(foreach hdr, $(header-y), \
-+  $(if $(wildcard $(srcdir)/$(hdr)),, \
-+       $(error Missing UAPI file $(srcdir)/$(hdr)) \
-+   ))
-+$(foreach hdr, $(genhdr-y), \
-+  $(if	$(wildcard $(gendir)/$(hdr)),, \
-+       $(error Missing generated UAPI file $(gendir)/$(hdr)) \
-+  ))
+ #include <linux/types.h>
+ #include <linux/inet_diag.h>
+-#include <rdma/ib_verbs.h>
++#include <rdma/ib_user_verbs.h>
  
- # Work out what needs to be removed
- oldheaders    := $(patsubst $(installdir)/%,%,$(wildcard $(installdir)/*.h))
-@@ -78,9 +67,8 @@ printdir = $(patsubst $(INSTALL_HDR_PATH)/%/,%,$(dir $@))
- quiet_cmd_install = INSTALL $(printdir) ($(words $(all-files))\
-                             file$(if $(word 2, $(all-files)),s))
-       cmd_install = \
--        $(CONFIG_SHELL) $< $(installdir) $(srcdir) $(input-files1-name); \
--        $(CONFIG_SHELL) $< $(installdir) $(oldsrcdir) $(input-files2-name); \
--        $(CONFIG_SHELL) $< $(installdir) $(gendir) $(input-files3-name); \
-+        $(CONFIG_SHELL) $< $(installdir) $(srcdir) $(header-y); \
-+        $(CONFIG_SHELL) $< $(installdir) $(gendir) $(genhdr-y); \
-         for F in $(wrapper-files); do                                   \
-                 echo "\#include <asm-generic/$$F>" > $(installdir)/$$F;    \
-         done;                                                           \
+ /* Request structure */
+ struct smc_diag_req {
+diff --git a/include/uapi/rdma/ib_user_verbs.h b/include/uapi/rdma/ib_user_verbs.h
+index 997f904c7692..8edce2b65903 100644
+--- a/include/uapi/rdma/ib_user_verbs.h
++++ b/include/uapi/rdma/ib_user_verbs.h
+@@ -1124,4 +1124,6 @@ struct ib_uverbs_ex_destroy_rwq_ind_table  {
+ 	__u32 ind_tbl_handle;
+ };
+ 
++#define IB_DEVICE_NAME_MAX 64
++
+ #endif /* IB_USER_VERBS_H */
 -- 
 2.8.1
 
