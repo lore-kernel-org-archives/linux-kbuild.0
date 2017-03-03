@@ -1,36 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from helcar.hengli.com.au ([209.40.204.226]:56763 "EHLO
-        helcar.apana.org.au" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1751340AbdCCJ6E (ORCPT
+Received: from mail-wr0-f173.google.com ([209.85.128.173]:34006 "EHLO
+        mail-wr0-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751733AbdCCRRx (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 3 Mar 2017 04:58:04 -0500
-Date: Fri, 3 Mar 2017 17:35:38 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v9 08/11] cryptouser.h: fix include from userland
-Message-ID: <20170303093538.GA26163@gondor.apana.org.au>
+        Fri, 3 Mar 2017 12:17:53 -0500
+Received: by mail-wr0-f173.google.com with SMTP id l37so78144195wrc.1
+        for <linux-kbuild@vger.kernel.org>; Fri, 03 Mar 2017 09:17:20 -0800 (PST)
+Reply-To: nicolas.dichtel@6wind.com
+Subject: Re: [PATCH v9 00/11] uapi: export all headers under uapi directories
 References: <20170301045241.GB9156@gondor.apana.org.au>
  <1488473802-13354-1-git-send-email-nicolas.dichtel@6wind.com>
- <1488473802-13354-9-git-send-email-nicolas.dichtel@6wind.com>
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Message-ID: <152f560b-c583-4aa4-a913-42c18a3cbd5f@6wind.com>
+Date: Fri, 3 Mar 2017 18:07:41 +0100
 MIME-Version: 1.0
+In-Reply-To: <1488473802-13354-1-git-send-email-nicolas.dichtel@6wind.com>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <1488473802-13354-9-git-send-email-nicolas.dichtel@6wind.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Cc: arnd@arndb.de, mmarek@suse.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, airlied@linux.ie, davem@davemloft.net, linux@armlinux.org.uk, bp@alien8.de, slash.tmp@free.fr, daniel.vetter@ffwll.ch, rmk+kernel@armlinux.org.uk, msalter@redhat.com, jengelh@inai.de, hch@infradead.org, tklauser@distanz.ch, mpe@ellerman.id.au, mingo@kernel.org, tglx@linutronix.de, ldv@altlinux.org, linux-rdma@vger.kernel.org
+To: arnd@arndb.de, mmarek@suse.com
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, airlied@linux.ie, davem@davemloft.net, linux@armlinux.org.uk, bp@alien8.de, slash.tmp@free.fr, daniel.vetter@ffwll.ch, rmk+kernel@armlinux.org.uk, msalter@redhat.com, jengelh@inai.de, hch@infradead.org, tklauser@distanz.ch, mpe@ellerman.id.au, mingo@kernel.org, tglx@linutronix.de, ldv@altlinux.org, herbert@gondor.apana.org.au, linux-rdma@vger.kernel.org, Stephen Rothwell <sfr@canb.auug.org.au>
 
-On Thu, Mar 02, 2017 at 05:56:39PM +0100, Nicolas Dichtel wrote:
-> This patch prepares the uapi export by fixing the following error:
+Le 02/03/2017 à 17:56, Nicolas Dichtel a écrit :
+> Patches #1 and #2 are just cleanup: some exported headers were still under
+> a non-uapi directory. Patch #3 is a fix to avoid exporting a file that was
+> not under an uapi directory.
+> After these three patches, all exported headers are under an uapi directory:
+> path #4 stops searching files in non uapi directories.
+> The patch #5 was spotted by code review: there is no in-tree user of this
+> functionality.
+> Patch #6 fixes some warnings/errors reported by 0-day tests.
+> Patch #7 to #9 fix some errors when the corresponding files are included by
+> userland.
+> Patches #10 and #11 remove the need to list explicitly headers. Now all files
+> under an uapi directory are exported.
 > 
-> .../linux/cryptouser.h:58:16: error: ‘CRYPTO_MAX_ALG_NAME’ undeclared here (not in a function)
->   char cru_name[CRYPTO_MAX_ALG_NAME];
+> This series has been tested with a 'make headers_install' on x86 and a
+> 'make headers_install_all'. I've checked the result of both commands.
 > 
-> Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+> This patch is built against linus tree. If I must rebase it against the kbuild
+> tree, just tell me.
+> Michal, is this series going through your tree?
+I'm a bit pushy on this, but it would be nice to get this series in before the
+rc1. In fact, it would certainly be better to have this living some times in
+-next, but it would probably generate a lot of conflicts in linux-next. OTOH
+those conflicts would be easy to solve.
 
-Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+
+Regards,
+Nicolas
