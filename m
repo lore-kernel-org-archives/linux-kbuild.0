@@ -1,70 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from vmicros1.altlinux.org ([194.107.17.57]:44986 "EHLO
-        vmicros1.altlinux.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933000AbdCJQZY (ORCPT
+Received: from mail-wr0-f179.google.com ([209.85.128.179]:32837 "EHLO
+        mail-wr0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755104AbdCJQe3 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 10 Mar 2017 11:25:24 -0500
-Date: Fri, 10 Mar 2017 19:24:18 +0300
-From: Gleb Fotengauer-Malinovskiy <glebfm@altlinux.org>
-Subject: [PATCH] jump label: fix passing kbuild_cflags when checking for asm
- goto support
-Message-ID: <20170310162411.GA18175@glebfm.cloud.tilaa.com>
+        Fri, 10 Mar 2017 11:34:29 -0500
+Received: by mail-wr0-f179.google.com with SMTP id u48so68333267wrc.0
+        for <linux-kbuild@vger.kernel.org>; Fri, 10 Mar 2017 08:34:27 -0800 (PST)
+Reply-To: nicolas.dichtel@6wind.com
+Subject: Re: [PATCH v9 00/11] uapi: export all headers under uapi directories
+References: <20170301045241.GB9156@gondor.apana.org.au>
+ <1488473802-13354-1-git-send-email-nicolas.dichtel@6wind.com>
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Message-ID: <3df45ecc-1aa0-a029-d7e5-2598f0908874@6wind.com>
+Date: Fri, 10 Mar 2017 17:34:18 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+In-Reply-To: <1488473802-13354-1-git-send-email-nicolas.dichtel@6wind.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: David Lin <dtwlin@google.com>, Steven Rostedt <rostedt@goodmis.org>, "Anton V. Boyarshinov" <boyarsh@altlinux.org>, "Dmitry V. Levin" <ldv@altlinux.org>, Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: arnd@arndb.de, mmarek@suse.com
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, airlied@linux.ie, davem@davemloft.net, linux@armlinux.org.uk, bp@alien8.de, slash.tmp@free.fr, daniel.vetter@ffwll.ch, rmk+kernel@armlinux.org.uk, msalter@redhat.com, jengelh@inai.de, hch@infradead.org, tklauser@distanz.ch, mpe@ellerman.id.au, mingo@kernel.org, tglx@linutronix.de, ldv@altlinux.org, herbert@gondor.apana.org.au, linux-rdma@vger.kernel.org
 
-The latest change of asm goto support check added passing of
-KBUILD_CFLAGS to compiler.  When these flags reference gcc plugins,
-there is a race condition between the build of these plugins and their
-use in this asm goto support check.
+Le 02/03/2017 à 17:56, Nicolas Dichtel a écrit :
+> Patches #1 and #2 are just cleanup: some exported headers were still under
+> a non-uapi directory. Patch #3 is a fix to avoid exporting a file that was
+> not under an uapi directory.
+> After these three patches, all exported headers are under an uapi directory:
+> path #4 stops searching files in non uapi directories.
+> The patch #5 was spotted by code review: there is no in-tree user of this
+> functionality.
+> Patch #6 fixes some warnings/errors reported by 0-day tests.
+> Patch #7 to #9 fix some errors when the corresponding files are included by
+> userland.
+> Patches #10 and #11 remove the need to list explicitly headers. Now all files
+> under an uapi directory are exported.
+> 
+> This series has been tested with a 'make headers_install' on x86 and a
+> 'make headers_install_all'. I've checked the result of both commands.
+> 
+> This patch is built against linus tree. If I must rebase it against the kbuild
+> tree, just tell me.
+> Michal, is this series going through your tree?
+Still waiting to know who may take this series in its tree ;-)
+kbuild tree has not been updated since two months (4.10-rc1) :/
 
-This change moves the check before all these references are added
-to KBUILD_CFLAGS.  This is correct because subsequent KBUILD_CFLAGS
-modifications are not relevant to this check.
 
-Reported-by: Anton V. Boyarshinov <boyarsh@altlinux.org>
-Fixes: 35f860f9ba6a ("jump label: pass kbuild_cflags when checking for asm goto support")
-Cc: stable@vger.kernel.org	# v4.10
-Signed-off-by: Gleb Fotengauer-Malinovskiy <glebfm@altlinux.org>
-Signed-off-by: Dmitry V. Levin <ldv@altlinux.org>
----
- Makefile | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 165cf97..7e3aade 100644
---- a/Makefile
-+++ b/Makefile
-@@ -653,6 +653,12 @@ KBUILD_CFLAGS += $(call cc-ifversion, -lt, 0409, \
- # Tell gcc to never replace conditional load with a non-conditional one
- KBUILD_CFLAGS	+= $(call cc-option,--param=allow-store-data-races=0)
- 
-+# check for 'asm goto'
-+ifeq ($(shell $(CONFIG_SHELL) $(srctree)/scripts/gcc-goto.sh $(CC) $(KBUILD_CFLAGS)), y)
-+	KBUILD_CFLAGS += -DCC_HAVE_ASM_GOTO
-+	KBUILD_AFLAGS += -DCC_HAVE_ASM_GOTO
-+endif
-+
- include scripts/Makefile.gcc-plugins
- 
- ifdef CONFIG_READABLE_ASM
-@@ -798,12 +804,6 @@ KBUILD_CFLAGS   += $(call cc-option,-Werror=incompatible-pointer-types)
- # use the deterministic mode of AR if available
- KBUILD_ARFLAGS := $(call ar-option,D)
- 
--# check for 'asm goto'
--ifeq ($(shell $(CONFIG_SHELL) $(srctree)/scripts/gcc-goto.sh $(CC) $(KBUILD_CFLAGS)), y)
--	KBUILD_CFLAGS += -DCC_HAVE_ASM_GOTO
--	KBUILD_AFLAGS += -DCC_HAVE_ASM_GOTO
--endif
--
- include scripts/Makefile.kasan
- include scripts/Makefile.extrawarn
- include scripts/Makefile.ubsan
-
--- 
-glebfm
+Regards,
+Nicolas
