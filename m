@@ -1,48 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-10.nifty.com ([210.131.2.77]:48924 "EHLO
-        conuserg-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932097AbdCJBpf (ORCPT
+Received: from mailout4.samsung.com ([203.254.224.34]:38656 "EHLO
+        mailout4.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751762AbdCJCBF (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 9 Mar 2017 20:45:35 -0500
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] MAINTAINERS: add Masahiro Yamada as a Kbuild maintainer
-Date: Fri, 10 Mar 2017 10:41:50 +0900
-Message-Id: <1489110110-9723-1-git-send-email-yamada.masahiro@socionext.com>
+        Thu, 9 Mar 2017 21:01:05 -0500
+From: Seung-Woo Kim <sw0312.kim@samsung.com>
+Subject: [RESEND][PATCH] Kbuild: fix file name in comment about extra gcc checks
+Date: Fri, 10 Mar 2017 11:01:00 +0900
+Message-id: <1489111260-5458-1-git-send-email-sw0312.kim@samsung.com>
+References: <CGME20170310020057epcas5p228e45982244ea0d7fd1e36a0620d0768@epcas5p2.samsung.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Michal Marek <mmarek@suse.com>, linux-kernel@vger.kernel.org, Stephen Rothwell <sfr@canb.auug.org.au>, Linus Torvalds <torvalds@linux-foundation.org>, Masahiro Yamada <yamada.masahiro@socionext.com>
+To: mmarek@suse.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, torvalds@linux-foundation.org
+Cc: sw0312.kim@samsung.com
 
-It has been difficult lately for Michal to work on Kbuild on his
-regular basis.  We discussed the maintainership of Kbuild, and I
-decided to be a co-maintainer.
+Extra gcc checks like W=1 were moved to scripts/Makefile.exrawarn,
+so the file name in comment needs to be fixed.
 
-Add myself to the maintainer field, and replace the repository with
-my own.
-
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-Acked-by: Michal Marek <mmarek@suse.com>
+Signed-off-by: Seung-Woo Kim <sw0312.kim@samsung.com>
 ---
+ Makefile |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
 
- MAINTAINERS | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index c265a5f..f1023c5 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -7084,9 +7084,9 @@ S:	Maintained
- F:	fs/autofs4/
+diff --git a/Makefile b/Makefile
+index 165cf97..faa9d26 100644
+--- a/Makefile
++++ b/Makefile
+@@ -707,7 +707,7 @@ KBUILD_CFLAGS += $(call cc-option, -fcatch-undefined-behavior)
+ else
  
- KERNEL BUILD + files below scripts/ (unless maintained elsewhere)
-+M:	Masahiro Yamada <yamada.masahiro@socionext.com>
- M:	Michal Marek <mmarek@suse.com>
--T:	git git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git for-next
--T:	git git://git.kernel.org/pub/scm/linux/kernel/git/mmarek/kbuild.git rc-fixes
-+T:	git git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
- L:	linux-kbuild@vger.kernel.org
- S:	Maintained
- F:	Documentation/kbuild/
+ # These warnings generated too much noise in a regular build.
+-# Use make W=1 to enable them (see scripts/Makefile.build)
++# Use make W=1 to enable them (see scripts/Makefile.extrawarn)
+ KBUILD_CFLAGS += $(call cc-disable-warning, unused-but-set-variable)
+ KBUILD_CFLAGS += $(call cc-disable-warning, unused-const-variable)
+ endif
 -- 
-2.7.4
+1.7.4.1
 
