@@ -1,57 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-yw0-f176.google.com ([209.85.161.176]:35940 "EHLO
-        mail-yw0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932769AbdCJSa7 (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 10 Mar 2017 13:30:59 -0500
-Received: by mail-yw0-f176.google.com with SMTP id o4so29052723ywd.3
-        for <linux-kbuild@vger.kernel.org>; Fri, 10 Mar 2017 10:30:58 -0800 (PST)
+Received: from mx2.suse.de ([195.135.220.15]:60485 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1755361AbdCJVUv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 10 Mar 2017 16:20:51 -0500
+Subject: Re: [PATCH 1/6] arm64: Use full path in KBUILD_IMAGE definition
+References: <20161122213434.14788-1-mmarek@suse.com>
+ <20170310175854.GE18894@arm.com>
+From: Michal Marek <mmarek@suse.com>
+Message-ID: <ba676afc-d52c-5f79-1794-2b751054bf53@suse.com>
+Date: Fri, 10 Mar 2017 22:20:43 +0100
 MIME-Version: 1.0
-In-Reply-To: <20170310175536.GX27556@glebfm.cloud.tilaa.com>
-References: <20170310162411.GA18175@glebfm.cloud.tilaa.com>
- <20170310120422.14e19269@gandalf.local.home> <20170310173952.GW27556@glebfm.cloud.tilaa.com>
- <20170310124210.5f52305f@gandalf.local.home> <20170310175536.GX27556@glebfm.cloud.tilaa.com>
-From: David Lin <dtwlin@google.com>
-Date: Fri, 10 Mar 2017 10:30:27 -0800
-Message-ID: <CAPzFB+UycD0_zx419BaX8F0xDV9yxZggRzSzf03dd6MMtEQSwA@mail.gmail.com>
-Subject: Re: [PATCH v2] jump label: fix passing kbuild_cflags when checking
- for asm goto support
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20170310175854.GE18894@arm.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Gleb Fotengauer-Malinovskiy <glebfm@altlinux.org>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Steven Rostedt <rostedt@goodmis.org>, "Anton V. Boyarshinov" <boyarsh@altlinux.org>, "Dmitry V. Levin" <ldv@altlinux.org>, Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>
+To: Will Deacon <will.deacon@arm.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, linux-arm-kernel@lists.infradead.org
 
-On Fri, Mar 10, 2017 at 9:55 AM, Gleb Fotengauer-Malinovskiy
-<glebfm@altlinux.org> wrote:
->
-> The latest change of asm goto support check added passing of KBUILD_CFLAGS
-> to compiler.  When these flags reference gcc plugins that are not built yet,
-> the check fails.
->
-> When one runs "make bzImage" followed by "make modules", the kernel is always
-> built with HAVE_JUMP_LABEL disabled, while the modules are built depending on
-> CONFIG_JUMP_LABEL.  If HAVE_JUMP_LABEL macro happens to be different, modules
-> are built with undefined references, e.g.:
->
-> ERROR: "static_key_slow_inc" [net/netfilter/xt_TEE.ko] undefined!
-> ERROR: "static_key_slow_dec" [net/netfilter/xt_TEE.ko] undefined!
-> ERROR: "static_key_slow_dec" [net/netfilter/nft_meta.ko] undefined!
-> ERROR: "static_key_slow_inc" [net/netfilter/nft_meta.ko] undefined!
-> ERROR: "nf_hooks_needed" [net/netfilter/ipvs/ip_vs.ko] undefined!
-> ERROR: "nf_hooks_needed" [net/ipv6/ipv6.ko] undefined!
-> ERROR: "static_key_count" [net/ipv6/ipv6.ko] undefined!
-> ERROR: "static_key_slow_inc" [net/ipv6/ipv6.ko] undefined!
->
-> This change moves the check before all these references are added
-> to KBUILD_CFLAGS.  This is correct because subsequent KBUILD_CFLAGS
-> modifications are not relevant to this check.
->
-> Reported-by: Anton V. Boyarshinov <boyarsh@altlinux.org>
-> Fixes: 35f860f9ba6a ("jump label: pass kbuild_cflags when checking for asm goto support")
-> Cc: stable@vger.kernel.org      # v4.10
-> Signed-off-by: Gleb Fotengauer-Malinovskiy <glebfm@altlinux.org>
-> Signed-off-by: Dmitry V. Levin <ldv@altlinux.org>
-> ---
+Dne 10.3.2017 v 18:58 Will Deacon napsal(a):
+> Hi Michael,
+> 
+> On Tue, Nov 22, 2016 at 10:34:29PM +0100, Michal Marek wrote:
+>> The KBUILD_IMAGE variable is used by the rpm and deb-pkg targets, which
+>> expect it to point to the image file in the build directory. The
+>> builddeb script has a workaround for architectures which only provide
+>> the basename, but let's provide a clean interface for packaging tools.
+>>
+>> Cc: Catalin Marinas <catalin.marinas@arm.com>
+>> Cc: Will Deacon <will.deacon@arm.com>
+>> Cc: linux-arm-kernel@lists.infradead.org
+>> Signed-off-by: Michal Marek <mmarek@suse.com>
+>> ---
+>>  arch/arm64/Makefile | 6 +++---
+>>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> What's the plan for this patch? I'm happy to merge it,
 
-Acked-by: David Lin <dtwlin@google.com>
+Great, please merge it.
+
+
+> but I don't see
+> the rest of the series queued anywhere.
+
+I'll see what remains and submit the rest via the kbuild tree.
+
+Thanks,
+Michal
