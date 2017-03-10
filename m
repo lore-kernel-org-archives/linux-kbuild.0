@@ -1,40 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mailout4.samsung.com ([203.254.224.34]:38656 "EHLO
-        mailout4.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751762AbdCJCBF (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:33091 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750781AbdCJCHL (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 9 Mar 2017 21:01:05 -0500
-From: Seung-Woo Kim <sw0312.kim@samsung.com>
-Subject: [RESEND][PATCH] Kbuild: fix file name in comment about extra gcc checks
-Date: Fri, 10 Mar 2017 11:01:00 +0900
-Message-id: <1489111260-5458-1-git-send-email-sw0312.kim@samsung.com>
-References: <CGME20170310020057epcas5p228e45982244ea0d7fd1e36a0620d0768@epcas5p2.samsung.com>
+        Thu, 9 Mar 2017 21:07:11 -0500
+MIME-Version: 1.0
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Fri, 10 Mar 2017 11:07:06 +0900
+Message-ID: <CAK7LNASmP6bsQcru5XoqgxsuznjK0JMwff96TRn3F_=hOUU6qA@mail.gmail.com>
+Subject: Kbuild maintainership
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: mmarek@suse.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, torvalds@linux-foundation.org
-Cc: sw0312.kim@samsung.com
+To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: masahiroy@kernel.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Stephen Rothwell <sfr@canb.auug.org.au>, Linus Torvalds <torvalds@linux-foundation.org>
 
-Extra gcc checks like W=1 were moved to scripts/Makefile.exrawarn,
-so the file name in comment needs to be fixed.
+Hello Kbuild contributors,
 
-Signed-off-by: Seung-Woo Kim <sw0312.kim@samsung.com>
----
- Makefile |    2 +-
- 1 files changed, 1 insertions(+), 1 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 165cf97..faa9d26 100644
---- a/Makefile
-+++ b/Makefile
-@@ -707,7 +707,7 @@ KBUILD_CFLAGS += $(call cc-option, -fcatch-undefined-behavior)
- else
- 
- # These warnings generated too much noise in a regular build.
--# Use make W=1 to enable them (see scripts/Makefile.build)
-+# Use make W=1 to enable them (see scripts/Makefile.extrawarn)
- KBUILD_CFLAGS += $(call cc-disable-warning, unused-but-set-variable)
- KBUILD_CFLAGS += $(call cc-disable-warning, unused-const-variable)
- endif
+As you may notice, Michal has been busy since the beginning
+of this year, and it has been getting difficult for him to
+work on Kbuild on his regular basis.
+
+Michal sent me an email a few days ago, and we discussed this locally.
+Then, I decided to be a new maintainer of Kbuild. [1]
+Michal will stay as a maintainer too, but Kbuild patches will be
+primarily collected by me from this development cycle.
+
+I know many developers are looking forward to their patches picked up.
+I will try my best to help the community, and I just started to take a look.
+So, please wait a little more.
+
+If you have urgent problems, please speak up!
+
+Thanks!
+
+
+[1] https://patchwork.kernel.org/patch/9614477/
+
 -- 
-1.7.4.1
-
+Best Regards
+Masahiro Yamada
