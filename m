@@ -1,47 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:60606 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S934844AbdCJK3p (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 10 Mar 2017 05:29:45 -0500
-MIME-Version: 1.0
-In-Reply-To: <132b313f-ac2d-be4d-8ab7-84b114041722@suse.com>
-References: <CAK7LNASmP6bsQcru5XoqgxsuznjK0JMwff96TRn3F_=hOUU6qA@mail.gmail.com>
- <dd914266-6ea1-3dd7-0531-0335bf3f723c@suse.com> <20170310201702.47b0a523@canb.auug.org.au>
- <132b313f-ac2d-be4d-8ab7-84b114041722@suse.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 10 Mar 2017 19:29:17 +0900
-Message-ID: <CAK7LNARSvhpvq2Tbhym+uxt-7pbz3h0s+p1V14bGe6gj8nLCMg@mail.gmail.com>
+Received: from ozlabs.org ([103.22.144.67]:47343 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S932991AbdCJJRL (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 10 Mar 2017 04:17:11 -0500
+Date: Fri, 10 Mar 2017 20:17:02 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
 Subject: Re: Kbuild maintainership
-Content-Type: text/plain; charset=UTF-8
+Message-ID: <20170310201702.47b0a523@canb.auug.org.au>
+In-Reply-To: <dd914266-6ea1-3dd7-0531-0335bf3f723c@suse.com>
+References: <CAK7LNASmP6bsQcru5XoqgxsuznjK0JMwff96TRn3F_=hOUU6qA@mail.gmail.com>
+        <dd914266-6ea1-3dd7-0531-0335bf3f723c@suse.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Michal Marek <mmarek@suse.com>
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, masahiroy@kernel.org, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>
 
 Hi Michal,
 
-
-2017-03-10 19:15 GMT+09:00 Michal Marek <mmarek@suse.com>:
-> On 2017-03-10 10:17, Stephen Rothwell wrote:
->> I assume that I will get a request to change the kbuild-current and
->> kbuilt trees in linux-next soon.  In the meantime, should I remove the
->> current ones?
+On Fri, 10 Mar 2017 09:48:44 +0100 Michal Marek <mmarek@suse.com> wrote:
 >
-> There is one genksyms fix in kbuild.git#kbuild which is not in mainline.
-> Masahiro, can you please pull it into your tree and give Stephen the url
-> and branches?
+> Dne 10.3.2017 v 03:07 Masahiro Yamada napsal(a):
+> > Hello Kbuild contributors,
+> > 
+> > 
+> > As you may notice, Michal has been busy since the beginning
+> > of this year, and it has been getting difficult for him to
+> > work on Kbuild on his regular basis.  
+> 
+> Yes, that's unfortunately the case.
+> 
+> 
+> > Michal sent me an email a few days ago, and we discussed this locally.
+> > Then, I decided to be a new maintainer of Kbuild. [1]  
+> 
+> Thanks a lot for this and I wish you good luck with this new challenge.
 
-I have been wondering how itshould be handled.
+I assume that I will get a request to change the kbuild-current and
+kbuilt trees in linux-next soon.  In the meantime, should I remove the
+current ones?
 
-(and I had already sent a question about this to your suse.com address.
-I am guessing it has not reached to you, yet.)
-
-
-I will pull the branch into the new repository.
-
-Thanks!
-
+No rush though since I am on leave next week.
 -- 
-Best Regards
-Masahiro Yamada
+Cheers,
+Stephen Rothwell
