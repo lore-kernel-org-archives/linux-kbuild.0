@@ -1,73 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:37624 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754908AbdCKNfE (ORCPT
+Received: from mail-qk0-f195.google.com ([209.85.220.195]:33967 "EHLO
+        mail-qk0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754980AbdCKX7H (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 11 Mar 2017 08:35:04 -0500
-MIME-Version: 1.0
-In-Reply-To: <20170222150833.83149-1-richard.weiyang@gmail.com>
-References: <20170222150833.83149-1-richard.weiyang@gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sat, 11 Mar 2017 22:34:50 +0900
-Message-ID: <CAK7LNATuG=RqghbmGrx99E95fFAbx9U8DUPp0XQtEO+fbBr-mA@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: strip the last slash in KBUILD_EXTMOD
-Content-Type: text/plain; charset=UTF-8
+        Sat, 11 Mar 2017 18:59:07 -0500
+From: Tom Rini <trini@konsulko.com>
+Subject: [PATCH] kbuild/mkspec: Fix architectures where KBUILD_IMAGE isn't a full path
+Date: Sat, 11 Mar 2017 23:59:22 +0000
+Message-Id: <1489276762-22280-1-git-send-email-trini@konsulko.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Wei Yang <richard.weiyang@gmail.com>
-Cc: Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.com>, linux-kernel@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will.deacon@arm.com>
 
-Hi Wei,
+On some architectures, such as arm64, KBUILD_IMAGE is not a full path
+but instead just the build target.  The builddeb script handles this
+case correctly today and will try arch/$ARCH/boot/$KBUILD_IMAGE so we
+can just borrow that logic and adapt it slightly for spec file syntax.
 
+Cc: Michal Marek <mmarek@suse.com>
+Cc: linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will.deacon@arm.com>
+Signed-off-by: Tom Rini <trini@konsulko.com>
+---
+It is currently a mixed-bag on if architectures will use a build target
+(arm, arm64, arc are certainly by inspection and a few others 'may') or
+a full path (x86, blackfin, s390).  Given that builddeb gets this case
+correct, I think changing mkspec is the right way to go here.
+---
+ scripts/package/mkspec | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-2017-02-23 0:08 GMT+09:00 Wei Yang <richard.weiyang@gmail.com>:
-> Current kbuild will build the target again if we run "make M=dir" and "make
-> M=dir/" by turns, since if_changed will see the prerequisite is changed.
-> The behavior may confuse the user a little, since actually we are building
-> the same target and no difference.
->
-> According to current implementation in scripts/Makefile.build, the obj
-> passed to next level is a directory name with last slash stripped. This
-> patch strips the last slash in KBUILD_EXTMOD which is assigned from "M=".
->
-> Signed-off-by: Wei Yang <richard.weiyang@gmail.com>
-> ---
->  Makefile | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
->
-> diff --git a/Makefile b/Makefile
-> index b1037774e8e8..db6ed60928ab 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -184,13 +184,15 @@ endif
->  # Old syntax make ... SUBDIRS=$PWD is still supported
->  # Setting the environment variable KBUILD_EXTMOD take precedence
->  ifdef SUBDIRS
-> -  KBUILD_EXTMOD ?= $(SUBDIRS)
-> +  __KBUILD_EXTMOD ?= $(SUBDIRS)
->  endif
->
->  ifeq ("$(origin M)", "command line")
-> -  KBUILD_EXTMOD := $(M)
-> +  __KBUILD_EXTMOD := $(M)
->  endif
->
-> +KBUILD_EXTMOD = $(patsubst %/,%,$(__KBUILD_EXTMOD))
-> +
->  # If building an external module we do not care about the all: rule
->  # but instead _all depend on modules
->  PHONY += all
-
-This patch would break a use-case
-where KBUILD_EXTMOD is given as an environment.
-
-
-
-Maybe adding the following should be enough?
-
-KBUILD_EXTMOD := $(patsubst %/,%,$(KBUILD_EXTMOD))
-
-
+diff --git a/scripts/package/mkspec b/scripts/package/mkspec
+index bb43f153fd8e..aa5f3db43f12 100755
+--- a/scripts/package/mkspec
++++ b/scripts/package/mkspec
+@@ -101,7 +101,11 @@ echo "%ifarch ppc64"
+ echo "cp vmlinux arch/powerpc/boot"
+ echo "cp arch/powerpc/boot/"'$KBUILD_IMAGE $RPM_BUILD_ROOT'"/boot/vmlinuz-$KERNELRELEASE"
+ echo "%else"
+-echo 'cp $KBUILD_IMAGE $RPM_BUILD_ROOT'"/boot/vmlinuz-$KERNELRELEASE"
++echo "if [ -e $KBUILD_IMAGE ]; then"
++echo '  cp $KBUILD_IMAGE $RPM_BUILD_ROOT'"/boot/vmlinuz-$KERNELRELEASE"
++echo "else"
++echo '  cp arch/$ARCH/boot/$KBUILD_IMAGE $RPM_BUILD_ROOT'"/boot/vmlinuz-$KERNELRELEASE"
++echo "fi"
+ echo "%endif"
+ echo "%endif"
+ 
 -- 
-Best Regards
-Masahiro Yamada
+2.7.4
+
