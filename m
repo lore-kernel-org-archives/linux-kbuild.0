@@ -1,41 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:62072 "EHLO
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:63756 "EHLO
         conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750954AbdCKFpp (ORCPT
+        with ESMTP id S1750954AbdCKFrG (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 11 Mar 2017 00:45:45 -0500
+        Sat, 11 Mar 2017 00:47:06 -0500
+Received: from mail-yw0-f169.google.com (mail-yw0-f169.google.com [209.85.161.169]) (authenticated)
+        by conssluserg-02.nifty.com with ESMTP id v2B5kgBq000451
+        for <linux-kbuild@vger.kernel.org>; Sat, 11 Mar 2017 14:46:42 +0900
+Received: by mail-yw0-f169.google.com with SMTP id p77so35570554ywg.1
+        for <linux-kbuild@vger.kernel.org>; Fri, 10 Mar 2017 21:46:42 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <132b313f-ac2d-be4d-8ab7-84b114041722@suse.com>
-References: <CAK7LNASmP6bsQcru5XoqgxsuznjK0JMwff96TRn3F_=hOUU6qA@mail.gmail.com>
- <dd914266-6ea1-3dd7-0531-0335bf3f723c@suse.com> <20170310201702.47b0a523@canb.auug.org.au>
- <132b313f-ac2d-be4d-8ab7-84b114041722@suse.com>
+In-Reply-To: <CAK8P3a3bzdV3zyU+UJD-WDe=7P-htxQ10fsYM3HKUqzCqXKL-A@mail.gmail.com>
+References: <20170307234823.17093.94956.stgit@bwallan-cwp1.jf.intel.com> <CAK8P3a3bzdV3zyU+UJD-WDe=7P-htxQ10fsYM3HKUqzCqXKL-A@mail.gmail.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sat, 11 Mar 2017 14:45:01 +0900
-Message-ID: <CAK7LNAS+YHOgPG4y6x6L+Cc0A2=kH9Ndtc0gVMKtX5UgtLk_9g@mail.gmail.com>
-Subject: Re: Kbuild maintainership
+Date: Sat, 11 Mar 2017 14:46:41 +0900
+Message-ID: <CAK7LNATkmGQap4jma51yerOnOoqMV1j+ryGyeBJiNOP11jc+xA@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: external module build warnings when KBUILD_OUTPUT
+ set and W=1
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Bruce Allan <bruce.w.allan@intel.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.com>
 
-Hi Michal,
-
-2017-03-10 19:15 GMT+09:00 Michal Marek <mmarek@suse.com>:
-> On 2017-03-10 10:17, Stephen Rothwell wrote:
->> I assume that I will get a request to change the kbuild-current and
->> kbuilt trees in linux-next soon.  In the meantime, should I remove the
->> current ones?
+2017-03-08 15:59 GMT+09:00 Arnd Bergmann <arnd@arndb.de>:
+> On Wed, Mar 8, 2017 at 12:48 AM, Bruce Allan <bruce.w.allan@intel.com> wrote:
+>> Commit db547ef19064 ("Kbuild: don't add obj tree in additional includes")
+>> causes warnings (-Wmissing-include-dirs) when compiling external modules
+>> with KBUILD_OUTPUT set and W=1.  This is because $src can be an absolute
+>> path to the external module source which when prefixed with -I$(srctree)/
+>> generates an incorrect directory path.
+>>
+>> Signed-off-by: Bruce Allan <bruce.w.allan@intel.com>
+>> Cc: Arnd Bergmann <arnd@arndb.de>
 >
-> There is one genksyms fix in kbuild.git#kbuild which is not in mainline.
-> Masahiro, can you please pull it into your tree and give Stephen the url
-> and branches?
+> Looks good to me, sorry for the regression
+>
+> Acked-by: Arnd Bergmann <arnd@arndb.de>
 
 
-Pulled into the (new)  linux-kbuild/kbuild
+Applied to linux-kbuild/fixes
 
-
-
+Thanks!
 
 
 -- 
