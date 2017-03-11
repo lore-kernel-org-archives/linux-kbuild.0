@@ -1,47 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:63756 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750954AbdCKFrG (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:35718 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750954AbdCKFrd (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 11 Mar 2017 00:47:06 -0500
-Received: from mail-yw0-f169.google.com (mail-yw0-f169.google.com [209.85.161.169]) (authenticated)
-        by conssluserg-02.nifty.com with ESMTP id v2B5kgBq000451
-        for <linux-kbuild@vger.kernel.org>; Sat, 11 Mar 2017 14:46:42 +0900
-Received: by mail-yw0-f169.google.com with SMTP id p77so35570554ywg.1
-        for <linux-kbuild@vger.kernel.org>; Fri, 10 Mar 2017 21:46:42 -0800 (PST)
+        Sat, 11 Mar 2017 00:47:33 -0500
 MIME-Version: 1.0
-In-Reply-To: <CAK8P3a3bzdV3zyU+UJD-WDe=7P-htxQ10fsYM3HKUqzCqXKL-A@mail.gmail.com>
-References: <20170307234823.17093.94956.stgit@bwallan-cwp1.jf.intel.com> <CAK8P3a3bzdV3zyU+UJD-WDe=7P-htxQ10fsYM3HKUqzCqXKL-A@mail.gmail.com>
+In-Reply-To: <1489111260-5458-1-git-send-email-sw0312.kim@samsung.com>
+References: <CGME20170310020057epcas5p228e45982244ea0d7fd1e36a0620d0768@epcas5p2.samsung.com>
+ <1489111260-5458-1-git-send-email-sw0312.kim@samsung.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sat, 11 Mar 2017 14:46:41 +0900
-Message-ID: <CAK7LNATkmGQap4jma51yerOnOoqMV1j+ryGyeBJiNOP11jc+xA@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: external module build warnings when KBUILD_OUTPUT
- set and W=1
+Date: Sat, 11 Mar 2017 14:47:12 +0900
+Message-ID: <CAK7LNATonsaOgd_ufgn2qocESk2LN0h9ZgMcEikWCCCwW0j3ag@mail.gmail.com>
+Subject: Re: [RESEND][PATCH] Kbuild: fix file name in comment about extra gcc checks
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Bruce Allan <bruce.w.allan@intel.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.com>
+To: Seung-Woo Kim <sw0312.kim@samsung.com>
+Cc: Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>
 
-2017-03-08 15:59 GMT+09:00 Arnd Bergmann <arnd@arndb.de>:
-> On Wed, Mar 8, 2017 at 12:48 AM, Bruce Allan <bruce.w.allan@intel.com> wrote:
->> Commit db547ef19064 ("Kbuild: don't add obj tree in additional includes")
->> causes warnings (-Wmissing-include-dirs) when compiling external modules
->> with KBUILD_OUTPUT set and W=1.  This is because $src can be an absolute
->> path to the external module source which when prefixed with -I$(srctree)/
->> generates an incorrect directory path.
->>
->> Signed-off-by: Bruce Allan <bruce.w.allan@intel.com>
->> Cc: Arnd Bergmann <arnd@arndb.de>
+2017-03-10 11:01 GMT+09:00 Seung-Woo Kim <sw0312.kim@samsung.com>:
+> Extra gcc checks like W=1 were moved to scripts/Makefile.exrawarn,
+> so the file name in comment needs to be fixed.
 >
-> Looks good to me, sorry for the regression
+> Signed-off-by: Seung-Woo Kim <sw0312.kim@samsung.com>
+> ---
+>  Makefile |    2 +-
+>  1 files changed, 1 insertions(+), 1 deletions(-)
 >
-> Acked-by: Arnd Bergmann <arnd@arndb.de>
+> diff --git a/Makefile b/Makefile
+> index 165cf97..faa9d26 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -707,7 +707,7 @@ KBUILD_CFLAGS += $(call cc-option, -fcatch-undefined-behavior)
+>  else
+>
+>  # These warnings generated too much noise in a regular build.
+> -# Use make W=1 to enable them (see scripts/Makefile.build)
+> +# Use make W=1 to enable them (see scripts/Makefile.extrawarn)
+>  KBUILD_CFLAGS += $(call cc-disable-warning, unused-but-set-variable)
+>  KBUILD_CFLAGS += $(call cc-disable-warning, unused-const-variable)
+>  endif
 
 
-Applied to linux-kbuild/fixes
+
+Applied to linux-kbuild/kbuild.
+
 
 Thanks!
+
+
 
 
 -- 
