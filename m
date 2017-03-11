@@ -1,70 +1,78 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:56843 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750928AbdCKFlh (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:20521 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750928AbdCKFnl (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 11 Mar 2017 00:41:37 -0500
-Received: from mail-yw0-f178.google.com (mail-yw0-f178.google.com [209.85.161.178]) (authenticated)
-        by conssluserg-01.nifty.com with ESMTP id v2B5fMfw005087
-        for <linux-kbuild@vger.kernel.org>; Sat, 11 Mar 2017 14:41:22 +0900
-Received: by mail-yw0-f178.google.com with SMTP id o4so35587173ywd.3
-        for <linux-kbuild@vger.kernel.org>; Fri, 10 Mar 2017 21:41:22 -0800 (PST)
+        Sat, 11 Mar 2017 00:43:41 -0500
 MIME-Version: 1.0
-In-Reply-To: <20170206065724.3937-1-matti.aaltonen@darkmatter.ae>
-References: <20170206065724.3937-1-matti.aaltonen@darkmatter.ae>
+In-Reply-To: <3df45ecc-1aa0-a029-d7e5-2598f0908874@6wind.com>
+References: <20170301045241.GB9156@gondor.apana.org.au> <1488473802-13354-1-git-send-email-nicolas.dichtel@6wind.com>
+ <3df45ecc-1aa0-a029-d7e5-2598f0908874@6wind.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sat, 11 Mar 2017 14:41:21 +0900
-Message-ID: <CAK7LNAQhwRAOTxo6vz+VmhJEMSG8VTtgwLAb9VHG=yWu8HPn7w@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: Add the source tree path to the
- Makefile.gcc-plugins path
+Date: Sat, 11 Mar 2017 14:43:15 +0900
+Message-ID: <CAK7LNARpx7f0eV5_AiPmNYT7MsRbGFOygJwjfAzX_7aCpuHwuw@mail.gmail.com>
+Subject: Re: [PATCH v9 00/11] uapi: export all headers under uapi directories
 Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Matti Aaltonen <matti.aaltonen@unikie.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Matti Aaltonen <matti.aaltonen@darkmatter.ae>
+To: nicolas.dichtel@6wind.com
+Cc: Arnd Bergmann <arnd@arndb.de>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-arch@vger.kernel.org, David Airlie <airlied@linux.ie>, "David S. Miller" <davem@davemloft.net>, Russell King <linux@armlinux.org.uk>, bp@alien8.de, slash.tmp@free.fr, daniel.vetter@ffwll.ch, rmk+kernel@armlinux.org.uk, msalter@redhat.com, jengelh@inai.de, hch@infradead.org, tklauser@distanz.ch, mpe@ellerman.id.au, Ingo Molnar <mingo@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, ldv@altlinux.org, Herbert Xu <herbert@gondor.apana.org.au>, linux-rdma@vger.kernel.org
 
-Hi Matti,
-
-
-2017-02-06 15:57 GMT+09:00 Matti Aaltonen <matti.aaltonen@unikie.com>:
-> Make sure that the Makefile.gcc-plugins is found also when
-> the build is not started from the kernel root directory.
->
-> Signed-off-by: Matti Aaltonen <matti.aaltonen@darkmatter.ae>
-> ---
->  Makefile | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/Makefile b/Makefile
-> index 96b27a8..d085504 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -651,7 +651,7 @@ KBUILD_CFLAGS += $(call cc-ifversion, -lt, 0409, \
->  # Tell gcc to never replace conditional load with a non-conditional one
->  KBUILD_CFLAGS  += $(call cc-option,--param=allow-store-data-races=0)
->
-> -include scripts/Makefile.gcc-plugins
-> +include $(srctree)/scripts/Makefile.gcc-plugins
->
->  ifdef CONFIG_READABLE_ASM
->  # Disable optimizations that make assembler listings hard to read.
-> --
+Hi Nicolas,
 
 
-Kbuild does not require $(srctree) for include directives.
+2017-03-11 1:34 GMT+09:00 Nicolas Dichtel <nicolas.dichtel@6wind.com>:
+> Le 02/03/2017 =C3=A0 17:56, Nicolas Dichtel a =C3=A9crit :
+>> Patches #1 and #2 are just cleanup: some exported headers were still und=
+er
+>> a non-uapi directory. Patch #3 is a fix to avoid exporting a file that w=
+as
+>> not under an uapi directory.
+>> After these three patches, all exported headers are under an uapi direct=
+ory:
+>> path #4 stops searching files in non uapi directories.
+>> The patch #5 was spotted by code review: there is no in-tree user of thi=
+s
+>> functionality.
+>> Patch #6 fixes some warnings/errors reported by 0-day tests.
+>> Patch #7 to #9 fix some errors when the corresponding files are included=
+ by
+>> userland.
+>> Patches #10 and #11 remove the need to list explicitly headers. Now all =
+files
+>> under an uapi directory are exported.
+>>
+>> This series has been tested with a 'make headers_install' on x86 and a
+>> 'make headers_install_all'. I've checked the result of both commands.
+>>
+>> This patch is built against linus tree. If I must rebase it against the =
+kbuild
+>> tree, just tell me.
+>> Michal, is this series going through your tree?
+> Still waiting to know who may take this series in its tree ;-)
 
 
-Please see the following line in the top-level Makefile.
-
-# o Look for make include files relative to root of kernel src
-MAKEFLAGS += -rR --include-dir=$(CURDIR)
-
-
-
-Or, do you have any problem without this patch?
+I will take care of this.
 
 
 
--- 
+> kbuild tree has not been updated since two months (4.10-rc1) :/
+
+Michal's tree is not active these days.
+Going forward, I will queue up Kbuild patches in my repository.
+
+
+
+BTW, this series does not apply cleanly.
+
+If you could rebase it onto v4.11-rc1 tag,
+it would be helpful.
+
+
+
+Thanks!
+
+--=20
 Best Regards
 Masahiro Yamada
