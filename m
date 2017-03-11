@@ -1,56 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:35718 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750954AbdCKFrd (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:24704 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750954AbdCKFsl (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 11 Mar 2017 00:47:33 -0500
+        Sat, 11 Mar 2017 00:48:41 -0500
 MIME-Version: 1.0
-In-Reply-To: <1489111260-5458-1-git-send-email-sw0312.kim@samsung.com>
-References: <CGME20170310020057epcas5p228e45982244ea0d7fd1e36a0620d0768@epcas5p2.samsung.com>
- <1489111260-5458-1-git-send-email-sw0312.kim@samsung.com>
+In-Reply-To: <20170216211820.4337-1-stephen.boyd@linaro.org>
+References: <20170216211820.4337-1-stephen.boyd@linaro.org>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sat, 11 Mar 2017 14:47:12 +0900
-Message-ID: <CAK7LNATonsaOgd_ufgn2qocESk2LN0h9ZgMcEikWCCCwW0j3ag@mail.gmail.com>
-Subject: Re: [RESEND][PATCH] Kbuild: fix file name in comment about extra gcc checks
+Date: Sat, 11 Mar 2017 14:48:33 +0900
+Message-ID: <CAK7LNATRgZY4Ju6hURPSu+QjFDv_hxeXLsLrx_KsP-bmg1hAcg@mail.gmail.com>
+Subject: Re: [PATCH] scripts: objdiff: Ignore debug info when comparing
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Seung-Woo Kim <sw0312.kim@samsung.com>
-Cc: Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>
+To: Stephen Boyd <stephen.boyd@linaro.org>
+Cc: Michal Marek <mmarek@suse.cz>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Jason Cooper <jason@lakedaemon.net>
 
-2017-03-10 11:01 GMT+09:00 Seung-Woo Kim <sw0312.kim@samsung.com>:
-> Extra gcc checks like W=1 were moved to scripts/Makefile.exrawarn,
-> so the file name in comment needs to be fixed.
+2017-02-17 6:18 GMT+09:00 Stephen Boyd <stephen.boyd@linaro.org>:
+> If the kernel is configured to be built with debug symbols, or
+> has bug tables, comparing files may not work if line numbers
+> change. This makes comparing object files with these options
+> harder to do. Let's strip out the debug info and drop the
+> __bug_table here so that we don't see false positives. There may
+> be other things to drop later, and it may be architecture
+> specific, but this works for me with my ARM64 build.
 >
-> Signed-off-by: Seung-Woo Kim <sw0312.kim@samsung.com>
-> ---
->  Makefile |    2 +-
->  1 files changed, 1 insertions(+), 1 deletions(-)
->
-> diff --git a/Makefile b/Makefile
-> index 165cf97..faa9d26 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -707,7 +707,7 @@ KBUILD_CFLAGS += $(call cc-option, -fcatch-undefined-behavior)
->  else
->
->  # These warnings generated too much noise in a regular build.
-> -# Use make W=1 to enable them (see scripts/Makefile.build)
-> +# Use make W=1 to enable them (see scripts/Makefile.extrawarn)
->  KBUILD_CFLAGS += $(call cc-disable-warning, unused-but-set-variable)
->  KBUILD_CFLAGS += $(call cc-disable-warning, unused-const-variable)
->  endif
+> Cc: Masahiro Yamada <yamada.m@jp.panasonic.com>
+> Cc: Jason Cooper <jason@lakedaemon.net>
+> Signed-off-by: Stephen Boyd <stephen.boyd@linaro.org>
 
 
-
-Applied to linux-kbuild/kbuild.
+Applied to linux-kbuild/misc with Jason's Reviewed-by.
 
 
 Thanks!
 
 
-
-
--- 
 Best Regards
 Masahiro Yamada
