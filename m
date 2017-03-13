@@ -1,55 +1,77 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.polytechnique.org ([129.104.30.34]:57282 "EHLO
-        mx1.polytechnique.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751662AbdCMTdv (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 13 Mar 2017 15:33:51 -0400
-From: Nicolas Iooss <nicolas.iooss_linux@m4x.org>
-Subject: [PATCH 1/1] gconfig: remove misleading parentheses around a condition
-Date: Mon, 13 Mar 2017 20:33:41 +0100
-Message-Id: <20170313193341.28696-1-nicolas.iooss_linux@m4x.org>
+Received: from mga02.intel.com ([134.134.136.20]:13209 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751687AbdCMWVI (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 13 Mar 2017 18:21:08 -0400
+From: Joe Konno <joe.konno@linux.intel.com>
+Subject: [PATCH] scripts: package: KDEB_SOURCENAME in .deb names
+Date: Mon, 13 Mar 2017 15:21:06 -0700
+Message-Id: <1489443666-29808-1-git-send-email-joe.konno@linux.intel.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>, linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, Nicolas Iooss <nicolas.iooss_linux@m4x.org>
+To: linux-kbuild@vger.kernel.org
 
-When building the kernel with clang, the compiler complains about the
-presence of a condition inside two pairs of parentheses:
+From: Joe Konno <joe.konno@intel.com>
 
-    scripts/kconfig/gconf.c:917:19: error: equality comparison with
-    extraneous parentheses [-Werror,-Wparentheses-equality]
-                    } else if ((col == COL_OPTION)) {
-                                ~~~~^~~~~~~~~~~~~
-    scripts/kconfig/gconf.c:917:19: note: remove extraneous parentheses
-    around the comparison to silence this warning
-                    } else if ((col == COL_OPTION)) {
-                               ~    ^            ~
-    scripts/kconfig/gconf.c:917:19: note: use '=' to turn this equality
-    comparison into an assignment
-                    } else if ((col == COL_OPTION)) {
-                                    ^~
-                                    =
+Currently, the KDEB_SOURCENAME make variable only controls the name of the
+packaged source tarball, and does not impact the .deb package names output
+by bindeb-pkg and deb-pkg. Presently, these files are more rigidly named,
+as the user may only control the names of .deb outputs by setting
+KDEB_PKGVERSION in their environment.
 
-Silence this warning by removing a level of parentheses.
+This patch modifies the builddeb script to use KDEB_SOURCENAME when naming
+the image, firmware-image, headers, and libc-dev .deb output files. This
+would allow folks who build-- for instance-- mainline, stable, and next
+kernel packages more control over how their .deb outputs are named.
 
-Signed-off-by: Nicolas Iooss <nicolas.iooss_linux@m4x.org>
+This patch also changes the default value of KDEB_SOURCENAME so as not to
+change default .deb output file names. However, this does have the side
+effect of renaming the source tarball generated for .deb source packages.
+
+For example:
+  $ KDEB_SOURCENAME="linux-mainline" make bindeb-pkg
+
+Would output .deb files that begin with
+  ../linux-mainline-{image,firmware-image,headers,libc-dev}
+
+Signed-off-by: Joe Konno <joe.konno@intel.com>
 ---
- scripts/kconfig/gconf.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ scripts/package/Makefile | 2 +-
+ scripts/package/builddeb | 8 ++++----
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/scripts/kconfig/gconf.c b/scripts/kconfig/gconf.c
-index 26d208b435a0..cfddddb9c9d7 100644
---- a/scripts/kconfig/gconf.c
-+++ b/scripts/kconfig/gconf.c
-@@ -914,7 +914,7 @@ on_treeview2_button_press_event(GtkWidget * widget,
- 			current = menu;
- 			display_tree_part();
- 			gtk_widget_set_sensitive(back_btn, TRUE);
--		} else if ((col == COL_OPTION)) {
-+		} else if (col == COL_OPTION) {
- 			toggle_sym_value(menu);
- 			gtk_tree_view_expand_row(view, path, TRUE);
- 		}
+diff --git a/scripts/package/Makefile b/scripts/package/Makefile
+index 71b4a8af9d4d..e4280da03991 100644
+--- a/scripts/package/Makefile
++++ b/scripts/package/Makefile
+@@ -23,7 +23,7 @@
+ 
+ # Remove hyphens since they have special meaning in RPM filenames
+ KERNELPATH := kernel-$(subst -,_,$(KERNELRELEASE))
+-KDEB_SOURCENAME ?= linux-$(KERNELRELEASE)
++KDEB_SOURCENAME ?= linux
+ export KDEB_SOURCENAME
+ # Include only those top-level files that are needed by make, plus the GPL copy
+ TAR_CONTENT := $(KBUILD_ALLDIRS) .config .scmversion Makefile \
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index 3c575cd07888..50caa143fb13 100755
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -96,10 +96,10 @@ fwdir="$objtree/debian/fwtmp"
+ kernel_headers_dir="$objtree/debian/hdrtmp"
+ libc_headers_dir="$objtree/debian/headertmp"
+ dbg_dir="$objtree/debian/dbgtmp"
+-packagename=linux-image-$version
+-fwpackagename=linux-firmware-image-$version
+-kernel_headers_packagename=linux-headers-$version
+-libc_headers_packagename=linux-libc-dev
++packagename=${sourcename}-image-$version
++fwpackagename=${sourcename}-firmware-image-$version
++kernel_headers_packagename=${sourcename}-headers-$version
++libc_headers_packagename=${sourcename}-libc-dev
+ dbg_packagename=$packagename-dbg
+ debarch=
+ forcearch=
 -- 
-2.12.0
+2.7.4
 
