@@ -1,53 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wr0-f182.google.com ([209.85.128.182]:36589 "EHLO
-        mail-wr0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754414AbdCMQ52 (ORCPT
+Received: from mx1.polytechnique.org ([129.104.30.34]:57282 "EHLO
+        mx1.polytechnique.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751662AbdCMTdv (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 13 Mar 2017 12:57:28 -0400
-Received: by mail-wr0-f182.google.com with SMTP id u108so107672131wrb.3
-        for <linux-kbuild@vger.kernel.org>; Mon, 13 Mar 2017 09:57:21 -0700 (PDT)
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [PATCH v9 00/11] uapi: export all headers under uapi directories
-References: <20170301045241.GB9156@gondor.apana.org.au>
- <1488473802-13354-1-git-send-email-nicolas.dichtel@6wind.com>
- <3df45ecc-1aa0-a029-d7e5-2598f0908874@6wind.com>
- <CAK7LNARpx7f0eV5_AiPmNYT7MsRbGFOygJwjfAzX_7aCpuHwuw@mail.gmail.com>
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Message-ID: <96811b2b-25af-ed32-5094-14987aefd4d2@6wind.com>
-Date: Mon, 13 Mar 2017 17:57:17 +0100
-MIME-Version: 1.0
-In-Reply-To: <CAK7LNARpx7f0eV5_AiPmNYT7MsRbGFOygJwjfAzX_7aCpuHwuw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+        Mon, 13 Mar 2017 15:33:51 -0400
+From: Nicolas Iooss <nicolas.iooss_linux@m4x.org>
+Subject: [PATCH 1/1] gconfig: remove misleading parentheses around a condition
+Date: Mon, 13 Mar 2017 20:33:41 +0100
+Message-Id: <20170313193341.28696-1-nicolas.iooss_linux@m4x.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Arnd Bergmann <arnd@arndb.de>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-arch@vger.kernel.org, David Airlie <airlied@linux.ie>, "David S. Miller" <davem@davemloft.net>, Russell King <linux@armlinux.org.uk>, bp@alien8.de, slash.tmp@free.fr, daniel.vetter@ffwll.ch, rmk+kernel@armlinux.org.uk, msalter@redhat.com, jengelh@inai.de, hch@infradead.org, tklauser@distanz.ch, mpe@ellerman.id.au, Ingo Molnar <mingo@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, ldv@altlinux.org, Herbert Xu <herbert@gondor.apana.org.au>, linux-rdma@vger.kernel.org
+To: "Yann E. MORIN" <yann.morin.1998@free.fr>, linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Nicolas Iooss <nicolas.iooss_linux@m4x.org>
 
-Le 11/03/2017 à 06:43, Masahiro Yamada a écrit :
-[snip]
-> 
-> I will take care of this.
-Thank you.
+When building the kernel with clang, the compiler complains about the
+presence of a condition inside two pairs of parentheses:
 
-> 
-> 
-> 
->> kbuild tree has not been updated since two months (4.10-rc1) :/
-> 
-> Michal's tree is not active these days.
-Ok, I didn't know that.
+    scripts/kconfig/gconf.c:917:19: error: equality comparison with
+    extraneous parentheses [-Werror,-Wparentheses-equality]
+                    } else if ((col == COL_OPTION)) {
+                                ~~~~^~~~~~~~~~~~~
+    scripts/kconfig/gconf.c:917:19: note: remove extraneous parentheses
+    around the comparison to silence this warning
+                    } else if ((col == COL_OPTION)) {
+                               ~    ^            ~
+    scripts/kconfig/gconf.c:917:19: note: use '=' to turn this equality
+    comparison into an assignment
+                    } else if ((col == COL_OPTION)) {
+                                    ^~
+                                    =
 
-> Going forward, I will queue up Kbuild patches in my repository.
-> 
-> 
-> 
-> BTW, this series does not apply cleanly.
-> 
-> If you could rebase it onto v4.11-rc1 tag,
-> it would be helpful.
-You really want this on top of 4.11-rc1 or the last linus tag, ie v4.11-rc2?
+Silence this warning by removing a level of parentheses.
 
+Signed-off-by: Nicolas Iooss <nicolas.iooss_linux@m4x.org>
+---
+ scripts/kconfig/gconf.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Regards,
-Nicolas
+diff --git a/scripts/kconfig/gconf.c b/scripts/kconfig/gconf.c
+index 26d208b435a0..cfddddb9c9d7 100644
+--- a/scripts/kconfig/gconf.c
++++ b/scripts/kconfig/gconf.c
+@@ -914,7 +914,7 @@ on_treeview2_button_press_event(GtkWidget * widget,
+ 			current = menu;
+ 			display_tree_part();
+ 			gtk_widget_set_sensitive(back_btn, TRUE);
+-		} else if ((col == COL_OPTION)) {
++		} else if (col == COL_OPTION) {
+ 			toggle_sym_value(menu);
+ 			gtk_tree_view_expand_row(view, path, TRUE);
+ 		}
+-- 
+2.12.0
+
