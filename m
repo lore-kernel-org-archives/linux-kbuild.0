@@ -1,39 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:52311 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750760AbdCNFiu (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:33881 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750768AbdCNFp1 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 14 Mar 2017 01:38:50 -0400
+        Tue, 14 Mar 2017 01:45:27 -0400
 MIME-Version: 1.0
-In-Reply-To: <96811b2b-25af-ed32-5094-14987aefd4d2@6wind.com>
-References: <20170301045241.GB9156@gondor.apana.org.au> <1488473802-13354-1-git-send-email-nicolas.dichtel@6wind.com>
- <3df45ecc-1aa0-a029-d7e5-2598f0908874@6wind.com> <CAK7LNARpx7f0eV5_AiPmNYT7MsRbGFOygJwjfAzX_7aCpuHwuw@mail.gmail.com>
- <96811b2b-25af-ed32-5094-14987aefd4d2@6wind.com>
+In-Reply-To: <1489110110-9723-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1489110110-9723-1-git-send-email-yamada.masahiro@socionext.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 14 Mar 2017 14:38:29 +0900
-Message-ID: <CAK7LNAQV0tDw7RCTdn-qicttbyjU9QRfxasvc-7S-+dxMfii8g@mail.gmail.com>
-Subject: Re: [PATCH v9 00/11] uapi: export all headers under uapi directories
+Date: Tue, 14 Mar 2017 14:45:20 +0900
+Message-ID: <CAK7LNASKKg6PTFiGMdR2XzWDVq2j_pBwXW6L2Mh4Ko+t0=QzHw@mail.gmail.com>
+Subject: Re: [PATCH] MAINTAINERS: add Masahiro Yamada as a Kbuild maintainer
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Cc: Arnd Bergmann <arnd@arndb.de>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-arch@vger.kernel.org, David Airlie <airlied@linux.ie>, "David S. Miller" <davem@davemloft.net>, Russell King <linux@armlinux.org.uk>, bp@alien8.de, slash.tmp@free.fr, Daniel Vetter <daniel.vetter@ffwll.ch>, rmk+kernel@armlinux.org.uk, msalter@redhat.com, jengelh@inai.de, hch@infradead.org, Tobias Klauser <tklauser@distanz.ch>, mpe@ellerman.id.au, Ingo Molnar <mingo@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, ldv@altlinux.org, Herbert Xu <herbert@gondor.apana.org.au>, linux-rdma@vger.kernel.org
+To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Michal Marek <mmarek@suse.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Stephen Rothwell <sfr@canb.auug.org.au>, Linus Torvalds <torvalds@linux-foundation.org>, Masahiro Yamada <yamada.masahiro@socionext.com>
 
-Ni Nicolas,
-
-
-2017-03-14 1:57 GMT+09:00 Nicolas Dichtel <nicolas.dichtel@6wind.com>:
->> BTW, this series does not apply cleanly.
->>
->> If you could rebase it onto v4.11-rc1 tag,
->> it would be helpful.
-> You really want this on top of 4.11-rc1 or the last linus tag, ie v4.11-rc2?
+2017-03-10 10:41 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
+> It has been difficult lately for Michal to work on Kbuild on his
+> regular basis.  We discussed the maintainership of Kbuild, and I
+> decided to be a co-maintainer.
 >
+> Add myself to the maintainer field, and replace the repository with
+> my own.
+>
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> Acked-by: Michal Marek <mmarek@suse.com>
 
-Basically, I queue up patches based on -rc1 tag
-unless there is a particular reason for otherwise.
 
-If it is based on -rc1, will it cause conflicts with Linus tree?
+Applied to linux-kbuild/fixes.
+
 
 
 -- 
