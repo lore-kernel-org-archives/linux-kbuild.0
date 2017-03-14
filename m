@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.126.187]:62491 "EHLO
+Received: from mout.kundenserver.de ([212.227.17.10]:49600 "EHLO
         mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750736AbdCNVhW (ORCPT
+        with ESMTP id S1751331AbdCNVhn (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 14 Mar 2017 17:37:22 -0400
+        Tue, 14 Mar 2017 17:37:43 -0400
 From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH] [v333kbuild: disable -ffunction-sections on gcc-4.7 with ftrace
-Date: Tue, 14 Mar 2017 22:35:51 +0100
-Message-Id: <20170314213600.3812349-1-arnd@arndb.de>
+Subject: [PATCH] [SUBMITTED 20170314] [v333kbuild: disable -ffunction-sections on gcc-4.7 with ftrace
+Date: Tue, 14 Mar 2017 22:37:15 +0100
+Message-Id: <20170314213724.3836900-1-arnd@arndb.de>
 In-Reply-To: <20170314213410.3762842-1-arnd@arndb.de>
 References: <20170314213410.3762842-1-arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -29,13 +29,14 @@ Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 Cc: Namhyung Kim <namhyung.with.foss@gmail.com>
 ---
 v2: accidentally resend the same patch as before
-v3: actually fixed version number in check as pointed out by Namhyung Kim
+v3: send the exact same patch once more, without doing the change I wanted
+v4: actually fixed version number in check as pointed out by Namhyung Kim (I hope)
 ---
  Makefile | 4 ++++
  1 file changed, 4 insertions(+)
 
 diff --git a/Makefile b/Makefile
-index 6e7e644a0b84..608727d3e47f 100644
+index 6e7e644a0b84..3a964fa3a787 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -662,7 +662,11 @@ KBUILD_CFLAGS	+= -Wextra
@@ -43,7 +44,7 @@ index 6e7e644a0b84..608727d3e47f 100644
  
  ifdef CONFIG_LD_DEAD_CODE_DATA_ELIMINATION
 +ifdef CONFIG_FUNCTION_TRACER
-+KBUILD_CFLAGS	+= $(call cc-ifversion, -ge,0409,$(call cc-option,-ffunction-sections,))
++KBUILD_CFLAGS	+= $(call cc-ifversion, -ge,0408,$(call cc-option,-ffunction-sections,))
 +else
  KBUILD_CFLAGS	+= $(call cc-option,-ffunction-sections,)
 +endif
