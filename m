@@ -1,51 +1,97 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f45.google.com ([74.125.82.45]:38356 "EHLO
-        mail-wm0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750824AbdCNIZL (ORCPT
+Received: from mail-lf0-f51.google.com ([209.85.215.51]:34565 "EHLO
+        mail-lf0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750836AbdCNIt6 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 14 Mar 2017 04:25:11 -0400
-Received: by mail-wm0-f45.google.com with SMTP id t189so57549816wmt.1
-        for <linux-kbuild@vger.kernel.org>; Tue, 14 Mar 2017 01:25:10 -0700 (PDT)
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [PATCH v9 00/11] uapi: export all headers under uapi directories
-References: <20170301045241.GB9156@gondor.apana.org.au>
- <1488473802-13354-1-git-send-email-nicolas.dichtel@6wind.com>
- <3df45ecc-1aa0-a029-d7e5-2598f0908874@6wind.com>
- <CAK7LNARpx7f0eV5_AiPmNYT7MsRbGFOygJwjfAzX_7aCpuHwuw@mail.gmail.com>
- <96811b2b-25af-ed32-5094-14987aefd4d2@6wind.com>
- <CAK7LNAQV0tDw7RCTdn-qicttbyjU9QRfxasvc-7S-+dxMfii8g@mail.gmail.com>
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Message-ID: <281def1c-e0dc-1493-3f48-fc0024c534ac@6wind.com>
-Date: Tue, 14 Mar 2017 09:25:03 +0100
+        Tue, 14 Mar 2017 04:49:58 -0400
+Received: by mail-lf0-f51.google.com with SMTP id z15so51433419lfd.1
+        for <linux-kbuild@vger.kernel.org>; Tue, 14 Mar 2017 01:49:57 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNAQV0tDw7RCTdn-qicttbyjU9QRfxasvc-7S-+dxMfii8g@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <1489443666-29808-1-git-send-email-joe.konno@linux.intel.com>
+References: <1489443666-29808-1-git-send-email-joe.konno@linux.intel.com>
+From: Riku Voipio <riku.voipio@linaro.org>
+Date: Tue, 14 Mar 2017 10:49:55 +0200
+Message-ID: <CAAqcGHntEudc=q4au_ewtaQuZLNs-0Z8OVcy5kzHq7OsqPo7Mg@mail.gmail.com>
+Subject: Re: [PATCH] scripts: package: KDEB_SOURCENAME in .deb names
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Arnd Bergmann <arnd@arndb.de>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-arch@vger.kernel.org, David Airlie <airlied@linux.ie>, "David S. Miller" <davem@davemloft.net>, Russell King <linux@armlinux.org.uk>, bp@alien8.de, slash.tmp@free.fr, Daniel Vetter <daniel.vetter@ffwll.ch>, rmk+kernel@armlinux.org.uk, msalter@redhat.com, jengelh@inai.de, hch@infradead.org, Tobias Klauser <tklauser@distanz.ch>, mpe@ellerman.id.au, Ingo Molnar <mingo@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, ldv@altlinux.org, Herbert Xu <herbert@gondor.apana.org.au>, linux-rdma@vger.kernel.org
+To: Joe Konno <joe.konno@linux.intel.com>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>
 
-Le 14/03/2017 à 06:38, Masahiro Yamada a écrit :
-> Ni Nicolas,
-> 
-> 
-> 2017-03-14 1:57 GMT+09:00 Nicolas Dichtel <nicolas.dichtel@6wind.com>:
->>> BTW, this series does not apply cleanly.
->>>
->>> If you could rebase it onto v4.11-rc1 tag,
->>> it would be helpful.
->> You really want this on top of 4.11-rc1 or the last linus tag, ie v4.11-rc2?
->>
-> 
-> Basically, I queue up patches based on -rc1 tag
-> unless there is a particular reason for otherwise.
-Ok, thank you for the explanation.
+On 14 March 2017 at 00:21, Joe Konno <joe.konno@linux.intel.com> wrote:
+> From: Joe Konno <joe.konno@intel.com>
+>
+> Currently, the KDEB_SOURCENAME make variable only controls the name of the
+> packaged source tarball, and does not impact the .deb package names output
+> by bindeb-pkg and deb-pkg. Presently, these files are more rigidly named,
+> as the user may only control the names of .deb outputs by setting
+> KDEB_PKGVERSION in their environment.
+>
+> This patch modifies the builddeb script to use KDEB_SOURCENAME when naming
+> the image, firmware-image, headers, and libc-dev .deb output files. This
+> would allow folks who build-- for instance-- mainline, stable, and next
+> kernel packages more control over how their .deb outputs are named.
+>
+> This patch also changes the default value of KDEB_SOURCENAME so as not to
+> change default .deb output file names. However, this does have the side
+> effect of renaming the source tarball generated for .deb source packages.
+>
+> For example:
+>   $ KDEB_SOURCENAME="linux-mainline" make bindeb-pkg
+>
+> Would output .deb files that begin with
+>   ../linux-mainline-{image,firmware-image,headers,libc-dev}
 
-> 
-> If it is based on -rc1, will it cause conflicts with Linus tree?
-I will check and let you know in the v10 submission.
+I'm not sure this a really useful. Next, mainline, stable etc are all
+different versions of linux, so version seems the correct place to
+describe them?
 
+> Signed-off-by: Joe Konno <joe.konno@intel.com>
+> ---
+>  scripts/package/Makefile | 2 +-
+>  scripts/package/builddeb | 8 ++++----
+>  2 files changed, 5 insertions(+), 5 deletions(-)
+>
+> diff --git a/scripts/package/Makefile b/scripts/package/Makefile
+> index 71b4a8af9d4d..e4280da03991 100644
+> --- a/scripts/package/Makefile
+> +++ b/scripts/package/Makefile
+> @@ -23,7 +23,7 @@
+>
+>  # Remove hyphens since they have special meaning in RPM filenames
+>  KERNELPATH := kernel-$(subst -,_,$(KERNELRELEASE))
+> -KDEB_SOURCENAME ?= linux-$(KERNELRELEASE)
+> +KDEB_SOURCENAME ?= linux
+>  export KDEB_SOURCENAME
+>  # Include only those top-level files that are needed by make, plus the GPL copy
+>  TAR_CONTENT := $(KBUILD_ALLDIRS) .config .scmversion Makefile \
+> diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+> index 3c575cd07888..50caa143fb13 100755
+> --- a/scripts/package/builddeb
+> +++ b/scripts/package/builddeb
+> @@ -96,10 +96,10 @@ fwdir="$objtree/debian/fwtmp"
+>  kernel_headers_dir="$objtree/debian/hdrtmp"
+>  libc_headers_dir="$objtree/debian/headertmp"
+>  dbg_dir="$objtree/debian/dbgtmp"
+> -packagename=linux-image-$version
+> -fwpackagename=linux-firmware-image-$version
+> -kernel_headers_packagename=linux-headers-$version
+> -libc_headers_packagename=linux-libc-dev
+> +packagename=${sourcename}-image-$version
+> +fwpackagename=${sourcename}-firmware-image-$version
+> +kernel_headers_packagename=${sourcename}-headers-$version
+> +libc_headers_packagename=${sourcename}-libc-dev
 
-Thank you,
-Nicolas
+The style here is to use variables without curly braces unless really needed.
+
+>  dbg_packagename=$packagename-dbg
+>  debarch=
+>  forcearch=
+> --
+> 2.7.4
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
