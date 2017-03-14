@@ -1,17 +1,19 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.17.13]:53663 "EHLO
+Received: from mout.kundenserver.de ([212.227.126.187]:62491 "EHLO
         mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751267AbdCNVeb (ORCPT
+        with ESMTP id S1750736AbdCNVhW (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 14 Mar 2017 17:34:31 -0400
+        Tue, 14 Mar 2017 17:37:22 -0400
 From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH] [v2] kbuild: disable -ffunction-sections on gcc-4.7 with ftrace
-Date: Tue, 14 Mar 2017 22:33:27 +0100
-Message-Id: <20170314213410.3762842-1-arnd@arndb.de>
+Subject: [PATCH] [v333kbuild: disable -ffunction-sections on gcc-4.7 with ftrace
+Date: Tue, 14 Mar 2017 22:35:51 +0100
+Message-Id: <20170314213600.3812349-1-arnd@arndb.de>
+In-Reply-To: <20170314213410.3762842-1-arnd@arndb.de>
+References: <20170314213410.3762842-1-arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>
-Cc: Arnd Bergmann <arnd@arndb.de>, Namhyung Kim <namhyung.with.foss@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Nicholas Piggin <npiggin@gmail.com>, Arnd Bergmann <arnd@arndb.de>, Namhyung Kim <namhyung.with.foss@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
 When ftrace is enabled and we build with gcc-4.7 or older, we
 get a warning for each file on architectures that select
@@ -26,7 +28,8 @@ Fixes: b67067f1176d ("kbuild: allow archs to select link dead code/data eliminat
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 Cc: Namhyung Kim <namhyung.with.foss@gmail.com>
 ---
-Fixed version number in check as pointed out by Namhyung Kim
+v2: accidentally resend the same patch as before
+v3: actually fixed version number in check as pointed out by Namhyung Kim
 ---
  Makefile | 4 ++++
  1 file changed, 4 insertions(+)
