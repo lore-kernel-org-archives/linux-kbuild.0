@@ -1,77 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:13209 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751687AbdCMWVI (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 13 Mar 2017 18:21:08 -0400
-From: Joe Konno <joe.konno@linux.intel.com>
-Subject: [PATCH] scripts: package: KDEB_SOURCENAME in .deb names
-Date: Mon, 13 Mar 2017 15:21:06 -0700
-Message-Id: <1489443666-29808-1-git-send-email-joe.konno@linux.intel.com>
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:38252 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750749AbdCNFXc (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 14 Mar 2017 01:23:32 -0400
+MIME-Version: 1.0
+In-Reply-To: <20170201230425.GA75891@beast>
+References: <20170201230425.GA75891@beast>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Tue, 14 Mar 2017 14:23:21 +0900
+Message-ID: <CAK7LNAQROQ=Gp_-fXf7nkEESKrXqSHRp10rkYxL3+NkcHdO3vA@mail.gmail.com>
+Subject: Re: [PATCH] Kbuild: support designated_init attribute
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
+To: Kees Cook <keescook@chromium.org>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-From: Joe Konno <joe.konno@intel.com>
+Hi Kees,
 
-Currently, the KDEB_SOURCENAME make variable only controls the name of the
-packaged source tarball, and does not impact the .deb package names output
-by bindeb-pkg and deb-pkg. Presently, these files are more rigidly named,
-as the user may only control the names of .deb outputs by setting
-KDEB_PKGVERSION in their environment.
 
-This patch modifies the builddeb script to use KDEB_SOURCENAME when naming
-the image, firmware-image, headers, and libc-dev .deb output files. This
-would allow folks who build-- for instance-- mainline, stable, and next
-kernel packages more control over how their .deb outputs are named.
+2017-02-02 8:04 GMT+09:00 Kees Cook <keescook@chromium.org>:
+> If a structure is marked with __attribute__((designated_init)) from
+> GCC or Sparse, it needs to have all static initializers using designated
+> initialization. Fail the build for any missing cases. This attribute will
+> be used by the randstruct plugin to make sure randomized structures are
+> being correctly initialized.
+>
+> Signed-off-by: Kees Cook <keescook@chromium.org>
+> ---
+>  Makefile | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/Makefile b/Makefile
+> index 96b27a888285..d4e0550e7abd 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -793,6 +793,9 @@ KBUILD_CFLAGS   += $(call cc-option,-Werror=date-time)
+>  # enforce correct pointer usage
+>  KBUILD_CFLAGS   += $(call cc-option,-Werror=incompatible-pointer-types)
+>
+> +# Require designated initializers for all marked structures
+> +KBUILD_CFLAGS   += $(call cc-option,-Werror=designated-init)
+> +
+>  # use the deterministic mode of AR if available
+>  KBUILD_ARFLAGS := $(call ar-option,D)
+>
 
-This patch also changes the default value of KDEB_SOURCENAME so as not to
-change default .deb output file names. However, this does have the side
-effect of renaming the source tarball generated for .deb source packages.
 
-For example:
-  $ KDEB_SOURCENAME="linux-mainline" make bindeb-pkg
+The code looks OK to me.
 
-Would output .deb files that begin with
-  ../linux-mainline-{image,firmware-image,headers,libc-dev}
+As far as I understood, this patch changes
+designated-init warnings into errors.  Correct?
 
-Signed-off-by: Joe Konno <joe.konno@intel.com>
----
- scripts/package/Makefile | 2 +-
- scripts/package/builddeb | 8 ++++----
- 2 files changed, 5 insertions(+), 5 deletions(-)
+If so, I think the commit subject "Kbuild: support designated_init attribute"
+does not directly describe what this patch does.
 
-diff --git a/scripts/package/Makefile b/scripts/package/Makefile
-index 71b4a8af9d4d..e4280da03991 100644
---- a/scripts/package/Makefile
-+++ b/scripts/package/Makefile
-@@ -23,7 +23,7 @@
- 
- # Remove hyphens since they have special meaning in RPM filenames
- KERNELPATH := kernel-$(subst -,_,$(KERNELRELEASE))
--KDEB_SOURCENAME ?= linux-$(KERNELRELEASE)
-+KDEB_SOURCENAME ?= linux
- export KDEB_SOURCENAME
- # Include only those top-level files that are needed by make, plus the GPL copy
- TAR_CONTENT := $(KBUILD_ALLDIRS) .config .scmversion Makefile \
-diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index 3c575cd07888..50caa143fb13 100755
---- a/scripts/package/builddeb
-+++ b/scripts/package/builddeb
-@@ -96,10 +96,10 @@ fwdir="$objtree/debian/fwtmp"
- kernel_headers_dir="$objtree/debian/hdrtmp"
- libc_headers_dir="$objtree/debian/headertmp"
- dbg_dir="$objtree/debian/dbgtmp"
--packagename=linux-image-$version
--fwpackagename=linux-firmware-image-$version
--kernel_headers_packagename=linux-headers-$version
--libc_headers_packagename=linux-libc-dev
-+packagename=${sourcename}-image-$version
-+fwpackagename=${sourcename}-firmware-image-$version
-+kernel_headers_packagename=${sourcename}-headers-$version
-+libc_headers_packagename=${sourcename}-libc-dev
- dbg_packagename=$packagename-dbg
- debarch=
- forcearch=
+
+
+
 -- 
-2.7.4
-
+Best Regards
+Masahiro Yamada
