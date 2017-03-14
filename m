@@ -1,62 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:38252 "EHLO
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:52311 "EHLO
         conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750749AbdCNFXc (ORCPT
+        with ESMTP id S1750760AbdCNFiu (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 14 Mar 2017 01:23:32 -0400
+        Tue, 14 Mar 2017 01:38:50 -0400
 MIME-Version: 1.0
-In-Reply-To: <20170201230425.GA75891@beast>
-References: <20170201230425.GA75891@beast>
+In-Reply-To: <96811b2b-25af-ed32-5094-14987aefd4d2@6wind.com>
+References: <20170301045241.GB9156@gondor.apana.org.au> <1488473802-13354-1-git-send-email-nicolas.dichtel@6wind.com>
+ <3df45ecc-1aa0-a029-d7e5-2598f0908874@6wind.com> <CAK7LNARpx7f0eV5_AiPmNYT7MsRbGFOygJwjfAzX_7aCpuHwuw@mail.gmail.com>
+ <96811b2b-25af-ed32-5094-14987aefd4d2@6wind.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 14 Mar 2017 14:23:21 +0900
-Message-ID: <CAK7LNAQROQ=Gp_-fXf7nkEESKrXqSHRp10rkYxL3+NkcHdO3vA@mail.gmail.com>
-Subject: Re: [PATCH] Kbuild: support designated_init attribute
+Date: Tue, 14 Mar 2017 14:38:29 +0900
+Message-ID: <CAK7LNAQV0tDw7RCTdn-qicttbyjU9QRfxasvc-7S-+dxMfii8g@mail.gmail.com>
+Subject: Re: [PATCH v9 00/11] uapi: export all headers under uapi directories
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kees Cook <keescook@chromium.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Cc: Arnd Bergmann <arnd@arndb.de>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-arch@vger.kernel.org, David Airlie <airlied@linux.ie>, "David S. Miller" <davem@davemloft.net>, Russell King <linux@armlinux.org.uk>, bp@alien8.de, slash.tmp@free.fr, Daniel Vetter <daniel.vetter@ffwll.ch>, rmk+kernel@armlinux.org.uk, msalter@redhat.com, jengelh@inai.de, hch@infradead.org, Tobias Klauser <tklauser@distanz.ch>, mpe@ellerman.id.au, Ingo Molnar <mingo@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, ldv@altlinux.org, Herbert Xu <herbert@gondor.apana.org.au>, linux-rdma@vger.kernel.org
 
-Hi Kees,
+Ni Nicolas,
 
 
-2017-02-02 8:04 GMT+09:00 Kees Cook <keescook@chromium.org>:
-> If a structure is marked with __attribute__((designated_init)) from
-> GCC or Sparse, it needs to have all static initializers using designated
-> initialization. Fail the build for any missing cases. This attribute will
-> be used by the randstruct plugin to make sure randomized structures are
-> being correctly initialized.
->
-> Signed-off-by: Kees Cook <keescook@chromium.org>
-> ---
->  Makefile | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/Makefile b/Makefile
-> index 96b27a888285..d4e0550e7abd 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -793,6 +793,9 @@ KBUILD_CFLAGS   += $(call cc-option,-Werror=date-time)
->  # enforce correct pointer usage
->  KBUILD_CFLAGS   += $(call cc-option,-Werror=incompatible-pointer-types)
->
-> +# Require designated initializers for all marked structures
-> +KBUILD_CFLAGS   += $(call cc-option,-Werror=designated-init)
-> +
->  # use the deterministic mode of AR if available
->  KBUILD_ARFLAGS := $(call ar-option,D)
+2017-03-14 1:57 GMT+09:00 Nicolas Dichtel <nicolas.dichtel@6wind.com>:
+>> BTW, this series does not apply cleanly.
+>>
+>> If you could rebase it onto v4.11-rc1 tag,
+>> it would be helpful.
+> You really want this on top of 4.11-rc1 or the last linus tag, ie v4.11-rc2?
 >
 
+Basically, I queue up patches based on -rc1 tag
+unless there is a particular reason for otherwise.
 
-The code looks OK to me.
-
-As far as I understood, this patch changes
-designated-init warnings into errors.  Correct?
-
-If so, I think the commit subject "Kbuild: support designated_init attribute"
-does not directly describe what this patch does.
-
-
+If it is based on -rc1, will it cause conflicts with Linus tree?
 
 
 -- 
