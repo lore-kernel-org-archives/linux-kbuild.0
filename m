@@ -1,56 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.17.10]:49600 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751331AbdCNVhn (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 14 Mar 2017 17:37:43 -0400
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH] [SUBMITTED 20170314] [v333kbuild: disable -ffunction-sections on gcc-4.7 with ftrace
-Date: Tue, 14 Mar 2017 22:37:15 +0100
-Message-Id: <20170314213724.3836900-1-arnd@arndb.de>
-In-Reply-To: <20170314213410.3762842-1-arnd@arndb.de>
-References: <20170314213410.3762842-1-arnd@arndb.de>
+Received: from mx2.suse.de ([195.135.220.15]:33285 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751375AbdCOAxv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 14 Mar 2017 20:53:51 -0400
+Date: Wed, 15 Mar 2017 01:53:48 +0100
+From: "Luis R. Rodriguez" <mcgrof@kernel.org>
+Subject: Re: [PATCH v2] firmware/Makefile: force recompilation if makefile
+ changes
+Message-ID: <20170315005348.GK28800@wotan.suse.de>
+References: <20170118173156.16060-1-mcgrof@kernel.org>
+ <20170123150727.4883-1-mcgrof@kernel.org>
+ <CAK7LNASzfaBQVTk94=eZ347ZhkZVhqwjrqfhWOro8Cg7pCykKg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAK7LNASzfaBQVTk94=eZ347ZhkZVhqwjrqfhWOro8Cg7pCykKg@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>
-Cc: Nicholas Piggin <npiggin@gmail.com>, Arnd Bergmann <arnd@arndb.de>, Namhyung Kim <namhyung.with.foss@gmail.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: "Luis R. Rodriguez" <mcgrof@kernel.org>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, ming.lei@canonical.com, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, teg@jklm.no, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, David Woodhouse <dwmw2@infradead.org>
 
-When ftrace is enabled and we build with gcc-4.7 or older, we
-get a warning for each file on architectures that select
-CONFIG_LD_DEAD_CODE_DATA_ELIMINATION:
+On Sat, Mar 11, 2017 at 02:37:02PM +0900, Masahiro Yamada wrote:
+> Hi Luis,
+> 
+> 
+> 2017-01-24 0:07 GMT+09:00 Luis R. Rodriguez <mcgrof@kernel.org>:
+> > If you modify the target asm we currently do not force the
+> > recompilation of the firmware files. The target asm is in
+> > the firmware/Makefile, peg this file as a dependency to
+> > require re-compilation of firmware targets when the asm
+> > changes.
+> >
+> > Signed-off-by: Luis R. Rodriguez <mcgrof@kernel.org>
+> > ---
+> >
+> > Michal,
+> >
+> > I had this patch as part of my linker table series [0] but have split it
+> > off as its a small atomic separate change and can go in separately. Greg
+> > prefers this be reviewed by the kbuild tree so sending it your way.
+> > This v2 has no modifications, just resending it to the kbuild tree.
+> >
+> > [0] https://lkml.kernel.org/r/20170115211057.17167-1-mcgrof@kernel.org
+> >
+> >  firmware/Makefile | 3 ++-
+> >  1 file changed, 2 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/firmware/Makefile b/firmware/Makefile
+> > index e297e1b52636..fa3e81c2a97b 100644
+> > --- a/firmware/Makefile
+> > +++ b/firmware/Makefile
+> > @@ -176,7 +176,8 @@ quiet_cmd_fwbin = MK_FW   $@
+> >  wordsize_deps := $(wildcard include/config/64bit.h include/config/32bit.h \
+> >                 include/config/ppc32.h include/config/ppc64.h \
+> >                 include/config/superh32.h include/config/superh64.h \
+> > -               include/config/x86_32.h include/config/x86_64.h)
+> > +               include/config/x86_32.h include/config/x86_64.h \
+> > +               firmware/Makefile)
+> >
+> >  $(patsubst %,$(obj)/%.gen.S, $(fw-shipped-y)): %: $(wordsize_deps)
+> >         $(call cmd,fwbin,$(patsubst %.gen.S,%,$@))
+> 
+> 
+> Why don't you use  $(call filechk,...) or $(call if_changed,...)
+> instead of wordsize_deps ?
 
-warning: -ffunction-sections disabled; it makes profiling impossible [enabled by default]
+Care to send a patch?
 
-This turns off function sections in that specific case, leaving
-it enabled for all other configurations.
-
-Fixes: b67067f1176d ("kbuild: allow archs to select link dead code/data elimination")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-Cc: Namhyung Kim <namhyung.with.foss@gmail.com>
----
-v2: accidentally resend the same patch as before
-v3: send the exact same patch once more, without doing the change I wanted
-v4: actually fixed version number in check as pointed out by Namhyung Kim (I hope)
----
- Makefile | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/Makefile b/Makefile
-index 6e7e644a0b84..3a964fa3a787 100644
---- a/Makefile
-+++ b/Makefile
-@@ -662,7 +662,11 @@ KBUILD_CFLAGS	+= -Wextra
- KBUILD_CFLAGS	+= $(call cc-disable-warning,frame-address,)
- 
- ifdef CONFIG_LD_DEAD_CODE_DATA_ELIMINATION
-+ifdef CONFIG_FUNCTION_TRACER
-+KBUILD_CFLAGS	+= $(call cc-ifversion, -ge,0408,$(call cc-option,-ffunction-sections,))
-+else
- KBUILD_CFLAGS	+= $(call cc-option,-ffunction-sections,)
-+endif
- KBUILD_CFLAGS	+= $(call cc-option,-fdata-sections,)
- endif
- 
--- 
-2.9.0
-
+  Luis
