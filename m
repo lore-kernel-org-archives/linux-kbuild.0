@@ -1,18 +1,18 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-qt0-f169.google.com ([209.85.216.169]:35955 "EHLO
-        mail-qt0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751237AbdCQMjW (ORCPT
+Received: from mail-qt0-f170.google.com ([209.85.216.170]:32805 "EHLO
+        mail-qt0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751110AbdCQMjj (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 17 Mar 2017 08:39:22 -0400
-Received: by mail-qt0-f169.google.com with SMTP id r45so61120962qte.3
-        for <linux-kbuild@vger.kernel.org>; Fri, 17 Mar 2017 05:39:21 -0700 (PDT)
+        Fri, 17 Mar 2017 08:39:39 -0400
+Received: by mail-qt0-f170.google.com with SMTP id i34so61352304qtc.0
+        for <linux-kbuild@vger.kernel.org>; Fri, 17 Mar 2017 05:39:38 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170317120837.pr74cv3xuj7qpoin@hirez.programming.kicks-ass.net>
+In-Reply-To: <CAG_fn=XcQLtcHRSm2BHYce9LMtyFJ+fWxfE4vYPCw+7U0DcrmQ@mail.gmail.com>
 References: <20170317001520.85223-1-md@google.com> <20170317001520.85223-7-md@google.com>
- <20170317120837.pr74cv3xuj7qpoin@hirez.programming.kicks-ass.net>
+ <20170317120837.pr74cv3xuj7qpoin@hirez.programming.kicks-ass.net> <CAG_fn=XcQLtcHRSm2BHYce9LMtyFJ+fWxfE4vYPCw+7U0DcrmQ@mail.gmail.com>
 From: Alexander Potapenko <glider@google.com>
-Date: Fri, 17 Mar 2017 13:31:23 +0100
-Message-ID: <CAG_fn=XcQLtcHRSm2BHYce9LMtyFJ+fWxfE4vYPCw+7U0DcrmQ@mail.gmail.com>
+Date: Fri, 17 Mar 2017 13:32:00 +0100
+Message-ID: <CAG_fn=WooTLkzex3hqPgO5pr7GsK3v7Z5riSA7K+-_S=S7rmBQ@mail.gmail.com>
 Subject: Re: [PATCH 6/7] md/raid10, LLVM: get rid of variable length array
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -21,46 +21,63 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Peter Zijlstra <peterz@infradead.org>
 Cc: Michael Davidson <md@google.com>, Michal Marek <mmarek@suse.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, Shaohua Li <shli@kernel.org>, Dmitry Vyukov <dvyukov@google.com>, Matthias Kaehlcke <mka@chromium.org>, x86@kernel.org, linux-kbuild@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org, linux-raid@vger.kernel.org
 
-On Fri, Mar 17, 2017 at 1:08 PM, Peter Zijlstra <peterz@infradead.org> wrot=
-e:
-> On Thu, Mar 16, 2017 at 05:15:19PM -0700, Michael Davidson wrote:
->> Replace a variable length array in a struct by allocating
->> the memory for the entire struct in a char array on the stack.
+On Fri, Mar 17, 2017 at 1:31 PM, Alexander Potapenko <glider@google.com> wr=
+ote:
+> On Fri, Mar 17, 2017 at 1:08 PM, Peter Zijlstra <peterz@infradead.org> wr=
+ote:
+>> On Thu, Mar 16, 2017 at 05:15:19PM -0700, Michael Davidson wrote:
+>>> Replace a variable length array in a struct by allocating
+>>> the memory for the entire struct in a char array on the stack.
+>>>
+>>> Signed-off-by: Michael Davidson <md@google.com>
+>>> ---
+>>>  drivers/md/raid10.c | 9 ++++-----
+>>>  1 file changed, 4 insertions(+), 5 deletions(-)
+>>>
+>>> diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
+>>> index 063c43d83b72..158ebdff782c 100644
+>>> --- a/drivers/md/raid10.c
+>>> +++ b/drivers/md/raid10.c
+>>> @@ -4654,11 +4654,10 @@ static int handle_reshape_read_error(struct mdd=
+ev *mddev,
+>>>       /* Use sync reads to get the blocks from somewhere else */
+>>>       int sectors =3D r10_bio->sectors;
+>>>       struct r10conf *conf =3D mddev->private;
+>>> -     struct {
+>>> -             struct r10bio r10_bio;
+>>> -             struct r10dev devs[conf->copies];
+>>> -     } on_stack;
+>>> -     struct r10bio *r10b =3D &on_stack.r10_bio;
+>>> +     char on_stack_r10_bio[sizeof(struct r10bio) +
+>>> +                           conf->copies * sizeof(struct r10dev)]
+>>> +                           __aligned(__alignof__(struct r10bio));
+>>> +     struct r10bio *r10b =3D (struct r10bio *)on_stack_r10_bio;
+>>>       int slot =3D 0;
+>>>       int idx =3D 0;
+>>>       struct bio_vec *bvec =3D r10_bio->master_bio->bi_io_vec;
 >>
->> Signed-off-by: Michael Davidson <md@google.com>
->> ---
->>  drivers/md/raid10.c | 9 ++++-----
->>  1 file changed, 4 insertions(+), 5 deletions(-)
 >>
->> diff --git a/drivers/md/raid10.c b/drivers/md/raid10.c
->> index 063c43d83b72..158ebdff782c 100644
->> --- a/drivers/md/raid10.c
->> +++ b/drivers/md/raid10.c
->> @@ -4654,11 +4654,10 @@ static int handle_reshape_read_error(struct mdde=
-v *mddev,
->>       /* Use sync reads to get the blocks from somewhere else */
->>       int sectors =3D r10_bio->sectors;
->>       struct r10conf *conf =3D mddev->private;
->> -     struct {
->> -             struct r10bio r10_bio;
->> -             struct r10dev devs[conf->copies];
->> -     } on_stack;
->> -     struct r10bio *r10b =3D &on_stack.r10_bio;
->> +     char on_stack_r10_bio[sizeof(struct r10bio) +
->> +                           conf->copies * sizeof(struct r10dev)]
->> +                           __aligned(__alignof__(struct r10bio));
->> +     struct r10bio *r10b =3D (struct r10bio *)on_stack_r10_bio;
->>       int slot =3D 0;
->>       int idx =3D 0;
->>       struct bio_vec *bvec =3D r10_bio->master_bio->bi_io_vec;
+>> That's disgusting. Why not fix LLVM to support this?
 >
+> IIUC there's only a handful of VLAIS instances in LLVM code, why not
+Sorry, "kernel code", not "LLVM code".
+> just drop them for the sake of better code portability?
+> (To quote Linus, "this feature is an abomination":
+> https://lkml.org/lkml/2013/9/23/500)
 >
-> That's disgusting. Why not fix LLVM to support this?
+> --
+> Alexander Potapenko
+> Software Engineer
+>
+> Google Germany GmbH
+> Erika-Mann-Stra=C3=9Fe, 33
+> 80636 M=C3=BCnchen
+>
+> Gesch=C3=A4ftsf=C3=BChrer: Matthew Scott Sucherman, Paul Terence Manicle
+> Registergericht und -nummer: Hamburg, HRB 86891
+> Sitz der Gesellschaft: Hamburg
 
-IIUC there's only a handful of VLAIS instances in LLVM code, why not
-just drop them for the sake of better code portability?
-(To quote Linus, "this feature is an abomination":
-https://lkml.org/lkml/2013/9/23/500)
+
 
 --=20
 Alexander Potapenko
