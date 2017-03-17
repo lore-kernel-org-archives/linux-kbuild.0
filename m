@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bombadil.infradead.org ([65.50.211.133]:42914 "EHLO
+Received: from bombadil.infradead.org ([65.50.211.133]:41133 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751208AbdCQTcK (ORCPT
+        with ESMTP id S1751180AbdCQUfd (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 17 Mar 2017 15:32:10 -0400
-Date: Fri, 17 Mar 2017 20:29:35 +0100
+        Fri, 17 Mar 2017 16:35:33 -0400
+Date: Fri, 17 Mar 2017 20:26:42 +0100
 From: Peter Zijlstra <peterz@infradead.org>
 Subject: Re: [PATCH 6/7] md/raid10, LLVM: get rid of variable length array
-Message-ID: <20170317192935.d5almj4brat6uvlt@hirez.programming.kicks-ass.net>
+Message-ID: <20170317192642.qnrf7xuopxzapl2r@hirez.programming.kicks-ass.net>
 References: <20170317001520.85223-1-md@google.com>
  <20170317001520.85223-7-md@google.com>
  <20170317120837.pr74cv3xuj7qpoin@hirez.programming.kicks-ass.net>
@@ -17,35 +17,26 @@ References: <20170317001520.85223-1-md@google.com>
  <CACT4Y+Ysvjz+UzEi0dTtsNxxnG7WXTiZPr+KSk8HHwSu7vX1ew@mail.gmail.com>
  <20170317185720.5s7qa6hl233t24ag@pd.tnic>
  <CACT4Y+bybdpqB71=inx8amwr188Mb2QyBeRTDdWZ3AFyDwVX0A@mail.gmail.com>
- <20170317192642.qnrf7xuopxzapl2r@hirez.programming.kicks-ass.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170317192642.qnrf7xuopxzapl2r@hirez.programming.kicks-ass.net>
+In-Reply-To: <CACT4Y+bybdpqB71=inx8amwr188Mb2QyBeRTDdWZ3AFyDwVX0A@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Dmitry Vyukov <dvyukov@google.com>
 Cc: Borislav Petkov <bp@alien8.de>, Alexander Potapenko <glider@google.com>, Michael Davidson <md@google.com>, Michal Marek <mmarek@suse.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, Shaohua Li <shli@kernel.org>, Matthias Kaehlcke <mka@chromium.org>, "x86@kernel.org" <x86@kernel.org>, "open list:KERNEL BUILD + fi..." <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org, linux-raid@vger.kernel.org, kbuild-all@01.org, Fengguang Wu <fengguang.wu@intel.com>
 
-On Fri, Mar 17, 2017 at 08:26:42PM +0100, Peter Zijlstra wrote:
-> On Fri, Mar 17, 2017 at 08:05:16PM +0100, Dmitry Vyukov wrote:
-> > You can also find some reasons in the Why section of LLVM-Linux project:
-> > http://llvm.linuxfoundation.org/index.php/Main_Page
-> 
-> From that:
-> 
->  - LLVM/Clang is a fast moving project with many things fixed quickly
->    and features added.
-> 
-> So what's the deal with that 5 year old bug you want us to work around?
-> 
-> Also, clang doesn't support asm cc flags output and a few other
-> extensions last time I checked.
-> 
+On Fri, Mar 17, 2017 at 08:05:16PM +0100, Dmitry Vyukov wrote:
+> You can also find some reasons in the Why section of LLVM-Linux project:
+> http://llvm.linuxfoundation.org/index.php/Main_Page
 
-Another great one:
+From that:
 
- - BSD License (some people prefer this license to the GPL)
+ - LLVM/Clang is a fast moving project with many things fixed quickly
+   and features added.
 
-Seems a very weak argument to make when talking about the Linux Kernel
-which is very explicitly GPLv2 (and not later).
+So what's the deal with that 5 year old bug you want us to work around?
+
+Also, clang doesn't support asm cc flags output and a few other
+extensions last time I checked.
+
