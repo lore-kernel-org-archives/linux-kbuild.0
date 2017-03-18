@@ -1,75 +1,107 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:62666 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751337AbdCRNO6 (ORCPT
+Received: from condef-07.nifty.com ([202.248.20.72]:50840 "EHLO
+        condef-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751007AbdCRNs5 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 18 Mar 2017 09:14:58 -0400
+        Sat, 18 Mar 2017 09:48:57 -0400
 MIME-Version: 1.0
-In-Reply-To: <ba676afc-d52c-5f79-1794-2b751054bf53@suse.com>
-References: <20161122213434.14788-1-mmarek@suse.com> <20170310175854.GE18894@arm.com>
- <ba676afc-d52c-5f79-1794-2b751054bf53@suse.com>
+In-Reply-To: <CAB=NE6U9c9=vui99QLH-cg=MAT2antTGKqMvKFswB1w+7Xnv5Q@mail.gmail.com>
+References: <20170118173156.16060-1-mcgrof@kernel.org> <20170123150727.4883-1-mcgrof@kernel.org>
+ <CAK7LNASzfaBQVTk94=eZ347ZhkZVhqwjrqfhWOro8Cg7pCykKg@mail.gmail.com>
+ <20170315005348.GK28800@wotan.suse.de> <CAK7LNAQmVSXVQt4-GHiOTUh4Dc0s0xB7Ob4kyA7G_qiM5CEDZA@mail.gmail.com>
+ <CAB=NE6U9c9=vui99QLH-cg=MAT2antTGKqMvKFswB1w+7Xnv5Q@mail.gmail.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sat, 18 Mar 2017 22:14:41 +0900
-Message-ID: <CAK7LNAToohT8a0Xz2Jh53PFcU5e8gCie+ktYhB_j1wzNhRF--A@mail.gmail.com>
-Subject: Re: [PATCH 1/6] arm64: Use full path in KBUILD_IMAGE definition
+Date: Sat, 18 Mar 2017 22:32:56 +0900
+Message-ID: <CAK7LNATjUKVdnnxJTg6vavux4O5PyBTpz727vRDRx_WqrYunkA@mail.gmail.com>
+Subject: Re: [PATCH v2] firmware/Makefile: force recompilation if makefile changes
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>, Will Deacon <will.deacon@arm.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+To: "Luis R. Rodriguez" <mcgrof@kernel.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Ming Lei <ming.lei@canonical.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Tom Gundersen <teg@jklm.no>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, David Woodhouse <dwmw2@infradead.org>
 
-Hi Will, Michal,
+Hi Luis,
 
-2017-03-11 6:20 GMT+09:00 Michal Marek <mmarek@suse.com>:
-> Dne 10.3.2017 v 18:58 Will Deacon napsal(a):
->> Hi Michael,
+2017-03-17 2:55 GMT+09:00 Luis R. Rodriguez <mcgrof@kernel.org>:
+> On Thu, Mar 16, 2017 at 10:43 AM, Masahiro Yamada
+> <yamada.masahiro@socionext.com> wrote:
+>> Hi Luis,
 >>
->> On Tue, Nov 22, 2016 at 10:34:29PM +0100, Michal Marek wrote:
->>> The KBUILD_IMAGE variable is used by the rpm and deb-pkg targets, which
->>> expect it to point to the image file in the build directory. The
->>> builddeb script has a workaround for architectures which only provide
->>> the basename, but let's provide a clean interface for packaging tools.
+>> 2017-03-15 9:53 GMT+09:00 Luis R. Rodriguez <mcgrof@kernel.org>:
+>>> On Sat, Mar 11, 2017 at 02:37:02PM +0900, Masahiro Yamada wrote:
+>>>> Hi Luis,
+>>>>
+>>>>
+>>>> 2017-01-24 0:07 GMT+09:00 Luis R. Rodriguez <mcgrof@kernel.org>:
+>>>> > If you modify the target asm we currently do not force the
+>>>> > recompilation of the firmware files. The target asm is in
+>>>> > the firmware/Makefile, peg this file as a dependency to
+>>>> > require re-compilation of firmware targets when the asm
+>>>> > changes.
+>>>> >
+>>>> > Signed-off-by: Luis R. Rodriguez <mcgrof@kernel.org>
+>>>> > ---
+>>>> >
+>>>> > Michal,
+>>>> >
+>>>> > I had this patch as part of my linker table series [0] but have split it
+>>>> > off as its a small atomic separate change and can go in separately. Greg
+>>>> > prefers this be reviewed by the kbuild tree so sending it your way.
+>>>> > This v2 has no modifications, just resending it to the kbuild tree.
+>>>> >
+>>>> > [0] https://lkml.kernel.org/r/20170115211057.17167-1-mcgrof@kernel.org
+>>>> >
+>>>> >  firmware/Makefile | 3 ++-
+>>>> >  1 file changed, 2 insertions(+), 1 deletion(-)
+>>>> >
+>>>> > diff --git a/firmware/Makefile b/firmware/Makefile
+>>>> > index e297e1b52636..fa3e81c2a97b 100644
+>>>> > --- a/firmware/Makefile
+>>>> > +++ b/firmware/Makefile
+>>>> > @@ -176,7 +176,8 @@ quiet_cmd_fwbin = MK_FW   $@
+>>>> >  wordsize_deps := $(wildcard include/config/64bit.h include/config/32bit.h \
+>>>> >                 include/config/ppc32.h include/config/ppc64.h \
+>>>> >                 include/config/superh32.h include/config/superh64.h \
+>>>> > -               include/config/x86_32.h include/config/x86_64.h)
+>>>> > +               include/config/x86_32.h include/config/x86_64.h \
+>>>> > +               firmware/Makefile)
+>>>> >
+>>>> >  $(patsubst %,$(obj)/%.gen.S, $(fw-shipped-y)): %: $(wordsize_deps)
+>>>> >         $(call cmd,fwbin,$(patsubst %.gen.S,%,$@))
+>>>>
+>>>>
+>>>> Why don't you use  $(call filechk,...) or $(call if_changed,...)
+>>>> instead of wordsize_deps ?
 >>>
->>> Cc: Catalin Marinas <catalin.marinas@arm.com>
->>> Cc: Will Deacon <will.deacon@arm.com>
->>> Cc: linux-arm-kernel@lists.infradead.org
->>> Signed-off-by: Michal Marek <mmarek@suse.com>
->>> ---
->>>  arch/arm64/Makefile | 6 +++---
->>>  1 file changed, 3 insertions(+), 3 deletions(-)
+>>> Care to send a patch?
 >>
->> What's the plan for this patch? I'm happy to merge it,
+>>
+>> Sorry for my late reply.
+>>
+>> Yes, if you want, I will give it a try.
+>>
+>> But, please wait until this weekend...
 >
-> Great, please merge it.
+> Andrew picked up my patch already as its been sitting in limbo without
+> any feedback for a long time
+
+
+OK.   (and, sorry for the delay.)
+
+It is not a good idea to make your work stuck even longer.
+
+
+> --- so you can work off of what is on
+> linux-next or we can request Andrew to drop this patch once and if you
+> get a replacement as its not yet on Linus' tree.
 >
->
->> but I don't see
->> the rest of the series queued anywhere.
->
-> I'll see what remains and submit the rest via the kbuild tree.
->
-> Thanks,
-> Michal
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+Please go ahead with your patch.
 
 
-I like this approach, rather than fixing scripts/package/mkspec.
-
-
-So, how shall we handle this series?
-
-
-I am OK with getting 1/6 in through arm64 tree,
-but 6/6 will be postponed in the case.
-
-
-
-If Will issues Acked-by, I can pick-up the whole series
-to linux-kbuild.
-
+When I find time to take a close look,
+I may come back to firmware/Makefile.
+But, I guess it will not happen soon.
 
 
 
