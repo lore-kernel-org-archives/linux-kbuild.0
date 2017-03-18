@@ -1,110 +1,86 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from condef-07.nifty.com ([202.248.20.72]:50840 "EHLO
-        condef-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751007AbdCRNs5 (ORCPT
+Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:51036 "EHLO
+        shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1751207AbdCRWjb (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 18 Mar 2017 09:48:57 -0400
+        Sat, 18 Mar 2017 18:39:31 -0400
+Date: Sat, 18 Mar 2017 21:58:23 +0000
+From: Ben Hutchings <ben@decadent.org.uk>
+Message-ID: <20170318215823.GS4152@decadent.org.uk>
 MIME-Version: 1.0
-In-Reply-To: <CAB=NE6U9c9=vui99QLH-cg=MAT2antTGKqMvKFswB1w+7Xnv5Q@mail.gmail.com>
-References: <20170118173156.16060-1-mcgrof@kernel.org> <20170123150727.4883-1-mcgrof@kernel.org>
- <CAK7LNASzfaBQVTk94=eZ347ZhkZVhqwjrqfhWOro8Cg7pCykKg@mail.gmail.com>
- <20170315005348.GK28800@wotan.suse.de> <CAK7LNAQmVSXVQt4-GHiOTUh4Dc0s0xB7Ob4kyA7G_qiM5CEDZA@mail.gmail.com>
- <CAB=NE6U9c9=vui99QLH-cg=MAT2antTGKqMvKFswB1w+7Xnv5Q@mail.gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sat, 18 Mar 2017 22:32:56 +0900
-Message-ID: <CAK7LNATjUKVdnnxJTg6vavux4O5PyBTpz727vRDRx_WqrYunkA@mail.gmail.com>
-Subject: Re: [PATCH v2] firmware/Makefile: force recompilation if makefile changes
-Content-Type: text/plain; charset=UTF-8
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="T4NxgPrvSrIDR5b4"
+Content-Disposition: inline
+Subject: [PATCH] Kbuild.include: addtree: Remove quotes before matching path
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Luis R. Rodriguez" <mcgrof@kernel.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Ming Lei <ming.lei@canonical.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Tom Gundersen <teg@jklm.no>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, David Woodhouse <dwmw2@infradead.org>
-
-Hi Luis,
-
-2017-03-17 2:55 GMT+09:00 Luis R. Rodriguez <mcgrof@kernel.org>:
-> On Thu, Mar 16, 2017 at 10:43 AM, Masahiro Yamada
-> <yamada.masahiro@socionext.com> wrote:
->> Hi Luis,
->>
->> 2017-03-15 9:53 GMT+09:00 Luis R. Rodriguez <mcgrof@kernel.org>:
->>> On Sat, Mar 11, 2017 at 02:37:02PM +0900, Masahiro Yamada wrote:
->>>> Hi Luis,
->>>>
->>>>
->>>> 2017-01-24 0:07 GMT+09:00 Luis R. Rodriguez <mcgrof@kernel.org>:
->>>> > If you modify the target asm we currently do not force the
->>>> > recompilation of the firmware files. The target asm is in
->>>> > the firmware/Makefile, peg this file as a dependency to
->>>> > require re-compilation of firmware targets when the asm
->>>> > changes.
->>>> >
->>>> > Signed-off-by: Luis R. Rodriguez <mcgrof@kernel.org>
->>>> > ---
->>>> >
->>>> > Michal,
->>>> >
->>>> > I had this patch as part of my linker table series [0] but have split it
->>>> > off as its a small atomic separate change and can go in separately. Greg
->>>> > prefers this be reviewed by the kbuild tree so sending it your way.
->>>> > This v2 has no modifications, just resending it to the kbuild tree.
->>>> >
->>>> > [0] https://lkml.kernel.org/r/20170115211057.17167-1-mcgrof@kernel.org
->>>> >
->>>> >  firmware/Makefile | 3 ++-
->>>> >  1 file changed, 2 insertions(+), 1 deletion(-)
->>>> >
->>>> > diff --git a/firmware/Makefile b/firmware/Makefile
->>>> > index e297e1b52636..fa3e81c2a97b 100644
->>>> > --- a/firmware/Makefile
->>>> > +++ b/firmware/Makefile
->>>> > @@ -176,7 +176,8 @@ quiet_cmd_fwbin = MK_FW   $@
->>>> >  wordsize_deps := $(wildcard include/config/64bit.h include/config/32bit.h \
->>>> >                 include/config/ppc32.h include/config/ppc64.h \
->>>> >                 include/config/superh32.h include/config/superh64.h \
->>>> > -               include/config/x86_32.h include/config/x86_64.h)
->>>> > +               include/config/x86_32.h include/config/x86_64.h \
->>>> > +               firmware/Makefile)
->>>> >
->>>> >  $(patsubst %,$(obj)/%.gen.S, $(fw-shipped-y)): %: $(wordsize_deps)
->>>> >         $(call cmd,fwbin,$(patsubst %.gen.S,%,$@))
->>>>
->>>>
->>>> Why don't you use  $(call filechk,...) or $(call if_changed,...)
->>>> instead of wordsize_deps ?
->>>
->>> Care to send a patch?
->>
->>
->> Sorry for my late reply.
->>
->> Yes, if you want, I will give it a try.
->>
->> But, please wait until this weekend...
->
-> Andrew picked up my patch already as its been sitting in limbo without
-> any feedback for a long time
+To: linux-kbuild@vger.kernel.org
+Cc: stable@vger.kernel.org, 856474@bugs.debian.org
 
 
-OK.   (and, sorry for the delay.)
+--T4NxgPrvSrIDR5b4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-It is not a good idea to make your work stuck even longer.
+systemtap currently fails to build modules when the kernel source and
+object trees are separate.
 
+systemtap adds something like -I"/usr/share/systemtap/runtime" to
+EXTRA_CFLAGS, and addtree should not adjust this as it's specifying an
+absolute directory.  But since make has no understanding of shell
+quoting, it does anyway.
 
-> --- so you can work off of what is on
-> linux-next or we can request Andrew to drop this patch once and if you
-> get a replacement as its not yet on Linus' tree.
->
+For a long time this didn't matter, because addtree would still emit
+the original -I option after the adjusted one.  However, commit
+db547ef19064 ("Kbuild: don't add obj tree in additional includes")
+changed it to remove the original -I option.
 
-Please go ahead with your patch.
+Remove quotes (both double and single) before matching against the
+excluded patterns.
 
+References: https://bugs.debian.org/856474
+Reported-and-tested-by: Jack Henschel <jackdev@mailbox.org>
+Reported-and-tested-by: Ritesh Raj Sarraf <rrs@debian.org>
+Fixes: db547ef19064 ("Kbuild: don't add obj tree in additional includes")
+Cc: stable@vger.kernel.org # 4.8+
+Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+---
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -207,7 +207,7 @@ hdr-inst :=3D -f $(srctree)/scripts/Makefi
+ # Prefix -I with $(srctree) if it is not an absolute path.
+ # skip if -I has no parameter
+ addtree =3D $(if $(patsubst -I%,%,$(1)), \
+-$(if $(filter-out -I/% -I./% -I../%,$(1)),$(patsubst -I%,-I$(srctree)/%,$(=
+1)),$(1)))
++$(if $(filter-out -I/% -I./% -I../%,$(subst $(quote),,$(subst $(squote),,$=
+(1)))),$(patsubst -I%,-I$(srctree)/%,$(1)),$(1)))
+=20
+ # Find all -I options and call addtree
+ flags =3D $(foreach o,$($(1)),$(if $(filter -I%,$(o)),$(call addtree,$(o))=
+,$(o)))
 
-When I find time to take a close look,
-I may come back to firmware/Makefile.
-But, I guess it will not happen soon.
+--T4NxgPrvSrIDR5b4
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
 
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
 
+iQIVAwUBWM2tf+e/yOyVhhEJAQqLQg//T7eiKpfHTcYDydv4yOIQff/SiyV4CzpC
+X4WwOLFKD1T+WXnjbHXv4xpgFPPtroBcYwVDT/EWgMKpzmqnyPLct5wW3pV2huBK
+FUaODbnsVxJmXexekxw/UZXC9hCVbTqbXMgBT/S+LZRbmFcIEXM2JZhb61NH/p6/
+98JrPKnRzjfWTXywFZflpQJPtHtN3E9xnYeiPIWQRpcvR+fEjXUsM1o/2FzzZQEG
+4YNwrzPi/esVK2zQdXo5VwgP0ShSkAY5XvDB9Cy0J+WWk1p41dt2N+0asYfLtUy2
+4S5X+7p5k2jsQNhLbApNAz/jBz5yJfNKhbrntku30NiracqnDw22UlyNfhF/3DUd
+FzDAvCSKaRze/Olt7GNPxAoCWmzTGxuk33tnafTfY6Wt37TggbUqPvORBwd+wDBA
+Q7rjgsww6AH4MMNrBScDU5fYLpN6GVOq2L+scWwrV9ZRWK48YpCH16d/jZ111agQ
+Wa1+xlulfFlfisFRh2x16hH6FoA/f7MMu8SpLj+Kk3PIa1i/QYLQmmupGVUNVrey
+JI6yoV3SB3ehs5bUdYY63nQ2hhAY4v8d4xN3EwDqBALhmsZX9gioHKwakdmLZ4MR
+i/IDyMXGslH0wgiFGuXp1qtrifOyfDS4hmtaqQknm0NYzH6Z3YkfYSZRnn4TYqR4
+0Op2swXqMvc=
+=Q2zP
+-----END PGP SIGNATURE-----
 
--- 
-Best Regards
-Masahiro Yamada
+--T4NxgPrvSrIDR5b4--
