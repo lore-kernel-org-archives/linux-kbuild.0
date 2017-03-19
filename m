@@ -1,86 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:51036 "EHLO
-        shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1751207AbdCRWjb (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 18 Mar 2017 18:39:31 -0400
-Date: Sat, 18 Mar 2017 21:58:23 +0000
-From: Ben Hutchings <ben@decadent.org.uk>
-Message-ID: <20170318215823.GS4152@decadent.org.uk>
+Received: from ozlabs.org ([103.22.144.67]:45721 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752058AbdCSK7X (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Sun, 19 Mar 2017 06:59:23 -0400
+Date: Sun, 19 Mar 2017 21:59:15 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+Subject: Re: [PATCH] MAINTAINERS: add Masahiro Yamada as a Kbuild maintainer
+Message-ID: <20170319215915.6bbbc26d@canb.auug.org.au>
+In-Reply-To: <CAK7LNASKKg6PTFiGMdR2XzWDVq2j_pBwXW6L2Mh4Ko+t0=QzHw@mail.gmail.com>
+References: <1489110110-9723-1-git-send-email-yamada.masahiro@socionext.com>
+        <CAK7LNASKKg6PTFiGMdR2XzWDVq2j_pBwXW6L2Mh4Ko+t0=QzHw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="T4NxgPrvSrIDR5b4"
-Content-Disposition: inline
-Subject: [PATCH] Kbuild.include: addtree: Remove quotes before matching path
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: stable@vger.kernel.org, 856474@bugs.debian.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>
 
+Hi Masahiro,
 
---T4NxgPrvSrIDR5b4
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Tue, 14 Mar 2017 14:45:20 +0900 Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
+>
+> 2017-03-10 10:41 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
+> > It has been difficult lately for Michal to work on Kbuild on his
+> > regular basis.  We discussed the maintainership of Kbuild, and I
+> > decided to be a co-maintainer.
+> >
+> > Add myself to the maintainer field, and replace the repository with
+> > my own.
+> >
+> > Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> > Acked-by: Michal Marek <mmarek@suse.com>  
+> 
+> Applied to linux-kbuild/fixes.
 
-systemtap currently fails to build modules when the kernel source and
-object trees are separate.
+I have also replaced the kbuild-current tree with this branch from tomorrow.
 
-systemtap adds something like -I"/usr/share/systemtap/runtime" to
-EXTRA_CFLAGS, and addtree should not adjust this as it's specifying an
-absolute directory.  But since make has no understanding of shell
-quoting, it does anyway.
-
-For a long time this didn't matter, because addtree would still emit
-the original -I option after the adjusted one.  However, commit
-db547ef19064 ("Kbuild: don't add obj tree in additional includes")
-changed it to remove the original -I option.
-
-Remove quotes (both double and single) before matching against the
-excluded patterns.
-
-References: https://bugs.debian.org/856474
-Reported-and-tested-by: Jack Henschel <jackdev@mailbox.org>
-Reported-and-tested-by: Ritesh Raj Sarraf <rrs@debian.org>
-Fixes: db547ef19064 ("Kbuild: don't add obj tree in additional includes")
-Cc: stable@vger.kernel.org # 4.8+
-Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
----
---- a/scripts/Kbuild.include
-+++ b/scripts/Kbuild.include
-@@ -207,7 +207,7 @@ hdr-inst :=3D -f $(srctree)/scripts/Makefi
- # Prefix -I with $(srctree) if it is not an absolute path.
- # skip if -I has no parameter
- addtree =3D $(if $(patsubst -I%,%,$(1)), \
--$(if $(filter-out -I/% -I./% -I../%,$(1)),$(patsubst -I%,-I$(srctree)/%,$(=
-1)),$(1)))
-+$(if $(filter-out -I/% -I./% -I../%,$(subst $(quote),,$(subst $(squote),,$=
-(1)))),$(patsubst -I%,-I$(srctree)/%,$(1)),$(1)))
-=20
- # Find all -I options and call addtree
- flags =3D $(foreach o,$($(1)),$(if $(filter -I%,$(o)),$(call addtree,$(o))=
-,$(o)))
-
---T4NxgPrvSrIDR5b4
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iQIVAwUBWM2tf+e/yOyVhhEJAQqLQg//T7eiKpfHTcYDydv4yOIQff/SiyV4CzpC
-X4WwOLFKD1T+WXnjbHXv4xpgFPPtroBcYwVDT/EWgMKpzmqnyPLct5wW3pV2huBK
-FUaODbnsVxJmXexekxw/UZXC9hCVbTqbXMgBT/S+LZRbmFcIEXM2JZhb61NH/p6/
-98JrPKnRzjfWTXywFZflpQJPtHtN3E9xnYeiPIWQRpcvR+fEjXUsM1o/2FzzZQEG
-4YNwrzPi/esVK2zQdXo5VwgP0ShSkAY5XvDB9Cy0J+WWk1p41dt2N+0asYfLtUy2
-4S5X+7p5k2jsQNhLbApNAz/jBz5yJfNKhbrntku30NiracqnDw22UlyNfhF/3DUd
-FzDAvCSKaRze/Olt7GNPxAoCWmzTGxuk33tnafTfY6Wt37TggbUqPvORBwd+wDBA
-Q7rjgsww6AH4MMNrBScDU5fYLpN6GVOq2L+scWwrV9ZRWK48YpCH16d/jZ111agQ
-Wa1+xlulfFlfisFRh2x16hH6FoA/f7MMu8SpLj+Kk3PIa1i/QYLQmmupGVUNVrey
-JI6yoV3SB3ehs5bUdYY63nQ2hhAY4v8d4xN3EwDqBALhmsZX9gioHKwakdmLZ4MR
-i/IDyMXGslH0wgiFGuXp1qtrifOyfDS4hmtaqQknm0NYzH6Z3YkfYSZRnn4TYqR4
-0Op2swXqMvc=
-=Q2zP
------END PGP SIGNATURE-----
-
---T4NxgPrvSrIDR5b4--
+-- 
+Cheers,
+Stephen Rothwell
