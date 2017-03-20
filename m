@@ -1,44 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from foss.arm.com ([217.140.101.70]:35650 "EHLO foss.arm.com"
+Received: from foss.arm.com ([217.140.101.70]:37416 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753491AbdCTKNH (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 20 Mar 2017 06:13:07 -0400
-Date: Mon, 20 Mar 2017 10:13:15 +0000
+        id S1753075AbdCTMNR (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 20 Mar 2017 08:13:17 -0400
+Date: Mon, 20 Mar 2017 12:13:28 +0000
 From: Will Deacon <will.deacon@arm.com>
-Subject: Re: kbuild/mkspec: Fix architectures where KBUILD_IMAGE isn't a full
- path
-Message-ID: <20170320101315.GB17263@arm.com>
-References: <1489276762-22280-1-git-send-email-trini@konsulko.com>
- <20170315145118.GA30463@bill-the-cat>
- <39bd8ad9-ce11-3d81-95a9-235ceaded812@suse.com>
- <20170315153755.GR19897@bill-the-cat>
+Subject: Re: [PATCH 1/6] arm64: Use full path in KBUILD_IMAGE definition
+Message-ID: <20170320121328.GH17263@arm.com>
+References: <20161122213434.14788-1-mmarek@suse.com>
+ <20170310175854.GE18894@arm.com>
+ <ba676afc-d52c-5f79-1794-2b751054bf53@suse.com>
+ <CAK7LNAToohT8a0Xz2Jh53PFcU5e8gCie+ktYhB_j1wzNhRF--A@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20170315153755.GR19897@bill-the-cat>
+In-Reply-To: <CAK7LNAToohT8a0Xz2Jh53PFcU5e8gCie+ktYhB_j1wzNhRF--A@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Tom Rini <trini@konsulko.com>
-Cc: Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
 
-On Wed, Mar 15, 2017 at 11:37:55AM -0400, Tom Rini wrote:
-> On Wed, Mar 15, 2017 at 04:03:44PM +0100, Michal Marek wrote:
-> > Dne 15.3.2017 v 15:51 Tom Rini napsal(a):
-> > > I found https://patchwork.kernel.org/patch/9442211/ today and I see that
-> > > it was brought up again just before I sent my patch.  I just want to
-> > > point out that 9442211 doesn't address arm, arc, and sh and they will
-> > > still not have a functional rpm build target.  This is at least probably
-> > > important for arm.  Of course all of those could also be addressed with
-> > > a patch similar to 9442211, and my main concern is making sure
-> > > everything gets fixed one way or another.  Thanks!
-> > 
-> > The patch is 1/6 of a series that also covers other architectures, but
-> > patchwork won't should you the rest of the thread. Have a look here for
-> > instance: https://lkml.org/lkml/2016/11/22/750.
+On Sat, Mar 18, 2017 at 10:14:41PM +0900, Masahiro Yamada wrote:
+> 2017-03-11 6:20 GMT+09:00 Michal Marek <mmarek@suse.com>:
+> > Dne 10.3.2017 v 18:58 Will Deacon napsal(a):
+> >> On Tue, Nov 22, 2016 at 10:34:29PM +0100, Michal Marek wrote:
+> >>> The KBUILD_IMAGE variable is used by the rpm and deb-pkg targets, which
+> >>> expect it to point to the image file in the build directory. The
+> >>> builddeb script has a workaround for architectures which only provide
+> >>> the basename, but let's provide a clean interface for packaging tools.
+> >>>
+> >>> Cc: Catalin Marinas <catalin.marinas@arm.com>
+> >>> Cc: Will Deacon <will.deacon@arm.com>
+> >>> Cc: linux-arm-kernel@lists.infradead.org
+> >>> Signed-off-by: Michal Marek <mmarek@suse.com>
+> >>> ---
+> >>>  arch/arm64/Makefile | 6 +++---
+> >>>  1 file changed, 3 insertions(+), 3 deletions(-)
+> >>
+> >> What's the plan for this patch? I'm happy to merge it,
+> >
+> > Great, please merge it.
+> >
+> >> but I don't see
+> >> the rest of the series queued anywhere.
+> >
+> > I'll see what remains and submit the rest via the kbuild tree.
+> >
 > 
-> Ah, OK, thanks.  I'll just hope it gets in soon, I like being able to
-> easily drop new kernels in on my arm64 box :)
+> I like this approach, rather than fixing scripts/package/mkspec.
+> 
+> 
+> So, how shall we handle this series?
+> 
+> 
+> I am OK with getting 1/6 in through arm64 tree,
+> but 6/6 will be postponed in the case.
+> 
+> 
+> 
+> If Will issues Acked-by, I can pick-up the whole series
+> to linux-kbuild.
 
-I'll pick up the arm64 patch this week (I was on holiday last week).
+Ok, that works for me too. For the first patch:
+
+Acked-by: Will Deacon <will.deacon@arm.com>
+
+So please take this via linux-kbuild.
 
 Will
