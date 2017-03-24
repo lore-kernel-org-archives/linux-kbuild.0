@@ -1,106 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:40973 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751115AbdCXIXv (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 24 Mar 2017 04:23:51 -0400
-Subject: Re: [PATCH] x86/boot: Support uncompressed kernel
-References: <1490273467-97948-1-git-send-email-chao.p.peng@linux.intel.com>
-From: Michal Marek <mmarek@suse.com>
-Message-ID: <41c3a740-6a0c-755b-4fd2-89a367d3e85e@suse.com>
-Date: Fri, 24 Mar 2017 09:09:45 +0100
+Received: from mail-wm0-f47.google.com ([74.125.82.47]:32963 "EHLO
+        mail-wm0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1756464AbdCXIc7 (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 24 Mar 2017 04:32:59 -0400
+Received: by mail-wm0-f47.google.com with SMTP id v203so6094168wmg.0
+        for <linux-kbuild@vger.kernel.org>; Fri, 24 Mar 2017 01:32:57 -0700 (PDT)
+Reply-To: nicolas.dichtel@6wind.com
+Subject: Re: [PATCH v10 00/11] uapi: export all headers under uapi directories
+References: <CAK7LNARpx7f0eV5_AiPmNYT7MsRbGFOygJwjfAzX_7aCpuHwuw@mail.gmail.com>
+ <1489496093-15315-1-git-send-email-nicolas.dichtel@6wind.com>
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Message-ID: <365519b5-d69e-34b7-fa2f-f11b8fabe69f@6wind.com>
+Date: Fri, 24 Mar 2017 09:32:54 +0100
 MIME-Version: 1.0
-In-Reply-To: <1490273467-97948-1-git-send-email-chao.p.peng@linux.intel.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <1489496093-15315-1-git-send-email-nicolas.dichtel@6wind.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Chao Peng <chao.p.peng@linux.intel.com>
-Cc: "H. Peter Anvin" <hpa@zytor.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, x86@kernel.org, Kees Cook <keescook@chromium.org>, Yinghai Lu <yinghai@kernel.org>, Baoquan He <bhe@redhat.com>, "H.J. Lu" <hjl.tools@gmail.com>, Paul Bolle <pebolle@tiscali.nl>, Masahiro Yamada <yamada.masahiro@socionext.com>, Borislav Petkov <bp@suse.de>, Andrew Morton <akpm@linux-foundation.org>, Arnd Bergmann <arnd@arndb.de>, Petr Mladek <pmladek@suse.com>, "David S. Miller" <davem@davemloft.net>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Andy Lutomirski <luto@kernel.org>, Thomas Garnier <thgarnie@google.com>, Nicolas Pitre <nicolas.pitre@linaro.org>, Tejun Heo <tj@kernel.org>, Daniel Mack <daniel@zonque.org>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Sergey Senozhatsky <sergey.senozhatsky@gmail.com>, Helge Deller <deller@gmx.de>, Rik van Riel <riel@redhat.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: yamada.masahiro@socionext.com
+Cc: arnd@arndb.de, mmarek@suse.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, airlied@linux.ie, davem@davemloft.net, linux@armlinux.org.uk, bp@alien8.de, slash.tmp@free.fr, daniel.vetter@ffwll.ch, rmk+kernel@armlinux.org.uk, msalter@redhat.com, jengelh@inai.de, hch@infradead.org, tklauser@distanz.ch, mpe@ellerman.id.au, mingo@kernel.org, tglx@linutronix.de, ldv@altlinux.org, herbert@gondor.apana.org.au, linux-rdma@vger.kernel.org
 
-On 2017-03-23 13:51, Chao Peng wrote:
-> Compressed kernel has its own drawback: uncompressing takes time. Even
-> though the time is short enough to ignore for most cases but for cases that
-> time is critical this is still a big number. In our on-going optimization
-> for kernel boot time, the measured overall kernel boot time is ~90ms while
-> the uncompressing takes ~50ms with gzip.
+Le 14/03/2017 à 13:54, Nicolas Dichtel a écrit :
+> Patches #1 and #2 are just cleanup: some exported headers were still under
+> a non-uapi directory. Patch #3 is a fix to avoid exporting a file that was
+> not under an uapi directory.
+> After these three patches, all exported headers are under an uapi directory:
+> path #4 stops searching files in non uapi directories.
+> The patch #5 was spotted by code review: there is no in-tree user of this
+> functionality.
+> Patch #6 fixes some warnings/errors reported by 0-day tests.
+> Patch #7 to #9 fix some errors when the corresponding files are included by
+> userland.
+> Patches #10 and #11 remove the need to list explicitly headers. Now all files
+> under an uapi directory are exported.
 > 
-> The patch adds a 'CONFIG_KERNEL_RAW' configure choice so the built binary
-> can have no uncompressing at all. The experiment shows:
+> This series has been tested with a 'make headers_install' on x86 and a
+> 'make headers_install_all'. I've checked the result of both commands.
 > 
->     kernel               kernel size    time in decompress_kernel
->     compressed (gzip)    3.3M           53ms
->     uncompressed         14M            3ms
-> 
-> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
-> ---
->  arch/x86/boot/compressed/Makefile |  3 +++
->  arch/x86/boot/compressed/misc.c   | 14 ++++++++++++++
->  init/Kconfig                      |  7 +++++++
->  scripts/Makefile.lib              |  8 ++++++++
->  4 files changed, 32 insertions(+)
-> 
-> diff --git a/arch/x86/boot/compressed/Makefile b/arch/x86/boot/compressed/Makefile
-> index f9ce75d..fc0e1c0 100644
-> --- a/arch/x86/boot/compressed/Makefile
-> +++ b/arch/x86/boot/compressed/Makefile
-> @@ -73,6 +73,8 @@ $(obj)/vmlinux.relocs: vmlinux FORCE
->  vmlinux.bin.all-y := $(obj)/vmlinux.bin
->  vmlinux.bin.all-$(CONFIG_X86_NEED_RELOCS) += $(obj)/vmlinux.relocs
->  
-> +$(obj)/vmlinux.bin.raw: $(vmlinux.bin.all-y) FORCE
-> +	$(call if_changed,raw)
->  $(obj)/vmlinux.bin.gz: $(vmlinux.bin.all-y) FORCE
->  	$(call if_changed,gzip)
->  $(obj)/vmlinux.bin.bz2: $(vmlinux.bin.all-y) FORCE
-> @@ -86,6 +88,7 @@ $(obj)/vmlinux.bin.lzo: $(vmlinux.bin.all-y) FORCE
->  $(obj)/vmlinux.bin.lz4: $(vmlinux.bin.all-y) FORCE
->  	$(call if_changed,lz4)
->  
-> +suffix-$(CONFIG_KERNEL_RAW)	:= raw
->  suffix-$(CONFIG_KERNEL_GZIP)	:= gz
->  suffix-$(CONFIG_KERNEL_BZIP2)	:= bz2
->  suffix-$(CONFIG_KERNEL_LZMA)	:= lzma
-> diff --git a/arch/x86/boot/compressed/misc.c b/arch/x86/boot/compressed/misc.c
-> index 79dac17..fb3cd43 100644
-> --- a/arch/x86/boot/compressed/misc.c
-> +++ b/arch/x86/boot/compressed/misc.c
-> @@ -123,6 +123,20 @@ static char *vidmem;
->  static int vidport;
->  static int lines, cols;
->  
-> +#ifdef CONFIG_KERNEL_RAW
-> +#include <linux/decompress/mm.h>
-> +static int __decompress(unsigned char *buf, long len,
-> +			long (*fill)(void*, unsigned long),
-> +			long (*flush)(void*, unsigned long),
-> +			unsigned char *outbuf, long olen,
-> +			long *pos,
-> +			void (*error)(char *x))
-> +{
-> +	memcpy(outbuf, buf, olen);
-> +	return 0;
-> +}
-> +#endif
-> +
->  #ifdef CONFIG_KERNEL_GZIP
->  #include "../../../../lib/decompress_inflate.c"
->  #endif
-> diff --git a/init/Kconfig b/init/Kconfig
-> index 2232080..1db2ea2 100644
-> --- a/init/Kconfig
-> +++ b/init/Kconfig
-> @@ -137,6 +137,13 @@ choice
->  
->  	  If in doubt, select 'gzip'
->  
-> +config KERNEL_RAW
-> +	bool "RAW"
-> +	help
-> +	  No compression. It creates much bigger kernel and uses much more
-> +	  space (disk/memory) than other choices. It can be useful when
-> +	  decompression speed is the most concern while space is not a problem.
+> This patch is built on top of masahiroy/linux-kbuild.git#for-next (v4.11-rc1).
+> I didn't find any conflict with v4.11-rc2.
+Masahiro, is this series under review or do you expect something else on my side?
 
-This needs to depend on a HAVE_KERNEL_RAW config that is selected by the
-architectures that implement this target (x86).
 
-Michal
+Regards,
+Nicolas
