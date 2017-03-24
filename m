@@ -1,61 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wr0-f175.google.com ([209.85.128.175]:34556 "EHLO
-        mail-wr0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933626AbdCXJDS (ORCPT
+Received: from mail-vk0-f52.google.com ([209.85.213.52]:34210 "EHLO
+        mail-vk0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754290AbdCXNrm (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 24 Mar 2017 05:03:18 -0400
-Received: by mail-wr0-f175.google.com with SMTP id l43so4988852wre.1
-        for <linux-kbuild@vger.kernel.org>; Fri, 24 Mar 2017 02:03:16 -0700 (PDT)
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [PATCH v10 00/11] uapi: export all headers under uapi directories
-References: <CAK7LNARpx7f0eV5_AiPmNYT7MsRbGFOygJwjfAzX_7aCpuHwuw@mail.gmail.com>
- <1489496093-15315-1-git-send-email-nicolas.dichtel@6wind.com>
- <365519b5-d69e-34b7-fa2f-f11b8fabe69f@6wind.com>
- <CAK7LNAR_yp+O9jUZC8mKdaHgTiCkE7p2-ZbA9YZ8OGyp+uxhBQ@mail.gmail.com>
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Message-ID: <c963314f-bcde-f483-c6b1-cad975842e16@6wind.com>
-Date: Fri, 24 Mar 2017 10:03:08 +0100
+        Fri, 24 Mar 2017 09:47:42 -0400
+Received: by mail-vk0-f52.google.com with SMTP id z204so3446135vkd.1
+        for <linux-kbuild@vger.kernel.org>; Fri, 24 Mar 2017 06:47:36 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNAR_yp+O9jUZC8mKdaHgTiCkE7p2-ZbA9YZ8OGyp+uxhBQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <96158847-4F1F-4293-8435-E111F39E3260@zytor.com>
+References: <20170317001520.85223-1-md@google.com> <20170317001520.85223-7-md@google.com>
+ <20170317120837.pr74cv3xuj7qpoin@hirez.programming.kicks-ass.net>
+ <CAG_fn=XcQLtcHRSm2BHYce9LMtyFJ+fWxfE4vYPCw+7U0DcrmQ@mail.gmail.com>
+ <20170317124404.mt3jd5q5vyk63q2w@hirez.programming.kicks-ass.net>
+ <CA+=D-XXy9yEQc-jLxSqRUwq=4ADnFqaxnsjSzV4=8jOisym=bQ@mail.gmail.com>
+ <20170317192746.y5ade3bymifdni2p@hirez.programming.kicks-ass.net> <96158847-4F1F-4293-8435-E111F39E3260@zytor.com>
+From: Dmitry Vyukov <dvyukov@google.com>
+Date: Fri, 24 Mar 2017 14:47:15 +0100
+Message-ID: <CACT4Y+awYCAwoCkh8PQ-i2BdkxeuFp9meVXp=Yv6hGY8YjDnQg@mail.gmail.com>
+Subject: Re: [PATCH 6/7] md/raid10, LLVM: get rid of variable length array
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Arnd Bergmann <arnd@arndb.de>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-arch@vger.kernel.org, David Airlie <airlied@linux.ie>, "David S. Miller" <davem@davemloft.net>, Russell King <linux@armlinux.org.uk>, bp@alien8.de, slash.tmp@free.fr, Daniel Vetter <daniel.vetter@ffwll.ch>, rmk+kernel@armlinux.org.uk, msalter@redhat.com, jengelh@inai.de, hch@infradead.org, Tobias Klauser <tklauser@distanz.ch>, mpe@ellerman.id.au, Ingo Molnar <mingo@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, "Dmitry V. Levin" <ldv@altlinux.org>, Herbert Xu <herbert@gondor.apana.org.au>, linux-rdma@vger.kernel.org
+To: "H. Peter Anvin" <hpa@zytor.com>
+Cc: Peter Zijlstra <peterz@infradead.org>, Michael Davidson <md@google.com>, Alexander Potapenko <glider@google.com>, Michal Marek <mmarek@suse.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, Shaohua Li <shli@kernel.org>, Matthias Kaehlcke <mka@chromium.org>, "x86@kernel.org" <x86@kernel.org>, "open list:KERNEL BUILD + fi..." <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org, linux-raid@vger.kernel.org
 
-Le 24/03/2017 à 09:42, Masahiro Yamada a écrit :
-> Hi Nicolas,
-> 
-> 
-> 2017-03-24 17:32 GMT+09:00 Nicolas Dichtel <nicolas.dichtel@6wind.com>:
->> Le 14/03/2017 à 13:54, Nicolas Dichtel a écrit :
->>> Patches #1 and #2 are just cleanup: some exported headers were still under
->>> a non-uapi directory. Patch #3 is a fix to avoid exporting a file that was
->>> not under an uapi directory.
->>> After these three patches, all exported headers are under an uapi directory:
->>> path #4 stops searching files in non uapi directories.
->>> The patch #5 was spotted by code review: there is no in-tree user of this
->>> functionality.
->>> Patch #6 fixes some warnings/errors reported by 0-day tests.
->>> Patch #7 to #9 fix some errors when the corresponding files are included by
->>> userland.
->>> Patches #10 and #11 remove the need to list explicitly headers. Now all files
->>> under an uapi directory are exported.
+On Fri, Mar 17, 2017 at 9:04 PM,  <hpa@zytor.com> wrote:
+> On March 17, 2017 12:27:46 PM PDT, Peter Zijlstra <peterz@infradead.org> wrote:
+>>On Fri, Mar 17, 2017 at 11:52:01AM -0700, Michael Davidson wrote:
+>>> On Fri, Mar 17, 2017 at 5:44 AM, Peter Zijlstra
+>><peterz@infradead.org> wrote:
+>>> >
+>>> > Be that as it may; what you construct above is disgusting. Surely
+>>the
+>>> > code can be refactored to not look like dog vomit?
+>>> >
+>>> > Also; its not immediately obvious conf->copies is 'small' and this
+>>> > doesn't blow up the stack; I feel that deserves a comment
+>>somewhere.
+>>> >
 >>>
->>> This series has been tested with a 'make headers_install' on x86 and a
->>> 'make headers_install_all'. I've checked the result of both commands.
+>>> I agree that the code is horrible.
 >>>
->>> This patch is built on top of masahiroy/linux-kbuild.git#for-next (v4.11-rc1).
->>> I didn't find any conflict with v4.11-rc2.
->> Masahiro, is this series under review or do you expect something else on my side?
+>>> It is, in fact, exactly the same solution that was used to remove
+>>> variable length arrays in structs from several of the crypto drivers
+>>a
+>>> few years ago - see the definition of SHASH_DESC_ON_STACK() in
+>>> "crypto/hash.h" - I did not, however, hide the horrors in a macro
+>>> preferring to leave the implementation visible as a warning to
+>>whoever
+>>> might touch the code next.
+>>>
+>>> I believe that the actual stack usage is exactly the same as it was
+>>previously.
+>>>
+>>> I can certainly wrap this  up in a macro and add comments with
+>>> appropriately dire warnings in it if you feel that is both necessary
+>>> and sufficient.
 >>
-> 
-> Under review.
-> Please give me time to take a closer look.
-> Sorry for the delay.
-No problem, take your time. I just wanted to be sure to not miss something ;-)
+>>We got away with ugly in the past, so we should get to do it again?
+>
+> Seriously, you should have taken the hack the first time that this needs to be fixed.  Just because this is a fairly uncommon construct in the kernel doesn't mean it is not in userspace.
 
 
-Thank you,
-Nicolas
+There is a reason why it is fairly uncommon in kernel.
+Initially it was used more widely, but then there was a decision to
+drop all uses of this feature. Namely:
+Linus: "We should definitely drop it. The feature is an abomination".
+https://lkml.org/lkml/2013/9/23/500
+I really don't understand why you cling onto this last use of the
+feature. Having a single use of a compiler extension on an error path
+of a non-mandatory driver does not look like a great idea to me. Let's
+just kill it off outside of clang discussion.
