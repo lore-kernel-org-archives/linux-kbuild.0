@@ -1,95 +1,118 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from host.76.145.23.62.rev.coltfrance.com ([62.23.145.76]:60850 "EHLO
+Received: from host.76.145.23.62.rev.coltfrance.com ([62.23.145.76]:60987 "EHLO
         proxy.6wind.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753223AbdC0MUk (ORCPT
+        with ESMTP id S1751911AbdC0MV1 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 27 Mar 2017 08:20:40 -0400
+        Mon, 27 Mar 2017 08:21:27 -0400
 From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Subject: [PATCH v11 00/12] uapi: export all headers under uapi directories
-Date: Mon, 27 Mar 2017 14:20:05 +0200
-Message-Id: <1490617217-30192-1-git-send-email-nicolas.dichtel@6wind.com>
-In-Reply-To: <CAK7LNAR_yp+O9jUZC8mKdaHgTiCkE7p2-ZbA9YZ8OGyp+uxhBQ@mail.gmail.com>
+Subject: [PATCH v11 06/12] uapi: includes linux/types.h before exporting files
+Date: Mon, 27 Mar 2017 14:20:11 +0200
+Message-Id: <1490617217-30192-7-git-send-email-nicolas.dichtel@6wind.com>
+In-Reply-To: <1490617217-30192-1-git-send-email-nicolas.dichtel@6wind.com>
 References: <CAK7LNAR_yp+O9jUZC8mKdaHgTiCkE7p2-ZbA9YZ8OGyp+uxhBQ@mail.gmail.com>
+ <1490617217-30192-1-git-send-email-nicolas.dichtel@6wind.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: yamada.masahiro@socionext.com
 Cc: arnd@arndb.de, mmarek@suse.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, airlied@linux.ie, davem@davemloft.net, linux@armlinux.org.uk, bp@alien8.de, slash.tmp@free.fr, daniel.vetter@ffwll.ch, rmk+kernel@armlinux.org.uk, msalter@redhat.com, jengelh@inai.de, hch@infradead.org, tklauser@distanz.ch, mpe@ellerman.id.au, mingo@kernel.org, tglx@linutronix.de, ldv@altlinux.org, nicolas.dichtel@6wind.com, herbert@gondor.apana.org.au, linux-rdma@vger.kernel.org
 
+Some files will be exported after a following patch. 0-day tests report the
+following warning/error:
+./usr/include/linux/bcache.h:8: include of <linux/types.h> is preferred over <asm/types.h>
+./usr/include/linux/bcache.h:11: found __[us]{8,16,32,64} type without #include <linux/types.h>
+./usr/include/linux/qrtr.h:8: found __[us]{8,16,32,64} type without #include <linux/types.h>
+./usr/include/linux/cryptouser.h:39: found __[us]{8,16,32,64} type without #include <linux/types.h>
+./usr/include/linux/pr.h:14: found __[us]{8,16,32,64} type without #include <linux/types.h>
+./usr/include/linux/btrfs_tree.h:337: found __[us]{8,16,32,64} type without #include <linux/types.h>
+./usr/include/rdma/bnxt_re-abi.h:45: found __[us]{8,16,32,64} type without #include <linux/types.h>
 
+Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+---
+ include/uapi/linux/bcache.h     | 2 +-
+ include/uapi/linux/btrfs_tree.h | 2 ++
+ include/uapi/linux/cryptouser.h | 2 ++
+ include/uapi/linux/pr.h         | 2 ++
+ include/uapi/linux/qrtr.h       | 1 +
+ include/uapi/rdma/bnxt_re-abi.h | 2 ++
+ 6 files changed, 10 insertions(+), 1 deletion(-)
 
-Patches #1 and #2 are just cleanup: some exported headers were still under
-a non-uapi directory. Patch #3 is a fix to avoid exporting a file that was
-not under an uapi directory.
-After these three patches, all exported headers are under an uapi directory:
-path #4 stops searching files in non uapi directories.
-The patch #5 was spotted by code review: there is no in-tree user of this
-functionality.
-Patch #6 fixes some warnings/errors reported by 0-day tests.
-Patch #7 to #9 fix some errors when the corresponding files are included by
-userland.
-Patches #10 and #11 remove the need to list explicitly headers. Now all files
-under an uapi directory are exported.
-Patch #12 is also a small cleanup.
+diff --git a/include/uapi/linux/bcache.h b/include/uapi/linux/bcache.h
+index 22b6ad31c706..e3bb0635e94a 100644
+--- a/include/uapi/linux/bcache.h
++++ b/include/uapi/linux/bcache.h
+@@ -5,7 +5,7 @@
+  * Bcache on disk data structures
+  */
+ 
+-#include <asm/types.h>
++#include <linux/types.h>
+ 
+ #define BITMASK(name, type, field, offset, size)		\
+ static inline __u64 name(const type *k)				\
+diff --git a/include/uapi/linux/btrfs_tree.h b/include/uapi/linux/btrfs_tree.h
+index d5ad15a106a7..6a261cb52d95 100644
+--- a/include/uapi/linux/btrfs_tree.h
++++ b/include/uapi/linux/btrfs_tree.h
+@@ -1,6 +1,8 @@
+ #ifndef _BTRFS_CTREE_H_
+ #define _BTRFS_CTREE_H_
+ 
++#include <linux/types.h>
++
+ /*
+  * This header contains the structure definitions and constants used
+  * by file system objects that can be retrieved using
+diff --git a/include/uapi/linux/cryptouser.h b/include/uapi/linux/cryptouser.h
+index 11d21fce14d6..c6a09c5261e7 100644
+--- a/include/uapi/linux/cryptouser.h
++++ b/include/uapi/linux/cryptouser.h
+@@ -18,6 +18,8 @@
+  * 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
+  */
+ 
++#include <linux/types.h>
++
+ /* Netlink configuration messages.  */
+ enum {
+ 	CRYPTO_MSG_BASE = 0x10,
+diff --git a/include/uapi/linux/pr.h b/include/uapi/linux/pr.h
+index 57d7c0f916b6..645ef3cf3dd0 100644
+--- a/include/uapi/linux/pr.h
++++ b/include/uapi/linux/pr.h
+@@ -1,6 +1,8 @@
+ #ifndef _UAPI_PR_H
+ #define _UAPI_PR_H
+ 
++#include <linux/types.h>
++
+ enum pr_type {
+ 	PR_WRITE_EXCLUSIVE		= 1,
+ 	PR_EXCLUSIVE_ACCESS		= 2,
+diff --git a/include/uapi/linux/qrtr.h b/include/uapi/linux/qrtr.h
+index 66c0748d26e2..9d76c566f66e 100644
+--- a/include/uapi/linux/qrtr.h
++++ b/include/uapi/linux/qrtr.h
+@@ -2,6 +2,7 @@
+ #define _LINUX_QRTR_H
+ 
+ #include <linux/socket.h>
++#include <linux/types.h>
+ 
+ struct sockaddr_qrtr {
+ 	__kernel_sa_family_t sq_family;
+diff --git a/include/uapi/rdma/bnxt_re-abi.h b/include/uapi/rdma/bnxt_re-abi.h
+index e2c8a3f0ccec..74018bd18d72 100644
+--- a/include/uapi/rdma/bnxt_re-abi.h
++++ b/include/uapi/rdma/bnxt_re-abi.h
+@@ -39,6 +39,8 @@
+ #ifndef __BNXT_RE_UVERBS_ABI_H__
+ #define __BNXT_RE_UVERBS_ABI_H__
+ 
++#include <linux/types.h>
++
+ #define BNXT_RE_ABI_VERSION	1
+ 
+ struct bnxt_re_uctx_resp {
+-- 
+2.8.1
 
-This series has been tested with a 'make headers_install' on x86 and a
-'make headers_install_all'. I've checked the result of both commands.
-
-This patch is built on top of masahiroy/linux-kbuild.git#for-next (v4.11-rc1).
-I didn't find any conflict with v4.11-rc4.
-
-v10 -> v11:
-  - patch #1: restore the double '_' in the header guard
-  - patch #6, #7, #8: order '#include' in alphabetical order 
-  - patch #10: rename header-n to no-export-headers
-               cleanup management of kvm.h, kvm_para.h and a.out.h
-  - patch #12: add it
-  - rebase on top of masahiroy/linux-kbuild.git#for-next
-
-v9 -> v10:
-  - rebase on top of masahiroy/linux-kbuild.git#for-next
-  - patch #4 & #10: fix dependency check
-  - fix some typos in commits logs
-
-v8 -> v9:
-  - rebase on top of linus tree
-  - patch #8: add include/uapi/linux/crypto.h
-
-v7 -> v8:
-  - rebase on top of linus tree
-  - add patch #7, #8 and #9
-
-v6 -> v7:
-  - rebase on top of linus tree
-  - patch #7: remove autogenerated files from the list in the commit log
-
-v5 -> v6:
-  - patch #6: remove change of include/uapi/linux/media.h
-  - patch #7: fix hdr export when 'make O=' is used (look for genhdr files in
-              the right directory)
-  - patch #8: fix 'make headers_check'
-
-v4 -> v5:
-  - patch #3: get back to v3 (don't export msr-index.h)
-  - patch #6: new in this version
-  - patch #7: fix compilation by introducing header-n
-
-v3 -> v4:
- - first patch has been included
- - patch #4: get back to v2 and remove arch/x86/include/asm/msr-index.h
-
-v2 -> v3:
- - patch #1: remove arch/arm/include/asm/types.h
- - patch #2: remove arch/h8300/include/asm/bitsperlong.h
- - patch #3: remove arch/nios2/include/uapi/asm/setup.h
- - patch #4: don't export msr-index.h
- - patch #5: fix a typo: s/unput-files3-name/input-files3-name
- - patch #6: no change
- - patch #7: fix include/uapi/asm-generic/Kbuild.asm by introducing mandatory-y
- - add patch #8
-
-v1 -> v2:
- - add patch #1 to #6
- - patch #7: remove use of header-y
-
-Comments are welcomed,
-Nicolas
