@@ -1,53 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wr0-f181.google.com ([209.85.128.181]:36573 "EHLO
-        mail-wr0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752869AbdC0JuG (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 27 Mar 2017 05:50:06 -0400
-Received: by mail-wr0-f181.google.com with SMTP id w11so35309309wrc.3
-        for <linux-kbuild@vger.kernel.org>; Mon, 27 Mar 2017 02:49:46 -0700 (PDT)
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [PATCH v10 01/11] h8300: put bitsperlong.h in uapi
-References: <CAK7LNARpx7f0eV5_AiPmNYT7MsRbGFOygJwjfAzX_7aCpuHwuw@mail.gmail.com>
- <1489496093-15315-1-git-send-email-nicolas.dichtel@6wind.com>
- <1489496093-15315-2-git-send-email-nicolas.dichtel@6wind.com>
- <CAK7LNASeY8-74c_7wcgVdw5BwCgJGO48YsTMzc06rAFRRqAyPw@mail.gmail.com>
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Message-ID: <1470ef61-3b51-869a-ded5-87b956e83d2d@6wind.com>
-Date: Mon, 27 Mar 2017 11:43:00 +0200
+Received: from mx2.suse.de ([195.135.220.15]:47531 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752246AbdC0Lro (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 27 Mar 2017 07:47:44 -0400
+Subject: Re: [PATCH] x86/boot: Support uncompressed kernel
+References: <1490273467-97948-1-git-send-email-chao.p.peng@linux.intel.com>
+ <CAE9FiQVmazd8Z=_DT2vrcy7aOpgtFwxAF1Cw6PvzFnE+MckSQg@mail.gmail.com>
+ <20170323153117.GA6356@tigerII.localdomain>
+ <1490333740.2925.7.camel@linux.intel.com>
+ <20170327075817.bb7wda62fcuvfa4b@linutronix.de>
+From: Michal Marek <mmarek@suse.com>
+Message-ID: <2e97b35f-bb9e-66e4-736d-66313626354e@suse.com>
+Date: Mon, 27 Mar 2017 13:47:39 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNASeY8-74c_7wcgVdw5BwCgJGO48YsTMzc06rAFRRqAyPw@mail.gmail.com>
+In-Reply-To: <20170327075817.bb7wda62fcuvfa4b@linutronix.de>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Arnd Bergmann <arnd@arndb.de>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-arch@vger.kernel.org, David Airlie <airlied@linux.ie>, "David S. Miller" <davem@davemloft.net>, Russell King <linux@armlinux.org.uk>, bp@alien8.de, slash.tmp@free.fr, Daniel Vetter <daniel.vetter@ffwll.ch>, rmk+kernel@armlinux.org.uk, msalter@redhat.com, jengelh@inai.de, hch@infradead.org, Tobias Klauser <tklauser@distanz.ch>, mpe@ellerman.id.au, Ingo Molnar <mingo@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, "Dmitry V. Levin" <ldv@altlinux.org>, Herbert Xu <herbert@gondor.apana.org.au>, linux-rdma@vger.kernel.org
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Chao Peng <chao.p.peng@linux.intel.com>
+Cc: Sergey Senozhatsky <sergey.senozhatsky@gmail.com>, Yinghai Lu <yinghai@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, the arch/x86 maintainers <x86@kernel.org>, Kees Cook <keescook@chromium.org>, Baoquan He <bhe@redhat.com>, "H.J. Lu" <hjl.tools@gmail.com>, Paul Bolle <pebolle@tiscali.nl>, Masahiro Yamada <yamada.masahiro@socionext.com>, Borislav Petkov <bp@suse.de>, Andrew Morton <akpm@linux-foundation.org>, Arnd Bergmann <arnd@arndb.de>, Petr Mladek <pmladek@suse.com>, "David S. Miller" <davem@davemloft.net>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Andy Lutomirski <luto@kernel.org>, Thomas Garnier <thgarnie@google.com>, Nicolas Pitre <nicolas.pitre@linaro.org>, Tejun Heo <tj@kernel.org>, Daniel Mack <daniel@zonque.org>, Helge Deller <deller@gmx.de>, Rik van Riel <riel@redhat.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-Le 27/03/2017 à 07:31, Masahiro Yamada a écrit :
-[snip]
->> -#endif /* __ASM_H8300_BITS_PER_LONG */
->> diff --git a/arch/h8300/include/uapi/asm/bitsperlong.h b/arch/h8300/include/uapi/asm/bitsperlong.h
->> new file mode 100644
->> index 000000000000..e56cf72369b6
->> --- /dev/null
->> +++ b/arch/h8300/include/uapi/asm/bitsperlong.h
->> @@ -0,0 +1,14 @@
->> +#ifndef _UAPI_ASM_H8300_BITS_PER_LONG
->> +#define _UAPI_ASM_H8300_BITS_PER_LONG
+Dne 27.3.2017 v 09:58 Sebastian Andrzej Siewior napsal(a):
+> On 2017-03-24 13:35:40 [+0800], Chao Peng wrote:
+>>
+>>>>>     kernel               kernel size    time in decompress_kernel
+>>>>>     compressed (gzip)    3.3M           53ms
+>>>>>     uncompressed         14M            3ms
+>>>>
+>> Exactly, LZ4 is the fastest. It takes 16ms to complete the
+>> decompression. Still sounds a little longer when compared to
+>> uncompressed kernel.
 > 
-> 
-> Just a minor comment.
-> 
-> The include guard was originally __ASM_H8300_BITS_PER_LONG.
-> This will change it into _ASM_H8300_BITS_PER_LONG
-> (after _UAPI is stripped by headers_install.sh)
-> 
-> I just thought _UAPI__ASM_H8300_BITS_PER_LONG might be even safer,
-> but I know I am nit-picking.  I can apply this as-is.
-> I leave it to you.
-I intentionnaly "clean" that, but I will restore it, no problem ;-)
+> Are we seriously talking here about one-time improvement of 13ms
+> boot time?
 
+If the use case is launching new VM instances continuously, then
+compressing the kernel image is about as useful as compressing /bin/bash.
 
-Regards,
-Nicolas
+Michal
