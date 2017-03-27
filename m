@@ -1,117 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg0-f66.google.com ([74.125.83.66]:32877 "EHLO
-        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752145AbdC0MvI (ORCPT
+Received: from mail-oi0-f66.google.com ([209.85.218.66]:34993 "EHLO
+        mail-oi0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752195AbdC0NZG (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 27 Mar 2017 08:51:08 -0400
-From: SeongJae Park <sj38.park@gmail.com>
-Subject: [PATCH] Fix dead URLs to ftp.kernel.org
-Date: Mon, 27 Mar 2017 21:44:06 +0900
-Message-Id: <20170327124406.6910-1-sj38.park@gmail.com>
-In-Reply-To: <CAEjAshqR0Nhp4Wkmkg_HrswsiuUb3rYJ=TOUSBSvoUT3FSWTjg@mail.gmail.com>
-References: <CAEjAshqR0Nhp4Wkmkg_HrswsiuUb3rYJ=TOUSBSvoUT3FSWTjg@mail.gmail.com>
+        Mon, 27 Mar 2017 09:25:06 -0400
+MIME-Version: 1.0
+In-Reply-To: <2e97b35f-bb9e-66e4-736d-66313626354e@suse.com>
+References: <1490273467-97948-1-git-send-email-chao.p.peng@linux.intel.com>
+ <CAE9FiQVmazd8Z=_DT2vrcy7aOpgtFwxAF1Cw6PvzFnE+MckSQg@mail.gmail.com>
+ <20170323153117.GA6356@tigerII.localdomain> <1490333740.2925.7.camel@linux.intel.com>
+ <20170327075817.bb7wda62fcuvfa4b@linutronix.de> <2e97b35f-bb9e-66e4-736d-66313626354e@suse.com>
+From: Arnd Bergmann <arnd@arndb.de>
+Date: Mon, 27 Mar 2017 15:25:04 +0200
+Message-ID: <CAK8P3a1nf7zOHZCK+ZhfhVo9R8Onz4Mv5T2eTg7i4nwuL=zo7w@mail.gmail.com>
+Subject: Re: [PATCH] x86/boot: Support uncompressed kernel
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: trivial@kernel.org, rml@tech9.net, axboe@fb.com, shli@kernel.org, raven@themaw.net, yamada.masahito@socionext.com, mmarek@suse.com
-Cc: linux-raid@vger.kernel.org, autofs@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, SeongJae Park <sj38.park@gmail.com>
+To: Michal Marek <mmarek@suse.com>
+Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Chao Peng <chao.p.peng@linux.intel.com>, Sergey Senozhatsky <sergey.senozhatsky@gmail.com>, Yinghai Lu <yinghai@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, the arch/x86 maintainers <x86@kernel.org>, Kees Cook <keescook@chromium.org>, Baoquan He <bhe@redhat.com>, "H.J. Lu" <hjl.tools@gmail.com>, Paul Bolle <pebolle@tiscali.nl>, Masahiro Yamada <yamada.masahiro@socionext.com>, Borislav Petkov <bp@suse.de>, Andrew Morton <akpm@linux-foundation.org>, Petr Mladek <pmladek@suse.com>, "David S. Miller" <davem@davemloft.net>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Andy Lutomirski <luto@kernel.org>, Thomas Garnier <thgarnie@google.com>, Nicolas Pitre <nicolas.pitre@linaro.org>, Tejun Heo <tj@kernel.org>, Daniel Mack <daniel@zonque.org>, Helge Deller <deller@gmx.de>, Rik van Riel <riel@redhat.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-URLs to ftp.kernel.org are still exist though the service is closed [0].
-This commit fixes the URLs to use www.kernel.org instead.
+On Mon, Mar 27, 2017 at 1:47 PM, Michal Marek <mmarek@suse.com> wrote:
+> Dne 27.3.2017 v 09:58 Sebastian Andrzej Siewior napsal(a):
+>> On 2017-03-24 13:35:40 [+0800], Chao Peng wrote:
+>>>
+>>>>>>     kernel               kernel size    time in decompress_kernel
+>>>>>>     compressed (gzip)    3.3M           53ms
+>>>>>>     uncompressed         14M            3ms
+>>>>>
+>>> Exactly, LZ4 is the fastest. It takes 16ms to complete the
+>>> decompression. Still sounds a little longer when compared to
+>>> uncompressed kernel.
+>>
+>> Are we seriously talking here about one-time improvement of 13ms
+>> boot time?
+>
+> If the use case is launching new VM instances continuously, then
+> compressing the kernel image is about as useful as compressing /bin/bash.
 
-[0] https://www.kernel.org/shutting-down-ftp-services.html
+I guess the next step would be to use CONFIG_XIP_KERNEL on x86,
+which requires an uncompressed kernel but has the additional advantage
+of sharing the read-only sections of the kernel image across virtual
+machines, resulting in better RAM and cache usage.
 
-Signed-off-by: SeongJae Park <sj38.park@gmail.com>
----
- MAINTAINERS              | 2 +-
- drivers/block/Kconfig    | 2 +-
- drivers/md/Kconfig       | 2 +-
- fs/autofs4/Kconfig       | 2 +-
- scripts/ksymoops/README  | 5 ++---
- scripts/package/builddeb | 4 ++--
- 6 files changed, 8 insertions(+), 9 deletions(-)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index c45c02bc6082..0a4df79c0823 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -10068,7 +10068,7 @@ W:	http://sourceforge.net/projects/accel-pptp
- PREEMPTIBLE KERNEL
- M:	Robert Love <rml@tech9.net>
- L:	kpreempt-tech@lists.sourceforge.net
--W:	ftp://ftp.kernel.org/pub/linux/kernel/people/rml/preempt-kernel
-+W:	https://www.kernel.org/pub/linux/kernel/people/rml/preempt-kernel
- S:	Supported
- F:	Documentation/preempt-locking.txt
- F:	include/linux/preempt.h
-diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
-index f744de7a0f9b..7b608cf2516f 100644
---- a/drivers/block/Kconfig
-+++ b/drivers/block/Kconfig
-@@ -219,7 +219,7 @@ config BLK_DEV_LOOP
- 
- 	  To use the loop device, you need the losetup utility, found in the
- 	  util-linux package, see
--	  <ftp://ftp.kernel.org/pub/linux/utils/util-linux/>.
-+	  <https://www.kernel.org/pub/linux/utils/util-linux/>.
- 
- 	  The loop device driver can also be used to "hide" a file system in
- 	  a disk partition, floppy, or regular file, either using encryption
-diff --git a/drivers/md/Kconfig b/drivers/md/Kconfig
-index b7767da50c26..585ff3284bf5 100644
---- a/drivers/md/Kconfig
-+++ b/drivers/md/Kconfig
-@@ -115,7 +115,7 @@ config MD_RAID10
- 
- 	  RAID-10 requires mdadm-1.7.0 or later, available at:
- 
--	  ftp://ftp.kernel.org/pub/linux/utils/raid/mdadm/
-+	  https://www.kernel.org/pub/linux/utils/raid/mdadm/
- 
- 	  If unsure, say Y.
- 
-diff --git a/fs/autofs4/Kconfig b/fs/autofs4/Kconfig
-index 1204d6384d39..44727bf18297 100644
---- a/fs/autofs4/Kconfig
-+++ b/fs/autofs4/Kconfig
-@@ -7,7 +7,7 @@ config AUTOFS4_FS
- 	  automounter (amd), which is a pure user space daemon.
- 
- 	  To use the automounter you need the user-space tools from
--	  <ftp://ftp.kernel.org/pub/linux/daemons/autofs/v4/>; you also
-+	  <https://www.kernel.org/pub/linux/daemons/autofs/v4/>; you also
- 	  want to answer Y to "NFS file system support", below.
- 
- 	  To compile this support as a module, choose M here: the module will be
-diff --git a/scripts/ksymoops/README b/scripts/ksymoops/README
-index f6cb06e3f30e..413043980127 100644
---- a/scripts/ksymoops/README
-+++ b/scripts/ksymoops/README
-@@ -1,8 +1,7 @@
- ksymoops has been removed from the kernel.  It was always meant to be a
- free standing utility, not linked to any particular kernel version.
- The latest version can be found in
--ftp://ftp.<country>.kernel.org/pub/linux/utils/kernel/ksymoops together
--with patches to other utilities in order to give more accurate Oops
--debugging.
-+https://www.kernel.org/pub/linux/utils/kernel/ksymoops together with patches to
-+other utilities in order to give more accurate Oops debugging.
- 
- Keith Owens <kaos@ocs.com.au> Sat Jun 19 10:30:34 EST 1999
-diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index 3c575cd07888..676fc10c9514 100755
---- a/scripts/package/builddeb
-+++ b/scripts/package/builddeb
-@@ -262,8 +262,8 @@ EOF
- cat <<EOF > debian/copyright
- This is a packacked upstream version of the Linux kernel.
- 
--The sources may be found at most Linux ftp sites, including:
--ftp://ftp.kernel.org/pub/linux/kernel
-+The sources may be found at most Linux archive sites, including:
-+https://www.kernel.org/pub/linux/kernel
- 
- Copyright: 1991 - 2015 Linus Torvalds and others.
- 
--- 
-2.10.0
-
+        Arnd
