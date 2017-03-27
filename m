@@ -1,22 +1,22 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wr0-f175.google.com ([209.85.128.175]:34088 "EHLO
-        mail-wr0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752594AbdC0JqA (ORCPT
+Received: from mail-wr0-f181.google.com ([209.85.128.181]:36573 "EHLO
+        mail-wr0-f181.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752869AbdC0JuG (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 27 Mar 2017 05:46:00 -0400
-Received: by mail-wr0-f175.google.com with SMTP id l43so47627481wre.1
-        for <linux-kbuild@vger.kernel.org>; Mon, 27 Mar 2017 02:45:31 -0700 (PDT)
+        Mon, 27 Mar 2017 05:50:06 -0400
+Received: by mail-wr0-f181.google.com with SMTP id w11so35309309wrc.3
+        for <linux-kbuild@vger.kernel.org>; Mon, 27 Mar 2017 02:49:46 -0700 (PDT)
 Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [PATCH v10 07/11] btrfs_tree.h: fix include from userland
+Subject: Re: [PATCH v10 01/11] h8300: put bitsperlong.h in uapi
 References: <CAK7LNARpx7f0eV5_AiPmNYT7MsRbGFOygJwjfAzX_7aCpuHwuw@mail.gmail.com>
  <1489496093-15315-1-git-send-email-nicolas.dichtel@6wind.com>
- <1489496093-15315-8-git-send-email-nicolas.dichtel@6wind.com>
- <CAK7LNATUdjuNVdOEhitsPrpeORFOR2ER3OYDf9Pxn1JP639FeQ@mail.gmail.com>
+ <1489496093-15315-2-git-send-email-nicolas.dichtel@6wind.com>
+ <CAK7LNASeY8-74c_7wcgVdw5BwCgJGO48YsTMzc06rAFRRqAyPw@mail.gmail.com>
 From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Message-ID: <f82705b0-1727-ef4a-138c-e268f3530f07@6wind.com>
-Date: Mon, 27 Mar 2017 11:45:17 +0200
+Message-ID: <1470ef61-3b51-869a-ded5-87b956e83d2d@6wind.com>
+Date: Mon, 27 Mar 2017 11:43:00 +0200
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNATUdjuNVdOEhitsPrpeORFOR2ER3OYDf9Pxn1JP639FeQ@mail.gmail.com>
+In-Reply-To: <CAK7LNASeY8-74c_7wcgVdw5BwCgJGO48YsTMzc06rAFRRqAyPw@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -24,35 +24,29 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
 Cc: Arnd Bergmann <arnd@arndb.de>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-arch@vger.kernel.org, David Airlie <airlied@linux.ie>, "David S. Miller" <davem@davemloft.net>, Russell King <linux@armlinux.org.uk>, bp@alien8.de, slash.tmp@free.fr, Daniel Vetter <daniel.vetter@ffwll.ch>, rmk+kernel@armlinux.org.uk, msalter@redhat.com, jengelh@inai.de, hch@infradead.org, Tobias Klauser <tklauser@distanz.ch>, mpe@ellerman.id.au, Ingo Molnar <mingo@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, "Dmitry V. Levin" <ldv@altlinux.org>, Herbert Xu <herbert@gondor.apana.org.au>, linux-rdma@vger.kernel.org
 
-Hi Masahiro,
-
-Le 27/03/2017 à 07:53, Masahiro Yamada a écrit :
-> Hi Nicolas,
-> 
-> 
-> 2017-03-14 21:54 GMT+09:00 Nicolas Dichtel <nicolas.dichtel@6wind.com>:
+Le 27/03/2017 à 07:31, Masahiro Yamada a écrit :
 [snip]
->> diff --git a/include/uapi/linux/btrfs_tree.h b/include/uapi/linux/btrfs_tree.h
->> index 6a261cb52d95..6a754ada59af 100644
->> --- a/include/uapi/linux/btrfs_tree.h
->> +++ b/include/uapi/linux/btrfs_tree.h
->> @@ -2,6 +2,7 @@
->>  #define _BTRFS_CTREE_H_
->>
->>  #include <linux/types.h>
->> +#include <linux/btrfs.h>
->>
+>> -#endif /* __ASM_H8300_BITS_PER_LONG */
+>> diff --git a/arch/h8300/include/uapi/asm/bitsperlong.h b/arch/h8300/include/uapi/asm/bitsperlong.h
+>> new file mode 100644
+>> index 000000000000..e56cf72369b6
+>> --- /dev/null
+>> +++ b/arch/h8300/include/uapi/asm/bitsperlong.h
+>> @@ -0,0 +1,14 @@
+>> +#ifndef _UAPI_ASM_H8300_BITS_PER_LONG
+>> +#define _UAPI_ASM_H8300_BITS_PER_LONG
 > 
-> Can you move <linux/types.h> below <linux/btrfs.h>
-> to sort the includes alphabetically?
-Ok.
-
 > 
-> This also applies to:
+> Just a minor comment.
 > 
-> include/uapi/linux/qrtr.h in 06/11
-> include/uapi/linux/cryptouser.h  in 08/11
-Ok.
+> The include guard was originally __ASM_H8300_BITS_PER_LONG.
+> This will change it into _ASM_H8300_BITS_PER_LONG
+> (after _UAPI is stripped by headers_install.sh)
+> 
+> I just thought _UAPI__ASM_H8300_BITS_PER_LONG might be even safer,
+> but I know I am nit-picking.  I can apply this as-is.
+> I leave it to you.
+I intentionnaly "clean" that, but I will restore it, no problem ;-)
 
 
 Regards,
