@@ -1,41 +1,71 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:47531 "EHLO mx2.suse.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752246AbdC0Lro (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 27 Mar 2017 07:47:44 -0400
-Subject: Re: [PATCH] x86/boot: Support uncompressed kernel
-References: <1490273467-97948-1-git-send-email-chao.p.peng@linux.intel.com>
- <CAE9FiQVmazd8Z=_DT2vrcy7aOpgtFwxAF1Cw6PvzFnE+MckSQg@mail.gmail.com>
- <20170323153117.GA6356@tigerII.localdomain>
- <1490333740.2925.7.camel@linux.intel.com>
- <20170327075817.bb7wda62fcuvfa4b@linutronix.de>
-From: Michal Marek <mmarek@suse.com>
-Message-ID: <2e97b35f-bb9e-66e4-736d-66313626354e@suse.com>
-Date: Mon, 27 Mar 2017 13:47:39 +0200
-MIME-Version: 1.0
-In-Reply-To: <20170327075817.bb7wda62fcuvfa4b@linutronix.de>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Received: from host.76.145.23.62.rev.coltfrance.com ([62.23.145.76]:60869 "EHLO
+        proxy.6wind.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752918AbdC0MUk (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 27 Mar 2017 08:20:40 -0400
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Subject: [PATCH v11 01/12] h8300: put bitsperlong.h in uapi
+Date: Mon, 27 Mar 2017 14:20:06 +0200
+Message-Id: <1490617217-30192-2-git-send-email-nicolas.dichtel@6wind.com>
+In-Reply-To: <1490617217-30192-1-git-send-email-nicolas.dichtel@6wind.com>
+References: <CAK7LNAR_yp+O9jUZC8mKdaHgTiCkE7p2-ZbA9YZ8OGyp+uxhBQ@mail.gmail.com>
+ <1490617217-30192-1-git-send-email-nicolas.dichtel@6wind.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Chao Peng <chao.p.peng@linux.intel.com>
-Cc: Sergey Senozhatsky <sergey.senozhatsky@gmail.com>, Yinghai Lu <yinghai@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, the arch/x86 maintainers <x86@kernel.org>, Kees Cook <keescook@chromium.org>, Baoquan He <bhe@redhat.com>, "H.J. Lu" <hjl.tools@gmail.com>, Paul Bolle <pebolle@tiscali.nl>, Masahiro Yamada <yamada.masahiro@socionext.com>, Borislav Petkov <bp@suse.de>, Andrew Morton <akpm@linux-foundation.org>, Arnd Bergmann <arnd@arndb.de>, Petr Mladek <pmladek@suse.com>, "David S. Miller" <davem@davemloft.net>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Andy Lutomirski <luto@kernel.org>, Thomas Garnier <thgarnie@google.com>, Nicolas Pitre <nicolas.pitre@linaro.org>, Tejun Heo <tj@kernel.org>, Daniel Mack <daniel@zonque.org>, Helge Deller <deller@gmx.de>, Rik van Riel <riel@redhat.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: yamada.masahiro@socionext.com
+Cc: arnd@arndb.de, mmarek@suse.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, airlied@linux.ie, davem@davemloft.net, linux@armlinux.org.uk, bp@alien8.de, slash.tmp@free.fr, daniel.vetter@ffwll.ch, rmk+kernel@armlinux.org.uk, msalter@redhat.com, jengelh@inai.de, hch@infradead.org, tklauser@distanz.ch, mpe@ellerman.id.au, mingo@kernel.org, tglx@linutronix.de, ldv@altlinux.org, nicolas.dichtel@6wind.com, herbert@gondor.apana.org.au, linux-rdma@vger.kernel.org
 
-Dne 27.3.2017 v 09:58 Sebastian Andrzej Siewior napsal(a):
-> On 2017-03-24 13:35:40 [+0800], Chao Peng wrote:
->>
->>>>>     kernel               kernel size    time in decompress_kernel
->>>>>     compressed (gzip)    3.3M           53ms
->>>>>     uncompressed         14M            3ms
->>>>
->> Exactly, LZ4 is the fastest. It takes 16ms to complete the
->> decompression. Still sounds a little longer when compared to
->> uncompressed kernel.
-> 
-> Are we seriously talking here about one-time improvement of 13ms
-> boot time?
+This header file is exported, thus move it to uapi.
 
-If the use case is launching new VM instances continuously, then
-compressing the kernel image is about as useful as compressing /bin/bash.
+Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+---
+ arch/h8300/include/asm/bitsperlong.h      | 14 --------------
+ arch/h8300/include/uapi/asm/bitsperlong.h | 14 ++++++++++++++
+ 2 files changed, 14 insertions(+), 14 deletions(-)
+ delete mode 100644 arch/h8300/include/asm/bitsperlong.h
+ create mode 100644 arch/h8300/include/uapi/asm/bitsperlong.h
 
-Michal
+diff --git a/arch/h8300/include/asm/bitsperlong.h b/arch/h8300/include/asm/bitsperlong.h
+deleted file mode 100644
+index e140e46729ac..000000000000
+--- a/arch/h8300/include/asm/bitsperlong.h
++++ /dev/null
+@@ -1,14 +0,0 @@
+-#ifndef __ASM_H8300_BITS_PER_LONG
+-#define __ASM_H8300_BITS_PER_LONG
+-
+-#include <asm-generic/bitsperlong.h>
+-
+-#if !defined(__ASSEMBLY__)
+-/* h8300-unknown-linux required long */
+-#define __kernel_size_t __kernel_size_t
+-typedef unsigned long	__kernel_size_t;
+-typedef long		__kernel_ssize_t;
+-typedef long		__kernel_ptrdiff_t;
+-#endif
+-
+-#endif /* __ASM_H8300_BITS_PER_LONG */
+diff --git a/arch/h8300/include/uapi/asm/bitsperlong.h b/arch/h8300/include/uapi/asm/bitsperlong.h
+new file mode 100644
+index 000000000000..34212608371e
+--- /dev/null
++++ b/arch/h8300/include/uapi/asm/bitsperlong.h
+@@ -0,0 +1,14 @@
++#ifndef _UAPI__ASM_H8300_BITS_PER_LONG
++#define _UAPI__ASM_H8300_BITS_PER_LONG
++
++#include <asm-generic/bitsperlong.h>
++
++#if !defined(__ASSEMBLY__)
++/* h8300-unknown-linux required long */
++#define __kernel_size_t __kernel_size_t
++typedef unsigned long	__kernel_size_t;
++typedef long		__kernel_ssize_t;
++typedef long		__kernel_ptrdiff_t;
++#endif
++
++#endif /* _UAPI__ASM_H8300_BITS_PER_LONG */
+-- 
+2.8.1
+
