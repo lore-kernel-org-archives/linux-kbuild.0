@@ -1,52 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from host.76.145.23.62.rev.coltfrance.com ([62.23.145.76]:32784 "EHLO
-        proxy.6wind.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752059AbdC0M3J (ORCPT
+Received: from mail-it0-f50.google.com ([209.85.214.50]:35883 "EHLO
+        mail-it0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752817AbdC0Mn0 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 27 Mar 2017 08:29:09 -0400
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Subject: [PATCH v11 12/12] arch/include: remove empty Kbuild files
-Date: Mon, 27 Mar 2017 14:20:17 +0200
-Message-Id: <1490617217-30192-13-git-send-email-nicolas.dichtel@6wind.com>
-In-Reply-To: <1490617217-30192-1-git-send-email-nicolas.dichtel@6wind.com>
-References: <CAK7LNAR_yp+O9jUZC8mKdaHgTiCkE7p2-ZbA9YZ8OGyp+uxhBQ@mail.gmail.com>
- <1490617217-30192-1-git-send-email-nicolas.dichtel@6wind.com>
+        Mon, 27 Mar 2017 08:43:26 -0400
+MIME-Version: 1.0
+In-Reply-To: <fabba6b8-8f8d-8f8f-1660-c579e6515563@suse.com>
+References: <20170327054731.31882-1-sj38.park@gmail.com> <fabba6b8-8f8d-8f8f-1660-c579e6515563@suse.com>
+From: SeongJae Park <sj38.park@gmail.com>
+Date: Mon, 27 Mar 2017 21:42:48 +0900
+Message-ID: <CAEjAshqR0Nhp4Wkmkg_HrswsiuUb3rYJ=TOUSBSvoUT3FSWTjg@mail.gmail.com>
+Subject: Re: [PATCH 0/5] Fix dead URLs to ftp.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: yamada.masahiro@socionext.com
-Cc: arnd@arndb.de, mmarek@suse.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, airlied@linux.ie, davem@davemloft.net, linux@armlinux.org.uk, bp@alien8.de, slash.tmp@free.fr, daniel.vetter@ffwll.ch, rmk+kernel@armlinux.org.uk, msalter@redhat.com, jengelh@inai.de, hch@infradead.org, tklauser@distanz.ch, mpe@ellerman.id.au, mingo@kernel.org, tglx@linutronix.de, ldv@altlinux.org, nicolas.dichtel@6wind.com, herbert@gondor.apana.org.au, linux-rdma@vger.kernel.org
+To: Michal Marek <mmarek@suse.com>
+Cc: rml@tech9.net, axboe@fb.com, shli@kernel.org, Ian Kent <raven@themaw.net>, yamada.masahito@socionext.com, linux-raid@vger.kernel.org, autofs@vger.kernel.org, linux-kbuild@vger.kernel.org, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 
-Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
----
- arch/cris/include/arch-v10/arch/Kbuild | 1 -
- arch/cris/include/arch-v32/arch/Kbuild | 1 -
- arch/tile/include/arch/Kbuild          | 1 -
- 3 files changed, 3 deletions(-)
- delete mode 100644 arch/cris/include/arch-v10/arch/Kbuild
- delete mode 100644 arch/cris/include/arch-v32/arch/Kbuild
- delete mode 100644 arch/tile/include/arch/Kbuild
+On Mon, Mar 27, 2017 at 8:54 PM, Michal Marek <mmarek@suse.com> wrote:
+> Dne 27.3.2017 v 07:47 SeongJae Park napsal(a):
+>> URLs to `ftp.kernel.org` exist here and there though `ftp.kernel.org` is
+>> already dead [0].  This patchset fixes those URLs to use `www.kernel.org`
+>> instead.
+>>
+>> The change is splitted into multiple patches for independent review and merge
+>> of each maintainer, though the change is trivial.
+>>
+>> [0] https://www.kernel.org/shutting-down-ftp-services.html
+>>
+>> SeongJae Park (5):
+>>   MAINTAINERS: Fix a dead URL to ftp.kernel.org
+>>   drivers/block: Fix a dead URL to ftp.kernel.org
+>>   drivers/md: Fix a dead URL to ftp.kernel.org
+>>   fs/autofs4: Fix a dead URL to ftp.kernel.org
+>>   scripts: Fix dead URLs to ftp.kernel.org
+>
+> I guess the change be sent in a single patch to the trivial tree.
 
-diff --git a/arch/cris/include/arch-v10/arch/Kbuild b/arch/cris/include/arch-v10/arch/Kbuild
-deleted file mode 100644
-index 1f0fc7a66f5f..000000000000
---- a/arch/cris/include/arch-v10/arch/Kbuild
-+++ /dev/null
-@@ -1 +0,0 @@
--# CRISv10 arch
-diff --git a/arch/cris/include/arch-v32/arch/Kbuild b/arch/cris/include/arch-v32/arch/Kbuild
-deleted file mode 100644
-index 2fd65c7e15c9..000000000000
---- a/arch/cris/include/arch-v32/arch/Kbuild
-+++ /dev/null
-@@ -1 +0,0 @@
--# CRISv32 arch
-diff --git a/arch/tile/include/arch/Kbuild b/arch/tile/include/arch/Kbuild
-deleted file mode 100644
-index 3751c9fabcf2..000000000000
---- a/arch/tile/include/arch/Kbuild
-+++ /dev/null
-@@ -1 +0,0 @@
--# Tile arch headers
--- 
-2.8.1
+Sounds reasonable.  I will post the single patch as a reply to this mail.
 
+
+Thanks,
+SeongJae Park
+
+>
+> Michal
+>
