@@ -1,46 +1,39 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi0-f66.google.com ([209.85.218.66]:34993 "EHLO
-        mail-oi0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752195AbdC0NZG (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:57625 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752686AbdC0Pdi (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 27 Mar 2017 09:25:06 -0400
+        Mon, 27 Mar 2017 11:33:38 -0400
 MIME-Version: 1.0
-In-Reply-To: <2e97b35f-bb9e-66e4-736d-66313626354e@suse.com>
-References: <1490273467-97948-1-git-send-email-chao.p.peng@linux.intel.com>
- <CAE9FiQVmazd8Z=_DT2vrcy7aOpgtFwxAF1Cw6PvzFnE+MckSQg@mail.gmail.com>
- <20170323153117.GA6356@tigerII.localdomain> <1490333740.2925.7.camel@linux.intel.com>
- <20170327075817.bb7wda62fcuvfa4b@linutronix.de> <2e97b35f-bb9e-66e4-736d-66313626354e@suse.com>
-From: Arnd Bergmann <arnd@arndb.de>
-Date: Mon, 27 Mar 2017 15:25:04 +0200
-Message-ID: <CAK8P3a1nf7zOHZCK+ZhfhVo9R8Onz4Mv5T2eTg7i4nwuL=zo7w@mail.gmail.com>
-Subject: Re: [PATCH] x86/boot: Support uncompressed kernel
+In-Reply-To: <be3fddad-8e04-e6aa-c486-c64864c5a061@6wind.com>
+References: <CAK7LNARpx7f0eV5_AiPmNYT7MsRbGFOygJwjfAzX_7aCpuHwuw@mail.gmail.com>
+ <1489496093-15315-1-git-send-email-nicolas.dichtel@6wind.com>
+ <365519b5-d69e-34b7-fa2f-f11b8fabe69f@6wind.com> <CAK7LNAR_yp+O9jUZC8mKdaHgTiCkE7p2-ZbA9YZ8OGyp+uxhBQ@mail.gmail.com>
+ <c963314f-bcde-f483-c6b1-cad975842e16@6wind.com> <CAK7LNAQJWNCRjWoKMH_Br1bwqtq+mQG-6yaWu5fwhC6sJ1fV8Q@mail.gmail.com>
+ <be3fddad-8e04-e6aa-c486-c64864c5a061@6wind.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Tue, 28 Mar 2017 00:33:16 +0900
+Message-ID: <CAK7LNAQ9v=y-kt8x9FKo8AnkVMXuHKAzQHhZET-J02RfV-rZLA@mail.gmail.com>
+Subject: Re: [PATCH v10 00/11] uapi: export all headers under uapi directories
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>
-Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Chao Peng <chao.p.peng@linux.intel.com>, Sergey Senozhatsky <sergey.senozhatsky@gmail.com>, Yinghai Lu <yinghai@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, the arch/x86 maintainers <x86@kernel.org>, Kees Cook <keescook@chromium.org>, Baoquan He <bhe@redhat.com>, "H.J. Lu" <hjl.tools@gmail.com>, Paul Bolle <pebolle@tiscali.nl>, Masahiro Yamada <yamada.masahiro@socionext.com>, Borislav Petkov <bp@suse.de>, Andrew Morton <akpm@linux-foundation.org>, Petr Mladek <pmladek@suse.com>, "David S. Miller" <davem@davemloft.net>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Andy Lutomirski <luto@kernel.org>, Thomas Garnier <thgarnie@google.com>, Nicolas Pitre <nicolas.pitre@linaro.org>, Tejun Heo <tj@kernel.org>, Daniel Mack <daniel@zonque.org>, Helge Deller <deller@gmx.de>, Rik van Riel <riel@redhat.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Cc: Arnd Bergmann <arnd@arndb.de>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-arch@vger.kernel.org, David Airlie <airlied@linux.ie>, "David S. Miller" <davem@davemloft.net>, Russell King <linux@armlinux.org.uk>, bp@alien8.de, slash.tmp@free.fr, Daniel Vetter <daniel.vetter@ffwll.ch>, rmk+kernel@armlinux.org.uk, msalter@redhat.com, jengelh@inai.de, hch@infradead.org, Tobias Klauser <tklauser@distanz.ch>, mpe@ellerman.id.au, Ingo Molnar <mingo@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, "Dmitry V. Levin" <ldv@altlinux.org>, Herbert Xu <herbert@gondor.apana.org.au>, linux-rdma@vger.kernel.org
 
-On Mon, Mar 27, 2017 at 1:47 PM, Michal Marek <mmarek@suse.com> wrote:
-> Dne 27.3.2017 v 09:58 Sebastian Andrzej Siewior napsal(a):
->> On 2017-03-24 13:35:40 [+0800], Chao Peng wrote:
->>>
->>>>>>     kernel               kernel size    time in decompress_kernel
->>>>>>     compressed (gzip)    3.3M           53ms
->>>>>>     uncompressed         14M            3ms
->>>>>
->>> Exactly, LZ4 is the fastest. It takes 16ms to complete the
->>> decompression. Still sounds a little longer when compared to
->>> uncompressed kernel.
->>
->> Are we seriously talking here about one-time improvement of 13ms
->> boot time?
->
-> If the use case is launching new VM instances continuously, then
-> compressing the kernel image is about as useful as compressing /bin/bash.
+Hi Nicolas,
 
-I guess the next step would be to use CONFIG_XIP_KERNEL on x86,
-which requires an uncompressed kernel but has the additional advantage
-of sharing the read-only sections of the kernel image across virtual
-machines, resulting in better RAM and cache usage.
+2017-03-27 18:45 GMT+09:00 Nicolas Dichtel <nicolas.dichtel@6wind.com>:
+>> I wanted to leave comments/questions on 10/11,
+>> but I could not find 10/11 in my mailbox.  I do not know why.
+> Note that you can download the mail from the kbuild patchwork, open it with your
+> email client and do a reply ;-)
 
-        Arnd
+I took the patch from the patchwork for git-am,
+but I was too lazy to import it to my mailer.  I will try it next time.
+Thanks for the tip!
+
+
+-- 
+Best Regards
+Masahiro Yamada
