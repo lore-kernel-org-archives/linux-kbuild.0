@@ -1,54 +1,78 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:46957 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751407AbdC0J1g (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 27 Mar 2017 05:27:36 -0400
-Message-ID: <1490606744.3661.7.camel@linux.intel.com>
-Subject: Re: [PATCH] x86/boot: Support uncompressed kernel
-From: Chao Peng <chao.p.peng@linux.intel.com>
-Date: Mon, 27 Mar 2017 17:25:44 +0800
-In-Reply-To: <20170327075817.bb7wda62fcuvfa4b@linutronix.de>
-References: <1490273467-97948-1-git-send-email-chao.p.peng@linux.intel.com>
-         <CAE9FiQVmazd8Z=_DT2vrcy7aOpgtFwxAF1Cw6PvzFnE+MckSQg@mail.gmail.com>
-         <20170323153117.GA6356@tigerII.localdomain>
-         <1490333740.2925.7.camel@linux.intel.com>
-         <20170327075817.bb7wda62fcuvfa4b@linutronix.de>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Received: from mail-wr0-f182.google.com ([209.85.128.182]:35563 "EHLO
+        mail-wr0-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751640AbdC0Jol (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 27 Mar 2017 05:44:41 -0400
+Received: by mail-wr0-f182.google.com with SMTP id u1so47623751wra.2
+        for <linux-kbuild@vger.kernel.org>; Mon, 27 Mar 2017 02:42:55 -0700 (PDT)
+Reply-To: nicolas.dichtel@6wind.com
+Subject: Re: [PATCH v10 11/11] uapi: export all arch specifics directories
+References: <CAK7LNARpx7f0eV5_AiPmNYT7MsRbGFOygJwjfAzX_7aCpuHwuw@mail.gmail.com>
+ <1489496093-15315-1-git-send-email-nicolas.dichtel@6wind.com>
+ <1489496093-15315-12-git-send-email-nicolas.dichtel@6wind.com>
+ <CAK7LNASihZAunuAR2TwfWUFnk+SNiVgzZjfDKBHzOEtwVnxVHw@mail.gmail.com>
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Message-ID: <d3a9ad53-2be9-5446-5932-27820842ffc6@6wind.com>
+Date: Mon, 27 Mar 2017 11:42:36 +0200
+MIME-Version: 1.0
+In-Reply-To: <CAK7LNASihZAunuAR2TwfWUFnk+SNiVgzZjfDKBHzOEtwVnxVHw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: Sergey Senozhatsky <sergey.senozhatsky@gmail.com>, Yinghai Lu <yinghai@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, the arch/x86 maintainers <x86@kernel.org>, Michal Marek <mmarek@suse.com>, Kees Cook <keescook@chromium.org>, Baoquan He <bhe@redhat.com>, "H.J. Lu" <hjl.tools@gmail.com>, Paul Bolle <pebolle@tiscali.nl>, Masahiro Yamada <yamada.masahiro@socionext.com>, Borislav Petkov <bp@suse.de>, Andrew Morton <akpm@linux-foundation.org>, Arnd Bergmann <arnd@arndb.de>, Petr Mladek <pmladek@suse.com>, "David S. Miller" <davem@davemloft.net>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Andy Lutomirski <luto@kernel.org>, Thomas Garnier <thgarnie@google.com>, Nicolas Pitre <nicolas.pitre@linaro.org>, Tejun Heo <tj@kernel.org>, Daniel Mack <daniel@zonque.org>, Helge Deller <deller@gmx.de>, Rik van Riel <riel@redhat.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Arnd Bergmann <arnd@arndb.de>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-arch@vger.kernel.org, David Airlie <airlied@linux.ie>, "David S. Miller" <davem@davemloft.net>, Russell King <linux@armlinux.org.uk>, bp@alien8.de, slash.tmp@free.fr, Daniel Vetter <daniel.vetter@ffwll.ch>, rmk+kernel@armlinux.org.uk, msalter@redhat.com, jengelh@inai.de, hch@infradead.org, Tobias Klauser <tklauser@distanz.ch>, mpe@ellerman.id.au, Ingo Molnar <mingo@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, "Dmitry V. Levin" <ldv@altlinux.org>, Herbert Xu <herbert@gondor.apana.org.au>, linux-rdma@vger.kernel.org
 
-On Mon, 2017-03-27 at 09:58 +0200, Sebastian Andrzej Siewior wrote:
-> On 2017-03-24 13:35:40 [+0800], Chao Peng wrote:
-> > 
-> > 
-> > > 
-> > > > 
-> > > > > 
-> > > > >     kernel               kernel size    time in
-> > > > > decompress_kernel
-> > > > >     compressed (gzip)    3.3M           53ms
-> > > > >     uncompressed         14M            3ms
-> > > > 
-> > Exactly, LZ4 is the fastest. It takes 16ms to complete the
-> > decompression. Still sounds a little longer when compared to
-> > uncompressed kernel.
-> 
-> Are we seriously talking here about one-time improvement of 13ms
-> boot time?
+Hi Masahiro,
 
-The usage model for us is to lunch kernel in virtual machine and there
-will be thousands of instances lunched and shutdowned/re-lunched
-frequently, so every single million-second helps. And 13ms means 20%
-improvement to our existing optimization (the other part besides
-decompression is optimized to ~40ms).
+Le 27/03/2017 à 07:27, Masahiro Yamada a écrit :
+> Hi Nicolas,
+> 
+> 
+> 2017-03-14 21:54 GMT+09:00 Nicolas Dichtel <nicolas.dichtel@6wind.com>:
+>> diff --git a/arch/cris/include/uapi/asm/Kbuild b/arch/cris/include/uapi/asm/Kbuild
+>> index d0c5471856e0..b15bf6bc0e94 100644
+>> --- a/arch/cris/include/uapi/asm/Kbuild
+>> +++ b/arch/cris/include/uapi/asm/Kbuild
+>> @@ -1,5 +1,2 @@
+>>  # UAPI Header export list
+>>  include include/uapi/asm-generic/Kbuild.asm
+>> -
+>> -subdir-y += ../arch-v10/arch/
+>> -subdir-y += ../arch-v32/arch/
+> 
+> 
+> Can you remove
+> arch/cris/include/arch-v32/arch/Kbuild
+> arch/cris/include/arch-v10/arch/Kbuild
+> as well?
+Ok.
 
-Chao
 > 
-> > 
-> > Chao
+> Or, not sure if they are still needed?
+I don't think so. Have a look to 77c8006d8df4 ("UAPI: Fix up empty files in
+arch/cris/") for more details.
+
 > 
-> Sebastian
+> 
+> 
+>> diff --git a/arch/tile/include/uapi/asm/Kbuild b/arch/tile/include/uapi/asm/Kbuild
+>> index e0a50111e07f..0c74c3c5ebfa 100644
+>> --- a/arch/tile/include/uapi/asm/Kbuild
+>> +++ b/arch/tile/include/uapi/asm/Kbuild
+>> @@ -2,5 +2,3 @@
+>>  include include/uapi/asm-generic/Kbuild.asm
+>>
+>>  generic-y += ucontext.h
+>> -
+>> -subdir-y += ../arch
+> 
+> Can you remove  arch/tile/include/arch/Kbuild as well?
+Ok.
+
+Because this removal is not directly related to this patch, I will add another
+patch in the series.
+
+Regards,
+Nicolas
