@@ -1,43 +1,68 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg0-f65.google.com ([74.125.83.65]:33932 "EHLO
-        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751886AbdC0Fsh (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:18576 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751213AbdC0Fxf (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 27 Mar 2017 01:48:37 -0400
-From: SeongJae Park <sj38.park@gmail.com>
-Subject: [PATCH 3/5] drivers/md: Fix a dead URL to ftp.kernel.org
-Date: Mon, 27 Mar 2017 14:47:29 +0900
-Message-Id: <20170327054731.31882-4-sj38.park@gmail.com>
-In-Reply-To: <20170327054731.31882-1-sj38.park@gmail.com>
-References: <20170327054731.31882-1-sj38.park@gmail.com>
+        Mon, 27 Mar 2017 01:53:35 -0400
+MIME-Version: 1.0
+In-Reply-To: <1489496093-15315-8-git-send-email-nicolas.dichtel@6wind.com>
+References: <CAK7LNARpx7f0eV5_AiPmNYT7MsRbGFOygJwjfAzX_7aCpuHwuw@mail.gmail.com>
+ <1489496093-15315-1-git-send-email-nicolas.dichtel@6wind.com> <1489496093-15315-8-git-send-email-nicolas.dichtel@6wind.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Mon, 27 Mar 2017 14:53:30 +0900
+Message-ID: <CAK7LNATUdjuNVdOEhitsPrpeORFOR2ER3OYDf9Pxn1JP639FeQ@mail.gmail.com>
+Subject: Re: [PATCH v10 07/11] btrfs_tree.h: fix include from userland
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: rml@tech9.net, axboe@fb.com, shli@kernel.org, raven@themaw.net, yamada.masahito@socionext.com, mmarek@suse.com
-Cc: linux-raid@vger.kernel.org, autofs@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, SeongJae Park <sj38.park@gmail.com>
+To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Cc: Arnd Bergmann <arnd@arndb.de>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-arch@vger.kernel.org, David Airlie <airlied@linux.ie>, "David S. Miller" <davem@davemloft.net>, Russell King <linux@armlinux.org.uk>, bp@alien8.de, slash.tmp@free.fr, Daniel Vetter <daniel.vetter@ffwll.ch>, rmk+kernel@armlinux.org.uk, msalter@redhat.com, jengelh@inai.de, hch@infradead.org, Tobias Klauser <tklauser@distanz.ch>, mpe@ellerman.id.au, Ingo Molnar <mingo@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, "Dmitry V. Levin" <ldv@altlinux.org>, Herbert Xu <herbert@gondor.apana.org.au>, linux-rdma@vger.kernel.org
 
-As ftp.kernel.org is closed [0], this commit fixes a dead URL to
-ftp.kernel.org in drivers/md/ to use www.kernel.org instead.
+Hi Nicolas,
 
-[0] https://www.kernel.org/shutting-down-ftp-services.html
 
-Signed-off-by: SeongJae Park <sj38.park@gmail.com>
----
- drivers/md/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+2017-03-14 21:54 GMT+09:00 Nicolas Dichtel <nicolas.dichtel@6wind.com>:
+> This patch prepares the uapi export by fixing the following errors:
+>
+> .../linux/btrfs_tree.h:283:2: error: #error "UUID items require BTRFS_UUI=
+D_SIZE =3D=3D 16!"
+>  #error "UUID items require BTRFS_UUID_SIZE =3D=3D 16!"
+>
+> .../linux/btrfs_tree.h:390:12: error: =E2=80=98BTRFS_UUID_SIZE=E2=80=99 u=
+ndeclared here (not in a function)
+>   __u8 uuid[BTRFS_UUID_SIZE];
+>             ^
+> .../linux/btrfs_tree.h:796:16: error: =E2=80=98BTRFS_DEV_STAT_VALUES_MAX=
+=E2=80=99 undeclared here (not in a function)
+>   __le64 values[BTRFS_DEV_STAT_VALUES_MAX];
+>
+> Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+> ---
+>  include/uapi/linux/btrfs_tree.h | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/include/uapi/linux/btrfs_tree.h b/include/uapi/linux/btrfs_t=
+ree.h
+> index 6a261cb52d95..6a754ada59af 100644
+> --- a/include/uapi/linux/btrfs_tree.h
+> +++ b/include/uapi/linux/btrfs_tree.h
+> @@ -2,6 +2,7 @@
+>  #define _BTRFS_CTREE_H_
+>
+>  #include <linux/types.h>
+> +#include <linux/btrfs.h>
+>
 
-diff --git a/drivers/md/Kconfig b/drivers/md/Kconfig
-index 5c5ed97c9fda..6a41633460ba 100644
---- a/drivers/md/Kconfig
-+++ b/drivers/md/Kconfig
-@@ -115,7 +115,7 @@ config MD_RAID10
- 
- 	  RAID-10 requires mdadm-1.7.0 or later, available at:
- 
--	  ftp://ftp.kernel.org/pub/linux/utils/raid/mdadm/
-+	  https://www.kernel.org/pub/linux/utils/raid/mdadm/
- 
- 	  If unsure, say Y.
- 
--- 
-2.10.0
+Can you move <linux/types.h> below <linux/btrfs.h>
+to sort the includes alphabetically?
 
+This also applies to:
+
+include/uapi/linux/qrtr.h in 06/11
+include/uapi/linux/cryptouser.h  in 08/11
+
+
+--=20
+Best Regards
+Masahiro Yamada
