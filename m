@@ -1,68 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:18576 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751213AbdC0Fxf (ORCPT
+Received: from Galois.linutronix.de ([146.0.238.70]:43863 "EHLO
+        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751499AbdC0H7K (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 27 Mar 2017 01:53:35 -0400
+        Mon, 27 Mar 2017 03:59:10 -0400
+Date: Mon, 27 Mar 2017 09:58:17 +0200
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Subject: Re: [PATCH] x86/boot: Support uncompressed kernel
+Message-ID: <20170327075817.bb7wda62fcuvfa4b@linutronix.de>
+References: <1490273467-97948-1-git-send-email-chao.p.peng@linux.intel.com>
+ <CAE9FiQVmazd8Z=_DT2vrcy7aOpgtFwxAF1Cw6PvzFnE+MckSQg@mail.gmail.com>
+ <20170323153117.GA6356@tigerII.localdomain>
+ <1490333740.2925.7.camel@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <1489496093-15315-8-git-send-email-nicolas.dichtel@6wind.com>
-References: <CAK7LNARpx7f0eV5_AiPmNYT7MsRbGFOygJwjfAzX_7aCpuHwuw@mail.gmail.com>
- <1489496093-15315-1-git-send-email-nicolas.dichtel@6wind.com> <1489496093-15315-8-git-send-email-nicolas.dichtel@6wind.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Mon, 27 Mar 2017 14:53:30 +0900
-Message-ID: <CAK7LNATUdjuNVdOEhitsPrpeORFOR2ER3OYDf9Pxn1JP639FeQ@mail.gmail.com>
-Subject: Re: [PATCH v10 07/11] btrfs_tree.h: fix include from userland
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8BIT
+In-Reply-To: <1490333740.2925.7.camel@linux.intel.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Cc: Arnd Bergmann <arnd@arndb.de>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-arch@vger.kernel.org, David Airlie <airlied@linux.ie>, "David S. Miller" <davem@davemloft.net>, Russell King <linux@armlinux.org.uk>, bp@alien8.de, slash.tmp@free.fr, Daniel Vetter <daniel.vetter@ffwll.ch>, rmk+kernel@armlinux.org.uk, msalter@redhat.com, jengelh@inai.de, hch@infradead.org, Tobias Klauser <tklauser@distanz.ch>, mpe@ellerman.id.au, Ingo Molnar <mingo@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, "Dmitry V. Levin" <ldv@altlinux.org>, Herbert Xu <herbert@gondor.apana.org.au>, linux-rdma@vger.kernel.org
+To: Chao Peng <chao.p.peng@linux.intel.com>
+Cc: Sergey Senozhatsky <sergey.senozhatsky@gmail.com>, Yinghai Lu <yinghai@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, the arch/x86 maintainers <x86@kernel.org>, Michal Marek <mmarek@suse.com>, Kees Cook <keescook@chromium.org>, Baoquan He <bhe@redhat.com>, "H.J. Lu" <hjl.tools@gmail.com>, Paul Bolle <pebolle@tiscali.nl>, Masahiro Yamada <yamada.masahiro@socionext.com>, Borislav Petkov <bp@suse.de>, Andrew Morton <akpm@linux-foundation.org>, Arnd Bergmann <arnd@arndb.de>, Petr Mladek <pmladek@suse.com>, "David S. Miller" <davem@davemloft.net>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Andy Lutomirski <luto@kernel.org>, Thomas Garnier <thgarnie@google.com>, Nicolas Pitre <nicolas.pitre@linaro.org>, Tejun Heo <tj@kernel.org>, Daniel Mack <daniel@zonque.org>, Helge Deller <deller@gmx.de>, Rik van Riel <riel@redhat.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
 
-Hi Nicolas,
+On 2017-03-24 13:35:40 [+0800], Chao Peng wrote:
+> 
+> > > >     kernel               kernel size    time in decompress_kernel
+> > > >     compressed (gzip)    3.3M           53ms
+> > > >     uncompressed         14M            3ms
+> > > 
+> Exactly, LZ4 is the fastest. It takes 16ms to complete the
+> decompression. Still sounds a little longer when compared to
+> uncompressed kernel.
 
+Are we seriously talking here about one-time improvement of 13ms
+boot time?
 
-2017-03-14 21:54 GMT+09:00 Nicolas Dichtel <nicolas.dichtel@6wind.com>:
-> This patch prepares the uapi export by fixing the following errors:
->
-> .../linux/btrfs_tree.h:283:2: error: #error "UUID items require BTRFS_UUI=
-D_SIZE =3D=3D 16!"
->  #error "UUID items require BTRFS_UUID_SIZE =3D=3D 16!"
->
-> .../linux/btrfs_tree.h:390:12: error: =E2=80=98BTRFS_UUID_SIZE=E2=80=99 u=
-ndeclared here (not in a function)
->   __u8 uuid[BTRFS_UUID_SIZE];
->             ^
-> .../linux/btrfs_tree.h:796:16: error: =E2=80=98BTRFS_DEV_STAT_VALUES_MAX=
-=E2=80=99 undeclared here (not in a function)
->   __le64 values[BTRFS_DEV_STAT_VALUES_MAX];
->
-> Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-> ---
->  include/uapi/linux/btrfs_tree.h | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/include/uapi/linux/btrfs_tree.h b/include/uapi/linux/btrfs_t=
-ree.h
-> index 6a261cb52d95..6a754ada59af 100644
-> --- a/include/uapi/linux/btrfs_tree.h
-> +++ b/include/uapi/linux/btrfs_tree.h
-> @@ -2,6 +2,7 @@
->  #define _BTRFS_CTREE_H_
->
->  #include <linux/types.h>
-> +#include <linux/btrfs.h>
->
+> Chao
 
-Can you move <linux/types.h> below <linux/btrfs.h>
-to sort the includes alphabetically?
-
-This also applies to:
-
-include/uapi/linux/qrtr.h in 06/11
-include/uapi/linux/cryptouser.h  in 08/11
-
-
---=20
-Best Regards
-Masahiro Yamada
+Sebastian
