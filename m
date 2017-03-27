@@ -1,43 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg0-f68.google.com ([74.125.83.68]:33371 "EHLO
-        mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751908AbdC0Fsh (ORCPT
+Received: from mail-pg0-f67.google.com ([74.125.83.67]:35707 "EHLO
+        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751854AbdC0Fsh (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Mon, 27 Mar 2017 01:48:37 -0400
 From: SeongJae Park <sj38.park@gmail.com>
-Subject: [PATCH 2/5] drivers/block: Fix a dead URL to ftp.kernel.org
-Date: Mon, 27 Mar 2017 14:47:28 +0900
-Message-Id: <20170327054731.31882-3-sj38.park@gmail.com>
-In-Reply-To: <20170327054731.31882-1-sj38.park@gmail.com>
-References: <20170327054731.31882-1-sj38.park@gmail.com>
+Subject: [PATCH 0/5] Fix dead URLs to ftp.kernel.org
+Date: Mon, 27 Mar 2017 14:47:26 +0900
+Message-Id: <20170327054731.31882-1-sj38.park@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: rml@tech9.net, axboe@fb.com, shli@kernel.org, raven@themaw.net, yamada.masahito@socionext.com, mmarek@suse.com
 Cc: linux-raid@vger.kernel.org, autofs@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, SeongJae Park <sj38.park@gmail.com>
 
-As ftp.kernel.org is closed [0], this commit fixes a dead URL to
-ftp.kernel.org in drivers/block/ to use www.kernel.org instead.
+URLs to `ftp.kernel.org` exist here and there though `ftp.kernel.org` is
+already dead [0].  This patchset fixes those URLs to use `www.kernel.org`
+instead.
+
+The change is splitted into multiple patches for independent review and merge
+of each maintainer, though the change is trivial.
 
 [0] https://www.kernel.org/shutting-down-ftp-services.html
 
-Signed-off-by: SeongJae Park <sj38.park@gmail.com>
----
- drivers/block/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+SeongJae Park (5):
+  MAINTAINERS: Fix a dead URL to ftp.kernel.org
+  drivers/block: Fix a dead URL to ftp.kernel.org
+  drivers/md: Fix a dead URL to ftp.kernel.org
+  fs/autofs4: Fix a dead URL to ftp.kernel.org
+  scripts: Fix dead URLs to ftp.kernel.org
 
-diff --git a/drivers/block/Kconfig b/drivers/block/Kconfig
-index f744de7a0f9b..7b608cf2516f 100644
---- a/drivers/block/Kconfig
-+++ b/drivers/block/Kconfig
-@@ -219,7 +219,7 @@ config BLK_DEV_LOOP
- 
- 	  To use the loop device, you need the losetup utility, found in the
- 	  util-linux package, see
--	  <ftp://ftp.kernel.org/pub/linux/utils/util-linux/>.
-+	  <https://www.kernel.org/pub/linux/utils/util-linux/>.
- 
- 	  The loop device driver can also be used to "hide" a file system in
- 	  a disk partition, floppy, or regular file, either using encryption
+ MAINTAINERS              | 2 +-
+ drivers/block/Kconfig    | 2 +-
+ drivers/md/Kconfig       | 2 +-
+ fs/autofs4/Kconfig       | 2 +-
+ scripts/ksymoops/README  | 5 ++---
+ scripts/package/builddeb | 4 ++--
+ 6 files changed, 8 insertions(+), 9 deletions(-)
+
 -- 
 2.10.0
 
