@@ -1,41 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg0-f54.google.com ([74.125.83.54]:35318 "EHLO
-        mail-pg0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753556AbdC1BTf (ORCPT
+Received: from out1-smtp.messagingengine.com ([66.111.4.25]:59229 "EHLO
+        out1-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1753605AbdC1CCN (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 27 Mar 2017 21:19:35 -0400
-Received: by mail-pg0-f54.google.com with SMTP id 81so42121116pgh.2
-        for <linux-kbuild@vger.kernel.org>; Mon, 27 Mar 2017 18:19:34 -0700 (PDT)
-From: Matthias Kaehlcke <mka@chromium.org>
-Subject: [PATCH] kbuild: use -Oz instead of -Os when using clang
-Date: Mon, 27 Mar 2017 18:19:09 -0700
-Message-Id: <20170328011909.150513-1-mka@chromium.org>
+        Mon, 27 Mar 2017 22:02:13 -0400
+Message-ID: <1490666521.3187.0.camel@themaw.net>
+Subject: Re: [PATCH 4/5] fs/autofs4: Fix a dead URL to ftp.kernel.org
+From: Ian Kent <raven@themaw.net>
+Date: Tue, 28 Mar 2017 10:02:01 +0800
+In-Reply-To: <20170327054731.31882-5-sj38.park@gmail.com>
+References: <20170327054731.31882-1-sj38.park@gmail.com>
+         <20170327054731.31882-5-sj38.park@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Behan Webster <behanw@converseincode.com>, Greg Hackmann <ghackmann@google.com>, Grant Grundler <grundler@chromium.org>, Michael Davidson <md@google.com>, Peter Foley <pefoley2@pefoley.com>, Matthias Kaehlcke <mka@chromium.org>
+To: SeongJae Park <sj38.park@gmail.com>, rml@tech9.net, axboe@fb.com, shli@kernel.org, yamada.masahito@socionext.com, mmarek@suse.com
+Cc: linux-raid@vger.kernel.org, autofs@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-This generates smaller resulting object code when compiled with clang.
+On Mon, 2017-03-27 at 14:47 +0900, SeongJae Park wrote:
+> As ftp.kernel.org is closed [0], this commit fixes a dead URL to
+> ftp.kernel.org in fs/autofs4/ to use www.kernel.org instead.
+> 
+> [0] https://www.kernel.org/shutting-down-ftp-services.html
+> 
+> Signed-off-by: SeongJae Park <sj38.park@gmail.com>
 
-Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
----
- Makefile | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ACK, and thanks for fixing this.
 
-diff --git a/Makefile b/Makefile
-index b2faa9319372..66bcdbf58371 100644
---- a/Makefile
-+++ b/Makefile
-@@ -638,7 +638,8 @@ KBUILD_CFLAGS	+= $(call cc-option,-fdata-sections,)
- endif
- 
- ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
--KBUILD_CFLAGS	+= -Os $(call cc-disable-warning,maybe-uninitialized,)
-+KBUILD_CFLAGS	+= $(call cc-option,-Oz,-Os)
-+KBUILD_CFLAGS	+= $(call cc-disable-warning,maybe-uninitialized,)
- else
- ifdef CONFIG_PROFILE_ALL_BRANCHES
- KBUILD_CFLAGS	+= -O2 $(call cc-disable-warning,maybe-uninitialized,)
--- 
-2.12.2.564.g063fe858b8-goog
-
+> ---
+>  fs/autofs4/Kconfig | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/fs/autofs4/Kconfig b/fs/autofs4/Kconfig
+> index 1204d6384d39..44727bf18297 100644
+> --- a/fs/autofs4/Kconfig
+> +++ b/fs/autofs4/Kconfig
+> @@ -7,7 +7,7 @@ config AUTOFS4_FS
+>  	  automounter (amd), which is a pure user space daemon.
+>  
+>  	  To use the automounter you need the user-space tools from
+> -	  <ftp://ftp.kernel.org/pub/linux/daemons/autofs/v4/>; you also
+> +	  <https://www.kernel.org/pub/linux/daemons/autofs/v4/>; you also
+>  	  want to answer Y to "NFS file system support", below.
+>  
+>  	  To compile this support as a module, choose M here: the module will
+> be
