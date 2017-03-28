@@ -1,60 +1,33 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga02.intel.com ([134.134.136.20]:46171 "EHLO mga02.intel.com"
+Received: from mx2.suse.de ([195.135.220.15]:34798 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751806AbdC1MBm (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 28 Mar 2017 08:01:42 -0400
-Message-ID: <1490702482.3011.7.camel@linux.intel.com>
-Subject: Re: [PATCH] x86/boot: Support uncompressed kernel
-From: Chao Peng <chao.p.peng@linux.intel.com>
-Date: Tue, 28 Mar 2017 20:01:22 +0800
-In-Reply-To: <CAK8P3a1nf7zOHZCK+ZhfhVo9R8Onz4Mv5T2eTg7i4nwuL=zo7w@mail.gmail.com>
-References: <1490273467-97948-1-git-send-email-chao.p.peng@linux.intel.com>
-         <CAE9FiQVmazd8Z=_DT2vrcy7aOpgtFwxAF1Cw6PvzFnE+MckSQg@mail.gmail.com>
-         <20170323153117.GA6356@tigerII.localdomain>
-         <1490333740.2925.7.camel@linux.intel.com>
-         <20170327075817.bb7wda62fcuvfa4b@linutronix.de>
-         <2e97b35f-bb9e-66e4-736d-66313626354e@suse.com>
-         <CAK8P3a1nf7zOHZCK+ZhfhVo9R8Onz4Mv5T2eTg7i4nwuL=zo7w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        id S1752131AbdC1Odx (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 28 Mar 2017 10:33:53 -0400
+Date: Tue, 28 Mar 2017 16:20:34 +0200 (CEST)
+From: Jiri Kosina <jikos@kernel.org>
+Subject: Re: [PATCH] Fix dead URLs to ftp.kernel.org
+In-Reply-To: <20170327124406.6910-1-sj38.park@gmail.com>
+Message-ID: <alpine.LSU.2.20.1703281620140.31814@cbobk.fhfr.pm>
+References: <CAEjAshqR0Nhp4Wkmkg_HrswsiuUb3rYJ=TOUSBSvoUT3FSWTjg@mail.gmail.com> <20170327124406.6910-1-sj38.park@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>, Michal Marek <mmarek@suse.com>
-Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Sergey Senozhatsky <sergey.senozhatsky@gmail.com>, Yinghai Lu <yinghai@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, the arch/x86 maintainers <x86@kernel.org>, Kees Cook <keescook@chromium.org>, Baoquan He <bhe@redhat.com>, "H.J. Lu" <hjl.tools@gmail.com>, Paul Bolle <pebolle@tiscali.nl>, Masahiro Yamada <yamada.masahiro@socionext.com>, Borislav Petkov <bp@suse.de>, Andrew Morton <akpm@linux-foundation.org>, Petr Mladek <pmladek@suse.com>, "David S. Miller" <davem@davemloft.net>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Andy Lutomirski <luto@kernel.org>, Thomas Garnier <thgarnie@google.com>, Nicolas Pitre <nicolas.pitre@linaro.org>, Tejun Heo <tj@kernel.org>, Daniel Mack <daniel@zonque.org>, Helge Deller <deller@gmx.de>, Rik van Riel <riel@redhat.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: SeongJae Park <sj38.park@gmail.com>
+Cc: rml@tech9.net, axboe@fb.com, shli@kernel.org, raven@themaw.net, yamada.masahito@socionext.com, mmarek@suse.com, linux-raid@vger.kernel.org, autofs@vger.kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Mon, 2017-03-27 at 15:25 +0200, Arnd Bergmann wrote:
-> On Mon, Mar 27, 2017 at 1:47 PM, Michal Marek <mmarek@suse.com> wrote:
-> > 
-> > Dne 27.3.2017 v 09:58 Sebastian Andrzej Siewior napsal(a):
-> > > 
-> > > On 2017-03-24 13:35:40 [+0800], Chao Peng wrote:
-> > > > 
-> > > > 
-> > > > > 
-> > > > > > 
-> > > > > > > 
-> > > > > > >     kernel               kernel size    time in
-> > > > > > > decompress_kernel
-> > > > > > >     compressed (gzip)    3.3M           53ms
-> > > > > > >     uncompressed         14M            3ms
-> > > > > > 
-> > > > Exactly, LZ4 is the fastest. It takes 16ms to complete the
-> > > > decompression. Still sounds a little longer when compared to
-> > > > uncompressed kernel.
-> > > 
-> > > Are we seriously talking here about one-time improvement of 13ms
-> > > boot time?
-> > 
-> > If the use case is launching new VM instances continuously, then
-> > compressing the kernel image is about as useful as compressing
-> > /bin/bash.
+On Mon, 27 Mar 2017, SeongJae Park wrote:
+
+> URLs to ftp.kernel.org are still exist though the service is closed [0].
+> This commit fixes the URLs to use www.kernel.org instead.
 > 
-> I guess the next step would be to use CONFIG_XIP_KERNEL on x86,
-> which requires an uncompressed kernel but has the additional advantage
-> of sharing the read-only sections of the kernel image across virtual
-> machines, resulting in better RAM and cache usage.
+> [0] https://www.kernel.org/shutting-down-ftp-services.html
+> 
+> Signed-off-by: SeongJae Park <sj38.park@gmail.com>
 
-That is something we wanna look into :)
+I've applied this to trivial.git#for-next.
 
-Chao
+-- 
+Jiri Kosina
+SUSE Labs
+
