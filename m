@@ -1,58 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:48631 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752292AbdC0Pfa (ORCPT
+Received: from mail-pg0-f54.google.com ([74.125.83.54]:35318 "EHLO
+        mail-pg0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753556AbdC1BTf (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 27 Mar 2017 11:35:30 -0400
-MIME-Version: 1.0
-In-Reply-To: <1490617217-30192-1-git-send-email-nicolas.dichtel@6wind.com>
-References: <CAK7LNAR_yp+O9jUZC8mKdaHgTiCkE7p2-ZbA9YZ8OGyp+uxhBQ@mail.gmail.com>
- <1490617217-30192-1-git-send-email-nicolas.dichtel@6wind.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 28 Mar 2017 00:35:07 +0900
-Message-ID: <CAK7LNATG6M7Q_sXbfRRLF6ALJPRkbr=h5zz9VjFRQEsDNL1AQA@mail.gmail.com>
-Subject: Re: [PATCH v11 00/12] uapi: export all headers under uapi directories
-Content-Type: text/plain; charset=UTF-8
+        Mon, 27 Mar 2017 21:19:35 -0400
+Received: by mail-pg0-f54.google.com with SMTP id 81so42121116pgh.2
+        for <linux-kbuild@vger.kernel.org>; Mon, 27 Mar 2017 18:19:34 -0700 (PDT)
+From: Matthias Kaehlcke <mka@chromium.org>
+Subject: [PATCH] kbuild: use -Oz instead of -Os when using clang
+Date: Mon, 27 Mar 2017 18:19:09 -0700
+Message-Id: <20170328011909.150513-1-mka@chromium.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Cc: Arnd Bergmann <arnd@arndb.de>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-arch@vger.kernel.org, David Airlie <airlied@linux.ie>, "David S. Miller" <davem@davemloft.net>, Russell King <linux@armlinux.org.uk>, bp@alien8.de, slash.tmp@free.fr, Daniel Vetter <daniel.vetter@ffwll.ch>, rmk+kernel@armlinux.org.uk, msalter@redhat.com, jengelh@inai.de, hch@infradead.org, Tobias Klauser <tklauser@distanz.ch>, mpe@ellerman.id.au, Ingo Molnar <mingo@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, "Dmitry V. Levin" <ldv@altlinux.org>, Herbert Xu <herbert@gondor.apana.org.au>, linux-rdma@vger.kernel.org
+To: Michal Marek <mmarek@suse.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Behan Webster <behanw@converseincode.com>, Greg Hackmann <ghackmann@google.com>, Grant Grundler <grundler@chromium.org>, Michael Davidson <md@google.com>, Peter Foley <pefoley2@pefoley.com>, Matthias Kaehlcke <mka@chromium.org>
 
-2017-03-27 21:20 GMT+09:00 Nicolas Dichtel <nicolas.dichtel@6wind.com>:
->
->
-> Patches #1 and #2 are just cleanup: some exported headers were still under
-> a non-uapi directory. Patch #3 is a fix to avoid exporting a file that was
-> not under an uapi directory.
-> After these three patches, all exported headers are under an uapi directory:
-> path #4 stops searching files in non uapi directories.
-> The patch #5 was spotted by code review: there is no in-tree user of this
-> functionality.
-> Patch #6 fixes some warnings/errors reported by 0-day tests.
-> Patch #7 to #9 fix some errors when the corresponding files are included by
-> userland.
-> Patches #10 and #11 remove the need to list explicitly headers. Now all files
-> under an uapi directory are exported.
-> Patch #12 is also a small cleanup.
->
-> This series has been tested with a 'make headers_install' on x86 and a
-> 'make headers_install_all'. I've checked the result of both commands.
->
-> This patch is built on top of masahiroy/linux-kbuild.git#for-next (v4.11-rc1).
-> I didn't find any conflict with v4.11-rc4.
->
-> v10 -> v11:
->   - patch #1: restore the double '_' in the header guard
->   - patch #6, #7, #8: order '#include' in alphabetical order
->   - patch #10: rename header-n to no-export-headers
->                cleanup management of kvm.h, kvm_para.h and a.out.h
->   - patch #12: add it
->   - rebase on top of masahiroy/linux-kbuild.git#for-next
+This generates smaller resulting object code when compiled with clang.
 
+Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+---
+ Makefile | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Series, applied to linux-kbuild/uapi.  Thanks!
-
-
+diff --git a/Makefile b/Makefile
+index b2faa9319372..66bcdbf58371 100644
+--- a/Makefile
++++ b/Makefile
+@@ -638,7 +638,8 @@ KBUILD_CFLAGS	+= $(call cc-option,-fdata-sections,)
+ endif
+ 
+ ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
+-KBUILD_CFLAGS	+= -Os $(call cc-disable-warning,maybe-uninitialized,)
++KBUILD_CFLAGS	+= $(call cc-option,-Oz,-Os)
++KBUILD_CFLAGS	+= $(call cc-disable-warning,maybe-uninitialized,)
+ else
+ ifdef CONFIG_PROFILE_ALL_BRANCHES
+ KBUILD_CFLAGS	+= -O2 $(call cc-disable-warning,maybe-uninitialized,)
 -- 
-Best Regards
-Masahiro Yamada
+2.12.2.564.g063fe858b8-goog
+
