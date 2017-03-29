@@ -1,48 +1,147 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vk0-f48.google.com ([209.85.213.48]:34683 "EHLO
-        mail-vk0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932594AbdC1W4Y (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:62345 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751943AbdC2CHq (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 28 Mar 2017 18:56:24 -0400
-Received: by mail-vk0-f48.google.com with SMTP id z204so106383665vkd.1
-        for <linux-kbuild@vger.kernel.org>; Tue, 28 Mar 2017 15:56:18 -0700 (PDT)
+        Tue, 28 Mar 2017 22:07:46 -0400
 MIME-Version: 1.0
-In-Reply-To: <3cbfa24b-8bae-7cc9-dcf5-93f02971e673@zytor.com>
-References: <1490273467-97948-1-git-send-email-chao.p.peng@linux.intel.com>
- <CAE9FiQVmazd8Z=_DT2vrcy7aOpgtFwxAF1Cw6PvzFnE+MckSQg@mail.gmail.com>
- <20170323153117.GA6356@tigerII.localdomain> <1490333740.2925.7.camel@linux.intel.com>
- <20170327075817.bb7wda62fcuvfa4b@linutronix.de> <2e97b35f-bb9e-66e4-736d-66313626354e@suse.com>
- <CAK8P3a1nf7zOHZCK+ZhfhVo9R8Onz4Mv5T2eTg7i4nwuL=zo7w@mail.gmail.com>
- <1490702482.3011.7.camel@linux.intel.com> <3cbfa24b-8bae-7cc9-dcf5-93f02971e673@zytor.com>
-From: Andy Lutomirski <luto@amacapital.net>
-Date: Tue, 28 Mar 2017 15:55:47 -0700
-Message-ID: <CALCETrVnc6pWKcbFWeJHmPVDtmD5Js_LbW_AVbx-sBJ0hpRNwQ@mail.gmail.com>
-Subject: Re: [PATCH] x86/boot: Support uncompressed kernel
+In-Reply-To: <20170314213724.3836900-1-arnd@arndb.de>
+References: <20170314213410.3762842-1-arnd@arndb.de> <20170314213724.3836900-1-arnd@arndb.de>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Wed, 29 Mar 2017 11:07:16 +0900
+Message-ID: <CAK7LNARWnDW5GqF_nAy=etwSLfL5XZ4zWB_UEkBdd5M88iS1UA@mail.gmail.com>
+Subject: Re: [PATCH] [SUBMITTED 20170314] [v333kbuild: disable
+ -ffunction-sections on gcc-4.7 with ftrace
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "H. Peter Anvin" <hpa@zytor.com>
-Cc: Chao Peng <chao.p.peng@linux.intel.com>, Arnd Bergmann <arnd@arndb.de>, Michal Marek <mmarek@suse.com>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Sergey Senozhatsky <sergey.senozhatsky@gmail.com>, Yinghai Lu <yinghai@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, the arch/x86 maintainers <x86@kernel.org>, Kees Cook <keescook@chromium.org>, Baoquan He <bhe@redhat.com>, "H.J. Lu" <hjl.tools@gmail.com>, Paul Bolle <pebolle@tiscali.nl>, Masahiro Yamada <yamada.masahiro@socionext.com>, Borislav Petkov <bp@suse.de>, Andrew Morton <akpm@linux-foundation.org>, Petr Mladek <pmladek@suse.com>, "David S. Miller" <davem@davemloft.net>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Andy Lutomirski <luto@kernel.org>, Thomas Garnier <thgarnie@google.com>, Nicolas Pitre <nicolas.pitre@linaro.org>, Tejun Heo <tj@kernel.org>, Daniel Mack <daniel@zonque.org>, Helge Deller <deller@gmx.de>, Rik van Riel <riel@redhat.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Michal Marek <mmarek@suse.com>, Nicholas Piggin <npiggin@gmail.com>, Namhyung Kim <namhyung.with.foss@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, masahiroy@kernel.org
 
-On Tue, Mar 28, 2017 at 3:38 PM, H. Peter Anvin <hpa@zytor.com> wrote:
-> On 03/28/17 05:01, Chao Peng wrote:
->>>
->>> I guess the next step would be to use CONFIG_XIP_KERNEL on x86,
->>> which requires an uncompressed kernel but has the additional advantage
->>> of sharing the read-only sections of the kernel image across virtual
->>> machines, resulting in better RAM and cache usage.
->>
->> That is something we wanna look into :)
->>
+Hi Arnd,
+
+
+2017-03-15 6:37 GMT+09:00 Arnd Bergmann <arnd@arndb.de>:
+> When ftrace is enabled and we build with gcc-4.7 or older, we
+> get a warning for each file on architectures that select
+> CONFIG_LD_DEAD_CODE_DATA_ELIMINATION:
 >
-> It is, but that is a second order thing... especially since the x86
-> kernel makes heavy use of self-patching at the moment.  What would be
-> more significant, though, would be to avoid the memcpy() and instead
-> decode the uncompressed kernel in-place.
+> warning: -ffunction-sections disabled; it makes profiling impossible [enabled by default]
+>
+> This turns off function sections in that specific case, leaving
+> it enabled for all other configurations.
+>
+> Fixes: b67067f1176d ("kbuild: allow archs to select link dead code/data elimination")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> Cc: Namhyung Kim <namhyung.with.foss@gmail.com>
+> ---
+> v2: accidentally resend the same patch as before
+> v3: send the exact same patch once more, without doing the change I wanted
+> v4: actually fixed version number in check as pointed out by Namhyung Kim (I hope)
+> ---
+>  Makefile | 4 ++++
+>  1 file changed, 4 insertions(+)
+>
+> diff --git a/Makefile b/Makefile
+> index 6e7e644a0b84..3a964fa3a787 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -662,7 +662,11 @@ KBUILD_CFLAGS      += -Wextra
+>  KBUILD_CFLAGS  += $(call cc-disable-warning,frame-address,)
+>
+>  ifdef CONFIG_LD_DEAD_CODE_DATA_ELIMINATION
+> +ifdef CONFIG_FUNCTION_TRACER
+> +KBUILD_CFLAGS  += $(call cc-ifversion, -ge,0408,$(call cc-option,-ffunction-sections,))
+> +else
+>  KBUILD_CFLAGS  += $(call cc-option,-ffunction-sections,)
+> +endif
+>  KBUILD_CFLAGS  += $(call cc-option,-fdata-sections,)
+>  endif
 >
 
-Having looked at this code recently, I'd rather fix it differently:
-use the streaming decompression API and integrate it with the ELF
-parsing code so we can decompress directly into the actual load
-location.  Also, the parse_elf() code needs some serious improved
-documentation and robustification.  It's absurdly fragile right now.
+
+I have two questions.
+
+[1]
+How did you produce this warning?
+I do not see any architecture that selects this option at this point of time.
+
+Did you edit Kconfig locally to select LD_DEAD_CODE_DATA_ELIMINATION?
+If so, is this patch not so urgent as the "Fixes" tag claims?
+
+
+[2]
+This question is more technical.
+
+The cause of the problem seems that GCC warns it cannot support the
+two at the same time,
+but it does handle it as an error.  So, cc-option assumes this
+combination is OK.
+
+Is it a good idea to add -Werror to cc-option checking?
+
+In my local test, the following patch solved this specific case.
+
+You contribute a lot for compile-test,
+so I'd like you to see if it has side-effects.
+
+
+
+
+diff --git a/Makefile b/Makefile
+index 231e6a7..5850850 100644
+--- a/Makefile
++++ b/Makefile
+@@ -632,11 +632,6 @@ include arch/$(SRCARCH)/Makefile
+ KBUILD_CFLAGS  += $(call cc-option,-fno-delete-null-pointer-checks,)
+ KBUILD_CFLAGS  += $(call cc-disable-warning,frame-address,)
+
+-ifdef CONFIG_LD_DEAD_CODE_DATA_ELIMINATION
+-KBUILD_CFLAGS  += $(call cc-option,-ffunction-sections,)
+-KBUILD_CFLAGS  += $(call cc-option,-fdata-sections,)
+-endif
+-
+ ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
+ KBUILD_CFLAGS  += -Os $(call cc-disable-warning,maybe-uninitialized,)
+ else
+@@ -767,6 +762,11 @@ ifdef CONFIG_DEBUG_SECTION_MISMATCH
+ KBUILD_CFLAGS += $(call cc-option, -fno-inline-functions-called-once)
+ endif
+
++ifdef CONFIG_LD_DEAD_CODE_DATA_ELIMINATION
++KBUILD_CFLAGS  += $(call cc-option,-ffunction-sections,)
++KBUILD_CFLAGS  += $(call cc-option,-fdata-sections,)
++endif
++
+ # arch Makefile may override CC so keep this after arch Makefile is included
+ NOSTDINC_FLAGS += -nostdinc -isystem $(shell $(CC) -print-file-name=include)
+ CHECKFLAGS     += $(NOSTDINC_FLAGS)
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index d6ca649..558d4f1 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -116,12 +116,12 @@ CC_OPTION_CFLAGS = $(filter-out
+$(GCC_PLUGINS_CFLAGS),$(KBUILD_CFLAGS))
+ # Usage: cflags-y += $(call cc-option,-march=winchip-c6,-march=i586)
+
+ cc-option = $(call try-run,\
+-       $(CC) $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS) $(1) -c -x c
+/dev/null -o "$$TMP",$(1),$(2))
++       $(CC) -Werror $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS) $(1) -c
+-x c /dev/null -o "$$TMP",$(1),$(2))
+
+ # cc-option-yn
+ # Usage: flag := $(call cc-option-yn,-march=winchip-c6)
+ cc-option-yn = $(call try-run,\
+-       $(CC) $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS) $(1) -c -x c
+/dev/null -o "$$TMP",y,n)
++       $(CC) -Werror $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS) $(1) -c
+-x c /dev/null -o "$$TMP",y,n)
+
+ # cc-option-align
+ # Prefix align with either -falign or -malign
+
+
+-- 
+Best Regards
+Masahiro Yamada
