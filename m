@@ -1,149 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f49.google.com ([209.85.215.49]:32939 "EHLO
-        mail-lf0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933447AbdCaNJv (ORCPT
+Received: from mail-oi0-f41.google.com ([209.85.218.41]:35501 "EHLO
+        mail-oi0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754879AbdCaUjO (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 31 Mar 2017 09:09:51 -0400
-Received: by mail-lf0-f49.google.com with SMTP id h125so43511604lfe.0
-        for <linux-kbuild@vger.kernel.org>; Fri, 31 Mar 2017 06:09:50 -0700 (PDT)
-From: riku.voipio@linaro.org
-Subject: [PATCH 3/3] builddeb: add make fastdeb-pkg target
-Date: Fri, 31 Mar 2017 16:09:41 +0300
-Message-Id: <20170331130941.5250-4-riku.voipio@linaro.org>
-In-Reply-To: <20170331130941.5250-1-riku.voipio@linaro.org>
-References: <20170331130941.5250-1-riku.voipio@linaro.org>
+        Fri, 31 Mar 2017 16:39:14 -0400
+MIME-Version: 1.0
+In-Reply-To: <CAFzeTN3-=a6n-PEKP5ssCUszYYPu5R5_6uf9DEdptPKEuWOsrQ@mail.gmail.com>
+References: <20170314213410.3762842-1-arnd@arndb.de> <20170314213724.3836900-1-arnd@arndb.de>
+ <CAK7LNARWnDW5GqF_nAy=etwSLfL5XZ4zWB_UEkBdd5M88iS1UA@mail.gmail.com>
+ <CAK8P3a101M6u2hjkEh47t5ZWfpGk80uHuFYFgfJi+vCLmvzaQg@mail.gmail.com>
+ <CAK7LNASJU0rQ2oiGnoi7knNvqLGvT8FryJJ4-ap+7isHuuBnsQ@mail.gmail.com>
+ <CAK8P3a3ph=9f0LV1JoAhP8ZO4-9GGqmSmV6ajXZzw2zJPSXOPw@mail.gmail.com> <CAFzeTN3-=a6n-PEKP5ssCUszYYPu5R5_6uf9DEdptPKEuWOsrQ@mail.gmail.com>
+From: Arnd Bergmann <arnd@arndb.de>
+Date: Fri, 31 Mar 2017 22:39:13 +0200
+Message-ID: <CAK8P3a0W8q_6Kbm64U501zmbTonx_1g4euSLZS=4rJ5sVnhhfw@mail.gmail.com>
+Subject: Re: [PATCH] [SUBMITTED 20170314] [v333kbuild: disable
+ -ffunction-sections on gcc-4.7 with ftrace
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org, mmarek@suse.com
-Cc: yamada.masahiro@socionext.com, debian-kernel@lists.debian.org, Riku Voipio <riku.voipio@linaro.org>, Andrew Donnellan <andrew.donnellan@au1.ibm.com>
+To: Mark Charlebois <charlebm@gmail.com>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, Nicholas Piggin <npiggin@gmail.com>, Namhyung Kim <namhyung.with.foss@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-From: Riku Voipio <riku.voipio@linaro.org>
+On Fri, Mar 31, 2017 at 5:54 PM, Mark Charlebois <charlebm@gmail.com> wrote:
+> What is it you need from me? To rebase 03497934e21, test (on what ARCH) and
+> resend (to who)?. Let me know if Arnd forwarding the patch isn't sufficient.
+> I'm not set up to test this at the moment, but could if needed.
 
-Currently, the deb-pkg and bindeb-pkg targets create multiple packages
-for the kernel binaries, headers, userspace headers and firmware.
+I've just send it, I think that's sufficient and will keep the the
+patch attributed
+correctly.
 
-For developers who generate Debian packages as part of their development
-workflows, it's often not necessary to generate all these packages.
-
-Introduce new target, fastdeb-pkg, which only generates kernel packages.
-Re-order package build order so that kernel binary package is created
-first and we can exit cleanly unless generating rest packages with the
-old bindeb-pkg and deb-pkg targets.
-
-Cc: Andrew Donnellan <andrew.donnellan@au1.ibm.com>
-Tested-By: Jim Davis <jim.epost@gmail.com>
-Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
----
- scripts/package/Makefile |  7 ++++++-
- scripts/package/builddeb | 49 +++++++++++++++++++++++++-----------------------
- 2 files changed, 32 insertions(+), 24 deletions(-)
-
-diff --git a/scripts/package/Makefile b/scripts/package/Makefile
-index 71b4a8af9d4d..fc86cc3ae222 100644
---- a/scripts/package/Makefile
-+++ b/scripts/package/Makefile
-@@ -97,6 +97,10 @@ bindeb-pkg: FORCE
- 	$(MAKE) KBUILD_SRC=
- 	+$(call cmd,builddeb)
- 
-+fastdeb-pkg: FORCE
-+	$(MAKE) KBUILD_SRC=
-+	+$(call cmd,builddeb)
-+
- clean-dirs += $(objtree)/debian/
- 
- 
-@@ -142,7 +146,8 @@ help: FORCE
- 	@echo '  rpm-pkg             - Build both source and binary RPM kernel packages'
- 	@echo '  binrpm-pkg          - Build only the binary kernel RPM package'
- 	@echo '  deb-pkg             - Build both source and binary deb kernel packages'
--	@echo '  bindeb-pkg          - Build only the binary kernel deb package'
-+	@echo '  bindeb-pkg          - Build all binary kernel deb packages'
-+	@echo '  fastdeb-pkg         - Build only the binary kernel image deb package'
- 	@echo '  tar-pkg             - Build the kernel as an uncompressed tarball'
- 	@echo '  targz-pkg           - Build the kernel as a gzip compressed tarball'
- 	@echo '  tarbz2-pkg          - Build the kernel as a bzip2 compressed tarball'
-diff --git a/scripts/package/builddeb b/scripts/package/builddeb
-index 3407826f2a99..6c2f57039d22 100755
---- a/scripts/package/builddeb
-+++ b/scripts/package/builddeb
-@@ -180,11 +180,6 @@ if grep -q '^CONFIG_MODULES=y' $KCONFIG_CONFIG ; then
- 	fi
- fi
- 
--if [ "$ARCH" != "um" ]; then
--	$MAKE headers_check KBUILD_SRC=
--	$MAKE headers_install KBUILD_SRC= INSTALL_HDR_PATH="$libc_headers_dir/usr"
--fi
--
- # Install the maintainer scripts
- # Note: hook scripts under /etc/kernel are also executed by official Debian
- # kernel packages, as well as kernel packages built using make-kpkg.
-@@ -315,6 +310,32 @@ EOF
- 
- fi
- 
-+# Move firmware out of kernel image package.
-+if [ -e "$tmpdir/lib/firmware" ]; then
-+	mv "$tmpdir/lib/firmware"/* "$fwdir/lib/firmware/$version/"
-+	rmdir "$tmpdir/lib/firmware"
-+fi
-+
-+create_package "$packagename" "$tmpdir"
-+[ "x$1" = "xfastdeb-pkg" ] && exit 0
-+
-+if [ -e "$fwdir/lib/firmware/$version" ]; then
-+	cat <<EOF >> debian/control
-+
-+Package: $fwpackagename
-+Architecture: all
-+Description: Linux kernel firmware, version $version
-+ This package contains firmware from the Linux kernel, version $version.
-+EOF
-+
-+	create_package "$fwpackagename" "$fwdir"
-+fi
-+
-+if [ "$ARCH" != "um" ]; then
-+	$MAKE headers_check KBUILD_SRC=
-+	$MAKE headers_install KBUILD_SRC= INSTALL_HDR_PATH="$libc_headers_dir/usr"
-+fi
-+
- # Build kernel header package
- (cd $srctree; find . -name Makefile\* -o -name Kconfig\* -o -name \*.pl) > "$objtree/debian/hdrsrcfiles"
- (cd $srctree; find arch/*/include include scripts -type f) >> "$objtree/debian/hdrsrcfiles"
-@@ -345,22 +366,6 @@ Description: Linux kernel headers for $KERNELRELEASE on \${kernel:debarch}
-  This is useful for people who need to build external modules
- EOF
- 
--# Do we have firmware? Move it out of the way and build it into a package.
--if [ -e "$tmpdir/lib/firmware" ]; then
--	mv "$tmpdir/lib/firmware"/* "$fwdir/lib/firmware/$version/"
--	rmdir "$tmpdir/lib/firmware"
--
--	cat <<EOF >> debian/control
--
--Package: $fwpackagename
--Architecture: all
--Description: Linux kernel firmware, version $version
-- This package contains firmware from the Linux kernel, version $version.
--EOF
--
--	create_package "$fwpackagename" "$fwdir"
--fi
--
- cat <<EOF >> debian/control
- 
- Package: $libc_headers_packagename
-@@ -377,8 +382,6 @@ if [ "$ARCH" != "um" ]; then
- 	create_package "$libc_headers_packagename" "$libc_headers_dir"
- fi
- 
--create_package "$packagename" "$tmpdir"
--
- if [ -n "$BUILD_DEBUG" ] ; then
- 	# Build debug package
- 	# Different tools want the image in different locations
--- 
-2.11.0
-
+        Arnd
