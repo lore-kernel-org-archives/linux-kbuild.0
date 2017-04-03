@@ -1,58 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg0-f48.google.com ([74.125.83.48]:33271 "EHLO
-        mail-pg0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752367AbdDCTrM (ORCPT
+Received: from asavdk4.altibox.net ([109.247.116.15]:54273 "EHLO
+        asavdk4.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751479AbdDCU10 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 3 Apr 2017 15:47:12 -0400
-Received: by mail-pg0-f48.google.com with SMTP id x125so129962012pgb.0
-        for <linux-kbuild@vger.kernel.org>; Mon, 03 Apr 2017 12:47:11 -0700 (PDT)
-From: Matthias Kaehlcke <mka@chromium.org>
-Subject: [PATCH] frv: Use OFFSET macro in DEF_*REG()
-Date: Mon,  3 Apr 2017 12:46:36 -0700
-Message-Id: <20170403194636.96438-1-mka@chromium.org>
+        Mon, 3 Apr 2017 16:27:26 -0400
+Date: Mon, 3 Apr 2017 22:20:33 +0200
+From: Sam Ravnborg <sam@ravnborg.org>
+Subject: Re: [PATCH] Kbuild.include: addtree: Remove quotes before matching
+ path
+Message-ID: <20170403202033.GB29829@ravnborg.org>
+References: <20170318215823.GS4152@decadent.org.uk>
+ <CAK7LNAQFx-yPj2c52sZ0LSv=UnQz-ATGJGkzT5wV7tq-GmvARw@mail.gmail.com>
+ <7bebf377-1268-ee02-c19b-f2d16d69cf79@suse.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7bebf377-1268-ee02-c19b-f2d16d69cf79@suse.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Matthias Kaehlcke <mka@chromium.org>
+To: Michal Marek <mmarek@suse.com>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Ben Hutchings <ben@decadent.org.uk>, Arnd Bergmann <arnd@arndb.de>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, stable@vger.kernel.org, 856474@bugs.debian.org
 
-Avoid code duplication by using OFFSET() in DEF_*REG() instead of
-replicating the macro.
+On Mon, Apr 03, 2017 at 03:25:10PM +0200, Michal Marek wrote:
+> On 2017-04-03 09:42, Masahiro Yamada wrote:
+> > Each Makefile knows it wants to see
+> > additional headers in the source tree, or objtree.
+> > 
+> > I am guessing the right approach in a long run is,
+> > we require -I to specify $(srctree) or $(objtree) explicitly.
+> > 
+> > ccflags-y := -I$(srctree)/foo/bar/baz
+> > 
+> > or
+> > 
+> > ccflags-y := -I$(objtree)/foo/bar/baz
+> > 
+> > 
+> > (For the latter, we can omit $(objtree)/ as it is ./)
+> > 
+> > 
+> > Then, delete $(call flags,_c_flags) after the conversion.
+> 
+> Agreed. The addtree function is more of a hack to make things just work
+> with O=, but AFAIK there is no clean way to implement VPATH for -I
+> arguments. So it's sensible to get rid of the hack. It looks like it's
+> going to be lot of work though:
+> 
+> $ git grep -e '-I' -- '*Makefile*' | wc -l
+> 732
+> $ git grep -e '-I *\$(\(src\|obj\)tree)' -- '*Makefile*' | wc -l
+> 166
 
-Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
----
- arch/frv/kernel/asm-offsets.c | 19 ++++---------------
- 1 file changed, 4 insertions(+), 15 deletions(-)
+There was a goal long time ago that moving the kernel source should
+not trigger a rebuild.
+Any hardcoded path would violate this (like $(srctree), $(objtree))
 
-diff --git a/arch/frv/kernel/asm-offsets.c b/arch/frv/kernel/asm-offsets.c
-index 8414293f213a..20c5b79b55f9 100644
---- a/arch/frv/kernel/asm-offsets.c
-+++ b/arch/frv/kernel/asm-offsets.c
-@@ -14,21 +14,10 @@
- #include <asm/thread_info.h>
- #include <asm/gdb-stub.h>
- 
--#define DEF_PTREG(sym, reg) \
--        asm volatile("\n->" #sym " %0 offsetof(struct pt_regs, " #reg ")" \
--		     : : "i" (offsetof(struct pt_regs, reg)))
--
--#define DEF_IREG(sym, reg) \
--        asm volatile("\n->" #sym " %0 offsetof(struct user_context, " #reg ")" \
--		     : : "i" (offsetof(struct user_context, reg)))
--
--#define DEF_FREG(sym, reg) \
--        asm volatile("\n->" #sym " %0 offsetof(struct user_context, " #reg ")" \
--		     : : "i" (offsetof(struct user_context, reg)))
--
--#define DEF_0REG(sym, reg) \
--        asm volatile("\n->" #sym " %0 offsetof(struct frv_frame0, " #reg ")" \
--		     : : "i" (offsetof(struct frv_frame0, reg)))
-+#define DEF_PTREG(sym, reg) OFFSET(sym, pt_regs, reg)
-+#define DEF_IREG(sym, reg) OFFSET(sym, user_context, reg)
-+#define DEF_FREG(sym, reg) OFFSET(sym, user_context, reg)
-+#define DEF_0REG(sym, reg) OFFSET(sym, frv_frame0, reg)
- 
- void foo(void)
- {
--- 
-2.12.2.564.g063fe858b8-goog
+I dunno if this is really something to aim for today.
 
+I have personally from time to time renamed the directory where
+I have kernel soruce (which is seen like moving the kernel source),
+and would not be happy if this always triggered a full rebuild.
+But this is frankly a corner case.
+
+	Sam
