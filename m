@@ -1,34 +1,106 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi0-f41.google.com ([209.85.218.41]:35501 "EHLO
-        mail-oi0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754879AbdCaUjO (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:31409 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751329AbdDCHnF (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 31 Mar 2017 16:39:14 -0400
+        Mon, 3 Apr 2017 03:43:05 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAFzeTN3-=a6n-PEKP5ssCUszYYPu5R5_6uf9DEdptPKEuWOsrQ@mail.gmail.com>
-References: <20170314213410.3762842-1-arnd@arndb.de> <20170314213724.3836900-1-arnd@arndb.de>
- <CAK7LNARWnDW5GqF_nAy=etwSLfL5XZ4zWB_UEkBdd5M88iS1UA@mail.gmail.com>
- <CAK8P3a101M6u2hjkEh47t5ZWfpGk80uHuFYFgfJi+vCLmvzaQg@mail.gmail.com>
- <CAK7LNASJU0rQ2oiGnoi7knNvqLGvT8FryJJ4-ap+7isHuuBnsQ@mail.gmail.com>
- <CAK8P3a3ph=9f0LV1JoAhP8ZO4-9GGqmSmV6ajXZzw2zJPSXOPw@mail.gmail.com> <CAFzeTN3-=a6n-PEKP5ssCUszYYPu5R5_6uf9DEdptPKEuWOsrQ@mail.gmail.com>
-From: Arnd Bergmann <arnd@arndb.de>
-Date: Fri, 31 Mar 2017 22:39:13 +0200
-Message-ID: <CAK8P3a0W8q_6Kbm64U501zmbTonx_1g4euSLZS=4rJ5sVnhhfw@mail.gmail.com>
-Subject: Re: [PATCH] [SUBMITTED 20170314] [v333kbuild: disable
- -ffunction-sections on gcc-4.7 with ftrace
+In-Reply-To: <20170318215823.GS4152@decadent.org.uk>
+References: <20170318215823.GS4152@decadent.org.uk>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Mon, 3 Apr 2017 16:42:43 +0900
+Message-ID: <CAK7LNAQFx-yPj2c52sZ0LSv=UnQz-ATGJGkzT5wV7tq-GmvARw@mail.gmail.com>
+Subject: Re: [PATCH] Kbuild.include: addtree: Remove quotes before matching path
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Mark Charlebois <charlebm@gmail.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, Nicholas Piggin <npiggin@gmail.com>, Namhyung Kim <namhyung.with.foss@gmail.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Ben Hutchings <ben@decadent.org.uk>, Arnd Bergmann <arnd@arndb.de>, Michal Marek <mmarek@suse.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, stable@vger.kernel.org, 856474@bugs.debian.org
 
-On Fri, Mar 31, 2017 at 5:54 PM, Mark Charlebois <charlebm@gmail.com> wrote:
-> What is it you need from me? To rebase 03497934e21, test (on what ARCH) and
-> resend (to who)?. Let me know if Arnd forwarding the patch isn't sufficient.
-> I'm not set up to test this at the moment, but could if needed.
++To Arnd
++To Michal
 
-I've just send it, I think that's sufficient and will keep the the
-patch attributed
-correctly.
+2017-03-19 6:58 GMT+09:00 Ben Hutchings <ben@decadent.org.uk>:
+> systemtap currently fails to build modules when the kernel source and
+> object trees are separate.
+>
+> systemtap adds something like -I"/usr/share/systemtap/runtime" to
+> EXTRA_CFLAGS, and addtree should not adjust this as it's specifying an
+> absolute directory.  But since make has no understanding of shell
+> quoting, it does anyway.
+>
+> For a long time this didn't matter, because addtree would still emit
+> the original -I option after the adjusted one.  However, commit
+> db547ef19064 ("Kbuild: don't add obj tree in additional includes")
+> changed it to remove the original -I option.
+>
+> Remove quotes (both double and single) before matching against the
+> excluded patterns.
+>
+> References: https://bugs.debian.org/856474
+> Reported-and-tested-by: Jack Henschel <jackdev@mailbox.org>
+> Reported-and-tested-by: Ritesh Raj Sarraf <rrs@debian.org>
+> Fixes: db547ef19064 ("Kbuild: don't add obj tree in additional includes")
+> Cc: stable@vger.kernel.org # 4.8+
+> Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+> ---
+> --- a/scripts/Kbuild.include
+> +++ b/scripts/Kbuild.include
+> @@ -207,7 +207,7 @@ hdr-inst := -f $(srctree)/scripts/Makefi
+>  # Prefix -I with $(srctree) if it is not an absolute path.
+>  # skip if -I has no parameter
+>  addtree = $(if $(patsubst -I%,%,$(1)), \
+> -$(if $(filter-out -I/% -I./% -I../%,$(1)),$(patsubst -I%,-I$(srctree)/%,$(1)),$(1)))
+> +$(if $(filter-out -I/% -I./% -I../%,$(subst $(quote),,$(subst $(squote),,$(1)))),$(patsubst -I%,-I$(srctree)/%,$(1)),$(1)))
+>
+>  # Find all -I options and call addtree
+>  flags = $(foreach o,$($(1)),$(if $(filter -I%,$(o)),$(call addtree,$(o)),$(o)))
 
-        Arnd
+
+
+I have been thinking about this patch.
+
+We touched addtree every time a new problem popped up.
+
+It would be easy to pick up this patch,
+but it looks like a crazy idea
+to play pattern-matching in the addtree even more.
+
+
+
+[1] -Ifoo/bar/baz
+[2] -I"foo/bar/baz"
+[3] -I foo/bar/baz    (whitespace(s) after -I)
+
+All of these are valid notation,
+and should be handled in the same way.
+
+However, addtree expects only [1],
+(then this patch is going to add [2] in the soup).
+
+
+Each Makefile knows it wants to see
+additional headers in the source tree, or objtree.
+
+I am guessing the right approach in a long run is,
+we require -I to specify $(srctree) or $(objtree) explicitly.
+
+ccflags-y := -I$(srctree)/foo/bar/baz
+
+or
+
+ccflags-y := -I$(objtree)/foo/bar/baz
+
+
+(For the latter, we can omit $(objtree)/ as it is ./)
+
+
+Then, delete $(call flags,_c_flags) after the conversion.
+
+Any comments?
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
