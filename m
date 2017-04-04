@@ -1,86 +1,107 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ws229.zone31-163-168.zaural.ru ([31.163.168.229]:51729 "HELO
-        zaural.ru" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with SMTP
-        id S1753980AbdDDOO1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 4 Apr 2017 10:14:27 -0400
-Content-Type: application/zip; name="4633317.zip"
-Date: Tue, 04 Apr 2017 14:14:22 -0000
-Message-ID: <149131526276.21467.16530788268290830235@zaural.ru>
-From: <smalinowska@frse.org.pl>
-Subject: 27646 linux-kbuild
-Reply-To: <smalinowska@frse.org.pl>
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment
+Received: from mail-pg0-f51.google.com ([74.125.83.51]:35304 "EHLO
+        mail-pg0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754925AbdDDR1d (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 4 Apr 2017 13:27:33 -0400
+Received: by mail-pg0-f51.google.com with SMTP id 81so158884543pgh.2
+        for <linux-kbuild@vger.kernel.org>; Tue, 04 Apr 2017 10:27:33 -0700 (PDT)
+From: Matthias Kaehlcke <mka@chromium.org>
+Subject: [PATCH v3] kbuild: Add support to generate LLVM bitcode files
+Date: Tue,  4 Apr 2017 10:27:06 -0700
+Message-Id: <20170404172706.171971-1-mka@chromium.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Michal Marek <mmarek@suse.com>, Emese Revfy <re.emese@gmail.com>, Kees Cook <keescook@chromium.org>, Behan Webster <behanw@converseincode.com>, "Luis R . Rodriguez" <mcgrof@kernel.org>, =?UTF-8?q?Vin=C3=ADcius=20Tinti?= <viniciustinti@gmail.com>, Kyeongmin Cho <korea.drzix@gmail.com>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Grant Grundler <grundler@chromium.org>, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>, Peter Foley <pefoley2@pefoley.com>, Matthias Kaehlcke <mka@chromium.org>
 
-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
-W3gyqMud2vXMJFxq3J+VP2P7eq78gleDGElDJXNtpn8oT0urxxBcDGU8LzJiv65iKWq2AuSCzhya
-Mh0HAqZMr1an1qZbu1ytwHNgTShgTrKrevhFAzgPh8vZaa+D7uXzWHOuDFxwUaNbqo8t53U6KUIU
-uFGnU76CjVJDW2G1UUar+XHtJePQ6dXzOk992BKM9BKw5NfjViczXelaY2WMYi8qMnh+4LHDej5m
-CYwywRltWuZK8ABP4VQmQJLF6pJBQVFzake9rCincKmcYPcEW+nfrA5+g2arx13uOUNNORVUF3pZ
-3yqDpnoWOlwzQMtxBoGO4+U8LanRcmX6btnWlprLMwqvadrXkYq85ypPQmdW7ebqhLxlFMhjRX/l
-VORcvGKsTMeFB1q1uO0au7nOWVjWqJ+pGSeE81zd6ZxfscPKPKs0OsooLW4SL/U6A0m1a4WHsT55
-pvTemr5ZARP9wERYhO3rWeD6NGBaTxFDPXxgiS+nKIH9IWcBp/XXMw26Ra9HMap4e/Py6japXBJ9
-4TbJHA/bIy/HjHl4qYQ/lH/229t37+ft/enDvNMlWLkPKxdikn13q3uyZ8/qS4+ux3hndzCb/UYr
-G/x3PN5ubjYU+8fp1P++bdu9NX4fHP6HH7Pv4j51+xj2znV72+1dtHvbNnvv8QQfIRnTbo+VYZa5
-rVu8+Fn3ad+9fv3DR//pu592e+xFy25fb15v9vp4PEDd5Xjalmu++mQvzaGWeVmf/a2u/eL9fPfT
-/dv18c3NKnpzs/v4btnW3/5+Ww2r8ruPlxU/VS2eb24ORppudzeb2/XedL2FrBu+qju9efHLh+GX
-+9PW7t1u92Nd/lVd9s3u5afr5f7402ZbVdA15BruXQnbcJr7/+gjrx8f3EmWKH/67GbyjI1rLPER
-9uAdJ7Q3CA2vZw8PboMPvP58dBusp49ug3lde+Sd6kE3vlf3wvWrV//u79++WN4fEUt9PPV30/Hn
-7e6v9Y3dm3rn+kCfr7stXjV9aOE5TrqDvs4Wxu74+W1xefrYMsX52h49ePWt0Pvtm4JfS/yWaJXt
-vurS+KzIA8VXHHx2M38wX7qZP3zhfpveOK4JfBSZ3K7ueL25mX/t37/e7F6er65XKEhyX9+XNfHr
-r+sPjy6/CfyDQcrpMn+vKJ9p63Jvzi9/rF+WJc5Et16f717+D1BLAQIeAxQAAgAIAESehEprZJT7
-pw0AAL8gAAAIABgAAAAAAAEAAACkgQAAAAAyOTY3OS5qc1VUBQADj6TjWHV4CwABBAAAAAAEAAAA
-AFBLBQYAAAAAAQABAE4AAADpDQAAAABQSwECHgMKAAIAAABEnoRKkg1cZE0OAABNDgAACQAYAAAA
-AAAAAAAApIEAAAAAMjk2NzkuemlwVVQFAAOPpONYdXgLAAEEAAAAAAQAAAAAUEsFBgAAAAABAAEA
-TwAAAJAOAAAAAA==
+From: Vinícius Tinti <viniciustinti@gmail.com>
+
+Add rules to kbuild in order to generate LLVM bitcode files with the .ll
+extension when using clang.
+
+  # from c code
+  CC=clang make kernel/pid.ll
+
+  # from asm code
+  CC=clang make arch/x86/kernel/preempt.ll
+
+From: Vinícius Tinti <viniciustinti@gmail.com>
+Signed-off-by: Vinícius Tinti <viniciustinti@gmail.com>
+Signed-off-by: Behan Webster <behanw@converseincode.com>
+Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+---
+Resending, original v3 patch: https://patchwork.kernel.org/patch/4891071/
+
+ .gitignore             |  1 +
+ Makefile               |  6 ++++++
+ scripts/Makefile.build | 14 ++++++++++++++
+ 3 files changed, 21 insertions(+)
+
+diff --git a/.gitignore b/.gitignore
+index c2ed4ecb0acd..0c39aa20b6ba 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -33,6 +33,7 @@
+ *.lzo
+ *.patch
+ *.gcno
++*.ll
+ modules.builtin
+ Module.symvers
+ *.dwo
+diff --git a/Makefile b/Makefile
+index e11989d36c87..d998ce363335 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1361,6 +1361,8 @@ help:
+ 	@echo  '                    (default: $$(INSTALL_MOD_PATH)/lib/firmware)'
+ 	@echo  '  dir/            - Build all files in dir and below'
+ 	@echo  '  dir/file.[ois]  - Build specified target only'
++	@echo  '  dir/file.ll     - Build the LLVM bitcode file'
++	@echo  '                    (requires compiler support for LLVM bitcode generation)'
+ 	@echo  '  dir/file.lst    - Build specified mixed source/assembly target only'
+ 	@echo  '                    (requires a recent binutils and recent build (System.map))'
+ 	@echo  '  dir/file.ko     - Build module including final link'
+@@ -1648,6 +1650,10 @@ endif
+ 	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+ %.symtypes: %.c prepare scripts FORCE
+ 	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
++%.ll: %.c prepare scripts FORCE
++	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
++%.ll: %.S prepare scripts FORCE
++	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
+ 
+ # Modules
+ /: prepare scripts FORCE
+diff --git a/scripts/Makefile.build b/scripts/Makefile.build
+index d883116ebaa4..e5a28da2e6fa 100644
+--- a/scripts/Makefile.build
++++ b/scripts/Makefile.build
+@@ -177,6 +177,20 @@ cmd_cc_symtypes_c =                                                         \
+ $(obj)/%.symtypes : $(src)/%.c FORCE
+ 	$(call cmd,cc_symtypes_c)
+ 
++# LLVM bitcode
++# Generate .ll files from .s and .c
++quiet_cmd_cc_ll_c = CC $(quiet_modtag)  $@
++      cmd_cc_ll_c = $(CC) $(c_flags) -emit-llvm -S -o $@ $<
++
++$(obj)/%.ll: $(src)/%.c FORCE
++	$(call if_changed_dep,cc_ll_c)
++
++quiet_cmd_as_ll_S = CPP $(quiet_modtag) $@
++      cmd_as_ll_S = $(CPP) $(a_flags)   -o $@ $<
++
++$(obj)/%.ll: $(src)/%.S FORCE
++	$(call if_changed_dep,as_ll_S)
++
+ # C (.c) files
+ # The C file is compiled and updated dependency information is generated.
+ # (See cmd_cc_o_c + relevant part of rule_cc_o_c)
+-- 
+2.12.2.715.g7642488e1d-goog
+
