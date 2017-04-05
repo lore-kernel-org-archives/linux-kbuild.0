@@ -1,69 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:32811 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751856AbdDEATf (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:55004 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755669AbdDESIa (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 4 Apr 2017 20:19:35 -0400
+        Wed, 5 Apr 2017 14:08:30 -0400
 MIME-Version: 1.0
+In-Reply-To: <20170317001520.85223-3-md@google.com>
+References: <20170317001520.85223-1-md@google.com> <20170317001520.85223-3-md@google.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 5 Apr 2017 09:19:15 +0900
-Message-ID: <CAK7LNAR2eHpFMmb=xdjiCb_=ZXqq11g9DafdZJegqnSTmQZyzA@mail.gmail.com>
-Subject: [GIT PULL] Kbuild fixes for v4.11
+Date: Thu, 6 Apr 2017 03:08:26 +0900
+Message-ID: <CAK7LNAR2efi4e3-st-hP3T7v=Hkb81beKibgYeKzxs3Q3kP0uA@mail.gmail.com>
+Subject: Re: [PATCH 2/7] Makefile, x86, LLVM: disable unsupported optimization flags
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, masahiroy@kernel.org, Michal Marek <mmarek@suse.com>
+To: Michael Davidson <md@google.com>
+Cc: Michal Marek <mmarek@suse.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, Shaohua Li <shli@kernel.org>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Matthias Kaehlcke <mka@chromium.org>, X86 ML <x86@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org, linux-raid@vger.kernel.org
 
-Hi Linus,
+Hi Michael,
 
-From this development cycle, I send Kbuild pull requests.
-Here are some Kbuild fixes.  Please get them in!
+2017-03-17 9:15 GMT+09:00 Michael Davidson <md@google.com>:
+> Unfortunately, while clang generates a warning about these flags
+> being unsupported it still exits with a status of 0 so we have
+> to explicitly disable them instead of just using a cc-option check.
+>
+> Signed-off-by: Michael Davidson <md@google.com>
 
 
-The following changes since commit c1ae3cfa0e89fa1a7ecc4c99031f5e9ae99d9201:
+Instead, does the following work for you?
+https://patchwork.kernel.org/patch/9657285/
 
-  Linux 4.11-rc1 (2017-03-05 12:59:56 -0800)
 
-are available in the git repository at:
+You need to use
+$(call cc-option, ...)
+for -falign-jumps=1 and -falign-loops=1
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
-tags/kbuild-fixes-v4.11
-
-for you to fetch changes up to 9be3213b14d44f6328281941193d97f3b97e7d4c:
-
-  gconfig: remove misleading parentheses around a condition
-(2017-03-22 02:56:33 +0900)
-
-----------------------------------------------------------------
-Kbuild fixes for v4.11
-
-- Hand-off primary maintainership of Kbuild
-- Fix build warnings
-- Fix build error when GCOV is enabled with old compiler
-- Fix HAVE_ASM_GOTO check when GCC plugin is enabled
-
-----------------------------------------------------------------
-Allan, Bruce W (1):
-      kbuild: external module build warnings when KBUILD_OUTPUT set and W=1
-
-Arnd Bergmann (1):
-      Kbuild: use cc-disable-warning consistently for maybe-uninitialized
-
-Gleb Fotengauer-Malinovskiy (1):
-      jump label: fix passing kbuild_cflags when checking for asm goto support
-
-Masahiro Yamada (1):
-      MAINTAINERS: add Masahiro Yamada as a Kbuild maintainer
-
-Nicolas Iooss (1):
-      gconfig: remove misleading parentheses around a condition
-
- MAINTAINERS             |  4 ++--
- Makefile                | 14 +++++++-------
- scripts/Makefile.lib    |  2 +-
- scripts/kconfig/gconf.c |  2 +-
- 4 files changed, 11 insertions(+), 11 deletions(-)
 
 
 -- 
