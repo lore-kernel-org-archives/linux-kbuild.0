@@ -1,65 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-io0-f170.google.com ([209.85.223.170]:35146 "EHLO
-        mail-io0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754768AbdDETLS (ORCPT
+Received: from mail-wm0-f43.google.com ([74.125.82.43]:38363 "EHLO
+        mail-wm0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752151AbdDIJmB (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 5 Apr 2017 15:11:18 -0400
-Received: by mail-io0-f170.google.com with SMTP id z13so16293666iof.2
-        for <linux-kbuild@vger.kernel.org>; Wed, 05 Apr 2017 12:11:18 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <20170405190130.GD145051@google.com>
-References: <20170317001520.85223-1-md@google.com> <20170317001520.85223-3-md@google.com>
- <CAK7LNAR2efi4e3-st-hP3T7v=Hkb81beKibgYeKzxs3Q3kP0uA@mail.gmail.com> <20170405190130.GD145051@google.com>
-From: Michael Davidson <md@google.com>
-Date: Wed, 5 Apr 2017 12:11:17 -0700
-Message-ID: <CA+=D-XVbZfgaQ+ZrjctAF5Ek3kaF3XqTLsSu==hK9savDztKsw@mail.gmail.com>
-Subject: Re: [PATCH 2/7] Makefile, x86, LLVM: disable unsupported optimization flags
-Content-Type: text/plain; charset=UTF-8
+        Sun, 9 Apr 2017 05:42:01 -0400
+Received: by mail-wm0-f43.google.com with SMTP id t189so18335890wmt.1
+        for <linux-kbuild@vger.kernel.org>; Sun, 09 Apr 2017 02:42:01 -0700 (PDT)
+Received: from localhost.localdomain (se167-2-88-172-169-60.fbx.proxad.net. [88.172.169.60])
+        by smtp.gmail.com with ESMTPSA id 94sm12904753wrp.34.2017.04.09.02.41.59
+        for <linux-kbuild@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Sun, 09 Apr 2017 02:41:59 -0700 (PDT)
+From: Vincent Legoll <vincent.legoll@gmail.com>
+Subject: [PATCH RFC] menuconfigification work
+Date: Sun,  9 Apr 2017 11:41:51 +0200
+Message-Id: <20170409094152.22268-1-vincent.legoll@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Matthias Kaehlcke <mka@chromium.org>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, Shaohua Li <shli@kernel.org>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, X86 ML <x86@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org, linux-raid@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
 
-It "works" for the cases that I currently care about but I have to say
-that I am uneasy about adding -Werror to the cc-option test in this
-way.
 
-Suppose that one of the *other* flags that is implicitly passed to the
-compiler by cc-option - eg something that was explicitly specified in
-$(KBUILD_CFLAGS) - triggers a warning. In that case all calls to
-cc-option will silently fail because of the -Werror and valid options
-will not be detected correctly.
+Hello,
 
-If everyone is OK with that because "it shouldn't normally ever
-happen" then that is fine, but if does result in a subtle change from
-existing behavior (and a trap that I almost immediately fell into
-after applying a similar patch).
+This is a RFC, for making some menus in Kconfig into menuconfigs, so that it is
+easier to disable a whole tree of options without even entering the menu.
 
-On Wed, Apr 5, 2017 at 12:01 PM, Matthias Kaehlcke <mka@chromium.org> wrote:
-> Hi Masahiro,
->
-> El Thu, Apr 06, 2017 at 03:08:26AM +0900 Masahiro Yamada ha dit:
->
->> 2017-03-17 9:15 GMT+09:00 Michael Davidson <md@google.com>:
->> > Unfortunately, while clang generates a warning about these flags
->> > being unsupported it still exits with a status of 0 so we have
->> > to explicitly disable them instead of just using a cc-option check.
->> >
->> > Signed-off-by: Michael Davidson <md@google.com>
->>
->>
->> Instead, does the following work for you?
->> https://patchwork.kernel.org/patch/9657285/
->
-> Thanks for the pointer, I was about to give this change (or rather its
-> ancestor) a rework myself :)
->
->> You need to use
->> $(call cc-option, ...)
->> for -falign-jumps=1 and -falign-loops=1
->
-> I can confirm that this works.
->
-> Thanks
->
-> Matthias
+The rationale is that the people that build their own kernels may want to
+disable unused things.
+
+I tried with one of the easy ones (or so I think) PPS.
+
+Did I do it properly ?
+
+I had to change some "if PPS" into "depends", and even add one that was implicit
+before, to PPS_GENERATOR_PARPORT.
+
+Is this kind of work wanted ?
+Is this acceptable for mainline ?
+
+If yes, I intend to find other candidates and do proper patch submissions, with
+the relevant maintainers also included in the review.
+
+Please advise
+Thanks
