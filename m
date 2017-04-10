@@ -1,91 +1,158 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:56761 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753751AbdDJOzD (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:16529 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754306AbdDJQBo (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 10 Apr 2017 10:55:03 -0400
+        Mon, 10 Apr 2017 12:01:44 -0400
+Received: from mail-yb0-f178.google.com (mail-yb0-f178.google.com [209.85.213.178]) (authenticated)
+        by conssluserg-06.nifty.com with ESMTP id v3AG1bXU026127
+        for <linux-kbuild@vger.kernel.org>; Tue, 11 Apr 2017 01:01:38 +0900
+Received: by mail-yb0-f178.google.com with SMTP id i124so33975917ybc.3
+        for <linux-kbuild@vger.kernel.org>; Mon, 10 Apr 2017 09:01:38 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CA+=D-XVbZfgaQ+ZrjctAF5Ek3kaF3XqTLsSu==hK9savDztKsw@mail.gmail.com>
-References: <20170317001520.85223-1-md@google.com> <20170317001520.85223-3-md@google.com>
- <CAK7LNAR2efi4e3-st-hP3T7v=Hkb81beKibgYeKzxs3Q3kP0uA@mail.gmail.com>
- <20170405190130.GD145051@google.com> <CA+=D-XVbZfgaQ+ZrjctAF5Ek3kaF3XqTLsSu==hK9savDztKsw@mail.gmail.com>
+In-Reply-To: <20170403093545.ebn5lawttpfwbpbl@x230>
+References: <20170223131008.13705-1-pvorel@suse.cz> <20170403093545.ebn5lawttpfwbpbl@x230>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Mon, 10 Apr 2017 23:54:57 +0900
-Message-ID: <CAK7LNARuyveh5o9ypX56rDACyYW-EMb--TB5Uar-NT0Egc_jiw@mail.gmail.com>
-Subject: Re: [PATCH 2/7] Makefile, x86, LLVM: disable unsupported optimization flags
+Date: Tue, 11 Apr 2017 01:01:36 +0900
+Message-ID: <CAK7LNAQ0Az05tnvxSnMdKZh0U4r-1k7U+PKhmtZ5BGwxCFng5w@mail.gmail.com>
+Subject: Re: [PATCH v3 1/1] kconfig: menuconfig make "selected by:" readable
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michael Davidson <md@google.com>
-Cc: Matthias Kaehlcke <mka@chromium.org>, Michal Marek <mmarek@suse.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, Shaohua Li <shli@kernel.org>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, X86 ML <x86@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org, linux-raid@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>
+To: Petr Vorel <pvorel@suse.cz>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Paul Bolle <pebolle@tiscali.nl>, Michal Marek <mmarek@suse.cz>
 
-Hi.
+Hi Petr,
 
-
-2017-04-06 4:11 GMT+09:00 Michael Davidson <md@google.com>:
-> It "works" for the cases that I currently care about but I have to say
-> that I am uneasy about adding -Werror to the cc-option test in this
-> way.
+2017-04-03 18:35 GMT+09:00 Petr Vorel <pvorel@suse.cz>:
+> Hi,
 >
-> Suppose that one of the *other* flags that is implicitly passed to the
-> compiler by cc-option - eg something that was explicitly specified in
-> $(KBUILD_CFLAGS) - triggers a warning. In that case all calls to
-> cc-option will silently fail because of the -Werror and valid options
-> will not be detected correctly.
+>> rev_dep expressions can get rather unwieldy, especially if a symbol is
+>> selected by more than a handful of other symbols. Ie, it's possible to
+>> have near endless expressions like:
+>>    A && B && !C || D || F && (G || H) || [...]
+>
+>> Chop these expressions into actually readable chunks:
+>>    - A && B && !C
+>>    - D
+>>    - F && (G || H)
+>>    - [...]
+>
+>> Ie, transform the top level "||" tokens into newlines and prepend each
+>> line with a minus. This makes the "Selected by:" blurb much easier to
+>> read.
+>
+>> This also prevents trimming too long lines.
+>
+>> Based on patch from Paul Bolle.
+>
+>> Reported-by: Paul Bolle <pebolle@tiscali.nl>
+>> Cc: Paul Bolle <pebolle@tiscali.nl>
+>> Signed-off-by: Petr Vorel <pvorel@suse.cz>
+>> ---
+>>  scripts/kconfig/expr.c | 16 +++++++++++++---
+>>  scripts/kconfig/menu.c |  2 +-
+>>  2 files changed, 14 insertions(+), 4 deletions(-)
+>
+>> diff --git a/scripts/kconfig/expr.c b/scripts/kconfig/expr.c
+>> index cbf4996dd9c1..4b4309b59349 100644
+>> --- a/scripts/kconfig/expr.c
+>> +++ b/scripts/kconfig/expr.c
+>> @@ -1070,6 +1070,8 @@ struct expr *expr_simplify_unmet_dep(struct expr *e1, struct expr *e2)
+>>       return expr_get_leftmost_symbol(ret);
+>>  }
+>
+>> +static int print_level = 0;
+>> +
+>>  void expr_print(struct expr *e, void (*fn)(void *, struct symbol *, const char *), void *data, int prevtoken)
+>>  {
+>>       if (!e) {
+>> @@ -1077,8 +1079,11 @@ void expr_print(struct expr *e, void (*fn)(void *, struct symbol *, const char *
+>>               return;
+>>       }
+>
+>> -     if (expr_compare_type(prevtoken, e->type) > 0)
+>> +     if (expr_compare_type(prevtoken, e->type) > 0) {
+>> +             print_level++;
+>>               fn(data, NULL, "(");
+>> +     }
+>> +
+>>       switch (e->type) {
+>>       case E_SYMBOL:
+>>               if (e->left.sym->name)
+>> @@ -1126,7 +1131,10 @@ void expr_print(struct expr *e, void (*fn)(void *, struct symbol *, const char *
+>>               break;
+>>       case E_OR:
+>>               expr_print(e->left.expr, fn, data, E_OR);
+>> -             fn(data, NULL, " || ");
+>> +             if (print_level == 0)
+>> +                     fn(data, NULL, "\n  - ");
+>> +             else
+>> +                     fn(data, NULL, " || ");
+>>               expr_print(e->right.expr, fn, data, E_OR);
+>>               break;
+>>       case E_AND:
+>> @@ -1156,8 +1164,10 @@ void expr_print(struct expr *e, void (*fn)(void *, struct symbol *, const char *
+>>               break;
+>>         }
+>>       }
+>> -     if (expr_compare_type(prevtoken, e->type) > 0)
+>> +     if (expr_compare_type(prevtoken, e->type) > 0) {
+>> +             print_level--;
+>>               fn(data, NULL, ")");
+>> +     }
+>>  }
+>
+>>  static void expr_print_file_helper(void *data, struct symbol *sym, const char *str)
+>> diff --git a/scripts/kconfig/menu.c b/scripts/kconfig/menu.c
+>> index e9357931b47d..3daf7b81637f 100644
+>> --- a/scripts/kconfig/menu.c
+>> +++ b/scripts/kconfig/menu.c
+>> @@ -675,7 +675,7 @@ static void get_symbol_str(struct gstr *r, struct symbol *sym,
+>
+>>       get_symbol_props_str(r, sym, P_SELECT, _("  Selects: "));
+>>       if (sym->rev_dep.expr) {
+>> -             str_append(r, _("  Selected by: "));
+>> +             str_append(r, _("  Selected by: \n  - "));
+>>               expr_gstr_print(sym->rev_dep.expr, r);
+>>               str_append(r, "\n");
+>>       }
+>
+> Any comment on this patch, please?
 
-Theoretically, options explicitly specified in KBUILD_CFLAGS
-should be always valid.
-Options that may not be supported in some cases
-should be wrapped with $(call cc-option ).
+
+I noticed you added me in the To: list.
+
+Basically I think this patch is a nice idea,
+but I am not a Kconfig maintainer.  Sorry.
+(I could pick up a really trivial one via kbuild tree somehow,
+but I want this one to be handled by a person with expertise in the area.)
+
+Yann E. MORIN is the Kconfig maintainer, but he has been
+silent for a few years. I guess Kconfig needs a new maintainer.
 
 
+Please take my comment just as a Kconfig user's point of view.
 
-> If everyone is OK with that because "it shouldn't normally ever
-> happen" then that is fine, but if does result in a subtle change from
-> existing behavior (and a trap that I almost immediately fell into
-> after applying a similar patch).
+The git-log only mentions "select", but I notice this patch
+also changes "depends on" format in a bit different way.
 
-There is a rare case where a particular combination fails
-(such as the conflict between -pg and -ffunction-sections
-as reported in https://patchwork.kernel.org/patch/9624573/).
+For example,
 
-In a such case, we may end up with swapping the order,
-but this should not happen quite often.
+General setup  --->
+     Kernel compression mode (Gzip)  --->
 
 
+shows its help like this:
 
-> On Wed, Apr 5, 2017 at 12:01 PM, Matthias Kaehlcke <mka@chromium.org> wrote:
->> Hi Masahiro,
->>
->> El Thu, Apr 06, 2017 at 03:08:26AM +0900 Masahiro Yamada ha dit:
->>
->>> 2017-03-17 9:15 GMT+09:00 Michael Davidson <md@google.com>:
->>> > Unfortunately, while clang generates a warning about these flags
->>> > being unsupported it still exits with a status of 0 so we have
->>> > to explicitly disable them instead of just using a cc-option check.
->>> >
->>> > Signed-off-by: Michael Davidson <md@google.com>
->>>
->>>
->>> Instead, does the following work for you?
->>> https://patchwork.kernel.org/patch/9657285/
->>
->> Thanks for the pointer, I was about to give this change (or rather its
->> ancestor) a rework myself :)
->>
->>> You need to use
->>> $(call cc-option, ...)
->>> for -falign-jumps=1 and -falign-loops=1
->>
->> I can confirm that this works.
->>
->> Thanks
->>
->> Matthias
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+  Depends on: HAVE_KERNEL_GZIP  [=y]
+  - HAVE_KERNEL_BZIP2 [=n]
+  - HAVE_KERNEL_LZMA [=y]
+  - HAVE_KERNEL_XZ [=y]
+  - HAVE_KERNEL_LZO [=y]
+  - HAVE_KERNEL_LZ4 [=y]
+
+(the first dependency in the same line in the "Depends on")
 
 
 
