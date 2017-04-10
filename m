@@ -1,66 +1,94 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.skyhub.de ([5.9.137.197]:53136 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1752067AbdDINHZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 9 Apr 2017 09:07:25 -0400
-From: Borislav Petkov <bp@alien8.de>
-Subject: [PATCH] kconfig: Check for libncurses before menuconfig
-Date: Sun,  9 Apr 2017 15:07:08 +0200
-Message-Id: <20170409130708.4753-1-bp@alien8.de>
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:56761 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753751AbdDJOzD (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 10 Apr 2017 10:55:03 -0400
+MIME-Version: 1.0
+In-Reply-To: <CA+=D-XVbZfgaQ+ZrjctAF5Ek3kaF3XqTLsSu==hK9savDztKsw@mail.gmail.com>
+References: <20170317001520.85223-1-md@google.com> <20170317001520.85223-3-md@google.com>
+ <CAK7LNAR2efi4e3-st-hP3T7v=Hkb81beKibgYeKzxs3Q3kP0uA@mail.gmail.com>
+ <20170405190130.GD145051@google.com> <CA+=D-XVbZfgaQ+ZrjctAF5Ek3kaF3XqTLsSu==hK9savDztKsw@mail.gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Mon, 10 Apr 2017 23:54:57 +0900
+Message-ID: <CAK7LNARuyveh5o9ypX56rDACyYW-EMb--TB5Uar-NT0Egc_jiw@mail.gmail.com>
+Subject: Re: [PATCH 2/7] Makefile, x86, LLVM: disable unsupported optimization flags
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: LKML <linux-kernel@vger.kernel.org>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
+To: Michael Davidson <md@google.com>
+Cc: Matthias Kaehlcke <mka@chromium.org>, Michal Marek <mmarek@suse.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, Shaohua Li <shli@kernel.org>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, X86 ML <x86@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-crypto@vger.kernel.org, linux-raid@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>
 
-From: Borislav Petkov <bp@suse.de>
+Hi.
 
-There is a check and a nice user-friendly message when the curses
-library is not present on the system and the user wants to do "make
-menuconfig". It doesn't get issued, though. Instead, we fail the build
-when mconf.c doesn't find the curses.h header:
 
-    HOSTCC  scripts/kconfig/mconf.o
-  In file included from scripts/kconfig/mconf.c:23:0:
-  scripts/kconfig/lxdialog/dialog.h:38:20: fatal error: curses.h: No such file or directory
-   #include CURSES_LOC
-                      ^
-  compilation terminated.
+2017-04-06 4:11 GMT+09:00 Michael Davidson <md@google.com>:
+> It "works" for the cases that I currently care about but I have to say
+> that I am uneasy about adding -Werror to the cc-option test in this
+> way.
+>
+> Suppose that one of the *other* flags that is implicitly passed to the
+> compiler by cc-option - eg something that was explicitly specified in
+> $(KBUILD_CFLAGS) - triggers a warning. In that case all calls to
+> cc-option will silently fail because of the -Werror and valid options
+> will not be detected correctly.
 
-Make that check a prerequisite to mconf so that the user sees the error
-message instead:
+Theoretically, options explicitly specified in KBUILD_CFLAGS
+should be always valid.
+Options that may not be supported in some cases
+should be wrapped with $(call cc-option ).
 
-  $ make menuconfig
-   *** Unable to find the ncurses libraries or the
-   *** required header files.
-   *** 'make menuconfig' requires the ncurses libraries.
-   ***
-   *** Install ncurses (ncurses-devel) and try again.
-   ***
-  scripts/kconfig/Makefile:203: recipe for target 'scripts/kconfig/dochecklxdialog' failed
-  make[1]: *** [scripts/kconfig/dochecklxdialog] Error 1
-  Makefile:548: recipe for target 'menuconfig' failed
-  make: *** [menuconfig] Error 2
 
-Signed-off-by: Borislav Petkov <bp@suse.de>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild@vger.kernel.org
----
- scripts/kconfig/Makefile | 2 ++
- 1 file changed, 2 insertions(+)
 
-diff --git a/scripts/kconfig/Makefile b/scripts/kconfig/Makefile
-index 90a091b6ae4d..e58220ce65b9 100644
---- a/scripts/kconfig/Makefile
-+++ b/scripts/kconfig/Makefile
-@@ -24,6 +24,8 @@ xconfig: $(obj)/qconf
- gconfig: $(obj)/gconf
- 	$< $(silent) $(Kconfig)
- 
-+$(obj)/mconf: $(obj)/dochecklxdialog
-+
- menuconfig: $(obj)/mconf
- 	$< $(silent) $(Kconfig)
- 
+> If everyone is OK with that because "it shouldn't normally ever
+> happen" then that is fine, but if does result in a subtle change from
+> existing behavior (and a trap that I almost immediately fell into
+> after applying a similar patch).
+
+There is a rare case where a particular combination fails
+(such as the conflict between -pg and -ffunction-sections
+as reported in https://patchwork.kernel.org/patch/9624573/).
+
+In a such case, we may end up with swapping the order,
+but this should not happen quite often.
+
+
+
+> On Wed, Apr 5, 2017 at 12:01 PM, Matthias Kaehlcke <mka@chromium.org> wrote:
+>> Hi Masahiro,
+>>
+>> El Thu, Apr 06, 2017 at 03:08:26AM +0900 Masahiro Yamada ha dit:
+>>
+>>> 2017-03-17 9:15 GMT+09:00 Michael Davidson <md@google.com>:
+>>> > Unfortunately, while clang generates a warning about these flags
+>>> > being unsupported it still exits with a status of 0 so we have
+>>> > to explicitly disable them instead of just using a cc-option check.
+>>> >
+>>> > Signed-off-by: Michael Davidson <md@google.com>
+>>>
+>>>
+>>> Instead, does the following work for you?
+>>> https://patchwork.kernel.org/patch/9657285/
+>>
+>> Thanks for the pointer, I was about to give this change (or rather its
+>> ancestor) a rework myself :)
+>>
+>>> You need to use
+>>> $(call cc-option, ...)
+>>> for -falign-jumps=1 and -falign-loops=1
+>>
+>> I can confirm that this works.
+>>
+>> Thanks
+>>
+>> Matthias
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-kbuild" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
 -- 
-2.11.0
-
+Best Regards
+Masahiro Yamada
