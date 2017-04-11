@@ -1,42 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:60698 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751983AbdDKDQO (ORCPT
+Received: from mail-lf0-f45.google.com ([209.85.215.45]:34428 "EHLO
+        mail-lf0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753997AbdDKHbw (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 10 Apr 2017 23:16:14 -0400
-Date: Tue, 11 Apr 2017 10:40:22 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v11 08/12] cryptouser.h: fix include from userland
-Message-ID: <20170411024022.GA10615@gondor.apana.org.au>
-References: <CAK7LNAR_yp+O9jUZC8mKdaHgTiCkE7p2-ZbA9YZ8OGyp+uxhBQ@mail.gmail.com>
- <1490617217-30192-1-git-send-email-nicolas.dichtel@6wind.com>
- <1490617217-30192-9-git-send-email-nicolas.dichtel@6wind.com>
+        Tue, 11 Apr 2017 03:31:52 -0400
+Received: by mail-lf0-f45.google.com with SMTP id z15so82241956lfd.1
+        for <linux-kbuild@vger.kernel.org>; Tue, 11 Apr 2017 00:31:51 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1490617217-30192-9-git-send-email-nicolas.dichtel@6wind.com>
+In-Reply-To: <20170331130941.5250-1-riku.voipio@linaro.org>
+References: <20170331130941.5250-1-riku.voipio@linaro.org>
+From: Riku Voipio <riku.voipio@linaro.org>
+Date: Tue, 11 Apr 2017 10:31:34 +0300
+Message-ID: <CAAqcGH=CksAWXJyOwh5wqQMekwsfPft+RDMYM+v4dxr+52-Uxw@mail.gmail.com>
+Subject: Re: [PATCH v2 0/3] builddeb updates for v4.12
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Cc: yamada.masahiro@socionext.com, arnd@arndb.de, mmarek@suse.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, airlied@linux.ie, davem@davemloft.net, linux@armlinux.org.uk, bp@alien8.de, slash.tmp@free.fr, daniel.vetter@ffwll.ch, rmk+kernel@armlinux.org.uk, msalter@redhat.com, jengelh@inai.de, hch@infradead.org, tklauser@distanz.ch, mpe@ellerman.id.au, mingo@kernel.org, tglx@linutronix.de, ldv@altlinux.org, linux-rdma@vger.kernel.org
+To: linux-kbuild <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.com>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, debian-kernel <debian-kernel@lists.debian.org>, Riku Voipio <riku.voipio@linaro.org>
 
-On Mon, Mar 27, 2017 at 02:20:13PM +0200, Nicolas Dichtel wrote:
-> This patch prepares the uapi export by fixing the following error:
-> 
-> .../linux/cryptouser.h:58:16: error: ‘CRYPTO_MAX_ALG_NAME’ undeclared here (not in a function)
->   char cru_name[CRYPTO_MAX_ALG_NAME];
-> 
-> Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-> Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+Hi Masahiro,
 
-Can we revert this patch please? I had forgotten about it when
-increasing the in-kernel CRYPTO_MAX_ALG_NAME so it now conflicts
-with the crypto tree.  The crypto tree has fixed the problem in
-a different way.
+On 31 March 2017 at 16:09,  <riku.voipio@linaro.org> wrote:
+> From: Riku Voipio <riku.voipio@linaro.org>
+>
+> Resend of the builddeb script updates that missed v4.11
+> round.
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Can you please take a look at the series?
+
+> Changes from v1 series:
+>
+> Standards-Version: line is removed instead of updating
+>
+> Andrew Donnellan (1):
+>   builddeb: fix typo
+>
+> Riku Voipio (2):
+>   builddeb: Update a few outdated and hardcoded strings
+>   builddeb: add make fastdeb-pkg target
+>
+>  scripts/package/Makefile |  7 +++++-
+>  scripts/package/builddeb | 58 +++++++++++++++++++++++-------------------------
+>  2 files changed, 34 insertions(+), 31 deletions(-)
+>
+> --
+> 2.11.0
+>
