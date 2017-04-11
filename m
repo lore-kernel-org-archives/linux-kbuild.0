@@ -1,214 +1,199 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:29171 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1753235AbdDKLNA (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 11 Apr 2017 07:13:00 -0400
-From: Felipe Balbi <felipe.balbi@linux.intel.com>
-Subject: [PATCH] scripts: kconfig: implement a sort method
-Date: Tue, 11 Apr 2017 14:12:27 +0300
-Message-Id: <20170411111227.20846-1-felipe.balbi@linux.intel.com>
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:60936 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751047AbdDKMBq (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 11 Apr 2017 08:01:46 -0400
+MIME-Version: 1.0
+In-Reply-To: <20170403212537.124217-1-mka@chromium.org>
+References: <20170403212537.124217-1-mka@chromium.org>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Tue, 11 Apr 2017 21:01:41 +0900
+Message-ID: <CAK7LNATZq8CWNxf_KAk6p4v2ZG6HEd70nxPB8MDWOcR5K5aQsA@mail.gmail.com>
+Subject: Re: [RFC PATCH] kbuild: Fix asm-offset generation to work with clang
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: yann.morin.1998@free.fr
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Felipe Balbi <felipe.balbi@linux.intel.com>
+To: Matthias Kaehlcke <mka@chromium.org>
+Cc: Michal Marek <mmarek@suse.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Grant Grundler <grundler@chromium.org>, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>, Behan Webster <behanw@converseincode.com>, Peter Foley <pefoley2@pefoley.com>
 
-With a growing amount of Kernel configuration, it's
-getting ever more difficult to find anything on
-menuconfig. Because of that, implement mergesort for
-kconfig to make it a little easier for anybody
-building kernels.
+Hi Matthias,
 
-Signed-off-by: Felipe Balbi <felipe.balbi@linux.intel.com>
----
- scripts/kconfig/lxdialog/menubox.c | 18 +++++----
- scripts/kconfig/mconf.c            | 83 +++++++++++++++++++++++++++++++++++---
- 2 files changed, 89 insertions(+), 12 deletions(-)
 
-diff --git a/scripts/kconfig/lxdialog/menubox.c b/scripts/kconfig/lxdialog/menubox.c
-index 11ae9ad7ac7b..d6cc04db6e60 100644
---- a/scripts/kconfig/lxdialog/menubox.c
-+++ b/scripts/kconfig/lxdialog/menubox.c
-@@ -162,6 +162,7 @@ static void print_buttons(WINDOW * win, int height, int width, int selected)
- 	print_button(win, gettext(" Help "), y, x + 24, selected == 2);
- 	print_button(win, gettext(" Save "), y, x + 36, selected == 3);
- 	print_button(win, gettext(" Load "), y, x + 48, selected == 4);
-+	print_button(win, gettext(" Sort "), y, x + 60, selected == 5);
- 
- 	wmove(win, y, x + 1 + 12 * selected);
- 	wrefresh(win);
-@@ -375,7 +376,7 @@ int dialog_menu(const char *title, const char *prompt,
- 		case TAB:
- 		case KEY_RIGHT:
- 			button = ((key == KEY_LEFT ? --button : ++button) < 0)
--			    ? 4 : (button > 4 ? 0 : button);
-+			    ? 5 : (button > 5 ? 0 : button);
- 
- 			print_buttons(dialog, height, width, button);
- 			wrefresh(menu);
-@@ -390,6 +391,7 @@ int dialog_menu(const char *title, const char *prompt,
- 		case '?':
- 		case 'z':
- 		case '\n':
-+		case '.':
- 			/* save scroll info */
- 			*s_scroll = scroll;
- 			delwin(menu);
-@@ -400,19 +402,21 @@ int dialog_menu(const char *title, const char *prompt,
- 			case 'h':
- 			case '?':
- 				return 2;
-+			case '.':
-+				return 5;
- 			case 's':
- 			case 'y':
--				return 5;
--			case 'n':
- 				return 6;
--			case 'm':
-+			case 'n':
- 				return 7;
--			case ' ':
-+			case 'm':
- 				return 8;
--			case '/':
-+			case ' ':
- 				return 9;
--			case 'z':
-+			case '/':
- 				return 10;
-+			case 'z':
-+				return 11;
- 			case '\n':
- 				return button;
- 			}
-diff --git a/scripts/kconfig/mconf.c b/scripts/kconfig/mconf.c
-index 315ce2c7cb9d..c4a2eb561be4 100644
---- a/scripts/kconfig/mconf.c
-+++ b/scripts/kconfig/mconf.c
-@@ -642,6 +642,75 @@ static void build_conf(struct menu *menu)
- 	indent -= doint;
- }
- 
-+static int less(struct menu *a, struct menu *b)
-+{
-+	const char *s1 = _(menu_get_prompt(a));
-+	const char *s2 = _(menu_get_prompt(b));
-+
-+	if (!s1)
-+		return 1;
-+
-+	if (!s2)
-+		return 0;
-+
-+	return strcmp(s1, s2) < 0;
-+}
-+
-+static struct menu *merge(struct menu *a, struct menu *b)
-+{
-+	struct menu head;
-+	struct menu *c = &head;
-+
-+	while (a && b) {
-+		if (less(a, b)) {
-+			c->next = a;
-+			c = a;
-+			a = a->next;
-+		} else {
-+			c->next = b;
-+			c = b;
-+			b = b->next;
-+		}
-+	}
-+
-+	c->next = a ? a : b;
-+
-+	return head.next;
-+}
-+
-+static struct menu *mergesort(struct menu *c)
-+{
-+	struct menu *a;
-+	struct menu *b;
-+
-+	if (!c)
-+		return c;
-+
-+	if (c->list)
-+		c->list =  mergesort(c->list);
-+
-+	if (!c->next)
-+		return c;
-+
-+	a = c;
-+	b = c->next;
-+
-+	while (b && b->next) {
-+		c = c->next;
-+		b = b->next->next;
-+	}
-+
-+	b = c->next;
-+	c->next = NULL;
-+
-+	return merge(mergesort(a), mergesort(b));
-+}
-+
-+static struct menu *sort_conf(void)
-+{
-+	return mergesort(&rootmenu);
-+}
-+
- static void conf(struct menu *menu, struct menu *active_menu)
- {
- 	struct menu *submenu;
-@@ -668,6 +737,7 @@ static void conf(struct menu *menu, struct menu *active_menu)
- 		res = dialog_menu(prompt ? _(prompt) : _("Main Menu"),
- 				  _(menu_instructions),
- 				  active_menu, &s_scroll);
-+
- 		if (res == 1 || res == KEY_ESC || res == -ERRDISPLAYTOOSMALL)
- 			break;
- 		if (item_count() != 0) {
-@@ -720,6 +790,9 @@ static void conf(struct menu *menu, struct menu *active_menu)
- 			conf_load();
- 			break;
- 		case 5:
-+			sort_conf();
-+			break;
-+		case 6:
- 			if (item_is_tag('t')) {
- 				if (sym_set_tristate_value(sym, yes))
- 					break;
-@@ -727,24 +800,24 @@ static void conf(struct menu *menu, struct menu *active_menu)
- 					show_textbox(NULL, setmod_text, 6, 74);
- 			}
- 			break;
--		case 6:
-+		case 7:
- 			if (item_is_tag('t'))
- 				sym_set_tristate_value(sym, no);
- 			break;
--		case 7:
-+		case 8:
- 			if (item_is_tag('t'))
- 				sym_set_tristate_value(sym, mod);
- 			break;
--		case 8:
-+		case 9:
- 			if (item_is_tag('t'))
- 				sym_toggle_tristate_value(sym);
- 			else if (item_is_tag('m'))
- 				conf(submenu, NULL);
- 			break;
--		case 9:
-+		case 10:
- 			search_conf();
- 			break;
--		case 10:
-+		case 11:
- 			show_all_options = !show_all_options;
- 			break;
- 		}
--- 
-2.11.0.295.gd7dffce1ce
+2017-04-04 6:25 GMT+09:00 Matthias Kaehlcke <mka@chromium.org>:
+> When using clang with -no-integerated-as clang will use the gnu
+> assembler instead of the integrated assembler. However clang will
+> still perform asm error checking before sending the inline assembly
+> language to gas.
+>
+> The generation of asm-offsets from within C code is dependent on gcc's
+> blind passing of whatever is in asm() through to gas. Arbirary text is
+> passed through which is then modified by a sed script into the
+> appropriate .h and .S code. Since the arbitrary text is not valid
+> assembly language, clang fails.
+>
+> This can be fixed by making the arbitrary text into an ASM comment and
+> then updating the sed scripts accordingly to work as expected.
+>
+> This solution works for both gcc and clang.
+>
+> Based-on-patch-from: Behan Webster <behanw@converseincode.com>
+> Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
 
+
+
+Could you check Jeroen Hofstee's work for U-Boot?
+
+http://patchwork.ozlabs.org/patch/375026/
+
+
+His idea is to use .ascii string
+in order to handle this in arch-agnostic way.
+
+If you are happy about this idea,
+I can forward his patch (with a little bit adjustment).
+
+We may want to refactor the patch because
+the double mark ".ascii" and "->" seem redundant,
+but it is just a detail.
+
+
+
+Masahiro
+
+
+
+> Dependencies
+>   all architectures
+>     kbuild: Consolidate header generation from ASM offset information
+>       https://patchwork.kernel.org/patch/9660459/
+>
+>   um
+>     um: Include kbuild.h instead of duplicating its macros
+>       https://patchwork.kernel.org/patch/9660503/
+>
+>   frv
+>     frv: Use OFFSET macro in DEF_*REG()
+>       https://patchwork.kernel.org/patch/9660473/
+>
+> The change has been build tested on a wide range of architectures.
+>
+> The if cascade in kbuild.h and the comment symbol list in
+> Makefile.asm-offsets won't win a beauty price. Alternatively the comment
+> symbol could be specified in arch/Kconfig. Personally I don't have a
+> strong preference on this point.
+>
+>  include/linux/kbuild.h       | 34 ++++++++++++++++++++++++++++---
+>  scripts/Makefile.asm-offsets | 48 ++++++++++++++++++++++++++++++++++++++++----
+>  2 files changed, 75 insertions(+), 7 deletions(-)
+>
+> diff --git a/include/linux/kbuild.h b/include/linux/kbuild.h
+> index 22a72198c14b..632e33d3b70c 100644
+> --- a/include/linux/kbuild.h
+> +++ b/include/linux/kbuild.h
+> @@ -1,15 +1,43 @@
+>  #ifndef __LINUX_KBUILD_H
+>  #define __LINUX_KBUILD_H
+>
+> +#if defined(CONFIG_ALPHA) || defined(CONFIG_AVR32) ||        \
+> +       defined(CONFIG_MICROBLAZE) || defined(CONFIG_MIPS) || \
+> +       defined(CONFIG_MN10300) || defined(CONFIG_PPC) || \
+> +       defined(CONFIG_S390) || defined(CONFIG_SCORE) ||      \
+> +       defined(CONFIG_UML_X86) || defined(CONFIG_X86) ||     \
+> +       defined(CONFIG_XTENSA)
+> +#define ASM_COMMENT_SYM "#"
+> +#elif defined(CONFIG_ARM) || defined(CONFIG_ARM64)
+> +#define ASM_COMMENT_SYM "@"
+> +#elif defined(CONFIG_ARC) || defined(CONFIG_C6X) ||            \
+> +       defined(CONFIG_CRIS) || defined(CONFIG_FRV) ||          \
+> +       defined(CONFIG_H8300) || defined(CONFIG_M32R) ||        \
+> +       defined(CONFIG_PARISC)
+> +#define ASM_COMMENT_SYM ";"
+> +#elif defined(CONFIG_BLACKFIN) || defined(CONFIG_HEXAGON) || \
+> +       defined(CONFIG_IA64) || defined(CONFIG_NIOS2) ||     \
+> +       defined(CONFIG_OPENRISC)
+> +#define ASM_COMMENT_SYM "//"
+> +#elif defined(CONFIG_METAG) || defined(CONFIG_SUPERH) ||       \
+> +       defined(CONFIG_SPARC) || defined(CONFIG_TILE) ||        \
+> +       defined(CONFIG_UNICORE32)
+> +#define ASM_COMMENT_SYM "!"
+> +#elif defined(CONFIG_M68K)
+> +#define ASM_COMMENT_SYM "|"
+> +#else
+> +#error Symbol for ASM inline comments is not defined for ARCH
+> +#endif
+> +
+>  #define DEFINE(sym, val) \
+> -        asm volatile("\n->" #sym " %0 " #val : : "i" (val))
+> +       asm volatile("\n" ASM_COMMENT_SYM "->" #sym " %0 " #val : : "i" (val))
+>
+> -#define BLANK() asm volatile("\n->" : : )
+> +#define BLANK() asm volatile("\n" ASM_COMMENT_SYM "->" : : )
+>
+>  #define OFFSET(sym, str, mem) \
+>         DEFINE(sym, offsetof(struct str, mem))
+>
+>  #define COMMENT(x) \
+> -       asm volatile("\n->#" x)
+> +       asm volatile("\n" ASM_COMMENT_SYM "->#" x)
+>
+>  #endif
+> diff --git a/scripts/Makefile.asm-offsets b/scripts/Makefile.asm-offsets
+> index 4ba80ba29b82..7f8d3cbc5901 100644
+> --- a/scripts/Makefile.asm-offsets
+> +++ b/scripts/Makefile.asm-offsets
+> @@ -1,9 +1,49 @@
+> +# Symbols for ASM inline comments for all architectures
+> +asm_comment_sym_arch_alpha = \#
+> +asm_comment_sym_arch_arc = \;
+> +asm_comment_sym_arch_arm = @
+> +asm_comment_sym_arch_arm64 = @
+> +asm_comment_sym_arch_avr32 = \#
+> +asm_comment_sym_arch_blackfin = //
+> +asm_comment_sym_arch_c6x = \;
+> +asm_comment_sym_arch_cris = \;
+> +asm_comment_sym_arch_frv = \;
+> +asm_comment_sym_arch_h8300 = \;
+> +asm_comment_sym_arch_hexagon = //
+> +asm_comment_sym_arch_ia64 = //
+> +asm_comment_sym_arch_m32r = \;
+> +asm_comment_sym_arch_m68k = |
+> +asm_comment_sym_arch_metag = !
+> +asm_comment_sym_arch_microblaze = \#
+> +asm_comment_sym_arch_mips = \#
+> +asm_comment_sym_arch_mn10300 = \#
+> +asm_comment_sym_arch_nios2 = //
+> +asm_comment_sym_arch_openrisc = //
+> +asm_comment_sym_arch_parisc = \;
+> +asm_comment_sym_arch_powerpc = \#
+> +asm_comment_sym_arch_s390 = \#
+> +asm_comment_sym_arch_score = \#
+> +asm_comment_sym_arch_sh = !
+> +asm_comment_sym_arch_sparc = !
+> +asm_comment_sym_arch_tile = !
+> +# Note: assumes uml_x86
+> +asm_comment_sym_arch_um = \#
+> +asm_comment_sym_arch_unicore32 = !
+> +asm_comment_sym_arch_x86 = \#
+> +asm_comment_sym_arch_xtensa = \#
+> +
+> +ASM_COMMENT_SYM = $(asm_comment_sym_arch_$(SRCARCH))
+> +
+> +ifeq ($(ASM_COMMENT_SYM),)
+> +$(error Symbol for ASM inline comments is not defined for ARCH=$(SRCARCH))
+> +endif
+> +
+>  # Default sed regexp - multiline due to syntax constraints
+>  define sed-asm-offsets-to-c
+> -       "/^->/{s:->#\(.*\):/* \1 */:; \
+> -       s:^->\([^ ]*\) [\$$#]*\([-0-9]*\) \(.*\):#define \1 \2 /* \3 */:; \
+> -       s:^->\([^ ]*\) [\$$#]*\([^ ]*\) \(.*\):#define \1 \2 /* \3 */:; \
+> -       s:->::; p;}"
+> +       "\:^$(ASM_COMMENT_SYM)->:{s:$(ASM_COMMENT_SYM)->#\(.*\):/* \1 */:; \
+> +       s:^$(ASM_COMMENT_SYM)->\([^ ]*\) [\$$#]*\([-0-9]*\) \(.*\):#define \1 \2 /* \3 */:; \
+> +       s:^$(ASM_COMMENT_SYM)->\([^ ]*\) [\$$#]*\([^ ]*\) \(.*\):#define \1 \2 /* \3 */:; \
+> +       s:$(ASM_COMMENT_SYM)->::; p;}"
+>  endef
+>
+>  define gen_header_from_asm_offsets
+> --
