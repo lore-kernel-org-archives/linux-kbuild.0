@@ -1,95 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf0-f170.google.com ([209.85.192.170]:33142 "EHLO
-        mail-pf0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751434AbdDJVJw (ORCPT
+Received: from orcrist.hmeau.com ([104.223.48.154]:60698 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751983AbdDKDQO (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 10 Apr 2017 17:09:52 -0400
-Received: by mail-pf0-f170.google.com with SMTP id s16so38777201pfs.0
-        for <linux-kbuild@vger.kernel.org>; Mon, 10 Apr 2017 14:09:52 -0700 (PDT)
-From: Matthias Kaehlcke <mka@chromium.org>
-Subject: [PATCH v2] kbuild: Add better clang cross build support
-Date: Mon, 10 Apr 2017 14:09:04 -0700
-Message-Id: <20170410210904.68211-1-mka@chromium.org>
+        Mon, 10 Apr 2017 23:16:14 -0400
+Date: Tue, 11 Apr 2017 10:40:22 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v11 08/12] cryptouser.h: fix include from userland
+Message-ID: <20170411024022.GA10615@gondor.apana.org.au>
+References: <CAK7LNAR_yp+O9jUZC8mKdaHgTiCkE7p2-ZbA9YZ8OGyp+uxhBQ@mail.gmail.com>
+ <1490617217-30192-1-git-send-email-nicolas.dichtel@6wind.com>
+ <1490617217-30192-9-git-send-email-nicolas.dichtel@6wind.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <1490617217-30192-9-git-send-email-nicolas.dichtel@6wind.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Behan Webster <behanw@converseincode.com>, Grant Grundler <grundler@chromium.org>, Greg Hackmann <ghackmann@google.com>, Michael Davidson <md@google.com>, Peter Foley <pefoley2@pefoley.com>, Matthias Kaehlcke <mka@chromium.org>
+To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Cc: yamada.masahiro@socionext.com, arnd@arndb.de, mmarek@suse.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org, airlied@linux.ie, davem@davemloft.net, linux@armlinux.org.uk, bp@alien8.de, slash.tmp@free.fr, daniel.vetter@ffwll.ch, rmk+kernel@armlinux.org.uk, msalter@redhat.com, jengelh@inai.de, hch@infradead.org, tklauser@distanz.ch, mpe@ellerman.id.au, mingo@kernel.org, tglx@linutronix.de, ldv@altlinux.org, linux-rdma@vger.kernel.org
 
-Add cross target to CC if using clang. Also add custom gcc toolchain
-path for fallback gcc tools.
+On Mon, Mar 27, 2017 at 02:20:13PM +0200, Nicolas Dichtel wrote:
+> This patch prepares the uapi export by fixing the following error:
+> 
+> .../linux/cryptouser.h:58:16: error: ‘CRYPTO_MAX_ALG_NAME’ undeclared here (not in a function)
+>   char cru_name[CRYPTO_MAX_ALG_NAME];
+> 
+> Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+> Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-COMPILER is previously set to "clang" if CC=clang was set from the
-make command line.  So -target and -gcc-toolchain can be added to CC,
-since we already know that it is set.
+Can we revert this patch please? I had forgotten about it when
+increasing the in-kernel CRYPTO_MAX_ALG_NAME so it now conflicts
+with the crypto tree.  The crypto tree has fixed the problem in
+a different way.
 
-Clang will fallback to using things like ld, as, and libgcc if
-(respectively) one of the llvm linkers isn't available, the integrated
-assembler is turned off, or an appropriately cross-compiled version of
-compiler-rt isn't available. To this end, you can specify the path to
-this fallback gcc toolchain with GCC_TOOLCHAIN.
-
-From: Behan Webster <behanw@converseincode.com>
-Signed-off-by: Behan Webster <behanw@converseincode.com>
-Reviewed-by: Jan-Simon Möller <dl9pf@gmx.de>
-Reviewed-by: Mark Charlebois <charlebm@gmail.com>
-Signed-off-by: Greg Hackmann <ghackmann@google.com>
-Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
----
-Changes in v2:
-- Fix GCC_TOOLCHAIN definition. $(LD) is needed to link the kernel, use
-  its path to determine the installation prefix of the toolchain.
-  (From: Greg Hackmann <ghackmann@google.com>)
-
- Makefile | 18 ++++++++++++++----
- 1 file changed, 14 insertions(+), 4 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index e11989d36c87..d3a02786bb53 100644
---- a/Makefile
-+++ b/Makefile
-@@ -375,6 +375,16 @@ LDFLAGS_vmlinux =
- CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage -fno-tree-loop-im -Wno-maybe-uninitialized
- CFLAGS_KCOV	:= $(call cc-option,-fsanitize-coverage=trace-pc,)
- 
-+ifeq ($(cc-name),clang)
-+ifneq ($(CROSS_COMPILE),)
-+CLANG_TARGET	:= -target $(notdir $(CROSS_COMPILE:%-=%))
-+GCC_TOOLCHAIN	:= $(realpath $(dir $(shell which $(LD)))/..)
-+endif
-+ifneq ($(GCC_TOOLCHAIN),)
-+CLANG_GCC_TC	:= -gcc-toolchain $(GCC_TOOLCHAIN)
-+endif
-+CLANG_FLAGS	:= $(CLANG_TARGET) $(CLANG_GCC_TC)
-+endif
- 
- # Use USERINCLUDE when you must reference the UAPI directories only.
- USERINCLUDE    := \
-@@ -395,18 +405,18 @@ LINUXINCLUDE    := \
- 
- LINUXINCLUDE	+= $(filter-out $(LINUXINCLUDE),$(USERINCLUDE))
- 
--KBUILD_CPPFLAGS := -D__KERNEL__
-+KBUILD_CPPFLAGS := -D__KERNEL__ $(CLANG_FLAGS)
- 
- KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
- 		   -fno-strict-aliasing -fno-common \
- 		   -Werror-implicit-function-declaration \
- 		   -Wno-format-security \
--		   -std=gnu89 $(call cc-option,-fno-PIE)
--
-+		   -std=gnu89 $(call cc-option,-fno-PIE) \
-+		   $(CLANG_FLAGS)
- 
- KBUILD_AFLAGS_KERNEL :=
- KBUILD_CFLAGS_KERNEL :=
--KBUILD_AFLAGS   := -D__ASSEMBLY__ $(call cc-option,-fno-PIE)
-+KBUILD_AFLAGS   := -D__ASSEMBLY__ $(call cc-option,-fno-PIE) $(CLANG_FLAGS)
- KBUILD_AFLAGS_MODULE  := -DMODULE
- KBUILD_CFLAGS_MODULE  := -DMODULE
- KBUILD_LDFLAGS_MODULE := -T $(srctree)/scripts/module-common.lds
+Thanks,
 -- 
-2.12.2.715.g7642488e1d-goog
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
