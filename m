@@ -1,93 +1,188 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from merlin.infradead.org ([205.233.59.134]:43582 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752384AbdDLSTd (ORCPT
+Received: from mail-pf0-f176.google.com ([209.85.192.176]:36245 "EHLO
+        mail-pf0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753929AbdDLToe (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 12 Apr 2017 14:19:33 -0400
-Subject: Re: [PATCH] scripts: kconfig: implement a sort method
-References: <20170411111227.20846-1-felipe.balbi@linux.intel.com>
- <7d017fc8-9e0b-f8a8-a877-edcc07c91949@infradead.org>
- <87d1ciawvn.fsf@linux.intel.com> <20170412160658.GA3531@scaer>
-From: Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <a5b84e01-f645-71c7-12c2-c9a0cd2377a9@infradead.org>
-Date: Wed, 12 Apr 2017 11:19:28 -0700
-MIME-Version: 1.0
-In-Reply-To: <20170412160658.GA3531@scaer>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+        Wed, 12 Apr 2017 15:44:34 -0400
+Received: by mail-pf0-f176.google.com with SMTP id o126so18253257pfb.3
+        for <linux-kbuild@vger.kernel.org>; Wed, 12 Apr 2017 12:44:33 -0700 (PDT)
+From: Matthias Kaehlcke <mka@chromium.org>
+Subject: [PATCH v2] kbuild: Consolidate header generation from ASM offset information
+Date: Wed, 12 Apr 2017 12:43:52 -0700
+Message-Id: <20170412194352.108290-1-mka@chromium.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Yann E. MORIN" <yann.morin.1998@free.fr>, Felipe Balbi <felipe.balbi@linux.intel.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, Tony Luck <tony.luck@intel.com>, Fenghua Yu <fenghua.yu@intel.com>, Andrew Morton <akpm@linux-foundation.org>, Jan Kiszka <jan.kiszka@siemens.com>, Kieran Bingham <kieran.bingham@linaro.org>
+Cc: linux-kernel@vger.kernel.org, linux-ia64@vger.kernel.org, linux-kbuild@vger.kernel.org, Grant Grundler <grundler@chromium.org>, Greg Hackmann <ghackmann@google.com>, Michael Davidson <md@google.com>, Matthias Kaehlcke <mka@chromium.org>
 
-On 04/12/17 09:06, Yann E. MORIN wrote:
-> Felipe, All,
-> 
-> On 2017-04-12 10:49 +0300, Felipe Balbi spake thusly:
->>
->> Randy Dunlap <rdunlap@infradead.org> writes:
->>> On 04/11/17 04:12, Felipe Balbi wrote:
->>>> With a growing amount of Kernel configuration, it's
->>>> getting ever more difficult to find anything on
->>>> menuconfig. Because of that, implement mergesort for
->>>> kconfig to make it a little easier for anybody
->>>> building kernels.
->>>
->>> Search works for me, but I don't mind Sort either.
->>
+Largely redundant code is used in different places to generate C headers
+from offset information extracted from assembly language output.
+Consolidate the code in Makefile.lib and use this instead.
 
-[snip]
+Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+---
+Changes in v2:
+- Move common stuff to Makefile.lib instead of adding a new include
+- Make entire filechk_offsets macro common
+- Remove wrapper from ia64 and mod Makefiles and call filechk_offsets
+  directly
 
-> 
-> Arguably, the order may also make sense, for example to "group" related
-> items. So, <Sort> should be a toggle, so that it is possible to go back
-> to the unsorted, original order, IMHO...
-> 
->>> Any Help text for Sort?  or is it obvious what it does?  (no)
->> wait, it's not obvious what "Sort" means?
-> 
-> I guess that what Randy said was that in this context, it is not more
-> obvious than Load or Save, and they are documented in the help (but it
-> is not obvious how to get the help).
+ Kbuild                    | 25 -------------------------
+ arch/ia64/kernel/Makefile | 26 ++------------------------
+ scripts/Makefile.lib      | 28 ++++++++++++++++++++++++++++
+ scripts/mod/Makefile      | 28 ++--------------------------
+ 4 files changed, 32 insertions(+), 75 deletions(-)
 
-Correct. and true (about how to get to the Help text).
-
-> For example, go on the "General setup" entry, but do not enter the menu.
-> Now, select Help: you'll get a bit of help on how to use menuconfig.
-> 
-> There, Load and Save are documented, in Alternate Configuration Files.
-> 
->>> In an 80x25 terminal (window), the < Sort > option wraps around
->>> past column 80.
->> not what I see here [1]
-> 
-> I see the same as Randy here:
-> 
->     $ stty size
->     25 80
-> 
->     https://imgur.com/a/ku0sG
-
-For some reason, Felipe's <Select> starts further to the left than mine
-or Yann's does.
-
->>> I haven't looked at the source code (lately), but I think that it
->>> would OK to not have the (extra) spaces inside the <...> brackets.
->>> I.e., instead of
->>>   │        <Select>    < Exit >    < Help >    < Save >    < Load >    < Sort  
->>>    >
->>> just have
->>>   │        <Select>    <Exit>    <Help>    <Save>    <Load>    <Sort>
->>>
->>> Or the <Select> does not need to be indented as much as it is.
->> I changed that for this very reason
-
-I don't see that. Is that part of the patch missing?
-
-> Or just always left-align the line, rather than center it?
-
-OK.
-
-
+diff --git a/Kbuild b/Kbuild
+index 3d0ae152af7c..94c752762bc2 100644
+--- a/Kbuild
++++ b/Kbuild
+@@ -7,31 +7,6 @@
+ # 4) Check for missing system calls
+ # 5) Generate constants.py (may need bounds.h)
+ 
+-# Default sed regexp - multiline due to syntax constraints
+-define sed-y
+-	"/^->/{s:->#\(.*\):/* \1 */:; \
+-	s:^->\([^ ]*\) [\$$#]*\([-0-9]*\) \(.*\):#define \1 \2 /* \3 */:; \
+-	s:^->\([^ ]*\) [\$$#]*\([^ ]*\) \(.*\):#define \1 \2 /* \3 */:; \
+-	s:->::; p;}"
+-endef
+-
+-# Use filechk to avoid rebuilds when a header changes, but the resulting file
+-# does not
+-define filechk_offsets
+-	(set -e; \
+-	 echo "#ifndef $2"; \
+-	 echo "#define $2"; \
+-	 echo "/*"; \
+-	 echo " * DO NOT MODIFY."; \
+-	 echo " *"; \
+-	 echo " * This file was generated by Kbuild"; \
+-	 echo " */"; \
+-	 echo ""; \
+-	 sed -ne $(sed-y); \
+-	 echo ""; \
+-	 echo "#endif" )
+-endef
+-
+ #####
+ # 1) Generate bounds.h
+ 
+diff --git a/arch/ia64/kernel/Makefile b/arch/ia64/kernel/Makefile
+index 3686d6abafde..9edda5466020 100644
+--- a/arch/ia64/kernel/Makefile
++++ b/arch/ia64/kernel/Makefile
+@@ -50,32 +50,10 @@ CFLAGS_traps.o  += -mfixed-range=f2-f5,f16-f31
+ # The gate DSO image is built using a special linker script.
+ include $(src)/Makefile.gate
+ 
+-# Calculate NR_IRQ = max(IA64_NATIVE_NR_IRQS, XEN_NR_IRQS, ...) based on config
+-define sed-y
+-	"/^->/{s:^->\([^ ]*\) [\$$#]*\([^ ]*\) \(.*\):#define \1 \2 /* \3 */:; s:->::; p;}"
+-endef
+-quiet_cmd_nr_irqs = GEN     $@
+-define cmd_nr_irqs
+-	(set -e; \
+-	 echo "#ifndef __ASM_NR_IRQS_H__"; \
+-	 echo "#define __ASM_NR_IRQS_H__"; \
+-	 echo "/*"; \
+-	 echo " * DO NOT MODIFY."; \
+-	 echo " *"; \
+-	 echo " * This file was generated by Kbuild"; \
+-	 echo " *"; \
+-	 echo " */"; \
+-	 echo ""; \
+-	 sed -ne $(sed-y) $<; \
+-	 echo ""; \
+-	 echo "#endif" ) > $@
+-endef
+-
+ # We use internal kbuild rules to avoid the "is up to date" message from make
+ arch/$(SRCARCH)/kernel/nr-irqs.s: arch/$(SRCARCH)/kernel/nr-irqs.c
+ 	$(Q)mkdir -p $(dir $@)
+ 	$(call if_changed_dep,cc_s_c)
+ 
+-include/generated/nr-irqs.h: arch/$(SRCARCH)/kernel/nr-irqs.s
+-	$(Q)mkdir -p $(dir $@)
+-	$(call cmd,nr_irqs)
++include/generated/nr-irqs.h: arch/$(SRCARCH)/kernel/nr-irqs.s FORCE
++	$(call filechk,offsets,__ASM_NR_IRQS_H__)
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index 0a07f9014944..dd567e5d59e0 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -408,3 +408,31 @@ quiet_cmd_xzmisc = XZMISC  $@
+ cmd_xzmisc = (cat $(filter-out FORCE,$^) | \
+ 	xz --check=crc32 --lzma2=dict=1MiB) > $@ || \
+ 	(rm -f $@ ; false)
++
++# ASM offsets
++# ---------------------------------------------------------------------------
++
++# Default sed regexp - multiline due to syntax constraints
++define sed-offsets
++	"/^->/{s:->#\(.*\):/* \1 */:; \
++	s:^->\([^ ]*\) [\$$#]*\([-0-9]*\) \(.*\):#define \1 \2 /* \3 */:; \
++	s:^->\([^ ]*\) [\$$#]*\([^ ]*\) \(.*\):#define \1 \2 /* \3 */:; \
++	s:->::; p;}"
++endef
++
++# Use filechk to avoid rebuilds when a header changes, but the resulting file
++# does not
++define filechk_offsets
++	(set -e; \
++	 echo "#ifndef $2"; \
++	 echo "#define $2"; \
++	 echo "/*"; \
++	 echo " * DO NOT MODIFY."; \
++	 echo " *"; \
++	 echo " * This file was generated by Kbuild"; \
++	 echo " */"; \
++	 echo ""; \
++	 sed -ne $(sed-offsets); \
++	 echo ""; \
++	 echo "#endif" )
++endef
+diff --git a/scripts/mod/Makefile b/scripts/mod/Makefile
+index 19d9bcadc0cc..b497d9764dcf 100644
+--- a/scripts/mod/Makefile
++++ b/scripts/mod/Makefile
+@@ -7,32 +7,8 @@ modpost-objs	:= modpost.o file2alias.o sumversion.o
+ 
+ devicetable-offsets-file := devicetable-offsets.h
+ 
+-define sed-y
+-	"/^->/{s:->#\(.*\):/* \1 */:; \
+-	s:^->\([^ ]*\) [\$$#]*\([-0-9]*\) \(.*\):#define \1 \2 /* \3 */:; \
+-	s:^->\([^ ]*\) [\$$#]*\([^ ]*\) \(.*\):#define \1 \2 /* \3 */:; \
+-	s:->::; p;}"
+-endef
+-
+-quiet_cmd_offsets = GEN     $@
+-define cmd_offsets
+-	(set -e; \
+-	 echo "#ifndef __DEVICETABLE_OFFSETS_H__"; \
+-	 echo "#define __DEVICETABLE_OFFSETS_H__"; \
+-	 echo "/*"; \
+-	 echo " * DO NOT MODIFY."; \
+-	 echo " *"; \
+-	 echo " * This file was generated by Kbuild"; \
+-	 echo " *"; \
+-	 echo " */"; \
+-	 echo ""; \
+-	 sed -ne $(sed-y) $<; \
+-	 echo ""; \
+-	 echo "#endif" ) > $@
+-endef
+-
+-$(obj)/$(devicetable-offsets-file): $(obj)/devicetable-offsets.s
+-	$(call if_changed,offsets)
++$(obj)/$(devicetable-offsets-file): $(obj)/devicetable-offsets.s FORCE
++	$(call filechk,offsets,__DEVICETABLE_OFFSETS_H__)
+ 
+ targets += $(devicetable-offsets-file) devicetable-offsets.s
+ 
 -- 
-~Randy
+2.12.2.715.g7642488e1d-goog
+
