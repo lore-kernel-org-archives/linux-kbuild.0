@@ -1,188 +1,88 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf0-f176.google.com ([209.85.192.176]:36245 "EHLO
-        mail-pf0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753929AbdDLToe (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:17256 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755471AbdDLUjS (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 12 Apr 2017 15:44:34 -0400
-Received: by mail-pf0-f176.google.com with SMTP id o126so18253257pfb.3
-        for <linux-kbuild@vger.kernel.org>; Wed, 12 Apr 2017 12:44:33 -0700 (PDT)
-From: Matthias Kaehlcke <mka@chromium.org>
-Subject: [PATCH v2] kbuild: Consolidate header generation from ASM offset information
-Date: Wed, 12 Apr 2017 12:43:52 -0700
-Message-Id: <20170412194352.108290-1-mka@chromium.org>
+        Wed, 12 Apr 2017 16:39:18 -0400
+MIME-Version: 1.0
+In-Reply-To: <CAK7LNAQmR374j_+9_yxwsuVoZ+KOHcDq83_R2VC7WEcpqmn1hA@mail.gmail.com>
+References: <20170328011909.150513-1-mka@chromium.org> <CAK7LNATU+JNx2eZCTuqyws=CQL3Z2p6QJ7Oa0DNMvxbNJNH4Jg@mail.gmail.com>
+ <20170330164106.GA2130@google.com> <CAK7LNARe61sBVL=zs7kb4BT5UgkBCYdKWa+esWZnT=j3idDdNw@mail.gmail.com>
+ <20170410180804.GA28657@google.com> <CAK7LNAQmR374j_+9_yxwsuVoZ+KOHcDq83_R2VC7WEcpqmn1hA@mail.gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Thu, 13 Apr 2017 05:39:13 +0900
+Message-ID: <CAK7LNARtG6NmDkR+gB8TrOXnRibgXoomdp7JpdfH5Kj2vKVhaw@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: use -Oz instead of -Os when using clang
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, Tony Luck <tony.luck@intel.com>, Fenghua Yu <fenghua.yu@intel.com>, Andrew Morton <akpm@linux-foundation.org>, Jan Kiszka <jan.kiszka@siemens.com>, Kieran Bingham <kieran.bingham@linaro.org>
-Cc: linux-kernel@vger.kernel.org, linux-ia64@vger.kernel.org, linux-kbuild@vger.kernel.org, Grant Grundler <grundler@chromium.org>, Greg Hackmann <ghackmann@google.com>, Michael Davidson <md@google.com>, Matthias Kaehlcke <mka@chromium.org>
+To: Matthias Kaehlcke <mka@chromium.org>
+Cc: Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Behan Webster <behanw@converseincode.com>, Greg Hackmann <ghackmann@google.com>, Grant Grundler <grundler@chromium.org>, Michael Davidson <md@google.com>, Peter Foley <pefoley2@pefoley.com>
 
-Largely redundant code is used in different places to generate C headers
-from offset information extracted from assembly language output.
-Consolidate the code in Makefile.lib and use this instead.
+2017-04-12 12:38 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
+> Hi Matthias,
+>
+>
+> 2017-04-11 3:08 GMT+09:00 Matthias Kaehlcke <mka@chromium.org>:
+>> Hi Masahiro,
+>>
+>> El Fri, Mar 31, 2017 at 02:57:43AM +0900 Masahiro Yamada ha dit:
+>>
+>>> 2017-03-31 1:41 GMT+09:00 Matthias Kaehlcke <mka@chromium.org>:
+>>> > El Fri, Mar 31, 2017 at 01:03:02AM +0900 Masahiro Yamada ha dit:
+>>> >
+>>> >> 2017-03-28 10:19 GMT+09:00 Matthias Kaehlcke <mka@chromium.org>:
+>>> >> > This generates smaller resulting object code when compiled with clang.
+>>> >> >
+>>> >> > Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+>>> >> > ---
+>>> >> >  Makefile | 3 ++-
+>>> >> >  1 file changed, 2 insertions(+), 1 deletion(-)
+>>> >> >
+>>> >> > diff --git a/Makefile b/Makefile
+>>> >> > index b2faa9319372..66bcdbf58371 100644
+>>> >> > --- a/Makefile
+>>> >> > +++ b/Makefile
+>>> >> > @@ -638,7 +638,8 @@ KBUILD_CFLAGS       += $(call cc-option,-fdata-sections,)
+>>> >> >  endif
+>>> >> >
+>>> >> >  ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
+>>> >> > -KBUILD_CFLAGS  += -Os $(call cc-disable-warning,maybe-uninitialized,)
+>>> >> > +KBUILD_CFLAGS  += $(call cc-option,-Oz,-Os)
+>>> >> > +KBUILD_CFLAGS  += $(call cc-disable-warning,maybe-uninitialized,)
+>>> >> >  else
+>>> >> >  ifdef CONFIG_PROFILE_ALL_BRANCHES
+>>> >> >  KBUILD_CFLAGS  += -O2 $(call cc-disable-warning,maybe-uninitialized,)
+>>> >> >
+>>> >>
+>>> >>
+>>> >>
+>>> >> This is the same as the following commit in LLVMLinux
+>>> >> except Author/Signed-off-by.
+>>> >>
+>>> >> Who should the authorship really belong to?
+>>> >
+>>> > (this time without html, sorry for the noise)
+>>> >
+>>> > It should belong to Behan, I missed to add a 'From' tag, sorry about
+>>> > that. Should I resend with the tag or can you fix it when applying the
+>>> > patch?
+>>>
+>>>
+>>> No need to re-send it.  I can fixup it manually.
+>>
+>> I couldn't locate this patch in your tree, has it been picked up?
+>>
+>
+>
+> I will pick this up shortly.  Sorry for the delay.
+>
 
-Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
----
-Changes in v2:
-- Move common stuff to Makefile.lib instead of adding a new include
-- Make entire filechk_offsets macro common
-- Remove wrapper from ia64 and mod Makefiles and call filechk_offsets
-  directly
 
- Kbuild                    | 25 -------------------------
- arch/ia64/kernel/Makefile | 26 ++------------------------
- scripts/Makefile.lib      | 28 ++++++++++++++++++++++++++++
- scripts/mod/Makefile      | 28 ++--------------------------
- 4 files changed, 32 insertions(+), 75 deletions(-)
+Applied to linux-kbuild/kbuild.  Thanks!
 
-diff --git a/Kbuild b/Kbuild
-index 3d0ae152af7c..94c752762bc2 100644
---- a/Kbuild
-+++ b/Kbuild
-@@ -7,31 +7,6 @@
- # 4) Check for missing system calls
- # 5) Generate constants.py (may need bounds.h)
- 
--# Default sed regexp - multiline due to syntax constraints
--define sed-y
--	"/^->/{s:->#\(.*\):/* \1 */:; \
--	s:^->\([^ ]*\) [\$$#]*\([-0-9]*\) \(.*\):#define \1 \2 /* \3 */:; \
--	s:^->\([^ ]*\) [\$$#]*\([^ ]*\) \(.*\):#define \1 \2 /* \3 */:; \
--	s:->::; p;}"
--endef
--
--# Use filechk to avoid rebuilds when a header changes, but the resulting file
--# does not
--define filechk_offsets
--	(set -e; \
--	 echo "#ifndef $2"; \
--	 echo "#define $2"; \
--	 echo "/*"; \
--	 echo " * DO NOT MODIFY."; \
--	 echo " *"; \
--	 echo " * This file was generated by Kbuild"; \
--	 echo " */"; \
--	 echo ""; \
--	 sed -ne $(sed-y); \
--	 echo ""; \
--	 echo "#endif" )
--endef
--
- #####
- # 1) Generate bounds.h
- 
-diff --git a/arch/ia64/kernel/Makefile b/arch/ia64/kernel/Makefile
-index 3686d6abafde..9edda5466020 100644
---- a/arch/ia64/kernel/Makefile
-+++ b/arch/ia64/kernel/Makefile
-@@ -50,32 +50,10 @@ CFLAGS_traps.o  += -mfixed-range=f2-f5,f16-f31
- # The gate DSO image is built using a special linker script.
- include $(src)/Makefile.gate
- 
--# Calculate NR_IRQ = max(IA64_NATIVE_NR_IRQS, XEN_NR_IRQS, ...) based on config
--define sed-y
--	"/^->/{s:^->\([^ ]*\) [\$$#]*\([^ ]*\) \(.*\):#define \1 \2 /* \3 */:; s:->::; p;}"
--endef
--quiet_cmd_nr_irqs = GEN     $@
--define cmd_nr_irqs
--	(set -e; \
--	 echo "#ifndef __ASM_NR_IRQS_H__"; \
--	 echo "#define __ASM_NR_IRQS_H__"; \
--	 echo "/*"; \
--	 echo " * DO NOT MODIFY."; \
--	 echo " *"; \
--	 echo " * This file was generated by Kbuild"; \
--	 echo " *"; \
--	 echo " */"; \
--	 echo ""; \
--	 sed -ne $(sed-y) $<; \
--	 echo ""; \
--	 echo "#endif" ) > $@
--endef
--
- # We use internal kbuild rules to avoid the "is up to date" message from make
- arch/$(SRCARCH)/kernel/nr-irqs.s: arch/$(SRCARCH)/kernel/nr-irqs.c
- 	$(Q)mkdir -p $(dir $@)
- 	$(call if_changed_dep,cc_s_c)
- 
--include/generated/nr-irqs.h: arch/$(SRCARCH)/kernel/nr-irqs.s
--	$(Q)mkdir -p $(dir $@)
--	$(call cmd,nr_irqs)
-+include/generated/nr-irqs.h: arch/$(SRCARCH)/kernel/nr-irqs.s FORCE
-+	$(call filechk,offsets,__ASM_NR_IRQS_H__)
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 0a07f9014944..dd567e5d59e0 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -408,3 +408,31 @@ quiet_cmd_xzmisc = XZMISC  $@
- cmd_xzmisc = (cat $(filter-out FORCE,$^) | \
- 	xz --check=crc32 --lzma2=dict=1MiB) > $@ || \
- 	(rm -f $@ ; false)
-+
-+# ASM offsets
-+# ---------------------------------------------------------------------------
-+
-+# Default sed regexp - multiline due to syntax constraints
-+define sed-offsets
-+	"/^->/{s:->#\(.*\):/* \1 */:; \
-+	s:^->\([^ ]*\) [\$$#]*\([-0-9]*\) \(.*\):#define \1 \2 /* \3 */:; \
-+	s:^->\([^ ]*\) [\$$#]*\([^ ]*\) \(.*\):#define \1 \2 /* \3 */:; \
-+	s:->::; p;}"
-+endef
-+
-+# Use filechk to avoid rebuilds when a header changes, but the resulting file
-+# does not
-+define filechk_offsets
-+	(set -e; \
-+	 echo "#ifndef $2"; \
-+	 echo "#define $2"; \
-+	 echo "/*"; \
-+	 echo " * DO NOT MODIFY."; \
-+	 echo " *"; \
-+	 echo " * This file was generated by Kbuild"; \
-+	 echo " */"; \
-+	 echo ""; \
-+	 sed -ne $(sed-offsets); \
-+	 echo ""; \
-+	 echo "#endif" )
-+endef
-diff --git a/scripts/mod/Makefile b/scripts/mod/Makefile
-index 19d9bcadc0cc..b497d9764dcf 100644
---- a/scripts/mod/Makefile
-+++ b/scripts/mod/Makefile
-@@ -7,32 +7,8 @@ modpost-objs	:= modpost.o file2alias.o sumversion.o
- 
- devicetable-offsets-file := devicetable-offsets.h
- 
--define sed-y
--	"/^->/{s:->#\(.*\):/* \1 */:; \
--	s:^->\([^ ]*\) [\$$#]*\([-0-9]*\) \(.*\):#define \1 \2 /* \3 */:; \
--	s:^->\([^ ]*\) [\$$#]*\([^ ]*\) \(.*\):#define \1 \2 /* \3 */:; \
--	s:->::; p;}"
--endef
--
--quiet_cmd_offsets = GEN     $@
--define cmd_offsets
--	(set -e; \
--	 echo "#ifndef __DEVICETABLE_OFFSETS_H__"; \
--	 echo "#define __DEVICETABLE_OFFSETS_H__"; \
--	 echo "/*"; \
--	 echo " * DO NOT MODIFY."; \
--	 echo " *"; \
--	 echo " * This file was generated by Kbuild"; \
--	 echo " *"; \
--	 echo " */"; \
--	 echo ""; \
--	 sed -ne $(sed-y) $<; \
--	 echo ""; \
--	 echo "#endif" ) > $@
--endef
--
--$(obj)/$(devicetable-offsets-file): $(obj)/devicetable-offsets.s
--	$(call if_changed,offsets)
-+$(obj)/$(devicetable-offsets-file): $(obj)/devicetable-offsets.s FORCE
-+	$(call filechk,offsets,__DEVICETABLE_OFFSETS_H__)
- 
- targets += $(devicetable-offsets-file) devicetable-offsets.s
- 
+
+
 -- 
-2.12.2.715.g7642488e1d-goog
-
+Best Regards
+Masahiro Yamada
