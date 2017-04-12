@@ -1,58 +1,83 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg0-f47.google.com ([74.125.83.47]:36274 "EHLO
-        mail-pg0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751645AbdDLBih (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:43913 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752046AbdDLDil (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 11 Apr 2017 21:38:37 -0400
-Received: by mail-pg0-f47.google.com with SMTP id g2so6678092pge.3
-        for <linux-kbuild@vger.kernel.org>; Tue, 11 Apr 2017 18:38:37 -0700 (PDT)
-Date: Tue, 11 Apr 2017 18:38:34 -0700
-From: Matthias Kaehlcke <mka@chromium.org>
-Subject: Re: [PATCH] kbuild: Consolidate header generation from ASM offset
- information
-Message-ID: <20170412013834.GE28657@google.com>
-References: <20170403193739.84905-1-mka@chromium.org>
- <CAK7LNAQ0sUnXJAzEy8ukK994mUMPJQKHAvyqpvqOXUfaX-pSvA@mail.gmail.com>
+        Tue, 11 Apr 2017 23:38:41 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAK7LNAQ0sUnXJAzEy8ukK994mUMPJQKHAvyqpvqOXUfaX-pSvA@mail.gmail.com>
+In-Reply-To: <20170410180804.GA28657@google.com>
+References: <20170328011909.150513-1-mka@chromium.org> <CAK7LNATU+JNx2eZCTuqyws=CQL3Z2p6QJ7Oa0DNMvxbNJNH4Jg@mail.gmail.com>
+ <20170330164106.GA2130@google.com> <CAK7LNARe61sBVL=zs7kb4BT5UgkBCYdKWa+esWZnT=j3idDdNw@mail.gmail.com>
+ <20170410180804.GA28657@google.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Wed, 12 Apr 2017 12:38:14 +0900
+Message-ID: <CAK7LNAQmR374j_+9_yxwsuVoZ+KOHcDq83_R2VC7WEcpqmn1hA@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: use -Oz instead of -Os when using clang
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Tony Luck <tony.luck@intel.com>, Fenghua Yu <fenghua.yu@intel.com>, Michal Marek <mmarek@suse.com>, Jan Kiszka <jan.kiszka@siemens.com>, Kieran Bingham <kieran.bingham@linaro.org>, Andrew Morton <akpm@linux-foundation.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-ia64@vger.kernel.org, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Grant Grundler <grundler@chromium.org>, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>
+To: Matthias Kaehlcke <mka@chromium.org>
+Cc: Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Behan Webster <behanw@converseincode.com>, Greg Hackmann <ghackmann@google.com>, Grant Grundler <grundler@chromium.org>, Michael Davidson <md@google.com>, Peter Foley <pefoley2@pefoley.com>
 
-Hi Masahiro,
+Hi Matthias,
 
-El Wed, Apr 12, 2017 at 09:03:28AM +0900 Masahiro Yamada ha dit:
 
-> 2017-04-04 4:37 GMT+09:00 Matthias Kaehlcke <mka@chromium.org>:
-> > Largely redundant code is used in different places to generate C headers
-> > from offset information extracted from assembly language output.
-> > Consolidate the code in a Makefile include and use this instead.
-> >
-> > Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
-> 
-> 
-> Please move sed-y and filechk_offsets to scripts/Makefile.lib .
-> (You may need to rename sed-y
-> because arch/xtensa/kernel/Makefile uses this name.)
-> 
-> 
-> We see various helpers in scripts/Makefile.lib,
-> so I do not think we need to create a new file just for this one.
-> 
-> Then, please reuse it from arch/ia64/kernel/Makefile and scripts/mod/Makefile.
-> Like this:
-> 
-> include/generated/nr-irqs.h: arch/$(SRCARCH)/kernel/nr-irqs.s FORCE
->         $(call filechk,offsets,__ASM_NR_IRQS_H__)
-> 
-> $(obj)/$(devicetable-offsets-file): $(obj)/devicetable-offsets.s FORCE
->         $(call filechk,offsets,__DEVICETABLE_OFFSETS_H__)
+2017-04-11 3:08 GMT+09:00 Matthias Kaehlcke <mka@chromium.org>:
+> Hi Masahiro,
+>
+> El Fri, Mar 31, 2017 at 02:57:43AM +0900 Masahiro Yamada ha dit:
+>
+>> 2017-03-31 1:41 GMT+09:00 Matthias Kaehlcke <mka@chromium.org>:
+>> > El Fri, Mar 31, 2017 at 01:03:02AM +0900 Masahiro Yamada ha dit:
+>> >
+>> >> 2017-03-28 10:19 GMT+09:00 Matthias Kaehlcke <mka@chromium.org>:
+>> >> > This generates smaller resulting object code when compiled with clang.
+>> >> >
+>> >> > Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+>> >> > ---
+>> >> >  Makefile | 3 ++-
+>> >> >  1 file changed, 2 insertions(+), 1 deletion(-)
+>> >> >
+>> >> > diff --git a/Makefile b/Makefile
+>> >> > index b2faa9319372..66bcdbf58371 100644
+>> >> > --- a/Makefile
+>> >> > +++ b/Makefile
+>> >> > @@ -638,7 +638,8 @@ KBUILD_CFLAGS       += $(call cc-option,-fdata-sections,)
+>> >> >  endif
+>> >> >
+>> >> >  ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
+>> >> > -KBUILD_CFLAGS  += -Os $(call cc-disable-warning,maybe-uninitialized,)
+>> >> > +KBUILD_CFLAGS  += $(call cc-option,-Oz,-Os)
+>> >> > +KBUILD_CFLAGS  += $(call cc-disable-warning,maybe-uninitialized,)
+>> >> >  else
+>> >> >  ifdef CONFIG_PROFILE_ALL_BRANCHES
+>> >> >  KBUILD_CFLAGS  += -O2 $(call cc-disable-warning,maybe-uninitialized,)
+>> >> >
+>> >>
+>> >>
+>> >>
+>> >> This is the same as the following commit in LLVMLinux
+>> >> except Author/Signed-off-by.
+>> >>
+>> >> Who should the authorship really belong to?
+>> >
+>> > (this time without html, sorry for the noise)
+>> >
+>> > It should belong to Behan, I missed to add a 'From' tag, sorry about
+>> > that. Should I resend with the tag or can you fix it when applying the
+>> > patch?
+>>
+>>
+>> No need to re-send it.  I can fixup it manually.
+>
+> I couldn't locate this patch in your tree, has it been picked up?
+>
 
-Thanks for your comments, I'll rework the patch accordingly.
 
-Cheers
+I will pick this up shortly.  Sorry for the delay.
 
-Matthias
+
+
+-- 
+Best Regards
+Masahiro Yamada
