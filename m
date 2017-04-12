@@ -1,88 +1,60 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:17256 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755471AbdDLUjS (ORCPT
+Received: from conuserg-07.nifty.com ([210.131.2.74]:46894 "EHLO
+        conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752765AbdDLW0u (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 12 Apr 2017 16:39:18 -0400
-MIME-Version: 1.0
-In-Reply-To: <CAK7LNAQmR374j_+9_yxwsuVoZ+KOHcDq83_R2VC7WEcpqmn1hA@mail.gmail.com>
-References: <20170328011909.150513-1-mka@chromium.org> <CAK7LNATU+JNx2eZCTuqyws=CQL3Z2p6QJ7Oa0DNMvxbNJNH4Jg@mail.gmail.com>
- <20170330164106.GA2130@google.com> <CAK7LNARe61sBVL=zs7kb4BT5UgkBCYdKWa+esWZnT=j3idDdNw@mail.gmail.com>
- <20170410180804.GA28657@google.com> <CAK7LNAQmR374j_+9_yxwsuVoZ+KOHcDq83_R2VC7WEcpqmn1hA@mail.gmail.com>
+        Wed, 12 Apr 2017 18:26:50 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 13 Apr 2017 05:39:13 +0900
-Message-ID: <CAK7LNARtG6NmDkR+gB8TrOXnRibgXoomdp7JpdfH5Kj2vKVhaw@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: use -Oz instead of -Os when using clang
-Content-Type: text/plain; charset=UTF-8
+Subject: [PATCH] kbuild: drop -Wno-unknown-warning-option from clang options
+Date: Thu, 13 Apr 2017 07:25:21 +0900
+Message-Id: <1492035921-9538-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Matthias Kaehlcke <mka@chromium.org>
-Cc: Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Behan Webster <behanw@converseincode.com>, Greg Hackmann <ghackmann@google.com>, Grant Grundler <grundler@chromium.org>, Michael Davidson <md@google.com>, Peter Foley <pefoley2@pefoley.com>
+To: linux-kbuild@vger.kernel.org
+Cc: Matthias Kaehlcke <mka@chromium.org>, Behan Webster <behanw@converseincode.com>, Arnd Bergmann <arnd@arndb.de>, Mark Charlebois <charlebm@gmail.com>, Kees Cook <keescook@chromium.org>, Michael Davidson <md@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, linux-kernel@vger.kernel.org
 
-2017-04-12 12:38 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
-> Hi Matthias,
->
->
-> 2017-04-11 3:08 GMT+09:00 Matthias Kaehlcke <mka@chromium.org>:
->> Hi Masahiro,
->>
->> El Fri, Mar 31, 2017 at 02:57:43AM +0900 Masahiro Yamada ha dit:
->>
->>> 2017-03-31 1:41 GMT+09:00 Matthias Kaehlcke <mka@chromium.org>:
->>> > El Fri, Mar 31, 2017 at 01:03:02AM +0900 Masahiro Yamada ha dit:
->>> >
->>> >> 2017-03-28 10:19 GMT+09:00 Matthias Kaehlcke <mka@chromium.org>:
->>> >> > This generates smaller resulting object code when compiled with clang.
->>> >> >
->>> >> > Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
->>> >> > ---
->>> >> >  Makefile | 3 ++-
->>> >> >  1 file changed, 2 insertions(+), 1 deletion(-)
->>> >> >
->>> >> > diff --git a/Makefile b/Makefile
->>> >> > index b2faa9319372..66bcdbf58371 100644
->>> >> > --- a/Makefile
->>> >> > +++ b/Makefile
->>> >> > @@ -638,7 +638,8 @@ KBUILD_CFLAGS       += $(call cc-option,-fdata-sections,)
->>> >> >  endif
->>> >> >
->>> >> >  ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
->>> >> > -KBUILD_CFLAGS  += -Os $(call cc-disable-warning,maybe-uninitialized,)
->>> >> > +KBUILD_CFLAGS  += $(call cc-option,-Oz,-Os)
->>> >> > +KBUILD_CFLAGS  += $(call cc-disable-warning,maybe-uninitialized,)
->>> >> >  else
->>> >> >  ifdef CONFIG_PROFILE_ALL_BRANCHES
->>> >> >  KBUILD_CFLAGS  += -O2 $(call cc-disable-warning,maybe-uninitialized,)
->>> >> >
->>> >>
->>> >>
->>> >>
->>> >> This is the same as the following commit in LLVMLinux
->>> >> except Author/Signed-off-by.
->>> >>
->>> >> Who should the authorship really belong to?
->>> >
->>> > (this time without html, sorry for the noise)
->>> >
->>> > It should belong to Behan, I missed to add a 'From' tag, sorry about
->>> > that. Should I resend with the tag or can you fix it when applying the
->>> > patch?
->>>
->>>
->>> No need to re-send it.  I can fixup it manually.
->>
->> I couldn't locate this patch in your tree, has it been picked up?
->>
->
->
-> I will pick this up shortly.  Sorry for the delay.
->
+Since commit c3f0d0bc5b01 ("kbuild, LLVMLinux: Add -Werror to
+cc-option to support clang"), cc-option and friends work correctly
+for clang.
 
+However, the combination of -Werror and -Wno-unknown-warning-option
+makes clang happy with any unknown warning options.
 
-Applied to linux-kbuild/kbuild.  Thanks!
+Once -Wno-unknown-warning-option is added, any succeeding call of
+cc-disable-warning is evaluated positive, then unknown warning
+options are accepted.  This should be dropped.
 
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
+ Makefile                   | 1 -
+ scripts/Makefile.extrawarn | 1 -
+ 2 files changed, 2 deletions(-)
 
+diff --git a/Makefile b/Makefile
+index 57a3695..03a9f9b 100644
+--- a/Makefile
++++ b/Makefile
+@@ -696,7 +696,6 @@ KBUILD_CFLAGS += $(stackp-flag)
+ 
+ ifeq ($(cc-name),clang)
+ KBUILD_CPPFLAGS += $(call cc-option,-Qunused-arguments,)
+-KBUILD_CPPFLAGS += $(call cc-option,-Wno-unknown-warning-option,)
+ KBUILD_CFLAGS += $(call cc-disable-warning, unused-variable)
+ KBUILD_CFLAGS += $(call cc-disable-warning, format-invalid-specifier)
+ KBUILD_CFLAGS += $(call cc-disable-warning, gnu)
+diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
+index 7c321a6..fb3522f 100644
+--- a/scripts/Makefile.extrawarn
++++ b/scripts/Makefile.extrawarn
+@@ -64,7 +64,6 @@ ifeq ($(cc-name),clang)
+ KBUILD_CFLAGS += $(call cc-disable-warning, initializer-overrides)
+ KBUILD_CFLAGS += $(call cc-disable-warning, unused-value)
+ KBUILD_CFLAGS += $(call cc-disable-warning, format)
+-KBUILD_CFLAGS += $(call cc-disable-warning, unknown-warning-option)
+ KBUILD_CFLAGS += $(call cc-disable-warning, sign-compare)
+ KBUILD_CFLAGS += $(call cc-disable-warning, format-zero-length)
+ KBUILD_CFLAGS += $(call cc-disable-warning, uninitialized)
 -- 
-Best Regards
-Masahiro Yamada
+2.7.4
+
