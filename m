@@ -1,80 +1,86 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg0-f46.google.com ([74.125.83.46]:34581 "EHLO
-        mail-pg0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753294AbdDNAhr (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 13 Apr 2017 20:37:47 -0400
-Received: by mail-pg0-f46.google.com with SMTP id 21so37492325pgg.1
-        for <linux-kbuild@vger.kernel.org>; Thu, 13 Apr 2017 17:37:47 -0700 (PDT)
-Date: Thu, 13 Apr 2017 17:37:45 -0700
-From: Matthias Kaehlcke <mka@chromium.org>
-Subject: Re: [RFC PATCH] kbuild: Fix asm-offset generation to work with clang
-Message-ID: <20170414003745.GI28657@google.com>
-References: <20170403212537.124217-1-mka@chromium.org>
- <CAK7LNATZq8CWNxf_KAk6p4v2ZG6HEd70nxPB8MDWOcR5K5aQsA@mail.gmail.com>
- <20170411180354.GD28657@google.com>
+Received: from terminus.zytor.com ([65.50.211.136]:55345 "EHLO mail.zytor.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1750747AbdDNFfi (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 14 Apr 2017 01:35:38 -0400
+Date: Thu, 13 Apr 2017 22:30:53 -0700
+In-Reply-To: <20170414002335.GH28657@google.com>
+References: <20170317001520.85223-1-md@google.com> <20170317001520.85223-4-md@google.com> <FB827022-C732-432A-8F31-734C88EBF7A4@zytor.com> <20170403230158.GA145051@google.com> <20170413231439.GG28657@google.com> <3b743cf7-3d81-1fd6-b3a9-2f58a3bd8817@zytor.com> <20170414002335.GH28657@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170411180354.GD28657@google.com>
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 8BIT
+Subject: Re: [PATCH 3/7] x86, LLVM: suppress clang warnings about unaligned accesses
+From: hpa@zytor.com
+Message-ID: <D1103AE6-704E-438C-B2D7-7C95DF564EE6@zytor.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Michal Marek <mmarek@suse.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Grant Grundler <grundler@chromium.org>, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>, Behan Webster <behanw@converseincode.com>, Peter Foley <pefoley2@pefoley.com>
+To: Matthias Kaehlcke <mka@chromium.org>
+Cc: Michael Davidson <md@google.com>, Michal Marek <mmarek@suse.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, Shaohua Li <shli@kernel.org>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, x86@kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-El Tue, Apr 11, 2017 at 11:03:54AM -0700 Matthias Kaehlcke ha dit:
+On April 13, 2017 5:23:35 PM PDT, Matthias Kaehlcke <mka@chromium.org> wrote:
+>El Thu, Apr 13, 2017 at 04:55:00PM -0700 H. Peter Anvin ha dit:
+>
+>> On 04/13/17 16:14, Matthias Kaehlcke wrote:
+>> > El Mon, Apr 03, 2017 at 04:01:58PM -0700 Matthias Kaehlcke ha dit:
+>> > 
+>> >> El Fri, Mar 17, 2017 at 04:50:19PM -0700 hpa@zytor.com ha dit:
+>> >>
+>> >>> On March 16, 2017 5:15:16 PM PDT, Michael Davidson
+><md@google.com> wrote:
+>> >>>> Suppress clang warnings about potential unaliged accesses
+>> >>>> to members in packed structs. This gets rid of almost 10,000
+>> >>>> warnings about accesses to the ring 0 stack pointer in the TSS.
+>> >>>>
+>> >>>> Signed-off-by: Michael Davidson <md@google.com>
+>> >>>> ---
+>> >>>> arch/x86/Makefile | 5 +++++
+>> >>>> 1 file changed, 5 insertions(+)
+>> >>>>
+>> >>>> diff --git a/arch/x86/Makefile b/arch/x86/Makefile
+>> >>>> index 894a8d18bf97..7f21703c475d 100644
+>> >>>> --- a/arch/x86/Makefile
+>> >>>> +++ b/arch/x86/Makefile
+>> >>>> @@ -128,6 +128,11 @@ endif
+>> >>>>         KBUILD_CFLAGS += $(call
+>cc-option,-maccumulate-outgoing-args)
+>> >>>> endif
+>> >>>>
+>> >>>> +ifeq ($(cc-name),clang)
+>> >>>> +# Suppress clang warnings about potential unaligned accesses.
+>> >>>> +KBUILD_CFLAGS += $(call cc-disable-warning,
+>address-of-packed-member)
+>> >>>> +endif
+>> >>>> +
+>> >>>> ifdef CONFIG_X86_X32
+>> >>>> 	x32_ld_ok := $(call try-run,\
+>> >>>> 			/bin/echo -e '1: .quad 1b' | \
+>> >>>
+>> >>> Why conditional on clang?
+>> >>
+>> >> My understanding is that this warning is clang specific, it is not
+>> >> listed on https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html
+>> > 
+>> > Actually this warning affects other platforms besides x86
+>> > (e.g. arm64), I'll submit a patch that disables the warning on all
+>> > platforms.
+>> > 
+>> 
+>> Drop the ifeq ($(cc-name),clang).
+>> 
+>> You should assume that if you have to add one of those ifeq's then
+>you
+>> are doing something fundamentally wrong.
+>
+>Thanks, however in the case of the global Makefile it seems we should
+>put it inside the already existing clang section:
+>
+>http://lxr.free-electrons.com/source/Makefile#L692
+>
+>Cheers
+>
+>Matthias
 
-> El Tue, Apr 11, 2017 at 09:01:41PM +0900 Masahiro Yamada ha dit:
-> 
-> > 2017-04-04 6:25 GMT+09:00 Matthias Kaehlcke <mka@chromium.org>:
-> > > When using clang with -no-integerated-as clang will use the gnu
-> > > assembler instead of the integrated assembler. However clang will
-> > > still perform asm error checking before sending the inline assembly
-> > > language to gas.
-> > >
-> > > The generation of asm-offsets from within C code is dependent on gcc's
-> > > blind passing of whatever is in asm() through to gas. Arbirary text is
-> > > passed through which is then modified by a sed script into the
-> > > appropriate .h and .S code. Since the arbitrary text is not valid
-> > > assembly language, clang fails.
-> > >
-> > > This can be fixed by making the arbitrary text into an ASM comment and
-> > > then updating the sed scripts accordingly to work as expected.
-> > >
-> > > This solution works for both gcc and clang.
-> > >
-> > > Based-on-patch-from: Behan Webster <behanw@converseincode.com>
-> > > Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
-> > 
-> > 
-> > 
-> > Could you check Jeroen Hofstee's work for U-Boot?
-> > 
-> > http://patchwork.ozlabs.org/patch/375026/
-> 
-> No I didn't come across it, thanks for the pointer!
-> 
-> > His idea is to use .ascii string
-> > in order to handle this in arch-agnostic way.
-> 
-> Looks good, way cleaner than my proposed solution :)
-> 
-> > If you are happy about this idea,
-> > I can forward his patch (with a little bit adjustment).
-> 
-> With forward you mean you plan to port it? Otherwise I'm also happy to
-> give it a go, just let me know.
-> 
-> > We may want to refactor the patch because
-> > the double mark ".ascii" and "->" seem redundant,
-> > but it is just a detail.
-> 
-> Agree, since we are already touching this part we might as well remove
-> the "->".
-
-Thinking about it a bit more it seems safer to keep the "->" since
-the input file might contain actual ".ascii" directives.
-
-Cheers
-
-Matthias
+We shouldn't, unless it will actively break non-clang builds...
+-- 
+Sent from my Android device with K-9 Mail. Please excuse my brevity.
