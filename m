@@ -1,27 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:50186 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1754768AbdDRJ76 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 18 Apr 2017 05:59:58 -0400
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20170403194636.96438-1-mka@chromium.org>
-References: <20170403194636.96438-1-mka@chromium.org>
-Subject: Re: [PATCH] frv: Use OFFSET macro in DEF_*REG()
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:28736 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1757105AbdDRKOp (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 18 Apr 2017 06:14:45 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <28526.1492509596.1@warthog.procyon.org.uk>
-Date: Tue, 18 Apr 2017 10:59:56 +0100
-Message-ID: <28527.1492509596@warthog.procyon.org.uk>
+In-Reply-To: <28527.1492509596@warthog.procyon.org.uk>
+References: <20170403194636.96438-1-mka@chromium.org> <28527.1492509596@warthog.procyon.org.uk>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Tue, 18 Apr 2017 19:14:38 +0900
+Message-ID: <CAK7LNAT67VSGqCtXfAgHvrQ1c8GCDts7LHBmYD1oann-BK_T0A@mail.gmail.com>
+Subject: Re: [PATCH] frv: Use OFFSET macro in DEF_*REG()
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Matthias Kaehlcke <mka@chromium.org>
-Cc: dhowells@redhat.com, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: David Howells <dhowells@redhat.com>
+Cc: Matthias Kaehlcke <mka@chromium.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-Matthias Kaehlcke <mka@chromium.org> wrote:
+Hi David,
 
-> Avoid code duplication by using OFFSET() in DEF_*REG() instead of
-> replicating the macro.
-> 
-> Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+2017-04-18 18:59 GMT+09:00 David Howells <dhowells@redhat.com>:
+> Matthias Kaehlcke <mka@chromium.org> wrote:
+>
+>> Avoid code duplication by using OFFSET() in DEF_*REG() instead of
+>> replicating the macro.
+>>
+>> Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+>
+> Reviewed-by: David Howells <dhowells@redhat.com>
 
-Reviewed-by: David Howells <dhowells@redhat.com>
+
+Ah, I've just noticed you are the last frv maintainer,
+and now the frv is orphan.
+
+So, I will pick up this patch to the kbuild tree.
+
+Thanks!
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
