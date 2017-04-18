@@ -1,45 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:47904 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1756019AbdDRI0e (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 18 Apr 2017 04:26:34 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:43498 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1756336AbdDRJ54 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 18 Apr 2017 05:57:56 -0400
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <1492149003-19136-2-git-send-email-yamada.masahiro@socionext.com>
+References: <1492149003-19136-2-git-send-email-yamada.masahiro@socionext.com> <1492149003-19136-1-git-send-email-yamada.masahiro@socionext.com>
+Subject: Re: [PATCH 1/2] kbuild: consolidate redundant sed script ASM offset generation
 MIME-Version: 1.0
-In-Reply-To: <20170417203518.GP28657@google.com>
-References: <20170403194636.96438-1-mka@chromium.org> <20170417203518.GP28657@google.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 18 Apr 2017 17:26:14 +0900
-Message-ID: <CAK7LNAQu1p_Vi72WrebxB9M2qwh6OupQxC2-ueCTFAoz7TO_5w@mail.gmail.com>
-Subject: Re: [PATCH] frv: Use OFFSET macro in DEF_*REG()
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <28459.1492509473.1@warthog.procyon.org.uk>
+Date: Tue, 18 Apr 2017 10:57:53 +0100
+Message-ID: <28460.1492509473@warthog.procyon.org.uk>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Matthias Kaehlcke <mka@chromium.org>
-Cc: David Howells <dhowells@redhat.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: dhowells@redhat.com, linux-kbuild@vger.kernel.org, Matthias Kaehlcke <mka@chromium.org>, Michael Davidson <md@google.com>, Michal Marek <mmarek@suse.com>, Jan Beulich <JBeulich@novell.com>, Alexander van Heukelum <heukelum@fastmail.fm>, linux-kernel@vger.kernel.org
 
-2017-04-18 5:35 GMT+09:00 Matthias Kaehlcke <mka@chromium.org>:
-> El Mon, Apr 03, 2017 at 12:46:36PM -0700 Matthias Kaehlcke ha dit:
->
->> Avoid code duplication by using OFFSET() in DEF_*REG() instead of
->> replicating the macro.
->>
->> Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
->
-> Ping, any feedback on this patch?
->
-> Thanks
->
-> Matthias
+Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
 
-If this is not picked up via frv tree,
-I will apply it to kbuild tree.
+> This part ended up in redundant code after touched by multiple
+> people.
+> 
+> [1] Commit 3234282f33b2 ("x86, asm: Fix CFI macro invocations to
+> deal with shortcomings in gas") added parentheses for defined
+> expressions to support old gas for x86.
+> 
+> [2] Commit a22dcdb0032c ("x86, asm: Fix ancient-GAS workaround")
+> split the pattern into two to avoid parentheses for non-numeric
+> expressions.
+> 
+> [3] Commit 95a2f6f72d37 ("Partially revert patch that encloses
+> asm-offset.h numbers in brackets") removed parentheses from numeric
+> expressions as well because parentheses in MN10300 assembly have a
+> special meaning (pointer access).
+> 
+> Apparently, there is a conflict between [1] and [3].  After all,
+> [3] took precedence, and a long time has passed since then.
 
-(frv does not seem very active these days.)
+There's a conflict between [1] and various assembly code formats.  Some
+formats define, say,
 
-Let's wait a bit and see if we get a response.
+	mov	4,r1
 
+to move the number 4 into register r1, and:
 
+	mov	(4),r1
 
--- 
-Best Regards
-Masahiro Yamada
+to move the contents of the memory at address 4 into r1.  Therefore, you
+cannot simply wrap numeric operands in brackets.  What might work is adding a
+'+' on the front, e.g.:
+
+	mov	+(4),r1
+
+David
