@@ -1,47 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi0-f52.google.com ([209.85.218.52]:36095 "EHLO
-        mail-oi0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S971281AbdDTSEI (ORCPT
+Received: from mail-io0-f175.google.com ([209.85.223.175]:33296 "EHLO
+        mail-io0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S947198AbdDTTmp (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 20 Apr 2017 14:04:08 -0400
-Received: by mail-oi0-f52.google.com with SMTP id r203so60853902oib.3
-        for <linux-kbuild@vger.kernel.org>; Thu, 20 Apr 2017 11:04:08 -0700 (PDT)
-Date: Thu, 20 Apr 2017 11:04:06 -0700
+        Thu, 20 Apr 2017 15:42:45 -0400
+Received: by mail-io0-f175.google.com with SMTP id k87so84139139ioi.0
+        for <linux-kbuild@vger.kernel.org>; Thu, 20 Apr 2017 12:42:45 -0700 (PDT)
 From: Matthias Kaehlcke <mka@chromium.org>
-Subject: Re: [PATCH v3] kbuild: Add support to generate LLVM bitcode files
-Message-ID: <20170420180406.GI128305@google.com>
-References: <20170404172706.171971-1-mka@chromium.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20170404172706.171971-1-mka@chromium.org>
+Subject: [PATCH RESEND] Makefile, LLVM: add -no-integrated-as to KBUILD_[AC]FLAGS
+Date: Thu, 20 Apr 2017 12:42:00 -0700
+Message-Id: <20170420194200.108884-1-mka@chromium.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, Emese Revfy <re.emese@gmail.com>, Kees Cook <keescook@chromium.org>, Behan Webster <behanw@converseincode.com>, "Luis R . Rodriguez" <mcgrof@kernel.org>, =?utf-8?B?Vmluw61jaXVz?= Tinti <viniciustinti@gmail.com>, Kyeongmin Cho <korea.drzix@gmail.com>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Grant Grundler <grundler@chromium.org>, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>, Peter Foley <pefoley2@pefoley.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Grant Grundler <grundler@chromium.org>, Greg Hackmann <ghackmann@google.com>, Michael Davidson <md@google.com>, Matthias Kaehlcke <mka@chromium.org>
 
-El Tue, Apr 04, 2017 at 10:27:06AM -0700 Matthias Kaehlcke ha dit:
+From: Michael Davidson <md@google.com>
 
-> From: Vinícius Tinti <viniciustinti@gmail.com>
-> 
-> Add rules to kbuild in order to generate LLVM bitcode files with the .ll
-> extension when using clang.
-> 
->   # from c code
->   CC=clang make kernel/pid.ll
-> 
->   # from asm code
->   CC=clang make arch/x86/kernel/preempt.ll
-> 
-> From: Vinícius Tinti <viniciustinti@gmail.com>
-> Signed-off-by: Vinícius Tinti <viniciustinti@gmail.com>
-> Signed-off-by: Behan Webster <behanw@converseincode.com>
-> Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
-> ---
+Add -no-integrated-as to KBUILD_AFLAGS and KBUILD_CFLAGS
+for clang.
 
-Ping, any comments on this patch?
+Signed-off-by: Michael Davidson <md@google.com>
+Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+---
+ Makefile | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Thanks
+diff --git a/Makefile b/Makefile
+index 5039b9148d15..3832c8243334 100644
+--- a/Makefile
++++ b/Makefile
+@@ -710,6 +710,8 @@ KBUILD_CFLAGS += $(call cc-disable-warning, tautological-compare)
+ # See modpost pattern 2
+ KBUILD_CFLAGS += $(call cc-option, -mno-global-merge,)
+ KBUILD_CFLAGS += $(call cc-option, -fcatch-undefined-behavior)
++KBUILD_CFLAGS += $(call cc-option, -no-integrated-as)
++KBUILD_AFLAGS += $(call cc-option, -no-integrated-as)
+ else
+ 
+ # These warnings generated too much noise in a regular build.
+-- 
+2.12.2.816.g2cccc81164-goog
 
-Matthias
