@@ -1,29 +1,22 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-it0-f43.google.com ([209.85.214.43]:38492 "EHLO
-        mail-it0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1423383AbdDUVkt (ORCPT
+Received: from mail.forsterkozpont.hu ([84.206.26.125]:37725 "EHLO
+        mail.forsterkozpont.hu" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1426503AbdDUXLq (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 21 Apr 2017 17:40:49 -0400
-Received: by mail-it0-f43.google.com with SMTP id e132so1324990ite.1
-        for <linux-kbuild@vger.kernel.org>; Fri, 21 Apr 2017 14:40:49 -0700 (PDT)
-From: Matthias Kaehlcke <mka@chromium.org>
-Subject: [PATCH 0/2] kbuild: clang: Disable spurious warnings
-Date: Fri, 21 Apr 2017 14:39:29 -0700
-Message-Id: <20170421213931.155210-1-mka@chromium.org>
+        Fri, 21 Apr 2017 19:11:46 -0400
+Date: Fri, 21 Apr 2017 18:59:33 +0200 (CEST)
+From: "Mr.Jerry Smith" <laszlo.cserhalmi@forsterkozpont.hu>
+Reply-To: "jerryfunds11@inbox.lv" <jerryfunds11@inbox.lv>
+Message-ID: <1904914428.4809911.1492793973278.JavaMail.zimbra@forsterkozpont.hu>
+Subject: 
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Grant Grundler <grundler@chromium.org>, Greg Hackmann <ghackmann@google.com>, Michael Davidson <md@google.com>, Matthias Kaehlcke <mka@chromium.org>
 
-Disable two clang warnings that generate a lot of noise.
 
-Matthias Kaehlcke (2):
-  kbuild: clang: Disable 'address-of-packed-member' warning
-  kbuild: clang: Disable the 'duplicate-decl-specifier' warning
 
- Makefile | 2 ++
- 1 file changed, 2 insertions(+)
+We Give Out Loans At 3% Interest Rate And We Offer Loans From $5,000 To $50,000,000.00, Are You Looking To Buy A House Car Or Company Or Start Up A Truck Company or Buy A Truck Or Personal Loans Or Business Loan, Email Us At jerryfunds11@inbox.lv  With Amount Needed And Phone Number.
 
--- 
-2.12.2.816.g2cccc81164-goog
 
