@@ -1,51 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-io0-f196.google.com ([209.85.223.196]:34905 "EHLO
-        mail-io0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1425337AbdDUTkG (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 21 Apr 2017 15:40:06 -0400
+Received: from mx2.suse.de ([195.135.220.15]:58568 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1425683AbdDUTw6 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 21 Apr 2017 15:52:58 -0400
+Subject: Re: [RFC-b PATCH] kbuild: redefine __FILE__ as relative path from
+ $(srctree) if possible
+References: <1492803404-17837-1-git-send-email-yamada.masahiro@socionext.com>
+From: Michal Marek <mmarek@suse.com>
+Message-ID: <0f175fe5-6036-b06a-db90-6fd05ece7102@suse.com>
+Date: Fri, 21 Apr 2017 21:52:54 +0200
 MIME-Version: 1.0
-In-Reply-To: <1492801407-26823-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1492801407-26823-1-git-send-email-yamada.masahiro@socionext.com>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Fri, 21 Apr 2017 21:40:04 +0200
-Message-ID: <CAMuHMdXnVucvnojMzqumvTOn=QwdDpr8FdfykjJHhtdGzO_Cyw@mail.gmail.com>
-Subject: Re: [RFC PATCH 0/2] kbuild: use relative path from $(srctree) instead
- of __FILE__
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <1492803404-17837-1-git-send-email-yamada.masahiro@socionext.com>
+Content-Type: text/plain; charset=iso-8859-2
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, Greg KH <gregkh@linuxfoundation.org>, the arch/x86 maintainers <x86@kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Michal Marek <mmarek@suse.com>, Andrew Morton <akpm@linux-foundation.org>, Sam Ravnborg <sam@ravnborg.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
+Cc: Andrew Morton <akpm@linux-foundation.org>, Greg KH <gregkh@linuxfoundation.org>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, x86@kernel.org, Sam Ravnborg <sam@ravnborg.org>, Linus Torvalds <torvalds@linux-foundation.org>
 
-Hi Yamada-san,
+Dne 21.4.2017 v 21:36 Masahiro Yamada napsal(a):
+> Since Kbuild runs in the objtree, __FILE__ can be a very long path
+> depending of $(srctree).
+> 
+> Commit 9da0763bdd82 ("kbuild: Use relative path when building in a
+> subdir of the source tree") made the situation better for cases
+> where objtree is a child of srctree.  ($(srctree) is "..")
+> 
+> For other cases of out-of-tree build, filenames in WARN_ON() etc.
+> are still an absolute path.  It also means the kernel image depends
+> on where it was built.
+> 
+> Here, the idea is to redefine __FILE__ as the relative path from
+> $(srctree), but doing so causes a compiler warning:
+>   warning: "__FILE__" redefined [-Wbuiltin-macro-redefined]
+> 
+> We can suppress it with -Wno-builtin-macro-redefined.  However,
+> this option is not recognized by old compilers.  So, __FILE__
+> is re-defined only when the option is supported.
 
-On Fri, Apr 21, 2017 at 9:03 PM, Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
-> Kbuild works in objtree, not in srctree.  So, __FILE__ is prefixed
-> with $(srctree)/ for out-of-tree build.
->
-> It would be nice to see the same log regardless
-> in-tree, or out-of-tree build.
->
-> 1/2 adds a new macro KBUILD_FILE.  This points the relative path
-> of the file we are building.  This is intended to replace __FILE__.
->
-> 2/2 replaces __FILE__ in bug.h as an example.  This will improve
-> the output of WARN_ON() etc.
+I actually like the KBUILD_FILE approach more, even if it means patching
+various users.
 
-I haven't tried your series, but I love the idea behind it!
-I never liked exposing full file paths in kernel images.
 
-Thanks!
+> Please note __FILE__ is always an absolute path for external
+> modules.  We can strip KBUILD_EXTMOD from the path if we want,
+> but I am not doing that.  It would make it difficult to figure out
+> the module in question in case of WARN_ON().
 
-Gr{oetje,eeting}s,
+Agreed. OOT modules are potential source of trouble, so let them stand out.
 
-                        Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+Michal
