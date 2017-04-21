@@ -1,93 +1,93 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi0-f47.google.com ([209.85.218.47]:34344 "EHLO
-        mail-oi0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1042006AbdDUSfK (ORCPT
+Received: from conuserg-09.nifty.com ([210.131.2.76]:26373 "EHLO
+        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1424504AbdDUTGT (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 21 Apr 2017 14:35:10 -0400
-Received: by mail-oi0-f47.google.com with SMTP id x184so107670786oia.1
-        for <linux-kbuild@vger.kernel.org>; Fri, 21 Apr 2017 11:35:10 -0700 (PDT)
-Date: Fri, 21 Apr 2017 10:27:52 -0700
-From: Matthias Kaehlcke <mka@chromium.org>
-Subject: Re: [PATCH v2] kbuild: Add better clang cross build support
-Message-ID: <20170421172752.GK128305@google.com>
-References: <20170410210904.68211-1-mka@chromium.org>
- <CAK7LNASiT1u218kOAXuc9Ai4oeFZBzxrdhBNUYHnYWF_eFTB6w@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAK7LNASiT1u218kOAXuc9Ai4oeFZBzxrdhBNUYHnYWF_eFTB6w@mail.gmail.com>
+        Fri, 21 Apr 2017 15:06:19 -0400
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [RFC PATCH 1/2] kbuild: add KBUILD_FILE to point relative file path from $(srctree)
+Date: Sat, 22 Apr 2017 04:03:26 +0900
+Message-Id: <1492801407-26823-2-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1492801407-26823-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1492801407-26823-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Behan Webster <behanw@converseincode.com>, Grant Grundler <grundler@chromium.org>, Greg Hackmann <ghackmann@google.com>, Michael Davidson <md@google.com>, Peter Foley <pefoley2@pefoley.com>
+To: linux-kbuild@vger.kernel.org
+Cc: Andrew Morton <akpm@linux-foundation.org>, Greg KH <gregkh@linuxfoundation.org>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, x86@kernel.org, Michal Marek <mmarek@suse.com>, Sam Ravnborg <sam@ravnborg.org>, Linus Torvalds <torvalds@linux-foundation.org>, Masahiro Yamada <yamada.masahiro@socionext.com>
 
-Hi Masahiro,
+Since Kbuild runs in the objtree, __FILE__ can be a very long path
+depending of $(srctree).
 
-Thanks for your comments.
+Commit 9da0763bdd82 ("kbuild: Use relative path when building in a
+subdir of the source tree") made the situation better for cases
+where objtree is a child of srctree.  ($(srctree) is "..")
 
-El Fri, Apr 21, 2017 at 05:24:31PM +0900 Masahiro Yamada ha dit:
+For other cases of out-of-tree build, filenames in WARN_ON() etc.
+are still an absolute path.  It also means the kernel image depends
+on where it was built.
 
-> 2017-04-11 6:09 GMT+09:00 Matthias Kaehlcke <mka@chromium.org>:
-> 
-> 
-> > COMPILER is previously set to "clang" if CC=clang was set from the
-> > make command line.  So -target and -gcc-toolchain can be added to CC,
-> > since we already know that it is set.
-> 
-> Can you reword or delete this paragraph?
-> I think this is confusing because COMPILER was replaced with cc-name
-> by commit 5631d9c4.
+Here, the idea is to define a new macro, KBUILD_FILE, to point the
+relative file path from $(srctree).
 
-Ok, I think not much is lost by deleting it.
+If we replace __FILE__ with KBUILD_FILE, we can rip off the path
+to the build directory.
 
-<snip>
+I am adding stringify helper because '"..."' wrapping is the same
+pattern for KBUILD_BASENAME, KBUILD_MODNAME, and KBUILD_FILE.
 
-> > -KBUILD_CPPFLAGS := -D__KERNEL__
-> > +KBUILD_CPPFLAGS := -D__KERNEL__ $(CLANG_FLAGS)
-> >
-> >  KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
-> >                    -fno-strict-aliasing -fno-common \
-> >                    -Werror-implicit-function-declaration \
-> >                    -Wno-format-security \
-> > -                  -std=gnu89 $(call cc-option,-fno-PIE)
-> > -
-> > +                  -std=gnu89 $(call cc-option,-fno-PIE) \
-> > +                  $(CLANG_FLAGS)
-> >
-> >  KBUILD_AFLAGS_KERNEL :=
-> >  KBUILD_CFLAGS_KERNEL :=
-> > -KBUILD_AFLAGS   := -D__ASSEMBLY__ $(call cc-option,-fno-PIE)
-> > +KBUILD_AFLAGS   := -D__ASSEMBLY__ $(call cc-option,-fno-PIE) $(CLANG_FLAGS)
-> 
-> 
-> This adds multiple -gcc-toolchain because both KBUILD_CPPFLAGS and KBUILD_CFLAGS
-> are added to c_flags.   See scripts/Makefile.lib
-> 
-> orig_c_flags   = $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS) $(KBUILD_SUBDIR_CCFLAGS) \
->                  $(ccflags-y) $(CFLAGS_$(basetarget).o)
-> 
-> 
-> Pre-processing is related to the front-end part,
-> so -target and -gcc-toolchain are not necessary for KBUILD_CPPFLAGS?
-> 
-> Maybe, adding it to KBUILD_CFLAGS and KBUILD_AFLAGS could be enough?
+Please note KBUILD_FILE is still an absolute path for external
+modules.  We can strip KBUILD_EXTMOD from the path if we want,
+but I am not doing that.  It would make it difficult to figure out
+the module in question in case of WARN_ON().
 
-Indeed it seems it is not needed in KBUILD_CPPFLAGS, at least I
-encountered no issues in a x86 and arm64 build.
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
-> Is it possible to move these to around line 700?
-> 
-> ifeq ($(cc-name),clang)
->    < add here ? >
-> KBUILD_CPPFLAGS += $(call cc-option,-Qunused-arguments,)
-> KBUILD_CPPFLAGS += $(call cc-option,-Wno-unknown-warning-option,)
-> 
-> I do not want to sprinkle ugly ifeq ($(cc-name,clang).
+ scripts/Kbuild.include | 4 ++++
+ scripts/Makefile.lib   | 5 +++--
+ 2 files changed, 7 insertions(+), 2 deletions(-)
 
-I agree, better concentrate clang specific stuff when possible.
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index 61f87a9..7fc3841 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -31,6 +31,10 @@ baseprereq = $(basename $(notdir $<))
+ escsq = $(subst $(squote),'\$(squote)',$1)
+ 
+ ###
++# Quote a string to pass it to C files. foo => '"foo"'
++stringify = $(squote)$(quote)$1$(quote)$(squote)
++
++###
+ # Easy method for doing a status message
+        kecho := :
+  quiet_kecho := echo
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index 9e70196..f8dce56 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -96,10 +96,11 @@ obj-dirs	:= $(addprefix $(obj)/,$(obj-dirs))
+ # Note: Files that end up in two or more modules are compiled without the
+ #       KBUILD_MODNAME definition. The reason is that any made-up name would
+ #       differ in different configs.
+-name-fix = $(squote)$(quote)$(subst $(comma),_,$(subst -,_,$1))$(quote)$(squote)
++name-fix = $(call stringify,$(subst $(comma),_,$(subst -,_,$1)))
+ basename_flags = -DKBUILD_BASENAME=$(call name-fix,$(basetarget))
+ modname_flags  = $(if $(filter 1,$(words $(modname))),\
+                  -DKBUILD_MODNAME=$(call name-fix,$(modname)))
++filepath_flags = -DKBUILD_FILE=$(call stringify,$(src)/$(notdir $<))
+ 
+ orig_c_flags   = $(KBUILD_CPPFLAGS) $(KBUILD_CFLAGS) $(KBUILD_SUBDIR_CCFLAGS) \
+                  $(ccflags-y) $(CFLAGS_$(basetarget).o)
+@@ -163,7 +164,7 @@ endif
+ 
+ c_flags        = -Wp,-MD,$(depfile) $(NOSTDINC_FLAGS) $(LINUXINCLUDE)     \
+ 		 $(__c_flags) $(modkern_cflags)                           \
+-		 $(basename_flags) $(modname_flags)
++		 $(basename_flags) $(modname_flags) $(filepath_flags)
+ 
+ a_flags        = -Wp,-MD,$(depfile) $(NOSTDINC_FLAGS) $(LINUXINCLUDE)     \
+ 		 $(__a_flags) $(modkern_aflags)
+-- 
+2.7.4
 
-I'll rework the patch and send out an update shortly.
-
-Cheers
-
-Matthias
