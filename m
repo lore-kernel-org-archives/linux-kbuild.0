@@ -1,103 +1,124 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-io0-f179.google.com ([209.85.223.179]:34003 "EHLO
-        mail-io0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1425657AbdDUTzG (ORCPT
+Received: from mail-oi0-f65.google.com ([209.85.218.65]:35051 "EHLO
+        mail-oi0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1161400AbdDUUzk (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 21 Apr 2017 15:55:06 -0400
-Received: by mail-io0-f179.google.com with SMTP id a103so132659273ioj.1
-        for <linux-kbuild@vger.kernel.org>; Fri, 21 Apr 2017 12:55:06 -0700 (PDT)
-Date: Fri, 21 Apr 2017 12:55:02 -0700
-From: Matthias Kaehlcke <mka@chromium.org>
-Subject: Re: [PATCH v3] kbuild: Add support to generate LLVM bitcode files
-Message-ID: <20170421195502.GL128305@google.com>
-References: <20170404172706.171971-1-mka@chromium.org>
- <CAK7LNASfCFW4KZ72rYXQTpYFGf+KJcjK+L8wvHtiHmXNVYRtwg@mail.gmail.com>
+        Fri, 21 Apr 2017 16:55:40 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAK7LNASfCFW4KZ72rYXQTpYFGf+KJcjK+L8wvHtiHmXNVYRtwg@mail.gmail.com>
+In-Reply-To: <CAGXu5jLTR+dY_Ayyix5Tg0Yn9LBFAt=j56MQVdJVGue-R-CizA@mail.gmail.com>
+References: <20161216105634.235457-1-arnd@arndb.de> <3302470.IDcDrWa0u6@wuerfel>
+ <CAGXu5jLPRYi+HK=07Zndc8szEKD4mZCqaHJFnHmmoYr7tA1xPw@mail.gmail.com>
+ <CAK8P3a2C2WhWjzF=HrzU15Ncg0juR+nstZukBEpqCrVNW5pnDA@mail.gmail.com> <CAGXu5jLTR+dY_Ayyix5Tg0Yn9LBFAt=j56MQVdJVGue-R-CizA@mail.gmail.com>
+From: Arnd Bergmann <arnd@arndb.de>
+Date: Fri, 21 Apr 2017 22:55:39 +0200
+Message-ID: <CAK8P3a114EVbnhbObfq-4pZp8XCT4fWzMXD+WkRi7iPXs1vFMA@mail.gmail.com>
+Subject: Re: [RFC] minimum gcc version for kernel: raise to gcc-4.3 or 4.6?
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Michal Marek <mmarek@suse.com>, Emese Revfy <re.emese@gmail.com>, Kees Cook <keescook@chromium.org>, Behan Webster <behanw@converseincode.com>, "Luis R . Rodriguez" <mcgrof@kernel.org>, =?utf-8?B?Vmluw61jaXVz?= Tinti <viniciustinti@gmail.com>, Kyeongmin Cho <korea.drzix@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Grant Grundler <grundler@chromium.org>, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>, Peter Foley <pefoley2@pefoley.com>
+To: Kees Cook <keescook@chromium.org>
+Cc: linux-arch <linux-arch@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Russell King <rmk+kernel@armlinux.org.uk>, Andrew Morton <akpm@linux-foundation.org>, kernel-build-reports@lists.linaro.org, kvmarm@lists.cs.columbia.edu
 
-Hi Masahiro,
+On Thu, Apr 20, 2017 at 9:52 PM, Kees Cook <keescook@chromium.org> wrote:
+> On Thu, Apr 20, 2017 at 3:15 AM, Arnd Bergmann <arnd@arndb.de> wrote:
+>> On Sun, Apr 16, 2017 at 9:52 PM, Kees Cook <keescook@chromium.org> wrote:
+>>>>> The original gcc-4.3 release was in early 2008. If we decide to still
+>>>>> support that, we probably want the first 10 quirks in this series,
+>>>>> while gcc-4.6 (released in 2011) requires none of them.
+>>>
+>>> I'd be in support of raising the minimum to gcc 4.6. (I'd actually
+>>> prefer 4.7, just to avoid some 4.6 packaging issues, and for better
+>>> gcc plugin support.)
+>>>
+>>> I'm curious what gcc 4.6 binaries are common in the wild besides
+>>> old-stable Debian (unsupported in maybe a year from now?) and 12.04
+>>> Ubuntu (going fully unsupported in 2 weeks). It looks like 4.6 was
+>>> used only in Fedora 15 and 16 (both EOL).
+>>
+>> I think we are better off defining two versions: One that we know
+>> a lot of people care about, and we actively try to make that work
+>> well in all configurations (e.g. 4.6, 4.7 or 4.8), fixing all warnings
+>> we run into, and an older version that we try not to break
+>> intentionally (e.g. 3.4, 4.1 or 4.3) but that we only fix when
+>> someone actually runs into a problem they can't work around
+>> by upgrading to a more modern compiler.
+>
+> For "working well everywhere" I feel like 4.8 is the better of those
+> three (I'd prefer 4.9). I think we should avoid 4.6 -- it seems not
+> widely used.
 
-El Fri, Apr 21, 2017 at 02:02:46PM +0900 Masahiro Yamada ha dit:
+I suspect that 4.9 might be the one that actually works best
+across architectures, and it contained some very significant
+changes. In my testing gcc-5 tends to behave very similarly
+to 4.9, and gcc-6 introduced a larger number of new warnings,
+so that would clearly be too new for a recommended version.
 
-> 2017-04-05 2:27 GMT+09:00 Matthias Kaehlcke <mka@chromium.org>:
-> > From: Vinícius Tinti <viniciustinti@gmail.com>
-> >
-> > Add rules to kbuild in order to generate LLVM bitcode files with the .ll
-> > extension when using clang.
-> 
-> 
-> First, I'd like to be sure about the terminology "LLVM bitcode"
-> because "bitcode" sounds like human-unreadable binary.
-> 
-> 
-> For example, 'man llvm-as' says:
->     llvm-as  is  the  LLVM  assembler.  It reads a file containing
->     human-readable LLVM assembly language, translates it to LLVM
->     bitcode, and writes the result into a file or to standard output.
-> 
-> 
-> As far as I understood:
-> 
-> *.ll   -  LLVM assembly  (human readable file)
-> *.bc   -  LLVM bitcode   (binary file)
-> 
-> Is this correct?
+The suggestion of 4.9 or higher is appealing as a recommendation
+because it matches what I would personally tell people:
 
-Yes, the terminology should be changed to talk about 'LLVM assembly'.
+- If you have gcc-4.9 or newer and you don't rely on any newer
+  features, there is no need to upgrade
+- Wth gcc-4.8, the -Wmaybe-uninitialized warnings are now turned
+  off because they were too noisy, so upgrading is probably a good
+  idea even though the compiler is otherwise ok and in widespread
+  use
+- gcc-4.6 and 4.7 are basically usable for building kernels, but the
+  warning output is often counterproductive, and the generated
+  object code may be noticeably worse.
+- anything before gcc-4.6 is missing too many features to be
+  useful on ARM, but may still be fine on other architectures.
 
-> >   # from c code
-> >   CC=clang make kernel/pid.ll
-> 
-> This does not work because CC is overridden in the top-level Makefile.
-> It should be
->     make CC=clang kernel/pid.ll
+On the other hand, there is a noticeable difference in compile
+speed, as a 5% slowdown compared to the previous release
+apparently is not considered a regression. These are the times
+I see for building ARM 'vexpress_defconfig':
 
-Will change
+gcc-4.4: real 0m47.269s user 11m48.576s
+gcc-4.5: real 0m44.878s user 10m58.900s
+gcc-4.6: real 0m44.621s user 11m34.716s
+gcc-4.7: real 0m47.476s user 12m42.924s
+gcc-4.8: real 0m48.494s user 13m19.736s
+gcc-4.9: real 0m50.140s user 13m44.876s
+gcc-5.x: real 0m51.302s user 14m05.564s
+gcc-6.x: real 0m54.615s user 15m06.304s
+gcc-7.x: real 0m56.008s user 15m44.720s
 
-> >   # from asm code
-> >   CC=clang make arch/x86/kernel/preempt.ll
-> 
-> arch/x86/kernel/preempt.* does not exist
-> (at least in the latest tree).
-> 
-> 
-> 
-> 
-> > +
-> > +quiet_cmd_as_ll_S = CPP $(quiet_modtag) $@
-> > +      cmd_as_ll_S = $(CPP) $(a_flags)   -o $@ $<
-> > +
-> > +$(obj)/%.ll: $(src)/%.S FORCE
-> > +       $(call if_changed_dep,as_ll_S)
-> > +
-> 
-> I could not understand how this rule can convert
-> architecture-specific assembly to LLVM intermediate expression.
-> 
-> This is just pre-processing *.S file.
-> 
-> 
-> Actually, this is completely the same as the rule *.S -> *.s
-> 
-> quiet_cmd_cpp_s_S = CPP $(quiet_modtag) $@
-> cmd_cpp_s_S       = $(CPP) $(a_flags) -o $@ $<
-> 
-> $(obj)/%.s: $(src)/%.S FORCE
->       $(call if_changed_dep,cpp_s_S)
+That is a factor of 1.5x in CPU cycles between slowest and
+fastest, so there is clearly a benefit to keeping the old versions
+around, but there is also no clear cut-off other thannoticing
+that gcc-4.4 is slower than 4.5 in this particular
+configuration.
 
-Indeed, unsurprisingly the content of a .ll file generated from a .S
-is the same as the corresponding .s.
+> For an old compiler... yikes. 3.4 sounds insane to me. :)
 
-Besides the Makefile rules it isn't clear to me how assembly would be
-converted to LLVM IR. I suggest to remove the rules for assembly.
+That was my initial thought as well. On ARM, it clearly is
+insane, as even gcc-4.0 is unable to build any of the modern
+defconfigs (lacking -mabi=aapcs, ICE when building vsprintf.c)
+and even the patch I did to get gcc-4.1 to build is probably
+too ugly to get merged, so to build any unpatched kernel after
+linux-3.6 you need at least gcc-4.2, or even gcc-4.4 for the
+''defconfig' (gcc-4.3 if you disable vdso).
 
-Cheers
+Then again, on x86, old cmpilers were claimed to be much better
+supported. I just tried it out and found that no x86 defconfig kernel
+since linux-3.2 could be built with gcc-3.4, probably not on any
+other architecture either (it cannot have forward declarations
+for inline functions and we have one in kernel/sched_fair.c).
 
-Matthias
+I think that would be a really good argument for requiring
+something newer ;-)
+
+The linux-4.2 x86 defconfig could still be built with gcc-4.0, but
+later kernels have several minor problems with that, and
+require at least gcc-4.3.
+
+If we are ok with this status quo, we could simply declare gcc-4.3
+the absolute minimum version for the kernel, make gcc-4.9
+the recommeded minimum version, and remove all workarounds
+for gcc-4.2 or older.
+
+If anyone has a good reason for gcc-4.0 through gcc-4.2, then
+we would need a small number of patches to get them back
+working with x86 defconfig.
+
+       Arnd
