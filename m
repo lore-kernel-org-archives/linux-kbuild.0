@@ -1,52 +1,69 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:48761 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1041590AbdDURnq (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 21 Apr 2017 13:43:46 -0400
-From: Jiri Slaby <jslaby@suse.cz>
-Subject: [PATCH 1/1] objtool: make it visible in make V=1 output
-Date: Fri, 21 Apr 2017 17:16:20 +0200
-Message-Id: <20170421151620.14297-1-jslaby@suse.cz>
+Received: from mail-yb0-f176.google.com ([209.85.213.176]:35193 "EHLO
+        mail-yb0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1162329AbdDUSVG (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 21 Apr 2017 14:21:06 -0400
+Received: by mail-yb0-f176.google.com with SMTP id 6so46964923ybq.2
+        for <linux-kbuild@vger.kernel.org>; Fri, 21 Apr 2017 11:21:05 -0700 (PDT)
+From: Matthias Kaehlcke <mka@chromium.org>
+Subject: [PATCH v2] kbuild: Add better clang cross build support
+Date: Fri, 21 Apr 2017 11:20:01 -0700
+Message-Id: <20170421182001.139199-1-mka@chromium.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: yamada.masahiro@socionext.com
-Cc: linux-kernel@vger.kernel.org, Jiri Slaby <jslaby@suse.cz>, Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, Josh Poimboeuf <jpoimboe@redhat.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Behan Webster <behanw@converseincode.com>, Grant Grundler <grundler@chromium.org>, Greg Hackmann <ghackmann@google.com>, Michael Davidson <md@google.com>, Peter Foley <pefoley2@pefoley.com>, Matthias Kaehlcke <mka@chromium.org>
 
-It is currently impossible to see what is going on with objtool when
-building, so call echo-cmd to see the actions:
-  gcc -Wp,-MD,arch/x86/entry/.entry_64.o.d  -nostdinc -isystem ...
-  ./tools/objtool/objtool check "arch/x86/entry/entry_64.o";
+Add cross target to CC if using clang. Also add custom gcc toolchain
+path for fallback gcc tools.
 
-Signed-off-by: Jiri Slaby <jslaby@suse.cz>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Michal Marek <mmarek@suse.com>
-Cc: linux-kbuild@vger.kernel.org
-Cc: Josh Poimboeuf <jpoimboe@redhat.com>
+Clang will fallback to using things like ld, as, and libgcc if
+(respectively) one of the llvm linkers isn't available, the integrated
+assembler is turned off, or an appropriately cross-compiled version of
+compiler-rt isn't available. To this end, you can specify the path to
+this fallback gcc toolchain with GCC_TOOLCHAIN.
+
+From: Behan Webster <behanw@converseincode.com>
+Signed-off-by: Behan Webster <behanw@converseincode.com>
+Reviewed-by: Jan-Simon Möller <dl9pf@gmx.de>
+Reviewed-by: Mark Charlebois <charlebm@gmail.com>
+Signed-off-by: Greg Hackmann <ghackmann@google.com>
+Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
 ---
- scripts/Makefile.build | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Changes in v2:
+- Moved new 'code' into existing ifeq clang block
+- Don't add -target and -gcc-toolchain to KBUILD_CPPFLAGS
+- Removed intermediate CLANG_FLAGS variable
+- Updated commit message, removed paragraph mentioning old COMPILER
+  variable
 
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index d883116ebaa4..dbe0dde80b00 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -272,14 +272,14 @@ define rule_cc_o_c
- 	$(call echo-cmd,checksrc) $(cmd_checksrc)			  \
- 	$(call cmd_and_fixdep,cc_o_c)					  \
- 	$(cmd_modversions_c)						  \
--	$(cmd_objtool)						          \
-+	$(call echo-cmd,objtool) $(cmd_objtool)				  \
- 	$(call echo-cmd,record_mcount) $(cmd_record_mcount)
- endef
+ Makefile | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/Makefile b/Makefile
+index 5039b9148d15..11c00bd3ec0c 100644
+--- a/Makefile
++++ b/Makefile
+@@ -698,6 +698,15 @@ endif
+ KBUILD_CFLAGS += $(stackp-flag)
  
- define rule_as_o_S
- 	$(call cmd_and_fixdep,as_o_S)					  \
- 	$(cmd_modversions_S)						  \
--	$(cmd_objtool)
-+	$(call echo-cmd,objtool) $(cmd_objtool)
- endef
- 
- # List module undefined symbols (or empty line if not enabled)
+ ifeq ($(cc-name),clang)
++ifneq ($(CROSS_COMPILE),)
++CLANG_TARGET	:= -target $(notdir $(CROSS_COMPILE:%-=%))
++GCC_TOOLCHAIN	:= $(realpath $(dir $(shell which $(LD)))/..)
++endif
++ifneq ($(GCC_TOOLCHAIN),)
++CLANG_GCC_TC	:= -gcc-toolchain $(GCC_TOOLCHAIN)
++endif
++KBUILD_CFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC)
++KBUILD_AFLAGS += $(CLANG_TARGET) $(CLANG_GCC_TC)
+ KBUILD_CPPFLAGS += $(call cc-option,-Qunused-arguments,)
+ KBUILD_CPPFLAGS += $(call cc-option,-Wno-unknown-warning-option,)
+ KBUILD_CFLAGS += $(call cc-disable-warning, unused-variable)
 -- 
-2.12.2
+2.12.2.816.g2cccc81164-goog
 
