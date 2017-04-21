@@ -1,52 +1,103 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:58568 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1425683AbdDUTw6 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 21 Apr 2017 15:52:58 -0400
-Subject: Re: [RFC-b PATCH] kbuild: redefine __FILE__ as relative path from
- $(srctree) if possible
-References: <1492803404-17837-1-git-send-email-yamada.masahiro@socionext.com>
-From: Michal Marek <mmarek@suse.com>
-Message-ID: <0f175fe5-6036-b06a-db90-6fd05ece7102@suse.com>
-Date: Fri, 21 Apr 2017 21:52:54 +0200
+Received: from mail-io0-f179.google.com ([209.85.223.179]:34003 "EHLO
+        mail-io0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1425657AbdDUTzG (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 21 Apr 2017 15:55:06 -0400
+Received: by mail-io0-f179.google.com with SMTP id a103so132659273ioj.1
+        for <linux-kbuild@vger.kernel.org>; Fri, 21 Apr 2017 12:55:06 -0700 (PDT)
+Date: Fri, 21 Apr 2017 12:55:02 -0700
+From: Matthias Kaehlcke <mka@chromium.org>
+Subject: Re: [PATCH v3] kbuild: Add support to generate LLVM bitcode files
+Message-ID: <20170421195502.GL128305@google.com>
+References: <20170404172706.171971-1-mka@chromium.org>
+ <CAK7LNASfCFW4KZ72rYXQTpYFGf+KJcjK+L8wvHtiHmXNVYRtwg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1492803404-17837-1-git-send-email-yamada.masahiro@socionext.com>
-Content-Type: text/plain; charset=iso-8859-2
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAK7LNASfCFW4KZ72rYXQTpYFGf+KJcjK+L8wvHtiHmXNVYRtwg@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
-Cc: Andrew Morton <akpm@linux-foundation.org>, Greg KH <gregkh@linuxfoundation.org>, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, x86@kernel.org, Sam Ravnborg <sam@ravnborg.org>, Linus Torvalds <torvalds@linux-foundation.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Michal Marek <mmarek@suse.com>, Emese Revfy <re.emese@gmail.com>, Kees Cook <keescook@chromium.org>, Behan Webster <behanw@converseincode.com>, "Luis R . Rodriguez" <mcgrof@kernel.org>, =?utf-8?B?Vmluw61jaXVz?= Tinti <viniciustinti@gmail.com>, Kyeongmin Cho <korea.drzix@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Grant Grundler <grundler@chromium.org>, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>, Peter Foley <pefoley2@pefoley.com>
 
-Dne 21.4.2017 v 21:36 Masahiro Yamada napsal(a):
-> Since Kbuild runs in the objtree, __FILE__ can be a very long path
-> depending of $(srctree).
+Hi Masahiro,
+
+El Fri, Apr 21, 2017 at 02:02:46PM +0900 Masahiro Yamada ha dit:
+
+> 2017-04-05 2:27 GMT+09:00 Matthias Kaehlcke <mka@chromium.org>:
+> > From: Vinícius Tinti <viniciustinti@gmail.com>
+> >
+> > Add rules to kbuild in order to generate LLVM bitcode files with the .ll
+> > extension when using clang.
 > 
-> Commit 9da0763bdd82 ("kbuild: Use relative path when building in a
-> subdir of the source tree") made the situation better for cases
-> where objtree is a child of srctree.  ($(srctree) is "..")
 > 
-> For other cases of out-of-tree build, filenames in WARN_ON() etc.
-> are still an absolute path.  It also means the kernel image depends
-> on where it was built.
+> First, I'd like to be sure about the terminology "LLVM bitcode"
+> because "bitcode" sounds like human-unreadable binary.
 > 
-> Here, the idea is to redefine __FILE__ as the relative path from
-> $(srctree), but doing so causes a compiler warning:
->   warning: "__FILE__" redefined [-Wbuiltin-macro-redefined]
 > 
-> We can suppress it with -Wno-builtin-macro-redefined.  However,
-> this option is not recognized by old compilers.  So, __FILE__
-> is re-defined only when the option is supported.
+> For example, 'man llvm-as' says:
+>     llvm-as  is  the  LLVM  assembler.  It reads a file containing
+>     human-readable LLVM assembly language, translates it to LLVM
+>     bitcode, and writes the result into a file or to standard output.
+> 
+> 
+> As far as I understood:
+> 
+> *.ll   -  LLVM assembly  (human readable file)
+> *.bc   -  LLVM bitcode   (binary file)
+> 
+> Is this correct?
 
-I actually like the KBUILD_FILE approach more, even if it means patching
-various users.
+Yes, the terminology should be changed to talk about 'LLVM assembly'.
 
+> >   # from c code
+> >   CC=clang make kernel/pid.ll
+> 
+> This does not work because CC is overridden in the top-level Makefile.
+> It should be
+>     make CC=clang kernel/pid.ll
 
-> Please note __FILE__ is always an absolute path for external
-> modules.  We can strip KBUILD_EXTMOD from the path if we want,
-> but I am not doing that.  It would make it difficult to figure out
-> the module in question in case of WARN_ON().
+Will change
 
-Agreed. OOT modules are potential source of trouble, so let them stand out.
+> >   # from asm code
+> >   CC=clang make arch/x86/kernel/preempt.ll
+> 
+> arch/x86/kernel/preempt.* does not exist
+> (at least in the latest tree).
+> 
+> 
+> 
+> 
+> > +
+> > +quiet_cmd_as_ll_S = CPP $(quiet_modtag) $@
+> > +      cmd_as_ll_S = $(CPP) $(a_flags)   -o $@ $<
+> > +
+> > +$(obj)/%.ll: $(src)/%.S FORCE
+> > +       $(call if_changed_dep,as_ll_S)
+> > +
+> 
+> I could not understand how this rule can convert
+> architecture-specific assembly to LLVM intermediate expression.
+> 
+> This is just pre-processing *.S file.
+> 
+> 
+> Actually, this is completely the same as the rule *.S -> *.s
+> 
+> quiet_cmd_cpp_s_S = CPP $(quiet_modtag) $@
+> cmd_cpp_s_S       = $(CPP) $(a_flags) -o $@ $<
+> 
+> $(obj)/%.s: $(src)/%.S FORCE
+>       $(call if_changed_dep,cpp_s_S)
 
-Michal
+Indeed, unsurprisingly the content of a .ll file generated from a .S
+is the same as the corresponding .s.
+
+Besides the Makefile rules it isn't clear to me how assembly would be
+converted to LLVM IR. I suggest to remove the rules for assembly.
+
+Cheers
+
+Matthias
