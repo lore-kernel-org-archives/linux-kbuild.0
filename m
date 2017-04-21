@@ -1,56 +1,100 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-io0-f170.google.com ([209.85.223.170]:35510 "EHLO
-        mail-io0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1031601AbdDTTwV (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:42500 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1035213AbdDUFCw (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 20 Apr 2017 15:52:21 -0400
-Received: by mail-io0-f170.google.com with SMTP id r16so80839780ioi.2
-        for <linux-kbuild@vger.kernel.org>; Thu, 20 Apr 2017 12:52:21 -0700 (PDT)
+        Fri, 21 Apr 2017 01:02:52 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAK8P3a2C2WhWjzF=HrzU15Ncg0juR+nstZukBEpqCrVNW5pnDA@mail.gmail.com>
-References: <20161216105634.235457-1-arnd@arndb.de> <3302470.IDcDrWa0u6@wuerfel>
- <CAGXu5jLPRYi+HK=07Zndc8szEKD4mZCqaHJFnHmmoYr7tA1xPw@mail.gmail.com> <CAK8P3a2C2WhWjzF=HrzU15Ncg0juR+nstZukBEpqCrVNW5pnDA@mail.gmail.com>
-From: Kees Cook <keescook@chromium.org>
-Date: Thu, 20 Apr 2017 12:52:18 -0700
-Message-ID: <CAGXu5jLTR+dY_Ayyix5Tg0Yn9LBFAt=j56MQVdJVGue-R-CizA@mail.gmail.com>
-Subject: Re: [RFC] minimum gcc version for kernel: raise to gcc-4.3 or 4.6?
+In-Reply-To: <20170404172706.171971-1-mka@chromium.org>
+References: <20170404172706.171971-1-mka@chromium.org>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Fri, 21 Apr 2017 14:02:46 +0900
+Message-ID: <CAK7LNASfCFW4KZ72rYXQTpYFGf+KJcjK+L8wvHtiHmXNVYRtwg@mail.gmail.com>
+Subject: Re: [PATCH v3] kbuild: Add support to generate LLVM bitcode files
 Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: linux-arch <linux-arch@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Russell King <rmk+kernel@armlinux.org.uk>, Andrew Morton <akpm@linux-foundation.org>, kernel-build-reports@lists.linaro.org, kvmarm@lists.cs.columbia.edu
+To: Matthias Kaehlcke <mka@chromium.org>
+Cc: Michal Marek <mmarek@suse.com>, Emese Revfy <re.emese@gmail.com>, Kees Cook <keescook@chromium.org>, Behan Webster <behanw@converseincode.com>, "Luis R . Rodriguez" <mcgrof@kernel.org>, =?UTF-8?Q?Vin=C3=ADcius_Tinti?= <viniciustinti@gmail.com>, Kyeongmin Cho <korea.drzix@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Grant Grundler <grundler@chromium.org>, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>, Peter Foley <pefoley2@pefoley.com>
 
-On Thu, Apr 20, 2017 at 3:15 AM, Arnd Bergmann <arnd@arndb.de> wrote:
-> On Sun, Apr 16, 2017 at 9:52 PM, Kees Cook <keescook@chromium.org> wrote:
->>>> The original gcc-4.3 release was in early 2008. If we decide to still
->>>> support that, we probably want the first 10 quirks in this series,
->>>> while gcc-4.6 (released in 2011) requires none of them.
->>
->> I'd be in support of raising the minimum to gcc 4.6. (I'd actually
->> prefer 4.7, just to avoid some 4.6 packaging issues, and for better
->> gcc plugin support.)
->>
->> I'm curious what gcc 4.6 binaries are common in the wild besides
->> old-stable Debian (unsupported in maybe a year from now?) and 12.04
->> Ubuntu (going fully unsupported in 2 weeks). It looks like 4.6 was
->> used only in Fedora 15 and 16 (both EOL).
+Hi Matthias,
+
+
+2017-04-05 2:27 GMT+09:00 Matthias Kaehlcke <mka@chromium.org>:
+> From: Vin=C3=ADcius Tinti <viniciustinti@gmail.com>
 >
-> I think we are better off defining two versions: One that we know
-> a lot of people care about, and we actively try to make that work
-> well in all configurations (e.g. 4.6, 4.7 or 4.8), fixing all warnings
-> we run into, and an older version that we try not to break
-> intentionally (e.g. 3.4, 4.1 or 4.3) but that we only fix when
-> someone actually runs into a problem they can't work around
-> by upgrading to a more modern compiler.
+> Add rules to kbuild in order to generate LLVM bitcode files with the .ll
+> extension when using clang.
 
-For "working well everywhere" I feel like 4.8 is the better of those
-three (I'd prefer 4.9). I think we should avoid 4.6 -- it seems not
-widely used.
 
-For an old compiler... yikes. 3.4 sounds insane to me. :)
+First, I'd like to be sure about the terminology "LLVM bitcode"
+because "bitcode" sounds like human-unreadable binary.
 
--Kees
 
--- 
-Kees Cook
-Pixel Security
+For example, 'man llvm-as' says:
+    llvm-as  is  the  LLVM  assembler.  It reads a file containing
+    human-readable LLVM assembly language, translates it to LLVM
+    bitcode, and writes the result into a file or to standard output.
+
+
+As far as I understood:
+
+*.ll   -  LLVM assembly  (human readable file)
+*.bc   -  LLVM bitcode   (binary file)
+
+Is this correct?
+
+
+
+
+
+
+>   # from c code
+>   CC=3Dclang make kernel/pid.ll
+
+This does not work because CC is overridden in the top-level Makefile.
+It should be
+    make CC=3Dclang kernel/pid.ll
+
+
+
+
+>   # from asm code
+>   CC=3Dclang make arch/x86/kernel/preempt.ll
+
+arch/x86/kernel/preempt.* does not exist
+(at least in the latest tree).
+
+
+
+
+> +
+> +quiet_cmd_as_ll_S =3D CPP $(quiet_modtag) $@
+> +      cmd_as_ll_S =3D $(CPP) $(a_flags)   -o $@ $<
+> +
+> +$(obj)/%.ll: $(src)/%.S FORCE
+> +       $(call if_changed_dep,as_ll_S)
+> +
+
+I could not understand how this rule can convert
+architecture-specific assembly to LLVM intermediate expression.
+
+This is just pre-processing *.S file.
+
+
+Actually, this is completely the same as the rule *.S -> *.s
+
+quiet_cmd_cpp_s_S =3D CPP $(quiet_modtag) $@
+cmd_cpp_s_S       =3D $(CPP) $(a_flags) -o $@ $<
+
+$(obj)/%.s: $(src)/%.S FORCE
+      $(call if_changed_dep,cpp_s_S)
+
+
+
+
+
+--=20
+Best Regards
+Masahiro Yamada
