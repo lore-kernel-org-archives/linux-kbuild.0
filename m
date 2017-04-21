@@ -1,83 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:20815 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1037512AbdDUJ5U (ORCPT
+Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:46871 "EHLO
+        shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1041363AbdDUQjc (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 21 Apr 2017 05:57:20 -0400
-Received: from mail-yw0-f175.google.com (mail-yw0-f175.google.com [209.85.161.175]) (authenticated)
-        by conssluserg-05.nifty.com with ESMTP id v3L9v7Tx004781
-        for <linux-kbuild@vger.kernel.org>; Fri, 21 Apr 2017 18:57:08 +0900
-Received: by mail-yw0-f175.google.com with SMTP id k11so4341070ywb.1
-        for <linux-kbuild@vger.kernel.org>; Fri, 21 Apr 2017 02:57:08 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <CAAqcGHk80P4tKFn+j5n6M=77XaDFkc_e30RZ04+MmMf=qJDyzw@mail.gmail.com>
-References: <20170331130941.5250-1-riku.voipio@linaro.org> <20170331130941.5250-4-riku.voipio@linaro.org>
- <CAK7LNAQT8pSjgW5ujnWWP3MKfU0=XnFKWVeNu-fx5NRRX0XgMg@mail.gmail.com> <CAAqcGHk80P4tKFn+j5n6M=77XaDFkc_e30RZ04+MmMf=qJDyzw@mail.gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 21 Apr 2017 18:57:06 +0900
-Message-ID: <CAK7LNAQ5V-B+Os2WZZb3H6hqCOsNtSvTZJw-kJmt5hP_xS+QcA@mail.gmail.com>
+        Fri, 21 Apr 2017 12:39:32 -0400
+Message-ID: <1492787077.31767.24.camel@decadent.org.uk>
 Subject: Re: [PATCH 3/3] builddeb: add make fastdeb-pkg target
-Content-Type: text/plain; charset=UTF-8
+From: Ben Hutchings <ben@decadent.org.uk>
+Date: Fri, 21 Apr 2017 16:04:37 +0100
+In-Reply-To: <CAK7LNAQ5V-B+Os2WZZb3H6hqCOsNtSvTZJw-kJmt5hP_xS+QcA@mail.gmail.com>
+References: <20170331130941.5250-1-riku.voipio@linaro.org>
+         <20170331130941.5250-4-riku.voipio@linaro.org>
+         <CAK7LNAQT8pSjgW5ujnWWP3MKfU0=XnFKWVeNu-fx5NRRX0XgMg@mail.gmail.com>
+         <CAAqcGHk80P4tKFn+j5n6M=77XaDFkc_e30RZ04+MmMf=qJDyzw@mail.gmail.com>
+         <CAK7LNAQ5V-B+Os2WZZb3H6hqCOsNtSvTZJw-kJmt5hP_xS+QcA@mail.gmail.com>
+Content-Type: multipart/signed; micalg="pgp-sha512";
+        protocol="application/pgp-signature"; boundary="=-qCCQEatzlre3AG7V8OO1"
+Mime-Version: 1.0
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Riku Voipio <riku.voipio@linaro.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Riku Voipio <riku.voipio@linaro.org>
 Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.com>, debian-kernel <debian-kernel@lists.debian.org>, Andrew Donnellan <andrew.donnellan@au1.ibm.com>
 
-Hi Riku,
 
+--=-qCCQEatzlre3AG7V8OO1
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-2017-04-20 19:53 GMT+09:00 Riku Voipio <riku.voipio@linaro.org>:
-> Hi,
->
-> Thanks for taking time to review.
->
-> On 18 April 2017 at 17:31, Masahiro Yamada
-> <yamada.masahiro@socionext.com> wrote:
->> Before expanding this even more,
->> please help me understand this script.
->>
->> Commit 3716001b implemented source package build
->> at the end of the builddeb script.
->> However, the binary packages are still built in its own way.
->> (So, debian/rules is not used in general workflows,
->> so we need to test it explicitly somehow.)
->
-> Historic reasons.. since the builddeb already existed, the easiest way
-> to implement debian/rules was to make a skeleton debian/rules that
-> calls builddeb indrectly.
->
->> Why do not we create a source package first,
->> then build binary packages from it?
->
-> I wouldn't do a source package per se, but we could create a debian/
-> directory tree and the call dpkg-buildpackage. This would be a more
-> substantial overhaul that might break some expected behavior of
-> deb-pkg targets. If people think its worth, I can give it a shot.
+On Fri, 2017-04-21 at 18:57 +0900, Masahiro Yamada wrote:
+[...]
+> In hindsight, it seems more straightforward to me
+> to build the binary packages from the source package.
+> But, I know this refactoring will need lots of changes, which may
+> break something.
+>=20
+> Once we support this fastdeb-pkg target,
+> we will not be able to convert the script in that way.
+> (because we do not have a standard way to generate a particular binary
+> package from *.dsc)
+[...]
 
+We kind of do, though it's a relatively new feature:
+https://wiki.debian.org/BuildProfileSpec
 
-In hindsight, it seems more straightforward to me
-to build the binary packages from the source package.
-But, I know this refactoring will need lots of changes, which may
-break something.
+Ben.
 
-Once we support this fastdeb-pkg target,
-we will not be able to convert the script in that way.
-(because we do not have a standard way to generate a particular binary
-package from *.dsc)
-That's why I asked the question, and I want to be careful.
+--=20
+Ben Hutchings
+I'm not a reverse psychological virus.=C2=A0=C2=A0Please don't copy me into=
+ your
+sig.
 
+--=-qCCQEatzlre3AG7V8OO1
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
 
+-----BEGIN PGP SIGNATURE-----
 
->> rpm-pkg does that way.
->> (generate a spec-file, then run rpmbuild)
->
-> speaking of the mkspec script, it would be nice to refactor it to here
-> documents over endless lines of echo.
+iQIzBAABCgAdFiEErCspvTSmr92z9o8157/I7JWGEQkFAlj6H4UACgkQ57/I7JWG
+EQngUQ/8C4UiJLnLvhDcK9ViWQeo0dJjSZQFwfvcWLL0gSWh0CyX2hiosN6iUdIW
+WZcW0RpGeulzbz2wchv0exEBd5OrRbb8tJAyMAgJhDlGmIRTbmc942AljXcy17sB
+UTXasOIy5C8rJxM+l6aIkn+4xJvDnMRhSSneQ6YC9QKdujcN3kfv3+5BNef6BIgN
+U5da3H5QVSAgJflaWs0W6xLYu+XT52mVqM8Lahv18ee/3lP3r1SHIWZCtaW3ADY3
+R2DlGaG6oMJQxpuyUQrrDPkS6FHjV2KORxU9YX2RPntCCjMcKjU3falzJiJTv4DK
+bpaw1YDUI7qQ1OFUfr7zKrJfVdVkROwM9JL8zf0lhmsu0ACJfDC4ozhkJ4YlRlBO
+gn/RTgxfMhTxXsXt9T2BP3NP2BjVtPNQr9QeGnC8p/P07EDoYCoK34ReS1vr3xlC
+fD0OxSW5SVn65RzCR6LGjBzTvMhBBvpYX4wMUSE6IfIfxzV2U3IzwtSpuiOA9Y1v
+hWWgsevyu3lyVynoFmK9zAbL+Qz+ECVm31B4JQxwm5YTcEw3HlvazHwrjYFcEmw3
+bWp5Qht8qjTBcLVGm8/H1whzAYRyCwHE1ywXJTJHjf151q1xlAaIr2QjWPYQ3pQs
+/CjDREY0t6QuKDkIk+2wm+8CnQfA+rpG1zvW8e8VImE7s3kjjA4=
+=Sewq
+-----END PGP SIGNATURE-----
 
-As always, cleaning patches are welcome.
-
-
-
--- 
-Best Regards
-Masahiro Yamada
+--=-qCCQEatzlre3AG7V8OO1--
