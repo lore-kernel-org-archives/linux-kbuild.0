@@ -1,106 +1,107 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi0-f66.google.com ([209.85.218.66]:35820 "EHLO
-        mail-oi0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1424740AbdDVPaI (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:62864 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933164AbdDWGsR (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 22 Apr 2017 11:30:08 -0400
+        Sun, 23 Apr 2017 02:48:17 -0400
+Received: from mail-yw0-f182.google.com (mail-yw0-f182.google.com [209.85.161.182]) (authenticated)
+        by conssluserg-06.nifty.com with ESMTP id v3N6ljmN019608
+        for <linux-kbuild@vger.kernel.org>; Sun, 23 Apr 2017 15:47:46 +0900
+Received: by mail-yw0-f182.google.com with SMTP id 203so63911431ywe.0
+        for <linux-kbuild@vger.kernel.org>; Sat, 22 Apr 2017 23:47:46 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <alpine.LFD.2.20.1704220400380.32200@eddie.linux-mips.org>
-References: <20161216105634.235457-1-arnd@arndb.de> <3302470.IDcDrWa0u6@wuerfel>
- <CAGXu5jLPRYi+HK=07Zndc8szEKD4mZCqaHJFnHmmoYr7tA1xPw@mail.gmail.com>
- <CAK8P3a2C2WhWjzF=HrzU15Ncg0juR+nstZukBEpqCrVNW5pnDA@mail.gmail.com>
- <CAGXu5jLTR+dY_Ayyix5Tg0Yn9LBFAt=j56MQVdJVGue-R-CizA@mail.gmail.com>
- <CAK8P3a114EVbnhbObfq-4pZp8XCT4fWzMXD+WkRi7iPXs1vFMA@mail.gmail.com>
- <CAGXu5jJpofLF0qAf0-2iNTesZt-X704Q7L=DpQYdtHY5n2HD0w@mail.gmail.com> <alpine.LFD.2.20.1704220400380.32200@eddie.linux-mips.org>
-From: Arnd Bergmann <arnd@arndb.de>
-Date: Sat, 22 Apr 2017 17:30:07 +0200
-Message-ID: <CAK8P3a28fi0GRcz1yLq+wRkaBBO_w74NnBCY7f3myg78JpaCCQ@mail.gmail.com>
-Subject: Re: [RFC] minimum gcc version for kernel: raise to gcc-4.3 or 4.6?
+In-Reply-To: <20170418010011.GC4152@decadent.org.uk>
+References: <20170418010011.GC4152@decadent.org.uk>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Sun, 23 Apr 2017 15:47:44 +0900
+Message-ID: <CAK7LNASG59wc7Ed24HFiGn0CFUxjDtMgKwy8dhz2PfvRDw1Y1w@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: Do not use hyphen in exported variable name
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: "Maciej W. Rozycki" <macro@linux-mips.org>
-Cc: Kees Cook <keescook@chromium.org>, linux-arch <linux-arch@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Russell King <rmk+kernel@armlinux.org.uk>, Andrew Morton <akpm@linux-foundation.org>, kernel-build-reports@lists.linaro.org, kvmarm@lists.cs.columbia.edu, Geert Uytterhoeven <geert@linux-m68k.org>
+To: Ben Hutchings <ben@decadent.org.uk>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, debian-kernel <debian-kernel@lists.debian.org>
 
-On Sat, Apr 22, 2017 at 5:10 AM, Maciej W. Rozycki <macro@linux-mips.org> wrote:
-> On Fri, 21 Apr 2017, Kees Cook wrote:
+Hi Ben,
+
+
+2017-04-18 10:00 GMT+09:00 Ben Hutchings <ben@decadent.org.uk>:
+> This definition in Makefile.dtbinst:
 >
->> > The linux-4.2 x86 defconfig could still be built with gcc-4.0, but
->> > later kernels have several minor problems with that, and
->> > require at least gcc-4.3.
->> >
->> > If we are ok with this status quo, we could simply declare gcc-4.3
->> > the absolute minimum version for the kernel, make gcc-4.9
->> > the recommeded minimum version, and remove all workarounds
->> > for gcc-4.2 or older.
->>
->> I think starting with this would be a good first step. I'm not sure
->> the best way to add "recommended minimum" to
->> Documentation/process/changes.rst hmmm
+>     export dtbinst-root ?= $(obj)
 >
->  FWIW for some reasons (mainly the ability to avoid NPTL) I have stuck to
-> GCC 4.1.2 with some MIPS configurations and I've had no issues with that
-> compiler up to Linux 4.6.0, which is the last kernel version I have tried
-> with that compiler so far.  I could check if anything has regressed since
-> then I suppose.
+> should define and export dtbinst-root when handling the root dts
+> directory, and do nothing in the subdirectories.  However, the
+> variable does not reliably get exported to the environment, perhaps
+> because its name contains a hyphen.
+>
+> Rename the variable to dtbinst_root.
+>
+> References: https://bugs.debian.org/833561
+> Fixes: 323a028d39cdi ("dts, kbuild: Implement support for dtb vendor subdirs")
+> Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+> ---
+> --- a/scripts/Makefile.dtbinst
+> +++ b/scripts/Makefile.dtbinst
+> @@ -14,7 +14,7 @@ src := $(obj)
+>  PHONY := __dtbs_install
+>  __dtbs_install:
+>
+> -export dtbinst-root ?= $(obj)
+> +export dtbinst_root ?= $(obj)
+>
+>  include include/config/auto.conf
+>  include scripts/Kbuild.include
+> @@ -22,7 +22,7 @@ include $(src)/Makefile
+>
+>  PHONY += __dtbs_install_prep
+>  __dtbs_install_prep:
+> -ifeq ("$(dtbinst-root)", "$(obj)")
+> +ifeq ("$(dtbinst_root)", "$(obj)")
+>         $(Q)mkdir -p $(INSTALL_DTBS_PATH)
+>  endif
+>
+> @@ -33,7 +33,7 @@ dtbinst-dirs  := $(dts-dirs)
+>  quiet_cmd_dtb_install =        INSTALL $<
+>        cmd_dtb_install =        mkdir -p $(2); cp $< $(2)
+>
+> -install-dir = $(patsubst $(dtbinst-root)%,$(INSTALL_DTBS_PATH)%,$(obj))
+> +install-dir = $(patsubst $(dtbinst_root)%,$(INSTALL_DTBS_PATH)%,$(obj))
+>
+>  $(dtbinst-files) $(dtbinst-dirs): | __dtbs_install_prep
+>
 
-Interesting. This is also the same version that Geert mentioned using
-on m68k. I've tried some more x86 and mips builds now and found:
 
-- x86 defconfig broke because the i915 driver relies on gcc-4.3 behavior
-  for alignment attributes as of a few kernel versions ago for the sw_fence
-  mechanism:
-drivers/gpu/drm/i915/intel_display.c:14571: error: alignment may not
-be specified for 'intel_atomic_commit_ready'
 
-- With gcc-4.0 I also get a couple of BUILD_BUG_ON() triggering for
-  correct code that it doesn't always consider compile-time constant (on all
-  architectures), this is from x86 defconfig starting around linux-4.3:
-mm/built-in.o: In function `do_set_pmd':
-memory.c:(.text+0x34df5): undefined reference to `__compiletime_assert_3157'
-drivers/built-in.o: In function `cea_mode_alternate_timings':
-drm_edid.c:(.text+0x10858a): undefined reference to `__compiletime_assert_2641'
+I tested dtbs_install once again by myself, but
+dtbinst-root is exported to the sub make
+and the vendor directories are created correctly.
 
-- gcc-4.0 has been broken for all MIPS configurations (but no other arch) since
-  commit 51b97e354ba9 ("kernel: use the gnu89 standard explicitly") in 3.18,
-  the problem still exists in stable/linux-3.18.y and mainline but would be
-  trivial to fix with a oneline patch if anyone had noticed this before me.
-arch/mips/kernel/vmlinux.lds.S:110:1: error: pasting "initcall0" and
-"." does not give a valid preprocessing token
 
-- The interprocedural optimization changes in gcc-4.3 mean that the
-  object code is a bit different, and we no longer expect the pre-gcc-4.3
-  behavior. This mostly results in warnings (e.g. maybe-uninitialized or
-  section mismatch) when the compiler and/or linker lacks the
-  information to see that the code is actually correct. On x86 I only
-  got one failure with gcc-4.1, on mips-gcc-4.1 I got this and a few
-  more depending on configuration:
-mm/built-in.o: In function `create_huge_pmd':
-memory.c:(.text+0x34e71): undefined reference to `do_huge_pmd_anonymous_page'
+I checked the debian's forum you gave
+> References: https://bugs.debian.org/833561
 
-The last one is the key here I think. The linker warnings and errors we
-run into here are all fairly easy to fix, but we will keep running into new
-ones since evidently nobody does regular builds checking for them, and
-they can appear randomly based on configuration for otherwise
-acceptable code. Today, most configurations I tried were broken because
-of this, and if things worked for you, you were either lucky that you didn't
-run into the same bugs (or that Geert fixed the ones you would have hit)
-or you had patches on top to work around them already.
+In there, you mentioned:
+"This looks like a bug in make, but we can at least work around it by
+using a non-hyphenated variable name."
 
-Based on what I found so far, gcc-4 can be pretty much ruled out from
-being the minimum version based on the number of failures I got.
-It's much better than 3.4 but much worse than 4.1 or 4.2 which seem
-fixable on MIPS and x86 at least, and may or may not work depending
-on configuration. So the best two possible (but conflicting) answers I
-have are
 
-a) There are known users on gcc-4.1, and we never break things that
-    work for users, so gcc-4.1 (or possibly 4.0 if a user shows up) would
-    be the minimum version.
-b) gcc-4.1 and 4.2 have too many problems, so users are better off
-    when we tell them to upgrade to something newer, and a minimum
-    version of gcc-4.3 has fewer surprises. We should remove all
-    workarounds for pre-gcc-4.3 compilers and just force a build error
-    message.
+Does this issue happen on a specific Make version?
 
-      Arnd
+I tested GNU make 3.81, 3.82, 4.0, 4.1, 4.2,
+but I was not hit by the problem.
+
+
+
+In the last post in the thread, you concluded:
+"We believe that the bug you reported is fixed in the latest version of
+linux, which is due to be installed in the Debian FTP archive."
+
+
+If so, why is this patch here?
+How is the dtbs_install procedure different in the Debian package?
+
+
+-- 
+Best Regards
+Masahiro Yamada
