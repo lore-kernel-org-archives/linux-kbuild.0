@@ -1,106 +1,133 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg0-f50.google.com ([74.125.83.50]:33814 "EHLO
-        mail-pg0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S977304AbdDXUFT (ORCPT
+Received: from mail-oi0-f65.google.com ([209.85.218.65]:35188 "EHLO
+        mail-oi0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S972744AbdDXUay (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 24 Apr 2017 16:05:19 -0400
-Received: by mail-pg0-f50.google.com with SMTP id v1so6420959pgv.1
-        for <linux-kbuild@vger.kernel.org>; Mon, 24 Apr 2017 13:05:19 -0700 (PDT)
-From: Matthias Kaehlcke <mka@chromium.org>
-Subject: [PATCH v4] kbuild: Add support to generate LLVM assembly files
-Date: Mon, 24 Apr 2017 13:04:58 -0700
-Message-Id: <20170424200458.74416-1-mka@chromium.org>
+        Mon, 24 Apr 2017 16:30:54 -0400
 MIME-Version: 1.0
+In-Reply-To: <alpine.LFD.2.20.1704241908260.32200@eddie.linux-mips.org>
+References: <20161216105634.235457-1-arnd@arndb.de> <3302470.IDcDrWa0u6@wuerfel>
+ <CAGXu5jLPRYi+HK=07Zndc8szEKD4mZCqaHJFnHmmoYr7tA1xPw@mail.gmail.com>
+ <CAK8P3a2C2WhWjzF=HrzU15Ncg0juR+nstZukBEpqCrVNW5pnDA@mail.gmail.com>
+ <CAGXu5jLTR+dY_Ayyix5Tg0Yn9LBFAt=j56MQVdJVGue-R-CizA@mail.gmail.com>
+ <CAK8P3a114EVbnhbObfq-4pZp8XCT4fWzMXD+WkRi7iPXs1vFMA@mail.gmail.com>
+ <CAGXu5jJpofLF0qAf0-2iNTesZt-X704Q7L=DpQYdtHY5n2HD0w@mail.gmail.com>
+ <alpine.LFD.2.20.1704220400380.32200@eddie.linux-mips.org>
+ <CAK8P3a28fi0GRcz1yLq+wRkaBBO_w74NnBCY7f3myg78JpaCCQ@mail.gmail.com>
+ <CAMuHMdWTiurUSacddYXgW69=QwOrZDV3Zt2DezJauPy8j-GMHw@mail.gmail.com>
+ <CAK8P3a32Y0AiKyVaotYb14uZZ1jM=nwhFD1vyP56epW1Y9KqSw@mail.gmail.com>
+ <alpine.LFD.2.20.1704241249350.32200@eddie.linux-mips.org>
+ <CAK8P3a03BTEBgz87k_dhJuqzOYQm_S5FFDrFgcBAE5FCH-e=dQ@mail.gmail.com> <alpine.LFD.2.20.1704241908260.32200@eddie.linux-mips.org>
+From: Arnd Bergmann <arnd@arndb.de>
+Date: Mon, 24 Apr 2017 22:30:52 +0200
+Message-ID: <CAK8P3a0HQUqtL=9pgPEreQJaA0AksiR06B4oAwvbYnJeA-2i7w@mail.gmail.com>
+Subject: Re: [RFC] minimum gcc version for kernel: raise to gcc-4.3 or 4.6?
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, =?UTF-8?q?Vin=C3=ADcius=20Tinti?= <viniciustinti@gmail.com>, Behan Webster <behanw@converseincode.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Grant Grundler <grundler@chromium.org>, Greg Hackmann <ghackmann@google.com>, Michael Davidson <md@google.com>, Matthias Kaehlcke <mka@chromium.org>
+To: "Maciej W. Rozycki" <macro@linux-mips.org>
+Cc: Geert Uytterhoeven <geert@linux-m68k.org>, Kees Cook <keescook@chromium.org>, linux-arch <linux-arch@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Russell King <rmk+kernel@armlinux.org.uk>, Andrew Morton <akpm@linux-foundation.org>, kernel-build-reports@lists.linaro.org, kvmarm@lists.cs.columbia.edu
 
-Add rules to kbuild in order to generate LLVM assembly files with the .ll
-extension when using clang.
+On Mon, Apr 24, 2017 at 8:30 PM, Maciej W. Rozycki <macro@linux-mips.org> wrote:
+> On Mon, 24 Apr 2017, Arnd Bergmann wrote:
+>
+>>
+>> So it still fails, but only because of one compiler error that I can avoid by
+>> disabling that driver, and you probably use a slightly patched compiler
+>> version that doesn't have this particular bug, or it was a regression between
+>> gcc-4.1.2 and 4.1.3.
+>
+>  Umm, I didn't build modules, sorry, because I don't usually use them with
+> those systems.  However I have completed this step now and it also worked
+> just fine:
+>
+> $ ls -la crypto/drbg.o
+> -rw-r--r--  1 macro macro 14096 Apr 24 18:59 crypto/drbg.o
+> $ file crypto/drbg.o
+> crypto/drbg.o: ELF 32-bit LSB MIPS-I relocatable, MIPS, version 1 (SYSV), not stripped
+> $
+>
+> so you are likely right that either I have a patch applied to my 4.1.2
+> build that has somehow fixed the ICE or it is a 4.1.3 regression (or a bad
+> patch in your 4.1.3 build).
 
-  # from c code
-  make CC=clang kernel/pid.ll
+Ok.
 
-From: Vinícius Tinti <viniciustinti@gmail.com>
-Signed-off-by: Vinícius Tinti <viniciustinti@gmail.com>
-Signed-off-by: Behan Webster <behanw@converseincode.com>
-Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
----
-Changes in v4:
-- changed 'bitcode' to 'assembly'
-- removed rule for creating LLVM assembly from machine assembly
-- added .ll files to clean rule
-- corrected example command in commit message
+>  BTW I do see these `may be used uninitialized' warnings just as Geert
+> does and even have a local patch, which I have neglected to submit, for a
+> 64-bit configuration (`decstation_defconfig' is 32-bit) where in a single
+> place -Werror turns it into a build failure.  I do not consider it a big
+> issue though, and might even wrap that patch up and submit sometime.
 
- .gitignore             | 1 +
- Makefile               | 5 +++++
- scripts/Makefile.build | 8 ++++++++
- 3 files changed, 14 insertions(+)
+I'd recommend dropping that -Werror from mips and the other few
+architectures that have it, or maybe wrapping it in a Kconfig symbol that
+is disabled by default. It would also take care of
+==> build/mips/bmips_be_defconfig/log <==
+cc1: warnings being treated as errors
+/git/arm-soc/arch/mips/bmips/setup.c:37: error: integer constant is
+too large for 'long' type
 
-diff --git a/.gitignore b/.gitignore
-index c2ed4ecb0acd..0c39aa20b6ba 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -33,6 +33,7 @@
- *.lzo
- *.patch
- *.gcno
-+*.ll
- modules.builtin
- Module.symvers
- *.dwo
+As mentioned, we can also turn off the warnings by default and let
+Geert turn them on again:
+
 diff --git a/Makefile b/Makefile
-index e11989d36c87..1cf775d7c510 100644
+index 779302695453..2528f60fb9ab 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -1361,6 +1361,8 @@ help:
- 	@echo  '                    (default: $$(INSTALL_MOD_PATH)/lib/firmware)'
- 	@echo  '  dir/            - Build all files in dir and below'
- 	@echo  '  dir/file.[ois]  - Build specified target only'
-+	@echo  '  dir/file.ll     - Build the LLVM assembly file'
-+	@echo  '                    (requires compiler support for LLVM assembly generation)'
- 	@echo  '  dir/file.lst    - Build specified mixed source/assembly target only'
- 	@echo  '                    (requires a recent binutils and recent build (System.map))'
- 	@echo  '  dir/file.ko     - Build module including final link'
-@@ -1545,6 +1547,7 @@ clean: $(clean-dirs)
- 		-o -name '*.symtypes' -o -name 'modules.order' \
- 		-o -name modules.builtin -o -name '.tmp_*.o.*' \
- 		-o -name '*.c.[012]*.*' \
-+		-o -name '*.ll' \
- 		-o -name '*.gcno' \) -type f -print | xargs rm -f
- 
- # Generate tags for editors
-@@ -1648,6 +1651,8 @@ endif
- 	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
- %.symtypes: %.c prepare scripts FORCE
- 	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
-+%.ll: %.c prepare scripts FORCE
-+	$(Q)$(MAKE) $(build)=$(build-dir) $(target-dir)$(notdir $@)
- 
- # Modules
- /: prepare scripts FORCE
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index d883116ebaa4..e5f1425c601f 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -177,6 +177,14 @@ cmd_cc_symtypes_c =                                                         \
- $(obj)/%.symtypes : $(src)/%.c FORCE
- 	$(call cmd,cc_symtypes_c)
- 
-+# LLVM assembly
-+# Generate .ll files from .c
-+quiet_cmd_cc_ll_c = CC $(quiet_modtag)  $@
-+      cmd_cc_ll_c = $(CC) $(c_flags) -emit-llvm -S -o $@ $<
-+
-+$(obj)/%.ll: $(src)/%.c FORCE
-+	$(call if_changed_dep,cc_ll_c)
-+
- # C (.c) files
- # The C file is compiled and updated dependency information is generated.
- # (See cmd_cc_o_c + relevant part of rule_cc_o_c)
--- 
-2.12.2.816.g2cccc81164-goog
+@@ -647,8 +647,10 @@ KBUILD_CFLAGS   += -O2
+ endif
+ endif
 
+-KBUILD_CFLAGS += $(call cc-ifversion, -lt, 0409, \
+-                                  $(call
+cc-disable-warning,maybe-uninitialized,))
++KBUILD_CFLAGS += $(call cc-ifversion, -lt, 0408, \
++                                 $(call cc-disable-warning,uninitialized, \
++                                 $(call cc-ifversion, -lt, 0409, \
++                                 $(call
+cc-disable-warning,maybe-uninitialized,))))
+
+ # Tell gcc to never replace conditional load with a non-conditional one
+ KBUILD_CFLAGS += $(call cc-option,--param=allow-store-data-races=0)
+
+
+I've built the remaining defconfigs in the meantime (linux-4.11-rc8, gcc-4.1.3,
+ARCH=mips) and got 38 builds with warnings and 20 failed builds. There are
+at least six different build failures and only one ICE among them (only
+in decstation_defconfig). With gcc-4.3 this is only slightly better: 18
+failed build, 20 with warnings and 20 without warnings.
+
+With linux-4.3, I saw this failure on 32 defconfigs,
+and you fixed that in linux-4.7 with e49d38488515 ("MIPS: MSA: Fix a
+link error on `_init_msa_upper' with older GCC"):
+
+arch/mips/built-in.o: In function `enable_restore_fp_context':
+traps.c:(.text+0xbefc): undefined reference to `_init_msa_upper'
+traps.c:(.text+0xbfc0): undefined reference to `_init_msa_upper'
+
+With gcc-4.9, all mips defconfigs now build without warnings.
+
+For the other architectures in linux-4.11-rc8 can actually build with
+sparc-gcc-4.1, afaict this was a bug that impacted all compilers up to
+gcc-4.7 and a workaround was added recently. In turn, parisc-gcc-4.1
+no longer works on linux-4.11, so we still have only three architectures
+that can build their 'defconfig' with the old compiler, plus the majority
+of the mips config files.
+
+So while overall I still think that gcc-4.1 is rather broken, it seems that
+you have it well under control on both mips and m68k. It's possible
+that some other people use patched gcc-4.1 or only build special
+configurations on further architectures that I found to be broken
+with vanilla toolchains and the regular defconfig.
+
+How about this approach then:
+
+- To keep it simple, we update the README.rst to say that a minimum
+  gcc-4.3 is required, while recommending gcc-4.9 for all architectures
+- Support for gcc-4.0 and earlier gets removed from linux/compiler.h,
+  and instead we add a summary of what I found, explaining that
+  gcc-4.1 has active users on a few architectures.
+- We make the Makefile show a warning once during compilation for
+  gcc earlier than 4.3.
+
+        Arnd
