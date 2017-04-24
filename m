@@ -1,106 +1,93 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-it0-f65.google.com ([209.85.214.65]:34626 "EHLO
-        mail-it0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1167429AbdDXKRG (ORCPT
+Received: from mail-lf0-f48.google.com ([209.85.215.48]:36341 "EHLO
+        mail-lf0-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1168994AbdDXLHr (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 24 Apr 2017 06:17:06 -0400
-MIME-Version: 1.0
-In-Reply-To: <CAK8P3a32Y0AiKyVaotYb14uZZ1jM=nwhFD1vyP56epW1Y9KqSw@mail.gmail.com>
-References: <20161216105634.235457-1-arnd@arndb.de> <3302470.IDcDrWa0u6@wuerfel>
- <CAGXu5jLPRYi+HK=07Zndc8szEKD4mZCqaHJFnHmmoYr7tA1xPw@mail.gmail.com>
- <CAK8P3a2C2WhWjzF=HrzU15Ncg0juR+nstZukBEpqCrVNW5pnDA@mail.gmail.com>
- <CAGXu5jLTR+dY_Ayyix5Tg0Yn9LBFAt=j56MQVdJVGue-R-CizA@mail.gmail.com>
- <CAK8P3a114EVbnhbObfq-4pZp8XCT4fWzMXD+WkRi7iPXs1vFMA@mail.gmail.com>
- <CAGXu5jJpofLF0qAf0-2iNTesZt-X704Q7L=DpQYdtHY5n2HD0w@mail.gmail.com>
- <alpine.LFD.2.20.1704220400380.32200@eddie.linux-mips.org>
- <CAK8P3a28fi0GRcz1yLq+wRkaBBO_w74NnBCY7f3myg78JpaCCQ@mail.gmail.com>
- <CAMuHMdWTiurUSacddYXgW69=QwOrZDV3Zt2DezJauPy8j-GMHw@mail.gmail.com> <CAK8P3a32Y0AiKyVaotYb14uZZ1jM=nwhFD1vyP56epW1Y9KqSw@mail.gmail.com>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Mon, 24 Apr 2017 12:17:03 +0200
-Message-ID: <CAMuHMdUOv-sn9vDei0qPaRe19faYJGZ1zo1X==JDyFWJW3x5=A@mail.gmail.com>
-Subject: Re: [RFC] minimum gcc version for kernel: raise to gcc-4.3 or 4.6?
-Content-Type: text/plain; charset=UTF-8
+        Mon, 24 Apr 2017 07:07:47 -0400
+Received: by mail-lf0-f48.google.com with SMTP id c80so71634988lfh.3
+        for <linux-kbuild@vger.kernel.org>; Mon, 24 Apr 2017 04:07:47 -0700 (PDT)
+From: riku.voipio@linaro.org
+Subject: [PATCH 1/2 v3] builddeb: Update a few outdated and hardcoded strings
+Date: Mon, 24 Apr 2017 14:07:40 +0300
+Message-Id: <20170424110741.4524-2-riku.voipio@linaro.org>
+In-Reply-To: <20170424110741.4524-1-riku.voipio@linaro.org>
+References: <20170424110741.4524-1-riku.voipio@linaro.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: "Maciej W. Rozycki" <macro@linux-mips.org>, Kees Cook <keescook@chromium.org>, linux-arch <linux-arch@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Russell King <rmk+kernel@armlinux.org.uk>, Andrew Morton <akpm@linux-foundation.org>, kernel-build-reports@lists.linaro.org, kvmarm@lists.cs.columbia.edu
+To: linux-kbuild@vger.kernel.org, mmarek@suse.com
+Cc: yamada.masahiro@socionext.com, debian-kernel@lists.debian.org, Riku Voipio <riku.voipio@linaro.org>, Timo Sigurdsson <public_timo.s@silentcreek.de>
 
-Hi Arnd,
+From: Riku Voipio <riku.voipio@linaro.org>
 
-On Mon, Apr 24, 2017 at 11:44 AM, Arnd Bergmann <arnd@arndb.de> wrote:
-> On Sun, Apr 23, 2017 at 10:13 PM, Geert Uytterhoeven
-> <geert@linux-m68k.org> wrote:
->> On Sat, Apr 22, 2017 at 5:30 PM, Arnd Bergmann <arnd@arndb.de> wrote:
->>> Based on what I found so far, gcc-4 can be pretty much ruled out from
->>> being the minimum version based on the number of failures I got.
->>> It's much better than 3.4 but much worse than 4.1 or 4.2 which seem
->>> fixable on MIPS and x86 at least, and may or may not work depending
->>> on configuration. So the best two possible (but conflicting) answers I
->>> have are
->>>
->>> a) There are known users on gcc-4.1, and we never break things that
->>>     work for users, so gcc-4.1 (or possibly 4.0 if a user shows up) would
->>>     be the minimum version.
->>> b) gcc-4.1 and 4.2 have too many problems, so users are better off
->>>     when we tell them to upgrade to something newer, and a minimum
->>>     version of gcc-4.3 has fewer surprises. We should remove all
->>>     workarounds for pre-gcc-4.3 compilers and just force a build error
->>>     message.
->>
->> If there's no real good reason (brokenness) to deprecate gcc-4.1, I would not
->> do it.I guess most people using old compilers know what they're doing.
->
-> What I'm trying to find out first is whether "people regularly using 10+
-> year old compilers for the latest kernels" is a strict subset of "people in
-> Geert's household".
+The builddeb script has some hardcoded references to Linux version 2.6
+which is ancient. Drop Provides as the virtual packages provided are not
+useful anymore. Leave the Provides for linux-kernel-headers, as someone
+might still be referring to it.
 
-Fair enough.
+While at it, updated copyright date and drop Standards-Version: since
+the package isn't Debian Standards compliant anyways.
 
->> My main motivation for keep on using gcc-4.1 is that it gives many warnings
->> that were disabled in later gcc versions.  I do look at all new warnings, and
->> send patches when they are real bugs, or are trivial to silence.
->
-> What kind of warnings do you see that disappeared with later versions?
-> Do you know what caused them to disappear in later versions (different
-> optimization decisions, warning getting disabled by default but still available
-> for turning on manually, ...)? Do you know if the disabled warnings are
-> still there in gcc-4.3 (I can try it out if you give me examples)?
+Cc: Timo Sigurdsson <public_timo.s@silentcreek.de>
+Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
+---
+v3: commit message update
+---
+ scripts/package/builddeb | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
 
-Mostly the "may be used uninitialized" warnings. I believe they were disabled
-in gcc-4.3 (4.2?) and later due to too many false positives, which is not an
-issue for me, as I look at differences.
-They were re-enabled lately (with much less false-positives), that's why you
-see them, and fix them.
+diff --git a/scripts/package/builddeb b/scripts/package/builddeb
+index d7cf7156414e..a88bd5a6b346 100755
+--- a/scripts/package/builddeb
++++ b/scripts/package/builddeb
+@@ -260,7 +260,7 @@ This is a packacked upstream version of the Linux kernel.
+ The sources may be found at most Linux archive sites, including:
+ https://www.kernel.org/pub/linux/kernel
+ 
+-Copyright: 1991 - 2015 Linus Torvalds and others.
++Copyright: 1991 - 2017 Linus Torvalds and others.
+ 
+ The git repository for mainline kernel development is at:
+ git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+@@ -283,7 +283,6 @@ Section: kernel
+ Priority: optional
+ Maintainer: $maintainer
+ Build-Depends: $build_depends
+-Standards-Version: 3.8.4
+ Homepage: http://www.kernel.org/
+ EOF
+ 
+@@ -291,7 +290,6 @@ if [ "$ARCH" = "um" ]; then
+ 	cat <<EOF >> debian/control
+ 
+ Package: $packagename
+-Provides: linux-image, linux-image-2.6, linux-modules-$version
+ Architecture: any
+ Description: User Mode Linux kernel, version $version
+  User-mode Linux is a port of the Linux kernel to its own system call
+@@ -308,7 +306,6 @@ else
+ 	cat <<EOF >> debian/control
+ 
+ Package: $packagename
+-Provides: linux-image, linux-image-2.6, linux-modules-$version
+ Suggests: $fwpackagename
+ Architecture: any
+ Description: Linux kernel, version $version
+@@ -341,7 +338,6 @@ rm -f "$objtree/debian/hdrsrcfiles" "$objtree/debian/hdrobjfiles"
+ cat <<EOF >> debian/control
+ 
+ Package: $kernel_headers_packagename
+-Provides: linux-headers, linux-headers-2.6
+ Architecture: any
+ Description: Linux kernel headers for $KERNELRELEASE on \${kernel:debarch}
+  This package provides kernel header files for $KERNELRELEASE on \${kernel:debarch}
+@@ -399,7 +395,6 @@ if [ -n "$BUILD_DEBUG" ] ; then
+ 
+ Package: $dbg_packagename
+ Section: debug
+-Provides: linux-debug, linux-debug-$version
+ Architecture: any
+ Description: Linux kernel debugging symbols for $version
+  This package will come in handy if you need to debug the kernel. It provides
+-- 
+2.11.0
 
-For example, do you see the warning fixed by commit 1b8c1012142d8322
-("drivers: net: xgene: Simplify xgene_enet_setup_mss() to kill warning")
-with gcc-4.3? Yes, that was a false positive.
-
-Or see commit cc4a7ffe02c95f53 ("spi: fsl-lpspi: Pre-initialize ret in
-fsl_lpspi_transfer_one_msg()"). That one was a real bug.
-
-I don't see that in any of the kisskb build logs, and they use gcc-4.2.4 for
-avr32. So having gcc-4.2 or gcc-4.3 in a farm won't help.
-
-And as long as I find real bugs this way, I'd like to continue doing it.
-
->> BTW, below is the diff I use to avoid an ICE.
->> After that, it builds and (test)boots fine on ARAnyM ;-)
->
-> I guess this means that even your builds require extra patches and you
-> can't strictly build a defconfig and expect that to work ;-)
-
-No sane people enable GFS in defconfig, so it's not affected.
-
-Oh wait, some mips, powerpc, s390, and tile do ;-)
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
