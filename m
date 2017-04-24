@@ -1,51 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-io0-f170.google.com ([209.85.223.170]:36752 "EHLO
-        mail-io0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1174478AbdDXUwc (ORCPT
+Received: from mail-io0-f179.google.com ([209.85.223.179]:35583 "EHLO
+        mail-io0-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S936408AbdDXXGA (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 24 Apr 2017 16:52:32 -0400
-Received: by mail-io0-f170.google.com with SMTP id p80so84552581iop.3
-        for <linux-kbuild@vger.kernel.org>; Mon, 24 Apr 2017 13:52:31 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <CAK8P3a0HQUqtL=9pgPEreQJaA0AksiR06B4oAwvbYnJeA-2i7w@mail.gmail.com>
-References: <20161216105634.235457-1-arnd@arndb.de> <3302470.IDcDrWa0u6@wuerfel>
- <CAGXu5jLPRYi+HK=07Zndc8szEKD4mZCqaHJFnHmmoYr7tA1xPw@mail.gmail.com>
- <CAK8P3a2C2WhWjzF=HrzU15Ncg0juR+nstZukBEpqCrVNW5pnDA@mail.gmail.com>
- <CAGXu5jLTR+dY_Ayyix5Tg0Yn9LBFAt=j56MQVdJVGue-R-CizA@mail.gmail.com>
- <CAK8P3a114EVbnhbObfq-4pZp8XCT4fWzMXD+WkRi7iPXs1vFMA@mail.gmail.com>
- <CAGXu5jJpofLF0qAf0-2iNTesZt-X704Q7L=DpQYdtHY5n2HD0w@mail.gmail.com>
- <alpine.LFD.2.20.1704220400380.32200@eddie.linux-mips.org>
- <CAK8P3a28fi0GRcz1yLq+wRkaBBO_w74NnBCY7f3myg78JpaCCQ@mail.gmail.com>
- <CAMuHMdWTiurUSacddYXgW69=QwOrZDV3Zt2DezJauPy8j-GMHw@mail.gmail.com>
- <CAK8P3a32Y0AiKyVaotYb14uZZ1jM=nwhFD1vyP56epW1Y9KqSw@mail.gmail.com>
- <alpine.LFD.2.20.1704241249350.32200@eddie.linux-mips.org>
- <CAK8P3a03BTEBgz87k_dhJuqzOYQm_S5FFDrFgcBAE5FCH-e=dQ@mail.gmail.com>
- <alpine.LFD.2.20.1704241908260.32200@eddie.linux-mips.org> <CAK8P3a0HQUqtL=9pgPEreQJaA0AksiR06B4oAwvbYnJeA-2i7w@mail.gmail.com>
-From: Kees Cook <keescook@chromium.org>
-Date: Mon, 24 Apr 2017 13:52:24 -0700
-Message-ID: <CAGXu5jKCSFVhGSD5mGLiAo6-G+k24g2Y=9p8Kr2-SffAY=uEBQ@mail.gmail.com>
-Subject: Re: [RFC] minimum gcc version for kernel: raise to gcc-4.3 or 4.6?
-Content-Type: text/plain; charset=UTF-8
+        Mon, 24 Apr 2017 19:06:00 -0400
+From: frowand.list@gmail.com
+Subject: [PATCH v2 0/2] of: Add unit tests for applying overlays
+Date: Mon, 24 Apr 2017 16:05:17 -0700
+Message-Id: <1493075119-32026-1-git-send-email-frowand.list@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: "Maciej W. Rozycki" <macro@linux-mips.org>, Geert Uytterhoeven <geert@linux-m68k.org>, linux-arch <linux-arch@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Russell King <rmk+kernel@armlinux.org.uk>, Andrew Morton <akpm@linux-foundation.org>, kernel-build-reports@lists.linaro.org, kvmarm@lists.cs.columbia.edu
+To: Rob Herring <robh+dt@kernel.org>, stephen.boyd@linaro.org, Michal Marek <mmarek@suse.com>
+Cc: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-On Mon, Apr 24, 2017 at 1:30 PM, Arnd Bergmann <arnd@arndb.de> wrote:
-> How about this approach then:
->
-> - To keep it simple, we update the README.rst to say that a minimum
->   gcc-4.3 is required, while recommending gcc-4.9 for all architectures
-> - Support for gcc-4.0 and earlier gets removed from linux/compiler.h,
->   and instead we add a summary of what I found, explaining that
->   gcc-4.1 has active users on a few architectures.
-> - We make the Makefile show a warning once during compilation for
->   gcc earlier than 4.3.
+From: Frank Rowand <frank.rowand@sony.com>
 
-This sounds good to me!
+Existing overlay unit tests examine individual pieces of the overlay
+code.  The new tests target the entire process of applying an overlay.
 
--Kees
+Changes from v1:
+  - Move overlay base dtb unflattening into unittest.c.  Call from fdt.c.
+  - Clarify file and variable names, 'overlay_test_' instead of 'ot_'
+  - Use proper naming convention for node names.
+  - A few added comments.
+  - Improve error messages in the new tests.
+
+Frank Rowand (2):
+  of: support dtc compiler flags for device tree overlays
+  of: Add unit tests for applying overlays.
+
+ drivers/of/fdt.c                                 |  14 +-
+ drivers/of/of_private.h                          |  11 +
+ drivers/of/unittest-data/Makefile                |  17 +-
+ drivers/of/unittest-data/overlay.dts             |  53 ++++
+ drivers/of/unittest-data/overlay_bad_phandle.dts |  20 ++
+ drivers/of/unittest-data/overlay_base.dts        |  80 ++++++
+ drivers/of/unittest.c                            | 318 +++++++++++++++++++++++
+ scripts/Makefile.lib                             |   2 +
+ 8 files changed, 507 insertions(+), 8 deletions(-)
+ create mode 100644 drivers/of/unittest-data/overlay.dts
+ create mode 100644 drivers/of/unittest-data/overlay_bad_phandle.dts
+ create mode 100644 drivers/of/unittest-data/overlay_base.dts
 
 -- 
-Kees Cook
-Pixel Security
+Frank Rowand <frank.rowand@sony.com>
+
