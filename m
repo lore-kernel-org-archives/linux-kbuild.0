@@ -1,44 +1,104 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-io0-f194.google.com ([209.85.223.194]:36561 "EHLO
-        mail-io0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1046408AbdDXFoE (ORCPT
+Received: from mail-io0-f177.google.com ([209.85.223.177]:36302 "EHLO
+        mail-io0-f177.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1168193AbdDXJo2 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 24 Apr 2017 01:44:04 -0400
-From: frowand.list@gmail.com
-Subject: [PATCH 1/2] of: add support of dtc compiler flags for device tree overlays
-Date: Sun, 23 Apr 2017 22:43:14 -0700
-Message-Id: <1493012595-696-2-git-send-email-frowand.list@gmail.com>
-In-Reply-To: <1493012595-696-1-git-send-email-frowand.list@gmail.com>
-References: <1493012595-696-1-git-send-email-frowand.list@gmail.com>
+        Mon, 24 Apr 2017 05:44:28 -0400
+MIME-Version: 1.0
+In-Reply-To: <CAMuHMdWTiurUSacddYXgW69=QwOrZDV3Zt2DezJauPy8j-GMHw@mail.gmail.com>
+References: <20161216105634.235457-1-arnd@arndb.de> <3302470.IDcDrWa0u6@wuerfel>
+ <CAGXu5jLPRYi+HK=07Zndc8szEKD4mZCqaHJFnHmmoYr7tA1xPw@mail.gmail.com>
+ <CAK8P3a2C2WhWjzF=HrzU15Ncg0juR+nstZukBEpqCrVNW5pnDA@mail.gmail.com>
+ <CAGXu5jLTR+dY_Ayyix5Tg0Yn9LBFAt=j56MQVdJVGue-R-CizA@mail.gmail.com>
+ <CAK8P3a114EVbnhbObfq-4pZp8XCT4fWzMXD+WkRi7iPXs1vFMA@mail.gmail.com>
+ <CAGXu5jJpofLF0qAf0-2iNTesZt-X704Q7L=DpQYdtHY5n2HD0w@mail.gmail.com>
+ <alpine.LFD.2.20.1704220400380.32200@eddie.linux-mips.org>
+ <CAK8P3a28fi0GRcz1yLq+wRkaBBO_w74NnBCY7f3myg78JpaCCQ@mail.gmail.com> <CAMuHMdWTiurUSacddYXgW69=QwOrZDV3Zt2DezJauPy8j-GMHw@mail.gmail.com>
+From: Arnd Bergmann <arnd@arndb.de>
+Date: Mon, 24 Apr 2017 11:44:26 +0200
+Message-ID: <CAK8P3a32Y0AiKyVaotYb14uZZ1jM=nwhFD1vyP56epW1Y9KqSw@mail.gmail.com>
+Subject: Re: [RFC] minimum gcc version for kernel: raise to gcc-4.3 or 4.6?
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rob Herring <robh+dt@kernel.org>, stephen.boyd@linaro.org, Michal Marek <mmarek@suse.com>
-Cc: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: "Maciej W. Rozycki" <macro@linux-mips.org>, Kees Cook <keescook@chromium.org>, linux-arch <linux-arch@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Russell King <rmk+kernel@armlinux.org.uk>, Andrew Morton <akpm@linux-foundation.org>, kernel-build-reports@lists.linaro.org, kvmarm@lists.cs.columbia.edu
 
-From: Frank Rowand <frank.rowand@sony.com>
+On Sun, Apr 23, 2017 at 10:13 PM, Geert Uytterhoeven
+<geert@linux-m68k.org> wrote:
+> Hi Arnd,
+>
+> On Sat, Apr 22, 2017 at 5:30 PM, Arnd Bergmann <arnd@arndb.de> wrote:
+>> Based on what I found so far, gcc-4 can be pretty much ruled out from
+>> being the minimum version based on the number of failures I got.
+>> It's much better than 3.4 but much worse than 4.1 or 4.2 which seem
+>> fixable on MIPS and x86 at least, and may or may not work depending
+>> on configuration. So the best two possible (but conflicting) answers I
+>> have are
+>>
+>> a) There are known users on gcc-4.1, and we never break things that
+>>     work for users, so gcc-4.1 (or possibly 4.0 if a user shows up) would
+>>     be the minimum version.
+>> b) gcc-4.1 and 4.2 have too many problems, so users are better off
+>>     when we tell them to upgrade to something newer, and a minimum
+>>     version of gcc-4.3 has fewer surprises. We should remove all
+>>     workarounds for pre-gcc-4.3 compilers and just force a build error
+>>     message.
+>
+> If there's no real good reason (brokenness) to deprecate gcc-4.1, I would not
+> do it.I guess most people using old compilers know what they're doing.
 
-The dtc compiler version that adds initial support was available
-in 4.11-rc1.  Add the ability to set the dtc compiler flags needed
-by overlays.
+What I'm trying to find out first is whether "people regularly using 10+
+year old compilers for the latest kernels" is a strict subset of "people in
+Geert's household".
 
-Signed-off-by: Frank Rowand <frank.rowand@sony.com>
----
- scripts/Makefile.lib | 2 ++
- 1 file changed, 2 insertions(+)
+Given that none of the three architectures I looked at (arm, mips, x86)
+has successfully built any defconfig for a few years, it's quite possible
+that it's just you ;-) The other architectures that were around 10 years
+ago (so they might have someone who still has old toolchain binaries)
+and that still exist today are alpha, cris, frv, ia64, m32r, parisc, powerpc,
+s390, sh, sparc and xtensa. The first six are similar to m68k in that the
+hardware is mostly obsolete and the ports are kept around to support
+those old systems that might also use ancient toolchains, or new
+toolchains may be unmaintained or buggy, which could be a reason
+to keep 4.1 supported or at least try to find out if 4.1 (or even any other
+version) still works at all.
 
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 0a07f9014944..0bbec480d323 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -283,6 +283,8 @@ ifeq ($(KBUILD_ENABLE_EXTRA_GCC_CHECKS),)
- DTC_FLAGS += -Wno-unit_address_vs_reg
- endif
- 
-+DTC_FLAGS += $(DTC_FLAGS_$(basetarget))
-+
- # Generate an assembly file to wrap the output of the device tree compiler
- quiet_cmd_dt_S_dtb= DTB     $@
- cmd_dt_S_dtb=						\
--- 
-Frank Rowand <frank.rowand@sony.com>
+> My main motivation for keep on using gcc-4.1 is that it gives many warnings
+> that were disabled in later gcc versions.  I do look at all new warnings, and
+> send patches when they are real bugs, or are trivial to silence.
 
+What kind of warnings do you see that disappeared with later versions?
+Do you know what caused them to disappear in later versions (different
+optimization decisions, warning getting disabled by default but still available
+for turning on manually, ...)? Do you know if the disabled warnings are
+still there in gcc-4.3 (I can try it out if you give me examples)?
+
+> Lately the usefulness has been decreasing, as you've been too aggressively
+> killing compiler warnings with recent gcc versions (which became better) ;-)
+> Hence if I detected a new warning with a point or an rc release, it usually
+> means the code was never in nex (ugh)t, or the maintainer ignored your patch.
+>
+> I could easily switch to v4.9 from kernel.org crosstool, though, but then I
+> would loose all those warnings.
+
+If gcc-4.3 produces similarly useful warnings, we could think about integrating
+gcc-4.3 into kernelci.org build reports as an option, and fix up all
+the existing
+warnings we get with that. I wouldn't want to do that with gcc-4.1 though as
+the older versions have relatively random behavior.
+
+One particular feature I'd like to use that requires a newer compiler is being
+able to control warnings per function liker glibc does, using e.g.
+ '_Pragma("GCC diagnostic disable \"-Woverride-init\"")'. Once we have that,
+we could turn on a couple of additional warnings that are generally useful
+but also warn about code that intentionally does something that would
+trigger the warning.
+
+> BTW, below is the diff I use to avoid an ICE.
+> After that, it builds and (test)boots fine on ARAnyM ;-)
+
+I guess this means that even your builds require extra patches and you
+can't strictly build a defconfig and expect that to work ;-)
+
+      Arnd
