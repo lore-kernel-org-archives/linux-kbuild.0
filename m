@@ -1,113 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-it0-f67.google.com ([209.85.214.67]:35211 "EHLO
-        mail-it0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1045950AbdDWUNW (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:42874 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1164144AbdDXCV7 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 23 Apr 2017 16:13:22 -0400
+        Sun, 23 Apr 2017 22:21:59 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAK8P3a28fi0GRcz1yLq+wRkaBBO_w74NnBCY7f3myg78JpaCCQ@mail.gmail.com>
-References: <20161216105634.235457-1-arnd@arndb.de> <3302470.IDcDrWa0u6@wuerfel>
- <CAGXu5jLPRYi+HK=07Zndc8szEKD4mZCqaHJFnHmmoYr7tA1xPw@mail.gmail.com>
- <CAK8P3a2C2WhWjzF=HrzU15Ncg0juR+nstZukBEpqCrVNW5pnDA@mail.gmail.com>
- <CAGXu5jLTR+dY_Ayyix5Tg0Yn9LBFAt=j56MQVdJVGue-R-CizA@mail.gmail.com>
- <CAK8P3a114EVbnhbObfq-4pZp8XCT4fWzMXD+WkRi7iPXs1vFMA@mail.gmail.com>
- <CAGXu5jJpofLF0qAf0-2iNTesZt-X704Q7L=DpQYdtHY5n2HD0w@mail.gmail.com>
- <alpine.LFD.2.20.1704220400380.32200@eddie.linux-mips.org> <CAK8P3a28fi0GRcz1yLq+wRkaBBO_w74NnBCY7f3myg78JpaCCQ@mail.gmail.com>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Sun, 23 Apr 2017 22:13:20 +0200
-Message-ID: <CAMuHMdWTiurUSacddYXgW69=QwOrZDV3Zt2DezJauPy8j-GMHw@mail.gmail.com>
-Subject: Re: [RFC] minimum gcc version for kernel: raise to gcc-4.3 or 4.6?
+In-Reply-To: <20170421195502.GL128305@google.com>
+References: <20170404172706.171971-1-mka@chromium.org> <CAK7LNASfCFW4KZ72rYXQTpYFGf+KJcjK+L8wvHtiHmXNVYRtwg@mail.gmail.com>
+ <20170421195502.GL128305@google.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Mon, 24 Apr 2017 11:21:48 +0900
+Message-ID: <CAK7LNAQas1xvs6KzAjaBBu+0iYzj_ZjhQOTAQB-1ciC0m1242Q@mail.gmail.com>
+Subject: Re: [PATCH v3] kbuild: Add support to generate LLVM bitcode files
 Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: "Maciej W. Rozycki" <macro@linux-mips.org>, Kees Cook <keescook@chromium.org>, linux-arch <linux-arch@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Russell King <rmk+kernel@armlinux.org.uk>, Andrew Morton <akpm@linux-foundation.org>, kernel-build-reports@lists.linaro.org, kvmarm@lists.cs.columbia.edu
+To: Matthias Kaehlcke <mka@chromium.org>
+Cc: Michal Marek <mmarek@suse.com>, Emese Revfy <re.emese@gmail.com>, Kees Cook <keescook@chromium.org>, Behan Webster <behanw@converseincode.com>, "Luis R . Rodriguez" <mcgrof@kernel.org>, =?UTF-8?Q?Vin=C3=ADcius_Tinti?= <viniciustinti@gmail.com>, Kyeongmin Cho <korea.drzix@gmail.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Grant Grundler <grundler@chromium.org>, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>, Peter Foley <pefoley2@pefoley.com>
 
-Hi Arnd,
+Hi Matthias,
 
-On Sat, Apr 22, 2017 at 5:30 PM, Arnd Bergmann <arnd@arndb.de> wrote:
-> Based on what I found so far, gcc-4 can be pretty much ruled out from
-> being the minimum version based on the number of failures I got.
-> It's much better than 3.4 but much worse than 4.1 or 4.2 which seem
-> fixable on MIPS and x86 at least, and may or may not work depending
-> on configuration. So the best two possible (but conflicting) answers I
-> have are
+
+
+2017-04-22 4:55 GMT+09:00 Matthias Kaehlcke <mka@chromium.org>:
+> Hi Masahiro,
 >
-> a) There are known users on gcc-4.1, and we never break things that
->     work for users, so gcc-4.1 (or possibly 4.0 if a user shows up) would
->     be the minimum version.
-> b) gcc-4.1 and 4.2 have too many problems, so users are better off
->     when we tell them to upgrade to something newer, and a minimum
->     version of gcc-4.3 has fewer surprises. We should remove all
->     workarounds for pre-gcc-4.3 compilers and just force a build error
->     message.
+> El Fri, Apr 21, 2017 at 02:02:46PM +0900 Masahiro Yamada ha dit:
+>
+>> 2017-04-05 2:27 GMT+09:00 Matthias Kaehlcke <mka@chromium.org>:
+>> > From: Vin=C3=ADcius Tinti <viniciustinti@gmail.com>
+>> >
+>> > Add rules to kbuild in order to generate LLVM bitcode files with the .=
+ll
+>> > extension when using clang.
+>>
+>>
+>> First, I'd like to be sure about the terminology "LLVM bitcode"
+>> because "bitcode" sounds like human-unreadable binary.
+>>
+>>
+>> For example, 'man llvm-as' says:
+>>     llvm-as  is  the  LLVM  assembler.  It reads a file containing
+>>     human-readable LLVM assembly language, translates it to LLVM
+>>     bitcode, and writes the result into a file or to standard output.
+>>
 
-If there's no real good reason (brokenness) to deprecate gcc-4.1, I would not
-do it.I guess most people using old compilers know what they're doing.
 
-My main motivation for keep on using gcc-4.1 is that it gives many warnings
-that were disabled in later gcc versions.  I do look at all new warnings, and
-send patches when they are real bugs, or are trivial to silence.
+One more thing:
 
-Lately the usefulness has been decreasing, as you've been too aggressively
-killing compiler warnings with recent gcc versions (which became better) ;-)
-Hence if I detected a new warning with a point or an rc release, it usually
-means the code was never in nex (ugh)t, or the maintainer ignored your patch.
+Please add '*.ll' pattern to the following clean target.
 
-I could easily switch to v4.9 from kernel.org crosstool, though, but then I
-would loose all those warnings.
 
-BTW, below is the diff I use to avoid an ICE.
-After that, it builds and (test)boots fine on ARAnyM ;-)
+clean: $(clean-dirs)
+        $(call cmd,rmdirs)
+        $(call cmd,rmfiles)
+        @find $(if $(KBUILD_EXTMOD), $(KBUILD_EXTMOD), .) $(RCS_FIND_IGNORE=
+) \
+                \( -name '*.[oas]' -o -name '*.ko' -o -name '.*.cmd' \
+                -o -name '*.ko.*' \
+                -o -name '*.dwo'  \
+                -o -name '*.su'  \
+                -o -name '.*.d' -o -name '.*.tmp' -o -name '*.mod.c' \
+                -o -name '*.symtypes' -o -name 'modules.order' \
+                -o -name modules.builtin -o -name '.tmp_*.o.*' \
+                -o -name '*.c.[012]*.*' \
+                -o -name '*.gcno' \) -type f -print | xargs rm -f
 
-diff --git a/fs/gfs2/glock.c b/fs/gfs2/glock.c
-index ec0848fcca02d896..eb75b324ac0ac53d 100644
---- a/fs/gfs2/glock.c
-+++ b/fs/gfs2/glock.c
-@@ -650,13 +650,16 @@ int gfs2_glock_get(struct gfs2_sbd *sdp, u64 number,
-                   struct gfs2_glock **glp)
- {
-        struct super_block *s = sdp->sd_vfs;
--       struct lm_lockname name = { .ln_number = number,
-+       // FIXME Avoid gcc 4.1.2 20061115 (prerelease) (Ubuntu 4.1.1-21) ICE
-+       //struct lm_lockname name = { .ln_number = number,
-+       struct lm_lockname name = {
-                                    .ln_type = glops->go_type,
-                                    .ln_sbd = sdp };
-        struct gfs2_glock *gl, *tmp = NULL;
-        struct address_space *mapping;
-        struct kmem_cache *cachep;
-        int ret, tries = 0;
-+       name.ln_number = number;
 
-        rcu_read_lock();
-        gl = rhashtable_lookup_fast(&gl_hash_table, &name, ht_parms);
-diff --git a/fs/gfs2/rgrp.c b/fs/gfs2/rgrp.c
-index 86ccc01593937d93..8783b72df5fa3d0c 100644
---- a/fs/gfs2/rgrp.c
-+++ b/fs/gfs2/rgrp.c
-@@ -1767,7 +1767,11 @@ static void try_rgrp_unlink(struct gfs2_rgrpd
-*rgd, u64 *last_unlinked, u64 skip
-        struct gfs2_inode *ip;
-        int error;
-        int found = 0;
--       struct gfs2_rbm rbm = { .rgd = rgd, .bii = 0, .offset = 0 };
-+       // FIXME Avoid gcc 4.1.2 20061115 (prerelease) (Ubuntu 4.1.1-21) ICE
-+       // struct gfs2_rbm rbm = { .rgd = rgd, .bii = 0, .offset = 0 };
-+       struct gfs2_rbm rbm = { .bii = 0, .offset = 0 };
-+       rbm.rgd = rgd;
-+
 
-        while (1) {
-                down_write(&sdp->sd_log_flush_lock);
 
-Gr{oetje,eeting}s,
 
-                        Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+--=20
+Best Regards
+Masahiro Yamada
