@@ -1,46 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:63011 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S979153AbdDXXKC (ORCPT
+Received: from mail-io0-f194.google.com ([209.85.223.194]:35423 "EHLO
+        mail-io0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752996AbdDYHGi (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 24 Apr 2017 19:10:02 -0400
-Received: from mail-yb0-f177.google.com (mail-yb0-f177.google.com [209.85.213.177]) (authenticated)
-        by conssluserg-04.nifty.com with ESMTP id v3ON9cpZ001989
-        for <linux-kbuild@vger.kernel.org>; Tue, 25 Apr 2017 08:09:39 +0900
-Received: by mail-yb0-f177.google.com with SMTP id 11so60602829ybw.1
-        for <linux-kbuild@vger.kernel.org>; Mon, 24 Apr 2017 16:09:39 -0700 (PDT)
+        Tue, 25 Apr 2017 03:06:38 -0400
 MIME-Version: 1.0
-In-Reply-To: <20170424110741.4524-1-riku.voipio@linaro.org>
-References: <20170424110741.4524-1-riku.voipio@linaro.org>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 25 Apr 2017 08:09:38 +0900
-Message-ID: <CAK7LNAQO9AOx7KVA2d0_kXygXBdqDdN128pkr3th_3MAujj+Vw@mail.gmail.com>
-Subject: Re: [PATCH v3 0/2] builddeb updates
+In-Reply-To: <CAGXu5jKCSFVhGSD5mGLiAo6-G+k24g2Y=9p8Kr2-SffAY=uEBQ@mail.gmail.com>
+References: <20161216105634.235457-1-arnd@arndb.de> <3302470.IDcDrWa0u6@wuerfel>
+ <CAGXu5jLPRYi+HK=07Zndc8szEKD4mZCqaHJFnHmmoYr7tA1xPw@mail.gmail.com>
+ <CAK8P3a2C2WhWjzF=HrzU15Ncg0juR+nstZukBEpqCrVNW5pnDA@mail.gmail.com>
+ <CAGXu5jLTR+dY_Ayyix5Tg0Yn9LBFAt=j56MQVdJVGue-R-CizA@mail.gmail.com>
+ <CAK8P3a114EVbnhbObfq-4pZp8XCT4fWzMXD+WkRi7iPXs1vFMA@mail.gmail.com>
+ <CAGXu5jJpofLF0qAf0-2iNTesZt-X704Q7L=DpQYdtHY5n2HD0w@mail.gmail.com>
+ <alpine.LFD.2.20.1704220400380.32200@eddie.linux-mips.org>
+ <CAK8P3a28fi0GRcz1yLq+wRkaBBO_w74NnBCY7f3myg78JpaCCQ@mail.gmail.com>
+ <CAMuHMdWTiurUSacddYXgW69=QwOrZDV3Zt2DezJauPy8j-GMHw@mail.gmail.com>
+ <CAK8P3a32Y0AiKyVaotYb14uZZ1jM=nwhFD1vyP56epW1Y9KqSw@mail.gmail.com>
+ <alpine.LFD.2.20.1704241249350.32200@eddie.linux-mips.org>
+ <CAK8P3a03BTEBgz87k_dhJuqzOYQm_S5FFDrFgcBAE5FCH-e=dQ@mail.gmail.com>
+ <alpine.LFD.2.20.1704241908260.32200@eddie.linux-mips.org>
+ <CAK8P3a0HQUqtL=9pgPEreQJaA0AksiR06B4oAwvbYnJeA-2i7w@mail.gmail.com> <CAGXu5jKCSFVhGSD5mGLiAo6-G+k24g2Y=9p8Kr2-SffAY=uEBQ@mail.gmail.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Tue, 25 Apr 2017 09:06:36 +0200
+Message-ID: <CAMuHMdV+6O1CAb=+r2x=ANy_NkD3C6EzYCpawuXaf2ynvpsn2Q@mail.gmail.com>
+Subject: Re: [RFC] minimum gcc version for kernel: raise to gcc-4.3 or 4.6?
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Riku Voipio <riku.voipio@linaro.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.com>, debian-kernel <debian-kernel@lists.debian.org>
+To: Kees Cook <keescook@chromium.org>
+Cc: Arnd Bergmann <arnd@arndb.de>, "Maciej W. Rozycki" <macro@linux-mips.org>, linux-arch <linux-arch@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Russell King <rmk+kernel@armlinux.org.uk>, Andrew Morton <akpm@linux-foundation.org>, kernel-build-reports@lists.linaro.org, kvmarm@lists.cs.columbia.edu
 
-2017-04-24 20:07 GMT+09:00  <riku.voipio@linaro.org>:
-> From: Riku Voipio <riku.voipio@linaro.org>
+On Mon, Apr 24, 2017 at 10:52 PM, Kees Cook <keescook@chromium.org> wrote:
+> On Mon, Apr 24, 2017 at 1:30 PM, Arnd Bergmann <arnd@arndb.de> wrote:
+>> How about this approach then:
+>>
+>> - To keep it simple, we update the README.rst to say that a minimum
+>>   gcc-4.3 is required, while recommending gcc-4.9 for all architectures
+>> - Support for gcc-4.0 and earlier gets removed from linux/compiler.h,
+>>   and instead we add a summary of what I found, explaining that
+>>   gcc-4.1 has active users on a few architectures.
+>> - We make the Makefile show a warning once during compilation for
+>>   gcc earlier than 4.3.
 >
-> Trivial builddeb updates, the fastdeb change to be refactored later.
->
-> Andrew Donnellan (1):
->   builddeb: fix typo
->
-> Riku Voipio (1):
->   builddeb: Update a few outdated and hardcoded strings
->
->  scripts/package/builddeb | 9 ++-------
->  1 file changed, 2 insertions(+), 7 deletions(-)
+> This sounds good to me!
 
++1
 
-Applied to linux-kbuild/misc.  Thanks!
+Gr{oetje,eeting}s,
 
+                        Geert
 
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
 
--- 
-Best Regards
-Masahiro Yamada
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
