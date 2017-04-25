@@ -1,54 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf0-f176.google.com ([209.85.192.176]:34730 "EHLO
-        mail-pf0-f176.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1953159AbdDYSbc (ORCPT
+Received: from smtp13.smtpout.orange.fr ([80.12.242.135]:49826 "EHLO
+        smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1949172AbdDYUHw (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 25 Apr 2017 14:31:32 -0400
-From: frowand.list@gmail.com
-Subject: [PATCH v3 0/2] of: Add unit tests for applying overlays
-Date: Tue, 25 Apr 2017 11:30:54 -0700
-Message-Id: <1493145056-16442-1-git-send-email-frowand.list@gmail.com>
+        Tue, 25 Apr 2017 16:07:52 -0400
+From: Robert Jarzmik <robert.jarzmik@free.fr>
+Subject: Re: [PATCH v2] tags: honor COMPILED_SOURCE with apart output directory
+References: <1481819733-3002-1-git-send-email-robert.jarzmik@free.fr>
+        <CAK7LNAQN2ZRFETM818ySYSOx1Tykhq7RCYeyFv=x1ARH7w7cww@mail.gmail.com>
+Date: Tue, 25 Apr 2017 22:07:47 +0200
+In-Reply-To: <CAK7LNAQN2ZRFETM818ySYSOx1Tykhq7RCYeyFv=x1ARH7w7cww@mail.gmail.com>
+        (Masahiro Yamada's message of "Tue, 25 Apr 2017 03:06:04 +0900")
+Message-ID: <87shkwi73g.fsf@belgarion.home>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rob Herring <robh+dt@kernel.org>, stephen.boyd@linaro.org, mmarek@suse.com
-Cc: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Michal Marek <mmarek@suse.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-From: Frank Rowand <frank.rowand@sony.com>
+Masahiro Yamada <yamada.masahiro@socionext.com> writes:
 
-Existing overlay unit tests examine individual pieces of the overlay
-code.  The new tests target the entire process of applying an overlay.
+> Hi Robert,
+>> diff --git a/scripts/tags.sh b/scripts/tags.sh
+>> index a2ff3388e5ea..35cb64d5211c 100755
+>> --- a/scripts/tags.sh
+>> +++ b/scripts/tags.sh
+>> @@ -106,7 +106,8 @@ all_compiled_sources()
+>>                 case "$i" in
+>>                         *.[cS])
+>>                                 j=${i/\.[cS]/\.o}
+>> -                               if [ -e $j ]; then
+>> +                               k="${j#$tree}"
+>> +                               if [ -e $j -o -e "$k" ]; then
+>
+>
+> Do we need to check both srctree and objtree?
+> I think checking objtree (after $tree is ripped off) is enough.
 
-Changes from v2:
-  - of_private.h: move __unflatten_device_tree() outside
-    #ifdef CONFIG_OF_UNITTEST
-  - unittest.c: move overlay declaration macros outside #ifdef CONFIG_OF_OVERLAY
-  - unittest.c: make overlay_info overlays[] static
-  - unittest.c: remove extra blank line
+If I remember correctly, as this goes back a couple of monthes when I made the
+tests of this patch, the srctree is checked for the case when the kernel is
+compiled without O=, and objtree for the case with O=.
 
-Changes from v1:
-  - Move overlay base dtb unflattening into unittest.c.  Call from fdt.c.
-  - Clarify file and variable names, 'overlay_test_' instead of 'ot_'
-  - Use proper naming convention for node names.
-  - A few added comments.
-  - Improve error messages in the new tests.
-
-Frank Rowand (2):
-  of: support dtc compiler flags for overlays
-  of: Add unit tests for applying overlays
-
- drivers/of/fdt.c                                 |  14 +-
- drivers/of/of_private.h                          |  12 +
- drivers/of/unittest-data/Makefile                |  17 +-
- drivers/of/unittest-data/overlay.dts             |  53 ++++
- drivers/of/unittest-data/overlay_bad_phandle.dts |  20 ++
- drivers/of/unittest-data/overlay_base.dts        |  80 ++++++
- drivers/of/unittest.c                            | 317 +++++++++++++++++++++++
- scripts/Makefile.lib                             |   2 +
- 8 files changed, 507 insertions(+), 8 deletions(-)
- create mode 100644 drivers/of/unittest-data/overlay.dts
- create mode 100644 drivers/of/unittest-data/overlay_bad_phandle.dts
- create mode 100644 drivers/of/unittest-data/overlay_base.dts
+Cheers.
 
 -- 
-Frank Rowand <frank.rowand@sony.com>
-
+Robert
