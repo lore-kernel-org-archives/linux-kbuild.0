@@ -1,74 +1,139 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from foss.arm.com ([217.140.101.70]:38258 "EHLO foss.arm.com"
+Received: from mail.kernel.org ([198.145.29.136]:57998 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1177307AbdDYJW1 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 25 Apr 2017 05:22:27 -0400
-Subject: Re: [RFC] minimum gcc version for kernel: raise to gcc-4.3 or 4.6?
-References: <20161216105634.235457-1-arnd@arndb.de>
- <3302470.IDcDrWa0u6@wuerfel>
- <CAGXu5jLPRYi+HK=07Zndc8szEKD4mZCqaHJFnHmmoYr7tA1xPw@mail.gmail.com>
-From: Suzuki K Poulose <Suzuki.Poulose@arm.com>
-Message-ID: <cd617c59-b922-3a61-1eb9-71144ce4c77a@arm.com>
-Date: Tue, 25 Apr 2017 10:22:23 +0100
+        id S1428850AbdDYQpC (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 25 Apr 2017 12:45:02 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAGXu5jLPRYi+HK=07Zndc8szEKD4mZCqaHJFnHmmoYr7tA1xPw@mail.gmail.com>
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <1493075119-32026-3-git-send-email-frowand.list@gmail.com>
+References: <1493075119-32026-1-git-send-email-frowand.list@gmail.com> <1493075119-32026-3-git-send-email-frowand.list@gmail.com>
+From: Rob Herring <robh+dt@kernel.org>
+Date: Tue, 25 Apr 2017 11:44:36 -0500
+Message-ID: <CAL_Jsq+8fcDwe4iPxLRsKnw_UAc6JE3KRRbnx1aS+o0oJH9tPw@mail.gmail.com>
+Subject: Re: [PATCH v2 2/2] of: Add unit tests for applying overlays
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kees Cook <keescook@chromium.org>
-Cc: Arnd Bergmann <arnd@arndb.de>, linux-arch <linux-arch@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>, kernel-build-reports@lists.linaro.org, LKML <linux-kernel@vger.kernel.org>, Russell King <rmk+kernel@armlinux.org.uk>, Andrew Morton <akpm@linux-foundation.org>, kvmarm@lists.cs.columbia.edu, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>
+To: Frank Rowand <frowand.list@gmail.com>
+Cc: Stephen Boyd <stephen.boyd@linaro.org>, Michal Marek <mmarek@suse.com>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On 16/04/17 20:52, Kees Cook wrote:
-> Was there a conclusion to this discussion? I didn't see anything
-> definitive in the thread...
+On Mon, Apr 24, 2017 at 6:05 PM,  <frowand.list@gmail.com> wrote:
+> From: Frank Rowand <frank.rowand@sony.com>
 >
-> Notes below...
->
-> On Fri, Dec 16, 2016 at 3:14 AM, Arnd Bergmann <arnd@arndb.de> wrote:
->> [Fixed linux-arm-kernel mailing list address, sorry for the duplicate,
->>  I'm not reposting all the ugly patches though, unless someone really
->>  wants them, https://lkml.org/lkml/2016/12/16/174 has a copy]
->>
->> On Friday, December 16, 2016 11:56:21 AM CET Arnd Bergmann wrote:
->>> I had some fun doing build testing with older gcc versions, building
->>> every release from 4.0 through 7.0 and running that on my randconfig
->>> setup to see what comes out.
->>>
->>> First of all, gcc-4.9 and higher is basically warning-free everywhere,
->>> although gcc-7 introduces some interesting new warnings (I have started
->>> doing patches for those as well). gcc-4.8 is probably good, too, and
->>> gcc-4.6 and 4.7 at least don't produce build failures in general, though
->>> the level of false-positive warnings increases (we could decide to turn
->>> those off for older compilers for build test purposes).
->>>
->>> In gcc-4.5 and below, dead code elimination is not as good as later,
->>> causing a couple of link errors, and some of them have no good workaround
->>> (see patch 1). It would be nice to declare that version too old, but
->>> several older distros that are still in wide use ship with compilers
->>> earlier than 4.6:
->>>
->>>  RHEL6:               gcc-4.4
->
-> This appears to have support until July 31, 2018. (Though it's using a
-> 2.6 kernel.)
->
->>>  Debian 6:    gcc-4.4
->
-> This went fully unsupported on Feb 29, 2016.
->
->>>  Ubuntu 10.04:        gcc-4.4
->
-> This went fully unsupported on Apr 30, 2015.
->
->>>  SLES11:      gcc-4.3
->
-> General support ends Mar 31 2019, fully unsupported 31 Mar 2022. (And
-> like RHEL6 is using a 2.6 kernel.)
+> Existing overlay unit tests examine individual pieces of the overlay
+> code.  The new tests target the entire process of applying an overlay.
 
-fyi, SLES11 upgraded to kernel 3.0, in SP2.
+Just a few nits.
 
-https://www.novell.com/support/kb/doc.php?id=3594951
+> Signed-off-by: Frank Rowand <frank.rowand@sony.com>
 
-Cheers
-Suzuki
+[...]
+
+> diff --git a/drivers/of/of_private.h b/drivers/of/of_private.h
+> index 18bbb4517e25..cc76b3b81eab 100644
+> --- a/drivers/of/of_private.h
+> +++ b/drivers/of/of_private.h
+> @@ -55,6 +55,17 @@ static inline int of_property_notify(int action, struct device_node *np,
+>  }
+>  #endif /* CONFIG_OF_DYNAMIC */
+>
+> +#ifdef CONFIG_OF_UNITTEST
+> +extern void __init unittest_unflatten_overlay_base(void);
+> +extern void *__unflatten_device_tree(const void *blob,
+
+This can and should be outside the ifdef.
+
+> +                             struct device_node *dad,
+> +                             struct device_node **mynodes,
+> +                             void *(*dt_alloc)(u64 size, u64 align),
+> +                             bool detached);
+> +#else
+> +static inline void unittest_unflatten_overlay_base(void) {};
+> +#endif
+> +
+>  /**
+>   * General utilities for working with live trees.
+>   *
+
+[...]
+
+> diff --git a/drivers/of/unittest.c b/drivers/of/unittest.c
+> index 62db55b97c10..884f6c1f8ae9 100644
+> --- a/drivers/of/unittest.c
+> +++ b/drivers/of/unittest.c
+> @@ -8,6 +8,7 @@
+>  #include <linux/err.h>
+>  #include <linux/errno.h>
+>  #include <linux/hashtable.h>
+> +#include <linux/libfdt.h>
+>  #include <linux/of.h>
+>  #include <linux/of_fdt.h>
+>  #include <linux/of_irq.h>
+> @@ -1925,6 +1926,320 @@ static void __init of_unittest_overlay(void)
+>  static inline void __init of_unittest_overlay(void) { }
+>  #endif
+>
+> +#ifdef CONFIG_OF_OVERLAY
+
+This can move down to...
+
+> +
+> +/*
+> + * __dtb_ot_begin[] and __dtb_ot_end[] are created by cmd_dt_S_dtb
+> + * in scripts/Makefile.lib
+> + */
+> +
+> +#define OVERLAY_INFO_EXTERN(name) \
+> +       extern uint8_t __dtb_##name##_begin[]; \
+> +       extern uint8_t __dtb_##name##_end[]
+> +
+> +#define OVERLAY_INFO(name, expected) \
+> +{      .dtb_begin       = __dtb_##name##_begin, \
+> +       .dtb_end         = __dtb_##name##_end, \
+> +       .expected_result = expected, \
+> +}
+> +
+> +struct overlay_info {
+> +       uint8_t            *dtb_begin;
+> +       uint8_t            *dtb_end;
+> +       void               *data;
+> +       struct device_node *np_overlay;
+> +       int                expected_result;
+> +       int                overlay_id;
+> +};
+> +
+> +OVERLAY_INFO_EXTERN(overlay_base);
+> +OVERLAY_INFO_EXTERN(overlay);
+> +OVERLAY_INFO_EXTERN(overlay_bad_phandle);
+
+...here. Maybe we want to move all this to a separate file instead.
+
+> +
+> +/* order of entries is hard-coded into users of overlays[] */
+> +struct overlay_info overlays[] = {
+
+static?
+
+> +       OVERLAY_INFO(overlay_base, -9999),
+> +       OVERLAY_INFO(overlay, 0),
+> +       OVERLAY_INFO(overlay_bad_phandle, -EINVAL),
+> +       {}
+> +};
+
+[...]
+
+> @@ -1962,6 +2277,9 @@ static int __init of_unittest(void)
+>         /* Double check linkage after removing testcase data */
+>         of_unittest_check_tree_linkage();
+>
+> +
+
+Extra blank line.
+
+> +       of_unittest_overlay_high_level();
+> +
+>         pr_info("end of unittest - %i passed, %i failed\n",
+>                 unittest_results.passed, unittest_results.failed);
+>
+> --
+> Frank Rowand <frank.rowand@sony.com>
+>
