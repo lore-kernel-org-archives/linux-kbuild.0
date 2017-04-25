@@ -1,48 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp13.smtpout.orange.fr ([80.12.242.135]:49826 "EHLO
-        smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1949172AbdDYUHw (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:60629 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1952001AbdDYVaK (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 25 Apr 2017 16:07:52 -0400
-From: Robert Jarzmik <robert.jarzmik@free.fr>
-Subject: Re: [PATCH v2] tags: honor COMPILED_SOURCE with apart output directory
-References: <1481819733-3002-1-git-send-email-robert.jarzmik@free.fr>
-        <CAK7LNAQN2ZRFETM818ySYSOx1Tykhq7RCYeyFv=x1ARH7w7cww@mail.gmail.com>
-Date: Tue, 25 Apr 2017 22:07:47 +0200
-In-Reply-To: <CAK7LNAQN2ZRFETM818ySYSOx1Tykhq7RCYeyFv=x1ARH7w7cww@mail.gmail.com>
-        (Masahiro Yamada's message of "Tue, 25 Apr 2017 03:06:04 +0900")
-Message-ID: <87shkwi73g.fsf@belgarion.home>
+        Tue, 25 Apr 2017 17:30:10 -0400
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20170424200458.74416-1-mka@chromium.org>
+References: <20170424200458.74416-1-mka@chromium.org>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Wed, 26 Apr 2017 06:30:04 +0900
+Message-ID: <CAK7LNARJN444jouow3+j7uxpVeFJ+EmkcEmxW_U_Ne0NL+rdug@mail.gmail.com>
+Subject: Re: [PATCH v4] kbuild: Add support to generate LLVM assembly files
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Michal Marek <mmarek@suse.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Matthias Kaehlcke <mka@chromium.org>
+Cc: Michal Marek <mmarek@suse.com>, =?UTF-8?Q?Vin=C3=ADcius_Tinti?= <viniciustinti@gmail.com>, Behan Webster <behanw@converseincode.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Grant Grundler <grundler@chromium.org>, Greg Hackmann <ghackmann@google.com>, Michael Davidson <md@google.com>
 
-Masahiro Yamada <yamada.masahiro@socionext.com> writes:
-
-> Hi Robert,
->> diff --git a/scripts/tags.sh b/scripts/tags.sh
->> index a2ff3388e5ea..35cb64d5211c 100755
->> --- a/scripts/tags.sh
->> +++ b/scripts/tags.sh
->> @@ -106,7 +106,8 @@ all_compiled_sources()
->>                 case "$i" in
->>                         *.[cS])
->>                                 j=${i/\.[cS]/\.o}
->> -                               if [ -e $j ]; then
->> +                               k="${j#$tree}"
->> +                               if [ -e $j -o -e "$k" ]; then
+2017-04-25 5:04 GMT+09:00 Matthias Kaehlcke <mka@chromium.org>:
+> Add rules to kbuild in order to generate LLVM assembly files with the .ll
+> extension when using clang.
 >
+>   # from c code
+>   make CC=3Dclang kernel/pid.ll
 >
-> Do we need to check both srctree and objtree?
-> I think checking objtree (after $tree is ripped off) is enough.
+> From: Vin=C3=ADcius Tinti <viniciustinti@gmail.com>
+> Signed-off-by: Vin=C3=ADcius Tinti <viniciustinti@gmail.com>
+> Signed-off-by: Behan Webster <behanw@converseincode.com>
+> Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+> ---
+> Changes in v4:
+> - changed 'bitcode' to 'assembly'
+> - removed rule for creating LLVM assembly from machine assembly
+> - added .ll files to clean rule
+> - corrected example command in commit message
 
-If I remember correctly, as this goes back a couple of monthes when I made the
-tests of this patch, the srctree is checked for the case when the kernel is
-compiled without O=, and objtree for the case with O=.
 
-Cheers.
+Applied to linux-kbuild/kbuild.  Thanks!
 
--- 
-Robert
+
+--=20
+Best Regards
+Masahiro Yamada
