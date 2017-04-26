@@ -1,55 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-it0-f51.google.com ([209.85.214.51]:37347 "EHLO
-        mail-it0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1033205AbdDYWse (ORCPT
+Received: from mail-pg0-f67.google.com ([74.125.83.67]:33110 "EHLO
+        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1433602AbdDZAKb (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 25 Apr 2017 18:48:34 -0400
-Received: by mail-it0-f51.google.com with SMTP id x188so85691939itb.0
-        for <linux-kbuild@vger.kernel.org>; Tue, 25 Apr 2017 15:48:34 -0700 (PDT)
-From: Matthias Kaehlcke <mka@chromium.org>
-Subject: [PATCH v2] kbuild: clang: add -no-integrated-as to KBUILD_[AC]FLAGS
-Date: Tue, 25 Apr 2017 15:47:35 -0700
-Message-Id: <20170425224735.131835-1-mka@chromium.org>
+        Tue, 25 Apr 2017 20:10:31 -0400
+From: frowand.list@gmail.com
+Subject: [PATCH v4 0/2] of: Add unit tests for applying overlays
+Date: Tue, 25 Apr 2017 17:09:52 -0700
+Message-Id: <1493165394-29367-1-git-send-email-frowand.list@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, Michael Davidson <md@google.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Grant Grundler <grundler@chromium.org>, Greg Hackmann <ghackmann@google.com>, Saleem Abdulrasool <compnerd@compnerd.org>, Matthias Kaehlcke <mka@chromium.org>
+To: Rob Herring <robh+dt@kernel.org>, stephen.boyd@linaro.org, mmarek@suse.com
+Cc: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-From: Michael Davidson <md@google.com>
+From: Frank Rowand <frank.rowand@sony.com>
 
-The Linux Kernel relies on GCC's acceptance of inline assembly as an
-opaque object which will not have any validation performed on the content.
-The current behaviour in LLVM is to perform validation of the contents by
-means of parsing the input if the MC layer can handle it.
+Existing overlay unit tests examine individual pieces of the overlay code.
+The new tests target the entire process of applying an overlay.
 
-Disable clangs integrated assembler and use the GNU assembler instead.
+Changes from v3:
+  - make subject line of patch 1 more generic
 
-Wording-mostly-from: Saleem Abdulrasool <compnerd@compnerd.org>
-Signed-off-by: Michael Davidson <md@google.com>
-Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
----
-Changes in v2:
-- Added paragraph explaining why this change is needed
-- Updated subject (was: Makefile, LLVM: add -no-integrated-as to KBUILD_[AC]FLAGS)
+Changes from v2:
+  - of_private.h: move __unflatten_device_tree() outside
+    #ifdef CONFIG_OF_UNITTEST
+  - unittest.c: move overlay declaration macros outside
+    #ifdef CONFIG_OF_OVERLAY
+  - unittest.c: make overlay_info overlays[] static
+  - unittest.c: remove extra blank line
 
-(agreed with Michael to update the patch)
+Changes from v1:
+  - Move overlay base dtb unflattening into unittest.c.  Call from fdt.c.
+  - Clarify file and variable names, 'overlay_test_' instead of 'ot_'
+  - Use proper naming convention for node names.
+  - A few added comments.
+  - Improve error messages in the new tests.
 
- Makefile | 2 ++
- 1 file changed, 2 insertions(+)
+Frank Rowand (2):
+  of: support dtc compiler flags for overlays
+  of: Add unit tests for applying overlays
 
-diff --git a/Makefile b/Makefile
-index 5039b9148d15..3832c8243334 100644
---- a/Makefile
-+++ b/Makefile
-@@ -710,6 +710,8 @@ KBUILD_CFLAGS += $(call cc-disable-warning, tautological-compare)
- # See modpost pattern 2
- KBUILD_CFLAGS += $(call cc-option, -mno-global-merge,)
- KBUILD_CFLAGS += $(call cc-option, -fcatch-undefined-behavior)
-+KBUILD_CFLAGS += $(call cc-option, -no-integrated-as)
-+KBUILD_AFLAGS += $(call cc-option, -no-integrated-as)
- else
- 
- # These warnings generated too much noise in a regular build.
+ drivers/of/fdt.c                                 |  14 +-
+ drivers/of/of_private.h                          |  12 +
+ drivers/of/unittest-data/Makefile                |  17 +-
+ drivers/of/unittest-data/overlay.dts             |  53 ++++
+ drivers/of/unittest-data/overlay_bad_phandle.dts |  20 ++
+ drivers/of/unittest-data/overlay_base.dts        |  80 ++++++
+ drivers/of/unittest.c                            | 317 +++++++++++++++++++++++
+ scripts/Makefile.lib                             |   2 +
+ 8 files changed, 507 insertions(+), 8 deletions(-)
+ create mode 100644 drivers/of/unittest-data/overlay.dts
+ create mode 100644 drivers/of/unittest-data/overlay_bad_phandle.dts
+ create mode 100644 drivers/of/unittest-data/overlay_base.dts
+
 -- 
-2.13.0.rc0.306.g87b477812d-goog
+Frank Rowand <frank.rowand@sony.com>
 
