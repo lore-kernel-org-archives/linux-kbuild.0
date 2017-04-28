@@ -1,48 +1,41 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-io0-f171.google.com ([209.85.223.171]:33565 "EHLO
-        mail-io0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932151AbdD0W0e (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:21047 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1033559AbdD1Agi (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 27 Apr 2017 18:26:34 -0400
-Date: Thu, 27 Apr 2017 17:26:32 -0500
-From: Rob Herring <robh@kernel.org>
-Subject: Re: [PATCH v4 2/2] of: Add unit tests for applying overlays
-Message-ID: <20170427222632.6hgrto6zr4zhcyya@rob-hp-laptop>
-References: <1493165394-29367-1-git-send-email-frowand.list@gmail.com>
- <1493165394-29367-3-git-send-email-frowand.list@gmail.com>
+        Thu, 27 Apr 2017 20:36:38 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1493165394-29367-3-git-send-email-frowand.list@gmail.com>
+In-Reply-To: <20170425224735.131835-1-mka@chromium.org>
+References: <20170425224735.131835-1-mka@chromium.org>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Fri, 28 Apr 2017 09:36:32 +0900
+Message-ID: <CAK7LNAQOZ-A+JRP1hCmKs1JdN5XsRkWW3OhhRb5-Hj+TMTs7jw@mail.gmail.com>
+Subject: Re: [PATCH v2] kbuild: clang: add -no-integrated-as to KBUILD_[AC]FLAGS
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: frowand.list@gmail.com
-Cc: stephen.boyd@linaro.org, mmarek@suse.com, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Matthias Kaehlcke <mka@chromium.org>
+Cc: Michal Marek <mmarek@suse.com>, Michael Davidson <md@google.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Grant Grundler <grundler@chromium.org>, Greg Hackmann <ghackmann@google.com>, Saleem Abdulrasool <compnerd@compnerd.org>
 
-On Tue, Apr 25, 2017 at 05:09:54PM -0700, frowand.list@gmail.com wrote:
-> From: Frank Rowand <frank.rowand@sony.com>
-> 
-> Existing overlay unit tests examine individual pieces of the overlay
-> code.  The new tests target the entire process of applying an overlay.
-> 
-> Signed-off-by: Frank Rowand <frank.rowand@sony.com>
+2017-04-26 7:47 GMT+09:00 Matthias Kaehlcke <mka@chromium.org>:
+> From: Michael Davidson <md@google.com>
+>
+> The Linux Kernel relies on GCC's acceptance of inline assembly as an
+> opaque object which will not have any validation performed on the content.
+> The current behaviour in LLVM is to perform validation of the contents by
+> means of parsing the input if the MC layer can handle it.
+>
+> Disable clangs integrated assembler and use the GNU assembler instead.
+>
+> Wording-mostly-from: Saleem Abdulrasool <compnerd@compnerd.org>
+> Signed-off-by: Michael Davidson <md@google.com>
+> Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
 > ---
-> 
-> There are checkpatch warnings.  I have reviewed them and feel they
-> can be ignored.
-> 
->  drivers/of/fdt.c                                 |  14 +-
->  drivers/of/of_private.h                          |  12 +
->  drivers/of/unittest-data/Makefile                |  17 +-
->  drivers/of/unittest-data/overlay.dts             |  53 ++++
->  drivers/of/unittest-data/overlay_bad_phandle.dts |  20 ++
->  drivers/of/unittest-data/overlay_base.dts        |  80 ++++++
->  drivers/of/unittest.c                            | 317 +++++++++++++++++++++++
->  7 files changed, 505 insertions(+), 8 deletions(-)
->  create mode 100644 drivers/of/unittest-data/overlay.dts
->  create mode 100644 drivers/of/unittest-data/overlay_bad_phandle.dts
->  create mode 100644 drivers/of/unittest-data/overlay_base.dts
 
-Applied.
 
-Rob
+Applied to linux-kbuild/kbuild.  Thanks!
+
+
+-- 
+Best Regards
+Masahiro Yamada
