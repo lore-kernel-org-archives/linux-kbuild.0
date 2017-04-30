@@ -1,69 +1,83 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:49386 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S938521AbdD3OBT (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:35438 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S968945AbdD3OPH (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 30 Apr 2017 10:01:19 -0400
+        Sun, 30 Apr 2017 10:15:07 -0400
+Received: from mail-yw0-f175.google.com (mail-yw0-f175.google.com [209.85.161.175]) (authenticated)
+        by conssluserg-02.nifty.com with ESMTP id v3UEEisF022810
+        for <linux-kbuild@vger.kernel.org>; Sun, 30 Apr 2017 23:14:45 +0900
+Received: by mail-yw0-f175.google.com with SMTP id 203so47849762ywe.0
+        for <linux-kbuild@vger.kernel.org>; Sun, 30 Apr 2017 07:14:45 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20170421213931.155210-3-mka@chromium.org>
-References: <20170421213931.155210-1-mka@chromium.org> <20170421213931.155210-3-mka@chromium.org>
+In-Reply-To: <1492932183.31767.64.camel@decadent.org.uk>
+References: <20170418010011.GC4152@decadent.org.uk> <CAK7LNASG59wc7Ed24HFiGn0CFUxjDtMgKwy8dhz2PfvRDw1Y1w@mail.gmail.com>
+ <1492932183.31767.64.camel@decadent.org.uk>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sun, 30 Apr 2017 23:01:11 +0900
-Message-ID: <CAK7LNATD-KbP6GtV_j6NMgcPQYRigz5pA8fdos7hQSzQpL8czw@mail.gmail.com>
-Subject: Re: [PATCH 2/2] kbuild: clang: Disable the 'duplicate-decl-specifier' warning
+Date: Sun, 30 Apr 2017 23:14:43 +0900
+Message-ID: <CAK7LNATV4vsczwkntLJPhvPew4NEL1JeckaBxeFk-6Q-Y_VfoQ@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: Do not use hyphen in exported variable name
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Matthias Kaehlcke <mka@chromium.org>
-Cc: Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Grant Grundler <grundler@chromium.org>, Greg Hackmann <ghackmann@google.com>, Michael Davidson <md@google.com>, masahiroy@kernel.org
+To: Ben Hutchings <ben@decadent.org.uk>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, debian-kernel <debian-kernel@lists.debian.org>
 
-Hi Matthias,
+Hi Ben,
 
 
-2017-04-22 6:39 GMT+09:00 Matthias Kaehlcke <mka@chromium.org>:
-> clang generates plenty of these warnings in different parts of the code.
-> They are mostly caused by container_of() and other macros which declare
-> a "const <type> *" variable for their internal use which triggers a
-> "duplicate 'const' specifier" warning if the <type> is already const
-> qualified.
+2017-04-23 16:23 GMT+09:00 Ben Hutchings <ben@decadent.org.uk>:
+> On Sun, 2017-04-23 at 15:47 +0900, Masahiro Yamada wrote:
+> [...]
+>> I tested dtbs_install once again by myself, but
+>> dtbinst-root is exported to the sub make
+>> and the vendor directories are created correctly.
+>>
+>>
+>> I checked the debian's forum you gave
+>> > References: https://bugs.debian.org/833561
+>>
+>> In there, you mentioned:
+>> "This looks like a bug in make, but we can at least work around it by
+>> using a non-hyphenated variable name."
+>>
+>>
+>> Does this issue happen on a specific Make version?
+>>
+>> I tested GNU make 3.81, 3.82, 4.0, 4.1, 4.2,
+>> but I was not hit by the problem.
 >
-> Wording-mostly-from: Michael Davidson <md@google.com>
-> Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+> I don't think this is make version dependent.  I can't reproduce the
+> issue today with make 4.1.  But I would have been using the same
+> version in August when I wrote that.
+>
+> What more can I say?  Clearly the hyphenated variable gets passed to
+> the sub-make in most cases.  But it's not totally reliable because last
+> year it wasn't working for us.
+>
+>> In the last post in the thread, you concluded:
+>> "We believe that the bug you reported is fixed in the latest version of
+>> linux, which is due to be installed in the Debian FTP archive."
+>
+> I didn't write that, it's a standard message generated for bugs marked
+> as closed in a package changelog. :-)
+>
+>> If so, why is this patch here?
+>> How is the dtbs_install procedure different in the Debian package?
+>
+> This is the patch I applied to the package.
+>
 
+Do you still need this patch for Debian?
 
+If so, I can pick it up because it is apparently harmless
+(maybe safer as you said).
 
-I think container_of() can be more simple,
-dropping the 'const'.
+However, I may add the following excuse in the git-log:
 
-The following patch worked for me.
+[masahiro
+ I cound not reproduce the issue, but at least this patch is harmless.]
 
-
-diff --git a/include/linux/kernel.h b/include/linux/kernel.h
-index 4c26dc3..d53672b 100644
---- a/include/linux/kernel.h
-+++ b/include/linux/kernel.h
-@@ -846,11 +846,9 @@ static inline void ftrace_dump(enum
-ftrace_dump_mode oops_dump_mode) { }
-  * @ptr:       the pointer to the member.
-  * @type:      the type of the container struct this is embedded in.
-  * @member:    the name of the member within the struct.
-- *
-  */
- #define container_of(ptr, type, member) ({                     \
--       const typeof( ((type *)0)->member ) *__mptr = (ptr);    \
--       (type *)( (char *)__mptr - offsetof(type,member) );})
-+       (type *)((void *)(ptr) - offsetof(type, member));})
-
- /* Rebuild everything on CONFIG_FTRACE_MCOUNT_RECORD */
- #ifdef CONFIG_FTRACE_MCOUNT_RECORD
-
-
-
-For also this one,
-I'd like to try to fix the code rather than hiding warnings.
-
-(We may end up with applying your patch after all,
-but I'd like to think about it for now.)
 
 
 
