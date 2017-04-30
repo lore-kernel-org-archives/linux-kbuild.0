@@ -1,61 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:48178 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S967435AbdD3OxL (ORCPT
+Received: from mail-lf0-f67.google.com ([209.85.215.67]:35547 "EHLO
+        mail-lf0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1756141AbdD3QQT (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 30 Apr 2017 10:53:11 -0400
-MIME-Version: 1.0
-In-Reply-To: <87shkwi73g.fsf@belgarion.home>
-References: <1481819733-3002-1-git-send-email-robert.jarzmik@free.fr>
- <CAK7LNAQN2ZRFETM818ySYSOx1Tykhq7RCYeyFv=x1ARH7w7cww@mail.gmail.com> <87shkwi73g.fsf@belgarion.home>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sun, 30 Apr 2017 23:53:05 +0900
-Message-ID: <CAK7LNARpU2Stv2=jWiK2z1WxY-EnKACkJbnFWOaD1POigGvSug@mail.gmail.com>
-Subject: Re: [PATCH v2] tags: honor COMPILED_SOURCE with apart output directory
-Content-Type: text/plain; charset=UTF-8
+        Sun, 30 Apr 2017 12:16:19 -0400
+From: Rabin Vincent <rabin@rab.in>
+Subject: [PATCH] Makefile: evaluate LDFLAGS_BUILD_ID only once
+Date: Sun, 30 Apr 2017 18:16:00 +0200
+Message-Id: <20170430161600.15845-1-rabin@rab.in>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Robert Jarzmik <robert.jarzmik@free.fr>
-Cc: Michal Marek <mmarek@suse.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: yamada.masahiro@socionext.com, mmarek@suse.com
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Rabin Vincent <rabin@rab.in>
 
-Hi Robert,
+Evaluate LDFLAGS_BUILD_ID (which involves invoking the compiler) only
+once instead of over and over.
 
-2017-04-26 5:07 GMT+09:00 Robert Jarzmik <robert.jarzmik@free.fr>:
-> Masahiro Yamada <yamada.masahiro@socionext.com> writes:
->
->> Hi Robert,
->>> diff --git a/scripts/tags.sh b/scripts/tags.sh
->>> index a2ff3388e5ea..35cb64d5211c 100755
->>> --- a/scripts/tags.sh
->>> +++ b/scripts/tags.sh
->>> @@ -106,7 +106,8 @@ all_compiled_sources()
->>>                 case "$i" in
->>>                         *.[cS])
->>>                                 j=${i/\.[cS]/\.o}
->>> -                               if [ -e $j ]; then
->>> +                               k="${j#$tree}"
->>> +                               if [ -e $j -o -e "$k" ]; then
->>
->>
->> Do we need to check both srctree and objtree?
->> I think checking objtree (after $tree is ripped off) is enough.
->
-> If I remember correctly, as this goes back a couple of monthes when I made the
-> tests of this patch, the srctree is checked for the case when the kernel is
-> compiled without O=, and objtree for the case with O=.
+This provides a ~20% reduction in null build time with x86 allnoconfig:
 
+$ make allnoconfig && make -j8
+$ perf stat -r5 -e sched:sched_process_exec make -j8
+-       2 119      sched:sched_process_exec
++       1 878      sched:sched_process_exec
 
-I thought of this too, but if O= is given, objects in srctree
-should not be checked.
+-       1,238817018 seconds time elapsed
++       0,971020553 seconds time elapsed
 
-For example, the kernel may be compiled for ARCH=arm with O= first,
-then for ARCH=x86 without O= second.
+Signed-off-by: Rabin Vincent <rabin@rab.in>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-If we include objects from both trees, the generated tag file
-will be a mixture of arm and x86.
-
-
-
+diff --git a/Makefile b/Makefile
+index 779302695453..c78a266594c1 100644
+--- a/Makefile
++++ b/Makefile
+@@ -815,7 +815,7 @@ KBUILD_AFLAGS   += $(ARCH_AFLAGS)   $(KAFLAGS)
+ KBUILD_CFLAGS   += $(ARCH_CFLAGS)   $(KCFLAGS)
+ 
+ # Use --build-id when available.
+-LDFLAGS_BUILD_ID = $(patsubst -Wl$(comma)%,%,\
++LDFLAGS_BUILD_ID := $(patsubst -Wl$(comma)%,%,\
+ 			      $(call cc-ldoption, -Wl$(comma)--build-id,))
+ KBUILD_LDFLAGS_MODULE += $(LDFLAGS_BUILD_ID)
+ LDFLAGS_vmlinux += $(LDFLAGS_BUILD_ID)
 -- 
-Best Regards
-Masahiro Yamada
+2.11.0
+
