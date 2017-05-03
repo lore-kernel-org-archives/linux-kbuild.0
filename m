@@ -1,128 +1,67 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf0-f175.google.com ([209.85.192.175]:33660 "EHLO
-        mail-pf0-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750775AbdEBBXd (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:64903 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750737AbdECELI (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 1 May 2017 21:23:33 -0400
-Received: by mail-pf0-f175.google.com with SMTP id q20so27790323pfg.0
-        for <linux-kbuild@vger.kernel.org>; Mon, 01 May 2017 18:23:32 -0700 (PDT)
-Date: Mon, 1 May 2017 18:23:30 -0700
-From: Matthias Kaehlcke <mka@chromium.org>
-Subject: Re: [PATCH 1/2] kbuild: clang: Disable 'address-of-packed-member'
- warning
-Message-ID: <20170502012330.GW128305@google.com>
-References: <20170421213931.155210-1-mka@chromium.org>
- <20170421213931.155210-2-mka@chromium.org>
- <CAK7LNASEnzDPQs2AY115sMx-i2NTUu9h9LHv5eN1ygvW81vtFw@mail.gmail.com>
+        Wed, 3 May 2017 00:11:08 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAK7LNASEnzDPQs2AY115sMx-i2NTUu9h9LHv5eN1ygvW81vtFw@mail.gmail.com>
+In-Reply-To: <20170414215450.18307-3-sthemmin@microsoft.com>
+References: <20170414215450.18307-1-sthemmin@microsoft.com> <20170414215450.18307-3-sthemmin@microsoft.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Wed, 3 May 2017 13:10:52 +0900
+Message-ID: <CAK7LNATjXkvuRO7iF7uAa1WwWSAH-JxGv6-ksVrdTaMJOhgbKg@mail.gmail.com>
+Subject: Re: [PATCH 2/2] kbuild: remove initramfs cpio with mrproper
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Grant Grundler <grundler@chromium.org>, Greg Hackmann <ghackmann@google.com>, Michael Davidson <md@google.com>
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Stephen Hemminger <sthemmin@microsoft.com>
 
-Hi Masahiro,
+Hi Stephen,
 
-El Sun, Apr 30, 2017 at 10:59:52PM +0900 Masahiro Yamada ha dit:
 
-> 2017-04-22 6:39 GMT+09:00 Matthias Kaehlcke <mka@chromium.org>:
-> > clang generates plenty of these warnings in different parts of the code,
-> > to an extent that the warnings are little more than noise. Disable the
-> > 'address-of-packed-member' warning.
-> >
-> > Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
-> 
-> 
-> As far as I compiled arch/x86/configs/x86_64_defconfig,
-> all address-of-packed-member warnings came from the single point:
-> 
-> ./arch/x86/include/asm/processor.h:534:30: warning: taking address of
-> packed member 'sp0' of class or structure 'x86_hw_tss' may result in
-> an unaligned pointer value [-Waddress-of-packed-member]
->         return this_cpu_read_stable(cpu_tss.x86_tss.sp0);
->                                     ^~~~~~~~~~~~~~~~~~~
-> ./arch/x86/include/asm/percpu.h:391:59: note: expanded from macro
-> 'this_cpu_read_stable'
-> #define this_cpu_read_stable(var)       percpu_stable_op("mov", var)
->                                                                 ^~~
-> ./arch/x86/include/asm/percpu.h:228:16: note: expanded from macro
-> 'percpu_stable_op'
->                     : "p" (&(var)));                    \
->                              ^~~
-> 
-> 
-> 
-> For this case, I was able to fix it with the following patch:
-> 
-> 
-> diff --git a/arch/x86/include/asm/percpu.h b/arch/x86/include/asm/percpu.h
-> index 9fa0360..de25d1c 100644
-> --- a/arch/x86/include/asm/percpu.h
-> +++ b/arch/x86/include/asm/percpu.h
-> @@ -211,26 +211,27 @@ do {
->         \
->  #define percpu_stable_op(op, var)                      \
->  ({                                                     \
->         typeof(var) pfo_ret__;                          \
-> +       void *__p = &(var);                             \
->         switch (sizeof(var)) {                          \
->         case 1:                                         \
->                 asm(op "b "__percpu_arg(P1)",%0"        \
->                     : "=q" (pfo_ret__)                  \
-> -                   : "p" (&(var)));                    \
-> +                   : "p" (__p));                       \
->                 break;                                  \
->         case 2:                                         \
->                 asm(op "w "__percpu_arg(P1)",%0"        \
->                     : "=r" (pfo_ret__)                  \
-> -                   : "p" (&(var)));                    \
-> +                   : "p" (__p));                       \
->                 break;                                  \
->         case 4:                                         \
->                 asm(op "l "__percpu_arg(P1)",%0"        \
->                     : "=r" (pfo_ret__)                  \
-> -                   : "p" (&(var)));                    \
-> +                   : "p" (__p));                       \
->                 break;                                  \
->         case 8:                                         \
->                 asm(op "q "__percpu_arg(P1)",%0"        \
->                     : "=r" (pfo_ret__)                  \
-> -                   : "p" (&(var)));                    \
-> +                   : "p" (__p));                       \
->                 break;                                  \
->         default: __bad_percpu_size();                   \
->         }                                               \
+2017-04-15 6:54 GMT+09:00 Stephen Hemminger <stephen@networkplumber.org>:
+> When 'make mrproper' is done, it should also remove the initramfs cpio
+> file. I ran into this while doing test build on one machine, followed
+> by make mrproper and rsync to a target machine. The build on the target
+> machine would succeed but be unbootable because of the bad initramfs.
 
-Thanks for having a look!
 
-It is odd though that you only see warnings from that origin, I
-encounter plenty of others with x86_64_defconfig, mostly stemming
-from uaccess macros:
+I think initramfs_data.cpio.* is unneeded for external modules.
 
-kernel/power/user.c:439:35: warning: taking address of packed member
-'dev' of class or structure 'compat_resume_swap_area' may result in an
-unaligned pointer value [-Waddress-of-packed-member]
-                err |= get_user(swap_area.dev, &u_swap_area->dev);
-                                                ^~~~~~~~~~~~~~~~
-./arch/x86/include/asm/uaccess.h:168:23: note: expanded from macro 'get_user'
-        register __inttype(*(ptr)) __val_gu asm("%"_ASM_DX);            \
-                             ^~~
-./arch/x86/include/asm/uaccess.h:132:41: note: expanded from macro '__inttype'
-__typeof__(__builtin_choose_expr(sizeof(x) > sizeof(0UL), 0ULL, 0UL))
-                                        ^
+So, shouldn't it removed by 'make clean', instead of 'make mrproper'?
 
-I looked into fixing different cases, but didn't see a clear path
-forward since we can't just cast the type away as in your patch above.
 
-> I'd like to see as much effort as possible
-> before we decide to hide this kind of warning.
-> 
-> Is it OK with you ?
 
-Sounds good, though I will probably leave this one for someone else :)
 
-Cheers
+> Signed-off-by: Stephen Hemminger <sthemmin@microsoft.com>
+> ---
+>  Makefile | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/Makefile b/Makefile
+> index 04ca211552f7..954292695bf6 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -1276,7 +1276,8 @@ MRPROPER_FILES += .config .config.old .version .old_version \
+>                   Module.symvers tags TAGS cscope* GPATH GTAGS GRTAGS GSYMS \
+>                   certs/signing_key.pem certs/signing_key.priv certs/signing_key.x509   \
+>                   certs/x509.genkey certs/extra_certificates certs/signing_key.x509.keyid \
+> -                 certs/signing_key.x509.signer vmlinux-gdb.py
+> +                 certs/signing_key.x509.signer vmlinux-gdb.py \
+> +                 usr/initramfs_data.cpio.gz
+>
 
-Matthias
+As you see usr/Makefile,
+datafile_y = initramfs_data.cpio$(suffix_y)
+
+The suffix could be .gz, .bz2, .xz, etc.
+
+
+Why only initramfs_data.cpio.gz?
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
