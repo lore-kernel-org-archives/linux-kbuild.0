@@ -1,56 +1,69 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-08.nifty.com ([210.131.2.75]:43049 "EHLO
-        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752176AbdEDBQR (ORCPT
+Received: from smtp11.smtpout.orange.fr ([80.12.242.133]:34758 "EHLO
+        smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752716AbdEDG3W (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 3 May 2017 21:16:17 -0400
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] kbuild: dtbinst: remove unnecessary __dtbs_install_prep target
-Date: Thu,  4 May 2017 10:14:57 +0900
-Message-Id: <1493860497-26311-1-git-send-email-yamada.masahiro@socionext.com>
+        Thu, 4 May 2017 02:29:22 -0400
+From: Robert Jarzmik <robert.jarzmik@free.fr>
+Subject: Re: [PATCH v2] tags: honor COMPILED_SOURCE with apart output directory
+References: <1481819733-3002-1-git-send-email-robert.jarzmik@free.fr>
+        <CAK7LNAQN2ZRFETM818ySYSOx1Tykhq7RCYeyFv=x1ARH7w7cww@mail.gmail.com>
+        <87shkwi73g.fsf@belgarion.home>
+        <CAK7LNARpU2Stv2=jWiK2z1WxY-EnKACkJbnFWOaD1POigGvSug@mail.gmail.com>
+Date: Thu, 04 May 2017 08:29:18 +0200
+In-Reply-To: <CAK7LNARpU2Stv2=jWiK2z1WxY-EnKACkJbnFWOaD1POigGvSug@mail.gmail.com>
+        (Masahiro Yamada's message of "Sun, 30 Apr 2017 23:53:05 +0900")
+Message-ID: <87h911yw1t.fsf@belgarion.home>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Ben Hutchings <ben@decadent.org.uk>, Russell King <rmk+kernel@armlinux.org.uk>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, linux-kernel@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Michal Marek <mmarek@suse.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-Since commit 5399eb9b3908 ("dtbsinstall: don't move target directory
-out of the way"), the target __dtbs_install_prep is invoked just for
-creating the install directory, but all the necessary directories
-are automatically created by:
-   cmd_dtb_install = mkdir -p $(2); cp $< $(2)
+Masahiro Yamada <yamada.masahiro@socionext.com> writes:
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
+> Hi Robert,
+>
+> 2017-04-26 5:07 GMT+09:00 Robert Jarzmik <robert.jarzmik@free.fr>:
+>> Masahiro Yamada <yamada.masahiro@socionext.com> writes:
+>>
+>>> Hi Robert,
+>>>> diff --git a/scripts/tags.sh b/scripts/tags.sh
+>>>> index a2ff3388e5ea..35cb64d5211c 100755
+>>>> --- a/scripts/tags.sh
+>>>> +++ b/scripts/tags.sh
+>>>> @@ -106,7 +106,8 @@ all_compiled_sources()
+>>>>                 case "$i" in
+>>>>                         *.[cS])
+>>>>                                 j=${i/\.[cS]/\.o}
+>>>> -                               if [ -e $j ]; then
+>>>> +                               k="${j#$tree}"
+>>>> +                               if [ -e $j -o -e "$k" ]; then
+>>>
+>>>
+>>> Do we need to check both srctree and objtree?
+>>> I think checking objtree (after $tree is ripped off) is enough.
+>>
+>> If I remember correctly, as this goes back a couple of monthes when I made the
+>> tests of this patch, the srctree is checked for the case when the kernel is
+>> compiled without O=, and objtree for the case with O=.
+>
+>
+> I thought of this too, but if O= is given, objects in srctree
+> should not be checked.
+>
+> For example, the kernel may be compiled for ARCH=arm with O= first,
+> then for ARCH=x86 without O= second.
+>
+> If we include objects from both trees, the generated tag file
+> will be a mixture of arm and x86.
+That's true, but is this case worth an additional test for this case, ie. is it
+a case anybody uses ? Given that that this tags generation never worked for out
+of tree builds, I was thinking it wasn't worth a :
+   [[ (-z $O -a -e $j) || (-n $O -a -e $k) ]];
 
- scripts/Makefile.dtbinst | 8 --------
- 1 file changed, 8 deletions(-)
+Cheers.
 
-diff --git a/scripts/Makefile.dtbinst b/scripts/Makefile.dtbinst
-index a1be75d..34614a4 100644
---- a/scripts/Makefile.dtbinst
-+++ b/scripts/Makefile.dtbinst
-@@ -20,12 +20,6 @@ include include/config/auto.conf
- include scripts/Kbuild.include
- include $(src)/Makefile
- 
--PHONY += __dtbs_install_prep
--__dtbs_install_prep:
--ifeq ("$(dtbinst-root)", "$(obj)")
--	$(Q)mkdir -p $(INSTALL_DTBS_PATH)
--endif
--
- dtbinst-files	:= $(dtb-y)
- dtbinst-dirs	:= $(dts-dirs)
- 
-@@ -35,8 +29,6 @@ quiet_cmd_dtb_install =	INSTALL $<
- 
- install-dir = $(patsubst $(dtbinst-root)%,$(INSTALL_DTBS_PATH)%,$(obj))
- 
--$(dtbinst-files) $(dtbinst-dirs): | __dtbs_install_prep
--
- $(dtbinst-files): %.dtb: $(obj)/%.dtb
- 	$(call cmd,dtb_install,$(install-dir))
- 
 -- 
-2.7.4
-
+Robert
