@@ -1,130 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:48026 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751619AbdEFQwh (ORCPT
+Received: from mail-lf0-f68.google.com ([209.85.215.68]:35832 "EHLO
+        mail-lf0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753442AbdEFWjq (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 6 May 2017 12:52:37 -0400
-MIME-Version: 1.0
-In-Reply-To: <20170502012330.GW128305@google.com>
-References: <20170421213931.155210-1-mka@chromium.org> <20170421213931.155210-2-mka@chromium.org>
- <CAK7LNASEnzDPQs2AY115sMx-i2NTUu9h9LHv5eN1ygvW81vtFw@mail.gmail.com> <20170502012330.GW128305@google.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sun, 7 May 2017 01:52:25 +0900
-Message-ID: <CAK7LNATysoDBqaTDT2zGs-ycHNqoX=RLfbG=1uHzLrVOiwO6fw@mail.gmail.com>
-Subject: Re: [PATCH 1/2] kbuild: clang: Disable 'address-of-packed-member' warning
-Content-Type: text/plain; charset=UTF-8
+        Sat, 6 May 2017 18:39:46 -0400
+From: Max Filippov <jcmvbkbc@gmail.com>
+Subject: [PATCH] docs: complete bumping minimal GNU Make version to 3.81
+Date: Sat,  6 May 2017 15:39:25 -0700
+Message-Id: <1494110365-1772-1-git-send-email-jcmvbkbc@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Matthias Kaehlcke <mka@chromium.org>
-Cc: Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Grant Grundler <grundler@chromium.org>, Greg Hackmann <ghackmann@google.com>, Michael Davidson <md@google.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Linus Torvalds <torvalds@linux-foundation.org>
+Cc: linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, Max Filippov <jcmvbkbc@gmail.com>
 
-Hi Matthias,
+Commit 37d69ee3080811 ("docs: bump minimal GNU Make version to 3.81")
+changes one entry of GNU make version in the changes.rst, there's still
+one more entry saying that one need version 3.80. Fix that.
 
+Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
+---
+ Documentation/process/changes.rst | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-2017-05-02 10:23 GMT+09:00 Matthias Kaehlcke <mka@chromium.org>:
-> Hi Masahiro,
->
-> El Sun, Apr 30, 2017 at 10:59:52PM +0900 Masahiro Yamada ha dit:
->
->> 2017-04-22 6:39 GMT+09:00 Matthias Kaehlcke <mka@chromium.org>:
->> > clang generates plenty of these warnings in different parts of the code,
->> > to an extent that the warnings are little more than noise. Disable the
->> > 'address-of-packed-member' warning.
->> >
->> > Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
->>
->>
->> As far as I compiled arch/x86/configs/x86_64_defconfig,
->> all address-of-packed-member warnings came from the single point:
->>
->> ./arch/x86/include/asm/processor.h:534:30: warning: taking address of
->> packed member 'sp0' of class or structure 'x86_hw_tss' may result in
->> an unaligned pointer value [-Waddress-of-packed-member]
->>         return this_cpu_read_stable(cpu_tss.x86_tss.sp0);
->>                                     ^~~~~~~~~~~~~~~~~~~
->> ./arch/x86/include/asm/percpu.h:391:59: note: expanded from macro
->> 'this_cpu_read_stable'
->> #define this_cpu_read_stable(var)       percpu_stable_op("mov", var)
->>                                                                 ^~~
->> ./arch/x86/include/asm/percpu.h:228:16: note: expanded from macro
->> 'percpu_stable_op'
->>                     : "p" (&(var)));                    \
->>                              ^~~
->>
->>
->>
->> For this case, I was able to fix it with the following patch:
->>
->>
->> diff --git a/arch/x86/include/asm/percpu.h b/arch/x86/include/asm/percpu.h
->> index 9fa0360..de25d1c 100644
->> --- a/arch/x86/include/asm/percpu.h
->> +++ b/arch/x86/include/asm/percpu.h
->> @@ -211,26 +211,27 @@ do {
->>         \
->>  #define percpu_stable_op(op, var)                      \
->>  ({                                                     \
->>         typeof(var) pfo_ret__;                          \
->> +       void *__p = &(var);                             \
->>         switch (sizeof(var)) {                          \
->>         case 1:                                         \
->>                 asm(op "b "__percpu_arg(P1)",%0"        \
->>                     : "=q" (pfo_ret__)                  \
->> -                   : "p" (&(var)));                    \
->> +                   : "p" (__p));                       \
->>                 break;                                  \
->>         case 2:                                         \
->>                 asm(op "w "__percpu_arg(P1)",%0"        \
->>                     : "=r" (pfo_ret__)                  \
->> -                   : "p" (&(var)));                    \
->> +                   : "p" (__p));                       \
->>                 break;                                  \
->>         case 4:                                         \
->>                 asm(op "l "__percpu_arg(P1)",%0"        \
->>                     : "=r" (pfo_ret__)                  \
->> -                   : "p" (&(var)));                    \
->> +                   : "p" (__p));                       \
->>                 break;                                  \
->>         case 8:                                         \
->>                 asm(op "q "__percpu_arg(P1)",%0"        \
->>                     : "=r" (pfo_ret__)                  \
->> -                   : "p" (&(var)));                    \
->> +                   : "p" (__p));                       \
->>                 break;                                  \
->>         default: __bad_percpu_size();                   \
->>         }                                               \
->
-> Thanks for having a look!
->
-> It is odd though that you only see warnings from that origin, I
-> encounter plenty of others with x86_64_defconfig, mostly stemming
-> from uaccess macros:
->
-> kernel/power/user.c:439:35: warning: taking address of packed member
-> 'dev' of class or structure 'compat_resume_swap_area' may result in an
-> unaligned pointer value [-Waddress-of-packed-member]
->                 err |= get_user(swap_area.dev, &u_swap_area->dev);
->                                                 ^~~~~~~~~~~~~~~~
-> ./arch/x86/include/asm/uaccess.h:168:23: note: expanded from macro 'get_user'
->         register __inttype(*(ptr)) __val_gu asm("%"_ASM_DX);            \
->                              ^~~
-> ./arch/x86/include/asm/uaccess.h:132:41: note: expanded from macro '__inttype'
-> __typeof__(__builtin_choose_expr(sizeof(x) > sizeof(0UL), 0ULL, 0UL))
->                                         ^
->
-> I looked into fixing different cases, but didn't see a clear path
-> forward since we can't just cast the type away as in your patch above.
-
-
-Curious.
-I tested clang 3.0 thru 4.0, but I could not reproduce this.
-
-This part just calculates sizeof(*(ptr)).
-I think it is a false positive warning bug if clang reports this.
-
-
-
-
+diff --git a/Documentation/process/changes.rst b/Documentation/process/changes.rst
+index cef7bc4..e25d63f 100644
+--- a/Documentation/process/changes.rst
++++ b/Documentation/process/changes.rst
+@@ -70,7 +70,7 @@ computer.
+ Make
+ ----
+ 
+-You will need GNU make 3.80 or later to build the kernel.
++You will need GNU make 3.81 or later to build the kernel.
+ 
+ Binutils
+ --------
 -- 
-Best Regards
-Masahiro Yamada
+2.1.4
+
