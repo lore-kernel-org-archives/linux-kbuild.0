@@ -1,163 +1,71 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg0-f47.google.com ([74.125.83.47]:34807 "EHLO
-        mail-pg0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751094AbdEHXSw (ORCPT
+Received: from merlin.infradead.org ([205.233.59.134]:38222 "EHLO
+        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751094AbdEHXwL (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 8 May 2017 19:18:52 -0400
-Received: by mail-pg0-f47.google.com with SMTP id u28so30496311pgn.1
-        for <linux-kbuild@vger.kernel.org>; Mon, 08 May 2017 16:18:52 -0700 (PDT)
-Date: Mon, 8 May 2017 16:18:50 -0700
-From: Matthias Kaehlcke <mka@chromium.org>
-Subject: Re: [PATCH 1/2] kbuild: clang: Disable 'address-of-packed-member'
- warning
-Message-ID: <20170508231850.GG128305@google.com>
-References: <20170421213931.155210-1-mka@chromium.org>
- <20170421213931.155210-2-mka@chromium.org>
- <CAK7LNASEnzDPQs2AY115sMx-i2NTUu9h9LHv5eN1ygvW81vtFw@mail.gmail.com>
- <20170502012330.GW128305@google.com>
- <CAK7LNATysoDBqaTDT2zGs-ycHNqoX=RLfbG=1uHzLrVOiwO6fw@mail.gmail.com>
+        Mon, 8 May 2017 19:52:11 -0400
+Subject: Re: [PATCH v2] Fix ctype(3) usage in the kconfig code on NetBSD
+From: Randy Dunlap <rdunlap@infradead.org>
+References: <1457397085-10907-1-git-send-email-n54@gmx.com>
+ <20170507134422.2666-1-n54@gmx.com>
+ <b2a75122-5762-542e-14b8-c6ef459b0825@gmx.com>
+ <0857dbdf-d62f-c290-37ca-727fc2b1696b@infradead.org>
+Message-ID: <a0bc2b55-0985-49a3-067d-5e7c1eb3ee5e@infradead.org>
+Date: Mon, 8 May 2017 16:52:04 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAK7LNATysoDBqaTDT2zGs-ycHNqoX=RLfbG=1uHzLrVOiwO6fw@mail.gmail.com>
+In-Reply-To: <0857dbdf-d62f-c290-37ca-727fc2b1696b@infradead.org>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Grant Grundler <grundler@chromium.org>, Greg Hackmann <ghackmann@google.com>, Michael Davidson <md@google.com>
+To: Kamil Rytarowski <n54@gmx.com>, linux-kbuild@vger.kernel.org
+Cc: yann.morin.1998@free.fr, Andrew Morton <akpm@linux-foundation.org>, Masahiro Yamada <yamada.masahiro@socionext.com>
 
-Hi Masahiro,
+On 05/07/17 17:04, Randy Dunlap wrote:
+> 
+> Patch makes sense to me. I haven't tested it but I can.
 
-El Sun, May 07, 2017 at 01:52:25AM +0900 Masahiro Yamada ha dit:
+Tested-by: Randy Dunlap <rdunlap@infradead.org>
 
-> 2017-05-02 10:23 GMT+09:00 Matthias Kaehlcke <mka@chromium.org>:
-> > Hi Masahiro,
-> >
-> > El Sun, Apr 30, 2017 at 10:59:52PM +0900 Masahiro Yamada ha dit:
-> >
-> >> 2017-04-22 6:39 GMT+09:00 Matthias Kaehlcke <mka@chromium.org>:
-> >> > clang generates plenty of these warnings in different parts of the code,
-> >> > to an extent that the warnings are little more than noise. Disable the
-> >> > 'address-of-packed-member' warning.
-> >> >
-> >> > Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
-> >>
-> >>
-> >> As far as I compiled arch/x86/configs/x86_64_defconfig,
-> >> all address-of-packed-member warnings came from the single point:
-> >>
-> >> ./arch/x86/include/asm/processor.h:534:30: warning: taking address of
-> >> packed member 'sp0' of class or structure 'x86_hw_tss' may result in
-> >> an unaligned pointer value [-Waddress-of-packed-member]
-> >>         return this_cpu_read_stable(cpu_tss.x86_tss.sp0);
-> >>                                     ^~~~~~~~~~~~~~~~~~~
-> >> ./arch/x86/include/asm/percpu.h:391:59: note: expanded from macro
-> >> 'this_cpu_read_stable'
-> >> #define this_cpu_read_stable(var)       percpu_stable_op("mov", var)
-> >>                                                                 ^~~
-> >> ./arch/x86/include/asm/percpu.h:228:16: note: expanded from macro
-> >> 'percpu_stable_op'
-> >>                     : "p" (&(var)));                    \
-> >>                              ^~~
-> >>
-> >>
-> >>
-> >> For this case, I was able to fix it with the following patch:
-> >>
-> >>
-> >> diff --git a/arch/x86/include/asm/percpu.h b/arch/x86/include/asm/percpu.h
-> >> index 9fa0360..de25d1c 100644
-> >> --- a/arch/x86/include/asm/percpu.h
-> >> +++ b/arch/x86/include/asm/percpu.h
-> >> @@ -211,26 +211,27 @@ do {
-> >>         \
-> >>  #define percpu_stable_op(op, var)                      \
-> >>  ({                                                     \
-> >>         typeof(var) pfo_ret__;                          \
-> >> +       void *__p = &(var);                             \
-> >>         switch (sizeof(var)) {                          \
-> >>         case 1:                                         \
-> >>                 asm(op "b "__percpu_arg(P1)",%0"        \
-> >>                     : "=q" (pfo_ret__)                  \
-> >> -                   : "p" (&(var)));                    \
-> >> +                   : "p" (__p));                       \
-> >>                 break;                                  \
-> >>         case 2:                                         \
-> >>                 asm(op "w "__percpu_arg(P1)",%0"        \
-> >>                     : "=r" (pfo_ret__)                  \
-> >> -                   : "p" (&(var)));                    \
-> >> +                   : "p" (__p));                       \
-> >>                 break;                                  \
-> >>         case 4:                                         \
-> >>                 asm(op "l "__percpu_arg(P1)",%0"        \
-> >>                     : "=r" (pfo_ret__)                  \
-> >> -                   : "p" (&(var)));                    \
-> >> +                   : "p" (__p));                       \
-> >>                 break;                                  \
-> >>         case 8:                                         \
-> >>                 asm(op "q "__percpu_arg(P1)",%0"        \
-> >>                     : "=r" (pfo_ret__)                  \
-> >> -                   : "p" (&(var)));                    \
-> >> +                   : "p" (__p));                       \
-> >>                 break;                                  \
-> >>         default: __bad_percpu_size();                   \
-> >>         }                                               \
-> >
-> > Thanks for having a look!
-> >
-> > It is odd though that you only see warnings from that origin, I
-> > encounter plenty of others with x86_64_defconfig, mostly stemming
-> > from uaccess macros:
-> >
-> > kernel/power/user.c:439:35: warning: taking address of packed member
-> > 'dev' of class or structure 'compat_resume_swap_area' may result in an
-> > unaligned pointer value [-Waddress-of-packed-member]
-> >                 err |= get_user(swap_area.dev, &u_swap_area->dev);
-> >                                                 ^~~~~~~~~~~~~~~~
-> > ./arch/x86/include/asm/uaccess.h:168:23: note: expanded from macro 'get_user'
-> >         register __inttype(*(ptr)) __val_gu asm("%"_ASM_DX);            \
-> >                              ^~~
-> > ./arch/x86/include/asm/uaccess.h:132:41: note: expanded from macro '__inttype'
-> > __typeof__(__builtin_choose_expr(sizeof(x) > sizeof(0UL), 0ULL, 0UL))
-> >                                         ^
-> >
-> > I looked into fixing different cases, but didn't see a clear path
-> > forward since we can't just cast the type away as in your patch above.
+
+> A bigger problem is who will merge it.  Yann has relinquished the
+> maintainership of kconfig (see http://marc.info/?l=linux-kbuild&m=149185505605964&w=2).
+> (That patch needs to be merged also.)
+> 
+> and the kbuild maintainer is not maintaining kconfig IIRC.
+> 
+> Andrew, would you push this patch?  and the one for the MAINTAINERS file?
+> (http://marc.info/?l=linux-kbuild&m=149419921910871&w=2)
 > 
 > 
-> Curious.
-> I tested clang 3.0 thru 4.0, but I could not reproduce this.
 > 
-> This part just calculates sizeof(*(ptr)).
-> I think it is a false positive warning bug if clang reports this.
+> On 05/07/17 06:59, Kamil Rytarowski wrote:
+>> I've rebased the patch to the current HEAD.
+>>
+>> This is general yearly PING...
+>>
+>> On 07.05.2017 15:44, Kamil Rytarowski wrote:
+>>> The current code produces set of warnings on NetBSD-7.99.25 (GCC 4.8.5):
+>>>
 
-The instance above is indeed somewhat doubtful, in any case there are
-plenty of others, most of them from fs/compat.c using __get/put_user_xyz():
+>>>
+>>> Signed-off-by: Kamil Rytarowski <n54@gmx.com>
+>>> ---
+>>>  scripts/basic/fixdep.c               |  2 +-
+>>>  scripts/kconfig/conf.c               |  6 +++---
+>>>  scripts/kconfig/confdata.c           |  9 +++++----
+>>>  scripts/kconfig/expr.c               |  3 ++-
+>>>  scripts/kconfig/lxdialog/checklist.c |  3 ++-
+>>>  scripts/kconfig/lxdialog/inputbox.c  |  3 ++-
+>>>  scripts/kconfig/lxdialog/menubox.c   | 11 +++++++----
+>>>  scripts/kconfig/lxdialog/util.c      |  5 +++--
+>>>  scripts/kconfig/menu.c               |  4 ++--
+>>>  scripts/kconfig/nconf.c              |  3 ++-
+>>>  scripts/kconfig/nconf.gui.c          |  3 ++-
+>>>  scripts/kconfig/symbol.c             |  8 ++++----
+>>>  12 files changed, 35 insertions(+), 25 deletions(-)
 
-fs/compat.c:366:33: warning: taking address of packed member 'l_whence' of class or structure 'compat_flock64' may result in an unaligned pointer value [-Waddress-of-packed-member]
-            __get_user(kfl->l_whence, &ufl->l_whence) ||
-                                       ^~~~~~~~~~~~~
-arch/x86/include/asm/uaccess.h:505:27: note: expanded from macro '__get_user'
-        __get_user_nocheck((x), (ptr), sizeof(*(ptr)))
-                                 ^~~
-arch/x86/include/asm/uaccess.h:436:29: note: expanded from macro '__get_user_nocheck'
-        __get_user_size(__gu_val, (ptr), (size), __gu_err, -EFAULT);    \
-                                   ^~~
-arch/x86/include/asm/uaccess.h:361:21: note: expanded from macro '__get_user_size'
-                __get_user_asm(x, ptr, retval, "w", "w", "=r", errret); \
-                                  ^~~
-arch/x86/include/asm/uaccess.h:385:19: note: expanded from macro '__get_user_asm'
-                     : "m" (__m(addr)), "i" (errret), "0" (err))
-                                ^~~~
-arch/x86/include/asm/uaccess.h:444:51: note: expanded from macro '__m'
-#define __m(x) (*(struct __large_struct __user *)(x))
-                                                  ^
 
-The clang version I use is fairly recent since it includes some
-fixes needed to build a working kernel (mostly for ARM64).
-
-clang --version
-Chromium OS 5.0_pre300080-r1 clang version 5.0.0
-
-Cheers
-
-Matthias
+-- 
+~Randy
