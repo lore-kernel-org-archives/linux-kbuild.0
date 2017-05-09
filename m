@@ -1,71 +1,124 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from merlin.infradead.org ([205.233.59.134]:38222 "EHLO
-        merlin.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751094AbdEHXwL (ORCPT
+Received: from mail-wr0-f172.google.com ([209.85.128.172]:35387 "EHLO
+        mail-wr0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751095AbdEIKJT (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 8 May 2017 19:52:11 -0400
-Subject: Re: [PATCH v2] Fix ctype(3) usage in the kconfig code on NetBSD
-From: Randy Dunlap <rdunlap@infradead.org>
-References: <1457397085-10907-1-git-send-email-n54@gmx.com>
- <20170507134422.2666-1-n54@gmx.com>
- <b2a75122-5762-542e-14b8-c6ef459b0825@gmx.com>
- <0857dbdf-d62f-c290-37ca-727fc2b1696b@infradead.org>
-Message-ID: <a0bc2b55-0985-49a3-067d-5e7c1eb3ee5e@infradead.org>
-Date: Mon, 8 May 2017 16:52:04 -0700
+        Tue, 9 May 2017 06:09:19 -0400
+Received: by mail-wr0-f172.google.com with SMTP id z52so65648579wrc.2
+        for <linux-kbuild@vger.kernel.org>; Tue, 09 May 2017 03:09:18 -0700 (PDT)
+Reply-To: nicolas.dichtel@6wind.com
+Subject: Re: [PATCH v11 10/12] uapi: export all headers under uapi directories
+References: <CAK7LNAR_yp+O9jUZC8mKdaHgTiCkE7p2-ZbA9YZ8OGyp+uxhBQ@mail.gmail.com>
+ <1490617217-30192-1-git-send-email-nicolas.dichtel@6wind.com>
+ <1490617217-30192-11-git-send-email-nicolas.dichtel@6wind.com>
+ <CAK7LNAT_iNH7RyPKW8aqOTcbr8rHyeWb2ijJpkw3b-rnR_=eFQ@mail.gmail.com>
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Message-ID: <6085107a-b860-92d3-c921-7fa6524c3d0a@6wind.com>
+Date: Tue, 9 May 2017 12:09:14 +0200
 MIME-Version: 1.0
-In-Reply-To: <0857dbdf-d62f-c290-37ca-727fc2b1696b@infradead.org>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <CAK7LNAT_iNH7RyPKW8aqOTcbr8rHyeWb2ijJpkw3b-rnR_=eFQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Kamil Rytarowski <n54@gmx.com>, linux-kbuild@vger.kernel.org
-Cc: yann.morin.1998@free.fr, Andrew Morton <akpm@linux-foundation.org>, Masahiro Yamada <yamada.masahiro@socionext.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On 05/07/17 17:04, Randy Dunlap wrote:
-> 
-> Patch makes sense to me. I haven't tested it but I can.
+Le 08/05/2017 à 01:17, Masahiro Yamada a écrit :
+Hi Masahiro,
 
-Tested-by: Randy Dunlap <rdunlap@infradead.org>
+[snip]
 
+> I will send pull-requests for v4.12 in a few days.
+> 
+> I need to fix a complex conflict reported by
+> https://lkml.org/lkml/2017/4/10/1208
+> 
+> I rebased linux-kbuild/uapi on commit 13e0988140
+> (dropping 08/12 "cryptouser.h: fix include from userland").
+Ok.
 
-> A bigger problem is who will merge it.  Yann has relinquished the
-> maintainership of kconfig (see http://marc.info/?l=linux-kbuild&m=149185505605964&w=2).
-> (That patch needs to be merged also.)
-> 
-> and the kbuild maintainer is not maintaining kconfig IIRC.
-> 
-> Andrew, would you push this patch?  and the one for the MAINTAINERS file?
-> (http://marc.info/?l=linux-kbuild&m=149419921910871&w=2)
-> 
 > 
 > 
-> On 05/07/17 06:59, Kamil Rytarowski wrote:
->> I've rebased the patch to the current HEAD.
->>
->> This is general yearly PING...
->>
->> On 07.05.2017 15:44, Kamil Rytarowski wrote:
->>> The current code produces set of warnings on NetBSD-7.99.25 (GCC 4.8.5):
->>>
+> I updated the list of headers, which were not exported,
+> are now exported.
+> 
+> If you find something is wrong, please let me know.
+> The list is now as follows:
+> 
+>     asm-arc/kvm_para.h
+>     asm-arc/ucontext.h
+>     asm-blackfin/shmparam.h
+>     asm-blackfin/ucontext.h
+>     asm-c6x/shmparam.h
+>     asm-c6x/ucontext.h
+>     asm-cris/kvm_para.h
+>     asm-h8300/shmparam.h
+>     asm-h8300/ucontext.h
+>     asm-hexagon/shmparam.h
+>     asm-m32r/kvm_para.h
+>     asm-m68k/kvm_para.h
+>     asm-m68k/shmparam.h
+>     asm-metag/kvm_para.h
+>     asm-metag/shmparam.h
+>     asm-metag/ucontext.h
+>     asm-mips/hwcap.h
+>     asm-mips/reg.h
+>     asm-mips/ucontext.h
+>     asm-nios2/kvm_para.h
+>     asm-nios2/ucontext.h
+>     asm-openrisc/shmparam.h
+>     asm-parisc/kvm_para.h
+>     asm-powerpc/perf_regs.h
+>     asm-sh/kvm_para.h
+>     asm-sh/ucontext.h
+>     asm-tile/shmparam.h
+>     asm-unicore32/shmparam.h
+>     asm-unicore32/ucontext.h
+>     asm-x86/hwcap2.h
+>     asm-xtensa/kvm_para.h
+>     drm/armada_drm.h
+>     drm/etnaviv_drm.h
+>     drm/vgem_drm.h
+>     linux/aspeed-lpc-ctrl.h
+>     linux/auto_dev-ioctl.h
+>     linux/bcache.h
+>     linux/btrfs_tree.h
+>     linux/can/vxcan.h
+>     linux/cifs/cifs_mount.h
+>     linux/coresight-stm.h
+>     linux/cryptouser.h
+>     linux/genwqe/genwqe_card.h
+>     linux/fsmap.h
+>     linux/hash_info.h
+>     linux/kcm.h
+>     linux/kcov.h
+>     linux/kfd_ioctl.h
+>     linux/lightnvm.h
+>     linux/module.h
+>     linux/nbd-netlink.h
+>     linux/nilfs2_api.h
+>     linux/nilfs2_ondisk.h
+>     linux/nsfs.h
+>     linux/pr.h
+>     linux/qrtr.h
+>     linux/rpmsg.h
+>     linux/sched/types.h
+>     linux/sed-opal.h
+>     linux/smc.h
+>     linux/smc_diag.h
+>     linux/stm.h
+>     linux/wil6210_uapi.h
+>     rdma/bnxt_re-abi.h
 
->>>
->>> Signed-off-by: Kamil Rytarowski <n54@gmx.com>
->>> ---
->>>  scripts/basic/fixdep.c               |  2 +-
->>>  scripts/kconfig/conf.c               |  6 +++---
->>>  scripts/kconfig/confdata.c           |  9 +++++----
->>>  scripts/kconfig/expr.c               |  3 ++-
->>>  scripts/kconfig/lxdialog/checklist.c |  3 ++-
->>>  scripts/kconfig/lxdialog/inputbox.c  |  3 ++-
->>>  scripts/kconfig/lxdialog/menubox.c   | 11 +++++++----
->>>  scripts/kconfig/lxdialog/util.c      |  5 +++--
->>>  scripts/kconfig/menu.c               |  4 ++--
->>>  scripts/kconfig/nconf.c              |  3 ++-
->>>  scripts/kconfig/nconf.gui.c          |  3 ++-
->>>  scripts/kconfig/symbol.c             |  8 ++++----
->>>  12 files changed, 35 insertions(+), 25 deletions(-)
+linux/vfio_ccw.h is missing in your list.
+And to be a bit picky, linux/fsmap.h should be put before
+linux/genwqe/genwqe_card.h ;-)
+
+I've rebased my tree on commit 2868b2513aa7 (see
+https://github.com/NicolasDichtel/linux/commits/master) and the following file
+should also be added after that: linux/switchtec_ioctl.h.
 
 
--- 
-~Randy
+Thank you,
+Nicolas
