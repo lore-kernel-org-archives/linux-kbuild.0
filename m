@@ -1,49 +1,46 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-08.nifty.com ([210.131.2.75]:37282 "EHLO
+Received: from conuserg-08.nifty.com ([210.131.2.75]:42830 "EHLO
         conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S934312AbdEOLQj (ORCPT
+        with ESMTP id S933422AbdEOLTe (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 15 May 2017 07:16:39 -0400
+        Mon, 15 May 2017 07:19:34 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 1/5] of: remove drivers/of/testcase-data from include search path for CPP
-Date: Mon, 15 May 2017 20:14:44 +0900
-Message-Id: <1494846888-18966-2-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1494846888-18966-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1494846888-18966-1-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH 0/5] devicetree: cleanup and improve DT cross-arch reference
+Date: Mon, 15 May 2017 20:14:43 +0900
+Message-Id: <1494846888-18966-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: devicetree@vger.kernel.org
-Cc: linux-arch <linux-arch@vger.kernel.org>, Omar Sandoval <osandov@osandov.com>, Gaurav Minocha <gaurav.minocha.os@gmail.com>, Grant Likely <grant.likely@linaro.org>, Frank Rowand <frowand.list@gmail.com>, Mark Rutland <mark.rutland@arm.com>, Olof Johansson <olof@lixom.net>, Russell King <linux@armlinux.org.uk>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+Cc: linux-arch <linux-arch@vger.kernel.org>, Omar Sandoval <osandov@osandov.com>, Gaurav Minocha <gaurav.minocha.os@gmail.com>, Grant Likely <grant.likely@linaro.org>, Frank Rowand <frowand.list@gmail.com>, Mark Rutland <mark.rutland@arm.com>, Olof Johansson <olof@lixom.net>, Russell King <linux@armlinux.org.uk>, Masahiro Yamada <yamada.masahiro@socionext.com>, Fabio Estevam <fabio.estevam@nxp.com>, Sascha Hauer <kernel@pengutronix.de>, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.com>, Michael Ellerman <mpe@ellerman.id.au>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, linux-kernel@vger.kernel.org, Paul Mackerras <paulus@samba.org>, Rob Herring <robh+dt@kernel.org>, linux-arm-kernel@lists.infradead.org, linuxppc-dev@lists.ozlabs.org, Shawn Guo <shawnguo@kernel.org>
 
-This search path was added by commit b5190516b282 ("of: Move testcase
-FDT data into drivers/of").  At that time, it was needed for platform
-DT files to include testcase data.
+This series depends on Olof's
+"devicetree: Move include prefixes from arch to separate directory"
+https://patchwork.kernel.org/patch/9724995/
 
-It became unnecessary when commit ae9304c9d311 ("Adding selftest
-testdata dynamically into live tree") introduced dynamic addition of
-testcase data, but it missed to delete this search path.
+1/5: clean-up of unused include path
+2/5: Fixup of last three DT files in ARM (needed for 4/5)
+3/5: Fixup of last three DT files in PowerPC (needed for 4/5)
+4/5: Remove arch/$(SRCARCH)/boot/dts include path
+5/5: Make DT cross-arch reference available for /include/ directive
 
-Moreover, the directory drivers/of/testcase-data does not exist since
-commit 19fd74879a32 ("of/unittest: Rename selftest.c to unittest.c").
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
+Masahiro Yamada (5):
+  of: remove drivers/of/testcase-data from include search path for CPP
+  ARM: dts: use #include "..." to include DT in the same directory
+  powerpc: dts: use #include "..." to include DT in the same directory
+  of: remove arch/$(SRCARCH)/boot/dts from include search path for CPP
+  of: add scripts/dtc/include-prefixes to search path for both CPP and
+    DTC
 
- scripts/Makefile.lib | 1 -
- 1 file changed, 1 deletion(-)
+ arch/arm/boot/dts/imx6q-zii-rdu2.dts  | 4 ++--
+ arch/arm/boot/dts/imx6qp-zii-rdu2.dts | 4 ++--
+ arch/arm/boot/dts/versatile-pb.dts    | 2 +-
+ arch/powerpc/boot/dts/ac14xx.dts      | 2 +-
+ arch/powerpc/boot/dts/mpc5121ads.dts  | 2 +-
+ arch/powerpc/boot/dts/pdm360ng.dts    | 2 +-
+ scripts/Makefile.lib                  | 8 ++++----
+ 7 files changed, 12 insertions(+), 12 deletions(-)
 
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 58c05e5..011d464 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -176,7 +176,6 @@ ld_flags       = $(LDFLAGS) $(ldflags-y)
- dtc_cpp_flags  = -Wp,-MD,$(depfile).pre.tmp -nostdinc                    \
- 		 -I$(srctree)/arch/$(SRCARCH)/boot/dts                   \
- 		 -I$(srctree)/scripts/dtc/include-prefixes               \
--		 -I$(srctree)/drivers/of/testcase-data                   \
- 		 -undef -D__DTS__
- 
- # Finds the multi-part object the current object will be linked into
 -- 
 2.7.4
 
