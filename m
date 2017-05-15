@@ -1,55 +1,69 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from bbox.sascha.silbe.org ([84.201.25.44]:59721 "EHLO
-        bbox.sascha.silbe.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1759302AbdENRJq (ORCPT
+Received: from conuserg-08.nifty.com ([210.131.2.75]:37284 "EHLO
+        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S934313AbdEOLQj (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 14 May 2017 13:09:46 -0400
-From: Sascha Silbe <x-linux@infra-silbe.de>
-Subject: [PATCH v2] kbuild: add explicit ARM support for tar-pkg
-Date: Sun, 14 May 2017 19:09:42 +0200
-Message-Id: <20170514170942.27944-1-x-linux@infra-silbe.de>
-In-Reply-To: <CAK7LNASc7NgthfZCWFT=3FhRQxxJuuzDVjT8GHik5A0+zBVxpw@mail.gmail.com>
-References: <CAK7LNASc7NgthfZCWFT=3FhRQxxJuuzDVjT8GHik5A0+zBVxpw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+        Mon, 15 May 2017 07:16:39 -0400
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH 5/5] of: add scripts/dtc/include-prefixes to search path for both CPP and DTC
+Date: Mon, 15 May 2017 20:14:48 +0900
+Message-Id: <1494846888-18966-6-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1494846888-18966-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1494846888-18966-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>
-Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: devicetree@vger.kernel.org
+Cc: linux-arch <linux-arch@vger.kernel.org>, Omar Sandoval <osandov@osandov.com>, Gaurav Minocha <gaurav.minocha.os@gmail.com>, Grant Likely <grant.likely@linaro.org>, Frank Rowand <frowand.list@gmail.com>, Mark Rutland <mark.rutland@arm.com>, Olof Johansson <olof@lixom.net>, Russell King <linux@armlinux.org.uk>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
 
-buildtar warns when an architecture doesn't have an explicit rule on
-what files to copy, even when the generic rule works just fine. Add a
-rule for ARM that does the same as the explicit rule, but avoids the
-warning.
+We had include/dt-bindings as an include path only for CPP, and this
+makes sense because header files in dt-bindings contain useful macros
+that parsed by pre-processor.
 
-Signed-off-by: Sascha Silbe <x-linux@infra-silbe.de>
+Commit 4027494ae6e3 ("ARM: dts: add arm/arm64 include symlinks") and
+commit 0a6081b673bb ("arm64: dts: add arm/arm64 include symlinks")
+allow us cross-arch DT reference, but this is only available for
+CPP's include directives, like
+    #include <arm/foo.dtsi>
+
+It makes as much sense to include DT from another architecture by
+DTC's builtin include directive, like
+    /include/ "arm/foo.dtsi"
+
+To achieve this, scripts/dtc/include-prefixes should be passed to
+both CPP and DTC.  I refactored Makefile.lib a bit to not repeat the
+same path.
+
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
-v1→v2: rebased on top of todays linus master, including commit 152e6744ebfc
 
-Not duplicating the rule would have been nice from a maintenance point
-of view, but doesn't fit the current code structure very well. It also
-avoids breakage if the generic rule ever gets adjusted to something
-else that doesn't work for ARM.
+ scripts/Makefile.lib | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-
- scripts/package/buildtar | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/scripts/package/buildtar b/scripts/package/buildtar
-index e046bff33589..ea84ba67619b 100755
---- a/scripts/package/buildtar
-+++ b/scripts/package/buildtar
-@@ -108,6 +108,9 @@ case "${ARCH}" in
- 			cp -v -- "${objtree}/vmlinux" "${tmpdir}/boot/vmlinux-${KERNELRELEASE}"
- 		fi
- 		;;
-+	arm)
-+		[ -f "${KBUILD_IMAGE}" ] && cp -v -- "${KBUILD_IMAGE}" "${tmpdir}/boot/vmlinux-kbuild-${KERNELRELEASE}"
-+		;;
- 	*)
- 		[ -f "${KBUILD_IMAGE}" ] && cp -v -- "${KBUILD_IMAGE}" "${tmpdir}/boot/vmlinux-kbuild-${KERNELRELEASE}"
- 		echo "" >&2
+diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
+index 9c8f38a..dcc0d5f 100644
+--- a/scripts/Makefile.lib
++++ b/scripts/Makefile.lib
+@@ -173,8 +173,10 @@ cpp_flags      = -Wp,-MD,$(depfile) $(NOSTDINC_FLAGS) $(LINUXINCLUDE)     \
+ 
+ ld_flags       = $(LDFLAGS) $(ldflags-y)
+ 
++DTC_INCLUDE    := $(srctree)/scripts/dtc/include-prefixes
++
+ dtc_cpp_flags  = -Wp,-MD,$(depfile).pre.tmp -nostdinc                    \
+-		 -I$(srctree)/scripts/dtc/include-prefixes               \
++		 $(addprefix -I,$(DTC_INCLUDE))                          \
+ 		 -undef -D__DTS__
+ 
+ # Finds the multi-part object the current object will be linked into
+@@ -315,7 +317,7 @@ quiet_cmd_dtc = DTC     $@
+ cmd_dtc = mkdir -p $(dir ${dtc-tmp}) ; \
+ 	$(CPP) $(dtc_cpp_flags) -x assembler-with-cpp -o $(dtc-tmp) $< ; \
+ 	$(DTC) -O dtb -o $@ -b 0 \
+-		-i $(dir $<) $(DTC_FLAGS) \
++		$(addprefix -i,$(dir $<) $(DTC_INCLUDE)) $(DTC_FLAGS) \
+ 		-d $(depfile).dtc.tmp $(dtc-tmp) ; \
+ 	cat $(depfile).pre.tmp $(depfile).dtc.tmp > $(depfile)
+ 
 -- 
-2.11.0
+2.7.4
 
