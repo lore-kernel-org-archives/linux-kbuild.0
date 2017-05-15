@@ -1,46 +1,60 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-08.nifty.com ([210.131.2.75]:42830 "EHLO
-        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S933422AbdEOLTe (ORCPT
+Received: from bombadil.infradead.org ([65.50.211.133]:51388 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S933836AbdEOSA3 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 15 May 2017 07:19:34 -0400
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 0/5] devicetree: cleanup and improve DT cross-arch reference
-Date: Mon, 15 May 2017 20:14:43 +0900
-Message-Id: <1494846888-18966-1-git-send-email-yamada.masahiro@socionext.com>
+        Mon, 15 May 2017 14:00:29 -0400
+Subject: Re: sparse on scripts/kconfig/*.c
+References: <fa98e27a-c08d-170f-68d1-2ab2918ef5d1@infradead.org>
+ <20170510101838.c5nwzaraeybyypwj@mwanda>
+ <20170510205357.xshdaack6mwku5np@mwanda>
+From: Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <605fc799-70c1-14af-904d-723b43ab9025@infradead.org>
+Date: Mon, 15 May 2017 11:00:22 -0700
+MIME-Version: 1.0
+In-Reply-To: <20170510205357.xshdaack6mwku5np@mwanda>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: devicetree@vger.kernel.org
-Cc: linux-arch <linux-arch@vger.kernel.org>, Omar Sandoval <osandov@osandov.com>, Gaurav Minocha <gaurav.minocha.os@gmail.com>, Grant Likely <grant.likely@linaro.org>, Frank Rowand <frowand.list@gmail.com>, Mark Rutland <mark.rutland@arm.com>, Olof Johansson <olof@lixom.net>, Russell King <linux@armlinux.org.uk>, Masahiro Yamada <yamada.masahiro@socionext.com>, Fabio Estevam <fabio.estevam@nxp.com>, Sascha Hauer <kernel@pengutronix.de>, linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.com>, Michael Ellerman <mpe@ellerman.id.au>, Benjamin Herrenschmidt <benh@kernel.crashing.org>, linux-kernel@vger.kernel.org, Paul Mackerras <paulus@samba.org>, Rob Herring <robh+dt@kernel.org>, linux-arm-kernel@lists.infradead.org, linuxppc-dev@lists.ozlabs.org, Shawn Guo <shawnguo@kernel.org>
+To: Dan Carpenter <dan.carpenter@oracle.com>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, smatch@vger.kernel.org
 
-This series depends on Olof's
-"devicetree: Move include prefixes from arch to separate directory"
-https://patchwork.kernel.org/patch/9724995/
+On 05/10/17 13:53, Dan Carpenter wrote:
+> I have created some new tools to make this process easier.
+> 
+> 1) First you still have to edit the Makefile:
+> 
+> -HOSTCC       = gcc
+> +HOSTCC       = ~/progs/smatch/devel/cgcc
+> 
+> 2) Build the data with this command:
+> 
+> 	~/progs/smatch/devel/smatch_scripts/build_generic_data.sh --target scripts/
+> 
+> The --target scripts/ is because we want to run smatch on the scripts/
+> directory.
+> 
+> 3) Run smatch:
+> 
+> 	~/progs/smatch/devel/smatch_scripts/test_generic.sh --target scripts/
+> 
+> I just wrote this code today so it might be a bit rough perhaps.  Let me
+> know if you have any issues.  It doesn't find anything like I said
+> before, but hopefully this can help other people who want to run Smatch
+> on user space code.
 
-1/5: clean-up of unused include path
-2/5: Fixup of last three DT files in ARM (needed for 4/5)
-3/5: Fixup of last three DT files in PowerPC (needed for 4/5)
-4/5: Remove arch/$(SRCARCH)/boot/dts include path
-5/5: Make DT cross-arch reference available for /include/ directive
+Thanks, Dan.
 
+I get this when running build_generic_data.sh:
 
-Masahiro Yamada (5):
-  of: remove drivers/of/testcase-data from include search path for CPP
-  ARM: dts: use #include "..." to include DT in the same directory
-  powerpc: dts: use #include "..." to include DT in the same directory
-  of: remove arch/$(SRCARCH)/boot/dts from include search path for CPP
-  of: add scripts/dtc/include-prefixes to search path for both CPP and
-    DTC
+readline() on closed filehandle FILE at /home/rdunlap/projects/smatch/smatch_scripts/../smatch_data/db/fill_db_caller_info.pl line 33.
 
- arch/arm/boot/dts/imx6q-zii-rdu2.dts  | 4 ++--
- arch/arm/boot/dts/imx6qp-zii-rdu2.dts | 4 ++--
- arch/arm/boot/dts/versatile-pb.dts    | 2 +-
- arch/powerpc/boot/dts/ac14xx.dts      | 2 +-
- arch/powerpc/boot/dts/mpc5121ads.dts  | 2 +-
- arch/powerpc/boot/dts/pdm360ng.dts    | 2 +-
- scripts/Makefile.lib                  | 8 ++++----
- 7 files changed, 12 insertions(+), 12 deletions(-)
+I see scripts/mod/* being built/checked ... but not scripts/kconfig/*.
+
+Any ideas?
+
 
 -- 
-2.7.4
-
+~Randy
