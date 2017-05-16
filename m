@@ -1,59 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:21059 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750713AbdEPE7c (ORCPT
+Received: from mail-oi0-f47.google.com ([209.85.218.47]:36061 "EHLO
+        mail-oi0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750713AbdEPFDM (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 16 May 2017 00:59:32 -0400
+        Tue, 16 May 2017 01:03:12 -0400
+Received: by mail-oi0-f47.google.com with SMTP id h4so11862964oib.3
+        for <linux-kbuild@vger.kernel.org>; Mon, 15 May 2017 22:03:12 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAA9_cmfm64EADryVO7YcdZG_steYbpjij8LNoyQNyiXZs_WJNQ@mail.gmail.com>
-References: <CAK7LNAR_yp+O9jUZC8mKdaHgTiCkE7p2-ZbA9YZ8OGyp+uxhBQ@mail.gmail.com>
- <1490617217-30192-1-git-send-email-nicolas.dichtel@6wind.com>
- <1490617217-30192-12-git-send-email-nicolas.dichtel@6wind.com>
- <CAA9_cmf1LXqYmOwad0sRjGyLRyhVOo8W-bcLkp-XFK9sQiFuhg@mail.gmail.com> <CAA9_cmfm64EADryVO7YcdZG_steYbpjij8LNoyQNyiXZs_WJNQ@mail.gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 16 May 2017 13:59:27 +0900
-Message-ID: <CAK7LNATBNU-2-+bkghurOHyU5CsC9JqqJD3b_nWVcJ_SYQ-xyQ@mail.gmail.com>
-Subject: Re: [PATCH v11 11/12] uapi: export all arch specifics directories
+In-Reply-To: <1494909330-24127-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1494909330-24127-1-git-send-email-yamada.masahiro@socionext.com>
+From: Dan Williams <dan.j.williams@intel.com>
+Date: Mon, 15 May 2017 22:03:11 -0700
+Message-ID: <CAPcyv4j_zRJvTkqCgaG9+dEsvvitsz_TZB=bS8eWS+=2mGysXQ@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: skip header install/check for right under uapi directories
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Dan Williams <dan.j.williams@intel.com>
-Cc: Nicolas Dichtel <nicolas.dichtel@6wind.com>, Arnd Bergmann <arnd@arndb.de>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-arch@vger.kernel.org, David Airlie <airlied@linux.ie>, David Miller <davem@davemloft.net>, Russell King <linux@armlinux.org.uk>, Borislav Petkov <bp@alien8.de>, slash.tmp@free.fr, Daniel Vetter <daniel.vetter@ffwll.ch>, Russell King <rmk+kernel@armlinux.org.uk>, msalter@redhat.com, jengelh@inai.de, Christoph Hellwig <hch@infradead.org>, Tobias Klauser <tklauser@distanz.ch>, Michael Ellerman <mpe@ellerman.id.au>, Ingo Molnar <mingo@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, "Dmitry V. Levin" <ldv@altlinux.org>, Herbert Xu <herbert@gondor.apana.org.au>, linux-rdma@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-kbuild@vger.kernel.org, Nicolas Dichtel <nicolas.dichtel@6wind.com>, Michal Marek <mmarek@suse.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 
-Hi Dan,
-
-
-2017-05-16 10:15 GMT+09:00 Dan Williams <dan.j.williams@intel.com>:
-> On Mon, May 15, 2017 at 6:02 PM, Dan Williams <dan.j.williams@intel.com> wrote:
->> On Mon, Mar 27, 2017 at 5:20 AM, Nicolas Dichtel
->> <nicolas.dichtel@6wind.com> wrote:
->>> This patch removes the need of subdir-y. Now all files/directories under
->>> arch/<arch>/include/uapi/ are exported.
->>>
->>> The only change for userland is the layout of the command 'make
->>> headers_install_all': directories asm-<arch> are replaced by arch-<arch>/.
->>> Those new directories contains all files/directories of the specified arch.
->>>
->>> Note that only cris and tile have more directories than only asm:
->>>  - arch-v[10|32] for cris;
->>>  - arch for tile.
->>>
->>> Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
->>
->> Starting with commit 61562f981e92 "uapi: export all arch specifics
->> directories", a "make INSTALL_HDR_PATH=$root/usr headers_install"
->> operation will delete standard glibc headers and others in
->> $root/usr/include.
+On Mon, May 15, 2017 at 9:35 PM, Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+> Since commit 61562f981e92 ("uapi: export all arch specifics
+> directories"), "make INSTALL_HDR_PATH=${root}/usr headers_install"
+> deletes standard glibc headers and others in ${root}/usr/include.
 >
-> Reverting commit 61562f981e92 fixes the problem for me.
+> The cause of the issue is that headers_install now starts descending
+> from arch/$(hdr-arch)/include/uapi with ${root}/usr/include for its
+> destination when installing asm headers.  So, headers already there
+> are assumed to be unwanted.
+>
+> When headers_install starts descending from include/uapi with
+> ${root}/usr/include for its destination, it works around the problem
+> by creating an dummy destination ${root}/usr/include/uapi, but this
+> is tricky.
+>
+> To fix the problem in a clean way is to skip header install/check in
+> include/uapi or arch/$(hdr-arch)/include/uapi.  A good side-effect
+> is the empty destination ${root}/usr/include/uapi will go away.
+>
+> Fixes: 61562f981e92 ("uapi: export all arch specifics directories")
+> Reported-by: Dan Williams <dan.j.williams@intel.com>
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 
-Thank you for your bug report.
+Works for me.
 
-Could you check this?
-https://patchwork.kernel.org/patch/9728323/
-
-
-
--- 
-Best Regards
-Masahiro Yamada
+Tested-by: Dan Williams <dan.j.williams@intel.com>
