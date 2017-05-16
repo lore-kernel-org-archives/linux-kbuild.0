@@ -1,54 +1,80 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f51.google.com ([74.125.82.51]:38091 "EHLO
-        mail-wm0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751591AbdEPHko (ORCPT
+Received: from aserp1040.oracle.com ([141.146.126.69]:51439 "EHLO
+        aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752042AbdEPJnw (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 16 May 2017 03:40:44 -0400
-Received: by mail-wm0-f51.google.com with SMTP id v15so80480036wmv.1
-        for <linux-kbuild@vger.kernel.org>; Tue, 16 May 2017 00:40:43 -0700 (PDT)
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [PATCH v2] kbuild: skip install/check of headers right under uapi
- directories
-References: <1494911703-16619-1-git-send-email-yamada.masahiro@socionext.com>
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Message-ID: <05860fa0-2186-8e02-5733-0f7528d9262f@6wind.com>
-Date: Tue, 16 May 2017 09:40:40 +0200
+        Tue, 16 May 2017 05:43:52 -0400
+Date: Tue, 16 May 2017 12:43:08 +0300
+From: Dan Carpenter <dan.carpenter@oracle.com>
+Subject: Re: sparse on scripts/kconfig/*.c
+Message-ID: <20170516094308.c62gxxaopegqfxym@mwanda>
+References: <fa98e27a-c08d-170f-68d1-2ab2918ef5d1@infradead.org>
+ <20170510101838.c5nwzaraeybyypwj@mwanda>
+ <20170510205357.xshdaack6mwku5np@mwanda>
+ <605fc799-70c1-14af-904d-723b43ab9025@infradead.org>
 MIME-Version: 1.0
-In-Reply-To: <1494911703-16619-1-git-send-email-yamada.masahiro@socionext.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <605fc799-70c1-14af-904d-723b43ab9025@infradead.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
-Cc: Dan Williams <dan.j.williams@intel.com>, Michal Marek <mmarek@suse.com>, linux-kernel@vger.kernel.org
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, smatch@vger.kernel.org
 
-Le 16/05/2017 à 07:15, Masahiro Yamada a écrit :
-> Since commit 61562f981e92 ("uapi: export all arch specifics
-> directories"), "make INSTALL_HDR_PATH=$root/usr headers_install"
-> deletes standard glibc headers and others in $root/usr/include.
+On Mon, May 15, 2017 at 11:00:22AM -0700, Randy Dunlap wrote:
+> On 05/10/17 13:53, Dan Carpenter wrote:
+> > I have created some new tools to make this process easier.
+> > 
+> > 1) First you still have to edit the Makefile:
+> > 
+> > -HOSTCC       = gcc
+> > +HOSTCC       = ~/progs/smatch/devel/cgcc
+> > 
+> > 2) Build the data with this command:
+> > 
+> > 	~/progs/smatch/devel/smatch_scripts/build_generic_data.sh --target scripts/
+> > 
+> > The --target scripts/ is because we want to run smatch on the scripts/
+> > directory.
+> > 
+> > 3) Run smatch:
+> > 
+> > 	~/progs/smatch/devel/smatch_scripts/test_generic.sh --target scripts/
+> > 
+> > I just wrote this code today so it might be a bit rough perhaps.  Let me
+> > know if you have any issues.  It doesn't find anything like I said
+> > before, but hopefully this can help other people who want to run Smatch
+> > on user space code.
 > 
-> The cause of the issue is that headers_install now starts descending
-> from arch/$(hdr-arch)/include/uapi with $root/usr/include for its
-> destination when installing asm headers.  So, headers already there
-> are assumed to be unwanted.
+> Thanks, Dan.
 > 
-> When headers_install starts descending from include/uapi with
-> $root/usr/include for its destination, it works around the problem
-> by creating an dummy destination $root/usr/include/uapi, but this
-> is tricky.
+> I get this when running build_generic_data.sh:
 > 
-> To fix the problem in a clean way is to skip headers install/check
-> in include/uapi or arch/$(hdr-arch)/include/uapi because we know
-> there are only sub-directories in uapi directories.  A good side
-> effect is the empty destination $root/usr/include/uapi will go
-> away.
+> readline() on closed filehandle FILE at /home/rdunlap/projects/smatch/smatch_scripts/../smatch_data/db/fill_db_caller_info.pl line 33.
 > 
-> I am also removing the trailing slash in the headers_check target to
-> skip checking in arch/$(hdr-arch)/include/uapi.
-> 
-> Fixes: 61562f981e92 ("uapi: export all arch specifics directories")
-> Reported-by: Dan Williams <dan.j.williams@intel.com>
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-Thank you for the patch.
 
-Acked-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Thanks, I will push a fix for this later today.
+
+> I see scripts/mod/* being built/checked ... but not scripts/kconfig/*.
+> 
+> Any ideas?
+> 
+
+Hm...  It turns out we need to do a `make mrproper` between runs.
+
+make mrproper ; make allmodconfig ; ~/progs/smatch/release/smatch_scripts/build_generic_data.sh --target scripts/
+make mrproper ; make allmodconfig ; ~/progs/smatch/release/smatch_scripts/test_generic.sh --target scripts/
+
+When I remove the grep out the autogenerated code this is what is left
+grep -v .lex.c smatch_warns.txt | grep -v .tab.c
+
+scripts/kconfig/expr.c:1027 expr_compare_type() info: ignoring unreachable code.
+scripts/kconfig/symbol.c:1152 sym_check_print_recursive() error: we previously assumed 'prop' could be null (see line 1144)
+scripts/kconfig/symbol.c:1153 sym_check_print_recursive() warn: curly braces intended?
+scripts/kconfig/symbol.c:1155 sym_check_print_recursive() warn: inconsistent indenting
+scripts/kconfig/menu.c:662 get_symbol_str() error: we previously assumed 'sym' could be null (see line 649)
+scripts/mod/modpost.c:460 parse_elf() info: ignoring unreachable code.
+scripts/mod/modpost.c:504 parse_elf() info: ignoring unreachable code.
+
+regards,
+dan carpenter
