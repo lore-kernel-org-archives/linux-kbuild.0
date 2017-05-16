@@ -1,173 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:29992 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751267AbdEPGbk (ORCPT
+Received: from mail-wm0-f51.google.com ([74.125.82.51]:38091 "EHLO
+        mail-wm0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751591AbdEPHko (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 16 May 2017 02:31:40 -0400
+        Tue, 16 May 2017 03:40:44 -0400
+Received: by mail-wm0-f51.google.com with SMTP id v15so80480036wmv.1
+        for <linux-kbuild@vger.kernel.org>; Tue, 16 May 2017 00:40:43 -0700 (PDT)
+Reply-To: nicolas.dichtel@6wind.com
+Subject: Re: [PATCH v2] kbuild: skip install/check of headers right under uapi
+ directories
+References: <1494911703-16619-1-git-send-email-yamada.masahiro@socionext.com>
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Message-ID: <05860fa0-2186-8e02-5733-0f7528d9262f@6wind.com>
+Date: Tue, 16 May 2017 09:40:40 +0200
 MIME-Version: 1.0
-In-Reply-To: <20170508231850.GG128305@google.com>
-References: <20170421213931.155210-1-mka@chromium.org> <20170421213931.155210-2-mka@chromium.org>
- <CAK7LNASEnzDPQs2AY115sMx-i2NTUu9h9LHv5eN1ygvW81vtFw@mail.gmail.com>
- <20170502012330.GW128305@google.com> <CAK7LNATysoDBqaTDT2zGs-ycHNqoX=RLfbG=1uHzLrVOiwO6fw@mail.gmail.com>
- <20170508231850.GG128305@google.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 16 May 2017 15:31:30 +0900
-Message-ID: <CAK7LNATPrCDCkjU697BjUD7g_kYGf6jRLuuh59SgapfJOb6Hjw@mail.gmail.com>
-Subject: Re: [PATCH 1/2] kbuild: clang: Disable 'address-of-packed-member' warning
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <1494911703-16619-1-git-send-email-yamada.masahiro@socionext.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Matthias Kaehlcke <mka@chromium.org>
-Cc: Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Grant Grundler <grundler@chromium.org>, Greg Hackmann <ghackmann@google.com>, Michael Davidson <md@google.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
+Cc: Dan Williams <dan.j.williams@intel.com>, Michal Marek <mmarek@suse.com>, linux-kernel@vger.kernel.org
 
-Hi Matthias,
+Le 16/05/2017 à 07:15, Masahiro Yamada a écrit :
+> Since commit 61562f981e92 ("uapi: export all arch specifics
+> directories"), "make INSTALL_HDR_PATH=$root/usr headers_install"
+> deletes standard glibc headers and others in $root/usr/include.
+> 
+> The cause of the issue is that headers_install now starts descending
+> from arch/$(hdr-arch)/include/uapi with $root/usr/include for its
+> destination when installing asm headers.  So, headers already there
+> are assumed to be unwanted.
+> 
+> When headers_install starts descending from include/uapi with
+> $root/usr/include for its destination, it works around the problem
+> by creating an dummy destination $root/usr/include/uapi, but this
+> is tricky.
+> 
+> To fix the problem in a clean way is to skip headers install/check
+> in include/uapi or arch/$(hdr-arch)/include/uapi because we know
+> there are only sub-directories in uapi directories.  A good side
+> effect is the empty destination $root/usr/include/uapi will go
+> away.
+> 
+> I am also removing the trailing slash in the headers_check target to
+> skip checking in arch/$(hdr-arch)/include/uapi.
+> 
+> Fixes: 61562f981e92 ("uapi: export all arch specifics directories")
+> Reported-by: Dan Williams <dan.j.williams@intel.com>
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+Thank you for the patch.
 
-Sorry for my late reply.
-
-2017-05-09 8:18 GMT+09:00 Matthias Kaehlcke <mka@chromium.org>:
-> Hi Masahiro,
->
-> El Sun, May 07, 2017 at 01:52:25AM +0900 Masahiro Yamada ha dit:
->
->> 2017-05-02 10:23 GMT+09:00 Matthias Kaehlcke <mka@chromium.org>:
->> > Hi Masahiro,
->> >
->> > El Sun, Apr 30, 2017 at 10:59:52PM +0900 Masahiro Yamada ha dit:
->> >
->> >> 2017-04-22 6:39 GMT+09:00 Matthias Kaehlcke <mka@chromium.org>:
->> >> > clang generates plenty of these warnings in different parts of the code,
->> >> > to an extent that the warnings are little more than noise. Disable the
->> >> > 'address-of-packed-member' warning.
->> >> >
->> >> > Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
->> >>
->> >>
->> >> As far as I compiled arch/x86/configs/x86_64_defconfig,
->> >> all address-of-packed-member warnings came from the single point:
->> >>
->> >> ./arch/x86/include/asm/processor.h:534:30: warning: taking address of
->> >> packed member 'sp0' of class or structure 'x86_hw_tss' may result in
->> >> an unaligned pointer value [-Waddress-of-packed-member]
->> >>         return this_cpu_read_stable(cpu_tss.x86_tss.sp0);
->> >>                                     ^~~~~~~~~~~~~~~~~~~
->> >> ./arch/x86/include/asm/percpu.h:391:59: note: expanded from macro
->> >> 'this_cpu_read_stable'
->> >> #define this_cpu_read_stable(var)       percpu_stable_op("mov", var)
->> >>                                                                 ^~~
->> >> ./arch/x86/include/asm/percpu.h:228:16: note: expanded from macro
->> >> 'percpu_stable_op'
->> >>                     : "p" (&(var)));                    \
->> >>                              ^~~
->> >>
->> >>
->> >>
->> >> For this case, I was able to fix it with the following patch:
->> >>
->> >>
->> >> diff --git a/arch/x86/include/asm/percpu.h b/arch/x86/include/asm/percpu.h
->> >> index 9fa0360..de25d1c 100644
->> >> --- a/arch/x86/include/asm/percpu.h
->> >> +++ b/arch/x86/include/asm/percpu.h
->> >> @@ -211,26 +211,27 @@ do {
->> >>         \
->> >>  #define percpu_stable_op(op, var)                      \
->> >>  ({                                                     \
->> >>         typeof(var) pfo_ret__;                          \
->> >> +       void *__p = &(var);                             \
->> >>         switch (sizeof(var)) {                          \
->> >>         case 1:                                         \
->> >>                 asm(op "b "__percpu_arg(P1)",%0"        \
->> >>                     : "=q" (pfo_ret__)                  \
->> >> -                   : "p" (&(var)));                    \
->> >> +                   : "p" (__p));                       \
->> >>                 break;                                  \
->> >>         case 2:                                         \
->> >>                 asm(op "w "__percpu_arg(P1)",%0"        \
->> >>                     : "=r" (pfo_ret__)                  \
->> >> -                   : "p" (&(var)));                    \
->> >> +                   : "p" (__p));                       \
->> >>                 break;                                  \
->> >>         case 4:                                         \
->> >>                 asm(op "l "__percpu_arg(P1)",%0"        \
->> >>                     : "=r" (pfo_ret__)                  \
->> >> -                   : "p" (&(var)));                    \
->> >> +                   : "p" (__p));                       \
->> >>                 break;                                  \
->> >>         case 8:                                         \
->> >>                 asm(op "q "__percpu_arg(P1)",%0"        \
->> >>                     : "=r" (pfo_ret__)                  \
->> >> -                   : "p" (&(var)));                    \
->> >> +                   : "p" (__p));                       \
->> >>                 break;                                  \
->> >>         default: __bad_percpu_size();                   \
->> >>         }                                               \
->> >
->> > Thanks for having a look!
->> >
->> > It is odd though that you only see warnings from that origin, I
->> > encounter plenty of others with x86_64_defconfig, mostly stemming
->> > from uaccess macros:
->> >
->> > kernel/power/user.c:439:35: warning: taking address of packed member
->> > 'dev' of class or structure 'compat_resume_swap_area' may result in an
->> > unaligned pointer value [-Waddress-of-packed-member]
->> >                 err |= get_user(swap_area.dev, &u_swap_area->dev);
->> >                                                 ^~~~~~~~~~~~~~~~
->> > ./arch/x86/include/asm/uaccess.h:168:23: note: expanded from macro 'get_user'
->> >         register __inttype(*(ptr)) __val_gu asm("%"_ASM_DX);            \
->> >                              ^~~
->> > ./arch/x86/include/asm/uaccess.h:132:41: note: expanded from macro '__inttype'
->> > __typeof__(__builtin_choose_expr(sizeof(x) > sizeof(0UL), 0ULL, 0UL))
->> >                                         ^
->> >
->> > I looked into fixing different cases, but didn't see a clear path
->> > forward since we can't just cast the type away as in your patch above.
->>
->>
->> Curious.
->> I tested clang 3.0 thru 4.0, but I could not reproduce this.
->>
->> This part just calculates sizeof(*(ptr)).
->> I think it is a false positive warning bug if clang reports this.
->
-> The instance above is indeed somewhat doubtful, in any case there are
-> plenty of others, most of them from fs/compat.c using __get/put_user_xyz():
->
-> fs/compat.c:366:33: warning: taking address of packed member 'l_whence' of class or structure 'compat_flock64' may result in an unaligned pointer value [-Waddress-of-packed-member]
->             __get_user(kfl->l_whence, &ufl->l_whence) ||
->                                        ^~~~~~~~~~~~~
-> arch/x86/include/asm/uaccess.h:505:27: note: expanded from macro '__get_user'
->         __get_user_nocheck((x), (ptr), sizeof(*(ptr)))
->                                  ^~~
-> arch/x86/include/asm/uaccess.h:436:29: note: expanded from macro '__get_user_nocheck'
->         __get_user_size(__gu_val, (ptr), (size), __gu_err, -EFAULT);    \
->                                    ^~~
-> arch/x86/include/asm/uaccess.h:361:21: note: expanded from macro '__get_user_size'
->                 __get_user_asm(x, ptr, retval, "w", "w", "=r", errret); \
->                                   ^~~
-> arch/x86/include/asm/uaccess.h:385:19: note: expanded from macro '__get_user_asm'
->                      : "m" (__m(addr)), "i" (errret), "0" (err))
->                                 ^~~~
-> arch/x86/include/asm/uaccess.h:444:51: note: expanded from macro '__m'
-> #define __m(x) (*(struct __large_struct __user *)(x))
->                                                   ^
->
-> The clang version I use is fairly recent since it includes some
-> fixes needed to build a working kernel (mostly for ARM64).
->
-> clang --version
-> Chromium OS 5.0_pre300080-r1 clang version 5.0.0
->
-> Cheers
->
-> Matthias
-
-
-OK.  I understood it is difficult to eliminate these warnings.
-I consider this series for v4.13 (unless somebody comes up with a
-better solution).
-
-
--- 
-Best Regards
-Masahiro Yamada
+Acked-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
