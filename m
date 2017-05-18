@@ -1,55 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:52860 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755246AbdERPpk (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 18 May 2017 11:45:40 -0400
+Received: from ms.lwn.net ([45.79.88.28]:36774 "EHLO ms.lwn.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S933545AbdERQuQ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 18 May 2017 12:50:16 -0400
+Date: Thu, 18 May 2017 10:50:14 -0600
+From: Jonathan Corbet <corbet@lwn.net>
+Subject: Re: [PATCH] Documentation, kbuild: fix typo "minimun" -> "minimum"
+Message-ID: <20170518105014.400353a6@lwn.net>
+In-Reply-To: <20170518121729.14776-1-tklauser@distanz.ch>
+References: <20170518121729.14776-1-tklauser@distanz.ch>
 MIME-Version: 1.0
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 19 May 2017 00:45:36 +0900
-Message-ID: <CAK7LNATvOxyaUmvhez4+oKmBBS1Wo73-xZeJSH4gn-7pc6KsPg@mail.gmail.com>
-Subject: [GIT PULL] Kbuild fixes for v4.12-rc2
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Tobias Klauser <tklauser@distanz.ch>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org
 
-Hi Linus,
+On Thu, 18 May 2017 14:17:29 +0200
+Tobias Klauser <tklauser@distanz.ch> wrote:
 
-Please pull one urgent fix of headers_install.
+>  Documentation/kbuild/makefiles.txt | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/Documentation/kbuild/makefiles.txt b/Documentation/kbuild/makefiles.txt
+> index e18daca65ccd..659afd56ecdb 100644
+> --- a/Documentation/kbuild/makefiles.txt
+> +++ b/Documentation/kbuild/makefiles.txt
+> @@ -1331,7 +1331,7 @@ See subsequent chapter for the syntax of the Kbuild file.
+>  	--- 7.5 mandatory-y
+>  
+>  	mandatory-y is essentially used by include/uapi/asm-generic/Kbuild.asm
+> -	to define the minimun set of headers that must be exported in
+> +	to define the minimum set of headers that must be exported in
+>  	include/asm.
 
+Applied to the docs tree, thanks.
 
-
-The following changes since commit 2ea659a9ef488125eb46da6eb571de5eae5c43f6:
-
-  Linux 4.12-rc1 (2017-05-13 13:19:49 -0700)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
-tags/kbuild-fixes-v4.12
-
-for you to fetch changes up to 05d8cba4a1e8c7e2d1f91a24a2f3d26852938a04:
-
-  kbuild: skip install/check of headers right under uapi directories
-(2017-05-18 02:17:45 +0900)
-
-----------------------------------------------------------------
-Kbuild fixes for v4.12
-
-- fix headers_install to not delete pre-existing headers
-  in the install destination
-
-----------------------------------------------------------------
-Masahiro Yamada (1):
-      kbuild: skip install/check of headers right under uapi directories
-
- Makefile                     |  2 +-
- scripts/Makefile.headersinst | 43 +++++++++++++++++++++++++++----------------
- 2 files changed, 28 insertions(+), 17 deletions(-)
-
-
--- 
-Best Regards
-Masahiro Yamada
+jon
