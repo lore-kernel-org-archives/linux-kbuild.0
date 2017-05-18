@@ -1,42 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from aserp1040.oracle.com ([141.146.126.69]:37693 "EHLO
-        aserp1040.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753970AbdERHPA (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 18 May 2017 03:15:00 -0400
-Date: Thu, 18 May 2017 10:14:14 +0300
-From: Dan Carpenter <dan.carpenter@oracle.com>
-Subject: Re: sparse on scripts/kconfig/*.c
-Message-ID: <20170518071414.bs3ohkc7h53nrgew@mwanda>
-References: <fa98e27a-c08d-170f-68d1-2ab2918ef5d1@infradead.org>
- <20170510101838.c5nwzaraeybyypwj@mwanda>
- <20170510205357.xshdaack6mwku5np@mwanda>
- <605fc799-70c1-14af-904d-723b43ab9025@infradead.org>
- <20170516094308.c62gxxaopegqfxym@mwanda>
- <931af9fe-3e42-9cc6-9bd5-74c1ef0e3114@infradead.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <931af9fe-3e42-9cc6-9bd5-74c1ef0e3114@infradead.org>
+Received: from mail.zhinst.com ([212.126.164.98]:60380 "EHLO mail.zhinst.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S932153AbdERMRh (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 18 May 2017 08:17:37 -0400
+From: Tobias Klauser <tklauser@distanz.ch>
+Subject: [PATCH] Documentation, kbuild: fix typo "minimun" -> "minimum"
+Date: Thu, 18 May 2017 14:17:29 +0200
+Message-Id: <20170518121729.14776-1-tklauser@distanz.ch>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, smatch@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>
+Cc: Jonathan Corbet <corbet@lwn.net>, linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org
 
-On Wed, May 17, 2017 at 07:53:35PM -0700, Randy Dunlap wrote:
-> 
-> I did a 'git pull' for updates. On the rebuild, I get this error:
-> 
-> macro_table.c:30:31: fatal error: cwchash/hashtable.h: No such file or directory
->  #include "cwchash/hashtable.h"
-> 
-> My problem?
-> 
-> thanks for your help.
+Signed-off-by: Tobias Klauser <tklauser@distanz.ch>
+---
+ Documentation/kbuild/makefiles.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-That's weird.  I haven't touched that code in years so I can't imagine
-what's going on.  :/  My fresh clone works.
+diff --git a/Documentation/kbuild/makefiles.txt b/Documentation/kbuild/makefiles.txt
+index e18daca65ccd..659afd56ecdb 100644
+--- a/Documentation/kbuild/makefiles.txt
++++ b/Documentation/kbuild/makefiles.txt
+@@ -1331,7 +1331,7 @@ See subsequent chapter for the syntax of the Kbuild file.
+ 	--- 7.5 mandatory-y
+ 
+ 	mandatory-y is essentially used by include/uapi/asm-generic/Kbuild.asm
+-	to define the minimun set of headers that must be exported in
++	to define the minimum set of headers that must be exported in
+ 	include/asm.
+ 
+ 	The convention is to list one subdir per line and
+-- 
+2.13.0
 
-regards,
-dan carpenter
 
