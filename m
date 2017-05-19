@@ -1,58 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:23362 "EHLO
-        conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751766AbdESHKx (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 19 May 2017 03:10:53 -0400
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] kbuild: add GNU Make version check
-Date: Fri, 19 May 2017 16:10:06 +0900
-Message-Id: <1495177806-24124-1-git-send-email-yamada.masahiro@socionext.com>
+Received: from mx2.suse.de ([195.135.220.15]:57037 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1751551AbdESKx2 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 19 May 2017 06:53:28 -0400
+Subject: Re: [PATCH] kbuild: simplify silent build (-s) detection
+References: <1495168096-22440-1-git-send-email-yamada.masahiro@socionext.com>
+From: Michal Marek <mmarek@suse.com>
+Message-ID: <9f1d9a57-5447-c23a-156a-02e7cab2d29a@suse.com>
+Date: Fri, 19 May 2017 12:53:25 +0200
+MIME-Version: 1.0
+In-Reply-To: <1495168096-22440-1-git-send-email-yamada.masahiro@socionext.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Thomas De Schampheleire <patrickdepinguin+buildroot@gmail.com>, Thomas Petazzoni <thomas.petazzoni@free-electrons.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, linux-kernel@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
 
-As Documentation/process/changes.rst says, Kbuild now depends on
-GNU Make 3.81 or later.
+On 2017-05-19 06:28, Masahiro Yamada wrote:
+> This allows to detect -s option without checking GNU Make version.
+> 
+> As commit e36aaea28972 ("kbuild: Fix silent builds with make-4")
+> pointed out, GNU Make 4.x changed the way/order it presents the
+> command line options into MAKEFLAGS.
+> 
+> In Make 3.8x, 's' is always be the first in a group of short options.
+> The group could be prefixed with '-'.
+> 
+> In Make 4.x, 's' is always the last in a group of short options.
+> 
+> As commit e6ac89fabd03 ("kbuild: Correctly deal with make options
+> which contain an 's'") addressed, we also need to deal with long
+> options that end with 's', like --warn-undefined-variables.
+> 
+> Test cases:
+> 
+> [1] command line input:    make --silent
+>      -> MAKEFLAGS for Make 3.8x:    s
+>      -> MAKEFLAGS for Make 4.x :    s
+> 
+> [2] command line input:    make -srR
+>      -> MAKEFLAGS for Make 3.8x:    sRr
+>      -> MAKEFLAGS for Make 4.x :    rRs
+> 
+> [3] command line input:    make -s -rR --warn-undefined-variables
+>      -> MAKEFLAGS for Make 3.8x:    --warn-undefined-variables -sRr
+>      -> MAKEFLAGS for Make 4.x :    rRs --warn-undefined-variables
+> 
+> We can take care of them, by filtering out long options (--%),
+> then matching -s% s% %s patterns.
 
-If invoked with older versions, it fails with an unclear error
-message.
+Good idea, that's a much cleaner way.
 
-$ make defconfig
-  HOSTCC  scripts/basic/fixdep
-scripts/Makefile.host:135: *** missing separator.  Stop.
-make: *** [defconfig] Error 2
-
-Stop building with a clearer message:
-
-Makefile:16: *** GNU Make >= 3.81 is required.  You are running version 3.80.  Stop.
-
-I borrowed the idea from Buildroot.
-
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
-
- Makefile | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/Makefile b/Makefile
-index d8b5c4230da0..5baaebf8f23a 100644
---- a/Makefile
-+++ b/Makefile
-@@ -10,6 +10,12 @@ NAME = Fearless Coyote
- # Comments in this file are targeted only to the developer, do not
- # expect to learn how to build the kernel reading this file.
- 
-+# Check Make version (note: this check will break at Make 10.x)
-+MIN_MAKE_VERSION := 3.81
-+ifneq ($(firstword $(sort $(MAKE_VERSION) $(MIN_MAKE_VERSION))),$(MIN_MAKE_VERSION))
-+$(error GNU Make >= $(MIN_MAKE_VERSION) is required.  You are running version $(MAKE_VERSION))
-+endif
-+
- # o Do not use make's built-in rules and variables
- #   (this increases performance and avoids hard-to-debug behaviour);
- # o Look for make include files relative to root of kernel src
--- 
-2.7.4
-
+Michal
