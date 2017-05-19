@@ -1,19 +1,20 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:38336 "EHLO
+Received: from conuserg-07.nifty.com ([210.131.2.74]:21437 "EHLO
         conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755589AbdESE2b (ORCPT
+        with ESMTP id S1752058AbdESHKA (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 19 May 2017 00:28:31 -0400
+        Fri, 19 May 2017 03:10:00 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] kbuild: simplify silent build (-s) detection
-Date: Fri, 19 May 2017 13:28:16 +0900
-Message-Id: <1495168096-22440-1-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH v2] kbuild: simplify silent build (-s) detection
+Date: Fri, 19 May 2017 16:09:08 +0900
+Message-Id: <1495177748-24037-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, linux-kernel@vger.kernel.org
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, linux-kernel@vger.kernel.org, Wang Nan <wangnan0@huawei.com>, Josh Poimboeuf <jpoimboe@redhat.com>, Arnaldo Carvalho de Melo <acme@redhat.com>, Jiri Olsa <jolsa@redhat.com>
 
-This allows to detect -s option without checking GNU Make version.
+This allows to detect -s (--silent) option without checking GNU Make
+version.
 
 As commit e36aaea28972 ("kbuild: Fix silent builds with make-4")
 pointed out, GNU Make 4.x changed the way/order it presents the
@@ -48,11 +49,16 @@ then matching -s% s% %s patterns.
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- Makefile | 9 +--------
- 1 file changed, 1 insertion(+), 8 deletions(-)
+Changes in v2:
+  - Fix makefiles under tools as well
+
+ Makefile                       | 9 +--------
+ tools/build/Makefile.build     | 8 +-------
+ tools/scripts/Makefile.include | 8 +-------
+ 3 files changed, 3 insertions(+), 22 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index b1ee4a4..d8b5c42 100644
+index b1ee4a49efa2..d8b5c4230da0 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -84,17 +84,10 @@ endif
@@ -74,6 +80,48 @@ index b1ee4a4..d8b5c42 100644
  
  export quiet Q KBUILD_VERBOSE
  
+diff --git a/tools/build/Makefile.build b/tools/build/Makefile.build
+index e279a71c650d..850fe9ce47d3 100644
+--- a/tools/build/Makefile.build
++++ b/tools/build/Makefile.build
+@@ -19,15 +19,9 @@ else
+   Q=@
+ endif
+ 
+-ifneq ($(filter 4.%,$(MAKE_VERSION)),)	# make-4
+-ifneq ($(filter %s ,$(firstword x$(MAKEFLAGS))),)
++ifneq ($(filter -s% s% %s,$(filter-out --%,$(MAKEFLAGS))),)
+   quiet=silent_
+ endif
+-else					# make-3.8x
+-ifneq ($(filter s% -s%,$(MAKEFLAGS)),)
+-  quiet=silent_
+-endif
+-endif
+ 
+ build-dir := $(srctree)/tools/build
+ 
+diff --git a/tools/scripts/Makefile.include b/tools/scripts/Makefile.include
+index fc74db62fef4..7fda39adf3cc 100644
+--- a/tools/scripts/Makefile.include
++++ b/tools/scripts/Makefile.include
+@@ -58,15 +58,9 @@ else
+ NO_SUBDIR = :
+ endif
+ 
+-ifneq ($(filter 4.%,$(MAKE_VERSION)),)  # make-4
+-ifneq ($(filter %s ,$(firstword x$(MAKEFLAGS))),)
++ifneq ($(filter -s% s% %s,$(filter-out --%,$(MAKEFLAGS))),)
+   silent=1
+ endif
+-else					# make-3.8x
+-ifneq ($(filter s% -s%,$(MAKEFLAGS)),)
+-  silent=1
+-endif
+-endif
+ 
+ #
+ # Define a callable command for descending to a new directory
 -- 
 2.7.4
 
