@@ -1,60 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-io0-f180.google.com ([209.85.223.180]:35675 "EHLO
-        mail-io0-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751049AbdESSJZ (ORCPT
+Received: from mx1.polytechnique.org ([129.104.30.34]:59795 "EHLO
+        mx1.polytechnique.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751260AbdETLhJ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 19 May 2017 14:09:25 -0400
-Received: by mail-io0-f180.google.com with SMTP id f102so51736766ioi.2
-        for <linux-kbuild@vger.kernel.org>; Fri, 19 May 2017 11:09:25 -0700 (PDT)
-Date: Fri, 19 May 2017 12:09:23 -0600
-From: Tycho Andersen <tycho@docker.com>
-Subject: Re: [PATCH] kconfig: always use user input symbols
-Message-ID: <20170519180923.eim267rfbtlwrd6p@smitten>
-References: <20170519150813.27845-1-tycho@docker.com>
- <CAMuHMdUjyatcp5ROwOW3JJWsTHqc79PCpdVrhFYCSFoFQr5YTg@mail.gmail.com>
+        Sat, 20 May 2017 07:37:09 -0400
+From: Nicolas Iooss <nicolas.iooss_linux@m4x.org>
+Subject: [PATCH 1/1] genksyms: add printf format attribute to error_with_pos()
+Date: Sat, 20 May 2017 13:27:00 +0200
+Message-Id: <20170520112700.27823-1-nicolas.iooss_linux@m4x.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAMuHMdUjyatcp5ROwOW3JJWsTHqc79PCpdVrhFYCSFoFQr5YTg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: "Yann E . MORIN" <yann.morin.1998@free.fr>, linux-kbuild <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Roman Zippel <zippel@linux-m68k.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, Nicolas Iooss <nicolas.iooss_linux@m4x.org>
 
-Hi Geert,
+When compiling with -Wsuggest-attribute=format in HOSTCFLAGS, gcc
+complains that error_with_pos() may be declared with a printf format
+attribute:
 
-On Fri, May 19, 2017 at 07:29:05PM +0200, Geert Uytterhoeven wrote:
-> Hi Tycho,
-> 
-> On Fri, May 19, 2017 at 5:08 PM, Tycho Andersen <tycho@docker.com> wrote:
-> > ...regardless of visibility.
-> >
-> > When a symbol that is not visible by default (e.g. PNFS_FLEXFILE_LAYOUT)
-> > has a default value, it is impossible to set the value to something not the
-> > default:
-> >
-> > ~/packages/linux render-symbol-inputs grep FLEXFILE .config
-> > CONFIG_PNFS_FLEXFILE_LAYOUT=y
-> > ~/packages/linux render-symbol-inputs make oldconfig
-> > scripts/kconfig/conf  --oldconfig Kconfig
-> > ~/packages/linux render-symbol-inputs grep FLEXFILE .config
-> > CONFIG_PNFS_FLEXFILE_LAYOUT=m
-> >
-> > There are two reasons for this: the symbol's user input value is only
-> > considered when it is visible (hunks 2 and 3), and the user values are
-> > explicitly ignored (hunk 1) if the symbols are not visible.
-> >
-> > It's not clear to me why hunk 1 exists. I'm sure it solve some problem, but
-> > I'm not sure why we would ever want to discard user input values, and
-> > causes a problem exactly as the comment describes.
-> 
-> This is intentional.  If a symbol is not visible, it's not meant to be changed
-> by the user, as doing so may break things (at build or runtime).
-> 
-> E.g. running "make oldconfig" after a kernel upgrade may retain the old
-> state of a variable, which is now invalid.  Ignoring invisible symbols
-> avoids this.
+    scripts/genksyms/genksyms.c:726:3: warning: function might be
+    possible candidate for ‘gnu_printf’ format attribute
+    [-Wsuggest-attribute=format]
+       vfprintf(stderr, fmt, args);
+       ^~~~~~~~
 
-Makes sense. Thanks!
+This would allow catching printf-format errors at compile time in
+callers to error_with_pos(). Add this attribute.
 
-Tycho
+Signed-off-by: Nicolas Iooss <nicolas.iooss_linux@m4x.org>
+---
+
+I am sending this to the maintainers listed in section "KERNEL BUILD +
+files below scripts/ (unless maintained elsewhere)" even though it does
+not list scripts/genksyms/. Should this directory be added in
+MAINTAINERS?
+
+ scripts/genksyms/genksyms.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/scripts/genksyms/genksyms.h b/scripts/genksyms/genksyms.h
+index 3bffdcaaa274..b724a0290c75 100644
+--- a/scripts/genksyms/genksyms.h
++++ b/scripts/genksyms/genksyms.h
+@@ -75,7 +75,7 @@ struct string_list *copy_list_range(struct string_list *start,
+ int yylex(void);
+ int yyparse(void);
+ 
+-void error_with_pos(const char *, ...);
++void error_with_pos(const char *, ...) __attribute__ ((format(printf, 1, 2)));
+ 
+ /*----------------------------------------------------------------------*/
+ #define xmalloc(size) ({ void *__ptr = malloc(size);		\
+-- 
+2.12.2
+
