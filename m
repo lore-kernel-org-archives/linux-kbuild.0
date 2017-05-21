@@ -1,42 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.skyhub.de ([5.9.137.197]:42326 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751403AbdETUdh (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 20 May 2017 16:33:37 -0400
-Date: Sat, 20 May 2017 22:33:23 +0200
-From: Borislav Petkov <bp@alien8.de>
-Subject: Re: [PATCH] kconfig: Check for libncurses before menuconfig
-Message-ID: <20170520203323.6ug3gq2yoms6acsu@pd.tnic>
-References: <20170409130708.4753-1-bp@alien8.de>
- <CAK7LNAT8tA=_Zi6i9w6cgHfkrwzxDm2-w2vuZpM57-P=YAvTUw@mail.gmail.com>
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:60721 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750961AbdEUJQC (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Sun, 21 May 2017 05:16:02 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAK7LNAT8tA=_Zi6i9w6cgHfkrwzxDm2-w2vuZpM57-P=YAvTUw@mail.gmail.com>
+In-Reply-To: <20170520203323.6ug3gq2yoms6acsu@pd.tnic>
+References: <20170409130708.4753-1-bp@alien8.de> <CAK7LNAT8tA=_Zi6i9w6cgHfkrwzxDm2-w2vuZpM57-P=YAvTUw@mail.gmail.com>
+ <20170520203323.6ug3gq2yoms6acsu@pd.tnic>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Sun, 21 May 2017 18:15:53 +0900
+Message-ID: <CAK7LNAT2tLPn70AcxnAZuv4=VAp2Wfg4ZRMEjVU0K2wntGSN9Q@mail.gmail.com>
+Subject: Re: [PATCH] kconfig: Check for libncurses before menuconfig
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
+To: Borislav Petkov <bp@alien8.de>
 Cc: LKML <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-On Sun, May 21, 2017 at 04:38:35AM +0900, Masahiro Yamada wrote:
-> Strange, I could not reproduce this.
+Hi Borislav,
 
-Remove libncurses5-dev or whatever it is called on your system and do:
 
-$ make menuconfig
-  HOSTCC  scripts/kconfig/mconf.o
-In file included from scripts/kconfig/mconf.c:23:0:
-scripts/kconfig/lxdialog/dialog.h:38:20: fatal error: curses.h: No such file or directory
- #include CURSES_LOC
-                    ^
-compilation terminated.
-scripts/Makefile.host:124: recipe for target 'scripts/kconfig/mconf.o' failed
-make[1]: *** [scripts/kconfig/mconf.o] Error 1
-Makefile:548: recipe for target 'menuconfig' failed
-make: *** [menuconfig] Error 2
+2017-05-21 5:33 GMT+09:00 Borislav Petkov <bp@alien8.de>:
+> On Sun, May 21, 2017 at 04:38:35AM +0900, Masahiro Yamada wrote:
+>> Strange, I could not reproduce this.
+>
+> Remove libncurses5-dev or whatever it is called on your system and do:
+>
+> $ make menuconfig
+>   HOSTCC  scripts/kconfig/mconf.o
+> In file included from scripts/kconfig/mconf.c:23:0:
+> scripts/kconfig/lxdialog/dialog.h:38:20: fatal error: curses.h: No such file or directory
+>  #include CURSES_LOC
+>                     ^
+> compilation terminated.
+> scripts/Makefile.host:124: recipe for target 'scripts/kconfig/mconf.o' failed
+> make[1]: *** [scripts/kconfig/mconf.o] Error 1
+> Makefile:548: recipe for target 'menuconfig' failed
+> make: *** [menuconfig] Error 2
+
+
+OK, I see.
+
+So, it is $(obj)/mconf.o instead of $(obj)/mconf
+that should depend on $(obj)/dochecklxdialog.
+
+
+Could you change line 199
+
+  $(addprefix $(obj)/,$(lxdialog)): $(obj)/dochecklxdialog
+
+to
+
+  $(addprefix $(obj)/, mconf.o $(lxdialog)): $(obj)/dochecklxdialog
+
+and send v2, please?
+
+
+This will make sure dochecklxdialog is run before compiling mconf.o
+in parallel building.
+
+
+Thanks!
+
+
 
 -- 
-Regards/Gruss,
-    Boris.
-
-Good mailing practices for 400: avoid top-posting and trim the reply.
+Best Regards
+Masahiro Yamada
