@@ -1,54 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi0-f43.google.com ([209.85.218.43]:36584 "EHLO
-        mail-oi0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S938010AbdEXIVL (ORCPT
+Received: from cn.fujitsu.com ([59.151.112.132]:32145 "EHLO
+        heian.cn.fujitsu.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1750854AbdE2DS6 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 24 May 2017 04:21:11 -0400
+        Sun, 28 May 2017 23:18:58 -0400
+From: Cao jin <caoj.fnst@cn.fujitsu.com>
+Subject: [PATCH] Top Makefile: tiny correction on `make help`
+Date: Mon, 29 May 2017 11:21:01 +0800
+Message-ID: <1496028061-19285-1-git-send-email-caoj.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-In-Reply-To: <20170524000419.GQ141096@google.com>
-References: <20170421213931.155210-1-mka@chromium.org> <20170421213931.155210-3-mka@chromium.org>
- <CAD=FV=XENNp3rcD5OK1d2WmccbqaT9=bjsayvbnA2Th8zmOAwg@mail.gmail.com>
- <CAK8P3a1y0MoxhMNr2v=R7-CANaATfFy58FM8heyOP78g-JZwHA@mail.gmail.com>
- <20170517184529.GG141096@google.com> <20170524000419.GQ141096@google.com>
-From: Arnd Bergmann <arnd@arndb.de>
-Date: Wed, 24 May 2017 10:21:04 +0200
-Message-ID: <CAK8P3a3D6oW4vaUD9JSGXFqqydrm5-Z0x9qOwzfn_WQryXezsA@mail.gmail.com>
-Subject: Re: [PATCH 2/2] kbuild: clang: Disable the 'duplicate-decl-specifier' warning
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Matthias Kaehlcke <mka@chromium.org>
-Cc: Doug Anderson <dianders@chromium.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Grant Grundler <grundler@chromium.org>, Greg Hackmann <ghackmann@google.com>, Michael Davidson <md@google.com>, Nick Desaulniers <ndesaulniers@google.com>
+To: yamada.masahiro@socionext.com, mmarek@suse.com
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Wed, May 24, 2017 at 2:04 AM, Matthias Kaehlcke <mka@chromium.org> wrote:
-> El Wed, May 17, 2017 at 11:45:29AM -0700 Matthias Kaehlcke ha dit:
->> El Wed, May 17, 2017 at 09:35:57AM +0200 Arnd Bergmann ha dit:
->> > On Tue, May 16, 2017 at 11:41 PM, Doug Anderson <dianders@chromium.org> wrote:
-> It seems the duplicate-decl-specifier warning targets specifically C89:
->
-> "The same type qualifier shall not appear more than once in the same
-> specifier list or qualifier list, either directly or via one or more
-> typedefs."
->
-> C89 (6.5.3)
->
-> gcc also raises a warning when '-pedantic' is specified and
-> -std=gnu89/c89 (or unspecified), but not with -std=gnu99/c99.
->
-> This bug might help to shed more light on this:
-> https://bugs.llvm.org/show_bug.cgi?id=32985
+The help info of `make -C=1` is little confusing, make it clear.
 
-I also notice that neither compiler differentiates between a)
+Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-typedef const int cint;
-const cint i;
+diff --git a/Makefile b/Makefile
+index efa267a..b34a34d 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1417,7 +1417,7 @@ help:
+ 	@echo  '  make V=0|1 [targets] 0 => quiet build (default), 1 => verbose build'
+ 	@echo  '  make V=2   [targets] 2 => give reason for rebuild of target'
+ 	@echo  '  make O=dir [targets] Locate all output files in "dir", including .config'
+-	@echo  '  make C=1   [targets] Check all c source with $$CHECK (sparse by default)'
++	@echo  '  make C=1   [targets] Check re-compiled c source only with $$CHECK (sparse by default)'
+ 	@echo  '  make C=2   [targets] Force check of all c source with $$CHECK'
+ 	@echo  '  make RECORDMCOUNT_WARN=1 [targets] Warn about ignored mcount sections'
+ 	@echo  '  make W=n   [targets] Enable extra gcc checks, n=1,2,3 where'
+-- 
+2.1.0
 
-and b)
-const int i;
-const typeof(a) j;
 
-I would have expected a warning for a) but not b), but both 'clang --std=gnu89'
-and 'gcc --pedantic --std=gnu89' warn about both of b as well, and don't warn
-for newer standards.
 
-       Arnd
