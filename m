@@ -1,63 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf0-f196.google.com ([209.85.192.196]:35968 "EHLO
-        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750864AbdE2XtV (ORCPT
+Received: from mail-it0-f43.google.com ([209.85.214.43]:34300 "EHLO
+        mail-it0-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751002AbdE3DWn (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 29 May 2017 19:49:21 -0400
-Date: Tue, 30 May 2017 09:49:05 +1000
-From: Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH] kbuild: provide THIN_ARCHIVES option for all
- architectures
-Message-ID: <20170530094905.03ecc254@roar.ozlabs.ibm.com>
-In-Reply-To: <20170529185251.GA3359@ravnborg.org>
-References: <20170529081103.29999-1-npiggin@gmail.com>
-        <20170529185251.GA3359@ravnborg.org>
+        Mon, 29 May 2017 23:22:43 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20170530091343.1f98b24b@roar.ozlabs.ibm.com>
+References: <20170529081103.29999-1-npiggin@gmail.com> <CA+55aFyM8c1h7S+x95qvv84jphu9=XSXZop=gVp7xc5tf3JJMQ@mail.gmail.com>
+ <CA+55aFwofV0DZhh+yGH_=ceBzFcSr_tGexuGV4Wioao096R-uQ@mail.gmail.com> <20170530091343.1f98b24b@roar.ozlabs.ibm.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Mon, 29 May 2017 20:22:41 -0700
+Message-ID: <CA+55aFzknOUqpSj_dtfebUuuk50g6NuaCxiM+DA0_5xs6=05fA@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: provide THIN_ARCHIVES option for all architectures
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sam Ravnborg <sam@ravnborg.org>
-Cc: Alan Modra <amodra@gmail.com>, linux-arch@vger.kernel.org, linux-kbuild@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>, Stephen Rothwell <sfr@canb.auug.org.au>
+To: Nicholas Piggin <npiggin@gmail.com>
+Cc: "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Stephen Rothwell <sfr@canb.auug.org.au>
 
-On Mon, 29 May 2017 20:52:51 +0200
-Sam Ravnborg <sam@ravnborg.org> wrote:
+On Mon, May 29, 2017 at 4:13 PM, Nicholas Piggin <npiggin@gmail.com> wrote:
+>
+> *thin* archives does require binutils 2.19. That's nearly 10 years
+> old, but we advertise 2.12 minimum at the moment.
 
-> Hi Nicholas.
-> 
-> > Supporting two different intermediate-artifact packaging schemes
-> > was only ever intended as a temporary transition.
-> > 
-> > This has so far caused no problems for powerpc, after a small fix
-> > for how the arch invoked ar. So now allow any arch to select the
-> > option, continue defaulting to N.  
-> 
-> Alan Modra recommended this approach several years ago, and I think
-> Stephen was the first to implement this for the kernel.
-> It would be good to have the rational whay ar is better than ld -r
-> included in the commit message for later reference.
+I think we're ok with upgrading that. We've been allowing some
+ridiculously old tools at times. I think "feature is 10 years old and
+actively used by other projects" (Qt uses it from some googling, for
+example) is more than sufficient.
 
-We *are* using Stephen's thin archives build infrastructure in the
-kernel already. Only powerpc is using it so far: a5967db9af
+If somebody has user space older than that, they presumably aren't
+building new kernels either.
 
-The big one for powerpc build is that  the linker keeps relative
-location of input sections the same, so as you link into larger
-built-in.o files, there is less opportunity to place code optimally.
-x86 may not care so much, but some other archs will.
-
-The build output size improvement is nice for everyone though.
-
-> I also recall that using ar gave some small kernel size reductions
-> from last time we played with this.
-> This info could also be nice to give a rough idea of the impact.
-
-There is some explanation in sfr's patch. It's not thin archives
-as such, but rather we have to link with --whole-archive, but it
-was a very small impact.
-
-IIRC today's final link is technically buggy without that option,
-it's just that in practice the top-level built-in.o files pull in
-so much that the linker will never discard one.
-
-Thanks,
-Nick
+                     Linus
