@@ -1,100 +1,53 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:64548 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751295AbdFEJMf (ORCPT
+Received: from smtp07.smtpout.orange.fr ([80.12.242.129]:37282 "EHLO
+        smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751338AbdFEMAd (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 5 Jun 2017 05:12:35 -0400
-MIME-Version: 1.0
-In-Reply-To: <20170511102559.52de2854@xeon-e3>
-References: <20170414215450.18307-1-sthemmin@microsoft.com>
- <20170414215450.18307-2-sthemmin@microsoft.com> <CAK7LNAR8fr21ZkjsC4C57XuAp8WQWarHgawjSMdYFU65cF2PxA@mail.gmail.com>
- <20170511102559.52de2854@xeon-e3>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Mon, 5 Jun 2017 18:12:30 +0900
-Message-ID: <CAK7LNARyH5+x=DEgXKKXkzdXFZaPwo3biQcKF49VVEYiL48C4w@mail.gmail.com>
-Subject: Re: [PATCH 1/2] kbuild: cleanup signing keys with mrproper
-Content-Type: text/plain; charset="UTF-8"
+        Mon, 5 Jun 2017 08:00:33 -0400
+From: Robert Jarzmik <robert.jarzmik@free.fr>
+Subject: [PATCH v3] tags: honor COMPILED_SOURCE with apart output directory
+Date: Mon,  5 Jun 2017 13:59:15 +0200
+Message-Id: <1496663955-8499-1-git-send-email-robert.jarzmik@free.fr>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Stephen Hemminger <sthemmin@microsoft.com>, David Woodhouse <dwmw2@infradead.org>, David Howells <dhowells@redhat.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>
+Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, Robert Jarzmik <robert.jarzmik@free.fr>
 
-Hi Stephen,
-Sorry for my late reply.
+When the kernel is compiled with an "O=" argument, the object files are
+not necessarily in the source tree, and more probably in another tree.
 
-2017-05-12 2:25 GMT+09:00 Stephen Hemminger <stephen@networkplumber.org>:
-> On Wed, 3 May 2017 13:37:08 +0900
-> Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
->
->> +CC David Woodhouse
->> +CC David Howells
->>
->>
->> 2017-04-15 6:54 GMT+09:00 Stephen Hemminger <stephen@networkplumber.org>:
->> > When 'make mrproper' is run it was supposed to remove the signing
->> > keys in the certs directory, but only the filename is given
->> > rather than the pathanme which is necessary to cause cleanup.
->> >
->> > Signed-off-by: Stephen Hemminger <sthemmin@microsoft.com>
->> > ---
->> >  Makefile | 6 +++---
->> >  1 file changed, 3 insertions(+), 3 deletions(-)
->> >
->> > diff --git a/Makefile b/Makefile
->> > index efa267a92ba6..04ca211552f7 100644
->> > --- a/Makefile
->> > +++ b/Makefile
->> > @@ -1274,9 +1274,9 @@ MRPROPER_DIRS  += include/config usr/include include/generated          \
->> >                   arch/*/include/generated .tmp_objdiff
->> >  MRPROPER_FILES += .config .config.old .version .old_version \
->> >                   Module.symvers tags TAGS cscope* GPATH GTAGS GRTAGS GSYMS \
->> > -                 signing_key.pem signing_key.priv signing_key.x509     \
->> > -                 x509.genkey extra_certificates signing_key.x509.keyid \
->> > -                 signing_key.x509.signer vmlinux-gdb.py
->> > +                 certs/signing_key.pem certs/signing_key.priv certs/signing_key.x509   \
->> > +                 certs/x509.genkey certs/extra_certificates certs/signing_key.x509.keyid \
->> > +                 certs/signing_key.x509.signer vmlinux-gdb.py
->> >
->>
->> The logic seems quite simple,
->> but I am not quite sure which file is still valid?
->>
->>
->> [1] signing_key.pem - OK, this should be certs/signing_key.pem
->>                          and removed by 'make mrproper'
->>
->> [2] signing_key.priv - deprecated by commit fb1179499134 ?
->>
->> [3] signing_key.x509 - OK, this should be certs/signing_key.x509
->>                          and removed by 'make mrproper'
->>
->> [4] x509.genkey - this is an intermediate file for generating signing_key.pem,
->>                   but unneeded for installing external modules.
->>                   Does it make more sense to delete this by 'make clean'?
->>
->> [5] extra_certificates - I am not sure where this is generated, and used
->>
->> [6] siging_key.x509.keyid - same as [5]
->>
->> [7] signing_key.x509.signer - same as [5]
->
-> Retested with current Linus tree:
->
-> After build, these files are present:
->         signing_key.x509
->
-> This file is never cleaned up by clean or proper.
->
-> The changes that I think are necessary:
->      certs/extra_certificates is no longer used, remove it from Makefile
->
->      certs/signing_key.x509 should be removed by mrproper
+In this situation, the current used check doesn't work, and
+COMPILED_SOURCE tags is broken with O= builds.
 
-I agree.
-I'd like obsolete files dropped from the list
-before fixing the file paths.
+This patch fixes it by looking for object files both in source tree and
+potential destination tree.
 
+It was verified that in the case of O= usage, the current directory is
+the build tree, ie. the tree referenced by O=xxx, and j is the source
+tree path concatenated with relative path of the object to the source
+tree root, hence the simple expression to compute "k" as the built
+object.
 
+Signed-off-by: Robert Jarzmik <robert.jarzmik@free.fr>
+---
+Since v1: amended k expression, Marek's comments
+Since v2: removed k from Masahiro's comments
+---
+ scripts/tags.sh | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/scripts/tags.sh b/scripts/tags.sh
+index a2ff3388e5ea..2a61db329adf 100755
+--- a/scripts/tags.sh
++++ b/scripts/tags.sh
+@@ -106,6 +106,7 @@ all_compiled_sources()
+ 		case "$i" in
+ 			*.[cS])
+ 				j=${i/\.[cS]/\.o}
++				j="${j#$tree}"
+ 				if [ -e $j ]; then
+ 					echo $i
+ 				fi
 -- 
-Best Regards
-Masahiro Yamada
+2.1.4
+
