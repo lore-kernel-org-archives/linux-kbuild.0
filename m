@@ -1,38 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp07.smtpout.orange.fr ([80.12.242.129]:42792 "EHLO
-        smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751300AbdFEMBA (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:45343 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751192AbdFEXsM (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 5 Jun 2017 08:01:00 -0400
-From: Robert Jarzmik <robert.jarzmik@free.fr>
-Subject: Re: [PATCH v2] tags: honor COMPILED_SOURCE with apart output directory
-References: <1481819733-3002-1-git-send-email-robert.jarzmik@free.fr>
-        <CAK7LNAQN2ZRFETM818ySYSOx1Tykhq7RCYeyFv=x1ARH7w7cww@mail.gmail.com>
-        <87shkwi73g.fsf@belgarion.home>
-        <CAK7LNARpU2Stv2=jWiK2z1WxY-EnKACkJbnFWOaD1POigGvSug@mail.gmail.com>
-        <87h911yw1t.fsf@belgarion.home>
-        <CAK7LNAQJ-vcsok7cWgLyKGiTxPoQkr0mNbf3t4d24jj6cPCw6w@mail.gmail.com>
-        <CAK7LNASa+z0NUhqM9PwMv5yJZE5nty6+SOD52y=3V+LCmqXX0A@mail.gmail.com>
-Date: Mon, 05 Jun 2017 14:00:44 +0200
-In-Reply-To: <CAK7LNASa+z0NUhqM9PwMv5yJZE5nty6+SOD52y=3V+LCmqXX0A@mail.gmail.com>
-        (Masahiro Yamada's message of "Mon, 5 Jun 2017 15:05:06 +0900")
-Message-ID: <877f0q1w5v.fsf@belgarion.home>
+        Mon, 5 Jun 2017 19:48:12 -0400
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <20170520112700.27823-1-nicolas.iooss_linux@m4x.org>
+References: <20170520112700.27823-1-nicolas.iooss_linux@m4x.org>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Tue, 6 Jun 2017 08:48:03 +0900
+Message-ID: <CAK7LNAQSQD-64E58dUmVyDkhymAJfGGD05dgnVG1P7BxW8SR+g@mail.gmail.com>
+Subject: Re: [PATCH 1/1] genksyms: add printf format attribute to error_with_pos()
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Michal Marek <mmarek@suse.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Nicolas Iooss <nicolas.iooss_linux@m4x.org>
+Cc: Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-Masahiro Yamada <yamada.masahiro@socionext.com> writes:
+2017-05-20 20:27 GMT+09:00 Nicolas Iooss <nicolas.iooss_linux@m4x.org>:
+> When compiling with -Wsuggest-attribute=3Dformat in HOSTCFLAGS, gcc
+> complains that error_with_pos() may be declared with a printf format
+> attribute:
+>
+>     scripts/genksyms/genksyms.c:726:3: warning: function might be
+>     possible candidate for =E2=80=98gnu_printf=E2=80=99 format attribute
+>     [-Wsuggest-attribute=3Dformat]
+>        vfprintf(stderr, fmt, args);
+>        ^~~~~~~~
+>
+> This would allow catching printf-format errors at compile time in
+> callers to error_with_pos(). Add this attribute.
+>
+> Signed-off-by: Nicolas Iooss <nicolas.iooss_linux@m4x.org>
 
-> Hi Robert,
-Hi Masahiro,
 
-Sorry, I was out lately.
-I sent a v3, thanks for keeping up pushing for this one.
+Applied to linux-kbuild/fixes.  Thanks!
 
-Cheers.
 
---
-Robert
+
+--=20
+Best Regards
+Masahiro Yamada
