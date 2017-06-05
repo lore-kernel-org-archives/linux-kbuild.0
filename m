@@ -1,223 +1,105 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:47142 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751247AbdFDXRf (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:63748 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751270AbdFEGFK (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 4 Jun 2017 19:17:35 -0400
+        Mon, 5 Jun 2017 02:05:10 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAK8P3a2umsN_fTLbRmMofFYBzfOSdfFTqYcKdtesAdXk9Dbwvg@mail.gmail.com>
-References: <20170529081103.29999-1-npiggin@gmail.com> <CAK8P3a2umsN_fTLbRmMofFYBzfOSdfFTqYcKdtesAdXk9Dbwvg@mail.gmail.com>
+In-Reply-To: <CAK7LNAQJ-vcsok7cWgLyKGiTxPoQkr0mNbf3t4d24jj6cPCw6w@mail.gmail.com>
+References: <1481819733-3002-1-git-send-email-robert.jarzmik@free.fr>
+ <CAK7LNAQN2ZRFETM818ySYSOx1Tykhq7RCYeyFv=x1ARH7w7cww@mail.gmail.com>
+ <87shkwi73g.fsf@belgarion.home> <CAK7LNARpU2Stv2=jWiK2z1WxY-EnKACkJbnFWOaD1POigGvSug@mail.gmail.com>
+ <87h911yw1t.fsf@belgarion.home> <CAK7LNAQJ-vcsok7cWgLyKGiTxPoQkr0mNbf3t4d24jj6cPCw6w@mail.gmail.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Mon, 5 Jun 2017 08:17:26 +0900
-Message-ID: <CAK7LNATyoCkDgywEdvR1z5kaTR+Uur1gg7-FT-0fV_HLb7AxMg@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: provide THIN_ARCHIVES option for all architectures
+Date: Mon, 5 Jun 2017 15:05:06 +0900
+Message-ID: <CAK7LNASa+z0NUhqM9PwMv5yJZE5nty6+SOD52y=3V+LCmqXX0A@mail.gmail.com>
+Subject: Re: [PATCH v2] tags: honor COMPILED_SOURCE with apart output directory
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Nicholas Piggin <npiggin@gmail.com>, linux-arch <linux-arch@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Stephen Rothwell <sfr@canb.auug.org.au>
+To: Robert Jarzmik <robert.jarzmik@free.fr>
+Cc: Michal Marek <mmarek@suse.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-Hi.
+Hi Robert,
 
-2017-06-01 6:13 GMT+09:00 Arnd Bergmann <arnd@arndb.de>:
-> On Mon, May 29, 2017 at 10:11 AM, Nicholas Piggin <npiggin@gmail.com> wrote:
->> Supporting two different intermediate-artifact packaging schemes
->> was only ever intended as a temporary transition.
->>
->> This has so far caused no problems for powerpc, after a small fix
->> for how the arch invoked ar. So now allow any arch to select the
->> option, continue defaulting to N.
->>
->> Cc: Stephen Rothwell <sfr@canb.auug.org.au>
->> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
->> ---
->> The next step will be to have archs always select THIN_ARCHIVES
->> when they are known to work. Then remove the option entirely.
->>
->> x86 has always just worked for me, so that should be easy.
+
+2017-05-07 0:57 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
+> Hi Robert,
 >
-> I have build-tested many thousand randconfig kernels on arm32 with
-> this option enabled, and did not run into build-time regressions
-> besides some initial problems from a broken binutils snapshot
-> (all released binutils versions should be fine).
+> 2017-05-04 15:29 GMT+09:00 Robert Jarzmik <robert.jarzmik@free.fr>:
+>> Masahiro Yamada <yamada.masahiro@socionext.com> writes:
+>>
+>>> Hi Robert,
+>>>
+>>> 2017-04-26 5:07 GMT+09:00 Robert Jarzmik <robert.jarzmik@free.fr>:
+>>>> Masahiro Yamada <yamada.masahiro@socionext.com> writes:
+>>>>
+>>>>> Hi Robert,
+>>>>>> diff --git a/scripts/tags.sh b/scripts/tags.sh
+>>>>>> index a2ff3388e5ea..35cb64d5211c 100755
+>>>>>> --- a/scripts/tags.sh
+>>>>>> +++ b/scripts/tags.sh
+>>>>>> @@ -106,7 +106,8 @@ all_compiled_sources()
+>>>>>>                 case "$i" in
+>>>>>>                         *.[cS])
+>>>>>>                                 j=${i/\.[cS]/\.o}
+>>>>>> -                               if [ -e $j ]; then
+>>>>>> +                               k="${j#$tree}"
+>>>>>> +                               if [ -e $j -o -e "$k" ]; then
+>>>>>
+>>>>>
+>>>>> Do we need to check both srctree and objtree?
+>>>>> I think checking objtree (after $tree is ripped off) is enough.
+>>>>
+>>>> If I remember correctly, as this goes back a couple of monthes when I made the
+>>>> tests of this patch, the srctree is checked for the case when the kernel is
+>>>> compiled without O=, and objtree for the case with O=.
+>>>
+>>>
+>>> I thought of this too, but if O= is given, objects in srctree
+>>> should not be checked.
+>>>
+>>> For example, the kernel may be compiled for ARCH=arm with O= first,
+>>> then for ARCH=x86 without O= second.
+>>>
+>>> If we include objects from both trees, the generated tag file
+>>> will be a mixture of arm and x86.
+>> That's true, but is this case worth an additional test for this case, ie. is it
+>> a case anybody uses ? Given that that this tags generation never worked for out
+>> of tree builds, I was thinking it wasn't worth a :
+>>    [[ (-z $O -a -e $j) || (-n $O -a -e $k) ]];
+>
+>
+> I am not saying we should do like that.
+>
+>
+> My suggestion is even simpler.
+>
+> Can we do like this?
+>
+>
+> diff --git a/scripts/tags.sh b/scripts/tags.sh
+> index d661f2f..d23dcbf 100755
+> --- a/scripts/tags.sh
+> +++ b/scripts/tags.sh
+> @@ -106,6 +106,7 @@ all_compiled_sources()
+>                 case "$i" in
+>                         *.[cS])
+>                                 j=${i/\.[cS]/\.o}
+> +                               j="${j#$tree}"
+>                                 if [ -e $j ]; then
+>                                         echo $i
+>                                 fi
+>
 >
 
 
-Please let me mention two advantages of using THIN_ARCHIVES.
+I tested the code above, and it worked fine.
 
+Could you send v3?  Then, I will apply it soon.
 
-
-[1]
-By switching to CONFIG_THIN_ARCHIVES,
-we can get back building allyesconfig on ARM.
-(probably because the final link is given more flexibility
-to insert veneers)
-
-This is a much cleaner solution than the following patch:
-https://patchwork.kernel.org/patch/6120441/
-
-
-
-[2]
-Thick archive does not work well with garbage collection
-(CONFIG_LD_DEAD_CODE_DATA_ELIMINATION).
-
-CONFIG_LD_DEAD_CODE_DATA_ELIMINATION can not deal with
-static functions with the same function name.
-
-
-The following is the test code I played with.
-
-
-
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index 3dcd7ec..a267145 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -13,6 +13,7 @@ config ARM64
-        select ARCH_HAS_ELF_RANDOMIZE
-        select ARCH_HAS_GCOV_PROFILE_ALL
-        select ARCH_HAS_GIGANTIC_PAGE
-+       select LD_DEAD_CODE_DATA_ELIMINATION
-        select ARCH_HAS_KCOV
-        select ARCH_HAS_SET_MEMORY
-        select ARCH_HAS_SG_CHAIN
---- a/init/main.c
-+++ b/init/main.c
-@@ -485,6 +485,8 @@ static void __init mm_init(void)
-        ioremap_huge_init();
- }
-
-+void this_is_called(void);
-+
- asmlinkage __visible void __init start_kernel(void)
- {
-        char *command_line;
-@@ -676,6 +678,9 @@ asmlinkage __visible void __init start_kernel(void)
-        }
-
-        /* Do the rest non-__init'ed, we're now alive */
-+
-+       this_is_called();
-+
-        rest_init();
- }
-
-diff --git a/kernel/Makefile b/kernel/Makefile
-index 72aa080..b938d4e 100644
---- a/kernel/Makefile
-+++ b/kernel/Makefile
-@@ -9,7 +9,8 @@ obj-y     = fork.o exec_domain.o panic.o \
-            extable.o params.o \
-            kthread.o sys_ni.o nsproxy.o \
-            notifier.o ksysfs.o cred.o reboot.o \
--           async.o range.o smpboot.o ucount.o
-+           async.o range.o smpboot.o ucount.o \
-+           foo.o bar.o
-
- obj-$(CONFIG_MULTIUSER) += groups.o
-
-diff --git a/kernel/bar.c b/kernel/bar.c
-new file mode 100644
-index 0000000..3b1431e
---- /dev/null
-+++ b/kernel/bar.c
-@@ -0,0 +1,31 @@
-+#include <linux/printk.h>
-+
-+static void greeting(void)
-+{
-+       printk("hello world0\n");
-+       printk("hello world1\n");
-+       printk("hello world2\n");
-+       printk("hello world3\n");
-+       printk("hello world4\n");
-+       printk("hello world5\n");
-+       printk("hello world6\n");
-+       printk("hello world7\n");
-+       printk("hello world8\n");
-+       printk("hello world9\n");
-+}
-+
-+void this_is_not_called1(void)
-+{
-+       int i;
-+
-+       for (i = 0; i < 100; i++)
-+               greeting();
-+}
-+
-+void this_is_not_called2(void)
-+{
-+       int i;
-+
-+       for (i = 0; i < 1000; i++)
-+               greeting();
-+}
-diff --git a/kernel/foo.c b/kernel/foo.c
-new file mode 100644
-index 0000000..10c8e8b
---- /dev/null
-+++ b/kernel/foo.c
-@@ -0,0 +1,31 @@
-+#include <linux/printk.h>
-+
-+static void greeting(void)
-+{
-+       printk("goodbye world0\n");
-+       printk("goodbye world1\n");
-+       printk("goodbye world2\n");
-+       printk("goodbye world3\n");
-+       printk("goodbye world4\n");
-+       printk("goodbye world5\n");
-+       printk("goodbye world6\n");
-+       printk("goodbye world7\n");
-+       printk("goodbye world8\n");
-+       printk("goodbye world9\n");
-+}
-+
-+void this_is_called(void)
-+{
-+       int i;
-+
-+       for (i = 0; i < 100; i++)
-+               greeting();
-+}
-+
-+void this_is_not_called0(void)
-+{
-+       int i;
-+
-+       for (i = 0; i < 1000; i++)
-+               greeting();
-+}
-
-
-
-The function greeting() in kernel/foo.c is called,
-whereas greeting() in kernel/bar.c is not called.
-
-The latter should be removed from the final binary,
-but both are kept.
-
-
-$ aarch64-linux-gnu-nm  vmlinux | grep 'greeting\|this_is_'
-ffff0000080f7420 t greeting
-ffff0000080f74a8 t greeting
-ffff0000080f7530 T this_is_called
-
-
-
-
-
-By selecting CONFIG_THIN_ARCHIVES, greeting()
-in kernel/bar.c is removed correctly.
-
-
-$ aarch64-linux-gnu-nm  vmlinux | grep 'greeting\|this_is_'
-ffff0000080f2bf0 t greeting
-ffff0000080f2c78 T this_is_called
-
+Or, if you are not reluctant to do so,
+may I modify your patch like above?
 
 
 
