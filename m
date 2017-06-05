@@ -1,44 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:45343 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751192AbdFEXsM (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:33676 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751192AbdFEX6P (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 5 Jun 2017 19:48:12 -0400
+        Mon, 5 Jun 2017 19:58:15 -0400
 MIME-Version: 1.0
-In-Reply-To: <20170520112700.27823-1-nicolas.iooss_linux@m4x.org>
-References: <20170520112700.27823-1-nicolas.iooss_linux@m4x.org>
+In-Reply-To: <1496663955-8499-1-git-send-email-robert.jarzmik@free.fr>
+References: <1496663955-8499-1-git-send-email-robert.jarzmik@free.fr>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 6 Jun 2017 08:48:03 +0900
-Message-ID: <CAK7LNAQSQD-64E58dUmVyDkhymAJfGGD05dgnVG1P7BxW8SR+g@mail.gmail.com>
-Subject: Re: [PATCH 1/1] genksyms: add printf format attribute to error_with_pos()
+Date: Tue, 6 Jun 2017 08:58:05 +0900
+Message-ID: <CAK7LNASUowYYh16-PuWdqxq1U30hCZZF4_kQeud2VnF3xsiE1Q@mail.gmail.com>
+Subject: Re: [PATCH v3] tags: honor COMPILED_SOURCE with apart output directory
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicolas Iooss <nicolas.iooss_linux@m4x.org>
-Cc: Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Robert Jarzmik <robert.jarzmik@free.fr>
+Cc: Michal Marek <mmarek@suse.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-2017-05-20 20:27 GMT+09:00 Nicolas Iooss <nicolas.iooss_linux@m4x.org>:
-> When compiling with -Wsuggest-attribute=3Dformat in HOSTCFLAGS, gcc
-> complains that error_with_pos() may be declared with a printf format
-> attribute:
+Hi Robert,
+
+I wanted you to update the log.
+
+2017-06-05 20:59 GMT+09:00 Robert Jarzmik <robert.jarzmik@free.fr>:
+> When the kernel is compiled with an "O=" argument, the object files are
+> not necessarily in the source tree, and more probably in another tree.
+
+Always in another tree.
+
+> In this situation, the current used check doesn't work, and
+> COMPILED_SOURCE tags is broken with O= builds.
 >
->     scripts/genksyms/genksyms.c:726:3: warning: function might be
->     possible candidate for =E2=80=98gnu_printf=E2=80=99 format attribute
->     [-Wsuggest-attribute=3Dformat]
->        vfprintf(stderr, fmt, args);
->        ^~~~~~~~
->
-> This would allow catching printf-format errors at compile time in
-> callers to error_with_pos(). Add this attribute.
->
-> Signed-off-by: Nicolas Iooss <nicolas.iooss_linux@m4x.org>
+> This patch fixes it by looking for object files both in source tree and
+> potential destination tree.
+
+only in the destination tree.
 
 
-Applied to linux-kbuild/fixes.  Thanks!
+> It was verified that in the case of O= usage, the current directory is
+> the build tree, ie. the tree referenced by O=xxx, and j is the source
+> tree path concatenated with relative path of the object to the source
+> tree root, hence the simple expression to compute "k" as the built
+> object.
+
+"k" is no longer used in v3.
+
+
+> Signed-off-by: Robert Jarzmik <robert.jarzmik@free.fr>
 
 
 
---=20
+I fixed up the git description and applied to linux-kbuild/fixes.
+If you see something wrong, please let me know.
+
+
+
+-- 
 Best Regards
 Masahiro Yamada
