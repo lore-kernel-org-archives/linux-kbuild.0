@@ -1,78 +1,100 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:63562 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751272AbdFEJCF (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:64548 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751295AbdFEJMf (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 5 Jun 2017 05:02:05 -0400
+        Mon, 5 Jun 2017 05:12:35 -0400
 MIME-Version: 1.0
-In-Reply-To: <20170514170942.27944-1-x-linux@infra-silbe.de>
-References: <CAK7LNASc7NgthfZCWFT=3FhRQxxJuuzDVjT8GHik5A0+zBVxpw@mail.gmail.com>
- <20170514170942.27944-1-x-linux@infra-silbe.de>
+In-Reply-To: <20170511102559.52de2854@xeon-e3>
+References: <20170414215450.18307-1-sthemmin@microsoft.com>
+ <20170414215450.18307-2-sthemmin@microsoft.com> <CAK7LNAR8fr21ZkjsC4C57XuAp8WQWarHgawjSMdYFU65cF2PxA@mail.gmail.com>
+ <20170511102559.52de2854@xeon-e3>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Mon, 5 Jun 2017 18:02:00 +0900
-Message-ID: <CAK7LNAR6HAe+DmdS8SrnYeWmfDPMxWzdfAn8VseOKvzmRKq95w@mail.gmail.com>
-Subject: Re: [PATCH v2] kbuild: add explicit ARM support for tar-pkg
+Date: Mon, 5 Jun 2017 18:12:30 +0900
+Message-ID: <CAK7LNARyH5+x=DEgXKKXkzdXFZaPwo3biQcKF49VVEYiL48C4w@mail.gmail.com>
+Subject: Re: [PATCH 1/2] kbuild: cleanup signing keys with mrproper
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Sascha Silbe <x-linux@infra-silbe.de>
-Cc: Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Stephen Hemminger <sthemmin@microsoft.com>, David Woodhouse <dwmw2@infradead.org>, David Howells <dhowells@redhat.com>
 
-Hi Sascha,
+Hi Stephen,
 Sorry for my late reply.
 
-2017-05-15 2:09 GMT+09:00 Sascha Silbe <x-linux@infra-silbe.de>:
-> buildtar warns when an architecture doesn't have an explicit rule on
-> what files to copy, even when the generic rule works just fine. Add a
-> rule for ARM that does the same as the explicit rule, but avoids the
-> warning.
+2017-05-12 2:25 GMT+09:00 Stephen Hemminger <stephen@networkplumber.org>:
+> On Wed, 3 May 2017 13:37:08 +0900
+> Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
 >
-> Signed-off-by: Sascha Silbe <x-linux@infra-silbe.de>
-> ---
-> v1=E2=86=92v2: rebased on top of todays linus master, including commit 15=
-2e6744ebfc
+>> +CC David Woodhouse
+>> +CC David Howells
+>>
+>>
+>> 2017-04-15 6:54 GMT+09:00 Stephen Hemminger <stephen@networkplumber.org>:
+>> > When 'make mrproper' is run it was supposed to remove the signing
+>> > keys in the certs directory, but only the filename is given
+>> > rather than the pathanme which is necessary to cause cleanup.
+>> >
+>> > Signed-off-by: Stephen Hemminger <sthemmin@microsoft.com>
+>> > ---
+>> >  Makefile | 6 +++---
+>> >  1 file changed, 3 insertions(+), 3 deletions(-)
+>> >
+>> > diff --git a/Makefile b/Makefile
+>> > index efa267a92ba6..04ca211552f7 100644
+>> > --- a/Makefile
+>> > +++ b/Makefile
+>> > @@ -1274,9 +1274,9 @@ MRPROPER_DIRS  += include/config usr/include include/generated          \
+>> >                   arch/*/include/generated .tmp_objdiff
+>> >  MRPROPER_FILES += .config .config.old .version .old_version \
+>> >                   Module.symvers tags TAGS cscope* GPATH GTAGS GRTAGS GSYMS \
+>> > -                 signing_key.pem signing_key.priv signing_key.x509     \
+>> > -                 x509.genkey extra_certificates signing_key.x509.keyid \
+>> > -                 signing_key.x509.signer vmlinux-gdb.py
+>> > +                 certs/signing_key.pem certs/signing_key.priv certs/signing_key.x509   \
+>> > +                 certs/x509.genkey certs/extra_certificates certs/signing_key.x509.keyid \
+>> > +                 certs/signing_key.x509.signer vmlinux-gdb.py
+>> >
+>>
+>> The logic seems quite simple,
+>> but I am not quite sure which file is still valid?
+>>
+>>
+>> [1] signing_key.pem - OK, this should be certs/signing_key.pem
+>>                          and removed by 'make mrproper'
+>>
+>> [2] signing_key.priv - deprecated by commit fb1179499134 ?
+>>
+>> [3] signing_key.x509 - OK, this should be certs/signing_key.x509
+>>                          and removed by 'make mrproper'
+>>
+>> [4] x509.genkey - this is an intermediate file for generating signing_key.pem,
+>>                   but unneeded for installing external modules.
+>>                   Does it make more sense to delete this by 'make clean'?
+>>
+>> [5] extra_certificates - I am not sure where this is generated, and used
+>>
+>> [6] siging_key.x509.keyid - same as [5]
+>>
+>> [7] signing_key.x509.signer - same as [5]
 >
-> Not duplicating the rule would have been nice from a maintenance point
-> of view, but doesn't fit the current code structure very well. It also
-> avoids breakage if the generic rule ever gets adjusted to something
-> else that doesn't work for ARM.
+> Retested with current Linus tree:
 >
+> After build, these files are present:
+>         signing_key.x509
 >
->  scripts/package/buildtar | 3 +++
->  1 file changed, 3 insertions(+)
+> This file is never cleaned up by clean or proper.
 >
-> diff --git a/scripts/package/buildtar b/scripts/package/buildtar
-> index e046bff33589..ea84ba67619b 100755
-> --- a/scripts/package/buildtar
-> +++ b/scripts/package/buildtar
-> @@ -108,6 +108,9 @@ case "${ARCH}" in
->                         cp -v -- "${objtree}/vmlinux" "${tmpdir}/boot/vml=
-inux-${KERNELRELEASE}"
->                 fi
->                 ;;
-> +       arm)
-> +               [ -f "${KBUILD_IMAGE}" ] && cp -v -- "${KBUILD_IMAGE}" "$=
-{tmpdir}/boot/vmlinux-kbuild-${KERNELRELEASE}"
-> +               ;;
->         *)
->                 [ -f "${KBUILD_IMAGE}" ] && cp -v -- "${KBUILD_IMAGE}" "$=
-{tmpdir}/boot/vmlinux-kbuild-${KERNELRELEASE}"
->                 echo "" >&2
+> The changes that I think are necessary:
+>      certs/extra_certificates is no longer used, remove it from Makefile
+>
+>      certs/signing_key.x509 should be removed by mrproper
+
+I agree.
+I'd like obsolete files dropped from the list
+before fixing the file paths.
 
 
-I do not get why we need to add a separate entry
-to avoid the WARNING.
-
-With KBUILD_IMAGE fixed, mkspec and builddeb now
-handle the kernel image in an (almost) arch-agnostic way.
-
-I think the WARNING can be simply removed from the default case.
-Also, could you rename vmlinux-kbuild-${KERNELRELEASE}
-to vmlinuz-${KERNELRELEASE} in order to align with mkspec/builddeb?
-Then, x86|i386|x86_64 can be merged into the default case.
-
-
---=20
+-- 
 Best Regards
 Masahiro Yamada
