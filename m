@@ -1,56 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:44632 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751274AbdFEHAf (ORCPT
+Received: from mail-pf0-f194.google.com ([209.85.192.194]:35574 "EHLO
+        mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751274AbdFEHA5 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 5 Jun 2017 03:00:35 -0400
+        Mon, 5 Jun 2017 03:00:57 -0400
+Date: Mon, 5 Jun 2017 17:00:45 +1000
+From: Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH] kbuild: provide THIN_ARCHIVES option for all
+ architectures
+Message-ID: <20170605170045.11760813@roar.ozlabs.ibm.com>
+In-Reply-To: <CAK7LNATyoCkDgywEdvR1z5kaTR+Uur1gg7-FT-0fV_HLb7AxMg@mail.gmail.com>
+References: <20170529081103.29999-1-npiggin@gmail.com>
+        <CAK8P3a2umsN_fTLbRmMofFYBzfOSdfFTqYcKdtesAdXk9Dbwvg@mail.gmail.com>
+        <CAK7LNATyoCkDgywEdvR1z5kaTR+Uur1gg7-FT-0fV_HLb7AxMg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20170520112700.27823-1-nicolas.iooss_linux@m4x.org>
-References: <20170520112700.27823-1-nicolas.iooss_linux@m4x.org>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Mon, 5 Jun 2017 16:00:23 +0900
-Message-ID: <CAK7LNASxpaFKPvJ9k=cg_R3K4i5_kG5TeFW6tcf=4OmE+Vej-A@mail.gmail.com>
-Subject: Re: [PATCH 1/1] genksyms: add printf format attribute to error_with_pos()
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicolas Iooss <nicolas.iooss_linux@m4x.org>
-Cc: Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Arnd Bergmann <arnd@arndb.de>, linux-arch <linux-arch@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>, Stephen Rothwell <sfr@canb.auug.org.au>
 
-Hi Nicolas
+On Mon, 5 Jun 2017 08:17:26 +0900
+Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
 
-2017-05-20 20:27 GMT+09:00 Nicolas Iooss <nicolas.iooss_linux@m4x.org>:
-> When compiling with -Wsuggest-attribute=3Dformat in HOSTCFLAGS, gcc
-> complains that error_with_pos() may be declared with a printf format
-> attribute:
->
->     scripts/genksyms/genksyms.c:726:3: warning: function might be
->     possible candidate for =E2=80=98gnu_printf=E2=80=99 format attribute
->     [-Wsuggest-attribute=3Dformat]
->        vfprintf(stderr, fmt, args);
->        ^~~~~~~~
->
-> This would allow catching printf-format errors at compile time in
-> callers to error_with_pos(). Add this attribute.
->
-> Signed-off-by: Nicolas Iooss <nicolas.iooss_linux@m4x.org>
-> ---
->
-> I am sending this to the maintainers listed in section "KERNEL BUILD +
-> files below scripts/ (unless maintained elsewhere)" even though it does
-> not list scripts/genksyms/. Should this directory be added in
-> MAINTAINERS?
+> Hi.
+> 
+> 2017-06-01 6:13 GMT+09:00 Arnd Bergmann <arnd@arndb.de>:
+> > On Mon, May 29, 2017 at 10:11 AM, Nicholas Piggin <npiggin@gmail.com> wrote:  
+> >> Supporting two different intermediate-artifact packaging schemes
+> >> was only ever intended as a temporary transition.
+> >>
+> >> This has so far caused no problems for powerpc, after a small fix
+> >> for how the arch invoked ar. So now allow any arch to select the
+> >> option, continue defaulting to N.
+> >>
+> >> Cc: Stephen Rothwell <sfr@canb.auug.org.au>
+> >> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> >> ---
+> >> The next step will be to have archs always select THIN_ARCHIVES
+> >> when they are known to work. Then remove the option entirely.
+> >>
+> >> x86 has always just worked for me, so that should be easy.  
+> >
+> > I have build-tested many thousand randconfig kernels on arm32 with
+> > this option enabled, and did not run into build-time regressions
+> > besides some initial problems from a broken binutils snapshot
+> > (all released binutils versions should be fine).
+> >  
+> 
+> 
+> Please let me mention two advantages of using THIN_ARCHIVES.
 
-scripts/genksyms/ is not explicitly listed in MAINTAINERS.
-So, patches that touch scripts/genksyms/ basically should go to the kbuild =
-tree
-by the rule "files below scripts/ (unless maintained elsewhere)".
-I will apply this patch shortly.  Thanks.
+[snip]
 
-If somebody offers to maintain scripts/genksyms/, I am totally fine with it=
-.
+Thank you for the post. I ran it through 0day and found some issues
+with a few archs that I'm working through. Some changes are needed to
+the generic thin archives build scripts, and some arch tweaks required.
+So it's not 100% trivial.
 
---=20
-Best Regards
-Masahiro Yamada
+4.13 might still be a realistic target if I make some progress.
+
+Thanks,
+Nick
