@@ -1,68 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:54989 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751107AbdFFBsM (ORCPT
+Received: from smtp10.smtpout.orange.fr ([80.12.242.132]:24674 "EHLO
+        smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750881AbdFFGNm (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 5 Jun 2017 21:48:12 -0400
+        Tue, 6 Jun 2017 02:13:42 -0400
+From: Robert Jarzmik <robert.jarzmik@free.fr>
+Subject: Re: [PATCH v3] tags: honor COMPILED_SOURCE with apart output directory
+References: <1496663955-8499-1-git-send-email-robert.jarzmik@free.fr>
+        <CAK7LNASUowYYh16-PuWdqxq1U30hCZZF4_kQeud2VnF3xsiE1Q@mail.gmail.com>
+Date: Tue, 06 Jun 2017 08:13:37 +0200
+In-Reply-To: <CAK7LNASUowYYh16-PuWdqxq1U30hCZZF4_kQeud2VnF3xsiE1Q@mail.gmail.com>
+        (Masahiro Yamada's message of "Tue, 6 Jun 2017 08:58:05 +0900")
+Message-ID: <8737bd1w4u.fsf@belgarion.home>
 MIME-Version: 1.0
-In-Reply-To: <1496028061-19285-1-git-send-email-caoj.fnst@cn.fujitsu.com>
-References: <1496028061-19285-1-git-send-email-caoj.fnst@cn.fujitsu.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 6 Jun 2017 10:47:43 +0900
-Message-ID: <CAK7LNAQ_OOvmCU6jdg+VNnWnZRzjeZ99Uz8o_2yDnMM+i=g=kg@mail.gmail.com>
-Subject: Re: [PATCH] Top Makefile: tiny correction on `make help`
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Cao jin <caoj.fnst@cn.fujitsu.com>
-Cc: Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Michal Marek <mmarek@suse.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-Hi Cao,
+Masahiro Yamada <yamada.masahiro@socionext.com> writes:
 
-
-2017-05-29 12:21 GMT+09:00 Cao jin <caoj.fnst@cn.fujitsu.com>:
-> The help info of `make -C=1` is little confusing, make it clear.
-
-`make C=1` instead of `make -C=1`
-
-
-
-> Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
-> ---
->  Makefile | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Hi Robert,
 >
-> diff --git a/Makefile b/Makefile
-> index efa267a..b34a34d 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -1417,7 +1417,7 @@ help:
->         @echo  '  make V=0|1 [targets] 0 => quiet build (default), 1 => verbose build'
->         @echo  '  make V=2   [targets] 2 => give reason for rebuild of target'
->         @echo  '  make O=dir [targets] Locate all output files in "dir", including .config'
-> -       @echo  '  make C=1   [targets] Check all c source with $$CHECK (sparse by default)'
-> +       @echo  '  make C=1   [targets] Check re-compiled c source only with $$CHECK (sparse by default)'
->         @echo  '  make C=2   [targets] Force check of all c source with $$CHECK'
->         @echo  '  make RECORDMCOUNT_WARN=1 [targets] Warn about ignored mcount sections'
->         @echo  '  make W=n   [targets] Enable extra gcc checks, n=1,2,3 where'
+> I wanted you to update the log.
+>
+> 2017-06-05 20:59 GMT+09:00 Robert Jarzmik <robert.jarzmik@free.fr>:
+>> When the kernel is compiled with an "O=" argument, the object files are
+>> not necessarily in the source tree, and more probably in another tree.
+>
+> Always in another tree.
+>
+>> In this situation, the current used check doesn't work, and
+>> COMPILED_SOURCE tags is broken with O= builds.
+>>
+>> This patch fixes it by looking for object files both in source tree and
+>> potential destination tree.
+>
+> only in the destination tree.
+>
+>
+>> It was verified that in the case of O= usage, the current directory is
+>> the build tree, ie. the tree referenced by O=xxx, and j is the source
+>> tree path concatenated with relative path of the object to the source
+>> tree root, hence the simple expression to compute "k" as the built
+>> object.
+>
+> "k" is no longer used in v3.
+>
+>
+>> Signed-off-by: Robert Jarzmik <robert.jarzmik@free.fr>
+>
+>
+>
+> I fixed up the git description and applied to linux-kbuild/fixes.
+> If you see something wrong, please let me know.
+Your changes are perfectly correct, thanks.
 
-Which phrase is qualified by "only"?
-
-[1] re-compiled c source only
-[2] only with $$CHECK
-
-I know [1] is what you mean (sorry for my nitpicking).
-
-
-Perhaps, "Check only re-compiled c source with $$CHECK" is even clearer?
-
-(or, just drop "only" because "re-compiled c source" is understandable enough ?)
-
-
-Could you use "kbuild: " instead of "Top Makefile" in the subject?
-
-Thanks.
+Cheers.
 
 -- 
-Best Regards
-Masahiro Yamada
+Robert
