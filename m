@@ -1,76 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:61510 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751774AbdFIQYb (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:32094 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751558AbdFIQeZ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 9 Jun 2017 12:24:31 -0400
+        Fri, 9 Jun 2017 12:34:25 -0400
 MIME-Version: 1.0
-In-Reply-To: <20170521094447.m4thpavivflyqtf6@pd.tnic>
-References: <20170409130708.4753-1-bp@alien8.de> <CAK7LNAT8tA=_Zi6i9w6cgHfkrwzxDm2-w2vuZpM57-P=YAvTUw@mail.gmail.com>
- <20170520203323.6ug3gq2yoms6acsu@pd.tnic> <CAK7LNAT2tLPn70AcxnAZuv4=VAp2Wfg4ZRMEjVU0K2wntGSN9Q@mail.gmail.com>
- <20170521094447.m4thpavivflyqtf6@pd.tnic>
+In-Reply-To: <1496733328-22521-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1496733328-22521-1-git-send-email-yamada.masahiro@socionext.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sat, 10 Jun 2017 01:24:11 +0900
-Message-ID: <CAK7LNATmuLv18m4cg-Y=ZHbZifbjEkBc5j30Afs_P8=5U-_OhQ@mail.gmail.com>
-Subject: Re: [PATCH v2] kconfig: Check for libncurses before menuconfig
+Date: Sat, 10 Jun 2017 01:34:11 +0900
+Message-ID: <CAK7LNATMMiTrSqXgjAHuVDOSgDYH77UpR2mAaTazEABVzxhKYg@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: remove duplicated arch/*/include/generated/uapi
+ include path
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Borislav Petkov <bp@alien8.de>
-Cc: LKML <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Michal Marek <mmarek@suse.com>, Arnd Bergmann <arnd@arndb.de>, James Hogan <james.hogan@imgtec.com>, Florian Fainelli <f.fainelli@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-2017-05-21 18:44 GMT+09:00 Borislav Petkov <bp@alien8.de>:
-> On Sun, May 21, 2017 at 06:15:53PM +0900, Masahiro Yamada wrote:
->> Could you change line 199
->>
->>   $(addprefix $(obj)/,$(lxdialog)): $(obj)/dochecklxdialog
->>
->> to
->>
->>   $(addprefix $(obj)/, mconf.o $(lxdialog)): $(obj)/dochecklxdialog
->>
->> and send v2, please?
+2017-06-06 16:15 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
+> Commit 90ac086bca10 ("Makefile: include arch/*/include/generated/uapi
+> before .../generated") introduced this for bisect'ability.  The commit
+> chose to promote arch/*/include/generated/uapi in the search path
+> rather than cleaning stale headers.
 >
-> Here it is:
+> After all, we found that approach was not enough, and ended up with
+> cleaning stale headers by commit cda2c65f981d ("kbuild: Remove stale
+> asm-generic wrappers").
 >
-> ---
-> From: Borislav Petkov <bp@suse.de>
-> Date: Sun, 9 Apr 2017 15:07:08 +0200
-> Subject: [PATCH v2] kconfig: Check for libncurses before menuconfig
+> So, the extra search path is no longer needed because Kbuild invokes
+> scripts/Makefile.asm-generic and remove stale headers before it starts
+> descending.
 >
-> There is a check and a nice user-friendly message when the curses
-> library is not present on the system and the user wants to do "make
-> menuconfig". It doesn't get issued, though. Instead, we fail the build
-> when mconf.c doesn't find the curses.h header:
+> This commit is also reverting commit dc33db7c338e ("Kbuild: avoid
+> duplicate include path") because we have no more duplicated path.
 >
->     HOSTCC  scripts/kconfig/mconf.o
->   In file included from scripts/kconfig/mconf.c:23:0:
->   scripts/kconfig/lxdialog/dialog.h:38:20: fatal error: curses.h: No such file or directory
->    #include CURSES_LOC
->                       ^
->   compilation terminated.
->
-> Make sure dochecklxdialog gets run before mconf is compiled so that the
-> user sees the error message instead:
->
->   $ make menuconfig
->    *** Unable to find the ncurses libraries or the
->    *** required header files.
->    *** 'make menuconfig' requires the ncurses libraries.
->    ***
->    *** Install ncurses (ncurses-devel) and try again.
->    ***
->   scripts/kconfig/Makefile:203: recipe for target 'scripts/kconfig/dochecklxdialog' failed
->   make[1]: *** [scripts/kconfig/dochecklxdialog] Error 1
->   Makefile:548: recipe for target 'menuconfig' failed
->   make: *** [menuconfig] Error 2
->
-> Signed-off-by: Borislav Petkov <bp@suse.de>
-> Cc: linux-kbuild@vger.kernel.org
-> Link: http://lkml.kernel.org/r/20170409130708.4753-1-bp@alien8.de
-> ---
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 
-Applied to linux-kbuild/fixes.  Thanks!
+
+Applied to linux-kbuild/kbuild.
 
 
 
