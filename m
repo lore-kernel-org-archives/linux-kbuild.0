@@ -1,149 +1,40 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-09.nifty.com ([210.131.2.76]:63917 "EHLO
-        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752052AbdFLD2F (ORCPT
+Received: from mail-pg0-f65.google.com ([74.125.83.65]:36640 "EHLO
+        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751989AbdFLIWc (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 11 Jun 2017 23:28:05 -0400
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 23/27] unicore32: move generic-y of exported headers to uapi/asm/Kbuild
-Date: Mon, 12 Jun 2017 12:27:17 +0900
-Message-Id: <1497238041-7011-24-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1497238041-7011-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1497238041-7011-1-git-send-email-yamada.masahiro@socionext.com>
+        Mon, 12 Jun 2017 04:22:32 -0400
+From: Jonathan Liu <net147@gmail.com>
+Subject: [PATCH] scripts/mkcompile_h: Remove trailing spaces from compiler version
+Date: Mon, 12 Jun 2017 18:23:17 +1000
+Message-Id: <20170612082317.20407-1-net147@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org, linux-arch <linux-arch@vger.kernel.org>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org, Guan Xuetao <gxt@mprc.pku.edu.cn>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Jonathan Liu <net147@gmail.com>
 
-Since commit fcc8487d477a ("uapi: export all headers under uapi
-directories"), all (and only) headers under uapi directories are
-exported, but asm-generic wrappers are still exceptions.
+Improves the output of "cat /proc/version" by getting rid of the
+trailing space at the end of the compiler version when the kernel
+is compiled using GCC.
 
-scripts/Makefile.headersinst still need to deal with old-kbuild-file
-for headers listed in arch/*/include/asm/Kbuild, but actually exported.
-
-As the last work to finish de-coupling the uapi from kernel headers,
-move generic-y of exported headers to uapi/asm/Kbuild.
-
-I moved "generic-y += kprobes.h" to keep the entries sorted.
-
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+Signed-off-by: Jonathan Liu <net147@gmail.com>
 ---
+ scripts/mkcompile_h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
- arch/unicore32/include/asm/Kbuild      | 31 +------------------------------
- arch/unicore32/include/uapi/asm/Kbuild | 28 ++++++++++++++++++++++++++++
- 2 files changed, 29 insertions(+), 30 deletions(-)
-
-diff --git a/arch/unicore32/include/asm/Kbuild b/arch/unicore32/include/asm/Kbuild
-index e9ad511c1043..fda7e2153086 100644
---- a/arch/unicore32/include/asm/Kbuild
-+++ b/arch/unicore32/include/asm/Kbuild
-@@ -1,67 +1,38 @@
--
- generic-y += atomic.h
--generic-y += auxvec.h
--generic-y += bitsperlong.h
- generic-y += bugs.h
- generic-y += clkdev.h
- generic-y += current.h
- generic-y += device.h
- generic-y += div64.h
- generic-y += emergency-restart.h
--generic-y += errno.h
- generic-y += exec.h
- generic-y += extable.h
- generic-y += fb.h
--generic-y += fcntl.h
- generic-y += ftrace.h
- generic-y += futex.h
- generic-y += hardirq.h
- generic-y += hw_irq.h
--generic-y += ioctl.h
--generic-y += ioctls.h
--generic-y += ipcbuf.h
- generic-y += irq_regs.h
- generic-y += irq_work.h
- generic-y += kdebug.h
- generic-y += kmap_types.h
-+generic-y += kprobes.h
- generic-y += local.h
- generic-y += mcs_spinlock.h
- generic-y += mm-arch-hooks.h
--generic-y += mman.h
- generic-y += module.h
--generic-y += msgbuf.h
--generic-y += param.h
- generic-y += parport.h
- generic-y += percpu.h
--generic-y += poll.h
--generic-y += posix_types.h
- generic-y += preempt.h
--generic-y += resource.h
- generic-y += sections.h
- generic-y += segment.h
--generic-y += sembuf.h
- generic-y += serial.h
--generic-y += setup.h
--generic-y += shmbuf.h
--generic-y += shmparam.h
--generic-y += siginfo.h
--generic-y += signal.h
- generic-y += sizes.h
--generic-y += socket.h
--generic-y += sockios.h
--generic-y += stat.h
--generic-y += statfs.h
--generic-y += swab.h
- generic-y += syscalls.h
--generic-y += termbits.h
--generic-y += termios.h
- generic-y += topology.h
- generic-y += trace_clock.h
--generic-y += types.h
--generic-y += ucontext.h
- generic-y += unaligned.h
- generic-y += user.h
- generic-y += vga.h
- generic-y += word-at-a-time.h
- generic-y += xor.h
--generic-y += kprobes.h
-diff --git a/arch/unicore32/include/uapi/asm/Kbuild b/arch/unicore32/include/uapi/asm/Kbuild
-index 13a97aa2285f..759a71411169 100644
---- a/arch/unicore32/include/uapi/asm/Kbuild
-+++ b/arch/unicore32/include/uapi/asm/Kbuild
-@@ -1,4 +1,32 @@
- # UAPI Header export list
- include include/uapi/asm-generic/Kbuild.asm
+diff --git a/scripts/mkcompile_h b/scripts/mkcompile_h
+index 6fdc97ef6023..fd8fdb91581d 100755
+--- a/scripts/mkcompile_h
++++ b/scripts/mkcompile_h
+@@ -76,7 +76,7 @@ UTS_TRUNCATE="cut -b -$UTS_LEN"
+   echo \#define LINUX_COMPILE_BY \"`echo $LINUX_COMPILE_BY | $UTS_TRUNCATE`\"
+   echo \#define LINUX_COMPILE_HOST \"`echo $LINUX_COMPILE_HOST | $UTS_TRUNCATE`\"
  
-+generic-y += auxvec.h
-+generic-y += bitsperlong.h
-+generic-y += errno.h
-+generic-y += fcntl.h
-+generic-y += ioctl.h
-+generic-y += ioctls.h
-+generic-y += ipcbuf.h
- generic-y += kvm_para.h
-+generic-y += mman.h
-+generic-y += msgbuf.h
-+generic-y += param.h
-+generic-y += poll.h
-+generic-y += posix_types.h
-+generic-y += resource.h
-+generic-y += sembuf.h
-+generic-y += setup.h
-+generic-y += shmbuf.h
-+generic-y += shmparam.h
-+generic-y += siginfo.h
-+generic-y += signal.h
-+generic-y += socket.h
-+generic-y += sockios.h
-+generic-y += stat.h
-+generic-y += statfs.h
-+generic-y += swab.h
-+generic-y += termbits.h
-+generic-y += termios.h
-+generic-y += types.h
-+generic-y += ucontext.h
+-  echo \#define LINUX_COMPILER \"`$CC -v 2>&1 | grep ' version '`\"
++  echo \#define LINUX_COMPILER \"`$CC -v 2>&1 | grep ' version ' | sed 's/[[:space:]]*$//'`\"
+ ) > .tmpcompile
+ 
+ # Only replace the real compile.h if the new one is different,
 -- 
-2.7.4
+2.12.2
 
