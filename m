@@ -1,47 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:32094 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751558AbdFIQeZ (ORCPT
+Received: from conuserg-09.nifty.com ([210.131.2.76]:63774 "EHLO
+        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751987AbdFLD2C (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 9 Jun 2017 12:34:25 -0400
-MIME-Version: 1.0
-In-Reply-To: <1496733328-22521-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1496733328-22521-1-git-send-email-yamada.masahiro@socionext.com>
+        Sun, 11 Jun 2017 23:28:02 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sat, 10 Jun 2017 01:34:11 +0900
-Message-ID: <CAK7LNATMMiTrSqXgjAHuVDOSgDYH77UpR2mAaTazEABVzxhKYg@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: remove duplicated arch/*/include/generated/uapi
- include path
-Content-Type: text/plain; charset="UTF-8"
+Subject: [PATCH 13/27] m32r: move generic-y of exported headers to uapi/asm/Kbuild
+Date: Mon, 12 Jun 2017 12:27:07 +0900
+Message-Id: <1497238041-7011-14-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <1497238041-7011-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1497238041-7011-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Cc: Michal Marek <mmarek@suse.com>, Arnd Bergmann <arnd@arndb.de>, James Hogan <james.hogan@imgtec.com>, Florian Fainelli <f.fainelli@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org, linux-arch <linux-arch@vger.kernel.org>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-2017-06-06 16:15 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
-> Commit 90ac086bca10 ("Makefile: include arch/*/include/generated/uapi
-> before .../generated") introduced this for bisect'ability.  The commit
-> chose to promote arch/*/include/generated/uapi in the search path
-> rather than cleaning stale headers.
->
-> After all, we found that approach was not enough, and ended up with
-> cleaning stale headers by commit cda2c65f981d ("kbuild: Remove stale
-> asm-generic wrappers").
->
-> So, the extra search path is no longer needed because Kbuild invokes
-> scripts/Makefile.asm-generic and remove stale headers before it starts
-> descending.
->
-> This commit is also reverting commit dc33db7c338e ("Kbuild: avoid
-> duplicate include path") because we have no more duplicated path.
->
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+Since commit fcc8487d477a ("uapi: export all headers under uapi
+directories"), all (and only) headers under uapi directories are
+exported, but asm-generic wrappers are still exceptions.
 
+scripts/Makefile.headersinst still need to deal with old-kbuild-file
+for headers listed in arch/*/include/asm/Kbuild, but actually exported.
 
-Applied to linux-kbuild/kbuild.
+As the last work to finish de-coupling the uapi from kernel headers,
+move generic-y of exported headers to uapi/asm/Kbuild.
 
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
+ arch/m32r/include/asm/Kbuild      | 2 --
+ arch/m32r/include/uapi/asm/Kbuild | 2 ++
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
+diff --git a/arch/m32r/include/asm/Kbuild b/arch/m32r/include/asm/Kbuild
+index c000ffac8586..15ad847321fc 100644
+--- a/arch/m32r/include/asm/Kbuild
++++ b/arch/m32r/include/asm/Kbuild
+@@ -1,10 +1,8 @@
+-
+ generic-y += clkdev.h
+ generic-y += current.h
+ generic-y += exec.h
+ generic-y += extable.h
+ generic-y += irq_work.h
+-generic-y += kvm_para.h
+ generic-y += mcs_spinlock.h
+ generic-y += mm-arch-hooks.h
+ generic-y += module.h
+diff --git a/arch/m32r/include/uapi/asm/Kbuild b/arch/m32r/include/uapi/asm/Kbuild
+index b15bf6bc0e94..13a97aa2285f 100644
+--- a/arch/m32r/include/uapi/asm/Kbuild
++++ b/arch/m32r/include/uapi/asm/Kbuild
+@@ -1,2 +1,4 @@
+ # UAPI Header export list
+ include include/uapi/asm-generic/Kbuild.asm
++
++generic-y += kvm_para.h
 -- 
-Best Regards
-Masahiro Yamada
+2.7.4
+
