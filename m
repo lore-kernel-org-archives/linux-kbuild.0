@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-09.nifty.com ([210.131.2.76]:63924 "EHLO
+Received: from conuserg-09.nifty.com ([210.131.2.76]:63932 "EHLO
         conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752075AbdFLD2F (ORCPT
+        with ESMTP id S1752119AbdFLD2G (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 11 Jun 2017 23:28:05 -0400
+        Sun, 11 Jun 2017 23:28:06 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 26/27] kbuild: split exported generic header creation into uapi-asm-generic
-Date: Mon, 12 Jun 2017 12:27:20 +0900
-Message-Id: <1497238041-7011-27-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH 02/27] kbuild: fix comment about dst of headers_{install,check}_all
+Date: Mon, 12 Jun 2017 12:26:56 +0900
+Message-Id: <1497238041-7011-3-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1497238041-7011-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1497238041-7011-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,43 +15,29 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org, linux-arch <linux-arch@vger.kernel.org>
 Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, linux-kernel@vger.kernel.org
 
-When we install headers, we are interested only in headers under uapi
-directories.  Split out uapi-asm-generic target and make headers_install
-depend on it.  It will avoid generating unneeded asm-generic wrappers.
+Commit 61562f981e92 ("uapi: export all arch specifics directories")
+changed the dst from asm-<arch> to arch-<arch> for headers_install_all
+or headers_check_all.  Update the comment.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- Makefile | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/Makefile b/Makefile
-index 1bb8c07db134..4fe556511c0d 100644
+index 63e10bd4f14a..298a096863a9 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -465,10 +465,11 @@ ifneq ($(KBUILD_SRC),)
- endif
+@@ -1141,7 +1141,7 @@ firmware_install:
+ #Default location for installed headers
+ export INSTALL_HDR_PATH = $(objtree)/usr
  
- # Support for using generic headers in asm-generic
--PHONY += asm-generic
--asm-generic:
-+PHONY += asm-generic uapi-asm-generic
-+asm-generic: uapi-asm-generic
- 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.asm-generic \
- 	            src=asm obj=arch/$(SRCARCH)/include/generated/asm
-+uapi-asm-generic:
- 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.asm-generic \
- 	            src=uapi/asm obj=arch/$(SRCARCH)/include/generated/uapi/asm
+-# If we do an all arch process set dst to asm-$(hdr-arch)
++# If we do an all arch process set dst to include/arch-$(hdr-arch)
+ hdr-dst = $(if $(KBUILD_HEADERS), dst=include/arch-$(hdr-arch), dst=include)
  
-@@ -1151,7 +1152,7 @@ PHONY += archscripts
- archscripts:
- 
- PHONY += __headers
--__headers: $(version_h) scripts_basic asm-generic archheaders archscripts
-+__headers: $(version_h) scripts_basic uapi-asm-generic archheaders archscripts
- 	$(Q)$(MAKE) $(build)=scripts build_unifdef
- 
- PHONY += headers_install_all
+ PHONY += archheaders
 -- 
 2.7.4
 
