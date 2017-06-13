@@ -1,48 +1,35 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wr0-f193.google.com ([209.85.128.193]:34175 "EHLO
-        mail-wr0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751494AbdFLMKw (ORCPT
+Received: from mail-pf0-f169.google.com ([209.85.192.169]:35677 "EHLO
+        mail-pf0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753122AbdFMA4A (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 12 Jun 2017 08:10:52 -0400
-MIME-Version: 1.0
-In-Reply-To: <1497238041-7011-15-git-send-email-yamada.masahiro@socionext.com>
-References: <1497238041-7011-1-git-send-email-yamada.masahiro@socionext.com> <1497238041-7011-15-git-send-email-yamada.masahiro@socionext.com>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Mon, 12 Jun 2017 14:10:50 +0200
-Message-ID: <CAMuHMdXoZxwVRTtvbOt+QRiHCb0_S2YDpxm8=KZUJhimTnTMoQ@mail.gmail.com>
-Subject: Re: [PATCH 14/27] m68k: move generic-y of exported headers to uapi/asm/Kbuild
-Content-Type: text/plain; charset="UTF-8"
+        Mon, 12 Jun 2017 20:56:00 -0400
+Received: by mail-pf0-f169.google.com with SMTP id l89so58874621pfi.2
+        for <linux-kbuild@vger.kernel.org>; Mon, 12 Jun 2017 17:56:00 -0700 (PDT)
+From: Matthias Kaehlcke <mka@chromium.org>
+Subject: [PATCH 0/3] x86: stack alignment for boot code and clang
+Date: Mon, 12 Jun 2017 17:55:28 -0700
+Message-Id: <20170613005531.77656-1-mka@chromium.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild <linux-kbuild@vger.kernel.org>, linux-arch <linux-arch@vger.kernel.org>, linux-m68k <linux-m68k@lists.linux-m68k.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+To: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H . Peter Anvin" <hpa@zytor.com>, "H . J . Lu" <hjl.tools@gmail.com>, David Woodhouse <dwmw2@infradead.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>
+Cc: x86@kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>, Nick Desaulniers <ndesaulniers@google.com>, Stephen Hines <srhines@google.com>, Kees Cook <keescook@chromium.org>, Arnd Bergmann <arnd@arndb.de>, Bernhard.Rosenkranzer@linaro.org, Peter Foley <pefoley2@pefoley.com>, Behan Webster <behanw@converseincode.com>, Douglas Anderson <dianders@chromium.org>, Matthias Kaehlcke <mka@chromium.org>
 
-On Mon, Jun 12, 2017 at 5:27 AM, Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
-> Since commit fcc8487d477a ("uapi: export all headers under uapi
-> directories"), all (and only) headers under uapi directories are
-> exported, but asm-generic wrappers are still exceptions.
->
-> scripts/Makefile.headersinst still need to deal with old-kbuild-file
-> for headers listed in arch/*/include/asm/Kbuild, but actually exported.
->
-> As the last work to finish de-coupling the uapi from kernel headers,
-> move generic-y of exported headers to uapi/asm/Kbuild.
->
-> For m68k, "generic-y += termios.h" is doubled in asm/Kbuild and
-> uapi/asm/Kbuild.  So, the one in the former can be simply removed.
->
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+This series fixes an issue with the stack of the x86 boot code not
+being aligned as intended. Further it adapts the Makefile to account
+for the fact that clang uses a different option to configure the
+stack alignment than gcc (-mstack-alignment=N vs
+-mpreferred-stack-boundary=N)
 
-Acked-by: Geert Uytterhoeven <geert@linux-m68k.org>
+Matthias Kaehlcke (3):
+  kbuild: Add cc-option-no-kbuild macro
+  x86/build: Use cc-option-no-kbuild for boot code compiler options
+  x86/build: Specify stack alignment for clang
 
-Gr{oetje,eeting}s,
+ arch/x86/Makefile      | 25 +++++++++++++++++--------
+ scripts/Kbuild.include |  5 +++++
+ 2 files changed, 22 insertions(+), 8 deletions(-)
 
-                        Geert
+-- 
+2.13.1.508.gb3defc5cc-goog
 
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
