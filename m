@@ -1,68 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:40719 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1754175AbdFNIcY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 14 Jun 2017 04:32:24 -0400
-Subject: Re: [PATCH v2 1/4] kbuild: Add cc-option-raw macro
-References: <20170613230854.112282-1-mka@chromium.org>
- <20170613230854.112282-2-mka@chromium.org>
- <CAK7LNAQ5zNgKLEfij_Ch1KyuFnK=6XudqDekJkXF=3uRZkEZuA@mail.gmail.com>
- <CAK8P3a0mdWAOLrEStcVLka-XAWMmyypPwZT5nSJB2gFvyxOLAQ@mail.gmail.com>
-From: Michal Marek <mmarek@suse.com>
-Message-ID: <fd23743c-93a1-a5e2-dd70-c46b07032cfd@suse.com>
-Date: Wed, 14 Jun 2017 10:32:20 +0200
-MIME-Version: 1.0
-In-Reply-To: <CAK8P3a0mdWAOLrEStcVLka-XAWMmyypPwZT5nSJB2gFvyxOLAQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Received: from smtprelay2.synopsys.com ([198.182.60.111]:59121 "EHLO
+        smtprelay.synopsys.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752394AbdFNMlH (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 14 Jun 2017 08:41:07 -0400
+From: Alexey Brodkin <Alexey.Brodkin@synopsys.com>
+Subject: [PATCH] Unexport LANG env variable
+Date: Wed, 14 Jun 2017 15:40:56 +0300
+Message-Id: <1497444056-24962-1-git-send-email-abrodkin@synopsys.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>, Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Matthias Kaehlcke <mka@chromium.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H . Peter Anvin" <hpa@zytor.com>, "H . J . Lu" <hjl.tools@gmail.com>, David Woodhouse <dwmw2@infradead.org>, X86 ML <x86@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>, Nick Desaulniers <ndesaulniers@google.com>, Stephen Hines <srhines@google.com>, Kees Cook <keescook@chromium.org>, =?UTF-8?Q?Bernhard_Rosenkr=c3=a4nzer?= <Bernhard.Rosenkranzer@linaro.org>, Peter Foley <pefoley2@pefoley.com>, Behan Webster <behanw@converseincode.com>, Douglas Anderson <dianders@chromium.org>
+To: linux-kernel@vger.kernel.org
+Cc: linux-kbuild@vger.kernel.org, Michal Marek <mmarek@suse.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-snps-arc@lists.infradead.org, Alexey Brodkin <Alexey.Brodkin@synopsys.com>, Vineet Gupta <Vineet.Gupta1@synopsys.com>
 
-Dne 14.6.2017 v 09:31 Arnd Bergmann napsal(a):
-> On Wed, Jun 14, 2017 at 3:27 AM, Masahiro Yamada
-> <yamada.masahiro@socionext.com> wrote:
->> 2017-06-14 8:08 GMT+09:00 Matthias Kaehlcke <mka@chromium.org>:
->>> cc-option uses KBUILD_CFLAGS and KBUILD_CPPFLAGS when it determines
->>> whether an option is supported or not. This is fine for options used to
->>> build the kernel itself, however some components like the x86 boot code
->>> use a different set of flags.
->>>
->>> Add the new macro cc-option-raw which serves the same purpose as
->>> cc-option but has additional parameters. One parameter is the compiler
->>> with which the check should be performed, the other the compiler options
->>> to be used instead KBUILD_C*FLAGS. The compiler parameter allows other
->>> macros like hostcc-option to be implemented on top of cc-option-raw.
->>>
->>> Also rework cc-option to make use of cc-option-raw.
->>>
->>> Suggested-by: Arnd Bergmann <arnd@arndb.de>
->>> Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com>
->>> Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
->>> ---
->>> Changes in v2:
->>> - Changed macro name from Add cc-option-no-kbuild to cc-option-raw
->>> - Added compiler as parameter to the macro
->>> - Reworked cc-option to make use of cc-option-raw
->>> - Updated commit message
->>>
->>>  scripts/Kbuild.include | 9 +++++++--
->>>  1 file changed, 7 insertions(+), 2 deletions(-)
->>>
->>
->> Acked-by: Masahiro Yamada <yamada.masahiro@socionext.com>
->> (if nothing better pops up)
-> 
-> Acked-by: Arnd Bergmann <arnd@arndb.de>
+In those cases when we parse output of standard utilities like readelf
+etc we rely on a particular sentences. For example for ARC we extract
+an entry-point from vmlinux like that:
+---------------------->8--------------------
+readelf -h vmlinux | grep "Entry point address" | grep -o 0x.*
+---------------------->8--------------------
 
-Acked-by: Michal Marek <mmarek@suse.com>
+And in case LANG is set to anything other than en_XX we're getting
+nothing and subsequent execution of mkimage utility fails.
 
+Probably there're more cases like that but given people rarely
+use non-English locales on their dev machines problems like the one
+above are not very visible.
 
-> Regarding the naming, __cc-option might be better than cc-option-raw,
-> but the current version is fine too.
+Signed-off-by: Alexey Brodkin <abrodkin@synopsys.com>
+Cc: Vineet Gupta <vgupta@synopsys.com>
+---
+ Makefile | 1 +
+ 1 file changed, 1 insertion(+)
 
-I have no strong opinion either way :).
-
-Michal
+diff --git a/Makefile b/Makefile
+index cdaa747f2a6a..581e684783ef 100644
+--- a/Makefile
++++ b/Makefile
+@@ -17,6 +17,7 @@ MAKEFLAGS += -rR --include-dir=$(CURDIR)
+ 
+ # Avoid funny character set dependencies
+ unexport LC_ALL
++unexport LANG
+ LC_COLLATE=C
+ LC_NUMERIC=C
+ export LC_COLLATE LC_NUMERIC
+-- 
+2.7.5
 
