@@ -1,27 +1,26 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:63787 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750757AbdFNHpG (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 14 Jun 2017 03:45:06 -0400
+Received: from mx2.suse.de ([195.135.220.15]:40719 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1754175AbdFNIcY (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 14 Jun 2017 04:32:24 -0400
+Subject: Re: [PATCH v2 1/4] kbuild: Add cc-option-raw macro
+References: <20170613230854.112282-1-mka@chromium.org>
+ <20170613230854.112282-2-mka@chromium.org>
+ <CAK7LNAQ5zNgKLEfij_Ch1KyuFnK=6XudqDekJkXF=3uRZkEZuA@mail.gmail.com>
+ <CAK8P3a0mdWAOLrEStcVLka-XAWMmyypPwZT5nSJB2gFvyxOLAQ@mail.gmail.com>
+From: Michal Marek <mmarek@suse.com>
+Message-ID: <fd23743c-93a1-a5e2-dd70-c46b07032cfd@suse.com>
+Date: Wed, 14 Jun 2017 10:32:20 +0200
 MIME-Version: 1.0
 In-Reply-To: <CAK8P3a0mdWAOLrEStcVLka-XAWMmyypPwZT5nSJB2gFvyxOLAQ@mail.gmail.com>
-References: <20170613230854.112282-1-mka@chromium.org> <20170613230854.112282-2-mka@chromium.org>
- <CAK7LNAQ5zNgKLEfij_Ch1KyuFnK=6XudqDekJkXF=3uRZkEZuA@mail.gmail.com> <CAK8P3a0mdWAOLrEStcVLka-XAWMmyypPwZT5nSJB2gFvyxOLAQ@mail.gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 14 Jun 2017 16:44:51 +0900
-Message-ID: <CAK7LNARWr0aLYdm56F0dCcXrssoprwPfmEm+VSJeRwGC0QiLGw@mail.gmail.com>
-Subject: Re: [PATCH v2 1/4] kbuild: Add cc-option-raw macro
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Matthias Kaehlcke <mka@chromium.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H . Peter Anvin" <hpa@zytor.com>, "H . J . Lu" <hjl.tools@gmail.com>, David Woodhouse <dwmw2@infradead.org>, Michal Marek <mmarek@suse.com>, X86 ML <x86@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>, Nick Desaulniers <ndesaulniers@google.com>, Stephen Hines <srhines@google.com>, Kees Cook <keescook@chromium.org>, =?UTF-8?Q?Bernhard_Rosenkr=C3=A4nzer?= <Bernhard.Rosenkranzer@linaro.org>, Peter Foley <pefoley2@pefoley.com>, Behan Webster <behanw@converseincode.com>, Douglas Anderson <dianders@chromium.org>
+To: Arnd Bergmann <arnd@arndb.de>, Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Matthias Kaehlcke <mka@chromium.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H . Peter Anvin" <hpa@zytor.com>, "H . J . Lu" <hjl.tools@gmail.com>, David Woodhouse <dwmw2@infradead.org>, X86 ML <x86@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>, Nick Desaulniers <ndesaulniers@google.com>, Stephen Hines <srhines@google.com>, Kees Cook <keescook@chromium.org>, =?UTF-8?Q?Bernhard_Rosenkr=c3=a4nzer?= <Bernhard.Rosenkranzer@linaro.org>, Peter Foley <pefoley2@pefoley.com>, Behan Webster <behanw@converseincode.com>, Douglas Anderson <dianders@chromium.org>
 
-Hi Arnd,
-
-
-2017-06-14 16:31 GMT+09:00 Arnd Bergmann <arnd@arndb.de>:
+Dne 14.6.2017 v 09:31 Arnd Bergmann napsal(a):
 > On Wed, Jun 14, 2017 at 3:27 AM, Masahiro Yamada
 > <yamada.masahiro@socionext.com> wrote:
 >> 2017-06-14 8:08 GMT+09:00 Matthias Kaehlcke <mka@chromium.org>:
@@ -54,23 +53,16 @@ Hi Arnd,
 >>
 >> Acked-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 >> (if nothing better pops up)
->
+> 
 > Acked-by: Arnd Bergmann <arnd@arndb.de>
->
+
+Acked-by: Michal Marek <mmarek@suse.com>
+
+
 > Regarding the naming, __cc-option might be better than cc-option-raw,
 > but the current version is fine too.
 
+I have no strong opinion either way :).
 
-Thank you for your suggestion.
+Michal
 
-Yes, double-underscore prefix is often used in the kernel coding,
-so I like your idea.
-
-I will leave it up to Matthias, though.
-Either will be fine for me.
-
-Thanks!
-
--- 
-Best Regards
-Masahiro Yamada
