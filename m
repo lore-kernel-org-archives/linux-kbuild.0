@@ -1,49 +1,61 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:53714 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753038AbdFNBaZ (ORCPT
+Received: from cn.fujitsu.com ([59.151.112.132]:37754 "EHLO
+        heian.cn.fujitsu.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1750749AbdFNHGS (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 13 Jun 2017 21:30:25 -0400
+        Wed, 14 Jun 2017 03:06:18 -0400
+Subject: Re: [PATCH v2] Kbuild: tiny correction on `make help`
+References: <1496740073-3320-1-git-send-email-caoj.fnst@cn.fujitsu.com>
+ <CAK7LNATSyqcf7X6Cn2GjObBdcW-qBxnS50BhgYAz5wcSKmCEjw@mail.gmail.com>
+ <593FB5F2.4040206@cn.fujitsu.com>
+ <CAK7LNATJP5Ua3bWsxKQFUJ=m7TmOzz168_ZrZ4O4tnvd6mrgjA@mail.gmail.com>
+From: Cao jin <caoj.fnst@cn.fujitsu.com>
+Message-ID: <5940E10A.10309@cn.fujitsu.com>
+Date: Wed, 14 Jun 2017 15:08:58 +0800
 MIME-Version: 1.0
-In-Reply-To: <20170613230854.112282-1-mka@chromium.org>
-References: <20170613230854.112282-1-mka@chromium.org>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 14 Jun 2017 10:30:08 +0900
-Message-ID: <CAK7LNAQn74G3K5czGCXWqmZgqGrZ0OyNMMN0wcEprKTBPwFfpg@mail.gmail.com>
-Subject: Re: [PATCH v2 0/4] x86: stack alignment for boot code and clang
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CAK7LNATJP5Ua3bWsxKQFUJ=m7TmOzz168_ZrZ4O4tnvd6mrgjA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Matthias Kaehlcke <mka@chromium.org>
-Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H . Peter Anvin" <hpa@zytor.com>, "H . J . Lu" <hjl.tools@gmail.com>, David Woodhouse <dwmw2@infradead.org>, Michal Marek <mmarek@suse.com>, X86 ML <x86@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>, Nick Desaulniers <ndesaulniers@google.com>, Stephen Hines <srhines@google.com>, Kees Cook <keescook@chromium.org>, Arnd Bergmann <arnd@arndb.de>, =?UTF-8?Q?Bernhard_Rosenkr=C3=A4nzer?= <Bernhard.Rosenkranzer@linaro.org>, Peter Foley <pefoley2@pefoley.com>, Behan Webster <behanw@converseincode.com>, Douglas Anderson <dianders@chromium.org>
-
-2017-06-14 8:08 GMT+09:00 Matthias Kaehlcke <mka@chromium.org>:
-> This series fixes an issue with the stack of the x86 boot code not
-> being aligned as intended. Further it adapts the Makefile to account
-> for the fact that clang uses a different option to configure the
-> stack alignment than gcc (-mstack-alignment=N vs
-> -mpreferred-stack-boundary=N)
->
-> Collaterally the series adds the new kbuild macros cc-option-raw and
-> hostcc-option, it also reworks cc-option to make use of cc-option-raw.
->
-> Matthias Kaehlcke (4):
->   kbuild: Add cc-option-raw macro
->   kbuild: Add hostcc-option macro
->   x86/build: Use cc-option-raw for boot code compiler options
->   x86/build: Specify stack alignment for clang
->
->  Makefile               |  2 +-
->  arch/x86/Makefile      | 33 +++++++++++++++++++++++++--------
->  scripts/Kbuild.include | 13 +++++++++++--
->  3 files changed, 37 insertions(+), 11 deletions(-)
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.com>
 
 
-I gave Acked-by to 1/4 and 2/4
-so that the whole series can go to x86 tree.
 
-Thanks!
+On 06/14/2017 09:15 AM, Masahiro Yamada wrote:
+> 2017-06-13 18:52 GMT+09:00 Cao jin <caoj.fnst@cn.fujitsu.com>:
+>> Yamada-san,
+>>
+>>   I have a question on the current top level Makefile. There are
+>> following lines, I have trouble to understand "firstword x$(MAKEFLAGS)"
+>> in 2nd line, why there is a 'x' there?
+>>
+>>
+>>   ifneq ($(filter 4.%,$(MAKE_VERSION)),)  # make-4
+>>   ifneq ($(filter %s ,$(firstword x$(MAKEFLAGS))),)
+> 
+> 
+> I do not understand the 'x' either.
+> 
+> Michal suggested the code according to the following:
+> https://patchwork.kernel.org/patch/3291301/
+> (I hope Michal can help you.)
+> 
+
+It does helps.
+
+> 
+> My first guess was, it was added just in case $(MAKEFLAGS) is empty.
+> Actually $(firstword ) seems to work with empty argument, though.
+> 
+
+I see, I guess you are saying it was added in case there is no
+single-letter flags in $(MAKEFLAGS) while it has "--debug=jobs", that
+make sense to me. Thanks very much, Yamada-san.
 
 -- 
-Best Regards
-Masahiro Yamada
+Sincerely,
+Cao jin
+
+
