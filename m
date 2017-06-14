@@ -1,36 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi0-f65.google.com ([209.85.218.65]:34816 "EHLO
-        mail-oi0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754344AbdFNH0r (ORCPT
+Received: from mail-oi0-f67.google.com ([209.85.218.67]:36234 "EHLO
+        mail-oi0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753286AbdFNHcD (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 14 Jun 2017 03:26:47 -0400
+        Wed, 14 Jun 2017 03:32:03 -0400
 MIME-Version: 1.0
-In-Reply-To: <20170613230854.112282-3-mka@chromium.org>
-References: <20170613230854.112282-1-mka@chromium.org> <20170613230854.112282-3-mka@chromium.org>
+In-Reply-To: <CAK7LNAQ5zNgKLEfij_Ch1KyuFnK=6XudqDekJkXF=3uRZkEZuA@mail.gmail.com>
+References: <20170613230854.112282-1-mka@chromium.org> <20170613230854.112282-2-mka@chromium.org>
+ <CAK7LNAQ5zNgKLEfij_Ch1KyuFnK=6XudqDekJkXF=3uRZkEZuA@mail.gmail.com>
 From: Arnd Bergmann <arnd@arndb.de>
-Date: Wed, 14 Jun 2017 09:26:46 +0200
-Message-ID: <CAK8P3a3wSbRiBp5xTz=L+NfkYOjDym0eq6c6VPq4w-qDEw0Kog@mail.gmail.com>
-Subject: Re: [PATCH v2 2/4] kbuild: Add hostcc-option macro
+Date: Wed, 14 Jun 2017 09:31:57 +0200
+Message-ID: <CAK8P3a0mdWAOLrEStcVLka-XAWMmyypPwZT5nSJB2gFvyxOLAQ@mail.gmail.com>
+Subject: Re: [PATCH v2 1/4] kbuild: Add cc-option-raw macro
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Matthias Kaehlcke <mka@chromium.org>
-Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H . Peter Anvin" <hpa@zytor.com>, "H . J . Lu" <hjl.tools@gmail.com>, David Woodhouse <dwmw2@infradead.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, the arch/x86 maintainers <x86@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>, Nick Desaulniers <ndesaulniers@google.com>, Stephen Hines <srhines@google.com>, Kees Cook <keescook@chromium.org>, =?UTF-8?Q?Bernhard_Rosenkr=C3=A4nzer?= <Bernhard.Rosenkranzer@linaro.org>, Peter Foley <pefoley2@pefoley.com>, Behan Webster <behanw@converseincode.com>, Douglas Anderson <dianders@chromium.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Matthias Kaehlcke <mka@chromium.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H . Peter Anvin" <hpa@zytor.com>, "H . J . Lu" <hjl.tools@gmail.com>, David Woodhouse <dwmw2@infradead.org>, Michal Marek <mmarek@suse.com>, X86 ML <x86@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>, Nick Desaulniers <ndesaulniers@google.com>, Stephen Hines <srhines@google.com>, Kees Cook <keescook@chromium.org>, =?UTF-8?Q?Bernhard_Rosenkr=C3=A4nzer?= <Bernhard.Rosenkranzer@linaro.org>, Peter Foley <pefoley2@pefoley.com>, Behan Webster <behanw@converseincode.com>, Douglas Anderson <dianders@chromium.org>
 
-On Wed, Jun 14, 2017 at 1:08 AM, Matthias Kaehlcke <mka@chromium.org> wrote:
-> hostcc-option is equivalent to cc-option, but uses the host compiler
-> and HOSTCFLAGS. Change HOSTCFLAGS to a simple expanded variable to
-> allow for HOSTCFLAGS += $(call hostcc-option, ...).
+On Wed, Jun 14, 2017 at 3:27 AM, Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+> 2017-06-14 8:08 GMT+09:00 Matthias Kaehlcke <mka@chromium.org>:
+>> cc-option uses KBUILD_CFLAGS and KBUILD_CPPFLAGS when it determines
+>> whether an option is supported or not. This is fine for options used to
+>> build the kernel itself, however some components like the x86 boot code
+>> use a different set of flags.
+>>
+>> Add the new macro cc-option-raw which serves the same purpose as
+>> cc-option but has additional parameters. One parameter is the compiler
+>> with which the check should be performed, the other the compiler options
+>> to be used instead KBUILD_C*FLAGS. The compiler parameter allows other
+>> macros like hostcc-option to be implemented on top of cc-option-raw.
+>>
+>> Also rework cc-option to make use of cc-option-raw.
+>>
+>> Suggested-by: Arnd Bergmann <arnd@arndb.de>
+>> Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+>> Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+>> ---
+>> Changes in v2:
+>> - Changed macro name from Add cc-option-no-kbuild to cc-option-raw
+>> - Added compiler as parameter to the macro
+>> - Reworked cc-option to make use of cc-option-raw
+>> - Updated commit message
+>>
+>>  scripts/Kbuild.include | 9 +++++++--
+>>  1 file changed, 7 insertions(+), 2 deletions(-)
+>>
 >
-> Suggested-by: Arnd Bergmann <arnd@arndb.de>
-> Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+> Acked-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> (if nothing better pops up)
 
-Actually, we already have a hostcc-option macro. What I meant with my suggestion
-was that we could redefine the existing one using cc-option-raw.
+Acked-by: Arnd Bergmann <arnd@arndb.de>
 
-I checked again now and found that while this was added in 2016 by
-Emese Revfy, we apparently don't have any users of the helper in the
-kernel.
+Regarding the naming, __cc-option might be better than cc-option-raw,
+but the current version is fine too.
 
-      Arnd
+          Arnd
