@@ -1,66 +1,63 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:56354 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1754259AbdFNHcZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 14 Jun 2017 03:32:25 -0400
-Subject: Re: [PATCH v2] Kbuild: tiny correction on `make help`
-References: <1496740073-3320-1-git-send-email-caoj.fnst@cn.fujitsu.com>
- <CAK7LNATSyqcf7X6Cn2GjObBdcW-qBxnS50BhgYAz5wcSKmCEjw@mail.gmail.com>
- <593FB5F2.4040206@cn.fujitsu.com>
- <CAK7LNATJP5Ua3bWsxKQFUJ=m7TmOzz168_ZrZ4O4tnvd6mrgjA@mail.gmail.com>
- <5940E10A.10309@cn.fujitsu.com>
-From: Michal Marek <mmarek@suse.com>
-Message-ID: <98403870-3c74-0730-2ffa-3048ed3827ad@suse.com>
-Date: Wed, 14 Jun 2017 09:32:22 +0200
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:52049 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751821AbdFNHkw (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Wed, 14 Jun 2017 03:40:52 -0400
 MIME-Version: 1.0
-In-Reply-To: <5940E10A.10309@cn.fujitsu.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <CAK8P3a3wSbRiBp5xTz=L+NfkYOjDym0eq6c6VPq4w-qDEw0Kog@mail.gmail.com>
+References: <20170613230854.112282-1-mka@chromium.org> <20170613230854.112282-3-mka@chromium.org>
+ <CAK8P3a3wSbRiBp5xTz=L+NfkYOjDym0eq6c6VPq4w-qDEw0Kog@mail.gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Wed, 14 Jun 2017 16:40:37 +0900
+Message-ID: <CAK7LNATLopr81QFViOWPakYeR9udkj6FDEPDw3HtjyOWd1yM4w@mail.gmail.com>
+Subject: Re: [PATCH v2 2/4] kbuild: Add hostcc-option macro
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Cao jin <caoj.fnst@cn.fujitsu.com>, Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Matthias Kaehlcke <mka@chromium.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H . Peter Anvin" <hpa@zytor.com>, "H . J . Lu" <hjl.tools@gmail.com>, David Woodhouse <dwmw2@infradead.org>, Michal Marek <mmarek@suse.com>, the arch/x86 maintainers <x86@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>, Nick Desaulniers <ndesaulniers@google.com>, Stephen Hines <srhines@google.com>, Kees Cook <keescook@chromium.org>, =?UTF-8?Q?Bernhard_Rosenkr=C3=A4nzer?= <Bernhard.Rosenkranzer@linaro.org>, Peter Foley <pefoley2@pefoley.com>, Behan Webster <behanw@converseincode.com>, Douglas Anderson <dianders@chromium.org>
 
-Dne 14.6.2017 v 09:08 Cao jin napsal(a):
-> 
-> 
-> On 06/14/2017 09:15 AM, Masahiro Yamada wrote:
->> 2017-06-13 18:52 GMT+09:00 Cao jin <caoj.fnst@cn.fujitsu.com>:
->>> Yamada-san,
->>>
->>>   I have a question on the current top level Makefile. There are
->>> following lines, I have trouble to understand "firstword x$(MAKEFLAGS)"
->>> in 2nd line, why there is a 'x' there?
->>>
->>>
->>>   ifneq ($(filter 4.%,$(MAKE_VERSION)),)  # make-4
->>>   ifneq ($(filter %s ,$(firstword x$(MAKEFLAGS))),)
->>
->>
->> I do not understand the 'x' either.
->>
->> Michal suggested the code according to the following:
->> https://patchwork.kernel.org/patch/3291301/
->> (I hope Michal can help you.)
->>
-> 
-> It does helps.
-> 
->>
->> My first guess was, it was added just in case $(MAKEFLAGS) is empty.
->> Actually $(firstword ) seems to work with empty argument, though.
->>
-> 
-> I see, I guess you are saying it was added in case there is no
-> single-letter flags in $(MAKEFLAGS) while it has "--debug=jobs", that
-> make sense to me. Thanks very much, Yamada-san.
+Hi Arnd,
 
-Well, it more than three years ago. But yes, I believe that was the
-intention:
 
-make --foo=s
+2017-06-14 16:26 GMT+09:00 Arnd Bergmann <arnd@arndb.de>:
+> On Wed, Jun 14, 2017 at 1:08 AM, Matthias Kaehlcke <mka@chromium.org> wrote:
+>> hostcc-option is equivalent to cc-option, but uses the host compiler
+>> and HOSTCFLAGS. Change HOSTCFLAGS to a simple expanded variable to
+>> allow for HOSTCFLAGS += $(call hostcc-option, ...).
+>>
+>> Suggested-by: Arnd Bergmann <arnd@arndb.de>
+>> Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+>> Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+>
+> Actually, we already have a hostcc-option macro. What I meant with my suggestion
+> was that we could redefine the existing one using cc-option-raw.
+>
+> I checked again now and found that while this was added in 2016 by
+> Emese Revfy, we apparently don't have any users of the helper in the
+> kernel.
 
-x$(MAKEFLAGS) => x --foo=s
-$(firstword x$(MAKEFLAGS)) => x
 
-Michal
+Oops, I missed it because
+it is defined in scripts/Makefile.host instead of scripts/Kbuild.include
+
+
+$(call cc-option, ...) is generally used in the top Makefile (or
+arch/*/Makefile).
+
+
+However, scripts/Makefile.host is not included from the top Makefile,
+so $(call hostcc-option, ...) is available only under sub-directories.
+I guess that is why we had no user of it.
+
+I think the right thing to do
+is to remove the former implementation from Makefile.host
+
+Thanks!
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
