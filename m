@@ -1,119 +1,166 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf0-f196.google.com ([209.85.192.196]:33020 "EHLO
-        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751727AbdFOBhg (ORCPT
+Received: from mail-ot0-f169.google.com ([74.125.82.169]:33560 "EHLO
+        mail-ot0-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750791AbdFOHC0 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 14 Jun 2017 21:37:36 -0400
-Received: by mail-pf0-f196.google.com with SMTP id w12so95384pfk.0
-        for <linux-kbuild@vger.kernel.org>; Wed, 14 Jun 2017 18:37:35 -0700 (PDT)
-Date: Thu, 15 Jun 2017 11:37:19 +1000
-From: Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [lkp] [+16673 bytes kernel size regression] [i386-tinyconfig]
- [b990389179] kbuild: switch to thin archives
-Message-ID: <20170615113719.16cfe185@roar.ozlabs.ibm.com>
-In-Reply-To: <20170614223353.GA1670@cloud>
-References: <59391052.ngo8ElPla53Vg9/O%xiaolong.ye@intel.com>
-        <20170608190025.48923437@roar.ozlabs.ibm.com>
-        <20170612185258.GA24471@cloud>
-        <20170613144520.31f07045@roar.ozlabs.ibm.com>
-        <20170613221335.GA30312@cloud>
-        <20170614095507.16365013@roar.ozlabs.ibm.com>
-        <20170614223353.GA1670@cloud>
+        Thu, 15 Jun 2017 03:02:26 -0400
+Received: by mail-ot0-f169.google.com with SMTP id k4so3913255otd.0
+        for <linux-kbuild@vger.kernel.org>; Thu, 15 Jun 2017 00:02:26 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20170614211556.2062728-12-arnd@arndb.de>
+References: <20170614211556.2062728-1-arnd@arndb.de> <20170614211556.2062728-12-arnd@arndb.de>
+From: Dmitry Vyukov <dvyukov@google.com>
+Date: Thu, 15 Jun 2017 09:02:04 +0200
+Message-ID: <CACT4Y+aNMBbkb8b+wwrdhVVxH-1NwgUm+vwXqUggmLnGK-8Q4w@mail.gmail.com>
+Subject: Re: [PATCH v2 11/11] kasan: rework Kconfig settings
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Josh Triplett <josh@joshtriplett.org>
-Cc: kbuild test robot <xiaolong.ye@intel.com>, 0day robot <fengguang.wu@intel.com>, kbuild-all@01.org, linux-kbuild <linux-kbuild@vger.kernel.org>
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Andrew Morton <akpm@linux-foundation.org>, kasan-dev <kasan-dev@googlegroups.com>, Alexander Potapenko <glider@google.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, netdev <netdev@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Arend van Spriel <arend.vanspriel@broadcom.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, Kees Cook <keescook@chromium.org>, Ingo Molnar <mingo@kernel.org>, "David S. Miller" <davem@davemloft.net>, "open list:KERNEL BUILD + fi..." <linux-kbuild@vger.kernel.org>
 
-cc'ing linux-kbuild
+On Wed, Jun 14, 2017 at 11:15 PM, Arnd Bergmann <arnd@arndb.de> wrote:
+> We get a lot of very large stack frames using gcc-7.0.1 with the default
+> -fsanitize-address-use-after-scope --param asan-stack=1 options, which
+> can easily cause an overflow of the kernel stack, e.g.
+>
+> drivers/acpi/nfit/core.c:2686:1: warning: the frame size of 4080 bytes is larger than 2048 bytes [-Wframe-larger-than=]
+> drivers/gpu/drm/amd/amdgpu/si.c:1756:1: warning: the frame size of 7304 bytes is larger than 2048 bytes [-Wframe-larger-than=]
+> drivers/gpu/drm/i915/gvt/handlers.c:2200:1: warning: the frame size of 43752 bytes is larger than 2048 bytes [-Wframe-larger-than=]
+> drivers/gpu/drm/vmwgfx/vmwgfx_drv.c:952:1: warning: the frame size of 6032 bytes is larger than 2048 bytes [-Wframe-larger-than=]
+> drivers/isdn/hardware/avm/b1.c:637:1: warning: the frame size of 13200 bytes is larger than 2048 bytes [-Wframe-larger-than=]
+> drivers/media/dvb-frontends/stv090x.c:3089:1: warning: the frame size of 5880 bytes is larger than 2048 bytes [-Wframe-larger-than=]
+> drivers/media/i2c/cx25840/cx25840-core.c:4964:1: warning: the frame size of 93992 bytes is larger than 2048 bytes [-Wframe-larger-than=]
+> drivers/net/wireless/ralink/rt2x00/rt2800lib.c:4994:1: warning: the frame size of 23928 bytes is larger than 2048 bytes [-Wframe-larger-than=]
+> drivers/staging/dgnc/dgnc_tty.c:2788:1: warning: the frame size of 7072 bytes is larger than 2048 bytes [-Wframe-larger-than=]
+> fs/ntfs/mft.c:2762:1: warning: the frame size of 7432 bytes is larger than 2048 bytes [-Wframe-larger-than=]
+> lib/atomic64_test.c:242:1: warning: the frame size of 12648 bytes is larger than 2048 bytes [-Wframe-larger-than=]
+>
+> To reduce this risk, -fsanitize-address-use-after-scope is now split out
+> into a separate Kconfig option, vhich cannot be selected at the same
+> time as KMEMCHECK, leading to stack frames that are smaller than 2
+> kilobytes most of the time on x86_64. An earlier version of this
+> patch also prevented combining KASAN_EXTRA with KASAN_INLINE, but that
+> is no longer necessary with gcc-7.0.1.
+>
+> A lot of warnings with KASAN_EXTRA go away if we disable KMEMCHECK,
+> as -fsanitize-address-use-after-scope seems to understand the builtin
+> memcpy, but adds checking code around an extern memcpy call. I had
+> to work around a circular dependency, as DEBUG_SLAB/SLUB depended
+> on !KMEMCHECK, while KASAN did it the other way round. Now we handle
+> both the same way.
+>
+> All patches to get the frame size below 2048 bytes with CONFIG_KASAN=y
+> and CONFIG_KASAN_EXTRA=n have been submitted along with this patch,
+> so we can bring back that default now. KASAN_EXTRA=y still causes lots
+> of warnings but now defaults to !COMPILE_TEST to disable it in
+> allmodconfig, and it remains disabled in all other defconfigs since
+> it is a new option.
+>
+> This reverts parts of commit commit 3f181b4 ("lib/Kconfig.debug:
+> disable -Wframe-larger-than warnings with KASAN=y").
+>
+> I experimented a bit more with smaller stack frames and have another
+> follow-up series that reduces the warning limit for 64-bit architectures
+> to 1280 bytes and 1536 when CONFIG_KASAN (but not KASAN_EXTRA) is
+> enabled, this requires another ~25 patches to address the additional
+> warnings. I also have patches for all KASAN_EXTRA warnings, but we
+> should look at those separately and then decide whether to remove
+> it completely, leaving out -fsanitize-address-use-after-scope.
+>
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+>  lib/Kconfig.debug      |  4 ++--
+>  lib/Kconfig.kasan      | 11 ++++++++++-
+>  lib/Kconfig.kmemcheck  |  1 +
+>  scripts/Makefile.kasan |  3 +++
+>  4 files changed, 16 insertions(+), 3 deletions(-)
+>
+> diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+> index ddbef2cac189..02ec4a4da7b1 100644
+> --- a/lib/Kconfig.debug
+> +++ b/lib/Kconfig.debug
+> @@ -217,7 +217,7 @@ config ENABLE_MUST_CHECK
+>  config FRAME_WARN
+>         int "Warn for stack frames larger than (needs gcc 4.4)"
+>         range 0 8192
+> -       default 0 if KASAN
+> +       default 3072 if KASAN_EXTRA
+>         default 2048 if GCC_PLUGIN_LATENT_ENTROPY
+>         default 1024 if !64BIT
+>         default 2048 if 64BIT
+> @@ -500,7 +500,7 @@ config DEBUG_OBJECTS_ENABLE_DEFAULT
+>
+>  config DEBUG_SLAB
+>         bool "Debug slab memory allocations"
+> -       depends on DEBUG_KERNEL && SLAB && !KMEMCHECK
+> +       depends on DEBUG_KERNEL && SLAB && !KMEMCHECK && !KASAN
+>         help
+>           Say Y here to have the kernel do limited verification on memory
+>           allocation as well as poisoning memory on free to catch use of freed
+> diff --git a/lib/Kconfig.kasan b/lib/Kconfig.kasan
+> index bd38aab05929..4d17a8f4742f 100644
+> --- a/lib/Kconfig.kasan
+> +++ b/lib/Kconfig.kasan
+> @@ -5,7 +5,7 @@ if HAVE_ARCH_KASAN
+>
+>  config KASAN
+>         bool "KASan: runtime memory debugger"
+> -       depends on SLUB || (SLAB && !DEBUG_SLAB)
+> +       depends on SLUB || SLAB
+>         select CONSTRUCTORS
+>         select STACKDEPOT
+>         help
+> @@ -20,6 +20,15 @@ config KASAN
+>           Currently CONFIG_KASAN doesn't work with CONFIG_DEBUG_SLAB
+>           (the resulting kernel does not boot).
+>
+> +config KASAN_EXTRA
+> +       bool "KAsan: extra checks"
+> +       depends on KASAN && !COMPILE_TEST
+> +       help
+> +         This enables further checks in the kernel address sanitizer, for now
+> +         it only includes the address-use-after-scope check that can lead
+> +         to excessive kernel stack usage, frame size warnings and longer
+> +         compile time.
+> +
+>  choice
+>         prompt "Instrumentation type"
+>         depends on KASAN
+> diff --git a/lib/Kconfig.kmemcheck b/lib/Kconfig.kmemcheck
+> index 846e039a86b4..58b9f3f81dc8 100644
+> --- a/lib/Kconfig.kmemcheck
+> +++ b/lib/Kconfig.kmemcheck
+> @@ -7,6 +7,7 @@ menuconfig KMEMCHECK
+>         bool "kmemcheck: trap use of uninitialized memory"
+>         depends on DEBUG_KERNEL
+>         depends on !X86_USE_3DNOW
+> +       depends on !KASAN_EXTRA
 
-On Wed, 14 Jun 2017 15:33:53 -0700
-Josh Triplett <josh@joshtriplett.org> wrote:
 
-> On Wed, Jun 14, 2017 at 09:55:07AM +1000, Nicholas Piggin wrote:
-> > On Tue, 13 Jun 2017 15:13:35 -0700
-> > Josh Triplett <josh@joshtriplett.org> wrote:
-> >   
-> > > On Tue, Jun 13, 2017 at 02:45:20PM +1000, Nicholas Piggin wrote:  
-> > > > On Mon, 12 Jun 2017 11:52:58 -0700
-> > > > Josh Triplett <josh@joshtriplett.org> wrote:
-> > > >     
-> > > > > On Thu, Jun 08, 2017 at 07:00:25PM +1000, Nicholas Piggin wrote:    
-> > > > > > FWIW, this is likely because existing linker attempts some type of
-> > > > > > elimination of dead code/data on a per-compilation-unit basis,
-> > > > > > which is probably slightly buggy anyway if you have implicit
-> > > > > > references.
-> > > > > > 
-> > > > > > It's far more effective to do real link-time analysis of unused
-> > > > > > code and data. Even with -ffunction-sections/-gc-sections (see
-> > > > > > LD_DEAD_CODE_DATA_ELIMINATION) already in tree which is quite
-> > > > > > basic, you can usually see some pretty big savings especially on
-> > > > > > tiny configs.      
-> > > > > 
-> > > > > Enabling LD_DEAD_CODE_DATA_ELIMINATION within tinyconfig might be a good
-> > > > > idea. However, is there a fundamental reason why this particular link
-> > > > > change needs to break the *existing* dead-code elimination? I'd much
-> > > > > rather avoid regressions, rather than just saying "we have another thing
-> > > > > that might handle this".    
-> > > > 
-> > > > The build stuff to do it is a bit tricky. I think it's possible but I
-> > > > have not quite managed it. It would require some more special casing of
-> > > > lib targets which I did not spend too much time on that because I'd
-> > > > rather go the other way and get rid of the lib handling stuff completely,
-> > > > and move to real DCE -- most of the kernel is "library" anyway, lib/ is
-> > > > not really special except being a bit more self-contained.
-> > > > 
-> > > > Here's i386-tinyconfig with LD_DEAD_CODE_DATA_ELIMINATION plus a small
-> > > > fix for it:
-> > > > 
-> > > >    text	   data	    bss	    dec	    hex	filename
-> > > >  655686	 203096	1191328	2050110	 1f483e	vmlinux.thin
-> > > >  515359	 184856	1193996	1894211	 1ce743	vmlinux.dce
-> > > > 
-> > > > I'd rather just work toward that. We're almost there already.    
-> > > 
-> > > That does look promising. Would you consider sending in a patch to add
-> > > CONFIG_LD_DEAD_CODE_DATA_ELIMINATION to tinyconfig, with the above stats
-> > > (along with the pre-thin baseline stats), and I'll happily offer a
-> > > Reviewed-by for it?  
-> > 
-> > Yes I would like to start providing it as an option for archs, we have
-> > just a little more work to get in -- some of the MIPS and ARM guys
-> > have been looking at it too. I would say 4.14 could be realistic if
-> > this goes smoothly.
-> > 
-> > What I'd like to do is get the thin archives build working on all
-> > archs, then start introducing this option. I realize 16K regressiion
-> > intermediate is not ideal, but it could be pretty subtle breakage if
-> > we get it wrong..  
-> 
-> The amount of savings here does certainly help, though. I'd really
-> appreciate it if you tried to get both in during the same kernel cycle
-> (at least for the most popular architectures), rather than having a
-> substantial gap between the two.
-> 
-> Would you consider adding a note to the "thin" series providing some
-> information about regaining the lost space via
-> CONFIG_LD_DEAD_CODE_DATA_ELIMINATION?  And adding a patch to the
-> CONFIG_LD_DEAD_CODE_DATA_ELIMINATION series that adds it to tinyconfig?
-> (Or, alternatively, invert the sense of the config option, so that 'y'
-> is a debug option to opt *out* of dead code elimination, which makes
-> allnoconfig DTRT.)
+KASAN is not meant to work with KMEMCHECK. I am not sure if it even
+works, and it's definitely unmaintained. Even if it works now, I am
+not sure what could be the intention of somebody running that
+combination.
+So I think we should do: depends on !KASAN
+Will it make things simper for you?
 
-I can add a note, but the DCE fixes and enablement really do have to
-go through arch trees. It's a different kettle of fish than thin
-archives and need linker script changes etc.
 
-I was going to do the thin archives series on a per-arch basis too, but
-Linus probably rightfully said just bite the bullet and switch them all
-over. It would be nice to switch those and iron out any issues there
-first.
-
-You're right it would have been good to avoid the intermediate
-regression. It's fairly small though and with definite path to resolving
-it.
-
-Thanks,
-Nick
+>         depends on SLUB || SLAB
+>         depends on !CC_OPTIMIZE_FOR_SIZE
+>         depends on !FUNCTION_TRACER
+> diff --git a/scripts/Makefile.kasan b/scripts/Makefile.kasan
+> index 9576775a86f6..3b3148faf866 100644
+> --- a/scripts/Makefile.kasan
+> +++ b/scripts/Makefile.kasan
+> @@ -29,5 +29,8 @@ else
+>      endif
+>  endif
+>
+> +ifdef CONFIG_KASAN_EXTRA
+>  CFLAGS_KASAN += $(call cc-option, -fsanitize-address-use-after-scope)
+>  endif
+> +
+> +endif
+> --
+> 2.9.0
