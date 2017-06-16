@@ -1,72 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:30106 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751815AbdFPAab (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:25561 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751673AbdFPAtK (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 15 Jun 2017 20:30:31 -0400
+        Thu, 15 Jun 2017 20:49:10 -0400
 MIME-Version: 1.0
-In-Reply-To: <1497445867.6424.36.camel@synopsys.com>
-References: <1497444056-24962-1-git-send-email-abrodkin@synopsys.com>
- <51f658dc-215a-6c0c-0ab9-d1164812a56d@suse.com> <1497445867.6424.36.camel@synopsys.com>
+In-Reply-To: <20170615173715.40882-2-mka@chromium.org>
+References: <20170615173715.40882-1-mka@chromium.org> <20170615173715.40882-2-mka@chromium.org>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 16 Jun 2017 09:29:51 +0900
-Message-ID: <CAK7LNARgbncLWQvGoR82hVGMOj4yggcvQQZB=aw6yEi-SE0zCw@mail.gmail.com>
-Subject: Re: [PATCH] Unexport LANG env variable
+Date: Fri, 16 Jun 2017 09:48:50 +0900
+Message-ID: <CAK7LNATWoG9ZWG+7rhF2HFXNjUzm=GgiKgJiG14f=e2fqQ0sGg@mail.gmail.com>
+Subject: Re: [PATCH v3 1/3] kbuild: Add __cc-option macro
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Alexey Brodkin <Alexey.Brodkin@synopsys.com>
-Cc: "mmarek@suse.com" <mmarek@suse.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "linux-kbuild@vger.kernel.org" <linux-kbuild@vger.kernel.org>, "linux-snps-arc@lists.infradead.org" <linux-snps-arc@lists.infradead.org>, "Vineet.Gupta1@synopsys.com" <Vineet.Gupta1@synopsys.com>
+To: Matthias Kaehlcke <mka@chromium.org>
+Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H . Peter Anvin" <hpa@zytor.com>, "H . J . Lu" <hjl.tools@gmail.com>, David Woodhouse <dwmw2@infradead.org>, Michal Marek <mmarek@suse.com>, X86 ML <x86@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>, Nick Desaulniers <ndesaulniers@google.com>, Stephen Hines <srhines@google.com>, Kees Cook <keescook@chromium.org>, Arnd Bergmann <arnd@arndb.de>, =?UTF-8?Q?Bernhard_Rosenkr=C3=A4nzer?= <Bernhard.Rosenkranzer@linaro.org>, Peter Foley <pefoley2@pefoley.com>, Behan Webster <behanw@converseincode.com>, Douglas Anderson <dianders@chromium.org>
 
-Hi Alexey,
-
-
-2017-06-14 22:11 GMT+09:00 Alexey Brodkin <Alexey.Brodkin@synopsys.com>:
-> Hi Michal,
+2017-06-16 2:37 GMT+09:00 Matthias Kaehlcke <mka@chromium.org>:
+> cc-option uses KBUILD_CFLAGS and KBUILD_CPPFLAGS when it determines
+> whether an option is supported or not. This is fine for options used to
+> build the kernel itself, however some components like the x86 boot code
+> use a different set of flags.
 >
-> On Wed, 2017-06-14 at 15:02 +0200, Michal Marek wrote:
->> Dne 14.6.2017 v 14:40 Alexey Brodkin napsal(a):
->> >
->> > In those cases when we parse output of standard utilities like readelf
->> > etc we rely on a particular sentences. For example for ARC we extract
->> > an entry-point from vmlinux like that:
->> > ---------------------->8--------------------
->> > readelf -h vmlinux | grep "Entry point address" | grep -o 0x.*
->> > ---------------------->8--------------------
->> >
->> > And in case LANG is set to anything other than en_XX we're getting
->> > nothing and subsequent execution of mkimage utility fails.
->> >
->> > Probably there're more cases like that but given people rarely
->> > use non-English locales on their dev machines problems like the one
->> > above are not very visible.
->>
->> I'm all for this change but the *.po files in the gcc tree must have
->> been created for a reason:
->>
->>   https://urldefense.proofpoint.com/v2/url?u=https-3A__github.com_gcc-2Dmirror_gcc_tree_master_gcc_po&d=DwICBA&c=DPL6_X_6JkXFx7AXWqB0tg&r=lqdeeSSEes
->> 0GFDDl656eViXO7breS55ytWkhpk5R81I&m=v2ilYYv6Z0WzVaIys3sCQdK3QBI9gqH7hUmoTGPpJ44&s=S3B79SHovtt1-wLRtngTUM0dKWMiokGE75HIrfgkbbc&e=
+> Add the new macro __cc-option which is a more generic version of
+> cc-option with additional parameters. One parameter is the compiler
+> with which the check should be performed, the other the compiler options
+> to be used instead KBUILD_C*FLAGS.
 >
-> That's for sure.
+> Refactor cc-option and hostcc-option to use __cc-option and move
+> hostcc-option to scripts/Kbuild.include.
 >
-> But then how may we have a predictable environment for our machinery?
->
-> I do realize that with that change in place people will start seeing
-> non-translated messages from other tools like compiler etc.
->
-> But probably that's not the worst idea as well because it helps googling :)
+> Suggested-by: Arnd Bergmann <arnd@arndb.de>
+> Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
 
 
-I do not want to lose users' freedom to choose their favorite language.
+Acked-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 
-
-For example, arch/powerpc/boot/wrapper  does this
-
-LANG=C elfformat="`${CROSS}objdump -p "$kernel" | grep 'file format' |
-awk '{print $4}'`"
-
-
-I think you can solve your problem like that.
 
 
 -- 
