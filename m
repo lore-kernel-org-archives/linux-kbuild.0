@@ -1,42 +1,59 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:25561 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751673AbdFPAtK (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:55514 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751644AbdFPCUo (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 15 Jun 2017 20:49:10 -0400
+        Thu, 15 Jun 2017 22:20:44 -0400
 MIME-Version: 1.0
-In-Reply-To: <20170615173715.40882-2-mka@chromium.org>
-References: <20170615173715.40882-1-mka@chromium.org> <20170615173715.40882-2-mka@chromium.org>
+In-Reply-To: <20170615083622.16618-1-richard.genoud@gmail.com>
+References: <20170615083622.16618-1-richard.genoud@gmail.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 16 Jun 2017 09:48:50 +0900
-Message-ID: <CAK7LNATWoG9ZWG+7rhF2HFXNjUzm=GgiKgJiG14f=e2fqQ0sGg@mail.gmail.com>
-Subject: Re: [PATCH v3 1/3] kbuild: Add __cc-option macro
+Date: Fri, 16 Jun 2017 11:20:34 +0900
+Message-ID: <CAK7LNAQ+3PNmHiTzKEbOBkCsZt2Eq3CAY6sZ-CbF=X6sejVp7Q@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: fix header installation under fakechroot environment
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Matthias Kaehlcke <mka@chromium.org>
-Cc: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H . Peter Anvin" <hpa@zytor.com>, "H . J . Lu" <hjl.tools@gmail.com>, David Woodhouse <dwmw2@infradead.org>, Michal Marek <mmarek@suse.com>, X86 ML <x86@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>, Nick Desaulniers <ndesaulniers@google.com>, Stephen Hines <srhines@google.com>, Kees Cook <keescook@chromium.org>, Arnd Bergmann <arnd@arndb.de>, =?UTF-8?Q?Bernhard_Rosenkr=C3=A4nzer?= <Bernhard.Rosenkranzer@linaro.org>, Peter Foley <pefoley2@pefoley.com>, Behan Webster <behanw@converseincode.com>, Douglas Anderson <dianders@chromium.org>
+To: Richard Genoud <richard.genoud@gmail.com>
+Cc: Nicolas Dichtel <nicolas.dichtel@6wind.com>, Daniel Vetter <daniel.vetter@ffwll.ch>, Russell King <rmk+kernel@armlinux.org.uk>, Mark Salter <msalter@redhat.com>, Michael Ellerman <mpe@ellerman.id.au>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-2017-06-16 2:37 GMT+09:00 Matthias Kaehlcke <mka@chromium.org>:
-> cc-option uses KBUILD_CFLAGS and KBUILD_CPPFLAGS when it determines
-> whether an option is supported or not. This is fine for options used to
-> build the kernel itself, however some components like the x86 boot code
-> use a different set of flags.
->
-> Add the new macro __cc-option which is a more generic version of
-> cc-option with additional parameters. One parameter is the compiler
-> with which the check should be performed, the other the compiler options
-> to be used instead KBUILD_C*FLAGS.
->
-> Refactor cc-option and hostcc-option to use __cc-option and move
-> hostcc-option to scripts/Kbuild.include.
->
-> Suggested-by: Arnd Bergmann <arnd@arndb.de>
-> Suggested-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-> Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+Hi Richard,
 
 
-Acked-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+2017-06-15 17:36 GMT+09:00 Richard Genoud <richard.genoud@gmail.com>:
+> Since commit fcc8487d477a ("uapi: export all headers under uapi
+> directories") fakechroot make bindeb-pkg fails, mismatching files for
+> directories:
+> touch: cannot touch 'usr/include/video/uvesafb.h/.install': Not a
+> directory
+>
+> This due to a bug in fakechroot:
+> when using the function $(wildcard $(srcdir)/*/.) in a makefile, under a
+> fakechroot environment, not only directories but also files are
+> returned.
+>
+> To circumvent that, we are using the functions:
+> $(sort $(dir $(wildcard $(srcdir)/*/))))
+>
+> And thanks to Yamada Masahiro who figured out the right
+> filter-out/patsubst order !
+
+Sorry if I confused you.
+
+The order of filter-out/patsubst was not a real problem,
+but just a matter of taste.
+
+Your original code used $(filter-out ./, ...),
+but this could not filter out anything.  This is the root cause.
+
+I will remove this paragraph because it is even confusing.
+
+Thanks for the credit, but it is regular review process,
+so it is not mandatory in git-log.  :-)
+
+
+I will pick up this patch shortly anyway.
+
 
 
 
