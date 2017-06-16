@@ -1,62 +1,49 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:55514 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751644AbdFPCUo (ORCPT
+Received: from mail-ot0-f196.google.com ([74.125.82.196]:36323 "EHLO
+        mail-ot0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752498AbdFPLmG (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 15 Jun 2017 22:20:44 -0400
+        Fri, 16 Jun 2017 07:42:06 -0400
 MIME-Version: 1.0
-In-Reply-To: <20170615083622.16618-1-richard.genoud@gmail.com>
-References: <20170615083622.16618-1-richard.genoud@gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 16 Jun 2017 11:20:34 +0900
-Message-ID: <CAK7LNAQ+3PNmHiTzKEbOBkCsZt2Eq3CAY6sZ-CbF=X6sejVp7Q@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: fix header installation under fakechroot environment
+In-Reply-To: <CACT4Y+aNMBbkb8b+wwrdhVVxH-1NwgUm+vwXqUggmLnGK-8Q4w@mail.gmail.com>
+References: <20170614211556.2062728-1-arnd@arndb.de> <20170614211556.2062728-12-arnd@arndb.de>
+ <CACT4Y+aNMBbkb8b+wwrdhVVxH-1NwgUm+vwXqUggmLnGK-8Q4w@mail.gmail.com>
+From: Arnd Bergmann <arnd@arndb.de>
+Date: Fri, 16 Jun 2017 13:42:05 +0200
+Message-ID: <CAK8P3a18fdnNNSMdxCG13LTFQwQgYmr9ZiBp_r86M5KyFKFqHA@mail.gmail.com>
+Subject: Re: [PATCH v2 11/11] kasan: rework Kconfig settings
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Richard Genoud <richard.genoud@gmail.com>
-Cc: Nicolas Dichtel <nicolas.dichtel@6wind.com>, Daniel Vetter <daniel.vetter@ffwll.ch>, Russell King <rmk+kernel@armlinux.org.uk>, Mark Salter <msalter@redhat.com>, Michael Ellerman <mpe@ellerman.id.au>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Dmitry Vyukov <dvyukov@google.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>, kasan-dev <kasan-dev@googlegroups.com>, Alexander Potapenko <glider@google.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, netdev <netdev@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Arend van Spriel <arend.vanspriel@broadcom.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, Kees Cook <keescook@chromium.org>, Ingo Molnar <mingo@kernel.org>, "David S. Miller" <davem@davemloft.net>, "open list:KERNEL BUILD + fi..." <linux-kbuild@vger.kernel.org>
 
-Hi Richard,
+On Thu, Jun 15, 2017 at 9:02 AM, Dmitry Vyukov <dvyukov@google.com> wrote:
+> On Wed, Jun 14, 2017 at 11:15 PM, Arnd Bergmann <arnd@arndb.de> wrote:
 
-
-2017-06-15 17:36 GMT+09:00 Richard Genoud <richard.genoud@gmail.com>:
-> Since commit fcc8487d477a ("uapi: export all headers under uapi
-> directories") fakechroot make bindeb-pkg fails, mismatching files for
-> directories:
-> touch: cannot touch 'usr/include/video/uvesafb.h/.install': Not a
-> directory
+>> diff --git a/lib/Kconfig.kmemcheck b/lib/Kconfig.kmemcheck
+>> index 846e039a86b4..58b9f3f81dc8 100644
+>> --- a/lib/Kconfig.kmemcheck
+>> +++ b/lib/Kconfig.kmemcheck
+>> @@ -7,6 +7,7 @@ menuconfig KMEMCHECK
+>>         bool "kmemcheck: trap use of uninitialized memory"
+>>         depends on DEBUG_KERNEL
+>>         depends on !X86_USE_3DNOW
+>> +       depends on !KASAN_EXTRA
 >
-> This due to a bug in fakechroot:
-> when using the function $(wildcard $(srcdir)/*/.) in a makefile, under a
-> fakechroot environment, not only directories but also files are
-> returned.
 >
-> To circumvent that, we are using the functions:
-> $(sort $(dir $(wildcard $(srcdir)/*/))))
->
-> And thanks to Yamada Masahiro who figured out the right
-> filter-out/patsubst order !
+> KASAN is not meant to work with KMEMCHECK. I am not sure if it even
+> works, and it's definitely unmaintained. Even if it works now, I am
+> not sure what could be the intention of somebody running that
+> combination.
+> So I think we should do: depends on !KASAN
+> Will it make things simper for you?
 
-Sorry if I confused you.
+I don't think it will change anything for me, other than having to respin the
+patch series or adding a patch on top.
 
-The order of filter-out/patsubst was not a real problem,
-but just a matter of taste.
+I have just checked that KMEMCHECK is already disabled in allmodconfig,
+and all but one of the warnings I address in the series show up in
+allmodconfig too.
 
-Your original code used $(filter-out ./, ...),
-but this could not filter out anything.  This is the root cause.
-
-I will remove this paragraph because it is even confusing.
-
-Thanks for the credit, but it is regular review process,
-so it is not mandatory in git-log.  :-)
-
-
-I will pick up this patch shortly anyway.
-
-
-
-
--- 
-Best Regards
-Masahiro Yamada
+      Arnd
