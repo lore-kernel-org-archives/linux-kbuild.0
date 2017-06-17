@@ -1,52 +1,35 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi0-f51.google.com ([209.85.218.51]:36025 "EHLO
-        mail-oi0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750899AbdFPLpL (ORCPT
+Received: from mail-pg0-f67.google.com ([74.125.83.67]:34628 "EHLO
+        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751962AbdFQNLJ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 16 Jun 2017 07:45:11 -0400
-Received: by mail-oi0-f51.google.com with SMTP id k145so22714955oih.3
-        for <linux-kbuild@vger.kernel.org>; Fri, 16 Jun 2017 04:45:11 -0700 (PDT)
+        Sat, 17 Jun 2017 09:11:09 -0400
+Date: Sat, 17 Jun 2017 23:10:54 +1000
+From: Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH 0/5] move everyone over to thin archives
+Message-ID: <20170617231054.63aeb5ac@roar.ozlabs.ibm.com>
+In-Reply-To: <20170609052417.561-1-npiggin@gmail.com>
+References: <20170609052417.561-1-npiggin@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAK8P3a18fdnNNSMdxCG13LTFQwQgYmr9ZiBp_r86M5KyFKFqHA@mail.gmail.com>
-References: <20170614211556.2062728-1-arnd@arndb.de> <20170614211556.2062728-12-arnd@arndb.de>
- <CACT4Y+aNMBbkb8b+wwrdhVVxH-1NwgUm+vwXqUggmLnGK-8Q4w@mail.gmail.com> <CAK8P3a18fdnNNSMdxCG13LTFQwQgYmr9ZiBp_r86M5KyFKFqHA@mail.gmail.com>
-From: Dmitry Vyukov <dvyukov@google.com>
-Date: Fri, 16 Jun 2017 13:44:50 +0200
-Message-ID: <CACT4Y+ZGbvy5jK=ouHxgcSKkCdvJBM6=4Gkd1sGvzOZvKg79GQ@mail.gmail.com>
-Subject: Re: [PATCH v2 11/11] kasan: rework Kconfig settings
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Andrew Morton <akpm@linux-foundation.org>, kasan-dev <kasan-dev@googlegroups.com>, Alexander Potapenko <glider@google.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, netdev <netdev@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, Arend van Spriel <arend.vanspriel@broadcom.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, Kees Cook <keescook@chromium.org>, Ingo Molnar <mingo@kernel.org>, "David S. Miller" <davem@davemloft.net>, "open list:KERNEL BUILD + fi..." <linux-kbuild@vger.kernel.org>
+To: linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, Linus Torvalds <torvalds@linux-foundation.org>, Stephen Rothwell <sfr@canb.auug.org.au>
 
-On Fri, Jun 16, 2017 at 1:42 PM, Arnd Bergmann <arnd@arndb.de> wrote:
->>> diff --git a/lib/Kconfig.kmemcheck b/lib/Kconfig.kmemcheck
->>> index 846e039a86b4..58b9f3f81dc8 100644
->>> --- a/lib/Kconfig.kmemcheck
->>> +++ b/lib/Kconfig.kmemcheck
->>> @@ -7,6 +7,7 @@ menuconfig KMEMCHECK
->>>         bool "kmemcheck: trap use of uninitialized memory"
->>>         depends on DEBUG_KERNEL
->>>         depends on !X86_USE_3DNOW
->>> +       depends on !KASAN_EXTRA
->>
->>
->> KASAN is not meant to work with KMEMCHECK. I am not sure if it even
->> works, and it's definitely unmaintained. Even if it works now, I am
->> not sure what could be the intention of somebody running that
->> combination.
->> So I think we should do: depends on !KASAN
->> Will it make things simper for you?
->
-> I don't think it will change anything for me, other than having to respin the
-> patch series or adding a patch on top.
->
-> I have just checked that KMEMCHECK is already disabled in allmodconfig,
-> and all but one of the warnings I address in the series show up in
-> allmodconfig too.
+On Fri,  9 Jun 2017 15:24:12 +1000
+Nicholas Piggin <npiggin@gmail.com> wrote:
 
-Ack.
+> This has gone through 0day several times now, and I think I've
+> weeded out all the build breakage. Following what Linus asked
+> for, I did not make it a user selectable option. I kept the
+> option there in case we need to do a depend on !ARCH for any
+> reason.
+> 
+> Please consider for the kbuild tree.
 
-We can disable it if/when KASAN+KMEMCHECK combination requires any
-additional work, or causes user confusion.
+Any thoughts on this?
+
+Thanks,
+Nick
