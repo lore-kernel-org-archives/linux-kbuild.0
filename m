@@ -1,94 +1,96 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg0-f49.google.com ([74.125.83.49]:34860 "EHLO
-        mail-pg0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750811AbdFSQmU (ORCPT
+Received: from mail-pg0-f54.google.com ([74.125.83.54]:35214 "EHLO
+        mail-pg0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753469AbdFSSir (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 19 Jun 2017 12:42:20 -0400
-Received: by mail-pg0-f49.google.com with SMTP id 132so16861906pgb.2
-        for <linux-kbuild@vger.kernel.org>; Mon, 19 Jun 2017 09:42:19 -0700 (PDT)
-Date: Mon, 19 Jun 2017 09:42:17 -0700
+        Mon, 19 Jun 2017 14:38:47 -0400
+Received: by mail-pg0-f54.google.com with SMTP id 132so18186085pgb.2
+        for <linux-kbuild@vger.kernel.org>; Mon, 19 Jun 2017 11:38:47 -0700 (PDT)
 From: Matthias Kaehlcke <mka@chromium.org>
-Subject: Re: [PATCH v3 1/3] kbuild: Add __cc-option macro
-Message-ID: <20170619164217.GO141096@google.com>
-References: <20170615173715.40882-2-mka@chromium.org>
- <201706181420.ojaPWgL6%fengguang.wu@intel.com>
- <CAK7LNAT2Aiz=k09N6AtE6pNvKh8yx=vaJBu49xzjEmv3JCiEBg@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAK7LNAT2Aiz=k09N6AtE6pNvKh8yx=vaJBu49xzjEmv3JCiEBg@mail.gmail.com>
+Subject: [PATCH v4 3/3] x86/build: Specify stack alignment for clang
+Date: Mon, 19 Jun 2017 11:37:57 -0700
+Message-Id: <20170619183757.124992-4-mka@chromium.org>
+In-Reply-To: <20170619183757.124992-1-mka@chromium.org>
+References: <20170619183757.124992-1-mka@chromium.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: kbuild-all@01.org, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H . Peter Anvin" <hpa@zytor.com>, "H . J . Lu" <hjl.tools@gmail.com>, David Woodhouse <dwmw2@infradead.org>, Michal Marek <mmarek@suse.com>, X86 ML <x86@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>, Nick Desaulniers <ndesaulniers@google.com>, Stephen Hines <srhines@google.com>, Kees Cook <keescook@chromium.org>, Arnd Bergmann <arnd@arndb.de>, Bernhard =?utf-8?Q?Rosenkr=C3=A4nzer?= <Bernhard.Rosenkranzer@linaro.org>, Peter Foley <pefoley2@pefoley.com>, Behan Webster <behanw@converseincode.com>, Douglas Anderson <dianders@chromium.org>, kbuild test robot <lkp@intel.com>
+To: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H . Peter Anvin" <hpa@zytor.com>, "H . J . Lu" <hjl.tools@gmail.com>, David Woodhouse <dwmw2@infradead.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>
+Cc: x86@kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>, Nick Desaulniers <ndesaulniers@google.com>, Stephen Hines <srhines@google.com>, Kees Cook <keescook@chromium.org>, Arnd Bergmann <arnd@arndb.de>, Bernhard.Rosenkranzer@linaro.org, Peter Foley <pefoley2@pefoley.com>, Behan Webster <behanw@converseincode.com>, Douglas Anderson <dianders@chromium.org>, Matthias Kaehlcke <mka@chromium.org>
 
-Hi Masahiro,
+For gcc stack alignment is configured with -mpreferred-stack-boundary=N,
+clang has the option -mstack-alignment=N for that purpose. Use the same
+alignment as with gcc.
 
-El Mon, Jun 19, 2017 at 11:00:42AM +0900 Masahiro Yamada ha dit:
+If the alignment is not specified clang assumes an alignment of
+16 bytes, as required by the standard ABI. However as mentioned in
+d9b0cde91c60 ("x86-64, gcc: Use -mpreferred-stack-boundary=3 if
+supported") the standard kernel entry on x86-64 leaves the stack
+on an 8-byte boundary, as a consequence clang will keep the stack
+misaligned.
 
-> Sorry, the code I suggested introduced a slight behavior change.
-> 
-> With this patch, cc-option adds a space before the returned option.
-> 
-> 
-> Please see line 46 of arch/sh/Makefile.
-> 
-> ifeq ($(cflags-y),)
-> 
-> 
-> Now cflags-y contains a space, so
-> this conditional is now evaluated as false,
-> which was actually true without the patch.
-> This is the cause of the build error.
+Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+---
+ arch/x86/Makefile | 26 +++++++++++++++++++++-----
+ 1 file changed, 21 insertions(+), 5 deletions(-)
 
-Thanks for looking into this, I also didn't realize that the extra
-space could be an issue.
+diff --git a/arch/x86/Makefile b/arch/x86/Makefile
+index b2dae639f778..9406d3670452 100644
+--- a/arch/x86/Makefile
++++ b/arch/x86/Makefile
+@@ -11,6 +11,14 @@ else
+         KBUILD_DEFCONFIG := $(ARCH)_defconfig
+ endif
+ 
++# Handle different option names for specifying stack alignment with gcc and
++# clang.
++ifeq ($(cc-name),clang)
++	cc_stack_align_opt := -mstack-alignment
++else
++	cc_stack_align_opt := -mpreferred-stack-boundary
++endif
++
+ # How to compile the 16-bit code.  Note we always compile for -march=i386;
+ # that way we can complain to the user if the CPU is insufficient.
+ #
+@@ -28,7 +36,7 @@ REALMODE_CFLAGS	:= $(M16_CFLAGS) -g -Os -D__KERNEL__ \
+ 
+ REALMODE_CFLAGS += $(call __cc-option, $(CC), $(REALMODE_CFLAGS), -ffreestanding)
+ REALMODE_CFLAGS += $(call __cc-option, $(CC), $(REALMODE_CFLAGS), -fno-stack-protector)
+-REALMODE_CFLAGS += $(call __cc-option, $(CC), $(REALMODE_CFLAGS), -mpreferred-stack-boundary=2)
++REALMODE_CFLAGS += $(call __cc-option, $(CC), $(REALMODE_CFLAGS), $(cc_stack_align_opt)=2)
+ export REALMODE_CFLAGS
+ 
+ # BITS is used as extension for files which are available in a 32 bit
+@@ -65,8 +73,10 @@ ifeq ($(CONFIG_X86_32),y)
+         # with nonstandard options
+         KBUILD_CFLAGS += -fno-pic
+ 
+-        # prevent gcc from keeping the stack 16 byte aligned
+-        KBUILD_CFLAGS += $(call cc-option,-mpreferred-stack-boundary=2)
++        # Align the stack to the register width instead of using the default
++        # alignment of 16 bytes. This reduces stack usage and the number of
++        # alignment instructions.
++        KBUILD_CFLAGS += $(call cc-option,$(cc_stack_align_opt)=2)
+ 
+         # Disable unit-at-a-time mode on pre-gcc-4.0 compilers, it makes gcc use
+         # a lot more stack due to the lack of sharing of stacklots:
+@@ -98,8 +108,14 @@ else
+         KBUILD_CFLAGS += $(call cc-option,-mno-80387)
+         KBUILD_CFLAGS += $(call cc-option,-mno-fp-ret-in-387)
+ 
+-	# Use -mpreferred-stack-boundary=3 if supported.
+-	KBUILD_CFLAGS += $(call cc-option,-mpreferred-stack-boundary=3)
++        # By default gcc and clang use a stack alignment of 16 bytes for x86.
++        # However the standard kernel entry on x86-64 leaves the stack on an
++        # 8-byte boundary. If the compiler isn't informed about the actual
++        # alignment it will generate extra alignment instructions for the
++        # default alignment which keep the stack *mis*aligned.
++        # Furthermore an alignment to the register width reduces stack usage
++        # and the number of alignment instructions.
++        KBUILD_CFLAGS += $(call cc-option,$(cc_stack_align_opt)=3)
+ 
+ 	# Use -mskip-rax-setup if supported.
+ 	KBUILD_CFLAGS += $(call cc-option,-mskip-rax-setup)
+-- 
+2.13.1.518.g3df882009-goog
 
-> Could you remove whitespaces before $(1) and $(2) in cc-option?
-> 
-> Also, please fix hostcc-option as well.
-
-Sure, I'll send out a new version soon.
-
-> 2017-06-18 15:58 GMT+09:00 kbuild test robot <lkp@intel.com>:
-> > Hi Matthias,
-> >
-> > [auto build test ERROR on tip/auto-latest]
-> > [also build test ERROR on v4.12-rc5 next-20170616]
-> > [if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
-> >
-> > url:    https://github.com/0day-ci/linux/commits/Matthias-Kaehlcke/kbuild-Add-__cc-option-macro/20170616-082252
-> > config: sh-sh7710voipgw_defconfig (attached as .config)
-> > compiler: sh4-linux-gnu-gcc (Debian 6.1.1-9) 6.1.1 20160705
-> > reproduce:
-> >         wget https://raw.githubusercontent.com/01org/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-> >         chmod +x ~/bin/make.cross
-> >         # save the attached .config to linux build tree
-> >         make.cross ARCH=sh
-> >
-> > All errors (new ones prefixed by >>):
-> >
-> >    {standard input}: Assembler messages:
-> >>> {standard input}:672: Error: invalid operands for opcode
-> >    {standard input}:673: Error: opcode not valid for this cpu variant
-> >    {standard input}:674: Error: opcode not valid for this cpu variant
-> >    {standard input}:675: Error: invalid operands for opcode
-> >    {standard input}:1900: Error: invalid operands for opcode
-> >    {standard input}:1901: Error: opcode not valid for this cpu variant
-> >    {standard input}:1902: Error: opcode not valid for this cpu variant
-> >    {standard input}:1903: Error: invalid operands for opcode
-> >    {standard input}:2067: Error: invalid operands for opcode
-> >    {standard input}:2068: Error: opcode not valid for this cpu variant
-> >    {standard input}:2069: Error: opcode not valid for this cpu variant
-> >    {standard input}:2070: Error: invalid operands for opcode
-> >    {standard input}:2570: Error: invalid operands for opcode
-> >    {standard input}:2571: Error: opcode not valid for this cpu variant
-> >    {standard input}:2572: Error: opcode not valid for this cpu variant
-> >    {standard input}:2573: Error: invalid operands for opcode
-> >
-> > ---
-> > 0-DAY kernel test infrastructure                Open Source Technology Center
-> > https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
-> 
-> 
-> 
