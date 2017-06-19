@@ -1,310 +1,94 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf0-f196.google.com ([209.85.192.196]:34881 "EHLO
-        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753791AbdFSPwU (ORCPT
+Received: from mail-pg0-f49.google.com ([74.125.83.49]:34860 "EHLO
+        mail-pg0-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750811AbdFSQmU (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 19 Jun 2017 11:52:20 -0400
-Date: Tue, 20 Jun 2017 01:52:05 +1000
-From: Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH 1/5] kbuild: thin archives final link close
- --whole-archives option
-Message-ID: <20170620015205.329519b2@roar.ozlabs.ibm.com>
-In-Reply-To: <CAK7LNATznx=5A1KnhkFHpjencsJj7AGUsHtDUu6M-Qkw=jvpPQ@mail.gmail.com>
-References: <20170609052417.561-1-npiggin@gmail.com>
-        <20170609052417.561-2-npiggin@gmail.com>
-        <CAK7LNASxuE-6eMk+Y-vyrMfibtYoD2JkjNS2z8QF85x9NdiiaA@mail.gmail.com>
-        <20170619165100.3ce26d00@roar.ozlabs.ibm.com>
-        <CAK7LNARuuQzGkYBdzoy3bVpBuNPZEMGerHSEdmrH+PqK0Gbyzg@mail.gmail.com>
-        <20170619182714.2cb60e17@roar.ozlabs.ibm.com>
-        <CAK7LNATznx=5A1KnhkFHpjencsJj7AGUsHtDUu6M-Qkw=jvpPQ@mail.gmail.com>
+        Mon, 19 Jun 2017 12:42:20 -0400
+Received: by mail-pg0-f49.google.com with SMTP id 132so16861906pgb.2
+        for <linux-kbuild@vger.kernel.org>; Mon, 19 Jun 2017 09:42:19 -0700 (PDT)
+Date: Mon, 19 Jun 2017 09:42:17 -0700
+From: Matthias Kaehlcke <mka@chromium.org>
+Subject: Re: [PATCH v3 1/3] kbuild: Add __cc-option macro
+Message-ID: <20170619164217.GO141096@google.com>
+References: <20170615173715.40882-2-mka@chromium.org>
+ <201706181420.ojaPWgL6%fengguang.wu@intel.com>
+ <CAK7LNAT2Aiz=k09N6AtE6pNvKh8yx=vaJBu49xzjEmv3JCiEBg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAK7LNAT2Aiz=k09N6AtE6pNvKh8yx=vaJBu49xzjEmv3JCiEBg@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-arch <linux-arch@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Linus Torvalds <torvalds@linux-foundation.org>, Stephen Rothwell <sfr@canb.auug.org.au>, kbuild test robot <fengguang.wu@intel.com>, Josh Triplett <josh@joshtriplett.org>
+Cc: kbuild-all@01.org, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H . Peter Anvin" <hpa@zytor.com>, "H . J . Lu" <hjl.tools@gmail.com>, David Woodhouse <dwmw2@infradead.org>, Michal Marek <mmarek@suse.com>, X86 ML <x86@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>, Nick Desaulniers <ndesaulniers@google.com>, Stephen Hines <srhines@google.com>, Kees Cook <keescook@chromium.org>, Arnd Bergmann <arnd@arndb.de>, Bernhard =?utf-8?Q?Rosenkr=C3=A4nzer?= <Bernhard.Rosenkranzer@linaro.org>, Peter Foley <pefoley2@pefoley.com>, Behan Webster <behanw@converseincode.com>, Douglas Anderson <dianders@chromium.org>, kbuild test robot <lkp@intel.com>
 
-On Mon, 19 Jun 2017 17:35:32 +0900
-Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
+Hi Masahiro,
 
-> Hi Nicholas,
+El Mon, Jun 19, 2017 at 11:00:42AM +0900 Masahiro Yamada ha dit:
+
+> Sorry, the code I suggested introduced a slight behavior change.
+> 
+> With this patch, cc-option adds a space before the returned option.
 > 
 > 
-> 2017-06-19 17:27 GMT+09:00 Nicholas Piggin <npiggin@gmail.com>:
-> > On Mon, 19 Jun 2017 17:14:22 +0900
-> > Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
-> >  
-> >> Hi Nicholas,
-> >>
-> >>
-> >> 2017-06-19 15:51 GMT+09:00 Nicholas Piggin <npiggin@gmail.com>:  
-> >> > On Mon, 19 Jun 2017 15:16:17 +0900
-> >> > Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
-> >> >  
-> >> >> Hi Nicholas,
-> >> >>
-> >> >>
-> >> >> 2017-06-09 14:24 GMT+09:00 Nicholas Piggin <npiggin@gmail.com>:  
-> >> >> > Close the --whole-archives option with --no-whole-archive. Some
-> >> >> > architectures end up including additional .o and files multiple
-> >> >> > times after this, and they get duplicate symbols when they are
-> >> >> > brought under the --whole-archives option.  
-> >> >>
-> >> >> Which architectures have additional files after --no-whole-archive ?
-> >> >>
-> >> >> I see this case only for ARCH = "um" in vmlinux_link()
-> >> >> where it adds some -l* options after --no-whole-archive.
-> >> >>
-> >> >> I think it is good to close the --whole-archives everywhere.
-> >> >> So, the code looks OK to me, but I just wondered about the log.  
-> >> >
-> >> > Actually a number of archs seemed to get build errors without this,
-> >> > and they seem to come from libgcc perhaps.
-> >> >
-> >> > binfmt_elf.c:(.text+0x4851): undefined reference to `__kernel_syscall_via_epc'
-> >> > /c/gcc/libgcc/libgcc2.c:1318: multiple definition of `__ucmpdi2'
-> >> > /c/gcc/libgcc/libgcc2.c:405: multiple definition of `__lshrdi3'
-> >> > /c/gcc/libgcc/libgcc2.c:433: multiple definition of `__ashldi3'
-> >> > /c/gcc/libgcc/libgcc2.c:461: multiple definition of `__ashrdi3'
-> >> >
-> >> > /home/tony/buildall/src/gcc/libgcc/config/xtensa/lib2funcs.S:36: multiple definition of `__xtensa_libgcc_window_spill'
-> >> >
-> >> > etc  
-> >>
-> >>
-> >> Oops, I did not test such architectures.
-> >>
-> >>  
-> >> > m32r, parisc, xtensa seemed to be getting such errors. I wonder if
-> >> > the linker implicitly adds some runtime libs at the end that get
-> >> > caught up here. Either way I didn't look too far into it because this
-> >> > fix seems obviously correct and solved the problem.
-> >> >
-> >> > Thanks,  
-> >>
-> >>
-> >> Which toolchains do you use?  
+> Please see line 46 of arch/sh/Makefile.
+> 
+> ifeq ($(cflags-y),)
+> 
+> 
+> Now cflags-y contains a space, so
+> this conditional is now evaluated as false,
+> which was actually true without the patch.
+> This is the cause of the build error.
+
+Thanks for looking into this, I also didn't realize that the extra
+space could be an issue.
+
+> Could you remove whitespaces before $(1) and $(2) in cc-option?
+> 
+> Also, please fix hostcc-option as well.
+
+Sure, I'll send out a new version soon.
+
+> 2017-06-18 15:58 GMT+09:00 kbuild test robot <lkp@intel.com>:
+> > Hi Matthias,
 > >
-> > I just had them run through the kbuild 0day tests. Not sure exactly
-> > what they use.
-> >  
-> >> I downloaded xtensa-linux- from this site:
-> >> https://www.kernel.org/pub/tools/crosstool/files/bin/x86_64/4.9.0/
-> >>
-> >>
-> >> I see a different error for xtensa.
-> >>
-> >>
-> >> I applied all of you 5 patches, but xtensa build still fails.
-> >>
-> >>   LD      vmlinux.o
-> >> xtensa-linux-ld: internal error
-> >> /home/tony/buildall/src/binutils/ld/ldlang.c 6178
-> >>
-> >>
-> >> Could you check it?  
+> > [auto build test ERROR on tip/auto-latest]
+> > [also build test ERROR on v4.12-rc5 next-20170616]
+> > [if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
 > >
-> > Ahh, the old ld: internal error... what ld version is that?
-> >  
+> > url:    https://github.com/0day-ci/linux/commits/Matthias-Kaehlcke/kbuild-Add-__cc-option-macro/20170616-082252
+> > config: sh-sh7710voipgw_defconfig (attached as .config)
+> > compiler: sh4-linux-gnu-gcc (Debian 6.1.1-9) 6.1.1 20160705
+> > reproduce:
+> >         wget https://raw.githubusercontent.com/01org/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+> >         chmod +x ~/bin/make.cross
+> >         # save the attached .config to linux build tree
+> >         make.cross ARCH=sh
+> >
+> > All errors (new ones prefixed by >>):
+> >
+> >    {standard input}: Assembler messages:
+> >>> {standard input}:672: Error: invalid operands for opcode
+> >    {standard input}:673: Error: opcode not valid for this cpu variant
+> >    {standard input}:674: Error: opcode not valid for this cpu variant
+> >    {standard input}:675: Error: invalid operands for opcode
+> >    {standard input}:1900: Error: invalid operands for opcode
+> >    {standard input}:1901: Error: opcode not valid for this cpu variant
+> >    {standard input}:1902: Error: opcode not valid for this cpu variant
+> >    {standard input}:1903: Error: invalid operands for opcode
+> >    {standard input}:2067: Error: invalid operands for opcode
+> >    {standard input}:2068: Error: opcode not valid for this cpu variant
+> >    {standard input}:2069: Error: opcode not valid for this cpu variant
+> >    {standard input}:2070: Error: invalid operands for opcode
+> >    {standard input}:2570: Error: invalid operands for opcode
+> >    {standard input}:2571: Error: opcode not valid for this cpu variant
+> >    {standard input}:2572: Error: opcode not valid for this cpu variant
+> >    {standard input}:2573: Error: invalid operands for opcode
+> >
+> > ---
+> > 0-DAY kernel test infrastructure                Open Source Technology Center
+> > https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
 > 
 > 
-> seems 2.24 according to the following:
 > 
-> 
-> masahiro@pug:~$ xtensa-linux-ld -v
-> GNU ld (GNU Binutils) 2.24
-
-Ah, thank you. It must have been that the 0day build (cc'ed) did
-not return any error to be from the ld internal error.
-
-This has led me to the true cause of the error which is the way
-external archives are handled. After implementing the fix, I think
-the lib.a size regression for thin archives should be solved as
-well.
-
-This patch should be added between patches 2 and 3 of this series.
-
-
-kbuild: handle libs-y archives separately from built-in.o archives
-
-The thin archives build currently puts all lib.a and built-in.o
-files together and links them with --whole-archive.
-
-This works because thin archives can recursively refer to thin
-archives. However some architectures include libgcc.a, which may
-not be a thin archive, or it may not be constructed with the "P"
-option, in which case its contents do not get linked correctly.
-
-So don't pull .a libs into the root built-in.o archive. These
-libs should already have symbol tables and indexes built, so they
-can be direct linker inputs. Move them out of the --whole-archive
-option, which restore the conditional linking behaviour of lib.a
-to thin archives builds.
-
-Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
----
- Documentation/kbuild/kbuild.txt |  8 +++++--
- Makefile                        |  7 +++---
- scripts/link-vmlinux.sh         | 47 ++++++++++++++++++++++++++++++++---------
- 3 files changed, 47 insertions(+), 15 deletions(-)
-
-diff --git a/Documentation/kbuild/kbuild.txt b/Documentation/kbuild/kbuild.txt
-index 0ff6a466a05b..ac2363ea05c5 100644
---- a/Documentation/kbuild/kbuild.txt
-+++ b/Documentation/kbuild/kbuild.txt
-@@ -236,5 +236,9 @@ Files specified with KBUILD_VMLINUX_INIT are linked first.
- KBUILD_VMLINUX_MAIN
- --------------------------------------------------
- All object files for the main part of vmlinux.
--KBUILD_VMLINUX_INIT and KBUILD_VMLINUX_MAIN together specify
--all the object files used to link vmlinux.
-+
-+KBUILD_VMLINUX_LIBS
-+--------------------------------------------------
-+All .a "lib" files for vmlinux.
-+KBUILD_VMLINUX_INIT, KBUILD_VMLINUX_MAIN, and KBUILD_VMLINUX_LIBS together
-+specify all the object files used to link vmlinux.
-diff --git a/Makefile b/Makefile
-index 470bd4d9513a..a145a537ad42 100644
---- a/Makefile
-+++ b/Makefile
-@@ -952,19 +952,20 @@ core-y		:= $(patsubst %/, %/built-in.o, $(core-y))
- drivers-y	:= $(patsubst %/, %/built-in.o, $(drivers-y))
- net-y		:= $(patsubst %/, %/built-in.o, $(net-y))
- libs-y1		:= $(patsubst %/, %/lib.a, $(libs-y))
--libs-y2		:= $(patsubst %/, %/built-in.o, $(libs-y))
-+libs-y2		:= $(filter-out %.a, $(patsubst %/, %/built-in.o, $(libs-y)))
- libs-y		:= $(libs-y1) $(libs-y2)
- virt-y		:= $(patsubst %/, %/built-in.o, $(virt-y))
- 
- # Externally visible symbols (used by link-vmlinux.sh)
- export KBUILD_VMLINUX_INIT := $(head-y) $(init-y)
--export KBUILD_VMLINUX_MAIN := $(core-y) $(libs-y) $(drivers-y) $(net-y) $(virt-y)
-+export KBUILD_VMLINUX_MAIN := $(core-y) $(libs-y2) $(drivers-y) $(net-y) $(virt-y)
-+export KBUILD_VMLINUX_LIBS := $(libs-y1)
- export KBUILD_LDS          := arch/$(SRCARCH)/kernel/vmlinux.lds
- export LDFLAGS_vmlinux
- # used by scripts/pacmage/Makefile
- export KBUILD_ALLDIRS := $(sort $(filter-out arch/%,$(vmlinux-alldirs)) arch Documentation include samples scripts tools)
- 
--vmlinux-deps := $(KBUILD_LDS) $(KBUILD_VMLINUX_INIT) $(KBUILD_VMLINUX_MAIN)
-+vmlinux-deps := $(KBUILD_LDS) $(KBUILD_VMLINUX_INIT) $(KBUILD_VMLINUX_MAIN) $(KBUILD_VMLINUX_LIBS)
- 
- # Include targets which we want to execute sequentially if the rest of the
- # kernel build went well. If CONFIG_TRIM_UNUSED_KSYMS is set, this might be
-diff --git a/scripts/link-vmlinux.sh b/scripts/link-vmlinux.sh
-index 2a062ea130b5..e7b7eee31538 100755
---- a/scripts/link-vmlinux.sh
-+++ b/scripts/link-vmlinux.sh
-@@ -3,9 +3,12 @@
- # link vmlinux
- #
- # vmlinux is linked from the objects selected by $(KBUILD_VMLINUX_INIT) and
--# $(KBUILD_VMLINUX_MAIN). Most are built-in.o files from top-level directories
--# in the kernel tree, others are specified in arch/$(ARCH)/Makefile.
--# Ordering when linking is important, and $(KBUILD_VMLINUX_INIT) must be first.
-+# $(KBUILD_VMLINUX_MAIN) and $(KBUILD_VMLINUX_LIBS). Most are built-in.o files
-+# from top-level directories in the kernel tree, others are specified in
-+# arch/$(ARCH)/Makefile. Ordering when linking is important, and
-+# $(KBUILD_VMLINUX_INIT) must be first. $(KBUILD_VMLINUX_LIBS) are archives
-+# which are linked conditionally (not within --whole-archive), and do not
-+# require symbol indexes added.
- #
- # vmlinux
- #   ^
-@@ -16,6 +19,9 @@
- #   +--< $(KBUILD_VMLINUX_MAIN)
- #   |    +--< drivers/built-in.o mm/built-in.o + more
- #   |
-+#   +--< $(KBUILD_VMLINUX_LIBS)
-+#   |    +--< lib/lib.a + more
-+#   |
- #   +-< ${kallsymso} (see description in KALLSYMS section)
- #
- # vmlinux version (uname -v) cannot be updated during normal
-@@ -37,9 +43,10 @@ info()
- 	fi
- }
- 
--# Thin archive build here makes a final archive with
--# symbol table and indexes from vmlinux objects, which can be
--# used as input to linker.
-+# Thin archive build here makes a final archive with symbol table and indexes
-+# from vmlinux objects INIT and MAIN, which can be used as input to linker.
-+# KBUILD_VMLINUX_LIBS archives should already have symbol table and indexes
-+# added.
- #
- # Traditional incremental style of link does not require this step
- #
-@@ -50,7 +57,7 @@ archive_builtin()
- 	if [ -n "${CONFIG_THIN_ARCHIVES}" ]; then
- 		info AR built-in.o
- 		rm -f built-in.o;
--		${AR} rcsT${KBUILD_ARFLAGS} built-in.o			\
-+		${AR} rcsTP${KBUILD_ARFLAGS} built-in.o			\
- 					${KBUILD_VMLINUX_INIT}		\
- 					${KBUILD_VMLINUX_MAIN}
- 	fi
-@@ -63,11 +70,17 @@ modpost_link()
- 	local objects
- 
- 	if [ -n "${CONFIG_THIN_ARCHIVES}" ]; then
--		objects="--whole-archive built-in.o --no-whole-archive"
-+		objects="--whole-archive				\
-+			built-in.o					\
-+			--no-whole-archive				\
-+			--start-group					\
-+			${KBUILD_VMLINUX_LIBS}				\
-+			--end-group"
- 	else
- 		objects="${KBUILD_VMLINUX_INIT}				\
- 			--start-group					\
- 			${KBUILD_VMLINUX_MAIN}				\
-+			${KBUILD_VMLINUX_LIBS}				\
- 			--end-group"
- 	fi
- 	${LD} ${LDFLAGS} -r -o ${1} ${objects}
-@@ -83,11 +96,18 @@ vmlinux_link()
- 
- 	if [ "${SRCARCH}" != "um" ]; then
- 		if [ -n "${CONFIG_THIN_ARCHIVES}" ]; then
--			objects="--whole-archive built-in.o ${1} --no-whole-archive"
-+			objects="--whole-archive			\
-+				built-in.o				\
-+				--no-whole-archive			\
-+				--start-group				\
-+				${KBUILD_VMLINUX_LIBS}			\
-+				--end-group				\
-+				${1}"
- 		else
- 			objects="${KBUILD_VMLINUX_INIT}			\
- 				--start-group				\
- 				${KBUILD_VMLINUX_MAIN}			\
-+				${KBUILD_VMLINUX_LIBS}			\
- 				--end-group				\
- 				${1}"
- 		fi
-@@ -96,11 +116,18 @@ vmlinux_link()
- 			-T ${lds} ${objects}
- 	else
- 		if [ -n "${CONFIG_THIN_ARCHIVES}" ]; then
--			objects="-Wl,--whole-archive built-in.o ${1} -Wl,--no-whole-archive"
-+			objects="-Wl,--whole-archive			\
-+				built-in.o				\
-+				-Wl,--no-whole-archive			\
-+				-Wl,--start-group			\
-+				${KBUILD_VMLINUX_LIBS}			\
-+				-Wl,--end-group				\
-+				${1}"
- 		else
- 			objects="${KBUILD_VMLINUX_INIT}			\
- 				-Wl,--start-group			\
- 				${KBUILD_VMLINUX_MAIN}			\
-+				${KBUILD_VMLINUX_LIBS}			\
- 				-Wl,--end-group				\
- 				${1}"
- 		fi
--- 
-2.11.0
-
