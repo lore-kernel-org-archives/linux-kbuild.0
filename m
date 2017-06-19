@@ -1,64 +1,122 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg0-f51.google.com ([74.125.83.51]:34019 "EHLO
-        mail-pg0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753967AbdFSSil (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 19 Jun 2017 14:38:41 -0400
-Received: by mail-pg0-f51.google.com with SMTP id 22so23992827pgc.1
-        for <linux-kbuild@vger.kernel.org>; Mon, 19 Jun 2017 11:38:41 -0700 (PDT)
-From: Matthias Kaehlcke <mka@chromium.org>
-Subject: [PATCH v4 2/3] x86/build: Use __cc-option for boot code compiler options
-Date: Mon, 19 Jun 2017 11:37:56 -0700
-Message-Id: <20170619183757.124992-3-mka@chromium.org>
-In-Reply-To: <20170619183757.124992-1-mka@chromium.org>
-References: <20170619183757.124992-1-mka@chromium.org>
+Received: from terminus.zytor.com ([65.50.211.136]:48877 "EHLO mail.zytor.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751955AbdFSUem (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 19 Jun 2017 16:34:42 -0400
+Date: Mon, 19 Jun 2017 13:17:03 -0700
+In-Reply-To: <20170619183757.124992-4-mka@chromium.org>
+References: <20170619183757.124992-1-mka@chromium.org> <20170619183757.124992-4-mka@chromium.org>
+MIME-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 8BIT
+Subject: Re: [PATCH v4 3/3] x86/build: Specify stack alignment for clang
+From: hpa@zytor.com
+Message-ID: <EAA687B2-ECD0-42C7-907E-BE8BDF311EC1@zytor.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H . Peter Anvin" <hpa@zytor.com>, "H . J . Lu" <hjl.tools@gmail.com>, David Woodhouse <dwmw2@infradead.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>
-Cc: x86@kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>, Nick Desaulniers <ndesaulniers@google.com>, Stephen Hines <srhines@google.com>, Kees Cook <keescook@chromium.org>, Arnd Bergmann <arnd@arndb.de>, Bernhard.Rosenkranzer@linaro.org, Peter Foley <pefoley2@pefoley.com>, Behan Webster <behanw@converseincode.com>, Douglas Anderson <dianders@chromium.org>, Matthias Kaehlcke <mka@chromium.org>
+To: Matthias Kaehlcke <mka@chromium.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H . J . Lu" <hjl.tools@gmail.com>, David Woodhouse <dwmw2@infradead.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>
+Cc: x86@kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>, Nick Desaulniers <ndesaulniers@google.com>, Stephen Hines <srhines@google.com>, Kees Cook <keescook@chromium.org>, Arnd Bergmann <arnd@arndb.de>, Bernhard.Rosenkranzer@linaro.org, Peter Foley <pefoley2@pefoley.com>, Behan Webster <behanw@converseincode.com>, Douglas Anderson <dianders@chromium.org>
 
-cc-option is used to enable compiler options for the boot code if they
-are available. The macro uses KBUILD_CFLAGS and KBUILD_CPPFLAGS for the
-check, however these flags aren't used to build the boot code, in
-consequence cc-option can yield wrong results. For example
--mpreferred-stack-boundary=2 is never set with a 64-bit compiler,
-since the setting is only valid for 16 and 32-bit binaries. This
-is also the case for 32-bit kernel builds, because the option -m32 is
-added to KBUILD_CFLAGS after the assignment of REALMODE_CFLAGS.
+On June 19, 2017 11:37:57 AM PDT, Matthias Kaehlcke <mka@chromium.org> wrote:
+>For gcc stack alignment is configured with
+>-mpreferred-stack-boundary=N,
+>clang has the option -mstack-alignment=N for that purpose. Use the same
+>alignment as with gcc.
+>
+>If the alignment is not specified clang assumes an alignment of
+>16 bytes, as required by the standard ABI. However as mentioned in
+>d9b0cde91c60 ("x86-64, gcc: Use -mpreferred-stack-boundary=3 if
+>supported") the standard kernel entry on x86-64 leaves the stack
+>on an 8-byte boundary, as a consequence clang will keep the stack
+>misaligned.
+>
+>Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+>---
+> arch/x86/Makefile | 26 +++++++++++++++++++++-----
+> 1 file changed, 21 insertions(+), 5 deletions(-)
+>
+>diff --git a/arch/x86/Makefile b/arch/x86/Makefile
+>index b2dae639f778..9406d3670452 100644
+>--- a/arch/x86/Makefile
+>+++ b/arch/x86/Makefile
+>@@ -11,6 +11,14 @@ else
+>         KBUILD_DEFCONFIG := $(ARCH)_defconfig
+> endif
+> 
+>+# Handle different option names for specifying stack alignment with
+>gcc and
+>+# clang.
+>+ifeq ($(cc-name),clang)
+>+	cc_stack_align_opt := -mstack-alignment
+>+else
+>+	cc_stack_align_opt := -mpreferred-stack-boundary
+>+endif
+>+
+># How to compile the 16-bit code.  Note we always compile for
+>-march=i386;
+> # that way we can complain to the user if the CPU is insufficient.
+> #
+>@@ -28,7 +36,7 @@ REALMODE_CFLAGS	:= $(M16_CFLAGS) -g -Os -D__KERNEL__
+>\
+> 
+>REALMODE_CFLAGS += $(call __cc-option, $(CC), $(REALMODE_CFLAGS),
+>-ffreestanding)
+>REALMODE_CFLAGS += $(call __cc-option, $(CC), $(REALMODE_CFLAGS),
+>-fno-stack-protector)
+>-REALMODE_CFLAGS += $(call __cc-option, $(CC), $(REALMODE_CFLAGS),
+>-mpreferred-stack-boundary=2)
+>+REALMODE_CFLAGS += $(call __cc-option, $(CC), $(REALMODE_CFLAGS),
+>$(cc_stack_align_opt)=2)
+> export REALMODE_CFLAGS
+> 
+> # BITS is used as extension for files which are available in a 32 bit
+>@@ -65,8 +73,10 @@ ifeq ($(CONFIG_X86_32),y)
+>         # with nonstandard options
+>         KBUILD_CFLAGS += -fno-pic
+> 
+>-        # prevent gcc from keeping the stack 16 byte aligned
+>-        KBUILD_CFLAGS += $(call
+>cc-option,-mpreferred-stack-boundary=2)
+>+        # Align the stack to the register width instead of using the
+>default
+>+        # alignment of 16 bytes. This reduces stack usage and the
+>number of
+>+        # alignment instructions.
+>+        KBUILD_CFLAGS += $(call cc-option,$(cc_stack_align_opt)=2)
+> 
+># Disable unit-at-a-time mode on pre-gcc-4.0 compilers, it makes gcc
+>use
+>         # a lot more stack due to the lack of sharing of stacklots:
+>@@ -98,8 +108,14 @@ else
+>         KBUILD_CFLAGS += $(call cc-option,-mno-80387)
+>         KBUILD_CFLAGS += $(call cc-option,-mno-fp-ret-in-387)
+> 
+>-	# Use -mpreferred-stack-boundary=3 if supported.
+>-	KBUILD_CFLAGS += $(call cc-option,-mpreferred-stack-boundary=3)
+>+        # By default gcc and clang use a stack alignment of 16 bytes
+>for x86.
+>+        # However the standard kernel entry on x86-64 leaves the stack
+>on an
+>+        # 8-byte boundary. If the compiler isn't informed about the
+>actual
+>+        # alignment it will generate extra alignment instructions for
+>the
+>+        # default alignment which keep the stack *mis*aligned.
+>+        # Furthermore an alignment to the register width reduces stack
+>usage
+>+        # and the number of alignment instructions.
+>+        KBUILD_CFLAGS += $(call cc-option,$(cc_stack_align_opt)=3)
+> 
+> 	# Use -mskip-rax-setup if supported.
+> 	KBUILD_CFLAGS += $(call cc-option,-mskip-rax-setup)
 
-Use __cc-option instead of cc-option for the boot mode options.
-The macro receives the compiler options as parameter instead of using
-KBUILD_C*FLAGS, for the boot code we pass REALMODE_CFLAGS.
+Goddammit.
 
-Also use separate statements for the __cc-option checks instead
-of performing them in the initial assignment of REALMODE_CFLAGS since
-the variable is an input of the macro.
+How many times do I have to say NAK to
 
-Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
----
- arch/x86/Makefile | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+>+ifeq ($(cc-name),clang)
 
-diff --git a/arch/x86/Makefile b/arch/x86/Makefile
-index bf240b920473..b2dae639f778 100644
---- a/arch/x86/Makefile
-+++ b/arch/x86/Makefile
-@@ -24,10 +24,11 @@ REALMODE_CFLAGS	:= $(M16_CFLAGS) -g -Os -D__KERNEL__ \
- 		   -DDISABLE_BRANCH_PROFILING \
- 		   -Wall -Wstrict-prototypes -march=i386 -mregparm=3 \
- 		   -fno-strict-aliasing -fomit-frame-pointer -fno-pic \
--		   -mno-mmx -mno-sse \
--		   $(call cc-option, -ffreestanding) \
--		   $(call cc-option, -fno-stack-protector) \
--		   $(call cc-option, -mpreferred-stack-boundary=2)
-+		   -mno-mmx -mno-sse
-+
-+REALMODE_CFLAGS += $(call __cc-option, $(CC), $(REALMODE_CFLAGS), -ffreestanding)
-+REALMODE_CFLAGS += $(call __cc-option, $(CC), $(REALMODE_CFLAGS), -fno-stack-protector)
-+REALMODE_CFLAGS += $(call __cc-option, $(CC), $(REALMODE_CFLAGS), -mpreferred-stack-boundary=2)
- export REALMODE_CFLAGS
- 
- # BITS is used as extension for files which are available in a 32 bit
+... before it sinks in?
 -- 
-2.13.1.518.g3df882009-goog
-
+Sent from my Android device with K-9 Mail. Please excuse my brevity.
