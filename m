@@ -1,77 +1,109 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf0-f194.google.com ([209.85.192.194]:34475 "EHLO
-        mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753367AbdFSGzt (ORCPT
+Received: from conuserg-12.nifty.com ([210.131.2.79]:21522 "EHLO
+        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751166AbdFSHbA (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 19 Jun 2017 02:55:49 -0400
-Date: Mon, 19 Jun 2017 16:55:35 +1000
-From: Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH 5/5] kbuild: thin archives make default for all archs
-Message-ID: <20170619165535.17087dea@roar.ozlabs.ibm.com>
-In-Reply-To: <CAK7LNATfQcjTWKBWPmJG9WQOVWw984MO0ag4LaazAb82d252qw@mail.gmail.com>
-References: <20170609052417.561-1-npiggin@gmail.com>
-        <20170609052417.561-6-npiggin@gmail.com>
-        <CAK7LNATfQcjTWKBWPmJG9WQOVWw984MO0ag4LaazAb82d252qw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+        Mon, 19 Jun 2017 03:31:00 -0400
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Subject: [PATCH] kbuild: deprecate cc-option-align
+Date: Mon, 19 Jun 2017 16:28:22 +0900
+Message-Id: <1497857303-15936-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-arch <linux-arch@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Linus Torvalds <torvalds@linux-foundation.org>, Stephen Rothwell <sfr@canb.auug.org.au>
+To: linux-kbuild@vger.kernel.org
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Matthias Kaehlcke <mka@chromium.org>, Marcin Nowakowski <marcin.nowakowski@imgtec.com>, Arnd Bergmann <arnd@arndb.de>, Mark Charlebois <charlebm@gmail.com>, Kees Cook <keescook@chromium.org>, Michal Marek <mmarek@suse.com>, linux-kernel@vger.kernel.org, x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, Jonathan Corbet <corbet@lwn.net>, Thomas Gleixner <tglx@linutronix.de>, linux-doc@vger.kernel.org, Josh Poimboeuf <jpoimboe@redhat.com>, Ingo Molnar <mingo@redhat.com>, Emese Revfy <re.emese@gmail.com>
 
-On Mon, 19 Jun 2017 15:22:14 +0900
-Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
+Documentation/kbuild/makefiles.txt says the change for align options
+occurred at GCC 3.0, and Documentation/process/changes.rst says the
+minimal supported GCC version is 3.2, so it should be safe to hard-code
+-falign* options.
 
-> Hi Nicholas,
-> 
-> 2017-06-09 14:24 GMT+09:00 Nicholas Piggin <npiggin@gmail.com>:
-> > Make thin archives build the default, but keep the config option
-> > to allow exemptions if any breakage can't be quickly solved.
-> >
-> > Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-> > ---
-> >  Documentation/process/changes.rst | 9 ++++-----
-> >  arch/Kconfig                      | 2 +-
-> >  arch/powerpc/Kconfig              | 8 --------
-> >  3 files changed, 5 insertions(+), 14 deletions(-)
-> >
-> > diff --git a/Documentation/process/changes.rst b/Documentation/process/changes.rst
-> > index e25d63f8c0da..56fd0687bd4a 100644
-> > --- a/Documentation/process/changes.rst
-> > +++ b/Documentation/process/changes.rst
-> > @@ -31,7 +31,7 @@ you probably needn't concern yourself with isdn4k-utils.
-> >  ====================== ===============  ========================================
-> >  GNU C                  3.2              gcc --version
-> >  GNU make               3.81             make --version
-> > -binutils               2.12             ld -v
-> > +binutils               2.20             ld -v
-> >  util-linux             2.10o            fdformat --version
-> >  module-init-tools      0.9.10           depmod -V
-> >  e2fsprogs              1.41.4           e2fsck -V
-> > @@ -75,10 +75,9 @@ You will need GNU make 3.81 or later to build the kernel.
-> >  Binutils
-> >  --------
-> >
-> > -Linux on IA-32 has recently switched from using ``as86`` to using ``gas`` for
-> > -assembling the 16-bit boot code, removing the need for ``as86`` to compile
-> > -your kernel.  This change does, however, mean that you need a recent
-> > -release of binutils.
-> > +The build system has recently switched to using thin archives (`ar T`) rather
-> > +than incremental linking (`ld -r`) for built-in.o intermediate steps. This
-> > +requires binutils 2.20 or newer.  
-> 
-> Sorry for my nit-picking.
-> 
-> If you see this document some years later,
-> "recently" may not be so recent.
-> 
-> Currently, this part is written like that already,
-> but perhaps is it better to reword it a bit?
+Fix the only user arch/x86/Makefile_32.cpu and deprecate the
+cc-option-align.
 
-Good point :)
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
 
-We could say "The build system has, as of 4.13, switched to using..."
+x86 maintainers,
 
-Thanks,
-Nick
+If this patch looks OK, could you give me Acked-by?
+
+
+ Documentation/kbuild/makefiles.txt | 16 ----------------
+ arch/x86/Makefile_32.cpu           |  7 +++----
+ scripts/Kbuild.include             |  5 -----
+ 3 files changed, 3 insertions(+), 25 deletions(-)
+
+diff --git a/Documentation/kbuild/makefiles.txt b/Documentation/kbuild/makefiles.txt
+index 1c49e87cea4f..247fb331c4b2 100644
+--- a/Documentation/kbuild/makefiles.txt
++++ b/Documentation/kbuild/makefiles.txt
+@@ -486,22 +486,6 @@ more details, with real examples.
+ 	respectively.
+ 	Note: cc-option-yn uses KBUILD_CFLAGS for $(CC) options
+ 
+-    cc-option-align
+-	gcc versions >= 3.0 changed the type of options used to specify
+-	alignment of functions, loops etc. $(cc-option-align), when used
+-	as prefix to the align options, will select the right prefix:
+-	gcc < 3.00
+-		cc-option-align = -malign
+-	gcc >= 3.00
+-		cc-option-align = -falign
+-
+-	Example:
+-		KBUILD_CFLAGS += $(cc-option-align)-functions=4
+-
+-	In the above example, the option -falign-functions=4 is used for
+-	gcc >= 3.00. For gcc < 3.00, -malign-functions=4 is used.
+-	Note: cc-option-align uses KBUILD_CFLAGS for $(CC) options
+-
+     cc-disable-warning
+ 	cc-disable-warning checks if gcc supports a given warning and returns
+ 	the commandline switch to disable it. This special function is needed,
+diff --git a/arch/x86/Makefile_32.cpu b/arch/x86/Makefile_32.cpu
+index a45eb15b7cf2..f3717d36718a 100644
+--- a/arch/x86/Makefile_32.cpu
++++ b/arch/x86/Makefile_32.cpu
+@@ -9,7 +9,6 @@ else
+ tune		= $(call cc-option,-mcpu=$(1),$(2))
+ endif
+ 
+-align := $(cc-option-align)
+ cflags-$(CONFIG_M486)		+= -march=i486
+ cflags-$(CONFIG_M586)		+= -march=i586
+ cflags-$(CONFIG_M586TSC)	+= -march=i586
+@@ -24,11 +23,11 @@ cflags-$(CONFIG_MK6)		+= -march=k6
+ # They make zero difference whatsosever to performance at this time.
+ cflags-$(CONFIG_MK7)		+= -march=athlon
+ cflags-$(CONFIG_MK8)		+= $(call cc-option,-march=k8,-march=athlon)
+-cflags-$(CONFIG_MCRUSOE)	+= -march=i686 $(align)-functions=0 $(align)-jumps=0 $(align)-loops=0
+-cflags-$(CONFIG_MEFFICEON)	+= -march=i686 $(call tune,pentium3) $(align)-functions=0 $(align)-jumps=0 $(align)-loops=0
++cflags-$(CONFIG_MCRUSOE)	+= -march=i686 -falign-functions=0 -falign-jumps=0 -falign-loops=0
++cflags-$(CONFIG_MEFFICEON)	+= -march=i686 $(call tune,pentium3) -falign-functions=0 -falign-jumps=0 -falign-loops=0
+ cflags-$(CONFIG_MWINCHIPC6)	+= $(call cc-option,-march=winchip-c6,-march=i586)
+ cflags-$(CONFIG_MWINCHIP3D)	+= $(call cc-option,-march=winchip2,-march=i586)
+-cflags-$(CONFIG_MCYRIXIII)	+= $(call cc-option,-march=c3,-march=i486) $(align)-functions=0 $(align)-jumps=0 $(align)-loops=0
++cflags-$(CONFIG_MCYRIXIII)	+= $(call cc-option,-march=c3,-march=i486) -falign-functions=0 -falign-jumps=0 -falign-loops=0
+ cflags-$(CONFIG_MVIAC3_2)	+= $(call cc-option,-march=c3-2,-march=i686)
+ cflags-$(CONFIG_MVIAC7)		+= -march=i686
+ cflags-$(CONFIG_MCORE2)		+= -march=i686 $(call tune,core2)
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index 5001bf9b6579..9a7697d17fb5 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -133,11 +133,6 @@ hostcc-option = $(call __cc-option, $(HOSTCC),\
+ cc-option-yn = $(call try-run,\
+ 	$(CC) -Werror $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS) $(1) -c -x c /dev/null -o "$$TMP",y,n)
+ 
+-# cc-option-align
+-# Prefix align with either -falign or -malign
+-cc-option-align = $(subst -functions=0,,\
+-	$(call cc-option,-falign-functions=0,-malign-functions=0))
+-
+ # cc-disable-warning
+ # Usage: cflags-y += $(call cc-disable-warning,unused-but-set-variable)
+ cc-disable-warning = $(call try-run,\
+-- 
+2.7.4
+
