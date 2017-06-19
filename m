@@ -1,257 +1,94 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mga09.intel.com ([134.134.136.24]:22212 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1750996AbdFRG7E (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 18 Jun 2017 02:59:04 -0400
-Date: Sun, 18 Jun 2017 14:58:33 +0800
-From: kbuild test robot <lkp@intel.com>
-Subject: Re: [PATCH v3 1/3] kbuild: Add __cc-option macro
-Message-ID: <201706181420.ojaPWgL6%fengguang.wu@intel.com>
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:25661 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753258AbdFSCAz (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Sun, 18 Jun 2017 22:00:55 -0400
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="fUYQa+Pmc3FrFX/N"
-Content-Disposition: inline
-In-Reply-To: <20170615173715.40882-2-mka@chromium.org>
+In-Reply-To: <201706181420.ojaPWgL6%fengguang.wu@intel.com>
+References: <20170615173715.40882-2-mka@chromium.org> <201706181420.ojaPWgL6%fengguang.wu@intel.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Mon, 19 Jun 2017 11:00:42 +0900
+Message-ID: <CAK7LNAT2Aiz=k09N6AtE6pNvKh8yx=vaJBu49xzjEmv3JCiEBg@mail.gmail.com>
+Subject: Re: [PATCH v3 1/3] kbuild: Add __cc-option macro
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Matthias Kaehlcke <mka@chromium.org>
-Cc: kbuild-all@01.org, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H . Peter Anvin" <hpa@zytor.com>, "H . J . Lu" <hjl.tools@gmail.com>, David Woodhouse <dwmw2@infradead.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, x86@kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>, Nick Desaulniers <ndesaulniers@google.com>, Stephen Hines <srhines@google.com>, Kees Cook <keescook@chromium.org>, Arnd Bergmann <arnd@arndb.de>, Bernhard.Rosenkranzer@linaro.org, Peter Foley <pefoley2@pefoley.com>, Behan Webster <behanw@converseincode.com>, Douglas Anderson <dianders@chromium.org>
-
-
---fUYQa+Pmc3FrFX/N
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Cc: kbuild-all@01.org, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H . Peter Anvin" <hpa@zytor.com>, "H . J . Lu" <hjl.tools@gmail.com>, David Woodhouse <dwmw2@infradead.org>, Michal Marek <mmarek@suse.com>, X86 ML <x86@kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>, Nick Desaulniers <ndesaulniers@google.com>, Stephen Hines <srhines@google.com>, Kees Cook <keescook@chromium.org>, Arnd Bergmann <arnd@arndb.de>, =?UTF-8?Q?Bernhard_Rosenkr=C3=A4nzer?= <Bernhard.Rosenkranzer@linaro.org>, Peter Foley <pefoley2@pefoley.com>, Behan Webster <behanw@converseincode.com>, Douglas Anderson <dianders@chromium.org>, kbuild test robot <lkp@intel.com>
 
 Hi Matthias,
 
-[auto build test ERROR on tip/auto-latest]
-[also build test ERROR on v4.12-rc5 next-20170616]
-[if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
 
-url:    https://github.com/0day-ci/linux/commits/Matthias-Kaehlcke/kbuild-Add-__cc-option-macro/20170616-082252
-config: sh-sh7710voipgw_defconfig (attached as .config)
-compiler: sh4-linux-gnu-gcc (Debian 6.1.1-9) 6.1.1 20160705
-reproduce:
-        wget https://raw.githubusercontent.com/01org/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # save the attached .config to linux build tree
-        make.cross ARCH=sh 
+Sorry, the code I suggested introduced a slight behavior change.
 
-All errors (new ones prefixed by >>):
+With this patch, cc-option adds a space before the returned option.
 
-   {standard input}: Assembler messages:
->> {standard input}:672: Error: invalid operands for opcode
-   {standard input}:673: Error: opcode not valid for this cpu variant
-   {standard input}:674: Error: opcode not valid for this cpu variant
-   {standard input}:675: Error: invalid operands for opcode
-   {standard input}:1900: Error: invalid operands for opcode
-   {standard input}:1901: Error: opcode not valid for this cpu variant
-   {standard input}:1902: Error: opcode not valid for this cpu variant
-   {standard input}:1903: Error: invalid operands for opcode
-   {standard input}:2067: Error: invalid operands for opcode
-   {standard input}:2068: Error: opcode not valid for this cpu variant
-   {standard input}:2069: Error: opcode not valid for this cpu variant
-   {standard input}:2070: Error: invalid operands for opcode
-   {standard input}:2570: Error: invalid operands for opcode
-   {standard input}:2571: Error: opcode not valid for this cpu variant
-   {standard input}:2572: Error: opcode not valid for this cpu variant
-   {standard input}:2573: Error: invalid operands for opcode
 
----
-0-DAY kernel test infrastructure                Open Source Technology Center
-https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
+Please see line 46 of arch/sh/Makefile.
 
---fUYQa+Pmc3FrFX/N
-Content-Type: application/gzip
-Content-Disposition: attachment; filename=".config.gz"
-Content-Transfer-Encoding: base64
+ifeq ($(cflags-y),)
 
-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
-It5SW0cn9P+/b/oBou6aAAA=
 
---fUYQa+Pmc3FrFX/N--
+Now cflags-y contains a space, so
+this conditional is now evaluated as false,
+which was actually true without the patch.
+This is the cause of the build error.
+
+
+Could you remove whitespaces before $(1) and $(2) in cc-option?
+
+Also, please fix hostcc-option as well.
+
+Thanks!
+
+
+
+
+
+
+2017-06-18 15:58 GMT+09:00 kbuild test robot <lkp@intel.com>:
+> Hi Matthias,
+>
+> [auto build test ERROR on tip/auto-latest]
+> [also build test ERROR on v4.12-rc5 next-20170616]
+> [if your patch is applied to the wrong git tree, please drop us a note to help improve the system]
+>
+> url:    https://github.com/0day-ci/linux/commits/Matthias-Kaehlcke/kbuild-Add-__cc-option-macro/20170616-082252
+> config: sh-sh7710voipgw_defconfig (attached as .config)
+> compiler: sh4-linux-gnu-gcc (Debian 6.1.1-9) 6.1.1 20160705
+> reproduce:
+>         wget https://raw.githubusercontent.com/01org/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+>         chmod +x ~/bin/make.cross
+>         # save the attached .config to linux build tree
+>         make.cross ARCH=sh
+>
+> All errors (new ones prefixed by >>):
+>
+>    {standard input}: Assembler messages:
+>>> {standard input}:672: Error: invalid operands for opcode
+>    {standard input}:673: Error: opcode not valid for this cpu variant
+>    {standard input}:674: Error: opcode not valid for this cpu variant
+>    {standard input}:675: Error: invalid operands for opcode
+>    {standard input}:1900: Error: invalid operands for opcode
+>    {standard input}:1901: Error: opcode not valid for this cpu variant
+>    {standard input}:1902: Error: opcode not valid for this cpu variant
+>    {standard input}:1903: Error: invalid operands for opcode
+>    {standard input}:2067: Error: invalid operands for opcode
+>    {standard input}:2068: Error: opcode not valid for this cpu variant
+>    {standard input}:2069: Error: opcode not valid for this cpu variant
+>    {standard input}:2070: Error: invalid operands for opcode
+>    {standard input}:2570: Error: invalid operands for opcode
+>    {standard input}:2571: Error: opcode not valid for this cpu variant
+>    {standard input}:2572: Error: opcode not valid for this cpu variant
+>    {standard input}:2573: Error: invalid operands for opcode
+>
+> ---
+> 0-DAY kernel test infrastructure                Open Source Technology Center
+> https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
