@@ -1,109 +1,92 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-12.nifty.com ([210.131.2.79]:21522 "EHLO
-        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751166AbdFSHbA (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:40058 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753348AbdFSIOh (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 19 Jun 2017 03:31:00 -0400
+        Mon, 19 Jun 2017 04:14:37 -0400
+MIME-Version: 1.0
+In-Reply-To: <20170619165100.3ce26d00@roar.ozlabs.ibm.com>
+References: <20170609052417.561-1-npiggin@gmail.com> <20170609052417.561-2-npiggin@gmail.com>
+ <CAK7LNASxuE-6eMk+Y-vyrMfibtYoD2JkjNS2z8QF85x9NdiiaA@mail.gmail.com> <20170619165100.3ce26d00@roar.ozlabs.ibm.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] kbuild: deprecate cc-option-align
-Date: Mon, 19 Jun 2017 16:28:22 +0900
-Message-Id: <1497857303-15936-1-git-send-email-yamada.masahiro@socionext.com>
+Date: Mon, 19 Jun 2017 17:14:22 +0900
+Message-ID: <CAK7LNARuuQzGkYBdzoy3bVpBuNPZEMGerHSEdmrH+PqK0Gbyzg@mail.gmail.com>
+Subject: Re: [PATCH 1/5] kbuild: thin archives final link close
+ --whole-archives option
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Matthias Kaehlcke <mka@chromium.org>, Marcin Nowakowski <marcin.nowakowski@imgtec.com>, Arnd Bergmann <arnd@arndb.de>, Mark Charlebois <charlebm@gmail.com>, Kees Cook <keescook@chromium.org>, Michal Marek <mmarek@suse.com>, linux-kernel@vger.kernel.org, x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, Jonathan Corbet <corbet@lwn.net>, Thomas Gleixner <tglx@linutronix.de>, linux-doc@vger.kernel.org, Josh Poimboeuf <jpoimboe@redhat.com>, Ingo Molnar <mingo@redhat.com>, Emese Revfy <re.emese@gmail.com>
+To: Nicholas Piggin <npiggin@gmail.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-arch <linux-arch@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Linus Torvalds <torvalds@linux-foundation.org>, Stephen Rothwell <sfr@canb.auug.org.au>
 
-Documentation/kbuild/makefiles.txt says the change for align options
-occurred at GCC 3.0, and Documentation/process/changes.rst says the
-minimal supported GCC version is 3.2, so it should be safe to hard-code
--falign* options.
-
-Fix the only user arch/x86/Makefile_32.cpu and deprecate the
-cc-option-align.
-
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
-
-x86 maintainers,
-
-If this patch looks OK, could you give me Acked-by?
+Hi Nicholas,
 
 
- Documentation/kbuild/makefiles.txt | 16 ----------------
- arch/x86/Makefile_32.cpu           |  7 +++----
- scripts/Kbuild.include             |  5 -----
- 3 files changed, 3 insertions(+), 25 deletions(-)
+2017-06-19 15:51 GMT+09:00 Nicholas Piggin <npiggin@gmail.com>:
+> On Mon, 19 Jun 2017 15:16:17 +0900
+> Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
+>
+>> Hi Nicholas,
+>>
+>>
+>> 2017-06-09 14:24 GMT+09:00 Nicholas Piggin <npiggin@gmail.com>:
+>> > Close the --whole-archives option with --no-whole-archive. Some
+>> > architectures end up including additional .o and files multiple
+>> > times after this, and they get duplicate symbols when they are
+>> > brought under the --whole-archives option.
+>>
+>> Which architectures have additional files after --no-whole-archive ?
+>>
+>> I see this case only for ARCH = "um" in vmlinux_link()
+>> where it adds some -l* options after --no-whole-archive.
+>>
+>> I think it is good to close the --whole-archives everywhere.
+>> So, the code looks OK to me, but I just wondered about the log.
+>
+> Actually a number of archs seemed to get build errors without this,
+> and they seem to come from libgcc perhaps.
+>
+> binfmt_elf.c:(.text+0x4851): undefined reference to `__kernel_syscall_via_epc'
+> /c/gcc/libgcc/libgcc2.c:1318: multiple definition of `__ucmpdi2'
+> /c/gcc/libgcc/libgcc2.c:405: multiple definition of `__lshrdi3'
+> /c/gcc/libgcc/libgcc2.c:433: multiple definition of `__ashldi3'
+> /c/gcc/libgcc/libgcc2.c:461: multiple definition of `__ashrdi3'
+>
+> /home/tony/buildall/src/gcc/libgcc/config/xtensa/lib2funcs.S:36: multiple definition of `__xtensa_libgcc_window_spill'
+>
+> etc
 
-diff --git a/Documentation/kbuild/makefiles.txt b/Documentation/kbuild/makefiles.txt
-index 1c49e87cea4f..247fb331c4b2 100644
---- a/Documentation/kbuild/makefiles.txt
-+++ b/Documentation/kbuild/makefiles.txt
-@@ -486,22 +486,6 @@ more details, with real examples.
- 	respectively.
- 	Note: cc-option-yn uses KBUILD_CFLAGS for $(CC) options
- 
--    cc-option-align
--	gcc versions >= 3.0 changed the type of options used to specify
--	alignment of functions, loops etc. $(cc-option-align), when used
--	as prefix to the align options, will select the right prefix:
--	gcc < 3.00
--		cc-option-align = -malign
--	gcc >= 3.00
--		cc-option-align = -falign
--
--	Example:
--		KBUILD_CFLAGS += $(cc-option-align)-functions=4
--
--	In the above example, the option -falign-functions=4 is used for
--	gcc >= 3.00. For gcc < 3.00, -malign-functions=4 is used.
--	Note: cc-option-align uses KBUILD_CFLAGS for $(CC) options
--
-     cc-disable-warning
- 	cc-disable-warning checks if gcc supports a given warning and returns
- 	the commandline switch to disable it. This special function is needed,
-diff --git a/arch/x86/Makefile_32.cpu b/arch/x86/Makefile_32.cpu
-index a45eb15b7cf2..f3717d36718a 100644
---- a/arch/x86/Makefile_32.cpu
-+++ b/arch/x86/Makefile_32.cpu
-@@ -9,7 +9,6 @@ else
- tune		= $(call cc-option,-mcpu=$(1),$(2))
- endif
- 
--align := $(cc-option-align)
- cflags-$(CONFIG_M486)		+= -march=i486
- cflags-$(CONFIG_M586)		+= -march=i586
- cflags-$(CONFIG_M586TSC)	+= -march=i586
-@@ -24,11 +23,11 @@ cflags-$(CONFIG_MK6)		+= -march=k6
- # They make zero difference whatsosever to performance at this time.
- cflags-$(CONFIG_MK7)		+= -march=athlon
- cflags-$(CONFIG_MK8)		+= $(call cc-option,-march=k8,-march=athlon)
--cflags-$(CONFIG_MCRUSOE)	+= -march=i686 $(align)-functions=0 $(align)-jumps=0 $(align)-loops=0
--cflags-$(CONFIG_MEFFICEON)	+= -march=i686 $(call tune,pentium3) $(align)-functions=0 $(align)-jumps=0 $(align)-loops=0
-+cflags-$(CONFIG_MCRUSOE)	+= -march=i686 -falign-functions=0 -falign-jumps=0 -falign-loops=0
-+cflags-$(CONFIG_MEFFICEON)	+= -march=i686 $(call tune,pentium3) -falign-functions=0 -falign-jumps=0 -falign-loops=0
- cflags-$(CONFIG_MWINCHIPC6)	+= $(call cc-option,-march=winchip-c6,-march=i586)
- cflags-$(CONFIG_MWINCHIP3D)	+= $(call cc-option,-march=winchip2,-march=i586)
--cflags-$(CONFIG_MCYRIXIII)	+= $(call cc-option,-march=c3,-march=i486) $(align)-functions=0 $(align)-jumps=0 $(align)-loops=0
-+cflags-$(CONFIG_MCYRIXIII)	+= $(call cc-option,-march=c3,-march=i486) -falign-functions=0 -falign-jumps=0 -falign-loops=0
- cflags-$(CONFIG_MVIAC3_2)	+= $(call cc-option,-march=c3-2,-march=i686)
- cflags-$(CONFIG_MVIAC7)		+= -march=i686
- cflags-$(CONFIG_MCORE2)		+= -march=i686 $(call tune,core2)
-diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index 5001bf9b6579..9a7697d17fb5 100644
---- a/scripts/Kbuild.include
-+++ b/scripts/Kbuild.include
-@@ -133,11 +133,6 @@ hostcc-option = $(call __cc-option, $(HOSTCC),\
- cc-option-yn = $(call try-run,\
- 	$(CC) -Werror $(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS) $(1) -c -x c /dev/null -o "$$TMP",y,n)
- 
--# cc-option-align
--# Prefix align with either -falign or -malign
--cc-option-align = $(subst -functions=0,,\
--	$(call cc-option,-falign-functions=0,-malign-functions=0))
--
- # cc-disable-warning
- # Usage: cflags-y += $(call cc-disable-warning,unused-but-set-variable)
- cc-disable-warning = $(call try-run,\
+
+Oops, I did not test such architectures.
+
+
+> m32r, parisc, xtensa seemed to be getting such errors. I wonder if
+> the linker implicitly adds some runtime libs at the end that get
+> caught up here. Either way I didn't look too far into it because this
+> fix seems obviously correct and solved the problem.
+>
+> Thanks,
+
+
+Which toolchains do you use?
+
+I downloaded xtensa-linux- from this site:
+https://www.kernel.org/pub/tools/crosstool/files/bin/x86_64/4.9.0/
+
+
+I see a different error for xtensa.
+
+
+I applied all of you 5 patches, but xtensa build still fails.
+
+  LD      vmlinux.o
+xtensa-linux-ld: internal error
+/home/tony/buildall/src/binutils/ld/ldlang.c 6178
+
+
+Could you check it?
+
+
 -- 
-2.7.4
-
+Best Regards
+Masahiro Yamada
