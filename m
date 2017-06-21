@@ -1,35 +1,95 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.fireflyinternet.com ([109.228.58.192]:62131 "EHLO
-        fireflyinternet.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1751093AbdFUJQS (ORCPT
+Received: from mail-pg0-f66.google.com ([74.125.83.66]:33837 "EHLO
+        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751620AbdFUJQW (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 21 Jun 2017 05:16:18 -0400
-Content-Type: text/plain; charset="utf-8"
+        Wed, 21 Jun 2017 05:16:22 -0400
+Date: Wed, 21 Jun 2017 19:16:07 +1000
+From: Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH 1/5] kbuild: thin archives final link close
+ --whole-archives option
+Message-ID: <20170621191607.33c8db74@roar.ozlabs.ibm.com>
+In-Reply-To: <CAK8P3a34gWKqPCFDAnWki4H-eyj50Xgar+YFT_+2Og-qJb_i8A@mail.gmail.com>
+References: <20170609052417.561-1-npiggin@gmail.com>
+        <20170609052417.561-2-npiggin@gmail.com>
+        <CAK7LNASxuE-6eMk+Y-vyrMfibtYoD2JkjNS2z8QF85x9NdiiaA@mail.gmail.com>
+        <20170619165100.3ce26d00@roar.ozlabs.ibm.com>
+        <CAK7LNARuuQzGkYBdzoy3bVpBuNPZEMGerHSEdmrH+PqK0Gbyzg@mail.gmail.com>
+        <20170619182714.2cb60e17@roar.ozlabs.ibm.com>
+        <CAK7LNATznx=5A1KnhkFHpjencsJj7AGUsHtDUu6M-Qkw=jvpPQ@mail.gmail.com>
+        <20170620015205.329519b2@roar.ozlabs.ibm.com>
+        <CAK7LNAS6zucv54-XwqfTbm=y20eFVQYLwgsVCdtS7mYknsYK+Q@mail.gmail.com>
+        <20170621124708.6bce7692@roar.ozlabs.ibm.com>
+        <CAK7LNATPyoVcsDtFjRhdmFh7v_HE9F=2GVX=z+XVWV2fXsEukA@mail.gmail.com>
+        <20170621140445.4d6fd92a@roar.ozlabs.ibm.com>
+        <CAK8P3a34gWKqPCFDAnWki4H-eyj50Xgar+YFT_+2Og-qJb_i8A@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8BIT
-From: Chris Wilson <chris@chris-wilson.co.uk>
-In-Reply-To: <20170621091341.spvazz22dodqwfzv@phenom.ffwll.local>
-References: <20170621063420.24913-1-npiggin@gmail.com>
- <20170621091341.spvazz22dodqwfzv@phenom.ffwll.local>
-Message-ID: <149803655698.29716.6121575885807792619@mail.alporthouse.com>
-Subject: Re: [PATCH] drm/i915: select CRC32
-Date: Wed, 21 Jun 2017 10:15:56 +0100
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Daniel Vetter <daniel@ffwll.ch>, Nicholas Piggin <npiggin@gmail.com>
-Cc: linux-kbuild@vger.kernel.org, intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Daniel Vetter <daniel.vetter@intel.com>
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-arch <linux-arch@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Linus Torvalds <torvalds@linux-foundation.org>, Stephen Rothwell <sfr@canb.auug.org.au>, kbuild test robot <fengguang.wu@intel.com>, Josh Triplett <josh@joshtriplett.org>, Nicolas Pitre <nicolas.pitre@linaro.org>
 
-Quoting Daniel Vetter (2017-06-21 10:13:41)
-> On Wed, Jun 21, 2017 at 04:34:20PM +1000, Nicholas Piggin wrote:
-> > kbuild test robot found a build failure when building with thin
-> > archives:
-> > 
-> > http://marc.info/?l=linux-kbuild&m=149802285009737&w=2
-> > 
-> > Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+On Wed, 21 Jun 2017 09:15:09 +0200
+Arnd Bergmann <arnd@arndb.de> wrote:
+
+> On Wed, Jun 21, 2017 at 6:04 AM, Nicholas Piggin <npiggin@gmail.com> wrote:
+> > On Wed, 21 Jun 2017 12:29:33 +0900
+> > Masahiro Yamada <yamada.masahiro@socionext.com> wrote:  
 > 
-> Pushed to drm-intel for 4.14, thanks.
+> >> BTW, I saw abuse of lib.a in
+> >> https://patchwork.kernel.org/patch/9768439/
+> >>
+> >> I see it in linux-next.
+> >>
+> >> commit 06e226c7fb233f676b01b144d0b321ebe510fdcd
+> >> Author: Stephen Boyd <sboyd@codeaurora.org>
+> >> Date:   Fri Jun 2 15:30:06 2017 -0700
+> >>
+> >>     clk: sunxi-ng: Move all clock types to a library
+> >>
+> >>
+> >>
+> >>
+> >> Now drivers/clk/sunxi-ng/lib.a
+> >> will go into thin archives.
+> >> The result might be different from what they expect...  
+> >
+> > Yes I see. With thin archives, that is just going to cause the
+> > same behaviour as built-in.o (everything will be linked). So the
+> > build should not break, but they won't get savings.
+> >
+> > Does it even save space with incremental linking? If the lib.a gets
+> > linked into drivers/built-in.o, I wonder what happens then?  
+> 
+> Ah, too bad. I thought we had found a way to use a library correctly
+> here, but I just verified that indeed all the just gets linked into built-in.o
+> 
+> I played around with it some more now, but without success: if I
+> build sunxi-ng as a loadable module (using a few modifications),
+> then the unneeded objects from lib.a are dropped as I had hoped,
+> but for built-in code we now always include everything.
+> 
+> I suppose that we can ignore this once we get
+> LD_DEAD_CODE_DATA_ELIMINATION enabled on ARM, but
+> until then, we have a code size regression.
 
-Probably deserves to be in fixes if we identify what introduced the CRC
-dep. mst-dp? pipe crc?
--Chris
+I didn't follow the thread there, is it a regression caused by
+thin archives, or just by removing the Kconfig symbol from each
+file?
+
+> Any other ideas for
+> how this could be solved? We used to have a Kconfig symbol
+> for each file, but those would frequently get out of sync.
+
+Not really sure. Possibly the way to do it would be to plumb
+lib-y through drivers/ as well (like obj-y is) so they can be
+linked on their own for the final vmlinux link.
+
+But that may be quite a bit of churn, so it may be better to
+hold such changes until we see how LD_DEAD_CODE_DATA_ELIMINATION
+works out.
+
+Thanks,
+Nick
