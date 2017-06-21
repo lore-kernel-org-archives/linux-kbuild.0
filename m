@@ -1,58 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf0-f194.google.com ([209.85.192.194]:34387 "EHLO
-        mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752339AbdFUH44 (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:43749 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751056AbdFUJMA (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 21 Jun 2017 03:56:56 -0400
-Received: by mail-pf0-f194.google.com with SMTP id d5so28344422pfe.1
-        for <linux-kbuild@vger.kernel.org>; Wed, 21 Jun 2017 00:56:56 -0700 (PDT)
-From: Nicholas Piggin <npiggin@gmail.com>
-Subject: [PATCH 2/2] tile: thin archives fix linking
-Date: Wed, 21 Jun 2017 17:56:38 +1000
-Message-Id: <20170621075638.19251-3-npiggin@gmail.com>
-In-Reply-To: <20170621075638.19251-1-npiggin@gmail.com>
-References: <20170621075638.19251-1-npiggin@gmail.com>
+        Wed, 21 Jun 2017 05:12:00 -0400
+MIME-Version: 1.0
+In-Reply-To: <CAK8P3a3D6oW4vaUD9JSGXFqqydrm5-Z0x9qOwzfn_WQryXezsA@mail.gmail.com>
+References: <20170421213931.155210-1-mka@chromium.org> <20170421213931.155210-3-mka@chromium.org>
+ <CAD=FV=XENNp3rcD5OK1d2WmccbqaT9=bjsayvbnA2Th8zmOAwg@mail.gmail.com>
+ <CAK8P3a1y0MoxhMNr2v=R7-CANaATfFy58FM8heyOP78g-JZwHA@mail.gmail.com>
+ <20170517184529.GG141096@google.com> <20170524000419.GQ141096@google.com> <CAK8P3a3D6oW4vaUD9JSGXFqqydrm5-Z0x9qOwzfn_WQryXezsA@mail.gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Wed, 21 Jun 2017 18:11:51 +0900
+Message-ID: <CAK7LNASXC1T_OkXD-T5XSKAHSNWrxAQCHPfk4dgnyq7MJBCSnQ@mail.gmail.com>
+Subject: Re: [PATCH 2/2] kbuild: clang: Disable the 'duplicate-decl-specifier' warning
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Nicholas Piggin <npiggin@gmail.com>, linux-kbuild@vger.kernel.org, Chris Metcalf <cmetcalf@mellanox.com>
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Matthias Kaehlcke <mka@chromium.org>, Doug Anderson <dianders@chromium.org>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Grant Grundler <grundler@chromium.org>, Greg Hackmann <ghackmann@google.com>, Michael Davidson <md@google.com>, Nick Desaulniers <ndesaulniers@google.com>
 
-The VDSO symbols can't be linked into built-in.o when building with
-thin archives, so change this to linking them into the final link.
+Hi.
 
-Cc: Chris Metcalf <cmetcalf@mellanox.com>
-Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
----
- arch/tile/Makefile             | 2 ++
- arch/tile/kernel/vdso/Makefile | 2 --
- 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/tile/Makefile b/arch/tile/Makefile
-index 4dc380a519d4..eb43ffb999b6 100644
---- a/arch/tile/Makefile
-+++ b/arch/tile/Makefile
-@@ -30,6 +30,8 @@ endif
- # In kernel modules, this causes load failures due to unsupported relocations.
- KBUILD_CFLAGS   += -fno-asynchronous-unwind-tables
- 
-+LDFLAGS_vmlinux	+= -R arch/tile/kernel/vdso/vdso-syms.o
-+
- LIBGCC_PATH     := \
-   $(shell $(CC) $(KBUILD_CFLAGS) $(KCFLAGS) -print-libgcc-file-name)
- 
-diff --git a/arch/tile/kernel/vdso/Makefile b/arch/tile/kernel/vdso/Makefile
-index c54fff37b5ff..84daaf2c5e2c 100644
---- a/arch/tile/kernel/vdso/Makefile
-+++ b/arch/tile/kernel/vdso/Makefile
-@@ -50,8 +50,6 @@ $(obj)/vdso.so.dbg: $(src)/vdso.lds $(obj-vdso)
- # table and layout of the linked DSO.  With ld -R we can then refer to
- # these symbols in the kernel code rather than hand-coded addresses.
- extra-y += vdso-syms.o
--$(obj)/built-in.o: $(obj)/vdso-syms.o
--$(obj)/built-in.o: ld_flags += -R $(obj)/vdso-syms.o
- 
- SYSCFLAGS_vdso.so.dbg = -shared -s -Wl,-soname=linux-vdso.so.1 \
-                             $(call cc-ldoption, -Wl$(comma)--hash-style=both)
+2017-05-24 17:21 GMT+09:00 Arnd Bergmann <arnd@arndb.de>:
+> On Wed, May 24, 2017 at 2:04 AM, Matthias Kaehlcke <mka@chromium.org> wrote:
+>> El Wed, May 17, 2017 at 11:45:29AM -0700 Matthias Kaehlcke ha dit:
+>>> El Wed, May 17, 2017 at 09:35:57AM +0200 Arnd Bergmann ha dit:
+>>> > On Tue, May 16, 2017 at 11:41 PM, Doug Anderson <dianders@chromium.org> wrote:
+>> It seems the duplicate-decl-specifier warning targets specifically C89:
+>>
+>> "The same type qualifier shall not appear more than once in the same
+>> specifier list or qualifier list, either directly or via one or more
+>> typedefs."
+>>
+>> C89 (6.5.3)
+>>
+>> gcc also raises a warning when '-pedantic' is specified and
+>> -std=gnu89/c89 (or unspecified), but not with -std=gnu99/c99.
+>>
+>> This bug might help to shed more light on this:
+>> https://bugs.llvm.org/show_bug.cgi?id=32985
+>
+> I also notice that neither compiler differentiates between a)
+>
+> typedef const int cint;
+> const cint i;
+>
+> and b)
+> const int i;
+> const typeof(a) j;
+>
+> I would have expected a warning for a) but not b), but both 'clang --std=gnu89'
+> and 'gcc --pedantic --std=gnu89' warn about both of b as well, and don't warn
+> for newer standards.
+>
+>        Arnd
+
+
+
+
+I think we agreed to apply 1/2.
+
+How about 2/2?
+
+I think we mostly discussed preferable behavior of -Wduplicate-decl-specifier,
+but we did not come up with an idea to solve the problem for
+already shipped clang versions.
+(BTW, we have not defined the minimal supported version of clang yet.)
+
+
 -- 
-2.11.0
-
+Best Regards
+Masahiro Yamada
