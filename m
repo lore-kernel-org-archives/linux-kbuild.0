@@ -1,110 +1,100 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.codeaurora.org ([198.145.29.96]:43158 "EHLO
-        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752828AbdFUQYk (ORCPT
+Received: from mail-pg0-f51.google.com ([74.125.83.51]:33835 "EHLO
+        mail-pg0-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753248AbdFUQ6k (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 21 Jun 2017 12:24:40 -0400
-Date: Wed, 21 Jun 2017 09:19:13 -0700
-From: Stephen Boyd <sboyd@codeaurora.org>
-Subject: Re: [PATCH 1/5] kbuild: thin archives final link close
- --whole-archives option
-Message-ID: <20170621161913.GY4493@codeaurora.org>
-References: <20170621140445.4d6fd92a@roar.ozlabs.ibm.com>
- <CAK8P3a34gWKqPCFDAnWki4H-eyj50Xgar+YFT_+2Og-qJb_i8A@mail.gmail.com>
- <20170621191607.33c8db74@roar.ozlabs.ibm.com>
- <CAK8P3a0NT42HKOU+ZDRg_-1hA+RzYnL0RtzqbMsLbY=yTUxGRA@mail.gmail.com>
- <20170621203824.719ffdc5@roar.ozlabs.ibm.com>
- <CAK8P3a1o91guXimc99sY3UOUjKTX5QxhQyOfY+j-x7MMCdRbdw@mail.gmail.com>
- <20170621211002.44525d9b@roar.ozlabs.ibm.com>
- <CAK8P3a2A9fMrNZPWJft2t+52kmGkGgm3gv_fxJntjevWtJ69Zw@mail.gmail.com>
- <20170621220213.2b33d56d@roar.ozlabs.ibm.com>
- <CAK8P3a0nVPz=eLV8ET6BYR2Qs0H3PQZuhYsu4Cb_kJSPACrR9w@mail.gmail.com>
+        Wed, 21 Jun 2017 12:58:40 -0400
+Received: by mail-pg0-f51.google.com with SMTP id e187so27095969pgc.1
+        for <linux-kbuild@vger.kernel.org>; Wed, 21 Jun 2017 09:58:35 -0700 (PDT)
+Date: Wed, 21 Jun 2017 09:58:32 -0700
+From: Matthias Kaehlcke <mka@chromium.org>
+Subject: Re: [PATCH 2/2] kbuild: clang: Disable the
+ 'duplicate-decl-specifier' warning
+Message-ID: <20170621165832.GB52338@google.com>
+References: <20170421213931.155210-1-mka@chromium.org>
+ <20170421213931.155210-3-mka@chromium.org>
+ <CAD=FV=XENNp3rcD5OK1d2WmccbqaT9=bjsayvbnA2Th8zmOAwg@mail.gmail.com>
+ <CAK8P3a1y0MoxhMNr2v=R7-CANaATfFy58FM8heyOP78g-JZwHA@mail.gmail.com>
+ <20170517184529.GG141096@google.com>
+ <20170524000419.GQ141096@google.com>
+ <CAK8P3a3D6oW4vaUD9JSGXFqqydrm5-Z0x9qOwzfn_WQryXezsA@mail.gmail.com>
+ <CAK7LNASXC1T_OkXD-T5XSKAHSNWrxAQCHPfk4dgnyq7MJBCSnQ@mail.gmail.com>
+ <CAK8P3a1QOz6qQdQux4mFXfwadhosHUgw0Ypwmz5tjZOWcV+0qQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CAK8P3a0nVPz=eLV8ET6BYR2Qs0H3PQZuhYsu4Cb_kJSPACrR9w@mail.gmail.com>
+In-Reply-To: <CAK8P3a1QOz6qQdQux4mFXfwadhosHUgw0Ypwmz5tjZOWcV+0qQ@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Arnd Bergmann <arnd@arndb.de>
-Cc: Nicholas Piggin <npiggin@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-arch <linux-arch@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Linus Torvalds <torvalds@linux-foundation.org>, Stephen Rothwell <sfr@canb.auug.org.au>, kbuild test robot <fengguang.wu@intel.com>, Josh Triplett <josh@joshtriplett.org>, Nicolas Pitre <nicolas.pitre@linaro.org>, Maxime Ripard <maxime.ripard@free-electrons.com>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Doug Anderson <dianders@chromium.org>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Grant Grundler <grundler@chromium.org>, Greg Hackmann <ghackmann@google.com>, Michael Davidson <md@google.com>, Nick Desaulniers <ndesaulniers@google.com>, Alexander Potapenko <glider@google.com>, Bernhard =?utf-8?Q?Rosenkr=C3=A4nzer?= <bero@linaro.org>
 
-On 06/21, Arnd Bergmann wrote:
-> On Wed, Jun 21, 2017 at 2:02 PM, Nicholas Piggin <npiggin@gmail.com> wrote:
-> > On Wed, 21 Jun 2017 13:32:17 +0200
-> > Arnd Bergmann <arnd@arndb.de> wrote:
-> >
-> >> On Wed, Jun 21, 2017 at 1:10 PM, Nicholas Piggin <npiggin@gmail.com> wrote:
-> >> > On Wed, 21 Jun 2017 12:49:10 +0200
-> >> > Arnd Bergmann <arnd@arndb.de> wrote:
-> >> >
-> >> >> On Wed, Jun 21, 2017 at 12:38 PM, Nicholas Piggin <npiggin@gmail.com> wrote:
-> >> >> > On Wed, 21 Jun 2017 12:21:16 +0200
-> >> >> > Arnd Bergmann <arnd@arndb.de> wrote:
-> >> >> >
-> >> >>
-> >> >> I'm building on top of yesterday's linux-next at the moment,
-> >> >> with a number of my own patches applied
-> >> >>
-> >> >> > I can take a look at ARM and try to get it at least to parity with
-> >> >> > incremental link. Any particular config options required?
-> >> >>
-> >> >> This is the patch I am testing with:
-> >> >>
-> >> >> https://pastebin.com/HQuhCEmK
-> >> >> I have not looked at that in a while, no idea if it works, or
-> >> >> if it has known problems.
-> >> >>
-> >> >> I last posted the patch in March for discussion:
-> >> >>
-> >> >> https://patchwork.kernel.org/patch/9626207/
-> >> >
-> >> > Well I just mean the stuff now in kbuild/thin-ac, not the LD_DCDE.
-> >> > Just want to try getting thin archives up to a point where there are
-> >> > no serious regressions first.
+El Wed, Jun 21, 2017 at 12:11:55PM +0200 Arnd Bergmann ha dit:
+
+> On Wed, Jun 21, 2017 at 11:11 AM, Masahiro Yamada
+> <yamada.masahiro@socionext.com> wrote:
+> > 2017-05-24 17:21 GMT+09:00 Arnd Bergmann <arnd@arndb.de>:
+> >> On Wed, May 24, 2017 at 2:04 AM, Matthias Kaehlcke <mka@chromium.org> wrote:
+> >>> El Wed, May 17, 2017 at 11:45:29AM -0700 Matthias Kaehlcke ha dit:
+> >>>> El Wed, May 17, 2017 at 09:35:57AM +0200 Arnd Bergmann ha dit:
+> >>>> > On Tue, May 16, 2017 at 11:41 PM, Doug Anderson <dianders@chromium.org> wrote:
+> >>> It seems the duplicate-decl-specifier warning targets specifically C89:
+> >>>
+> >>> "The same type qualifier shall not appear more than once in the same
+> >>> specifier list or qualifier list, either directly or via one or more
+> >>> typedefs."
+> >>>
+> >>> C89 (6.5.3)
+> >>>
+> >>> gcc also raises a warning when '-pedantic' is specified and
+> >>> -std=gnu89/c89 (or unspecified), but not with -std=gnu99/c99.
+> >>>
+> >>> This bug might help to shed more light on this:
+> >>> https://bugs.llvm.org/show_bug.cgi?id=32985
 > >>
-> >> For my build testing, I have now reverted most of my patch and only
-> >> left the 'select THIN_ARCHIVES'. I'll let you know if I run into problems.
+> >> I also notice that neither compiler differentiates between a)
+> >>
+> >> typedef const int cint;
+> >> const cint i;
+> >>
+> >> and b)
+> >> const int i;
+> >> const typeof(a) j;
+> >>
+> >> I would have expected a warning for a) but not b), but both 'clang --std=gnu89'
+> >> and 'gcc --pedantic --std=gnu89' warn about both of b as well, and don't warn
+> >> for newer standards.
+> >>
+> >>        Arnd
 > >
-> > Okay. Currently with the patches in the kbuild tree, thin archives
-> > actually does better than incremental linking for ARM (defconfig).
 > >
-> > 11651574        6090952  418616 18161142        1151df6 vmlinux.thinarc
-> > 11656118        6095208  418952 18170278        11541a6 vmlinux.inc
 > >
-> > In mainline, thin archives is sub-optimal for lib-y libraries (just
-> > pulls them all in). But now that I test it, even that is better than
-> > incremental linking for ARM:
 > >
-> > 11653926        6090888  418620 18163434        11526ea vmlinux.thinarc
+> > I think we agreed to apply 1/2.
 > >
-> > I haven't grabbed that "clk: sunxi-ng: Move all clock types to a library"
-> > patch yet to check. What tree is it in? I wonder if I could convince you
-> > to drop that for now and bring it up on linux-kernel/linux-kbuild? I
-> > think it's quite reasonable to reduce Kconfig hell of very fine grained
-> > conditional compilation/linking if we can make the toolchain do it for
-> > us. So we should consider how to support it nicely rather than having
-> > such hacks IMO.
-> 
-> [adding Maxime and Stephen to cc]
-> 
-> Stephen,
-> 
-> The hack has come to bite us after all, with Nick's proposed change to
-> CONFIG_THIN_ARCHIVES for all architectures, the entire lib.a file will
-> end up being linked into each kernel that enables the directory.
-> 
-> I'm out of other ideas for fixing it, so it seems better to revert back to
-> individual Kconfig options. Once we enable
-> CONFIG_LD_DEAD_CODE_DATA_ELIMINATION (which is the
-> next step after CONFIG_THIN_ARCHIVES), we can simply list
-> all files, and the linker will drop all unused functions by itself.
-> 
+> > How about 2/2?
+> >
+> > I think we mostly discussed preferable behavior of -Wduplicate-decl-specifier,
+> > but we did not come up with an idea to solve the problem for
+> > already shipped clang versions.
+> > (BTW, we have not defined the minimal supported version of clang yet.)
 
-Ok. Can you send a revert patch to the list with some information
-on why we can't do the hack anymore and also Cc lkml/kbuild
-lists? The commit is in linux-next now as commit 06e226c7fb23
-(clk: sunxi-ng: Move all clock types to a library, 2017-06-02).
+I think it will have to be a future version. There is still an issue
+affecting at least llist_for_each_entry_safe(), where clang optimizes
+away a check for check for a NULL pointer. For gcc this optimization
+is switched off with -fno-delete-null-pointer-check, clang currently
+does not have this flag or an equivalent.
 
--- 
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum,
-a Linux Foundation Collaborative Project
+For now a workaround like this is needed for newer kernels:
+
+https://android-git.linaro.org/kernel/hikey-clang.git/commit/?h=android-hikey-linaro-4.9-clang&id=4f3c3c1e7b153e333603be74d786d79bb872e8ff
+
+For arm64 at least one other clang fix is missing, to make
+-mgeneral-regs-only consistent with gcc
+(https://bugs.llvm.org/show_bug.cgi?id=30792)
+
+> I see that container_of() has been modified in linux-next and no longer adds
+> the 'const' keyword, do we actually still need the patch?
+
+There is still (at least) the case of const arrays passed to
+MODULE_DEVICE_TABLE.
