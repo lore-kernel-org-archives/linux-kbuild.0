@@ -1,47 +1,75 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg0-f65.google.com ([74.125.83.65]:34597 "EHLO
-        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752689AbdFUJ0t (ORCPT
+Received: from mail-oi0-f54.google.com ([209.85.218.54]:36372 "EHLO
+        mail-oi0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751434AbdFUKL4 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 21 Jun 2017 05:26:49 -0400
-Received: by mail-pg0-f65.google.com with SMTP id j186so26562108pge.1
-        for <linux-kbuild@vger.kernel.org>; Wed, 21 Jun 2017 02:26:48 -0700 (PDT)
-Date: Wed, 21 Jun 2017 19:26:36 +1000
-From: Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH] drm/i915: select CRC32
-Message-ID: <20170621192636.6fdba5cf@roar.ozlabs.ibm.com>
-In-Reply-To: <149803655698.29716.6121575885807792619@mail.alporthouse.com>
-References: <20170621063420.24913-1-npiggin@gmail.com>
-        <20170621091341.spvazz22dodqwfzv@phenom.ffwll.local>
-        <149803655698.29716.6121575885807792619@mail.alporthouse.com>
+        Wed, 21 Jun 2017 06:11:56 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <CAK7LNASXC1T_OkXD-T5XSKAHSNWrxAQCHPfk4dgnyq7MJBCSnQ@mail.gmail.com>
+References: <20170421213931.155210-1-mka@chromium.org> <20170421213931.155210-3-mka@chromium.org>
+ <CAD=FV=XENNp3rcD5OK1d2WmccbqaT9=bjsayvbnA2Th8zmOAwg@mail.gmail.com>
+ <CAK8P3a1y0MoxhMNr2v=R7-CANaATfFy58FM8heyOP78g-JZwHA@mail.gmail.com>
+ <20170517184529.GG141096@google.com> <20170524000419.GQ141096@google.com>
+ <CAK8P3a3D6oW4vaUD9JSGXFqqydrm5-Z0x9qOwzfn_WQryXezsA@mail.gmail.com> <CAK7LNASXC1T_OkXD-T5XSKAHSNWrxAQCHPfk4dgnyq7MJBCSnQ@mail.gmail.com>
+From: Arnd Bergmann <arnd@arndb.de>
+Date: Wed, 21 Jun 2017 12:11:55 +0200
+Message-ID: <CAK8P3a1QOz6qQdQux4mFXfwadhosHUgw0Ypwmz5tjZOWcV+0qQ@mail.gmail.com>
+Subject: Re: [PATCH 2/2] kbuild: clang: Disable the 'duplicate-decl-specifier' warning
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Chris Wilson <chris@chris-wilson.co.uk>
-Cc: Daniel Vetter <daniel@ffwll.ch>, linux-kbuild@vger.kernel.org, intel-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Daniel Vetter <daniel.vetter@intel.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Matthias Kaehlcke <mka@chromium.org>, Doug Anderson <dianders@chromium.org>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Grant Grundler <grundler@chromium.org>, Greg Hackmann <ghackmann@google.com>, Michael Davidson <md@google.com>, Nick Desaulniers <ndesaulniers@google.com>
 
-On Wed, 21 Jun 2017 10:15:56 +0100
-Chris Wilson <chris@chris-wilson.co.uk> wrote:
+On Wed, Jun 21, 2017 at 11:11 AM, Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+> 2017-05-24 17:21 GMT+09:00 Arnd Bergmann <arnd@arndb.de>:
+>> On Wed, May 24, 2017 at 2:04 AM, Matthias Kaehlcke <mka@chromium.org> wrote:
+>>> El Wed, May 17, 2017 at 11:45:29AM -0700 Matthias Kaehlcke ha dit:
+>>>> El Wed, May 17, 2017 at 09:35:57AM +0200 Arnd Bergmann ha dit:
+>>>> > On Tue, May 16, 2017 at 11:41 PM, Doug Anderson <dianders@chromium.org> wrote:
+>>> It seems the duplicate-decl-specifier warning targets specifically C89:
+>>>
+>>> "The same type qualifier shall not appear more than once in the same
+>>> specifier list or qualifier list, either directly or via one or more
+>>> typedefs."
+>>>
+>>> C89 (6.5.3)
+>>>
+>>> gcc also raises a warning when '-pedantic' is specified and
+>>> -std=gnu89/c89 (or unspecified), but not with -std=gnu99/c99.
+>>>
+>>> This bug might help to shed more light on this:
+>>> https://bugs.llvm.org/show_bug.cgi?id=32985
+>>
+>> I also notice that neither compiler differentiates between a)
+>>
+>> typedef const int cint;
+>> const cint i;
+>>
+>> and b)
+>> const int i;
+>> const typeof(a) j;
+>>
+>> I would have expected a warning for a) but not b), but both 'clang --std=gnu89'
+>> and 'gcc --pedantic --std=gnu89' warn about both of b as well, and don't warn
+>> for newer standards.
+>>
+>>        Arnd
+>
+>
+>
+>
+> I think we agreed to apply 1/2.
+>
+> How about 2/2?
+>
+> I think we mostly discussed preferable behavior of -Wduplicate-decl-specifier,
+> but we did not come up with an idea to solve the problem for
+> already shipped clang versions.
+> (BTW, we have not defined the minimal supported version of clang yet.)
 
-> Quoting Daniel Vetter (2017-06-21 10:13:41)
-> > On Wed, Jun 21, 2017 at 04:34:20PM +1000, Nicholas Piggin wrote:  
-> > > kbuild test robot found a build failure when building with thin
-> > > archives:
-> > > 
-> > > http://marc.info/?l=linux-kbuild&m=149802285009737&w=2
-> > > 
-> > > Signed-off-by: Nicholas Piggin <npiggin@gmail.com>  
-> > 
-> > Pushed to drm-intel for 4.14, thanks.  
-> 
-> Probably deserves to be in fixes if we identify what introduced the CRC
-> dep. mst-dp? pipe crc?
+I see that container_of() has been modified in linux-next and no longer adds
+the 'const' keyword, do we actually still need the patch?
 
-Looks like
-
-579cea5f3 ("drm/i915/gvt: golden virtual HW state management")
-
-Thanks,
-Nick
+        Arnd
