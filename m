@@ -1,72 +1,101 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg0-f50.google.com ([74.125.83.50]:35539 "EHLO
-        mail-pg0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750987AbdFTRhY (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:30090 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753096AbdFUBRn (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 20 Jun 2017 13:37:24 -0400
-Received: by mail-pg0-f50.google.com with SMTP id 132so31962755pgb.2
-        for <linux-kbuild@vger.kernel.org>; Tue, 20 Jun 2017 10:37:23 -0700 (PDT)
-Date: Tue, 20 Jun 2017 10:37:21 -0700
-From: Matthias Kaehlcke <mka@chromium.org>
-Subject: Re: [PATCH v4 3/3] x86/build: Specify stack alignment for clang
-Message-ID: <20170620173721.GA52338@google.com>
-References: <20170619183757.124992-1-mka@chromium.org>
- <20170619183757.124992-4-mka@chromium.org>
- <EAA687B2-ECD0-42C7-907E-BE8BDF311EC1@zytor.com>
- <20170619204704.GP141096@google.com>
- <20170620092054.7d2mgzx6cw3jvgji@gmail.com>
+        Tue, 20 Jun 2017 21:17:43 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20170620092054.7d2mgzx6cw3jvgji@gmail.com>
+In-Reply-To: <20170620015205.329519b2@roar.ozlabs.ibm.com>
+References: <20170609052417.561-1-npiggin@gmail.com> <20170609052417.561-2-npiggin@gmail.com>
+ <CAK7LNASxuE-6eMk+Y-vyrMfibtYoD2JkjNS2z8QF85x9NdiiaA@mail.gmail.com>
+ <20170619165100.3ce26d00@roar.ozlabs.ibm.com> <CAK7LNARuuQzGkYBdzoy3bVpBuNPZEMGerHSEdmrH+PqK0Gbyzg@mail.gmail.com>
+ <20170619182714.2cb60e17@roar.ozlabs.ibm.com> <CAK7LNATznx=5A1KnhkFHpjencsJj7AGUsHtDUu6M-Qkw=jvpPQ@mail.gmail.com>
+ <20170620015205.329519b2@roar.ozlabs.ibm.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Wed, 21 Jun 2017 10:17:11 +0900
+Message-ID: <CAK7LNAS6zucv54-XwqfTbm=y20eFVQYLwgsVCdtS7mYknsYK+Q@mail.gmail.com>
+Subject: Re: [PATCH 1/5] kbuild: thin archives final link close
+ --whole-archives option
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ingo Molnar <mingo@kernel.org>
-Cc: hpa@zytor.com, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H . J . Lu" <hjl.tools@gmail.com>, David Woodhouse <dwmw2@infradead.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, x86@kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>, Nick Desaulniers <ndesaulniers@google.com>, Stephen Hines <srhines@google.com>, Kees Cook <keescook@chromium.org>, Arnd Bergmann <arnd@arndb.de>, Bernhard.Rosenkranzer@linaro.org, Peter Foley <pefoley2@pefoley.com>, Behan Webster <behanw@converseincode.com>, Douglas Anderson <dianders@chromium.org>
+To: Nicholas Piggin <npiggin@gmail.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-arch <linux-arch@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Linus Torvalds <torvalds@linux-foundation.org>, Stephen Rothwell <sfr@canb.auug.org.au>, kbuild test robot <fengguang.wu@intel.com>, Josh Triplett <josh@joshtriplett.org>
 
-El Tue, Jun 20, 2017 at 11:20:54AM +0200 Ingo Molnar ha dit:
+Hi Nicholas,
 
-> 
-> * Matthias Kaehlcke <mka@chromium.org> wrote:
-> 
-> > Ingo didn't like the duplication and suggested the use of a variable, which 
-> > kinda implies a check for the compiler name.
-> 
-> I don't think it implies that: why cannot cc_stack_align_opt probe for the 
-> compiler option and use whichever is available, without hard-coding the compiler 
-> name?
+2017-06-20 0:52 GMT+09:00 Nicholas Piggin <npiggin@gmail.com>:
+>>
+>> masahiro@pug:~$ xtensa-linux-ld -v
+>> GNU ld (GNU Binutils) 2.24
+>
+> Ah, thank you. It must have been that the 0day build (cc'ed) did
+> not return any error to be from the ld internal error.
+>
+> This has led me to the true cause of the error which is the way
+> external archives are handled. After implementing the fix, I think
+> the lib.a size regression for thin archives should be solved as
+> well.
 
-We could do this:
 
-ifneq ($(call __cc-option, $(CC), -mno-sse, -mpreferred-stack-boundary=3,),)
-        cc_stack_align_opt := -mpreferred-stack-boundary
-endif
-ifneq ($(call cc-option, -mstack-alignment=3,),)
-        cc_stack_align_opt := -mstack-alignment
-endif
+Thanks for figuring this out!
 
-If preferred cc-option could be used to probe for
--mpreferred-stack-boundary , however it would require REALMODE_CFLAGS
-to be moved further down in the Makefile.
 
-Since this solution also won't win a beauty price please let me know
-if it is acceptable before respinning the patch or if you have other
-suggestions.
+> This patch should be added between patches 2 and 3 of this series.
+>
 
-> > I also think this is a cleaner solution. [...]
-> 
-> I concur with hpa: hard-coding compiler is awfully fragile and ugly as well.
-> 
-> With the proper probing of compiler options it will be possible for compilers to 
-> consolidate their options, and it would be possible for a third compiler to use a 
-> mixture of GCC and Clang options. With hard-coding none of that flexibility is 
-> available.
-> 
-> > but I'm happy to respin the patch if you have another suggestion that is ok for 
-> > both of you.
-> 
-> Please do.
-> 
-> Thanks,
-> 
-> 	Ingo
+Done.
+
+
+I applied all 6 patches to linux-kbuild/thin-ar.
+
+I fixed up some:
+
+[1] fix a typo  "tihs"  -> "this"
+[2] reword the document as "The build system has, as of 4.13, switched
+to using..."
+[3] Add "P" to link_vmlinux.sh as well
+
+
+Could you double-check if I did them correctly?
+
+
+
+
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -952,19 +952,20 @@ core-y            := $(patsubst %/, %/built-in.o, $(core-y))
+>  drivers-y      := $(patsubst %/, %/built-in.o, $(drivers-y))
+>  net-y          := $(patsubst %/, %/built-in.o, $(net-y))
+>  libs-y1                := $(patsubst %/, %/lib.a, $(libs-y))
+> -libs-y2                := $(patsubst %/, %/built-in.o, $(libs-y))
+> +libs-y2                := $(filter-out %.a, $(patsubst %/, %/built-in.o, $(libs-y)))
+>  libs-y         := $(libs-y1) $(libs-y2)
+
+
+After I applied this patch, I noticed one more thing.
+
+With this patch, I think "libs-y" will be unnecessary.
+
+If you ack me to fix-up locally, I will remove:
+   libs-y         := $(libs-y1) $(libs-y2)
+
+
+
+
+> @@ -50,7 +57,7 @@ archive_builtin()
+>         if [ -n "${CONFIG_THIN_ARCHIVES}" ]; then
+>                 info AR built-in.o
+>                 rm -f built-in.o;
+> -               ${AR} rcsT${KBUILD_ARFLAGS} built-in.o                  \
+> +               ${AR} rcsTP${KBUILD_ARFLAGS} built-in.o                 \
+>                                         ${KBUILD_VMLINUX_INIT}          \
+>                                         ${KBUILD_VMLINUX_MAIN}
+>         fi
+
+I moved this hunk to  2/6 "thin archives use P option to ar".
+
+
+-- 
+Best Regards
+Masahiro Yamada
