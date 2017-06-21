@@ -1,75 +1,82 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi0-f54.google.com ([209.85.218.54]:36372 "EHLO
-        mail-oi0-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751434AbdFUKL4 (ORCPT
+Received: from mail-ot0-f196.google.com ([74.125.82.196]:36187 "EHLO
+        mail-ot0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751434AbdFUKVS (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 21 Jun 2017 06:11:56 -0400
+        Wed, 21 Jun 2017 06:21:18 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNASXC1T_OkXD-T5XSKAHSNWrxAQCHPfk4dgnyq7MJBCSnQ@mail.gmail.com>
-References: <20170421213931.155210-1-mka@chromium.org> <20170421213931.155210-3-mka@chromium.org>
- <CAD=FV=XENNp3rcD5OK1d2WmccbqaT9=bjsayvbnA2Th8zmOAwg@mail.gmail.com>
- <CAK8P3a1y0MoxhMNr2v=R7-CANaATfFy58FM8heyOP78g-JZwHA@mail.gmail.com>
- <20170517184529.GG141096@google.com> <20170524000419.GQ141096@google.com>
- <CAK8P3a3D6oW4vaUD9JSGXFqqydrm5-Z0x9qOwzfn_WQryXezsA@mail.gmail.com> <CAK7LNASXC1T_OkXD-T5XSKAHSNWrxAQCHPfk4dgnyq7MJBCSnQ@mail.gmail.com>
+In-Reply-To: <20170621191607.33c8db74@roar.ozlabs.ibm.com>
+References: <20170609052417.561-1-npiggin@gmail.com> <20170609052417.561-2-npiggin@gmail.com>
+ <CAK7LNASxuE-6eMk+Y-vyrMfibtYoD2JkjNS2z8QF85x9NdiiaA@mail.gmail.com>
+ <20170619165100.3ce26d00@roar.ozlabs.ibm.com> <CAK7LNARuuQzGkYBdzoy3bVpBuNPZEMGerHSEdmrH+PqK0Gbyzg@mail.gmail.com>
+ <20170619182714.2cb60e17@roar.ozlabs.ibm.com> <CAK7LNATznx=5A1KnhkFHpjencsJj7AGUsHtDUu6M-Qkw=jvpPQ@mail.gmail.com>
+ <20170620015205.329519b2@roar.ozlabs.ibm.com> <CAK7LNAS6zucv54-XwqfTbm=y20eFVQYLwgsVCdtS7mYknsYK+Q@mail.gmail.com>
+ <20170621124708.6bce7692@roar.ozlabs.ibm.com> <CAK7LNATPyoVcsDtFjRhdmFh7v_HE9F=2GVX=z+XVWV2fXsEukA@mail.gmail.com>
+ <20170621140445.4d6fd92a@roar.ozlabs.ibm.com> <CAK8P3a34gWKqPCFDAnWki4H-eyj50Xgar+YFT_+2Og-qJb_i8A@mail.gmail.com>
+ <20170621191607.33c8db74@roar.ozlabs.ibm.com>
 From: Arnd Bergmann <arnd@arndb.de>
-Date: Wed, 21 Jun 2017 12:11:55 +0200
-Message-ID: <CAK8P3a1QOz6qQdQux4mFXfwadhosHUgw0Ypwmz5tjZOWcV+0qQ@mail.gmail.com>
-Subject: Re: [PATCH 2/2] kbuild: clang: Disable the 'duplicate-decl-specifier' warning
+Date: Wed, 21 Jun 2017 12:21:16 +0200
+Message-ID: <CAK8P3a0NT42HKOU+ZDRg_-1hA+RzYnL0RtzqbMsLbY=yTUxGRA@mail.gmail.com>
+Subject: Re: [PATCH 1/5] kbuild: thin archives final link close
+ --whole-archives option
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Matthias Kaehlcke <mka@chromium.org>, Doug Anderson <dianders@chromium.org>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Grant Grundler <grundler@chromium.org>, Greg Hackmann <ghackmann@google.com>, Michael Davidson <md@google.com>, Nick Desaulniers <ndesaulniers@google.com>
+To: Nicholas Piggin <npiggin@gmail.com>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-arch <linux-arch@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Linus Torvalds <torvalds@linux-foundation.org>, Stephen Rothwell <sfr@canb.auug.org.au>, kbuild test robot <fengguang.wu@intel.com>, Josh Triplett <josh@joshtriplett.org>, Nicolas Pitre <nicolas.pitre@linaro.org>
 
-On Wed, Jun 21, 2017 at 11:11 AM, Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
-> 2017-05-24 17:21 GMT+09:00 Arnd Bergmann <arnd@arndb.de>:
->> On Wed, May 24, 2017 at 2:04 AM, Matthias Kaehlcke <mka@chromium.org> wrote:
->>> El Wed, May 17, 2017 at 11:45:29AM -0700 Matthias Kaehlcke ha dit:
->>>> El Wed, May 17, 2017 at 09:35:57AM +0200 Arnd Bergmann ha dit:
->>>> > On Tue, May 16, 2017 at 11:41 PM, Doug Anderson <dianders@chromium.org> wrote:
->>> It seems the duplicate-decl-specifier warning targets specifically C89:
->>>
->>> "The same type qualifier shall not appear more than once in the same
->>> specifier list or qualifier list, either directly or via one or more
->>> typedefs."
->>>
->>> C89 (6.5.3)
->>>
->>> gcc also raises a warning when '-pedantic' is specified and
->>> -std=gnu89/c89 (or unspecified), but not with -std=gnu99/c99.
->>>
->>> This bug might help to shed more light on this:
->>> https://bugs.llvm.org/show_bug.cgi?id=32985
+On Wed, Jun 21, 2017 at 11:16 AM, Nicholas Piggin <npiggin@gmail.com> wrote:
+> On Wed, 21 Jun 2017 09:15:09 +0200
+> Arnd Bergmann <arnd@arndb.de> wrote:
+>
+>> On Wed, Jun 21, 2017 at 6:04 AM, Nicholas Piggin <npiggin@gmail.com> wrote:
+>> > On Wed, 21 Jun 2017 12:29:33 +0900
+>> > Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
 >>
->> I also notice that neither compiler differentiates between a)
+>> >> BTW, I saw abuse of lib.a in
+>> >> https://patchwork.kernel.org/patch/9768439/
+>> >>
+>> >> I see it in linux-next.
+>> >>
+>> >> commit 06e226c7fb233f676b01b144d0b321ebe510fdcd
+>> >> Author: Stephen Boyd <sboyd@codeaurora.org>
+>> >> Date:   Fri Jun 2 15:30:06 2017 -0700
+>> >>
+>> >>     clk: sunxi-ng: Move all clock types to a library
+>> >>
+>> >>
+>> >>
+>> >>
+>> >> Now drivers/clk/sunxi-ng/lib.a
+>> >> will go into thin archives.
+>> >> The result might be different from what they expect...
+>> >
+>> > Yes I see. With thin archives, that is just going to cause the
+>> > same behaviour as built-in.o (everything will be linked). So the
+>> > build should not break, but they won't get savings.
+>> >
+>> > Does it even save space with incremental linking? If the lib.a gets
+>> > linked into drivers/built-in.o, I wonder what happens then?
 >>
->> typedef const int cint;
->> const cint i;
+>> Ah, too bad. I thought we had found a way to use a library correctly
+>> here, but I just verified that indeed all the just gets linked into built-in.o
 >>
->> and b)
->> const int i;
->> const typeof(a) j;
+>> I played around with it some more now, but without success: if I
+>> build sunxi-ng as a loadable module (using a few modifications),
+>> then the unneeded objects from lib.a are dropped as I had hoped,
+>> but for built-in code we now always include everything.
 >>
->> I would have expected a warning for a) but not b), but both 'clang --std=gnu89'
->> and 'gcc --pedantic --std=gnu89' warn about both of b as well, and don't warn
->> for newer standards.
->>
->>        Arnd
+>> I suppose that we can ignore this once we get
+>> LD_DEAD_CODE_DATA_ELIMINATION enabled on ARM, but
+>> until then, we have a code size regression.
 >
->
->
->
-> I think we agreed to apply 1/2.
->
-> How about 2/2?
->
-> I think we mostly discussed preferable behavior of -Wduplicate-decl-specifier,
-> but we did not come up with an idea to solve the problem for
-> already shipped clang versions.
-> (BTW, we have not defined the minimal supported version of clang yet.)
+> I didn't follow the thread there, is it a regression caused by
+> thin archives, or just by removing the Kconfig symbol from each
+> file?
 
-I see that container_of() has been modified in linux-next and no longer adds
-the 'const' keyword, do we actually still need the patch?
+I thought it was the latter, but actually it only happens with thin
+archives, so we are fine as long as we enable THIN_ARCHIVES
+and LD_DEAD_CODE_DATA_ELIMINATION at the same time
+on ARM.
 
         Arnd
