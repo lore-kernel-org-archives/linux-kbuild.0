@@ -1,56 +1,70 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf0-f195.google.com ([209.85.192.195]:33606 "EHLO
-        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751884AbdFUGpM (ORCPT
+Received: from mail-oi0-f66.google.com ([209.85.218.66]:33853 "EHLO
+        mail-oi0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750987AbdFUHPL (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 21 Jun 2017 02:45:12 -0400
-Received: by mail-pf0-f195.google.com with SMTP id w12so27922640pfk.0
-        for <linux-kbuild@vger.kernel.org>; Tue, 20 Jun 2017 23:45:07 -0700 (PDT)
-Date: Wed, 21 Jun 2017 16:44:51 +1000
-From: Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [kbuild:thin-ar 6/6] arch/tile/kernel/signal.c:181: undefined
- reference to `__vdso_rt_sigreturn'
-Message-ID: <20170621164451.1fc47e0d@roar.ozlabs.ibm.com>
-In-Reply-To: <201706211350.mC5QFFxU%fengguang.wu@intel.com>
-References: <201706211350.mC5QFFxU%fengguang.wu@intel.com>
+        Wed, 21 Jun 2017 03:15:11 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20170621140445.4d6fd92a@roar.ozlabs.ibm.com>
+References: <20170609052417.561-1-npiggin@gmail.com> <20170609052417.561-2-npiggin@gmail.com>
+ <CAK7LNASxuE-6eMk+Y-vyrMfibtYoD2JkjNS2z8QF85x9NdiiaA@mail.gmail.com>
+ <20170619165100.3ce26d00@roar.ozlabs.ibm.com> <CAK7LNARuuQzGkYBdzoy3bVpBuNPZEMGerHSEdmrH+PqK0Gbyzg@mail.gmail.com>
+ <20170619182714.2cb60e17@roar.ozlabs.ibm.com> <CAK7LNATznx=5A1KnhkFHpjencsJj7AGUsHtDUu6M-Qkw=jvpPQ@mail.gmail.com>
+ <20170620015205.329519b2@roar.ozlabs.ibm.com> <CAK7LNAS6zucv54-XwqfTbm=y20eFVQYLwgsVCdtS7mYknsYK+Q@mail.gmail.com>
+ <20170621124708.6bce7692@roar.ozlabs.ibm.com> <CAK7LNATPyoVcsDtFjRhdmFh7v_HE9F=2GVX=z+XVWV2fXsEukA@mail.gmail.com>
+ <20170621140445.4d6fd92a@roar.ozlabs.ibm.com>
+From: Arnd Bergmann <arnd@arndb.de>
+Date: Wed, 21 Jun 2017 09:15:09 +0200
+Message-ID: <CAK8P3a34gWKqPCFDAnWki4H-eyj50Xgar+YFT_+2Og-qJb_i8A@mail.gmail.com>
+Subject: Re: [PATCH 1/5] kbuild: thin archives final link close
+ --whole-archives option
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: kbuild test robot <fengguang.wu@intel.com>
-Cc: kbuild-all@01.org, linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>
+To: Nicholas Piggin <npiggin@gmail.com>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-arch <linux-arch@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Linus Torvalds <torvalds@linux-foundation.org>, Stephen Rothwell <sfr@canb.auug.org.au>, kbuild test robot <fengguang.wu@intel.com>, Josh Triplett <josh@joshtriplett.org>, Nicolas Pitre <nicolas.pitre@linaro.org>
 
-On Wed, 21 Jun 2017 13:56:55 +0800
-kbuild test robot <fengguang.wu@intel.com> wrote:
+On Wed, Jun 21, 2017 at 6:04 AM, Nicholas Piggin <npiggin@gmail.com> wrote:
+> On Wed, 21 Jun 2017 12:29:33 +0900
+> Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
 
-> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git thin-ar
-> head:   0bae3a17f25c189d5d6ddece12a1a9d1a9040cc2
-> commit: 0bae3a17f25c189d5d6ddece12a1a9d1a9040cc2 [6/6] kbuild: thin archives make default for all archs
-> config: tile-tilegx_defconfig (attached as .config)
-> compiler: tilegx-linux-gcc (GCC) 4.6.2
-> reproduce:
->         wget https://raw.githubusercontent.com/01org/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
->         chmod +x ~/bin/make.cross
->         git checkout 0bae3a17f25c189d5d6ddece12a1a9d1a9040cc2
->         # save the attached .config to linux build tree
->         make.cross ARCH=tile 
-> 
-> All errors (new ones prefixed by >>):
-> 
->    arch/tile/kernel/signal.o: In function `setup_rt_frame':
-> >> arch/tile/kernel/signal.c:181: undefined reference to `__vdso_rt_sigreturn'  
->    arch/tile/kernel/signal.c:182: undefined reference to `__vdso_rt_sigreturn'
-> >> arch/tile/kernel/signal.c:181: undefined reference to `__vdso_rt_sigreturn'  
->    arch/tile/kernel/stack.o: In function `is_sigreturn':
-> >> arch/tile/kernel/stack.c:128: undefined reference to `__vdso_rt_sigreturn'
-> >> arch/tile/kernel/stack.c:128: undefined reference to `__vdso_rt_sigreturn'  
->    arch/tile/kernel/stack.o:arch/tile/kernel/stack.c:127: more undefined references to `__vdso_rt_sigreturn' follow
+>> BTW, I saw abuse of lib.a in
+>> https://patchwork.kernel.org/patch/9768439/
+>>
+>> I see it in linux-next.
+>>
+>> commit 06e226c7fb233f676b01b144d0b321ebe510fdcd
+>> Author: Stephen Boyd <sboyd@codeaurora.org>
+>> Date:   Fri Jun 2 15:30:06 2017 -0700
+>>
+>>     clk: sunxi-ng: Move all clock types to a library
+>>
+>>
+>>
+>>
+>> Now drivers/clk/sunxi-ng/lib.a
+>> will go into thin archives.
+>> The result might be different from what they expect...
+>
+> Yes I see. With thin archives, that is just going to cause the
+> same behaviour as built-in.o (everything will be linked). So the
+> build should not break, but they won't get savings.
+>
+> Does it even save space with incremental linking? If the lib.a gets
+> linked into drivers/built-in.o, I wonder what happens then?
 
-This requires the same fix as for arch/sh
+Ah, too bad. I thought we had found a way to use a library correctly
+here, but I just verified that indeed all the just gets linked into built-in.o
 
-Now that I do a proper grep, it looks like ia64 may require the same as
-well. I will do some more testing and submit those.
+I played around with it some more now, but without success: if I
+build sunxi-ng as a loadable module (using a few modifications),
+then the unneeded objects from lib.a are dropped as I had hoped,
+but for built-in code we now always include everything.
 
-Thanks,
-Nick
+I suppose that we can ignore this once we get
+LD_DEAD_CODE_DATA_ELIMINATION enabled on ARM, but
+until then, we have a code size regression. Any other ideas for
+how this could be solved? We used to have a Kconfig symbol
+for each file, but those would frequently get out of sync.
+
+         Arnd
