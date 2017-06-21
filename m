@@ -1,68 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi0-f68.google.com ([209.85.218.68]:35600 "EHLO
-        mail-oi0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751083AbdFUUzH (ORCPT
+Received: from mail-pf0-f174.google.com ([209.85.192.174]:36056 "EHLO
+        mail-pf0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752252AbdFUVTf (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 21 Jun 2017 16:55:07 -0400
+        Wed, 21 Jun 2017 17:19:35 -0400
+Received: by mail-pf0-f174.google.com with SMTP id q86so6592785pfl.3
+        for <linux-kbuild@vger.kernel.org>; Wed, 21 Jun 2017 14:19:35 -0700 (PDT)
+Date: Wed, 21 Jun 2017 14:19:32 -0700
+From: Matthias Kaehlcke <mka@chromium.org>
+Subject: Re: [PATCH 2/2] kbuild: clang: Disable the
+ 'duplicate-decl-specifier' warning
+Message-ID: <20170621211932.GC52338@google.com>
+References: <20170421213931.155210-3-mka@chromium.org>
+ <CAD=FV=XENNp3rcD5OK1d2WmccbqaT9=bjsayvbnA2Th8zmOAwg@mail.gmail.com>
+ <CAK8P3a1y0MoxhMNr2v=R7-CANaATfFy58FM8heyOP78g-JZwHA@mail.gmail.com>
+ <20170517184529.GG141096@google.com>
+ <20170524000419.GQ141096@google.com>
+ <CAK8P3a3D6oW4vaUD9JSGXFqqydrm5-Z0x9qOwzfn_WQryXezsA@mail.gmail.com>
+ <CAK7LNASXC1T_OkXD-T5XSKAHSNWrxAQCHPfk4dgnyq7MJBCSnQ@mail.gmail.com>
+ <CAK8P3a1QOz6qQdQux4mFXfwadhosHUgw0Ypwmz5tjZOWcV+0qQ@mail.gmail.com>
+ <20170621165832.GB52338@google.com>
+ <CAK8P3a1yopRPex3yrKj50cRPy8d3+urGE2XN3aQ61Uu=FE8oVQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20170622040838.1c63ebb7@roar.ozlabs.ibm.com>
-References: <20170621140445.4d6fd92a@roar.ozlabs.ibm.com> <CAK8P3a34gWKqPCFDAnWki4H-eyj50Xgar+YFT_+2Og-qJb_i8A@mail.gmail.com>
- <20170621191607.33c8db74@roar.ozlabs.ibm.com> <CAK8P3a0NT42HKOU+ZDRg_-1hA+RzYnL0RtzqbMsLbY=yTUxGRA@mail.gmail.com>
- <20170621203824.719ffdc5@roar.ozlabs.ibm.com> <CAK8P3a1o91guXimc99sY3UOUjKTX5QxhQyOfY+j-x7MMCdRbdw@mail.gmail.com>
- <20170621211002.44525d9b@roar.ozlabs.ibm.com> <CAK8P3a2A9fMrNZPWJft2t+52kmGkGgm3gv_fxJntjevWtJ69Zw@mail.gmail.com>
- <20170621220213.2b33d56d@roar.ozlabs.ibm.com> <CAK8P3a0nVPz=eLV8ET6BYR2Qs0H3PQZuhYsu4Cb_kJSPACrR9w@mail.gmail.com>
- <20170621161913.GY4493@codeaurora.org> <20170622040838.1c63ebb7@roar.ozlabs.ibm.com>
-From: Arnd Bergmann <arnd@arndb.de>
-Date: Wed, 21 Jun 2017 22:55:06 +0200
-Message-ID: <CAK8P3a2vV10+ymS7vHybfhRf_DVvACOW4O2OZzyz+v75y2Ak4w@mail.gmail.com>
-Subject: Re: [PATCH 1/5] kbuild: thin archives final link close
- --whole-archives option
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAK8P3a1yopRPex3yrKj50cRPy8d3+urGE2XN3aQ61Uu=FE8oVQ@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicholas Piggin <npiggin@gmail.com>
-Cc: Stephen Boyd <sboyd@codeaurora.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-arch <linux-arch@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Linus Torvalds <torvalds@linux-foundation.org>, Stephen Rothwell <sfr@canb.auug.org.au>, kbuild test robot <fengguang.wu@intel.com>, Josh Triplett <josh@joshtriplett.org>, Nicolas Pitre <nicolas.pitre@linaro.org>, Maxime Ripard <maxime.ripard@free-electrons.com>
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Doug Anderson <dianders@chromium.org>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Grant Grundler <grundler@chromium.org>, Greg Hackmann <ghackmann@google.com>, Michael Davidson <md@google.com>, Nick Desaulniers <ndesaulniers@google.com>, Alexander Potapenko <glider@google.com>, Bernhard =?utf-8?Q?Rosenkr=C3=A4nzer?= <bero@linaro.org>
 
-On Wed, Jun 21, 2017 at 8:08 PM, Nicholas Piggin <npiggin@gmail.com> wrote:
-> On Wed, 21 Jun 2017 09:19:13 -0700
-> Stephen Boyd <sboyd@codeaurora.org> wrote:
->> On 06/21, Arnd Bergmann wrote:
->>
->> Ok. Can you send a revert patch to the list with some information
->> on why we can't do the hack anymore and also Cc lkml/kbuild
->> lists? The commit is in linux-next now as commit 06e226c7fb23
->> (clk: sunxi-ng: Move all clock types to a library, 2017-06-02).
->>
->
-> I grabbed this patch and applied it to the kbuid/thin-ac tree. I tested
-> with thin archives enabled and disabled with arm defconfig which ends up
-> setting CONFIG_SUNXI_CCU=3Dy.
->
-> The patch makes no difference to vmlinux size whether using traditional
-> incremental link, or thin archives (there is a small difference between
-> inclink and thinarc but that's unrelated).
->
-> So this thin archives change does not break your patch, it's just that
-> it doesn't really do the right thing. I like the general idea, but we
-> need to work out how to make it properly supported by the build system.
->
-> With the patch applied, this is what the build system currently does:
->
-> arm-linux-gnueabihf-ld -EL    -r -o drivers/clk/sunxi-ng/built-in.o drive=
-rs/clk/sunxi-ng/ccu-sun5i.o drivers/clk/sunxi-ng/ccu-sun6i-a31.o drivers/cl=
-k/sunxi-ng/ccu-sun8i-a23.o drivers/clk/sunxi-ng/ccu-sun8i-a33.o drivers/clk=
-/sunxi-ng/ccu-sun8i-h3.o drivers/clk/sunxi-ng/ccu-sun8i-v3s.o drivers/clk/s=
-unxi-ng/ccu-sun8i-r.o drivers/clk/sunxi-ng/ccu-sun9i-a80.o drivers/clk/sunx=
-i-ng/ccu-sun9i-a80-de.o drivers/clk/sunxi-ng/ccu-sun9i-a80-usb.o drivers/cl=
-k/sunxi-ng/lib.a drivers/clk/sunxi-ng/lib-ksyms.o
->
-> This incremental link pulls in all your lib.a objects and links them
-> into built-in.o. They can no longer be selectively linked.
+El Wed, Jun 21, 2017 at 07:59:42PM +0200 Arnd Bergmann ha dit:
 
-I think the ARM defconfig actually needs all those objects because it
-enables all the high-level drivers. You could try disabling e.g. all except
-CONFIG_SUN8I_DE2_CCU if you want the objects to actually becomes
-unused.
+> On Wed, Jun 21, 2017 at 6:58 PM, Matthias Kaehlcke <mka@chromium.org> wrote:
+> > El Wed, Jun 21, 2017 at 12:11:55PM +0200 Arnd Bergmann ha dit:
+> >> I see that container_of() has been modified in linux-next and no longer adds
+> >> the 'const' keyword, do we actually still need the patch?
+> >
+> > There is still (at least) the case of const arrays passed to
+> > MODULE_DEVICE_TABLE.
+> 
+> Does the 'const' have any effect there? As it's just an alias, it
+> should at least
+> not impact the placement of the symbol in the object file, right?
 
-       Arnd
+I agree, it shouldn't make a difference.
+
+> Maybe we can just remove that 'const' too.
+
+Seems worth a try. Do you want to send a patch for the removal?
+
+> Do you see any other instances?
+
+For both x86 and arm64 defconfig the instances are all from
+container_of() or MODULE_DEVICE_TABLE.
