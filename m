@@ -1,111 +1,152 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.17.10]:51731 "EHLO
+Received: from mout.kundenserver.de ([212.227.17.24]:51869 "EHLO
         mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753601AbdFVRPe (ORCPT
+        with ESMTP id S1751193AbdFVRPw (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 22 Jun 2017 13:15:34 -0400
+        Thu, 22 Jun 2017 13:15:52 -0400
 From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH v3 07/11] tty: improve tty_insert_flip_char() fast path
-Date: Thu, 22 Jun 2017 19:13:51 +0200
-Message-Id: <20170622171355.267192-8-arnd@arndb.de>
+Subject: [PATCH v3 11/11] kasan: rework Kconfig settings
+Date: Thu, 22 Jun 2017 19:13:55 +0200
+Message-Id: <20170622171355.267192-12-arnd@arndb.de>
 In-Reply-To: <20170622171355.267192-1-arnd@arndb.de>
 References: <20170622171355.267192-1-arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Andrew Morton <akpm@linux-foundation.org>
-Cc: kasan-dev@googlegroups.com, Dmitry Vyukov <dvyukov@google.com>, Alexander Potapenko <glider@google.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Arend van Spriel <arend.vanspriel@broadcom.com>, Arnd Bergmann <arnd@arndb.de>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, Kees Cook <keescook@chromium.org>, Ingo Molnar <mingo@kernel.org>, "David S . Miller" <davem@davemloft.net>, linux-kbuild@vger.kernel.org, Samuel Thibault <samuel.thibault@ens-lyon.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri Slaby <jslaby@suse.com>, stable@vger.kernel.org
+Cc: kasan-dev@googlegroups.com, Dmitry Vyukov <dvyukov@google.com>, Alexander Potapenko <glider@google.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Arend van Spriel <arend.vanspriel@broadcom.com>, Arnd Bergmann <arnd@arndb.de>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, Kees Cook <keescook@chromium.org>, Ingo Molnar <mingo@kernel.org>, "David S . Miller" <davem@davemloft.net>, linux-kbuild@vger.kernel.org, Samuel Thibault <samuel.thibault@ens-lyon.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri Slaby <jslaby@suse.com>
 
-kernelci.org reports a crazy stack usage for the VT code when CONFIG_KASAN
-is enabled:
+We get a lot of very large stack frames using gcc-7.0.1 with the default
+-fsanitize-address-use-after-scope --param asan-stack=1 options, which
+can easily cause an overflow of the kernel stack, e.g.
 
-drivers/tty/vt/keyboard.c: In function 'kbd_keycode':
-drivers/tty/vt/keyboard.c:1452:1: error: the frame size of 2240 bytes is larger than 2048 bytes [-Werror=frame-larger-than=]
+drivers/acpi/nfit/core.c:2686:1: warning: the frame size of 4080 bytes is larger than 2048 bytes [-Wframe-larger-than=]
+drivers/gpu/drm/amd/amdgpu/si.c:1756:1: warning: the frame size of 7304 bytes is larger than 2048 bytes [-Wframe-larger-than=]
+drivers/gpu/drm/i915/gvt/handlers.c:2200:1: warning: the frame size of 43752 bytes is larger than 2048 bytes [-Wframe-larger-than=]
+drivers/gpu/drm/vmwgfx/vmwgfx_drv.c:952:1: warning: the frame size of 6032 bytes is larger than 2048 bytes [-Wframe-larger-than=]
+drivers/isdn/hardware/avm/b1.c:637:1: warning: the frame size of 13200 bytes is larger than 2048 bytes [-Wframe-larger-than=]
+drivers/media/dvb-frontends/stv090x.c:3089:1: warning: the frame size of 5880 bytes is larger than 2048 bytes [-Wframe-larger-than=]
+drivers/media/i2c/cx25840/cx25840-core.c:4964:1: warning: the frame size of 93992 bytes is larger than 2048 bytes [-Wframe-larger-than=]
+drivers/net/wireless/ralink/rt2x00/rt2800lib.c:4994:1: warning: the frame size of 23928 bytes is larger than 2048 bytes [-Wframe-larger-than=]
+drivers/staging/dgnc/dgnc_tty.c:2788:1: warning: the frame size of 7072 bytes is larger than 2048 bytes [-Wframe-larger-than=]
+fs/ntfs/mft.c:2762:1: warning: the frame size of 7432 bytes is larger than 2048 bytes [-Wframe-larger-than=]
+lib/atomic64_test.c:242:1: warning: the frame size of 12648 bytes is larger than 2048 bytes [-Wframe-larger-than=]
 
-The problem is that tty_insert_flip_char() gets inlined many times into
-kbd_keycode(), and also into other functions, and each copy requires 128
-bytes for stack redzone to check for a possible out-of-bounds access on
-the 'ch' and 'flags' arguments that are passed into
-tty_insert_flip_string_flags as a variable-length string.
+To reduce this risk, -fsanitize-address-use-after-scope is now split out
+into a separate Kconfig option, vhich cannot be selected at the same
+time as KMEMCHECK, leading to stack frames that are smaller than 2
+kilobytes most of the time on x86_64. An earlier version of this
+patch also prevented combining KASAN_EXTRA with KASAN_INLINE, but that
+is no longer necessary with gcc-7.0.1.
 
-This introduces a new __tty_insert_flip_char() function for the slow
-path, which receives the two arguments by value. This completely avoids
-the problem and the stack usage goes back down to around 100 bytes.
+A lot of warnings with KASAN_EXTRA go away if we disable KMEMCHECK,
+as -fsanitize-address-use-after-scope seems to understand the builtin
+memcpy, but adds checking code around an extern memcpy call. I had
+to work around a circular dependency, as DEBUG_SLAB/SLUB depended
+on !KMEMCHECK, while KASAN did it the other way round. Now we handle
+both the same way.
 
-Without KASAN, this is also slightly better, as we don't have to
-spill the arguments to the stack but can simply pass 'ch' and 'flag'
-in registers, saving a few bytes in .text for each call site.
+All patches to get the frame size below 2048 bytes with CONFIG_KASAN=y
+and CONFIG_KASAN_EXTRA=n have been submitted along with this patch,
+so we can bring back that default now. KASAN_EXTRA=y still causes lots
+of warnings but now defaults to !COMPILE_TEST to disable it in
+allmodconfig, and it remains disabled in all other defconfigs since
+it is a new option.
 
-This should be backported to linux-4.0 or later, which first introduced
-the stack sanitizer in the kernel.
+This reverts parts of commit commit 3f181b4 ("lib/Kconfig.debug:
+disable -Wframe-larger-than warnings with KASAN=y").
 
-Cc: stable@vger.kernel.org
-Fixes: c420f167db8c ("kasan: enable stack instrumentation")
+I experimented a bit more with smaller stack frames and have another
+follow-up series that reduces the warning limit for 64-bit architectures
+to 1280 bytes and 1536 when CONFIG_KASAN (but not KASAN_EXTRA) is
+enabled, this requires another ~25 patches to address the additional
+warnings. I also have patches for all KASAN_EXTRA warnings, but we
+should look at those separately and then decide whether to remove
+it completely, leaving out -fsanitize-address-use-after-scope.
+
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
-I already submitted this separately to Greg, but he hasn't replied
-yet. I assume that it's fine if Andrew picks it up along with the
-other patches and drops it again in case Greg applies it to linux-next.
+ lib/Kconfig.debug      |  4 ++--
+ lib/Kconfig.kasan      | 11 ++++++++++-
+ lib/Kconfig.kmemcheck  |  1 +
+ scripts/Makefile.kasan |  3 +++
+ 4 files changed, 16 insertions(+), 3 deletions(-)
 
- drivers/tty/tty_buffer.c | 24 ++++++++++++++++++++++++
- include/linux/tty_flip.h |  3 ++-
- 2 files changed, 26 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/tty/tty_buffer.c b/drivers/tty/tty_buffer.c
-index 4e7a4e9dcf4d..2da05fa37aec 100644
---- a/drivers/tty/tty_buffer.c
-+++ b/drivers/tty/tty_buffer.c
-@@ -362,6 +362,30 @@ int tty_insert_flip_string_flags(struct tty_port *port,
- EXPORT_SYMBOL(tty_insert_flip_string_flags);
+diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+index ddbef2cac189..02ec4a4da7b1 100644
+--- a/lib/Kconfig.debug
++++ b/lib/Kconfig.debug
+@@ -217,7 +217,7 @@ config ENABLE_MUST_CHECK
+ config FRAME_WARN
+ 	int "Warn for stack frames larger than (needs gcc 4.4)"
+ 	range 0 8192
+-	default 0 if KASAN
++	default 3072 if KASAN_EXTRA
+ 	default 2048 if GCC_PLUGIN_LATENT_ENTROPY
+ 	default 1024 if !64BIT
+ 	default 2048 if 64BIT
+@@ -500,7 +500,7 @@ config DEBUG_OBJECTS_ENABLE_DEFAULT
  
- /**
-+ *	__tty_insert_flip_char   -	Add one character to the tty buffer
-+ *	@port: tty port
-+ *	@ch: character
-+ *	@flag: flag byte
-+ *
-+ *	Queue a single byte to the tty buffering, with an optional flag.
-+ *	This is the slow path of tty_insert_flip_char.
-+ */
-+int __tty_insert_flip_char(struct tty_port *port, unsigned char ch, char flag)
-+{
-+	struct tty_buffer *tb = port->buf.tail;
-+	int flags = (flag == TTY_NORMAL) ? TTYB_NORMAL : 0;
-+
-+	if (!tty_buffer_request_room(port, 1))
-+		return 0;
-+
-+	*flag_buf_ptr(tb, tb->used) = flag;
-+	*char_buf_ptr(tb, tb->used++) = ch;
-+
-+	return 1;
-+}
-+EXPORT_SYMBOL(__tty_insert_flip_char);
-+
-+/**
-  *	tty_schedule_flip	-	push characters to ldisc
-  *	@port: tty port to push from
-  *
-diff --git a/include/linux/tty_flip.h b/include/linux/tty_flip.h
-index c28dd523f96e..d43837f2ce3a 100644
---- a/include/linux/tty_flip.h
-+++ b/include/linux/tty_flip.h
-@@ -12,6 +12,7 @@ extern int tty_prepare_flip_string(struct tty_port *port,
- 		unsigned char **chars, size_t size);
- extern void tty_flip_buffer_push(struct tty_port *port);
- void tty_schedule_flip(struct tty_port *port);
-+int __tty_insert_flip_char(struct tty_port *port, unsigned char ch, char flag);
+ config DEBUG_SLAB
+ 	bool "Debug slab memory allocations"
+-	depends on DEBUG_KERNEL && SLAB && !KMEMCHECK
++	depends on DEBUG_KERNEL && SLAB && !KMEMCHECK && !KASAN
+ 	help
+ 	  Say Y here to have the kernel do limited verification on memory
+ 	  allocation as well as poisoning memory on free to catch use of freed
+diff --git a/lib/Kconfig.kasan b/lib/Kconfig.kasan
+index bd38aab05929..4d17a8f4742f 100644
+--- a/lib/Kconfig.kasan
++++ b/lib/Kconfig.kasan
+@@ -5,7 +5,7 @@ if HAVE_ARCH_KASAN
  
- static inline int tty_insert_flip_char(struct tty_port *port,
- 					unsigned char ch, char flag)
-@@ -26,7 +27,7 @@ static inline int tty_insert_flip_char(struct tty_port *port,
- 		*char_buf_ptr(tb, tb->used++) = ch;
- 		return 1;
- 	}
--	return tty_insert_flip_string_flags(port, &ch, &flag, 1);
-+	return __tty_insert_flip_char(port, ch, flag);
- }
+ config KASAN
+ 	bool "KASan: runtime memory debugger"
+-	depends on SLUB || (SLAB && !DEBUG_SLAB)
++	depends on SLUB || SLAB
+ 	select CONSTRUCTORS
+ 	select STACKDEPOT
+ 	help
+@@ -20,6 +20,15 @@ config KASAN
+ 	  Currently CONFIG_KASAN doesn't work with CONFIG_DEBUG_SLAB
+ 	  (the resulting kernel does not boot).
  
- static inline int tty_insert_flip_string(struct tty_port *port,
++config KASAN_EXTRA
++	bool "KAsan: extra checks"
++	depends on KASAN && !COMPILE_TEST
++	help
++	  This enables further checks in the kernel address sanitizer, for now
++	  it only includes the address-use-after-scope check that can lead
++	  to excessive kernel stack usage, frame size warnings and longer
++	  compile time.
++
+ choice
+ 	prompt "Instrumentation type"
+ 	depends on KASAN
+diff --git a/lib/Kconfig.kmemcheck b/lib/Kconfig.kmemcheck
+index 846e039a86b4..58b9f3f81dc8 100644
+--- a/lib/Kconfig.kmemcheck
++++ b/lib/Kconfig.kmemcheck
+@@ -7,6 +7,7 @@ menuconfig KMEMCHECK
+ 	bool "kmemcheck: trap use of uninitialized memory"
+ 	depends on DEBUG_KERNEL
+ 	depends on !X86_USE_3DNOW
++	depends on !KASAN
+ 	depends on SLUB || SLAB
+ 	depends on !CC_OPTIMIZE_FOR_SIZE
+ 	depends on !FUNCTION_TRACER
+diff --git a/scripts/Makefile.kasan b/scripts/Makefile.kasan
+index 9576775a86f6..3b3148faf866 100644
+--- a/scripts/Makefile.kasan
++++ b/scripts/Makefile.kasan
+@@ -29,5 +29,8 @@ else
+     endif
+ endif
+ 
++ifdef CONFIG_KASAN_EXTRA
+ CFLAGS_KASAN += $(call cc-option, -fsanitize-address-use-after-scope)
+ endif
++
++endif
 -- 
 2.9.0
 
