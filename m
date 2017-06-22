@@ -1,69 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf0-f196.google.com ([209.85.192.196]:35266 "EHLO
-        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751149AbdFVMjz (ORCPT
+Received: from mail-pf0-f195.google.com ([209.85.192.195]:33587 "EHLO
+        mail-pf0-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750812AbdFVOEH (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 22 Jun 2017 08:39:55 -0400
-Received: by mail-pf0-f196.google.com with SMTP id s66so2746331pfs.2
-        for <linux-kbuild@vger.kernel.org>; Thu, 22 Jun 2017 05:39:55 -0700 (PDT)
-From: Nicholas Piggin <npiggin@gmail.com>
-Subject: [PATCH v2 3/3] tile: thin archives fix linking
-Date: Thu, 22 Jun 2017 22:39:29 +1000
-Message-Id: <20170622123929.15054-4-npiggin@gmail.com>
-In-Reply-To: <20170622123929.15054-1-npiggin@gmail.com>
-References: <20170622123929.15054-1-npiggin@gmail.com>
+        Thu, 22 Jun 2017 10:04:07 -0400
+Received: by mail-pf0-f195.google.com with SMTP id w12so3122539pfk.0
+        for <linux-kbuild@vger.kernel.org>; Thu, 22 Jun 2017 07:04:06 -0700 (PDT)
+Date: Thu, 22 Jun 2017 23:34:01 +0930
+From: Alan Modra <amodra@gmail.com>
+Subject: Re: [kbuild:thin-ar 5/8] ia64-linux-ld: warning: .note.gnu.build-id
+ section discarded, --build-id ignored.
+Message-ID: <20170622140400.GE8406@bubble.grove.modra.org>
+References: <201706221136.76FjJsv8%fengguang.wu@intel.com>
+ <20170622143327.32177b0a@roar.ozlabs.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170622143327.32177b0a@roar.ozlabs.ibm.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Nicholas Piggin <npiggin@gmail.com>, linux-kbuild@vger.kernel.org, Chris Metcalf <cmetcalf@mellanox.com>
+To: Nicholas Piggin <npiggin@gmail.com>
+Cc: kbuild test robot <fengguang.wu@intel.com>, kbuild-all@01.org, linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>
 
-The VDSO symbols can't be linked into built-in.o when building with
-thin archives, so change this to linking a new object file that is
-included into the built-in.o.
+On Thu, Jun 22, 2017 at 02:33:27PM +1000, Nicholas Piggin wrote:
+> On Thu, 22 Jun 2017 11:48:38 +0800
+> kbuild test robot <fengguang.wu@intel.com> wrote:
+> > >> ia64-linux-ld: warning: .note.gnu.build-id section discarded, --build-id ignored.  
+> 
+> 
+> Sigh.
+> 
+> What's happening here is that when performing the final link with the
+> -R option, the linker forgets to emit the --build-id section it was
+> asked to.
+> 
+> This is the final link command line that causes the error:
+> 
+> $ ia64-linux-ld -static -R arch/ia64/kernel/gate-syms.o --build-id -o vmlinux -T ./arch/ia64/kernel/vmlinux.lds --whole-archive built-in.o --no-whole-archive --start-group lib/lib.a arch/ia64/lib/lib.a --end-group
 
-Cc: Chris Metcalf <cmetcalf@mellanox.com>
-Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
----
- arch/tile/kernel/vdso/Makefile | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+Try putting the --just-symbols (-R) file after --no-whole-archive.
+The idea being to make it not the first object file.  --just-symbols
+files have their contents discarded, and the linker is stupidly
+attaching the section it creates to hold the build-id, to that file.
 
-diff --git a/arch/tile/kernel/vdso/Makefile b/arch/tile/kernel/vdso/Makefile
-index c54fff37b5ff..e140472d5be6 100644
---- a/arch/tile/kernel/vdso/Makefile
-+++ b/arch/tile/kernel/vdso/Makefile
-@@ -11,7 +11,7 @@ obj-vdso := $(addprefix $(obj)/, $(obj-vdso))
- # vdso32 is only for tilegx -m32 compat task.
- VDSO32-$(CONFIG_COMPAT) := y
- 
--obj-y += vdso.o
-+obj-y += vdso.o vdso-syms.o
- obj-$(VDSO32-y) += vdso32.o
- extra-y += vdso.lds
- CPPFLAGS_vdso.lds += -P -C -U$(ARCH)
-@@ -49,16 +49,18 @@ $(obj)/vdso.so.dbg: $(src)/vdso.lds $(obj-vdso)
- # We also create a special relocatable object that should mirror the symbol
- # table and layout of the linked DSO.  With ld -R we can then refer to
- # these symbols in the kernel code rather than hand-coded addresses.
--extra-y += vdso-syms.o
--$(obj)/built-in.o: $(obj)/vdso-syms.o
--$(obj)/built-in.o: ld_flags += -R $(obj)/vdso-syms.o
- 
- SYSCFLAGS_vdso.so.dbg = -shared -s -Wl,-soname=linux-vdso.so.1 \
-                             $(call cc-ldoption, -Wl$(comma)--hash-style=both)
--SYSCFLAGS_vdso_syms.o = -r
--$(obj)/vdso-syms.o: $(src)/vdso.lds $(obj)/vrt_sigreturn.o FORCE
-+SYSCFLAGS_vdso_dummy.o = -r
-+$(obj)/vdso-dummy.o: $(src)/vdso.lds $(obj)/vrt_sigreturn.o FORCE
- 	$(call if_changed,vdsold)
- 
-+quiet_cmd_vdso_sym = VDSOSYM $@
-+      cmd_vdso_sym = $(LD) -r -R $(obj)/vdso-dummy.o -o $@
-+
-+$(obj)/vdso-syms.o: $(obj)/vdso-dummy.o
-+	$(call if_changed,vdso_sym)
- 
- # strip rule for the .so file
- $(obj)/%.so: OBJCOPYFLAGS := -S
 -- 
-2.11.0
-
+Alan Modra
+Australia Development Lab, IBM
