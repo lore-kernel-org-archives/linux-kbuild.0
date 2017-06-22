@@ -1,62 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf0-f196.google.com ([209.85.192.196]:33418 "EHLO
-        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751149AbdFVMjq (ORCPT
+Received: from mail-pg0-f67.google.com ([74.125.83.67]:34548 "EHLO
+        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751149AbdFVMjv (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 22 Jun 2017 08:39:46 -0400
+        Thu, 22 Jun 2017 08:39:51 -0400
 From: Nicholas Piggin <npiggin@gmail.com>
-Subject: [PATCH v2 1/3] sh: thin archives fix linking
-Date: Thu, 22 Jun 2017 22:39:27 +1000
-Message-Id: <20170622123929.15054-2-npiggin@gmail.com>
+Subject: [PATCH v2 2/3] ia64: thin archives fix linking
+Date: Thu, 22 Jun 2017 22:39:28 +1000
+Message-Id: <20170622123929.15054-3-npiggin@gmail.com>
 In-Reply-To: <20170622123929.15054-1-npiggin@gmail.com>
 References: <20170622123929.15054-1-npiggin@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Nicholas Piggin <npiggin@gmail.com>, linux-kbuild@vger.kernel.org, Yoshinori Sato <ysato@users.sourceforge.jp>, Rich Felker <dalias@libc.org>, linux-sh@vger.kernel.org
+Cc: Nicholas Piggin <npiggin@gmail.com>, linux-kbuild@vger.kernel.org, Tony Luck <tony.luck@intel.com>, Fenghua Yu <fenghua.yu@intel.com>, linux-ia64@vger.kernel.org
 
 The VDSO symbols can't be linked into built-in.o when building with
 thin archives, so change this to linking a new object file that is
 included into the built-in.o.
 
-Cc: Yoshinori Sato <ysato@users.sourceforge.jp>
-Cc: Rich Felker <dalias@libc.org>
-Cc: linux-sh@vger.kernel.org
+Cc: Tony Luck <tony.luck@intel.com>
+Cc: Fenghua Yu <fenghua.yu@intel.com>
+Cc: linux-ia64@vger.kernel.org
 Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 ---
- arch/sh/kernel/vsyscall/Makefile | 16 +++++++++-------
- 1 file changed, 9 insertions(+), 7 deletions(-)
+ arch/ia64/kernel/Makefile.gate | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
 
-diff --git a/arch/sh/kernel/vsyscall/Makefile b/arch/sh/kernel/vsyscall/Makefile
-index 8f0ea5fc835c..efc7a6837ef6 100644
---- a/arch/sh/kernel/vsyscall/Makefile
-+++ b/arch/sh/kernel/vsyscall/Makefile
-@@ -1,4 +1,4 @@
--obj-y += vsyscall.o vsyscall-syscall.o
-+obj-y += vsyscall.o vsyscall-syscall.o vsyscall-syms.o
+diff --git a/arch/ia64/kernel/Makefile.gate b/arch/ia64/kernel/Makefile.gate
+index a32903ada016..e20c711c2b1e 100644
+--- a/arch/ia64/kernel/Makefile.gate
++++ b/arch/ia64/kernel/Makefile.gate
+@@ -2,7 +2,9 @@
  
- $(obj)/vsyscall-syscall.o: \
- 	$(foreach F,trapa,$(obj)/vsyscall-$F.so)
-@@ -26,11 +26,13 @@ $(obj)/vsyscall-%.so: $(src)/vsyscall.lds $(obj)/vsyscall-%.o FORCE
- # We also create a special relocatable object that should mirror the symbol
- # table and layout of the linked DSO.  With ld -R we can then refer to
- # these symbols in the kernel code rather than hand-coded addresses.
--extra-y += vsyscall-syms.o
--$(obj)/built-in.o: $(obj)/vsyscall-syms.o
--$(obj)/built-in.o: ld_flags += -R $(obj)/vsyscall-syms.o
--
--SYSCFLAGS_vsyscall-syms.o = -r
--$(obj)/vsyscall-syms.o: $(src)/vsyscall.lds \
-+SYSCFLAGS_vsyscall-dummy.o = -r
-+$(obj)/vsyscall-dummy.o: $(src)/vsyscall.lds \
- 			$(obj)/vsyscall-trapa.o $(obj)/vsyscall-note.o FORCE
- 	$(call if_changed,syscall)
+ targets += gate.so gate-syms.o
+ 
+-extra-y += gate.so gate-syms.o gate.lds gate.o
++obj-y += gate-syms.o
 +
-+quiet_cmd_syscall_syms = SYSCALL $@
-+      cmd_syscall_syms = $(LD) -r -R $(obj)/vsyscall-dummy.o -o $@
-+
-+$(obj)/vsyscall-syms.o: $(obj)/vsyscall-dummy.o
-+	$(call if_changed,syscall_syms)
++extra-y += gate.so gate.lds gate.o
+ 
+ CPPFLAGS_gate.lds := -P -C -U$(ARCH)
+ 
+@@ -14,12 +16,12 @@ GATECFLAGS_gate.so = -shared -s -Wl,-soname=linux-gate.so.1 \
+ $(obj)/gate.so: $(obj)/gate.lds $(obj)/gate.o FORCE
+ 	$(call if_changed,gate)
+ 
+-$(obj)/built-in.o: $(obj)/gate-syms.o
+-$(obj)/built-in.o: ld_flags += -R $(obj)/gate-syms.o
++# create an object file to resolve gate symbols
++quiet_cmd_gate_syms = GATESYM $@
++      cmd_gate_syms = $(LD) -r -T $(obj)/gate.lds -R $(obj)/gate.o -o $@
+ 
+-GATECFLAGS_gate-syms.o = -r
+ $(obj)/gate-syms.o: $(obj)/gate.lds $(obj)/gate.o FORCE
+-	$(call if_changed,gate)
++	$(call if_changed,gate_syms)
+ 
+ # gate-data.o contains the gate DSO image as data in section .data..gate.
+ # We must build gate.so before we can assemble it.
 -- 
 2.11.0
 
