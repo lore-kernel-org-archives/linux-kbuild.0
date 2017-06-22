@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([217.72.192.74]:58841 "EHLO
+Received: from mout.kundenserver.de ([212.227.17.13]:63366 "EHLO
         mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753601AbdFVRPl (ORCPT
+        with ESMTP id S1752253AbdFVRPz (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 22 Jun 2017 13:15:41 -0400
+        Thu, 22 Jun 2017 13:15:55 -0400
 From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH v3 02/11] netlink: mark nla_put_{u8,u16,u32} noinline_if_stackbloat
-Date: Thu, 22 Jun 2017 19:13:46 +0200
-Message-Id: <20170622171355.267192-3-arnd@arndb.de>
+Subject: [PATCH v3 04/11] mtd: cfi: reduce stack size with KASAN
+Date: Thu, 22 Jun 2017 19:13:48 +0200
+Message-Id: <20170622171355.267192-5-arnd@arndb.de>
 In-Reply-To: <20170622171355.267192-1-arnd@arndb.de>
 References: <20170622171355.267192-1-arnd@arndb.de>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,198 +15,104 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Andrew Morton <akpm@linux-foundation.org>
 Cc: kasan-dev@googlegroups.com, Dmitry Vyukov <dvyukov@google.com>, Alexander Potapenko <glider@google.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Arend van Spriel <arend.vanspriel@broadcom.com>, Arnd Bergmann <arnd@arndb.de>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, Kees Cook <keescook@chromium.org>, Ingo Molnar <mingo@kernel.org>, "David S . Miller" <davem@davemloft.net>, linux-kbuild@vger.kernel.org, Samuel Thibault <samuel.thibault@ens-lyon.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jiri Slaby <jslaby@suse.com>
 
-When CONFIG_KASAN is enabled, the "--param asan-stack=1" causes rather large
-stack frames in some functions. This goes unnoticed normally because
-CONFIG_FRAME_WARN is disabled with CONFIG_KASAN by default as of commit
-3f181b4d8652 ("lib/Kconfig.debug: disable -Wframe-larger-than warnings with
-KASAN=y").
+When CONFIG_KASAN is used, we consume a lot of extra stack space:
 
-The kernelci.org build bot however has the warning enabled and that led
-me to investigate it a little further, as every build produces these warnings:
+drivers/mtd/chips/cfi_cmdset_0020.c: In function 'do_write_buffer':
+drivers/mtd/chips/cfi_cmdset_0020.c:603:1: error: the frame size of 2184 bytes is larger than 1536 bytes [-Werror=frame-larger-than=]
+drivers/mtd/chips/cfi_cmdset_0020.c: In function 'cfi_staa_erase_varsize':
+drivers/mtd/chips/cfi_cmdset_0020.c:972:1: error: the frame size of 1936 bytes is larger than 1536 bytes [-Werror=frame-larger-than=]
+drivers/mtd/chips/cfi_cmdset_0001.c: In function 'do_write_buffer':
+drivers/mtd/chips/cfi_cmdset_0001.c:1841:1: error: the frame size of 1776 bytes is larger than 1536 bytes [-Werror=frame-larger-than=]
 
-net/wireless/nl80211.c:4389:1: warning: the frame size of 2240 bytes is larger than 2048 bytes [-Wframe-larger-than=]
-net/wireless/nl80211.c:1895:1: warning: the frame size of 3776 bytes is larger than 2048 bytes [-Wframe-larger-than=]
-net/wireless/nl80211.c:1410:1: warning: the frame size of 2208 bytes is larger than 2048 bytes [-Wframe-larger-than=]
-net/bridge/br_netlink.c:1282:1: warning: the frame size of 2544 bytes is larger than 2048 bytes [-Wframe-larger-than=]
+This marks some functions as noinline_if_stackbloat to keep reduce the
+overall stack size.
 
-With the new noinline_if_stackbloat annotation, we can avoid the problem
-when KASAN is enabled but not change anything otherwise.
-
-Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>
-Cc: Alexander Potapenko <glider@google.com>
-Cc: Dmitry Vyukov <dvyukov@google.com>
-Cc: kasan-dev@googlegroups.com
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- include/net/netlink.h | 36 ++++++++++++++++++------------------
- 1 file changed, 18 insertions(+), 18 deletions(-)
+ drivers/mtd/chips/cfi_cmdset_0020.c | 8 ++++----
+ include/linux/mtd/map.h             | 8 ++++----
+ 2 files changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/include/net/netlink.h b/include/net/netlink.h
-index 01709172b3d3..24b4badd6eaf 100644
---- a/include/net/netlink.h
-+++ b/include/net/netlink.h
-@@ -766,7 +766,7 @@ static inline int nla_parse_nested(struct nlattr *tb[], int maxtype,
-  * @attrtype: attribute type
-  * @value: numeric value
-  */
--static inline int nla_put_u8(struct sk_buff *skb, int attrtype, u8 value)
-+static noinline_if_stackbloat int nla_put_u8(struct sk_buff *skb, int attrtype, u8 value)
- {
- 	return nla_put(skb, attrtype, sizeof(u8), &value);
+diff --git a/drivers/mtd/chips/cfi_cmdset_0020.c b/drivers/mtd/chips/cfi_cmdset_0020.c
+index 7d342965f392..5eee5e883f55 100644
+--- a/drivers/mtd/chips/cfi_cmdset_0020.c
++++ b/drivers/mtd/chips/cfi_cmdset_0020.c
+@@ -244,7 +244,7 @@ static struct mtd_info *cfi_staa_setup(struct map_info *map)
  }
-@@ -777,7 +777,7 @@ static inline int nla_put_u8(struct sk_buff *skb, int attrtype, u8 value)
-  * @attrtype: attribute type
-  * @value: numeric value
-  */
--static inline int nla_put_u16(struct sk_buff *skb, int attrtype, u16 value)
-+static noinline_if_stackbloat int nla_put_u16(struct sk_buff *skb, int attrtype, u16 value)
+ 
+ 
+-static inline int do_read_onechip(struct map_info *map, struct flchip *chip, loff_t adr, size_t len, u_char *buf)
++static noinline_if_stackbloat int do_read_onechip(struct map_info *map, struct flchip *chip, loff_t adr, size_t len, u_char *buf)
  {
- 	return nla_put(skb, attrtype, sizeof(u16), &value);
+ 	map_word status, status_OK;
+ 	unsigned long timeo;
+@@ -728,7 +728,7 @@ cfi_staa_writev(struct mtd_info *mtd, const struct kvec *vecs,
  }
-@@ -788,7 +788,7 @@ static inline int nla_put_u16(struct sk_buff *skb, int attrtype, u16 value)
-  * @attrtype: attribute type
-  * @value: numeric value
-  */
--static inline int nla_put_be16(struct sk_buff *skb, int attrtype, __be16 value)
-+static noinline_if_stackbloat int nla_put_be16(struct sk_buff *skb, int attrtype, __be16 value)
+ 
+ 
+-static inline int do_erase_oneblock(struct map_info *map, struct flchip *chip, unsigned long adr)
++static noinline_if_stackbloat int do_erase_oneblock(struct map_info *map, struct flchip *chip, unsigned long adr)
  {
- 	return nla_put(skb, attrtype, sizeof(__be16), &value);
+ 	struct cfi_private *cfi = map->fldrv_priv;
+ 	map_word status, status_OK;
+@@ -1029,7 +1029,7 @@ static void cfi_staa_sync (struct mtd_info *mtd)
+ 	}
  }
-@@ -799,7 +799,7 @@ static inline int nla_put_be16(struct sk_buff *skb, int attrtype, __be16 value)
-  * @attrtype: attribute type
-  * @value: numeric value
-  */
--static inline int nla_put_net16(struct sk_buff *skb, int attrtype, __be16 value)
-+static noinline_if_stackbloat int nla_put_net16(struct sk_buff *skb, int attrtype, __be16 value)
+ 
+-static inline int do_lock_oneblock(struct map_info *map, struct flchip *chip, unsigned long adr)
++static noinline_if_stackbloat int do_lock_oneblock(struct map_info *map, struct flchip *chip, unsigned long adr)
  {
- 	return nla_put_be16(skb, attrtype | NLA_F_NET_BYTEORDER, value);
+ 	struct cfi_private *cfi = map->fldrv_priv;
+ 	map_word status, status_OK;
+@@ -1175,7 +1175,7 @@ static int cfi_staa_lock(struct mtd_info *mtd, loff_t ofs, uint64_t len)
+ 	}
+ 	return 0;
  }
-@@ -810,7 +810,7 @@ static inline int nla_put_net16(struct sk_buff *skb, int attrtype, __be16 value)
-  * @attrtype: attribute type
-  * @value: numeric value
-  */
--static inline int nla_put_le16(struct sk_buff *skb, int attrtype, __le16 value)
-+static noinline_if_stackbloat int nla_put_le16(struct sk_buff *skb, int attrtype, __le16 value)
+-static inline int do_unlock_oneblock(struct map_info *map, struct flchip *chip, unsigned long adr)
++static noinline_if_stackbloat int do_unlock_oneblock(struct map_info *map, struct flchip *chip, unsigned long adr)
  {
- 	return nla_put(skb, attrtype, sizeof(__le16), &value);
+ 	struct cfi_private *cfi = map->fldrv_priv;
+ 	map_word status, status_OK;
+diff --git a/include/linux/mtd/map.h b/include/linux/mtd/map.h
+index 3aa56e3104bb..29db74314db8 100644
+--- a/include/linux/mtd/map.h
++++ b/include/linux/mtd/map.h
+@@ -316,7 +316,7 @@ static inline map_word map_word_or(struct map_info *map, map_word val1, map_word
+ 	return r;
  }
-@@ -821,7 +821,7 @@ static inline int nla_put_le16(struct sk_buff *skb, int attrtype, __le16 value)
-  * @attrtype: attribute type
-  * @value: numeric value
-  */
--static inline int nla_put_u32(struct sk_buff *skb, int attrtype, u32 value)
-+static noinline_if_stackbloat int nla_put_u32(struct sk_buff *skb, int attrtype, u32 value)
+ 
+-static inline int map_word_andequal(struct map_info *map, map_word val1, map_word val2, map_word val3)
++static noinline_if_stackbloat int map_word_andequal(struct map_info *map, map_word val1, map_word val2, map_word val3)
  {
- 	return nla_put(skb, attrtype, sizeof(u32), &value);
+ 	int i;
+ 
+@@ -328,7 +328,7 @@ static inline int map_word_andequal(struct map_info *map, map_word val1, map_wor
+ 	return 1;
  }
-@@ -832,7 +832,7 @@ static inline int nla_put_u32(struct sk_buff *skb, int attrtype, u32 value)
-  * @attrtype: attribute type
-  * @value: numeric value
-  */
--static inline int nla_put_be32(struct sk_buff *skb, int attrtype, __be32 value)
-+static noinline_if_stackbloat int nla_put_be32(struct sk_buff *skb, int attrtype, __be32 value)
+ 
+-static inline int map_word_bitsset(struct map_info *map, map_word val1, map_word val2)
++static noinline_if_stackbloat int map_word_bitsset(struct map_info *map, map_word val1, map_word val2)
  {
- 	return nla_put(skb, attrtype, sizeof(__be32), &value);
+ 	int i;
+ 
+@@ -362,7 +362,7 @@ static inline map_word map_word_load(struct map_info *map, const void *ptr)
+ 	return r;
  }
-@@ -843,7 +843,7 @@ static inline int nla_put_be32(struct sk_buff *skb, int attrtype, __be32 value)
-  * @attrtype: attribute type
-  * @value: numeric value
-  */
--static inline int nla_put_net32(struct sk_buff *skb, int attrtype, __be32 value)
-+static noinline_if_stackbloat int nla_put_net32(struct sk_buff *skb, int attrtype, __be32 value)
+ 
+-static inline map_word map_word_load_partial(struct map_info *map, map_word orig, const unsigned char *buf, int start, int len)
++static noinline_if_stackbloat map_word map_word_load_partial(struct map_info *map, map_word orig, const unsigned char *buf, int start, int len)
  {
- 	return nla_put_be32(skb, attrtype | NLA_F_NET_BYTEORDER, value);
- }
-@@ -854,7 +854,7 @@ static inline int nla_put_net32(struct sk_buff *skb, int attrtype, __be32 value)
-  * @attrtype: attribute type
-  * @value: numeric value
-  */
--static inline int nla_put_le32(struct sk_buff *skb, int attrtype, __le32 value)
-+static noinline_if_stackbloat int nla_put_le32(struct sk_buff *skb, int attrtype, __le32 value)
+ 	int i;
+ 
+@@ -392,7 +392,7 @@ static inline map_word map_word_load_partial(struct map_info *map, map_word orig
+ #define MAP_FF_LIMIT 8
+ #endif
+ 
+-static inline map_word map_word_ff(struct map_info *map)
++static noinline_if_stackbloat map_word map_word_ff(struct map_info *map)
  {
- 	return nla_put(skb, attrtype, sizeof(__le32), &value);
- }
-@@ -866,7 +866,7 @@ static inline int nla_put_le32(struct sk_buff *skb, int attrtype, __le32 value)
-  * @value: numeric value
-  * @padattr: attribute type for the padding
-  */
--static inline int nla_put_u64_64bit(struct sk_buff *skb, int attrtype,
-+static noinline_if_stackbloat int nla_put_u64_64bit(struct sk_buff *skb, int attrtype,
- 				    u64 value, int padattr)
- {
- 	return nla_put_64bit(skb, attrtype, sizeof(u64), &value, padattr);
-@@ -879,7 +879,7 @@ static inline int nla_put_u64_64bit(struct sk_buff *skb, int attrtype,
-  * @value: numeric value
-  * @padattr: attribute type for the padding
-  */
--static inline int nla_put_be64(struct sk_buff *skb, int attrtype, __be64 value,
-+static noinline_if_stackbloat int nla_put_be64(struct sk_buff *skb, int attrtype, __be64 value,
- 			       int padattr)
- {
- 	return nla_put_64bit(skb, attrtype, sizeof(__be64), &value, padattr);
-@@ -892,7 +892,7 @@ static inline int nla_put_be64(struct sk_buff *skb, int attrtype, __be64 value,
-  * @value: numeric value
-  * @padattr: attribute type for the padding
-  */
--static inline int nla_put_net64(struct sk_buff *skb, int attrtype, __be64 value,
-+static noinline_if_stackbloat int nla_put_net64(struct sk_buff *skb, int attrtype, __be64 value,
- 				int padattr)
- {
- 	return nla_put_be64(skb, attrtype | NLA_F_NET_BYTEORDER, value,
-@@ -906,7 +906,7 @@ static inline int nla_put_net64(struct sk_buff *skb, int attrtype, __be64 value,
-  * @value: numeric value
-  * @padattr: attribute type for the padding
-  */
--static inline int nla_put_le64(struct sk_buff *skb, int attrtype, __le64 value,
-+static noinline_if_stackbloat int nla_put_le64(struct sk_buff *skb, int attrtype, __le64 value,
- 			       int padattr)
- {
- 	return nla_put_64bit(skb, attrtype, sizeof(__le64), &value, padattr);
-@@ -918,7 +918,7 @@ static inline int nla_put_le64(struct sk_buff *skb, int attrtype, __le64 value,
-  * @attrtype: attribute type
-  * @value: numeric value
-  */
--static inline int nla_put_s8(struct sk_buff *skb, int attrtype, s8 value)
-+static noinline_if_stackbloat int nla_put_s8(struct sk_buff *skb, int attrtype, s8 value)
- {
- 	return nla_put(skb, attrtype, sizeof(s8), &value);
- }
-@@ -929,7 +929,7 @@ static inline int nla_put_s8(struct sk_buff *skb, int attrtype, s8 value)
-  * @attrtype: attribute type
-  * @value: numeric value
-  */
--static inline int nla_put_s16(struct sk_buff *skb, int attrtype, s16 value)
-+static noinline_if_stackbloat int nla_put_s16(struct sk_buff *skb, int attrtype, s16 value)
- {
- 	return nla_put(skb, attrtype, sizeof(s16), &value);
- }
-@@ -940,7 +940,7 @@ static inline int nla_put_s16(struct sk_buff *skb, int attrtype, s16 value)
-  * @attrtype: attribute type
-  * @value: numeric value
-  */
--static inline int nla_put_s32(struct sk_buff *skb, int attrtype, s32 value)
-+static noinline_if_stackbloat int nla_put_s32(struct sk_buff *skb, int attrtype, s32 value)
- {
- 	return nla_put(skb, attrtype, sizeof(s32), &value);
- }
-@@ -952,7 +952,7 @@ static inline int nla_put_s32(struct sk_buff *skb, int attrtype, s32 value)
-  * @value: numeric value
-  * @padattr: attribute type for the padding
-  */
--static inline int nla_put_s64(struct sk_buff *skb, int attrtype, s64 value,
-+static noinline_if_stackbloat int nla_put_s64(struct sk_buff *skb, int attrtype, s64 value,
- 			      int padattr)
- {
- 	return nla_put_64bit(skb, attrtype, sizeof(s64), &value, padattr);
-@@ -987,7 +987,7 @@ static inline int nla_put_flag(struct sk_buff *skb, int attrtype)
-  * @njiffies: number of jiffies to convert to msecs
-  * @padattr: attribute type for the padding
-  */
--static inline int nla_put_msecs(struct sk_buff *skb, int attrtype,
-+static noinline_if_stackbloat int nla_put_msecs(struct sk_buff *skb, int attrtype,
- 				unsigned long njiffies, int padattr)
- {
- 	u64 tmp = jiffies_to_msecs(njiffies);
+ 	map_word r;
+ 	int i;
 -- 
 2.9.0
 
