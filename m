@@ -1,45 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:51820 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751095AbdFVBRh (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:61520 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751997AbdFVBTD (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 21 Jun 2017 21:17:37 -0400
+        Wed, 21 Jun 2017 21:19:03 -0400
 MIME-Version: 1.0
-In-Reply-To: <20170615083622.16618-1-richard.genoud@gmail.com>
-References: <20170615083622.16618-1-richard.genoud@gmail.com>
+In-Reply-To: <1496996992-17857-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1496996992-17857-1-git-send-email-yamada.masahiro@socionext.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 22 Jun 2017 10:17:31 +0900
-Message-ID: <CAK7LNATAYn2-4X7Dyn0tRqNfZCNVU6Ws3VaMSsQJ=MhUMLy+_Q@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: fix header installation under fakechroot environment
+Date: Thu, 22 Jun 2017 10:18:38 +0900
+Message-ID: <CAK7LNAToMSMNFAKd-NHwvx=yAjFaho0qPk-6zU13WZbzfPbxqw@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: replace genhdr-y with generated-y, deprecating genhdr-y
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Richard Genoud <richard.genoud@gmail.com>
-Cc: Nicolas Dichtel <nicolas.dichtel@6wind.com>, Daniel Vetter <daniel.vetter@ffwll.ch>, Russell King <rmk+kernel@armlinux.org.uk>, Mark Salter <msalter@redhat.com>, Michael Ellerman <mpe@ellerman.id.au>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+To: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Nicolas Dichtel <nicolas.dichtel@6wind.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Daniel Vetter <daniel.vetter@ffwll.ch>, Michal Marek <mmarek@suse.com>, Michael Ellerman <mpe@ellerman.id.au>, X86 ML <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>, Jonathan Corbet <corbet@lwn.net>, Thomas Gleixner <tglx@linutronix.de>, linux-doc@vger.kernel.org, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Ingo Molnar <mingo@redhat.com>, Russell King <linux@armlinux.org.uk>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-2017-06-15 17:36 GMT+09:00 Richard Genoud <richard.genoud@gmail.com>:
-> Since commit fcc8487d477a ("uapi: export all headers under uapi
-> directories") fakechroot make bindeb-pkg fails, mismatching files for
-> directories:
-> touch: cannot touch 'usr/include/video/uvesafb.h/.install': Not a
-> directory
+2017-06-09 17:29 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
+> Prior to commit fcc8487d477a ("uapi: export all headers under uapi
+> directories"), genhdr-y was meant to specify generated UAPI headers.
 >
-> This due to a bug in fakechroot:
-> when using the function $(wildcard $(srcdir)/*/.) in a makefile, under a
-> fakechroot environment, not only directories but also files are
-> returned.
+> - generated-y: generated headers (other than asm-generic wrappers)
+> - header-y   : headers to be exported
+> - genhdr-y   : generated headers to be exported (generated-y + header-y)
 >
-> To circumvent that, we are using the functions:
-> $(sort $(dir $(wildcard $(srcdir)/*/))))
+> Now headers under UAPI directories are all exported.  So, there is no
+> more difference between generated-y and genhdr-y.
 >
-> And thanks to Yamada Masahiro who figured out the right
-> filter-out/patsubst order !
+> We see two users of genhdr-y, arch/{arm,x86}/include/uapi/asm/Kbuild.
+> They generate some headers in arch/{arm,x86}/include/uapi/generated/
+> directories, which are obviously exported.
 >
-> Fixes: fcc8487d477a ("uapi: export all headers under uapi directories")
-> Signed-off-by: Richard Genoud <richard.genoud@gmail.com>
-> ---
+> Replace genhdr-y with generated-y, and deprecate genhdr-y.
+>
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 
-Applied to linux-kbuild/fixes.  Thanks!
+Applied to linux-kbuild/kbuild.
+
+
 
 -- 
 Best Regards
