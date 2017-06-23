@@ -1,131 +1,105 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:21666 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753694AbdFWJ4n (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:58531 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754161AbdFWKDG (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 23 Jun 2017 05:56:43 -0400
+        Fri, 23 Jun 2017 06:03:06 -0400
 MIME-Version: 1.0
-In-Reply-To: <20170622123929.15054-3-npiggin@gmail.com>
-References: <20170622123929.15054-1-npiggin@gmail.com> <20170622123929.15054-3-npiggin@gmail.com>
+In-Reply-To: <20170623135031.793e36cb@roar.ozlabs.ibm.com>
+References: <20170622123929.15054-1-npiggin@gmail.com> <20170622123929.15054-2-npiggin@gmail.com>
+ <CAK7LNAQk9Vm0u1Avm6ruPw6rdbiXmmdpG0gLtduHM30tHs7=6g@mail.gmail.com> <20170623135031.793e36cb@roar.ozlabs.ibm.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 23 Jun 2017 18:56:32 +0900
-Message-ID: <CAK7LNATX=Mvu1PtHQOnkwr2D9wc4cFJEOoTPgOK2t=026i8OKg@mail.gmail.com>
-Subject: Re: [PATCH v2 2/3] ia64: thin archives fix linking
+Date: Fri, 23 Jun 2017 19:02:44 +0900
+Message-ID: <CAK7LNAQvJvtAjNp+ytVPiMZTw+P-K0cE78_XKSVP13QbSdLLdw@mail.gmail.com>
+Subject: Re: [PATCH v2 1/3] sh: thin archives fix linking
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Nicholas Piggin <npiggin@gmail.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Tony Luck <tony.luck@intel.com>, Fenghua Yu <fenghua.yu@intel.com>, linux-ia64@vger.kernel.org
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Yoshinori Sato <ysato@users.sourceforge.jp>, Rich Felker <dalias@libc.org>, linux-sh@vger.kernel.org
 
-Hi Nicholas,
-
-
-2017-06-22 21:39 GMT+09:00 Nicholas Piggin <npiggin@gmail.com>:
-> The VDSO symbols can't be linked into built-in.o when building with
-> thin archives, so change this to linking a new object file that is
-> included into the built-in.o.
+2017-06-23 12:50 GMT+09:00 Nicholas Piggin <npiggin@gmail.com>:
+> On Fri, 23 Jun 2017 12:25:10 +0900
+> Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
 >
-> Cc: Tony Luck <tony.luck@intel.com>
-> Cc: Fenghua Yu <fenghua.yu@intel.com>
-> Cc: linux-ia64@vger.kernel.org
-> Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-> ---
->  arch/ia64/kernel/Makefile.gate | 12 +++++++-----
->  1 file changed, 7 insertions(+), 5 deletions(-)
+>> 2017-06-22 21:39 GMT+09:00 Nicholas Piggin <npiggin@gmail.com>:
+>> > The VDSO symbols can't be linked into built-in.o when building with
+>> > thin archives, so change this to linking a new object file that is
+>> > included into the built-in.o.
+>> >
+>> > Cc: Yoshinori Sato <ysato@users.sourceforge.jp>
+>> > Cc: Rich Felker <dalias@libc.org>
+>> > Cc: linux-sh@vger.kernel.org
+>> > Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+>> > ---
+>> >  arch/sh/kernel/vsyscall/Makefile | 16 +++++++++-------
+>> >  1 file changed, 9 insertions(+), 7 deletions(-)
+>> >
+>> > diff --git a/arch/sh/kernel/vsyscall/Makefile b/arch/sh/kernel/vsyscall/Makefile
+>> > index 8f0ea5fc835c..efc7a6837ef6 100644
+>> > --- a/arch/sh/kernel/vsyscall/Makefile
+>> > +++ b/arch/sh/kernel/vsyscall/Makefile
+>> > @@ -1,4 +1,4 @@
+>> > -obj-y += vsyscall.o vsyscall-syscall.o
+>> > +obj-y += vsyscall.o vsyscall-syscall.o vsyscall-syms.o
+>> >
+>> >  $(obj)/vsyscall-syscall.o: \
+>> >         $(foreach F,trapa,$(obj)/vsyscall-$F.so)
+>> > @@ -26,11 +26,13 @@ $(obj)/vsyscall-%.so: $(src)/vsyscall.lds $(obj)/vsyscall-%.o FORCE
+>> >  # We also create a special relocatable object that should mirror the symbol
+>> >  # table and layout of the linked DSO.  With ld -R we can then refer to
+>> >  # these symbols in the kernel code rather than hand-coded addresses.
+>> > -extra-y += vsyscall-syms.o
+>> > -$(obj)/built-in.o: $(obj)/vsyscall-syms.o
+>> > -$(obj)/built-in.o: ld_flags += -R $(obj)/vsyscall-syms.o
+>> > -
+>> > -SYSCFLAGS_vsyscall-syms.o = -r
+>> > -$(obj)/vsyscall-syms.o: $(src)/vsyscall.lds \
+>> > +SYSCFLAGS_vsyscall-dummy.o = -r
+>> > +$(obj)/vsyscall-dummy.o: $(src)/vsyscall.lds \
+>> >                         $(obj)/vsyscall-trapa.o $(obj)/vsyscall-note.o FORCE
+>> >         $(call if_changed,syscall)
+>> > +
+>> > +quiet_cmd_syscall_syms = SYSCALL $@
+>> > +      cmd_syscall_syms = $(LD) -r -R $(obj)/vsyscall-dummy.o -o $@
+>> > +
+>> > +$(obj)/vsyscall-syms.o: $(obj)/vsyscall-dummy.o
+>> > +       $(call if_changed,syscall_syms)
+>> > --
+>> > 2.11.0
+>>
+>> I applied this, but
+>> I just noticed vsyscall-dummy is rebuilt every time.
+>>
+>>
+>>   SYSCALL arch/sh/kernel/vsyscall/vsyscall-dummy.o
+>>   SYSCALL arch/sh/kernel/vsyscall/vsyscall-syms.o
+>>   AR      arch/sh/kernel/vsyscall/built-in.o
+>>   AR      arch/sh/kernel/built-in.o
+>>
+>>
+>>
+>> We can avoid the unneeded rebuild by adding "vsyscall-dummy.o" to "targets".
+>>
+>> targets += vsyscall-note.o vsyscall.lds vsyscall-dummy.o
 >
-> diff --git a/arch/ia64/kernel/Makefile.gate b/arch/ia64/kernel/Makefile.gate
-> index a32903ada016..e20c711c2b1e 100644
-> --- a/arch/ia64/kernel/Makefile.gate
-> +++ b/arch/ia64/kernel/Makefile.gate
-> @@ -2,7 +2,9 @@
->
->  targets += gate.so gate-syms.o
->
-> -extra-y += gate.so gate-syms.o gate.lds gate.o
-> +obj-y += gate-syms.o
-> +
-> +extra-y += gate.so gate.lds gate.o
->
->  CPPFLAGS_gate.lds := -P -C -U$(ARCH)
->
-> @@ -14,12 +16,12 @@ GATECFLAGS_gate.so = -shared -s -Wl,-soname=linux-gate.so.1 \
->  $(obj)/gate.so: $(obj)/gate.lds $(obj)/gate.o FORCE
->         $(call if_changed,gate)
->
-> -$(obj)/built-in.o: $(obj)/gate-syms.o
-> -$(obj)/built-in.o: ld_flags += -R $(obj)/gate-syms.o
-> +# create an object file to resolve gate symbols
-> +quiet_cmd_gate_syms = GATESYM $@
-> +      cmd_gate_syms = $(LD) -r -T $(obj)/gate.lds -R $(obj)/gate.o -o $@
->
-> -GATECFLAGS_gate-syms.o = -r
->  $(obj)/gate-syms.o: $(obj)/gate.lds $(obj)/gate.o FORCE
-> -       $(call if_changed,gate)
-> +       $(call if_changed,gate_syms)
->
->  # gate-data.o contains the gate DSO image as data in section .data..gate.
->  # We must build gate.so before we can assemble it.
+> Thanks, good catch. The tile patch may have the same issue?
 > --
-> 2.11.0
+
+I think so.
 
 
-Build test passed, but the symbol table seems different.
-
-For example,  __kernel_sigtramp will change
-a000000000040740 T __kernel_sigtramp
- to
-0000000000000020 A __kernel_sigtramp
+One more fix.
 
 
++$(obj)/vsyscall-syms.o: $(obj)/vsyscall-dummy.o
++       $(call if_changed,syscall_syms)
 
 
+$(call if_changed,...) must have FORCE in the dependency field.
+Otherwise, if_changed may not be evaluated.
 
-
-Without this patch,
-
-$ ia64-linux-nm -n arch/ia64/kernel/gate-syms.o
-a000000000000600 D __start_gate_mckinley_e9_patchlist
-a000000000000604 D __end_gate_mckinley_e9_patchlist
-a000000000000604 D __end_gate_vtop_patchlist
-a000000000000604 D __start_gate_fsyscall_patchlist
-a000000000000604 D __start_gate_vtop_patchlist
-a000000000000608 D __end_gate_fsyscall_patchlist
-a000000000000608 D __start_gate_brl_fsys_bubble_down_patchlist
-a00000000000060c D __end_gate_brl_fsys_bubble_down_patchlist
-a000000000040720 T __kernel_syscall_via_break
-a000000000040740 T __kernel_sigtramp
-a000000000040770 t back_from_setup_rbs
-a000000000040830 t back_from_restore_rbs
-a0000000000408a0 t setup_rbs
-a000000000040900 t restore_rbs
-a000000000040a00 T __kernel_syscall_via_epc
-
-$ ia64-linux-nm -n arch/ia64/kernel/built-in.o | grep  __kernel_sigtramp
-a000000000040740 A __kernel_sigtramp
-
-
-With this patch,
-
-$ ia64-linux-nm -n arch/ia64/kernel/gate-syms.o
-0000000000000000 A __kernel_syscall_via_break
-0000000000000020 A __kernel_sigtramp
-00000000000002e0 A __kernel_syscall_via_epc
-a000000000000600 D __end_gate_brl_fsys_bubble_down_patchlist
-a000000000000600 D __end_gate_fsyscall_patchlist
-a000000000000600 D __end_gate_mckinley_e9_patchlist
-a000000000000600 D __end_gate_vtop_patchlist
-a000000000000600 D __start_gate_brl_fsys_bubble_down_patchlist
-a000000000000600 D __start_gate_fsyscall_patchlist
-a000000000000600 D __start_gate_mckinley_e9_patchlist
-a000000000000600 D __start_gate_vtop_patchlist
-
-$ ia64-linux-nm -n arch/ia64/kernel/built-in.o | grep __kernel_sigtramp
-0000000000000020 A __kernel_sigtramp
-
-
-Could you check it?
-
-
+I can fix up it locally.  :-)
 
 
 -- 
