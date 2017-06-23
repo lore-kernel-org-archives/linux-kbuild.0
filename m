@@ -1,130 +1,171 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg0-f65.google.com ([74.125.83.65]:36314 "EHLO
-        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751287AbdFWNo1 (ORCPT
+Received: from mail.free-electrons.com ([62.4.15.54]:47578 "EHLO
+        mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751999AbdFWO5q (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 23 Jun 2017 09:44:27 -0400
-Date: Fri, 23 Jun 2017 23:44:15 +1000
-From: Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH v2 2/3] ia64: thin archives fix linking
-Message-ID: <20170623234415.7d493a8d@roar.ozlabs.ibm.com>
-In-Reply-To: <CAK7LNATX=Mvu1PtHQOnkwr2D9wc4cFJEOoTPgOK2t=026i8OKg@mail.gmail.com>
-References: <20170622123929.15054-1-npiggin@gmail.com>
-        <20170622123929.15054-3-npiggin@gmail.com>
-        <CAK7LNATX=Mvu1PtHQOnkwr2D9wc4cFJEOoTPgOK2t=026i8OKg@mail.gmail.com>
+        Fri, 23 Jun 2017 10:57:46 -0400
+Date: Fri, 23 Jun 2017 16:57:34 +0200
+From: Maxime Ripard <maxime.ripard@free-electrons.com>
+Subject: Re: [PATCH 1/5] kbuild: thin archives final link close
+ --whole-archives option
+Message-ID: <20170623145734.7pv3rdgucveg66s3@flea.lan>
+References: <20170621211002.44525d9b@roar.ozlabs.ibm.com>
+ <CAK8P3a2A9fMrNZPWJft2t+52kmGkGgm3gv_fxJntjevWtJ69Zw@mail.gmail.com>
+ <20170621220213.2b33d56d@roar.ozlabs.ibm.com>
+ <CAK8P3a0nVPz=eLV8ET6BYR2Qs0H3PQZuhYsu4Cb_kJSPACrR9w@mail.gmail.com>
+ <20170621161913.GY4493@codeaurora.org>
+ <20170622040838.1c63ebb7@roar.ozlabs.ibm.com>
+ <CAK8P3a2vV10+ymS7vHybfhRf_DVvACOW4O2OZzyz+v75y2Ak4w@mail.gmail.com>
+ <20170622061838.ljlmk4enzpvdlyyu@flea.lan>
+ <20170623015021.58f74316@roar.ozlabs.ibm.com>
+ <CAK7LNATbd5n2uMsTN_jaUN+QjpB5DN3AvS+6iqqt3w3kuwQS3A@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="33cog44uo5eg5a2w"
+Content-Disposition: inline
+In-Reply-To: <CAK7LNATbd5n2uMsTN_jaUN+QjpB5DN3AvS+6iqqt3w3kuwQS3A@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Tony Luck <tony.luck@intel.com>, Fenghua Yu <fenghua.yu@intel.com>, linux-ia64@vger.kernel.org
+Cc: Nicholas Piggin <npiggin@gmail.com>, Arnd Bergmann <arnd@arndb.de>, Stephen Boyd <sboyd@codeaurora.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-arch <linux-arch@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Linus Torvalds <torvalds@linux-foundation.org>, Stephen Rothwell <sfr@canb.auug.org.au>, kbuild test robot <fengguang.wu@intel.com>, Josh Triplett <josh@joshtriplett.org>, Nicolas Pitre <nicolas.pitre@linaro.org>
 
-On Fri, 23 Jun 2017 18:56:32 +0900
-Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
 
+--33cog44uo5eg5a2w
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Jun 23, 2017 at 02:31:40PM +0900, Masahiro Yamada wrote:
 > Hi Nicholas,
-> 
-> 
-> 2017-06-22 21:39 GMT+09:00 Nicholas Piggin <npiggin@gmail.com>:
+>=20
+> 2017-06-23 0:50 GMT+09:00 Nicholas Piggin <npiggin@gmail.com>:
+> > On Thu, 22 Jun 2017 08:18:38 +0200
+> > Maxime Ripard <maxime.ripard@free-electrons.com> wrote:
+> >
+> >> On Wed, Jun 21, 2017 at 10:55:06PM +0200, Arnd Bergmann wrote:
+> >> > On Wed, Jun 21, 2017 at 8:08 PM, Nicholas Piggin <npiggin@gmail.com>=
+ wrote:
+> >> > > On Wed, 21 Jun 2017 09:19:13 -0700
+> >> > > Stephen Boyd <sboyd@codeaurora.org> wrote:
+> >> > >> On 06/21, Arnd Bergmann wrote:
+> >> > >>
+> >> > >> Ok. Can you send a revert patch to the list with some information
+> >> > >> on why we can't do the hack anymore and also Cc lkml/kbuild
+> >> > >> lists? The commit is in linux-next now as commit 06e226c7fb23
+> >> > >> (clk: sunxi-ng: Move all clock types to a library, 2017-06-02).
+> >> > >>
+> >> > >
+> >> > > I grabbed this patch and applied it to the kbuid/thin-ac tree. I t=
+ested
+> >> > > with thin archives enabled and disabled with arm defconfig which e=
+nds up
+> >> > > setting CONFIG_SUNXI_CCU=3Dy.
+> >> > >
+> >> > > The patch makes no difference to vmlinux size whether using tradit=
+ional
+> >> > > incremental link, or thin archives (there is a small difference be=
+tween
+> >> > > inclink and thinarc but that's unrelated).
+> >> > >
+> >> > > So this thin archives change does not break your patch, it's just =
+that
+> >> > > it doesn't really do the right thing. I like the general idea, but=
+ we
+> >> > > need to work out how to make it properly supported by the build sy=
+stem.
+> >> > >
+> >> > > With the patch applied, this is what the build system currently do=
+es:
+> >> > >
+> >> > > arm-linux-gnueabihf-ld -EL    -r -o drivers/clk/sunxi-ng/built-in.=
+o drivers/clk/sunxi-ng/ccu-sun5i.o drivers/clk/sunxi-ng/ccu-sun6i-a31.o dri=
+vers/clk/sunxi-ng/ccu-sun8i-a23.o drivers/clk/sunxi-ng/ccu-sun8i-a33.o driv=
+ers/clk/sunxi-ng/ccu-sun8i-h3.o drivers/clk/sunxi-ng/ccu-sun8i-v3s.o driver=
+s/clk/sunxi-ng/ccu-sun8i-r.o drivers/clk/sunxi-ng/ccu-sun9i-a80.o drivers/c=
+lk/sunxi-ng/ccu-sun9i-a80-de.o drivers/clk/sunxi-ng/ccu-sun9i-a80-usb.o dri=
+vers/clk/sunxi-ng/lib.a drivers/clk/sunxi-ng/lib-ksyms.o
+> >> > >
+> >> > > This incremental link pulls in all your lib.a objects and links th=
+em
+> >> > > into built-in.o. They can no longer be selectively linked.
+> >> >
+> >> > I think the ARM defconfig actually needs all those objects because it
+> >> > enables all the high-level drivers. You could try disabling e.g. all=
+ except
+> >> > CONFIG_SUN8I_DE2_CCU if you want the objects to actually becomes
+> >> > unused.
+> >>
+> >> You can also disable MACH_SUN8I, it should disable a significant
+> >> number of the clocks driver.
+> >
+> >    text    data     bss     dec     hex filename
+> > 11655078        6018736  418944 18092758        11412d6 vmlinux.inclink
+> > 11655078        6018736  418944 18092758        11412d6 vmlinux.inclink=
+=2Eclk
+> > 11650534        6010288  418616 18079438        113dece vmlinux.thinarc
+> > 11650534        6010288  418616 18079438        113dece vmlinux.thinarc=
+=2Eclk
+> >
+> > Same result for me when compiling defconfig minus MACH_SUN8I, comparing
+> > +/- the clock patch and thin archives. No size savings. As I explained
+> > already, I really can't see how there could be any saving if the lib.a =
+is
+> > incrementally linked into built-in.o.
+>=20
+> I think defconfig minus MACH_SUN8I
+> will give no difference to CONFIG_SUNXI_CCU*
+>=20
+> As far as I tried,  minus MACH_SUN8I still enabled the following:
+> CONFIG_SUNXI_CCU=3Dy
+> CONFIG_SUNXI_CCU_DIV=3Dy
+> CONFIG_SUNXI_CCU_FRAC=3Dy
+> CONFIG_SUNXI_CCU_GATE=3Dy
+> CONFIG_SUNXI_CCU_MUX=3Dy
+> CONFIG_SUNXI_CCU_MULT=3Dy
+> CONFIG_SUNXI_CCU_PHASE=3Dy
+> CONFIG_SUNXI_CCU_NK=3Dy
+> CONFIG_SUNXI_CCU_NKM=3Dy
+> CONFIG_SUNXI_CCU_NKMP=3Dy
+> CONFIG_SUNXI_CCU_NM=3Dy
+> CONFIG_SUNXI_CCU_MP=3Dy
+>=20
+> I think you need to disable some more MACH_SUN*I and
+> perhaps disable some CONFIG_SUN*I_*_CCU explicitly,
+> then you will see difference in the result.
 
+Ah, right, it's all selected by the rest.
 
-> Without this patch,
-> 
-> $ ia64-linux-nm -n arch/ia64/kernel/gate-syms.o
-> a000000000000600 D __start_gate_mckinley_e9_patchlist
-> a000000000000604 D __end_gate_mckinley_e9_patchlist
-> a000000000000604 D __end_gate_vtop_patchlist
-> a000000000000604 D __start_gate_fsyscall_patchlist
-> a000000000000604 D __start_gate_vtop_patchlist
-> a000000000000608 D __end_gate_fsyscall_patchlist
-> a000000000000608 D __start_gate_brl_fsys_bubble_down_patchlist
-> a00000000000060c D __end_gate_brl_fsys_bubble_down_patchlist
-> a000000000040720 T __kernel_syscall_via_break
-> a000000000040740 T __kernel_sigtramp
-> a000000000040770 t back_from_setup_rbs
-> a000000000040830 t back_from_restore_rbs
-> a0000000000408a0 t setup_rbs
-> a000000000040900 t restore_rbs
-> a000000000040a00 T __kernel_syscall_via_epc
-> 
-> $ ia64-linux-nm -n arch/ia64/kernel/built-in.o | grep  __kernel_sigtramp
-> a000000000040740 A __kernel_sigtramp
-> 
-> 
-> With this patch,
-> 
-> $ ia64-linux-nm -n arch/ia64/kernel/gate-syms.o
-> 0000000000000000 A __kernel_syscall_via_break
+I guess to get a meaningful example you could disable all the
+SUN*I_CCU (SUN5I, SUN8I, and the likes) options and while keeping
+SUN8I_R_CCU.
 
-> 0000000000000020 A __kernel_sigtramp
-> 00000000000002e0 A __kernel_syscall_via_epc
-> a000000000000600 D __end_gate_brl_fsys_bubble_down_patchlist
-> a000000000000600 D __end_gate_fsyscall_patchlist
-> a000000000000600 D __end_gate_mckinley_e9_patchlist
-> a000000000000600 D __end_gate_vtop_patchlist
-> a000000000000600 D __start_gate_brl_fsys_bubble_down_patchlist
-> a000000000000600 D __start_gate_fsyscall_patchlist
-> a000000000000600 D __start_gate_mckinley_e9_patchlist
-> a000000000000600 D __start_gate_vtop_patchlist
-> 
-> $ ia64-linux-nm -n arch/ia64/kernel/built-in.o | grep __kernel_sigtramp
-> 0000000000000020 A __kernel_sigtramp
-> 
-> 
-> Could you check it?
+Most of the clock types shouldn't be used but div and gates.
 
-Sorry about this, thank you for catching it.
+Maxime
 
-This needs a dummy .o file as well. It seems we cannot do both -T and -R
-operations in one step. This patch follows more like sh and tile fixes.
+--=20
+Maxime Ripard, Free Electrons
+Embedded Linux and Kernel engineering
+http://free-electrons.com
 
-Thanks,
-Nick
+--33cog44uo5eg5a2w
+Content-Type: application/pgp-signature; name="signature.asc"
 
----
- arch/ia64/kernel/Makefile.gate | 18 ++++++++++++------
- 1 file changed, 12 insertions(+), 6 deletions(-)
+-----BEGIN PGP SIGNATURE-----
 
-diff --git a/arch/ia64/kernel/Makefile.gate b/arch/ia64/kernel/Makefile.gate
-index a32903ada016..e8ca862e7b21 100644
---- a/arch/ia64/kernel/Makefile.gate
-+++ b/arch/ia64/kernel/Makefile.gate
-@@ -1,8 +1,10 @@
- # The gate DSO image is built using a special linker script.
- 
--targets += gate.so gate-syms.o
-+targets += gate.so gate-syms.o gate-dummy.o
- 
--extra-y += gate.so gate-syms.o gate.lds gate.o
-+obj-y += gate-syms.o
-+
-+extra-y += gate.so gate.lds gate.o
- 
- CPPFLAGS_gate.lds := -P -C -U$(ARCH)
- 
-@@ -14,13 +16,17 @@ GATECFLAGS_gate.so = -shared -s -Wl,-soname=linux-gate.so.1 \
- $(obj)/gate.so: $(obj)/gate.lds $(obj)/gate.o FORCE
- 	$(call if_changed,gate)
- 
--$(obj)/built-in.o: $(obj)/gate-syms.o
--$(obj)/built-in.o: ld_flags += -R $(obj)/gate-syms.o
-+# create an object file to resolve gate symbols
-+quiet_cmd_gate_syms = GATESYM $@
-+      cmd_gate_syms = $(LD) -r -R $(obj)/gate-dummy.o -o $@
- 
--GATECFLAGS_gate-syms.o = -r
--$(obj)/gate-syms.o: $(obj)/gate.lds $(obj)/gate.o FORCE
-+GATECFLAGS_gate-dummy.o = -r
-+$(obj)/gate-dummy.o: $(obj)/gate.lds $(obj)/gate.o FORCE
- 	$(call if_changed,gate)
- 
-+$(obj)/gate-syms.o: $(obj)/gate-dummy.o FORCE
-+	$(call if_changed,gate_syms)
-+
- # gate-data.o contains the gate DSO image as data in section .data..gate.
- # We must build gate.so before we can assemble it.
- # Note: kbuild does not track this dependency due to usage of .incbin
--- 
-2.11.0
+iQIcBAEBAgAGBQJZTSxeAAoJEBx+YmzsjxAg6FoQAIa5kTABMrQsVQiWZKzQxBh0
+qeBuCuv7ijrRP1UrhGQLFwo4ezrWxLdDoJ8W0zox6sKuZwpfqQlmamDk/sfUWNJl
+WoV/+HeAvCdEVZHDAzkLpH75i1EpEQCzjGgJ99sj7khe0nYBaMoMVpgp9BJZS9uM
+09cckDBn9CgpIl5ifeG4LN4j8j0RlwJMklxWeG0IReBpUShMK2ybIx6mmrULqd8S
+odkl20UMvfAIkXRA4SlX/PoIoqWKcpkqvQfSRCFN/RMDXr0H8IbEAWvq66jKYTJ+
+2z+dqMWTi4K1WJ6wRgmXFu7P8YtaLlM5XQrw3CQnmOd4nX5OiQV9ZquMKcuy6U5B
+MH6BLy1Tq/DxzU90aqD0Q9T0V57wY1K6ytEOieVe6fMERg7OHG+HIFh1Fv2b42pN
+vbm2F1P2sTG5IsYOHT60gAdBoEV2W+DKunxY+CohXVo+fQBAZYLTIJuUWUeimja8
+xlbNwjZoMjuojnlbBVr8OnQicSEXtvnkrDApd0FpFyYp5tx2Gu7kWaF0z/ZVKPGe
+HcjGKOARHUpeHMBLkHTNMCxM4L6SJeYSU6X6VWk8+mq0J8nV0H9gBI22dCLbpoVe
+p9n5pis2O2omxViBx48m4bIKNu4A0y1DEqb3RED98ccrjgPMEkyo+RoQX4ofF58Y
+ysjyv0MOG/9NcR6BlkFO
+=atQP
+-----END PGP SIGNATURE-----
 
+--33cog44uo5eg5a2w--
