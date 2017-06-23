@@ -1,87 +1,129 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg0-f66.google.com ([74.125.83.66]:34733 "EHLO
-        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754176AbdFWDum (ORCPT
+Received: from conssluserg-01.nifty.com ([210.131.2.80]:41903 "EHLO
+        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754233AbdFWFcD (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 22 Jun 2017 23:50:42 -0400
-Date: Fri, 23 Jun 2017 13:50:31 +1000
-From: Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [PATCH v2 1/3] sh: thin archives fix linking
-Message-ID: <20170623135031.793e36cb@roar.ozlabs.ibm.com>
-In-Reply-To: <CAK7LNAQk9Vm0u1Avm6ruPw6rdbiXmmdpG0gLtduHM30tHs7=6g@mail.gmail.com>
-References: <20170622123929.15054-1-npiggin@gmail.com>
-        <20170622123929.15054-2-npiggin@gmail.com>
-        <CAK7LNAQk9Vm0u1Avm6ruPw6rdbiXmmdpG0gLtduHM30tHs7=6g@mail.gmail.com>
+        Fri, 23 Jun 2017 01:32:03 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20170623015021.58f74316@roar.ozlabs.ibm.com>
+References: <CAK8P3a0NT42HKOU+ZDRg_-1hA+RzYnL0RtzqbMsLbY=yTUxGRA@mail.gmail.com>
+ <20170621203824.719ffdc5@roar.ozlabs.ibm.com> <CAK8P3a1o91guXimc99sY3UOUjKTX5QxhQyOfY+j-x7MMCdRbdw@mail.gmail.com>
+ <20170621211002.44525d9b@roar.ozlabs.ibm.com> <CAK8P3a2A9fMrNZPWJft2t+52kmGkGgm3gv_fxJntjevWtJ69Zw@mail.gmail.com>
+ <20170621220213.2b33d56d@roar.ozlabs.ibm.com> <CAK8P3a0nVPz=eLV8ET6BYR2Qs0H3PQZuhYsu4Cb_kJSPACrR9w@mail.gmail.com>
+ <20170621161913.GY4493@codeaurora.org> <20170622040838.1c63ebb7@roar.ozlabs.ibm.com>
+ <CAK8P3a2vV10+ymS7vHybfhRf_DVvACOW4O2OZzyz+v75y2Ak4w@mail.gmail.com>
+ <20170622061838.ljlmk4enzpvdlyyu@flea.lan> <20170623015021.58f74316@roar.ozlabs.ibm.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Fri, 23 Jun 2017 14:31:40 +0900
+Message-ID: <CAK7LNATbd5n2uMsTN_jaUN+QjpB5DN3AvS+6iqqt3w3kuwQS3A@mail.gmail.com>
+Subject: Re: [PATCH 1/5] kbuild: thin archives final link close
+ --whole-archives option
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Yoshinori Sato <ysato@users.sourceforge.jp>, Rich Felker <dalias@libc.org>, linux-sh@vger.kernel.org
+To: Nicholas Piggin <npiggin@gmail.com>
+Cc: Maxime Ripard <maxime.ripard@free-electrons.com>, Arnd Bergmann <arnd@arndb.de>, Stephen Boyd <sboyd@codeaurora.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-arch <linux-arch@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Linus Torvalds <torvalds@linux-foundation.org>, Stephen Rothwell <sfr@canb.auug.org.au>, kbuild test robot <fengguang.wu@intel.com>, Josh Triplett <josh@joshtriplett.org>, Nicolas Pitre <nicolas.pitre@linaro.org>
 
-On Fri, 23 Jun 2017 12:25:10 +0900
-Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
+Hi Nicholas,
 
-> 2017-06-22 21:39 GMT+09:00 Nicholas Piggin <npiggin@gmail.com>:
-> > The VDSO symbols can't be linked into built-in.o when building with
-> > thin archives, so change this to linking a new object file that is
-> > included into the built-in.o.
-> >
-> > Cc: Yoshinori Sato <ysato@users.sourceforge.jp>
-> > Cc: Rich Felker <dalias@libc.org>
-> > Cc: linux-sh@vger.kernel.org
-> > Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-> > ---
-> >  arch/sh/kernel/vsyscall/Makefile | 16 +++++++++-------
-> >  1 file changed, 9 insertions(+), 7 deletions(-)
-> >
-> > diff --git a/arch/sh/kernel/vsyscall/Makefile b/arch/sh/kernel/vsyscall/Makefile
-> > index 8f0ea5fc835c..efc7a6837ef6 100644
-> > --- a/arch/sh/kernel/vsyscall/Makefile
-> > +++ b/arch/sh/kernel/vsyscall/Makefile
-> > @@ -1,4 +1,4 @@
-> > -obj-y += vsyscall.o vsyscall-syscall.o
-> > +obj-y += vsyscall.o vsyscall-syscall.o vsyscall-syms.o
-> >
-> >  $(obj)/vsyscall-syscall.o: \
-> >         $(foreach F,trapa,$(obj)/vsyscall-$F.so)
-> > @@ -26,11 +26,13 @@ $(obj)/vsyscall-%.so: $(src)/vsyscall.lds $(obj)/vsyscall-%.o FORCE
-> >  # We also create a special relocatable object that should mirror the symbol
-> >  # table and layout of the linked DSO.  With ld -R we can then refer to
-> >  # these symbols in the kernel code rather than hand-coded addresses.
-> > -extra-y += vsyscall-syms.o
-> > -$(obj)/built-in.o: $(obj)/vsyscall-syms.o
-> > -$(obj)/built-in.o: ld_flags += -R $(obj)/vsyscall-syms.o
-> > -
-> > -SYSCFLAGS_vsyscall-syms.o = -r
-> > -$(obj)/vsyscall-syms.o: $(src)/vsyscall.lds \
-> > +SYSCFLAGS_vsyscall-dummy.o = -r
-> > +$(obj)/vsyscall-dummy.o: $(src)/vsyscall.lds \
-> >                         $(obj)/vsyscall-trapa.o $(obj)/vsyscall-note.o FORCE
-> >         $(call if_changed,syscall)
-> > +
-> > +quiet_cmd_syscall_syms = SYSCALL $@
-> > +      cmd_syscall_syms = $(LD) -r -R $(obj)/vsyscall-dummy.o -o $@
-> > +
-> > +$(obj)/vsyscall-syms.o: $(obj)/vsyscall-dummy.o
-> > +       $(call if_changed,syscall_syms)
-> > --
-> > 2.11.0  
-> 
-> I applied this, but
-> I just noticed vsyscall-dummy is rebuilt every time.
-> 
-> 
->   SYSCALL arch/sh/kernel/vsyscall/vsyscall-dummy.o
->   SYSCALL arch/sh/kernel/vsyscall/vsyscall-syms.o
->   AR      arch/sh/kernel/vsyscall/built-in.o
->   AR      arch/sh/kernel/built-in.o
-> 
-> 
-> 
-> We can avoid the unneeded rebuild by adding "vsyscall-dummy.o" to "targets".
-> 
-> targets += vsyscall-note.o vsyscall.lds vsyscall-dummy.o
+2017-06-23 0:50 GMT+09:00 Nicholas Piggin <npiggin@gmail.com>:
+> On Thu, 22 Jun 2017 08:18:38 +0200
+> Maxime Ripard <maxime.ripard@free-electrons.com> wrote:
+>
+>> On Wed, Jun 21, 2017 at 10:55:06PM +0200, Arnd Bergmann wrote:
+>> > On Wed, Jun 21, 2017 at 8:08 PM, Nicholas Piggin <npiggin@gmail.com> w=
+rote:
+>> > > On Wed, 21 Jun 2017 09:19:13 -0700
+>> > > Stephen Boyd <sboyd@codeaurora.org> wrote:
+>> > >> On 06/21, Arnd Bergmann wrote:
+>> > >>
+>> > >> Ok. Can you send a revert patch to the list with some information
+>> > >> on why we can't do the hack anymore and also Cc lkml/kbuild
+>> > >> lists? The commit is in linux-next now as commit 06e226c7fb23
+>> > >> (clk: sunxi-ng: Move all clock types to a library, 2017-06-02).
+>> > >>
+>> > >
+>> > > I grabbed this patch and applied it to the kbuid/thin-ac tree. I tes=
+ted
+>> > > with thin archives enabled and disabled with arm defconfig which end=
+s up
+>> > > setting CONFIG_SUNXI_CCU=3Dy.
+>> > >
+>> > > The patch makes no difference to vmlinux size whether using traditio=
+nal
+>> > > incremental link, or thin archives (there is a small difference betw=
+een
+>> > > inclink and thinarc but that's unrelated).
+>> > >
+>> > > So this thin archives change does not break your patch, it's just th=
+at
+>> > > it doesn't really do the right thing. I like the general idea, but w=
+e
+>> > > need to work out how to make it properly supported by the build syst=
+em.
+>> > >
+>> > > With the patch applied, this is what the build system currently does=
+:
+>> > >
+>> > > arm-linux-gnueabihf-ld -EL    -r -o drivers/clk/sunxi-ng/built-in.o =
+drivers/clk/sunxi-ng/ccu-sun5i.o drivers/clk/sunxi-ng/ccu-sun6i-a31.o drive=
+rs/clk/sunxi-ng/ccu-sun8i-a23.o drivers/clk/sunxi-ng/ccu-sun8i-a33.o driver=
+s/clk/sunxi-ng/ccu-sun8i-h3.o drivers/clk/sunxi-ng/ccu-sun8i-v3s.o drivers/=
+clk/sunxi-ng/ccu-sun8i-r.o drivers/clk/sunxi-ng/ccu-sun9i-a80.o drivers/clk=
+/sunxi-ng/ccu-sun9i-a80-de.o drivers/clk/sunxi-ng/ccu-sun9i-a80-usb.o drive=
+rs/clk/sunxi-ng/lib.a drivers/clk/sunxi-ng/lib-ksyms.o
+>> > >
+>> > > This incremental link pulls in all your lib.a objects and links them
+>> > > into built-in.o. They can no longer be selectively linked.
+>> >
+>> > I think the ARM defconfig actually needs all those objects because it
+>> > enables all the high-level drivers. You could try disabling e.g. all e=
+xcept
+>> > CONFIG_SUN8I_DE2_CCU if you want the objects to actually becomes
+>> > unused.
+>>
+>> You can also disable MACH_SUN8I, it should disable a significant
+>> number of the clocks driver.
+>
+>    text    data     bss     dec     hex filename
+> 11655078        6018736  418944 18092758        11412d6 vmlinux.inclink
+> 11655078        6018736  418944 18092758        11412d6 vmlinux.inclink.c=
+lk
+> 11650534        6010288  418616 18079438        113dece vmlinux.thinarc
+> 11650534        6010288  418616 18079438        113dece vmlinux.thinarc.c=
+lk
+>
+> Same result for me when compiling defconfig minus MACH_SUN8I, comparing
+> +/- the clock patch and thin archives. No size savings. As I explained
+> already, I really can't see how there could be any saving if the lib.a is
+> incrementally linked into built-in.o.
 
-Thanks, good catch. The tile patch may have the same issue?
+I think defconfig minus MACH_SUN8I
+will give no difference to CONFIG_SUNXI_CCU*
+
+As far as I tried,  minus MACH_SUN8I still enabled the following:
+CONFIG_SUNXI_CCU=3Dy
+CONFIG_SUNXI_CCU_DIV=3Dy
+CONFIG_SUNXI_CCU_FRAC=3Dy
+CONFIG_SUNXI_CCU_GATE=3Dy
+CONFIG_SUNXI_CCU_MUX=3Dy
+CONFIG_SUNXI_CCU_MULT=3Dy
+CONFIG_SUNXI_CCU_PHASE=3Dy
+CONFIG_SUNXI_CCU_NK=3Dy
+CONFIG_SUNXI_CCU_NKM=3Dy
+CONFIG_SUNXI_CCU_NKMP=3Dy
+CONFIG_SUNXI_CCU_NM=3Dy
+CONFIG_SUNXI_CCU_MP=3Dy
+
+I think you need to disable some more MACH_SUN*I and
+perhaps disable some CONFIG_SUN*I_*_CCU explicitly,
+then you will see difference in the result.
+
+
+
+
+
+--=20
+Best Regards
+Masahiro Yamada
