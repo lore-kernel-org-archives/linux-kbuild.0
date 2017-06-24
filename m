@@ -1,64 +1,50 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.linuxfoundation.org ([140.211.169.12]:46528 "EHLO
-        mail.linuxfoundation.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1755268AbdFWUZf (ORCPT
+Received: from mail-wr0-f193.google.com ([209.85.128.193]:34522 "EHLO
+        mail-wr0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751316AbdFXOsP (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 23 Jun 2017 16:25:35 -0400
-Date: Sat, 24 Jun 2017 00:07:58 +0800
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH v3 07/11] tty: improve tty_insert_flip_char() fast path
-Message-ID: <20170623160758.GA19961@kroah.com>
-References: <20170622171355.267192-1-arnd@arndb.de>
- <20170622171355.267192-8-arnd@arndb.de>
+        Sat, 24 Jun 2017 10:48:15 -0400
+Received: by mail-wr0-f193.google.com with SMTP id k67so19580878wrc.1
+        for <linux-kbuild@vger.kernel.org>; Sat, 24 Jun 2017 07:48:15 -0700 (PDT)
+From: =?UTF-8?q?Bj=C3=B8rn=20Forsman?= <bjorn.forsman@gmail.com>
+Subject: [PATCH] kbuild: create deterministic initramfs directory listings
+Date: Sat, 24 Jun 2017 16:48:10 +0200
+Message-Id: <20170624144810.7363-1-bjorn.forsman@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170622171355.267192-8-arnd@arndb.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Andrew Morton <akpm@linux-foundation.org>, kasan-dev@googlegroups.com, Dmitry Vyukov <dvyukov@google.com>, Alexander Potapenko <glider@google.com>, Andrey Ryabinin <aryabinin@virtuozzo.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Arend van Spriel <arend.vanspriel@broadcom.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, Kees Cook <keescook@chromium.org>, Ingo Molnar <mingo@kernel.org>, "David S . Miller" <davem@davemloft.net>, linux-kbuild@vger.kernel.org, Samuel Thibault <samuel.thibault@ens-lyon.org>, Jiri Slaby <jslaby@suse.com>, stable@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: mmarek@suse.com, =?UTF-8?q?Bj=C3=B8rn=20Forsman?= <bjorn.forsman@gmail.com>
 
-On Thu, Jun 22, 2017 at 07:13:51PM +0200, Arnd Bergmann wrote:
-> kernelci.org reports a crazy stack usage for the VT code when CONFIG_KASAN
-> is enabled:
-> 
-> drivers/tty/vt/keyboard.c: In function 'kbd_keycode':
-> drivers/tty/vt/keyboard.c:1452:1: error: the frame size of 2240 bytes is larger than 2048 bytes [-Werror=frame-larger-than=]
-> 
-> The problem is that tty_insert_flip_char() gets inlined many times into
-> kbd_keycode(), and also into other functions, and each copy requires 128
-> bytes for stack redzone to check for a possible out-of-bounds access on
-> the 'ch' and 'flags' arguments that are passed into
-> tty_insert_flip_string_flags as a variable-length string.
-> 
-> This introduces a new __tty_insert_flip_char() function for the slow
-> path, which receives the two arguments by value. This completely avoids
-> the problem and the stack usage goes back down to around 100 bytes.
-> 
-> Without KASAN, this is also slightly better, as we don't have to
-> spill the arguments to the stack but can simply pass 'ch' and 'flag'
-> in registers, saving a few bytes in .text for each call site.
-> 
-> This should be backported to linux-4.0 or later, which first introduced
-> the stack sanitizer in the kernel.
-> 
-> Cc: stable@vger.kernel.org
-> Fixes: c420f167db8c ("kasan: enable stack instrumentation")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
-> I already submitted this separately to Greg, but he hasn't replied
-> yet. I assume that it's fine if Andrew picks it up along with the
-> other patches and drops it again in case Greg applies it to linux-next.
+kbuild runs "find" on each entry in CONFIG_INITRAMFS_SOURCE that is a
+directory. The order of the file listing output by "find" matter for
+build reproducability, hence this patch applies "sort" to get
+deterministic results.
 
-I've been traveling in China this week, give me a chance to catch up
-please.
+Without this patch, two different machines with identical initramfs
+directory input may produce differing initramfs cpio archives (different
+hash) due to the different order of the files within the archive.
 
-And no, I don't like this patch either, I think kasan needs to be fixed
-here, not work around it in odd ways in code that is completly
-acceptable to "sane" compilers.  But give me a week to catch up on my
-pending stuff first...
+Signed-off-by: Bjørn Forsman <bjorn.forsman@gmail.com>
+---
+ scripts/gen_initramfs_list.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-thanks,
+diff --git a/scripts/gen_initramfs_list.sh b/scripts/gen_initramfs_list.sh
+index 0055b07b03b6..72f094585cca 100755
+--- a/scripts/gen_initramfs_list.sh
++++ b/scripts/gen_initramfs_list.sh
+@@ -174,7 +174,7 @@ dir_filelist() {
+ 	${dep_list}header "$1"
+ 
+ 	srcdir=$(echo "$1" | sed -e 's://*:/:g')
+-	dirlist=$(find "${srcdir}" -printf "%p %m %U %G\n")
++	dirlist=$(find "${srcdir}" -printf "%p %m %U %G\n" | sort)
+ 
+ 	# If $dirlist is only one line, then the directory is empty
+ 	if [  "$(echo "${dirlist}" | wc -l)" -gt 1 ]; then
+-- 
+2.12.2
 
-greg k-h
