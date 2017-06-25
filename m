@@ -1,75 +1,92 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:57374 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750944AbdFYDz1 (ORCPT
+Received: from mail-pf0-f194.google.com ([209.85.192.194]:33805 "EHLO
+        mail-pf0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751116AbdFYFXd (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 24 Jun 2017 23:55:27 -0400
+        Sun, 25 Jun 2017 01:23:33 -0400
+Received: by mail-pf0-f194.google.com with SMTP id d5so13570712pfe.1
+        for <linux-kbuild@vger.kernel.org>; Sat, 24 Jun 2017 22:23:33 -0700 (PDT)
+Date: Sun, 25 Jun 2017 15:23:21 +1000
+From: Nicholas Piggin <npiggin@gmail.com>
+Subject: Re: [PATCH v2 3/3] tile: thin archives fix linking
+Message-ID: <20170625152321.4e7bd191@roar.ozlabs.ibm.com>
+In-Reply-To: <CAK7LNATU6=90_uUTZZAj1hsX8hvJ7w-Lb0T4gXiqyWwMomYimw@mail.gmail.com>
+References: <20170622123929.15054-1-npiggin@gmail.com>
+        <20170622123929.15054-4-npiggin@gmail.com>
+        <CAK7LNATU6=90_uUTZZAj1hsX8hvJ7w-Lb0T4gXiqyWwMomYimw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAK8P3a1m9teuQV-r5-753FBVtFTDsz=31bC_zeuCZ5ViBTQKRw@mail.gmail.com>
-References: <20170621211002.44525d9b@roar.ozlabs.ibm.com> <CAK8P3a2A9fMrNZPWJft2t+52kmGkGgm3gv_fxJntjevWtJ69Zw@mail.gmail.com>
- <20170621220213.2b33d56d@roar.ozlabs.ibm.com> <CAK8P3a0nVPz=eLV8ET6BYR2Qs0H3PQZuhYsu4Cb_kJSPACrR9w@mail.gmail.com>
- <20170621161913.GY4493@codeaurora.org> <20170622040838.1c63ebb7@roar.ozlabs.ibm.com>
- <CAK8P3a2vV10+ymS7vHybfhRf_DVvACOW4O2OZzyz+v75y2Ak4w@mail.gmail.com>
- <20170622061838.ljlmk4enzpvdlyyu@flea.lan> <20170623015021.58f74316@roar.ozlabs.ibm.com>
- <CAK7LNATbd5n2uMsTN_jaUN+QjpB5DN3AvS+6iqqt3w3kuwQS3A@mail.gmail.com>
- <20170623145734.7pv3rdgucveg66s3@flea.lan> <CAK8P3a1m9teuQV-r5-753FBVtFTDsz=31bC_zeuCZ5ViBTQKRw@mail.gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sun, 25 Jun 2017 12:55:12 +0900
-Message-ID: <CAK7LNATajsaJxFs9tzvKCz53ZoY7cymbA5f0yCYHXjBgB8+ciA@mail.gmail.com>
-Subject: Re: [PATCH 1/5] kbuild: thin archives final link close
- --whole-archives option
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Maxime Ripard <maxime.ripard@free-electrons.com>, Nicholas Piggin <npiggin@gmail.com>, Stephen Boyd <sboyd@codeaurora.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-arch <linux-arch@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Linus Torvalds <torvalds@linux-foundation.org>, Stephen Rothwell <sfr@canb.auug.org.au>, kbuild test robot <fengguang.wu@intel.com>, Josh Triplett <josh@joshtriplett.org>, Nicolas Pitre <nicolas.pitre@linaro.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Chris Metcalf <cmetcalf@mellanox.com>
 
-2017-06-24 0:04 GMT+09:00 Arnd Bergmann <arnd@arndb.de>:
-> On Fri, Jun 23, 2017 at 4:57 PM, Maxime Ripard
-> <maxime.ripard@free-electrons.com> wrote:
->> On Fri, Jun 23, 2017 at 02:31:40PM +0900, Masahiro Yamada wrote:
->>> As far as I tried,  minus MACH_SUN8I still enabled the following:
->>> CONFIG_SUNXI_CCU=y
->>> CONFIG_SUNXI_CCU_DIV=y
->>> CONFIG_SUNXI_CCU_FRAC=y
->>> CONFIG_SUNXI_CCU_GATE=y
->>> CONFIG_SUNXI_CCU_MUX=y
->>> CONFIG_SUNXI_CCU_MULT=y
->>> CONFIG_SUNXI_CCU_PHASE=y
->>> CONFIG_SUNXI_CCU_NK=y
->>> CONFIG_SUNXI_CCU_NKM=y
->>> CONFIG_SUNXI_CCU_NKMP=y
->>> CONFIG_SUNXI_CCU_NM=y
->>> CONFIG_SUNXI_CCU_MP=y
->>>
->>> I think you need to disable some more MACH_SUN*I and
->>> perhaps disable some CONFIG_SUN*I_*_CCU explicitly,
->>> then you will see difference in the result.
->>
->> Ah, right, it's all selected by the rest.
->>
->> I guess to get a meaningful example you could disable all the
->> SUN*I_CCU (SUN5I, SUN8I, and the likes) options and while keeping
->> SUN8I_R_CCU.
->>
->> Most of the clock types shouldn't be used but div and gates.
->
-> Given that we appear to basically always pull in all (or most) of
-> the CCU parts anyway, and it's hard to even test with a subset
-> being disabled, I wonder how much we care about dropping
-> the unused objects at all:
->
-> Maybe the answer is that we just always build all of them into
-> the kernel and make only the SoC-specific objects configurable ;-)
->
-> Once we start linking with  --gc-sections, it will all be fine anyway.
->
+On Sun, 25 Jun 2017 12:28:43 +0900
+Masahiro Yamada <yamada.masahiro@socionext.com> wrote:
 
-I agree!
+> 2017-06-22 21:39 GMT+09:00 Nicholas Piggin <npiggin@gmail.com>:
+> > The VDSO symbols can't be linked into built-in.o when building with
+> > thin archives, so change this to linking a new object file that is
+> > included into the built-in.o.
+> >
+> > Cc: Chris Metcalf <cmetcalf@mellanox.com>
+> > Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
+> > ---
+> >  arch/tile/kernel/vdso/Makefile | 14 ++++++++------
+> >  1 file changed, 8 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/arch/tile/kernel/vdso/Makefile b/arch/tile/kernel/vdso/Makefile
+> > index c54fff37b5ff..e140472d5be6 100644
+> > --- a/arch/tile/kernel/vdso/Makefile
+> > +++ b/arch/tile/kernel/vdso/Makefile
+> > @@ -11,7 +11,7 @@ obj-vdso := $(addprefix $(obj)/, $(obj-vdso))
+> >  # vdso32 is only for tilegx -m32 compat task.
+> >  VDSO32-$(CONFIG_COMPAT) := y
+> >
+> > -obj-y += vdso.o
+> > +obj-y += vdso.o vdso-syms.o
+> >  obj-$(VDSO32-y) += vdso32.o
+> >  extra-y += vdso.lds
+> >  CPPFLAGS_vdso.lds += -P -C -U$(ARCH)
+> > @@ -49,16 +49,18 @@ $(obj)/vdso.so.dbg: $(src)/vdso.lds $(obj-vdso)
+> >  # We also create a special relocatable object that should mirror the symbol
+> >  # table and layout of the linked DSO.  With ld -R we can then refer to
+> >  # these symbols in the kernel code rather than hand-coded addresses.
+> > -extra-y += vdso-syms.o
+> > -$(obj)/built-in.o: $(obj)/vdso-syms.o
+> > -$(obj)/built-in.o: ld_flags += -R $(obj)/vdso-syms.o
+> >
+> >  SYSCFLAGS_vdso.so.dbg = -shared -s -Wl,-soname=linux-vdso.so.1 \
+> >                              $(call cc-ldoption, -Wl$(comma)--hash-style=both)
+> > -SYSCFLAGS_vdso_syms.o = -r
+> > -$(obj)/vdso-syms.o: $(src)/vdso.lds $(obj)/vrt_sigreturn.o FORCE
+> > +SYSCFLAGS_vdso_dummy.o = -r
+> > +$(obj)/vdso-dummy.o: $(src)/vdso.lds $(obj)/vrt_sigreturn.o FORCE
+> >         $(call if_changed,vdsold)
+> >
+> > +quiet_cmd_vdso_sym = VDSOSYM $@
+> > +      cmd_vdso_sym = $(LD) -r -R $(obj)/vdso-dummy.o -o $@
+> > +
+> > +$(obj)/vdso-syms.o: $(obj)/vdso-dummy.o
+> > +       $(call if_changed,vdso_sym)
+> >
+> >  # strip rule for the .so file
+> >  $(obj)/%.so: OBJCOPYFLAGS := -S
+> > --
+> > 2.11.0
+> >
+> > --  
+> 
+> I updated thin-ar branch.
+> 
+> Just in case, the following is my local fix-up:
+> 
+>  - Fix incremental build
+>  - Do not repeat "$(obj)/vsyscall-dummy.o" in the build command
 
+All your changes here and to the other patches look good to me,
+thanks for the help.
 
-
-
--- 
-Best Regards
-Masahiro Yamada
+Thanks,
+Nick
