@@ -1,90 +1,111 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:17670 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751491AbdF0DCa (ORCPT
+Received: from mail.free-electrons.com ([62.4.15.54]:52713 "EHLO
+        mail.free-electrons.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751742AbdF0Pms (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 26 Jun 2017 23:02:30 -0400
-Received: from mail-yb0-f170.google.com (mail-yb0-f170.google.com [209.85.213.170]) (authenticated)
-        by conssluserg-02.nifty.com with ESMTP id v5R32EiC014241
-        for <linux-kbuild@vger.kernel.org>; Tue, 27 Jun 2017 12:02:14 +0900
-Received: by mail-yb0-f170.google.com with SMTP id e201so5747258ybb.1
-        for <linux-kbuild@vger.kernel.org>; Mon, 26 Jun 2017 20:02:14 -0700 (PDT)
+        Tue, 27 Jun 2017 11:42:48 -0400
+Date: Tue, 27 Jun 2017 17:42:35 +0200
+From: Maxime Ripard <maxime.ripard@free-electrons.com>
+Subject: Re: [PATCH 1/5] kbuild: thin archives final link close
+ --whole-archives option
+Message-ID: <20170627154235.4a3silh5qlhnvnos@flea.lan>
+References: <20170621220213.2b33d56d@roar.ozlabs.ibm.com>
+ <CAK8P3a0nVPz=eLV8ET6BYR2Qs0H3PQZuhYsu4Cb_kJSPACrR9w@mail.gmail.com>
+ <20170621161913.GY4493@codeaurora.org>
+ <20170622040838.1c63ebb7@roar.ozlabs.ibm.com>
+ <CAK8P3a2vV10+ymS7vHybfhRf_DVvACOW4O2OZzyz+v75y2Ak4w@mail.gmail.com>
+ <20170622061838.ljlmk4enzpvdlyyu@flea.lan>
+ <20170623015021.58f74316@roar.ozlabs.ibm.com>
+ <CAK7LNATbd5n2uMsTN_jaUN+QjpB5DN3AvS+6iqqt3w3kuwQS3A@mail.gmail.com>
+ <20170623145734.7pv3rdgucveg66s3@flea.lan>
+ <CAK8P3a1m9teuQV-r5-753FBVtFTDsz=31bC_zeuCZ5ViBTQKRw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20170626114615.30e2a72d@roar.ozlabs.ibm.com>
-References: <201706251957.uG7LtWSJ%fengguang.wu@intel.com> <20170626114615.30e2a72d@roar.ozlabs.ibm.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Tue, 27 Jun 2017 12:02:12 +0900
-Message-ID: <CAK7LNASivy+nNv8_u7RCMjGq74C3YbTs2dUtXGtPkrPeqYtrPQ@mail.gmail.com>
-Subject: Re: [kbuild:thin-ar 10/10] frv-linux-ld: Warning: size of symbol
- `sys_bpf' changed from 40 in kernel/sys_ni.o to 1800 in kernel/bpf/syscall.o
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="ds7sh6hdenphovoh"
+Content-Disposition: inline
+In-Reply-To: <CAK8P3a1m9teuQV-r5-753FBVtFTDsz=31bC_zeuCZ5ViBTQKRw@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicholas Piggin <npiggin@gmail.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, David Howells <dhowells@redhat.com>
-
-2017-06-26 10:46 GMT+09:00 Nicholas Piggin <npiggin@gmail.com>:
-> On Sun, 25 Jun 2017 19:29:14 +0800
-> kbuild test robot <fengguang.wu@intel.com> wrote:
->
->> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git thin-ar
->> head:   e7238f4fac14967bba823ef4b4b77ee928a4860a
->> commit: e7238f4fac14967bba823ef4b4b77ee928a4860a [10/10] kbuild: thin archives make default for all archs
->> config: frv-allmodconfig (attached as .config)
->> compiler: frv-linux-gcc (GCC) 6.2.0
->> reproduce:
->>         wget https://raw.githubusercontent.com/01org/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
->>         chmod +x ~/bin/make.cross
->>         git checkout e7238f4fac14967bba823ef4b4b77ee928a4860a
->>         # save the attached .config to linux build tree
->>         make.cross ARCH=frv
->>
->> All warnings (new ones prefixed by >>):
->
-> [snip]
->
->>    frv-linux-ld: Warning: size of symbol `sys_eventfd' changed from 40 in kernel/sys_ni.o to 44 in fs/eventfd.o
->> >> frv-linux-ld: Warning: size of symbol `sys_userfaultfd' changed from 40 in kernel/sys_ni.o to 356 in fs/userfaultfd.o
->>    frv-linux-ld: Warning: size of symbol `sys_io_setup' changed from 40 in kernel/sys_ni.o to 2636 in fs/aio.o
->
-> These warnings also happen with incremental linking and must be due to
-> some bug in the arch port or toolchain.
->
->>    init/main.o: In function `do_one_initcall':
->>    init/main.c:792:(.text+0x1b8): relocation truncated to fit: R_FRV_GPREL12 against symbol `initcall_debug' defined in .sbss section in init/main.o
->
-> [snip]
->
-> These aren't new either, and due to the large allmodconfig kernel.
->
-> So none of this is newly caused by the thin archives patch.
->
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Nicholas Piggin <npiggin@gmail.com>, Stephen Boyd <sboyd@codeaurora.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-arch <linux-arch@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Linus Torvalds <torvalds@linux-foundation.org>, Stephen Rothwell <sfr@canb.auug.org.au>, kbuild test robot <fengguang.wu@intel.com>, Josh Triplett <josh@joshtriplett.org>, Nicolas Pitre <nicolas.pitre@linaro.org>
 
 
+--ds7sh6hdenphovoh
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I tested "make ARCH=frv defconfig" in Linus' tree.
+On Fri, Jun 23, 2017 at 05:04:45PM +0200, Arnd Bergmann wrote:
+> On Fri, Jun 23, 2017 at 4:57 PM, Maxime Ripard
+> <maxime.ripard@free-electrons.com> wrote:
+> > On Fri, Jun 23, 2017 at 02:31:40PM +0900, Masahiro Yamada wrote:
+> >> As far as I tried,  minus MACH_SUN8I still enabled the following:
+> >> CONFIG_SUNXI_CCU=3Dy
+> >> CONFIG_SUNXI_CCU_DIV=3Dy
+> >> CONFIG_SUNXI_CCU_FRAC=3Dy
+> >> CONFIG_SUNXI_CCU_GATE=3Dy
+> >> CONFIG_SUNXI_CCU_MUX=3Dy
+> >> CONFIG_SUNXI_CCU_MULT=3Dy
+> >> CONFIG_SUNXI_CCU_PHASE=3Dy
+> >> CONFIG_SUNXI_CCU_NK=3Dy
+> >> CONFIG_SUNXI_CCU_NKM=3Dy
+> >> CONFIG_SUNXI_CCU_NKMP=3Dy
+> >> CONFIG_SUNXI_CCU_NM=3Dy
+> >> CONFIG_SUNXI_CCU_MP=3Dy
+> >>
+> >> I think you need to disable some more MACH_SUN*I and
+> >> perhaps disable some CONFIG_SUN*I_*_CCU explicitly,
+> >> then you will see difference in the result.
+> >
+> > Ah, right, it's all selected by the rest.
+> >
+> > I guess to get a meaningful example you could disable all the
+> > SUN*I_CCU (SUN5I, SUN8I, and the likes) options and while keeping
+> > SUN8I_R_CCU.
+> >
+> > Most of the clock types shouldn't be used but div and gates.
+>=20
+> Given that we appear to basically always pull in all (or most) of
+> the CCU parts anyway, and it's hard to even test with a subset
+> being disabled, I wonder how much we care about dropping
+> the unused objects at all:
+>=20
+> Maybe the answer is that we just always build all of them into
+> the kernel and make only the SoC-specific objects configurable ;-)
 
- v4.12-rc2 : failed
- v4.12-rc3 : failed
- v4.12-rc4 : success
- v4.12-rc5 : success
- v4.12-rc6 : success
- v4.12-rc7 : success
+I was trying to avoid that, but maybe that's not worth it, and it's
+our only solution.
 
-So, I think something was fixed between -rc3 and -rc4.
-(I have not tried git-bisect)
+> Once we start linking with  --gc-sections, it will all be fine anyway.
 
+That works for me. Who wants to send the patch?
 
+Thanks!
+Maxime
 
-The current thin-ar branch is based on v4.12-rc2 tag.
-That's why we see frv build error.
+--=20
+Maxime Ripard, Free Electrons
+Embedded Linux and Kernel engineering
+http://free-electrons.com
 
+--ds7sh6hdenphovoh
+Content-Type: application/pgp-signature; name="signature.asc"
 
-By rebasing thin-ar onto v4.12-rc4 tag,
-I do not see this build error any more.
+-----BEGIN PGP SIGNATURE-----
 
+iQIcBAEBAgAGBQJZUnzrAAoJEBx+YmzsjxAgd2wP/3zWkniZak/Wm2qfjOGdS9ld
+tlv2iq3tTyZ7eCvbRSRCzGd8YMy58PjaN2mcGKfHlKsscEcRdTYMMp4ir2VxGy4u
+TlgZEjcUZpO/VcnSnuxKUfT6W//rRMZyiWvTgpiecwcmeM2BdPOguzAPR2BomHzV
+BPYd8Do4J1bD0160dorXHCll3SQXdo71NJtSLKWnkVLLcLxhftntHkv1aojb1Sf2
+fBsiZNtHFTWgyQZuiQ/nWySXiciKxqWttMZHCo2mWDVad1uBSww4N+UU66Xo9yRK
+CsVClb2M//YkPoRk0DJtF5dkRHgR5bRJVo9RLPPG/Ij+5zeFFE7LZyhOC5KLZImu
+8LvawFcaN8MT3R/01NuEEaTN9ECl966Z2M7EpFLtaIj3dbWTzu14TkH1DNSrtktE
+95skx3r1b9HH0GiIH3Sw2Rmv6aocxgJirrS9Zz7wiHQFNwaMi31XK2FMQc2iHEoZ
+AjStkrwEMpcUCn6iuAjosv+WnK+MAZisZQpc9Qh6ZQJ1wzgkjY209+ZOjl6/63D/
+LAwHRlza3mSHZ6VcZe4IyIsUIC5uzyINvV18+z6/giA3eXrtzhOt7lngb+yRSF3h
+ss0QI5MPuvmcYbQe2Pn1cjseGwpjb0zx6pm5sbl3xFL06dmeMMoRJ98TK4ke6ro5
+fuHxLudW1nvffilvgVj3
+=61Ib
+-----END PGP SIGNATURE-----
 
-
--- 
-Best Regards
-Masahiro Yamada
+--ds7sh6hdenphovoh--
