@@ -1,109 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:55557 "EHLO
+Received: from metis.ext.4.pengutronix.de ([92.198.50.35]:57217 "EHLO
         metis.ext.4.pengutronix.de" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1751602AbdF2J0x (ORCPT
+        by vger.kernel.org with ESMTP id S1752105AbdF2MLv (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 29 Jun 2017 05:26:53 -0400
-Date: Thu, 29 Jun 2017 11:26:51 +0200
-From: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <uwe@kleine-koenig.org>
-Subject: Re: [RFC] kbuild: Enable Large File Support for hostprogs
-Message-ID: <20170629092646.djtsrkbtz5ywdefj@taurus.defre.kleine-koenig.org>
-References: <1431307012.6033.9.camel@decadent.org.uk>
+        Thu, 29 Jun 2017 08:11:51 -0400
+From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?=
+        <u.kleine-koenig@pengutronix.de>
+Subject: [PATCH] kbuild: Enable Large File Support for hostprogs
+Date: Thu, 29 Jun 2017 14:11:36 +0200
+Message-Id: <20170629121136.16860-1-u.kleine-koenig@pengutronix.de>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="6ybfctqugprl6qtt"
-Content-Disposition: inline
-In-Reply-To: <1431307012.6033.9.camel@decadent.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Ben Hutchings <ben@decadent.org.uk>
-Cc: linux-kbuild@vger.kernel.org, 778942@bugs.debian.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>
+Cc: linux-kbuild@vger.kernel.org, kernel@pengutronix.de, Ben Hutchings <ben@decadent.org.uk>
 
+This fixes the following build error for me when building on an 32 bit
+machine using an XFS file system:
 
---6ybfctqugprl6qtt
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+	$ make scripts/basic/fixdep
+	  HOSTCC  scripts/basic/fixdep
+	fixdep: error fstat'ing depfile: scripts/basic/.fixdep.d: Value too large for defined data type
 
-Hello Ben,
-
-On Mon, May 11, 2015 at 02:16:52AM +0100, Ben Hutchings wrote:
-> Some programs built on a 32-bit host need Large File Support (LFS).
-> Regardless of whether any of them need to deal with large files,
-> non-LFS *stat() functions don't work at all on an XFS volume with
-> 64-bit inodes.
->=20
-> References: https://bugs.debian.org/778942
-> Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
-> ---
->  Makefile | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/Makefile b/Makefile
-> index fbd43bf..a6fb432 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -297,7 +297,7 @@ CONFIG_SHELL :=3D $(shell if [ -x "$$BASH" ]; then ec=
-ho $$BASH; \
-> =20
->  HOSTCC       =3D gcc
->  HOSTCXX      =3D g++
-> -HOSTCFLAGS   =3D -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fom=
-it-frame-pointer -std=3Dgnu89
-> +HOSTCFLAGS   =3D -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fom=
-it-frame-pointer -std=3Dgnu89 -D_LARGEFILE64_SOURCE -D_FILE_OFFSET_BITS=3D64
->  HOSTCXXFLAGS =3D -O2
-
-I think we need the same for HOSTCXXFLAGS?
-
-Also I wonder if this would be a better approach:
+Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+---
+ Makefile | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
 diff --git a/Makefile b/Makefile
-index e40c471abe29..d9dd5db0abce 100644
+index e40c471abe29..2c72207ce298 100644
 --- a/Makefile
 +++ b/Makefile
-@@ -301,9 +301,15 @@ CONFIG_SHELL :=3D $(shell if [ -x "$$BASH" ]; then ech=
-o $$BASH; \
+@@ -301,9 +301,15 @@ CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
  	  else if [ -x /bin/bash ]; then echo /bin/bash; \
  	  else echo sh; fi ; fi)
-=20
-+HOST_LFS_CFLAGS :=3D $(getconf LFS_CFLAGS)
-+HOST_LFS_LDFLAGS :=3D $(getconf LFS_LDFLAGS)
-+HOST_LFS_LIBS :=3D $(getconf LFS_LIBS)
+ 
++HOST_LFS_CFLAGS := $(shell getconf LFS_CFLAGS)
++HOST_LFS_LDFLAGS := $(shell getconf LFS_LDFLAGS)
++HOST_LFS_LIBS := $(shell getconf LFS_LIBS)
 +
- HOSTCC       =3D gcc
- HOSTCXX      =3D g++
--HOSTCFLAGS   =3D -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit=
--frame-pointer -std=3Dgnu89
-+HOSTCFLAGS   =3D -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit=
--frame-pointer -std=3Dgnu89 $(HOST_LFS_CFLAGS)
-+HOSTLDFLAGS  =3D $(HOST_LFS_LDFLAGS)
-+HOSTLOADLIBES =3D $(HOST_LFS_LIBS)
--HOSTCXXFLAGS =3D -O2
-+HOSTCXXFLAGS =3D -O2 $(HOST_LFS_CFLAGS)
-=20
+ HOSTCC       = gcc
+ HOSTCXX      = g++
+-HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89
++HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer -std=gnu89 $(HOST_LFS_CFLAGS)
++HOSTLDFLAGS  = $(HOST_LFS_LDFLAGS)
++HOST_LOADLIBES = $(HOST_LFS_LIBS)
+ HOSTCXXFLAGS = -O2
+ 
  ifeq ($(shell $(HOSTCC) -v 2>&1 | grep -c "clang version"), 1)
- HOSTCFLAGS  +=3D -Wno-unused-value -Wno-unused-parameter \
+@@ -417,7 +423,7 @@ KERNELVERSION = $(VERSION)$(if $(PATCHLEVEL),.$(PATCHLEVEL)$(if $(SUBLEVEL),.$(S
+ 
+ export VERSION PATCHLEVEL SUBLEVEL KERNELRELEASE KERNELVERSION
+ export ARCH SRCARCH CONFIG_SHELL HOSTCC HOSTCFLAGS CROSS_COMPILE AS LD CC
+-export CPP AR NM STRIP OBJCOPY OBJDUMP
++export CPP AR NM STRIP OBJCOPY OBJDUMP HOSTLDFLAGS HOST_LOADLIBES
+ export MAKE AWK GENKSYMS INSTALLKERNEL PERL PYTHON UTS_MACHINE
+ export HOSTCXX HOSTCXXFLAGS LDFLAGS_MODULE CHECK CHECKFLAGS
+ 
+-- 
+2.11.0
 
-but note, that HOSTLDFLAGS and HOSTLOADLIBES doesn't seem to be picked
-up.
-
-Best regards
-Uwe
-
---6ybfctqugprl6qtt
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEfnIqFpAYrP8+dKQLwfwUeK3K7AkFAllUx9MACgkQwfwUeK3K
-7An7hAf/RMaOgXYbz/V2eB5Yme3MvMLMY0P6rqPLT6lzoTNA9XqjzdxU3yuIciO0
-GxMHv3FhwMnuh+RZoPAD9u8rrNKfC+GVPILmoKXZzYcKBVepDpkST2GYUvxAfrwl
-+nme7a9qTvrz8t34Rw/zsfHQ13nZ8sBbRkObKV2MUiU+g+NjrSmWLM0IGBx+L3tc
-FgydJWxSkl9/FYByDQe0KlglMpa3CcFaj38YFqbyWynu3wUqC6vOHbIP8JR7fT3U
-3+1oxY7M1XOALh0R/BPmBjtMv6u6t908se8Ryx2HkHiB66+zlCBipDTCFWHUTQOQ
-Gi6bYkyXwg1kxnyhQzjM0W5mO7dksA==
-=htfi
------END PGP SIGNATURE-----
-
---6ybfctqugprl6qtt--
