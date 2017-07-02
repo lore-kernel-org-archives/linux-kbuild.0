@@ -1,75 +1,142 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f67.google.com ([209.85.215.67]:35703 "EHLO
-        mail-lf0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751680AbdF3X71 (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 30 Jun 2017 19:59:27 -0400
+Received: from mga07.intel.com ([134.134.136.100]:65406 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751454AbdGBBCX (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Sat, 1 Jul 2017 21:02:23 -0400
+Date: Sun, 2 Jul 2017 09:02:09 +0800
+From: kbuild test robot <fengguang.wu@intel.com>
+Subject: [kbuild:thin-ar 11/12] undefined reference to `_GLOBAL_OFFSET_TABLE_'
+Message-ID: <201707020907.hkcfbdSI%fengguang.wu@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20170630225822.25349-1-sboyd@codeaurora.org>
-References: <20170630225822.25349-1-sboyd@codeaurora.org>
-From: Rob Clark <robdclark@gmail.com>
-Date: Fri, 30 Jun 2017 19:59:24 -0400
-Message-ID: <CAF6AEGuSwgyqf7pb15M0Pg1SJrQu9TVX76FV9jL=i5LNjFcdtA@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: modpost: Warn about references from rodata to
- __init text
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/mixed; boundary="WIyZ46R2i8wDzkSu"
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Stephen Boyd <sboyd@codeaurora.org>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-arm-msm <linux-arm-msm@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, linux-kbuild@vger.kernel.org, Bjorn Andersson <bjorn.andersson@linaro.org>
+To: Nicholas Piggin <npiggin@gmail.com>
+Cc: kbuild-all@01.org, linux-kbuild@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>
 
-On Fri, Jun 30, 2017 at 6:58 PM, Stephen Boyd <sboyd@codeaurora.org> wrote:
-> If we have a structure that's marked const it will be placed
-> into the .rodata section but it could reference an init section
-> function. Include the read only data section in the check we have
-> for read/write data sections referencing init sections so we can
-> find this class of problems. This exposes quite a few places
-> where const marked structures are referencing __init functions and
-> __init data that we were previously ignoring.
->
-> Cc: Rob Clark <robdclark@gmail.com>
-> Cc: Bjorn Andersson <bjorn.andersson@linaro.org>
-> Signed-off-by: Stephen Boyd <sboyd@codeaurora.org>
-> ---
->
-> Making this change leads to quite a few other errors even on the
-> multi_v7_defconfig for ARM[1]. I still need to do a build of the
-> allmodconfig to see how many other errors there, but it seems to
-> be quite a few. I suppose those will need to be fixed before we can
-> merge this?
 
-thanks.. the explosions you get with these mistakes when building
-drivers as modules in a distro kernel config are quite "fun" to
-debug..
+--WIyZ46R2i8wDzkSu
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-I'm not quite sure about the rules for whether merging this would
-count as a regression, but I would argue those drivers are already
-broken, just no one noticed yet.  Similar to when a new gcc gets more
-clever about detecting bugs.  So I wouldn't be against merging this
-first to force drivers to fix their crap ;-)
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git thin-ar
+head:   42317ea79d9af0a83b6cfdfe43c27a91d468bfb1
+commit: 799c43415442414b1032580c47684cb709dfed6d [11/12] kbuild: thin archives make default for all archs
+config: microblaze-allnoconfig (attached as .config)
+compiler: microblaze-linux-gcc (GCC) 6.2.0
+reproduce:
+        wget https://raw.githubusercontent.com/01org/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        git checkout 799c43415442414b1032580c47684cb709dfed6d
+        # save the attached .config to linux build tree
+        make.cross ARCH=microblaze 
 
-BR,
--R
+All errors (new ones prefixed by >>):
 
-> [1] https://www.irccloud.com/pastebin/zzqfWGQY/
->
->  scripts/mod/modpost.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/scripts/mod/modpost.c b/scripts/mod/modpost.c
-> index 48397feb08fb..4f2be5c6727d 100644
-> --- a/scripts/mod/modpost.c
-> +++ b/scripts/mod/modpost.c
-> @@ -903,7 +903,7 @@ static void check_section(const char *modname, struct elf_info *elf,
->  #define ALL_INIT_SECTIONS INIT_SECTIONS, ALL_XXXINIT_SECTIONS
->  #define ALL_EXIT_SECTIONS EXIT_SECTIONS, ALL_XXXEXIT_SECTIONS
->
-> -#define DATA_SECTIONS ".data", ".data.rel"
-> +#define DATA_SECTIONS ".rodata", ".data", ".data.rel"
->  #define TEXT_SECTIONS ".text", ".text.unlikely", ".sched.text", \
->                 ".kprobes.text", ".cpuidle.text"
->  #define OTHER_TEXT_SECTIONS ".ref.text", ".head.text", ".spinlock.text", \
-> --
-> The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
-> a Linux Foundation Collaborative Project
->
+   mm/slub.o: In function `__slab_free.isra.13':
+>> (.text+0x1038): undefined reference to `_GLOBAL_OFFSET_TABLE_'
+   scripts/link-vmlinux.sh: line 93: 23109 Segmentation fault      ${LD} ${LDFLAGS} ${LDFLAGS_vmlinux} -o ${2} -T ${lds} ${objects}
+
+---
+0-DAY kernel test infrastructure                Open Source Technology Center
+https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
+
+--WIyZ46R2i8wDzkSu
+Content-Type: application/gzip
+Content-Disposition: attachment; filename=".config.gz"
+Content-Transfer-Encoding: base64
+
+H4sICPBEWFkAAy5jb25maWcAjVxdb9u40r7fXyF0z0UXOE3TpO12cZALmqIsrkVRFSnbyY3g
+2mprNLEDf3Tb99e/M6RsfZHuFlgk0Qy/hjPDZ4bD/f233wNyPGyfFof1cvH4+DP4Um2q3eJQ
+rYLP68fqf0Eog1TqgIVcXwFzst4cf7x+Wi9320+Pi/+rgrdXb26url/tlm+DSbXbVI8B3W4+
+r78coZP1dvPb779RmUZ8XApOczlKyAO7+wkd1V/VjGTBeh9stodgXx1OzPlMMVGOWcpyTkuV
+8TSRdAINa/qDTFkZCtLuiuQ0LmOiSp7I8U1Z3N60O/ayvX/rGP80cjxjfBzrZuATgZKEj3Ki
+YRYsIfcOBlWI5qvShE50TigrVZFlMm91iSsLWTYkhCw6sXCl7168flx/ev20XR0fq/3r/xQp
+EazMWcKIYq+vlkbqL05tRwVPQs2Bg801GSUwru0bNuT3YGw2+RFXfHxutmiUywlLS5mWSmTN
+PHjKdcnSKYgOpyK4vru9ORFhU5UqqRQZT9jdixeNoOtvpWZKO0QMyybJlOWKy7TTrk0oSaGl
+ozGIhhSJLmOpNMrh7sXLzXZT/dHqRt2rKc+oUweimKRhwpy0QjHY2jbJiIznH4P98dP+5/5Q
+PTUiO203kMsM9JsNNQFJKpazlkDhSygF4alDb1Ad2JSlWp12S6+fqt3eNXr8UGbQSoacti0h
+lUjhvhUaspMSg7KDSqkSNSdXAyHQrHitF/tvwQGmFCw2q2B/WBz2wWK53B43h/XmSzM3zemk
+hAYloVQWqebp+LSgnBaBGq4GWO5LoLWXAn+CBsMiXSqkLHO7ueq110RNFPbiXC/2DqaZJKis
+QqYuTwQsKWNhqdiYjowhtrvPGTMsxradYxhLLEc8vXHrIp/YXy54IUVjmACtXWBjYONcFply
+9got6CSTPNW4n1rm7snZntHITF9uIaGDcy8tmYAlTo2DyEPHAigtZQa6xB9YGckclRV+CJLS
+ziHQZ1Pwi6M3qwfthgJ8AAeDzd2LGzMtYP/RFYBLSdxM9ypSFzkyqfjcYRFnhgm0VPfCTcxy
+2IOJRzPG7u/g0Muo8EwnKjSbOyksk75F8nFKkih0Es3KPDTjiDy0URZdlBvh0v09nHJYYN3U
+LTXBxIjkOe/u7GlSYsTCkIVtTcjom+u3A39VI5Ks2n3e7p4Wm2UVsO/VBjwWAd9F0WeBZ7Wu
+zfYzFXbNpfFZvh3Ho41oOC/dG6sSMnK5q6QYdbBPIkfe9mUErgXdTZnDWSWFW0yCZCUIUc7K
+IkUr5ABLHph7v0DgGkBVSDQp4XjlEadE867Ta6mtjHgCPtuxjphMGRis4ejYsSG8fzsCuADz
+GKfoWihlSjk6OZ+OcEqVqLjgYHXRQh2mM5pMel8A9JUk4+B3wHwamkF1MwIbB2d+mZEcNOwE
+LrqexkAxmLxmFNyiY2Y65qnpj0+ZakYQMiwSOBrB3ZQsiYxbbKjZ2KKsBLQnUXc3nTmfIGfc
+ngpXBDyAwsW4PGeCCHcEU52RPFS3zUh4pMIJziLYP46aGkVqsAlmxClqh1muHwij35XgG8oJ
+y1OWAPB2+xYf8wmJXYbaSsNW6381RovdSrzPbgEsldNXnxZ7CFO+WRt/3m0hYOkgkHN/yF1r
+NENzGYjrpIyoXFTGLAe5OjbFOGYlsIc3LSO0iuE5IWVX+mdIDbbFTGADlotMCArbkNvQc0bC
+mn6J5mw7yzlEJ57GbWLdujlgwPE8dB2vkXn2uDigGw22zxjZddwmaAZEBuC0ipT2fYrhC6vP
+683atAugk6CJBq+bDav1w4iZhGF+d/3jr2v778QyR6c0bwWT12VEBE/u7158X+8O1Y93Ly6w
+ou0KlYMUQMXuLnWKnBkV2b9kxcOKJb9kC/n0lzzxDGHNL9mirLjIA92A/7t78efVm+ur1Yt6
+C3fbZbXfg/wPP58tgP9cLQ7HXbVvdiGD/Rewnyl4oM4RW3+fygSORpK7MWHN5Q4vHso319eu
+E+WhvHl33THLh/K2y9rrxd3NHXTTR7dxjqGI5/wsBpo62sJfDhWnIjSmM5Iy8QGNoTDTHB22
+avsLwD8IgMPanQ6jLLCVxfHRfMCQyhrMYvUd8csqWLbTK6eJBotdFRzBHTYjAygAFGWwNNjR
+bc+OAIMX4MghNmCwo+YoBK7rniXC4QGAe2iF2qBq2/OHHi1KiIaBG5eDH0CZQoaoDgbun/GI
+9bpOqvO5bmqadb027ASOBCYaScPlwlxZAmgk06YnsxN/mX8thY3vlfE2pbbYxdHLlOe61BLP
+62aWKYSMRVmjLggAOUDHOaId2OwTCwaOELSYQ3siOkgkYaAFBDTUqZkPWU/NGsqoCAcqw35U
+y+Nh8emxMmm7wMDdQ0d/IQKNhAabyLnHPGsO3C+34RlkIYuLrQVX7jiXQgwaFiIbGtxxH8ih
+vWWUux0M5XXyxBNwNfTTue7lc4QvtQXu1182MzQqnAbdwi/q+Py83UEHtSuF72yzet6uN4fe
+tEuWhib0dmdfmHaM930NsUm4W3+38UiTpVsv688uGRU2VolZknliYAjPtcgit6jAvNOQINL0
+uXLTfcRzASiU2VSGOyidgb8hoWcSNkLBTIFLCVpzBUhfhjngbt9iDAOb5h64ZRkw4Vh3Aw5O
+yKkn9wF2H9+D4CAcdQYC55QcGC8MyinrAG0EiyoGuYQgmChyICbU7JXZ2s6uCe3KlYSaNr5F
+Ru2RZIThnfYkUoGKJoupqHYHJSN5cu8mobtDR9X+1kOB8AUEl/dSP21kLTAzbp2CDbnq7HWj
+P/bTQCxivV+65AKKIe5xHu5URAoxkSpADRVuGfWogMqJO1amN87JMAaBgQj2Z+tuBjSU8q9b
+On8/aKarH4t9wDf7w+74ZDIK+6/gLlbBYbfY7LGrAIKRKljBWtfP+OvJqsnjodotgigbE/DV
+u6d/0Mustv9sHreLVWDT+ydevjkAqgBYZ1TJ+oETTVEeOT5PZeb42nQUb/cHL5EudivXMF7+
+7fMZUarD4lAFYrFZfKlQIsFLKpX4o+/UcH7n7hpZ09idLKJzGw94iSQqTrYusyGWUlTxWtda
+e3zGh4pj+NZJyuA3MO3hBcDm+XgYdtXE82lWDNUrBomaHeavZYBNOhqvMHnvXNqYCObUVwpq
+tliCCrksSGs3KAfvBUDJR5r4aDg9gDbouAH5uLPXmeClvU1x+2yIQy4ksOrAJZ5xSobIAAIw
+ykmwvLhkCv9l3t6T+97M7V7eUOcWelL0KnNDEQWLdy9a8eFiQDsdY2YOpcVv9T3s1lz8dJGH
+zoLl43b5rU9gGwMAAdDiBRYGd4A1ZjKfIMY1aV448EWGSb3DFkargsNXCAJXKxOXLx5tr/ur
+9vTGGZe967AzbfbGky+fgTGSqQeeGaqJOy7Q8S40cetyPBOenKWOWS6IGzXPiKZxKF3pTKVG
+mONXfGSymdZtbDfr5T5Q68c1xFvBaLH89vy4ME682X3lSvKOKMCCfnejHfj25fYp2D9Xy/Vn
+wHREjEgHnVOHyxEQBa4/HzdLE+rVrmd19qcNoIhCg6zcMS4QMSJLAApAfOLLJJ+54oSGbjNA
+npi/f3vzpsyEB1XHGqGA4vTW28WEicwDI5Es9Pvbv/70kpV4d+3WOzKav7u+viwIBPwe7UGy
+5iURt7fv5qWGwOCCGLTw+O2cjQtAXNLtDAULOTld9A+TmrvF81dUO4ebCHMx4Cc0C16S42q9
+hYP4nNr5Y1CA0e7EZOmGDtlwRbvFUxV8On7+DK42HLrayO0GMEmdGCwImuNaXHO5MibggbQH
+jssideHiAsxTxhBVQSCvE4bBFSeti3OkD0on8OM5/RvTzglfqOHtPn4zoG3VRSv4Pfv6c4/F
+MUGy+Iln0ND+cDRwse5wT2aGPqeMT50cSB2TcOyIC83w23/MdjzisD+NW9c/n6tX1DeTIsm4
+97wuZu5NFMKj7Ewob/osZRD2sdA9kr354SM44T2oJNdY7kCUJ5YTpA66huGyIBBxuZJ06j6l
+Jab53VMq5iFXme8622R5LJYcjjld72A0l8yxGZcgwa5LqEOd5W67334+BDHs2e7VNPhyrACA
+OyzchqLoeDIy9piIJmP3lRxNJojSEiknrjs0DOUhGmsFgbbeob5fs9PYPj3BKUMNsjCu4J/t
+7lsnA3puU5I5x58QIXtyPWfOdO4O9lss2Zz8kgUOlJuBdM/gWj2vN2bePfO1i1Hb465zcDZC
+Uzm1sXb306mSp9Ec8Jzmnhww34fuRXPDY47PjLt9n4rrDqj4BYPQhbty7cyhhbuchZ0nqd24
+VBCejOTwOi2vnraHCmM5l4JjDkVjMEyHDZ+f9l/6UlfA+FKZ4p5AgkZ9XT//0SCfXjx4hkZq
+S/sdra/EvPe9EUaRgg56o32YQ+kRApIePIdQJjDaiXLmyUHMtRc+gJA8VyLcgxWymXCYMs8/
+0pi3jBh1b8wpbN68TPMmuVzHTjzVneIvnsF57PX/NuEPf+hcJr6YLRLDncbzrV2z1UQIdZbM
+dwBi7AEWXt58SAUGRp5sbJsLTjG3BQBKLicyJYbDPyKGEL14stknOjz92/Uh4APXEHW5PHRO
+hscC2ax22/WqzQbgKpfcDXBD4r76Tr3xudLu77Dt4G10PERxmFjqQMBW6rrZYuQaNIWw1bHu
+yBHNRnjLYJWhixFVXS9FqDsQY3NEasBmL3ekp37NXNUjR++8aw/EUprfZ94SlkilUvPIkxG5
+QOOWVnoLyyJyofXHQmr3eWYoVHuqpQotI/W29KTqI3Pn66bVedoe2e7KYvm1B+LV4NLJ2sC+
+Oq625vbIsa3o/H3DGxq4rCTMPXAAbxN9VxBYfueOJAtAxAkAax8asj9ADzwd4E2U0SNb+ORm
+SpOh0OrL3K8Q9HcrWk39NvjnKCFj1Qo6TKvn3Xpz+Gbw+eqpglOxgafNhJU0aj02ZUKn2pm7
+P8+3soCYYblDjrdnjPYMG/TKlN/Czi6/7c2AS/t954LE9k4E70jd9piauqUZyVNgBZxIIUDz
+FANaVlEobetLHadXlGNVOvZ29+b65m3bj+U8K4kSpbdUEitazAjA5Q5eUrACDOLFSHoKB1Fb
+SjlLL94gRa6CtJjh/ZWyK+vc85g2ipnCFtQqgbkkT8K0y2TFKlNPKquejcxBrWaMTE5XxR7s
+hiAAdLl7P9Lpyl7bnzRSAKqDiDGsPh2/fLGa3JUTwBmWKp//tF0iI97feY5t7CaTXMnU56ht
+N3L0N8jGKXdT1WenD4dgAnIYSv9EuTCCKXQDn+1zF5Zr6suCI9He6Ods3C/L6PFZrGeu/i9N
+KO5dZdVXvbAbQQJxyfHZGm+82HzpWCwee0UGvQxLFFtDIBGcZGqrMdxJz4/OvGdr91JQKdBX
+2TuGXfRySpKCNTVHlojxhiz03aDqxutwLNnuFkvDoSfpiRFHmDCW9fTLCAzF2Oh38HJfx4H7
+/wZPx0P1o4JfqsPy6urqj6FLPL0qurTRWGt98a55NrNMWMw7y4h2+wXLawDPBVvK4SC/iHlM
+B5hBuzAI0VKgn0hAZL+YCwxjSmkVSyK8W3av0wwKaqjx6rV/Bd2o2lkOdWe+BEb9DOrC1CbW
+V1yaPPf0X7ss/isOdclVGWzHfaXflofmLGQpFv4M4QM+NnH7XLPBvrcoyhYt42MSUzziOcF+
+uROmA5ZHlzn+VTf+nTLPcj4qK41L5vGxPt5y/8F2knfJ8lxibebfbFBD2oLe+OzLydM+T051
+qHYJeS8jdqaOc5LFbp7wPiVoSJGh9juwUFCYRwJwYFCZh62HSEBE22oAYjP9gUityuDjKYB0
+utofekpjilnMOwDlS6sbFi911Lw8xLJ1/4aPzGMmL906lvdvL1u4mUvM5t4iHztZAIPpuK5b
+ctuZ4ZsAo5bukNkwmNc1kZ8+4lp4EgGGXhSeQN1Qc6zZN3X9F9YKLG4DaD9UuDCD0Pu8CmCG
+V84GU6X2MQdoX17442BFRNarT2/rsrkmmYzDztMU/NutBad3FqosRoqk+BQh9T1VMhzu4I6R
+HHaHkeGdh6qWx9368NMVy0zYvSeMZLTIub4HqTNlslzmCcFFXncUgCKJSQ7eHVAKZgCozO7t
+qY3Xet0i1B6b78zT4EeQR8iQDWv1zg7T+rZmKaRVENandl/aYhrEjbZGPCUAVYd2YvHT+tNu
+ASHCbnsEv9OuWwbDweo/OJHcb0saumMpObHvRIavW7E6kstODfD5IZDslMfmtKSUa/cWAvXN
+ex+l1G+uQ+52CkjmGk42x6yBdnvTm8PtjdPddRkSTtno/oOjqaW4rwtqFpLPfDeilmPkCTKA
+6r4lT/jItPSU4eb0gycBFeK7Ldzc+nnbpepZe4XsEc+Za/4AiuvuwJLKEf3baYUK1aRdRW4/
+4XnaLyFX/f8RAHreFEIWb3IRGcxlnzvsOWnk6cTrbCyc9B6RhKEbsZmn4b2Xmc1WRWEHIKi6
+ZN3tSjC37SkLbx5P4eNfwjt+9/8BWHb6FedBAAA=
+
+--WIyZ46R2i8wDzkSu--
