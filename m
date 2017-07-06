@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf0-f170.google.com ([209.85.192.170]:34098 "EHLO
-        mail-pf0-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752580AbdGFWBv (ORCPT
+Received: from mail-pf0-f171.google.com ([209.85.192.171]:34117 "EHLO
+        mail-pf0-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752696AbdGFWBq (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 6 Jul 2017 18:01:51 -0400
-Received: by mail-pf0-f170.google.com with SMTP id q85so7202599pfq.1
-        for <linux-kbuild@vger.kernel.org>; Thu, 06 Jul 2017 15:01:46 -0700 (PDT)
+        Thu, 6 Jul 2017 18:01:46 -0400
+Received: by mail-pf0-f171.google.com with SMTP id q85so7203403pfq.1
+        for <linux-kbuild@vger.kernel.org>; Thu, 06 Jul 2017 15:01:45 -0700 (PDT)
 From: Greg Hackmann <ghackmann@google.com>
-Subject: [PATCH 2/4] kasan: added functions for unpoisoning stack variables
-Date: Thu,  6 Jul 2017 15:01:12 -0700
-Message-Id: <20170706220114.142438-3-ghackmann@google.com>
+Subject: [PATCH 4/4] kasan: add compiler support for clang
+Date: Thu,  6 Jul 2017 15:01:14 -0700
+Message-Id: <20170706220114.142438-5-ghackmann@google.com>
 In-Reply-To: <20170706220114.142438-1-ghackmann@google.com>
 References: <20170706220114.142438-1-ghackmann@google.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -17,49 +17,33 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>
 Cc: linux-kernel@vger.kernel.org, kasan-dev@googlegroups.com, linux-mm@kvack.org, linux-kbuild@vger.kernel.org, Matthias Kaehlcke <mka@chromium.org>, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>
 
-From: Alexander Potapenko <glider@google.com>
+For now we can hard-code ASAN ABI level 5, since historical clang builds
+can't build the kernel anyway.  We also need to emulate gcc's
+__SANITIZE_ADDRESS__ flag, or memset() calls won't be instrumented.
 
-As a code-size optimization, LLVM builds since r279383 may
-bulk-manipulate the shadow region when (un)poisoning large memory
-blocks.  This requires new callbacks that simply do an uninstrumented
-memset().
-
-This fixes linking the Clang-built kernel when using KASAN.
-
-Signed-off-by: Alexander Potapenko <glider@google.com>
-[ghackmann@google.com: fix memset() parameters, and tweak
- commit message to describe new callbacks]
 Signed-off-by: Greg Hackmann <ghackmann@google.com>
 ---
- mm/kasan/kasan.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ include/linux/compiler-clang.h | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/mm/kasan/kasan.c b/mm/kasan/kasan.c
-index 892b626f564b..89911e5c69f9 100644
---- a/mm/kasan/kasan.c
-+++ b/mm/kasan/kasan.c
-@@ -828,6 +828,21 @@ void __asan_allocas_unpoison(const void *stack_top, const void *stack_bottom)
- }
- EXPORT_SYMBOL(__asan_allocas_unpoison);
- 
-+/* Emitted by the compiler to [un]poison local variables. */
-+#define DEFINE_ASAN_SET_SHADOW(byte) \
-+	void __asan_set_shadow_##byte(const void *addr, size_t size)	\
-+	{								\
-+		__memset((void *)addr, 0x##byte, size);			\
-+	}								\
-+	EXPORT_SYMBOL(__asan_set_shadow_##byte)
+diff --git a/include/linux/compiler-clang.h b/include/linux/compiler-clang.h
+index d614c5ea1b5e..8153f793b22a 100644
+--- a/include/linux/compiler-clang.h
++++ b/include/linux/compiler-clang.h
+@@ -23,3 +23,13 @@
+  */
+ #undef inline
+ #define inline inline __attribute__((unused)) notrace
 +
-+DEFINE_ASAN_SET_SHADOW(00);
-+DEFINE_ASAN_SET_SHADOW(f1);
-+DEFINE_ASAN_SET_SHADOW(f2);
-+DEFINE_ASAN_SET_SHADOW(f3);
-+DEFINE_ASAN_SET_SHADOW(f5);
-+DEFINE_ASAN_SET_SHADOW(f8);
++/* all clang versions usable with the kernel support KASAN ABI version 5
++ */
++#define KASAN_ABI_VERSION 5
 +
- #ifdef CONFIG_MEMORY_HOTPLUG
- static int kasan_mem_notifier(struct notifier_block *nb,
- 			unsigned long action, void *data)
++/* emulate gcc's __SANITIZE_ADDRESS__ flag
++ */
++#if __has_feature(address_sanitizer)
++#define __SANITIZE_ADDRESS__
++#endif
 -- 
 2.13.2.725.g09c95d1e9-goog
 
