@@ -1,154 +1,111 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg0-f47.google.com ([74.125.83.47]:36423 "EHLO
-        mail-pg0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752743AbdGFWBk (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:45057 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752953AbdGGAHF (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 6 Jul 2017 18:01:40 -0400
-Received: by mail-pg0-f47.google.com with SMTP id u62so7172885pgb.3
-        for <linux-kbuild@vger.kernel.org>; Thu, 06 Jul 2017 15:01:39 -0700 (PDT)
-From: Greg Hackmann <ghackmann@google.com>
-Subject: [PATCH 1/4] kasan: support alloca() poisoning
-Date: Thu,  6 Jul 2017 15:01:11 -0700
-Message-Id: <20170706220114.142438-2-ghackmann@google.com>
-In-Reply-To: <20170706220114.142438-1-ghackmann@google.com>
-References: <20170706220114.142438-1-ghackmann@google.com>
+        Thu, 6 Jul 2017 20:07:05 -0400
+MIME-Version: 1.0
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Fri, 7 Jul 2017 09:06:36 +0900
+Message-ID: <CAK7LNATckAMF=2Z2NsUxbgr07QYbjxcSxVFbmiBd5Bp1eo53Mw@mail.gmail.com>
+Subject: [GIT PULL 1/3] Kbuild updates for v4.13
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>
-Cc: linux-kernel@vger.kernel.org, kasan-dev@googlegroups.com, linux-mm@kvack.org, linux-kbuild@vger.kernel.org, Matthias Kaehlcke <mka@chromium.org>, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.com>
 
-clang's AddressSanitizer implementation adds redzones on either side of
-alloca()ed buffers.  These redzones are 32-byte aligned and at least 32
-bytes long.
+Hi Linus,
 
-__asan_alloca_poison() is passed the size and address of the allocated
-buffer, *excluding* the redzones on either side.  The left redzone will
-always be to the immediate left of this buffer; but AddressSanitizer may
-need to add padding between the end of the buffer and the right redzone.
-If there are any 8-byte chunks inside this padding, we should poison
-those too.
+Here are Kbuild updates for v4.13.  Please pull!
 
-__asan_allocas_unpoison() is just passed the top and bottom of the
-dynamic stack area, so unpoisoning is simpler.
 
-Signed-off-by: Greg Hackmann <ghackmann@google.com>
----
- lib/test_kasan.c  | 22 ++++++++++++++++++++++
- mm/kasan/kasan.c  | 26 ++++++++++++++++++++++++++
- mm/kasan/kasan.h  |  8 ++++++++
- mm/kasan/report.c |  3 +++
- 4 files changed, 59 insertions(+)
+I think you will see a trivial merge conflict in
+arch/arm/include/uapi/asm/Kbuild.
 
-diff --git a/lib/test_kasan.c b/lib/test_kasan.c
-index a25c9763fce1..f774fcafb696 100644
---- a/lib/test_kasan.c
-+++ b/lib/test_kasan.c
-@@ -473,6 +473,26 @@ static noinline void __init use_after_scope_test(void)
- 	p[1023] = 1;
- }
- 
-+static noinline void __init kasan_alloca_oob_left(void)
-+{
-+	volatile int i = 10;
-+	char alloca_array[i];
-+	char *p = alloca_array - 1;
-+
-+	pr_info("out-of-bounds to left on alloca\n");
-+	*(volatile char *)p;
-+}
-+
-+static noinline void __init kasan_alloca_oob_right(void)
-+{
-+	volatile int i = 10;
-+	char alloca_array[i];
-+	char *p = alloca_array + round_up(i, 8);
-+
-+	pr_info("out-of-bounds to right on alloca\n");
-+	*(volatile char *)p;
-+}
-+
- static int __init kmalloc_tests_init(void)
- {
- 	/*
-@@ -503,6 +523,8 @@ static int __init kmalloc_tests_init(void)
- 	memcg_accounted_kmem_cache();
- 	kasan_stack_oob();
- 	kasan_global_oob();
-+	kasan_alloca_oob_left();
-+	kasan_alloca_oob_right();
- 	ksize_unpoisons_memory();
- 	copy_user_test();
- 	use_after_scope_test();
-diff --git a/mm/kasan/kasan.c b/mm/kasan/kasan.c
-index c81549d5c833..892b626f564b 100644
---- a/mm/kasan/kasan.c
-+++ b/mm/kasan/kasan.c
-@@ -802,6 +802,32 @@ void __asan_unpoison_stack_memory(const void *addr, size_t size)
- }
- EXPORT_SYMBOL(__asan_unpoison_stack_memory);
- 
-+/* Emitted by compiler to poison alloca()ed objects. */
-+void __asan_alloca_poison(unsigned long addr, size_t size)
-+{
-+	size_t rounded_up_size = round_up(size, KASAN_SHADOW_SCALE_SIZE);
-+	size_t padding_size = round_up(size, KASAN_ALLOCA_REDZONE_SIZE) -
-+			round_up(size, KASAN_SHADOW_SCALE_SIZE);
-+
-+	const void *left_redzone = (const void *)(addr -
-+			KASAN_ALLOCA_REDZONE_SIZE);
-+	const void *right_redzone = (const void *)(addr + rounded_up_size);
-+
-+	kasan_poison_shadow(left_redzone, KASAN_ALLOCA_REDZONE_SIZE,
-+			KASAN_ALLOCA_LEFT);
-+	kasan_poison_shadow(right_redzone,
-+			padding_size + KASAN_ALLOCA_REDZONE_SIZE,
-+			KASAN_ALLOCA_RIGHT);
-+}
-+EXPORT_SYMBOL(__asan_alloca_poison);
-+
-+/* Emitted by compiler to unpoison alloca()ed areas when the stack unwinds. */
-+void __asan_allocas_unpoison(const void *stack_top, const void *stack_bottom)
-+{
-+	kasan_unpoison_shadow(stack_top, stack_bottom - stack_top);
-+}
-+EXPORT_SYMBOL(__asan_allocas_unpoison);
-+
- #ifdef CONFIG_MEMORY_HOTPLUG
- static int kasan_mem_notifier(struct notifier_block *nb,
- 			unsigned long action, void *data)
-diff --git a/mm/kasan/kasan.h b/mm/kasan/kasan.h
-index 1229298cce64..b857dc70d6a2 100644
---- a/mm/kasan/kasan.h
-+++ b/mm/kasan/kasan.h
-@@ -23,6 +23,14 @@
- #define KASAN_STACK_PARTIAL     0xF4
- #define KASAN_USE_AFTER_SCOPE   0xF8
- 
-+/*
-+ * alloca redzone shadow values
-+ */
-+#define KASAN_ALLOCA_LEFT	0xCA
-+#define KASAN_ALLOCA_RIGHT	0xCB
-+
-+#define KASAN_ALLOCA_REDZONE_SIZE	32
-+
- /* Don't break randconfig/all*config builds */
- #ifndef KASAN_ABI_VERSION
- #define KASAN_ABI_VERSION 1
-diff --git a/mm/kasan/report.c b/mm/kasan/report.c
-index beee0e980e2d..c6a5b7ab9e3a 100644
---- a/mm/kasan/report.c
-+++ b/mm/kasan/report.c
-@@ -101,6 +101,9 @@ static const char *get_shadow_bug_type(struct kasan_access_info *info)
- 		break;
- 	case KASAN_USE_AFTER_SCOPE:
- 		bug_type = "use-after-scope";
-+	case KASAN_ALLOCA_LEFT:
-+	case KASAN_ALLOCA_RIGHT:
-+		bug_type = "alloca-out-of-bounds";
- 		break;
- 	}
- 
+Please replace "genhdr-y" with "generated-y",
+keeping the "generic-y += siginfo.h" line.
+
+The diff will look like this:
+
+---------------------------------
+@@@ -1,8 -1,6 +1,8 @@@
+  # UAPI Header export list
+  include include/uapi/asm-generic/Kbuild.asm
+
+- genhdr-y += unistd-common.h
+- genhdr-y += unistd-oabi.h
+- genhdr-y += unistd-eabi.h
++ generated-y += unistd-common.h
++ generated-y += unistd-oabi.h
++ generated-y += unistd-eabi.h
+ +
+ +generic-y += siginfo.h
+----------------------------------
+
+
+
+The following changes since commit 08332893e37af6ae779367e78e444f8f9571511d:
+
+  Linux 4.12-rc2 (2017-05-21 19:30:23 -0700)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
+tags/kbuild-v4.13
+
+for you to fetch changes up to c4e6fff1ae5729c2af159008b13fca39fbbac70e:
+
+  kbuild: improve comments on KBUILD_SRC (2017-07-03 08:03:10 +0900)
+
+----------------------------------------------------------------
+Kbuild updates for v4.13
+
+- Clean up Makefiles and scripts
+
+- Improve clang support
+
+- Remove unneeded genhdr-y syntax
+
+- Remove unneeded cc-option-align macro
+
+- Introduce __cc-option macro and use it to fix x86 boot code compiler flags
+
+----------------------------------------------------------------
+Arnd Bergmann (1):
+      kbuild: speed up checksyscalls.sh
+
+Cao jin (1):
+      kbuild: improve comments on KBUILD_SRC
+
+Masahiro Yamada (4):
+      kbuild: simplify silent build (-s) detection
+      kbuild: remove duplicated arch/*/include/generated/uapi include path
+      kbuild: replace genhdr-y with generated-y
+      kbuild: remove cc-option-align
+
+Matthias Kaehlcke (4):
+      kbuild: clang: Disable 'address-of-packed-member' warning
+      kbuild: Add __cc-option macro
+      x86/build: Use __cc-option for boot code compiler options
+      x86/build: Specify stack alignment for clang
+
+ Documentation/kbuild/makefiles.txt | 41
+++++++-----------------------------------
+ Makefile                           | 24 ++++++++----------------
+ arch/arm/include/uapi/asm/Kbuild   |  6 +++---
+ arch/x86/Makefile                  | 33 +++++++++++++++++++++++++--------
+ arch/x86/Makefile_32.cpu           |  7 +++----
+ arch/x86/include/uapi/asm/Kbuild   |  6 +++---
+ scripts/Kbuild.include             | 19 ++++++++++++-------
+ scripts/Makefile.asm-generic       |  2 +-
+ scripts/Makefile.host              |  6 ------
+ scripts/checksyscalls.sh           | 11 ++++-------
+ tools/build/Makefile.build         |  8 +-------
+ tools/scripts/Makefile.include     |  8 +-------
+ 12 files changed, 67 insertions(+), 104 deletions(-)
+
+
 -- 
-2.13.2.725.g09c95d1e9-goog
-
+Best Regards
+Masahiro Yamada
