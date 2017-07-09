@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-08.nifty.com ([210.131.2.75]:45815 "EHLO
+Received: from conuserg-08.nifty.com ([210.131.2.75]:45822 "EHLO
         conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752623AbdGISdX (ORCPT
+        with ESMTP id S1752641AbdGISdY (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 9 Jul 2017 14:33:23 -0400
+        Sun, 9 Jul 2017 14:33:24 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v2 19/28] openrisc: move generic-y of exported headers to uapi/asm/Kbuild
-Date: Mon, 10 Jul 2017 03:32:51 +0900
-Message-Id: <1499625180-8067-20-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH v2 24/28] unicore32: move generic-y of exported headers to uapi/asm/Kbuild
+Date: Mon, 10 Jul 2017 03:32:56 +0900
+Message-Id: <1499625180-8067-25-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1499625180-8067-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1499625180-8067-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -31,24 +31,24 @@ sorted.
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- arch/openrisc/include/asm/Kbuild      | 29 +----------------------------
- arch/openrisc/include/uapi/asm/Kbuild | 27 +++++++++++++++++++++++++++
- 2 files changed, 28 insertions(+), 28 deletions(-)
+ arch/unicore32/include/asm/Kbuild      | 30 +-----------------------------
+ arch/unicore32/include/uapi/asm/Kbuild | 27 +++++++++++++++++++++++++++
+ 2 files changed, 28 insertions(+), 29 deletions(-)
 
-diff --git a/arch/openrisc/include/asm/Kbuild b/arch/openrisc/include/asm/Kbuild
-index 091585addb91..5bea416a7792 100644
---- a/arch/openrisc/include/asm/Kbuild
-+++ b/arch/openrisc/include/asm/Kbuild
-@@ -1,6 +1,4 @@
+diff --git a/arch/unicore32/include/asm/Kbuild b/arch/unicore32/include/asm/Kbuild
+index 7a53a55341de..fda7e2153086 100644
+--- a/arch/unicore32/include/asm/Kbuild
++++ b/arch/unicore32/include/asm/Kbuild
+@@ -1,66 +1,38 @@
+-
+ generic-y += atomic.h
 -generic-y += auxvec.h
- generic-y += barrier.h
 -generic-y += bitsperlong.h
- generic-y += bug.h
  generic-y += bugs.h
- generic-y += cacheflush.h
-@@ -11,57 +9,32 @@ generic-y += device.h
+ generic-y += clkdev.h
+ generic-y += current.h
+ generic-y += device.h
  generic-y += div64.h
- generic-y += dma.h
  generic-y += emergency-restart.h
 -generic-y += errno.h
  generic-y += exec.h
@@ -56,17 +56,16 @@ index 091585addb91..5bea416a7792 100644
  generic-y += fb.h
 -generic-y += fcntl.h
  generic-y += ftrace.h
+ generic-y += futex.h
  generic-y += hardirq.h
  generic-y += hw_irq.h
 -generic-y += ioctl.h
 -generic-y += ioctls.h
 -generic-y += ipcbuf.h
- generic-y += irq.h
  generic-y += irq_regs.h
  generic-y += irq_work.h
  generic-y += kdebug.h
  generic-y += kmap_types.h
--generic-y += kvm_para.h
 +generic-y += kprobes.h
  generic-y += local.h
  generic-y += mcs_spinlock.h
@@ -74,7 +73,8 @@ index 091585addb91..5bea416a7792 100644
 -generic-y += mman.h
  generic-y += module.h
 -generic-y += msgbuf.h
- generic-y += pci.h
+-generic-y += param.h
+ generic-y += parport.h
  generic-y += percpu.h
 -generic-y += poll.h
 -generic-y += posix_types.h
@@ -83,33 +83,35 @@ index 091585addb91..5bea416a7792 100644
  generic-y += sections.h
  generic-y += segment.h
 -generic-y += sembuf.h
+ generic-y += serial.h
 -generic-y += setup.h
 -generic-y += shmbuf.h
 -generic-y += shmparam.h
 -generic-y += signal.h
+ generic-y += sizes.h
 -generic-y += socket.h
 -generic-y += sockios.h
 -generic-y += stat.h
 -generic-y += statfs.h
- generic-y += string.h
 -generic-y += swab.h
- generic-y += switch_to.h
+ generic-y += syscalls.h
 -generic-y += termbits.h
 -generic-y += termios.h
  generic-y += topology.h
  generic-y += trace_clock.h
 -generic-y += types.h
 -generic-y += ucontext.h
+ generic-y += unaligned.h
  generic-y += user.h
  generic-y += vga.h
  generic-y += word-at-a-time.h
  generic-y += xor.h
 -generic-y += kprobes.h
-diff --git a/arch/openrisc/include/uapi/asm/Kbuild b/arch/openrisc/include/uapi/asm/Kbuild
-index b55fc2ae1e8c..62286dbeb904 100644
---- a/arch/openrisc/include/uapi/asm/Kbuild
-+++ b/arch/openrisc/include/uapi/asm/Kbuild
-@@ -1,4 +1,31 @@
+diff --git a/arch/unicore32/include/uapi/asm/Kbuild b/arch/unicore32/include/uapi/asm/Kbuild
+index 1c44d3b3eba0..759a71411169 100644
+--- a/arch/unicore32/include/uapi/asm/Kbuild
++++ b/arch/unicore32/include/uapi/asm/Kbuild
+@@ -1,5 +1,32 @@
  # UAPI Header export list
  include include/uapi/asm-generic/Kbuild.asm
  
@@ -120,9 +122,10 @@ index b55fc2ae1e8c..62286dbeb904 100644
 +generic-y += ioctl.h
 +generic-y += ioctls.h
 +generic-y += ipcbuf.h
-+generic-y += kvm_para.h
+ generic-y += kvm_para.h
 +generic-y += mman.h
 +generic-y += msgbuf.h
++generic-y += param.h
 +generic-y += poll.h
 +generic-y += posix_types.h
 +generic-y += resource.h
