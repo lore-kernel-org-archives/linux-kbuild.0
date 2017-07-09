@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-08.nifty.com ([210.131.2.75]:45701 "EHLO
+Received: from conuserg-08.nifty.com ([210.131.2.75]:45698 "EHLO
         conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752547AbdGISdR (ORCPT
+        with ESMTP id S1752554AbdGISdR (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
         Sun, 9 Jul 2017 14:33:17 -0400
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v2 09/28] cris: move generic-y of exported headers to uapi/asm/Kbuild
-Date: Mon, 10 Jul 2017 03:32:41 +0900
-Message-Id: <1499625180-8067-10-git-send-email-yamada.masahiro@socionext.com>
+Subject: [PATCH v2 03/28] kbuild: pass dst= to Makefile.headersinst from top Makefile
+Date: Mon, 10 Jul 2017 03:32:35 +0900
+Message-Id: <1499625180-8067-4-git-send-email-yamada.masahiro@socionext.com>
 In-Reply-To: <1499625180-8067-1-git-send-email-yamada.masahiro@socionext.com>
 References: <1499625180-8067-1-git-send-email-yamada.masahiro@socionext.com>
 Sender: linux-kbuild-owner@vger.kernel.org
@@ -15,107 +15,69 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: linux-kbuild@vger.kernel.org
 Cc: linux-arch@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, linux-kernel@vger.kernel.org
 
-Since commit fcc8487d477a ("uapi: export all headers under uapi
-directories"), all (and only) headers under uapi directories are
-exported, but asm-generic wrappers are still exceptions.
-
-To complete de-coupling the uapi from kernel headers, move generic-y
-of exported headers to uapi/asm/Kbuild.
-
-With this change, "make headers_install" will just need to parse
-uapi/asm/Kbuild to build up exported headers.
-
-Also, move "generic-y += kprobes.h", "generic-y += emergency-restart.h"
-up in order to keep the entries sorted.
+We can always pass dst= from the top Makefile.  This will simplify
+the logic in Makefile.headersinst.
 
 Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
 
- arch/cris/include/asm/Kbuild      | 21 ++-------------------
- arch/cris/include/uapi/asm/Kbuild | 17 +++++++++++++++++
- 2 files changed, 19 insertions(+), 19 deletions(-)
+ Makefile                     | 4 ++--
+ scripts/Makefile.headersinst | 8 ++------
+ 2 files changed, 4 insertions(+), 8 deletions(-)
 
-diff --git a/arch/cris/include/asm/Kbuild b/arch/cris/include/asm/Kbuild
-index acc5781100c2..460349cb147f 100644
---- a/arch/cris/include/asm/Kbuild
-+++ b/arch/cris/include/asm/Kbuild
-@@ -1,48 +1,31 @@
- generic-y += atomic.h
--generic-y += auxvec.h
- generic-y += barrier.h
--generic-y += bitsperlong.h
- generic-y += clkdev.h
- generic-y += cmpxchg.h
- generic-y += current.h
- generic-y += device.h
- generic-y += div64.h
--generic-y += errno.h
-+generic-y += emergency-restart.h
- generic-y += exec.h
- generic-y += extable.h
--generic-y += emergency-restart.h
--generic-y += fcntl.h
- generic-y += futex.h
- generic-y += hardirq.h
--generic-y += ioctl.h
--generic-y += ipcbuf.h
- generic-y += irq_regs.h
- generic-y += irq_work.h
- generic-y += kdebug.h
- generic-y += kmap_types.h
--generic-y += kvm_para.h
-+generic-y += kprobes.h
- generic-y += linkage.h
- generic-y += local.h
- generic-y += local64.h
- generic-y += mcs_spinlock.h
- generic-y += mm-arch-hooks.h
--generic-y += mman.h
- generic-y += module.h
--generic-y += msgbuf.h
- generic-y += percpu.h
--generic-y += poll.h
- generic-y += preempt.h
--generic-y += resource.h
- generic-y += sections.h
--generic-y += sembuf.h
--generic-y += shmbuf.h
--generic-y += socket.h
--generic-y += sockios.h
--generic-y += statfs.h
- generic-y += topology.h
- generic-y += trace_clock.h
--generic-y += types.h
- generic-y += vga.h
- generic-y += word-at-a-time.h
- generic-y += xor.h
--generic-y += kprobes.h
-diff --git a/arch/cris/include/uapi/asm/Kbuild b/arch/cris/include/uapi/asm/Kbuild
-index b55fc2ae1e8c..3687b54bb18e 100644
---- a/arch/cris/include/uapi/asm/Kbuild
-+++ b/arch/cris/include/uapi/asm/Kbuild
-@@ -1,4 +1,21 @@
- # UAPI Header export list
- include include/uapi/asm-generic/Kbuild.asm
+diff --git a/Makefile b/Makefile
+index ce5875628740..70c414b15859 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1154,7 +1154,7 @@ PHONY += headers_install
+ headers_install: __headers
+ 	$(if $(wildcard $(srctree)/arch/$(hdr-arch)/include/uapi/asm/Kbuild),, \
+ 	  $(error Headers not exportable for the $(SRCARCH) architecture))
+-	$(Q)$(MAKE) $(hdr-inst)=include/uapi
++	$(Q)$(MAKE) $(hdr-inst)=include/uapi dst=include
+ 	$(Q)$(MAKE) $(hdr-inst)=arch/$(hdr-arch)/include/uapi $(hdr-dst)
  
-+generic-y += auxvec.h
-+generic-y += bitsperlong.h
-+generic-y += errno.h
-+generic-y += fcntl.h
-+generic-y += ioctl.h
-+generic-y += ipcbuf.h
-+generic-y += kvm_para.h
-+generic-y += mman.h
-+generic-y += msgbuf.h
-+generic-y += poll.h
-+generic-y += resource.h
-+generic-y += sembuf.h
-+generic-y += shmbuf.h
- generic-y += siginfo.h
-+generic-y += socket.h
-+generic-y += sockios.h
-+generic-y += statfs.h
-+generic-y += types.h
+ PHONY += headers_check_all
+@@ -1163,7 +1163,7 @@ headers_check_all: headers_install_all
+ 
+ PHONY += headers_check
+ headers_check: headers_install
+-	$(Q)$(MAKE) $(hdr-inst)=include/uapi HDRCHECK=1
++	$(Q)$(MAKE) $(hdr-inst)=include/uapi dst=include HDRCHECK=1
+ 	$(Q)$(MAKE) $(hdr-inst)=arch/$(hdr-arch)/include/uapi $(hdr-dst) HDRCHECK=1
+ 
+ # ---------------------------------------------------------------------------
+diff --git a/scripts/Makefile.headersinst b/scripts/Makefile.headersinst
+index 4e9287bfdf28..e9147f05ea77 100644
+--- a/scripts/Makefile.headersinst
++++ b/scripts/Makefile.headersinst
+@@ -23,15 +23,12 @@ subdirs       := $(patsubst $(srcdir)/%/,%,\
+ 		 $(filter-out $(srcdir)/,\
+ 		 $(sort $(dir $(wildcard $(srcdir)/*/)))))
+ 
+-# caller may set destination dir (when installing to asm/)
+-_dst          := $(if $(dst),$(dst),$(obj))
+-
+ # Recursion
+ __headers: $(subdirs)
+ 
+ .PHONY: $(subdirs)
+ $(subdirs):
+-	$(Q)$(MAKE) $(hdr-inst)=$(obj)/$@ dst=$(_dst)/$@
++	$(Q)$(MAKE) $(hdr-inst)=$(obj)/$@ dst=$(dst)/$@
+ 
+ # Skip header install/check for include/uapi and arch/$(hdr-arch)/include/uapi.
+ # We have only sub-directories there.
+@@ -48,8 +45,7 @@ ifneq ($(wildcard $(old-kbuild-file)),)
+ include $(old-kbuild-file)
+ endif
+ 
+-installdir    := $(INSTALL_HDR_PATH)/$(subst uapi/,,$(_dst))
+-
++installdir    := $(INSTALL_HDR_PATH)/$(dst)
+ gendir        := $(objtree)/$(subst include/,include/generated/,$(obj))
+ header-files  := $(notdir $(wildcard $(srcdir)/*.h))
+ header-files  += $(notdir $(wildcard $(srcdir)/*.agh))
 -- 
 2.7.4
 
