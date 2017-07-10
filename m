@@ -1,52 +1,85 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi0-f53.google.com ([209.85.218.53]:33230 "EHLO
-        mail-oi0-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753510AbdGJItN (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:36420 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751674AbdGJJMs (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 10 Jul 2017 04:49:13 -0400
-Received: by mail-oi0-f53.google.com with SMTP id p188so68870049oia.0
-        for <linux-kbuild@vger.kernel.org>; Mon, 10 Jul 2017 01:49:12 -0700 (PDT)
+        Mon, 10 Jul 2017 05:12:48 -0400
 MIME-Version: 1.0
-In-Reply-To: <20170706220114.142438-5-ghackmann@google.com>
-References: <20170706220114.142438-1-ghackmann@google.com> <20170706220114.142438-5-ghackmann@google.com>
-From: Dmitry Vyukov <dvyukov@google.com>
-Date: Mon, 10 Jul 2017 10:48:46 +0200
-Message-ID: <CACT4Y+aTdmohCejgV1NNSitk5WL2s_YyvBHMbDOGSBoWz8qzdA@mail.gmail.com>
-Subject: Re: [PATCH 4/4] kasan: add compiler support for clang
+In-Reply-To: <20170710084208.GA25874@ravnborg.org>
+References: <1499625180-8067-1-git-send-email-yamada.masahiro@socionext.com> <20170710084208.GA25874@ravnborg.org>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Mon, 10 Jul 2017 18:12:28 +0900
+Message-ID: <CAK7LNASdy7Lm+Bos2usOUeEPrCYzTdfVk1T79zm9v8JOTNEBZg@mail.gmail.com>
+Subject: Re: [PATCH v2 00/28] kbuild: complete UAPI de-coupling and cleanup scripts/Makefile.headersinst
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Greg Hackmann <ghackmann@google.com>
-Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, LKML <linux-kernel@vger.kernel.org>, kasan-dev <kasan-dev@googlegroups.com>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "open list:KERNEL BUILD + fi..." <linux-kbuild@vger.kernel.org>, Matthias Kaehlcke <mka@chromium.org>, Michael Davidson <md@google.com>
+To: Sam Ravnborg <sam@ravnborg.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, linux-arch <linux-arch@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 
-On Fri, Jul 7, 2017 at 12:01 AM, Greg Hackmann <ghackmann@google.com> wrote:
-> For now we can hard-code ASAN ABI level 5, since historical clang builds
-> can't build the kernel anyway.  We also need to emulate gcc's
-> __SANITIZE_ADDRESS__ flag, or memset() calls won't be instrumented.
+Hi Sam,
+
+
+2017-07-10 17:42 GMT+09:00 Sam Ravnborg <sam@ravnborg.org>:
+> Hi Masahiro.
 >
-> Signed-off-by: Greg Hackmann <ghackmann@google.com>
-> ---
->  include/linux/compiler-clang.h | 10 ++++++++++
->  1 file changed, 10 insertions(+)
+> On Mon, Jul 10, 2017 at 03:32:32AM +0900, Masahiro Yamada wrote:
+>> In v4.12-rc1, we had a big progress for headers_install.
+>> All (and only) headers under UAPI directories are exported.
+>> However, asm-generic wrappers are still exceptions because
+>> most of arch/*/include/asm/Kbuild include "generic-y" for
+>> exported headers.  As a result, many of generic-wrappers to be
+>> exported are generated outside UAPI directories.
+>>
+>> To finish de-coupling UAPI, "generic-y" for exported headers
+>> should be moved to arch/*/include/uapi/asm/Kbuild.
+>>
+>> With those cleanups, the logic of headers_install will become
+>> even simpler.  UAPI will be completely self-contained.
+>>
+>> This series is based on:
+>> commit 19bf2e0ef18ec8a7284ecc83459a2664cb885cd5
+>>
+>> Changes for v2:
+>>   - rebase on the latest in the mainline in order to avoid merge conflicts
 >
-> diff --git a/include/linux/compiler-clang.h b/include/linux/compiler-clang.h
-> index d614c5ea1b5e..8153f793b22a 100644
-> --- a/include/linux/compiler-clang.h
-> +++ b/include/linux/compiler-clang.h
-> @@ -23,3 +23,13 @@
->   */
->  #undef inline
->  #define inline inline __attribute__((unused)) notrace
-> +
-> +/* all clang versions usable with the kernel support KASAN ABI version 5
-> + */
-> +#define KASAN_ABI_VERSION 5
-> +
-> +/* emulate gcc's __SANITIZE_ADDRESS__ flag
-> + */
-> +#if __has_feature(address_sanitizer)
-> +#define __SANITIZE_ADDRESS__
-> +#endif
+> Series looks good.
+>
+> In several of your patches assignments are moved to the arch
+> specific uapi file, but the same assignment are already present in
+> include/uapi/asm-generic/Kbuild.asm so the assignment is redundant.
+>
+> For example:
+> $ARCH uapi Kbuild:
+> generic-y += errno.h
+>
+> uapi/asm-generic Kbuild:
+> mandatory-y += errno.h
+>
+> As this patch-set is touching all arch files this
+> could be a good opportunity to clean this up too.
+>
+> But maybe mandatory-y and generic-y do something different,
+> and both are needed. In wich cases all is good.
+>
+
+Thanks for your review, and you have a good point.
+
+If neither arch-own header implementation is found
+nor generic-y is specified, the build system can automatically generate
+generic wrappers for "mandatory" headers.
+
+I also considered of it, but I wanted to take my time.
+
+I simply moved generic-y without introducing any logical change
+in order to make this series less controversial.
+
+One point of forcing explicit generic-y might be,
+to give arch maintainers an opportunity to judge
+if falling back to asm-generic one works or not.
 
 
-Reviewed-by: Dmitry Vyukov <dvyukov@google.com>
+
+-- 
+Best Regards
+Masahiro Yamada
