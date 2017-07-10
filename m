@@ -1,63 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from asavdk4.altibox.net ([109.247.116.15]:53426 "EHLO
-        asavdk4.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753565AbdGJIsE (ORCPT
+Received: from mail-oi0-f41.google.com ([209.85.218.41]:35244 "EHLO
+        mail-oi0-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753789AbdGJIsS (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 10 Jul 2017 04:48:04 -0400
-Date: Mon, 10 Jul 2017 10:42:08 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: [PATCH v2 00/28] kbuild: complete UAPI de-coupling and cleanup
- scripts/Makefile.headersinst
-Message-ID: <20170710084208.GA25874@ravnborg.org>
-References: <1499625180-8067-1-git-send-email-yamada.masahiro@socionext.com>
+        Mon, 10 Jul 2017 04:48:18 -0400
+Received: by mail-oi0-f41.google.com with SMTP id 191so69002545oii.2
+        for <linux-kbuild@vger.kernel.org>; Mon, 10 Jul 2017 01:48:12 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1499625180-8067-1-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <20170706220114.142438-4-ghackmann@google.com>
+References: <20170706220114.142438-1-ghackmann@google.com> <20170706220114.142438-4-ghackmann@google.com>
+From: Dmitry Vyukov <dvyukov@google.com>
+Date: Mon, 10 Jul 2017 10:47:46 +0200
+Message-ID: <CACT4Y+Zr530Hj90adwBpLW_U6VY7AomAM+VZctZTtW4GA8ULpQ@mail.gmail.com>
+Subject: Re: [PATCH 3/4] kasan: support LLVM-style asan parameters
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Greg Hackmann <ghackmann@google.com>
+Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, LKML <linux-kernel@vger.kernel.org>, kasan-dev <kasan-dev@googlegroups.com>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "open list:KERNEL BUILD + fi..." <linux-kbuild@vger.kernel.org>, Matthias Kaehlcke <mka@chromium.org>, Michael Davidson <md@google.com>
 
-Hi Masahiro.
+On Fri, Jul 7, 2017 at 12:01 AM, Greg Hackmann <ghackmann@google.com> wrote:
+> Use cc-option to figure out whether the compiler's sanitizer uses
+> LLVM-style parameters ("-mllvm -asan-foo=bar") or GCC-style parameters
+> ("--param asan-foo=bar").
+>
+> Signed-off-by: Greg Hackmann <ghackmann@google.com>
+> ---
+>  scripts/Makefile.kasan | 10 +++++++++-
+>  1 file changed, 9 insertions(+), 1 deletion(-)
+>
+> diff --git a/scripts/Makefile.kasan b/scripts/Makefile.kasan
+> index 9576775a86f6..b66ae4b4546b 100644
+> --- a/scripts/Makefile.kasan
+> +++ b/scripts/Makefile.kasan
+> @@ -9,11 +9,19 @@ KASAN_SHADOW_OFFSET ?= $(CONFIG_KASAN_SHADOW_OFFSET)
+>
+>  CFLAGS_KASAN_MINIMAL := -fsanitize=kernel-address
+>
+> -CFLAGS_KASAN := $(call cc-option, -fsanitize=kernel-address \
+> +CFLAGS_KASAN_GCC := $(call cc-option, -fsanitize=kernel-address \
+>                 -fasan-shadow-offset=$(KASAN_SHADOW_OFFSET) \
+>                 --param asan-stack=1 --param asan-globals=1 \
+>                 --param asan-instrumentation-with-call-threshold=$(call_threshold))
+>
+> +CFLAGS_KASAN_LLVM := $(call cc-option, -fsanitize=kernel-address \
+> +               -mllvm -asan-mapping-offset=$(KASAN_SHADOW_OFFSET) \
+> +               -mllvm -asan-stack=1 -mllvm -asan-globals=1 \
+> +               -mllvm -asan-use-after-scope=1 \
+> +               -mllvm -asan-instrumentation-with-call-threshold=$(call_threshold))
+> +
+> +CFLAGS_KASAN := $(CFLAGS_KASAN_GCC) $(CFLAGS_KASAN_LLVM)
+> +
+>  ifeq ($(call cc-option, $(CFLAGS_KASAN_MINIMAL) -Werror),)
+>     ifneq ($(CONFIG_COMPILE_TEST),y)
+>          $(warning Cannot use CONFIG_KASAN: \
 
-On Mon, Jul 10, 2017 at 03:32:32AM +0900, Masahiro Yamada wrote:
-> In v4.12-rc1, we had a big progress for headers_install.
-> All (and only) headers under UAPI directories are exported.
-> However, asm-generic wrappers are still exceptions because
-> most of arch/*/include/asm/Kbuild include "generic-y" for
-> exported headers.  As a result, many of generic-wrappers to be
-> exported are generated outside UAPI directories.
-> 
-> To finish de-coupling UAPI, "generic-y" for exported headers
-> should be moved to arch/*/include/uapi/asm/Kbuild.
-> 
-> With those cleanups, the logic of headers_install will become
-> even simpler.  UAPI will be completely self-contained.
-> 
-> This series is based on:
-> commit 19bf2e0ef18ec8a7284ecc83459a2664cb885cd5
-> 
-> Changes for v2:
->   - rebase on the latest in the mainline in order to avoid merge conflicts
-
-Series looks good.
-
-In several of your patches assignments are moved to the arch
-specific uapi file, but the same assignment are already present in
-include/uapi/asm-generic/Kbuild.asm so the assignment is redundant.
-
-For example:
-$ARCH uapi Kbuild:
-generic-y += errno.h
-
-uapi/asm-generic Kbuild:
-mandatory-y += errno.h
-
-As this patch-set is touching all arch files this
-could be a good opportunity to clean this up too.
-
-But maybe mandatory-y and generic-y do something different,
-and both are needed. In wich cases all is good.
-
-	Sam
+Reviewed-by: Dmitry Vyukov <dvyukov@google.com>
