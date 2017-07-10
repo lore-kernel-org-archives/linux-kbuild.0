@@ -1,89 +1,168 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pf0-f196.google.com ([209.85.192.196]:35926 "EHLO
-        mail-pf0-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753239AbdGJCNt (ORCPT
+Received: from mail-oi0-f50.google.com ([209.85.218.50]:34843 "EHLO
+        mail-oi0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753761AbdGJIom (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 9 Jul 2017 22:13:49 -0400
-Date: Mon, 10 Jul 2017 12:13:29 +1000
-From: Nicholas Piggin <npiggin@gmail.com>
-Subject: Re: [RFC PATCH] x86: enable dead code and data elimination (LTO)
-Message-ID: <20170710121329.77dd3364@roar.ozlabs.ibm.com>
-In-Reply-To: <alpine.LFD.2.20.1707090946090.1959@knanqh.ubzr>
-References: <20170709031333.29443-1-npiggin@gmail.com>
-        <20170709090551.bm2c55ctt3togim7@gmail.com>
-        <CAK7LNAR-VF2o3-qcCXnkath_B74KQodh_vezPRErGPhZSao2VA@mail.gmail.com>
-        <alpine.LFD.2.20.1707090946090.1959@knanqh.ubzr>
+        Mon, 10 Jul 2017 04:44:42 -0400
+Received: by mail-oi0-f50.google.com with SMTP id 191so68941989oii.2
+        for <linux-kbuild@vger.kernel.org>; Mon, 10 Jul 2017 01:44:36 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20170706220114.142438-2-ghackmann@google.com>
+References: <20170706220114.142438-1-ghackmann@google.com> <20170706220114.142438-2-ghackmann@google.com>
+From: Dmitry Vyukov <dvyukov@google.com>
+Date: Mon, 10 Jul 2017 10:44:15 +0200
+Message-ID: <CACT4Y+YWLc3n-PBcD1Cmu_FLGSDd+vyTTyeBamk2bBZhdWJSoA@mail.gmail.com>
+Subject: Re: [PATCH 1/4] kasan: support alloca() poisoning
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Nicolas Pitre <nicolas.pitre@linaro.org>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Ingo Molnar <mingo@kernel.org>, linux-arch <linux-arch@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, X86 ML <x86@kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, Paul Burton <paul.burton@imgtec.com>, Linus Torvalds <torvalds@linux-foundation.org>, Thomas Gleixner <tglx@linutronix.de>, "H. Peter Anvin" <hpa@zytor.com>, Peter Zijlstra <a.p.zijlstra@chello.nl>, Andrew Morton <akpm@linux-foundation.org>
+To: Greg Hackmann <ghackmann@google.com>
+Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, LKML <linux-kernel@vger.kernel.org>, kasan-dev <kasan-dev@googlegroups.com>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "open list:KERNEL BUILD + fi..." <linux-kbuild@vger.kernel.org>, Matthias Kaehlcke <mka@chromium.org>, Michael Davidson <md@google.com>
 
-On Sun, 9 Jul 2017 09:59:44 -0400 (EDT)
-Nicolas Pitre <nicolas.pitre@linaro.org> wrote:
+On Fri, Jul 7, 2017 at 12:01 AM, Greg Hackmann <ghackmann@google.com> wrote:
+> clang's AddressSanitizer implementation adds redzones on either side of
+> alloca()ed buffers.  These redzones are 32-byte aligned and at least 32
+> bytes long.
+>
+> __asan_alloca_poison() is passed the size and address of the allocated
+> buffer, *excluding* the redzones on either side.  The left redzone will
+> always be to the immediate left of this buffer; but AddressSanitizer may
+> need to add padding between the end of the buffer and the right redzone.
+> If there are any 8-byte chunks inside this padding, we should poison
+> those too.
+>
+> __asan_allocas_unpoison() is just passed the top and bottom of the
+> dynamic stack area, so unpoisoning is simpler.
+>
+> Signed-off-by: Greg Hackmann <ghackmann@google.com>
+> ---
+>  lib/test_kasan.c  | 22 ++++++++++++++++++++++
+>  mm/kasan/kasan.c  | 26 ++++++++++++++++++++++++++
+>  mm/kasan/kasan.h  |  8 ++++++++
+>  mm/kasan/report.c |  3 +++
+>  4 files changed, 59 insertions(+)
+>
+> diff --git a/lib/test_kasan.c b/lib/test_kasan.c
+> index a25c9763fce1..f774fcafb696 100644
+> --- a/lib/test_kasan.c
+> +++ b/lib/test_kasan.c
+> @@ -473,6 +473,26 @@ static noinline void __init use_after_scope_test(void)
+>         p[1023] = 1;
+>  }
+>
+> +static noinline void __init kasan_alloca_oob_left(void)
+> +{
+> +       volatile int i = 10;
+> +       char alloca_array[i];
+> +       char *p = alloca_array - 1;
+> +
+> +       pr_info("out-of-bounds to left on alloca\n");
+> +       *(volatile char *)p;
+> +}
+> +
+> +static noinline void __init kasan_alloca_oob_right(void)
+> +{
+> +       volatile int i = 10;
+> +       char alloca_array[i];
+> +       char *p = alloca_array + round_up(i, 8);
+> +
+> +       pr_info("out-of-bounds to right on alloca\n");
+> +       *(volatile char *)p;
+> +}
+> +
+>  static int __init kmalloc_tests_init(void)
+>  {
+>         /*
+> @@ -503,6 +523,8 @@ static int __init kmalloc_tests_init(void)
+>         memcg_accounted_kmem_cache();
+>         kasan_stack_oob();
+>         kasan_global_oob();
+> +       kasan_alloca_oob_left();
+> +       kasan_alloca_oob_right();
+>         ksize_unpoisons_memory();
+>         copy_user_test();
+>         use_after_scope_test();
+> diff --git a/mm/kasan/kasan.c b/mm/kasan/kasan.c
+> index c81549d5c833..892b626f564b 100644
+> --- a/mm/kasan/kasan.c
+> +++ b/mm/kasan/kasan.c
+> @@ -802,6 +802,32 @@ void __asan_unpoison_stack_memory(const void *addr, size_t size)
+>  }
+>  EXPORT_SYMBOL(__asan_unpoison_stack_memory);
+>
+> +/* Emitted by compiler to poison alloca()ed objects. */
+> +void __asan_alloca_poison(unsigned long addr, size_t size)
+> +{
+> +       size_t rounded_up_size = round_up(size, KASAN_SHADOW_SCALE_SIZE);
+> +       size_t padding_size = round_up(size, KASAN_ALLOCA_REDZONE_SIZE) -
+> +                       round_up(size, KASAN_SHADOW_SCALE_SIZE);
 
-> On Sun, 9 Jul 2017, Masahiro Yamada wrote:
-> 
-> > Hi.
-> > 
-> > 2017-07-09 18:05 GMT+09:00 Ingo Molnar <mingo@kernel.org>:  
-> > >
-> > > * Nicholas Piggin <npiggin@gmail.com> wrote:
-> > >  
-> > >> FYI, easiest way to check if you forgot to KEEP a linker table is
-> > >> to look at `readelf -S vmlinux` differences, and to see what is
-> > >> being trimmed, look at nm differences or use --print-gc-sections
-> > >> LD option to see what symbols you're trimming. Linker tables,
-> > >> boot entry, and exception entry tends to require anchoring.  
-> > >
-> > > Could you please add a debug build target to display all discarded
-> > > symbols/sections? Something like:
-> > >
-> > >         make lto-check
-> > >
-> > > ... or so?
+Perhaps s/round_up(size, KASAN_SHADOW_SCALE_SIZE)/rounded_up_size/
+because we already calculated that.
 
-Some kind of option like this could be a good idea. It could apply
-to any kind of link-time optimization we do. I'll think about it.
+> +
+> +       const void *left_redzone = (const void *)(addr -
+> +                       KASAN_ALLOCA_REDZONE_SIZE);
+> +       const void *right_redzone = (const void *)(addr + rounded_up_size);
 
-> > >
-> > > Thanks,
-> > >
-> > >         Ingo  
-> > 
-> > 
-> > Actually, LTO activity existed some years ago
-> > (but not pulled in).
-> > 
-> > http://www.spinics.net/lists/linux-kbuild/msg09242.html
-> > 
-> > 
-> > IIUC, this patch enables "dead code elimination",
-> > (or "garbage collection"?),
-> > but I think it is different from what is called LTO.  
-> 
-> Yes, it is different.  With gc-sections the linker simply drops code 
-> sections that have no references to them.
+Please check that size is rounded to KASAN_ALLOCA_REDZONE_SIZE. That's
+the expectation, right? That can change is clang silently.
 
-Yes, I shouldn't have confused the terms. gc-sections is a trivial
-form of LTO, but not "LTO".
+> +       kasan_poison_shadow(left_redzone, KASAN_ALLOCA_REDZONE_SIZE,
+> +                       KASAN_ALLOCA_LEFT);
+> +       kasan_poison_shadow(right_redzone,
+> +                       padding_size + KASAN_ALLOCA_REDZONE_SIZE,
+> +                       KASAN_ALLOCA_RIGHT);
 
-> This is therefore fast and low 
-> complexity.  LTO postpones the compiler's code optimization passes at 
-> the point where everything is linked together and can do things like 
-> constant propagation across multiple files, etc. LTO is therefore more 
-> efficient at removing unused code but compilation time is much longer 
-> due to the added complexity and inherent difficulty to parallelize the 
-> operation across multiple CPUS.
-> 
-> I think we should aim for gc-sections to be used by default and have LTO 
-> as a possible option only.
+We also need to poison the unaligned part at the end of the object
+from size to rounded_up_size. You can see how we do it for heap
+objects.
 
-I agree after it starts getting implemented and debugged by small
-system users, we could make it default in the interest of sharing
-testing and reducing combinations.
-
-Thanks,
-Nick
+> +}
+> +EXPORT_SYMBOL(__asan_alloca_poison);
+> +/* Emitted by compiler to unpoison alloca()ed areas when the stack unwinds. */
+> +void __asan_allocas_unpoison(const void *stack_top, const void *stack_bottom)
+> +{
+> +       kasan_unpoison_shadow(stack_top, stack_bottom - stack_top);
+> +}
+> +EXPORT_SYMBOL(__asan_allocas_unpoison);
+> +
+>  #ifdef CONFIG_MEMORY_HOTPLUG
+>  static int kasan_mem_notifier(struct notifier_block *nb,
+>                         unsigned long action, void *data)
+> diff --git a/mm/kasan/kasan.h b/mm/kasan/kasan.h
+> index 1229298cce64..b857dc70d6a2 100644
+> --- a/mm/kasan/kasan.h
+> +++ b/mm/kasan/kasan.h
+> @@ -23,6 +23,14 @@
+>  #define KASAN_STACK_PARTIAL     0xF4
+>  #define KASAN_USE_AFTER_SCOPE   0xF8
+>
+> +/*
+> + * alloca redzone shadow values
+> + */
+> +#define KASAN_ALLOCA_LEFT      0xCA
+> +#define KASAN_ALLOCA_RIGHT     0xCB
+> +
+> +#define KASAN_ALLOCA_REDZONE_SIZE      32
+> +
+>  /* Don't break randconfig/all*config builds */
+>  #ifndef KASAN_ABI_VERSION
+>  #define KASAN_ABI_VERSION 1
+> diff --git a/mm/kasan/report.c b/mm/kasan/report.c
+> index beee0e980e2d..c6a5b7ab9e3a 100644
+> --- a/mm/kasan/report.c
+> +++ b/mm/kasan/report.c
+> @@ -101,6 +101,9 @@ static const char *get_shadow_bug_type(struct kasan_access_info *info)
+>                 break;
+>         case KASAN_USE_AFTER_SCOPE:
+>                 bug_type = "use-after-scope";
+> +       case KASAN_ALLOCA_LEFT:
+> +       case KASAN_ALLOCA_RIGHT:
+> +               bug_type = "alloca-out-of-bounds";
+>                 break;
+>         }
+>
+> --
+> 2.13.2.725.g09c95d1e9-goog
+>
