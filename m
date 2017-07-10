@@ -1,57 +1,109 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-ve1eur01on0094.outbound.protection.outlook.com ([104.47.1.94]:6607
-        "EHLO EUR01-VE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1752666AbdGJKc0 (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 10 Jul 2017 06:32:26 -0400
-Subject: Re: [PATCH 4/4] kasan: add compiler support for clang
-References: <20170706220114.142438-1-ghackmann@google.com>
- <20170706220114.142438-5-ghackmann@google.com>
-From: Andrey Ryabinin <aryabinin@virtuozzo.com>
-Message-ID: <34230d2e-c134-6cbc-2a59-c78c78782526@virtuozzo.com>
-Date: Mon, 10 Jul 2017 13:34:24 +0300
-MIME-Version: 1.0
-In-Reply-To: <20170706220114.142438-5-ghackmann@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Received: from youngberry.canonical.com ([91.189.89.112]:46046 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1754173AbdGJPAD (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 10 Jul 2017 11:00:03 -0400
+From: Paolo Pisati <paolo.pisati@canonical.com>
+Subject: [PATCH] scripts/package: snap-pkg target
+Date: Mon, 10 Jul 2017 16:59:57 +0200
+Message-Id: <1499698797-10747-1-git-send-email-paolo.pisati@canonical.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Greg Hackmann <ghackmann@google.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>
-Cc: linux-kernel@vger.kernel.org, kasan-dev@googlegroups.com, linux-mm@kvack.org, linux-kbuild@vger.kernel.org, Matthias Kaehlcke <mka@chromium.org>, Michael Davidson <md@google.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org
+Cc: =?UTF-8?q?Vin=C3=ADcius=20Tinti?= <viniciustinti@gmail.com>, Matthias Kaehlcke <mka@chromium.org>, "Luis R . Rodriguez" <mcgrof@kernel.org>, linux-kernel@vger.kernel.org
 
-On 07/07/2017 01:01 AM, Greg Hackmann wrote:
-> For now we can hard-code ASAN ABI level 5, since historical clang builds
-> can't build the kernel anyway.  We also need to emulate gcc's
-> __SANITIZE_ADDRESS__ flag, or memset() calls won't be instrumented.
-> 
-> Signed-off-by: Greg Hackmann <ghackmann@google.com>
-> ---
->  include/linux/compiler-clang.h | 10 ++++++++++
->  1 file changed, 10 insertions(+)
-> 
-> diff --git a/include/linux/compiler-clang.h b/include/linux/compiler-clang.h
-> index d614c5ea1b5e..8153f793b22a 100644
-> --- a/include/linux/compiler-clang.h
-> +++ b/include/linux/compiler-clang.h
-> @@ -23,3 +23,13 @@
->   */
->  #undef inline
->  #define inline inline __attribute__((unused)) notrace
-> +
-> +/* all clang versions usable with the kernel support KASAN ABI version 5
-> + */
+Following in footsteps of other targets like 'deb-pkg, 'rpm-pkg' and 'tar-pkg',
+this patch adds a 'snap-pkg' target for the creation of a Linux kernel snap
+package using the kbuild infrastructure.
 
- Enclosing */ should be on the same line for single-line comments.
+A snap, in its general form, is a self contained, sandboxed, universal package
+and it is intended to work across multiple distributions and/or devices. A snap
+package is distributed as a single compressed squashfs filesystem.
 
-> +#define KASAN_ABI_VERSION 5
-> +
-> +/* emulate gcc's __SANITIZE_ADDRESS__ flag
-> + */
+A kernel snap is a snap package carrying the Linux kernel, kernel modules,
+accessory files (DTBs, System.map, etc) and a manifesto file.  The purpose of a
+kernel snap is to carry the Linux kernel during the creation of a system image,
+eg. Ubuntu Core, and it's subsequent upgrades.
 
-Ditto.
+For more information on snap packages: https://snapcraft.io/docs/
 
-> +#if __has_feature(address_sanitizer)
-> +#define __SANITIZE_ADDRESS__
-> +#endif
-> 
+Signed-off-by: Paolo Pisati <paolo.pisati@canonical.com>
+---
+ .gitignore                         |  5 +++++
+ scripts/package/Makefile           | 14 ++++++++++++++
+ scripts/package/snapcraft.template | 14 ++++++++++++++
+ 3 files changed, 33 insertions(+)
+ create mode 100644 scripts/package/snapcraft.template
+
+diff --git a/.gitignore b/.gitignore
+index 0c39aa2..638c492 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -59,6 +59,11 @@ Module.symvers
+ /debian/
+ 
+ #
++# Snap directory (make snap-pkg)
++#
++/snap/
++
++#
+ # tar directory (make tar*-pkg)
+ #
+ /tar-install/
+diff --git a/scripts/package/Makefile b/scripts/package/Makefile
+index 71b4a8a..a7ea67c 100644
+--- a/scripts/package/Makefile
++++ b/scripts/package/Makefile
+@@ -99,6 +99,19 @@ bindeb-pkg: FORCE
+ 
+ clean-dirs += $(objtree)/debian/
+ 
++# snap-pkg
++# ---------------------------------------------------------------------------
++snap-pkg: FORCE
++	rm -rf $(objtree)/snap
++	mkdir $(objtree)/snap
++	sed "s@KERNELRELEASE@$(KERNELRELEASE)@; \
++		s@SRCTREE@$(shell realpath $(srctree))@" \
++		$(srctree)/scripts/package/snapcraft.template > \
++		$(objtree)/snap/snapcraft.yaml
++	cd $(objtree)/snap && \
++	snapcraft --target-arch=$(UTS_MACHINE)
++
++clean-dirs += $(objtree)/snap/
+ 
+ # tarball targets
+ # ---------------------------------------------------------------------------
+@@ -143,6 +156,7 @@ help: FORCE
+ 	@echo '  binrpm-pkg          - Build only the binary kernel RPM package'
+ 	@echo '  deb-pkg             - Build both source and binary deb kernel packages'
+ 	@echo '  bindeb-pkg          - Build only the binary kernel deb package'
++	@echo '  snap-pkg            - Build only the binary kernel snap package'
+ 	@echo '  tar-pkg             - Build the kernel as an uncompressed tarball'
+ 	@echo '  targz-pkg           - Build the kernel as a gzip compressed tarball'
+ 	@echo '  tarbz2-pkg          - Build the kernel as a bzip2 compressed tarball'
+diff --git a/scripts/package/snapcraft.template b/scripts/package/snapcraft.template
+new file mode 100644
+index 0000000..2e7ffc8
+--- /dev/null
++++ b/scripts/package/snapcraft.template
+@@ -0,0 +1,14 @@
++name: kernel
++version: KERNELRELEASE
++summary: Linux kernel
++description: The upstream Linux kernel
++grade: stable
++confinement: strict
++type: kernel
++
++parts:
++  kernel:
++    plugin: kernel
++    source: SRCTREE
++    source-type: git
++    kconfigfile: SRCTREE/.config
+-- 
+2.7.4
+
