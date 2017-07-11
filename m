@@ -1,42 +1,34 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg0-f65.google.com ([74.125.83.65]:34019 "EHLO
-        mail-pg0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754467AbdGJUVy (ORCPT
+Received: from mail-oi0-f46.google.com ([209.85.218.46]:33012 "EHLO
+        mail-oi0-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1755251AbdGKGNt (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 10 Jul 2017 16:21:54 -0400
-Date: Tue, 11 Jul 2017 05:21:50 +0900
-From: Stafford Horne <shorne@gmail.com>
-Subject: Re: [PATCH v2 19/28] openrisc: move generic-y of exported headers to
- uapi/asm/Kbuild
-Message-ID: <20170710202150.GA2600@lianli.shorne-pla.net>
-References: <1499625180-8067-1-git-send-email-yamada.masahiro@socionext.com>
- <1499625180-8067-20-git-send-email-yamada.masahiro@socionext.com>
+        Tue, 11 Jul 2017 02:13:49 -0400
+Received: by mail-oi0-f46.google.com with SMTP id p188so93348842oia.0
+        for <linux-kbuild@vger.kernel.org>; Mon, 10 Jul 2017 23:13:48 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1499625180-8067-20-git-send-email-yamada.masahiro@socionext.com>
+In-Reply-To: <CA+r1Zhi3b_KxcKVohEty5ObdrA+OZ-3Pyyu2ggB1aDQ7FoHErw@mail.gmail.com>
+References: <1499698797-10747-1-git-send-email-paolo.pisati@canonical.com> <CA+r1Zhi3b_KxcKVohEty5ObdrA+OZ-3Pyyu2ggB1aDQ7FoHErw@mail.gmail.com>
+From: Paolo Pisati <paolo.pisati@canonical.com>
+Date: Tue, 11 Jul 2017 08:13:47 +0200
+Message-ID: <CAMsH0TQF1drb2p9w8P5xnCvA4YGFKNfSRtBbmDHLFpOK__+x=w@mail.gmail.com>
+Subject: Re: [PATCH] scripts/package: snap-pkg target
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: linux-kbuild@vger.kernel.org, linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org
+To: Jim Davis <jim.epost@gmail.com>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, =?UTF-8?Q?Vin=C3=ADcius_Tinti?= <viniciustinti@gmail.com>, Matthias Kaehlcke <mka@chromium.org>, "Luis R . Rodriguez" <mcgrof@kernel.org>, linux-kernel <linux-kernel@vger.kernel.org>
 
-On Mon, Jul 10, 2017 at 03:32:51AM +0900, Masahiro Yamada wrote:
-> Since commit fcc8487d477a ("uapi: export all headers under uapi
-> directories"), all (and only) headers under uapi directories are
-> exported, but asm-generic wrappers are still exceptions.
-> 
-> To complete de-coupling the uapi from kernel headers, move generic-y
-> of exported headers to uapi/asm/Kbuild.
-> 
-> With this change, "make headers_install" will just need to parse
-> uapi/asm/Kbuild to build up exported headers.
-> 
-> Also, move "generic-y += kprobes.h" up in order to keep the entries
-> sorted.
+On Mon, Jul 10, 2017 at 6:46 PM, Jim Davis <jim.epost@gmail.com> wrote:
+>>
+>> For more information on snap packages: https://snapcraft.io/docs/
+>
+> Is this something a user could do with the existing deb target, and
+> then running deb2snap?
 
-Thanks this looks good.
-
-Acked-by: Stafford Horne <shorne@gmail.com>
-
-> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
-
+No, the kernel snap is a special case, it requires communication with
+the store (e.g. to download the core snap) and some extra steps,
+therefore you should use snapcraft and abstract from these details.
+-- 
+bye,
+p.
