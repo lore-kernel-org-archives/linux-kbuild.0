@@ -1,43 +1,42 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mout.kundenserver.de ([212.227.17.13]:61866 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753830AbdGNMIv (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 14 Jul 2017 08:08:51 -0400
-From: Arnd Bergmann <arnd@arndb.de>
-Subject: [PATCH 01/22] kbuild: disable -Wformat-truncation warnings by default
-Date: Fri, 14 Jul 2017 14:06:53 +0200
-Message-Id: <20170714120720.906842-2-arnd@arndb.de>
-In-Reply-To: <20170714120720.906842-1-arnd@arndb.de>
-References: <20170714120720.906842-1-arnd@arndb.de>
+Received: from mail-eopbgr30101.outbound.protection.outlook.com ([40.107.3.101]:45116
+        "EHLO EUR03-AM5-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1753522AbdGNQtu (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Fri, 14 Jul 2017 12:49:50 -0400
+Subject: Re: [PATCH 1/4] kasan: support alloca() poisoning
+References: <20170706220114.142438-1-ghackmann@google.com>
+ <20170706220114.142438-2-ghackmann@google.com>
+ <66645c53-de05-8371-ead8-d4e939af60a7@virtuozzo.com>
+ <39dd8c5c-e606-486a-bcef-b8481c5203a1@google.com>
+From: Andrey Ryabinin <aryabinin@virtuozzo.com>
+Message-ID: <0e51dc15-1c93-2326-444d-8257b61af54f@virtuozzo.com>
+Date: Fri, 14 Jul 2017 19:52:05 +0300
+MIME-Version: 1.0
+In-Reply-To: <39dd8c5c-e606-486a-bcef-b8481c5203a1@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Linus Torvalds <torvalds@linux-foundation.org>, Guenter Roeck <linux@roeck-us.net>, akpm@linux-foundation.org, netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>, "James E . J . Bottomley" <jejb@linux.vnet.ibm.com>, "Martin K . Petersen" <martin.petersen@oracle.com>, linux-scsi@vger.kernel.org, x86@kernel.org, Arnd Bergmann <arnd@arndb.de>, linux-kbuild@vger.kernel.org
+To: Greg Hackmann <ghackmann@google.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>
+Cc: linux-kernel@vger.kernel.org, kasan-dev@googlegroups.com, linux-mm@kvack.org, linux-kbuild@vger.kernel.org, Matthias Kaehlcke <mka@chromium.org>, Michael Davidson <md@google.com>
 
-With x86 allmodconfig, we currently get 233 -Wformat-truncation warnings,
-which makes the entire warnings rather useless.
+On 07/14/2017 01:49 AM, Greg Hackmann wrote:
+> On 07/10/2017 03:30 AM, Andrey Ryabinin wrote:
+>> gcc now supports this too. So I think this patch should enable it.
+>> It's off by default so you'll have to add --param asan-instrument-allocas=1 into cflags
+>> to make it work
+> 
+> Thanks, will fix.  For now, it looks like I'll need to build gcc from git to test this?
+> 
 
-This turns off the warning by default, unless we specify W=1 or higher
+Right, you'll need quite fresh revision >= 250032
 
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- scripts/Makefile.extrawarn | 3 +++
- 1 file changed, 3 insertions(+)
+>>>   lib/test_kasan.c  | 22 ++++++++++++++++++++++
+>>
+>> Tests would be better as a separate patch.
+> 
+> I was following the precedent in 828347f8f9a5 ("kasan: support use-after-scope detection") which added both at the same time. But I can split the test off into a separate patch if you feel really strongly about it.
 
-diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
-index fb3522fd8702..4b63c2f71adb 100644
---- a/scripts/Makefile.extrawarn
-+++ b/scripts/Makefile.extrawarn
-@@ -67,5 +67,8 @@ KBUILD_CFLAGS += $(call cc-disable-warning, format)
- KBUILD_CFLAGS += $(call cc-disable-warning, sign-compare)
- KBUILD_CFLAGS += $(call cc-disable-warning, format-zero-length)
- KBUILD_CFLAGS += $(call cc-disable-warning, uninitialized)
-+else
-+# noisy gcc-7 warnings
-+KBUILD_CFLAGS += $(call cc-option,-Wformat-truncation=0)
- endif
- endif
--- 
-2.9.0
-
+Please, do the split.
