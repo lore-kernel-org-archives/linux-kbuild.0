@@ -1,41 +1,85 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg0-f42.google.com ([74.125.83.42]:33072 "EHLO
-        mail-pg0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752926AbdGMWuA (ORCPT
+Received: from mail-oi0-f52.google.com ([209.85.218.52]:33764 "EHLO
+        mail-oi0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750914AbdGNGNz (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 13 Jul 2017 18:50:00 -0400
-Received: by mail-pg0-f42.google.com with SMTP id k14so36433582pgr.0
-        for <linux-kbuild@vger.kernel.org>; Thu, 13 Jul 2017 15:50:00 -0700 (PDT)
-Subject: Re: [PATCH 1/4] kasan: support alloca() poisoning
-References: <20170706220114.142438-1-ghackmann@google.com>
- <20170706220114.142438-2-ghackmann@google.com>
- <66645c53-de05-8371-ead8-d4e939af60a7@virtuozzo.com>
-From: Greg Hackmann <ghackmann@google.com>
-Message-ID: <39dd8c5c-e606-486a-bcef-b8481c5203a1@google.com>
-Date: Thu, 13 Jul 2017 15:49:58 -0700
+        Fri, 14 Jul 2017 02:13:55 -0400
+Received: by mail-oi0-f52.google.com with SMTP id p188so63922879oia.0
+        for <linux-kbuild@vger.kernel.org>; Thu, 13 Jul 2017 23:13:55 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <66645c53-de05-8371-ead8-d4e939af60a7@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <c7160aca-a203-e3d8-eb49-b051aff78f0e@google.com>
+References: <20170706220114.142438-1-ghackmann@google.com> <20170706220114.142438-2-ghackmann@google.com>
+ <CACT4Y+YWLc3n-PBcD1Cmu_FLGSDd+vyTTyeBamk2bBZhdWJSoA@mail.gmail.com> <c7160aca-a203-e3d8-eb49-b051aff78f0e@google.com>
+From: Dmitry Vyukov <dvyukov@google.com>
+Date: Fri, 14 Jul 2017 08:13:33 +0200
+Message-ID: <CACT4Y+Yo1gKVJQF74kG5gZ60Qmzo65=6NLnN69ybd+QtzfAi1w@mail.gmail.com>
+Subject: Re: [PATCH 1/4] kasan: support alloca() poisoning
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>
-Cc: linux-kernel@vger.kernel.org, kasan-dev@googlegroups.com, linux-mm@kvack.org, linux-kbuild@vger.kernel.org, Matthias Kaehlcke <mka@chromium.org>, Michael Davidson <md@google.com>
+To: Greg Hackmann <ghackmann@google.com>
+Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>, Alexander Potapenko <glider@google.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, LKML <linux-kernel@vger.kernel.org>, kasan-dev <kasan-dev@googlegroups.com>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "open list:KERNEL BUILD + fi..." <linux-kbuild@vger.kernel.org>, Matthias Kaehlcke <mka@chromium.org>, Michael Davidson <md@google.com>
 
-On 07/10/2017 03:30 AM, Andrey Ryabinin wrote:
-> gcc now supports this too. So I think this patch should enable it.
-> It's off by default so you'll have to add --param asan-instrument-allocas=1 into cflags
-> to make it work
+On Fri, Jul 14, 2017 at 12:40 AM, Greg Hackmann <ghackmann@google.com> wrote:
+> Hi,
+>
+> Thanks for taking a look at this patchstack.  I apologize for the delay in
+> responding.
+>
+> On 07/10/2017 01:44 AM, Dmitry Vyukov wrote:
+>>>
+>>> +
+>>> +       const void *left_redzone = (const void *)(addr -
+>>> +                       KASAN_ALLOCA_REDZONE_SIZE);
+>>> +       const void *right_redzone = (const void *)(addr +
+>>> rounded_up_size);
+>>
+>>
+>> Please check that size is rounded to KASAN_ALLOCA_REDZONE_SIZE. That's
+>> the expectation, right? That can change is clang silently.
+>>
+>>> +       kasan_poison_shadow(left_redzone, KASAN_ALLOCA_REDZONE_SIZE,
+>>> +                       KASAN_ALLOCA_LEFT);
+>>> +       kasan_poison_shadow(right_redzone,
+>>> +                       padding_size + KASAN_ALLOCA_REDZONE_SIZE,
+>>> +                       KASAN_ALLOCA_RIGHT);
+>>
+>>
+>> We also need to poison the unaligned part at the end of the object
+>> from size to rounded_up_size. You can see how we do it for heap
+>> objects.
+>
+>
+> The expectation is that `size' is the exact size of the alloca()ed object.
+> `rounded_up_size' then adds the 0-7 bytes needed to adjust the size to the
+> ASAN shadow scale.  So `addr + rounded_up_size' should be the correct place
+> to start poisoning.
 
-Thanks, will fix.  For now, it looks like I'll need to build gcc from 
-git to test this?
 
->>   lib/test_kasan.c  | 22 ++++++++++++++++++++++
-> 
-> Tests would be better as a separate patch.
+We need to start poisoning at addr+size exactly.
+Asan shadow scheme supports this. It's not possible to poison
+beginning of an aligned 8-byte block, but leave tail unpoisoned. But
+it is possible to poison tail of an aligned 8-byte block and leave
+beginning unpoisoned. Look at what we do for kmalloc.
 
-I was following the precedent in 828347f8f9a5 ("kasan: support 
-use-after-scope detection") which added both at the same time.  But I 
-can split the test off into a separate patch if you feel really strongly 
-about it.
+
+> In retrospect this part of the code was pretty confusing.  How about this?
+> I think its intent is clearer, plus it's a closer match for the description
+> in my commit message:
+>
+>         unsigned long left_redzone_start;
+>         unsigned long object_end;
+>         unsigned long right_redzone_start, right_redzone_end;
+>
+>         left_redzone_start = addr - KASAN_ALLOCA_REDZONE_SIZE;
+>         kasan_poison_shadow((const void *)left_redzone_start,
+>                         KASAN_ALLOCA_REDZONE_SIZE,
+>                         KASAN_ALLOCA_LEFT);
+>
+>         object_end = round_up(addr + size, KASAN_SHADOW_SCALE_SIZE);
+>         right_redzone_start = round_up(object_end,
+> KASAN_ALLOCA_REDZONE_SIZE);
+>         right_redzone_end = right_redzone_start + KASAN_ALLOCA_REDZONE_SIZE;
+>         kasan_poison_shadow((const void *)object_end,
+>                         right_redzone_end - object_end,
+>                         KASAN_ALLOCA_RIGHT);
