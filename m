@@ -1,72 +1,83 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-06.nifty.com ([210.131.2.91]:25257 "EHLO
-        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751279AbdGQLNc (ORCPT
+Received: from ec2-52-27-115-49.us-west-2.compute.amazonaws.com ([52.27.115.49]:54526
+        "EHLO osg.samsung.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1751595AbdGQVqx (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 17 Jul 2017 07:13:32 -0400
+        Mon, 17 Jul 2017 17:46:53 -0400
+From: Mauro Carvalho Chehab <mchehab@s-opensource.com>
+Subject: [PATCH v2 1/8] docs: Makefile: remove no-ops targets
+Date: Mon, 17 Jul 2017 18:46:35 -0300
+Message-Id: <8ff84b2654333dee56681b63d8e413babc13dba0.1500327282.git.mchehab@s-opensource.com>
+In-Reply-To: <cover.1500327282.git.mchehab@s-opensource.com>
+References: <cover.1500327282.git.mchehab@s-opensource.com>
 MIME-Version: 1.0
-In-Reply-To: <1500199925-5542-1-git-send-email-caoj.fnst@cn.fujitsu.com>
-References: <1499938671-13376-1-git-send-email-caoj.fnst@cn.fujitsu.com> <1500199925-5542-1-git-send-email-caoj.fnst@cn.fujitsu.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Mon, 17 Jul 2017 20:13:15 +0900
-Message-ID: <CAK7LNAQiOSdMYqV+U_155iNaL-cBWn99kLu8uczW9pKR-Gwkww@mail.gmail.com>
-Subject: Re: [PATCH v2] kbuild: trivial cleanups on the comments
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <cover.1500327282.git.mchehab@s-opensource.com>
+References: <cover.1500327282.git.mchehab@s-opensource.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Cao jin <caoj.fnst@cn.fujitsu.com>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.com>
+To: Linux Doc Mailing List <linux-doc@vger.kernel.org>
+Cc: Mauro Carvalho Chehab <mchehab@s-opensource.com>, Mauro Carvalho Chehab <mchehab@infradead.org>, linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>, Harry Wei <harryxiyou@gmail.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, linux-kernel@zh-kernel.org, linux-kbuild@vger.kernel.org
 
-Hi Cao,
+After removal of DocBook, those targets are bogus.
 
+Reported-by: Jim Davis <jim.epost@gmail.com>
+Signed-off-by: Mauro Carvalho Chehab <mchehab@s-opensource.com>
+---
+ Documentation/Makefile                 | 10 ----------
+ Documentation/translations/zh_CN/HOWTO |  2 --
+ Makefile                               |  2 +-
+ 3 files changed, 1 insertion(+), 13 deletions(-)
 
-2017-07-16 19:12 GMT+09:00 Cao jin <caoj.fnst@cn.fujitsu.com>:
-> index 61f87a9..f0a4ada 100644
-> --- a/scripts/Kbuild.include
-> +++ b/scripts/Kbuild.include
-> @@ -85,8 +85,8 @@ TMPOUT := $(if $(KBUILD_EXTMOD),$(firstword $(KBUILD_EXTMOD))/)
->
->  # try-run
->  # Usage: option = $(call try-run, $(CC)...-o "$$TMP",option-ok,otherwise)
-> -# Exit code chooses option. "$$TMP" is can be used as temporary file and
-> -# is automatically cleaned up.
-> +# Exit code chooses option. "$$TMP" serves as temporary file and is
-> +# automatically cleaned up.
-
-
-I am not a native speaker, but I think "file" is countable.
-
-Maybe, is "as a temporary file" even better?
-
-
-
-
-> diff --git a/scripts/basic/Makefile b/scripts/basic/Makefile
-> index ec10d93..edd983f 100644
-> --- a/scripts/basic/Makefile
-> +++ b/scripts/basic/Makefile
-> @@ -1,5 +1,5 @@
->  ###
-> -# Makefile.basic lists the most basic programs used during the build process.
-> +# scripts/basic/Makefile lists the most basic programs used during the build process.
-
-This change is correct, but this line will exceed 80 cols limit.
-
-Wrap the lines, or reword like "This Makefile lists ..."
-
-Either will do.
-
-
-
->  # The programs listed herein are what are needed to do the basic stuff,
->  # such as fix file dependencies.
->  # This initial step is needed to avoid files to be recompiled
-
-
-
-
-
-
+diff --git a/Documentation/Makefile b/Documentation/Makefile
+index a42320385df3..d75c00e3aadb 100644
+--- a/Documentation/Makefile
++++ b/Documentation/Makefile
+@@ -95,16 +95,6 @@ endif # HAVE_SPHINX
+ # The following targets are independent of HAVE_SPHINX, and the rules should
+ # work or silently pass without Sphinx.
+ 
+-# no-ops for the Sphinx toolchain
+-sgmldocs:
+-	@:
+-psdocs:
+-	@:
+-mandocs:
+-	@:
+-installmandocs:
+-	@:
+-
+ cleandocs:
+ 	$(Q)rm -rf $(BUILDDIR)
+ 	$(Q)$(MAKE) BUILDDIR=$(abspath $(BUILDDIR)) $(build)=Documentation/media clean
+diff --git a/Documentation/translations/zh_CN/HOWTO b/Documentation/translations/zh_CN/HOWTO
+index 11be075ba5fa..5f6d09edc9ac 100644
+--- a/Documentation/translations/zh_CN/HOWTO
++++ b/Documentation/translations/zh_CN/HOWTO
+@@ -149,9 +149,7 @@ Linux内核代码中包含有大量的文档。这些文档对于学习如何与
+ 核源码的主目录中使用以下不同命令将会分别生成PDF、Postscript、HTML和手册
+ 页等不同格式的文档：
+     make pdfdocs
+-    make psdocs
+     make htmldocs
+-    make mandocs
+ 
+ 
+ 如何成为内核开发者
+diff --git a/Makefile b/Makefile
+index b4fb9a1d1594..8b7237a0d66a 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1467,7 +1467,7 @@ $(help-board-dirs): help-%:
+ 
+ # Documentation targets
+ # ---------------------------------------------------------------------------
+-DOC_TARGETS := xmldocs sgmldocs psdocs latexdocs pdfdocs htmldocs mandocs installmandocs epubdocs cleandocs linkcheckdocs
++DOC_TARGETS := xmldocs latexdocs pdfdocs htmldocs epubdocs cleandocs linkcheckdocs
+ PHONY += $(DOC_TARGETS)
+ $(DOC_TARGETS): scripts_basic FORCE
+ 	$(Q)$(MAKE) $(build)=Documentation $@
 -- 
-Best Regards
-Masahiro Yamada
+2.13.3
+
