@@ -1,54 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f65.google.com ([209.85.215.65]:33469 "EHLO
-        mail-lf0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751769AbdGROYz (ORCPT
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:41494 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752000AbdGRSjC (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 18 Jul 2017 10:24:55 -0400
-Received: by mail-lf0-f65.google.com with SMTP id t72so2010674lff.0
-        for <linux-kbuild@vger.kernel.org>; Tue, 18 Jul 2017 07:24:55 -0700 (PDT)
+        Tue, 18 Jul 2017 14:39:02 -0400
 MIME-Version: 1.0
-Reply-To: mrs.melianatrump@yahoo.com
-From: "Mrs.Meliana Trump" <ugochukwuonuorah12@gmail.com>
-Date: Tue, 18 Jul 2017 07:24:53 -0700
-Message-ID: <CAOYsR4hfz2d52khW4AfuD1=vcXCDM7z18SBkgtTCuHGeZVr_Og@mail.gmail.com>
-Subject: Attention To me and get back to me urgent
+In-Reply-To: <20170630225822.25349-1-sboyd@codeaurora.org>
+References: <20170630225822.25349-1-sboyd@codeaurora.org>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Wed, 19 Jul 2017 03:38:57 +0900
+Message-ID: <CAK7LNAQgv5s8-2fo+qV9a29Fyj0m1nKA1WZzoJpYzhP6NAZ8wg@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: modpost: Warn about references from rodata to
+ __init text
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
+To: Stephen Boyd <sboyd@codeaurora.org>
+Cc: Michal Marek <mmarek@suse.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-arm-msm <linux-arm-msm@vger.kernel.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Rob Clark <robdclark@gmail.com>, Bjorn Andersson <bjorn.andersson@linaro.org>
 
-Attention:Beneficiary
+2017-07-01 7:58 GMT+09:00 Stephen Boyd <sboyd@codeaurora.org>:
+> If we have a structure that's marked const it will be placed
+> into the .rodata section but it could reference an init section
+> function. Include the read only data section in the check we have
+> for read/write data sections referencing init sections so we can
+> find this class of problems. This exposes quite a few places
+> where const marked structures are referencing __init functions and
+> __init data that we were previously ignoring.
+>
+> Cc: Rob Clark <robdclark@gmail.com>
+> Cc: Bjorn Andersson <bjorn.andersson@linaro.org>
+> Signed-off-by: Stephen Boyd <sboyd@codeaurora.org>
+> ---
+>
+> Making this change leads to quite a few other errors even on the
+> multi_v7_defconfig for ARM[1]. I still need to do a build of the
+> allmodconfig to see how many other errors there, but it seems to
+> be quite a few. I suppose those will need to be fixed before we can
+> merge this?
+>
+> [1] https://www.irccloud.com/pastebin/zzqfWGQY/
 
-I am  Meliana Trump, and I am writing to inform you about your Bank
-Check Draft brought back 16/07/2017 by the United Embassy Mr John
-Moore from the government of Benin Republic in the white house
-Washington DC been mandated to be deliver to your home address once
-you reconfirm it with the one we have here with us to avoid wrong
-delivery of your check draft Eighteen million united states dollars
-$18,000,000,00usd that was assigned to be delivered to your humble
-home address by Honorable president Donald Trump the president of this
-great country this week by a delivery agent Mr John Moore
+Applied to linux-kbuild/misc.  Thanks!
 
-Also reconfirm your details for the check delivery by filling the form
-below and send it immediately to our mrs.melianatrump@yahoo.com  in
-for verification and for prompt collection of your fund.
+Now people will notice the warnings in linux-next,
+and will start fixing drivers.
+We still have plenty of time until the next merge windows.  :-)
 
-Fill The Form Below:
-
-1. Residential Address :
-2. Next of Kin :
-3. Mobile Number:
-4. Fax Number :
-5. Occupation :
-6. Sex :
-7. Age :
-8. Nationality :
-9. Country :
-10. Marital Status :
-
-
-Accept my hearty congratulation again!
-
-Yours Sincerely,
-MRS MELIANA TRUMP
-FIRST_LADY
-1600 Pennsylvania Ave NW, Washington, DC 20500, United States
+-- 
+Best Regards
+Masahiro Yamada
