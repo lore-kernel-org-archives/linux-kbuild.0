@@ -1,51 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:41494 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752000AbdGRSjC (ORCPT
+Received: from mail-it0-f67.google.com ([209.85.214.67]:33645 "EHLO
+        mail-it0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751962AbdGSACq (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 18 Jul 2017 14:39:02 -0400
+        Tue, 18 Jul 2017 20:02:46 -0400
 MIME-Version: 1.0
-In-Reply-To: <20170630225822.25349-1-sboyd@codeaurora.org>
-References: <20170630225822.25349-1-sboyd@codeaurora.org>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Wed, 19 Jul 2017 03:38:57 +0900
-Message-ID: <CAK7LNAQgv5s8-2fo+qV9a29Fyj0m1nKA1WZzoJpYzhP6NAZ8wg@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: modpost: Warn about references from rodata to
- __init text
+In-Reply-To: <CAMsH0TQF1drb2p9w8P5xnCvA4YGFKNfSRtBbmDHLFpOK__+x=w@mail.gmail.com>
+References: <1499698797-10747-1-git-send-email-paolo.pisati@canonical.com>
+ <CA+r1Zhi3b_KxcKVohEty5ObdrA+OZ-3Pyyu2ggB1aDQ7FoHErw@mail.gmail.com> <CAMsH0TQF1drb2p9w8P5xnCvA4YGFKNfSRtBbmDHLFpOK__+x=w@mail.gmail.com>
+From: Jim Davis <jim.epost@gmail.com>
+Date: Tue, 18 Jul 2017 17:02:45 -0700
+Message-ID: <CA+r1ZhhZ2yFy=nzhs91nXxkPN_iSyUrE73EzBkB9NVHUOUHWrA@mail.gmail.com>
+Subject: Re: [PATCH] scripts/package: snap-pkg target
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Stephen Boyd <sboyd@codeaurora.org>
-Cc: Michal Marek <mmarek@suse.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-arm-msm <linux-arm-msm@vger.kernel.org>, linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Rob Clark <robdclark@gmail.com>, Bjorn Andersson <bjorn.andersson@linaro.org>
+To: Paolo Pisati <paolo.pisati@canonical.com>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, =?UTF-8?Q?Vin=C3=ADcius_Tinti?= <viniciustinti@gmail.com>, Matthias Kaehlcke <mka@chromium.org>, "Luis R . Rodriguez" <mcgrof@kernel.org>, linux-kernel <linux-kernel@vger.kernel.org>
 
-2017-07-01 7:58 GMT+09:00 Stephen Boyd <sboyd@codeaurora.org>:
-> If we have a structure that's marked const it will be placed
-> into the .rodata section but it could reference an init section
-> function. Include the read only data section in the check we have
-> for read/write data sections referencing init sections so we can
-> find this class of problems. This exposes quite a few places
-> where const marked structures are referencing __init functions and
-> __init data that we were previously ignoring.
+On Mon, Jul 10, 2017 at 11:13 PM, Paolo Pisati
+<paolo.pisati@canonical.com> wrote:
+> On Mon, Jul 10, 2017 at 6:46 PM, Jim Davis <jim.epost@gmail.com> wrote:
+>>>
+>>> For more information on snap packages: https://snapcraft.io/docs/
+>>
+>> Is this something a user could do with the existing deb target, and
+>> then running deb2snap?
 >
-> Cc: Rob Clark <robdclark@gmail.com>
-> Cc: Bjorn Andersson <bjorn.andersson@linaro.org>
-> Signed-off-by: Stephen Boyd <sboyd@codeaurora.org>
-> ---
->
-> Making this change leads to quite a few other errors even on the
-> multi_v7_defconfig for ARM[1]. I still need to do a build of the
-> allmodconfig to see how many other errors there, but it seems to
-> be quite a few. I suppose those will need to be fixed before we can
-> merge this?
->
-> [1] https://www.irccloud.com/pastebin/zzqfWGQY/
+> No, the kernel snap is a special case, it requires communication with
+> the store (e.g. to download the core snap) and some extra steps,
+> therefore you should use snapcraft and abstract from these details.
 
-Applied to linux-kbuild/misc.  Thanks!
+From a quick check on top of 4.13-rc1 it does what it says, but...
+building a snap like this, unless I'm missing something, is quite
+different from building a kernel deb or rpm or tar package.
 
-Now people will notice the warnings in linux-next,
-and will start fixing drivers.
-We still have plenty of time until the next merge windows.  :-)
+Once I fed the snap into ubuntu-image, after hunting down a plausible
+model file, I did get an image file that booted under qemu.  I guess
+if you're in the know about snap (and I don't include myself in that
+august company) you'd know that the snap-pkg target won't directly
+give you something you can boot, but the "make help" output looks so
+similar to the other conventional build targets that the some might
+miss that point.
+
+The snap-informed would also know that the snap-pkg target would
+download stuff from the internet as part of the build process, but
+that's unusual enough in kernel building that another recent build
+target, linkcheckdocs, included "(will connect to external hosts)" as
+part of its "make help" output.  That probably would be a good idea
+for the snap-pkg target too.
+
+Running snap-pkg twice in a row seems to have rebuilt the entire
+kernel source, unlike the other more conventional build targets.
+
 
 -- 
-Best Regards
-Masahiro Yamada
+Jim
