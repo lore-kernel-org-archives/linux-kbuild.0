@@ -1,124 +1,74 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f47.google.com ([209.85.215.47]:33726 "EHLO
-        mail-lf0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752070AbdGSHBU (ORCPT
+Received: from mail-oi0-f66.google.com ([209.85.218.66]:37173 "EHLO
+        mail-oi0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932592AbdGTHYW (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 19 Jul 2017 03:01:20 -0400
-Received: by mail-lf0-f47.google.com with SMTP id z78so28337505lff.0
-        for <linux-kbuild@vger.kernel.org>; Wed, 19 Jul 2017 00:01:19 -0700 (PDT)
+        Thu, 20 Jul 2017 03:24:22 -0400
 MIME-Version: 1.0
-In-Reply-To: <1499698797-10747-1-git-send-email-paolo.pisati@canonical.com>
-References: <1499698797-10747-1-git-send-email-paolo.pisati@canonical.com>
-From: Riku Voipio <riku.voipio@linaro.org>
-Date: Wed, 19 Jul 2017 10:01:17 +0300
-Message-ID: <CAAqcGHkQEccKi0_0kFqi4QjQsOxG7b=aLDTvSDpvZ+fQXbHXkQ@mail.gmail.com>
-Subject: Re: [PATCH] scripts/package: snap-pkg target
+In-Reply-To: <596fd414.fDkQ2LPtuAl0Zq0f%akpm@linux-foundation.org>
+References: <596fd414.fDkQ2LPtuAl0Zq0f%akpm@linux-foundation.org>
+From: Arnd Bergmann <arnd@arndb.de>
+Date: Thu, 20 Jul 2017 09:24:21 +0200
+Message-ID: <CAK8P3a1NXUw9oSb-YB+TGeQYd6-sNMW+S5E5FUV_0TuBGhKV_A@mail.gmail.com>
+Subject: Re: + kbuild-disable-wformat-truncation-warnings-by-default.patch
+ added to -mm tree
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Paolo Pisati <paolo.pisati@canonical.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, linux-kbuild <linux-kbuild@vger.kernel.org>, =?UTF-8?Q?Vin=C3=ADcius_Tinti?= <viniciustinti@gmail.com>, Matthias Kaehlcke <mka@chromium.org>, "Luis R . Rodriguez" <mcgrof@kernel.org>, LKML <linux-kernel@vger.kernel.org>, Jim Davis <jim.epost@gmail.com>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: mm-commits@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, stable <stable@vger.kernel.org>, gregkh <gregkh@linuxfoundation.org>
 
-On 10 July 2017 at 17:59, Paolo Pisati <paolo.pisati@canonical.com> wrote:
-> Following in footsteps of other targets like 'deb-pkg, 'rpm-pkg' and 'tar-pkg',
-> this patch adds a 'snap-pkg' target for the creation of a Linux kernel snap
-> package using the kbuild infrastructure.
+On Wed, Jul 19, 2017 at 11:50 PM,  <akpm@linux-foundation.org> wrote:
+> ------------------------------------------------------
+> From: Arnd Bergmann <arnd@arndb.de>
+> Subject: kbuild: disable -Wformat-truncation warnings by default
 >
-> A snap, in its general form, is a self contained, sandboxed, universal package
-> and it is intended to work across multiple distributions and/or devices. A snap
-> package is distributed as a single compressed squashfs filesystem.
+> With x86 allmodconfig, we currently get 233 -Wformat-truncation warnings,
+> which makes the entire warnings rather useless.
 >
-> A kernel snap is a snap package carrying the Linux kernel, kernel modules,
-> accessory files (DTBs, System.map, etc) and a manifesto file.  The purpose of a
-> kernel snap is to carry the Linux kernel during the creation of a system image,
-> eg. Ubuntu Core, and it's subsequent upgrades.
+> This turns off the warning by default, unless we specify W=1 or higher
 >
-> For more information on snap packages: https://snapcraft.io/docs/
->
-> Signed-off-by: Paolo Pisati <paolo.pisati@canonical.com>
+> Link: http://lkml.kernel.org/r/20170714120720.906842-2-arnd@arndb.de
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
 > ---
->  .gitignore                         |  5 +++++
->  scripts/package/Makefile           | 14 ++++++++++++++
->  scripts/package/snapcraft.template | 14 ++++++++++++++
->  3 files changed, 33 insertions(+)
->  create mode 100644 scripts/package/snapcraft.template
 >
-> diff --git a/.gitignore b/.gitignore
-> index 0c39aa2..638c492 100644
-> --- a/.gitignore
-> +++ b/.gitignore
-> @@ -59,6 +59,11 @@ Module.symvers
->  /debian/
+>  scripts/Makefile.extrawarn |    3 +++
+>  1 file changed, 3 insertions(+)
 >
->  #
-> +# Snap directory (make snap-pkg)
-> +#
-> +/snap/
-> +
-> +#
->  # tar directory (make tar*-pkg)
->  #
->  /tar-install/
-> diff --git a/scripts/package/Makefile b/scripts/package/Makefile
-> index 71b4a8a..a7ea67c 100644
-> --- a/scripts/package/Makefile
-> +++ b/scripts/package/Makefile
-> @@ -99,6 +99,19 @@ bindeb-pkg: FORCE
->
->  clean-dirs += $(objtree)/debian/
->
-> +# snap-pkg
-> +# ---------------------------------------------------------------------------
-> +snap-pkg: FORCE
-> +       rm -rf $(objtree)/snap
-> +       mkdir $(objtree)/snap
-> +       sed "s@KERNELRELEASE@$(KERNELRELEASE)@; \
-> +               s@SRCTREE@$(shell realpath $(srctree))@" \
-> +               $(srctree)/scripts/package/snapcraft.template > \
-> +               $(objtree)/snap/snapcraft.yaml
-> +       cd $(objtree)/snap && \
-> +       snapcraft --target-arch=$(UTS_MACHINE)
-> +
-> +clean-dirs += $(objtree)/snap/
->
->  # tarball targets
->  # ---------------------------------------------------------------------------
-> @@ -143,6 +156,7 @@ help: FORCE
->         @echo '  binrpm-pkg          - Build only the binary kernel RPM package'
->         @echo '  deb-pkg             - Build both source and binary deb kernel packages'
->         @echo '  bindeb-pkg          - Build only the binary kernel deb package'
-> +       @echo '  snap-pkg            - Build only the binary kernel snap package'
->         @echo '  tar-pkg             - Build the kernel as an uncompressed tarball'
->         @echo '  targz-pkg           - Build the kernel as a gzip compressed tarball'
->         @echo '  tarbz2-pkg          - Build the kernel as a bzip2 compressed tarball'
-> diff --git a/scripts/package/snapcraft.template b/scripts/package/snapcraft.template
-> new file mode 100644
-> index 0000000..2e7ffc8
-> --- /dev/null
-> +++ b/scripts/package/snapcraft.template
-> @@ -0,0 +1,14 @@
-> +name: kernel
-> +version: KERNELRELEASE
-> +summary: Linux kernel
-> +description: The upstream Linux kernel
-> +grade: stable
-> +confinement: strict
-> +type: kernel
-> +
-> +parts:
-> +  kernel:
-> +    plugin: kernel
-> +    source: SRCTREE
-> +    source-type: git
-> +    kconfigfile: SRCTREE/.config
+> diff -puN scripts/Makefile.extrawarn~kbuild-disable-wformat-truncation-warnings-by-default scripts/Makefile.extrawarn
+> --- a/scripts/Makefile.extrawarn~kbuild-disable-wformat-truncation-warnings-by-default
+> +++ a/scripts/Makefile.extrawarn
+> @@ -67,5 +67,8 @@ KBUILD_CFLAGS += $(call cc-disable-warni
+>  KBUILD_CFLAGS += $(call cc-disable-warning, sign-compare)
+>  KBUILD_CFLAGS += $(call cc-disable-warning, format-zero-length)
+>  KBUILD_CFLAGS += $(call cc-disable-warning, uninitialized)
+> +else
+> +# noisy gcc-7 warnings
+> +KBUILD_CFLAGS += $(call cc-option,-Wformat-truncation=0)
+>  endif
+>  endif
 
-As we see from the above lines, the snapcraft command already has lots
-of special code for handling kernels. I think would make more sense to
-add support building a kernel source tree into the snapcraft command
-itself. Most importantly that would work with older kernel trees,
-while this patch above will only work from v4.14+
+Hi Andrew, Linus, Greg,
 
-Maybe add a parameter like "snapcraft --kernel" in current kernel
-sourcetree. Or ship a "snapcraft-kernel" command in snapcraft package.
+I noticed that Linus has made a similar patch in 4.13-rc1, commit bd664f6b3e37
+("disable new gcc-7.1.1 warnings for now"), and it completely disables three
+warnings (format-truncation, format-overflow and int-in-bool-context).
 
-Riku
+Obviously there is no point in having both, so let's talk about what we
+want for 4.13, stable-backports and for future kernels, I'll then send those
+patches. Here is my first suggestion:
+
+- enable all three warnings with "make W=1" in 4.13, but leave them
+  disabled by default.
+- backport Linus' patch, plus the follow-up for W=1 to stable kernels,
+  to allow stable kernels to build cleanly
+- backport the patches that address any other gcc-7 warnings, as
+  well as those that are not obvious false-positives to stable kernels
+- In 4.14+, use my version above and address all int-in-bool-context
+  and format-overflow warnings, but only use -Wformat-truncation
+  with make W=1.
+
+Any other suggestions?
+
+        Arnd
