@@ -1,80 +1,65 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-02.nifty.com ([210.131.2.81]:57307 "EHLO
-        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753750AbdGUP6H (ORCPT
+Received: from mail-pg0-f45.google.com ([74.125.83.45]:34521 "EHLO
+        mail-pg0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752780AbdGUV52 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 21 Jul 2017 11:58:07 -0400
-MIME-Version: 1.0
-In-Reply-To: <20170720175213.GB3291@codeaurora.org>
-References: <20170630225822.25349-1-sboyd@codeaurora.org> <CAF6AEGuSwgyqf7pb15M0Pg1SJrQu9TVX76FV9jL=i5LNjFcdtA@mail.gmail.com>
- <CAK7LNAQ6y-budCyzFpHubqEtHGwtARNdGa3O3Wacs+55R87dMg@mail.gmail.com> <20170720175213.GB3291@codeaurora.org>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sat, 22 Jul 2017 00:57:44 +0900
-Message-ID: <CAK7LNASZGsUt+DQiaxT7UPK6riuXJug-hWQmB-Ssa53T6cdyXw@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: modpost: Warn about references from rodata to
- __init text
-Content-Type: text/plain; charset="UTF-8"
+        Fri, 21 Jul 2017 17:57:28 -0400
+Received: by mail-pg0-f45.google.com with SMTP id 123so33605412pgj.1
+        for <linux-kbuild@vger.kernel.org>; Fri, 21 Jul 2017 14:57:28 -0700 (PDT)
+From: Matthias Kaehlcke <mka@chromium.org>
+Subject: [PATCH 1/2] kbuild: Add macros cc-option-3 and __cc-option-3
+Date: Fri, 21 Jul 2017 14:56:56 -0700
+Message-Id: <20170721215657.81631-1-mka@chromium.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Stephen Boyd <sboyd@codeaurora.org>
-Cc: Rob Clark <robdclark@gmail.com>, Michal Marek <mmarek@suse.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-arm-msm <linux-arm-msm@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Bjorn Andersson <bjorn.andersson@linaro.org>
+To: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H . Peter Anvin" <hpa@zytor.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>
+Cc: x86@kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, dianders@chromium.org, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>, Nick Desaulniers <ndesaulniers@google.com>, Stephen Hines <srhines@google.com>, Kees Cook <keescook@chromium.org>, Arnd Bergmann <arnd@arndb.de>, Bernhard.Rosenkranzer@linaro.org, Matthias Kaehlcke <mka@chromium.org>
 
-Hi Stephen,
+The macro cc-option receives two parameters (the second may be empty). It
+returns the first parameter if it is a valid compiler option, otherwise
+the second one. It is not evaluated if the second parameter is a valid
+compiler option. This seems to be fine in virtually all cases, however
+there are scenarios where the second paramater needs to be evaluated too,
+and an empty value (or a third option) should be returned if it is not
+valid.
 
+The macro cc-option-3 receives three parameters and returns parameter 1
+or 2 (in this order) if one of them is found to be a valid compiler
+option, and otherwise paramater 3. The macro __cc-option-3 works
+analogously.
 
-2017-07-21 2:52 GMT+09:00 Stephen Boyd <sboyd@codeaurora.org>:
-> On 07/20, Masahiro Yamada wrote:
->> Hi Stephen, Rob,
->>
->> 2017-07-01 8:59 GMT+09:00 Rob Clark <robdclark@gmail.com>:
->> > On Fri, Jun 30, 2017 at 6:58 PM, Stephen Boyd <sboyd@codeaurora.org> wrote:
->> >> If we have a structure that's marked const it will be placed
->> >> into the .rodata section but it could reference an init section
->> >> function. Include the read only data section in the check we have
->> >> for read/write data sections referencing init sections so we can
->> >> find this class of problems. This exposes quite a few places
->> >> where const marked structures are referencing __init functions and
->> >> __init data that we were previously ignoring.
->> >>
->> >> Cc: Rob Clark <robdclark@gmail.com>
->> >> Cc: Bjorn Andersson <bjorn.andersson@linaro.org>
->> >> Signed-off-by: Stephen Boyd <sboyd@codeaurora.org>
->> >> ---
->> >>
->> >> Making this change leads to quite a few other errors even on the
->> >> multi_v7_defconfig for ARM[1]. I still need to do a build of the
->> >> allmodconfig to see how many other errors there, but it seems to
->> >> be quite a few. I suppose those will need to be fixed before we can
->> >> merge this?
->> >
->> > thanks.. the explosions you get with these mistakes when building
->> > drivers as modules in a distro kernel config are quite "fun" to
->> > debug..
->> >
->> > I'm not quite sure about the rules for whether merging this would
->> > count as a regression, but I would argue those drivers are already
->> > broken, just no one noticed yet.  Similar to when a new gcc gets more
->> > clever about detecting bugs.  So I wouldn't be against merging this
->> > first to force drivers to fix their crap ;-)
->>
->> I applied this, but this way seems unacceptable.
->> I cannot send a pull-req for this
->> unless most of the warnings are fixed.
->>
->> Is there any activity for driver fixes?
->
-> Sorry, no. I've only had a little time to look at the errors
-> reported. Some of them seem to be noise, because there are
-> structures that have a handful of members where one of the
-> members points to an __init function or piece of data that is
-> only used in __init code. We would need to mark these structures
-> as __ref or write more complicated section mismatch checking code
-> to be silent in these cases.
+Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+---
+ scripts/Kbuild.include | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-OK.  I will drop this patch for now.
-
-
-
+diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
+index dd8e2dde0b34..dc83635f2317 100644
+--- a/scripts/Kbuild.include
++++ b/scripts/Kbuild.include
+@@ -113,6 +113,11 @@ as-instr = $(call try-run,\
+ __cc-option = $(call try-run,\
+ 	$(1) -Werror $(2) $(3) -c -x c /dev/null -o "$$TMP",$(3),$(4))
+ 
++# __cc-option-3
++# Usage: MY_CFLAGS += $(call __cc-option-3,$(CC),$(MY_CFLAGS),\
++#	-mpreferred-stack-boundary=2,-mstack-alignment=4,)
++__cc-option-3 = $(call __cc-option,$(1),$(2),$(3),$(call __cc-option,$(1),$(2),$(4),$(5)))
++
+ # Do not attempt to build with gcc plugins during cc-option tests.
+ # (And this uses delayed resolution so the flags will be up to date.)
+ CC_OPTION_CFLAGS = $(filter-out $(GCC_PLUGINS_CFLAGS),$(KBUILD_CFLAGS))
+@@ -123,6 +128,10 @@ CC_OPTION_CFLAGS = $(filter-out $(GCC_PLUGINS_CFLAGS),$(KBUILD_CFLAGS))
+ cc-option = $(call __cc-option, $(CC),\
+ 	$(KBUILD_CPPFLAGS) $(CC_OPTION_CFLAGS),$(1),$(2))
+ 
++# cc-option-3
++# Usage: cflags-y += $(call cc-option-3,-mpreferred-stack-boundary=3,-mstack-alignment=8,)
++cc-option-3 = $(call cc-option,$(1),$(call cc-option,$(2),$(3)))
++
+ # hostcc-option
+ # Usage: cflags-y += $(call hostcc-option,-march=winchip-c6,-march=i586)
+ hostcc-option = $(call __cc-option, $(HOSTCC),\
 -- 
-Best Regards
-Masahiro Yamada
+2.14.0.rc0.284.gd933b75aa4-goog
+
