@@ -1,37 +1,80 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from smtp.codeaurora.org ([198.145.29.96]:47878 "EHLO
-        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932226AbdGTSou (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:57307 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753750AbdGUP6H (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 20 Jul 2017 14:44:50 -0400
-Date: Thu, 20 Jul 2017 11:44:49 -0700
-From: Stephen Boyd <sboyd@codeaurora.org>
-Subject: Detecting system includes in drivers
-Message-ID: <20170720184449.GA19878@codeaurora.org>
+        Fri, 21 Jul 2017 11:58:07 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+In-Reply-To: <20170720175213.GB3291@codeaurora.org>
+References: <20170630225822.25349-1-sboyd@codeaurora.org> <CAF6AEGuSwgyqf7pb15M0Pg1SJrQu9TVX76FV9jL=i5LNjFcdtA@mail.gmail.com>
+ <CAK7LNAQ6y-budCyzFpHubqEtHGwtARNdGa3O3Wacs+55R87dMg@mail.gmail.com> <20170720175213.GB3291@codeaurora.org>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Sat, 22 Jul 2017 00:57:44 +0900
+Message-ID: <CAK7LNASZGsUt+DQiaxT7UPK6riuXJug-hWQmB-Ssa53T6cdyXw@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: modpost: Warn about references from rodata to
+ __init text
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
+To: Stephen Boyd <sboyd@codeaurora.org>
+Cc: Rob Clark <robdclark@gmail.com>, Michal Marek <mmarek@suse.com>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-arm-msm <linux-arm-msm@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Bjorn Andersson <bjorn.andersson@linaro.org>
 
-I've run into a problem where I have a driver C file and a header
-file for that driver that are in the same directory. The C file
-has an include like 
+Hi Stephen,
 
-    #include <driver.h>
 
-instead of
+2017-07-21 2:52 GMT+09:00 Stephen Boyd <sboyd@codeaurora.org>:
+> On 07/20, Masahiro Yamada wrote:
+>> Hi Stephen, Rob,
+>>
+>> 2017-07-01 8:59 GMT+09:00 Rob Clark <robdclark@gmail.com>:
+>> > On Fri, Jun 30, 2017 at 6:58 PM, Stephen Boyd <sboyd@codeaurora.org> wrote:
+>> >> If we have a structure that's marked const it will be placed
+>> >> into the .rodata section but it could reference an init section
+>> >> function. Include the read only data section in the check we have
+>> >> for read/write data sections referencing init sections so we can
+>> >> find this class of problems. This exposes quite a few places
+>> >> where const marked structures are referencing __init functions and
+>> >> __init data that we were previously ignoring.
+>> >>
+>> >> Cc: Rob Clark <robdclark@gmail.com>
+>> >> Cc: Bjorn Andersson <bjorn.andersson@linaro.org>
+>> >> Signed-off-by: Stephen Boyd <sboyd@codeaurora.org>
+>> >> ---
+>> >>
+>> >> Making this change leads to quite a few other errors even on the
+>> >> multi_v7_defconfig for ARM[1]. I still need to do a build of the
+>> >> allmodconfig to see how many other errors there, but it seems to
+>> >> be quite a few. I suppose those will need to be fixed before we can
+>> >> merge this?
+>> >
+>> > thanks.. the explosions you get with these mistakes when building
+>> > drivers as modules in a distro kernel config are quite "fun" to
+>> > debug..
+>> >
+>> > I'm not quite sure about the rules for whether merging this would
+>> > count as a regression, but I would argue those drivers are already
+>> > broken, just no one noticed yet.  Similar to when a new gcc gets more
+>> > clever about detecting bugs.  So I wouldn't be against merging this
+>> > first to force drivers to fix their crap ;-)
+>>
+>> I applied this, but this way seems unacceptable.
+>> I cannot send a pull-req for this
+>> unless most of the warnings are fixed.
+>>
+>> Is there any activity for driver fixes?
+>
+> Sorry, no. I've only had a little time to look at the errors
+> reported. Some of them seem to be noise, because there are
+> structures that have a handful of members where one of the
+> members points to an __init function or piece of data that is
+> only used in __init code. We would need to mark these structures
+> as __ref or write more complicated section mismatch checking code
+> to be silent in these cases.
 
-    #include "driver.h"
+OK.  I will drop this patch for now.
 
-and building this in tree fails, but building it out of tree with
-the O= option doesn't fail. Is there anyway that building out of
-tree can be made to fail as well? The difference seems to be that
-we include the directory for the drivers/ path when compiling the
-C file out of tree, but we don't do that when building in tree.
+
 
 -- 
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum,
-a Linux Foundation Collaborative Project
+Best Regards
+Masahiro Yamada
