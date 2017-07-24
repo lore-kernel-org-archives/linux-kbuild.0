@@ -1,92 +1,108 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg0-f42.google.com ([74.125.83.42]:33691 "EHLO
-        mail-pg0-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753516AbdGUV53 (ORCPT
+Received: from mail-wm0-f68.google.com ([74.125.82.68]:38178 "EHLO
+        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S932079AbdGXOVR (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 21 Jul 2017 17:57:29 -0400
-Received: by mail-pg0-f42.google.com with SMTP id k14so33701073pgr.0
-        for <linux-kbuild@vger.kernel.org>; Fri, 21 Jul 2017 14:57:29 -0700 (PDT)
-From: Matthias Kaehlcke <mka@chromium.org>
-Subject: [PATCH 2/2] x86/build: Fix stack alignment for CLang
-Date: Fri, 21 Jul 2017 14:56:57 -0700
-Message-Id: <20170721215657.81631-2-mka@chromium.org>
-In-Reply-To: <20170721215657.81631-1-mka@chromium.org>
-References: <20170721215657.81631-1-mka@chromium.org>
+        Mon, 24 Jul 2017 10:21:17 -0400
+Received: by mail-wm0-f68.google.com with SMTP id r123so3520469wmb.5
+        for <linux-kbuild@vger.kernel.org>; Mon, 24 Jul 2017 07:21:17 -0700 (PDT)
+From: =?UTF-8?q?Bj=C3=B8rn=20Forsman?= <bjorn.forsman@gmail.com>
+Subject: [PATCH] kbuild: /bin/pwd -> pwd
+Date: Mon, 24 Jul 2017 16:20:47 +0200
+Message-Id: <20170724142047.3679-1-bjorn.forsman@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H . Peter Anvin" <hpa@zytor.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>
-Cc: x86@kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, dianders@chromium.org, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>, Nick Desaulniers <ndesaulniers@google.com>, Stephen Hines <srhines@google.com>, Kees Cook <keescook@chromium.org>, Arnd Bergmann <arnd@arndb.de>, Bernhard.Rosenkranzer@linaro.org, Matthias Kaehlcke <mka@chromium.org>
+To: linux-kbuild@vger.kernel.org
+Cc: yamada.masahiro@socionext.com, mmarek@suse.com, jan.kiszka@siemens.com, kieran@ksquared.org.uk, =?UTF-8?q?Bj=C3=B8rn=20Forsman?= <bjorn.forsman@gmail.com>
 
-Commit:
+Several places already use pwd and rely on $PATH lookup. Moving the
+remaining /bin/pwd users over for consistency.
 
-  d77698df39a5 ("x86/build: Specify stack alignment for clang")
+Also, a reason for doing /bin/pwd -> pwd instead of the other way around
+is because I believe build systems should make little assumptions on host
+filesystem layout. Case in point, we do this kind of patching already in
+NixOS.
 
-intended to use the same stack alignment for clang as with gcc.
-
-The two compilers use different options to configure the stack alignment
-(gcc: -mpreferred-stack-boundary=n, clang: -mstack-alignment=n).
-
-The above commit assumes that the clang option uses the same parameter
-type as gcc, i.e. that the alignment is specified as 2^n. However clang
-interprets the value of this option literally to use an alignment of n,
-in consequence the stack remains misaligned.
-
-Change the values used with -mstack-alignment to be the actual alignment
-instead of a power of two.
-
-Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
+Signed-off-by: Bjørn Forsman <bjorn.forsman@gmail.com>
 ---
- arch/x86/Makefile | 16 +++++-----------
- 1 file changed, 5 insertions(+), 11 deletions(-)
+ Documentation/ia64/xen.txt |  2 +-
+ Makefile                   | 10 +++++-----
+ scripts/gdb/linux/Makefile |  2 +-
+ 3 files changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/arch/x86/Makefile b/arch/x86/Makefile
-index 1e902f926be3..2b2f59c1a5f0 100644
---- a/arch/x86/Makefile
-+++ b/arch/x86/Makefile
-@@ -11,14 +11,6 @@ else
-         KBUILD_DEFCONFIG := $(ARCH)_defconfig
+diff --git a/Documentation/ia64/xen.txt b/Documentation/ia64/xen.txt
+index c61a99f7c8bb..a12c74ce2773 100644
+--- a/Documentation/ia64/xen.txt
++++ b/Documentation/ia64/xen.txt
+@@ -41,7 +41,7 @@ Getting and Building Xen and Dom0
+ 
+  5. make initrd for Dom0/DomU
+     # make -C linux-2.6.18-xen.hg ARCH=ia64 modules_install \
+-      O=$(/bin/pwd)/build-linux-2.6.18-xen_ia64
++      O=$(pwd)/build-linux-2.6.18-xen_ia64
+     # mkinitrd -f /boot/efi/efi/redhat/initrd-2.6.18.8-xen.img \
+       2.6.18.8-xen --builtin mptspi --builtin mptbase \
+       --builtin mptscsih --builtin uhci-hcd --builtin ohci-hcd \
+diff --git a/Makefile b/Makefile
+index b4fb9a1d1594..64e72eba5701 100644
+--- a/Makefile
++++ b/Makefile
+@@ -131,7 +131,7 @@ ifneq ($(KBUILD_OUTPUT),)
+ # check that the output directory actually exists
+ saved-output := $(KBUILD_OUTPUT)
+ KBUILD_OUTPUT := $(shell mkdir -p $(KBUILD_OUTPUT) && cd $(KBUILD_OUTPUT) \
+-								&& /bin/pwd)
++								&& pwd)
+ $(if $(KBUILD_OUTPUT),, \
+      $(error failed to create output directory "$(saved-output)"))
+ 
+@@ -978,7 +978,7 @@ ifdef CONFIG_HEADERS_CHECK
+ 	$(Q)$(MAKE) -f $(srctree)/Makefile headers_check
  endif
+ ifdef CONFIG_GDB_SCRIPTS
+-	$(Q)ln -fsn `cd $(srctree) && /bin/pwd`/scripts/gdb/vmlinux-gdb.py
++	$(Q)ln -fsn `cd $(srctree) && pwd`/scripts/gdb/vmlinux-gdb.py
+ endif
+ ifdef CONFIG_TRIM_UNUSED_KSYMS
+ 	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/adjust_autoksyms.sh \
+@@ -1237,7 +1237,7 @@ _modinst_:
+ 	@rm -rf $(MODLIB)/kernel
+ 	@rm -f $(MODLIB)/source
+ 	@mkdir -p $(MODLIB)/kernel
+-	@ln -s `cd $(srctree) && /bin/pwd` $(MODLIB)/source
++	@ln -s `cd $(srctree) && pwd` $(MODLIB)/source
+ 	@if [ ! $(objtree) -ef  $(MODLIB)/build ]; then \
+ 		rm -f $(MODLIB)/build ; \
+ 		ln -s $(CURDIR) $(MODLIB)/build ; \
+@@ -1629,11 +1629,11 @@ image_name:
+ # Clear a bunch of variables before executing the submake
+ tools/: FORCE
+ 	$(Q)mkdir -p $(objtree)/tools
+-	$(Q)$(MAKE) LDFLAGS= MAKEFLAGS="$(tools_silent) $(filter --j% -j,$(MAKEFLAGS))" O=$(shell cd $(objtree) && /bin/pwd) subdir=tools -C $(src)/tools/
++	$(Q)$(MAKE) LDFLAGS= MAKEFLAGS="$(tools_silent) $(filter --j% -j,$(MAKEFLAGS))" O=$(shell cd $(objtree) && pwd) subdir=tools -C $(src)/tools/
  
--# For gcc stack alignment is specified with -mpreferred-stack-boundary,
--# clang has the option -mstack-alignment for that purpose.
--ifneq ($(call cc-option, -mpreferred-stack-boundary=4),)
--        cc_stack_align_opt := -mpreferred-stack-boundary
--else ifneq ($(call cc-option, -mstack-alignment=4),)
--        cc_stack_align_opt := -mstack-alignment
--endif
--
- # How to compile the 16-bit code.  Note we always compile for -march=i386;
- # that way we can complain to the user if the CPU is insufficient.
- #
-@@ -36,7 +28,9 @@ REALMODE_CFLAGS	:= $(M16_CFLAGS) -g -Os -D__KERNEL__ \
+ tools/%: FORCE
+ 	$(Q)mkdir -p $(objtree)/tools
+-	$(Q)$(MAKE) LDFLAGS= MAKEFLAGS="$(tools_silent) $(filter --j% -j,$(MAKEFLAGS))" O=$(shell cd $(objtree) && /bin/pwd) subdir=tools -C $(src)/tools/ $*
++	$(Q)$(MAKE) LDFLAGS= MAKEFLAGS="$(tools_silent) $(filter --j% -j,$(MAKEFLAGS))" O=$(shell cd $(objtree) && pwd) subdir=tools -C $(src)/tools/ $*
  
- REALMODE_CFLAGS += $(call __cc-option, $(CC), $(REALMODE_CFLAGS), -ffreestanding)
- REALMODE_CFLAGS += $(call __cc-option, $(CC), $(REALMODE_CFLAGS), -fno-stack-protector)
--REALMODE_CFLAGS += $(call __cc-option, $(CC), $(REALMODE_CFLAGS), $(cc_stack_align_opt)=2)
-+REALMODE_CFLAGS += $(call __cc-option-3, $(CC), $(REALMODE_CFLAGS),\
-+	-mpreferred-stack-boundary=2,-mstack-alignment=4,)
-+
- export REALMODE_CFLAGS
+ # Single targets
+ # ---------------------------------------------------------------------------
+diff --git a/scripts/gdb/linux/Makefile b/scripts/gdb/linux/Makefile
+index 8b00031f5349..f1ac5db46932 100644
+--- a/scripts/gdb/linux/Makefile
++++ b/scripts/gdb/linux/Makefile
+@@ -1,6 +1,6 @@
+ always := gdb-scripts
  
- # BITS is used as extension for files which are available in a 32 bit
-@@ -76,7 +70,7 @@ ifeq ($(CONFIG_X86_32),y)
-         # Align the stack to the register width instead of using the default
-         # alignment of 16 bytes. This reduces stack usage and the number of
-         # alignment instructions.
--        KBUILD_CFLAGS += $(call cc-option,$(cc_stack_align_opt)=2)
-+        KBUILD_CFLAGS += $(call cc-option-3,-mpreferred-stack-boundary=2,-mstack-alignment=4,)
+-SRCTREE := $(shell cd $(srctree) && /bin/pwd)
++SRCTREE := $(shell cd $(srctree) && pwd)
  
-         # Disable unit-at-a-time mode on pre-gcc-4.0 compilers, it makes gcc use
-         # a lot more stack due to the lack of sharing of stacklots:
-@@ -115,7 +109,7 @@ else
-         # default alignment which keep the stack *mis*aligned.
-         # Furthermore an alignment to the register width reduces stack usage
-         # and the number of alignment instructions.
--        KBUILD_CFLAGS += $(call cc-option,$(cc_stack_align_opt)=3)
-+        KBUILD_CFLAGS += $(call cc-option-3,-mpreferred-stack-boundary=3,-mstack-alignment=8,)
- 
- 	# Use -mskip-rax-setup if supported.
- 	KBUILD_CFLAGS += $(call cc-option,-mskip-rax-setup)
+ $(obj)/gdb-scripts:
+ ifneq ($(KBUILD_SRC),)
 -- 
-2.14.0.rc0.284.gd933b75aa4-goog
+2.12.2
 
