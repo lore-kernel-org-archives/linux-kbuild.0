@@ -1,108 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-wm0-f68.google.com ([74.125.82.68]:38178 "EHLO
-        mail-wm0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S932079AbdGXOVR (ORCPT
+Received: from gauss.credativ.com ([93.94.130.89]:34004 "EHLO
+        gauss.credativ.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752259AbdGXPeZ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 24 Jul 2017 10:21:17 -0400
-Received: by mail-wm0-f68.google.com with SMTP id r123so3520469wmb.5
-        for <linux-kbuild@vger.kernel.org>; Mon, 24 Jul 2017 07:21:17 -0700 (PDT)
-From: =?UTF-8?q?Bj=C3=B8rn=20Forsman?= <bjorn.forsman@gmail.com>
-Subject: [PATCH] kbuild: /bin/pwd -> pwd
-Date: Mon, 24 Jul 2017 16:20:47 +0200
-Message-Id: <20170724142047.3679-1-bjorn.forsman@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+        Mon, 24 Jul 2017 11:34:25 -0400
+From: Sedat Dilek <sedat.dilek@credativ.de>
+Subject: [PATCH] kbuild: Update example for ccflags-y usage
+Date: Mon, 24 Jul 2017 17:27:05 +0200
+Message-Id: <20170724152705.17131-1-sedat.dilek@credativ.de>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: yamada.masahiro@socionext.com, mmarek@suse.com, jan.kiszka@siemens.com, kieran@ksquared.org.uk, =?UTF-8?q?Bj=C3=B8rn=20Forsman?= <bjorn.forsman@gmail.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, Jonathan Corbet <corbet@lwn.net>, linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Sedat Dilek <sedat.dilek@gmail.com>
 
-Several places already use pwd and rely on $PATH lookup. Moving the
-remaining /bin/pwd users over for consistency.
+From: Sedat Dilek <sedat.dilek@gmail.com>
 
-Also, a reason for doing /bin/pwd -> pwd instead of the other way around
-is because I believe build systems should make little assumptions on host
-filesystem layout. Case in point, we do this kind of patching already in
-NixOS.
+The old example to describe ccflags-y usage is no more valid.
 
-Signed-off-by: Bjørn Forsman <bjorn.forsman@gmail.com>
+Signed-off-by: Sedat Dilek <sedat.dilek@gmail.com>
 ---
- Documentation/ia64/xen.txt |  2 +-
- Makefile                   | 10 +++++-----
- scripts/gdb/linux/Makefile |  2 +-
- 3 files changed, 7 insertions(+), 7 deletions(-)
+ Documentation/kbuild/makefiles.txt | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/Documentation/ia64/xen.txt b/Documentation/ia64/xen.txt
-index c61a99f7c8bb..a12c74ce2773 100644
---- a/Documentation/ia64/xen.txt
-+++ b/Documentation/ia64/xen.txt
-@@ -41,7 +41,7 @@ Getting and Building Xen and Dom0
+diff --git a/Documentation/kbuild/makefiles.txt b/Documentation/kbuild/makefiles.txt
+index 7003141a6d4f..cadfa882c275 100644
+--- a/Documentation/kbuild/makefiles.txt
++++ b/Documentation/kbuild/makefiles.txt
+@@ -297,9 +297,9 @@ more details, with real examples.
+ 	ccflags-y specifies options for compiling with $(CC).
  
-  5. make initrd for Dom0/DomU
-     # make -C linux-2.6.18-xen.hg ARCH=ia64 modules_install \
--      O=$(/bin/pwd)/build-linux-2.6.18-xen_ia64
-+      O=$(pwd)/build-linux-2.6.18-xen_ia64
-     # mkinitrd -f /boot/efi/efi/redhat/initrd-2.6.18.8-xen.img \
-       2.6.18.8-xen --builtin mptspi --builtin mptbase \
-       --builtin mptscsih --builtin uhci-hcd --builtin ohci-hcd \
-diff --git a/Makefile b/Makefile
-index b4fb9a1d1594..64e72eba5701 100644
---- a/Makefile
-+++ b/Makefile
-@@ -131,7 +131,7 @@ ifneq ($(KBUILD_OUTPUT),)
- # check that the output directory actually exists
- saved-output := $(KBUILD_OUTPUT)
- KBUILD_OUTPUT := $(shell mkdir -p $(KBUILD_OUTPUT) && cd $(KBUILD_OUTPUT) \
--								&& /bin/pwd)
-+								&& pwd)
- $(if $(KBUILD_OUTPUT),, \
-      $(error failed to create output directory "$(saved-output)"))
+ 	Example:
+-		# drivers/acpi/Makefile
+-		ccflags-y := -Os
+-		ccflags-$(CONFIG_ACPI_DEBUG) += -DACPI_DEBUG_OUTPUT
++		# drivers/acpi/acpica/Makefile
++		ccflags-y						:= -Os -D_LINUX -DBUILDING_ACPICA
++		ccflags-$(CONFIG_ACPI_DEBUG)	+= -DACPI_DEBUG_OUTPUT
  
-@@ -978,7 +978,7 @@ ifdef CONFIG_HEADERS_CHECK
- 	$(Q)$(MAKE) -f $(srctree)/Makefile headers_check
- endif
- ifdef CONFIG_GDB_SCRIPTS
--	$(Q)ln -fsn `cd $(srctree) && /bin/pwd`/scripts/gdb/vmlinux-gdb.py
-+	$(Q)ln -fsn `cd $(srctree) && pwd`/scripts/gdb/vmlinux-gdb.py
- endif
- ifdef CONFIG_TRIM_UNUSED_KSYMS
- 	$(Q)$(CONFIG_SHELL) $(srctree)/scripts/adjust_autoksyms.sh \
-@@ -1237,7 +1237,7 @@ _modinst_:
- 	@rm -rf $(MODLIB)/kernel
- 	@rm -f $(MODLIB)/source
- 	@mkdir -p $(MODLIB)/kernel
--	@ln -s `cd $(srctree) && /bin/pwd` $(MODLIB)/source
-+	@ln -s `cd $(srctree) && pwd` $(MODLIB)/source
- 	@if [ ! $(objtree) -ef  $(MODLIB)/build ]; then \
- 		rm -f $(MODLIB)/build ; \
- 		ln -s $(CURDIR) $(MODLIB)/build ; \
-@@ -1629,11 +1629,11 @@ image_name:
- # Clear a bunch of variables before executing the submake
- tools/: FORCE
- 	$(Q)mkdir -p $(objtree)/tools
--	$(Q)$(MAKE) LDFLAGS= MAKEFLAGS="$(tools_silent) $(filter --j% -j,$(MAKEFLAGS))" O=$(shell cd $(objtree) && /bin/pwd) subdir=tools -C $(src)/tools/
-+	$(Q)$(MAKE) LDFLAGS= MAKEFLAGS="$(tools_silent) $(filter --j% -j,$(MAKEFLAGS))" O=$(shell cd $(objtree) && pwd) subdir=tools -C $(src)/tools/
- 
- tools/%: FORCE
- 	$(Q)mkdir -p $(objtree)/tools
--	$(Q)$(MAKE) LDFLAGS= MAKEFLAGS="$(tools_silent) $(filter --j% -j,$(MAKEFLAGS))" O=$(shell cd $(objtree) && /bin/pwd) subdir=tools -C $(src)/tools/ $*
-+	$(Q)$(MAKE) LDFLAGS= MAKEFLAGS="$(tools_silent) $(filter --j% -j,$(MAKEFLAGS))" O=$(shell cd $(objtree) && pwd) subdir=tools -C $(src)/tools/ $*
- 
- # Single targets
- # ---------------------------------------------------------------------------
-diff --git a/scripts/gdb/linux/Makefile b/scripts/gdb/linux/Makefile
-index 8b00031f5349..f1ac5db46932 100644
---- a/scripts/gdb/linux/Makefile
-+++ b/scripts/gdb/linux/Makefile
-@@ -1,6 +1,6 @@
- always := gdb-scripts
- 
--SRCTREE := $(shell cd $(srctree) && /bin/pwd)
-+SRCTREE := $(shell cd $(srctree) && pwd)
- 
- $(obj)/gdb-scripts:
- ifneq ($(KBUILD_SRC),)
+ 	This variable is necessary because the top Makefile owns the
+ 	variable $(KBUILD_CFLAGS) and uses it for compilation flags for the
 -- 
-2.12.2
+2.11.0
 
