@@ -1,49 +1,43 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-09.nifty.com ([210.131.2.76]:37833 "EHLO
-        conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1754078AbdGYC00 (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 24 Jul 2017 22:26:26 -0400
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 1/3] of: remove drivers/of/testcase-data from include search path for CPP
-Date: Tue, 25 Jul 2017 11:23:34 +0900
-Message-Id: <1500949416-24105-2-git-send-email-yamada.masahiro@socionext.com>
-In-Reply-To: <1500949416-24105-1-git-send-email-yamada.masahiro@socionext.com>
-References: <1500949416-24105-1-git-send-email-yamada.masahiro@socionext.com>
+Received: from mail.kernel.org ([198.145.29.99]:38510 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1752882AbdGYUgw (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 25 Jul 2017 16:36:52 -0400
+MIME-Version: 1.0
+In-Reply-To: <1493165394-29367-3-git-send-email-frowand.list@gmail.com>
+References: <1493165394-29367-1-git-send-email-frowand.list@gmail.com> <1493165394-29367-3-git-send-email-frowand.list@gmail.com>
+From: Rob Herring <robh+dt@kernel.org>
+Date: Tue, 25 Jul 2017 15:36:29 -0500
+Message-ID: <CAL_JsqKZ5JcunaY9K5MEjyS-sxargKtJq11x+DVMwHs8WrnH+Q@mail.gmail.com>
+Subject: Re: [PATCH v4 2/2] of: Add unit tests for applying overlays
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: devicetree@vger.kernel.org, Rob Herring <robh@kernel.org>
-Cc: linux-arch <linux-arch@vger.kernel.org>, Omar Sandoval <osandov@osandov.com>, Gaurav Minocha <gaurav.minocha.os@gmail.com>, Grant Likely <grant.likely@linaro.org>, Frank Rowand <frowand.list@gmail.com>, Mark Rutland <mark.rutland@arm.com>, Olof Johansson <olof@lixom.net>, Russell King <linux@armlinux.org.uk>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Frank Rowand <frowand.list@gmail.com>
+Cc: Stephen Boyd <stephen.boyd@linaro.org>, Michal Marek <mmarek@suse.com>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-This search path was added by commit b5190516b282 ("of: Move testcase
-FDT data into drivers/of").  At that time, it was needed for platform
-DT files to include testcase data.
+On Tue, Apr 25, 2017 at 7:09 PM,  <frowand.list@gmail.com> wrote:
+> From: Frank Rowand <frank.rowand@sony.com>
+>
+> Existing overlay unit tests examine individual pieces of the overlay
+> code.  The new tests target the entire process of applying an overlay.
+>
+> Signed-off-by: Frank Rowand <frank.rowand@sony.com>
+> ---
 
-It became unnecessary when commit ae9304c9d311 ("Adding selftest
-testdata dynamically into live tree") introduced dynamic addition of
-testcase data, but it missed to delete this search path.
+[...]
 
-Moreover, the directory drivers/of/testcase-data does not exist since
-commit 19fd74879a32 ("of/unittest: Rename selftest.c to unittest.c").
+> @@ -1261,6 +1263,8 @@ void __init unflatten_device_tree(void)
+>
+>         /* Get pointer to "/chosen" and "/aliases" nodes for use everywhere */
+>         of_alias_scan(early_init_dt_alloc_memory_arch);
+> +
+> +       unittest_unflatten_overlay_base();
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
+This breaks on systems that don't boot with FDT and call
+unflatten_device_tree, namely x86 and UML (UML needs a few hacks to
+work) which was a feature of the unittest. Considering applying
+overlays on x86 is something we'll want to support, the unittest
+should support that case.
 
- scripts/Makefile.lib | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 58c05e5d9870..011d464d2132 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -176,7 +176,6 @@ ld_flags       = $(LDFLAGS) $(ldflags-y)
- dtc_cpp_flags  = -Wp,-MD,$(depfile).pre.tmp -nostdinc                    \
- 		 -I$(srctree)/arch/$(SRCARCH)/boot/dts                   \
- 		 -I$(srctree)/scripts/dtc/include-prefixes               \
--		 -I$(srctree)/drivers/of/testcase-data                   \
- 		 -undef -D__DTS__
- 
- # Finds the multi-part object the current object will be linked into
--- 
-2.7.4
-
+Rob
