@@ -1,56 +1,48 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-it0-f65.google.com ([209.85.214.65]:35694 "EHLO
-        mail-it0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751113AbdG0Xq1 (ORCPT
+Received: from mail-pg0-f52.google.com ([74.125.83.52]:36601 "EHLO
+        mail-pg0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751735AbdGaQfG (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 27 Jul 2017 19:46:27 -0400
-Subject: Re: [PATCH v4 2/2] of: Add unit tests for applying overlays
-References: <1493165394-29367-1-git-send-email-frowand.list@gmail.com>
- <1493165394-29367-3-git-send-email-frowand.list@gmail.com>
- <CAL_JsqKZ5JcunaY9K5MEjyS-sxargKtJq11x+DVMwHs8WrnH+Q@mail.gmail.com>
-From: Frank Rowand <frowand.list@gmail.com>
-Message-ID: <597A7B4F.2000702@gmail.com>
-Date: Thu, 27 Jul 2017 16:46:23 -0700
+        Mon, 31 Jul 2017 12:35:06 -0400
+Received: by mail-pg0-f52.google.com with SMTP id 125so140430310pgi.3
+        for <linux-kbuild@vger.kernel.org>; Mon, 31 Jul 2017 09:35:06 -0700 (PDT)
+Date: Mon, 31 Jul 2017 09:35:03 -0700
+From: Matthias Kaehlcke <mka@chromium.org>
+Subject: Re: [PATCH 2/2] kbuild: clang: Disable the
+ 'duplicate-decl-specifier' warning
+Message-ID: <20170731163503.GF84665@google.com>
+References: <20170421213931.155210-3-mka@chromium.org>
+ <CAD=FV=XENNp3rcD5OK1d2WmccbqaT9=bjsayvbnA2Th8zmOAwg@mail.gmail.com>
+ <CAK8P3a1y0MoxhMNr2v=R7-CANaATfFy58FM8heyOP78g-JZwHA@mail.gmail.com>
+ <20170517184529.GG141096@google.com>
+ <20170524000419.GQ141096@google.com>
+ <CAK8P3a3D6oW4vaUD9JSGXFqqydrm5-Z0x9qOwzfn_WQryXezsA@mail.gmail.com>
+ <CAK7LNASXC1T_OkXD-T5XSKAHSNWrxAQCHPfk4dgnyq7MJBCSnQ@mail.gmail.com>
+ <CAK8P3a1QOz6qQdQux4mFXfwadhosHUgw0Ypwmz5tjZOWcV+0qQ@mail.gmail.com>
+ <20170621165832.GB52338@google.com>
+ <CAK8P3a1yopRPex3yrKj50cRPy8d3+urGE2XN3aQ61Uu=FE8oVQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAL_JsqKZ5JcunaY9K5MEjyS-sxargKtJq11x+DVMwHs8WrnH+Q@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+In-Reply-To: <CAK8P3a1yopRPex3yrKj50cRPy8d3+urGE2XN3aQ61Uu=FE8oVQ@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Rob Herring <robh+dt@kernel.org>
-Cc: Stephen Boyd <stephen.boyd@linaro.org>, Michal Marek <mmarek@suse.com>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Doug Anderson <dianders@chromium.org>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Grant Grundler <grundler@chromium.org>, Greg Hackmann <ghackmann@google.com>, Michael Davidson <md@google.com>, Nick Desaulniers <ndesaulniers@google.com>, Alexander Potapenko <glider@google.com>, Bernhard =?utf-8?Q?Rosenkr=C3=A4nzer?= <bero@linaro.org>
 
-On 07/25/17 13:36, Rob Herring wrote:
-> On Tue, Apr 25, 2017 at 7:09 PM,  <frowand.list@gmail.com> wrote:
->> From: Frank Rowand <frank.rowand@sony.com>
->>
->> Existing overlay unit tests examine individual pieces of the overlay
->> code.  The new tests target the entire process of applying an overlay.
->>
->> Signed-off-by: Frank Rowand <frank.rowand@sony.com>
->> ---
-> 
-> [...]
-> 
->> @@ -1261,6 +1263,8 @@ void __init unflatten_device_tree(void)
->>
->>         /* Get pointer to "/chosen" and "/aliases" nodes for use everywhere */
->>         of_alias_scan(early_init_dt_alloc_memory_arch);
->> +
->> +       unittest_unflatten_overlay_base();
-> 
-> This breaks on systems that don't boot with FDT and call
-> unflatten_device_tree, namely x86 and UML (UML needs a few hacks to
-> work) which was a feature of the unittest. Considering applying
-> overlays on x86 is something we'll want to support, the unittest
-> should support that case.
-> 
-> Rob
-> 
+El Wed, Jun 21, 2017 at 07:59:42PM +0200 Arnd Bergmann ha dit:
 
-I meant to reply when I read this...
+> On Wed, Jun 21, 2017 at 6:58 PM, Matthias Kaehlcke <mka@chromium.org> wrote:
+> > El Wed, Jun 21, 2017 at 12:11:55PM +0200 Arnd Bergmann ha dit:
+> >> I see that container_of() has been modified in linux-next and no longer adds
+> >> the 'const' keyword, do we actually still need the patch?
+> >
+> > There is still (at least) the case of const arrays passed to
+> > MODULE_DEVICE_TABLE.
+> 
+> Does the 'const' have any effect there? As it's just an alias, it
+> should at least
+> not impact the placement of the symbol in the object file, right? Maybe we can
+> just remove that 'const' too. Do you see any other instances?
 
-I'll look at this, probably next week.  Thanks for pointing out
-the issue.
-
--Frank
+For the record: https://git.kernel.org/pub/scm/linux/kernel/git/jeyu/linux.git/commit/?h=modules-next&id=0bf8bf50eddc7511b52461bae798cbfaa0157a34
