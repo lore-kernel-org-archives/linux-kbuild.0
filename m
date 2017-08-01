@@ -1,467 +1,147 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg0-f67.google.com ([74.125.83.67]:36186 "EHLO
+Received: from mail-pg0-f67.google.com ([74.125.83.67]:34141 "EHLO
         mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751699AbdHABAp (ORCPT
+        with ESMTP id S1750716AbdHAFbz (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 31 Jul 2017 21:00:45 -0400
-Received: by mail-pg0-f67.google.com with SMTP id y129so269841pgy.3
-        for <linux-kbuild@vger.kernel.org>; Mon, 31 Jul 2017 18:00:45 -0700 (PDT)
-Subject: [PATCH v7 02/15] lib: Add shared copies of some GCC library routines
-Date: Mon, 31 Jul 2017 17:59:56 -0700
-Message-Id: <20170801010009.3302-3-palmer@dabbelt.com>
-In-Reply-To: <20170801010009.3302-1-palmer@dabbelt.com>
+        Tue, 1 Aug 2017 01:31:55 -0400
+Date: Tue, 1 Aug 2017 13:31:59 +0800
+From: Boqun Feng <boqun.feng@gmail.com>
+Subject: Re: [PATCH v7 08/15] RISC-V: Atomic and Locking Code
+Message-ID: <20170801053159.h3ssqlznowicnsmg@tardis>
 References: <20170801010009.3302-1-palmer@dabbelt.com>
-From: Palmer Dabbelt <palmer@dabbelt.com>
+ <20170801010009.3302-9-palmer@dabbelt.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="dnai72hj6sg4ibfz"
+Content-Disposition: inline
+In-Reply-To: <20170801010009.3302-9-palmer@dabbelt.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: peterz@infradead.org, tglx@linutronix.de, jason@lakedaemon.net, marc.zyngier@arm.com, Arnd Bergmann <arnd@arndb.de>
-Cc: yamada.masahiro@socionext.com, mmarek@suse.com, albert@sifive.com, will.deacon@arm.com, boqun.feng@gmail.com, oleg@redhat.com, mingo@redhat.com, daniel.lezcano@linaro.org, gregkh@linuxfoundation.org, jslaby@suse.com, davem@davemloft.net, mchehab@kernel.org, hverkuil@xs4all.nl, rdunlap@infradead.org, viro@zeniv.linux.org.uk, mhiramat@kernel.org, fweisbec@gmail.com, mcgrof@kernel.org, dledford@redhat.com, bart.vanassche@sandisk.com, sstabellini@kernel.org, mpe@ellerman.id.au, rmk+kernel@armlinux.org.uk, paul.gortmaker@windriver.com, nicolas.dichtel@6wind.com, linux@roeck-us.net, heiko.carstens@de.ibm.com, schwidefsky@de.ibm.com, geert@linux-m68k.org, akpm@linux-foundation.org, andriy.shevchenko@linux.intel.com, jiri@mellanox.com, vgupta@synopsys.com, airlied@redhat.com, jk@ozlabs.org, chris@chris-wilson.co.uk, Jason@zx2c4.com, paulmck@linux.vnet.ibm.com, ncardwell@google.com, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, patches@groups.riscv.org, Palmer Dabbelt <palmer@dabbelt.com>
+To: Palmer Dabbelt <palmer@dabbelt.com>
+Cc: peterz@infradead.org, tglx@linutronix.de, jason@lakedaemon.net, marc.zyngier@arm.com, Arnd Bergmann <arnd@arndb.de>, yamada.masahiro@socionext.com, mmarek@suse.com, albert@sifive.com, will.deacon@arm.com, oleg@redhat.com, mingo@redhat.com, daniel.lezcano@linaro.org, gregkh@linuxfoundation.org, jslaby@suse.com, davem@davemloft.net, mchehab@kernel.org, hverkuil@xs4all.nl, rdunlap@infradead.org, viro@zeniv.linux.org.uk, mhiramat@kernel.org, fweisbec@gmail.com, mcgrof@kernel.org, dledford@redhat.com, bart.vanassche@sandisk.com, sstabellini@kernel.org, mpe@ellerman.id.au, rmk+kernel@armlinux.org.uk, paul.gortmaker@windriver.com, nicolas.dichtel@6wind.com, linux@roeck-us.net, heiko.carstens@de.ibm.com, schwidefsky@de.ibm.com, geert@linux-m68k.org, akpm@linux-foundation.org, andriy.shevchenko@linux.intel.com, jiri@mellanox.com, vgupta@synopsys.com, airlied@redhat.com, jk@ozlabs.org, chris@chris-wilson.co.uk, Jason@zx2c4.com, paulmck@linux.vnet.ibm.com, ncardwell@google.com, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, patches@groups.riscv.org
 
-Many ports (m32r, microblaze, mips, parisc, score, and sparc) use
-functionally identical copies of various GCC library routine files,
-which came up as we were submitting the RISC-V port (which also uses
-some of these).
 
-This patch adds a new copy of these library routine files, which are
-functionally identical to the various other copies.  These are
-availiable via Kconfig as CONFIG_GENERIC_$ROUTINE, which currently isn't
-used anywhere.
+--dnai72hj6sg4ibfz
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Palmer Dabbelt <palmer@dabbelt.com>
-Reviewed-by: Geert Uytterhoeven <geert@linux-m68k.org>
-Signed-off-by: Palmer Dabbelt <palmer@dabbelt.com>
----
- include/lib/libgcc.h | 44 ++++++++++++++++++++++++++++++++
- lib/Kconfig          | 18 +++++++++++++
- lib/Makefile         |  8 ++++++
- lib/ashldi3.c        | 45 ++++++++++++++++++++++++++++++++
- lib/ashrdi3.c        | 46 +++++++++++++++++++++++++++++++++
- lib/cmpdi2.c         | 42 ++++++++++++++++++++++++++++++
- lib/lshrdi3.c        | 45 ++++++++++++++++++++++++++++++++
- lib/muldi3.c         | 72 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- lib/ucmpdi2.c        | 35 +++++++++++++++++++++++++
- 9 files changed, 355 insertions(+)
- create mode 100644 include/lib/libgcc.h
- create mode 100644 lib/ashldi3.c
- create mode 100644 lib/ashrdi3.c
- create mode 100644 lib/cmpdi2.c
- create mode 100644 lib/lshrdi3.c
- create mode 100644 lib/muldi3.c
- create mode 100644 lib/ucmpdi2.c
+On Mon, Jul 31, 2017 at 06:00:02PM -0700, Palmer Dabbelt wrote:
+> This contains all the code that directly interfaces with the RISC-V
+> memory model.  While this code corforms to the current RISC-V ISA
+> specifications (user 2.2 and priv 1.10), the memory model is somewhat
+> underspecified in those documents.  There is a working group that hopes
+> to produce a formal memory model by the end of the year, but my
+> understanding is that the basic definitions we're relying on here won't
+> change significantly.
+>=20
+> Signed-off-by: Palmer Dabbelt <palmer@dabbelt.com>
+> ---
+>  arch/riscv/include/asm/atomic.h         | 328 ++++++++++++++++++++++++++=
+++++++
+>  arch/riscv/include/asm/barrier.h        |  68 +++++++
+>  arch/riscv/include/asm/bitops.h         | 218 +++++++++++++++++++++
+>  arch/riscv/include/asm/cacheflush.h     |  39 ++++
+>  arch/riscv/include/asm/cmpxchg.h        | 134 +++++++++++++
+>  arch/riscv/include/asm/io.h             | 303 ++++++++++++++++++++++++++=
++++
+>  arch/riscv/include/asm/spinlock.h       | 165 ++++++++++++++++
+>  arch/riscv/include/asm/spinlock_types.h |  33 ++++
+>  arch/riscv/include/asm/tlb.h            |  24 +++
+>  arch/riscv/include/asm/tlbflush.h       |  64 +++++++
+>  10 files changed, 1376 insertions(+)
+>  create mode 100644 arch/riscv/include/asm/atomic.h
+>  create mode 100644 arch/riscv/include/asm/barrier.h
+>  create mode 100644 arch/riscv/include/asm/bitops.h
+>  create mode 100644 arch/riscv/include/asm/cacheflush.h
+>  create mode 100644 arch/riscv/include/asm/cmpxchg.h
+>  create mode 100644 arch/riscv/include/asm/io.h
+>  create mode 100644 arch/riscv/include/asm/spinlock.h
+>  create mode 100644 arch/riscv/include/asm/spinlock_types.h
+>  create mode 100644 arch/riscv/include/asm/tlb.h
+>  create mode 100644 arch/riscv/include/asm/tlbflush.h
+>=20
+> diff --git a/arch/riscv/include/asm/atomic.h b/arch/riscv/include/asm/ato=
+mic.h
+> new file mode 100644
+> index 000000000000..ee3ab06e492b
+> --- /dev/null
+> +++ b/arch/riscv/include/asm/atomic.h
+> @@ -0,0 +1,328 @@
+> +/*
+> + * Copyright (C) 2007 Red Hat, Inc. All Rights Reserved.
+> + * Copyright (C) 2012 Regents of the University of California
+> + * Copyright (C) 2017 SiFive
+> + *
+> + * This program is free software; you can redistribute it and/or
+> + * modify it under the terms of the GNU General Public Licence
+> + * as published by the Free Software Foundation; either version
+> + * 2 of the Licence, or (at your option) any later version.
+> + */
+> +
+> +#ifndef _ASM_RISCV_ATOMIC_H
+> +#define _ASM_RISCV_ATOMIC_H
+> +
+> +#ifdef CONFIG_GENERIC_ATOMIC64
+> +# include <asm-generic/atomic64.h>
+> +#else
+> +# if (__riscv_xlen < 64)
+> +#  error "64-bit atomics require XLEN to be at least 64"
+> +# endif
+> +#endif
+> +
+> +#include <asm/cmpxchg.h>
+> +#include <asm/barrier.h>
+> +
+> +#define ATOMIC_INIT(i)	{ (i) }
+> +static __always_inline int atomic_read(const atomic_t *v)
+> +{
+> +	return READ_ONCE(v->counter);
+> +}
+> +static __always_inline void atomic_set(atomic_t *v, int i)
+> +{
+> +	WRITE_ONCE(v->counter, i);
+> +}
+> +
+> +#ifndef CONFIG_GENERIC_ATOMIC64
+> +#define ATOMIC64_INIT(i) { (i) }
+> +static __always_inline int atomic64_read(const atomic64_t *v)
+                         ^^^^^
 
-diff --git a/include/lib/libgcc.h b/include/lib/libgcc.h
-new file mode 100644
-index 000000000000..a5397e34e005
---- /dev/null
-+++ b/include/lib/libgcc.h
-@@ -0,0 +1,44 @@
-+/*
-+ * include/lib/libgcc.h
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, see the file COPYING, or write
-+ * to the Free Software Foundation, Inc.
-+ */
-+
-+
-+#ifndef __LIB_LIBGCC_H
-+#define __LIB_LIBGCC_H
-+
-+#include <asm/byteorder.h>
-+
-+typedef int word_type __attribute__ ((mode (__word__)));
-+
-+#ifdef __BIG_ENDIAN
-+struct DWstruct {
-+	int high, low;
-+};
-+#elif defined(__LITTLE_ENDIAN)
-+struct DWstruct {
-+	int low, high;
-+};
-+#else
-+#error I feel sick.
-+#endif
-+
-+typedef union {
-+	struct DWstruct s;
-+	long long ll;
-+} DWunion;
-+
-+#endif /* __ASM_LIBGCC_H */
-diff --git a/lib/Kconfig b/lib/Kconfig
-index 6762529ad9e4..ee7d8bf0b7e1 100644
---- a/lib/Kconfig
-+++ b/lib/Kconfig
-@@ -576,3 +576,21 @@ config PRIME_NUMBERS
- 	tristate
- 
- endmenu
-+
-+config GENERIC_ASHLDI3
-+	bool
-+
-+config GENERIC_ASHRDI3
-+	bool
-+
-+config GENERIC_LSHRDI3
-+	bool
-+
-+config GENERIC_MULDI3
-+	bool
-+
-+config GENERIC_CMPDI2
-+	bool
-+
-+config GENERIC_UCMPDI2
-+	bool
-diff --git a/lib/Makefile b/lib/Makefile
-index 40c18372b301..a9ee19497331 100644
---- a/lib/Makefile
-+++ b/lib/Makefile
-@@ -243,3 +243,11 @@ UBSAN_SANITIZE_ubsan.o := n
- obj-$(CONFIG_SBITMAP) += sbitmap.o
- 
- obj-$(CONFIG_PARMAN) += parman.o
-+
-+# GCC library routines
-+obj-$(CONFIG_GENERIC_ASHLDI3) += ashldi3.o
-+obj-$(CONFIG_GENERIC_ASHRDI3) += ashrdi3.o
-+obj-$(CONFIG_GENERIC_LSHRDI3) += lshrdi3.o
-+obj-$(CONFIG_GENERIC_MULDI3) += muldi3.o
-+obj-$(CONFIG_GENERIC_CMPDI2) += cmpdi2.o
-+obj-$(CONFIG_GENERIC_UCMPDI2) += ucmpdi2.o
-diff --git a/lib/ashldi3.c b/lib/ashldi3.c
-new file mode 100644
-index 000000000000..ff4ec63d2ab6
---- /dev/null
-+++ b/lib/ashldi3.c
-@@ -0,0 +1,45 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, see the file COPYING, or write
-+ * to the Free Software Foundation, Inc.
-+ */
-+
-+
-+#include <linux/export.h>
-+
-+#include <lib/libgcc.h>
-+
-+long long notrace __ashldi3(long long u, word_type b)
-+{
-+	DWunion uu, w;
-+	word_type bm;
-+
-+	if (b == 0)
-+		return u;
-+
-+	uu.ll = u;
-+	bm = 32 - b;
-+
-+	if (bm <= 0) {
-+		w.s.low = 0;
-+		w.s.high = (unsigned int) uu.s.low << -bm;
-+	} else {
-+		const unsigned int carries = (unsigned int) uu.s.low >> bm;
-+
-+		w.s.low = (unsigned int) uu.s.low << b;
-+		w.s.high = ((unsigned int) uu.s.high << b) | carries;
-+	}
-+
-+	return w.ll;
-+}
-+EXPORT_SYMBOL(__ashldi3);
-diff --git a/lib/ashrdi3.c b/lib/ashrdi3.c
-new file mode 100644
-index 000000000000..2e67c97ac65a
---- /dev/null
-+++ b/lib/ashrdi3.c
-@@ -0,0 +1,46 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, see the file COPYING, or write
-+ * to the Free Software Foundation, Inc.
-+ */
-+
-+#include <linux/export.h>
-+
-+#include <lib/libgcc.h>
-+
-+long long notrace __ashrdi3(long long u, word_type b)
-+{
-+	DWunion uu, w;
-+	word_type bm;
-+
-+	if (b == 0)
-+		return u;
-+
-+	uu.ll = u;
-+	bm = 32 - b;
-+
-+	if (bm <= 0) {
-+		/* w.s.high = 1..1 or 0..0 */
-+		w.s.high =
-+		    uu.s.high >> 31;
-+		w.s.low = uu.s.high >> -bm;
-+	} else {
-+		const unsigned int carries = (unsigned int) uu.s.high << bm;
-+
-+		w.s.high = uu.s.high >> b;
-+		w.s.low = ((unsigned int) uu.s.low >> b) | carries;
-+	}
-+
-+	return w.ll;
-+}
-+EXPORT_SYMBOL(__ashrdi3);
-diff --git a/lib/cmpdi2.c b/lib/cmpdi2.c
-new file mode 100644
-index 000000000000..6d7ebf6c2b86
---- /dev/null
-+++ b/lib/cmpdi2.c
-@@ -0,0 +1,42 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, see the file COPYING, or write
-+ * to the Free Software Foundation, Inc.
-+ */
-+
-+#include <linux/export.h>
-+
-+#include <lib/libgcc.h>
-+
-+word_type notrace __cmpdi2(long long a, long long b)
-+{
-+	const DWunion au = {
-+		.ll = a
-+	};
-+	const DWunion bu = {
-+		.ll = b
-+	};
-+
-+	if (au.s.high < bu.s.high)
-+		return 0;
-+	else if (au.s.high > bu.s.high)
-+		return 2;
-+
-+	if ((unsigned int) au.s.low < (unsigned int) bu.s.low)
-+		return 0;
-+	else if ((unsigned int) au.s.low > (unsigned int) bu.s.low)
-+		return 2;
-+
-+	return 1;
-+}
-+EXPORT_SYMBOL(__cmpdi2);
-diff --git a/lib/lshrdi3.c b/lib/lshrdi3.c
-new file mode 100644
-index 000000000000..8e845f4bb65f
---- /dev/null
-+++ b/lib/lshrdi3.c
-@@ -0,0 +1,45 @@
-+/*
-+ * lib/lshrdi3.c
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, see the file COPYING, or write
-+ * to the Free Software Foundation, Inc.
-+ */
-+
-+#include <linux/module.h>
-+#include <lib/libgcc.h>
-+
-+long long notrace __lshrdi3(long long u, word_type b)
-+{
-+	DWunion uu, w;
-+	word_type bm;
-+
-+	if (b == 0)
-+		return u;
-+
-+	uu.ll = u;
-+	bm = 32 - b;
-+
-+	if (bm <= 0) {
-+		w.s.high = 0;
-+		w.s.low = (unsigned int) uu.s.high >> -bm;
-+	} else {
-+		const unsigned int carries = (unsigned int) uu.s.high << bm;
-+
-+		w.s.high = (unsigned int) uu.s.high >> b;
-+		w.s.low = ((unsigned int) uu.s.low >> b) | carries;
-+	}
-+
-+	return w.ll;
-+}
-+EXPORT_SYMBOL(__lshrdi3);
-diff --git a/lib/muldi3.c b/lib/muldi3.c
-new file mode 100644
-index 000000000000..88938543e10a
---- /dev/null
-+++ b/lib/muldi3.c
-@@ -0,0 +1,72 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, see the file COPYING, or write
-+ * to the Free Software Foundation, Inc.
-+ */
-+
-+#include <linux/export.h>
-+#include <lib/libgcc.h>
-+
-+#define W_TYPE_SIZE 32
-+
-+#define __ll_B ((unsigned long) 1 << (W_TYPE_SIZE / 2))
-+#define __ll_lowpart(t) ((unsigned long) (t) & (__ll_B - 1))
-+#define __ll_highpart(t) ((unsigned long) (t) >> (W_TYPE_SIZE / 2))
-+
-+/* If we still don't have umul_ppmm, define it using plain C.  */
-+#if !defined(umul_ppmm)
-+#define umul_ppmm(w1, w0, u, v)						\
-+	do {								\
-+		unsigned long __x0, __x1, __x2, __x3;			\
-+		unsigned short __ul, __vl, __uh, __vh;			\
-+									\
-+		__ul = __ll_lowpart(u);					\
-+		__uh = __ll_highpart(u);				\
-+		__vl = __ll_lowpart(v);					\
-+		__vh = __ll_highpart(v);				\
-+									\
-+		__x0 = (unsigned long) __ul * __vl;			\
-+		__x1 = (unsigned long) __ul * __vh;			\
-+		__x2 = (unsigned long) __uh * __vl;			\
-+		__x3 = (unsigned long) __uh * __vh;			\
-+									\
-+		__x1 += __ll_highpart(__x0); /* this can't give carry */\
-+		__x1 += __x2; /* but this indeed can */			\
-+		if (__x1 < __x2) /* did we get it? */			\
-+		__x3 += __ll_B; /* yes, add it in the proper pos */	\
-+									\
-+		(w1) = __x3 + __ll_highpart(__x1);			\
-+		(w0) = __ll_lowpart(__x1) * __ll_B + __ll_lowpart(__x0);\
-+	} while (0)
-+#endif
-+
-+#if !defined(__umulsidi3)
-+#define __umulsidi3(u, v) ({				\
-+	DWunion __w;					\
-+	umul_ppmm(__w.s.high, __w.s.low, u, v);		\
-+	__w.ll;						\
-+	})
-+#endif
-+
-+long long notrace __muldi3(long long u, long long v)
-+{
-+	const DWunion uu = {.ll = u};
-+	const DWunion vv = {.ll = v};
-+	DWunion w = {.ll = __umulsidi3(uu.s.low, vv.s.low)};
-+
-+	w.s.high += ((unsigned long) uu.s.low * (unsigned long) vv.s.high
-+		+ (unsigned long) uu.s.high * (unsigned long) vv.s.low);
-+
-+	return w.ll;
-+}
-+EXPORT_SYMBOL(__muldi3);
-diff --git a/lib/ucmpdi2.c b/lib/ucmpdi2.c
-new file mode 100644
-index 000000000000..49a53505c8e3
---- /dev/null
-+++ b/lib/ucmpdi2.c
-@@ -0,0 +1,35 @@
-+/*
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, see the file COPYING, or write
-+ * to the Free Software Foundation, Inc.
-+ */
-+
-+#include <linux/module.h>
-+#include <lib/libgcc.h>
-+
-+word_type __ucmpdi2(unsigned long long a, unsigned long long b)
-+{
-+	const DWunion au = {.ll = a};
-+	const DWunion bu = {.ll = b};
-+
-+	if ((unsigned int) au.s.high < (unsigned int) bu.s.high)
-+		return 0;
-+	else if ((unsigned int) au.s.high > (unsigned int) bu.s.high)
-+		return 2;
-+	if ((unsigned int) au.s.low < (unsigned int) bu.s.low)
-+		return 0;
-+	else if ((unsigned int) au.s.low > (unsigned int) bu.s.low)
-+		return 2;
-+	return 1;
-+}
-+EXPORT_SYMBOL(__ucmpdi2);
--- 
-2.13.0
+should be "long long"?
 
+> +{
+> +	return READ_ONCE(v->counter);
+> +}
+> +static __always_inline void atomic64_set(atomic64_t *v, int i)
+                                                          ^^^^^
+Ditto.
+
+Have you ever run the selftest with CONFIG_ATOMIC64_SELFTEST=3Dy?
+
+Regards,
+Boqun
+
+> +{
+> +	WRITE_ONCE(v->counter, i);
+> +}
+> +#endif
+> +
+[...]
+
+--dnai72hj6sg4ibfz
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCAAdFiEEj5IosQTPz8XU1wRHSXnow7UH+rgFAlmAEkoACgkQSXnow7UH
++rgRogf/QCzYx/AeWZGeYF/ItyMitBTD50zxJpccH6wuTe5kmiV7N2QRJ8ZZHf2O
+TebD4PZd2v2bp5/a7vANsx6Ivo0qv6Ni4RF0n2BH+L2nULV45CExxpCHLfHtx3Og
+nca+8N3gwM4jDss34ekmqxSuP5wVj3RNkVEn3BGscAiptsXrB0gOlZ8166NdUZUS
+jHPS1kw6KPS8VOGwyScq4/nkUu/DvpJczs//MQRBbYFm/4f7yuv4yVxMrdcrIC2G
+EkdyoorFe+tcrRX3NjJcF9CwVEOvvIiNyECOzW+A2iwVzQJBsePFfN1yjxKfcwLh
+vKlQSgTxl8QeATKwSM7k76SgRflYzA==
+=fDBJ
+-----END PGP SIGNATURE-----
+
+--dnai72hj6sg4ibfz--
