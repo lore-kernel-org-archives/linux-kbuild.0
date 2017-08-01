@@ -1,14 +1,14 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg0-f68.google.com ([74.125.83.68]:34856 "EHLO
+Received: from mail-pg0-f68.google.com ([74.125.83.68]:34238 "EHLO
         mail-pg0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751926AbdHABBF (ORCPT
+        with ESMTP id S1751808AbdHABA5 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 31 Jul 2017 21:01:05 -0400
-Received: by mail-pg0-f68.google.com with SMTP id l64so274656pge.2
-        for <linux-kbuild@vger.kernel.org>; Mon, 31 Jul 2017 18:01:05 -0700 (PDT)
-Subject: [PATCH v7 13/15] RISC-V: Paging and MMU
-Date: Mon, 31 Jul 2017 18:00:07 -0700
-Message-Id: <20170801010009.3302-14-palmer@dabbelt.com>
+        Mon, 31 Jul 2017 21:00:57 -0400
+Received: by mail-pg0-f68.google.com with SMTP id y192so290851pgd.1
+        for <linux-kbuild@vger.kernel.org>; Mon, 31 Jul 2017 18:00:57 -0700 (PDT)
+Subject: [PATCH v7 09/15] RISC-V: Generic library routines and assembly
+Date: Mon, 31 Jul 2017 18:00:03 -0700
+Message-Id: <20170801010009.3302-10-palmer@dabbelt.com>
 In-Reply-To: <20170801010009.3302-1-palmer@dabbelt.com>
 References: <20170801010009.3302-1-palmer@dabbelt.com>
 From: Palmer Dabbelt <palmer@dabbelt.com>
@@ -17,37 +17,44 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: peterz@infradead.org, tglx@linutronix.de, jason@lakedaemon.net, marc.zyngier@arm.com, Arnd Bergmann <arnd@arndb.de>
 Cc: yamada.masahiro@socionext.com, mmarek@suse.com, albert@sifive.com, will.deacon@arm.com, boqun.feng@gmail.com, oleg@redhat.com, mingo@redhat.com, daniel.lezcano@linaro.org, gregkh@linuxfoundation.org, jslaby@suse.com, davem@davemloft.net, mchehab@kernel.org, hverkuil@xs4all.nl, rdunlap@infradead.org, viro@zeniv.linux.org.uk, mhiramat@kernel.org, fweisbec@gmail.com, mcgrof@kernel.org, dledford@redhat.com, bart.vanassche@sandisk.com, sstabellini@kernel.org, mpe@ellerman.id.au, rmk+kernel@armlinux.org.uk, paul.gortmaker@windriver.com, nicolas.dichtel@6wind.com, linux@roeck-us.net, heiko.carstens@de.ibm.com, schwidefsky@de.ibm.com, geert@linux-m68k.org, akpm@linux-foundation.org, andriy.shevchenko@linux.intel.com, jiri@mellanox.com, vgupta@synopsys.com, airlied@redhat.com, jk@ozlabs.org, chris@chris-wilson.co.uk, Jason@zx2c4.com, paulmck@linux.vnet.ibm.com, ncardwell@google.com, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, patches@groups.riscv.org, Palmer Dabbelt <palmer@dabbelt.com>
 
-This patch contains code to manage the RISC-V MMU, including definitions
-of the page tables and the page walking code.
+This patch contains code that is more specific to the RISC-V ISA than it
+is to Linux.  It contains string and math operations, C wrappers for
+various assembly instructions, stack walking code, and uaccess.
 
 Signed-off-by: Palmer Dabbelt <palmer@dabbelt.com>
 ---
- arch/riscv/include/asm/mmu_context.h  |  69 ++++++
- arch/riscv/include/asm/page.h         | 134 +++++++++++
- arch/riscv/include/asm/pgalloc.h      | 124 ++++++++++
- arch/riscv/include/asm/pgtable-32.h   |  25 ++
- arch/riscv/include/asm/pgtable-64.h   |  84 +++++++
- arch/riscv/include/asm/pgtable-bits.h |  48 ++++
- arch/riscv/include/asm/pgtable.h      | 430 ++++++++++++++++++++++++++++++++++
- arch/riscv/mm/fault.c                 | 282 ++++++++++++++++++++++
- 8 files changed, 1196 insertions(+)
- create mode 100644 arch/riscv/include/asm/mmu_context.h
- create mode 100644 arch/riscv/include/asm/page.h
- create mode 100644 arch/riscv/include/asm/pgalloc.h
- create mode 100644 arch/riscv/include/asm/pgtable-32.h
- create mode 100644 arch/riscv/include/asm/pgtable-64.h
- create mode 100644 arch/riscv/include/asm/pgtable-bits.h
- create mode 100644 arch/riscv/include/asm/pgtable.h
- create mode 100644 arch/riscv/mm/fault.c
+ arch/riscv/include/asm/asm.h            |  76 +++++
+ arch/riscv/include/asm/csr.h            | 125 ++++++++
+ arch/riscv/include/asm/linkage.h        |  20 ++
+ arch/riscv/include/asm/string.h         |  26 ++
+ arch/riscv/include/asm/uaccess.h        | 513 ++++++++++++++++++++++++++++++++
+ arch/riscv/include/asm/word-at-a-time.h |  55 ++++
+ arch/riscv/kernel/stacktrace.c          | 177 +++++++++++
+ arch/riscv/lib/memcpy.S                 | 115 +++++++
+ arch/riscv/lib/memset.S                 | 120 ++++++++
+ arch/riscv/lib/uaccess.S                | 117 ++++++++
+ arch/riscv/lib/udivdi3.S                |  38 +++
+ 11 files changed, 1382 insertions(+)
+ create mode 100644 arch/riscv/include/asm/asm.h
+ create mode 100644 arch/riscv/include/asm/csr.h
+ create mode 100644 arch/riscv/include/asm/linkage.h
+ create mode 100644 arch/riscv/include/asm/string.h
+ create mode 100644 arch/riscv/include/asm/uaccess.h
+ create mode 100644 arch/riscv/include/asm/word-at-a-time.h
+ create mode 100644 arch/riscv/kernel/stacktrace.c
+ create mode 100644 arch/riscv/lib/memcpy.S
+ create mode 100644 arch/riscv/lib/memset.S
+ create mode 100644 arch/riscv/lib/uaccess.S
+ create mode 100644 arch/riscv/lib/udivdi3.S
 
-diff --git a/arch/riscv/include/asm/mmu_context.h b/arch/riscv/include/asm/mmu_context.h
+diff --git a/arch/riscv/include/asm/asm.h b/arch/riscv/include/asm/asm.h
 new file mode 100644
-index 000000000000..de1fc1631fc4
+index 000000000000..6cbbb6a68d76
 --- /dev/null
-+++ b/arch/riscv/include/asm/mmu_context.h
-@@ -0,0 +1,69 @@
++++ b/arch/riscv/include/asm/asm.h
+@@ -0,0 +1,76 @@
 +/*
-+ * Copyright (C) 2012 Regents of the University of California
++ * Copyright (C) 2015 Regents of the University of California
 + *
 + *   This program is free software; you can redistribute it and/or
 + *   modify it under the terms of the GNU General Public License
@@ -59,211 +66,208 @@ index 000000000000..de1fc1631fc4
 + *   GNU General Public License for more details.
 + */
 +
-+#ifndef _ASM_RISCV_MMU_CONTEXT_H
-+#define _ASM_RISCV_MMU_CONTEXT_H
++#ifndef _ASM_RISCV_ASM_H
++#define _ASM_RISCV_ASM_H
 +
-+#include <asm-generic/mm_hooks.h>
-+
-+#include <linux/mm.h>
-+#include <linux/sched.h>
-+#include <asm/tlbflush.h>
-+
-+static inline void enter_lazy_tlb(struct mm_struct *mm,
-+	struct task_struct *task)
-+{
-+}
-+
-+/* Initialize context-related info for a new mm_struct */
-+static inline int init_new_context(struct task_struct *task,
-+	struct mm_struct *mm)
-+{
-+	return 0;
-+}
-+
-+static inline void destroy_context(struct mm_struct *mm)
-+{
-+}
-+
-+static inline pgd_t *current_pgdir(void)
-+{
-+	return pfn_to_virt(csr_read(sptbr) & SPTBR_PPN);
-+}
-+
-+static inline void set_pgdir(pgd_t *pgd)
-+{
-+	csr_write(sptbr, virt_to_pfn(pgd) | SPTBR_MODE);
-+}
-+
-+static inline void switch_mm(struct mm_struct *prev,
-+	struct mm_struct *next, struct task_struct *task)
-+{
-+	if (likely(prev != next)) {
-+		set_pgdir(next->pgd);
-+		local_flush_tlb_all();
-+	}
-+}
-+
-+static inline void activate_mm(struct mm_struct *prev,
-+			       struct mm_struct *next)
-+{
-+	switch_mm(prev, next, NULL);
-+}
-+
-+static inline void deactivate_mm(struct task_struct *task,
-+	struct mm_struct *mm)
-+{
-+}
-+
-+#endif /* _ASM_RISCV_MMU_CONTEXT_H */
-diff --git a/arch/riscv/include/asm/page.h b/arch/riscv/include/asm/page.h
-new file mode 100644
-index 000000000000..5bbbff2d5a60
---- /dev/null
-+++ b/arch/riscv/include/asm/page.h
-@@ -0,0 +1,134 @@
-+/*
-+ * Copyright (C) 2009 Chen Liqin <liqin.chen@sunplusct.com>
-+ * Copyright (C) 2012 Regents of the University of California
-+ * Copyright (C) 2017 SiFive
-+ * Copyright (C) 2017 XiaojingZhu <zhuxiaoj@ict.ac.cn>
-+ *
-+ *   This program is free software; you can redistribute it and/or
-+ *   modify it under the terms of the GNU General Public License
-+ *   as published by the Free Software Foundation, version 2.
-+ *
-+ *   This program is distributed in the hope that it will be useful,
-+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *   GNU General Public License for more details.
-+ */
-+
-+#ifndef _ASM_RISCV_PAGE_H
-+#define _ASM_RISCV_PAGE_H
-+
-+#include <linux/pfn.h>
-+#include <linux/const.h>
-+
-+#define PAGE_SHIFT	(12)
-+#define PAGE_SIZE	(_AC(1, UL) << PAGE_SHIFT)
-+#define PAGE_MASK	(~(PAGE_SIZE - 1))
-+
-+/*
-+ * PAGE_OFFSET -- the first address of the first page of memory.
-+ * When not using MMU this corresponds to the first free page in
-+ * physical memory (aligned on a page boundary).
-+ */
-+#ifdef CONFIG_64BIT
-+#define PAGE_OFFSET		_AC(0xffffffff80000000, UL)
++#ifdef __ASSEMBLY__
++#define __ASM_STR(x)	x
 +#else
-+#define PAGE_OFFSET		_AC(0xc0000000, UL)
++#define __ASM_STR(x)	#x
 +#endif
 +
-+#define KERN_VIRT_SIZE (-PAGE_OFFSET)
++#if __riscv_xlen == 64
++#define __REG_SEL(a, b)	__ASM_STR(a)
++#elif __riscv_xlen == 32
++#define __REG_SEL(a, b)	__ASM_STR(b)
++#else
++#error "Unexpected __riscv_xlen"
++#endif
++
++#define REG_L		__REG_SEL(ld, lw)
++#define REG_S		__REG_SEL(sd, sw)
++#define SZREG		__REG_SEL(8, 4)
++#define LGREG		__REG_SEL(3, 2)
++
++#if __SIZEOF_POINTER__ == 8
++#ifdef __ASSEMBLY__
++#define RISCV_PTR		.dword
++#define RISCV_SZPTR		8
++#define RISCV_LGPTR		3
++#else
++#define RISCV_PTR		".dword"
++#define RISCV_SZPTR		"8"
++#define RISCV_LGPTR		"3"
++#endif
++#elif __SIZEOF_POINTER__ == 4
++#ifdef __ASSEMBLY__
++#define RISCV_PTR		.word
++#define RISCV_SZPTR		4
++#define RISCV_LGPTR		2
++#else
++#define RISCV_PTR		".word"
++#define RISCV_SZPTR		"4"
++#define RISCV_LGPTR		"2"
++#endif
++#else
++#error "Unexpected __SIZEOF_POINTER__"
++#endif
++
++#if (__SIZEOF_INT__ == 4)
++#define INT		__ASM_STR(.word)
++#define SZINT		__ASM_STR(4)
++#define LGINT		__ASM_STR(2)
++#else
++#error "Unexpected __SIZEOF_INT__"
++#endif
++
++#if (__SIZEOF_SHORT__ == 2)
++#define SHORT		__ASM_STR(.half)
++#define SZSHORT		__ASM_STR(2)
++#define LGSHORT		__ASM_STR(1)
++#else
++#error "Unexpected __SIZEOF_SHORT__"
++#endif
++
++#endif /* _ASM_RISCV_ASM_H */
+diff --git a/arch/riscv/include/asm/csr.h b/arch/riscv/include/asm/csr.h
+new file mode 100644
+index 000000000000..387d0dbf0073
+--- /dev/null
++++ b/arch/riscv/include/asm/csr.h
+@@ -0,0 +1,125 @@
++/*
++ * Copyright (C) 2015 Regents of the University of California
++ *
++ *   This program is free software; you can redistribute it and/or
++ *   modify it under the terms of the GNU General Public License
++ *   as published by the Free Software Foundation, version 2.
++ *
++ *   This program is distributed in the hope that it will be useful,
++ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *   GNU General Public License for more details.
++ */
++
++#ifndef _ASM_RISCV_CSR_H
++#define _ASM_RISCV_CSR_H
++
++#include <linux/const.h>
++
++/* Status register flags */
++#define SR_IE   _AC(0x00000002, UL) /* Interrupt Enable */
++#define SR_PIE  _AC(0x00000020, UL) /* Previous IE */
++#define SR_PS   _AC(0x00000100, UL) /* Previously Supervisor */
++#define SR_SUM  _AC(0x00040000, UL) /* Supervisor may access User Memory */
++
++#define SR_FS           _AC(0x00006000, UL) /* Floating-point Status */
++#define SR_FS_OFF       _AC(0x00000000, UL)
++#define SR_FS_INITIAL   _AC(0x00002000, UL)
++#define SR_FS_CLEAN     _AC(0x00004000, UL)
++#define SR_FS_DIRTY     _AC(0x00006000, UL)
++
++#define SR_XS           _AC(0x00018000, UL) /* Extension Status */
++#define SR_XS_OFF       _AC(0x00000000, UL)
++#define SR_XS_INITIAL   _AC(0x00008000, UL)
++#define SR_XS_CLEAN     _AC(0x00010000, UL)
++#define SR_XS_DIRTY     _AC(0x00018000, UL)
++
++#ifndef CONFIG_64BIT
++#define SR_SD   _AC(0x80000000, UL) /* FS/XS dirty */
++#else
++#define SR_SD   _AC(0x8000000000000000, UL) /* FS/XS dirty */
++#endif
++
++/* SPTBR flags */
++#if __riscv_xlen == 32
++#define SPTBR_PPN     _AC(0x003FFFFF, UL)
++#define SPTBR_MODE_32 _AC(0x80000000, UL)
++#define SPTBR_MODE    SPTBR_MODE_32
++#else
++#define SPTBR_PPN     _AC(0x00000FFFFFFFFFFF, UL)
++#define SPTBR_MODE_39 _AC(0x8000000000000000, UL)
++#define SPTBR_MODE    SPTBR_MODE_39
++#endif
++
++/* Interrupt Enable and Interrupt Pending flags */
++#define SIE_SSIE _AC(0x00000002, UL) /* Software Interrupt Enable */
++#define SIE_STIE _AC(0x00000020, UL) /* Timer Interrupt Enable */
++
++#define EXC_INST_MISALIGNED     0
++#define EXC_INST_ACCESS         1
++#define EXC_BREAKPOINT          3
++#define EXC_LOAD_ACCESS         5
++#define EXC_STORE_ACCESS        7
++#define EXC_SYSCALL             8
++#define EXC_INST_PAGE_FAULT     12
++#define EXC_LOAD_PAGE_FAULT     13
++#define EXC_STORE_PAGE_FAULT    15
 +
 +#ifndef __ASSEMBLY__
 +
-+#define PAGE_UP(addr)	(((addr)+((PAGE_SIZE)-1))&(~((PAGE_SIZE)-1)))
-+#define PAGE_DOWN(addr)	((addr)&(~((PAGE_SIZE)-1)))
++#define csr_swap(csr, val)					\
++({								\
++	unsigned long __v = (unsigned long)(val);		\
++	__asm__ __volatile__ ("csrrw %0, " #csr ", %1"		\
++			      : "=r" (__v) : "rK" (__v));	\
++	__v;							\
++})
 +
-+/* align addr on a size boundary - adjust address up/down if needed */
-+#define _ALIGN_UP(addr, size)	(((addr)+((size)-1))&(~((size)-1)))
-+#define _ALIGN_DOWN(addr, size)	((addr)&(~((size)-1)))
++#define csr_read(csr)						\
++({								\
++	register unsigned long __v;				\
++	__asm__ __volatile__ ("csrr %0, " #csr			\
++			      : "=r" (__v));			\
++	__v;							\
++})
 +
-+/* align addr on a size boundary - adjust address up if needed */
-+#define _ALIGN(addr, size)	_ALIGN_UP(addr, size)
++#define csr_write(csr, val)					\
++({								\
++	unsigned long __v = (unsigned long)(val);		\
++	__asm__ __volatile__ ("csrw " #csr ", %0"		\
++			      : : "rK" (__v));			\
++})
 +
-+#define clear_page(pgaddr)			memset((pgaddr), 0, PAGE_SIZE)
-+#define copy_page(to, from)			memcpy((to), (from), PAGE_SIZE)
++#define csr_read_set(csr, val)					\
++({								\
++	unsigned long __v = (unsigned long)(val);		\
++	__asm__ __volatile__ ("csrrs %0, " #csr ", %1"		\
++			      : "=r" (__v) : "rK" (__v));	\
++	__v;							\
++})
 +
-+#define clear_user_page(pgaddr, vaddr, page)	memset((pgaddr), 0, PAGE_SIZE)
-+#define copy_user_page(vto, vfrom, vaddr, topg) \
-+			memcpy((vto), (vfrom), PAGE_SIZE)
++#define csr_set(csr, val)					\
++({								\
++	unsigned long __v = (unsigned long)(val);		\
++	__asm__ __volatile__ ("csrs " #csr ", %0"		\
++			      : : "rK" (__v));			\
++})
 +
-+/*
-+ * Use struct definitions to apply C type checking
-+ */
++#define csr_read_clear(csr, val)				\
++({								\
++	unsigned long __v = (unsigned long)(val);		\
++	__asm__ __volatile__ ("csrrc %0, " #csr ", %1"		\
++			      : "=r" (__v) : "rK" (__v));	\
++	__v;							\
++})
 +
-+/* Page Global Directory entry */
-+typedef struct {
-+	unsigned long pgd;
-+} pgd_t;
-+
-+/* Page Table entry */
-+typedef struct {
-+	unsigned long pte;
-+} pte_t;
-+
-+typedef struct {
-+	unsigned long pgprot;
-+} pgprot_t;
-+
-+typedef struct page *pgtable_t;
-+
-+#define pte_val(x)	((x).pte)
-+#define pgd_val(x)	((x).pgd)
-+#define pgprot_val(x)	((x).pgprot)
-+
-+#define __pte(x)	((pte_t) { (x) })
-+#define __pgd(x)	((pgd_t) { (x) })
-+#define __pgprot(x)	((pgprot_t) { (x) })
-+
-+#ifdef CONFIG_64BITS
-+#define PTE_FMT "%016lx"
-+#else
-+#define PTE_FMT "%08lx"
-+#endif
-+
-+extern unsigned long va_pa_offset;
-+extern unsigned long pfn_base;
-+
-+extern unsigned long max_low_pfn;
-+extern unsigned long min_low_pfn;
-+
-+#define __pa(x)		((unsigned long)(x) - va_pa_offset)
-+#define __va(x)		((void *)((unsigned long) (x) + va_pa_offset))
-+
-+#define phys_to_pfn(phys)	(PFN_DOWN(phys))
-+#define pfn_to_phys(pfn)	(PFN_PHYS(pfn))
-+
-+#define virt_to_pfn(vaddr)	(phys_to_pfn(__pa(vaddr)))
-+#define pfn_to_virt(pfn)	(__va(pfn_to_phys(pfn)))
-+
-+#define virt_to_page(vaddr)	(pfn_to_page(virt_to_pfn(vaddr)))
-+#define page_to_virt(page)	(pfn_to_virt(page_to_pfn(page)))
-+
-+#define page_to_phys(page)	(pfn_to_phys(page_to_pfn(page)))
-+#define page_to_bus(page)	(page_to_phys(page))
-+#define phys_to_page(paddr)	(pfn_to_page(phys_to_pfn(paddr)))
-+
-+#define pfn_valid(pfn) \
-+	(((pfn) >= pfn_base) && (((pfn)-pfn_base) < max_mapnr))
-+
-+#define ARCH_PFN_OFFSET		(pfn_base)
++#define csr_clear(csr, val)					\
++({								\
++	unsigned long __v = (unsigned long)(val);		\
++	__asm__ __volatile__ ("csrc " #csr ", %0"		\
++			      : : "rK" (__v));			\
++})
 +
 +#endif /* __ASSEMBLY__ */
 +
-+#define virt_addr_valid(vaddr)	(pfn_valid(virt_to_pfn(vaddr)))
-+
-+#define VM_DATA_DEFAULT_FLAGS	(VM_READ | VM_WRITE | \
-+				 VM_MAYREAD | VM_MAYWRITE | VM_MAYEXEC)
-+
-+#include <asm-generic/memory_model.h>
-+#include <asm-generic/getorder.h>
-+
-+/* vDSO support */
-+/* We do define AT_SYSINFO_EHDR but don't use the gate mechanism */
-+#define __HAVE_ARCH_GATE_AREA
-+
-+#endif /* _ASM_RISCV_PAGE_H */
-diff --git a/arch/riscv/include/asm/pgalloc.h b/arch/riscv/include/asm/pgalloc.h
++#endif /* _ASM_RISCV_CSR_H */
+diff --git a/arch/riscv/include/asm/linkage.h b/arch/riscv/include/asm/linkage.h
 new file mode 100644
-index 000000000000..a79ed5faff3a
+index 000000000000..b7b304ca89c4
 --- /dev/null
-+++ b/arch/riscv/include/asm/pgalloc.h
-@@ -0,0 +1,124 @@
++++ b/arch/riscv/include/asm/linkage.h
+@@ -0,0 +1,20 @@
 +/*
-+ * Copyright (C) 2009 Chen Liqin <liqin.chen@sunplusct.com>
-+ * Copyright (C) 2012 Regents of the University of California
++ * Copyright (C) 2015 Regents of the University of California
 + *
 + *   This program is free software; you can redistribute it and/or
 + *   modify it under the terms of the GNU General Public License
@@ -275,124 +279,21 @@ index 000000000000..a79ed5faff3a
 + *   GNU General Public License for more details.
 + */
 +
-+#ifndef _ASM_RISCV_PGALLOC_H
-+#define _ASM_RISCV_PGALLOC_H
++#ifndef _ASM_RISCV_LINKAGE_H
++#define _ASM_RISCV_LINKAGE_H
 +
-+#include <linux/mm.h>
-+#include <asm/tlb.h>
++#define __ALIGN		.balign 4
++#define __ALIGN_STR	".balign 4"
 +
-+static inline void pmd_populate_kernel(struct mm_struct *mm,
-+	pmd_t *pmd, pte_t *pte)
-+{
-+	unsigned long pfn = virt_to_pfn(pte);
-+
-+	set_pmd(pmd, __pmd((pfn << _PAGE_PFN_SHIFT) | _PAGE_TABLE));
-+}
-+
-+static inline void pmd_populate(struct mm_struct *mm,
-+	pmd_t *pmd, pgtable_t pte)
-+{
-+	unsigned long pfn = virt_to_pfn(page_address(pte));
-+
-+	set_pmd(pmd, __pmd((pfn << _PAGE_PFN_SHIFT) | _PAGE_TABLE));
-+}
-+
-+#ifndef __PAGETABLE_PMD_FOLDED
-+static inline void pud_populate(struct mm_struct *mm, pud_t *pud, pmd_t *pmd)
-+{
-+	unsigned long pfn = virt_to_pfn(pmd);
-+
-+	set_pud(pud, __pud((pfn << _PAGE_PFN_SHIFT) | _PAGE_TABLE));
-+}
-+#endif /* __PAGETABLE_PMD_FOLDED */
-+
-+#define pmd_pgtable(pmd)	pmd_page(pmd)
-+
-+static inline pgd_t *pgd_alloc(struct mm_struct *mm)
-+{
-+	pgd_t *pgd;
-+
-+	pgd = (pgd_t *)__get_free_page(GFP_KERNEL);
-+	if (likely(pgd != NULL)) {
-+		memset(pgd, 0, USER_PTRS_PER_PGD * sizeof(pgd_t));
-+		/* Copy kernel mappings */
-+		memcpy(pgd + USER_PTRS_PER_PGD,
-+			init_mm.pgd + USER_PTRS_PER_PGD,
-+			(PTRS_PER_PGD - USER_PTRS_PER_PGD) * sizeof(pgd_t));
-+	}
-+	return pgd;
-+}
-+
-+static inline void pgd_free(struct mm_struct *mm, pgd_t *pgd)
-+{
-+	free_page((unsigned long)pgd);
-+}
-+
-+#ifndef __PAGETABLE_PMD_FOLDED
-+
-+static inline pmd_t *pmd_alloc_one(struct mm_struct *mm, unsigned long addr)
-+{
-+	return (pmd_t *)__get_free_page(
-+		GFP_KERNEL | __GFP_RETRY_MAYFAIL | __GFP_ZERO);
-+}
-+
-+static inline void pmd_free(struct mm_struct *mm, pmd_t *pmd)
-+{
-+	free_page((unsigned long)pmd);
-+}
-+
-+#define __pmd_free_tlb(tlb, pmd, addr)  pmd_free((tlb)->mm, pmd)
-+
-+#endif /* __PAGETABLE_PMD_FOLDED */
-+
-+static inline pte_t *pte_alloc_one_kernel(struct mm_struct *mm,
-+	unsigned long address)
-+{
-+	return (pte_t *)__get_free_page(
-+		GFP_KERNEL | __GFP_RETRY_MAYFAIL | __GFP_ZERO);
-+}
-+
-+static inline struct page *pte_alloc_one(struct mm_struct *mm,
-+	unsigned long address)
-+{
-+	struct page *pte;
-+
-+	pte = alloc_page(GFP_KERNEL | __GFP_RETRY_MAYFAIL | __GFP_ZERO);
-+	if (likely(pte != NULL))
-+		pgtable_page_ctor(pte);
-+	return pte;
-+}
-+
-+static inline void pte_free_kernel(struct mm_struct *mm, pte_t *pte)
-+{
-+	free_page((unsigned long)pte);
-+}
-+
-+static inline void pte_free(struct mm_struct *mm, pgtable_t pte)
-+{
-+	pgtable_page_dtor(pte);
-+	__free_page(pte);
-+}
-+
-+#define __pte_free_tlb(tlb, pte, buf)   \
-+do {                                    \
-+	pgtable_page_dtor(pte);         \
-+	tlb_remove_page((tlb), pte);    \
-+} while (0)
-+
-+static inline void check_pgt_cache(void)
-+{
-+}
-+
-+#endif /* _ASM_RISCV_PGALLOC_H */
-diff --git a/arch/riscv/include/asm/pgtable-32.h b/arch/riscv/include/asm/pgtable-32.h
++#endif /* _ASM_RISCV_LINKAGE_H */
+diff --git a/arch/riscv/include/asm/string.h b/arch/riscv/include/asm/string.h
 new file mode 100644
-index 000000000000..d61974b74182
+index 000000000000..9210fcf4ff52
 --- /dev/null
-+++ b/arch/riscv/include/asm/pgtable-32.h
-@@ -0,0 +1,25 @@
++++ b/arch/riscv/include/asm/string.h
+@@ -0,0 +1,26 @@
 +/*
-+ * Copyright (C) 2012 Regents of the University of California
++ * Copyright (C) 2013 Regents of the University of California
 + *
 + *   This program is free software; you can redistribute it and/or
 + *   modify it under the terms of the GNU General Public License
@@ -404,24 +305,25 @@ index 000000000000..d61974b74182
 + *   GNU General Public License for more details.
 + */
 +
-+#ifndef _ASM_RISCV_PGTABLE_32_H
-+#define _ASM_RISCV_PGTABLE_32_H
++#ifndef _ASM_RISCV_STRING_H
++#define _ASM_RISCV_STRING_H
 +
-+#include <asm-generic/pgtable-nopmd.h>
-+#include <linux/const.h>
++#include <linux/types.h>
++#include <linux/linkage.h>
 +
-+/* Size of region mapped by a page global directory */
-+#define PGDIR_SHIFT     22
-+#define PGDIR_SIZE      (_AC(1, UL) << PGDIR_SHIFT)
-+#define PGDIR_MASK      (~(PGDIR_SIZE - 1))
++#define __HAVE_ARCH_MEMSET
++extern asmlinkage void *memset(void *, int, size_t);
 +
-+#endif /* _ASM_RISCV_PGTABLE_32_H */
-diff --git a/arch/riscv/include/asm/pgtable-64.h b/arch/riscv/include/asm/pgtable-64.h
++#define __HAVE_ARCH_MEMCPY
++extern asmlinkage void *memcpy(void *, const void *, size_t);
++
++#endif /* _ASM_RISCV_STRING_H */
+diff --git a/arch/riscv/include/asm/uaccess.h b/arch/riscv/include/asm/uaccess.h
 new file mode 100644
-index 000000000000..7aa0ea9bd8bb
+index 000000000000..27b90d64814b
 --- /dev/null
-+++ b/arch/riscv/include/asm/pgtable-64.h
-@@ -0,0 +1,84 @@
++++ b/arch/riscv/include/asm/uaccess.h
+@@ -0,0 +1,513 @@
 +/*
 + * Copyright (C) 2012 Regents of the University of California
 + *
@@ -433,857 +335,1166 @@ index 000000000000..7aa0ea9bd8bb
 + *   but WITHOUT ANY WARRANTY; without even the implied warranty of
 + *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 + *   GNU General Public License for more details.
++ *
++ * This file was copied from include/asm-generic/uaccess.h
 + */
 +
-+#ifndef _ASM_RISCV_PGTABLE_64_H
-+#define _ASM_RISCV_PGTABLE_64_H
-+
-+#include <linux/const.h>
-+
-+#define PGDIR_SHIFT     30
-+/* Size of region mapped by a page global directory */
-+#define PGDIR_SIZE      (_AC(1, UL) << PGDIR_SHIFT)
-+#define PGDIR_MASK      (~(PGDIR_SIZE - 1))
-+
-+#define PMD_SHIFT       21
-+/* Size of region mapped by a page middle directory */
-+#define PMD_SIZE        (_AC(1, UL) << PMD_SHIFT)
-+#define PMD_MASK        (~(PMD_SIZE - 1))
-+
-+/* Page Middle Directory entry */
-+typedef struct {
-+	unsigned long pmd;
-+} pmd_t;
-+
-+#define pmd_val(x)      ((x).pmd)
-+#define __pmd(x)        ((pmd_t) { (x) })
-+
-+#define PTRS_PER_PMD    (PAGE_SIZE / sizeof(pmd_t))
-+
-+static inline int pud_present(pud_t pud)
-+{
-+	return (pud_val(pud) & _PAGE_PRESENT);
-+}
-+
-+static inline int pud_none(pud_t pud)
-+{
-+	return (pud_val(pud) == 0);
-+}
-+
-+static inline int pud_bad(pud_t pud)
-+{
-+	return !pud_present(pud);
-+}
-+
-+static inline void set_pud(pud_t *pudp, pud_t pud)
-+{
-+	*pudp = pud;
-+}
-+
-+static inline void pud_clear(pud_t *pudp)
-+{
-+	set_pud(pudp, __pud(0));
-+}
-+
-+static inline unsigned long pud_page_vaddr(pud_t pud)
-+{
-+	return (unsigned long)pfn_to_virt(pud_val(pud) >> _PAGE_PFN_SHIFT);
-+}
-+
-+#define pmd_index(addr) (((addr) >> PMD_SHIFT) & (PTRS_PER_PMD - 1))
-+
-+static inline pmd_t *pmd_offset(pud_t *pud, unsigned long addr)
-+{
-+	return (pmd_t *)pud_page_vaddr(*pud) + pmd_index(addr);
-+}
-+
-+static inline pmd_t pfn_pmd(unsigned long pfn, pgprot_t prot)
-+{
-+	return __pmd((pfn << _PAGE_PFN_SHIFT) | pgprot_val(prot));
-+}
-+
-+#define pmd_ERROR(e) \
-+	pr_err("%s:%d: bad pmd %016lx.\n", __FILE__, __LINE__, pmd_val(e))
-+
-+#endif /* _ASM_RISCV_PGTABLE_64_H */
-diff --git a/arch/riscv/include/asm/pgtable-bits.h b/arch/riscv/include/asm/pgtable-bits.h
-new file mode 100644
-index 000000000000..997ddbb1d370
---- /dev/null
-+++ b/arch/riscv/include/asm/pgtable-bits.h
-@@ -0,0 +1,48 @@
-+/*
-+ * Copyright (C) 2012 Regents of the University of California
-+ *
-+ *   This program is free software; you can redistribute it and/or
-+ *   modify it under the terms of the GNU General Public License
-+ *   as published by the Free Software Foundation, version 2.
-+ *
-+ *   This program is distributed in the hope that it will be useful,
-+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *   GNU General Public License for more details.
-+ */
-+
-+#ifndef _ASM_RISCV_PGTABLE_BITS_H
-+#define _ASM_RISCV_PGTABLE_BITS_H
++#ifndef _ASM_RISCV_UACCESS_H
++#define _ASM_RISCV_UACCESS_H
 +
 +/*
-+ * PTE format:
-+ * | XLEN-1  10 | 9             8 | 7 | 6 | 5 | 4 | 3 | 2 | 1 | 0
-+ *       PFN      reserved for SW   D   A   G   U   X   W   R   V
++ * User space memory access functions
 + */
++#include <linux/errno.h>
++#include <linux/compiler.h>
++#include <linux/thread_info.h>
++#include <asm/byteorder.h>
++#include <asm/asm.h>
 +
-+#define _PAGE_ACCESSED_OFFSET 6
++#define __enable_user_access()							\
++	__asm__ __volatile__ ("csrs sstatus, %0" : : "r" (SR_SUM) : "memory")
++#define __disable_user_access()							\
++	__asm__ __volatile__ ("csrc sstatus, %0" : : "r" (SR_SUM) : "memory")
 +
-+#define _PAGE_PRESENT   (1 << 0)
-+#define _PAGE_READ      (1 << 1)    /* Readable */
-+#define _PAGE_WRITE     (1 << 2)    /* Writable */
-+#define _PAGE_EXEC      (1 << 3)    /* Executable */
-+#define _PAGE_USER      (1 << 4)    /* User */
-+#define _PAGE_GLOBAL    (1 << 5)    /* Global */
-+#define _PAGE_ACCESSED  (1 << 6)    /* Set by hardware on any access */
-+#define _PAGE_DIRTY     (1 << 7)    /* Set by hardware on any write */
-+#define _PAGE_SOFT      (1 << 8)    /* Reserved for software */
-+
-+#define _PAGE_SPECIAL   _PAGE_SOFT
-+#define _PAGE_TABLE     _PAGE_PRESENT
-+
-+#define _PAGE_PFN_SHIFT 10
-+
-+/* Set of bits to preserve across pte_modify() */
-+#define _PAGE_CHG_MASK  (~(unsigned long)(_PAGE_PRESENT | _PAGE_READ |	\
-+					  _PAGE_WRITE | _PAGE_EXEC |	\
-+					  _PAGE_USER | _PAGE_GLOBAL))
-+
-+/* Advertise support for _PAGE_SPECIAL */
-+#define __HAVE_ARCH_PTE_SPECIAL
-+
-+#endif /* _ASM_RISCV_PGTABLE_BITS_H */
-diff --git a/arch/riscv/include/asm/pgtable.h b/arch/riscv/include/asm/pgtable.h
-new file mode 100644
-index 000000000000..3399257780b2
---- /dev/null
-+++ b/arch/riscv/include/asm/pgtable.h
-@@ -0,0 +1,430 @@
 +/*
-+ * Copyright (C) 2012 Regents of the University of California
++ * The fs value determines whether argument validity checking should be
++ * performed or not.  If get_fs() == USER_DS, checking is performed, with
++ * get_fs() == KERNEL_DS, checking is bypassed.
 + *
-+ *   This program is free software; you can redistribute it and/or
-+ *   modify it under the terms of the GNU General Public License
-+ *   as published by the Free Software Foundation, version 2.
-+ *
-+ *   This program is distributed in the hope that it will be useful,
-+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *   GNU General Public License for more details.
++ * For historical reasons, these macros are grossly misnamed.
 + */
 +
-+#ifndef _ASM_RISCV_PGTABLE_H
-+#define _ASM_RISCV_PGTABLE_H
++#define KERNEL_DS	(~0UL)
++#define USER_DS		(TASK_SIZE)
 +
-+#include <linux/mmzone.h>
++#define get_ds()	(KERNEL_DS)
++#define get_fs()	(current_thread_info()->addr_limit)
 +
-+#include <asm/pgtable-bits.h>
++static inline void set_fs(mm_segment_t fs)
++{
++	current_thread_info()->addr_limit = fs;
++}
 +
-+#ifndef __ASSEMBLY__
++#define segment_eq(a, b) ((a) == (b))
++
++#define user_addr_max()	(get_fs())
++
++
++#define VERIFY_READ	0
++#define VERIFY_WRITE	1
++
++/**
++ * access_ok: - Checks if a user space pointer is valid
++ * @type: Type of access: %VERIFY_READ or %VERIFY_WRITE.  Note that
++ *        %VERIFY_WRITE is a superset of %VERIFY_READ - if it is safe
++ *        to write to a block, it is always safe to read from it.
++ * @addr: User space pointer to start of block to check
++ * @size: Size of block to check
++ *
++ * Context: User context only.  This function may sleep.
++ *
++ * Checks if a pointer to a block of memory in user space is valid.
++ *
++ * Returns true (nonzero) if the memory block may be valid, false (zero)
++ * if it is definitely invalid.
++ *
++ * Note that, depending on architecture, this function probably just
++ * checks that the pointer is in the user space range - after calling
++ * this function, memory access functions may still return -EFAULT.
++ */
++#define access_ok(type, addr, size) ({					\
++	__chk_user_ptr(addr);						\
++	likely(__access_ok((unsigned long __force)(addr), (size)));	\
++})
++
++/*
++ * Ensure that the range [addr, addr+size) is within the process's
++ * address space
++ */
++static inline int __access_ok(unsigned long addr, unsigned long size)
++{
++	const mm_segment_t fs = get_fs();
++
++	return (size <= fs) && (addr <= (fs - size));
++}
++
++/*
++ * The exception table consists of pairs of addresses: the first is the
++ * address of an instruction that is allowed to fault, and the second is
++ * the address at which the program should continue.  No registers are
++ * modified, so it is entirely up to the continuation code to figure out
++ * what to do.
++ *
++ * All the routines below use bits of fixup code that are out of line
++ * with the main instruction path.  This means when everything is well,
++ * we don't even have to jump over them.  Further, they do not intrude
++ * on our cache or tlb entries.
++ */
++
++struct exception_table_entry {
++	unsigned long insn, fixup;
++};
++
++extern int fixup_exception(struct pt_regs *state);
++
++#if defined(__LITTLE_ENDIAN)
++#define __MSW	1
++#define __LSW	0
++#elif defined(__BIG_ENDIAN)
++#define __MSW	0
++#define	__LSW	1
++#else
++#error "Unknown endianness"
++#endif
++
++/*
++ * The "__xxx" versions of the user access functions do not verify the address
++ * space - it must have been done previously with a separate "access_ok()"
++ * call.
++ */
 +
 +#ifdef CONFIG_MMU
-+
-+/* Page Upper Directory not used in RISC-V */
-+#include <asm-generic/pgtable-nopud.h>
-+#include <asm/page.h>
-+#include <asm/tlbflush.h>
-+#include <linux/mm_types.h>
-+
-+#ifdef CONFIG_64BIT
-+#include <asm/pgtable-64.h>
-+#else
-+#include <asm/pgtable-32.h>
-+#endif /* CONFIG_64BIT */
-+
-+/* Number of entries in the page global directory */
-+#define PTRS_PER_PGD    (PAGE_SIZE / sizeof(pgd_t))
-+/* Number of entries in the page table */
-+#define PTRS_PER_PTE    (PAGE_SIZE / sizeof(pte_t))
-+
-+/* Number of PGD entries that a user-mode program can use */
-+#define USER_PTRS_PER_PGD   (TASK_SIZE / PGDIR_SIZE)
-+#define FIRST_USER_ADDRESS  0
-+
-+/* Page protection bits */
-+#define _PAGE_BASE	(_PAGE_PRESENT | _PAGE_ACCESSED | _PAGE_USER)
-+
-+#define PAGE_NONE		__pgprot(0)
-+#define PAGE_READ		__pgprot(_PAGE_BASE | _PAGE_READ)
-+#define PAGE_WRITE		__pgprot(_PAGE_BASE | _PAGE_READ | _PAGE_WRITE)
-+#define PAGE_EXEC		__pgprot(_PAGE_BASE | _PAGE_EXEC)
-+#define PAGE_READ_EXEC		__pgprot(_PAGE_BASE | _PAGE_READ | _PAGE_EXEC)
-+#define PAGE_WRITE_EXEC		__pgprot(_PAGE_BASE | _PAGE_READ |	\
-+					 _PAGE_EXEC | _PAGE_WRITE)
-+
-+#define PAGE_COPY		PAGE_READ
-+#define PAGE_COPY_EXEC		PAGE_EXEC
-+#define PAGE_COPY_READ_EXEC	PAGE_READ_EXEC
-+#define PAGE_SHARED		PAGE_WRITE
-+#define PAGE_SHARED_EXEC	PAGE_WRITE_EXEC
-+
-+#define _PAGE_KERNEL		(_PAGE_READ \
-+				| _PAGE_WRITE \
-+				| _PAGE_PRESENT \
-+				| _PAGE_ACCESSED \
-+				| _PAGE_DIRTY)
-+
-+#define PAGE_KERNEL		__pgprot(_PAGE_KERNEL)
-+#define PAGE_KERNEL_EXEC	__pgprot(_PAGE_KERNEL | _PAGE_EXEC)
-+
-+extern pgd_t swapper_pg_dir[];
-+
-+/* MAP_PRIVATE permissions: xwr (copy-on-write) */
-+#define __P000	PAGE_NONE
-+#define __P001	PAGE_READ
-+#define __P010	PAGE_COPY
-+#define __P011	PAGE_COPY
-+#define __P100	PAGE_EXEC
-+#define __P101	PAGE_READ_EXEC
-+#define __P110	PAGE_COPY_EXEC
-+#define __P111	PAGE_COPY_READ_EXEC
-+
-+/* MAP_SHARED permissions: xwr */
-+#define __S000	PAGE_NONE
-+#define __S001	PAGE_READ
-+#define __S010	PAGE_SHARED
-+#define __S011	PAGE_SHARED
-+#define __S100	PAGE_EXEC
-+#define __S101	PAGE_READ_EXEC
-+#define __S110	PAGE_SHARED_EXEC
-+#define __S111	PAGE_SHARED_EXEC
-+
-+/*
-+ * ZERO_PAGE is a global shared page that is always zero,
-+ * used for zero-mapped memory areas, etc.
-+ */
-+extern unsigned long empty_zero_page[PAGE_SIZE / sizeof(unsigned long)];
-+#define ZERO_PAGE(vaddr) (virt_to_page(empty_zero_page))
-+
-+static inline int pmd_present(pmd_t pmd)
-+{
-+	return (pmd_val(pmd) & _PAGE_PRESENT);
-+}
-+
-+static inline int pmd_none(pmd_t pmd)
-+{
-+	return (pmd_val(pmd) == 0);
-+}
-+
-+static inline int pmd_bad(pmd_t pmd)
-+{
-+	return !pmd_present(pmd);
-+}
-+
-+static inline void set_pmd(pmd_t *pmdp, pmd_t pmd)
-+{
-+	*pmdp = pmd;
-+}
-+
-+static inline void pmd_clear(pmd_t *pmdp)
-+{
-+	set_pmd(pmdp, __pmd(0));
-+}
-+
-+
-+static inline pgd_t pfn_pgd(unsigned long pfn, pgprot_t prot)
-+{
-+	return __pgd((pfn << _PAGE_PFN_SHIFT) | pgprot_val(prot));
-+}
-+
-+#define pgd_index(addr) (((addr) >> PGDIR_SHIFT) & (PTRS_PER_PGD - 1))
-+
-+/* Locate an entry in the page global directory */
-+static inline pgd_t *pgd_offset(const struct mm_struct *mm, unsigned long addr)
-+{
-+	return mm->pgd + pgd_index(addr);
-+}
-+/* Locate an entry in the kernel page global directory */
-+#define pgd_offset_k(addr)      pgd_offset(&init_mm, (addr))
-+
-+static inline struct page *pmd_page(pmd_t pmd)
-+{
-+	return pfn_to_page(pmd_val(pmd) >> _PAGE_PFN_SHIFT);
-+}
-+
-+static inline unsigned long pmd_page_vaddr(pmd_t pmd)
-+{
-+	return (unsigned long)pfn_to_virt(pmd_val(pmd) >> _PAGE_PFN_SHIFT);
-+}
-+
-+/* Yields the page frame number (PFN) of a page table entry */
-+static inline unsigned long pte_pfn(pte_t pte)
-+{
-+	return (pte_val(pte) >> _PAGE_PFN_SHIFT);
-+}
-+
-+#define pte_page(x)     pfn_to_page(pte_pfn(x))
-+
-+/* Constructs a page table entry */
-+static inline pte_t pfn_pte(unsigned long pfn, pgprot_t prot)
-+{
-+	return __pte((pfn << _PAGE_PFN_SHIFT) | pgprot_val(prot));
-+}
-+
-+static inline pte_t mk_pte(struct page *page, pgprot_t prot)
-+{
-+	return pfn_pte(page_to_pfn(page), prot);
-+}
-+
-+#define pte_index(addr) (((addr) >> PAGE_SHIFT) & (PTRS_PER_PTE - 1))
-+
-+static inline pte_t *pte_offset_kernel(pmd_t *pmd, unsigned long addr)
-+{
-+	return (pte_t *)pmd_page_vaddr(*pmd) + pte_index(addr);
-+}
-+
-+#define pte_offset_map(dir, addr)	pte_offset_kernel((dir), (addr))
-+#define pte_unmap(pte)			((void)(pte))
-+
-+/*
-+ * Certain architectures need to do special things when PTEs within
-+ * a page table are directly modified.  Thus, the following hook is
-+ * made available.
-+ */
-+static inline void set_pte(pte_t *ptep, pte_t pteval)
-+{
-+	*ptep = pteval;
-+}
-+
-+static inline void set_pte_at(struct mm_struct *mm,
-+	unsigned long addr, pte_t *ptep, pte_t pteval)
-+{
-+	set_pte(ptep, pteval);
-+}
-+
-+static inline void pte_clear(struct mm_struct *mm,
-+	unsigned long addr, pte_t *ptep)
-+{
-+	set_pte_at(mm, addr, ptep, __pte(0));
-+}
-+
-+static inline int pte_present(pte_t pte)
-+{
-+	return (pte_val(pte) & _PAGE_PRESENT);
-+}
-+
-+static inline int pte_none(pte_t pte)
-+{
-+	return (pte_val(pte) == 0);
-+}
-+
-+/* static inline int pte_read(pte_t pte) */
-+
-+static inline int pte_write(pte_t pte)
-+{
-+	return pte_val(pte) & _PAGE_WRITE;
-+}
-+
-+static inline int pte_huge(pte_t pte)
-+{
-+	return pte_present(pte)
-+		&& (pte_val(pte) & (_PAGE_READ | _PAGE_WRITE | _PAGE_EXEC));
-+}
-+
-+/* static inline int pte_exec(pte_t pte) */
-+
-+static inline int pte_dirty(pte_t pte)
-+{
-+	return pte_val(pte) & _PAGE_DIRTY;
-+}
-+
-+static inline int pte_young(pte_t pte)
-+{
-+	return pte_val(pte) & _PAGE_ACCESSED;
-+}
-+
-+static inline int pte_special(pte_t pte)
-+{
-+	return pte_val(pte) & _PAGE_SPECIAL;
-+}
-+
-+/* static inline pte_t pte_rdprotect(pte_t pte) */
-+
-+static inline pte_t pte_wrprotect(pte_t pte)
-+{
-+	return __pte(pte_val(pte) & ~(_PAGE_WRITE));
-+}
-+
-+/* static inline pte_t pte_mkread(pte_t pte) */
-+
-+static inline pte_t pte_mkwrite(pte_t pte)
-+{
-+	return __pte(pte_val(pte) | _PAGE_WRITE);
-+}
-+
-+/* static inline pte_t pte_mkexec(pte_t pte) */
-+
-+static inline pte_t pte_mkdirty(pte_t pte)
-+{
-+	return __pte(pte_val(pte) | _PAGE_DIRTY);
-+}
-+
-+static inline pte_t pte_mkclean(pte_t pte)
-+{
-+	return __pte(pte_val(pte) & ~(_PAGE_DIRTY));
-+}
-+
-+static inline pte_t pte_mkyoung(pte_t pte)
-+{
-+	return __pte(pte_val(pte) | _PAGE_ACCESSED);
-+}
-+
-+static inline pte_t pte_mkold(pte_t pte)
-+{
-+	return __pte(pte_val(pte) & ~(_PAGE_ACCESSED));
-+}
-+
-+static inline pte_t pte_mkspecial(pte_t pte)
-+{
-+	return __pte(pte_val(pte) | _PAGE_SPECIAL);
-+}
-+
-+/* Modify page protection bits */
-+static inline pte_t pte_modify(pte_t pte, pgprot_t newprot)
-+{
-+	return __pte((pte_val(pte) & _PAGE_CHG_MASK) | pgprot_val(newprot));
-+}
-+
-+#define pgd_ERROR(e) \
-+	pr_err("%s:%d: bad pgd " PTE_FMT ".\n", __FILE__, __LINE__, pgd_val(e))
-+
-+
-+/* Commit new configuration to MMU hardware */
-+static inline void update_mmu_cache(struct vm_area_struct *vma,
-+	unsigned long address, pte_t *ptep)
-+{
-+	/*
-+	 * The kernel assumes that TLBs don't cache invalid entries, but
-+	 * in RISC-V, SFENCE.VMA specifies an ordering constraint, not a
-+	 * cache flush; it is necessary even after writing invalid entries.
-+	 * Relying on flush_tlb_fix_spurious_fault would suffice, but
-+	 * the extra traps reduce performance.  So, eagerly SFENCE.VMA.
-+	 */
-+	local_flush_tlb_page(address);
-+}
-+
-+#define __HAVE_ARCH_PTE_SAME
-+static inline int pte_same(pte_t pte_a, pte_t pte_b)
-+{
-+	return pte_val(pte_a) == pte_val(pte_b);
-+}
-+
-+#define __HAVE_ARCH_PTEP_SET_ACCESS_FLAGS
-+static inline int ptep_set_access_flags(struct vm_area_struct *vma,
-+					unsigned long address, pte_t *ptep,
-+					pte_t entry, int dirty)
-+{
-+	if (!pte_same(*ptep, entry))
-+		set_pte_at(vma->vm_mm, address, ptep, entry);
-+	/*
-+	 * update_mmu_cache will unconditionally execute, handling both
-+	 * the case that the PTE changed and the spurious fault case.
-+	 */
-+	return true;
-+}
-+
-+#define __HAVE_ARCH_PTEP_GET_AND_CLEAR
-+static inline pte_t ptep_get_and_clear(struct mm_struct *mm,
-+				       unsigned long address, pte_t *ptep)
-+{
-+	return __pte(atomic_long_xchg((atomic_long_t *)ptep, 0));
-+}
-+
-+#define __HAVE_ARCH_PTEP_TEST_AND_CLEAR_YOUNG
-+static inline int ptep_test_and_clear_young(struct vm_area_struct *vma,
-+					    unsigned long address,
-+					    pte_t *ptep)
-+{
-+	if (!pte_young(*ptep))
-+		return 0;
-+	return test_and_clear_bit(_PAGE_ACCESSED_OFFSET, &pte_val(*ptep));
-+}
-+
-+#define __HAVE_ARCH_PTEP_SET_WRPROTECT
-+static inline void ptep_set_wrprotect(struct mm_struct *mm,
-+				      unsigned long address, pte_t *ptep)
-+{
-+	atomic_long_and(~(unsigned long)_PAGE_WRITE, (atomic_long_t *)ptep);
-+}
-+
-+#define __HAVE_ARCH_PTEP_CLEAR_YOUNG_FLUSH
-+static inline int ptep_clear_flush_young(struct vm_area_struct *vma,
-+					 unsigned long address, pte_t *ptep)
-+{
-+	/*
-+	 * This comment is borrowed from x86, but applies equally to RISC-V:
-+	 *
-+	 * Clearing the accessed bit without a TLB flush
-+	 * doesn't cause data corruption. [ It could cause incorrect
-+	 * page aging and the (mistaken) reclaim of hot pages, but the
-+	 * chance of that should be relatively low. ]
-+	 *
-+	 * So as a performance optimization don't flush the TLB when
-+	 * clearing the accessed bit, it will eventually be flushed by
-+	 * a context switch or a VM operation anyway. [ In the rare
-+	 * event of it not getting flushed for a long time the delay
-+	 * shouldn't really matter because there's no real memory
-+	 * pressure for swapout to react to. ]
-+	 */
-+	return ptep_test_and_clear_young(vma, address, ptep);
-+}
-+
-+/*
-+ * Encode and decode a swap entry
-+ *
-+ * Format of swap PTE:
-+ *	bit            0:	_PAGE_PRESENT (zero)
-+ *	bit            1:	reserved for future use (zero)
-+ *	bits      2 to 6:	swap type
-+ *	bits 7 to XLEN-1:	swap offset
-+ */
-+#define __SWP_TYPE_SHIFT	2
-+#define __SWP_TYPE_BITS		5
-+#define __SWP_TYPE_MASK		((1UL << __SWP_TYPE_BITS) - 1)
-+#define __SWP_OFFSET_SHIFT	(__SWP_TYPE_BITS + __SWP_TYPE_SHIFT)
-+
-+#define MAX_SWAPFILES_CHECK()	\
-+	BUILD_BUG_ON(MAX_SWAPFILES_SHIFT > __SWP_TYPE_BITS)
-+
-+#define __swp_type(x)	(((x).val >> __SWP_TYPE_SHIFT) & __SWP_TYPE_MASK)
-+#define __swp_offset(x)	((x).val >> __SWP_OFFSET_SHIFT)
-+#define __swp_entry(type, offset) ((swp_entry_t) \
-+	{ ((type) << __SWP_TYPE_SHIFT) | ((offset) << __SWP_OFFSET_SHIFT) })
-+
-+#define __pte_to_swp_entry(pte)	((swp_entry_t) { pte_val(pte) })
-+#define __swp_entry_to_pte(x)	((pte_t) { (x).val })
-+
-+#ifdef CONFIG_FLATMEM
-+#define kern_addr_valid(addr)   (1) /* FIXME */
-+#endif
-+
-+extern void paging_init(void);
-+
-+static inline void pgtable_cache_init(void)
-+{
-+	/* No page table caches to initialize */
-+}
-+
++#define __get_user_asm(insn, x, ptr, err)			\
++do {								\
++	uintptr_t __tmp;					\
++	__typeof__(x) __x;					\
++	__enable_user_access();					\
++	__asm__ __volatile__ (					\
++		"1:\n"						\
++		"	" insn " %1, %3\n"			\
++		"2:\n"						\
++		"	.section .fixup,\"ax\"\n"		\
++		"	.balign 4\n"				\
++		"3:\n"						\
++		"	li %0, %4\n"				\
++		"	li %1, 0\n"				\
++		"	jump 2b, %2\n"				\
++		"	.previous\n"				\
++		"	.section __ex_table,\"a\"\n"		\
++		"	.balign " RISCV_SZPTR "\n"			\
++		"	" RISCV_PTR " 1b, 3b\n"			\
++		"	.previous"				\
++		: "+r" (err), "=&r" (__x), "=r" (__tmp)		\
++		: "m" (*(ptr)), "i" (-EFAULT));			\
++	__disable_user_access();				\
++	(x) = __x;						\
++} while (0)
 +#endif /* CONFIG_MMU */
 +
-+#define VMALLOC_SIZE     (KERN_VIRT_SIZE >> 1)
-+#define VMALLOC_END      (PAGE_OFFSET - 1)
-+#define VMALLOC_START    (PAGE_OFFSET - VMALLOC_SIZE)
-+
-+/*
-+ * Task size is 0x40000000000 for RV64 or 0xb800000 for RV32.
-+ * Note that PGDIR_SIZE must evenly divide TASK_SIZE.
-+ */
 +#ifdef CONFIG_64BIT
-+#define TASK_SIZE (PGDIR_SIZE * PTRS_PER_PGD / 2)
-+#else
-+#define TASK_SIZE VMALLOC_START
-+#endif
++#define __get_user_8(x, ptr, err) \
++	__get_user_asm("ld", x, ptr, err)
++#else /* !CONFIG_64BIT */
++#ifdef CONFIG_MMU
++#define __get_user_8(x, ptr, err)				\
++do {								\
++	u32 __user *__ptr = (u32 __user *)(ptr);		\
++	u32 __lo, __hi;						\
++	uintptr_t __tmp;					\
++	__enable_user_access();					\
++	__asm__ __volatile__ (					\
++		"1:\n"						\
++		"	lw %1, %4\n"				\
++		"2:\n"						\
++		"	lw %2, %5\n"				\
++		"3:\n"						\
++		"	.section .fixup,\"ax\"\n"		\
++		"	.balign 4\n"				\
++		"4:\n"						\
++		"	li %0, %6\n"				\
++		"	li %1, 0\n"				\
++		"	li %2, 0\n"				\
++		"	jump 3b, %3\n"				\
++		"	.previous\n"				\
++		"	.section __ex_table,\"a\"\n"		\
++		"	.balign " RISCV_SZPTR "\n"			\
++		"	" RISCV_PTR " 1b, 4b\n"			\
++		"	" RISCV_PTR " 2b, 4b\n"			\
++		"	.previous"				\
++		: "+r" (err), "=&r" (__lo), "=r" (__hi),	\
++			"=r" (__tmp)				\
++		: "m" (__ptr[__LSW]), "m" (__ptr[__MSW]),	\
++			"i" (-EFAULT));				\
++	__disable_user_access();				\
++	(x) = (__typeof__(x))((__typeof__((x)-(x)))(		\
++		(((u64)__hi << 32) | __lo)));			\
++} while (0)
++#endif /* CONFIG_MMU */
++#endif /* CONFIG_64BIT */
 +
-+#include <asm-generic/pgtable.h>
 +
-+#endif /* !__ASSEMBLY__ */
++/**
++ * __get_user: - Get a simple variable from user space, with less checking.
++ * @x:   Variable to store result.
++ * @ptr: Source address, in user space.
++ *
++ * Context: User context only.  This function may sleep.
++ *
++ * This macro copies a single simple variable from user space to kernel
++ * space.  It supports simple types like char and int, but not larger
++ * data types like structures or arrays.
++ *
++ * @ptr must have pointer-to-simple-variable type, and the result of
++ * dereferencing @ptr must be assignable to @x without a cast.
++ *
++ * Caller must check the pointer with access_ok() before calling this
++ * function.
++ *
++ * Returns zero on success, or -EFAULT on error.
++ * On error, the variable @x is set to zero.
++ */
++#define __get_user(x, ptr)					\
++({								\
++	register long __gu_err = 0;				\
++	const __typeof__(*(ptr)) __user *__gu_ptr = (ptr);	\
++	__chk_user_ptr(__gu_ptr);				\
++	switch (sizeof(*__gu_ptr)) {				\
++	case 1:							\
++		__get_user_asm("lb", (x), __gu_ptr, __gu_err);	\
++		break;						\
++	case 2:							\
++		__get_user_asm("lh", (x), __gu_ptr, __gu_err);	\
++		break;						\
++	case 4:							\
++		__get_user_asm("lw", (x), __gu_ptr, __gu_err);	\
++		break;						\
++	case 8:							\
++		__get_user_8((x), __gu_ptr, __gu_err);	\
++		break;						\
++	default:						\
++		BUILD_BUG();					\
++	}							\
++	__gu_err;						\
++})
 +
-+#endif /* _ASM_RISCV_PGTABLE_H */
-diff --git a/arch/riscv/mm/fault.c b/arch/riscv/mm/fault.c
-new file mode 100644
-index 000000000000..df2ca3c65048
---- /dev/null
-+++ b/arch/riscv/mm/fault.c
-@@ -0,0 +1,282 @@
++/**
++ * get_user: - Get a simple variable from user space.
++ * @x:   Variable to store result.
++ * @ptr: Source address, in user space.
++ *
++ * Context: User context only.  This function may sleep.
++ *
++ * This macro copies a single simple variable from user space to kernel
++ * space.  It supports simple types like char and int, but not larger
++ * data types like structures or arrays.
++ *
++ * @ptr must have pointer-to-simple-variable type, and the result of
++ * dereferencing @ptr must be assignable to @x without a cast.
++ *
++ * Returns zero on success, or -EFAULT on error.
++ * On error, the variable @x is set to zero.
++ */
++#define get_user(x, ptr)					\
++({								\
++	const __typeof__(*(ptr)) __user *__p = (ptr);		\
++	might_fault();						\
++	access_ok(VERIFY_READ, __p, sizeof(*__p)) ?		\
++		__get_user((x), __p) :				\
++		((x) = 0, -EFAULT);				\
++})
++
++
++#ifdef CONFIG_MMU
++#define __put_user_asm(insn, x, ptr, err)			\
++do {								\
++	uintptr_t __tmp;					\
++	__typeof__(*(ptr)) __x = x;				\
++	__enable_user_access();					\
++	__asm__ __volatile__ (					\
++		"1:\n"						\
++		"	" insn " %z3, %2\n"			\
++		"2:\n"						\
++		"	.section .fixup,\"ax\"\n"		\
++		"	.balign 4\n"				\
++		"3:\n"						\
++		"	li %0, %4\n"				\
++		"	jump 2b, %1\n"				\
++		"	.previous\n"				\
++		"	.section __ex_table,\"a\"\n"		\
++		"	.balign " RISCV_SZPTR "\n"			\
++		"	" RISCV_PTR " 1b, 3b\n"			\
++		"	.previous"				\
++		: "+r" (err), "=r" (__tmp), "=m" (*(ptr))	\
++		: "rJ" (__x), "i" (-EFAULT));			\
++	__disable_user_access();				\
++} while (0)
++#endif /* CONFIG_MMU */
++
++
++#ifdef CONFIG_64BIT
++#define __put_user_8(x, ptr, err) \
++	__put_user_asm("sd", x, ptr, err)
++#else /* !CONFIG_64BIT */
++#ifdef CONFIG_MMU
++#define __put_user_8(x, ptr, err)				\
++do {								\
++	u32 __user *__ptr = (u32 __user *)(ptr);		\
++	u64 __x = (__typeof__((x)-(x)))(x);			\
++	uintptr_t __tmp;					\
++	__enable_user_access();					\
++	__asm__ __volatile__ (					\
++		"1:\n"						\
++		"	sw %z4, %2\n"				\
++		"2:\n"						\
++		"	sw %z5, %3\n"				\
++		"3:\n"						\
++		"	.section .fixup,\"ax\"\n"		\
++		"	.balign 4\n"				\
++		"4:\n"						\
++		"	li %0, %6\n"				\
++		"	jump 2b, %1\n"				\
++		"	.previous\n"				\
++		"	.section __ex_table,\"a\"\n"		\
++		"	.balign " RISCV_SZPTR "\n"			\
++		"	" RISCV_PTR " 1b, 4b\n"			\
++		"	" RISCV_PTR " 2b, 4b\n"			\
++		"	.previous"				\
++		: "+r" (err), "=r" (__tmp),			\
++			"=m" (__ptr[__LSW]),			\
++			"=m" (__ptr[__MSW])			\
++		: "rJ" (__x), "rJ" (__x >> 32), "i" (-EFAULT));	\
++	__disable_user_access();				\
++} while (0)
++#endif /* CONFIG_MMU */
++#endif /* CONFIG_64BIT */
++
++
++/**
++ * __put_user: - Write a simple value into user space, with less checking.
++ * @x:   Value to copy to user space.
++ * @ptr: Destination address, in user space.
++ *
++ * Context: User context only.  This function may sleep.
++ *
++ * This macro copies a single simple value from kernel space to user
++ * space.  It supports simple types like char and int, but not larger
++ * data types like structures or arrays.
++ *
++ * @ptr must have pointer-to-simple-variable type, and @x must be assignable
++ * to the result of dereferencing @ptr.
++ *
++ * Caller must check the pointer with access_ok() before calling this
++ * function.
++ *
++ * Returns zero on success, or -EFAULT on error.
++ */
++#define __put_user(x, ptr)					\
++({								\
++	register long __pu_err = 0;				\
++	__typeof__(*(ptr)) __user *__gu_ptr = (ptr);		\
++	__chk_user_ptr(__gu_ptr);				\
++	switch (sizeof(*__gu_ptr)) {				\
++	case 1:							\
++		__put_user_asm("sb", (x), __gu_ptr, __pu_err);	\
++		break;						\
++	case 2:							\
++		__put_user_asm("sh", (x), __gu_ptr, __pu_err);	\
++		break;						\
++	case 4:							\
++		__put_user_asm("sw", (x), __gu_ptr, __pu_err);	\
++		break;						\
++	case 8:							\
++		__put_user_8((x), __gu_ptr, __pu_err);	\
++		break;						\
++	default:						\
++		BUILD_BUG();					\
++	}							\
++	__pu_err;						\
++})
++
++/**
++ * put_user: - Write a simple value into user space.
++ * @x:   Value to copy to user space.
++ * @ptr: Destination address, in user space.
++ *
++ * Context: User context only.  This function may sleep.
++ *
++ * This macro copies a single simple value from kernel space to user
++ * space.  It supports simple types like char and int, but not larger
++ * data types like structures or arrays.
++ *
++ * @ptr must have pointer-to-simple-variable type, and @x must be assignable
++ * to the result of dereferencing @ptr.
++ *
++ * Returns zero on success, or -EFAULT on error.
++ */
++#define put_user(x, ptr)					\
++({								\
++	__typeof__(*(ptr)) __user *__p = (ptr);			\
++	might_fault();						\
++	access_ok(VERIFY_WRITE, __p, sizeof(*__p)) ?		\
++		__put_user((x), __p) :				\
++		-EFAULT;					\
++})
++
++
++extern unsigned long __must_check __copy_user(void __user *to,
++	const void __user *from, unsigned long n);
++
++static inline unsigned long
++raw_copy_from_user(void *to, const void __user *from, unsigned long n)
++{
++	return __copy_user(to, from, n);
++}
++
++static inline unsigned long
++raw_copy_to_user(void __user *to, const void *from, unsigned long n)
++{
++	return __copy_user(to, from, n);
++}
++
++extern long strncpy_from_user(char *dest, const char __user *src, long count);
++
++extern long __must_check strlen_user(const char __user *str);
++extern long __must_check strnlen_user(const char __user *str, long n);
++
++extern
++unsigned long __must_check __clear_user(void __user *addr, unsigned long n);
++
++static inline
++unsigned long __must_check clear_user(void __user *to, unsigned long n)
++{
++	might_fault();
++	return access_ok(VERIFY_WRITE, to, n) ?
++		__clear_user(to, n) : n;
++}
++
 +/*
-+ * Copyright (C) 2009 Sunplus Core Technology Co., Ltd.
-+ *  Lennox Wu <lennox.wu@sunplusct.com>
-+ *  Chen Liqin <liqin.chen@sunplusct.com>
++ * Atomic compare-and-exchange, but with a fixup for userspace faults.  Faults
++ * will set "err" to -EFAULT, while successful accesses return the previous
++ * value.
++ */
++#ifdef CONFIG_MMU
++#define __cmpxchg_user(ptr, old, new, err, size, lrb, scb)	\
++({								\
++	__typeof__(ptr) __ptr = (ptr);				\
++	__typeof__(*(ptr)) __old = (old);			\
++	__typeof__(*(ptr)) __new = (new);			\
++	__typeof__(*(ptr)) __ret;				\
++	__typeof__(err) __err = 0;				\
++	register unsigned int __rc;				\
++	__enable_user_access();					\
++	switch (size) {						\
++	case 4:							\
++		__asm__ __volatile__ (				\
++		"0:\n"						\
++		"	lr.w" #scb " %[ret], %[ptr]\n"		\
++		"	bne          %[ret], %z[old], 1f\n"	\
++		"	sc.w" #lrb " %[rc], %z[new], %[ptr]\n"	\
++		"	bnez         %[rc], 0b\n"		\
++		"1:\n"						\
++		".section .fixup,\"ax\"\n"			\
++		".balign 4\n"					\
++		"2:\n"						\
++		"	li %[err], %[efault]\n"			\
++		"	jump 1b, %[rc]\n"			\
++		".previous\n"					\
++		".section __ex_table,\"a\"\n"			\
++		".balign " RISCV_SZPTR "\n"			\
++		"	" RISCV_PTR " 1b, 2b\n"			\
++		".previous\n"					\
++			: [ret] "=&r" (__ret),			\
++			  [rc]  "=&r" (__rc),			\
++			  [ptr] "+A" (*__ptr),			\
++			  [err] "=&r" (__err)			\
++			: [old] "rJ" (__old),			\
++			  [new] "rJ" (__new),			\
++			  [efault] "i" (-EFAULT));		\
++		break;						\
++	case 8:							\
++		__asm__ __volatile__ (				\
++		"0:\n"						\
++		"	lr.d" #scb " %[ret], %[ptr]\n"		\
++		"	bne          %[ret], %z[old], 1f\n"	\
++		"	sc.d" #lrb " %[rc], %z[new], %[ptr]\n"	\
++		"	bnez         %[rc], 0b\n"		\
++		"1:\n"						\
++		".section .fixup,\"ax\"\n"			\
++		".balign 4\n"					\
++		"2:\n"						\
++		"	li %[err], %[efault]\n"			\
++		"	jump 1b, %[rc]\n"			\
++		".previous\n"					\
++		".section __ex_table,\"a\"\n"			\
++		".balign " RISCV_SZPTR "\n"			\
++		"	" RISCV_PTR " 1b, 2b\n"			\
++		".previous\n"					\
++			: [ret] "=&r" (__ret),			\
++			  [rc]  "=&r" (__rc),			\
++			  [ptr] "+A" (*__ptr),			\
++			  [err] "=&r" (__err)			\
++			: [old] "rJ" (__old),			\
++			  [new] "rJ" (__new),			\
++			  [efault] "i" (-EFAULT));		\
++		break;						\
++	default:						\
++		BUILD_BUG();					\
++	}							\
++	__disable_user_access();				\
++	(err) = __err;						\
++	__ret;							\
++})
++#endif /* CONFIG_MMU */
++
++#endif /* _ASM_RISCV_UACCESS_H */
+diff --git a/arch/riscv/include/asm/word-at-a-time.h b/arch/riscv/include/asm/word-at-a-time.h
+new file mode 100644
+index 000000000000..aa6238791d3e
+--- /dev/null
++++ b/arch/riscv/include/asm/word-at-a-time.h
+@@ -0,0 +1,55 @@
++/*
 + * Copyright (C) 2012 Regents of the University of California
 + *
++ *   This program is free software; you can redistribute it and/or
++ *   modify it under the terms of the GNU General Public License
++ *   as published by the Free Software Foundation, version 2.
++ *
++ *   This program is distributed in the hope that it will be useful,
++ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *   GNU General Public License for more details.
++ * Derived from arch/x86/include/asm/word-at-a-time.h
++ */
++
++#ifndef _ASM_RISCV_WORD_AT_A_TIME_H
++#define _ASM_RISCV_WORD_AT_A_TIME_H
++
++
++#include <linux/kernel.h>
++
++struct word_at_a_time {
++	const unsigned long one_bits, high_bits;
++};
++
++#define WORD_AT_A_TIME_CONSTANTS { REPEAT_BYTE(0x01), REPEAT_BYTE(0x80) }
++
++static inline unsigned long has_zero(unsigned long val,
++	unsigned long *bits, const struct word_at_a_time *c)
++{
++	unsigned long mask = ((val - c->one_bits) & ~val) & c->high_bits;
++	*bits = mask;
++	return mask;
++}
++
++static inline unsigned long prep_zero_mask(unsigned long val,
++	unsigned long bits, const struct word_at_a_time *c)
++{
++	return bits;
++}
++
++static inline unsigned long create_zero_mask(unsigned long bits)
++{
++	bits = (bits - 1) & ~bits;
++	return bits >> 7;
++}
++
++static inline unsigned long find_zero(unsigned long mask)
++{
++	return fls64(mask) >> 3;
++}
++
++/* The mask we created is directly usable as a bytemask */
++#define zero_bytemask(mask) (mask)
++
++#endif /* _ASM_RISCV_WORD_AT_A_TIME_H */
+diff --git a/arch/riscv/kernel/stacktrace.c b/arch/riscv/kernel/stacktrace.c
+new file mode 100644
+index 000000000000..559aae781154
+--- /dev/null
++++ b/arch/riscv/kernel/stacktrace.c
+@@ -0,0 +1,177 @@
++/*
++ * Copyright (C) 2008 ARM Limited
++ * Copyright (C) 2014 Regents of the University of California
++ *
 + * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License as published by
-+ * the Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
 + *
 + * This program is distributed in the hope that it will be useful,
 + * but WITHOUT ANY WARRANTY; without even the implied warranty of
 + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 + * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, see the file COPYING, or write
-+ * to the Free Software Foundation, Inc.,
 + */
 +
++#include <linux/export.h>
++#include <linux/kallsyms.h>
++#include <linux/sched.h>
++#include <linux/sched/debug.h>
++#include <linux/sched/task_stack.h>
++#include <linux/stacktrace.h>
 +
-+#include <linux/mm.h>
-+#include <linux/kernel.h>
-+#include <linux/interrupt.h>
-+#include <linux/perf_event.h>
-+#include <linux/signal.h>
-+#include <linux/uaccess.h>
++#ifdef CONFIG_FRAME_POINTER
 +
-+#include <asm/pgalloc.h>
-+#include <asm/ptrace.h>
-+#include <asm/uaccess.h>
++struct stackframe {
++	unsigned long fp;
++	unsigned long ra;
++};
 +
-+/*
-+ * This routine handles page faults.  It determines the address and the
-+ * problem, and then passes it off to one of the appropriate routines.
-+ */
-+asmlinkage void do_page_fault(struct pt_regs *regs)
++static void notrace walk_stackframe(struct task_struct *task,
++	struct pt_regs *regs, bool (*fn)(unsigned long, void *), void *arg)
 +{
-+	struct task_struct *tsk;
-+	struct vm_area_struct *vma;
-+	struct mm_struct *mm;
-+	unsigned long addr, cause;
-+	unsigned int flags = FAULT_FLAG_ALLOW_RETRY | FAULT_FLAG_KILLABLE;
-+	int fault, code = SEGV_MAPERR;
++	unsigned long fp, sp, pc;
 +
-+	cause = regs->scause;
-+	addr = regs->sbadaddr;
-+
-+	tsk = current;
-+	mm = tsk->mm;
-+
-+	/*
-+	 * Fault-in kernel-space virtual memory on-demand.
-+	 * The 'reference' page table is init_mm.pgd.
-+	 *
-+	 * NOTE! We MUST NOT take any locks for this case. We may
-+	 * be in an interrupt or a critical region, and should
-+	 * only copy the information from the master page table,
-+	 * nothing more.
-+	 */
-+	if (unlikely((addr >= VMALLOC_START) && (addr <= VMALLOC_END)))
-+		goto vmalloc_fault;
-+
-+	/* Enable interrupts if they were enabled in the parent context. */
-+	if (likely(regs->sstatus & SR_PIE))
-+		local_irq_enable();
-+
-+	/*
-+	 * If we're in an interrupt, have no user context, or are running
-+	 * in an atomic region, then we must not take the fault.
-+	 */
-+	if (unlikely(faulthandler_disabled() || !mm))
-+		goto no_context;
-+
-+	if (user_mode(regs))
-+		flags |= FAULT_FLAG_USER;
-+
-+	perf_sw_event(PERF_COUNT_SW_PAGE_FAULTS, 1, regs, addr);
-+
-+retry:
-+	down_read(&mm->mmap_sem);
-+	vma = find_vma(mm, addr);
-+	if (unlikely(!vma))
-+		goto bad_area;
-+	if (likely(vma->vm_start <= addr))
-+		goto good_area;
-+	if (unlikely(!(vma->vm_flags & VM_GROWSDOWN)))
-+		goto bad_area;
-+	if (unlikely(expand_stack(vma, addr)))
-+		goto bad_area;
-+
-+	/*
-+	 * Ok, we have a good vm_area for this memory access, so
-+	 * we can handle it.
-+	 */
-+good_area:
-+	code = SEGV_ACCERR;
-+
-+	switch (cause) {
-+	case EXC_INST_PAGE_FAULT:
-+		if (!(vma->vm_flags & VM_EXEC))
-+			goto bad_area;
-+		break;
-+	case EXC_LOAD_PAGE_FAULT:
-+		if (!(vma->vm_flags & VM_READ))
-+			goto bad_area;
-+		break;
-+	case EXC_STORE_PAGE_FAULT:
-+		if (!(vma->vm_flags & VM_WRITE))
-+			goto bad_area;
-+		flags |= FAULT_FLAG_WRITE;
-+		break;
-+	default:
-+		panic("%s: unhandled cause %lu", __func__, cause);
++	if (regs) {
++		fp = GET_FP(regs);
++		sp = GET_USP(regs);
++		pc = GET_IP(regs);
++	} else if (task == NULL || task == current) {
++		const register unsigned long current_sp __asm__ ("sp");
++		fp = (unsigned long)__builtin_frame_address(0);
++		sp = current_sp;
++		pc = (unsigned long)walk_stackframe;
++	} else {
++		/* task blocked in __switch_to */
++		fp = task->thread.s[0];
++		sp = task->thread.sp;
++		pc = task->thread.ra;
 +	}
 +
-+	/*
-+	 * If for any reason at all we could not handle the fault,
-+	 * make sure we exit gracefully rather than endlessly redo
-+	 * the fault.
-+	 */
-+	fault = handle_mm_fault(vma, addr, flags);
++	for (;;) {
++		unsigned long low, high;
++		struct stackframe *frame;
 +
-+	/*
-+	 * If we need to retry but a fatal signal is pending, handle the
-+	 * signal first. We do not need to release the mmap_sem because it
-+	 * would already be released in __lock_page_or_retry in mm/filemap.c.
-+	 */
-+	if ((fault & VM_FAULT_RETRY) && fatal_signal_pending(tsk))
-+		return;
++		if (unlikely(!__kernel_text_address(pc) || fn(pc, arg)))
++			break;
 +
-+	if (unlikely(fault & VM_FAULT_ERROR)) {
-+		if (fault & VM_FAULT_OOM)
-+			goto out_of_memory;
-+		else if (fault & VM_FAULT_SIGBUS)
-+			goto do_sigbus;
-+		BUG();
-+	}
-+
-+	/*
-+	 * Major/minor page fault accounting is only done on the
-+	 * initial attempt. If we go through a retry, it is extremely
-+	 * likely that the page will be found in page cache at that point.
-+	 */
-+	if (flags & FAULT_FLAG_ALLOW_RETRY) {
-+		if (fault & VM_FAULT_MAJOR) {
-+			tsk->maj_flt++;
-+			perf_sw_event(PERF_COUNT_SW_PAGE_FAULTS_MAJ,
-+				      1, regs, addr);
-+		} else {
-+			tsk->min_flt++;
-+			perf_sw_event(PERF_COUNT_SW_PAGE_FAULTS_MIN,
-+				      1, regs, addr);
-+		}
-+		if (fault & VM_FAULT_RETRY) {
-+			/*
-+			 * Clear FAULT_FLAG_ALLOW_RETRY to avoid any risk
-+			 * of starvation.
-+			 */
-+			flags &= ~(FAULT_FLAG_ALLOW_RETRY);
-+			flags |= FAULT_FLAG_TRIED;
-+
-+			/*
-+			 * No need to up_read(&mm->mmap_sem) as we would
-+			 * have already released it in __lock_page_or_retry
-+			 * in mm/filemap.c.
-+			 */
-+			goto retry;
-+		}
-+	}
-+
-+	up_read(&mm->mmap_sem);
-+	return;
-+
-+	/*
-+	 * Something tried to access memory that isn't in our memory map.
-+	 * Fix it, but check if it's kernel or user first.
-+	 */
-+bad_area:
-+	up_read(&mm->mmap_sem);
-+	/* User mode accesses just cause a SIGSEGV */
-+	if (user_mode(regs)) {
-+		do_trap(regs, SIGSEGV, code, addr, tsk);
-+		return;
-+	}
-+
-+no_context:
-+	/* Are we prepared to handle this kernel fault? */
-+	if (fixup_exception(regs))
-+		return;
-+
-+	/*
-+	 * Oops. The kernel tried to access some bad page. We'll have to
-+	 * terminate things with extreme prejudice.
-+	 */
-+	bust_spinlocks(1);
-+	pr_alert("Unable to handle kernel %s at virtual address " REG_FMT "\n",
-+		(addr < PAGE_SIZE) ? "NULL pointer dereference" :
-+		"paging request", addr);
-+	die(regs, "Oops");
-+	do_exit(SIGKILL);
-+
-+	/*
-+	 * We ran out of memory, call the OOM killer, and return the userspace
-+	 * (which will retry the fault, or kill us if we got oom-killed).
-+	 */
-+out_of_memory:
-+	up_read(&mm->mmap_sem);
-+	if (!user_mode(regs))
-+		goto no_context;
-+	pagefault_out_of_memory();
-+	return;
-+
-+do_sigbus:
-+	up_read(&mm->mmap_sem);
-+	/* Kernel mode? Handle exceptions or die */
-+	if (!user_mode(regs))
-+		goto no_context;
-+	do_trap(regs, SIGBUS, BUS_ADRERR, addr, tsk);
-+	return;
-+
-+vmalloc_fault:
-+	{
-+		pgd_t *pgd, *pgd_k;
-+		pud_t *pud, *pud_k;
-+		p4d_t *p4d, *p4d_k;
-+		pmd_t *pmd, *pmd_k;
-+		pte_t *pte_k;
-+		int index;
-+
-+		if (user_mode(regs))
-+			goto bad_area;
-+
-+		/*
-+		 * Synchronize this task's top level page-table
-+		 * with the 'reference' page table.
-+		 *
-+		 * Do _not_ use "tsk->active_mm->pgd" here.
-+		 * We might be inside an interrupt in the middle
-+		 * of a task switch.
-+		 */
-+		index = pgd_index(addr);
-+		pgd = (pgd_t *)pfn_to_virt(csr_read(sptbr)) + index;
-+		pgd_k = init_mm.pgd + index;
-+
-+		if (!pgd_present(*pgd_k))
-+			goto no_context;
-+		set_pgd(pgd, *pgd_k);
-+
-+		p4d = p4d_offset(pgd, addr);
-+		p4d_k = p4d_offset(pgd_k, addr);
-+		if (!p4d_present(*p4d_k))
-+			goto no_context;
-+
-+		pud = pud_offset(p4d, addr);
-+		pud_k = pud_offset(p4d_k, addr);
-+		if (!pud_present(*pud_k))
-+			goto no_context;
-+
-+		/*
-+		 * Since the vmalloc area is global, it is unnecessary
-+		 * to copy individual PTEs
-+		 */
-+		pmd = pmd_offset(pud, addr);
-+		pmd_k = pmd_offset(pud_k, addr);
-+		if (!pmd_present(*pmd_k))
-+			goto no_context;
-+		set_pmd(pmd, *pmd_k);
-+
-+		/*
-+		 * Make sure the actual PTE exists as well to
-+		 * catch kernel vmalloc-area accesses to non-mapped
-+		 * addresses. If we don't do this, this will just
-+		 * silently loop forever.
-+		 */
-+		pte_k = pte_offset_kernel(pmd_k, addr);
-+		if (!pte_present(*pte_k))
-+			goto no_context;
-+		return;
++		/* Validate frame pointer */
++		low = sp + sizeof(struct stackframe);
++		high = ALIGN(sp, THREAD_SIZE);
++		if (unlikely(fp < low || fp > high || fp & 0x7))
++			break;
++		/* Unwind stack frame */
++		frame = (struct stackframe *)fp - 1;
++		sp = fp;
++		fp = frame->fp;
++		pc = frame->ra - 0x4;
 +	}
 +}
++
++#else /* !CONFIG_FRAME_POINTER */
++
++static void notrace walk_stackframe(struct task_struct *task,
++	struct pt_regs *regs, bool (*fn)(unsigned long, void *), void *arg)
++{
++	unsigned long sp, pc;
++	unsigned long *ksp;
++
++	if (regs) {
++		sp = GET_USP(regs);
++		pc = GET_IP(regs);
++	} else if (task == NULL || task == current) {
++		const register unsigned long current_sp __asm__ ("sp");
++		sp = current_sp;
++		pc = (unsigned long)walk_stackframe;
++	} else {
++		/* task blocked in __switch_to */
++		sp = task->thread.sp;
++		pc = task->thread.ra;
++	}
++
++	if (unlikely(sp & 0x7))
++		return;
++
++	ksp = (unsigned long *)sp;
++	while (!kstack_end(ksp)) {
++		if (__kernel_text_address(pc) && unlikely(fn(pc, arg)))
++			break;
++		pc = (*ksp++) - 0x4;
++	}
++}
++
++#endif /* CONFIG_FRAME_POINTER */
++
++
++static bool print_trace_address(unsigned long pc, void *arg)
++{
++	print_ip_sym(pc);
++	return false;
++}
++
++void show_stack(struct task_struct *task, unsigned long *sp)
++{
++	pr_cont("Call Trace:\n");
++	walk_stackframe(task, NULL, print_trace_address, NULL);
++}
++
++
++static bool save_wchan(unsigned long pc, void *arg)
++{
++	if (!in_sched_functions(pc)) {
++		unsigned long *p = arg;
++		*p = pc;
++		return true;
++	}
++	return false;
++}
++
++unsigned long get_wchan(struct task_struct *task)
++{
++	unsigned long pc = 0;
++
++	if (likely(task && task != current && task->state != TASK_RUNNING))
++		walk_stackframe(task, NULL, save_wchan, &pc);
++	return pc;
++}
++
++
++#ifdef CONFIG_STACKTRACE
++
++static bool __save_trace(unsigned long pc, void *arg, bool nosched)
++{
++	struct stack_trace *trace = arg;
++
++	if (unlikely(nosched && in_sched_functions(pc)))
++		return false;
++	if (unlikely(trace->skip > 0)) {
++		trace->skip--;
++		return false;
++	}
++
++	trace->entries[trace->nr_entries++] = pc;
++	return (trace->nr_entries >= trace->max_entries);
++}
++
++static bool save_trace(unsigned long pc, void *arg)
++{
++	return __save_trace(pc, arg, false);
++}
++
++/*
++ * Save stack-backtrace addresses into a stack_trace buffer.
++ */
++void save_stack_trace_tsk(struct task_struct *tsk, struct stack_trace *trace)
++{
++	walk_stackframe(tsk, NULL, save_trace, trace);
++	if (trace->nr_entries < trace->max_entries)
++		trace->entries[trace->nr_entries++] = ULONG_MAX;
++}
++EXPORT_SYMBOL_GPL(save_stack_trace_tsk);
++
++void save_stack_trace(struct stack_trace *trace)
++{
++	save_stack_trace_tsk(NULL, trace);
++}
++EXPORT_SYMBOL_GPL(save_stack_trace);
++
++#endif /* CONFIG_STACKTRACE */
+diff --git a/arch/riscv/lib/memcpy.S b/arch/riscv/lib/memcpy.S
+new file mode 100644
+index 000000000000..80f9c1a5c598
+--- /dev/null
++++ b/arch/riscv/lib/memcpy.S
+@@ -0,0 +1,115 @@
++/*
++ * Copyright (C) 2013 Regents of the University of California
++ *
++ *   This program is free software; you can redistribute it and/or
++ *   modify it under the terms of the GNU General Public License
++ *   as published by the Free Software Foundation, version 2.
++ *
++ *   This program is distributed in the hope that it will be useful,
++ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *   GNU General Public License for more details.
++ */
++
++#include <linux/linkage.h>
++#include <asm/asm.h>
++
++/* void *memcpy(void *, const void *, size_t) */
++ENTRY(memcpy)
++	move t6, a0  /* Preserve return value */
++
++	/* Defer to byte-oriented copy for small sizes */
++	sltiu a3, a2, 128
++	bnez a3, 4f
++	/* Use word-oriented copy only if low-order bits match */
++	andi a3, t6, SZREG-1
++	andi a4, a1, SZREG-1
++	bne a3, a4, 4f
++
++	beqz a3, 2f  /* Skip if already aligned */
++	/*
++	 * Round to nearest double word-aligned address
++	 * greater than or equal to start address
++	 */
++	andi a3, a1, ~(SZREG-1)
++	addi a3, a3, SZREG
++	/* Handle initial misalignment */
++	sub a4, a3, a1
++1:
++	lb a5, 0(a1)
++	addi a1, a1, 1
++	sb a5, 0(t6)
++	addi t6, t6, 1
++	bltu a1, a3, 1b
++	sub a2, a2, a4  /* Update count */
++
++2:
++	andi a4, a2, ~((16*SZREG)-1)
++	beqz a4, 4f
++	add a3, a1, a4
++3:
++	REG_L a4,       0(a1)
++	REG_L a5,   SZREG(a1)
++	REG_L a6, 2*SZREG(a1)
++	REG_L a7, 3*SZREG(a1)
++	REG_L t0, 4*SZREG(a1)
++	REG_L t1, 5*SZREG(a1)
++	REG_L t2, 6*SZREG(a1)
++	REG_L t3, 7*SZREG(a1)
++	REG_L t4, 8*SZREG(a1)
++	REG_L t5, 9*SZREG(a1)
++	REG_S a4,       0(t6)
++	REG_S a5,   SZREG(t6)
++	REG_S a6, 2*SZREG(t6)
++	REG_S a7, 3*SZREG(t6)
++	REG_S t0, 4*SZREG(t6)
++	REG_S t1, 5*SZREG(t6)
++	REG_S t2, 6*SZREG(t6)
++	REG_S t3, 7*SZREG(t6)
++	REG_S t4, 8*SZREG(t6)
++	REG_S t5, 9*SZREG(t6)
++	REG_L a4, 10*SZREG(a1)
++	REG_L a5, 11*SZREG(a1)
++	REG_L a6, 12*SZREG(a1)
++	REG_L a7, 13*SZREG(a1)
++	REG_L t0, 14*SZREG(a1)
++	REG_L t1, 15*SZREG(a1)
++	addi a1, a1, 16*SZREG
++	REG_S a4, 10*SZREG(t6)
++	REG_S a5, 11*SZREG(t6)
++	REG_S a6, 12*SZREG(t6)
++	REG_S a7, 13*SZREG(t6)
++	REG_S t0, 14*SZREG(t6)
++	REG_S t1, 15*SZREG(t6)
++	addi t6, t6, 16*SZREG
++	bltu a1, a3, 3b
++	andi a2, a2, (16*SZREG)-1  /* Update count */
++
++4:
++	/* Handle trailing misalignment */
++	beqz a2, 6f
++	add a3, a1, a2
++
++	/* Use word-oriented copy if co-aligned to word boundary */
++	or a5, a1, t6
++	or a5, a5, a3
++	andi a5, a5, 3
++	bnez a5, 5f
++7:
++	lw a4, 0(a1)
++	addi a1, a1, 4
++	sw a4, 0(t6)
++	addi t6, t6, 4
++	bltu a1, a3, 7b
++
++	ret
++
++5:
++	lb a4, 0(a1)
++	addi a1, a1, 1
++	sb a4, 0(t6)
++	addi t6, t6, 1
++	bltu a1, a3, 5b
++6:
++	ret
++END(memcpy)
+diff --git a/arch/riscv/lib/memset.S b/arch/riscv/lib/memset.S
+new file mode 100644
+index 000000000000..a790107cf4c9
+--- /dev/null
++++ b/arch/riscv/lib/memset.S
+@@ -0,0 +1,120 @@
++/*
++ * Copyright (C) 2013 Regents of the University of California
++ *
++ *   This program is free software; you can redistribute it and/or
++ *   modify it under the terms of the GNU General Public License
++ *   as published by the Free Software Foundation, version 2.
++ *
++ *   This program is distributed in the hope that it will be useful,
++ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *   GNU General Public License for more details.
++ */
++
++
++#include <linux/linkage.h>
++#include <asm/asm.h>
++
++/* void *memset(void *, int, size_t) */
++ENTRY(memset)
++	move t0, a0  /* Preserve return value */
++
++	/* Defer to byte-oriented fill for small sizes */
++	sltiu a3, a2, 16
++	bnez a3, 4f
++
++	/*
++	 * Round to nearest XLEN-aligned address
++	 * greater than or equal to start address
++	 */
++	addi a3, t0, SZREG-1
++	andi a3, a3, ~(SZREG-1)
++	beq a3, t0, 2f  /* Skip if already aligned */
++	/* Handle initial misalignment */
++	sub a4, a3, t0
++1:
++	sb a1, 0(t0)
++	addi t0, t0, 1
++	bltu t0, a3, 1b
++	sub a2, a2, a4  /* Update count */
++
++2: /* Duff's device with 32 XLEN stores per iteration */
++	/* Broadcast value into all bytes */
++	andi a1, a1, 0xff
++	slli a3, a1, 8
++	or a1, a3, a1
++	slli a3, a1, 16
++	or a1, a3, a1
++#ifdef CONFIG_64BIT
++	slli a3, a1, 32
++	or a1, a3, a1
++#endif
++
++	/* Calculate end address */
++	andi a4, a2, ~(SZREG-1)
++	add a3, t0, a4
++
++	andi a4, a4, 31*SZREG  /* Calculate remainder */
++	beqz a4, 3f            /* Shortcut if no remainder */
++	neg a4, a4
++	addi a4, a4, 32*SZREG  /* Calculate initial offset */
++
++	/* Adjust start address with offset */
++	sub t0, t0, a4
++
++	/* Jump into loop body */
++	/* Assumes 32-bit instruction lengths */
++	la a5, 3f
++#ifdef CONFIG_64BIT
++	srli a4, a4, 1
++#endif
++	add a5, a5, a4
++	jr a5
++3:
++	REG_S a1,        0(t0)
++	REG_S a1,    SZREG(t0)
++	REG_S a1,  2*SZREG(t0)
++	REG_S a1,  3*SZREG(t0)
++	REG_S a1,  4*SZREG(t0)
++	REG_S a1,  5*SZREG(t0)
++	REG_S a1,  6*SZREG(t0)
++	REG_S a1,  7*SZREG(t0)
++	REG_S a1,  8*SZREG(t0)
++	REG_S a1,  9*SZREG(t0)
++	REG_S a1, 10*SZREG(t0)
++	REG_S a1, 11*SZREG(t0)
++	REG_S a1, 12*SZREG(t0)
++	REG_S a1, 13*SZREG(t0)
++	REG_S a1, 14*SZREG(t0)
++	REG_S a1, 15*SZREG(t0)
++	REG_S a1, 16*SZREG(t0)
++	REG_S a1, 17*SZREG(t0)
++	REG_S a1, 18*SZREG(t0)
++	REG_S a1, 19*SZREG(t0)
++	REG_S a1, 20*SZREG(t0)
++	REG_S a1, 21*SZREG(t0)
++	REG_S a1, 22*SZREG(t0)
++	REG_S a1, 23*SZREG(t0)
++	REG_S a1, 24*SZREG(t0)
++	REG_S a1, 25*SZREG(t0)
++	REG_S a1, 26*SZREG(t0)
++	REG_S a1, 27*SZREG(t0)
++	REG_S a1, 28*SZREG(t0)
++	REG_S a1, 29*SZREG(t0)
++	REG_S a1, 30*SZREG(t0)
++	REG_S a1, 31*SZREG(t0)
++	addi t0, t0, 32*SZREG
++	bltu t0, a3, 3b
++	andi a2, a2, SZREG-1  /* Update count */
++
++4:
++	/* Handle trailing misalignment */
++	beqz a2, 6f
++	add a3, t0, a2
++5:
++	sb a1, 0(t0)
++	addi t0, t0, 1
++	bltu t0, a3, 5b
++6:
++	ret
++END(memset)
+diff --git a/arch/riscv/lib/uaccess.S b/arch/riscv/lib/uaccess.S
+new file mode 100644
+index 000000000000..58fb2877c865
+--- /dev/null
++++ b/arch/riscv/lib/uaccess.S
+@@ -0,0 +1,117 @@
++#include <linux/linkage.h>
++#include <asm/asm.h>
++#include <asm/csr.h>
++
++	.altmacro
++	.macro fixup op reg addr lbl
++	LOCAL _epc
++_epc:
++	\op \reg, \addr
++	.section __ex_table,"a"
++	.balign RISCV_SZPTR
++	RISCV_PTR _epc, \lbl
++	.previous
++	.endm
++
++ENTRY(__copy_user)
++
++	/* Enable access to user memory */
++	li t6, SR_SUM
++	csrs sstatus, t6
++
++	add a3, a1, a2
++	/* Use word-oriented copy only if low-order bits match */
++	andi t0, a0, SZREG-1
++	andi t1, a1, SZREG-1
++	bne t0, t1, 2f
++
++	addi t0, a1, SZREG-1
++	andi t1, a3, ~(SZREG-1)
++	andi t0, t0, ~(SZREG-1)
++	/*
++	 * a3: terminal address of source region
++	 * t0: lowest XLEN-aligned address in source
++	 * t1: highest XLEN-aligned address in source
++	 */
++	bgeu t0, t1, 2f
++	bltu a1, t0, 4f
++1:
++	fixup REG_L, t2, (a1), 10f
++	fixup REG_S, t2, (a0), 10f
++	addi a1, a1, SZREG
++	addi a0, a0, SZREG
++	bltu a1, t1, 1b
++2:
++	bltu a1, a3, 5f
++
++3:
++	/* Disable access to user memory */
++	csrc sstatus, t6
++	li a0, 0
++	ret
++4: /* Edge case: unalignment */
++	fixup lbu, t2, (a1), 10f
++	fixup sb, t2, (a0), 10f
++	addi a1, a1, 1
++	addi a0, a0, 1
++	bltu a1, t0, 4b
++	j 1b
++5: /* Edge case: remainder */
++	fixup lbu, t2, (a1), 10f
++	fixup sb, t2, (a0), 10f
++	addi a1, a1, 1
++	addi a0, a0, 1
++	bltu a1, a3, 5b
++	j 3b
++ENDPROC(__copy_user)
++
++
++ENTRY(__clear_user)
++
++	/* Enable access to user memory */
++	li t6, SR_SUM
++	csrs sstatus, t6
++
++	add a3, a0, a1
++	addi t0, a0, SZREG-1
++	andi t1, a3, ~(SZREG-1)
++	andi t0, t0, ~(SZREG-1)
++	/*
++	 * a3: terminal address of target region
++	 * t0: lowest doubleword-aligned address in target region
++	 * t1: highest doubleword-aligned address in target region
++	 */
++	bgeu t0, t1, 2f
++	bltu a0, t0, 4f
++1:
++	fixup REG_S, zero, (a0), 10f
++	addi a0, a0, SZREG
++	bltu a0, t1, 1b
++2:
++	bltu a0, a3, 5f
++
++3:
++	/* Disable access to user memory */
++	csrc sstatus, t6
++	li a0, 0
++	ret
++4: /* Edge case: unalignment */
++	fixup sb, zero, (a0), 10f
++	addi a0, a0, 1
++	bltu a0, t0, 4b
++	j 1b
++5: /* Edge case: remainder */
++	fixup sb, zero, (a0), 10f
++	addi a0, a0, 1
++	bltu a0, a3, 5b
++	j 3b
++ENDPROC(__clear_user)
++
++	.section .fixup,"ax"
++	.balign 4
++10:
++	/* Disable access to user memory */
++	csrs sstatus, t6
++	sub a0, a3, a0
++	ret
++	.previous
+diff --git a/arch/riscv/lib/udivdi3.S b/arch/riscv/lib/udivdi3.S
+new file mode 100644
+index 000000000000..cb01ae5b181a
+--- /dev/null
++++ b/arch/riscv/lib/udivdi3.S
+@@ -0,0 +1,38 @@
++/*
++ * Copyright (C) 2016-2017 Free Software Foundation, Inc.
++ *
++ *   This program is free software; you can redistribute it and/or
++ *   modify it under the terms of the GNU General Public License
++ *   as published by the Free Software Foundation, version 2.
++ *
++ *   This program is distributed in the hope that it will be useful,
++ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *   GNU General Public License for more details.
++ */
++
++  .globl __udivdi3
++__udivdi3:
++  mv    a2, a1
++  mv    a1, a0
++  li    a0, -1
++  beqz  a2, .L5
++  li    a3, 1
++  bgeu  a2, a1, .L2
++.L1:
++  blez  a2, .L2
++  slli  a2, a2, 1
++  slli  a3, a3, 1
++  bgtu  a1, a2, .L1
++.L2:
++  li    a0, 0
++.L3:
++  bltu  a1, a2, .L4
++  sub   a1, a1, a2
++  or    a0, a0, a3
++.L4:
++  srli  a3, a3, 1
++  srli  a2, a2, 1
++  bnez  a3, .L3
++.L5:
++  ret
 -- 
 2.13.0
 
