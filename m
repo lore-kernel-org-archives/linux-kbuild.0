@@ -1,14 +1,14 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg0-f67.google.com ([74.125.83.67]:34198 "EHLO
+Received: from mail-pg0-f67.google.com ([74.125.83.67]:36186 "EHLO
         mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751862AbdHABAt (ORCPT
+        with ESMTP id S1751699AbdHABAp (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 31 Jul 2017 21:00:49 -0400
-Received: by mail-pg0-f67.google.com with SMTP id y192so290574pgd.1
-        for <linux-kbuild@vger.kernel.org>; Mon, 31 Jul 2017 18:00:48 -0700 (PDT)
-Subject: [PATCH v7 04/15] irqchip: RISC-V Local Interrupt Controller Driver
-Date: Mon, 31 Jul 2017 17:59:58 -0700
-Message-Id: <20170801010009.3302-5-palmer@dabbelt.com>
+        Mon, 31 Jul 2017 21:00:45 -0400
+Received: by mail-pg0-f67.google.com with SMTP id y129so269841pgy.3
+        for <linux-kbuild@vger.kernel.org>; Mon, 31 Jul 2017 18:00:45 -0700 (PDT)
+Subject: [PATCH v7 02/15] lib: Add shared copies of some GCC library routines
+Date: Mon, 31 Jul 2017 17:59:56 -0700
+Message-Id: <20170801010009.3302-3-palmer@dabbelt.com>
 In-Reply-To: <20170801010009.3302-1-palmer@dabbelt.com>
 References: <20170801010009.3302-1-palmer@dabbelt.com>
 From: Palmer Dabbelt <palmer@dabbelt.com>
@@ -17,271 +17,451 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: peterz@infradead.org, tglx@linutronix.de, jason@lakedaemon.net, marc.zyngier@arm.com, Arnd Bergmann <arnd@arndb.de>
 Cc: yamada.masahiro@socionext.com, mmarek@suse.com, albert@sifive.com, will.deacon@arm.com, boqun.feng@gmail.com, oleg@redhat.com, mingo@redhat.com, daniel.lezcano@linaro.org, gregkh@linuxfoundation.org, jslaby@suse.com, davem@davemloft.net, mchehab@kernel.org, hverkuil@xs4all.nl, rdunlap@infradead.org, viro@zeniv.linux.org.uk, mhiramat@kernel.org, fweisbec@gmail.com, mcgrof@kernel.org, dledford@redhat.com, bart.vanassche@sandisk.com, sstabellini@kernel.org, mpe@ellerman.id.au, rmk+kernel@armlinux.org.uk, paul.gortmaker@windriver.com, nicolas.dichtel@6wind.com, linux@roeck-us.net, heiko.carstens@de.ibm.com, schwidefsky@de.ibm.com, geert@linux-m68k.org, akpm@linux-foundation.org, andriy.shevchenko@linux.intel.com, jiri@mellanox.com, vgupta@synopsys.com, airlied@redhat.com, jk@ozlabs.org, chris@chris-wilson.co.uk, Jason@zx2c4.com, paulmck@linux.vnet.ibm.com, ncardwell@google.com, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, patches@groups.riscv.org, Palmer Dabbelt <palmer@dabbelt.com>
 
-This patch adds a driver that manages the local interrupts on each
-RISC-V hart, as specifiec by the RISC-V supervisor level ISA manual.
-The local interrupt controller manages software interrupts, timer
-interrupts, and hardware interrupts (which are routed via the
-platform level interrupt controller).  Per-hart local interrupt
-controllers are found on all RISC-V systems.
+Many ports (m32r, microblaze, mips, parisc, score, and sparc) use
+functionally identical copies of various GCC library routine files,
+which came up as we were submitting the RISC-V port (which also uses
+some of these).
+
+This patch adds a new copy of these library routine files, which are
+functionally identical to the various other copies.  These are
+availiable via Kconfig as CONFIG_GENERIC_$ROUTINE, which currently isn't
+used anywhere.
 
 Signed-off-by: Palmer Dabbelt <palmer@dabbelt.com>
+Reviewed-by: Geert Uytterhoeven <geert@linux-m68k.org>
+Signed-off-by: Palmer Dabbelt <palmer@dabbelt.com>
 ---
- drivers/irqchip/Kconfig          |  14 +++
- drivers/irqchip/Makefile         |   1 +
- drivers/irqchip/irq-riscv-intc.c | 213 +++++++++++++++++++++++++++++++++++++++
- 3 files changed, 228 insertions(+)
- create mode 100644 drivers/irqchip/irq-riscv-intc.c
+ include/lib/libgcc.h | 44 ++++++++++++++++++++++++++++++++
+ lib/Kconfig          | 18 +++++++++++++
+ lib/Makefile         |  8 ++++++
+ lib/ashldi3.c        | 45 ++++++++++++++++++++++++++++++++
+ lib/ashrdi3.c        | 46 +++++++++++++++++++++++++++++++++
+ lib/cmpdi2.c         | 42 ++++++++++++++++++++++++++++++
+ lib/lshrdi3.c        | 45 ++++++++++++++++++++++++++++++++
+ lib/muldi3.c         | 72 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ lib/ucmpdi2.c        | 35 +++++++++++++++++++++++++
+ 9 files changed, 355 insertions(+)
+ create mode 100644 include/lib/libgcc.h
+ create mode 100644 lib/ashldi3.c
+ create mode 100644 lib/ashrdi3.c
+ create mode 100644 lib/cmpdi2.c
+ create mode 100644 lib/lshrdi3.c
+ create mode 100644 lib/muldi3.c
+ create mode 100644 lib/ucmpdi2.c
 
-diff --git a/drivers/irqchip/Kconfig b/drivers/irqchip/Kconfig
-index f1fd5f44d1d4..7923d3fa8fae 100644
---- a/drivers/irqchip/Kconfig
-+++ b/drivers/irqchip/Kconfig
-@@ -306,3 +306,17 @@ config QCOM_IRQ_COMBINER
- 	help
- 	  Say yes here to add support for the IRQ combiner devices embedded
- 	  in Qualcomm Technologies chips.
-+
-+config RISCV_INTC
-+	def_bool y if RISCV
-+	#bool "RISC-V Interrupt Controller"
-+	depends on RISCV
-+	default y
-+	help
-+	   This enables support for the local interrupt controller found in
-+	   standard RISC-V systems.  The local interrupt controller handles
-+	   timer interrupts, software interrupts, and hardware interrupts.
-+	   Without a local interrupt controller the system will be unable to
-+	   handle any interrupts, including those passed via the PLIC.
-+
-+	   If you don't know what to do here, say Y.
-diff --git a/drivers/irqchip/Makefile b/drivers/irqchip/Makefile
-index e88d856cc09c..b1aa9114afc4 100644
---- a/drivers/irqchip/Makefile
-+++ b/drivers/irqchip/Makefile
-@@ -78,3 +78,4 @@ obj-$(CONFIG_EZNPS_GIC)			+= irq-eznps.o
- obj-$(CONFIG_ARCH_ASPEED)		+= irq-aspeed-vic.o irq-aspeed-i2c-ic.o
- obj-$(CONFIG_STM32_EXTI) 		+= irq-stm32-exti.o
- obj-$(CONFIG_QCOM_IRQ_COMBINER)		+= qcom-irq-combiner.o
-+obj-$(CONFIG_RISCV_INTC)		+= irq-riscv-intc.o
-diff --git a/drivers/irqchip/irq-riscv-intc.c b/drivers/irqchip/irq-riscv-intc.c
+diff --git a/include/lib/libgcc.h b/include/lib/libgcc.h
 new file mode 100644
-index 000000000000..96ae020cf1d5
+index 000000000000..a5397e34e005
 --- /dev/null
-+++ b/drivers/irqchip/irq-riscv-intc.c
-@@ -0,0 +1,213 @@
++++ b/include/lib/libgcc.h
+@@ -0,0 +1,44 @@
 +/*
-+ * Copyright (C) 2012 Regents of the University of California
-+ * Copyright (C) 2017 SiFive
++ * include/lib/libgcc.h
 + *
-+ *   This program is free software; you can redistribute it and/or
-+ *   modify it under the terms of the GNU General Public License
-+ *   as published by the Free Software Foundation, version 2.
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
 + *
-+ *   This program is distributed in the hope that it will be useful,
-+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *   GNU General Public License for more details.
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see the file COPYING, or write
++ * to the Free Software Foundation, Inc.
 + */
 +
-+#include <linux/irq.h>
-+#include <linux/irqchip.h>
-+#include <linux/irqdomain.h>
-+#include <linux/interrupt.h>
-+#include <linux/ftrace.h>
-+#include <linux/of.h>
-+#include <linux/seq_file.h>
 +
-+#include <asm/ptrace.h>
-+#include <asm/sbi.h>
-+#include <asm/smp.h>
++#ifndef __LIB_LIBGCC_H
++#define __LIB_LIBGCC_H
 +
-+struct riscv_irq_data {
-+	struct irq_chip		chip;
-+	struct irq_domain	*domain;
-+	int			hart;
-+	char			name[20];
++#include <asm/byteorder.h>
++
++typedef int word_type __attribute__ ((mode (__word__)));
++
++#ifdef __BIG_ENDIAN
++struct DWstruct {
++	int high, low;
 +};
-+DEFINE_PER_CPU(struct riscv_irq_data, riscv_irq_data);
-+
-+static void riscv_software_interrupt(void)
-+{
-+#ifdef CONFIG_SMP
-+	irqreturn_t ret;
-+
-+	ret = handle_ipi();
-+
-+	WARN_ON(ret == IRQ_NONE);
++#elif defined(__LITTLE_ENDIAN)
++struct DWstruct {
++	int low, high;
++};
 +#else
-+	/*
-+	 * We currently only use software interrupts to pass inter-processor
-+	 * interrupts, so if a non-SMP system gets a software interrupt then we
-+	 * don't know what to do.
-+	 */
-+	pr_warning("Software Interrupt without CONFIG_SMP\n");
++#error I feel sick.
 +#endif
-+}
 +
-+asmlinkage void __irq_entry do_IRQ(unsigned int cause, struct pt_regs *regs)
++typedef union {
++	struct DWstruct s;
++	long long ll;
++} DWunion;
++
++#endif /* __ASM_LIBGCC_H */
+diff --git a/lib/Kconfig b/lib/Kconfig
+index 6762529ad9e4..ee7d8bf0b7e1 100644
+--- a/lib/Kconfig
++++ b/lib/Kconfig
+@@ -576,3 +576,21 @@ config PRIME_NUMBERS
+ 	tristate
+ 
+ endmenu
++
++config GENERIC_ASHLDI3
++	bool
++
++config GENERIC_ASHRDI3
++	bool
++
++config GENERIC_LSHRDI3
++	bool
++
++config GENERIC_MULDI3
++	bool
++
++config GENERIC_CMPDI2
++	bool
++
++config GENERIC_UCMPDI2
++	bool
+diff --git a/lib/Makefile b/lib/Makefile
+index 40c18372b301..a9ee19497331 100644
+--- a/lib/Makefile
++++ b/lib/Makefile
+@@ -243,3 +243,11 @@ UBSAN_SANITIZE_ubsan.o := n
+ obj-$(CONFIG_SBITMAP) += sbitmap.o
+ 
+ obj-$(CONFIG_PARMAN) += parman.o
++
++# GCC library routines
++obj-$(CONFIG_GENERIC_ASHLDI3) += ashldi3.o
++obj-$(CONFIG_GENERIC_ASHRDI3) += ashrdi3.o
++obj-$(CONFIG_GENERIC_LSHRDI3) += lshrdi3.o
++obj-$(CONFIG_GENERIC_MULDI3) += muldi3.o
++obj-$(CONFIG_GENERIC_CMPDI2) += cmpdi2.o
++obj-$(CONFIG_GENERIC_UCMPDI2) += ucmpdi2.o
+diff --git a/lib/ashldi3.c b/lib/ashldi3.c
+new file mode 100644
+index 000000000000..ff4ec63d2ab6
+--- /dev/null
++++ b/lib/ashldi3.c
+@@ -0,0 +1,45 @@
++/*
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see the file COPYING, or write
++ * to the Free Software Foundation, Inc.
++ */
++
++
++#include <linux/export.h>
++
++#include <lib/libgcc.h>
++
++long long notrace __ashldi3(long long u, word_type b)
 +{
-+	struct pt_regs *old_regs = set_irq_regs(regs);
-+	struct irq_domain *domain;
++	DWunion uu, w;
++	word_type bm;
 +
-+	irq_enter();
++	if (b == 0)
++		return u;
 +
-+	/*
-+	 * There are three classes of interrupt: timer, software, and
-+	 * external devices.  We dispatch between them here.  External
-+	 * device interrupts use the generic IRQ mechanisms.
-+	 */
-+	switch (cause) {
-+	case INTERRUPT_CAUSE_TIMER:
-+		riscv_timer_interrupt();
-+		break;
-+	case INTERRUPT_CAUSE_SOFTWARE:
-+		riscv_software_interrupt();
-+		break;
-+	default:
-+		domain = per_cpu(riscv_irq_data, smp_processor_id()).domain;
-+		generic_handle_irq(irq_find_mapping(domain, cause));
-+		break;
++	uu.ll = u;
++	bm = 32 - b;
++
++	if (bm <= 0) {
++		w.s.low = 0;
++		w.s.high = (unsigned int) uu.s.low << -bm;
++	} else {
++		const unsigned int carries = (unsigned int) uu.s.low >> bm;
++
++		w.s.low = (unsigned int) uu.s.low << b;
++		w.s.high = ((unsigned int) uu.s.high << b) | carries;
 +	}
 +
-+	irq_exit();
-+	set_irq_regs(old_regs);
++	return w.ll;
 +}
-+
-+static int riscv_irqdomain_map(struct irq_domain *d, unsigned int irq,
-+			       irq_hw_number_t hwirq)
-+{
-+	struct riscv_irq_data *data = d->host_data;
-+
-+	irq_set_chip_and_handler(irq, &data->chip, handle_simple_irq);
-+	irq_set_chip_data(irq, data);
-+	irq_set_noprobe(irq);
-+	irq_set_affinity(irq, cpumask_of(data->hart));
-+
-+	return 0;
-+}
-+
-+static const struct irq_domain_ops riscv_irqdomain_ops = {
-+	.map	= riscv_irqdomain_map,
-+	.xlate	= irq_domain_xlate_onecell,
-+};
-+
++EXPORT_SYMBOL(__ashldi3);
+diff --git a/lib/ashrdi3.c b/lib/ashrdi3.c
+new file mode 100644
+index 000000000000..2e67c97ac65a
+--- /dev/null
++++ b/lib/ashrdi3.c
+@@ -0,0 +1,46 @@
 +/*
-+ * On RISC-V systems local interrupts are masked or unmasked by writing the SIE
-+ * (Supervisor Interrupt Enable) CSR.  As CSRs can only be written on the local
-+ * hart, these functions can only be called on the hart that corresponds to the
-+ * IRQ chip.  They are only called internally to this module, so they BUG_ON if
-+ * this condition is violated rather than attempting to handle the error by
-+ * forwarding to the target hart, as that's already expected to have been done.
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see the file COPYING, or write
++ * to the Free Software Foundation, Inc.
 + */
-+static void riscv_irq_mask(struct irq_data *d)
-+{
-+	struct riscv_irq_data *data = irq_data_get_irq_chip_data(d);
 +
-+	BUG_ON(smp_processor_id() != data->hart);
-+	csr_clear(sie, 1 << (long)d->hwirq);
++#include <linux/export.h>
++
++#include <lib/libgcc.h>
++
++long long notrace __ashrdi3(long long u, word_type b)
++{
++	DWunion uu, w;
++	word_type bm;
++
++	if (b == 0)
++		return u;
++
++	uu.ll = u;
++	bm = 32 - b;
++
++	if (bm <= 0) {
++		/* w.s.high = 1..1 or 0..0 */
++		w.s.high =
++		    uu.s.high >> 31;
++		w.s.low = uu.s.high >> -bm;
++	} else {
++		const unsigned int carries = (unsigned int) uu.s.high << bm;
++
++		w.s.high = uu.s.high >> b;
++		w.s.low = ((unsigned int) uu.s.low >> b) | carries;
++	}
++
++	return w.ll;
 +}
++EXPORT_SYMBOL(__ashrdi3);
+diff --git a/lib/cmpdi2.c b/lib/cmpdi2.c
+new file mode 100644
+index 000000000000..6d7ebf6c2b86
+--- /dev/null
++++ b/lib/cmpdi2.c
+@@ -0,0 +1,42 @@
++/*
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see the file COPYING, or write
++ * to the Free Software Foundation, Inc.
++ */
 +
-+static void riscv_irq_unmask(struct irq_data *d)
++#include <linux/export.h>
++
++#include <lib/libgcc.h>
++
++word_type notrace __cmpdi2(long long a, long long b)
 +{
-+	struct riscv_irq_data *data = irq_data_get_irq_chip_data(d);
++	const DWunion au = {
++		.ll = a
++	};
++	const DWunion bu = {
++		.ll = b
++	};
 +
-+	BUG_ON(smp_processor_id() != data->hart);
-+	csr_set(sie, 1 << (long)d->hwirq);
-+}
-+
-+/* Callbacks for twiddling SIE on another hart. */
-+static void riscv_irq_enable_helper(void *d)
-+{
-+	riscv_irq_unmask(d);
-+}
-+
-+static void riscv_irq_disable_helper(void *d)
-+{
-+	riscv_irq_mask(d);
-+}
-+
-+static void riscv_irq_enable(struct irq_data *d)
-+{
-+	struct riscv_irq_data *data = irq_data_get_irq_chip_data(d);
-+
-+	/*
-+	 * It's only possible to write SIE on the current hart.  This jumps
-+	 * over to the target hart if it's not the current one.  It's invalid
-+	 * to write SIE on a hart that's not currently running.
-+	 */
-+	if (data->hart == smp_processor_id())
-+		riscv_irq_unmask(d);
-+	else if (cpu_online(data->hart))
-+		smp_call_function_single(data->hart,
-+					 riscv_irq_enable_helper,
-+					 d,
-+					 true);
-+	else
-+		WARN_ON_ONCE(1);
-+}
-+
-+static void riscv_irq_disable(struct irq_data *d)
-+{
-+	struct riscv_irq_data *data = irq_data_get_irq_chip_data(d);
-+
-+	/*
-+	 * It's only possible to write SIE on the current hart.  This jumps
-+	 * over to the target hart if it's not the current one.  It's invalid
-+	 * to write SIE on a hart that's not currently running.
-+	 */
-+	if (data->hart == smp_processor_id())
-+		riscv_irq_mask(d);
-+	else if (cpu_online(data->hart))
-+		smp_call_function_single(data->hart,
-+					 riscv_irq_disable_helper,
-+					 d,
-+					 true);
-+	else
-+		WARN_ON_ONCE(1);
-+}
-+
-+static int riscv_intc_init(struct device_node *node, struct device_node *parent)
-+{
-+	int hart;
-+	struct riscv_irq_data *data;
-+
-+	if (parent)
++	if (au.s.high < bu.s.high)
 +		return 0;
++	else if (au.s.high > bu.s.high)
++		return 2;
 +
-+	hart = riscv_of_processor_hart(node->parent);
-+	if (hart < 0)
-+		return -EIO;
++	if ((unsigned int) au.s.low < (unsigned int) bu.s.low)
++		return 0;
++	else if ((unsigned int) au.s.low > (unsigned int) bu.s.low)
++		return 2;
 +
-+	data = &per_cpu(riscv_irq_data, hart);
-+	snprintf(data->name, sizeof(data->name), "riscv,cpu_intc,%d", hart);
-+	data->hart = hart;
-+	data->chip.name = data->name;
-+	data->chip.irq_mask = riscv_irq_mask;
-+	data->chip.irq_unmask = riscv_irq_unmask;
-+	data->chip.irq_enable = riscv_irq_enable;
-+	data->chip.irq_disable = riscv_irq_disable;
-+	data->domain = irq_domain_add_linear(
-+		node,
-+		8*sizeof(uintptr_t),
-+		&riscv_irqdomain_ops,
-+		data);
-+	if (!data->domain)
-+		goto error_add_linear;
-+	pr_info("%s: %d local interrupts mapped\n",
-+	        data->name, 8*(int)sizeof(uintptr_t));
-+	return 0;
-+
-+error_add_linear:
-+	pr_warning("%s: unable to add IRQ domain\n",
-+		   data->name);
-+	return -(ENXIO);
-+
++	return 1;
 +}
++EXPORT_SYMBOL(__cmpdi2);
+diff --git a/lib/lshrdi3.c b/lib/lshrdi3.c
+new file mode 100644
+index 000000000000..8e845f4bb65f
+--- /dev/null
++++ b/lib/lshrdi3.c
+@@ -0,0 +1,45 @@
++/*
++ * lib/lshrdi3.c
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see the file COPYING, or write
++ * to the Free Software Foundation, Inc.
++ */
 +
-+IRQCHIP_DECLARE(riscv, "riscv,cpu-intc", riscv_intc_init);
++#include <linux/module.h>
++#include <lib/libgcc.h>
++
++long long notrace __lshrdi3(long long u, word_type b)
++{
++	DWunion uu, w;
++	word_type bm;
++
++	if (b == 0)
++		return u;
++
++	uu.ll = u;
++	bm = 32 - b;
++
++	if (bm <= 0) {
++		w.s.high = 0;
++		w.s.low = (unsigned int) uu.s.high >> -bm;
++	} else {
++		const unsigned int carries = (unsigned int) uu.s.high << bm;
++
++		w.s.high = (unsigned int) uu.s.high >> b;
++		w.s.low = ((unsigned int) uu.s.low >> b) | carries;
++	}
++
++	return w.ll;
++}
++EXPORT_SYMBOL(__lshrdi3);
+diff --git a/lib/muldi3.c b/lib/muldi3.c
+new file mode 100644
+index 000000000000..88938543e10a
+--- /dev/null
++++ b/lib/muldi3.c
+@@ -0,0 +1,72 @@
++/*
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see the file COPYING, or write
++ * to the Free Software Foundation, Inc.
++ */
++
++#include <linux/export.h>
++#include <lib/libgcc.h>
++
++#define W_TYPE_SIZE 32
++
++#define __ll_B ((unsigned long) 1 << (W_TYPE_SIZE / 2))
++#define __ll_lowpart(t) ((unsigned long) (t) & (__ll_B - 1))
++#define __ll_highpart(t) ((unsigned long) (t) >> (W_TYPE_SIZE / 2))
++
++/* If we still don't have umul_ppmm, define it using plain C.  */
++#if !defined(umul_ppmm)
++#define umul_ppmm(w1, w0, u, v)						\
++	do {								\
++		unsigned long __x0, __x1, __x2, __x3;			\
++		unsigned short __ul, __vl, __uh, __vh;			\
++									\
++		__ul = __ll_lowpart(u);					\
++		__uh = __ll_highpart(u);				\
++		__vl = __ll_lowpart(v);					\
++		__vh = __ll_highpart(v);				\
++									\
++		__x0 = (unsigned long) __ul * __vl;			\
++		__x1 = (unsigned long) __ul * __vh;			\
++		__x2 = (unsigned long) __uh * __vl;			\
++		__x3 = (unsigned long) __uh * __vh;			\
++									\
++		__x1 += __ll_highpart(__x0); /* this can't give carry */\
++		__x1 += __x2; /* but this indeed can */			\
++		if (__x1 < __x2) /* did we get it? */			\
++		__x3 += __ll_B; /* yes, add it in the proper pos */	\
++									\
++		(w1) = __x3 + __ll_highpart(__x1);			\
++		(w0) = __ll_lowpart(__x1) * __ll_B + __ll_lowpart(__x0);\
++	} while (0)
++#endif
++
++#if !defined(__umulsidi3)
++#define __umulsidi3(u, v) ({				\
++	DWunion __w;					\
++	umul_ppmm(__w.s.high, __w.s.low, u, v);		\
++	__w.ll;						\
++	})
++#endif
++
++long long notrace __muldi3(long long u, long long v)
++{
++	const DWunion uu = {.ll = u};
++	const DWunion vv = {.ll = v};
++	DWunion w = {.ll = __umulsidi3(uu.s.low, vv.s.low)};
++
++	w.s.high += ((unsigned long) uu.s.low * (unsigned long) vv.s.high
++		+ (unsigned long) uu.s.high * (unsigned long) vv.s.low);
++
++	return w.ll;
++}
++EXPORT_SYMBOL(__muldi3);
+diff --git a/lib/ucmpdi2.c b/lib/ucmpdi2.c
+new file mode 100644
+index 000000000000..49a53505c8e3
+--- /dev/null
++++ b/lib/ucmpdi2.c
+@@ -0,0 +1,35 @@
++/*
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see the file COPYING, or write
++ * to the Free Software Foundation, Inc.
++ */
++
++#include <linux/module.h>
++#include <lib/libgcc.h>
++
++word_type __ucmpdi2(unsigned long long a, unsigned long long b)
++{
++	const DWunion au = {.ll = a};
++	const DWunion bu = {.ll = b};
++
++	if ((unsigned int) au.s.high < (unsigned int) bu.s.high)
++		return 0;
++	else if ((unsigned int) au.s.high > (unsigned int) bu.s.high)
++		return 2;
++	if ((unsigned int) au.s.low < (unsigned int) bu.s.low)
++		return 0;
++	else if ((unsigned int) au.s.low > (unsigned int) bu.s.low)
++		return 2;
++	return 1;
++}
++EXPORT_SYMBOL(__ucmpdi2);
 -- 
 2.13.0
 
