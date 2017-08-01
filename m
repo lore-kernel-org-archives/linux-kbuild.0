@@ -1,14 +1,14 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg0-f67.google.com ([74.125.83.67]:37775 "EHLO
-        mail-pg0-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751806AbdHABBD (ORCPT
+Received: from mail-pf0-f193.google.com ([209.85.192.193]:35976 "EHLO
+        mail-pf0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751651AbdHABAy (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 31 Jul 2017 21:01:03 -0400
-Received: by mail-pg0-f67.google.com with SMTP id 83so261174pgb.4
-        for <linux-kbuild@vger.kernel.org>; Mon, 31 Jul 2017 18:01:03 -0700 (PDT)
-Subject: [PATCH v7 12/15] RISC-V: Device, timer, IRQs, and the SBI
-Date: Mon, 31 Jul 2017 18:00:06 -0700
-Message-Id: <20170801010009.3302-13-palmer@dabbelt.com>
+        Mon, 31 Jul 2017 21:00:54 -0400
+Received: by mail-pf0-f193.google.com with SMTP id t83so249238pfj.3
+        for <linux-kbuild@vger.kernel.org>; Mon, 31 Jul 2017 18:00:54 -0700 (PDT)
+Subject: [PATCH v7 07/15] RISC-V: Init and Halt Code
+Date: Mon, 31 Jul 2017 18:00:01 -0700
+Message-Id: <20170801010009.3302-8-palmer@dabbelt.com>
 In-Reply-To: <20170801010009.3302-1-palmer@dabbelt.com>
 References: <20170801010009.3302-1-palmer@dabbelt.com>
 From: Palmer Dabbelt <palmer@dabbelt.com>
@@ -17,42 +17,52 @@ List-ID: <linux-kbuild.vger.kernel.org>
 To: peterz@infradead.org, tglx@linutronix.de, jason@lakedaemon.net, marc.zyngier@arm.com, Arnd Bergmann <arnd@arndb.de>
 Cc: yamada.masahiro@socionext.com, mmarek@suse.com, albert@sifive.com, will.deacon@arm.com, boqun.feng@gmail.com, oleg@redhat.com, mingo@redhat.com, daniel.lezcano@linaro.org, gregkh@linuxfoundation.org, jslaby@suse.com, davem@davemloft.net, mchehab@kernel.org, hverkuil@xs4all.nl, rdunlap@infradead.org, viro@zeniv.linux.org.uk, mhiramat@kernel.org, fweisbec@gmail.com, mcgrof@kernel.org, dledford@redhat.com, bart.vanassche@sandisk.com, sstabellini@kernel.org, mpe@ellerman.id.au, rmk+kernel@armlinux.org.uk, paul.gortmaker@windriver.com, nicolas.dichtel@6wind.com, linux@roeck-us.net, heiko.carstens@de.ibm.com, schwidefsky@de.ibm.com, geert@linux-m68k.org, akpm@linux-foundation.org, andriy.shevchenko@linux.intel.com, jiri@mellanox.com, vgupta@synopsys.com, airlied@redhat.com, jk@ozlabs.org, chris@chris-wilson.co.uk, Jason@zx2c4.com, paulmck@linux.vnet.ibm.com, ncardwell@google.com, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, patches@groups.riscv.org, Palmer Dabbelt <palmer@dabbelt.com>
 
-This patch contains code that interfaces with devices that are mandated
-by the RISC-V supervisor specification and that don't have explicit
-drivers anywhere else in the tree.  This includes the staticly defined
-interrupts, the CSR-mapped timer, and virtualized SBI devices.
+This contains the various __init C functions, the initial assembly
+kernel entry point, and the code to reset the system.  When a file was
+init-related this patch contains the entire file.
 
 Signed-off-by: Palmer Dabbelt <palmer@dabbelt.com>
 ---
- arch/riscv/include/asm/delay.h       |  28 +++++++++
- arch/riscv/include/asm/dma-mapping.h |  38 ++++++++++++
- arch/riscv/include/asm/irq.h         |  28 +++++++++
- arch/riscv/include/asm/irqflags.h    |  63 ++++++++++++++++++++
- arch/riscv/include/asm/pci.h         |  48 +++++++++++++++
- arch/riscv/include/asm/sbi.h         | 100 +++++++++++++++++++++++++++++++
- arch/riscv/include/asm/timex.h       |  59 +++++++++++++++++++
- arch/riscv/lib/delay.c               | 110 +++++++++++++++++++++++++++++++++++
- arch/riscv/mm/ioremap.c              |  92 +++++++++++++++++++++++++++++
- 9 files changed, 566 insertions(+)
- create mode 100644 arch/riscv/include/asm/delay.h
- create mode 100644 arch/riscv/include/asm/dma-mapping.h
- create mode 100644 arch/riscv/include/asm/irq.h
- create mode 100644 arch/riscv/include/asm/irqflags.h
- create mode 100644 arch/riscv/include/asm/pci.h
- create mode 100644 arch/riscv/include/asm/sbi.h
- create mode 100644 arch/riscv/include/asm/timex.h
- create mode 100644 arch/riscv/lib/delay.c
- create mode 100644 arch/riscv/mm/ioremap.c
+ arch/riscv/include/asm/bug.h   |  88 ++++++++++++++
+ arch/riscv/include/asm/cache.h |  22 ++++
+ arch/riscv/include/asm/smp.h   |  52 ++++++++
+ arch/riscv/kernel/cacheinfo.c  | 105 +++++++++++++++++
+ arch/riscv/kernel/cpu.c        |  89 ++++++++++++++
+ arch/riscv/kernel/head.S       | 151 ++++++++++++++++++++++++
+ arch/riscv/kernel/irq.c        |  20 ++++
+ arch/riscv/kernel/reset.c      |  36 ++++++
+ arch/riscv/kernel/setup.c      | 261 +++++++++++++++++++++++++++++++++++++++++
+ arch/riscv/kernel/smp.c        | 110 +++++++++++++++++
+ arch/riscv/kernel/smpboot.c    | 112 ++++++++++++++++++
+ arch/riscv/kernel/time.c       |  76 ++++++++++++
+ arch/riscv/kernel/traps.c      | 180 ++++++++++++++++++++++++++++
+ arch/riscv/kernel/vdso.c       | 125 ++++++++++++++++++++
+ arch/riscv/mm/init.c           |  70 +++++++++++
+ 15 files changed, 1497 insertions(+)
+ create mode 100644 arch/riscv/include/asm/bug.h
+ create mode 100644 arch/riscv/include/asm/cache.h
+ create mode 100644 arch/riscv/include/asm/smp.h
+ create mode 100644 arch/riscv/kernel/cacheinfo.c
+ create mode 100644 arch/riscv/kernel/cpu.c
+ create mode 100644 arch/riscv/kernel/head.S
+ create mode 100644 arch/riscv/kernel/irq.c
+ create mode 100644 arch/riscv/kernel/reset.c
+ create mode 100644 arch/riscv/kernel/setup.c
+ create mode 100644 arch/riscv/kernel/smp.c
+ create mode 100644 arch/riscv/kernel/smpboot.c
+ create mode 100644 arch/riscv/kernel/time.c
+ create mode 100644 arch/riscv/kernel/traps.c
+ create mode 100644 arch/riscv/kernel/vdso.c
+ create mode 100644 arch/riscv/mm/init.c
 
-diff --git a/arch/riscv/include/asm/delay.h b/arch/riscv/include/asm/delay.h
+diff --git a/arch/riscv/include/asm/bug.h b/arch/riscv/include/asm/bug.h
 new file mode 100644
-index 000000000000..cbb0c9eb96cb
+index 000000000000..c3e13764a943
 --- /dev/null
-+++ b/arch/riscv/include/asm/delay.h
-@@ -0,0 +1,28 @@
++++ b/arch/riscv/include/asm/bug.h
+@@ -0,0 +1,88 @@
 +/*
-+ * Copyright (C) 2009 Chen Liqin <liqin.chen@sunplusct.com>
-+ * Copyright (C) 2016 Regents of the University of California
++ * Copyright (C) 2012 Regents of the University of California
 + *
 + *   This program is free software; you can redistribute it and/or
 + *   modify it under the terms of the GNU General Public License
@@ -64,70 +74,536 @@ index 000000000000..cbb0c9eb96cb
 + *   GNU General Public License for more details.
 + */
 +
-+#ifndef _ASM_RISCV_DELAY_H
-+#define _ASM_RISCV_DELAY_H
++#ifndef _ASM_RISCV_BUG_H
++#define _ASM_RISCV_BUG_H
 +
-+extern unsigned long riscv_timebase;
++#include <linux/compiler.h>
++#include <linux/const.h>
++#include <linux/types.h>
 +
-+#define udelay udelay
-+extern void udelay(unsigned long usecs);
++#include <asm/asm.h>
 +
-+#define ndelay ndelay
-+extern void ndelay(unsigned long nsecs);
++#ifdef CONFIG_GENERIC_BUG
++#define __BUG_INSN	_AC(0x00100073, UL) /* ebreak */
 +
-+extern void __delay(unsigned long cycles);
++#ifndef __ASSEMBLY__
++typedef u32 bug_insn_t;
 +
-+#endif /* _ASM_RISCV_DELAY_H */
-diff --git a/arch/riscv/include/asm/dma-mapping.h b/arch/riscv/include/asm/dma-mapping.h
++#ifdef CONFIG_GENERIC_BUG_RELATIVE_POINTERS
++#define __BUG_ENTRY_ADDR	INT " 1b - 2b"
++#define __BUG_ENTRY_FILE	INT " %0 - 2b"
++#else
++#define __BUG_ENTRY_ADDR	RISCV_PTR " 1b"
++#define __BUG_ENTRY_FILE	RISCV_PTR " %0"
++#endif
++
++#ifdef CONFIG_DEBUG_BUGVERBOSE
++#define __BUG_ENTRY			\
++	__BUG_ENTRY_ADDR "\n\t"		\
++	__BUG_ENTRY_FILE "\n\t"		\
++	SHORT " %1"
++#else
++#define __BUG_ENTRY			\
++	__BUG_ENTRY_ADDR
++#endif
++
++#define BUG()							\
++do {								\
++	__asm__ __volatile__ (					\
++		"1:\n\t"					\
++			"ebreak\n"				\
++			".pushsection __bug_table,\"a\"\n\t"	\
++		"2:\n\t"					\
++			__BUG_ENTRY "\n\t"			\
++			".org 2b + %2\n\t"			\
++			".popsection"				\
++		:						\
++		: "i" (__FILE__), "i" (__LINE__),		\
++		  "i" (sizeof(struct bug_entry)));		\
++	unreachable();						\
++} while (0)
++#endif /* !__ASSEMBLY__ */
++#else /* CONFIG_GENERIC_BUG */
++#ifndef __ASSEMBLY__
++#define BUG()							\
++do {								\
++	__asm__ __volatile__ ("ebreak\n");			\
++	unreachable();						\
++} while (0)
++#endif /* !__ASSEMBLY__ */
++#endif /* CONFIG_GENERIC_BUG */
++
++#define HAVE_ARCH_BUG
++
++#include <asm-generic/bug.h>
++
++#ifndef __ASSEMBLY__
++
++struct pt_regs;
++struct task_struct;
++
++extern void die(struct pt_regs *regs, const char *str);
++extern void do_trap(struct pt_regs *regs, int signo, int code,
++	unsigned long addr, struct task_struct *tsk);
++
++#endif /* !__ASSEMBLY__ */
++
++#endif /* _ASM_RISCV_BUG_H */
+diff --git a/arch/riscv/include/asm/cache.h b/arch/riscv/include/asm/cache.h
 new file mode 100644
-index 000000000000..3eec1000196d
+index 000000000000..e8f0d1110d74
 --- /dev/null
-+++ b/arch/riscv/include/asm/dma-mapping.h
-@@ -0,0 +1,38 @@
++++ b/arch/riscv/include/asm/cache.h
+@@ -0,0 +1,22 @@
 +/*
-+ * Copyright (C) 2003-2004 Hewlett-Packard Co
-+ *	David Mosberger-Tang <davidm@hpl.hp.com>
-+ * Copyright (C) 2012 ARM Ltd.
-+ * Copyright (C) 2016 SiFive, Inc.
++ * Copyright (C) 2017 Chen Liqin <liqin.chen@sunplusct.com>
++ * Copyright (C) 2012 Regents of the University of California
 + *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
++ *   This program is free software; you can redistribute it and/or
++ *   modify it under the terms of the GNU General Public License
++ *   as published by the Free Software Foundation, version 2.
 + *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
++ *   This program is distributed in the hope that it will be useful,
++ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *   GNU General Public License for more details.
 + */
-+#ifndef __ASM_RISCV_DMA_MAPPING_H
-+#define __ASM_RISCV_DMA_MAPPING_H
 +
-+/* Use ops->dma_mapping_error (if it exists) or assume success */
-+// #undef DMA_ERROR_CODE
++#ifndef _ASM_RISCV_CACHE_H
++#define _ASM_RISCV_CACHE_H
 +
-+static inline const struct dma_map_ops *get_arch_dma_ops(struct bus_type *bus)
-+{
-+	return &dma_noop_ops;
-+}
++#define L1_CACHE_SHIFT		6
 +
-+static inline bool dma_capable(struct device *dev, dma_addr_t addr, size_t size)
-+{
-+	if (!dev->dma_mask)
-+		return false;
++#define L1_CACHE_BYTES		(1 << L1_CACHE_SHIFT)
 +
-+	return addr + size - 1 <= *dev->dma_mask;
-+}
-+
-+#endif	/* __ASM_RISCV_DMA_MAPPING_H */
-diff --git a/arch/riscv/include/asm/irq.h b/arch/riscv/include/asm/irq.h
++#endif /* _ASM_RISCV_CACHE_H */
+diff --git a/arch/riscv/include/asm/smp.h b/arch/riscv/include/asm/smp.h
 new file mode 100644
-index 000000000000..4dee9d4c13c0
+index 000000000000..be872bf5a1cd
 --- /dev/null
-+++ b/arch/riscv/include/asm/irq.h
-@@ -0,0 +1,28 @@
++++ b/arch/riscv/include/asm/smp.h
+@@ -0,0 +1,52 @@
++/*
++ * Copyright (C) 2012 Regents of the University of California
++ *
++ *   This program is free software; you can redistribute it and/or
++ *   modify it under the terms of the GNU General Public License
++ *   as published by the Free Software Foundation, version 2.
++ *
++ *   This program is distributed in the hope that it will be useful,
++ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *   GNU General Public License for more details.
++ */
++
++#ifndef _ASM_RISCV_SMP_H
++#define _ASM_RISCV_SMP_H
++
++/* This both needs asm-offsets.h and is used when generating it. */
++#ifndef GENERATING_ASM_OFFSETS
++#include <asm/asm-offsets.h>
++#endif
++
++#include <linux/cpumask.h>
++#include <linux/irqreturn.h>
++
++#ifdef CONFIG_SMP
++
++/* SMP initialization hook for setup_arch */
++void __init init_clockevent(void);
++
++/* SMP initialization hook for setup_arch */
++void __init setup_smp(void);
++
++/* Hook for the generic smp_call_function_many() routine. */
++void arch_send_call_function_ipi_mask(struct cpumask *mask);
++
++/* Hook for the generic smp_call_function_single() routine. */
++void arch_send_call_function_single_ipi(int cpu);
++
++/*
++ * This is particularly ugly: it appears we can't actually get the definition
++ * of task_struct here, but we need access to the CPU this task is running on.
++ * Instead of using C we're using asm-offsets.h to get the current processor
++ * ID.
++ */
++#define raw_smp_processor_id() (*((int*)((char*)get_current() + TASK_CPU)))
++
++/* Interprocessor interrupt handler */
++irqreturn_t handle_ipi(void);
++
++#endif /* CONFIG_SMP */
++
++#endif /* _ASM_RISCV_SMP_H */
+diff --git a/arch/riscv/kernel/cacheinfo.c b/arch/riscv/kernel/cacheinfo.c
+new file mode 100644
+index 000000000000..10ed2749e246
+--- /dev/null
++++ b/arch/riscv/kernel/cacheinfo.c
+@@ -0,0 +1,105 @@
++/*
++ * Copyright (C) 2017 SiFive
++ *
++ *   This program is free software; you can redistribute it and/or
++ *   modify it under the terms of the GNU General Public License
++ *   as published by the Free Software Foundation, version 2.
++ *
++ *   This program is distributed in the hope that it will be useful,
++ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *   GNU General Public License for more details.
++ */
++
++#include <linux/cacheinfo.h>
++#include <linux/cpu.h>
++#include <linux/of.h>
++#include <linux/of_device.h>
++
++static void ci_leaf_init(struct cacheinfo *this_leaf,
++			 struct device_node *node,
++			 enum cache_type type, unsigned int level)
++{
++	this_leaf->of_node = node;
++	this_leaf->level = level;
++	this_leaf->type = type;
++	/* not a sector cache */
++	this_leaf->physical_line_partition = 1;
++	/* TODO: Add to DTS */
++	this_leaf->attributes =
++		CACHE_WRITE_BACK
++		| CACHE_READ_ALLOCATE
++		| CACHE_WRITE_ALLOCATE;
++}
++
++static int __init_cache_level(unsigned int cpu)
++{
++	struct cpu_cacheinfo *this_cpu_ci = get_cpu_cacheinfo(cpu);
++	struct device_node *np = of_cpu_device_node_get(cpu);
++	int levels = 0, leaves = 0, level;
++
++	if (of_property_read_bool(np, "cache-size"))
++		++leaves;
++	if (of_property_read_bool(np, "i-cache-size"))
++		++leaves;
++	if (of_property_read_bool(np, "d-cache-size"))
++		++leaves;
++	if (leaves > 0)
++		levels = 1;
++
++	while ((np = of_find_next_cache_node(np))) {
++		if (!of_device_is_compatible(np, "cache"))
++			break;
++		if (of_property_read_u32(np, "cache-level", &level))
++			break;
++		if (level <= levels)
++			break;
++		if (of_property_read_bool(np, "cache-size"))
++			++leaves;
++		if (of_property_read_bool(np, "i-cache-size"))
++			++leaves;
++		if (of_property_read_bool(np, "d-cache-size"))
++			++leaves;
++		levels = level;
++	}
++
++	this_cpu_ci->num_levels = levels;
++	this_cpu_ci->num_leaves = leaves;
++	return 0;
++}
++
++static int __populate_cache_leaves(unsigned int cpu)
++{
++	struct cpu_cacheinfo *this_cpu_ci = get_cpu_cacheinfo(cpu);
++	struct cacheinfo *this_leaf = this_cpu_ci->info_list;
++	struct device_node *np = of_cpu_device_node_get(cpu);
++	int levels = 1, level = 1;
++
++	if (of_property_read_bool(np, "cache-size"))
++		ci_leaf_init(this_leaf++, np, CACHE_TYPE_UNIFIED, level);
++	if (of_property_read_bool(np, "i-cache-size"))
++		ci_leaf_init(this_leaf++, np, CACHE_TYPE_INST, level);
++	if (of_property_read_bool(np, "d-cache-size"))
++		ci_leaf_init(this_leaf++, np, CACHE_TYPE_DATA, level);
++
++	while ((np = of_find_next_cache_node(np))) {
++		if (!of_device_is_compatible(np, "cache"))
++			break;
++		if (of_property_read_u32(np, "cache-level", &level))
++			break;
++		if (level <= levels)
++			break;
++		if (of_property_read_bool(np, "cache-size"))
++			ci_leaf_init(this_leaf++, np, CACHE_TYPE_UNIFIED, level);
++		if (of_property_read_bool(np, "i-cache-size"))
++			ci_leaf_init(this_leaf++, np, CACHE_TYPE_INST, level);
++		if (of_property_read_bool(np, "d-cache-size"))
++			ci_leaf_init(this_leaf++, np, CACHE_TYPE_DATA, level);
++		levels = level;
++	}
++
++	return 0;
++}
++
++DEFINE_SMP_CALL_CACHE_FUNCTION(init_cache_level)
++DEFINE_SMP_CALL_CACHE_FUNCTION(populate_cache_leaves)
+diff --git a/arch/riscv/kernel/cpu.c b/arch/riscv/kernel/cpu.c
+new file mode 100644
+index 000000000000..20004bd7a216
+--- /dev/null
++++ b/arch/riscv/kernel/cpu.c
+@@ -0,0 +1,89 @@
++/*
++ * Copyright (C) 2012 Regents of the University of California
++ *
++ *   This program is free software; you can redistribute it and/or
++ *   modify it under the terms of the GNU General Public License
++ *   as published by the Free Software Foundation, version 2.
++ *
++ *   This program is distributed in the hope that it will be useful,
++ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *   GNU General Public License for more details.
++ */
++
++#include <linux/init.h>
++#include <linux/seq_file.h>
++#include <linux/of.h>
++
++/* Return -1 if not a valid hart */
++int riscv_of_processor_hart(struct device_node *node)
++{
++	const char *isa, *status;
++	u32 hart;
++
++	if (!of_device_is_compatible(node, "riscv"))
++		return -(ENODEV);
++	if (of_property_read_u32(node, "reg", &hart)
++	    || hart >= NR_CPUS)
++		return -(ENODEV);
++	if (of_property_read_string(node, "status", &status)
++	    || strcmp(status, "okay"))
++		return -(ENODEV);
++	if (of_property_read_string(node, "riscv,isa", &isa)
++	    || isa[0] != 'r'
++	    || isa[1] != 'v')
++		return -(ENODEV);
++
++	return hart;
++}
++
++#ifdef CONFIG_PROC_FS
++
++static void *c_start(struct seq_file *m, loff_t *pos)
++{
++	*pos = cpumask_next(*pos - 1, cpu_online_mask);
++	if ((*pos) < nr_cpu_ids)
++		return (void *)(uintptr_t)(1 + *pos);
++	return NULL;
++}
++
++static void *c_next(struct seq_file *m, void *v, loff_t *pos)
++{
++	(*pos)++;
++	return c_start(m, pos);
++}
++
++static void c_stop(struct seq_file *m, void *v)
++{
++}
++
++static int c_show(struct seq_file *m, void *v)
++{
++	unsigned long hart_id = (unsigned long)v - 1;
++	struct device_node *node = of_get_cpu_node(hart_id, NULL);
++	const char *compat, *isa, *mmu;
++
++	seq_printf(m, "hart\t: %lu\n", hart_id);
++	if (!of_property_read_string(node, "riscv,isa", &isa)
++	    && isa[0] == 'r'
++	    && isa[1] == 'v')
++		seq_printf(m, "isa\t: %s\n", isa);
++	if (!of_property_read_string(node, "mmu-type", &mmu)
++	    && !strncmp(mmu, "riscv,", 6))
++		seq_printf(m, "mmu\t: %s\n", mmu+6);
++	if (!of_property_read_string(node, "compatible", &compat)
++	    && strcmp(compat, "riscv"))
++		seq_printf(m, "uarch\t: %s\n", compat);
++	seq_puts(m, "\n");
++
++	return 0;
++}
++
++const struct seq_operations cpuinfo_op = {
++	.start	= c_start,
++	.next	= c_next,
++	.stop	= c_stop,
++	.show	= c_show
++};
++
++#endif /* CONFIG_PROC_FS */
+diff --git a/arch/riscv/kernel/head.S b/arch/riscv/kernel/head.S
+new file mode 100644
+index 000000000000..708b70ec0795
+--- /dev/null
++++ b/arch/riscv/kernel/head.S
+@@ -0,0 +1,151 @@
++/*
++ * Copyright (C) 2012 Regents of the University of California
++ *
++ *   This program is free software; you can redistribute it and/or
++ *   modify it under the terms of the GNU General Public License
++ *   as published by the Free Software Foundation, version 2.
++ *
++ *   This program is distributed in the hope that it will be useful,
++ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *   GNU General Public License for more details.
++ */
++
++#include <asm/thread_info.h>
++#include <asm/asm-offsets.h>
++#include <asm/asm.h>
++#include <linux/init.h>
++#include <linux/linkage.h>
++#include <asm/thread_info.h>
++#include <asm/page.h>
++#include <asm/csr.h>
++
++__INIT
++ENTRY(_start)
++	/* Mask all interrupts */
++	csrw sie, zero
++
++	/* Load the global pointer */
++.option push
++.option norelax
++	la gp, __global_pointer$
++.option pop
++
++	/*
++	 * Disable FPU to detect illegal usage of
++	 * floating point in kernel space
++	 */
++	li t0, SR_FS
++	csrc sstatus, t0
++
++	/* Pick one hart to run the main boot sequence */
++	la a3, hart_lottery
++	li a2, 1
++	amoadd.w a3, a2, (a3)
++	bnez a3, .Lsecondary_start
++
++	/* Save hart ID and DTB physical address */
++	mv s0, a0
++	mv s1, a1
++
++	/* Initialize page tables and relocate to virtual addresses */
++	la sp, init_thread_union + THREAD_SIZE
++	call setup_vm
++	call relocate
++
++	/* Restore C environment */
++	la tp, init_task
++
++	la sp, init_thread_union
++	li a0, ASM_THREAD_SIZE
++	add sp, sp, a0
++
++	/* Start the kernel */
++	mv a0, s0
++	mv a1, s1
++	call sbi_save
++	tail start_kernel
++
++relocate:
++	/* Relocate return address */
++	li a1, PAGE_OFFSET
++	la a0, _start
++	sub a1, a1, a0
++	add ra, ra, a1
++
++	/* Point stvec to virtual address of intruction after sptbr write */
++	la a0, 1f
++	add a0, a0, a1
++	csrw stvec, a0
++
++	/* Compute sptbr for kernel page tables, but don't load it yet */
++	la a2, swapper_pg_dir
++	srl a2, a2, PAGE_SHIFT
++	li a1, SPTBR_MODE
++	or a2, a2, a1
++
++	/*
++	 * Load trampoline page directory, which will cause us to trap to
++	 * stvec if VA != PA, or simply fall through if VA == PA
++	 */
++	la a0, trampoline_pg_dir
++	srl a0, a0, PAGE_SHIFT
++	or a0, a0, a1
++	sfence.vma
++	csrw sptbr, a0
++1:
++	/* Set trap vector to spin forever to help debug */
++	la a0, .Lsecondary_park
++	csrw stvec, a0
++
++	/* Reload the global pointer */
++.option push
++.option norelax
++	la gp, __global_pointer$
++.option pop
++
++	/* Switch to kernel page tables */
++	csrw sptbr, a2
++
++	ret
++
++.Lsecondary_start:
++#ifdef CONFIG_SMP
++	li a1, CONFIG_NR_CPUS
++	bgeu a0, a1, .Lsecondary_park
++
++	slli a0, a0, LGREG
++	la a1, __cpu_up_stack_pointer
++	la a2, __cpu_up_task_pointer
++	add a1, a0, a1
++	add a2, a0, a2
++
++	/*
++	 * This hart didn't win the lottery, so we wait for the winning hart to
++	 * get far enough along the boot process that it should continue.
++	 */
++.Lwait_for_cpu_up:
++	REG_L sp, (a1)
++	REG_L tp, (a2)
++	beqz sp, .Lwait_for_cpu_up
++	beqz tp, .Lwait_for_cpu_up
++	fence
++
++	/* Enable virtual memory and relocate to virtual address */
++	call relocate
++
++	tail smp_callin
++#endif
++
++.Lsecondary_park:
++	/* We lack SMP support or have too many harts, so park this hart */
++	wfi
++	j .Lsecondary_park
++END(_start)
++
++__PAGE_ALIGNED_BSS
++	/* Empty zero page */
++	.balign PAGE_SIZE
++ENTRY(empty_zero_page)
++	.fill (empty_zero_page + PAGE_SIZE) - ., 1, 0x00
++END(empty_zero_page)
+diff --git a/arch/riscv/kernel/irq.c b/arch/riscv/kernel/irq.c
+new file mode 100644
+index 000000000000..737d7cce2c6d
+--- /dev/null
++++ b/arch/riscv/kernel/irq.c
+@@ -0,0 +1,20 @@
 +/*
 + * Copyright (C) 2012 Regents of the University of California
 + * Copyright (C) 2017 SiFive
@@ -142,26 +618,18 @@ index 000000000000..4dee9d4c13c0
 + *   GNU General Public License for more details.
 + */
 +
-+#ifndef _ASM_RISCV_IRQ_H
-+#define _ASM_RISCV_IRQ_H
++#include <linux/irqchip.h>
 +
-+#define NR_IRQS         0
-+
-+#define INTERRUPT_CAUSE_SOFTWARE    1
-+#define INTERRUPT_CAUSE_TIMER       5
-+#define INTERRUPT_CAUSE_EXTERNAL    9
-+
-+void riscv_timer_interrupt(void);
-+
-+#include <asm-generic/irq.h>
-+
-+#endif /* _ASM_RISCV_IRQ_H */
-diff --git a/arch/riscv/include/asm/irqflags.h b/arch/riscv/include/asm/irqflags.h
++void __init init_IRQ(void)
++{
++	irqchip_init();
++}
+diff --git a/arch/riscv/kernel/reset.c b/arch/riscv/kernel/reset.c
 new file mode 100644
-index 000000000000..6fdc860d7f84
+index 000000000000..2a53d26ffdd6
 --- /dev/null
-+++ b/arch/riscv/include/asm/irqflags.h
-@@ -0,0 +1,63 @@
++++ b/arch/riscv/kernel/reset.c
+@@ -0,0 +1,36 @@
 +/*
 + * Copyright (C) 2012 Regents of the University of California
 + *
@@ -175,287 +643,618 @@ index 000000000000..6fdc860d7f84
 + *   GNU General Public License for more details.
 + */
 +
++#include <linux/reboot.h>
++#include <linux/export.h>
++#include <asm/sbi.h>
 +
-+#ifndef _ASM_RISCV_IRQFLAGS_H
-+#define _ASM_RISCV_IRQFLAGS_H
++void (*pm_power_off)(void) = machine_power_off;
++EXPORT_SYMBOL(pm_power_off);
 +
-+#include <asm/processor.h>
-+#include <asm/csr.h>
-+
-+/* read interrupt enabled status */
-+static inline unsigned long arch_local_save_flags(void)
++void machine_restart(char *cmd)
 +{
-+	return csr_read(sstatus);
++	do_kernel_restart(cmd);
++	while (1);
 +}
 +
-+/* unconditionally enable interrupts */
-+static inline void arch_local_irq_enable(void)
++void machine_halt(void)
 +{
-+	csr_set(sstatus, SR_IE);
++	machine_power_off();
 +}
 +
-+/* unconditionally disable interrupts */
-+static inline void arch_local_irq_disable(void)
++void machine_power_off(void)
 +{
-+	csr_clear(sstatus, SR_IE);
++	sbi_shutdown();
++	while (1);
 +}
-+
-+/* get status and disable interrupts */
-+static inline unsigned long arch_local_irq_save(void)
-+{
-+	return csr_read_clear(sstatus, SR_IE);
-+}
-+
-+/* test flags */
-+static inline int arch_irqs_disabled_flags(unsigned long flags)
-+{
-+	return !(flags & SR_IE);
-+}
-+
-+/* test hardware interrupt enable bit */
-+static inline int arch_irqs_disabled(void)
-+{
-+	return arch_irqs_disabled_flags(arch_local_save_flags());
-+}
-+
-+/* set interrupt enabled status */
-+static inline void arch_local_irq_restore(unsigned long flags)
-+{
-+	csr_set(sstatus, flags & SR_IE);
-+}
-+
-+#endif /* _ASM_RISCV_IRQFLAGS_H */
-diff --git a/arch/riscv/include/asm/pci.h b/arch/riscv/include/asm/pci.h
+diff --git a/arch/riscv/kernel/setup.c b/arch/riscv/kernel/setup.c
 new file mode 100644
-index 000000000000..285747fa2ef0
+index 000000000000..148fd0dc414b
 --- /dev/null
-+++ b/arch/riscv/include/asm/pci.h
-@@ -0,0 +1,48 @@
++++ b/arch/riscv/kernel/setup.c
+@@ -0,0 +1,261 @@
 +/*
-+ * Copyright (C) 2016 SiFive
++ * Copyright (C) 2009 Sunplus Core Technology Co., Ltd.
++ *  Chen Liqin <liqin.chen@sunplusct.com>
++ *  Lennox Wu <lennox.wu@sunplusct.com>
++ * Copyright (C) 2012 Regents of the University of California
 + *
-+ *   This program is free software; you can redistribute it and/or
-+ *   modify it under the terms of the GNU General Public License
-+ *   as published by the Free Software Foundation, version 2.
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
 + *
-+ *   This program is distributed in the hope that it will be useful,
-+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *   GNU General Public License for more details.
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program; if not, see the file COPYING, or write
++ * to the Free Software Foundation, Inc.,
 + */
 +
-+#ifndef __ASM_RISCV_PCI_H
-+#define __ASM_RISCV_PCI_H
++#include <linux/init.h>
++#include <linux/mm.h>
++#include <linux/memblock.h>
++#include <linux/sched.h>
++#include <linux/initrd.h>
++#include <linux/console.h>
++#include <linux/screen_info.h>
++#include <linux/of_fdt.h>
++#include <linux/of_platform.h>
++#include <linux/sched/task.h>
 +
-+#include <linux/types.h>
-+#include <linux/slab.h>
-+#include <linux/dma-mapping.h>
++#include <asm/setup.h>
++#include <asm/sections.h>
++#include <asm/pgtable.h>
++#include <asm/smp.h>
++#include <asm/sbi.h>
++#include <asm/tlbflush.h>
++#include <asm/thread_info.h>
 +
-+#include <asm/io.h>
++#ifdef CONFIG_DUMMY_CONSOLE
++struct screen_info screen_info = {
++	.orig_video_lines	= 30,
++	.orig_video_cols	= 80,
++	.orig_video_mode	= 0,
++	.orig_video_ega_bx	= 0,
++	.orig_video_isVGA	= 1,
++	.orig_video_points	= 8
++};
++#endif
 +
-+#define PCIBIOS_MIN_IO		0
-+#define PCIBIOS_MIN_MEM		0
++#ifdef CONFIG_CMDLINE_BOOL
++static char __initdata builtin_cmdline[COMMAND_LINE_SIZE] = CONFIG_CMDLINE;
++#endif /* CONFIG_CMDLINE_BOOL */
 +
-+/* RISC-V shim does not initialize PCI bus */
-+#define pcibios_assign_all_busses() 1
++unsigned long va_pa_offset;
++unsigned long pfn_base;
 +
-+/* RISC-V TileLink and PCIe share the share address space */
-+#define PCI_DMA_BUS_IS_PHYS 1
++/* The lucky hart to first increment this variable will boot the other cores */
++atomic_t hart_lottery;
 +
-+extern int isa_dma_bridge_buggy;
-+
-+#ifdef CONFIG_PCI
-+static inline int pci_get_legacy_ide_irq(struct pci_dev *dev, int channel)
-+{
-+	/* no legacy IRQ on risc-v */
-+	return -ENODEV;
-+}
-+
-+static inline int pci_proc_domain(struct pci_bus *bus)
-+{
-+	/* always show the domain in /proc */
-+	return 1;
-+}
-+#endif  /* CONFIG_PCI */
-+
-+#endif  /* __ASM_PCI_H */
-diff --git a/arch/riscv/include/asm/sbi.h b/arch/riscv/include/asm/sbi.h
-new file mode 100644
-index 000000000000..b6bb10b92fe2
---- /dev/null
-+++ b/arch/riscv/include/asm/sbi.h
-@@ -0,0 +1,100 @@
++#if defined(CONFIG_HVC_RISCV_SBI) && defined(CONFIG_EARLY_PRINTK)
 +/*
++ * The SBI's early console lives in hvc_riscv_sbi.c, but we want very early
++ * access
++ */
++extern struct console riscv_sbi_early_console_dev;
++#endif
++
++#ifdef CONFIG_BLK_DEV_INITRD
++static void __init setup_initrd(void)
++{
++	extern char __initramfs_start[];
++	extern unsigned long __initramfs_size;
++	unsigned long size;
++
++	if (__initramfs_size > 0) {
++		initrd_start = (unsigned long)(&__initramfs_start);
++		initrd_end = initrd_start + __initramfs_size;
++	}
++
++	if (initrd_start >= initrd_end) {
++		printk(KERN_INFO "initrd not found or empty");
++		goto disable;
++	}
++	if (__pa(initrd_end) > PFN_PHYS(max_low_pfn)) {
++		printk(KERN_ERR "initrd extends beyond end of memory");
++		goto disable;
++	}
++
++	size =  initrd_end - initrd_start;
++	memblock_reserve(__pa(initrd_start), size);
++	initrd_below_start_ok = 1;
++
++	printk(KERN_INFO "Initial ramdisk at: 0x%p (%lu bytes)\n",
++		(void *)(initrd_start), size);
++	return;
++disable:
++	pr_cont(" - disabling initrd\n");
++	initrd_start = 0;
++	initrd_end = 0;
++}
++#endif /* CONFIG_BLK_DEV_INITRD */
++
++pgd_t swapper_pg_dir[PTRS_PER_PGD] __page_aligned_bss;
++pgd_t trampoline_pg_dir[PTRS_PER_PGD] __initdata __aligned(PAGE_SIZE);
++
++#ifndef __PAGETABLE_PMD_FOLDED
++#define NUM_SWAPPER_PMDS ((uintptr_t)-PAGE_OFFSET >> PGDIR_SHIFT)
++pmd_t swapper_pmd[PTRS_PER_PMD*((-PAGE_OFFSET)/PGDIR_SIZE)] __page_aligned_bss;
++pmd_t trampoline_pmd[PTRS_PER_PGD] __initdata __aligned(PAGE_SIZE);
++#endif
++
++asmlinkage void __init setup_vm(void)
++{
++	extern char _start;
++	uintptr_t i;
++	uintptr_t pa = (uintptr_t) &_start;
++	pgprot_t prot = __pgprot(pgprot_val(PAGE_KERNEL) | _PAGE_EXEC);
++
++	va_pa_offset = PAGE_OFFSET - pa;
++	pfn_base = PFN_DOWN(pa);
++
++	/* Sanity check alignment and size */
++	BUG_ON((PAGE_OFFSET % PGDIR_SIZE) != 0);
++	BUG_ON((pa % (PAGE_SIZE * PTRS_PER_PTE)) != 0);
++
++#ifndef __PAGETABLE_PMD_FOLDED
++	trampoline_pg_dir[(PAGE_OFFSET >> PGDIR_SHIFT) % PTRS_PER_PGD] =
++		pfn_pgd(PFN_DOWN((uintptr_t)trampoline_pmd),
++			__pgprot(_PAGE_TABLE));
++	trampoline_pmd[0] = pfn_pmd(PFN_DOWN(pa), prot);
++
++	for (i = 0; i < (-PAGE_OFFSET)/PGDIR_SIZE; ++i) {
++		size_t o = (PAGE_OFFSET >> PGDIR_SHIFT) % PTRS_PER_PGD + i;
++		swapper_pg_dir[o] =
++			pfn_pgd(PFN_DOWN((uintptr_t)swapper_pmd) + i,
++				__pgprot(_PAGE_TABLE));
++	}
++	for (i = 0; i < ARRAY_SIZE(swapper_pmd); i++)
++		swapper_pmd[i] = pfn_pmd(PFN_DOWN(pa + i * PMD_SIZE), prot);
++#else
++	trampoline_pg_dir[(PAGE_OFFSET >> PGDIR_SHIFT) % PTRS_PER_PGD] =
++		pfn_pgd(PFN_DOWN(pa), prot);
++
++	for (i = 0; i < (-PAGE_OFFSET)/PGDIR_SIZE; ++i) {
++		size_t o = (PAGE_OFFSET >> PGDIR_SHIFT) % PTRS_PER_PGD + i;
++		swapper_pg_dir[o] =
++			pfn_pgd(PFN_DOWN(pa + i * PGDIR_SIZE), prot);
++	}
++#endif
++}
++
++void __init sbi_save(unsigned int hartid, void *dtb)
++{
++	early_init_dt_scan(__va(dtb));
++}
++
++/*
++ * Allow the user to manually add a memory region (in case DTS is broken);
++ * "mem_end=nn[KkMmGg]"
++ */
++static int __init mem_end_override(char *p)
++{
++	resource_size_t base, end;
++
++	if (!p)
++		return -EINVAL;
++	base = (uintptr_t) __pa(PAGE_OFFSET);
++	end = memparse(p, &p) & PMD_MASK;
++	if (end == 0)
++		return -EINVAL;
++	memblock_add(base, end - base);
++	return 0;
++}
++early_param("mem_end", mem_end_override);
++
++static void __init setup_bootmem(void)
++{
++	struct memblock_region *reg;
++	phys_addr_t mem_size = 0;
++
++	/* Find the memory region containing the kernel */
++	for_each_memblock(memory, reg) {
++		phys_addr_t vmlinux_end = __pa(_end);
++		phys_addr_t end = reg->base + reg->size;
++
++		if (reg->base <= vmlinux_end && vmlinux_end <= end) {
++			/*
++			 * Reserve from the start of the region to the end of
++			 * the kernel
++			 */
++			memblock_reserve(reg->base, vmlinux_end - reg->base);
++			mem_size = min(reg->size, (phys_addr_t)-PAGE_OFFSET);
++		}
++	}
++	BUG_ON(mem_size == 0);
++
++	set_max_mapnr(PFN_DOWN(mem_size));
++	max_low_pfn = pfn_base + PFN_DOWN(mem_size);
++
++#ifdef CONFIG_BLK_DEV_INITRD
++	setup_initrd();
++#endif /* CONFIG_BLK_DEV_INITRD */
++
++	early_init_fdt_reserve_self();
++	early_init_fdt_scan_reserved_mem();
++	memblock_allow_resize();
++	memblock_dump_all();
++}
++
++void __init setup_arch(char **cmdline_p)
++{
++#if defined(CONFIG_TTY_RISCV_SBI) && defined(CONFIG_EARLY_PRINTK)
++	if (likely(early_console == NULL)) {
++		early_console = &riscv_sbi_early_console;
++		register_console(early_console);
++	}
++#endif
++
++#ifdef CONFIG_CMDLINE_BOOL
++#ifdef CONFIG_CMDLINE_OVERRIDE
++	strlcpy(boot_command_line, builtin_cmdline, COMMAND_LINE_SIZE);
++#else
++	if (builtin_cmdline[0] != '\0') {
++		/* Append bootloader command line to built-in */
++		strlcat(builtin_cmdline, " ", COMMAND_LINE_SIZE);
++		strlcat(builtin_cmdline, boot_command_line, COMMAND_LINE_SIZE);
++		strlcpy(boot_command_line, builtin_cmdline, COMMAND_LINE_SIZE);
++	}
++#endif /* CONFIG_CMDLINE_OVERRIDE */
++#endif /* CONFIG_CMDLINE_BOOL */
++	*cmdline_p = boot_command_line;
++
++	parse_early_param();
++
++	init_mm.start_code = (unsigned long) _stext;
++	init_mm.end_code   = (unsigned long) _etext;
++	init_mm.end_data   = (unsigned long) _edata;
++	init_mm.brk        = (unsigned long) _end;
++
++	setup_bootmem();
++	paging_init();
++	unflatten_device_tree();
++
++#ifdef CONFIG_SMP
++	setup_smp();
++#endif
++
++#ifdef CONFIG_DUMMY_CONSOLE
++	conswitchp = &dummy_con;
++#endif
++
++	riscv_fill_hwcap();
++}
++
++static int __init riscv_device_init(void)
++{
++	return of_platform_populate(NULL, of_default_bus_match_table, NULL, NULL);
++}
++subsys_initcall_sync(riscv_device_init);
+diff --git a/arch/riscv/kernel/smp.c b/arch/riscv/kernel/smp.c
+new file mode 100644
+index 000000000000..b4a71ec5906f
+--- /dev/null
++++ b/arch/riscv/kernel/smp.c
+@@ -0,0 +1,110 @@
++/*
++ * SMP initialisation and IPI support
++ * Based on arch/arm64/kernel/smp.c
++ *
++ * Copyright (C) 2012 ARM Ltd.
 + * Copyright (C) 2015 Regents of the University of California
++ * Copyright (C) 2017 SiFive
 + *
-+ *   This program is free software; you can redistribute it and/or
-+ *   modify it under the terms of the GNU General Public License
-+ *   as published by the Free Software Foundation, version 2.
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
 + *
-+ *   This program is distributed in the hope that it will be useful,
-+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *   GNU General Public License for more details.
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 + */
 +
-+#ifndef _ASM_RISCV_SBI_H
-+#define _ASM_RISCV_SBI_H
++#include <linux/interrupt.h>
++#include <linux/smp.h>
++#include <linux/sched.h>
 +
-+#include <linux/types.h>
++#include <asm/sbi.h>
++#include <asm/tlbflush.h>
++#include <asm/cacheflush.h>
 +
-+#define SBI_SET_TIMER 0
-+#define SBI_CONSOLE_PUTCHAR 1
-+#define SBI_CONSOLE_GETCHAR 2
-+#define SBI_CLEAR_IPI 3
-+#define SBI_SEND_IPI 4
-+#define SBI_REMOTE_FENCE_I 5
-+#define SBI_REMOTE_SFENCE_VMA 6
-+#define SBI_REMOTE_SFENCE_VMA_ASID 7
-+#define SBI_SHUTDOWN 8
++/* A collection of single bit ipi messages.  */
++static struct {
++	unsigned long bits ____cacheline_aligned;
++} ipi_data[NR_CPUS] __cacheline_aligned;
 +
-+#define SBI_CALL(which, arg0, arg1, arg2) ({			\
-+	register uintptr_t a0 asm ("a0") = (uintptr_t)(arg0);	\
-+	register uintptr_t a1 asm ("a1") = (uintptr_t)(arg1);	\
-+	register uintptr_t a2 asm ("a2") = (uintptr_t)(arg2);	\
-+	register uintptr_t a7 asm ("a7") = (uintptr_t)(which);	\
-+	asm volatile ("ecall"					\
-+		      : "+r" (a0)				\
-+		      : "r" (a1), "r" (a2), "r" (a7)		\
-+		      : "memory");				\
-+	a0;							\
-+})
++enum ipi_message_type {
++	IPI_RESCHEDULE,
++	IPI_CALL_FUNC,
++	IPI_MAX
++};
 +
-+/* Lazy implementations until SBI is finalized */
-+#define SBI_CALL_0(which) SBI_CALL(which, 0, 0, 0)
-+#define SBI_CALL_1(which, arg0) SBI_CALL(which, arg0, 0, 0)
-+#define SBI_CALL_2(which, arg0, arg1) SBI_CALL(which, arg0, arg1, 0)
-+
-+static inline void sbi_console_putchar(int ch)
++irqreturn_t handle_ipi(void)
 +{
-+	SBI_CALL_1(SBI_CONSOLE_PUTCHAR, ch);
++	unsigned long *pending_ipis = &ipi_data[smp_processor_id()].bits;
++
++	/* Clear pending IPI */
++	csr_clear(sip, SIE_SSIE);
++
++	while (true) {
++		unsigned long ops;
++
++		/* Order bit clearing and data access. */
++		mb();
++
++		ops = xchg(pending_ipis, 0);
++		if (ops == 0)
++			return IRQ_HANDLED;
++
++		if (ops & (1 << IPI_RESCHEDULE))
++			scheduler_ipi();
++
++		if (ops & (1 << IPI_CALL_FUNC))
++			generic_smp_call_function_interrupt();
++
++		BUG_ON((ops >> IPI_MAX) != 0);
++
++		/* Order data access and bit testing. */
++		mb();
++	}
++
++	return IRQ_HANDLED;
 +}
 +
-+static inline int sbi_console_getchar(void)
++static void
++send_ipi_message(const struct cpumask *to_whom, enum ipi_message_type operation)
 +{
-+	return SBI_CALL_0(SBI_CONSOLE_GETCHAR);
++	int i;
++
++	mb();
++	for_each_cpu(i, to_whom)
++		set_bit(operation, &ipi_data[i].bits);
++
++	mb();
++	sbi_send_ipi(cpumask_bits(to_whom));
 +}
 +
-+static inline void sbi_set_timer(uint64_t stime_value)
++void arch_send_call_function_ipi_mask(struct cpumask *mask)
 +{
-+#if __riscv_xlen == 32
-+	SBI_CALL_2(SBI_SET_TIMER, stime_value, stime_value >> 32);
-+#else
-+	SBI_CALL_1(SBI_SET_TIMER, stime_value);
-+#endif
++	send_ipi_message(mask, IPI_CALL_FUNC);
 +}
 +
-+static inline void sbi_shutdown(void)
++void arch_send_call_function_single_ipi(int cpu)
 +{
-+	SBI_CALL_0(SBI_SHUTDOWN);
++	send_ipi_message(cpumask_of(cpu), IPI_CALL_FUNC);
 +}
 +
-+static inline void sbi_clear_ipi(void)
++static void ipi_stop(void *unused)
 +{
-+	SBI_CALL_0(SBI_CLEAR_IPI);
++	while (1)
++		wait_for_interrupt();
 +}
 +
-+static inline void sbi_send_ipi(const unsigned long *hart_mask)
++void smp_send_stop(void)
 +{
-+	SBI_CALL_1(SBI_SEND_IPI, hart_mask);
++	on_each_cpu(ipi_stop, NULL, 1);
 +}
 +
-+static inline void sbi_remote_fence_i(const unsigned long *hart_mask)
++void smp_send_reschedule(int cpu)
 +{
-+	SBI_CALL_1(SBI_REMOTE_FENCE_I, hart_mask);
++	send_ipi_message(cpumask_of(cpu), IPI_RESCHEDULE);
 +}
-+
-+static inline void sbi_remote_sfence_vma(const unsigned long *hart_mask,
-+					 unsigned long start,
-+					 unsigned long size)
-+{
-+	SBI_CALL_1(SBI_REMOTE_SFENCE_VMA, hart_mask);
-+}
-+
-+static inline void sbi_remote_sfence_vma_asid(const unsigned long *hart_mask,
-+					      unsigned long start,
-+					      unsigned long size,
-+					      unsigned long asid)
-+{
-+	SBI_CALL_1(SBI_REMOTE_SFENCE_VMA_ASID, hart_mask);
-+}
-+
-+#endif
-diff --git a/arch/riscv/include/asm/timex.h b/arch/riscv/include/asm/timex.h
+diff --git a/arch/riscv/kernel/smpboot.c b/arch/riscv/kernel/smpboot.c
 new file mode 100644
-index 000000000000..3df4932d8964
+index 000000000000..30d8213593bf
 --- /dev/null
-+++ b/arch/riscv/include/asm/timex.h
-@@ -0,0 +1,59 @@
++++ b/arch/riscv/kernel/smpboot.c
+@@ -0,0 +1,112 @@
 +/*
-+ * Copyright (C) 2012 Regents of the University of California
++ * SMP initialisation and IPI support
++ * Based on arch/arm64/kernel/smp.c
 + *
-+ *   This program is free software; you can redistribute it and/or
-+ *   modify it under the terms of the GNU General Public License
-+ *   as published by the Free Software Foundation, version 2.
++ * Copyright (C) 2012 ARM Ltd.
++ * Copyright (C) 2015 Regents of the University of California
++ * Copyright (C) 2017 SiFive
 + *
-+ *   This program is distributed in the hope that it will be useful,
-+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *   GNU General Public License for more details.
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
 + */
 +
-+#ifndef _ASM_RISCV_TIMEX_H
-+#define _ASM_RISCV_TIMEX_H
++#include <linux/module.h>
++#include <linux/init.h>
++#include <linux/kernel.h>
++#include <linux/mm.h>
++#include <linux/sched.h>
++#include <linux/kernel_stat.h>
++#include <linux/notifier.h>
++#include <linux/cpu.h>
++#include <linux/percpu.h>
++#include <linux/delay.h>
++#include <linux/err.h>
++#include <linux/irq.h>
++#include <linux/of.h>
++#include <linux/sched/task_stack.h>
++#include <asm/irq.h>
++#include <asm/mmu_context.h>
++#include <asm/tlbflush.h>
++#include <asm/sections.h>
++#include <asm/sbi.h>
 +
-+#include <asm/param.h>
++void *__cpu_up_stack_pointer[NR_CPUS];
++void *__cpu_up_task_pointer[NR_CPUS];
 +
-+typedef unsigned long cycles_t;
-+
-+static inline cycles_t get_cycles(void)
++void __init smp_prepare_boot_cpu(void)
 +{
-+	cycles_t n;
-+
-+	__asm__ __volatile__ (
-+		"rdtime %0"
-+		: "=r" (n));
-+	return n;
 +}
 +
-+#ifdef CONFIG_64BIT
-+static inline uint64_t get_cycles64(void)
++void __init smp_prepare_cpus(unsigned int max_cpus)
 +{
-+        return get_cycles();
 +}
-+#else
-+static inline uint64_t get_cycles64(void)
++
++void __init setup_smp(void)
 +{
-+	u32 lo, hi, tmp;
-+	__asm__ __volatile__ (
-+		"1:\n"
-+		"rdtimeh %0\n"
-+		"rdtime %1\n"
-+		"rdtimeh %2\n"
-+		"bne %0, %2, 1b"
-+		: "=&r" (hi), "=&r" (lo), "=&r" (tmp));
-+	return ((u64)hi << 32) | lo;
++	struct device_node *dn = NULL;
++	int hart, im_okay_therefore_i_am = 0;
++
++	while ((dn = of_find_node_by_type(dn, "cpu"))) {
++		hart = riscv_of_processor_hart(dn);
++		if (hart >= 0) {
++			set_cpu_possible(hart, true);
++			set_cpu_present(hart, true);
++			if (hart == smp_processor_id()) {
++				BUG_ON(im_okay_therefore_i_am);
++				im_okay_therefore_i_am = 1;
++			}
++		}
++	}
++
++	BUG_ON(!im_okay_therefore_i_am);
 +}
-+#endif
 +
-+#define ARCH_HAS_READ_CURRENT_TIMER
-+
-+static inline int read_current_timer(unsigned long *timer_val)
++int __cpu_up(unsigned int cpu, struct task_struct *tidle)
 +{
-+	*timer_val = get_cycles();
++	/*
++	 * On RISC-V systems, all harts boot on their own accord.  Our _start
++	 * selects the first hart to boot the kernel and causes the remainder
++	 * of the harts to spin in a loop waiting for their stack pointer to be
++	 * setup by that main hart.  Writing __cpu_up_stack_pointer signals to
++	 * the spinning harts that they can continue the boot process.
++	 */
++	smp_mb();
++	__cpu_up_stack_pointer[cpu] = task_stack_page(tidle) + THREAD_SIZE;
++	__cpu_up_task_pointer[cpu] = tidle;
++
++	while (!cpu_online(cpu))
++		cpu_relax();
++
 +	return 0;
 +}
 +
-+#endif /* _ASM_RISCV_TIMEX_H */
-diff --git a/arch/riscv/lib/delay.c b/arch/riscv/lib/delay.c
++void __init smp_cpus_done(unsigned int max_cpus)
++{
++}
++
++/*
++ * C entry point for a secondary processor.
++ */
++asmlinkage void __init smp_callin(void)
++{
++	struct mm_struct *mm = &init_mm;
++
++	/* All kernel threads share the same mm context.  */
++	atomic_inc(&mm->mm_count);
++	current->active_mm = mm;
++
++	trap_init();
++	init_clockevent();
++	notify_cpu_starting(smp_processor_id());
++	set_cpu_online(smp_processor_id(), 1);
++	local_flush_tlb_all();
++	local_irq_enable();
++	preempt_disable();
++	cpu_startup_entry(CPUHP_AP_ONLINE_IDLE);
++}
+diff --git a/arch/riscv/kernel/time.c b/arch/riscv/kernel/time.c
 new file mode 100644
-index 000000000000..1cc4ac3964b4
+index 000000000000..6e72c61ba816
 --- /dev/null
-+++ b/arch/riscv/lib/delay.c
-@@ -0,0 +1,110 @@
++++ b/arch/riscv/kernel/time.c
+@@ -0,0 +1,76 @@
++/*
++ * Copyright (C) 2012 Regents of the University of California
++ * Copyright (C) 2017 SiFive
++ *
++ *   This program is free software; you can redistribute it and/or
++ *   modify it under the terms of the GNU General Public License
++ *   as published by the Free Software Foundation, version 2.
++ *
++ *   This program is distributed in the hope that it will be useful,
++ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *   GNU General Public License for more details.
++ */
++
++#include <linux/clocksource.h>
++#include <linux/clockchips.h>
++#include <linux/delay.h>
++#include <linux/timer_riscv.h>
++
++#include <asm/sbi.h>
++
++unsigned long riscv_timebase;
++
++static int next_event(unsigned long delta, struct clock_event_device *ce)
++{
++	/*
++	 * time_init() allocates a timer for each CPU.  Since we're writing the
++	 * timer comparison register here we can't allow the timers to cross
++	 * harts.
++	 */
++	BUG_ON(ce != timer_riscv_device(smp_processor_id()));
++	sbi_set_timer(get_cycles64() + delta);
++	return 0;
++}
++
++static unsigned long long rdtime(struct clocksource *cs)
++{
++	/*
++	 * It's guarnteed that all the timers across all the harts are
++	 * synchronized within one tick of each other, so while this could
++	 * technically go backwards when hopping between CPUs, practically it
++	 * won't happen.
++	 */
++	return get_cycles64();
++}
++
++void riscv_timer_interrupt(void)
++{
++	int cpu = smp_processor_id();
++	struct clock_event_device *evdev = timer_riscv_device(cpu);
++
++	evdev->event_handler(evdev);
++}
++
++void __init init_clockevent(void)
++{
++	int cpu_id = smp_processor_id();
++
++	timer_riscv_init(cpu_id, riscv_timebase, &rdtime, &next_event);
++	csr_set(sie, SIE_STIE);
++}
++
++void __init time_init(void)
++{
++	struct device_node *cpu;
++	u32 prop;
++
++	cpu = of_find_node_by_path("/cpus");
++	if (!cpu || of_property_read_u32(cpu, "timebase-frequency", &prop))
++		panic(KERN_WARNING "RISC-V system with no 'timebase-frequency' in DTS\n");
++	riscv_timebase = prop;
++
++	lpj_fine = riscv_timebase / HZ;
++
++	init_clockevent();
++}
+diff --git a/arch/riscv/kernel/traps.c b/arch/riscv/kernel/traps.c
+new file mode 100644
+index 000000000000..93132cb59184
+--- /dev/null
++++ b/arch/riscv/kernel/traps.c
+@@ -0,0 +1,180 @@
 +/*
 + * Copyright (C) 2012 Regents of the University of California
 + *
@@ -469,112 +1268,312 @@ index 000000000000..1cc4ac3964b4
 + *   GNU General Public License for more details.
 + */
 +
-+#include <linux/delay.h>
-+#include <linux/param.h>
-+#include <linux/timex.h>
-+#include <linux/export.h>
++#include <linux/kernel.h>
++#include <linux/init.h>
++#include <linux/sched.h>
++#include <linux/sched/debug.h>
++#include <linux/sched/signal.h>
++#include <linux/signal.h>
++#include <linux/kdebug.h>
++#include <linux/uaccess.h>
++#include <linux/mm.h>
++#include <linux/module.h>
++#include <linux/irq.h>
 +
-+/*
-+ * This is copies from arch/arm/include/asm/delay.h
-+ *
-+ * Loop (or tick) based delay:
-+ *
-+ * loops = loops_per_jiffy * jiffies_per_sec * delay_us / us_per_sec
-+ *
-+ * where:
-+ *
-+ * jiffies_per_sec = HZ
-+ * us_per_sec = 1000000
-+ *
-+ * Therefore the constant part is HZ / 1000000 which is a small
-+ * fractional number. To make this usable with integer math, we
-+ * scale up this constant by 2^31, perform the actual multiplication,
-+ * and scale the result back down by 2^31 with a simple shift:
-+ *
-+ * loops = (loops_per_jiffy * delay_us * UDELAY_MULT) >> 31
-+ *
-+ * where:
-+ *
-+ * UDELAY_MULT = 2^31 * HZ / 1000000
-+ *             = (2^31 / 1000000) * HZ
-+ *             = 2147.483648 * HZ
-+ *             = 2147 * HZ + 483648 * HZ / 1000000
-+ *
-+ * 31 is the biggest scale shift value that won't overflow 32 bits for
-+ * delay_us * UDELAY_MULT assuming HZ <= 1000 and delay_us <= 2000.
-+ */
-+#define MAX_UDELAY_US	2000
-+#define MAX_UDELAY_HZ	1000
-+#define UDELAY_MULT	(2147UL * HZ + 483648UL * HZ / 1000000UL)
-+#define UDELAY_SHIFT	31
++#include <asm/processor.h>
++#include <asm/ptrace.h>
++#include <asm/csr.h>
 +
-+#if HZ > MAX_UDELAY_HZ
-+#error "HZ > MAX_UDELAY_HZ"
-+#endif
++int show_unhandled_signals = 1;
 +
-+/*
-+ * RISC-V supports both UDELAY and NDELAY.  This is largely the same as above,
-+ * but with different constants.  I added 10 bits to the shift to get this, but
-+ * the result is that I need a 64-bit multiply, which is slow on 32-bit
-+ * platforms.
-+ *
-+ * NDELAY_MULT = 2^41 * HZ / 1000000000
-+ *             = (2^41 / 1000000000) * HZ
-+ *             = 2199.02325555 * HZ
-+ *             = 2199 * HZ + 23255550 * HZ / 1000000000
-+ *
-+ * The maximum here is to avoid 64-bit overflow, but it isn't checked as it
-+ * won't happen.
-+ */
-+#define MAX_NDELAY_NS   (1ULL << 42)
-+#define MAX_NDELAY_HZ	MAX_UDELAY_HZ
-+#define NDELAY_MULT	((unsigned long long)(2199ULL * HZ + 23255550ULL * HZ / 1000000000ULL))
-+#define NDELAY_SHIFT	41
++extern asmlinkage void handle_exception(void);
 +
-+#if HZ > MAX_NDELAY_HZ
-+#error "HZ > MAX_NDELAY_HZ"
-+#endif
++static DEFINE_SPINLOCK(die_lock);
 +
-+void __delay(unsigned long cycles)
++void die(struct pt_regs *regs, const char *str)
 +{
-+	u64 t0 = get_cycles();
++	static int die_counter;
++	int ret;
 +
-+	while ((unsigned long)(get_cycles() - t0) < cycles)
-+		cpu_relax();
++	oops_enter();
++
++	spin_lock_irq(&die_lock);
++	console_verbose();
++	bust_spinlocks(1);
++
++	pr_emerg("%s [#%d]\n", str, ++die_counter);
++	print_modules();
++	show_regs(regs);
++
++	ret = notify_die(DIE_OOPS, str, regs, 0, regs->scause, SIGSEGV);
++
++	bust_spinlocks(0);
++	add_taint(TAINT_DIE, LOCKDEP_NOW_UNRELIABLE);
++	spin_unlock_irq(&die_lock);
++	oops_exit();
++
++	if (in_interrupt())
++		panic("Fatal exception in interrupt");
++	if (panic_on_oops)
++		panic("Fatal exception");
++	if (ret != NOTIFY_STOP)
++		do_exit(SIGSEGV);
 +}
 +
-+void udelay(unsigned long usecs)
++static inline void do_trap_siginfo(int signo, int code,
++	unsigned long addr, struct task_struct *tsk)
 +{
-+	unsigned long ucycles = usecs * lpj_fine * UDELAY_MULT;
++	siginfo_t info;
 +
-+	if (unlikely(usecs > MAX_UDELAY_US)) {
-+		__delay((u64)usecs * riscv_timebase / 1000000ULL);
-+		return;
++	info.si_signo = signo;
++	info.si_errno = 0;
++	info.si_code = code;
++	info.si_addr = (void __user *)addr;
++	force_sig_info(signo, &info, tsk);
++}
++
++void do_trap(struct pt_regs *regs, int signo, int code,
++	unsigned long addr, struct task_struct *tsk)
++{
++	if (show_unhandled_signals && unhandled_signal(tsk, signo)
++	    && printk_ratelimit()) {
++		pr_info("%s[%d]: unhandled signal %d code 0x%x at 0x" REG_FMT,
++			tsk->comm, task_pid_nr(tsk), signo, code, addr);
++		print_vma_addr(KERN_CONT " in ", GET_IP(regs));
++		pr_cont("\n");
++		show_regs(regs);
 +	}
 +
-+	__delay(ucycles >> UDELAY_SHIFT);
++	do_trap_siginfo(signo, code, addr, tsk);
 +}
-+EXPORT_SYMBOL(udelay);
 +
-+void ndelay(unsigned long nsecs)
++static void do_trap_error(struct pt_regs *regs, int signo, int code,
++	unsigned long addr, const char *str)
++{
++	if (user_mode(regs)) {
++		do_trap(regs, signo, code, addr, current);
++	} else {
++		if (!fixup_exception(regs))
++			die(regs, str);
++	}
++}
++
++#define DO_ERROR_INFO(name, signo, code, str)				\
++asmlinkage void name(struct pt_regs *regs)				\
++{									\
++	do_trap_error(regs, signo, code, regs->sepc, "Oops - " str);	\
++}
++
++DO_ERROR_INFO(do_trap_unknown,
++	SIGILL, ILL_ILLTRP, "unknown exception");
++DO_ERROR_INFO(do_trap_insn_misaligned,
++	SIGBUS, BUS_ADRALN, "instruction address misaligned");
++DO_ERROR_INFO(do_trap_insn_fault,
++	SIGSEGV, SEGV_ACCERR, "instruction access fault");
++DO_ERROR_INFO(do_trap_insn_illegal,
++	SIGILL, ILL_ILLOPC, "illegal instruction");
++DO_ERROR_INFO(do_trap_load_misaligned,
++	SIGBUS, BUS_ADRALN, "load address misaligned");
++DO_ERROR_INFO(do_trap_load_fault,
++	SIGSEGV, SEGV_ACCERR, "load access fault");
++DO_ERROR_INFO(do_trap_store_misaligned,
++	SIGBUS, BUS_ADRALN, "store (or AMO) address misaligned");
++DO_ERROR_INFO(do_trap_store_fault,
++	SIGSEGV, SEGV_ACCERR, "store (or AMO) access fault");
++DO_ERROR_INFO(do_trap_ecall_u,
++	SIGILL, ILL_ILLTRP, "environment call from U-mode");
++DO_ERROR_INFO(do_trap_ecall_s,
++	SIGILL, ILL_ILLTRP, "environment call from S-mode");
++DO_ERROR_INFO(do_trap_ecall_m,
++	SIGILL, ILL_ILLTRP, "environment call from M-mode");
++
++asmlinkage void do_trap_break(struct pt_regs *regs)
++{
++#ifdef CONFIG_GENERIC_BUG
++	if (!user_mode(regs)) {
++		enum bug_trap_type type;
++
++		type = report_bug(regs->sepc, regs);
++		switch (type) {
++		case BUG_TRAP_TYPE_NONE:
++			break;
++		case BUG_TRAP_TYPE_WARN:
++			regs->sepc += sizeof(bug_insn_t);
++			return;
++		case BUG_TRAP_TYPE_BUG:
++			die(regs, "Kernel BUG");
++		}
++	}
++#endif /* CONFIG_GENERIC_BUG */
++
++	do_trap_siginfo(SIGTRAP, TRAP_BRKPT, regs->sepc, current);
++	regs->sepc += 0x4;
++}
++
++#ifdef CONFIG_GENERIC_BUG
++int is_valid_bugaddr(unsigned long pc)
++{
++	bug_insn_t insn;
++
++	if (pc < PAGE_OFFSET)
++		return 0;
++	if (probe_kernel_address((bug_insn_t __user *)pc, insn))
++		return 0;
++	return (insn == __BUG_INSN);
++}
++#endif /* CONFIG_GENERIC_BUG */
++
++void __init trap_init(void)
 +{
 +	/*
-+	 * This doesn't bother checking for overflow, as it won't happen (it's
-+	 * an hour) of delay.
++	 * Set sup0 scratch register to 0, indicating to exception vector
++	 * that we are presently executing in the kernel
 +	 */
-+	unsigned long long ncycles = nsecs * lpj_fine * NDELAY_MULT;
-+	__delay(ncycles >> NDELAY_SHIFT);
++	csr_write(sscratch, 0);
++	/* Set the exception vector address */
++	csr_write(stvec, &handle_exception);
++	/* Enable all interrupts */
++	csr_write(sie, -1);
 +}
-+EXPORT_SYMBOL(ndelay);
-diff --git a/arch/riscv/mm/ioremap.c b/arch/riscv/mm/ioremap.c
+diff --git a/arch/riscv/kernel/vdso.c b/arch/riscv/kernel/vdso.c
 new file mode 100644
-index 000000000000..e99194a4077e
+index 000000000000..e8a178df8144
 --- /dev/null
-+++ b/arch/riscv/mm/ioremap.c
-@@ -0,0 +1,92 @@
++++ b/arch/riscv/kernel/vdso.c
+@@ -0,0 +1,125 @@
 +/*
-+ * (C) Copyright 1995 1996 Linus Torvalds
-+ * (C) Copyright 2012 Regents of the University of California
++ * Copyright (C) 2004 Benjamin Herrenschmidt, IBM Corp.
++ *                    <benh@kernel.crashing.org>
++ * Copyright (C) 2012 ARM Limited
++ * Copyright (C) 2015 Regents of the University of California
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License
++ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include <linux/mm.h>
++#include <linux/slab.h>
++#include <linux/binfmts.h>
++#include <linux/err.h>
++
++#include <asm/vdso.h>
++
++extern char vdso_start[], vdso_end[];
++
++static unsigned int vdso_pages;
++static struct page **vdso_pagelist;
++
++/*
++ * The vDSO data page.
++ */
++static union {
++	struct vdso_data	data;
++	u8			page[PAGE_SIZE];
++} vdso_data_store __page_aligned_data;
++struct vdso_data *vdso_data = &vdso_data_store.data;
++
++static int __init vdso_init(void)
++{
++	unsigned int i;
++
++	vdso_pages = (vdso_end - vdso_start) >> PAGE_SHIFT;
++	vdso_pagelist =
++		kcalloc(vdso_pages + 1, sizeof(struct page *), GFP_KERNEL);
++	if (unlikely(vdso_pagelist == NULL)) {
++		pr_err("vdso: pagelist allocation failed\n");
++		return -ENOMEM;
++	}
++
++	for (i = 0; i < vdso_pages; i++) {
++		struct page *pg;
++
++		pg = virt_to_page(vdso_start + (i << PAGE_SHIFT));
++		ClearPageReserved(pg);
++		vdso_pagelist[i] = pg;
++	}
++	vdso_pagelist[i] = virt_to_page(vdso_data);
++
++	return 0;
++}
++arch_initcall(vdso_init);
++
++int arch_setup_additional_pages(struct linux_binprm *bprm,
++	int uses_interp)
++{
++	struct mm_struct *mm = current->mm;
++	unsigned long vdso_base, vdso_len;
++	int ret;
++
++	vdso_len = (vdso_pages + 1) << PAGE_SHIFT;
++
++	down_write(&mm->mmap_sem);
++	vdso_base = get_unmapped_area(NULL, 0, vdso_len, 0, 0);
++	if (unlikely(IS_ERR_VALUE(vdso_base))) {
++		ret = vdso_base;
++		goto end;
++	}
++
++	/*
++	 * Put vDSO base into mm struct. We need to do this before calling
++	 * install_special_mapping or the perf counter mmap tracking code
++	 * will fail to recognise it as a vDSO (since arch_vma_name fails).
++	 */
++	mm->context.vdso = (void *)vdso_base;
++
++	ret = install_special_mapping(mm, vdso_base, vdso_len,
++		(VM_READ | VM_EXEC | VM_MAYREAD | VM_MAYWRITE | VM_MAYEXEC),
++		vdso_pagelist);
++
++	if (unlikely(ret))
++		mm->context.vdso = NULL;
++
++end:
++	up_write(&mm->mmap_sem);
++	return ret;
++}
++
++const char *arch_vma_name(struct vm_area_struct *vma)
++{
++	if (vma->vm_mm && (vma->vm_start == (long)vma->vm_mm->context.vdso))
++		return "[vdso]";
++	return NULL;
++}
++
++/*
++ * Function stubs to prevent linker errors when AT_SYSINFO_EHDR is defined
++ */
++
++int in_gate_area_no_mm(unsigned long addr)
++{
++	return 0;
++}
++
++int in_gate_area(struct mm_struct *mm, unsigned long addr)
++{
++	return 0;
++}
++
++struct vm_area_struct *get_gate_vma(struct mm_struct *mm)
++{
++	return NULL;
++}
+diff --git a/arch/riscv/mm/init.c b/arch/riscv/mm/init.c
+new file mode 100644
+index 000000000000..9f4bee5e51fd
+--- /dev/null
++++ b/arch/riscv/mm/init.c
+@@ -0,0 +1,70 @@
++/*
++ * Copyright (C) 2012 Regents of the University of California
 + *
 + *   This program is free software; you can redistribute it and/or
 + *   modify it under the terms of the GNU General Public License
@@ -586,84 +1585,63 @@ index 000000000000..e99194a4077e
 + *   GNU General Public License for more details.
 + */
 +
-+#include <linux/export.h>
++#include <linux/init.h>
 +#include <linux/mm.h>
-+#include <linux/vmalloc.h>
-+#include <linux/io.h>
++#include <linux/bootmem.h>
++#include <linux/initrd.h>
++#include <linux/memblock.h>
++#include <linux/swap.h>
 +
++#include <asm/tlbflush.h>
++#include <asm/sections.h>
 +#include <asm/pgtable.h>
++#include <asm/io.h>
 +
-+/*
-+ * Remap an arbitrary physical address space into the kernel virtual
-+ * address space. Needed when the kernel wants to access high addresses
-+ * directly.
-+ *
-+ * NOTE! We need to allow non-page-aligned mappings too: we will obviously
-+ * have to convert them into an offset in a page-aligned mapping, but the
-+ * caller shouldn't need to know that small detail.
-+ */
-+static void __iomem *__ioremap_caller(phys_addr_t addr, size_t size,
-+	pgprot_t prot, void *caller)
++static void __init zone_sizes_init(void)
 +{
-+	phys_addr_t last_addr;
-+	unsigned long offset, vaddr;
-+	struct vm_struct *area;
++	unsigned long zones_size[MAX_NR_ZONES];
 +
-+	/* Disallow wrap-around or zero size */
-+	last_addr = addr + size - 1;
-+	if (!size || last_addr < addr)
-+		return NULL;
-+
-+	/* Page-align mappings */
-+	offset = addr & (~PAGE_MASK);
-+	addr &= PAGE_MASK;
-+	size = PAGE_ALIGN(size + offset);
-+
-+	area = get_vm_area_caller(size, VM_IOREMAP, caller);
-+	if (!area)
-+		return NULL;
-+	vaddr = (unsigned long)area->addr;
-+
-+	if (ioremap_page_range(vaddr, vaddr + size, addr, prot)) {
-+		free_vm_area(area);
-+		return NULL;
-+	}
-+
-+	return (void __iomem *)(vaddr + offset);
++	memset(zones_size, 0, sizeof(zones_size));
++	zones_size[ZONE_NORMAL] = max_mapnr;
++	free_area_init_node(0, zones_size, pfn_base, NULL);
 +}
 +
-+/*
-+ * ioremap     -   map bus memory into CPU space
-+ * @offset:    bus address of the memory
-+ * @size:      size of the resource to map
-+ *
-+ * ioremap performs a platform specific sequence of operations to
-+ * make bus memory CPU accessible via the readb/readw/readl/writeb/
-+ * writew/writel functions and the other mmio helpers. The returned
-+ * address is not guaranteed to be usable directly as a virtual
-+ * address.
-+ *
-+ * Must be freed with iounmap.
-+ */
-+void __iomem *ioremap(phys_addr_t offset, unsigned long size)
++void setup_zero_page(void)
 +{
-+	return __ioremap_caller(offset, size, PAGE_KERNEL,
-+		__builtin_return_address(0));
++	memset((void *)empty_zero_page, 0, PAGE_SIZE);
 +}
-+EXPORT_SYMBOL(ioremap);
 +
-+
-+/**
-+ * iounmap - Free a IO remapping
-+ * @addr: virtual address from ioremap_*
-+ *
-+ * Caller must ensure there is only one unmapping for the same pointer.
-+ */
-+void iounmap(void __iomem *addr)
++void __init paging_init(void)
 +{
-+	vunmap((void *)((unsigned long)addr & PAGE_MASK));
++	init_mm.pgd = (pgd_t *)pfn_to_virt(csr_read(sptbr));
++
++	setup_zero_page();
++	local_flush_tlb_all();
++	zone_sizes_init();
 +}
-+EXPORT_SYMBOL(iounmap);
++
++void __init mem_init(void)
++{
++#ifdef CONFIG_FLATMEM
++	BUG_ON(!mem_map);
++#endif /* CONFIG_FLATMEM */
++
++	high_memory = (void *)(__va(PFN_PHYS(max_low_pfn)));
++	free_all_bootmem();
++
++	mem_init_print_info(NULL);
++}
++
++void free_initmem(void)
++{
++	free_initmem_default(0);
++}
++
++#ifdef CONFIG_BLK_DEV_INITRD
++void free_initrd_mem(unsigned long start, unsigned long end)
++{
++}
++#endif /* CONFIG_BLK_DEV_INITRD */
 -- 
 2.13.0
 
