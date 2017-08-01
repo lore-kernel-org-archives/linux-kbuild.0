@@ -1,135 +1,60 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from [183.91.158.132] ([183.91.158.132]:8822 "EHLO
-        heian.cn.fujitsu.com" rhost-flags-FAIL-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1751610AbdHALo3 (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 1 Aug 2017 07:44:29 -0400
-From: Cao jin <caoj.fnst@cn.fujitsu.com>
-Subject: [PATCH v4] kbuild: trivial cleanups on the comments
-Date: Tue, 1 Aug 2017 19:36:34 +0800
-Message-ID: <1501587394-32226-1-git-send-email-caoj.fnst@cn.fujitsu.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Received: from mga02.intel.com ([134.134.136.20]:57247 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751101AbdHANEl (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Tue, 1 Aug 2017 09:04:41 -0400
+Message-ID: <1501592608.29303.321.camel@linux.intel.com>
+Subject: Re: [PATCH v7 01/15] MAINTAINERS: Add RISC-V
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Date: Tue, 01 Aug 2017 16:03:28 +0300
+In-Reply-To: <20170801010009.3302-2-palmer@dabbelt.com>
+References: <20170801010009.3302-1-palmer@dabbelt.com>
+         <20170801010009.3302-2-palmer@dabbelt.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
-Cc: yamada.masahiro@socionext.com, mmarek@suse.com, rdunlap@infradead.org
+To: Palmer Dabbelt <palmer@dabbelt.com>, peterz@infradead.org, tglx@linutronix.de, jason@lakedaemon.net, marc.zyngier@arm.com, Arnd Bergmann <arnd@arndb.de>
+Cc: yamada.masahiro@socionext.com, mmarek@suse.com, albert@sifive.com, will.deacon@arm.com, boqun.feng@gmail.com, oleg@redhat.com, mingo@redhat.com, daniel.lezcano@linaro.org, gregkh@linuxfoundation.org, jslaby@suse.com, davem@davemloft.net, mchehab@kernel.org, hverkuil@xs4all.nl, rdunlap@infradead.org, viro@zeniv.linux.org.uk, mhiramat@kernel.org, fweisbec@gmail.com, mcgrof@kernel.org, dledford@redhat.com, bart.vanassche@sandisk.com, sstabellini@kernel.org, mpe@ellerman.id.au, rmk+kernel@armlinux.org.uk, paul.gortmaker@windriver.com, nicolas.dichtel@6wind.com, linux@roeck-us.net, heiko.carstens@de.ibm.com, schwidefsky@de.ibm.com, geert@linux-m68k.org, akpm@linux-foundation.org, jiri@mellanox.com, vgupta@synopsys.com, airlied@redhat.com, jk@ozlabs.org, chris@chris-wilson.co.uk, Jason@zx2c4.com, paulmck@linux.vnet.ibm.com, ncardwell@google.com, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, patches@groups.riscv.org
 
-Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
----
-Since this one has not been merged yet and I find more cleanups,
-so I have v4 out.
+On Mon, 2017-07-31 at 17:59 -0700, Palmer Dabbelt wrote:
+> From: Jonathan Neuschäfer <j.neuschaefer@gmx.net>
+> 
+> RISC-V needs a MAINTAINERS entry. Let's add one.
+> 
 
-v3 addressed comments from Masahiro-san and Randy Dunlap.
-v4 find several more cleanups in Makefile.build worth to be
-   included into this trivial patch.
+Have you checked this by a brand new script (*) from Linus? 
 
- Makefile               | 6 +++---
- scripts/Kbuild.include | 7 +++----
- scripts/Makefile.build | 8 ++++----
- scripts/basic/Makefile | 2 +-
- 4 files changed, 11 insertions(+), 12 deletions(-)
+(*) parse-maintainers.pl
 
-diff --git a/Makefile b/Makefile
-index 7b60fb3..2600f03 100644
---- a/Makefile
-+++ b/Makefile
-@@ -961,7 +961,7 @@ export KBUILD_VMLINUX_INIT := $(head-y) $(init-y)
- export KBUILD_VMLINUX_MAIN := $(core-y) $(libs-y) $(drivers-y) $(net-y) $(virt-y)
- export KBUILD_LDS          := arch/$(SRCARCH)/kernel/vmlinux.lds
- export LDFLAGS_vmlinux
--# used by scripts/pacmage/Makefile
-+# used by scripts/package/Makefile
- export KBUILD_ALLDIRS := $(sort $(filter-out arch/%,$(vmlinux-alldirs)) arch Documentation include samples scripts tools)
- 
- vmlinux-deps := $(KBUILD_LDS) $(KBUILD_VMLINUX_INIT) $(KBUILD_VMLINUX_MAIN)
-@@ -989,8 +989,8 @@ include/generated/autoksyms.h: FORCE
- ARCH_POSTLINK := $(wildcard $(srctree)/arch/$(SRCARCH)/Makefile.postlink)
- 
- # Final link of vmlinux with optional arch pass after final link
--    cmd_link-vmlinux =                                                 \
--	$(CONFIG_SHELL) $< $(LD) $(LDFLAGS) $(LDFLAGS_vmlinux) ;       \
-+cmd_link-vmlinux =                                                 \
-+	$(CONFIG_SHELL) $< $(LD) $(LDFLAGS) $(LDFLAGS_vmlinux) ;    \
- 	$(if $(ARCH_POSTLINK), $(MAKE) -f $(ARCH_POSTLINK) $@, true)
- 
- vmlinux: scripts/link-vmlinux.sh vmlinux_prereq $(vmlinux-deps) FORCE
-diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index 61f87a9..2e721fc 100644
---- a/scripts/Kbuild.include
-+++ b/scripts/Kbuild.include
-@@ -85,8 +85,8 @@ TMPOUT := $(if $(KBUILD_EXTMOD),$(firstword $(KBUILD_EXTMOD))/)
- 
- # try-run
- # Usage: option = $(call try-run, $(CC)...-o "$$TMP",option-ok,otherwise)
--# Exit code chooses option. "$$TMP" is can be used as temporary file and
--# is automatically cleaned up.
-+# Exit code chooses option. "$$TMP" serves as a temporary file and is
-+# automatically cleaned up.
- try-run = $(shell set -e;		\
- 	TMP="$(TMPOUT).$$$$.tmp";	\
- 	TMPO="$(TMPOUT).$$$$.o";	\
-@@ -256,7 +256,6 @@ make-cmd = $(call escsq,$(subst \#,\\\#,$(subst $$,$$$$,$(cmd_$(1)))))
- any-prereq = $(filter-out $(PHONY),$?) $(filter-out $(PHONY) $(wildcard $^),$^)
- 
- # Execute command if command has changed or prerequisite(s) are updated.
--#
- if_changed = $(if $(strip $(any-prereq) $(arg-check)),                       \
- 	@set -e;                                                             \
- 	$(echo-cmd) $(cmd_$(1));                                             \
-@@ -310,7 +309,7 @@ if_changed_rule = $(if $(strip $(any-prereq) $(arg-check) ),                 \
- 	$(rule_$(1)), @:)
- 
- ###
--# why - tell why a a target got build
-+# why - tell why a target got built
- #       enabled by make V=2
- #       Output (listed in the order they are checked):
- #          (1) - due to target is PHONY
-diff --git a/scripts/Makefile.build b/scripts/Makefile.build
-index 733e044..ee95762 100644
---- a/scripts/Makefile.build
-+++ b/scripts/Makefile.build
-@@ -229,8 +229,8 @@ ifeq ("$(origin RECORDMCOUNT_WARN)", "command line")
- endif
- # Due to recursion, we must skip empty.o.
- # The empty.o file is created in the make process in order to determine
--#  the target endianness and word size. It is made before all other C
--#  files, including recordmcount.
-+# the target endianness and word size. It is made before all other C
-+# files, including recordmcount.
- sub_cmd_record_mcount =					\
- 	if [ $(@) != "scripts/mod/empty.o" ]; then	\
- 		$(objtree)/scripts/recordmcount $(RECORDMCOUNT_FLAGS) "$(@)";	\
-@@ -245,13 +245,13 @@ sub_cmd_record_mcount = set -e ; perl $(srctree)/scripts/recordmcount.pl "$(ARCH
- 	"$(LD)" "$(NM)" "$(RM)" "$(MV)" \
- 	"$(if $(part-of-module),1,0)" "$(@)";
- recordmcount_source := $(srctree)/scripts/recordmcount.pl
--endif
-+endif # BUILD_C_RECORDMCOUNT
- cmd_record_mcount =						\
- 	if [ "$(findstring $(CC_FLAGS_FTRACE),$(_c_flags))" =	\
- 	     "$(CC_FLAGS_FTRACE)" ]; then			\
- 		$(sub_cmd_record_mcount)			\
- 	fi;
--endif
-+endif # CONFIG_FTRACE_MCOUNT_RECORD
- 
- ifdef CONFIG_STACK_VALIDATION
- ifneq ($(SKIP_STACK_VALIDATION),1)
-diff --git a/scripts/basic/Makefile b/scripts/basic/Makefile
-index ec10d93..0372b33 100644
---- a/scripts/basic/Makefile
-+++ b/scripts/basic/Makefile
-@@ -1,5 +1,5 @@
- ###
--# Makefile.basic lists the most basic programs used during the build process.
-+# This Makefile lists the most basic programs used during the build process.
- # The programs listed herein are what are needed to do the basic stuff,
- # such as fix file dependencies.
- # This initial step is needed to avoid files to be recompiled
+> Signed-off-by: Jonathan Neuschäfer <j.neuschaefer@gmx.net>
+> Signed-off-by: Palmer Dabbelt <palmer@dabbelt.com>
+> ---
+>  MAINTAINERS | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 196bbc4613c7..651b9ad5cd68 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -11302,6 +11302,15 @@ S:	Maintained
+>  F:	drivers/mtd/nand/r852.c
+>  F:	drivers/mtd/nand/r852.h
+>  
+> +RISC-V ARCHITECTURE
+> +M:	Palmer Dabbelt <palmer@sifive.com>
+> +M:	Albert Ou <albert@sifive.com>
+> +L:	patches@groups.riscv.org
+> +T:	git https://github.com/riscv/riscv-linux
+> +S:	Supported
+> +F:	arch/riscv/
+> +K:	riscv
+> +
+>  ROCCAT DRIVERS
+>  M:	Stefan Achatz <erazor_de@users.sourceforge.net>
+>  W:	http://sourceforge.net/projects/roccat/
+
 -- 
-2.1.0
-
-
-
+Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Intel Finland Oy
