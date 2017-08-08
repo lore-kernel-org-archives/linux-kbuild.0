@@ -1,38 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-vk0-f65.google.com ([209.85.213.65]:32859 "EHLO
-        mail-vk0-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751880AbdHHMgD (ORCPT
+Received: from [183.91.158.132] ([183.91.158.132]:15817 "EHLO
+        heian.cn.fujitsu.com" rhost-flags-FAIL-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1752075AbdHHNPy (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Tue, 8 Aug 2017 08:36:03 -0400
+        Tue, 8 Aug 2017 09:15:54 -0400
+From: Cao jin <caoj.fnst@cn.fujitsu.com>
+Subject: [PATCH] fixdep: trivial: typo fix and correction
+Date: Tue, 8 Aug 2017 21:20:50 +0800
+Message-ID: <1502198450-7374-1-git-send-email-caoj.fnst@cn.fujitsu.com>
 MIME-Version: 1.0
-Reply-To: sedat.dilek@gmail.com
-In-Reply-To: <20170807142416.150fd699@lwn.net>
-References: <20170724152705.17131-1-sedat.dilek@credativ.de> <20170807142416.150fd699@lwn.net>
-From: Sedat Dilek <sedat.dilek@gmail.com>
-Date: Tue, 8 Aug 2017 14:36:02 +0200
-Message-ID: <CA+icZUXr02r9jbbtQbP2eyijS+rEAopcznL1uND_qtFdLL5jBw@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: Update example for ccflags-y usage
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Jonathan Corbet <corbet@lwn.net>
-Cc: Sedat Dilek <sedat.dilek@credativ.de>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, linux-kbuild@vger.kernel.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+Cc: yamada.masahiro@socionext.com, mmarek@suse.com
 
-On Mon, Aug 7, 2017 at 10:24 PM, Jonathan Corbet <corbet@lwn.net> wrote:
-> On Mon, 24 Jul 2017 17:27:05 +0200
-> Sedat Dilek <sedat.dilek@credativ.de> wrote:
->
->> The old example to describe ccflags-y usage is no more valid.
->>
->> Signed-off-by: Sedat Dilek <sedat.dilek@gmail.com>
->
-> I've applied this; had to clean up some whitespace weirdness on the way.
->
+Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
+---
+ scripts/basic/fixdep.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-My apologies for this, forgot to run the checkpatch-script.
+diff --git a/scripts/basic/fixdep.c b/scripts/basic/fixdep.c
+index fff818b..bbf62cb 100644
+--- a/scripts/basic/fixdep.c
++++ b/scripts/basic/fixdep.c
+@@ -25,7 +25,7 @@
+  *
+  * So we play the same trick that "mkdep" played before. We replace
+  * the dependency on autoconf.h by a dependency on every config
+- * option which is mentioned in any of the listed prequisites.
++ * option which is mentioned in any of the listed prerequisites.
+  *
+  * kconfig populates a tree in include/config/ with an empty file
+  * for each config symbol and when the configuration is updated
+@@ -34,7 +34,7 @@
+  * the config symbols are rebuilt.
+  *
+  * So if the user changes his CONFIG_HIS_DRIVER option, only the objects
+- * which depend on "include/linux/config/his/driver.h" will be rebuilt,
++ * which depend on "include/config/his/driver.h" will be rebuilt,
+  * so most likely only his driver ;-)
+  *
+  * The idea above dates, by the way, back to Michael E Chastain, AFAIK.
+@@ -75,7 +75,7 @@
+  * and then basically copies the .<target>.d file to stdout, in the
+  * process filtering out the dependency on autoconf.h and adding
+  * dependencies on include/config/my/option.h for every
+- * CONFIG_MY_OPTION encountered in any of the prequisites.
++ * CONFIG_MY_OPTION encountered in any of the prerequisites.
+  *
+  * It will also filter out all the dependencies on *.ver. We need
+  * to make sure that the generated version checksum are globally up
+-- 
+2.1.0
 
-Will this go to Linux v4.13 or v4.14?
 
-Thanks.
 
-- Sedat -
