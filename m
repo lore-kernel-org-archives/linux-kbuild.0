@@ -1,31 +1,44 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:41616 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753787AbdHIQGi (ORCPT
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:60045 "EHLO
+        heian.cn.fujitsu.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1752389AbdHJNpT (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 9 Aug 2017 12:06:38 -0400
+        Thu, 10 Aug 2017 09:45:19 -0400
+Subject: Re: [PATCH] fixdep: trivial: typo fix and correction
+References: <1502198450-7374-1-git-send-email-caoj.fnst@cn.fujitsu.com>
+ <CAK7LNATGat99BK_N9SiyogotLcXFA5P__G-aV6jW+sEw-TGbvA@mail.gmail.com>
+From: Cao jin <caoj.fnst@cn.fujitsu.com>
+Message-ID: <598C64A6.2090109@cn.fujitsu.com>
+Date: Thu, 10 Aug 2017 21:50:30 +0800
 MIME-Version: 1.0
-In-Reply-To: <1501641066-15316-1-git-send-email-caoj.fnst@cn.fujitsu.com>
-References: <1501641066-15316-1-git-send-email-caoj.fnst@cn.fujitsu.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 10 Aug 2017 01:05:36 +0900
-Message-ID: <CAK7LNARQ7r2OA5Sg+4KLdtJ_TNK2h5iWOuoj5K-qnHku4S7puw@mail.gmail.com>
-Subject: Re: [PATCH v5] kbuild: trivial cleanups on the comments
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CAK7LNATGat99BK_N9SiyogotLcXFA5P__G-aV6jW+sEw-TGbvA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Cao jin <caoj.fnst@cn.fujitsu.com>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Randy Dunlap <rdunlap@infradead.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.com>
 
-2017-08-02 11:31 GMT+09:00 Cao jin <caoj.fnst@cn.fujitsu.com>:
-> This is a bunch of trivial fixes and cleanups.
->
-> Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
-> ---
+Hi Masahiro-san
 
+On 08/10/2017 12:05 AM, Masahiro Yamada wrote:
+> 2017-08-08 22:20 GMT+09:00 Cao jin <caoj.fnst@cn.fujitsu.com>:
+>> Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
+> 
+> Applied to linux-kbuild/fixes.  Thanks!
+> 
 
-Applied to linux-kbuild/fixes.  Thanks!
+I want to ask a question via this thread.
+
+I am tracing how each kernel source file compiled, and I met mounts-y in
+init/Makefile, I have trouble in finding the rule which compile
+$(mounts-y), but I clearly see the files in $(mounts-y) are compiled in
+the output of `make -n vmlinux`, but the files listed in mounts-y are
+not listed in obj-y. I think I must miss something, could you give some
+hint?
 
 -- 
-Best Regards
-Masahiro Yamada
+Sincerely,
+Cao jin
+
+
