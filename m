@@ -1,68 +1,73 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from outbound.smtp.vt.edu ([198.82.183.121]:39854 "EHLO
-        omr2.cc.vt.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1751439AbdHJXoc (ORCPT
+Received: from conssluserg-03.nifty.com ([210.131.2.82]:35668 "EHLO
+        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750714AbdHKXcI (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 10 Aug 2017 19:44:32 -0400
-Received: from mr4.cc.vt.edu (mr4.cc.vt.edu [IPv6:2607:b400:92:8300:0:7b:e2b1:6a29])
-        by omr2.cc.vt.edu (8.14.4/8.14.4) with ESMTP id v7AMwPZj019628
-        for <linux-kbuild@vger.kernel.org>; Thu, 10 Aug 2017 18:58:25 -0400
-Received: from mail-qk0-f200.google.com (mail-qk0-f200.google.com [209.85.220.200])
-        by mr4.cc.vt.edu (8.14.7/8.14.7) with ESMTP id v7AMwKs1015382
-        for <linux-kbuild@vger.kernel.org>; Thu, 10 Aug 2017 18:58:25 -0400
-Received: by mail-qk0-f200.google.com with SMTP id k126so10386168qke.8
-        for <linux-kbuild@vger.kernel.org>; Thu, 10 Aug 2017 15:58:25 -0700 (PDT)
-From: valdis.kletnieks@vt.edu
-Subject: Re: make clean all broken with -j? + question regarding modpost
-In-Reply-To: <20170810154251.GA23083@localhost.localdomain>
-References: <20170810154251.GA23083@localhost.localdomain>
-Mime-Version: 1.0
-Content-Type: multipart/signed; boundary="==_Exmh_1502405898_2116P";
-         micalg=pgp-sha1; protocol="application/pgp-signature"
-Content-Transfer-Encoding: 7bit
-Date: Thu, 10 Aug 2017 18:58:18 -0400
-Message-ID: <38798.1502405898@turing-police.cc.vt.edu>
+        Fri, 11 Aug 2017 19:32:08 -0400
+MIME-Version: 1.0
+In-Reply-To: <598C64A6.2090109@cn.fujitsu.com>
+References: <1502198450-7374-1-git-send-email-caoj.fnst@cn.fujitsu.com>
+ <CAK7LNATGat99BK_N9SiyogotLcXFA5P__G-aV6jW+sEw-TGbvA@mail.gmail.com> <598C64A6.2090109@cn.fujitsu.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Sat, 12 Aug 2017 08:31:15 +0900
+Message-ID: <CAK7LNATCsyg+mFGucfQaKGK_74yfW=vz8s4ii64FD9eV=ztUmw@mail.gmail.com>
+Subject: Re: [PATCH] fixdep: trivial: typo fix and correction
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Thomas Meyer <thomas@m3y3r.de>
-Cc: linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Cao jin <caoj.fnst@cn.fujitsu.com>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.com>
 
---==_Exmh_1502405898_2116P
-Content-Type: text/plain; charset=us-ascii
+Hi.
 
-On Thu, 10 Aug 2017 17:42:51 +0200, Thomas Meyer said:
-
-> 1.) make with multiple targets
+2017-08-10 22:50 GMT+09:00 Cao jin <caoj.fnst@cn.fujitsu.com>:
+> Hi Masahiro-san
 >
-> When running
-> $ make -j4 clean all
-> I get error from make (probably in scripts/Makefile.modbuiltin):
-> Output from above with V=1:
+> On 08/10/2017 12:05 AM, Masahiro Yamada wrote:
+>> 2017-08-08 22:20 GMT+09:00 Cao jin <caoj.fnst@cn.fujitsu.com>:
+>>> Signed-off-by: Cao jin <caoj.fnst@cn.fujitsu.com>
+>>
+>> Applied to linux-kbuild/fixes.  Thanks!
+>>
+>
+> I want to ask a question via this thread.
+>
+> I am tracing how each kernel source file compiled, and I met mounts-y in
+> init/Makefile, I have trouble in finding the rule which compile
+> $(mounts-y), but I clearly see the files in $(mounts-y) are compiled in
+> the output of `make -n vmlinux`, but the files listed in mounts-y are
+> not listed in obj-y. I think I must miss something, could you give some
+> hint?
+>
 
-Possibly unrelated, but I suspect there's a bunch of weirdness lurking in there.
 
-I often end up building lots of kernels (especially during a bisect), and
-I've noticed that if I do a 'git bisect good/bad' and then do
+The magic is the following line:
 
-make modconfig; make -j4   it will in fact do 4 streams.
+scripts/Makefile.lib  line 55
 
-But if I just say 'make -j4' and it decides it needs to do a modconfig,
-it will then apparently lose the -j4 somewhere and run just one stream.
-(But if it doesn't do a modconfig, the -j4 works...)
+# if $(foo-objs) exists, foo.o is a composite object
+multi-used-y := $(sort $(foreach m,$(obj-y), $(if $(strip
+$($(m:.o=-objs)) $($(m:.o=-y))), $(m))))
 
---==_Exmh_1502405898_2116P
-Content-Type: application/pgp-signature
 
------BEGIN PGP SIGNATURE-----
-Comment: Exmh version 2.8.0 04/21/2017
+If foo.o is added to obj-y and foo-objs or foo-y exist,
+they are also expanded.
 
-iQEVAwUBWYzlCo0DS38y7CIcAQKOTAf/fKl3beXDd0g4xDyk0T8vWl6uRPPiW5l4
-9n5Dp+M2ENHlGPUxfwo7404SiSEtkC2aimms85ekUQBxEVvUyHX48GFd+at+MuMx
-aYmyb3vbED69UHTOOAfuODWP27Flc3EG1qceF3HjCRuX4lfDQsDUbf9UbZ2MQLDc
-tmLnzF3AUZXc/Fi7oZYRd3o0v0EoI+ULhVd/wCaFjKZQ5GqVEDq0HWrdkdbYkFTr
-WDKDN/08TQ3KuFp58fsu79RoGd0f9XkiAVlLLiAUh1WSYWPE9JpAUvrj5hP6zfjI
-O0TNrIyRkB7bHI3JaB65+uNooXFT9S3B2N3EcoYht2mdlmlIlg/nEA==
-=Jmhf
------END PGP SIGNATURE-----
 
---==_Exmh_1502405898_2116P--
+
+
+
+If you see init/Makefile, mounts.o is added to obj-y.
+
+obj-y                          := main.o version.o mounts.o
+
+
+
+
+
+
+
+
+-- 
+Best Regards
+Masahiro Yamada
