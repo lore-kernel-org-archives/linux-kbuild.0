@@ -1,58 +1,51 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from www17.your-server.de ([213.133.104.17]:46439 "EHLO
-        www17.your-server.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750872AbdHLLVb (ORCPT
+Received: from mail-it0-f66.google.com ([209.85.214.66]:35906 "EHLO
+        mail-it0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750844AbdHLMAG (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 12 Aug 2017 07:21:31 -0400
-Date: Sat, 12 Aug 2017 13:21:26 +0200
-From: Thomas Meyer <thomas@m3y3r.de>
-Subject: Re: make clean all broken with -j? + question regarding modpost
-Message-ID: <20170812112126.GB7704@localhost.localdomain>
-References: <20170810154251.GA23083@localhost.localdomain>
- <1cb96165-34a1-7f8e-4211-e87af3cfb60a@infradead.org>
- <CAK7LNARwaZJv62LEqBv5BiGsV9r4TdeNZ41bWH2H-cXA6g7WzA@mail.gmail.com>
+        Sat, 12 Aug 2017 08:00:06 -0400
+Received: by mail-it0-f66.google.com with SMTP id o72so575739ita.3
+        for <linux-kbuild@vger.kernel.org>; Sat, 12 Aug 2017 05:00:05 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAK7LNARwaZJv62LEqBv5BiGsV9r4TdeNZ41bWH2H-cXA6g7WzA@mail.gmail.com>
+In-Reply-To: <CAK7LNARVhn9QkjOSfSHr+G2P08v9za2m51cr6kruekA8FwVVhg@mail.gmail.com>
+References: <20170724142047.3679-1-bjorn.forsman@gmail.com> <CAK7LNARVhn9QkjOSfSHr+G2P08v9za2m51cr6kruekA8FwVVhg@mail.gmail.com>
+From: =?UTF-8?Q?Bj=C3=B8rn_Forsman?= <bjorn.forsman@gmail.com>
+Date: Sat, 12 Aug 2017 14:00:04 +0200
+Message-ID: <CAEYzJUEgX4+1b0c8jqC7TALWZkKqLiqE0HMvB1zqHrEfv9yEEg@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: /bin/pwd -> pwd
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Randy Dunlap <rdunlap@infradead.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-kbuild <linux-kbuild@vger.kernel.org>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Jan Kiszka <jan.kiszka@siemens.com>, kieran@ksquared.org.uk
 
-On Sat, Aug 12, 2017 at 12:15:11PM +0900, Masahiro Yamada wrote:
+Hi,
+
+On 12 August 2017 at 05:26, Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
 > Hi.
-> 
-> 2017-08-11 3:28 GMT+09:00 Randy Dunlap <rdunlap@infradead.org>:
-> 
-> >> 2.) compile modpost with debug symbols, -g
-> >> how do I compile the modpost helper program with debug symbols? In what
-> >> makefile, kbuild file do I need to add the compiler flag?
-> >> Any help would be appreciated!
-> 
-> 
-> If you want to pass extra options to the build command of host-programs,
-> HOST_EXTRACFLAGS is supported.
-> 
-> For example,  HOST_EXTRACFLAGS=-g
+>
+> 2017-07-24 23:20 GMT+09:00 Bj=C3=B8rn Forsman <bjorn.forsman@gmail.com>:
+>> Several places already use pwd and rely on $PATH lookup. Moving the
+>> remaining /bin/pwd users over for consistency.
+>>
+>> Also, a reason for doing /bin/pwd -> pwd instead of the other way around
+>> is because I believe build systems should make little assumptions on hos=
+t
+>> filesystem layout. Case in point, we do this kind of patching already in
+>> NixOS.
+> [...]
+> Could you use $(abspath ...) instead of $(shell cd ... && /bin/pwd) ?
+> [...]
+> This one should use $(realpath ...) instead of $(abspath ...), I think.
+>
+> The difference between them is that
+> $(realpath ...) returns an empty string if the given path does not exist.
 
-Yes, after reading Documentation/kbuild/makefiles.txt and studying the
-top level Makefile I was able to figure it out by myself.
+That sounds like possibly changing semantics. I'd prefer to keep the
+patch as is, since I'm not familiar with the side effects of inserting
+relative vs absolute paths here. Is that OK for you?
 
-But many thanks for the hint!
-
-Now I just need to find out why an UML kernel with CONFIG_GCOV fails to
-build all modules. modpost abends with missing symbols
-__gcov_init, etc.
-
-
-with kind regards
-thomas
-> 
-> 
-> 
-> 
-> 
-> -- 
-> Best Regards
-> Masahiro Yamada
+Best regards,
+Bj=C3=B8rn Forsman
