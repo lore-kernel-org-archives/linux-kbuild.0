@@ -1,51 +1,38 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-it0-f66.google.com ([209.85.214.66]:35906 "EHLO
-        mail-it0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750844AbdHLMAG (ORCPT
+Received: from mail-yw0-f193.google.com ([209.85.161.193]:33164 "EHLO
+        mail-yw0-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752275AbdHNWjt (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 12 Aug 2017 08:00:06 -0400
-Received: by mail-it0-f66.google.com with SMTP id o72so575739ita.3
-        for <linux-kbuild@vger.kernel.org>; Sat, 12 Aug 2017 05:00:05 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <CAK7LNARVhn9QkjOSfSHr+G2P08v9za2m51cr6kruekA8FwVVhg@mail.gmail.com>
-References: <20170724142047.3679-1-bjorn.forsman@gmail.com> <CAK7LNARVhn9QkjOSfSHr+G2P08v9za2m51cr6kruekA8FwVVhg@mail.gmail.com>
-From: =?UTF-8?Q?Bj=C3=B8rn_Forsman?= <bjorn.forsman@gmail.com>
-Date: Sat, 12 Aug 2017 14:00:04 +0200
-Message-ID: <CAEYzJUEgX4+1b0c8jqC7TALWZkKqLiqE0HMvB1zqHrEfv9yEEg@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: /bin/pwd -> pwd
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        Mon, 14 Aug 2017 18:39:49 -0400
+From: Pramuka Perera <pramuka.perera@gmail.com>
+Subject: [PATCH] [PATCH] linux: Makefile: 4:  Changed Makefile EXTRAVERSION to "-eudyptula"
+Date: Mon, 14 Aug 2017 18:39:44 -0400
+Message-Id: <1502750384-19554-1-git-send-email-pramuka.perera@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Jan Kiszka <jan.kiszka@siemens.com>, kieran@ksquared.org.uk
+To: yamada.masahiro@socionext.com, mmarek@suse.com, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: Pramuka Perera <pramuka.perera@gmail.com>
 
-Hi,
+As required by Task 03 of the Eudyptula Challenge, modified the EXTRAVERSION variable to "-eudyptula".
 
-On 12 August 2017 at 05:26, Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
-> Hi.
->
-> 2017-07-24 23:20 GMT+09:00 Bj=C3=B8rn Forsman <bjorn.forsman@gmail.com>:
->> Several places already use pwd and rely on $PATH lookup. Moving the
->> remaining /bin/pwd users over for consistency.
->>
->> Also, a reason for doing /bin/pwd -> pwd instead of the other way around
->> is because I believe build systems should make little assumptions on hos=
-t
->> filesystem layout. Case in point, we do this kind of patching already in
->> NixOS.
-> [...]
-> Could you use $(abspath ...) instead of $(shell cd ... && /bin/pwd) ?
-> [...]
-> This one should use $(realpath ...) instead of $(abspath ...), I think.
->
-> The difference between them is that
-> $(realpath ...) returns an empty string if the given path does not exist.
+Signed-off-by: Pramuka Perera <pramuka.perera@gmail.com>
+---
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-That sounds like possibly changing semantics. I'd prefer to keep the
-patch as is, since I'm not familiar with the side effects of inserting
-relative vs absolute paths here. Is that OK for you?
+diff --git a/Makefile b/Makefile
+index 37087b4..9456b24 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1,7 +1,7 @@
+ VERSION = 4
+ PATCHLEVEL = 13
+ SUBLEVEL = 0
+-EXTRAVERSION = -rc3
++EXTRAVERSION = -eudyptula
+ NAME = Fearless Coyote
+ 
+ # *DOCUMENTATION*
+-- 
+2.7.4
 
-Best regards,
-Bj=C3=B8rn Forsman
