@@ -1,115 +1,96 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg0-f45.google.com ([74.125.83.45]:34662 "EHLO
-        mail-pg0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753113AbdHOBaY (ORCPT
+Received: from mail-pg0-f52.google.com ([74.125.83.52]:33148 "EHLO
+        mail-pg0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753564AbdHOBa0 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 14 Aug 2017 21:30:24 -0400
-Received: by mail-pg0-f45.google.com with SMTP id u185so57739485pgb.1
-        for <linux-kbuild@vger.kernel.org>; Mon, 14 Aug 2017 18:30:23 -0700 (PDT)
+        Mon, 14 Aug 2017 21:30:26 -0400
+Received: by mail-pg0-f52.google.com with SMTP id u5so57838501pgn.0
+        for <linux-kbuild@vger.kernel.org>; Mon, 14 Aug 2017 18:30:26 -0700 (PDT)
 From: Matthias Kaehlcke <mka@chromium.org>
-Subject: [PATCH v2 1/2] kbuild: Also evaluate alternative option passed to cc-option, etc
-Date: Mon, 14 Aug 2017 18:29:40 -0700
-Message-Id: <20170815012941.75151-1-mka@chromium.org>
+Subject: [PATCH v2 2/2] x86/build: Fix stack alignment for CLang
+Date: Mon, 14 Aug 2017 18:29:41 -0700
+Message-Id: <20170815012941.75151-2-mka@chromium.org>
+In-Reply-To: <20170815012941.75151-1-mka@chromium.org>
+References: <20170815012941.75151-1-mka@chromium.org>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H . Peter Anvin" <hpa@zytor.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>
 Cc: x86@kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, dianders@chromium.org, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>, Nick Desaulniers <ndesaulniers@google.com>, Stephen Hines <srhines@google.com>, Kees Cook <keescook@chromium.org>, Arnd Bergmann <arnd@arndb.de>, Bernhard.Rosenkranzer@linaro.org, Matthias Kaehlcke <mka@chromium.org>
 
-The macro cc-option receives two parameters (the second may be empty). It
-returns the first parameter if it is a valid compiler option, otherwise
-the second one. It is not evaluated if the second parameter is a valid
-compiler option. This seems to be fine in virtually all cases, however
-there are scenarios where the second parameter needs to be evaluated
-too, and an empty value (or a third option) should be returned if it is
-not valid.
+Commit:
 
-The new macro try-run-opt receives a 'base command' and two options as
-parameters. It runs 'base command' + option 1 and returns option 1
-upon success. In case of failure 'base command' + option 2 is executed,
-in case of success option 2 is returned, otherwise an empty string.
+  d77698df39a5 ("x86/build: Specify stack alignment for clang")
 
-Rework [__]cc-option, ld-option, and cc-ldoption to use try-run-opt
-instead of try-run to make sure the alternative option is evaluated.
+intended to use the same stack alignment for clang as with gcc.
+
+The two compilers use different options to configure the stack alignment
+(gcc: -mpreferred-stack-boundary=n, clang: -mstack-alignment=n).
+
+The above commit assumes that the clang option uses the same parameter
+type as gcc, i.e. that the alignment is specified as 2^n. However clang
+interprets the value of this option literally to use an alignment of n,
+in consequence the stack remains misaligned.
+
+Change the values used with -mstack-alignment to be the actual alignment
+instead of a power of two.
 
 Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
 ---
 Changes in v2:
-- add try-run-opt instead of cc-option-3
-- use try-run-opt for [__]cc-option, ld-option and ccld-option
-- updated subject (was 'kbuild: Add macros cc-option-3 and __cc-option-3')
-  and commit message
+- use the reworked [__]cc-option instead of cc-option-3, the macro now
+  also evaluates the alternative option 
 
- scripts/Kbuild.include | 33 +++++++++++++++++++++++++--------
- 1 file changed, 25 insertions(+), 8 deletions(-)
+ arch/x86/Makefile | 16 +++++-----------
+ 1 file changed, 5 insertions(+), 11 deletions(-)
 
-diff --git a/scripts/Kbuild.include b/scripts/Kbuild.include
-index dd8e2dde0b34..48a6d0e9b073 100644
---- a/scripts/Kbuild.include
-+++ b/scripts/Kbuild.include
-@@ -85,8 +85,8 @@ TMPOUT := $(if $(KBUILD_EXTMOD),$(firstword $(KBUILD_EXTMOD))/)
+diff --git a/arch/x86/Makefile b/arch/x86/Makefile
+index 1e902f926be3..c7b25ba2d2fa 100644
+--- a/arch/x86/Makefile
++++ b/arch/x86/Makefile
+@@ -11,14 +11,6 @@ else
+         KBUILD_DEFCONFIG := $(ARCH)_defconfig
+ endif
  
- # try-run
- # Usage: option = $(call try-run, $(CC)...-o "$$TMP",option-ok,otherwise)
--# Exit code chooses option. "$$TMP" is can be used as temporary file and
--# is automatically cleaned up.
-+# Runs the command $1, exit code chooses option. "$$TMP" is used as temporary
-+# file and is automatically cleaned up.
- try-run = $(shell set -e;		\
- 	TMP="$(TMPOUT).$$$$.tmp";	\
- 	TMPO="$(TMPOUT).$$$$.o";	\
-@@ -96,6 +96,23 @@ try-run = $(shell set -e;		\
- 	fi;				\
- 	rm -f "$$TMP" "$$TMPO")
+-# For gcc stack alignment is specified with -mpreferred-stack-boundary,
+-# clang has the option -mstack-alignment for that purpose.
+-ifneq ($(call cc-option, -mpreferred-stack-boundary=4),)
+-        cc_stack_align_opt := -mpreferred-stack-boundary
+-else ifneq ($(call cc-option, -mstack-alignment=4),)
+-        cc_stack_align_opt := -mstack-alignment
+-endif
+-
+ # How to compile the 16-bit code.  Note we always compile for -march=i386;
+ # that way we can complain to the user if the CPU is insufficient.
+ #
+@@ -36,7 +28,9 @@ REALMODE_CFLAGS	:= $(M16_CFLAGS) -g -Os -D__KERNEL__ \
  
-+# try-run-opt
-+# Usage: option = $(call try-run-opt, $(CC)...-o "$$TMP",option-ok,otherwise)
-+# Runs the command '$1 $2' and outputs $2 if the execution was successful.
-+# Otherwise runs '$1 $3' (if $3 is not empty) and outputs $3 upon success. No
-+# output if both commands fail. "$$TMP" is used as temporary file and is
-+# automatically cleaned up.
-+try-run-opt = $(shell set -e;           \
-+        TMP="$(TMPOUT).$$$$.tmp";       \
-+        TMPO="$(TMPOUT).$$$$.o";        \
-+        if ($(1) $(2)) >/dev/null 2>&1; \
-+        then echo "$(2)";               \
-+        elif [ -n "$(3)" ] && ($(1) $(3)) >/dev/null 2>&1;      \
-+        then echo "$(3)";               \
-+        else echo "";                   \
-+        fi;                             \
-+        rm -f "$$TMP" "$$TMPO")
+ REALMODE_CFLAGS += $(call __cc-option, $(CC), $(REALMODE_CFLAGS), -ffreestanding)
+ REALMODE_CFLAGS += $(call __cc-option, $(CC), $(REALMODE_CFLAGS), -fno-stack-protector)
+-REALMODE_CFLAGS += $(call __cc-option, $(CC), $(REALMODE_CFLAGS), $(cc_stack_align_opt)=2)
++REALMODE_CFLAGS += $(call __cc-option, $(CC), $(REALMODE_CFLAGS),\
++	-mpreferred-stack-boundary=2,-mstack-alignment=4)
 +
- # as-option
- # Usage: cflags-y += $(call as-option,-Wa$(comma)-isa=foo,)
+ export REALMODE_CFLAGS
  
-@@ -110,8 +127,8 @@ as-instr = $(call try-run,\
+ # BITS is used as extension for files which are available in a 32 bit
+@@ -76,7 +70,7 @@ ifeq ($(CONFIG_X86_32),y)
+         # Align the stack to the register width instead of using the default
+         # alignment of 16 bytes. This reduces stack usage and the number of
+         # alignment instructions.
+-        KBUILD_CFLAGS += $(call cc-option,$(cc_stack_align_opt)=2)
++        KBUILD_CFLAGS += $(call cc-option,-mpreferred-stack-boundary=2,-mstack-alignment=4)
  
- # __cc-option
- # Usage: MY_CFLAGS += $(call __cc-option,$(CC),$(MY_CFLAGS),-march=winchip-c6,-march=i586)
--__cc-option = $(call try-run,\
--	$(1) -Werror $(2) $(3) -c -x c /dev/null -o "$$TMP",$(3),$(4))
-+__cc-option = $(call try-run-opt,\
-+	$(1) -Werror $(2) -c -x c /dev/null -o "$$TMP",$(3),$(4))
+         # Disable unit-at-a-time mode on pre-gcc-4.0 compilers, it makes gcc use
+         # a lot more stack due to the lack of sharing of stacklots:
+@@ -115,7 +109,7 @@ else
+         # default alignment which keep the stack *mis*aligned.
+         # Furthermore an alignment to the register width reduces stack usage
+         # and the number of alignment instructions.
+-        KBUILD_CFLAGS += $(call cc-option,$(cc_stack_align_opt)=3)
++        KBUILD_CFLAGS += $(call cc-option,-mpreferred-stack-boundary=3,-mstack-alignment=8)
  
- # Do not attempt to build with gcc plugins during cc-option tests.
- # (And this uses delayed resolution so the flags will be up to date.)
-@@ -159,13 +176,13 @@ cc-if-fullversion = $(shell [ $(cc-fullversion) $(1) $(2) ] && echo $(3) || echo
- 
- # cc-ldoption
- # Usage: ldflags += $(call cc-ldoption, -Wl$(comma)--hash-style=both)
--cc-ldoption = $(call try-run,\
--	$(CC) $(1) -nostdlib -x c /dev/null -o "$$TMP",$(1),$(2))
-+cc-ldoption = $(call try-run-opt,\
-+	$(CC) -nostdlib -x c /dev/null -o "$$TMP",$(1),$(2))
- 
- # ld-option
- # Usage: LDFLAGS += $(call ld-option, -X)
--ld-option = $(call try-run,\
--	$(CC) -x c /dev/null -c -o "$$TMPO" ; $(LD) $(1) "$$TMPO" -o "$$TMP",$(1),$(2))
-+ld-option = $(call try-run-opt,\
-+	$(CC) -x c /dev/null -c -o "$$TMPO" ; $(LD) "$$TMPO" -o "$$TMP",$(1),$(2))
- 
- # ar-option
- # Usage: KBUILD_ARFLAGS := $(call ar-option,D)
+ 	# Use -mskip-rax-setup if supported.
+ 	KBUILD_CFLAGS += $(call cc-option,-mskip-rax-setup)
 -- 
 2.14.0.434.g98096fd7a8-goog
 
