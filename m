@@ -1,96 +1,52 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg0-f52.google.com ([74.125.83.52]:33148 "EHLO
-        mail-pg0-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753564AbdHOBa0 (ORCPT
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:35597 "EHLO
+        heian.cn.fujitsu.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1753780AbdHOK53 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 14 Aug 2017 21:30:26 -0400
-Received: by mail-pg0-f52.google.com with SMTP id u5so57838501pgn.0
-        for <linux-kbuild@vger.kernel.org>; Mon, 14 Aug 2017 18:30:26 -0700 (PDT)
-From: Matthias Kaehlcke <mka@chromium.org>
-Subject: [PATCH v2 2/2] x86/build: Fix stack alignment for CLang
-Date: Mon, 14 Aug 2017 18:29:41 -0700
-Message-Id: <20170815012941.75151-2-mka@chromium.org>
-In-Reply-To: <20170815012941.75151-1-mka@chromium.org>
-References: <20170815012941.75151-1-mka@chromium.org>
+        Tue, 15 Aug 2017 06:57:29 -0400
+From: Cao jin <caoj.fnst@cn.fujitsu.com>
+Subject: special handle of scripts/kconfig/zconf.tab.o
+Message-ID: <5992D4DF.2080405@cn.fujitsu.com>
+Date: Tue, 15 Aug 2017 19:02:55 +0800
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, "H . Peter Anvin" <hpa@zytor.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>
-Cc: x86@kernel.org, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org, dianders@chromium.org, Michael Davidson <md@google.com>, Greg Hackmann <ghackmann@google.com>, Nick Desaulniers <ndesaulniers@google.com>, Stephen Hines <srhines@google.com>, Kees Cook <keescook@chromium.org>, Arnd Bergmann <arnd@arndb.de>, Bernhard.Rosenkranzer@linaro.org, Matthias Kaehlcke <mka@chromium.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Michal Marek <mmarek@suse.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-Commit:
+Masahiro-san,
 
-  d77698df39a5 ("x86/build: Specify stack alignment for clang")
+I have a question about make *config. In scripts/kconfig/Makefile, there
+is following statement:
 
-intended to use the same stack alignment for clang as with gcc.
+$(obj)/zconf.tab.o: $(obj)/zconf.lex.c $(obj)/zconf.hash.c
 
-The two compilers use different options to configure the stack alignment
-(gcc: -mpreferred-stack-boundary=n, clang: -mstack-alignment=n).
+and the $(obj)/zconf.{tab,hash,lex}.c match the rule in Makefile.lib:
 
-The above commit assumes that the clang option uses the same parameter
-type as gcc, i.e. that the alignment is specified as 2^n. However clang
-interprets the value of this option literally to use an alignment of n,
-in consequence the stack remains misaligned.
+$(obj)/%: $(src)/%_shipped
+        $(call cmd,shipped)
 
-Change the values used with -mstack-alignment to be the actual alignment
-instead of a power of two.
+and cmd_shipped just transform the _shipped file to .c via `cat`.
 
-Signed-off-by: Matthias Kaehlcke <mka@chromium.org>
----
-Changes in v2:
-- use the reworked [__]cc-option instead of cc-option-3, the macro now
-  also evaluates the alternative option 
+And zconf.tab.c includes several *other* .c files which make the whole
+process a little obscure, because there are not corresponding .o files
+for the *other* .c files.
 
- arch/x86/Makefile | 16 +++++-----------
- 1 file changed, 5 insertions(+), 11 deletions(-)
+My questions is: Does this special handling has other meanings that I
+may miss? Or just legacy.
 
-diff --git a/arch/x86/Makefile b/arch/x86/Makefile
-index 1e902f926be3..c7b25ba2d2fa 100644
---- a/arch/x86/Makefile
-+++ b/arch/x86/Makefile
-@@ -11,14 +11,6 @@ else
-         KBUILD_DEFCONFIG := $(ARCH)_defconfig
- endif
- 
--# For gcc stack alignment is specified with -mpreferred-stack-boundary,
--# clang has the option -mstack-alignment for that purpose.
--ifneq ($(call cc-option, -mpreferred-stack-boundary=4),)
--        cc_stack_align_opt := -mpreferred-stack-boundary
--else ifneq ($(call cc-option, -mstack-alignment=4),)
--        cc_stack_align_opt := -mstack-alignment
--endif
--
- # How to compile the 16-bit code.  Note we always compile for -march=i386;
- # that way we can complain to the user if the CPU is insufficient.
- #
-@@ -36,7 +28,9 @@ REALMODE_CFLAGS	:= $(M16_CFLAGS) -g -Os -D__KERNEL__ \
- 
- REALMODE_CFLAGS += $(call __cc-option, $(CC), $(REALMODE_CFLAGS), -ffreestanding)
- REALMODE_CFLAGS += $(call __cc-option, $(CC), $(REALMODE_CFLAGS), -fno-stack-protector)
--REALMODE_CFLAGS += $(call __cc-option, $(CC), $(REALMODE_CFLAGS), $(cc_stack_align_opt)=2)
-+REALMODE_CFLAGS += $(call __cc-option, $(CC), $(REALMODE_CFLAGS),\
-+	-mpreferred-stack-boundary=2,-mstack-alignment=4)
-+
- export REALMODE_CFLAGS
- 
- # BITS is used as extension for files which are available in a 32 bit
-@@ -76,7 +70,7 @@ ifeq ($(CONFIG_X86_32),y)
-         # Align the stack to the register width instead of using the default
-         # alignment of 16 bytes. This reduces stack usage and the number of
-         # alignment instructions.
--        KBUILD_CFLAGS += $(call cc-option,$(cc_stack_align_opt)=2)
-+        KBUILD_CFLAGS += $(call cc-option,-mpreferred-stack-boundary=2,-mstack-alignment=4)
- 
-         # Disable unit-at-a-time mode on pre-gcc-4.0 compilers, it makes gcc use
-         # a lot more stack due to the lack of sharing of stacklots:
-@@ -115,7 +109,7 @@ else
-         # default alignment which keep the stack *mis*aligned.
-         # Furthermore an alignment to the register width reduces stack usage
-         # and the number of alignment instructions.
--        KBUILD_CFLAGS += $(call cc-option,$(cc_stack_align_opt)=3)
-+        KBUILD_CFLAGS += $(call cc-option,-mpreferred-stack-boundary=3,-mstack-alignment=8)
- 
- 	# Use -mskip-rax-setup if supported.
- 	KBUILD_CFLAGS += $(call cc-option,-mskip-rax-setup)
+Because a straightforward way in my mind would be:
+
+rename zconf.{tab,hash,lex}.c_shipped to zconf.{tab,hash,lex}.c, then
+has following in the Makefile
+
+common-objs := zconf.tab.o zconf.hash.o zconf.lex.o util.o etc...
+conf-objs := conf.o $(common-objs)
+
 -- 
-2.14.0.434.g98096fd7a8-goog
+Sincerely,
+Cao jin
+
 
