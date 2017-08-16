@@ -1,70 +1,120 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:42924 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751556AbdHPPcL (ORCPT
+Received: from mail-yw0-f172.google.com ([209.85.161.172]:34392 "EHLO
+        mail-yw0-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751461AbdHPPla (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 16 Aug 2017 11:32:11 -0400
-Received: from mail-yw0-f177.google.com (mail-yw0-f177.google.com [209.85.161.177]) (authenticated)
-        by conssluserg-03.nifty.com with ESMTP id v7GFW3Oe017990
-        for <linux-kbuild@vger.kernel.org>; Thu, 17 Aug 2017 00:32:04 +0900
-Received: by mail-yw0-f177.google.com with SMTP id u207so24827498ywc.3
-        for <linux-kbuild@vger.kernel.org>; Wed, 16 Aug 2017 08:32:04 -0700 (PDT)
+        Wed, 16 Aug 2017 11:41:30 -0400
+Received: by mail-yw0-f172.google.com with SMTP id s143so24985468ywg.1
+        for <linux-kbuild@vger.kernel.org>; Wed, 16 Aug 2017 08:41:30 -0700 (PDT)
+Date: Wed, 16 Aug 2017 11:41:29 -0400
+From: Tom Rini <trini@konsulko.com>
+Subject: Re: [PATCH] devicetree: Enable generation of __symbols__ in all dtb
+ files
+Message-ID: <20170816154129.GP20467@bill-the-cat>
+References: <1502831736-28282-1-git-send-email-trini@konsulko.com>
+ <599388D0.9050108@gmail.com>
+ <20170816004238.GH20467@bill-the-cat>
+ <CAL_JsqJp+jAf7yNYFd3BX2cjEsvDrb+44qg85+07Q639aFSapg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAEYzJUEgX4+1b0c8jqC7TALWZkKqLiqE0HMvB1zqHrEfv9yEEg@mail.gmail.com>
-References: <20170724142047.3679-1-bjorn.forsman@gmail.com>
- <CAK7LNARVhn9QkjOSfSHr+G2P08v9za2m51cr6kruekA8FwVVhg@mail.gmail.com> <CAEYzJUEgX4+1b0c8jqC7TALWZkKqLiqE0HMvB1zqHrEfv9yEEg@mail.gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Thu, 17 Aug 2017 00:31:22 +0900
-Message-ID: <CAK7LNATj+oidNg_FTpa57BfUK=kBNhHzs8wdbobCFbQaagV2RA@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: /bin/pwd -> pwd
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="al55iTfEjmb7rUKv"
+Content-Disposition: inline
+In-Reply-To: <CAL_JsqJp+jAf7yNYFd3BX2cjEsvDrb+44qg85+07Q639aFSapg@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: =?UTF-8?Q?Bj=C3=B8rn_Forsman?= <bjorn.forsman@gmail.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.com>, Jan Kiszka <jan.kiszka@siemens.com>, Kieran Bingham <kieran@ksquared.org.uk>
-
-Hi.
+To: Rob Herring <robh+dt@kernel.org>
+Cc: Frank Rowand <frowand.list@gmail.com>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, Tero Kristo <t-kristo@ti.com>, Nishanth Menon <nm@ti.com>, Tomi Valkeinen <tomi.valkeinen@ti.com>, Sekhar Nori <nsekhar@ti.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, Pantelis Antoniou <pantelis.antoniou@konsulko.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
 
-2017-08-12 21:00 GMT+09:00 Bj=C3=B8rn Forsman <bjorn.forsman@gmail.com>:
-> Hi,
->
-> On 12 August 2017 at 05:26, Masahiro Yamada
-> <yamada.masahiro@socionext.com> wrote:
->> Hi.
->>
->> 2017-07-24 23:20 GMT+09:00 Bj=C3=B8rn Forsman <bjorn.forsman@gmail.com>:
->>> Several places already use pwd and rely on $PATH lookup. Moving the
->>> remaining /bin/pwd users over for consistency.
->>>
->>> Also, a reason for doing /bin/pwd -> pwd instead of the other way aroun=
-d
->>> is because I believe build systems should make little assumptions on ho=
-st
->>> filesystem layout. Case in point, we do this kind of patching already i=
-n
->>> NixOS.
->> [...]
->> Could you use $(abspath ...) instead of $(shell cd ... && /bin/pwd) ?
->> [...]
->> This one should use $(realpath ...) instead of $(abspath ...), I think.
->>
->> The difference between them is that
->> $(realpath ...) returns an empty string if the given path does not exist=
-.
->
-> That sounds like possibly changing semantics. I'd prefer to keep the
-> patch as is, since I'm not familiar with the side effects of inserting
-> relative vs absolute paths here. Is that OK for you?
->
+--al55iTfEjmb7rUKv
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I prefer abspath/realpath.
+On Wed, Aug 16, 2017 at 10:22:03AM -0500, Rob Herring wrote:
+> On Tue, Aug 15, 2017 at 7:42 PM, Tom Rini <trini@konsulko.com> wrote:
+> > On Tue, Aug 15, 2017 at 04:50:40PM -0700, Frank Rowand wrote:
+> >> On 08/15/17 14:15, Tom Rini wrote:
+> >> > With support for stacked overlays being part of libfdt it is now
+> >> > possible and likely that overlays which require __symbols__ will be
+> >> > applied to the dtb files generated by the kernel.  This is done by
+> >> > passing -@ to dtc.  This does increase the filesize (and resident me=
+mory
+> >> > usage) based on the number of __symbol__ entries added to match the
+> >> > contents of the dts.
+> >> >
+> >> > Cc: Rob Herring <robh+dt@kernel.org>
+> >> > Cc: Frank Rowand <frowand.list@gmail.com>
+> >> > Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+> >> > Cc: Michal Marek <mmarek@suse.com>
+> >> > Cc: Pantelis Antoniou <pantelis.antoniou@konsulko.com>
+> >> > Cc: devicetree@vger.kernel.org
+> >> > Cc: linux-kernel@vger.kernel.org
+> >> > CC: linux-kbuild@vger.kernel.org
+> >> > Signed-off-by: Tom Rini <trini@konsulko.com>
+> >> > ---
+> >> > In order for a dtb file to be useful with all types of overlays, it
+> >> > needs to be generated with the -@ flag passed to dtc so that __symbo=
+ls__
+> >> > are generated.  This however is not free, and increases the resulting
+> >> > dtb file by up to approximately 50% today.  In the current worst case
+> >> > this is moving from 88KiB to 133KiB.  In talking with Frank about th=
+is,
+> >> > he outlined 3 possible ways (with the 4th option of something else
+> >> > entirely).
+> >> >
+> >> > 1. Make passing -@ to dtc be dependent upon some CONFIG symbol.
+> >> > 2. In the kernel, if the kernel does not have overlay support, disca=
+rd
+> >> > the __symbols__ information that we've been passed.
+> >> > 3. Have the bootloader pass in, or not, __symbols__ information.
+> >>
+> >> I also was hoping that other people might have ideas for additional
+> >> approaches.
+> >
+> > Yes, please.
+>=20
+> A couple of other options come to mind:
+>=20
+> "make DTC_FLAGS=3D'-@' dtbs" should already work. So there's already a
+> way to build what you want and the kernel is not setting the policy.
 
-If you are reluctant to do it, I will take a look.
+Not ideal since that drops out the -Wno... flags we pass in.  I don't
+see off-hand why it's not appending to DTC_FLAGS, but that's a fixable
+problem.
 
+> Do like we do for the unittests and make it a per board decision:
+>=20
+> DTC_FLAGS_my-som-board.dtb :=3D -@
+>=20
+> Then boards that actually need it like SoMs can turn it on.
 
+A concern about that of mine is that we'll start to see a 'flood' of
+patches growing that list at the end of arch/arm/boot/dts/Makefile.
 
 --=20
-Best Regards
-Masahiro Yamada
+Tom
+
+--al55iTfEjmb7rUKv
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJZlGepAAoJEIf59jXTHXZSPCYP/iiKyBFAwt8ltQ4C0XL3PBba
+YLaRPjZwtTjEG9NTn0LMtYQ2Ly0mwpMA2IpYpFYRJI/GtyYZBnt3ZlWohAz7gucw
+OhQWa6S+XzlUBLINEUHPChBqmdPcWZomkTYM2pAgAdJkBz7osadJGHMdlTJwfSrv
+l+1GZ64F1Vf2mY8629uv1Ct1BfJ3JqNTAKTcXlLE3+lLMxVz4eX6URNB19EYMp9m
+Uu58739nLTxkcvIs3mWAiIzrGPdPD4N7X8PCxcBGLVAbeL2TLv5ObPD8iQDJ3jwR
+JXGdZPCqAc260yt/eVGy7iUZqOSsG7jtkQyghXK71+XDZuAJRmlsOt5PWvSuVVDy
+pV8IY8U6WwKnWi1l7+L751Zt93arAXyfoe3iyyquiRO7CcwIsWgrK9YqiyYGoc/j
+9SduGU5p8q7z/7GrmBSFXLYYHQgThR1GVYzMhO+J7xAx8asMuyD2qsp+MC/R7t/w
+sSPFsuyHtnD4Vy00Axu1Xz/8XoU4xJXQLv6h+243Qt9Jmhp1eakV7gkoWYkp+Oxu
+1ULeQHuzjFTuAmwGoJTvkYP0NiljC9SK6f3sIcmrSBkXn5bLQiX91IxjH2oMNLox
+L2BNLT7h+wZR1JP/Wa84UtI6P/cSGOS+PfDrpSdQvmDzx+/tKwOE4ok43kVaeyIB
+DGjSP6bTTIBLrfz2C2Ie
+=nEIW
+-----END PGP SIGNATURE-----
+
+--al55iTfEjmb7rUKv--
