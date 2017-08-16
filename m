@@ -1,235 +1,138 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-yw0-f174.google.com ([209.85.161.174]:36191 "EHLO
-        mail-yw0-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751611AbdHPPJM (ORCPT
+Received: from Galois.linutronix.de ([146.0.238.70]:58814 "EHLO
+        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751575AbdHPPOc (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 16 Aug 2017 11:09:12 -0400
-Received: by mail-yw0-f174.google.com with SMTP id u207so24399186ywc.3
-        for <linux-kbuild@vger.kernel.org>; Wed, 16 Aug 2017 08:09:11 -0700 (PDT)
-Date: Wed, 16 Aug 2017 11:09:10 -0400
-From: Tom Rini <trini@konsulko.com>
-Subject: Re: [PATCH] devicetree: Enable generation of __symbols__ in all dtb
- files
-Message-ID: <20170816150910.GO20467@bill-the-cat>
-References: <1502831736-28282-1-git-send-email-trini@konsulko.com>
- <599388D0.9050108@gmail.com>
- <20170816004238.GH20467@bill-the-cat>
- <5993BA59.9070406@gmail.com>
+        Wed, 16 Aug 2017 11:14:32 -0400
+Date: Wed, 16 Aug 2017 17:12:18 +0200 (CEST)
+From: Thomas Gleixner <tglx@linutronix.de>
+Subject: Re: [PATCH v7 04/15] irqchip: RISC-V Local Interrupt Controller
+ Driver
+In-Reply-To: <20170801010009.3302-5-palmer@dabbelt.com>
+Message-ID: <alpine.DEB.2.20.1708161702350.1987@nanos>
+References: <20170801010009.3302-1-palmer@dabbelt.com> <20170801010009.3302-5-palmer@dabbelt.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="kCytVXyVRCMICUUg"
-Content-Disposition: inline
-In-Reply-To: <5993BA59.9070406@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Frank Rowand <frowand.list@gmail.com>
-Cc: devicetree@vger.kernel.org, Tero Kristo <t-kristo@ti.com>, Nishanth Menon <nm@ti.com>, Tomi Valkeinen <tomi.valkeinen@ti.com>, Sekhar Nori <nsekhar@ti.com>, Rob Herring <robh+dt@kernel.org>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, Pantelis Antoniou <pantelis.antoniou@konsulko.com>, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org
+To: Palmer Dabbelt <palmer@dabbelt.com>
+Cc: peterz@infradead.org, jason@lakedaemon.net, marc.zyngier@arm.com, Arnd Bergmann <arnd@arndb.de>, yamada.masahiro@socionext.com, mmarek@suse.com, albert@sifive.com, will.deacon@arm.com, boqun.feng@gmail.com, oleg@redhat.com, mingo@redhat.com, daniel.lezcano@linaro.org, gregkh@linuxfoundation.org, jslaby@suse.com, davem@davemloft.net, mchehab@kernel.org, hverkuil@xs4all.nl, rdunlap@infradead.org, viro@zeniv.linux.org.uk, mhiramat@kernel.org, fweisbec@gmail.com, mcgrof@kernel.org, dledford@redhat.com, bart.vanassche@sandisk.com, sstabellini@kernel.org, mpe@ellerman.id.au, rmk+kernel@armlinux.org.uk, paul.gortmaker@windriver.com, nicolas.dichtel@6wind.com, linux@roeck-us.net, heiko.carstens@de.ibm.com, schwidefsky@de.ibm.com, geert@linux-m68k.org, akpm@linux-foundation.org, andriy.shevchenko@linux.intel.com, jiri@mellanox.com, vgupta@synopsys.com, airlied@redhat.com, jk@ozlabs.org, chris@chris-wilson.co.uk, Jason@zx2c4.com, paulmck@linux.vnet.ibm.com, ncardwell@google.com, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, patches@groups.riscv.org
+
+On Mon, 31 Jul 2017, Palmer Dabbelt wrote:
+> +static void riscv_software_interrupt(void)
+> +{
+> +#ifdef CONFIG_SMP
+> +	irqreturn_t ret;
+> +
+> +	ret = handle_ipi();
+> +
+> +	WARN_ON(ret == IRQ_NONE);
+
+  	WARN_ON(handle_ipi() == IRQ_NONE);
+
+perhaps?
+
+> +#else
+> +	/*
+> +	 * We currently only use software interrupts to pass inter-processor
+> +	 * interrupts, so if a non-SMP system gets a software interrupt then we
+> +	 * don't know what to do.
+> +	 */
+> +	pr_warning("Software Interrupt without CONFIG_SMP\n");
+> +#endif
+> +}
 
 
---kCytVXyVRCMICUUg
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> +static void riscv_irq_enable(struct irq_data *d)
+> +{
+> +	struct riscv_irq_data *data = irq_data_get_irq_chip_data(d);
+> +
+> +	/*
+> +	 * It's only possible to write SIE on the current hart.  This jumps
+> +	 * over to the target hart if it's not the current one.  It's invalid
+> +	 * to write SIE on a hart that's not currently running.
+> +	 */
+> +	if (data->hart == smp_processor_id())
+> +		riscv_irq_unmask(d);
+> +	else if (cpu_online(data->hart))
+> +		smp_call_function_single(data->hart,
+> +					 riscv_irq_enable_helper,
+> +					 d,
+> +					 true);
+> +	else
+> +		WARN_ON_ONCE(1);
 
-On Tue, Aug 15, 2017 at 08:22:01PM -0700, Frank Rowand wrote:
-> On 08/15/17 17:42, Tom Rini wrote:
-> > On Tue, Aug 15, 2017 at 04:50:40PM -0700, Frank Rowand wrote:
-> >> On 08/15/17 14:15, Tom Rini wrote:
-> >>> With support for stacked overlays being part of libfdt it is now
-> >>> possible and likely that overlays which require __symbols__ will be
-> >>> applied to the dtb files generated by the kernel.  This is done by
-> >>> passing -@ to dtc.  This does increase the filesize (and resident mem=
-ory
-> >>> usage) based on the number of __symbol__ entries added to match the
-> >>> contents of the dts.
-> >>>
-> >>> Cc: Rob Herring <robh+dt@kernel.org>
-> >>> Cc: Frank Rowand <frowand.list@gmail.com>
-> >>> Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
-> >>> Cc: Michal Marek <mmarek@suse.com>
-> >>> Cc: Pantelis Antoniou <pantelis.antoniou@konsulko.com>
-> >>> Cc: devicetree@vger.kernel.org
-> >>> Cc: linux-kernel@vger.kernel.org
-> >>> CC: linux-kbuild@vger.kernel.org
-> >>> Signed-off-by: Tom Rini <trini@konsulko.com>
-> >>> ---
-> >>> In order for a dtb file to be useful with all types of overlays, it
-> >>> needs to be generated with the -@ flag passed to dtc so that __symbol=
-s__
-> >>> are generated.  This however is not free, and increases the resulting
-> >>> dtb file by up to approximately 50% today.  In the current worst case
-> >>> this is moving from 88KiB to 133KiB.  In talking with Frank about thi=
-s,
-> >>> he outlined 3 possible ways (with the 4th option of something else
-> >>> entirely).
-> >>>
-> >>> 1. Make passing -@ to dtc be dependent upon some CONFIG symbol.
-> >>> 2. In the kernel, if the kernel does not have overlay support, discard
-> >>> the __symbols__ information that we've been passed.
-> >>> 3. Have the bootloader pass in, or not, __symbols__ information.
-> >>
-> >> I also was hoping that other people might have ideas for additional
-> >> approaches.
-> >=20
-> > Yes, please.
-> >=20
-> >>> This patch is an attempt to implement something between the 3rd option
-> >>> and a different, 4th option.  Frank was thinking that we might introd=
-uce
-> >>> a new symbol to control generation of __symbol__ information for opti=
-on
-> >>> 1.  I think this gets the usage backwards and will lead to confusion
-> >>> among users and developers.
-> >>>
-> >>> My proposal is that we do not want __symbols__ existence to be depend=
-ent
-> >>> on some part of the kernel configuration for a number of reasons.
-> >>> First, this is out of step with the rest of how dtbs are created today
-> >>> and more importantly, thought about.  Today, all dtb content is
-> >>> independent of CONFIG options.  If you build a dtb from a given kernel
-> >>> tree, everyone will agree on the result.  This is part of the "contra=
-ct"
-> >>> on passing old kernels and new dtb files even.
-> >>
-> >> I hope that dtb contents are independent of CONFIG options, but I don't
-> >> feel confident is stating that there is not such dependency.  (Of cour=
-se,
-> >> whether to build a dtb can be dependent on a CONFIG option in the Make=
-file,
-> >> but that is not the same concept.)
-> >>
-> >> The only existing rule that I am aware of that helps avoid a dts depen=
-dency
-> >> on kernel CONFIG options is that included files can not be from genera=
-l kernel
-> >> header files; they must be in include/dt-bindings/.
-> >=20
-> > I'm fairly certain for in-kernel stuff at least, the assumption is
-> > correct.
-> >=20
-> >> Should we add text to Documentation/devicetree/bindings/submitting-pat=
-ches.txt
-> >> that explicitly states that dts files are not allowed to contain any
-> >> dependency on kernel CONFIG options?
-> >=20
-> > Certainly can't hurt.
-> >=20
-> >>> Second, I think this is out of step with how a lot of overlay usage w=
-ill
-> >>> occur.  My thinking is that with maximally useful overlays being
-> >>> available in mainline, lots of use-cases that we have today that resu=
-lt
-> >>> in a number of DTS files being included can become just overlays.  Th=
-is
-> >>
-> >> I disagree with this.  My _opinion_ is that overlays should be the exc=
-eption,
-> >> not the common case.  Overlays require extra complexity in the various
-> >> subsystems that interact with device trees.  For an overlay to work, t=
-hese
-> >> subsystems must be able to react to changes made to the device tree by
-> >> an overlay.  The current mechanism is via notifiers, which only exist
-> >> for a few subsystems.
-> >=20
-> > Ah.  Now, I can't blame you for thinking with your kernel hat on, but,
-> > you're thinking with your kernel hat on :)  (And taking mine off for a
-> > minute is why I changed my mind between when we talked on IRC, and what
-> > I posted).  Kernel run-time apply an overlay has various use cases that
-> > I don't want to discount, but don't want to try and go in detail on
-> > either.
-> >=20
-> > At heart, one of the issues here is that the Linux kernel is the
-> > authoritative source of dts and dtb files.  Assembling a dtb and N
-> > overlays at some point prior to booting Linux, in order to give it a
-> > complete and valid system is going to be a common case.  Even setting
->=20
-> Yes.  When discussing overlay issues and technologies we should be very
-> clear about whether the context is post-boot run time loading of an
-> overlay or using overlays applied on top of a base dtb to create a
-> dtb to be fed to the kernel for booting.  These are very different
-> domains.
->=20
-> For the case of constructing a boot time dtb from a base dtb and one
-> or more overlays my primary concerns are related to the complexity
-> (and again fragility) of the approach.  It is already quite difficult
-> to read source dts files and dts include files and determine what the
-> final dtb will contain.  This has been the motivation for several of
-> my debugging tools.  Adding overlays to the mix will increase the
-> complexity of understanding the final product (dtb), where the
-> individual items originated, and what component to modify to result
-> in a change to the final product.  It will add the further challenge
-> that applying overlays in different orders may result in different
-> final dtbs (depending on how strict the rules for applying an overlay
-> are).  I agree that this technology has some valuable upsides and
-> use cases, but I also fear the negative impacts.  The trick lies
-> in finding a way to meet the technology needs in a manner that
-> successfully balances the costs and the benefits.
->=20
-> I mentioned my concerns about the robustness of overlays applied to
-> a running Linux system in another reply.  It seems to me that
-> applying overlays pre-boot is more robust as far as the driver and
-> subsystem initialization is concerned, because the normal boot
-> path will be used to process the resulting dtb instead of using
-> an overlay loading path in the kernel.
->=20
->=20
-> > aside all of the hobbyist board families out there, SoMs are a big
-> > thing.  Eval modules are a big thing.  This turns not just enabling
-> > these as a vendor but using them as a developer into a much less error
-> > prone system.
->=20
-> If I understand the eval modules concept, then using overlays to
-> develop and test device tree changes is somewhat analogous to using
-> kernel modules to develop and test drivers.  Yes, this may make
-> some device tree source development more efficient.  And in other
-> cases may actually make it less efficient.  I don't see the impact
-> as being very large one direction or the other.
->=20
->=20
-> > To try and re-state my rational, if the Linux kernel needs some
-> > safe-guards or other mechanisms to restrict what can be done on top of
-> > OF_OVERLAY (which is not widely enabled in mainline), OK, that's
-> > certainly a discussion to have and think about implications of.  But,
-> > the Linux kernel is the producer of most dtbs that will be consumed by a
-> > variety of platforms.  I feel it needs to generate the dtb that can be
-> > used for all consumers, since it is the source of these resources.
->=20
-> This has gone far off topic from the original issue you brought up,
-> which is how, in the context of the Linux kernel build environment, to
-> enable building a base dtb that contains the symbols that are needed to
-> load an overlay.  Can we return to the base topic?  And if anyone wants
-> to discuss the other issues start a new thread?
+If you write a small helper:
 
-Well, how about this?  There certainly should be some discussion about
-how in the context of the Linux kernel run-time, the various impacts of
-overlays need to be handled.  But for out of kernel pre-boot cases, I
-believe __symbols__ always is the only answer that won't bring everyone
-more pain down the line.  What needs to happen before we can get to that
-point, since the Linux kernel is the gate-keeper to how dtbs are built?
+static void riscv_remote_ctrl(unsigned int cpu, void (*fn)(void *d),
+       	    		      struct irq_data *data)
+{
+	smp_call_function_single(cpu, cb, data, true);
+}
 
---=20
-Tom
+Then both riscv_irq_enable() and riscv_irq_disable() become readable
+functions.
 
---kCytVXyVRCMICUUg
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
+	if (data->hart == smp_processor_id())
+		riscv_irq_unmask(d);
+	else if (cpu_online(data->hart))
+	     	riscv_remote_ctrl(data->hart, riscv_irq_enable_helper, d);
+	else
+		WARN_ON_ONCE(1);
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
+Hmm?
 
-iQIcBAEBAgAGBQJZlGAWAAoJEIf59jXTHXZS1IYP/3C/+BnKIdCJDWPk/31bMOoJ
-yYbPIV7EAg+M9h8mXkTOU1diUszZ1V/l6pvwiRVS7hUHdqxRDWt5CK2BfNWfkn4N
-Oc1MMJ1o4KwcPJ5E65lD7A0BWCivnLhESeOVs4pAWzdMiQiREcOE2w0ugiUvUdJ+
-Yh8cL8RmHNoBymqAb9yfo/6cN2YHi5hCLYt4iPZ6hRFrM34WMLCF2jw22My11HKt
-qUXel5EA0ngubnBoq9hZMuurd9JX6Ym0ioAM0ZIYGlFR8mUQcAdCoJHjNnyXa7B0
-N6tmg88cYHc3UykQiHA3vYf2Vkm+YMHtuoeORW+j+peF5wcGs85d7awLPMJRMdmP
-WejpTSTUNgqrNyHOi0je4fEFdiI+kK4F8eFR9SXqx7FOBPQmITl8ZyTLHt2w57/t
-VGF0s1wlemH1QfEO53Qx+ickP09cGo4014kAiJJXa1FtrsUIOac1Xrc3mKUgPaN5
-AcD+zU+TbtcK2r1yo6j3DuqMHEQAE+MMhPcXVTOJ/QUaXqWDY4eMlKB8FMOAH6yA
-pQmY4hznhNox8xhflfrBG9oPHTH/ZSLXGnz5Q4nb6aghWb3RxklflwU2z+hyKqaS
-FDXGGceNQioX3oQNTR2J1mfZKMRCG9howLRvGqqOkdIHRtetvM5ptwuq6kIDrDER
-9JEKH4CfCux/sIOfkIB/
-=QNQP
------END PGP SIGNATURE-----
+> +static int riscv_intc_init(struct device_node *node, struct device_node *parent)
+> +{
+> +	int hart;
+> +	struct riscv_irq_data *data;
+> +
+> +	if (parent)
+> +		return 0;
+> +
+> +	hart = riscv_of_processor_hart(node->parent);
+> +	if (hart < 0)
+> +		return -EIO;
+> +
+> +	data = &per_cpu(riscv_irq_data, hart);
+> +	snprintf(data->name, sizeof(data->name), "riscv,cpu_intc,%d", hart);
+> +	data->hart = hart;
+> +	data->chip.name = data->name;
+> +	data->chip.irq_mask = riscv_irq_mask;
+> +	data->chip.irq_unmask = riscv_irq_unmask;
+> +	data->chip.irq_enable = riscv_irq_enable;
+> +	data->chip.irq_disable = riscv_irq_disable;
+> +	data->domain = irq_domain_add_linear(
+> +		node,
+> +		8*sizeof(uintptr_t),
+> +		&riscv_irqdomain_ops,
+> +		data);
 
---kCytVXyVRCMICUUg--
+This is really horrible to read. What's wrong with using the full 80 chars?
+
+	data->domain = irq_domain_add_linear(node, 8 * sizeof(uintptr_t),
+					     &riscv_irqdomain_ops, data);
+
+> +	if (!data->domain)
+> +		goto error_add_linear;
+> +	pr_info("%s: %d local interrupts mapped\n",
+> +	        data->name, 8*(int)sizeof(uintptr_t));
+
+Can we please make that '8 * sizeof()' a constant and use it in both
+places? Which makes the pr_info also fit into a single line.
+
+> +	return 0;
+> +
+> +error_add_linear:
+> +	pr_warning("%s: unable to add IRQ domain\n",
+> +		   data->name);
+
+Single line please. Enough room.
+
+> +	return -(ENXIO);
+
+No braces.
+
+Thanks,
+
+	tglx
