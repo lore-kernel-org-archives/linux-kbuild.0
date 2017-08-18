@@ -1,40 +1,32 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ec2-52-27-115-49.us-west-2.compute.amazonaws.com ([52.27.115.49]:56795
-        "EHLO osg.samsung.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1751807AbdHRVyp (ORCPT
+Received: from mail-wm0-f66.google.com ([74.125.82.66]:33688 "EHLO
+        mail-wm0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751673AbdHRWV3 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 18 Aug 2017 17:54:45 -0400
-From: Shuah Khan <shuahkh@osg.samsung.com>
-Subject: [PATCH v2] Makefile: add kselftest-clean to PHONY target list
-Date: Fri, 18 Aug 2017 15:54:41 -0600
-Message-Id: <20170818215441.2828-1-shuahkh@osg.samsung.com>
+        Fri, 18 Aug 2017 18:21:29 -0400
+Received: by mail-wm0-f66.google.com with SMTP id q189so5583585wmd.0
+        for <linux-kbuild@vger.kernel.org>; Fri, 18 Aug 2017 15:21:28 -0700 (PDT)
+From: Nicolas Porcel <nicolasporcel06@gmail.com>
+Subject: [PATCH 0/2] Improve KCONFIG_CONFIG use in kconfig
+Date: Sat, 19 Aug 2017 00:20:50 +0200
+Message-Id: <20170818222052.22375-1-nicolasporcel06@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: yamada.masahiro@socionext.com, mmarek@suse.com
-Cc: Shuah Khan <shuahkh@osg.samsung.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
+To: linux-kbuild@vger.kernel.org
+Cc: Nicolas Porcel <nicolasporcel06@gmail.com>
 
-kselftest-clean isn't in the PHONY target list. Add it.
+This patch series will improve the use of KCONFIG_CONFIG in order to perform
+out of tree kernel configuration. This is useful when the kernel source is not
+on a writable directory.
 
-Signed-off-by: Shuah Khan <shuahkh@osg.samsung.com>
----
-Changes since v1:
--- Fix spelling error in commit header - PHONY not PHOMY
+Nicolas Porcel (2):
+  kconfig: Use KCONFIG_CONFIG in buildtar
+  kconfig: support out of tree KCONFIG_CONFIG
 
- Makefile | 1 +
- 1 file changed, 1 insertion(+)
+ scripts/kconfig/confdata.c | 35 ++++++++++++++++++++---------------
+ scripts/package/buildtar   |  4 ++--
+ 2 files changed, 22 insertions(+), 17 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index b4fb9a1d1594..eccb8d704c23 100644
---- a/Makefile
-+++ b/Makefile
-@@ -1184,6 +1184,7 @@ PHONY += kselftest
- kselftest:
- 	$(Q)$(MAKE) -C tools/testing/selftests run_tests
- 
-+PHONY += kselftest-clean
- kselftest-clean:
- 	$(Q)$(MAKE) -C tools/testing/selftests clean
- 
 -- 
-2.11.0
+2.14.1
 
