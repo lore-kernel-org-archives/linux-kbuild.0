@@ -1,13 +1,13 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from ec2-52-27-115-49.us-west-2.compute.amazonaws.com ([52.27.115.49]:56771
+Received: from ec2-52-27-115-49.us-west-2.compute.amazonaws.com ([52.27.115.49]:56795
         "EHLO osg.samsung.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1752309AbdHRVln (ORCPT
+        with ESMTP id S1751807AbdHRVyp (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 18 Aug 2017 17:41:43 -0400
+        Fri, 18 Aug 2017 17:54:45 -0400
 From: Shuah Khan <shuahkh@osg.samsung.com>
-Subject: [PATCH] Makefile: add kselftest-clean to PHOMY target list
-Date: Fri, 18 Aug 2017 15:41:38 -0600
-Message-Id: <20170818214138.2020-1-shuahkh@osg.samsung.com>
+Subject: [PATCH v2] Makefile: add kselftest-clean to PHONY target list
+Date: Fri, 18 Aug 2017 15:54:41 -0600
+Message-Id: <20170818215441.2828-1-shuahkh@osg.samsung.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: yamada.masahiro@socionext.com, mmarek@suse.com
@@ -17,6 +17,9 @@ kselftest-clean isn't in the PHONY target list. Add it.
 
 Signed-off-by: Shuah Khan <shuahkh@osg.samsung.com>
 ---
+Changes since v1:
+-- Fix spelling error in commit header - PHONY not PHOMY
+
  Makefile | 1 +
  1 file changed, 1 insertion(+)
 
