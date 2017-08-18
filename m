@@ -1,51 +1,37 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-08.nifty.com ([210.131.2.75]:56439 "EHLO
-        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751594AbdHRQLS (ORCPT
+Received: from ec2-52-27-115-49.us-west-2.compute.amazonaws.com ([52.27.115.49]:56771
+        "EHLO osg.samsung.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1752309AbdHRVln (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 18 Aug 2017 12:11:18 -0400
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH] kbuild: fix alignment of GPERF log
-Date: Sat, 19 Aug 2017 01:10:46 +0900
-Message-Id: <1503072646-20707-1-git-send-email-yamada.masahiro@socionext.com>
+        Fri, 18 Aug 2017 17:41:43 -0400
+From: Shuah Khan <shuahkh@osg.samsung.com>
+Subject: [PATCH] Makefile: add kselftest-clean to PHOMY target list
+Date: Fri, 18 Aug 2017 15:41:38 -0600
+Message-Id: <20170818214138.2020-1-shuahkh@osg.samsung.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, linux-kernel@vger.kernel.org
+To: yamada.masahiro@socionext.com, mmarek@suse.com
+Cc: Shuah Khan <shuahkh@osg.samsung.com>, linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-When regenerating *.hash.c_shipped, the GPERF log is unaligned.
+kselftest-clean isn't in the PHONY target list. Add it.
 
-$ rm -rf scripts/kconfig/zconf.hash.c_shipped
-$ make REGENERATE_PARSERS=1 defconfig
-  HOSTCC  scripts/basic/fixdep
-  HOSTCC  scripts/kconfig/conf.o
-  SHIPPED scripts/kconfig/zconf.tab.c
-  SHIPPED scripts/kconfig/zconf.lex.c
-  GPERF scripts/kconfig/zconf.hash.c_shipped
-  SHIPPED scripts/kconfig/zconf.hash.c
-  HOSTCC  scripts/kconfig/zconf.tab.o
-  HOSTLD  scripts/kconfig/conf
-  ...
-
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+Signed-off-by: Shuah Khan <shuahkh@osg.samsung.com>
 ---
+ Makefile | 1 +
+ 1 file changed, 1 insertion(+)
 
- scripts/Makefile.lib | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/scripts/Makefile.lib b/scripts/Makefile.lib
-index 58c05e5d9870..06e2c577e3bc 100644
---- a/scripts/Makefile.lib
-+++ b/scripts/Makefile.lib
-@@ -196,7 +196,7 @@ ifdef REGENERATE_PARSERS
+diff --git a/Makefile b/Makefile
+index b4fb9a1d1594..eccb8d704c23 100644
+--- a/Makefile
++++ b/Makefile
+@@ -1184,6 +1184,7 @@ PHONY += kselftest
+ kselftest:
+ 	$(Q)$(MAKE) -C tools/testing/selftests run_tests
  
- # GPERF
- # ---------------------------------------------------------------------------
--quiet_cmd_gperf = GPERF $@
-+quiet_cmd_gperf = GPERF   $@
-       cmd_gperf = gperf -t --output-file $@ -a -C -E -g -k 1,3,$$ -p -t $<
++PHONY += kselftest-clean
+ kselftest-clean:
+ 	$(Q)$(MAKE) -C tools/testing/selftests clean
  
- .PRECIOUS: $(src)/%.hash.c_shipped
 -- 
-2.7.4
+2.11.0
 
