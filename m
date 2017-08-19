@@ -1,38 +1,76 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from asavdk4.altibox.net ([109.247.116.15]:43948 "EHLO
-        asavdk4.altibox.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751101AbdHSPBY (ORCPT
+Received: from mail-oi0-f66.google.com ([209.85.218.66]:36745 "EHLO
+        mail-oi0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751760AbdHSRDw (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 19 Aug 2017 11:01:24 -0400
-Date: Sat, 19 Aug 2017 17:01:21 +0200
-From: Sam Ravnborg <sam@ravnborg.org>
-Subject: Re: special handle of scripts/kconfig/zconf.tab.o
-Message-ID: <20170819150121.GA9084@ravnborg.org>
-References: <5992D4DF.2080405@cn.fujitsu.com>
- <CAK7LNATGwrMBsaps1oVOi_21R8jzTadeWSwaK1dA8nMaJs7KpQ@mail.gmail.com>
- <20170819145441.GA5940@ravnborg.org>
+        Sat, 19 Aug 2017 13:03:52 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170819145441.GA5940@ravnborg.org>
+In-Reply-To: <1503132577-24423-1-git-send-email-yamada.masahiro@socionext.com>
+References: <1503132577-24423-1-git-send-email-yamada.masahiro@socionext.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Sat, 19 Aug 2017 10:03:51 -0700
+Message-ID: <CA+55aFzQ4shyD=bqdSMreU33iLVkEsSgnMXegL5wcu5ug0fOUg@mail.gmail.com>
+Subject: Re: [RFC PATCH 0/3] kbuild: generate intermediate C files instead of
+ copying _shipped files
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Cao jin <caoj.fnst@cn.fujitsu.com>, Michal Marek <mmarek@suse.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, Rob Herring <robh@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Richard Purdie <richard.purdie@linuxfoundation.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Andrew Morton <akpm@linux-foundation.org>, Mauro Carvalho Chehab <mchehab@kernel.org>, Nicholas Piggin <npiggin@gmail.com>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Markus Heiser <markus.heiser@darmarit.de>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Frank Rowand <frowand.list@gmail.com>, Rob Herring <robh+dt@kernel.org>, SeongJae Park <sj38.park@gmail.com>, "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-> > The difference between with/without _shipped is,
-> > zconf.{tab,hash,lex}.c_shipped reside under $(srctree),
-> > whereas zconf.{tab,hash,lex}.c under $(objtree).
-> 
-> The whole idea behind the *_shipped file was to have less dependencies
-> on the host system buildign the kernel.
-> So we did not rely on users having all of flex, bison, gperf
-> installed in the right versions.
-Another reason to use the _shipped files was to make
-the "make *config" step faster for a clean kernel.
+On Sat, Aug 19, 2017 at 1:49 AM, Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+>
+> Here is one question.  Is it acceptable to use those rules all the time?
+> That is, generate those C files by flex, bison, gperf during the
+> kernel building.
 
-It is much faster to copy a file than to runn the tools.
-The build machines has become significant faster since
-then so maybe this is less than an issue today.
+Yeah, I think we probably should do that.
 
-	Sam
+However, when I just tested, I noticed that we have issues with
+re-generating those files. With gperf 3.1 installed, I get
+
+  In file included from scripts/kconfig/zconf.tab.c:213:0:
+  scripts/kconfig/zconf.gperf:147:1: error: conflicting types for
+=E2=80=98kconf_id_lookup=E2=80=99
+  scripts/kconfig/zconf.gperf:12:31: note: previous declaration of
+=E2=80=98kconf_id_lookup=E2=80=99 was here
+   static const struct kconf_id *kconf_id_lookup(register const char
+*str, register unsigned int len);
+                                 ^~~~~~~~~~~~~~~
+
+because gperf now generates
+
+   const struct kconf_id *
+  -kconf_id_lookup (register const char *str, register unsigned int len)
+  +kconf_id_lookup (register const char *str, register size_t len)
+
+and I'm not sure how to detect that automatically. It seems to be a
+gperf-3.1 change, and gperf doesn't seem to generate any version
+markers.
+
+Working around that, I hit:
+
+  In file included from scripts/genksyms/lex.lex.c:1921:0:
+  scripts/genksyms/keywords.gperf:54:1: error: conflicting types for
+=E2=80=98is_reserved_word=E2=80=99
+   static, STATIC_KEYW
+   ^~~~~~~~~~~~~~~~
+  In file included from scripts/genksyms/lex.lex.c:1921:0:
+  scripts/genksyms/keywords.gperf:6:30: note: previous declaration of
+=E2=80=98is_reserved_word=E2=80=99 was here
+   static const struct resword *is_reserved_word(register const char
+*str, register unsigned int len);
+                              ^~~~~~~~~~~~~~~~
+
+so we have at least two cases of this in the source tree.
+
+So one of the advantages of the pre-shipped files is that we can avoid
+that kind of crazy version issues with the tools.
+
+But if we can solve the versioning thing easily, I certainly don't
+mind getting rid of the pre-generated files. Having to have
+flex/bison/gperf isn't a huge onus on the kernel build system.
+
+              Linus
