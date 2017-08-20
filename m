@@ -1,15 +1,15 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:30564 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752839AbdHTMu6 (ORCPT
+Received: from conssluserg-02.nifty.com ([210.131.2.81]:37345 "EHLO
+        conssluserg-02.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752852AbdHTMww (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 20 Aug 2017 08:50:58 -0400
+        Sun, 20 Aug 2017 08:52:52 -0400
 MIME-Version: 1.0
 In-Reply-To: <20170818215441.2828-1-shuahkh@osg.samsung.com>
 References: <20170818215441.2828-1-shuahkh@osg.samsung.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sun, 20 Aug 2017 21:50:05 +0900
-Message-ID: <CAK7LNASORROK60AQz9D+-KUBbPYKxAwm0KFwXCt0TReFL3FgkQ@mail.gmail.com>
+Date: Sun, 20 Aug 2017 21:52:06 +0900
+Message-ID: <CAK7LNAQw-7X0RDNQv9TSWDAK8NpOv6Uqz_TBW5HgB=1nOr23Zw@mail.gmail.com>
 Subject: Re: [PATCH v2] Makefile: add kselftest-clean to PHONY target list
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
