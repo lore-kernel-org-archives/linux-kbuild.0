@@ -1,70 +1,78 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-oi0-f50.google.com ([209.85.218.50]:36205 "EHLO
-        mail-oi0-f50.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753183AbdHTTvW (ORCPT
+Received: from mail-pg0-f66.google.com ([74.125.83.66]:33953 "EHLO
+        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753183AbdHTTyH (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 20 Aug 2017 15:51:22 -0400
-MIME-Version: 1.0
-In-Reply-To: <CAK7LNAQ_1g_EJCvEv2mCa1x3oMR7uZAvPbwQxnjeKNkrtmbvxg@mail.gmail.com>
-References: <596fd414.fDkQ2LPtuAl0Zq0f%akpm@linux-foundation.org>
- <CAK8P3a1NXUw9oSb-YB+TGeQYd6-sNMW+S5E5FUV_0TuBGhKV_A@mail.gmail.com> <CAK7LNAQ_1g_EJCvEv2mCa1x3oMR7uZAvPbwQxnjeKNkrtmbvxg@mail.gmail.com>
-From: Arnd Bergmann <arnd@arndb.de>
-Date: Sun, 20 Aug 2017 21:51:21 +0200
-Message-ID: <CAK8P3a1fSGm8OCKu3pxD6Cnkbbn3=EbeTN2Xdzi3Y9K3Ue9UxQ@mail.gmail.com>
-Subject: Re: + kbuild-disable-wformat-truncation-warnings-by-default.patch
- added to -mm tree
-Content-Type: text/plain; charset="UTF-8"
+        Sun, 20 Aug 2017 15:54:07 -0400
+Received: by mail-pg0-f66.google.com with SMTP id i12so5324329pgr.1
+        for <linux-kbuild@vger.kernel.org>; Sun, 20 Aug 2017 12:54:07 -0700 (PDT)
+Date: Sun, 20 Aug 2017 12:54:05 -0700 (PDT)
+Subject: Re: [PATCH v7 02/15] lib: Add shared copies of some GCC library routines
+In-Reply-To: <1501592780.29303.324.camel@linux.intel.com>
+From: Palmer Dabbelt <palmer@dabbelt.com>
+Message-ID: <mhng-7ffaa0f4-dc5d-42d0-a927-83262fecee02@palmer-si-x1c4>
+Mime-Version: 1.0 (MHng)
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, mm-commits@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, stable <stable@vger.kernel.org>, gregkh <gregkh@linuxfoundation.org>
+To: andriy.shevchenko@linux.intel.com
+Cc: peterz@infradead.org, tglx@linutronix.de, jason@lakedaemon.net, marc.zyngier@arm.com, Arnd Bergmann <arnd@arndb.de>, yamada.masahiro@socionext.com, mmarek@suse.com, albert@sifive.com, will.deacon@arm.com, boqun.feng@gmail.com, oleg@redhat.com, mingo@redhat.com, daniel.lezcano@linaro.org, gregkh@linuxfoundation.org, jslaby@suse.com, davem@davemloft.net, mchehab@kernel.org, hverkuil@xs4all.nl, rdunlap@infradead.org, viro@zeniv.linux.org.uk, mhiramat@kernel.org, fweisbec@gmail.com, mcgrof@kernel.org, dledford@redhat.com, bart.vanassche@sandisk.com, sstabellini@kernel.org, mpe@ellerman.id.au, rmk+kernel@armlinux.org.uk, paul.gortmaker@windriver.com, nicolas.dichtel@6wind.com, linux@roeck-us.net, heiko.carstens@de.ibm.com, schwidefsky@de.ibm.com, geert@linux-m68k.org, akpm@linux-foundation.org, jiri@mellanox.com, vgupta@synopsys.com, airlied@redhat.com, jk@ozlabs.org, chris@chris-wilson.co.uk, Jason@zx2c4.com, paulmck@linux.vnet.ibm.com, ncardwell@google.com, linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, patches@groups.riscv.org
 
-On Sun, Aug 20, 2017 at 3:19 PM, Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
-> 2017-07-20 16:24 GMT+09:00 Arnd Bergmann <arnd@arndb.de>:
->> - enable all three warnings with "make W=1" in 4.13, but leave them
->>   disabled by default.
->> - backport Linus' patch, plus the follow-up for W=1 to stable kernels,
->>   to allow stable kernels to build cleanly
->> - backport the patches that address any other gcc-7 warnings, as
->>   well as those that are not obvious false-positives to stable kernels
->> - In 4.14+, use my version above and address all int-in-bool-context
->>   and format-overflow warnings, but only use -Wformat-truncation
->>   with make W=1.
+On Tue, 01 Aug 2017 06:06:20 PDT (-0700), andriy.shevchenko@linux.intel.com wrote:
+> On Mon, 2017-07-31 at 17:59 -0700, Palmer Dabbelt wrote:
+>> Many ports (m32r, microblaze, mips, parisc, score, and sparc) use
+>> functionally identical copies of various GCC library routine files,
+>> which came up as we were submitting the RISC-V port (which also uses
+>> some of these).
+>>
+>> This patch adds a new copy of these library routine files, which are
+>> functionally identical to the various other copies.  These are
+>> availiable via Kconfig as CONFIG_GENERIC_$ROUTINE, which currently
+>> isn't
+>> used anywhere.
 >>
 >
-> Talking about 4.14+, shall we move -Wformat-truncation
-> from the top Makefile (always disable) to
-> Makefile.extrawarn (enable with W=1) ?
+>
+>> Signed-off-by: Palmer Dabbelt <palmer@dabbelt.com>
+>
+>> Reviewed-by: Geert Uytterhoeven <geert@linux-m68k.org>
+>
+>> Signed-off-by: Palmer Dabbelt <palmer@dabbelt.com>
+>
+> That's why we are putting tags before own SoB line(s)
 
-I dropped the ball on this one, sorry. I think we should do this for
-all three warnings (format-overflow, format-truncation and
-int-in-bool-context) for the time being.
+OK, sorry about that -- I'll fix it for our v8 patch set.
 
-In case of format-truncation, there are countless warnings,
-most of them false-postives, so we simply can't enable them
-by default.
+> In two cases in the patch you have
+>
+> +
+> +
+>
+> for no reason. I think you may remove second empty line.
 
-For -Wformat-overflow, there is one patch that I need to
-rewrite, all my other patches are pending for 4.14, see
-https://patchwork.kernel.org/patch/9840801/ for the missing
-one. This should be trivial to fix. However, enabling
-CONFIG_UBSAN_SANITIZE_ALL results in seven additional
-false positives. I created an patch for this in
-https://pastebin.com/CD7nhRNp but can't submit that as it's
-obviously bogus. I reported the gcc bug as
-https://gcc.gnu.org/bugzilla/show_bug.cgi?id=81592
+Makes sense.  I'll squash this into the next patch set.
 
-What we could do there is to disable the warning if
-CONFIG_UBSAN_SANITIZE_ALL is turned on (like
-we do for -Wmaybe-uninitialized in
-CONFIG_UBSAN_SANITIZE_ALL) but leave it on otherwise.
+diff --git a/include/lib/libgcc.h b/include/lib/libgcc.h
+index a5397e34e005..32e1e0f4b2d0 100644
+--- a/include/lib/libgcc.h
++++ b/include/lib/libgcc.h
+@@ -16,7 +16,6 @@
+  * to the Free Software Foundation, Inc.
+  */
 
-I submitted patches for all -Wint-in-bool-context in arm/arm64/x86
-randconfig builds, but there are still six known warnings for which
-my patches did not get queued for 4.14.
-I have to revisit those all to decide whether we can find an
-acceptable workaround in the kernel and enable the warning again
-by default, or leave it in W=1 until gcc improves enough.
+-
+ #ifndef __LIB_LIBGCC_H
+ #define __LIB_LIBGCC_H
 
-      Arnd
+diff --git a/lib/ashldi3.c b/lib/ashldi3.c
+index ff4ec63d2ab6..1b6087db95a5 100644
+--- a/lib/ashldi3.c
++++ b/lib/ashldi3.c
+@@ -14,7 +14,6 @@
+  * to the Free Software Foundation, Inc.
+  */
+
+-
+ #include <linux/export.h>
+
+ #include <lib/libgcc.h>
+
