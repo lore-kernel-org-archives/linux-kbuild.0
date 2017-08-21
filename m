@@ -1,83 +1,92 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:33001 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753448AbdHUBqJ (ORCPT
+Received: from mail.cn.fujitsu.com ([183.91.158.132]:10478 "EHLO
+        heian.cn.fujitsu.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1750962AbdHUDau (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 20 Aug 2017 21:46:09 -0400
+        Sun, 20 Aug 2017 23:30:50 -0400
+Subject: Re: special handle of scripts/kconfig/zconf.tab.o
+References: <5992D4DF.2080405@cn.fujitsu.com>
+ <CAK7LNATGwrMBsaps1oVOi_21R8jzTadeWSwaK1dA8nMaJs7KpQ@mail.gmail.com>
+From: Cao jin <caoj.fnst@cn.fujitsu.com>
+Message-ID: <599A5542.9060509@cn.fujitsu.com>
+Date: Mon, 21 Aug 2017 11:36:34 +0800
 MIME-Version: 1.0
-In-Reply-To: <CAK8P3a1fSGm8OCKu3pxD6Cnkbbn3=EbeTN2Xdzi3Y9K3Ue9UxQ@mail.gmail.com>
-References: <596fd414.fDkQ2LPtuAl0Zq0f%akpm@linux-foundation.org>
- <CAK8P3a1NXUw9oSb-YB+TGeQYd6-sNMW+S5E5FUV_0TuBGhKV_A@mail.gmail.com>
- <CAK7LNAQ_1g_EJCvEv2mCa1x3oMR7uZAvPbwQxnjeKNkrtmbvxg@mail.gmail.com> <CAK8P3a1fSGm8OCKu3pxD6Cnkbbn3=EbeTN2Xdzi3Y9K3Ue9UxQ@mail.gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Mon, 21 Aug 2017 10:45:22 +0900
-Message-ID: <CAK7LNAQTM1Gkvbnb6wppa1fcwuz8SZWJ2QiA8ibzROsfiB3hEA@mail.gmail.com>
-Subject: Re: + kbuild-disable-wformat-truncation-warnings-by-default.patch
- added to -mm tree
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <CAK7LNATGwrMBsaps1oVOi_21R8jzTadeWSwaK1dA8nMaJs7KpQ@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Andrew Morton <akpm@linux-foundation.org>, mm-commits@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, stable <stable@vger.kernel.org>, gregkh <gregkh@linuxfoundation.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>, Sam Ravnborg <sam@ravnborg.org>
+Cc: Michal Marek <mmarek@suse.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-Hi Arnd,
+Hi,
+  Thank you both for those valuable info.
 
-2017-08-21 4:51 GMT+09:00 Arnd Bergmann <arnd@arndb.de>:
-> On Sun, Aug 20, 2017 at 3:19 PM, Masahiro Yamada
-> <yamada.masahiro@socionext.com> wrote:
->> 2017-07-20 16:24 GMT+09:00 Arnd Bergmann <arnd@arndb.de>:
->>> - enable all three warnings with "make W=1" in 4.13, but leave them
->>>   disabled by default.
->>> - backport Linus' patch, plus the follow-up for W=1 to stable kernels,
->>>   to allow stable kernels to build cleanly
->>> - backport the patches that address any other gcc-7 warnings, as
->>>   well as those that are not obvious false-positives to stable kernels
->>> - In 4.14+, use my version above and address all int-in-bool-context
->>>   and format-overflow warnings, but only use -Wformat-truncation
->>>   with make W=1.
->>>
+On 08/19/2017 08:42 PM, Masahiro Yamada wrote:
+> Hi.
+> (+CC Sam)
+> 
+> 2017-08-15 20:02 GMT+09:00 Cao jin <caoj.fnst@cn.fujitsu.com>:
+>> Masahiro-san,
 >>
->> Talking about 4.14+, shall we move -Wformat-truncation
->> from the top Makefile (always disable) to
->> Makefile.extrawarn (enable with W=1) ?
->
-> I dropped the ball on this one, sorry. I think we should do this for
-> all three warnings (format-overflow, format-truncation and
-> int-in-bool-context) for the time being.
->
-> In case of format-truncation, there are countless warnings,
-> most of them false-postives, so we simply can't enable them
-> by default.
->
-> For -Wformat-overflow, there is one patch that I need to
-> rewrite, all my other patches are pending for 4.14, see
-> https://patchwork.kernel.org/patch/9840801/ for the missing
-> one. This should be trivial to fix. However, enabling
-> CONFIG_UBSAN_SANITIZE_ALL results in seven additional
-> false positives. I created an patch for this in
-> https://pastebin.com/CD7nhRNp but can't submit that as it's
-> obviously bogus. I reported the gcc bug as
-> https://gcc.gnu.org/bugzilla/show_bug.cgi?id=81592
->
-> What we could do there is to disable the warning if
-> CONFIG_UBSAN_SANITIZE_ALL is turned on (like
-> we do for -Wmaybe-uninitialized in
-> CONFIG_UBSAN_SANITIZE_ALL) but leave it on otherwise.
->
-> I submitted patches for all -Wint-in-bool-context in arm/arm64/x86
-> randconfig builds, but there are still six known warnings for which
-> my patches did not get queued for 4.14.
-> I have to revisit those all to decide whether we can find an
-> acceptable workaround in the kernel and enable the warning again
-> by default, or leave it in W=1 until gcc improves enough.
->
+>> I have a question about make *config. In scripts/kconfig/Makefile, there
+>> is following statement:
+>>
+>> $(obj)/zconf.tab.o: $(obj)/zconf.lex.c $(obj)/zconf.hash.c
+>>
+>> and the $(obj)/zconf.{tab,hash,lex}.c match the rule in Makefile.lib:
+>>
+>> $(obj)/%: $(src)/%_shipped
+>>         $(call cmd,shipped)
+>>
+>> and cmd_shipped just transform the _shipped file to .c via `cat`.
+>>
+>> And zconf.tab.c includes several *other* .c files which make the whole
+>> process a little obscure, because there are not corresponding .o files
+>> for the *other* .c files.
+>>
+>> My questions is: Does this special handling has other meanings that I
+>> may miss? Or just legacy.
+> 
 
-I was just wondering how to handle your original patch.
-I do not mean to press you.
-We can take our time to make the right decision.  Thanks!
+> 
+> 
+>> Because a straightforward way in my mind would be:
+>>
+>> rename zconf.{tab,hash,lex}.c_shipped to zconf.{tab,hash,lex}.c, then
+>> has following in the Makefile
+>>
+>> common-objs := zconf.tab.o zconf.hash.o zconf.lex.o util.o etc...
+>> conf-objs := conf.o $(common-objs)
+>>
+> 
 
+> 
+> 
+> Here, we have one more question.
+> 
+> 
+> Can we generate zconf.{tab,hash,lex}.c from zconf.{y,gperf,l}
+> instead of from *_shipped?
+> 
+> This is also possible, technically.
+> But, I do not know if it is acceptable to have
+> more external tool dependencies.
+> (So, I sent RFC patches to hear more opinions.)
+> 
 
+I think this is good for the new comers who don't know those tools
+before. When I come to here. I just noticed that kbuild will cat
+*_shipped file to the corresponding .c file, and miss the part that the
+.c file is actually created by the tools.
+
+And another new-comer friendly improvement may be something like: remove
+"include *.c" lines in zconf.y, and modify makefile like I said above.
+ So I will not get confused when I see symbols within certain .c file is
+used while don't see the certain .o file.
 
 -- 
-Best Regards
-Masahiro Yamada
+Sincerely,
+Cao jin
+
+
