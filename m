@@ -1,59 +1,80 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:37433 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753430AbdHUAK5 (ORCPT
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:33001 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753448AbdHUBqJ (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 20 Aug 2017 20:10:57 -0400
+        Sun, 20 Aug 2017 21:46:09 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAK8P3a0WibLt9Bozj8F-jwkW+4-NvGb7dXJCcSZ5mr-ubt3s2Q@mail.gmail.com>
-References: <20170726133655.2137437-1-arnd@arndb.de> <CAK7LNATndykM25k_-ra+R=GptoETMJYuYZs04+=Eb9GiYUVkjQ@mail.gmail.com>
- <CAK8P3a0WibLt9Bozj8F-jwkW+4-NvGb7dXJCcSZ5mr-ubt3s2Q@mail.gmail.com>
+In-Reply-To: <CAK8P3a1fSGm8OCKu3pxD6Cnkbbn3=EbeTN2Xdzi3Y9K3Ue9UxQ@mail.gmail.com>
+References: <596fd414.fDkQ2LPtuAl0Zq0f%akpm@linux-foundation.org>
+ <CAK8P3a1NXUw9oSb-YB+TGeQYd6-sNMW+S5E5FUV_0TuBGhKV_A@mail.gmail.com>
+ <CAK7LNAQ_1g_EJCvEv2mCa1x3oMR7uZAvPbwQxnjeKNkrtmbvxg@mail.gmail.com> <CAK8P3a1fSGm8OCKu3pxD6Cnkbbn3=EbeTN2Xdzi3Y9K3Ue9UxQ@mail.gmail.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Mon, 21 Aug 2017 09:09:59 +0900
-Message-ID: <CAK7LNATpsLJfFR6z+yFSkOPZP71Lqw5cKt8agibRvCpua6EjdA@mail.gmail.com>
-Subject: Re: [PATCH v2] Kbuild: use -fshort-wchar globally
+Date: Mon, 21 Aug 2017 10:45:22 +0900
+Message-ID: <CAK7LNAQTM1Gkvbnb6wppa1fcwuz8SZWJ2QiA8ibzROsfiB3hEA@mail.gmail.com>
+Subject: Re: + kbuild-disable-wformat-truncation-warnings-by-default.patch
+ added to -mm tree
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Arnd Bergmann <arnd@arndb.de>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Michal Marek <mmarek@suse.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>, Juergen Gross <jgross@suse.com>, David Vrabel <david.vrabel@citrix.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, xen-devel <xen-devel@lists.xenproject.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>, mm-commits@vger.kernel.org, Linus Torvalds <torvalds@linux-foundation.org>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, stable <stable@vger.kernel.org>, gregkh <gregkh@linuxfoundation.org>
 
-2017-08-21 4:22 GMT+09:00 Arnd Bergmann <arnd@arndb.de>:
-> On Sun, Aug 20, 2017 at 2:31 PM, Masahiro Yamada
+Hi Arnd,
+
+2017-08-21 4:51 GMT+09:00 Arnd Bergmann <arnd@arndb.de>:
+> On Sun, Aug 20, 2017 at 3:19 PM, Masahiro Yamada
 > <yamada.masahiro@socionext.com> wrote:
->> Hi Arnd,
+>> 2017-07-20 16:24 GMT+09:00 Arnd Bergmann <arnd@arndb.de>:
+>>> - enable all three warnings with "make W=1" in 4.13, but leave them
+>>>   disabled by default.
+>>> - backport Linus' patch, plus the follow-up for W=1 to stable kernels,
+>>>   to allow stable kernels to build cleanly
+>>> - backport the patches that address any other gcc-7 warnings, as
+>>>   well as those that are not obvious false-positives to stable kernels
+>>> - In 4.14+, use my version above and address all int-in-bool-context
+>>>   and format-overflow warnings, but only use -Wformat-truncation
+>>>   with make W=1.
+>>>
 >>
->> This patch was picked up for linux-next
->> (I assume it was queued up for 4.14-rc1)
->> but I see this warning in Linus' tree.
->>
->> If we are not comfortable with this warning in the 4.13 release,
->> shall I include this patch in the kbuild/fixes pull request?
->> (planned this week)
->>
->> Please let me know your thought.
+>> Talking about 4.14+, shall we move -Wformat-truncation
+>> from the top Makefile (always disable) to
+>> Makefile.extrawarn (enable with W=1) ?
 >
-> Yes, I think it would be good to have in 4.13, since it's a regression
-> against older kernels.
+> I dropped the ball on this one, sorry. I think we should do this for
+> all three warnings (format-overflow, format-truncation and
+> int-in-bool-context) for the time being.
 >
->> 2017-07-26 22:36 GMT+09:00 Arnd Bergmann <arnd@arndb.de>:
->>> A previous patch added the --no-wchar-size-warning to the Makefile to
->>> avoid this harmless warning:
->>
->> "A previous patch" sounds ambiguous.
->>
->> The previous patch was applied one year ago.
->>
->>
->> If it is OK, I can reword like
->>
->> Commit 971a69db7dc0 ("Xen: don't warn about 2-byte wchar_t in efi") added ...
+> In case of format-truncation, there are countless warnings,
+> most of them false-postives, so we simply can't enable them
+> by default.
 >
-> Good idea, thanks!
+> For -Wformat-overflow, there is one patch that I need to
+> rewrite, all my other patches are pending for 4.14, see
+> https://patchwork.kernel.org/patch/9840801/ for the missing
+> one. This should be trivial to fix. However, enabling
+> CONFIG_UBSAN_SANITIZE_ALL results in seven additional
+> false positives. I created an patch for this in
+> https://pastebin.com/CD7nhRNp but can't submit that as it's
+> obviously bogus. I reported the gcc bug as
+> https://gcc.gnu.org/bugzilla/show_bug.cgi?id=81592
+>
+> What we could do there is to disable the warning if
+> CONFIG_UBSAN_SANITIZE_ALL is turned on (like
+> we do for -Wmaybe-uninitialized in
+> CONFIG_UBSAN_SANITIZE_ALL) but leave it on otherwise.
+>
+> I submitted patches for all -Wint-in-bool-context in arm/arm64/x86
+> randconfig builds, but there are still six known warnings for which
+> my patches did not get queued for 4.14.
+> I have to revisit those all to decide whether we can find an
+> acceptable workaround in the kernel and enable the warning again
+> by default, or leave it in W=1 until gcc improves enough.
 >
 
-
-Applied to linux-kbuild/fixes.  Thanks!
+I was just wondering how to handle your original patch.
+I do not mean to press you.
+We can take our time to make the right decision.  Thanks!
 
 
 
