@@ -1,78 +1,55 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:37010 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751240AbdHUJFb (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 21 Aug 2017 05:05:31 -0400
+Received: from mail.kernel.org ([198.145.29.99]:38580 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1753407AbdHURMx (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Mon, 21 Aug 2017 13:12:53 -0400
 MIME-Version: 1.0
-In-Reply-To: <20170821084930.GA7678@ulmo>
-References: <1503209051-16477-1-git-send-email-yamada.masahiro@socionext.com> <20170821084930.GA7678@ulmo>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Mon, 21 Aug 2017 18:04:38 +0900
-Message-ID: <CAK7LNAS73Or9G82-8zT=7XjKfP_zEK2+TgutaOHw7SPeeO9_CA@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: use $(abspath ...) instead of $(shell cd ... && /bin/pwd)
+In-Reply-To: <1503132577-24423-4-git-send-email-yamada.masahiro@socionext.com>
+References: <1503132577-24423-1-git-send-email-yamada.masahiro@socionext.com> <1503132577-24423-4-git-send-email-yamada.masahiro@socionext.com>
+From: Rob Herring <robh@kernel.org>
+Date: Mon, 21 Aug 2017 12:12:31 -0500
+Message-ID: <CAL_JsqKWX1kb58_cck5ACGJGg8p2irsZNXufq2ougbRDxnLhXw@mail.gmail.com>
+Subject: Re: [RFC PATCH 3/3] kbuild: generate *.tab.c and *.tab.h during build
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Thierry Reding <treding@nvidia.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, =?UTF-8?Q?Bj=C3=B8rn_Forsman?= <bjorn.forsman@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.com>, linux-pm@vger.kernel.org, Kieran Bingham <kieran@bingham.xyz>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Thomas Renninger <trenn@suse.com>, Josh Poimboeuf <jpoimboe@redhat.com>, Arnaldo Carvalho de Melo <acme@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.com>, Linus Torvalds <torvalds@linux-foundation.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Richard Purdie <richard.purdie@linuxfoundation.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Andrew Morton <akpm@linux-foundation.org>, Mauro Carvalho Chehab <mchehab@kernel.org>, Nicholas Piggin <npiggin@gmail.com>, "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, SeongJae Park <sj38.park@gmail.com>, Frank Rowand <frowand.list@gmail.com>, "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-2017-08-21 17:49 GMT+09:00 Thierry Reding <treding@nvidia.com>:
-> On Sun, Aug 20, 2017 at 03:04:11PM +0900, Masahiro Yamada wrote:
->> Kbuild conventionally uses $(shell cd ... && /bin/pwd) idiom to get
->> the absolute path of the directory because GNU Make 3.80, the minimal
->> supported version at that time, did not support $(abspath ...) or
->> $(realpath ...).
->>
->> Commit 37d69ee30808 ("docs: bump minimal GNU Make version to 3.81")
->> dropped the GNU Make 3.80 support, so we are now allowed to use those
->> make-builtin helpers.
->>
->> This conversion will provide better portability without relying on
->> the pwd command or its location /bin/pwd.
->>
->> I am intentionally using $(realpath ...) instead $(abspath ...) in
->> some places.  The difference between the two is $(realpath ...)
->> returns an empty string if the given path does not exist.  It is
->> convenient in places where we need to error-out if the makefile fails
->> to create an output directory.
->>
->> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
->> ---
->>
->>  Makefile                       | 12 ++++++------
->>  scripts/gdb/linux/Makefile     |  2 +-
->>  tools/power/cpupower/Makefile  |  2 +-
->>  tools/scripts/Makefile.include |  6 +++---
->>  4 files changed, 11 insertions(+), 11 deletions(-)
+On Sat, Aug 19, 2017 at 3:49 AM, Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
+> *.tab.[ch] files are artifacts generated from *.y by using bison.
+> Instead of running bison, we conventionally version-control
+> *.tab.[ch]_shipped files and copy them to *.tab.[ch] during build.
 >
-> This looks very similar to a patch I had written a long time ago:
+> It is true that this approach can minimize external tool dependency,
+> but we need to update the shipped files from time to time.  This
+> commit switches to build-time generation of the intermediate C files.
+
+When do we need to update them?
+
 >
-> Acked-by: Thierry Reding <treding@nvidia.com>
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> ---
+>
+>  Documentation/process/changes.rst    |   12 +
+>  scripts/Makefile.lib                 |   14 +-
+>  scripts/dtc/Makefile                 |    9 +-
+>  scripts/dtc/dtc-parser.tab.c_shipped | 2303 -------------------------------
+>  scripts/dtc/dtc-parser.tab.h_shipped |  125 --
 
+The script to import dtc normally creates these. If you change this,
+please make sure the script still works.
 
-Yup.
-
-Three month ago, I sent a reminder to you,
-but I did not get a response.
-
-https://lkml.org/lkml/2017/5/18/1370
-
-
-
-
-This time, Bjorn sent a patch to replace /bin/pwd with pwd.
-
-I asked him to use $(abspath ...) / $(realpath ...),
-but he did not like to do it.
-
-https://patchwork.kernel.org/patch/9859591/
-
-
-So, I am doing it by myself.
-
-
-
--- 
-Best Regards
-Masahiro Yamada
+>  scripts/genksyms/Makefile            |    5 +-
+>  scripts/genksyms/parse.tab.c_shipped | 2394 --------------------------------
+>  scripts/genksyms/parse.tab.h_shipped |  119 --
+>  scripts/kconfig/Makefile             |    2 +-
+>  scripts/kconfig/zconf.tab.c_shipped  | 2471 ----------------------------------
+>  10 files changed, 24 insertions(+), 7430 deletions(-)
+>  delete mode 100644 scripts/dtc/dtc-parser.tab.c_shipped
+>  delete mode 100644 scripts/dtc/dtc-parser.tab.h_shipped
+>  delete mode 100644 scripts/genksyms/parse.tab.c_shipped
+>  delete mode 100644 scripts/genksyms/parse.tab.h_shipped
+>  delete mode 100644 scripts/kconfig/zconf.tab.c_shipped
+>
