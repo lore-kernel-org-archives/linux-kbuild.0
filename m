@@ -1,92 +1,80 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail.cn.fujitsu.com ([183.91.158.132]:10478 "EHLO
-        heian.cn.fujitsu.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1750962AbdHUDau (ORCPT
+Received: from hqemgate15.nvidia.com ([216.228.121.64]:16887 "EHLO
+        hqemgate15.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752566AbdHUIx6 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 20 Aug 2017 23:30:50 -0400
-Subject: Re: special handle of scripts/kconfig/zconf.tab.o
-References: <5992D4DF.2080405@cn.fujitsu.com>
- <CAK7LNATGwrMBsaps1oVOi_21R8jzTadeWSwaK1dA8nMaJs7KpQ@mail.gmail.com>
-From: Cao jin <caoj.fnst@cn.fujitsu.com>
-Message-ID: <599A5542.9060509@cn.fujitsu.com>
-Date: Mon, 21 Aug 2017 11:36:34 +0800
+        Mon, 21 Aug 2017 04:53:58 -0400
+Date: Mon, 21 Aug 2017 10:49:30 +0200
+From: Thierry Reding <treding@nvidia.com>
+Subject: Re: [PATCH] kbuild: use $(abspath ...) instead of $(shell cd ... &&
+ /bin/pwd)
+Message-ID: <20170821084930.GA7678@ulmo>
+References: <1503209051-16477-1-git-send-email-yamada.masahiro@socionext.com>
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNATGwrMBsaps1oVOi_21R8jzTadeWSwaK1dA8nMaJs7KpQ@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <1503209051-16477-1-git-send-email-yamada.masahiro@socionext.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="BOKacYhQ+x31HxR3"
+Content-Disposition: inline
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, Sam Ravnborg <sam@ravnborg.org>
-Cc: Michal Marek <mmarek@suse.com>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: linux-kbuild@vger.kernel.org, =?utf-8?B?QmrDuHJu?= Forsman <bjorn.forsman@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.com>, linux-pm@vger.kernel.org, Kieran Bingham <kieran@bingham.xyz>, linux-kernel@vger.kernel.org, Thomas Renninger <trenn@suse.com>, Josh Poimboeuf <jpoimboe@redhat.com>, Arnaldo Carvalho de Melo <acme@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>
 
-Hi,
-  Thank you both for those valuable info.
+--BOKacYhQ+x31HxR3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 08/19/2017 08:42 PM, Masahiro Yamada wrote:
-> Hi.
-> (+CC Sam)
-> 
-> 2017-08-15 20:02 GMT+09:00 Cao jin <caoj.fnst@cn.fujitsu.com>:
->> Masahiro-san,
->>
->> I have a question about make *config. In scripts/kconfig/Makefile, there
->> is following statement:
->>
->> $(obj)/zconf.tab.o: $(obj)/zconf.lex.c $(obj)/zconf.hash.c
->>
->> and the $(obj)/zconf.{tab,hash,lex}.c match the rule in Makefile.lib:
->>
->> $(obj)/%: $(src)/%_shipped
->>         $(call cmd,shipped)
->>
->> and cmd_shipped just transform the _shipped file to .c via `cat`.
->>
->> And zconf.tab.c includes several *other* .c files which make the whole
->> process a little obscure, because there are not corresponding .o files
->> for the *other* .c files.
->>
->> My questions is: Does this special handling has other meanings that I
->> may miss? Or just legacy.
-> 
+On Sun, Aug 20, 2017 at 03:04:11PM +0900, Masahiro Yamada wrote:
+> Kbuild conventionally uses $(shell cd ... && /bin/pwd) idiom to get
+> the absolute path of the directory because GNU Make 3.80, the minimal
+> supported version at that time, did not support $(abspath ...) or
+> $(realpath ...).
+>=20
+> Commit 37d69ee30808 ("docs: bump minimal GNU Make version to 3.81")
+> dropped the GNU Make 3.80 support, so we are now allowed to use those
+> make-builtin helpers.
+>=20
+> This conversion will provide better portability without relying on
+> the pwd command or its location /bin/pwd.
+>=20
+> I am intentionally using $(realpath ...) instead $(abspath ...) in
+> some places.  The difference between the two is $(realpath ...)
+> returns an empty string if the given path does not exist.  It is
+> convenient in places where we need to error-out if the makefile fails
+> to create an output directory.
+>=20
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+> ---
+>=20
+>  Makefile                       | 12 ++++++------
+>  scripts/gdb/linux/Makefile     |  2 +-
+>  tools/power/cpupower/Makefile  |  2 +-
+>  tools/scripts/Makefile.include |  6 +++---
+>  4 files changed, 11 insertions(+), 11 deletions(-)
 
-> 
-> 
->> Because a straightforward way in my mind would be:
->>
->> rename zconf.{tab,hash,lex}.c_shipped to zconf.{tab,hash,lex}.c, then
->> has following in the Makefile
->>
->> common-objs := zconf.tab.o zconf.hash.o zconf.lex.o util.o etc...
->> conf-objs := conf.o $(common-objs)
->>
-> 
+This looks very similar to a patch I had written a long time ago:
 
-> 
-> 
-> Here, we have one more question.
-> 
-> 
-> Can we generate zconf.{tab,hash,lex}.c from zconf.{y,gperf,l}
-> instead of from *_shipped?
-> 
-> This is also possible, technically.
-> But, I do not know if it is acceptable to have
-> more external tool dependencies.
-> (So, I sent RFC patches to hear more opinions.)
-> 
+Acked-by: Thierry Reding <treding@nvidia.com>
 
-I think this is good for the new comers who don't know those tools
-before. When I come to here. I just noticed that kbuild will cat
-*_shipped file to the corresponding .c file, and miss the part that the
-.c file is actually created by the tools.
+--BOKacYhQ+x31HxR3
+Content-Type: application/pgp-signature; name="signature.asc"
 
-And another new-comer friendly improvement may be something like: remove
-"include *.c" lines in zconf.y, and modify makefile like I said above.
- So I will not get confused when I see symbols within certain .c file is
-used while don't see the certain .o file.
+-----BEGIN PGP SIGNATURE-----
 
--- 
-Sincerely,
-Cao jin
+iQIzBAABCAAdFiEEiOrDCAFJzPfAjcif3SOs138+s6EFAlmanpcACgkQ3SOs138+
+s6E41w//XaIYnoRQswXyc2L8SpJTW3Rm0BJIgfrzKNvvAdtfdPOvwVyX6/0KCCOS
+Q5+VLAUXOM6Iv4m6n+2FIz+0/wiUBPaxhgirlaS5vGU1f2xpjGw6uWdrOeW7EDOH
+sOExltQtcu5KSdJKjBo8Rlqk74NOCghpAf4a8FR+kaHBx14yLqAoWhefzyYx0Ku9
+WICJIi8+6fItarHuVgIKwLc+8ZiOuV/KwExFnPn9bT3QrTF9YlihkYiZfEanZvvq
+1C9dA4ZaC78wOuFpifyl+GjlvDrH3ec20qr08yQ8+dm5J4JbWTkuQ0SJHur+QOR2
+nSWPfHwErmcuv2+WMmHIIiLyOt9OjMMKzqnsI1056GXRYazhlUM8e5LKZV4IoaTF
+NeDQmrkBLtalwVNbktu09Dug92SN7c2R5fRwPKhmwl7cRqrZI6rm6zgAVKWGIdGx
+2gtmLe2O+Wn/uWqzxYBcrunyn7DfqQDAsoX43tv6WQYfsjm86M4Kw83dP5yO7oql
+ZccEiSM3eOOw8nElaij3cpO8egT11qKL2nN1s/beMAm7GVYotpgyf6hGRBl4DFAf
+gzSFvEq/WaGhwxVqMA7zsiKD0pzfE6IkTXDCBmMcF1+4Z7TYA8YLmTatxXlnDApk
+b0qnwGq/0GXqRi0ja/WVzGAM7segXBqa65rbdrH0o70N/KzUi5g=
+=5n/b
+-----END PGP SIGNATURE-----
 
-
+--BOKacYhQ+x31HxR3--
