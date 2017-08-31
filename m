@@ -1,45 +1,36 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:35962 "EHLO
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:36497 "EHLO
         conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751363AbdHaXxO (ORCPT
+        with ESMTP id S1751419AbdHaXxn (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 31 Aug 2017 19:53:14 -0400
+        Thu, 31 Aug 2017 19:53:43 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNAS73Or9G82-8zT=7XjKfP_zEK2+TgutaOHw7SPeeO9_CA@mail.gmail.com>
-References: <1503209051-16477-1-git-send-email-yamada.masahiro@socionext.com>
- <20170821084930.GA7678@ulmo> <CAK7LNAS73Or9G82-8zT=7XjKfP_zEK2+TgutaOHw7SPeeO9_CA@mail.gmail.com>
+In-Reply-To: <20170830140413.9333-1-jthumshirn@suse.de>
+References: <20170830140413.9333-1-jthumshirn@suse.de>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 1 Sep 2017 08:52:21 +0900
-Message-ID: <CAK7LNARntwzEggrv4nNgppnDgzpoZHwLgjVt_G7+G+W-K5h5hw@mail.gmail.com>
-Subject: Re: [PATCH] kbuild: use $(abspath ...) instead of $(shell cd ... && /bin/pwd)
+Date: Fri, 1 Sep 2017 08:52:55 +0900
+Message-ID: <CAK7LNARcvmKN9bQit6ufkTJdgcpFW3Ahti4Jh-ZsrN+g9vtUsg@mail.gmail.com>
+Subject: Re: [PATCH v2] Kbuild: enable -Wunused-macros warning for "make W=2"
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Thierry Reding <treding@nvidia.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, =?UTF-8?Q?Bj=C3=B8rn_Forsman?= <bjorn.forsman@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.com>, linux-pm@vger.kernel.org, Kieran Bingham <kieran@ksquared.org.uk>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Thomas Renninger <trenn@suse.com>, Josh Poimboeuf <jpoimboe@redhat.com>, Arnaldo Carvalho de Melo <acme@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>
+To: Johannes Thumshirn <jthumshirn@suse.de>
+Cc: Michal Marek <mmarek@suse.com>, Linux Kernel Mailinglist <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-2017-08-21 18:04 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
-> 2017-08-21 17:49 GMT+09:00 Thierry Reding <treding@nvidia.com>:
->> On Sun, Aug 20, 2017 at 03:04:11PM +0900, Masahiro Yamada wrote:
->>> Kbuild conventionally uses $(shell cd ... && /bin/pwd) idiom to get
->>> the absolute path of the directory because GNU Make 3.80, the minimal
->>> supported version at that time, did not support $(abspath ...) or
->>> $(realpath ...).
->>>
->>> Commit 37d69ee30808 ("docs: bump minimal GNU Make version to 3.81")
->>> dropped the GNU Make 3.80 support, so we are now allowed to use those
->>> make-builtin helpers.
->>>
->>> This conversion will provide better portability without relying on
->>> the pwd command or its location /bin/pwd.
->>>
->>> I am intentionally using $(realpath ...) instead $(abspath ...) in
->>> some places.  The difference between the two is $(realpath ...)
->>> returns an empty string if the given path does not exist.  It is
->>> convenient in places where we need to error-out if the makefile fails
->>> to create an output directory.
->>>
->>> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+2017-08-30 23:04 GMT+09:00 Johannes Thumshirn <jthumshirn@suse.de>:
+> We have lots of dead defines and macros in drivers, lets offer users a way
+> to detect and eventually remove them.
+>
+> Signed-off-by: Johannes Thumshirn <jthumshirn@suse.de>
+> ---
+>
+> Notes:
+>     Changes to v1:
+>     * Change from W=1 to W=2
 >
 
-Applied to linux-kbuild.
+Applied to linux-kbuild.  Thanks.
+
+-- 
+Best Regards
+Masahiro Yamada
