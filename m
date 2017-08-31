@@ -1,42 +1,105 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mx2.suse.de ([195.135.220.15]:59640 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1751317AbdH3OEZ (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Wed, 30 Aug 2017 10:04:25 -0400
-From: Johannes Thumshirn <jthumshirn@suse.de>
-Subject: [PATCH v2] Kbuild: enable -Wunused-macros warning for "make W=2"
-Date: Wed, 30 Aug 2017 16:04:13 +0200
-Message-Id: <20170830140413.9333-1-jthumshirn@suse.de>
+Received: from mail-pg0-f66.google.com ([74.125.83.66]:35869 "EHLO
+        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751739AbdHaPg5 (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 31 Aug 2017 11:36:57 -0400
+Received: by mail-pg0-f66.google.com with SMTP id 83so696186pgb.3
+        for <linux-kbuild@vger.kernel.org>; Thu, 31 Aug 2017 08:36:57 -0700 (PDT)
+From: Roger Shimizu <rogershimizu@gmail.com>
+Subject: [PATCH] scripts: make extract-vmlinux support armel/armhf
+Date: Fri,  1 Sep 2017 00:36:31 +0900
+Message-Id: <20170831153631.31026-1-rogershimizu@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>
-Cc: Linux Kernel Mailinglist <linux-kernel@vger.kernel.org>, linux-kbuild@vger.kernel.org, Johannes Thumshirn <jthumshirn@suse.de>
+To: Michal Marek <mmarek@suse.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Russell King <linux@arm.linux.org.uk>
+Cc: Roger Shimizu <rogershimizu@gmail.com>, Corentin Chary <corentincj@iksaif.net>, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org
 
-We have lots of dead defines and macros in drivers, lets offer users a way
-to detect and eventually remove them.
+vmlinux/zImage on armel/armhf seems not an ELF, so update the script
+scripts/extract-vmlinux to support such case.
 
-Signed-off-by: Johannes Thumshirn <jthumshirn@suse.de>
+This fix is tested on Debian amd64, armel, and armhf platform, with
+Debian kernels.
+
+Fixes: 09d481270d44 ("scripts: add extract-vmlinux")
+Cc: Corentin Chary <corentincj@iksaif.net>
+Cc: Michal Marek <mmarek@suse.com>
+Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Russell King <linux@arm.linux.org.uk>
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: linux-kbuild@vger.kernel.org
+Signed-off-by: Roger Shimizu <rogershimizu@gmail.com>
 ---
 
-Notes:
-    Changes to v1:
-    * Change from W=1 to W=2
+Dear Michal, Masahiro-san, and Russell,
 
- scripts/Makefile.extrawarn | 1 +
- 1 file changed, 1 insertion(+)
+I posted this patch before [0] but didn't get positive response.
+Recently when I trace a Debian kernel issue, I still find this patch
+useful to locate the root cause [1].
 
-diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
-index fb3522fd8702..ae8a1357d01d 100644
---- a/scripts/Makefile.extrawarn
-+++ b/scripts/Makefile.extrawarn
-@@ -37,6 +37,7 @@ warning-2 += $(call cc-option, -Wlogical-op)
- warning-2 += $(call cc-option, -Wmissing-field-initializers)
- warning-2 += $(call cc-option, -Wsign-compare)
- warning-2 += $(call cc-option, -Wmaybe-uninitialized)
-+warning-2 += $(call cc-option, -Wunused-macros)
+Besides, it's a well known bug confuses other developers [2][3].
+So I decide to submit the patch again.
+
+[0]: https://patchwork.kernel.org/patch/8120831/
+[1]: https://bugs.debian.org/870185#50
+[2]: https://bugs.launchpad.net/linaro-ubuntu/+bug/1050453
+[3]: https://bugs.linaro.org/show_bug.cgi?id=461
+
+Please kindly help to review. Thank you!
+
+Cheers,
+Roger Shimizu, GMT +9 Tokyo
+PGP/GPG: 4096R/6C6ACD6417B3ACB1
+
+ scripts/extract-vmlinux | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
+
+diff --git a/scripts/extract-vmlinux b/scripts/extract-vmlinux
+index 5061abcc2540..0c72ecd24969 100755
+--- a/scripts/extract-vmlinux
++++ b/scripts/extract-vmlinux
+@@ -6,6 +6,7 @@
+ # (c) 2009,2010 Dick Streefland <dick@streefland.net>
+ #
+ # (c) 2011      Corentin Chary <corentin.chary@gmail.com>
++# (c) 2016      Roger Shimizu <rogershimizu@gmail.com>
+ #
+ # Licensed under the GNU General Public License, version 2 (GPLv2).
+ # ----------------------------------------------------------------------
+@@ -15,7 +16,14 @@ check_vmlinux()
+ 	# Use readelf to check if it's a valid ELF
+ 	# TODO: find a better to way to check that it's really vmlinux
+ 	#       and not just an elf
+-	readelf -h $1 > /dev/null 2>&1 || return 1
++	case "$2" in
++	0|"")
++		readelf -h $1 > /dev/null 2>&1 || return 1
++		;;
++	1)
++	# For ARCH like armel/armhf, vmlinux is not ELF, so we skip the check
++		;;
++	esac
  
- warning-3 := -Wbad-function-cast
- warning-3 += -Wcast-qual
+ 	cat $1
+ 	exit 0
+@@ -31,7 +39,7 @@ try_decompress()
+ 	do
+ 		pos=${pos%%:*}
+ 		tail -c+$pos "$img" | $3 > $tmp 2> /dev/null
+-		check_vmlinux $tmp
++		test $? -eq 0 && check_vmlinux $tmp 1
+ 	done
+ }
+ 
+@@ -53,7 +61,7 @@ check_vmlinux $img
+ 
+ # That didn't work, so retry after decompression.
+ try_decompress '\037\213\010' xy    gunzip
+-try_decompress '\3757zXZ\000' abcde unxz
++try_decompress '\3757zXZ\000' abcde "unxz --single-stream"
+ try_decompress 'BZh'          xy    bunzip2
+ try_decompress '\135\0\0\0'   xxx   unlzma
+ try_decompress '\211\114\132' xy    'lzop -d'
 -- 
-2.12.3
+2.11.0
 
