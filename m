@@ -1,102 +1,56 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pandora.armlinux.org.uk ([78.32.30.218]:51502 "EHLO
-        pandora.armlinux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751693AbdHaQUL (ORCPT
-        <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 31 Aug 2017 12:20:11 -0400
-Date: Thu, 31 Aug 2017 17:19:57 +0100
-From: Russell King - ARM Linux <linux@armlinux.org.uk>
+Received: from muru.com ([72.249.23.125]:39156 "EHLO muru.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1751811AbdHaRnW (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 31 Aug 2017 13:43:22 -0400
+Date: Thu, 31 Aug 2017 10:43:19 -0700
+From: Tony Lindgren <tony@atomide.com>
 Subject: Re: [PATCH] scripts: make extract-vmlinux support armel/armhf
-Message-ID: <20170831161957.GU20805@n2100.armlinux.org.uk>
+Message-ID: <20170831174318.GM6008@atomide.com>
 References: <20170831153631.31026-1-rogershimizu@gmail.com>
  <20170831154941.GS20805@n2100.armlinux.org.uk>
  <CAEQ9gEmBv-fb2MbedSzs+dWtrq-ChXwiMrisyofZ7zfu+jADYA@mail.gmail.com>
+ <20170831161957.GU20805@n2100.armlinux.org.uk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAEQ9gEmBv-fb2MbedSzs+dWtrq-ChXwiMrisyofZ7zfu+jADYA@mail.gmail.com>
+In-Reply-To: <20170831161957.GU20805@n2100.armlinux.org.uk>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Roger Shimizu <rogershimizu@gmail.com>
-Cc: Michal Marek <mmarek@suse.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Corentin Chary <corentincj@iksaif.net>, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org
+To: Russell King - ARM Linux <linux@armlinux.org.uk>
+Cc: Roger Shimizu <rogershimizu@gmail.com>, Corentin Chary <corentincj@iksaif.net>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org
 
-On Fri, Sep 01, 2017 at 01:05:16AM +0900, Roger Shimizu wrote:
-> Dear Russell,
+* Russell King - ARM Linux <linux@armlinux.org.uk> [170831 09:21]:
+> On Fri, Sep 01, 2017 at 01:05:16AM +0900, Roger Shimizu wrote:
+> > On Fri, Sep 1, 2017 at 12:49 AM, Russell King - ARM Linux
+> > <linux@armlinux.org.uk> wrote:
+> > > What's the use case - what are you using the output of this script with?
+> > 
+> > I already provided a use case, to trace a Debian kernel issue caused
+> > by kernel size.
+> > - https://bugs.debian.org/870185#50
 > 
-> Thanks for your review!
+> Sorry, I haven't time to look - it needs me to use firefox on a
+> different machine.  Maybe you could help by providing some details
+> by email, otherwise I've got extra work to do at some point in the
+> future (probably days away) if I remember (your mail will get buried).
+> Much of my time is in front of a _textual_ _only_ interface, and elinks
+> does not work with several modern SSL-only sites.
 > 
-> On Fri, Sep 1, 2017 at 12:49 AM, Russell King - ARM Linux
-> <linux@armlinux.org.uk> wrote:
-> > On Fri, Sep 01, 2017 at 12:36:31AM +0900, Roger Shimizu wrote:
-> >> vmlinux/zImage on armel/armhf seems not an ELF, so update the script
-> >> scripts/extract-vmlinux to support such case.
-> >>
-> >> This fix is tested on Debian amd64, armel, and armhf platform, with
-> >> Debian kernels.
-> >>
-> >> Fixes: 09d481270d44 ("scripts: add extract-vmlinux")
-> >> Cc: Corentin Chary <corentincj@iksaif.net>
-> >> Cc: Michal Marek <mmarek@suse.com>
-> >> Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
-> >> Cc: Russell King <linux@arm.linux.org.uk>
-> >> Cc: linux-arm-kernel@lists.infradead.org
-> >> Cc: linux-kbuild@vger.kernel.org
-> >> Signed-off-by: Roger Shimizu <rogershimizu@gmail.com>
-> >> ---
-> >>
-> >> Dear Michal, Masahiro-san, and Russell,
-> >>
-> >> I posted this patch before [0] but didn't get positive response.
-> >> Recently when I trace a Debian kernel issue, I still find this patch
-> >> useful to locate the root cause [1].
-> >>
-> >> Besides, it's a well known bug confuses other developers [2][3].
-> >> So I decide to submit the patch again.
-> >>
-> >> [0]: https://patchwork.kernel.org/patch/8120831/
-> >> [1]: https://bugs.debian.org/870185#50
-> >> [2]: https://bugs.launchpad.net/linaro-ubuntu/+bug/1050453
-> >> [3]: https://bugs.linaro.org/show_bug.cgi?id=461
-> >>
-> >> Please kindly help to review. Thank you!
-> >
-> > I don't think this makes sense.  This script claims to extract a "vmlinux"
-> > from a compressed kernel image.  "vmlinux" is normally the term of the
-> > ELF object, and indeed as the script currently stands, it always guarantees
-> > to output an ELF file.
+> > I also see other people complaining this issue:
+> >  - https://bugs.launchpad.net/linaro-ubuntu/+bug/1050453
+> >  - https://bugs.linaro.org/show_bug.cgi?id=461
+> > 
+> > By a random web search, I find another blog post on how to dissamble the kernel.
+> >  - https://blog.packagecloud.io/eng/2016/03/08/how-to-extract-and-disassmble-a-linux-kernel-image-vmlinuz/
 > 
-> If you think creating a new "scripts/extract-zImage" file is more
-> proper way, we can do it.
-> 
-> > However, ARM zImage does not store a compressed ELF object, it stores a
-> > compressed binary image of the executable in memory, so what you get out
-> > of this script is not an ELF file, but the binary image (iow, what
-> > arch/arm/boot/Image is.)
-> >
-> > What's the use case - what are you using the output of this script with?
-> 
-> I already provided a use case, to trace a Debian kernel issue caused
-> by kernel size.
-> - https://bugs.debian.org/870185#50
+> Yea, all SSL sites, I'm not going to try elinks with them, I don't
+> have the time to mess around.
 
-Sorry, I haven't time to look - it needs me to use firefox on a
-different machine.  Maybe you could help by providing some details
-by email, otherwise I've got extra work to do at some point in the
-future (probably days away) if I remember (your mail will get buried).
-Much of my time is in front of a _textual_ _only_ interface, and elinks
-does not work with several modern SSL-only sites.
+I think the use case is to get the booted kernel size from zImage
+to avoid overwriting dts or initramfs. Don't we already have that
+at the end of zImage somewhere for kexec?
 
-> I also see other people complaining this issue:
->  - https://bugs.launchpad.net/linaro-ubuntu/+bug/1050453
->  - https://bugs.linaro.org/show_bug.cgi?id=461
-> 
-> By a random web search, I find another blog post on how to dissamble the kernel.
->  - https://blog.packagecloud.io/eng/2016/03/08/how-to-extract-and-disassmble-a-linux-kernel-image-vmlinuz/
+Regards,
 
-Yea, all SSL sites, I'm not going to try elinks with them, I don't
-have the time to mess around.
-
--- 
-RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
-FTTC broadband for 0.8mile line in suburbia: sync at 8.8Mbps down 630kbps up
-According to speedtest.net: 8.21Mbps down 510kbps up
+Tony
