@@ -1,56 +1,45 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from muru.com ([72.249.23.125]:39156 "EHLO muru.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1751811AbdHaRnW (ORCPT <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 31 Aug 2017 13:43:22 -0400
-Date: Thu, 31 Aug 2017 10:43:19 -0700
-From: Tony Lindgren <tony@atomide.com>
-Subject: Re: [PATCH] scripts: make extract-vmlinux support armel/armhf
-Message-ID: <20170831174318.GM6008@atomide.com>
-References: <20170831153631.31026-1-rogershimizu@gmail.com>
- <20170831154941.GS20805@n2100.armlinux.org.uk>
- <CAEQ9gEmBv-fb2MbedSzs+dWtrq-ChXwiMrisyofZ7zfu+jADYA@mail.gmail.com>
- <20170831161957.GU20805@n2100.armlinux.org.uk>
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:35962 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751363AbdHaXxO (ORCPT
+        <rfc822;linux-kbuild@vger.kernel.org>);
+        Thu, 31 Aug 2017 19:53:14 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20170831161957.GU20805@n2100.armlinux.org.uk>
+In-Reply-To: <CAK7LNAS73Or9G82-8zT=7XjKfP_zEK2+TgutaOHw7SPeeO9_CA@mail.gmail.com>
+References: <1503209051-16477-1-git-send-email-yamada.masahiro@socionext.com>
+ <20170821084930.GA7678@ulmo> <CAK7LNAS73Or9G82-8zT=7XjKfP_zEK2+TgutaOHw7SPeeO9_CA@mail.gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Fri, 1 Sep 2017 08:52:21 +0900
+Message-ID: <CAK7LNARntwzEggrv4nNgppnDgzpoZHwLgjVt_G7+G+W-K5h5hw@mail.gmail.com>
+Subject: Re: [PATCH] kbuild: use $(abspath ...) instead of $(shell cd ... && /bin/pwd)
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Russell King - ARM Linux <linux@armlinux.org.uk>
-Cc: Roger Shimizu <rogershimizu@gmail.com>, Corentin Chary <corentincj@iksaif.net>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org
+To: Thierry Reding <treding@nvidia.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, =?UTF-8?Q?Bj=C3=B8rn_Forsman?= <bjorn.forsman@gmail.com>, Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.com>, linux-pm@vger.kernel.org, Kieran Bingham <kieran@ksquared.org.uk>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Thomas Renninger <trenn@suse.com>, Josh Poimboeuf <jpoimboe@redhat.com>, Arnaldo Carvalho de Melo <acme@redhat.com>, Jan Kiszka <jan.kiszka@siemens.com>
 
-* Russell King - ARM Linux <linux@armlinux.org.uk> [170831 09:21]:
-> On Fri, Sep 01, 2017 at 01:05:16AM +0900, Roger Shimizu wrote:
-> > On Fri, Sep 1, 2017 at 12:49 AM, Russell King - ARM Linux
-> > <linux@armlinux.org.uk> wrote:
-> > > What's the use case - what are you using the output of this script with?
-> > 
-> > I already provided a use case, to trace a Debian kernel issue caused
-> > by kernel size.
-> > - https://bugs.debian.org/870185#50
-> 
-> Sorry, I haven't time to look - it needs me to use firefox on a
-> different machine.  Maybe you could help by providing some details
-> by email, otherwise I've got extra work to do at some point in the
-> future (probably days away) if I remember (your mail will get buried).
-> Much of my time is in front of a _textual_ _only_ interface, and elinks
-> does not work with several modern SSL-only sites.
-> 
-> > I also see other people complaining this issue:
-> >  - https://bugs.launchpad.net/linaro-ubuntu/+bug/1050453
-> >  - https://bugs.linaro.org/show_bug.cgi?id=461
-> > 
-> > By a random web search, I find another blog post on how to dissamble the kernel.
-> >  - https://blog.packagecloud.io/eng/2016/03/08/how-to-extract-and-disassmble-a-linux-kernel-image-vmlinuz/
-> 
-> Yea, all SSL sites, I'm not going to try elinks with them, I don't
-> have the time to mess around.
+2017-08-21 18:04 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
+> 2017-08-21 17:49 GMT+09:00 Thierry Reding <treding@nvidia.com>:
+>> On Sun, Aug 20, 2017 at 03:04:11PM +0900, Masahiro Yamada wrote:
+>>> Kbuild conventionally uses $(shell cd ... && /bin/pwd) idiom to get
+>>> the absolute path of the directory because GNU Make 3.80, the minimal
+>>> supported version at that time, did not support $(abspath ...) or
+>>> $(realpath ...).
+>>>
+>>> Commit 37d69ee30808 ("docs: bump minimal GNU Make version to 3.81")
+>>> dropped the GNU Make 3.80 support, so we are now allowed to use those
+>>> make-builtin helpers.
+>>>
+>>> This conversion will provide better portability without relying on
+>>> the pwd command or its location /bin/pwd.
+>>>
+>>> I am intentionally using $(realpath ...) instead $(abspath ...) in
+>>> some places.  The difference between the two is $(realpath ...)
+>>> returns an empty string if the given path does not exist.  It is
+>>> convenient in places where we need to error-out if the makefile fails
+>>> to create an output directory.
+>>>
+>>> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+>
 
-I think the use case is to get the booted kernel size from zImage
-to avoid overwriting dts or initramfs. Don't we already have that
-at the end of zImage somewhere for kexec?
-
-Regards,
-
-Tony
+Applied to linux-kbuild.
