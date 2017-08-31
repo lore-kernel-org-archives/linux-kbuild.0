@@ -1,105 +1,110 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-pg0-f66.google.com ([74.125.83.66]:35869 "EHLO
-        mail-pg0-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751739AbdHaPg5 (ORCPT
+Received: from pandora.armlinux.org.uk ([78.32.30.218]:51072 "EHLO
+        pandora.armlinux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752411AbdHaPt6 (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 31 Aug 2017 11:36:57 -0400
-Received: by mail-pg0-f66.google.com with SMTP id 83so696186pgb.3
-        for <linux-kbuild@vger.kernel.org>; Thu, 31 Aug 2017 08:36:57 -0700 (PDT)
-From: Roger Shimizu <rogershimizu@gmail.com>
-Subject: [PATCH] scripts: make extract-vmlinux support armel/armhf
-Date: Fri,  1 Sep 2017 00:36:31 +0900
-Message-Id: <20170831153631.31026-1-rogershimizu@gmail.com>
+        Thu, 31 Aug 2017 11:49:58 -0400
+Date: Thu, 31 Aug 2017 16:49:41 +0100
+From: Russell King - ARM Linux <linux@armlinux.org.uk>
+Subject: Re: [PATCH] scripts: make extract-vmlinux support armel/armhf
+Message-ID: <20170831154941.GS20805@n2100.armlinux.org.uk>
+References: <20170831153631.31026-1-rogershimizu@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170831153631.31026-1-rogershimizu@gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Michal Marek <mmarek@suse.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Russell King <linux@arm.linux.org.uk>
-Cc: Roger Shimizu <rogershimizu@gmail.com>, Corentin Chary <corentincj@iksaif.net>, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org
+To: Roger Shimizu <rogershimizu@gmail.com>
+Cc: Michal Marek <mmarek@suse.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Corentin Chary <corentincj@iksaif.net>, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org
 
-vmlinux/zImage on armel/armhf seems not an ELF, so update the script
-scripts/extract-vmlinux to support such case.
+On Fri, Sep 01, 2017 at 12:36:31AM +0900, Roger Shimizu wrote:
+> vmlinux/zImage on armel/armhf seems not an ELF, so update the script
+> scripts/extract-vmlinux to support such case.
+> 
+> This fix is tested on Debian amd64, armel, and armhf platform, with
+> Debian kernels.
+> 
+> Fixes: 09d481270d44 ("scripts: add extract-vmlinux")
+> Cc: Corentin Chary <corentincj@iksaif.net>
+> Cc: Michal Marek <mmarek@suse.com>
+> Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+> Cc: Russell King <linux@arm.linux.org.uk>
+> Cc: linux-arm-kernel@lists.infradead.org
+> Cc: linux-kbuild@vger.kernel.org
+> Signed-off-by: Roger Shimizu <rogershimizu@gmail.com>
+> ---
+> 
+> Dear Michal, Masahiro-san, and Russell,
+> 
+> I posted this patch before [0] but didn't get positive response.
+> Recently when I trace a Debian kernel issue, I still find this patch
+> useful to locate the root cause [1].
+> 
+> Besides, it's a well known bug confuses other developers [2][3].
+> So I decide to submit the patch again.
+> 
+> [0]: https://patchwork.kernel.org/patch/8120831/
+> [1]: https://bugs.debian.org/870185#50
+> [2]: https://bugs.launchpad.net/linaro-ubuntu/+bug/1050453
+> [3]: https://bugs.linaro.org/show_bug.cgi?id=461
+> 
+> Please kindly help to review. Thank you!
 
-This fix is tested on Debian amd64, armel, and armhf platform, with
-Debian kernels.
+I don't think this makes sense.  This script claims to extract a "vmlinux"
+from a compressed kernel image.  "vmlinux" is normally the term of the
+ELF object, and indeed as the script currently stands, it always guarantees
+to output an ELF file.
 
-Fixes: 09d481270d44 ("scripts: add extract-vmlinux")
-Cc: Corentin Chary <corentincj@iksaif.net>
-Cc: Michal Marek <mmarek@suse.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Russell King <linux@arm.linux.org.uk>
-Cc: linux-arm-kernel@lists.infradead.org
-Cc: linux-kbuild@vger.kernel.org
-Signed-off-by: Roger Shimizu <rogershimizu@gmail.com>
----
+However, ARM zImage does not store a compressed ELF object, it stores a
+compressed binary image of the executable in memory, so what you get out
+of this script is not an ELF file, but the binary image (iow, what
+arch/arm/boot/Image is.)
 
-Dear Michal, Masahiro-san, and Russell,
+What's the use case - what are you using the output of this script with?
 
-I posted this patch before [0] but didn't get positive response.
-Recently when I trace a Debian kernel issue, I still find this patch
-useful to locate the root cause [1].
+> diff --git a/scripts/extract-vmlinux b/scripts/extract-vmlinux
+> index 5061abcc2540..0c72ecd24969 100755
+> --- a/scripts/extract-vmlinux
+> +++ b/scripts/extract-vmlinux
+> @@ -6,6 +6,7 @@
+>  # (c) 2009,2010 Dick Streefland <dick@streefland.net>
+>  #
+>  # (c) 2011      Corentin Chary <corentin.chary@gmail.com>
+> +# (c) 2016      Roger Shimizu <rogershimizu@gmail.com>
+>  #
+>  # Licensed under the GNU General Public License, version 2 (GPLv2).
+>  # ----------------------------------------------------------------------
+> @@ -15,7 +16,14 @@ check_vmlinux()
+>  	# Use readelf to check if it's a valid ELF
+>  	# TODO: find a better to way to check that it's really vmlinux
+>  	#       and not just an elf
+> -	readelf -h $1 > /dev/null 2>&1 || return 1
+> +	case "$2" in
+> +	0|"")
+> +		readelf -h $1 > /dev/null 2>&1 || return 1
+> +		;;
+> +	1)
+> +	# For ARCH like armel/armhf, vmlinux is not ELF, so we skip the check
+> +		;;
+> +	esac
 
-Besides, it's a well known bug confuses other developers [2][3].
-So I decide to submit the patch again.
+Right, so passing the second argument as 1 bypasses the "is it ELF" check.
 
-[0]: https://patchwork.kernel.org/patch/8120831/
-[1]: https://bugs.debian.org/870185#50
-[2]: https://bugs.launchpad.net/linaro-ubuntu/+bug/1050453
-[3]: https://bugs.linaro.org/show_bug.cgi?id=461
+> @@ -31,7 +39,7 @@ try_decompress()
+>  	do
+>  		pos=${pos%%:*}
+>  		tail -c+$pos "$img" | $3 > $tmp 2> /dev/null
+> -		check_vmlinux $tmp
+> +		test $? -eq 0 && check_vmlinux $tmp 1
 
-Please kindly help to review. Thank you!
+and here you always pass '1', thereby bypassing the ELF check for every
+architecture.  What if some architecture stores another compressed
+object in the same compressed image?  I suspect the check is there to
+ensure that it works on architectures where the compressed kernel image
+contains other compressed objects.
 
-Cheers,
-Roger Shimizu, GMT +9 Tokyo
-PGP/GPG: 4096R/6C6ACD6417B3ACB1
-
- scripts/extract-vmlinux | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
-
-diff --git a/scripts/extract-vmlinux b/scripts/extract-vmlinux
-index 5061abcc2540..0c72ecd24969 100755
---- a/scripts/extract-vmlinux
-+++ b/scripts/extract-vmlinux
-@@ -6,6 +6,7 @@
- # (c) 2009,2010 Dick Streefland <dick@streefland.net>
- #
- # (c) 2011      Corentin Chary <corentin.chary@gmail.com>
-+# (c) 2016      Roger Shimizu <rogershimizu@gmail.com>
- #
- # Licensed under the GNU General Public License, version 2 (GPLv2).
- # ----------------------------------------------------------------------
-@@ -15,7 +16,14 @@ check_vmlinux()
- 	# Use readelf to check if it's a valid ELF
- 	# TODO: find a better to way to check that it's really vmlinux
- 	#       and not just an elf
--	readelf -h $1 > /dev/null 2>&1 || return 1
-+	case "$2" in
-+	0|"")
-+		readelf -h $1 > /dev/null 2>&1 || return 1
-+		;;
-+	1)
-+	# For ARCH like armel/armhf, vmlinux is not ELF, so we skip the check
-+		;;
-+	esac
- 
- 	cat $1
- 	exit 0
-@@ -31,7 +39,7 @@ try_decompress()
- 	do
- 		pos=${pos%%:*}
- 		tail -c+$pos "$img" | $3 > $tmp 2> /dev/null
--		check_vmlinux $tmp
-+		test $? -eq 0 && check_vmlinux $tmp 1
- 	done
- }
- 
-@@ -53,7 +61,7 @@ check_vmlinux $img
- 
- # That didn't work, so retry after decompression.
- try_decompress '\037\213\010' xy    gunzip
--try_decompress '\3757zXZ\000' abcde unxz
-+try_decompress '\3757zXZ\000' abcde "unxz --single-stream"
- try_decompress 'BZh'          xy    bunzip2
- try_decompress '\135\0\0\0'   xxx   unlzma
- try_decompress '\211\114\132' xy    'lzop -d'
 -- 
-2.11.0
-
+RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
+FTTC broadband for 0.8mile line in suburbia: sync at 8.8Mbps down 630kbps up
+According to speedtest.net: 8.21Mbps down 510kbps up
