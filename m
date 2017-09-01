@@ -1,36 +1,64 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:36497 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751419AbdHaXxn (ORCPT
+Received: from pandora.armlinux.org.uk ([78.32.30.218]:44234 "EHLO
+        pandora.armlinux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752583AbdIAXRN (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 31 Aug 2017 19:53:43 -0400
+        Fri, 1 Sep 2017 19:17:13 -0400
+Date: Sat, 2 Sep 2017 00:16:54 +0100
+From: Russell King - ARM Linux <linux@armlinux.org.uk>
+Subject: Re: [PATCH] scripts: make extract-vmlinux support armel/armhf
+Message-ID: <20170901231654.GY20805@n2100.armlinux.org.uk>
+References: <20170831153631.31026-1-rogershimizu@gmail.com>
+ <20170831154941.GS20805@n2100.armlinux.org.uk>
+ <CAEQ9gEmBv-fb2MbedSzs+dWtrq-ChXwiMrisyofZ7zfu+jADYA@mail.gmail.com>
+ <20170831161957.GU20805@n2100.armlinux.org.uk>
+ <20170831174318.GM6008@atomide.com>
 MIME-Version: 1.0
-In-Reply-To: <20170830140413.9333-1-jthumshirn@suse.de>
-References: <20170830140413.9333-1-jthumshirn@suse.de>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 1 Sep 2017 08:52:55 +0900
-Message-ID: <CAK7LNARcvmKN9bQit6ufkTJdgcpFW3Ahti4Jh-ZsrN+g9vtUsg@mail.gmail.com>
-Subject: Re: [PATCH v2] Kbuild: enable -Wunused-macros warning for "make W=2"
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20170831174318.GM6008@atomide.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Johannes Thumshirn <jthumshirn@suse.de>
-Cc: Michal Marek <mmarek@suse.com>, Linux Kernel Mailinglist <linux-kernel@vger.kernel.org>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
+To: Tony Lindgren <tony@atomide.com>
+Cc: Roger Shimizu <rogershimizu@gmail.com>, Corentin Chary <corentincj@iksaif.net>, Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org
 
-2017-08-30 23:04 GMT+09:00 Johannes Thumshirn <jthumshirn@suse.de>:
-> We have lots of dead defines and macros in drivers, lets offer users a way
-> to detect and eventually remove them.
->
-> Signed-off-by: Johannes Thumshirn <jthumshirn@suse.de>
-> ---
->
-> Notes:
->     Changes to v1:
->     * Change from W=1 to W=2
->
+On Thu, Aug 31, 2017 at 10:43:19AM -0700, Tony Lindgren wrote:
+> * Russell King - ARM Linux <linux@armlinux.org.uk> [170831 09:21]:
+> > On Fri, Sep 01, 2017 at 01:05:16AM +0900, Roger Shimizu wrote:
+> > > On Fri, Sep 1, 2017 at 12:49 AM, Russell King - ARM Linux
+> > > <linux@armlinux.org.uk> wrote:
+> > > > What's the use case - what are you using the output of this script with?
+> > > 
+> > > I already provided a use case, to trace a Debian kernel issue caused
+> > > by kernel size.
+> > > - https://bugs.debian.org/870185#50
+> > 
+> > Sorry, I haven't time to look - it needs me to use firefox on a
+> > different machine.  Maybe you could help by providing some details
+> > by email, otherwise I've got extra work to do at some point in the
+> > future (probably days away) if I remember (your mail will get buried).
+> > Much of my time is in front of a _textual_ _only_ interface, and elinks
+> > does not work with several modern SSL-only sites.
+> > 
+> > > I also see other people complaining this issue:
+> > >  - https://bugs.launchpad.net/linaro-ubuntu/+bug/1050453
+> > >  - https://bugs.linaro.org/show_bug.cgi?id=461
+> > > 
+> > > By a random web search, I find another blog post on how to dissamble the kernel.
+> > >  - https://blog.packagecloud.io/eng/2016/03/08/how-to-extract-and-disassmble-a-linux-kernel-image-vmlinuz/
+> > 
+> > Yea, all SSL sites, I'm not going to try elinks with them, I don't
+> > have the time to mess around.
+> 
+> I think the use case is to get the booted kernel size from zImage
+> to avoid overwriting dts or initramfs. Don't we already have that
+> at the end of zImage somewhere for kexec?
 
-Applied to linux-kbuild.  Thanks.
+We do, but finding where that is is difficult if a DTB has been appended
+as it's right at the end of the compressed data.  kexec doesn't use it,
+it just assumes there's a 5x expansion of the kernel compressed image.
 
 -- 
-Best Regards
-Masahiro Yamada
+RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
+FTTC broadband for 0.8mile line in suburbia: sync at 8.8Mbps down 630kbps up
+According to speedtest.net: 8.21Mbps down 510kbps up
