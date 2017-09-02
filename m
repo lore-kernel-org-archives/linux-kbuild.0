@@ -1,59 +1,58 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conuserg-07.nifty.com ([210.131.2.74]:39917 "EHLO
-        conuserg-07.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752671AbdIBIGE (ORCPT
+Received: from mail-wr0-f194.google.com ([209.85.128.194]:38068 "EHLO
+        mail-wr0-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1752770AbdIBWVH (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 2 Sep 2017 04:06:04 -0400
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH 1/2] kbuild: buildtar: fix tar error when CONFIG_MODULES is disabled
-Date: Sat,  2 Sep 2017 17:05:34 +0900
-Message-Id: <1504339535-31825-1-git-send-email-yamada.masahiro@socionext.com>
+        Sat, 2 Sep 2017 18:21:07 -0400
+Received: by mail-wr0-f194.google.com with SMTP id j3so1632120wrb.5
+        for <linux-kbuild@vger.kernel.org>; Sat, 02 Sep 2017 15:21:07 -0700 (PDT)
+Date: Sun, 3 Sep 2017 00:21:01 +0200
+From: Nicolas Porcel <nicolasporcel06@gmail.com>
+Subject: Re: [PATCH 2/2] kconfig: support out of tree KCONFIG_CONFIG
+Message-ID: <20170902222101.GA5414@nicolas-netbook>
+References: <20170818222052.22375-1-nicolasporcel06@gmail.com>
+ <20170818222052.22375-3-nicolasporcel06@gmail.com>
+ <CAK7LNAQWFKFcm2PbOc-wc2bP1YmKBObhyyWr51mw6MCZRzVGOQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <CAK7LNAQWFKFcm2PbOc-wc2bP1YmKBObhyyWr51mw6MCZRzVGOQ@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: linux-kbuild@vger.kernel.org
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, linux-kernel@vger.kernel.org
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
 
-$tmpdir/lib is created by "make modules_install".  It does not exist
-if CONFIG_MODULES is disabled, then tar reports the following messages:
+On Sat, Sep 02, 2017 at 04:31:44PM +0900, Masahiro Yamada wrote:
+> 2017-08-19 7:20 GMT+09:00 Nicolas Porcel <nicolasporcel06@gmail.com>:
+> 
+> If the kernel source is not writable, O= should be used.
 
-tar: lib: Cannot stat: No such file or directory
-tar: Exiting with failure status due to previous errors
+You are right, I didn't know O= worked for kernel config.
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
+> I think KCONFIG_CONFIG only contains a file name
+> and this restriction is intentional
+> because conf_write() might be called with a directory path (for
+> example from gconf.c)
+> 
+> 
+> If we change the behavior,
+> I think conf_write() should just error-out
+> when directory path is given.
+> 
 
- scripts/package/buildtar | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+When I build a kernel, I set KCONFIG_CONFIG to reference a file on a
+different file-system than the build directory. It used to work before
+kernel 4.12, hence my patch.
 
-diff --git a/scripts/package/buildtar b/scripts/package/buildtar
-index 483ba00524d5..60dd836a0214 100755
---- a/scripts/package/buildtar
-+++ b/scripts/package/buildtar
-@@ -51,13 +51,14 @@ esac
- #
- rm -rf -- "${tmpdir}"
- mkdir -p -- "${tmpdir}/boot"
--
-+dirs=boot
- 
- #
- # Try to install modules
- #
- if grep -q '^CONFIG_MODULES=y' "${KCONFIG_CONFIG}"; then
- 	make ARCH="${ARCH}" O="${objtree}" KBUILD_SRC= INSTALL_MOD_PATH="${tmpdir}" modules_install
-+	dirs="$dirs lib"
- fi
- 
- 
-@@ -129,7 +130,7 @@ esac
- 	if tar --owner=root --group=root --help >/dev/null 2>&1; then
- 		opts="--owner=root --group=root"
- 	fi
--	tar cf - -C "$tmpdir" boot/ lib/ $opts | ${compress} > "${tarball}${file_ext}"
-+	tar cf - -C "$tmpdir" $dirs $opts | ${compress} > "${tarball}${file_ext}"
- )
- 
- echo "Tarball successfully created in ${tarball}${file_ext}"
+I now realize that I misunderstood the purpose of this variable. It
+also means that it is not possible to store the configuration file
+outside the build directory when using silentconfig for instance.
+
+Of course, I can use a symlink with KCONFIG_OVERWRITECONFIG, but it
+may be an interesting feature to be able to specify an absolute path
+for the kernel config file.
+
+Best regards,
+
 -- 
-2.7.4
-
+Nicolas Porcel
