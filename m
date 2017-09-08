@@ -1,115 +1,47 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-05.nifty.com ([210.131.2.90]:46821 "EHLO
-        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1756255AbdIHPlp (ORCPT
+Received: from mail-it0-f68.google.com ([209.85.214.68]:36425 "EHLO
+        mail-it0-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1756581AbdIHRWb (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Fri, 8 Sep 2017 11:41:45 -0400
-Received: from mail-yw0-f177.google.com (mail-yw0-f177.google.com [209.85.161.177]) (authenticated)
-        by conssluserg-05.nifty.com with ESMTP id v88FfWfw013023
-        for <linux-kbuild@vger.kernel.org>; Sat, 9 Sep 2017 00:41:33 +0900
-Received: by mail-yw0-f177.google.com with SMTP id v72so6355336ywa.3
-        for <linux-kbuild@vger.kernel.org>; Fri, 08 Sep 2017 08:41:33 -0700 (PDT)
+        Fri, 8 Sep 2017 13:22:31 -0400
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNASm98uy4vC7c3UxM10fx422jHwg+QUmadcpc+_TvECqew@mail.gmail.com>
-References: <20170816110855.6021-1-riku.voipio@linaro.org> <CAK7LNASm98uy4vC7c3UxM10fx422jHwg+QUmadcpc+_TvECqew@mail.gmail.com>
-From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Sat, 9 Sep 2017 00:40:51 +0900
-Message-ID: <CAK7LNARdpaJ6q16_XXqkuAC-fP1X=gZQn3Z31dftab702HcUGw@mail.gmail.com>
-Subject: Re: [PATCH 1/2] scripts/package/Makefile: make revision update a function
+In-Reply-To: <CAK7LNATaisd3tPNbujTWLUq-2sMQ3pyTkPRSgjw00zUzv=GvSQ@mail.gmail.com>
+References: <1503132577-24423-1-git-send-email-yamada.masahiro@socionext.com>
+ <CA+55aFzQ4shyD=bqdSMreU33iLVkEsSgnMXegL5wcu5ug0fOUg@mail.gmail.com>
+ <CA+55aFzr2HTZVOuzpHYDwmtRJLsVzE-yqg2DHpHi_9ePsYp5ug@mail.gmail.com> <CAK7LNATaisd3tPNbujTWLUq-2sMQ3pyTkPRSgjw00zUzv=GvSQ@mail.gmail.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Fri, 8 Sep 2017 10:22:30 -0700
+Message-ID: <CA+55aFwvaZSXubcmaaZD-i5c_F5bHWhr6OBxRM+=7dGueua0Ng@mail.gmail.com>
+Subject: Re: [RFC PATCH 0/3] kbuild: generate intermediate C files instead of
+ copying _shipped files
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Riku Voipio <riku.voipio@linaro.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.com>, debian-kernel <debian-kernel@lists.debian.org>
+To: Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, Rob Herring <robh@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Richard Purdie <richard.purdie@linuxfoundation.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Andrew Morton <akpm@linux-foundation.org>, Mauro Carvalho Chehab <mchehab@kernel.org>, Nicholas Piggin <npiggin@gmail.com>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Markus Heiser <markus.heiser@darmarit.de>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Frank Rowand <frowand.list@gmail.com>, Rob Herring <robh+dt@kernel.org>, SeongJae Park <sj38.park@gmail.com>, "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-2017-09-08 2:04 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
-> Hi Riku,
+On Thu, Sep 7, 2017 at 11:18 PM, Masahiro Yamada
+<yamada.masahiro@socionext.com> wrote:
 >
+> If CONFIG_MODVERSIONS is enabled,
+> I notice lots of error messages.
+> WARNING: EXPORT symbol "finish_open" [vmlinux] version generation
+> failed, symbol will not be versioned
 >
-> 2017-08-16 20:08 GMT+09:00  <riku.voipio@linaro.org>:
->> From: Riku Voipio <riku.voipio@linaro.org>
->>
->> The updated deb-pkg and bindeb-pkg will use the same snippet,
->> so make it reusable.
->>
->> Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
->> ---
->>  scripts/package/Makefile | 12 +++++++-----
->>  1 file changed, 7 insertions(+), 5 deletions(-)
->>
->> diff --git a/scripts/package/Makefile b/scripts/package/Makefile
->> index 71b4a8af9d4d..9867638896ad 100644
->> --- a/scripts/package/Makefile
->> +++ b/scripts/package/Makefile
->> @@ -44,14 +44,18 @@ tar -cz $(RCS_TAR_IGNORE) -f $(2).tar.gz \
->>         $(addprefix $(2)/,$(TAR_CONTENT) $(3)); \
->>  rm -f $(2) $(objtree)/.scmversion
->>
->> +quiet_cmd_updateversion = UPDATEVERSION
->> +      cmd_updateversion = \
->> +       $(CONFIG_SHELL) $(srctree)/scripts/mkversion > $(objtree)/.tmp_version; \
->> +       mv -f $(objtree)/.tmp_version $(objtree)/.version
->> +
->>  # rpm-pkg
->>  # ---------------------------------------------------------------------------
->>  rpm-pkg rpm: FORCE
->>         $(MAKE) clean
->>         $(CONFIG_SHELL) $(MKSPEC) >$(objtree)/kernel.spec
->>         $(call cmd,src_tar,$(KERNELPATH),kernel.spec)
->> -       $(CONFIG_SHELL) $(srctree)/scripts/mkversion > $(objtree)/.tmp_version
->> -       mv -f $(objtree)/.tmp_version $(objtree)/.version
->> +       $(call cmd,updateversion)
->>         rpmbuild $(RPMOPTS) --target $(UTS_MACHINE) -ta $(KERNELPATH).tar.gz
->>         rm $(KERNELPATH).tar.gz kernel.spec
->>
->> @@ -60,9 +64,7 @@ rpm-pkg rpm: FORCE
->>  binrpm-pkg: FORCE
->>         $(MAKE) KBUILD_SRC=
->>         $(CONFIG_SHELL) $(MKSPEC) prebuilt > $(objtree)/binkernel.spec
->> -       $(CONFIG_SHELL) $(srctree)/scripts/mkversion > $(objtree)/.tmp_version
->> -       mv -f $(objtree)/.tmp_version $(objtree)/.version
->> -
->> +       $(call cmd,updateversion)
->>         rpmbuild $(RPMOPTS) --define "_builddir $(objtree)" --target \
->>                 $(UTS_MACHINE) -bb $(objtree)/binkernel.spec
->>         rm binkernel.spec
+> So, I think something was broken in scripts/genksyms/.
 >
->
->
-> scripts/mkversion is pretty small.
-> I think scripts/mkversion can also update .version
->
-> For example,
->
->
->
->
-> if [ ! -f .version ]
-> then
->     version=1
-> else
->     version=$(expr 0$(cat .version) + 1)
-> fi
->
-> echo $version > .version
-> echo $version
->
->
->
->
-> Then, remove the duplicated code from the Makefile.
+> Of course, it was a trivial conversion, so it should not be hard to fix...
 
+Indeed, hopefully it would be trivial, but I don't even see the error here.
 
+Of course, I only did a "make allmodconfig" to test the MODVERSIONS
+case, I didn't actually install the modules. Is that error perhaps
+only detected at install time?
 
-Sorry, please let me think about this carefully.
+I did build and install a kernel with that patch, but that's my actual
+"real" config for the machine, and it didn't have MODVERSIONS enabled.
 
-We have simliar code in
-scripts/link-vmlinux.sh and scripts/mkversion
+Oh, how I hate modversions. But I'll take a look if I can see what I
+did wrong in the "Trivial and Obvious(tm)" conversion.
 
-
-
-
-
--- 
-Best Regards
-Masahiro Yamada
+                  Linus
