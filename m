@@ -1,103 +1,87 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from conssluserg-01.nifty.com ([210.131.2.80]:57228 "EHLO
-        conssluserg-01.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1752375AbdIGRFU (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:53979 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1753126AbdIHGTP (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Thu, 7 Sep 2017 13:05:20 -0400
-Received: from mail-yw0-f180.google.com (mail-yw0-f180.google.com [209.85.161.180]) (authenticated)
-        by conssluserg-01.nifty.com with ESMTP id v87H551K005166
-        for <linux-kbuild@vger.kernel.org>; Fri, 8 Sep 2017 02:05:06 +0900
-Received: by mail-yw0-f180.google.com with SMTP id s62so1002621ywg.0
-        for <linux-kbuild@vger.kernel.org>; Thu, 07 Sep 2017 10:05:06 -0700 (PDT)
+        Fri, 8 Sep 2017 02:19:15 -0400
 MIME-Version: 1.0
-In-Reply-To: <20170816110855.6021-1-riku.voipio@linaro.org>
-References: <20170816110855.6021-1-riku.voipio@linaro.org>
+In-Reply-To: <CA+55aFzr2HTZVOuzpHYDwmtRJLsVzE-yqg2DHpHi_9ePsYp5ug@mail.gmail.com>
+References: <1503132577-24423-1-git-send-email-yamada.masahiro@socionext.com>
+ <CA+55aFzQ4shyD=bqdSMreU33iLVkEsSgnMXegL5wcu5ug0fOUg@mail.gmail.com> <CA+55aFzr2HTZVOuzpHYDwmtRJLsVzE-yqg2DHpHi_9ePsYp5ug@mail.gmail.com>
 From: Masahiro Yamada <yamada.masahiro@socionext.com>
-Date: Fri, 8 Sep 2017 02:04:24 +0900
-Message-ID: <CAK7LNASm98uy4vC7c3UxM10fx422jHwg+QUmadcpc+_TvECqew@mail.gmail.com>
-Subject: Re: [PATCH 1/2] scripts/package/Makefile: make revision update a function
+Date: Fri, 8 Sep 2017 15:18:31 +0900
+Message-ID: <CAK7LNATaisd3tPNbujTWLUq-2sMQ3pyTkPRSgjw00zUzv=GvSQ@mail.gmail.com>
+Subject: Re: [RFC PATCH 0/3] kbuild: generate intermediate C files instead of
+ copying _shipped files
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Riku Voipio <riku.voipio@linaro.org>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.com>, debian-kernel <debian-kernel@lists.debian.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, Rob Herring <robh@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Richard Purdie <richard.purdie@linuxfoundation.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Andrew Morton <akpm@linux-foundation.org>, Mauro Carvalho Chehab <mchehab@kernel.org>, Nicholas Piggin <npiggin@gmail.com>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Markus Heiser <markus.heiser@darmarit.de>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Frank Rowand <frowand.list@gmail.com>, Rob Herring <robh+dt@kernel.org>, SeongJae Park <sj38.park@gmail.com>, "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-Hi Riku,
+Hi Linus,
 
 
-2017-08-16 20:08 GMT+09:00  <riku.voipio@linaro.org>:
-> From: Riku Voipio <riku.voipio@linaro.org>
+Very sorry that I had not responded quickly.
+
+When I was digging into tool version dependency,
+as you pointed out, gperf is a problem (but seemed one time breakage
+for gperf 3.1)
+flex seemed very stable for a long time.
+bison seemed a bit problem if old version is used.
+
+
+But, I did not have enough time to take a closer look.
+I thought I should respond after I tested more, but I has been pressed
+by my daily tasks, then time passed...
+Very sorry.
+
+
+
+Today, I just noticed gperf usage got dropped from the kernel.
+
+If CONFIG_MODVERSIONS is enabled,
+I notice lots of error messages.
+WARNING: EXPORT symbol "finish_open" [vmlinux] version generation
+failed, symbol will not be
+
+
+So, I think something was broken in scripts/genksyms/.
+
+Of course, it was a trivial conversion, so it should not be hard to fix...
+
+
+
+> gperf is clearly written by clowns that don't understand about
+> compatibility issues - it would have been trivial for them to add some
+> kind of marker define so that you could test for this directly rather
+> than depend on some kind of autoconf "try to build and see if it
+> fails" crap.
+
+
+One idea may be to process the output of "gperf -v"
+and embed GPERF_VERSION into the output .c files.
+
+But, if you are unhappy with gperf breakage this time,
+we can live without gperf.
+
+
+
+
+> It's likely not even any slower, but who the hell knows.. Do we even
+> care? It's almost certainly faster if you compare to generating that
+> gperf code.
 >
-> The updated deb-pkg and bindeb-pkg will use the same snippet,
-> so make it reusable.
->
-> Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
-> ---
->  scripts/package/Makefile | 12 +++++++-----
->  1 file changed, 7 insertions(+), 5 deletions(-)
->
-> diff --git a/scripts/package/Makefile b/scripts/package/Makefile
-> index 71b4a8af9d4d..9867638896ad 100644
-> --- a/scripts/package/Makefile
-> +++ b/scripts/package/Makefile
-> @@ -44,14 +44,18 @@ tar -cz $(RCS_TAR_IGNORE) -f $(2).tar.gz \
->         $(addprefix $(2)/,$(TAR_CONTENT) $(3)); \
->  rm -f $(2) $(objtree)/.scmversion
->
-> +quiet_cmd_updateversion = UPDATEVERSION
-> +      cmd_updateversion = \
-> +       $(CONFIG_SHELL) $(srctree)/scripts/mkversion > $(objtree)/.tmp_version; \
-> +       mv -f $(objtree)/.tmp_version $(objtree)/.version
-> +
->  # rpm-pkg
->  # ---------------------------------------------------------------------------
->  rpm-pkg rpm: FORCE
->         $(MAKE) clean
->         $(CONFIG_SHELL) $(MKSPEC) >$(objtree)/kernel.spec
->         $(call cmd,src_tar,$(KERNELPATH),kernel.spec)
-> -       $(CONFIG_SHELL) $(srctree)/scripts/mkversion > $(objtree)/.tmp_version
-> -       mv -f $(objtree)/.tmp_version $(objtree)/.version
-> +       $(call cmd,updateversion)
->         rpmbuild $(RPMOPTS) --target $(UTS_MACHINE) -ta $(KERNELPATH).tar.gz
->         rm $(KERNELPATH).tar.gz kernel.spec
->
-> @@ -60,9 +64,7 @@ rpm-pkg rpm: FORCE
->  binrpm-pkg: FORCE
->         $(MAKE) KBUILD_SRC=
->         $(CONFIG_SHELL) $(MKSPEC) prebuilt > $(objtree)/binkernel.spec
-> -       $(CONFIG_SHELL) $(srctree)/scripts/mkversion > $(objtree)/.tmp_version
-> -       mv -f $(objtree)/.tmp_version $(objtree)/.version
-> -
-> +       $(call cmd,updateversion)
->         rpmbuild $(RPMOPTS) --define "_builddir $(objtree)" --target \
->                 $(UTS_MACHINE) -bb $(objtree)/binkernel.spec
->         rm binkernel.spec
+
+For scripts/kconfig/, I think we do not care at all
+because we usually invoke it just once when we configure the build setting.
 
 
+If we enable CONFIG_MODVERSIONS, scripts/genksyms/ is invoked
+over and over again.
 
-scripts/mkversion is pretty small.
-I think scripts/mkversion can also update .version
-
-For example,
-
-
-
-
-if [ ! -f .version ]
-then
-    version=1
-else
-    version=$(expr 0$(cat .version) + 1)
-fi
-
-echo $version > .version
-echo $version
-
-
-
-
-Then, remove the duplicated code from the Makefile.
-
+Sorry, I have not evaluated if
+the perfect hash gives us noticeable advantage or not..
 
 
 
