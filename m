@@ -1,106 +1,144 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pandora.armlinux.org.uk ([78.32.30.218]:58870 "EHLO
+Received: from pandora.armlinux.org.uk ([78.32.30.218]:34142 "EHLO
         pandora.armlinux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1757334AbdIIJG4 (ORCPT
+        with ESMTP id S1753731AbdIIO2K (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 9 Sep 2017 05:06:56 -0400
-Date: Sat, 9 Sep 2017 10:06:37 +0100
+        Sat, 9 Sep 2017 10:28:10 -0400
+Date: Sat, 9 Sep 2017 15:27:53 +0100
 From: Russell King - ARM Linux <linux@armlinux.org.uk>
 Subject: Re: [PATCH] scripts: make extract-vmlinux support armel/armhf
-Message-ID: <20170909090637.GA20805@n2100.armlinux.org.uk>
+Message-ID: <20170909142753.GB20805@n2100.armlinux.org.uk>
 References: <20170831153631.31026-1-rogershimizu@gmail.com>
  <20170831154941.GS20805@n2100.armlinux.org.uk>
  <CAEQ9gEmBv-fb2MbedSzs+dWtrq-ChXwiMrisyofZ7zfu+jADYA@mail.gmail.com>
- <20170831161957.GU20805@n2100.armlinux.org.uk>
- <20170831174318.GM6008@atomide.com>
- <20170901231654.GY20805@n2100.armlinux.org.uk>
- <CAEQ9gEk6iGFY0hx36QbQHywKbttWTJdQxZzpOKULCgFLvS9TOw@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAEQ9gEk6iGFY0hx36QbQHywKbttWTJdQxZzpOKULCgFLvS9TOw@mail.gmail.com>
+In-Reply-To: <CAEQ9gEmBv-fb2MbedSzs+dWtrq-ChXwiMrisyofZ7zfu+jADYA@mail.gmail.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Roger Shimizu <rogershimizu@gmail.com>
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>, Michal Marek <mmarek@suse.com>, Tony Lindgren <tony@atomide.com>, Corentin Chary <corentincj@iksaif.net>, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org
+Cc: Michal Marek <mmarek@suse.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Corentin Chary <corentincj@iksaif.net>, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org
 
-On Sat, Sep 09, 2017 at 04:33:55PM +0900, Roger Shimizu wrote:
-> On Sat, Sep 2, 2017 at 8:16 AM, Russell King - ARM Linux
+On Fri, Sep 01, 2017 at 01:05:16AM +0900, Roger Shimizu wrote:
+> On Fri, Sep 1, 2017 at 12:49 AM, Russell King - ARM Linux
 > <linux@armlinux.org.uk> wrote:
-> > On Thu, Aug 31, 2017 at 10:43:19AM -0700, Tony Lindgren wrote:
-> >> I think the use case is to get the booted kernel size from zImage
-> >> to avoid overwriting dts or initramfs. Don't we already have that
-> >> at the end of zImage somewhere for kexec?
+> > However, ARM zImage does not store a compressed ELF object, it stores a
+> > compressed binary image of the executable in memory, so what you get out
+> > of this script is not an ELF file, but the binary image (iow, what
+> > arch/arm/boot/Image is.)
 > >
-> > We do, but finding where that is is difficult if a DTB has been appended
-> > as it's right at the end of the compressed data.  kexec doesn't use it,
-> > it just assumes there's a 5x expansion of the kernel compressed image.
+> > What's the use case - what are you using the output of this script with?
 > 
-> My patch already take the appended DTB blob part into consideration.
-> It uses "unxz --single-stream" instead of "unxz" to extract, so unxz
-> just ignore the DTB.
+> I already provided a use case, to trace a Debian kernel issue caused
+> by kernel size.
+> - https://bugs.debian.org/870185#50
 
-Sorry, I wasn't talking about the patch here.
+Knowing the decompressed kernel image size alone is not sufficient
+to guarantee that a kernel can boot, since both the decompressed and
+compressed kernel images must be in memory together.
 
-The whole point of _this_ method of replying, where the relevant context
-of the message being replied to is left and the reply is placed directly
-beneath the paragraph to which the reply is relevant is to make clear
-_what_ is being replied to.
+The temptation (as can be seen from kexec tooling) is to take the
+size of the compressed image and allow for a 4x expansion of that
+image, forgetting that the compressed image needs to remain available
+during the decompression stage.  Hence, kexec was fixed to assume
+that 5x the compressed kernel image size would be needed for the
+kernel to successfully boot.
 
-My comments above are directly beneath a comment from Tony Lindgren asking
-about the size field, which is appended after the compressed kernel image
-data.  My reply was to Tony on that point alone, and why we aren't using
-that for kexec-tools.
+As far as I'm aware, that fixed the problem and no one has since
+shown that it fails.  This simple method should also work without
+needing to resort to extracting the compressed image.
 
-kexec-tools used to assume too small a size for the expansion of the
-kernel image, and that has been changed.
+Now, we do store the decompressed image size within the compressed
+image (it's at the end of the compressed image) but it's very fiddly
+to get to - there is other data after the end of the compressed image
+which is of variable length, and although we have a header on the
+compressed kernel which tells us the end of its own data, we have no
+way to know how far back from the end of the image that size
+information is stored.
 
-I'm afraid that I still haven't got around to looking at _any_ of the
-URLs you've provided so I'm still in the dark about (a) why this is
-needed and (b) why it's acceptable for this script to output a binary
-blob for ARM rather than an ELF file that it guarantees today.  It's
-annoying that elinks' SSL implementation is buggy and causes connections
-to certain SSL sites to fail, but alas that's the inconvenience that
-buggy software causes.
+This is a tad annoying, but it is the result of "evolution" rather
+than explicit design - and this is why kexec tooling has had to
+resort to the 5x heuristic.
 
-Until I'm able to see some reasoning, I can't begin to consider this
-patch.
+> I also see other people complaining this issue:
+>  - https://bugs.launchpad.net/linaro-ubuntu/+bug/1050453
+>  - https://bugs.linaro.org/show_bug.cgi?id=461
 
-Moreover, I'm not convinced by any of your arguments about why it's
-acceptable to defeat the check for the ELF object _for all users_ of
-this script.  What if some other architecture has multiple compressed
-objects in their image and the "vmlinux" is not the first.  Your
-argument seems to be "they should use a different script", yet you
-are the one changing the script from outputting the first compressed
-ELF object to merely producing the first compressed image.  "vmlinux"
-is the name of the ELF kernel image, and the script is called
-"extract-vmlinux" so this is obviously the right script which should
-be extracting the correct compressed ELF object.
+These URLs are identical to those which you listed in your first
+email.  All of them do not say why people want to do this, only
+that they're trying to do it and it doesn't work.
 
-Hence, I don't buy your reasoning that in such a situation, another
-architecture's use of this script should use some other script because
-your changes fix it for ARM but cause a regression elsewhere.
+In my first reply to you, I explicitly asked for use cases.  That
+means providing the reason why the feature is necessary, and what
+it is being used for, not providing evidence that folk want to do
+it.
 
-The way we work on the kernel, if a change causes a user visible
-regression, then the change was wrong and an alternative solution
-needs to be sought.
+Having a "want" is not the same as explaining "why" something is
+required.
 
-I percieve the risk of this patch causing a regression on other
-architectures to be high because it gratuitously changes functionality
-of the script which didn't have to be there if all we cared about was
-extracting the first image.  Hence, it must have been added because
-there is a need for it.
+> By a random web search, I find another blog post on how to dissamble the kernel.
+>  - https://blog.packagecloud.io/eng/2016/03/08/how-to-extract-and-disassmble-a-linux-kernel-image-vmlinuz/
 
-So far, nothing has been said that lowers that risk.
+This is a great example which backs up _my_ assertion below:
 
-It's not up to me to search around to try and evaluate risk - it's
-my responsibility to ask the question (I already did) and it's the
-submitter's responsibility to show that it's likely safe.
+> > and here you always pass '1', thereby bypassing the ELF check for every
+> > architecture.  What if some architecture stores another compressed
+> > object in the same compressed image?  I suspect the check is there to
+> > ensure that it works on architectures where the compressed kernel image
+> > contains other compressed objects.
 
-Thus far, the reasoning seems to be purely "several people are having
-a problem with this script on ARM, here's a patch that fixes it for
-ARM but might break existing users, but we don't care about existing
-users."  That makes me even more wary.
+The "blog.packagecloud.io" blog entry you've pointed at gives an
+example of how to extract the *ELF object* from the compressed
+kernel image and then run objdump on it.
+
+As I've already explained, "vmlinux" is the name of the ELF kernel
+image, and the script is called "extract-vmlinux".  Ergo, the
+script is used to extract the ELF kernel image from a compressed
+kernel image.  That is its purpose.  The resulting image should be
+acceptable to objdump to disassemble.
+
+So, even if the extract-vmlinux script were to be modified in the
+way you want, the rest of the blog post is irrelevant, because the
+resulting output from the modified script would produce a non-ELF
+object and the following steps given there would fail.
+
+So I repeat my questions:
+
+1. what is the use case?
+
+2. what use is the output of this script put to?
+
+   (for the above two questions, I want to know what user*s* (plural)
+    are wanting this script to do and what purpose they're putting it
+    to.)
+
+3. what impact does this modification have to other architectures
+   which may be using this script?
+
+4. is it safe to modify the script to provide the first compressed
+   object whatever it may be rather than the first compressed ELF
+   object?
+
+And some new questions:
+
+5. what about other scripts using extract-vmlinux which then go on
+   to expect the output of the script to be an ELF file?
+
+6. should the script _on ARM only_ turn the zImage back into an ELF
+   file suitable for other tooling, so the script provides an
+   identical experience for all architectures?
+
+7. have these modifications been tested with other architecture's
+   kernel images to confirm that it doesn't cause a regression for
+   existing users?
+
+Here's a much wider question: with the advent of KASLR for ARM, should
+we store a partially linked kernel ELF image within the zImage instead
+of a fully linked image, and then have a minimal linker as part of
+the zImage decompressor to link the ELF image for the randomized
+address?  If we did that, then the existing script would just work for
+ARM.
 
 -- 
 RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
