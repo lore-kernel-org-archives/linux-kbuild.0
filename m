@@ -1,146 +1,54 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from pandora.armlinux.org.uk ([78.32.30.218]:34142 "EHLO
-        pandora.armlinux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1753731AbdIIO2K (ORCPT
+Received: from conssluserg-06.nifty.com ([210.131.2.91]:65303 "EHLO
+        conssluserg-06.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1750993AbdIJN7T (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sat, 9 Sep 2017 10:28:10 -0400
-Date: Sat, 9 Sep 2017 15:27:53 +0100
-From: Russell King - ARM Linux <linux@armlinux.org.uk>
-Subject: Re: [PATCH] scripts: make extract-vmlinux support armel/armhf
-Message-ID: <20170909142753.GB20805@n2100.armlinux.org.uk>
-References: <20170831153631.31026-1-rogershimizu@gmail.com>
- <20170831154941.GS20805@n2100.armlinux.org.uk>
- <CAEQ9gEmBv-fb2MbedSzs+dWtrq-ChXwiMrisyofZ7zfu+jADYA@mail.gmail.com>
+        Sun, 10 Sep 2017 09:59:19 -0400
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAEQ9gEmBv-fb2MbedSzs+dWtrq-ChXwiMrisyofZ7zfu+jADYA@mail.gmail.com>
+In-Reply-To: <CA+55aFy4w6Ken-a83EE+otw6d+cgRfdV9wj6ayoDYFhi251Gvg@mail.gmail.com>
+References: <1503132577-24423-1-git-send-email-yamada.masahiro@socionext.com>
+ <CA+55aFzQ4shyD=bqdSMreU33iLVkEsSgnMXegL5wcu5ug0fOUg@mail.gmail.com>
+ <CA+55aFzr2HTZVOuzpHYDwmtRJLsVzE-yqg2DHpHi_9ePsYp5ug@mail.gmail.com>
+ <CAK7LNATaisd3tPNbujTWLUq-2sMQ3pyTkPRSgjw00zUzv=GvSQ@mail.gmail.com>
+ <CA+55aFwvaZSXubcmaaZD-i5c_F5bHWhr6OBxRM+=7dGueua0Ng@mail.gmail.com>
+ <CA+55aFzZNpuYjVa4EZ2eJhvtU7-bzZTor_596TA5_CY77j+BEw@mail.gmail.com>
+ <CA+55aFzz_fv--Kx8phjWt_VOzZOMmbs0XX7_kL--_XRitWwJQA@mail.gmail.com> <CA+55aFy4w6Ken-a83EE+otw6d+cgRfdV9wj6ayoDYFhi251Gvg@mail.gmail.com>
+From: Masahiro Yamada <yamada.masahiro@socionext.com>
+Date: Sun, 10 Sep 2017 22:58:27 +0900
+Message-ID: <CAK7LNAQL7noRiHvnsrKWuZ9NLxq8bP5OAEybAK801f1DdPiJBQ@mail.gmail.com>
+Subject: Re: [RFC PATCH 0/3] kbuild: generate intermediate C files instead of
+ copying _shipped files
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Roger Shimizu <rogershimizu@gmail.com>
-Cc: Michal Marek <mmarek@suse.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, Corentin Chary <corentincj@iksaif.net>, linux-arm-kernel@lists.infradead.org, linux-kbuild@vger.kernel.org
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, Rob Herring <robh@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Richard Purdie <richard.purdie@linuxfoundation.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Andrew Morton <akpm@linux-foundation.org>, Mauro Carvalho Chehab <mchehab@kernel.org>, Nicholas Piggin <npiggin@gmail.com>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Markus Heiser <markus.heiser@darmarit.de>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Frank Rowand <frowand.list@gmail.com>, Rob Herring <robh+dt@kernel.org>, SeongJae Park <sj38.park@gmail.com>, "Yann E. MORIN" <yann.morin.1998@free.fr>
 
-On Fri, Sep 01, 2017 at 01:05:16AM +0900, Roger Shimizu wrote:
-> On Fri, Sep 1, 2017 at 12:49 AM, Russell King - ARM Linux
-> <linux@armlinux.org.uk> wrote:
-> > However, ARM zImage does not store a compressed ELF object, it stores a
-> > compressed binary image of the executable in memory, so what you get out
-> > of this script is not an ELF file, but the binary image (iow, what
-> > arch/arm/boot/Image is.)
-> >
-> > What's the use case - what are you using the output of this script with?
-> 
-> I already provided a use case, to trace a Debian kernel issue caused
-> by kernel size.
-> - https://bugs.debian.org/870185#50
+Hi Linus,
 
-Knowing the decompressed kernel image size alone is not sufficient
-to guarantee that a kernel can boot, since both the decompressed and
-compressed kernel images must be in memory together.
 
-The temptation (as can be seen from kexec tooling) is to take the
-size of the compressed image and allow for a 4x expansion of that
-image, forgetting that the compressed image needs to remain available
-during the decompression stage.  Hence, kexec was fixed to assume
-that 5x the compressed kernel image size would be needed for the
-kernel to successfully boot.
+2017-09-09 6:38 GMT+09:00 Linus Torvalds <torvalds@linux-foundation.org>:
+> On Fri, Sep 8, 2017 at 11:39 AM, Linus Torvalds
+> <torvalds@linux-foundation.org> wrote:
+>>
+>> Strange. Does anybody see what the pattern to the failure is?
+>
+> Found it. Stupid special case for 'typeof()' that used
+> is_reserved_word() in ways I hadn't realized.
+>
+> Fix committed.
+>
+>              Linus
 
-As far as I'm aware, that fixed the problem and no one has since
-shown that it fails.  This simple method should also work without
-needing to resort to extracting the compressed image.
 
-Now, we do store the decompressed image size within the compressed
-image (it's at the end of the compressed image) but it's very fiddly
-to get to - there is other data after the end of the compressed image
-which is of variable length, and although we have a header on the
-compressed kernel which tells us the end of its own data, we have no
-way to know how far back from the end of the image that size
-information is stored.
+"is_reserved_word()" sounds like a boolean function
+that returns 1 or 0.
+Maybe, the choice of the function name was not nice.
 
-This is a tad annoying, but it is the result of "evolution" rather
-than explicit design - and this is why kexec tooling has had to
-resort to the 5x heuristic.
+Anyway, thanks a lot for taking care of all this!
 
-> I also see other people complaining this issue:
->  - https://bugs.launchpad.net/linaro-ubuntu/+bug/1050453
->  - https://bugs.linaro.org/show_bug.cgi?id=461
 
-These URLs are identical to those which you listed in your first
-email.  All of them do not say why people want to do this, only
-that they're trying to do it and it doesn't work.
-
-In my first reply to you, I explicitly asked for use cases.  That
-means providing the reason why the feature is necessary, and what
-it is being used for, not providing evidence that folk want to do
-it.
-
-Having a "want" is not the same as explaining "why" something is
-required.
-
-> By a random web search, I find another blog post on how to dissamble the kernel.
->  - https://blog.packagecloud.io/eng/2016/03/08/how-to-extract-and-disassmble-a-linux-kernel-image-vmlinuz/
-
-This is a great example which backs up _my_ assertion below:
-
-> > and here you always pass '1', thereby bypassing the ELF check for every
-> > architecture.  What if some architecture stores another compressed
-> > object in the same compressed image?  I suspect the check is there to
-> > ensure that it works on architectures where the compressed kernel image
-> > contains other compressed objects.
-
-The "blog.packagecloud.io" blog entry you've pointed at gives an
-example of how to extract the *ELF object* from the compressed
-kernel image and then run objdump on it.
-
-As I've already explained, "vmlinux" is the name of the ELF kernel
-image, and the script is called "extract-vmlinux".  Ergo, the
-script is used to extract the ELF kernel image from a compressed
-kernel image.  That is its purpose.  The resulting image should be
-acceptable to objdump to disassemble.
-
-So, even if the extract-vmlinux script were to be modified in the
-way you want, the rest of the blog post is irrelevant, because the
-resulting output from the modified script would produce a non-ELF
-object and the following steps given there would fail.
-
-So I repeat my questions:
-
-1. what is the use case?
-
-2. what use is the output of this script put to?
-
-   (for the above two questions, I want to know what user*s* (plural)
-    are wanting this script to do and what purpose they're putting it
-    to.)
-
-3. what impact does this modification have to other architectures
-   which may be using this script?
-
-4. is it safe to modify the script to provide the first compressed
-   object whatever it may be rather than the first compressed ELF
-   object?
-
-And some new questions:
-
-5. what about other scripts using extract-vmlinux which then go on
-   to expect the output of the script to be an ELF file?
-
-6. should the script _on ARM only_ turn the zImage back into an ELF
-   file suitable for other tooling, so the script provides an
-   identical experience for all architectures?
-
-7. have these modifications been tested with other architecture's
-   kernel images to confirm that it doesn't cause a regression for
-   existing users?
-
-Here's a much wider question: with the advent of KASLR for ARM, should
-we store a partially linked kernel ELF image within the zImage instead
-of a fully linked image, and then have a minimal linker as part of
-the zImage decompressor to link the ELF image for the randomized
-address?  If we did that, then the existing script would just work for
-ARM.
 
 -- 
-RMK's Patch system: http://www.armlinux.org.uk/developer/patches/
-FTTC broadband for 0.8mile line in suburbia: sync at 8.8Mbps down 630kbps up
-According to speedtest.net: 8.21Mbps down 510kbps up
+Best Regards
+Masahiro Yamada
