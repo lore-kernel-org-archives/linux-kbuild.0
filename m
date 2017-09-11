@@ -1,53 +1,116 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-it0-f45.google.com ([209.85.214.45]:37990 "EHLO
-        mail-it0-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1750953AbdIJQ2A (ORCPT
+Received: from mail-lf0-f47.google.com ([209.85.215.47]:34015 "EHLO
+        mail-lf0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751029AbdIKKsv (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Sun, 10 Sep 2017 12:28:00 -0400
+        Mon, 11 Sep 2017 06:48:51 -0400
+Received: by mail-lf0-f47.google.com with SMTP id l196so17466988lfl.1
+        for <linux-kbuild@vger.kernel.org>; Mon, 11 Sep 2017 03:48:51 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAK7LNAQL7noRiHvnsrKWuZ9NLxq8bP5OAEybAK801f1DdPiJBQ@mail.gmail.com>
-References: <1503132577-24423-1-git-send-email-yamada.masahiro@socionext.com>
- <CA+55aFzQ4shyD=bqdSMreU33iLVkEsSgnMXegL5wcu5ug0fOUg@mail.gmail.com>
- <CA+55aFzr2HTZVOuzpHYDwmtRJLsVzE-yqg2DHpHi_9ePsYp5ug@mail.gmail.com>
- <CAK7LNATaisd3tPNbujTWLUq-2sMQ3pyTkPRSgjw00zUzv=GvSQ@mail.gmail.com>
- <CA+55aFwvaZSXubcmaaZD-i5c_F5bHWhr6OBxRM+=7dGueua0Ng@mail.gmail.com>
- <CA+55aFzZNpuYjVa4EZ2eJhvtU7-bzZTor_596TA5_CY77j+BEw@mail.gmail.com>
- <CA+55aFzz_fv--Kx8phjWt_VOzZOMmbs0XX7_kL--_XRitWwJQA@mail.gmail.com>
- <CA+55aFy4w6Ken-a83EE+otw6d+cgRfdV9wj6ayoDYFhi251Gvg@mail.gmail.com> <CAK7LNAQL7noRiHvnsrKWuZ9NLxq8bP5OAEybAK801f1DdPiJBQ@mail.gmail.com>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Sun, 10 Sep 2017 09:27:58 -0700
-Message-ID: <CA+55aFyFZTdOBA0cdCna0yqwZk=_DEw7XD43TOOAv6SjOxZw7g@mail.gmail.com>
-Subject: Re: [RFC PATCH 0/3] kbuild: generate intermediate C files instead of
- copying _shipped files
+In-Reply-To: <CAK7LNARdpaJ6q16_XXqkuAC-fP1X=gZQn3Z31dftab702HcUGw@mail.gmail.com>
+References: <20170816110855.6021-1-riku.voipio@linaro.org> <CAK7LNASm98uy4vC7c3UxM10fx422jHwg+QUmadcpc+_TvECqew@mail.gmail.com>
+ <CAK7LNARdpaJ6q16_XXqkuAC-fP1X=gZQn3Z31dftab702HcUGw@mail.gmail.com>
+From: Riku Voipio <riku.voipio@linaro.org>
+Date: Mon, 11 Sep 2017 13:48:49 +0300
+Message-ID: <CAAqcGHmSdO_xorBEUnGiG6VuY4VOQd4jfLzKSNQ=DUb1wK-Nww@mail.gmail.com>
+Subject: Re: [PATCH 1/2] scripts/package/Makefile: make revision update a function
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
 To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Sam Ravnborg <sam@ravnborg.org>, Michal Marek <mmarek@suse.com>, Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, Rob Herring <robh@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Richard Purdie <richard.purdie@linuxfoundation.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Andrew Morton <akpm@linux-foundation.org>, Mauro Carvalho Chehab <mchehab@kernel.org>, Nicholas Piggin <npiggin@gmail.com>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, Markus Heiser <markus.heiser@darmarit.de>, Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Frank Rowand <frowand.list@gmail.com>, Rob Herring <robh+dt@kernel.org>, SeongJae Park <sj38.park@gmail.com>, "Yann E. MORIN" <yann.morin.1998@free.fr>
+Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.com>, debian-kernel <debian-kernel@lists.debian.org>
 
-On Sun, Sep 10, 2017 at 6:58 AM, Masahiro Yamada
+On 8 September 2017 at 18:40, Masahiro Yamada
 <yamada.masahiro@socionext.com> wrote:
+> 2017-09-08 2:04 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
+>> Hi Riku,
+>>
+>>
+>> 2017-08-16 20:08 GMT+09:00  <riku.voipio@linaro.org>:
+>>> From: Riku Voipio <riku.voipio@linaro.org>
+>>>
+>>> The updated deb-pkg and bindeb-pkg will use the same snippet,
+>>> so make it reusable.
+>>>
+>>> Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
+>>> ---
+>>>  scripts/package/Makefile | 12 +++++++-----
+>>>  1 file changed, 7 insertions(+), 5 deletions(-)
+>>>
+>>> diff --git a/scripts/package/Makefile b/scripts/package/Makefile
+>>> index 71b4a8af9d4d..9867638896ad 100644
+>>> --- a/scripts/package/Makefile
+>>> +++ b/scripts/package/Makefile
+>>> @@ -44,14 +44,18 @@ tar -cz $(RCS_TAR_IGNORE) -f $(2).tar.gz \
+>>>         $(addprefix $(2)/,$(TAR_CONTENT) $(3)); \
+>>>  rm -f $(2) $(objtree)/.scmversion
+>>>
+>>> +quiet_cmd_updateversion = UPDATEVERSION
+>>> +      cmd_updateversion = \
+>>> +       $(CONFIG_SHELL) $(srctree)/scripts/mkversion > $(objtree)/.tmp_version; \
+>>> +       mv -f $(objtree)/.tmp_version $(objtree)/.version
+>>> +
+>>>  # rpm-pkg
+>>>  # ---------------------------------------------------------------------------
+>>>  rpm-pkg rpm: FORCE
+>>>         $(MAKE) clean
+>>>         $(CONFIG_SHELL) $(MKSPEC) >$(objtree)/kernel.spec
+>>>         $(call cmd,src_tar,$(KERNELPATH),kernel.spec)
+>>> -       $(CONFIG_SHELL) $(srctree)/scripts/mkversion > $(objtree)/.tmp_version
+>>> -       mv -f $(objtree)/.tmp_version $(objtree)/.version
+>>> +       $(call cmd,updateversion)
+>>>         rpmbuild $(RPMOPTS) --target $(UTS_MACHINE) -ta $(KERNELPATH).tar.gz
+>>>         rm $(KERNELPATH).tar.gz kernel.spec
+>>>
+>>> @@ -60,9 +64,7 @@ rpm-pkg rpm: FORCE
+>>>  binrpm-pkg: FORCE
+>>>         $(MAKE) KBUILD_SRC=
+>>>         $(CONFIG_SHELL) $(MKSPEC) prebuilt > $(objtree)/binkernel.spec
+>>> -       $(CONFIG_SHELL) $(srctree)/scripts/mkversion > $(objtree)/.tmp_version
+>>> -       mv -f $(objtree)/.tmp_version $(objtree)/.version
+>>> -
+>>> +       $(call cmd,updateversion)
+>>>         rpmbuild $(RPMOPTS) --define "_builddir $(objtree)" --target \
+>>>                 $(UTS_MACHINE) -bb $(objtree)/binkernel.spec
+>>>         rm binkernel.spec
+>>
+>>
+>>
+>> scripts/mkversion is pretty small.
+>> I think scripts/mkversion can also update .version
+>>
+>> For example,
+>>
+>>
+>>
+>>
+>> if [ ! -f .version ]
+>> then
+>>     version=1
+>> else
+>>     version=$(expr 0$(cat .version) + 1)
+>> fi
+>>
+>> echo $version > .version
+>> echo $version
+>>
+>>
+>>
+>>
+>> Then, remove the duplicated code from the Makefile.
 >
-> "is_reserved_word()" sounds like a boolean function
-> that returns 1 or 0.
-> Maybe, the choice of the function name was not nice.
+>
+>
+> Sorry, please let me think about this carefully.
+>
+> We have simliar code in
+> scripts/link-vmlinux.sh and scripts/mkversion
 
-Yeah, not great name. That's the old name, though - I didn't change
-that part, I just changed how it used to return the token structure
-pointer, which would be NULL when it wasn't a keyword.
+Oh. Looking deeper, running "make binrpm" twice in a row incrediments
+the .version with two. I think we can leave updating version to
+link-mklinux and drop updating .version from
+scripts/packaging/Makefile. The actual use of mkversion is then to
+predict the next version, and we can stop using .version directly in
+builddeb since the build will outdate it.
 
-I actually *should* have made it just return 0 for the "not a keyword"
-case rather than -1, and that would have ended up being semantically
-closer to the old use (because you could treat the return value as a
-boolean, like you could with the token pointer). But it's been
-literally decades since I used bison/flex, and I didn't remember the
-rules for 'enum yytokentype', so I just thought "negative numbers for
-error" was safer. Zero would have been fine, no token can have that
-number anyway (it just means EOF).
-
-And negative wasn't safer, it caused that bug due to the bare boolean
-use I hadn't noticed.
-
-Oh well.
-
-          Linus
+Riku
