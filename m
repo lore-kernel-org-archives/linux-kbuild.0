@@ -1,116 +1,112 @@
 Return-Path: <linux-kbuild-owner@vger.kernel.org>
-Received: from mail-lf0-f47.google.com ([209.85.215.47]:34015 "EHLO
-        mail-lf0-f47.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1751029AbdIKKsv (ORCPT
+Received: from youngberry.canonical.com ([91.189.89.112]:38953 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1751311AbdILKLi (ORCPT
         <rfc822;linux-kbuild@vger.kernel.org>);
-        Mon, 11 Sep 2017 06:48:51 -0400
-Received: by mail-lf0-f47.google.com with SMTP id l196so17466988lfl.1
-        for <linux-kbuild@vger.kernel.org>; Mon, 11 Sep 2017 03:48:51 -0700 (PDT)
-MIME-Version: 1.0
-In-Reply-To: <CAK7LNARdpaJ6q16_XXqkuAC-fP1X=gZQn3Z31dftab702HcUGw@mail.gmail.com>
-References: <20170816110855.6021-1-riku.voipio@linaro.org> <CAK7LNASm98uy4vC7c3UxM10fx422jHwg+QUmadcpc+_TvECqew@mail.gmail.com>
- <CAK7LNARdpaJ6q16_XXqkuAC-fP1X=gZQn3Z31dftab702HcUGw@mail.gmail.com>
-From: Riku Voipio <riku.voipio@linaro.org>
-Date: Mon, 11 Sep 2017 13:48:49 +0300
-Message-ID: <CAAqcGHmSdO_xorBEUnGiG6VuY4VOQd4jfLzKSNQ=DUb1wK-Nww@mail.gmail.com>
-Subject: Re: [PATCH 1/2] scripts/package/Makefile: make revision update a function
-Content-Type: text/plain; charset="UTF-8"
+        Tue, 12 Sep 2017 06:11:38 -0400
+From: Paolo Pisati <paolo.pisati@canonical.com>
+Subject: [PATCH v2] scripts/package: snap-pkg target
+Date: Tue, 12 Sep 2017 12:11:31 +0200
+Message-Id: <1505211091-19295-1-git-send-email-paolo.pisati@canonical.com>
 Sender: linux-kbuild-owner@vger.kernel.org
 List-ID: <linux-kbuild.vger.kernel.org>
-To: Masahiro Yamada <yamada.masahiro@socionext.com>
-Cc: Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>, Michal Marek <mmarek@suse.com>, debian-kernel <debian-kernel@lists.debian.org>
+To: Michal Marek <mmarek@suse.com>, Masahiro Yamada <yamada.masahiro@socionext.com>, =?UTF-8?q?Vin=C3=ADcius=20Tinti?= <viniciustinti@gmail.com>, Behan Webster <behanw@converseincode.com>, Matthias Kaehlcke <mka@chromium.org>
+Cc: linux-kbuild@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On 8 September 2017 at 18:40, Masahiro Yamada
-<yamada.masahiro@socionext.com> wrote:
-> 2017-09-08 2:04 GMT+09:00 Masahiro Yamada <yamada.masahiro@socionext.com>:
->> Hi Riku,
->>
->>
->> 2017-08-16 20:08 GMT+09:00  <riku.voipio@linaro.org>:
->>> From: Riku Voipio <riku.voipio@linaro.org>
->>>
->>> The updated deb-pkg and bindeb-pkg will use the same snippet,
->>> so make it reusable.
->>>
->>> Signed-off-by: Riku Voipio <riku.voipio@linaro.org>
->>> ---
->>>  scripts/package/Makefile | 12 +++++++-----
->>>  1 file changed, 7 insertions(+), 5 deletions(-)
->>>
->>> diff --git a/scripts/package/Makefile b/scripts/package/Makefile
->>> index 71b4a8af9d4d..9867638896ad 100644
->>> --- a/scripts/package/Makefile
->>> +++ b/scripts/package/Makefile
->>> @@ -44,14 +44,18 @@ tar -cz $(RCS_TAR_IGNORE) -f $(2).tar.gz \
->>>         $(addprefix $(2)/,$(TAR_CONTENT) $(3)); \
->>>  rm -f $(2) $(objtree)/.scmversion
->>>
->>> +quiet_cmd_updateversion = UPDATEVERSION
->>> +      cmd_updateversion = \
->>> +       $(CONFIG_SHELL) $(srctree)/scripts/mkversion > $(objtree)/.tmp_version; \
->>> +       mv -f $(objtree)/.tmp_version $(objtree)/.version
->>> +
->>>  # rpm-pkg
->>>  # ---------------------------------------------------------------------------
->>>  rpm-pkg rpm: FORCE
->>>         $(MAKE) clean
->>>         $(CONFIG_SHELL) $(MKSPEC) >$(objtree)/kernel.spec
->>>         $(call cmd,src_tar,$(KERNELPATH),kernel.spec)
->>> -       $(CONFIG_SHELL) $(srctree)/scripts/mkversion > $(objtree)/.tmp_version
->>> -       mv -f $(objtree)/.tmp_version $(objtree)/.version
->>> +       $(call cmd,updateversion)
->>>         rpmbuild $(RPMOPTS) --target $(UTS_MACHINE) -ta $(KERNELPATH).tar.gz
->>>         rm $(KERNELPATH).tar.gz kernel.spec
->>>
->>> @@ -60,9 +64,7 @@ rpm-pkg rpm: FORCE
->>>  binrpm-pkg: FORCE
->>>         $(MAKE) KBUILD_SRC=
->>>         $(CONFIG_SHELL) $(MKSPEC) prebuilt > $(objtree)/binkernel.spec
->>> -       $(CONFIG_SHELL) $(srctree)/scripts/mkversion > $(objtree)/.tmp_version
->>> -       mv -f $(objtree)/.tmp_version $(objtree)/.version
->>> -
->>> +       $(call cmd,updateversion)
->>>         rpmbuild $(RPMOPTS) --define "_builddir $(objtree)" --target \
->>>                 $(UTS_MACHINE) -bb $(objtree)/binkernel.spec
->>>         rm binkernel.spec
->>
->>
->>
->> scripts/mkversion is pretty small.
->> I think scripts/mkversion can also update .version
->>
->> For example,
->>
->>
->>
->>
->> if [ ! -f .version ]
->> then
->>     version=1
->> else
->>     version=$(expr 0$(cat .version) + 1)
->> fi
->>
->> echo $version > .version
->> echo $version
->>
->>
->>
->>
->> Then, remove the duplicated code from the Makefile.
->
->
->
-> Sorry, please let me think about this carefully.
->
-> We have simliar code in
-> scripts/link-vmlinux.sh and scripts/mkversion
+Following in footsteps of other targets like 'deb-pkg, 'rpm-pkg' and 'tar-pkg',
+this patch adds a 'snap-pkg' target for the creation of a Linux kernel snap
+package using the kbuild infrastructure.
 
-Oh. Looking deeper, running "make binrpm" twice in a row incrediments
-the .version with two. I think we can leave updating version to
-link-mklinux and drop updating .version from
-scripts/packaging/Makefile. The actual use of mkversion is then to
-predict the next version, and we can stop using .version directly in
-builddeb since the build will outdate it.
+A snap, in its general form, is a self contained, sandboxed, universal package
+and it is intended to work across multiple distributions and/or devices. A snap
+package is distributed as a single compressed squashfs filesystem.
 
-Riku
+A kernel snap is a snap package carrying the Linux kernel, kernel modules,
+accessory files (DTBs, System.map, etc) and a manifesto file.  The purpose of a
+kernel snap is to carry the Linux kernel during the creation of a system image,
+eg. Ubuntu Core, and its subsequent upgrades.
+
+For more information on snap packages: https://snapcraft.io/docs/
+
+Signed-off-by: Paolo Pisati <paolo.pisati@canonical.com>
+---
+Changes since v1:
+ - slightly improve the messaging
+---
+ .gitignore                         |  5 +++++
+ scripts/package/Makefile           | 14 ++++++++++++++
+ scripts/package/snapcraft.template | 14 ++++++++++++++
+ 3 files changed, 33 insertions(+)
+ create mode 100644 scripts/package/snapcraft.template
+
+diff --git a/.gitignore b/.gitignore
+index 0c39aa2..638c492 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -59,6 +59,11 @@ Module.symvers
+ /debian/
+ 
+ #
++# Snap directory (make snap-pkg)
++#
++/snap/
++
++#
+ # tar directory (make tar*-pkg)
+ #
+ /tar-install/
+diff --git a/scripts/package/Makefile b/scripts/package/Makefile
+index 71b4a8a..cfa1b2d 100644
+--- a/scripts/package/Makefile
++++ b/scripts/package/Makefile
+@@ -99,6 +99,19 @@ bindeb-pkg: FORCE
+ 
+ clean-dirs += $(objtree)/debian/
+ 
++# snap-pkg
++# ---------------------------------------------------------------------------
++snap-pkg: FORCE
++	rm -rf $(objtree)/snap
++	mkdir $(objtree)/snap
++	sed "s@KERNELRELEASE@$(KERNELRELEASE)@; \
++		s@SRCTREE@$(shell realpath $(srctree))@" \
++		$(srctree)/scripts/package/snapcraft.template > \
++		$(objtree)/snap/snapcraft.yaml
++	cd $(objtree)/snap && \
++	snapcraft --target-arch=$(UTS_MACHINE)
++
++clean-dirs += $(objtree)/snap/
+ 
+ # tarball targets
+ # ---------------------------------------------------------------------------
+@@ -143,6 +156,7 @@ help: FORCE
+ 	@echo '  binrpm-pkg          - Build only the binary kernel RPM package'
+ 	@echo '  deb-pkg             - Build both source and binary deb kernel packages'
+ 	@echo '  bindeb-pkg          - Build only the binary kernel deb package'
++	@echo '  snap-pkg            - Build only the binary kernel snap package (will connect to external hosts)'
+ 	@echo '  tar-pkg             - Build the kernel as an uncompressed tarball'
+ 	@echo '  targz-pkg           - Build the kernel as a gzip compressed tarball'
+ 	@echo '  tarbz2-pkg          - Build the kernel as a bzip2 compressed tarball'
+diff --git a/scripts/package/snapcraft.template b/scripts/package/snapcraft.template
+new file mode 100644
+index 0000000..2e7ffc8
+--- /dev/null
++++ b/scripts/package/snapcraft.template
+@@ -0,0 +1,14 @@
++name: kernel
++version: KERNELRELEASE
++summary: Linux kernel
++description: The upstream Linux kernel
++grade: stable
++confinement: strict
++type: kernel
++
++parts:
++  kernel:
++    plugin: kernel
++    source: SRCTREE
++    source-type: git
++    kconfigfile: SRCTREE/.config
+-- 
+2.7.4
+
